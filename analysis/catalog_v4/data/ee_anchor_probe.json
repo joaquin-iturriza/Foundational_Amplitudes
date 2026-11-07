@@ -267,21 +267,21 @@
     "ebeam2": 182.5
    },
    "isr": {
-    "run": "FA-ccin2p3-22907651",
-    "events_returned": 1000,
-    "s_generate": 105.2,
-    "s_per_kept_event": 0.1053,
-    "kept": 0.999,
+    "run": "FA-ccin2p3-4390f747",
+    "events_returned": 10000,
+    "s_generate": 210.4,
+    "s_per_kept_event": 0.021,
+    "kept": 0.9998,
     "below_window": 0.0,
-    "cuts_partonic": 0.001,
+    "cuts_partonic": 0.0002,
     "cuts_lab": 0.0,
     "shat_frac": {
-     "q01": 0.6749667610789416,
-     "q10": 0.9165236406090915,
-     "q50": 0.9991123579766872,
-     "below_0.99": 0.311,
-     "below_0.5": 0.001,
-     "min": 0.38218945508034446
+     "q01": 0.6288798432881249,
+     "q10": 0.9121523248434111,
+     "q50": 0.999535259147306,
+     "below_0.99": 0.2727,
+     "below_0.5": 0.0005,
+     "min": 0.4304733896006912
     },
     "beam_card": {
      "lpp1": "-3",
@@ -290,10 +290,10 @@
     }
    },
    "none": {
-    "run": "FA-ccin2p3-22907651",
-    "events_returned": 1000,
-    "s_generate": 105.1,
-    "s_per_kept_event": 0.1051,
+    "run": "FA-ccin2p3-4390f747",
+    "events_returned": 10000,
+    "s_generate": 195.6,
+    "s_per_kept_event": 0.0196,
     "kept": 1.0,
     "below_window": 0.0,
     "cuts_partonic": 0.0,
@@ -313,20 +313,20 @@
     }
    },
    "isronly": {
-    "run": "FA-ccin2p3-22907651",
-    "events_returned": 1000,
-    "s_generate": 105.2,
-    "s_per_kept_event": 0.1053,
-    "kept": 0.999,
+    "run": "FA-ccin2p3-4390f747",
+    "events_returned": 10000,
+    "s_generate": 210.4,
+    "s_per_kept_event": 0.021,
+    "kept": 0.9996,
     "below_window": 0.0,
-    "cuts_partonic": 0.001,
+    "cuts_partonic": 0.0004,
     "cuts_lab": 0.0,
     "shat_frac": {
-     "q01": 0.6197687920242301,
-     "q10": 0.9195202316221589,
-     "q50": 0.9997030892575799,
-     "below_0.99": 0.295,
-     "below_0.5": 0.001,
+     "q01": 0.6199079238368389,
+     "q10": 0.9099304262074747,
+     "q50": 0.9996128024782298,
+     "below_0.99": 0.277,
+     "below_0.5": 0.0005,
      "min": 0.4061513741185029
     },
     "beam_card": {
