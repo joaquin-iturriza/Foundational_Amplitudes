@@ -14113,6 +14113,18 @@ entries:
       one-rung ladder and NaN, send such events to resonance_draw (unreachable in the 1301 r1 recipes); (5) its docstring''s
       ''same edges'' is wrong (no recoil floor term); (6) build_mixture_dataset and _flat_mcmc_part do not pass mc_solve_tol;
       (7) a gap from before this branch: under flat_grid, an all-fallback channel draw records extra grid columns.'
+  - at: '2026-11-07T05:01:28+00:00'
+    text: '2026-11-07 step 75 r1 check submitted. Design v1 FIX (design reviewer: fill bar scored core bins only, i.e. moved
+      after step 65''s result; no class for held-out outside without a dsh_ pool; no wall/disk), revised: bar = every in-range
+      bin, margin included, >= 0.95, exempt only bins whose lower edge is above the class''s reach (max candidate over all
+      three policies, both seeds); v4_uux_bgtxwp added (19 classes); PASS. Reader multichannel_check.py step75r1 @7abcb409.
+      Repo-reviewer PASS at 7abcb409 (nits: MC_SOLVE_TOL constant unused, _smixr tag keyed on flat_stall alone, resladder
+      edge doc; none reachable with r1 recipes). regen-rev merged 9fa6af37. 38 CPU jobs (19 classes x seeds 42/43; scripts/job_multichannel_check.sh,
+      MCHECK_POLICIES=current+grid_both_res2f_budget12+grid_r1_budget12) at CC 0196253e, --time 00:45:00, target r1_check
+      0.25 h: 45490ecb a4d2920f 9c8d4414 80db53a9 36cba1e1 8927532c 50dec618 c8e649a1 159b6e1b a887d3a7 366dd2a9 33ca285e
+      4c5609c2 08145531 d778bd05 7d804832 10f07108 6da2ba6c e9a35a71 398d5148 f32d8870 4c22ec52 336a1ef2 3e2b3cc7 c8bce610
+      3a3ea92a 1e3b9b9f 50b3e49c c6c38394 8d5a5c56 f7a7ba9c f44964e5 0fe3062c d6d4dd8a 3cebc1cf a0f896ee 19ee5ed5 55e054d8
+      ; wait on step 75. Read: multichannel_check.py step75r1-pull then step75r1 -> data/r1_check.json.'
   handoff:
     state: '2026-11-07 ~05:55. Step 75: profile and where reads done (finding 2026-11-07). Revision r1 implemented on branch
       regen-rev (worktree worktrees/wt-regen-rev @7d00f36c, not merged): mg5_pipeline_final policy keys flat_stall 0.2 (stop
