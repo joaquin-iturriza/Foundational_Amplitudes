@@ -3,15 +3,19 @@
 quota sampler at 12 and at 50; each legend label carries the policy's cost (train-pool replay seconds over the old
 generation-log seconds, mean of the seeds). Reads data/mcmc_check.json (multichannel_check.py step69).
 With the argument grid (plan step 72): data/grid_check.json (multichannel_check.py step72), the channel-grid quota
-sampler at 12 and 8 labels per flat event against the quota sampler at 12 and 50, figs/grid_check_*."""
+sampler at 12 and 8 labels per flat event against the quota sampler at 12 and 50, figs/grid_check_*; with grid_fwd (plan
+step 75) data/grid_fwd_check.json (multichannel_check.py step75), the grids with the forward joint-resonance channel,
+figs/grid_fwd_check_*."""
 import json, os, sys
 import numpy as np
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, ROOT)
 import plot_style as ps
 
-GRID = len(sys.argv) > 1 and sys.argv[1] == "grid"
-D = json.load(open(os.path.join(ROOT, "analysis", "catalog_v4", "data", "grid_check.json" if GRID else "mcmc_check.json")))
+ARG = sys.argv[1] if len(sys.argv) > 1 else ""
+GRID = ARG in ("grid", "grid_fwd")
+OUT = {"grid": "grid_check", "grid_fwd": "grid_fwd_check"}.get(ARG, "mcmc_check")
+D = json.load(open(os.path.join(ROOT, "analysis", "catalog_v4", "data", f"{OUT}.json")))
 LAB = {"v4_uux_epemg": r"$u\bar u\to e^+e^-g$", "v4_uux_epemvevex": r"$u\bar u\to e^+e^-\nu_e\bar\nu_e$",
        "v4_uu_bbxuu": r"$uu\to b\bar b uu$", "v4_us_ddxsu": r"$us\to d\bar d su$",
        "v4_udx_csxvevex": r"$u\bar d\to c\bar s\nu_e\bar\nu_e$"}
@@ -30,4 +34,4 @@ for (fig, ax), (c, o) in zip(figs, D["classes"].items()):
     ax.set_xlabel(r"$\log_{10}|\mathcal{M}|^2$"); ax.set_ylabel("fill")
     ps.legend(ax, "lower left")
     ps.process_label(ax, LAB.get(c, c))
-ps.save_panels(figs, os.path.join(ROOT, "analysis", "catalog_v4", "figs", "grid_check" if GRID else "mcmc_check"))
+ps.save_panels(figs, os.path.join(ROOT, "analysis", "catalog_v4", "figs", OUT))
