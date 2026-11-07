@@ -4797,7 +4797,11 @@ def recipe_output_path(recipe, out_dir):
     # a steered pool (tools/steer_pool.py) has its own tag: it is built from a reference model's
     # sigma, never by this generator, and must not shadow the mixture pool of the same spec
     samp_tag = {"flat": "", "steered": "_ssteer"}.get(mode, "_smix")
-    f_def = float((recipe.get("sampling") or {}).get("f_default", 0))
+    if mode == "mixture" and (recipe.get("sampling") or {}).get("flat_range"):
+        # the flat part filled flat in log|M|^2 over the class's pp range (catalog_coverage step 65): its own file, so
+        # the regeneration never overwrites the pool every earlier read used (same spec, other recipe id)
+        samp_tag += "q"
+    f_def =float((recipe.get("sampling") or {}).get("f_default", 0))
     if f_def > 0:
         samp_tag += f"d{int(round(100 * f_def)):02d}"     # a default-share pool never shadows its catalog's _smix pool
     if recipe.get("mode") == "lhe_pp":
