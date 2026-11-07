@@ -12917,6 +12917,21 @@ entries:
       carry weight. Step 71 re-run: 91.1876 and 3000 GeV already read WORKS (91: 4.5% of events below 0.99 of sqrt(s); 3000:
       CLIC spectrum 41.6% vs ISR alone 29.0%, q10 0.80 vs 0.90, 1.1x the no-spectrum time per kept event); the other 8 on
       the step-71 wait. Repo backlog: 58ec8ab8 (sampling_cost.py ee <policy>) not yet reviewed.'
+  - at: '2026-11-07T00:43:43+00:00'
+    text: '2026-11-07 step 71 re-run read (tools/lhe_probe.py eeisr-read @a4441bb5 -> data/ee_anchor_probe.json, figure figs/ee_anchor_probe:
+      q10 and share of sqrt(s_hat)/sqrt(s) < 0.99 per energy, machine spectrum / ISR only / none). 1000 events of dsh_epem_bbxvevex
+      per run. Every spectrum run returns 1000 events with the banner as asked (lpp1 -3, lpp2 +3, pdlabel per EE_ANCHOR);
+      kept after window and cuts 0.996-1.0. Share below 0.99 (q10) with the anchor spectrum: 91.1876 0.045 (0.995), 160 0.228
+      (0.961), 209 0.217 (0.962), 240 fcce240ll 0.290 (0.927) vs ISR only 0.247 (0.940), 365 fcce365ll 0.311 (0.917) vs 0.295
+      (0.920), 380 0.257 (0.926), 500 ilc500ll 0.434 (0.890) vs 0.282 (0.915), 1000 0.277 (0.910), 1500 0.295 (0.901), 3000
+      clic3000ll 0.416 (0.804) vs 0.290 (0.903); without spectrum 0 (1.0) everywhere. The event shares sit below the leading-log
+      luminosity expectation (0.35-0.43) as sigma weighting predicts, most at the Z pole (0.045: radiation pulls the event
+      off the peak). Time per kept event with spectrum over without: 0.67-1.25x (1.14 at 91, 1.13 at 3000): no COST. Verdicts:
+      WORKS at 9 energies; 365 GeV NO_BEAMSTRAHLUNG by the 0.02 rule: the difference 0.016 is inside the 1000-event spread
+      (+-0.02), banner correct (fcce365ll), so no card fix; re-run at 10000 events (+-0.006) FA-ccin2p3-4390f747, target 0.6
+      h, wait on step 71; if still not above ISR only, 365 takes isronlyll as a recorded gap (FCC-ee''s beamstrahlung at 365
+      GeV is small, circular collider). Next on WORKS: the regeneration design of the 170 e+e- default pools at the anchor
+      energies, cost ~1x the old per kept event, the energy list shown to Joaquin with it.'
   handoff:
     state: '2026-11-07 ~01:00. Steps 69 and 71 have all 20 runs ended clean (E3944, NOT acked: the new owner reads, then acks).
       STEP 69 (cheap flat sampler, D317; <= 2x is the step-69 design''s own bar, D317 names no number): Markov-chain flat
