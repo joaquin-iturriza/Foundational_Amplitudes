@@ -13335,6 +13335,30 @@ entries:
       the queue (yield, complete share, kept under dsh_eea_''s window and cuts: needs a mapping eea_ -> dsh_eea_ accept in
       lhe_probe parts, to add), spectrum share below 0.99 per pool and energy (bbxvevex vs data/ee_anchor_probe.json), core-h
       via lhe_rates --prefix eea_; then stage 2.'
+  - at: '2026-11-07T02:08:47+00:00'
+    text: '2026-11-07 step 72 read (multichannel_check.py step72 @b3ba8b94 -> data/grid_check.json; figure figs/grid_check_a-e
+      via fig_mcmc_check.py grid: fill per in-range 0.25-dex log10|M|^2 bin, seed mean, cost over the old generation in each
+      label). 10 CPU jobs (0a3c7d19 d6afbf50 ab948eed 3f659a1d e32a6f40 49c754da 84ca2133 900855d4 5a859c8c 2baa0d0b) COMPLETED.
+      Verdict PARTIAL at both budgets (fill and cost fail, diversity holds, grids above quota12 on every 2->4 class). Share
+      of in-range bins filled >= 0.95, seeds 42/43, grids12 | grids8 | quota12 | quota50: uux_epemg 1/1 | 1/1 | 1/1 | 1/1;
+      uux_epemvevex 0.936/0.936 | 0.872/0.894 | 0.851/0.851 | 0.979/0.957; uu_bbxuu 1/1 | 0.979/0.979 | 0.896/0.896 | 0.958/0.958;
+      us_ddxsu 1/1 | 1/1 | 0.922/0.922 | 0.980/0.980; udx_csxvevex 0.898/0.898 | 0.857/0.857 | 0.837/0.837 | 0.918/0.939.
+      So the grids fill the QCD classes'' tops at 12 (the 1-1.5 dex quota12 left short) but leave the two electroweak 2->4
+      classes short in their top 1 dex (udx_csxvevex top bin 0.14 at grids12, 0.22 at quota50; uux_epemvevex 0.60). Cost over
+      old (seed 42/43): grids12 uux_epemg 1.01/0.94, uux_epemvevex 1.36/1.99, uu_bbxuu 1.86/2.31, us_ddxsu 3.04/2.14, udx_csxvevex
+      2.26/1.57; grids8 0.87/0.85, 0.97/1.42, 1.26/1.27, 2.26/1.51, 1.62/1.13. Where the time goes (us_ddxsu grids12 seed
+      42): proposal 77 s, labels 55 s, of 144 s; laptop profile: the two ladder channels take 0.57 s per 2916 draws against
+      0.05-0.14 s for the others, 70% in multiperipheral_draw''s bisections (60 halvings, 3 solves, cosh/sinh each). Where-read
+      of the short bins (multichannel_check.py where on the held-out pp events above the short edge, data/quota_where/v4_*_grid72.json):
+      udx_csxvevex above -0.81 (10 events): sqrt(s_hat) 1.4-2.6 TeV (median 1.7 TeV vs 0.28 below), both W and Z on shell
+      (2 pairs near the poles), the Z pair''s |cos theta| 0.9999 (1-|cos| ~1e-4), every final 1-|cos| 1e-2.9..1e-3.6; uux_epemvevex
+      above -1.4 (67): sqrt(s_hat) 0.6-1.5 TeV, the boson pair at |cos| 0.958-0.9999. These are high-energy diboson events
+      with the boson pair along the beam (t-channel quark exchange); the joint-resonance channel (which keeps 70-80% of these
+      classes'' flat events) draws the pair''s direction isotropically, and a 100-bin grid on that uniform number resolves
+      1-|cos| only down to ~0.01, so the 1e-4 corner stays at its isotropic rate. Next (design''s PARTIAL branch, one revision,
+      re-run once): joint-resonance channel with the pair''s direction log-forward (1-|cos theta*| log-uniform, the t-channel
+      pole''s mapping) under the grids, and the ladder''s bisections replaced by a faster exact solve (the COST branch''s
+      proposal fix); the per-channel fill per bin recorded in the re-run.'
   handoff:
     state: '2026-11-07 ~03:00. Step 61 read: NO (data/het_signhead61.json, figs/het_signhead61, het_oneloop.py step61 @66f94590);
       findings recorded. Step 71 done: WORKS at all 10 anchor energies, 365 GeV keeps fcce365ll (finding). Step 73 (het sign
