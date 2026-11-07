@@ -3124,6 +3124,7 @@ def sampling_policy(cfg, role=None):
             if pol.setdefault("flat_grid_smooth", FLAT_GRID_SMOOTH) != FLAT_GRID_SMOOTH:
                 raise ValueError(f"sampling.flat_grid_smooth = {pol['flat_grid_smooth']!r} differs from the code's "
                                  f"{FLAT_GRID_SMOOTH}; the grid refit reads the code's")
+            pol["flat_grid_smooth"] = FLAT_GRID_SMOOTH     # the code's value, however a recipe spelled it
     if pol.get("multichannel"):
         # the multichannel proposal's constants enter the policy, hence the recipe id (absent without multichannel,
         # which no pool built so far sets); the draws read the module constants, so a policy naming another value is
