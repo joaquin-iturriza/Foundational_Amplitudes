@@ -3738,10 +3738,10 @@ entries:
       4ba33195 8a523b67 8b543518 4d6e9b06 a77e20b8, afterok on the prebuild), wait on step 64; read per the passed design
       (joint 12-cell fit, shared-exponent fit, per-width length fits; reused w8 4x/16x trial_1262); quote the prebuild''s
       cache key and one GPU job''s key; record each cell''s GPU.'
-    73: '(l) het sign head, next attempt after step 61''s NO (D296: explore it): sign head on a detached copy of the last
-      block (its gradient never enters the clipped shared update), one seed (D315) against the weight-1 rerun FA-ccin2p3-ac8d6fca
-      and the MSE control at seed 42; implement in a worktree, repo-reviewer, design, design-reviewer, submit. Then, if the
-      sign still lags, the clipping regime (99% of het steps clipped).'
+    73: '(l) het sign head on a detached copy of the last block (model.net.sign_branch, design PASS, merged 4ca404d1), one
+      seed (D315): arm v4_het_signhead_branch seed 42 = FA-ccin2p3-54961d3e (scripts/job_catalog_v3_short.sh -- v4_het_signhead_branch
+      at 411215ce, --time 03:30:00, --mem 16G, target signhead_branch_s42 3.49 h), against the weight-1 rerun FA-ccin2p3-ac8d6fca
+      and the MSE control at seed 42. On end: read by step 61''s rules (het_oneloop.py step73).'
     76: '(o) step 76: mixed-pair mass cut (lhe.mixed_pair_mmin -> MadEvent dummy_cuts) merged, recipes carry it for dsh_eea_epem_accxh/aepemh;
       18 probes (scripts/job_lhe_probe.sh PROBE_SHARD=eeisr PROBE_VARIANTS=isr, 1000 events, both pools x 9 energies, target
       mmin_probe 0.3 h) queued at CC. On end: python tools/lhe_probe.py eeisr-read <the 9 runs of a pool> --out analysis/catalog_v4/data/ee_mmin_probe_<pool>.json
