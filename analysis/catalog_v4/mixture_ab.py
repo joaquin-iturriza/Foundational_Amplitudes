@@ -1519,11 +1519,14 @@ def warm_wsd():
     if not S15["B_wsd"]:
         sys.exit("warm_wsd: S15 B_wsd not filled")
 
-    def pair(num, den):
-        row = {"run": num, "over": den}
+    same = dict(sp["max_d_same_data"]); same.update({r: max(same["PP4"], same["EE4"]) for r in ("held", "HD4", "HD5")})
+
+    def pair(num, den, width=w):
+        # den: a run id, or {read: run id} (B: its held-out reads sit on its training run)
+        row = {"run": num, "over": den, "widening": width}
         for read in ("PP4", "EE4", "held", "HD4", "HD5"):
-            r, cr = _one(num, den, read, cls)
-            row[read] = None if r is None else r_with_interval(cr, math.exp(w[read]))
+            r, cr = _one(num, den[read] if isinstance(den, dict) else den, read, cls)
+            row[read] = None if r is None else r_with_interval(cr, math.exp(width[read]))
         return row
     out = {"design": "plan warm_start step 15 (D319, D315)", "B_wsd": S15["B_wsd"], "widening": w, "arms": {}}
     for name, run in S15["arms"].items():
@@ -1536,11 +1539,18 @@ def warm_wsd():
                               "SHORT" if max(x["widened"][0] for x in d) > 1 else "INCONCLUSIVE")
     out["B_wsd_over_B"] = pair(S15["B_wsd"], S14["B"])
     if S15["arms"]["wsdfinal_default50"]:
-        rb = out["restart_over_branch50"] = pair(S15["arms"]["wsdfinal_default50"], S15["arms"]["wsdbranch50"])
+        # same parent and data: the same-data width, as step 14's branch_over_wsdfinal
+        rb = out["restart_over_branch50"] = pair(S15["arms"]["wsdfinal_default50"], S15["arms"]["wsdbranch50"], same)
         out["restart_as_good_as_branch"] = all(rb[r] is not None and 1 / 1.05 <= rb[r]["R"] <= 1.05
                                                for r in ("PP4", "EE4"))
-    bl = blowups([S15["B_wsd"]] + [r for r in S15["arms"].values() if r])
+    bl = blowups([S15["B_wsd"], S14["B"]["PP4"]] + [r for r in S15["arms"].values() if r])
     out["blowups"] = {"flagged": bl["flagged"], "spiked_recovered": bl["spiked_recovered"]}
+    if bl["flagged"]:   # a verdict is withheld while a run read blew up or is unchecked (blowups)
+        for row in out["arms"].values():
+            if "outcome" in row:
+                row["outcome_withheld"] = row.pop("outcome")
+        if "restart_as_good_as_branch" in out:
+            out["restart_as_good_as_branch_withheld"] = out.pop("restart_as_good_as_branch")
     json.dump(out, open(os.path.join(DATA, "warm_start_S15.json"), "w"), indent=1)
 
     def strip(x):
