@@ -14211,6 +14211,23 @@ entries:
       2.20-2.72, v4_dbx_hhtxu 2.17, v4_dbx_ahtxu 2.12-2.19, v4_uc_cuvevex 2.24-2.29, v4_us_ddxsu 2.27, v4_uu_bbxuu 2.01-2.37.
       Next by the design''s NO branch: one revision r2 (top-margin channel reach, the outside event''s distance, labels vs
       proposal on the 6 costly classes), its own design and review.'
+  - at: '2026-11-07T05:48:08+00:00'
+    text: '2026-11-07 step 75 r2 analysis of the r1 check (multichannel_check.py step75r2-where @7e3cfcd0 -> data/r1_where.json;
+      chunk quotas, kept and candidates per channel summed over the 36 chunks of each class and seed). Short top-margin bins
+      are reached only by the multiperipheral edge ladder (mperi edge) and the resonance ladders (resl), and their chunks
+      end on the label budget or the stall stop: v4_uu_bbxuu [5.127] fill 0.65 (17-21 of 36 chunks short, budget stop in 17-21
+      chunks; candidates there mperi edge 529-691, resl Z 150-547), v4_us_ddxsu [5.285] 0.82-0.86 (9-12 chunks short; mperi
+      edge 1169-1292), v4_bb_bbvevex [1.608] 0.93 (resl Z only, 1605-1698 candidates, 4-5 budget stops), v4_ug_auuux [2.995]
+      0.93-0.95 (mperi edge 1175-1530), v4_bbx_ccxh [-3.809] 0.46-0.62 (the Z resonance channel res, 544-1150 candidates,
+      stall 3-4 chunks), v4_uux_bgtxwp [-1.206] 0.36-0.46 (top-resonance ladder only, 3459-4403 candidates, 10% kept, stall
+      18-25 chunks) and its top bin [-0.96] with no r1 candidate (the step-65 policy drew 7-9 there). The two 2->2 classes
+      (v4_bb_bb, v4_ddx_ttx) are one chunk each with stall stops; their zero bottom bins have no candidate of any policy.
+      Cost: the 6 classes over 2x end every chunk on quota (hhtxu, ahtxu) or mostly so: label 16-100 s plus proposal 17-33
+      s of 109-200 s per job; the old sampling''s split is not recorded (no quota chunks), so labels vs proposal against it
+      needs its own timing. Candidate r2 changes: (1) the reader exempts bins below the least candidate of any policy and
+      seed (the reach rule''s mirror); (2) the flat part''s channel weights per bin: route the stalled chunks'' rounds to
+      the channels that hold candidates in the short top bins (mperi edge, resl, res) instead of ending on stall/budget; (3)
+      cost: the proposal of mc_mperi_all on hhtxu/ahtxu (r1 2.12-2.19 against the step-65 policy''s 1.89-1.93).'
   handoff:
     state: '2026-11-07 ~07:00. Step 75: r1 check design FIX once (core-only fill bar; no no-dsh_ outside class), revised (all
       in-range bins incl. margin, exempt only bins above the class''s reach; +v4_uux_bgtxwp, 19 classes), design PASS, repo
