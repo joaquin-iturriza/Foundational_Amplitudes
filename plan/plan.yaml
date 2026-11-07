@@ -12879,6 +12879,20 @@ entries:
       209 f40181a9, 240 c2a64023, 365 22907651, 380 46cfc529, 500 29c4405a, 1000 32c90fcc, 1500 d5062c3c, 3000 045ca31e; target
       0.6 h; reader tools/lhe_probe.py eeisr-read @47b9ea78. The design''s fixed ''lpp1 +3, lpp2 -3'' becomes lpp1 -3, lpp2
       +3 (the process string''s order).'
+  - at: '2026-11-07T00:34:25+00:00'
+    text: '2026-11-07 step 67 (g) e+e- forward check read (multichannel_check.py pull/summary/coverage, fig_quota_fill.py
+      ee -> figs/ee_quota_fill_a-d + legend, sampling_cost.py ee quota_ladder_both_res2_fwdfree_budget750 -> data/sampling_cost_ee_quota_ladder_both_res2_fwdfree_budget750.json;
+      8 CPU jobs 99c626bb 668b44ae c614f966 9facd90d 918b84df 9a1f489d 3a819881 9726c7c1, seeds 42/43). Question: does letting
+      finals go forward uncut down to 1-|cos|=1e-8 (fwd_free_floor) fill the top of the e+e- log|M|^2 range at budget 750?
+      Per class, ''edge'' = the lower edge of the first in-range bin below 0.95 (seeds 42, 43), budget 750 without -> with
+      the forward switch: nu_mu nu_mu~ Z -0.14/-0.14 -> every bin filled on both seeds (YES, held-out outside kept 0/0); tau+
+      tau- nu_e nu_e~ -3.00/-3.00 -> filled / 0.22 (shift 4.2/3.2 dex, PARTIAL); b b~ nu_e nu_e~ -2.70/-2.45 -> -2.20/-2.20
+      (0.5/0.25 dex, NO; top in-range bins 0.4-0.7 of quota); gamma H nu_e nu_e~ -6.11/-6.11 -> -5.37/-5.37 (0.74 dex, NO;
+      held-out events outside the kept range 43/31 -> 0/0). Control (budget 750 without the switch) reproduces step 66 on
+      every class and seed. Cost, train replay over ''current'' in the same job: 103x, 103x, 107x for tautau/bb/gammaH (1.8x
+      for nu nu Z, whose quota fills in the first rounds); upper estimate for the 170 e+e- classes 324 core-h against 3.38
+      old. So the forward switch is the missing region for the Z and tau classes, but at budget 750 (~100x, refused by D317);
+      it enters step 72''s sampler as a channel option, not as a budget.'
   handoff:
     state: '2026-11-07 ~01:00. Steps 69 and 71 have all 20 runs ended clean (E3944, NOT acked: the new owner reads, then acks).
       STEP 69 (cheap flat sampler, D317; <= 2x is the step-69 design''s own bar, D317 names no number): Markov-chain flat
