@@ -25,13 +25,14 @@ if [ "$PROBE_SHARD" = eeisr ]; then
     # PROBE_ENERGY with the machine's ISR (+ beamstrahlung) spectrum (lhe_probe run --ee-isr) beside the same run
     # without it (the ee4_ pools' setting), in parallel; PROBE_EVENTS events each (default 1000)
     # at an energy whose spectrum adds beamstrahlung (EE_ANCHOR not isronlyll), a third run with ISR alone (same
-    # class, energy and seed), so the beamstrahlung part is seen apart from the ISR one; one core per run
+    # class, energy and seed), so the beamstrahlung part is seen apart from the ISR one; one core per run; PROBE_TIMEOUT
+    # seconds per run (default 720; the first ISR runs' surveys alone took 465-720 s, 2026-11-07)
     PD=$(python -c "import sys; sys.path.insert(0, 'recipes'); import gen_catalog_v4_default as g; print(g.EE_ANCHOR[float(sys.argv[1])])" "${PROBE_ENERGY:?}")
     V="isr none"; [ "$PD" != isronlyll ] && V="isr none isronly"
     for v in $V; do
         F=; [ $v = isr ] && F=--ee-isr; [ $v = isronly ] && F="--ee-isr --patch pdlabel=isronlyll"
         python tools/lhe_probe.py run --process "${PROBE_PROCESS:?}" --energy "${PROBE_ENERGY:?}" \
-            --events "${PROBE_EVENTS:-1000}" $F > "eeisr_${PROBE_ENERGY}_$v.log" 2>&1 &
+            --events "${PROBE_EVENTS:-1000}" --timeout "${PROBE_TIMEOUT:-720}" $F > "eeisr_${PROBE_ENERGY}_$v.log" 2>&1 &
     done
     wait
     for v in $V; do grep -h PROBE_JSON "eeisr_${PROBE_ENERGY}_$v.log" | sed "s/^PROBE_JSON /EEISR_JSON $v /"; done

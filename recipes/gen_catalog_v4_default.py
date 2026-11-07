@@ -76,11 +76,17 @@ EE_ANCHOR = {91.1876: "isronlyll", 160.0: "isronlyll", 209.0: "isronlyll", 240.0
              380.0: "isronlyll", 500.0: "ilc500ll", 1000.0: "isronlyll", 1500.0: "isronlyll", 3000.0: "clic3000ll"}
 
 
-def ee_beam_patches(energy, pdg_beams=(-11, 11)):
+def ee_beam_patches(energy, proc_str):
     """The run-card values of an e+e- run at collider energy `energy` (a key of EE_ANCHOR) with its machine's ISR
-    (+ beamstrahlung) spectrum: lpp1/lpp2 (+3 electron, -3 positron, by the process's beam order), pdlabel, ebeam1/2"""
-    lpp = {11: 3, -11: -3}
-    return {"lpp1": lpp[int(pdg_beams[0])], "lpp2": lpp[int(pdg_beams[1])], "pdlabel": EE_ANCHOR[float(energy)],
+    (+ beamstrahlung) spectrum: lpp1/lpp2 (+3 electron, -3 positron) by the beam order of the MadGraph process string
+    `proc_str` (its first two particles, as MadEvent orders the beams), pdlabel, ebeam1/2. The pool's pdg_ids are not
+    the beam order (ee4_/dsh_ pools generate 'e+ e- > ...' and list [11, -11, ...]): taking them gave lpp1 +3 to the
+    positron beam and a zero cross section (step 71's first probe, 2026-11-07)."""
+    lpp = {"e-": 3, "e+": -3}
+    b = proc_str.split(">")[0].split()
+    if len(b) != 2 or any(x not in lpp for x in b):
+        raise ValueError(f"ee_beam_patches: beams of {proc_str!r} are not e+/e-")
+    return {"lpp1": lpp[b[0]], "lpp2": lpp[b[1]], "pdlabel": EE_ANCHOR[float(energy)],
             "ebeam1": float(energy) / 2.0, "ebeam2": float(energy) / 2.0}
 EE_CARDS = "recipes/catalog_v4_ee"
 PP_CARDS = "recipes/catalog_v4_pp"

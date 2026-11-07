@@ -439,7 +439,7 @@ def cmd_run(a):
         if a.ee_isr:     # the collider anchor's beam spectrum at this energy (recipes/gen_catalog_v4_default.EE_ANCHOR)
             sys.path.insert(0, os.path.join(ROOT, "recipes"))
             from gen_catalog_v4_default import ee_beam_patches
-            patches.update(ee_beam_patches(a.energy, cfg["pdg_ids"][:2]))
+            patches.update(ee_beam_patches(a.energy, cfg.get("proc_str") or cfg["mg5_generate"][0].split(None, 1)[1]))
         run_card, param_card = mg.lhe_cards(cfg)
         shutil.copy2(param_card, f"{ev}/Cards/param_card.dat")
         shutil.copy2(run_card, f"{ev}/Cards/run_card.dat")
