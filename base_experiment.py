@@ -1745,8 +1745,7 @@ class BaseExperiment:
                     loss.backward()
                 if self.cfg.training.clip_grad_value is not None:
                     torch.nn.utils.clip_grad_value_(self.model.parameters(), self.cfg.training.clip_grad_value)
-                gn = torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.cfg.training.clip_grad_norm,
-                                                    error_if_nonfinite=False)
+                gn = self._clip_grad_norm(self.cfg.training.clip_grad_norm)
                 if not torch.isfinite(gn):
                     continue
                 self.optimizer.step()
@@ -1762,6 +1761,49 @@ class BaseExperiment:
         if moved != 0.0:      # an optimizer whose lr-0 step is not a no-op (e.g. ScheduleFree's averaging)
             raise RuntimeError(f"moment fill changed the starting weights by {moved:.3g}: "
                                f"{type(self.optimizer).__name__} does not stand still at lr 0")
+
+    def _clip_grad_norm(self, max_norm):
+        """clip_grad_norm_ over the model's parameters; returns the pre-clip norm. With model.net.sign_branch the
+        sign branch (MuPTransformer.sign_block and the readout's sign row) is clipped as a separate group at the same
+        max norm and the rest as before, so the sign gradient neither enters nor shrinks the shared update. The sign
+        row is a row of linear_out: the rows of a Linear are independent and that row's gradient comes from the sign
+        path alone (MuPTransformer.forward drops the main readout's sign column), so it is moved to the sign group by
+        row. The returned norm is the rest's (train_grad_norm keeps its meaning), non-finite when the sign group's is,
+        so the NaN guard still skips the step."""
+        cache = getattr(self, "_sign_branch_net", None)
+        if cache is None or cache[0] is not self.model:      # rebuilt if the model object is replaced
+            net = next((m for m in self.model.modules() if getattr(m, "sign_branch", False)
+                        and hasattr(m, "sign_block")), None)
+            cache = self._sign_branch_net = (self.model, net)
+        net = cache[1]
+        if net is None:
+            return torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm, error_if_nonfinite=False)
+        k = net.sign_index
+        side_ids = {id(p) for p in net.sign_block.parameters()}
+        main = [p.grad for p in self.model.parameters() if p.grad is not None and id(p) not in side_ids]
+        side = [p.grad for p in net.sign_block.parameters() if p.grad is not None]
+        rows = []
+        for p in (net.linear_out.weight, net.linear_out.bias):
+            if p is not None and p.grad is not None:
+                rows.append((p.grad, p.grad[k].clone()))
+                p.grad[k] = 0.0                              # out of the main norm, back below at the sign scale
+
+        def _norm(gs):
+            if not gs:
+                return torch.zeros((), device=next(self.model.parameters()).device)
+            return torch.linalg.vector_norm(torch.stack([torch.linalg.vector_norm(g.float()) for g in gs]))
+
+        gn = _norm(main)
+        gs = _norm(side + [r for _, r in rows])
+        cm = torch.clamp(max_norm / (gn + 1e-6), max=1.0)   # torch.nn.utils.clip_grad_norm_'s coefficient
+        cs = torch.clamp(max_norm / (gs + 1e-6), max=1.0)
+        for g in main:
+            g.mul_(cm.to(g.dtype))
+        for g in side:
+            g.mul_(cs.to(g.dtype))
+        for g, r in rows:
+            g[k] = r * cs.to(r.dtype)
+        return gn + 0.0 * gs
 
     def _step(self, data, step):
         # actual update step
@@ -1785,11 +1827,7 @@ class BaseExperiment:
                 self.cfg.training.clip_grad_value,
             )
         # rescale gradients such that their norm matches a given number
-        grad_norm_t = torch.nn.utils.clip_grad_norm_(
-            self.model.parameters(),
-            self.cfg.training.clip_grad_norm,
-            error_if_nonfinite=False,
-        )
+        grad_norm_t = self._clip_grad_norm(self.cfg.training.clip_grad_norm)
 
         # --- materialise the per-step scalars (the one unavoidable D2H sync) ---
         # train_grad_norm is always logged, so grad_norm must be read every step;

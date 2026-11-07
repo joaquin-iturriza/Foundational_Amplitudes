@@ -129,6 +129,7 @@ net:
                              # readout is already per-event. false = old per-particle softplus then
                              # mean-pool (sigma = mean_i softplus(z_i)), which COMPRESSES sigma's
                              # dynamic range -> reliability slope ~1.5, tail under-predicted ~2.75x.
+  sign_branch: false   # HETEROSC + sign head + sigma_after_pool: the sign logit from a copy of the last block on detached features and frames, clipped apart
   sign_channel: false  # set by experiment.init_data under HETEROSC + training.sign_head: readout rows [mu, sign, sigma]
   detach_sigma_backbone: false   # HETEROSC only: sigma reads DETACHED backbone features so
                                  # the backbone gets only mu's (pure-MSE, beta=1) gradient and
