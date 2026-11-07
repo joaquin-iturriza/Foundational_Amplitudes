@@ -15105,6 +15105,11 @@ entries:
       and seed sixth-revision time/old against fifth-revision time/old: 20 of 38 above the diagonal, most on it. Next by the
       design''s PASS: regenerate the 1301 hadronic classes with R6 (_smixw), waiting on Joaquin''s straddling-bin answer and
       his summed-vs-per-class cost bar call.'
+  - at: '2026-11-07T11:46:12+00:00'
+    text: '2026-11-07 11:45 Joaquin''s weekend hold D322 (''pause the parallel work for the weekend ... We leave what''s running
+      running, analyze it, and that''s it for now''): no new designs or submissions on catalog_coverage, warm_start, agent_redesign,
+      v3_prep_explore. What already runs is read when it ends: the deeper sign-branch run FA-ccin2p3-22bc476d (step 81) and
+      the scaling-grid runs (steps 64/70). Then stop. Regeneration step 82 also waits on the open scope question.'
   handoff:
     state: '2026-11-07 ~11:00. Step 79 r5 read (data/r5_check.json, r5_acted.json, figs/r5_check.png): FAIL on fill only:
       bbxuu back at quota (35/36 chunks bitwise r2 under _chunk_sig), bgtxwp [-1.206,-0.96] 0.867/0.870 (r3 0.925/0.917),
