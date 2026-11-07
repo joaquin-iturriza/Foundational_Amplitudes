@@ -14378,6 +14378,29 @@ entries:
       18 tasks, est 0.3 core-h (measured rates), longest task 0.02 h. 2 workers (site pick: CC, one wave; 16 cores each, --time
       00:45:00, target mmin_pools 0.1 h): FA-ccin2p3-76d5f550, FA-ccin2p3-1b593ca6 (scripts/job_lhe_parts.sh LHE_QUEUE=catalog_v4_dsh_eea
       @68c275df); step 76 waits on them. On end: lhe_parts status (assembled 115 of 115), yields --by-energy for short runs.'
+  - at: '2026-11-07T06:54:42+00:00'
+    text: '2026-11-07 step 78 r2 check read (multichannel_check.py step75r2 @adfa3b35 -> data/r2_check.json; 38 jobs, 19 classes
+      x seeds 42/43, r2 = r1 + keep extremes + stall patience 2 + label budget 18, against r1 and the old sampling in the
+      same job): verdict NO on fill only. OUTSIDE: 0 held-out in-support pp events outside the kept range on every class and
+      seed (r1 in the same jobs: 2, the bbx_htaptam event at both seeds; r2 kept max -4.4745/-4.4747 now above the held-out
+      top -4.4859). COST: summed over the 38 jobs r2 1.527x the old sampling (bar 2x: pass; r1 1.527x in the same jobs); per
+      class median 1.78, 15 of 38 class-seeds over 2x (r1 14): bbx_htaptam 3.02 (seed 42), uux_bgtxwp 2.97-2.98, uc_cuvevex
+      2.67, bbx_ccxh 2.63-2.64, us_ddxsu 2.62 (s42), uu_bbxuu 2.49-2.50, bb_bbvevex 2.32-2.37, dbx_hhtxu 2.13-2.21, dbx_ahtxu
+      2.11-2.17. FILL: every r1 short top-margin bin now fills >= 0.95 (uu_bbxuu 5.127, us_ddxsu 5.285, bb_bbvevex 1.608,
+      ug_auuux 2.995); three classes short in one bin each, at both seeds: bb_bb [8.34, 8.585] 0.147/0.189 (straddles the
+      reach 8.382: 16.4% of the bin''s width reachable), bbx_ccxh [-3.809, -3.56] 0.865/0.77 (straddles the reach -3.795:
+      5.7% reachable; r1 0.62/0.46), uux_bgtxwp [-1.206, -0.96] 0.734/0.79 (r1 0.36/0.46). bgtxwp is a real short: the reader''s
+      reach (-1.025, from the r2 job''s three policies) lies inside that bin, but the step-65 policy drew candidates up to
+      -0.939/-0.973 in the r1 job (data/r2_where.json, step78-where @adfa3b35), so the whole bin is reachable and the straddling
+      bin is the next one [-0.96, -0.714] (9%). Channel-by-bin (r2_where.json + per chunk): under r2 the bin is filled by
+      the top resonance ladder resl [0,3] only (13711-15461 candidates); 25 of 36 chunks fill it to quota with 111-937 candidates
+      each, while 10-11 chunks get 0-4 candidates and stop on the stall rule after 4 rounds: bimodal per chunk, so the miss
+      is steering, not budget. Cause in flat_quota_weights: an empty bin''s deficit goes evenly to every candidate of the
+      nearest occupied bin (~900 in [-1.452, -1.206]), so a chunk whose first round put nothing in [-1.206, -0.96] never steers
+      its proposal toward that bin''s edge. The step-65 policy reached the top through res [0,1,3] (the three-leg top resonance;
+      306-415 candidates in that bin, kept 76-98), which r1/r2''s channel shares leave at 0-1 candidates there. Next by the
+      design''s NO branch: a revision r3 of the steering of empty bins; the straddling-bin question to Joaquin now covers
+      bb_bb 8.34 and bbx_ccxh -3.809 (and bgtxwp -0.96, exempt by r2''s reader).'
   handoff:
     state: '2026-11-07 ~08:00. Step 78 (r2 sampler check): r2 = r1 + flat_keep_ext + flat_stall_patience 2 + flat_budget 18
       merged 56b3c909 (repo + design PASS; cost bar = summed seconds over the 38 jobs <= 2x current, per class listed); 38
