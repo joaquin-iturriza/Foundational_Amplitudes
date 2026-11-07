@@ -14778,6 +14778,20 @@ entries:
       reviewed. Figure analysis/catalog_v4/figs/r4_check.png (r2_check_fig.py r4 @f24bfe10): (a) fill per bin against log|M|^2
       minus the reach, r3 dashed, r4 solid, four short classes; (b) per class and seed r4 time / old against r3 time / old
       (14 of 38 above equal cost).'
+  - at: '2026-11-07T09:19:07+00:00'
+    text: '2026-11-07 step 81 (r5) submitted. r5 = r3 + flat_empty_near_min: r3''s nearest-candidate steering of an empty
+      quota bin acts only where the nearest occupied bin(s) hold more candidates than the bin''s deficit, r2''s rule (every
+      candidate of that bin) otherwise. Reason: on both short classes the fill moved with how few candidates carry an empty
+      bin''s deficit (bbxuu top bin r2 1.0, r3 0.90/0.80, r4 0.70/0.72; bgtxwp [-1.206,-0.96] 0.73/0.79, 0.925/0.917, 0.835/0.809);
+      bbxuu''s nearest occupied bin is itself short (count < quota 18), so r3''s 18 nearest reached below it, while bgtxwp''s
+      holds ~900 (class total; design reviewer: per chunk it may be small in early rounds, read bins_empty_small first). Round-2
+      missing on bbxuu (design reviewer''s count, 36 chunks per seed, round 1 identical): r2 41-126 (median 81) / 58-102 (84.5),
+      r3 92-133 (107.5) / 95-127 (107.5), r4 102-146 (123) / 107-146 (126); r3 above r2 in 36/36 chunks at both seeds. Branch
+      sampler-r5 @d9fb42a2 (design PASS, repo-reviewer PASS), merged c40ab06d, synced CC. 38 CPU jobs (scripts/job_multichannel_check.sh
+      MCHECK_POLICIES=current+grid_r3_budget18+grid_r5_budget18, 19 classes x seeds 42/43, --time 00:45:00, --mem 8G, target
+      r5_check 0.2 h) at c40ab06d; 21 of the first 38 parallel submissions timed out on ssh and were resubmitted 3 at a time;
+      two timed-out ones reached slurm unregistered (62998652, 62998654: same code and class-seed as a registered job, deterministic,
+      so at most a duplicate write of identical output). Step 79 waits on them.'
   handoff:
     state: '2026-11-07 ~10:00. Flat sampler: r3 (r2 + flat_empty_near) NO (data/r3_check.json @014b20a0, figs/r3_check.png):
       bgtxwp [-1.206,-0.96] 0.925/0.917 (r2 0.73/0.79), uu_bbxuu regressed to 0.90/0.80 (r2 1.0). r4 (r3 + flat_empty_unique,
