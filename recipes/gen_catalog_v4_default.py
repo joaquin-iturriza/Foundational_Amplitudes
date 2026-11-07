@@ -222,7 +222,12 @@ def dsha_short(lhe, y, by_e, name):
     completeness per energy): moved whole to complete gridpack runs of EEA_SHORT_RUN (eea_short's rule for a pool
     whose runs integrated on their own; its parts are not reused), each energy's runs sized from the complete share
     stage 2's runs measured at that energy over every pool (complete over runs), COMPLETE_SHARE x RUN_SAFETY where it
-    has none."""
+    has none. Whole, not only the short energies: lhe.gridpack and the events' identity are per pool, so a pool cannot
+    keep its one-run parts at some energies and draw gridpack runs at others. The share counts every stage-2 run at that
+    energy, these pools' own short runs of ~6500 events among them (gridpack runs of 200 are not split out in the
+    yields file): lower than the 200-event runs' own, so a run or two more per energy, never fewer. Time: stage 2's 370
+    gridpacks at this precision took median 52 s, at most 1109 s on 16 cores (worker logs); epepemem's and aepemz's
+    short high-energy runs took 3372-3793 s for one run of ~7000 events, inside a 2 h worker."""
     if lhe.get("gridpack"):
         raise SystemExit(f"{name}: a gridpack pool in {DSHA_YIELDS}: only one-run pools are relaid")
     if y.get("energy") and sorted(set(float(e) for e in y["energy"])) != sorted(float(E) for E in lhe["energies"]):
@@ -281,6 +286,8 @@ def anchor_pools(mg, P, T, trees, is_ee, ee_lhe, ee, dsh, rates, med, kept, comp
                 isr = r.get("isr") or {}
                 if isr.get("kept") is None or not isr.get("events_returned"):
                     raise SystemExit(f"{name}: no kept fraction at {E} GeV in {mm}")
+                if isr.get("mixed_pair_mmin") != float(mg.V4_CUTS["ee"]["m_min"]):     # a probe made without the cut
+                    raise SystemExit(f"{name}: {mm} at {E} GeV was not probed with the mixed-pair cut")
                 m1["kept_by_energy"][f"{float(E):g}"] = float(isr["kept"])
                 m1["yield"] = min(m1["yield"], float(isr["events_returned"]) / float(isr["events_asked"]))
             if sorted(m1["kept_by_energy"], key=float) != [f"{float(E):g}" for E in Es]:
