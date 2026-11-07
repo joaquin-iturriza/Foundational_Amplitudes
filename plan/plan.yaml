@@ -3742,16 +3742,6 @@ entries:
       block (its gradient never enters the clipped shared update), one seed (D315) against the weight-1 rerun FA-ccin2p3-ac8d6fca
       and the MSE control at seed 42; implement in a worktree, repo-reviewer, design, design-reviewer, submit. Then, if the
       sign still lags, the clipping regime (99% of het steps clipped).'
-    74: '(m) e+e- default pools at the collider anchor energies (step 71 WORKS at all 10, data/ee_anchor_probe.json @901d600f;
-      D318, D320). Read 2026-11-07: ee_beam_patches/EE_ANCHOR are wired only into tools/lhe_probe.py (--ee-isr); production
-      (tools/lhe_parts.py runs, recipes/gen_catalog_v4_default.py EE_ENERGIES = 91.1876 240 365 500 1000 3000, no ISR, run
-      card recipes/catalog_v4_ee) does not use them. To do: (1) wire the per-energy beam patches into the lhe_parts run builder
-      for ee4_/dsh_ e+e- pools; (2) new pool names so the 169 ee4_ test pools that every EE4 read so far used are not overwritten
-      (old reads stay comparable); (3) design: what is regenerated (169 ee4_ test pools of 2000 events, 115 dsh_ pools that
-      reuse ee4_), at the 10 anchor energies with equal shares; cost from the old runs (ee4_ 22 core-h, longest pool 1.05
-      h; dsh_ e+e- 82 core-h, longest 14.1 h; tools/regen_time.py, lhe_rates_dsh_ee4.json) times the spectrum''s 0.67-1.25x
-      per kept event, plus 4 more surveys per pool (465-720 s each in the probe); (4) show Joaquin the energy list with it;
-      then the e+e- flat ranges for step 68 (pp_support.py pull ee, tools/flat_range.py).'
     76: '(o) step 76: cause found (mixed-pair mass cut, data/ee_cutread160.json). Fix on branch ee-mixcut (worktrees/wt-ee-mixcut
       @00e59616: lhe.mixed_pair_mmin -> MadEvent dummy_cuts; set on dsh_eea_epem_accxh/aepemh), repo review sent to repo-reviewer
       aa4bae7d4383c3f5a. On PASS: merge, regenerate recipes (gen_catalog_v4_default.py), probe both pools at their energies
@@ -12071,11 +12061,6 @@ entries:
       if:
       - 'SIGN NOT WORSE THAN MSE, MAGNITUDE AS RERUN: adopt the detached head'
       - 'NO: clipping regime next'
-    74:
-      feeds: the e+e- pools of the regeneration (D318, D320)
-      if:
-      - 'design PASS: submit the e+e- default-pool queue at the width site pick offers'
-      - 'design FIX: revise once'
     76:
       feeds: whether the two pools join the e+e- anchor default shares
       if:
