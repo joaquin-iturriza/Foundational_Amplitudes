@@ -10496,6 +10496,19 @@ entries:
       the short bins (which channel and dimensions their candidates came from), one revision (more grid bins or a pairwise
       grid on the ladder''s pT/eta), re-run once. NO (grids not above quota12, or diversity fails) -> dead end recorded; next
       attempt a cell-splitting (foam) or normalising-flow proposal on the same harness.'
+    passed_at: '2026-11-07T00:31:38+00:00'
+    reviewer: 'Step 72 channel-grid quota sampler: grid12 vs quota12 differ only in sampling.flat_grid (same job, node, commit,
+      class, seed; read 08458603 diff), grid8 judged by absolute rules; check 2: toy re-run here (tests/test_flat_grid.py
+      @08458603) grid12 fill 1.000, bins>=0.95 1.00 at 18000 labels vs quota12 0.915/0.87 at 24000, dup 0.0; step 69 data
+      (mcmc_check.json) separate quota12 from quota50 by share>=0.95 0.85/0.90/0.92/0.84 vs 0.98/0.96/0.98/0.92 and min bin
+      fill 0.03-0.15 vs 0.21-0.85; check 3: seed 42 vs 43 share>=0.95 identical for quota12 on every class, quota50 within
+      0.02, against the 0.08-0.16 gap to close, rules required on both seeds, 2 seeds as sibling steps 67/69; outcomes YES/COST/PARTIAL/NO
+      stated with thresholds; no training, HPO or GPU (checks 9, 11-13 n/a), disk small (step-69 reads 55-275 kB, temp replays);
+      held-out events are the pp default in-support events D294 names. Note: quota12 already costs 2.2-3.5x on the QCD/EW
+      2->4 classes, so COST is a likely outcome, which the design routes via t_propose/t_label and the budget-8 row. Searched:
+      VEGAS, foam, importance sampl, adaptive grid, flat_grid, channel grid, normalising/normalizing flow, per-channel in
+      results.tex, the entry''s dead ends and findings, site decisions (D294, D315, D317, D318): only results.tex l.10246
+      (proposed, never built) and l.9747 (training-time sampler), both named in prior.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
