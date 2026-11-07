@@ -104,6 +104,13 @@ EEA_PREFIX = "eea_"
 # layout (gridpack runs of the same size), and the plan's probe file (yield x kept per pool, EEA_PROBE).
 EEA_STAGE1 = os.path.join(ROOT, "analysis", "catalog_v4", "data", "lhe_parts_eea_stage1.json")
 EEA_PROBE = os.path.join(ROOT, "analysis", "catalog_v4", "data", "lhe_probe_yields_dsh_eea.json")
+# the dsh_eea_ queue's rates (lhe_parts plan --rates): the old dsh_<x> pool's measured core-s per event
+# (lhe_rates_dsh_ee4.json) times eea_<x>'s over ee4_<x>'s (lhe_rates_eea.json, lhe_rates.json / lhe_rates_dsh_ee4.json:
+# the beam spectrum and the anchor energies at the same pool size). An upper estimate: eea_'s runs are 204 events per
+# energy against ee4_'s 340, so more of their time is integration a larger run spreads over more events.
+EEA_RATES = os.path.join(ROOT, "analysis", "catalog_v4", "data", "lhe_rates_eea.json")
+OLD_DSH_RATES = os.path.join(ROOT, "analysis", "catalog_v4", "data", "lhe_rates_dsh_ee4.json")
+DSHA_RATES = os.path.join(ROOT, "analysis", "catalog_v4", "data", "lhe_rates_dsh_eea.json")
 DSHA_PREFIX = "dsh_eea_"
 ANCHOR_ENERGIES = tuple(sorted(EE_ANCHOR))
 # blocks left out of an anchor pool by a decision on its old pool: ee4_epem_cgsxwm's 3 TeV block, whose runs stop
@@ -274,6 +281,17 @@ def anchor_pools(mg, P, T, trees, is_ee, ee_lhe, ee, dsh, rates, med, kept, comp
     if s1:
         with open(EEA_PROBE, "w") as f:      # lhe_parts plan --probe of the dsh_eea_ queue
             json.dump(dict(sorted(probe.items())), f, indent=1)
+    if os.path.exists(EEA_RATES) and os.path.exists(OLD_DSH_RATES):
+        r_eea, r_old = json.load(open(EEA_RATES)), {**json.load(open(RATES)), **json.load(open(OLD_DSH_RATES))}
+        out = {}
+        for name, e in dsha.items():
+            x = name[len(DSHA_PREFIX):]
+            od, o4, ne = r_old.get("dsh_" + x), r_old.get("ee4_" + x), r_eea.get(EEA_PREFIX + x)
+            if od and o4 and ne:
+                out[name] = {"core_s_per_event": od["core_s_per_event"] * ne["core_s_per_event"] / o4["core_s_per_event"],
+                             "nfinal": int(e["nfinal"]), "source": f"dsh_{x} x eea_{x}/ee4_{x}"}
+        with open(DSHA_RATES, "w") as f:
+            json.dump(dict(sorted(out.items())), f, indent=1)
     with open(os.path.join(HERE, "catalog_v4_eea_processes.yaml"), "w") as f:
         f.write(HDR)
         yaml.safe_dump({"lhe": a_lhe, "processes": eea}, f, sort_keys=False)
