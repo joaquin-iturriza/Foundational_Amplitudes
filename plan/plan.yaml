@@ -16075,7 +16075,7 @@ entries:
     decision: D307
   owner:
     agent: aa91c448ea3a5ca1c
-    state: working
+    state: closed
     since: '2026-11-07T02:47:32+00:00'
     state_at: '2026-11-07T06:06:40+00:00'
     context: 251967
@@ -19075,32 +19075,25 @@ entries:
       restart). Write-up in results.tex not done (next owner).'
   step_waits: {}
   handoff:
-    state: 'Step 13 done (finding 2026-11-07, dead end recorded): the optimizer-state continuation removes the restart jump
-      but reads as the fresh-optimizer continuation, WORSE than the default restart on EE4 (1.240 [1.034,1.505]), PP4 1.148;
-      figure figs/ws_restart_study_s13 @9d30a635; its write-up goes with step 14''s, after par:v4_warm_start_valley (not written
-      yet). Step 14 (step 9): control 238e6f81, shrinkperturb rerun 0f346464 (run dir v4_het_wsx_shrinkperturb_tagfix1), share50_k267
-      77e8bf2b COMPLETED, not yet read; the WSD branch arms 1354daee (share 0.25), 4dc35a98 (0.50) and wsdfinal_default 9079718e
-      RUNNING (resubmitted unchained after E3971; parent dccb61e8 trained clean, only its save check failed, fixed 36dcf7d9);
-      plan wait step 9 on the six. NEXT when they end: read7.sh per run (scratchpad copy: site logs -n 3000000 > log; mixture_ab.py
-      val + extract per ZERO_SHOT axis), check the branch sigma stages log no OPT_STATE and no live-weights line, mixture_ab.py
-      warm_single (S14 has the current ids) -> data/warm_start_S14.json, figure plot_ws_fixes.py, pick the recipe by the design''s
-      rule, write steps 13+14 up in docs/results.tex with src/claim lines.'
-    decisions: 'D319 explore fixes for the warm start; D315 single seed; D307 no change tests until the mechanism is fixed.
-      Recipe rule fixed before the read: the step-14 arm BETTER than the control with MATCH-estimate at the smallest cost
-      is the candidate, to Joaquin with the D307 hold; if none, share 0.50 retraining at 533 (C1s50, MATCH at two seeds) goes
-      to Joaquin as the recipe for data changes. Defect fixed b91cf7c6 (clear_start_only: the sigma stage and the parent readers
-      no longer re-apply shrink_perturb, start_weights=live, load_optimizer_state, moment_fill; tests/test_start_only_keys.py);
-      the first step-13 pair 05df656d/07bfc8d7 and shrinkperturb 71852916 are not read.'
-    ruled_out: 'as before, plus: the restart jump as the cause of the k=533 gap (step 13: optimizer state removes it, no gain);
-      step-3198/2132 continued with or without optimizer state.'
-    running: 'step 14: FA-ccin2p3-1354daee, FA-ccin2p3-4dc35a98, FA-ccin2p3-9079718e (completed, unread: 238e6f81, 0f346464,
-      77e8bf2b)'
-    files: 'analysis/catalog_v4/mixture_ab.py (S14, warm_single, WARM C1r_step3198_continue_optstate); analysis/catalog_v4/plot_ws_restart.py,
-      plot_ws_fixes.py, ws_restart_steps.py; analysis/catalog_v4/data/warm_start_C1r_step3198_continue_optstate.json, ws_restart_steps.json;
-      scripts/job_catalog_v3_short.sh (SHORT_TAG on the rerun arms, TRAIN_SAVES); base_experiment.py clear_start_only; run.py
-      sigma_stage_cfg; tests/test_start_only_keys.py; read script <scratchpad>/read7.sh (copy it: site logs -n 3000000, mixture_ab.py
-      val and extract per axis)'
-    written: '2026-11-07T02:24:00+00:00'
+    state: 'Step 15 read (finding 2026-11-07): under a matched WSD schedule the warm start MATCHES the change from scratch
+      at 1/8 of a pretraining: WSD final model, default restart, share 0.50, 533 steps: R(warm/B_wsd) PP4 0.802 [0.744,0.860],
+      EE4 0.940 [0.827,1.058]; the branch on share 0.50 0.845/1.022 MATCH; restart over branch 0.949/0.907 (restart better,
+      chosen; outside the 5% band in its favour, stated). WSD from scratch is no better than cosine on the reads (0.973/0.975).
+      Steps 13 and 14 written up (par:v4_warm_start_optstate, par:v4_warm_start_fixes @3abe9aa7, notes-editor PASS). NEXT:
+      write step 15 up after par:v4_warm_start_fixes with src/claim lines (warm_wsd and plot_ws_fixes.py --s15 at 1d49c55c,
+      keys arms.wsdfinal_default50.PP4.R etc.; the last {...} line of each), notes-editor review, then the recipe to Joaquin
+      with the D307 lift request.'
+    decisions: 'D319 explore warm-start fixes; D315 single seed; D307 no change tests until the mechanism is fixed (the lift
+      is Joaquin''s). Recipe rule fixed before the step-14 read, tie-broken after the read by lowest R (stated); step 15''s
+      rule: MATCH widened upper <= 1.35 on PP4 and EE4.'
+    ruled_out: 'as before, plus: optimizer-state continuation (step 13), shrink and perturb (diverges at start, WORSE), branching
+      before the WSD cooldown vs restarting its final (no gain; the restart is 5-9% better at share 0.50), share 0.50 at 267
+      steps (= control, not MATCH).'
+    running: none
+    files: analysis/catalog_v4/mixture_ab.py (S14, S15, warm_single, warm_wsd); analysis/catalog_v4/plot_ws_fixes.py (default
+      and --s15); analysis/catalog_v4/data/warm_start_S14.json, warm_start_S15.json; figs/ws_fixes, figs/ws_wsd_match; scripts/job_catalog_v3_short.sh
+      arms v4_het_control_wsd, v4_het_wsx_*, v4_het_default25_wsd; read script <scratchpad>/read7.sh
+    written: '2026-11-07T06:08:48+00:00'
   step_why:
     9:
       feeds: the warm-start recipe (D319) and the lift of D307
