@@ -884,6 +884,76 @@ def cmd_node(a):
     print("NODE_JSON " + json.dumps(out), flush=True)
 
 
+def cmd_eeisr_read(a):
+    """step 71's read (plan catalog_coverage, design of 2026-11-06T23:38): the EEISR_JSON lines of the eeisr probe jobs
+    (scripts/job_lhe_probe.sh PROBE_SHARD=eeisr; `site logs <run>`) -> one record per energy and spectrum (isr = the
+    anchor's, none = lpp 0, isronly = ISR alone at a beamstrahlung energy), and the design's verdict per energy:
+    FAILS = the isr run returned no events, errored, or has share(sqrt(s_hat)/sqrt(s) < 0.99) = 0;
+    BANNER = its banner's lpp1/lpp2/pdlabel differ from ee_beam_patches (the MadGraph process string's beam order) and
+    EE_ANCHOR; NO_BEAMSTRAHLUNG = at a beamstrahlung energy the isr share below 0.99 is not above isronly's + BS_MIN or
+    its q10 not lower; COST = the isr run's seconds per kept event > COST_MAX x the none run's; else WORKS.
+    The whole probe WORKS when every energy does."""
+    sys.path.insert(0, os.path.join(ROOT, "recipes"))
+    from gen_catalog_v4_default import ee_beam_patches, EE_ANCHOR
+    BS_MIN, COST_MAX = 0.02, 2.0
+    rec = {}
+    for run in a.runs:
+        txt = subprocess.run(["site", "logs", run, "-n", "100000"], capture_output=True, text=True).stdout
+        for line in txt.splitlines():
+            if line.startswith("EEISR_JSON "):
+                _, v, j = line.split(None, 2)
+                d = json.loads(j)
+                E = round(2.0 * float(d["patches"]["ebeam1"]), 4)
+                d.pop("log_tail", None) if d.get("events_returned") else None
+                rec.setdefault(E, {})[v] = dict(d, run=run)
+    out = {"source": "tools/lhe_probe.py eeisr-read", "rules": {"bs_min": BS_MIN, "cost_max": COST_MAX},
+           "energies": {}}
+    for E in sorted(rec):
+        R = rec[E]; isr, none, iso = R.get("isr", {}), R.get("none", {}), R.get("isronly")
+        cfg = mg.PROCESSES[isr.get("process") or none.get("process")]
+        want = ee_beam_patches(E, cfg.get("proc_str") or cfg["mg5_generate"][0].split(None, 1)[1])
+        sf = isr.get("shat_frac") or {}
+        v = "WORKS"
+        if not isr.get("events_returned") or isr.get("error") or not sf.get("below_0.99"):
+            v = "FAILS"
+        elif {k: str(isr.get("beam_card", {}).get(k)) for k in ("lpp1", "lpp2", "pdlabel")} != \
+                {k: str(want[k]) for k in ("lpp1", "lpp2", "pdlabel")}:
+            v = "BANNER"
+        elif iso is not None and not (iso.get("shat_frac") and sf["below_0.99"] > iso["shat_frac"]["below_0.99"] + BS_MIN
+                                      and sf["q10"] < iso["shat_frac"]["q10"]):
+            v = "NO_BEAMSTRAHLUNG"
+        elif none.get("s_per_kept_event") and (isr.get("s_per_kept_event") or 1e9) > COST_MAX * none["s_per_kept_event"]:
+            v = "COST"
+        keep = ("run", "events_returned", "s_generate", "s_per_kept_event", "kept", "below_window", "cuts_partonic",
+                "cuts_lab", "shat_frac", "beam_card", "error", "timeout", "log_tail")
+        out["energies"][E] = {"pdlabel": EE_ANCHOR.get(float(E)), "verdict": v, "expected_beams": want,
+                              **{k: {x: r.get(x) for x in keep if x in r} for k, r in R.items()}}
+    vs = [o["verdict"] for o in out["energies"].values()]
+    out["verdict"] = "WORKS" if vs and all(x == "WORKS" for x in vs) else sorted(set(vs) - {"WORKS"})
+    json.dump(out, open(a.out, "w"), indent=1)
+    print("EEISR", out["verdict"], {E: o["verdict"] for E, o in out["energies"].items()})
+    if a.fig:
+        sys.path.insert(0, ROOT)
+        import plot_style as ps
+        Es = sorted(out["energies"])
+        fig, (ax1, ax2) = ps.figure(ncols=2)
+        for key, lab, col, mk in (("isr", "machine spectrum", ps.C.vermillion, "o"), ("isronly", "ISR only", ps.C.blue, "s"),
+                                  ("none", "no spectrum", ps.C.grey, "^")):
+            pts = [(E, out["energies"][E][key]["shat_frac"]) for E in Es
+                   if key in out["energies"][E] and out["energies"][E][key].get("shat_frac")]
+            if not pts:
+                continue
+            x = [p[0] for p in pts]
+            ax1.plot(x, [p[1]["q10"] for p in pts], marker=mk, color=col, label=lab)
+            ax2.plot(x, [p[1]["below_0.99"] for p in pts], marker=mk, color=col, label=lab)
+        for ax in (ax1, ax2):
+            ax.set_xscale("log"); ax.set_xlabel(r"$\sqrt{s}$ [GeV]")
+        ax1.set_ylabel(r"$q_{10}(\sqrt{\hat s}/\sqrt{s})$")
+        ax2.set_ylabel(r"share $\sqrt{\hat s}/\sqrt{s}<0.99$")
+        ps.legend(ax2, "upper left")
+        ps.save(fig, a.fig)
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -939,8 +1009,10 @@ def main():
     s.add_argument("--by-energy-out", default=None, help="a gridpack pool's yield and complete-run share per energy")
     s.add_argument("--rates-out", default=None, help="a gridpack pool's slowest probe run as core seconds per event "
                    "(lhe_parts plan --rates)")
+    s = sub.add_parser("eeisr-read"); s.add_argument("runs", nargs="+"); s.add_argument("--out", required=True)
+    s.add_argument("--fig", default=None, help="figure base path (png + pdf)")
     a = ap.parse_args()
-    {"list": cmd_list, "parts": cmd_parts, "run": cmd_run, "node": cmd_node, "summary": cmd_summary, "kept": cmd_kept, "mixcheck": cmd_mixcheck, "runsize": cmd_runsize, "runlevel": cmd_runlevel, "runlevel-summary": cmd_runlevel_summary, "gridpack": cmd_gridpack, "gridpool": cmd_gridpool, "gridpool-plan": cmd_gridpool_plan}[a.cmd](a)
+    {"eeisr-read": cmd_eeisr_read, "list": cmd_list, "parts": cmd_parts, "run": cmd_run, "node": cmd_node, "summary": cmd_summary, "kept": cmd_kept, "mixcheck": cmd_mixcheck, "runsize": cmd_runsize, "runlevel": cmd_runlevel, "runlevel-summary": cmd_runlevel_summary, "gridpack": cmd_gridpack, "gridpool": cmd_gridpool, "gridpool-plan": cmd_gridpool_plan}[a.cmd](a)
 
 
 if __name__ == "__main__":
