@@ -13445,6 +13445,18 @@ entries:
       re-run once): joint-resonance channel with the pair''s direction log-forward (1-|cos theta*| log-uniform, the t-channel
       pole''s mapping) under the grids, and the ladder''s bisections replaced by a faster exact solve (the COST branch''s
       proposal fix); the per-channel fill per bin recorded in the re-run.'
+  - at: '2026-11-07T02:25:49+00:00'
+    text: '2026-11-07 step 75 submitted (step 72''s PARTIAL revision). Code res2-fwd merged 8d1da5d8 (repo-reviewer PASS,
+      watermark 5ebbe8d6; design PASS): joint-resonance channel''s forward variant (sampling.mc_res2_fwd, MC_RES2_FWD_FLOOR
+      1e-6 [open]), ladder solve by regula falsi (momenta equal to the 60 halvings of b3ba8b94 to <= 3.6e-13 relative, 4.4-5.1x
+      faster), per-channel per-quota-bin counts in FLAT_LAST; tests 30 passed. 10 CPU jobs at CC 322f48b1-596e3b71 (no sampler
+      diff between them), scripts/job_multichannel_check.sh, MCHECK_POLICIES=current+quota_ladder_both_res2+quota_ladder_both_res2_budget12+grid_both_res2f_budget12+grid_both_res2f_budget8:
+      uux_epemg 1b60b145/0387052d (00:20), uux_epemvevex e9513eb9/f657333a (00:30), uu_bbxuu f7d4e8b6/d8e3afc7 (01:10), us_ddxsu
+      d996a248/83d25626 (01:00), udx_csxvevex 45f39aab/87ac1bbb (00:30), seeds 42/43; target grid_fwd_check 0.8 h; wait on
+      step 75. Reviewer note to act on before any regeneration recipe sets mc_res2_fwd: MC_RES2_FWD_FLOOR (like MC_TAIL, MC_LADDER_*)
+      is not written into the policy in sampling_policy (~mg5_pipeline_final.py:3115), so the recipe id would not follow it;
+      put these constants into the policy first. Nit: tests/test_multichannel.py _module_at leaves a zz_probe_solve_* tmp
+      dir.'
   handoff:
     state: '2026-11-07 ~03:00. Step 61 read: NO (data/het_signhead61.json, figs/het_signhead61, het_oneloop.py step61 @66f94590);
       findings recorded. Step 71 done: WORKS at all 10 anchor energies, 365 GeV keeps fcce365ll (finding). Step 73 (het sign
