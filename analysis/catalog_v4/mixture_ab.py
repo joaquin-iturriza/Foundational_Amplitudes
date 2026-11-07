@@ -1499,8 +1499,8 @@ def seed_pairs():
 
 
 # step 15 (D319, seed 42, D315): the WSD warm starts against the C1 change from scratch under the WSD schedule
-S15 = {"B_wsd": "",                                   # v4_het_default25_wsd, filled at submission
-       "arms": {"wsdbranch50": S14["arms"]["wsdbranch50"], "wsdfinal_default50": "",   # filled at submission
+S15 = {"B_wsd": "FA-ccin2p3-388dcd45",                # v4_het_default25_wsd, submitted 2026-11-07 (limit 03:45)
+       "arms": {"wsdbranch50": S14["arms"]["wsdbranch50"], "wsdfinal_default50": "FA-ccin2p3-1e6646e2",   # submitted 2026-11-07 (limit 02:30)
                 "wsdbranch25": S14["arms"]["wsdbranch25"], "wsdfinal_default": S14["arms"]["wsdfinal_default"]}}
 
 
