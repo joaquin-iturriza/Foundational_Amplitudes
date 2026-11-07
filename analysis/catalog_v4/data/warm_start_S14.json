@@ -81,7 +81,7 @@
      1.3887
     ],
     "frac_classes_below_1": 0.2282,
-    "R_over_B_seed42": null
+    "R_over_B_seed42": 1.2208
    },
    "HD4": {
     "R": 1.3239,
@@ -95,7 +95,7 @@
      1.5624
     ],
     "frac_classes_below_1": 0.2895,
-    "R_over_B_seed42": 1.6038
+    "R_over_B_seed42": 1.4218
    },
    "HD5": {
     "R": 1.1311,
@@ -109,7 +109,7 @@
      1.5715
     ],
     "frac_classes_below_1": 0.3571,
-    "R_over_B_seed42": 20.2042
+    "R_over_B_seed42": 0.9797
    },
    "outcome": "WORSE",
    "match_estimate": false,
@@ -168,7 +168,7 @@
      1.1537
     ],
     "frac_classes_below_1": 0.2896,
-    "R_over_B_seed42": null
+    "R_over_B_seed42": 1.0215
    },
    "HD4": {
     "R": 0.9738,
@@ -182,7 +182,7 @@
      1.1075
     ],
     "frac_classes_below_1": 0.5526,
-    "R_over_B_seed42": 1.1982
+    "R_over_B_seed42": 1.0779
    },
    "HD5": {
     "R": 0.9888,
@@ -196,7 +196,7 @@
      1.1347
     ],
     "frac_classes_below_1": 0.5357,
-    "R_over_B_seed42": 14.6878
+    "R_over_B_seed42": 1.0136
    },
    "outcome": "NOT BETTER",
    "match_estimate": false,
@@ -255,7 +255,7 @@
      0.9123
     ],
     "frac_classes_below_1": 0.7475,
-    "R_over_B_seed42": null
+    "R_over_B_seed42": 0.7943
    },
    "HD4": {
     "R": 0.8735,
@@ -269,7 +269,7 @@
      1.06
     ],
     "frac_classes_below_1": 0.6316,
-    "R_over_B_seed42": 1.1075
+    "R_over_B_seed42": 1.0002
    },
    "HD5": {
     "R": 1.101,
@@ -283,7 +283,7 @@
      1.3689
     ],
     "frac_classes_below_1": 0.3571,
-    "R_over_B_seed42": 15.3284
+    "R_over_B_seed42": 0.9994
    },
    "outcome": "BETTER",
    "match_estimate": true,
@@ -342,7 +342,7 @@
      0.9329
     ],
     "frac_classes_below_1": 0.709,
-    "R_over_B_seed42": null
+    "R_over_B_seed42": 0.8183
    },
    "HD4": {
     "R": 0.7791,
@@ -356,7 +356,7 @@
      0.9279
     ],
     "frac_classes_below_1": 0.7281,
-    "R_over_B_seed42": 0.9714
+    "R_over_B_seed42": 0.8353
    },
    "HD5": {
     "R": 1.093,
@@ -370,7 +370,7 @@
      1.3795
     ],
     "frac_classes_below_1": 0.3929,
-    "R_over_B_seed42": 14.5819
+    "R_over_B_seed42": 0.9117
    },
    "outcome": "BETTER",
    "match_estimate": true,
@@ -429,7 +429,7 @@
      0.9196
     ],
     "frac_classes_below_1": 0.7632,
-    "R_over_B_seed42": null
+    "R_over_B_seed42": 0.7889
    },
    "HD4": {
     "R": 0.8696,
@@ -443,7 +443,7 @@
      0.9897
     ],
     "frac_classes_below_1": 0.6754,
-    "R_over_B_seed42": 1.0653
+    "R_over_B_seed42": 0.947
    },
    "HD5": {
     "R": 1.0087,
@@ -457,7 +457,7 @@
      1.2609
     ],
     "frac_classes_below_1": 0.5,
-    "R_over_B_seed42": 14.3341
+    "R_over_B_seed42": 0.8874
    },
    "outcome": "BETTER",
    "match_estimate": true,
@@ -516,7 +516,7 @@
      1.0964
     ],
     "frac_classes_below_1": 0.465,
-    "R_over_B_seed42": null
+    "R_over_B_seed42": 0.9683
    },
    "HD4": {
     "R": 0.8977,
@@ -530,7 +530,7 @@
      1.0134
     ],
     "frac_classes_below_1": 0.7632,
-    "R_over_B_seed42": 1.0646
+    "R_over_B_seed42": 0.9568
    },
    "HD5": {
     "R": 0.9504,
@@ -544,7 +544,7 @@
      1.0875
     ],
     "frac_classes_below_1": 0.6786,
-    "R_over_B_seed42": 14.4607
+    "R_over_B_seed42": 0.9312
    },
    "outcome": "BETTER",
    "match_estimate": true,
@@ -603,7 +603,7 @@
      1.0863
     ],
     "frac_classes_below_1": 0.4679,
-    "R_over_B_seed42": null
+    "R_over_B_seed42": 0.9694
    },
    "HD4": {
     "R": 1.0225,
@@ -617,7 +617,7 @@
      1.1153
     ],
     "frac_classes_below_1": 0.4649,
-    "R_over_B_seed42": 1.2951
+    "R_over_B_seed42": 1.1596
    },
    "HD5": {
     "R": 1.0159,
@@ -631,7 +631,7 @@
      1.147
     ],
     "frac_classes_below_1": 0.4286,
-    "R_over_B_seed42": 15.7048
+    "R_over_B_seed42": 0.9418
    },
    "outcome": "NOT BETTER",
    "match_estimate": false,
@@ -728,7 +728,7 @@
    "FA-ccin2p3-77e8bf2b: training run FA-ccin2p3-77e8bf2b block 0 step 10"
   ]
  },
- "parents_val_last": {
+ "parents_val_best": {
   "cosine": {
    "run": "FA-ccin2p3-87ea24d0",
    "step": 4264,

@@ -1422,7 +1422,10 @@ S14 = {"control": "FA-ccin2p3-238e6f81",     # submitted 2026-11-07 @74aa4ce6 (l
                 "wsdbranch25": "FA-ccin2p3-1354daee", "wsdbranch50": "FA-ccin2p3-4dc35a98",
                 "wsdfinal_default": "FA-ccin2p3-9079718e", "share50_k533": "FA-ccin2p3-9a357af2"},
        "control_older": "FA-ccin2p3-341bf564",           # the step-1 default restart at seed 42 (older commit)
-       "B": "FA-ccin2p3-9538e607", "B_HD": "FA-ccin2p3-4dca09e5"}
+       # B, share 0.25 from scratch (het) at seed 42, per read: PP4, EE4, HD4, HD5 on 9538e607, the catalog held-out
+       # axes on its training run f0156d88 (MIX_HET["default25"]["held"]); 4dca09e5 is the MSE-loss B's HD reread
+       "B": {"PP4": MIX_HET["default25"]["PP4"][0], "EE4": MIX_HET["default25"]["EE4"][0],
+             "held": MIX_HET["default25"]["held"][0], "HD4": HD4_HET["default25"][0], "HD5": HD5_HET["default25"][0]}}
 # the parents: the cosine het control the non-WSD arms start from, and the WSD parent of the branch arms
 S14_PARENTS = {"cosine": "FA-ccin2p3-87ea24d0", "wsd": "FA-ccin2p3-dccb61e8"}
 # each arm's widening over the control (design round 2): same parent and data -> the largest paired seed spread of
@@ -1538,7 +1541,7 @@ def warm_single():
                 continue
             res = r_with_interval(cr, math.exp(w[read]))
             if bref:
-                rb, _ = _one(run, S14["B_HD"] if read in ("HD4", "HD5") else S14["B"], read, cls)
+                rb, _ = _one(run, S14["B"][read], read, cls)
                 res["R_over_B_seed42"] = None if rb is None else round(rb, 4)
                 if read in est:
                     res["R_over_B_estimate"] = round(r * est[read], 4)
@@ -1576,13 +1579,22 @@ def warm_single():
         rd["EXPOSURE_supported"] = (all(e[r]["widened"][0] <= 1 <= e[r]["widened"][1] for r in ("PP4", "EE4"))
                                     and out["arms"]["share50_k533"].get("outcome") == "BETTER")
     # the blow-up check of every run read (a run that blew up is listed apart), and the two parents' own validation
-    # loss at their last step (het NLL on the base recipe's validation split; the WSD parent has no zero-shot reads)
+    # loss at their best checkpoint (lowest het NLL of the main stage on the base recipe's validation split; the WSD
+    # parent has no zero-shot reads)
     bl = blowups([ctl] + [r for r in arms.values() if r])
     out["blowups"] = {"flagged": bl["flagged"], "spiked_recovered": bl["spiked_recovered"]}
-    out["parents_val_last"] = {}
+    if bl["flagged"]:   # a verdict is withheld while a run read blew up or is unchecked (blowups)
+        for row in list(out["arms"].values()) + [v for v in rd.values() if isinstance(v, dict)]:
+            if "outcome" in row:
+                row["outcome_withheld"] = row.pop("outcome")
+        for k in ("BRANCH_works", "WSD_parent_as_good", "EXPOSURE_supported"):
+            if k in rd:
+                rd[k + "_withheld"] = rd.pop(k)
+    out["parents_val_best"] = {}
     for k, r in S14_PARENTS.items():
         v = json.load(open(os.path.join(READS, f"{r}_val.json")))["blocks"][0]["vals"]
-        out["parents_val_last"][k] = {"run": r, "step": v[-1][0], "val": round(v[-1][1], 4)}
+        best = min(v, key=lambda z: z[1])
+        out["parents_val_best"][k] = {"run": r, "step": best[0], "val": round(best[1], 4)}
     print("readings", {k: v for k, v in rd.items() if not isinstance(v, dict)},
           (rd.get("branch_over_wsdfinal") or {}).get("outcome"), out["blowups"])
     json.dump(out, open(os.path.join(DATA, "warm_start_S14.json"), "w"), indent=1)

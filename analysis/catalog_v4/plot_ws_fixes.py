@@ -85,7 +85,7 @@ def main():   # dup-ok: one run per arm (seed 42 only), per-arm main-stage lengt
                 rv, (l, h) = row[axis]["R"], row[axis]["widened"]
                 aR.errorbar([j + dx], [rv], yerr=[[rv - l], [h - rv]], color=col, marker=mk, ls="none", capsize=2)
     for a, axis in ((aP, "PP4"), (aE, "EE4")):
-        m, _ = class_mse((S14["B"],), axis, cls)
+        m, _ = class_mse((S14["B"][axis],), axis, cls)
         a.step(m, np.arange(1, len(m) + 1) / len(m), where="post", color="k", ls=":")
         out[f"B {axis} median class MSE"] = float(np.median(m))
     aG.plot([], [], "k:", label="share 0.25 from scratch")
