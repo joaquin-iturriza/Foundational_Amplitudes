@@ -18339,6 +18339,15 @@ entries:
       on share 0.50 (lowest at equal 533 steps; two gains multiply: WSD parent ~0.76/0.83, share 0.50 ~0.87/0.81). Caveat:
       B (share 0.25 from scratch) is cosine; the matched from-scratch under WSD is not read. Write-up par:v4_warm_start_optstate
       + par:v4_warm_start_fixes (notes-editor review before commit). E4025/E4026 acked.'
+  - at: '2026-11-07T03:14:08+00:00'
+    text: '2026-11-07 ~05:15 CET: step 15 (D319, D315; design PASSED 2026-11-07, repo-reviewer PASS after one FIX: the HD
+      reads of B were divided by the MSE-loss B 4dca09e5, now the het B 9538e607, held on f0156d88; parents at the best checkpoint;
+      verdicts withheld on a flagged run; restart-over-branch at the same-data width) merged 30027dc8, submitted whole on
+      CC (site pick 2 jobs ~1.4 h), scripts/job_catalog_v3_short.sh, 16G: B_wsd v4_het_default25_wsd FA-ccin2p3-388dcd45 (limit
+      03:45, work 3.56 h), v4_het_wsx_wsdfinal_default50 FA-ccin2p3-1e6646e2 (limit 02:30), code @e27bc3c3; target ws_wsd_match
+      3.6 h; 6.25 GPU-h at limits; plan wait step 9 on both. Read: read7.sh per run, mixture_ab.py warm_wsd -> data/warm_start_S15.json,
+      then a figure and the write-up after par:v4_warm_start_fixes. Step 13+14 write-up committed 0ef92b6f/3abe9aa7 (notes-editor
+      PASS).'
   step_waits:
     '9': FA-ccin2p3-388dcd45 FA-ccin2p3-1e6646e2
   handoff:
