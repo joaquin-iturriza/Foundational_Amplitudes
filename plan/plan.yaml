@@ -12899,6 +12899,19 @@ entries:
       for nu nu Z, whose quota fills in the first rounds); upper estimate for the 170 e+e- classes 324 core-h against 3.38
       old. So the forward switch is the missing region for the Z and tau classes, but at budget 750 (~100x, refused by D317);
       it enters step 72''s sampler as a channel option, not as a budget.'
+  - at: '2026-11-07T00:40:33+00:00'
+    text: '2026-11-07 step 72 (k) submitted: channel-grid quota sampler (sampling.flat_grid; per-channel factorised grids
+      on the proposal''s uniform numbers, 100 bins, 0.2 floor, refitted each round to the quota weights) merged f8630100 (repo-reviewer
+      PASS, watermark 65938f8c; design PASS). Toy (tests/test_flat_grid.py): grids at 12 fill 1.000, every bin, after 9 labels
+      per flat event, vs quota12 0.915. 10 CPU jobs at CC f8630100, scripts/job_multichannel_check.sh, MCHECK_POLICIES=current+quota_ladder_both_res2+quota_ladder_both_res2_budget12+grid_both_res2_budget12+grid_both_res2_budget8:
+      uux_epemg 0a3c7d19/d6afbf50 (00:20), uux_epemvevex ab948eed/3f659a1d (00:30), uu_bbxuu e32a6f40/49c754da (01:10), us_ddxsu
+      84ca2133/900855d4 (01:00), udx_csxvevex 5a859c8c/2baa0d0b (00:30), seeds 42/43; target grid_check 0.8 h; wait on step
+      72. Read: multichannel_check.py pull <tag> <class> 42,43 per class, then step72 -> data/grid_check.json (verdict YES
+      when grids at 8 or 12 pass, passed_at), figure via fig_mcmc_check.py extended. Note for the read: the isc channel adapts
+      only 3 dimensions (its per-parton sub-batches pass through unmapped) and RAMBO''s dimensions fit only when its candidates
+      carry weight. Step 71 re-run: 91.1876 and 3000 GeV already read WORKS (91: 4.5% of events below 0.99 of sqrt(s); 3000:
+      CLIC spectrum 41.6% vs ISR alone 29.0%, q10 0.80 vs 0.90, 1.1x the no-spectrum time per kept event); the other 8 on
+      the step-71 wait. Repo backlog: 58ec8ab8 (sampling_cost.py ee <policy>) not yet reviewed.'
   handoff:
     state: '2026-11-07 ~01:00. Steps 69 and 71 have all 20 runs ended clean (E3944, NOT acked: the new owner reads, then acks).
       STEP 69 (cheap flat sampler, D317; <= 2x is the step-69 design''s own bar, D317 names no number): Markov-chain flat
