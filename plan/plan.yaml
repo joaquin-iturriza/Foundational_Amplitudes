@@ -10975,6 +10975,12 @@ entries:
     units: null
     start: '2026-11-06T23:34:21+00:00'
     at: '2026-11-06T23:34:21+00:00'
+  - batch: ee_anchor_probe_rerun
+    wall_h: 0.6
+    jobs: 10
+    units: null
+    start: '2026-11-07T00:20:46+00:00'
+    at: '2026-11-07T00:20:46+00:00'
   step_why:
     37:
       feeds: one shared data cache per dataset that a GPU job only opens
