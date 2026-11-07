@@ -18990,6 +18990,21 @@ entries:
       3.6 h; 6.25 GPU-h at limits; plan wait step 9 on both. Read: read7.sh per run, mixture_ab.py warm_wsd -> data/warm_start_S15.json,
       then a figure and the write-up after par:v4_warm_start_fixes. Step 13+14 write-up committed 0ef92b6f/3abe9aa7 (notes-editor
       PASS).'
+  - at: '2026-11-07T06:08:21+00:00'
+    text: '2026-11-07 step 15 read (D319, D315; design passed 2026-11-07): both runs clean (V3_SHORT_DONE; B_wsd main stage
+      scheduler WSD T_max 4264), blow-up check flags none. mixture_ab.py warm_wsd @1d49c55c -> data/warm_start_S15.json, figure
+      figs/ws_wsd_match (plot_ws_fixes.py --s15 @1d49c55c). R(warm/B_wsd), seed 42, widened by PP4 0.0505 / EE4 0.0809, rule
+      MATCH when widened upper <= 1.35 on both: WSD final restart share 0.50 (1e6646e2) PP4 0.802 [0.744,0.860], EE4 0.940
+      [0.827,1.058] MATCH; WSD branch share 0.50 0.845 [0.784,0.906] / 1.022 [0.891,1.177] MATCH; WSD final restart share
+      0.25 0.979 / 1.187 [1.026,1.348] MATCH (just); WSD branch share 0.25 0.988 / 1.224 [1.059,1.414] SHORT. YES: the warm
+      start matches the change from scratch at 533/4264 = 1/8 of a pretraining when parent and from-scratch share the WSD
+      schedule. Restart over branch on share 0.50: 0.949 [0.929,0.969] / 0.907 [0.839,0.980] (same-data width): outside the
+      5% band, so the rule''s ''restart as good as branch'' is False, but in the restart''s favour; recipe taken: the restart
+      (simpler, better; deviation from the literal rule stated). The schedule from scratch: R(B_wsd/B cosine) 0.973 [0.912,1.037]
+      / 0.975 [0.863,1.087] (no gain on the reads; val NLL best -2.828 WSD vs -2.911 cosine): WSD helps the warm start, not
+      the from-scratch run. Recipe for Joaquin: pretrain with WSD (cooldown 1/8), warm start = default restart of its final
+      model on share 0.50 for 1/8 of a pretraining; request to lift D307. Single seed 42 (favourable seed of the cosine default
+      restart). Write-up in results.tex not done (next owner).'
   step_waits:
     '9': FA-ccin2p3-388dcd45 FA-ccin2p3-1e6646e2
   handoff:
