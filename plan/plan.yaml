@@ -13840,6 +13840,20 @@ entries:
       anchor pools needs ~5 GB; rebuilding both (~36 GB) would fill the disk under the regeneration. A grid job that breaks
       is restarted after a prebuild of its arm (scripts/job_catalog_v3_short_prebuild.sh <arm>) once the regeneration has
       finished and freed its share.'
+  - at: '2026-11-07T04:13:10+00:00'
+    text: '2026-11-07 step 65 read (analysis/catalog_v4/regen_read.py @8a1abe50 pull/read/fig -> data/regen_g12_read.json,
+      figs/regen_g12_fill): the 32 regeneration shards (FA-ccin2p3-926ddf2e..7c4df684) COMPLETED, 3903 _smixq pools, 0 bad
+      pools (integrity), composition of the 5 step-75 classes ok. Verdict by the passed v3 design: SHORT, with COST on a large
+      minority. Fill: 527 of 1301 classes have at least one in-range 0.25-dex log10|M|^2 bin under 0.95 of quota in some role
+      (share of bins filled: median 0.933 over those 527, 160 below 0.9, worst 0.5); the other 774 fill every bin; 12272 chunks
+      hit the label budget. Coverage (D269 bar 0): 213 classes leave >= 1 held-out in-support pp event outside the regenerated
+      range, 404 events of 44.0M in support (max 14 per class: v4_bbx_ccxh 13). Cost: 45.2 core-h of sampling against old
+      26.0 (1.74x total; estimate 32 [28-46]); per class median 1.86x, 473 classes above 2x (max 4.64 v4_udx_cggsx); step-75
+      control classes 1.38-2.25x (step 75 range 0.78-2.11). So step 75''s 5-class check did not carry to the catalog: the
+      grid sampler at budget 12 fills 60% of classes completely, and the median class costs 1.86x. Next, by the design''s
+      branches: SHORT revision for the 527 (short bins: budget or channel, read where the short bins sit and which classes
+      hit the budget) and the 213 (widening rule that reads no scored events: ~493 classes lack dsh_ pools), and COST first
+      (fixed before step 68): where the time goes (labels vs proposal vs compile) on the classes above 2x.'
   handoff:
     state: '2026-11-07 ~05:00. Step 65: hadronic regeneration (1301 classes, channel grids at 12 + forward channel, new _smixq
       pools) RUNNING: 32 CC htc shards at ecc78b8b, target hadronic_regen_g12 0.35 h, wait on step 65; design v3 PASS (FILLED
