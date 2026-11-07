@@ -3746,6 +3746,10 @@ entries:
       (MCHECK_CLASS/MCHECK_PROBE per class as step 69, MCHECK_SEED 42/43, MCHECK_POLICIES=current+quota_ladder_both_res2+quota_ladder_both_res2_budget12+grid_both_res2_budget12+grid_both_res2_budget8;
       limits uux_epemg 00:20, uux_epemvevex 00:30, uu_bbxuu 01:10, us_ddxsu 01:00, udx_csxvevex 00:30); plan wait; read: multichannel_check.py
       pull <tag> <class> 42,43 per class, then step72 -> data/grid_check.json; figure: fig_mcmc_check.py extended to grid_check'
+    73: '(l) het sign head, next attempt after step 61''s NO (D296: explore it): sign head on a detached copy of the last
+      block (its gradient never enters the clipped shared update), one seed (D315) against the weight-1 rerun FA-ccin2p3-ac8d6fca
+      and the MSE control at seed 42; implement in a worktree, repo-reviewer, design, design-reviewer, submit. Then, if the
+      sign still lags, the clipping regime (99% of het steps clipped).'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -11073,6 +11077,11 @@ entries:
       - 'COST: fix proposal overhead from t_propose, re-run once'
       - 'PARTIAL: where-read of the short bins, one revision'
       - 'NO: dead end recorded, then a foam or flow proposal on the same harness'
+    73:
+      feeds: how the het loss keeps a sign head (D287/D296)
+      if:
+      - 'SIGN NOT WORSE THAN MSE, MAGNITUDE AS RERUN: adopt the detached head'
+      - 'NO: clipping regime next'
   owner:
     agent: a3fc2aab45ed49d42
     state: working
