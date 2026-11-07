@@ -3728,9 +3728,16 @@ entries:
     64: '(e) Epochs and scaling (D292, D293): count the epochs of every point of par:v4_width, par:v4_mult_width_length, step
       32/40; redo every point under one epoch at >= 1 epoch and extend the width x length map as one GPU-hour axis with L(C)
       = A C^-alpha + L_inf; GPU-h estimate before submit, above 30 GPU-h to the main session.'
-    65: (a) design the regeneration of the 1301 hadronic tree classes with sampling.multichannel + mc_mperi_both + mc_res2
-      and the flat quota at the budget Joaquin picks (750, or ~3000 to fill the margin), the cost from the measured replay
-      times (step 67 finding); repo-reviewer over fa872486..686c3241 first
+    65: '(a) regeneration of the 1301 hadronic tree classes with step 75''s sampler: flat part filled flat in log|M|^2 over
+      each class''s pp range (recipes/catalog_v4_flat_range.json) by the channel-grid quota sampler (multichannel + mc_res2
+      + mc_mperi_both + mc_res2_fwd + flat_grid, flat_budget 12; constants in the policy: branch mc-policy, merge on repo-reviewer
+      PASS). To build: a recipe writer for every recipe holding the hadronic tree classes (training mixture catalog_v4_default25_train.yaml''s
+      797, the held-out catalog-sampled recipes catalog_v4_heldout_H*.yaml, the rest of the 1301 from catalog_v4_census.yaml),
+      each class''s mc_resonances from its diagram sidecar (data/diagrams on CC; 152 locally) and mc_res_params(physics);
+      then the design (cost estimate data/sampling_cost_grid12.json @sampling_cost.py summary grid12: old 26.0 core-h of tree
+      pools, new 32 [28-46] core-h, an estimate from the 5 check classes'' ratios by final-state count; read: every regenerated
+      pool''s FLAT_LAST budget_hit / bins short per class) and design-reviewer; shards of scripts/job_catalog_v4_regen.sh
+      with V4REGEN_RECIPES at the site pick width, target from the old shards'' times x 1.8.'
     68: '(f) e+e- classes in the regeneration (Joaquin 2026-11-06 ~19:50 ''If I asked for pp sampled data, why would you produce
       e+e- datasets that are different in any way?''; D294 on every beam): step 65''s regeneration design covers all 170 e+e-
       tree classes of the range table too, each flat in log|M|^2 over its own default-sampled range +-0.5 dex, with the sampling
@@ -10942,8 +10949,6 @@ entries:
     '37': steps 61 and 64 of this entry (the first memmap GPU batch); the prebuild is chained before that batch
     '64': FA-ccin2p3-34cfff0c FA-ccin2p3-c53b8e51 FA-ccin2p3-ff309c2d FA-ccin2p3-1b1a8f6e FA-ccin2p3-b07d6237 FA-ccin2p3-4ba33195
       FA-ccin2p3-8a523b67 FA-ccin2p3-8b543518 FA-ccin2p3-4d6e9b06 FA-ccin2p3-a77e20b8
-    '65': 'step 69 of this entry (the cheap flat sampler check): its verdict chooses the sampler the regeneration is designed
-      with'
     '70': FA-ccin2p3-34cfff0c FA-ccin2p3-c53b8e51 FA-ccin2p3-ff309c2d FA-ccin2p3-1b1a8f6e FA-ccin2p3-b07d6237 FA-ccin2p3-4ba33195
       FA-ccin2p3-8a523b67 FA-ccin2p3-8b543518 FA-ccin2p3-4d6e9b06 FA-ccin2p3-a77e20b8
     '68': 'the adaptive-grid sampler check (step 72) and the 365 GeV rerun of step 71: they choose the e+e- sampler and the
@@ -11507,10 +11512,10 @@ entries:
       - 'estimate <= 30 GPU-h or covered by D292/D293: design, review, submit'
       - 'above 30 GPU-h not covered: estimate to the main session'
     65:
-      feeds: 'D294: what the hadronic classes are regenerated with'
+      feeds: 'D294/D317: what the hadronic classes are regenerated with, at <= 2x the old cost'
       if:
-      - 'Joaquin accepts the margin at 750: design at 750'
-      - 'Joaquin pays to fill the margin: design at ~3000 (estimate: 4x the 750 time on uu_bbxuu-like classes)'
+      - 'design PASS: submit the shards whole, wait on them'
+      - 'design FIX: revise once'
     68:
       feeds: 'D294: what the e+e- classes are regenerated with'
       if:
