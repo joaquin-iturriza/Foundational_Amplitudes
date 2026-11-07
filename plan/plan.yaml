@@ -11768,6 +11768,67 @@ entries:
       with separate branches for bgtxwp losing r3''s pull and for bbxuu where r4 acted or never acted. Searched docs/results.tex,
       the entry and site decisions FA for: empty bin, stack, unique, flat_empty, nearest candidates, smixu, r4, share floor;
       nothing earlier. CPU only; about 0.5 MB per job.'
+  - at: '2026-11-07T09:04:53+00:00'
+    question: 'Step 81 revision r5 of the flat sampler (after r4''s NO): r5 = r3 (tools/regen_recipes.R3) plus flat_empty_near_min:
+      r3''s nearest-candidate rule (an empty quota bin''s deficit on its deficit-many nearest candidates) acts only on an
+      empty bin whose nearest occupied bin(s) hold MORE finite candidates than its deficit; otherwise the deficit goes to
+      every candidate of those bins (r2''s rule). Branch sampler-r5 @d9fb42a2 (worktrees/wt-r5; R5 = dict(R3, flat_empty_near_min=True),
+      policy grid_r5_budget18, pools _smixv; rounds now record bins_empty_small for every policy, diagnostics only). Does
+      r5, on the same 19 classes x seeds 42/43, (1) fill every in-range 0.25-dex quota bin, margin included, at >= 0.95 of
+      quota (exempt: lower edge above the class''s reach or upper edge below its floor, reach and floor over this job and
+      the r1-r4 jobs; straddling bins scored and listed with their reachable share); (2) leave ZERO scored held-out in-support
+      pp events outside the kept range (D269); (3) cost summed over the 38 jobs <= 2x the old sampling''s in the same jobs?
+      In particular whether v4_uu_bbxuu returns to r2''s 1.0 in [5.127,5.373] and [4.881,5.127] (r3 0.897/0.795, r4 0.696/0.724)
+      while v4_uux_bgtxwp keeps r3''s [-1.206,-0.96] 0.925/0.917. Feeds: whether the 1301 hadronic classes are regenerated
+      with r5 (_smixv) before step 68; the straddling bins wait on Joaquin''s scope answer.'
+    prior: 'Searched docs/results.tex (empty bin, nearest occupied, near_min, flat_empty: 0 hits), plan show catalog_coverage
+      (steps 75-80, r1-r4 checks) and site decisions FA (empty bin, nearest, sampler): no earlier rule of this kind. Earlier
+      on the same question: r2 (data/r2_check.json): bbxuu 1.0 in its top bins with 1/0 of 36 chunks at the budget, bgtxwp
+      [-1.206,-0.96] 0.734/0.79 (its empty top bin''s deficit diluted over the ~900 candidates of [-1.452,-1.206], data/r2_where.json).
+      r3 (r3_check.json @014b20a0): bgtxwp 0.925/0.917, bbxuu 0.897/0.795 with 8/12 chunks at the budget (r3_rounds.json).
+      r4 = r3 + flat_empty_unique (r4_check.json, r4_acted.json @f24bfe10): acted on every bbxuu and bgtxwp chunk and made
+      both worse (bbxuu 0.696/0.724, 20/18 chunks at the budget; bgtxwp 0.835/0.809). Ruled out: per-channel split (r3_channel_presence.json),
+      de-stacking (r4).'
+    measure: 'multichannel_check.py run <class> <probe> current+grid_r3_budget18+grid_r5_budget18 <seed> (scripts/job_multichannel_check.sh,
+      CPU, one job per class and seed, three policies on one node) -> per policy and chunk kept/quota per bin, rounds (missing,
+      bins_short, bins_empty, bins_empty_small), stops, candidates per channel and bin, cand_max/min, seconds; heldout_r1
+      with outside_dex. Read: step81r5-pull, step81r5 -> data/r5_check.json (new r5, old r3 in the same job, reach and floor
+      over the r1-r4 jobs, same bars as r2-r4), step81r5-acted -> data/r5_acted.json (per class and seed: chunks with a round
+      holding a small empty bin under r3 and r5, chunks differing r3 vs r5, the r5 chunks whose every empty bin was small
+      and how many of them equal r2''s chunk in the r3 jobs bitwise), step79-rounds/where for any short bin; figure r2_check_fig.py
+      r5.'
+    check: 'On existing data the fill per bin moves with how few candidates carry an empty bin''s deficit, monotonically on
+      both short classes: bbxuu''s top bin 1.0 (r2: the candidates of the nearest occupied bin) -> 0.897/0.795 (r3: the 18
+      nearest, stacked) -> 0.696/0.724 (r4: up to 7x18 distinct nearest); bgtxwp''s [-1.206,-0.96] 0.734/0.79 (r2: ~900 candidates
+      of [-1.452,-1.206]) -> 0.925/0.917 (r3: the 26 nearest) -> 0.835/0.809 (r4: 52). The difference is where the nearest
+      occupied bin holds fewer candidates than the deficit: bbxuu''s first round has 6-10 empty bins among 17 short (rounds
+      in the r3/r4 reads), so the occupied bin next to the empties is itself short (count < quota 18 = an empty bin''s deficit)
+      and r3''s 18 nearest reach below it; bgtxwp''s nearest occupied bin holds ~900 > 26. r5''s rule takes r2''s where the
+      near bin is small and r3''s where it is large. The r3/r4 rounds show the regression from round 2 on (bbxuu missing after
+      round 2 about 100-130 under r3/r4 vs 60-100 under r2 on the same chunks, round 1 identical) and late rounds without
+      empty bins: the gap is opened while bins are empty. Unit test test_r5_empty_near_min: weights equal r3''s when the nearest
+      occupied bin holds 30 > 10, equal r2''s when it holds 4 <= 10, total weight equal, r3 unchanged without the key, _smixv
+      tag, R5 == dict(R3, flat_empty_near_min=True); 11 tests pass @d9fb42a2. Determinism: r3 per seed is identical in the
+      r3, r4 and r5 jobs; r5 equals r2 bitwise in a chunk whose every empty bin of every round was small (step81r5-acted counts
+      it against r2''s chunks in the r3 jobs).'
+    fixed: 'Everything of r3 (R3: r2''s channels and ladders, keep extremes, stall 0.2 patience 2, budget 18, grid constants,
+      ranges_dsh, flat_empty_near), R1_CLASSES and probes, data seeds, train role chunk plan; one commit for all 38 jobs (trunk
+      after sampler-r5 merges). CPU only, 0 GPU-h. Wall: r3/r4 three-policy jobs up to ~640 s of sampling: target 0.2 h, --time
+      00:45:00, 8G, ~0.5 MB JSON per job.'
+    control: 'r3 (grid_r3_budget18) and the old sampling (current) in the same job on the same node (r3 deterministic per
+      seed: kept per bin equal to the r3 and r4 jobs'', a determinism check); r2''s numbers beside from r3_check.json and
+      r4''s from r4_check.json; r2 bitwise equality in all-small chunks.'
+    seeds: Data seeds 42 and 43, as r1-r4, each class at both.
+    outcome: 'PASS (every class and seed: every scored non-straddling bin >= 0.95, 0 held-out outside, summed cost <= 2x)
+      -> straddling bins per Joaquin''s answer; regenerate the 1301 hadronic classes with R5 (_smixv), read by regen_read.py
+      with the same bars, then step 68. bbxuu back at >= 0.95 and bgtxwp at r3''s 0.925/0.917 or better but < 0.95 with 2-3
+      chunks at 0-1 kept (stall stops): the in-chunk steering limit for bgtxwp is reached under r3''s rule; report to Joaquin
+      with the numbers, next the stall rule for those chunks (their reads per round first). bbxuu still short: if r5_acted
+      shows r5 equal to r2 bitwise on its chunks, the regression is not the steering rule (read rounds against r2''s in the
+      same seeds); if r5 used r3''s rule on bbxuu chunks (near bin larger than the deficit in some round), the rule''s threshold
+      is wrong for it: read the rounds where it did. bgtxwp below r3''s: r5 took r2''s rule where r3''s helped (read bins_empty_small
+      on its short chunks). Any other class newly short: rounds and where-read for that bin. Outside > 0 -> outside_dex. Summed
+      cost > 2x -> per-channel seconds. Job failures -> log read, fixed, rerun.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
