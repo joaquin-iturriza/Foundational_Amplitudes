@@ -11678,6 +11678,32 @@ entries:
       their quota of it). NO with bbxuu still short: stacking was not the cause; read its rounds per bin, r4 dropped, next
       r2 + a budget raise for chunks still converging. Outside > 0 -> outside_dex. Summed cost > 2x -> per-channel seconds.
       Job failures -> log read, fixed, rerun.'
+    fix_at: '2026-11-07T08:10:49+00:00'
+    fix: '(1) Check 2 and 4, v4_uux_bgtxwp: the check says r4 keeps r3''s bgtxwp gain because r4 = r3 when at most one bin
+      is empty, but bgtxwp is a two-empty-bin case. Its top quota bin [-0.96,-0.714] (quota 25-26 per chunk) is empty in every
+      r3 chunk: at the end 35/36 chunks at seed 42 and 34/36 at seed 43 have it as the only empty bin, and 1 and 2 chunks
+      have both [-1.206,-0.96] and [-0.96,-0.714] empty (multichannel_check_reads/v4_uux_bgtxwp_current+grid_r2_budget18+grid_r3_budget18_{42,43}.json,
+      quota_chunks kept_per_bin). So in every round where the reachable bin [-1.206,-0.96] is still empty, flat_quota_weights
+      with unique gives that bin (lower index, done first) the nearest ~25 candidates and moves the straddling bin''s ~25
+      units to the next ~25 lower candidates, where r3 stacked both on the same top ~25. That halves the extra pull toward
+      the top that made r3''s gain (short chunks 10/8 to 3/3). r4 therefore changes bgtxwp too and may lose that gain. Fix:
+      correct the check. Add an outcome branch, scored against r3 in the same job: bgtxwp''s [-1.206,-0.96] below r3''s 0.925/0.917,
+      or more than 3/3 short chunks, means de-stacking costs bgtxwp. The NO branch''s conclusion that the in-chunk steering
+      limit is reached may be drawn only when r4 is at least r3 on bgtxwp. If you want r4 to leave bgtxwp alone, say how bins
+      above the reach or straddling bins take part in the unique assignment. (2) Check 2, v4_uu_bbxuu: the change acts only
+      when two or more bins are empty in the same round. The design states that bbxuu''s top 3-9 bins sit empty after a round,
+      but no data shows it. The per-round records hold only n, missing and bins_short (for example bbxuu r3 seed 43 chunk
+      1: bins_short 17,6,5,4,3,3). Short is not empty, and at the end only 1 of 36 bbxuu r3 chunks at seed 43 (0 at seed 42)
+      has an empty bin. Fix: show the empty-bin count per round on existing data, or add a bins_empty count to the rounds
+      record that _flat_quota_part writes, so the r4 jobs record it for both r3 and r4. Then split the outcome''s ''bbxuu
+      still short: stacking was not the cause'' branch into ''r4 acted (2 or more empty bins in a round) and did not help''
+      and ''r4 never acted'' (r4 identical to r3 per seed, since the policies are deterministic per seed). Checks that pass:
+      matched control (r3 and the old sampling in the same job, only flat_empty_unique differs, R4 == dict(R3, flat_empty_unique=True)
+      asserted in tests/test_flat_grid.py); seeds 42/43 the same as the r1-r3 sibling checks; prior (searched docs/results.tex,
+      the entry and site decisions FA for empty bin, stack, unique, flat_empty, nearest candidates, smixu, r4, share floor:
+      no earlier revision of this kind); scope per Joaquin''s ''uniform sampling in logM^2 that covers the range of the pp
+      sampled process'' and the 2x cost bar; held-out pp test events the same as earlier checks; no training, HPO or label-in-map
+      issue; disk ~0.5 MB JSON per CPU job.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
