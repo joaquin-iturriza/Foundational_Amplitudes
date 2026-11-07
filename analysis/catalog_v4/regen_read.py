@@ -30,11 +30,11 @@ FIG = os.path.join(HERE, "figs", "regen_g12_fill")
 FILL_BAR = 0.95            # steps 72/75: a bin is filled at >= 0.95 of its quota
 COST_BAR = 2.0             # CLAUDE.md: a new method's cost over the one it replaces above 2x is a finding
 CHECK5 = ["v4_uux_epemg", "v4_uux_epemvevex", "v4_uu_bbxuu", "v4_us_ddxsu", "v4_udx_csxvevex"]   # step 75's classes
-STEP75 = {"lo": 0.78, "hi": 2.11}
+STEP75 = {"lo": 0.78, "hi": 2.11}     # step 75's cost range over the old, seeds 42/43 (grid_fwd_check.json)
 # D269 ("there is no way "a few" events lie outside, be that 10%, 1%, or whatever, if you had done what I asked, that
 # percentage would be zero"): held-out in-support pp events outside the regenerated pools' log|M|^2 range; FILLED needs
 # none on every class, a class with one or more is SHORT with its count (a tolerance is Joaquin's call, never the read's)
-COVER_BAR = 0     # step 75's cost range over the old, seeds 42/43 (grid_fwd_check.json)
+COVER_BAR = 0
 
 PULL = r'''
 import json, os, sys, traceback
