@@ -888,7 +888,7 @@ def step73_fig():
 # step 80 (D296, D315): the sign branch deepened to a copy of the last 4 of the 8 blocks (model.net.sign_branch_blocks=4,
 # arm v4_het_signhead_branch4 seed 42), read against step 73's one-block branch (54961d3e, same code otherwise), the
 # shared-trunk weight-1 head (ac8d6fca) and the MSE control, all seed 42
-STEP80 = {"branch4": ("FA-ccin2p3-PENDING",), "branch1": STEP73["branch"]}
+STEP80 = {"branch4": ("FA-ccin2p3-22bc476d",), "branch1": STEP73["branch"]}
 
 
 def step80_bands():
