@@ -4788,6 +4788,12 @@ entries:
     why: more seeds than the sibling classes is Joaquin's call (CLAUDE.md scope rule), taken on the design reviewer's suggestion
       without asking; flagged by the repo-reviewer, cancelled before starting (no CPU used); asked instead
     at: '2026-11-06T10:22:38+00:00'
+  - tried: 'Step 65 design v2 (2026-11-07): read''s coverage bar at <= 2 held-out pp events outside per class (step 67/75''s
+      reviewer-passed rule) and a SHORT remedy widening the range table from the held-out events'
+    why: 'Design reviewer FIX twice: D269 asks for zero outside (''that percentage would be zero''), a tolerance is Joaquin''s
+      call; widening from the scored events would pass by construction. Replaced by v3: bar 0, a SHORT revision widened from
+      the PP4 val events and scored on the dsh_ events only.'
+    at: '2026-11-07T03:34:29+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
