@@ -110,7 +110,17 @@ def _seconds(c, fname, policy):
     return xs
 
 
-def summary():
+# plan step 75's sampler (channel grids + forward joint resonance, at 12 labels per flat event), read the same way:
+# `summary grid12` -> data/sampling_cost_grid12.json
+STEP75_FILE = ("{c}_current+quota_ladder_both_res2+quota_ladder_both_res2_budget12+grid_both_res2f_budget12+"
+               "grid_both_res2f_budget8_{s}.json")
+POLICIES = {"grid12": (STEP75_FILE, "grid_both_res2f_budget12"), "grid8": (STEP75_FILE, "grid_both_res2f_budget8")}
+
+
+def summary(policy=None):
+    """without `policy` the budget-750 quota sampler (NEW_POLICY) -> OUT; with one of POLICIES that policy's seconds
+    from its own check jobs -> OUT with _<policy> before .json"""
+    new_file, new_policy = POLICIES[policy] if policy else (NEW_FILE, NEW_POLICY)
     gen = json.load(open(GEN))["classes"]
     fr = json.load(open(os.path.join(ROOT, "recipes", "catalog_v4_flat_range.json")))
     names = sorted(c for c in fr if not c.startswith(EE_PREFIX))     # the 1301 hadronic classes
@@ -119,7 +129,7 @@ def summary():
     old = {c: sum(gen[c][r]["seconds"] for r in gen[c]) for c in names if c not in missing}
     test = {}
     for c in TEST:
-        new = _seconds(c, NEW_FILE, NEW_POLICY)
+        new = _seconds(c, new_file, new_policy)
         plain = _seconds(c, PLAIN_FILE, "multichannel")
         o_train = gen[c]["train"]["seconds"]
         test[c] = {"nfinal": nf[c], "old_train_s": o_train, "old_all_s": round(old[c], 1),
@@ -139,11 +149,11 @@ def summary():
         tot[f"new_core_h_{k}"] = round(sum(s * (a if nf[c] <= 3 else b) for c, s in old.items()) / 3600)
     for b in by_n.values():
         b["old_core_h"] = round(b["old_core_h"], 2)
-    res = {"definition": __doc__.split("\n\n")[1], "missing_old": missing, "test_classes": test,
+    res = {"definition": __doc__.split("\n\n")[1], "policy": new_policy, "missing_old": missing, "test_classes": test,
            "ratio_nfinal_le3": r3, "ratio_nfinal_ge4": {"median": float(np.median(r4)), "min": min(r4), "max": max(r4)},
            "by_nfinal": {str(k): by_n[k] for k in sorted(by_n)}, "total_1301": tot,
            "old_per_class_s": {c: round(s, 1) for c, s in old.items()}, "nfinal": nf}
-    json.dump(res, open(OUT, "w"), indent=1)
+    json.dump(res, open(OUT.replace(".json", f"_{policy}.json") if policy else OUT, "w"), indent=1)
     print(json.dumps({k: res[k] for k in ("test_classes", "ratio_nfinal_ge4", "by_nfinal", "total_1301")}, indent=1))
     print("missing", len(missing), missing[:10])
 
