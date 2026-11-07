@@ -11980,6 +11980,17 @@ entries:
       read the branch''s validation sign accuracy and per-class shares first. H5 listed beside, called only beyond 2.04x against
       the one-block branch (9.3%: below 4.56% or above 19.0%). INCOMPLETE (a read missing) or FAULT (magnitude outside the
       band on any read) come before any verdict.'
+    passed_at: '2026-11-07T09:40:47+00:00'
+    reviewer: 'Re-check after FIX: verdict now on HD5. I recomputed the pooled within-arm SD of ln(median wrong-sign share)
+      over 4 arms x 4 seeds from data/reads/*_sign.json and the MSE reads: HD5 0.086 (one-run band 1.275), H5 0.252 (band
+      2.04), matching step80_bands. HD5 moves with the sign''s share of the network: MSE seeds 11.15-13.95% vs every het seed
+      13.0-18.65%, disjoint. The branches are consistent and cover every value: YES <13.0 and <=13.95; NOT RESOLVED 13.0-18.9;
+      NO >18.9; H5 beside at 2.04x; INCOMPLETE/FAULT first. Caveat for the read: YES is set against the 16 het seed values
+      and the MSE range, not one-run against the one-block 14.85 (13.0 is a 1.14x move there, inside the 1.275 band), so report
+      it that way. Only sign_branch_blocks=4 differs (job script 38fa76a1); HETEROSC mean; one seed (D315); disk one run dir,
+      no cache; 2.9 GPU-h. Check 5 searched results.tex for sign branch, sign_branch, detached, sign head, parallel/separate
+      trunk, sign network, wrong-sign, pair head; plan steps 56/61/73 and dead ends; site decisions ''sign'' (D287, D296,
+      D315): no prior branch-depth work.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
