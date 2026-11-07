@@ -10614,6 +10614,76 @@ entries:
       head'', ''wrong-sign'', ''clip per''; plan.yaml and catalog_coverage evidence/dead ends for sign_branch/detach/attach;
       site decisions (D287, D296, D315): no earlier run of the sign head off the shared trunk; detach_sigma_backbone (results.tex
       l.10395, 10475) is the sigma analogue and is named in prior.'
+  - at: '2026-11-07T01:28:19+00:00'
+    question: 'Step 73 (D287/D296; the NO branch of step 61, whose design names the attachment point next): does computing
+      the het sign logit with a separate copy of the last transformer block fed detached features and detached frames (model.net.sign_branch:
+      the sign gradient reaches only that block and linear_out''s sign row, clipped on its own, so it never takes from the
+      trunk''s clipped update) make the het sign head''s wrong-sign share on the held-out one-loop pools no worse than the
+      MSE control''s, with the magnitude no worse than the weight-1 het sign head''s?'
+    prior: 'Step 61 (data/het_signhead61.json @66f94590, het_oneloop.py step61): NO. Median over pools of the seed-mean wrong-sign
+      share, catalog-sampled one-loop H5 (21 pools) / default-sampled one-loop HD5 (19 classes), four seeds: MSE control 6.7/13.0%,
+      weight-1 het sign head (same-code rerun ac8d6fca 752344ce b13f456c 83dc9690) 13.0/17.5%, matched per event 8.4/14.9%
+      (vs rerun H5 14 better/6 worse, p 0.058), weight 75 9.7/15.0%; magnitude R over the rerun: per event PP4 1.13 [1.06,1.21],
+      HD4 1.19, H1-H7c 1.14-1.23; weight 75 PP4 1.39, 1.20-1.59 elsewhere; pre-clip gradient norm unchanged (23-27), clip
+      at 5 binding on 98.6-99.6% of steps: with the update norm fixed by the clip, a larger sign term takes its share from
+      the magnitude. Re-seed rule passed (rerun vs step-56 arm H5 0.97, HD5 0.955). Step 56: weight-1 het sign head worse
+      than MSE on H5 17/21 (p 0.0036), HD5 15/19 (p 0.0096); magnitude R vs het reference PP4 1.002, EE4 0.953. het_sign_diag.json
+      @999e9742: het pre-clip norm 75x the MSE control''s. Searched results.tex (sign head, sign branch, detached, attachment,
+      het sign), plan, decisions: no run with the sign head off the shared trunk; models/lloca.py detach_sigma_backbone is
+      the same idea for sigma (no run of it under the het sign head).'
+    measure: 'As step 61, het_oneloop.py step61''s computation with the branch arm in place of the matched arms (STEP61 extended,
+      same reads): sign (gating) per pool the seed-mean wrong-sign share on H5 (21 pools, val) and HD5 (19 classes, test),
+      one-sided paired sign tests against the MSE control (v4_dimensionless_muon seeds 42-45; HD5 rereads dc9feba1 af09cad3
+      8833a131 481ad196) and against the weight-1 rerun (ac8d6fca 752344ce b13f456c 83dc9690), all-positive beside; per-validation
+      sign accuracy on the 63 signed training pools. Magnitude R = branch arm over the weight-1 rerun, seed-paired, het_oneloop''s
+      widened interval: PP4 and EE4 gating (upper <= 1.10), HD4 and each H1-H7c shown worse only if lower > 1 and R > 1.10,
+      H5/HD5 reported. Beside: R of the branch arm over the old het magnitude reference without a sign head (5abe4a0e 92207f6a
+      0208896e 8ddc490b: by construction the branch leaves the trunk''s gradient that of a het model whose sign gradient is
+      zero), the pre-clip gradient norm of the trunk and of the branch (logged separately), best validation het NLL. Figure
+      figs/het_signhead73 (step61_fig''s four panels with the branch arm): per-pool wrong-sign shares on H5 and HD5 beside
+      the rerun and the MSE control, class-median MSE per read against the rerun''s, validation curves.'
+    check: 'On existing data the measures resolve at four seeds: step 61 read the weight-1 rerun against the MSE control at
+      H5 1.94x median (14/21 worse), the matched-per-event arm against the rerun at 0.65x (14 better/6 worse, p 0.058), and
+      magnitude shifts of 13% on PP4 with intervals of +-6% (widened [1.06, 1.21]); step 56 resolved the het/MSE sign gap
+      at p 0.0036 / 0.0096. The mechanism is checked in code (tests/test_sign_branch.py @c4d5a900, 16 passed): the sign logit''s
+      backward gives exactly zero gradient on the trunk, framesnet and every readout row but the sign row (plain, checkpointed,
+      repeat-frames paths); mu/sigma give zero on the branch; with the sign term scaled 1e8 the trunk''s clipped gradient
+      is bit-equal to the run without it; flag off bit-equal to trunk. So the trunk''s update is that of a het model with
+      no sign gradient, and the sign has its own clip budget.'
+    fixed: 'Everything of v4_het_control_signhead (width 8, 4264 steps, catalog_v4_base_train, het loss + sigma stage, MUON_BEST
+      HPs, signed_magnitude_target, sign_near_weight 1, sign_loss_weight 1, no sign_het_match, no pair head, reads PP4/EE4/HD4/HD5
+      + H1-H7c), plus ++model.net.sign_branch=true: arm v4_het_signhead_branch[_seed2|_seed3|_seed4] of scripts/job_catalog_v3_short.sh
+      at trunk after merging sign-branch (c4d5a900, repo-reviewer PASS) synced to CC; gpu_v100 as step 61; in memory, no cache;
+      limit 03:30:00 (short_wall''s, as step 61''s arms; their jobs took 2.4-2.5 h; the branch adds about 7% of a training
+      step, measured on CPU). The sign block starts as a copy of the last trunk block; sign row of the readout clipped with
+      the branch.'
+    control: 'The weight-1 het sign head rerun at the same code family (v4_het_control_signhead[_seedK]_tagkeyed: ac8d6fca
+      752344ce b13f456c 83dc9690, 7b50861c) for sign and magnitude; the MSE control (old code, kept under step 61''s re-seed
+      rule, which passed) for the sign non-inferiority; the het magnitude reference beside.'
+    seeds: '42-45 (4 jobs), as the weight-1 rerun and the MSE control, because four seeds resolved the sign gap and one does
+      not (per seed the rerun''s H5 median is 0.88-1.99x the MSE control''s, p 0.0036-0.67; the same configuration at two
+      code versions 0.63-1.16x of itself). Joaquin''s D315 (one seed in general) is asked against this (plan ask, 2026-11-07):
+      submission waits on his answer. On ''one seed'': seed 42 alone (FA job v4_het_signhead_branch), read against seed 42
+      of the rerun (ac8d6fca) and of the MSE control, with the one-seed outcome table in the outcome field.'
+    outcome: 'Same rules as step 61, the branch arm in place of a matched arm. YES: sign not worse than the MSE control on
+      H5 and HD5 (one-sided p_arm_worse > 0.05 and median wrong-sign within 1.2x), better than the weight-1 rerun on H5 (one-sided
+      p < 0.05), magnitude PP4 and EE4 upper <= 1.10 and no read of HD4, H1-H7c shown worse -> adopt sign_branch as the het
+      sign head, write up. SIGN YES, MAGNITUDE HURT (not expected: the trunk sees no sign gradient) -> report both, look for
+      the cause in the clip/optimizer groups. PARTIAL (better than the rerun, still worse than MSE): the sign improves when
+      it stops competing but the trunk''s het features carry less sign information than MSE''s -> next the clipping regime
+      (clip per loss term, or the het NLL''s gradient rescaled) so the trunk learns sign-relevant features too. NO (not better
+      than the rerun): the shared update was not what held the sign back -> gradient share and attachment both ruled out;
+      next the clipping regime on the whole het model, then the sign target (sign_near definition). Blow-ups listed apart.
+      Cost: 4 jobs x 1 V100 x ~2.6 h = ~10.4 GPU-h of work, 14 at the limits.
+
+      One-seed version (only if Joaquin answers ''one seed''), read at seed 42 against the rerun''s and the MSE control''s
+      seed 42: the gap the branch is meant to close is 1.54x at seed 42 (H5 median, rerun over MSE), inside the 0.63-1.16x
+      spread one configuration shows by itself between code versions, so one seed cannot answer the sign question. Sign: ''not
+      resolved'' in every case except the branch''s H5 or HD5 median wrong-sign above 1.16x the rerun''s at seed 42 (worse
+      than the spread allows) -> NO for the branch. Magnitude, R = branch over rerun at seed 42: PP4 or EE4 R > 1.15 (per-seed-pair
+      spread of one configuration 0.80-1.14) -> MAGNITUDE HURT, a NO; HD4 or any H1-H7c R > 1.3 (their spread 0.71-1.27) ->
+      MAGNITUDE HURT; otherwise ''magnitude not shown hurt''. Next after a one-seed ''not resolved'': ask Joaquin again for
+      seeds 43-45 with the seed-42 numbers in hand; after a one-seed NO: the clipping regime as in the four-seed NO.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
