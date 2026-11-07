@@ -29,6 +29,12 @@ returns, how much of it its pool keeps, what it costs in time and disk, and what
                                             max pT
     runlevel --queue Q... [--match RE]     the runsize pass with the run as the unit: reuse pools' short runs, rows'
                                             runs from the shuffle, within-run correlation, run-level permutation test
+    cutread --queue Q... --match RE --energy E --out F.json [--max-events N]   e+e- parts at one collider energy read
+                                            cut by cut against what the mixture keeps (accept_of: the class's window
+                                            and fiducial cuts in the partonic frame): the share each piece removes
+                                            (window, pT, |cos| partonic and lab, Delta R and pair mass split into
+                                            pairs the e+e- run card cuts and pairs it cannot) and the share removed by
+                                            that piece alone (plan catalog_coverage step 76)
     node                                    the node's disks (TMPDIR, /tmp, SCRATCH), cores and memory, one JSON line
 """
 import argparse, glob, json, math, os, re, shutil, signal, socket, subprocess, sys, time
@@ -894,6 +900,104 @@ def cmd_runsize(a):
     print("RUNSIZE_JSON " + json.dumps(out), flush=True)
 
 
+# e+e- run card (recipes/catalog_v4_ee/run_card.dat) cut categories: j (light quarks, b with maxjetflavor 5, gluon),
+# a (photon), l (charged leptons). Delta R is cut for every pair of categories (drjj ... dral); a pair mass only for
+# jj, bb, aa, and ll (MadGraph's mmll: same-flavour opposite-sign leptons), so a mixed pair's mass cut (a-j, a-l,
+# j-l, unlike leptons) is applied only by the mixture's rejection
+_CARD_CAT = {**{q: "j" for q in (1, 2, 3, 4, 5, 21)}, 22: "a", 11: "l", 13: "l", 15: "l"}
+
+
+def _pair_card_mass(pi, pj):
+    ci, cj = _CARD_CAT.get(abs(pi)), _CARD_CAT.get(abs(pj))
+    if ci is None or ci != cj:
+        return False
+    return ci != "l" or pi == -pj
+
+
+def cut_pieces(P, acc):
+    """Per event of P (lab frame, beams first) the pieces of the accept `acc` (accept_of) it fails, as boolean arrays:
+    window (sqrt(s_hat) outside the class's window), pt, cos (partonic frame), cos_lab, dr_card (every pair) and
+    m_card / m_mixed (pairs whose cut the e+e- run card expresses / does not); with the least mixed pair mass"""
+    import itertools
+    lo, hi, m_f, pdg, cuts = acc
+    P = np.asarray(P, float)
+    Q = mg.to_partonic_frame(P)
+    q = Q[:, 0] + Q[:, 1]
+    sq = np.sqrt(np.clip(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(1), 0.0, None))
+    extra = {abs(int(p)) for p in (cuts.get("cut_pdgs") or ())}
+    slots = [2 + i for i in range(len(m_f)) if abs(int(pdg[2 + i])) not in mg._NEUTRINOS
+             and (float(m_f[i]) == 0.0 or abs(int(pdg[2 + i])) in extra)]
+    N = len(P)
+    f = {k: np.zeros(N, bool) for k in ("pt", "cos", "cos_lab", "dr_card", "m_card", "m_mixed")}
+    f["window"] = (sq < lo) | (sq > hi)
+    pt = lambda p: np.hypot(p[..., 1], p[..., 2])
+    cost = lambda p: np.abs(p[..., 3]) / np.clip(np.linalg.norm(p[..., 1:], axis=-1), 1e-12, None)
+    eta = lambda p: np.arcsinh(p[..., 3] / np.clip(pt(p), 1e-9, None))
+    phi = lambda p: np.arctan2(p[..., 2], p[..., 1])
+    for s_ in slots:
+        f["pt"] |= pt(Q[:, s_]) <= cuts["pt_min"]
+        f["cos"] |= cost(Q[:, s_]) >= cuts["cos_max"]
+        f["cos_lab"] |= cost(P[:, s_]) >= cuts["cos_max"]
+    mmix = np.full(N, np.inf)
+    for i, j in itertools.combinations(slots, 2):
+        pi, pj = Q[:, i], Q[:, j]
+        dphi = np.abs(phi(pi) - phi(pj)); dphi = np.minimum(dphi, 2 * np.pi - dphi)
+        dr = np.sqrt((eta(pi) - eta(pj)) ** 2 + dphi ** 2)
+        s2 = pi + pj
+        m = np.sqrt(np.clip(s2[:, 0] ** 2 - (s2[:, 1:] ** 2).sum(-1), 0.0, None))
+        card = _pair_card_mass(int(pdg[i]), int(pdg[j]))
+        f["dr_card"] |= dr <= cuts["dr_min"]          # every Delta R pair is on the card (drjj ... dral)
+        f["m_card" if card else "m_mixed"] |= m <= cuts["m_min"]
+        if not card:
+            mmix = np.minimum(mmix, m)
+    return f, mmix, sq
+
+
+def cmd_cutread(a):
+    out = {}
+    for q in _queues(a.queue):
+        D = lp._dirs(q)
+        for sf in sorted(glob.glob(os.path.join(D["specs"], "*.json"))):
+            name = os.path.basename(sf)[:-5]
+            if not re.search(a.match, name):
+                continue
+            acc = accept_of(name)
+            if acc is None:
+                out[name] = {"error": "no accept (class not trained)"}; continue
+            Ps, nparts = [], 0
+            for p, run in mg.lhe_part_paths(name, lp._spec(D, name)):
+                if run[2].get("ebeam1") is None or abs(2 * float(run[2]["ebeam1"]) - a.energy) > 1e-6:
+                    continue
+                try:
+                    with np.load(p) as z:
+                        Ps.append(np.asarray(z["mom"])); nparts += 1
+                except (FileNotFoundError, OSError, KeyError, ValueError):
+                    continue
+                if sum(len(x) for x in Ps) >= a.max_events:
+                    break
+            if not Ps:
+                out[name] = {"error": f"no part at {a.energy:g} GeV"}; continue
+            P = np.concatenate(Ps)[:a.max_events]
+            f, mmix, sq = cut_pieces(P, acc)
+            keys = ("window", "pt", "cos", "dr_card", "m_card", "m_mixed")   # what the accept applies (cos: partonic)
+            anyf = np.zeros(len(P), bool)
+            for k in keys:
+                anyf |= f[k]
+            r = {"queue": os.path.basename(q), "energy": a.energy, "parts": nparts, "events": int(len(P)),
+                 "window": [acc[0], acc[1]], "kept": float((~anyf).mean()),
+                 "fails": {k: float(f[k].mean()) for k in f},
+                 "fails_alone": {k: float((f[k] & ~np.any([f[o] for o in keys if o != k], 0)).mean()) for k in keys},
+                 "cos_partonic_not_lab": float((f["cos"] & ~f["cos_lab"]).mean()),
+                 "sqrt_shat_q": [float(x) for x in np.quantile(sq, [0.01, 0.1, 0.5, 0.9])]}
+            fin = np.isfinite(mmix)
+            if fin.any():
+                r["mixed_pair_min_mass_q"] = {str(x): float(np.quantile(mmix[fin], x)) for x in (0.01, 0.1, 0.25, 0.5)}
+            out[name] = r
+    with open(a.out, "w") as fh:
+        json.dump(out, fh, indent=1, sort_keys=True)
+    print("CUTREAD " + json.dumps({n: {k: v[k] for k in ("kept", "fails_alone") if k in v} for n, v in out.items()}))
+
+
 def cmd_node(a):
     out = {"host": socket.gethostname(), "nproc": os.cpu_count(), "TMPDIR": os.environ.get("TMPDIR")}
     for k, p in (("tmpdir", os.environ.get("TMPDIR")), ("tmp", "/tmp"), ("scratch", os.environ.get("SCRATCH"))):
@@ -995,6 +1099,9 @@ def main():
     s.add_argument("--keep", default=None, help="save the run's events and banner under KEEP/<process>/")
     s.add_argument("--ee-isr", action="store_true", help="e+e-: the collider anchor's ISR (+ beamstrahlung) spectrum "
                    "at --energy (gen_catalog_v4_default.EE_ANCHOR)")
+    s = sub.add_parser("cutread"); s.add_argument("--queue", nargs="+", required=True); s.add_argument("--out", required=True)
+    s.add_argument("--match", required=True); s.add_argument("--energy", type=float, required=True)
+    s.add_argument("--max-events", type=int, default=20000)
     s = sub.add_parser("gridpack"); s.add_argument("--process", required=True)
     s.add_argument("--grid-events", type=int, required=True, help="events of the run whose precision the grid has")
     s.add_argument("--runs", type=int, required=True); s.add_argument("--events", type=int, default=1000)
@@ -1039,7 +1146,7 @@ def main():
     s = sub.add_parser("eeisr-read"); s.add_argument("runs", nargs="+"); s.add_argument("--out", required=True)
     s.add_argument("--fig", default=None, help="figure base path (png + pdf)")
     a = ap.parse_args()
-    {"eeisr-read": cmd_eeisr_read, "list": cmd_list, "parts": cmd_parts, "run": cmd_run, "node": cmd_node, "summary": cmd_summary, "kept": cmd_kept, "mixcheck": cmd_mixcheck, "runsize": cmd_runsize, "runlevel": cmd_runlevel, "runlevel-summary": cmd_runlevel_summary, "gridpack": cmd_gridpack, "gridpool": cmd_gridpool, "gridpool-plan": cmd_gridpool_plan}[a.cmd](a)
+    {"eeisr-read": cmd_eeisr_read, "cutread": cmd_cutread, "list": cmd_list, "parts": cmd_parts, "run": cmd_run, "node": cmd_node, "summary": cmd_summary, "kept": cmd_kept, "mixcheck": cmd_mixcheck, "runsize": cmd_runsize, "runlevel": cmd_runlevel, "runlevel-summary": cmd_runlevel_summary, "gridpack": cmd_gridpack, "gridpool": cmd_gridpool, "gridpool-plan": cmd_gridpool_plan}[a.cmd](a)
 
 
 if __name__ == "__main__":
