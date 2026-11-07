@@ -15484,6 +15484,9 @@ entries:
     17: 'Live check of the idle wake (site idle_pass, fix of 2026-11-06 site.bak-20261106-idlelive): at the first real moment
       plan next lists RESUME/LAUNCH with nothing running, confirm a STALLED idle: event is opened by the running supervisor
       within 45 min; report to Joaquin either way.'
+    18: 'D324 (Joaquin: 10 min batching, track usage before and after): baseline with tools/wake_batching.py up to 2026-11-07T17:00;
+      batch main-session wakes (owner hand-backs, task notifications) and owner resumes at 10 min; after a week the same tool
+      on the after-period, both with a figure.'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -15759,6 +15762,11 @@ entries:
       if:
       - 'fired: report and drop'
       - 'did not fire: trace and fix, replay again'
+    18:
+      feeds: whether 10-minute batching cuts token usage as the replay predicts (11-31% main session)
+      if:
+      - 'after-period saving within or above the predicted band: keep 10 min'
+      - 'saving below the band: report to Joaquin with the numbers and the causes'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
