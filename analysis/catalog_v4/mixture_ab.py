@@ -1498,6 +1498,69 @@ def seed_pairs():
     print(json.dumps(out, indent=1))
 
 
+# step 15 (D319, seed 42, D315): the WSD warm starts against the C1 change from scratch under the WSD schedule
+S15 = {"B_wsd": "",                                   # v4_het_default25_wsd, filled at submission
+       "arms": {"wsdbranch50": S14["arms"]["wsdbranch50"], "wsdfinal_default50": "",   # filled at submission
+                "wsdbranch25": S14["arms"]["wsdbranch25"], "wsdfinal_default": S14["arms"]["wsdfinal_default"]}}
+
+
+def warm_wsd():
+    """Step 15's reads -> data/warm_start_S15.json. Seed 42: R(arm/B_wsd) on PP4 and EE4 (deciding), held, HD4, HD5
+    per arm, the WSD warm starts at k=533 over the C1 change from scratch trained with the WSD parent's schedule;
+    beside, R(B_wsd/B) (the schedule's gain from scratch) and R(wsdfinal_default50/wsdbranch50) (restart against
+    branch on share 0.50). Median over classes of the class geometric mean of probe ratios; 95% class bootstrap
+    widened on each side by the largest measured paired seed spread of any kind (data/ws_seed_pairs.json, as step 14's
+    WSD arms; held, HD4, HD5 the larger of PP4's and EE4's). Rule of par:v4_warm_start, fixed before the read: MATCH
+    when the widened upper end is at most 1.35 on PP4 and EE4, else SHORT when a widened lower end is above 1, else
+    INCONCLUSIVE. Same-recipe reading: restart as good as branch when R(wsdfinal_default50/wsdbranch50) is within
+    [1/1.05, 1.05] on both reads."""
+    cls = class_of()
+    sp = json.load(open(os.path.join(DATA, "ws_seed_pairs.json")))
+    w = {r: max(sp["max_d_same_data"][r], sp["share_pair_d"][r], sp["parent_swap"][r]["max_abs_lnR"])
+         for r in ("PP4", "EE4")}
+    w.update({r: max(w["PP4"], w["EE4"]) for r in ("held", "HD4", "HD5")})
+    if not S15["B_wsd"]:
+        sys.exit("warm_wsd: S15 B_wsd not filled")
+
+    same = dict(sp["max_d_same_data"]); same.update({r: max(same["PP4"], same["EE4"]) for r in ("held", "HD4", "HD5")})
+
+    def pair(num, den, width=w):
+        # den: a run id, or {read: run id} (B: its held-out reads sit on its training run)
+        row = {"run": num, "over": den, "widening": width}
+        for read in ("PP4", "EE4", "held", "HD4", "HD5"):
+            r, cr = _one(num, den[read] if isinstance(den, dict) else den, read, cls)
+            row[read] = None if r is None else r_with_interval(cr, math.exp(width[read]))
+        return row
+    out = {"design": "plan warm_start step 15 (D319, D315)", "B_wsd": S15["B_wsd"], "widening": w, "arms": {}}
+    for name, run in S15["arms"].items():
+        if not run:
+            continue
+        row = out["arms"][name] = pair(run, S15["B_wsd"])
+        d = [row[r] for r in ("PP4", "EE4")]
+        if all(x is not None for x in d):
+            row["outcome"] = ("MATCH" if max(x["widened"][1] for x in d) <= 1.35 else
+                              "SHORT" if max(x["widened"][0] for x in d) > 1 else "INCONCLUSIVE")
+    out["B_wsd_over_B"] = pair(S15["B_wsd"], S14["B"])
+    if S15["arms"]["wsdfinal_default50"]:
+        # same parent and data: the same-data width, as step 14's branch_over_wsdfinal
+        rb = out["restart_over_branch50"] = pair(S15["arms"]["wsdfinal_default50"], S15["arms"]["wsdbranch50"], same)
+        out["restart_as_good_as_branch"] = all(rb[r] is not None and 1 / 1.05 <= rb[r]["R"] <= 1.05
+                                               for r in ("PP4", "EE4"))
+    bl = blowups([S15["B_wsd"], S14["B"]["PP4"]] + [r for r in S15["arms"].values() if r])
+    out["blowups"] = {"flagged": bl["flagged"], "spiked_recovered": bl["spiked_recovered"]}
+    if bl["flagged"]:   # a verdict is withheld while a run read blew up or is unchecked (blowups)
+        for row in out["arms"].values():
+            if "outcome" in row:
+                row["outcome_withheld"] = row.pop("outcome")
+        if "restart_as_good_as_branch" in out:
+            out["restart_as_good_as_branch_withheld"] = out.pop("restart_as_good_as_branch")
+    json.dump(out, open(os.path.join(DATA, "warm_start_S15.json"), "w"), indent=1)
+
+    def strip(x):
+        return {k: strip(v) for k, v in x.items() if k != "classes"} if isinstance(x, dict) else x
+    print(json.dumps(strip(out)))
+
+
 def warm_single():
     """Step 14's reads -> data/warm_start_S14.json. Per arm, seed 42: R(arm/control) on PP4 and EE4 (deciding), held
     (catalog-sampled held-out, pooled), HD4, HD5; median over classes of the class geometric mean of probe ratios; 95%
@@ -1627,6 +1690,7 @@ def main():
     w.add_argument("change", nargs="?", default="C1")
     sub.add_parser("seed_pairs")
     sub.add_parser("warm_single")
+    sub.add_parser("warm_wsd")
     ep = sub.add_parser("epochs")
     ep.add_argument("run"); ep.add_argument("log")
     a = ap.parse_args()
@@ -1654,6 +1718,8 @@ def main():
         seed_pairs()
     elif a.cmd == "warm_single":
         warm_single()
+    elif a.cmd == "warm_wsd":
+        warm_wsd()
     elif a.cmd == "epochs":
         epochs(a.run, a.log)
     else:
