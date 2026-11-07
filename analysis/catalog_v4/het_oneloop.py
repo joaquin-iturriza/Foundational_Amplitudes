@@ -346,25 +346,36 @@ SIGNHEAD = {"arm": ("FA-ccin2p3-18b98b55", "FA-ccin2p3-b2538139", "FA-ccin2p3-66
             "mse_h5": ("v4_dimensionless_muon", "v4_dimensionless_muon_seed2", "v4_dimensionless_muon_seed3",
                        "v4_dimensionless_muon_seed4")}
 SH_SEEDS = (42, 43, 44, 45)
+# step 61 (D287/D296; designs passed 2026-11-06T05:06:47 and 05:15:07), seeds 42-45 in order: the matched sign weights
+# (v4_het_signhead_matched_event: per-event sign BCE x the het NLL's detached mu factor; _const: sign_loss_weight 75) and
+# the same-code rerun of step 56's arm (v4_het_control_signhead[_seedK]_tagkeyed, SHORT_TAG=keyed), all three after the
+# keyed-draw augmentation (d18e44f1); event at 92322402, const and rerun at 7b50861c (the training code between the two
+# differs only in default-off warm-start options: base_experiment/optim/run.py fine_tune.*_warmup, load_optimizer_state)
+STEP61 = {"matched_event": ("FA-ccin2p3-9079850b", "FA-ccin2p3-ebe4c4ed", "FA-ccin2p3-297c4366", "FA-ccin2p3-dce345d8"),
+          "matched_const": ("FA-ccin2p3-e90fea9a", "FA-ccin2p3-14c988b0", "FA-ccin2p3-45b2d041", "FA-ccin2p3-04d27cd1"),
+          "rerun": ("FA-ccin2p3-ac8d6fca", "FA-ccin2p3-752344ce", "FA-ccin2p3-b13f456c", "FA-ccin2p3-83dc9690")}
 SH_AXES = ("HD5", "H5", "PP4", "EE4", "HD4", "H1", "H2", "H2p5", "H3", "H6", "H7E", "H7c")
 PAIR_GATE = {"HD5": 0.43, "H5": 0.40}     # absolute bound on the sd over classes of the paired ln ratio (design check 3)
 TOL = 1.25                                # magnitude no-worse tolerance on the widened upper end
 
 
-def signhead_pull():
-    """Per run of SIGNHEAD: its job log's ZERO_SHOT, SIGNED_AB and validation lines (site logs), the zero-shot reads per
-    axis (mixture_ab extract -> data/reads/<run>_<axis>.json), the validation curve (mixture_ab val), and the sign
-    reads: HD5 from the ZERO_SHOT records (wrong_sign, wrong_sign_near, neg_share; test split), H5 from the SIGNED_AB
-    lines (signed_ab_score --arm head, val split) -> data/reads/<run>_sign.json"""
+def signhead_pull(runs=None):
+    """Per run of SIGNHEAD (or `runs`, {kind: runs}): its job log's ZERO_SHOT, SIGNED_AB and validation lines (site
+    logs), the zero-shot reads per axis (mixture_ab extract -> data/reads/<run>_<axis>.json), the validation curve
+    (mixture_ab val), and the sign reads: HD5 from the ZERO_SHOT records (wrong_sign, wrong_sign_near, neg_share; test
+    split), H5 from the SIGNED_AB lines (signed_ab_score --arm head, val split), the main block's pre-clip gradient norm
+    -> data/reads/<run>_sign.json"""
     import re, tempfile
     from mixture_ab import extract, val
     tags = "|".join(SH_AXES)
     pat = re.compile(rf"^(({tags}) ZERO_SHOT |SIGNED_AB |RUN_SUMMARY )|Starting to train for|Val loss \(combined\)|"
-                     r"sign_head: sign accuracy on the")
+                     r"sign_head: sign accuracy on the|Grad-norm \(pre-clip\)")
     acc_re = re.compile(r"sign accuracy on the (\d+) signed pools: median ([0-9.]+), min ([0-9.]+)")
+    gn_re = re.compile(r"Grad-norm \(pre-clip\): median=([0-9.e+-]+) p90=([0-9.e+-]+) max=([0-9.e+-]+) \| clip=\S+ "
+                       r"bound ([0-9.]+)% of steps")
     h5_pools = set()
-    for kind in ("arm", "ref", "mse_hd5", "mse_train"):
-        for run in SIGNHEAD[kind]:
+    for kind, kind_runs in (runs or {k: SIGNHEAD[k] for k in ("arm", "ref", "mse_hd5", "mse_train")}).items():
+        for run in kind_runs:
             if kind == "ref" and run in MAG and os.path.exists(os.path.join(READS, f"{run}_H5.json")):
                 continue                         # seeds 42/43 of the reference were read at step 47
             txt = subprocess.run(["site", "logs", run, "-n", "3000000"], capture_output=True, text=True,
@@ -375,11 +386,14 @@ def signhead_pull():
             axes = {"mse_hd5": ("HD5",), "mse_train": ()}.get(kind, SH_AXES)
             for ax in axes:
                 extract(run, f.name, ax)
-            if kind in ("arm", "ref"):
+            if kind not in ("mse_hd5", "mse_train"):
                 val(run, f.name)
+            gn = [m.groups() for m in (gn_re.search(l) for l in lines) if m]
             # per validation of the training (main block, then the sigma stage): [n signed pools, median, min] accuracy
             sg = {"HD5": {}, "H5": {}, "val_sign_acc": [[int(m.group(1)), float(m.group(2)), float(m.group(3))]
-                                                        for m in (acc_re.search(l) for l in lines) if m]}
+                                                        for m in (acc_re.search(l) for l in lines) if m],
+                  # [median, p90, max, % of steps the clip bounds] of the main block (the first Grad-norm line)
+                  "grad_norm_main": [float(x) for x in gn[0]] if gn else None}
             for l in lines:
                 if l.startswith("HD5 ZERO_SHOT "):
                     d = json.loads(l[len("HD5 ZERO_SHOT "):])
@@ -392,12 +406,17 @@ def signhead_pull():
             json.dump({"run": run, "source": "site logs ZERO_SHOT/SIGNED_AB lines", **sg},
                       open(os.path.join(READS, f"{run}_sign.json"), "w"), indent=0, sort_keys=True)
             os.unlink(f.name)
-            print(run, kind, {k: len(v) for k, v in sg.items()})
-            if kind in ("arm", "mse_train") and not sg["val_sign_acc"]:
+            print(run, kind, {k: len(v) for k, v in sg.items() if isinstance(v, (dict, list))}, flush=True)
+            if kind not in ("ref", "mse_hd5") and not sg["val_sign_acc"]:
                 print(f"WARNING {run}: no 'sign_head: sign accuracy' line in its log")
-            if kind == "arm":
+            if kind not in ("ref", "mse_hd5", "mse_train"):
                 h5_pools |= set(sg["H5"])
-    h5_neg_pull(h5_pools)
+    if runs is None:
+        h5_neg_pull(h5_pools)
+    else:
+        known = set(json.load(open(os.path.join(DATA, "het_signhead_h5_neg.json")))["neg"])
+        if h5_pools - known:
+            print("WARNING H5 pools without a negative share (rerun h5_neg_pull):", sorted(h5_pools - known))
 
 
 NEG_REMOTE = r'''
@@ -553,11 +572,196 @@ def signhead():
                                for ax, r in out["sign"].items()}}))
 
 
+def _paired_mag(arm, ref, ax, cls):
+    """R = arm over ref on one read, seed-paired as signhead (1): per class the geometric mean over the pairs of the
+    class's geometric-mean probe ratio, R the median over classes, the class bootstrap widened by the se over the pairs
+    of the per-pair class-median ln ratio"""
+    import math
+    from mixture_ab import load, class_ratios, r_with_interval
+    a = [load(r, ax) for r in arm]; b = [load(r, ax) for r in ref]
+    ks = sorted(set.intersection(*[set(x) for x in a + b]))
+    per_pair = [class_ratios(a[i], b[i], ks, cls) for i in range(len(arm))]
+    classes = sorted(per_pair[0])
+    lnr = np.array([[math.log(pp[c]) for c in classes] for pp in per_pair])
+    pair_meds = [float(np.median(row)) for row in lnr]
+    se = float(np.std(pair_meds, ddof=1) / math.sqrt(len(pair_meds)))
+    x = r_with_interval({c: math.exp(float(lnr[:, j].mean())) for j, c in enumerate(classes)}, math.exp(se))
+    x.update(per_pair_R=[round(math.exp(m), 4) for m in pair_meds], se_ln_pairs=round(se, 4), n_probes=len(ks))
+    # the compared quantity itself: per side the median over classes of the class's seed-geometric-mean MSE
+    side = lambda xs: float(np.median(list(class_ratios({k: gm([v[k] for v in xs]) for k in ks},
+                                                        {k: 1.0 for k in ks}, ks, cls).values())))
+    x.update(mse_class_median_arm=round(side(a), 6), mse_class_median_ref=round(side(b), 6))
+    return x
+
+
+def _sign_pair(A, C, h5neg, ax, test="arm_worse"):
+    """per pool the seed-mean wrong-sign share of runs A against runs C ({pool: record} per run): counts, the one-sided
+    sign test of `test` (arm_worse: A above C; arm_better: A below C), a two-sided p, the medians and their ratio"""
+    if ax == "H5":           # SIGNED_AB carries no negative share: the val pool's (h5_neg_pull)
+        A = [{p: dict(v, neg_share=h5neg[p][0]) for p, v in x.items() if p in h5neg} for x in A]
+    pools = sorted(set.intersection(*[set(x) for x in A + C]))
+    ps = [p for p in pools if all(x[p].get("wrong_sign") is not None for x in A + C)]
+    am = np.array([np.mean([x[p]["wrong_sign"] for x in A]) for p in ps])
+    cm = np.array([np.mean([x[p]["wrong_sign"] for x in C]) for p in ps])
+    worse, better = int((am > cm).sum()), int((am < cm).sum())
+    n = worse + better
+    r = {"n": len(ps), "a_above": worse, "a_below": better, "ties": len(ps) - n,
+         "p_a_above": round(_sign_test(worse, n), 4), "p_a_below": round(_sign_test(better, n), 4),
+         "p_two_sided": round(min(1.0, 2 * min(_sign_test(worse, n), _sign_test(better, n))), 4),
+         "median_a_pct": round(100 * float(np.median(am)), 2), "median_c_pct": round(100 * float(np.median(cm)), 2)}
+    r["median_ratio_a_over_c"] = round(float(np.median(am)) / float(np.median(cm)), 3) if np.median(cm) > 0 else None
+    if all("neg_share" in x[p] for x in A for p in ps):
+        r["all_positive_median_pct"] = round(100 * float(np.median([np.mean([x[p]["neg_share"] for x in A])
+                                                                    for p in ps])), 2)
+    r["per_pool_pct"] = {p: [round(100 * float(u), 2), round(100 * float(v), 2)] for p, u, v in zip(ps, am, cm)}
+    return r
+
+
+GATE_MAG = ("PP4", "EE4")                     # upper end of the widened interval <= MAG_UP (design 05:06)
+SHOWN_AXES = ("HD4", "H1", "H2", "H2p5", "H3", "H6", "H7E", "H7c")   # hurt only if lower > 1 and R > MAG_UP
+MAG_UP = 1.10
+SIGN_TOL = 1.2                                # median wrong-sign within 1.2x the MSE control's; re-seed band [1/1.2, 1.2]
+
+
+def step61():
+    """Step 61's read (designs passed 2026-11-06T05:06:47 and 05:15:07) -> data/het_signhead61.json.
+    Re-seed rule first: the step-56 arm (old code) against its same-code rerun on H5 and HD5: per-pool two-sided sign
+    test p < 0.05 or a median wrong-sign ratio outside [1/1.2, 1.2] -> the MSE control (old code) is rerun at the same
+    code before any YES or NO against it. Per matched arm: sign not worse than the MSE control on H5 and HD5 (one-sided
+    p_arm_worse > 0.05 and median within 1.2x), better than the rerun on H5 (one-sided p < 0.05); magnitude R = arm over
+    the rerun, seed-paired: PP4 and EE4 widened upper <= 1.10, no read of HD4, H1-H7c shown worse (widened lower > 1 and
+    R > 1.10). YES / SIGN YES MAGNITUDE HURT / PARTIAL (better than the rerun, still worse than MSE) / NOT BETTER;
+    the step is NO when neither arm beats the rerun. Beside: the rerun against the old het magnitude reference and the
+    old step-56 arm (magnitude), the rerun against the MSE control (sign), pre-clip gradient norms, the training-pool
+    sign accuracy, blow-ups."""
+    from mixture_ab import class_of, blowups
+    cls = class_of()
+    rr, old = STEP61["rerun"], SIGNHEAD["arm"]
+    h5neg = json.load(open(os.path.join(DATA, "het_signhead_h5_neg.json")))["neg"]
+    sr = lambda runs, ax: [_sign_read(r)[ax] for r in runs]
+    ctl = {"HD5": sr(SIGNHEAD["mse_hd5"], "HD5"), "H5": [_mse_h5_sign(m) for m in SIGNHEAD["mse_h5"]]}
+    out = {"design": "plan catalog_coverage step 61 (D287, D296; passed 2026-11-06T05:06:47 and 05:15:07)",
+           "runs": STEP61, "old_step56_arm": old, "mse_control": {k: SIGNHEAD[k] for k in ("mse_train", "mse_hd5", "mse_h5")},
+           "het_magnitude_reference_old": SIGNHEAD["ref"], "seeds": SH_SEEDS}
+    # re-seed rule
+    rs = {ax: _sign_pair(sr(rr, ax), sr(old, ax), h5neg, ax) for ax in ("H5", "HD5")}
+    bad = [ax for ax, r in rs.items() if r["p_two_sided"] < 0.05 or not (1 / SIGN_TOL <= r["median_ratio_a_over_c"] <= SIGN_TOL)]
+    out["reseed"] = {"rule": "rerun (a) vs old step-56 arm (c): two-sided p < 0.05 or median ratio outside [1/1.2, 1.2] "
+                             "-> the MSE control is rerun at the same code before a verdict against it",
+                     "H5": rs["H5"], "HD5": rs["HD5"], "failed_on": bad, "mse_control_stands": not bad}
+    out["rerun_vs_mse"] = {ax: _sign_pair(sr(rr, ax), ctl[ax], h5neg, ax) for ax in ("H5", "HD5")}
+    out["rerun_magnitude"] = {"vs_old_het_reference": {ax: _paired_mag(rr, SIGNHEAD["ref"], ax, cls) for ax in SH_AXES},
+                              "vs_old_step56_arm": {ax: _paired_mag(rr, old, ax, cls) for ax in SH_AXES}}
+    out["arms"], better_any = {}, False
+    for arm in ("matched_event", "matched_const"):
+        runs = STEP61[arm]
+        a = {"sign_vs_mse": {ax: _sign_pair(sr(runs, ax), ctl[ax], h5neg, ax) for ax in ("H5", "HD5")},
+             "sign_vs_rerun": {ax: _sign_pair(sr(runs, ax), sr(rr, ax), h5neg, ax) for ax in ("H5", "HD5")},
+             "magnitude_vs_rerun": {ax: _paired_mag(runs, rr, ax, cls) for ax in SH_AXES}}
+        not_worse = {ax: a["sign_vs_mse"][ax]["p_a_above"] > 0.05 and
+                     a["sign_vs_mse"][ax]["median_a_pct"] <= SIGN_TOL * a["sign_vs_mse"][ax]["median_c_pct"]
+                     for ax in ("H5", "HD5")}
+        better = a["sign_vs_rerun"]["H5"]["p_a_below"] < 0.05
+        m = a["magnitude_vs_rerun"]
+        gate = {ax: m[ax]["widened"][1] <= MAG_UP for ax in GATE_MAG}
+        shown = [ax for ax in SHOWN_AXES if m[ax]["widened"][0] > 1 and m[ax]["R"] > MAG_UP]
+        sign_yes = all(not_worse.values()) and better
+        mag_ok = all(gate.values()) and not shown
+        v = ("YES" if sign_yes and mag_ok else "SIGN YES, MAGNITUDE HURT" if sign_yes else
+             "PARTIAL" if better else "NOT BETTER THAN THE RERUN")
+        if not out["reseed"]["mse_control_stands"] and v in ("YES", "SIGN YES, MAGNITUDE HURT", "PARTIAL"):
+            v += " (pending: MSE control rerun at the same code, re-seed rule)"
+        better_any |= better
+        a["checks"] = {"sign_not_worse_than_mse": not_worse, "better_than_rerun_H5": better,
+                       "magnitude_gate_upper_le_1.10": gate, "magnitude_shown_worse": shown}
+        a["verdict"] = v
+        acc = [[x[1] for x in _sign_read(r)["val_sign_acc"]] for r in runs]
+        a["val_sign_accuracy_last_main"] = [x[50] if len(x) > 50 else x[-1] for x in acc]
+        a["grad_norm_main"] = [_sign_read(r)["grad_norm_main"] for r in runs]
+        out["arms"][arm] = a
+    out["rerun_grad_norm_main"] = [_sign_read(r)["grad_norm_main"] for r in rr]
+    out["rerun_val_sign_accuracy_last_main"] = [[x[1] for x in _sign_read(r)["val_sign_acc"]][50] for r in rr]
+    out["step_verdict"] = "NO (neither arm beats the rerun on H5)" if not better_any else \
+        "; ".join(f"{k}: {v['verdict']}" for k, v in out["arms"].items())
+    out["blowups"] = blowups([r for k in STEP61 for r in STEP61[k]])
+    if out["blowups"]["flagged"]:
+        out["step_verdict"] = None
+    json.dump(out, open(os.path.join(DATA, "het_signhead61.json"), "w"), indent=1)
+    brief = lambda r: {k: v for k, v in r.items() if k != "per_pool_pct"}
+    print(json.dumps({"reseed": {ax: brief(out["reseed"][ax]) for ax in ("H5", "HD5")},
+                      "rerun_vs_mse": {ax: brief(r) for ax, r in out["rerun_vs_mse"].items()},
+                      "arms": {k: {"verdict": a["verdict"], "checks": a["checks"],
+                                   "sign_vs_mse": {ax: brief(r) for ax, r in a["sign_vs_mse"].items()},
+                                   "sign_vs_rerun": {ax: brief(r) for ax, r in a["sign_vs_rerun"].items()},
+                                   "mag": {ax: [m["R"], m["widened"]] for ax, m in a["magnitude_vs_rerun"].items()},
+                                   "acc": a["val_sign_accuracy_last_main"], "gn": [g[0] for g in a["grad_norm_main"]]}
+                               for k, a in out["arms"].items()},
+                      "rerun_mag_vs_old_ref": {ax: [m["R"], m["widened"]] for ax, m in
+                                               out["rerun_magnitude"]["vs_old_het_reference"].items()},
+                      "rerun_gn": [g[0] for g in out["rerun_grad_norm_main"]],
+                      "blowups": out["blowups"]["flagged"], "spikes": out["blowups"]["spiked_recovered"],
+                      "verdict": out["step_verdict"]}, indent=0))
+
+
+def step61_fig():
+    """figs/het_signhead61: (a) H5 and (b) HD5 per pool the seed-mean wrong-sign share of the rerun (weight 1), the two
+    matched arms, the MSE control and an all-positive sign, pools sorted by the MSE control; (c) per read the median over
+    classes of the class's seed-geometric-mean MSE of log|M|^2 for the rerun and the two arms; (d) the validation
+    val_loss_no_reg of the main block, seed median, per arm. From data/het_signhead61.json and data/reads/<run>_val.json."""
+    import plot_style as ps
+    d = json.load(open(os.path.join(DATA, "het_signhead61.json")))
+    fig, axs = ps.figure(ncols=2, nrows=2)
+    a, b, c, e = axs.ravel()
+    col = {"rerun": ps.C.blue, "matched_event": ps.C.vermillion, "matched_const": ps.C.green}
+    lab = {"rerun": "het, sign weight 1", "matched_event": "het, matched per event", "matched_const": "het, sign weight 75"}
+    # (c): one point per read (the 12 of SH_AXES), the dashed line is the weight-1 rerun itself (equal MSE)
+    for ax, axn in ((a, "H5"), (b, "HD5")):
+        ctl = d["rerun_vs_mse"][axn]["per_pool_pct"]
+        pools = sorted(ctl, key=lambda p: ctl[p][1])
+        x = np.arange(len(pools))
+        ax.plot(x, [ctl[p][1] for p in pools], "k_", label="MSE loss control")
+        ax.plot(x, [ctl[p][0] for p in pools], "o", color=col["rerun"], mfc="none", label=lab["rerun"])
+        for arm, mk in (("matched_event", "^"), ("matched_const", "s")):
+            pp = d["arms"][arm]["sign_vs_mse"][axn]["per_pool_pct"]
+            ax.plot(x, [pp[p][0] for p in pools], mk, color=col[arm], mfc="none", label=lab[arm])
+        ax.set_yscale("symlog", linthresh=1)
+        ax.set_xlabel({"H5": "catalog-sampled one-loop pool", "HD5": "default-sampled one-loop class"}[axn])
+        ax.set_ylabel("wrong-sign share (%)")
+        ax.set_xticks([])
+    m0 = d["arms"]["matched_event"]["magnitude_vs_rerun"]
+    ref = [m0[r]["mse_class_median_ref"] for r in SH_AXES]
+    for arm, mk in (("matched_event", "^"), ("matched_const", "s")):
+        m = d["arms"][arm]["magnitude_vs_rerun"]
+        c.plot(ref, [m[r]["mse_class_median_arm"] for r in SH_AXES], mk, color=col[arm], mfc="none")
+    lim = [min(ref) / 1.5, max(ref) * 2.5]
+    c.plot(lim, lim, color=col["rerun"], linestyle="--", label="equal to weight 1")
+    c.set(xscale="log", yscale="log", xlim=lim, ylim=lim)
+    c.set_xlabel(r"weight 1: class median MSE$(\log|M|^2)$")
+    c.set_ylabel(r"matched: class median MSE")
+    for arm in ("rerun", "matched_event", "matched_const"):
+        cur = [json.load(open(os.path.join(READS, f"{r}_val.json")))["blocks"][0]["vals"] for r in STEP61[arm]]
+        n = min(len(v) for v in cur)
+        # the median over the four seeds: single-seed spikes (up to 2e10, all recovered) would hide the curves
+        e.plot([v[0] for v in cur[0][:n]], np.median([[v[1] for v in x[:n]] for x in cur], axis=0), color=col[arm])
+    e.set_yscale("symlog", linthresh=1)
+    e.set_xlabel("training step")
+    e.set_ylabel("validation het NLL")
+    h = a.get_legend_handles_labels()[0] + c.get_legend_handles_labels()[0]
+    ps.legend(c, "upper left", handles=h)
+    ps.save(fig, os.path.join(FIGS, "het_signhead61"))
+
+
 if __name__ == "__main__":
     if sys.argv[1:] == ["magnitude"]:
         magnitude()
     elif sys.argv[1:] == ["signhead_pull"]:
         signhead_pull()
+    elif sys.argv[1:] == ["step61_pull"]:
+        signhead_pull(STEP61)
+    elif sys.argv[1:] == ["step61"]:
+        step61()
+    elif sys.argv[1:] == ["step61_fig"]:
+        step61_fig()
     elif sys.argv[1:] == ["signhead"]:
         signhead()
     else:
