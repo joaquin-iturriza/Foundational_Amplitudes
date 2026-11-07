@@ -737,9 +737,9 @@ processes:
       run_card: run_card.dat
       param_card: param_card.dat
       model: sm-no_b_mass
-      n_val: 5615
-      n_test: 3615
-      n_train: 56150
+      n_val: 5500
+      n_test: 3500
+      n_train: 55001
       label_alphas: running_sqrt_shat
       parts: true
       source: catalog_v4's parameter card, the e+e- run card with catalog_v4's e+e-
@@ -931,9 +931,9 @@ processes:
       run_card: run_card.dat
       param_card: param_card.dat
       model: sm-no_b_mass
-      n_val: 5720
-      n_test: 3720
-      n_train: 57200
+      n_val: 5500
+      n_test: 3500
+      n_train: 55001
       label_alphas: running_sqrt_shat
       parts: true
       source: catalog_v4's parameter card, the e+e- run card with catalog_v4's e+e-

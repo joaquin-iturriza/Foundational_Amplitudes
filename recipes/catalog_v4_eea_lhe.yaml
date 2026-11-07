@@ -1264,9 +1264,9 @@ processes:
   sqrts:
   - 13000
   - 13000
-  n_train: 56150
-  n_val: 5615
-  n_test: 3615
+  n_train: 55001
+  n_val: 5500
+  n_test: 3500
 - name: dsh_eea_epem_accxz
   sqrts:
   - 13000
@@ -1285,9 +1285,9 @@ processes:
   sqrts:
   - 13000
   - 13000
-  n_train: 57200
-  n_val: 5720
-  n_test: 3720
+  n_train: 55001
+  n_val: 5500
+  n_test: 3500
 - name: dsh_eea_epem_aepemz
   sqrts:
   - 13000

@@ -1,0 +1,343 @@
+{
+ "source": "tools/lhe_probe.py eeisr-read",
+ "rules": {
+  "bs_min": 0.02,
+  "cost_max": 2.0
+ },
+ "energies": {
+  "160.0": {
+   "pdlabel": "isronlyll",
+   "verdict": "WORKS",
+   "expected_beams": {
+    "lpp1": -3,
+    "lpp2": 3,
+    "pdlabel": "isronlyll",
+    "ebeam1": 80.0,
+    "ebeam2": 80.0
+   },
+   "isr": {
+    "run": "FA-ccin2p3-17d89d85",
+    "mixed_pair_mmin": 10.0,
+    "events_asked": 1000,
+    "events_returned": 1000,
+    "s_generate": 75.1,
+    "s_per_kept_event": 0.0751,
+    "kept": 1.0,
+    "below_window": 0.0,
+    "cuts_partonic": 0.0,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "n": 1000,
+     "q01": 0.9906158290363503,
+     "q10": 0.998024236545229,
+     "q50": 0.9999927152056325,
+     "below_0.99": 0.008,
+     "below_0.5": 0.0,
+     "min": 0.9845153476457338
+    },
+    "beam_card": {
+     "lpp1": "-3",
+     "lpp2": "3",
+     "pdlabel": "isronlyll"
+    }
+   }
+  },
+  "209.0": {
+   "pdlabel": "isronlyll",
+   "verdict": "WORKS",
+   "expected_beams": {
+    "lpp1": -3,
+    "lpp2": 3,
+    "pdlabel": "isronlyll",
+    "ebeam1": 104.5,
+    "ebeam2": 104.5
+   },
+   "isr": {
+    "run": "FA-ccin2p3-e22b4949",
+    "mixed_pair_mmin": 10.0,
+    "events_asked": 1000,
+    "events_returned": 1000,
+    "s_generate": 45.0,
+    "s_per_kept_event": 0.045,
+    "kept": 1.0,
+    "below_window": 0.0,
+    "cuts_partonic": 0.0,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "n": 1000,
+     "q01": 0.9403558964263015,
+     "q10": 0.9898703373635451,
+     "q50": 0.9999467973910355,
+     "below_0.99": 0.101,
+     "below_0.5": 0.0,
+     "min": 0.8386509128053274
+    },
+    "beam_card": {
+     "lpp1": "-3",
+     "lpp2": "3",
+     "pdlabel": "isronlyll"
+    }
+   }
+  },
+  "240.0": {
+   "pdlabel": "fcce240ll",
+   "verdict": "WORKS",
+   "expected_beams": {
+    "lpp1": -3,
+    "lpp2": 3,
+    "pdlabel": "fcce240ll",
+    "ebeam1": 120.0,
+    "ebeam2": 120.0
+   },
+   "isr": {
+    "run": "FA-ccin2p3-a1585468",
+    "mixed_pair_mmin": 10.0,
+    "events_asked": 1000,
+    "events_returned": 1000,
+    "s_generate": 30.0,
+    "s_per_kept_event": 0.03,
+    "kept": 1.0,
+    "below_window": 0.0,
+    "cuts_partonic": 0.0,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "n": 1000,
+     "q01": 0.9335822309082293,
+     "q10": 0.9775172934158886,
+     "q50": 0.9998226943517479,
+     "below_0.99": 0.17,
+     "below_0.5": 0.0,
+     "min": 0.8963358042510092
+    },
+    "beam_card": {
+     "lpp1": "-3",
+     "lpp2": "3",
+     "pdlabel": "fcce240ll"
+    }
+   }
+  },
+  "365.0": {
+   "pdlabel": "fcce365ll",
+   "verdict": "WORKS",
+   "expected_beams": {
+    "lpp1": -3,
+    "lpp2": 3,
+    "pdlabel": "fcce365ll",
+    "ebeam1": 182.5,
+    "ebeam2": 182.5
+   },
+   "isr": {
+    "run": "FA-ccin2p3-0c5a7122",
+    "mixed_pair_mmin": 10.0,
+    "events_asked": 1000,
+    "events_returned": 1000,
+    "s_generate": 30.0,
+    "s_per_kept_event": 0.03,
+    "kept": 1.0,
+    "below_window": 0.0,
+    "cuts_partonic": 0.0,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "n": 1000,
+     "q01": 0.7147296981066542,
+     "q10": 0.9244267852927428,
+     "q50": 0.9992951869023838,
+     "below_0.99": 0.297,
+     "below_0.5": 0.0,
+     "min": 0.6115840929949137
+    },
+    "beam_card": {
+     "lpp1": "-3",
+     "lpp2": "3",
+     "pdlabel": "fcce365ll"
+    }
+   }
+  },
+  "380.0": {
+   "pdlabel": "isronlyll",
+   "verdict": "WORKS",
+   "expected_beams": {
+    "lpp1": -3,
+    "lpp2": 3,
+    "pdlabel": "isronlyll",
+    "ebeam1": 190.0,
+    "ebeam2": 190.0
+   },
+   "isr": {
+    "run": "FA-ccin2p3-f13fecbe",
+    "mixed_pair_mmin": 10.0,
+    "events_asked": 1000,
+    "events_returned": 1000,
+    "s_generate": 30.0,
+    "s_per_kept_event": 0.03,
+    "kept": 1.0,
+    "below_window": 0.0,
+    "cuts_partonic": 0.0,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "n": 1000,
+     "q01": 0.7448617895503314,
+     "q10": 0.9077926783705657,
+     "q50": 0.9993219845723453,
+     "below_0.99": 0.305,
+     "below_0.5": 0.0,
+     "min": 0.5900027366758435
+    },
+    "beam_card": {
+     "lpp1": "-3",
+     "lpp2": "3",
+     "pdlabel": "isronlyll"
+    }
+   }
+  },
+  "500.0": {
+   "pdlabel": "ilc500ll",
+   "verdict": "WORKS",
+   "expected_beams": {
+    "lpp1": -3,
+    "lpp2": 3,
+    "pdlabel": "ilc500ll",
+    "ebeam1": 250.0,
+    "ebeam2": 250.0
+   },
+   "isr": {
+    "run": "FA-ccin2p3-eb26d389",
+    "mixed_pair_mmin": 10.0,
+    "events_asked": 1000,
+    "events_returned": 1000,
+    "s_generate": 30.0,
+    "s_per_kept_event": 0.0301,
+    "kept": 0.998,
+    "below_window": 0.0,
+    "cuts_partonic": 0.002,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "n": 1000,
+     "q01": 0.5942911090343858,
+     "q10": 0.8760922368248896,
+     "q50": 0.9908688157860346,
+     "below_0.99": 0.488,
+     "below_0.5": 0.002,
+     "min": 0.4436266215147618
+    },
+    "beam_card": {
+     "lpp1": "-3",
+     "lpp2": "3",
+     "pdlabel": "ilc500ll"
+    }
+   }
+  },
+  "1000.0": {
+   "pdlabel": "isronlyll",
+   "verdict": "WORKS",
+   "expected_beams": {
+    "lpp1": -3,
+    "lpp2": 3,
+    "pdlabel": "isronlyll",
+    "ebeam1": 500.0,
+    "ebeam2": 500.0
+   },
+   "isr": {
+    "run": "FA-ccin2p3-08ae487a",
+    "mixed_pair_mmin": 10.0,
+    "events_asked": 1000,
+    "events_returned": 1000,
+    "s_generate": 30.0,
+    "s_per_kept_event": 0.0303,
+    "kept": 0.989,
+    "below_window": 0.0,
+    "cuts_partonic": 0.011,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "n": 1000,
+     "q01": 0.5529735097812114,
+     "q10": 0.8816649273827735,
+     "q50": 0.9992128332245772,
+     "below_0.99": 0.328,
+     "below_0.5": 0.006,
+     "min": 0.4467702350045266
+    },
+    "beam_card": {
+     "lpp1": "-3",
+     "lpp2": "3",
+     "pdlabel": "isronlyll"
+    }
+   }
+  },
+  "1500.0": {
+   "pdlabel": "isronlyll",
+   "verdict": "WORKS",
+   "expected_beams": {
+    "lpp1": -3,
+    "lpp2": 3,
+    "pdlabel": "isronlyll",
+    "ebeam1": 750.0,
+    "ebeam2": 750.0
+   },
+   "isr": {
+    "run": "FA-ccin2p3-81113f0a",
+    "mixed_pair_mmin": 10.0,
+    "events_asked": 1000,
+    "events_returned": 1000,
+    "s_generate": 30.0,
+    "s_per_kept_event": 0.0306,
+    "kept": 0.98,
+    "below_window": 0.0,
+    "cuts_partonic": 0.02,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "n": 1000,
+     "q01": 0.35243876622710457,
+     "q10": 0.8179541441723462,
+     "q50": 0.9989146480215383,
+     "below_0.99": 0.349,
+     "below_0.5": 0.022,
+     "min": 0.2200640015478306
+    },
+    "beam_card": {
+     "lpp1": "-3",
+     "lpp2": "3",
+     "pdlabel": "isronlyll"
+    }
+   }
+  },
+  "3000.0": {
+   "pdlabel": "clic3000ll",
+   "verdict": "WORKS",
+   "expected_beams": {
+    "lpp1": -3,
+    "lpp2": 3,
+    "pdlabel": "clic3000ll",
+    "ebeam1": 1500.0,
+    "ebeam2": 1500.0
+   },
+   "isr": {
+    "run": "FA-ccin2p3-9cc1284c",
+    "mixed_pair_mmin": 10.0,
+    "events_asked": 1000,
+    "events_returned": 1000,
+    "s_generate": 45.0,
+    "s_per_kept_event": 0.0498,
+    "kept": 0.904,
+    "below_window": 0.0,
+    "cuts_partonic": 0.096,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "n": 1000,
+     "q01": 0.22384213636375286,
+     "q10": 0.5806207627432629,
+     "q50": 0.9814124156181678,
+     "below_0.99": 0.545,
+     "below_0.5": 0.072,
+     "min": 0.14810836809757372
+    },
+    "beam_card": {
+     "lpp1": "-3",
+     "lpp2": "3",
+     "pdlabel": "clic3000ll"
+    }
+   }
+  }
+ },
+ "verdict": "WORKS"
+}
