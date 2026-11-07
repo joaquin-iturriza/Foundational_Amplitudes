@@ -30,14 +30,16 @@ if [ "$PROBE_SHARD" = eeisr ]; then
     PD=$(python -c "import sys; sys.path.insert(0, 'recipes'); import gen_catalog_v4_default as g; print(g.EE_ANCHOR[float(sys.argv[1])])" "${PROBE_ENERGY:?}")
     V="isr none"; [ "$PD" != isronlyll ] && V="isr none isronly"
     V="${PROBE_VARIANTS:-$V}"      # e.g. isr: the anchor's spectrum only (step 76's kept-fraction probe)
+    # the logs carry the job id: jobs at the same energy share the checkout as their directory, and one's rm took the
+    # other's log (step 76: aepemh's 209/1000/1500/3000 GeV logs removed by accxh's jobs at those energies)
     for v in $V; do
         F=; [ $v = isr ] && F=--ee-isr; [ $v = isronly ] && F="--ee-isr --patch pdlabel=isronlyll"
         python tools/lhe_probe.py run --process "${PROBE_PROCESS:?}" --energy "${PROBE_ENERGY:?}" \
-            --events "${PROBE_EVENTS:-1000}" --timeout "${PROBE_TIMEOUT:-720}" $F > "eeisr_${PROBE_ENERGY}_$v.log" 2>&1 &
+            --events "${PROBE_EVENTS:-1000}" --timeout "${PROBE_TIMEOUT:-720}" $F > "eeisr_${SLURM_JOB_ID:-$$}_${PROBE_ENERGY}_$v.log" 2>&1 &
     done
     wait
-    for v in $V; do grep -h PROBE_JSON "eeisr_${PROBE_ENERGY}_$v.log" | sed "s/^PROBE_JSON /EEISR_JSON $v /"; done
-    rm -f eeisr_${PROBE_ENERGY}_*.log
+    for v in $V; do grep -h PROBE_JSON "eeisr_${SLURM_JOB_ID:-$$}_${PROBE_ENERGY}_$v.log" | sed "s/^PROBE_JSON /EEISR_JSON $v /"; done
+    rm -f eeisr_${SLURM_JOB_ID:-$$}_${PROBE_ENERGY}_*.log
     echo "RUN_SUMMARY lhe_probe eeisr rc=$?"; exit 0
 fi
 if [ "$PROBE_SHARD" = reread ]; then
