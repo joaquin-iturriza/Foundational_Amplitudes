@@ -1055,7 +1055,7 @@ def cmd_eeisr_read(a):
             v = "NO_BEAMSTRAHLUNG"
         elif none.get("s_per_kept_event") and (isr.get("s_per_kept_event") or 1e9) > COST_MAX * none["s_per_kept_event"]:
             v = "COST"
-        keep = ("run", "events_returned", "s_generate", "s_per_kept_event", "kept", "below_window", "cuts_partonic",
+        keep = ("run", "events_asked", "events_returned", "s_generate", "s_per_kept_event", "kept", "below_window", "cuts_partonic",
                 "cuts_lab", "shat_frac", "beam_card", "error", "timeout", "log_tail")
         out["energies"][E] = {"pdlabel": EE_ANCHOR.get(float(E)), "verdict": v, "expected_beams": want,
                               **{k: {x: r.get(x) for x in keep if x in r} for k, r in R.items()}}
