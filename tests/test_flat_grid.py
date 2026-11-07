@@ -224,3 +224,31 @@ def test_r4_empty_unique_tag():
     assert mg.recipe_output_path(rec, "/d").endswith("_train_smixu_amplitudes.npy")
     from tools.regen_recipes import R3, R4
     assert R4 == dict(R3, flat_empty_unique=True)
+
+
+def test_r5_empty_near_min():
+    """plan step 81's r5: with flat_empty_near_min (and flat_empty_near) an empty bin whose nearest occupied bin holds no
+    more candidates than its deficit takes r2's rule (every candidate of that bin), else r3's (the deficit-many nearest);
+    weights identical to r3 without the key and to r2 where every empty bin is small; _smixv tag; R5 = R3 + the key"""
+    edges = np.linspace(0.0, 4.0, 5); quota = np.array([10, 10, 10, 10])
+    rng = np.random.default_rng(0)
+    big = rng.uniform(0.0, 2.0, 30)                                  # bins 0-1 hold 30, bins 2-3 empty: nearest bin 1 > 10
+    small = np.concatenate([rng.uniform(0.0, 1.0, 20), rng.uniform(1.0, 2.0, 4)])   # nearest bin 1 holds 4 <= 10
+    for logm in (big, small):
+        w2, _, _ = mg.flat_quota_weights(logm, edges, quota)
+        w3, _, _ = mg.flat_quota_weights(logm, edges, quota, empty_near=True)
+        w3b, _, _ = mg.flat_quota_weights(logm, edges, quota, empty_near=True, near_min=False)
+        w5, _, _ = mg.flat_quota_weights(logm, edges, quota, empty_near=True, near_min=True)
+        assert (w3 == w3b).all() and np.isclose(w5.sum(), w3.sum()) and np.isclose(w2.sum(), w3.sum())
+        b = np.searchsorted(edges, logm, side="right") - 1
+        if logm is big:
+            assert (np.bincount(b, minlength=4)[1] > 10) and np.allclose(w5, w3) and not np.allclose(w5, w2)
+        else:
+            assert np.allclose(w5, w2) and not np.allclose(w5, w3)
+            assert np.allclose(w5[b == 1], (6 + 20) / 4) and np.allclose(w5[b == 0], 0.0)
+    rec = {"process": "x", "sqrts_min": 10, "sqrts_max": 20, "role": "train",
+           "sampling": {"mode": "mixture", "flat_range": [0, 1], "flat_stall": 0.2, "flat_keep_ext": True,
+                        "flat_empty_near": True, "flat_empty_near_min": True}}
+    assert mg.recipe_output_path(rec, "/d").endswith("_train_smixv_amplitudes.npy")
+    from tools.regen_recipes import R3, R5
+    assert R5 == dict(R3, flat_empty_near_min=True)

@@ -78,7 +78,7 @@ QUOTA_POLICIES = ("quota", "quota_ladder_res2", "quota_ladder_res2_budget500", "
                   "quota_ladder_both_res2", "quota_ladder_both_res2_budget750", "quota_ladder_both_res2_fwdfree_budget750",
                   "mcmc_both_res2_budget12", "quota_ladder_both_res2_budget12", "grid_both_res2_budget12",
                   "grid_both_res2_budget8", "grid_both_res2f_budget12", "grid_both_res2f_budget8", "grid_r1_budget12",
-                  "grid_r2_budget18", "grid_r3_budget18", "grid_r4_budget18")
+                  "grid_r2_budget18", "grid_r3_budget18", "grid_r4_budget18", "grid_r5_budget18")
 # the flat-part diversity read (flat_diversity.py) of each quota policy against this one at the same seed in the same job:
 # independent draws (the quota sampler with both ladders at budget 50), plan catalog_coverage step 69
 DIVERSITY_REF = "quota_ladder_both_res2"
@@ -209,7 +209,8 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
             s.update(multichannel=True, mc_resonances=[[list(S), q] for S, q in res], mc_isc=True, mc_res_params=rp)
         if policy in QUOTA_POLICIES:
             from tools.flat_range import ranges, ranges_dsh
-            s.update(flat_range=(ranges_dsh() if policy in ("grid_r1_budget12", "grid_r2_budget18", "grid_r3_budget18", "grid_r4_budget18") else ranges())[name])
+            s.update(flat_range=(ranges_dsh() if policy in ("grid_r1_budget12", "grid_r2_budget18", "grid_r3_budget18", "grid_r4_budget18",
+                                         "grid_r5_budget18") else ranges())[name])
         if policy == "grid_r1_budget12":
             # plan step 75's revision of step 65's sampler (tools/regen_recipes.R1): step 65's switches plus the stall
             # stop, the ladder solves at 1e-12, ladders on every hadronic class, the resonance ladder; the range joined
@@ -231,6 +232,11 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
             # candidate steered by two empty bins (tools/regen_recipes.R4)
             from tools.regen_recipes import R4
             s.update(R4)
+        if policy == "grid_r5_budget18":
+            # plan step 81's r5 (after r4's NO, data/r4_check.json, r4_acted.json): r3 with its nearest-candidate rule
+            # only where the nearest occupied bin holds more candidates than the empty bin's deficit (tools/regen_recipes.R5)
+            from tools.regen_recipes import R5
+            s.update(R5)
         if policy.startswith("quota_ladder_res2"):     # step 58's re-check: + the multiperipheral and joint-resonance channels
             s.update(mc_mperi=True, mc_res2=True)
         if policy == "quota_ladder_edge_res2":     # step 66: the same channels with the ladder's edge variant
@@ -918,6 +924,7 @@ R1_COST = 2.0        # CLAUDE.md: a new method's cost over the one it replaces a
 R2_TAG = "current+grid_r1_budget12+grid_r2_budget18"
 R3_TAG = "current+grid_r2_budget18+grid_r3_budget18"
 R4_TAG = "current+grid_r3_budget18+grid_r4_budget18"
+R5_TAG = "current+grid_r3_budget18+grid_r5_budget18"
 
 
 def step75r1():
@@ -1327,6 +1334,39 @@ def step79r4_acted(pols=("grid_r3_budget18", "grid_r4_budget18")):
                                         for k, v in out.items()}))
 
 
+def step81r5_acted():
+    """data/r5_acted.json (plan step 81's r5): per class and seed of the r5 jobs (R5_TAG), for r3 and r5 the chunks with
+    a round holding an empty bin whose nearest occupied bin(s) hold no more candidates than its deficit (rounds'
+    bins_empty_small: where r5 takes r2's rule; r5 is r3 bitwise in a chunk without one), the chunks whose kept per bin
+    or rounds differ between r3 and r5, and the r5 chunks whose every empty bin of every round was small (r5 is r2
+    bitwise there) with how many of them equal r2's chunk of the r3 jobs (R3_TAG; r2 is deterministic per seed)"""
+    out = {}
+    for c in R1_CLASSES:
+        for seed in SEEDS:
+            f = os.path.join(READS, f"{c}_{R5_TAG}_{seed}.json")
+            if not os.path.exists(f):
+                continue
+            runs = json.load(open(f))["runs"]
+            q3, q5 = (runs[f"{p}_{seed}"]["quota_chunks"] for p in ("grid_r3_budget18", "grid_r5_budget18"))
+            small = lambda x: any((r.get("bins_empty_small") or 0) > 0 for r in x["rounds"])
+            all_small = [i for i, x in enumerate(q5) if small(x) and all((r.get("bins_empty_small") or 0) ==
+                                                                          (r.get("bins_empty") or 0) for r in x["rounds"])]
+            rec = {"chunks": len(q5), "chunks_with_small_empty_r3": int(sum(map(small, q3))),
+                   "chunks_with_small_empty_r5": int(sum(map(small, q5))),
+                   "chunks_differing_r3_r5": int(sum(a["kept_per_bin"] != b["kept_per_bin"] or len(a["rounds"]) != len(b["rounds"])
+                                                     for a, b in zip(q3, q5))),
+                   "chunks_all_small_r5": len(all_small)}
+            f2 = os.path.join(READS, f"{c}_{R3_TAG}_{seed}.json")
+            if os.path.exists(f2):
+                q2 = json.load(open(f2))["runs"][f"grid_r2_budget18_{seed}"]["quota_chunks"]
+                rec["chunks_all_small_equal_r2"] = int(sum(q5[i]["kept_per_bin"] == q2[i]["kept_per_bin"] for i in all_small))
+            out[f"{c}/{seed}"] = rec
+    json.dump(out, open(os.path.join(DATA, "r5_acted.json"), "w"), indent=1)
+    print("STEP81R5_ACTED", json.dumps({k: [v["chunks_with_small_empty_r5"], v["chunks_differing_r3_r5"],
+                                            v["chunks_all_small_r5"], v.get("chunks_all_small_equal_r2")]
+                                        for k, v in out.items()}))
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         sys.argv.append("--help")
@@ -1368,6 +1408,13 @@ if __name__ == "__main__":
     elif sys.argv[1] == "step79r4":   # r4 against r3, the policy it changes, in the same job (r2 beside: r3_check.json)
         step75r2("grid_r4_budget18", "grid_r3_budget18", R4_TAG, out_file="r4_check.json",
                  design="plan catalog_coverage step 79 revision r4", reach_tags=(R1_TAG, R2_TAG, R3_TAG))
+    elif sys.argv[1] == "step81r5-pull":
+        pull(R5_TAG, R1_CLASSES)
+    elif sys.argv[1] == "step81r5":   # r5 against r3 in the same job (r2 beside: r3_check.json, r4: r4_check.json)
+        step75r2("grid_r5_budget18", "grid_r3_budget18", R5_TAG, out_file="r5_check.json",
+                 design="plan catalog_coverage step 81 revision r5", reach_tags=(R1_TAG, R2_TAG, R3_TAG, R4_TAG))
+    elif sys.argv[1] == "step81r5-acted":
+        step81r5_acted()
     elif sys.argv[1] == "step79-channel-presence":
         step79_channel_presence()
     elif sys.argv[1] == "step79r4-acted":

@@ -4203,7 +4203,7 @@ def flat_quota_bins(lo, hi, n_flat, rng, dex_per_bin=FLAT_DEX_PER_BIN):
     return np.linspace(lo, hi, nb + 1), q
 
 
-def flat_quota_weights(logm, edges, quota, empty_near=False, unique=False):
+def flat_quota_weights(logm, edges, quota, empty_near=False, unique=False, near_min=False):
     """per-candidate steering weight: its bin's deficit / count; an empty bin's deficit goes to the candidates of the
     nearest bin holding some, shared on a tie (candidates beyond the range count toward the edge bins); 0 where nothing is missing.
     With `empty_near` (pol["flat_empty_near"], plan step 78's r3), an empty bin's deficit goes instead to the
@@ -4216,7 +4216,14 @@ def flat_quota_weights(logm, edges, quota, empty_near=False, unique=False):
     converged slower than r2 on v4_uu_bbxuu, whose top 3-9 bins sit empty after a round, and regressed it from 1.0 to
     0.90/0.80 in its top bin; data/r3_check.json, r3_rounds.json). Empty bins are taken in ascending order; when fewer
     free candidates remain than a bin's deficit, each takes more than one unit, and once none is free the bin stacks on
-    its nearest candidates as without `unique`"""
+    its nearest candidates as without `unique`.
+    With `near_min` too (pol["flat_empty_near_min"], plan step 81's r5), `empty_near` acts only on an empty bin whose
+    nearest occupied bin(s) hold more finite candidates than its deficit; otherwise the deficit goes to every candidate
+    of those bins, as without `empty_near` (r2's rule). The deficit-many nearest candidates then never reach below the
+    nearest occupied bin: on both classes the fill moved with how few candidates carry an empty bin's deficit (r2 every
+    candidate of the nearest occupied bin, r3 the deficit-many nearest, r4 more again: v4_uu_bbxuu's top bin 1.0, 0.90/0.80,
+    0.70/0.72, its nearest occupied bin itself short; v4_uux_bgtxwp's [-1.206, -0.96] 0.73/0.79, 0.925/0.917, 0.835/0.809,
+    its nearest occupied bin ~900 candidates; data/r2_check.json, r3_check.json, r4_check.json)"""
     nb = len(quota)
     fin = np.isfinite(logm)
     b = np.full(len(logm), -1)
@@ -4232,7 +4239,8 @@ def flat_quota_weights(logm, edges, quota, empty_near=False, unique=False):
         fi = np.nonzero(fin)[0]
         free = np.ones(len(fi), bool)            # (unique) candidates no empty bin has taken yet
         for j in np.nonzero(deficit > 0)[0]:
-            if empty_near and steer[j] == 0:
+            d = np.abs(occ - j); near = occ[d == d.min()]           # a tie (one on each side) shares the deficit
+            if empty_near and steer[j] == 0 and not (near_min and steer[near].sum() <= np.ceil(deficit[j])):
                 # distance in log|M|^2 to the bin [edges[j], edges[j+1]]; the nearest deficit-many candidates
                 dist = np.maximum(edges[j] - logm[fi], 0.0) + np.maximum(logm[fi] - edges[j + 1], 0.0)
                 if unique and free.any():
@@ -4244,7 +4252,6 @@ def flat_quota_weights(logm, edges, quota, empty_near=False, unique=False):
                 w[fi[pick]] += deficit[j] / k
                 free[pick] = False
                 continue
-            d = np.abs(occ - j); near = occ[d == d.min()]           # a tie (one on each side) shares the deficit
             per[near] += deficit[j] / len(near)
     w[fin] += per[b[fin]] / np.maximum(steer[b[fin]], 1.0)
     return w, cnt, deficit
@@ -4382,13 +4389,23 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
         with np.errstate(divide="ignore", invalid="ignore"):
             logm = np.log(np.where(me_c > 0, me_c, np.nan))
         w, cnt, deficit = flat_quota_weights(logm, edges, quota, bool(pol.get("flat_empty_near")),
-                                             bool(pol.get("flat_empty_unique")))
+                                             bool(pol.get("flat_empty_unique")), bool(pol.get("flat_empty_near_min")))
         # bins_empty (plan step 79's r4 design review): short bins holding no finite candidate, in range or clipped to an
         # edge bin, i.e. those flat_empty_near steers by its nearest candidates (r4 differs from r3 only with >= 2)
         fb = np.clip(np.searchsorted(edges, logm[np.isfinite(logm)], side="right") - 1, 0, len(quota) - 1)
-        n_empty = int(((deficit > 0) & (np.bincount(fb, minlength=len(quota)) == 0)).sum())
+        fcnt = np.bincount(fb, minlength=len(quota))
+        emp = np.nonzero((deficit > 0) & (fcnt == 0))[0]
+        n_empty = len(emp)
+        # bins_empty_small (plan step 81's r5): empty bins whose nearest occupied bin(s) hold no more finite candidates
+        # than the bin's deficit, i.e. those flat_empty_near_min steers by r2's rule (r5 is r3 in a round without one)
+        occ_b = np.nonzero(fcnt > 0)[0]
+        n_small = 0
+        for j in emp:
+            if len(occ_b):
+                dd = np.abs(occ_b - j)
+                n_small += int(fcnt[occ_b[dd == dd.min()]].sum() <= np.ceil(deficit[j]))
         rounds.append({"n": int(n), "missing": int(deficit.sum()), "bins_short": int((deficit > 0).sum()),
-                       "bins_empty": n_empty})
+                       "bins_empty": n_empty, "bins_empty_small": n_small})
         if deficit.sum() == 0 or len(cand) >= budget or not w.any():
             break
         # pol["flat_stall"] (plan step 75's cost revision): stop once a round past the first fills fewer events than
@@ -4925,9 +4942,10 @@ def recipe_output_path(recipe, out_dir):
         # (any of its keys, repo review 2026-11-07), and r2 (sampling.flat_keep_ext: the extremes kept, the stall
         # patience, budget 18) its own: _smixs, and r3 (sampling.flat_empty_near: an empty bin steered by its nearest
         # candidates, plan step 78) its own: _smixt, and r4 (sampling.flat_empty_unique: no candidate steered by two
-        # empty bins, plan step 79) its own: _smixu
+        # empty bins, plan step 79) its own: _smixu, and r5 (sampling.flat_empty_near_min: r3's rule only where the
+        # nearest occupied bin holds more candidates than the deficit, plan step 81) its own: _smixv
         sp = recipe.get("sampling") or {}
-        samp_tag += ("u" if sp.get("flat_empty_unique") else "t" if sp.get("flat_empty_near") else
+        samp_tag += ("v" if sp.get("flat_empty_near_min") else "u" if sp.get("flat_empty_unique") else "t" if sp.get("flat_empty_near") else
                      "s" if any(sp.get(k) for k in ("flat_keep_ext", "flat_stall_patience")) else
                      "r" if any(sp.get(k) for k in ("flat_stall", "mc_solve_tol", "mc_mperi_all", "mc_resladder")) else "q")
     f_def =float((recipe.get("sampling") or {}).get("f_default", 0))
