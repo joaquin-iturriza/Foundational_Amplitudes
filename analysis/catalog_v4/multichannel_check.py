@@ -78,7 +78,7 @@ QUOTA_POLICIES = ("quota", "quota_ladder_res2", "quota_ladder_res2_budget500", "
                   "quota_ladder_both_res2", "quota_ladder_both_res2_budget750", "quota_ladder_both_res2_fwdfree_budget750",
                   "mcmc_both_res2_budget12", "quota_ladder_both_res2_budget12", "grid_both_res2_budget12",
                   "grid_both_res2_budget8", "grid_both_res2f_budget12", "grid_both_res2f_budget8", "grid_r1_budget12",
-                  "grid_r2_budget18")
+                  "grid_r2_budget18", "grid_r3_budget18")
 # the flat-part diversity read (flat_diversity.py) of each quota policy against this one at the same seed in the same job:
 # independent draws (the quota sampler with both ladders at budget 50), plan catalog_coverage step 69
 DIVERSITY_REF = "quota_ladder_both_res2"
@@ -209,7 +209,7 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
             s.update(multichannel=True, mc_resonances=[[list(S), q] for S, q in res], mc_isc=True, mc_res_params=rp)
         if policy in QUOTA_POLICIES:
             from tools.flat_range import ranges, ranges_dsh
-            s.update(flat_range=(ranges_dsh() if policy in ("grid_r1_budget12", "grid_r2_budget18") else ranges())[name])
+            s.update(flat_range=(ranges_dsh() if policy in ("grid_r1_budget12", "grid_r2_budget18", "grid_r3_budget18") else ranges())[name])
         if policy == "grid_r1_budget12":
             # plan step 75's revision of step 65's sampler (tools/regen_recipes.R1): step 65's switches plus the stall
             # stop, the ladder solves at 1e-12, ladders on every hadronic class, the resonance ladder; the range joined
@@ -221,6 +221,11 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
             # extremes kept, the stall stop after two stalled rounds, budget 18 (tools/regen_recipes.R2)
             from tools.regen_recipes import R2
             s.update(R2)
+        if policy == "grid_r3_budget18":
+            # plan step 78's r3 (after r2's NO, data/r2_check.json, r2_where.json): r2 plus an empty bin steered by the
+            # candidates nearest to it in log|M|^2 (tools/regen_recipes.R3)
+            from tools.regen_recipes import R3
+            s.update(R3)
         if policy.startswith("quota_ladder_res2"):     # step 58's re-check: + the multiperipheral and joint-resonance channels
             s.update(mc_mperi=True, mc_res2=True)
         if policy == "quota_ladder_edge_res2":     # step 66: the same channels with the ladder's edge variant
@@ -906,6 +911,7 @@ R1_TAG = "current+grid_both_res2f_budget12+grid_r1_budget12"
 R1_FILL = 0.95       # steps 72/75/65's bin bar
 R1_COST = 2.0        # CLAUDE.md: a new method's cost over the one it replaces above 2x is a finding
 R2_TAG = "current+grid_r1_budget12+grid_r2_budget18"
+R3_TAG = "current+grid_r2_budget18+grid_r3_budget18"
 
 
 def step75r1():
@@ -1066,7 +1072,8 @@ def step75r2_rounds():
     print("STEP75R2_ROUNDS", json.dumps({k: round(v, 3) for k, v in res.items() if k.startswith("total_cost")}))
 
 
-def step75r2():
+def step75r2(new="grid_r2_budget18", old="grid_r1_budget12", tag=None, out_file="r2_check.json",
+              design="plan catalog_coverage step 75 revision r2 (step 78)", reach_tags=None):
     """data/r2_check.json: per class and seed of R1_CLASSES, r2 (grid_r2_budget18) and r1 (grid_r1_budget12) in the
     same job as the old sampling (current): (1) fill of every in-range quota bin, margin included, at >= R1_FILL of
     quota, exempt only bins whose lower edge lies above the class's reach (the highest candidate of any policy at either
@@ -1075,15 +1082,21 @@ def step75r2():
     reach; (2) the held-out in-support events outside the kept range (heldout_r1) with their distance; (3) the cost
     r2 seconds / current seconds per class, and summed over every class and seed (the bar: the method's generation
     time, <= R1_COST); per channel the proposal seconds. Verdict PASS when (1) and (2) hold on every class and seed and
-    the summed cost is <= R1_COST, else the failing kinds"""
+    the summed cost is <= R1_COST, else the failing kinds.
+    Parametrised for plan step 78's r3 (step78r3): `new` against `old` in the jobs of `tag`; `reach_tags` adds the
+    candidates of every policy in those earlier jobs of the class to its reach and floor (the highest and least candidate
+    any policy drew: r2's read took them from its own job only, and v4_uux_bgtxwp's step-65 policy had drawn up to
+    -0.939 in the r1 job, above r2's job's -1.025)"""
     sys.path.insert(0, ROOT)
     from tools.flat_range import MARGIN_DEX, ranges_dsh
     rg = ranges_dsh(); L = np.log(10.0)
     rows, fails = {}, {"fill": [], "outside": [], "cost": [], "missing": []}
-    T = {"grid_r2_budget18": 0.0, "grid_r1_budget12": 0.0, "current": 0.0}
+    tag = tag or R2_TAG
+    T = {new: 0.0, old: 0.0, "current": 0.0}
     for c in R1_CLASSES:
-        files = [os.path.join(READS, f"{c}_{R2_TAG}_{seed}.json") for seed in SEEDS]
-        allr = [r for f in files if os.path.exists(f) for r in json.load(open(f))["runs"].values()]
+        files = [os.path.join(READS, f"{c}_{tag}_{seed}.json") for seed in SEEDS]
+        rf = files + [os.path.join(READS, f"{c}_{t}_{seed}.json") for t in (reach_tags or ()) for seed in SEEDS]
+        allr = [r for f in rf if os.path.exists(f) for r in json.load(open(f))["runs"].values()]
         reach = max([r["cand_max"] for r in allr if r.get("cand_max") is not None], default=None)
         floor = min([r["cand_min"] for r in allr if r.get("cand_min") is not None], default=None)
         for seed, f in zip(SEEDS, files):
@@ -1091,7 +1104,7 @@ def step75r2():
                 fails["missing"].append(f"{c}/{seed}"); continue
             runs = json.load(open(f))["runs"]
             cur = runs.get(f"current_{seed}", {}).get("seconds")
-            for pol in ("grid_r2_budget18", "grid_r1_budget12"):
+            for pol in (new, old):
                 r = runs.get(f"{pol}_{seed}")
                 if r is None or cur is None:
                     fails["missing"].append(f"{c}/{pol}/{seed}"); continue
@@ -1127,23 +1140,23 @@ def step75r2():
                     d["stops"][x["stop"]] = d["stops"].get(x["stop"], 0) + 1
                 rows.setdefault(c, {})[f"{pol}_{seed}"] = d
                 T[pol] += r["seconds"]
-                if pol == "grid_r2_budget18":
+                if pol == new:
                     T["current"] += cur
                     if d["fill_share"] < 1.0:
                         fails["fill"].append(f"{c}/{seed}")
                     if out is None or out > 0:
                         fails["outside"].append(f"{c}/{seed}")
-    tot = {p: T[p] / T["current"] if T["current"] else None for p in ("grid_r2_budget18", "grid_r1_budget12")}
-    if tot["grid_r2_budget18"] is None or tot["grid_r2_budget18"] > R1_COST:
-        fails["cost"].append(f"total {tot['grid_r2_budget18']}")
+    tot = {p: T[p] / T["current"] if T["current"] else None for p in (new, old)}
+    if tot[new] is None or tot[new] > R1_COST:
+        fails["cost"].append(f"total {tot[new]}")
     verdict = ("INCOMPLETE" if fails["missing"] else "PASS" if not any(fails[k] for k in ("fill", "outside", "cost"))
                else "FAIL: " + ", ".join(k for k in ("fill", "outside", "cost") if fails[k]))
-    res = {"design": "plan catalog_coverage step 75 revision r2 (step 78)", "verdict": verdict, "fails": fails,
+    res = {"design": design, "verdict": verdict, "fails": fails,
            "total_cost": tot, "per_class_over_2x": sorted(f"{c}/{k}" for c, v in rows.items() for k, d in v.items()
-                                                          if k.startswith("grid_r2") and d["cost_vs_current"] > R1_COST),
+                                                          if k.startswith(new) and d["cost_vs_current"] > R1_COST),
            "classes": rows}
-    json.dump(res, open(os.path.join(DATA, "r2_check.json"), "w"), indent=1)
-    print("STEP75R2", verdict, json.dumps(fails), json.dumps(tot))
+    json.dump(res, open(os.path.join(DATA, out_file), "w"), indent=1)
+    print("STEP75R2" if new == "grid_r2_budget18" else "STEP78R3", verdict, json.dumps(fails), json.dumps(tot))
 
 
 def pull(policies=None, classes=None, seeds=SEEDS):
@@ -1236,6 +1249,11 @@ if __name__ == "__main__":
         pull(R2_TAG, R1_CLASSES)
     elif sys.argv[1] == "step75r2":
         step75r2()
+    elif sys.argv[1] == "step78r3-pull":
+        pull(R3_TAG, R1_CLASSES)
+    elif sys.argv[1] == "step78r3":
+        step75r2("grid_r3_budget18", "grid_r2_budget18", R3_TAG, out_file="r3_check.json",
+                 "plan catalog_coverage step 78 revision r3", reach_tags=(R1_TAG, R2_TAG))
     elif sys.argv[1] == "step78-where":
         step78_where()
     elif sys.argv[1] == "summary":

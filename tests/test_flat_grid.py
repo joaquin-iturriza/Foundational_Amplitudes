@@ -168,3 +168,28 @@ def test_resladder_and_channels():
     assert mg.recipe_output_path(rec, "/d").endswith("_train_smixr_amplitudes.npy")
     rec["sampling"].pop("flat_stall")
     assert mg.recipe_output_path(rec, "/d").endswith("_train_smixq_amplitudes.npy")
+
+
+def test_r3_empty_near_tag():
+    """plan step 78's r3: with flat_empty_near an empty bin's deficit goes to the deficit-many candidates nearest to it
+    in log|M|^2 (one unit each), not to every candidate of the nearest occupied bin; bins holding candidates keep their
+    weights, the total weight is the same, and without the key the weights are unchanged; a policy with flat_empty_near gets
+    the _smixt pool tag"""
+    edges = np.linspace(0.0, 4.0, 5); quota = np.array([10, 10, 10, 10])
+    logm = np.random.default_rng(0).uniform(0.0, 2.0, 15)          # bin 0 and 1 partly filled, bins 2 and 3 empty
+    w0, c0, d0 = mg.flat_quota_weights(logm, edges, quota)
+    w1, c1, d1 = mg.flat_quota_weights(logm, edges, quota, empty_near=True)
+    wf, _, _ = mg.flat_quota_weights(logm, edges, quota, empty_near=False)
+    assert (w0 == wf).all() and (c0 == c1).all() and (d0 == d1).all()
+    assert np.isclose(w0.sum(), w1.sum())
+    top = np.argsort(logm)[::-1][:10]                                # the 10 nearest to bins 2 and 3: the highest
+    rest = np.setdiff1d(np.arange(len(logm)), top)
+    b = np.searchsorted(edges, logm, side="right") - 1
+    own = np.where(d0[b] > 0, d0[b] / np.bincount(b, minlength=4)[b], 0.0)     # each bin's own deficit / count
+    assert np.allclose(w1[top], own[top] + 2.0) and np.allclose(w1[rest], own[rest])
+
+    rec = {"process": "x", "sqrts_min": 10, "sqrts_max": 20, "role": "train",
+           "sampling": {"mode": "mixture", "flat_range": [0, 1], "flat_stall": 0.2, "flat_keep_ext": True,
+                        "flat_empty_near": True}}
+    assert mg.recipe_output_path(rec, "/d").endswith("_train_smixt_amplitudes.npy")
+

@@ -59,6 +59,10 @@ R1 = dict(G12, flat_stall=0.2, mc_solve_tol=1e-12, mc_mperi_all=True, mc_resladd
 # - flat_budget 18: two more rounds of oversample/2 x n_flat for chunks still converging at r1's budget (uu_bbxuu,
 #   us_ddxsu, bb_bbvevex, ug_auuux: missing at the stop and the last round's fill in r1_rounds.json); pools _smixs
 R2 = dict(R1, flat_keep_ext=True, flat_stall_patience=2, flat_budget=18)
+# plan step 78's r3 (after r2's NO on v4_uux_bgtxwp's reachable top bin [-1.206, -0.96]; data/r2_check.json,
+# r2_where.json): r2 plus flat_empty_near: an empty bin's deficit steers the proposal through the deficit-many candidates
+# nearest to it in log|M|^2, not through every candidate of the nearest occupied bin; pools _smixt
+R3 = dict(R2, flat_empty_near=True)
 FLAT_RANGE_R1 = os.path.join(REC, "catalog_v4_flat_range_dsh.json")
 OUT_R1 = "catalog_v4_r1_regen.yaml"
 
