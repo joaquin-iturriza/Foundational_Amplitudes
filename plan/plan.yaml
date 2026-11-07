@@ -3754,6 +3754,11 @@ entries:
       ILC TDR, CLIC staging) for the energies; make the e+e- run card per energy (lpp -3/3, pdlabel ilc500ll / clic3000ll
       / fcce240ll / fcce365ll where a beamstrahlung grid exists, isronlyll elsewhere) in recipes/gen_catalog_v4_default.py;
       probe it with tools/lhe_probe.py on one class at each energy under a reviewed design'
+    72: '(k) channel-grid flat sampler (step 72, design 2026-11-07, branch flat-grid 08458603): on design-reviewer PASS and
+      repo-reviewer PASS merge flat-grid, sync CC, site pick, plan target grid_check 0.8 h --jobs 10, submit 10 CPU jobs scripts/job_multichannel_check.sh
+      (MCHECK_CLASS/MCHECK_PROBE per class as step 69, MCHECK_SEED 42/43, MCHECK_POLICIES=current+quota_ladder_both_res2+quota_ladder_both_res2_budget12+grid_both_res2_budget12+grid_both_res2_budget8;
+      limits uux_epemg 00:20, uux_epemvevex 00:30, uu_bbxuu 01:10, us_ddxsu 01:00, udx_csxvevex 00:30); plan wait; read: multichannel_check.py
+      pull <tag> <class> 42,43 per class, then step72 -> data/grid_check.json; figure: fig_mcmc_check.py extended to grid_check'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -11071,6 +11076,13 @@ entries:
         re-read the e+e- flat ranges (pp_support.py pull ee, tools/flat_range.py)'
       - 'the lepton densities fail in our MadEvent setup or an energy lacks a grid: fix the setup or use isronlyll there,
         recorded as the gap, then the same'
+    72:
+      feeds: 'the sampling of step 65''s regeneration (D317: <= 2x the old cost)'
+      if:
+      - 'YES: step 65 design with flat_grid at the lowest passing budget'
+      - 'COST: fix proposal overhead from t_propose, re-run once'
+      - 'PARTIAL: where-read of the short bins, one revision'
+      - 'NO: dead end recorded, then a foam or flow proposal on the same harness'
   owner:
     agent: a8f345d56440782be
     state: working
