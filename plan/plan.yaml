@@ -11222,6 +11222,19 @@ entries:
       events) it goes to Joaquin with the counts (plan ask), never into the verdict. COST (total over 2x, or a class family
       over it) -> where the time goes (labels vs proposal vs compile), fixed before step 68. Composition fails -> mix_compose''s
       replay fixed before any recipe reads these pools. Job failures -> log read, fixed, shard rerun (resumable).'
+    passed_at: '2026-11-07T03:35:11+00:00'
+    reviewer: 'Step 65 v3 regeneration of 1301 hadronic tree classes on grid_both_res2f_budget12: one change (sampler + D294
+      pp range, rest of the stage-1/5 entries kept, new _smixq paths, old pools as control); fill moved with the sampler step
+      72->75 (udx_csxvevex 0.898->1.000, uux_epemvevex 0.936->1.000, grid_check/grid_fwd_check.json), held-out outside 0-1
+      per class in step 75; coverage now at D269''s bar (regen_read.py @1abda20d COVER_BAR 0, any class with >=1 outside is
+      SHORT, tolerance only via plan ask), counts by source (PP4 val, dsh_); prior states step 75''s COST verdict (us_ddxsu
+      2.11, same-node 2.17), every class over 2x named; one data seed (generation batch); outcomes FILLED/SHORT/COST/compose/failures
+      stated; disk ~43 GB vs 64 GB free 2026-11-07 with a 50 GB floor at submission; CPU only. Searched results.tex (smixq,
+      g12, grid12, channel grid, res2f, flat_grid, regenerat), entry and site decisions (regenerat, grid, resample, catalog):
+      no earlier regeneration with this sampler. For the SHORT revision''s own design: about 493 of the 1301 classes have
+      no dsh_ pool (808 named in recipes/catalog_v4_default_lhe.yaml), so for them widening from PP4 val leaves nothing unread
+      to score on; that revision must widen by a rule that reads no scored events. Cosmetic: the COVER_BAR line still carries
+      the cost-range comment.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
