@@ -15186,6 +15186,11 @@ entries:
       WORSE than the default restart (PP4 1.148 [0.977,1.351], EE4 1.240 [1.034,1.505]); the jump is not what keeps the warm
       start short (mixture_ab.py warm C1r_step3198_continue_optstate @9d30a635)
     at: '2026-11-07T02:23:57+00:00'
+  - tried: Shrink and perturb the cosine parent (p <- 0.4 p + 0.1 p0, fresh muP init) before the default restart at k=533
+      (step 14, v4_het_wsx_shrinkperturb_tagfix1, FA-ccin2p3-0f346464, seed 42)
+    why: 'WORSE: R(arm/control) PP4 1.438 [1.386,1.505], EE4 1.360 [1.203,1.552]; the shrunk model diverges at the start (grad
+      norm 3.0e15, loss above 0 through step 50) and 533 steps do not recover it (mixture_ab.py warm_single @1e7042dd)'
+    at: '2026-11-07T02:57:37+00:00'
   asks:
   - ask: 'The widened warm-start test (every change tried that allows a warm start, design passed): C2-C8 cost about 95 GPU-h
       beyond the share-0.25 runs (66 GPU-h if the loss and one-loop target changes C7, C8 are not run because their from-scratch
