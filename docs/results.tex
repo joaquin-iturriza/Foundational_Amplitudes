@@ -3706,6 +3706,124 @@ probes as a cumulative fraction of classes, with the share-$0.25$ change from sc
 % allow: 533 42 0 40 25 95 2 0.25 0.5 because they are the retraining length, the seed, the plotted window, the median window, the interval level, the square in |M|^2, the share and the plot's cut
 \end{figure}
 
+\paragraph{The warm start against the change from scratch under the same schedule (2026-11-07).}\label{par:v4_warm_start_wsd_match}
+Par.~\ref{par:v4_warm_start_fixes} left one comparison open: its WSD warm starts were read against B, the C1 change
+(share $0.25$, het loss) pretrained from scratch with the cosine schedule, while their parent was pretrained with
+WSD. This step [D319] pretrains the C1 change from scratch under the WSD parent's own schedule (B\textsubscript{WSD}:
+\code{v4\_het\_default25}'s setup with only \code{training.scheduler=WSD} and its cooldown over the last eighth,
+FA-ccin2p3-388dcd45) and adds the simplest WSD recipe on share $0.50$: the WSD parent's final model at the default
+restart (lr scale $1$, re-warm, cosine to about $0$, fresh optimizer) for $533$ steps (FA-ccin2p3-1e6646e2). Both
+ran from \code{scripts/job\_catalog\_v3\_short.sh} (arms \code{v4\_het\_default25\_wsd},
+\code{v4\_het\_wsx\_wsdfinal\_default50}, code @e27bc3c3) on CC-IN2P3. Design (passed 2026-11-07): seed $42$ only
+[D315], every warm start at $k=533$ ($1/8$ of the $4264$-step pretraining) read as $R(\text{arm}/B_\text{WSD})$ on PP4
+and EE4 as par.~\ref{par:v4_warm_start}, each model after its sigma stage (D276); the interval is the $95\%$ class
+bootstrap widened on each side by the largest measured paired seed spread of any kind (PP4 $0.0505$, EE4 $0.0809$),
+as the WSD arms of par.~\ref{par:v4_warm_start_fixes}. Fixed before the read: MATCH when the widened upper end is at
+most $1.35$ on PP4 and EE4, SHORT when a widened lower end is above $1$, else INCONCLUSIVE; YES when either share-$0.50$
+WSD arm is MATCH; the restart is as good as the branch when $R(\text{restart}/\text{branch})$ on share $0.50$ lies in
+$[1/1.05, 1.05]$ on both reads, and then the recipe is the restart, else the branch. The blow-up check flags no run.
+The outcome is the design's YES branch (fig.~\ref{fig:ws_wsd_match}). The restart of the WSD final model on share $0.50$
+is MATCH: PP4 $0.802$ ($[0.744, 0.860]$), EE4 $0.940$ ($[0.827, 1.058]$), and so is the branch on share $0.50$, PP4
+$0.845$ ($[0.784, 0.906]$), EE4 $1.022$ ($[0.891, 1.177]$). On share $0.25$ the restart is MATCH at the bar's edge, PP4
+$0.979$ ($[0.915, 1.045]$), EE4 $1.187$ ($[1.026, 1.348]$), and the branch is SHORT, PP4 $0.988$ ($[0.918, 1.058]$),
+EE4 $1.224$ ($[1.059, 1.414]$): the share-$0.50$ exposure is what gives the match its margin on EE4. The restart on
+share $0.50$ does not trade the other reads: catalog-sampled held-out $0.827$, HD4 $0.795$, HD5 $0.941$ ($[0.734,
+1.235]$, $28$ classes). Under the cosine schedule the same question read SHORT at $k=533$ ($R(W/B)$ PP4 $1.333$, EE4
+$1.513$, two seeds, par.~\ref{par:v4_warm_start}); the two reads measure the same ratio, and what changed between them
+is the parent's schedule, the share and the from-scratch reference (B against B\textsubscript{WSD}, which read alike
+below), and the seeds (two there, one here).
+The schedule does not help the change from scratch: $R(B_\text{WSD}/B)$ is PP4 $0.973$ ($[0.912, 1.037]$), EE4
+$0.975$ ($[0.863, 1.087]$), and B\textsubscript{WSD}'s best validation loss is $-2.828$ against B's $-2.911$. So the
+seed-$42$ read of the WSD branch on share $0.50$ over the cosine B in par.~\ref{par:v4_warm_start_fixes}, PP4 $0.815$,
+EE4 $0.966$, carries over to B\textsubscript{WSD} nearly unchanged, and the gain of the WSD warm starts comes from their
+parent, not from a weaker reference. The restart reads better than the branch on share $0.50$, PP4 $0.949$ ($[0.929,
+0.969]$), EE4 $0.907$ ($[0.839, 0.980]$), with the same-data widening (PP4 $0.0157$, EE4 $0.0669$) since parent and
+data are the same: outside the $5\%$ band, so the literal rule picks the branch; the restart is taken as the recipe
+instead (a deviation from the rule, decided after the read), because the band was meant to allow the simpler arm when
+it is not worse, and here it is better on both reads and needs no saved pre-cooldown checkpoint. The recipe: pretrain
+with WSD (cooldown the last eighth), then restart its final model under the change at the default restart, on share
+$0.50$, for $1/8$ of a pretraining; it matches the change pretrained from scratch at $1/8$ of its compute, on top of
+the parent's pretraining already paid. Caveats: one seed, and seed $42$ is the cosine default restart's favourable
+seed, so the share-$0.25$ restart's MATCH at $1.348$ is a tie with the bar, not a margin; the change tested is C1
+only. Testing the other changes with this recipe waits on lifting D307.
+% src: python3 analysis/catalog_v4/mixture_ab.py warm_wsd @1d49c55c
+% claim: widening.PP4=0.0505
+% claim: widening.EE4=0.0809
+% claim: arms.wsdfinal_default50.PP4.R=0.802
+% claim: arms.wsdfinal_default50.PP4.widened.0=0.744
+% claim: arms.wsdfinal_default50.PP4.widened.1=0.860
+% claim: arms.wsdfinal_default50.EE4.R=0.940
+% claim: arms.wsdfinal_default50.EE4.widened.0=0.827
+% claim: arms.wsdfinal_default50.EE4.widened.1=1.058
+% claim: arms.wsdbranch50.PP4.R=0.845
+% claim: arms.wsdbranch50.PP4.widened.0=0.784
+% claim: arms.wsdbranch50.PP4.widened.1=0.906
+% claim: arms.wsdbranch50.EE4.R=1.022
+% claim: arms.wsdbranch50.EE4.widened.0=0.891
+% claim: arms.wsdbranch50.EE4.widened.1=1.177
+% claim: arms.wsdfinal_default.PP4.R=0.979
+% claim: arms.wsdfinal_default.PP4.widened.0=0.915
+% claim: arms.wsdfinal_default.PP4.widened.1=1.045
+% claim: arms.wsdfinal_default.EE4.R=1.187
+% claim: arms.wsdfinal_default.EE4.widened.0=1.026
+% claim: arms.wsdfinal_default.EE4.widened.1=1.348
+% claim: arms.wsdbranch25.PP4.R=0.988
+% claim: arms.wsdbranch25.PP4.widened.0=0.918
+% claim: arms.wsdbranch25.PP4.widened.1=1.058
+% claim: arms.wsdbranch25.EE4.R=1.224
+% claim: arms.wsdbranch25.EE4.widened.0=1.059
+% claim: arms.wsdbranch25.EE4.widened.1=1.414
+% claim: arms.wsdfinal_default50.held.R=0.827
+% claim: arms.wsdfinal_default50.HD4.R=0.795
+% claim: arms.wsdfinal_default50.HD5.R=0.941
+% claim: arms.wsdfinal_default50.HD5.widened.0=0.734
+% claim: arms.wsdfinal_default50.HD5.widened.1=1.235
+% claim: arms.wsdfinal_default50.HD5.n_classes=28
+% claim: B_wsd_over_B.PP4.R=0.973
+% claim: B_wsd_over_B.PP4.widened.0=0.912
+% claim: B_wsd_over_B.PP4.widened.1=1.037
+% claim: B_wsd_over_B.EE4.R=0.975
+% claim: B_wsd_over_B.EE4.widened.0=0.863
+% claim: B_wsd_over_B.EE4.widened.1=1.087
+% claim: restart_over_branch50.PP4.R=0.949
+% claim: restart_over_branch50.PP4.widened.0=0.929
+% claim: restart_over_branch50.PP4.widened.1=0.969
+% claim: restart_over_branch50.EE4.R=0.907
+% claim: restart_over_branch50.EE4.widened.0=0.839
+% claim: restart_over_branch50.EE4.widened.1=0.980
+% claim: restart_over_branch50.widening.PP4=0.0157
+% claim: restart_over_branch50.widening.EE4=0.0669
+% src: python3 analysis/catalog_v4/mixture_ab.py warm_single @c68e5215
+% claim: estimate_factor_W533_over_B.PP4=1.333
+% claim: estimate_factor_W533_over_B.EE4=1.513
+% claim: arms.wsdbranch50.PP4.R_over_B_seed42=0.815
+% claim: arms.wsdbranch50.EE4.R_over_B_seed42=0.966
+% src: python3 analysis/catalog_v4/plot_ws_fixes.py --s15 @265f3bbf
+% claim: B_wsd.val_best=-2.828
+% claim: B_cosine.val_best=-2.911
+% allow: 0.25 0.50 1 0 533 42 4264 95 1.35 1.05 5 8 because they are the shares, the restart's lr scale and its end, the retraining length, the seed, the pretraining length, the interval level, the bars of the rule (and the band in percent), and the eighth of a pretraining
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.49\linewidth]{../analysis/catalog_v4/figs/ws_wsd_match_a.pdf}\hfill
+\includegraphics[width=0.49\linewidth]{../analysis/catalog_v4/figs/ws_wsd_match_b.pdf}\\[1ex]
+\includegraphics[width=0.49\linewidth]{../analysis/catalog_v4/figs/ws_wsd_match_c.pdf}\hfill
+\includegraphics[width=0.49\linewidth]{../analysis/catalog_v4/figs/ws_wsd_match_d.pdf}\\[1ex]
+\includegraphics[width=0.49\linewidth]{../analysis/catalog_v4/figs/ws_wsd_match_e.pdf}
+% src: python3 analysis/catalog_v4/plot_ws_fixes.py --s15 @265f3bbf
+\caption{The WSD warm starts against the C1 change pretrained from scratch under the same WSD schedule, seed $42$.
+(a) Validation loss (het NLL) of the change from scratch over its pretraining, cosine (B, dotted) and WSD
+(B\textsubscript{WSD}). (b) Validation loss of the four WSD warm starts over their $533$ steps: the WSD parent's final
+model at the default restart (restart) or the parent branched before its cooldown (branch), on share $0.50$ or $0.25$.
+(c) $R(\text{arm}/B_\text{WSD})$, the ratio of per-class MSE of $\log|M|^2$ (median over classes of each class's
+geometric mean over probes) on PP4 (circles) and EE4 (squares); each interval is the $95\%$ class bootstrap widened on
+each side by the largest paired seed spread; dashed, the MATCH bar $1.35$. (d, e) Per-class MSE of $\log|M|^2$ on the
+default-sampled test splits of the pp (PP4) and $e^+e^-$ (EE4) probes as a cumulative fraction of classes, every model
+after its sigma stage.}
+\label{fig:ws_wsd_match}
+% allow: 42 533 0.50 0.25 2 95 1.35 because they are the seed, the retraining length, the shares, the square in |M|^2, the interval level and the bar
+\end{figure}
+
 \paragraph{Warm start for the other changes (2026-11-06).}\label{par:v4_warm_start_changes}
 The question of par.~\ref{par:v4_warm_start} asked of every other change that allows a warm start [D283, D300], with
 C1 (share $0.25$, het loss; YES at $k=1066$) the earlier result each is set against: C2 the default-sampled share
