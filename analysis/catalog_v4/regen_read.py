@@ -30,7 +30,11 @@ FIG = os.path.join(HERE, "figs", "regen_g12_fill")
 FILL_BAR = 0.95            # steps 72/75: a bin is filled at >= 0.95 of its quota
 COST_BAR = 2.0             # CLAUDE.md: a new method's cost over the one it replaces above 2x is a finding
 CHECK5 = ["v4_uux_epemg", "v4_uux_epemvevex", "v4_uu_bbxuu", "v4_us_ddxsu", "v4_udx_csxvevex"]   # step 75's classes
-STEP75 = {"lo": 0.78, "hi": 2.11}     # step 75's cost range over the old, seeds 42/43 (grid_fwd_check.json)
+STEP75 = {"lo": 0.78, "hi": 2.11}
+# D269 ("that percentage would be zero"): held-out in-support pp events outside the regenerated pools' log|M|^2 range; the
+# bar is step 67/75's passed rule (<= 2 per class: step 75 left 0-1 per class on 5 classes; the range table is read from
+# 1.2e4 PP4 events, so a held-out sample of similar size can pass its max by chance), above it the class is SHORT
+COVER_BAR = 2     # step 75's cost range over the old, seeds 42/43 (grid_fwd_check.json)
 
 PULL = r'''
 import json, os, sys, traceback
@@ -66,6 +70,46 @@ for p in reg("recipes/catalog_v4_g12_regen.yaml"):
         except Exception as e:
             d["error"] = "%%s: %%s" %% (type(e).__name__, e)
         out["pools"][p["name"] + "/" + role] = d
+# D269 / D264 coverage against held-out default-sampled pp events (never read for the range table: the PP4 probe's val
+# pool and the class's dsh_ pools; multichannel_check.pp_sources / _pp, step 75's count): in-support events outside the
+# regenerated val+test pools' log10|M|^2 [min, max] (every role samples one distribution; the 1e5-row train pools are
+# not read on the login node), the out-of-window share, and the catalog-over-pp density per 0.25-dex bin
+sys.path.insert(0, os.path.join(os.getcwd(), "analysis", "catalog_v4"))
+import multichannel_check as mcc
+probe = {r["class"]: r["probe"] for r in json.load(open("analysis/catalog_v4/data/pp_support_reads.json"))["rows"]}
+out["coverage"] = {}
+B = np.arange(-40.0, 15.0001, 0.25)
+for p in reg("recipes/catalog_v4_g12_regen.yaml"):
+    n = p["name"]
+    try:
+        lm = []
+        for role in ("val", "test"):
+            r = mg.variable_energy_recipe(n, float(p["sqrts"][0]), float(p["sqrts"][1]), int(p["n_" + role]), role=role, seed=42)
+            f = mg.recipe_output_path(r, datagen.dest_for_role(role))
+            if os.path.exists(f):
+                lm.append(np.log10(np.abs(np.asarray(np.load(f, mmap_mode="r")[:, -1]))))
+        if not lm:
+            out["coverage"][n] = {"missing": True}; continue
+        lm = np.concatenate(lm); lm = lm[np.isfinite(lm)]
+        lo, hi = float(lm.min()), float(lm.max())
+        h = mcc._pp(mcc.pp_sources(n, probe[n])["heldout"], mg.PROCESSES[n], float(p["sqrts"][0]), float(p["sqrts"][1]), n)
+        if h is None:
+            out["coverage"][n] = {"kept": [lo, hi], "heldout": None}; continue
+        ls, ss = h["lm"], h["sup"]
+        cat = np.histogram(np.clip(lm, B[0], B[-1] - 1e-9), B)[0] / len(lm)
+        pp = np.histogram(np.clip(ls[ss], B[0], B[-1] - 1e-9), B)[0]
+        m = pp >= 10
+        ratio = np.where(m, cat / np.maximum(pp / max(ss.sum(), 1), 1e-300), np.inf)
+        i = int(np.argmin(ratio)) if m.any() else None
+        out["coverage"][n] = {"kept": [lo, hi], "n_heldout": int(len(ls)), "n_in_support": int(ss.sum()),
+                              "outside_kept": int((ss & ((ls < lo) | (ls > hi))).sum()),
+                              "above_kept": int((ss & (ls > hi)).sum()), "below_kept": int((ss & (ls < lo)).sum()),
+                              "outside_window_all": h["outside_window"], "fail_cuts_in_window_all": h["fail_cuts_in_window"],
+                              "density_ratio_min": float(ratio[i]) if i is not None else None,
+                              "density_ratio_min_bin": [float(B[i]), float(B[i + 1])] if i is not None else None,
+                              "density_ratio_median": float(np.median(ratio[m])) if m.any() else None}
+    except Exception as e:
+        out["coverage"][n] = {"error": "%%s: %%s" %% (type(e).__name__, str(e)[:300])}
 import mix_compose as mc
 # the default25 mixture's share on the regenerated pool: the regeneration entry plus default25's f_default and source
 # (the _g12 training copies wait on step 68), composed as the loader composes it
@@ -132,10 +176,18 @@ def read():
     ratios = {n: [v["cost_ratio"] for v in classes.values() if v["nfinal"] == n and v["cost_ratio"]] for n in (2, 3, 4)}
     new_h = sum(v["secs"] for v in classes.values()) / 3600
     old_h = sum(old["old_per_class_s"][c] for c in classes if c in old["old_per_class_s"]) / 3600
+    cov = d.get("coverage", {})
+    over = {c: v["outside_kept"] for c, v in cov.items() if (v.get("outside_kept") or 0) > COVER_BAR}
+    cov_bad = [c for c, v in cov.items() if v.get("error") or v.get("missing")]
+    for c, v in cov.items():
+        if c in classes:
+            classes[c]["coverage"] = v
+    cost_over = sorted((c for c, v in classes.items() if (v["cost_ratio"] or 0) > COST_BAR),
+                       key=lambda c: -classes[c]["cost_ratio"])
     comp = d["compose"]
     comp_ok = all(v.get("ok") for v in comp.values() if "skipped" not in v)
     ctl = {c: classes.get(c, {}).get("cost_ratio") for c in CHECK5}
-    verdict = ("BROKEN" if bad else "COMPOSE_FAILS" if not comp_ok else "SHORT" if short
+    verdict = ("BROKEN" if bad or cov_bad else "COMPOSE_FAILS" if not comp_ok else "SHORT" if short or over
                else "COST" if new_h > COST_BAR * old_h else "FILLED")
     return {"design": "plan catalog_coverage step 65 (design 2026-11-07)", "verdict": verdict,
             "classes_read": len(classes), "classes_short": short, "pools_bad": bad[:50], "n_pools_bad": len(bad),
@@ -146,6 +198,14 @@ def read():
                                      for n, v in ratios.items() if v},
             "control_step75_cost_ratio": ctl, "step75_range": STEP75,
             "budget_hit_chunks": sum(v["budget_hit"] for v in classes.values()),
+            "cover_bar": COVER_BAR, "classes_outside_over_bar": over, "coverage_errors": cov_bad,
+            "heldout_outside_kept_total": sum(v.get("outside_kept") or 0 for v in cov.values()),
+            "heldout_in_support_total": sum(v.get("n_in_support") or 0 for v in cov.values()),
+            "classes_with_any_outside": sum(1 for v in cov.values() if (v.get("outside_kept") or 0) > 0),
+            "density_ratio_min_q10": (float(np.quantile([v["density_ratio_min"] for v in cov.values()
+                                                         if v.get("density_ratio_min") is not None], 0.1))
+                                      if cov else None),
+            "classes_cost_over_2x": {c: round(classes[c]["cost_ratio"], 2) for c in cost_over},
             "compose": comp, "classes": classes}
 
 
@@ -153,7 +213,10 @@ def cmd_read(a):
     r = read()
     json.dump(r, open(READ_OUT, "w"), indent=1)
     print(json.dumps({k: r[k] for k in ("verdict", "classes_read", "n_pools_bad", "new_core_h_sampling", "old_core_h",
-                                        "cost_ratio_by_nfinal", "control_step75_cost_ratio", "budget_hit_chunks")},
+                                        "cost_ratio_by_nfinal", "control_step75_cost_ratio", "budget_hit_chunks",
+                                        "heldout_outside_kept_total", "heldout_in_support_total",
+                                        "classes_with_any_outside", "classes_outside_over_bar", "density_ratio_min_q10",
+                                        "classes_cost_over_2x")},
                      indent=1))
     print("short:", r["classes_short"][:20])
 
