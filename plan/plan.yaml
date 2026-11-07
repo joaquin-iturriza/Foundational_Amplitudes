@@ -4168,7 +4168,7 @@ entries:
     - FA-ccin2p3-ffc3cd1c
     - FA-lxplus-f44c7c06
     - FA-lxplus-fdf08708
-    commit: 9fa6af37
+    commit: ef2dccd6
     paths:
     - 'HAND-OFF (2026-10-30 06:30, gridpack queue step). (1) CODE on branch gridpack-queue, worktree worktrees/wt-gridpack-queue,
       commit 0e9dda71 rebased on trunk 4609381f (merged the conflict in lhe_parts main(): --grid-cores kept with upstream
@@ -4441,6 +4441,7 @@ entries:
     - analysis/catalog_v4/data/complete_runs.json
     - analysis/catalog_v4/data/control_pool_ids_1d9d6a29.json
     - analysis/catalog_v4/data/density_check.json
+    - analysis/catalog_v4/data/ee_cutread_anchor.json
     - analysis/catalog_v4/data/ee_gain_events.json
     - analysis/catalog_v4/data/ee_gain_mechanism.json
     - analysis/catalog_v4/data/ee_support_reads.json
@@ -4453,6 +4454,7 @@ entries:
     - analysis/catalog_v4/data/lhe_probe_yields_hd_h5.json
     - analysis/catalog_v4/data/lhe_rates_hd_5body.json
     - analysis/catalog_v4/data/lhe_rates_hd_h5.json
+    - analysis/catalog_v4/data/lhe_run_yields_dsh_eea.json
     - analysis/catalog_v4/data/mixed_order_audit.json
     - analysis/catalog_v4/data/mixture_ab.json
     - analysis/catalog_v4/data/mixture_ab_het.json
@@ -4462,6 +4464,8 @@ entries:
     - analysis/catalog_v4/data/probe_stage_split.json
     - analysis/catalog_v4/data/quota_coverage.json
     - analysis/catalog_v4/data/quota_where
+    - analysis/catalog_v4/data/r1_check.json
+    - analysis/catalog_v4/data/r1_where.json
     - analysis/catalog_v4/data/reads
     - analysis/catalog_v4/data/sampling_cost_ee.json
     - analysis/catalog_v4/data/sampling_cost_grid12.json
