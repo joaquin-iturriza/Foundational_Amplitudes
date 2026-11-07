@@ -11431,6 +11431,76 @@ entries:
       val/test, none of which builds the range. Check 5 searched: results.tex for stall, resonance ladder, resladder, smixr,
       dsh_ train, solve_tol, mperi_all, margin; the entry''s dead ends and findings (step 65 v2/v3, step 67 verdict, step
       65 read); site decisions D269, D270, D294, D317, D318. No repeat found.'
+  - at: '2026-11-07T06:08:25+00:00'
+    question: 'Step 75 revision r2 of the flat sampler (step 78, after r1''s NO): r2 = r1 (tools/regen_recipes.R1) plus (a)
+      flat_keep_ext: the highest and the lowest in-range candidate of each chunk always kept, each in place of the first kept
+      event of its bin; (b) flat_stall_patience 2: the stall stop needs two consecutive stalled rounds instead of one; (c)
+      flat_budget 18 instead of 12 (two more rounds of oversample/2 x n_flat for chunks still converging). Code: branch sampler-r2
+      @c825cb19 (worktrees/wt-r2), tools/regen_recipes.R2, policy grid_r2_budget18. Does r2, on the same 19 classes x seeds
+      42/43 as r1, (1) fill every in-range 0.25-dex quota bin, the 0.5-dex margin included, at >= 0.95 of quota, exempting
+      only bins whose lower edge lies above the class''s reach (the highest candidate any policy drew at either seed; r1''s
+      rule) and, the same rule mirrored, bins whose upper edge lies below the class''s floor (the least candidate any policy
+      drew at either seed); a bin straddling the reach or floor stays scored, listed with the share of its width the candidates
+      reach; (2) leave ZERO scored held-out in-support pp events outside the kept range (D269; PP4 val + dsh_ val + dsh_ test);
+      (3) cost: summed over the 38 jobs, r2 seconds <= 2x the old sampling''s seconds in the same jobs (CLAUDE.md''s 2x margin
+      on a new method''s cost over the one it replaces; D317 is about the catalog''s generation time), every class''s ratio
+      reported and those over 2x listed? Feeds: whether all 1301 hadronic classes are regenerated with r2 (pools _smixs) before
+      step 68''s e+e- classes join. Cost bar change from r1 stated openly: r1 scored cost per class (12 of 38 over 2x) while
+      its summed cost was 1.495x; the method''s cost is the regeneration''s total time, so the bar is on the sum; the per-class
+      list goes to Joaquin with the result.'
+    prior: 'r1 check (multichannel_check.py step75r1 @224b49db -> data/r1_check.json): NO. Fill: 0 core shorts on 19 classes
+      x 2 seeds; margin shorts on 9 classes: bottom bins no candidate of any policy reached (ddx_ttx [-1.1,-0.86], bb_bb [0.01,0.26]),
+      top-margin bins under 0.95 (uu_bbxuu 5.127 0.65, us_ddxsu 5.285 0.82-0.86, bb_bbvevex 1.608 0.93, ug_auuux 2.995 0.93-0.95,
+      bbx_ccxh -3.809 0.46-0.62, uux_bgtxwp -1.206 0.36-0.46 and -0.96 0, bb_bb 8.34 0.07-0.11). Outside: 1 held-out event
+      on bbx_htaptam at both seeds. Cost per class median 1.66, 12 of 38 over 2x. r1_where.json (step75r2-where @7e3cfcd0):
+      short top bins reached only by the edge ladder and resonance ladders, chunks ending on the label budget or the stall
+      stop. r1_rounds.json (step75r2-rounds @c825cb19): summed cost r1 1.495x, step-65 policy 1.851x; the short top bins fill
+      1.0 in quota-stopped chunks and 0.26-0.50 (uu_bbxuu 5.127, bb_bbvevex, ug_auuux, us_ddxsu 5.285) in budget-stopped ones,
+      which stop with 1-52 events missing after a last round that filled 11-60; uux_bgtxwp -1.206 fills 0.08-0.09 in the chunks
+      that stopped on one stalled round against 0.84-1.0 in those that ran a fourth round; bbx_ccxh -3.809 0.18-0.20 stall
+      vs 1.03 budget. htaptam: r1 kept max -4.4868/-4.4895 at seeds 42/43, r1''s highest candidate -4.4794/-4.4754, the step-65
+      policy kept max -4.4726 (0 outside); the held-out top (dsh_bbx_htaptam test) -4.4859 (login-node read with analysis.common.find_pool,
+      not a committed tool; r2''s reader records each outside event''s distance, outside_dex): r1 drew candidates above it
+      and left them out (uniform selection inside the top bin). Step 65 read (regen_read.py @8a1abe50): 527 classes short,
+      213 with held-out outside, cost median 1.86x, total 1.74x. Straddling bins: bb_bb [8.34,8.585] with reach 8.382 (17%
+      of its width reachable), uux_bgtxwp [-0.96,-0.714] reach -0.939 (9%): no sampler change can fill these at 0.95 of a
+      full-width quota; their exemption is Joaquin''s call (plan ask), not applied here. Searched docs/results.tex (patience,
+      budget 18, extreme, highest candidate, stall), plan show catalog_coverage (patience, keep extremes, total cost), site
+      decisions (D269, D294, D317, D318): no earlier keep-extremes, patience or budget-18 revision.'
+    measure: 'analysis/catalog_v4/multichannel_check.py run <class> <probe> current+grid_r1_budget12+grid_r2_budget18 <seed>
+      (scripts/job_multichannel_check.sh, CPU, one job per class and seed, three policies on one node, the class''s train
+      pool replayed chunk by chunk) -> per policy kept/quota per bin per chunk, rounds and stops, labels, candidates per channel
+      and bin, cand_max and cand_min, t_label, t_propose and t_propose_by_channel (new: each channel''s draw seconds), seconds;
+      heldout_r1 with outside_dex. Read by multichannel_check.py step75r2-pull then step75r2 -> data/r2_check.json: per class
+      and seed (1) fill of every scored bin, exempt above reach / below floor listed, straddling bins listed with their reachable
+      width share; (2) heldout_r1 outside count and distances; (3) cost r2/current per class and summed over all 38 jobs (bar),
+      r1 beside it in the same job; per channel proposal seconds (item 4 of the step: labels vs proposal per channel on the
+      classes over 2x).'
+    check: 'On existing data (r1_rounds.json @c825cb19, from r1''s per-chunk records): (b) patience: uux_bgtxwp''s -1.206
+      bin fills 0.08/0.09 in the 25/18 chunks that stopped after one stalled round and 1.0/0.84 in the 11/18 that ran a fourth
+      round; bbx_ccxh -3.809 0.20/0.18 vs 1.03; tests/test_flat_grid.py test_r2_keep_ext_patience_tag: the toy chunk that
+      r1 stops after 2 rounds runs 3 with patience 2. (c) budget: the budget-stopped chunks of uu_bbxuu (17/21 chunks), us_ddxsu
+      (9/12), bb_bbvevex (5/4), ug_auuux (3/4) stop 1-52 events short after a last round that filled 11-60, while the same
+      bins fill 1.0 in the quota-stopped chunks: one or two more rounds close them. (a) keep_ext: the htaptam held-out top
+      -4.4859 lies below r1''s highest candidate at both seeds and above its kept max; the test shows the extremes kept with
+      the per-bin counts unchanged and the selection unchanged without the key. Cost: estimate (assumption: each stall chunk
+      runs one more full round, each budget chunk to 18) summed 1.637x (r1 1.495x), per class up to 2.89x (bb_bbvevex) - an
+      estimate, measured by this check.'
+    fixed: 'Classes'' windows, sizes, base/physics, mixture shares (f_flat 0.35, f_fwd 0.15, fwd_cand 1/3), cuts, range (tools/flat_range.ranges_dsh,
+      r1''s), grid constants, flat_stall 0.2, ladders/resladder/solve_tol as r1, data seeds as the chunk plan, train role
+      (1e5 events); code = trunk after sampler-r2 merges (repo-reviewer PASS), one commit for all 38 jobs. CPU only, 0 GPU-h.
+      Wall: r1''s three-policy jobs took up to ~850 s per class; r2 adds at most 50% labels on budget chunks: target 0.35
+      h, limit --time 01:00:00. Disk ~0.5 MB JSON per job plus temporary chunk dirs deleted per chunk.'
+    control: 'r1 (grid_r1_budget12) and the old sampling (current) in the same job on the same node: r2 against both; the
+      per-class r1 numbers of r1_check.json reproduced beside it.'
+    seeds: Data seeds 42 and 43 (r1's), each class at both.
+    outcome: 'PASS (every class and seed: every scored bin >= 0.95 of quota, 0 heldout_r1 events outside; summed r2 cost <=
+      2x current) -> regenerate the 1301 hadronic classes with R2 (recipes via regen_recipes write, pools _smixs), read by
+      regen_read.py with the same bar, then step 68; the per-class cost list (classes over 2x) goes to Joaquin with the result.
+      NO: if only the straddling bins (bb_bb 8.34, bgtxwp -0.96) fail -> the straddle exemption to Joaquin by plan ask with
+      how many bins and classes it drops; a non-straddling bin short -> channel-by-bin and a revision of that channel; outside
+      > 0 -> outside_dex against the candidates'' range; summed cost > 2x -> per-channel proposal and label seconds, the changes
+      ranked by cost per bin filled. Job failures -> log read, fixed, rerun.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
