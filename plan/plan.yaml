@@ -16090,12 +16090,10 @@ entries:
     blocks: the change tests held by D307
     blocks_steps: &id002 []
   owner:
-    agent: aa91c448ea3a5ca1c
-    state: stopped
-    since: '2026-11-07T02:47:32+00:00'
-    state_at: '2026-11-07T06:10:10+00:00'
-    context: 268430
-    context_at: '2026-11-07T06:12:20+00:00'
+    agent: ae9049fb82fff3856
+    state: working
+    since: '2026-11-07T06:12:26+00:00'
+    state_at: '2026-11-07T06:12:26+00:00'
   designs:
   - at: '2026-11-04T21:14:59+00:00'
     question: 'D282: when a change to the pretraining is good and keeps the parameter shapes, does warm-starting the existing
