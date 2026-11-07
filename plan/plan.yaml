@@ -14311,6 +14311,14 @@ entries:
       pool whose one run at a high energy stopped short (e.g. dsh_eea_epem_ataptam 3000 GeV 206 of 6401), the cause already
       read in step 77; queue at the last of them: todo 0, done 10427, failed 17, assembled 91 of 113. No other error. Those
       pools are among the 20 relaid by step 77 (merged ef2dccd6, 47 workers running).'
+  - at: '2026-11-07T06:29:58+00:00'
+    text: '2026-11-07 step 77 read: the 47 relay workers COMPLETED; queue catalog_v4_dsh_eea (lhe_parts status) todo 0, claimed
+      0, done 18891, failed 20 (the stage-2 assembly refusals), assembled 113 of 113. Run yields after the relay (lhe_parts
+      yields --by-energy -> data/lhe_run_yields_dsh_eea_relay.json @6059c92e): runs complete per energy 885/887 (91 GeV) to
+      2089/2183 (3000 GeV); 257 runs of ~18000 returned under their ask, median 0.97 of it (10% quantile 0.91); only 2 under
+      0.3 (the catalog''s short-run rule): dsh_eea_epem_bbxgz 3000 GeV 20 of 200 and dsh_eea_epem_wpwmzz 3000 GeV 53 of 200,
+      0.3% and 0.7% of their pool''s events at that energy; kept, not relaid (a whole-pool relay for under 1% of one energy''s
+      events). Step 77 done.'
   handoff:
     state: '2026-11-07 ~08:00. Step 77: the 20 stage-2 dsh_eea_ pools not assembled (18 one-run pools short at 1000/1500/3000
       GeV, epepemem and aepemz short too after rerun) relaid whole as complete gridpack runs of 200 (dsha_short in recipes/gen_catalog_v4_default.py,
