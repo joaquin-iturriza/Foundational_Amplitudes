@@ -11990,6 +11990,54 @@ entries:
       no cache; 2.9 GPU-h. Check 5 searched results.tex for sign branch, sign_branch, detached, sign head, parallel/separate
       trunk, sign network, wrong-sign, pair head; plan steps 56/61/73 and dead ends; site decisions ''sign'' (D287, D296,
       D315): no prior branch-depth work.'
+  - at: '2026-11-07T09:49:24+00:00'
+    question: 'Step 82 revision r6 of the flat sampler (after r5''s NO on v4_uux_bgtxwp): r6 = r5 (tools/regen_recipes.R5)
+      without the stall stop (flat_stall_off; the rounds end at quota or the label budget 18 only), branch sampler-r6 @14b9789b,
+      pools _smixw. Does r6, on the same 19 classes x seeds 42/43, (1) fill every in-range non-straddling 0.25-dex quota bin,
+      margin included, at >= 0.95 of quota (exempt: lower edge above the class''s reach or upper edge below its floor, reach
+      and floor over the r1-r6 jobs; straddling bins scored and listed with their reachable share), (2) leave ZERO scored
+      held-out in-support pp events outside the kept range (D269), (3) cost summed over the 38 jobs <= 2x the old sampling''s
+      in the same jobs? In particular whether v4_uux_bgtxwp [-1.206,-0.96] reaches >= 0.95 (r5 0.867/0.870, r3 0.925/0.917)
+      while v4_uu_bbxuu stays at r5''s quota fill. Feeds: whether the 1301 hadronic classes are regenerated with r6 (_smixw)
+      before step 68; the straddling bins wait on Joaquin''s scope answer.'
+    prior: 'Searched docs/results.tex (stall, flat sampler, budget, quota bin: none on this rule), plan show catalog_coverage
+      (steps 75-81: r1 introduced the stall stop for cost, r2 its patience 2, r3-r5 the empty-bin steering) and site decisions
+      FA (sampler, stall, budget: D317 bars a 100x generation cost; D318; none on the stall rule). r5 (data/r5_check.json,
+      r5_acted.json, figs/r5_check.png): bbxuu at quota (stops quota 35/36, 36/36; r5 = r2 bitwise in 35/36 chunks), bgtxwp
+      0.867/0.870, cost 1.594x (r3 1.843x in the same jobs), only fill fails; straddling bins bb_bb 0.108/0.13, bbx_ccxh 0.865/0.77,
+      bgtxwp [-0.96,-0.714] 0.'
+    measure: 'multichannel_check.py run <class> <probe> current+grid_r5_budget18+grid_r6_budget18 <seed> (scripts/job_multichannel_check.sh,
+      CPU, one job per class and seed, three policies on one node). Read: step82r6-pull, step82r6 -> data/r6_check.json (r6
+      against r5 in the same job, reach and floor over the r1-r6 jobs, the bars of r2-r5), step82r6-stops -> data/r6_stops.json
+      (per class and seed the stop kinds under r5 and r6, kept per short bin per stop kind, labels charged, chunks equal r5/r6
+      and among r5''s non-stall chunks); figure r2_check_fig.py r6.'
+    check: 'On existing data the shortfall sits wholly in stall-stopped chunks: bgtxwp''s [-1.206,-0.96] per chunk by stop
+      kind (r5 jobs, multichannel_check_reads/*_current+grid_r3_budget18+grid_r5_budget18_<seed>.json): r5 stall 14 chunks
+      (5 below 20 of quota 26: 0,0,1,2,3) and budget 22 (all >= 25) at seed 42, stall 20 (5 below: 0,1,2,2,3) and budget 16
+      (all >= 25) at seed 43; r3 stall 9 (3 below: 0,1,7) / budget 27 (all >= 25), stall 12 (3 below) / budget 24. The stalled
+      short chunks hold missing at ~51 for 2-3 rounds with the empty bin steered by r3''s rule (bins_empty 2, small 0), so
+      the proposal had not yet reached it when the stall rule ended them, while every chunk that ran to the budget filled
+      it. Cost estimate (assumption: a stalled chunk run to the budget charges 18 x its quota labels): over the 38 r5 jobs
+      13.0e6 -> 14.75e6 labels (+13%): per class bgtxwp +10-12%, bbx_ccxh +12%, bb_bb +50%, bbx_htaptam +50%, ddx_ttx +100%
+      (one stall chunk each, small totals); r5 1.594x the old sampling -> about 1.8x if seconds follow labels: under the 2x
+      bar. Determinism: r6 equals r5 bitwise in every chunk that stopped at quota or the budget under r5 (the stall test is
+      the only change), so bbxuu (no stall stops under r5) is predicted bitwise r5; step82r6-stops counts it. Unit test test_r6_stall_off
+      (R6 == R5 + flat_stall_off, _smixw tag, _smixv kept for R5, both stall sites guarded); tests/test_flat_grid.py 12 pass.'
+    fixed: 'Everything of r5 (R5: r3''s channels and ladders, keep extremes, budget 18, grid constants, ranges_dsh, flat_empty_near,
+      flat_empty_near_min), R1_CLASSES and probes, data seeds, the train role''s chunk plan; one commit for all 38 jobs (trunk
+      after sampler-r6 merges). CPU only, 0 GPU-h. Wall: r5 three-policy jobs up to ~640 s of sampling, r6 +13% labels: target
+      0.2 h, --time 00:45:00, --mem 8G, ~0.5 MB JSON per job.'
+    control: r5 (grid_r5_budget18) and the old sampling (current) in the same job on the same node; r5 is deterministic per
+      seed (its kept per bin equal to the r5 jobs', a determinism check); r3 beside from r5_check.json.
+    seeds: Data seeds 42 and 43, as r1-r5, each class at both.
+    outcome: 'PASS (every class and seed: every scored non-straddling bin >= 0.95, 0 held-out outside, summed cost <= 2x)
+      -> straddling bins per Joaquin''s answer; regenerate the 1301 hadronic classes with R6 (_smixw), read by regen_read.py
+      with the same bars, then step 68. bgtxwp still short with its short chunks at the budget: the proposal does not reach
+      the bin within budget 18 in those chunks: read their channels per bin (step78-where) before a budget change. bgtxwp
+      short with chunks stopping no_steer: read those. Summed cost > 2x -> per-class seconds and labels from r6_stops (the
+      stalled chunks'' extra rounds) and a stall rule kept only where the bin is unreachable by the class''s reach. Any class
+      newly short or not bitwise r5 where r5 stopped at quota/budget: a fault, traced in the rounds. Outside > 0 -> outside_dex.
+      Job failures -> log read, fixed, rerun.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
