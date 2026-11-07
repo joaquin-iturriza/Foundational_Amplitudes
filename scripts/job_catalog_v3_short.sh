@@ -402,7 +402,7 @@ case "$ARM" in
                                           "++training.save_model_at_steps=[3731]" ++training.heterosc_sigma_stage_steps=0)
                             COMMON=(training.loss=HETEROSC ++training.loss_aggregation=mean ++training.sign_head=false
                                     ++model.diagram_encoder_llm4lhc.bsm_labels=true)
-                            ITERS_FIXED=4264; TRAIN_ONLY=1
+                            ITERS_FIXED=4264; TRAIN_ONLY=1; TRAIN_SAVES=3731
                             TRAIN="$PROJECT_DIR/recipes/catalog_v4_base_train.yaml" ;;
     # step 14 (D319), seed 42 only (D315), warm starts toward the C1 change (share 0.25) at the restart, v4_het_wsx_<arm>:
     #   default_rerun     v4_het_warm25_k533 again at this commit (the same-commit control; a new run directory)
@@ -758,8 +758,11 @@ if [ "$MODE" != eval ]; then
     fi
 fi
 if [ -n "$TRAIN_ONLY" ]; then
-    ls "$OUT"/models/model_run0_best.pt* "$OUT"/models/model_run0_step2132.pt* "$OUT"/models/model_run0_step3198.pt* \
-        || { echo "$ARM: a saved model is missing in $OUT/models"; exit 1; }
+    # the checkpoints the arm saves: v4_het_control_ckpt steps 2132/3198, the WSD parent step 3731 (TRAIN_SAVES)
+    for st in ${TRAIN_SAVES:-2132 3198}; do
+        ls "$OUT"/models/model_run0_step$st.pt* || { echo "$ARM: a saved model is missing in $OUT/models"; exit 1; }
+    done
+    ls "$OUT"/models/model_run0_best.pt* || { echo "$ARM: a saved model is missing in $OUT/models"; exit 1; }
     echo "V3_SHORT_DONE $ARM (training only)"; exit 0
 fi
 # v4_het_long_best: the trial's sigma-only stage, in a dir of its own, once. As run.py runs it after a training run:
