@@ -15134,6 +15134,12 @@ entries:
       low lr keeps the parent''s function (R(W/A) 1.00), the HD4 gain does not carry to PP4/EE4 (par:v4_warm_start_grow_tuned
       @65fcb32d)'
     at: '2026-11-06T19:46:43+00:00'
+  - tried: Continuing the step-3198 checkpoint with the parent's optimizer state (step 13, v4_het_ws_step3198_continue_optstate[_seed2]_tagfix1,
+      FA-ccin2p3-1c90ae73/013708af)
+    why: removes the restart jump (G 79/79 vs 631/1016) but reads as the fresh-optimizer continuation (R 1.006/1.009) and
+      WORSE than the default restart (PP4 1.148 [0.977,1.351], EE4 1.240 [1.034,1.505]); the jump is not what keeps the warm
+      start short (mixture_ab.py warm C1r_step3198_continue_optstate @9d30a635)
+    at: '2026-11-07T02:23:57+00:00'
   asks:
   - ask: 'The widened warm-start test (every change tried that allows a warm start, design passed): C2-C8 cost about 95 GPU-h
       beyond the share-0.25 runs (66 GPU-h if the loss and one-loop target changes C7, C8 are not run because their from-scratch
