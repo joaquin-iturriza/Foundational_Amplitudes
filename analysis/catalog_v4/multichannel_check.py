@@ -77,7 +77,7 @@ SEEDS = (42, 43)
 QUOTA_POLICIES = ("quota", "quota_ladder_res2", "quota_ladder_res2_budget500", "quota_ladder_edge_res2",
                   "quota_ladder_both_res2", "quota_ladder_both_res2_budget750", "quota_ladder_both_res2_fwdfree_budget750",
                   "mcmc_both_res2_budget12", "quota_ladder_both_res2_budget12", "grid_both_res2_budget12",
-                  "grid_both_res2_budget8", "grid_both_res2f_budget12", "grid_both_res2f_budget8")
+                  "grid_both_res2_budget8", "grid_both_res2f_budget12", "grid_both_res2f_budget8", "grid_r1_budget12")
 # the flat-part diversity read (flat_diversity.py) of each quota policy against this one at the same seed in the same job:
 # independent draws (the quota sampler with both ladders at budget 50), plan catalog_coverage step 69
 DIVERSITY_REF = "quota_ladder_both_res2"
@@ -170,9 +170,13 @@ def pp_sources(name, probe):
         # an e+e- class: its range was read from its default-share pool (pp_support.py pull ee), its EE4 test pool
         # (2000 MadEvent events at the fixed collider energies) is the held-out source
         return {"table": [f"{dsh}_{w}_train_lhe_amplitudes.npy"], "heldout": [f"{probe}_{w}_test_lhe_amplitudes.npy"]}
+    # heldout_r1: what step 75's revision is scored on (its range also reads the dsh_ train pool,
+    # tools/flat_range.ranges_dsh): the probe's val pool and the dsh_ val and test pools
     return {"table": [f"{probe}_{w}_{r}_lhe_amplitudes.npy" for r in ("train", "test")],
             "heldout": [f"{probe}_{w}_val_lhe_amplitudes.npy"] + [f"{dsh}_{w}_{r}_lhe_amplitudes.npy"
-                                                                  for r in ("train", "val", "test")]}
+                                                                  for r in ("train", "val", "test")],
+            "heldout_r1": [f"{probe}_{w}_val_lhe_amplitudes.npy"] + [f"{dsh}_{w}_{r}_lhe_amplitudes.npy"
+                                                                     for r in ("val", "test")]}
 
 
 def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
@@ -203,8 +207,14 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
         if policy in ("multichannel",) + QUOTA_POLICIES:
             s.update(multichannel=True, mc_resonances=[[list(S), q] for S, q in res], mc_isc=True, mc_res_params=rp)
         if policy in QUOTA_POLICIES:
-            from tools.flat_range import ranges
-            s.update(flat_range=ranges()[name])
+            from tools.flat_range import ranges, ranges_dsh
+            s.update(flat_range=(ranges_dsh() if policy == "grid_r1_budget12" else ranges())[name])
+        if policy == "grid_r1_budget12":
+            # plan step 75's revision of step 65's sampler (tools/regen_recipes.R1): step 65's switches plus the stall
+            # stop, the ladder solves at 1e-12, ladders on every hadronic class, the resonance ladder; the range joined
+            # with the dsh_ train pool (tools/flat_range.ranges_dsh)
+            from tools.regen_recipes import R1
+            s.update(R1)
         if policy.startswith("quota_ladder_res2"):     # step 58's re-check: + the multiperipheral and joint-resonance channels
             s.update(mc_mperi=True, mc_res2=True)
         if policy == "quota_ladder_edge_res2":     # step 66: the same channels with the ladder's edge variant
@@ -868,6 +878,90 @@ def step72(tag=STEP72_TAG, pols=STEP72, out="grid_check", source="step72"):
     print(source.upper(), res["verdict"], res["passed_at"], res["verdict_by_test"])
 
 
+# plan step 75's revision r1 checked before the catalog (design 2026-11-07): the worst classes of every failure kind of
+# the step-65 regeneration (data/regen_g12_profile.json, regen_where.json) and step 75's two controls, each with its PP4
+# probe (data/pp_support_reads.json)
+R1_CLASSES = {"v4_bbx_aazz": "pp13v4_bbx_aazz", "v4_dbx_hhtxu": "pp13v4_dbx_hhtxu", "v4_ddx_ghwpwm": "pp13_ddx_ghwpwm",
+              "v4_dg_adwpwm": "pp13_dg_adwpwm", "v4_dbx_ahtxu": "pp13v4_dbx_ahtxu", "v4_bb_bbvevex": "pp13v4_bb_bbvevex",
+              "v4_bbx_htaptam": "pp13v4_bbx_htaptam", "v4_udx_vevexwp": "pp13_udx_vevexwp", "v4_bb_bb": "pp13v4_bb_bb",
+              "v4_ddx_ttx": "pp13v4_ddx_ttx", "v4_ddx_btxwpz": "pp13v4_ddx_btxwpz", "v4_ug_auuux": "pp13v4_ug_auuux",
+              "v4_uux_ddxwpwm": "pp13v4_uux_ddxwpwm", "v4_bbx_ccxh": "pp13v4_bbx_ccxh", "v4_udx_cggsx": "pp13_udx_cggsx",
+              "v4_uc_cuvevex": "pp13v4_uc_cuvevex", "v4_us_ddxsu": "pp13v4_us_ddxsu", "v4_uu_bbxuu": "pp13v4_uu_bbxuu",
+              # design review 2026-11-07 (FIX 2): held-out outside on a class without a dsh_ pool, whose range r1's
+              # dsh_ join leaves as it was (step 65: 2 events)
+              "v4_uux_bgtxwp": "pp13v4_uux_bgtxwp"}
+R1_TAG = "current+grid_both_res2f_budget12+grid_r1_budget12"
+R1_FILL = 0.95       # steps 72/75/65's bin bar
+R1_COST = 2.0        # CLAUDE.md: a new method's cost over the one it replaces above 2x is a finding
+
+
+def step75r1():
+    """data/r1_check.json: per class and seed, for r1 (grid_r1_budget12) and the step-65 policy (grid_both_res2f_budget12)
+    in the same job: fill of every in-range quota bin at >= R1_FILL of quota (kept and quota summed over the chunks;
+    each policy against its own range table, tools/flat_range.ranges_dsh for r1, ranges for step 65), step 65's bar
+    with the 0.5-dex margin included (design review 2026-11-07, FIX 1); exempt only a bin above the class's kinematic
+    reach, whose lower edge lies above every candidate any channel of any policy drew for the class at either seed
+    (cand_max over the job files), listed apart; the core bins ([range lo + 0.5 dex, range hi - 0.5 dex]) and margin
+    bins reported separately; the held-out in-support events outside the kept [min, max] on heldout_r1 (PP4 val + dsh_
+    val + dsh_ test); the cost (policy seconds / current seconds, same job), labels and stops; verdict PASS when r1
+    fills every non-exempt bin, leaves 0 outside and costs <= R1_COST on every class and seed, else the failing kinds"""
+    sys.path.insert(0, ROOT)
+    from tools.flat_range import MARGIN_DEX, ranges, ranges_dsh
+    rg = {"grid_r1_budget12": ranges_dsh(), "grid_both_res2f_budget12": ranges()}
+    L = np.log(10.0)
+    rows, fails = {}, {"fill": [], "outside": [], "cost": [], "missing": []}
+    for c in R1_CLASSES:
+        # the class's kinematic reach: the highest candidate of any policy and channel at either seed
+        reach = [r.get("cand_max") for seed in SEEDS
+                 for f in [os.path.join(READS, f"{c}_{R1_TAG}_{seed}.json")] if os.path.exists(f)
+                 for r in json.load(open(f))["runs"].values() if r.get("cand_max") is not None]
+        reach = max(reach) if reach else None
+        for seed in SEEDS:
+            f = os.path.join(READS, f"{c}_{R1_TAG}_{seed}.json")
+            if not os.path.exists(f):
+                fails["missing"].append(f"{c}/{seed}"); continue
+            runs = json.load(open(f))["runs"]
+            cur = runs.get(f"current_{seed}", {}).get("seconds")
+            for pol in rg:
+                r = runs.get(f"{pol}_{seed}")
+                if r is None:
+                    fails["missing"].append(f"{c}/{pol}/{seed}"); continue
+                qc = r["quota_chunks"]; e = np.asarray(qc[0]["edges_log10"])
+                q = np.sum([x["quota"] for x in qc], 0).astype(float); k = np.sum([x["kept_per_bin"] for x in qc], 0)
+                fill = np.where(q > 0, k / np.maximum(q, 1), 1.0)
+                lo, hi = rg[pol][c][0] / L + MARGIN_DEX, rg[pol][c][1] / L - MARGIN_DEX
+                core = (e[:-1] >= lo - 1e-9) & (e[1:] <= hi + 1e-9) & (q > 0)
+                marg = ~core & (q > 0)
+                exempt = (q > 0) & (e[:-1] > reach) if reach is not None else np.zeros_like(core)
+                scored = (q > 0) & ~exempt
+                out = r["sources"].get("heldout_r1", {}).get("n_in_support_outside_kept")
+                d = {"bins": int(scored.sum()), "fill_share": float((fill[scored] >= R1_FILL).mean()) if scored.any() else 1.0,
+                     "short": [[round(e[i], 3), round(e[i + 1], 3), round(float(fill[i]), 3), "core" if core[i] else "margin"]
+                               for i in np.nonzero(scored & (fill < R1_FILL))[0]],
+                     "exempt_above_reach": [[round(e[i], 3), round(e[i + 1], 3)] for i in np.nonzero(exempt)[0]],
+                     "class_reach_log10": reach, "core_bins": int(core.sum()), "core_fill_share": float((fill[core] >= R1_FILL).mean()) if core.any() else 1.0,
+                     "core_short": [[round(e[i], 3), round(e[i + 1], 3), round(float(fill[i]), 3)] for i in np.nonzero(core & (fill < R1_FILL))[0]],
+                     "margin_fill": [[round(e[i], 3), round(float(fill[i]), 3)] for i in np.nonzero(marg)[0]],
+                     "outside_heldout_r1": out, "outside_by_source": {k2: v.get("n_in_support_outside_kept") for k2, v in r["sources"].items()},
+                     "kept_max": r["kept_max"], "seconds": r["seconds"], "cost_vs_current": r["seconds"] / cur if cur else None,
+                     "labels_flat": r.get("n_labels_flat"), "stops": dict(zip(*np.unique([x["stop"] for x in qc], return_counts=True))) if qc else {}}
+                d["stops"] = {str(a): int(b) for a, b in d["stops"].items()}
+                rows.setdefault(c, {})[f"{pol}_{seed}"] = d
+                if pol == "grid_r1_budget12":
+                    if d["fill_share"] < 1.0:
+                        fails["fill"].append(f"{c}/{seed}")
+                    if out is None or out > 0:
+                        fails["outside"].append(f"{c}/{seed}")
+                    if d["cost_vs_current"] is None or d["cost_vs_current"] > R1_COST:
+                        fails["cost"].append(f"{c}/{seed}")
+    verdict = ("INCOMPLETE" if fails["missing"] else "PASS" if not any(fails[k] for k in ("fill", "outside", "cost"))
+               else "FAIL: " + ", ".join(k for k in ("fill", "outside", "cost") if fails[k]))
+    res = {"design": "plan catalog_coverage step 75 revision r1 (design 2026-11-07)", "verdict": verdict, "fails": fails,
+           "classes": rows}
+    json.dump(res, open(os.path.join(DATA, "r1_check.json"), "w"), indent=1)
+    print("STEP75R1", verdict, json.dumps(fails))
+
+
 def pull(policies=None, classes=None, seeds=SEEDS):
     """each class's $SCRATCH/zz_mcheck/<class>.json from CC (analysis/common site_python) -> data/multichannel_check_reads/;
     with `policies` (e.g. "multichannel+quota"), the per-seed files <class>_<policies>_<seed>.json of each seed"""
@@ -898,6 +992,10 @@ if __name__ == "__main__":
         step72()
     elif sys.argv[1] == "step75":
         step72(STEP75_TAG, STEP75, "grid_fwd_check", "step75")
+    elif sys.argv[1] == "step75r1-pull":
+        pull(R1_TAG, R1_CLASSES)
+    elif sys.argv[1] == "step75r1":
+        step75r1()
     elif sys.argv[1] == "summary":
         summary()
     elif sys.argv[1] == "coverage":

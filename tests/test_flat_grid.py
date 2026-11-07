@@ -86,3 +86,53 @@ def test_channel_bin_record():
 
 if __name__ == "__main__":
     test_grid_map(); test_unchanged_without_grid(); test_grid_fills_toy(); print("ok")
+
+
+def test_stall_stop():
+    """sampling.flat_stall (plan step 75's cost revision): a range whose top no candidate reaches stops once a round
+    fills less than the stall share of what was missing, before the budget, recorded as stop 'stall'; without the key
+    the same chunk runs to the budget"""
+    def go(stall):
+        rng = np.random.default_rng(3)
+        uni = lambda k: np.exp(rng.uniform(np.log(50.0), np.log(3000.0), size=k))
+        pol = dict(_pol(12, True), flat_range=[np.log(1e-8), np.log(1e30)])      # top 21 dex above the toy's reach
+        if stall:
+            pol["flat_stall"] = stall
+        mg._flat_quota_part(500, 50.0, 3000.0, uni, True, M, PDG, rng, None, pol, toy_label, 0.0, None)
+        return dict(mg.FLAT_LAST)
+    a, b = go(None), go(0.2)
+    assert a["stop"] == "budget" and b["stop"] == "stall"
+    assert b["n_labels"] < a["n_labels"] and len(b["rounds"]) == 2
+
+
+def test_solve_tol():
+    """sampling.mc_solve_tol: the ladder's momenta within 1e-10 sqrt(s) of the full collapse"""
+    rng = np.random.default_rng(1); sq = np.exp(rng.uniform(np.log(40), np.log(6000), 2000))
+    P0 = mg.multiperipheral_draw(2000, sq, np.zeros(4), 1e-6, np.random.default_rng(5), edge=True)
+    P1 = mg.multiperipheral_draw(2000, sq, np.zeros(4), 1e-6, np.random.default_rng(5), edge=True, solve_tol=1e-12)
+    assert (np.abs(P1 - P0).max((1, 2)) / sq).max() < 1e-10
+
+
+def test_resladder_and_channels():
+    """step 75's revision: the resonance ladder conserves momentum and puts S near its pole; mc_resladder adds one
+    'resl' channel per resonance and mc_mperi_all the ladders to a hadronic class with one parton among its finals,
+    neither without its key; a policy with flat_stall gets the _smixr pool tag"""
+    rng = np.random.default_rng(2); nb = 2000; sq = np.exp(rng.uniform(np.log(200), np.log(6000), nb))
+    P = mg.resladder_draw(nb, sq, np.zeros(4), [2, 3], 91.188, 2.4414, 1e-6, rng, edge=True, solve_tol=1e-12)
+    tot = P.sum(1)
+    assert np.abs(tot[:, 0] - sq).max() / sq.max() < 1e-9 and np.abs(tot[:, 1:]).max() < 1e-6 * sq.max()
+    Z = P[:, 2] + P[:, 3]; mZ = np.sqrt(np.clip(Z[:, 0] ** 2 - (Z[:, 1:] ** 2).sum(1), 0, None))
+    assert np.mean(np.abs(mZ - 91.188) < 5 * 2.4414) > 0.6
+    rp = {23: (91.188, 2.4414)}
+    base = mg.mc_channels([0, 0, 0, 0], [5, 5, 5, 5, 12, -12], [([2, 3], 23)], True, rp, True, True, False, True, True)
+    new = mg.mc_channels([0, 0, 0, 0], [5, 5, 5, 5, 12, -12], [([2, 3], 23)], True, rp, True, True, False, True, True,
+                         True, True)
+    assert [c for c in new if c not in base] == [("resl", (2, 3), 23, 91.188, 2.4414)]
+    one = ([0, 0, 0, 125.0], [1, -5, 22, 2, -6, 25])        # d b~ > a u t~ h: one parton (u) among the finals
+    assert not any(c[0] == "mperi" for c in mg.mc_channels(*one, [], True, rp, True, True, False, True, True))
+    assert sum(c[0] == "mperi" for c in mg.mc_channels(*one, [], True, rp, True, True, False, True, True, True)) == 2
+    rec = {"process": "x", "sqrts_min": 10, "sqrts_max": 20, "role": "train",
+           "sampling": {"mode": "mixture", "flat_range": [0, 1], "flat_stall": 0.2}}
+    assert mg.recipe_output_path(rec, "/d").endswith("_train_smixr_amplitudes.npy")
+    rec["sampling"].pop("flat_stall")
+    assert mg.recipe_output_path(rec, "/d").endswith("_train_smixq_amplitudes.npy")

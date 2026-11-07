@@ -3609,11 +3609,16 @@ MC_LADDER_PT_SPAN = 3.2
 # [MC_LADDER_SPAN_LO, MC_LADDER_PT_SPAN] (the narrowest 5%: every pT within 5% of the cut) and the outer end is
 # eta_max - d, d log-uniform in MC_LADDER_EDGE_D (density toward the edge) [both ranges open]
 MC_LADDER_SPAN_LO = 1.05
+# pol["mc_solve_tol"] (plan step 75's cost revision; absent: 0, every pool built before): the ladder's solves stop at
+# this relative bracket or residual (log mass, rapidity) instead of collapsing the bracket to adjacent floats, which
+# took ~20 more halvings (one every third step) and most of the ladder's time; the momenta's own rounding is ~3e-11
+# relative in the mass already (measured at the full collapse), so 1e-12 changes nothing a label can see
+MC_SOLVE_TOL = 1e-12
 MC_LADDER_EDGE_D = (1e-3, 1.0)
 
 
 def multiperipheral_draw(nb, sqrts, masses, y_lo, rng, pt_lo=MC_PT_LO, eta_max=MC_ETA_MAX, pt_span=MC_LADDER_PT_SPAN,
-                         edge=False):
+                         edge=False, solve_tol=0.0, bad_out=None):
     """(nb, N, 4) finals in the partonic frame (plan step 58: the forward multiperipheral events at the top of the QCD
     classes' log|M|^2 range, sqrt(s_hat) 20-60x the window's edge, |eta| to 4.9, pT at the cut). The first N - 1
     finals at pT log-uniform in [pt_lo, pt_span pt_lo], phi uniform; the last balances their pT (so its pT is not
@@ -3624,8 +3629,10 @@ def multiperipheral_draw(nb, sqrts, masses, y_lo, rng, pt_lo=MC_PT_LO, eta_max=M
     are scaled up (factor k) until the mass reaches sqrt(s) (wider angles at large sqrt(s)); y0 is recomputed at the
     final k, so a massive final can move it slightly. An event whose mass at Y = 0 already exceeds sqrt(s) takes the
     plain splitter. With `edge` (plan step 66), each event's pT span is log-uniform in [MC_LADDER_SPAN_LO, pt_span]
-    and eta_cap = eta_max - d with d log-uniform in MC_LADDER_EDGE_D; without it the draws are the step-58 ladder's."""
-    masses = np.asarray(masses, float); N = len(masses); sqrts = np.asarray(sqrts, float)
+    and eta_cap = eta_max - d with d log-uniform in MC_LADDER_EDGE_D; without it the draws are the step-58 ladder's.
+    `masses` (N,) or, per event, (nb, N) (resladder_draw's rung mass); per-event masses with an event that has no room
+    leave its row unset and mark it in `bad_out` (the caller draws it otherwise)."""
+    masses = np.asarray(masses, float); N = masses.shape[-1]; sqrts = np.asarray(sqrts, float)
     span = (np.exp(rng.uniform(np.log(MC_LADDER_SPAN_LO), np.log(pt_span), (nb, 1))) if edge else pt_span)
     pt = np.exp(rng.uniform(np.log(pt_lo), np.log(pt_lo * span), (nb, N - 1)))
     ph = rng.uniform(0.0, 2.0 * np.pi, (nb, N - 1))
@@ -3635,11 +3642,11 @@ def multiperipheral_draw(nb, sqrts, masses, y_lo, rng, pt_lo=MC_PT_LO, eta_max=M
     u = 2.0 * (u - u.min(1, keepdims=True)) / (u.max(1, keepdims=True) - u.min(1, keepdims=True)) - 1.0
     ones = np.ones(nb)
 
-    pt2, m2 = px ** 2 + py ** 2, masses[None] ** 2
+    pt2, m2 = px ** 2 + py ** 2, np.broadcast_to(masses ** 2 if masses.ndim == 2 else masses[None] ** 2, (nb, N))
     al = np.arange(nb)
 
     def parts(Y, k, i=al):       # rows i only (the solves below evaluate the rows still open)
-        mt = np.sqrt(k[:, None] ** 2 * pt2[i] + m2)
+        mt = np.sqrt(k[:, None] ** 2 * pt2[i] + m2[i])
         y = Y[:, None] * u[i]
         e = np.exp(y); ei = 1.0 / e
         E, pz = mt * (0.5 * (e + ei)), mt * (0.5 * (e - ei))
@@ -3676,7 +3683,11 @@ def multiperipheral_draw(nb, sqrts, masses, y_lo, rng, pt_lo=MC_PT_LO, eta_max=M
             lo, glo = np.where(t, x, lo), np.where(t, gx, glo)
             hi, ghi = np.where(t, hi, x), np.where(t, ghi, gx)
             side = np.where(t, 1, -1).astype(np.int8)
+            # converged: adjacent floats, or (solve_tol > 0, pol["mc_solve_tol"]) the bracket within solve_tol
+            # (relative) or lo's residual within it; the result is lo, on f's True side, either way
             done = (hi <= np.nextafter(lo, np.inf)) | (x == lo) & ~t | (x == hi) & t
+            if solve_tol > 0:
+                done |= (hi - lo <= solve_tol * np.maximum(1.0, np.abs(lo))) | (np.abs(glo) <= solve_tol)
             if done.any():
                 out[r[done]] = lo[done]
                 keep = ~done
@@ -3687,11 +3698,12 @@ def multiperipheral_draw(nb, sqrts, masses, y_lo, rng, pt_lo=MC_PT_LO, eta_max=M
     bad = parts(0.0 * ones, ones)[0] >= sqrts
     # the mass grows with Y (M^2 = sum_ij mt_i mt_j cosh(Y (u_i - u_j)), the pT sum is 0) and with k
     hiY = np.full(nb, eta_max)
+    g_ = al                     # rows still growing: only they are evaluated (row-wise, so the values are the same)
     for _ in range(8):
-        grow = parts(hiY, ones)[0] < sqrts
-        if not grow.any():
+        g_ = g_[parts(hiY[g_], ones[g_], g_)[0] < sqrts[g_]]
+        if not len(g_):
             break
-        hiY = np.where(grow, 2.0 * hiY, hiY)
+        hiY[g_] *= 2.0
     # the solves take log M - log sqrt(s) (M ~ cosh Y: near linear in Y in log, so the secant steps converge fast)
     with np.errstate(divide="ignore"):
         lsq = np.log(sqrts)
@@ -3709,23 +3721,50 @@ def multiperipheral_draw(nb, sqrts, masses, y_lo, rng, pt_lo=MC_PT_LO, eta_max=M
     Y, k = np.where(short, Yc, Ym), ones.copy()
     if short.any():
         hik = ones.copy()
+        g_ = np.nonzero(short)[0]
         for _ in range(40):
-            grow = short & (parts(Y, hik)[0] < sqrts)
-            if not grow.any():
+            g_ = g_[parts(Y[g_], hik[g_], g_)[0] < sqrts[g_]]
+            if not len(g_):
                 break
-            hik = np.where(grow, 2.0 * hik, hik)
+            hik[g_] *= 2.0
         S = np.nonzero(short)[0]
         with np.errstate(divide="ignore"):
             k[S] = bisect(lambda kk, i: np.log(parts(Y[S[i]], kk, S[i])[0]) - lsq[S[i]], ones[S], hik[S])
     _, y, mt = parts(Y, k)
     P = np.stack([mt * np.cosh(y), k[:, None] * px, k[:, None] * py, mt * np.sinh(y)], -1)
-    if bad.any():
+    if bad_out is not None:
+        bad_out[:] = bad
+    if bad.any() and masses.ndim == 1:
         P[bad] = democratic_draw(int(bad.sum()), sqrts[bad], masses, y_lo, rng)
     return P
 
 
+def resladder_draw(nb, sqrts, masses, S, M, G, y_lo, rng, edge=False, solve_tol=0.0, tail=MC_TAIL):
+    """(nb, N, 4) finals in the partonic frame (plan step 75's SHORT revision): the multiperipheral ladder with the finals S
+    (a resonance's decay products) as one rung of mass m_S on the Breit-Wigner (resonance_draw's _bw_mass, the same
+    edges), the rung then decayed in its rest frame into S (_blob_decay): the forward ladder with a resonance on shell
+    among its rungs, where the short top bins of the electroweak-QCD classes sit (an on-shell Z to neutrinos along the
+    beam at sqrt(s_hat) ~1.5 TeV in bb_bbvevex, regen_g12_where.json). An event with no room takes resonance_draw."""
+    masses = np.asarray(masses, float); N = len(masses); sqrts = np.asarray(sqrts, float)
+    S = list(S); T = [i for i in range(N) if i not in S]
+    floor = sqrts * np.sqrt(y_lo)
+    a = masses[S].sum() + floor; b = sqrts - masses[T].sum()
+    ok = b > a * (1 + 1e-9)
+    mS = _bw_mass(nb, np.where(ok, a, 1.0), np.where(ok, b, 2.0), M, G, rng, tail)
+    mr = np.concatenate([np.broadcast_to(masses[T], (nb, len(T))), mS[:, None]], 1)      # the rung last
+    bad = np.zeros(nb, bool)
+    Q = multiperipheral_draw(nb, sqrts, mr, y_lo, rng, edge=edge, solve_tol=solve_tol, bad_out=bad)
+    P = np.zeros((nb, N, 4))
+    P[:, T] = Q[:, :len(T)]
+    P[:, S] = _blob_decay(Q[:, -1], mS, masses[S], y_lo, rng)
+    bad |= ~ok
+    if bad.any():
+        P[bad] = resonance_draw(int(bad.sum()), sqrts[bad], masses, S, M, G, y_lo, rng, tail)
+    return P
+
+
 def mc_channels(m_finals, pdg_ids, resonances, isc=True, res_params=None, res2=False, mperi=False, mperi_edge=False,
-                mperi_both=False, res2_fwd=False):
+                mperi_both=False, res2_fwd=False, mperi_all=False, resladder=False):
     """the flat part's channels for a class: ("rambo",), ("splitter",), ("res", S, |pdg|, M, G) per resonance (M, G from
     `res_params` {|pdg|: (M, G)}, the entry's mc_res_params; MC_RES when absent), ("isc", parton indices) when a final
     is a parton and there are at least three finals; with `res2`, ("res2", S1, p1, M1, G1, S2, p2, M2, G2) per pair of
@@ -3735,7 +3774,11 @@ def mc_channels(m_finals, pdg_ids, resonances, isc=True, res_params=None, res2=F
     classes' range), ("mperi", "edge") instead with `mperi_edge` (multiperipheral_draw's edge variant, plan step 66),
     both ("mperi",) and ("mperi", "edge") with `mperi_both` (plan step 67: the edge variant fills the QCD top but costs
     the electroweak class udx_csxvevex part of its top bins); with `res2_fwd` (with `res2`), also ("res2f", ...) per
-    joint pair, the pair along the beam (resonance2_draw's fwd, plan step 72's PARTIAL branch)"""
+    joint pair, the pair along the beam (resonance2_draw's fwd, plan step 72's PARTIAL branch); with `mperi_all` (plan
+    step 75's SHORT revision) the ladders on every hadronic-beam class with at least three finals, whatever its partons
+    (the short top of e.g. dbx_ahtxu: every final forward at sqrt(s_hat) ~2 TeV, one parton among the finals); with
+    `resladder`, on hadronic beams with at least three finals, ("resl", S, |pdg|, M, G) per resonance: the edge ladder
+    with S as one rung on its Breit-Wigner (resladder_draw)"""
     pdg = [int(x) for x in pdg_ids]; nf = len(pdg) - 2
     rp = {abs(int(k)): tuple(map(float, v)) for k, v in (res_params or MC_RES).items()}
     res = [("res", tuple(S), int(p)) + rp[int(p)] for S, p in resonances]
@@ -3746,12 +3789,15 @@ def mc_channels(m_finals, pdg_ids, resonances, isc=True, res_params=None, res2=F
     if res2:
         pairs = [a[1:] + b[1:] for i, a in enumerate(res) for b in res[i + 1:] if not set(a[1]) & set(b[1])]
         ch += [("res2",) + q for q in pairs] + ([("res2f",) + q for q in pairs] if res2_fwd else [])
-    if mperi and len(partons) >= 2 and all(abs(q) in MC_PARTONS for q in pdg[:2]):   # hadronic beams only (|eta| < 5)
+    hadronic = all(abs(q) in MC_PARTONS for q in pdg[:2])                              # hadronic beams only (|eta| < 5)
+    if mperi and hadronic and (len(partons) >= 2 or (mperi_all and nf >= 3)):
         ch += ([("mperi",), ("mperi", "edge")] if mperi_both else [("mperi", "edge")] if mperi_edge else [("mperi",)])
+    if resladder and hadronic and nf >= 3:
+        ch += [("resl",) + r[1:] for r in res]
     return ch
 
 
-def _mc_draw(ch, nb, sq, m_finals, y_lo, rng):
+def _mc_draw(ch, nb, sq, m_finals, y_lo, rng, solve_tol=0.0):
     """finals of one channel"""
     N = len(m_finals)
     if ch[0] == "rambo":
@@ -3766,7 +3812,9 @@ def _mc_draw(ch, nb, sq, m_finals, y_lo, rng):
         return resonance2_draw(nb, sq, m_finals, ch[1], ch[3], ch[4], ch[5], ch[7], ch[8], y_lo, rng,
                                fwd=ch[0] == "res2f")
     if ch[0] == "mperi":
-        return multiperipheral_draw(nb, sq, m_finals, y_lo, rng, edge=ch[1:] == ("edge",))
+        return multiperipheral_draw(nb, sq, m_finals, y_lo, rng, edge=ch[1:] == ("edge",), solve_tol=solve_tol)
+    if ch[0] == "resl":
+        return resladder_draw(nb, sq, m_finals, ch[1], ch[3], ch[4], y_lo, rng, edge=True, solve_tol=solve_tol)
     return is_collinear_draw(nb, sq, m_finals, ch[1], y_lo, rng)
 
 
@@ -3845,7 +3893,7 @@ class _GridRng:
 
 
 def _candidates_mc(nb, sqrts_draw, m_finals, pdg_ids, rng, cuts, channels, shares, y_lo, frac_fwd=0.0,
-                   beam_mass=None, grids=None):
+                   beam_mass=None, grids=None, solve_tol=0.0):
     """_candidates with the finals of each draw from a channel picked with probabilities `shares`; returns
     (events, sqrt(s), channel index per event); cuts by rejection with top-up as _collect_with_cuts"""
     m_finals = np.asarray(m_finals, float); pdg = np.asarray(pdg_ids, int)
@@ -3860,10 +3908,10 @@ def _candidates_mc(nb, sqrts_draw, m_finals, pdg_ids, rng, cuts, channels, share
             e = c == i
             if e.any():
                 if grids is None:
-                    F[e] = _mc_draw(ch, int(e.sum()), sq[e], m_finals, y_lo, rng)
+                    F[e] = _mc_draw(ch, int(e.sum()), sq[e], m_finals, y_lo, rng, solve_tol)
                 else:    # pol["flat_grid"]: the channel's uniform numbers through its grid, recorded per event
                     gr = _GridRng(rng, grids[i], int(e.sum()))
-                    F[e] = _mc_draw(ch, int(e.sum()), sq[e], m_finals, y_lo, gr)
+                    F[e] = _mc_draw(ch, int(e.sum()), sq[e], m_finals, y_lo, gr, solve_tol)
                     Y = np.hstack(gr.cols) if gr.cols else np.zeros((int(e.sum()), 0))
                     for r, k in enumerate(np.nonzero(e)[0]):
                         ys[k] = Y[r]
@@ -4041,7 +4089,7 @@ def _flat_mcmc_part(n_flat, uni, m_finals, pdg_ids, rng, cuts, pol, label, fwd_c
         chans = mc_channels(m_finals, pdg_ids, pol.get("mc_resonances") or [], bool(pol.get("mc_isc", True)),
                             pol.get("mc_res_params"), bool(pol.get("mc_res2")), bool(pol.get("mc_mperi")),
                             bool(pol.get("mc_mperi_edge")), bool(pol.get("mc_mperi_both")),
-                            bool(pol.get("mc_res2_fwd")))
+                            bool(pol.get("mc_res2_fwd")), bool(pol.get("mc_mperi_all")), bool(pol.get("mc_resladder")))
         ev0, sq0, c0 = _candidates_mc(n0, uni, m_finals, pdg_ids, rng, cuts, chans, np.full(len(chans), 1.0 / len(chans)),
                                       pol["y_lo"], fwd_cand, beam_mass)
     else:
@@ -4253,7 +4301,7 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
         chans = mc_channels(m_finals, pdg_ids, pol.get("mc_resonances") or [], bool(pol.get("mc_isc", True)),
                             pol.get("mc_res_params"), bool(pol.get("mc_res2")), bool(pol.get("mc_mperi")),
                             bool(pol.get("mc_mperi_edge")), bool(pol.get("mc_mperi_both")),
-                            bool(pol.get("mc_res2_fwd")))
+                            bool(pol.get("mc_res2_fwd")), bool(pol.get("mc_mperi_all")), bool(pol.get("mc_resladder")))
         shares = np.full(len(chans), 1.0 / len(chans))
     grids = ([_ChanGrid(pol.get("flat_grid_bins", FLAT_GRID_BINS), pol.get("flat_grid_floor", FLAT_GRID_FLOOR))
               for _ in chans] if mc and pol.get("flat_grid") else None)
@@ -4268,11 +4316,11 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
         t0 = time.perf_counter()
         if mc and grids is not None:
             ev, sq, c, ys = _candidates_mc(n, draw_sq, m_finals, pdg_ids, rng, cuts, chans, shares, pol["y_lo"],
-                                           fwd_cand, beam_mass, grids=grids)
+                                           fwd_cand, beam_mass, grids=grids, solve_tol=float(pol.get("mc_solve_tol", 0.0)))
             ys_c += ys
         elif mc:
             ev, sq, c = _candidates_mc(n, draw_sq, m_finals, pdg_ids, rng, cuts, chans, shares, pol["y_lo"], fwd_cand,
-                                       beam_mass)
+                                       beam_mass, solve_tol=float(pol.get("mc_solve_tol", 0.0)))
         else:
             ev, sq = _candidates(n, draw_sq, m_finals, pdg_ids, rng, cuts, pol["democratic"], pol["y_lo"], fwd_cand,
                                  beam_mass)
@@ -4288,6 +4336,14 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
         rounds.append({"n": int(n), "missing": int(deficit.sum()), "bins_short": int((deficit > 0).sum())})
         if deficit.sum() == 0 or len(cand) >= budget or not w.any():
             break
+        # pol["flat_stall"] (plan step 75's cost revision): stop once a round past the first fills fewer events than
+        # flat_stall x the lesser of (what was missing before it) and (what its labels buy at the budget's mean rate,
+        # n / flat_budget): bins the proposal does not reach (above a class's kinematic maximum) stop the rounds instead
+        # of spending the budget on them, while a round that completes a nearly filled part still counts
+        if pol.get("flat_stall") and len(rounds) >= 2:
+            filled = rounds[-2]["missing"] - rounds[-1]["missing"]
+            if filled < float(pol["flat_stall"]) * min(rounds[-2]["missing"], n / float(pol["flat_budget"])):
+                break
         nb_s = _adaptive_bins(int((w > 0).sum()), int(pol["n_sqrts_bins"]))
         e_s, p_s = _sqrts_proposal_weighted(tr(sq_c), w, t_lo, t_hi, nb_s)
         draw_sq = lambda k, e_s=e_s, p_s=p_s: itr(_draw_sqrts_from_bins(k, e_s, p_s, rng))
@@ -4310,12 +4366,14 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
     short = np.maximum(quota - take, 0)
     # why the rounds stopped: every bin at quota, the budget reached, or no candidate left to steer the proposal by
     # (no finite log|M|^2 among them) with bins short and the budget not reached
-    stop = "quota" if short.sum() == 0 else ("budget" if len(cand) >= budget else "no_steer")
+    stop = "quota" if short.sum() == 0 else ("budget" if len(cand) >= budget else
+                                              "stall" if pol.get("flat_stall") and w.any() else "no_steer")
     budget_hit = stop == "budget"
     if stop != "quota":
         lo10 = edges[:-1][short > 0] / np.log(10.0)
         why = (f"at the budget ({len(cand):,} candidates, {pol['flat_budget']} per flat event)" if budget_hit else
-               f"with nothing to steer by ({len(cand):,} candidates, none with a finite log|M|^2), budget not reached")
+               f"stalled ({len(cand):,} candidates; the last round filled < {pol['flat_stall']} of the missing)"
+               if stop == "stall" else f"with nothing to steer by ({len(cand):,} candidates, none with a finite log|M|^2), budget not reached")
         print(f"  [WARN] flat quota: stopped {why} with {int((short > 0).sum())} bins short by {int(short.sum())} "
               f"events (log10|M|^2 bins from {lo10.min():.2f} to {lo10.max():.2f}); their events taken from bins with "
               f"candidates to spare")
@@ -4416,7 +4474,7 @@ def build_mixture_dataset(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng
             chans = mc_channels(m_finals, pdg_ids, pol.get("mc_resonances") or [], bool(pol.get("mc_isc", True)),
                                 pol.get("mc_res_params"), bool(pol.get("mc_res2")), bool(pol.get("mc_mperi")),
                                 bool(pol.get("mc_mperi_edge")), bool(pol.get("mc_mperi_both")),
-                                bool(pol.get("mc_res2_fwd")))
+                                bool(pol.get("mc_res2_fwd")), bool(pol.get("mc_mperi_all")), bool(pol.get("mc_resladder")))
             sh1 = np.full(len(chans), 1.0 / len(chans))
             ev1, sq1, c1 = _candidates_mc(n1, uni, m_finals, pdg_ids, rng, cuts, chans, sh1, pol["y_lo"], fwd_cand,
                                           beam_mass)
@@ -4799,8 +4857,10 @@ def recipe_output_path(recipe, out_dir):
     samp_tag = {"flat": "", "steered": "_ssteer"}.get(mode, "_smix")
     if mode == "mixture" and (recipe.get("sampling") or {}).get("flat_range"):
         # the flat part filled flat in log|M|^2 over the class's pp range (catalog_coverage step 65): its own file, so
-        # the regeneration never overwrites the pool every earlier read used (same spec, other recipe id)
-        samp_tag += "q"
+        # the regeneration never overwrites the pool every earlier read used (same spec, other recipe id); step 75's
+        # revision (sampling.flat_stall: the stall stop, ladders on every hadronic class, the resonance ladder, the
+        # range joined with the dsh_ train pool) its own again, so step 65's _smixq pools stay as read
+        samp_tag += "r" if (recipe.get("sampling") or {}).get("flat_stall") else "q"
     f_def =float((recipe.get("sampling") or {}).get("f_default", 0))
     if f_def > 0:
         samp_tag += f"d{int(round(100 * f_def)):02d}"     # a default-share pool never shadows its catalog's _smix pool

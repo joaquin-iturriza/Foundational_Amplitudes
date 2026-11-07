@@ -359,7 +359,7 @@ def gen_chunk(task):
 
 
 FLAT_FILL_KEYS = ("quota", "kept_per_bin", "cand_per_bin", "budget_hit", "stop", "n_candidates", "n_labels",
-                  "t_propose", "t_label", "kept_per_channel_bin", "channels")
+                  "t_propose", "t_label", "kept_per_channel_bin", "channels", "rounds")
 
 
 def _write_flat_fill(out_path, secs):

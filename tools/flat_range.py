@@ -9,6 +9,11 @@ put the pp minimum a median 4.4 decades below the catalog's own (repo-reviewer, 
 
     python3 tools/flat_range.py            print the count and the widest ranges
     python3 tools/flat_range.py --write    -> recipes/catalog_v4_flat_range.json {class: [lo, hi]} (natural log)
+    python3 tools/flat_range.py --dsh --write   the same with each class's dsh_ train pool's in-support events joined
+        (analysis/catalog_v4/data/dsh_train_support.json, regen_where.py pull-dsh: 45001 default-sampled MadEvent
+        events, a training input, never scored for coverage once read here; plan catalog_coverage step 75's SHORT
+        revision: the 1.2e4 PP4 events + 0.5 dex left held-out dsh_ events above the top on 209 of 797 classes)
+        -> recipes/catalog_v4_flat_range_dsh.json
 """
 import json, os, sys
 
@@ -21,6 +26,8 @@ READS = os.path.join(ROOT, "analysis", "catalog_v4", "data", "pp_support_reads.j
 # for pp sampled data, why would you produce e+e- datasets that are different in any way?")
 EE_READS = os.path.join(ROOT, "analysis", "catalog_v4", "data", "ee_support_reads.json")
 OUT = os.path.join(ROOT, "recipes", "catalog_v4_flat_range.json")
+DSH = os.path.join(ROOT, "analysis", "catalog_v4", "data", "dsh_train_support.json")
+OUT_DSH = os.path.join(ROOT, "recipes", "catalog_v4_flat_range_dsh.json")
 # decades of |M|^2 beyond the in-support pp events' min and max: D270 ("sample in a way that covers the range the pp beams
 # cover, but wider") asks for a margin; 0.5 decade (two of the sampler's 0.25-dex bins) is the chosen width, not his number
 MARGIN_DEX = 0.5
@@ -49,11 +56,27 @@ def ranges(reads=(READS, EE_READS), margin_dex=MARGIN_DEX):
     return out
 
 
+def ranges_dsh(dsh=DSH, margin_dex=MARGIN_DEX):
+    """ranges() with each class's dsh_ train pool's in-support log|M|^2 extent joined before the margin (classes
+    without a dsh_ pool keep ranges()'s)"""
+    out = ranges(margin_dex=margin_dex)
+    m = margin_dex * np.log(10.0)
+    for c, d in json.load(open(dsh)).items():
+        if "error" in d:
+            raise SystemExit(f"{dsh}: {c}: {d['error']}")
+        if c not in out or d.get("logm10_min_in_support") is None:
+            continue
+        lo, hi = d["logm10_min_in_support"] * np.log(10.0) - m, d["logm10_max_in_support"] * np.log(10.0) + m
+        out[c] = [min(lo, out[c][0]), max(hi, out[c][1])]
+    return out
+
+
 if __name__ == "__main__":
-    rg = ranges()
+    use_dsh = "--dsh" in sys.argv[1:]
+    rg = ranges_dsh() if use_dsh else ranges()
     w = sorted(((hi - lo) / np.log(10.0), c) for c, (lo, hi) in rg.items())
     print(f"{len(rg)} classes; width in decades: median {w[len(w) // 2][0]:.1f}, widest {w[-1][0]:.1f} ({w[-1][1]})")
     if "--write" in sys.argv[1:]:
-        with open(OUT, "w") as f:
+        with open(OUT_DSH if use_dsh else OUT, "w") as f:
             json.dump({c: [round(lo, 6), round(hi, 6)] for c, (lo, hi) in sorted(rg.items())}, f, indent=0)
-        print("wrote", OUT)
+        print("wrote", OUT_DSH if use_dsh else OUT)

@@ -1,0 +1,5581 @@
+{
+"v4_bb_abbh": {
+"n": 45001,
+"n_in_support": 44996,
+"file": "dsh_bb_abbh_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.534655373960817,
+"logm10_max_in_support": -3.4142108574338526
+},
+"v4_bb_abbz": {
+"n": 45001,
+"n_in_support": 44992,
+"file": "dsh_bb_abbz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.18104986295368,
+"logm10_max_in_support": -0.979554319067593
+},
+"v4_bb_bb": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bb_bb_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": 0.5101596420790883,
+"logm10_max_in_support": 8.08509212780974
+},
+"v4_bb_bbbbx": {
+"n": 45001,
+"n_in_support": 44990,
+"file": "dsh_bb_bbbbx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.695793725505723,
+"logm10_max_in_support": 3.869191571093428
+},
+"v4_bb_bbddx": {
+"n": 45001,
+"n_in_support": 44982,
+"file": "dsh_bb_bbddx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.254954452465,
+"logm10_max_in_support": 4.366227012324481
+},
+"v4_bb_bbepem": {
+"n": 45001,
+"n_in_support": 44997,
+"file": "dsh_bb_bbepem_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.477261660497133,
+"logm10_max_in_support": 0.4715722324132364
+},
+"v4_bb_bbg": {
+"n": 45001,
+"n_in_support": 44995,
+"file": "dsh_bb_bbg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -2.5369393189046736,
+"logm10_max_in_support": 6.646557356104814
+},
+"v4_bb_bbgg": {
+"n": 45001,
+"n_in_support": 44989,
+"file": "dsh_bb_bbgg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.57317086867276,
+"logm10_max_in_support": 5.6872424187732245
+},
+"v4_bb_bbgh": {
+"n": 45001,
+"n_in_support": 44992,
+"file": "dsh_bb_bbgh_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.77892141057732,
+"logm10_max_in_support": -1.3140940791479867
+},
+"v4_bb_bbgz": {
+"n": 45001,
+"n_in_support": 44986,
+"file": "dsh_bb_bbgz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.2151044487914,
+"logm10_max_in_support": 1.6007320015028275
+},
+"v4_bb_bbh": {
+"n": 45001,
+"n_in_support": 44996,
+"file": "dsh_bb_bbh_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.947691620697443,
+"logm10_max_in_support": -0.2336053353467299
+},
+"v4_bb_bbhh": {
+"n": 45001,
+"n_in_support": 44966,
+"file": "dsh_bb_bbhh_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.094927726218579,
+"logm10_max_in_support": -4.972401652153838
+},
+"v4_bb_bbhz": {
+"n": 45001,
+"n_in_support": 44966,
+"file": "dsh_bb_bbhz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.444734283721235,
+"logm10_max_in_support": -3.825441766352249
+},
+"v4_bb_bbuux": {
+"n": 45001,
+"n_in_support": 44987,
+"file": "dsh_bb_bbuux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.235058565084352,
+"logm10_max_in_support": 4.073163696596447
+},
+"v4_bb_bbvevex": {
+"n": 45001,
+"n_in_support": 44996,
+"file": "dsh_bb_bbvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.776839977381778,
+"logm10_max_in_support": 1.3553518775942532
+},
+"v4_bb_bbz": {
+"n": 45001,
+"n_in_support": 44991,
+"file": "dsh_bb_bbz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.43864853846019,
+"logm10_max_in_support": 2.9482863024747705
+},
+"v4_bb_bbzz": {
+"n": 45001,
+"n_in_support": 44976,
+"file": "dsh_bb_bbzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.693926586938014,
+"logm10_max_in_support": -2.1825428242547305
+},
+"v4_bbx_aa": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_aa_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -4.130634196537391,
+"logm10_max_in_support": -1.2667093632329873
+},
+"v4_bbx_aaa": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_aaa_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.954798792833866,
+"logm10_max_in_support": -4.859585265971241
+},
+"v4_bbx_aaaa": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_aaaa_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.97370285045926,
+"logm10_max_in_support": -8.879737631009263
+},
+"v4_bbx_aaag": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_bbx_aaag_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.753445177754623,
+"logm10_max_in_support": -6.254482270608505
+},
+"v4_bbx_aaaz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_aaaz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.233105764733137,
+"logm10_max_in_support": -7.14523646221132
+},
+"v4_bbx_aaccx": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_aaccx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.26407444037667,
+"logm10_max_in_support": -3.6460195470903183
+},
+"v4_bbx_aaddx": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_aaddx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.654048991381991,
+"logm10_max_in_support": -4.891691258675694
+},
+"v4_bbx_aaepem": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_aaepem_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.148412098843723,
+"logm10_max_in_support": -3.471975398672876
+},
+"v4_bbx_aag": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_aag_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.4283842627939185,
+"logm10_max_in_support": -2.5018191065548545
+},
+"v4_bbx_aagz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_aagz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.32815564574201,
+"logm10_max_in_support": -5.094789793051104
+},
+"v4_bbx_aataptam": {
+"n": 45001,
+"n_in_support": 44959,
+"file": "dsh_bbx_aataptam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.497610174195827,
+"logm10_max_in_support": -3.5629502193199594
+},
+"v4_bbx_aavevex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_aavevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.275266352313793,
+"logm10_max_in_support": -5.268888447255417
+},
+"v4_bbx_aawpwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_aawpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.184636747331293,
+"logm10_max_in_support": -4.231681146624009
+},
+"v4_bbx_aaz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_aaz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.245344100002685,
+"logm10_max_in_support": -3.3685047566981043
+},
+"v4_bbx_aazz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_aazz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.13078525433423,
+"logm10_max_in_support": -6.625047517545919
+},
+"v4_bbx_abbx": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_bbx_abbx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.076240386651607,
+"logm10_max_in_support": 4.237650257376653
+},
+"v4_bbx_abbxg": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_bbx_abbxg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.528399332543197,
+"logm10_max_in_support": 3.4974543034498637
+},
+"v4_bbx_abbxh": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_bbx_abbxh_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.63533658947596,
+"logm10_max_in_support": -3.838524150387783
+},
+"v4_bbx_abbxz": {
+"n": 45001,
+"n_in_support": 44997,
+"file": "dsh_bbx_abbxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.101966280803264,
+"logm10_max_in_support": -1.0417602928004774
+},
+"v4_bbx_accx": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_accx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.844001258598472,
+"logm10_max_in_support": -1.0412449895782765
+},
+"v4_bbx_acsxwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_acsxwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.52435075596162,
+"logm10_max_in_support": -2.817876634447762
+},
+"v4_bbx_addx": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_addx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.030381807308116,
+"logm10_max_in_support": -1.4115742864199168
+},
+"v4_bbx_addxg": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_addxg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.101388391932778,
+"logm10_max_in_support": -2.2854953130430813
+},
+"v4_bbx_addxz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_addxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.493584276111289,
+"logm10_max_in_support": -3.9450630512476303
+},
+"v4_bbx_aepem": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_aepem_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.623343457246787,
+"logm10_max_in_support": -1.3595370183006315
+},
+"v4_bbx_aepemg": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_aepemg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.24431547664818,
+"logm10_max_in_support": -2.2962802016937505
+},
+"v4_bbx_aepemz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_aepemz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.883514803422358,
+"logm10_max_in_support": -2.6007133845800854
+},
+"v4_bbx_aepvewm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_aepvewm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.986166402515861,
+"logm10_max_in_support": -2.7388941843856753
+},
+"v4_bbx_agg": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_agg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.151565939243415,
+"logm10_max_in_support": 0.39780381080939214
+},
+"v4_bbx_aggg": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_aggg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.812600937010577,
+"logm10_max_in_support": -0.9153444781207708
+},
+"v4_bbx_aggz": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_bbx_aggz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.430011641116554,
+"logm10_max_in_support": -2.5461072639112756
+},
+"v4_bbx_agtaptam": {
+"n": 45001,
+"n_in_support": 44981,
+"file": "dsh_bbx_agtaptam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.307701990239305,
+"logm10_max_in_support": -2.4098854468109114
+},
+"v4_bbx_agvevex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_agvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.652648348169455,
+"logm10_max_in_support": -2.9196078225415856
+},
+"v4_bbx_agwpwm": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_bbx_agwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.02652499951175,
+"logm10_max_in_support": -3.3007653601984415
+},
+"v4_bbx_agz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_agz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.505495011416587,
+"logm10_max_in_support": -0.9050260952244991
+},
+"v4_bbx_agzz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_agzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.992747880077316,
+"logm10_max_in_support": -4.372825893061425
+},
+"v4_bbx_ahhz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_ahhz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -16.114364864932302,
+"logm10_max_in_support": -9.999895694582708
+},
+"v4_bbx_ahtaptam": {
+"n": 45001,
+"n_in_support": 44984,
+"file": "dsh_bbx_ahtaptam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.947015748626114,
+"logm10_max_in_support": -5.964975055837862
+},
+"v4_bbx_ahvevex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_ahvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.340884954716559,
+"logm10_max_in_support": -7.024061505465304
+},
+"v4_bbx_ahwpwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_ahwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.296259743224145,
+"logm10_max_in_support": -6.512420183141988
+},
+"v4_bbx_ahz": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_bbx_ahz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.929717774125953,
+"logm10_max_in_support": -5.182817528171247
+},
+"v4_bbx_ahzz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_ahzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.22134827156791,
+"logm10_max_in_support": -8.869311128410738
+},
+"v4_bbx_ataptam": {
+"n": 45001,
+"n_in_support": 44989,
+"file": "dsh_bbx_ataptam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.383288189395544,
+"logm10_max_in_support": -1.446332617965539
+},
+"v4_bbx_ataptamz": {
+"n": 45001,
+"n_in_support": 44982,
+"file": "dsh_bbx_ataptamz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.926108971820769,
+"logm10_max_in_support": -2.9250115536126526
+},
+"v4_bbx_atapvtwm": {
+"n": 45001,
+"n_in_support": 44993,
+"file": "dsh_bbx_atapvtwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.34748486592089,
+"logm10_max_in_support": -2.9568250185346194
+},
+"v4_bbx_avevex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_avevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.370619631551202,
+"logm10_max_in_support": -1.6309631069798567
+},
+"v4_bbx_avevexz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_avevexz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.59752689539598,
+"logm10_max_in_support": -4.109233932924991
+},
+"v4_bbx_awpwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_awpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.420882651966031,
+"logm10_max_in_support": -1.8018914162146367
+},
+"v4_bbx_awpwmz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_awpwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.849475597488563,
+"logm10_max_in_support": -6.103489624588532
+},
+"v4_bbx_az": {
+"n": 45001,
+"n_in_support": 44901,
+"file": "dsh_bbx_az_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -3.0947684319300155,
+"logm10_max_in_support": 0.0024717704381662106
+},
+"v4_bbx_azz": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_bbx_azz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.73927745087382,
+"logm10_max_in_support": -2.502159994700649
+},
+"v4_bbx_azzz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_azzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.679916804160674,
+"logm10_max_in_support": -7.067341717812655
+},
+"v4_bbx_bbbxbx": {
+"n": 45001,
+"n_in_support": 44978,
+"file": "dsh_bbx_bbbxbx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.917413298790113,
+"logm10_max_in_support": 4.5948142054478
+},
+"v4_bbx_bbx": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_bbx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": 0.2614197104899863,
+"logm10_max_in_support": 8.228232149176918
+},
+"v4_bbx_bbxepem": {
+"n": 45001,
+"n_in_support": 44995,
+"file": "dsh_bbx_bbxepem_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.922400703353052,
+"logm10_max_in_support": 0.7660577399123804
+},
+"v4_bbx_bbxg": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_bbx_bbxg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -3.3654287316606766,
+"logm10_max_in_support": 7.032377576845532
+},
+"v4_bbx_bbxgg": {
+"n": 45001,
+"n_in_support": 44985,
+"file": "dsh_bbx_bbxgg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.968279749074443,
+"logm10_max_in_support": 5.969109029236173
+},
+"v4_bbx_bbxgh": {
+"n": 45001,
+"n_in_support": 44996,
+"file": "dsh_bbx_bbxgh_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.822127840923722,
+"logm10_max_in_support": -2.366917669566349
+},
+"v4_bbx_bbxgz": {
+"n": 45001,
+"n_in_support": 44989,
+"file": "dsh_bbx_bbxgz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.542453969816526,
+"logm10_max_in_support": 2.1592832128287425
+},
+"v4_bbx_bbxh": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_bbx_bbxh_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.191113740130588,
+"logm10_max_in_support": -0.27164433366059404
+},
+"v4_bbx_bbxhz": {
+"n": 45001,
+"n_in_support": 44992,
+"file": "dsh_bbx_bbxhz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.028207431756874,
+"logm10_max_in_support": -3.342090856805577
+},
+"v4_bbx_bbxtaptam": {
+"n": 45001,
+"n_in_support": 44992,
+"file": "dsh_bbx_bbxtaptam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.273256842690575,
+"logm10_max_in_support": 0.9011916615217906
+},
+"v4_bbx_bbxvevex": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_bbx_bbxvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.804147120377113,
+"logm10_max_in_support": 1.5410926481445848
+},
+"v4_bbx_bbxwpwm": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_bbx_bbxwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.285338483566953,
+"logm10_max_in_support": 3.8114949813620402
+},
+"v4_bbx_bbxz": {
+"n": 45001,
+"n_in_support": 44994,
+"file": "dsh_bbx_bbxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.987263357432185,
+"logm10_max_in_support": 3.1731041546538328
+},
+"v4_bbx_bbxzz": {
+"n": 45001,
+"n_in_support": 44990,
+"file": "dsh_bbx_bbxzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.41576872975618,
+"logm10_max_in_support": -2.4072045797886807
+},
+"v4_bbx_ccx": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_ccx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -0.46179725244281644,
+"logm10_max_in_support": 1.0079887499469717
+},
+"v4_bbx_ccxg": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_ccxg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -3.9183338701043424,
+"logm10_max_in_support": 0.9322093554488387
+},
+"v4_bbx_ccxh": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_ccxh_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.79471407051321,
+"logm10_max_in_support": -3.8107393540977896
+},
+"v4_bbx_ccxz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_ccxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.690329807023172,
+"logm10_max_in_support": -0.26445090299241086
+},
+"v4_bbx_chsxwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_chsxwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.088429214276935,
+"logm10_max_in_support": -4.553760327695912
+},
+"v4_bbx_csxwmz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_csxwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.708804726689205,
+"logm10_max_in_support": -2.9010719030428005
+},
+"v4_bbx_ddxhz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_ddxhz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.927294502708865,
+"logm10_max_in_support": -5.672100955059403
+},
+"v4_bbx_ddxtaptam": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_bbx_ddxtaptam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.776111535428875,
+"logm10_max_in_support": -2.2069596068122252
+},
+"v4_bbx_ddxwpwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_ddxwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.172284992628587,
+"logm10_max_in_support": -3.318741965038214
+},
+"v4_bbx_ddxz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_ddxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.363680369515828,
+"logm10_max_in_support": -0.26753981599297794
+},
+"v4_bbx_epem": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_epem_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -3.674227611881059,
+"logm10_max_in_support": 0.2896082350264107
+},
+"v4_bbx_epemg": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_epemg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.092688179587892,
+"logm10_max_in_support": 0.41260973090310793
+},
+"v4_bbx_epemgz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_epemgz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.449271808671657,
+"logm10_max_in_support": -2.5594949909384974
+},
+"v4_bbx_epemh": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_epemh_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.19982257016814,
+"logm10_max_in_support": -4.493500745296225
+},
+"v4_bbx_epemtaptam": {
+"n": 45001,
+"n_in_support": 44997,
+"file": "dsh_bbx_epemtaptam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.842041125301309,
+"logm10_max_in_support": -3.271566344037111
+},
+"v4_bbx_epemvtvtx": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_epemvtvtx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.155558971598369,
+"logm10_max_in_support": -1.9338911398130443
+},
+"v4_bbx_epemwpwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_epemwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.708467057293781,
+"logm10_max_in_support": -5.252477111571819
+},
+"v4_bbx_epemz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_epemz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.075045409042904,
+"logm10_max_in_support": -0.9396404948721806
+},
+"v4_bbx_epemzz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_epemzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.273611856957757,
+"logm10_max_in_support": -4.594092679934082
+},
+"v4_bbx_epgvewm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_epgvewm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.66965805088712,
+"logm10_max_in_support": -2.407641880778022
+},
+"v4_bbx_ephvewm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_ephvewm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.46034689071578,
+"logm10_max_in_support": -5.367944444332978
+},
+"v4_bbx_epvewm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_epvewm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.623773591664609,
+"logm10_max_in_support": -0.6651189073574906
+},
+"v4_bbx_gg": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_gg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -0.08901223290300284,
+"logm10_max_in_support": 3.0139634890674283
+},
+"v4_bbx_ggg": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_ggg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -3.6024880344958605,
+"logm10_max_in_support": 2.0382382852270675
+},
+"v4_bbx_gggg": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_gggg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.1367596271388045,
+"logm10_max_in_support": 0.9917194788346113
+},
+"v4_bbx_gggz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_gggz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.754924388074166,
+"logm10_max_in_support": -0.4528258543819198
+},
+"v4_bbx_gghz": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_bbx_gghz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.870666853015909,
+"logm10_max_in_support": -4.405018987571979
+},
+"v4_bbx_ggz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_ggz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -4.728584430456141,
+"logm10_max_in_support": 0.9178894385179994
+},
+"v4_bbx_ggzz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_ggzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.419645495422495,
+"logm10_max_in_support": -2.3596000761313047
+},
+"v4_bbx_ghhz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_ghhz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.885945213457015,
+"logm10_max_in_support": -8.273650840769443
+},
+"v4_bbx_ghtaptam": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_ghtaptam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.435999375686743,
+"logm10_max_in_support": -5.119103356407339
+},
+"v4_bbx_ghvevex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_ghvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.500827458073903,
+"logm10_max_in_support": -4.715710599581957
+},
+"v4_bbx_ghwpwm": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_bbx_ghwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.857031011687695,
+"logm10_max_in_support": -5.581678357631713
+},
+"v4_bbx_ghz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_ghz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.688253012863849,
+"logm10_max_in_support": -2.876910420383341
+},
+"v4_bbx_ghzz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_ghzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.700977982776369,
+"logm10_max_in_support": -6.680762907124903
+},
+"v4_bbx_gtaptam": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_bbx_gtaptam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.1993882008768075,
+"logm10_max_in_support": -0.02858115833506631
+},
+"v4_bbx_gtaptamz": {
+"n": 45001,
+"n_in_support": 44993,
+"file": "dsh_bbx_gtaptamz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.153482186875559,
+"logm10_max_in_support": -2.7860106533832947
+},
+"v4_bbx_gtapvtwm": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_bbx_gtapvtwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.34901652886543,
+"logm10_max_in_support": -2.34244856867768
+},
+"v4_bbx_gvevex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_gvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.442649548389503,
+"logm10_max_in_support": 0.64748469149649
+},
+"v4_bbx_gvevexz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_gvevexz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.204849615744976,
+"logm10_max_in_support": -1.9567534243165607
+},
+"v4_bbx_gwpwm": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_bbx_gwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.126954114441835,
+"logm10_max_in_support": -0.7562938837131589
+},
+"v4_bbx_gwpwmz": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_bbx_gwpwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.289403307891003,
+"logm10_max_in_support": -4.818040985805381
+},
+"v4_bbx_gz": {
+"n": 45001,
+"n_in_support": 44913,
+"file": "dsh_bbx_gz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -0.9074675818473016,
+"logm10_max_in_support": 2.403093571167521
+},
+"v4_bbx_gzz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_gzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.521736702206101,
+"logm10_max_in_support": -1.1167423110491053
+},
+"v4_bbx_gzzz": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_bbx_gzzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.510781199682004,
+"logm10_max_in_support": -5.390688657209758
+},
+"v4_bbx_hhtaptam": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_hhtaptam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -16.693611910964066,
+"logm10_max_in_support": -9.22089723005996
+},
+"v4_bbx_hhwpwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_hhwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.344978007619051,
+"logm10_max_in_support": -9.11460359048168
+},
+"v4_bbx_hhz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_hhz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.837443552403498,
+"logm10_max_in_support": -7.286925469408419
+},
+"v4_bbx_hhzz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_hhzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.211733080999798,
+"logm10_max_in_support": -10.866630787062151
+},
+"v4_bbx_htaptam": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_htaptam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.155584014872764,
+"logm10_max_in_support": -4.4735066367492236
+},
+"v4_bbx_htaptamz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_htaptamz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.546276546172237,
+"logm10_max_in_support": -6.623005978965801
+},
+"v4_bbx_htapvtwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_htapvtwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.085722622520912,
+"logm10_max_in_support": -4.971979148740229
+},
+"v4_bbx_hvevex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_hvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.20507011476714,
+"logm10_max_in_support": -3.9800439286177993
+},
+"v4_bbx_hvevexz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_hvevexz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.840056218969364,
+"logm10_max_in_support": -6.353550502036455
+},
+"v4_bbx_hwpwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_hwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.909469587599954,
+"logm10_max_in_support": -3.794298950044026
+},
+"v4_bbx_hwpwmz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_hwpwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.065308545476725,
+"logm10_max_in_support": -8.476798645543413
+},
+"v4_bbx_hz": {
+"n": 45001,
+"n_in_support": 44901,
+"file": "dsh_bbx_hz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -3.84014289803015,
+"logm10_max_in_support": -2.6101261042101975
+},
+"v4_bbx_hzz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_hzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.817813650166977,
+"logm10_max_in_support": -4.85362359612522
+},
+"v4_bbx_hzzz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_hzzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.60718112044212,
+"logm10_max_in_support": -9.828902942231583
+},
+"v4_bbx_taptam": {
+"n": 45001,
+"n_in_support": 44919,
+"file": "dsh_bbx_taptam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -3.67065282119705,
+"logm10_max_in_support": 0.28908509961039697
+},
+"v4_bbx_taptamuux": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_bbx_taptamuux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.004957215373622,
+"logm10_max_in_support": -2.471847069677469
+},
+"v4_bbx_taptamz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_taptamz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.014599111819559,
+"logm10_max_in_support": -1.081301461960718
+},
+"v4_bbx_tapvtwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_tapvtwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.800410369984814,
+"logm10_max_in_support": -0.8337233132323593
+},
+"v4_bbx_tapvtwmz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_tapvtwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.587614667899777,
+"logm10_max_in_support": -3.3846204945998566
+},
+"v4_bbx_uuxwpwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_uuxwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.155474553306952,
+"logm10_max_in_support": -3.2904838856102834
+},
+"v4_bbx_vevevexvex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_vevevexvex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.392435221707947,
+"logm10_max_in_support": -2.3016149835031725
+},
+"v4_bbx_vevex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_vevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.713033698733574,
+"logm10_max_in_support": 0.7921672845344827
+},
+"v4_bbx_vevexvtvtx": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_vevexvtvtx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.27092193367745,
+"logm10_max_in_support": -2.2345760810804114
+},
+"v4_bbx_vevexwpwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_vevexwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.74049425382134,
+"logm10_max_in_support": -4.076132547705917
+},
+"v4_bbx_vevexz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_vevexz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.123807978157512,
+"logm10_max_in_support": -0.21125079414728015
+},
+"v4_bbx_vevexzz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_vevexzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.257124237294574,
+"logm10_max_in_support": -4.2944160430677085
+},
+"v4_bbx_wpwm": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_bbx_wpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -2.9533054004705757,
+"logm10_max_in_support": 0.8818458358689013
+},
+"v4_bbx_wpwmz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_wpwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.285411600429343,
+"logm10_max_in_support": -2.7728620287032197
+},
+"v4_bbx_wpwmzz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_wpwmzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.5502605512639,
+"logm10_max_in_support": -7.770123269858414
+},
+"v4_bbx_zz": {
+"n": 45001,
+"n_in_support": 44926,
+"file": "dsh_bbx_zz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -2.4568294191488023,
+"logm10_max_in_support": 1.2763625116965
+},
+"v4_bbx_zzz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_zzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.353534584216932,
+"logm10_max_in_support": -3.5772017685802755
+},
+"v4_bbx_zzzz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bbx_zzzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.963374350199132,
+"logm10_max_in_support": -8.462141317761507
+},
+"v4_bg_aaab": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bg_aaab_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.329536004835047,
+"logm10_max_in_support": -6.752838777475224
+},
+"v4_bg_aab": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bg_aab_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.807522990797217,
+"logm10_max_in_support": -2.839548568686172
+},
+"v4_bg_aabg": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_bg_aabg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.386261420143118,
+"logm10_max_in_support": 0.1970255493891398
+},
+"v4_bg_aabz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bg_aabz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.872752009366927,
+"logm10_max_in_support": -5.353937747436627
+},
+"v4_bg_ab": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bg_ab_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -2.0505835652170643,
+"logm10_max_in_support": 0.8950256836084504
+},
+"v4_bg_abg": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_bg_abg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -4.872178122861322,
+"logm10_max_in_support": 5.066884428664864
+},
+"v4_bg_abvevex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bg_abvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.830687357080206,
+"logm10_max_in_support": -3.1068322406452733
+},
+"v4_bg_abwpwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bg_abwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.407735875010447,
+"logm10_max_in_support": -2.335852318868744
+},
+"v4_bg_abz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bg_abz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.719811239594334,
+"logm10_max_in_support": -1.4961723015044859
+},
+"v4_bg_abzz": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_bg_abzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.363141999689235,
+"logm10_max_in_support": -5.694966146689918
+},
+"v4_bg_bbbx": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_bg_bbbx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -3.433314883002598,
+"logm10_max_in_support": 5.370983575805685
+},
+"v4_bg_bbbxz": {
+"n": 45001,
+"n_in_support": 44992,
+"file": "dsh_bg_bbbxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.170562678267654,
+"logm10_max_in_support": -0.061599956856170014
+},
+"v4_bg_bccx": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_bg_bccx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -3.8563006439563057,
+"logm10_max_in_support": 6.202002575148415
+},
+"v4_bg_bepem": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bg_bepem_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.578086397508428,
+"logm10_max_in_support": -0.28961411709021384
+},
+"v4_bg_bg": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bg_bg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": 0.8643491556971704,
+"logm10_max_in_support": 8.801063984738496
+},
+"v4_bg_bgg": {
+"n": 45001,
+"n_in_support": 44996,
+"file": "dsh_bg_bgg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -1.9880855962153716,
+"logm10_max_in_support": 7.246951480583675
+},
+"v4_bg_bggg": {
+"n": 45001,
+"n_in_support": 44982,
+"file": "dsh_bg_bggg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -4.997295227600012,
+"logm10_max_in_support": 5.734189614967154
+},
+"v4_bg_bggz": {
+"n": 45001,
+"n_in_support": 44992,
+"file": "dsh_bg_bggz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.489482586010615,
+"logm10_max_in_support": 2.01348758482572
+},
+"v4_bg_bgvevex": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_bg_bgvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.720055985502942,
+"logm10_max_in_support": 1.9309569616266138
+},
+"v4_bg_bgwpwm": {
+"n": 45001,
+"n_in_support": 44993,
+"file": "dsh_bg_bgwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.950848775439663,
+"logm10_max_in_support": 0.519859151398219
+},
+"v4_bg_bgzz": {
+"n": 45001,
+"n_in_support": 44992,
+"file": "dsh_bg_bgzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.365965255243765,
+"logm10_max_in_support": -2.10395723820341
+},
+"v4_bg_bhvevex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bg_bhvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.590422887771458,
+"logm10_max_in_support": -5.167314558318783
+},
+"v4_bg_bhwpwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bg_bhwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.992071253714007,
+"logm10_max_in_support": -4.410520732117959
+},
+"v4_bg_bhz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bg_bhz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.755277094132763,
+"logm10_max_in_support": -3.0441551335473296
+},
+"v4_bg_btaptam": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_bg_btaptam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.727801768765306,
+"logm10_max_in_support": -0.19957480186816642
+},
+"v4_bg_buuxz": {
+"n": 45001,
+"n_in_support": 44996,
+"file": "dsh_bg_buuxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.149172953566394,
+"logm10_max_in_support": 1.0441124237907582
+},
+"v4_bg_bvevex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bg_bvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.515144152453543,
+"logm10_max_in_support": 0.48523916789730576
+},
+"v4_bg_bvevexz": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_bg_bvevexz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.516609414621756,
+"logm10_max_in_support": -3.1643128218290593
+},
+"v4_bg_bwpwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bg_bwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.029122861185649,
+"logm10_max_in_support": 0.36063185305632034
+},
+"v4_bg_bwpwmz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_bg_bwpwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.418685760556624,
+"logm10_max_in_support": -3.1906049296288446
+},
+"v4_bg_bz": {
+"n": 45001,
+"n_in_support": 44962,
+"file": "dsh_bg_bz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -1.3999428137662646,
+"logm10_max_in_support": 2.1668848764556325
+},
+"v4_bg_bzz": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_bg_bzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.229141792854556,
+"logm10_max_in_support": -1.6925536488380533
+},
+"v4_bg_bzzz": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_bg_bzzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.90749287776847,
+"logm10_max_in_support": -6.659822913996902
+},
+"v4_db_aabd": {
+"n": 45001,
+"n_in_support": 44994,
+"file": "dsh_db_aabd_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.140700615787397,
+"logm10_max_in_support": 0.5240481219263408
+},
+"v4_db_abd": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_db_abd_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.022758821345692,
+"logm10_max_in_support": 4.972992541365374
+},
+"v4_db_abdg": {
+"n": 45001,
+"n_in_support": 44977,
+"file": "dsh_db_abdg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.226301299886536,
+"logm10_max_in_support": 4.208717669995403
+},
+"v4_db_abdh": {
+"n": 45001,
+"n_in_support": 44969,
+"file": "dsh_db_abdh_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.103540328927117,
+"logm10_max_in_support": -2.963757603800332
+},
+"v4_db_abuwm": {
+"n": 45001,
+"n_in_support": 44925,
+"file": "dsh_db_abuwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.431942895215144,
+"logm10_max_in_support": 0.5676178961976847
+},
+"v4_db_bd": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_db_bd_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -0.16203872308823383,
+"logm10_max_in_support": 8.638835043861786
+},
+"v4_db_bdepem": {
+"n": 45001,
+"n_in_support": 44973,
+"file": "dsh_db_bdepem_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.281471811549729,
+"logm10_max_in_support": 0.9683328056281395
+},
+"v4_db_bdg": {
+"n": 45001,
+"n_in_support": 44983,
+"file": "dsh_db_bdg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -2.803074562020596,
+"logm10_max_in_support": 7.225191358417064
+},
+"v4_db_bdgz": {
+"n": 45001,
+"n_in_support": 44952,
+"file": "dsh_db_bdgz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.255859109358214,
+"logm10_max_in_support": 1.8837869118683455
+},
+"v4_db_bdh": {
+"n": 45001,
+"n_in_support": 44979,
+"file": "dsh_db_bdh_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.212134866477944,
+"logm10_max_in_support": 0.3172301773301623
+},
+"v4_db_bdhh": {
+"n": 45001,
+"n_in_support": 44908,
+"file": "dsh_db_bdhh_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.951263175965625,
+"logm10_max_in_support": -4.430840383501629
+},
+"v4_db_bdhz": {
+"n": 45001,
+"n_in_support": 44899,
+"file": "dsh_db_bdhz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.113767147387367,
+"logm10_max_in_support": -3.160327328282174
+},
+"v4_db_bduux": {
+"n": 45001,
+"n_in_support": 44953,
+"file": "dsh_db_bduux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.898340405393704,
+"logm10_max_in_support": 4.8087061846695
+},
+"v4_db_bdvevex": {
+"n": 45001,
+"n_in_support": 44969,
+"file": "dsh_db_bdvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.614808962909969,
+"logm10_max_in_support": 1.824600938772612
+},
+"v4_db_bdz": {
+"n": 45001,
+"n_in_support": 44967,
+"file": "dsh_db_bdz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.509774279450599,
+"logm10_max_in_support": 3.364566160272588
+},
+"v4_db_bdzz": {
+"n": 45001,
+"n_in_support": 44911,
+"file": "dsh_db_bdzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.911282117141724,
+"logm10_max_in_support": -1.8606207022718242
+},
+"v4_db_bguwm": {
+"n": 45001,
+"n_in_support": 44918,
+"file": "dsh_db_bguwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.121214818370689,
+"logm10_max_in_support": 2.295498145604351
+},
+"v4_db_bhuwm": {
+"n": 45001,
+"n_in_support": 44895,
+"file": "dsh_db_bhuwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.298215116935317,
+"logm10_max_in_support": -3.252566808644135
+},
+"v4_db_buwm": {
+"n": 45001,
+"n_in_support": 44963,
+"file": "dsh_db_buwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.945029300597313,
+"logm10_max_in_support": 3.550540414159848
+},
+"v4_db_buwmz": {
+"n": 45001,
+"n_in_support": 44920,
+"file": "dsh_db_buwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.91721853234927,
+"logm10_max_in_support": -1.7248064923912079
+},
+"v4_dbx_abxd": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_dbx_abxd_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -4.969105545336788,
+"logm10_max_in_support": 4.808706091854048
+},
+"v4_dbx_abxdh": {
+"n": 45001,
+"n_in_support": 44967,
+"file": "dsh_dbx_abxdh_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.925555969779357,
+"logm10_max_in_support": -2.9751621669742208
+},
+"v4_dbx_abxdz": {
+"n": 45001,
+"n_in_support": 44971,
+"file": "dsh_dbx_abxdz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.369351953755217,
+"logm10_max_in_support": -0.12152674785613628
+},
+"v4_dbx_abxuwm": {
+"n": 45001,
+"n_in_support": 44984,
+"file": "dsh_dbx_abxuwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.572879506010153,
+"logm10_max_in_support": 1.9467586558645567
+},
+"v4_dbx_bbxbxd": {
+"n": 45001,
+"n_in_support": 44940,
+"file": "dsh_dbx_bbxbxd_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.158908199256004,
+"logm10_max_in_support": 4.743788547171752
+},
+"v4_dbx_bxdepem": {
+"n": 45001,
+"n_in_support": 44976,
+"file": "dsh_dbx_bxdepem_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.967328577107827,
+"logm10_max_in_support": 1.0668917880732014
+},
+"v4_dbx_bxdg": {
+"n": 45001,
+"n_in_support": 44981,
+"file": "dsh_dbx_bxdg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -2.4973817535997114,
+"logm10_max_in_support": 7.480466697734547
+},
+"v4_dbx_bxdgh": {
+"n": 45001,
+"n_in_support": 44972,
+"file": "dsh_dbx_bxdgh_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.952481657526645,
+"logm10_max_in_support": -1.1430480732718182
+},
+"v4_dbx_bxdgz": {
+"n": 45001,
+"n_in_support": 44949,
+"file": "dsh_dbx_bxdgz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.160393275567797,
+"logm10_max_in_support": 2.267602669019276
+},
+"v4_dbx_bxdhz": {
+"n": 45001,
+"n_in_support": 44897,
+"file": "dsh_dbx_bxdhz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.379742490256147,
+"logm10_max_in_support": -3.277039364923314
+},
+"v4_dbx_bxduux": {
+"n": 45001,
+"n_in_support": 44941,
+"file": "dsh_dbx_bxduux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.233695211220693,
+"logm10_max_in_support": 4.816148178095246
+},
+"v4_dbx_bxdvevex": {
+"n": 45001,
+"n_in_support": 44974,
+"file": "dsh_dbx_bxdvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.829455602068988,
+"logm10_max_in_support": 1.7044216648893693
+},
+"v4_dbx_bxdz": {
+"n": 45001,
+"n_in_support": 44966,
+"file": "dsh_dbx_bxdz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.356588599840594,
+"logm10_max_in_support": 3.166355488507915
+},
+"v4_dbx_bxdzz": {
+"n": 45001,
+"n_in_support": 44918,
+"file": "dsh_dbx_bxdzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.08981921868287,
+"logm10_max_in_support": -1.6554422917602871
+},
+"v4_dbx_bxguwm": {
+"n": 45001,
+"n_in_support": 44942,
+"file": "dsh_dbx_bxguwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.738637115018959,
+"logm10_max_in_support": 3.231700308067012
+},
+"v4_dbx_bxhuwm": {
+"n": 45001,
+"n_in_support": 44980,
+"file": "dsh_dbx_bxhuwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.404781585608664,
+"logm10_max_in_support": 0.6065393231464165
+},
+"v4_dbx_bxuwm": {
+"n": 45001,
+"n_in_support": 44982,
+"file": "dsh_dbx_bxuwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.811387466191257,
+"logm10_max_in_support": 4.9576846240810495
+},
+"v4_dbx_bxuwmz": {
+"n": 45001,
+"n_in_support": 44986,
+"file": "dsh_dbx_bxuwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.099019122071775,
+"logm10_max_in_support": 0.2533943431241148
+},
+"v4_dd_aduwm": {
+"n": 45001,
+"n_in_support": 44875,
+"file": "dsh_dd_aduwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.12145146745666,
+"logm10_max_in_support": 0.670815533496523
+},
+"v4_dd_dduux": {
+"n": 45001,
+"n_in_support": 44750,
+"file": "dsh_dd_dduux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.867368859132136,
+"logm10_max_in_support": 4.645948007773939
+},
+"v4_dd_dguwm": {
+"n": 45001,
+"n_in_support": 44765,
+"file": "dsh_dd_dguwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.001867142605695,
+"logm10_max_in_support": 2.5805026150029686
+},
+"v4_dd_dhuwm": {
+"n": 45001,
+"n_in_support": 44763,
+"file": "dsh_dd_dhuwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.192927768873998,
+"logm10_max_in_support": -2.910278021042025
+},
+"v4_dd_duwm": {
+"n": 45001,
+"n_in_support": 44816,
+"file": "dsh_dd_duwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.132852769262682,
+"logm10_max_in_support": 4.008323679190585
+},
+"v4_dd_duwmz": {
+"n": 45001,
+"n_in_support": 44842,
+"file": "dsh_dd_duwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.086239933346281,
+"logm10_max_in_support": -1.463065232265338
+},
+"v4_ddx_aauux": {
+"n": 45001,
+"n_in_support": 44996,
+"file": "dsh_ddx_aauux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.90712607264403,
+"logm10_max_in_support": -0.37247917929238483
+},
+"v4_ddx_aawpwm": {
+"n": 45001,
+"n_in_support": 44997,
+"file": "dsh_ddx_aawpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.975488596160961,
+"logm10_max_in_support": -4.345115334459836
+},
+"v4_ddx_acsxwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ddx_acsxwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.53514418994237,
+"logm10_max_in_support": -0.9809576250586253
+},
+"v4_ddx_aduxwp": {
+"n": 45001,
+"n_in_support": 44973,
+"file": "dsh_ddx_aduxwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.247209272956502,
+"logm10_max_in_support": 0.4651368062369244
+},
+"v4_ddx_aepvewm": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_ddx_aepvewm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.421178735310189,
+"logm10_max_in_support": -1.5160045243070805
+},
+"v4_ddx_agwpwm": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_ddx_agwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.294389518024664,
+"logm10_max_in_support": -2.7366740271644874
+},
+"v4_ddx_ahuux": {
+"n": 45001,
+"n_in_support": 44904,
+"file": "dsh_ddx_ahuux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.293817650544822,
+"logm10_max_in_support": -1.1586883250076474
+},
+"v4_ddx_ahwpwm": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_ddx_ahwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.856106545063504,
+"logm10_max_in_support": -7.248637801508433
+},
+"v4_ddx_atapvtwm": {
+"n": 45001,
+"n_in_support": 44984,
+"file": "dsh_ddx_atapvtwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.526276552198402,
+"logm10_max_in_support": -0.9929094119777943
+},
+"v4_ddx_auux": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ddx_auux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.4542061377293525,
+"logm10_max_in_support": 2.5359877399689505
+},
+"v4_ddx_awpwm": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_ddx_awpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.899476497876171,
+"logm10_max_in_support": -0.6905598215662974
+},
+"v4_ddx_awpwmz": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_ddx_awpwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.777331994556032,
+"logm10_max_in_support": -5.062669803147652
+},
+"v4_ddx_bbxg": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ddx_bbxg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -4.772005287904837,
+"logm10_max_in_support": 1.1114545956358415
+},
+"v4_ddx_bbxh": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ddx_bbxh_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.291667551262176,
+"logm10_max_in_support": -3.633556438501312
+},
+"v4_ddx_chsxwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ddx_chsxwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.84564334579293,
+"logm10_max_in_support": -4.962606302655297
+},
+"v4_ddx_csxwmz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ddx_csxwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.428193138141703,
+"logm10_max_in_support": -2.7327384671441584
+},
+"v4_ddx_dguxwp": {
+"n": 45001,
+"n_in_support": 44959,
+"file": "dsh_ddx_dguxwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.22458022020928,
+"logm10_max_in_support": 2.4591353712085846
+},
+"v4_ddx_dhuxwp": {
+"n": 45001,
+"n_in_support": 44953,
+"file": "dsh_ddx_dhuxwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.142310997642419,
+"logm10_max_in_support": -3.0864877053849136
+},
+"v4_ddx_duxwp": {
+"n": 45001,
+"n_in_support": 44985,
+"file": "dsh_ddx_duxwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.647094029175466,
+"logm10_max_in_support": 3.6100514220051227
+},
+"v4_ddx_duxwpz": {
+"n": 45001,
+"n_in_support": 44968,
+"file": "dsh_ddx_duxwpz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.80312157230545,
+"logm10_max_in_support": -1.4775947497256998
+},
+"v4_ddx_epemmupmum": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ddx_epemmupmum_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.467682460807291,
+"logm10_max_in_support": -2.7428764545620394
+},
+"v4_ddx_epgvewm": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_ddx_epgvewm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.134134082270558,
+"logm10_max_in_support": -0.6384883261655248
+},
+"v4_ddx_ephvewm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ddx_ephvewm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.290700190522314,
+"logm10_max_in_support": -5.182411702145691
+},
+"v4_ddx_gguux": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ddx_gguux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.8990687540103695,
+"logm10_max_in_support": 0.413286451050276
+},
+"v4_ddx_ggwpwm": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_ddx_ggwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.602946014636423,
+"logm10_max_in_support": -1.0649209831436293
+},
+"v4_ddx_ghuux": {
+"n": 45001,
+"n_in_support": 44951,
+"file": "dsh_ddx_ghuux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.936861637789704,
+"logm10_max_in_support": -0.15519225002627676
+},
+"v4_ddx_ghwpwm": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_ddx_ghwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.35773025014028,
+"logm10_max_in_support": -4.999169402142443
+},
+"v4_ddx_gtapvtwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ddx_gtapvtwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.309516502910434,
+"logm10_max_in_support": -0.5017147706991721
+},
+"v4_ddx_guux": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ddx_guux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -4.360562779417232,
+"logm10_max_in_support": 2.1117885346416725
+},
+"v4_ddx_gwpwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ddx_gwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.25817174541938,
+"logm10_max_in_support": 0.607866185308869
+},
+"v4_ddx_gwpwmz": {
+"n": 45001,
+"n_in_support": 44997,
+"file": "dsh_ddx_gwpwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.529999535563936,
+"logm10_max_in_support": -3.660314682940051
+},
+"v4_ddx_hhuux": {
+"n": 45001,
+"n_in_support": 44801,
+"file": "dsh_ddx_hhuux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.303979893496637,
+"logm10_max_in_support": -3.725118042373019
+},
+"v4_ddx_htapvtwm": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_ddx_htapvtwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.98873865088032,
+"logm10_max_in_support": -5.127440561780706
+},
+"v4_ddx_huux": {
+"n": 45001,
+"n_in_support": 44944,
+"file": "dsh_ddx_huux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.240340150070804,
+"logm10_max_in_support": 0.8502542863918544
+},
+"v4_ddx_hwpwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ddx_hwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.495393403975282,
+"logm10_max_in_support": -3.736248909794832
+},
+"v4_ddx_hwpwmz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ddx_hwpwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.319072725278533,
+"logm10_max_in_support": -7.770957501015383
+},
+"v4_ddx_taptamuux": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_ddx_taptamuux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.814569698761593,
+"logm10_max_in_support": 0.4935888241133737
+},
+"v4_ddx_taptaptamtam": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_ddx_taptaptamtam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.10772174312324,
+"logm10_max_in_support": -2.7485507498056885
+},
+"v4_ddx_tapvtwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ddx_tapvtwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.024917111003493,
+"logm10_max_in_support": 1.516033866411846
+},
+"v4_ddx_tapvtwmz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ddx_tapvtwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.31742159481004,
+"logm10_max_in_support": -3.1381411645073465
+},
+"v4_ddx_uuuxux": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ddx_uuuxux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.847177805574338,
+"logm10_max_in_support": -1.569043845190505
+},
+"v4_ddx_uux": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ddx_uux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -0.5690435933385112,
+"logm10_max_in_support": 2.8286462416449503
+},
+"v4_ddx_uuxz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ddx_uuxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.048346237971709,
+"logm10_max_in_support": 0.8926681322235152
+},
+"v4_ddx_wpwm": {
+"n": 45001,
+"n_in_support": 44989,
+"file": "dsh_ddx_wpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -3.0631687903086844,
+"logm10_max_in_support": 2.585679135587917
+},
+"v4_ddx_wpwmz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ddx_wpwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.760200932541795,
+"logm10_max_in_support": -1.3475237033160172
+},
+"v4_ddx_wpwpwmwm": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_ddx_wpwpwmwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.518416201248119,
+"logm10_max_in_support": -6.491258007642408
+},
+"v4_dg_aauwm": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_dg_aauwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.973290396453878,
+"logm10_max_in_support": -3.291657646947726
+},
+"v4_dg_adwpwm": {
+"n": 45001,
+"n_in_support": 44997,
+"file": "dsh_dg_adwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.807743009798255,
+"logm10_max_in_support": -3.751507093912116
+},
+"v4_dg_aemuvex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_dg_aemuvex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.139812263145656,
+"logm10_max_in_support": -1.3552348556594842
+},
+"v4_dg_aguwm": {
+"n": 45001,
+"n_in_support": 44979,
+"file": "dsh_dg_aguwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.388255776656457,
+"logm10_max_in_support": 1.0706404913033776
+},
+"v4_dg_ahuwm": {
+"n": 45001,
+"n_in_support": 44993,
+"file": "dsh_dg_ahuwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.099710047412238,
+"logm10_max_in_support": -6.114030272726214
+},
+"v4_dg_atamuvtx": {
+"n": 45001,
+"n_in_support": 44984,
+"file": "dsh_dg_atamuvtx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.717694440730133,
+"logm10_max_in_support": -1.188075096066198
+},
+"v4_dg_auwm": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_dg_auwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.05898529737492,
+"logm10_max_in_support": -0.1681786482404856
+},
+"v4_dg_bbxd": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_dg_bbxd_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -4.090238197993769,
+"logm10_max_in_support": 6.257394754812243
+},
+"v4_dg_bbxuwm": {
+"n": 45001,
+"n_in_support": 44983,
+"file": "dsh_dg_bbxuwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.196280383605755,
+"logm10_max_in_support": 1.355519920356575
+},
+"v4_dg_cxgsu": {
+"n": 45001,
+"n_in_support": 44983,
+"file": "dsh_dg_cxgsu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.974932338081665,
+"logm10_max_in_support": 2.9379111360918193
+},
+"v4_dg_cxhsu": {
+"n": 45001,
+"n_in_support": 44927,
+"file": "dsh_dg_cxhsu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.48594470950142,
+"logm10_max_in_support": -2.18408778662367
+},
+"v4_dg_cxsu": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_dg_cxsu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.701376510682836,
+"logm10_max_in_support": 1.6696452621697364
+},
+"v4_dg_ddxuwm": {
+"n": 45001,
+"n_in_support": 44965,
+"file": "dsh_dg_ddxuwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.457553344033714,
+"logm10_max_in_support": 1.208465832391288
+},
+"v4_dg_dguux": {
+"n": 45001,
+"n_in_support": 44968,
+"file": "dsh_dg_dguux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.448744057892897,
+"logm10_max_in_support": 5.332079695806974
+},
+"v4_dg_dhuux": {
+"n": 45001,
+"n_in_support": 44919,
+"file": "dsh_dg_dhuux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.696975353881875,
+"logm10_max_in_support": -1.9679152367064743
+},
+"v4_dg_dhwpwm": {
+"n": 45001,
+"n_in_support": 44990,
+"file": "dsh_dg_dhwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.372660782710478,
+"logm10_max_in_support": -6.663443409590031
+},
+"v4_dg_duux": {
+"n": 45001,
+"n_in_support": 44996,
+"file": "dsh_dg_duux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -4.189278458812095,
+"logm10_max_in_support": 6.222331745083738
+},
+"v4_dg_duuxz": {
+"n": 45001,
+"n_in_support": 44972,
+"file": "dsh_dg_duuxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.483290661929633,
+"logm10_max_in_support": 0.991010365972874
+},
+"v4_dg_dwpwm": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_dg_dwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.930637474432489,
+"logm10_max_in_support": -0.3747562007477687
+},
+"v4_dg_dwpwmz": {
+"n": 45001,
+"n_in_support": 44994,
+"file": "dsh_dg_dwpwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.923301262156603,
+"logm10_max_in_support": -5.116820943312944
+},
+"v4_dg_emguvex": {
+"n": 45001,
+"n_in_support": 44983,
+"file": "dsh_dg_emguvex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.5785016106941,
+"logm10_max_in_support": 2.5079737496645427
+},
+"v4_dg_emhuvex": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_dg_emhuvex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.469818191208478,
+"logm10_max_in_support": -4.484796498611639
+},
+"v4_dg_emuvex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_dg_emuvex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.745191713641963,
+"logm10_max_in_support": 1.2682118908874076
+},
+"v4_dg_emuvexz": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_dg_emuvexz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.99771163237032,
+"logm10_max_in_support": -2.4948843060708605
+},
+"v4_dg_epemuwm": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_dg_epemuwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.452319466950657,
+"logm10_max_in_support": -2.9370685227727327
+},
+"v4_dg_gguwm": {
+"n": 45001,
+"n_in_support": 44954,
+"file": "dsh_dg_gguwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.188715840601711,
+"logm10_max_in_support": 2.491125069950727
+},
+"v4_dg_ghuwm": {
+"n": 45001,
+"n_in_support": 44964,
+"file": "dsh_dg_ghuwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.24176920577953,
+"logm10_max_in_support": -2.87399195745879
+},
+"v4_dg_gtamuvtx": {
+"n": 45001,
+"n_in_support": 44975,
+"file": "dsh_dg_gtamuvtx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.317939848275683,
+"logm10_max_in_support": 2.243223950189994
+},
+"v4_dg_guwm": {
+"n": 45001,
+"n_in_support": 44980,
+"file": "dsh_dg_guwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -4.834339739840319,
+"logm10_max_in_support": 3.8496420904217277
+},
+"v4_dg_hhuwm": {
+"n": 45001,
+"n_in_support": 44988,
+"file": "dsh_dg_hhuwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.47103821212877,
+"logm10_max_in_support": -8.245213646343199
+},
+"v4_dg_htamuvtx": {
+"n": 45001,
+"n_in_support": 44997,
+"file": "dsh_dg_htamuvtx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.918736504630848,
+"logm10_max_in_support": -4.104032512541374
+},
+"v4_dg_huwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_dg_huwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.93040314680883,
+"logm10_max_in_support": -3.157302701218253
+},
+"v4_dg_huwmz": {
+"n": 45001,
+"n_in_support": 44983,
+"file": "dsh_dg_huwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.99640962482055,
+"logm10_max_in_support": -6.841164231211959
+},
+"v4_dg_tamuvtx": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_dg_tamuvtx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.753533939346764,
+"logm10_max_in_support": 0.9286305903589872
+},
+"v4_dg_tamuvtxz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_dg_tamuvtxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.650557505173472,
+"logm10_max_in_support": -2.425861867325852
+},
+"v4_dg_uuuxwm": {
+"n": 45001,
+"n_in_support": 44987,
+"file": "dsh_dg_uuuxwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.877402350729097,
+"logm10_max_in_support": 1.1222353700916692
+},
+"v4_dg_uvevexwm": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_dg_uvevexwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.216039816011934,
+"logm10_max_in_support": -2.6290754710415296
+},
+"v4_dg_uwm": {
+"n": 45001,
+"n_in_support": 44710,
+"file": "dsh_dg_uwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -1.1229979847788232,
+"logm10_max_in_support": 2.787379799708822
+},
+"v4_dg_uwmz": {
+"n": 45001,
+"n_in_support": 44997,
+"file": "dsh_dg_uwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.840280691266326,
+"logm10_max_in_support": -1.0222505613324342
+},
+"v4_ds_bbxds": {
+"n": 45001,
+"n_in_support": 44920,
+"file": "dsh_ds_bbxds_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.254279836029953,
+"logm10_max_in_support": 5.054906150026406
+},
+"v4_ds_cdwm": {
+"n": 45001,
+"n_in_support": 44975,
+"file": "dsh_ds_cdwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.60587312629446,
+"logm10_max_in_support": 3.6063985700208985
+},
+"v4_dsx_aacxu": {
+"n": 45001,
+"n_in_support": 44985,
+"file": "dsh_dsx_aacxu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.677028431548388,
+"logm10_max_in_support": -0.3745866422901682
+},
+"v4_dsx_acxgu": {
+"n": 45001,
+"n_in_support": 44985,
+"file": "dsh_dsx_acxgu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.78190340190429,
+"logm10_max_in_support": 1.052160227614061
+},
+"v4_dsx_acxhu": {
+"n": 45001,
+"n_in_support": 44923,
+"file": "dsh_dsx_acxhu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.897103048768727,
+"logm10_max_in_support": -1.0161029751589699
+},
+"v4_dsx_acxu": {
+"n": 45001,
+"n_in_support": 44995,
+"file": "dsh_dsx_acxu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.699834978491266,
+"logm10_max_in_support": 2.9577851399094004
+},
+"v4_dsx_acxuz": {
+"n": 45001,
+"n_in_support": 44978,
+"file": "dsh_dsx_acxuz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.479485599517728,
+"logm10_max_in_support": -1.4159982494233156
+},
+"v4_dsx_bbxcxu": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_dsx_bbxcxu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.24392965030404,
+"logm10_max_in_support": 0.8836093565702899
+},
+"v4_dsx_bbxdsx": {
+"n": 45001,
+"n_in_support": 44911,
+"file": "dsh_dsx_bbxdsx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.316239166250382,
+"logm10_max_in_support": 4.912601383923206
+},
+"v4_dsx_cxddxu": {
+"n": 45001,
+"n_in_support": 44982,
+"file": "dsh_dsx_cxddxu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.874325299905568,
+"logm10_max_in_support": 2.6783877933640348
+},
+"v4_dsx_cxdwp": {
+"n": 45001,
+"n_in_support": 44970,
+"file": "dsh_dsx_cxdwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.851115871439138,
+"logm10_max_in_support": 3.7054147830417365
+},
+"v4_dsx_cxepemu": {
+"n": 45001,
+"n_in_support": 44988,
+"file": "dsh_dsx_cxepemu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.034838639737918,
+"logm10_max_in_support": -0.6229054112914705
+},
+"v4_dsx_cxggu": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_dsx_cxggu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.616080850531684,
+"logm10_max_in_support": 2.811872466472844
+},
+"v4_dsx_cxghu": {
+"n": 45001,
+"n_in_support": 44939,
+"file": "dsh_dsx_cxghu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.03053959431517,
+"logm10_max_in_support": -0.22134447045166739
+},
+"v4_dsx_cxgu": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_dsx_cxgu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.292521020193568,
+"logm10_max_in_support": 4.448376499131509
+},
+"v4_dsx_cxguz": {
+"n": 45001,
+"n_in_support": 44986,
+"file": "dsh_dsx_cxguz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.783091220927796,
+"logm10_max_in_support": -0.05693252662627986
+},
+"v4_dsx_cxhhu": {
+"n": 45001,
+"n_in_support": 44784,
+"file": "dsh_dsx_cxhhu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.9945360149658,
+"logm10_max_in_support": -3.648978592959376
+},
+"v4_dsx_cxhu": {
+"n": 45001,
+"n_in_support": 44945,
+"file": "dsh_dsx_cxhu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.810266378626615,
+"logm10_max_in_support": 1.1526687439555652
+},
+"v4_dsx_cxhuz": {
+"n": 45001,
+"n_in_support": 44868,
+"file": "dsh_dsx_cxhuz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.949895474216365,
+"logm10_max_in_support": -2.9518640338235476
+},
+"v4_dsx_cxu": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_dsx_cxu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -4.933238357073869,
+"logm10_max_in_support": 5.616089197486456
+},
+"v4_dsx_cxuuux": {
+"n": 45001,
+"n_in_support": 44996,
+"file": "dsh_dsx_cxuuux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.14199511231775,
+"logm10_max_in_support": 0.4506934426437068
+},
+"v4_dsx_cxuvevex": {
+"n": 45001,
+"n_in_support": 44993,
+"file": "dsh_dsx_cxuvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.952626122621577,
+"logm10_max_in_support": -0.7076581799718407
+},
+"v4_dsx_cxuz": {
+"n": 45001,
+"n_in_support": 44995,
+"file": "dsh_dsx_cxuz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.477298081410929,
+"logm10_max_in_support": 1.3083280044730867
+},
+"v4_dsx_cxuzz": {
+"n": 45001,
+"n_in_support": 44967,
+"file": "dsh_dsx_cxuzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.590857614759384,
+"logm10_max_in_support": -3.080559341557064
+},
+"v4_dsx_dhhsx": {
+"n": 45001,
+"n_in_support": 44818,
+"file": "dsh_dsx_dhhsx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.287440159556283,
+"logm10_max_in_support": -4.35649321155829
+},
+"v4_dsx_dhsx": {
+"n": 45001,
+"n_in_support": 44958,
+"file": "dsh_dsx_dhsx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.965115906716065,
+"logm10_max_in_support": 0.4184058858473779
+},
+"v4_gg_aabbx": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_gg_aabbx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.141368063893673,
+"logm10_max_in_support": -4.25234634794675
+},
+"v4_gg_abbx": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_gg_abbx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.425566215613659,
+"logm10_max_in_support": -0.795454071150188
+},
+"v4_gg_abbxg": {
+"n": 45001,
+"n_in_support": 44997,
+"file": "dsh_gg_abbxg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.794169591719339,
+"logm10_max_in_support": 1.6968170529372661
+},
+"v4_gg_bbxg": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_gg_bbxg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -3.0653282137860667,
+"logm10_max_in_support": 6.1870179703507056
+},
+"v4_gg_bbxgg": {
+"n": 45001,
+"n_in_support": 44996,
+"file": "dsh_gg_bbxgg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.855304885780273,
+"logm10_max_in_support": 5.296419053868196
+},
+"v4_gg_bbxz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_gg_bbxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.5311054373566835,
+"logm10_max_in_support": -0.4881678429297467
+},
+"v4_gg_csxwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_gg_csxwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.934423258880291,
+"logm10_max_in_support": 0.3550920537564007
+},
+"v4_gg_gg": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_gg_gg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": 1.4369758997196944,
+"logm10_max_in_support": 8.810532771294584
+},
+"v4_gg_ggg": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_gg_ggg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -1.5963902214728993,
+"logm10_max_in_support": 7.320911454748026
+},
+"v4_gg_gggg": {
+"n": 45001,
+"n_in_support": 44988,
+"file": "dsh_gg_gggg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -4.462250115668594,
+"logm10_max_in_support": 6.224753782407518
+},
+"v4_ub_aabu": {
+"n": 45001,
+"n_in_support": 44994,
+"file": "dsh_ub_aabu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.568453721581546,
+"logm10_max_in_support": 1.8613195653523318
+},
+"v4_ub_abdwp": {
+"n": 45001,
+"n_in_support": 44985,
+"file": "dsh_ub_abdwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.493662932424805,
+"logm10_max_in_support": 1.644592525275433
+},
+"v4_ub_abgu": {
+"n": 45001,
+"n_in_support": 44977,
+"file": "dsh_ub_abgu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.772870295453453,
+"logm10_max_in_support": 4.466390401796214
+},
+"v4_ub_abu": {
+"n": 45001,
+"n_in_support": 44996,
+"file": "dsh_ub_abu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.11233759222689,
+"logm10_max_in_support": 5.565596528490318
+},
+"v4_ub_bddxu": {
+"n": 45001,
+"n_in_support": 44937,
+"file": "dsh_ub_bddxu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.389144760008741,
+"logm10_max_in_support": 5.174672940320314
+},
+"v4_ub_bdgwp": {
+"n": 45001,
+"n_in_support": 44929,
+"file": "dsh_ub_bdgwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.171565592656298,
+"logm10_max_in_support": 2.899702752400338
+},
+"v4_ub_bdhwp": {
+"n": 45001,
+"n_in_support": 44988,
+"file": "dsh_ub_bdhwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.980158562342412,
+"logm10_max_in_support": 0.293978174191431
+},
+"v4_ub_bdwp": {
+"n": 45001,
+"n_in_support": 44963,
+"file": "dsh_ub_bdwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.430702551826621,
+"logm10_max_in_support": 4.2210954491128465
+},
+"v4_ub_bdwpz": {
+"n": 45001,
+"n_in_support": 44976,
+"file": "dsh_ub_bdwpz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.176869017226377,
+"logm10_max_in_support": 0.40259738300820525
+},
+"v4_ub_bepemu": {
+"n": 45001,
+"n_in_support": 44968,
+"file": "dsh_ub_bepemu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.8080818085835,
+"logm10_max_in_support": 1.1263485479659678
+},
+"v4_ub_bgu": {
+"n": 45001,
+"n_in_support": 44980,
+"file": "dsh_ub_bgu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -2.916317223659923,
+"logm10_max_in_support": 7.651068696043005
+},
+"v4_ub_buuux": {
+"n": 45001,
+"n_in_support": 44930,
+"file": "dsh_ub_buuux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.4750538934815065,
+"logm10_max_in_support": 4.533552399438648
+},
+"v4_ub_buvevex": {
+"n": 45001,
+"n_in_support": 44958,
+"file": "dsh_ub_buvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.124985884310695,
+"logm10_max_in_support": 1.5597131637645136
+},
+"v4_ub_buz": {
+"n": 45001,
+"n_in_support": 44967,
+"file": "dsh_ub_buz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.690626469374734,
+"logm10_max_in_support": 3.167278841413075
+},
+"v4_ubx_abxhu": {
+"n": 45001,
+"n_in_support": 44947,
+"file": "dsh_ubx_abxhu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.454276091986044,
+"logm10_max_in_support": -2.6006667030770774
+},
+"v4_ubx_abxu": {
+"n": 45001,
+"n_in_support": 44992,
+"file": "dsh_ubx_abxu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.204613597238448,
+"logm10_max_in_support": 5.504511349881001
+},
+"v4_ubx_bbxbxu": {
+"n": 45001,
+"n_in_support": 44935,
+"file": "dsh_ubx_bbxbxu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.331115320969843,
+"logm10_max_in_support": 4.5383212950582115
+},
+"v4_ubx_bxddxu": {
+"n": 45001,
+"n_in_support": 44930,
+"file": "dsh_ubx_bxddxu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.124693978848635,
+"logm10_max_in_support": 5.0072380579483395
+},
+"v4_ubx_bxdgwp": {
+"n": 45001,
+"n_in_support": 44887,
+"file": "dsh_ubx_bxdgwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.675615319892154,
+"logm10_max_in_support": 2.5654724523338945
+},
+"v4_ubx_bxdhwp": {
+"n": 45001,
+"n_in_support": 44873,
+"file": "dsh_ubx_bxdhwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.5994473520358,
+"logm10_max_in_support": -2.708714549853758
+},
+"v4_ubx_bxdwp": {
+"n": 45001,
+"n_in_support": 44924,
+"file": "dsh_ubx_bxdwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.2051424334509235,
+"logm10_max_in_support": 3.7902492025166628
+},
+"v4_ubx_bxdwpz": {
+"n": 45001,
+"n_in_support": 44843,
+"file": "dsh_ubx_bxdwpz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.609992033143662,
+"logm10_max_in_support": -1.6245712407196382
+},
+"v4_ubx_bxepemu": {
+"n": 45001,
+"n_in_support": 44973,
+"file": "dsh_ubx_bxepemu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.00946367592772,
+"logm10_max_in_support": 0.9749339754532607
+},
+"v4_ubx_bxguz": {
+"n": 45001,
+"n_in_support": 44928,
+"file": "dsh_ubx_bxguz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.190599803299886,
+"logm10_max_in_support": 2.6796821161731024
+},
+"v4_ubx_bxuuux": {
+"n": 45001,
+"n_in_support": 44927,
+"file": "dsh_ubx_bxuuux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.729233966370646,
+"logm10_max_in_support": 4.615082247824015
+},
+"v4_ubx_bxuvevex": {
+"n": 45001,
+"n_in_support": 44963,
+"file": "dsh_ubx_bxuvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.766925213067395,
+"logm10_max_in_support": 1.5814267765127181
+},
+"v4_ubx_bxuz": {
+"n": 45001,
+"n_in_support": 44957,
+"file": "dsh_ubx_bxuz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.187189346897544,
+"logm10_max_in_support": 3.335229305778121
+},
+"v4_ubx_bxuzz": {
+"n": 45001,
+"n_in_support": 44911,
+"file": "dsh_ubx_bxuzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.796741191884509,
+"logm10_max_in_support": -2.040610663449389
+},
+"v4_uc_acgu": {
+"n": 45001,
+"n_in_support": 44964,
+"file": "dsh_uc_acgu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.280738212946782,
+"logm10_max_in_support": 4.643289949252668
+},
+"v4_uc_achu": {
+"n": 45001,
+"n_in_support": 44943,
+"file": "dsh_uc_achu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.446867557953706,
+"logm10_max_in_support": -2.5133816527010757
+},
+"v4_uc_acuz": {
+"n": 45001,
+"n_in_support": 44929,
+"file": "dsh_uc_acuz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.029436542179155,
+"logm10_max_in_support": 0.21521971551658245
+},
+"v4_uc_bbxcu": {
+"n": 45001,
+"n_in_support": 44901,
+"file": "dsh_uc_bbxcu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.162627769219881,
+"logm10_max_in_support": 4.825649550097118
+},
+"v4_uc_cddxu": {
+"n": 45001,
+"n_in_support": 44908,
+"file": "dsh_uc_cddxu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.0756107649456075,
+"logm10_max_in_support": 4.649998118374861
+},
+"v4_uc_cepemu": {
+"n": 45001,
+"n_in_support": 44964,
+"file": "dsh_uc_cepemu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.26466676962111,
+"logm10_max_in_support": 1.1917208254033858
+},
+"v4_uc_cghu": {
+"n": 45001,
+"n_in_support": 44948,
+"file": "dsh_uc_cghu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.6757992424207,
+"logm10_max_in_support": -1.1306563489486714
+},
+"v4_uc_cgu": {
+"n": 45001,
+"n_in_support": 44967,
+"file": "dsh_uc_cgu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -3.5945738442121877,
+"logm10_max_in_support": 7.353494633291309
+},
+"v4_uc_chhu": {
+"n": 45001,
+"n_in_support": 44800,
+"file": "dsh_uc_chhu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -16.017691768739823,
+"logm10_max_in_support": -4.444049983426214
+},
+"v4_uc_chu": {
+"n": 45001,
+"n_in_support": 44963,
+"file": "dsh_uc_chu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.099654248757602,
+"logm10_max_in_support": 0.349889943962358
+},
+"v4_uc_chuz": {
+"n": 45001,
+"n_in_support": 44856,
+"file": "dsh_uc_chuz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.398551316147735,
+"logm10_max_in_support": -3.120529185468341
+},
+"v4_uc_cuuux": {
+"n": 45001,
+"n_in_support": 44898,
+"file": "dsh_uc_cuuux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.399702664325629,
+"logm10_max_in_support": 4.693607138113641
+},
+"v4_uc_cuvevex": {
+"n": 45001,
+"n_in_support": 44949,
+"file": "dsh_uc_cuvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.313854942047213,
+"logm10_max_in_support": 1.36920147958023
+},
+"v4_uc_cuz": {
+"n": 45001,
+"n_in_support": 44920,
+"file": "dsh_uc_cuz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.1941583103443545,
+"logm10_max_in_support": 3.2577584613730384
+},
+"v4_uc_cuzz": {
+"n": 45001,
+"n_in_support": 44843,
+"file": "dsh_uc_cuzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.31994743212072,
+"logm10_max_in_support": -2.0422831822499607
+},
+"v4_ucx_aadsx": {
+"n": 45001,
+"n_in_support": 44979,
+"file": "dsh_ucx_aadsx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.96062633704489,
+"logm10_max_in_support": -0.03846777213383823
+},
+"v4_ucx_acxuz": {
+"n": 45001,
+"n_in_support": 44937,
+"file": "dsh_ucx_acxuz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.934566240688707,
+"logm10_max_in_support": 0.1782918111923182
+},
+"v4_ucx_adgsx": {
+"n": 45001,
+"n_in_support": 44987,
+"file": "dsh_ucx_adgsx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.296474707682814,
+"logm10_max_in_support": 1.4378878689076675
+},
+"v4_ucx_adhsx": {
+"n": 45001,
+"n_in_support": 44908,
+"file": "dsh_ucx_adhsx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.200701295082753,
+"logm10_max_in_support": -1.2666843856665244
+},
+"v4_ucx_adsx": {
+"n": 45001,
+"n_in_support": 44996,
+"file": "dsh_ucx_adsx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.090077525454413,
+"logm10_max_in_support": 3.0034269072571584
+},
+"v4_ucx_adsxz": {
+"n": 45001,
+"n_in_support": 44970,
+"file": "dsh_ucx_adsxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.621194503668303,
+"logm10_max_in_support": -1.2119921248549905
+},
+"v4_ucx_bbxcxu": {
+"n": 45001,
+"n_in_support": 44910,
+"file": "dsh_ucx_bbxcxu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.917463172730381,
+"logm10_max_in_support": 4.9999234647121105
+},
+"v4_ucx_bbxdsx": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_ucx_bbxdsx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.875668405104417,
+"logm10_max_in_support": 1.1203337166210692
+},
+"v4_ucx_cxepemu": {
+"n": 45001,
+"n_in_support": 44957,
+"file": "dsh_ucx_cxepemu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.979336958609885,
+"logm10_max_in_support": 0.9775334737588914
+},
+"v4_ucx_cxggu": {
+"n": 45001,
+"n_in_support": 44919,
+"file": "dsh_ucx_cxggu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.448512379102335,
+"logm10_max_in_support": 6.161089319833859
+},
+"v4_ucx_cxgu": {
+"n": 45001,
+"n_in_support": 44968,
+"file": "dsh_ucx_cxgu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -2.7637293677780255,
+"logm10_max_in_support": 7.328566556962548
+},
+"v4_ucx_cxguz": {
+"n": 45001,
+"n_in_support": 44910,
+"file": "dsh_ucx_cxguz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.340036507973137,
+"logm10_max_in_support": 2.23776925558548
+},
+"v4_ucx_cxhu": {
+"n": 45001,
+"n_in_support": 44954,
+"file": "dsh_ucx_cxhu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.55065535334983,
+"logm10_max_in_support": 0.09394116148506351
+},
+"v4_ucx_cxuuux": {
+"n": 45001,
+"n_in_support": 44911,
+"file": "dsh_ucx_cxuuux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.898188666732964,
+"logm10_max_in_support": 4.403591317623537
+},
+"v4_ucx_cxuvevex": {
+"n": 45001,
+"n_in_support": 44948,
+"file": "dsh_ucx_cxuvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.272147646318134,
+"logm10_max_in_support": 1.464179213632566
+},
+"v4_ucx_cxuz": {
+"n": 45001,
+"n_in_support": 44954,
+"file": "dsh_ucx_cxuz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.050705457092534,
+"logm10_max_in_support": 3.3417361243857644
+},
+"v4_ucx_cxuzz": {
+"n": 45001,
+"n_in_support": 44824,
+"file": "dsh_ucx_cxuzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.06468403278999,
+"logm10_max_in_support": -2.161756068941549
+},
+"v4_ucx_depemsx": {
+"n": 45001,
+"n_in_support": 44988,
+"file": "dsh_ucx_depemsx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.80475760148621,
+"logm10_max_in_support": -0.6318616049287156
+},
+"v4_ucx_dgsxz": {
+"n": 45001,
+"n_in_support": 44976,
+"file": "dsh_ucx_dgsxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.69731074883141,
+"logm10_max_in_support": -0.0965522523695619
+},
+"v4_ucx_dhsxz": {
+"n": 45001,
+"n_in_support": 44903,
+"file": "dsh_ucx_dhsxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.757386523002067,
+"logm10_max_in_support": -3.256290145565811
+},
+"v4_ucx_dsxvevex": {
+"n": 45001,
+"n_in_support": 44989,
+"file": "dsh_ucx_dsxvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.662418764931525,
+"logm10_max_in_support": -0.6786166935179431
+},
+"v4_ucx_dsxz": {
+"n": 45001,
+"n_in_support": 44989,
+"file": "dsh_ucx_dsxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.815657043380059,
+"logm10_max_in_support": 1.4423545079465523
+},
+"v4_ucx_dsxzz": {
+"n": 45001,
+"n_in_support": 44966,
+"file": "dsh_ucx_dsxzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.238083828100061,
+"logm10_max_in_support": -3.217563018828118
+},
+"v4_ud_aadu": {
+"n": 45001,
+"n_in_support": 44939,
+"file": "dsh_ud_aadu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.131565014080145,
+"logm10_max_in_support": 2.0986832955918415
+},
+"v4_ud_addwp": {
+"n": 45001,
+"n_in_support": 44778,
+"file": "dsh_ud_addwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.08985251963478,
+"logm10_max_in_support": 0.5131611402232984
+},
+"v4_ud_adgu": {
+"n": 45001,
+"n_in_support": 44841,
+"file": "dsh_ud_adgu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.913848964228592,
+"logm10_max_in_support": 5.059269570385561
+},
+"v4_ud_adu": {
+"n": 45001,
+"n_in_support": 44959,
+"file": "dsh_ud_adu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -4.77253243278625,
+"logm10_max_in_support": 5.830751907194836
+},
+"v4_ud_auuwm": {
+"n": 45001,
+"n_in_support": 44861,
+"file": "dsh_ud_auuwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.142136010360234,
+"logm10_max_in_support": 0.8277822797489334
+},
+"v4_ud_bbxdu": {
+"n": 45001,
+"n_in_support": 44613,
+"file": "dsh_ud_bbxdu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.306609398918217,
+"logm10_max_in_support": 5.220669080455136
+},
+"v4_ud_dddxu": {
+"n": 45001,
+"n_in_support": 44637,
+"file": "dsh_ud_dddxu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.556238550526108,
+"logm10_max_in_support": 5.2587631907581835
+},
+"v4_ud_ddgwp": {
+"n": 45001,
+"n_in_support": 44653,
+"file": "dsh_ud_ddgwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.137094276425307,
+"logm10_max_in_support": 2.2713476641961345
+},
+"v4_ud_ddhwp": {
+"n": 45001,
+"n_in_support": 44672,
+"file": "dsh_ud_ddhwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.84807853879661,
+"logm10_max_in_support": -3.3806228232483972
+},
+"v4_ud_ddwp": {
+"n": 45001,
+"n_in_support": 44768,
+"file": "dsh_ud_ddwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.700565315700929,
+"logm10_max_in_support": 3.6547857546559768
+},
+"v4_ud_ddwpz": {
+"n": 45001,
+"n_in_support": 44716,
+"file": "dsh_ud_ddwpz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.936892289583637,
+"logm10_max_in_support": -1.9731414364368458
+},
+"v4_ud_depemu": {
+"n": 45001,
+"n_in_support": 44813,
+"file": "dsh_ud_depemu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.807168399643988,
+"logm10_max_in_support": 1.2929314095448605
+},
+"v4_ud_dghu": {
+"n": 45001,
+"n_in_support": 44782,
+"file": "dsh_ud_dghu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.71539211956209,
+"logm10_max_in_support": 0.49719910285911895
+},
+"v4_ud_dgu": {
+"n": 45001,
+"n_in_support": 44813,
+"file": "dsh_ud_dgu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -2.9015198279691066,
+"logm10_max_in_support": 7.519942123368213
+},
+"v4_ud_dhhu": {
+"n": 45001,
+"n_in_support": 44427,
+"file": "dsh_ud_dhhu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.45004117356902,
+"logm10_max_in_support": -3.3792357742087873
+},
+"v4_ud_dhu": {
+"n": 45001,
+"n_in_support": 44795,
+"file": "dsh_ud_dhu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.384760081623837,
+"logm10_max_in_support": 1.3205497748529573
+},
+"v4_ud_du": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ud_du_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": 0.14129095480479895,
+"logm10_max_in_support": 8.609088684677108
+},
+"v4_ud_duuux": {
+"n": 45001,
+"n_in_support": 44652,
+"file": "dsh_ud_duuux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.20138552427468,
+"logm10_max_in_support": 4.656175602006619
+},
+"v4_ud_duvevex": {
+"n": 45001,
+"n_in_support": 44812,
+"file": "dsh_ud_duvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.34035590360836,
+"logm10_max_in_support": 1.622828571963392
+},
+"v4_ud_duz": {
+"n": 45001,
+"n_in_support": 44792,
+"file": "dsh_ud_duz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.661280223776988,
+"logm10_max_in_support": 3.54397771770637
+},
+"v4_ud_huuwm": {
+"n": 45001,
+"n_in_support": 44682,
+"file": "dsh_ud_huuwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.544269743069709,
+"logm10_max_in_support": -3.01581279417646
+},
+"v4_ud_uuwmz": {
+"n": 45001,
+"n_in_support": 44806,
+"file": "dsh_ud_uuwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.841132939274662,
+"logm10_max_in_support": -1.767642602907101
+},
+"v4_udx_aaawp": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_aaawp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.764384254899163,
+"logm10_max_in_support": -4.980585452306501
+},
+"v4_udx_aacsx": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_aacsx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.779934270180313,
+"logm10_max_in_support": -2.6246926863065685
+},
+"v4_udx_aadxu": {
+"n": 45001,
+"n_in_support": 44961,
+"file": "dsh_udx_aadxu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.519894958600776,
+"logm10_max_in_support": 2.3314136913066563
+},
+"v4_udx_aaepve": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_aaepve_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.499558234002233,
+"logm10_max_in_support": -2.7004230924917554
+},
+"v4_udx_aagwp": {
+"n": 45001,
+"n_in_support": 44994,
+"file": "dsh_udx_aagwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.418719276999271,
+"logm10_max_in_support": -3.3549770455798256
+},
+"v4_udx_aahwp": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_udx_aahwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.75014319692133,
+"logm10_max_in_support": -6.532258949703991
+},
+"v4_udx_aawp": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_aawp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.633479337801791,
+"logm10_max_in_support": -1.2766618849054496
+},
+"v4_udx_aawpz": {
+"n": 45001,
+"n_in_support": 44997,
+"file": "dsh_udx_aawpz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.53940681080308,
+"logm10_max_in_support": -4.6347254939785065
+},
+"v4_udx_accxwp": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_udx_accxwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.776192277817525,
+"logm10_max_in_support": -2.255572762451634
+},
+"v4_udx_acgsx": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_acgsx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.472217681131896,
+"logm10_max_in_support": -0.43645201459640665
+},
+"v4_udx_achsx": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_achsx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.066804540365712,
+"logm10_max_in_support": -5.03156645197638
+},
+"v4_udx_acsx": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_acsx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.097017871561666,
+"logm10_max_in_support": 0.4071680390196225
+},
+"v4_udx_acsxz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_acsxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.765362874788098,
+"logm10_max_in_support": -1.7461097921499873
+},
+"v4_udx_addxwp": {
+"n": 45001,
+"n_in_support": 44921,
+"file": "dsh_udx_addxwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.911757647091003,
+"logm10_max_in_support": -0.011119767658809674
+},
+"v4_udx_adxgu": {
+"n": 45001,
+"n_in_support": 44934,
+"file": "dsh_udx_adxgu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.074973150876513,
+"logm10_max_in_support": 4.759834167681925
+},
+"v4_udx_adxhu": {
+"n": 45001,
+"n_in_support": 44986,
+"file": "dsh_udx_adxhu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.088498544824793,
+"logm10_max_in_support": -2.4384423448460497
+},
+"v4_udx_adxu": {
+"n": 45001,
+"n_in_support": 44986,
+"file": "dsh_udx_adxu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.798950370603936,
+"logm10_max_in_support": 5.70692091377619
+},
+"v4_udx_adxuz": {
+"n": 45001,
+"n_in_support": 44905,
+"file": "dsh_udx_adxuz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.849346505615674,
+"logm10_max_in_support": -0.03452010173981062
+},
+"v4_udx_aepemwp": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_udx_aepemwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.636467019312654,
+"logm10_max_in_support": -2.354522562817843
+},
+"v4_udx_aepgve": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_aepgve_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.422246900862739,
+"logm10_max_in_support": -0.03416148308405094
+},
+"v4_udx_aephve": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_aephve_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.769366342534981,
+"logm10_max_in_support": -5.103004453042263
+},
+"v4_udx_aepve": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_aepve_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.565652696144572,
+"logm10_max_in_support": -0.07456471165798588
+},
+"v4_udx_aepvez": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_aepvez_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.44071498515538,
+"logm10_max_in_support": -1.1310419053754999
+},
+"v4_udx_aggwp": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_aggwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.409048222073357,
+"logm10_max_in_support": -0.9399613195662351
+},
+"v4_udx_aghwp": {
+"n": 45001,
+"n_in_support": 44992,
+"file": "dsh_udx_aghwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.714493003498466,
+"logm10_max_in_support": -5.510023075088862
+},
+"v4_udx_agwpz": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_udx_agwpz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.390571375822164,
+"logm10_max_in_support": -3.064359804926724
+},
+"v4_udx_ahhwp": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_udx_ahhwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -16.82798492989272,
+"logm10_max_in_support": -9.32570761903566
+},
+"v4_udx_ahtapvt": {
+"n": 45001,
+"n_in_support": 44991,
+"file": "dsh_udx_ahtapvt_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.299036938297952,
+"logm10_max_in_support": -5.128649733468483
+},
+"v4_udx_ahwp": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_ahwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.760920254707571,
+"logm10_max_in_support": -4.092110952341772
+},
+"v4_udx_ahwpz": {
+"n": 45001,
+"n_in_support": 44993,
+"file": "dsh_udx_ahwpz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.986373451538098,
+"logm10_max_in_support": -7.046737887382242
+},
+"v4_udx_ataptamwp": {
+"n": 45001,
+"n_in_support": 44983,
+"file": "dsh_udx_ataptamwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.48424553239535,
+"logm10_max_in_support": -2.3008430794263335
+},
+"v4_udx_atapvt": {
+"n": 45001,
+"n_in_support": 44980,
+"file": "dsh_udx_atapvt_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.645175133572206,
+"logm10_max_in_support": -0.08239721160451702
+},
+"v4_udx_auuxwp": {
+"n": 45001,
+"n_in_support": 44987,
+"file": "dsh_udx_auuxwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.61925857040969,
+"logm10_max_in_support": 0.8828635103022054
+},
+"v4_udx_avevexwp": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_avevexwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.618714402235153,
+"logm10_max_in_support": -2.44358432614248
+},
+"v4_udx_awp": {
+"n": 45001,
+"n_in_support": 44824,
+"file": "dsh_udx_awp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -4.867488207038391,
+"logm10_max_in_support": 1.3968190384850925
+},
+"v4_udx_awpwpwm": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_udx_awpwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.607596195117143,
+"logm10_max_in_support": -5.70777340022573
+},
+"v4_udx_awpz": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_awpz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.652473140528773,
+"logm10_max_in_support": -0.9856145505802671
+},
+"v4_udx_bbxcsx": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_bbxcsx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.163034726107671,
+"logm10_max_in_support": -0.8931652245410818
+},
+"v4_udx_bbxdxu": {
+"n": 45001,
+"n_in_support": 44868,
+"file": "dsh_udx_bbxdxu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.145012699231621,
+"logm10_max_in_support": 5.021164965953377
+},
+"v4_udx_bbxepve": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_bbxepve_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.252985810316796,
+"logm10_max_in_support": -0.20178823388840025
+},
+"v4_udx_bbxhwp": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_bbxhwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.287240867687688,
+"logm10_max_in_support": -5.39554718862828
+},
+"v4_udx_bbxtapvt": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_udx_bbxtapvt_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.708591163756287,
+"logm10_max_in_support": -1.2249273072655391
+},
+"v4_udx_bbxwp": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_bbxwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.105907118634681,
+"logm10_max_in_support": 0.5902403494689272
+},
+"v4_udx_ccxgwp": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_ccxgwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.680224199186991,
+"logm10_max_in_support": -0.9003112863011101
+},
+"v4_udx_ccxhwp": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_ccxhwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.875819685934164,
+"logm10_max_in_support": -5.49099865325325
+},
+"v4_udx_ccxwp": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_ccxwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.630495688028793,
+"logm10_max_in_support": 0.7975309589371953
+},
+"v4_udx_ccxwpz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_ccxwpz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.875330092971998,
+"logm10_max_in_support": -2.500110746015517
+},
+"v4_udx_cddxsx": {
+"n": 45001,
+"n_in_support": 44923,
+"file": "dsh_udx_cddxsx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.432814663607191,
+"logm10_max_in_support": 2.71820911753771
+},
+"v4_udx_cepemsx": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_cepemsx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.209602237346669,
+"logm10_max_in_support": -0.49817228347097486
+},
+"v4_udx_cggsx": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_cggsx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.24767056607094,
+"logm10_max_in_support": 0.6670476767903829
+},
+"v4_udx_cghsx": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_cghsx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.660636685573195,
+"logm10_max_in_support": -3.395460407879321
+},
+"v4_udx_cgsx": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_cgsx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -4.848711918828946,
+"logm10_max_in_support": 1.9529182461506491
+},
+"v4_udx_cgsxz": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_cgsxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.380489072543325,
+"logm10_max_in_support": -0.1764729331451259
+},
+"v4_udx_chhsx": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_chhsx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.891452733727624,
+"logm10_max_in_support": -7.7940481611167165
+},
+"v4_udx_chsx": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_chsx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.720187334361965,
+"logm10_max_in_support": -3.0252813689908034
+},
+"v4_udx_chsxz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_chsxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.288629110175405,
+"logm10_max_in_support": -4.553762205104082
+},
+"v4_udx_csx": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_csx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -4.561689341956314,
+"logm10_max_in_support": 1.8326225459089254
+},
+"v4_udx_csxvevex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_csxvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.668155925629753,
+"logm10_max_in_support": 0.421786343991026
+},
+"v4_udx_csxz": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_csxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.991424375455436,
+"logm10_max_in_support": 1.8058207630811534
+},
+"v4_udx_csxzz": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_csxzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.066276961154855,
+"logm10_max_in_support": -3.0966393797210228
+},
+"v4_udx_ddxdxu": {
+"n": 45001,
+"n_in_support": 44863,
+"file": "dsh_udx_ddxdxu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.237668061638181,
+"logm10_max_in_support": 4.985587531400014
+},
+"v4_udx_ddxepve": {
+"n": 45001,
+"n_in_support": 44940,
+"file": "dsh_udx_ddxepve_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.031780029581723,
+"logm10_max_in_support": 2.6949945289064914
+},
+"v4_udx_ddxgwp": {
+"n": 45001,
+"n_in_support": 44865,
+"file": "dsh_udx_ddxgwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.821853097247507,
+"logm10_max_in_support": 2.791299132150839
+},
+"v4_udx_ddxhwp": {
+"n": 45001,
+"n_in_support": 44900,
+"file": "dsh_udx_ddxhwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.164474783098424,
+"logm10_max_in_support": -2.7651225539562616
+},
+"v4_udx_ddxtapvt": {
+"n": 45001,
+"n_in_support": 44927,
+"file": "dsh_udx_ddxtapvt_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.26913222805261,
+"logm10_max_in_support": 2.885602996837778
+},
+"v4_udx_ddxwp": {
+"n": 45001,
+"n_in_support": 44917,
+"file": "dsh_udx_ddxwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.5109819603455,
+"logm10_max_in_support": 3.809320431999234
+},
+"v4_udx_dxepemu": {
+"n": 45001,
+"n_in_support": 44939,
+"file": "dsh_udx_dxepemu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.987376748043435,
+"logm10_max_in_support": 1.1133840703600928
+},
+"v4_udx_dxggu": {
+"n": 45001,
+"n_in_support": 44870,
+"file": "dsh_udx_dxggu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.796603724091193,
+"logm10_max_in_support": 6.242350672622897
+},
+"v4_udx_dxghu": {
+"n": 45001,
+"n_in_support": 44993,
+"file": "dsh_udx_dxghu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.551163503225439,
+"logm10_max_in_support": -1.3003710817026364
+},
+"v4_udx_dxgu": {
+"n": 45001,
+"n_in_support": 44939,
+"file": "dsh_udx_dxgu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -3.1052860179404553,
+"logm10_max_in_support": 7.361280342962426
+},
+"v4_udx_dxguz": {
+"n": 45001,
+"n_in_support": 44879,
+"file": "dsh_udx_dxguz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.944376682308686,
+"logm10_max_in_support": 1.8913720078913583
+},
+"v4_udx_dxhhu": {
+"n": 45001,
+"n_in_support": 44920,
+"file": "dsh_udx_dxhhu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.013591731612879,
+"logm10_max_in_support": -4.672496234917082
+},
+"v4_udx_dxhu": {
+"n": 45001,
+"n_in_support": 44990,
+"file": "dsh_udx_dxhu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.569600742624845,
+"logm10_max_in_support": 0.1259245412140144
+},
+"v4_udx_dxu": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_dxu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -0.021085248016304473,
+"logm10_max_in_support": 8.620606673418862
+},
+"v4_udx_dxuuux": {
+"n": 45001,
+"n_in_support": 44864,
+"file": "dsh_udx_dxuuux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.073159626458104,
+"logm10_max_in_support": 4.533981706181406
+},
+"v4_udx_dxuvevex": {
+"n": 45001,
+"n_in_support": 44943,
+"file": "dsh_udx_dxuvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.594009276652468,
+"logm10_max_in_support": 1.6869913354447037
+},
+"v4_udx_dxuz": {
+"n": 45001,
+"n_in_support": 44916,
+"file": "dsh_udx_dxuz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.755305169666494,
+"logm10_max_in_support": 3.246350091978629
+},
+"v4_udx_dxuzz": {
+"n": 45001,
+"n_in_support": 44864,
+"file": "dsh_udx_dxuzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.356483451024205,
+"logm10_max_in_support": -1.663699517871584
+},
+"v4_udx_epemgwp": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_udx_epemgwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.154140311544714,
+"logm10_max_in_support": -1.4566398973978663
+},
+"v4_udx_epemhwp": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_epemhwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.170965053410916,
+"logm10_max_in_support": -6.228496619533999
+},
+"v4_udx_epemmupvm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_epemmupvm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.971863413737198,
+"logm10_max_in_support": -1.2126071151744442
+},
+"v4_udx_epemtapvt": {
+"n": 45001,
+"n_in_support": 44997,
+"file": "dsh_udx_epemtapvt_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.902062184384791,
+"logm10_max_in_support": -1.0521551406656364
+},
+"v4_udx_epemwp": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_epemwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.518446268919902,
+"logm10_max_in_support": 0.5685658856698441
+},
+"v4_udx_epepemve": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_epepemve_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.477619744339846,
+"logm10_max_in_support": -1.0993241231332413
+},
+"v4_udx_epggve": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_epggve_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.465006733805179,
+"logm10_max_in_support": 0.6141057467888554
+},
+"v4_udx_epghve": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_epghve_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.96614207473524,
+"logm10_max_in_support": -4.105933012831097
+},
+"v4_udx_epgve": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_epgve_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.9261700241242865,
+"logm10_max_in_support": 1.6410018584598929
+},
+"v4_udx_epgvez": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_epgvez_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.231677776582698,
+"logm10_max_in_support": -0.7912816290240361
+},
+"v4_udx_ephvez": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_ephvez_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.078258468039554,
+"logm10_max_in_support": -5.026504564663471
+},
+"v4_udx_epuuxve": {
+"n": 45001,
+"n_in_support": 44981,
+"file": "dsh_udx_epuuxve_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.134301454187923,
+"logm10_max_in_support": 2.6266772809379506
+},
+"v4_udx_epvevevex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_epvevevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.358088902726763,
+"logm10_max_in_support": -0.980707368131056
+},
+"v4_udx_epvez": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_epvez_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.73569681342383,
+"logm10_max_in_support": 1.0871869556789766
+},
+"v4_udx_epvezz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_epvezz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.559794334877482,
+"logm10_max_in_support": -3.597288982823332
+},
+"v4_udx_gghwp": {
+"n": 45001,
+"n_in_support": 44997,
+"file": "dsh_udx_gghwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.962798485007104,
+"logm10_max_in_support": -3.897157913782918
+},
+"v4_udx_ggtapvt": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_ggtapvt_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.206451949246478,
+"logm10_max_in_support": 0.7414009649199685
+},
+"v4_udx_ggwp": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_udx_ggwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -4.7980935036364265,
+"logm10_max_in_support": 2.2833548320856414
+},
+"v4_udx_ggwpz": {
+"n": 45001,
+"n_in_support": 44993,
+"file": "dsh_udx_ggwpz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.775923850082503,
+"logm10_max_in_support": -1.2000345663465788
+},
+"v4_udx_ghhwp": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_udx_ghhwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.720446364974842,
+"logm10_max_in_support": -8.039549101606697
+},
+"v4_udx_ghtapvt": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_ghtapvt_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.884278879050877,
+"logm10_max_in_support": -4.036201967524211
+},
+"v4_udx_ghwp": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_udx_ghwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.919693263537244,
+"logm10_max_in_support": -2.6543544852184664
+},
+"v4_udx_ghwpz": {
+"n": 45001,
+"n_in_support": 44996,
+"file": "dsh_udx_ghwpz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.682231290750133,
+"logm10_max_in_support": -5.876697525563544
+},
+"v4_udx_gssxwp": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_gssxwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.716816434222196,
+"logm10_max_in_support": -1.1278032745324984
+},
+"v4_udx_gtaptamwp": {
+"n": 45001,
+"n_in_support": 44997,
+"file": "dsh_udx_gtaptamwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.388727236936166,
+"logm10_max_in_support": -1.7027568067519367
+},
+"v4_udx_gtapvt": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_gtapvt_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.615216882716796,
+"logm10_max_in_support": 1.4054305326701733
+},
+"v4_udx_guuxwp": {
+"n": 45001,
+"n_in_support": 44958,
+"file": "dsh_udx_guuxwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.293095825261268,
+"logm10_max_in_support": 2.442930024358787
+},
+"v4_udx_gvevexwp": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_gvevexwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.712352679227267,
+"logm10_max_in_support": -0.5364705087051557
+},
+"v4_udx_gwp": {
+"n": 45001,
+"n_in_support": 44275,
+"file": "dsh_udx_gwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -0.6109341288892438,
+"logm10_max_in_support": 2.71874405074529
+},
+"v4_udx_gwpwpwm": {
+"n": 45001,
+"n_in_support": 44997,
+"file": "dsh_udx_gwpwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.00682229639144,
+"logm10_max_in_support": -3.193647931172894
+},
+"v4_udx_gwpz": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_udx_gwpz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.3226393225745126,
+"logm10_max_in_support": 0.6586115136928347
+},
+"v4_udx_hhhwp": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_hhhwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -16.828292173863527,
+"logm10_max_in_support": -11.94969732438032
+},
+"v4_udx_hhtapvt": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_hhtapvt_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -16.00957624067702,
+"logm10_max_in_support": -8.275468050477537
+},
+"v4_udx_hhwp": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_hhwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.93485706303782,
+"logm10_max_in_support": -7.2192488942260535
+},
+"v4_udx_hhwpz": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_hhwpz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.279188177712319,
+"logm10_max_in_support": -10.102922774571248
+},
+"v4_udx_hssxwp": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_hssxwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.207161404173926,
+"logm10_max_in_support": -5.173206088076718
+},
+"v4_udx_htaptamwp": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_udx_htaptamwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.799086571145924,
+"logm10_max_in_support": -6.077475245797818
+},
+"v4_udx_htapvt": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_htapvt_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.681444353674253,
+"logm10_max_in_support": -3.5080549754621067
+},
+"v4_udx_htapvtz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_htapvtz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.721732323151008,
+"logm10_max_in_support": -4.836787183041065
+},
+"v4_udx_huuxwp": {
+"n": 45001,
+"n_in_support": 44949,
+"file": "dsh_udx_huuxwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.929035164308866,
+"logm10_max_in_support": -3.049505327233803
+},
+"v4_udx_hvevexwp": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_hvevexwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.665590184101221,
+"logm10_max_in_support": -5.262385838242933
+},
+"v4_udx_hwp": {
+"n": 45001,
+"n_in_support": 44945,
+"file": "dsh_udx_hwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -4.051817870113828,
+"logm10_max_in_support": -2.4906818064587872
+},
+"v4_udx_hwpwpwm": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_hwpwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.812154134452522,
+"logm10_max_in_support": -8.069949946359644
+},
+"v4_udx_hwpz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_hwpz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.3144887702621,
+"logm10_max_in_support": -3.5469566500545455
+},
+"v4_udx_hwpzz": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_udx_hwpzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.082299711818166,
+"logm10_max_in_support": -8.084139264133139
+},
+"v4_udx_mupvevexvm": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_mupvevexvm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.994726487469768,
+"logm10_max_in_support": 0.02907092837381291
+},
+"v4_udx_taptamwp": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_udx_taptamwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.333178206993209,
+"logm10_max_in_support": 0.7918205853055746
+},
+"v4_udx_taptamwpz": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_taptamwpz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.30022009307795,
+"logm10_max_in_support": -4.181867915839859
+},
+"v4_udx_tapuuxvt": {
+"n": 45001,
+"n_in_support": 44971,
+"file": "dsh_udx_tapuuxvt_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.368761534171972,
+"logm10_max_in_support": 2.4424662141327946
+},
+"v4_udx_tapvevexvt": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_tapvevexvt_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.994449598581486,
+"logm10_max_in_support": -0.5091827325817296
+},
+"v4_udx_tapvt": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_tapvt_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -4.643450456118324,
+"logm10_max_in_support": 1.3552388315695423
+},
+"v4_udx_tapvtz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_tapvtz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.181747648627365,
+"logm10_max_in_support": 0.9715335716198397
+},
+"v4_udx_vevexwp": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_vevexwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.04615013657495,
+"logm10_max_in_support": 1.2232492039142628
+},
+"v4_udx_wpwpwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_wpwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.14739519322277,
+"logm10_max_in_support": -0.6316108516143942
+},
+"v4_udx_wpwpwmz": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_udx_wpwpwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.652552471369313,
+"logm10_max_in_support": -6.719986485150105
+},
+"v4_udx_wpz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_wpz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -3.0590932763749707,
+"logm10_max_in_support": 2.771480535171078
+},
+"v4_udx_wpzz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_udx_wpzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.507079614302581,
+"logm10_max_in_support": -1.9686628605984997
+},
+"v4_ug_aadwp": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_ug_aadwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.934662382710963,
+"logm10_max_in_support": -4.120998861961916
+},
+"v4_ug_accxu": {
+"n": 45001,
+"n_in_support": 44989,
+"file": "dsh_ug_accxu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.836474546674523,
+"logm10_max_in_support": 3.6511069140961148
+},
+"v4_ug_acdsx": {
+"n": 45001,
+"n_in_support": 44994,
+"file": "dsh_ug_acdsx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.213204212365202,
+"logm10_max_in_support": -0.5724252086404648
+},
+"v4_ug_addxu": {
+"n": 45001,
+"n_in_support": 44991,
+"file": "dsh_ug_addxu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.064504615419404,
+"logm10_max_in_support": 3.3897927831178998
+},
+"v4_ug_adepve": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ug_adepve_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.840955928286482,
+"logm10_max_in_support": -1.0383274802538454
+},
+"v4_ug_adgwp": {
+"n": 45001,
+"n_in_support": 44968,
+"file": "dsh_ug_adgwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.709845699686403,
+"logm10_max_in_support": -0.17152313582939135
+},
+"v4_ug_adhwp": {
+"n": 45001,
+"n_in_support": 44996,
+"file": "dsh_ug_adhwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.788673499565405,
+"logm10_max_in_support": -6.383351988052118
+},
+"v4_ug_adwp": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ug_adwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.9609912878469355,
+"logm10_max_in_support": -0.8094352586279697
+},
+"v4_ug_adwpz": {
+"n": 45001,
+"n_in_support": 44990,
+"file": "dsh_ug_adwpz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.674154447096942,
+"logm10_max_in_support": -3.9458802377154476
+},
+"v4_ug_aepemu": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ug_aepemu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.295920006474148,
+"logm10_max_in_support": -2.447239216866012
+},
+"v4_ug_ataptamu": {
+"n": 45001,
+"n_in_support": 44986,
+"file": "dsh_ug_ataptamu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.919038815257627,
+"logm10_max_in_support": -2.3059496724658985
+},
+"v4_ug_auuux": {
+"n": 45001,
+"n_in_support": 44988,
+"file": "dsh_ug_auuux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.921213984460707,
+"logm10_max_in_support": 2.7433028545320606
+},
+"v4_ug_auwpwm": {
+"n": 45001,
+"n_in_support": 44997,
+"file": "dsh_ug_auwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.599167060853729,
+"logm10_max_in_support": -3.616683562435701
+},
+"v4_ug_bbxdwp": {
+"n": 45001,
+"n_in_support": 44968,
+"file": "dsh_ug_bbxdwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.26238368902583,
+"logm10_max_in_support": 1.4633802881852518
+},
+"v4_ug_bbxuz": {
+"n": 45001,
+"n_in_support": 44956,
+"file": "dsh_ug_bbxuz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.414530634741435,
+"logm10_max_in_support": 1.0816809733447303
+},
+"v4_ug_ccxgu": {
+"n": 45001,
+"n_in_support": 44956,
+"file": "dsh_ug_ccxgu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.8662216491707,
+"logm10_max_in_support": 5.468483123351229
+},
+"v4_ug_ccxhu": {
+"n": 45001,
+"n_in_support": 44893,
+"file": "dsh_ug_ccxhu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.780646767025411,
+"logm10_max_in_support": -2.887544415366451
+},
+"v4_ug_ccxu": {
+"n": 45001,
+"n_in_support": 44994,
+"file": "dsh_ug_ccxu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -4.243899261424493,
+"logm10_max_in_support": 6.3851500061045385
+},
+"v4_ug_ccxuz": {
+"n": 45001,
+"n_in_support": 44973,
+"file": "dsh_ug_ccxuz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.487894064496441,
+"logm10_max_in_support": 1.4045706427371463
+},
+"v4_ug_cdsxz": {
+"n": 45001,
+"n_in_support": 44973,
+"file": "dsh_ug_cdsxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.855806595974649,
+"logm10_max_in_support": -1.4834050203275548
+},
+"v4_ug_ddxuz": {
+"n": 45001,
+"n_in_support": 44959,
+"file": "dsh_ug_ddxuz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.102863121684404,
+"logm10_max_in_support": 1.1627950752665481
+},
+"v4_ug_depemwp": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_ug_depemwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.478844187489008,
+"logm10_max_in_support": -2.7116260372320027
+},
+"v4_ug_depvez": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_ug_depvez_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.68187190541283,
+"logm10_max_in_support": -2.392770840740029
+},
+"v4_ug_dgwpz": {
+"n": 45001,
+"n_in_support": 44936,
+"file": "dsh_ug_dgwpz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.700360528908478,
+"logm10_max_in_support": -1.6032243137897415
+},
+"v4_ug_dhwpz": {
+"n": 45001,
+"n_in_support": 44981,
+"file": "dsh_ug_dhwpz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.5064324486589,
+"logm10_max_in_support": -6.977821740307333
+},
+"v4_ug_dtapvt": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_ug_dtapvt_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.944623716553171,
+"logm10_max_in_support": 1.2819542083140585
+},
+"v4_ug_dvevexwp": {
+"n": 45001,
+"n_in_support": 44996,
+"file": "dsh_ug_dvevexwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.516073323073513,
+"logm10_max_in_support": -2.4326913443682945
+},
+"v4_ug_dwpz": {
+"n": 45001,
+"n_in_support": 44996,
+"file": "dsh_ug_dwpz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.994753702459161,
+"logm10_max_in_support": -0.6088791773648728
+},
+"v4_ug_dwpzz": {
+"n": 45001,
+"n_in_support": 44991,
+"file": "dsh_ug_dwpzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.04702787242661,
+"logm10_max_in_support": -5.634255416839714
+},
+"v4_ug_epemgu": {
+"n": 45001,
+"n_in_support": 44973,
+"file": "dsh_ug_epemgu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.12987518572099,
+"logm10_max_in_support": 1.6314484130549556
+},
+"v4_ug_epemhu": {
+"n": 45001,
+"n_in_support": 44995,
+"file": "dsh_ug_epemhu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.66360321352264,
+"logm10_max_in_support": -5.364438300405323
+},
+"v4_ug_epemu": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ug_epemu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.569767403771281,
+"logm10_max_in_support": -0.029605074061757553
+},
+"v4_ug_epemuz": {
+"n": 45001,
+"n_in_support": 44994,
+"file": "dsh_ug_epemuz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.204751608517935,
+"logm10_max_in_support": -4.016950551359298
+},
+"v4_ug_guuux": {
+"n": 45001,
+"n_in_support": 44949,
+"file": "dsh_ug_guuux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.8028926205444264,
+"logm10_max_in_support": 5.111589454858632
+},
+"v4_ug_htaptamu": {
+"n": 45001,
+"n_in_support": 44997,
+"file": "dsh_ug_htaptamu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -16.57745428777418,
+"logm10_max_in_support": -5.384687730229908
+},
+"v4_ug_huuux": {
+"n": 45001,
+"n_in_support": 44901,
+"file": "dsh_ug_huuux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.076375194780596,
+"logm10_max_in_support": -3.594339686211255
+},
+"v4_ug_huwpwm": {
+"n": 45001,
+"n_in_support": 44986,
+"file": "dsh_ug_huwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.745607822375273,
+"logm10_max_in_support": -6.3767498989974865
+},
+"v4_ug_taptamu": {
+"n": 45001,
+"n_in_support": 44997,
+"file": "dsh_ug_taptamu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.507034809172367,
+"logm10_max_in_support": 0.14770780530880281
+},
+"v4_ug_taptamuz": {
+"n": 45001,
+"n_in_support": 44989,
+"file": "dsh_ug_taptamuz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.341502737954423,
+"logm10_max_in_support": -3.1120991889469796
+},
+"v4_ug_uuux": {
+"n": 45001,
+"n_in_support": 44992,
+"file": "dsh_ug_uuux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -4.05591376184395,
+"logm10_max_in_support": 6.153925472804043
+},
+"v4_ug_uuuxz": {
+"n": 45001,
+"n_in_support": 44958,
+"file": "dsh_ug_uuuxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.772496191737181,
+"logm10_max_in_support": 0.3182496371129319
+},
+"v4_ug_uvevex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_ug_uvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.5618792475472265,
+"logm10_max_in_support": 0.15626035688230103
+},
+"v4_ug_uwpwmz": {
+"n": 45001,
+"n_in_support": 44997,
+"file": "dsh_ug_uwpwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.039996270206005,
+"logm10_max_in_support": -4.8248207321886785
+},
+"v4_ug_uzzz": {
+"n": 45001,
+"n_in_support": 44977,
+"file": "dsh_ug_uzzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.024389829524718,
+"logm10_max_in_support": -6.955367019528417
+},
+"v4_us_aacd": {
+"n": 45001,
+"n_in_support": 44979,
+"file": "dsh_us_aacd_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.743792099517023,
+"logm10_max_in_support": 0.05912562589938734
+},
+"v4_us_acd": {
+"n": 45001,
+"n_in_support": 44994,
+"file": "dsh_us_acd_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.370391071147031,
+"logm10_max_in_support": 2.7514772548970288
+},
+"v4_us_acdg": {
+"n": 45001,
+"n_in_support": 44987,
+"file": "dsh_us_acdg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.02793799145939,
+"logm10_max_in_support": 2.0789694841880904
+},
+"v4_us_acdh": {
+"n": 45001,
+"n_in_support": 44887,
+"file": "dsh_us_acdh_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.061796704491428,
+"logm10_max_in_support": -1.2502951498076726
+},
+"v4_us_acdz": {
+"n": 45001,
+"n_in_support": 44973,
+"file": "dsh_us_acdz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.312516805915461,
+"logm10_max_in_support": -1.1630942097407033
+},
+"v4_us_bbxcd": {
+"n": 45001,
+"n_in_support": 44996,
+"file": "dsh_us_bbxcd_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.142148701357163,
+"logm10_max_in_support": 0.2222088442785376
+},
+"v4_us_bbxsu": {
+"n": 45001,
+"n_in_support": 44901,
+"file": "dsh_us_bbxsu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.7661092076015805,
+"logm10_max_in_support": 5.052731387467514
+},
+"v4_us_cd": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_us_cd_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -3.7772100366513284,
+"logm10_max_in_support": 5.425427417299546
+},
+"v4_us_cdddx": {
+"n": 45001,
+"n_in_support": 44997,
+"file": "dsh_us_cdddx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.503865601203591,
+"logm10_max_in_support": 0.28592960344239193
+},
+"v4_us_cdepem": {
+"n": 45001,
+"n_in_support": 44982,
+"file": "dsh_us_cdepem_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.54236547655343,
+"logm10_max_in_support": -1.0042245418185787
+},
+"v4_us_cdg": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_us_cdg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.527004387299807,
+"logm10_max_in_support": 3.773062539779411
+},
+"v4_us_cdgg": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_us_cdgg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.431582859480129,
+"logm10_max_in_support": 2.289837709231053
+},
+"v4_us_cdgh": {
+"n": 45001,
+"n_in_support": 44918,
+"file": "dsh_us_cdgh_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.731001275634254,
+"logm10_max_in_support": 0.22123848490579753
+},
+"v4_us_cdgz": {
+"n": 45001,
+"n_in_support": 44972,
+"file": "dsh_us_cdgz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.779101434171306,
+"logm10_max_in_support": -0.05884856249092097
+},
+"v4_us_cdh": {
+"n": 45001,
+"n_in_support": 44921,
+"file": "dsh_us_cdh_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.960629493553093,
+"logm10_max_in_support": 1.1495300549016345
+},
+"v4_us_cdhh": {
+"n": 45001,
+"n_in_support": 44694,
+"file": "dsh_us_cdhh_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.01422785173658,
+"logm10_max_in_support": -3.4874500749517137
+},
+"v4_us_cdhz": {
+"n": 45001,
+"n_in_support": 44853,
+"file": "dsh_us_cdhz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.526391962462178,
+"logm10_max_in_support": -3.3530561981659073
+},
+"v4_us_cduux": {
+"n": 45001,
+"n_in_support": 44971,
+"file": "dsh_us_cduux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.047868848042885,
+"logm10_max_in_support": 3.2655819396449797
+},
+"v4_us_cdvevex": {
+"n": 45001,
+"n_in_support": 44986,
+"file": "dsh_us_cdvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.27514420074631,
+"logm10_max_in_support": -0.7029953623964493
+},
+"v4_us_cdzz": {
+"n": 45001,
+"n_in_support": 44949,
+"file": "dsh_us_cdzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.476658455186547,
+"logm10_max_in_support": -3.0194066292361152
+},
+"v4_us_cuwm": {
+"n": 45001,
+"n_in_support": 44976,
+"file": "dsh_us_cuwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.893972816142478,
+"logm10_max_in_support": 3.599270537665681
+},
+"v4_us_ddxsu": {
+"n": 45001,
+"n_in_support": 44877,
+"file": "dsh_us_ddxsu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.478972737711702,
+"logm10_max_in_support": 5.032136018306032
+},
+"v4_us_hsu": {
+"n": 45001,
+"n_in_support": 44933,
+"file": "dsh_us_hsu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.570719342165539,
+"logm10_max_in_support": 0.4553955690664268
+},
+"v4_usx_bbxsxu": {
+"n": 45001,
+"n_in_support": 44899,
+"file": "dsh_usx_bbxsxu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.3124313066475475,
+"logm10_max_in_support": 4.916945750970907
+},
+"v4_usx_cxuwp": {
+"n": 45001,
+"n_in_support": 44972,
+"file": "dsh_usx_cxuwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.135047610305549,
+"logm10_max_in_support": 3.7924885297092326
+},
+"v4_usx_ghsxu": {
+"n": 45001,
+"n_in_support": 44943,
+"file": "dsh_usx_ghsxu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.287254391719507,
+"logm10_max_in_support": -0.5664225289630526
+},
+"v4_usx_hhsxu": {
+"n": 45001,
+"n_in_support": 44765,
+"file": "dsh_usx_hhsxu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -16.08873728679316,
+"logm10_max_in_support": -4.399406405769346
+},
+"v4_usx_hsxu": {
+"n": 45001,
+"n_in_support": 44938,
+"file": "dsh_usx_hsxu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.301854701666933,
+"logm10_max_in_support": 0.15598454598376474
+},
+"v4_uu_aauu": {
+"n": 45001,
+"n_in_support": 44880,
+"file": "dsh_uu_aauu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.206696857896429,
+"logm10_max_in_support": 2.496876136350449
+},
+"v4_uu_aduwp": {
+"n": 45001,
+"n_in_support": 44752,
+"file": "dsh_uu_aduwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.512332176168417,
+"logm10_max_in_support": 1.4567929519598726
+},
+"v4_uu_aguu": {
+"n": 45001,
+"n_in_support": 44761,
+"file": "dsh_uu_aguu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.146620164518293,
+"logm10_max_in_support": 4.730536587405107
+},
+"v4_uu_ahuu": {
+"n": 45001,
+"n_in_support": 44689,
+"file": "dsh_uu_ahuu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.129884381155694,
+"logm10_max_in_support": -2.695642885497119
+},
+"v4_uu_auuz": {
+"n": 45001,
+"n_in_support": 44713,
+"file": "dsh_uu_auuz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.74050879251278,
+"logm10_max_in_support": 0.7411403160045369
+},
+"v4_uu_bbxuu": {
+"n": 45001,
+"n_in_support": 44451,
+"file": "dsh_uu_bbxuu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.420281969399458,
+"logm10_max_in_support": 4.873024922270901
+},
+"v4_uu_ddxuu": {
+"n": 45001,
+"n_in_support": 44479,
+"file": "dsh_uu_ddxuu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.901461197678323,
+"logm10_max_in_support": 4.8433105405957635
+},
+"v4_uu_dhuwp": {
+"n": 45001,
+"n_in_support": 44536,
+"file": "dsh_uu_dhuwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.024725939893797,
+"logm10_max_in_support": -2.693928622884596
+},
+"v4_uu_duwpz": {
+"n": 45001,
+"n_in_support": 44626,
+"file": "dsh_uu_duwpz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.440039316769031,
+"logm10_max_in_support": -1.119694054268606
+},
+"v4_uu_epemuu": {
+"n": 45001,
+"n_in_support": 44751,
+"file": "dsh_uu_epemuu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.771134653797812,
+"logm10_max_in_support": 1.1270470190413933
+},
+"v4_uu_gguu": {
+"n": 45001,
+"n_in_support": 44488,
+"file": "dsh_uu_gguu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.262435483992983,
+"logm10_max_in_support": 6.229634429783767
+},
+"v4_uu_ghuu": {
+"n": 45001,
+"n_in_support": 44704,
+"file": "dsh_uu_ghuu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.683603767640587,
+"logm10_max_in_support": -0.8417439932379833
+},
+"v4_uu_guu": {
+"n": 45001,
+"n_in_support": 44723,
+"file": "dsh_uu_guu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -3.035417634776731,
+"logm10_max_in_support": 7.3698376350409465
+},
+"v4_uu_guuz": {
+"n": 45001,
+"n_in_support": 44560,
+"file": "dsh_uu_guuz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.672658095003497,
+"logm10_max_in_support": 2.032808427141443
+},
+"v4_uu_hhuu": {
+"n": 45001,
+"n_in_support": 44179,
+"file": "dsh_uu_hhuu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -16.315504754391043,
+"logm10_max_in_support": -4.723890341907977
+},
+"v4_uu_huuz": {
+"n": 45001,
+"n_in_support": 44449,
+"file": "dsh_uu_huuz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.270975063827223,
+"logm10_max_in_support": -3.4704407436848443
+},
+"v4_uu_uu": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uu_uu_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": 0.5427323722315871,
+"logm10_max_in_support": 8.327850296108338
+},
+"v4_uu_uuuux": {
+"n": 45001,
+"n_in_support": 44482,
+"file": "dsh_uu_uuuux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.740573495996453,
+"logm10_max_in_support": 4.469611726423163
+},
+"v4_uu_uuvevex": {
+"n": 45001,
+"n_in_support": 44759,
+"file": "dsh_uu_uuvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.07511108589347,
+"logm10_max_in_support": 1.4597528929093078
+},
+"v4_uu_uuz": {
+"n": 45001,
+"n_in_support": 44709,
+"file": "dsh_uu_uuz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.849599436122678,
+"logm10_max_in_support": 3.203067974604599
+},
+"v4_uu_uuzz": {
+"n": 45001,
+"n_in_support": 44523,
+"file": "dsh_uu_uuzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.67978979554749,
+"logm10_max_in_support": -2.4945457853723054
+},
+"v4_uux_aabbx": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_aabbx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.93195260496718,
+"logm10_max_in_support": -3.785628075817989
+},
+"v4_uux_aaddx": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_uux_aaddx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.67408325476122,
+"logm10_max_in_support": -0.9082577917053748
+},
+"v4_uux_aaepem": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_aaepem_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.462196566027199,
+"logm10_max_in_support": -3.646450188285222
+},
+"v4_uux_aavevex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_aavevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.124500343088426,
+"logm10_max_in_support": -4.224289364806413
+},
+"v4_uux_aawpwm": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_uux_aawpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.540254073936195,
+"logm10_max_in_support": -4.618129480866917
+},
+"v4_uux_abbx": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_abbx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.061510492225979,
+"logm10_max_in_support": -0.19736404827612353
+},
+"v4_uux_abbxg": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_abbxg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.403260881323437,
+"logm10_max_in_support": -1.7895165050853092
+},
+"v4_uux_abbxz": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_uux_abbxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.056504355787814,
+"logm10_max_in_support": -2.8764607388553936
+},
+"v4_uux_accxg": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_accxg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.41869219795265,
+"logm10_max_in_support": -1.7867226956751814
+},
+"v4_uux_accxz": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_uux_accxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.120727106186024,
+"logm10_max_in_support": -3.042865070567978
+},
+"v4_uux_acsxwm": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_uux_acsxwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.148396676296818,
+"logm10_max_in_support": -1.511664975696547
+},
+"v4_uux_addx": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_addx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.794041865544898,
+"logm10_max_in_support": 1.624194067369576
+},
+"v4_uux_addxg": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_uux_addxg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.075466533439505,
+"logm10_max_in_support": 1.034070939658835
+},
+"v4_uux_addxh": {
+"n": 45001,
+"n_in_support": 44878,
+"file": "dsh_uux_addxh_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.670066623509324,
+"logm10_max_in_support": -1.449549259298128
+},
+"v4_uux_addxz": {
+"n": 45001,
+"n_in_support": 44991,
+"file": "dsh_uux_addxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.179739741012355,
+"logm10_max_in_support": -1.5724388137851109
+},
+"v4_uux_aduxwp": {
+"n": 45001,
+"n_in_support": 44926,
+"file": "dsh_uux_aduxwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.863918165411366,
+"logm10_max_in_support": 0.534079088213063
+},
+"v4_uux_aepem": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_aepem_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.290807904848554,
+"logm10_max_in_support": -1.280728396334994
+},
+"v4_uux_aepemg": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_aepemg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.521291025904286,
+"logm10_max_in_support": -2.32537933713551
+},
+"v4_uux_aepemh": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_aepemh_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.134287659094436,
+"logm10_max_in_support": -6.1923270688608945
+},
+"v4_uux_aepemz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_aepemz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.341675175607513,
+"logm10_max_in_support": -3.104870055245047
+},
+"v4_uux_aepvewm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_aepvewm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.939433163475837,
+"logm10_max_in_support": -0.9618055219467788
+},
+"v4_uux_agtaptam": {
+"n": 45001,
+"n_in_support": 44987,
+"file": "dsh_uux_agtaptam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.065953817205834,
+"logm10_max_in_support": -2.350910844245495
+},
+"v4_uux_aguux": {
+"n": 45001,
+"n_in_support": 44958,
+"file": "dsh_uux_aguux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.962193407396061,
+"logm10_max_in_support": 4.387277422574673
+},
+"v4_uux_agvevex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_agvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.365287894829535,
+"logm10_max_in_support": -2.1576464442765055
+},
+"v4_uux_agwpwm": {
+"n": 45001,
+"n_in_support": 44993,
+"file": "dsh_uux_agwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.088356087574542,
+"logm10_max_in_support": -2.987272123442961
+},
+"v4_uux_ahtaptam": {
+"n": 45001,
+"n_in_support": 44992,
+"file": "dsh_uux_ahtaptam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -16.39543338261921,
+"logm10_max_in_support": -6.232930594840409
+},
+"v4_uux_ahuux": {
+"n": 45001,
+"n_in_support": 44974,
+"file": "dsh_uux_ahuux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.97705186774578,
+"logm10_max_in_support": -2.5380712631788125
+},
+"v4_uux_ahwpwm": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_uux_ahwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.89866957455026,
+"logm10_max_in_support": -7.55792712305753
+},
+"v4_uux_ataptam": {
+"n": 45001,
+"n_in_support": 44992,
+"file": "dsh_uux_ataptam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.670799744387303,
+"logm10_max_in_support": -1.4932474283885546
+},
+"v4_uux_ataptamz": {
+"n": 45001,
+"n_in_support": 44993,
+"file": "dsh_uux_ataptamz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.262596575936815,
+"logm10_max_in_support": -3.2067614420714703
+},
+"v4_uux_atapvtwm": {
+"n": 45001,
+"n_in_support": 44993,
+"file": "dsh_uux_atapvtwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.736320041314977,
+"logm10_max_in_support": -1.7241175308949503
+},
+"v4_uux_auux": {
+"n": 45001,
+"n_in_support": 44996,
+"file": "dsh_uux_auux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -4.593323474871917,
+"logm10_max_in_support": 5.474677748454945
+},
+"v4_uux_auuxz": {
+"n": 45001,
+"n_in_support": 44954,
+"file": "dsh_uux_auuxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.331960435899775,
+"logm10_max_in_support": 0.13695479847024702
+},
+"v4_uux_avevex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_avevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.0426401163412,
+"logm10_max_in_support": -0.8472047310905955
+},
+"v4_uux_avevexz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_avevexz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.722598343505329,
+"logm10_max_in_support": -3.8512985765936225
+},
+"v4_uux_awpwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_awpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.060922094446132,
+"logm10_max_in_support": -1.2788633652276482
+},
+"v4_uux_awpwmz": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_uux_awpwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.589695632016694,
+"logm10_max_in_support": -5.529751873200732
+},
+"v4_uux_bbbxbx": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_uux_bbbxbx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.009917664341122,
+"logm10_max_in_support": -1.7176673882045788
+},
+"v4_uux_bbxgz": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_uux_bbxgz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.50568424577559,
+"logm10_max_in_support": -1.3633445955269867
+},
+"v4_uux_bbxtaptam": {
+"n": 45001,
+"n_in_support": 44993,
+"file": "dsh_uux_bbxtaptam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.128266330426456,
+"logm10_max_in_support": -2.336750405955553
+},
+"v4_uux_bbxwpwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_bbxwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.955000180875873,
+"logm10_max_in_support": -1.349158393261173
+},
+"v4_uux_bbxz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_bbxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.374947397134335,
+"logm10_max_in_support": 0.5013024115816731
+},
+"v4_uux_bbxzz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_bbxzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.481664598986223,
+"logm10_max_in_support": -3.676978817756925
+},
+"v4_uux_ccxg": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_ccxg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -4.395904708948784,
+"logm10_max_in_support": 0.867706357704113
+},
+"v4_uux_ccxgg": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_ccxgg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.7717708999924575,
+"logm10_max_in_support": 0.7245771523683348
+},
+"v4_uux_ccxgh": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_uux_ccxgh_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.92678718124355,
+"logm10_max_in_support": -4.3919146639340925
+},
+"v4_uux_ccxh": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_ccxh_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.862241673820325,
+"logm10_max_in_support": -3.973911964151442
+},
+"v4_uux_ccxhh": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_ccxhh_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.85108143132915,
+"logm10_max_in_support": -8.685899114615616
+},
+"v4_uux_ccxhz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_ccxhz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.046799133118265,
+"logm10_max_in_support": -5.786025420944202
+},
+"v4_uux_chsxwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_chsxwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.406588557806913,
+"logm10_max_in_support": -4.363729815945449
+},
+"v4_uux_csxwmz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_csxwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.251715645680898,
+"logm10_max_in_support": -2.79401409071053
+},
+"v4_uux_ddxgz": {
+"n": 45001,
+"n_in_support": 44995,
+"file": "dsh_uux_ddxgz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.820484466560448,
+"logm10_max_in_support": -0.2783254282554096
+},
+"v4_uux_ddxtaptam": {
+"n": 45001,
+"n_in_support": 44992,
+"file": "dsh_uux_ddxtaptam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.96345468994311,
+"logm10_max_in_support": 0.8983624385760864
+},
+"v4_uux_ddxwpwm": {
+"n": 45001,
+"n_in_support": 44996,
+"file": "dsh_uux_ddxwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.375226197690255,
+"logm10_max_in_support": -0.906838109294168
+},
+"v4_uux_ddxz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_ddxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.460906614362884,
+"logm10_max_in_support": 1.1137550132948966
+},
+"v4_uux_ddxzz": {
+"n": 45001,
+"n_in_support": 44978,
+"file": "dsh_uux_ddxzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.29676747734056,
+"logm10_max_in_support": -3.2076504136400747
+},
+"v4_uux_dguxwp": {
+"n": 45001,
+"n_in_support": 44837,
+"file": "dsh_uux_dguxwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.510655008305974,
+"logm10_max_in_support": 2.432453502108983
+},
+"v4_uux_dhuxwp": {
+"n": 45001,
+"n_in_support": 44835,
+"file": "dsh_uux_dhuxwp_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.564618673300743,
+"logm10_max_in_support": -2.473713793173293
+},
+"v4_uux_duxwpz": {
+"n": 45001,
+"n_in_support": 44811,
+"file": "dsh_uux_duxwpz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.607606748840553,
+"logm10_max_in_support": -1.6578256977605936
+},
+"v4_uux_epemg": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_epemg_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.291553919159151,
+"logm10_max_in_support": 0.08599306638292609
+},
+"v4_uux_epemgh": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_uux_epemgh_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.70335274889453,
+"logm10_max_in_support": -5.31899935091949
+},
+"v4_uux_epemgz": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_uux_epemgz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.432987615095907,
+"logm10_max_in_support": -2.477506749849134
+},
+"v4_uux_epemhz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_epemhz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.258524231222852,
+"logm10_max_in_support": -6.507734221922646
+},
+"v4_uux_epemtaptam": {
+"n": 45001,
+"n_in_support": 44995,
+"file": "dsh_uux_epemtaptam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.66224221937869,
+"logm10_max_in_support": -2.983795501580837
+},
+"v4_uux_epemuux": {
+"n": 45001,
+"n_in_support": 44970,
+"file": "dsh_uux_epemuux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.970185949416303,
+"logm10_max_in_support": 1.853533831788494
+},
+"v4_uux_epemvevex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_epemvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.878742675002156,
+"logm10_max_in_support": -0.24923346552673864
+},
+"v4_uux_epemvmvmx": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_epemvmvmx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.725622957218132,
+"logm10_max_in_support": -2.26396908226667
+},
+"v4_uux_epemwpwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_epemwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.652327049051465,
+"logm10_max_in_support": -4.112979370697485
+},
+"v4_uux_epemz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_epemz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.19527699170514,
+"logm10_max_in_support": -0.32108893471873234
+},
+"v4_uux_epemzz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_epemzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.77190400924483,
+"logm10_max_in_support": -4.694814509919275
+},
+"v4_uux_ephvewm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_ephvewm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.066668385180607,
+"logm10_max_in_support": -4.864946145721083
+},
+"v4_uux_epvewm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_epvewm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.6676024678921335,
+"logm10_max_in_support": 1.1158789687494284
+},
+"v4_uux_epvewmz": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_uux_epvewmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.746125518321392,
+"logm10_max_in_support": -2.6869579276992503
+},
+"v4_uux_ggtaptam": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_uux_ggtaptam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.043299368997648,
+"logm10_max_in_support": -0.9147174815636491
+},
+"v4_uux_gguux": {
+"n": 45001,
+"n_in_support": 44899,
+"file": "dsh_uux_gguux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.142648104287517,
+"logm10_max_in_support": 6.148134790714844
+},
+"v4_uux_ggvevex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_ggvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.197093014500782,
+"logm10_max_in_support": -0.6549785727590699
+},
+"v4_uux_ggwpwm": {
+"n": 45001,
+"n_in_support": 44996,
+"file": "dsh_uux_ggwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.238975906668806,
+"logm10_max_in_support": -0.9052096492622885
+},
+"v4_uux_ghtaptam": {
+"n": 45001,
+"n_in_support": 44996,
+"file": "dsh_uux_ghtaptam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.883008462682767,
+"logm10_max_in_support": -5.088499266381563
+},
+"v4_uux_ghuux": {
+"n": 45001,
+"n_in_support": 44962,
+"file": "dsh_uux_ghuux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.990526575901558,
+"logm10_max_in_support": -0.9375778494623517
+},
+"v4_uux_ghwpwm": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_uux_ghwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.951985954188547,
+"logm10_max_in_support": -5.767729085613125
+},
+"v4_uux_gtaptamz": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_uux_gtaptamz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.198178004301953,
+"logm10_max_in_support": -2.693482242400952
+},
+"v4_uux_gtapvtwm": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_uux_gtapvtwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.523866239852591,
+"logm10_max_in_support": -0.09122712498268669
+},
+"v4_uux_guux": {
+"n": 45001,
+"n_in_support": 44955,
+"file": "dsh_uux_guux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -2.4253785724402515,
+"logm10_max_in_support": 7.677897963738384
+},
+"v4_uux_guuxz": {
+"n": 45001,
+"n_in_support": 44915,
+"file": "dsh_uux_guuxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.249278870339472,
+"logm10_max_in_support": 2.019678212964259
+},
+"v4_uux_gvevex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_gvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.347347883020044,
+"logm10_max_in_support": 0.8938590674121435
+},
+"v4_uux_gvevexz": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_uux_gvevexz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.829424300186155,
+"logm10_max_in_support": -1.1523680610179672
+},
+"v4_uux_gwpwm": {
+"n": 45001,
+"n_in_support": 44999,
+"file": "dsh_uux_gwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -6.3135419196106195,
+"logm10_max_in_support": 0.4404947751144187
+},
+"v4_uux_gwpwmz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_gwpwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.320838542241887,
+"logm10_max_in_support": -3.576836020949523
+},
+"v4_uux_hhtaptam": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_hhtaptam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -16.27538483802338,
+"logm10_max_in_support": -9.341265731716783
+},
+"v4_uux_hhuux": {
+"n": 45001,
+"n_in_support": 44850,
+"file": "dsh_uux_hhuux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -16.59326839241378,
+"logm10_max_in_support": -4.491024975848166
+},
+"v4_uux_hhwpwm": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_uux_hhwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.250658957879867,
+"logm10_max_in_support": -9.664788001000554
+},
+"v4_uux_htaptam": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_htaptam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.393787414680094,
+"logm10_max_in_support": -4.621619129679533
+},
+"v4_uux_htaptamz": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_uux_htaptamz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.333221384698005,
+"logm10_max_in_support": -6.750379187753825
+},
+"v4_uux_htapvtwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_htapvtwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -16.061652040889612,
+"logm10_max_in_support": -5.329956009294432
+},
+"v4_uux_huux": {
+"n": 45001,
+"n_in_support": 44970,
+"file": "dsh_uux_huux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.156913353325896,
+"logm10_max_in_support": -0.0003333305114656643
+},
+"v4_uux_huuxz": {
+"n": 45001,
+"n_in_support": 44915,
+"file": "dsh_uux_huuxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.513328902395951,
+"logm10_max_in_support": -3.409895239446156
+},
+"v4_uux_hvevex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_hvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.467621809133757,
+"logm10_max_in_support": -4.148644100937402
+},
+"v4_uux_hwpwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_hwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.0842502322486,
+"logm10_max_in_support": -3.7250911754090095
+},
+"v4_uux_hwpwmz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_hwpwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.51513123695593,
+"logm10_max_in_support": -8.15277504913561
+},
+"v4_uux_hzzz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_hzzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.396983894241455,
+"logm10_max_in_support": -9.928660774105534
+},
+"v4_uux_taptam": {
+"n": 45001,
+"n_in_support": 44699,
+"file": "dsh_uux_taptam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -3.492069797838886,
+"logm10_max_in_support": 0.164075859946679
+},
+"v4_uux_taptamuux": {
+"n": 45001,
+"n_in_support": 44927,
+"file": "dsh_uux_taptamuux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.345270668096298,
+"logm10_max_in_support": 1.023879125888048
+},
+"v4_uux_taptamvevex": {
+"n": 45001,
+"n_in_support": 44997,
+"file": "dsh_uux_taptamvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.552480398074104,
+"logm10_max_in_support": -2.7010727803898553
+},
+"v4_uux_taptamz": {
+"n": 45001,
+"n_in_support": 44997,
+"file": "dsh_uux_taptamz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -9.017810899633567,
+"logm10_max_in_support": -0.7959690680223042
+},
+"v4_uux_taptamzz": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_uux_taptamzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -14.725417998196741,
+"logm10_max_in_support": -4.716405261810733
+},
+"v4_uux_taptaptamtam": {
+"n": 45001,
+"n_in_support": 44988,
+"file": "dsh_uux_taptaptamtam_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.498450424278749,
+"logm10_max_in_support": -3.5738083622687316
+},
+"v4_uux_tapvtwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_tapvtwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.859212102425699,
+"logm10_max_in_support": 2.1433538206631733
+},
+"v4_uux_tapvtwmz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_tapvtwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.255729942174407,
+"logm10_max_in_support": -3.1185402586617874
+},
+"v4_uux_uuuxux": {
+"n": 45001,
+"n_in_support": 44892,
+"file": "dsh_uux_uuuxux_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.489508722387414,
+"logm10_max_in_support": 4.457134680431496
+},
+"v4_uux_uuxvevex": {
+"n": 45001,
+"n_in_support": 44943,
+"file": "dsh_uux_uuxvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -10.079041582918835,
+"logm10_max_in_support": 1.3403829914479726
+},
+"v4_uux_uuxwpwm": {
+"n": 45001,
+"n_in_support": 44902,
+"file": "dsh_uux_uuxwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -11.910724155546871,
+"logm10_max_in_support": -1.0577072449132003
+},
+"v4_uux_uuxz": {
+"n": 45001,
+"n_in_support": 44942,
+"file": "dsh_uux_uuxz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.4522871828078125,
+"logm10_max_in_support": 3.1921547002344397
+},
+"v4_uux_uuxzz": {
+"n": 45001,
+"n_in_support": 44912,
+"file": "dsh_uux_uuxzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -12.93732041971093,
+"logm10_max_in_support": -2.2809838280850316
+},
+"v4_uux_vevevexvex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_vevevexvex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.46145304771018,
+"logm10_max_in_support": -2.669341553354188
+},
+"v4_uux_vevex": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_vevex_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -5.5936463432662284,
+"logm10_max_in_support": 0.6260513332970226
+},
+"v4_uux_vevexvmvmx": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_vevexvmvmx_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.248317045075792,
+"logm10_max_in_support": -1.8454311400794308
+},
+"v4_uux_vevexwpwm": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_vevexwpwm_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.28158061700254,
+"logm10_max_in_support": -3.720052637229727
+},
+"v4_uux_vevexz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_vevexz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.373367941010825,
+"logm10_max_in_support": -0.09914582297081787
+},
+"v4_uux_vevexzz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_vevexzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.926059118379811,
+"logm10_max_in_support": -4.391691662724696
+},
+"v4_uux_wpwmz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_wpwmz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -7.905186126241126,
+"logm10_max_in_support": -1.607709269030891
+},
+"v4_uux_wpwmzz": {
+"n": 45001,
+"n_in_support": 45000,
+"file": "dsh_uux_wpwmzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -13.492827163884563,
+"logm10_max_in_support": -7.0701379113921226
+},
+"v4_uux_zzz": {
+"n": 45001,
+"n_in_support": 45001,
+"file": "dsh_uux_zzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -8.943194542888303,
+"logm10_max_in_support": -3.427245157987406
+},
+"v4_uux_zzzz": {
+"n": 45001,
+"n_in_support": 44998,
+"file": "dsh_uux_zzzz_13000-13000GeV_train_lhe_amplitudes.npy",
+"logm10_min_in_support": -15.462950172103568,
+"logm10_max_in_support": -8.941203789275896
+}
+}
