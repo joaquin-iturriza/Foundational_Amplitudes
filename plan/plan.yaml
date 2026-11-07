@@ -10924,6 +10924,23 @@ entries:
       a correlated proposal (a pairwise grid on sqrt(s) x the channel''s forward variable, or a normalising flow) on the same
       harness. NO (grids+res2f fill less than step 72''s grids on a class, or diversity fails) -> res2f dead end recorded;
       the electroweak top stays short and the next attempt is the correlated proposal.'
+    passed_at: '2026-11-07T02:20:06+00:00'
+    reviewer: 'Step 75 checked against step 72''s passed design and read: same 5 classes, seeds 42/43, probes, train role
+      1e5, bins, limits and reader rules; the only cell change is the policy set (grid_both_res2f at 12 and 8 vs current/quota12/quota50
+      in the same job, step 72''s grids without the forward channel as the before, the regula-falsi solve equal to the halvings
+      to 1e-13 per tests, so fill differences are the forward channel''s). Check 2: data/grid_check.json shows the fill share
+      moving with the sampler (grids12 0.898-1.0 vs quota12 0.837-0.922), and quota_where/v4_udx_csxvevex_grid72.json (partonic
+      frame) puts the 10 held-out events above -0.81 at Z-pair |cos| 0.9999-1.0 (q10-q90) and v4_uux_epemvevex_grid72.json''s
+      67 events above -1.4 at 0.958/0.9994/0.9999, against below-edge medians 0.87/0.72: the region the forward joint-resonance
+      channel draws into (the design''s ''2-10 per class'' undercounts uux_epemvevex''s 67, not material). Check 3: fill share
+      is seed-stable (0.936/0.936, 0.898/0.898 in step 72); cost has a real seed spread (us_ddxsu same-job 3.10/2.16, uu_bbxuu
+      1.89/2.37), handled by per-seed rules and the COST branch, seeds as the sibling steps 69/72. Outcome stated for YES/COST/PARTIAL/NO
+      with what each feeds; no second re-run. Disk: step 72 job wrote a 73 KB JSON (site logs FA-ccin2p3-0a3c7d19), CPU only,
+      no GPU, <= 7 core-h. Test events: default-sampled pp held-out pools (pp13_ val, dsh_), as D294''s ''range of the pp
+      sampled process''. No training, no HPO. Searched results.tex for res2, forward, t-channel, log-forward, joint resonance,
+      regula, multiperipheral/ladder, grid_check, cos theta*: only the catalog''s forward component (a different mechanism)
+      and a v1 pair-bias note; entry dead ends for res2/forward/grid/ladder/resonance: none on sampling; decisions D294, D317,
+      D318: no comparison named that the design omits.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
