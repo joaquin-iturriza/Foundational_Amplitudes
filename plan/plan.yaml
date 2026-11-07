@@ -10684,6 +10684,15 @@ entries:
       spread of one configuration 0.80-1.14) -> MAGNITUDE HURT, a NO; HD4 or any H1-H7c R > 1.3 (their spread 0.71-1.27) ->
       MAGNITUDE HURT; otherwise ''magnitude not shown hurt''. Next after a one-seed ''not resolved'': ask Joaquin again for
       seeds 43-45 with the seed-42 numbers in hand; after a one-seed NO: the clipping regime as in the four-seed NO.'
+    passed_at: '2026-11-07T01:28:43+00:00'
+    reviewer: 'Re-check after FIX: only seeds and outcome changed (other fields identical). One-seed outcome table now stated
+      (sign ''not resolved'' unless branch > 1.16x the rerun at seed 42 = NO; magnitude HURT at PP4/EE4 R > 1.15, HD4/H1-H7c
+      R > 1.3; next steps for each). Check 2: rerun/MSE H5 1.94x seed-mean, step 56 p 0.0036, magnitude 13% resolved at four
+      seeds. Check 3: per-seed rerun/MSE H5 1.54/1.16/0.88/1.99, HD5 1.45/1.22/1.07/1.67, same config across code 0.63-0.87
+      (recomputed from reads/*_sign.json); four seeds as siblings, one seed per D315 asked of Joaquin, submission waits. Wording
+      nit: 1.54x at seed 42 is not ''inside 0.63-1.16x''; the reason one seed cannot resolve is the per-seed rerun/MSE range
+      0.88-1.99x; say that in the question to Joaquin. Searched: results.tex sign branch, sign_branch, detach, attachment,
+      own copy, het sign head, wrong-sign, clip per; plan.yaml; decisions D287 D296 D315.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
