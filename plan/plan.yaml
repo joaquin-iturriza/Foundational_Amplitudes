@@ -12066,9 +12066,9 @@ entries:
       - 'a complete share under 1/MAX_ASK_FACTOR at an energy: larger gridpack per complete_layout, never more runs'
   owner:
     agent: a43d3315615ba19df
-    state: closed
+    state: stopped
     since: '2026-11-07T04:48:42+00:00'
-    state_at: '2026-11-07T04:48:54+00:00'
+    state_at: '2026-11-07T05:13:11+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
