@@ -3748,8 +3748,6 @@ entries:
       the two runs'' training logs for the first steps (equal loss at step 1 = same trunk start, divergence after = nondeterminism);
       then, if needed, a same-config repeat of the 1-block arm (v4_het_signhead_branch seed 42, ~2.5 GPU-h) under a reviewed
       design to measure the same-config magnitude spread.'
-    84: 'Upkeep (Joaquin 2026-11-07 on the sign figure: ''what is the x axis in the top plots?''): send_check.py refuses a
-      SendUserFile of a figure whose caption does not name its x and y axes; tested on captions with and without them.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -12761,11 +12759,6 @@ entries:
       - 'same-config spread covers 1.26 on HD5: replace the 1.15 check by that spread, sign reading NOT RESOLVED (HD5 14.05%),
         next the trunk-shared sign gradient under its own optimizer moments'
       - 'same-config runs agree within 1.15: find the coupling in the 4-block branch before any sign verdict'
-    84:
-      feeds: every figure reaches Joaquin with its axes named (CLAUDE.md figure rule)
-      if:
-      - 'check passes its tests: merge and use'
-      - 'check misfires on real captions: fix or disable via hook_incident'
   owner:
     agent: ae4ee7fc35b7e4306
     state: stopped
