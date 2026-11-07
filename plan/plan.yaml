@@ -5520,6 +5520,14 @@ entries:
       step-73 and step-75 designs: neither settles the seed count for a sign question nor whether the margin width is part
       of the bar'
     blocks: the step-73 sign-head submission; the fill rule of the step-75 check
+    blocks_steps:
+    - 73
+  - ask: 'Scope: seeds for the sign-head arm. Four seeds (4 V100 jobs, about 9.3 GPU-h) or one (2.3 GPU-h) for the detached
+      sign-head arm, given that one seed can only show a sign gap larger than about 2x?'
+    at: '2026-11-07T05:13:54+00:00'
+    searched: 'site decisions --project FA (D315 one seed in general), step-73 design: D315 is general and the sign question
+      is noisier than its basis'
+    blocks: the step-73 sign-head submission
     blocks_steps: &id001
     - 73
   designs:
@@ -14185,14 +14193,12 @@ entries:
       lhe_run_yields_dsh_eea_stage2.json; worktrees wt-regen-rev, wt-ee-cutread, wt-ee-mixcut merged but not removed (remove_worktree.sh
       refused by the permission classifier)
     written: '2026-11-07T05:13:08+00:00'
-  ask: 'Scope: seeds for the sign-head arm, and what ''wider'' than the pp range means for the fill verdict. (1) Four seeds
-    (4 V100 jobs, about 9.3 GPU-h) or one (2.3 GPU-h) for the detached sign-head arm? (2) Should the extra half decade above
-    the highest pp event count toward the regeneration''s pass or fail, or only be reported?'
-  waiting_since: '2026-11-07T04:49:44+00:00'
-  searched: 'site decisions --project FA (D269/D270 ''the range the pp beams cover, but wider'', D294, D315 one seed), the
-    step-73 and step-75 designs: neither settles the seed count for a sign question nor whether the margin width is part of
-    the bar'
-  blocks: the step-73 sign-head submission; the fill rule of the step-75 check
+  ask: 'Scope: seeds for the sign-head arm. Four seeds (4 V100 jobs, about 9.3 GPU-h) or one (2.3 GPU-h) for the detached
+    sign-head arm, given that one seed can only show a sign gap larger than about 2x?'
+  waiting_since: '2026-11-07T05:13:54+00:00'
+  searched: 'site decisions --project FA (D315 one seed in general), step-73 design: D315 is general and the sign question
+    is noisier than its basis'
+  blocks: the step-73 sign-head submission
   blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
