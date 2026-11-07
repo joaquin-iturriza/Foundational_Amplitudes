@@ -11282,9 +11282,9 @@ entries:
       - 'design FIX: revise once'
   owner:
     agent: a3fc2aab45ed49d42
-    state: closed
+    state: stopped
     since: '2026-11-07T01:02:53+00:00'
-    state_at: '2026-11-07T01:02:53+00:00'
+    state_at: '2026-11-07T01:30:00+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
