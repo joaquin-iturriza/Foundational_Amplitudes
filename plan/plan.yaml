@@ -5502,6 +5502,16 @@ entries:
       so neither settles it.'
     blocks: only the submission of the detached sign-branch arm (step 73); its implementation, repo review and design review
       go ahead
+    blocks_steps:
+    - 73
+  - ask: 'Scope: seeds for the sign-head arm, and what ''wider'' than the pp range means for the fill verdict. (1) Four seeds
+      (4 V100 jobs, about 9.3 GPU-h) or one (2.3 GPU-h) for the detached sign-head arm? (2) Should the extra half decade above
+      the highest pp event count toward the regeneration''s pass or fail, or only be reported?'
+    at: '2026-11-07T04:49:44+00:00'
+    searched: 'site decisions --project FA (D269/D270 ''the range the pp beams cover, but wider'', D294, D315 one seed), the
+      step-73 and step-75 designs: neither settles the seed count for a sign question nor whether the margin width is part
+      of the bar'
+    blocks: the step-73 sign-head submission; the fill rule of the step-75 check
     blocks_steps: &id001
     - 73
   designs:
@@ -14047,23 +14057,14 @@ entries:
       recipes/catalog_v4_r1_regen.yaml, analysis/catalog_v4/data/regen_g12_profile.json, regen_g12_where.json, regen_g12_where_pull.json,
       dsh_train_support.json, regen_g12_read.json, regen_g12_pull.json'
     written: '2026-11-07T04:47:39+00:00'
-  ask: 'Scope: four seeds or one for the next het sign-head arm, against your D315 (one seed in general). The next try (step
-    61 came out NO: up-weighting the sign loss bought an insignificant sign gain, 13.0% -> 8.4% median wrong-sign on the held-out
-    one-loop pools, for 13-40% worse magnitude, because the gradient clip binds on 99% of het steps) is a sign head on its
-    own copy of the last transformer block, fed detached features, so its gradient never competes with the magnitude. On this
-    question one seed does not resolve: per seed, the weight-1 het sign head''s median wrong-sign share on the 21 held-out
-    one-loop pools is 0.88x to 1.99x the MSE control''s (sign test p 0.0036 to 0.67), and the same configuration rerun at
-    another code version reads 0.63x to 1.16x of itself; four seeds resolved the gap (p 0.0036, step 56). Four seeds (4 V100
-    jobs, about 9.3 GPU-h; the weight-1 rerun and the MSE control already have four) or one (2.3 GPU-h), accepting that one
-    seed can only show a sign gap larger than about 2x and a magnitude change larger than about 15%?'
-  waiting_since: '2026-11-07T01:19:07+00:00'
-  searched: 'CLAUDE.md scope rule (fewer seeds than a design is your call) and site decisions: D315 (no multiple seeds, for
-    the scaling grid and in general) against step 56/61''s passed designs (four seeds, chosen because four resolved the sign
-    gap); per-seed spreads read from data/het_signhead61.json and reads/<run>_sign.json @66f94590. D315''s premise (seed variation
-    consistent) holds for magnitude class medians (about 11%) but not for the per-pool wrong-sign share, so neither settles
-    it.'
-  blocks: only the submission of the detached sign-branch arm (step 73); its implementation, repo review and design review
-    go ahead
+  ask: 'Scope: seeds for the sign-head arm, and what ''wider'' than the pp range means for the fill verdict. (1) Four seeds
+    (4 V100 jobs, about 9.3 GPU-h) or one (2.3 GPU-h) for the detached sign-head arm? (2) Should the extra half decade above
+    the highest pp event count toward the regeneration''s pass or fail, or only be reported?'
+  waiting_since: '2026-11-07T04:49:44+00:00'
+  searched: 'site decisions --project FA (D269/D270 ''the range the pp beams cover, but wider'', D294, D315 one seed), the
+    step-73 and step-75 designs: neither settles the seed count for a sign question nor whether the margin width is part of
+    the bar'
+  blocks: the step-73 sign-head submission; the fill rule of the step-75 check
   blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
