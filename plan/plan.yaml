@@ -10777,6 +10777,78 @@ entries:
       the 1.0 h target. Prior searched: results.tex ''beam spectrum'', ''isronly'', ''beamstrahl'', ''anchor'', ''eea_'',
       ''initial-state radiation'', ''ISR'', ''collider energ'', ''lpp'' (only the fixed-energy ee4_ mention at l.4671); entry
       dead ends; decisions D318, D320, D193: no prior run of the anchor pools.'
+  - at: '2026-11-07T01:52:22+00:00'
+    question: 'Step 74 (D318, D320 ''The collider anchor sounds good''): build every e+e- default-sampled pool again at the
+      10 collider anchor energies, each energy''s MadEvent runs with that machine''s beam spectrum, under new names: the 170
+      test pools of 2000 events (eea_<x>, counterparts of ee4_<x>) and the 115 default-share pools of the e+e- training classes
+      (dsh_eea_<x>, counterparts of dsh_<x>, reusing eea_<x>''s test block). In two stages, the first being the generation
+      rule''s probe for the second: does the production generation with lhe.beam_spectrum build all 285 pools with the spectrum
+      in every run, equal shares over the energies past each class''s edge, at a cost within 2x of the estimate from the old
+      pools?'
+    prior: 'Step 71 probe (data/ee_anchor_probe.json @901d600f): dsh_epem_bbxvevex, 1000 events per energy, every spectrum
+      run returns its events with the banner as asked (lpp1 -3, lpp2 +3, pdlabel per EE_ANCHOR), kept after window and cuts
+      0.996-1.0, share of events with sqrt(s_hat)/sqrt(s) < 0.99 from 0.045 (91 GeV) to 0.43 (500, 3000 GeV), 0 without spectrum;
+      time per kept event with/without 0.67-1.25x; 365 GeV fcce365ll indistinguishable from ISR only (kept). Old generation:
+      ee4_ 169 pools 22 core-h, dsh_ e+e- 115 pools 82 core-h of runs (par:v4_regen_time); 42 e+e- pools rebuilt in complete
+      runs of 200 from per-energy gridpacks because their runs stopped short (par:v4_short_runs, complete_runs.json), 11 of
+      them sized from probe-measured complete shares 0.69-1.0 (lhe_probe_by_energy.json); ee4_epem_cgsxwm''s 3 TeV block dropped
+      (D193). docs/results.tex searched (beam spectrum, isronly, beamstrahl, anchor, eea_, ISR, collider energ, lpp): nothing
+      else; plan steps 71/74; decisions D318, D320, D193. Design review 1 (FIX): no probe stated, per-energy probe shares
+      dropped, no disk figure: this revision answers each.'
+    measure: 'Stage 1 (eea_ queue, the probe): per pool and energy from its part files (tools/lhe_probe.py parts): yield (returned/asked),
+      share of complete runs, seconds per event, part energy check (lhe_parts.part_energy_ok: no event above the collider
+      energy, the highest within 1%), the share of events whose incoming-beam energy sum is below 0.99 x the collider energy
+      (> 0 at every energy; eea_epem_bbxvevex against the step-71 probe''s share per energy within its binomial spread), and
+      the fraction of eea_<x>''s events the dsh_eea_<x> mixture keeps (dsh_eea_''s window and cuts, per energy); pools assembled
+      of 170; core-h (tools/lhe_rates.py --prefix eea_, regen_time) against the estimate. Stage 2 (dsh_eea_ queue): planned
+      with --probe from stage 1''s numbers for the same class (kept x yield per pool; complete shares per energy for its complete-run
+      pools, accept_margin from the measured kept per energy), then pools assembled of 115, part energy check, lhe_probe mixcheck
+      (kept >= the mixture''s need), equal shares (lhe_parts shares), core-h against the estimate.'
+    check: 'Code (ee-anchor @fccf37a8, repo-reviewer PASS @5b384b62; tests/test_ee_anchor.py 6 passed, with test_default_share/test_lhe_gridpack/test_lhe_parts/test_pool_physics
+      48 passed): every run of the 285 new pools carries exactly ee_beam_patches(E, process string), the values the step-71
+      probe ran with and whose banners read back right at all 10 energies; old ee4_/dsh_ runs and recipe ids unchanged (regenerating
+      leaves every existing recipe file byte-identical); one gridpack per energy carrying its spectrum, each run drawn from
+      its own energy''s; part_energy_ok accepts radiated beams and refuses events above the collider energy or none near it.
+      The probe showed the measure moves with the change: share below 0.99 is 0 without spectrum and 0.045-0.43 with it. Why
+      stage 1 is its own probe: its runs are probe-sized (about 204 events per energy, or complete runs of 200 from a gridpack,
+      the size the old probes ran), cover every class at every anchor energy with its spectrum, and an eea_ pool keeps every
+      event (no window or cut after generation: lhe_probe.accept_of is None), so the kept-fraction check the probe exists
+      for is 1 by construction; it is planned with --probe '''' (stated here: the probe file gate is skipped for it only).
+      It also tests MadGraph 3.7''s gridpack mode with lpp +-3 and pdlabel, not yet run (140 eea_ gridpacks).'
+    fixed: 'Catalog_v4 e+e- run card (recipes/catalog_v4_ee), parameter card, generate lines, labels at alpha_s(sqrt(s_hat));
+      energies EE_ANCHOR 91.1876, 160, 209, 240, 365, 380, 500, 1000, 1500, 3000 GeV past each class''s lower edge, ttbar
+      nu nu out at 365 (EE_ZERO_SURVEY), cgsxwm out at 3 TeV (D193); spectra isronlyll at 91.1876/160/209/380/1000/1500, fcce240ll,
+      fcce365ll, ilc500ll, clic3000ll (machine sources in recipes/gen_catalog_v4_default.py: LEP Phys. Rept. 532 (2013) 119;
+      FCC CDR EPJ ST 228 (2019) 261; CEPC arXiv:1809.00285; ILC TDR arXiv:1306.6327; CLIC arXiv:1608.07537; spectra arXiv:2108.10261);
+      sizes as old (eea 2000 test events; dsh_eea 0.5 x 1e5/1e4/1e4 x (1+margin) less the reused block); layouts as the old
+      pools'' (one run per energy, or run_layout <= 1800 core-s per run; the 42 complete-run pools keep runs of 200 from per-energy
+      gridpacks with grid_events, the 11 probe-sized ones their measured complete shares at the shared energies and 0.8 elsewhere
+      until stage 1 measures them); standalones reused from ee4_; seed 42; CC htc workers scripts/job_lhe_parts.sh, 16 cores,
+      gridpacks on 16 cores (--grid-cores 16). Disk (CC /sps/lpnhe 67 GB free, read 2026-11-07): pools 248 B/event (ee4_epem_bbxvevex
+      test pool 496128 B for 2000) -> 7.7M events ~1.9 GB, parts about the same ~2 GB, gridpacks 5.8 MB median / 7.6 MB max
+      (123 old e+e- gridpacks on CC) x 332 <= 2.5 GB: <= 7 GB in all, parts and gridpacks deleted after assembly (lhe_parts
+      gc --parts); MadEvent dirs on node-local TMPDIR. No training recipe changes.'
+    control: 'The old pools of the same classes (ee4_<x>, dsh_<x>: same cards, cuts, sizes, layouts at 6 fixed-beam energies)
+      for cost, yield and assembly; the step-71 probe (same class at the same 10 energies with spectrum, ISR only, none) for
+      the spectrum''s share per energy.'
+    seeds: 'Catalog seed 42 (MadEvent iseeds from the pool names; dsh_eea_ iseeds salted where they would collide with their
+      eea_ pool''s: lhe.iseed_salt).'
+    outcome: 'Stage 1 BUILT (170 assembled, every part passes the energy check, spectrum share > 0 at every energy, bbxvevex
+      within the probe''s spread, cost <= 2x its estimate) -> stage 2 planned from its numbers and submitted under this design
+      (layout read, --probe file from stage 1, target recorded). Stage 1 PARTIAL: pools whose runs stop short or survey zero
+      at a new energy -> repaired with the existing tools (energy_runs from their yields, complete runs from gridpacks with
+      measured shares, EE_ZERO_SURVEY where a class''s real edge is above an energy), rebuilt, named; GRIDPACK FAILS with
+      the spectrum -> those pools in plain runs of 200 (the size that completed before), reported. SPECTRUM MISSING (share
+      0 at an energy, or a banner without the asked pdlabel) -> stop, fix the patching, rebuild. COST > 2x -> read where the
+      time goes before anything else. Stage 2 BUILT (115 assembled, mixcheck ok, equal shares) -> the anchor pools are the
+      e+e- default-sampled data: next step 68''s e+e- flat ranges from them and an EE4 read axis on eea_; the training default
+      share moves to dsh_eea_ with the step-65/68 regeneration. Estimate (tools/regen_time.py anchor @fccf37a8; old per-run
+      cost x spectrum factor 0.67-1.25, gridpacks at the old e+e- gridpack tasks 712 (median) / 1700 (mean) core-s x the same
+      factor): stage 1 runs 23.5-43.8 + 140 gridpacks 18.6-82.6 = 42-126 core-h; stage 2 runs 66.5-124.1 + 192 gridpacks 25.4-113.3
+      = 92-237 core-h; old 104 core-h of runs plus 206 gridpacks. Longest run 835-1557 s (dsh_eea_epem_epepemem), longest
+      gridpack 794 s wall. Layout stage 1: 16 workers x 16 cores x 2 h on CC htc (site pick offers 32 at once; 16 x 16 cores
+      = 256 cores give 126 core-h in 0.5 h), target 1.0 h; stage 2 at the width site pick then offers, target from stage 1''s
+      measured rates.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
