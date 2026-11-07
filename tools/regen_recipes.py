@@ -14,8 +14,10 @@ names (mg.recipe_output_path), so the pools every earlier read used stay where t
                                             resonance channels from its diagram sidecar (data/diagrams), whether its
                                             compiled standalone exists, free disk -> analysis/catalog_v4/data/regen_g12_inputs.json
     python3 tools/regen_recipes.py write    -> recipes/catalog_v4_g12_regen.yaml (the 1301 classes once, from the
-                                            generation stages 1 and 5) and a _g12 copy of every recipe holding them
-                                            (training mixtures and the catalog-sampled held-out recipes)
+                                            generation stages 1 and 5)
+    python3 tools/regen_recipes.py readers  a _g12 copy of every recipe holding them (found by scanning recipes/,
+                                            NOT_READERS excepted with reasons); refused while a reader holds an e+e-
+                                            tree class no regeneration covers (step 68)
     python3 tools/regen_recipes.py check    every _g12 reader resolves each hadronic pool to the regeneration's (recipe
                                             id and file name), every regenerated pool is new (_smixq, no old path)
 """
@@ -28,10 +30,11 @@ REC = os.path.join(ROOT, "recipes")
 FLAT_RANGE = os.path.join(REC, "catalog_v4_flat_range.json")
 INPUTS = os.path.join(ROOT, "analysis", "catalog_v4", "data", "regen_g12_inputs.json")
 STAGES = ["catalog_v4_gen_stage1.yaml", "catalog_v4_gen_stage5.yaml"]     # where the 1301 classes are generated
-# recipes that read the hadronic tree pools: each gets a _g12 copy reading the regenerated ones
-READERS = ["catalog_v4_base_train.yaml", "catalog_v4_default25_train.yaml", "catalog_v4_default50_train.yaml",
-           "catalog_v4_default25_pponly_train.yaml", "catalog_v4_heldout_H1.yaml", "catalog_v4_heldout_H2.yaml",
-           "catalog_v4_heldout_H3.yaml", "catalog_v4_heldout_H3p.yaml", "catalog_v4_heldout_H4.yaml"]
+# recipes holding hadronic tree classes that get no _g12 copy, each with its reason (every other recipes/catalog_v4_*.yaml
+# holding one is a reader: readers_of() scans for them, so a new recipe is never left on the old pools unnoticed)
+NOT_READERS = {"catalog_v4_census.yaml": "the numeric equality census: 0 events per class, no pools",
+               "catalog_v4_gen_stage1.yaml": "a generation stage: the regeneration recipe replaces it",
+               "catalog_v4_gen_stage5.yaml": "a generation stage: the regeneration recipe replaces it"}
 OUT_REGEN = "catalog_v4_g12_regen.yaml"
 EE_PREFIX = "v4_epem"
 # grid_both_res2f_budget12 (multichannel_check.py, step 75): the sampler's switches; the constants behind them enter
@@ -129,7 +132,41 @@ def cmd_write(a):
     with open(os.path.join(REC, OUT_REGEN), "w") as f:
         f.write(head); yaml.safe_dump({"processes": procs}, f, sort_keys=False, default_flow_style=None, width=200)
     print(f"{OUT_REGEN}: {len(procs)} classes")
-    for r in READERS:
+
+
+def readers_of():
+    """recipes/catalog_v4_*.yaml (not _g12) with at least one hadronic tree class at events > 0, NOT_READERS left out"""
+    had = set(hadronic()); out = []
+    for f in sorted(os.listdir(REC)):
+        if not (f.startswith("catalog_v4_") and f.endswith(".yaml")) or f.startswith("catalog_v4_g12_") or f in NOT_READERS:
+            continue
+        spec = yaml.safe_load(open(os.path.join(REC, f)))
+        ps = spec.get("processes") if isinstance(spec, dict) else None
+        if ps and any(isinstance(p, dict) and p.get("name") in had and sum(int(p.get(k, 0) or 0) for k in
+                      ("n_train", "n_val", "n_test")) > 0 for p in ps):
+            out.append(f)
+    return out
+
+
+def cmd_readers(a):
+    """A _g12 copy of every reader recipe, the hadronic entries on the new sampler. Refused while a reader holds a tree
+    class of the range table (an e+e- class) that no regeneration covers: Joaquin 2026-11-06 ("If I asked for pp sampled
+    data, why would you produce e+e- datasets that are different in any way?"), so a training or held-out recipe never
+    mixes the two samplers; the e+e- classes join with step 68."""
+    sys.path.insert(0, ROOT)
+    inp = json.load(open(INPUTS)); fr = json.load(open(FLAT_RANGE)); had = set(hadronic())
+    covered = had      # the classes a regeneration recipe covers (step 68 adds the e+e- ones)
+    readers = readers_of(); refuse = {}
+    for r in readers:
+        spec = yaml.safe_load(open(os.path.join(REC, r)))
+        left = sorted(p["name"] for p in spec["processes"] if p["name"] in fr and p["name"] not in covered)
+        if left:
+            refuse[r] = left
+    if refuse:
+        sys.exit("regen_recipes readers: refused, these readers hold e+e- tree classes not yet regenerated (step 68): "
+                 + "; ".join(f"{r}: {len(v)} (e.g. {v[0]})" for r, v in refuse.items()))
+    head = ("# generated by tools/regen_recipes.py readers (plan catalog_coverage step 65); do not edit\n")
+    for r in readers:
         spec = yaml.safe_load(open(os.path.join(REC, r))); k = 0
         for p in spec["processes"]:
             if p["name"] in had:
@@ -174,8 +211,12 @@ def cmd_check(a):
         old.update(_ids(os.path.join(REC, f)))
     same = [k for k in reg if old.get(k, (None, None))[1] == reg[k][1]]
     assert not same, f"{len(same)} regenerated pools at an old pool's path: {same[:3]}"
-    for r in READERS:
+    readers = readers_of()
+    print(f"{len(readers)} reader recipes hold hadronic tree classes: {', '.join(readers)}")
+    for r in readers:
         out = r.replace("catalog_v4_", "catalog_v4_g12_", 1)
+        if not os.path.exists(os.path.join(REC, out)):
+            print(f"{out}: not written (readers is refused until the e+e- classes are regenerated)"); continue
         ids = _ids(os.path.join(REC, out), strip_default=True)
         miss = [k for k, v in ids.items() if reg.get(k) != v]
         bad += len(miss)
@@ -189,9 +230,9 @@ def cmd_check(a):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
-    sub.add_parser("pull"); sub.add_parser("write"); sub.add_parser("check")
+    sub.add_parser("pull"); sub.add_parser("write"); sub.add_parser("readers"); sub.add_parser("check")
     a = ap.parse_args()
-    {"pull": cmd_pull, "write": cmd_write, "check": cmd_check}[a.cmd](a)
+    {"pull": cmd_pull, "write": cmd_write, "readers": cmd_readers, "check": cmd_check}[a.cmd](a)
 
 
 if __name__ == "__main__":

@@ -422,10 +422,16 @@ def finalize_dataset(process, sqrts_min, sqrts_max, n_events, role, seed,
     if is_virt(process) and all(os.path.exists(b) for b in borns):
         np.save(final[:-len(".npy")] + ".born.npy", np.concatenate([np.load(b) for b in borns]))
     # the quota-filled flat part's fill per chunk (_write_flat_fill), kept when every chunk wrote one
+    # (one written when any chunk has one; a chunk without it, e.g. reused after a kill between its .npy and its fill,
+    # is a null entry and a [WARN], so the read sees the gap)
     fills = [p[:-len(".npy")] + ".flatfill.json" for p in ordered_chunk_paths]
-    if fills and all(os.path.exists(f) for f in fills):
+    have = [os.path.exists(f) for f in fills]
+    if any(have):
+        if not all(have):
+            print(f"[WARN] flat fill: {os.path.basename(final)}: chunks {[i for i, h in enumerate(have) if not h]} "
+                  f"have no .flatfill.json (null entries)", flush=True)
         with open(final[:-len(".npy")] + ".flatfill.json", "w") as f:
-            json.dump({"chunks": [json.load(open(x)) for x in fills]}, f)
+            json.dump({"chunks": [json.load(open(x)) if h else None for x, h in zip(fills, have)]}, f)
     full = dict(rec)
     full["effective_seed"] = seed + mg.ROLE_SEED_OFFSET.get(role, 0)
     full["chunked"]        = True
