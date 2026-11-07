@@ -1,0 +1,1026 @@
+{
+ "classes": {
+  "v4_bbx_aazz/42": {
+   "stops": {
+    "quota": 36
+   },
+   "short_bins": [],
+   "budget_missing_at_stop": [],
+   "budget_last_round_filled": [],
+   "stall_round_filled": [],
+   "labels_r1": 183708,
+   "labels_r2_est": 183708,
+   "cost_r1": 0.9809250127499191,
+   "cost_r2_est": 0.9809250127499191
+  },
+  "v4_bbx_aazz/43": {
+   "stops": {
+    "quota": 36
+   },
+   "short_bins": [],
+   "budget_missing_at_stop": [],
+   "budget_last_round_filled": [],
+   "stall_round_filled": [],
+   "labels_r1": 186624,
+   "labels_r2_est": 186624,
+   "cost_r1": 0.9827120092831911,
+   "cost_r2_est": 0.9827120092831911
+  },
+  "v4_dbx_hhtxu/42": {
+   "stops": {
+    "quota": 36
+   },
+   "short_bins": [],
+   "budget_missing_at_stop": [],
+   "budget_last_round_filled": [],
+   "stall_round_filled": [],
+   "labels_r1": 285768,
+   "labels_r2_est": 285768,
+   "cost_r1": 2.167010432940708,
+   "cost_r2_est": 2.167010432940708
+  },
+  "v4_dbx_hhtxu/43": {
+   "stops": {
+    "quota": 36
+   },
+   "short_bins": [],
+   "budget_missing_at_stop": [],
+   "budget_last_round_filled": [],
+   "stall_round_filled": [],
+   "labels_r1": 285768,
+   "labels_r2_est": 285768,
+   "cost_r1": 2.165568449390774,
+   "cost_r2_est": 2.165568449390774
+  },
+  "v4_ddx_ghwpwm/42": {
+   "stops": {
+    "quota": 36
+   },
+   "short_bins": [],
+   "budget_missing_at_stop": [],
+   "budget_last_round_filled": [],
+   "stall_round_filled": [],
+   "labels_r1": 209952,
+   "labels_r2_est": 209952,
+   "cost_r1": 1.3208912159252422,
+   "cost_r2_est": 1.3208912159252422
+  },
+  "v4_ddx_ghwpwm/43": {
+   "stops": {
+    "quota": 36
+   },
+   "short_bins": [],
+   "budget_missing_at_stop": [],
+   "budget_last_round_filled": [],
+   "stall_round_filled": [],
+   "labels_r1": 209952,
+   "labels_r2_est": 209952,
+   "cost_r1": 1.3265489218792452,
+   "cost_r2_est": 1.3265489218792452
+  },
+  "v4_dg_adwpwm/42": {
+   "stops": {
+    "quota": 36
+   },
+   "short_bins": [],
+   "budget_missing_at_stop": [],
+   "budget_last_round_filled": [],
+   "stall_round_filled": [],
+   "labels_r1": 209952,
+   "labels_r2_est": 209952,
+   "cost_r1": 1.1106473428539752,
+   "cost_r2_est": 1.1106473428539752
+  },
+  "v4_dg_adwpwm/43": {
+   "stops": {
+    "quota": 36
+   },
+   "short_bins": [],
+   "budget_missing_at_stop": [],
+   "budget_last_round_filled": [],
+   "stall_round_filled": [],
+   "labels_r1": 212868,
+   "labels_r2_est": 212868,
+   "cost_r1": 1.1202038317935756,
+   "cost_r2_est": 1.1202038317935756
+  },
+  "v4_dbx_ahtxu/42": {
+   "stops": {
+    "quota": 36
+   },
+   "short_bins": [],
+   "budget_missing_at_stop": [],
+   "budget_last_round_filled": [],
+   "stall_round_filled": [],
+   "labels_r1": 309096,
+   "labels_r2_est": 309096,
+   "cost_r1": 2.193330353588146,
+   "cost_r2_est": 2.193330353588146
+  },
+  "v4_dbx_ahtxu/43": {
+   "stops": {
+    "quota": 36
+   },
+   "short_bins": [],
+   "budget_missing_at_stop": [],
+   "budget_last_round_filled": [],
+   "stall_round_filled": [],
+   "labels_r1": 312012,
+   "labels_r2_est": 312012,
+   "cost_r1": 2.1241324698338753,
+   "cost_r2_est": 2.1241324698338753
+  },
+  "v4_bb_bbvevex/42": {
+   "stops": {
+    "quota": 31,
+    "budget": 5
+   },
+   "short_bins": [
+    {
+     "lo": 1.608,
+     "fill": 0.93,
+     "fill_stall_chunks": null,
+     "fill_budget_chunks": 0.495,
+     "fill_quota_chunks": 1.0
+    }
+   ],
+   "budget_missing_at_stop": [
+    18,
+    15,
+    9,
+    5,
+    2
+   ],
+   "budget_last_round_filled": [
+    16,
+    3,
+    11,
+    9,
+    16
+   ],
+   "stall_round_filled": [],
+   "labels_r1": 408240,
+   "labels_r2_est": 437400,
+   "cost_r1": 2.7209023929155065,
+   "cost_r2_est": 2.8934925591770617
+  },
+  "v4_bb_bbvevex/43": {
+   "stops": {
+    "budget": 4,
+    "quota": 32
+   },
+   "short_bins": [
+    {
+     "lo": 1.608,
+     "fill": 0.933,
+     "fill_stall_chunks": null,
+     "fill_budget_chunks": 0.389,
+     "fill_quota_chunks": 1.0
+    }
+   ],
+   "budget_missing_at_stop": [
+    18,
+    17,
+    6,
+    3
+   ],
+   "budget_last_round_filled": [
+    13,
+    16,
+    10,
+    11
+   ],
+   "stall_round_filled": [],
+   "labels_r1": 402408,
+   "labels_r2_est": 425736,
+   "cost_r1": 2.2047703065133883,
+   "cost_r2_est": 2.317847927843138
+  },
+  "v4_bbx_htaptam/42": {
+   "stops": {
+    "stall": 6
+   },
+   "short_bins": [],
+   "budget_missing_at_stop": [],
+   "budget_last_round_filled": [],
+   "stall_round_filled": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "labels_r1": 314982,
+   "labels_r2_est": 419976,
+   "cost_r1": 1.6250105942785509,
+   "cost_r2_est": 2.078257404621786
+  },
+  "v4_bbx_htaptam/43": {
+   "stops": {
+    "stall": 6
+   },
+   "short_bins": [],
+   "budget_missing_at_stop": [],
+   "budget_last_round_filled": [],
+   "stall_round_filled": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "labels_r1": 314982,
+   "labels_r2_est": 419976,
+   "cost_r1": 1.6075585173147602,
+   "cost_r2_est": 2.0567064899958063
+  },
+  "v4_udx_vevexwp/42": {
+   "stops": {
+    "quota": 6
+   },
+   "short_bins": [],
+   "budget_missing_at_stop": [],
+   "budget_last_round_filled": [],
+   "stall_round_filled": [],
+   "labels_r1": 209988,
+   "labels_r2_est": 209988,
+   "cost_r1": 1.136986237038987,
+   "cost_r2_est": 1.136986237038987
+  },
+  "v4_udx_vevexwp/43": {
+   "stops": {
+    "quota": 6
+   },
+   "short_bins": [],
+   "budget_missing_at_stop": [],
+   "budget_last_round_filled": [],
+   "stall_round_filled": [],
+   "labels_r1": 209988,
+   "labels_r2_est": 209988,
+   "cost_r1": 1.1335144328123457,
+   "cost_r2_est": 1.1335144328123457
+  },
+  "v4_bb_bb/42": {
+   "stops": {
+    "stall": 1
+   },
+   "short_bins": [
+    {
+     "lo": 0.01,
+     "fill": 0.0,
+     "fill_stall_chunks": 0.0,
+     "fill_budget_chunks": null,
+     "fill_quota_chunks": null
+    },
+    {
+     "lo": 8.34,
+     "fill": 0.073,
+     "fill_stall_chunks": 0.073,
+     "fill_budget_chunks": null,
+     "fill_quota_chunks": null
+    }
+   ],
+   "budget_missing_at_stop": [],
+   "budget_last_round_filled": [],
+   "stall_round_filled": [
+    46
+   ],
+   "labels_r1": 315000,
+   "labels_r2_est": 420000,
+   "cost_r1": 1.8299236558862695,
+   "cost_r2_est": 2.3258035162297386
+  },
+  "v4_bb_bb/43": {
+   "stops": {
+    "stall": 1
+   },
+   "short_bins": [
+    {
+     "lo": 0.01,
+     "fill": 0.0,
+     "fill_stall_chunks": 0.0,
+     "fill_budget_chunks": null,
+     "fill_quota_chunks": null
+    },
+    {
+     "lo": 8.34,
+     "fill": 0.108,
+     "fill_stall_chunks": 0.108,
+     "fill_budget_chunks": null,
+     "fill_quota_chunks": null
+    }
+   ],
+   "budget_missing_at_stop": [],
+   "budget_last_round_filled": [],
+   "stall_round_filled": [
+    79
+   ],
+   "labels_r1": 315000,
+   "labels_r2_est": 420000,
+   "cost_r1": 1.1034773169582321,
+   "cost_r2_est": 1.3871701888220198
+  },
+  "v4_ddx_ttx/42": {
+   "stops": {
+    "stall": 1
+   },
+   "short_bins": [
+    {
+     "lo": -1.1,
+     "fill": 0.0,
+     "fill_stall_chunks": 0.0,
+     "fill_budget_chunks": null,
+     "fill_quota_chunks": null
+    }
+   ],
+   "budget_missing_at_stop": [],
+   "budget_last_round_filled": [],
+   "stall_round_filled": [
+    0
+   ],
+   "labels_r1": 210000,
+   "labels_r2_est": 315000,
+   "cost_r1": 0.9869260402888357,
+   "cost_r2_est": 1.352223328075406
+  },
+  "v4_ddx_ttx/43": {
+   "stops": {
+    "stall": 1
+   },
+   "short_bins": [
+    {
+     "lo": -1.1,
+     "fill": 0.0,
+     "fill_stall_chunks": 0.0,
+     "fill_budget_chunks": null,
+     "fill_quota_chunks": null
+    }
+   ],
+   "budget_missing_at_stop": [],
+   "budget_last_round_filled": [],
+   "stall_round_filled": [
+    0
+   ],
+   "labels_r1": 210000,
+   "labels_r2_est": 315000,
+   "cost_r1": 0.9873661450083573,
+   "cost_r2_est": 1.3547356336488172
+  },
+  "v4_ddx_btxwpz/42": {
+   "stops": {
+    "quota": 36
+   },
+   "short_bins": [],
+   "budget_missing_at_stop": [],
+   "budget_last_round_filled": [],
+   "stall_round_filled": [],
+   "labels_r1": 209952,
+   "labels_r2_est": 209952,
+   "cost_r1": 0.758227368625001,
+   "cost_r2_est": 0.758227368625001
+  },
+  "v4_ddx_btxwpz/43": {
+   "stops": {
+    "quota": 36
+   },
+   "short_bins": [],
+   "budget_missing_at_stop": [],
+   "budget_last_round_filled": [],
+   "stall_round_filled": [],
+   "labels_r1": 209952,
+   "labels_r2_est": 209952,
+   "cost_r1": 1.1563187170667888,
+   "cost_r2_est": 1.1563187170667888
+  },
+  "v4_ug_auuux/42": {
+   "stops": {
+    "quota": 33,
+    "budget": 3
+   },
+   "short_bins": [
+    {
+     "lo": 2.995,
+     "fill": 0.948,
+     "fill_stall_chunks": null,
+     "fill_budget_chunks": 0.368,
+     "fill_quota_chunks": 1.0
+    }
+   ],
+   "budget_missing_at_stop": [
+    16,
+    31,
+    7
+   ],
+   "budget_last_round_filled": [
+    32,
+    60,
+    47
+   ],
+   "stall_round_filled": [],
+   "labels_r1": 370332,
+   "labels_r2_est": 387828,
+   "cost_r1": 1.265660701561819,
+   "cost_r2_est": 1.317773578822392
+  },
+  "v4_ug_auuux/43": {
+   "stops": {
+    "quota": 32,
+    "budget": 4
+   },
+   "short_bins": [
+    {
+     "lo": 2.995,
+     "fill": 0.93,
+     "fill_stall_chunks": null,
+     "fill_budget_chunks": 0.368,
+     "fill_quota_chunks": 1.0
+    }
+   ],
+   "budget_missing_at_stop": [
+    1,
+    35,
+    21,
+    18
+   ],
+   "budget_last_round_filled": [
+    45,
+    12,
+    53,
+    49
+   ],
+   "stall_round_filled": [],
+   "labels_r1": 390744,
+   "labels_r2_est": 414072,
+   "cost_r1": 1.5464878401762943,
+   "cost_r2_est": 1.627502288707951
+  },
+  "v4_uux_ddxwpwm/42": {
+   "stops": {
+    "quota": 36
+   },
+   "short_bins": [],
+   "budget_missing_at_stop": [],
+   "budget_last_round_filled": [],
+   "stall_round_filled": [],
+   "labels_r1": 244944,
+   "labels_r2_est": 244944,
+   "cost_r1": 1.2533617886018906,
+   "cost_r2_est": 1.2533617886018906
+  },
+  "v4_uux_ddxwpwm/43": {
+   "stops": {
+    "quota": 36
+   },
+   "short_bins": [],
+   "budget_missing_at_stop": [],
+   "budget_last_round_filled": [],
+   "stall_round_filled": [],
+   "labels_r1": 262440,
+   "labels_r2_est": 262440,
+   "cost_r1": 1.3555493449505187,
+   "cost_r2_est": 1.3555493449505187
+  },
+  "v4_bbx_ccxh/42": {
+   "stops": {
+    "stall": 3,
+    "budget": 3
+   },
+   "short_bins": [
+    {
+     "lo": -3.809,
+     "fill": 0.616,
+     "fill_stall_chunks": 0.198,
+     "fill_budget_chunks": 1.034,
+     "fill_quota_chunks": null
+    }
+   ],
+   "budget_missing_at_stop": [
+    208,
+    209,
+    208
+   ],
+   "budget_last_round_filled": [
+    33,
+    25,
+    106
+   ],
+   "stall_round_filled": [
+    69,
+    3,
+    42
+   ],
+   "labels_r1": 367479,
+   "labels_r2_est": 524970,
+   "cost_r1": 1.7306349821443567,
+   "cost_r2_est": 2.3638604891276227
+  },
+  "v4_bbx_ccxh/43": {
+   "stops": {
+    "stall": 4,
+    "budget": 2
+   },
+   "short_bins": [
+    {
+     "lo": -3.809,
+     "fill": 0.463,
+     "fill_stall_chunks": 0.179,
+     "fill_budget_chunks": 1.034,
+     "fill_quota_chunks": null
+    }
+   ],
+   "budget_missing_at_stop": [
+    209,
+    208
+   ],
+   "budget_last_round_filled": [
+    95,
+    114
+   ],
+   "stall_round_filled": [
+    35,
+    3,
+    58,
+    46
+   ],
+   "labels_r1": 349980,
+   "labels_r2_est": 489972,
+   "cost_r1": 1.7002432745393348,
+   "cost_r2_est": 2.2806072082788424
+  },
+  "v4_udx_cggsx/42": {
+   "stops": {
+    "quota": 36
+   },
+   "short_bins": [],
+   "budget_missing_at_stop": [],
+   "budget_last_round_filled": [],
+   "stall_round_filled": [],
+   "labels_r1": 209952,
+   "labels_r2_est": 209952,
+   "cost_r1": 1.7102781257523654,
+   "cost_r2_est": 1.7102781257523654
+  },
+  "v4_udx_cggsx/43": {
+   "stops": {
+    "quota": 36
+   },
+   "short_bins": [],
+   "budget_missing_at_stop": [],
+   "budget_last_round_filled": [],
+   "stall_round_filled": [],
+   "labels_r1": 215784,
+   "labels_r2_est": 215784,
+   "cost_r1": 1.7517043442278661,
+   "cost_r2_est": 1.7517043442278661
+  },
+  "v4_uc_cuvevex/42": {
+   "stops": {
+    "quota": 35,
+    "budget": 1
+   },
+   "short_bins": [],
+   "budget_missing_at_stop": [
+    2
+   ],
+   "budget_last_round_filled": [
+    16
+   ],
+   "stall_round_filled": [],
+   "labels_r1": 390744,
+   "labels_r2_est": 396576,
+   "cost_r1": 2.293915930083764,
+   "cost_r2_est": 2.324414943234679
+  },
+  "v4_uc_cuvevex/43": {
+   "stops": {
+    "quota": 34,
+    "budget": 2
+   },
+   "short_bins": [],
+   "budget_missing_at_stop": [
+    17,
+    7
+   ],
+   "budget_last_round_filled": [
+    15,
+    30
+   ],
+   "stall_round_filled": [],
+   "labels_r1": 379080,
+   "labels_r2_est": 390744,
+   "cost_r1": 2.237771138392549,
+   "cost_r2_est": 2.298765648567631
+  },
+  "v4_us_ddxsu/42": {
+   "stops": {
+    "quota": 27,
+    "budget": 9
+   },
+   "short_bins": [
+    {
+     "lo": 5.285,
+     "fill": 0.862,
+     "fill_stall_chunks": null,
+     "fill_budget_chunks": 0.443,
+     "fill_quota_chunks": 1.0
+    }
+   ],
+   "budget_missing_at_stop": [
+    2,
+    19,
+    16,
+    4,
+    5,
+    15,
+    12,
+    3,
+    14
+   ],
+   "budget_last_round_filled": [
+    21,
+    31,
+    23,
+    35,
+    38,
+    24,
+    20,
+    29,
+    24
+   ],
+   "stall_round_filled": [],
+   "labels_r1": 411156,
+   "labels_r2_est": 463644,
+   "cost_r1": 2.2744127347407685,
+   "cost_r2_est": 2.5331322744619986
+  },
+  "v4_us_ddxsu/43": {
+   "stops": {
+    "quota": 24,
+    "budget": 12
+   },
+   "short_bins": [
+    {
+     "lo": 5.037,
+     "fill": 0.945,
+     "fill_stall_chunks": null,
+     "fill_budget_chunks": 0.835,
+     "fill_quota_chunks": 1.0
+    },
+    {
+     "lo": 5.285,
+     "fill": 0.823,
+     "fill_stall_chunks": null,
+     "fill_budget_chunks": 0.467,
+     "fill_quota_chunks": 1.0
+    }
+   ],
+   "budget_missing_at_stop": [
+    36,
+    8,
+    44,
+    9,
+    4,
+    9,
+    3,
+    16,
+    13,
+    12,
+    1,
+    3
+   ],
+   "budget_last_round_filled": [
+    0,
+    34,
+    16,
+    20,
+    43,
+    20,
+    17,
+    35,
+    19,
+    17,
+    12,
+    17
+   ],
+   "stall_round_filled": [],
+   "labels_r1": 411156,
+   "labels_r2_est": 481140,
+   "cost_r1": 2.274726921220872,
+   "cost_r2_est": 2.619544911819852
+  },
+  "v4_uu_bbxuu/42": {
+   "stops": {
+    "budget": 17,
+    "quota": 19
+   },
+   "short_bins": [
+    {
+     "lo": 4.881,
+     "fill": 0.91,
+     "fill_stall_chunks": null,
+     "fill_budget_chunks": 0.81,
+     "fill_quota_chunks": 1.0
+    },
+    {
+     "lo": 5.127,
+     "fill": 0.651,
+     "fill_stall_chunks": null,
+     "fill_budget_chunks": 0.261,
+     "fill_quota_chunks": 1.0
+    }
+   ],
+   "budget_missing_at_stop": [
+    11,
+    16,
+    12,
+    7,
+    20,
+    21,
+    13,
+    12,
+    21,
+    15,
+    13,
+    39,
+    24,
+    21,
+    12,
+    1,
+    34
+   ],
+   "budget_last_round_filled": [
+    38,
+    28,
+    29,
+    35,
+    49,
+    23,
+    22,
+    26,
+    24,
+    3,
+    38,
+    10,
+    9,
+    18,
+    19,
+    23,
+    16
+   ],
+   "stall_round_filled": [],
+   "labels_r1": 414072,
+   "labels_r2_est": 513216,
+   "cost_r1": 2.3674493041124363,
+   "cost_r2_est": 2.868340271215271
+  },
+  "v4_uu_bbxuu/43": {
+   "stops": {
+    "budget": 21,
+    "quota": 15
+   },
+   "short_bins": [
+    {
+     "lo": 4.881,
+     "fill": 0.946,
+     "fill_stall_chunks": null,
+     "fill_budget_chunks": 0.907,
+     "fill_quota_chunks": 1.0
+    },
+    {
+     "lo": 5.127,
+     "fill": 0.65,
+     "fill_stall_chunks": null,
+     "fill_budget_chunks": 0.399,
+     "fill_quota_chunks": 1.0
+    }
+   ],
+   "budget_missing_at_stop": [
+    6,
+    14,
+    4,
+    17,
+    18,
+    11,
+    18,
+    52,
+    13,
+    4,
+    15,
+    35,
+    10,
+    5,
+    3,
+    9,
+    12,
+    19,
+    5,
+    15,
+    4
+   ],
+   "budget_last_round_filled": [
+    44,
+    40,
+    39,
+    11,
+    18,
+    28,
+    28,
+    13,
+    46,
+    18,
+    31,
+    16,
+    24,
+    11,
+    39,
+    22,
+    40,
+    47,
+    39,
+    16,
+    43
+   ],
+   "stall_round_filled": [],
+   "labels_r1": 416988,
+   "labels_r2_est": 539460,
+   "cost_r1": 2.012447475073292,
+   "cost_r2_est": 2.5337051494697
+  },
+  "v4_uux_bgtxwp/42": {
+   "stops": {
+    "stall": 25,
+    "budget": 11
+   },
+   "short_bins": [
+    {
+     "lo": -1.206,
+     "fill": 0.361,
+     "fill_stall_chunks": 0.082,
+     "fill_budget_chunks": 1.0,
+     "fill_quota_chunks": null
+    },
+    {
+     "lo": -0.96,
+     "fill": 0.0,
+     "fill_stall_chunks": 0.0,
+     "fill_budget_chunks": 0.0,
+     "fill_quota_chunks": null
+    }
+   ],
+   "budget_missing_at_stop": [
+    26,
+    25,
+    26,
+    26,
+    25,
+    25,
+    25,
+    26,
+    26,
+    26,
+    25
+   ],
+   "budget_last_round_filled": [
+    0,
+    0,
+    23,
+    0,
+    0,
+    0,
+    0,
+    13,
+    15,
+    0,
+    25
+   ],
+   "stall_round_filled": [
+    0,
+    2,
+    1,
+    3,
+    1,
+    2,
+    8,
+    11,
+    2,
+    8,
+    0,
+    10,
+    1,
+    4,
+    5,
+    7,
+    0,
+    6,
+    0,
+    0,
+    0,
+    2,
+    0,
+    0,
+    0
+   ],
+   "labels_r1": 347004,
+   "labels_r2_est": 484056,
+   "cost_r1": 1.8715013530184155,
+   "cost_r2_est": 2.5140462163430297
+  },
+  "v4_uux_bgtxwp/43": {
+   "stops": {
+    "budget": 18,
+    "stall": 18
+   },
+   "short_bins": [
+    {
+     "lo": -1.206,
+     "fill": 0.464,
+     "fill_stall_chunks": 0.093,
+     "fill_budget_chunks": 0.836,
+     "fill_quota_chunks": null
+    },
+    {
+     "lo": -0.96,
+     "fill": 0.0,
+     "fill_stall_chunks": 0.0,
+     "fill_budget_chunks": 0.0,
+     "fill_quota_chunks": null
+    }
+   ],
+   "budget_missing_at_stop": [
+    51,
+    26,
+    25,
+    25,
+    26,
+    51,
+    25,
+    26,
+    25,
+    26,
+    26,
+    25,
+    26,
+    26,
+    25,
+    50,
+    26,
+    26
+   ],
+   "budget_last_round_filled": [
+    0,
+    0,
+    0,
+    14,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    25,
+    6
+   ],
+   "stall_round_filled": [
+    1,
+    5,
+    6,
+    0,
+    7,
+    2,
+    3,
+    7,
+    0,
+    1,
+    0,
+    1,
+    2,
+    0,
+    7,
+    6,
+    2,
+    0
+   ],
+   "labels_r1": 367416,
+   "labels_r2_est": 524880,
+   "cost_r1": 1.9601216658345566,
+   "cost_r2_est": 2.69573578611545
+  }
+ },
+ "total_seconds": {
+  "r1": 3155.085829097341,
+  "current": 2110.869118732575,
+  "r2_est": 3454.7007920199744,
+  "step65": 3906.2965676226304
+ },
+ "total_cost_r1": 1.494685672881388,
+ "total_cost_step65": 1.8505631320089047,
+ "total_cost_r2_est": 1.6366248202514204
+}
