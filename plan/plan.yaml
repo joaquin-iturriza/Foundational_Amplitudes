@@ -11608,6 +11608,20 @@ entries:
       -> the channel route (res [0,1,3] share floor, the channel the step-65 policy reached the top with), one more revision;
       a class that passed under r2 now short -> r3''s concentration of weight on few candidates hurts it: read its rounds,
       revise; outside > 0 -> outside_dex; summed cost > 2x -> per-channel seconds. Job failures -> log read, fixed, rerun.'
+    passed_at: '2026-11-07T07:03:41+00:00'
+    reviewer: 'r3 vs r2 differ only in flat_empty_near (R3 = dict(R2, flat_empty_near=True), sampler-r3 @db973ca9), same 38-job
+      layout and same node as r2 and the old sampling; reader change (reach over r1/r2 jobs) scores both arms alike. Check
+      2: r2 per-chunk reads of v4_uux_bgtxwp bin [-1.206,-0.96] (multichannel_check_reads ..._grid_r2_budget18_42/43): 10/36
+      and 8/36 chunks stall at 0-5 candidates, rounds 2-3 at missing 51-52 with 2 bins short (both top bins empty, so their
+      deficit went to the [-1.452,-1.206] bin), the 1-5 footholds arrive only in the last round; the other 26/28 chunks fill
+      to quota 25-26: per-chunk fill moves with whether an empty bin''s steering finds the bin, which is what r3 changes;
+      read per bin and class, not diluted. Check 3: seeds 42/43 on all 19 classes as r1/r2; seed spread of that bin''s fill
+      0.734/0.79 (r1 0.36/0.46) against a 0.95 bar per seed. Check 14: 49 GB free on /sps (df now), ~0.5 MB JSON per job.
+      Check 5 searched results.tex, plan show, site decisions for empty bin, empty_near, nearest occupied, nearest candidates,
+      steer, flat_quota_weights, deficit, bgtxwp, straddl, r3: only step 58''s original nearest-occupied-bin rule (the one
+      r3 replaces) and the sigma-steering thread (unrelated); no earlier empty-bin steering revision. Note for the read: r3
+      also re-steers the always-empty top-margin bins above reach on every class; a class regressing from r2 is in the NO
+      branch.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
