@@ -10986,6 +10986,19 @@ entries:
       the shared-feature path, next the clipping regime. PARTIAL (better than rerun, worse than MSE) or NOT BETTER -> the
       sign gap is not the gradient competition: next the clipping regime (clip 5 binds on 99% of het steps). Blow-up flagged
       -> no verdict, listed apart.'
+    passed_at: '2026-11-07T03:04:09+00:00'
+    reviewer: 'Step 73 sign branch: one change against the weight-1 het sign-head rerun (job script arms v4_het_signhead_branch
+      vs v4_het_control_signhead differ only in ++model.net.sign_branch=true; commit 47839345 bundles own block copy + detached
+      input/frames + own clip group, all named in the question); measure moved on existing data (het_signhead61.json: rerun
+      vs MSE H5 median 12.96% vs 6.69%, ratio 1.94; step 56 p 0.0036 at 4 seeds; magnitude R separated per-event 1.13 [1.06,1.21]
+      and weight 75 1.39 from the rerun); seeds 4 match the rerun and MSE control, the one-seed reading (D315) is asked of
+      Joaquin with its resolution (>~2x sign, >~15% magnitude) and submission waits; outcome YES/SIGN-YES-MAG-HURT/PARTIAL/NO
+      stated; HETEROSC (D71), same DIM+MUON_BEST, ITERS 4264, no HPO; reads H5 catalog-sampled / HD5 default-sampled as steps
+      56/61; disk ~0.86 GB per job (129 MB run + 727 MB scratch of the rerun) x4 vs 64 GB free on /sps/lpnhe; wall 3.49 h
+      incl. 1.25 margin covers one extra block. Searched results.tex, entry and decisions for sign_branch, sign branch, detached,
+      detach, own copy, sign head, clip apart/clip group: only steps 56/61 and the unrelated detached-sigma backbone. Caveat
+      for the write-up: a NOT BETTER does not by itself rule out gradient competition, since the detached trunk also stops
+      learning sign features.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
