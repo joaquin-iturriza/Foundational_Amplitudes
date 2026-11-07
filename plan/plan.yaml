@@ -11301,6 +11301,31 @@ entries:
       labels vs proposal per channel. Margin bins short are reported (a bin above the class''s kinematic maximum, e.g. 2->2
       tops, holds no candidate), never counted in the verdict: the 0.5-dex margin was a chosen width (tools/flat_range.MARGIN_DEX),
       the coverage requirement (D269) is the scored count. Job failures -> log read, fixed, rerun.'
+    fix_at: '2026-11-07T04:48:45+00:00'
+    fix: '(1) Outcome bar moved after the SHORT result (checks 4 and 6). Step 65''s read, which the design revises, counted
+      every in-range 0.25-dex bin including the 0.5-dex margin (regen_g12_read.json: SHORT on 527 classes), step 67''s verdict
+      counted short margin bins as NEAR, and next step 75 says the revision is ''read by the same rules''. r1''s verdict (multichannel_check.py
+      step75r1, core = [range lo + 0.5 dex, range hi - 0.5 dex]) never counts margin bins, and the margin holds 2852 + 76
+      of the 4071 short bins in step 65''s profile, so most of the failure leaves the bar instead of being fixed. The margin
+      is the ''but wider'' of D270 (''covers the range the pp beams cover, but wider''). Fix: keep step 65''s bin bar (every
+      in-range bin >= 0.95, margin included). Exempt only bins shown to hold no candidate from any channel across the class''s
+      chunks, i.e. above its kinematic maximum (e.g. the 45 of 58 2->2 top bins with no candidate); that exemption is measured,
+      not chosen. Any wider exemption of margin bins goes to Joaquin with plan ask, stating what it drops (number of bins
+      and classes). (2) One failure kind has no class in the 18 (check 6). In step 65 four classes had held-out pp events
+      outside the range and no dsh_ pool: v4_dg_accxd 1, v4_ug_dgtapvt 1, v4_uux_ahvevex 1, v4_uux_bgtxwp 2. Change (e), the
+      dsh_ train range, cannot reach them (tools/flat_range.ranges_dsh leaves their range unchanged), and none is among the
+      18. The three ''outside without a short bin'' classes (ug_auuux, uux_ddxwpwm, bbx_ccxh) all have dsh_ pools (dsh_train_support.json).
+      Fix: add one of them (v4_uux_bgtxwp, the worst) to R1_CLASSES, at both seeds like the other classes, or say how a PASS
+      on 18 covers them. (3) Minor, record with the revision: the batch''s wall-time target per job (from step 75''s budget-12
+      replay times, multichannel_check.py need) and its disk (about 0.5 MB of JSON per job in $SCRATCH/zz_mcheck plus temporary
+      chunk dirs) are not stated. Checks that held: change against a matched control (r1, the step-65 policy and current in
+      one job on one node; the bundle of five changes is the question and is stated). The measure responds (grid_fwd_check.json
+      udx_csxvevex: top bins 0.04-0.11 under quota12 against 1.0 under grid12). Seeds 42/43 as in step 75 with every class
+      and seed required to pass; the cost spread seen between seeds is 2.17 against 1.43 (us_ddxsu). Held-out scoring on PP4
+      val + dsh_ val + dsh_ test, none of which builds the range (PP4 train+test and dsh_ train build it). Test events are
+      default-sampled 13 TeV pp (D269/D294). No training, loss, preprocessing or HPO involved. Searched for check 5: results.tex
+      for stall, resonance ladder, resladder, smixr, dsh_ train, solve_tol, mperi_all, margin; the entry''s findings and dead
+      ends (step 65 v2/v3, step 67 verdict, step 65 read); site decisions (D269, D270, D294, D317, D318). No repeat found.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
