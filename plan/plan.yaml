@@ -15918,7 +15918,7 @@ entries:
     - FA-ccin2p3-f5245570
     - FA-ccin2p3-f699e170
     - FA-ccin2p3-fbb16a33
-    commit: 3abe9aa7
+    commit: 7bd323c3
     paths:
     - analysis/catalog_v3/data/short_reads/v4_mse_cont_k1066
     - analysis/catalog_v3/data/short_reads/v4_mse_cont_k1066_seed2
@@ -15959,6 +15959,7 @@ entries:
     - analysis/catalog_v4/data/warm_start_C1r_step3198_default.json
     - analysis/catalog_v4/data/warm_start_C1t.json
     - analysis/catalog_v4/data/warm_start_S14.json
+    - analysis/catalog_v4/data/warm_start_S15.json
     - analysis/catalog_v4/data/ws_hpo8/het_split.json
     - analysis/catalog_v4/data/ws_hpo8/het_split_log.txt.gz
     - analysis/catalog_v4/data/ws_hpo8/trial_curves.json
