@@ -18159,6 +18159,21 @@ entries:
       training loss over steps 0-39 -2.31/-2.27 vs -1.55/-1.46) and changes nothing downstream: the restart jump is ruled
       out as the cause of the k=533 gap; the continued arms lose by their less-trained start model. Figure analysis/catalog_v4/figs/ws_restart_study_s13
       (plot_ws_restart.py @9d30a635, step 12''s arms plus this one). Write-up with step 14''s, after par:v4_warm_start_valley.'
+  - at: '2026-11-07T02:57:33+00:00'
+    text: '2026-11-07 step 14 read (D319, D315; design passed round 2 2026-11-06T23:15): six runs clean, sigma stages clean
+      (no OPT_STATE, no live weights, shrink in main stage only). mixture_ab.py warm_single @1e7042dd -> data/warm_start_S14.json,
+      figure figs/ws_fixes (plot_ws_fixes.py @1e7042dd). R(arm/control = cosine parent default restart 238e6f81), seed 42,
+      widened by kind: control vs step-1 s42 1.009/1.027 (reproduces); shrink and perturb 1.438 [1.386,1.505] / 1.360 [1.203,1.552]
+      WORSE, diverged at the start (loss 0.87 at step 0, grad norm 3.0e15, loss above 0 through step 50, recovered to val
+      -2.222 vs -2.659); share 0.50 k267 1.026 [0.968,1.086] / 0.996 [0.894,1.099] NOT BETTER (EXPOSURE supported); share
+      0.50 k533 0.865/0.812 BETTER MATCH-est 1.153/1.228; WSD branch share 0.25 0.775 [0.724,0.826] / 0.853 [0.765,0.970];
+      WSD branch share 0.50 0.656 [0.616,0.702] / 0.694 [0.615,0.784], est R/B 0.875/1.050, seed-42 R/B 0.815/0.966; WSD final
+      default restart 0.759/0.832; all three WSD BETTER MATCH-est, held 0.82-0.84 (no flag). Branch over WSD final restart
+      1.016/1.035 NOT BETTER (BRANCH not working; jump gone G 61/57 vs 181 vs 1023). WSD parent val at 4264 -2.909 vs cosine
+      parent -2.858: the gain is the better WSD-pretrained parent, not the branch. Recipe by the rule: candidate the WSD branch
+      on share 0.50 (lowest at equal 533 steps; two gains multiply: WSD parent ~0.76/0.83, share 0.50 ~0.87/0.81). Caveat:
+      B (share 0.25 from scratch) is cosine; the matched from-scratch under WSD is not read. Write-up par:v4_warm_start_optstate
+      + par:v4_warm_start_fixes (notes-editor review before commit). E4025/E4026 acked.'
   step_waits:
     '9': FA-ccin2p3-238e6f81 FA-ccin2p3-0f346464 FA-ccin2p3-77e8bf2b FA-ccin2p3-1354daee FA-ccin2p3-4dc35a98 FA-ccin2p3-9079718e
   handoff:
