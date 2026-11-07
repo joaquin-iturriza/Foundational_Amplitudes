@@ -15057,14 +15057,11 @@ entries:
   - D307
   - D313
   next:
-    9: 'Step 14 (D319, single seed D315): new warm-start mechanisms toward the C1 change (share 0.25, het, k=533) at seed
-      42, against the same-commit default restart (FA-ccin2p3-238e6f81) and B: shrink-and-perturb (rerun FA-ccin2p3-0f346464
-      after b91cf7c6; 71852916 not read), share 0.50 for 267 steps (FA-ccin2p3-77e8bf2b), the WSD parent (dccb61e8, trained
-      clean, failed only its save check, fixed 36dcf7d9) branched at step 3731 with its optimizer state, cooldown on share
-      0.25 (FA-ccin2p3-1354daee) or 0.50 (FA-ccin2p3-4dc35a98), and its final at the default restart (FA-ccin2p3-9079718e),
-      resubmitted unchained after the fix b91cf7c6; share 0.50 at 533 (9a357af2) beside. Check the branch sigma stages log
-      no OPT_STATE and no live-weights line. Reads: read7.sh per run, mixture_ab.py warm_single (S14) -> data/warm_start_S14.json,
-      figure plot_ws_fixes.py'
+    9: 'Step 15 (D319, seed 42, D315): the matched from-scratch control under WSD (v4_het_default25_wsd) and the WSD final
+      at the default restart on share 0.50 (v4_het_wsx_wsdfinal_default50); design recorded 2026-11-07, design reviewer and
+      repo reviewer of branch ws-wsd-match @809e45c7 running; on both PASS: merge, site sync, site pick FA --jobs 2, target
+      ws_wsd_match 3.6 h, submit (limits 03:45 and 02:30, 16G), fill S15 in mixture_ab.py, plan wait. Read: read7.sh per run,
+      mixture_ab.py warm_wsd -> data/warm_start_S15.json, figure, write-up after par:v4_warm_start_fixes'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -18271,8 +18268,7 @@ entries:
       on share 0.50 (lowest at equal 533 steps; two gains multiply: WSD parent ~0.76/0.83, share 0.50 ~0.87/0.81). Caveat:
       B (share 0.25 from scratch) is cosine; the matched from-scratch under WSD is not read. Write-up par:v4_warm_start_optstate
       + par:v4_warm_start_fixes (notes-editor review before commit). E4025/E4026 acked.'
-  step_waits:
-    '9': FA-ccin2p3-238e6f81 FA-ccin2p3-0f346464 FA-ccin2p3-77e8bf2b FA-ccin2p3-1354daee FA-ccin2p3-4dc35a98 FA-ccin2p3-9079718e
+  step_waits: {}
   handoff:
     state: 'Step 13 done (finding 2026-11-07, dead end recorded): the optimizer-state continuation removes the restart jump
       but reads as the fresh-optimizer continuation, WORSE than the default restart on EE4 (1.240 [1.034,1.505]), PP4 1.148;
@@ -18302,7 +18298,9 @@ entries:
     written: '2026-11-07T02:24:00+00:00'
   step_why:
     9:
-      feeds: 'the warm-start recipe (D319): which mechanism closes the k=533 gap to the change from scratch'
+      feeds: the warm-start recipe (D319) and whether it matches pretraining from scratch at 1/8 of the compute under the
+        same schedule
       if:
-      - 'an arm BETTER with MATCH-estimate: the cheapest such arm is the recipe candidate, to Joaquin with the D307 hold'
-      - 'none BETTER: share 0.50 retraining at 533 (C1s50, MATCH at two seeds) goes to Joaquin as the recipe for data changes'
+      - 'a share-0.50 WSD arm MATCH over B_wsd: the recipe (restart if within 5% of the branch, else branch) goes to Joaquin
+        with the request to lift D307'
+      - 'neither MATCH: the numbers go to Joaquin; the WSD gain reported as a pretraining-schedule finding'
