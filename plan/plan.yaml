@@ -15355,7 +15355,7 @@ entries:
   title: the redesign of how agents work on this project
   question: Does the implemented redesign (hooks, review, supervisor, owners and hand-offs, rules-only CLAUDE.md with pushed
     sections) hold on tonight's real states and in live use?
-  status: running
+  status: waiting_user
   quotes:
   - said_at: '2026-10-30T04:46:16.657000+00:00'
     text: everything else I believe looks good I believe, you can start
@@ -15697,6 +15697,11 @@ entries:
     - 19
     answered_at: '2026-11-06T19:52:40.785000+00:00'
     decision: D321
+  - ask: 'Your hold: do you want a batching window for wakes (main session and owner resumes), and which? 10 min cuts main-session
+      wakes 817 -> 380 and tokens 11-31% at a mean delay of 6 min; 60 min cuts 16-50% at 28 min.'
+    at: '2026-11-07T12:55:03+00:00'
+    searched: 'site decisions D322, D323: neither sets a batching window'
+    holds_all: the entry is under the weekend hold D322; only this answer moves it
   step_why:
     11:
       feeds: whether the redesign is finished
@@ -16456,6 +16461,11 @@ entries:
     running: none
     files: docs/results.tex tools/push_replay.py tools/main_turns.py tools/compaction_replay.py tools/model_trial.py analysis/agent_redesign/main_turns_split_5708b248.json
     written: '2026-11-04T19:52:42+00:00'
+  ask: 'Your hold: do you want a batching window for wakes (main session and owner resumes), and which? 10 min cuts main-session
+    wakes 817 -> 380 and tokens 11-31% at a mean delay of 6 min; 60 min cuts 16-50% at 28 min.'
+  waiting_since: '2026-11-07T12:55:03+00:00'
+  searched: 'site decisions D322, D323: neither sets a batching window'
+  holds_all: the entry is under the weekend hold D322; only this answer moves it
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
   question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
