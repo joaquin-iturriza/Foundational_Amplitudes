@@ -11401,6 +11401,12 @@ entries:
     units: null
     start: '2026-11-07T00:43:13+00:00'
     at: '2026-11-07T00:43:13+00:00'
+  - batch: eea_anchor_stage1
+    wall_h: 1.0
+    jobs: 16
+    units: null
+    start: '2026-11-07T01:54:10+00:00'
+    at: '2026-11-07T01:54:10+00:00'
   step_why:
     37:
       feeds: one shared data cache per dataset that a GPU job only opens
