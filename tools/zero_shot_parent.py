@@ -38,6 +38,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import siteconf  # noqa: E402
+from base_experiment import clear_start_only  # noqa: E402
 import pool_physics  # noqa: E402
 from rebuild_run import _build, cached_parent_loads, load_best_weights, scored_split  # noqa: E402
 from multiplicity_extrap import parent_target_standardization  # noqa: E402
@@ -173,6 +174,7 @@ def _read(recipe):
         cfg.fine_tune.pretrained_path = ckpt
         cfg.fine_tune.target_stats = "own"
         cfg.fine_tune.offshell_stats = "parent"
+        clear_start_only(cfg.fine_tune)   # the parent's own scored model, as it was read
     try:
         exp = _build(cfg, None, None, None)          # init_model loads the parent's weights, as a fine-tune does
     except Exception as e:                            # a missing pool or sidecar on this site: listed, not dropped

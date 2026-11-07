@@ -21,6 +21,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import siteconf  # noqa: E402
+from base_experiment import clear_start_only  # noqa: E402
 from rebuild_run import _build  # noqa: E402
 
 # --parent <pretraining run dir>: score that pretraining instead of the run dir's own parent, on the run dir's probe
@@ -43,6 +44,7 @@ for run_dir in args:
         cfg.fine_tune.pretrained_path = siteconf._expand_str(str(cfg.fine_tune.pretrained_path))
         if parent:
             cfg.fine_tune.pretrained_path = os.path.join(parent, "models", "model_run0_best.pt")
+        clear_start_only(cfg.fine_tune)   # the parent's own scored model, as it was read
     saved = json.load(open(os.path.join(run_dir, "data_stats.json")))
     # the run's own off-shellness scale is pinned only for its own parent: with --parent the stats it recorded were merged
     # with a different parent's, so the fine-tune's merge (fine_tune.offshell_stats=parent) is redone with the new one

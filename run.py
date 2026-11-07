@@ -8,6 +8,7 @@ import hydra
 import torch
 from omegaconf import OmegaConf, open_dict
 from experiment import AmplitudeExperiment
+from base_experiment import clear_start_only
 from preprocessing import unresolved_amp_trafos
 
 
@@ -39,6 +40,7 @@ def sigma_stage_cfg(cfg):
         # grow it again (plan warm_start step 4: FA-ccin2p3-1b390f47, ea48ea8c failed here, 16 -> 16 heads)
         s.fine_tune.grow_width = False
         s.fine_tune.moment_fill_steps = 0   # the stage starts from this run's model; no moment fill (D303)
+        clear_start_only(s.fine_tune)      # nor a second shrink, live start or optimizer-state load (step 14)
         if "muon_warmup_steps" in s.fine_tune:
             s.fine_tune.muon_warmup_steps = 0   # the stage is its own optimizer on sigma; no Muon warmup (D303)
         if "adamw_warmup_steps" in s.fine_tune:

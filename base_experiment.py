@@ -77,6 +77,19 @@ torch.autograd.set_detect_anomaly(False)
 MIN_STEP_SKIP = 1000
 
 
+def clear_start_only(ft):
+    """Clear, in a config that loads a finished run as its parent (the HETEROSC sigma stage, the zero-shot and k-shot
+    readers), the fine_tune keys that shaped only how that run started from its own parent (plan warm_start steps 13
+    and 14): fine_tune.shrink_perturb, fine_tune.start_weights=live, fine_tune.load_optimizer_state and
+    fine_tune.moment_fill_steps. Inherited, they were applied again to the run's own model: the sigma stage of
+    v4_het_wsx_shrinkperturb (FA-ccin2p3-71852916) shrank its trained model and every probe read shrank it once more.
+    The caller holds open_dict."""
+    ft.shrink_perturb = None
+    ft.start_weights = "scored"
+    ft.load_optimizer_state = False
+    ft.moment_fill_steps = 0
+
+
 def _ckpt_live_state(ck):
     """A checkpoint's live (training) weights, the ones a resume continues from: "model_live" where the checkpoint
     was written with EMA on (format marker "model_is_ema"; D63), else "model" (EMA off, or a checkpoint older than

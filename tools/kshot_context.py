@@ -23,6 +23,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import siteconf  # noqa: E402
+from base_experiment import clear_start_only  # noqa: E402
 from rebuild_run import _build, load_best_weights  # noqa: E402
 
 
@@ -97,6 +98,7 @@ def main():
             cfg.fine_tune.pretrained_path = ckpt
             cfg.fine_tune.target_stats = "own"
             cfg.fine_tune.offshell_stats = "parent"
+            clear_start_only(cfg.fine_tune)   # the parent's own scored model, as it was read
             cfg.model.context_names_file = os.path.join(parent, "context_names.json")
         try:
             exp = _build(cfg, None, None, None)
