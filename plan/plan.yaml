@@ -3758,6 +3758,10 @@ entries:
       then one SHORT revision for the short classes only (short bins by budget/channel; outside events by a widening rule
       that reads no scored events, ~493 classes lack dsh_ pools), its own design and design review, regenerated, read by the
       same rules.'
+    76: '(o) step 74 stage 2 left out dsh_eea_epem_accxh and dsh_eea_epem_aepemh (kept 0.436 / 0.493 at 160 GeV, ask > 2x
+      what they keep: lhe_parts plan refused). Read the cause from their eea_ parts at 160 GeV cut by cut (pT, |cos|, Delta
+      R, same-type and mixed pair masses), make generation express the missing cut (suspected: m > 10 GeV on mixed photon-quark/photon-lepton
+      pairs, not in the run card), probe it, then plan them into catalog_v4_dsh_eea.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -11851,6 +11855,11 @@ entries:
       if:
       - 'COST cause found and fixed: the SHORT revision designed and submitted'
       - 'no fix within 2x: the cost and its cause go to Joaquin'
+    76:
+      feeds: the e+e- default-sampled data at the anchor energies (step 68's flat ranges)
+      if:
+      - 'kept >= 0.5 at every energy after the fix: planned and built'
+      - 'still short: Joaquin decides between dropping 160 GeV for them and accepting'
   owner:
     agent: a10eccf640da955ae
     state: working
