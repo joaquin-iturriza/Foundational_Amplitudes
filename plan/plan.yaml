@@ -5574,8 +5574,20 @@ entries:
     searched: 'CLAUDE.md (2x margin rule on a method''s cost), site decisions D269, D294, D317: none settles the edge-bin
       exemption or whether the 2x is per class'
     blocks: the 1301-class regeneration with the sixth revision (step 82)
+    blocks_steps:
+    - 82
+  - ask: 'Scope: (1) before regenerating the 1301 hadronic classes with the sixth flat-sampler revision: exempt the bins cut
+      by a class''s kinematic maximum (bb->bb, bbx->ccxH, uux->bgtxW+ top bin) or score them on their reachable share; and
+      is the 2x cost bar on the total (1.62x) or per class (19 of 38 over)? (2) Your hold: the deeper sign-branch read is
+      a FAULT (MSE(4-block)/MSE(1-block) 1.26 on the default one-loop classes, bar 1.15); may the owner trace it with one
+      repeat of the one-block run, about 2.5 GPU-h, design reviewed first?'
+    at: '2026-11-07T15:49:31+00:00'
+    searched: 'CLAUDE.md, site decisions D269, D294, D317, D322 (weekend hold: read only): none settles the edge bins, the
+      per-class cost bar, or lifts the hold for the repeat'
+    blocks: the 1301-class regeneration (step 82) and the sign-branch fault trace (step 83)
     blocks_steps: &id001
     - 82
+    - 83
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -15159,17 +15171,16 @@ entries:
       mg5_pipeline_final.py (flat_stall_off), tools/regen_recipes.py (R6), analysis/catalog_v4/multichannel_check.py (grid_r6_budget18,
       _chunk_sig, step82r6*), analysis/catalog_v4/r2_check_fig.py (r6), tests/test_flat_grid.py
     written: '2026-11-07T09:55:54+00:00'
-  ask: 'Scope: before regenerating the 1301 hadronic classes with the sixth flat-sampler revision (passes on every non-edge
-    bin, 0 outside, total cost 1.62x the old): (1) bins cut by a class''s kinematic maximum (bb->bb 8.34, 17% reachable, fill
-    0.19/0.22; bbx->ccxH -3.81, 6% reachable, 0.88/0.85; uux->bgtxW+ -0.96, 9% reachable, 0): exempt them, or score them on
-    their reachable share (then only the uux->bgtxW+ top bin fails)? (2) the 2x cost bar: on the total over the check (1.62x,
-    passes) or per class (19 of 38 class-seeds over 2x)?'
-  waiting_since: '2026-11-07T10:35:04+00:00'
-  searched: 'CLAUDE.md (2x margin rule on a method''s cost), site decisions D269, D294, D317: none settles the edge-bin exemption
-    or whether the 2x is per class'
-  blocks: the 1301-class regeneration with the sixth revision (step 82)
+  ask: 'Scope: (1) before regenerating the 1301 hadronic classes with the sixth flat-sampler revision: exempt the bins cut
+    by a class''s kinematic maximum (bb->bb, bbx->ccxH, uux->bgtxW+ top bin) or score them on their reachable share; and is
+    the 2x cost bar on the total (1.62x) or per class (19 of 38 over)? (2) Your hold: the deeper sign-branch read is a FAULT
+    (MSE(4-block)/MSE(1-block) 1.26 on the default one-loop classes, bar 1.15); may the owner trace it with one repeat of
+    the one-block run, about 2.5 GPU-h, design reviewed first?'
+  waiting_since: '2026-11-07T15:49:31+00:00'
+  searched: 'CLAUDE.md, site decisions D269, D294, D317, D322 (weekend hold: read only): none settles the edge bins, the per-class
+    cost bar, or lifts the hold for the repeat'
+  blocks: the 1301-class regeneration (step 82) and the sign-branch fault trace (step 83)
   blocks_steps: *id001
-  checked_until: '2026-11-07T15:40:47+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
