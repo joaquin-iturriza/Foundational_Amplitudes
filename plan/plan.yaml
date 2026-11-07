@@ -3754,13 +3754,12 @@ entries:
       yields file like EEA_YIELDS), requeue the 4 stale claimed tasks (epepemem, aepemz), check the 93 assembled pools for
       runs with got < asked, lhe_parts plan --skip-claimed, site pick, target, submit; ack the 18 assembly-failure events
       (E4096..E4119) with what was done.'
-    78: '(q) step 75 r1 read NO (finding 2026-11-07, data/r1_check.json): every core bin filled, cost median 1.66x; left:
-      top-margin bins under 0.95 on 7 classes, 1 held-out event outside on v4_bbx_htaptam, cost 2.0-2.7x on 6 classes. Revision
-      r2: (1) the reader exempts bins no candidate of any policy/seed reached below the class''s least candidate too (ddx_ttx,
-      bb_bb bottom bins; same rule as the reach exemption, state it to the design reviewer); (2) channel-by-bin on the short
-      top-margin bins (which channel reaches them, where the held-out tops sit) and one change of that channel; (3) the htaptam
-      outside event''s distance above the kept max; (4) labels vs proposal per channel on the 6 classes over 2x. Own design
-      (plan design), design-reviewer, the same 19 classes x 2 seeds.'
+    78: '(q) step 75 r2 (after r1''s NO): r2 = r1 + flat_keep_ext + flat_stall_patience 2 + flat_budget 18 on branch sampler-r2
+      @c825cb19 (worktrees/wt-r2; tools/regen_recipes.R2, policy grid_r2_budget18; readers multichannel_check.py step75r2-rounds
+      -> data/r1_rounds.json, step75r2 -> data/r2_check.json). Design recorded 2026-11-07, design-reviewer and repo-reviewer
+      running. On both PASS: merge, site sync, site pick FA --jobs 38, plan target --batch r2_check --wall 0.35 --jobs 38,
+      submit 38 CPU jobs (scripts/job_multichannel_check.sh, MCHECK_POLICIES=current+grid_r1_budget12+grid_r2_budget18, seeds
+      42/43, --time 01:00:00), plan wait 78 on them; read step75r2-pull then step75r2.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -12142,8 +12141,10 @@ entries:
     78:
       feeds: whether all 1301 hadronic classes are regenerated with the revised sampler before step 68's e+e- classes join
       if:
-      - 'PASS: regenerate the 1301 classes (recipes/catalog_v4_r1_regen.yaml with r2), read by regen_read.py at the same bar'
-      - 'NO again: the failing kinds go to Joaquin with what an exemption or tolerance would drop'
+      - 'PASS: regenerate the 1301 classes with R2 (_smixs), read by regen_read.py at the same bar; per-class costs over 2x
+        to Joaquin'
+      - 'NO only on the straddling bins (bb_bb 8.34, uux_bgtxwp -0.96): their exemption to Joaquin (plan ask)'
+      - 'NO otherwise: the failing kind per the design''s NO branch'
   owner:
     agent: a1b86f13fe672cb82
     state: working
