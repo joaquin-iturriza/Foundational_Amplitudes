@@ -14319,6 +14319,12 @@ entries:
       0.3 (the catalog''s short-run rule): dsh_eea_epem_bbxgz 3000 GeV 20 of 200 and dsh_eea_epem_wpwmzz 3000 GeV 53 of 200,
       0.3% and 0.7% of their pool''s events at that energy; kept, not relaid (a whole-pool relay for under 1% of one energy''s
       events). Step 77 done.'
+  - at: '2026-11-07T06:30:01+00:00'
+    text: '2026-11-07 step 76 probes read (site logs EEISR_JSON of the 18 jobs): with the mixed-pair cut, dsh_eea_epem_accxh
+      keeps 1.0/1.0/1.0/0.999/0.999/0.997/0.997/0.988/0.963 at 160/209/240/365/380/500/1000/1500/3000 GeV (was 0.436 at 160),
+      aepemh 1.0/1.0/1.0/1.0/0.998 at 160/240/365/380/500 (was 0.493). aepemh''s 209/1000/1500/3000 GeV logs were lost: jobs
+      at the same energy share the checkout and one''s rm -f eeisr_<E>_*.log took the other''s; fixed e2f51bd9 (per-job log
+      names), the 4 rerun as FA-ccin2p3-e22b4949 08ae487a 81113f0a 9cc1284c (wait on step 76).'
   handoff:
     state: '2026-11-07 ~08:00. Step 77: the 20 stage-2 dsh_eea_ pools not assembled (18 one-run pools short at 1000/1500/3000
       GeV, epepemem and aepemz short too after rerun) relaid whole as complete gridpack runs of 200 (dsha_short in recipes/gen_catalog_v4_default.py,
