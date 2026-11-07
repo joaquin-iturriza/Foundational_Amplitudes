@@ -1423,6 +1423,8 @@ S14 = {"control": "FA-ccin2p3-238e6f81",     # submitted 2026-11-07 @74aa4ce6 (l
                 "wsdfinal_default": "FA-ccin2p3-9079718e", "share50_k533": "FA-ccin2p3-9a357af2"},
        "control_older": "FA-ccin2p3-341bf564",           # the step-1 default restart at seed 42 (older commit)
        "B": "FA-ccin2p3-9538e607", "B_HD": "FA-ccin2p3-4dca09e5"}
+# the parents: the cosine het control the non-WSD arms start from, and the WSD parent of the branch arms
+S14_PARENTS = {"cosine": "FA-ccin2p3-87ea24d0", "wsd": "FA-ccin2p3-dccb61e8"}
 # each arm's widening over the control (design round 2): same parent and data -> the largest paired seed spread of
 # the same-data pairs; a changed data share -> the share pair's; the WSD parent's arms -> the largest measured spread
 # of any kind (same-data, share pair, parent swap)
@@ -1573,9 +1575,21 @@ def warm_single():
         e = out["arms"]["share50_k267"]
         rd["EXPOSURE_supported"] = (all(e[r]["widened"][0] <= 1 <= e[r]["widened"][1] for r in ("PP4", "EE4"))
                                     and out["arms"]["share50_k533"].get("outcome") == "BETTER")
+    # the blow-up check of every run read (a run that blew up is listed apart), and the two parents' own validation
+    # loss at their last step (het NLL on the base recipe's validation split; the WSD parent has no zero-shot reads)
+    bl = blowups([ctl] + [r for r in arms.values() if r])
+    out["blowups"] = {"flagged": bl["flagged"], "spiked_recovered": bl["spiked_recovered"]}
+    out["parents_val_last"] = {}
+    for k, r in S14_PARENTS.items():
+        v = json.load(open(os.path.join(READS, f"{r}_val.json")))["blocks"][0]["vals"]
+        out["parents_val_last"][k] = {"run": r, "step": v[-1][0], "val": round(v[-1][1], 4)}
     print("readings", {k: v for k, v in rd.items() if not isinstance(v, dict)},
-          (rd.get("branch_over_wsdfinal") or {}).get("outcome"))
+          (rd.get("branch_over_wsdfinal") or {}).get("outcome"), out["blowups"])
     json.dump(out, open(os.path.join(DATA, "warm_start_S14.json"), "w"), indent=1)
+
+    def strip(x):
+        return {k: strip(v) for k, v in x.items() if k != "classes"} if isinstance(x, dict) else x
+    print(json.dumps(strip(out)))
 
 
 def main():
