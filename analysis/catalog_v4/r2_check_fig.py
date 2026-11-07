@@ -8,6 +8,8 @@ reads in data/multichannel_check_reads/ of the r2 jobs, current+grid_r1_budget12
     in the same job on the same node; the 2x bar on both axes and the diagonal.
 
     python analysis/catalog_v4/r2_check_fig.py      -> analysis/catalog_v4/figs/r2_check.{png,pdf}
+    python analysis/catalog_v4/r2_check_fig.py r4   -> figs/r4_check.{png,pdf} (plan step 80: r3 against r4 in the r4
+        jobs, data/r4_check.json)
     python analysis/catalog_v4/r2_check_fig.py r3   -> analysis/catalog_v4/figs/r3_check.{png,pdf} (plan step 79: the
         r3 jobs, current+grid_r2_budget18+grid_r3_budget18, data/r3_check.json; r2 against r3, the reach of r3_check.json,
         taken over the r1, r2 and r3 jobs)
@@ -36,7 +38,10 @@ WINDOW = 2.5          # dex below the reach shown in (a)
 REV = {"r2": (TAG, "r2_check.json", POL, ("first revision", "second revision"), SHORT),
        "r3": ("current+grid_r2_budget18+grid_r3_budget18", "r3_check.json",
               {"grid_r2_budget18": ("r2", "--", "o", "none"), "grid_r3_budget18": ("r3", "-", "o", None)},
-              ("second revision", "third revision"), SHORT_R3)}
+              ("second revision", "third revision"), SHORT_R3),
+       "r4": ("current+grid_r3_budget18+grid_r4_budget18", "r4_check.json",
+              {"grid_r3_budget18": ("r3", "--", "o", "none"), "grid_r4_budget18": ("r4", "-", "o", None)},
+              ("third revision", "fourth revision"), SHORT_R3)}
 
 
 def fill_per_bin(cls, pol, seed, tag=TAG):
