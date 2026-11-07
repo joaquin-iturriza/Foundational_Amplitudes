@@ -11795,6 +11795,12 @@ entries:
     units: null
     start: '2026-11-07T03:10:29+00:00'
     at: '2026-11-07T03:10:29+00:00'
+  - batch: hadronic_regen_g12
+    wall_h: 0.35
+    jobs: 32
+    units: null
+    start: '2026-11-07T03:35:14+00:00'
+    at: '2026-11-07T03:35:14+00:00'
   step_why:
     37:
       feeds: one shared data cache per dataset that a GPU job only opens
