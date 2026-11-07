@@ -11282,7 +11282,7 @@ entries:
       - 'design FIX: revise once'
   owner:
     agent: a3fc2aab45ed49d42
-    state: working
+    state: closed
     since: '2026-11-07T01:02:53+00:00'
     state_at: '2026-11-07T01:02:53+00:00'
   findings:
@@ -13135,44 +13135,30 @@ entries:
       fcce240ll, 365 fcce365ll, 500 ilc500ll, 3000 clic3000ll) and ISR only elsewhere (91.1876, 160, 209, 380, 1000, 1500).
       Step 71 WORKS at all 10 energies.'
   handoff:
-    state: '2026-11-07 ~02:30. Step 69 (Markov-chain flat part) read: NO (data/mcmc_check.json, figs/mcmc_check_a-e). Step
-      72 (channel-grid quota sampler, sampling.flat_grid, merged f8630100, repo-reviewer PASS watermark 65938f8c, design PASS)
-      running: 10 CPU jobs 0a3c7d19 d6afbf50 ab948eed 3f659a1d e32a6f40 49c754da 84ca2133 900855d4 5a859c8c 2baa0d0b (uux_epemg,
-      uux_epemvevex, uu_bbxuu, us_ddxsu, udx_csxvevex x seeds 42/43), wait on step 72. READ 72: for each class python3 analysis/catalog_v4/multichannel_check.py
-      pull current+quota_ladder_both_res2+quota_ladder_both_res2_budget12+grid_both_res2_budget12+grid_both_res2_budget8 <class>
-      42,43; then multichannel_check.py step72 -> data/grid_check.json (verdict YES if grids at 8 or 12 pass, passed_at; else
-      grid12''s COST/PARTIAL/NO; verdict_by_test, checks_by_test; t_propose_s/t_label_s per row for COST); figure: extend
-      analysis/catalog_v4/fig_mcmc_check.py to read grid_check.json (policies grid12, grid8, quota12, quota50); note in the
-      read: the isc channel adapts only 3 dims, RAMBO''s dims only when its candidates carry weight. Outcomes per the design
-      of 2026-11-07 (YES -> step 65 regeneration design with flat_grid at passed_at, then e+e- step 68; COST -> t_propose
-      vs t_label, fix overhead, rerun once; PARTIAL -> where-read of short bins, one revision; NO -> dead end, foam/flow proposal).
-      Step 67 (e+e- forward switch) read and unwaited: fills Z/tau classes, not bb/gammaH, at ~100x (finding). Step 71 (e+e-
-      collider anchor) re-run after the beam-order fix a8374dc6: WORKS at 9 energies (data/ee_anchor_probe.json, figs/ee_anchor_probe);
-      365 GeV within noise of ISR alone -> rerun at 10000 events FA-ccin2p3-4390f747 (wait on step 71). READ: python3 tools/lhe_probe.py
-      eeisr-read <the 10 rerun ids b947f0b6 ef79c5e2 f40181a9 c2a64023 22907651 46cfc529 29c4405a 32c90fcc d5062c3c 045ca31e,
-      with 22907651 replaced by 4390f747> --out analysis/catalog_v4/data/ee_anchor_probe.json --fig analysis/catalog_v4/figs/ee_anchor_probe
-      (the reader keys records by energy, the later run''s lines overwrite the earlier''s); if 365 still NO_BEAMSTRAHLUNG:
-      isronlyll at 365 as a recorded gap. Then design the regeneration of the 170 e+e- default pools at EE_ANCHOR energies
-      (cost per kept event ~1x the no-spectrum runs) and show Joaquin the energy list with it (D320''s proposal text is not
-      in the ledger), then re-read e+e- flat ranges (pp_support.py pull ee, tools/flat_range.py) for step 68.'
-    decisions: 'Beam types of an e+e- run come from the MadGraph process string (ee4_/dsh_ pools generate ''e+ e- > ...'',
-      their pdg_ids list e- first): design''s fixed ''lpp1 +3, lpp2 -3'' corrected to -3/+3 as a defect repair. Per-run probe
-      timeout 1800 s (surveys took 465-720 s). 365 GeV: the 0.016 gap is inside the 1000-event spread and the banner is right,
-      so a 10000-event rerun, not a card change. Next sampler after the chains'' NO: adaptive per-channel grids on the proposal''s
-      uniform numbers (no Jacobian needed: the flat part keeps unweighted events per bin), at caps 12 and 8 beside quota 12/50;
-      the 2x bar is the step-69 design''s. The forward switch (fwd_free_floor) stays a channel option for e+e-, not a budget-750
-      policy.'
-    ruled_out: 'Markov-chain flat part (step 69: below the quota sampler at the same budget on 4 of 5 classes, NN-distance
-      q10 0.17-0.34). Earlier: union with MadEvent default events; propagator pre-screen; first chain collection (near-copies).
-      Budget 750 with the forward switch for e+e- at ~100x (refused by D317).'
-    running: 'step 72: 10 CPU jobs (ids above), target 0.8 h; step 71: FA-ccin2p3-4390f747 (365 GeV, 10000 events), target
-      0.6 h. Elsewhere: scaling grid seed 42 (step 64/70), step 61 sign-output jobs (main session).'
-    files: 'mg5_pipeline_final.py (_ChanGrid, _GridRng, _candidates_mc grids=, _flat_quota_part flat_grid, FLAT_GRID_*), analysis/catalog_v4/multichannel_check.py
-      (step69 generalised, STEP72, step72), tests/test_flat_grid.py, analysis/catalog_v4/fig_mcmc_check.py, analysis/catalog_v4/sampling_cost.py
-      (ee <policy>), tools/lhe_probe.py (eeisr-read), recipes/gen_catalog_v4_default.py (ee_beam_patches from proc_str), scripts/job_lhe_probe.sh
-      (PROBE_TIMEOUT), data/mcmc_check.json, data/ee_anchor_probe.json, data/quota_coverage.json. Repo backlog: 58ec8ab8 (sampling_cost.py
-      ee <policy>) not reviewed yet.'
-    written: '2026-11-07T00:44:12+00:00'
+    state: '2026-11-07 ~03:00. Step 61 read: NO (data/het_signhead61.json, figs/het_signhead61, het_oneloop.py step61 @66f94590);
+      findings recorded. Step 71 done: WORKS at all 10 anchor energies, 365 GeV keeps fcce365ll (finding). Step 73 (het sign
+      head on a detached copy of the last block, model.net.sign_branch): code merged 4ca404d1 (repo-reviewer PASS, watermark
+      c4d5a900; tests/test_sign_branch.py), synced to CC; design PASSED (after one FIX: one-seed outcome table). Submission
+      waits only on Joaquin''s seed answer (plan ask, Scope: four seeds vs one under D315). On ''four'': site pick FA --jobs
+      4, plan target catalog_coverage --batch sign_branch --wall 2.7 --jobs 4, site submit 4x scripts/job_catalog_v3_short.sh
+      v4_het_signhead_branch[_seed2|_seed3|_seed4] --hdr=--time=03:30:00 --item catalog_coverage, plan run each, plan wait
+      73; read by extending het_oneloop.STEP61 with the branch arm (step61''s rules; note the branch arm''s logged pre-clip
+      grad norm excludes the sign group, the rerun''s includes it; use len(val blocks[0])-1 for the last main validation).
+      On ''one'': seed 42 only, the one-seed table of the outcome. Step 74 (e+e- default pools at the anchor energies): ready,
+      not started; the beam patches are wired only into lhe_probe, production needs wiring (see step text). Steps 64/70 (scaling
+      grid) and 72 (channel-grid sampler) on their waits; 65/68 wait on 72.'
+    decisions: 'Step 61 verdict NO by its design''s rule (neither matched arm beats the weight-1 rerun on H5 at p<0.05; event
+      arm p 0.058); both matched weights hurt the magnitude. Next attempt by the design''s NO branch: the attachment point.
+      365 GeV: fcce365ll kept (machine spectrum, correct banner, same cost, equal to ISR within 0.006). Sign-branch''s clip:
+      the readout''s sign row moved into the sign group with sign_block (else a large sign gradient shrinks the trunk''s clipped
+      update). Seed count asked of Joaquin because D315 conflicts with the measured per-seed spread of the sign read.'
+    ruled_out: 'Up-weighting the het sign loss (per-event matched factor, constant weight 75; step 61): sign gain not significant,
+      magnitude 13-59% worse.'
+    running: none of this owner's; elsewhere scaling grid (steps 64/70) and step 72 CPU jobs on their waits
+    files: analysis/catalog_v4/het_oneloop.py (STEP61, step61_pull, step61, step61_fig), data/het_signhead61.json, figs/het_signhead61,
+      data/ee_anchor_probe.json, models/transformer_lloca_mup.py + models/lloca.py + base_experiment.py _clip_grad_norm (sign_branch),
+      scripts/job_catalog_v3_short.sh arm v4_het_signhead_branch, tests/test_sign_branch.py
+    written: '2026-11-07T01:29:24+00:00'
   ask: 'Scope: four seeds or one for the next het sign-head arm, against your D315 (one seed in general). The next try (step
     61 came out NO: up-weighting the sign loss bought an insignificant sign gain, 13.0% -> 8.4% median wrong-sign on the held-out
     one-loop pools, for 13-40% worse magnitude, because the gradient clip binds on 99% of het steps) is a sign head on its
