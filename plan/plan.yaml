@@ -72,7 +72,7 @@ entries:
     stale_because: the figure was drawn as four panel files (figure-style rules), and the old check looked for one pp_trained
       file
   writeup: 8a0f886
-- status: running
+- status: held
   quotes:
   - said_at: '2026-10-22T03:20:41.808Z'
     text: send the A against B, and while that runs, keep working on this
@@ -159,6 +159,15 @@ entries:
     answers_after: '2026-11-04T18:48:19+00:00'
     covers:
     - v3_prep_explore
+  - said_at: '2026-11-09T19:53:59.278000+00:00'
+    text: Please keep the longer training and everything else that was held well noted, we will keep them on the back burner
+      for now since I was asked to shift gears slightly, make sure nothing of what we've been doing is lost before we move
+      on, any open threads, non discussed results, the current state should be well kept, and if in a few days I ask you to
+      remind me what we were doing, you should answer as if I was asking you right now.
+    decision: D333
+    answers_after: '2026-11-04T18:48:19+00:00'
+    covers:
+    - v3_prep_explore
   decisions:
   - D83
   - D129
@@ -173,6 +182,7 @@ entries:
   - D222
   - D267
   - D271
+  - D333
   next:
     10: '(b) more 6-particle training pools in the held-out multiplicity cells (D216), on catalog_v4. Done: MadGraph existence
       (125 of 147), held-out-family children dropped (97), v4 strings 97/97 and class check FA-ccin2p3-11fbcd25 (analysis/catalog_v4/data/multext_classcheck.json
@@ -2677,6 +2687,7 @@ entries:
   mechanism: a held-out process of a trained multiplicity is predicted worse than training processes of its cell; either the
     network lacks capacity or steps (a), or the cell lacks training processes close to it (b)
   expected: not recorded
+  hold_decision: D333
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
