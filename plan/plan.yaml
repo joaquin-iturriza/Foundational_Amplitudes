@@ -20453,12 +20453,10 @@ entries:
     withdrawn_why: Joaquin approved the fold and the sigma-driven generation in his message of 2026-11-10 (D338, D339; D344
       covers this entry)
   owner:
-    agent: a74fb932acb5d82dc
-    state: closed
-    since: '2026-11-09T23:27:24+00:00'
-    state_at: '2026-11-09T23:53:54+00:00'
-    context: 297017
-    context_at: '2026-11-09T23:51:58+00:00'
+    agent: aa26e7fa90e7c65d6
+    state: working
+    since: '2026-11-09T23:54:24+00:00'
+    state_at: '2026-11-09T23:54:24+00:00'
   findings:
   - at: '2026-11-09T23:36:11+00:00'
     text: 'Inventory (2026-11-10, owner a74fb932): origin/l2-gen = 79 commits over trunk (67 of them origin/heterosc''s, 2026-07-11..07-18,
