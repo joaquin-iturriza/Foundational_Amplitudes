@@ -15776,6 +15776,10 @@ entries:
       refuses the agent''s own settings change): delete origin/zz_trial_* (24), the agent-a822d561 worktree (uncommitted copy
       of the context-vector code, landed in trunk c3a69184) and worktree-agent-a63efbd0 (tip 41a3158b, local and origin),
       printing each tip sha first; stop the two shells hung since 2026-11-06 (pids 907898, 1422043).'
+    23: 'D335 (reply_check off as a blocker) did not take effect: hook_incident disabled reply_check.py in disabled.json,
+      but plan_check.py calls reply_check itself, so it still refused on 2026-11-10 (''what do you mean you can''t kill it?'').
+      Make plan_check skip the reply check while reply_check.py is listed disabled (or remove the call per D335), test on
+      that refusal.'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16111,6 +16115,11 @@ entries:
       if:
       - 'grant in place: delete, stop the shells, report counts'
       - 'not run: leave them listed by repo_hygiene'
+    23:
+      feeds: whether the reply check stays off as D335 asks
+      if:
+      - 'fixed: no reply-check refusal on the next user message'
+      - 'still fires: trace the other caller'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
