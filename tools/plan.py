@@ -170,7 +170,36 @@ def _read():
     d = (yaml.safe_load(open(PLAN_FILE)) if os.path.exists(PLAN_FILE) else None) or {}
     d.setdefault("entries", [])
     st = json.load(open(STATE_FILE)) if os.path.exists(STATE_FILE) else {}
+    ledger_sync(d)
     return d, st
+
+
+def ledger_sync(d):
+    """An entry's status follows a hold or release recorded straight in the ledger (`site decide --kind hold|release
+    --covers <entries>`): a running or waiting entry whose site item is held becomes held under the hold decision in
+    force that covers it; a held entry whose item is active again (its hold no longer in force) runs. Applied on every
+    read, so plan_check and plan next see it at once; a write persists it. (2026-11-09: D327/D328 held the items and
+    left the entries running, so plan_check demanded owners for parked work and the hold was repeated as D331-D333.)"""
+    try:
+        c = sqlite3.connect(RUNS_DB) if os.path.exists(RUNS_DB) else None
+        if c is None:
+            return
+        items = dict(c.execute("SELECT id, status FROM items WHERE project=?", (PROJECT,)).fetchall())
+        holds = c.execute("SELECT id, covers FROM decisions WHERE project=? AND kind='hold' AND in_force=1 "
+                          "ORDER BY recorded", (PROJECT,)).fetchall()
+    except sqlite3.Error:
+        return
+    held_by = {}
+    for did, cov in holds:
+        for x in (cov or "").split(","):
+            held_by[x.strip()] = did                       # the latest hold in force covering it
+    for e in d["entries"]:
+        it, s = items.get(e.get("id")), e.get("status")
+        if it == "held" and s in ("running", "waiting_user") and e["id"] in held_by:
+            e["status"], e["hold_decision"] = "held", held_by[e["id"]]
+        elif it == "active" and s == "held" and e.get("hold_decision") and e["id"] not in held_by:
+            e["status"] = "running"
+            e.pop("hold_decision", None)
 
 
 def _write_atomic(path, text):
@@ -3153,6 +3182,19 @@ def cmd_done(a):
         if a.override_runs:
             e["runs_override"] = a.override_runs
     print("plan: %s done (%s)" % (a.id, a.writeup))
+    close_item(a.id)
+
+
+def close_item(eid):
+    """The entry's site item ends with it (`site item done`), so `site items` no longer lists done work as active
+    (2026-11-09: eight done entries were still active items). A failure is reported, never undoes the done."""
+    c = db()
+    r = c.execute("SELECT status FROM items WHERE project=? AND id=?", (PROJECT, eid)).fetchone() if c else None
+    if not r or r[0] == "done":
+        return
+    rc, out, err = site_call("item", "done", PROJECT, eid)
+    print("plan: site item %s %s" % (eid, "done" if rc == 0 else "NOT closed (%s); run `site item done %s %s`"
+                                     % ((err or out).strip()[-200:], PROJECT, eid)))
 
 
 def render(d):
