@@ -3750,6 +3750,13 @@ entries:
       numbers), so the divergence arises in the first 85 steps, not from a random-number shift at init. Left, held by D322
       and Joaquin''s question (2): a same-config repeat of the 1-block arm (v4_het_signhead_branch seed 42, ~2.5 GPU-h) under
       a reviewed design to measure the same-config magnitude spread.'
+    84: 'D326: continue training from the scaling grid''s largest run (width 32, 16x, FA-ccin2p3-a77e20b8, once it ends) with
+      the warm-start recipe. The grid runs are cosine; the warm-start study found a cosine parent restarts badly (MSE ratio
+      over scratch 1.33 pp / 1.51 e+e-) and a WSD parent well (0.80 / 0.94). Design (owner, design-reviewer): how to continue
+      from a cosine-final model (re-warm then WSD over the new steps, against the alternatives the study supports), what the
+      continuation trains on (more steps on catalog_v4, or the 1301-class regeneration once its edge-bin call is answered),
+      measure best val_loss_no_reg and the pooled held-out read against the width-32 grid curve at matched total compute;
+      GPU-h estimate to Joaquin if above 30.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -12784,6 +12791,11 @@ entries:
       - 'same-config runs differ by >= 1.15 on HD5: the 1.15 check is replaced by the same-config spread, sign reading stands
         at NOT RESOLVED'
       - 'same-config runs agree within 1.15: find the coupling in the 4-block branch before any sign verdict'
+    84:
+      feeds: D326 continue from the largest run
+      if:
+      - 'continuation beats the width-32 grid curve at matched total compute: it becomes the pretraining candidate''s path'
+      - 'it does not: report where it falls short, propose the WSD-from-start rerun with its GPU-h'
   owner:
     agent: abe4f9535994a7b12
     state: stopped
