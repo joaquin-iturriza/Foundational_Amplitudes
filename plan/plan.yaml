@@ -2661,6 +2661,12 @@ entries:
   - at: '2026-10-31T04:24:08+00:00'
     text: 'a compaction inside the turn of owner acd8bbf4e51c1e6d4 at 2026-10-31T04:22:08.879Z: its brief or scope was too
       large; narrow the next brief'
+  - at: '2026-11-09T19:55:56+00:00'
+    text: 'PARKED 2026-11-09 by D327/D328 (Joaquin shifted gears; nothing to run until he resumes; answer ''what were we doing''
+      from this). State unchanged since 11-05: step 10 (more 6-particle training pools in held-out multiplicity cells, D216,
+      94 pools kept, recipes @f6c378ec) waits on catalog_coverage''s sampling being settled (the 1301-class regeneration),
+      then generation and the share-0.25 arm against its matched control. Sign-head search sweep ended (20 of 20). Nothing
+      running.'
   objective: 'The held-out multiplicity gap on catalog_v4 (D267, D271: the preprocessing exploration moves to catalog_v4).
     The 218 held-out 6-particle (2->4) tree pools of H2 read zero-shot above their cells'' training floor (par:v4_shape_gap),
     and no per-event or per-process correction carries it (par:v4_lco_not, par:v4_kshot_spread). Which lever narrows it: (a)
