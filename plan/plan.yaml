@@ -20488,3 +20488,5 @@ entries:
       if:
       - 'every cited script runs on CPU on trunk: branches deleted'
       - 'a script depends on a deleted run or JZ-only data: its result is marked unreproducible and the script kept as history'
+  step_waits:
+    '1': 'main session: go after the inventory report (narrowing: report before porting large parts)'
