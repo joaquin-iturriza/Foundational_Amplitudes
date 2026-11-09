@@ -16107,7 +16107,7 @@ entries:
       time for wake_batching.py)'
   owner:
     agent: a3433fbc56e65e68c
-    state: working
+    state: closed
     since: '2026-11-07T12:48:31+00:00'
     state_at: '2026-11-09T23:05:13.997000+00:00'
     context: 294977
@@ -16826,16 +16826,36 @@ entries:
       no RUN_DONE fired). Hook fixes this session: plan_check ask parts without ''?'' (58dd7542), send_check skips slide decks
       under talks/ (39458623).'
   handoff:
-    state: '2026-11-04: write-up in docs/results.tex sec:agent-redesign committed and passed by the notes-editor (37cced30);
-      step 13 dropped (D277 keeps the main window at 500k); open: next 12 (mechanical-worker tool cut, measurable next session;
-      effort after D213''s watch) and next 14 (deck cold read, held D268); next 11 = plan done once 14 is settled'
-    decisions: 'Numbers rerun over a closed window ending 2026-11-04T19:00Z (tools d30cb3aa: --until in push_replay/main_turns/compaction_replay,
-      push_replay --revert 85064616 rebuilds the cut-1 counterfactual from git) so verify_claims reproduces them; no cut proposed
-      for the three wake branches that fired (D277, Stop refusals are real omissions, D217 already routes inline work)'
-    ruled_out: lowering the main session's auto-compact window (D277)
+    state: '2026-11-10: step 20 (D334 repo cleanup prevention) built, not yet reviewed: a44a2ca8 (remove_worktree.sh deletes
+      a merged remote copy, uses -D after a trunk-merge check; auto_push.sh pushes trunk only; model_trial setup makes detached
+      worktrees; tools/repo_hygiene.py --fold-agents folds ended agents'' merged .claude/worktrees and lists unexplained worktrees/branches/remote
+      branches, exit 1; tests/test_repo_hygiene.py 4/4) and 54f5954c (remove_worktree ignores per-checkout runtime state and
+      docs LaTeX products). Done by hand: 14 merged worktrees removed via remove_worktree.sh (wt-dimless, wt-ledger, wt-rebalance,
+      agent a065a7c3 a1af7714 a47dc0de a4c80fc6 a5215922 a61851fb a6859ebf a98911a7 ab0a3b5d ae8c4bb4; ae8c4bb4''s sweep/sweep_config_tp3_*
+      were identical in trunk); origin fwd-free and worktree-agent-a98911a7 (0 not in trunk by git cherry) deleted. Counts
+      now: worktrees 4 (main, wt-decomp unmerged, agent-a822d561 with staged changes to config/model/lloca.yaml experiment.py
+      wrappers.py scripts/job_catalog_norm.sh scripts/job_kshot_context.sh tools/kshot_context.py tests/test_context_vector.py:
+      left, Joaquin''s call; agent-a63efbd0 +1), local branches 10, remote 35 (heterosc +67, l2-gen +79, adaptive-ir, multbias,
+      decomp, 5 worktree-agent-* +2, 24 zz_trial_*: Joaquin''s per-branch call). OPEN: (1) repo-reviewer pass on a44a2ca8,
+      54f5954c (code pillar overdue; the gate refuses commits until it runs); (2) add tools/repo_hygiene.py --fold-agents
+      to FA''s maintain list in ~/.config/ccorch/projects.toml (not done); (3) plan_files_guard false positives (sed -i on
+      a non-plan file whose pattern names plan/.state.json; python heredoc whose triple-quoted text names it): fixed copy
+      and test in the scratchpad (pfg.py, test_plan_files_guard_text.py, 9 cases pass), installing it was denied by the auto-mode
+      classifier as self-modification: needs Joaquin''s or the main session''s go; (4) the owner leave-check work (main''s
+      request: every step an owner leaves in flight or waited, all listed in one refusal, date waits): WIP patch leave_check_wip.patch
+      + test_plan_leave_check.py in the scratchpad, reverted from the tree because tests/test_plan_design_withdraw.py::test_withdrawn_gives_no_review
+      fails with it (cause not found; the design-to-review listing in next_steps_keyed); plan_check SubagentStop branch tested
+      (owner refused with steps 15 and 20 in one line, non-owner passes) but needs a SubagentStop registration (diff to Joaquin).
+      CLAUDE.md line 22 changed per Joaquin (f9f59851), claudemd-keeper backlog.'
+    decisions: 'auto_push pushes trunk only (feature branches stay local until merged; justification: the hook published every
+      branch and nothing deleted them, 97 remote); agent worktrees are folded only when the agent ended and HEAD is in trunk;
+      branches with commits not in trunk are never deleted without Joaquin; retired ccin2p3/jeanzay kept on origin'
+    ruled_out: loosening plan_files_guard without approval (classifier denied)
     running: none
-    files: docs/results.tex tools/push_replay.py tools/main_turns.py tools/compaction_replay.py tools/model_trial.py analysis/agent_redesign/main_turns_split_5708b248.json
-    written: '2026-11-04T19:52:42+00:00'
+    files: tools/repo_hygiene.py scripts/remove_worktree.sh .claude/hooks/auto_push.sh tools/model_trial.py tests/test_repo_hygiene.py
+      /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/leave_check_wip.patch /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/test_plan_leave_check.py
+      /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/pfg.py /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/test_plan_files_guard_text.py
+    written: '2026-11-09T23:06:32+00:00'
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
   question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
