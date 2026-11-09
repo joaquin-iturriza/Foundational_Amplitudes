@@ -9,7 +9,7 @@ uniform-sqrt(s) ee->uu test set, per sqrt(s) bin, each run's model_run0_best.pt)
   zpeak     the MSE of the [91, 93) GeV bin
   resonance the mean of the per-bin MSEs of the bins below 100 GeV
 Seeds: mean and sample standard deviation over the 3 seeds; 'gain' = base over arm (above 1: the arm is better);
-'recovered' = (base - sigma) / (base - oracle) on the seed means. CPU only.
+'recovered_pct' = 100 (base - sigma) / (base - oracle) on the seed means. CPU only.
 
     python3 analysis/divergences/eeuu_resonance_numbers.py
 """
@@ -71,7 +71,7 @@ def main():
             d[key]["gain_sigma_mean"] = sig(gain.mean())
             d[key]["sigma_over_base_worst"] = sig((v["sigma"] / v["base"]).max())
             m = {a: x.mean() for a, x in v.items()}
-            d[key]["recovered"] = sig((m["base"] - m["sigma"]) / (m["base"] - m["oracle"]))
+            d[key]["recovered_pct"] = round(100 * (m["base"] - m["sigma"]) / (m["base"] - m["oracle"]))
         out[name] = d
     print(json.dumps(out))
 
