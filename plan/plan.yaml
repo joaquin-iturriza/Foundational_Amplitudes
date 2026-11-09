@@ -20429,3 +20429,8 @@ entries:
     withdrawn_at: '2026-11-09T23:26:18+00:00'
     withdrawn_why: Joaquin approved the fold and the sigma-driven generation in his message of 2026-11-10 (D338, D339; D344
       covers this entry)
+  owner:
+    agent: a74fb932acb5d82dc
+    state: working
+    since: '2026-11-09T23:27:24+00:00'
+    state_at: '2026-11-09T23:27:24+00:00'
