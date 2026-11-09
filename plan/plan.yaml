@@ -5585,6 +5585,16 @@ entries:
     searched: 'CLAUDE.md, site decisions D269, D294, D317, D322 (weekend hold: read only): none settles the edge bins, the
       per-class cost bar, or lifts the hold for the repeat'
     blocks: the 1301-class regeneration (step 82) and the sign-branch fault trace (step 83)
+    blocks_steps:
+    - 82
+    - 83
+  - ask: 'Scope: (1) edge bins before the 1301-class regeneration with the sixth sampler revision: exempt the bins cut by
+      a class''s kinematic maximum (a), or score them with the quota cut to the reachable share (b; then only the uux->bgtxW+
+      top bin fails)? (2) keep the two e+e- 3000 GeV short runs (bbxgz 20/200, wpwmzz 53/200, 0.3% and 0.7% of that energy''s
+      events) or regenerate both pools? (3) the sign-branch repeat run (about 2.5 GPU-h), after the free step-0 log check.'
+    at: '2026-11-09T11:12:38+00:00'
+    searched: 'CLAUDE.md, site decisions D269, D294, D317, D322, D325 (2x per class, a guide): none settles these'
+    blocks: the 1301-class regeneration (step 82) and the sign-branch fault trace (step 83)
     blocks_steps: &id001
     - 82
     - 83
@@ -15169,17 +15179,14 @@ entries:
       mg5_pipeline_final.py (flat_stall_off), tools/regen_recipes.py (R6), analysis/catalog_v4/multichannel_check.py (grid_r6_budget18,
       _chunk_sig, step82r6*), analysis/catalog_v4/r2_check_fig.py (r6), tests/test_flat_grid.py
     written: '2026-11-07T09:55:54+00:00'
-  ask: 'Scope: (1) before regenerating the 1301 hadronic classes with the sixth flat-sampler revision: exempt the bins cut
-    by a class''s kinematic maximum (bb->bb, bbx->ccxH, uux->bgtxW+ top bin) or score them on their reachable share; and is
-    the 2x cost bar on the total (1.62x) or per class (19 of 38 over)? (2) Your hold: the deeper sign-branch read is a FAULT
-    (MSE(4-block)/MSE(1-block) 1.26 on the default one-loop classes, bar 1.15); may the owner trace it with one repeat of
-    the one-block run, about 2.5 GPU-h, design reviewed first?'
-  waiting_since: '2026-11-07T15:49:31+00:00'
-  searched: 'CLAUDE.md, site decisions D269, D294, D317, D322 (weekend hold: read only): none settles the edge bins, the per-class
-    cost bar, or lifts the hold for the repeat'
+  ask: 'Scope: (1) edge bins before the 1301-class regeneration with the sixth sampler revision: exempt the bins cut by a
+    class''s kinematic maximum (a), or score them with the quota cut to the reachable share (b; then only the uux->bgtxW+
+    top bin fails)? (2) keep the two e+e- 3000 GeV short runs (bbxgz 20/200, wpwmzz 53/200, 0.3% and 0.7% of that energy''s
+    events) or regenerate both pools? (3) the sign-branch repeat run (about 2.5 GPU-h), after the free step-0 log check.'
+  waiting_since: '2026-11-09T11:12:38+00:00'
+  searched: 'CLAUDE.md, site decisions D269, D294, D317, D322, D325 (2x per class, a guide): none settles these'
   blocks: the 1301-class regeneration (step 82) and the sign-branch fault trace (step 83)
   blocks_steps: *id001
-  checked_until: '2026-11-07T18:57:45+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
