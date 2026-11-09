@@ -20427,11 +20427,11 @@ entries:
   decisions:
   - D344
   next:
-    1: 'Record the July results: write up the unrecorded ee->uu online-generation study (l2-gen: static/sigma+IS/oracle/reweight/coordinate-free
-      adapt arms on the starved and f=0.25 bases) from the 8 trunk summaries through one committed reader in analysis/divergences
-      with src/claim lines and a figure; fold the branch-only heterosc result JSONs and give sec:div-sampling''s existing
-      numbers src/claim lines where a tracked JSON reproduces them (the rest marked as from deleted runs); notes-editor and
-      repo-reviewer'
+    1: 'Finish step 1 on branch sigma-gen (worktrees/wt-sigma-gen): src/claim lines for the remaining paragraphs of sec:div-sampling,
+      one committed reader per family (heterosc head + two-stage from the folded heterosc_rank/calib_rank/diag_ckpt_mu JSONs;
+      Q2 tolerance, deep sampling, sigma speed and the ee->uugg loop from the tracked summaries; the October het-loss paragraphs
+      from their CC runs, reading not rerunning), correcting any number the reader does not reproduce and saying so; then
+      notes-editor (running) and repo-reviewer passes'
     2: 'Fold the scripts: bring the ~20 scripts sec:div-sampling cites (and the generation path gen_uu_sampling/l2_online/eval_eeuu_resonance)
       onto trunk ported to siteconf and the current HETEROSC defaults (beta=0, nll select, sigma stage), CPU-tested; the one-off
       July launchers of the withdrawn diagnosis chain are kept only as history in the branch commits named in results.tex;
@@ -20514,9 +20514,8 @@ entries:
     1:
       feeds: 'whether the July studies carry over: what they found, recorded reproducibly'
       if:
-      - 'the reweight-only arm matches sigma+IS on the starved base: sigma-driven generation is designed without an IS correction,
-        keeping p~sigma^gamma as l2_online_uugg.py does'
-      - 'sigma+IS beats reweight-only: is_weight_path is ported and the design carries the correction'
+      - 'every number reproduces or is corrected: step 1 closes, step 2 starts'
+      - 'a number rests only on a deleted run: it is marked as from a deleted run, with the run named'
     2:
       feeds: whether the July code carries over to the current HETEROSC loss and catalog_v4 pipeline
       if:
