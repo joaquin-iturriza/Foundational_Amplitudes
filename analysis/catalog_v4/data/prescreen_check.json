@@ -1,0 +1,145 @@
+{
+ "tool": "analysis/catalog_v4/prescreen_check.py",
+ "classes": {
+  "v4_uux_epemg": {
+   "catalog_train": {
+    "missing": true
+   },
+   "default_dsh_train": {
+    "file": "dsh_uux_epemg_13000-13000GeV_train_lhe_amplitudes.npy",
+    "n_diagrams": 4,
+    "n_lines": 8,
+    "S_sum": {
+     "spearman": 0.78,
+     "spread_dex_median": 0.647,
+     "spread_dex_q90": 0.683,
+     "hit_pm1bin": 0.692,
+     "hit_pm1bin_top_decile": 0.808,
+     "spearman_top_decile": 0.4016,
+     "n": 45001
+    },
+    "S_max": {
+     "spearman": 0.7724,
+     "spread_dex_median": 0.652,
+     "spread_dex_q90": 0.7,
+     "hit_pm1bin": 0.659,
+     "hit_pm1bin_top_decile": 0.755,
+     "spearman_top_decile": 0.3913,
+     "n": 45001
+    }
+   }
+  },
+  "v4_uux_epemvevex": {
+   "catalog_train": {
+    "missing": true
+   },
+   "default_dsh_train": {
+    "file": "dsh_uux_epemvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+    "n_diagrams": 19,
+    "n_lines": 57,
+    "S_sum": {
+     "spearman": 0.8377,
+     "spread_dex_median": 0.644,
+     "spread_dex_q90": 0.838,
+     "hit_pm1bin": 0.499,
+     "hit_pm1bin_top_decile": 0.332,
+     "spearman_top_decile": 0.4547,
+     "n": 45001
+    },
+    "S_max": {
+     "spearman": 0.8411,
+     "spread_dex_median": 0.65,
+     "spread_dex_q90": 0.792,
+     "hit_pm1bin": 0.501,
+     "hit_pm1bin_top_decile": 0.333,
+     "spearman_top_decile": 0.4556,
+     "n": 45001
+    }
+   }
+  },
+  "v4_uu_bbxuu": {
+   "catalog_train": {
+    "missing": true
+   },
+   "default_dsh_train": {
+    "file": "dsh_uu_bbxuu_13000-13000GeV_train_lhe_amplitudes.npy",
+    "n_diagrams": 110,
+    "n_lines": 330,
+    "S_sum": {
+     "spearman": 0.575,
+     "spread_dex_median": 1.484,
+     "spread_dex_q90": 1.527,
+     "hit_pm1bin": 0.185,
+     "hit_pm1bin_top_decile": 0.02,
+     "spearman_top_decile": 0.2122,
+     "n": 45001
+    },
+    "S_max": {
+     "spearman": 0.5985,
+     "spread_dex_median": 1.435,
+     "spread_dex_q90": 1.486,
+     "hit_pm1bin": 0.187,
+     "hit_pm1bin_top_decile": 0.02,
+     "spearman_top_decile": 0.2475,
+     "n": 45001
+    }
+   }
+  },
+  "v4_us_ddxsu": {
+   "catalog_train": {
+    "missing": true
+   },
+   "default_dsh_train": {
+    "file": "dsh_us_ddxsu_13000-13000GeV_train_lhe_amplitudes.npy",
+    "n_diagrams": 70,
+    "n_lines": 210,
+    "S_sum": {
+     "spearman": 0.6304,
+     "spread_dex_median": 1.314,
+     "spread_dex_q90": 1.357,
+     "hit_pm1bin": 0.216,
+     "hit_pm1bin_top_decile": 0.041,
+     "spearman_top_decile": 0.2075,
+     "n": 45001
+    },
+    "S_max": {
+     "spearman": 0.6523,
+     "spread_dex_median": 1.273,
+     "spread_dex_q90": 1.317,
+     "hit_pm1bin": 0.222,
+     "hit_pm1bin_top_decile": 0.059,
+     "spearman_top_decile": 0.2289,
+     "n": 45001
+    }
+   }
+  },
+  "v4_udx_csxvevex": {
+   "catalog_train": {
+    "missing": true
+   },
+   "default_dsh_train": {
+    "file": "dsh_udx_csxvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+    "n_diagrams": 6,
+    "n_lines": 18,
+    "S_sum": {
+     "spearman": 0.8178,
+     "spread_dex_median": 0.656,
+     "spread_dex_q90": 0.849,
+     "hit_pm1bin": 0.43,
+     "hit_pm1bin_top_decile": 0.287,
+     "spearman_top_decile": 0.4641,
+     "n": 45001
+    },
+    "S_max": {
+     "spearman": 0.8234,
+     "spread_dex_median": 0.666,
+     "spread_dex_q90": 0.837,
+     "hit_pm1bin": 0.435,
+     "hit_pm1bin_top_decile": 0.287,
+     "spearman_top_decile": 0.4644,
+     "n": 45001
+    }
+   }
+  }
+ }
+}
