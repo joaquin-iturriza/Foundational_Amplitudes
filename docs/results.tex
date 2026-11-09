@@ -10589,12 +10589,14 @@ momenta, labels the exact tree $|\mathcal{M}|^2$ with the compiled \code{ee\_uu}
 ($14.5$k\,ev/s, scale verified vs production), and thins $3\mathrm{M}$ candidates to $400$k
 flat-in-$\log|\mathcal{M}|^2$ \emph{without replacement} (all unique). The shaper reads \emph{only}
 $|\mathcal{M}|^2$; $\sqrt{s}$ is eval-only. Generation lifts pole coverage $0.4\%\!\to\!32\%$ with genuinely
-new events, and beats resampling $2.6\times$ on the log-flat metric (Fig.~\ref{fig:eeuu_flatlogm_resonance}). \emph{Bug found + fixed (would have inverted the result):} the standalone expects
+new events, and beats resampling $2.58\times$ on the log-flat metric (Fig.~\ref{fig:eeuu_flatlogm_resonance}). \emph{Bug found + fixed (would have inverted the result):} the standalone expects
 the final-state quarks in the \emph{opposite} slot order from how production stores $[e^-,e^+,u,\bar u]$;
 a direct driver call mirror-flips the $Z$ forward-backward asymmetry, so the model trains perfectly on
 its own set (internal val $10^{-5}$) yet \emph{anti-correlates} on production test ($\rho_{\rm bulk}\!=\!-0.99$).
 Relabeling production AS-IS gives $\rho{=}0.94$ (mirrored); swapping the final two recovers the stored
 $|\mathcal{M}|^2$ exactly. Fix: swap for the driver, store unswapped ($\rho{=}+0.994$ post-fix).
+% src: python3 analysis/divergences/eeuu_resonance_numbers.py @71db9819
+% claim: generation.resampled_over_generated=2.58
 
 \begin{figure}[H]
   \centering
@@ -10621,15 +10623,31 @@ $f$ = fraction flat-$\log|\mathcal{M}|^2$ (rest uniform-$\sqrt{s}$), generated f
 ckpt/HPs/$N{=}400$k, common \textsc{rambo} test binned by $\sqrt{s}$, each arm de-standardized to true
 $\log|\mathcal{M}|^2$ (per-dataset standardization already handles the scale, so the earlier
 ``$\sigma$-scale confound'' worry was spurious). Under the equal-per-$\sqrt{s}$-decade (log-flat) metric:
-$f{=}0$ (raw) $1.0\mathrm{e}{-}3$; $f{=}0.25$ $3.5\mathrm{e}{-}5$; $\mathbf{f{=}0.5}$ $\mathbf{1.5\mathrm{e}{-}5}$
-(optimum); $f{=}0.75$ $7.9\mathrm{e}{-}5$; $f{=}1$ (pure flat) $1.1\mathrm{e}{-}4$. Event-weighted
+$f{=}0$ (raw) $1.0\times10^{-3}$; $f{=}0.25$ $3.5\times10^{-5}$; $\mathbf{f{=}0.5}$ $\mathbf{1.5\times10^{-5}}$
+(optimum); $f{=}0.75$ $7.9\times10^{-5}$; $f{=}1$ (pure flat) $1.1\times10^{-4}$. Event-weighted
 (bulk-heavy) overall bottoms at $f{=}0.25$. So the interior optimum is $f\!\approx\!0.25$--$0.5$, beating
-raw \textsc{rambo} $\sim$$30$--$70\times$ and \textbf{pure} flat-$\log|\mathcal{M}|^2$ $\sim$$4$--$7\times$:
+raw \textsc{rambo} $29$--$67\times$ and \textbf{pure} flat-$\log|\mathcal{M}|^2$ $3.1$--$7.1\times$:
 \emph{flat-$\log|\mathcal{M}|^2$ is the coverage criterion you mix in at a modest fraction, not a good
 pure base}: pure flat starves the bulk (mirror of \textsc{rambo} starving the pole), same shape as the
-uug antenna interior optimum. Generation still beats resampling $\sim$$8\times$ ($3.5\mathrm{e}{-}5$ vs
-$2.8\mathrm{e}{-}4$). Tooling: \code{gen\_uu\_sampling.py} (\code{uniform}/\code{flatlogm}/\code{mixture}),
-\code{finetune\_genmix.sh}, \code{plot\_genmix\_sweep.py} (Fig.~\ref{fig:eeuu_genmix_fraction_sweep}).
+uug antenna interior optimum. Generation still beats resampling $8.0\times$ ($3.5\times10^{-5}$ vs
+$2.8\times10^{-4}$). Tooling: \code{gen\_uu\_sampling.py} (\code{uniform}/\code{flatlogm}/\code{mixture}),
+\code{finetune\_genmix.sh}, \code{plot\_genmix\_sweep.py} (Fig.~\ref{fig:eeuu_genmix_fraction_sweep}). Corrected
+2026-11-10 against the committed reader: pure flat is $3.1$--$7.1\times$ worse than the optimum range, where an
+earlier version said $4$--$7\times$.
+% src: python3 analysis/divergences/eeuu_resonance_numbers.py @71db9819
+% claim: sweep.raw=1.0e-3
+% claim: sweep.mix025=3.5e-5
+% claim: sweep.mix050=1.5e-5
+% claim: sweep.mix075=7.9e-5
+% claim: sweep.genflat=1.1e-4
+% claim: sweep.raw_over_mix025=29
+% claim: sweep.raw_over_mix050=67
+% claim: sweep.genflat_over_mix025=3.1
+% claim: sweep.genflat_over_mix050=7.1
+% claim: generation.resampled_over_mix025=8.0
+% claim: generation.resampled_flat=2.8e-4
+% allow: 0 0.25 0.5 0.75 1 because they are the flat fractions f of the arms, settings
+% allow: 4 7 because they are the superseded ratio range the correction names
 
 \begin{figure}[H]
   \centering
@@ -10640,10 +10658,10 @@ $2.8\mathrm{e}{-}4$). Tooling: \code{gen\_uu\_sampling.py} (\code{uniform}/\code
   \emph{Left: the interior optimum.} Three metrics vs $f$. The objective is the \emph{log-flat}
   one: the mean of the per-$\sqrt s$-bin MSE, so every bin counts once
   however many events it holds; the plain event mean instead follows the bulk, which holds almost all
-  the events, and so barely sees the pole. Log-flat gives $1.0\mathrm{e}{-}3$, $3.5\mathrm{e}{-}5$,
-  $\mathbf{1.5\mathrm{e}{-}5}$, $7.9\mathrm{e}{-}5$, $1.1\mathrm{e}{-}4$ at $f=0,0.25,0.5,0.75,1$,
-  a minimum at $f{=}0.5$, beating raw \textsc{rambo} $\sim\!30$--$70\times$ and \emph{pure} flat
-  $\sim\!4$--$7\times$. The resonance-region curve ($\sqrt s<100$) tracks it; the event-weighted
+  the events, and so barely sees the pole. Log-flat gives $1.0\times10^{-3}$, $3.5\times10^{-5}$,
+  $\mathbf{1.5\times10^{-5}}$, $7.9\times10^{-5}$, $1.1\times10^{-4}$ at $f=0,0.25,0.5,0.75,1$,
+  a minimum at $f{=}0.5$, beating raw \textsc{rambo} $29$--$67\times$ and \emph{pure} flat
+  $3.1$--$7.1\times$. The resonance-region curve ($\sqrt s<100$) tracks it; the event-weighted
   ``overall'' curve, being bulk-heavy, bottoms earlier at $f{=}0.25$, which is exactly why the
   objective has to be the equal-per-bin one.
   \emph{Right: the mechanism, the bulk$\leftrightarrow$pole trade-off.} The same runs resolved per
@@ -10653,6 +10671,17 @@ $2.8\mathrm{e}{-}4$). Tooling: \code{gen\_uu\_sampling.py} (\code{uniform}/\code
   bulk exactly as \textsc{rambo} starves the pole. Same shape as the $u\bar u g$ antenna sweep
   (Fig.~\ref{fig:deep_sampling_fraction_sweep}).}
   \label{fig:eeuu_genmix_fraction_sweep}
+% src: python3 analysis/divergences/eeuu_resonance_numbers.py @71db9819
+% claim: sweep.raw=1.0e-3
+% claim: sweep.mix025=3.5e-5
+% claim: sweep.mix050=1.5e-5
+% claim: sweep.mix075=7.9e-5
+% claim: sweep.genflat=1.1e-4
+% claim: sweep.raw_over_mix025=29
+% claim: sweep.raw_over_mix050=67
+% claim: sweep.genflat_over_mix025=3.1
+% claim: sweep.genflat_over_mix050=7.1
+% allow: 0 0.25 0.5 0.75 1 100 because they are the flat fractions f of the arms and a bin edge in GeV, settings
 \end{figure}
 
 \paragraph{Eval bug (invalidated an earlier read): in-process state leak across tags.} The multi-tag
@@ -10669,28 +10698,63 @@ bit-identically), extract $\sigma$ over a fresh $1.5\mathrm{M}$ mix025 pool (glo
 subsample $400$k \emph{without replacement} by $\pi\!\propto\!\sigma^\alpha$ (no ceiling, since the pool is fresh).
 $\sigma$'s budget reallocation matches the oracle almost exactly (pole $20\%$ vs $18\%$). But over
 \textbf{3 seeds} $\times$\{base,$\sigma$,oracle\} (\code{finetune\_l1\_seeds.sh}): logflat base
-$4.6\mathrm{e}{-}5\!\pm\!3.4\mathrm{e}{-}5$, $\sigma$ $1.8\mathrm{e}{-}4\!\pm\!2.3\mathrm{e}{-}4$, oracle
-$3.1\mathrm{e}{-}5\!\pm\!3.3\mathrm{e}{-}6$; $\sigma$/base per-seed $=1.46\times,0.04\times,1.12\times$ (one
-seed $25\times$ \emph{worse}). \textbf{The seed-0 $1.5\times$ ``win'' was inside the $\sim$$4\times$
+$4.6\times10^{-5}\!\pm\!3.35\times10^{-5}$, $\sigma$ $1.78\times10^{-4}\!\pm\!2.33\times10^{-4}$, oracle
+$3.11\times10^{-5}\!\pm\!3.29\times10^{-6}$ (mean $\pm$ sample standard deviation over seeds); base over $\sigma$ per seed
+$=1.46,0.0447,1.12$ (one seed $22.3\times$ \emph{worse}; corrected 2026-11-10: the ratio was labelled $\sigma$/base and
+the worst seed given as $25\times$). \textbf{The seed-0 $1.5\times$ ``win'' was inside the $\sim$$4\times$
 run-to-run variance.} Even the oracle buys little on the mean and does not beat base's best draws. Conclusion:
 \textbf{coverage is the dominant lever; emphasis is second-order once coverage is good}, and the current $\sigma$ head is too weak a within-region signal to realize the oracle.
 $\sigma$-emphasis should earn its keep only where coverage is \emph{capped}: a starved,
 un-regenerable pool.
+% src: python3 analysis/divergences/eeuu_resonance_numbers.py @71db9819
+% claim: l1_mix025.logflat.base.mean=4.6e-5
+% claim: l1_mix025.logflat.base.std=3.35e-5
+% claim: l1_mix025.logflat.sigma.mean=1.78e-4
+% claim: l1_mix025.logflat.sigma.std=2.33e-4
+% claim: l1_mix025.logflat.oracle.mean=3.11e-5
+% claim: l1_mix025.logflat.oracle.std=3.29e-6
+% claim: l1_mix025.logflat.gain_sigma.0=1.46
+% claim: l1_mix025.logflat.gain_sigma.1=0.0447
+% claim: l1_mix025.logflat.gain_sigma.2=1.12
+% claim: l1_mix025.logflat.sigma_over_base_worst=22.3
+% allow: 25 because it is the superseded value the correction names
 
 \paragraph{Emphasis confirmed where coverage is capped: $\sigma\!\approx\!$oracle on a starved base (3-seed).}
 Repeating the emphasis pipeline on a \textbf{starved} $1.5\mathrm{M}$ \textsc{rambo} base (pole $0.44\%$;
 \code{sigma\_fit\_raw.sh}, $\rho(\sigma,|r|){=}0.52$; $\sigma$ lifts pole selection $0.4\%\!\to\!1.6\%$,
 the $4\times$ ceiling, $\approx$oracle's $1.5\%$) \emph{flips the verdict}. Over 3 seeds
-$\times$\{base,$\sigma$,oracle\}, logflat: base $1.4\mathrm{e}{-}4\!\pm\!1.3\mathrm{e}{-}4$, $\sigma$
-$4.1\mathrm{e}{-}5\!\pm\!2.8\mathrm{e}{-}5$, oracle $4.4\mathrm{e}{-}5\!\pm\!2.4\mathrm{e}{-}5$; $\sigma$/base
-per-seed $=1.10\times,1.89\times,12.65\times$ (\emph{helps every seed}, mean $5.2\times$ logflat / $5.7\times$
-resonance), and \textbf{$\sigma$ recovers $103$--$143\%$ of the oracle}: the real head is as good as the
-perfect error signal here. Contrast the covered $f{=}0.25$ base, where $\sigma$/base was
-$1.46\times,0.04\times,1.12\times$ (null). \textbf{This scopes emphasis precisely: $\sigma$-reweighting is the
+$\times$\{base,$\sigma$,oracle\}, logflat: base $1.39\times10^{-4}\!\pm\!1.28\times10^{-4}$, $\sigma$
+$4.09\times10^{-5}\!\pm\!2.8\times10^{-5}$, oracle $4.36\times10^{-5}\!\pm\!2.45\times10^{-5}$;
+per-seed $=1.10\times,1.89\times,12.6\times$ (base over $\sigma$; \emph{helps every seed}, mean $5.21\times$ logflat / $5.67\times$
+on the bins below $100$\,GeV), and \textbf{$\sigma$ recovers $103\%$ (logflat) and $106\%$ (below $100$\,GeV) of the
+oracle's gain} on the seed means, $(\bar b-\bar\sigma)/(\bar b-\bar o)$: the real head is as good as the
+perfect error signal here (corrected 2026-11-10: an earlier version gave an upper end of $143\%$, which no summary
+reproduces). Contrast the covered $f{=}0.25$ base, where base over $\sigma$ was
+$1.46,0.0447,1.12$ (null). \textbf{This scopes emphasis precisely: $\sigma$-reweighting is the
 tool for when you cannot regenerate coverage (a starved, fixed pool); on a base you can generate
 well, emphasis adds nothing.} Mechanism = the coverage ceiling: on \textsc{rambo}, uniform barely touches
 the pole ($0.4\%$), so concentrating the \emph{limited} pole events fixes the resonance; on mix025 coverage
 is already balanced, leaving $\sigma$ nothing to reallocate.
+% src: python3 analysis/divergences/eeuu_resonance_numbers.py @71db9819
+% claim: l1_starved.logflat.base.mean=1.39e-4
+% claim: l1_starved.logflat.base.std=1.28e-4
+% claim: l1_starved.logflat.sigma.mean=4.09e-5
+% claim: l1_starved.logflat.sigma.std=2.8e-5
+% claim: l1_starved.logflat.oracle.mean=4.36e-5
+% claim: l1_starved.logflat.oracle.std=2.45e-5
+% claim: l1_starved.logflat.gain_sigma.0=1.10
+% claim: l1_starved.logflat.gain_sigma.1=1.89
+% claim: l1_starved.logflat.gain_sigma.2=12.6
+% claim: l1_starved.logflat.gain_sigma_mean=5.21
+% claim: l1_starved.resonance.gain_sigma_mean=5.67
+% claim: l1_starved.logflat.recovered_pct=103
+% claim: l1_starved.resonance.recovered_pct=106
+% claim: l1_mix025.logflat.gain_sigma.0=1.46
+% claim: l1_mix025.logflat.gain_sigma.1=0.0447
+% claim: l1_mix025.logflat.gain_sigma.2=1.12
+% allow: 100 because it is the bin edge in GeV, a setting
+% allow: 143\% because it is the superseded value the correction names
+% allow: 0.25 because it is the coverage fraction f, a setting
 
 \paragraph{Takeaway.} \emph{Generate a modest flat-$\log|\mathcal{M}|^2$ admixture
 ($f\!\approx\!0.25$--$0.5$) for coverage; add $\sigma$-reweighting only when the pool is starved and
