@@ -20404,7 +20404,8 @@ entries:
     the current HETEROSC loss, what did its studies find, and how is generation driven by the predicted sigma built on it?
   status: running
   quotes: []
-  decisions: []
+  decisions:
+  - D344
   next: 'Inventory both branches (l2-gen contains heterosc) commit by commit against trunk: what trunk already has in another
     form, what is new; find each study''s runs and results (run dirs named in the commits) and record them in docs/results.tex
     with src/claim lines; port the scripts and code to the current HETEROSC loss and the current data pipeline (catalog_v4),
