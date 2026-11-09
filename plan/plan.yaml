@@ -20454,7 +20454,7 @@ entries:
       covers this entry)
   owner:
     agent: a74fb932acb5d82dc
-    state: stopped
+    state: closed
     since: '2026-11-09T23:27:24+00:00'
     state_at: '2026-11-09T23:50:30+00:00'
     context: 297017
@@ -20515,3 +20515,23 @@ entries:
   step_waits:
     '2': 'step 1 (order set by the main session: step 1 first)'
     '1': notes-editor re-check (fixes 7ea5b4b2) on branch sigma-gen; then the src/claim pass continues
+  handoff:
+    state: 'Step 1 half done on branch sigma-gen (worktree worktrees/wt-sigma-gen, pushed, tip 4fbe67ef; notes-editor passed
+      and advanced at 4fbe67ef). Done: ee->uu online-generation write-up with fig:l2_eeuu_online (reader analysis/divergences/l2_eeuu_online.py);
+      fair reruns'' summaries committed; heterosc JSONs folded; src/claim lines on the Z-resonance paragraphs (analysis/divergences/eeuu_resonance_numbers.py),
+      three published numbers corrected; starved-base sigma-reweighting result qualified (sigma-free IS arm matches sigma,
+      ratio 1.11). Remaining step 1: src/claim lines for the other ~30 paragraphs of sec:div-sampling (heterosc head and two-stage
+      from the folded JSONs; Q2, deep sampling, sigma speed, ee->uugg loop from tracked summaries; October het paragraphs
+      D47-D94 from CC runs, read only; numbers resting only on deleted runs marked with the run named); repo-reviewer on the
+      two readers and the plot_style.save_panels fix (its lock was held by another agent on 2026-11-10); merge into trunk.
+      Step 2 (D338: port every script incl. launchers, is_weight_path, plot_mse png, adaptive_ir.py; then delete the 3 branches
+      after review) waits on step 1.'
+    decisions: Port everything under D338 (main session 2026-11-10). The write-up uses the 2026-09-07 fair reruns wherever
+      they exist; panel (a) static remains the one-pool July run, disclosed; a fresh-draw rerun would be a new GPU job, passed
+      to the main session. Numbers the committed readers do not reproduce are corrected in place, the correction stated.
+    ruled_out: numbers from throwaway one-liners; treating the July static/IS arms as fair (they reused one pool per round)
+    running: none
+    files: 'worktrees/wt-sigma-gen: analysis/divergences/l2_eeuu_online.py, analysis/divergences/eeuu_resonance_numbers.py,
+      docs/results.tex sec:div-sampling; July run dirs survive only on Jean Zay (wt-heterosc/runs 690M, wt-l2-gen/runs/eeuu_l2
+      5.2G)'
+    written: '2026-11-09T23:53:12+00:00'
