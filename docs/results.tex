@@ -10760,7 +10760,6 @@ is already balanced, leaving $\sigma$ nothing to reallocate.
 ($f\!\approx\!0.25$--$0.5$) for coverage; add $\sigma$-reweighting only when the pool is starved and
 un-regenerable.}
 
-
 \paragraph{Online $\sigma$-driven generation on $ee\to u\bar u$: the design (branch \code{l2-gen}, 2026-07-18; two arms rerun 2026-09-07).}
 Before the $ee\to u\bar ugg$ loop below, the same idea was tried on the $Z$ resonance with
 \code{analysis/divergences/l2\_online.py}. One frozen candidate pool of $3\times10^{6}$ labelled $ee\to u\bar u$ events
@@ -10841,8 +10840,8 @@ $\sigma^{\gamma}$ ($\gamma=1$, three seeds) against the $f=0.25$ static arm with
 six rounds each, the same $\mu$ steps per round (Fig.~\ref{fig:l2_eeuu_online}c): after round~5 $\sigma^{\gamma}$ is at
 $1.48\times10^{-5}$ and static at $1.11\times10^{-5}$, a ratio $\sigma^{\gamma}$ over static of $1.34$; the seeds of
 each overlap ($\sigma^{\gamma}$ $5.79\times10^{-6}$ to $2.57\times10^{-5}$, static $7.12\times10^{-6}$ to
-$2.12\times10^{-5}$), and the oracle $|r|^{\gamma}$ (seed~0) ends at $2.43\times10^{-5}$. Its seed~0 round~5 comes from
-the same chain continued in a second job. On a $2\to2$ resonance the one-parameter coverage base is already near
+$2.12\times10^{-5}$), and the oracle $|r|^{\gamma}$ (seed~0) ends at $2.43\times10^{-5}$. The $\sigma^{\gamma}$ seed-0 value at round~5 comes
+from the same chain continued in a second job. On a $2\to2$ resonance the one-parameter coverage base is already near
 optimal, which is why the method was moved to $ee\to u\bar ugg$, where no single density is.
 % src: python3 analysis/divergences/l2_eeuu_online.py @c7b61a70
 % claim: coordfree.adapt.gmean=1.48e-5
@@ -10870,6 +10869,7 @@ optimal, which is why the method was moved to $ee\to u\bar ugg$, where no single
   \label{fig:l2_eeuu_online}
 % allow: 0 0.25 0.5 1 2 because they are the arms' settings f, alpha and gamma, and the square in log|M|^2
 \end{figure}
+
 \paragraph{Steering validated on $ee\to u\bar u gg$: $\sigma$-informed on-the-fly generation beats
 uniform generation, coordinate-free.} Steering is the layer where $\sigma$ finally overcomes the
 coverage ceiling: instead of \emph{reweighting} a fixed pool, the model's live uncertainty steers what
