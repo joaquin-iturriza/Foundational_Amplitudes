@@ -16013,6 +16013,16 @@ entries:
     holds_all: the entry is under the weekend hold D322; only this answer moves it
     answered_at: '2026-11-07T16:59:14.266000+00:00'
     decision: D330
+  - ask: 'Permission classifier refusal: `Agent(mechanical-worker): delete on origin every branch merged into origin/trunk,
+      remove merged worktrees via scripts/remove_worktree.sh, make remove_worktree.sh also delete the remote branch` (refused
+      as Git Destructive). May I delete the branches already merged into trunk (62 remote, about 37 local) and the merged
+      worktrees, nothing unmerged, and fix the scripts so it stops recurring?'
+    at: '2026-11-09T22:48:59+00:00'
+    searched: 'CLAUDE.md (worktrees removed only by scripts/remove_worktree.sh; never delete what is costly), site decisions:
+      none authorises deleting remote branches'
+    blocks: the branch cleanup (step 20)
+    blocks_steps: &id001
+    - 20
   step_why:
     11:
       feeds: whether the redesign is finished
@@ -16797,6 +16807,15 @@ entries:
     running: none
     files: docs/results.tex tools/push_replay.py tools/main_turns.py tools/compaction_replay.py tools/model_trial.py analysis/agent_redesign/main_turns_split_5708b248.json
     written: '2026-11-04T19:52:42+00:00'
+  ask: 'Permission classifier refusal: `Agent(mechanical-worker): delete on origin every branch merged into origin/trunk,
+    remove merged worktrees via scripts/remove_worktree.sh, make remove_worktree.sh also delete the remote branch` (refused
+    as Git Destructive). May I delete the branches already merged into trunk (62 remote, about 37 local) and the merged worktrees,
+    nothing unmerged, and fix the scripts so it stops recurring?'
+  waiting_since: '2026-11-09T22:48:59+00:00'
+  searched: 'CLAUDE.md (worktrees removed only by scripts/remove_worktree.sh; never delete what is costly), site decisions:
+    none authorises deleting remote branches'
+  blocks: the branch cleanup (step 20)
+  blocks_steps: *id001
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
   question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
