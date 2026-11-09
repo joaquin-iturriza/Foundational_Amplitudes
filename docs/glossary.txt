@@ -1,0 +1,22 @@
+# Terms a figure or deck sent to the user may use as they are (.claude/hooks/send_check.py), one per line:
+# term<TAB>plain definition. A term is added only once the user has accepted it.
+# PROPOSED, NOT YET ACCEPTED (2026-10-27): every entry below waits for the user's acceptance.
+dimensionless target	the amplitude divided by its physical scales (the emission scales: powers of the collision energy and of the soft and collinear invariants set by the process), so the network learns a number without units of order one
+context vector	a short learned vector per process, fitted from a few of its events, that tells the network which process it is reading; set to zero when reading zero-shot
+catalog_v3	the third generated catalog of processes (October 2026): one pool per class of processes equal up to relabelling, every tree class plus one-loop, loop-induced, alpha_s, heavy-quark and new-physics layers, sampled up to 1 TeV, with seven held-out axes
+catalog_v4	the fourth catalog: catalog v3's processes regenerated with hadron-collider cuts (pT > 10 GeV, abs(eta) < 5), energies up to 6 TeV drawn log-uniform, every tree diagram (electroweak production included) and a massless b quark
+H1	held out: new combinations, processes whose particles and multiplicity are all seen in training but never together in one process
+H2	held out: higher multiplicity, 2 to 4 processes of families that have no 2 to 4 process in training (and 2 to 5)
+H3	held out: new particle content, the physical top quark (bracketed in training by heavy quarks of 50, 300 and 600 GeV)
+H4	held out: a new vertex class, the quartic gauge family (only in the twin catalog that leaves it out of training)
+H5	held out: a new perturbative order, one-loop processes whose class is trained only at tree level
+H6	held out: a coupling between trained values, alpha_s = 0.13 when 0.09 and 0.15 are trained
+H7	held out: outside the trained kinematic range, harder cuts (pT of at least 30 GeV) and higher energies (1 to 10 TeV)
+zero-shot	the pretrained model read on a process it never trained on, with no further training
+fine-tune	further training of the pretrained model on one new process, all weights updated
+Muon	an optimizer that orthogonalises each weight matrix's update (here on the hidden matrices; AdamW on the rest)
+AdamW	the Adam optimizer with weight decay decoupled from the gradient
+relabelled processes	held-out processes that equal a training process up to a renaming of their legs (the same amplitude up to a constant factor)
+new processes	held-out processes equal to no training process up to relabelling
+level of the error	the part of the error one number per process removes: the squared mean of the prediction's error on log |M|^2
+shape of the error	what is left of the error once its level is removed: the spread of the error over the process's events
