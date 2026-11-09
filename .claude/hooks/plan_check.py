@@ -313,7 +313,11 @@ def stop_conditions(inp, refused):
         b, n = f()
         bad += b
         notes += n
-    if not refused and not bad and not sc.registered_at_stop("reply_check.py", repo):
+    # a check disabled by an incident (.claude/hooks/disabled.json) is off here too: the dispatcher skips only the
+    # standalone hook, and reply_check kept refusing through plan_check while disabled (D335; 2026-11-09 23:45,
+    # "what do you mean you can't kill it?")
+    if not refused and not bad and not sc.registered_at_stop("reply_check.py", repo) \
+            and not sc.disabled("reply_check.py", os.path.join(repo, ".claude", "hooks")):
         b, n = sc.reply(inp)
         bad += b
     return bad, notes
@@ -337,11 +341,11 @@ def leave_check(inp):
     its turn only with every next step of its entry in flight, under `plan wait` (a date wait included) or held by an
     open question, all the uncovered ones named in one refusal (2026-11-09: steps 18, 19 and 21 left uncovered, the
     main session refused once per step). Any other agent passes: the main session's gate is not applied to agents."""
+    aid = inp.get("agent_id")
+    if not aid:
+        return 0
     try:
         import plan
-        aid = inp.get("agent_id")
-        if not aid:
-            return 0
         d, _st = plan.load()
         bad = []
         for e in d["entries"]:
@@ -351,7 +355,20 @@ def leave_check(inp):
                     bad.append("%s: steps you leave uncovered; put each in flight, under `plan wait %s <step> --on "
                                "<run ids | a date YYYY-MM-DD | what it waits on>`, or drop it (plan drop-next): %s" % (
                                    e["id"], e["id"], "; ".join(left)))
-    except Exception as ex:                       # fail closed, as the Stop gate
+    except Exception as ex:
+        # fail closed only for an agent that could be an owner (its id in the plan's raw text): a reviewer or worker
+        # cannot repair the plan, so it passes (repo-reviewer on 9fa60369)
+        try:
+            import plan as p_
+            path = p_.PLAN_FILE
+        except Exception:
+            path = os.path.join(HERE, "plan", "plan.yaml")
+        try:
+            owner = aid in open(path, errors="replace").read()
+        except OSError:
+            owner = False
+        if not owner:
+            return 0
         sys.stderr.write("plan leave-check failed (%r); fix it before ending the turn\n" % ex)
         return 2
     if bad:

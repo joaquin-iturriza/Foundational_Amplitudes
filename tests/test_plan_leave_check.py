@@ -136,6 +136,22 @@ def test_subagent_stop_non_owner_passes():
     assert rc == 0, err
 
 
+
+def test_subagent_stop_corrupt_plan_refuses_only_the_owner():
+    setup_module()
+    good = open(PLAN).read()
+    try:
+        with open(PLAN, "w") as fh:
+            fh.write(good + "\n  : [unclosed\n")           # no longer parses
+        rc, err = hook("a" + "0" * 16)
+        assert rc == 0, err                              # a reviewer or worker cannot repair the plan: passes
+        rc, err = hook(OWNER)
+        assert rc == 2 and "leave-check failed" in err, err
+    finally:
+        with open(PLAN, "w") as fh:
+            fh.write(good)
+
+
 if __name__ == "__main__":
     n = 0
     for k, f in list(globals().items()):

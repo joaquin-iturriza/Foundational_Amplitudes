@@ -3430,7 +3430,8 @@ def main(argv=None):
         *WHY_ARGS,
         A("--next", type=int, help="replace only next step N (a step agent's own step), keeping the others"))
     cmd("wait", cmd_wait, "step N waits on something outside the turn: noted, never demanded, until unwait", ID,
-        A("n", type=int, help="the step"), A("--on", required=True, help="what it waits on"))
+        A("n", type=int, help="the step"), A("--on", required=True, help="what it waits on: run ids, or any text; a "
+          "text with a date (YYYY-MM-DD[THH:MM], UTC) and no run id is a date wait, quiet until then"))
     cmd("unwait", cmd_unwait, "step N no longer waits", ID, A("n", type=int, help="the step"))
     cmd("leave-check", cmd_leave_check, "an owner's last check before ending its turn: every next step in flight, "
         "waited on or held", ID)

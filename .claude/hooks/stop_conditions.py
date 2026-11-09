@@ -199,6 +199,15 @@ def opener(inp, state, records=None):
 
 
 # ------------------------------------------------------------------ incidents
+def disabled(name, hooks=HOOKS):
+    """the hook `name` is listed in disabled.json (an incident turned it off): a check plan_check runs on its behalf is
+    off too. An unreadable list counts as nothing disabled (the check runs, as before the list existed)."""
+    try:
+        return name in (json.load(open(os.path.join(hooks, "disabled.json"))) or {})
+    except (OSError, ValueError, TypeError):
+        return False
+
+
 def incidents(hooks=HOOKS):
     try:
         off = json.load(open(os.path.join(hooks, "disabled.json")))
