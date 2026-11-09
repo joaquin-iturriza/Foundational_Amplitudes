@@ -12109,6 +12109,55 @@ entries:
       outside, D317 cost). Disk: ~0.45 MB per read, 38 jobs, CC /sps/lpnhe 48G free. Open, not a fail: summed vs per-class
       2x bar is Joaquin''s pending call (15 class-seeds over 2x under r5; bb_bb/htaptam/ddx_ttx per-class cost rises 1.5-2x
       labels), and r6 no longer records the stalled flag per round.'''
+  - at: '2026-11-09T15:43:26+00:00'
+    question: 'Step 84 (D326, Joaquin 2026-11-09 ''with the warm up study we can take the largest run and keep improving from
+      there''): does continuing the scaling grid''s largest model, width 32 at 16x (FA-ccin2p3-a77e20b8, 68224 steps, cosine-decayed
+      final model after its sigma stage), for 68224 more steps on the same data reach a lower validation error than the width-32
+      grid curve predicts for a from-scratch run at the same total compute (32x, C = 2 x 1.706e17 = 3.41e17)? Feeds whether
+      the pretraining candidate''s path is ''continue the largest model'' (and in what schedule) or a WSD-from-start rerun.'
+    prior: 'par:v4_warm_start (cosine parent, default restart re-warm + cosine, fresh optimizer, k = 533 = 1/8 of the parent''s
+      steps, onto the C1 change): R(W/B) PP4 1.33 [1.30,1.37], EE4 1.51 [1.37,1.71], SHORT; par:v4_warm_start_optstate: continuing
+      with the parent''s optimizer state removes the restart jump but changes nothing downstream (R 1.006/1.009 over the fresh-optimizer
+      arm); par:v4_warm_start_valley: continued arms lose by their schedule; par:v4_warm_start_wsd_match: a WSD parent (cooldown
+      last eighth) restarted at the default restart for 1/8 of a pretraining is MATCH, PP4 0.802 [0.744,0.860], EE4 0.940
+      [0.827,1.058] (share 0.50), and the restart beats the pre-cooldown branch (PP4 0.949, EE4 0.907). Differences here:
+      the continuation is on the SAME data and loss (no change to carry), length equal to the parent''s (not 1/8), width 32.
+      Step 70 read (scaling_grid.py @be930dd2): width 32 L = 0.0088/0.0050/0.0030 at 2x/4x/8x (16x running), best val NLL
+      -4.337/-4.705/-5.057, pooled held_default R 0.613/0.543/0.512; interim 11-cell law fit has L_inf -> 0 (no saturation
+      claimed). Searched results.tex (warm_start*, continue, restart, WSD, cosine), plan show, site decisions (D307 D308 D315
+      D319 D322 D326).'
+    measure: 'Per arm the final model (best checkpoint by aggregate val_loss_no_reg, then the sigma fit, D276): L = geometric
+      mean over the 1153 training pools of the validation MSE of ln|M|^2 (sigma stage''s saved predictions, scaling_grid.py
+      pull), best val_loss_no_reg (het NLL), pooled held_default R and PP4/EE4 R over the grid''s w32 16x cell (median over
+      classes of the class''s geometric mean, class bootstrap 95%). Reference value at matched compute: the width-32 grid
+      curve one doubling past 16x, L_32x = L_16x (L_16x/L_8x) (bare log-log step through the last two cells, a labelled estimate;
+      also the per-width law fit (ii) at 32x once w32 16x is in), the same for best val NLL and held_default R. Blow-up check
+      (mixture_ab.blowups).'
+    check: 'The measure moves with steps at width 32 at the resolution needed: L 0.0088 -> 0.0050 -> 0.0030 (x0.57, x0.60
+      per doubling) against a seed spread of 6.2% (w32 1x seed pair); best val NLL -4.337 -> -4.705 -> -5.057 (0.35 per doubling).
+      The cosine restart''s cost in par:v4_warm_start (x1.33 at 1/8 length) is far above the spread, so a restart penalty
+      is resolvable.'
+    fixed: 'Data, loss and HPs of the grid (arm v4_het_default25, LONG_HP 1262 point: muon_weight_decay 0.04733132, regularization_lambda
+      9.114591e-08, eta_min 1.376875e-08, ema false, batch 16384, whole catalog_v4 default25 train set, memmap, eval_subsample
+      200, MuonAdamW, het loss, width 32, LONG_CKPT true), seed 42. Start: a77e20b8''s final model (after its sigma stage)
+      via fine_tune.pretrained_path, fresh optimizer (par:v4_warm_start_optstate: state changes nothing), lr scale 1 at lr
+      3.649e-3 (the window law at 68224 steps, the parent''s own peak; not tuned, a lower bound as the grid''s), re-warm over
+      0.18 of the steps (trial_1262''s warmup_frac), then WSD with its cooldown over the last eighth (the schedule par:v4_warm_start_wsd_match
+      found to restart well, and it leaves a pre-cooldown checkpoint to continue again), 68224 steps (total 136448 = 32x,
+      20.3 epochs). New job-script switch LONG_CONT=<parent run dir> on the LONG_HP path, own run dir _cont; code reviewed
+      (repo-reviewer) before submit. CC-IN2P3 gpu_v100/gpu_h100, mem 32G, limit from short_wall --width 32. Wall: V100 width
+      32 at 3.34 s/step (w32 8x: 31.65 h over 34112 steps) -> 63.3 h training + ~1.7 h overhead = ~65 GPU-h, one job; within
+      the 7-day QoS.'
+    control: The width-32 grid curve itself (same data, HPs point, seed and code family; cells 2x/4x/8x/16x) extrapolated
+      one doubling to 32x, labelled an estimate. A measured matched control (width 32 from scratch at 136448 steps, cosine,
+      ~130 GPU-h) is the alternative, offered to Joaquin with its cost, not run without his go.
+    seeds: 42 only (D315); the error band is the w32 seed spread 6.2% (|ln(L42/L43)| of the 1x pair).
+    outcome: 'BETTER: continuation L below the 32x estimate by more than 6.2% (and best val NLL below its estimate) -> continue-the-largest-model
+      with WSD is the candidate''s path; its pre-cooldown checkpoint is the next start. EQUAL (within 6.2%): continuation
+      equals from-scratch at matched compute and reuses 16x''s compute, so it is taken; held_default R reported beside. WORSE
+      (above by > 6.2%): the cosine-final start costs; report where (curve, held_default), propose a WSD-from-start width-32
+      run with its GPU-h. Blow-up: listed apart with where, never dropped. GPU-h ~65 > 30: the estimate goes to Joaquin before
+      submission (D326 approves the work, not a cost); submit only after a77e20b8 ends.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
