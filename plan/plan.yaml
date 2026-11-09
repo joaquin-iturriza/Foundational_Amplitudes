@@ -16109,7 +16109,7 @@ entries:
     agent: a3433fbc56e65e68c
     state: stopped
     since: '2026-11-07T12:48:31+00:00'
-    state_at: '2026-11-09T22:50:48+00:00'
+    state_at: '2026-11-09T22:55:05.958000+00:00'
     context: 224822
     context_at: '2026-11-09T22:54:53+00:00'
   designs:
