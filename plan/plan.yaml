@@ -15777,7 +15777,7 @@ entries:
   match: zz_redesign_*
   evidence:
     runs: []
-    commit: f47ac235
+    commit: 2ae2ae25
     paths:
     - .claude/hooks/notification_absorb.py
     - .claude/hooks/owner_handoff.py
@@ -15799,6 +15799,10 @@ entries:
       done entries'' items closed: delta, pp_sampling, lowd_ft, setup_redesign, muon_test, ft_harm, muon_hp, error_correlates);
       plan reads hold/release recorded by site decide (ledger_sync). Baseline (to 2026-11-07T17:00, 8.22 days): main 823 wakes
       / 819.8M; 10 min 385 wakes, 727.7-570.7M; owners 247 / 618.2M, 10 min 110, 591.5-481.1M. repo-reviewer launched.'
+    - '2026-11-09: next 18 (batching built: hand-back spool + fixed 600 s waiter window, default) and next 19 (supervisor
+      polls held items'' runs) passed the repo-reviewer after one FIX round (4 findings fixed in 2ae2ae25 and ~/.local/bin/site,
+      backup site.bak-20261109-review1); watermark advanced to 2ae2ae25. Measurement of the batch and the live check of a
+      held run''s end are next 21.'
     - analysis/agent_redesign/agent_tasks.json
     - analysis/agent_redesign/context_breakdown.json
     - analysis/agent_redesign/figs/context_breakdown.png
