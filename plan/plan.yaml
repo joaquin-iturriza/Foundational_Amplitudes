@@ -16121,7 +16121,6 @@ entries:
       code'
     '20': 'Joaquin: run python3 tools/switch_settings.py --switch L --apply (D337; repo-reviewer PASS on 700fe4fa; the permission
       classifier refused it to the agent as self-modification) and install the plan_files_guard fix (D336, scratchpad pfg.py)'
-    '23': the repo-reviewer's re-check of 700fe4fa (reviewer a0b2da08acd94dae3)
   owner:
     agent: a5f2aff63bd28c5a8
     state: working
