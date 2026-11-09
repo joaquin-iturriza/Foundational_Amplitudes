@@ -16767,6 +16767,10 @@ entries:
   - D313
   next:
     9: Joaquin's answer to lifting D307 (asked 2026-11-07T06:09); write-up of step 15 is committed (7bd323c3, par:v4_warm_start_wsd_match)
+    10: 'Notes-editor finding (review 11-09): par:v4_warm_start_wsd_match takes the restart as the recipe against its own
+      pre-read 5% band rule, which picks the branch on share 0.50 (restart/branch PP4 0.949 [0.929,0.969], EE4 0.907 [0.839,0.980]).
+      Fix the text to the pre-set rule: the recipe sentence names the branch; the restart''s better read is reported as a
+      post-hoc observation. Waits on the D322 hold''s release.'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -20071,6 +20075,11 @@ entries:
         default restart of its final model on share 0.50, 533 steps) against each change pretrained from scratch under WSD,
         design review, submit'
       - 'no: close the entry with plan done --writeup 7bd323c3'
+    10:
+      feeds: the warm-start recipe
+      if:
+      - 'text fixed and notes-editor passes: the recipe is the branch, restart noted post hoc'
+      - 'notes-editor still blocks: revise once more on its finding'
   ask: 'Your hold: the warm start now matches from scratch at 533 steps when both sides use the WSD schedule (restart of the
     WSD final model at share 0.50: pp 0.80, e+e- 0.94, bar 1.35). May I lift your hold on testing other changes (D307) and
     resume them with this recipe: pretrain with WSD, restart the final model, retrain 533 steps at share 0.50?'
