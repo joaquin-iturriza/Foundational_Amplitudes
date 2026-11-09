@@ -10725,12 +10725,14 @@ Repeating the emphasis pipeline on a \textbf{starved} $1.5\mathrm{M}$ \textsc{ra
 the $4\times$ ceiling, $\approx$oracle's $1.5\%$) \emph{flips the verdict}. Over 3 seeds
 $\times$\{base,$\sigma$,oracle\}, logflat: base $1.39\times10^{-4}\!\pm\!1.28\times10^{-4}$, $\sigma$
 $4.09\times10^{-5}\!\pm\!2.8\times10^{-5}$, oracle $4.36\times10^{-5}\!\pm\!2.45\times10^{-5}$;
-per-seed $=1.10\times,1.89\times,12.6\times$ (base over $\sigma$; \emph{helps every seed}, mean $5.21\times$ logflat / $5.67\times$
+per-seed $=1.10\times,1.89\times,12.6\times$ (base over $\sigma$; \emph{helps every seed}, arithmetic mean of the per-seed ratios, dominated by one seed, $5.21\times$ logflat / $5.67\times$
 on the bins below $100$\,GeV), and \textbf{$\sigma$ recovers $103\%$ (logflat) and $106\%$ (below $100$\,GeV) of the
 oracle's gain} on the seed means, $(\bar b-\bar\sigma)/(\bar b-\bar o)$: the real head is as good as the
 perfect error signal here (corrected 2026-11-10: an earlier version gave an upper end of $143\%$, which no summary
 reproduces). Contrast the covered $f{=}0.25$ base, where base over $\sigma$ was
-$1.46,0.0447,1.12$ (null). \textbf{This scopes emphasis precisely: $\sigma$-reweighting is the
+$1.46,0.0447,1.12$ (null). (Caveat, 2026-11-10: this study has no reweighting arm that ignores $\sigma$; in the online study below such an arm
+matches $\sigma$ on the same starved base, so what this paragraph credits to $\sigma$ may be emphasis in general.)
+\textbf{This scopes emphasis precisely: $\sigma$-reweighting is the
 tool for when you cannot regenerate coverage (a starved, fixed pool); on a base you can generate
 well, emphasis adds nothing.} Mechanism = the coverage ceiling: on \textsc{rambo}, uniform barely touches
 the pole ($0.4\%$), so concentrating the \emph{limited} pole events fixes the resonance; on mix025 coverage
@@ -10758,7 +10760,8 @@ is already balanced, leaving $\sigma$ nothing to reallocate.
 
 \paragraph{Takeaway.} \emph{Generate a modest flat-$\log|\mathcal{M}|^2$ admixture
 ($f\!\approx\!0.25$--$0.5$) for coverage; add $\sigma$-reweighting only when the pool is starved and
-un-regenerable.}
+un-regenerable.} On a starved pool, reweighting toward the right objective without $\sigma$ did about as well in the
+online study below, so $\sigma$'s own share of that gain is not established.
 
 \paragraph{Online $\sigma$-driven generation on $ee\to u\bar u$: the design (branch \code{l2-gen}, 2026-07-18; two arms rerun 2026-09-07).}
 Before the $ee\to u\bar ugg$ loop below, the same idea was tried on the $Z$ resonance with
@@ -10815,8 +10818,10 @@ not the conclusion), $\sigma^{0.5}$+IS at $2.75\times10^{-5}$, and the oracle (s
 IS arm, which never looks at $\sigma$, reaches $3.06\times10^{-5}$ with a fresh draw and $2.81\times10^{-5}$ with one
 pool. Static over $\sigma^{0.5}$+IS is $5.25$, static over IS $4.72$, IS over $\sigma^{0.5}$+IS $1.11$, inside the
 seed spread of the IS arm ($1.61\times10^{-5}$ to $5.84\times10^{-5}$). So on this base almost the whole gain comes from
-training toward the right objective; $\sigma$-resampling adds at most about $10\%$ on top. This is the starved-base
-result of the reweighting paragraphs above seen again: there the ceiling was coverage, here it is the objective.
+training toward the right objective; $\sigma$-resampling adds about $10\%$ on the geometric mean, inside that spread.
+This qualifies the starved-base $\sigma$-reweighting result above: that study had no reweighting arm that ignores
+$\sigma$, and here such an arm recovers nearly all of the gain, so the gain credited to $\sigma$ there may belong to
+emphasis toward the pole in general.
 % src: python3 analysis/divergences/l2_eeuu_online.py @c7b61a70
 % claim: starved.static_fair.gmean=1.44e-4
 % claim: starved.static_prefix.gmean=2.06e-4
