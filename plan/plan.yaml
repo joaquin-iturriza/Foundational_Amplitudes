@@ -16116,8 +16116,6 @@ entries:
       idle: event (or its absence after 45 min) is the trigger'
     '21': 'the date 2026-11-17: a week of usage after the 2026-11-09 23:54 restart of the waiter and supervisor on the batching
       code'
-    '20': repo-reviewer a0b2da08acd94dae3 re-check of 1c051019 (fixes of its 3 blocking findings on a44a2ca8/54f5954c, tests
-      8/8); on PASS add 'python3 tools/repo_hygiene.py --fold-agents' to FA maintain in ~/.config/ccorch/projects.toml
   owner:
     agent: a5f2aff63bd28c5a8
     state: stopped
