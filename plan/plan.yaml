@@ -16110,6 +16110,8 @@ entries:
       owner
     '19': the repo-reviewer's verdict on the batching and supervisor fixes (b1901f40, f47ac235); the reviewer resumes the
       owner
+    '21': 'the date 2026-11-17: a week of usage after the restart of the waiter and supervisor on 2026-11-09 ~23:55 (the since
+      time for wake_batching.py)'
   owner:
     agent: a3433fbc56e65e68c
     state: stopped
