@@ -15351,6 +15351,24 @@ entries:
       else the measured from-scratch 32x control (~130 GPU-h) goes to Joaquin; (4) restate BETTER/EQUAL/WORSE on that band;
       (5) cite par:v4_warm_start_fixes and B_wsd in the prior; (14) disk per job (a77e20b8''s run dir, checkpoints, memmap
       cache key reused) against CC free disk read at design time.'
+  - at: '2026-11-09T19:55:47+00:00'
+    text: 'PARKED 2026-11-09 by D327/D328 (Joaquin shifted gears; nothing to run until he resumes; answer ''what were we doing''
+      from this). State: (1) scaling grid width x length (step 70): 11 of 12 cells read (scaling_grid.py @be930dd2, figs scaling_grid_{compute,hours,reads,loss});
+      width 32 lowest per GPU-hour at every budget; at equal compute width and steps trade about evenly on MSE(ln|M|^2) (w16
+      16x 0.0048 vs w32 4x 0.0050), but on best val loss w32 2x -4.337 is worse than w16 8x -4.606; pooled held-out read (700
+      classes) MSE/MSE(w8,2x) flat along length (w32 8x 0.512, w16 0.580->0.620 8x->16x) while pp test falls to 0.151; interim
+      joint fit sends L_inf to 0 (no law so far). Last cell w32 16x FA-ccin2p3-a77e20b8 still training at the hold (val -4.86
+      at 13:25 11-09); when it ends the supervisor collects it, the 12-cell fit and write-up wait for resume. All shown to
+      Joaquin 11-09 (a correction: held-out was HD4 only first, 0.295, corrected to pooled 0.512). (2) Step 84, D326 continue
+      from the width-32 16x model: design recorded, design-reviewer FIX (two changes at once vs cosine reference; extrapolated
+      reference band 15-20% not 6.2%; cite par:v4_warm_start_fixes; disk per job); revision not done; GPU: ~65 GPU-h continuation,
+      ~130 GPU-h more for a measured from-scratch control; Joaquin asked both, unanswered. (3) Sign head: step 81 4-block
+      FAULT (MSE ratio 1.259 vs 1-block on HD5); step-0 log check ruled out an RNG shift (trunks bit-equal at init), divergence
+      by step 85; a 2.5 GPU-h repeat of the 1-block run is the only separating test, unanswered. (4) Sampler r6 passes all
+      non-edge bins (uux_bgtxwp 0.973/0.974, summed cost 1.62x); 1301-class regeneration (step 82) waits on the edge-bin call
+      (a) exempt or (b) quota scaled to reachable share; D325 says 2x is per class, a guide. (5) e+e- anchor pools: keep or
+      regenerate the two 3000 GeV short runs (bbxgz 20/200, wpwmzz 53/200), unanswered. Owner abe4f9535994a7b12 closed with
+      hand-off written; a fresh owner starts from it.'
   handoff:
     state: '2026-11-09. Step 70 scaling grid: 9 of 10 cells read (scaling_grid.py @be930dd2 -> data/scaling_grid.json; figs/scaling_grid_compute,
       _loss, _hours, _reads); repo-reviewer PASS (watermark 9b577ea9). w32 16x FA-ccin2p3-a77e20b8 still running; step 70
