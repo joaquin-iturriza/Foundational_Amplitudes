@@ -15762,6 +15762,15 @@ entries:
       also deletes the remote branch; remove merged worktrees through it; delete branches merged into trunk locally and on
       origin (not trunk, main, ccin2p3, jeanzay); list unmerged ones with commits not in trunk for Joaquin. Needs his yes
       (classifier refused the deletion as Git Destructive).'
+    21: 'After-period of the 10-minute batch (D324), on or after 2026-11-17: python3 tools/wake_batching.py --since <the time
+      the main session''s waiter and supervisor were restarted on the new site code> --until +7 days --out analysis/agent_redesign/wake_batching_after.json
+      --fig analysis/agent_redesign/figs/wake_batching_after; compare per day with the baseline (analysis/agent_redesign/wake_batching_baseline.json
+      @b65c92a9: main 823 wakes / 819.8M tokens in 8.22 days, owners 247 / 618.2M; predicted at 10 min: main 385 wakes, 727.7M
+      (work kept) to 570.7M (largest only), i.e. 11-30% fewer tokens; owners not batchable live, only measured). Live batching
+      covers main-session hand-backs (spooled HANDBACK events) and routine site events (fixed 600 s window); agent-finished
+      notifications after a hand-back were already absorbed; owner resumes by peer hand-backs cannot be held (Claude Code
+      offers no delivery delay, an owner has no waiter). Also confirm the first run of a held item that ends gets its RUN
+      event and RUN_DONE with no manual poll (next 19 fix).'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16064,6 +16073,11 @@ entries:
       if:
       - 'Joaquin says yes: run it and report counts before/after and the unmerged list'
       - 'he says no: leave branches, only fix the scripts'
+    21:
+      feeds: whether 10-minute batching cuts token usage as the replay predicts
+      if:
+      - 'saving within or above 11-30% on main per day: keep 10 min'
+      - 'below: report to Joaquin with numbers and causes'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
