@@ -20456,7 +20456,7 @@ entries:
     agent: a74fb932acb5d82dc
     state: closed
     since: '2026-11-09T23:27:24+00:00'
-    state_at: '2026-11-09T23:50:30+00:00'
+    state_at: '2026-11-09T23:53:19+00:00'
     context: 297017
     context_at: '2026-11-09T23:51:58+00:00'
   findings:
