@@ -15154,6 +15154,37 @@ entries:
       (median 63.6 vs 66.9); step time 4-block/1-block = 1.1312/0.9822 s = 1.152. Next (held by D322 until lifted): trace
       the FAULT (do two same-config runs of the 1-block arm diverge as much; if yes, the 1.15 check is replaced by the same-config
       spread and the sign reading stands at NOT RESOLVED; if no, find the coupling).'
+  - at: '2026-11-09T11:22:36+00:00'
+    text: '2026-11-09 step 70 read, 9 of the 10 new cells (analysis/catalog_v4/scaling_grid.py pull/read/fig @c2dec101 ->
+      data/scaling_grid.json, scaling_grid_preds.json; figs/scaling_grid_compute, scaling_grid_hours, scaling_grid_reads).
+      Question (D292/D293/D314): on catalog_v4 share 0.25 (het, whole set, memmap, every cell at trial_1262''s HPs, lr = 7.82114e-3
+      (steps/17056)^-0.55, seed 42), how does L = the geometric mean over the 1153 training pools of the validation MSE of
+      ln|M|^2 (sigma stage''s saved predictions, final model) fall with C = 6NSB along width 8/16/32 and length 2x/4x/8x/16x
+      of 4264 steps, and does one law L = A C^-alpha + L_inf hold? Cells (run, GPU, main-block training hours, L): w8 2x 34cfff0c
+      V100-SXM2 2.25 h 0.0359; w8 4x reused trial_1262 (H100) 0.0206; w8 8x 4ba33195 SXM2 8.86 h 0.0166; w8 16x reused trial_1262
+      (H100) 0.0123; w16 2x c53b8e51 SXM2 3.93 h 0.0174; w16 4x 1b1a8f6e SXM2 7.76 h 0.0102; w16 8x 8a523b67 SXM2 15.46 h
+      0.0064; w16 16x 4d6e9b06 V100-PCIE 33.16 h 0.0048; w32 2x ff309c2d SXM2 7.83 h 0.0088; w32 4x b07d6237 SXM2 15.74 h
+      0.0050; w32 8x 8b543518 SXM2 31.65 h 0.0030; w32 16x a77e20b8 RUNNING. Best val_loss_no_reg (het NLL) falls monotonically
+      on every axis (w8 2x -3.471 -> w32 8x -5.057). Blow-ups: none; every new cell spiked and recovered (val NLL up to 1e9
+      at steps 1870-30008, best checkpoint at the end in all). Fits at the design''s seed-spread error (per width the 1x seed
+      pair''s |ln(L42/L43)|: w8 0.032, w16 0.078, w32 0.062): (ii) per width over length, 1 dof: w8 alpha 1.13, L_inf 0.0102,
+      chi2_red 8.6 (misfit; two of its four cells are the reused H100 runs at earlier code), w16 alpha 1.06, L_inf 0.0032,
+      chi2_red 0.05; w32 waits on a77e20b8. (iii) per length over width, 3 points, not a test: bare power-law slopes 0.53
+      (2x), 0.53 (4x), 0.64 (8x). (i) joint and (iv) shared-exponent wait on a77e20b8; INTERIM over the 11 cells in hand,
+      not a verdict: joint L_inf -> 0 (grid edge), alpha 0.57, chi2_red 7.1 (8 dof); shared exponent L_inf -> 0, alpha 0.53,
+      chi2_red 8.1 (6 dof): both on the design''s NO branch so far. Equal compute: w16 4x 0.0102 vs w8 16x 0.0123 at C 1.09e16/1.19e16;
+      w16 8x 0.0064 vs w32 2x 0.0088 at 2.19e16/2.13e16; w16 16x 0.0048 vs w32 4x 0.0050 at 4.37e16/4.26e16 (within the seed
+      spread). Per GPU-hour (V100) width 32 is lowest at every budget measured: ~8 h w32 2x 0.0088 vs w16 4x 0.0102 vs w8
+      8x 0.0166; ~16 h w32 4x 0.0050 vs w16 8x 0.0064; ~32 h w32 8x 0.0030 vs w16 16x 0.0048 (a width-32 step costs 3.5x a
+      width-8 step for 14x the parameters). Zero-shot reads, R = median over classes of the class''s geometric mean of cell
+      / w8 2x (class bootstrap 95%): PP4 falls to 0.151 [0.137, 0.169] at w32 8x and 0.237 at w16 16x; EE4 0.175 / 0.225;
+      held-out default-sampled trees HD4 0.295 [0.18, 0.49] / 0.436; one-loop HD5 and H5 do not move on any cell (HD5 0.93-1.16,
+      H5 0.93-1.06, every interval containing 1). Earlier result (par:v4_width, 0.64 epoch, base HPs): one law over 8 runs
+      failed with L_inf -> 0, chi2_red 2851, and ''steps buy far more than width'' (w8 16x 0.0123 vs w32 1x 0.0271-0.0288);
+      at >= 1 epoch and equal HPs the width-for-steps trade is roughly even at equal C and width wins per GPU-hour. Cache
+      keys: prebuild FA-ccin2p3-bf203857 built 27a1422795e9872faa6b9eaf, every GPU cell opened 0c897ca2d81c98d3828e2808 (18.03
+      GB, 110361200 events): the design''s ''one shared key'' did not hold (the prebuild''s key differs), no effect on the
+      cells (each opened the same existing key; both caches later deleted under D310, finding 2026-11-07T03:53).'
   handoff:
     state: '2026-11-07 ~11:00. Step 79 r5 read (data/r5_check.json, r5_acted.json, figs/r5_check.png): FAIL on fill only:
       bbxuu back at quota (35/36 chunks bitwise r2 under _chunk_sig), bgtxwp [-1.206,-0.96] 0.867/0.870 (r3 0.925/0.917),
