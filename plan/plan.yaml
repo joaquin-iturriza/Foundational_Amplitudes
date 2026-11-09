@@ -20520,4 +20520,5 @@ entries:
       if:
       - 'every ported script runs its CPU path on trunk: branches deleted after review'
       - 'a script needs data only on Jean Zay or a deleted run: ported anyway, its dependency named in its docstring'
-  step_waits: {}
+  step_waits:
+    '2': 'step 1 (order set by the main session: step 1 first)'
