@@ -16929,7 +16929,7 @@ entries:
   question: When a change to the setup is good and allows it, does warm-starting from an existing pretrained model with a
     short retraining under the change match pretraining from scratch with the change, and at what fraction of the compute?
     (short runs, D282)
-  status: running
+  status: held
   quotes:
   - said_at: '2026-11-04T21:07:53.532000+00:00'
     text: So I'd like to test an idea first. If we find a change that is really good, and the change allows it, could we take
@@ -16954,10 +16954,20 @@ entries:
     answers_after: '2026-11-06T19:47:17+00:00'
     covers:
     - warm_start
+  - said_at: '2026-11-09T19:53:59.278000+00:00'
+    text: Please keep the longer training and everything else that was held well noted, we will keep them on the back burner
+      for now since I was asked to shift gears slightly, make sure nothing of what we've been doing is lost before we move
+      on, any open threads, non discussed results, the current state should be well kept, and if in a few days I ask you to
+      remind me what we were doing, you should answer as if I was asking you right now.
+    decision: D332
+    answers_after: '2026-11-07T06:09:21+00:00'
+    covers:
+    - warm_start
   decisions:
   - D282
   - D307
   - D313
+  - D332
   next:
     9: Joaquin's answer to lifting D307 (asked 2026-11-07T06:09); write-up of step 15 is committed (7bd323c3, par:v4_warm_start_wsd_match)
     10: 'Notes-editor finding (review 11-09): par:v4_warm_start_wsd_match takes the restart as the recipe against its own
@@ -17232,7 +17242,9 @@ entries:
     at: '2026-11-07T06:09:21+00:00'
     searched: 'site decisions --project FA: D307 holds change tests until the warm start is fixed; no decision lifts it'
     blocks: the change tests held by D307
-    blocks_steps: &id001 []
+    blocks_steps: []
+    answered_at: '2026-11-09T19:53:59.015000+00:00'
+    decision: D332
   owner:
     agent: ae9049fb82fff3856
     state: stopped
@@ -20282,11 +20294,4 @@ entries:
       if:
       - 'text fixed and notes-editor passes: the recipe is the branch, restart noted post hoc'
       - 'notes-editor still blocks: revise once more on its finding'
-  ask: 'Your hold: the warm start now matches from scratch at 533 steps when both sides use the WSD schedule (restart of the
-    WSD final model at share 0.50: pp 0.80, e+e- 0.94, bar 1.35). May I lift your hold on testing other changes (D307) and
-    resume them with this recipe: pretrain with WSD, restart the final model, retrain 533 steps at share 0.50?'
-  waiting_since: '2026-11-07T06:09:21+00:00'
-  searched: 'site decisions --project FA: D307 holds change tests until the warm start is fixed; no decision lifts it'
-  blocks: the change tests held by D307
-  blocks_steps: *id001
-  checked_until: '2026-11-09T15:47:06+00:00'
+  hold_decision: D332
