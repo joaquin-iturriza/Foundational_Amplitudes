@@ -20431,7 +20431,11 @@ entries:
   evidence:
     runs: []
     commit: null
-    paths: []
+    paths:
+    - analysis/divergences/l2_conf_summary.json
+    - analysis/divergences/l2_online_summary.json
+    - analysis/divergences/l2_rw_summary.json
+    - analysis/divergences/l2_starv_summary.json
   dead_ends: []
   asks:
   - ask: 'Scope: fold heterosc/l2-gen into trunk at the current het loss, record results, delete after; then sigma-driven
