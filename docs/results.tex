@@ -10696,6 +10696,116 @@ is already balanced, leaving $\sigma$ nothing to reallocate.
 ($f\!\approx\!0.25$--$0.5$) for coverage; add $\sigma$-reweighting only when the pool is starved and
 un-regenerable.}
 
+
+\paragraph{Online $\sigma$-driven generation on $ee\to u\bar u$: the design (branch \code{l2-gen}, 2026-07-18; two arms rerun 2026-09-07).}
+Before the $ee\to u\bar ugg$ loop below, the same idea was tried on the $Z$ resonance with
+\code{analysis/divergences/l2\_online.py}. One frozen candidate pool of $3\times10^{6}$ labelled $ee\to u\bar u$ events
+($\sqrt s$ from $91$ to $1000$\,GeV, half of it on the pole) feeds every arm. Each arm fine-tunes $\mu$ from \code{base22}
+in a warm chain of rounds of $1500$ steps; each round trains on $4\times10^{5}$ events drawn from the candidate pool
+without replacement, and round~0 is the same coverage draw for every arm. The arms differ only in how the later rounds
+draw: \emph{static} draws from the coverage base $p_{\rm cov}=f\cdot(\text{flat in }\log|\mathcal M|^2)+(1-f)\cdot(\text{uniform
+in }\sqrt s)$; \emph{$\sigma^\alpha$+IS} draws $\propto p_{\rm cov}\,\sigma^\alpha$, $\sigma$ from a $\sigma$-only fit on
+the previous round's $\mu$, and corrects the loss per $\log|\mathcal M|^2$ bin by $c_b=Q_b/\pi_b$ back to the objective
+$Q$ (\code{training.is\_weight\_path}); \emph{$|r|^\alpha$+IS} is the same with the true error $|r|$; \emph{IS} keeps the
+static draw and only applies the correction, which separates the objective from $\sigma$; \emph{$\sigma^\gamma$} draws
+$\propto\sigma^\gamma$ over the candidate pool with no base density and no correction (EMA-damped, coordinate-free). The
+score is the MSE of $\ln|\mathcal M|^2$ on a fixed uniform-$\sqrt s$ test set of $10^{5}$ events, in $8$ $\sqrt s$ bins
+dense on the peak, averaged with equal weight per bin; each round is read at its best checkpoint; seeds are combined by
+the geometric mean. \textbf{A fairness defect, and what it touches.} Until commit \code{35230574} (2026-07-18 23:08) the
+static and IS arms re-drew the \emph{same} pool every round (a fixed seed), so they saw $4\times10^{5}$ distinct events
+where the $\sigma$ and $|r|$ arms saw a fresh draw each round. Every July run of those two arms predates the fix (the
+starved-base ones ended 14:38 to 15:29 that day, read from their job logs); the starved-base static and IS arms and the
+$f=0.25$ static control of the coordinate-free arm were rerun after it on 2026-09-07, and the comparisons below use the
+reruns wherever they exist.
+% allow: 1500 because it is the number of steps per round, a setting
+% allow: 91 1000 because they are the window edges in GeV, a setting
+% allow: 8 because it is the number of evaluation bins, a setting
+% allow: 0.25 because it is the coverage fraction f, a setting
+% allow: 23:08 14:38 15:29 because they are clock times
+% allow: 3\times10^{6} 4\times10^{5} 10^{5} because they are pool and test-set sizes, settings
+% allow: 0 1 2 5 because they are round and seed indices and the square in log|M|^2, not results
+
+\paragraph{On a good coverage base, $\sigma$-emphasis hurts.}
+With $f=0.25$ (one seed, three rounds, static here the one-pool variant), the static arm ends at
+$1.82\times10^{-5}$. $\sigma^{1}$+IS ends at $5.54\times10^{-4}$, $30.5$ times the static arm, and even the true-error
+oracle $|r|^{1}$+IS ends at $1.46\times10^{-4}$ ($8.02$ times); both jump up at round~1, when the draw first
+concentrates (Fig.~\ref{fig:l2_eeuu_online}a). Softening the exponent only brings $\sigma$ back to the static arm:
+$\sigma^{0.5}$+IS $3.79\times10^{-5}$, $\sigma^{0.25}$+IS $1.96\times10^{-5}$. The static arm had fewer distinct events
+than these and still won, so the defect above does not change the verdict.
+% src: python3 analysis/divergences/l2_eeuu_online.py @c7b61a70
+% claim: f025.static=1.82e-5
+% claim: f025.sigma_a1=5.54e-4
+% claim: f025.sigma_a1_over_static=30.5
+% claim: f025.oracle_a1=1.46e-4
+% claim: f025.oracle_a1_over_static=8.02
+% claim: f025.sigma_a05=3.79e-5
+% claim: f025.sigma_a025=1.96e-5
+% allow: 0.25 because it is the coverage fraction f, a setting
+% allow: 0.5 because it is an exponent setting of an arm
+% allow: 0 1 2 5 because they are round and seed indices and the square in log|M|^2, not results
+
+\paragraph{On a starved base the gain is the objective, not $\sigma$.}
+Sampling base $f=0$ (uniform $\sqrt s$, $0.44\%$ on the pole), objective $Q$ the $f=0.25$ mixture, $\alpha=0.5$, three
+seeds, three rounds (Fig.~\ref{fig:l2_eeuu_online}b). After round~2 the static arm with a fresh draw per round is at
+$1.44\times10^{-4}$ (the one-pool July run $2.06\times10^{-4}$, $1.43$ times higher: the defect cost the static arm,
+not the conclusion), $\sigma^{0.5}$+IS at $2.75\times10^{-5}$, and the oracle (seed~0 only) at $2.3\times10^{-5}$. The
+IS arm, which never looks at $\sigma$, reaches $3.06\times10^{-5}$ with a fresh draw and $2.81\times10^{-5}$ with one
+pool. Static over $\sigma^{0.5}$+IS is $5.25$, static over IS $4.72$, IS over $\sigma^{0.5}$+IS $1.11$, inside the
+seed spread of the IS arm ($1.61\times10^{-5}$ to $5.84\times10^{-5}$). So on this base almost the whole gain comes from
+training toward the right objective; $\sigma$-resampling adds at most about $10\%$ on top. This is the starved-base
+result of the reweighting paragraphs above seen again: there the ceiling was coverage, here it is the objective.
+% src: python3 analysis/divergences/l2_eeuu_online.py @c7b61a70
+% claim: starved.static_fair.gmean=1.44e-4
+% claim: starved.static_prefix.gmean=2.06e-4
+% claim: starved.static_prefix_over_fair=1.43
+% claim: starved.sigma_a05.gmean=2.75e-5
+% claim: starved.oracle_seed0=2.3e-5
+% claim: starved.reweight_fair.gmean=3.06e-5
+% claim: starved.reweight_prefix.gmean=2.81e-5
+% claim: starved.static_fair_over_sigma=5.25
+% claim: starved.static_fair_over_reweight_fair=4.72
+% claim: starved.reweight_fair_over_sigma=1.11
+% claim: starved.reweight_fair.seeds.2=1.61e-5
+% claim: starved.reweight_fair.seeds.1=5.84e-5
+% allow: 0.25 0.5 because they are the objective fraction and the exponent, settings
+% allow: 0.44\% because it is the pole share of the starved base, a property of the setup
+% allow: 10\% because it is the rounded IS over sigma ratio above, 1.11
+% allow: 0 1 2 5 because they are round and seed indices and the square in log|M|^2, not results
+
+\paragraph{The coordinate-free draw on $ee\to u\bar u$ does not beat a fresh static draw.}
+$\sigma^{\gamma}$ ($\gamma=1$, three seeds) against the $f=0.25$ static arm with a fresh draw per round (three seeds),
+six rounds each, the same $\mu$ steps per round (Fig.~\ref{fig:l2_eeuu_online}c): after round~5 $\sigma^{\gamma}$ is at
+$1.48\times10^{-5}$ and static at $1.11\times10^{-5}$, a ratio $\sigma^{\gamma}$ over static of $1.34$; the seeds of
+each overlap ($\sigma^{\gamma}$ $5.79\times10^{-6}$ to $2.57\times10^{-5}$, static $7.12\times10^{-6}$ to
+$2.12\times10^{-5}$), and the oracle $|r|^{\gamma}$ (seed~0) ends at $2.43\times10^{-5}$. Its seed~0 round~5 comes from
+the same chain continued in a second job. On a $2\to2$ resonance the one-parameter coverage base is already near
+optimal, which is why the method was moved to $ee\to u\bar ugg$, where no single density is.
+% src: python3 analysis/divergences/l2_eeuu_online.py @c7b61a70
+% claim: coordfree.adapt.gmean=1.48e-5
+% claim: coordfree.static_fair.gmean=1.11e-5
+% claim: coordfree.adapt_over_static=1.34
+% claim: coordfree.adapt.seeds.2=5.79e-6
+% claim: coordfree.adapt.seeds.1=2.57e-5
+% claim: coordfree.static_fair.seeds.0=7.12e-6
+% claim: coordfree.static_fair.seeds.2=2.12e-5
+% claim: coordfree.adapt_oracle_seed0=2.43e-5
+% allow: 0.25 because it is the coverage fraction f, a setting
+% allow: 0 1 2 5 because they are round and seed indices and the square in log|M|^2, not results
+
+\begin{figure}[H]
+  \centering
+  \pnl{l2_eeuu_online_a.pdf}\hfill\pnl{l2_eeuu_online_b.pdf} \\[1ex]
+  \pnl{l2_eeuu_online_c.pdf}
+  \caption{Online generation on $ee\to u\bar u$: the MSE of $\ln|\mathcal M|^2$ averaged over the $\sqrt s$ bins of the
+  test set, after each round. (a) Coverage base $f=0.25$, one seed: static (one pool) against $\sigma^\alpha$+IS at
+  $\alpha=1,0.5,0.25$ and the oracle $|r|^1$+IS. (b) Starved base $f=0$, objective $f=0.25$, geometric mean of three
+  seeds (oracle: seed 0): static and IS-only, each with one pool (dashed, before the fairness fix) and a fresh draw
+  (solid), against $\sigma^{0.5}$+IS and $|r|^{0.5}$+IS. (c) Coordinate-free $\sigma^\gamma$ ($\gamma=1$) against the
+  static $f=0.25$ arm with a fresh draw, three seeds each, six rounds; oracle $|r|^\gamma$ seed 0.
+  (\code{analysis/divergences/l2\_eeuu\_online.py --plot})}
+  \label{fig:l2_eeuu_online}
+% allow: 0 0.25 0.5 1 2 because they are the arms' settings f, alpha and gamma, and the square in log|M|^2
+\end{figure}
 \paragraph{Steering validated on $ee\to u\bar u gg$: $\sigma$-informed on-the-fly generation beats
 uniform generation, coordinate-free.} Steering is the layer where $\sigma$ finally overcomes the
 coverage ceiling: instead of \emph{reweighting} a fixed pool, the model's live uncertainty steers what
