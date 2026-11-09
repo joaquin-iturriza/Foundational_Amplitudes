@@ -20397,3 +20397,33 @@ entries:
       - 'text fixed and notes-editor passes: the recipe is the branch, restart noted post hoc'
       - 'notes-editor still blocks: revise once more on its finding'
   hold_decision: D332
+- id: sigma_generation
+  title: fold the July heterosc/l2-gen work into trunk and build sigma-driven generation
+  question: Does the July divergence-study work on origin/heterosc and origin/l2-gen (sigma head and inspection, starved-base
+    L1 sigma-reweighted fine-tuning, online L2 adaptive generation, 91+95 files, mostly analysis/divergences) carry over to
+    the current HETEROSC loss, what did its studies find, and how is generation driven by the predicted sigma built on it?
+  status: waiting_user
+  quotes: []
+  decisions: []
+  next: 'Inventory both branches (l2-gen contains heterosc) commit by commit against trunk: what trunk already has in another
+    form, what is new; find each study''s runs and results (run dirs named in the commits) and record them in docs/results.tex
+    with src/claim lines; port the scripts and code to the current HETEROSC loss and the current data pipeline (catalog_v4),
+    tested on CPU; assess origin/adaptive-ir''s online IR-bin importance-sampling controller in the same pass (fold if the
+    sigma-driven generation uses it, else report). Only after everything is folded, committed and reviewed: delete origin/heterosc,
+    origin/l2-gen. Then design the sigma-driven generation (design reviewer; GPU estimate to Joaquin above 30 GPU-h).'
+  done_when: null
+  notes_ref: null
+  match: FA-*sigma_gen*,sigma_gen_*
+  evidence:
+    runs: []
+    commit: null
+    paths: []
+  dead_ends: []
+  asks:
+  - ask: 'Scope: fold heterosc/l2-gen into trunk at the current het loss, record results, delete after; then sigma-driven
+      generation?'
+    at: '2026-11-09T23:25:58+00:00'
+    searched: D338/D339 approve it; recorded through plan answer
+  ask: 'Scope: fold heterosc/l2-gen into trunk at the current het loss, record results, delete after; then sigma-driven generation?'
+  waiting_since: '2026-11-09T23:25:58+00:00'
+  searched: D338/D339 approve it; recorded through plan answer
