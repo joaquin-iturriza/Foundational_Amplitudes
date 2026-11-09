@@ -35,10 +35,12 @@ except Exception:
 [ -z "$cmd" ] && exit 0
 
 # Only look at commands that destroy a worktree.
+# rm only as a command word (start, or after ; & | ( or a newline) with an -r flag, so prose that merely
+# contains "rm ", a dash, an r and a worktree path (a plan hand-off naming worktrees/...) is not a deletion.
 case "$cmd" in
   *"worktree remove"*|*"worktree  remove"*) ;;
-  *rm\ *-*r*\ *worktrees/*|*rm\ -rf\ *worktrees/*) ;;
-  *) exit 0 ;;
+  *)
+    printf '%s\n' "$cmd" | grep -qE '(^|[;&|(])[[:space:]]*(sudo[[:space:]]+)?rm[[:space:]]+(-[A-Za-z]*[rR][A-Za-z]*[[:space:]]+|--recursive[[:space:]]+)[^;&|]*worktrees/' || exit 0 ;;
 esac
 
 # Which worktree(s)? Pull every worktrees/<name> token out of the command.
