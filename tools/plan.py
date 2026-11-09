@@ -439,7 +439,10 @@ def ask_matches_set(e, texts):
     qs = ask_questions(e.get("ask"))
     sents = [x for t in texts for x in re.split(r"(?<=[.?!;])\s+|\n+", t or "")
              if "?" in x or re.search(r"your (call|pick|go|choice|decision)|tell me|let me know|which (one|do)", x.lower())]
-    return bool(qs) and all(any(part_asked(q, x) for x in sents) for q in qs)
+    allsents = [x for t in texts for x in re.split(r"(?<=[.?!;])\s+|\n+", t or "")]
+    # a numbered part that is no question (no "?", e.g. "(3) the repeat run, after the check.") is asked by any sentence
+    # (2026-11-09: three parts quoted word for word, the last without "?", were refused twice)
+    return bool(qs) and all(any(part_asked(q, x) for x in (sents if "?" in q else allsents)) for q in qs)
 
 
 def ask_matches(e, text):
@@ -455,7 +458,8 @@ def ask_matches(e, text):
     # a multi-part question is asked when each part is asked by some sentence (2026-11-06: two numbered questions,
     # each sharing under half of the whole question's terms, were refused)
     parts = ask_parts(e.get("ask"))
-    if parts and all(any(part_asked(p, x) for x in sents) for p in parts):
+    allsents = [x for x in re.split(r"(?<=[.?!;])\s+|\n+", text or "")]
+    if parts and all(any(part_asked(p, x) for x in (sents if "?" in p else allsents)) for p in parts):
         return True
     # a single-question ask is asked by its question sentence too: the background before it (numbers, estimates, a
     # withdrawn question) makes the whole ask long, and a message asking it in its own words shares under half of it

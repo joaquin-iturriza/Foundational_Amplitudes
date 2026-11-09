@@ -158,3 +158,19 @@ def test_unnumbered_ask_missing_signoutput_refuses():
     assert not plan.ask_matches_set(CC, [CC_Q2])
     assert not plan.ask_matches_set(CC, ["Joaquin, the grid costs 449 GPU-h; the jobs need 3:30; nothing asked."])
     assert not plan.ask_matches_set(CC, [])
+
+
+COV_ASK = ("Scope: (1) edge bins before the regeneration with the sixth sampler revision: exempt the bins cut by a "
+           "class's kinematic maximum (a), or score them with the quota cut to the reachable share (b; then only the "
+           "uux->bgtxW+ top bin fails)? (2) keep the two e+e- 3000 GeV short runs (bbxgz 20/200, wpwmzz 53/200) or "
+           "regenerate both pools? (3) the sign-branch repeat run (about 2.5 GPU-h), after the free step-0 log check.")
+COV = {"id": "catalog_coverage", "status": "waiting_user", "ask": COV_ASK, "waiting_since": "2026-11-09T11:12:38+00:00"}
+
+
+def test_numbered_ask_last_part_without_question_mark_quoted_passes():
+    assert plan.ask_matches_set(COV, ["Joaquin, the open questions, word for word:\n\"" + COV_ASK + "\""])
+    assert plan.ask_matches(COV, "Joaquin, " + COV_ASK)
+
+
+def test_numbered_ask_last_part_missing_refuses():
+    assert not plan.ask_matches_set(COV, ["Joaquin, " + COV_ASK.split(" (3)")[0]])
