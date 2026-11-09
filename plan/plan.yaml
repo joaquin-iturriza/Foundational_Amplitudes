@@ -20415,12 +20415,16 @@ entries:
   quotes: []
   decisions:
   - D344
-  next: 'Inventory both branches (l2-gen contains heterosc) commit by commit against trunk: what trunk already has in another
-    form, what is new; find each study''s runs and results (run dirs named in the commits) and record them in docs/results.tex
-    with src/claim lines; port the scripts and code to the current HETEROSC loss and the current data pipeline (catalog_v4),
-    tested on CPU; assess origin/adaptive-ir''s online IR-bin importance-sampling controller in the same pass (fold if the
-    sigma-driven generation uses it, else report). Only after everything is folded, committed and reviewed: delete origin/heterosc,
-    origin/l2-gen. Then design the sigma-driven generation (design reviewer; GPU estimate to Joaquin above 30 GPU-h).'
+  next:
+    1: 'Record the July results: write up the unrecorded ee->uu online-generation study (l2-gen: static/sigma+IS/oracle/reweight/coordinate-free
+      adapt arms on the starved and f=0.25 bases) from the 8 trunk summaries through one committed reader in analysis/divergences
+      with src/claim lines and a figure; fold the branch-only heterosc result JSONs and give sec:div-sampling''s existing
+      numbers src/claim lines where a tracked JSON reproduces them (the rest marked as from deleted runs); notes-editor and
+      repo-reviewer'
+    2: 'Fold the scripts: bring the ~20 scripts sec:div-sampling cites (and the generation path gen_uu_sampling/l2_online/eval_eeuu_resonance)
+      onto trunk ported to siteconf and the current HETEROSC defaults (beta=0, nll select, sigma stage), CPU-tested; the one-off
+      July launchers of the withdrawn diagnosis chain are kept only as history in the branch commits named in results.tex;
+      then delete origin/heterosc, origin/l2-gen, origin/adaptive-ir after review'
   done_when: null
   notes_ref: null
   match: FA-*sigma_gen*,sigma_gen_*
@@ -20472,3 +20476,15 @@ entries:
       ~ Q_b E_b^(a/2) with c_b=Q_b/pi_b; never wired into training; same IS math as is_weight_path; trunk''s sigma-driven
       generation (l2_online_uugg.py, keep p ~ sigma^gamma, coordinate-free, no correction) does not use it -> report, do not
       fold (results.tex already records it as deprioritised).'
+  step_why:
+    1:
+      feeds: 'whether the July studies carry over: what they found, recorded reproducibly'
+      if:
+      - 'the reweight-only arm matches sigma+IS on the starved base: sigma-driven generation is designed without an IS correction,
+        keeping p~sigma^gamma as l2_online_uugg.py does'
+      - 'sigma+IS beats reweight-only: is_weight_path is ported and the design carries the correction'
+    2:
+      feeds: whether the July code carries over to the current HETEROSC loss and catalog_v4 pipeline
+      if:
+      - 'every cited script runs on CPU on trunk: branches deleted'
+      - 'a script depends on a deleted run or JZ-only data: its result is marked unreproducible and the script kept as history'
