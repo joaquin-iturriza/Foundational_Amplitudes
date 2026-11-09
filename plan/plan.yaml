@@ -20462,9 +20462,9 @@ entries:
       covers this entry)
   owner:
     agent: a74fb932acb5d82dc
-    state: working
+    state: stopped
     since: '2026-11-09T23:27:24+00:00'
-    state_at: '2026-11-09T23:39:26.159000+00:00'
+    state_at: '2026-11-09T23:49:47+00:00'
     context: 238162
     context_at: '2026-11-09T23:45:48+00:00'
   findings:
