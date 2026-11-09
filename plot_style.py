@@ -568,7 +568,7 @@ def save_panels(figs, base: str, repo: str | None = None) -> list:
         fig = item[0] if isinstance(item, tuple) else item
         out.append(save(fig, f"{base}_{PANEL_SUFFIXES[i]}", repo=repo))
     stem = os.path.basename(base)
-    rows = [PANEL_SUFFIXES[i:i + 2] for i in range(0, len(figs), 2)]
+    rows = [PANEL_SUFFIXES[i:min(i + 2, len(figs))] for i in range(0, len(figs), 2)]
     body = " \\\\[1ex]\n  ".join(
         "\\hfill".join(f"\\includegraphics{{{stem}_{s}.pdf}}" for s in row) for row in rows)
     print(f"  LaTeX:\n  \\centering\n  {body}")
