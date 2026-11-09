@@ -15772,6 +15772,10 @@ entries:
       notifications after a hand-back were already absorbed; owner resumes by peer hand-backs cannot be held (Claude Code
       offers no delivery delay, an owner has no waiter). Also confirm the first run of a held item that ends gets its RUN
       event and RUN_DONE with no manual poll (next 19 fix).'
+    22: 'After Joaquin runs the scratchpad grant_git.py (git cleanup permissions in .claude/settings.local.json; the classifier
+      refuses the agent''s own settings change): delete origin/zz_trial_* (24), the agent-a822d561 worktree (uncommitted copy
+      of the context-vector code, landed in trunk c3a69184) and worktree-agent-a63efbd0 (tip 41a3158b, local and origin),
+      printing each tip sha first; stop the two shells hung since 2026-11-06 (pids 907898, 1422043).'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16102,6 +16106,11 @@ entries:
       if:
       - 'saving within or above 11-30% on main per day: keep 10 min'
       - 'below: report to Joaquin with numbers and causes'
+    22:
+      feeds: whether the repository is cut back to trunk plus the unmerged branches Joaquin keeps
+      if:
+      - 'grant in place: delete, stop the shells, report counts'
+      - 'not run: leave them listed by repo_hygiene'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
