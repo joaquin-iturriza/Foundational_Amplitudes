@@ -16718,6 +16718,14 @@ entries:
       the merge (double_wake: advance re-run from the worktree, d351162a). scripts/remove_worktree.sh left the merged branch
       because auto_push had given it a stale upstream (origin/double_wake at 79aaaf64): ''git branch -d'' refuses a branch
       not merged to its upstream; deleted by hand after --unset-upstream, remote branch deleted'
+  - at: '2026-11-09T19:55:53+00:00'
+    text: 'PARKED 2026-11-09 by D327/D328 (Joaquin shifted gears; nothing to run until he resumes; answer ''what were we doing''
+      from this). State: wake batching analysis (tools/wake_batching.py @41b23ec1, fig analysis/agent_redesign/figs/wake_batching.png):
+      main session 817 wakes/805M tokens; 10-min window 380 wakes, saving 11-31%, mean delay 6.3 min; 60-min 16-50%; owner
+      resumes 4-22% at 10 min. D324 approved the 10-minute window with usage tracked before and after; not built yet (plan
+      step). Also pending: the supervisor registry refresh fix (runs that ended stayed RUNNING until a manual site poll, so
+      no RUN_DONE fired). Hook fixes this session: plan_check ask parts without ''?'' (58dd7542), send_check skips slide decks
+      under talks/ (39458623).'
   handoff:
     state: '2026-11-04: write-up in docs/results.tex sec:agent-redesign committed and passed by the notes-editor (37cced30);
       step 13 dropped (D277 keeps the main window at 500k); open: next 12 (mechanical-worker tool cut, measurable next session;
