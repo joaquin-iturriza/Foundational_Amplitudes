@@ -20198,6 +20198,15 @@ entries:
       panels instead of a 3x2 grid with a hole; keys B_cosine/B_wsd/<arm>.val_best for claims), src mixture_ab.py warm_wsd
       @1d49c55c (reruns identical), verify_claims --worktree 0 problems. Outcome stated as the design''s YES branch; restart-over-branch
       stated as a deviation from the literal 5% rule decided after the read.'
+  - at: '2026-11-09T19:55:50+00:00'
+    text: 'PARKED 2026-11-09 by D327/D328 (Joaquin shifted gears; nothing to run until he resumes; answer ''what were we doing''
+      from this). State: WSD parent + default restart on share 0.50 for 533 steps matches from scratch (MSE ratio pp 0.80,
+      e+e- 0.94, bar 1.35; cosine was 1.33/1.51), one seed, written up par:v4_warm_start_wsd_match @7bd323c3; WSD from scratch
+      is not better than cosine (probe ratio 0.97, best val -2.828 vs -2.911) though the het parent pair went the other way
+      (-2.909 vs -2.858). Open: (a) Joaquin''s lift of D307 (no change tests until the warm start is fixed) with this recipe,
+      asked, not answered (his D326 used the study to continue the largest run instead); (b) the notes-editor''s finding:
+      the write-up takes the restart as recipe against its own pre-read rule (which picks the branch); text fix is a plan
+      step, waits on resume.'
   step_waits: {}
   handoff:
     state: 'Step 15 read (finding 2026-11-07): under a matched WSD schedule the warm start MATCHES the change from scratch
