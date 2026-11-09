@@ -15215,6 +15215,16 @@ entries:
       170, 4-block 1.2e10 at ~680) or a coupling inside training not yet found (clip groups are tested separate, test_d).
       A same-config repeat of the 1-block arm remains the test that separates the two; it waits on Joaquin''s answer to question
       (2) (D322).'
+  - at: '2026-11-09T12:41:35+00:00'
+    text: '2026-11-09 correction to the step-70 read (repo-reviewer, scaling_grid.py @be930dd2): the held-out read is now
+      the pooled default-sampled read of the held-out classes (held_default: their PP4 and EE4 probes plus HD4 and HD5, 700
+      classes, as par:v4_width), R over w8 2x (median over classes of the class''s geometric mean of cell / reference, class
+      bootstrap 95%): w8 4x 0.723, 8x 0.769, 16x 0.685; w16 2x 0.750, 4x 0.672, 8x 0.580, 16x 0.620; w32 2x 0.613, 4x 0.543,
+      8x 0.512 [0.446, 0.560]. The earlier finding quoted HD4 alone (w32 8x 0.295, w16 16x 0.436), labelled ''held-out default-sampled
+      trees'': HD4 is kept in the json beside it. Pooled, the held-out classes gain far less than the pp test pools (PP4 0.151
+      at w32 8x) and flatten along length (w16 8x 0.580 -> 16x 0.620, w8 4x 0.723 -> 8x 0.769). Figures: scaling_grid_reads
+      now plots held_default (y = MSE / MSE(width 8, 2x)); new scaling_grid_loss (best val_loss_no_reg against C; w8 2x -3.471
+      -> w32 8x -5.057).'
   handoff:
     state: '2026-11-07 ~11:00. Step 79 r5 read (data/r5_check.json, r5_acted.json, figs/r5_check.png): FAIL on fill only:
       bbxuu back at quota (35/36 chunks bitwise r2 under _chunk_sig), bgtxwp [-1.206,-0.96] 0.867/0.870 (r3 0.925/0.917),
