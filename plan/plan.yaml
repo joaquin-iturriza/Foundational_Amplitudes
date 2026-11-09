@@ -12798,9 +12798,9 @@ entries:
       - 'it does not: report where it falls short, propose the WSD-from-start rerun with its GPU-h'
   owner:
     agent: abe4f9535994a7b12
-    state: stopped
+    state: working
     since: '2026-11-09T11:11:07+00:00'
-    state_at: '2026-11-09T12:43:26+00:00'
+    state_at: '2026-11-09T15:42:01+00:00'
     context: 229714
     context_at: '2026-11-09T12:42:12+00:00'
   findings:
