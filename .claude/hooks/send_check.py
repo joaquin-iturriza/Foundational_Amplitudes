@@ -145,11 +145,18 @@ def axes_missing(caption):
     return any(not has_axes(shared + " " + parts[i]) for i in range(2, len(parts), 2))
 
 
+def is_deck(path):
+    """A slide-deck PDF (under a talks/ directory) has no single pair of axes: exempt from the axes rule."""
+    return path.lower().endswith(".pdf") and "talks" in os.path.normpath(path).split(os.sep)
+
+
 def axes_findings(tool_input, cwd):
     cap = tool_input.get("caption") if isinstance(tool_input, dict) else None
     cap = cap if isinstance(cap, str) else ""
     out = []
     for p in sent_files(tool_input, FIG_EXT):
+        if is_deck(p):
+            continue
         if axes_missing(cap):
             out.append("%s: its caption must say what the x and y axes are (e.g. \"x axis: ..., y axis: ...\" or "
                        "\"<y quantity> against <x quantity>\", for each panel)" % p)
