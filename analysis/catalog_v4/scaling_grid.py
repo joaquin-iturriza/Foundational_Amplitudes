@@ -23,9 +23,14 @@ runs/catalog_v4_long/v4_het_default25_w<W>_x<F>_hp1262; widths 8 at 4x and 16x a
              w16 0.077, w32 0.062), the design's seed-spread error. A fit runs only with all its cells in; (i) and
              (iv) need all 12 (an INTERIM fit over the cells in hand is printed beside, labelled, never a verdict).
              -> data/scaling_grid.json
-  fig        figs/scaling_grid.{png,pdf}: (a) L against C per width, fits drawn where determined;
-             (b) best val_loss_no_reg against C; (c) R over the width-8 2x cell on PP4 and the default-sampled
-             held-out pools against C
+             Beside the axes, held_default: the default-sampled events of the held-out classes pooled (the PP4
+             and EE4 probes whose class is held out, plus HD4 and HD5; keys (axis, probe)), pooled and per held-out
+             axis, as mixture_ab._held_default builds it for two seeds, here on one seed per side.
+  fig        four figures (png + pdf; the passed design names the measures, not a figure layout):
+             figs/scaling_grid_compute  L against C per width, per-width fits drawn where determined;
+             figs/scaling_grid_loss     best val_loss_no_reg (het NLL, main block) against C per width;
+             figs/scaling_grid_hours    L against the main block's training GPU-hours (extra: cost per width);
+             figs/scaling_grid_reads    R over the width-8 2x cell against C, on PP4 and on held_default pooled
 """
 import json, math, os, re, subprocess, sys
 
@@ -208,6 +213,27 @@ def fit_law(pts, shared_exponent=False):
             "L_inf_at_edge": bool(edge)}
 
 
+def held_default(run, ref, cls, ax_of):
+    """{"held_default": R pooled, "held_default/<axis>": R per held-out axis} of run over ref on the default-sampled
+    events of the held-out classes: PP4 and EE4 probes whose class is held out, plus HD4 and HD5 (keys (axis,
+    probe)); {} when a read is missing"""
+    import mixture_ab as mab
+    num, den = {}, {}
+    for ax in ("PP4", "EE4", "HD4", "HD5"):
+        a, b = mab.read_of(run, ax), mab.read_of(ref, ax)
+        if a is None or b is None:
+            return {}
+        num.update({(ax, p): x for p, x in a.items()}); den.update({(ax, p): x for p, x in b.items()})
+    keys = [k for k in set(num) & set(den) if cls(k[1]) in ax_of]
+    cl = lambda k: cls(k[1])
+    out = {"held_default": read_r({k: num[k] for k in keys}, {k: den[k] for k in keys}, cl)}
+    for hax in mab.HELD:
+        ks = [k for k in keys if ax_of[cls(k[1])] == hax]
+        if ks:
+            out[f"held_default/{hax}"] = read_r({k: num[k] for k in ks}, {k: den[k] for k in ks}, cl)
+    return out
+
+
 def read():
     import mixture_ab as mab
     cls = mab.class_of()
@@ -227,6 +253,7 @@ def read():
                         "n_pools": None if m is None else m[1], "nonfinite_events": None if m is None else m[2],
                         "best_val_loss_no_reg": best_val(train), **log_facts(run)}
     ref = NEW[REF]
+    ax_of = mab._held_axes(cls)
     reads = {}
     for k, c in cells.items():
         reads[k] = {}
@@ -237,7 +264,8 @@ def read():
             if a is None or b is None:
                 continue
             reads[k][ax] = read_r(a, b, cls)
-        # default-sampled held-out pooled: HD4 + HD5 + the held-out classes' PP4/EE4 probes, as width_x1 held_default
+        if c["run"] != ref:
+            reads[k].update(held_default(c["run"], ref, cls, ax_of))
     in_hand = [k for k, c in cells.items() if c["mse_logm2_gmean"] is not None]
     pt = lambda k, grp: (grp, cells[k]["C"], cells[k]["mse_logm2_gmean"], sig[cells[k]["width"]])
     fits = {"sigma_rel_per_width": {str(w): round(v, 4) for w, v in sig.items()}}
@@ -325,6 +353,23 @@ def fig():
     ps.legend(ax, "upper right")
     ps.save(f1, os.path.join(FIGS, "scaling_grid_compute"))
 
+    # 1b: best val_loss_no_reg (het NLL of the main block) against compute
+    fl, ax = ps.figure()
+    for w, (col, mk) in WCOL.items():
+        ks = [f"w{w}_x{f}" for f in (2, 4, 8, 16) if cells[f"w{w}_x{f}"]["best_val_loss_no_reg"] is not None]
+        xs = [cells[k]["C"] for k in ks]; ys = [cells[k]["best_val_loss_no_reg"] for k in ks]
+        ax.plot(xs, ys, color=col, lw=1.2)
+        for k, x, y in zip(ks, xs, ys):
+            ax.plot([x], [y], marker=mk, color=col, ls="none", mfc="none" if cells[k]["reused"] else col)
+        ax.plot([], [], marker=mk, color=col, label=f"width {w}")
+        report[f"best_val_w{w}"] = dict(zip(ks, [round(y, 4) for y in ys]))
+    ax.plot([], [], marker="o", color="k", mfc="none", ls="none", label="reused run (H100)")
+    ax.set_xscale("log")
+    ax.set_xlabel("training compute $6NSB$ (FLOP)")
+    ax.set_ylabel("best validation het. loss")
+    ps.legend(ax, "upper right")
+    ps.save(fl, os.path.join(FIGS, "scaling_grid_loss"))
+
     # 2: MSE against training GPU-hours (the main block's training time; reused cells on H100)
     lb = json.load(open(os.path.join(DATA, "long_sweeps_best.json")))
     hrs = {"w8_x4": lb["17056"]["best"]["traintime_hours"], "w8_x16": lb["68224"]["best"]["traintime_hours"]}
@@ -344,10 +389,11 @@ def fig():
     ps.legend(ax, "lower left")
     ps.save(f2, os.path.join(FIGS, "scaling_grid_hours"))
 
-    # 3: test (pp, PP4) and held-out default-sampled tree (HD4) error over the width-8 2x cell, against compute
+    # 3: R over the width-8 2x cell on the pp test pools (PP4) and the held-out classes' default-sampled events
+    # pooled (held_default: their PP4/EE4 probes, HD4, HD5), against compute
     f3, ax = ps.figure()
     for w, (col, mk) in WCOL.items():
-        for ax_name, ls, mfc in (("PP4", "-", None), ("HD4", ":", "none")):
+        for ax_name, ls, mfc in (("PP4", "-", None), ("held_default", ":", "none")):
             ks = [f"w{w}_x{f}" for f in (2, 4, 8, 16)
                   if f"w{w}_x{f}" == "w8_x2" or ax_name in d["reads_R_over_w8_x2"][f"w{w}_x{f}"]]
             xs = [cells[k]["C"] for k in ks]
@@ -355,11 +401,11 @@ def fig():
             ax.plot(xs, ys, color=col, ls=ls, marker=mk, mfc=mfc or col, lw=1.1)
             report[f"R_{ax_name}_w{w}"] = dict(zip(ks, ys))
         ax.plot([], [], color=col, marker=mk, ls="none", label=f"width {w}")
-    ax.plot([], [], color="k", ls="-", label="pp test pools")
+    ax.plot([], [], color="k", ls="-", label="pp test")
     ax.plot([], [], color="k", ls=":", marker="o", mfc="none", label="held-out classes")
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlabel("training compute $6NSB$ (FLOP)")
-    ax.set_ylabel("relative test MSE")
+    ax.set_ylabel("MSE / MSE(width 8, 2$\\times$)")
     ps.legend(ax, "upper right")
     ps.save(f3, os.path.join(FIGS, "scaling_grid_reads"))
     print(json.dumps(report, indent=1))
