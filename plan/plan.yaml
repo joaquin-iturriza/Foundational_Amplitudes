@@ -15766,10 +15766,6 @@ entries:
       notifications after a hand-back were already absorbed; owner resumes by peer hand-backs cannot be held (Claude Code
       offers no delivery delay, an owner has no waiter). Also confirm the first run of a held item that ends gets its RUN
       event and RUN_DONE with no manual poll (next 19 fix).'
-    23: 'D335 (reply_check off as a blocker) did not take effect: hook_incident disabled reply_check.py in disabled.json,
-      but plan_check.py calls reply_check itself, so it still refused on 2026-11-10 (''what do you mean you can''t kill it?'').
-      Make plan_check skip the reply check while reply_check.py is listed disabled (or remove the call per D335), test on
-      that refusal.'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16102,11 +16098,6 @@ entries:
       if:
       - 'saving within or above 11-30% on main per day: keep 10 min'
       - 'below: report to Joaquin with numbers and causes'
-    23:
-      feeds: whether the reply check stays off as D335 asks
-      if:
-      - 'fixed: no reply-check refusal on the next user message'
-      - 'still fires: trace the other caller'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
