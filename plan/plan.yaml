@@ -20446,3 +20446,29 @@ entries:
     state_at: '2026-11-09T23:27:41+00:00'
     context: 133516
     context_at: '2026-11-09T23:33:57+00:00'
+  findings:
+  - at: '2026-11-09T23:36:11+00:00'
+    text: 'Inventory (2026-11-10, owner a74fb932): origin/l2-gen = 79 commits over trunk (67 of them origin/heterosc''s, 2026-07-11..07-18,
+      + 12 l2-gen 07-18..09-07), 95 files. CORE CODE: every branch code change is already on trunk in its later form (HETEROSC
+      2-ch LLoCa head, beta-NLL, mean aggregation under HETEROSC, sigma_after_pool, detach_sigma_backbone, heterosc_mu_only/sigma_only/rank_curve,
+      two-stage sigma stage, TYPE_TOKEN_DICT/AmplitudeMLPWrapper), except training.is_weight_path (l2-gen 5fe8545d: per-log|M|^2-bin
+      IS weight c_b=Q_b/pi_b in _per_event_loss, ~40 lines) and base_plots.plot_mse png+pdf. SCRIPTS: 77 of 85 analysis/divergences
+      files and all 5 sweep configs are absent on trunk (2 plot scripts and grow_sigma_head differ); ~all hardcode Jean Zay
+      paths/#SBATCH; docs/results.tex sec:div-sampling cites ~20 of them (calib_eval.py, twostage_sigma*.sh, extract_sigma.py,
+      grad_decomp.py, rank_mu_mse.py, sigma_speed*.py, build_*_pools.py, gen_uu_sampling.py, eval_eeuu_resonance.py, finetune_*.sh,
+      clip_test.sh, sigma_fit_raw.sh, sweep_heterosc_foundation.sh). RESULTS: heterosc-branch studies (sigma map, beta x lr
+      foundation grid, diagnosis chain, two-stage calibration, sigma speed, Q2 tolerance, ee->uu L0 generated fraction, L1
+      3-seed and starved-base) are written in results.tex sec:div-sampling but with 0 src/claim lines; their summary JSONs
+      for Q2/L0/L1 are on trunk, the heterosc ones (heterosc_rank.json, calib_rank*.json, diag_ckpt_mu.json, figs/heterosc_sigma_summary.json)
+      only on the branch. The l2-gen ee->uu ONLINE study (l2_online.py: static/l2/oracle/reweight/adapt arms, starved base,
+      3 seeds) is NOT written up anywhere; its 8 summaries (analysis/divergences/l2_*_summary.json) are on trunk. First read
+      of them: starved base, round 2, logflat MSE per seed: static 1.59e-4/2.56e-4/2.14e-4, sigma-emphasized+IS 3.51e-5/2.20e-5/2.69e-5,
+      reweight-only (IS correction, no sigma resampling) 2.75e-5/1.85e-5/4.35e-5 -> the gain is the IS objective, not sigma
+      (to be checked against the fairness fix 35230574 timeline). RUN DIRS surviving (Jean Zay only, checked JZ runs/, worktrees/,
+      SCRATCH/WORK/STORE to depth 4, CC runs/): worktrees/wt-heterosc/runs {eeuu_sigfit, heterosc_sigspeed, heterosc_twostage,
+      heterosc_twostage2, mse_scratch_hpo} 690M, worktrees/wt-l2-gen/runs/eeuu_l2 5.2G (223 entries), plus 10 figs and 160
+      job logs in the JZ worktrees; pretrain22_heldout_uug, heterosc_foundation, eeuu_flatlogm, q2_sigma_reweight, heterosc_scratch_hpo2,
+      heterosc_bisect are gone. ADAPTIVE-IR (1 commit f74d990b, adaptive_ir.py 79 lines): per-y_min-bin IS controller pi_b
+      ~ Q_b E_b^(a/2) with c_b=Q_b/pi_b; never wired into training; same IS math as is_weight_path; trunk''s sigma-driven
+      generation (l2_online_uugg.py, keep p ~ sigma^gamma, coordinate-free, no correction) does not use it -> report, do not
+      fold (results.tex already records it as deprioritised).'
