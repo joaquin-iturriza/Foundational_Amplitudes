@@ -15760,9 +15760,6 @@ entries:
     18: 'D324 (Joaquin: 10 min batching, track usage before and after): baseline with tools/wake_batching.py up to 2026-11-07T17:00;
       batch main-session wakes (owner hand-backs, task notifications) and owner resumes at 10 min; after a week the same tool
       on the after-period, both with a figure.'
-    19: 'Upkeep 2026-11-09: the run registry stayed RUNNING for runs that had ended (FA-ccin2p3-22bc476d 2+ h, scaling-grid
-      4d6e9b06 8a523b67 8b543518 b07d6237 for days) until a manual site poll, so no RUN_DONE fired; find why the supervisor''s
-      poll did not refresh them and fix it, tested on a run that ends.'
     20: 'Branch cleanup (Joaquin 11-09: too many branches; 45 local, 97 remote, 24 worktrees). Causes: auto_push.sh pushes
       every worktree branch to origin; scripts/remove_worktree.sh deletes only the local branch; Agent-isolation worktrees
       in .claude/worktrees never go through remove_worktree.sh; model-trial zz_trial_* branches pushed and kept. Do: remove_worktree.sh
@@ -16088,11 +16085,6 @@ entries:
       if:
       - 'after-period saving within or above the predicted band: keep 10 min'
       - 'saving below the band: report to Joaquin with the numbers and the causes'
-    19:
-      feeds: run ends reach their owners without a manual poll
-      if:
-      - 'cause found in the supervisor''s poll: fix, test, restart the supervisor'
-      - 'cause in the scheduler query: fix in site poll and report'
     20:
       feeds: whether the repository is cut back to trunk plus the unmerged branches Joaquin keeps
       if:
@@ -16116,8 +16108,6 @@ entries:
     '17': 'the first real idle moment: plan next listing RESUME/LAUNCH with no FA job live; the supervisor''s own STALLED
       idle: event (or its absence after 45 min) is the trigger'
     '18': the repo-reviewer's verdict on the batching and supervisor fixes (b1901f40, f47ac235); the reviewer resumes the
-      owner
-    '19': the repo-reviewer's verdict on the batching and supervisor fixes (b1901f40, f47ac235); the reviewer resumes the
       owner
     '21': 'the date 2026-11-17: a week of usage after the restart of the waiter and supervisor on 2026-11-09 ~23:55 (the since
       time for wake_batching.py)'
