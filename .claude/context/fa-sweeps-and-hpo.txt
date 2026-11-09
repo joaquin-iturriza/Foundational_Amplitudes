@@ -64,8 +64,8 @@ Add `--dry-run` to preview. Registry: `~/.sweep_manager/registry.json`.
 **Rebalancing across sites — `sweep/rebalance.py PREFIX... [--apply] [--allow-jeanzay]`.** `site pick` places a
 batch once; this moves trials that have not started from the latest-finishing site to the earliest (by backlog and
 achieved rate), deletes nothing (the source is cancelled and marked `MOVED_TO`), and copies a fine-tune parent's
-whole run directory if missing. Run by the supervisor over `tp3_`; without `--apply` it prints the plan. Placement
-follows `site pick` and this tool, never a hand pick and never a question for me.
+whole run directory if missing. Run by the supervisor over `tp3_`; without `--apply` it prints the plan.
+Placement: `site pick`, then this tool.
 
 HPO search-space rules (harvested from 422 converged sweeps; derivation in `docs/results.tex` § optimization laws):
 
@@ -109,16 +109,7 @@ HPO search-space rules (harvested from 422 converged sweeps; derivation in `docs
    (e.g. 300→150 candidates, ~15→~8 obs) at equal resolution, or explore far
    denser at equal budget. Seed new cells from `lr_center(t)`, not a flat prior.
    The `sweep_config*template.yaml` defaults already encode these ranges.
-6. **Why HP questions go through DyHPO, single-fidelity** (the rule is in CLAUDE.md) (`fidelity_schedule.t_steps:
-   [T]`, one value; the multi-fidelity ladder is unused here) — never a hand-rolled
-   grid, whatever the question is called. "Is `clip_grad_norm` the culprit?" and
-   "does it work at any `lr`?" are HP searches, not diagnostics. The reason is
-   substantive, not stylistic: HPs **interact**, so a 1-D grid at fixed
-   everything-else answers only "best `lr` *given those* values", cannot reach a joint
-   optimum (one needing `lr` *and* `beta` together), and comes back flat —
-   manufacturing a **false** "it doesn't work at any `lr`". Sweep the coupled space.
-   Job arrays stay right for **non-HP** ablations (loss type, data tag, warm-start
-   checkpoint, ablation flags, seeds).
+6. Single-fidelity means `fidelity_schedule.t_steps: [T]`, one value; the multi-fidelity ladder is unused.
 
 Sweeps across sites (`sweep/drive.py`):
 `generate_sweep` + `sweep_manager` keep the
