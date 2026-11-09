@@ -15756,6 +15756,12 @@ entries:
     19: 'Upkeep 2026-11-09: the run registry stayed RUNNING for runs that had ended (FA-ccin2p3-22bc476d 2+ h, scaling-grid
       4d6e9b06 8a523b67 8b543518 b07d6237 for days) until a manual site poll, so no RUN_DONE fired; find why the supervisor''s
       poll did not refresh them and fix it, tested on a run that ends.'
+    20: 'Branch cleanup (Joaquin 11-09: too many branches; 45 local, 97 remote, 24 worktrees). Causes: auto_push.sh pushes
+      every worktree branch to origin; scripts/remove_worktree.sh deletes only the local branch; Agent-isolation worktrees
+      in .claude/worktrees never go through remove_worktree.sh; model-trial zz_trial_* branches pushed and kept. Do: remove_worktree.sh
+      also deletes the remote branch; remove merged worktrees through it; delete branches merged into trunk locally and on
+      origin (not trunk, main, ccin2p3, jeanzay); list unmerged ones with commits not in trunk for Joaquin. Needs his yes
+      (classifier refused the deletion as Git Destructive).'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16043,6 +16049,11 @@ entries:
       if:
       - 'cause found in the supervisor''s poll: fix, test, restart the supervisor'
       - 'cause in the scheduler query: fix in site poll and report'
+    20:
+      feeds: whether the repository is cut back to trunk plus the unmerged branches Joaquin keeps
+      if:
+      - 'Joaquin says yes: run it and report counts before/after and the unmerged list'
+      - 'he says no: leave branches, only fix the scripts'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
