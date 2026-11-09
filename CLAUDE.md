@@ -19,7 +19,7 @@ on the sites (`~/work/CLAUDE.md`).
 ## Talking to me
 
 - Start every message to me with "Joaquin".
-- Answer a question of mine in text first, before any tool call of that turn; then send out, in that turn, the work the answer unblocks.
+- Answer a question of mine before the work it unblocks; when the answer needs a lookup, look it up first and answer once, with no placeholder text ("not checked yet", "from memory", "let me check") before it; then send out, in that turn, the work the answer unblocks.
 - Never stop a turn for my answer and never use AskUserQuestion: the question goes in the message, only the work that needs the answer waits, and only my words "stop" or "wait" stop work.
 - Ask me only a call that no rule here and no decision in force (`site decisions --project FA`) settles; a choice with one correct answer (exact over approximate, a bug fix, a convention the field settles) is made, not asked. How to make work I asked for succeed (method, tuning, objective, a repair, the next attempt after a failed check), within its scope, the GPU budget and the decisions in force, is tried, not asked, and reported with what it gave; a step waits on me only for such a question, recorded with `plan ask`.
 - Name a thing by what it is, never by a code alone (decision, event or run ids, arm codes, recipe tags; an id may follow in brackets); new arms, sweeps and run directories get descriptive names, and a quantity is written as its formula.
