@@ -15341,6 +15341,16 @@ entries:
       at w32 8x) and flatten along length (w16 8x 0.580 -> 16x 0.620, w8 4x 0.723 -> 8x 0.769). Figures: scaling_grid_reads
       now plots held_default (y = MSE / MSE(width 8, 2x)); new scaling_grid_loss (best val_loss_no_reg against C; w8 2x -3.471
       -> w32 8x -5.057).'
+  - at: '2026-11-09T15:46:08+00:00'
+    text: '2026-11-09 step 84 design (continue w32 16x a77e20b8 with re-warm + WSD, 68224 steps, ~65 GPU-h): design-reviewer
+      FIX (recorded by it). To revise once: (1) the continuation changes schedule (WSD) as well as start against a cosine
+      reference: fold in the measured WSD-over-cosine factor (par:v4_warm_start_fixes: WSD parent val -2.909 vs cosine -2.858;
+      final model 0.759 pp / 0.832 e+e- of the cosine control) or restate the comparison and what then decides against a WSD-from-start
+      rerun; (3) band: the two-point extrapolation L_16x^2/L_8x carries sqrt(5) x 6.2% = 13.9% seed error plus a shape error
+      (w8 +9.7%, w16 -15.8% when the same step predicts their 16x), so ~15-20%; state the smallest effect worth acting on,
+      else the measured from-scratch 32x control (~130 GPU-h) goes to Joaquin; (4) restate BETTER/EQUAL/WORSE on that band;
+      (5) cite par:v4_warm_start_fixes and B_wsd in the prior; (14) disk per job (a77e20b8''s run dir, checkpoints, memmap
+      cache key reused) against CC free disk read at design time.'
   handoff:
     state: '2026-11-09. Step 70 scaling grid: 9 of 10 cells read (scaling_grid.py @be930dd2 -> data/scaling_grid.json; figs/scaling_grid_compute,
       _loss, _hours, _reads); repo-reviewer PASS (watermark 9b577ea9). w32 16x FA-ccin2p3-a77e20b8 still running; step 70
