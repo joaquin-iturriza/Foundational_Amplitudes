@@ -20490,3 +20490,4 @@ entries:
       - 'a script depends on a deleted run or JZ-only data: its result is marked unreproducible and the script kept as history'
   step_waits:
     '1': 'main session: go after the inventory report (narrowing: report before porting large parts)'
+    '2': 'main session: go after the inventory report (narrowing: report before porting large parts)'
