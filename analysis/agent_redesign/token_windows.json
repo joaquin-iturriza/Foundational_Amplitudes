@@ -1,0 +1,3215 @@
+{
+ "coverage": {
+  "-home-joaquin": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-29T01:30:05.558000",
+   "last": "2026-10-29T01:44:11.353000",
+   "api_messages": 13,
+   "weighted_M": 0.14
+  },
+  "-home-joaquin-hasan-clipper": {
+   "files": 6,
+   "subagent_files": 0,
+   "first": "2026-08-05T18:34:14.933000",
+   "last": "2026-09-07T17:33:35.696000",
+   "api_messages": 2306,
+   "weighted_M": 95.7
+  },
+  "-home-joaquin-mnt-ccin2p3-Foundational-Amplitudes": {
+   "files": 23,
+   "subagent_files": 22,
+   "first": "2026-09-12T12:51:58.597000",
+   "last": "2026-09-25T08:35:29.822000",
+   "api_messages": 1992,
+   "weighted_M": 79.42
+  },
+  "-home-joaquin-mnt-ccin2p3-madgrav": {
+   "files": 15,
+   "subagent_files": 14,
+   "first": "2026-09-01T13:01:39.796000",
+   "last": "2026-09-08T13:46:30.623000",
+   "api_messages": 1208,
+   "weighted_M": 58.02
+  },
+  "-home-joaquin-mnt-eos-jitu-amplitude-DSI": {
+   "files": 4,
+   "subagent_files": 0,
+   "first": "2026-07-03T11:31:33.423000",
+   "last": "2026-09-17T14:10:39.289000",
+   "api_messages": 853,
+   "weighted_M": 27.64
+  },
+  "-home-joaquin-mnt-eos-likelihoods": {
+   "files": 3,
+   "subagent_files": 0,
+   "first": "2026-09-08T13:04:08.074000",
+   "last": "2026-09-16T16:17:08.700000",
+   "api_messages": 359,
+   "weighted_M": 17.07
+  },
+  "-home-joaquin-work-FA": {
+   "files": 732,
+   "subagent_files": 727,
+   "first": "2026-09-22T21:20:27.295000",
+   "last": "2026-10-30T23:44:38.476000",
+   "api_messages": 40517,
+   "weighted_M": 1146.98
+  },
+  "-home-joaquin-work-FA-worktrees-zz-ab-gate-a": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-29T05:06:41.428000",
+   "last": "2026-10-29T05:13:22.953000",
+   "api_messages": 16,
+   "weighted_M": 0.28
+  },
+  "-home-joaquin-work-FA-worktrees-zz-ab-gate-b": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-29T05:06:40.083000",
+   "last": "2026-10-29T05:16:00.834000",
+   "api_messages": 15,
+   "weighted_M": 0.29
+  },
+  "-home-joaquin-work-FA-worktrees-zz-ab-gate-on": {
+   "files": 2,
+   "subagent_files": 0,
+   "first": "2026-10-29T05:05:25.861000",
+   "last": "2026-10-29T05:05:46.864000",
+   "api_messages": 2,
+   "weighted_M": 0.09
+  },
+  "-home-joaquin-work-FA-worktrees-zz-ab-lookups-a": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-29T05:06:39.781000",
+   "last": "2026-10-29T05:16:09.641000",
+   "api_messages": 40,
+   "weighted_M": 0.74
+  },
+  "-home-joaquin-work-FA-worktrees-zz-ab-lookups-b": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-29T05:06:41.815000",
+   "last": "2026-10-29T05:17:38.380000",
+   "api_messages": 34,
+   "weighted_M": 0.6
+  },
+  "-home-joaquin-work-FA-worktrees-zz-ab-prior-a": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-29T05:06:41.326000",
+   "last": "2026-10-29T05:13:44.984000",
+   "api_messages": 19,
+   "weighted_M": 0.32
+  },
+  "-home-joaquin-work-FA-worktrees-zz-ab-prior-b": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-29T05:06:40.276000",
+   "last": "2026-10-29T05:17:40.580000",
+   "api_messages": 25,
+   "weighted_M": 0.43
+  },
+  "-home-joaquin-work-FA-worktrees-zz-ab-sendcheck-a": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-29T05:06:40.490000",
+   "last": "2026-10-29T05:15:08.359000",
+   "api_messages": 26,
+   "weighted_M": 0.5
+  },
+  "-home-joaquin-work-FA-worktrees-zz-ab-sendcheck-b": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-29T05:06:41.360000",
+   "last": "2026-10-29T05:14:13.825000",
+   "api_messages": 27,
+   "weighted_M": 0.45
+  },
+  "-home-joaquin-work-FA-worktrees-zz-ab2-dfew-a": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-29T05:47:36.702000",
+   "last": "2026-10-29T05:59:58.203000",
+   "api_messages": 23,
+   "weighted_M": 0.41
+  },
+  "-home-joaquin-work-FA-worktrees-zz-ab2-dfew-b": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-29T05:47:39.203000",
+   "last": "2026-10-29T05:52:39.679000",
+   "api_messages": 18,
+   "weighted_M": 0.3
+  },
+  "-home-joaquin-work-FA-worktrees-zz-ab2-dfew-c": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-29T06:00:18.262000",
+   "last": "2026-10-29T06:05:35.872000",
+   "api_messages": 19,
+   "weighted_M": 0.31
+  },
+  "-home-joaquin-work-FA-worktrees-zz-ab2-dfew-d": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-29T06:00:19.667000",
+   "last": "2026-10-29T06:05:46.072000",
+   "api_messages": 19,
+   "weighted_M": 0.32
+  },
+  "-home-joaquin-work-FA-worktrees-zz-ab2-ftharm-a": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-29T05:47:50.984000",
+   "last": "2026-10-29T05:58:10.051000",
+   "api_messages": 50,
+   "weighted_M": 1.06
+  },
+  "-home-joaquin-work-FA-worktrees-zz-ab2-ftharm-b": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-29T05:47:53.028000",
+   "last": "2026-10-29T05:56:49.864000",
+   "api_messages": 49,
+   "weighted_M": 1.02
+  },
+  "-home-joaquin-work-FA-worktrees-zz-ab2-ftharm-c": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-29T06:00:31.908000",
+   "last": "2026-10-29T06:11:31.183000",
+   "api_messages": 54,
+   "weighted_M": 1.18
+  },
+  "-home-joaquin-work-FA-worktrees-zz-ab2-ftharm-d": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-29T06:00:32.282000",
+   "last": "2026-10-29T06:10:14.822000",
+   "api_messages": 43,
+   "weighted_M": 0.89
+  },
+  "-home-joaquin-work-FA-worktrees-zz-ab2-hsplit-a": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-29T05:47:46.079000",
+   "last": "2026-10-29T05:52:37.251000",
+   "api_messages": 24,
+   "weighted_M": 0.43
+  },
+  "-home-joaquin-work-FA-worktrees-zz-ab2-hsplit-b": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-29T05:47:46.939000",
+   "last": "2026-10-29T05:53:21.876000",
+   "api_messages": 30,
+   "weighted_M": 0.54
+  },
+  "-home-joaquin-work-FA-worktrees-zz-ab2-hsplit-c": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-29T06:00:26.821000",
+   "last": "2026-10-29T06:03:24.364000",
+   "api_messages": 16,
+   "weighted_M": 0.3
+  },
+  "-home-joaquin-work-FA-worktrees-zz-ab2-hsplit-d": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-29T06:00:26.276000",
+   "last": "2026-10-29T06:04:20.931000",
+   "api_messages": 24,
+   "weighted_M": 0.38
+  },
+  "-home-joaquin-work-FA-worktrees-zz-ab2-v4pp-a": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-29T05:48:10.373000",
+   "last": "2026-10-29T05:54:08.347000",
+   "api_messages": 28,
+   "weighted_M": 0.61
+  },
+  "-home-joaquin-work-FA-worktrees-zz-ab2-v4pp-b": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-29T05:48:09.558000",
+   "last": "2026-10-29T05:59:37.565000",
+   "api_messages": 38,
+   "weighted_M": 0.86
+  },
+  "-home-joaquin-work-FA-worktrees-zz-ab2-v4pp-c": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-29T06:00:53.020000",
+   "last": "2026-10-29T06:15:55.108000",
+   "api_messages": 54,
+   "weighted_M": 1.15
+  },
+  "-home-joaquin-work-FA-worktrees-zz-ab2-v4pp-d": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-29T06:00:53.583000",
+   "last": "2026-10-29T06:16:35.543000",
+   "api_messages": 55,
+   "weighted_M": 1.27
+  },
+  "-home-joaquin-work-amplitude-dsi": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-10-05T13:07:39.505000",
+   "last": "2026-10-05T13:20:27.914000",
+   "api_messages": 25,
+   "weighted_M": 0.25
+  },
+  "-home-joaquin-work-finml": {
+   "files": 2,
+   "subagent_files": 0,
+   "first": "2026-10-26T17:52:34.002000",
+   "last": "2026-10-26T18:35:09.744000",
+   "api_messages": 27,
+   "weighted_M": 0.31
+  },
+  "-home-joaquin-work-likelihoods": {
+   "files": 2,
+   "subagent_files": 0,
+   "first": "2026-09-25T10:36:01.909000",
+   "last": "2026-10-30T20:58:17.759000",
+   "api_messages": 2116,
+   "weighted_M": 71.24
+  },
+  "-home-joaquin-work-madgrav": {
+   "files": 3,
+   "subagent_files": 0,
+   "first": "2026-10-26T17:13:50.695000",
+   "last": "2026-10-26T17:54:52.174000",
+   "api_messages": 25,
+   "weighted_M": 0.38
+  },
+  "-mnt-c-Users-Joaquin": {
+   "files": 3,
+   "subagent_files": 0,
+   "first": "2026-09-03T12:44:40.564000",
+   "last": "2026-09-07T14:06:52.639000",
+   "api_messages": 3,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp-30kq1wq": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:20:58.965000",
+   "last": "2026-08-20T15:21:06.392000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp-4q7vwxh": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T01:28:24.726000",
+   "last": "2026-08-22T01:28:51.247000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp-5pu8jry": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:40:57.013000",
+   "last": "2026-08-20T16:41:05.804000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp-7ucwuy-": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:36:54.566000",
+   "last": "2026-08-20T14:37:03.894000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp-gf82xhk": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-21T14:59:46.153000",
+   "last": "2026-08-21T15:00:01.650000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp-h4q248g": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:03:03.138000",
+   "last": "2026-08-20T18:03:10.170000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp-jl7ufgc": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:21:51.387000",
+   "last": "2026-08-20T15:22:00.072000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp-rhltd7e": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:01:11.569000",
+   "last": "2026-08-20T17:01:30.883000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmp-s4mhoyw": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:04:54.031000",
+   "last": "2026-08-20T18:05:03.453000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp06izw2a9": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:03:22.197000",
+   "last": "2026-08-20T17:03:30.928000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp085lww4c": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:37:41.245000",
+   "last": "2026-08-20T16:37:51.293000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp0h0h6e07": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:41:23.428000",
+   "last": "2026-08-20T14:41:31.291000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp0kjkakg2": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T12:38:12.206000",
+   "last": "2026-08-20T12:38:25.033000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp0knl4wd3": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T01:26:34.310000",
+   "last": "2026-08-22T01:27:07.001000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp0p0gfafx": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:37:40.607000",
+   "last": "2026-08-20T16:37:49.039000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp0r-gx-n1": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:43:17.463000",
+   "last": "2026-08-20T16:43:26.543000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp0sciuo3d": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:40:17.193000",
+   "last": "2026-08-20T14:40:24.435000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp0xsg5gvs": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T12:37:42.405000",
+   "last": "2026-08-20T12:37:44.788000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp0zzrwccv": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:40:26.923000",
+   "last": "2026-08-20T14:40:35.525000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp13xu0ssa": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:00:52.877000",
+   "last": "2026-08-20T17:01:02.899000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp143bqmzr": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:40:16.822000",
+   "last": "2026-08-20T14:40:24.116000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp190rigy2": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-19T14:25:22.305000",
+   "last": "2026-08-19T14:25:27.324000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp1dfox3wj": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-21T15:00:03.286000",
+   "last": "2026-08-21T15:00:16.245000",
+   "api_messages": 1,
+   "weighted_M": 0.01
+  },
+  "-tmp-tmp1lnnjvzx": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:37:56.340000",
+   "last": "2026-08-20T14:38:05.750000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp1n0nfwry": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:40:06.040000",
+   "last": "2026-08-20T14:40:14.407000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp1pxr1110": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:37:14.890000",
+   "last": "2026-08-20T16:37:21.660000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp1rkqkb0k": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T01:59:16.389000",
+   "last": "2026-08-22T01:59:50.355000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmp2-vt1ypj": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:38:08.336000",
+   "last": "2026-08-20T14:38:24.674000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp235gfl88": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-21T15:02:24.903000",
+   "last": "2026-08-21T15:02:54.297000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp2eq4do7o": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:45:49.580000",
+   "last": "2026-08-20T16:45:58.249000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp2hyrbvr9": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:34:42.370000",
+   "last": "2026-08-20T14:34:51.314000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp2ovkyew3": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:02:49.292000",
+   "last": "2026-08-20T17:02:58.109000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp2sc3tfum": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-21T15:02:56.423000",
+   "last": "2026-08-21T15:03:09.286000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp32-q-act": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:37:45.781000",
+   "last": "2026-08-20T14:37:53.850000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp32da6uwr": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:37:14.127000",
+   "last": "2026-08-20T16:37:20.777000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp39if284h": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:36:54.363000",
+   "last": "2026-08-20T14:37:03.405000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp3c1eaayd": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:18:55.807000",
+   "last": "2026-08-20T15:19:22.733000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp3e1cxto9": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-19T14:24:36.132000",
+   "last": "2026-08-19T14:24:38.528000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp3e5exozc": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:46:02.560000",
+   "last": "2026-08-20T16:46:11.066000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp3i92yi37": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T01:58:06.324000",
+   "last": "2026-08-22T01:58:38.879000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp3jzyj2zp": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:45:50.333000",
+   "last": "2026-08-20T16:45:57.536000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp3kgua9h1": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-19T14:25:43.895000",
+   "last": "2026-08-19T14:25:51.579000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp3ks12u7r": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T01:57:14.518000",
+   "last": "2026-08-22T01:57:28.735000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp3lfy9700": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:37:03.956000",
+   "last": "2026-08-20T14:37:13.432000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp3o0g6l6d": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:40:27.896000",
+   "last": "2026-08-20T16:40:38.932000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp3pws5epw": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:22:45.511000",
+   "last": "2026-08-20T15:23:33.691000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmp3sv3xcnv": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-19T14:24:15.800000",
+   "last": "2026-08-19T14:24:18.412000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp3x20bb7f": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:46:14.541000",
+   "last": "2026-08-20T16:46:22.999000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp42abxwbk": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-19T14:23:05.606000",
+   "last": "2026-08-19T14:23:23.902000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp485uyer7": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:46:01.236000",
+   "last": "2026-08-20T16:46:12.591000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp48ldc8qn": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:41:16.285000",
+   "last": "2026-08-20T14:41:23.463000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp4d6o60r7": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:41:05.432000",
+   "last": "2026-08-20T16:41:12.902000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp4dulbigs": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-21T14:59:12.059000",
+   "last": "2026-08-21T14:59:44.627000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp4s0xfrqt": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:37:13.483000",
+   "last": "2026-08-20T16:37:43.585000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmp4vt55m9h": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:02:49.643000",
+   "last": "2026-08-20T18:02:57.329000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp5-8t606z": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:43:59.645000",
+   "last": "2026-08-20T16:44:09.586000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp526544cb": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-19T14:25:04.942000",
+   "last": "2026-08-19T14:25:07.239000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp52yu4-v-": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T01:57:30.393000",
+   "last": "2026-08-22T01:58:01.900000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp5aawzolt": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T01:26:01.890000",
+   "last": "2026-08-22T01:26:20.226000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp5ezkns0s": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:43:15.990000",
+   "last": "2026-08-20T16:43:31.245000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp5ghxr2go": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:34:36.065000",
+   "last": "2026-08-20T14:34:44.172000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp5gpduusv": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-19T14:24:25.704000",
+   "last": "2026-08-19T14:24:33.940000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp5lczkdex": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:36:42.218000",
+   "last": "2026-08-20T14:36:51.380000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp5ludcsb0": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:39:55.196000",
+   "last": "2026-08-20T14:40:10.205000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp5xpj0ht2": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:03:38.899000",
+   "last": "2026-08-20T17:03:44.557000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp63ma5pii": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-21T01:08:17.517000",
+   "last": "2026-08-21T01:08:36.414000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp6e539092": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T12:37:26.780000",
+   "last": "2026-08-20T12:37:30.625000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp6fqnwz6l": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-21T01:07:57.869000",
+   "last": "2026-08-21T01:08:15.514000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp6fwdthp5": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T01:55:31.913000",
+   "last": "2026-08-22T01:56:15.242000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmp6jz179qn": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:22:05.363000",
+   "last": "2026-08-20T15:22:13.632000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp6kmb2ixe": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:43:15.757000",
+   "last": "2026-08-20T16:43:25.036000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp6oenz0vq": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:37:15.030000",
+   "last": "2026-08-20T16:37:33.768000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmp6stppd2g": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:46:28.866000",
+   "last": "2026-08-20T16:46:35.560000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp6tlajjd2": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:41:07.180000",
+   "last": "2026-08-20T16:41:17.091000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp6zk4rbne": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:44:12.158000",
+   "last": "2026-08-20T16:44:20.888000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp767o1boh": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:02:49.369000",
+   "last": "2026-08-20T18:02:58.211000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp7o00dz3n": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:37:38.892000",
+   "last": "2026-08-20T16:37:45.847000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp83lnhhuv": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T01:24:51.052000",
+   "last": "2026-08-22T01:25:05.898000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp83zpw2vj": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:34:48.805000",
+   "last": "2026-08-20T14:34:56.193000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp84x7ec6r": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:37:16.559000",
+   "last": "2026-08-20T14:37:24.718000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp87277hrt": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:04:09.283000",
+   "last": "2026-08-20T17:04:40.097000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmp8c860onq": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-21T01:07:36.461000",
+   "last": "2026-08-21T01:07:55.860000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp8crpra-c": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T12:38:27.385000",
+   "last": "2026-08-20T12:38:37.116000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp8ilt99bm": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:17:20.928000",
+   "last": "2026-08-20T15:17:28.818000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp8liucdde": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:38:10.105000",
+   "last": "2026-08-20T16:38:32.476000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp8t2qf6rr": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:43:33.149000",
+   "last": "2026-08-20T16:43:54.104000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmp8xlqilbr": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-21T01:09:40.939000",
+   "last": "2026-08-21T01:10:23.282000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmp8xnzi90d": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:03:07.931000",
+   "last": "2026-08-20T17:03:14.163000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp9-7ctwjp": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:43:48.358000",
+   "last": "2026-08-20T16:43:56.089000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp91xiwi3n": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-19T14:24:01.573000",
+   "last": "2026-08-19T14:24:09.047000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp96kvd-e3": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:46:01.073000",
+   "last": "2026-08-20T16:46:10.313000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp96mu92b0": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:04:27.749000",
+   "last": "2026-08-20T18:04:37.682000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp96w32eus": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:01:43.183000",
+   "last": "2026-08-20T17:01:48.157000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmp9j9gmq3a": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:23:37.187000",
+   "last": "2026-08-20T15:23:43.725000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpa-8qbii4": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:41:24.883000",
+   "last": "2026-08-20T14:41:38.233000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpa0kywdj3": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:16:54.033000",
+   "last": "2026-08-20T15:17:01.825000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpa2-wqe7a": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:40:52.790000",
+   "last": "2026-08-20T14:41:01.265000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpa2z9jjj6": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T12:37:16.052000",
+   "last": "2026-08-20T12:37:18",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpa4c54pwv": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:37:45.163000",
+   "last": "2026-08-20T14:37:54.183000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpag2w02e0": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:43:33.779000",
+   "last": "2026-08-20T16:43:50.848000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpahg0feo0": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:03:53.065000",
+   "last": "2026-08-20T17:04:01.969000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpao-arb7n": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T01:30:10.854000",
+   "last": "2026-08-22T01:30:41.217000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpaw6p1d1j": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:03:06.196000",
+   "last": "2026-08-20T17:03:14.012000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpazkzvspj": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:05:07.354000",
+   "last": "2026-08-20T18:05:14.568000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpb-ge9awx": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:40:26.646000",
+   "last": "2026-08-20T14:40:35.278000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpb-r3lufd": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:03:38.522000",
+   "last": "2026-08-20T17:03:46.236000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpb57vbb61": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T01:28:52.098000",
+   "last": "2026-08-22T01:29:15.351000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpb59ui26i": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:34:25.618000",
+   "last": "2026-08-20T14:34:34.980000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpbdlto8w0": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:43:38.526000",
+   "last": "2026-08-20T16:43:47.857000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpbevgdrp6": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:17:06.036000",
+   "last": "2026-08-20T15:17:15.573000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpbmlp3gtd": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:03:14.341000",
+   "last": "2026-08-20T18:03:24.008000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpbnp35hx3": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:00:53.118000",
+   "last": "2026-08-20T17:01:01.528000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpc1tklph6": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:37:26.936000",
+   "last": "2026-08-20T16:37:35.962000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpc3tev9xv": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:36:42.653000",
+   "last": "2026-08-20T14:36:50.367000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpci9vhek1": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:03:06.770000",
+   "last": "2026-08-20T17:03:13.692000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpcjoox-zb": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T12:39:15.117000",
+   "last": "2026-08-20T12:39:18.571000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpcksbgkft": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:05:08.263000",
+   "last": "2026-08-20T18:05:26.198000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpclkbr040": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:40:41.180000",
+   "last": "2026-08-20T16:41:02.846000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmpctgc1und": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:02:36.620000",
+   "last": "2026-08-20T18:02:43.254000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpcvuaffdh": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T12:37:20.249000",
+   "last": "2026-08-20T12:37:24.506000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpcxsqwcy-": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:44:02.224000",
+   "last": "2026-08-20T16:44:12.067000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpd-0r4q4n": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:04:28.043000",
+   "last": "2026-08-20T18:04:34.813000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpd4f-miwy": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:17:20.905000",
+   "last": "2026-08-20T15:17:29.516000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpdc4a371t": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T01:56:36.859000",
+   "last": "2026-08-22T01:57:00.925000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpdsiq6syh": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-19T14:24:21.201000",
+   "last": "2026-08-19T14:24:23.725000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpdudft2sj": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:16:54.041000",
+   "last": "2026-08-20T15:17:00.682000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpe-90wf01": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T01:27:31.190000",
+   "last": "2026-08-22T01:28:23.236000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmpeadrne47": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:36:59.972000",
+   "last": "2026-08-20T16:37:09.382000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpebl7ueuc": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:40:53.086000",
+   "last": "2026-08-20T14:41:01.714000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpebt4cjkb": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:17:05.815000",
+   "last": "2026-08-20T15:17:14.095000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpeyr6mhfk": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:22:17.858000",
+   "last": "2026-08-20T15:22:27.347000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpeyz23uxo": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T01:24:28.355000",
+   "last": "2026-08-22T01:24:49.487000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpf-jqfs6y": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:38:06.970000",
+   "last": "2026-08-20T14:38:21.600000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpf5b88e-k": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:03:03.426000",
+   "last": "2026-08-20T18:03:10.101000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpf5rjiiub": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:40:12.833000",
+   "last": "2026-08-20T14:40:19.123000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpf93hc23o": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-19T14:23:44.781000",
+   "last": "2026-08-19T14:23:59.773000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpfc4uavma": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:02:48.755000",
+   "last": "2026-08-20T18:02:57.821000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpff08o1sc": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:04:53.837000",
+   "last": "2026-08-20T18:05:02.398000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpfgpv4p2f": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:37:26.539000",
+   "last": "2026-08-20T16:37:35.002000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpfiq6wf1y": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T01:23:17.812000",
+   "last": "2026-08-22T01:23:17.967000",
+   "api_messages": 0,
+   "weighted_M": 0.0
+  },
+  "-tmp-tmpflqhh3hu": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:43:56.036000",
+   "last": "2026-08-20T16:44:05.126000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpfm75s7ml": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:03:34.876000",
+   "last": "2026-08-20T18:04:15.635000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmpfooc0o17": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-19T14:25:17.890000",
+   "last": "2026-08-19T14:25:20.320000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpfvmr3y9o": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:36:59.998000",
+   "last": "2026-08-20T16:37:09.470000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpfziecqv1": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:40:54.399000",
+   "last": "2026-08-20T16:41:00.452000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpgckcx6wy": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-21T15:02:01.345000",
+   "last": "2026-08-21T15:02:22.179000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpgd6v3wp8": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T12:38:39.344000",
+   "last": "2026-08-20T12:38:41.483000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpgefztv52": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:40:26.941000",
+   "last": "2026-08-20T16:40:34.923000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpggf3pi9w": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:34:25.472000",
+   "last": "2026-08-20T14:34:33.341000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpgm5qblxi": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:03:03.752000",
+   "last": "2026-08-20T18:03:11.601000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpgm8y2ti0": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:20:44.189000",
+   "last": "2026-08-20T15:20:53.607000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpgn8epzsp": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:36:42.521000",
+   "last": "2026-08-20T14:36:52.008000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpgnh0pp0-": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:05:07.975000",
+   "last": "2026-08-20T18:05:24.178000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpgrean9g5": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:17:19.420000",
+   "last": "2026-08-20T15:17:30.097000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpgsf8bsqt": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:45:49.821000",
+   "last": "2026-08-20T16:46:03.299000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmpgyh9cs8t": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-21T01:10:25.312000",
+   "last": "2026-08-21T01:10:47.383000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmph-r-dcy2": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:43:15.515000",
+   "last": "2026-08-20T16:43:25.924000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmph7oed2ld": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:17:33.402000",
+   "last": "2026-08-20T15:17:41.630000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmph8tkja9p": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:00:53.248000",
+   "last": "2026-08-20T17:01:09.792000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmphnumcztb": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:34:46.472000",
+   "last": "2026-08-20T14:34:56.538000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmphyb25mua": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:40:52.577000",
+   "last": "2026-08-20T14:41:00.821000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpi3qieeg3": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:37:32.889000",
+   "last": "2026-08-20T14:37:42.402000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpi5i5o6ko": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:03:22.459000",
+   "last": "2026-08-20T17:03:32.321000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpi995iuky": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:22:04.239000",
+   "last": "2026-08-20T15:22:11.605000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpid09dve8": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:34:25.165000",
+   "last": "2026-08-20T14:34:41.713000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmpidw4o017": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:04:40.065000",
+   "last": "2026-08-20T18:04:48.615000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpiesa-vq3": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:40:21.471000",
+   "last": "2026-08-20T14:40:30.169000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpijgswmon": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:21:51.720000",
+   "last": "2026-08-20T15:22:00.413000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpijl9maue": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:22:04.128000",
+   "last": "2026-08-20T15:22:14.857000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpimqgx405": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:20:13.954000",
+   "last": "2026-08-20T15:20:21.960000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpj1v6wo42": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T12:37:32.802000",
+   "last": "2026-08-20T12:37:41.299000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpjbl0wnax": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-21T14:58:51.819000",
+   "last": "2026-08-21T14:59:10.518000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpjf1wbrlv": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:43:30.809000",
+   "last": "2026-08-20T16:43:40.499000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpjl91jhvo": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T01:26:21.722000",
+   "last": "2026-08-22T01:26:32.598000",
+   "api_messages": 1,
+   "weighted_M": 0.01
+  },
+  "-tmp-tmpjpd4huv-": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T01:59:51.827000",
+   "last": "2026-08-22T02:00:20.329000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpjr-lsyoy": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:05:31.477000",
+   "last": "2026-08-20T18:06:07.408000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmpjre5ou75": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:03:07.245000",
+   "last": "2026-08-20T17:03:15.009000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpjx05l2y0": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:01:54.450000",
+   "last": "2026-08-20T17:02:10.697000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpjyx--ral": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:41:17.116000",
+   "last": "2026-08-20T14:41:24.472000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpk053q5un": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:02:48.701000",
+   "last": "2026-08-20T17:02:57.995000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpk2twnspq": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:37:55.025000",
+   "last": "2026-08-20T14:38:03.095000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpk846le4n": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:40:04.962000",
+   "last": "2026-08-20T14:40:37.893000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmpkj0j7wye": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:20:13.977000",
+   "last": "2026-08-20T15:20:22.183000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpl239nb72": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:01:10.027000",
+   "last": "2026-08-20T17:01:16.075000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpl3eopud9": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:17:07.250000",
+   "last": "2026-08-20T15:17:15.596000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpl58llyfq": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:04:27.954000",
+   "last": "2026-08-20T18:04:37.050000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmplgqwkmxv": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:20:54.185000",
+   "last": "2026-08-20T15:21:02.033000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmplgslg3zg": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-19T14:24:48.295000",
+   "last": "2026-08-19T14:24:51.768000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmplkk7dxpm": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:34:58.886000",
+   "last": "2026-08-20T14:35:14.481000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmplmmgc-vt": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T12:38:57.525000",
+   "last": "2026-08-20T12:39:14.232000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmplr-ytkt6": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:01:42.215000",
+   "last": "2026-08-20T17:01:50.047000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmplrt3juyx": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:46:29.726000",
+   "last": "2026-08-20T16:46:48.308000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmplyhtzxmh": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:02:15.559000",
+   "last": "2026-08-20T17:02:36.050000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpm-07t6f3": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:01:45.750000",
+   "last": "2026-08-20T17:01:54.116000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpm1i3a1xq": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:36:42.497000",
+   "last": "2026-08-20T14:36:51.703000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpm7ozz1ol": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-19T14:24:11.235000",
+   "last": "2026-08-19T14:24:13.941000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpmbd1hhvj": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T01:58:39.340000",
+   "last": "2026-08-22T01:59:14.938000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmpme-92gll": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:40:52.788000",
+   "last": "2026-08-20T16:41:02.204000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpmij9oasa": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:40:32.914000",
+   "last": "2026-08-20T14:40:48.115000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpmr-gqyrf": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:37:33.071000",
+   "last": "2026-08-20T14:37:42.054000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpmtq80z9z": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:41:07.475000",
+   "last": "2026-08-20T16:41:15.505000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpmwhfug1o": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:03:02.560000",
+   "last": "2026-08-20T18:03:09.140000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpn1wxmxw8": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T01:23:01.026000",
+   "last": "2026-08-22T01:23:16.269000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpn2g04908": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-19T14:24:40.528000",
+   "last": "2026-08-19T14:24:46.169000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpn732unax": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T01:29:16.935000",
+   "last": "2026-08-22T01:30:09.138000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmpnucymmbd": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:37:48.574000",
+   "last": "2026-08-20T16:38:04.972000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpny837pzl": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:39:55.445000",
+   "last": "2026-08-20T14:40:03.125000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpo-njtk0w": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:01:09.352000",
+   "last": "2026-08-20T17:01:40.208000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmpo147lxnt": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:16:54.127000",
+   "last": "2026-08-20T15:17:00.431000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpo2v0brs3": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:22:17.252000",
+   "last": "2026-08-20T15:22:25.572000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpo3bx5y4q": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-19T14:25:09.404000",
+   "last": "2026-08-19T14:25:15.817000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpon0c4-j-": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:21:51.465000",
+   "last": "2026-08-20T15:22:00.359000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmposl246sl": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-21T14:58:20.992000",
+   "last": "2026-08-21T14:58:49.482000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpp0y0v92j": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:40:44.272000",
+   "last": "2026-08-20T16:40:53.992000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpp8nqzw64": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:20:40.161000",
+   "last": "2026-08-20T15:20:49.480000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmppbj3nzvf": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T02:01:03.805000",
+   "last": "2026-08-22T02:01:22.076000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmppkcr9wbl": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:37:14.064000",
+   "last": "2026-08-20T14:37:23.373000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmppvfogy2i": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:03:21.623000",
+   "last": "2026-08-20T17:03:31.052000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpq1plkmts": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:22:05.509000",
+   "last": "2026-08-20T15:22:12.681000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpq5f-mlx3": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-19T14:24:54.027000",
+   "last": "2026-08-19T14:25:02.878000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpq5l4uff7": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:40:26.775000",
+   "last": "2026-08-20T16:40:36.376000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpq9gmev01": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:02:34.913000",
+   "last": "2026-08-20T18:02:43.940000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpqit2qsqv": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:41:15.361000",
+   "last": "2026-08-20T14:41:22.212000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpqq6gdsrr": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:41:21.581000",
+   "last": "2026-08-20T16:41:59.361000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmpqs9zsebe": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:40:40.033000",
+   "last": "2026-08-20T16:40:49.264000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpqw4rapn9": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T02:00:21.899000",
+   "last": "2026-08-22T02:01:00.572000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmpqzcuxymu": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T12:37:47.169000",
+   "last": "2026-08-20T12:37:49.768000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpr95330j8": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T01:22:28.737000",
+   "last": "2026-08-22T01:22:58.784000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmprnd45rv-": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:37:33.776000",
+   "last": "2026-08-20T14:37:43.636000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmprnv20bib": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:37:32.959000",
+   "last": "2026-08-20T14:37:42.665000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmprnwrsf2b": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:20:27.725000",
+   "last": "2026-08-20T15:20:44.380000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmprqz7ry1h": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:20:14.226000",
+   "last": "2026-08-20T15:20:21.661000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmprs5-p9bd": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:40:27.644000",
+   "last": "2026-08-20T16:40:36.657000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmprwljw5tm": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:37:56.669000",
+   "last": "2026-08-20T14:38:04.190000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmps1y993r0": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-21T15:03:11.081000",
+   "last": "2026-08-21T15:03:33.555000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmps2q6f8cy": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-21T01:10:49.485000",
+   "last": "2026-08-21T01:11:01.065000",
+   "api_messages": 1,
+   "weighted_M": 0.01
+  },
+  "-tmp-tmps6cvz08h": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:04:40.454000",
+   "last": "2026-08-20T18:04:48.549000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmps9sivc3k": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T12:39:20.799000",
+   "last": "2026-08-20T12:39:22.783000",
+   "api_messages": 1,
+   "weighted_M": 0.01
+  },
+  "-tmp-tmpscoqhzac": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:03:20.914000",
+   "last": "2026-08-20T17:03:30.721000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpsgbq-sqq": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:34:35.880000",
+   "last": "2026-08-20T14:34:46.676000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpsguw2itt": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:46:52.349000",
+   "last": "2026-08-20T16:47:16.049000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpsj9an7l3": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:37:14.716000",
+   "last": "2026-08-20T14:37:24.181000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpsjadjqi-": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:02:34.910000",
+   "last": "2026-08-20T18:02:43.830000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpsme7s15l": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:41:03.450000",
+   "last": "2026-08-20T14:41:12.645000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpsp5mnbhf": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:02:34.936000",
+   "last": "2026-08-20T18:02:44.005000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpsqq0z1j0": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:34:53.729000",
+   "last": "2026-08-20T14:35:02.321000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpsrmspwnf": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:45:50.773000",
+   "last": "2026-08-20T16:45:58.357000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpss9dyeea": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:46:08.169000",
+   "last": "2026-08-20T16:46:28.358000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmpssy0hj48": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:37:44.921000",
+   "last": "2026-08-20T14:38:07.553000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmpswwufucx": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:41:03.863000",
+   "last": "2026-08-20T14:41:13.666000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpsxkrnnfd": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T12:38:01.393000",
+   "last": "2026-08-20T12:38:09.857000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpsybugtao": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:03:15.314000",
+   "last": "2026-08-20T18:03:29.747000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpt-7rc7-k": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:41:05.769000",
+   "last": "2026-08-20T14:41:14.128000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpt-lshu2p": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:04:41.009000",
+   "last": "2026-08-20T18:05:02.302000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmptiau53v-": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:17:04.272000",
+   "last": "2026-08-20T15:17:40.146000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmptiss6pz4": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-19T14:23:25.774000",
+   "last": "2026-08-19T14:23:42.959000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpto225z-o": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:22:32.676000",
+   "last": "2026-08-20T15:22:40.314000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmptoq0c-zi": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T01:56:16.826000",
+   "last": "2026-08-22T01:56:35.304000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmptq-n2adv": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:46:17.292000",
+   "last": "2026-08-20T16:46:24.584000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmptwt0n2uh": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:40:05.606000",
+   "last": "2026-08-20T14:40:14.140000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmptzlzm9yl": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:02:49.643000",
+   "last": "2026-08-20T18:02:57.672000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpu0pjcjxz": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T12:38:43.692000",
+   "last": "2026-08-20T12:38:55.282000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpu2yah1mw": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:20:26.983000",
+   "last": "2026-08-20T15:20:38.997000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpu3d6qvip": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-19T14:25:53.703000",
+   "last": "2026-08-19T14:25:55.464000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpu6ilhypf": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:20:27.473000",
+   "last": "2026-08-20T15:20:34.382000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpu6rc72h3": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T12:37:56.574000",
+   "last": "2026-08-20T12:37:59.109000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpugsv0i4l": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:34:46.472000",
+   "last": "2026-08-20T14:34:56.478000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpukbuujwa": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-21T15:00:52.934000",
+   "last": "2026-08-21T15:01:22.053000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpuqo01znk": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:46:28.358000",
+   "last": "2026-08-20T16:46:36.655000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpuu4egb6a": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:39:55.243000",
+   "last": "2026-08-20T14:40:02.907000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpuytjvpv1": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:22:30.759000",
+   "last": "2026-08-20T15:22:37.359000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpv4pzdns9": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:34:25.070000",
+   "last": "2026-08-20T14:34:33.168000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpv5pfz9g8": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:34:58.688000",
+   "last": "2026-08-20T14:35:07.206000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpva5ynyky": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:21:11.654000",
+   "last": "2026-08-20T15:21:42.838000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpvcx7ycbv": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:01:24.530000",
+   "last": "2026-08-20T17:01:32.864000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpvdkqtqzw": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:37:45.098000",
+   "last": "2026-08-20T14:37:52.574000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpvj40imad": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:44:26.873000",
+   "last": "2026-08-20T16:45:10.078000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmpvjyic8a0": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:02:49.077000",
+   "last": "2026-08-20T17:02:59.597000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpvlctd6vi": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:40:52.438000",
+   "last": "2026-08-20T14:41:03.061000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpvo9ikecl": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-19T14:25:39.405000",
+   "last": "2026-08-19T14:25:41.844000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpw0rlbjte": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:41:40.644000",
+   "last": "2026-08-20T14:41:48.729000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpw0whw53k": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:36:53.072000",
+   "last": "2026-08-20T14:37:01.815000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpw3g40r-9": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T12:37:51.849000",
+   "last": "2026-08-20T12:37:54.109000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpw6ktzwmi": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:16:53.955000",
+   "last": "2026-08-20T15:16:58.906000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpwb608y0m": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:40:42.137000",
+   "last": "2026-08-20T16:40:49.794000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpwg085o31": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-19T14:26:06.816000",
+   "last": "2026-08-19T14:26:12.067000",
+   "api_messages": 1,
+   "weighted_M": 0.01
+  },
+  "-tmp-tmpwjtnm8tf": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:37:05.753000",
+   "last": "2026-08-20T14:37:15.397000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpwkn0zn30": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:04:29.216000",
+   "last": "2026-08-20T18:04:36.784000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpwqqih8ce": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:17:33.806000",
+   "last": "2026-08-20T15:17:51.789000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpwrho883v": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:37:04.375000",
+   "last": "2026-08-20T14:37:13.150000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpwtvg-jee": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:43:55.553000",
+   "last": "2026-08-20T16:44:04.180000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpwxl72l0n": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:37:06.505000",
+   "last": "2026-08-20T14:37:14.108000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpx4joh511": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:01:15.250000",
+   "last": "2026-08-20T17:01:34.599000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmpx94k68jt": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:00:53.771000",
+   "last": "2026-08-20T17:01:00.903000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpxco25r3o": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:04:53.878000",
+   "last": "2026-08-20T18:05:02.990000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpxfi2jplv": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:22:19.970000",
+   "last": "2026-08-20T15:22:27.758000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpxhp8y6hy": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:37:00.053000",
+   "last": "2026-08-20T16:37:08.078000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpxjxy5-sh": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:20:14.263000",
+   "last": "2026-08-20T15:20:22.106000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpxk6x4r2t": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-21T15:01:23.517000",
+   "last": "2026-08-21T15:01:59.858000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpxq69-p03": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:01:40.341000",
+   "last": "2026-08-20T17:01:47.136000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpxyg6nvx3": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T18:04:38.253000",
+   "last": "2026-08-20T18:04:48.576000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpy1cycf-h": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-19T14:25:29.417000",
+   "last": "2026-08-19T14:25:33.395000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpy2iudark": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:34:37.325000",
+   "last": "2026-08-20T14:34:43.930000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpy4fqm-t8": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T01:57:02.390000",
+   "last": "2026-08-22T01:57:12.786000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpy6dtv-hz": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-21T15:00:17.847000",
+   "last": "2026-08-21T15:00:45.177000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpy7cs9pwg": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:37:00.357000",
+   "last": "2026-08-20T16:37:08.642000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpy9qep8ka": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:41:26.085000",
+   "last": "2026-08-20T14:41:34.406000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpycw56zqz": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:22:18.858000",
+   "last": "2026-08-20T15:22:27.445000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpyeoz3tf7": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:36:54.874000",
+   "last": "2026-08-20T14:37:01.501000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpyi2t67l2": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T12:37:13.141000",
+   "last": "2026-08-20T12:37:13.727000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpyn3cxp0o": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T16:46:15.551000",
+   "last": "2026-08-20T16:46:25.481000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpytk2fubm": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:17:56.713000",
+   "last": "2026-08-20T15:18:25.787000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpyuupoxbm": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T17:02:48.409000",
+   "last": "2026-08-20T17:02:58.414000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpyxytbe7u": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:41:04.790000",
+   "last": "2026-08-20T14:41:21.181000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmpz-v3aqvf": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:20:27.659000",
+   "last": "2026-08-20T15:20:34.688000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpz0kzn0sh": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-19T14:25:35.350000",
+   "last": "2026-08-19T14:25:37.295000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpz15p5piw": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T01:27:10.911000",
+   "last": "2026-08-22T01:27:29.598000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpz4xf2ff9": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:17:32.615000",
+   "last": "2026-08-20T15:17:40.255000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpz5nustn2": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:20:39.922000",
+   "last": "2026-08-20T15:20:48.862000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpzd90sxjj": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:21:51.499000",
+   "last": "2026-08-20T15:22:01.764000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpzhneemz1": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-22T01:25:07.644000",
+   "last": "2026-08-22T01:26:00.343000",
+   "api_messages": 1,
+   "weighted_M": 0.03
+  },
+  "-tmp-tmpziqadwiu": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-19T14:25:57.611000",
+   "last": "2026-08-19T14:26:04.787000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpzjjnv7pg": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:20:49.521000",
+   "last": "2026-08-20T15:20:58.525000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpzksvg08l": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:38:05.563000",
+   "last": "2026-08-20T14:38:14.080000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpzpa1zpvp": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T15:20:54.966000",
+   "last": "2026-08-20T15:21:03.944000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  },
+  "-tmp-tmpzvvlh9ie": {
+   "files": 1,
+   "subagent_files": 0,
+   "first": "2026-08-20T14:39:54.982000",
+   "last": "2026-08-20T14:40:02.055000",
+   "api_messages": 1,
+   "weighted_M": 0.02
+  }
+ },
+ "weighted_M_by_period_model": {
+  "main_alone": {
+   "claude-opus-4-8": 8.31,
+   "claude-opus-5": 200.62,
+   "<synthetic>": 0.0,
+   "claude-sonnet-5": 11.23,
+   "claude-fable-5-1": 71.18,
+   "claude-opus-5-5": 764.95,
+   "claude-haiku-4-5-20251001": 0.45,
+   "claude-sonnet-5-5": 3.78,
+   "claude-haiku-5-5": 0.12
+  },
+  "step_agents": {
+   "claude-opus-5-5": 405.34,
+   "claude-sonnet-5-5": 8.42,
+   "claude-haiku-5-5": 0.59,
+   "<synthetic>": 0.0
+  },
+  "redesign": {
+   "claude-opus-5-5": 42.27,
+   "claude-sonnet-5-5": 1.63
+  }
+ },
+ "windows": {
+  "all_models": {
+   "main_alone": {
+    "max_5h_M": 34.93,
+    "at": "2026-10-25T17:02:19.263000",
+    "median_5h_M": 7.12,
+    "top_windows_M": [
+     [
+      "2026-10-25T17:02:19.263000",
+      34.9
+     ],
+     [
+      "2026-10-15T05:58:24.385000",
+      31.5
+     ],
+     [
+      "2026-10-15T13:32:28.687000",
+      31.3
+     ],
+     [
+      "2026-08-19T02:46:03.635000",
+      23.7
+     ],
+     [
+      "2026-10-13T01:12:41.770000",
+      21.8
+     ],
+     [
+      "2026-09-13T11:33:40.655000",
+      21.6
+     ],
+     [
+      "2026-10-22T03:53:06.043000",
+      21.1
+     ],
+     [
+      "2026-09-24T23:24:31.432000",
+      19.4
+     ]
+    ]
+   },
+   "step_agents": {
+    "max_5h_M": 77.79,
+    "at": "2026-10-25T20:19:40.083000",
+    "median_5h_M": 31.1,
+    "top_windows_M": [
+     [
+      "2026-10-25T20:19:40.083000",
+      77.8
+     ],
+     [
+      "2026-10-29T19:52:17.369000",
+      58.9
+     ],
+     [
+      "2026-10-30T06:25:45.120000",
+      50.9
+     ],
+     [
+      "2026-10-29T06:37:33.942000",
+      45.1
+     ],
+     [
+      "2026-10-26T03:58:08.506000",
+      41.0
+     ],
+     [
+      "2026-10-26T23:29:29.111000",
+      38.1
+     ],
+     [
+      "2026-10-26T15:51:30.761000",
+      29.4
+     ],
+     [
+      "2026-10-26T09:39:34.541000",
+      23.3
+     ]
+    ]
+   },
+   "redesign": {
+    "max_5h_M": 31.71,
+    "at": "2026-10-30T13:43:00.226000",
+    "median_5h_M": 17.56,
+    "top_windows_M": [
+     [
+      "2026-10-30T13:43:00.226000",
+      31.7
+     ],
+     [
+      "2026-10-30T20:58:17.585000",
+      19.5
+     ]
+    ]
+   }
+  },
+  "opus": {
+   "main_alone": {
+    "max_5h_M": 34.93,
+    "at": "2026-10-25T17:02:19.263000",
+    "median_5h_M": 7.0,
+    "top_windows_M": [
+     [
+      "2026-10-25T17:02:19.263000",
+      34.9
+     ],
+     [
+      "2026-10-15T05:58:24.385000",
+      31.3
+     ],
+     [
+      "2026-10-15T13:32:28.687000",
+      31.2
+     ],
+     [
+      "2026-08-19T02:46:03.635000",
+      23.7
+     ],
+     [
+      "2026-10-13T01:12:41.770000",
+      21.5
+     ],
+     [
+      "2026-10-22T03:53:06.043000",
+      20.9
+     ],
+     [
+      "2026-10-24T18:33:18.220000",
+      19.3
+     ],
+     [
+      "2026-10-23T04:04:07.658000",
+      19.1
+     ]
+    ]
+   },
+   "step_agents": {
+    "max_5h_M": 74.86,
+    "at": "2026-10-25T20:19:40.083000",
+    "median_5h_M": 30.33,
+    "top_windows_M": [
+     [
+      "2026-10-25T20:19:40.083000",
+      74.9
+     ],
+     [
+      "2026-10-29T19:53:11.653000",
+      57.9
+     ],
+     [
+      "2026-10-30T06:25:45.120000",
+      50.6
+     ],
+     [
+      "2026-10-29T06:37:33.942000",
+      44.5
+     ],
+     [
+      "2026-10-26T03:58:08.506000",
+      40.2
+     ],
+     [
+      "2026-10-26T23:29:29.111000",
+      36.9
+     ],
+     [
+      "2026-10-26T17:35:22.373000",
+      28.6
+     ],
+     [
+      "2026-10-30T11:35:06.117000",
+      23.0
+     ]
+    ]
+   },
+   "redesign": {
+    "max_5h_M": 31.71,
+    "at": "2026-10-30T13:43:00.226000",
+    "median_5h_M": 16.75,
+    "top_windows_M": [
+     [
+      "2026-10-30T13:43:00.226000",
+      31.7
+     ],
+     [
+      "2026-10-30T20:58:17.585000",
+      18.1
+     ]
+    ]
+   }
+  },
+  "sonnet": {
+   "main_alone": {
+    "max_5h_M": 2.18,
+    "at": "2026-09-07T17:12:39.914000",
+    "median_5h_M": 0.25,
+    "top_windows_M": [
+     [
+      "2026-09-07T17:12:39.914000",
+      2.2
+     ],
+     [
+      "2026-10-02T01:15:03.324000",
+      1.4
+     ],
+     [
+      "2026-09-24T23:15:29.882000",
+      1.0
+     ],
+     [
+      "2026-09-14T15:50:09.206000",
+      0.8
+     ],
+     [
+      "2026-09-29T07:45:09.489000",
+      0.8
+     ],
+     [
+      "2026-10-01T03:51:22.323000",
+      0.7
+     ],
+     [
+      "2026-09-23T10:08:54.795000",
+      0.6
+     ],
+     [
+      "2026-10-05T01:05:21.644000",
+      0.5
+     ]
+    ]
+   },
+   "step_agents": {
+    "max_5h_M": 2.89,
+    "at": "2026-10-25T21:00:08.929000",
+    "median_5h_M": 0.77,
+    "top_windows_M": [
+     [
+      "2026-10-25T21:00:08.929000",
+      2.9
+     ],
+     [
+      "2026-10-26T13:46:32.292000",
+      1.2
+     ],
+     [
+      "2026-10-26T21:59:26.416000",
+      1.2
+     ],
+     [
+      "2026-10-29T18:41:50.813000",
+      1.1
+     ],
+     [
+      "2026-10-26T05:07:31.105000",
+      1.0
+     ],
+     [
+      "2026-10-29T05:22:07.029000",
+      0.6
+     ],
+     [
+      "2026-10-29T13:33:20.105000",
+      0.1
+     ],
+     [
+      "2026-10-30T03:57:56.584000",
+      0.1
+     ]
+    ]
+   },
+   "redesign": {
+    "max_5h_M": 1.36,
+    "at": "2026-10-30T19:39:35.640000",
+    "median_5h_M": 0.54,
+    "top_windows_M": [
+     [
+      "2026-10-30T19:39:35.640000",
+      1.4
+     ]
+    ]
+   }
+  }
+ },
+ "since_2026-10-30T16:55:13_all_FA_transcripts_M": 31.02
+}
