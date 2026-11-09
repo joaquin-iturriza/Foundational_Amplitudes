@@ -15488,6 +15488,9 @@ entries:
     18: 'D324 (Joaquin: 10 min batching, track usage before and after): baseline with tools/wake_batching.py up to 2026-11-07T17:00;
       batch main-session wakes (owner hand-backs, task notifications) and owner resumes at 10 min; after a week the same tool
       on the after-period, both with a figure.'
+    19: 'Upkeep 2026-11-09: the run registry stayed RUNNING for runs that had ended (FA-ccin2p3-22bc476d 2+ h, scaling-grid
+      4d6e9b06 8a523b67 8b543518 b07d6237 for days) until a manual site poll, so no RUN_DONE fired; find why the supervisor''s
+      poll did not refresh them and fix it, tested on a run that ends.'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -15768,6 +15771,11 @@ entries:
       if:
       - 'after-period saving within or above the predicted band: keep 10 min'
       - 'saving below the band: report to Joaquin with the numbers and the causes'
+    19:
+      feeds: run ends reach their owners without a manual poll
+      if:
+      - 'cause found in the supervisor''s poll: fix, test, restart the supervisor'
+      - 'cause in the scheduler query: fix in site poll and report'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
