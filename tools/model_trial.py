@@ -338,7 +338,9 @@ def altcheck():
 def setup(task, arm):
     c = TASKS[task][0]
     p = wt(task, arm)
-    git("worktree", "add", "-b", "zz_trial_%s_%s" % (task, arm), p, c + "^")
+    # detached: a trial arm needs no branch, and a branch here was published by auto_push (D334: 28 zz_trial_*
+    # branches left on origin)
+    git("worktree", "add", "--detach", p, c + "^")
     print(p)
 
 
@@ -353,7 +355,7 @@ def brief(task, arm):
             "signatures exactly):\n%s\n\n"
             "Fix it in the code (the smallest correct change), add or update a test of it if the repository has a "
             "test file for that code, run the tests you touched from inside the worktree with %s <file> when the "
-            "file has a __main__ runner, else with that python -m pytest -q <file>, then commit everything you changed on the worktree's branch: git -C %s commit -am "
+            "file has a __main__ runner, else with that python -m pytest -q <file>, then commit everything you changed in the worktree (detached HEAD): git -C %s commit -am "
             "\"<what you changed>\" (git add new files first). End with a short report: the cause, the change, the "
             "test run's result." % (wt(task, arm), defect, INTERFACE[task], PY, wt(task, arm)))
 

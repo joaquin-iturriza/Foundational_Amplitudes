@@ -1,6 +1,6 @@
 #!/bin/bash
 # Remove a finished worktree the one safe way: fold its untracked results into the trunk, then remove it (--force only
-# after every untracked file is checked), then delete its branch if it is merged. The steps cannot be skipped or reordered by the caller.
+# after every untracked file is checked), then delete its branch if it is merged, here and on origin. The steps cannot be skipped or reordered by the caller.
 #     bash scripts/remove_worktree.sh worktrees/wt-<feat>
 set -euo pipefail
 WT="${1:?usage: remove_worktree.sh worktrees/wt-<feat>}"
@@ -26,8 +26,22 @@ if [ ${#left[@]} -gt 0 ]; then
     exit 1
 fi
 git worktree remove --force "$WT"
-if git branch --merged trunk | grep -qx "  $BR"; then
-    git branch -d "$BR"
+if [ "$BR" = "HEAD" ] || [ "$BR" = "trunk" ] || [ "$BR" = "main" ]; then
+    exit 0                       # a detached worktree (model trials) has no branch to delete
+fi
+if git merge-base --is-ancestor "$BR" trunk; then
+    # merged: -D, since -d also asks for the branch to be merged into its upstream, and a stale upstream (an old
+    # auto_push of the branch) made it refuse a merged branch (2026-11-04, double_wake)
+    git branch -D "$BR"
+    # its copy on origin goes too, when that copy is also in trunk (D334: no merged branches left on origin)
+    if git ls-remote --exit-code --heads origin "$BR" >/dev/null 2>&1; then
+        git fetch --quiet origin "refs/heads/$BR:refs/remotes/origin/$BR" 2>/dev/null || true
+        if git merge-base --is-ancestor "refs/remotes/origin/$BR" trunk 2>/dev/null; then
+            git push --quiet origin --delete "$BR" && echo "remove_worktree: deleted origin/$BR"
+        else
+            echo "remove_worktree: origin/$BR has commits trunk lacks; kept"
+        fi
+    fi
 else
     echo "remove_worktree: branch $BR is not merged into trunk; kept"
 fi

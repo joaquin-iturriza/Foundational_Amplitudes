@@ -21,12 +21,11 @@ if [ -f "$REPO/plan/plan.yaml" ] && [ -f "$REPO/tools/plan.py" ]; then
   verified=$(python3 "$REPO/tools/plan.py" claims --verified 2>/dev/null)
 fi
 
-# Walk every worktree (the main checkout + any ../wt-* feature worktrees) so
-# feature-branch commits get pushed too.
+# Walk the worktrees for the one on trunk (the main checkout); every other branch is skipped.
 git worktree list --porcelain 2>/dev/null | awk '/^worktree /{print $2}' | while read -r wt; do
   br=$(git -C "$wt" symbolic-ref --quiet --short HEAD 2>/dev/null) || continue
   [ -z "$br" ] && continue
-  [ "$br" = "main" ] && continue   # main is published via scripts/publish_main.sh, never pushed here
+  [ "$br" = "trunk" ] || continue   # main is published by scripts/publish_main.sh; feature branches stay local
   if [ "$br" = "trunk" ] && [ -n "$gated" ]; then
     head=$(git -C "$wt" rev-parse HEAD)
     if [ "$verified" != "$head" ]; then
@@ -49,22 +48,17 @@ git worktree list --porcelain 2>/dev/null | awk '/^worktree /{print $2}' | while
     fi
   fi
 
-  if git -C "$wt" rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
-    ahead=$(git -C "$wt" rev-list --count '@{u}'..HEAD 2>/dev/null || echo 0)
-    if [ "${ahead:-0}" -gt 0 ]; then
-      if git -C "$wt" push --quiet 2>/dev/null; then
-        echo "[auto-push] $br: pushed $ahead commit(s) to origin"
-      else
-        echo "[auto-push] $br: push of $ahead commit(s) FAILED (push manually)"
-      fi
-    fi
-  else
-    # New feature branch with no upstream yet — publish it.
-    if git -C "$wt" push --quiet -u origin "$br" 2>/dev/null; then
-      echo "[auto-push] $br: published new branch to origin"
+  # Only trunk goes to origin (D334, 2026-11-09: 97 remote branches, most merged feature, agent and trial branches
+  # this hook had published and nothing deleted). A feature branch lives in its worktree until it merges into trunk,
+  # which is what reaches origin; scripts/remove_worktree.sh deletes any remote copy left from before.
+  ahead=$(git -C "$wt" rev-list --count '@{u}'..HEAD 2>/dev/null || echo 1)
+  if [ "${ahead:-0}" -gt 0 ]; then
+    if git -C "$wt" push --quiet origin "HEAD:refs/heads/trunk" 2>/dev/null; then
+      echo "[auto-push] trunk: pushed $ahead commit(s) to origin"
     else
-      echo "[auto-push] $br: publish FAILED (push manually)"
+      echo "[auto-push] trunk: push of $ahead commit(s) FAILED (push manually)"
     fi
   fi
 done
 exit 0
+
