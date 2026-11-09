@@ -5626,7 +5626,23 @@ entries:
     searched: 'CLAUDE.md GPU budget rule; site decisions D153, D242, D244, D326 (approves the work, names no cost): none covers
       65 GPU-h'
     blocks: step 84's code and submission
+    blocks_steps:
+    - 84
+  - ask: 'Scope: (1) edge bins before the 1301-class regeneration with the sixth sampler revision: exempt the bins cut by
+      a class''s kinematic maximum (a), or score them with the quota cut to the reachable share (b; then only the uux->bgtxW+
+      top bin fails)? (2) keep the two e+e- 3000 GeV short runs (bbxgz 20/200, wpwmzz 53/200, 0.3% and 0.7% of that energy''s
+      events) or regenerate both pools? (3) the sign-branch repeat run (about 2.5 GPU-h), now that the step-0 log check ruled
+      out a random-number shift? (4) GPU budget: may the continuation of the width-32 16x grid model (about 65 GPU-h, one
+      V100 job) run once FA-ccin2p3-a77e20b8 ends, and do you want the measured from-scratch width-32 control at the same
+      total compute (about 130 GPU-h more)?'
+    at: '2026-11-09T15:45:25+00:00'
+    searched: 'CLAUDE.md; site decisions D269, D294, D317, D322, D325 (2x per class, a guide), D153, D242, D244, D326 (approves
+      the continuation, names no cost): none settles these'
+    blocks: the 1301-class regeneration (step 82), the sign-branch fault trace (step 83), the continuation's code and submission
+      (step 84)
     blocks_steps: &id001
+    - 82
+    - 83
     - 84
   designs:
   - at: '2026-10-29T05:15:16+00:00'
@@ -15316,14 +15332,18 @@ entries:
     files: analysis/catalog_v4/scaling_grid.py, analysis/catalog_v4/data/scaling_grid.json, analysis/catalog_v4/mixture_ab.py
       (extract/val/_held_default), scripts/job_catalog_v3_short.sh (LONG_HP path; LONG_CONT to add), tests/test_sign_branch.py
     written: '2026-11-09T15:43:48+00:00'
-  ask: 'GPU budget: about 65 GPU-h above 30 with no decision covering it: the continuation of the width-32 16x grid model
-    (one V100 job, 68224 more steps, re-warm then WSD) once FA-ccin2p3-a77e20b8 ends; and optionally a measured from-scratch
-    width-32 control at the same total compute, about 130 GPU-h more, without which the comparison is against the width-32
-    curve extended one doubling (an estimate).'
-  waiting_since: '2026-11-09T15:44:30+00:00'
-  searched: 'CLAUDE.md GPU budget rule; site decisions D153, D242, D244, D326 (approves the work, names no cost): none covers
-    65 GPU-h'
-  blocks: step 84's code and submission
+  ask: 'Scope: (1) edge bins before the 1301-class regeneration with the sixth sampler revision: exempt the bins cut by a
+    class''s kinematic maximum (a), or score them with the quota cut to the reachable share (b; then only the uux->bgtxW+
+    top bin fails)? (2) keep the two e+e- 3000 GeV short runs (bbxgz 20/200, wpwmzz 53/200, 0.3% and 0.7% of that energy''s
+    events) or regenerate both pools? (3) the sign-branch repeat run (about 2.5 GPU-h), now that the step-0 log check ruled
+    out a random-number shift? (4) GPU budget: may the continuation of the width-32 16x grid model (about 65 GPU-h, one V100
+    job) run once FA-ccin2p3-a77e20b8 ends, and do you want the measured from-scratch width-32 control at the same total compute
+    (about 130 GPU-h more)?'
+  waiting_since: '2026-11-09T15:45:25+00:00'
+  searched: 'CLAUDE.md; site decisions D269, D294, D317, D322, D325 (2x per class, a guide), D153, D242, D244, D326 (approves
+    the continuation, names no cost): none settles these'
+  blocks: the 1301-class regeneration (step 82), the sign-branch fault trace (step 83), the continuation's code and submission
+    (step 84)
   blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
