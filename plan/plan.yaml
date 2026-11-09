@@ -20402,7 +20402,7 @@ entries:
   question: Does the July divergence-study work on origin/heterosc and origin/l2-gen (sigma head and inspection, starved-base
     L1 sigma-reweighted fine-tuning, online L2 adaptive generation, 91+95 files, mostly analysis/divergences) carry over to
     the current HETEROSC loss, what did its studies find, and how is generation driven by the predicted sigma built on it?
-  status: waiting_user
+  status: running
   quotes: []
   decisions: []
   next: 'Inventory both branches (l2-gen contains heterosc) commit by commit against trunk: what trunk already has in another
@@ -20424,6 +20424,8 @@ entries:
       generation?'
     at: '2026-11-09T23:25:58+00:00'
     searched: D338/D339 approve it; recorded through plan answer
-  ask: 'Scope: fold heterosc/l2-gen into trunk at the current het loss, record results, delete after; then sigma-driven generation?'
-  waiting_since: '2026-11-09T23:25:58+00:00'
-  searched: D338/D339 approve it; recorded through plan answer
+    answered_at: '2026-11-09T23:26:18+00:00'
+    decision: D344
+    withdrawn_at: '2026-11-09T23:26:18+00:00'
+    withdrawn_why: Joaquin approved the fold and the sigma-driven generation in his message of 2026-11-10 (D338, D339; D344
+      covers this entry)
