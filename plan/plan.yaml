@@ -16106,6 +16106,8 @@ entries:
       with main_turns.py
     '17': 'the first real idle moment: plan next listing RESUME/LAUNCH with no FA job live; the supervisor''s own STALLED
       idle: event (or its absence after 45 min) is the trigger'
+    '18': the repo-reviewer's verdict on the batching and supervisor fixes (b1901f40, f47ac235); the reviewer resumes the
+      owner
   owner:
     agent: a3433fbc56e65e68c
     state: stopped
