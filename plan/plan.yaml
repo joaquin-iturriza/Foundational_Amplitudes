@@ -20432,10 +20432,9 @@ entries:
       Q2 tolerance, deep sampling, sigma speed and the ee->uugg loop from the tracked summaries; the October het-loss paragraphs
       from their CC runs, reading not rerunning), correcting any number the reader does not reproduce and saying so; then
       notes-editor (running) and repo-reviewer passes'
-    2: 'Fold the scripts: bring the ~20 scripts sec:div-sampling cites (and the generation path gen_uu_sampling/l2_online/eval_eeuu_resonance)
-      onto trunk ported to siteconf and the current HETEROSC defaults (beta=0, nll select, sigma stage), CPU-tested; the one-off
-      July launchers of the withdrawn diagnosis chain are kept only as history in the branch commits named in results.tex;
-      then delete origin/heterosc, origin/l2-gen, origin/adaptive-ir after review'
+    2: 'Fold everything (D338): port every origin/l2-gen script and sweep config to trunk on siteconf (no Jean Zay paths),
+      the withdrawn diagnosis chain''s one-off launchers included, plus training.is_weight_path, plot_mse''s png, and adaptive_ir.py
+      from origin/adaptive-ir; CPU-tested; after review delete origin/heterosc, origin/l2-gen, origin/adaptive-ir'
   done_when: null
   notes_ref: null
   match: FA-*sigma_gen*,sigma_gen_*
@@ -20519,7 +20518,6 @@ entries:
     2:
       feeds: whether the July code carries over to the current HETEROSC loss and catalog_v4 pipeline
       if:
-      - 'every cited script runs on CPU on trunk: branches deleted'
-      - 'a script depends on a deleted run or JZ-only data: its result is marked unreproducible and the script kept as history'
-  step_waits:
-    '2': 'main session: go after the inventory report (narrowing: report before porting large parts)'
+      - 'every ported script runs its CPU path on trunk: branches deleted after review'
+      - 'a script needs data only on Jean Zay or a deleted run: ported anyway, its dependency named in its docstring'
+  step_waits: {}
