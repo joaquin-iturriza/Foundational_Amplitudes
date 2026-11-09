@@ -14,10 +14,14 @@ fi
 bash scripts/fold_worktree.sh "$WT" --apply
 # git refuses to remove a worktree holding untracked files; --force is used only once every untracked file has an
 # identical copy at the same path in the trunk (the fold put the results there); anything else is listed and kept
-# regenerable caches (__pycache__/ dirs, *.pyc, .pytest_cache/) never count: they are never a result
+# regenerable caches (__pycache__/ dirs, *.pyc, .pytest_cache/) and per-checkout runtime state never count
 left=()
 while IFS= read -r f; do
-    case "$f" in */__pycache__/*|__pycache__/*|*.pyc|.pytest_cache/*|*/.pytest_cache/*) continue ;; esac
+    # per-checkout runtime state (review watermarks, watchdog state, the plan's check cache and state) is bookkeeping of
+    # that checkout, never a result: the trunk holds its own (D334, 13 merged worktrees refused on these alone)
+    case "$f" in */__pycache__/*|__pycache__/*|*.pyc|.pytest_cache/*|*/.pytest_cache/*) continue ;;
+        .claude/.review_state/*|.claude/.watchdog_state.json|.claude/.notes_flushed|plan/.check_cache.json|plan/.state.json) continue ;;
+        docs/*.aux|docs/*.log|docs/*.out|docs/*.toc) continue ;; esac     # LaTeX build products of docs/*.tex
     cmp -s "$WT/$f" "$REPO/$f" || left+=("$f")
 done < <(git -C "$WT" ls-files --others; git -C "$WT" ls-files --others --ignored --exclude-standard)
 if [ ${#left[@]} -gt 0 ]; then
