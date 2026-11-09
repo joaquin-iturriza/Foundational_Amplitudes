@@ -15185,6 +15185,21 @@ entries:
       keys: prebuild FA-ccin2p3-bf203857 built 27a1422795e9872faa6b9eaf, every GPU cell opened 0c897ca2d81c98d3828e2808 (18.03
       GB, 110361200 events): the design''s ''one shared key'' did not hold (the prebuild''s key differs), no effect on the
       cells (each opened the same existing key; both caches later deleted under D310, finding 2026-11-07T03:53).'
+  - at: '2026-11-09T11:22:51+00:00'
+    text: '2026-11-09 step 83 log read (no job; site logs of FA-ccin2p3-54961d3e, 1-block sign branch @411215ce, and FA-ccin2p3-22bc476d,
+      4-block @7fd9221c; both seed 42, V100-SXM2, 4264 steps, 703 batches): the logs carry no main-block validation before
+      the first update (the only ''step 0'' line is the sigma stage''s, of the final models: -2.8636 vs -2.8334) and no per-step
+      training loss, so the earliest comparison is the first validation, step 85: val_loss_no_reg 0.0944 (1-block) vs 0.0688
+      (4-block); per process already different (bb->a b b h 0.432 vs 0.419, bb->bb -0.094 vs -0.109). Both ''Using seed 42''.
+      Construction is not the cause: tests/test_sign_branch.py test_b_init_k (rerun today, 4 passed) asserts the CPU RNG after
+      construction and every trunk parameter bit-equal to the flag-off model for k-block branches (built under fork_rng, then
+      loaded from the trunk''s last k blocks), so the 1- and 4-block trunks start bit-equal; the only training-path code change
+      between the two commits is the branch (models/transformer_lloca_mup.py, models/lloca.py, config/model/lloca.yaml), and
+      the branch''s forward draws no random numbers (model dropout 0.0; frames reused detached). So the trunks diverge during
+      the first 85 steps, not at step 0: GPU nondeterminism amplified by the warm-up (both runs spike: 1-block 1.7e6 at step
+      170, 4-block 1.2e10 at ~680) or a coupling inside training not yet found (clip groups are tested separate, test_d).
+      A same-config repeat of the 1-block arm remains the test that separates the two; it waits on Joaquin''s answer to question
+      (2) (D322).'
   handoff:
     state: '2026-11-07 ~11:00. Step 79 r5 read (data/r5_check.json, r5_acted.json, figs/r5_check.png): FAIL on fill only:
       bbxuu back at quota (35/36 chunks bitwise r2 under _chunk_sig), bgtxwp [-1.206,-0.96] 0.867/0.870 (r3 0.925/0.917),
