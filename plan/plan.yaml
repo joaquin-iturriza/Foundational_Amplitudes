@@ -20441,9 +20441,12 @@ entries:
   match: FA-*sigma_gen*,sigma_gen_*
   evidence:
     runs: []
-    commit: null
+    commit: ecbc632b
     paths:
+    - analysis/divergences/eeuu_resonance_numbers.py
+    - analysis/divergences/figs/l2_eeuu_online_b.png
     - analysis/divergences/l2_conf_summary.json
+    - analysis/divergences/l2_eeuu_online.py
     - analysis/divergences/l2_online_summary.json
     - analysis/divergences/l2_rw_summary.json
     - analysis/divergences/l2_starv_summary.json
