@@ -3516,7 +3516,7 @@ entries:
   title: 'the catalog''s coverage: analysis-level acceptance with the hard regions oversampled'
   question: The catalog's fiducial cuts (|cos theta|<0.9, i.e. |eta|<1.47) were an unsourced regulator and leave out about
     40% of 13 TeV pp events; replace them by analysis-level acceptance and oversample the forward and collinear regions
-  status: running
+  status: held
   quotes:
   - said_at: '2026-10-25T19:28:44.743000+00:00'
     text: Okay, yes to 1 to 3, yes to electroweak production and the smaller fixes, no to the decayed final states
@@ -3692,6 +3692,15 @@ entries:
     answers_after: '2026-11-06T22:36:12+00:00'
     covers:
     - catalog_coverage
+  - said_at: '2026-11-09T19:53:59.278000+00:00'
+    text: Please keep the longer training and everything else that was held well noted, we will keep them on the back burner
+      for now since I was asked to shift gears slightly, make sure nothing of what we've been doing is lost before we move
+      on, any open threads, non discussed results, the current state should be well kept, and if in a few days I ask you to
+      remind me what we were doing, you should answer as if I was asking you right now.
+    decision: D331
+    answers_after: '2026-11-09T15:45:25+00:00'
+    covers:
+    - catalog_coverage
   decisions:
   - D127
   - D130
@@ -3720,6 +3729,7 @@ entries:
   - D258
   - D288
   - D318
+  - D331
   next:
     37: '(b) done: memmap format 3 merged d18e44f1 (finding 2026-11-06). Left: a memmap run now needs a CPU prebuild first
       (scripts/job_mmap_prebuild.sh with the run''s overrides and seed); time the first whole-set build and record it; section
@@ -5536,6 +5546,8 @@ entries:
       go ahead
     blocks_steps:
     - 73
+    answered_at: '2026-11-09T19:53:59.015000+00:00'
+    decision: D331
   - ask: 'Scope: seeds for the sign-head arm, and what ''wider'' than the pp range means for the fill verdict. (1) Four seeds
       (4 V100 jobs, about 9.3 GPU-h) or one (2.3 GPU-h) for the detached sign-head arm? (2) Should the extra half decade above
       the highest pp event count toward the regeneration''s pass or fail, or only be reported?'
@@ -5546,6 +5558,8 @@ entries:
     blocks: the step-73 sign-head submission; the fill rule of the step-75 check
     blocks_steps:
     - 73
+    answered_at: '2026-11-09T19:53:59.015000+00:00'
+    decision: D331
   - ask: 'Scope: seeds for the sign-head arm. Four seeds (4 V100 jobs, about 9.3 GPU-h) or one (2.3 GPU-h) for the detached
       sign-head arm, given that one seed can only show a sign gap larger than about 2x?'
     at: '2026-11-07T05:13:54+00:00'
@@ -5554,6 +5568,8 @@ entries:
     blocks: the step-73 sign-head submission
     blocks_steps:
     - 73
+    answered_at: '2026-11-09T19:53:59.015000+00:00'
+    decision: D331
   - ask: 'Scope: exempting from the coverage bar the bins that straddle a class''s kinematic edge. On bb_bb (top bin, log10|M|^2
       8.34-8.59) and uux_bgtxwp (top bin, -0.96 to -0.71) the highest |M|^2 any sampler ever drew sits inside the bin (8.38
       and -0.94), so only 17% and 9% of the bin''s width is physically reachable and no sampler can fill it to 0.95 of a full-width
@@ -5566,6 +5582,8 @@ entries:
     blocks: the verdict on those two bins in the r2 check and the 1301-class regeneration (the r2 jobs run meanwhile)
     blocks_steps:
     - 78
+    answered_at: '2026-11-09T19:53:59.015000+00:00'
+    decision: D331
   - ask: 'Scope: on bb_bb (top bin 8.34-8.59 in log10|M|^2) and uux_bgtxwp (top bin -0.96 to -0.71), the highest |M|^2 any
       sampler ever drew sits inside the bin (8.38, -0.94), so only 17% and 9% of the bin is reachable. Exempt such edge-straddling
       bins from the 0.95 fill bar like bins wholly above the edge, or score them with the quota cut to the reachable share
@@ -5576,6 +5594,8 @@ entries:
     blocks: the verdict on those two bins and the 1301-class regeneration (step 78's read)
     blocks_steps:
     - 78
+    answered_at: '2026-11-09T19:53:59.015000+00:00'
+    decision: D331
   - ask: 'Scope: the fill bar on bins cut by the kinematic maximum (update with the r2 result). The check scores every 0.25-dex
       bin of log10|M|^2 at >= 0.95 of its quota and exempts bins wholly above the highest |M|^2 any sampler drew (the class''s
       reach). Two bins straddle the reach, so most of their width cannot be filled by any sampler: v4_bb_bb [8.34, 8.585]
@@ -5591,6 +5611,8 @@ entries:
       for uux_bgtxwp's steering goes ahead meanwhile
     blocks_steps:
     - 78
+    answered_at: '2026-11-09T19:53:59.015000+00:00'
+    decision: D331
   - ask: 'Scope: before regenerating the 1301 hadronic classes with the sixth flat-sampler revision (passes on every non-edge
       bin, 0 outside, total cost 1.62x the old): (1) bins cut by a class''s kinematic maximum (bb->bb 8.34, 17% reachable,
       fill 0.19/0.22; bbx->ccxH -3.81, 6% reachable, 0.88/0.85; uux->bgtxW+ -0.96, 9% reachable, 0): exempt them, or score
@@ -5602,6 +5624,8 @@ entries:
     blocks: the 1301-class regeneration with the sixth revision (step 82)
     blocks_steps:
     - 82
+    answered_at: '2026-11-09T19:53:59.015000+00:00'
+    decision: D331
   - ask: 'Scope: (1) before regenerating the 1301 hadronic classes with the sixth flat-sampler revision: exempt the bins cut
       by a class''s kinematic maximum (bb->bb, bbx->ccxH, uux->bgtxW+ top bin) or score them on their reachable share; and
       is the 2x cost bar on the total (1.62x) or per class (19 of 38 over)? (2) Your hold: the deeper sign-branch read is
@@ -5614,6 +5638,8 @@ entries:
     blocks_steps:
     - 82
     - 83
+    answered_at: '2026-11-09T19:53:59.015000+00:00'
+    decision: D331
   - ask: 'Scope: (1) edge bins before the 1301-class regeneration with the sixth sampler revision: exempt the bins cut by
       a class''s kinematic maximum (a), or score them with the quota cut to the reachable share (b; then only the uux->bgtxW+
       top bin fails)? (2) keep the two e+e- 3000 GeV short runs (bbxgz 20/200, wpwmzz 53/200, 0.3% and 0.7% of that energy''s
@@ -5624,6 +5650,8 @@ entries:
     blocks_steps:
     - 82
     - 83
+    answered_at: '2026-11-09T19:53:59.015000+00:00'
+    decision: D331
   - ask: 'GPU budget: about 65 GPU-h above 30 with no decision covering it: the continuation of the width-32 16x grid model
       (one V100 job, 68224 more steps, re-warm then WSD) once FA-ccin2p3-a77e20b8 ends; and optionally a measured from-scratch
       width-32 control at the same total compute, about 130 GPU-h more, without which the comparison is against the width-32
@@ -5634,6 +5662,8 @@ entries:
     blocks: step 84's code and submission
     blocks_steps:
     - 84
+    answered_at: '2026-11-09T19:53:59.015000+00:00'
+    decision: D331
   - ask: 'Scope: (1) edge bins before the 1301-class regeneration with the sixth sampler revision: exempt the bins cut by
       a class''s kinematic maximum (a), or score them with the quota cut to the reachable share (b; then only the uux->bgtxW+
       top bin fails)? (2) keep the two e+e- 3000 GeV short runs (bbxgz 20/200, wpwmzz 53/200, 0.3% and 0.7% of that energy''s
@@ -5646,10 +5676,12 @@ entries:
       the continuation, names no cost): none settles these'
     blocks: the 1301-class regeneration (step 82), the sign-branch fault trace (step 83), the continuation's code and submission
       (step 84)
-    blocks_steps: &id001
+    blocks_steps:
     - 82
     - 83
     - 84
+    answered_at: '2026-11-09T19:53:59.015000+00:00'
+    decision: D331
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -15395,19 +15427,7 @@ entries:
     files: analysis/catalog_v4/scaling_grid.py, analysis/catalog_v4/data/scaling_grid.json, analysis/catalog_v4/mixture_ab.py
       (extract/val/_held_default), scripts/job_catalog_v3_short.sh (LONG_HP path; LONG_CONT to add), tests/test_sign_branch.py
     written: '2026-11-09T15:43:48+00:00'
-  ask: 'Scope: (1) edge bins before the 1301-class regeneration with the sixth sampler revision: exempt the bins cut by a
-    class''s kinematic maximum (a), or score them with the quota cut to the reachable share (b; then only the uux->bgtxW+
-    top bin fails)? (2) keep the two e+e- 3000 GeV short runs (bbxgz 20/200, wpwmzz 53/200, 0.3% and 0.7% of that energy''s
-    events) or regenerate both pools? (3) the sign-branch repeat run (about 2.5 GPU-h), now that the step-0 log check ruled
-    out a random-number shift? (4) GPU budget: may the continuation of the width-32 16x grid model (about 65 GPU-h, one V100
-    job) run once FA-ccin2p3-a77e20b8 ends, and do you want the measured from-scratch width-32 control at the same total compute
-    (about 130 GPU-h more)?'
-  waiting_since: '2026-11-09T15:45:25+00:00'
-  searched: 'CLAUDE.md; site decisions D269, D294, D317, D322, D325 (2x per class, a guide), D153, D242, D244, D326 (approves
-    the continuation, names no cost): none settles these'
-  blocks: the 1301-class regeneration (step 82), the sign-branch fault trace (step 83), the continuation's code and submission
-    (step 84)
-  blocks_steps: *id001
+  hold_decision: D331
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
@@ -17212,7 +17232,7 @@ entries:
     at: '2026-11-07T06:09:21+00:00'
     searched: 'site decisions --project FA: D307 holds change tests until the warm start is fixed; no decision lifts it'
     blocks: the change tests held by D307
-    blocks_steps: &id002 []
+    blocks_steps: &id001 []
   owner:
     agent: ae9049fb82fff3856
     state: stopped
@@ -20268,5 +20288,5 @@ entries:
   waiting_since: '2026-11-07T06:09:21+00:00'
   searched: 'site decisions --project FA: D307 holds change tests until the warm start is fixed; no decision lifts it'
   blocks: the change tests held by D307
-  blocks_steps: *id002
+  blocks_steps: *id001
   checked_until: '2026-11-09T15:47:06+00:00'
