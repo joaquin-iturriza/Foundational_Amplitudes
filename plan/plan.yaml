@@ -12847,7 +12847,7 @@ entries:
       - 'it does not: report where it falls short, propose the WSD-from-start rerun with its GPU-h'
   owner:
     agent: abe4f9535994a7b12
-    state: working
+    state: closed
     since: '2026-11-09T11:11:07+00:00'
     state_at: '2026-11-09T15:42:01+00:00'
     context: 229714
@@ -15287,32 +15287,25 @@ entries:
       now plots held_default (y = MSE / MSE(width 8, 2x)); new scaling_grid_loss (best val_loss_no_reg against C; w8 2x -3.471
       -> w32 8x -5.057).'
   handoff:
-    state: '2026-11-07 ~11:00. Step 79 r5 read (data/r5_check.json, r5_acted.json, figs/r5_check.png): FAIL on fill only:
-      bbxuu back at quota (35/36 chunks bitwise r2 under _chunk_sig), bgtxwp [-1.206,-0.96] 0.867/0.870 (r3 0.925/0.917),
-      cost 1.594x; every short bgtxwp chunk was a stall stop, every budget stop filled. Step 82 r6 = r5 without the stall
-      stop (flat_stall_off, _smixw; design PASS, repo PASS at 3219d30d, merged aae3fd1b): 38 check jobs being submitted by
-      the detached batch r6_submit (ids land in the scratchpad r6_runs.txt and plan run); next 83 says what to do on its DONE
-      event (wait on the ids) and on end (step82r6-pull, step82r6, step82r6-stops, r2_check_fig.py r6). Step 80 sign head:
-      v4_het_signhead_branch4 FA-ccin2p3-22bc476d running (4 detached blocks confirmed in its log: sign_block.blocks.0-3),
-      next 81 waits on it; read het_oneloop.py step80_pull, step80_one (HD5 verdict vs four-seed bands, step80_bands). Straddling-bin
-      scope question still waits on Joaquin.'
-    decisions: 'Sign head: the deeper detached branch (k=4) over a trunk-shared own clip group, because clip 5 against a het
-      pre-clip norm ~66 makes an own clip group a ~13x sign upweighting, the mechanism step 61 showed costs magnitude, and
-      Adam normalises after the clip; step 73''s magnitude ''gain'' (PP4 0.865) is the seed-42 pairing (4-seed shared vs no
-      head 0.987, seed 42 1.13). Verdict on HD5, whose four-seed SD of ln median is 0.086 (band 1.275) against H5''s 0.252
-      (band 2.04): YES HD5 < 13.0% (below every het seed, inside the MSE range 11.15-13.95). Sampler: r6 drops the stall stop
-      since the shortfall sits wholly in stall-stopped chunks and running them to the budget costs about +13% labels (estimate,
-      r5 1.594x -> ~1.8x).'
-    ruled_out: 'sign gradient into the trunk under its own clip group (= upweighting); per-event match on the detached block
-      (inert); flat_empty_near_min alone for bgtxwp (r5: round-1 empty bins are all small in every chunk, so r5 takes r2''s
-      rule there)'
-    running: FA-ccin2p3-22bc476d (step 80, ~2.9 h from 10:50 CET); the r6 submission batch and its 38 CPU jobs (step 83);
-      steps 64/70 scaling grid GPU runs
-    files: models/transformer_lloca_mup.py (sign_branch_blocks, _BlockStack), models/lloca.py, config/model/lloca.yaml, scripts/job_catalog_v3_short.sh
-      (v4_het_signhead_branch4), analysis/catalog_v4/het_oneloop.py (STEP80, step80_bands, step80_one, step80_pull), tests/test_sign_branch.py,
-      mg5_pipeline_final.py (flat_stall_off), tools/regen_recipes.py (R6), analysis/catalog_v4/multichannel_check.py (grid_r6_budget18,
-      _chunk_sig, step82r6*), analysis/catalog_v4/r2_check_fig.py (r6), tests/test_flat_grid.py
-    written: '2026-11-07T09:55:54+00:00'
+    state: '2026-11-09. Step 70 scaling grid: 9 of 10 cells read (scaling_grid.py @be930dd2 -> data/scaling_grid.json; figs/scaling_grid_compute,
+      _loss, _hours, _reads); repo-reviewer PASS (watermark 9b577ea9). w32 16x FA-ccin2p3-a77e20b8 still running; step 70
+      waits on it (plan wait 70), then: site logs -n 3000000 > <dir>/a77e20b8.log, mixture_ab.py extract (12 axes) + val,
+      scaling_grid.py pull, SG_LOGS=<dir> scaling_grid.py read, fig, the design''s verdict from the joint 12-cell and shared-exponent
+      fits (interim over 11: L_inf -> 0, chi2_red 7.1/8.1, NO branch so far), write-up in results.tex. Step 83: log read done
+      (trunks start bit-equal per test_b_init_k; divergence within the first 85 steps); same-config repeat waits on Joaquin''s
+      question (2). Step 84 (D326, continue the largest run): design recorded 2026-11-09 (re-warm + WSD, 68224 more steps
+      from a77e20b8''s final model, against the w32 grid curve extrapolated to 32x; ~65 GPU-h, one V100 job), design-reviewer
+      launched; needs a LONG_CONT job-script switch (repo-reviewed) and Joaquin''s go on ~65 GPU-h; submit only after a77e20b8
+      ends. Steps 82/68 wait on Joaquin''s straddling-bin answer (D325 settled the cost bar: per class, a guide).'
+    decisions: Grid fit errors = per-width 1x seed-pair |ln ratio| (w8 0.032, w16 0.078, w32 0.062); held-out read = pooled
+      held_default (700 classes), HD4 alone kept beside; step 84 starts from the cosine-final model with a fresh optimizer
+      (optstate changed nothing) and WSD so the run leaves a pre-cooldown checkpoint; control = w32 curve extrapolation, measured
+      from-scratch 32x control (~130 GPU-h) offered to Joaquin only.
+    ruled_out: random-number shift at init as the cause of the sign-branch trunk divergence (test_b_init_k)
+    running: FA-ccin2p3-a77e20b8 (grid w32 16x, step 70 waits on it)
+    files: analysis/catalog_v4/scaling_grid.py, analysis/catalog_v4/data/scaling_grid.json, analysis/catalog_v4/mixture_ab.py
+      (extract/val/_held_default), scripts/job_catalog_v3_short.sh (LONG_HP path; LONG_CONT to add), tests/test_sign_branch.py
+    written: '2026-11-09T15:43:48+00:00'
   ask: 'Scope: (1) edge bins before the 1301-class regeneration with the sixth sampler revision: exempt the bins cut by a
     class''s kinematic maximum (a), or score them with the quota cut to the reachable share (b; then only the uux->bgtxW+
     top bin fails)? (2) keep the two e+e- 3000 GeV short runs (bbxgz 20/200, wpwmzz 53/200, 0.3% and 0.7% of that energy''s
