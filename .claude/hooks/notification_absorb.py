@@ -78,19 +78,32 @@ PROJECT = "FA"
 SITE_BIN = os.path.expanduser(os.environ.get("NOTIFY_SITE_BIN", "~/.local/bin/site"))
 
 
-def waiter_alive(project=PROJECT):
-    """The project's events waiter is armed: its pid file names a live `site events --wait` process."""
+def proc_start(pid):
+    """(clock ticks since boot as written in /proc/<pid>/stat field 22, start as epoch seconds) or None."""
     try:
-        pid = int(open(os.path.join(CCORCH, "events_waiter.%s.pid" % project)).read().split()[0])
+        ticks = open("/proc/%d/stat" % pid).read().rsplit(")", 1)[1].split()[19]
+        btime = next(int(l.split()[1]) for l in open("/proc/stat") if l.startswith("btime "))
+        return ticks, btime + int(ticks) / os.sysconf("SC_CLK_TCK")
+    except (OSError, IndexError, ValueError, StopIteration):
+        return None
+
+
+def waiter_alive(project=PROJECT):
+    """The project's events waiter is armed with code that knows HANDBACK: its pid file names a live `site events
+    --wait` process (the start ticks it recorded match the live process's, so a reused pid does not pass) that
+    started after `site` was last changed (an older waiter runs the old code, which treats HANDBACK as urgent and
+    neither prints the report nor acks it)."""
+    try:
+        f = open(os.path.join(CCORCH, "events_waiter.%s.pid" % project)).read().split()
+        pid = int(f[0])
         cmd = open("/proc/%d/cmdline" % pid, "rb").read().replace(b"\0", b" ").decode(errors="replace")
     except (OSError, ValueError, IndexError):
         return False
-    if not ("events" in cmd and "--wait" in cmd):
+    st = proc_start(pid)
+    if not ("events" in cmd and "--wait" in cmd) or not st or (len(f) > 1 and f[1] != st[0]):
         return False
-    # a waiter started before the `site` it runs was last changed runs the old code, which neither collects HANDBACK
-    # events in its window nor prints their reports: spool only to a waiter that knows them
     try:
-        return os.stat("/proc/%d" % pid).st_ctime >= os.stat(SITE_BIN).st_mtime
+        return st[1] >= os.stat(SITE_BIN).st_mtime
     except OSError:
         return False
 

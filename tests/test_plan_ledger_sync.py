@@ -52,6 +52,16 @@ def test_release_from_ledger():
     assert d["entries"][1]["status"] == "held", d
 
 
+def test_forbid_stays_held():
+    # plan answer --kind forbid: entry held under D5 (forbid), the ledger item stays active: not released on read,
+    # whether the forbid is in force or (a later release of something else) not
+    ledger({"a": "active", "b": "active"}, [("D5", "forbid", "a", 1, 1), ("D6", "forbid", "b", 0, 2)])
+    d = {"entries": [{"id": "a", "status": "held", "hold_decision": "D5"},
+                     {"id": "b", "status": "held", "hold_decision": "D6"}]}
+    plan.ledger_sync(d)
+    assert [e["status"] for e in d["entries"]] == ["held", "held"], d
+
+
 def test_held_item_without_decision_unchanged():
     ledger({"a": "held"}, [])
     d = {"entries": [{"id": "a", "status": "running"}]}

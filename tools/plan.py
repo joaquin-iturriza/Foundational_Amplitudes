@@ -177,7 +177,8 @@ def _read():
 def ledger_sync(d):
     """An entry's status follows a hold or release recorded straight in the ledger (`site decide --kind hold|release
     --covers <entries>`): a running or waiting entry whose site item is held becomes held under the hold decision in
-    force that covers it; a held entry whose item is active again (its hold no longer in force) runs. Applied on every
+    force that covers it; a held entry whose item is active again and whose hold (kind hold, not forbid) is no longer
+    in force, with no other hold or forbid in force on it, runs. Applied on every
     read, so plan_check and plan next see it at once; a write persists it. (2026-11-09: D327/D328 held the items and
     left the entries running, so plan_check demanded owners for parked work and the hold was repeated as D331-D333.)"""
     try:
@@ -185,8 +186,9 @@ def ledger_sync(d):
         if c is None:
             return
         items = dict(c.execute("SELECT id, status FROM items WHERE project=?", (PROJECT,)).fetchall())
-        holds = c.execute("SELECT id, covers FROM decisions WHERE project=? AND kind='hold' AND in_force=1 "
-                          "ORDER BY recorded", (PROJECT,)).fetchall()
+        holds = c.execute("SELECT id, covers FROM decisions WHERE project=? AND kind IN ('hold','forbid') AND "
+                          "in_force=1 ORDER BY recorded", (PROJECT,)).fetchall()
+        kinds = dict(c.execute("SELECT id, kind FROM decisions WHERE project=?", (PROJECT,)).fetchall())
     except sqlite3.Error:
         return
     held_by = {}
@@ -197,7 +199,9 @@ def ledger_sync(d):
         it, s = items.get(e.get("id")), e.get("status")
         if it == "held" and s in ("running", "waiting_user") and e["id"] in held_by:
             e["status"], e["hold_decision"] = "held", held_by[e["id"]]
-        elif it == "active" and s == "held" and e.get("hold_decision") and e["id"] not in held_by:
+        elif it == "active" and s == "held" and kinds.get(e.get("hold_decision")) == "hold" and e["id"] not in held_by:
+            # only a hold that is no longer in force releases it; a forbid (plan answer --kind forbid) leaves the item
+            # active in the ledger and the entry held
             e["status"] = "running"
             e.pop("hold_decision", None)
 

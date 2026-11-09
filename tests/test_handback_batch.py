@@ -40,10 +40,11 @@ def test_handback_of():
     assert na.handback_of("Joaquin here, what is the state?") is None
 
 
-def fake_waiter(alive=True):
+def fake_waiter(alive=True, ticks=None):
     p = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)", "site", "events", "--wait"])
+    time.sleep(0.2)
     with open(os.path.join(TMP, "events_waiter.FA.pid"), "w") as f:
-        f.write("%d 0" % p.pid)
+        f.write("%d %s" % (p.pid, ticks or na.proc_start(p.pid)[0]))     # as site writes it (_proc_start)
     if not alive:
         p.kill(); p.wait()
     return p
@@ -79,7 +80,14 @@ def test_hook_spools_only_with_live_waiter():
     p = fake_waiter(alive=True)
     try:
         os.utime(na.SITE_BIN_TEST, (time.time() + 3600, time.time() + 3600))
-        assert run_hook(data, site) == "", "a waiter older than its site code: passes"
+        assert run_hook(data, site) == "", "a waiter that started before its site code changed: passes"
+        os.utime(na.SITE_BIN_TEST, (time.time() - 3600, time.time() - 3600))
+        assert na.waiter_alive(), "a waiter started after the change"
+        start = na.proc_start(p.pid)[1]
+        assert abs(start - time.time()) < 30, "real start time, not the /proc inode's ctime: %.0f s off" % (
+            start - time.time())
+        os.utime(na.SITE_BIN_TEST, (start + 5, start + 5))
+        assert not na.waiter_alive(), "site changed 5 s after the waiter started"
         os.utime(na.SITE_BIN_TEST, (0, 0))
         assert run_hook(dict(data, agent_id="a0123456789abcdef"), site) == "", "inside an agent: passes"
         assert run_hook(dict(data, prompt="what is the state?"), site) == "", "typed text: passes"
@@ -91,6 +99,11 @@ def test_hook_spools_only_with_live_waiter():
         assert open(spooled).read() == HB
         bad, _ = stub_site(1)
         assert run_hook(data, bad) == "", "site event failed: the prompt goes through"
+    finally:
+        p.kill(); p.wait()
+    p = fake_waiter(alive=True, ticks="12345")
+    try:
+        assert not na.waiter_alive(), "pid file's start ticks differ from the live process (a reused pid)"
     finally:
         p.kill(); p.wait()
 
@@ -140,6 +153,29 @@ def test_waiter_fixed_window_and_delivery():
     assert c.execute("SELECT acked, ack_note FROM events WHERE kind='HANDBACK'").fetchone()[1] == \
         "delivered by the events waiter"
     assert c.execute("SELECT COUNT(*) FROM events WHERE kind='RUN_DONE' AND acked IS NULL").fetchone()[0] >= 2
+
+
+def test_new_only_waiter_takes_an_open_handback():
+    # a HANDBACK left open by a waiter that ended or was re-armed in its window is delivered by the next --new-only
+    # waiter (never counted as already seen); its window counts from when it opened, so an old one returns at once
+    m = load_site(os.path.join(TMP, "runs3.db"))
+    rep = os.path.join(TMP, "spooled3.txt")
+    open(rep, "w").write(HB)
+    c = m.ldb()
+    m.add_event(c, "ZZ", None, "HANDBACK", "handback:y:1", "hand-back from %s: x | report: %s" % (A, rep))
+    c.execute("UPDATE events SET ts=ts-700")
+    c.commit()
+    m.add_event(c, "ZZ", "e", "RUN_DONE", "runs:old", "an older routine event, already seen")
+    out, took = waiter(m, 600, lambda m: None)
+    assert REPORT.splitlines()[0] in out and "runs:old" not in out and took < 5, (took, out)
+    assert m.ldb().execute("SELECT acked FROM events WHERE kind='HANDBACK'").fetchone()[0]
+
+
+def test_default_debounce_is_600():
+    m = load_site(os.path.join(TMP, "runs4.db"))
+    out = subprocess.run([sys.executable, os.path.expanduser("~/.local/bin/site"), "events", "--help"],
+                         capture_output=True, text=True).stdout
+    assert "default 600" in " ".join(out.split()), out
 
 
 def test_waiter_urgent_returns_at_once():
