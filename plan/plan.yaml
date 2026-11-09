@@ -12184,6 +12184,35 @@ entries:
       (above by > 6.2%): the cosine-final start costs; report where (curve, held_default), propose a WSD-from-start width-32
       run with its GPU-h. Blow-up: listed apart with where, never dropped. GPU-h ~65 > 30: the estimate goes to Joaquin before
       submission (D326 approves the work, not a cost); submit only after a77e20b8 ends.'
+    fix_at: '2026-11-09T15:45:37+00:00'
+    fix: '1 (one change, matched control): the continuation runs a WSD schedule (re-warm, stable, cooldown over the last eighth)
+      while the reference is the cosine width-32 grid curve, so continuation and schedule change together. The warm-start
+      study already measured that WSD alone gives a better model (results.tex par:v4_warm_start_fixes: WSD parent val -2.909
+      against the cosine parent''s -2.858; its final model reads 0.759 pp / 0.832 e+e- of the cosine control; that paragraph
+      itself says ''a parent that pretrains better under WSD makes a from-scratch change under WSD likely better as well'',
+      and step 15 built a WSD from-scratch control, B_wsd, for exactly this reason). BETTER here could be the schedule, not
+      the continuation, and the entry''s fork is continuation against a WSD-from-start rerun, whose from-scratch reference
+      is WSD, not cosine. Fix: either put the schedule''s gain into the reference (state the measured WSD-over-cosine factor
+      and its interval, and what BETTER/EQUAL/WORSE mean after it) or make the stated comparison ''continuation+WSD against
+      cosine from scratch'' with the conclusion limited to that, and say what then decides against the WSD-from-start rerun.
+      3 (spread): the 6.2% band is the seed spread of one run, but the reference is a two-point extrapolation L_32x = L_16x^2/L_8x,
+      whose seed error alone is sqrt(5) x 6.2% = 13.9% (ln L_32x = 2 ln L_16x - ln L_8x), plus the curve-shape error: the
+      same two-point step backtested on the grid (scaling_grid.json) predicts w8 16x 0.01345 against measured 0.01226 (+9.7%)
+      and w16 16x 0.00406 against 0.00482 (-15.8%); per-doubling ratios drift 0.57-0.81 within a width, the per-width law
+      fits for w8/w16 give L_inf > 0 (0.0102, 0.0032), and Joaquin noted the longest run ''seems to be plateauing'' (D292),
+      so the bare step is biased low. Fix: the band is the extrapolation''s error (propagated seed error and the backtest
+      on w8/w16, about 15-20% combined with the continuation''s own 6.2%), and the design states the smallest effect worth
+      acting on and whether it stands above that band; if it does not, the measured matched control (~130 GPU-h) or a cheaper
+      resolvable reference goes to Joaquin as the question, with what the estimate-only read can and cannot tell. 4 (outcome):
+      BETTER/EQUAL/WORSE are set at +-6.2%, inside the reference''s own error, so EQUAL and either side are not separable;
+      restate them on the corrected band and the schedule-corrected reference. 5 (prior): the prior lists the WSD restart
+      results but omits the WSD-over-cosine from-scratch gain (par:v4_warm_start_fixes, step 15 B_wsd) and results.tex''s
+      own caution about it; add it with its numbers. 14 (disk): no disk per job or free disk stated; give a77e20b8''s disk
+      (run dir, checkpoints with LONG_CKPT, the memmap cache and whether the continuation opens the grid''s existing cache,
+      shown by its key) against CC''s free disk read now. Passed: 2 (L 0.00879/0.00504/0.00300 and best val NLL -4.337/-4.705/-5.057
+      confirmed in analysis/catalog_v4/data/scaling_grid.json; the measure moves ~x0.6 per doubling), 6, 7 (D326 names no
+      reference), 8, 9 (het loss, D71), 10 (training pools'' validation and pooled held_default as the grid), 11 (the grid''s
+      settled setup), 13 (no sweep; lr at the window law, stated untuned), GPU-h ~65 to Joaquin before submit.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
