@@ -14,10 +14,18 @@ This hook blocks that prompt, so no model call is made on it, only when all hold
   - the transcript holds a hand-back message from that same agent (the report did reach this session).
 Anything else (a notification with the report inline, an agent waiting on its own work, a failed or killed agent,
 a background command, typed text) passes untouched. A crash exits 1 (non-blocking: the prompt goes through).
+
+Hand-back batching (D324, Joaquin 2026-11-07: "10 minutes seems reasonable"): a prompt that is one agent's hand-back
+and nothing else, arriving in the main session (no agent_id) while its events waiter (`site events --wait`, pid file
+~/.local/share/ccorch/events_waiter.FA.pid) is alive and was started after `site` last changed, is written to ~/.local/share/ccorch/spool/FA/ and opened as a
+routine HANDBACK event (`site event`); the prompt is blocked. The waiter collects routine events for a fixed
+--debounce window (600 s) from the first, then prints each spooled report in full and acks it: hand-backs, run ends and
+other routine events of one 10-minute window wake the main session once. No waiter alive, a failed `site event`, a
+prompt holding anything else (typed text, a second message): the prompt goes through untouched.
     python3 notification_absorb.py            (hook input on stdin)
     python3 notification_absorb.py --check <transcript.jsonl> <prompt file>    the verdict, for tests and replays
 """
-import json, re, sys
+import hashlib, json, os, re, subprocess, sys, time
 
 AGENT = re.compile(r"<task-id>(a[0-9a-f]{16})</task-id>")
 DELIVERED = re.compile(r"report was delivered to you as a message from \"?(a[0-9a-f]{16})\"? \(its SubagentHandback call\)")
@@ -62,6 +70,66 @@ def verdict(prompt, transcript):
     return True, agent
 
 
+HANDBACK = re.compile(r'\AAnother Claude session sent a message:\s*<agent-message from="(a[0-9a-f]{16})">\s*'
+                      r'\[Subagent hand-back\]')
+TRAILER = 'That "other Claude session" is an agent working inside this same session'
+CCORCH = os.path.expanduser(os.environ.get("NOTIFY_CCORCH_HOME", "~/.local/share/ccorch"))
+PROJECT = "FA"
+SITE_BIN = os.path.expanduser(os.environ.get("NOTIFY_SITE_BIN", "~/.local/bin/site"))
+
+
+def waiter_alive(project=PROJECT):
+    """The project's events waiter is armed: its pid file names a live `site events --wait` process."""
+    try:
+        pid = int(open(os.path.join(CCORCH, "events_waiter.%s.pid" % project)).read().split()[0])
+        cmd = open("/proc/%d/cmdline" % pid, "rb").read().replace(b"\0", b" ").decode(errors="replace")
+    except (OSError, ValueError, IndexError):
+        return False
+    if not ("events" in cmd and "--wait" in cmd):
+        return False
+    # a waiter started before the `site` it runs was last changed runs the old code, which neither collects HANDBACK
+    # events in its window nor prints their reports: spool only to a waiter that knows them
+    try:
+        return os.stat("/proc/%d" % pid).st_ctime >= os.stat(SITE_BIN).st_mtime
+    except OSError:
+        return False
+
+
+def handback_of(prompt):
+    """The agent id when the prompt is exactly one hand-back (and the harness's standard note after it), else None."""
+    s = (prompt or "").strip()
+    m = HANDBACK.match(s)
+    if not m or s.count("<agent-message") != 1:
+        return None
+    end = s.find("</agent-message>")
+    if end < 0:
+        return None
+    rest = s[end + len("</agent-message>"):].strip()
+    if rest and not rest.startswith(TRAILER):
+        return None
+    if rest.count("<") or rest.count("[") or "\n\n" in rest:     # anything after the standard note may be new
+        return None
+    return m.group(1)
+
+
+def spool(prompt, agent, site=("site",)):
+    """(ok, event line): the report written to the spool and opened as a HANDBACK event."""
+    d = os.path.join(CCORCH, "spool", PROJECT)
+    os.makedirs(d, exist_ok=True)
+    h = hashlib.sha1(prompt.encode()).hexdigest()[:10]
+    path = os.path.join(d, "%d_%s_%s.txt" % (time.time(), agent, h))
+    with open(path, "w") as f:
+        f.write(prompt)
+    body = prompt.split("The report follows:", 1)[-1].strip().splitlines()
+    first = " ".join((body[0] if body else "").split())[:160]
+    r = subprocess.run(list(site) + ["event", "--project", PROJECT, "--kind", "HANDBACK", "--key",
+                                     "handback:%s:%s" % (agent, h), "--msg",
+                                     "hand-back from %s: %s | report: %s" % (agent, first, path)],
+                       capture_output=True, text=True, timeout=60)
+    ok = r.returncode == 0 and re.search(r"\bE\d+\b", r.stdout or "")
+    return bool(ok), (r.stdout or r.stderr or "").strip()[-200:]
+
+
 def main():
     if len(sys.argv) == 4 and sys.argv[1] == "--check":
         with open(sys.argv[3]) as f:
@@ -70,7 +138,15 @@ def main():
     d = json.load(sys.stdin)
     if d.get("hook_event_name", "UserPromptSubmit") != "UserPromptSubmit":
         return 0
-    block, why = verdict(str(d.get("prompt") or ""), d.get("transcript_path"))
+    prompt = str(d.get("prompt") or "")
+    agent = None if d.get("agent_id") else handback_of(prompt)
+    if agent and waiter_alive():
+        ok, line = spool(prompt, agent)
+        if ok:
+            print(json.dumps({"decision": "block", "reason": "hand-back of %s spooled for the 10-minute batch (%s); "
+                              "the events waiter delivers it" % (agent, line)}))
+            return 0
+    block, why = verdict(prompt, d.get("transcript_path"))
     if block:
         print(json.dumps({"decision": "block",
                           "reason": "agent %s finished; its report was already delivered by its hand-back" % why}))
