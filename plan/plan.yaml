@@ -3734,10 +3734,11 @@ entries:
       step 67 settles; step 66 measured at budget 750 without the forward fix: SHORT, cost 105-111x the old, upper-side 375
       core-h over the 170 (old 3.38). Open inside it: the 55 held-out e+e- classes'' range comes from the 2000-event EE4 pool
       they are scored on (label-in-inputs: generate default events for them, or accept)'
-    70: '(i) scaling grid seed 42: prebuild FA-ccin2p3-bf203857 then 10 GPU jobs (34cfff0c c53b8e51 ff309c2d 1b1a8f6e b07d6237
-      4ba33195 8a523b67 8b543518 4d6e9b06 a77e20b8, afterok on the prebuild), wait on step 64; read per the passed design
-      (joint 12-cell fit, shared-exponent fit, per-width length fits; reused w8 4x/16x trial_1262); quote the prebuild''s
-      cache key and one GPU job''s key; record each cell''s GPU.'
+    70: '(i) scaling grid: 9 of 10 new cells read (finding 2026-11-09, scaling_grid.py @c2dec101). Left: when FA-ccin2p3-a77e20b8
+      (w32 16x) ends: fetch its log (site logs -n 3000000 > <logs>/a77e20b8.log), mixture_ab.py extract (12 axes) and val,
+      scaling_grid.py pull, SG_LOGS=<logs> scaling_grid.py read, fig; then the design''s verdict from the joint 12-cell fit
+      (i) and the shared-exponent fit (iv), w32''s per-width fit (ii), and the write-up in docs/results.tex (par:v4_width
+      successor) with % src/claim lines.'
     82: '(t4) r6 passed the step-82 design on every non-straddling bin (finding 2026-11-07 step 83: bgtxwp 0.973/0.974, outside
       0, summed cost 1.621x). Regenerate the 1301 hadronic classes with R6 (tools/regen_recipes.R6, pools _smixw), read by
       regen_read.py with the same bars, then step 68. Waits on Joaquin: the straddling-bin scope answer (under r6 it reduces
@@ -12108,8 +12109,6 @@ entries:
     '37': steps 61 and 64 of this entry (the first memmap GPU batch); the prebuild is chained before that batch
     '64': FA-ccin2p3-34cfff0c FA-ccin2p3-c53b8e51 FA-ccin2p3-ff309c2d FA-ccin2p3-1b1a8f6e FA-ccin2p3-b07d6237 FA-ccin2p3-4ba33195
       FA-ccin2p3-8a523b67 FA-ccin2p3-8b543518 FA-ccin2p3-4d6e9b06 FA-ccin2p3-a77e20b8
-    '70': FA-ccin2p3-34cfff0c FA-ccin2p3-c53b8e51 FA-ccin2p3-ff309c2d FA-ccin2p3-1b1a8f6e FA-ccin2p3-b07d6237 FA-ccin2p3-4ba33195
-      FA-ccin2p3-8a523b67 FA-ccin2p3-8b543518 FA-ccin2p3-4d6e9b06 FA-ccin2p3-a77e20b8
     '68': 'the adaptive-grid sampler check (step 72) and the 365 GeV rerun of step 71: they choose the e+e- sampler and the
       anchor energies'
   targets:
@@ -12765,10 +12764,13 @@ entries:
       - 'step 67 YES/NEAR: e+e- classes in step 65''s design with the forward fix and its measured cost'
       - 'step 67 PARTIAL/NO: e+e- classes wait on the next channel read, hadronic regeneration not held by them'
     70:
-      feeds: the compute scaling at >= 1 epoch (D292, D293, D314)
+      feeds: 'the compute scaling at >= 1 epoch (D292, D293, D314): alpha, L_inf and which width and length the pretraining
+        candidate takes at a GPU budget'
       if:
-      - 'one law fits (joint chi2_red <= 3): candidate on the fitted frontier'
-      - 'misfit: per-width or shared-exponent read, candidate from the measured cells'
+      - 'YES (joint chi2_red <= 3, L_inf inside the grid): alpha and L_inf quoted, candidate on the compute frontier'
+      - 'PARTIAL (only shared exponent holds): one alpha and L_inf, candidate the width with the lowest curve at the budget'
+      - 'NO (both misfit or L_inf -> 0, as the 11-cell interim): no law claimed, candidate from the measured cells by loss
+        per GPU-hour (width 32 so far)'
     82:
       feeds: whether the catalog's hadronic pools are regenerated with the r6 sampler
       if:
