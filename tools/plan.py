@@ -1278,7 +1278,10 @@ def next_steps_keyed(d, st, t=None, msgs=None):
         held = blocked_steps(e) if e.get("status") == "running" else set()
         for k in step_keys(e) if e.get("status") == "running" else [None]:
             r = why_moves(e, st, msgs, t, d, checks, sweeps, key=k)
-            if r and k in (e.get("step_waits") or {}) or r and str(k) in (e.get("step_waits") or {}):
+            wk = (e.get("step_waits") or {}).get(str(k)) or (e.get("step_waits") or {}).get(k)
+            if r and wk is not None and wait_due(wk, t):
+                r = ("step %s waited until %s: the date has come" % (k, wait_date(wk).isoformat()[:16]), None)
+            elif r and k in (e.get("step_waits") or {}) or r and str(k) in (e.get("step_waits") or {}):
                 note("%s step %d waits on %s (plan wait); not listed until plan unwait" % (
                     e["id"], k, (e.get("step_waits") or {}).get(str(k))))
                 continue
@@ -1483,6 +1486,23 @@ def wait_run_ids(text):
     return sorted(ids)
 
 
+def wait_date(text):
+    """The date a wait names when it names no run (`plan wait N --on 2026-11-17`, or "on or after 2026-11-17T09:00"):
+    the step wakes nothing until then; None for a wait on runs or with no date."""
+    if not text or wait_run_ids(text):
+        return None
+    m = re.search(r"\b(20\d\d-\d\d-\d\d)(?:[T ](\d\d:\d\d))?", str(text))
+    if not m:
+        return None
+    return dt.datetime.fromisoformat(m.group(1) + "T" + (m.group(2) or "00:00") + ":00+00:00")
+
+
+def wait_due(text, t=None):
+    """A date wait whose date has come: the step is ready again."""
+    d = wait_date(text)
+    return bool(d) and d <= (t or now())
+
+
 def waited_runs_ended(text):
     """True when a plan-wait text names registry run ids (wait_run_ids: full ids and resolved bare suffixes) and every
     one has ended (state read from the run registry); a text without run ids, or an id the registry does not know, is
@@ -1502,22 +1522,70 @@ def waited_runs_ended(text):
 
 
 def entry_reason(e, st, msgs, t, d, checks, sweeps):
-    """(reason, since) of the first next step of a running entry that can move (waits and held steps left out)."""
+    """(reason, since) of a running entry's next steps that can move (waits and held steps left out), every one of
+    them in one reason (2026-11-09: steps 18, 19 and 21 came back one stop refusal at a time). A date wait (wait_date)
+    is left out until its date, then listed."""
     held = blocked_steps(e)
+    ready, other = [], None
     for k in step_keys(e):
         w = (e.get("step_waits") or {}).get(k) or (e.get("step_waits") or {}).get(str(k))
         if w and k not in held and waited_runs_ended(w):
             return ("step %s waited on %s: those runs have ended (plan unwait it once read)" % (k, w[:120]), None)
+        if w and k not in held and wait_due(w, t):
+            ready.append((k, ("step %s waited until %s: the date has come (plan unwait it and take it)" % (
+                k, wait_date(w).isoformat()[:16]), None)))
+            continue
         if k in held or k in (e.get("step_waits") or {}) or str(k) in (e.get("step_waits") or {}):
             continue
         r = why_moves(e, st, msgs, t, d, checks, sweeps, key=k)
         if r and r[0].startswith("nothing in flight"):
             # per step (2026-11-05): a step with no wait and no hold, nothing of its own in flight, is READY whatever
             # else the entry has live; a stopped owner that wrote after the switch-over date does not make it so
-            r = ("ready step %s of %s has no one working on it: %s" % (k, e["id"], r[0]), r[1])
-        if r:
-            return r
-    return None
+            ready.append((k, r))
+        elif r and not other:
+            other = r
+    if ready:
+        ks = ", ".join(str(k) for k, _ in ready)
+        return ("ready step%s %s of %s ha%s no one working on %s: %s" % (
+            "s" if len(ready) > 1 else "", ks, e["id"], "ve" if len(ready) > 1 else "s",
+            "them" if len(ready) > 1 else "it", "; ".join(r[0][:160] for _, r in ready)), ready[0][1][1])
+    return other
+
+
+def leave_problems(eid, t=None):
+    """What an owner leaving its turn has not covered: every next step of the running entry `eid` that is neither in
+    flight, nor under `plan wait` (a date wait included), nor held by an open question, in one list. An owner ends its
+    turn only when this is empty (2026-11-09: steps 18, 19 and 21 were left 'ready, no one working' though they waited
+    on a reviewer and on a date; the main session's stop was refused once per step)."""
+    t = t or now()
+    d, st = load()
+    e = entry(d, eid)
+    if e.get("status") != "running":
+        return []
+    msgs = messages(oldest_open(d, st))
+    checks = item_checks([eid])
+    sweeps = site_sweeps(want_of(st, [eid]), all_sites=False)
+    held = blocked_steps(e)
+    out = []
+    for k in step_keys(e):
+        w = (e.get("step_waits") or {}).get(str(k)) or (e.get("step_waits") or {}).get(k)
+        if k in held or (w and not waited_runs_ended(w) and not wait_due(w, t)):
+            continue
+        r = why_moves(e, st, msgs, t, d, checks, sweeps, key=k)
+        if r and r[0].startswith("nothing in flight"):
+            out.append("step %s: %s" % (k, (dict(nexts(e)).get(k) or "")[:90]))
+        elif w:
+            out.append("step %s: its wait (%s) is over" % (k, str(w)[:60]))
+    return out
+
+
+def cmd_leave_check(a):
+    bad = leave_problems(a.id)
+    if bad:
+        sys.exit("plan: %s: before ending your turn, put each of these in flight, under `plan wait %s <step> --on "
+                 "<run ids | a date YYYY-MM-DD | what it waits on>`, or drop it (plan drop-next):\n  %s"
+                 % (a.id, a.id, "\n  ".join(bad)))
+    print("plan: %s: every next step is in flight, waited on or held" % a.id)
 
 
 def owner_actions(d, st, t=None, msgs=None, events=None):
@@ -1982,9 +2050,13 @@ def entry_status(d, st, events=None):
         if ended:
             ids = sorted({r for _k, w in ended for r in wait_run_ids(w)})
             why.append("steps %s wait on runs that ended (%s)" % (", ".join(str(k) for k, _w in ended), ", ".join(ids)))
+        due = [str(k) for k, w in sorted((e.get("step_waits") or {}).items(), key=lambda kv: str(kv[0]))
+               if w and wait_due(w)]
+        if due:
+            why.append("steps %s waited until a date that has come" % ", ".join(due))
         timed = [str(w) for _k, w in sorted((e.get("step_waits") or {}).items(), key=lambda kv: str(kv[0]))
-                 if w and not wait_run_ids(w)]
-        if timed and not evs and not ended:       # a wait that names no run (a day of clean running): not a stall
+                 if w and not wait_run_ids(w) and not wait_due(w)]
+        if timed and not evs and not ended and not due:       # a wait that names no run (a day of clean running): not a stall
             out.append((eid, "WAITING", "; ".join(timed)))
             continue
         if not why and not (e.get("step_waits") or {}):
@@ -3360,6 +3432,8 @@ def main(argv=None):
     cmd("wait", cmd_wait, "step N waits on something outside the turn: noted, never demanded, until unwait", ID,
         A("n", type=int, help="the step"), A("--on", required=True, help="what it waits on"))
     cmd("unwait", cmd_unwait, "step N no longer waits", ID, A("n", type=int, help="the step"))
+    cmd("leave-check", cmd_leave_check, "an owner's last check before ending its turn: every next step in flight, "
+        "waited on or held", ID)
     cmd("add-next", cmd_add_next, "add an independent next step to the entry", ID, A("text", help="the step"),
         *WHY_ARGS)
     cmd("drop-next", cmd_drop_next, "remove next step N (finished, nothing follows it)", ID,

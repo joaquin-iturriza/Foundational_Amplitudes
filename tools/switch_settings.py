@@ -19,6 +19,8 @@ The agent redesign's switch-overs (impl_order.txt), each from the previous one's
   D   the owners: PreToolUse(Agent) brief_guard.py; context_push.py pre (acts), post (reads and acts) and session
       (SessionStart); PostToolUse(Agent|SendMessage) owner_context.py (timeout 60), which also switches the plan to
       owners; PostToolUse(Bash|Edit|Write|MultiEdit|NotebookEdit) delegation_note.py (project file only)
+  L   the owner leave-check (D337): SubagentStop plan_check.py (timeout 300), which on that event checks only that a
+      running entry's owner leaves every next step in flight, waited on or held (project file only)
     python3 tools/switch_settings.py --switch A|B [--patch FILE]     the diff of both files (a patch: patch -d / -p1)
     python3 tools/switch_settings.py --switch A|B --apply            each changed file saved as <file>.pre<A|B> first
     python3 tools/switch_settings.py --revert A|B                    the .pre<A|B> files put back"""
@@ -134,6 +136,15 @@ def hook_set_d(s):
     return s
 
 
+def hook_set_l(s):
+    """L, from the current project file: plan_check.py on SubagentStop (D337), nothing else changed."""
+    s = copy.deepcopy(s)
+    groups = s.setdefault("hooks", {}).setdefault("SubagentStop", [])
+    if not any(h["command"] == DISPATCH_P + "plan_check.py" for g in groups for h in g["hooks"]):
+        groups.append({"hooks": [{"type": "command", "command": DISPATCH_P + "plan_check.py", "timeout": 300}]})
+    return s
+
+
 def _text(obj, path):
     """the file's own JSON style (the user file is ASCII-escaped, the project file is not)."""
     cur = open(path).read()
@@ -153,13 +164,15 @@ def switch_over(which, project, user):
         out.append((project, _text(hook_set_b(through_dispatch(p)), project)))
     elif which == "D":
         out.append((project, _text(hook_set_d(hook_set_b(through_dispatch(p))), project)))
+    elif which == "L":
+        out.append((project, _text(hook_set_l(p), project)))
     return [(f, t) for f, t in out if t != open(f).read()]
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser()
-    ap.add_argument("--switch", choices=("A", "B", "D"))
-    ap.add_argument("--revert", choices=("A", "B", "D"))
+    ap.add_argument("--switch", choices=("A", "B", "D", "L"))
+    ap.add_argument("--revert", choices=("A", "B", "D", "L"))
     ap.add_argument("--patch", help="--switch: write the diff here as a patch (apply: patch -d / -p1 < FILE)")
     ap.add_argument("--user-settings", default=USER_SETTINGS)
     ap.add_argument("--settings", default=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),

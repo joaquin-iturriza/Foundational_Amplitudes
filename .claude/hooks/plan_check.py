@@ -332,6 +332,34 @@ def report_once(st, once):
     return new
 
 
+def leave_check(inp):
+    """SubagentStop (D337): the only check at an agent's stop. An agent that is a running entry's recorded owner ends
+    its turn only with every next step of its entry in flight, under `plan wait` (a date wait included) or held by an
+    open question, all the uncovered ones named in one refusal (2026-11-09: steps 18, 19 and 21 left uncovered, the
+    main session refused once per step). Any other agent passes: the main session's gate is not applied to agents."""
+    try:
+        import plan
+        aid = inp.get("agent_id")
+        if not aid:
+            return 0
+        d, _st = plan.load()
+        bad = []
+        for e in d["entries"]:
+            if e.get("status") == "running" and (e.get("owner") or {}).get("agent") == aid:
+                left = plan.leave_problems(e["id"])
+                if left:
+                    bad.append("%s: steps you leave uncovered; put each in flight, under `plan wait %s <step> --on "
+                               "<run ids | a date YYYY-MM-DD | what it waits on>`, or drop it (plan drop-next): %s" % (
+                                   e["id"], e["id"], "; ".join(left)))
+    except Exception as ex:                       # fail closed, as the Stop gate
+        sys.stderr.write("plan leave-check failed (%r); fix it before ending the turn\n" % ex)
+        return 2
+    if bad:
+        sys.stderr.write("PLAN CHECK: the turn cannot end yet.\n" + "\n".join("  " + b for b in bad) + "\n")
+        return 2
+    return 0
+
+
 def main():
     try:
         try:
@@ -339,7 +367,9 @@ def main():
         except ValueError:
             inp = {}
         inp = inp if isinstance(inp, dict) else {}
-        main_session = not (inp.get("agent_id") or inp.get("agent_type"))
+        if inp.get("hook_event_name") == "SubagentStop":
+            return leave_check(inp)
+        main_session =not (inp.get("agent_id") or inp.get("agent_type"))
         booked = bookkeep_owners(inp.get("transcript_path")) if main_session and inp.get("transcript_path") else []
         bad, once, st = problems()
         import plan

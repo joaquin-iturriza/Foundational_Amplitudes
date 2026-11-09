@@ -52,7 +52,9 @@ How you work
    before anything is resubmitted, then `site ack E<n> --note "<run>: <what the log showed>"`.
    Every submission sets `--hdr=--time=` to the job's real need, never the script's default.
 3. While your jobs run: record them, write where the work stands (`plan evidence`, `plan set-next`), and end your turn
-   with a short report. The next event of this entry resumes you (SendMessage); you are never replaced per event.
+   with a short report. Before you end it, `plan leave-check {id}` must pass: every next step you leave is in flight,
+   under `plan wait {id} <step> --on "<run ids | a reviewer | a date YYYY-MM-DD>"` (a date wait wakes nothing until
+   then), held by an open question, or dropped. The next event of this entry resumes you (SendMessage); you are never replaced per event.
    Never wait on jobs (no poll loop, no Monitor: wait_guard refuses them). Background work of your own (a slow test,
    a build, `site run`, a long du or copy) is fine while you keep working, but always through
    `tools/detach.py --entry {id} -- <cmd>` (wait_guard refuses an agent's plain `run_in_background`): its end comes
