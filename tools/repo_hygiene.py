@@ -4,12 +4,18 @@ set up so this can't happen again"). Run by the supervisor's maintain pass; a no
     python3 tools/repo_hygiene.py [--fold-agents] [--no-fetch] [--json]
 
 --fold-agents  every Agent-isolation worktree (.claude/worktrees/agent-<id>) whose agent has ended (its transcript's last
-               assistant message ended the turn or called SubagentHandback, and nothing was written for 15 min; or no
-               transcript at all) and whose HEAD is in trunk is folded and removed with scripts/remove_worktree.sh
-               (results folded into the trunk, the worktree removed, its branch deleted here and on origin).
+               assistant message ended the turn or called SubagentHandback, and nothing was written for 15 min) and
+               whose HEAD is in trunk is folded and removed with scripts/remove_worktree.sh (results folded into the
+               trunk, the worktree removed, its branch deleted here and on origin). Never folded: an agent with no
+               transcript found (its state is unknown, so it is listed), and an agent that is a plan entry's recorded
+               owner (a stopped owner waiting on jobs looks ended; a closed one is listed for a person).
+Not listed: a running agent's worktree, a live owner's, and an open model-trial arm (a detached worktrees/zz_trial_<task>_<arm>
+whose run analysis/agent_redesign/model_trial.json has not recorded yet).
 The check (always): what live work does not explain, each listed with why:
   worktree_merged     a worktree (not the main checkout) whose HEAD is in trunk and that is not an agent's running one
+  agent_unknown       an agent worktree whose agent has no transcript under HYGIENE_TRANSCRIPTS (never folded)
   agent_unmerged      an ended agent's worktree with commits trunk lacks (folding it would lose them: a person decides)
+  trial_done          a model-trial arm whose run is recorded (remove it with scripts/remove_worktree.sh <wt> --discard)
   branch_merged       a local branch other than trunk/main, checked out in no worktree, already in trunk
   branch_orphan       a local branch other than trunk/main, checked out in no worktree, with commits trunk lacks
   remote_merged       a branch on origin other than trunk/main (and the retired ccin2p3, jeanzay) whose tip is in trunk
@@ -23,6 +29,9 @@ KEEP = {"trunk", "main"}
 KEEP_REMOTE = KEEP | {"ccin2p3", "jeanzay"}   # retired, kept on GitHub (fa-git-and-release)
 TRANSCRIPTS = os.path.expanduser(os.environ.get("HYGIENE_TRANSCRIPTS", "~/.claude/projects/-home-joaquin-work-FA"))
 QUIET_S = 900
+PLAN = os.environ.get("HYGIENE_PLAN", os.path.join(ROOT, "plan", "plan.yaml"))
+TRIAL_REC = os.environ.get("HYGIENE_TRIAL_REC", os.path.join(ROOT, "analysis", "agent_redesign", "model_trial.json"))
+TRIAL_ARMS = ("sonnet", "opuslow", "sonnetlow")     # tools/model_trial.py ARMS
 
 
 def git(*a, cwd=ROOT, check=False):
@@ -79,6 +88,35 @@ def agent_state(aid):
     return "ended" if ended else "running"
 
 
+def owners():
+    """{agent id: (entry id, owner state)} of every plan entry's recorded owner; a plan that cannot be read raises (an
+    owner unseen would be folded)."""
+    if not os.path.exists(PLAN):
+        return {}
+    import yaml
+    with open(PLAN) as fh:
+        d = yaml.safe_load(fh) or {}
+    out = {}
+    for e in d.get("entries") or []:
+        o = e.get("owner") or {}
+        if o.get("agent"):
+            out[o["agent"]] = (e.get("id"), o.get("state") or "?")
+    return out
+
+
+def trial_recorded(name):
+    """True when worktrees/zz_trial_<task>_<arm>'s run is in the model-trial record, False while it is open."""
+    rest = name[len("zz_trial_"):]
+    task, _, arm = rest.rpartition("_")
+    if arm not in TRIAL_ARMS:
+        return True                  # not an arm name: not a trial this tool knows, so not explained
+    try:
+        runs = json.load(open(TRIAL_REC)).get("runs") or []
+    except (OSError, ValueError):
+        runs = []
+    return any(r.get("task") == task and r.get("arm") == arm for r in runs)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--fold-agents", action="store_true")
@@ -90,6 +128,7 @@ def main():
         git("fetch", "--prune", "--quiet", "origin")
     agent_dir = os.path.join(ROOT, ".claude", "worktrees")
     live_branches = set()
+    own = owners()
     for w in worktrees():
         p, br = w["path"], w.get("branch")
         if os.path.realpath(p) == os.path.realpath(ROOT):
@@ -99,6 +138,22 @@ def main():
         if os.path.realpath(p).startswith(os.path.realpath(agent_dir) + os.sep):
             aid = os.path.basename(p)[len("agent-"):]
             st = agent_state(aid)
+            if aid in own:
+                eid, ost = own[aid]
+                if br:
+                    live_branches.add(br)
+                if ost != "closed":
+                    continue          # a live owner's worktree: its work explains it
+                found.append(("worktree_merged" if merged else "agent_unmerged", rel,
+                              "agent %s is the closed owner of plan entry %s: never folded, a person removes it with "
+                              "scripts/remove_worktree.sh" % (aid, eid)))
+                continue
+            if st == "unknown":
+                found.append(("agent_unknown", rel, "agent %s has no transcript under %s; never folded (HEAD %s)" % (
+                    aid, TRANSCRIPTS, "in trunk" if merged else "has commits trunk lacks")))
+                if br:
+                    live_branches.add(br)
+                continue
             if st == "running":
                 if br:
                     live_branches.add(br)
@@ -121,11 +176,17 @@ def main():
             if br:
                 live_branches.add(br)
             continue
+        name = os.path.basename(p)
+        if not br and name.startswith("zz_trial_") and os.path.dirname(rel) == "worktrees":
+            if trial_recorded(name):
+                found.append(("trial_done", rel, "model-trial arm recorded; remove it with scripts/remove_worktree.sh "
+                              "%s --discard" % rel))
+            continue                  # an open trial arm: detached at its fix's parent, in trunk until the agent commits
         if br:
             live_branches.add(br)
         if merged:
-            found.append(("worktree_merged", rel, "branch %s is in trunk: finished work? remove it with "
-                          "scripts/remove_worktree.sh" % br))
+            found.append(("worktree_merged", rel, "%s is in trunk: finished work? remove it with "
+                          "scripts/remove_worktree.sh" % ("branch " + br if br else "detached HEAD")))
     out, _ = git("for-each-ref", "--format=%(refname:short)", "refs/heads")
     for br in out.split():
         if br in KEEP or br in live_branches:

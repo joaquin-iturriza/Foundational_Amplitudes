@@ -1,11 +1,15 @@
 """The repository stays at trunk, main and live worktrees (agent_redesign step 20, D334). Each case runs in a temporary
 git world (a bare origin and a clone holding copies of the scripts under test); the real repository is not touched.
   remove_worktree.sh   a merged branch is deleted here and on origin; a remote copy with commits trunk lacks is kept;
-                       a merged branch with a stale upstream is deleted (git branch -d refused it, 2026-11-04)
+                       a merged branch with a stale upstream is deleted (git branch -d refused it, 2026-11-04);
+                       a detached worktree whose HEAD trunk lacks is refused unless --discard (repo-reviewer, a44a2ca8);
+                       a remote copy pushed past a stale tracking ref is kept (the ancestry test read the stale ref)
   auto_push.sh         trunk is pushed; a feature branch is never published
   repo_hygiene.py      an ended agent's merged worktree is folded and removed (--fold-agents), a running one is kept,
                        an ended one with unmerged commits is listed; merged local and remote branches are listed;
-                       a clean world exits 0
+                       a clean world exits 0; an agent with no transcript is listed, never folded; a plan entry's
+                       owner is never folded (a live one not listed, a closed one listed); an open model-trial arm is
+                       not listed, a recorded one is
   model_trial.py       setup makes a detached worktree (no zz_trial_* branch)
 
     .venv-cpu/bin/python tests/test_repo_hygiene.py
@@ -65,7 +69,7 @@ def test_remove_worktree_deletes_remote_copy():
     assert "deleted origin/a" in out and "a" not in remote_heads(t), out
     assert sh("git branch --list a", r).strip() == ""
     out = sh("bash scripts/remove_worktree.sh worktrees/wt-b", r)
-    assert "origin/b has commits trunk lacks; kept" in out and "b" in remote_heads(t), out
+    assert "origin/b (" in out and "has commits trunk lacks; kept" in out and "b" in remote_heads(t), out
     assert sh("git branch --list b", r).strip() == "", "local merged b deleted although its upstream is ahead"
 
 
@@ -123,6 +127,82 @@ def test_model_trial_setup_is_detached():
     src = open(os.path.join(ROOT, "tools", "model_trial.py")).read()
     body = src[src.index("def setup("):src.index("\n\n\n", src.index("def setup("))]
     assert '"--detach"' in body and '"-b"' not in body, body
+
+
+def test_remove_worktree_refuses_detached_head_not_in_trunk():
+    t, r = world()
+    sh("git worktree add -q --detach worktrees/zz_d trunk", r)
+    w = os.path.join(r, "worktrees/zz_d")
+    open(os.path.join(w, "d.txt"), "w").write("d")
+    sh("git add -A && git commit -qm d", w)
+    sha = sh("git rev-parse HEAD", w).strip()
+    p = subprocess.run("bash scripts/remove_worktree.sh worktrees/zz_d", cwd=r, shell=True, capture_output=True,
+                       text=True)
+    assert p.returncode == 1 and sha in p.stderr and os.path.isdir(w), p.stdout + p.stderr
+    out = sh("bash scripts/remove_worktree.sh worktrees/zz_d --discard", r)
+    assert "discarding" in out and sha in out and not os.path.isdir(w), out
+    sh("git worktree add -q --detach worktrees/zz_e trunk", r)          # detached at a trunk commit: removed
+    sh("bash scripts/remove_worktree.sh worktrees/zz_e", r)
+    assert not os.path.isdir(os.path.join(r, "worktrees/zz_e"))
+
+
+def test_remove_worktree_keeps_remote_ahead_of_stale_tracking_ref():
+    t, r = world()
+    feature(r, "worktrees/wt-s", "s", merge=True, push=True)     # origin/s tracking ref here: in trunk
+    sh("git clone -q -b s origin.git other", t)                   # someone else pushes to s; no fetch here
+    o = os.path.join(t, "other")
+    sh("git config user.email o@o; git config user.name o", o)
+    open(os.path.join(o, "s2.txt"), "w").write("s2")
+    sh("git add -A && git commit -qm s2 && git push -q origin s", o)
+    assert sh("git merge-base --is-ancestor refs/remotes/origin/s trunk && echo stale", r).strip() == "stale"
+    # a fetch that cannot update the tracking ref (here a held ref lock; offline or a lock in real use) left it stale
+    os.makedirs(os.path.join(r, ".git/refs/remotes/origin"), exist_ok=True)
+    open(os.path.join(r, ".git/refs/remotes/origin/s.lock"), "w").close()
+    out = sh("bash scripts/remove_worktree.sh worktrees/wt-s", r)
+    assert "origin/s (" in out and "kept" in out and "s" in remote_heads(t), out
+
+
+def hygiene(r, env, *args):
+    p = subprocess.run([sys.executable, "tools/repo_hygiene.py", "--no-fetch"] + list(args), cwd=r,
+                       capture_output=True, text=True, env=env)
+    return p.returncode, p.stdout + p.stderr
+
+
+def test_repo_hygiene_never_folds_unknown_agent_or_plan_owner():
+    t, r = world()
+    tdir = os.path.join(t, "transcripts")
+    unknown, live_owner, closed_owner = "a" + "4" * 16, "a" + "5" * 16, "a" + "6" * 16
+    for aid in (unknown, live_owner, closed_owner):
+        feature(r, ".claude/worktrees/agent-%s" % aid, "worktree-agent-%s" % aid, merge=True)
+    transcript(tdir, live_owner, True, 3600)        # ended by its transcript: a stopped owner waiting on jobs
+    transcript(tdir, closed_owner, True, 3600)
+    owners_file = os.path.join(t, "owners.yaml")
+    with open(owners_file, "w") as fh:
+        fh.write(json.dumps({"entries": [
+            {"id": "e_live", "owner": {"agent": live_owner, "state": "stopped"}},
+            {"id": "e_closed", "owner": {"agent": closed_owner, "state": "closed"}}]}))
+    env = dict(os.environ, HYGIENE_TRANSCRIPTS=tdir, HYGIENE_PLAN=owners_file)
+    rc, out = hygiene(r, env, "--fold-agents")
+    for aid in (unknown, live_owner, closed_owner):
+        assert os.path.isdir(os.path.join(r, ".claude/worktrees/agent-" + aid)), out
+    assert rc == 1 and "agent_unknown" in out and unknown in out, out
+    assert live_owner not in out, out
+    assert "closed owner of plan entry e_closed" in out, out
+
+
+def test_repo_hygiene_open_trial_arm_not_listed():
+    t, r = world()
+    sh("git worktree add -q --detach worktrees/zz_trial_poolrow_sonnet trunk", r)
+    rec = os.path.join(t, "model_trial.json")
+    with open(rec, "w") as fh:
+        fh.write(json.dumps({"runs": []}))
+    env = dict(os.environ, HYGIENE_TRIAL_REC=rec)
+    rc, out = hygiene(r, env)
+    assert rc == 0 and "repo_hygiene: clean" in out, out
+    with open(rec, "w") as fh:
+        fh.write(json.dumps({"runs": [{"task": "poolrow", "arm": "sonnet"}]}))
+    rc, out = hygiene(r, env)
+    assert rc == 1 and "trial_done" in out and "zz_trial_poolrow_sonnet --discard" in out, out
 
 
 if __name__ == "__main__":

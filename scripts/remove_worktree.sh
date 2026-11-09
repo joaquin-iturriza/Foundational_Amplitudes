@@ -1,13 +1,24 @@
 #!/bin/bash
 # Remove a finished worktree the one safe way: fold its untracked results into the trunk, then remove it (--force only
 # after every untracked file is checked), then delete its branch if it is merged, here and on origin. The steps cannot be skipped or reordered by the caller.
-#     bash scripts/remove_worktree.sh worktrees/wt-<feat>
+#     bash scripts/remove_worktree.sh worktrees/wt-<feat> [--discard]
+# A detached worktree (a model-trial arm) has no branch to keep its commits: it is removed only when its HEAD is in
+# trunk, or with --discard, which drops its commits (their sha is printed, recoverable while git keeps them).
 set -euo pipefail
-WT="${1:?usage: remove_worktree.sh worktrees/wt-<feat>}"
+WT="${1:?usage: remove_worktree.sh worktrees/wt-<feat> [--discard]}"
+DISCARD=0
+[ "${2:-}" = "--discard" ] && DISCARD=1
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO"
 [ -d "$WT" ] || { echo "remove_worktree: no worktree at $WT" >&2; exit 1; }
 BR="$(git -C "$WT" rev-parse --abbrev-ref HEAD)"
+SHA="$(git -C "$WT" rev-parse HEAD)"
+if [ "$BR" = "HEAD" ] && ! git merge-base --is-ancestor "$SHA" trunk; then
+    if [ $DISCARD -eq 0 ]; then
+        echo "remove_worktree: $WT is detached at $SHA, which trunk lacks; not removed (--discard drops it)" >&2; exit 1
+    fi
+    echo "remove_worktree: discarding detached $WT at $SHA (not in trunk)"
+fi
 if [ -n "$(git -C "$WT" status --porcelain --untracked-files=no)" ]; then
     echo "remove_worktree: $WT has uncommitted tracked changes; commit or drop them first" >&2; exit 1
 fi
@@ -38,12 +49,19 @@ if git merge-base --is-ancestor "$BR" trunk; then
     # auto_push of the branch) made it refuse a merged branch (2026-11-04, double_wake)
     git branch -D "$BR"
     # its copy on origin goes too, when that copy is also in trunk (D334: no merged branches left on origin)
-    if git ls-remote --exit-code --heads origin "$BR" >/dev/null 2>&1; then
-        git fetch --quiet origin "refs/heads/$BR:refs/remotes/origin/$BR" 2>/dev/null || true
-        if git merge-base --is-ancestor "refs/remotes/origin/$BR" trunk 2>/dev/null; then
-            git push --quiet origin --delete "$BR" && echo "remove_worktree: deleted origin/$BR"
+    # the sha is read from origin itself (a fetch that failed would leave a stale tracking ref), must be a commit here
+    # and in trunk, and the delete is leased on it: a push to origin/$BR after the read makes the delete fail
+    if ! heads="$(git ls-remote --heads origin "refs/heads/$BR" 2>/dev/null)"; then
+        echo "remove_worktree: origin unreachable; origin/$BR not checked"
+        exit 0
+    fi
+    rsha="$(printf '%s\n' "$heads" | awk -v r="refs/heads/$BR" '$2 == r {print $1}')"
+    if [ -n "$rsha" ]; then
+        if git cat-file -e "$rsha^{commit}" 2>/dev/null && git merge-base --is-ancestor "$rsha" trunk; then
+            git push --quiet --force-with-lease="refs/heads/$BR:$rsha" origin --delete "$BR" &&
+                echo "remove_worktree: deleted origin/$BR"
         else
-            echo "remove_worktree: origin/$BR has commits trunk lacks; kept"
+            echo "remove_worktree: origin/$BR ($rsha) has commits trunk lacks; kept"
         fi
     fi
 else
