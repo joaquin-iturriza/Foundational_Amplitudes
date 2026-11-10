@@ -29,7 +29,8 @@ for proc, sw, hp in (("ee_ttbar", "vob_tt", 1333), ("ee_uu", "vob_uu", 670)):
     for s in (43, 44):
         RUNS[(proc, "V", s)] = "%s_V_hp%04d_s%d" % (sw, hp, s)
     for s in (42, 43, 44):
-        RUNS[(proc, "V/B", s)] = "%s_VB_atVhp%04d_s%d" % (sw, hp, s)
+        # the first e+e- -> u u~ V/B runs died in plots.py on the constant target (fixed in plots.py, E4605): reruns _r2
+        RUNS[(proc, "V/B", s)] = "%s_VB_atVhp%04d_s%d%s" % (sw, hp, s, "_r2" if proc == "ee_uu" else "")
 
 REMOTE = r'''
 import json, os, sys, numpy as np

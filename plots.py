@@ -847,6 +847,8 @@ def plot_histogram_single_output(
         sort_idx = np.argsort(truth_values)
         largest_min = truth_values[sort_idx][-largest_idx - 1]
         largest_mask = truth_values > largest_min
+        if not largest_mask.any():   # a constant truth (V/B of a massless 2->2) has no value above its 1% quantile
+            largest_mask = np.zeros_like(largest_mask); largest_mask[sort_idx[-largest_idx:]] = True
         restructured_data[1] = restructured_data[1][largest_mask]
     
     if xrange is None:
