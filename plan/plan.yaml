@@ -20663,3 +20663,32 @@ entries:
       is the cheaper tool; (ii) B at or below D3/E3 -> the catalog''s fixed density already captures it; either way the result
       goes to Joaquin before anything more of sigma-driven generation is built (D339 says he will use it). A D3-vs-A loss
       on the current loss (July replicated as no) is reported as the change of loss/start undoing the July gain.'
+    fix_at: '2026-11-10T01:18:09+00:00'
+    fix: '(1) One change at a time: the checkpoint is chosen by best val_loss_no_reg, but the design does not say which validation
+      set each arm uses. If each arm validates on its own growing draw, checkpoint selection differs between arms along with
+      the keep rule. Fix: one fixed validation set shared by all arms and seeds (e.g. a uniform-keep draw of the proposal
+      at a fixed seed, unweighted for arm C too), named in the design. (2) A/B protocol and outcome: HPs come from an 8-trial
+      DyHPO on arm A only. Per CLAUDE.md that is the first stage (feature at the baseline''s best HPs, done if better). The
+      NO branch, though, closes the question at A''s HPs. Fix: if D3 or E3 loses at A''s HPs, the second stage is the same
+      8-trial sweep for the sigma arm (and for B and C if they are the compared controls), best against best, before a no
+      is reported. Say so in the outcome and include its cost in the GPU estimate. (3) Seeds against spread: the 1.14 logflat
+      max/min spread comes from July runs warm-started from base22 with the init fixed, where seeds varied only proposals
+      and keep draws. Here seeds 0,1,2 also vary the from-scratch init, so the spread is not measured and is probably larger;
+      on ee->uu the IS arm''s three warm-start seeds already spread 1.61e-5 to 5.84e-5 (3.6x, results.tex ~line 11165). The
+      expected sigma-over-IS effect there was 1.11, inside that spread. Fix: state that arm A''s three seeds measure the from-scratch
+      spread, and add an UNRESOLVED outcome distinct from NO. NO reading (i), ''C within the sigma arm''s seed range, so the
+      gain is the objective'', is what pure noise would also produce. When the spread hides an effect of about 15%, more seeds
+      become a question to Joaquin (equal across all six arms, with the added GPU-h), not a conclusion. (4) Outcome: as written,
+      a noise-dominated result confirms NO(i). Separate ''C resolved at or below the sigma arm'' (no) from ''not resolved''
+      (ask Joaquin). (5) HPO timing (check 13): the sweep''s wall time is not stated (8 trials, 3 start-up then 2 sequential
+      batches, at about 0.5 h per trial, so about 1.5 h). State it, and state when the 18-run batch finishes after it. (6)
+      Disk (check 14): disk per job and the site''s free disk are not stated. Fix: estimate per run (pool of 300k 6-leg events
+      plus 6x candidates per round, held-out 100k, checkpoints, any preprocessing cache) and the shared held-out set, read
+      df on the target site at submission, check again on the first jobs, and confirm no per-job cache copy. (7) Minor, check
+      11: name the training target and preprocessing explicitly (single-process canonical: per-dataset log plus standardization
+      on ln|M|^2, stats frozen at round 0; no target_propagators, no sign head) so a reader can match it to the settled defaults.
+      Checks that hold: the measure moves with the keep rule beyond 3 warm-start seeds (sigma_gen_design_check.py @ccede377
+      reproduces: worst gamma-3 seed over best base seed 0.834 logflat and 0.75 deepest, gamma 10 0.817 and 0.669; fixed-fraction
+      evals 13.4 to 1.79). The loss is HETEROSC beta=0 with the 250-step sigma stage (D70, D71, D276). The prior is complete
+      (searched results.tex for steering, base22, l2_online_uugg, IS-only, is_weight, f_flat, DEFAULT_SAMPLING, sigma-driven,
+      seed spread). Only the keep rule or loss weight moves between arms. The design answers D339 within scope.'
