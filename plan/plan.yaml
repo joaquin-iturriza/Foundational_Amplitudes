@@ -21594,6 +21594,67 @@ entries:
       Cost: e+e- > b b~ 8 runs at the 4-particle rates (0.073-0.084 s/step k<=7, 0.16 k=8, 0.40 k=9) + 0.08 h: 3.3 GPU-h;
       u u~ > e+e- Z 8 runs at the 5-particle rates: 3.9 GPU-h; 7.2 GPU-h; limits 0:30 / 0:45 / 2:30 (~1.6x the need); one
       wave on CC. Disk 16 x 23 MB, 6.2 GB free.'
+  - at: '2026-11-10T10:23:45+00:00'
+    question: 'One-loop arm stage 1, revised after Joaquin''s corrections of 2026-11-10 (D371 to come). Three held-out one-loop
+      targets whose Born is a training tree of both parents: b b~ > Z Z (v4_bbx_zz_nlo), u u~ > e+e- Z (v4_uux_epemz_nlo),
+      e+e- > b b~ (v4_epem_bbx_nlo, massless b, V/B constant: kept, since dropping it rested on a prediction, not a run).
+      Per target and D=10^(k/2), k=2..9, trained from scratch on V/B: at which horizon T(D) does the training error stop falling,
+      what does the common measure MSE((V/B)_pred - (V/B)_true) on the test pool read at each D (and MSE ln|V| for the one-signed
+      targets: all three here), where on that measure does the stage-2 threshold sit, and is the constant of e+e- > b b~ learned
+      at small D? This job: the 16 runs of u u~ > e+e- Z (rerun) and e+e- > b b~; the 8 b b~ > Z Z runs of the 09:15 PASS
+      stand.'
+    prior: '(1) par:vob_june (results.tex 4331-4350): on e+e- > u u~ V/B = 2.49 = C_F(pi^2-8) at every event (relative std
+      5e-13); on t t~ V/B beats V at 4000 steps from scratch 4.58e-8 against 1.75e-7 MSE of ln|V| (3.82x), fine-tuned 6.89x.
+      (2) This entry''s finding 2026-11-10T08:58 (virtual_over_born at current defaults, e+e- > t t~): V/B below V in all
+      three seeds, median 3.9x; step rate 0.372 s/step at BS 16384 on V100. (3) Checked today on CC from the existing sidecars
+      (born_of_pool, 50000 train rows): std of ln|V|-ln B = 1.9e-12 on ee_uu_nlo_25-1000GeV, 0.132 on ee_ttbar_nlo_362-1000GeV
+      (p1..p99 3.53..3.98), no negative V in either. (4) This entry''s tree calibration cal2 (analysis/data_saving/data/horizons_cal2.json
+      @f280a9fc): same job script and lr law; e+e- > t t~ crosses 1e-4 from D=100; e+e- > c c~ g and b b~ g g never, best
+      inside the warm-up at k<=8 (horizons then from a DyHPO, stage 2). (5) par:v4_loop_born (results.tex 4215): removing
+      the Born halves a one-loop class''s level spread (2.55 to 1.01). (6) Draft fig 22 (old setup, ee > u u~ one loop): fine-tune
+      1-2 orders below scratch. No one-loop D-calibration on catalog_v4 exists. Searched: results.tex (V/B, over Born, one-loop,
+      data saving, H5), plan show pretrain_data_saving and virtual_over_born, site decisions --project FA (D315 D355 D356
+      D360 D366). (7) sec:ladder one-loop probes (results.tex 13688-13697): e+e- > d d~ and b b~ at one loop, fine-tune below
+      scratch in every cell, 1.4-9.3x. (8) EW one-loop e+e- > d d~ scratch flattens at 7.6-8.5e-3 (14194-14199). (9) hp58
+      (10770-10782): one-loop scratch bests move strongly with the lr (52x at D=1e4). (10) The constant e+e- > u u~ V/B: learned
+      to MSE ln|V| 2.1e-25 at D=5e4 x 0.7, 4000-8000 steps only (par:vob_june); never measured at small D. (11) V/B spreads
+      (vb_spread.py @cc288ee1): b b~ > Z Z 0.267, u u~ > e+e- Z 0.294, e+e- > b b~ 2e-12, none with V<0. (12) The common measure
+      on existing runs (vb_test_mse.py --glob ''runs/vob_tt_VB_atVhp1333_s4*''): e+e- > t t~ V/B at D=5e4: MSE V/B 3.8-5.8e-7
+      against var(V/B) 32.2, MSE ln|V| 1.8-2.7e-10.'
+    measure: 'Per run (scripts/job_data_saving.sh <target> <k> <steps> scratch ++data.target_over_born=true tag=cal_vb2 @cc288ee1,
+      which turns the parent''s target_physics_factor and target_physics_orders off for V/B): (i) training horizon from the
+      validation curve of the trained target (result.json val_mse_curve x prepd_std^2, horizons.py: s_b, best_frac, s_4, T(D)
+      by the passed rule and the too-low-lr branch, the curve''s unit carried per run); (ii) the common measure on the 5e3
+      test pool of the final model (sigma_stage/preds_test.npz raw_pred/raw_truth = V/B with every target factor divided out):
+      MSE_VB = mean((V/B_pred - V/B_true)^2), beside it var(V/B) and, the three targets being one-signed, MSE ln|V| (vb_test_mse.py
+      --tag cal_vb cal_vb2). The stage-2 threshold L0 on MSE_VB is set once from these scratch curves before stage 2: the
+      largest power of ten that the scratch L(D) of b b~ > Z Z and u u~ > e+e- Z both cross inside k=2..9 (e+e- > b b~ read
+      at the same L0; if it sits below L0 at every D, no gap is measurable there and that is reported). Runs whose data_stats
+      show the physics factor on a 2->3 target are listed apart.'
+    check: '(a) The factor defect and its fix, CPU dry run of init_data on CC (D=1000, the parent config, the job''s overrides):
+      prepd_std of u u~ > e+e- Z 2.57 with the factors on, 0.291 off (pool sigma 0.294); b b~ > Z Z 0.257 (2->2: the factor
+      is constant, its cal_vb runs stand); e+e- > b b~ 1e-6 (the std floor). (b) The common measure reads on existing predictions:
+      e+e- > t t~ V/B seeds give MSE_VB 3.8e-7, 5.8e-7, 4.9e-7 (var 32.2), and raw_pred/raw_truth are V/B (median 43.1 = e^3.76,
+      the pool''s ln|V/B| mean 3.76). (c) It moves with D: the trained-unit curve does (cal2 e+e- > t t~ 2.9e-3 at D=10 to
+      9.1e-7 at 1e4), and MSE_VB is that error mapped through V/B''s own scale.'
+    fixed: 'Parent config trial 1262 of cov_v4_long_hpo8_cc_68224 (base config, as cal2: model, inputs, HETEROSC + sigma stage,
+      checkpoint on val mu MSE, heterosc_select=mu_mse); lr = the parent''s law 7.82114e-3 (T/17056)^-0.55 times the transfer
+      D factor (as cal2); batch min(16384, D/2); D = prefixes of the 5e4 train pool, val/test the frozen 5e3; steps 8000 for
+      k<=8, 12000 for k=9 (as cal2); V/B target (data.target_over_born=true, virtual_over_born''s verdict); CC-IN2P3 only
+      (pools and sidecars there); scripts/job_data_saving.sh at the submitted commit. For V/B runs: data.target_physics_factor=false
+      and data.target_physics_orders=false (V/B is dimensionless and its coupling powers cancel), the same in stage 2''s two
+      arms. Readout on the final model after the sigma stage (D276).'
+    control: 'A calibration, not an A/B: it sets T(D) and the threshold L0 for stage 2, where fine-tune and scratch are matched
+      per cell. Across D, one protocol; across targets, one measure (MSE_VB). The 8 b b~ > Z Z cal_vb runs share every setting
+      with the new 16 (their factor being a constant).'
+    seeds: Seed 42, one run per cell (D315, settled).
+    outcome: 'Per target, L(D) on MSE_VB (scratch) with MSE ln|V| beside; T(D) per run; L0 chosen by the rule above. e+e-
+      > b b~ is read against L0: below L0 at every D gives no gap to measure (reported, stage 2 still runs its cells); above
+      at small D and below later gives its D gap like the others. Too-low-lr or warm-up bests send T(D) to the stage-2 DyHPO
+      (as passed). Figures: MSE_VB against D per target (the three on one panel, L0 drawn), MSE ln|V| against D beside, and
+      the training-unit calibration figure. Cost: e+e- > b b~ 8 runs at the 4-particle rates (0.073-0.084 s/step k<=7, 0.16
+      k=8, 0.40 k=9) + 0.08 h: 3.3 GPU-h; u u~ > e+e- Z 8 runs at the 5-particle rates: 3.9 GPU-h; 7.2 GPU-h; limits 0:30
+      / 0:45 / 2:30 (~1.6x the need); one wave on CC. Disk 16 x 23 MB, 6.2 GB free.'
   step_waits:
     '3': '2026-11-12'
     '4': '2026-11-12'
