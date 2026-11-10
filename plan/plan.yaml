@@ -21485,6 +21485,16 @@ entries:
       and 13.9. So with the parent''s target, a network that merely stayed inside its training range would beat Bakar''s MLP
       by 3 decades in the soft limit; ours runs away from it, which is the inputs'' (dimensionless momenta) extrapolation,
       not the target.'
+  - at: '2026-11-10T06:38:57+00:00'
+    text: 'Protocol A from scratch, ee->uugg (KIT evaluate.py via kit_predict; kit_result.txt/json in runs/kit/kit_A_ee_uugg_me2_n{900000,100000}_t8000
+      on CC; one seed; 0.79 s/step float64 V100). log10-MSE 9e5 / 1e5: bulk 1.4e-3 / 2.3e-3; soft x 1e-7..1e-6 4241 / 9067
+      (Bakar''s MLP at 1e5: 0.40); coll_gg y 1e-7..1e-6 16.9 / 20.5; coll_qg y 1e-7..1e-6 16.6 / 18.4; azimuth g->gg y 1e-7
+      29.2 / 29.2. Exponents (exact -2 soft, -1 coll; truth -2.001, -0.991 gg, -0.974 qg): soft pred +2.80 / +16.6, coll_gg
+      -0.11 / +0.03, coll_qg -0.08 / -0.01. cos 2phi harmonic, rms over groups (truth / pred / error): y 1e-3 0.063 / 0.064
+      / 0.033 (9e5), 0.064 / 0.046 (1e5); y 1e-5 0.025 / 0.009 / 0.024 and 0.007 / 0.024; y 1e-7 0.025 / 0.012 / 0.027 and
+      0.001 / 0.024: the harmonic is learned where the bulk reaches (y 1e-3) and lost deeper. Same pattern as uug: soft runs
+      away with the wrong sign, collinear flat, far behind the MLP; the plain-target arm on uug (FA-ccin2p3-2642b17b) decides
+      whether the preprocessing is the cause.'
   step_why:
     1:
       feeds: 'the numbers sent to KIT: whether hard_train fixes each family (B vs B_bulk)'
