@@ -21528,6 +21528,38 @@ entries:
       the scored strata pool (<=2.2e6 rows x 31 float64 = 0.55 GB) and predictions; pools are cached per (dataset, n, role)
       and shared by the seeds and the off-shell pair (9e5 x 31 x 8 B = 0.22 GB each); total <= 32 x 0.7 + 2 = ~25 GB, checked
       on the first job.'
+  - at: '2026-11-10T03:55:39+00:00'
+    question: 'The two KIT parents (step 2): catalog_v4 pretrainings at trial 1262''s setup with the KIT targets'' whole families
+      held out. Fair NLO parent: every tree plus ee->tt Born plus 10 one-loop pools, for the tt virtual target only. Held-out
+      parent: the parent''s pools minus the ee->tt, ee->qqbar g and ee->qqbar gg families, for protocol A pretrained on all
+      four targets. Do they train like trial 1262 on the pools they share, so that fine-tunes from them are comparable to
+      the catalog''s? Feeds: protocol A pretrained, and the fair NLO D-scan''s parent. It could serve pretrain_data_saving
+      too, whose tree targets (ee->ttbar, ee->ccbar g, ee->bbbar gg) sit in these families while trial 1262 trains bbxg, ccxgg
+      and the ee->tt mass variants.'
+    prior: 'Trial 1262 of cov_v4_long_hpo8_cc_68224 (results.tex 2611-2630): the 68224-step catalog_v4 pretraining picked
+      over 17056 steps (R=0.671 PP4, 0.677 EE4, 0.921 held out). Its recipe recipes/catalog_v4_default25_train.yaml (1153
+      pools, 108 one-loop by n_loops) trains v4_epem_ttx__mt50/300/600, v4_epem_bbxg (+as090/as150), v4_bbx_epemg, v4_bg_bepem,
+      v4_uux_epemg(+_nlo), v4_ug_epemu(+_nlo), v4_epem_ccxgg and v4_ug_epemgu: relabellings, scan variants and crossings of
+      the KIT targets, so it fails Bakar''s family hold-out. No family-held-out catalog pretraining exists (results.tex, plan,
+      decisions D353 D360 D363 searched for held out/family/pretraining).'
+    measure: Each parent's aggregate val_loss_no_reg at its best checkpoint and the per-pool val_loss_no_reg on the pools
+      it shares with trial 1262 (median of the per-pool ratio parent/1262), read from per_process_metrics.json; the families'
+      zero-shot log-MSE on the KIT bulk_test (tools/kit_predict.py on the parent rebuilt on the KIT pool) as the pretrained
+      arm's step 0.
+    check: 'Removing pools moves a catalog pretraining''s per-pool loss little at this size: the 17056 to 68224 change moved
+      the shared pools by R=0.67 to 0.92, and the dimensionless twin (catalog_v3_twin_train, 151 pools removed) is the precedent
+      for a removal arm read the same way. A ratio far from 1 on shared pools would flag a broken recipe.'
+    fixed: 'Everything but the recipe: trial 1262''s saved config (muP LLoCa width 8, MuonAdamW lr 3.649e-3, 68224 steps,
+      batch 16384, HETEROSC with its sigma stage, diagrams, off-shellness, default25 sampling), fresh start (warm_start_idx=null),
+      float32 (the catalog pools are bulk; the KIT fine-tunes run float64), seed 42. Code: scripts/job_kit_pretrain.sh, recipes/gen_kit_pretrain.py
+      at de51ed68.'
+    control: Trial 1262 itself (the same setup with the families in), read on the shared pools.
+    seeds: One seed (42) each, as trial 1262 (a parent, not a compared cell; its seed spread enters through the fine-tunes'
+      two seeds).
+    outcome: 'The parent is usable when the median shared-pool ratio to trial 1262 is within 0.8-1.25 and no pool blows up;
+      otherwise the recipe or run is broken and is traced before any fine-tune. Cost: 2 x 68224 x 0.474 s = 18 GPU-h (V100
+      catalog step of results.tex par:dancat, an estimate; H100 faster), under 30. Disk: two run dirs of ~2 GB (checkpoints,
+      metrics) on 44 GB free; the pools are the catalog''s, cached already.'
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
