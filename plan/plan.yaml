@@ -21209,6 +21209,25 @@ entries:
       or a bound), at 1e-4 not reached; ee->bbbar gg at 1e-2 a bound (scratch ~0.07 at 1e5), 1e-4 not reached. Figures: per
       target L(D) scratch vs fine-tune with both levels drawn, one MSE vs GPU-hours panel; write-up in docs/results.tex replacing
       the draft''s fig 22. A run that blows up is listed apart with its step.'
+    fix_at: '2026-11-10T06:52:01+00:00'
+    fix: 'Re-check after the revision of 06:51. Checks 2, 4, 5, 13, 14 and 15 are now met. Seen: the prior cites par:v3_muon
+      (9.1x and 2.2x) and sec:ladder''s gain_heatmap, nogain and seed paragraph; the outcome has YES/NO/NOT RESOLVED and bounds;
+      the crossing is the first bracketing pair; the scratch trial command is quoted from the CC dry run of sweep/gen_data_saving.py
+      @9f720993 with heterosc_select=mu_mse and result_path; disk is 23 MB per run, 3.3 GB per phase against 7.9 GB free,
+      with prune before phase b; waves 3,3,2 with phase a about 5.5 h. The fine-tune cell''s dry run must come before the
+      fine-tune arm is submitted. One check still fails. (3) The design''s own numbers put the expected effect inside its
+      noise band. ee->ttbar at 1e-4: expected S about 1.5-3 against a YES bar of 3.2. ee->ccbar g at 1e-2: expected S about
+      10 against a band of about 15x. ee->bbbar gg: a bound only. So about 200-290 GPU-h would most likely return NOT RESOLVED
+      on the two readable cells, and a measurement expected to be unable to see its effect is what this review must stop.
+      Two fixes, either or both. (a) Owner''s call, inside the approved work: read D* from a fit of log L against log D over
+      each arm''s grid points near the crossing (e.g. 3-5 points, or L(D)=A D^-a + L_inf over the arm), not from the two bracketing
+      points alone, with the band taken from the fit''s residuals and the 5x search spread. Restate per target the expected
+      S against that narrower band. If the expected S then clears the band on at least the ccbar g 1e-2 cell, the design can
+      pass. (b) If no readout brings the expected effect above the spread, the remedy is more searches or seeds per cell,
+      which is Joaquin''s call under D315 (''I see no reason to keep doing multiple seeds''). Put it to him as a question
+      with the numbers: ''With one 8-trial search per cell the expected savings (ttbar ~1.5-3x, ccbar g ~10x) sit inside the
+      5x search-to-search spread (bands 3.2x and ~15x); do you want a second search at the cells bracketing each crossing
+      (cost X GPU-h), or run as is and accept NOT RESOLVED as the likely answer?'' Do not add seeds without his words.'
   step_waits:
     '1': FA-ccin2p3-53bb43b9 FA-ccin2p3-fbec992c FA-ccin2p3-9da809e2 FA-ccin2p3-ad1b108d FA-ccin2p3-883309f7 FA-ccin2p3-72685d7d
       FA-ccin2p3-50cc73c3 FA-ccin2p3-43d4b67a FA-ccin2p3-5c6b6dcb FA-ccin2p3-01d9738a FA-ccin2p3-df5578c6 FA-ccin2p3-85c8280d
