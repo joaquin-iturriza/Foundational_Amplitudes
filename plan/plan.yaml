@@ -21334,6 +21334,29 @@ entries:
       (cal2''s measured rates: 4 particles like t t~, 5 like c c~ g), 24 runs ~11.3 GPU-h; longest run k=9 ~1.7 h; one wave
       (site pick: 53 free GPUs on CC fit 24); CPU sidecar job ~0.8 h (builds in parallel, then 15 pools in parallel). Disk
       23 MB per run (cal2) x 24 = 0.55 GB, read at submission.'
+    fix_at: '2026-11-10T09:13:25+00:00'
+    fix: '(1) Not a repeat / prior incomplete: the prior field cites draft fig 22 and says no one-loop D-calibration exists
+      on catalog_v4, but omits the one-loop data-saving work already in docs/results.tex on the earlier setup: the transfer
+      ladder''s one-loop e+e- -> d d~ and b b~ probes (fine-tune over scratch 1.4-9.3x per cell, geometric means 3.3 and 2.7,
+      results.tex ~13693-13695); the electroweak one-loop e+e- -> d d~ scratch flattening between D=1e2 and 10^2.5 at 7.6-8.5e-3
+      (~14196-14199); and the lr sensitivity of one-loop scratch cells: extending the lr window lowered the one-loop b b~
+      best 52x at D=1e4 (0.028 to 5.4e-4) and left the one-loop b b~ (1e4) and d d~ (1e2) optima unbracketed at the highest
+      lr (~10772-10780, het_stage2.py @0b277b39). Add them to prior with what each says for this calibration: whether 1e-4
+      is expected reachable from scratch on a one loop, and that a fixed-lr calibration can be lr-limited on one loops in
+      the other direction from cal2 (best at the run''s end because the lr is too low, not only best in the warm-up). State
+      an outcome branch for that case (e.g. a fixed-lr best still falling at the end, or far above the ladder''s tuned one-loop
+      numbers at matched D, sends the horizon to the stage-2 scratch DyHPO like the warm-up case). Terms searched: bbx_zz,
+      bg_ab, uux_epemz, epem_ddxz, data saving, over Born, V/B, one-loop/at one loop with fine-tune/scratch/horizon in results.tex;
+      plan show; site decisions D315-D368. (2) Time per unit of the sidecar job not from its own setup: job_vob_born.sh keeps
+      the 1:15 limit and the 0.8 h target derived for 2->2 pools at 10 ms per point, but born_of_pool re-evaluates the full
+      one-loop point per row (virt_evaluator), and two of the five pools are 2->3 (u u~ -> e+e- Z, e+e- -> d d~ Z) at 5e4
+      rows each; take the per-point MadLoop time for these processes from their catalog_v4 generation logs or the earlier
+      ee_ttbar/ee_uu sidecar job''s measured time, and size --time and the target from it. Minor: CC free disk read now is
+      6.3 GB on /sps/lpnhe (design says 8.7); 0.55 GB still fits, update the number. Everything else holds: one change (D)
+      at the cal2 protocol, measure shown to move on cal2 (ttbar best 2.9e-3 at D=10 to 9.1e-7 at 1e4, horizons_cal2.json),
+      one seed per D315, outcomes stated, HETEROSC parent, V/B per D357 and the virtual_over_born verdict, readout result.json
+      from the same script, pools and Born trees present (kit held-out and catalog_v4_train recipes carry v4_bbx_zz, v4_bg_ab,
+      v4_uux_epemz, v4_epem_bbxz), 11.3 GPU-h.'
   step_waits:
     '3': '2026-11-12'
     '4': '2026-11-12'
