@@ -21473,6 +21473,14 @@ entries:
       range: plain 1.000 in every deep bin, T 0.06-0.12 in every bin (medians -1.21..-1.12 inside bulk T [-4.24,-0.48]). So
       protocol A''s +20.2 soft exponent is the network''s T leaving a flat, in-range truth: the failure points at the inputs''
       extrapolation, not the target. Plain-target-and-inputs arm (uug 1e5) designed, under review.'
+  - at: '2026-11-10T06:24:55+00:00'
+    text: 'Flat-predictor floors on uug (tools/kit_target_slope.py FLAT lines at 902b6372, truth only): holding the emission-scale
+      target T at its bulk-range edge would score log10-MSE 5.6e-4 in the deepest soft bin (x 1e-7..1e-6) and 1.7e-3 in the
+      deepest collinear bin (y 1e-7..1e-6); held at its bulk median 0.69 and 0.78. Bakar''s MLP: 0.32 and 0.11. Protocol A
+      from scratch (FA-ccin2p3-f6b2ece9, n=1e5) scored 14180 and 30.1. The plain log10|M|^2 held at its bulk edge scores 115.9
+      and 13.9. So with the parent''s target, a network that merely stayed inside its training range would beat Bakar''s MLP
+      by 3 decades in the soft limit; ours runs away from it, which is the inputs'' (dimensionless momenta) extrapolation,
+      not the target.'
   step_why:
     1:
       feeds: 'the numbers sent to KIT: whether hard_train fixes each family (B vs B_bulk)'
