@@ -21537,6 +21537,12 @@ entries:
       = ~1.6x the cal2 rate need + 0.08 h). Third round: the last seven H5 candidates with Born in both parents (bb>bb, b
       b~>HZ, b b~>c c~ H, bg>bgg, gg>b b~ g, u c~>c~ H u, u d~>c c~ W+), FA-ccin2p3-326bc006, same rule (std >= 0.1, no V<0;
       2->2 first). If none passes, the one-loop arm has two targets unless Joaquin chooses otherwise.'
+  - at: '2026-11-10T10:09:26+00:00'
+    text: 'From kit_benchmark: the heldout parent runs/kit/kit_pretrain_heldout (FA-ccin2p3-62c2443b) will not end ~16:00
+      UTC: it runs 0.944 s/step, 17.9 h for 68224 steps against a 12 h limit; it stops ~19:00 UTC at ~45k steps and is finished
+      by the resume job FA-ccin2p3-78b8190c (same run dir, run_idx 1; its best checkpoint is models/model_run1_best.pt, the
+      best over both segments), ETA ~02:00 UTC 2026-11-11. Use model_run1_best.pt, not model_run0_best.pt, once 78b8190c ends
+      with RUN_DONE.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
