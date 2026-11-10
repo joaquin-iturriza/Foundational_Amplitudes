@@ -21805,9 +21805,8 @@ entries:
     start: '2026-11-10T03:40:33+00:00'
     at: '2026-11-10T03:40:33+00:00'
   step_waits:
-    '1': the detached sweep driver vob_V_sweeps (sweeps vob_tt_V, vob_uu_V on ccin2p3; wave 1 trials FA-ccin2p3-d9a3299e,
-      -eeaee186, -21166e76, -51c0b933, -0d9a3ce8, -1e364b61 running); sidecars done (FA-ccin2p3-d0c0e4cd, step 0 ratio 0.21
-      on ee->tt)
+    '1': the detached sweep driver vob_V_sweeps (sweeps vob_tt_V and vob_uu_V on ccin2p3, 16 trials in waves 3/3/2; its end
+      comes back as a site event)
   handoff:
     state: 'Cause settled and written up (results.tex par:vob_june @c16ed102; analysis/virtual_over_born/june_targets.py @d9b38f1c):
       the June V/B ''failure'' was read in standardized units. ee->uu V/B is the constant C_F(pi^2-8) (rel std 5e-13), standardized
