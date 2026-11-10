@@ -21258,9 +21258,9 @@ entries:
   asks: []
   owner:
     agent: a146b0b19432572ea
-    state: working
+    state: stopped
     since: '2026-11-10T02:22:02+00:00'
-    state_at: '2026-11-10T03:31:51.471000+00:00'
+    state_at: '2026-11-10T03:35:10+00:00'
     context: 250903
     context_at: '2026-11-10T03:34:32+00:00'
   findings:
