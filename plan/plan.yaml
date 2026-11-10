@@ -20864,6 +20864,9 @@ entries:
       decision'
     4: 'Readout: per target L(D) scratch vs fine-tune (best trial per cell), D*(1e-4) by log-log interpolation, saving D*_scratch/D*_ft,
       one MSE vs GPU-hours panel; figures replacing the draft''s fig 22; write-up in docs/results.tex'
+    5: 'Before stage 2 goes out (after Joaquin''s budget go): read CC disk (8.7 GB free on 2026-11-10 after the KIT caches);
+      if stage 2''s phase does not fit, bring Joaquin a concrete proposal for amp_data_cache (122 GB, other entries'' pools)
+      or another site, told to him 2026-11-10'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -20932,6 +20935,11 @@ entries:
       if:
       - 'saving >= 10^0.5 on a target: the gap holds there'
       - 'saving < 10^0.5: not resolved or no gap, reported as such'
+    5:
+      feeds: whether stage 2 fits on CC's disk
+      if:
+      - 'fits: submit the phase'
+      - 'does not fit: the concrete pruning or site proposal goes to Joaquin before submission'
   designs:
   - at: '2026-11-10T02:35:09+00:00'
     question: 'Step 1 (D356 horizons, tree arm): on catalog_v4''s held-out tree targets ee->ttbar (H3, 2->2 massive), ee->ccbar
