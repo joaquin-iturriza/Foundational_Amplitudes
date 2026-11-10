@@ -10382,30 +10382,85 @@ $\sigma$ row zeroed (a \code{sign\_head} parent's second row is its sign logit),
 their signed-log target). All run on CC: the $72$ cells first trained on CC and lxplus in $18$ jobs (2026-10-16), the
 $107$ first trained on Jean Zay in $20$ (2026-10-21, after copying them and their $11$ parents to CC). One blew up:
 \code{tp3\_uu64fte\_ee\_nnbar\_d8} trial $114$, at step $1360$ (validation NLL $10^{12}$, then $50$ non-finite gradient
-steps and the run aborts); its best checkpoint, step $400$ at NLL $-2.65$ against $-7$ to $-9$ for the other cells, went
+steps and the run aborts; its CC job log); its best checkpoint, step $400$ at NLL $-2.65$ against $-7$ to $-9$ for the other cells, went
 through the $\sigma$ stage on its own (\code{scripts/job\_het\_delta\_stage.sh}): $29\times$ the MSE cell's median
 $|\Delta|$, pull std $1.06$. It is drawn apart and left out of the numbers below. Fig.~\ref{fig:het_delta_summary}
 (\code{het\_delta\_summary.py}; per-probe figures \code{delta\_het\_*} from \code{delta\_plots.py --het},
 \code{pull\_het\_ladder\_*} and \code{pull\_het\_summary} from \code{het\_delta\_pulls.py}). Each het cell is compared with the MSE evaluation the $\Delta$ plots draw for it (\code{delta\_plots.pick}: the
 precision it was trained at; $3$ of them reruns of a pruned trial). On the $146$ $2\to2$ cells the het $\mu$ has a
-median $|\Delta|$ $0.64$ times the MSE cell's (median over cells; lower in $119$ of $146$, from $0.03\times$ on the
+median $|\Delta|$ $0.64$ times the MSE cell's (median over cells; lower in $118$ of $146$ (read $119$ before the reader), from $0.03\times$ on the
 one-loop $ee\to d\bar d$ synthetic cell to $7\times$ on $u\bar u\to Zg$ from rung 9; per probe from $0.15$ on the
 electroweak one-loop $ee\to d\bar d$ to $0.98$ on $ee\to d\bar d$), and the pulls are calibrated: std $1.01$, $1.02$,
 $1.03$ at the quartiles, $138$ of $146$ within $0.9$ to $1.2$, $|{\rm pull}|<1$ for $0.61$ to $0.80$ of the events. The
 eight outside: five between $0.81$ and $0.89$, and three above $1.2$ ($ee\to b\bar b$ one-loop from rungs 1 and 8,
-$3.42$ and $1.33$; $ee\to\nu\bar\nu$ from rung 7, $1.31$) whose std is set by a few events (largest $|{\rm pull}|$ $236$
-and $62$) while $|{\rm pull}|<1$ stays $0.65$ to $0.77$. With more final-state particles both fail. On the $19$
+$3.42$ and $1.33$; $ee\to\nu\bar\nu$ from rung 7, $1.31$) whose std is set by a few events (largest $|{\rm pull}|$ $236$,
+$62$ and $62$) while $|{\rm pull}|<1$ stays $0.65$ to $0.77$. With more final-state particles both fail. On the $19$
 $2\to3$ cells ($3$ each of $ee\to d\bar dg$ and $ee\to t\bar tg$, $13$ of $u\bar u\to Zgg$) the het $\mu$ is worse
 ($1.55\times$ the MSE median $|\Delta|$, $0.90$ to $3.78$, lower in $2$ of $19$) and $\sigma$ too small on test (pull
 std $2.14$ at the median, $0.99$ to $3.28$, $3$ of $19$ within $0.9$ to $1.2$; $|{\rm pull}|<1$ $0.46$ to $0.69$;
 $u\bar u\to Zgg$ worst). On the $13$ $2\to4$ cells ($u\bar u\to Zggg$) the same: $1.63\times$ ($1.16$ to $2.48$, lower in
 none), pull std $1.48$ at the median ($1.05$ to $3.45$, $2$ of $13$ within $0.9$ to $1.2$), $|{\rm pull}|<1$ $0.34$ to
 $0.62$. The cause appears to be overfitting rather than the stage, as measured on the first $12$ of these
-$32$ cells: the training split's pulls have std $0.46$ to $0.91$ (calibrated or wider than needed), validation and test $0.99$
+$32$ cells (read from their evaluations on CC, no committed reader): the training split's pulls have std $0.46$ to $0.91$ (calibrated or wider than needed), validation and test $0.99$
 to $2.99$, while the $15$ $2\to2$ cells checked ($ee\to d\bar d$, $u\bar u\to gg$) have $0.99$ to $1.12$ on all three
 splits. The stage fits $\sigma$ to the training residuals, which at $D=10^4$ on these processes are smaller than the
 residuals on unseen events. Under the A/B protocol the het loss losing at the MSE cell's HPs calls for its own sweep
 before a verdict on $\mu$; neither that nor a $\sigma$ fitted on held-out residuals is run.
+% src: python3 analysis/transfer/het_delta_summary.py @d7baad30
+% claim: cells=179
+% claim: reruns=3
+% claim: jobs_cclx=18
+% claim: cells_cclx=72
+% claim: jobs_jz=20
+% claim: cells_jz=107
+% claim: blowup_ratio.0=29
+% claim: blowup_pull_std.0=1.06
+% claim: 2to2.n=146
+% claim: 2to2.ratio_median=0.64
+% claim: 2to2.lower=118
+% claim: 2to2.ratio_min=0.03
+% claim: 2to2.ratio_max=7
+% claim: 2to2.probe_ratio_min=0.15
+% claim: 2to2.probe_ratio_max=0.98
+% claim: 2to2.std_q1=1.01
+% claim: 2to2.std_median=1.02
+% claim: 2to2.std_q3=1.03
+% claim: 2to2.within=138
+% claim: 2to2.f1_min=0.61
+% claim: 2to2.f1_max=0.80
+% claim: 2to2.below_n=5
+% claim: 2to2.below_min=0.81
+% claim: 2to2.below_max=0.89
+% claim: 2to2.above_std.0=3.42
+% claim: 2to2.above_std.1=1.33
+% claim: 2to2.above_std.2=1.31
+% claim: 2to2.above_max_abs_pull.0=236
+% claim: 2to2.above_max_abs_pull.1=62
+% claim: 2to2.above_f1_min=0.65
+% claim: 2to2.above_f1_max=0.77
+% claim: 2to3.n=19
+% claim: 2to3.ratio_median=1.55
+% claim: 2to3.ratio_min=0.90
+% claim: 2to3.ratio_max=3.78
+% claim: 2to3.lower=2
+% claim: 2to3.std_median=2.14
+% claim: 2to3.std_min=0.99
+% claim: 2to3.std_max=3.28
+% claim: 2to3.within=3
+% claim: 2to3.f1_min=0.46
+% claim: 2to3.f1_max=0.69
+% claim: 2to4.n=13
+% claim: 2to4.ratio_median=1.63
+% claim: 2to4.ratio_min=1.16
+% claim: 2to4.ratio_max=2.48
+% claim: 2to4.lower=0
+% claim: 2to4.std_median=1.48
+% claim: 2to4.std_min=1.05
+% claim: 2to4.std_max=3.45
+% claim: 2to4.within=2
+% claim: 2to4.f1_min=0.34
+% claim: 2to4.f1_max=0.62
+% allow: 119 because it is the superseded value, quoted as corrected
 
 \begin{figure}[H]
 \centering
