@@ -20879,8 +20879,8 @@ entries:
     state: working
     since: '2026-11-10T02:21:50+00:00'
     state_at: '2026-11-10T02:21:50+00:00'
-    context: 138049
-    context_at: '2026-11-10T02:27:54+00:00'
+    context: 0
+    context_at: '2026-11-10T03:31:26+00:00'
   step_why:
     1:
       feeds: the per-D horizons of the tree sweeps (D356) and whether scratch reaches 1e-4 inside the 1e5 pools
