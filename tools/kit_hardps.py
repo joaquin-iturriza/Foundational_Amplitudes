@@ -27,6 +27,12 @@ import numpy as np
 PREFIX = "kit_"
 HARD = "hard"
 SPLITS = ("bulk_train", "bulk_test", "hard_train", "hard_test")
+# the catalog sidecar (data/diagrams/<name>.diagrams.json) each KIT (file, target) reads its diagrams and its
+# propagator masks (data.offshell_per_event) from: the same process at the same order in the catalog's leg order. A
+# file not listed has none (a run of it sets model.use_diagrams=false and data.offshell_per_event=false, or a sidecar
+# is dumped with tools/dump_diagrams.py and listed here).
+DIAGRAMS_OF = {("ee_tt", "born"): "ee_ttbar", ("ee_tt", "virt_finite"): "ee_ttbar_nlo",
+               ("ee_uug", "me2"): "ee_uug", ("ee_uugg", "me2"): "ee_uugg"}
 
 
 def kit_dir():
@@ -88,7 +94,7 @@ def catalog_entry(name):
     perm = beam_perm([p["pdg"] for p in parts])
     pdgs = [int(parts[i]["pdg"]) for i in perm]
     n_loops, k, b, _ = target_info(meta, target)
-    return {
+    entry = {
         "kind": "kit",
         "kit": {"file": stem, "target": target, "variant": variant},
         "nfinal": len(pdgs) - 2,
@@ -99,6 +105,9 @@ def catalog_entry(name):
         "m_finals": [float(parts[i]["mass"]) for i in perm[2:]],
         "param_card_patches": {},
     }
+    if (stem, target) in DIAGRAMS_OF:
+        entry["diagrams_of"] = DIAGRAMS_OF[(stem, target)]
+    return entry
 
 
 def file_sha256(path):
