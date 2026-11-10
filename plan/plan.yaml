@@ -21300,7 +21300,8 @@ entries:
       if:
       - 'float64 holds on every real stratum: design protocol A from scratch and the KIT pretraining'
       - 'a stratum loses precision in float64: trace and fix the step that loses it before any run'
-  step_waits: {}
+  step_waits:
+    '1': kit_precision detached CPU check on CC
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
