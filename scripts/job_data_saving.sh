@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=data_saving
+#SBATCH --job-name=dsave
 #SBATCH --cpus-per-task=4
 #SBATCH --time=04:00:00
 #SBATCH --output=%x_%j.out
@@ -13,7 +13,7 @@
 # law at <steps>, 7.82114e-3 (steps/17056)^-0.55 (the trial-1262 law of job_catalog_v3_short.sh LONG_HP), times the
 # transfer study's fitted D factor (sweep/gen_transfer_pilot.lr_surface's D part); a training.lr=... argument wins.
 # The batch is the parent's 16384, which experiment.py caps at D/2 (the transfer study's B = min(16384, D/2)).
-# Run dir runs/data_saving/<mode>_<target>_d<k>_t<steps>[_<tag>] (tag=<name> argument).
+# Run dir runs/data_saving/dsave_<mode>_<target>_d<k>_t<steps>[_<tag>] (tag=<name> argument).
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
@@ -43,7 +43,7 @@ if [ "$MODE" = ft ]; then
     PT="$PROJECT_DIR/$PARENT/models/model_run0_best.pt"; [ -e "$PT" ] || PT="$PT.gz"
     FT=(fine_tune.pretrained_path="$PT" fine_tune.target_stats=own fine_tune.offshell_stats=parent)
 fi
-OUT="$PROJECT_DIR/runs/data_saving/${MODE}_${TGT}_d${K}_t${T}${TAG}"
+OUT="$PROJECT_DIR/runs/data_saving/dsave_${MODE}_${TGT}_d${K}_t${T}${TAG}"
 echo "DATA_SAVING target=$TGT k=$K D=$D steps=$T mode=$MODE parent=$PARENT args: ${ARGS[*]}"
 python run.py --config-path "$PROJECT_DIR/$PARENT" --config-name config run_dir="$OUT" run_name=null \
     data.processes_file="$RECIPE" data.train_subsample="$D" data.eval_subsample=null data.phase_space_on_pool=true \
