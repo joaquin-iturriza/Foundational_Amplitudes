@@ -21669,7 +21669,9 @@ entries:
   step_waits:
     '3': '2026-11-12'
     '4': '2026-11-12'
-    '2': the design reviewer (three-target V/B design, ~12:10)
+    '2': FA-ccin2p3-1a76418b FA-ccin2p3-8185dc12 FA-ccin2p3-a6b8bd70 FA-ccin2p3-66bb0110 FA-ccin2p3-92717272 FA-ccin2p3-15dbc25a
+      FA-ccin2p3-9a1612f6 FA-ccin2p3-4a8a0d6c FA-ccin2p3-d1e00a87 FA-ccin2p3-e0add644 FA-ccin2p3-1dfa217f FA-ccin2p3-320bc5dd
+      FA-ccin2p3-73fa5be0 FA-ccin2p3-d25b0baf FA-ccin2p3-59c11d82 FA-ccin2p3-468ef654 FA-ccin2p3-0dd9e90b
     '5': step 3 (stage 2 go)
     '6': the design reviewer (three-target V/B design, ~12:10)
   findings:
