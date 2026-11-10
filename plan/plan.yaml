@@ -20978,6 +20978,7 @@ entries:
   step_waits:
     '1': a design reviewer
     '2': '2026-11-12'
+    '3': '2026-11-12'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
