@@ -20962,7 +20962,6 @@ entries:
   - D362
   next:
     2: Close once the repo-reviewer passes its backlog containing ed3be235 (rung_grid.py zorder and line width)
-    3: Close once the repo-reviewer passes its backlog containing ed3be235 (rung_grid.py zorder and line width)
   done_when: null
   notes_ref: null
   match: none
@@ -20979,11 +20978,6 @@ entries:
     state_at: '2026-11-10T02:22:22.260000+00:00'
   step_why:
     2:
-      feeds: whether the redrawn figs 10 and 11 ship as they are
-      if:
-      - 'pass: plan done ladder_figs'
-      - 'block: a mechanical-worker fixes what it names, then the same reviewer re-checks'
-    3:
       feeds: whether the redrawn figs 10 and 11 ship as they are
       if:
       - 'pass: plan done ladder_figs'
