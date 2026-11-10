@@ -16121,6 +16121,8 @@ entries:
     '17': 'the first real idle moment: plan next listing RESUME/LAUNCH with no FA job live; the supervisor''s own STALLED
       idle: event (or its absence after 45 min) is the trigger'
     '21': the date 2026-11-17 (a week after the 2026-11-09 23:54 restart on the batching code)
+    '22': repo-reviewer a0b2da08acd94dae3 on the whole backlog since 5e5b2788 plus the uncommitted template change (t_steps
+      [40000]); then add user_said() to tools/plan.py (plan ask path fix) and its re-check
   owner:
     agent: a5f2aff63bd28c5a8
     state: working
