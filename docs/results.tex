@@ -11701,8 +11701,8 @@ $\sigma_{\rm rel}\!\in\![5\!\times\!10^{-3},0.15]$, $\gamma\!\in\![1,5]$; object
 The tuned Bayesian network reaches $2.87\times10^{-2}$, versus $3.01\times10^{-2}$ for uniform generation
 ($0.95\times$, a real but modest win) and $2.65\times10^{-2}$ for the het-head $\sigma^{\gamma=3}$ baseline
 ($1.08\times$: \textbf{it loses}). The sweep's \emph{structure} is the informative part:
-$\sigma_{\rm rel}$ alone decides the outcome (Spearman $\rho=+0.965$ with the objective, monotone: wider
-posterior is uniformly worse; the sweep's three widest posteriors, $\sigma_{\rm rel}=0.090$, $0.099$ and $0.128$,
+$\sigma_{\rm rel}$ alone decides the outcome (Spearman $\rho=+0.965$ with the objective: wider
+posterior is worse, close to monotonically; the sweep's three widest posteriors, $\sigma_{\rm rel}=0.090$, $0.099$ and $0.128$,
 cost $2.77$, $2.46$ and $3.07\times$ its best), while
 $\beta_{\rm KL}$ ($\rho=-0.05$) and even the keep exponent $\gamma$ ($\rho=-0.07$) are \emph{noise} by
 comparison, and the optimum sits \textbf{on the lower bound} of the $\sigma_{\rm rel}$ range, i.e.\ the
@@ -11831,11 +11831,11 @@ loss.} Tooling: the polynomial keep rule and \code{--objective logflat} in \code
   \widerow{\pnl{l2_poly_keep_a.pdf}\hfill\pnl{l2_poly_keep_b.pdf}}
   \caption{\textbf{Polynomial keep rule vs the $\sigma^\gamma$ power law.} \emph{(a)} The $12$-trial DyHPO
   sweep: log-flat MSE vs the quadratic coefficient $c_2$, coloured by $c_1{=}\gamma$. The power law is the
-  nested $c_2{=}0$ line (red dashed); positive $c_2$ is the helpful direction (best three configs at
+  nested $c_2{=}0$ line (red dashed); positive $c_2$ is the favoured direction (best three configs at
   $c_2=1.30$, $2.40$, $1.42$; the negative-$c_2$ ones rank $4$, $5$, $8$, $10$), in the direction of the $\mathbb E[\mathrm{err}^2|\sigma]$
   curvature. \emph{(b)} The honest $3$-seed comparison: the polynomial optimum ($3.22\times10^{-2}$) and the
   best power-law arm $\sigma^{10}$ ($3.25\times10^{-2}$) overlap heavily seed-to-seed: the $1\%$ edge is
-  inside the scatter. Curvature is the right direction but does not robustly beat a well-tuned exponent.}
+  inside the scatter. Curvature points the right way but does not robustly beat a well-tuned exponent.}
   \label{fig:l2_poly_keep}
 % src: python3 analysis/divergences/steering_numbers.py @40b69989
 % claim: poly.trials=12
