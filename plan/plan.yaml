@@ -21480,7 +21480,8 @@ entries:
       if:
       - 'B''s best beats A: package B'
       - 'else: package A'
-  step_waits: {}
+  step_waits:
+    '1': FA-ccin2p3-7d74d518 FA-ccin2p3-366a4a98 FA-ccin2p3-f6b2ece9 FA-ccin2p3-12a9d54b
   handoff:
     state: 'Protocol A from scratch: 10 runs on CC under the design passed 2026-11-10 03:59 (one seed per D315; 22 runs ~28
       GPU-h incl. B). Running: FA-ccin2p3-ac4868da (tt Born, off-shellness on, 9e5) and FA-ccin2p3-c8ac36f0 (tt virtual, on,
