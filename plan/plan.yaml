@@ -20960,7 +20960,8 @@ entries:
     - draft_rewrite
   decisions:
   - D362
-  next: null
+  next:
+    2: Close once the repo-reviewer passes its backlog containing ed3be235 (rung_grid.py zorder and line width)
   done_when: null
   notes_ref: null
   match: none
@@ -20975,6 +20976,12 @@ entries:
     state: stopped
     since: '2026-11-10T02:21:42+00:00'
     state_at: '2026-11-10T02:22:22.260000+00:00'
+  step_why:
+    2:
+      feeds: whether the redrawn figs 10 and 11 ship as they are
+      if:
+      - 'pass: plan done ladder_figs'
+      - 'block: a mechanical-worker fixes what it names, then the same reviewer re-checks'
 - id: virtual_over_born
   title: why learning the virtual over the Born fails for us, and making it work
   question: Why does training on V/B (finite one-loop virtual over the exact Born) not work for us when the literature finds
