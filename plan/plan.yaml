@@ -21269,10 +21269,27 @@ entries:
     - kit_benchmark
   decisions:
   - D363
-  next: Read the real-bin precision check (detached kit_precision, log ~/.local/share/ccorch/detached/20261110-043611_kit_precision.log,
-    JSON at $SCRATCH/kit_precision_check.json on CC); then the protocol A design (float64 step rate needed for GPU-h), the
-    KIT pretraining design (shared with pretrain_data_saving if held-out families permit), the fair NLO D-scan, the threshold
-    scan, the checkpoint + inference package for KIT
+  next:
+    1: 'Protocol A from scratch (10 runs) and protocol B (6 continuations), float64, design of 2026-11-10 (scripts/job_kit.sh
+      on branch kit_protoA): design review and repo review, merge, sync CC, CPU dry run of A and B on CC (off-shell mask line
+      N=P, float64, B''s parent stats), then submit A at site pick''s width and B on A''s end; ~23 GPU-h (estimate, float64
+      0.8 s/step assumed, read from the first jobs)'
+    2: 'KIT pretrainings with whole families held out (design): one catalog_v4 pretraining without ee->qqbar g and ee->qqbar
+      gg of every flavour (incl. bbxg, ccxgg, accxg-free check) but with the ee->tt Born and at most 10 other one-loop pools
+      bulk only (Bakar''s fair NLO pretraining, also protocol A''s parent for uug/uugg), and one without the ee->tt family
+      (mt 50/300/600 variants included) for protocol A on tt; at trial 1262''s HPs and 68224 steps (~9 GPU-h each, estimate
+      from results.tex par:dancat''s 0.474 s/step catalog V100 step). The existing parent trial 1262 trains ee->tt at mt 50/300/600,
+      bbxg and ccxgg, so it fails the family hold-out; pretrain_data_saving''s targets (ee->ttbar, ee->ccbar g, ee->bbbar
+      gg) sit in these same families, so these two parents could serve it too'
+    3: 'Fair NLO D-scan (Bakar): ee->tt virtual, 1e2..1e4 bulk one-loop target points (D=10^(k/2), k=4..8), fine-tuned from
+      the fair NLO pretraining against the from-scratch V/B with exact Born baseline of virtual_over_born, scored on the hard
+      bins (bulk-only standardization and early stopping); design once the parent and the V/B baseline exist'
+    4: 'Threshold scan (Gudrun): sigma(sqrt s) of ee->tt around 2m_t (m_t=173, sqrt s 340-360 GeV) at LO and NLO, like Fig.
+      1 of arXiv:1506.06864; exact LO and fixed-order NLO from MG5_aMC (e+ e- > t t~ [QCD]) at a sqrt s grid, and the surrogate''s
+      NLO as exact NLO + integral over cos theta of (V_surrogate - V_exact) on a Born phase-space grid with MadLoop V at those
+      points; design once a tt virtual model exists'
+    5: 'Checkpoint + inference package for KIT (Joaquin sends it): the best protocol A/B checkpoints, a float64 predict script
+      taking momenta and quantum numbers, log10|M|^2 out'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -21313,12 +21330,32 @@ entries:
       not a precision loss (float64 medians 4e-15).'
   step_why:
     1:
-      feeds: whether the transformer can be scored on the KIT benchmark at float64 and at what cost
+      feeds: the from-scratch KIT numbers against Bakar's MLP and the control of every later arm
       if:
-      - 'float64 holds on every real stratum: design protocol A from scratch and the KIT pretraining'
-      - 'a stratum loses precision in float64: trace and fix the step that loses it before any run'
-  step_waits:
-    '1': kit_precision detached CPU check on CC
+      - 'exponents within 0.1 of exact and deepest bins below the MLP: extrapolation holds, the pretrained arm tests the gain'
+      - 'exponents flat or deep bins above the MLP: report the failure per family; B says whether showing the region fixes
+        it'
+    2:
+      feeds: protocol A pretrained and the fair NLO D-scan's parent
+      if:
+      - 'designed and reviewed under 30 GPU-h: submit'
+      - 'over 30 GPU-h: the estimate to Joaquin'
+    3:
+      feeds: whether pretraining helps the one-loop target in the hard bins under the fair protocol
+      if:
+      - 'parent and V/B baseline ready: design, review, submit'
+      - 'either not ready: waits on it'
+    4:
+      feeds: Gudrun's threshold-scan figure
+      if:
+      - 'tt virtual model trained: generate the grid and the NLO reference (CPU), plot'
+      - 'no model yet: waits on protocol A'
+    5:
+      feeds: what Joaquin sends KIT
+      if:
+      - 'A runs done: build and test the package'
+      - 'not done: waits'
+  step_waits: {}
   handoff:
     state: Data on CC ($DATA_DIR/kit_hardps/hardps_benchmark) and lxplus; Jean Zay copy failed twice on ssh timeout (setup
       gap, not blocking). Loader, float64 model path and scoring script reviewed (repo-reviewer PASS) and merged into trunk
