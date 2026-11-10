@@ -9,9 +9,10 @@ the three files of the first release: a new file (two-loop gg->HH, hadronic tt, 
 read the same way.
 
 A dataset name is `kit_<file>__<target>[__hard]`, e.g. `kit_ee_tt__virt_finite`, `kit_ee_uug__me2`:
-  train  the first n_train events of bulk_train (with `__hard`: plus every hard_train stratum, protocol B and the
-         tree pretraining, where hard points are allowed)
-  val    the last n_val events of bulk_train (early stopping on bulk only, whatever the variant)
+  train  the first n_train events of bulk_train (with `__hard`: plus the first 90% of every hard_train stratum,
+         protocol B, where hard points are allowed)
+  val    the last n_val events of bulk_train (bulk-only early stopping); with `__hard` plus the last 10% of every
+         hard_train stratum, so protocol B's checkpoint sees the hard fit it tests
   test   the first n_test events of bulk_test
 Rows are FA's pool rows, float64: the 4-momenta reordered to the catalog's (e-, e+, finals), the PDG ids, the target.
 A target with n_loops > 0 is stored alpha_s-stripped as the catalog's one-loop pools are (mg5_pipeline_final
@@ -21,12 +22,20 @@ preprocessing takes the signed log).
 """
 import json
 import os
+import sys
 
 import numpy as np
 
 PREFIX = "kit_"
 HARD = "hard"
+HARD_VAL_FRAC = 0.1
 SPLITS = ("bulk_train", "bulk_test", "hard_train", "hard_test")
+# the catalog sidecar (data/diagrams/<name>.diagrams.json) each KIT (file, target) reads its diagrams and its
+# propagator masks (data.offshell_per_event) from: the same process at the same order in the catalog's leg order. A
+# file not listed has none (a run of it sets model.use_diagrams=false and data.offshell_per_event=false, or a sidecar
+# is dumped with tools/dump_diagrams.py and listed here).
+DIAGRAMS_OF = {("ee_tt", "born"): "ee_ttbar", ("ee_tt", "virt_finite"): "ee_ttbar_nlo",
+               ("ee_uug", "me2"): "ee_uug", ("ee_uugg", "me2"): "ee_uugg"}
 
 
 def kit_dir():
@@ -88,7 +97,7 @@ def catalog_entry(name):
     perm = beam_perm([p["pdg"] for p in parts])
     pdgs = [int(parts[i]["pdg"]) for i in perm]
     n_loops, k, b, _ = target_info(meta, target)
-    return {
+    entry = {
         "kind": "kit",
         "kit": {"file": stem, "target": target, "variant": variant},
         "nfinal": len(pdgs) - 2,
@@ -99,6 +108,9 @@ def catalog_entry(name):
         "m_finals": [float(parts[i]["mass"]) for i in perm[2:]],
         "param_card_patches": {},
     }
+    if (stem, target) in DIAGRAMS_OF:
+        entry["diagrams_of"] = DIAGRAMS_OF[(stem, target)]
+    return entry
 
 
 def file_sha256(path):
@@ -151,7 +163,7 @@ def recipe(name, sqrts_min, sqrts_max, n_events, role, seed):
         "kit_variant": variant,
         "kit_strip": "alpha_s/2pi per loop",
         "kit_layout": 1,
-    }
+    } | ({"kit_hard_val_frac": HARD_VAL_FRAC} if variant == HARD else {})
 
 
 def group_rows(g, target, meta):
@@ -163,6 +175,15 @@ def group_rows(g, target, meta):
     n, P = mom.shape[0], mom.shape[1]
     pdg = np.broadcast_to(np.asarray([parts[i]["pdg"] for i in perm], dtype=np.float64), (n, P))
     return np.concatenate([mom.reshape(n, 4 * P), pdg, y[:, None]], axis=1)
+
+
+def _hard_part(g, target, role):
+    """A hard_train stratum's train part (its first 1 - HARD_VAL_FRAC) or val part (the rest): with `__hard`, the
+    checkpoint is chosen on bulk val plus these held-out hard points, so the selection sees the fit protocol B tests"""
+    m = g["momenta"].shape[0]
+    cut = m - int(round(HARD_VAL_FRAC * m))
+    sl = slice(0, cut) if role == "train" else slice(cut, m)
+    return {k: g[k][sl] for k in ("momenta", target)}
 
 
 def role_rows(name, role, n_events):
@@ -178,12 +199,16 @@ def role_rows(name, role, n_events):
             assert n <= N, f"{name}: {n} train events asked, bulk_train holds {N}"
             rows = group_rows({k: bulk[k][:n] for k in ("momenta", target)}, target, meta)
             if variant == HARD:
-                rows = np.concatenate([rows] + [group_rows(f[f"hard_train/{st}"], target, meta)
-                                                for st in sorted(f["hard_train"])], axis=0)
+                rows = np.concatenate([rows] + [group_rows(_hard_part(f[f"hard_train/{st}"], target, "train"),
+                                                           target, meta) for st in sorted(f["hard_train"])], axis=0)
             return rows
         if role == "val":
             assert n <= N, f"{name}: {n} val events asked, bulk_train holds {N}"
-            return group_rows({k: bulk[k][N - n:] for k in ("momenta", target)}, target, meta)
+            rows = group_rows({k: bulk[k][N - n:] for k in ("momenta", target)}, target, meta)
+            if variant == HARD:
+                rows = np.concatenate([rows] + [group_rows(_hard_part(f[f"hard_train/{st}"], target, "val"),
+                                                           target, meta) for st in sorted(f["hard_train"])], axis=0)
+            return rows
         assert role == "test", role
         g = f["bulk_test/bulk"]
         assert n <= g["momenta"].shape[0], f"{name}: {n} test events asked, bulk_test holds {g['momenta'].shape[0]}"
@@ -239,3 +264,33 @@ def log10_name(stem, target):
             if k in g:
                 return k
     raise KeyError(f"{stem}: no log10 dataset for {target}")
+
+
+def signs(stems=None):
+    """{file/target/split/stratum: (events, events with target <= 0)} over every group of every file: whether a
+    target is signed where it is scored (tools/kit_predict.py reads positive targets only)."""
+    import glob
+    import h5py
+    stems = stems or sorted(os.path.basename(p)[:-3] for p in glob.glob(os.path.join(kit_dir(), "*.h5")))
+    out = {}
+    for stem in stems:
+        meta = metadata(stem)
+        with h5py.File(h5_path(stem), "r") as f:
+            for split in SPLITS:
+                for st in (sorted(f[split]) if split in f else []):
+                    for target in meta["targets"]:
+                        if target in f[split][st]:
+                            y = np.asarray(f[split][st][target][:])
+                            out[f"{stem}/{target}/{split}/{st}"] = (int(y.size), int((y <= 0).sum()))
+    return out
+
+
+if __name__ == "__main__":
+    # python tools/kit_hardps.py signs [<file> ...]: per group, the events and those with a non-positive target
+    if len(sys.argv) >= 2 and sys.argv[1] == "signs":
+        res = signs(sys.argv[2:] or None)
+        for k, (n, neg) in res.items():
+            print(f"{k}: {n} events, {neg} with target <= 0")
+        print(f"SIGNS total {sum(n for n, _ in res.values())} events, {sum(m for _, m in res.values())} non-positive")
+    else:
+        sys.exit("usage: python tools/kit_hardps.py signs [<file> ...]")
