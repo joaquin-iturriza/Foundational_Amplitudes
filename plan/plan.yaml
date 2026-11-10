@@ -21626,9 +21626,11 @@ entries:
     - FA-ccin2p3-c8ac36f0
     - FA-ccin2p3-de744946
     - FA-ccin2p3-f6b2ece9
-    commit: 412188b7
+    commit: 302e816a
     paths:
+    - analysis/kit_benchmark/data/kit_fig_A.json
     - tests/test_kit_hardps.py
+    - tools/kit_figures.py
     - tools/kit_hardps.py
     - tools/kit_precision_check.py
     - tools/kit_predict.py
