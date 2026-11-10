@@ -77,7 +77,10 @@ def main():
     a2.set_xlabel(r"pull $(\mu-\log|\mathcal{M}|^2)/\sigma$"); a2.set_ylabel("density")
     ps.shared_legend(fig, a2, ncol=4); ps.process_label(a1, r"$e^+e^-\to t\bar t$", loc="lower right")
     ps.save(fig, os.path.join(HERE, "figs", "het_sigonly"))
-    print(json.dumps({k: stats(run) for run, k in KEY.items() if os.path.exists(os.path.join(D, run))}))
+    missing = [run for run in KEY if not os.path.exists(os.path.join(D, run))]
+    if missing:
+        sys.exit(f"het_sigonly: run directories missing under {D}: {missing}")
+    print(json.dumps({k: stats(run) for run, k in KEY.items()}))
 
 
 if __name__ == "__main__":

@@ -160,8 +160,10 @@ def claims(S):
                          for k in ("bbb_sigma_rel", "bbb_beta", "gamma")},
                       het_rank_min=min(F[t]["spearman_sigma_abserr"] for t in ("sigma_s0", "g3_s0")),
                       het_rank_max=max(F[t]["spearman_sigma_abserr"] for t in ("sigma_s0", "g3_s0")))
-    near01 = [r["val_loss"] / obj.min() for r in rows if 0.08 <= r["bbb_sigma_rel"] <= 0.12]   # sigma_rel ~ 0.1
-    out["bbb"].update(srel01_min=min(near01), srel01_max=max(near01))
+    # the three widest posteriors of the sweep (largest sigma_rel), each with its cost over the sweep's best
+    widest = sorted(rows, key=lambda r: r["bbb_sigma_rel"])[-3:]
+    out["bbb"].update(widest_srel=[round(r["bbb_sigma_rel"], 3) for r in widest],
+                      widest_cost=[round(r["val_loss"] / obj.min(), 2) for r in widest])
     # polynomial keep rule: R^2 of the error-vs-sigma fits on the base arms, the sweep, and the 3-seed confirmation
     poly = sorted(S["l2_poly_uugg"], key=lambda r: r["logflat_mse"])
     pl = [logflat(f"uugg_polyopt_s{s}") for s in (0, 1, 2)]
