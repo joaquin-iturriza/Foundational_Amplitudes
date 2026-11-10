@@ -21378,12 +21378,13 @@ entries:
     - FA-ccin2p3-b99b09db
     - FA-ccin2p3-c8ac36f0
     - FA-ccin2p3-de744946
-    commit: 0e02e74a
+    commit: 436952f2
     paths:
     - tests/test_kit_hardps.py
     - tools/kit_hardps.py
     - tools/kit_precision_check.py
     - tools/kit_predict.py
+    - tools/kit_target_slope.py
   dead_ends: []
   asks:
   - ask: 'GPU budget: ~47 GPU-h above 30 with no decision covering it (D353 approves new KIT runs but names no cost). This
