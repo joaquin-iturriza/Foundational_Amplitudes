@@ -20960,8 +20960,7 @@ entries:
     - draft_rewrite
   decisions:
   - D362
-  next: 'mechanical-worker: find the rung_grid producer, draw the scratch curve above every rung curve, nothing else changed,
-    regenerate png+pdf, look once at low resolution, commit.'
+  next: null
   done_when: null
   notes_ref: null
   match: none
