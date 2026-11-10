@@ -21416,9 +21416,9 @@ entries:
   asks: []
   owner:
     agent: ad1f728c67fc934fd
-    state: working
+    state: stopped
     since: '2026-11-10T02:18:36+00:00'
-    state_at: '2026-11-10T03:35:13.318000+00:00'
+    state_at: '2026-11-10T03:43:46+00:00'
     context: 242949
     context_at: '2026-11-10T03:33:48+00:00'
   designs:
