@@ -20692,3 +20692,81 @@ entries:
       evals 13.4 to 1.79). The loss is HETEROSC beta=0 with the 250-step sigma stage (D70, D71, D276). The prior is complete
       (searched results.tex for steering, base22, l2_online_uugg, IS-only, is_weight, f_flat, DEFAULT_SAMPLING, sigma-driven,
       seed spread). Only the keep rule or loss weight moves between arms. The design answers D339 within scope.'
+  - at: '2026-11-10T01:19:10+00:00'
+    question: 'Step 3 (D339, sigma-driven generation on the current HETEROSC loss): on e+e- -> u ubar g g, does drawing each
+      round''s fresh training events with probability proportional to the model''s live predicted sigma^gamma give a lower
+      held-out log-flat-per-decade MSE of ln|M|^2 than (a) a good fixed draw, the catalog''s own mixture density (f_flat 0.35
+      flat in log|M|^2), (b) plain loss reweighting toward that density with no sigma, and (c) the uniform keep of the same
+      proposal; and does sigma add on top of the catalog density (the form generation would take in the catalog generator)?'
+    prior: 'docs/results.tex sec:div-sampling (searched: sigma, steering, l2_online, uugg, IS, reweight, fraction sweep, catalog
+      mixture f_flat; plan show sigma_generation; site decisions --project FA: D339 approves building it, no study or cost
+      decision). (1) ee->uu online study (l2_eeuu_online.py @c7b61a70, fig:l2_eeuu_online): good f=0.25 base, 1 seed: sigma^1+IS
+      30.5x worse than static; starved f=0 base, 3 seeds: static 1.44e-4, sigma^0.5+IS 2.75e-5, IS-only 3.06e-5 (seeds 1.61e-5..5.84e-5,
+      3.6x), IS over sigma 1.11 inside that spread; coordinate-free sigma^1 vs fresh static f=0.25, 3 seeds: 1.48e-5 vs 1.11e-5,
+      seeds overlap. (2) Starved-base L1 sigma-reweighting ~oracle (3 seeds), no sigma-free reweighting arm. (3) ee->uugg
+      steering loop (l2_online_uugg.py, steering_numbers.py @40b69989): sigma^gamma vs UNIFORM keep of the democratic+RAMBO
+      proposal, 3 seeds from base22, logflat sigma/base 92/81/78/76/74% at gamma 1/2/3/5/10, deepest decade 90..55%, bulk
+      decade 107->128%; gamma 20/30 (1 seed) degrade overall past gamma~3; transfers to uug, uuggg, bbbarg. No study ran sigma
+      against plain loss reweighting or a good fixed draw on uugg. (4) Coverage layer: flat-in-log|M|^2 mixture f~0.25-0.5
+      adopted in the catalog as DEFAULT_SAMPLING f_flat 0.35, oversample 6, democratic 0.5, y_lo 1e-6 (mg5_pipeline_final.py:3103).
+      HOW THIS DIFFERS: adds the two missing controls and the sigma-on-catalog arm; current loss (HETEROSC beta=0, MuonAdamW,
+      250-step sigma stage, D70/D276) instead of July''s beta=1 detached-sigma pure-MSE mu; from scratch at a DyHPO-best HP
+      set because base22 (runs/pretrain22_heldout_uug) no longer exists; a fixed shared validation set instead of each arm''s
+      own draw; the July loop''s Jean Zay paths ( standalones, BASE22) rebuilt on siteconf (the round boundary is the existing
+      exp._cycle monkeypatch).'
+    measure: 'Primary: logflat = mean over the 7 y_min decades (<1e-6 ... >0.1) of the per-decade MSE of ln|M|^2 on a fixed
+      held-out deep-IR uugg set (100k events, y_min down to 1e-8, seed 777, make_heldout_uugg.py regenerated on CC, labels
+      from the ee_uugg standalone), from each run''s final model (best checkpoint by val_loss_no_reg on the SHARED validation
+      set below, then the sigma stage, D276), combined over seeds by geometric mean; decade definition of steering_numbers.py.
+      Secondary: deepest-decade (y_min<1e-6) MSE, bulk-decade (y_min>0.1) MSE (the reallocation cost), all-event MSE, Spearman(sigma,
+      |error|) on the held-out set.'
+    check: 'analysis/divergences/sigma_gen_design_check.py @ccede377 (branch sigma-gen3, over the committed steering_eval_summary.json
+      of the July uugg evals): base arm seed spread max/min logflat 1.14, deepest 1.27; worst sigma seed over best base seed
+      0.83x (gamma 3) and 0.82x (gamma 10) on logflat, 0.75x and 0.67x on the deepest decade: the measure moves with the keep
+      rule beyond 3-seed noise. CAVEAT: those July seeds all started from base22 (seeds varied proposals and keep draws only);
+      here seeds also vary the from-scratch init, so the July 1.14 is not this study''s spread: arm A''s 3 seeds measure it
+      (and the IS arm on ee->uu spread 3.6x).'
+    fixed: 'Process e+e- -> u ubar g g, sqrt(s) uniform 91-1000 GeV, lowered cuts LOW_CUTS (pT>1, cos<0.9, dR>0.05, m>0.3);
+      proposal = 0.5 IR-democratic splitter (y_lo 1e-6) + 0.5 flat RAMBO, oversample 6 candidates per kept event in every
+      arm; 10 rounds, 300k training events (30k fresh per round, growing pool), 4000 steps under one cosine; model mu-P LLoCa
+      num_blocks 8, num_heads 8, use_diagrams false, particle_encoder_hidden 0; target: the single-process default ln|M|^2
+      with amp_trafos [log, standardization] per dataset, momentum and amplitude stats frozen at round 0, no target_propagators,
+      no sign_head; loss HETEROSC beta=0, mean aggregation, heterosc_select nll, default 250-step sigma-only stage; MuonAdamW,
+      batch 16384, HPs = best of an 8-trial single-fidelity DyHPO over the template''s coupled space at t=4000 on arm A (start-up
+      trials then 2 sequential batches, D244), identical in all arms; from scratch; round-0 draw the same uniform keep in
+      every arm for a given seed; scoring sigma = the live joint sigma head at each round boundary; VALIDATION: one shared
+      set of 20k events drawn once (seed 778) with the catalog-density construction of arm B, labelled, used unweighted for
+      checkpoint selection by every arm and seed (arm C''s loss weight applies to training only); the same held-out set for
+      all runs. Disk: per run the growing pool 300k x 31 float64 = 74 MB, the shared validation 5 MB and held-out 25 MB written
+      once in a shared directory and only read by the jobs (no per-job cache; candidates are held in memory and discarded),
+      checkpoints and plots ~0.2 GB -> <=0.3 GB per run, <=8 GB for 26 runs (<=15 GB with stage 2), checked against the site''s
+      free disk read at submission.'
+    control: 'Arms differ ONLY in each round''s keep rule / loss weight: A uniform keep of the proposal (July''s base); B
+      catalog density = keep without replacement with weight w_B(x) = 0.65 + 0.35/(n_bins * dens_b(x)), dens_b the candidates''
+      histogram in 60 equal log|M|^2 bins (mg5_pipeline_final._flat_logm_select''s binning; DEFAULT_SAMPLING f_flat 0.35 in
+      expectation; labels all 6x candidates); C IS-only = A''s draw with the training loss weighted per log|M|^2 bin by c_b
+      = Q_b/pi_b, Q = B''s density, pi_b the growing pool''s histogram, recomputed each round (training.is_weight_path mechanism;
+      validation unweighted); D3 keep ∝ sigma^3 over the proposal (coordinate-free); D10 keep ∝ sigma^10; E3 keep ∝ w_B(x)*sigma^3
+      (sigma on top of the catalog density). Matched pairs: D3 vs A (July replicated on the current loss), D3/E3 vs B (good
+      fixed draw), D3 vs C (plain loss reweighting), E3 vs B (does sigma add to the catalog density).'
+    seeds: '3 seeds per arm (0,1,2: init, proposals, keep draws; round 0 identical across arms per seed), 6 arms = 18 runs,
+      plus the 8 DyHPO trials on arm A (seed 0); held-out seed 777 and validation seed 778 fixed. Arm A''s 3 seeds measure
+      this setup''s seed spread; if it is too wide to resolve a ~15% effect, more seeds (the same number in all six arms,
+      with their GPU-h) go to Joaquin as a question, not a conclusion. Time (estimate, new setup, read from the batch''s own
+      first jobs): ~10 min of training (4000 steps at batch 16384, 6 legs, scaled from tp3 single-process trials, 2816 steps
+      in under 4 min wall at 4 legs) + 10 rounds of propose/label/score + held-out eval -> target 0.5 h per run, 1 GPU. Stage
+      1: DyHPO 8 trials in 3 waves ~1.5 h wall, 4 GPU-h; then the 18 runs in one wave ~0.5 h, 9 GPU-h; 13 GPU-h (26 at 1 h
+      per run). Stage 2 (only if the sigma arm loses at A''s HPs): the same 8-trial sweep for D3, B and C, 24 runs, 12 GPU-h
+      (24 at 1 h); stage 1+2 up to 25 GPU-h at the target, under 30 (D153); if the measured per-run time puts the total over
+      30, stage 2 goes to Joaquin with the number first.'
+    outcome: 'YES: D3 (or D10) logflat geometric mean below A, B and C each, with every seed of the sigma arm below the best
+      seed of that control, and E3 below B the same way -> sigma-driven generation is built into the generation path as a
+      sigma^gamma tilt of the catalog density (E form), gamma 3 unless D10 gains in the deepest decade without a worse logflat;
+      next: the multi-process version for the catalog. NO (only after stage 2, best against best): after the same 8-trial
+      sweep for D3, B and C, the sigma arm''s best is not below B''s best or C''s best beyond arm A''s measured seed spread,
+      with the controls'' seeds below or interleaved with the sigma seeds -> (i) C matches: the gain is the reweighted objective,
+      plain loss reweighting is the cheaper tool; (ii) B matches: the catalog''s density already captures it; the result goes
+      to Joaquin before more of sigma-driven generation is built (D339). UNRESOLVED: seeds of the compared arms interleave
+      and the geometric means differ by less than arm A''s seed spread -> neither yes nor no; the needed seed count (same
+      in all arms) and its GPU-h go to Joaquin as a question. A D3-vs-A loss is reported as the change of loss/start undoing
+      the July gain.'
