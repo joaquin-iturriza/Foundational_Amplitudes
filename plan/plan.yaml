@@ -21865,7 +21865,7 @@ entries:
       30, so no budget question remains'
   owner:
     agent: acb06568a509d0cc2
-    state: working
+    state: closed
     since: '2026-11-10T08:19:56+00:00'
     state_at: '2026-11-10T09:21:04.697000+00:00'
     context: 226286
@@ -22070,35 +22070,42 @@ entries:
     '7': FA-ccin2p3-c35a2199 FA-ccin2p3-ac436bba
     '8': FA-ccin2p3-c35a2199 FA-ccin2p3-ac436bba
   handoff:
-    state: 'Protocol A from scratch done (10 runs, scores recorded as findings): tt Coulomb 1/beta not extrapolated (exponent
-      ~0, deep bin 7-8.7 vs Bakar MLP 7.8); uug/uugg soft runs away with wrong sign (uug 1e5 soft +20.2, deep bin 14180 vs
-      MLP 0.32), collinear flat. Truth check (tools/kit_target_slope.py 902b6372): the parent''s emission-scale target T is
-      flat and in range in every uug hard bin (T flat-edge floor 5.6e-4 soft), so the failure is the inputs'' extrapolation.
-      Running: plain target+inputs arm on uug 1e5 FA-ccin2p3-2642b17b (design passed 06:24; read per its 3 branches against
-      control f6b2ece9 and the FLAT floors); pretrainings heldout FA-ccin2p3-62c2443b and fair_nlo FA-ccin2p3-d0b132b6 (job_kit_pretrain.sh
-      at 4894e2c8, 12 h requested, target 9 h, memmap caches prebuilt 20 GB each). PENDING at >= 08:05 UTC (budget window):
-      B and B_bulk, 12 x 3000 steps from the six n=9e5 A runs: KIT_FROM=runs/kit/<A dir> site submit ccin2p3 FA scripts/job_kit.sh
-      --allow-dirty --item kit_benchmark --est-gpu-hours <h> --hdr=--time=<0:50 tt, 1:00 uug, 1:10 uugg> -- <ds> 900000 3000
-      B|B_bulk tag=<offon|offoff for tt, none for uug/uugg> [offoff: data.offshell_per_event=false data.internal_mass_scalars=false];
-      A dirs: kit_A_ee_tt_born_n900000_t8000_offon/offoff, kit_A_ee_tt_virt_finite_n900000_t8000_offon/offoff, kit_A_ee_uug_me2_n900000_t8000,
-      kit_A_ee_uugg_me2_n900000_t8000; B path dry-run passed; plan target the batch first; ~11 GPU-h. Then: readout against
-      Bakar''s MLP table (slides 8-9; only soft/coll/Coulomb/bulk numbers are in the design so far), A_ft from heldout, the
-      fair NLO D-scan, threshold scan, KIT package. Tell pretrain_data_saving''s owner when heldout is ready.'
-    decisions: 'One seed per cell (D315); resolved above 0.3 decades, exponents at 0.1. Off-shellness off = offshell_per_event=false
-      AND internal_mass_scalars=false. Protocol B: train adds 90% of each hard_train stratum, val bulk + last 10%; B_bulk
-      matched control. The plain-target arm turns off target_physics_factor, target_physics_orders and dimensionless_inputs
-      together (the coordinator''s ask); its outcome is read on exponents, then deep bins against flat-predictor floors (reviewer
-      FIX then PASS). Pretrainings need a CPU memmap prebuild per recipe (scripts/job_mmap_prebuild.sh with the pretraining''s
-      overrides; ~20 GB each). job_kit.sh / job_kit_pretrain.sh print RUN_DONE on success (0e02e74a).'
-    ruled_out: 'float32 for KIT runs; trial 1262 as KIT parent (fails family hold-out); bulk-only checkpoint for protocol
-      B; the emission-scale target as the cause of the uug runaway (truth T is flat and in range: kit_target_slope.py)'
-    running: FA-ccin2p3-2642b17b (plain uug arm), FA-ccin2p3-62c2443b (heldout pretraining), FA-ccin2p3-d0b132b6 (fair_nlo
-      pretraining)
-    files: scripts/job_kit.sh scripts/job_kit_pretrain.sh scripts/job_mmap_prebuild.sh tools/kit_hardps.py tools/kit_predict.py
-      tools/kit_target_slope.py recipes/catalog_v4_kit_pretrain_{heldout,fair_nlo}.yaml; runs/kit/*/kit_benchmark/kit_result.{txt,json}
-      on CC; KIT slides /home/joaquin/.claude/uploads/71602535-0955-42ad-a58f-23dc320798dc/12a84312-hardps_benchmark_slides.pdf;
-      CC disk 8.7 GB free at 06:45 UTC
-    written: '2026-11-10T07:05:23+00:00'
+    state: 'Protocol A from scratch done and drawn (tools/kit_figures.py, figs in analysis/kit_benchmark/figs, data analysis/kit_benchmark/data/kit_fig_A.json):
+      no arm follows any limit; uug soft dives (1e5 median -153 vs truth +7.6). Plain target+inputs arm (2642b17b): saturates
+      (soft +0.78, coll +0.17, deep bins at the do-nothing floor; bulk 7.1e-6, 2 decades below the parent-preprocessed control).
+      FEAT check (kit_target_slope 412188b7): the off-shellness column sits outside its bulk range in 100% of hard events.
+      RUNNING: off-shellness-off arms uug c35a2199, uugg ac436bba (design passed 08:35, bands a-d against 1-decade variability;
+      read per the design, compare with f6b2ece9/12a9d54b and the 9e5 runs); protocol B: B_bulk done for tt x4 and uug (de0489b9,
+      7ea922a6, 788401d3, c79ef941, fcf9541f), uugg B e9937c15 and B_bulk 677b9e9a running (their scoring now uses the fixed
+      rebuild), the five other B runs trained fine but failed at scoring (rebuild mom_div assertion, fixed in rebuild_run.py)
+      and are re-scored without retraining by FA-ccin2p3-9165f51b, fe5c6e7d, 5b5877e0, 21dc6836, 1974ee97 (KIT_SCORE_ONLY=1,
+      REREAD of 77e3e6c2, 2e56eeca, fb15e13b, 11c56b6e, 45c023b0). Pretrainings heldout 62c2443b and fair_nlo d0b132b6 running,
+      end ~16:00 UTC. FIRST THING (Joaquin, today): the pretrained fine-tunes A_ft from the heldout parent are THE result
+      that matters; submit them the moment 62c2443b ends. No A_ft design is recorded yet: record it now (arms: tt Born and
+      virtual off-shellness on and off, uug, uugg at the n of the A scratch runs it is compared with, 9e5 and 1e5; controls
+      the A scratch runs; job_kit.sh A_ft mode with --env KIT_PARENT=runs/kit/kit_pretrain_heldout; steps and lr as the A
+      runs), get the reviewer''s pass, and queue it with site launch (ready check: 62c2443b COMPLETED with RUN_DONE) so it
+      goes at the parent''s end. Then: B readout (B vs B_bulk per family, figure with kit_figures.py adding the B dirs), tell
+      pretrain_data_saving (plan finding there) when 62c2443b ends, fair NLO D-scan after d0b132b6, threshold scan (needs
+      exact fixed-order NLO sigma(sqrt s) at KIT alpha_s 0.118 fixed, m_t 173: MG5_aMC fixed order or exact formulas validated
+      against it; surrogate side = exact NLO + integral of (V_surr - V_exact) over 2-body phase space), KIT package. Every
+      result goes out with its figure (kit_figures.py; legend says what each curve is, caption says per curve from scratch
+      or fine-tuned).'
+    decisions: 'One seed (D315). Off-shellness off = offshell_per_event=false AND internal_mass_scalars=false. KIT_FROM /
+      KIT_PARENT reach the job only through site submit --env (a shell variable is not exported: 12 B jobs failed so). Fine-tuned
+      runs are scored on their own frozen stats (rebuild_run fix 3fffcbc2; kit_predict --check-rebuild N is a CPU check).
+      Re-scoring a trained run: KIT_SCORE_ONLY=1 with the same job_kit.sh arguments, REREAD=<run id>. The off-shellness design''s
+      cuts are 1 decade on deep bins and soft-exponent bands (a) [-2.5,-1.5] (b) (-1.5,+1] (c) >+1 or within 1 decade of control
+      (d) <-2.5, because 1e5 vs 9e5 moved the deep soft bin by 1 decade. Plain-arm reading: saturates (preprocessing is not
+      what blocks the limits; it costs 2 decades of bulk).'
+    ruled_out: float32; trial 1262 as parent; bulk-only checkpoint for B; the emission-scale target as the cause of the uug
+      runaway; dimless_offshell_eps 1e-12 as a lever (changes only the deepest two decades of the column)
+    running: FA-ccin2p3-c35a2199, ac436bba (off-shellness-off arms); e9937c15, 677b9e9a (uugg B, B_bulk); 9165f51b, fe5c6e7d,
+      5b5877e0, 21dc6836, 1974ee97 (B re-scoring); 62c2443b, d0b132b6 (pretrainings)
+    files: scripts/job_kit.sh (KIT_SCORE_ONLY, --env note) tools/kit_predict.py (--check-rebuild) tools/rebuild_run.py tools/kit_figures.py
+      tools/kit_target_slope.py (FEAT) analysis/kit_benchmark/data/kit_fig_A.json analysis/kit_benchmark/figs/ scripts/job_kit_pretrain.sh
+      recipes/catalog_v4_kit_pretrain_{heldout,fair_nlo}.yaml; KIT slides /home/joaquin/.claude/uploads/71602535-0955-42ad-a58f-23dc320798dc/12a84312-hardps_benchmark_slides.pdf
+    written: '2026-11-10T09:30:05+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
