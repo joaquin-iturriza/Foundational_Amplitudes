@@ -63,6 +63,13 @@ def main():
               f"lower in {s['mumse_below_nll']}/{s['n']}")
     print("missing:", missing)
     json.dump(out, open(os.path.join(HERE, "het_mumse_summary.json"), "w"), indent=1)
+    # results.tex numbers (D85): the per-multiplicity medians, the share of the NLL selection's gap to MSE that the
+    # mu-MSE selection closes, (nll - mumse) / (nll - 1) on the medians, and the mu-MSE-selected cells below MSE
+    nums = {k.replace("->", "to"): dict(v, gap_closed=(v["nll_over_mse"] - v["mumse_over_mse"]) / (v["nll_over_mse"] - 1))
+            for k, v in out.items() if k.startswith("2->")}
+    nums.update(n=len(pts), mumse_below_nll=sum(p["het_mumse"] < p["het_nll"] for p in pts),
+                below_mse=sorted(p["het_mumse"] / p["mse"] for p in pts if p["het_mumse"] < p["mse"]))
+    print(json.dumps(nums))
 
     fig, ax = ps.figure()
     for nf, col, lab in ((3, ps.C.vermillion, r"$2\to3$"), (4, ps.C.green, r"$2\to4$")):
