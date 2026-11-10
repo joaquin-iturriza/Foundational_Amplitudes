@@ -51,7 +51,8 @@ from particle_ids import global_encode  # noqa: E402
 from lloca.utils.rand_transforms import rand_lorentz          # noqa: E402
 from lloca.utils.polar_decomposition import restframe_boost   # noqa: E402
 
-WORK = os.environ["WORK"]
+# July warm start (Jean Zay only, deleted since): kept so --setup july reproduces the July runs' configs; the
+# current-loss setup (--setup current) trains from scratch and never reads it.
 BASE22 = f"{REPO}/runs/pretrain22_heldout_uug/base/models/model_run0_best.pt"
 # Lowered fiducial cuts (open the deep IR), matching gen_uug_sampling.LOW_CUTS.
 LOW_CUTS = {"pt_min": 1.0, "cos_max": 0.9, "dr_min": 0.05, "m_min": 0.3}
@@ -110,7 +111,7 @@ def set_process(name):
     g["PDG"] = pdg
     g["NP"] = len(pdg)                                       # 2 beams + final state
     g["MASSES"] = masses                                     # FINAL-state masses only
-    g["STANDALONE"] = f"{WORK}/mg5amcnlo/{spec['standalone']}"
+    g["STANDALONE"] = f"{mp.WORK_DIR}/{spec['standalone']}"   # MG5_WORK_DIR of the site (sites/activate.sh)
     g["DATASET"] = spec["dataset"]
     fin = np.arange(2, len(pdg))
     g["GLUONS"] = [int(i) for i in fin if pdg[i] == 21]
@@ -148,6 +149,21 @@ SIG_ARM_OVERRIDES = [
     "model.net.detach_sigma_backbone=true", "model.net.sigma_after_pool=true",
 ]
 
+# --setup current (plan sigma_generation step 3): the decided run defaults instead of July's. Architecture of the
+# canonical single-process run (.claude/context/fa-canonical-setup), the HETEROSC loss as config/default.yaml has it
+# (beta 0, joint mu/sigma, sigma_after_pool; the 250-step sigma-only stage ends the run, D70/D276), MuonAdamW and the
+# template's fixed_params (sweep/sweep_config_jeanzay_template.yaml). The HPs (lr, L2 lambda, warmup, eta_min, EMA)
+# come from --hp, the best trial of the step's DyHPO; nothing here fixes them.
+CURRENT_OVERRIDES = [
+    "model.use_diagrams=false", "model.particle_encoder_hidden=0",
+    "model.net.num_blocks=8", "model.net.num_heads=8",
+    "training.batchsize=16384", "evaluation.batchsize=16384",
+    "training.regularization=L2", "training.scheduler=CosineAnnealingLR", "training.optimizer=MuonAdamW",
+    "training.loss=HETEROSC", "training.heterosc_beta=0.0", "training.heterosc_sigma_only=false",
+    "model.net.detach_sigma_backbone=false", "model.net.sigma_after_pool=true",
+    "training.get_ID=false", "training.validate_frac=0.01",
+]
+
 
 # ---------------------------------------------------------------- base proposal (process-agnostic)
 def propose_momenta(n, y_lo, mix_ir, cuts, rng, sqrt_s_lo=91.0, sqrt_s_hi=1000.0):
@@ -174,8 +190,24 @@ def propose_momenta(n, y_lo, mix_ir, cuts, rng, sqrt_s_lo=91.0, sqrt_s_hi=1000.0
     return P[rng.permutation(len(P))]
 
 
+_BACKEND_READY = set()
+
+
+def ensure_standalone():
+    """Build the process's standalone under MG5_WORK_DIR if it is not there (datagen.ensure_backend, the catalog's
+    own builder), once per process and run."""
+    key = os.path.basename(STANDALONE)[:-len("_standalone")]
+    if key in _BACKEND_READY:
+        return
+    if not os.path.exists(os.path.join(STANDALONE, mp.CPP_DRIVER_NAME)):
+        import datagen
+        datagen.ensure_backend(key)
+    _BACKEND_READY.add(key)
+
+
 def label_events(P):
     """Exact tree |M|^2 via the compiled ee_uugg standalone. P: (n,6,4)."""
+    ensure_standalone()
     events = [(P[i], PDG) for i in range(len(P))]
     with mp.CppDriverPipe(f"{STANDALONE}/{mp.CPP_DRIVER_NAME}", STANDALONE) as pipe:
         # stored rows -> MadGraph slots (the catalog key is the standalone name); fixed card alpha_s as before
@@ -298,6 +330,37 @@ def keep_logweight(sig, args):
     return args.keep_c1 * u + args.keep_c2 * u ** 2 + args.keep_c3 * u ** 3
 
 
+def catalog_logweight(logm, f=0.35, n_bins=60):
+    """Log keep weight that turns a draw from the candidates into the catalog's mixture density in expectation:
+    (1-f) of it the candidates' own density, f of it flat in log|M|^2 (mg5_pipeline_final DEFAULT_SAMPLING f_flat
+    0.35; equal bins over the candidates' range as in _flat_logm_select, 60 bins). Per candidate
+    w = (1-f) + f / (n_bins * frac_b), frac_b the share of candidates in its bin. Non-finite log|M|^2 gets -inf."""
+    logm = np.asarray(logm, dtype=np.float64)
+    ok = np.isfinite(logm)
+    out = np.full(logm.shape, -np.inf)
+    v = logm[ok]
+    edges = np.linspace(v.min(), v.max() + 1e-12, n_bins + 1)
+    b = np.clip(np.searchsorted(edges, v, side="right") - 1, 0, n_bins - 1)
+    frac = np.bincount(b, minlength=n_bins).astype(float) / len(v)
+    out[ok] = np.log((1.0 - f) + f / (n_bins * frac[b]))
+    return out
+
+
+def is_table(logm_pool, f=0.35, n_bins=60):
+    """IS table {logm_edges, c} (the format experiment._get_is_weights reads) that reweights a pool drawn from pi to
+    the catalog mixture Q = (1-f) pi + f flat, per log|M|^2 bin: c_b = Q_b / pi_b over equal bins of the pool's range,
+    renormalised so sum_b pi_b c_b = 1 (mass of Q on bins the pool leaves empty cannot be trained on)."""
+    v = np.asarray(logm_pool, dtype=np.float64)
+    v = v[np.isfinite(v)]
+    edges = np.linspace(v.min(), v.max() + 1e-12, n_bins + 1)
+    b = np.clip(np.searchsorted(edges, v, side="right") - 1, 0, n_bins - 1)
+    pi = np.bincount(b, minlength=n_bins).astype(float) / len(v)
+    q = (1.0 - f) * pi + f / n_bins
+    c = np.where(pi > 0, q / np.where(pi > 0, pi, 1.0), 0.0)
+    c /= float((pi * c).sum())
+    return {"logm_edges": edges.tolist(), "c": c.tolist(), "f": f, "n_bins": n_bins, "n_pool": int(len(v))}
+
+
 def _dataset_to_lists(ds):
     """Explode an AmplitudeDataset (round-0 train pool) back into per-event lists to seed the pool."""
     pf = ds.particles_flat.cpu().numpy()
@@ -332,6 +395,23 @@ def _make_train_loader(exp, pool):
     )
 
 
+def _make_val_loader(exp, path):
+    """exp.val_loader from a shared labelled validation file (rows: momenta, PDG ids, |M|^2; make_shared_uugg_sets.py),
+    preprocessed with the FROZEN round-0 stats, so every arm and seed selects its checkpoint on the same events."""
+    from dataset import AmplitudeDataset, build_flat_arrays, collate_variable_length
+    rows = np.load(path)
+    P = rows[:, :NP * 4].reshape(-1, NP, 4)
+    parts, toks_l, amp_p, orders, pids = preprocess_increment(exp, P, rows[:, -1])
+    pf, tf, off = build_flat_arrays(parts, toks_l)
+    ds = AmplitudeDataset(particles_flat=pf, offsets=off, amplitudes=np.asarray(amp_p).reshape(-1, 1),
+                          tokens_flat=tf, order_labels=np.asarray(orders),
+                          process_ids=np.asarray(pids).astype(np.int64), dtype=exp.dtype)
+    exp.val_loader = torch.utils.data.DataLoader(
+        ds, batch_size=int(exp.cfg.evaluation.batchsize), shuffle=False, drop_last=False,
+        collate_fn=collate_variable_length, num_workers=0)
+    print(f"[val] shared validation set {path}: {len(ds)} events", flush=True)
+
+
 # ---------------------------------------------------------------- cfg build
 # Capacity axis (--num_heads / --no_pretrain), set once from argv in main().
 # num_heads is the muP width axis, so a width change makes every backbone tensor a different
@@ -347,7 +427,7 @@ NUM_HEADS = None
 NO_PRETRAIN = False
 
 
-def build_cfg(total_steps, round0_dir, exp_name, run_name, seed, arm, pretrained=None):
+def build_cfg(total_steps, round0_dir, exp_name, run_name, seed, arm, pretrained=None, setup="july", extra=()):
     from hydra import compose, initialize_config_dir
     # BOTH arms train the identical HETEROSC(detach, beta=1) model (same mu training, same sigma head);
     # they differ ONLY in the per-round keep rule (uniform vs prop sigma^gamma), so the base arm is a
@@ -364,12 +444,15 @@ def build_cfg(total_steps, round0_dir, exp_name, run_name, seed, arm, pretrained
     else:
         pre_ov = []
     width_ov = [f"model.net.num_heads={NUM_HEADS}"] if NUM_HEADS else []
-    overrides = data_overrides() + MU_OVERRIDES + width_ov + arm_ov + pre_ov + [
-        f"exp_name={exp_name}", f"run_name={run_name}", f"seed={seed}",
-        f"data.data_path={round0_dir}/",
-        f"training.iterations={total_steps}",
-        "plot=false", "save=true", "training.save_intermediate=true",
-    ]
+    tail = [f"exp_name={exp_name}", f"run_name={run_name}", f"seed={seed}",
+            f"data.data_path={round0_dir}/", f"training.iterations={total_steps}"]
+    if setup == "current":
+        # every arm (bbb aside, which --setup current refuses) trains the same current-loss net; plots on (CLAUDE.md)
+        overrides = (data_overrides() + CURRENT_OVERRIDES + width_ov + ["fine_tune.pretrained_path=null"] + tail
+                     + ["plot=true", "save=true", "training.save_intermediate=false"] + list(extra))
+    else:
+        overrides = data_overrides() + MU_OVERRIDES + width_ov + arm_ov + pre_ov + tail + [
+            "plot=false", "save=true", "training.save_intermediate=true"] + list(extra)
     # Compose from the MAIN-repo config, NOT the worktree's: the runtime imports the core modules
     # (experiment/base_experiment/models) from the main repo, so the config tree must match them --
     # e.g. the sigma-head fields (heterosc_beta, detach_sigma_backbone) live in the main-repo config.
@@ -381,7 +464,7 @@ def build_cfg(total_steps, round0_dir, exp_name, run_name, seed, arm, pretrained
 # ---------------------------------------------------------------- driver
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--arm", required=True, choices=["base", "sigma", "bbb"],
+    ap.add_argument("--arm", required=True, choices=["base", "sigma", "bbb", "catalog", "isonly", "sigma_catalog"],
                     help="base=uniform keep; sigma=keep prop het-head sigma^gamma; "
                          "bbb=keep prop EPISTEMIC sigma^gamma from a full-network Bayes-by-backprop net")
     ap.add_argument("--bbb_beta", type=float, default=1e-2, help="bbb: ELBO KL weight (loss += beta*KL/N)")
@@ -432,18 +515,32 @@ def main():
     ap.add_argument("--heldout_label", default=None,
                     help="label for the held-out npz (default: <base|sigma|g{γ}>_s{seed}, the plot tags)")
     ap.add_argument("--heldout_path", default=None, help="held-out npz (default: heldout_uugg_deepIR.npz)")
-    ap.add_argument("--objective", default="deep", choices=["deep", "overall", "logflat"],
+    ap.add_argument("--objective", default="deep", choices=["deep", "overall", "logflat", "val"],
                     help="which held-out metric becomes val_loss in --result_path (sweep objective). "
                          "'deep' is the historical default; 'logflat' is correct for concentration "
                          "trade-off questions -- 'deep' rewards starving the bulk.")
     ap.add_argument("--result_path", default=None,
                     help="if set, write {'val_loss': deep-IR MSE, ...} here after the held-out eval "
                          "(the objective a DyHPO sweep reads).")
+    # plan sigma_generation step 3: the current-loss setup, its HPs, the shared validation set, the catalog density
+    ap.add_argument("--setup", default="july", choices=["july", "current"],
+                    help="july: the July configs (beta=1 detached sigma, AdamW fine-tune HPs, base22); current: the "
+                         "decided defaults (CURRENT_OVERRIDES), from scratch, HPs from --hp, sigma stage at the end")
+    ap.add_argument("--hp", action="append", default=[], help="Hydra override key=value (repeatable; --setup current)")
+    ap.add_argument("--val_path", default=None, help="shared labelled validation rows (.npy); replaces the round-0 val split")
+    ap.add_argument("--cat_f", type=float, default=0.35, help="catalog arms: the flat-in-log|M|^2 share f_flat")
+    ap.add_argument("--cat_bins", type=int, default=60, help="catalog arms and isonly: log|M|^2 bins")
     ap.add_argument("--validate_prep", action="store_true",
                     help="CPU check: increment preprocessing reproduces init_data on the same rows")
     args = ap.parse_args()
 
     global NUM_HEADS, NO_PRETRAIN
+    if args.setup == "current":
+        if args.arm == "bbb":
+            ap.error("--setup current covers the het-head arms only (bbb is a July MSE net)")
+        args.no_pretrain = True       # from scratch: base22 is gone and the current setup has no 1-ch parent to grow
+    elif args.arm in ("catalog", "isonly", "sigma_catalog") or args.hp or args.val_path:
+        ap.error("the catalog/isonly/sigma_catalog arms, --hp and --val_path belong to --setup current")
     if args.num_heads is not None and not args.no_pretrain:
         ap.error("--num_heads requires --no_pretrain: BASE22 is num_heads=8, so at any other width "
                  "the warm start either raises or silently drops the whole backbone.")
@@ -456,10 +553,10 @@ def main():
     R = args.rounds
     inc_n = args.n_total // R
     steps_per_round = args.total_steps // R
-    exp_name = f"eeuu_l2{args.process}"
+    exp_name = f"eeuu_l2{args.process}" if args.setup == "july" else f"sigmagen_current_{args.process}"
     # encode gamma for the sigma/bbb arms (else two gamma runs of the same arm share a run dir and
     # collide); gamma=1 stays the canonical unsuffixed name for backward compatibility.
-    gsuf = f"_g{int(args.gamma)}" if (args.arm in ("sigma", "bbb") and args.gamma != 1.0) else ""
+    gsuf = f"_g{int(args.gamma)}" if (args.arm in ("sigma", "bbb", "sigma_catalog") and args.gamma != 1.0) else ""
     run_name = f"{tag}_{args.arm}{gsuf}_s{args.seed}"
     rng_gen = np.random.default_rng(1000 + args.seed)
     print(f"[driver] process={args.process} PDG={PDG.tolist()} NP={NP} standalone={STANDALONE}", flush=True)
@@ -503,7 +600,10 @@ def main():
     # --- build experiment (warm-start base22[grown], freeze stats, ONE cosine over total_steps) ---
     from experiment import AmplitudeExperiment
     torch.set_default_dtype(torch.float32)
-    cfg = build_cfg(args.total_steps, round0_dir, exp_name, run_name, 42 + args.seed, args.arm, pretrained)
+    is_path = os.path.join(round0_dir, "is_weights.json") if args.arm == "isonly" else None
+    extra = list(args.hp) + ([f"training.is_weight_path={is_path}"] if is_path else [])
+    cfg = build_cfg(args.total_steps, round0_dir, exp_name, run_name, 42 + args.seed, args.arm, pretrained,
+                    setup=args.setup, extra=extra)
     # Assert rather than trust the override chain: at num_heads=8 a leftover warm start LOADS
     # CLEANLY (shapes happen to match) and the run silently becomes warm-started while the sweep
     # reports it as fresh-init. Only the other widths would have failed loudly.
@@ -525,7 +625,15 @@ def main():
 
     # We need init_data to have run (stats frozen) before defining the hook, but train() is called
     # inside full_run(). So we run the init prefix here, install the hook, then the loop.
-    exp.init_physics(); exp.init_geometric_algebra(); exp.init_data(); exp._init_dataloader()
+    exp.init_physics(); exp.init_geometric_algebra()
+    _before = dict(exp.__dict__)
+    exp.init_data()
+    # what init_data made, as base_experiment records it, so the sigma stage can reuse the data (run.py's path)
+    exp._data_keys = [k for k, v in exp.__dict__.items() if k not in _before or _before[k] is not v]
+    exp._data_keys += [k for k in ("_proc_npart", "mom_mean", "mom_std") if hasattr(exp, k) and k not in exp._data_keys]
+    exp._init_dataloader()
+    if args.val_path:
+        _make_val_loader(exp, args.val_path)
 
     if args.validate_prep:
         _validate_prep(exp, args, rng_gen); return
@@ -575,6 +683,21 @@ def main():
             "amps": list(pool_lists[2]), "orders": list(pool_lists[3]), "pids": list(pool_lists[4])}
     print(f"[pool] round-0 train pool seeded: {len(pool['parts'])} events", flush=True)
 
+    def write_is_table():
+        """isonly arm: the IS table toward the catalog density over the CURRENT pool, reloaded by the experiment."""
+        amps = np.asarray(pool["amps"], dtype=np.float64).reshape(-1)
+        raw = amps * float(np.atleast_1d(exp.prepd_std)[0]) + float(np.atleast_1d(exp.prepd_mean)[0])
+        tab = is_table(raw, f=args.cat_f, n_bins=args.cat_bins)
+        import json
+        with open(is_path, "w") as f:
+            json.dump(tab, f)
+        exp._is_weight_cache = "unset"                      # _get_is_weights reloads the new table
+        print(f"[is] table over {tab['n_pool']} pool events: c in [{min(tab['c']):.3f}, {max(tab['c']):.3f}]",
+              flush=True)
+
+    if is_path:
+        write_is_table()
+
     # --- saturation state: per-round record + the "stop growing" latch ---
     sat = {"rounds": [], "stopped_at": None, "n_saturated": 0, "prev_p99": None}
 
@@ -622,14 +745,26 @@ def main():
         # keeps the saturation curves comparable between arms.
         want_sat = bool(args.sat_log or args.stop_on_saturation)
         sig = None
-        if args.arm in ("sigma", "bbb") or want_sat:
+        if args.arm in ("sigma", "bbb", "sigma_catalog") or want_sat:
             # score fresh proposals by the LIVE model's uncertainty; keep WITHOUT replacement ∝ σ^γ.
             # sigma arm = het-head aleatoric σ; bbb arm = epistemic predictive std (K posterior samples).
             if args.arm == "bbb":
                 sig = score_epistemic(exp, P_prop, args.bbb_ksamples)
             else:
                 sig = score_sigma(exp, P_prop)
-        if args.arm in ("sigma", "bbb"):
+        me_all = None
+        if args.arm in ("catalog", "sigma_catalog"):
+            # catalog density (DEFAULT_SAMPLING f_flat) needs every candidate's label; sigma_catalog tilts it by sigma^gamma
+            me_all = label_events(P_prop)
+            logw = catalog_logweight(np.log(np.clip(me_all, 1e-300, None)), f=args.cat_f, n_bins=args.cat_bins)
+            if args.arm == "sigma_catalog":
+                logw = logw + keep_logweight(sig, args)
+            w = np.exp(logw - logw[np.isfinite(logw)].max())
+            w[~np.isfinite(w)] = 0.0
+            keep = rng.choice(len(P_prop), size=keep_n, replace=False, p=w / w.sum())
+            print(f"[round {r}] {args.arm} kept log|M|^2 mean={np.log(me_all[keep]).mean():.3f} "
+                  f"vs all {np.log(me_all).mean():.3f}", flush=True)
+        elif args.arm in ("sigma", "bbb"):
             # Keep-rule weight, always built in LOG space and max-shifted. Mathematically identical
             # to the direct power, but safe at large gamma: a direct sigma**gamma underflows to exact
             # 0 for the small-sigma tail once gamma is big (sigma~1e-2, gamma~30 -> 1e-60, worse for
@@ -649,15 +784,17 @@ def main():
                   f"kept σ mean={sig[keep].mean():.3g} vs all {sig.mean():.3g} "
                   f"keep-rule monotonicity ρ={mono:+.3f}", flush=True)
         else:
-            keep = rng.choice(len(P_prop), size=keep_n, replace=False)          # base arm: uniform
+            keep = rng.choice(len(P_prop), size=keep_n, replace=False)          # base / isonly: uniform
         P_keep = P_prop[keep]
-        me = label_events(P_keep)
+        me = me_all[keep] if me_all is not None else label_events(P_keep)
         parts, toks, amp_p, orders, pids = preprocess_increment(exp, P_keep, me)
         pool["parts"] += parts; pool["toks"] += toks
         pool["amps"] += [amp_p[i] for i in range(len(amp_p))]
         pool["orders"] += [orders[i] for i in range(len(orders))]
         pool["pids"] += [pids[i] for i in range(len(pids))]
         _make_train_loader(exp, pool)
+        if is_path:
+            write_is_table()
         print(f"[round {r}] +{len(P_keep)} events -> pool={len(pool['parts'])} "
               f"(step {step}/{args.total_steps})", flush=True)
         # Probe AFTER the pool has grown, so `pool` is the size that produced the next round's sigma.
@@ -701,8 +838,26 @@ def main():
 
     # run training (regeneration fires inside _cycle at each round boundary) + full_run's tail
     exp.train(); exp._save_model()
+    stage_exp = None
     if exp.is_main_process():
         exp.evaluate()
+        if args.setup == "current":
+            if exp.cfg.plot and exp.cfg.save:
+                exp.plot()
+            # the sigma-only stage that ends every HETEROSC run (D70; run.py's own path), on this run's final pool and
+            # the shared validation set; its checkpoints become the run's models (D95, promote_final_model)
+            from run import sigma_stage_cfg, promote_final_model
+            stage = sigma_stage_cfg(exp.cfg)
+            if stage is not None:
+                stage_exp = AmplitudeExperiment(stage)
+                stage_exp._reuse_data_from = exp
+                _orig_dl = stage_exp._init_dataloader
+                def _stage_dataloader():
+                    _orig_dl()
+                    stage_exp.train_loader, stage_exp.val_loader = exp.train_loader, exp.val_loader
+                stage_exp._init_dataloader = _stage_dataloader
+                stage_exp()
+                promote_final_model(exp.cfg.run_dir, stage.run_dir)
         # Fold the held-out deep-IR eval into the run tail: reload the BEST checkpoint (the same
         # model_run0_best.pt the standalone eval scores, so the number matches) and score it in-process
         # BEFORE compress_models() gzips the checkpoints. Eliminates the separate eval job + queue wait.
@@ -712,8 +867,10 @@ def main():
             # module object still on the default set_process("uugg"). EV.score_and_save reads L.NP/PDG,
             # so point THAT copy at our process too, else uug/uuggg momenta get reshaped with NP=6.
             EV.L.set_process(args.process)
-            if args.arm == "base":
-                htag = "base"
+            if args.arm in ("base", "catalog", "isonly"):
+                htag = args.arm
+            elif args.arm == "sigma_catalog":
+                htag = f"sigcat_g{int(args.gamma)}"
             elif args.arm == "bbb":
                 htag = "bbb" if args.gamma == 1.0 else f"bbb_g{int(args.gamma)}"
             else:
@@ -733,8 +890,12 @@ def main():
                 # Which metric the sweep minimises. 'deep' is the historical default (the BBB sweep
                 # used it); 'logflat' is the right choice for any question about the concentration
                 # trade-off, since 'deep' rewards starving the bulk and 'overall' is bulk-dominated.
+                # 'val': the final model's best val_loss_no_reg on the shared validation set (the HP sweep's objective,
+                # never the held-out set the comparison is read on)
+                vsrc = stage_exp if stage_exp is not None else exp
+                metrics["val"] = float(min(vsrc.val_loss_no_reg)) if vsrc.val_loss_no_reg else float("inf")
                 key = {"deep": "deep_mse", "overall": "overall_mse",
-                       "logflat": "logflat_mse"}[args.objective]
+                       "logflat": "logflat_mse", "val": "val"}[args.objective]
                 with open(args.result_path, "w") as f:
                     json.dump({"val_loss": metrics[key], "objective": args.objective,
                                "overall_mse": metrics["overall_mse"], "deep_mse": metrics["deep_mse"],
