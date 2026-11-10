@@ -998,7 +998,10 @@ def _open_run(exp, c, d, meta, fdir, need, want_offshell):
     # ---- dimensionless_inputs: the mass column's statistics over the massive train particles ----
     if dimless:
         dms = c.get("dimless_mass_stats")
-        if dms is not None:
+        if c["use_pids"]:
+            # one-hot PIDs have no mass column (wrappers.setup_dimless_pids): no statistics, None is frozen
+            exp._dimless_mass_stats = None
+        elif dms is not None:
             exp._dimless_mass_stats = [float(dms[0]), float(dms[1])]
         else:
             from particle_ids import GLOBAL_PROPERTY_MATRIX, PARTICLE_FEATURE_NAMES, MASS_MASSLESS_LOG10_THR
@@ -1015,8 +1018,11 @@ def _open_run(exp, c, d, meta, fdir, need, want_offshell):
             mu = s1 / n1 if n1 else 0.0
             sdv = float(np.sqrt(max(s2 / n1 - mu ** 2, 0.0))) if n1 else 1.0
             exp._dimless_mass_stats = [mu, sdv if sdv > 1e-6 else 1.0]
-        LOGGER.info(f"dimensionless_inputs (memmap): log10(m / sqrt(s_hat)) over the massive train particles, mean "
-                    f"{exp._dimless_mass_stats[0]:.3f}, std {exp._dimless_mass_stats[1]:.3f}")
+        if exp._dimless_mass_stats is None:
+            LOGGER.info("dimensionless_inputs (memmap) under use_PIDs: no mass column, no mass statistics")
+        else:
+            LOGGER.info(f"dimensionless_inputs (memmap): log10(m / sqrt(s_hat)) over the massive train particles, mean "
+                        f"{exp._dimless_mass_stats[0]:.3f}, std {exp._dimless_mass_stats[1]:.3f}")
 
     # ---- amplitudes: the target factor, then the shared transform / standardization (frozen or fitted here) ----
     raw, fac = {}, {}
