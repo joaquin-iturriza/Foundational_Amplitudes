@@ -21020,6 +21020,16 @@ entries:
       8 trials) on this cell, about 8 x 2.7 = 22 GPU-h, and its best is compared against the quantum-number arm, best against
       best. Held out: R on encodable probes read the same way; every probe with an unseen particle is a case one-hot cannot
       predict at all.'
+    passed_at: '2026-11-10T02:31:37+00:00'
+    reviewer: 'Re-check of the pidqn design after FIX: only data.use_PIDs moves (no mass column under one-hot, stated); same-commit
+      qn control; one-hot worse now triggers the baseline''s own Muon search (sweep_config_ccin2p3_muon_test_search_muon.yaml,
+      8 trials, 3 start-up, lr + muon_weight_decay) best against best, ~22 GPU-h. Check 2: par:v4_width PP4 R 0.565 [0.522,
+      0.614], tab:enc +12%..+18%. Check 3: seed_spread.json het |ln R_seed| median 0.102, q90 0.228, one seed per D315. Disk:
+      data_mmap.py keys (base_key_doc, features_key_doc) hold no tokenizer or use_PIDs, so both arms reuse the existing 2.5
+      GB cache; 2 x 0.86 GB vs 44 GB free on /sps/lpnhe (df 2026-11-10); confirm the same key in both first logs. Wall 2.7
+      h x 2 = 5.4 GPU-h. Reads'' sampling stated (PP4/EE4 mixture share 0.25, H1-H7c catalog-sampled, HD4/HD5 default-sampled).
+      Searched: use_PIDs, PIDs, pid arm, one-hot, pid_vs_phys, pretrain25_zs_pid, quantum number in results.tex, plan.yaml,
+      site decisions.'
   step_why:
     1:
       feeds: D364 claim that pIDs and quantum numbers behave the same, on the latest setup
