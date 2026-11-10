@@ -19,8 +19,10 @@ dyhpo:
   n_startup: 3               # n_trials / 3
   total_budget: 10000
 
+# Single fidelity (HPO rule 6, D346): one value, the run's training length set by its design; 40000 is the
+# full-fidelity length the old ladder [1000, 10000, 40000] ended at. Full dataset is always used.
 fidelity_schedule:
-  t_steps: [1000, 10000, 40000]
+  t_steps: [40000]
 
 fixed_params:
   data.data_path: ${PROJECT_DIR}/data/
