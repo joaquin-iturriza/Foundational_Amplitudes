@@ -21814,7 +21814,8 @@ entries:
       FA-ccin2p3-2a632c3b FA-ccin2p3-a1a0fd87 FA-ccin2p3-bcd58c9a FA-ccin2p3-eb7adf64 FA-ccin2p3-17be3bb9 FA-ccin2p3-f1896ed1
     '2': FA-ccin2p3-62c2443b FA-ccin2p3-d0b132b6
     '3': FA-ccin2p3-d0b132b6
-    '4': 2026-11-10T08:00 (the tt virtual model it uses is chosen from protocol B's runs, submitted then)
+    '4': FA-ccin2p3-7fd8137c FA-ccin2p3-bc7f10c3 FA-ccin2p3-536b71f5 FA-ccin2p3-35819bf4 FA-ccin2p3-eafb814b FA-ccin2p3-a8d0c926
+      FA-ccin2p3-2a632c3b FA-ccin2p3-a1a0fd87 FA-ccin2p3-bcd58c9a FA-ccin2p3-eb7adf64 FA-ccin2p3-17be3bb9 FA-ccin2p3-f1896ed1
     '5': 2026-11-10T08:00 (packages the best A/B checkpoints; B submitted then)
   handoff:
     state: 'Protocol A from scratch done (10 runs, scores recorded as findings): tt Coulomb 1/beta not extrapolated (exponent
