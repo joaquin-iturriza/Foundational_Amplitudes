@@ -20580,3 +20580,72 @@ entries:
     files: experiment.py _is_weighted/_get_is_weights; config/default.yaml is_weight_path; base_plots._save_pair; tests/test_is_weight_path.py,
       tests/test_base_plots_pair.py; analysis/divergences/* (ported); sweep/sweep_config_heterosc_*.yaml, sweep_config_mse_scratch.yaml
     written: '2026-11-10T01:07:14+00:00'
+  designs:
+  - at: '2026-11-10T01:15:54+00:00'
+    question: 'Step 3 (D339, sigma-driven generation on the current HETEROSC loss): on e+e- -> u ubar g g, does drawing each
+      round''s fresh training events with probability proportional to the model''s live predicted sigma^gamma give a lower
+      held-out log-flat-per-decade MSE of ln|M|^2 than (a) a good fixed draw, the catalog''s own mixture density (f_flat 0.35
+      flat in log|M|^2), (b) plain loss reweighting toward that density with no sigma, and (c) the uniform keep of the same
+      proposal; and does sigma add on top of the catalog density (the form generation would take in the catalog generator)?'
+    prior: 'docs/results.tex sec:div-sampling (searched: sigma, steering, l2_online, uugg, IS, reweight, fraction sweep, catalog
+      mixture f_flat; plan show sigma_generation; site decisions --project FA: D339 approves building it, no study or cost
+      decision). (1) ee->uu online study (l2_online.py, l2_eeuu_online.py @c7b61a70, fig:l2_eeuu_online): good f=0.25 base,
+      1 seed: sigma^1+IS 30.5x worse than static, sigma^0.25 only matches it; starved f=0 base, 3 seeds: static 1.44e-4, sigma^0.5+IS
+      2.75e-5, IS-only (no sigma) 3.06e-5, IS over sigma 1.11 inside the IS seed spread -> the gain is the objective, not
+      sigma; coordinate-free sigma^1 vs fresh static f=0.25, 6 rounds, 3 seeds: 1.48e-5 vs 1.11e-5 (1.34, seeds overlap).
+      (2) Starved-base L1 sigma-reweighting ~oracle (3 seeds) but no sigma-free reweighting arm. (3) ee->uugg steering loop
+      (l2_online_uugg.py, steering_numbers.py @40b69989): sigma^gamma keep vs UNIFORM keep of the democratic+RAMBO proposal,
+      3 seeds, logflat sigma/base 92/81/78/76/74% at gamma 1/2/3/5/10, deepest decade 90..55%, bulk decade rises 107->128%;
+      gamma 20/30 (1 seed) saturate deep and degrade overall past gamma~3; transfers to uug, uuggg, bbbarg (Z-localised gain).
+      No study ran sigma against plain loss reweighting or against a good fixed draw on uugg. (4) Coverage layer: flat-in-log|M|^2
+      mixture f~0.25-0.5 is the deployable fixed density (uug antenna fraction sweep, ee->uu fraction sweep), adopted in the
+      catalog as DEFAULT_SAMPLING f_flat 0.35, oversample 6, democratic 0.5, y_lo 1e-6 (mg5_pipeline_final.py:3103). HOW THIS
+      DIFFERS: adds the two missing controls (catalog-density draw; IS-only reweighting toward it) and the sigma-on-catalog
+      arm; runs on the current loss (HETEROSC beta=0 NLL, MuonAdamW, the 250-step sigma stage ending the run, D70/D276) instead
+      of July''s beta=1 detached-sigma pure-MSE mu; trains from scratch at a DyHPO-best HP set because July''s warm start
+      base22 (runs/pretrain22_heldout_uug) no longer exists; the round boundary hook (_online_hook in base_experiment.train)
+      and Jean Zay paths ( standalones) of the July loop are not on trunk and are rebuilt on siteconf.'
+    measure: 'Primary: logflat = mean over the 7 y_min decades (<1e-6 ... >0.1) of the per-decade MSE of ln|M|^2 on a fixed
+      held-out deep-IR uugg set (100k events, y_min down to 1e-8, seed 777, make_heldout_uugg.py regenerated on CC, labels
+      from the ee_uugg standalone), from each run''s final model (best checkpoint by val_loss_no_reg, then the sigma stage,
+      D276), combined over seeds by geometric mean; reader steering_numbers.py''s decade definition. Secondary: deepest-decade
+      (y_min<1e-6) MSE, bulk-decade (y_min>0.1) MSE (the reallocation cost), all-event MSE, Spearman(sigma, |error|) on the
+      held-out set (does the live sigma rank error under the current loss).'
+    check: 'analysis/divergences/sigma_gen_design_check.py (worktree sigma-gen3, over the committed steering_eval_summary.json
+      of the July uugg evals): base arm seed spread max/min logflat 1.14, deepest 1.27; sigma^3 seeds 0.0342/0.0342/0.0342
+      and sigma^10 0.0335/0.0320/0.0320 vs base 0.0466/0.0437/0.0410: the worst sigma seed is below the best base seed by
+      0.83x (gamma 3) and 0.82x (gamma 10) on logflat, 0.75x and 0.67x on the deepest decade. So the measure moves with the
+      keep rule beyond 3-seed noise, and a 3-seed contrast resolves a ~15% effect; the July summary has no arm against a good
+      fixed draw or IS-only, which is what this design adds.'
+    fixed: Process e+e- -> u ubar g g, sqrt(s) uniform 91-1000 GeV, lowered cuts LOW_CUTS (pT>1, cos<0.9, dR>0.05, m>0.3);
+      proposal = 0.5 IR-democratic splitter (y_lo 1e-6) + 0.5 flat RAMBO, oversample 6 candidates per kept event (the catalog's)
+      in every arm; 10 rounds, 300k events total (30k fresh per round, growing pool), 4000 steps total under one cosine; model
+      mu-P LLoCa num_blocks 8, num_heads 8, use_diagrams false, particle_encoder_hidden 0 (canonical single-process); loss
+      HETEROSC beta=0, mean aggregation, heterosc_select nll, default 250-step sigma-only stage at the end; MuonAdamW and
+      batch 16384, HPs = the best trial of an 8-trial single-fidelity DyHPO over the template's coupled space at t=4000 on
+      arm A (start-up trials then 2 sequential batches, D244), identical in all arms; from scratch (no warm start); preprocessing
+      stats frozen at round 0 (the round-0 draw is the same uniform keep in every arm for a given seed); scoring sigma = the
+      live joint sigma head at each round boundary (no per-round sigma fit); same held-out set for all runs.
+    control: 'Arms differ ONLY in each round''s keep rule / loss weight, as a 2x2 plus controls: A uniform keep of the proposal
+      (July''s base); B catalog density = keep without replacement with weight w_B(x) = 0.65 + 0.35/(n_bins * dens_b(x)),
+      dens_b the candidates'' histogram in 60 equal log|M|^2 bins (mg5_pipeline_final._flat_logm_select''s binning; = DEFAULT_SAMPLING
+      f_flat 0.35 in expectation; labels all 6x candidates); C IS-only = A''s draw with the training loss weighted per log|M|^2
+      bin by c_b = Q_b/pi_b, Q = B''s density, pi_b the growing pool''s histogram, recomputed each round (training.is_weight_path
+      mechanism; validation unweighted); D3 keep ∝ sigma^3 over the proposal (the July overall optimum, coordinate-free);
+      D10 keep ∝ sigma^10 (July deepest-decade optimum); E3 keep ∝ w_B(x)*sigma^3 (sigma on top of the catalog density). Matched
+      controls for the sigma question: D3 vs A (replicates July on the current loss), D3/E3 vs B (good fixed draw), D3 vs
+      C (plain loss reweighting), E3 vs B (does sigma add to the catalog density).'
+    seeds: '3 seeds per arm (0,1,2: init, proposals, keep draws; round 0 identical across arms per seed), 6 arms = 18 runs,
+      plus the 8 DyHPO trials on arm A (seed 0); held-out set seed 777 fixed. Estimate (not measured: new setup, read from
+      the batch''s own first jobs): 4000 steps at batch 16384 for 6-leg events ~10 min on a CC GPU (from the tp3 single-process
+      trials, 2816 steps in under 4 min of wall at 4 legs) + 10 rounds of proposal/label/score + held-out eval ~15 min ->
+      target 0.5 h per run, 1 GPU; 26 runs x 0.5 h = 13 GPU-h (26 GPU-h if 1 h per run), under the 30 GPU-h confirm line (D153).'
+    outcome: 'YES (sigma-driven generation earns its place): D3 (or D10) logflat geometric mean below A, B and C each, with
+      every seed of the sigma arm below the best seed of that control (the criterion the July check passes against A at 0.83x);
+      and E3 below B the same way -> sigma-driven generation is built into the generation path as a sigma^gamma tilt of the
+      catalog density (E form), gamma 3 unless D10''s deep-decade gain without a worse logflat says otherwise; next step:
+      the multi-process version for the catalog. NO, two readings: (i) C within the sigma arm''s seed range (as on ee->uu,
+      IS over sigma 1.11) -> the gain is the reweighted objective, not sigma''s choice of events, and plain loss reweighting
+      is the cheaper tool; (ii) B at or below D3/E3 -> the catalog''s fixed density already captures it; either way the result
+      goes to Joaquin before anything more of sigma-driven generation is built (D339 says he will use it). A D3-vs-A loss
+      on the current loss (July replicated as no) is reported as the change of loss/start undoing the July gain.'
