@@ -20929,7 +20929,7 @@ entries:
     - 4
   owner:
     agent: a3907d6d36879af7b
-    state: working
+    state: closed
     since: '2026-11-10T09:01:19+00:00'
     state_at: '2026-11-10T09:01:31+00:00'
     context: 180032
@@ -21549,33 +21549,22 @@ entries:
     start: '2026-11-10T09:16:45+00:00'
     at: '2026-11-10T09:16:45+00:00'
   handoff:
-    state: 'Step 1 (tree calibration) done and dropped: 27 scratch runs tagged cal2 (CC, scripts/job_data_saving.sh @c88e9b5c,
-      seed 42, the parent''s fixed lr law), read by analysis/data_saving/horizons.py into analysis/data_saving/data/horizons_cal2.json
-      @f280a9fc. ee->ttbar crosses 1e-4 from D=100, its T(D) for k=2..10 = 800,1440,4000,2240,2560,1120,4000,1680,1680. ee->ccbar
-      g and ee->bbbar gg never reach 1e-4 (best 3.8e-3 and 1.7e-2 at D=1e5; at k<=8 the best sits in the warm-up), so their
-      horizons come from phase a (scratch DyHPO at 8000/12000 steps). Stage-2 design (recorded 06:51) got FIX twice from the
-      design reviewer on check 3 (expected saving inside the 5x search spread): dead end recorded for the two-point D* readout;
-      the next revision reads D* from a fit over 3-5 D points per arm (log L vs log D, or A D^-a + L_inf) with a band from
-      residuals and the 5x spread, then re-review (continue the same design reviewer). GPU-budget ask with Joaquin (holds
-      steps 3,4; step 5 the CC disk check waits on step 3): phase a 89.0 GPU-h (gen_data_saving.py), ttbar 12.4+12.4, phase
-      b up to ~180. Fine-tune parent: kit_benchmark''s held-out pretraining FA-ccin2p3-f0ca7a15 failed 07:08 (missing memmap
-      cache), its owner reruns it; the fine-tune dry run (run_trial.build_command) is due once it exists. One-loop arm (step
-      2) gated on virtual_over_born''s verdict.'
-    decisions: Scratch base config = trial 1262 of cov_v4_long_hpo8_cc_68224 (calibration parent); fine-tune parent = kit_benchmark's
-      family-held-out pretraining (trial 1262 trains near-duplicates of the targets). One seed per cell (D315). Checkpoint
-      on val mu MSE (D85/D89, heterosc_select=mu_mse; DyHPO observes it). lr window one decade either side of the calibration
-      lr c=7.82114e-3 (T/17056)^-0.55 x D factor (the parent's Muon law; the AdamW surface is ~10x lower), repo-reviewer passed
-      @9f720993. Readout at 1e-4 where reached and at 1e-2 for all targets (coordinator, Joaquin informed). Job script prints
-      RUN_DONE (0be8dbb5) and writes result.json (c88e9b5c); cluster.time in the sweep configs is the estimate, drive.py adds
-      the margin.
-    ruled_out: 'The 18 first runs tagged cal (no mu-MSE curve kept: parent''s result_path null) and the 9 bbbar gg at 0d14a678
-      (cancelled); the fixed-lr plateau rule for ccbar g/bbbar gg horizons (best inside the warm-up); D* from the two bracketing
-      grid points alone (inside the noise); more seeds (D315, never ask).'
-    running: none
-    files: scripts/job_data_saving.sh, analysis/data_saving/horizons.py, analysis/data_saving/data/horizons_cal2.json, sweep/gen_data_saving.py
-      (phase a / phase b --ft-parent --horizons), recipes/catalog_v4_datasaving_epem_{ttx,ccxg,bbxgg}.yaml, docs/results.tex
-      sec:ladder (seed paragraph, gain_heatmap, nogain) and par:v3_muon, par:v4_length
-    written: '2026-11-10T07:06:00+00:00'
+    state: 'Step 6 in progress: v4_epem_bbx_nlo dropped (V/B constant); v4_bbx_zz_nlo and v4_uux_epemz_nlo kept; bg_ab and
+      epem_ddxz out (V changes sign, signedlog target). Third target: first of bbx_gg, dg_uwm, bbx_avevex, db_bdz, uc_cuz
+      with std ln|V/B| >= 0.1 and no V<0, from sidecar job FA-ccin2p3-35699fdd (running); then rerun analysis/data_saving/vb_spread.py,
+      write recipes/catalog_v4_datasaving_<t>.yaml + loops entry + plot colour, draw the spread figure, and submit the 24-run
+      cal_vb calibration (design passed 09:15, targets recorded: cal_vb 1.7 h x 24, scratchpad submit_cal_vb.sh without the
+      dependency flag: CC refused afterok on the CPU job). Stage 2 still waits on Joaquin''s budget answer; stage-2 fit-based
+      D* revision drafted (n=4: bands 1.26x ttbar, 3.8x ccbar g).'
+    decisions: One-loop targets need std ln|V/B| >= 0.1 and V of one sign (a sign-changing V/B trains on signedlog, not ln|V|);
+      horizons.py lists non-ln|V| runs apart and sends still-falling or >5.4e-4-at-1e4 one-loop curves to the stage-2 DyHPO
+      (design review FIX then PASS).
+    ruled_out: v4_epem_bbx_nlo (constant V/B), v4_bg_ab_nlo and v4_epem_ddxz_nlo (V changes sign on 28.7% and 13.9% of rows);
+      afterok dependency from a CPU job on CC.
+    running: FA-ccin2p3-35699fdd (CPU Born sidecars of five candidates)
+    files: scripts/job_vob_born.sh, analysis/data_saving/vb_spread.py, analysis/data_saving/horizons.py, analysis/data_saving/plot_calibration.py,
+      recipes/catalog_v4_datasaving_{bbx_zz_nlo,uux_epemz_nlo,loops}.yaml
+    written: '2026-11-10T09:26:01+00:00'
   ask: 'GPU budget: 200-290 GPU-h above 30 with no decision covering it. Stage 2 of the data-saving study (three held-out
     tree targets, scratch against fine-tuned, an 8-trial DyHPO per cell, one seed per cell). The data saved expected from
     the calibration''s scratch slopes and earlier results (par:v3_muon, fine-tuned MSE about 9 times below scratch; sec:ladder,
