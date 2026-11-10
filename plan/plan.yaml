@@ -20929,3 +20929,29 @@ entries:
     paths: []
   dead_ends: []
   asks: []
+- id: ladder_figs
+  title: 'draft figs 10 and 11: from-scratch line on top'
+  question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
+  status: running
+  quotes:
+  - said_at: '2026-11-10T02:08:07.285000+00:00'
+    text: I only want you to change figure 10 and 11 so that the black from scratch line is on top and clearly visible, explain
+      in the text that the point is to show that any pretraining, even if completely unrelated to the target process, in general
+      helps.
+    decision: D362
+    covers:
+    - ladder_figs
+    - draft_rewrite
+  decisions:
+  - D362
+  next: 'mechanical-worker: find the rung_grid producer, draw the scratch curve above every rung curve, nothing else changed,
+    regenerate png+pdf, look once at low resolution, commit.'
+  done_when: null
+  notes_ref: null
+  match: none
+  evidence:
+    runs: []
+    commit: null
+    paths: []
+  dead_ends: []
+  asks: []
