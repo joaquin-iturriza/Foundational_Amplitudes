@@ -27,6 +27,8 @@ RECIPE="$PROJECT_DIR/recipes/catalog_v4_kit_pretrain_${WHICH}.yaml"
 [ -e "$RECIPE" ] && [ -e "$PROJECT_DIR/$PARENT/config.yaml" ] || { echo "no $RECIPE or $PARENT/config.yaml"; exit 2; }
 TAG=; ARGS=(); for x in "$@"; do case "$x" in tag=*) TAG="_${x#tag=}";; *) ARGS+=("$x");; esac; done
 OUT="$PROJECT_DIR/runs/kit/kit_pretrain_${WHICH}${TAG}"
+# the run's total steps (the parent's 68224); KIT_TOTAL_STEPS only for a CPU dry run of the resume on a tiny run
+TOTAL="${KIT_TOTAL_STEPS:-68224}"
 if [ "${KIT_RESUME:-}" = 1 ]; then
     # KIT_RESUME=1 (site submit --env, with --hdr=--dependency=afterany:<the first job>): continue a pretraining its
     # time limit stopped (the first two ran 0.94 s/step on V100, 17.9 h for 68224 steps against a 12 h limit). It
@@ -61,12 +63,12 @@ sys.exit(1)
 PYEOF
 ) || { echo "KIT_PRETRAIN_RESUME: no usable checkpoint in $M"; exit 2; }
     read -r F DONE <<< "$PICK"
-    REM=$((68224 - DONE))
+    REM=$((TOTAL - DONE))
     [ "$REM" -gt 0 ] || { echo "KIT_PRETRAIN_RESUME: $F has $DONE steps, nothing left"; exit 2; }
     cp "$M/$F" "$M/model_run0.pt" && echo "$F last_epoch=$DONE remaining=$REM $(date -u +%FT%TZ)" > "$M/resumed_from.txt"
     echo "KIT_PRETRAIN_RESUME from $F at step $DONE: $REM steps left, args: ${ARGS[*]}"
     python run.py --config-path "$OUT" --config-name config run_dir="$OUT" warm_start_idx=0 run_idx=0 \
-        training.iterations="$REM" training.increment_steps=68224 training.is_dyhpo_run=false \
+        training.iterations="$REM" training.increment_steps="$TOTAL" training.is_dyhpo_run=false \
         ++training.resume_seed_best=true "${ARGS[@]}"
     RC=$?
     echo "KIT_PRETRAIN_DONE rc=$RC $OUT"
