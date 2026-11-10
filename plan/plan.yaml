@@ -20924,9 +20924,19 @@ entries:
       and its horizons, names no GPU-h), 2026-10-06T00:17 (the old transfer study''s finish, approved items of that study
       only), 2026-11-06T19:52 (warm-start lr mismatch, another question); none covers 200-290 GPU-h'
     blocks: stage 2 submissions (phase a about 90 GPU-h, phase b, ee->ttbar 12.4 + 12.4)
-    blocks_steps: &id003
+    blocks_steps:
     - 3
     - 4
+  - ask: 'Scope: if none of the last seven candidates (bb->bb, bbbar->HZ, bbbar->ccbarH, bg->bgg, gg->bbbar g, ucbar->cbarHu,
+      udbar->ccbarW+) has a one-signed virtual, accept a one-loop arm with two targets (bbbar->ZZ, uubar->e+e-Z) instead of
+      three?'
+    at: '2026-11-10T09:52:10+00:00'
+    searched: 'his request 2026-11-10T02:08 (''one-loop targets with the trees in the pretraining'', no count); 2026-11-01T16:17
+      (batches of three a scheduling choice); 2026-10-04T10:57 (arms must test what their names say: unrelated to count);
+      site decisions D355, D356, D360; CLAUDE.md scope rule'
+    blocks: only the third target's 8 calibration runs
+    blocks_steps: &id003
+    - 6
   owner:
     agent: a3907d6d36879af7b
     state: stopped
@@ -21575,20 +21585,14 @@ entries:
     files: scripts/job_vob_born.sh, analysis/data_saving/vb_spread.py, analysis/data_saving/horizons.py, analysis/data_saving/plot_calibration.py,
       recipes/catalog_v4_datasaving_{bbx_zz_nlo,uux_epemz_nlo,loops}.yaml
     written: '2026-11-10T09:26:01+00:00'
-  ask: 'GPU budget: 200-290 GPU-h above 30 with no decision covering it. Stage 2 of the data-saving study (three held-out
-    tree targets, scratch against fine-tuned, an 8-trial DyHPO per cell, one seed per cell). The data saved expected from
-    the calibration''s scratch slopes and earlier results (par:v3_muon, fine-tuned MSE about 9 times below scratch; sec:ladder,
-    half a decade of D): about 1.5 to 3 times for ee->ttbar at MSE 1e-4 and about 10 times for ee->ccbar g at 1e-2. Two searches
-    of one cell differ up to 5 times in MSE, which moves D* by about 0.15 decade (ttbar), 0.8 (ccbar g), 1.4 (bbbar gg). From
-    scratch ee->ccbar g and ee->bbbar gg stay above 1e-4 at every D up to 1e5 (best 4e-2 and 1.5e-1 at D=1e4 at a fixed lr).
-    Go, with D* read from a fit over 3 to 5 D points per arm, accepting that ee->ttbar at 1e-4 may read not resolved and ee->bbbar
-    gg a lower bound?'
-  waiting_since: '2026-11-10T06:53:44+00:00'
-  searched: 'CLAUDE.md GPU budget rule; site decisions D315, D354 (''we will need to run a lot of things'': the programme,
-    no cost), D355, D356, D360 (the study, no cost); Joaquin''s messages 2026-11-10T02:08 (the programme: asks for the study
-    and its horizons, names no GPU-h), 2026-10-06T00:17 (the old transfer study''s finish, approved items of that study only),
-    2026-11-06T19:52 (warm-start lr mismatch, another question); none covers 200-290 GPU-h'
-  blocks: stage 2 submissions (phase a about 90 GPU-h, phase b, ee->ttbar 12.4 + 12.4)
+  ask: 'Scope: if none of the last seven candidates (bb->bb, bbbar->HZ, bbbar->ccbarH, bg->bgg, gg->bbbar g, ucbar->cbarHu,
+    udbar->ccbarW+) has a one-signed virtual, accept a one-loop arm with two targets (bbbar->ZZ, uubar->e+e-Z) instead of
+    three?'
+  waiting_since: '2026-11-10T09:52:10+00:00'
+  searched: 'his request 2026-11-10T02:08 (''one-loop targets with the trees in the pretraining'', no count); 2026-11-01T16:17
+    (batches of three a scheduling choice); 2026-10-04T10:57 (arms must test what their names say: unrelated to count); site
+    decisions D355, D356, D360; CLAUDE.md scope rule'
+  blocks: only the third target's 8 calibration runs
   blocks_steps: *id003
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
