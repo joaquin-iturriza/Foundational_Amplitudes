@@ -22283,6 +22283,58 @@ entries:
       an arm with exponents off by >0.3 but not near 0 and deep bins below the floor falls in no branch; report it as partial.
       Searched: dimensionless, plain target, target_physics_factor=false, dimensionless_inputs=false, emission scale, KIT,
       Bakar in docs/results.tex and site decisions.'
+  - at: '2026-11-10T08:29:58+00:00'
+    question: 'Is the off-shellness input column what makes the parent-preprocessed network run away into the ee->uug and
+      ee->uugg soft limits? Protocol A from scratch, n=1e5, on the parent''s setup (emission-scale target T, dimensionless
+      inputs, off-shellness columns on) gave soft exponents +20.2 (uug) and +16.6 (uugg) against exact -2, deepest soft bins
+      14180 and 9067 against Bakar''s MLP 0.32 and 0.40; T itself is flat and inside its bulk range in every hard bin (T flat-edge
+      floor 5.6e-4 soft uug). The off-shellness column log1p(o/eps) is outside its bulk range in 100% of hard events, 3-13
+      units below it (FEAT lines). One matched arm per process with the off-shellness columns removed (data.offshell_per_event=false
+      and data.internal_mass_scalars=false, the entry''s ''off'' definition), everything else of the control. Feeds: which
+      input carries the runaway, so the input-representation lever (the plain arm''s ''saturates'' branch) changes the right
+      thing; and whether a T-target network with in-range inputs reaches the floor that beats Bakar''s MLP, the number for
+      KIT.'
+    prior: 'Searched docs/results.tex, the plan and site decisions for off-shellness, offshell_per_event, internal_mass_scalars,
+      dimensionless, KIT. results.tex 9025-9078: off-shellness adopted for resonances (flagship A/B over the 44-dataset Z/top/Higgs
+      mixture), D2 lever arms; never tested into massless soft/collinear limits. This entry: tt virtual 9e5 off-shellness
+      on vs off: Coulomb deep bin 8.68 vs 7.00 (0.09 decades, unresolved), Sudakov 15-50 TeV 0.28 vs 64 (off blew up); tt
+      Born threshold bins on 1.85 decades lower. uug plain target+inputs arm FA-ccin2p3-2642b17b (off-shellness on, GeV):
+      saturates, soft +0.78, coll +0.17, deep bins 0.10/0.26 decades above the plain flat-edge floor, bulk 7.1e-6 vs control
+      8.2e-4.'
+    measure: 'KIT''s src/evaluate.py through tools/kit_predict.py on the run''s final model: soft_x and coll_y (uugg: coll_gg,
+      coll_qg) fitted exponents against exact (-2, -1), log10-MSE per hard_test stratum, deepest bins (x, y 1e-7..1e-6) and
+      bulk_test; bin by bin against the control, and against the T flat-edge floors of tools/kit_target_slope.py (uug 5.6e-4
+      soft, 1.7e-3 coll deepest bins; uugg read from the same tool''s FLAT lines before the readout) and Bakar''s MLP at 1e5
+      (uug 0.32 / 0.11, uugg soft 0.40).'
+    check: 'tools/kit_target_slope.py at 412188b7 (CC CPU, ee_uug me2, truth, 1e5 per stratum): the off-shellness column the
+      model reads, log1p(o/eps) of o = min 2p_i.p_j/s_hat over pairs with a gluon at eps 1e-6: bulk range [9.33, 13.05], hard-bin
+      medians soft 6.77 / 4.48 / 2.27 / 0.63 / 0.08, coll 8.06 / 5.76 / 3.48 / 1.43 / 0.28, outside the bulk range 1.000 in
+      every hard bin; T: outside 0.06-0.12, slope +0.000 soft / -0.029 coll. So with off-shellness on, a network asked for
+      a flat T is fed an input many units outside its training range in every hard event; removing it leaves the momenta (dimensionless)
+      as the only route to the limit. Measure moves with an input-set change: in this entry off-shellness on/off moved tt
+      Born threshold bins by 1.85 decades and the tt virtual Sudakov bin from 64 to 0.28; Bakar''s MLP raw vs log-invariant
+      inputs moved the soft exponent by 2.1. Noise: one seed (D315), seed spread 0.148 decades; resolved above 0.3 decades,
+      exponents at 0.1.'
+    fixed: 'Everything of each control: scripts/job_kit.sh A mode at 412188b7 (unchanged since b658bee6 for this path), trial
+      1262''s saved config as base (muP LLoCa, HETEROSC, MuonAdamW, batch 16384, diagrams through the sidecar, T target, dimensionless
+      inputs), float64, seed 42, 8000 steps, lr from the script''s D-factor law (1.19e-2 as the controls), n_train 1e5, val
+      the last 1e5 of bulk_train, test bulk_test 2e5 and every hard_test stratum. Only data.offshell_per_event and data.internal_mass_scalars
+      change (true -> false), as in the tt off arms (the dimensionless path refuses internal_mass_scalars without offshell_per_event).
+      Rates from the controls: uug 0.675 s/step (1.5 h + 3 min sigma and scoring, --time 2:00), uugg 0.79 s/step (1.76 h +
+      4 min, --time 2:15); 2 jobs, 3.9 GPU-h requested. Disk: run dir 70 MB each, data.memmap=false; CC 8.4 GB free before
+      the B batch (~2 GB), arms add 0.15 GB. tag=nooffshell.'
+    control: 'FA-ccin2p3-f6b2ece9 (uug n=1e5 protocol A) and FA-ccin2p3-12a9d54b (uugg n=1e5 protocol A): the same job, seed,
+      steps, lr and data with the off-shellness columns on. Externally Bakar''s MLP at 1e5.'
+    seeds: One seed (42), D315.
+    outcome: 'Read on exponents first, deep bins second. Off-shellness was the runaway: arm''s soft exponent within 0.3 of
+      -2 and collinear within 0.3 of -1, and deep soft/collinear bins more than 0.3 decades below the control''s: T with in-range
+      inputs extrapolates; the input-representation lever is to keep the off-shellness column inside its range (clamped, or
+      off for massless lines) and protocol A_ft / B / the KIT package use it. Runaway gone but flat: soft exponent within
+      0.3 of 0 (or |pred| < 0.3) and deep bins below the control''s by more than 0.3 decades: the off-shellness column drove
+      the runaway, the momenta carry no limit; report the deep bins against the T flat-edge floor (a flat T is the floor itself)
+      and the next lever is how the momenta enter (architecture), not the column. No change (exponents within 0.3 and deep
+      bins within 0.3 decades of the control''s): the momenta drive the runaway; next lever the momentum representation. Each
+      branch read per process; uug and uugg disagreeing is reported as such.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
