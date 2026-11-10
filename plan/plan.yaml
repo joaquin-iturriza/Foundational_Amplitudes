@@ -21616,6 +21616,7 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-12a9d54b
+    - FA-ccin2p3-2642b17b
     - FA-ccin2p3-2c922af4
     - FA-ccin2p3-366a4a98
     - FA-ccin2p3-7d74d518
@@ -21625,7 +21626,7 @@ entries:
     - FA-ccin2p3-c8ac36f0
     - FA-ccin2p3-de744946
     - FA-ccin2p3-f6b2ece9
-    commit: 436952f2
+    commit: 412188b7
     paths:
     - tests/test_kit_hardps.py
     - tools/kit_hardps.py
