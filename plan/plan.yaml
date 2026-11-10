@@ -21746,6 +21746,24 @@ entries:
       113 MB), B batch 12 run dirs ~0.85 GB + six __hard train/val pools ~1.2 GB, plain arm 0.07 GB: ~2.5 GB, fits with ~6
       GB left. Not ours, untouched: amp_data_cache 122 GB (KIT pools in it 0.95 GB, ours, needed by B), mmap caches 7d589cbf,
       f5ccb555 (2.5 GB each).'
+  - at: '2026-11-10T08:21:05+00:00'
+    text: 'Plain target and inputs arm, ee->uug protocol A from scratch n=1e5 (FA-ccin2p3-2642b17b, scripts/job_kit.sh at
+      c53a6608, data.target_physics_factor/target_physics_orders/dimensionless_inputs=false, rest as control FA-ccin2p3-f6b2ece9;
+      KIT evaluate.py via kit_predict, runs/kit/kit_A_ee_uug_me2_n100000_t8000_plain/kit_benchmark/kit_result.txt on CC; one
+      seed; 0.675 s/step, 1.53 h). Branch: SATURATES (on the fails side). Exponents plain / control (exact; Bakar MLP): soft
+      +0.78 / +20.2 (-2; -2.12), collinear +0.17 / +0.32 (-1; -0.93). Deepest bins log10-MSE plain / control / plain flat-edge
+      floor / MLP: soft x 1e-7..1e-6 144.9 / 14180 / 115.9 / 0.32 (plain 0.10 decades above its floor); coll y 1e-7..1e-6
+      25.5 / 30.1 / 13.9 / 0.11 (0.26 decades above its floor). So the plain arm holds near its bulk-edge value (bias -12.0
+      decades soft, -5.0 collinear), no limit is learned; collinear exponent within 0.3 of 0, soft off by 2.8 with the wrong
+      sign, both deep bins within 0.3 decades of the do-nothing floor. Against the control: soft deep bin 1.99 decades lower
+      (the runaway is gone), collinear deep 0.07 (unresolved); shallower bins plain WORSE: soft x 1e-3..1e-2 1.18 vs 0.34
+      (+0.54 decades), 1e-4..1e-3 6.9 vs 3.0 (+0.37), coll y 1e-3..1e-2 0.075 vs 0.037 (+0.31). Bulk_test: plain 7.1e-6 vs
+      control 8.2e-4 (2.06 decades better) and vs Bakar''s MLP at 1e5 2.1e-5 (0.47 decades better); bulk |M|^2-weighted error
+      6.9e-3 vs 8.2e3 (control has blow-ups). The control''s gap to its own T flat-edge floor: 14180 vs 5.6e-4 (7.4 decades).
+      Reading: the parent''s preprocessing is not what blocks extrapolation into the limits (neither preprocessing learns
+      them; the next lever is the input representation, log invariants as in Bakar''s MLP), but the dimensionless target+inputs
+      cost 2 decades of bulk accuracy on uug from scratch at 1e5 and cause the soft runaway. Exponent and bin numbers resolved
+      at 0.3 decades / 0.1 (D315 one seed).'
   step_why:
     1:
       feeds: 'the numbers sent to KIT: whether hard_train fixes each family (B vs B_bulk)'
