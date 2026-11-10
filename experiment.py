@@ -2229,6 +2229,13 @@ class AmplitudeExperiment(BaseExperiment):
             # data.offshell_stats, else the swapped split shifts the input of every event
             mu, sd = self._resolve_offshell_stats(lambda: (osh.mean(0), osh.std(0)), osh.shape[1])
             osh = ((osh - mu) / sd).astype(np.float32)
+            if bool(self.cfg.data.get("offshell_zero", False)):
+                # data.offshell_zero (kit_benchmark A_ft off arms): the off-shellness columns held at 0, so a parent
+                # trained with them loads unchanged and they carry nothing; they enter only through the first Linear
+                # of the input and frames nets (concatenated per-particle scalars), where a zero column is the same
+                # as the column removed (offshell_per_event=false and internal_mass_scalars=false)
+                osh[:] = 0.0
+                LOGGER.info("offshell_zero: off-shellness columns held at 0")
             n_pdg = len(self._internal_mass_pdgs)
             self.all_order_labels[:, -n_pdg:] = osh
             LOGGER.info(f"offshell_per_event ON: internal-mass slot ({n_pdg} col) filled "
