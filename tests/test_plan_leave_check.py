@@ -81,6 +81,11 @@ def test_date_wait():
                            "21": "on or after 2026-11-17"}
     assert plan.wait_date("on or after 2026-11-17") == dt.datetime(2026, 11, 17, tzinfo=dt.timezone.utc)
     assert plan.wait_date("FA-ccin2p3-a77e20b8 2026-11-17") is None, "a wait on runs is not a date wait"
+    assert plan.wait_date("2026-11-17") and plan.wait_date("the date 2026-11-17: a week of usage")
+    # E4458 (2026-11-10): waits that only date something else are not date waits
+    for w in ("a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)",
+              "Joaquin: syncClaudeAiSkills false (asked 2026-10-31 ~00:30)", "reviewer, expected 2026-11-12"):
+        assert plan.wait_date(w) is None, w
     before = dt.datetime(2026, 11, 10, tzinfo=dt.timezone.utc)
     after = dt.datetime(2026, 11, 18, tzinfo=dt.timezone.utc)
     assert 21 not in steps(plan.leave_problems("agent_redesign", t=before))

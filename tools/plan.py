@@ -1487,11 +1487,14 @@ def wait_run_ids(text):
 
 
 def wait_date(text):
-    """The date a wait names when it names no run (`plan wait N --on 2026-11-17`, or "on or after 2026-11-17T09:00"):
-    the step wakes nothing until then; None for a wait on runs or with no date."""
+    """The date a wait is on, when it names no run: the text starts with the date (`plan wait N --on 2026-11-17`) or
+    puts it after "on or after", "until", "not before" or "the date" ("on or after 2026-11-17T09:00"); the step wakes
+    nothing until then. None for a wait on runs, with no date, or with a date that only dates something else
+    ("asked 2026-10-31", "applied 2026-10-30": two such waits came due as date waits, 2026-11-10, E4458)."""
     if not text or wait_run_ids(text):
         return None
-    m = re.search(r"\b(20\d\d-\d\d-\d\d)(?:[T ](\d\d:\d\d))?", str(text))
+    m = re.search(r"(?:^\s*|\b(?:on or after|until|not before|the date)\s+)(20\d\d-\d\d-\d\d)(?:[T ](\d\d:\d\d))?",
+                  str(text), re.I)
     if not m:
         return None
     return dt.datetime.fromisoformat(m.group(1) + "T" + (m.group(2) or "00:00") + ":00+00:00")
@@ -2050,8 +2053,9 @@ def entry_status(d, st, events=None):
         if ended:
             ids = sorted({r for _k, w in ended for r in wait_run_ids(w)})
             why.append("steps %s wait on runs that ended (%s)" % (", ".join(str(k) for k, _w in ended), ", ".join(ids)))
+        live_steps = {str(k) for k in step_keys(e)}     # a wait left on a dropped step wakes nothing
         due = [str(k) for k, w in sorted((e.get("step_waits") or {}).items(), key=lambda kv: str(kv[0]))
-               if w and wait_due(w)]
+               if w and str(k) in live_steps and wait_due(w)]
         if due:
             why.append("steps %s waited until a date that has come" % ", ".join(due))
         timed = [str(w) for _k, w in sorted((e.get("step_waits") or {}).items(), key=lambda kv: str(kv[0]))
@@ -3431,7 +3435,8 @@ def main(argv=None):
         A("--next", type=int, help="replace only next step N (a step agent's own step), keeping the others"))
     cmd("wait", cmd_wait, "step N waits on something outside the turn: noted, never demanded, until unwait", ID,
         A("n", type=int, help="the step"), A("--on", required=True, help="what it waits on: run ids, or any text; a "
-          "text with a date (YYYY-MM-DD[THH:MM], UTC) and no run id is a date wait, quiet until then"))
+          "text with no run id that starts with a date (YYYY-MM-DD[THH:MM], UTC) or has one after 'on or after', "
+          "'until', 'not before' or 'the date' is a date wait, quiet until then"))
     cmd("unwait", cmd_unwait, "step N no longer waits", ID, A("n", type=int, help="the step"))
     cmd("leave-check", cmd_leave_check, "an owner's last check before ending its turn: every next step in flight, "
         "waited on or held", ID)
