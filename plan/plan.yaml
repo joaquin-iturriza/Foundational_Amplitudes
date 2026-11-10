@@ -22009,6 +22009,11 @@ entries:
       42-44); median V over median V/B 3.9x. Readout: analysis/virtual_over_born/seed_mse.py @d767344e. Its Born sidecars
       are on CC only. For KIT the baseline must be refit on the KIT ee_tt virtual bulk (m_t=173, mu_R=sqrt s) at each D, with
       exact Born from the KIT file''s born target.'
+  - at: '2026-11-10T09:20:42+00:00'
+    text: '2026-11-10 ~09:20: Joaquin asked whether the KIT networks shown were from scratch (yes, all protocol A/B so far).
+      Told him: the pretrained fine-tunes (A_ft from the heldout parent FA-ccin2p3-62c2443b, ~16:00 UTC) are the result that
+      matters and go out the moment it ends; every KIT figure caption from now on says per curve whether it is from scratch
+      or fine-tuned; off-shellness and preprocessing effects so far are scratch-only, not a verdict on the model'
   step_why:
     1:
       feeds: 'the numbers sent to KIT: whether hard_train fixes each family (B vs B_bulk)'
