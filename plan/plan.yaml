@@ -21435,6 +21435,31 @@ entries:
       not carry beta). B: fixes a family when its hard-bin log-MSE falls to within 10x of bulk; else the network cannot fit
       the singular region even when shown it. Cost estimate 23 GPU-h (assumption: float64 0.8 s/step, 2.2x the 0.36 s/step
       V100 float32 rung step of results.tex par:dancat; read from the first jobs).'
+    fix_at: '2026-11-10T03:50:52+00:00'
+    fix: '(1) Not a repeat / prior incomplete: the prior names only the draft''s divergence study and says no earlier transformer
+      run exists on this question, but docs/results.tex sec:divergences-holdout (lines 9832-10020) is protocol A and B already
+      run once on ee->uug and ee->uugg: a held-out divergent region (y_min below its 15th percentile), pure extrapolation
+      f=0 gives held-out MSE 0.709 (deepest y_min<1e-3 bin 11.1), adding back 5% of the region gives 0.030 (24x), f=1 gives
+      0.0028; uugg 0.22 -> 0.024; single-limit hold-outs soft 0.076, collinear 0.047; and sec:div-sampling (coverage must
+      be generated). Name these in prior, say what differs this time (KIT bulk cut s_ij/s>0.01 and bins to 1e-7, float64,
+      muP LLoCa from scratch rather than the base22 fine-tune with levers off, KIT''s scoring) and use them to set the expected
+      outcome for A and for B. (2) Protocol B against A changes two things and its checkpoint selection is blind to what B
+      tests: B adds hard_train AND 3000 more steps from a fresh warmup at A''s lr, and its checkpoint is chosen on the bulk-only
+      validation mu MSE, which cannot see the hard-bin fit (adding hard data can only raise bulk loss, so the selected step
+      can sit at B''s start and B reads as A). Fix: select B on a held-out slice of hard_train (with bulk), or score B''s
+      final model and say so; and for the per-bin B-against-A comparison add the matched control, each A continued 3000 steps
+      on bulk only with the same restart, or drop that comparison and keep only the absolute ''within 10x of bulk'' read.
+      (3) Seeds against spread: the spread cited (D89, up to 2x on 2->2) is a checkpoint-selection change, not a seed-to-seed
+      spread, and no seed spread exists anywhere for per-bin extrapolation log-MSE or fitted exponents; the outcome reads
+      exponents to 0.1, the deepest bin against Bakar''s MLP and off-shellness on/off at >2x, all with one seed. Fix: measure
+      the spread inside the design, e.g. seed 43 on all six n=9e5 protocol A runs (every sibling cell alike, not a subset),
+      and state each threshold against it; that brings the estimate to about 34 GPU-h, so name the budget rule or decision
+      that covers it. (4) Disk not stated: CC /sps/lpnhe has 44 GB free (92% used). State disk per job (run dir, predictions,
+      any recipe cache under SCRATCH with data.memmap=false) and whether the 16 jobs share one cache of the 2.7 GB KIT data
+      or each builds its own, checked on the first job. Checks that hold: training loss HETEROSC and the emission-scales plus
+      coupling-orders target are the parent''s (catalog_v4_long trial_1262 config.yaml lines 5833-5838, 5907); lr is the same
+      at n=1e5 and 9e5 (D clipped to 7e4, factor 0) so only n moves; off-shellness on/off is the slides'' request and is included;
+      test events are KIT''s hard_test and bulk_test as asked; no label in the inputs (singular_var, z, phi scoring only).'
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
