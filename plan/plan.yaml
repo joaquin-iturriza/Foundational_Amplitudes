@@ -21993,9 +21993,9 @@ entries:
       30, so no budget question remains'
   owner:
     agent: a674b9b77e97e3012
-    state: working
+    state: stopped
     since: '2026-11-10T09:30:58+00:00'
-    state_at: '2026-11-10T09:59:57.272000+00:00'
+    state_at: '2026-11-10T10:22:37.913000+00:00'
     context: 232732
     context_at: '2026-11-10T10:10:05+00:00'
   findings:
