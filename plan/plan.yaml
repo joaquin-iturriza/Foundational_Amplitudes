@@ -22151,6 +22151,26 @@ entries:
       sigma stage then refused an existing sigma_stage dir, which a time-limited run does not have: not tested on a killed
       run). Resume runs: heldout FA-ccin2p3-78b8190c (--time 9:00, target 6.6 h), fair_nlo FA-ccin2p3-03ea3719 (--time 7:30,
       target 4.8 h). Parents now ready ~02:00 UTC 2026-11-11 (heldout) and ~00:30 (fair_nlo), not 16:00 UTC.'
+  - at: '2026-11-10T10:20:42+00:00'
+    text: 'Protocol B readout (B = continuation of the n=9e5 protocol A scratch run for 3000 steps with the hard_train strata
+      added; B_bulk = the same continuation on bulk only; one seed; KIT evaluate.py via kit_predict; tools/kit_readout.py
+      at 754519dd on analysis/kit_benchmark/data/kit_fig_B.json, collected on CC by tools/kit_figures.py collect; figures
+      analysis/kit_benchmark/figs/kit_{mse,median}_B_<proc>[_nooffshell]_{a..d}.png, all curves from scratch). Deepest-bin
+      log10-MSE, B / B_bulk (decades gained): tt Born, off-shellness on: threshold beta 1e-4..1e-3 1.0e-10 / 5.5e-6 (4.7),
+      Sudakov 15-50 TeV 3.5e-3 / 0.18 (1.7); off: 3.6e-10 / 1.2e-3 (6.5), 8.6e-3 / 0.11 (1.1). tt virtual on: threshold 2.38
+      / 8.71 (0.56), Sudakov 9.5e-4 / 0.29 (2.5); off: 3.30 / 7.13 (0.33), 3.8e-3 / 5.77 (3.2); threshold exponent B -0.43
+      (on) / -0.32 (off) vs truth -1.02 (B_bulk +0.03 / -0.03). uug: soft x 1e-7..1e-6 877 / 1230 (0.15), coll y 3.1 / 24.9
+      (0.9); exponents B soft -0.97, coll -0.82 (truth -2.00, -1.00). uugg: soft 316 / 3980 (1.1), coll_gg 0.30 / 15.6 (1.7),
+      coll_qg 0.39 / 15.1 (1.6), azimuth y 1e-7 0.67 / 26.3 (1.6); exponents B soft -2.90, coll_gg -0.99, coll_qg -0.96 (truth
+      -2.00, -0.99, -0.97). Bulk_test B / B_bulk: uug 4.0e-3 / 4.1e-4 (B 1 decade worse), uugg 4.7e-4 / 7.9e-4, tt 1e-10..2e-8
+      both. Against Bakar''s MLP (bulk only, log inputs, 1e5): uug soft 0.32 coll 0.11, uugg soft 0.40 coll_qg 0.08 coll_gg
+      0.05, tt virtual threshold 7.8, Sudakov 0.05. Reading (B design''s two branches): data deficit, fixed by hard events:
+      tt Born threshold (to the bulk level), tt Sudakov (below the MLP), uugg collinear (exponents exact, but 4-6x above the
+      bulk-only MLP and 3 decades above bulk). Representation deficit (B not below B_bulk by 0.3 decades, or far above bulk
+      with the wrong exponent): uug soft (0.15 decades; median overshoots, +12 vs truth +7.6 deepest), uugg soft (1.1 decades
+      but overshoot, exponent -2.9), tt virtual Coulomb threshold (0.3-0.6 decades, exponent -0.4 vs -1.0, median flat at
+      -0.4 vs truth +1.7). So hard events teach collinear and the tt Born/Sudakov ends; the soft limit and the Coulomb rise
+      are not representable from these inputs even when trained on (next lever: log-invariant inputs, as Bakar''s MLP).'
   step_why:
     1:
       feeds: 'the numbers sent to KIT: whether hard_train fixes each family (B vs B_bulk)'
