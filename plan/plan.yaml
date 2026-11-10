@@ -22080,8 +22080,6 @@ entries:
       batch)'
     5: 'Checkpoint + inference package for KIT (Joaquin sends it): best A_ft/B checkpoints, a float64 predict script, log10|M|^2
       out; after the A_ft batch'
-    6: 'Off-shellness-off arms, protocol A from scratch n=1e5 on uug FA-ccin2p3-c35a2199 and uugg ac436bba (design passed
-      08:35): read per the design''s bands (a)-(d) against f6b2ece9 / 12a9d54b, figure with kit_figures.py'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -22358,11 +22356,6 @@ entries:
       if:
       - 'A_ft best: package A_ft'
       - 'B best: package B'
-    6:
-      feeds: which input carries the soft runaway
-      if:
-      - 'band a/b: the column drove the runaway'
-      - 'band c: the momentum representation'
   step_waits:
     '2': FA-ccin2p3-78b8190c FA-ccin2p3-03ea3719
     '7': FA-ccin2p3-c35a2199 FA-ccin2p3-ac436bba
@@ -22371,7 +22364,6 @@ entries:
     '3': FA-ccin2p3-03ea3719
     '4': FA-ccin2p3-78b8190c
     '5': FA-ccin2p3-78b8190c
-    '6': FA-ccin2p3-c35a2199 FA-ccin2p3-ac436bba
   handoff:
     state: 'Protocol A from scratch done and drawn (tools/kit_figures.py, figs in analysis/kit_benchmark/figs, data analysis/kit_benchmark/data/kit_fig_A.json):
       no arm follows any limit; uug soft dives (1e5 median -153 vs truth +7.6). Plain target+inputs arm (2642b17b): saturates
