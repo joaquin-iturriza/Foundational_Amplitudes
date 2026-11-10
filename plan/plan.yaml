@@ -20547,6 +20547,13 @@ entries:
       het_mumse22_summary JSON at 6 significant digits so verify_claims stops rewriting it (88947b50); the 3 differing scripts
       keep trunk''s later form (nothing lost); results.tex mentions updated (2460ee07). repo-reviewer and notes-editor running
       on july-port.'
+  - at: '2026-11-10T01:07:10+00:00'
+    text: 'Step 2 done: july-port merged into trunk (13cbb9e3, pushed), worktree folded, branch deleted. repo-reviewer passed
+      (a raise added for LLOCA_PROC_LOSS=loop with is_weight_path, at its note) and so did the notes-editor (it changed ''the
+      same correction'' to ''the same form, over log-amplitude bins rather than y_min bins''). origin/heterosc and origin/l2-gen
+      deleted under D338. origin/adaptive-ir NOT deleted: no decision of Joaquin''s names it (D338 covers heterosc and l2-gen);
+      its one file is byte-identical at analysis/divergences/adaptive_ir.py on trunk. Next, step 3 (D339): sigma-driven generation
+      on the folded work.'
   step_why:
     1:
       feeds: 'whether the July studies carry over: what they found, recorded reproducibly'
