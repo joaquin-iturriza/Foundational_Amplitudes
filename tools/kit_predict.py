@@ -54,6 +54,8 @@ def predict(run_dir, splits, out):
     os.makedirs(out, exist_ok=True)
     pool = os.path.join(out, "kit_strata_pool.npy")
     np.save(pool, rows)
+    # the per-event alpha_s sidecar data.target_physics_orders reads beside every pool (the file's fixed alpha_s)
+    np.save(pool[:-len(".npy")] + ".alphas.npy", np.full(len(rows), float(kh.metadata(stem)["alpha_s"])))
     exp, loader = rebuild(run_dir, "test", pool, len(rows))
     trafos = [list(t) for t in (getattr(exp, "_amp_trafos_pp", None) or [exp.cfg.data.amp_trafos])]
     assert all(t == ["log", "standardization"] for t in trafos), (

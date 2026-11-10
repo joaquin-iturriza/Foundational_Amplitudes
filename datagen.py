@@ -501,15 +501,18 @@ def ensure_dataset(process, sqrts_min, sqrts_max, n_events, role, seed,
     out    = mg.recipe_output_path(recipe, dest_dir)
     wanted = mg.recipe_id(recipe)
 
-    if _is_cached(out, wanted):
-        return out
     if mg.is_kit(process):
-        # a KIT benchmark pool is a read of its HDF5 file (seconds), never generation: built even under require_cache
+        # a KIT benchmark pool is a read of its HDF5 file (seconds), never generation: built even under require_cache;
+        # its per-event alpha_s sidecar (the file's fixed alpha_s) is written for pools cached before it existed too
         from tools import kit_hardps
-        kit_hardps.build_pool(recipe, out)
-        full = dict(recipe)
-        full["physics"] = {"source": "kit_hardps", "file": recipe["kit_file"], "target": recipe["kit_target"]}
-        mg.write_recipe(out, full)
+        if not _is_cached(out, wanted):
+            kit_hardps.build_pool(recipe, out)
+            full = dict(recipe)
+            full["physics"] = {"source": "kit_hardps", "file": recipe["kit_file"], "target": recipe["kit_target"]}
+            mg.write_recipe(out, full)
+        kit_hardps.ensure_alphas(recipe, out)
+        return out
+    if _is_cached(out, wanted):
         return out
     if float((recipe.get("sampling") or {}).get("f_default", 0)) > 0:
         # a default-share mixture is composed at load from the entry's catalog_v4 pool and its default_source's lhe

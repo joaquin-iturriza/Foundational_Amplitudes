@@ -241,6 +241,20 @@ def build_pool(rec, out):
     return out
 
 
+def ensure_alphas(rec, out):
+    """The pool's per-event alpha_s sidecar <pool>.alphas.npy (what data.target_physics_orders divides the coupling
+    powers by, as the catalog's pools carry): the file's fixed alpha_s for every event. Written when missing."""
+    ap = out[:-len(".npy")] + ".alphas.npy"
+    if os.path.exists(ap):
+        return ap
+    stem, _, _ = parse(rec["process"])
+    n = np.load(out, mmap_mode="r").shape[0]
+    tmp = f"{ap[:-len('.npy')]}.tmp{os.getpid()}.npy"
+    np.save(tmp, np.full(n, float(metadata(stem)["alpha_s"]), dtype=np.float64))
+    os.replace(tmp, ap)
+    return ap
+
+
 def stratum_rows(stem, target, split, stratum):
     """The FA pool rows of one stratum (for scoring)."""
     import h5py

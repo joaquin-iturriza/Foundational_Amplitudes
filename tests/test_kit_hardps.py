@@ -165,6 +165,10 @@ def section1_pools(d):
     # the one hard_train stratum of 50: its first 45 train, its last 5 validation (kh.HARD_VAL_FRAC)
     assert tr.shape[0] == 500 and va.shape[0] == 100 and te.shape[0] == 200 and hb.shape[0] == 545, hb.shape
     assert np.array_equal(hb[:500], tr), "the hard variant's bulk part differs"
+    # the per-event alpha_s sidecar data.target_physics_orders reads (the file's fixed 0.118), on every pool
+    _p = datagen.ensure_dataset("kit_ee_uug__me2", 1000, 1000, 500, role="train", seed=42)
+    _a = np.load(_p[:-len(".npy")] + ".alphas.npy")
+    assert _a.shape == (500,) and np.allclose(_a, 0.118), _a[:3]
     assert hv.shape[0] == 105 and np.array_equal(hv[:100], va), "the hard variant's val is bulk val + 5 hard"
     assert not (set(map(tuple, hv[100:, :20])) & set(map(tuple, hb[500:, :20]))), "hard val overlaps hard train"
     assert "_n500_" in os.path.basename(datagen.ensure_dataset("kit_ee_uug__me2", 1000, 1000, 500, role="train",
