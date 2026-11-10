@@ -21204,7 +21204,7 @@ entries:
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
-  status: running
+  status: done
   quotes:
   - said_at: '2026-11-10T02:08:07.285000+00:00'
     text: I only want you to change figure 10 and 11 so that the black from scratch line is on top and clearly visible, explain
@@ -21251,6 +21251,7 @@ entries:
       ''zorder=10'' analysis/transfer/rung_grid.py && git merge-base --is-ancestor 623407c6 $(cut -d'' '' -f1 .claude/.review_state/notes-editor)'
     stale_because: the D362 sentence moved into 'The grid in one picture' on the notes-editor's review; the old check grepped
       the removed paragraph title
+  writeup: 20d89f0d
 - id: virtual_over_born
   title: why learning the virtual over the Born fails for us, and making it work
   question: Why does training on V/B (finite one-loop virtual over the exact Born) not work for us when the literature finds
