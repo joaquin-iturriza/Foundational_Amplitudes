@@ -13,8 +13,8 @@ committed summaries in analysis/divergences/:
                                  (M_base - M_arm)/(M_base - M_oracle), base = no reweighting, oracle = true |residual|
   evtest_A.json, leaktest.json, leakfix.json  the multi-tag eval leak check (eval_eeuu_resonance.py): ft_mix025 as the
                                  only tag, as the second tag after raw, and the same with a per-tag run_dir
-Keys: deep.*, fraction.*, float32.*, foundation.*, q2.*, coverage.*, leak.* (fraction of an arm's 400k training events per
-decade). CPU only.
+Keys: deep.*, fraction.*, float32.*, foundation.*, q2.*, leak.*, and coverage.* (the percentage of an arm's 400k
+training events per decade). CPU only.
 
     python3 analysis/divergences/sampling_numbers.py
 """
