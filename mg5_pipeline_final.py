@@ -246,6 +246,20 @@ def standalone_name(process):
     return base if me(cfg) == me(PROCESSES[base]) else process
 
 
+def is_kit(process):
+    """True for a KIT hard phase-space benchmark dataset (``kit_<file>__<target>[__hard]``, tools/kit_hardps.py): read
+    from the benchmark's HDF5 files, no generator behind it."""
+    return str(process).startswith("kit_") and "__" in str(process)
+
+
+def register_kit(process):
+    """Register a KIT dataset into PROCESSES from its name and its file's metadata (idempotent). Returns its cfg."""
+    if process not in PROCESSES:
+        from tools import kit_hardps
+        PROCESSES[process] = kit_hardps.catalog_entry(process)
+    return PROCESSES[process]
+
+
 def is_synthetic(process):
     """True for a synthetic-amplitude process name (``syn_<k>``, ``syn<n>_<k>``,
     ``syn[<n>]v<V>_<k>``): tools/synthetic_amplitudes.py, no MadGraph behind it. The name grammar is that module's."""
@@ -285,6 +299,8 @@ def register_recipe_processes(specs, default_sampling=None):
     for s in specs:
         name = s["name"]
         base = s.get("base", name)
+        if is_kit(base):
+            register_kit(base)
         if is_synthetic(base):
             register_synthetic(base)
         physics = s.get("physics")
@@ -4859,6 +4875,11 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
     NOT want a different chunk policy to mint a second, physically-identical frozen
     dataset. Hence `n_chunks` is left out of the val/test identity entirely — one
     test set serves regardless of how it was sliced for generation."""
+    if is_kit(process):
+        # the KIT hard phase-space benchmark: read from its HDF5 files (tools/kit_hardps.py), its own identity
+        register_kit(process)
+        from tools import kit_hardps
+        return kit_hardps.recipe(process, sqrts_min, sqrts_max, n_events, role=role, seed=seed)
     cfg = register_synthetic(process) if is_synthetic(process) else PROCESSES[process]
     if cfg.get("kind") == "lhe_pp":
         # MadEvent pp events (catalog_daniel): a different generator, so a different identity

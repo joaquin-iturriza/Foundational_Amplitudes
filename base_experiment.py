@@ -648,6 +648,10 @@ class BaseExperiment:
             LOGGER.debug(
                 "Using dtype float16 (bfloat16 is not supported by environment)"
             )
+        elif str(self.cfg.training.get("dtype", "float32")) == "float64":
+            # the whole model in float64, frames and attention included (the KIT hard phase-space benchmark)
+            self.dtype = torch.float64
+            LOGGER.info("Using dtype float64")
         else:
             self.dtype = torch.float32
             LOGGER.debug("Using dtype float32")

@@ -9,7 +9,7 @@ from mup import MuReadout, set_base_shapes, make_base_shapes
 
 from lloca.framesnet.frames import Frames
 
-from .attention_lloca_mup import LLoCaAttention, build_block_diagonal_bias
+from .attention_lloca_mup import LLoCaAttention, build_block_diagonal_bias, build_pair_ctx
 from .bayesian_readout import MuBayesianReadout
 from lloca.reps.tensorreps import TensorReps
 from lloca.mup import mup_parametrized  # self-contained μP base-shape machinery
@@ -578,6 +578,10 @@ class MuPTransformer(nn.Module):
             attn_kwargs["attn_bias"] = build_block_diagonal_bias(ptr, seq_lens=seq_lens, causal=True)
         elif pair_ctx is not None:
             attn_kwargs["pair_ctx"] = pair_ctx
+        elif ptr is not None and inputs.dtype == torch.float64:
+            # float64 (training.dtype=float64): xformers has no float64 kernel, so the per-event attention runs in the
+            # padded dense layout of the pair-bias path, with no bias (exact, cheap for events of a few particles)
+            attn_kwargs["pair_ctx"] = build_pair_ctx(ptr, inputs.shape[-2], seq_lens=seq_lens)
         elif ptr is not None:
             if os.environ.get("LLOCA_ATTN_MASK", "per_forward") == "per_block":
                 attn_kwargs["ptr"] = ptr
