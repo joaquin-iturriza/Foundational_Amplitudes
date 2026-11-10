@@ -20884,7 +20884,24 @@ entries:
       L vs log D over 3-5 points per arm near the crossing, or A D^-a + L_inf), band from fit residuals and the 5x spread;
       outside: more searches per cell (D315, Joaquin''s).'
     at: '2026-11-10T06:52:51+00:00'
-  asks: []
+  asks:
+  - ask: 'GPU budget: 200-290 GPU-h above 30 with no decision covering it. Stage 2 of the data-saving study (three held-out
+      tree targets, scratch against fine-tuned, an 8-trial DyHPO per cell, one seed per cell). The data saved expected from
+      the calibration''s scratch slopes and earlier results (par:v3_muon, fine-tuned MSE about 9 times below scratch; sec:ladder,
+      half a decade of D): about 1.5 to 3 times for ee->ttbar at MSE 1e-4 and about 10 times for ee->ccbar g at 1e-2. Two
+      searches of one cell differ up to 5 times in MSE, which moves D* by about 0.15 decade (ttbar), 0.8 (ccbar g), 1.4 (bbbar
+      gg). From scratch ee->ccbar g and ee->bbbar gg stay above 1e-4 at every D up to 1e5 (best 4e-2 and 1.5e-1 at D=1e4 at
+      a fixed lr). Go, with D* read from a fit over 3 to 5 D points per arm, accepting that ee->ttbar at 1e-4 may read not
+      resolved and ee->bbbar gg a lower bound?'
+    at: '2026-11-10T06:53:44+00:00'
+    searched: 'CLAUDE.md GPU budget rule; site decisions D315, D354 (''we will need to run a lot of things'': the programme,
+      no cost), D355, D356, D360 (the study, no cost); Joaquin''s messages 2026-11-10T02:08 (the programme: asks for the study
+      and its horizons, names no GPU-h), 2026-10-06T00:17 (the old transfer study''s finish, approved items of that study
+      only), 2026-11-06T19:52 (warm-start lr mismatch, another question); none covers 200-290 GPU-h'
+    blocks: stage 2 submissions (phase a about 90 GPU-h, phase b, ee->ttbar 12.4 + 12.4)
+    blocks_steps: &id002
+    - 3
+    - 4
   owner:
     agent: ad04aefad1cbf46c9
     state: working
@@ -21336,6 +21353,21 @@ entries:
     files: scripts/job_data_saving.sh (5ba7c3c5), recipes/catalog_v4_datasaving_*.yaml, /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/cal.tsv
       (layout), docs/results.tex sec:ladder and par:v3_muon (prior), recipes/catalog_v4_roles.json
     written: '2026-11-10T04:30:23+00:00'
+  ask: 'GPU budget: 200-290 GPU-h above 30 with no decision covering it. Stage 2 of the data-saving study (three held-out
+    tree targets, scratch against fine-tuned, an 8-trial DyHPO per cell, one seed per cell). The data saved expected from
+    the calibration''s scratch slopes and earlier results (par:v3_muon, fine-tuned MSE about 9 times below scratch; sec:ladder,
+    half a decade of D): about 1.5 to 3 times for ee->ttbar at MSE 1e-4 and about 10 times for ee->ccbar g at 1e-2. Two searches
+    of one cell differ up to 5 times in MSE, which moves D* by about 0.15 decade (ttbar), 0.8 (ccbar g), 1.4 (bbbar gg). From
+    scratch ee->ccbar g and ee->bbbar gg stay above 1e-4 at every D up to 1e5 (best 4e-2 and 1.5e-1 at D=1e4 at a fixed lr).
+    Go, with D* read from a fit over 3 to 5 D points per arm, accepting that ee->ttbar at 1e-4 may read not resolved and ee->bbbar
+    gg a lower bound?'
+  waiting_since: '2026-11-10T06:53:44+00:00'
+  searched: 'CLAUDE.md GPU budget rule; site decisions D315, D354 (''we will need to run a lot of things'': the programme,
+    no cost), D355, D356, D360 (the study, no cost); Joaquin''s messages 2026-11-10T02:08 (the programme: asks for the study
+    and its horizons, names no GPU-h), 2026-10-06T00:17 (the old transfer study''s finish, approved items of that study only),
+    2026-11-06T19:52 (warm-start lr mismatch, another question); none covers 200-290 GPU-h'
+  blocks: stage 2 submissions (phase a about 90 GPU-h, phase b, ee->ttbar 12.4 + 12.4)
+  blocks_steps: *id002
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
@@ -22589,7 +22621,7 @@ entries:
       about cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID,
       says nothing about the draft's sections)
     blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-    blocks_steps: &id002 []
+    blocks_steps: &id003 []
   owner:
     agent: afb073b8fc9460ec5
     state: stopped
@@ -22607,7 +22639,7 @@ entries:
     cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID, says
     nothing about the draft's sections)
   blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-  blocks_steps: *id002
+  blocks_steps: *id003
   step_why:
     1:
       feeds: the draft's results (D354)
