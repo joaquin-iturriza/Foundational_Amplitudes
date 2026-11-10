@@ -21077,6 +21077,18 @@ entries:
       Limits from measured main-stage rates: ttbar k=9,10 0.37-0.39 s/step, ccbar g k=9,10 0.46-0.47 s/step (12000 steps 1.25-1.58
       h); bbbar gg k=9,10 assumed ~0.6 s/step (n=6). Work ~16 GPU-h. The four running cal k=9,10 runs (68cf389d 1dffc6c7 b2237a3a
       9a675320) are superseded, left to end.'
+  - at: '2026-11-10T05:50:18+00:00'
+    text: '2026-11-10 07:xx, partial cal2 read (analysis/data_saving/horizons.py @6d2a1794, 25 of 27 runs, ttbar k=9,10 still
+      running): ee->ttbar crosses 1e-4 from D=100 (best 5.5e-5 at 6880/8000; 9.1e-7 at D=1e4, best near the end from D=316).
+      ee->ccbar g and ee->bbbar gg sit far above: best 4.0e-2 / 1.5e-1 at D=1e4. Their best checkpoints fall inside the warm-up
+      (1440 of 8000 steps) in 13 of 14 runs, k=2..8, including D=1e3-1e4 (bbbar gg D=1e4: step 480); the val curve never comes
+      back below during the anneal (last/best 1.05-1.84). In sec:ladder''s ee->dd~ calibration and in these ttbar runs the
+      best moves to the end from D=1e3 (ttbar: from D=316), so this is not the data-limited early best of small D. The fixed
+      lr of the parent''s lr law (7.82e-3 (T/17056)^-0.55 times the D factor, 9.6e-3 at k=8) looks too high for these two
+      targets: the design''s plateau rule (T = 1.1 s_b) would set their horizons from an lr artifact (528-2816 steps). Not
+      used. Context: the parent''s own median held-out 6-particle MSE after 68224 steps is 1.2e-2 (par:v4_length/size_figs),
+      so 1e-4 at D<=1e5 from scratch on 2->3/2->4 catalog_v4 pools may be out of reach whatever the lr. Also ee->ttbar D=3162:
+      last 7.8e-4 against best 3.3e-6 (a late spike).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
