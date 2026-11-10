@@ -132,8 +132,8 @@ def collect(run_dirs):
     print("KITFIG " + json.dumps(out))
 
 
-PROC = {("ee_tt", "virt_finite"): r"$e^+e^-\to t\bar t$, virtual", ("ee_tt", "born"): r"$e^+e^-\to t\bar t$, Born",
-        ("ee_uug", "me2"): r"$e^+e^-\to u\bar u g$", ("ee_uugg", "me2"): r"$e^+e^-\to u\bar u gg$"}
+PROC = {("ee_tt", "virt_finite"): r"$t\bar t$ virtual", ("ee_tt", "born"): r"$t\bar t$ Born",
+        ("ee_uug", "me2"): r"$u\bar u g$", ("ee_uugg", "me2"): r"$u\bar u gg$"}
 XLAB = {"threshold_beta": r"top velocity $\beta$", "sudakov_sqrts": r"$\sqrt{s}$ [GeV]",
         "soft_x": r"soft gluon $x=2E_g/\sqrt{s}$", "coll_y": r"collinear $y=s_{qg}/s$",
         "coll_qg_y": r"collinear $y=s_{qg}/s$", "coll_gg_y": r"collinear $y=s_{gg}/s$",
@@ -141,13 +141,13 @@ XLAB = {"threshold_beta": r"top velocity $\beta$", "sudakov_sqrts": r"$\sqrt{s}$
 
 
 def arm_label(r):
-    n = r"10^5" if r["n"] == 100000 else r"9{\times}10^5"
-    lab = rf"scratch ${n}$"
-    if r["mode"] in ("B", "B_bulk"):
-        lab = {"B": "hard added", "B_bulk": "bulk continued"}[r["mode"]] + rf" ${n}$"
+    """short legend symbol: the training size, then what differs (protocol, off-shellness off, plain target)"""
+    lab = r"$10^5$" if r["n"] == 100000 else r"$9{\times}10^5$"
+    if r["mode"] in ("B", "B_bulk", "A_ft"):
+        lab = {"B": "hard+", "B_bulk": "bulk+", "A_ft": "pretr."}[r["mode"]] + " " + lab
     tag = r["tag"]
     if tag in ("offoff", "nooffshell"):
-        lab += ", off-shell. off"
+        lab += ", off"
     elif tag == "plain":
         lab += ", plain"
     return lab
@@ -155,6 +155,7 @@ def arm_label(r):
 
 def plot(path, outdir):
     import plot_style as ps
+    from matplotlib.ticker import NullFormatter
     d = json.load(open(path))
     os.makedirs(outdir, exist_ok=True)
     colors = [ps.C.blue, ps.C.vermillion, ps.C.green, ps.C.orange, ps.C.purple, ps.C.sky]
@@ -175,13 +176,14 @@ def plot(path, outdir):
                              if k.startswith("hard_test/") and family(k.split("/")[1]) == fam)
                 ax.plot(*zip(*pts), "o-", color=c, label=lab)
             fl = sorted((v["x"], v["mse"]) for st, v in tr["floor"].items() if family(st) == fam)
-            ax.plot(*zip(*fl), "--", color=ps.C.grey, label="truth held in bulk range")
+            ax.plot(*zip(*fl), "--", color=ps.C.grey, label="floor")
             ref = MLP.get((stem, target, fam))
             if ref:
                 x = np.sqrt(ref[0] * ref[1])
-                ax.plot([x], [ref[2]], "*", color="k", label="MLP, log invariants")
-                ax.plot([x], [ref[3]], "x", color="k", label="MLP, raw invariants")
+                ax.plot([x], [ref[2]], "*", color="k", label="MLP log")
+                ax.plot([x], [ref[3]], "x", color="k", label="MLP raw")
             ax.set_xscale("log")
+            ax.xaxis.set_minor_formatter(NullFormatter())
             ax.set_yscale("log")
             ax.set_xlabel(XLAB.get(fam, fam.replace("_", " ")))
             ax.set_ylabel(r"log-MSE of $\log_{10}|\mathcal{M}|^2$")
@@ -200,6 +202,7 @@ def plot(path, outdir):
                 if rows:
                     ax.plot([q[0] for q in rows], [q[2] for q in rows], "o-", color=c, label=lab)
             ax.set_xscale("log")
+            ax.xaxis.set_minor_formatter(NullFormatter())
             ax.set_xlabel(XLAB.get(fam, fam.replace("_", " ")))
             ax.set_ylabel(r"median $\log_{10}|\mathcal{M}|^2$")
             ps.process_label(ax, PROC.get((stem, target), stem))
