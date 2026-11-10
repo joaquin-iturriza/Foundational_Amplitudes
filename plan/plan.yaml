@@ -20401,7 +20401,7 @@ entries:
   match: FA-*sigma_gen*,sigma_gen_*
   evidence:
     runs: []
-    commit: ecbc632b
+    commit: 96ed66d5
     paths:
     - analysis/divergences/eeuu_resonance_numbers.py
     - analysis/divergences/figs/l2_eeuu_online_b.png
@@ -20410,6 +20410,10 @@ entries:
     - analysis/divergences/l2_online_summary.json
     - analysis/divergences/l2_rw_summary.json
     - analysis/divergences/l2_starv_summary.json
+    - analysis/divergences/steering_eval_summary.json
+    - analysis/divergences/steering_numbers.py
+    - analysis/transfer/het_delta_summary.py
+    - analysis/transfer/het_stage2.py
   dead_ends: []
   asks:
   - ask: 'Scope: fold heterosc/l2-gen into trunk at the current het loss, record results, delete after; then sigma-driven
