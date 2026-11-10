@@ -10539,6 +10539,17 @@ Median $|\Delta|$, het over MSE: median $1.39$ over the $13$ $2\to3$ cells and $
 against $1.59$ and $1.79$ for the het retrain at each MSE cell's own HPs; the shared HPs beat the het retrain at the MSE
 cell's HPs in $19$ of the $24$, and MSE in $1$ ($e^+e^-\to t\bar tg$ fine-tuned from the dead-cone star, $0.45$). So the het
 HPs help, and the het loss stays $30$ to $40\%$ behind MSE on $\mu$ at these multiplicities.
+% src: python3 analysis/transfer/het_shared_summary.py @257891cf
+% claim: n=24
+% claim: reruns=4
+% claim: 2to3.n=13
+% claim: 2to3.shared_median=1.39
+% claim: 2to4.n=11
+% claim: 2to4.shared_median=1.36
+% claim: 2to3.msehp_median=1.59
+% claim: 2to4.msehp_median=1.79
+% claim: shared_beats_msehp_n=19
+% claim: below_mse.0=0.45
 
 \begin{figure}[H]
 \centering
