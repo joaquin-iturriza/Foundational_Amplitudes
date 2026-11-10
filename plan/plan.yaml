@@ -21526,6 +21526,12 @@ entries:
     units: null
     start: '2026-11-10T05:11:50+00:00'
     at: '2026-11-10T05:11:50+00:00'
+  - batch: vb_sidecars
+    wall_h: 0.4
+    jobs: 1
+    units: null
+    start: '2026-11-10T09:16:42+00:00'
+    at: '2026-11-10T09:16:42+00:00'
   handoff:
     state: 'Step 1 (tree calibration) done and dropped: 27 scratch runs tagged cal2 (CC, scripts/job_data_saving.sh @c88e9b5c,
       seed 42, the parent''s fixed lr law), read by analysis/data_saving/horizons.py into analysis/data_saving/data/horizons_cal2.json
