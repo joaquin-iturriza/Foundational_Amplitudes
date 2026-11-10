@@ -141,10 +141,11 @@ XLAB = {"threshold_beta": r"top velocity $\beta$", "sudakov_sqrts": r"$\sqrt{s}$
 
 
 def arm_label(r):
-    """short legend symbol: the training size, then what differs (protocol, off-shellness off, plain target)"""
-    lab = r"$N=10^5$" if r["n"] == 100000 else r"$N=9\times10^5$"
-    if r["mode"] in ("B", "B_bulk", "A_ft"):
-        lab = {"B": "hard+", "B_bulk": "bulk+", "A_ft": "pretr."}[r["mode"]] + " " + lab
+    """legend text saying what the curve is (D368, D369): how the network was trained, then the bulk size"""
+    n = r"$10^5$" if r["n"] == 100000 else r"$9\times10^5$"
+    how = {"A": "scratch", "A_ft": "pretrained", "B": "scratch + hard events",
+           "B_bulk": "scratch + bulk steps"}[r["mode"]]
+    lab = f"{how}, {n} bulk"
     tag = r["tag"]
     if tag in ("offoff", "nooffshell"):
         lab += ",\nno off-shell input"
@@ -153,7 +154,7 @@ def arm_label(r):
     return lab
 
 
-def plot(path, outdir):
+def plot(path, outdir, prefix=""):
     import plot_style as ps
     from matplotlib.ticker import NullFormatter
     d = json.load(open(path))
@@ -191,8 +192,8 @@ def plot(path, outdir):
         h0 = figs[0][1].get_legend_handles_labels()[0]
         for _, ax in figs:
             ps.legend(ax, "upper left", handles=h0)
-            ps.make_room(ax, max_growth=3.0)
-        written += ps.save_panels(figs, os.path.join(outdir, f"kit_mse_{base}"))
+            ps.make_room(ax)
+        written += ps.save_panels(figs, os.path.join(outdir, f"kit_mse_{prefix}{base}"))
         # (2) median predicted vs truth log10|M|^2
         figs = ps.panels(len(fams))
         for (fig, ax), fam in zip(figs, fams):
@@ -211,8 +212,8 @@ def plot(path, outdir):
         h0 = figs[0][1].get_legend_handles_labels()[0]
         for _, ax in figs:
             ps.legend(ax, "upper left", handles=h0)
-            ps.make_room(ax, max_growth=3.0)
-        written += ps.save_panels(figs, os.path.join(outdir, f"kit_median_{base}"))
+            ps.make_room(ax)
+        written += ps.save_panels(figs, os.path.join(outdir, f"kit_median_{prefix}{base}"))
     for w in written:
         print(w)
 
@@ -225,11 +226,12 @@ def main():
     p = sub.add_parser("plot")
     p.add_argument("data")
     p.add_argument("--out", default=os.path.join(ROOT, "analysis", "kit_benchmark", "figs"))
+    p.add_argument("--prefix", default="", help="file name prefix after kit_mse_ / kit_median_ (e.g. B_)")
     a = ap.parse_args()
     if a.cmd == "collect":
         collect(a.run_dirs)
     else:
-        plot(a.data, a.out)
+        plot(a.data, a.out, a.prefix)
 
 
 if __name__ == "__main__":
