@@ -20982,8 +20982,10 @@ entries:
   match: optrec_*
   evidence:
     runs: []
-    commit: null
-    paths: []
+    commit: b78a7c41
+    paths:
+    - docs/results.tex
+    - scripts/job_catalog_v3_short.sh
   dead_ends: []
   asks: []
   owner:
