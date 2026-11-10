@@ -258,16 +258,34 @@
  {
   "target": "epem_ccxg",
   "k": 9,
+  "D": 31623,
   "steps": 12000,
-  "error": "FileNotFoundError(2, 'No such file or directory')",
-  "missing": true
+  "every": 240,
+  "rate_s_per_step": 0.46076584565639495,
+  "sigma_stage": true,
+  "s_b": 2400,
+  "best": 0.020549465743494793,
+  "best_frac": 0.2,
+  "s_4": null,
+  "last": 0.024645006366115146,
+  "rule": "plateau",
+  "T": 2640
  },
  {
   "target": "epem_ccxg",
   "k": 10,
+  "D": 100000,
   "steps": 12000,
-  "error": "FileNotFoundError(2, 'No such file or directory')",
-  "missing": true
+  "every": 240,
+  "rate_s_per_step": 0.4738922136624654,
+  "sigma_stage": true,
+  "s_b": 6240,
+  "best": 0.003803972163366809,
+  "best_frac": 0.52,
+  "s_4": null,
+  "last": 0.004320087002882044,
+  "rule": "plateau",
+  "T": 6960
  },
  {
   "target": "epem_bbxgg",
@@ -384,15 +402,33 @@
  {
   "target": "epem_bbxgg",
   "k": 9,
+  "D": 31623,
   "steps": 12000,
-  "error": "FileNotFoundError(2, 'No such file or directory')",
-  "missing": true
+  "every": 240,
+  "rate_s_per_step": 0.5077124130328496,
+  "sigma_stage": true,
+  "s_b": 1200,
+  "best": 0.05292724628362126,
+  "best_frac": 0.1,
+  "s_4": null,
+  "last": 0.09403524908073915,
+  "rule": "plateau",
+  "T": 1440
  },
  {
   "target": "epem_bbxgg",
   "k": 10,
+  "D": 100000,
   "steps": 12000,
-  "error": "FileNotFoundError(2, 'No such file or directory')",
-  "missing": true
+  "every": 240,
+  "rate_s_per_step": 0.5218148405949274,
+  "sigma_stage": true,
+  "s_b": 7920,
+  "best": 0.016816091797057703,
+  "best_frac": 0.66,
+  "s_4": null,
+  "last": 0.017002933684283777,
+  "rule": "plateau",
+  "T": 8880
  }
 ]
