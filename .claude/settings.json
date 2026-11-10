@@ -324,6 +324,17 @@
           }
         ]
       }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/dispatch.py\" plan_check.py",
+            "timeout": 300
+          }
+        ]
+      }
     ]
   },
   "enabledPlugins": {

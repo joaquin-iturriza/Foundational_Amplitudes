@@ -71,11 +71,17 @@ WRITE = re.compile(r"""open\([^)\n]*,\s*(?:mode\s*=\s*)?['"][^'"]*[wax+]|\.write
 
 def writes_plan(body):
     """A line of an interpreter's script that writes and names a plan file, itself or through a variable set to one."""
+    # a triple-quoted string, over one line or many, is text (code to put in another file, a docstring), never code
+    # run here: taken out first (2026-11-10: two heredocs patching tests/*.py refused for test code inside such a
+    # string, `open(plan, "w")` with plan a temp path and `open(PLAN, "w").write(src)` in a test world)
+    body = re.sub(r"[rbuRBU]?('''|\"\"\")[\s\S]*?\1", "''", body)
     # variables set to a plan file's PATH (p = "plan/plan.yaml", Path(...), os.path.join(...)), not to its contents
     # a string with whitespace is text (a pattern, a message), not a path: it is dropped before the name is looked for
     text = re.compile(r"\"[^\"\n]*\s[^\"\n]*\"|'[^'\n]*\s[^'\n]*'")
+    # a triple-quoted string (o = '''...''', text to replace in another file) is text too, never a path
     names = {m.group(1) for m in re.finditer(r"^\s*([A-Za-z_]\w*)\s*=([^=\n].*)$", body, re.M)
-             if re.search(DATA, text.sub("", m.group(2))) and not re.search(r"\bopen\(|\.read|\bload\(|safe_load", m.group(2))}
+             if not re.match(r"\s*[rbuRBU]?('''|\"\"\")", m.group(2))
+             and re.search(DATA, text.sub("", m.group(2))) and not re.search(r"\bopen\(|\.read|\bload\(|safe_load", m.group(2))}
     for line in body.splitlines():
         if WRITE.search(line) and (re.search(DATA, line) or any(re.search(r"\b%s\b" % re.escape(n), line)
                                                                  for n in names)):
@@ -119,7 +125,14 @@ def mentions(seg):
     if any(named(t) for t in seg) or c_writes(seg):
         return True
     p = prog_of(cmd_words(seg))
-    return (p == "sed" or p in AWK) and any(re.search(DATA, t) for t in seg)
+    # inside a sed or awk program the plan file counts only as the target of a write (sed w, awk > or >>): a program
+    # that merely contains the name (a substitution in another file's text) is not one (2026-11-09: sed -i on
+    # scripts/remove_worktree.sh refused for a pattern naming plan/.state.json)
+    if p == "sed":
+        return any(re.search(r"(?:^|[;\s}/])w\s*" + DATA, t) for t in seg)
+    if p in AWK:
+        return any(re.search(r">>?\s*\"?" + DATA, t) for t in seg)
+    return False
 
 
 def bash_refusal(cmd):
