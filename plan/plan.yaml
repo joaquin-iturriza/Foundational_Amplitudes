@@ -21425,6 +21425,17 @@ entries:
       are rebuilt (D208), 10-20 min each (the script''s estimate at c84956b0), in parallel; target 0.6 h, limit --time=01:15:00,
       --cpus-per-task=15 (five processes x three pools). Disk 23 MB per run (cal2) x 24 = 0.55 GB, 6.3 GB free on CC /sps/lpnhe
       (design reviewer, 2026-11-10 ~09:15; 6.5 GB read by df at 09:10); read again at submission.'
+    passed_at: '2026-11-10T09:16:18+00:00'
+    reviewer: 'Re-check of the one-loop calibration (sidecars + 24 scratch V/B runs): one change (D) at cal2''s protocol;
+      measure shown to move on cal2 (ttbar best 2.9e-3 at D=10 to 9.1e-7 at 1e4, horizons_cal2.json) and sidecar spread separates
+      cases (std ln V/B 1.9e-12 ee_uu vs 0.132 ee_ttbar); one seed per D315; outcomes for yes/no plus the new too-low-lr branch
+      (best_frac>=0.8 still falling, or above hp58''s 5.4e-4 at D=1e4, goes to the stage-2 DyHPO); prior now cites sec:ladder
+      one-loop probes (means 3.3, 2.7), EW one-loop d d~ flattening at 7.6-8.5e-3, hp58''s 52x lr effect; sidecar time: the
+      20 ms/point 2->3 assumption sits above catalog_v4''s measured generation of the same pools (analysis/catalog_v4/data/sampling_cost_gen.json:
+      5e4 train rows of u u~>e+e-Z and e+e->d d~Z in 92 s, bg_ab 27 s, bbx_zz 46 s), so 0.6 h within 1:15 holds; disk 0.55
+      GB vs 6.3 GB free; HETEROSC parent, V/B per D357/D366 and the virtual_over_born verdict; Born trees in both parents''
+      recipes, target loops held out. Terms searched: bbx_zz, bg_ab, uux_epemz, epem_ddxz, data saving, over Born, V/B, one-loop/at
+      one loop with fine-tune/scratch/horizon in results.tex; plan show; site decisions D315-D368.'
   step_waits:
     '3': '2026-11-12'
     '4': '2026-11-12'
