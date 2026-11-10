@@ -15774,10 +15774,6 @@ entries:
       notifications after a hand-back were already absorbed; owner resumes by peer hand-backs cannot be held (Claude Code
       offers no delivery delay, an owner has no waiter). Also confirm the first run of a held item that ends gets its RUN
       event and RUN_DONE with no manual poll (next 19 fix).'
-    22: 'Fix the sweep template to single-fidelity per Joaquin (answered weeks ago, re-recorded 2026-11-10): fidelity_schedule.t_steps
-      in sweep/sweep_config_*template*.yaml to one value, the length the canonical setup (fa-canonical-setup) and the decisions
-      in force give; find his earlier answer in the transcripts and cite it; also find why the earlier answer was not in the
-      ledger, so the question was asked again.'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16134,11 +16130,6 @@ entries:
       if:
       - 'saving within or above 11-30% on main per day: keep 10 min'
       - 'below: report to Joaquin with numbers and causes'
-    22:
-      feeds: whether the template matches the single-fidelity rule
-      if:
-      - 'fixed and reviewed: template has one t_steps value'
-      - 'the canonical length is ambiguous: report the candidates'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
@@ -16146,11 +16137,6 @@ entries:
     '17': 'the first real idle moment: plan next listing RESUME/LAUNCH with no FA job live; the supervisor''s own STALLED
       idle: event (or its absence after 45 min) is the trigger'
     '21': the date 2026-11-17 (a week after the 2026-11-09 23:54 restart on the batching code)
-    '22': 'repo-reviewer a0b2da08acd94dae3 FIX (lock held) on the backlog: (1) .claude/hooks/review_backlog.sh reset_pillar:
-      advance --at on a diverged branch (sigma-gen 5e5b2788) overwrote trunk''s watermark; move only on fast-forward, else
-      append to .passed; then restore the watermark to f5ac899c; (2) worktree_fold_guard.sh 7395041f rm pattern misses /bin/rm,
-      rm -f -r, xargs rm, command rm: widen, test 5 cases. Template t_steps [40000] PASSED (uncommitted until the gate clears);
-      then user_said() in plan.py'
   owner:
     agent: ae6bb73ebcb464af0
     state: working
