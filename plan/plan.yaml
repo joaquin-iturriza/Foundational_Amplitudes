@@ -21607,10 +21607,6 @@ entries:
       from MG5_aMC and the surrogate''s NLO from its V; design once a tt virtual model exists'
     5: 'Checkpoint + inference package for KIT (Joaquin sends it): best A/B checkpoints, a float64 predict script, log10|M|^2
       out; after B'
-    6: 'Plain target and inputs arm on uug 1e5 (FA-ccin2p3-2642b17b, scripts/job_kit.sh at c53a6608, design passed 06:24):
-      on its end read kit_result.txt against the control f6b2ece9 and the flat floors of tools/kit_target_slope.py, per the
-      design''s three branches (a result fitting none, exponents off but not near 0 with deep bins below the floor, reads
-      as partial)'
     7: 'Off-shellness-off arm, protocol A from scratch n=1e5 on uug and uugg (job_kit.sh A tag=nooffshell, data.offshell_per_event=false
       data.internal_mass_scalars=false; controls f6b2ece9, 12a9d54b; design recorded 08:50, under review): read per the design''s
       three branches'
@@ -21806,11 +21802,6 @@ entries:
       if:
       - 'B''s best beats A: package B'
       - 'else: package A'
-    6:
-      feeds: whether the parent's preprocessing breaks uug extrapolation, before the pretrained protocol A arm is read
-      if:
-      - 'extrapolates: next arm T target with plain inputs'
-      - 'saturates or fails: the next lever is the input representation (log invariants), not the target'
     7:
       feeds: 'which input carries the uug/uugg soft runaway, so the input-representation lever (plain arm: saturates) changes
         the right thing'
@@ -21825,7 +21816,6 @@ entries:
     '3': FA-ccin2p3-d0b132b6
     '4': 2026-11-10T08:00 (the tt virtual model it uses is chosen from protocol B's runs, submitted then)
     '5': 2026-11-10T08:00 (packages the best A/B checkpoints; B submitted then)
-    '6': FA-ccin2p3-2642b17b
   handoff:
     state: 'Protocol A from scratch done (10 runs, scores recorded as findings): tt Coulomb 1/beta not extrapolated (exponent
       ~0, deep bin 7-8.7 vs Bakar MLP 7.8); uug/uugg soft runs away with wrong sign (uug 1e5 soft +20.2, deep bin 14180 vs
