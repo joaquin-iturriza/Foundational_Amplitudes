@@ -21913,26 +21913,26 @@ entries:
   decisions:
   - D363
   next:
-    1: 'Protocol B and B_bulk (design passed 03:59): 12 x 3000 steps from the six n=9e5 A runs (tt Born/virtual off-shellness
-      on and off, uug, uugg); submit when the uug/uugg A runs FA-ccin2p3-7d74d518, 366a4a98 (and the 1e5 f6b2ece9, 12a9d54b)
-      end and their scores are read, not before 2026-11-10T07:00 UTC (the 60-min budget window of the two pretrainings, 24
-      GPU-h requested); B path dry-run passed on CC; request --time 0:50 tt, 1:00 uug, 1:10 uugg; then the readout against
-      Bakar''s MLP table'
-    2: 'Family-held-out pretrainings running: heldout FA-ccin2p3-f0ca7a15 and fair_nlo FA-ccin2p3-95427201 (scripts/job_kit_pretrain.sh
-      at ea26f3fb, 68224 steps, 12 h requested, target 9 h); on their end, protocol A fine-tuned (A_ft) from heldout for tt,
-      uug, uugg, and tell pretrain_data_saving''s owner the heldout parent is ready'
+    1: 'A_ft (design passed ~11:10 UTC): 12 fine-tunes from runs/kit/kit_pretrain_heldout, queued as site launch kit_aft_heldout
+      (scripts/launch_kit_aft.sh at caeda81a) on the heldout resume FA-ccin2p3-78b8190c''s RUN_DONE (ETA ~02:00 UTC 2026-11-11);
+      scratch controls tt Born/virtual on n=1e5 FA-ccin2p3-b3d27208, d083f5da running; on the batch''s end: read the first
+      job''s lr line, readout with tools/kit_readout.py, figures kit_figures.py (A_ft beside its scratch control, caption
+      per curve scratch or pretrained; the A figures redrawn with the tighter legend room), per the design''s bands, with
+      the lr_scale 0.1 check before any ''no help'''
+    2: 'Pretraining resumes: heldout FA-ccin2p3-78b8190c and fair_nlo FA-ccin2p3-03ea3719 (KIT_RESUME=1, afterany on 62c2443b
+      / d0b132b6, which stop at their 12 h limit ~19:00 UTC at ~45k / ~50k of 68224 steps); on their end check each parent
+      per its 03:57 design (median shared-pool ratio to trial 1262 within 0.8-1.25, no pool blown up) and tell pretrain_data_saving
+      the heldout parent is ready (model_run0_best.pt after the sigma stage)'
     3: 'Fair NLO D-scan (Bakar): ee->tt virtual, 1e2..1e4 bulk one-loop target points, fine-tuned from the fair_nlo parent
-      against virtual_over_born''s from-scratch V/B with exact Born; design once the fair_nlo parent and the V/B baseline
-      exist'
-    4: 'Threshold scan (Gudrun): sigma(sqrt s) of ee->tt around 2m_t at LO and NLO like Fig. 1 of arXiv:1506.06864, exact
-      from MG5_aMC and the surrogate''s NLO from its V; design once a tt virtual model exists'
-    5: 'Checkpoint + inference package for KIT (Joaquin sends it): best A/B checkpoints, a float64 predict script, log10|M|^2
-      out; after B'
-    7: 'Off-shellness-off arm, protocol A from scratch n=1e5 on uug and uugg (job_kit.sh A tag=nooffshell, data.offshell_per_event=false
-      data.internal_mass_scalars=false; controls f6b2ece9, 12a9d54b; design recorded 08:50, under review): read per the design''s
-      three branches'
-    8: 'Tighten the y axes of the KIT error panels (kit_mse_*: legend room stretches them to 1e15-1e16 against data below
-      1e4), told to Joaquin 2026-11-10; do it with the next redraw (B, off-shellness-off arms)'
+      against a from-scratch V/B with exact Born refit on the KIT ee_tt virtual bulk; design once FA-ccin2p3-03ea3719 ends'
+    4: 'Threshold scan (Gudrun): sigma(sqrt s) of ee->tt around 2m_t at LO and NLO like Fig. 1 of arXiv:1506.06864: exact
+      fixed-order NLO (MG5_aMC or validated formulas, alpha_s 0.118 fixed, m_t 173) and the surrogate''s NLO = exact + integral
+      of (V_surr - V_exact) over 2-body phase space; design with the tt virtual model that goes to KIT (A_ft, after the A_ft
+      batch)'
+    5: 'Checkpoint + inference package for KIT (Joaquin sends it): best A_ft/B checkpoints, a float64 predict script, log10|M|^2
+      out; after the A_ft batch'
+    6: 'Off-shellness-off arms, protocol A from scratch n=1e5 on uug FA-ccin2p3-c35a2199 and uugg ac436bba (design passed
+      08:35): read per the design''s bands (a)-(d) against f6b2ece9 / 12a9d54b, figure with kit_figures.py'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -22173,52 +22173,37 @@ entries:
       are not representable from these inputs even when trained on (next lever: log-invariant inputs, as Bakar''s MLP).'
   step_why:
     1:
-      feeds: 'the numbers sent to KIT: whether hard_train fixes each family (B vs B_bulk)'
+      feeds: the pretrained model's numbers for KIT and whether pretraining changes extrapolation into the limits
       if:
-      - 'B below B_bulk by >0.3 decades and within 10x of bulk: the deficit is data, report it so'
-      - 'B not below B_bulk: the deficit is in what the network represents (inputs, e.g. a threshold variable), report it
-        so'
+      - 'A_ft >=1 decade below scratch in deep bins or exponent in band: pretrained model goes to KIT, B continues from A_ft'
+      - 'within 1 decade or worse: rerun 3 cells at lr_scale 0.1 before reporting no help'
     2:
-      feeds: 'protocol A pretrained against from scratch: does pretraining with the family held out help extrapolation'
+      feeds: usable parents for A_ft and the fair NLO scan
       if:
-      - 'A_ft below A scratch by >0.3 decades in hard bins: pretraining transfers to hard regions'
-      - 'no difference: report pretraining as no help on hard bins'
+      - 'ratio in 0.8-1.25: parents usable'
+      - 'outside: trace the recipe or the resume before any fine-tune'
     3:
-      feeds: 'Bakar''s fair NLO comparison: pretrained V against from-scratch V/B'
+      feeds: Bakar's fair NLO comparison
       if:
-      - 'pretrained below V/B baseline on hard bins: report the gain per D'
-      - 'not below: report that V/B with exact Born wins'
+      - 'fine-tune below V/B baseline at small D: pretraining saves one-loop data'
+      - 'not below: report so'
     4:
-      feeds: 'Gudrun''s request: is the surrogate''s NLO usable at threshold'
+      feeds: whether the surrogate reproduces the threshold cross section
       if:
-      - 'surrogate NLO within MC error of exact: send the plot'
-      - 'surrogate off near threshold (expected: protocol A''s Coulomb exponent is ~0): send the plot with that deficit'
+      - 'surrogate NLO within the scale band of exact: report'
+      - 'outside near threshold: the Coulomb deficit (B readout) shows in the observable'
     5:
-      feeds: what Joaquin sends KIT
+      feeds: what KIT receives
       if:
-      - 'B''s best beats A: package B'
-      - 'else: package A'
-    7:
-      feeds: 'which input carries the uug/uugg soft runaway, so the input-representation lever (plain arm: saturates) changes
-        the right thing'
+      - 'A_ft best: package A_ft'
+      - 'B best: package B'
+    6:
+      feeds: which input carries the soft runaway
       if:
-      - 'soft/coll exponents within 0.3 of exact and deep bins >0.3 decades below control: keep the off-shellness column in
-        range for A_ft, B and the KIT package'
-      - 'runaway gone but flat, or no change: the momenta representation (architecture) is the next lever'
-    8:
-      feeds: readable KIT figures
-      if:
-      - 'redrawn: send with what changed'
-      - 'plot_style blocks it: fix make_room'
+      - 'band a/b: the column drove the runaway'
+      - 'band c: the momentum representation'
   step_waits:
-    '1': FA-ccin2p3-9165f51b FA-ccin2p3-fe5c6e7d FA-ccin2p3-5b5877e0 FA-ccin2p3-21dc6836 FA-ccin2p3-1974ee97 FA-ccin2p3-e9937c15
-      FA-ccin2p3-677b9e9a
     '2': FA-ccin2p3-62c2443b FA-ccin2p3-d0b132b6
-    '3': FA-ccin2p3-d0b132b6
-    '4': FA-ccin2p3-9165f51b FA-ccin2p3-fe5c6e7d FA-ccin2p3-5b5877e0 FA-ccin2p3-21dc6836 FA-ccin2p3-1974ee97 FA-ccin2p3-e9937c15
-      FA-ccin2p3-677b9e9a
-    '5': FA-ccin2p3-9165f51b FA-ccin2p3-fe5c6e7d FA-ccin2p3-5b5877e0 FA-ccin2p3-21dc6836 FA-ccin2p3-1974ee97 FA-ccin2p3-e9937c15
-      FA-ccin2p3-677b9e9a
     '7': FA-ccin2p3-c35a2199 FA-ccin2p3-ac436bba
     '8': FA-ccin2p3-c35a2199 FA-ccin2p3-ac436bba
   handoff:
