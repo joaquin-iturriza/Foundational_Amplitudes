@@ -45,6 +45,16 @@ def main():
         print(f"2->{nf - 1 + 1 if nf == 3 else 4}: {len(q)} cells, het@shared / MSE median {np.median(r_):.2f}, lower than MSE in "
               f"{int((r_ < 1).sum())}/{len(r_)}; het@MSE-HPs / MSE median {np.median(r2):.2f}")
     print("missing (lost to the full disk):", missing)
+    # results.tex numbers (D82): per multiplicity the cells and the medians of het@shared and het@MSE-HPs over MSE;
+    # the cells where the shared HPs beat the het retrain at the MSE HPs, and those below MSE (their ratio)
+    out = {f"2to{nf}": dict(n=len(q), shared_median=float(np.median([p["het_shared"] / p["mse"] for p in q])),
+                            msehp_median=float(np.median([p["het_mse"] / p["mse"] for p in q if p["het_mse"]])))
+           for nf in (3, 4) for q in [[p for p in pts if NFIN[p["probe"]] == nf]]}
+    out.update(n=len(pts), shared_beats_msehp_n=sum(p["het_mse"] is not None and p["het_shared"] < p["het_mse"] for p in pts),
+               below_mse=[p["het_shared"] / p["mse"] for p in pts if p["het_shared"] < p["mse"]],
+               reruns=sum(len(l.split()) - 1 for l in open(os.path.join(HERE, "het_shared_rerun.txt"))
+                          if l.strip() and not l.startswith("#")))      # cells rerun (one job line: GPU-h, cells)
+    print(json.dumps(out))
     json.dump({"cells": pts, "missing": missing}, open(os.path.join(HERE, "het_shared_summary.json"), "w"), indent=1)
 
     fig, ax = ps.figure()
