@@ -15779,7 +15779,7 @@ entries:
   match: zz_redesign_*
   evidence:
     runs: []
-    commit: cb0fd64a
+    commit: 219a2b60
     paths:
     - .claude/hooks/notification_absorb.py
     - .claude/hooks/owner_handoff.py
@@ -15812,6 +15812,8 @@ entries:
       mid-turn and cost nothing. One of the 3 (11-06 04:42) carried its report inline (no hand-back), which the hook passes
       by design; the other 2 not inspected. Step 23 done: plan_check skips reply_check while disabled.json lists it (700fe4fa,
       repo-reviewer PASS).'
+    - '2026-11-10 step 22 done: repo-reviewer a0b2da08acd94dae3 PASS on the re-check (watermark 525a5a42, lock released);
+      templates committed at t_steps [8000] (D347) in 219a2b60'
     - '2026-11-10 step 22: repo-reviewer a0b2da08acd94dae3''s two blockers fixed in d9158526: review_backlog.sh reset_pillar
       moves the watermark only forward along the main checkout''s history (a diverged branch pass is listed in .passed only;
       a stranded watermark is replaced), tests/test_review_advance_at.py new case fails on the old hook; watermark restored
