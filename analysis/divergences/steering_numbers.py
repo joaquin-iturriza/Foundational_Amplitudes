@@ -160,6 +160,8 @@ def claims(S):
                          for k in ("bbb_sigma_rel", "bbb_beta", "gamma")},
                       het_rank_min=min(F[t]["spearman_sigma_abserr"] for t in ("sigma_s0", "g3_s0")),
                       het_rank_max=max(F[t]["spearman_sigma_abserr"] for t in ("sigma_s0", "g3_s0")))
+    near01 = [r["val_loss"] / obj.min() for r in rows if 0.08 <= r["bbb_sigma_rel"] <= 0.12]   # sigma_rel ~ 0.1
+    out["bbb"].update(srel01_min=min(near01), srel01_max=max(near01))
     # polynomial keep rule: R^2 of the error-vs-sigma fits on the base arms, the sweep, and the 3-seed confirmation
     poly = sorted(S["l2_poly_uugg"], key=lambda r: r["logflat_mse"])
     pl = [logflat(f"uugg_polyopt_s{s}") for s in (0, 1, 2)]
@@ -175,6 +177,18 @@ def claims(S):
     out["sat"] = dict(p99=sat, base_rise=sat["uugg_base_n600000"] / sat["uugg_base_n75000"] - 1,
                       budget_factor=600000 / 75000,
                       sigma_below_base=[1 - sat[f"uugg_sigma_n{n}"] / sat[f"uugg_base_n{n}"] for n in (75000, 150000, 600000)])
+    # the same numbers where the text writes them as percentages
+    pc = lambda x: 100 * float(x)
+    out["pct"] = dict(
+        uugg_logflat=[pc(g3s[g]["logflat"]) for g in ("1", "2", "3", "5", "10")],
+        uugg_deepest=[pc(g3s[g]["deepest"]) for g in ("1", "2", "3", "5", "10")],
+        uugg_shallowest=[pc(g3s[g]["shallowest"]) for g in ("1", "10")],
+        uugg_deepest_gain_10_30=pc(1 - out["uugg_s0"]["30"]["deepest"] / out["uugg_s0"]["10"]["deepest"]),
+        uugg_overall_worse_30=pc(out["uugg_s0"]["30"]["overall"] - 1),
+        uuggg_worse_20=pc(out["uuggg"]["20"]["deep"] - 1),
+        bbb_gap=[pc(1 - out["bbb"]["over_uniform"]), pc(out["bbb"]["over_het"] - 1)],
+        poly_best_under_power_s0=pc(1 - out["poly"]["best_over_power_s0"]), poly_edge=pc(out["poly"]["edge"]),
+        sat_base_rise=pc(out["sat"]["base_rise"]), sat_sigma_below=[pc(x) for x in out["sat"]["sigma_below_base"]])
     return json.loads(json.dumps(out, default=float))
 
 
