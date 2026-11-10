@@ -21357,6 +21357,74 @@ entries:
       one seed per D315, outcomes stated, HETEROSC parent, V/B per D357 and the virtual_over_born verdict, readout result.json
       from the same script, pools and Born trees present (kit held-out and catalog_v4_train recipes carry v4_bbx_zz, v4_bg_ab,
       v4_uux_epemz, v4_epem_bbxz), 11.3 GPU-h.'
+  - at: '2026-11-10T09:15:20+00:00'
+    question: 'One-loop arm, steps 6 and 2 (stage 1). (a) Which three held-out one-loop targets (H5, Born a training tree
+      of both candidate parents) carry a V/B that varies, so V/B training has something to learn: keep v4_bbx_zz_nlo (b b~
+      > z z) and v4_uux_epemz_nlo (u u~ > e+ e- z), replace v4_epem_bbx_nlo (massless e+e- > b b~, V/B constant C_F(pi^2-8))
+      by v4_bg_ab_nlo (b g > a b, QCD Compton with a photon; class v4_bg_ab, its only same-class loop v4_dg_ad_nlo in neither
+      parent), spare v4_epem_ddxz_nlo. (b) Per target and D=10^(k/2), k=2..9 (5e4 train pool), trained from scratch on V/B:
+      at which horizon T(D) (D356 rule) and does MSE(ln|V|) reach 1e-4?'
+    prior: '(1) par:vob_june (results.tex 4331-4350): on e+e- > u u~ V/B = 2.49 = C_F(pi^2-8) at every event (relative std
+      5e-13); on t t~ V/B beats V at 4000 steps from scratch 4.58e-8 against 1.75e-7 MSE of ln|V| (3.82x), fine-tuned 6.89x.
+      (2) This entry''s finding 2026-11-10T08:58 (virtual_over_born at current defaults, e+e- > t t~): V/B below V in all
+      three seeds, median 3.9x; step rate 0.372 s/step at BS 16384 on V100. (3) Checked today on CC from the existing sidecars
+      (born_of_pool, 50000 train rows): std of ln|V|-ln B = 1.9e-12 on ee_uu_nlo_25-1000GeV, 0.132 on ee_ttbar_nlo_362-1000GeV
+      (p1..p99 3.53..3.98), no negative V in either. (4) This entry''s tree calibration cal2 (analysis/data_saving/data/horizons_cal2.json
+      @f280a9fc): same job script and lr law; e+e- > t t~ crosses 1e-4 from D=100; e+e- > c c~ g and b b~ g g never, best
+      inside the warm-up at k<=8 (horizons then from a DyHPO, stage 2). (5) par:v4_loop_born (results.tex 4215): removing
+      the Born halves a one-loop class''s level spread (2.55 to 1.01). (6) Draft fig 22 (old setup, ee > u u~ one loop): fine-tune
+      1-2 orders below scratch. (7) sec:ladder one-loop probes (results.tex 13688-13697): e+e- > d d~ and b b~ at one loop,
+      fine-tune below scratch in every cell, 1.4-9.3x, geometric means 3.3 and 2.7 (an 8-trial search per cell, older setup).
+      (8) The electroweak one-loop e+e- > d d~ from scratch flattens between D=1e2 and 10^2.5 at 7.6-8.5e-3 (results.tex 14194-14199).
+      (9) hp58 (results.tex 10770-10782, het_stage2.py @0b277b39): one-loop scratch bests move strongly with the lr: widening
+      the window lowered the one-loop b b~ best 52x at D=1e4 (0.028 to 5.4e-4), and the one-loop b b~ at 1e4 and d d~ at 1e2
+      kept their best at the highest rate tried. What they predict here: 1e-4 from scratch on a one-loop target is not shown
+      anywhere (best tuned one-loop scratch 5.4e-4 at D=1e4, on V not V/B); and a fixed lr can mislead the other way from
+      cal2 (too low: best at the run''s end, still falling), which the outcome branches on. No one-loop D-calibration on catalog_v4
+      exists. Searched: results.tex (V/B, over Born, one-loop, data saving, H5), plan show pretrain_data_saving and virtual_over_born,
+      site decisions --project FA (D315 D355 D356 D360 D366).'
+    measure: '(a) Born sidecars by scripts/job_vob_born.sh (generalized to take processes, CPU, CC) for v4_epem_bbx_nlo, v4_bbx_zz_nlo,
+      v4_uux_epemz_nlo, v4_bg_ab_nlo, v4_epem_ddxz_nlo (train 5e4, val 5e3, test 5e3; the stored target reproduced on every
+      row or no sidecar). Per train pool: std, p1, p99 of ln|V|-ln B and the share of V<0. Rule fixed now: a target is kept
+      when std >= 0.1 (sigma^2 >= 1e-2, two decades above the 1e-4 level; e+e- > t t~ has 0.132); v4_bg_ab_nlo failing it
+      is replaced by v4_epem_ddxz_nlo. (b) 24 scratch runs (3 targets x k=2..9), scripts/job_data_saving.sh <target> <k> <steps>
+      scratch ++data.target_over_born=true tag=cal_vb: per run the validation mu MSE curve (result.json val_mse_curve) times
+      prepd_std^2 of the V/B log target = MSE of ln|V/B| = MSE of ln|V| (B exact), read by analysis/data_saving/horizons.py
+      (target list extended): s_b, best_frac, s_4 (first step <= 1e-4), step rate, T(D) by the passed rule (1.1 s_4 if reached;
+      else 1.1 s_b if best_frac < 0.8; else extend). A non-finite curve is listed apart with its step.'
+    check: '(a) The sidecar spread separates the two cases on existing data (prior 3): 1.9e-12 on massless ee_uu (nothing
+      to learn) against 0.132 on ee_ttbar (learned 3.9x better than V). (b) The calibration measure moves with D on existing
+      data: in cal2 (same job script, lr law and readout) e+e- > t t~ best MSE falls from 2.9e-3 (D=10) to 9.1e-7 (1e4) and
+      3.7e-9 (1e5), and s_b moves from inside the run (640 steps at D=10) to its end (from D=316). Dry run of the command:
+      job_data_saving.sh with an _nlo target already caps k at 9 and passes data.memmap=false; ++data.target_over_born=true
+      is the key of config/amplitudes.yaml (the parent''s saved config may lack it, hence ++). The first finished run''s data_stats.json
+      is read for target_over_born=true before the readout.'
+    fixed: 'Parent config trial 1262 of cov_v4_long_hpo8_cc_68224 (base config, as cal2: model, inputs, HETEROSC + sigma stage,
+      checkpoint on val mu MSE, heterosc_select=mu_mse); lr = the parent''s law 7.82114e-3 (T/17056)^-0.55 times the transfer
+      D factor (as cal2); batch min(16384, D/2); D = prefixes of the 5e4 train pool, val/test the frozen 5e3; steps 8000 for
+      k<=8, 12000 for k=9 (as cal2); V/B target (data.target_over_born=true, virtual_over_born''s verdict); CC-IN2P3 only
+      (pools and sidecars there); scripts/job_data_saving.sh at the submitted commit.'
+    control: 'A calibration, not an A/B: it fixes T(D) for stage 2, where each fine-tune cell is matched to a scratch cell
+      at the same T(D), prefixes, model, inputs and checkpoint rule. Within it, the comparison is across D at one protocol;
+      e+e- > t t~ (cal2) is the reference curve of the same protocol on a tree.'
+    seeds: Seed 42, one run per cell (D315, settled).
+    outcome: '(a) Kept targets: those with std(ln|V/B|) >= 0.1; v4_epem_bbx_nlo expected ~1e-12 (dropped, reported), the other
+      three expected above 0.1. (b) Per target: YES (1e-4 reachable from scratch) when some k<=9 has s_4: T(D) from the rule,
+      stage 2 reads D* at 1e-4; NO when no D reaches it: stage 2 reads at 1e-2 like the trees, and where the best sits in
+      the warm-up (best_frac < 0.2 at D >= 1e3) the horizon comes from stage 2''s scratch DyHPO (held by Joaquin''s budget
+      answer). Too-low-lr branch (prior 9): where the best sits in the last fifth (best_frac >= 0.8) with the curve still
+      falling (last validation point the minimum, or below 0.9 of the value at 0.8 of the run), or the best is above 5.4e-4
+      at D=1e4 (hp58''s tuned one-loop b b~ there), the fixed-lr curve is not read as a horizon: that target''s T(D) also
+      comes from the stage-2 scratch DyHPO (the extend rule is not applied at a fixed lr). Figure: per target the best MSE
+      of ln|V| against D and the val curves per k, the 1e-4 and 1e-2 levels drawn. Cost: GPU estimate per target 6 x 8000
+      x 0.087 s + 8000 x 0.17 s + 12000 x 0.47 s + 8 x 0.08 h overhead = 3.8 GPU-h (cal2''s measured rates: 4 particles like
+      t t~, 5 like c c~ g), 24 runs ~11.3 GPU-h; longest run k=9 ~1.7 h; one wave (site pick: 53 free GPUs on CC fit 24);
+      CPU sidecar job: measured on virtual_over_born''s sidecar job FA-ccin2p3-d0c0e4cd (slurm 63259838, standalones already
+      built): 77 s in all for two 2->2 processes x (5e4+5e3+5e3) rows, so <= 1 ms per 2->2 point; 2->3 (u u~ > e+e- z, e+e-
+      > d d~ z) assumed <= 20 ms per point (one-loop pentagon class, estimate) = <= 17 min for 5e4 rows; the five standalones
+      are rebuilt (D208), 10-20 min each (the script''s estimate at c84956b0), in parallel; target 0.6 h, limit --time=01:15:00,
+      --cpus-per-task=15 (five processes x three pools). Disk 23 MB per run (cal2) x 24 = 0.55 GB, 6.3 GB free on CC /sps/lpnhe
+      (design reviewer, 2026-11-10 ~09:15; 6.5 GB read by df at 09:10); read again at submission.'
   step_waits:
     '3': '2026-11-12'
     '4': '2026-11-12'
