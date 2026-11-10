@@ -21442,6 +21442,21 @@ entries:
       Born and tt virtual, off-shellness on, 9e5) step at 0.56 s/step in float64 on V100 (1000 steps in 563 s), so 8000 steps
       take 1.25 h against the 1.8 h target. Signs census (tools/kit_hardps.py signs): 9183000 KIT events, 0 non-positive,
       so tt virtual is scored as positive.'
+  - at: '2026-11-10T06:01:22+00:00'
+    text: 'Protocol A from scratch, tt (KIT src/evaluate.py through tools/kit_predict.py, kit_result.txt in each run dir on
+      CC, code ea26f3fb-era job_kit.sh at b2b18e01/0d14a678; one seed). log10-MSE bulk_test / Coulomb beta 1e-4..1e-3 / Sudakov
+      15-50 TeV, and threshold exponent (exact -1, truth -1.016): tt virtual 9e5 off-shellness on 1.8e-9 / 8.68 / 0.283, pred
+      +0.028; 9e5 off 6.0e-9 / 7.00 / 64.4 (wgt err 1.95e27: a few events overshoot by >1e27, clip 30 decades, a blow-up at
+      15-50 TeV), pred -0.041; 1e5 off 1.2e-8 / 7.12 / 0.240, pred -0.021. Bakar''s MLP at 1e5: Coulomb 7.8 (2.4 with the
+      threshold variable), exponent -0.02/-0.44. So the Coulomb 1/beta is not extrapolated from bulk (beta>0.2) by any arm
+      (exponent ~0, deep bin 7-8.7, at the MLP''s 7.8); off-shellness on vs off at 9e5: Coulomb +0.09 decades in log10-MSE
+      ratio terms (8.68 vs 7.00, not resolved under the 0.3-decade rule? log10(8.68/7.00)=0.09), Sudakov deep bin 0.28 vs
+      64 (on removes the blow-up). tt Born (no exponent listed by the scorer): bulk 6.2e-10 on / 1.0e-8 off / 6.3e-10 off
+      1e5; Coulomb 1.7e-5 on / 1.2e-3 off / 5.1e-3 off 1e5; Sudakov 15-50 TeV 0.21 on / 0.10 off / 0.018 off 1e5. Off-shellness
+      on lowers the tt Born threshold bins by 1.85 decades (1.19e-3/1.67e-5) at 9e5. 1e5 uug/uugg runs overfit (HETEROSC val
+      NLL rising to +3.2 and +28.6 by step 6240-7360; the best checkpoint is early). B path dry run on CC (KIT_FROM tt Born
+      offon, 2000 bulk, 5 steps): hard pool 33500 train (2000 + 31500 = 90% of hard_train), val 4000 (500 + 3500), A''s frozen
+      stats and best weights loaded, training steps fine; the sigma stage is the A path.'
   step_why:
     1:
       feeds: the from-scratch KIT numbers against Bakar's MLP and the control of every later arm
