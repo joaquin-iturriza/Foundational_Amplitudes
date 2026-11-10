@@ -21278,6 +21278,9 @@ entries:
       if:
       - 'precision holds and float64 step rate fits 30 GPU-h for protocol A: design and submit protocol A from scratch'
       - 'precision fails on a stratum: trace and fix the step that loses it before any run'
+  step_waits:
+    '1': 'a reviewer: repo-reviewer re-check of branch kit (review fixes uncommitted in worktrees/wt-kit), and the Jean Zay
+      copy kit_copy_jz'
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
