@@ -1,0 +1,13 @@
+# pretrain_data_saving: the held-out one-loop target v4_uux_epemz_nlo alone (its entry of recipes/catalog_v4_heldout_H5.yaml; its Born is a training tree)
+sampling:
+  mode: mixture
+  f_fwd: 0.15
+  fwd_cand: 0.3333333333333333
+processes:
+- name: v4_uux_epemz_nlo
+  sqrts:
+  - 112
+  - 6000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
