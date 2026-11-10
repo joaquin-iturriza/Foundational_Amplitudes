@@ -21239,11 +21239,8 @@ entries:
     - draft_rewrite
   decisions:
   - D365
-  next:
-    1: Restructure the draft in ~/drafts/fm_amplitudes_2026-11 into the D354/D365 order (data saving, optimizations, ladder
-      and star arms, KIT benchmarks), apply the cut map except the three held co-author sections, reword what stays, marked
-      slots for results still running
-    2: Fill each slot as pretrain_data_saving, optimizations_recap, ladder_figs and kit_benchmark land their results
+  next: Fill the draft's slots (~/drafts/fm_amplitudes_2026-11/paper.tex, \slot{...}) as pretrain_data_saving, optimizations_recap,
+    kit_benchmark and virtual_over_born land their results; then the abstract's and outlook's numbers
   done_when: null
   notes_ref: null
   match: none
@@ -21285,12 +21282,7 @@ entries:
   blocks_steps: *id002
   step_why:
     1:
-      feeds: the rewritten draft's structure and cuts (D365)
-      if:
-      - 'compiles with all slots marked: commit and report the slot list to the main session'
-      - 'a cut or move breaks a reference that the kept text needs: reword the kept text to stand without it'
-    2:
       feeds: the draft's results (D354)
       if:
       - 'a sibling entry lands a result: fill its slot, recompile, commit'
-      - 'a sibling result contradicts the story text: rewrite the story text around the result and report it'
+      - 'a sibling result contradicts the story text: rewrite the story text around it and report it'
