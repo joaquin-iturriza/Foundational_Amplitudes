@@ -23075,7 +23075,7 @@ entries:
     start: '2026-11-10T08:56:26+00:00'
     at: '2026-11-10T08:56:26+00:00'
   step_waits:
-    '1': FA-ccin2p3-98b88bb7 FA-ccin2p3-e9990f4d FA-ccin2p3-929eaf80
+    '1': 'a reviewer: repo-reviewer over the code backlog, launched 2026-11-10'
   handoff:
     state: 'Cause settled and written up (results.tex par:vob_june @c16ed102; analysis/virtual_over_born/june_targets.py @d9b38f1c):
       the June V/B ''failure'' was read in standardized units. ee->uu V/B is the constant C_F(pi^2-8) (rel std 5e-13), standardized
