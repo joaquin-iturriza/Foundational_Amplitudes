@@ -20939,7 +20939,7 @@ entries:
     - 6
   owner:
     agent: a3907d6d36879af7b
-    state: working
+    state: closed
     since: '2026-11-10T09:01:19+00:00'
     state_at: '2026-11-10T10:15:32.646000+00:00'
     context: 300637
@@ -21804,22 +21804,26 @@ entries:
     start: '2026-11-10T09:16:45+00:00'
     at: '2026-11-10T09:16:45+00:00'
   handoff:
-    state: 'Step 6 in progress: v4_epem_bbx_nlo dropped (V/B constant); v4_bbx_zz_nlo and v4_uux_epemz_nlo kept; bg_ab and
-      epem_ddxz out (V changes sign, signedlog target). Third target: first of bbx_gg, dg_uwm, bbx_avevex, db_bdz, uc_cuz
-      with std ln|V/B| >= 0.1 and no V<0, from sidecar job FA-ccin2p3-35699fdd (running); then rerun analysis/data_saving/vb_spread.py,
-      write recipes/catalog_v4_datasaving_<t>.yaml + loops entry + plot colour, draw the spread figure, and submit the 24-run
-      cal_vb calibration (design passed 09:15, targets recorded: cal_vb 1.7 h x 24, scratchpad submit_cal_vb.sh without the
-      dependency flag: CC refused afterok on the CPU job). Stage 2 still waits on Joaquin''s budget answer; stage-2 fit-based
-      D* revision drafted (n=4: bands 1.26x ttbar, 3.8x ccbar g).'
-    decisions: One-loop targets need std ln|V/B| >= 0.1 and V of one sign (a sign-changing V/B trains on signedlog, not ln|V|);
-      horizons.py lists non-ln|V| runs apart and sends still-falling or >5.4e-4-at-1e4 one-loop curves to the stage-2 DyHPO
-      (design review FIX then PASS).
-    ruled_out: v4_epem_bbx_nlo (constant V/B), v4_bg_ab_nlo and v4_epem_ddxz_nlo (V changes sign on 28.7% and 13.9% of rows);
-      afterok dependency from a CPU job on CC.
-    running: FA-ccin2p3-35699fdd (CPU Born sidecars of five candidates)
-    files: scripts/job_vob_born.sh, analysis/data_saving/vb_spread.py, analysis/data_saving/horizons.py, analysis/data_saving/plot_calibration.py,
-      recipes/catalog_v4_datasaving_{bbx_zz_nlo,uux_epemz_nlo,loops}.yaml
-    written: '2026-11-10T09:26:01+00:00'
+    state: 'One-loop arm stage 1. Targets (Joaquin''s corrections 2026-11-10): b b~ > Z Z, u u~ > e+e- Z, e+e- > b b~ (constant
+      V/B kept: drop only on a measured run). Readout: common test MSE of V/B (vb_test_mse.py), MSE ln|V| beside; T(D) from
+      the trained-unit val curve (horizons.py); L0 on MSE_VB set from the scratch curves. b b~ > Z Z: 8 cal_vb runs done/running
+      (FA-ccin2p3-ba296372 56508e36 8ef62e68 b3c0cda3 310d8987 d3dd10e8 8e41af66 0dd9e90b), stand. u u~ > e+e- Z cal_vb runs
+      superseded (physics factor multiplied V/B by s_hat/s0; fixed @cc288ee1, k=9 cancelled). Design for the 16 new runs (u
+      u~ > e+e- Z rerun + e+e- > b b~, tag cal_vb2, 7.2 GPU-h, limits 0:30/0:45/2:30) recorded ~12:10, NOT yet reviewed: launch
+      the design-reviewer (it reviewed earlier versions as add953067bc1728ea), on PASS submit with the scratchpad pattern:
+      site submit ccin2p3 FA scripts/job_data_saving.sh --item pretrain_data_saving --hdr=--time=<0:30|0:45|2:30> -- <target>
+      <k> <8000|12000> scratch ++data.target_over_born=true tag=cal_vb2, after site pick FA --jobs 16 and plan target cal_vb2.
+      Then the figures (MSE_VB vs D, MSE ln|V| vs D). Stage 2 waits on Joaquin''s GPU budget. Stage-2 tree design: fit-based
+      D* revision drafted (bands 1.26x ttbar, 3.8x ccbar g at n=4), not recorded.'
+    decisions: 'V/B runs: target_physics_factor and target_physics_orders off (job_data_saving.sh). One-loop common measure
+      MSE((V/B)_pred-(V/B)_true) on test (D371 to come). Never drop a target on a prediction. Sign-changing targets allowed
+      (trained in their own transform).'
+    ruled_out: The sign rule and the sigma>=0.1 cut; b g > a b, e+e- > d d~ Z, b b~ > a ve ve~ as replacements (search stopped);
+      u u~ > e+e- Z cal_vb runs (physics factor); afterok dependencies from CPU jobs on CC.
+    running: b b~ > Z Z cal_vb runs (8); FA-ccin2p3-326bc006 (sidecars, not acted on)
+    files: scripts/job_data_saving.sh, scripts/job_vob_born.sh, analysis/data_saving/{horizons,vb_test_mse,vb_spread,plot_calibration,plot_vb_spread}.py,
+      analysis/data_saving/data/vb_spread.json, recipes/catalog_v4_datasaving_{bbx_zz_nlo,uux_epemz_nlo,epem_bbx_nlo,loops}.yaml
+    written: '2026-11-10T10:24:01+00:00'
   ask: 'Scope: if none of the last seven candidates (bb->bb, bbbar->HZ, bbbar->ccbarH, bg->bgg, gg->bbbar g, ucbar->cbarHu,
     udbar->ccbarW+) has a one-signed virtual, accept a one-loop arm with two targets (bbbar->ZZ, uubar->e+e-Z) instead of
     three?'
