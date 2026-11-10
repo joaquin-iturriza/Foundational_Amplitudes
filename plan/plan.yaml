@@ -22792,6 +22792,71 @@ entries:
       11 (parent preprocessing, the emission-scales+coupling-orders target D364 names as converged), 13 (no sweep), 14 (1.2
       GB vs 6.5 GB free on /sps/lpnhe today, memmap off, pools cached), 15 (rates from the float64 scratch runs of the same
       config; offshell_zero after standardisation equals the removed column for the first Linear).'
+  - at: '2026-11-10T10:03:22+00:00'
+    question: 'Does pretraining (the catalog_v4 parent with the KIT families held out, FA-ccin2p3-62c2443b finished by its
+      resume 78b8190c) change protocol A''s extrapolation into the KIT hard bins and its bulk accuracy, against the same network
+      from scratch? Protocol A fine-tuned (A_ft) from the heldout parent on bulk only, per KIT target and n, matched one-to-one
+      with the protocol A from-scratch runs; only the start weights differ (lr_scale 1.0, so the lr is the scratch runs'').
+      Feeds the number sent to KIT for the pretrained model (Joaquin: the result that matters) and whether the foundation-model
+      claim holds on hard phase space.'
+    prior: 'Searched docs/results.tex, the plan and site decisions for KIT, A_ft, divergences, singular/soft/collinear limit,
+      extrapolat, held out, pretrain/fine-tun/scratch. (1) results.tex sec:divergences-holdout (~9898-10100): a 22-process
+      foundation with the gluon family held out (uug, uugg, uuggg, ddg, bbg) fine-tuned on ee->uug outside the divergence
+      region; f=0 is pure extrapolation: deepest bin (y_min<1e-3) MSE of log|M|^2 11.1 for uug (prediction flat and capped
+      into the limit), 0.98 for uugg (partly follows the 1/y_min rise); 5% in-region events cut uug 24x; no from-scratch control.
+      What differs here: the catalog_v4 parent (1139 pools), KIT bins down to 1e-7, a matched from-scratch control, float64,
+      KIT''s evaluate.py. That study predicts A_ft flat and capped into the uug limit (band b of the outcome, not a runaway)
+      and a partial follow on uugg. (2) This entry, protocol A from scratch (kit_fig_A.json, figures kit_mse_*/kit_median_*):
+      no arm follows any limit; uug soft exponent +20.2 (1e5) / +1.8 (9e5) vs exact -2, deepest soft bin log10-MSE 14180 /
+      1366 vs Bakar MLP 0.32; uugg +16.6 / +2.8, 9067 / 4241; tt virtual threshold deep-bin median -1.3 vs truth +1.69; tt
+      Born threshold bins 1.85 decades lower with off-shellness on. (3) Transfer study (sec:ladder): fine-tunes beat scratch
+      in the bulk at small D.'
+    measure: 'KIT src/evaluate.py through tools/kit_predict.py on each run''s final model: log10-MSE per hard_test stratum
+      (deepest bins: uug/uugg soft x and coll y 1e-7..1e-6; tt Born/virtual threshold beta and Coulomb/Sudakov bins), bias,
+      99th percentile, |M|^2-weighted error, fitted exponents (soft -2, coll -1; tt per KIT''s fit), and bulk_test log10-MSE;
+      each A_ft against its matched scratch run.'
+    check: 'CC login CPU dry runs (job_kit.sh A_ft, trial 1262 as stand-in parent, same architecture as the heldout parent):
+      uug n=2000 fine-tune loads the parent (tokenizer, weights), step-0 validation -0.58 against the scratch run''s 1.2e4
+      at step 0 (the pretrained weights carry over through the KIT preprocessing). Off arm: the parent cannot load with the
+      columns removed (linear_in 29 vs 26, framesnet 51 vs 45 inputs); data.offshell_zero (979b9449) holds them at 0, the
+      parent loads unchanged; they enter only the first Linear of the input and frames nets as concatenated per-particle scalars,
+      so a zero column is the removed column; dry run tt virtual n=2000 +data.offshell_zero=true: log ''offshell_zero: off-shellness
+      columns held at 0'', no shape mismatch, step-0 validation 804, KIT_DONE rc=0. lr: the parent config''s fine_tune.lr_scale
+      is 0.1 (reviewer, CC config.yaml); job_kit.sh A_ft now passes fine_tune.lr_scale=1.0 (caeda81a), so every group runs
+      at training.lr = 0.0118605 as the scratch runs; the first job''s log line of the lr is read before the rest is read
+      out. Measure moves with a change of this size: off-shellness on/off moved tt Born threshold bins 1.85 decades, the plain
+      arm moved the uug deep soft bin 2 decades; noise: 1e5 vs 9e5 moved the uug deep soft bin 1.0 decade (uugg 0.33), no
+      seed spread (D315).'
+    fixed: 'Everything of each matched scratch run but the start weights: scripts/job_kit.sh A_ft mode at caeda81a (KIT_PARENT=runs/kit/kit_pretrain_heldout
+      via site submit --env; the parent''s last segment''s best checkpoint, the best over both segments by resume_seed_best;
+      the parent''s config.yaml as base, so model and inputs are the trial-1262 setup of the scratch runs), fine_tune.lr_scale=1.0,
+      layer_decay 1.0, float64, seed 42, 8000 steps, lr 0.0118605 (the A lr law at 8000 steps, as every scratch run), HETEROSC,
+      mu_mse selection then sigma stage, fine_tune.target_stats=own, offshell_stats=parent, bulk_train first n events, val
+      last 1e5 of bulk_train, test bulk_test 2e5 and every hard_test stratum. Off arms: +data.offshell_zero=true. Rates from
+      the scratch runs (V100 float64): tt 0.56 s/step (1.25 h), uug 0.68 (1.52 h), uugg 0.80 (1.78 h), plus ~10 min start,
+      sigma stage and scoring; --time tt 1:40, uug 1:55, uugg 2:10. 14 jobs: 12 A_ft (scripts/launch_kit_aft.sh, queued with
+      site launch on the parent resume''s RUN_DONE, all 12 at once on CC) + 2 new scratch controls now; 18.5 GPU-h target,
+      21.5 requested. Disk ~85 MB per run, 1.2 GB of 6.5 GB free.'
+    control: 'The protocol A from-scratch run of the same target, n and off-shellness: tt virtual 9e5 on c8ac36f0, 9e5 off
+      de744946, 1e5 off 88aa155a; tt Born 9e5 on ac4868da, 9e5 off b99b09db, 1e5 off 2c922af4; uug 9e5 7d74d518, 1e5 f6b2ece9;
+      uugg 9e5 366a4a98, 1e5 12a9d54b; the two missing cells (tt Born and virtual, off-shellness on, n=1e5) run now as scratch
+      controls with the same job_kit.sh A arguments (tag=offon). Reference: Bakar''s MLP table, the T flat-edge floors, the
+      sec:divergences-holdout f=0 cell.'
+    seeds: One seed (42) per arm, D315; cuts set against the observed 1e5-vs-9e5 variability (1 decade on deep bins) instead
+      of a seed spread.
+    outcome: 'Per arm, deepest-bin log10-MSE d and exponent s of A_ft against its scratch control: (a) d at least 1 decade
+      below scratch in a family''s deep bins, or s inside the extrapolating band (soft [-2.5,-1.5], coll [-1.5,-0.5], tt within
+      0.5 of KIT''s exact exponent) where scratch is outside: pretraining helps the extrapolation; the A_ft numbers go to
+      KIT as the pretrained model''s and B continues from A_ft. (b) d within 1 decade of scratch and s in the same band, or
+      (c) d more than 1 decade above scratch: before ''no help'' or ''hurts'' is reported, the lr axis is checked: the deep-bin
+      cells (uug and uugg, n=1e5, and the tt virtual 1e5 off cell) rerun at the parent''s fine-tune lr_scale 0.1 (3 jobs,
+      ~5 GPU-h, same design otherwise); (b)/(c) stand only if the 0.1 arm lands in the same band; if 0.1 reaches (a) the finding
+      is ''pretraining helps at the fine-tune lr'', reported with both lr points. (b) after that check: pretraining does not
+      change extrapolation into the limit (as sec:divergences-holdout''s flat, capped uug); the bulk_test MSE then decides
+      transfer (A_ft below scratch by >0.3 decades = bulk transfer only); next lever the input representation (log invariants)
+      for both. (c) after that check: the parent''s prior hurts in the limit, reported with which strata; next the parent''s
+      preprocessing against KIT''s ranges. The 9e5 and 1e5 rows read the same way; a gain at 1e5 that vanishes at 9e5 is a
+      data-saving gain, not an extrapolation gain. Families disagreeing are reported as such.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
