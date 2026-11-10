@@ -21455,6 +21455,16 @@ entries:
       NLL rising to +3.2 and +28.6 by step 6240-7360; the best checkpoint is early). B path dry run on CC (KIT_FROM tt Born
       offon, 2000 bulk, 5 steps): hard pool 33500 train (2000 + 31500 = 90% of hard_train), val 4000 (500 + 3500), A''s frozen
       stats and best weights loaded, training steps fine; the sigma stage is the A path.'
+  - at: '2026-11-10T06:16:48+00:00'
+    text: 'Protocol A from scratch, ee->uug (KIT evaluate.py via kit_predict, kit_result.txt in runs/kit/kit_A_ee_uug_me2_n{900000,100000}_t8000
+      on CC; one seed; 0.67 s/step float64 V100). log10-MSE 9e5 / 1e5: bulk 5.3e-4 / 8.2e-4 (Bakar''s MLP at 1e5: 2.1e-5,
+      so our bulk is 39x worse than his at 1e5); soft x 1e-7..1e-6 1366 / 14180 (MLP 0.32); coll y 1e-7..1e-6 25.4 / 30.1
+      (MLP 0.11). Exponents: soft pred +1.81 / +20.2 (exact -2; MLP -2.12), coll pred +0.20 / +0.32 (exact -1; MLP -0.93).
+      So from scratch on these inputs the network extrapolates with the wrong sign into both limits, far behind Bakar''s log-invariant
+      MLP, and its bulk is also worse than his. Earlier catalog float32 runs got collinear slopes -2.15..-2.26 against -2.303
+      (sec:divergences), on a different region and bins. Prebuild gap: the two pretrainings (f0ca7a15, 95427201) failed at
+      data loading, no memmap cache for the new recipes; CPU prebuilds d995bd5a, 43e5fc44 submitted, GPU jobs to follow with
+      afterok at 07:00 UTC (budget window).'
   step_why:
     1:
       feeds: 'the numbers sent to KIT: whether hard_train fixes each family (B vs B_bulk)'
