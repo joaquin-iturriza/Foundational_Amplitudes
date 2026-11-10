@@ -20868,8 +20868,10 @@ entries:
   match: dsave_*
   evidence:
     runs: []
-    commit: null
-    paths: []
+    commit: 495b2607
+    paths:
+    - recipes/catalog_v4_datasaving_trees.yaml
+    - scripts/job_data_saving.sh
   dead_ends: []
   asks: []
   owner:
