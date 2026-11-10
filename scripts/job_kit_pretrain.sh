@@ -9,8 +9,8 @@
 # setup (trial 1262 of cov_v4_long_hpo8_cc_68224: its saved config.yaml is the base, so model, HPs, steps, loss and
 # sigma stage are the parent's); only the recipe changes (recipes/gen_kit_pretrain.py).
 #     site submit <site|auto> FA scripts/job_kit_pretrain.sh -- <heldout|fair_nlo> [key=value ...]
-# heldout   recipes/kit_pretrain_heldout.yaml: protocol A's pretrained parent (no ee->tt, ee->qqbar g, ee->qqbar gg)
-# fair_nlo  recipes/kit_pretrain_fair_nlo.yaml: Bakar's fair NLO parent (every tree, the target's tree ee->tt
+# heldout   recipes/catalog_v4_kit_pretrain_heldout.yaml: protocol A's pretrained parent (no ee->tt, ee->qqbar g, ee->qqbar gg)
+# fair_nlo  recipes/catalog_v4_kit_pretrain_fair_nlo.yaml: Bakar's fair NLO parent (every tree, the target's tree ee->tt
 #           included, 10 one-loop pools)
 # Run dir runs/kit/kit_pretrain_<recipe>[_<tag>] (tag=<name> argument).
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
@@ -19,7 +19,7 @@ cd "$PROJECT_DIR"
 WHICH="$1"; shift
 case "$WHICH" in heldout|fair_nlo) ;; *) echo "heldout or fair_nlo"; exit 2 ;; esac
 PARENT="runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262"
-RECIPE="$PROJECT_DIR/recipes/kit_pretrain_${WHICH}.yaml"
+RECIPE="$PROJECT_DIR/recipes/catalog_v4_kit_pretrain_${WHICH}.yaml"
 [ -e "$RECIPE" ] && [ -e "$PROJECT_DIR/$PARENT/config.yaml" ] || { echo "no $RECIPE or $PARENT/config.yaml"; exit 2; }
 TAG=; ARGS=(); for x in "$@"; do case "$x" in tag=*) TAG="_${x#tag=}";; *) ARGS+=("$x");; esac; done
 OUT="$PROJECT_DIR/runs/kit/kit_pretrain_${WHICH}${TAG}"

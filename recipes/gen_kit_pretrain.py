@@ -14,9 +14,9 @@ entry):
                 one-loop v4_uux_epemg_nlo, v4_ug_epemu_nlo
   ee->qqbar gg  v4_epem_ccxgg, v4_ug_epemgu
 Writes
-  recipes/kit_pretrain_heldout.yaml   the parent's pools minus the three families: protocol A's pretrained parent for
+  recipes/catalog_v4_kit_pretrain_heldout.yaml   the parent's pools minus the three families: protocol A's pretrained parent for
                                       every KIT target (tt Born, tt virtual, uug, uugg)
-  recipes/kit_pretrain_fair_nlo.yaml  Bakar's fair NLO pretraining for the ee->tt virtual target: every tree pool of
+  recipes/catalog_v4_kit_pretrain_fair_nlo.yaml  Bakar's fair NLO pretraining for the ee->tt virtual target: every tree pool of
                                       the parent, the target's own tree v4_epem_ttx added (recipes/
                                       catalog_v4_datasaving_epem_ttx.yaml's entry), and 10 one-loop pools drawn at
                                       random (numpy seed 0) from the parent's one-loop pools (n_loops > 0 in the catalog
@@ -98,7 +98,7 @@ def main():
         return
     for name, rec, what in (("kit_pretrain_heldout", held, "the parent's pools minus the KIT families"),
                             ("kit_pretrain_fair_nlo", fair, "trees + v4_epem_ttx + 10 one-loop pools (seed 0)")):
-        with open(os.path.join(ROOT, "recipes", f"{name}.yaml"), "w") as f:
+        with open(os.path.join(ROOT, "recipes", f"catalog_v4_{name}.yaml"), "w") as f:
             f.write(f"# kit_benchmark: {what}; written by recipes/gen_kit_pretrain.py from "
                     f"recipes/catalog_v4_default25_train.yaml\n")
             yaml.safe_dump(rec, f, sort_keys=False)
