@@ -83,6 +83,28 @@ def main():
     ps.shared_legend(fig, ax, ncol=3)
     ps.save(fig, os.path.join(HERE, "figs", "het23_hps"))
     print("cells:", "; ".join(f"{i + 1} {LAB[probe(c)]} {arm(c)}" for i, c in enumerate(CELLS)))
+    # the numbers of results.tex (D75 paragraph): per cell, in CELLS order, het at its own HPs over MSE and the het
+    # retrain at the MSE HPs over het at its own (above 1: the own sweep is better); the best trials' pull std; the HP
+    # positions in the search range (warmup: lower or upper half, lin; lambda: upper half, log) and the EMA decays
+    pulls = {}
+    for f in glob.glob(os.path.join(HERE, "het23_data", "*.npz")):
+        with np.load(f) as z:
+            pulls.update({k[: -len("__pull")]: z[k] for k in z.files if k.endswith("__pull") and "_het__" in k})
+    own_mse = [o["het_own"] / o["mse"] for o in out]
+    mse_hp_own = [o["het_mse_hp"] / o["het_own"] for o in out]
+    pstd = [float(pulls[next(k for k in pulls if k.startswith(o["cell"] + "_het__"))].std()) for o in out]
+    het_hp, mse_hp = [hp[o["het_run"]] for o in out], [hp[o["mse_run"]] for o in out]
+    pos = lambda v, lo, hi: (np.log(v) - np.log(lo)) / (np.log(hi) - np.log(lo))
+    mse_ema = [h[5] for h in mse_hp if h[4]]
+    het_ema = [h[5] for h in het_hp if h[4]]
+    nums = dict(own_over_mse=[float(x) for x in own_mse], mse_hp_over_own=mse_hp_own,
+                own_better_n=sum(r > 1 for r in mse_hp_own), own_worse_n=sum(r < 1 for r in mse_hp_own),
+                pull_std_min=min(pstd), pull_std_max=max(pstd),
+                het_warmup_lower_n=sum(h[2] < 0.125 for h in het_hp), mse_warmup_upper_n=sum(h[2] > 0.125 for h in mse_hp),
+                mse_lambda_upper_n=int(sum(pos(h[1], 1e-10, 1e-6) > 0.5 for h in mse_hp)),
+                het_ema_on_n=len(het_ema), mse_ema_on_n=len(mse_ema), het_ema_min=min(het_ema), het_ema_max=max(het_ema),
+                mse_ema_090_092_n=sum(0.895 <= d < 0.925 for d in mse_ema))
+    print(json.dumps(nums, default=float))
 
 
 if __name__ == "__main__":

@@ -155,14 +155,22 @@ reset_pillar() {
   paths=$(pillar_field "$who" 4)
   sha=${2:-$(git rev-parse HEAD)}
   lines=$(pillar_size "$who" "$sha" "$paths")     # the uncommitted remainder just reviewed
-  # every passed tip is listed (tools/review_state.passed reads the list), so a pass of one branch survives another
-  # branch's pass moving the watermark; an explicit --at that is an ancestor of the watermark (an older branch's tip)
-  # never moves the watermark back
+  # every passed tip is listed (tools/review_state.passed reads the list, the merge guard's test), so a pass of a
+  # worktree branch is kept there. The watermark is the main checkout's: the gate measures the checkout's backlog from
+  # it, so it moves only forward along the checkout's history: to a sha that is in the checkout's HEAD and descends
+  # from the current watermark. A branch tip not in it (2026-11-10: sigma-gen's pass at 5e5b2788 overwrote trunk's
+  # f5ac899c and put 1262 reviewed lines back in trunk's backlog), or an older tip, is only listed. A watermark that
+  # is gone or off the checkout's history is replaced by any sha in it.
   mkdir -p "$STATE_ROOT/$STATE_REL"
   echo "$sha" >> "$STATE_ROOT/$STATE_REL/$who.passed"
-  if [ -n "${2:-}" ]; then
-    local cur; cur=$(read_state "$who" | awk '{print $1}')
-    [ -n "$cur" ] && git merge-base --is-ancestor "$sha" "$cur" 2>/dev/null && return 0
+  local cur main
+  cur=$(read_state "$who" | awk '{print $1}')
+  main=$(git -C "$STATE_ROOT" rev-parse -q --verify HEAD 2>/dev/null)
+  if [ -n "$cur" ] && git cat-file -e "$cur^{commit}" 2>/dev/null; then
+    [ -n "$main" ] && ! git merge-base --is-ancestor "$sha" "$main" 2>/dev/null && return 0
+    if [ -n "$main" ] && git merge-base --is-ancestor "$cur" "$main" 2>/dev/null; then
+      git merge-base --is-ancestor "$cur" "$sha" 2>/dev/null || return 0
+    fi
   fi
   write_state "$who" "$sha" "$lines" 0 "$(reviewed_hash "$sha" "$paths")"
 }

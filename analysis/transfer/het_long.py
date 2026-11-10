@@ -26,6 +26,13 @@ import plot_style as ps  # noqa: E402
 D = os.path.join(HERE, "het_ab_data")
 
 
+R = {}                                       # every number printed, keyed by horizon; printed last as one JSON line
+
+
+def g3(x):
+    return float(f"{x:.3g}")
+
+
 def main():
     runs = [("8k", os.path.join(D, "long", "t8k.json"), ps.C.sky),
             ("16k", os.path.join(D, "long", "t16k.json"), ps.C.blue),
@@ -39,6 +46,8 @@ def main():
         a1.plot(st, d["val_curve"], color=c, label=lab)
         a2.plot(st, d["val_mse_curve"], color=c)
         i = int(np.argmin(d["val_curve"]))
+        R.setdefault(lab, {}).update(val_nll=round(d["val_loss"], 3), best_step=d["best_step"],
+                                     val_mse=g3(d["val_mse_curve"][i]), train_mse=g3(d["train_eval_mse_curve"][i]))
         print(f"{lab}: best val NLL {d['val_loss']:.3f} at step {d['best_step']}, val MSE(mu) there {d['val_mse_curve'][i]:.3g},"
               f" train-split MSE(mu) there {d['train_eval_mse_curve'][i]:.3g}")
     a1.set_ylim(-9.5, 0)
@@ -62,6 +71,13 @@ def main():
         lo, hi = min(lo, cs.min(), rms.min()), max(hi, cs.max(), rms.max())
         t, pr = zp["raw_truth"].reshape(-1).astype(float), zp["raw_pred"].reshape(-1).astype(float)
         pull = (mu - tr) / sg
+        R.setdefault(lab, {}).update(test_mse=g3(np.mean((np.log(pr) - np.log(t)) ** 2)),
+                                     median_absdelta=g3(np.median(np.abs(pr - t) / t)), pull_std=g3(pull.std()),
+                                     median_sigma_over_rms=g3(np.median(sg) / np.sqrt(np.mean(r ** 2))),
+                                     sigma_span=g3(cs.max() / cs.min()), err_span=g3(rms.max() / rms.min()),
+                                     sigma_over_rms_best_decile=g3(cs[np.argmin(rms)] / rms.min()),
+                                     sigma_over_rms_worst_decile=g3(cs[np.argmax(rms)] / rms.max()),
+                                     rms_over_sigma_worst_decile=g3(rms.max() / cs[np.argmax(rms)]))
         print(f"{lab}: test MSE(log|M|^2) {np.mean((np.log(pr) - np.log(t)) ** 2):.3g}, median |Delta| "
               f"{np.median(np.abs(pr - t) / t):.3g}, pull std {pull.std():.2f}, median sigma / RMS error "
               f"{np.median(sg) / np.sqrt(np.mean(r ** 2)):.2f}")
@@ -95,6 +111,11 @@ def main():
         pull = (mu - tr) / s2
         hh, ee = np.histogram(pull, bins=np.linspace(-5, 5, 41), density=True)
         a2.stairs(hh, ee, color=c)
+        R.setdefault(lab, {})["recal"] = dict(
+            b=g3(p[1]), pull_std=g3(pull.std()), pull_std_raw=g3(((mu - tr) / sg).std()),
+            frac_pull_lt1=g3(np.mean(np.abs(pull) < 1)), rms_over_sigma_min=g3((rms / cs).min()),
+            rms_over_sigma_max=g3((rms / cs).max()), max_abs_pull=g3(np.abs(pull).max()),
+            nll_drop=g3(nll([0, 1], mu, tr, sg) - nll([0, 1], mu, tr, s2)))
         print(f"{lab} recalibrated: a {np.exp(p[0]):.3g}, b {p[1]:.2f}; test pull std {pull.std():.2f} (raw "
               f"{((mu - tr) / sg).std():.2f}), |pull|<1 {np.mean(np.abs(pull) < 1):.2f}; RMS/sigma per decile "
               f"{np.round(rms / cs, 2)}; test NLL {nll([0, 1], mu, tr, s2):.3f} (raw {nll([0, 1], mu, tr, sg):.3f})")
@@ -114,6 +135,11 @@ def main():
     b32 = min((r for r in sw["tp3_scr32k_ee_ttbar_d8"] if r["hp"] in ch), key=lambda r: r["val_loss"])
     for lab, b in (("8k", b8), ("32k", b32)):
         print(f"MSE baseline {lab} (hp {b['hp']}): test MSE(log|M|^2) {b['test_loss'] * b['prepd_std'] ** 2:.3g}")
+        R.setdefault("mse_baseline", {})[lab] = g3(b["test_loss"] * b["prepd_std"] ** 2)
+    for lab in ("8k", "32k"):
+        if "test_mse" in R.get(lab, {}):
+            R.setdefault("mse_over_het", {})[lab] = g3(R["mse_baseline"][lab] / R[lab]["test_mse"])
+    print(json.dumps(R))
 
 
 if __name__ == "__main__":

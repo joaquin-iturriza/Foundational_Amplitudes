@@ -12,7 +12,7 @@ Figures (analysis/transfer/figs/):
     python analysis/transfer/het_ab.py --sweep    the GP sweep's best trial (tp_het_ee_ttbar_d8/trial_1550, D57) in
         place of the one run: het_ab_data/sweep_eval/<sweep>__<trial>/{preds,sigma}_test.npz, figures het_ab_sweep_*
 """
-import os, sys
+import json, os, sys
 
 import numpy as np
 
@@ -84,6 +84,14 @@ def main():
     print(f"median |Delta|: MSE {np.median(np.abs(dm)):.3g}, het {np.median(np.abs(dh)):.3g}; "
           f"test mu-MSE (std. units): het {np.mean((mu - tr) ** 2):.3g}; pull mean {pull.mean():.3f} std {pull.std():.3f}; "
           f"median sigma / RMS error {np.median(sg) / np.sqrt(np.mean(r ** 2)):.2f}")
+    g = lambda x: float(f"{x:.3g}")
+    print(json.dumps({"median_absdelta_mse": g(np.median(np.abs(dm))), "median_absdelta_het": g(np.median(np.abs(dh))),
+                      "mse_over_het_median_absdelta": g(np.median(np.abs(dm)) / np.median(np.abs(dh))),
+                      "test_mu_mse_std": g(np.mean((mu - tr) ** 2)), "pull_mean": g(pull.mean()), "pull_std": g(pull.std()),
+                      "median_sigma_over_rms": g(np.median(sg) / np.sqrt(np.mean(r ** 2))),
+                      "decile_sigma_min": g(cs.min()), "decile_sigma_max": g(cs.max()),
+                      "decile_rms_min": g(rms.min()), "decile_rms_max": g(rms.max()),
+                      "decile_sigma": [g(x) for x in cs], "decile_rms": [g(x) for x in rms]}))
 
 
 if __name__ == "__main__":

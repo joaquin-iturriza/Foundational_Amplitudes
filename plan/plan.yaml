@@ -15722,6 +15722,18 @@ entries:
     answers_after: '2026-11-09T22:48:59+00:00'
     covers:
     - agent_redesign
+  - said_at: '2026-11-10T00:42:35.190000+00:00'
+    text: I already answered the sweep template question many weeks ago, yes, the template should be fixed
+    decision: D346
+    answers_after: '2026-11-10T00:16:40+00:00'
+    covers:
+    - agent_redesign
+  - said_at: '2026-11-10T00:52:17.038000+00:00'
+    text: 8k is fine.
+    decision: D347
+    answers_after: '2026-11-10T00:49:03+00:00'
+    covers:
+    - agent_redesign
   decisions:
   - D186
   - D203
@@ -15735,6 +15747,8 @@ entries:
   - D321
   - D330
   - D334
+  - D346
+  - D347
   next:
     11: 'Close: write up in docs/results.tex what the redesign changed and measured (cut 1 replay and check, the main-session
       wake re-measure, the compaction leak fix, the model trial), with % src lines from push_replay.py, main_turns.py --split
@@ -15760,6 +15774,10 @@ entries:
       notifications after a hand-back were already absorbed; owner resumes by peer hand-backs cannot be held (Claude Code
       offers no delivery delay, an owner has no waiter). Also confirm the first run of a held item that ends gets its RUN
       event and RUN_DONE with no manual poll (next 19 fix).'
+    22: 'Fix the sweep template to single-fidelity per Joaquin (answered weeks ago, re-recorded 2026-11-10): fidelity_schedule.t_steps
+      in sweep/sweep_config_*template*.yaml to one value, the length the canonical setup (fa-canonical-setup) and the decisions
+      in force give; find his earlier answer in the transcripts and cite it; also find why the earlier answer was not in the
+      ledger, so the question was asked again.'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16061,13 +16079,27 @@ entries:
     blocks: the remaining branch cleanup and the two hook installs (step 20)
     blocks_steps:
     - 20
+    answered_at: '2026-11-10T00:42:35.066000+00:00'
+    decision: D346
   - ask: 'Scope: the sweep template''s fidelity_schedule.t_steps is [1000, 10000, 40000] (multi-fidelity) while the HPO rule
       says single-fidelity, one value: which holds, the rule (cut the template to one length) or the template (change the
       rule)?'
     at: '2026-11-10T00:16:40+00:00'
     searched: CLAUDE.md HPO rule, fa-sweeps-and-hpo rule 6, D241; the claudemd-keeper flagged the contradiction 2026-11-10;
       none settles which side is right
-    blocks_steps: &id001 []
+    blocks_steps: []
+    answered_at: '2026-11-10T00:42:35.066000+00:00'
+    decision: D346
+  - ask: 'Scope: the sweep template''s single training length (D346): no decision names it; recent sweep configs use 8000
+      steps (29 configs), 2816 (24), 704 (10), 4264, 17056, 68224 among others; the old ladder''s top was 40000. Which should
+      the template carry? (recommend 8000, the length most sweeps actually use; each sweep config still sets its own)'
+    at: '2026-11-10T00:49:03+00:00'
+    searched: 'fa-canonical-setup, CLAUDE.md, site decisions D241 D346, and his messages in the transcripts (2026-10-23 ''I
+      never asked to run a multifidelity sweep''): none names a length'
+    blocks_steps:
+    - 22
+    answered_at: '2026-11-10T00:52:17.038000+00:00'
+    decision: D347
   step_why:
     11:
       feeds: whether the redesign is finished
@@ -16094,6 +16126,11 @@ entries:
       if:
       - 'saving within or above 11-30% on main per day: keep 10 min'
       - 'below: report to Joaquin with numbers and causes'
+    22:
+      feeds: whether the template matches the single-fidelity rule
+      if:
+      - 'fixed and reviewed: template has one t_steps value'
+      - 'the canonical length is ambiguous: report the candidates'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
@@ -16101,13 +16138,18 @@ entries:
     '17': 'the first real idle moment: plan next listing RESUME/LAUNCH with no FA job live; the supervisor''s own STALLED
       idle: event (or its absence after 45 min) is the trigger'
     '21': the date 2026-11-17 (a week after the 2026-11-09 23:54 restart on the batching code)
+    '22': 'repo-reviewer a0b2da08acd94dae3 FIX (lock held) on the backlog: (1) .claude/hooks/review_backlog.sh reset_pillar:
+      advance --at on a diverged branch (sigma-gen 5e5b2788) overwrote trunk''s watermark; move only on fast-forward, else
+      append to .passed; then restore the watermark to f5ac899c; (2) worktree_fold_guard.sh 7395041f rm pattern misses /bin/rm,
+      rm -f -r, xargs rm, command rm: widen, test 5 cases. Template t_steps [40000] PASSED (uncommitted until the gate clears);
+      then user_said() in plan.py'
   owner:
-    agent: a5f2aff63bd28c5a8
-    state: stopped
-    since: '2026-11-09T23:09:07+00:00'
-    state_at: '2026-11-10T00:20:22+00:00'
-    context: 233079
-    context_at: '2026-11-10T00:21:07+00:00'
+    agent: ae6bb73ebcb464af0
+    state: working
+    since: '2026-11-10T00:52:25+00:00'
+    state_at: '2026-11-10T00:56:40.804000+00:00'
+    context: 105931
+    context_at: '2026-11-10T00:56:46+00:00'
   designs:
   - at: '2026-10-30T19:52:22+00:00'
     question: 'Can lxplus''s HTCondor GPU nodes run FA jobs: does the env activate, the GPU show, the xformers attention kernel
@@ -16822,42 +16864,26 @@ entries:
       no RUN_DONE fired). Hook fixes this session: plan_check ask parts without ''?'' (58dd7542), send_check skips slide decks
       under talks/ (39458623).'
   handoff:
-    state: '2026-11-10: step 20 (D334 repo cleanup prevention) built, not yet reviewed: a44a2ca8 (remove_worktree.sh deletes
-      a merged remote copy, uses -D after a trunk-merge check; auto_push.sh pushes trunk only; model_trial setup makes detached
-      worktrees; tools/repo_hygiene.py --fold-agents folds ended agents'' merged .claude/worktrees and lists unexplained worktrees/branches/remote
-      branches, exit 1; tests/test_repo_hygiene.py 4/4) and 54f5954c (remove_worktree ignores per-checkout runtime state and
-      docs LaTeX products). Done by hand: 14 merged worktrees removed via remove_worktree.sh (wt-dimless, wt-ledger, wt-rebalance,
-      agent a065a7c3 a1af7714 a47dc0de a4c80fc6 a5215922 a61851fb a6859ebf a98911a7 ab0a3b5d ae8c4bb4; ae8c4bb4''s sweep/sweep_config_tp3_*
-      were identical in trunk); origin fwd-free and worktree-agent-a98911a7 (0 not in trunk by git cherry) deleted. Counts
-      now: worktrees 4 (main, wt-decomp unmerged, agent-a822d561 with staged changes to config/model/lloca.yaml experiment.py
-      wrappers.py scripts/job_catalog_norm.sh scripts/job_kshot_context.sh tools/kshot_context.py tests/test_context_vector.py:
-      left, Joaquin''s call; agent-a63efbd0 +1), local branches 10, remote 35 (heterosc +67, l2-gen +79, adaptive-ir, multbias,
-      decomp, 5 worktree-agent-* +2, 24 zz_trial_*: Joaquin''s per-branch call). OPEN: (1) repo-reviewer pass on a44a2ca8,
-      54f5954c (code pillar overdue; the gate refuses commits until it runs); (2) add tools/repo_hygiene.py --fold-agents
-      to FA''s maintain list in ~/.config/ccorch/projects.toml (not done); (3) plan_files_guard false positives (sed -i on
-      a non-plan file whose pattern names plan/.state.json; python heredoc whose triple-quoted text names it): fixed copy
-      and test in the scratchpad (pfg.py, test_plan_files_guard_text.py, 9 cases pass), installing it was denied by the auto-mode
-      classifier as self-modification: needs Joaquin''s or the main session''s go; (4) the owner leave-check work (main''s
-      request: every step an owner leaves in flight or waited, all listed in one refusal, date waits): WIP patch leave_check_wip.patch
-      + test_plan_leave_check.py in the scratchpad, reverted from the tree because tests/test_plan_design_withdraw.py::test_withdrawn_gives_no_review
-      fails with it (cause not found; the design-to-review listing in next_steps_keyed); plan_check SubagentStop branch tested
-      (owner refused with steps 15 and 20 in one line, non-owner passes) but needs a SubagentStop registration (diff to Joaquin).
-      CLAUDE.md line 22 changed per Joaquin (f9f59851), claudemd-keeper backlog.'
-    decisions: 'auto_push pushes trunk only (feature branches stay local until merged; justification: the hook published every
-      branch and nothing deleted them, 97 remote); agent worktrees are folded only when the agent ended and HEAD is in trunk;
-      branches with commits not in trunk are never deleted without Joaquin; retired ccin2p3/jeanzay kept on origin'
-    ruled_out: loosening plan_files_guard without approval (classifier denied)
-    running: none
-    files: tools/repo_hygiene.py scripts/remove_worktree.sh .claude/hooks/auto_push.sh tools/model_trial.py tests/test_repo_hygiene.py
-      /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/leave_check_wip.patch /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/test_plan_leave_check.py
-      /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/pfg.py /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/test_plan_files_guard_text.py
-    written: '2026-11-09T23:06:32+00:00'
-  ask: 'Scope: the sweep template''s fidelity_schedule.t_steps is [1000, 10000, 40000] (multi-fidelity) while the HPO rule
-    says single-fidelity, one value: which holds, the rule (cut the template to one length) or the template (change the rule)?'
-  waiting_since: '2026-11-10T00:16:40+00:00'
-  searched: CLAUDE.md HPO rule, fa-sweeps-and-hpo rule 6, D241; the claudemd-keeper flagged the contradiction 2026-11-10;
-    none settles which side is right
-  blocks_steps: *id001
+    state: '2026-11-10: step 20 closed (repo hygiene 1c051019 in maintain; leave-check 9fa60369/700fe4fa registered on SubagentStop
+      by Joaquin 5759a43f; guard fix installed, test 1b06ad6f); steps 15, 23 dropped (double wake already fixed by notification_absorb:
+      main_turns split 11-04 21:14, agent_done-started turns 19/$1.81 before vs 3/$0.19 after; reply_check skip 700fe4fa);
+      step 22 (figure caption rule, 541f6a86/699f441f, keeper PASS) dropped; date-wait fix c965a1f7 PASS. NEW step 22 (D346
+      sweep template): sweep/sweep_config_template.yaml and sweep_config_jeanzay_template.yaml set to t_steps [40000] in the
+      WORKING TREE, uncommitted: the review gate refuses commits (repo-reviewer watermark still 5e5b2788, 1262 lines, though
+      the reviewer said it advanced to f5ac899c); reviewer a0b2da08acd94dae3 asked to review the whole backlog and the template
+      diff. Canonical length ambiguous: no table or decision names one; recent configs use 8000 (29), 2816 (24), 704 (10)...;
+      40000 kept as the ladder''s full fidelity, report candidates to main. Joaquin''s earlier answer: 2026-10-23T02:12 main
+      transcript 71602535: ''What do you mean by "multi fidelity sweeps", as far as I know, I never asked to run a multifidelity
+      sweep''. Why it was asked again: it was a remark, not an answer to a recorded ask, so never went through site decide;
+      plan ask''s answered_asks reads only recorded answers. Path fix designed and prototyped (scratchpad proto_said.py, 2
+      s, finds the 10-23 message): plan.user_said(ask) over the user''s typed texts, rare words (df<=1%), >=2 shared, top
+      3 by idf; cmd_ask refuses unless --searched names the transcripts. The plan.py edit was blocked by the review gate;
+      apply after the reviewer advances, add a test, re-review, then drop step 22.'
+    decisions: 40000 kept for the template (the ladder's full fidelity) since nothing names a canonical length; plan ask must
+      search Joaquin's own messages before asking
+    running: repo-reviewer a0b2da08acd94dae3 on the whole backlog
+    files: sweep/sweep_config_template.yaml sweep/sweep_config_jeanzay_template.yaml tools/plan.py /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/proto_said.py
+    written: '2026-11-10T00:48:15+00:00'
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
   question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
@@ -20426,10 +20452,12 @@ entries:
     withdrawn_why: Joaquin approved the fold and the sigma-driven generation in his message of 2026-11-10 (D338, D339; D344
       covers this entry)
   owner:
-    agent: ab750e1a2b2271249
+    agent: a1c22b0fc38cc284c
     state: working
-    since: '2026-11-10T00:21:35+00:00'
-    state_at: '2026-11-10T00:21:35+00:00'
+    since: '2026-11-10T00:45:23+00:00'
+    state_at: '2026-11-10T00:45:27+00:00'
+    context: 158283
+    context_at: '2026-11-10T00:56:50+00:00'
   findings:
   - at: '2026-11-09T23:36:11+00:00'
     text: 'Inventory (2026-11-10, owner a74fb932): origin/l2-gen = 79 commits over trunk (67 of them origin/heterosc''s, 2026-07-11..07-18,
@@ -20502,6 +20530,15 @@ entries:
       overall 0.62/0.54, contrast 2.61/2.57). Pre-flight label checked: the 4.48 contrast is e+e- -> u ubar g (heldout_eval_uug_base_s0),
       correct as written. Marked without committed reader: t tbar threshold scan, Bayes z^2 and rank rho, saturation repeat,
       D47 training-split pulls and blow-up log values, D89 step-80 NLLs, D91 MSE-cell lr.'
+  - at: '2026-11-10T00:44:05+00:00'
+    text: 'repo-reviewer a437be4394e3e0f7d on sigma-gen @96ed66d5: FIX, one blocking finding (lock still held; continue that
+      same reviewer with the fix commit). steering_numbers.py:527 picks its own band 0.08<=sigma_rel<=0.12, which keeps the
+      trials at 0.090 (2.77x) and 0.099 (2.46x) and drops the one at 0.128 (3.07x), so the ''corrected'' Bayes cost ''2.5
+      to 2.8'' in results.tex (~line 11705; claims bbb.srel01_min/max) comes from where the band was put. Fix: report the
+      top-of-range trials with their sigma_rel (''sigma_rel 0.09 to 0.13 costs 2.5 to 3.1x''), or use a selection the sweep
+      design sets, and rewrite the sentence and its claims to name it. Everything else checked clean: definitions match the
+      plotting scripts, no silent drops, het_stage2 output identical. Nit: het_sigonly.py:870 skips a run whose directory
+      is missing (verify_claims would catch it).'
   step_why:
     1:
       feeds: 'whether the July studies carry over: what they found, recorded reproducibly'
@@ -20515,39 +20552,34 @@ entries:
       - 'a script needs data only on Jean Zay or a deleted run: ported anyway, its dependency named in its docstring'
   step_waits:
     '2': 'step 1 (order set by the main session: step 1 first)'
-    '1': 'next owner: resume the src/claim pass from the hand-off'
+    '1': repo-reviewer a437be4394e3e0f7d
   handoff:
-    state: 'Step 1 provenance about half done on branch sigma-gen (worktrees/wt-sigma-gen, pushed, tip bd18525b; verify_claims
-      0 problems). Done since 4fbe67ef: ee->uu online figure redrawn with short corner legends + headroom (l2_eeuu_online.py
-      @3a7d3081), caption defines every symbol, paragraph placing it against the section''s earlier sigma results (b8f31319/877adb20);
-      src/claim lines via analysis/divergences/sampling_numbers.py @d4e775ae (deep/antenna sampling + 2 captions, float32
-      floor, foundation grid, coverage, Q2 + 2 captions, eval leak; Q2 log-flat gains from q2_logflat_gains.json computed
-      on JZ from q2rw_eval_*.npz) and the October ttbar paragraphs via analysis/transfer/het_ab.py @af216a04 (+ --sweep),
-      het_sweep.py @1a42f4e6, het_long.py @f7130695, het_sigonly.py @665117a2 (one-run correction, D57, D61, recalibration).
-      Marked as from JZ job logs / CC run results: sigma-speed paragraph, withdrawn two-stage paragraph, single-run val MSEs,
-      per-trial test errors, clip grad norms, D68/D69 sweep values, stage timings, training-split diagnosis. REMAINING step
-      1: (a) the D47-D94 cell paragraphs (het_delta_summary.py, het_delta_pulls.py, het23_summary.py, het_shared_summary.py,
-      het_mumse*_summary.py, het_finale_s1.py, het_stage2.py: make each print a final JSON line, data in analysis/transfer/*_data,
-      symlinked into the worktree from the main checkout, never committed); (b) the ee->uugg-and-later paragraphs (Steering
-      uugg .. sigma-tail floor): their eval files heldout_eval_*.npz, l2_*.npz, sweeps/l2_poly_uugg exist only on the Jean
-      Zay MAIN checkout analysis/divergences/ (listed 2026-11-10): compute summaries there read-only with site run --quote
-      jeanzay FA -- python3 -c (print one line per key; one long line gets lost), commit as JSON beside a reader, as done
-      for q2_logflat_gains.json; (c) the pre-flight paragraph says ''On u ubar g, sigma climbs 4.5x ... into the Z pole''
-      with contrast 4.48 for ''u ubar g (Z peak)'': check against plot_sigma_vs_divergence.py and the eval files whether the
-      process is ee->uu or uug, fix the label; (d) the section''s opening italic block (3-seed, 8x: from the saturation paragraph''s
-      reader). Then repo-reviewer on the sigma-gen readers (eeuu_resonance_numbers, l2_eeuu_online, sampling_numbers, the
-      four transfer readers'' JSON output) and the plot_style.save_panels fix, merge sigma-gen into trunk, then step 2 (port,
-      D338).'
-    decisions: 'Numbers that do not reproduce are corrected in place with the old value quoted (% allow lines for the superseded
-      value). Numbers resting on CC run results, JZ job logs or data no committed reader can read are marked in the visible
-      text, source named. Helper agents for the claims split were refused by brief_guard (an owner is never split): the owner
-      does the work itself. Online-figure legends: short symbols in a corner, all explanation in the caption (Joaquin 2026-11-10,
-      rejecting word legends).'
-    ruled_out: throwaway one-liners as sources; word legends on figures; calling an artifact deleted without a whole search
-      (the Q2 npz were found on the JZ main checkout after the worktree listing missed them)
-    running: none
-    files: 'worktrees/wt-sigma-gen: docs/results.tex sec:div-sampling; analysis/divergences/{sampling_numbers.py,q2_logflat_gains.json,l2_eeuu_online.py,eeuu_resonance_numbers.py};
-      analysis/transfer/{het_ab,het_sweep,het_long,het_sigonly}.py; scratch matcher (numbers in a line range vs a reader''s
-      JSON keys): /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/match.py (copy it:
-      python3 match.py <first> <last> -- <cmd or json>, run from the worktree root)'
-    written: '2026-11-10T00:19:29+00:00'
+    state: 'Step 1 provenance DONE on branch sigma-gen (worktrees/wt-sigma-gen, pushed, tip after 1d203e8d + caption fix):
+      every numbered paragraph of sec:div-sampling has src/claim lines or a visible source mark; verify_claims 0 problems;
+      notes-editor PASSED (advanced to 692a1ee2; its non-blocking poly-wording note applied). repo-reviewer launched on the
+      sigma-gen code backlog (agent a437be4394e3e0f7d, lock held, running at hand-off): on PASS merge sigma-gen into trunk;
+      on FIX continue that same reviewer with the fix commits. Step 2 (D338) STARTED in worktrees/wt-july-port (branch july-port
+      from trunk, NOT committed): all 77 absent branch scripts copied from origin/l2-gen and mechanically ported (scratchpad
+      port.py: #SBATCH account/partition/qos dropped, module/conda lines replaced by the ccorch header + sites/activate.sh,
+      Jean Zay paths -> $PROJECT_DIR / siteconf.PROJECT_DIR / ${PROJECT_DIR}), 5 sweep configs renamed sweep_config_heterosc_*.yaml
+      / sweep_config_mse_scratch.yaml with paths blocks emptied (their comments still say project_dir must be the heterosc
+      worktree: rewrite), adaptive_ir.py placed at analysis/divergences/adaptive_ir.py; bash -n and py_compile pass. The commit
+      was REFUSED by dupcheck (e.g. rank_mu_mse.mu_mse_for_run ~ diag_ckpt_mu.eval_ckpt 0.88; slice_mu_head._load = extract_preds.load_finetuned_state
+      1.00): next owner resolves each (import the existing function, or ''# dup-ok: <reason>'' for a historical launcher),
+      then commits. Still to do in step 2: training.is_weight_path from l2-gen 5fe8545d and base_plots.plot_mse png+pdf onto
+      trunk core (CPU test), the 3 DIFF analysis scripts (grow_sigma_head, plot_genmix_sweep, plot_q2_rankmag: keep trunk''s
+      later form, check nothing lost), update results.tex mentions of branch adaptive-ir and worktree wt-heterosc (header
+      block, allocation paragraph) to the trunk paths, repo-reviewer, merge, then delete origin/heterosc, origin/l2-gen, origin/adaptive-ir.'
+    decisions: Numbers not reproduced are corrected in place quoting the old value; numbers without a committed reader are
+      marked in the text with their source. Jean Zay-only eval files are read through steering_numbers.py --fetch (site_python,
+      read-only) into a committed summary JSON. b bbar g seeds 1 and 2 (found on JZ) added to the text, replacing the single-seed
+      caveat. het_stage2.py reads trial HPs from driver_state.json (no surrogate pickle) so it runs in .venv-cpu. train_pool_sigma_antenna.npz
+      (12.8 MB, gitignored data, tracked only on l2-gen) copied untracked into the main checkout analysis/divergences/. Sweep
+      configs renamed without jeanzay_.
+    ruled_out: throwaway one-liners as sources; committing regenerated JSONs that differ only by float noise (het_mumse22_summary.json
+      reverted)
+    running: repo-reviewer a437be4394e3e0f7d on sigma-gen (no jobs)
+    files: 'worktrees/wt-sigma-gen: docs/results.tex sec:div-sampling, analysis/divergences/steering_numbers.py + steering_eval_summary.json,
+      analysis/transfer/het_{delta_summary,23_summary,shared_summary,mumse_summary,mumse22_summary,finale_s1,stage2}.py; worktrees/wt-july-port
+      (uncommitted port); scratchpad port.py and port_inventory.txt in /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/'
+    written: '2026-11-10T00:43:00+00:00'

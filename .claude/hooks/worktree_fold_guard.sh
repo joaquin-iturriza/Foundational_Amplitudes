@@ -35,12 +35,18 @@ except Exception:
 [ -z "$cmd" ] && exit 0
 
 # Only look at commands that destroy a worktree.
-# rm only as a command word (start, or after ; & | ( or a newline) with an -r flag, so prose that merely
-# contains "rm ", a dash, an r and a worktree path (a plan hand-off naming worktrees/...) is not a deletion.
+# rm only as a command word (start, or after ; & | ( ` or a newline), so prose that merely contains "rm ", a dash, an
+# r and a worktree path (a plan hand-off naming worktrees/...) is not a deletion. The word may carry a path or a
+# backslash (/bin/rm, \rm) and wrappers before it (sudo, command, env, nohup, exec, time, xargs, with their options
+# and VAR=value words); the recursive flag is any option word holding r/R, or --recursive, before or after the path.
+PRE='((sudo|command|env|nohup|exec|time|xargs)([[:space:]]+(-[^[:space:]]*|[A-Za-z_][A-Za-z0-9_]*=[^[:space:]]*))*[[:space:]]+)*'
+RMW='(\\|[^[:space:];&|()`]*/)?rm'
+RFLAG='[[:space:]](-[A-Za-z]*[rR][A-Za-z]*|--recursive)([[:space:]]|$)'
+B='(^|[;&|(`])[[:space:]]*'"$PRE$RMW"
 case "$cmd" in
   *"worktree remove"*|*"worktree  remove"*) ;;
   *)
-    printf '%s\n' "$cmd" | grep -qE '(^|[;&|(])[[:space:]]*(sudo[[:space:]]+)?rm[[:space:]]+(-[A-Za-z]*[rR][A-Za-z]*[[:space:]]+|--recursive[[:space:]]+)[^;&|]*worktrees/' || exit 0 ;;
+    printf '%s\n' "$cmd" | grep -qE "$B([[:space:]][^;&|]*)?$RFLAG[^;&|]*worktrees/|$B[[:space:]][^;&|]*worktrees/[^;&|]*$RFLAG" || exit 0 ;;
 esac
 
 # Which worktree(s)? Pull every worktrees/<name> token out of the command.
