@@ -1596,6 +1596,10 @@ class AmplitudeExperiment(BaseExperiment):
             _di_cfg = bool(self.cfg.data.get("dimensionless_inputs", False))
             assert _di_stats == _di_cfg, (f"frozen data stats were fitted with dimensionless_inputs={_di_stats}, "
                                           f"this run sets {_di_cfg}")
+            _vb_stats = bool(stats.get("target_over_born", False))
+            _vb_cfg = bool(self.cfg.data.get("target_over_born", False))
+            assert _vb_stats == _vb_cfg, (f"frozen data stats were fitted with target_over_born={_vb_stats}, "
+                                          f"this run sets {_vb_cfg}")
             _tp_stats = bool(stats.get("target_propagators", False))
             _tp_cfg = bool(self.cfg.data.get("target_propagators", False))
             assert _tp_stats == _tp_cfg, (
@@ -1669,6 +1673,8 @@ class AmplitudeExperiment(BaseExperiment):
         cap_for   = {"train": train_cap, "val": eval_cap, "test": eval_cap}
 
         if bool(self.cfg.data.get("memmap", False)):
+            assert not bool(self.cfg.data.get("target_over_born", False)), \
+                "data.target_over_born is built on the in-memory path (data.memmap=false)"
             # host memory that scales with the batch: the same arrays, built once per input set into
             # memory-mapped files and gathered by index (data_mmap.py)
             from data_mmap import init_data_recipes_mmap
@@ -1710,6 +1716,12 @@ class AmplitudeExperiment(BaseExperiment):
                 particles  = data_raw[:, :momenta_cols]
                 pdg_ids    = data_raw[:, momenta_cols:-1].astype(int)
                 amplitudes = data_raw[:, [-1]]
+                if bool(self.cfg.data.get("target_over_born", False)):
+                    # the one-loop virtual over its exact Born, event by event (plan virtual_over_born, D366; the KIT NLO
+                    # protocol's V/B baseline): the Born is MadLoop's |M0|^2 on the same row, kept as the row-aligned
+                    # sidecar <pool>.born.npy (tools/nlo_virtual_pipeline.born_path). Every relative error (log-space MSE,
+                    # |pred/true - 1|) of V/B is that of the recombined V = (V/B) B, B being exact.
+                    amplitudes = amplitudes / self._born_of_pool(paths[role][name], amplitudes.shape[0])
 
                 if use_pids:
                     toks = self.tokenizer.register_and_encode(pdg_ids)
@@ -2699,6 +2711,17 @@ class AmplitudeExperiment(BaseExperiment):
             n += 1
         return n, out
 
+    @staticmethod
+    def _born_of_pool(pool, n):
+        """The first n rows of a one-loop pool's Born sidecar, (n, 1), checked positive (data.target_over_born)."""
+        bp = pool[:-len(".npy")] + ".born.npy" if pool.endswith(".npy") else pool + ".born.npy"
+        assert os.path.exists(bp), (f"data.target_over_born: no Born sidecar {bp} "
+                                    f"(tools/nlo_virtual_pipeline.py <process> --born-of <pool> writes it)")
+        b = np.asarray(np.load(bp, mmap_mode="r")[:n], dtype=np.float64).reshape(-1, 1)
+        assert b.shape[0] == n, f"data.target_over_born: {bp} has {b.shape[0]} rows, the pool {n}"
+        assert np.all(np.isfinite(b)) and np.all(b > 0), f"data.target_over_born: non-positive Born in {bp}"
+        return b
+
     def _save_data_stats(self, stats_path, mom_div, amp_trafos, per_dataset):
         """Write the frozen data statistics (data_stats.json) a resume / fine-tune / rebuild reloads."""
         with open(stats_path, "w") as f:
@@ -2714,6 +2737,7 @@ class AmplitudeExperiment(BaseExperiment):
                 **({"affine_multiplicity": self._affine_multiplicity}
                    if getattr(self, "_affine_multiplicity", None) else {}),
                 "target_propagators": bool(self.cfg.data.get("target_propagators", False)),
+                "target_over_born": bool(self.cfg.data.get("target_over_born", False)),
                 "signedlog_scale_shift": self._signedlog_scale_shift(),
                 "target_physics_factor": bool(self.cfg.data.get("target_physics_factor", False)),
                 "target_physics_dim_only": bool(self.cfg.data.get("target_physics_dim_only", False)),
