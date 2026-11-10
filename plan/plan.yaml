@@ -16111,8 +16111,7 @@ entries:
     '14': 'Joaquin bringing back the deck cold-read agent (D261: ''we will do it later'')'
     '17': 'the first real idle moment: plan next listing RESUME/LAUNCH with no FA job live; the supervisor''s own STALLED
       idle: event (or its absence after 45 min) is the trigger'
-    '21': 'the date 2026-11-17: a week of usage after the 2026-11-09 23:54 restart of the waiter and supervisor on the batching
-      code'
+    '21': the date 2026-11-17 (a week after the 2026-11-09 23:54 restart on the batching code)
     '20': 'Joaquin: run python3 tools/switch_settings.py --switch L --apply (D337; repo-reviewer PASS on 700fe4fa; the permission
       classifier refused it to the agent as self-modification) and install the plan_files_guard fix (D336, scratchpad pfg.py)'
   owner:
