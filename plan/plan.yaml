@@ -21130,6 +21130,85 @@ entries:
       rule, with only the initialisation and searched space differing; HETEROSC with the sigma stage; the parent''s preprocessing
       as D355 asks; batch min(16384, D/2) and T(D) move with D as in sec:ladder and D356; D364''s AdamW-parent arm and its
       cost are stated.'
+  - at: '2026-11-10T06:51:04+00:00'
+    question: 'Step 1 revised for ee->ccbar g (H1) and ee->bbbar gg (H2), and stage 2 for all three held-out tree targets
+      (D356, D360). Per (target, D=10^(k/2), k=2..10): at which horizon T(D) does each cell train (D356: up to where scratch
+      reaches 1e-4, else where it plateaus), and how much target data does pretraining save: D*_scratch/D*_ft where the best-of-8
+      scratch and fine-tune L(D) curves cross MSE(ln|M|^2) = 1e-4 (where reached) and 1e-2 (the common looser level, all three
+      targets; Joaquin told of both)?'
+    prior: '(1) This entry''s calibration (analysis/data_saving/horizons.py @6d2a1794, data/horizons_cal2.json @27d530b4;
+      27 scratch runs at the calibration lr c, seed 42): ee->ttbar crosses 1e-4 from D=100 (first crossing 3520/1920/2240/960/3520/1440/1440
+      steps for k=4..10; 9.1e-7 at 1e4, 3.7e-9 at 1e5, best at the end from D=316); D=10, 32 plateau at 2.9e-3 (step 640),
+      1.4e-3 (1280). ee->ccbar g, ee->bbbar gg k=2..8: best 4.1 to 4.0e-2 and 4.1 to 1.5e-1, inside the 1440-step warm-up
+      in 13 of 14 runs, never regained (last/best 1.05-1.84); k=9,10 end ~08:15 and enter the same table. (2) par:v3_muon
+      ''Fine-tunes at small D'' (catalog_v3 short pretraining, held-out targets, D=10-316): all 128 fine-tune cells below
+      scratch; scratch/ft MSE 2.2 from the AdamW parent, 9.1 from the Muon parent (11.9 at D=10). (3) sec:ladder fig:gain_heatmap
+      and par:nogain: geometric-mean gain L_scratch/L_ft 1.7-3.4 over rungs; fine-tunes reach scratch''s loss half a decade
+      of D later where scratch is steep; ''One seed is not a measurement at a cell'': two independent 8-trial searches of
+      one cell up to 5x apart, single seeds at fixed HPs up to 75x. (4) sec:ladder horizons (ee->dd~ best at 160-4160 steps
+      up to D=316, at the end from 1e3; 4.3-4.8x lower at 32k for 2->2 at 10^3.5-10^4). (5) par:v4_length: the parent''s median
+      held-out 6-particle MSE 1.2e-2 after 68224 steps (size_figs mse.w8_s68224_7=0.0123): 1e-4 on 2->3/2->4 at D<=1e5 may
+      be out of reach. (6) Draft fig 22 (old setup, ee->uu one loop): fine-tune 1-2 orders below scratch. This design differs:
+      catalog_v4 held-out-family parent (D355), per-target horizons (D356), readout in D at two levels. Searched: data saving,
+      D*, fine-tune vs scratch, gain, seed spread, ccbar g, bbbar gg, 1e-4 in results.tex, the entry, site decisions (D315,
+      D355, D356, D360, D364).'
+    measure: 'Per (target, D, arm): the best trial''s MSE(ln|M|^2) of the mean at its best checkpoint (DyHPO observes the
+      val mu MSE: base_experiment.py 1182-1304 under heterosc_select=mu_mse; times prepd_std^2), its best step, GPU-h. L(D)
+      per target and arm. D*(L0) for L0 in {1e-4, 1e-2}: the first pair of consecutive grid points (from small D) with L above
+      then at or below L0, log-log interpolated; for ee->ttbar at 1e-4 that pair lies between the plateau-horizon cells (k<=3,
+      converged) and the first crossing cell, so the truncated horizons above it (which hold scratch near 1e-4 by construction)
+      do not enter. Saving S = D*_scratch/D*_ft; a bound when one arm misses L0 on 10..1e5 (scratch misses: S > 1e5/D*_ft;
+      fine-tune below at D=10: S > D*_scratch/10). Phase a also gives, per (target, D), the scratch best trial''s curve: first
+      step at 1e-2, at 1e-4, best step, best_frac, and its lr against the window.'
+    check: 'Saving moves with pretraining on existing data: par:v3_muon 9.1x lower MSE from a Muon catalog parent at D=10-316,
+      and sec:ladder half a decade of D; at this calibration''s scratch slopes (ee->ccbar g ~0.85, ee->bbbar gg ~0.5, ee->ttbar
+      ~5 decades of MSE per decade of D between D=32 and 100) a 9x MSE gain is S ~ 13 (ccbar g), ~80 (bbbar gg), ~1.5 (ttbar
+      at 1e-4). The lr search is the change that should move the multi-parton best steps: at c the same law puts ee->ttbar''s
+      best at the end from D=316 and the other two inside the warm-up; an early best that survives the search (best trial''s
+      best before 0.2 of the run at D>=1e3) is read as a data-limited plateau (overfitting at ~240 epochs, the other reading),
+      and T(D) = 1.1 s_b then holds by the passed rule. 1e-2 at bbbar gg: its scratch falls 1.5-2.2x per half decade, ~0.07
+      at 1e5 by extrapolation, so a bound is expected there. Dry run on CC (sweep/gen_data_saving.py @9f720993, run_trial.build_command
+      for ds_scr_epem_ttx_d8_t4000): run.py --config-path <trial 1262 run dir> --config-name config run_name=null ++data.source=recipes
+      ++data.processes_file=.../catalog_v4_datasaving_epem_ttx.yaml ++data.train_subsample=10000 ++data.eval_subsample=null
+      ++data.phase_space_on_pool=true ++data.memmap=false ++training.heterosc_select=mu_mse ++evaluation.train_subsample=2000
+      ++seed=42 ++fine_tune.pretrained_path=null <HPs> training.iterations=4000 warm_start_idx=null training.result_path=<sweep
+      results json>: the calibration''s job_data_saving.sh semantics. The fine-tune cell adds fine_tune.pretrained_path=<parent>/models/model_run0_best.pt,
+      target_stats=own, offshell_stats=parent, base_config the held-out parent; dry-run when that parent exists (kit_benchmark''s
+      FA-ccin2p3-f0ca7a15 failed at 07:08 on a missing memmap cache; its owner reruns it).'
+    fixed: 'Model and inputs of the parent''s saved config (base_config: scratch trial 1262 of cov_v4_long_hpo8_cc_68224,
+      fine-tune kit_benchmark''s family-held-out pretraining of the same setup, recipes/catalog_v4_kit_pretrain_heldout.yaml);
+      batch min(16384, D/2); D = prefixes of the target''s 1e5 pool, fixed 1e4 val/test; HETEROSC + sigma stage; single-fidelity
+      8-trial DyHPO (n_startup 3, sweep/drive.py waves 3,3,2) per cell. Scratch space: training.lr one decade either side
+      of c = 7.82114e-3 (T/17056)^-0.55 times the transfer D factor (the calibration lr, the parent''s MuonAdamW law; the
+      AdamW lr surface sits ~10x lower) plus the template''s muon_weight_decay, lambda, warm-up, eta_min, EMA; fine-tune space
+      rule 4 (lr_scale [0.1,10], layer_decay [0.75,1]) plus the same. Horizons: ee->ttbar T(D) = 800, 1440, 4000, 2240, 2560,
+      1120, 4000, 1680, 1680 (k=2..10; passed rule on the calibration). ee->ccbar g, ee->bbbar gg: phase a = scratch sweeps
+      at 8000 (k<=8) / 12000 (k=9,10); from the best trial T(D) = 1.1 x first 1e-4 crossing, else 1.1 x best step if before
+      0.8 of the run, else the full horizon (a 4x extension of the best trial''s config while its best stays in the last fifth,
+      to 64k, its cost to Joaquin first); phase b = both arms at T(D), phase a''s sweep being the scratch arm where T(D) equals
+      its horizon. CC-IN2P3 (the pools exist there), seed 42.'
+    control: 'Per (target, D): fine-tune against scratch at the same T(D), prefixes, model, inputs and checkpoint rule, each
+      the best of its own 8-trial DyHPO; only the initialisation and the searched space differ. Scratch cells are shared with
+      optimizations_recap''s AdamW-parent arm (D364: one more fine-tune sweep per cell, about the fine-tune arm''s GPU-h,
+      plus its pretraining).'
+    seeds: 'Seed 42, one search per cell (D315, settled). Spread: sec:ladder''s two 8-trial searches of one cell up to 5x
+      apart; at the scratch slopes above that moves D* by log10(5)/slope: ~0.15 decade (ttbar at 1e-4), ~0.8 (ccbar g), ~1.4
+      (bbbar gg). Cost (measured plain-run step rates 0.073-0.097 s/step k<=7, 0.16-0.19 k=8, 0.40-0.51 k=9,10, plus 0.08
+      h per trial; generator estimates): ee->ttbar scratch 12.4 GPU-h, fine-tune ~12.4; phase a ~90 (to be printed by the
+      generator once k=9,10 rates are in), phase b at most ~90 fine-tune + ~90 scratch re-sweeps. Above 30 GPU-h with no decision
+      on the cost: phase a and phase b go to Joaquin with the generator''s totals; ee->ttbar scratch (12.4) goes on the pass;
+      ee->ttbar fine-tune when the parent exists. Layout: every sweep of a batch in flight at once (site pick: 58 free GPUs
+      on CC), waves 3,3,2: phase a ~5.5 h (three waves of ~1.8 h at k=9,10), ee->ttbar ~1 h. Disk: 23 MB per run (du of cal2
+      runs), 144 trials per phase ~3.3 GB against /sps/lpnhe''s 7.9 GB free (df, 2026-11-10 ~08:00): phase a or ee->ttbar
+      fits; before phase b, sweep/prune.py (D19) removes non-best trials'' models and disk is read again at each submission.'
+    outcome: 'Per target and level L0 (1e-4, 1e-2): YES when S > 10^0.5 (step 4''s bar) and log10 S exceeds sqrt(2) log10(5)/slope
+      (both arms'' D* noise from the 5x search spread at the local scratch slope); NO when fine-tune L(D) is not below scratch
+      at the two bracketing grid points; NOT RESOLVED in between (reported with S and the band); a bound when an arm misses
+      L0 on the grid. Expected from par:v3_muon and sec:ladder: ee->ttbar at 1e-4 S ~1.5-3 (YES needs > 3.2; may be not resolved),
+      at 1e-2 unmeasurable (both arms below at D=10, stated); ee->ccbar g at 1e-2 S ~10 against a ~15x band (likely not resolved
+      or a bound), at 1e-4 not reached; ee->bbbar gg at 1e-2 a bound (scratch ~0.07 at 1e5), 1e-4 not reached. Figures: per
+      target L(D) scratch vs fine-tune with both levels drawn, one MSE vs GPU-hours panel; write-up in docs/results.tex replacing
+      the draft''s fig 22. A run that blows up is listed apart with its step.'
   step_waits:
     '1': FA-ccin2p3-53bb43b9 FA-ccin2p3-fbec992c FA-ccin2p3-9da809e2 FA-ccin2p3-ad1b108d FA-ccin2p3-883309f7 FA-ccin2p3-72685d7d
       FA-ccin2p3-50cc73c3 FA-ccin2p3-43d4b67a FA-ccin2p3-5c6b6dcb FA-ccin2p3-01d9738a FA-ccin2p3-df5578c6 FA-ccin2p3-85c8280d
