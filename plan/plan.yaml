@@ -20535,6 +20535,18 @@ entries:
       design sets, and rewrite the sentence and its claims to name it. Everything else checked clean: definitions match the
       plotting scripts, no silent drops, het_stage2 output identical. Nit: het_sigonly.py:870 skips a run whose directory
       is missing (verify_claims would catch it).'
+  - at: '2026-11-10T01:04:38+00:00'
+    text: 'Step 1 merged: repo-reviewer FIX (Bayes cost from a hand-set sigma_rel band) fixed by reporting the sweep''s three
+      widest posteriors, sigma_rel 0.090/0.099/0.128 costing 2.77/2.46/3.07x its best (steering_numbers.py @40b69989); notes-editor
+      asked ''close to monotonically'' in place of ''monotone'' (the 0.099 trial costs less than the 0.090 one) and a matching
+      poly-keep caption; both reviewers passed; sigma-gen merged into trunk (95c90f29), worktree folded, branch deleted here
+      and on origin. Step 2 on july-port (worktrees/wt-july-port, pushed, tip 2460ee07): 76 scripts + adaptive_ir.py + 5 sweep
+      configs committed (e0d3f149) after resolving dupcheck (extract_sigma_eeuu folded into extract_train_pool_sigma --process
+      eeuu; rank_mu_mse and slice_mu_head import the existing functions) and removing 12 leftover worktree/JZ paths; training.is_weight_path
+      ported with validation never weighted and multi-process runs refused, base_plots pdf+png pair, CPU tests (1ab43057);
+      het_mumse22_summary JSON at 6 significant digits so verify_claims stops rewriting it (88947b50); the 3 differing scripts
+      keep trunk''s later form (nothing lost); results.tex mentions updated (2460ee07). repo-reviewer and notes-editor running
+      on july-port.'
   step_why:
     1:
       feeds: 'whether the July studies carry over: what they found, recorded reproducibly'
