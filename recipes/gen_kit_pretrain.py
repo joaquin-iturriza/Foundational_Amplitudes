@@ -19,7 +19,8 @@ Writes
   recipes/kit_pretrain_fair_nlo.yaml  Bakar's fair NLO pretraining for the ee->tt virtual target: every tree pool of
                                       the parent, the target's own tree v4_epem_ttx added (recipes/
                                       catalog_v4_datasaving_epem_ttx.yaml's entry), and 10 one-loop pools drawn at
-                                      random (numpy seed 0) from the parent's one-loop pools outside the families
+                                      random (numpy seed 0) from the parent's one-loop pools (n_loops > 0 in the catalog
+                                      entry, the loop-induced `*_loop` pools included) outside the families
 """
 import argparse
 import os
@@ -69,8 +70,16 @@ def build():
     assert scanned == listed, f"family scan and list differ: {sorted(scanned ^ listed)}"
     head = {k: v for k, v in par.items() if k != "processes"}
     held = dict(head, processes=[p for p in ps if p["name"] not in listed])
-    trees = [p for p in ps if not p["name"].endswith("_nlo")]
-    loops = sorted(p["name"] for p in ps if p["name"].endswith("_nlo") and p["name"] not in listed)
+    # tree or loop by the catalog entry's loop count (mg5_pipeline_final.PROCESSES), not the name: the loop-induced
+    # `*_loop` pools are one-loop too
+    import sys
+    sys.path.insert(0, ROOT)
+    import mg5_pipeline_final as mg
+    mg.register_recipe_processes(ps)
+    n_loops = {p["name"]: int((mg.PROCESSES.get(p["name"]) or mg.PROCESSES[p.get("base", p["name"])]).get("n_loops", 0) or 0)
+               for p in ps}
+    trees = [p for p in ps if n_loops[p["name"]] == 0]
+    loops = sorted(p["name"] for p in ps if n_loops[p["name"]] > 0 and p["name"] not in listed)
     pick = sorted(np.random.default_rng(0).choice(loops, N_LOOP, replace=False).tolist())
     (ttx,) = yaml.safe_load(open(TTX))["processes"]
     assert ttx["name"] == "v4_epem_ttx" and ttx["name"] not in names

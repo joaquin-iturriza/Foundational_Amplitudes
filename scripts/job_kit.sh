@@ -34,10 +34,11 @@ NVAL=100000; NTEST=200000
 TAG=; ARGS=(); for x in "$@"; do case "$x" in tag=*) TAG="_${x#tag=}";; seed=*) TAG="${TAG}_seed${x#seed=}"; ARGS+=("$x");; *) ARGS+=("$x");; esac; done
 STEM="${DS#kit_}"; FILE="${STEM%%__*}"; TGT="${STEM#*__}"
 OUT="$PROJECT_DIR/runs/kit/kit_${MODE}_${FILE}_${TGT}_n${N}_t${T}${TAG}"
-mkdir -p "$OUT"
 NAME="$DS"; [ "$MODE" = B ] && NAME="${DS}__hard"
 case "$FILE" in *tt*) SQ="[346, 50000]" ;; *) SQ="[1000, 1000]" ;; esac
-RECIPE="$OUT/kit_recipe.yaml"
+# the recipe lives beside the run dir, not in it: run.py refuses an existing run dir (a fresh start, never a warm one)
+mkdir -p "$PROJECT_DIR/runs/kit/recipes"
+RECIPE="$PROJECT_DIR/runs/kit/recipes/$(basename "$OUT").yaml"
 printf 'processes:\n- name: %s\n  sqrts: %s\n  n_train: %s\n  n_val: %s\n  n_test: %s\n' "$NAME" "$SQ" "$N" "$NVAL" "$NTEST" > "$RECIPE"
 if [ "$MODE" = B ]; then
     [ -n "$KIT_FROM" ] && [ -e "$PROJECT_DIR/$KIT_FROM/config.yaml" ] || { echo "B needs KIT_FROM=<protocol A run dir>"; exit 2; }
@@ -69,7 +70,7 @@ echo "KIT dataset=$NAME n_train=$N steps=$T mode=$MODE base=$BASE args: ${ARGS[*
 python run.py --config-path "$BASE" --config-name config run_dir="$OUT" run_name=null \
     data.source=recipes data.processes_file="$RECIPE" data.train_subsample=null data.eval_subsample=null \
     data.memmap=false training.dtype=float64 training.iterations="$T" training.heterosc_select=mu_mse \
-    evaluation.train_subsample=2000 seed=42 "${FT[@]}" "${ARGS[@]}"
+    evaluation.train_subsample=2000 seed=42 warm_start_idx=null "${FT[@]}" "${ARGS[@]}"
 RC=$?
 if [ $RC -eq 0 ]; then
     python tools/kit_predict.py "$OUT"

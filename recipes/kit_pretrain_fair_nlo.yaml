@@ -13309,118 +13309,6 @@ processes:
   n_train: 100000
   n_val: 10000
   n_test: 10000
-- name: v4_ddx_hg_loop
-  sqrts:
-  - 136
-  - 6000
-  n_train: 50000
-  n_val: 5000
-  n_test: 5000
-- name: v4_ddx_hh_loop
-  sqrts:
-  - 250
-  - 6000
-  n_train: 50000
-  n_val: 5000
-  n_test: 5000
-- name: v4_ddx_hhh_loop
-  sqrts:
-  - 375
-  - 6000
-  n_train: 50000
-  n_val: 5000
-  n_test: 5000
-- name: v4_epem_hh_loop
-  sqrts:
-  - 250
-  - 6000
-  n_train: 50000
-  n_val: 5000
-  n_test: 5000
-- name: v4_epem_hhh_loop
-  sqrts:
-  - 375
-  - 6000
-  n_train: 50000
-  n_val: 5000
-  n_test: 5000
-- name: v4_gg_aa_loop
-  sqrts:
-  - 20
-  - 6000
-  n_train: 50000
-  n_val: 5000
-  n_test: 5000
-- name: v4_gg_aag_loop
-  sqrts:
-  - 30
-  - 6000
-  n_train: 50000
-  n_val: 5000
-  n_test: 5000
-- name: v4_gg_hg_loop
-  sqrts:
-  - 136
-  - 6000
-  n_train: 50000
-  n_val: 5000
-  n_test: 5000
-- name: v4_gg_hh_loop
-  sqrts:
-  - 250
-  - 6000
-  n_train: 50000
-  n_val: 5000
-  n_test: 5000
-- name: v4_gg_hhh_loop
-  sqrts:
-  - 375
-  - 6000
-  n_train: 50000
-  n_val: 5000
-  n_test: 5000
-- name: v4_gg_wpwm_loop
-  sqrts:
-  - 161
-  - 6000
-  n_train: 50000
-  n_val: 5000
-  n_test: 5000
-- name: v4_gg_za_loop
-  sqrts:
-  - 102
-  - 6000
-  n_train: 50000
-  n_val: 5000
-  n_test: 5000
-- name: v4_gg_zz_loop
-  sqrts:
-  - 183
-  - 6000
-  n_train: 50000
-  n_val: 5000
-  n_test: 5000
-- name: v4_uux_hg_loop
-  sqrts:
-  - 136
-  - 6000
-  n_train: 50000
-  n_val: 5000
-  n_test: 5000
-- name: v4_uux_hh_loop
-  sqrts:
-  - 250
-  - 6000
-  n_train: 50000
-  n_val: 5000
-  n_test: 5000
-- name: v4_uux_hhh_loop
-  sqrts:
-  - 375
-  - 6000
-  n_train: 50000
-  n_val: 5000
-  n_test: 5000
 - name: v4_bbx_gvevex__as090
   base: v4_bbx_gvevex
   sqrts:
@@ -13595,30 +13483,23 @@ processes:
   n_train: 50000
   n_val: 5000
   n_test: 5000
-- name: v4_bbx_addx_nlo
+- name: v4_bbx_aepem_nlo
   sqrts:
   - 30
   - 6000
   n_train: 50000
   n_val: 5000
   n_test: 5000
-- name: v4_bbx_ataptam_nlo
-  sqrts:
-  - 31
-  - 6000
-  n_train: 50000
-  n_val: 5000
-  n_test: 5000
-- name: v4_bbx_gz_nlo
+- name: v4_bbx_az_nlo
   sqrts:
   - 102
   - 6000
   n_train: 50000
   n_val: 5000
   n_test: 5000
-- name: v4_bbx_taptam_nlo
+- name: v4_bbx_htaptam_nlo
   sqrts:
-  - 21
+  - 146
   - 6000
   n_train: 50000
   n_val: 5000
@@ -13630,23 +13511,30 @@ processes:
   n_train: 50000
   n_val: 5000
   n_test: 5000
-- name: v4_ddx_ggg_nlo
+- name: v4_bg_bccx_nlo
   sqrts:
   - 30
   - 6000
   n_train: 50000
   n_val: 5000
   n_test: 5000
-- name: v4_dsx_cxuz_nlo
+- name: v4_dg_tamuvtx_nlo
   sqrts:
-  - 112
+  - 21
   - 6000
   n_train: 50000
   n_val: 5000
   n_test: 5000
-- name: v4_udx_epgve_nlo
+- name: v4_gg_aag_loop
   sqrts:
-  - 20
+  - 30
+  - 6000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
+- name: v4_udx_ggwp_nlo
+  sqrts:
+  - 101
   - 6000
   n_train: 50000
   n_val: 5000

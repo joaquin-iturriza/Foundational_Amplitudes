@@ -25,6 +25,6 @@ TAG=; ARGS=(); for x in "$@"; do case "$x" in tag=*) TAG="_${x#tag=}";; *) ARGS+
 OUT="$PROJECT_DIR/runs/kit/kit_pretrain_${WHICH}${TAG}"
 echo "KIT_PRETRAIN recipe=$RECIPE parent=$PARENT args: ${ARGS[*]}"
 python run.py --config-path "$PROJECT_DIR/$PARENT" --config-name config run_dir="$OUT" run_name=null \
-    data.processes_file="$RECIPE" fine_tune.pretrained_path=null "${ARGS[@]}"
+    data.processes_file="$RECIPE" fine_tune.pretrained_path=null warm_start_idx=null training.iterations=68224 training.is_dyhpo_run=false "${ARGS[@]}"
 RC=$?
 echo "KIT_PRETRAIN_DONE rc=$RC $OUT"; exit $RC

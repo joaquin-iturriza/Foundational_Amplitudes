@@ -161,8 +161,12 @@ def section1_pools(d):
     va = np.load(datagen.ensure_dataset("kit_ee_uug__me2", 1000, 1000, 100, role="val", seed=42))
     te = np.load(datagen.ensure_dataset("kit_ee_uug__me2", 1000, 1000, 200, role="test", seed=42))
     hb = np.load(datagen.ensure_dataset("kit_ee_uug__me2__hard", 1000, 1000, 500, role="train", seed=42))
-    assert tr.shape[0] == 500 and va.shape[0] == 100 and te.shape[0] == 200 and hb.shape[0] == 550
+    hv = np.load(datagen.ensure_dataset("kit_ee_uug__me2__hard", 1000, 1000, 100, role="val", seed=42))
+    # the one hard_train stratum of 50: its first 45 train, its last 5 validation (kh.HARD_VAL_FRAC)
+    assert tr.shape[0] == 500 and va.shape[0] == 100 and te.shape[0] == 200 and hb.shape[0] == 545, hb.shape
     assert np.array_equal(hb[:500], tr), "the hard variant's bulk part differs"
+    assert hv.shape[0] == 105 and np.array_equal(hv[:100], va), "the hard variant's val is bulk val + 5 hard"
+    assert not (set(map(tuple, hv[100:, :20])) & set(map(tuple, hb[500:, :20]))), "hard val overlaps hard train"
     assert "_n500_" in os.path.basename(datagen.ensure_dataset("kit_ee_uug__me2", 1000, 1000, 500, role="train",
                                                                 seed=42)), "the pool name lacks its event count"
     try:
