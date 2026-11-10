@@ -21639,6 +21639,18 @@ entries:
       decades and within 10x of bulk; else the deficit is in what the network can represent. Cost (estimate, assuming float64
       at 0.8 s/step): A 10 x 8000 = 17.8 GPU-h, B + B_bulk 12 x 3000 = 8.0, scoring ~2: ~28 GPU-h, under 30; read from the
       first jobs. Disk on CC: 44 GB free; <= 22 x 0.7 + 2 = ~17 GB, checked on the first job.'
+    passed_at: '2026-11-10T03:59:26+00:00'
+    reviewer: 'Protocol A/B, second revision (recorded 03:59), the one-seed fix of the 03:54 verdict. Code unchanged from
+      the reviewed de51ed68 (git diff de51ed68 45eadf29 on scripts/job_kit.sh, tools/kit_hardps.py, tools/kit_predict.py is
+      empty). Check 1: B against B_bulk, same A weights, steps, lr and restart, B with hard_train in training and in its 10%
+      held-out validation, B_bulk without; off-shellness on/off at the same n; 1e5 against 9e5 with the same lr (both clipped
+      at the D-factor edge, 1.19e-2). Check 2: on these files the slides'' MLP moves the soft exponent -0.02 to -2.12 and
+      the soft bin 89 to 0.32, and the hold-out add-back moved uug 24x (results.tex 9868-9895). Check 3: one seed per D315;
+      differences read against 2x the project''s 0.148-decade seed spread (results.tex ~7336), stated as an assumption for
+      extrapolation bins; exponents at 0.1. Check 4: yes/no per family, off-shellness and B stated. HETEROSC and the emission-scales
+      plus orders target from trial 1262''s config (5907, 5833-5838). Disk ~17 GB against 44 GB free on CC; ~28 GPU-h, under
+      30. Test events: KIT hard_test and bulk_test. Searched: KIT, hard phase, hard_train, extrapolat, holdout, add-back,
+      Coulomb, off-shell, float64 in docs/results.tex, the plan and site decisions (D25, D315, D353, D363).'
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
