@@ -10599,10 +10599,10 @@ against the MSE cell, with the main run's checkpoint picked on the validation $\
 D47's $2\to2$ cells retrained with the checkpoint on the validation $\mu$ MSE, everything else as D47 (config, HPs, data,
 seed, parent; the config files differ in \code{heterosc\_select} alone; \code{scripts/job\_het\_delta.sh --mumse},
 \code{analysis/transfer/het\_mumse22\_summary.py}, Fig.~\ref{fig:het_mumse22}). Read as D85 read its $24$ cells, the
-rerun is worse: median $|\Delta|$ $0.77$ times the MSE cell's ($91$ of $146$ below it) against D47's $0.64$ ($119$ of
+rerun is worse: median $|\Delta|$ $0.77$ times the MSE cell's ($92$ of $146$ below it; read $91$ before the reader) against D47's $0.64$ ($118$ of
 $146$), and $1.15$ times D47 cell by cell, lower in only $56$; on the one-loop probes up to $130\times$ (electroweak
 $e^+e^-\to d\bar d$). That reading is wrong, because the two runs of a cell are not the same run: they already differ at
-the first validation (step $80$: NLL $-0.59$ against $-0.70$ on the cell above), and their best validation $\mu$ MSE (each run's minimum)
+the first validation (step $80$: NLL $-0.59$ against $-0.70$ on the cell above, from the two runs' CC logs), and their best validation $\mu$ MSE (each run's minimum)
 differs by more than $2\times$ in $69$ of the $146$ cells ($10$ to $90\%$ of the ratio: $0.20$
 to $5.9$, median $0.97$). Inside one run the checkpoint choice barely matters at $2\to2$: the $\mu$ MSE at D47's NLL pick over its
 run's $\mu$-MSE minimum is $1.00$ at the median and $1.03$ at the $75$th percentile ($1.29$ at the $90$th). At $2\to3$ and $2\to4$ (the
@@ -10611,6 +10611,31 @@ costs $16\%$ in $\mu$ at the median, so D85's conclusion stands there. At $2\to2
 about $2$ either way per cell (D47's $0.64$ is one draw of it), and the selection is not what separates them. The pulls stay
 calibrated with either pick (std $0.99$, $1.01$, $1.02$ at the quartiles; $125$ of $146$ within $0.9$ to $1.2$, against
 $138$). The cell that blew up in D47 (\code{tp3\_uu64fte\_ee\_nnbar\_d8} trial $114$) is left out of these numbers, as there; its rerun is $51$ times the MSE cell's median $|\Delta|$.
+% src: python3 analysis/transfer/het_mumse22_summary.py @36296438
+% claim: n=146
+% claim: mumse_over_mse=0.77
+% claim: mumse_below_mse=92
+% claim: nll_over_mse=0.64
+% claim: nll_below_mse=118
+% claim: mumse_over_nll=1.15
+% claim: mumse_below_nll=56
+% claim: mumse_over_nll_by_probe.ee_dd_ew_nlo=130
+% claim: run22_2x=69
+% claim: run22_q.0=0.20
+% claim: run22_q.4=5.9
+% claim: run22_q.2=0.97
+% claim: sel22_q.2=1.00
+% claim: sel22_q.3=1.03
+% claim: sel22_q.4=1.29
+% claim: run24_q.0=0.90
+% claim: run24_q.4=1.15
+% claim: pull_mumse_q.0=0.99
+% claim: pull_mumse_q.1=1.01
+% claim: pull_mumse_q.2=1.02
+% claim: pull_mumse_in=125
+% claim: pull_nll_in=138
+% claim: blew_rerun_over_mse.0=51
+% allow: 91 because it is the superseded value, quoted as corrected
 
 \begin{figure}[H]
 \centering
