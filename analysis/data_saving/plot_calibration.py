@@ -25,21 +25,24 @@ targets = {"trees": [
 ], "loops": [
     ("bbx_zz_nlo", r"$b\bar b\to ZZ$", ps.C.blue),
     ("uux_epemz_nlo", r"$u\bar u\to e^+e^-Z$", ps.C.vermillion),
-    ("bbx_gg_nlo", r"$b\bar b\to gg$", ps.C.green),
-    ("dg_uwm_nlo", r"$dg\to uW^-$", ps.C.green),
-    ("bbx_avevex_nlo", r"$b\bar b\to\gamma\nu\bar\nu$", ps.C.green),
-    ("db_bdz_nlo", r"$db\to bdZ$", ps.C.green),
-    ("uc_cuz_nlo", r"$uc\to cuZ$", ps.C.green),
+] + [  # third-target candidates (only one is run): each its own colour from the cycle after blue and vermillion
+    (t, lab, ps.CYCLE[2 + n % (len(ps.CYCLE) - 2)]) for n, (t, lab) in enumerate([
+        ("bbx_gg_nlo", r"$b\bar b\to gg$"), ("dg_uwm_nlo", r"$dg\to uW^-$"),
+        ("bbx_avevex_nlo", r"$b\bar b\to\gamma\nu\bar\nu$"), ("db_bdz_nlo", r"$db\to bdZ$"), ("uc_cuz_nlo", r"$uc\to cuZ$"),
+        ("bb_bb_nlo", r"$bb\to bb$"), ("bbx_hz_nlo", r"$b\bar b\to HZ$"), ("bbx_ccxh_nlo", r"$b\bar b\to c\bar cH$"),
+        ("bg_bgg_nlo", r"$bg\to bgg$"), ("gg_bbxg_nlo", r"$gg\to b\bar bg$"), ("ucx_cxhu_nlo", r"$u\bar c\to\bar cHu$"),
+        ("udx_ccxwp_nlo", r"$u\bar d\to c\bar cW^+$")])
 ]}[arm]
 targets = [t for t in targets if any(r["target"] == t[0] for r in rows)]
 fig, ax = ps.figure()
+blown = []
 for t, lab, col in targets:
     r = sorted((r for r in rows if r["target"] == t and "best" in r), key=lambda r: r["D"])
     ax.plot([x["D"] for x in r], [x["best"] for x in r], marker="o", color=col, label=lab)
-    # a run that blew up is shown apart at its D, at the top edge of the axis (never dropped; the caption says so); missing or non-ln|V| runs are printed
+    # a run that blew up is shown apart at its D (drawn below, once the scales are set; never dropped); missing or
+    # non-ln|V| runs are printed
     bl = [x for x in rows if x["target"] == t and "blowup_step" in x]
-    if bl:
-        ax.plot([x["D"] for x in bl], [ax.get_ylim()[1]] * len(bl), marker="x", linestyle="none", color=col)
+    blown += [(x["D"], col) for x in bl]
     for x in rows:
         if x["target"] == t and "best" not in x and "blowup_step" not in x:
             print("not plotted:", t, x.get("k"), "missing" if x.get("missing") else "not ln|V|" if x.get("not_ln_v") else "?")
@@ -49,6 +52,11 @@ ax.axhline(1e-4, color="gray", linestyle="--", label=r"$10^{-4}$")
 ax.axhline(1e-2, color="gray", linestyle=":", label=r"$10^{-2}$")
 ax.set_xscale("log")
 ax.set_yscale("log")
+if blown:
+    # at 3x the largest finite best MSE, one legend entry: the caption says the height carries no value
+    top = 3 * max(x["best"] for x in rows if "best" in x)
+    for n, (D, col) in enumerate(blown):
+        ax.plot([D], [top], marker="x", linestyle="none", color=col, label="blew up" if n == 0 else None)
 ax.set_xlabel(r"$D$")
 ax.set_ylabel(r"best val MSE$(\ln|\mathcal{M}|^2)$" if arm == "trees" else r"best val MSE$(\ln|V|)$")
 ps.legend(ax, "lower left", ncol=2)
