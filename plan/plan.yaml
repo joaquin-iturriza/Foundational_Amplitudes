@@ -21054,6 +21054,9 @@ entries:
       Fixed: the parent config carries warm_start_idx 0 (it was a sweep trial), so a rerun into an existing run dir would
       reload it; job_data_saving.sh now passes warm_start_idx=null (5ba7c3c5); the 18 running runs trained from scratch (log:
       Cannot load model ... training model from scratch).'
+  - at: '2026-11-10T03:49:35+00:00'
+    text: 'Settled, not asked: one seed per cell in stage 2 (D315, ''I see no reason to keep doing multiple seeds''); the
+      parent stays width 8 (par:v4_length''s choice, a method call inside the approved work).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
