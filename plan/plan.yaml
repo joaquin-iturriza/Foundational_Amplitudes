@@ -21217,6 +21217,14 @@ entries:
       8 (no labels), 9/11/12/13 (no training or sweep), 10 (all rows of the pools the question names). Terms searched: virt_ratio,
       virtual over, V/B, over the Born, virt/born, born_of_pool, loop_born, times a constant, pi^2-8, ratio target, kinematics-independent
       in docs/results.tex; the entry''s evidence (empty) and decisions quoted on it.'
+  findings:
+  - at: '2026-11-10T02:33:03+00:00'
+    text: 'Cause of the June V/B ''failure'' (june_targets.py @d9b38f1c): it was read in standardized units. ee->uu: V/B =
+      2.4928058681 = C_F(pi^2-8), relative std 5.0e-13 (1604 distinct values = rounding), so the standardized target was rounding
+      noise x 2e12 and val loss sat at 0.86 at every horizon; in log|V| units that is 2.1e-25 (exact). ee->tt: std of log
+      target 0.140 (V/B) vs 0.622 (V); converted to MSE of log|V| at t=4000, V/B beats V in all six arms: scratch 4.58e-8
+      vs 1.75e-7 (3.8x), fine-tune 4.66e-8 vs 3.21e-7 (6.9x), EWC 7.3x, freeze 11.9x, LoRA 7.3x, reset-head 35x. Standardization
+      had no std floor (preprocess_amplitude clip=False).'
 - id: draft_rewrite
   title: rewrite of the paper draft around the new story
   question: 'Rewrite the draft (the 2026-11-10 zip) into the story of D365/D354: pretraining works (data saved at 1e-4), the
