@@ -21214,8 +21214,8 @@ entries:
   - D362
   next:
     2: Close once the repo-reviewer passes its backlog containing ed3be235 (rung_grid.py zorder and line width)
-  done_when: 'grep -q ''The point of Fig.~\\ref{fig:rung_grid}: any pretraining helps'' docs/results.tex && grep -q ''zorder=10''
-    analysis/transfer/rung_grid.py && git merge-base --is-ancestor 623407c6 $(cut -d'' '' -f1 .claude/.review_state/notes-editor)'
+  done_when: grep -q 'any pretraining, even one completely' docs/results.tex && grep -q 'zorder=10' analysis/transfer/rung_grid.py
+    && git merge-base --is-ancestor cc016731 $(cut -d' ' -f1 .claude/.review_state/notes-editor)
   notes_ref: fig:rung_grid
   match: none
   evidence:
@@ -21241,6 +21241,12 @@ entries:
       - 'block: a mechanical-worker fixes what it names, then the same reviewer re-checks'
   step_waits:
     '2': repo-reviewer ab509e058c7ecefae
+  history:
+  - at: '2026-11-10T03:32:40+00:00'
+    was_done_when: 'grep -q ''The point of Fig.~\\ref{fig:rung_grid}: any pretraining helps'' docs/results.tex && grep -q
+      ''zorder=10'' analysis/transfer/rung_grid.py && git merge-base --is-ancestor 623407c6 $(cut -d'' '' -f1 .claude/.review_state/notes-editor)'
+    stale_because: the D362 sentence moved into 'The grid in one picture' on the notes-editor's review; the old check grepped
+      the removed paragraph title
 - id: virtual_over_born
   title: why learning the virtual over the Born fails for us, and making it work
   question: Why does training on V/B (finite one-loop virtual over the exact Born) not work for us when the literature finds
