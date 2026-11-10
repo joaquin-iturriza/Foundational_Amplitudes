@@ -21465,6 +21465,13 @@ entries:
       (sec:divergences), on a different region and bins. Prebuild gap: the two pretrainings (f0ca7a15, 95427201) failed at
       data loading, no memmap cache for the new recipes; CPU prebuilds d995bd5a, 43e5fc44 submitted, GPU jobs to follow with
       afterok at 07:00 UTC (budget window).'
+  - at: '2026-11-10T06:22:42+00:00'
+    text: 'The parent''s emission-scale target is flat into the uug limits (tools/kit_target_slope.py ee_uug me2 at 436952f2,
+      truth only, 1e5 events per hard_test stratum): slope vs log10 singular_var, plain log10|M|^2 soft -2.000 / collinear
+      -1.001, T = (ln|M|^2 + sum ln q_k^2)/ln10 soft +0.000 / collinear -0.029; hard events outside the bulk_train [0.5%,99.5%]
+      range: plain 1.000 in every deep bin, T 0.06-0.12 in every bin (medians -1.21..-1.12 inside bulk T [-4.24,-0.48]). So
+      protocol A''s +20.2 soft exponent is the network''s T leaving a flat, in-range truth: the failure points at the inputs''
+      extrapolation, not the target. Plain-target-and-inputs arm (uug 1e5) designed, under review.'
   step_why:
     1:
       feeds: 'the numbers sent to KIT: whether hard_train fixes each family (B vs B_bulk)'
