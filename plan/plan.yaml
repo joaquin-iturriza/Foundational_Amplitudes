@@ -20411,6 +20411,9 @@ entries:
     2: 'Fold everything (D338): port every origin/l2-gen script and sweep config to trunk on siteconf (no Jean Zay paths),
       the withdrawn diagnosis chain''s one-off launchers included, plus training.is_weight_path, plot_mse''s png, and adaptive_ir.py
       from origin/adaptive-ir; CPU-tested; after review delete origin/heterosc, origin/l2-gen, origin/adaptive-ir'
+    3: 'Redraw l2_eeuu_online_a/b/c with short symbol legends (Joaquin 2026-11-10: no sentences in figures); caption in results.tex
+      defines the process (ee->uu), each panel''s base and seeds, r (residual ln|M|^2 pred - true), IS (per-bin loss weight
+      target/drawn density) and every symbol; main session sends the figure with that caption.'
   done_when: null
   notes_ref: null
   match: FA-*sigma_gen*,sigma_gen_*
@@ -20504,6 +20507,11 @@ entries:
       if:
       - 'every ported script runs its CPU path on trunk: branches deleted after review'
       - 'a script needs data only on Jean Zay or a deleted run: ported anyway, its dependency named in its docstring'
+    3:
+      feeds: whether Joaquin can read the ee->uu online study from its figure and caption alone
+      if:
+      - 'redrawn and sent: continue provenance'
+      - 'still unclear: ask what is missing'
   step_waits:
     '2': 'step 1 (order set by the main session: step 1 first)'
     '1': 'next owner: resume the src/claim pass from the hand-off'
