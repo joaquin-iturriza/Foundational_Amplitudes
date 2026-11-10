@@ -20985,3 +20985,28 @@ entries:
     paths: []
   dead_ends: []
   asks: []
+- id: draft_rewrite
+  title: rewrite of the paper draft around the new story
+  question: 'Rewrite the draft (the 2026-11-10 zip) into the story of D365/D354: pretraining works (data saved at 1e-4), the
+    optimizations behind it, the ladder and star arms as they are (figs 10/11 redrawn, text: any pretraining, even unrelated,
+    helps), the KIT NLO and hard-region benchmarks replacing the divergence section; the rest cut.'
+  status: running
+  quotes:
+  - said_at: '2026-11-10T02:08:07.285000+00:00'
+    text: This means updating the draft, cutting a ton of stuff, and having a clear story.
+    decision: D365
+    covers:
+    - draft_rewrite
+  decisions:
+  - D365
+  next: Set up ~/drafts/fm_amplitudes_2026-11 from the zip (git init; the old draft untouched); apply the cut map, holding
+    the three cuts that are Joaquin's call; restructure and reword; results of the other entries fill in as they land.
+  done_when: null
+  notes_ref: null
+  match: none
+  evidence:
+    runs: []
+    commit: null
+    paths: []
+  dead_ends: []
+  asks: []
