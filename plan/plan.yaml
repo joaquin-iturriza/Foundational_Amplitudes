@@ -16143,7 +16143,7 @@ entries:
     agent: ae6bb73ebcb464af0
     state: stopped
     since: '2026-11-10T00:52:25+00:00'
-    state_at: '2026-11-10T01:00:32.967000+00:00'
+    state_at: '2026-11-10T01:02:10.609000+00:00'
     context: 117696
     context_at: '2026-11-10T01:09:27+00:00'
   designs:
