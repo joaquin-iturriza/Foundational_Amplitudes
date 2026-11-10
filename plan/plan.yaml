@@ -21186,8 +21186,12 @@ entries:
   match: kit_*
   evidence:
     runs: []
-    commit: null
-    paths: []
+    commit: ffceebe6
+    paths:
+    - tests/test_kit_hardps.py
+    - tools/kit_hardps.py
+    - tools/kit_precision_check.py
+    - tools/kit_predict.py
   dead_ends: []
   asks: []
   owner:
