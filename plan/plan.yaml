@@ -21538,7 +21538,7 @@ entries:
     '3': 2026-11-10T07:00 (the fair_nlo parent is resubmitted then; the D-scan designs when it and virtual_over_born's V/B
       baseline exist)
     '4': 2026-11-10T08:00 (the tt virtual model it uses is chosen from protocol B's runs, submitted then)
-    '5': FA-ccin2p3-7d74d518 FA-ccin2p3-366a4a98
+    '5': 2026-11-10T08:00 (packages the best A/B checkpoints; B submitted then)
     '6': FA-ccin2p3-2642b17b
   handoff:
     state: 'Protocol A from scratch: 10 runs on CC under the design passed 2026-11-10 03:59 (one seed per D315; 22 runs ~28
