@@ -75,7 +75,7 @@ through plan answer or plan unanswered; a running entry with an open question ke
 question does not block (CLAUDE.md 0g: only what needs the answer waits). The plan files change only through this CLI (plan_files_guard.py).
 Env for tests: PLAN_FILE, PLAN_STATE, PLAN_RUNS_DB, PLAN_SITE, PLAN_SITE_MODULE, PLAN_TRANSCRIPTS, PLAN_AGENTS,
 PLAN_ROOT, PLAN_SWEEP_SITES."""
-import argparse, contextlib, datetime as dt, fcntl, fnmatch, glob, importlib.machinery, importlib.util, json, os, re
+import argparse, contextlib, datetime as dt, fcntl, fnmatch, glob, importlib.machinery, importlib.util, json, math, os, re
 import shlex, shutil, sqlite3, subprocess, sys, tempfile
 
 import yaml
@@ -930,6 +930,54 @@ def typed_at(quote, since=None):
         q = S()._norm(quote)
         return sorted(ts for ts, role, t in messages(since) if role == "user" and q in S()._norm(t))
     return sorted(parse(x) for x in S().user_said(quote, PROJECT) if x and x != "?")
+
+
+SAID_RARE = 0.01     # a term is distinctive when at most this share of the user's messages hold it
+SAID_MIN = 2         # distinctive terms a message must share with the question
+SAID_TOP = 3
+
+
+def user_said(ask, top=SAID_TOP):
+    """The user's own typed messages that may already answer `ask`: those sharing at least SAID_MIN of its rare terms
+    (held by at most SAID_RARE of his messages), best first by the summed idf of the shared terms; [(time, text,
+    shared terms)]. (2026-11-10: the sweep template's fidelity question was asked again although he had said on 10-23
+    'I never asked to run a multifidelity sweep': a remark, not an answer to a recorded ask, so only his messages held it.)"""
+    texts, seen = [], set()
+    for ts, role, t in messages():
+        k = re.sub(r"\s+", " ", t).strip()
+        if role == "user" and k not in seen:     # a message queued mid-turn is logged twice (enqueue, then delivery)
+            seen.add(k)
+            texts.append((ts, t, ask_terms(t)))
+    n = len(texts)
+    df = {}
+    for _, _, w in texts:
+        for x in w:
+            df[x] = df.get(x, 0) + 1
+    rare = {x for x in ask_terms(ask) if 0 < df.get(x, 0) <= max(1, SAID_RARE * n)}
+    hits = []
+    for ts, t, w in texts:
+        h = rare & w
+        if len(h) >= SAID_MIN:
+            hits.append((sum(math.log(n / df[x]) for x in h), ts, t, sorted(h)))
+    hits.sort(key=lambda x: (-x[0], x[1]))
+    return [(ts, t, h) for _, ts, t, h in hits[:top]]
+
+
+def _said_stamp(ts):
+    return ts.astimezone(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M")
+
+
+def _said_ok(ask, searched):
+    """A question is asked only after the user's own messages that may answer it were read: each one user_said finds
+    is named in --searched by its time (YYYY-MM-DDTHH:MM UTC, or with a space for the T)."""
+    s = searched or ""
+    missing = [(ts, t, h) for ts, t, h in user_said(ask)
+               if _said_stamp(ts) not in s and _said_stamp(ts).replace("T", " ") not in s]
+    if missing:
+        sys.exit("plan: Joaquin's own messages share this question's rare terms and may already answer it; read each "
+                 "and name it in --searched by its time (UTC), with why it does not settle the question:\n" + "\n".join(
+                     "  %s [%s] %s" % (_said_stamp(ts), ", ".join(h), re.sub(r"\s+", " ", t)[:200])
+                     for ts, t, h in missing))
 
 
 _AGENTS = {}
@@ -2448,6 +2496,7 @@ def cmd_add(a):
     if a.ask:
         _ask_ok(a.ask)
         _searched_ok(a.searched)
+        _said_ok(a.ask, a.searched)
     with transaction() as (d, st):
         if any(e["id"] == a.id for e in d["entries"]):
             sys.exit("plan: entry %s exists" % a.id)
@@ -2689,6 +2738,7 @@ def cmd_ask(a):
     froze the entry's independent work for 8 h.)"""
     _ask_ok(a.ask)
     _searched_ok(a.searched)
+    _said_ok(a.ask, a.searched)
     bsteps = None
     if (a.blocks_steps or "").strip().lower() == "none":
         bsteps = []   # explicitly holds no next step (the question blocks only what --blocks names)
