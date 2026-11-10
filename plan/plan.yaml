@@ -21789,6 +21789,49 @@ entries:
       plus orders target from trial 1262''s config (5907, 5833-5838). Disk ~17 GB against 44 GB free on CC; ~28 GPU-h, under
       30. Test events: KIT hard_test and bulk_test. Searched: KIT, hard phase, hard_train, extrapolat, holdout, add-back,
       Coulomb, off-shell, float64 in docs/results.tex, the plan and site decisions (D25, D315, D353, D363).'
+  - at: '2026-11-10T06:20:34+00:00'
+    question: 'Is the parent config''s target preprocessing what breaks extrapolation of ee->uug into its soft and collinear
+      limits? Protocol A from scratch on the parent''s setup (emission-scale dimensionless target T = ln|M|^2 + sum_k ln q_k^2
+      - (N-4) ln s0 - coupling orders, data.target_physics_factor/orders, dim_ref=qperp, plus data.dimensionless_inputs) gave
+      at n=1e5 soft exponent +20.2 (exact -2), collinear +0.32 (exact -1), deepest soft bin log10-MSE 14180, collinear 30.1,
+      bulk 8.2e-4 (Bakar''s MLP at 1e5: -2.12, -0.93, 0.32, 0.11, 2.1e-5). One matched from-scratch arm, n=1e5, with a plain
+      per-dataset standardized ln|M|^2 target and plain (GeV) inputs: data.target_physics_factor=false, data.target_physics_orders=false,
+      data.dimensionless_inputs=false, everything else the same. Feeds: whether the pretrained protocol A arm (which inherits
+      this preprocessing from its parent) can be read as a test of pretraining, or whether the preprocessing must change first;
+      and the numbers sent to KIT.'
+    prior: 'Searched docs/results.tex, the plan and site decisions for: dimensionless, emission scale, qperp, target_physics,
+      extrapolat, KIT. results.tex 459-463: the dimensionless target extrapolates where the GeV baseline does not, along multiplicity
+      and collider energy (error 1.2 and 2.9 against the baseline''s level; median per-probe ratio 0.03 and 0.07), D93/D99
+      adopted it. Not tested into soft/collinear limits at fixed multiplicity. sec:divergences: catalog float32 ee->uug into
+      its collinear limit gave slopes -2.15..-2.26 against -2.303 (a different variable and range). This entry: protocol A
+      uug 9e5/1e5 above (kit_result.txt in runs/kit/kit_A_ee_uug_me2_n{900000,100000}_t8000 on CC).'
+    measure: 'KIT''s own src/evaluate.py through tools/kit_predict.py on the run''s final model (best validation mu MSE, then
+      the sigma stage): soft_x and coll_y fitted exponents against exact (-2, -1), log10-MSE per hard_test stratum (deepest
+      bins soft x 1e-7..1e-6, coll y 1e-7..1e-6), bulk_test log10-MSE; compared with the protocol A uug n=1e5 run (FA-ccin2p3-f6b2ece9)
+      bin by bin.'
+    check: 'On the truth alone, tools/kit_target_slope.py (CPU, KIT hard_test) gives each family''s slope in plain log10|M|^2
+      and in T and the share of hard events outside the bulk_train range of each target: if T''s slope is ~0 (the emission
+      scales divide out the singularity) the target change moves what has to be extrapolated from a -2/-1 slope to a flat
+      one; its numbers are recorded before the run. Bakar''s MLP on these files: raw against log invariants moved the soft
+      exponent -0.02 to -2.12 and the soft bin 89 to 0.32, so an input/target representation change moves this measure by
+      orders of magnitude. Noise: one seed (D315); the project''s seed spread 0.148 decades, differences resolved above 0.3
+      decades and exponents at 0.1.'
+    fixed: 'Everything of the protocol A uug n=1e5 run (FA-ccin2p3-f6b2ece9): scripts/job_kit.sh A mode, trial 1262''s saved
+      config as base (muP LLoCa, HETEROSC, MuonAdamW, batch 16384, diagrams through the ee_uug sidecar, off-shellness columns
+      on), float64, seed 42, 8000 steps, lr 1.19e-2 (the D-factor law, clipped), n_train 1e5, val the last 1e5 of bulk_train,
+      test bulk_test 2e5 and every hard_test stratum. Only data.target_physics_factor, data.target_physics_orders and data.dimensionless_inputs
+      change (true -> false). Rate: 0.675 s/step read from f6b2ece9 (same batch, pool size, multiplicity, float64): 8000 steps
+      1.5 h + sigma stage 2 min + scoring; --time 2:00, 2 GPU-h; readout: kit_result.txt is written by the same script and
+      base config (all ten A runs), and a CPU dry run of this exact config on CC (5 steps) shows it builds and trains.'
+    control: 'The protocol A uug n=1e5 run FA-ccin2p3-f6b2ece9: the same job, seed, steps, lr and data, with the parent''s
+      dimensionless target and inputs. Externally Bakar''s MLP at 1e5.'
+    seeds: One seed (42), D315.
+    outcome: 'Yes, the preprocessing breaks it: the plain arm''s soft and collinear exponents are within 0.3 of exact (-2,
+      -1) or its deepest soft/collinear bins are lower than the dimensionless arm''s by more than 0.3 decades; then the pretrained
+      protocol A arm is read knowing its parent''s preprocessing hurts limits, and a fix (a target/input variant) is designed
+      before the KIT numbers are final. No: the plain arm is as wrong (exponents near 0 or positive, deep bins within 0.3
+      decades or worse): the failure is in the network''s extrapolation of the momenta, not in T, and the next lever is inputs
+      (log invariants as Bakar''s MLP). Either way the finding is reported.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
