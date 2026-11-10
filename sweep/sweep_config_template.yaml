@@ -16,10 +16,10 @@ dyhpo:
   n_startup: 10       # random evaluations before the surrogate activates (like n_startup_trials in Optuna)
   total_budget: 10000 # internal DyHPO budget counter — generous upper bound
 
-# Single fidelity (HPO rule 6, D346): one value, the run's training length set by its design; 40000 is the
-# full-fidelity length the old ladder [1000, 10000, 40000] ended at. Full dataset is always used.
+# Single fidelity (HPO rule 6, D346): one value; the template's length is 8000 steps (D347), a sweep config sets its
+# own from its run's design. Full dataset is always used.
 fidelity_schedule:
-  t_steps: [40000]
+  t_steps: [8000]
 
 fixed_params:
   data.data_path: ${PROJECT_DIR}/data/
