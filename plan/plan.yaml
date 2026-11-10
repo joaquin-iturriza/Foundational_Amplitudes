@@ -21637,6 +21637,20 @@ entries:
       b b~ > a ve ve~ (v4_bbx_avevex_nlo, sigma 0.684, V<0 1.0%), the closest analogue of b b~ > Z Z and u u~ > e+e- Z. The
       question ''accept a two-target one-loop arm?'' (in my 11:00 report, never recorded with plan ask) is withdrawn. Third
       round (FA-ccin2p3-326bc006): b b~ > H Z 0.305 and b b > b b 0.455 one-signed; bg > bgg no pool or sidecar read.'
+  - at: '2026-11-10T10:22:40+00:00'
+    text: '2026-11-10 ~12:00 (Joaquin''s corrections, relayed by the main session): (1) a target or arm is never dropped on
+      a prediction of training behaviour, only on a measured run: e+e- > b b~ (constant V/B) was dropped on the extrapolation
+      that a constant is learned at every D, while the e+e- > u u~ V/B runs were at D=5e4 and 8000 steps only; it is back
+      as the third one-loop target, and its scratch calibration (k=2..9) measures whether the constant is learned at small
+      D. The third-target search is stopped (b b~ > a ve ve~ withdrawn; FA-ccin2p3-326bc006 left to finish, not acted on).
+      (2) One-loop targets are compared on one measure: the test MSE of (V/B)_pred - (V/B)_true (any sign of V; the NLO correction''s
+      error), with MSE ln|V| beside for one-signed targets; training keeps each process''s own transform; the D-gap threshold
+      is set on this measure from the scratch curves. (3) Defect found by the design reviewer: the parent''s target_physics_factor
+      (dim_only, (s0/s_hat)^(4-N)) and target_physics_orders multiplied V/B by s_hat/s0 on the 2->3 u u~ > e+e- Z: prepd_std
+      2.57 with them, 0.291 without (CPU dry run of init_data on CC, D=1000; pool sigma 0.294); b b~ > Z Z (2->2, constant
+      factor) 0.257 either way, its 8 cal_vb runs stand; e+e- > b b~ 1e-6 (the std floor). Fixed in scripts/job_data_saving.sh
+      (both off for V/B runs); the 8 u u~ > e+e- Z cal_vb runs are superseded (k=9 FA-ccin2p3-adac4033 cancelled), the readouts
+      list them apart.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
