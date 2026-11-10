@@ -149,6 +149,9 @@ def main():
             ax.set_ylabel(ylab)
             ax.xaxis.set_major_locator(matplotlib.ticker.MaxNLocator(integer=True))
             ps.legend(ax, loc, ncol=nc)
+        # panel (a)'s five arms span the whole log range: the default 1.8x headroom leaves its legend on a curve
+        f1.canvas.draw()
+        ps.make_room(ax1, max_growth=3.0)
         ps.save_panels(figs, os.path.join(HERE, "figs", "l2_eeuu_online"), repo=REPO)
 
     print(json.dumps(out))
