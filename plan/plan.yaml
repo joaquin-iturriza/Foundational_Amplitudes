@@ -20832,7 +20832,7 @@ entries:
   blocks: step 3's job submissions (the design's final form and its re-check depend on the stage-2 scope); the code rebuild
     in worktrees/wt-sigma-gen3 does not wait
   blocks_steps: *id001
-  checked_until: '2026-11-10T02:21:53+00:00'
+  checked_until: '2026-11-10T02:22:12+00:00'
 - id: pretrain_data_saving
   title: 'pretraining saves target data: dataset-size scaling, fine-tuned against scratch, on the current catalog setup'
   question: 'On the current setup (big catalog, every accumulated optimization, the fixed single-fidelity DyHPO), how much
