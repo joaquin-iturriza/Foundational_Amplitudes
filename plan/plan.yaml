@@ -20849,12 +20849,20 @@ entries:
     - pretrain_data_saving
   decisions:
   - D360
-  next: 'Design (no jobs yet): the held-out tree-level and one-loop targets (whole families held out of the pretraining),
-    the pretraining (big catalog, current defaults, targets held out; for the one-loop arm the tree levels in), the D grid,
-    per-D horizons as in the ladder study (stop where scratch reaches 1e-4 or plateaus), a DyHPO sweep per scratch cell from
-    the template, the fine-tune protocol, the readout (D at 1e-4 per curve and their ratio; plus one compute or wall-time
-    panel); prior work: the draft''s fig 22 (compute_scan_eeuu_wt_min), docs/results.tex transfer and catalog_v4 sections;
-    GPU-h per batch. One-loop runs wait on virtual_over_born per D357 unless it does not resolve quickly.'
+  next:
+    1: 'Tree arm, stage 1 (horizon calibration, D356): prebuild the 1e5-event train splits of the three held-out tree targets
+      (ee->ttbar H3, ee->ccbar g = ee->uubar g H1, ee->bbbar gg H2), then one fixed-HP scratch run per (target, D=10^(k/2),
+      k=2..10) on the parent''s model setup, 8000 steps at k<=8, 12000 at k=9,10 (27 runs, ~27 GPU-h); read per D the best
+      step and the step where MSE(ln|M|^2) first reaches 1e-4 -> the per-target horizon T(D)'
+    2: 'One-loop arm, stage 1 (horizon calibration): the same for three held-out one-loop targets whose Born is in the pretraining
+      (ee->bbbar H5, bbbar->ZZ H5, uubar->e+e-Z H5), D=10^(k/2), k=2..9 (5e4 pools); target representation from virtual_over_born
+      per D357'
+    3: 'Stage 2: one single-fidelity 8-trial DyHPO per (target, D, arm), scratch over the template''s space, fine-tune (full
+      retrain + layer decay from the w8 x16 catalog_v4 pretraining best_cov_v4_long_hpo8_cc_68224_trial_1262) over the fine-tune
+      space, both at T(D); GPU-h estimate from stage 1''s measured step rate, to Joaquin if over 30 GPU-h without a covering
+      decision'
+    4: 'Readout: per target L(D) scratch vs fine-tune (best trial per cell), D*(1e-4) by log-log interpolation, saving D*_scratch/D*_ft,
+      one MSE vs GPU-hours panel; figures replacing the draft''s fig 22; write-up in docs/results.tex'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -20871,6 +20879,29 @@ entries:
     state_at: '2026-11-10T02:21:50+00:00'
     context: 138049
     context_at: '2026-11-10T02:27:54+00:00'
+  step_why:
+    1:
+      feeds: the per-D horizons of the tree sweeps (D356) and whether scratch reaches 1e-4 inside the 1e5 pools
+      if:
+      - 'scratch reaches 1e-4 at some D <= 1e5: T(D) = min(1.1 x the 1e-4 step, 1.1 x best step when the best sits before
+        0.8 of the run, the cap); sweeps designed at those T(D)'
+      - 'scratch never reaches 1e-4 on a target: its saving is a lower bound; the target stays, or a larger pool is generated
+        (asked with its cost)'
+    2:
+      feeds: the one-loop horizons and target (V or V/B) of the one-loop sweeps
+      if:
+      - 'virtual_over_born resolves (V/B works or is ruled out) by 2026-11-12: calibrate with its target'
+      - 'not resolved by then: calibrate on V as now (D357)'
+    3:
+      feeds: 'D360: the data saved at MSE(ln|M|^2)=1e-4, trees and one loops'
+      if:
+      - 'estimate covered or <= 30 GPU-h: design, review, submit'
+      - 'over 30 and not covered: estimate to Joaquin'
+    4:
+      feeds: draft_rewrite's pretraining figure
+      if:
+      - 'saving >= 10^0.5 on a target: the gap holds there'
+      - 'saving < 10^0.5: not resolved or no gap, reported as such'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
