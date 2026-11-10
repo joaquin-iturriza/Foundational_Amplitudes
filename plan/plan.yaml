@@ -21544,12 +21544,10 @@ entries:
   dead_ends: []
   asks: []
   owner:
-    agent: ad1f728c67fc934fd
-    state: closed
-    since: '2026-11-10T02:18:36+00:00'
-    state_at: '2026-11-10T03:43:46+00:00'
-    context: 263970
-    context_at: '2026-11-10T03:44:43+00:00'
+    agent: aa70fe4b5162f3a20
+    state: working
+    since: '2026-11-10T03:53:00+00:00'
+    state_at: '2026-11-10T03:53:00+00:00'
   designs:
   - at: '2026-11-10T02:29:27+00:00'
     question: 'Is the earlier V/B attempt''s failure a property of the target itself: is V/B (stored one-loop virtual over
