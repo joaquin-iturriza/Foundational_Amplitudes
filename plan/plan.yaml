@@ -20863,3 +20863,38 @@ entries:
     paths: []
   dead_ends: []
   asks: []
+- id: optimizations_recap
+  title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
+  question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
+    1e-4 and transfer better, and how is every adopted and rejected choice (catalog, held-out classes, smart sampling, sigma
+    sampling, emission scales + coupling orders preprocessing, adimensionalisation options, input conditionings, off-shellness,
+    the meaning of zero-shot error as the fine-tune's starting point) written up with clear formulas (D364)?
+  status: running
+  quotes:
+  - said_at: '2026-11-10T02:08:07.285000+00:00'
+    text: Then we show all the work behind all the optimizations we did along the way, how  pIDs and quantum numbers behave
+      the same, but that quantum numbers in principle allow for arbitrary extrapolation (though I'd like to see the claim
+      that pIDs and quantum numbers behave the same be tested again on our latest setup), the catalog we are using, the classes
+      we held out, how it's constructed, the smart sampling, the sigma sampling as a promising direction to have a good sampling
+      that is process agnostic, the emission scales + coupling orders preprocessing we converged to, why this was chosen (good
+      at extrapolating on multiplicity when zero shooting), the motivation to adimensionalise, the different options, everything
+      well explained in formulas that are clear, the change to muon and how it trains a network that transfers better (ideally
+      extend the plots that compare the optimizers to this arbitrary 1e-4 value), the different input conditionings that we
+      tried that didn't work, properly explained again in clear formulas, the one(s?) that did like offshellness.
+    decision: D364
+    covers:
+    - optimizations_recap
+  decisions:
+  - D364
+  next: Collect from docs/results.tex what is already measured for each item of D364 with numbers and figures; design the
+    two reruns (pID vs quantum numbers on the current setup; the optimizer comparison extended to 1e-4) with GPU-h; then draft
+    the section text for the draft_rewrite owner.
+  done_when: null
+  notes_ref: null
+  match: optrec_*
+  evidence:
+    runs: []
+    commit: null
+    paths: []
+  dead_ends: []
+  asks: []
