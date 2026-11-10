@@ -43,17 +43,33 @@ MLP = {("ee_uug", "me2", "soft_x"): (1e-7, 1e-6, 0.32, 89.0),
        ("ee_tt", "virt_finite", "sudakov_sqrts"): (15e3, 50e3, 0.05, 4.2e4)}
 
 
+def _split(stratum):
+    """(family, [bin edges]) of a stratum name: its trailing numeric tokens are the edges (one for a fixed-y set)"""
+    tok = stratum.split("_")
+    k = len(tok)
+    while k > 0:
+        try:
+            float(tok[k - 1])
+        except ValueError:
+            break
+        k -= 1
+    return "_".join(tok[:k]), [float(t) for t in tok[k:]]
+
+
 def family(stratum):
-    return stratum.rsplit("_", 2)[0]
+    return _split(stratum)[0]
 
 
 def edges(stratum):
-    lo, hi = stratum.rsplit("_", 2)[1:]
-    return float(lo), float(hi)
+    e = _split(stratum)[1]
+    return e[0], e[-1]
 
 
-def truth_key(g, target):
-    return f"log10_{target}" if f"log10_{target}" in g else target
+def truth(g, ds, target):
+    """log10 truth of a KIT group: the dataset the prediction is named after, else log10|raw target|"""
+    if ds in g:
+        return np.asarray(g[ds][:], np.float64)
+    return np.log10(np.abs(np.asarray(g[target][:], np.float64)))
 
 
 def collect(run_dirs):
@@ -77,21 +93,17 @@ def collect(run_dirs):
                     strata[name] = dict(r)
                     continue
                 g = f[f"hard_test/{st}"]
-                tk = truth_key(g, target)
-                t = np.asarray(g[tk][:], np.float64)
-                if tk == target:
-                    t = np.log10(t)
+                t = truth(g, ds, target)
+                dsname = ds
                 y = np.asarray(p[f"hard_test/{st}/{ds}"][:], np.float64)
                 sv = (np.asarray(g["singular_var"][:], np.float64) if "singular_var" in g
                       else np.full(len(t), np.sqrt(np.prod(edges(st)))))
                 strata[name] = dict(r, x=float(np.median(sv)), lo=edges(st)[0], hi=edges(st)[1])
+                assert len(t) == len(y), (name, len(t), len(y))
                 fams.setdefault(family(st), []).append((sv, t, y, st))
             if key not in out["truth"]:
                 b = f["bulk_train/bulk"]
-                tk = truth_key(b, target)
-                tb = np.asarray(b[tk][:200000], np.float64)
-                if tk == target:
-                    tb = np.log10(tb)
+                tb = truth(b, dsname, target)[:200000]
                 lo, hi = np.quantile(tb, [0.005, 0.995])
                 floor, tmed = {}, {}
                 for fam, parts in fams.items():
@@ -125,7 +137,7 @@ PROC = {("ee_tt", "virt_finite"): r"$e^+e^-\to t\bar t$, virtual", ("ee_tt", "bo
 XLAB = {"threshold_beta": r"top velocity $\beta$", "sudakov_sqrts": r"$\sqrt{s}$ [GeV]",
         "soft_x": r"soft gluon $x=2E_g/\sqrt{s}$", "coll_y": r"collinear $y=s_{qg}/s$",
         "coll_qg_y": r"collinear $y=s_{qg}/s$", "coll_gg_y": r"collinear $y=s_{gg}/s$",
-        "azimuth_y": r"$g\to gg$ collinear $y=s_{gg}/s$"}
+        "azimuth_gg_y": r"$g\to gg$ collinear $y=s_{gg}/s$"}
 
 
 def arm_label(r):
