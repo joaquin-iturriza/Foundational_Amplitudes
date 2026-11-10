@@ -22822,9 +22822,8 @@ entries:
     - virtual_over_born
   decisions:
   - D366
-  next: 'Matched test at current defaults (design of 2026-11-10): Born sidecars (scripts/job_vob_born.sh, CPU), then DyHPO
-    sweeps vob_tt_V, vob_tt_VB, vob_uu_V (template, 8 trials, 8000 steps), each arm''s best re-run at seeds 43, 44, ee->uu
-    V/B at the uu V best config seeds 42-44; read MSE of log|V| best against best; merge branch vob after repo-reviewer PASS.'
+  next: 'Close: repo-reviewer pass over the code backlog (plots.py @7aa4659c, job_vob_seed.sh, seed_mse.py, pool_targets.py,
+    job_vob_born.sh), then plan done --writeup 2f5cc25a (par:vob_pools, par:vob_now).'
   done_when: null
   notes_ref: null
   match: vob_*
@@ -23043,12 +23042,10 @@ entries:
       in plots.py on the constant target, fixed @7aa4659c).'
   step_why:
     1:
-      feeds: whether V/B beats V for us at current defaults, and the V/B-with-exact-Born scratch baseline for kit_benchmark;
-        whether pretrain_data_saving's one-loop runs train V/B
+      feeds: whether the V/B verdict (par:vob_now) stands on reviewed code
       if:
-      - 'V/B lower on ee->tt beyond seed spread: recommend V/B (with Born sidecars) for the one-loop runs and hand the baseline
-        to kit_benchmark'
-      - 'no gain: look for the cause in what changed since June (HETEROSC, Muon, the mass-scheme shift in the stored target)'
+      - 'PASS: plan done --writeup 2f5cc25a'
+      - 'BLOCK: fix, re-check with the same reviewer, re-run seed_mse.py if a number moves'
   targets:
   - batch: vob_born
     wall_h: 0.8
@@ -23074,8 +23071,7 @@ entries:
     units: null
     start: '2026-11-10T08:56:26+00:00'
     at: '2026-11-10T08:56:26+00:00'
-  step_waits:
-    '1': 'a reviewer: repo-reviewer over the code backlog, launched 2026-11-10'
+  step_waits: {}
   handoff:
     state: 'Cause settled and written up (results.tex par:vob_june @c16ed102; analysis/virtual_over_born/june_targets.py @d9b38f1c):
       the June V/B ''failure'' was read in standardized units. ee->uu V/B is the constant C_F(pi^2-8) (rel std 5e-13), standardized
