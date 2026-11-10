@@ -16754,6 +16754,131 @@ $n^2 d$ for $n\lesssim12$): it is linear in $n$ once the GPU is saturated
 $1/\nh$.
 
 % ==========================================================================
+\section{The optimizations behind the setup, for the paper (D364)}\label{sec:optrecap}
+% ==========================================================================
+The user (D364): ``Then we show all the work behind all the optimizations we did along the way, \dots\ everything well
+explained in formulas that are clear''. One paragraph per choice, adopted or rejected, with its formula and where its
+measurement lives in these notes; the numbers are read in the paragraphs referenced (their provenance is there). Two
+items wait on runs of plan entry \code{optimizations\_recap}: the one-hot against quantum-number rerun (step pidqn)
+and the optimizer comparison down to MSE $10^{-4}$ (step muon\_1e4).
+% allow: 10^{-4} because it is the precision the comparison is set to (D356), a setting
+
+\paragraph{Notation and the error we quote.} An event has $N$ external particles ($2\to N-2$), momenta $p_i$, partonic
+% allow: 10^{-4} because it is the precision the comparison is set to (D356), a setting
+% allow: 2 because it is the exponent of a squared quantity, a constant
+energy $\hat s=(p_1+p_2)^2$ and invariants $s_{ij}=2|p_i\cdot p_j|$. Every error is the mean squared error of
+$\ln|\mathcal M|^2$, $\mathrm{MSE}=\langle(\ln|\mathcal M|^2_{\rm pred}-\ln|\mathcal M|^2_{\rm true})^2\rangle$: an MSE of
+one is a typical prediction off by a factor $e$, an MSE of $10^{-4}$ one off by a percent.
+% allow: 2 because it is the two incoming legs of the notation, a constant
+
+\paragraph{The catalog.} Built from equality classes, not process strings (the catalog\_v3 census and its pools and
+% allow: 2 because it is the exponent of a squared quantity, a constant
+levels, Sec.~\ref{sec:catalog}): every $2\to2$ and $2\to3$ final multiset of SM particles on every beam ($e^+e^-$,
+quark pairs, quark-gluon, $gg$), every $2\to3$ plus a gluon or photon, and the four-fermion and multi-boson $2\to4$
+finals, under charge, baryon and lepton number; beam order, the first two generations and charge conjugation are
+collapsed; what MadGraph accepts is kept; two processes whose $|\mathcal M|^2$ agree on shared points under a
+relabelling of their legs are one class, and the class is the unit of training and of every hold-out. catalog\_v4
+(par.~\ref{par:v4_validation}, par.~\ref{par:v4_vs_v3}) keeps the classes and changes the coverage: the LHC acceptance
+on hadronic beams, $\sqrt{\hat s}$ log-uniform from threshold to $6$\,TeV, every tree diagram under
+$\mathrm{QED}\le b$ (vector-boson fusion and scattering, electroweak-QCD interference), a massless $b$.
+% allow: 6 because it is the catalog's energy edge in TeV, a setting
+
+\paragraph{Held-out classes.} Whole classes along axes a user can move (Table~\ref{tab:v3_short}): H1 new combinations
+of seen particles and beams, H2 $2\to4$ families, H2.5 $2\to5$ (one particle more than any training process), H3 a
+physical top, H5 one-loop virtuals, H6 an $\alpha_s(M_Z)$ between the trained ones, H7c a harder $p_T$ cut, H7E higher
+energies. Each is read on its catalog-sampled pool and on default-sampled (MadEvent) pools; the training classes'
+default-sampled test pools are PP4 and EE4 (par.~\ref{par:v4_mixture}).
+
+\paragraph{Sampling the phase space.} A fitted network's error follows its training density, and every hard region of
+% allow: 2 1 because they are the exponent of a squared quantity and the one of a fraction's complement, constants
+an amplitude (a resonance, a threshold, a soft or collinear corner) is an extreme of $|\mathcal M|^2$, the one
+coordinate every process has. Each pool is the mixture
+\begin{equation}
+  \rho=f_{\rm def}\,\rho_{\rm default}+f_{\rm flat}\,\rho_{\ln|\mathcal M|^2\text{-flat}}+f_{\rm fwd}\,\rho_{\rm fwd}
+  +(1-f_{\rm def}-f_{\rm flat}-f_{\rm fwd})\,\rho_{\rm PS},\qquad (f_{\rm def},f_{\rm flat},f_{\rm fwd})=(0.25,0.35,0.15),
+\end{equation}
+with $\rho_{\rm PS}$ flat phase space, the flat-$\ln|\mathcal M|^2$ part kept from a labelled candidate pool by the
+inverse density of its $\ln|\mathcal M|^2$ (candidates from a recursive $1\to2$ splitter with log-flat intermediate
+masses and an adaptive $\sqrt{\hat s}$ pass; no resonance mass is read), the forward part one final particle turned to
+an angle uniform in $\ln[1/(1-|\cos\theta|)]$, and $\rho_{\rm default}$ the generator's own sampling. The flat share has
+an interior optimum and must be generated, not resampled (the generated fraction sweep and the takeaway of
+Sec.~\ref{sec:divergences}); the default share is par.~\ref{par:v4_mixture}'s verdict and par.~\ref{par:v4_ee_mechanism}
+its mechanism.
+% allow: 0.25 0.35 0.15 because they are the catalog's mixture shares, settings
+
+\paragraph{Sampling by the model's own uncertainty.} The heteroscedastic head predicts $(\mu,\sigma)$ per event under
+% allow: 2 because it is the exponent of a squared quantity, a constant
+$\mathcal L=\langle(y-\mu)^2/2\sigma^2+\ln\sigma\rangle$, so $\sigma(x)$ estimates the model's error on any process.
+Steered generation proposes fresh momenta from a process-agnostic base (flat phase space mixed with the splitter), keeps
+them without replacement with $P_{\rm keep}(x)\propto\sigma(x)^\gamma$, labels and trains on them, round after round.
+On a multi-scale infrared process it beats a uniform keep in every decade of $y_{\min}=\min s_{ij}/\hat s$ but the bulk,
+best at moderate $\gamma$; a richer keep rule and a Bayesian $\sigma$ add nothing; the $\sigma$-contrast
+$\langle\sigma\rangle_{\rm singular}/\langle\sigma\rangle_{\rm bulk}$ predicts beforehand whether it pays; on a pool that
+already covers the space, reweighting by $\sigma$ does not help (Sec.~\ref{sec:divergences}, its steering and keep-rule
+paragraphs). The promising, process-agnostic route; not yet run at catalog scale.
+
+\paragraph{Why a dimensionless target.} $|\mathcal M|^2$ of $2\to N-2$ scattering has mass dimension $2(4-N)$, so every
+% allow: 2 because it is the exponent of a squared quantity, a constant
+$T_\Lambda=\ln|\mathcal M|^2-(4-N)\ln\Lambda^2$ with one shared standardization is as good as another within one
+multiplicity and differs across them: with $\Lambda$ a fixed unit, the extrapolation to a new multiplicity depends on the
+unit (the units-of-the-target paragraph, Sec.~\ref{sec:catalog-open}'s Daniel's-catalog round). The options tried:
+$\Lambda^2=\hat s$ (unit-free, blind to a soft or collinear particle), the geometric mean of the event's $s_{ij}$
+(shrinks with one), a fitted constant $s_0$ (tied to one set of cuts), the hybrid of $\hat s$'s shape and the emission
+scales' per-process level and its blends (par.~\ref{par:v3_prep_sampling}'s neighbours), and the emission scales. The
+inputs are made dimensionless too: $p_i/\sqrt{\hat s}$, $\log_{10}(m/\sqrt{\hat s})$, $(s_{\rm prop}-M^2)/\hat s$.
+% allow: 4 2 because they are the four-point mass-dimension base and the factor of a squared amplitude, constants
+
+\paragraph{The adopted target: emission scales and coupling orders.}
+% allow: 2 because it is the exponent of a squared quantity, a constant
+\begin{equation}
+  T=\ln|\mathcal M|^2-q\ln(4\pi\alpha_s)-e\ln(4\pi\alpha)+\sum_{k=1}^{N-4}\ln q_k^2,\qquad
+  q_k^2=\min_{a<b}\frac{s_{ak}s_{bk}}{s_{ab}}+m_k^2,
+\end{equation}
+then one standardization shared by all processes; $q$, $e$ the process's QCD and QED orders (the highest $\alpha_s$
+power and its $\alpha$ power when several monomials contribute), $\alpha_s$ the event's own; at each of the $N-4$ steps
+the final particle with the smallest dipole scale is removed (\code{physics\_scales.qperp\_logs}). $q_k^2$ is the scale
+at which soft and collinear limits factorise, $|\mathcal M_N|^2\to g^2|\mathcal M_{N-1}|^2/q_k^2$, so $T$ divides out
+the leading cost of each extra particle. Chosen because it extrapolates in multiplicity zero-shot
+(par.~\ref{par:dimless_orders}, par.~\ref{par:dimless_qperp}, Table~\ref{tab:v3_short}); it costs a little inside the
+trained multiplicities.
+% allow: 4 1 because they are the four-point base of the emission count and the sum's first index, constants
+
+\paragraph{Particle encoding.} Quantum numbers
+$[Q,s,\log_{10}(m/\sqrt{\hat s}),T_3,B,L,\text{colour rep.},C_2(R),\text{generation}]$, labels one-hot, magnitudes
+standardized (Def.~\ref{def:enc}, Table~\ref{tab:enc}), against a one-hot token per PDG id: alike in distribution on the
+small set, but a token has no input for a particle outside training while the quantum numbers place it in the same space,
+which in principle allows arbitrary extrapolation in particle content (Principle~\ref{prin:zeroshot}). The rerun on the
+current setup is step pidqn.
+
+\paragraph{Input conditionings.} A feature helps when it carries what the momenta cannot, in a form the network can use
+% allow: 2 because it is the exponent of a squared quantity, a constant
+(Principle~\ref{prin:levers}). Adopted: off-shellness per internal propagator,
+$o=(s_{\rm prop}-M^2)/\hat s$ with $s_{\rm prop}=(\sum_{i\in\rm prop}p_i)^2$, for the $Z$, $W$, top and Higgs
+(Table~\ref{tab:levers}, Table~\ref{tab:bigrun_arms}, the catalog\_v2 needle paragraphs). Not adopted: a raw $\ln M$
+scalar, the leg-system mass, $\ln\alpha$ under per-process standardization, our diagram graph encoder, the pairwise
+attention bias from $s-m^2$ (Sec.~\ref{sec:bigrun}), the per-process context vector $c_p$, and for the multiplicity gap
+the soft-dipole antenna $D=\sum_{a,b}s_{ab}/(s_{aj}s_{bj})$ (par.~\ref{par:v4_dipole}), the propagator product
+$P=\sum_dC_d\prod_S|s_S-M_S^2+iM_S\Gamma_S|^{-k}$ (par.~\ref{par:v4_prop}), a shared map of order-free event features
+(par.~\ref{par:v4_lco}, par.~\ref{par:v4_lco_not}), a per-process affine (par.~\ref{par:v4_kshot_spread}) and the soft
+limit's normalization and colour weight (par.~\ref{par:v4_mult_cand}).
+
+\paragraph{The optimizer.} Muon on the $\mu$P hidden matrices, AdamW elsewhere:
+% allow: 10^{-4} because it is the precision the comparison is set to (D356), a setting
+$W\leftarrow W-\eta\,(c\,\mathrm{NS}_5(M_t)+\lambda W)$, $M_t=\beta M_{t-1}+\nabla_W\mathcal L$, with $\mathrm{NS}_5$
+five Newton-Schulz iterations towards $UV^\top$ of $M_t=U\Sigma V^\top$, $\lambda$ a decoupled weight decay and $c$
+matching AdamW's update RMS. Ahead of AdamW best against best in pretraining, zero-shot on every held-out axis, and after
+small-$D$ fine-tunes, part of it the better start (par.~\ref{par:v3_muon}); the extension to MSE $10^{-4}$ is step
+muon\_1e4.
+% allow: 5 because it is the Newton-Schulz iteration count, a setting
+
+\paragraph{What a zero-shot error means.} The user: most zero-shot errors are not usable in practice (an MSE near one, values off by a factor of about
+$2.7$), but the point is to reduce them as much as possible, since the zero-shot error is the starting point, the
+vertical shift, from which the fine-tune starts, so that acceptable precision is reached with less data. Measured: a
+fine-tune that keeps the parent's standardization ends below the zero-shot and further below as $D$ grows, while
+refitting it discards the level the zero-shot carries (par.~\ref{par:v3_muon}).
+% allow: 2.7 because it is e, the factor an MSE of one means
+
+% ==========================================================================
 \section{Methodological principles}\label{sec:principles}
 % ==========================================================================
 
