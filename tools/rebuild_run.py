@@ -203,6 +203,13 @@ def rebuild(run_dir, role, path, n_events):
         cfg.data.processes_file = tmp.name
         cfg.data.eval_subsample = None            # the swapped split is read whole (the recipe count caps it)
         cfg.run_dir = tempfile.mkdtemp(prefix="rebuild_", dir=os.environ["SCRATCH"])
+    if OmegaConf.select(OmegaConf.load(os.path.join(run_dir, "config.yaml")), "fine_tune.pretrained_path"):
+        # a fine-tuned run trained on frozen stats (its parent's, kept in its own data_stats.json), not on stats of
+        # its own train split (protocol B adds hard events, which moves mom_div): the experiment reads frozen stats
+        # from <pretrained_path>/../../data_stats.json, so point it at this run's own best model
+        own = os.path.join(run_dir, "models", "model_run0_best.pt")
+        with open_dict(cfg):
+            cfg.fine_tune.pretrained_path = own if os.path.exists(own) else own + ".gz"
     saved = json.load(open(os.path.join(run_dir, "data_stats.json")))
     if cfg.data.get("offshell_per_event", False) and cfg.data.get("offshell_stats", None) is None:
         # the off-shellness column stats are fitted on every role together (experiment.py), so the swapped

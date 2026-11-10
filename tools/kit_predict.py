@@ -97,7 +97,21 @@ def main():
     ap.add_argument("run_dir")
     ap.add_argument("--splits", nargs="+", default=["hard_test", "bulk_test"])
     ap.add_argument("--out", default=None)
+    ap.add_argument("--check-rebuild", type=int, default=0, metavar="N",
+                    help="only rebuild the run on the first N bulk_test events (its stats asserted), then exit: a CPU check")
     a = ap.parse_args()
+    if a.check_rebuild:
+        import tempfile
+        from tools.rebuild_run import rebuild
+        stem, target, _ = kh.parse(run_target(a.run_dir))
+        r = kh.stratum_rows(stem, target, "bulk_test", kh.strata(stem, "bulk_test")[0])[:a.check_rebuild]
+        d = tempfile.mkdtemp(prefix="kitcheck_", dir=os.environ.get("SCRATCH"))
+        pool = os.path.join(d, "pool.npy")
+        np.save(pool, r)
+        np.save(pool[:-len(".npy")] + ".alphas.npy", np.full(len(r), float(kh.metadata(stem)["alpha_s"])))
+        exp, _ = rebuild(a.run_dir, "test", pool, len(r))
+        print(f"REBUILD_OK {a.run_dir} mom_div {exp.mom_div}")
+        return
     out = a.out or os.path.join(a.run_dir, "kit_benchmark")
     stem, path = predict(a.run_dir, a.splits, out)
     r = evaluate(stem, path, out)
