@@ -21400,6 +21400,45 @@ entries:
       (ee->uu V/B rel std 5.0e-13, 1604 distinct values; ee->tt std of log target 0.140 for V/B against 0.622 for V), the
       3.8x-35x June gap in MSE of log|V|, 3 seeds per arm with a non-overlap rule, the outcome for yes and no, prior now cites
       results.tex l.14536-14540, l.9054, par:v4_loop_born(_events).'
+  - at: '2026-11-10T03:33:07+00:00'
+    question: 'At current defaults (template sweep: LLoCa muP, MuonAdamW, HETEROSC, BS 16384, 8000 steps, from scratch), does
+      training on V/B (the stored one-loop virtual over MadLoop''s exact Born, event by event: data.target_over_born) give
+      a lower MSE of log|V| than training on V, on e+e- -> t t~ (V/B varies) and on e+e- -> u u~ (V/B a constant: a check
+      that the std floor lets it be learned exactly)? Also the from-scratch V/B baseline with exact Born for kit_benchmark.
+      Step 0 (CPU, scripts/job_vob_born.sh): the Born sidecars with their pool identity, the stored target reproduced on every
+      row; read: std(log|V/B|)/std(log|V|) on the current pools (ee->tt''s stored target carries the mass-scheme shift, par:v4_loop_born_events).'
+    prior: '(1) results.tex l.14536-14540: massless e+e- -> q q~ at mu=sqrt(s), finite over Born constant to 1e-16 (tools/ew_sudakov_check.py);
+      parse_dat.py: C_F(pi^2-8) on eeuu. (2) June 2026 V/B sweeps (2b81ee1e, analysis/hpo_optima/hpo_optima.json) re-read
+      from their datasets (analysis/virtual_over_born/june_targets.py @d9b38f1c): ee->uu V/B relative std 5.0e-13, standardized
+      loss 0.86 = MSE of log|V| 2.1e-25; ee->tt log-target std 0.140 (V/B) vs 0.622 (V), V/B below V in MSE of log|V| at t=4000
+      in all six arms (scratch 3.8x .. reset-head 35x); the June ''does not scale'' (l.9054) and the 2026-10-15 note compared
+      standardized units. (3) par:v4_loop_born(_events): pool-level Born-relative levels, no V/B training. Differs: current
+      MadLoop pools, current defaults, std floor.'
+    measure: 'Per process and arm: MSE of log|V| on the test pool at the run''s model (analysis.common.trial_mse; for V/B
+      the MSE of log|V/B| equals that of the recombined log|V|, B exact), at seeds 42, 43, 44; the ratio V over V/B beside
+      the two values. Step 0: std of log|V| and log|V/B| per pool, n_rel_above_1e-6 = 0.'
+    check: 'June runs: the same V vs V/B comparison moved MSE of log|V| by 3.8x-35x at t=4000, all six arms one direction;
+      on ee->uu V/B reached the rounding floor. The floor and the sidecar identity check pass tests/test_target_over_born.py
+      (vob @c48cd336).'
+    fixed: Pools ee_ttbar_nlo_362-1000GeV, ee_uu_nlo_25-1000GeV (50000/5000/5000; recipes/vob_*.yaml, checked on CC to resolve
+      to the cached pools with require_cache), template search space and fixed params, 8000 steps, HETEROSC (final model after
+      the sigma fit), single-process features, data seed 42, site ccin2p3 only; the only change between arms is data.target_over_born.
+    control: 'The V arm: same pools, same config, target as stored.'
+    seeds: 'A/B rule of CLAUDE.md: DyHPO sweeps vob_tt_V and vob_uu_V (8 trials, seed 42); each one''s best config re-run
+      at seeds 43, 44; V/B at that same best config at seeds 42, 43, 44 on each process. Only if V/B is not better on ee->tt:
+      the vob_tt_VB sweep (same template), best against best, its best at seeds 43, 44.'
+    outcome: 'Yes: on ee->tt the three V/B seeds lie below the three V seeds in MSE of log|V| -> V/B works for us at current
+      defaults; the June ''failure'' was the standardized-units comparison plus the constant ee->uu target; pretrain_data_saving''s
+      one-loop runs can train V/B with sidecars and report MSE of log|V|. No (overlap or above): the vob_tt_VB sweep runs,
+      best against best; if still no gain, the cause is looked for in what changed since June (HETEROSC, Muon, the shift in
+      the stored target). ee->uu V/B below 1e-10 on all seeds = the floor works; above = a defect. Step 0: ratio below 0.5
+      = narrower as in June (0.22); above 1 = the shift widens it, predicting a No. Layout: step 0 one CPU job on CC (htc),
+      target 0.5 h. Sweeps by sweep/drive.py --sites ccin2p3 in the template''s chained waves 3/3/2 (DyHPO needs its 3 random
+      trials observed before guided ones; the two sweeps run side by side), 0.4 h per trial (8000 steps at 0.127 s/step =
+      17 min, single-process 2->2 sibling FA-ccin2p3-5f933ea3, plus sigma stage and eval): 3 waves = 1.2 h plus queue; then
+      10 seed runs in one wave, 0.4 h: about 2 h to the answer, 26 runs = 10.4 GPU-h (+ 4.4 if the tt V/B sweep is needed).
+      Disk: 11 MB per run dir (sibling trial_0002), 26 runs = 0.3 GB, sidecars 0.5 MB, against 44 GB free on /sps/lpnhe (df
+      today).'
   findings:
   - at: '2026-11-10T02:33:03+00:00'
     text: 'Cause of the June V/B ''failure'' (june_targets.py @d9b38f1c): it was read in standardized units. ee->uu: V/B =
