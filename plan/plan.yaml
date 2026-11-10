@@ -21418,7 +21418,7 @@ entries:
   asks: []
   owner:
     agent: ad1f728c67fc934fd
-    state: stopped
+    state: closed
     since: '2026-11-10T02:18:36+00:00'
     state_at: '2026-11-10T03:43:46+00:00'
     context: 263970
@@ -21610,6 +21610,33 @@ entries:
     at: '2026-11-10T03:40:33+00:00'
   step_waits:
     '1': FA-ccin2p3-d0c0e4cd; the detached sweep driver vob_V_sweeps (vob_tt_V, vob_uu_V)
+  handoff:
+    state: 'Cause settled and written up (results.tex par:vob_june @c16ed102; analysis/virtual_over_born/june_targets.py @d9b38f1c):
+      the June V/B ''failure'' was read in standardized units. ee->uu V/B is the constant C_F(pi^2-8) (rel std 5e-13), standardized
+      into noise; ee->tt V/B beat V in MSE of log|V| in all six June arms (3.8x scratch .. 35x reset-head). Now the matched
+      test at current defaults (design passed 2026-11-10): Born sidecar CPU job FA-ccin2p3-d0c0e4cd (scripts/job_vob_born.sh
+      @c84956b0, target 0.8 h) and DyHPO sweeps vob_tt_V, vob_uu_V (sweep/sweep_config_vob_{tt,uu}_V.yaml, drive.py --sites
+      ccin2p3 --wave-sizes 3,3,2, detached job vob_V_sweeps, log ~/.local/share/ccorch/detached/20261110-043925_vob_V_sweeps.log,
+      target 1.2 h). Next when they end: check sidecars written (BORN_OF_POOL lines, n_rel_above_1e-6=0, .born.npy.json present)
+      and read std(log|V/B|)/std(log|V|) (design thresholds 0.5 / 1); each sweep''s best config re-run at seeds 43, 44; V/B
+      (data.target_over_born=true) at that same best config, seeds 42-44, on both processes, ccin2p3 only; read MSE of log|V|
+      (analysis.common.trial_mse) per seed; only if V/B not better on ee->tt run sweep_config_vob_tt_VB.yaml (best against
+      best). Then write up in results.tex after par:vob_june and plan done. pretrain_data_saving (one-loop runs, D357) and
+      kit_benchmark (V/B baseline with exact Born) wait on this current-defaults verdict: report it to the main session as
+      soon as the seed runs end. Pending ack: the first Born job FA-ccin2p3-4328fd3b failed (no P0_* in the MadLoop standalones,
+      which are no longer kept on CC, D208); fixed in c84956b0 (job builds and certifies them via datagen.ensure_virt_backend
+      first) and resubmitted as FA-ccin2p3-d0c0e4cd; ack its RUN event with that note when it appears.'
+    decisions: 'D366 (the user''s question; lifts the 2026-10-15 no-ratio note). CLAUDE.md A/B rule: V/B at V''s best HPs
+      first, its own sweep only as the second branch (repo-reviewer). Sweeps on ccin2p3 only because the sidecars exist only
+      there. Std floor 1e-6 only acts on a constant target. HETEROSC default kept.'
+    ruled_out: 'Re-measuring ee->uu V/B constancy (settled: results.tex l.14536-14540 and the June data). Comparing V and
+      V/B in standardized loss units (the June mistake). memmap path for target_over_born (asserted off).'
+    running: FA-ccin2p3-d0c0e4cd (Born sidecars, CPU htc); sweeps vob_tt_V and vob_uu_V via detached driver vob_V_sweeps (trials
+      FA-ccin2p3-1e364b61, -0d9a3ce8, -51c0b933, -21166e76, -eeaee186, -d9a3299e running, 10 more to come)
+    files: experiment.py (_born_of_pool, target_over_born), preprocessing.py (AMP_STD_FLOOR), tools/nlo_virtual_pipeline.py
+      (born_of_pool identity record), scripts/job_vob_born.sh, recipes/vob_ee_{uu,ttbar}_nlo.yaml, sweep/sweep_config_vob_{tt_V,tt_VB,uu_V}.yaml,
+      tests/test_target_over_born.py, analysis/virtual_over_born/june_targets.py, docs/results.tex par:vob_june
+    written: '2026-11-10T03:45:01+00:00'
 - id: draft_rewrite
   title: rewrite of the paper draft around the new story
   question: 'Rewrite the draft (the 2026-11-10 zip) into the story of D365/D354: pretraining works (data saved at 1e-4), the
