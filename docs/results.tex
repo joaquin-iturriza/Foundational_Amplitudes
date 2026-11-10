@@ -13907,40 +13907,20 @@ pretraining (rungs $7$--$9$: $3.7$--$4.2\times$ against $2.5\times$); the probes
 cases, below. $u\bar u\to Zggg$ is $1.7$--$3.1\times$ lower from rung $8$ ($+2\to4$) than from rung $7$ at every $D$.
 \begin{figure}[H]
 \centering
+\widerow{\includegraphics{../analysis/transfer/figs/rung_grid_ee_legend.pdf}} \\[0.5ex]
 \widerow{\pnl{../analysis/transfer/figs/rung_grid_ee_a.pdf}\hfill\pnl{../analysis/transfer/figs/rung_grid_ee_b.pdf}} \\[1ex]
 \widerow{\pnl{../analysis/transfer/figs/rung_grid_ee_c.pdf}\hfill\pnl{../analysis/transfer/figs/rung_grid_ee_d.pdf}} \\[1ex]
 \widerow{\pnl{../analysis/transfer/figs/rung_grid_ee_e.pdf}\hfill\pnl{../analysis/transfer/figs/rung_grid_ee_f.pdf}} \\[1ex]
 \widerow{\pnl{../analysis/transfer/figs/rung_grid_qcd_a.pdf}\hfill\pnl{../analysis/transfer/figs/rung_grid_qcd_b.pdf}} \\[1ex]
 \widerow{\pnl{../analysis/transfer/figs/rung_grid_qcd_c.pdf}\hfill\pnl{../analysis/transfer/figs/rung_grid_qcd_d.pdf}} \\[1ex]
 \widerow{\pnl{../analysis/transfer/figs/rung_grid_qcd_e.pdf}\hfill\pnl{../analysis/transfer/figs/rung_grid_qcd_f.pdf}}
-\caption{The fine-tune grid (2026-10-04): each probe's MSE of $\log|\mathcal M|^2$ against $D$, from scratch,
-fine-tuned from $ee\to u\bar u$ ($32$k and $64$k parents) and from every ladder rung in the grid's setup (solid), and the
-earlier setup (dashed: Table~\ref{tab:ladder_transfer_all}'s $ee\to u\bar u$ cells and the preliminary rung $4$ and $9$
-fine-tunes). A cell is its search's best of five trials. The from-scratch curve is drawn in black on top of every rung.}
+\caption{The fine-tune grid, the $8$k grid (\code{TP\_USE\_32K=0}): each probe's MSE of $\log|\mathcal M|^2$ against $D$,
+from scratch (black, drawn on top of every rung) and fine-tuned from $ee\to u\bar u$ (rung $0$, its $64$k parent) and from
+every ladder rung. A cell is its search's best (scratch: eight trials, fine-tune: five).}
 \label{fig:rung_grid}
+% allow: 8 because it names the 8k-step grid
+% allow: 0 because it is a rung index
 \end{figure}
-
-\paragraph{The point of Fig.~\ref{fig:rung_grid}: any pretraining helps.} With scratch drawn on top, the figure shows
-that any pretraining, even one completely unrelated to the target process, in general helps: the fine-tuned curves sit
-below scratch on nearly every probe and $D$, whatever the pretraining contains. Of the $840$ (probe, $D$, pretraining)
-cells of the $8$k grid, $698$ fine-tune below scratch; averaged over $D$, $106$ of the $120$ probe--pretraining pairs
-gain. $ee\to u\bar u$ alone, which shares no structure with most probes, gains $1.7\times$ (geometric mean over its
-cells), rungs $1$--$6$ $2.1$--$2.4\times$ and rungs $7$--$9$ $3.2$--$3.4\times$ (\code{gain\_heatmap.py}).
-% src: python3 analysis/transfer/gain_heatmap.py @e9a7b4e5
-% claim: cells.n=840
-% claim: cells.below_scratch=698
-% claim: pairs.n=120
-% claim: pairs.gain=106
-% claim: gm_gain.rung0=1.7
-% claim: gm_gain.rung3=2.1
-% claim: gm_gain.rung6=2.4
-% claim: gm_gain.rung8=3.2
-% claim: gm_gain.rung9=3.4
-% allow: 1 because it is a rung index
-% allow: 6 because it is a rung index
-% allow: 7 because it is a rung index
-% allow: 8 because it is a rung index
-% allow: 9 because it is a rung index
 
 \paragraph{Each probe against the structure it needs.} Fig.~\ref{fig:rung_focus} (\code{rung\_focus.py}) draws, per
 probe, scratch, the first rung that adds the probe's structure, the rung below it (the same pretraining without it; $ee\to
@@ -13995,7 +13975,10 @@ cells replace those at $D=10^{3.5}$, $10^4$ once every pretraining has them, the
 \label{fig:rung_focus}
 \end{figure}
 
-\paragraph{The grid in one picture (2026-10-05, the paper's summary).} Fig.~\ref{fig:gain_heatmap}
+\paragraph{The grid in one picture (2026-10-05, the paper's summary).} The point of this figure and of
+Fig.~\ref{fig:rung_grid}, scratch drawn on top (the user's call, 2026-11-10): any pretraining, even one completely
+unrelated to the target process, in general helps; the column of $ee\to u\bar u$ alone, which shares no structure with
+most probes, gains on every probe but $ee\to Z\gamma$. Fig.~\ref{fig:gain_heatmap}
 (\code{gain\_heatmap.py}, the $8$k grid) gives each probe--pretraining pair the mean over $D$ of
 $\log_{10}(L_{\rm scratch}/L_{\rm fine\text{-}tune})$, each half-decade of $D$ weighted the same (the rule that ranks the
 leader in Fig.~\ref{fig:rung_focus}). Of the $840$ cells
