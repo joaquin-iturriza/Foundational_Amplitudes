@@ -20850,10 +20850,6 @@ entries:
   decisions:
   - D360
   next:
-    1: 'Tree arm, stage 1 (horizon calibration, D356): prebuild the 1e5-event train splits of the three held-out tree targets
-      (ee->ttbar H3, ee->ccbar g = ee->uubar g H1, ee->bbbar gg H2), then one fixed-HP scratch run per (target, D=10^(k/2),
-      k=2..10) on the parent''s model setup, 8000 steps at k<=8, 12000 at k=9,10 (27 runs, ~27 GPU-h); read per D the best
-      step and the step where MSE(ln|M|^2) first reaches 1e-4 -> the per-target horizon T(D)'
     2: 'One-loop arm, stage 1 (horizon calibration): the same for three held-out one-loop targets whose Born is in the pretraining
       (ee->bbbar H5, bbbar->ZZ H5, uubar->e+e-Z H5), D=10^(k/2), k=2..9 (5e4 pools), trained on V/B (data.target_over_born,
       merge 5c35e4f5) and read as MSE of log|V|, gated on virtual_over_born''s current-defaults confirmation (sweeps vob_tt_V
@@ -20913,13 +20909,6 @@ entries:
     context: 218695
     context_at: '2026-11-10T06:54:25+00:00'
   step_why:
-    1:
-      feeds: the per-D horizons of the tree sweeps (D356) and whether scratch reaches 1e-4 inside the 1e5 pools
-      if:
-      - 'scratch reaches 1e-4 at some D <= 1e5: T(D) = min(1.1 x the 1e-4 step, 1.1 x best step when the best sits before
-        0.8 of the run, the cap); sweeps designed at those T(D)'
-      - 'scratch never reaches 1e-4 on a target: its saving is a lower bound; the target stays, or a larger pool is generated
-        (asked with its cost)'
     2:
       feeds: the one-loop target and horizons of the one-loop sweeps (D357)
       if:
@@ -21262,11 +21251,6 @@ entries:
       5x search-to-search spread (bands 3.2x and ~15x); do you want a second search at the cells bracketing each crossing
       (cost X GPU-h), or run as is and accept NOT RESOLVED as the likely answer?'' Do not add seeds without his words.'
   step_waits:
-    '1': FA-ccin2p3-53bb43b9 FA-ccin2p3-fbec992c FA-ccin2p3-9da809e2 FA-ccin2p3-ad1b108d FA-ccin2p3-883309f7 FA-ccin2p3-72685d7d
-      FA-ccin2p3-50cc73c3 FA-ccin2p3-43d4b67a FA-ccin2p3-5c6b6dcb FA-ccin2p3-01d9738a FA-ccin2p3-df5578c6 FA-ccin2p3-85c8280d
-      FA-ccin2p3-1aab0bc9 FA-ccin2p3-c0eaea8a FA-ccin2p3-3535f5a7 FA-ccin2p3-7e72b5af FA-ccin2p3-d1574796 FA-ccin2p3-530f424f
-      FA-ccin2p3-b477d1f4 FA-ccin2p3-06090327 FA-ccin2p3-5907f86e FA-ccin2p3-fe3037a7 FA-ccin2p3-3bea3c86 FA-ccin2p3-2c4092c0
-      FA-ccin2p3-ebb936cf FA-ccin2p3-072c4aa8 FA-ccin2p3-5a1aac32
     '3': '2026-11-12'
     '4': '2026-11-12'
     '2': virtual_over_born
