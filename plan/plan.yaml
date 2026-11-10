@@ -20427,7 +20427,7 @@ entries:
       covers this entry)
   owner:
     agent: ab750e1a2b2271249
-    state: working
+    state: closed
     since: '2026-11-10T00:21:35+00:00'
     state_at: '2026-11-10T00:21:35+00:00'
   findings:
@@ -20517,37 +20517,32 @@ entries:
     '2': 'step 1 (order set by the main session: step 1 first)'
     '1': 'next owner: resume the src/claim pass from the hand-off'
   handoff:
-    state: 'Step 1 provenance about half done on branch sigma-gen (worktrees/wt-sigma-gen, pushed, tip bd18525b; verify_claims
-      0 problems). Done since 4fbe67ef: ee->uu online figure redrawn with short corner legends + headroom (l2_eeuu_online.py
-      @3a7d3081), caption defines every symbol, paragraph placing it against the section''s earlier sigma results (b8f31319/877adb20);
-      src/claim lines via analysis/divergences/sampling_numbers.py @d4e775ae (deep/antenna sampling + 2 captions, float32
-      floor, foundation grid, coverage, Q2 + 2 captions, eval leak; Q2 log-flat gains from q2_logflat_gains.json computed
-      on JZ from q2rw_eval_*.npz) and the October ttbar paragraphs via analysis/transfer/het_ab.py @af216a04 (+ --sweep),
-      het_sweep.py @1a42f4e6, het_long.py @f7130695, het_sigonly.py @665117a2 (one-run correction, D57, D61, recalibration).
-      Marked as from JZ job logs / CC run results: sigma-speed paragraph, withdrawn two-stage paragraph, single-run val MSEs,
-      per-trial test errors, clip grad norms, D68/D69 sweep values, stage timings, training-split diagnosis. REMAINING step
-      1: (a) the D47-D94 cell paragraphs (het_delta_summary.py, het_delta_pulls.py, het23_summary.py, het_shared_summary.py,
-      het_mumse*_summary.py, het_finale_s1.py, het_stage2.py: make each print a final JSON line, data in analysis/transfer/*_data,
-      symlinked into the worktree from the main checkout, never committed); (b) the ee->uugg-and-later paragraphs (Steering
-      uugg .. sigma-tail floor): their eval files heldout_eval_*.npz, l2_*.npz, sweeps/l2_poly_uugg exist only on the Jean
-      Zay MAIN checkout analysis/divergences/ (listed 2026-11-10): compute summaries there read-only with site run --quote
-      jeanzay FA -- python3 -c (print one line per key; one long line gets lost), commit as JSON beside a reader, as done
-      for q2_logflat_gains.json; (c) the pre-flight paragraph says ''On u ubar g, sigma climbs 4.5x ... into the Z pole''
-      with contrast 4.48 for ''u ubar g (Z peak)'': check against plot_sigma_vs_divergence.py and the eval files whether the
-      process is ee->uu or uug, fix the label; (d) the section''s opening italic block (3-seed, 8x: from the saturation paragraph''s
-      reader). Then repo-reviewer on the sigma-gen readers (eeuu_resonance_numbers, l2_eeuu_online, sampling_numbers, the
-      four transfer readers'' JSON output) and the plot_style.save_panels fix, merge sigma-gen into trunk, then step 2 (port,
-      D338).'
-    decisions: 'Numbers that do not reproduce are corrected in place with the old value quoted (% allow lines for the superseded
-      value). Numbers resting on CC run results, JZ job logs or data no committed reader can read are marked in the visible
-      text, source named. Helper agents for the claims split were refused by brief_guard (an owner is never split): the owner
-      does the work itself. Online-figure legends: short symbols in a corner, all explanation in the caption (Joaquin 2026-11-10,
-      rejecting word legends).'
-    ruled_out: throwaway one-liners as sources; word legends on figures; calling an artifact deleted without a whole search
-      (the Q2 npz were found on the JZ main checkout after the worktree listing missed them)
-    running: none
-    files: 'worktrees/wt-sigma-gen: docs/results.tex sec:div-sampling; analysis/divergences/{sampling_numbers.py,q2_logflat_gains.json,l2_eeuu_online.py,eeuu_resonance_numbers.py};
-      analysis/transfer/{het_ab,het_sweep,het_long,het_sigonly}.py; scratch matcher (numbers in a line range vs a reader''s
-      JSON keys): /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/match.py (copy it:
-      python3 match.py <first> <last> -- <cmd or json>, run from the worktree root)'
-    written: '2026-11-10T00:19:29+00:00'
+    state: 'Step 1 provenance DONE on branch sigma-gen (worktrees/wt-sigma-gen, pushed, tip after 1d203e8d + caption fix):
+      every numbered paragraph of sec:div-sampling has src/claim lines or a visible source mark; verify_claims 0 problems;
+      notes-editor PASSED (advanced to 692a1ee2; its non-blocking poly-wording note applied). repo-reviewer launched on the
+      sigma-gen code backlog (agent a437be4394e3e0f7d, lock held, running at hand-off): on PASS merge sigma-gen into trunk;
+      on FIX continue that same reviewer with the fix commits. Step 2 (D338) STARTED in worktrees/wt-july-port (branch july-port
+      from trunk, NOT committed): all 77 absent branch scripts copied from origin/l2-gen and mechanically ported (scratchpad
+      port.py: #SBATCH account/partition/qos dropped, module/conda lines replaced by the ccorch header + sites/activate.sh,
+      Jean Zay paths -> $PROJECT_DIR / siteconf.PROJECT_DIR / ${PROJECT_DIR}), 5 sweep configs renamed sweep_config_heterosc_*.yaml
+      / sweep_config_mse_scratch.yaml with paths blocks emptied (their comments still say project_dir must be the heterosc
+      worktree: rewrite), adaptive_ir.py placed at analysis/divergences/adaptive_ir.py; bash -n and py_compile pass. The commit
+      was REFUSED by dupcheck (e.g. rank_mu_mse.mu_mse_for_run ~ diag_ckpt_mu.eval_ckpt 0.88; slice_mu_head._load = extract_preds.load_finetuned_state
+      1.00): next owner resolves each (import the existing function, or ''# dup-ok: <reason>'' for a historical launcher),
+      then commits. Still to do in step 2: training.is_weight_path from l2-gen 5fe8545d and base_plots.plot_mse png+pdf onto
+      trunk core (CPU test), the 3 DIFF analysis scripts (grow_sigma_head, plot_genmix_sweep, plot_q2_rankmag: keep trunk''s
+      later form, check nothing lost), update results.tex mentions of branch adaptive-ir and worktree wt-heterosc (header
+      block, allocation paragraph) to the trunk paths, repo-reviewer, merge, then delete origin/heterosc, origin/l2-gen, origin/adaptive-ir.'
+    decisions: Numbers not reproduced are corrected in place quoting the old value; numbers without a committed reader are
+      marked in the text with their source. Jean Zay-only eval files are read through steering_numbers.py --fetch (site_python,
+      read-only) into a committed summary JSON. b bbar g seeds 1 and 2 (found on JZ) added to the text, replacing the single-seed
+      caveat. het_stage2.py reads trial HPs from driver_state.json (no surrogate pickle) so it runs in .venv-cpu. train_pool_sigma_antenna.npz
+      (12.8 MB, gitignored data, tracked only on l2-gen) copied untracked into the main checkout analysis/divergences/. Sweep
+      configs renamed without jeanzay_.
+    ruled_out: throwaway one-liners as sources; committing regenerated JSONs that differ only by float noise (het_mumse22_summary.json
+      reverted)
+    running: repo-reviewer a437be4394e3e0f7d on sigma-gen (no jobs)
+    files: 'worktrees/wt-sigma-gen: docs/results.tex sec:div-sampling, analysis/divergences/steering_numbers.py + steering_eval_summary.json,
+      analysis/transfer/het_{delta_summary,23_summary,shared_summary,mumse_summary,mumse22_summary,finale_s1,stage2}.py; worktrees/wt-july-port
+      (uncommitted port); scratchpad port.py and port_inventory.txt in /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/'
+    written: '2026-11-10T00:43:00+00:00'
