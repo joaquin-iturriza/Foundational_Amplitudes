@@ -21315,7 +21315,19 @@ entries:
     - tools/kit_precision_check.py
     - tools/kit_predict.py
   dead_ends: []
-  asks: []
+  asks:
+  - ask: 'GPU budget: ~47 GPU-h above 30 with no decision covering it (D353 approves new KIT runs but names no cost). This
+      is the KIT protocol A (from scratch) and protocol B batch. A is 20 runs: ee->tt Born and ee->tt virtual each with off-shellness
+      on and off, ee->uug and ee->uugg, at 9e5 bulk events, plus the four off-shellness-off cells at 1e5 (the reference MLP''s
+      size), all at seeds 42 and 43, 8000 steps, float64. B adds 12 three-thousand-step continuations: B with hard_train added,
+      and its bulk-only control. The estimate assumes float64 at 0.8 s/step; the first jobs measure the real rate. Do I submit
+      it at that cost?'
+    at: '2026-11-10T03:58:11+00:00'
+    searched: 'site decisions --project FA (D353, D363 name no cost; the D153/D242/D244 budget rule); CLAUDE.md GPU budget;
+      Joaquin''s messages: 2026-11-10T02:08, the KIT request, says ''if we need to run new things, that''s fine too'' with
+      no cost or size; 2026-10-06T00:17 approves the transfer study''s compute only; 2026-11-03T09:01 is about slides'
+    blocks_steps: &id002
+    - 1
   owner:
     agent: a06276d2ba4ba402b
     state: working
@@ -21575,6 +21587,17 @@ entries:
       held out, family, leave-out, base22, pretraining, twin in docs/results.tex, plan (pretrain_data_saving) and site decisions
       (D25, D315, D353, D360, D363); the old base22 leave-out foundation (sec:divergences-holdout) held out the five gluon
       processes on the old setup and is not reusable.'
+  ask: 'GPU budget: ~47 GPU-h above 30 with no decision covering it (D353 approves new KIT runs but names no cost). This is
+    the KIT protocol A (from scratch) and protocol B batch. A is 20 runs: ee->tt Born and ee->tt virtual each with off-shellness
+    on and off, ee->uug and ee->uugg, at 9e5 bulk events, plus the four off-shellness-off cells at 1e5 (the reference MLP''s
+    size), all at seeds 42 and 43, 8000 steps, float64. B adds 12 three-thousand-step continuations: B with hard_train added,
+    and its bulk-only control. The estimate assumes float64 at 0.8 s/step; the first jobs measure the real rate. Do I submit
+    it at that cost?'
+  waiting_since: '2026-11-10T03:58:11+00:00'
+  searched: 'site decisions --project FA (D353, D363 name no cost; the D153/D242/D244 budget rule); CLAUDE.md GPU budget;
+    Joaquin''s messages: 2026-11-10T02:08, the KIT request, says ''if we need to run new things, that''s fine too'' with no
+    cost or size; 2026-10-06T00:17 approves the transfer study''s compute only; 2026-11-03T09:01 is about slides'
+  blocks_steps: *id002
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
@@ -21917,7 +21940,7 @@ entries:
       about cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID,
       says nothing about the draft's sections)
     blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-    blocks_steps: &id002 []
+    blocks_steps: &id003 []
   owner:
     agent: afb073b8fc9460ec5
     state: stopped
@@ -21935,7 +21958,7 @@ entries:
     cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID, says
     nothing about the draft's sections)
   blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-  blocks_steps: *id002
+  blocks_steps: *id003
   step_why:
     1:
       feeds: the draft's results (D354)
