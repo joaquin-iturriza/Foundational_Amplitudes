@@ -21560,6 +21560,21 @@ entries:
       otherwise the recipe or run is broken and is traced before any fine-tune. Cost: 2 x 68224 x 0.474 s = 18 GPU-h (V100
       catalog step of results.tex par:dancat, an estimate; H100 faster), under 30. Disk: two run dirs of ~2 GB (checkpoints,
       metrics) on 44 GB free; the pools are the catalog''s, cached already.'
+    passed_at: '2026-11-10T03:55:54+00:00'
+    reviewer: 'Re-review of the 03:54 revision: prior now names sec:divergences-holdout (uug held out 0.709, deepest 11.1,
+      5% add-back 0.030, uugg 0.22->0.024; checked at results.tex 9832-10020; it writes the old cut as y_min<0.01, the text
+      has c=3.9e-2, a wording slip only). Check 2: on these files the slides'' MLP moves the soft exponent -0.02->-2.12 and
+      the soft bin 89->0.32 (slides 5-9), and the hold-out add-back moved uug 24x; B now validates on bulk plus the last 10%
+      of each hard_train stratum (tools/kit_hardps.py _hard_part, ef8a0dc7), so its checkpoint sees the hard fit, and B_bulk
+      (job_kit.sh de51ed68) is the same 3000-step restart from the same A weights with no hard points, so B against B_bulk
+      varies only access to hard_train (training and selection; read it that way). Check 3: no spread existed, the design
+      measures it with seeds 42 and 43 on all 10 A cells and reads every difference against twice the larger spread; B and
+      B_bulk both at seed 42, matched; the seed=43 argument wins over the script''s seed=42 (Hydra last-override, tested in
+      .venv-cpu). Loss HETEROSC and the emission-scales plus orders target from the parent config (lines 5833-5838, 5907);
+      lr identical at both n (D clipped to 7e4, 1.19e-2 at 8000 steps); disk ~25 GB against 44 GB free on CC (df today), within
+      it even unshared (32 x ~0.9 GB); cost ~47 GPU-h, over 30, held for Joaquin''s confirmation as the design states. Searched:
+      KIT, hard phase, hard_train, extrapolat, holdout, add-back, Coulomb, off-shell, float64 in docs/results.tex, plan.yaml,
+      site decisions (D25, D353, D363).'
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
