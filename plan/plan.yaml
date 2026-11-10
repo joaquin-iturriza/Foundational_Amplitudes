@@ -20991,7 +20991,7 @@ entries:
     since: '2026-11-10T02:18:36+00:00'
     state_at: '2026-11-10T02:18:36+00:00'
     context: 83148
-    context_at: '2026-11-10T02:21:12+00:00'
+    context_at: '2026-11-10T02:21:16+00:00'
 - id: draft_rewrite
   title: rewrite of the paper draft around the new story
   question: 'Rewrite the draft (the 2026-11-10 zip) into the story of D365/D354: pretraining works (data saved at 1e-4), the
