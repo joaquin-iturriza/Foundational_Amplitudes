@@ -21819,6 +21819,7 @@ entries:
       FA-ccin2p3-de0489b9 FA-ccin2p3-7ea922a6 FA-ccin2p3-788401d3 FA-ccin2p3-c79ef941 FA-ccin2p3-fcf9541f FA-ccin2p3-677b9e9a
     '5': FA-ccin2p3-77e3e6c2 FA-ccin2p3-2e56eeca FA-ccin2p3-fb15e13b FA-ccin2p3-11c56b6e FA-ccin2p3-45c023b0 FA-ccin2p3-e9937c15
       FA-ccin2p3-de0489b9 FA-ccin2p3-7ea922a6 FA-ccin2p3-788401d3 FA-ccin2p3-c79ef941 FA-ccin2p3-fcf9541f FA-ccin2p3-677b9e9a
+    '7': FA-ccin2p3-c35a2199 FA-ccin2p3-ac436bba
   handoff:
     state: 'Protocol A from scratch done (10 runs, scores recorded as findings): tt Coulomb 1/beta not extrapolated (exponent
       ~0, deep bin 7-8.7 vs Bakar MLP 7.8); uug/uugg soft runs away with wrong sign (uug 1e5 soft +20.2, deep bin 14180 vs
