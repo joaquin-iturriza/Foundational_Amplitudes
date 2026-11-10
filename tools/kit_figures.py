@@ -136,7 +136,7 @@ PROC = {("ee_tt", "virt_finite"): r"$t\bar t$ virtual", ("ee_tt", "born"): r"$t\
         ("ee_uug", "me2"): r"$u\bar u g$", ("ee_uugg", "me2"): r"$u\bar u gg$"}
 XLAB = {"threshold_beta": r"top velocity $\beta$", "sudakov_sqrts": r"$\sqrt{s}$ [GeV]",
         "soft_x": r"soft gluon $x=2E_g/\sqrt{s}$", "coll_y": r"collinear $y=s_{qg}/s$",
-        "coll_qg_y": r"collinear $y=s_{qg}/s$", "coll_gg_y": r"collinear $y=s_{gg}/s$",
+        "coll_qg_y": r"quark-gluon collinear $y=s_{qg}/s$", "coll_gg_y": r"gluon-gluon collinear $y=s_{gg}/s$",
         "azimuth_gg_y": r"$g\to gg$ collinear $y=s_{gg}/s$"}
 
 
