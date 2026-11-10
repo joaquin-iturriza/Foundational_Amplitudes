@@ -15766,6 +15766,10 @@ entries:
       notifications after a hand-back were already absorbed; owner resumes by peer hand-backs cannot be held (Claude Code
       offers no delivery delay, an owner has no waiter). Also confirm the first run of a held item that ends gets its RUN
       event and RUN_DONE with no manual poll (next 19 fix).'
+    22: 'After the claudemd-keeper passes its backlog: CLAUDE.md ''Send a figure once per version, with what its axes and
+      points are'' gets '', in a caption that stands alone: the process, the setting (base, seeds, compute) and every symbol
+      of the legend defined; the legend itself stays short symbols, never sentences'' (Joaquin 2026-11-10, diff already shown
+      him); mechanical-worker commits it.'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16098,6 +16102,11 @@ entries:
       if:
       - 'saving within or above 11-30% on main per day: keep 10 min'
       - 'below: report to Joaquin with numbers and causes'
+    22:
+      feeds: whether figure captions stop omitting process, setting and symbol definitions
+      if:
+      - 'committed: claudemd-keeper reviews it in its next backlog'
+      - 'gate refuses: run the claudemd-keeper first'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
