@@ -15751,12 +15751,6 @@ entries:
     17: 'Live check of the idle wake (site idle_pass, fix of 2026-11-06 site.bak-20261106-idlelive): at the first real moment
       plan next lists RESUME/LAUNCH with nothing running, confirm a STALLED idle: event is opened by the running supervisor
       within 45 min; report to Joaquin either way.'
-    20: 'Branch cleanup (Joaquin 11-09: too many branches; 45 local, 97 remote, 24 worktrees). Causes: auto_push.sh pushes
-      every worktree branch to origin; scripts/remove_worktree.sh deletes only the local branch; Agent-isolation worktrees
-      in .claude/worktrees never go through remove_worktree.sh; model-trial zz_trial_* branches pushed and kept. Do: remove_worktree.sh
-      also deletes the remote branch; remove merged worktrees through it; delete branches merged into trunk locally and on
-      origin (not trunk, main, ccin2p3, jeanzay); list unmerged ones with commits not in trunk for Joaquin. Needs his yes
-      (classifier refused the deletion as Git Destructive).'
     21: 'After-period of the 10-minute batch (D324), on or after 2026-11-17: python3 tools/wake_batching.py --since <the time
       the main session''s waiter and supervisor were restarted on the new site code> --until +7 days --out analysis/agent_redesign/wake_batching_after.json
       --fig analysis/agent_redesign/figs/wake_batching_after; compare per day with the baseline (analysis/agent_redesign/wake_batching_baseline.json
@@ -16095,11 +16089,6 @@ entries:
       if:
       - 'fired: report and drop'
       - 'did not fire: trace and fix, replay again'
-    20:
-      feeds: whether the repository is cut back to trunk plus the unmerged branches Joaquin keeps
-      if:
-      - 'Joaquin says yes: run it and report counts before/after and the unmerged list'
-      - 'he says no: leave branches, only fix the scripts'
     21:
       feeds: whether 10-minute batching cuts token usage as the replay predicts
       if:
@@ -16112,8 +16101,6 @@ entries:
     '17': 'the first real idle moment: plan next listing RESUME/LAUNCH with no FA job live; the supervisor''s own STALLED
       idle: event (or its absence after 45 min) is the trigger'
     '21': the date 2026-11-17 (a week after the 2026-11-09 23:54 restart on the batching code)
-    '20': 'Joaquin: run python3 tools/switch_settings.py --switch L --apply (D337; repo-reviewer PASS on 700fe4fa; the permission
-      classifier refused it to the agent as self-modification) and install the plan_files_guard fix (D336, scratchpad pfg.py)'
   owner:
     agent: a5f2aff63bd28c5a8
     state: working
