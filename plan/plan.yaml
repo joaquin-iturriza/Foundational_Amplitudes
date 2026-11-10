@@ -21065,6 +21065,15 @@ entries:
       failure from the inherited warm_start_idx 0; main stages complete (8000 steps each), not resubmitted. Measured step
       rates (V100, w8, scratch): ~0.075-0.087 s/step for B<=158 (k<=7), 0.146 s (ee->tt) and 0.172 s (ee->ccbar g) at B=5000
       (k=8).'
+  - at: '2026-11-10T05:13:34+00:00'
+    text: '2026-11-10 06:2x: the first 18 calibration runs (tag cal) kept no curve of the validation mu MSE: the parent config''s
+      training.result_path is null, so no result.json (val_mse_curve, best_step) was written, and the log carries only the
+      het NLL per validation; s_b and s_4 were unreadable. Fixed: job_data_saving.sh passes training.result_path=$OUT/result.json
+      (c88e9b5c). All 27 calibration runs resubmitted on CC at c88e9b5c with tag=cal2 (18 ttbar/ccbar g, 9 bbbar gg; the 9
+      bbbar gg first sent at 0d14a678 were cancelled within minutes). Readout tool analysis/data_saving/horizons.py (committed).
+      Limits from measured main-stage rates: ttbar k=9,10 0.37-0.39 s/step, ccbar g k=9,10 0.46-0.47 s/step (12000 steps 1.25-1.58
+      h); bbbar gg k=9,10 assumed ~0.6 s/step (n=6). Work ~16 GPU-h. The four running cal k=9,10 runs (68cf389d 1dffc6c7 b2237a3a
+      9a675320) are superseded, left to end.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
