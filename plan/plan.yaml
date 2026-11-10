@@ -21786,8 +21786,7 @@ entries:
   step_waits:
     '1': 2026-11-10T08:00 (60 min after the pretrainings' resubmission; uugg A 9e5 scores read first)
     '2': FA-ccin2p3-62c2443b FA-ccin2p3-d0b132b6
-    '3': 2026-11-10T07:00 (the fair_nlo parent is resubmitted then; the D-scan designs when it and virtual_over_born's V/B
-      baseline exist)
+    '3': FA-ccin2p3-d0b132b6
     '4': 2026-11-10T08:00 (the tt virtual model it uses is chosen from protocol B's runs, submitted then)
     '5': 2026-11-10T08:00 (packages the best A/B checkpoints; B submitted then)
     '6': FA-ccin2p3-2642b17b
