@@ -33,7 +33,8 @@ DS="$1"; N="$2"; T="$3"; MODE="$4"; shift 4
 [[ "$N" =~ ^[0-9]+$ ]] && [[ "$T" =~ ^[0-9]+$ ]] || { echo "n_train and steps are integers"; exit 2; }
 case "$MODE" in A|A_ft|B|B_bulk) ;; *) echo "mode A, A_ft, B or B_bulk"; exit 2 ;; esac
 PARENT="${KIT_PARENT:-runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262}"
-NVAL=100000; NTEST=200000
+# KIT_NVAL / KIT_NTEST / KIT_NO_SCORE=1 only for a CPU dry run of the setup on a login node
+NVAL="${KIT_NVAL:-100000}"; NTEST="${KIT_NTEST:-200000}"
 TAG=; ARGS=(); for x in "$@"; do case "$x" in tag=*) TAG="_${x#tag=}";; seed=*) TAG="${TAG}_seed${x#seed=}"; ARGS+=("$x");; *) ARGS+=("$x");; esac; done
 STEM="${DS#kit_}"; FILE="${STEM%%__*}"; TGT="${STEM#*__}"
 OUT="$PROJECT_DIR/runs/kit/kit_${MODE}_${FILE}_${TGT}_n${N}_t${T}${TAG}"
@@ -75,7 +76,7 @@ python run.py --config-path "$BASE" --config-name config run_dir="$OUT" run_name
     data.memmap=false training.dtype=float64 training.iterations="$T" training.heterosc_select=mu_mse \
     evaluation.train_subsample=2000 seed=42 warm_start_idx=null "${FT[@]}" "${ARGS[@]}"
 RC=$?
-if [ $RC -eq 0 ]; then
+if [ $RC -eq 0 ] && [ -z "$KIT_NO_SCORE" ]; then
     python tools/kit_predict.py "$OUT"
     RC=$?
 fi
