@@ -20975,6 +20975,8 @@ entries:
       per D355; only D, batch min(16384,D/2), the lr D factor and the horizon move with D (all from the ladder protocol or
       D356); no sweep in this step; disk 44 GB free on /sps/lpnhe read now, parent run dir 113 MB, 27 runs fit; test events
       are the target''s own recipe-entry sampling, no user words name another.'
+  step_waits:
+    '1': a design reviewer
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
