@@ -21333,6 +21333,57 @@ entries:
     files: tools/kit_hardps.py tools/kit_predict.py tools/kit_precision_check.py tests/test_kit_hardps.py; KIT slides /home/joaquin/.claude/uploads/71602535-0955-42ad-a58f-23dc320798dc/12a84312-hardps_benchmark_slides.pdf;
       KIT README/evaluate.py in the data dir on CC
     written: '2026-11-10T03:36:40+00:00'
+  designs:
+  - at: '2026-11-10T03:47:41+00:00'
+    question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
+      muP LLoCa transformer, trained float64 on bulk only (s_ij/s>0.01; tt: beta in [0.2,0.98]), extrapolate into the hard
+      bins (soft x, collinear y down to 1e-7, g->gg azimuth, tt threshold beta 1e-4..0.2, tt Sudakov sqrt s 1.74-50 TeV) of
+      ee->tt Born, ee->tt one-loop virtual (finite part, mu_R=sqrt s), ee->uug and ee->uugg, and how much does adding hard_train
+      (protocol B) fix it; for tt with the off-shellness input on and off (the slides'' request); at the full bulk (9e5 train)
+      and at 1e5 (the reference MLP''s size). Feeds: the benchmark numbers sent to KIT against their reference MLP (3x128)
+      table, and the from-scratch arm the pretrained protocol A arm and the fair NLO D-scan are compared with.'
+    prior: 'Searched docs/results.tex (KIT, hard phase, float64, Coulomb, soft/collinear limit, extrapolation), plan show
+      kit_benchmark, site decisions (D353, D363). (1) The draft''s divergence study (results.tex sec. near 9610-9830, catalog
+      float32, ee->uug sampled into its limits): collinear slopes -2.15..-2.26 against -2.303, error <~1e-2 into the collinear
+      limit, degradation only for uugg in its deepest soft/collinear limit; D363 supersedes it by this benchmark (bulk-only
+      training, scored outside the training range). (2) The tp3_star transfer arms (soft/collinear, tt threshold at sqrt s
+      363-450) measured transfer, not extrapolation out of the training support. (3) Bakar''s reference MLP on 1e5 bulk: log10-MSE
+      bulk uug 2.1e-5, soft x 1e-7 bin 0.32, collinear y 1e-7 0.11, uugg soft 0.40, tt virtual bulk 7.6e-7, beta 1e-4..1e-3
+      7.8 (2.4 with log(s_tt-4m^2)); exponents uug soft -2.12/-2 exact, coll -0.93/-1, tt Coulomb -0.02 (-0.44)/-1. (4) This
+      entry''s precision check (finding 2026-11-10, cc602bfc): float64 keeps every stratum''s singular variable to <=2.6e-10
+      median through the data path, float32 loses beta<1e-3 at 0.10 median. No earlier transformer run on these files exists.'
+    measure: 'The benchmark''s own src/evaluate.py through tools/kit_predict.py on each run''s final model (mean at the checkpoint
+      of lowest validation mu MSE, then the sigma stage, D276/D85): per hard_test stratum and bulk_test, log10-MSE, bias,
+      99th percentile of |log10 pred - log10 truth|, |M|^2-weighted relative error; per family the fitted exponent against
+      the exact one (-2 soft, -1 collinear, -1 Coulomb V/B); per azimuth scan the harmonic h. Compared: A against Bakar''s
+      MLP (at 1e5), A at 1e5 against 9e5, tt off-shellness on against off, B against A per bin.'
+    check: 'The measure moves with the input and training content on these very files: Bakar''s MLP, raw against log invariants,
+      moves the soft exponent from -0.02 to -2.12 and the soft-bin log-MSE from 89 to 0.32, and adding log(s_tt-4m^2) moves
+      the Coulomb bin from 7.8 to 2.4 (slides 5-9); the bulk-to-deepest-bin rise is 3-7 orders, far above seed noise (D89:
+      a 2->2 het rerun moves the best MSE by up to 2x, 0.3 decade). Off-shellness was the largest single input gain in the
+      catalog levers (tab:levers).'
+    fixed: 'Model, inputs and every HP but lr and steps: the catalog_v4 pretraining''s saved config (runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262/config.yaml;
+      muP LLoCa, HETEROSC, MuonAdamW, batch 16384, diagrams through the catalog sidecars ee_ttbar, ee_ttbar_nlo, ee_uug, ee_uugg),
+      so the later pretrained arm is the same network; training.dtype=float64; lr = 7.82114e-3 (T/17056)^-0.55 x the transfer
+      study''s D factor (scripts/job_data_saving.sh''s law); A 8000 steps; validation the last 1e5 of bulk_train, test the
+      2e5 of bulk_test; B: continued from its A run''s best weights with A''s target and off-shellness stats, hard_train (5e3
+      per stratum) added, 3000 steps at A''s lr, validation still bulk; seed 42. Config: scripts/job_kit.sh at 8de5c522 (branch
+      kit_protoA).'
+    control: 'Each comparison''s control is the run differing only in the named axis: tt off-shellness off against on (same
+      D); n=1e5 against 9e5 (same flags); B against its own A run; the external control is Bakar''s MLP table at 1e5 bulk.
+      Runs: A scratch at n=9e5: tt Born off-shell on, tt Born off, tt virtual on, tt virtual off, uug, uugg (6); A scratch
+      at n=1e5: tt Born off, tt virtual off, uug, uugg (4); B from each of the six n=9e5 A runs (6). uug/uugg keep the parent''s
+      off-shellness input (the s-channel Z column is constant at fixed sqrt s, std guarded to 1).'
+    seeds: 'One seed (42) per run: the quantities read are per-bin errors spanning orders of magnitude and power exponents;
+      D89''s seed spread (up to 2x on 2->2 MSE) is below the effects compared except the off-shell on/off bulk difference,
+      which is read as resolved only when it exceeds 2x; a second seed comes with the stage-2 DyHPO best.'
+    outcome: 'Per family: extrapolation holds when the fitted exponent is within 0.1 of the exact one and the deepest bin''s
+      log10-MSE is below Bakar''s log-invariant MLP (0.32 soft uug, 0.11 coll uug, 0.40 soft uugg, 7.8 Coulomb); it fails
+      when the exponent stays near 0 (flat, like the raw MLP) or the deepest bin is above the MLP. Off-shellness: helps tt
+      when on gives lower hard-bin log-MSE by >2x than off, else no effect (expected none on the Coulomb bins: s-M_Z^2 does
+      not carry beta). B: fixes a family when its hard-bin log-MSE falls to within 10x of bulk; else the network cannot fit
+      the singular region even when shown it. Cost estimate 23 GPU-h (assumption: float64 0.8 s/step, 2.2x the 0.36 s/step
+      V100 float32 rung step of results.tex par:dancat; read from the first jobs).'
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
