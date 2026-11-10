@@ -21980,6 +21980,18 @@ entries:
       control: exponents off by more than 0.3 with deep bins above the flat-edge floor: neither preprocessing helps; same
       next lever. In every case the control''s own gap to its T flat-edge floor (14180 against 5.6e-4) is reported: with the
       dimensionless target, a network that only stayed in range would beat Bakar''s MLP.'
+    passed_at: '2026-11-10T06:25:13+00:00'
+    reviewer: 'Re-check after FIX: outcome now reads exponents (within 0.3 of -2/-1) and deep bins against flat-predictor
+      floors; confirmed on CC with kit_target_slope.py at 902b6372: plain_edge 115.9 soft x 1e-7..1e-6, 13.9 coll y 1e-7..1e-6,
+      T_edge 5.6e-4/1.7e-3, slopes plain -2.000/-1.001, T +0.000/-0.029; control f6b2ece9 kit_result.txt 14180/30.1, exponents
+      +20.2/+0.32. One change (parent preprocessing as a whole, 3 flags, stated), rest of f6b2ece9 fixed (HETEROSC, float64,
+      seed 42, 8000 steps, lr 1.19e-2). Measure responds: off-shellness moved tt Born threshold bins 1.85 decades in this
+      entry, results.tex 459-463 dimensionless vs GeV 0.03-0.07, Bakar''s MLP representation change moved soft exponent by
+      2.1. Seeds: one per D315 vs 0.148-decade spread, effects in decades. Disk: run dir 70 MB (du on CC), data.memmap=false
+      in job_kit.sh line 76, 25 GB free. Rate 0.675 s/step from f6b2ece9; kit_result.txt read. Minor gap left to the owner:
+      an arm with exponents off by >0.3 but not near 0 and deep bins below the floor falls in no branch; report it as partial.
+      Searched: dimensionless, plain target, target_physics_factor=false, dimensionless_inputs=false, emission scale, KIT,
+      Bakar in docs/results.tex and site decisions.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
