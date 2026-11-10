@@ -20943,9 +20943,9 @@ entries:
       a two-target arm is no longer in question
   owner:
     agent: a66d0d73cd29b8da3
-    state: working
+    state: stopped
     since: '2026-11-10T10:24:52+00:00'
-    state_at: '2026-11-10T10:24:52+00:00'
+    state_at: '2026-11-10T10:33:09.295000+00:00'
     context: 98603
     context_at: '2026-11-10T10:46:26+00:00'
   step_why:
@@ -22128,9 +22128,9 @@ entries:
       30, so no budget question remains'
   owner:
     agent: a674b9b77e97e3012
-    state: stopped
+    state: working
     since: '2026-11-10T09:30:58+00:00'
-    state_at: '2026-11-10T10:22:37.913000+00:00'
+    state_at: '2026-11-10T10:46:20.791000+00:00'
     context: 277083
     context_at: '2026-11-10T10:24:03+00:00'
   findings:
