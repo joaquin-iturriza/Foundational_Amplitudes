@@ -54,4 +54,7 @@ python run.py --config-path "$PROJECT_DIR/$PARENT" --config-name config run_dir=
     data.processes_file="$RECIPE" data.train_subsample="$D" data.eval_subsample=null data.phase_space_on_pool=true \
     data.memmap=false training.iterations="$T" training.heterosc_select=mu_mse evaluation.train_subsample=2000 seed=42 warm_start_idx=null training.result_path="$OUT/result.json" "${FT[@]}" "${ARGS[@]}"
 RC=$?
-echo "DATA_SAVING_DONE rc=$RC $OUT"; exit $RC
+echo "DATA_SAVING_DONE rc=$RC $OUT"
+# the supervisor's clean-end marker (~/.config/ccorch/projects.toml end_markers), only on success
+[ "$RC" -eq 0 ] && echo "RUN_DONE $OUT"
+exit $RC
