@@ -21063,6 +21063,37 @@ entries:
     state_at: '2026-11-10T02:18:36+00:00'
     context: 134969
     context_at: '2026-11-10T02:28:06+00:00'
+  designs:
+  - at: '2026-11-10T02:29:27+00:00'
+    question: 'Is the earlier V/B attempt''s failure a property of the target itself: is V/B (stored one-loop virtual over
+      MadLoop''s Born, event by event) a kinematics-independent constant on e+e- -> u u~ at mu^2=s, so its standardized target
+      is rounding noise, while on e+e- -> t t~ it varies? And how much narrower is log|V/B| than log|V| (the spread the network
+      must place)? The job also writes the row-aligned Born sidecars the V/B training arm reads.'
+    prior: 'June 2026 attempt (commit 2b81ee1e make_ratio_datasets.py, data/parse_dat.py; sweeps finetune_scaling_virt_002,
+      finetune_{ewc,freeze,lora,resethead}_scaling_virt, scaling_solo_full, scaling_solo_nh8_anchor_virt_002, harvested in
+      analysis/hpo_optima/hpo_optima.json): ee_uu_nlo_virt_ratio best val_loss (standardized) 0.862-0.864 at every horizon
+      t=40..4000 in all six arms (fine-tune, EWC, freeze, LoRA, reset-head, from scratch), i.e. nothing learned; ee_ttbar_nlo_virt_ratio
+      scaled like the absolute virtual (2.39e-6 vs 8.29e-7 at t=4000 fine-tuned, 2.35e-6 from scratch), compared in standardized
+      units only. parse_dat.py states virt_fin/born = C_F(pi^2-8) exactly for eeuu. docs/results.tex l.9054 (''does not scale
+      meaningfully''), l.15331 (user 2026-10-15, lifted by D366); par:v4_loop_born / par:v4_loop_born_events (Born re-evaluated
+      on 2000 events of 17 catalog_v4 pools: pool-level, not these pools, no training). This design: every row of the current
+      ee_uu_nlo_25-1000GeV and ee_ttbar_nlo_362-1000GeV pools (MadLoop, mu^2=s, alpha_s-stripped, the shift on tt), no training.'
+    measure: 'Per pool (train/val/test): relative spread std(V/B)/|mean(V/B)| and max|V/B/median-1|; std of log|V| and of
+      log|V/B| (natural log), their ratio; share of V/B<0; the stored target reproduced (n_rel_above_1e-6 = 0, born_of_pool''s
+      check).'
+    check: 'The old runs (hpo_optima.json above) already show the measured target moving the outcome: the ee->uu ratio cells
+      stay at 0.864 for 1000x more steps while the ee->tt ratio cells fall by 5 decades; parse_dat.py''s own sanity print
+      reads virt/born = 2.4928 = C_F(pi^2-8) on eeuu.dat. The born_of_pool path was checked on 17 catalog_v4 pools (par:v4_loop_born_events:
+      17/17 reproduce, max rel 1.4e-11).'
+    fixed: The pools as generated (2026-09-13 recipes, alpha_s(MZ)=0.118 stripped, mu^2=s), MadLoop evaluator of the generator
+      (virt_evaluator, same mass-shift rule), all rows, float64.
+    control: log|V| of the same events (the target as trained now).
+    seeds: none (deterministic re-evaluation of fixed events)
+    outcome: 'Yes (degenerate target): on ee->uu V/B relative spread below 1e-10 -> the earlier ee->uu V/B failure is a zero-information
+      target standardized by rounding noise, not a failure of learning V/B; the V/B arm needs a std floor (a constant target
+      is learned exactly) and the informative test is ee->tt. No: ee->uu V/B varies at >1e-6 -> the cause is elsewhere (standardization,
+      signedlog scale, comparison units) and is read from the training test. Either way the log-spread ratio says how much
+      narrower the V/B target is on ee->tt.'
 - id: draft_rewrite
   title: rewrite of the paper draft around the new story
   question: 'Rewrite the draft (the 2026-11-10 zip) into the story of D365/D354: pretraining works (data saved at 1e-4), the
