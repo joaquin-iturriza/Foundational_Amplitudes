@@ -22024,6 +22024,19 @@ entries:
       5b5877e0, 21dc6836, 1974ee97 (SLURM 63278963-63278988) ran 34-48 s each (sacct Elapsed, all COMPLETED with RUN_DONE)
       against a requested --time 0:20, a 25x margin. From now on a score-only job requests --hdr=--time=00:05:00 (measured
       <=48 s plus start-up), never a round default. The five are not resubmitted.'
+  - at: '2026-11-10T09:46:31+00:00'
+    text: 'The two family-held-out pretrainings cannot finish in their 12 h limit: heldout FA-ccin2p3-62c2443b runs 0.944
+      s/step (iteration 7581 at 7159 s, V100, 1139 pools, memmap, 4 CPUs) and fair_nlo d0b132b6 0.852 s/step, so 68224 steps
+      need 17.9 h and 16.2 h against the design''s 0.474 s/step estimate (2x; results.tex par:dancat rate) and --time 12:00.
+      They will stop at ~45k and ~50k steps, mid-cosine. Fix (repair inside the passed 03:57 design, scripts/job_kit_pretrain.sh
+      KIT_RESUME=1 at 9fe2dcaa): a resume job per run, queued afterany on its SLURM job (63270651, 63270654), restarts from
+      model_run0_best.pt (written at every improving validation, every 1364 steps; val improves at each so far: -0.80 -> -2.04)
+      with optimizer and scheduler state, and trains the remaining steps of the same 68224-step cosine (increment_steps=68224)
+      as run_idx 1 in the same run dir; A_ft takes the parent''s last segment''s best (job_kit.sh). Tested on CC login CPU
+      (uug 30-step run then a 12-step warm start: model, optimizer and scheduler loaded, T_max kept, trained to the end; the
+      sigma stage then refused an existing sigma_stage dir, which a time-limited run does not have: not tested on a killed
+      run). Resume runs: heldout FA-ccin2p3-78b8190c (--time 9:00, target 6.6 h), fair_nlo FA-ccin2p3-03ea3719 (--time 7:30,
+      target 4.8 h). Parents now ready ~02:00 UTC 2026-11-11 (heldout) and ~00:30 (fair_nlo), not 16:00 UTC.'
   step_why:
     1:
       feeds: 'the numbers sent to KIT: whether hard_train fixes each family (B vs B_bulk)'
