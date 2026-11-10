@@ -11,6 +11,10 @@ committed summaries in analysis/divergences/:
   heterosc_rank.json             the HETEROSC foundation grid lr x beta: in-distribution validation MSE of mu
   q2rw_eval_summary.json         the sigma-reweighting (Q2) arms on the deep-IR test: event-weighted MSE; gain =
                                  (M_base - M_arm)/(M_base - M_oracle), base = no reweighting, oracle = true |residual|
+  q2_logflat_gains.json          the same arms under both metrics, event-weighted and log-flat (the mean of the six
+                                 per-decade MSEs), with the per-decade MSE: q2_metrics.gains run on Jean Zay over the
+                                 per-event eval files q2rw_eval_<tag>.npz, which exist only there (main checkout,
+                                 analysis/divergences/), brought home 2026-11-10
   evtest_A.json, leaktest.json, leakfix.json  the multi-tag eval leak check (eval_eeuu_resonance.py): ft_mix025 as the
                                  only tag, as the second tag after raw, and the same with a per-tag run_dir
 Keys: deep.*, fraction.*, float32.*, foundation.*, q2.*, leak.*, and coverage.* (the percentage of an arm's 400k
@@ -74,6 +78,10 @@ def main():
     q.update({r["tag"]: r["mse"] for r in load("q2rank_eval_summary.json")})
     b, o = q["baseQ"], q["oracle"]
     out["q2"] = {"event_gain_pct": {t: sig(100 * (b - m) / (b - o), 2) for t, m in q.items()}}
+    lfg = load("q2_logflat_gains.json")["arms"]
+    out["q2"]["logflat_gain_pct"] = {t: sig(100 * v["logflat"], 2) for t, v in lfg.items()}
+    out["q2"]["event_gain_pct_jz"] = {t: sig(100 * v["event"], 2) for t, v in lfg.items()}
+    out["q2"]["bulk_mse"] = {t: sig(v["per_decade"][-1], 2) for t, v in lfg.items()}
     qb = load("q2rw_eval_summary.json")[0]["binmse"]
     out["q2"]["test_pct_below_1e-3"] = sig(100 * qb[0][2] / sum(x[2] for x in qb), 2)
 
