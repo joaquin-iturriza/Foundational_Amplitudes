@@ -126,32 +126,29 @@ def main():
         figs = ps.panels(3)
         (f1, ax1), (f2, ax2), (f3, ax3) = figs
         r3 = np.arange(R)
-        S = r"$\sigma$"
-        RW = "\n+ loss reweighting"
-        for k, lab, c, ls in [("static", f"fixed draw, one reused pool\n(no {S})", ps.C.blue, "-"),
-                              ("sigma_a1", f"{S}-weighted draw {RW}", ps.C.vermillion, "-"),
-                              ("sigma_a05", f"{S}" + r"$^{0.5}$" + f"-weighted draw {RW}", ps.C.vermillion, "--"),
-                              ("sigma_a025", f"{S}" + r"$^{0.25}$" + f"-weighted draw {RW}", ps.C.vermillion, ":"),
-                              ("oracle_a1", f"true-error-weighted draw {RW} \n(best case)", ps.C.grey, "-")]:
+        for k, lab, c, ls in [("static", "static, reused", ps.C.blue, "-"),
+                              ("sigma_a1", r"$\sigma^{1}$ + IS", ps.C.vermillion, "-"),
+                              ("sigma_a05", r"$\sigma^{0.5}$ + IS", ps.C.vermillion, "--"),
+                              ("sigma_a025", r"$\sigma^{0.25}$ + IS", ps.C.vermillion, ":"),
+                              ("oracle_a1", r"$|r|^{1}$ + IS", ps.C.grey, "-")]:
             ax1.plot(r3, base[k], ls, marker="o", color=c, label=lab)
-        for k, lab, c, ls in [("static_prefix", f"fixed draw, reused pool\n(no {S})", ps.C.blue, "--"),
-                              ("static_fair", f"fixed draw (no {S})", ps.C.blue, "-"),
-                              ("reweight_prefix", f"fixed draw, reused pool{RW} (no {S})", ps.C.green, "--"),
-                              ("reweight_fair", f"fixed draw{RW} (no {S})", ps.C.green, "-"),
-                              ("sigma_a05", f"{S}" + r"$^{0.5}$" + f"-weighted draw{RW}", ps.C.vermillion, "-")]:
+        for k, lab, c, ls in [("static_prefix", "static, reused", ps.C.blue, "--"),
+                              ("static_fair", "static", ps.C.blue, "-"),
+                              ("reweight_prefix", "IS only, reused", ps.C.green, "--"),
+                              ("reweight_fair", "IS only", ps.C.green, "-"),
+                              ("sigma_a05", r"$\sigma^{0.5}$ + IS", ps.C.vermillion, "-")]:
             ax2.plot(r3, arms_b[k][1], ls, marker="o", color=c, label=lab)
-        ax2.plot(r3, oracle_b, "-", marker="o", color=ps.C.grey,
-                 label=r"true-error$^{0.5}$-weighted" + "\ndraw + loss reweighting\n(best case)")
+        ax2.plot(r3, oracle_b, "-", marker="o", color=ps.C.grey, label=r"$|r|^{0.5}$ + IS")
         r6 = np.arange(R6)
-        ax3.plot(r6, sf_g, "-", marker="o", color=ps.C.blue, label=f"fixed draw (no {S})")
-        ax3.plot(r6, ad_g, "-", marker="o", color=ps.C.vermillion, label=f"{S}-weighted draw,\nno loss reweighting")
-        ax3.plot(r6, orc0, "-", marker="o", color=ps.C.grey, label="true-error-weighted draw\n(best case)")
-        for (fig, ax) in figs:
+        ax3.plot(r6, sf_g, "-", marker="o", color=ps.C.blue, label="static")
+        ax3.plot(r6, ad_g, "-", marker="o", color=ps.C.vermillion, label=r"$\sigma^{\gamma}$")
+        ax3.plot(r6, orc0, "-", marker="o", color=ps.C.grey, label=r"$|r|^{\gamma}$")
+        for ax, nc, loc in ((ax1, 1, "lower left"), (ax2, 1, "lower left"), (ax3, 1, "upper right")):
             ax.set_yscale("log")
             ax.set_xlabel("round")
             ax.set_ylabel(ylab)
             ax.xaxis.set_major_locator(matplotlib.ticker.MaxNLocator(integer=True))
-            ps.shared_legend(fig, ax, ncol=1)    # too many arms for a corner of the plot box
+            ps.legend(ax, loc, ncol=nc)
         ps.save_panels(figs, os.path.join(HERE, "figs", "l2_eeuu_online"), repo=REPO)
 
     print(json.dumps(out))
