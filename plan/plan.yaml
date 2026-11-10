@@ -20982,6 +20982,8 @@ entries:
       if:
       - 'pass: plan done ladder_figs'
       - 'block: a mechanical-worker fixes what it names, then the same reviewer re-checks'
+  step_waits:
+    '2': repo-reviewer
 - id: virtual_over_born
   title: why learning the virtual over the Born fails for us, and making it work
   question: Why does training on V/B (finite one-loop virtual over the exact Born) not work for us when the literature finds
