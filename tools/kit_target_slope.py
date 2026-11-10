@@ -13,6 +13,8 @@ and, per stratum, the share of its events whose value lies outside the [0.5%, 99
 the first n_bulk events of bulk_train: how far each target has to extrapolate past what training saw.
 Rows are tools/kit_hardps.py's (catalog leg order, the stripped target). Prints one SLOPE line per family and one
 RANGE line per stratum.
+FLAT lines: per stratum, the log10-MSE (KIT's, of log10 |M|^2) of predictors that learned nothing about the limit:
+each target clipped to its bulk range (_edge) or held at its bulk median (_median).
 """
 import argparse
 import os
@@ -59,6 +61,12 @@ def main():
         out = {k: float(np.mean((v < lo[k]) | (v > hi[k]))) for k, v in (("plain", p), ("T", t))}
         print(f"RANGE {st} n={len(p)} outside bulk range: plain {out['plain']:.3f} T {out['T']:.3f}; "
               f"median plain {np.median(p):.3f} T {np.median(t):.3f}")
+        # what a network that learned nothing about the limit scores in KIT's log10-MSE of |M|^2: each target held at
+        # the edge of its bulk range (the value clipped to it), and held at its bulk median; T's predictions are
+        # mapped back to log10 |M|^2 with the event's own emission scales (p - t is that event's -sum ln q^2 / ln 10)
+        flat = {"plain_edge": np.clip(p, lo["plain"], hi["plain"]), "plain_median": np.full_like(p, np.median(bp)),
+                "T_edge": p + (np.clip(t, lo["T"], hi["T"]) - t), "T_median": p + (np.median(bt) - t)}
+        print(f"FLAT {st} log10-MSE " + " ".join(f"{k} {np.mean((v - p) ** 2):.3e}" for k, v in flat.items()))
         if sv is not None:
             fits.setdefault(st.rsplit("_", 2)[0], []).append((np.log10(sv), p, t))
     for fam, parts in fits.items():
