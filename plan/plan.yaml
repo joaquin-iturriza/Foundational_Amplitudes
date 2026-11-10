@@ -16065,8 +16065,15 @@ entries:
     searched: CLAUDE.md (hook registrations go to Joaquin as a diff; never delete unmerged work); site decisions D334 covers
       merged branches only
     blocks: the remaining branch cleanup and the two hook installs (step 20)
-    blocks_steps: &id001
+    blocks_steps:
     - 20
+  - ask: 'Scope: the sweep template''s fidelity_schedule.t_steps is [1000, 10000, 40000] (multi-fidelity) while the HPO rule
+      says single-fidelity, one value: which holds, the rule (cut the template to one length) or the template (change the
+      rule)?'
+    at: '2026-11-10T00:16:40+00:00'
+    searched: CLAUDE.md HPO rule, fa-sweeps-and-hpo rule 6, D241; the claudemd-keeper flagged the contradiction 2026-11-10;
+      none settles which side is right
+    blocks_steps: &id001 []
   step_why:
     11:
       feeds: whether the redesign is finished
@@ -16859,15 +16866,11 @@ entries:
       /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/leave_check_wip.patch /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/test_plan_leave_check.py
       /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/pfg.py /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/test_plan_files_guard_text.py
     written: '2026-11-09T23:06:32+00:00'
-  ask: 'Permission classifier refusal: `install the fixed plan_files_guard (scratchpad pfg.py) over .claude/hooks/plan_files_guard.py`
-    (refused as self-modification). Install it? Also: register plan_check on SubagentStop for the owner leave-check once its
-    failing test is fixed? And per branch, delete or keep the unmerged ones: heterosc (+67), l2-gen (+79), adaptive-ir, multbias,
-    decomp with its worktree, five 2026-06-28 worktree-agent-* (+2), the 24 zz_trial_*, the agent-a822d561 worktree with uncommitted
-    lloca.yaml/experiment.py/wrappers.py/kshot-context edits, and agent-a63efbd0 (+1)?'
-  waiting_since: '2026-11-09T23:07:47+00:00'
-  searched: CLAUDE.md (hook registrations go to Joaquin as a diff; never delete unmerged work); site decisions D334 covers
-    merged branches only
-  blocks: the remaining branch cleanup and the two hook installs (step 20)
+  ask: 'Scope: the sweep template''s fidelity_schedule.t_steps is [1000, 10000, 40000] (multi-fidelity) while the HPO rule
+    says single-fidelity, one value: which holds, the rule (cut the template to one length) or the template (change the rule)?'
+  waiting_since: '2026-11-10T00:16:40+00:00'
+  searched: CLAUDE.md HPO rule, fa-sweeps-and-hpo rule 6, D241; the claudemd-keeper flagged the contradiction 2026-11-10;
+    none settles which side is right
   blocks_steps: *id001
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
