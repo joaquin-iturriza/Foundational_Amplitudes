@@ -5,7 +5,7 @@ log10(L_scratch / L_fine-tune), each half-decade of D weighted the same (the rul
 structure (rung_focus.FOCUS) is outlined.
     python analysis/transfer/gain_heatmap.py      -> figs/gain_heatmap
 """
-import io, contextlib, os, sys
+import io, contextlib, json, os, sys
 import numpy as np
 from matplotlib.patches import Rectangle
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -39,3 +39,14 @@ ps.shared_legend(fig, ax, ncol=1)
 ps.save(fig, os.path.join(ROOT, "analysis", "transfer", "figs", "gain_heatmap"))
 for i, p in enumerate(P):
     print(f"{p:12s} " + " ".join(f"{10 ** g:5.1f}" for g in G[i]))
+# the counts behind "any pretraining in general helps" (D362): (probe, D, pretraining) cells and probe-pretraining pairs
+# (gain averaged over D, as drawn) whose fine-tune is below scratch, and each pretraining's geometric-mean gain over cells
+cells = []
+for i, p in enumerate(P):
+    for k in range(2, 9):
+        s = scratch(p, k, steered=False)[0]
+        if s:
+            cells += [(r, np.log10(s / v)) for r in R for v in [best(f"{fam(r)}_{p}_d{k}")[0]] if v]
+print(json.dumps({"cells": {"n": len(cells), "below_scratch": int(sum(g > 0 for _, g in cells))},
+                  "pairs": {"n": int(np.isfinite(G).sum()), "gain": int((G > 0).sum())},
+                  "gm_gain": {f"rung{r}": round(float(10 ** np.mean([g for q, g in cells if q == r])), 2) for r in R}}))
