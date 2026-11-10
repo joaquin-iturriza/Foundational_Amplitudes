@@ -33,11 +33,14 @@ if [ "${KIT_RESUME:-}" = 1 ]; then
     # starts from the best checkpoint, with optimizer, scheduler and step (model_run0_best.pt, written at each
     # validation that improved, every 1364 steps; model_run0_current.pt only when the best cannot be read), copied to model_run0.pt for run.py's
     # warm start (warm_start_idx=0: run_idx 1, the same run dir), and trains the remaining steps of the same cosine
-    # (training.increment_steps=68224 keeps T_max and the warmup; the scheduler's last_epoch is restored). A first job
-    # that finished (model_run0.pt without resumed_from.txt) or a finished resume (model_run1.pt) ends at once.
+    # (training.increment_steps=68224 keeps T_max and the warmup; the scheduler's last_epoch is restored). A run that
+    # already finished (its sigma stage promoted the final model) ends at once. The sigma stage of the resumed
+    # segment starts from model_run1_best.pt (run.py) and, as in any HETEROSC run, leaves the final model as
+    # models/model_run0_best.pt and model_run0.pt.
     # training.resume_seed_best makes model_run1_best.pt the best over both segments (A_ft takes the last segment's).
     M="$OUT/models"
-    if { [ -e "$M/model_run0.pt" ] && [ ! -e "$M/resumed_from.txt" ]; } || [ -e "$M/model_run1.pt" ]; then
+    # finished = the sigma stage promoted its final model (sigma_stage/models becomes a link to models/, run.py)
+    if [ -L "$OUT/sigma_stage/models" ]; then
         echo "KIT_PRETRAIN_RESUME: $OUT already finished, nothing to resume"; echo "RUN_DONE $OUT"; exit 0
     fi
     PICK=$(python - "$M" <<'PYEOF'

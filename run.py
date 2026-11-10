@@ -31,7 +31,9 @@ def sigma_stage_cfg(cfg):
         # transform as a fresh run does (tools/zero_shot_parent.py). The stage itself reads the frozen per-pool ones.
         s.data.amp_trafos = unresolved_amp_trafos(s.data.amp_trafos)
         s.ema = False
-        s.fine_tune.pretrained_path = os.path.join(cfg.run_dir, "models", "model_run0_best.pt")
+        # this segment's best: a run resumed past its time limit is run_idx 1 (training.resume_seed_best makes its
+        # best the best over both segments); a fresh run is run_idx 0
+        s.fine_tune.pretrained_path = os.path.join(cfg.run_dir, "models", f"model_run{int(cfg.get('run_idx') or 0)}_best.pt")
         s.fine_tune.lr_scale = 1.0
         s.fine_tune.layer_decay = 1.0
         s.fine_tune.freeze_blocks = []
