@@ -10089,8 +10089,8 @@ for test weighting $q$, neither uniform nor pure antenna, consistent with the in
 above. An online adaptive per-$y_{\min}$-bin importance sampler was prototyped
 (\code{analysis/divergences/adaptive\_ir.py}); the controller math is CPU-validated
 (unbiased IS correction with mean weight $=1$; variance-optimal proposal
-$\pi_b\!\propto\!Q_b\sqrt{E_b}$). The controller is \emph{not} wired into the training loop; the same correction
-$c_b=Q_b/\pi_b$ over bins of the log-amplitude, from a table written when the pool is built, is \code{training.is\_weight\_path}. Caveat: the
+$\pi_b\!\propto\!Q_b\sqrt{E_b}$). The controller is \emph{not} wired into the training loop; the same form of correction,
+$c_b=Q_b/\pi_b$ but over log-amplitude bins rather than $y_{\min}$ bins, read from a table written when the pool is built, is \code{training.is\_weight\_path}. Caveat: the
 variance-reduction proposal ($\pi\!\propto\!Q\sqrt{E}$, fixed objective, faster convergence) is
 \emph{not} the finite-data allocation optimum ($\pi\!\propto\!\sqrt{QC}$). Deprioritised in favour
 of the heteroscedastic head below.
