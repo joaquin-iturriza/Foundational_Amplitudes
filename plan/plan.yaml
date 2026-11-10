@@ -22320,6 +22320,18 @@ entries:
       but overshoot, exponent -2.9), tt virtual Coulomb threshold (0.3-0.6 decades, exponent -0.4 vs -1.0, median flat at
       -0.4 vs truth +1.7). So hard events teach collinear and the tt Born/Sudakov ends; the soft limit and the Coulomb rise
       are not representable from these inputs even when trained on (next lever: log-invariant inputs, as Bakar''s MLP).'
+  - at: '2026-11-10T10:47:24+00:00'
+    text: 'Off-shellness-off arms, protocol A from scratch n=1e5, one seed (uug FA-ccin2p3-c35a2199, uugg ac436bba; job_kit.sh
+      A tag=nooffshell, data.offshell_per_event=false data.internal_mass_scalars=false; controls f6b2ece9, 12a9d54b; KIT evaluate.py;
+      tools/kit_readout.py at 754519dd on analysis/kit_benchmark/data/kit_fig_A_nooffshell.json @48494606; figures analysis/kit_benchmark/figs/kit_{mse,median}_offshell_ee_{uug,uugg}_me2_*.png).
+      Soft exponent off / on (exact -2): uug -1.51 / +20.18, uugg +7.81 / +16.60. Deepest soft bin x 1e-7..1e-6 log10-MSE
+      off / on: uug 516 / 14180 (1.44 decades lower), uugg 3670 / 9067 (0.39). Collinear exponents off / on: uug +0.23 / +0.32;
+      uugg gg +0.08 / +0.03, qg +0.11 / -0.01; deep collinear bins unchanged (uug 34.5 / 30.1; uugg 20.4 / 20.5, 20.3 / 18.4).
+      Bulk_test off / on: uug 4.3e-4 / 8.2e-4, uugg 1.8e-3 / 2.3e-3. Bands of the 08:35 design: uug (a) at the band''s edge
+      (s -1.51 in [-2.5,-1.5], d 1.4 decades below): the off-shellness column drove uug''s soft runaway, but d 516 stays 3
+      decades above Bakar''s MLP 0.32 and above the plain arm''s 145; uugg (c) (s +7.8 > +1, d within 1 decade): the runaway
+      there is not the column''s. The families disagree; neither learns the collinear limit. Next: the momentum representation
+      (log invariants) is the lever for both; A_ft keeps the parent''s inputs (its off arms hold the column at 0).'
   step_why:
     1:
       feeds: the pretrained model's numbers for KIT and whether pretraining changes extrapolation into the limits
