@@ -21592,6 +21592,53 @@ entries:
       held out, family, leave-out, base22, pretraining, twin in docs/results.tex, plan (pretrain_data_saving) and site decisions
       (D25, D315, D353, D360, D363); the old base22 leave-out foundation (sec:divergences-holdout) held out the five gluon
       processes on the old setup and is not reusable.'
+  - at: '2026-11-10T03:59:09+00:00'
+    question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark. Second revision: the reviewer''s
+      03:54 FIX, one seed per D315. How well does the muP LLoCa transformer, trained float64 on bulk only (s_ij/s>0.01; tt
+      beta in [0.2,0.98]), extrapolate into the hard bins of ee->tt Born, ee->tt one-loop virtual (finite, mu_R=sqrt s), ee->uug
+      and ee->uugg? The hard bins are soft x and collinear y down to 1e-7, the g->gg azimuth, tt threshold beta 1e-4..0.2
+      and Sudakov sqrt s 1.74-50 TeV. Follow-ons: how much does hard_train fix it (B against the same continuation on bulk
+      only, B_bulk), and does the off-shellness input change tt? Run at 9e5 and at 1e5 bulk events (the reference MLP''s size).
+      Feeds: the numbers sent to KIT against their reference MLP, and the from-scratch control of the pretrained protocol
+      A arm and of the fair NLO D-scan.'
+    prior: 'As the 03:54 revision, which the reviewer checked. sec:divergences (catalog float32 ee->uug into its limits: collinear
+      slopes -2.15..-2.26 against -2.303). sec:divergences-holdout (results.tex 9832-10030), protocols A/B run once on the
+      old 22-process base: uug held out 0.709 MSE(ln) (deepest y_min<1e-3 bin 11.1); 5% of the region added back 0.030; all
+      of it 0.0028; uugg 0.22 down to 0.024; soft alone 0.076, collinear alone 0.047. Bakar''s MLP at 1e5, log10-MSE: uug
+      bulk 2.1e-5, soft 1e-7 bin 0.32, coll 0.11; uugg soft 0.40; tt virtual bulk 7.6e-7, beta 1e-4..1e-3 7.8 (2.4 with the
+      threshold variable); exponents soft -2.12, coll -0.93, Coulomb -0.02/-0.44, against -2, -1, -1 exact. Precision check
+      cc602bfc: float64 holds on every stratum. Differences now: bins down to 1e-7, float64, from scratch on the target, KIT''s
+      scorer, the tt Coulomb and Sudakov bins.'
+    measure: 'KIT''s src/evaluate.py through tools/kit_predict.py on each run''s final model: the mean at the lowest validation
+      mu MSE, then the sigma stage (D276/D85). Per hard_test stratum and bulk_test: log10-MSE, bias, 99th percentile of |log10
+      pred - log10 truth|, |M|^2-weighted relative error. Per family: the fitted exponent against the exact one. Per azimuth
+      scan: the harmonic h. Comparisons: A against Bakar''s MLP (at 1e5); 1e5 against 9e5; tt off-shellness on against off;
+      B against B_bulk per bin.'
+    check: 'In Bakar''s MLP, raw against log invariants moves the soft exponent from -0.02 to -2.12 and the soft-bin log-MSE
+      from 89 to 0.32; the threshold variable moves the Coulomb bin from 7.8 to 2.4. In our hold-out study, 5% of the region
+      added back moved uug''s MSE 24x and the deepest bin 20x. Noise level: one seed per D315. Differences are read against
+      the project''s measured seed spread, 0.148 decades (results.tex ~7336, the Muon study) and 0.09-0.14 on the catalog,
+      assuming it carries over to the extrapolation bins and the exponents.'
+    fixed: 'Model, inputs and HPs but lr and steps: trial 1262''s saved config (muP LLoCa, HETEROSC, MuonAdamW, batch 16384,
+      diagrams through the catalog sidecars ee_ttbar, ee_ttbar_nlo, ee_uug, ee_uugg). float64, fresh start (warm_start_idx=null),
+      seed 42. lr 7.82114e-3 (T/17056)^-0.55 x D factor (1.19e-2 at T=8000, both n clipped). A: 8000 steps; val the last 1e5
+      of bulk_train; test the bulk_test 2e5 and every hard_test stratum. B: 3000 steps from A''s best weights with A''s stats,
+      at A''s lr; train adds the first 90% of every hard_train stratum; val is bulk plus the last 10% of each. B_bulk: the
+      identical continuation on bulk only. Code: scripts/job_kit.sh and tools/kit_hardps.py at trunk 45eadf29 (merged, repo-reviewer
+      PASS).'
+    control: 'Each comparison''s control differs only in its named axis: off-shellness off against on (same n); 1e5 against
+      9e5; B against B_bulk (same start, steps and restart, no hard points); externally, Bakar''s MLP at 1e5. Runs: A at n=9e5:
+      tt Born off-shell on and off, tt virtual on and off, uug, uugg (6); A at n=1e5: tt Born off, tt virtual off, uug, uugg
+      (4); B and B_bulk from each n=9e5 A run (12); 22 runs in all, one seed.'
+    seeds: One seed (42) per cell, D315 ('For the scaling grid, and in general. I see no reason to keep doing multiple seeds').
+    outcome: 'A difference counts as resolved when it exceeds 2x the project''s seed spread (0.3 decades) in that quantity,
+      and for exponents when it exceeds 0.1. A per family: extrapolation holds when the exponent is within 0.1 of exact and
+      the deepest bin''s log10-MSE is below Bakar''s MLP at 1e5 (0.32 / 0.11 / 0.40 / 7.8); it fails when the exponent stays
+      near 0 or the deep bin is above the MLP. Off-shellness helps tt when on is lower than off by more than 0.3 decades in
+      the hard bins, else no effect (expected on Coulomb). Hard data fixes a family when B is below B_bulk by more than 0.3
+      decades and within 10x of bulk; else the deficit is in what the network can represent. Cost (estimate, assuming float64
+      at 0.8 s/step): A 10 x 8000 = 17.8 GPU-h, B + B_bulk 12 x 3000 = 8.0, scoring ~2: ~28 GPU-h, under 30; read from the
+      first jobs. Disk on CC: 44 GB free; <= 22 x 0.7 + 2 = ~17 GB, checked on the first job.'
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
