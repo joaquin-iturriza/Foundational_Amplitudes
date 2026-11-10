@@ -20453,6 +20453,23 @@ entries:
     withdrawn_at: '2026-11-09T23:26:18+00:00'
     withdrawn_why: Joaquin approved the fold and the sigma-driven generation in his message of 2026-11-10 (D338, D339; D344
       covers this entry)
+  - ask: 'GPU budget: ~33 GPU-h (up to 66 if a run takes 1 h) above 30 with no decision covering it. Sigma-driven generation
+      (D339) study on ee->uugg, current HETEROSC loss, from scratch (July warm start base22 is gone). The sigma^gamma-driven
+      draw is tested against the uniform keep of the democratic+RAMBO proposal, the catalog''s fixed density (f_flat 0.35
+      flat in log|M|^2) and plain loss reweighting toward it without sigma, plus sigma on top of the catalog density, 6 arms
+      x 3 seeds. Stage 1 (13 GPU-h): an 8-trial DyHPO on the uniform arm, then the 18 runs at its best HPs. Stage 2 (20 GPU-h,
+      only if sigma loses at those HPs): the same sweep for the four compared arms, each best rerun at 2 more seeds. Go for
+      the whole design, or stage 1 now and stage 2 asked again with its measured cost?'
+    at: '2026-11-10T01:21:50+00:00'
+    searched: 'CLAUDE.md GPU budget rule; site decisions --project FA: D339 names no cost, D153 sets the 30 GPU-h line. Joaquin''s
+      messages: 2026-09-23T07:30 (the reference should be uniform+democratic sampling, not uniform: the uniform arm here is
+      exactly the democratic+RAMBO proposal, and the catalog-density arm is added; it names no cost), 2026-11-06T19:52 (warm-start
+      lr mismatch, another entry, no cost for this), 2026-10-08T02:19 (synthetic data framing, another study), 2026-10-06T00:17
+      (approves the transfer study''s plan only), 2026-11-06T04:28 (worktree handling and other entries, no cost for this)'
+    blocks: step 3's job submissions (the design's final form and its re-check depend on the stage-2 scope); the code rebuild
+      in worktrees/wt-sigma-gen3 does not wait
+    blocks_steps: &id001
+    - 3
   owner:
     agent: a237615c421bbf029
     state: working
@@ -20794,3 +20811,19 @@ entries:
       the stage-2 NO and UNRESOLVED rules for single-seed bests, compared against arm A''s 3-seed spread. Everything else
       passes as in the first review (check reader @ccede377 reproduced: 0.834 and 0.817 log-flat MSE ratios, 0.75 and 0.669
       deepest-decade ratios; prior search complete).'
+  ask: 'GPU budget: ~33 GPU-h (up to 66 if a run takes 1 h) above 30 with no decision covering it. Sigma-driven generation
+    (D339) study on ee->uugg, current HETEROSC loss, from scratch (July warm start base22 is gone). The sigma^gamma-driven
+    draw is tested against the uniform keep of the democratic+RAMBO proposal, the catalog''s fixed density (f_flat 0.35 flat
+    in log|M|^2) and plain loss reweighting toward it without sigma, plus sigma on top of the catalog density, 6 arms x 3
+    seeds. Stage 1 (13 GPU-h): an 8-trial DyHPO on the uniform arm, then the 18 runs at its best HPs. Stage 2 (20 GPU-h, only
+    if sigma loses at those HPs): the same sweep for the four compared arms, each best rerun at 2 more seeds. Go for the whole
+    design, or stage 1 now and stage 2 asked again with its measured cost?'
+  waiting_since: '2026-11-10T01:21:50+00:00'
+  searched: 'CLAUDE.md GPU budget rule; site decisions --project FA: D339 names no cost, D153 sets the 30 GPU-h line. Joaquin''s
+    messages: 2026-09-23T07:30 (the reference should be uniform+democratic sampling, not uniform: the uniform arm here is
+    exactly the democratic+RAMBO proposal, and the catalog-density arm is added; it names no cost), 2026-11-06T19:52 (warm-start
+    lr mismatch, another entry, no cost for this), 2026-10-08T02:19 (synthetic data framing, another study), 2026-10-06T00:17
+    (approves the transfer study''s plan only), 2026-11-06T04:28 (worktree handling and other entries, no cost for this)'
+  blocks: step 3's job submissions (the design's final form and its re-check depend on the stage-2 scope); the code rebuild
+    in worktrees/wt-sigma-gen3 does not wait
+  blocks_steps: *id001
