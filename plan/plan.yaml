@@ -21421,8 +21421,8 @@ entries:
     state: stopped
     since: '2026-11-10T02:18:36+00:00'
     state_at: '2026-11-10T03:43:46+00:00'
-    context: 242949
-    context_at: '2026-11-10T03:33:48+00:00'
+    context: 263970
+    context_at: '2026-11-10T03:44:43+00:00'
   designs:
   - at: '2026-11-10T02:29:27+00:00'
     question: 'Is the earlier V/B attempt''s failure a property of the target itself: is V/B (stored one-loop virtual over
