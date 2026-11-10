@@ -21576,18 +21576,18 @@ entries:
         to kit_benchmark'
       - 'no gain: look for the cause in what changed since June (HETEROSC, Muon, the mass-scheme shift in the stored target)'
   targets:
-  - batch: vob_born
-    wall_h: 0.5
-    jobs: 1
-    units: null
-    start: '2026-11-10T03:36:42+00:00'
-    at: '2026-11-10T03:36:42+00:00'
   - batch: vob_V_sweeps
     wall_h: 1.2
     jobs: 16
     units: null
     start: '2026-11-10T03:39:24+00:00'
     at: '2026-11-10T03:39:24+00:00'
+  - batch: vob_born
+    wall_h: 0.8
+    jobs: 1
+    units: null
+    start: '2026-11-10T03:40:33+00:00'
+    at: '2026-11-10T03:40:33+00:00'
 - id: draft_rewrite
   title: rewrite of the paper draft around the new story
   question: 'Rewrite the draft (the 2026-11-10 zip) into the story of D365/D354: pretraining works (data saved at 1e-4), the
