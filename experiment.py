@@ -4051,7 +4051,9 @@ class AmplitudeExperiment(BaseExperiment):
             # the beta=1 mu-gradient is provably 0.5x the MSE one (uniform, Adam-invariant),
             # so this arm MUST reproduce the 1-ch MSE result unless the model is at fault.
             if bool(self.cfg.training.get("heterosc_mu_only", False)):
-                return ((y_pred - y) ** 2).flatten(1).mean(dim=1)
+                elem = (y_pred - y) ** 2
+                return self._is_weighted(elem.flatten(1).mean(dim=1), y) \
+                    if self.cfg.training.get("is_weight_path", None) else elem.flatten(1).mean(dim=1)
             # STAGE 2 of the two-stage recipe (heterosc_sigma_only): mu comes from a frozen,
             # MSE-trained trunk+head, and only the sigma readout row trains. Detaching mu here
             # makes the residual a CONSTANT w.r.t. autograd, so the NLL's mu-gradient
@@ -4072,7 +4074,49 @@ class AmplitudeExperiment(BaseExperiment):
         else:
             raise ValueError(f"Unknown loss function {name}")
         # mean over feature dims → (B,)
-        return elem.flatten(1).mean(dim=1) if elem.dim() > 1 else elem
+        per_event = elem.flatten(1).mean(dim=1) if elem.dim() > 1 else elem
+        return self._is_weighted(per_event, y) if self.cfg.training.get("is_weight_path", None) else per_event
+
+    def _is_weighted(self, per_event, y):
+        """Importance-sampling correction of the TRAINING loss (training.is_weight_path; off when null).
+
+        A pool drawn from a density pi that oversamples some log|M|^2 regions (sigma-emphasized generation) trains
+        the objective Q it was drawn against when each event's loss is multiplied by c_b = Q_b / pi_b of its
+        log|M|^2 bin: with sum_b pi_b c_b = 1 the batch loss is an unbiased estimator of the Q-weighted objective
+        for any pi, so the emphasis changes only the gradient variance. The table {logm_edges, c} is written at
+        pool build (analysis/divergences/l2_online.py build_pool). Validation is never weighted: the recorded
+        val_loss_no_reg stays the plain per-event mean of the pool."""
+        if not self.model.training:
+            return per_event
+        isw = self._get_is_weights()
+        if isw is None:
+            return per_event
+        edges, cvals, amp_mean, amp_std = isw
+        yf = (y.flatten(1).mean(dim=1) if y.dim() > 1 else y).detach()
+        logm = yf * amp_std + amp_mean                     # standardized log-amp -> raw log|M|^2
+        b = torch.bucketize(logm.to(edges.dtype), edges).clamp(0, cvals.numel() - 1)
+        return per_event * cvals[b].to(per_event.dtype)
+
+    def _get_is_weights(self):
+        """The per-log|M|^2-bin IS table of training.is_weight_path, loaded once; None when the path is null."""
+        if getattr(self, "_is_weight_cache", "unset") != "unset":
+            return self._is_weight_cache
+        path = self.cfg.training.get("is_weight_path", None)
+        if not path:
+            self._is_weight_cache = None
+            return None
+        with open(path) as f:
+            d = json.load(f)
+        edges = torch.tensor(d["logm_edges"][1:-1], device=self.device, dtype=torch.float64)   # inner edges
+        cvals = torch.tensor(d["c"], device=self.device, dtype=torch.float64)
+        if np.atleast_1d(self.prepd_mean).size != 1:   # one table over one pool's log|M|^2 axis
+            raise ValueError("training.is_weight_path needs a single-process run (one amplitude preprocessing)")
+        amp_mean = float(np.atleast_1d(self.prepd_mean)[0])
+        amp_std = float(np.atleast_1d(self.prepd_std)[0])
+        LOGGER.info(f"IS correction from {path}: {cvals.numel()} log|M|^2 bins, c in "
+                    f"[{float(cvals.min()):.3f}, {float(cvals.max()):.3f}]")
+        self._is_weight_cache = (edges, cvals, amp_mean, amp_std)
+        return self._is_weight_cache
 
     def _aggregate_per_process_loss(self, y_pred, y, process_ids, loss_agg, sigma=None, sign=None):
         """Mean (or geometric mean) over per-process mean losses.
@@ -4103,6 +4147,8 @@ class AmplitudeExperiment(BaseExperiment):
         if self.cfg.training.loss == "HETEROSC":
             loss_agg = "mean"
         if os.environ.get("LLOCA_PROC_LOSS", "vectorized") == "loop" and loss_agg != "excess":
+            if self.cfg.training.get("is_weight_path", None):
+                raise NotImplementedError("LLOCA_PROC_LOSS=loop does not carry training.is_weight_path")
             unique_procs = torch.unique(process_ids)
             per_proc = [self.loss(y_pred[process_ids == p], y[process_ids == p])
                         for p in unique_procs]

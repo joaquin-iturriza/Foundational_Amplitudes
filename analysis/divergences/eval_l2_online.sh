@@ -1,0 +1,35 @@
+#!/bin/bash
+#SBATCH --job-name=ev_l2
+#SBATCH --gres=gpu:1
+#SBATCH --cpus-per-task=8
+#SBATCH --time=00:40:00
+#SBATCH --output=analysis/divergences/ev_l2_%j.out
+#SBATCH --error=analysis/divergences/ev_l2_%j.out
+# Eval every arm x round mu ckpt on the common RAMBO test -> logflat A/B + per-round migration.
+# Usage: sbatch eval_l2_online.sh <tag> <rounds>
+set -e
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/../.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
+WT=$PROJECT_DIR
+cd "$WT"
+TAG=${1:-run}
+ROUNDS=${2:-3}
+# TAGLIST lets one job cover several run tags (e.g. the 3 seeds of one study); ARMS and SUMMARY
+# make the arm set and the destination explicit, since not every study uses static/l2/oracle
+# (the mechanism decomposition adds 'reweight', the coordinate-free one uses 'adapt').
+TAGLIST=${TAGLIST:-$TAG}
+ARMS=${ARMS:-"static l2 oracle"}
+SUMMARY=${SUMMARY:-l2_online_summary.json}
+TAGS=""
+for t in $TAGLIST; do
+  for arm in $ARMS; do
+    for ((r=0; r<ROUNDS; r++)); do TAGS="$TAGS,${t}_${arm}_mu_r${r}"; done
+  done
+done
+TAGS=${TAGS#,}
+echo "[eval] summary=$SUMMARY arms='$ARMS' tags=$TAGS"
+python analysis/divergences/eval_eeuu_resonance.py \
+  --runs_root "$WT/runs/eeuu_l2" --run_prefix "" --tags "$TAGS" \
+  --test $PROJECT_DIR/data_test_eeuu/ee_uu_91-1000GeV_amplitudes.npy \
+  --out_prefix "l2_online_${TAG}_" --summary "$SUMMARY"
+echo "DONE eval_l2_online $TAG"

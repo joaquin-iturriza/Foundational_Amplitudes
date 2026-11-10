@@ -21,6 +21,18 @@ from delta_plots import load, pick, tag  # noqa: E402
 BLEW = "tp3_uu64fte_ee_nnbar_d8__trial_0114"
 
 
+
+def _sig6(x):
+    """Floats to 6 significant digits for the committed JSON: a rerun's last-digit float noise (1e-7 relative) no
+    longer rewrites the tracked file; the printed claims are unrounded."""
+    if isinstance(x, float):
+        return float(f"{x:.6g}")
+    if isinstance(x, dict):
+        return {k: _sig6(v) for k, v in x.items()}
+    if isinstance(x, (list, tuple)):
+        return [_sig6(v) for v in x]
+    return x
+
 def arrs(path, suf):
     with np.load(path, allow_pickle=True) as z:
         return {k[: -len(suf)]: z[k] for k in z.files if k.endswith(suf)}
@@ -62,7 +74,7 @@ def main():
     s["mumse_over_nll_by_probe"] = {k: float(np.median(v)) for k, v in sorted(per.items())}
     print(json.dumps(s, indent=1))
     print("blew up in D47:", blew, "missing:", missing)
-    json.dump(dict(summary=s, cells=pts, blew_up=blew, missing=missing),
+    json.dump(_sig6(dict(summary=s, cells=pts, blew_up=blew, missing=missing)),
               open(os.path.join(HERE, "het_mumse22_summary.json"), "w"), indent=1)
 
     # the figure: what the selection does inside one run against how far two runs of one config land apart, from the
@@ -76,7 +88,7 @@ def main():
              sel22_q=[float(x) for x in np.quantile(sel22, [.1, .25, .5, .75, .9])],
              run24_q=[float(x) for x in np.quantile(run24, [.1, .25, .5, .75, .9])],
              sel24_q=[float(x) for x in np.quantile(sel24, [.1, .25, .5, .75, .9])])
-    json.dump(dict(summary=s, cells=pts, blew_up=blew, missing=missing),
+    json.dump(_sig6(dict(summary=s, cells=pts, blew_up=blew, missing=missing)),
               open(os.path.join(HERE, "het_mumse22_summary.json"), "w"), indent=1)
     fig, ax = ps.figure()
     # the final JSON line results.tex claims from: the summary, and the blown-up D47 cell's rerun over its MSE cell

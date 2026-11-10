@@ -200,6 +200,10 @@ training:
  # median over it) this many times the others, each pool's mean weight kept at 1 (in-memory data path only)
  sign_near_weight: 1.0
  sign_near_factor: 10.0
+ is_weight_path: null    # importance-sampling correction of the TRAINING loss: path to an is_weights.json
+                        # {logm_edges, c} written at pool build; each event's loss times c_b = Q_b/pi_b of its
+                        # log|M|^2 bin, so a sigma-emphasized pool trains the coverage objective Q unbiasedly.
+                        # null = off; validation is never weighted.
  loss_aggregation_tau: 0.0   # τ-floor for the geometric mean (TRAINING loss only): aggregate
                         # log(MSE_p + τ), capping a converged process's gradient weight at 1/τ
                         # (a 1e-4 process otherwise outweighs a stuck one by 1e4). 0 = exact

@@ -10002,7 +10002,9 @@ softening of the IR, in advance; (iii) the keep rule's shape is settled, since a
 temperature over seeds, and the $\sigma$-tail \emph{floors} at a level $8\times$ more data does not move
 (at fixed optimizer budget, so the binding constraint is capacity, not coverage), giving a stopping
 rule for how much to generate. Tooling under \code{analysis/divergences/};
-heteroscedastic code on worktree \code{worktrees/wt-heterosc} (branch \code{heterosc}). Remaining/future
+the heteroscedastic code is on \code{trunk} (\code{models/lloca.py}, \code{experiment.py}), and the July scripts and
+sweep configs of branches \code{heterosc} and \code{l2-gen} were ported there (\code{analysis/divergences/},
+\code{sweep/sweep\_config\_heterosc\_*.yaml}). Remaining/future
 work is collected in the hand-off, Sec.~\ref{sec:div-open}.}
 % src: python3 analysis/divergences/steering_numbers.py @40b69989
 % claim: sat.budget_factor=8
@@ -10085,16 +10087,17 @@ budget the optimum is the equimarginal (water-filling) allocation: sample until 
 (test-weighted) error reduction is equal everywhere, $p^\star\!\propto\!\sqrt{q\cdot\text{diff}}$
 for test weighting $q$, neither uniform nor pure antenna, consistent with the interior optimum
 above. An online adaptive per-$y_{\min}$-bin importance sampler was prototyped
-(\code{adaptive\_ir.py}, branch \code{adaptive-ir}); the controller math is CPU-validated
+(\code{analysis/divergences/adaptive\_ir.py}); the controller math is CPU-validated
 (unbiased IS correction with mean weight $=1$; variance-optimal proposal
-$\pi_b\!\propto\!Q_b\sqrt{E_b}$). It is \emph{not} wired into the training loop. Caveat: the
+$\pi_b\!\propto\!Q_b\sqrt{E_b}$). The controller is \emph{not} wired into the training loop; the same form of correction,
+$c_b=Q_b/\pi_b$ but over log-amplitude bins rather than $y_{\min}$ bins, read from a table written when the pool is built, is \code{training.is\_weight\_path}. Caveat: the
 variance-reduction proposal ($\pi\!\propto\!Q\sqrt{E}$, fixed objective, faster convergence) is
 \emph{not} the finite-data allocation optimum ($\pi\!\propto\!\sqrt{QC}$). Deprioritised in favour
 of the heteroscedastic head below.
 
 \paragraph{The heteroscedastic $(\mu,\sigma)$ head.}
 Goal: a learned per-event uncertainty $\sigma(x)$ as an attention/sampling signal
-(process/divergence-agnostic, no hand-binning). All on branch \code{heterosc}.
+(process/divergence-agnostic, no hand-binning). Built on branch \code{heterosc}, now on \code{trunk}.
 \emph{Wiring:} HETEROSC existed for the MLP configs but was never wired for the $\mu$P
 LLoCa net; now the net emits $2\times$\code{out\_shape} channels (mean, softplus $\sigma$) when
 \code{loss=HETEROSC} (\code{models/lloca.py}); \code{net.loss} interpolates \code{training.loss};
@@ -11105,7 +11108,7 @@ is already balanced, leaving $\sigma$ nothing to reallocate.
 un-regenerable.} On a starved pool, reweighting toward the right objective without $\sigma$ did about as well in the
 online study below, so $\sigma$'s own share of that gain is not established.
 
-\paragraph{Online $\sigma$-driven generation on $ee\to u\bar u$: the design (branch \code{l2-gen}, 2026-07-18; two arms rerun 2026-09-07).}
+\paragraph{Online $\sigma$-driven generation on $ee\to u\bar u$: the design (2026-07-18 on branch \code{l2-gen}, now on \code{trunk}; two arms rerun 2026-09-07).}
 Before the $ee\to u\bar ugg$ loop below, the same idea was tried on the $Z$ resonance with
 \code{analysis/divergences/l2\_online.py}. One frozen candidate pool of $3\times10^{6}$ labelled $ee\to u\bar u$ events
 ($\sqrt s$ from $91$ to $1000$\,GeV, half of it on the pole) feeds every arm. Each arm fine-tunes $\mu$ from \code{base22}

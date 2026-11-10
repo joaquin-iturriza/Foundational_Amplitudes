@@ -1,6 +1,13 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+
+def _save_pair(fig, file):
+    """Save the figure as <base>.pdf and <base>.png side by side (file given with or without .pdf)."""
+    base = file[:-4] if file.endswith(".pdf") else file
+    fig.savefig(base + ".pdf", format="pdf", bbox_inches="tight")
+    fig.savefig(base + ".png", format="png", dpi=150, bbox_inches="tight")
+
 #plt.rcParams["font.family"] = "serif"
 #plt.rcParams["font.serif"] = "Charter"
 plt.rcParams["text.usetex"] = False
@@ -163,7 +170,7 @@ def plot_loss(
                 frameon=False, fontsize=FONTSIZE_LEGEND,
             )
 
-    fig.savefig(file, format="pdf", bbox_inches="tight")
+    _save_pair(fig, file)
     plt.close(fig)
 
 def plot_mse(file, mse_losses, labels=None, title=None):
@@ -208,7 +215,7 @@ def plot_mse(file, mse_losses, labels=None, title=None):
     if title:
         fig.suptitle(title, fontsize=FONTSIZE + 1, y=1.02)
  
-    fig.savefig(file, format="pdf", bbox_inches="tight")
+    _save_pair(fig, file)
     plt.close(fig)
 
 
@@ -229,5 +236,5 @@ def plot_metric(file, metrics, metric_label, labels=None, logy=False):
     ax.set_ylabel(metric_label, fontsize=FONTSIZE)
     ax.set_xlabel("Number of iterations", fontsize=FONTSIZE)
     ax.legend(fontsize=FONTSIZE_LEGEND, frameon=False, loc="upper left")
-    fig.savefig(file, format="pdf", bbox_inches="tight")
+    _save_pair(fig, file)
     plt.close()
