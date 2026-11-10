@@ -22126,7 +22126,7 @@ entries:
       30, so no budget question remains'
   owner:
     agent: a674b9b77e97e3012
-    state: working
+    state: closed
     since: '2026-11-10T09:30:58+00:00'
     state_at: '2026-11-10T10:46:20.791000+00:00'
     context: 277083
@@ -22365,42 +22365,31 @@ entries:
     '4': FA-ccin2p3-78b8190c
     '5': FA-ccin2p3-78b8190c
   handoff:
-    state: 'Protocol A from scratch done and drawn (tools/kit_figures.py, figs in analysis/kit_benchmark/figs, data analysis/kit_benchmark/data/kit_fig_A.json):
-      no arm follows any limit; uug soft dives (1e5 median -153 vs truth +7.6). Plain target+inputs arm (2642b17b): saturates
-      (soft +0.78, coll +0.17, deep bins at the do-nothing floor; bulk 7.1e-6, 2 decades below the parent-preprocessed control).
-      FEAT check (kit_target_slope 412188b7): the off-shellness column sits outside its bulk range in 100% of hard events.
-      RUNNING: off-shellness-off arms uug c35a2199, uugg ac436bba (design passed 08:35, bands a-d against 1-decade variability;
-      read per the design, compare with f6b2ece9/12a9d54b and the 9e5 runs); protocol B: B_bulk done for tt x4 and uug (de0489b9,
-      7ea922a6, 788401d3, c79ef941, fcf9541f), uugg B e9937c15 and B_bulk 677b9e9a running (their scoring now uses the fixed
-      rebuild), the five other B runs trained fine but failed at scoring (rebuild mom_div assertion, fixed in rebuild_run.py)
-      and are re-scored without retraining by FA-ccin2p3-9165f51b, fe5c6e7d, 5b5877e0, 21dc6836, 1974ee97 (KIT_SCORE_ONLY=1,
-      REREAD of 77e3e6c2, 2e56eeca, fb15e13b, 11c56b6e, 45c023b0). Pretrainings heldout 62c2443b and fair_nlo d0b132b6 running,
-      end ~16:00 UTC. FIRST THING (Joaquin, today): the pretrained fine-tunes A_ft from the heldout parent are THE result
-      that matters; submit them the moment 62c2443b ends. No A_ft design is recorded yet: record it now (arms: tt Born and
-      virtual off-shellness on and off, uug, uugg at the n of the A scratch runs it is compared with, 9e5 and 1e5; controls
-      the A scratch runs; job_kit.sh A_ft mode with --env KIT_PARENT=runs/kit/kit_pretrain_heldout; steps and lr as the A
-      runs), get the reviewer''s pass, and queue it with site launch (ready check: 62c2443b COMPLETED with RUN_DONE) so it
-      goes at the parent''s end. Then: B readout (B vs B_bulk per family, figure with kit_figures.py adding the B dirs), tell
-      pretrain_data_saving (plan finding there) when 62c2443b ends, fair NLO D-scan after d0b132b6, threshold scan (needs
-      exact fixed-order NLO sigma(sqrt s) at KIT alpha_s 0.118 fixed, m_t 173: MG5_aMC fixed order or exact formulas validated
-      against it; surrogate side = exact NLO + integral of (V_surr - V_exact) over 2-body phase space), KIT package. Every
-      result goes out with its figure (kit_figures.py; legend says what each curve is, caption says per curve from scratch
-      or fine-tuned).'
-    decisions: 'One seed (D315). Off-shellness off = offshell_per_event=false AND internal_mass_scalars=false. KIT_FROM /
-      KIT_PARENT reach the job only through site submit --env (a shell variable is not exported: 12 B jobs failed so). Fine-tuned
-      runs are scored on their own frozen stats (rebuild_run fix 3fffcbc2; kit_predict --check-rebuild N is a CPU check).
-      Re-scoring a trained run: KIT_SCORE_ONLY=1 with the same job_kit.sh arguments, REREAD=<run id>. The off-shellness design''s
-      cuts are 1 decade on deep bins and soft-exponent bands (a) [-2.5,-1.5] (b) (-1.5,+1] (c) >+1 or within 1 decade of control
-      (d) <-2.5, because 1e5 vs 9e5 moved the deep soft bin by 1 decade. Plain-arm reading: saturates (preprocessing is not
-      what blocks the limits; it costs 2 decades of bulk).'
-    ruled_out: float32; trial 1262 as parent; bulk-only checkpoint for B; the emission-scale target as the cause of the uug
-      runaway; dimless_offshell_eps 1e-12 as a lever (changes only the deepest two decades of the column)
-    running: FA-ccin2p3-c35a2199, ac436bba (off-shellness-off arms); e9937c15, 677b9e9a (uugg B, B_bulk); 9165f51b, fe5c6e7d,
-      5b5877e0, 21dc6836, 1974ee97 (B re-scoring); 62c2443b, d0b132b6 (pretrainings)
-    files: scripts/job_kit.sh (KIT_SCORE_ONLY, --env note) tools/kit_predict.py (--check-rebuild) tools/rebuild_run.py tools/kit_figures.py
-      tools/kit_target_slope.py (FEAT) analysis/kit_benchmark/data/kit_fig_A.json analysis/kit_benchmark/figs/ scripts/job_kit_pretrain.sh
-      recipes/catalog_v4_kit_pretrain_{heldout,fair_nlo}.yaml; KIT slides /home/joaquin/.claude/uploads/71602535-0955-42ad-a58f-23dc320798dc/12a84312-hardps_benchmark_slides.pdf
-    written: '2026-11-10T09:30:05+00:00'
+    state: 'Protocol A scratch, plain arm, off-shellness-off arms (uug band a at the edge: soft -1.51, deep 516 vs 14180;
+      uugg band c: +7.8, 3670 vs 9067) and protocol B (hard events fix tt Born threshold, tt Sudakov, uugg collinear; not
+      uug/uugg soft nor the tt virtual Coulomb rise: representation) are read, recorded as findings and drawn (analysis/kit_benchmark/figs
+      kit_*_B_*, kit_*_offshell_*; data kit_fig_{A,B,A_nooffshell}.json; tools/kit_readout.py). The pretrainings 62c2443b/d0b132b6
+      run 0.94/0.85 s/step and stop at their 12 h limit ~19:00 UTC at ~45k/~50k steps; resume jobs 78b8190c (heldout, ETA
+      ~02:00 UTC 11-11) and 03ea3719 (fair_nlo, ~00:30) finish them (KIT_RESUME, tested, reviewer PASS). A_ft design passed
+      (~11:10 UTC, after FIX: lr_scale 1.0, lr-axis check, divergences-holdout prior); its 12 jobs are queued as site launch
+      kit_aft_heldout on 78b8190c''s RUN_DONE; scratch controls tt on n=1e5 b3d27208, d083f5da running. On A_ft end: read
+      the first job''s lr line, readout + figures (A_ft beside scratch, caption per curve), bands, lr_scale 0.1 check (3 cells)
+      before any ''no help''. Error-panel y axes: legend room now default (was 3x growth), still to ~1e11 on uug soft where
+      the 5-entry legend needs room.'
+    decisions: One seed (D315). A_ft at fine_tune.lr_scale=1.0 (only the start weights differ from scratch). Off arms of A_ft
+      hold the off-shellness columns at 0 (data.offshell_zero), equivalent to removal for a first Linear. Resume from the
+      best checkpoint with resume_seed_best, sigma stage from model_run<idx>_best (88b5685b); the final parent model is models/model_run0_best.pt
+      after promotion. Score-only jobs request --time 0:05 (measured 34-48 s). KIT_FROM/KIT_PARENT only via site submit --env.
+      launch_kit_aft.sh needs site pick to allot all 12 to ccin2p3 and submits --no-sync.
+    ruled_out: float32; trial 1262 as parent; bulk-only checkpoint for B; emission-scale target as the uug runaway's cause;
+      dimless_offshell_eps 1e-12; the off-shellness column as the uugg runaway's cause (band c); hard events as a fix for
+      the soft limit (B 0.15 decades on uug)
+    running: FA-ccin2p3-62c2443b, d0b132b6 (pretrainings, to their limit), 78b8190c, 03ea3719 (resumes, afterany), b3d27208,
+      d083f5da (scratch controls); site launch kit_aft_heldout (12 A_ft)
+    files: scripts/job_kit.sh scripts/job_kit_pretrain.sh scripts/launch_kit_aft.sh tools/kit_figures.py tools/kit_readout.py
+      tools/kit_predict.py run.py base_experiment.py (resume_seed_best) experiment.py (offshell_zero) analysis/kit_benchmark/data/
+      analysis/kit_benchmark/figs/
+    written: '2026-11-10T10:47:45+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
