@@ -21357,6 +21357,18 @@ entries:
       azimuth y 1e-7. Three uugg strata (coll_gg y 1e-4..1e-2, coll_qg y 1e-3..1e-2) show max 0.4-0.99 in both dtypes and
       in the definition check alike: the check''s min-over-gluon-pairs differs from the file''s designated pair on a few events,
       not a precision loss (float64 medians 4e-15).'
+  - at: '2026-11-10T04:26:28+00:00'
+    text: 'Protocol A batch, first submission (b2b18e01): 8 of 10 failed at data loading, read in their logs. (1) The 4 off-shellness-off
+      tt runs (FA-ccin2p3-fef0cb4c, 41de7470, e3f2f12e, d9ca7c6a): the parent''s dimensionless inputs refuse internal_mass_scalars
+      without offshell_per_event, so the off arm now sets data.internal_mass_scalars=false as well (the off-shellness columns
+      removed). (2) The 4 uug/uugg runs (63a54687, 2a4e268e, 304d0945, b12b6123): data.target_physics_orders needs a per-event
+      alpha_s sidecar, and KIT pools had none. Fix 0d14a678: KIT pools and kit_predict''s scoring pool now carry the file''s
+      fixed alpha_s 0.118 (tests/test_kit_hardps.py section 1 checks it). Both fixes were dry-run on CC (uugg and tt virtual
+      with off-shellness off, 5 steps each, rc 0). Their run dirs were deleted (empty debris) and the 8 runs resubmitted as
+      FA-ccin2p3-b99b09db, de744946, 7d74d518, 366a4a98, 2c922af4, 88aa155a, f6b2ece9, 12a9d54b. The 2 runs that started (tt
+      Born and tt virtual, off-shellness on, 9e5) step at 0.56 s/step in float64 on V100 (1000 steps in 563 s), so 8000 steps
+      take 1.25 h against the 1.8 h target. Signs census (tools/kit_hardps.py signs): 9183000 KIT events, 0 non-positive,
+      so tt virtual is scored as positive.'
   step_why:
     1:
       feeds: the from-scratch KIT numbers against Bakar's MLP and the control of every later arm
