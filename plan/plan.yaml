@@ -21016,7 +21016,7 @@ entries:
   asks: []
   owner:
     agent: aba79dc379109f4aa
-    state: working
+    state: closed
     since: '2026-11-10T02:21:46+00:00'
     state_at: '2026-11-10T03:31:20.409000+00:00'
     context: 296088
@@ -21153,6 +21153,26 @@ entries:
   step_waits:
     '2': '2026-11-11'
     '1': repo-reviewer a908d9ab432d34127 re-check of 9ecbae9f, then merge pid_vs_qn, site sync, submit
+  handoff:
+    state: 'pidqn design PASSED (design-reviewer, second look). Code on branch pid_vs_qn (worktree worktrees/pid_vs_qn: 5541a2ec
+      + fix 9ecbae9f). The repo-reviewer (agent a908d9ab432d34127, holds the lock) BLOCKED on a wrong _dimless_mass_stats
+      under use_PIDs; that is fixed in 9ecbae9f and its re-check was requested. After PASS: merge pid_vs_qn into trunk, site
+      sync, site pick FA --jobs 2 (all sites timed out at 2026-11-10 ~04:xx: retry), then submit 2 jobs: PIDQN=pid and PIDQN=qn
+      with LONG_HEADS=8 LONG_FACTOR=1 LONG_MEMMAP=true, arm v4_het_default25, scripts/job_catalog_v3_short.sh, --hdr=--time
+      from tools/short_wall.py (~2.7 h), --item for optimizations_recap; target recorded (pidqn 2.7 h, 2 jobs); plan run +
+      plan wait step 1 on both run ids. Check both logs open the same memmap cache key (reviewer note). Write-up recap section
+      committed: docs/results.tex sec:optrecap (b78a7c41), formulas per D364 item with refs; numbers to fill for pidqn and
+      muon_1e4. Step 2 muon_1e4 waits on pretrain_data_saving''s design (date 2026-11-11): add an AdamW parent (AdamW at catalog_v3
+      stage-2 best lr 7.82e-3, L2 1e-6) of the data-saving parent''s setup and fine-tune it on that study''s grid to MSE 1e-4;
+      GPU-h then, above 30 needs Joaquin.'
+    decisions: 'D364 scope; D315 one seed per arm; design-reviewer: if one-hot worse (R>1.26) run the 8-trial Muon-space DyHPO
+      for it (~22 GPU-h) best against best; the zero-shot framing paragraph uses Joaquin''s words as relayed by the main session'
+    ruled_out: 'a separate pID control rerun at an old commit (same-commit qn arm instead); two seeds (D315); a new .tex/.txt
+      file for the paper paragraphs (md_guard): the recap lives in docs/results.tex sec:optrecap'
+    running: none (no job submitted yet); repo-reviewer re-check in flight
+    files: worktrees/pid_vs_qn (experiment.py, wrappers.py, data_mmap.py, scripts/job_catalog_v3_short.sh PIDQN, tests/test_pid_dimless.py);
+      docs/results.tex sec:optrecap; analysis/catalog_v4/data/seed_spread.json
+    written: '2026-11-10T03:33:29+00:00'
 - id: kit_benchmark
   title: the KIT hard phase-space benchmark and the fair NLO protocol (Bakar, Gudrun)
   question: 'On the KIT datasets (ee->tt Born and one-loop virtual, ee->uug, ee->uugg; hard bins by distance to the singularity):
