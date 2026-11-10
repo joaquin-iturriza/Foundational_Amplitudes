@@ -339,6 +339,11 @@ class AmplitudeLLoCaWrapper(nn.Module):
         self.register_buffer("_dm_log10m", torch.as_tensor(raw_log10m, dtype=torch.float32), persistent=False)
         self.register_buffer("_dm_massive", torch.as_tensor(massive, dtype=torch.bool), persistent=False)
 
+    def setup_dimless_pids(self):
+        """data.dimensionless_inputs under use_PIDs: no mass column to put per sqrt(s_hat); the event's log10
+        sqrt(s_hat), the last column of order_labels, is only taken off (and kept for the diagram encoder's s_hat)."""
+        self.dimless_pids = True
+
     def _apply_dimless_mass(self, raw_props, particle_type_indices, ptr, order_labels):
         """(raw_props with the mass column per event, order_labels without the log10 sqrt(s_hat) column)"""
         lrs = order_labels[:, -1].repeat_interleave(ptr[1:] - ptr[:-1], dim=0)          # (N_total,)
@@ -852,15 +857,17 @@ class AmplitudeLLoCaWrapper(nn.Module):
                                 forwarded to the attention-mask builder to skip a
                                 GPU→CPU sync (see build_block_diagonal_bias).
         """
+        ev_lrs = None
         if self.use_pids:
             particle_type = torch.nn.functional.one_hot(
                 particle_type_indices, num_classes=self.token_size
             ).to(dtype=self.network_dtype, device=fourmomenta.device)
+            if getattr(self, "dimless_pids", False):
+                ev_lrs, order_labels = order_labels[:, -1], order_labels[:, :-1]
         else:
             raw_props = self.property_matrix[particle_type_indices]   # (N_total, n_features)
             if self.mass_from_momenta:
                 raw_props = self._apply_mass_from_momenta(raw_props, fourmomenta)
-            ev_lrs = None
             if getattr(self, "dimless_mass", False):
                 ev_lrs = order_labels[:, -1]                           # log10 sqrt(s_hat) per event, GeV
                 raw_props, order_labels = self._apply_dimless_mass(raw_props, particle_type_indices, ptr, order_labels)

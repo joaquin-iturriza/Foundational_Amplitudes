@@ -698,6 +698,18 @@ if [ -n "$LONG_HEADS$LONG_FACTOR$LONG_LR" ]; then
         echo "GROW parent=$GPT heads $((LH / 2)) -> $LH steps=$GROW_K${GROW_HP:+ hp $GROW_HP}"
     fi
 fi
+# PIDQN=<pid|qn> (plan optimizations_recap, D364: "I'd like to see the claim that pIDs and quantum numbers behave the
+# same be tested again on our latest setup"): a 1x width-8 cell (LONG_HEADS=8 LONG_FACTOR=1) with the particles encoded
+# as a one-hot PDG token (pid: data.use_PIDs=true) or as their quantum numbers (qn: the default, unchanged), both in
+# their own run dir <cell>_pidqn_<pid|qn> at one commit, so qn is the same-commit control. Under use_PIDs the
+# dimensionless inputs keep the momenta and off-shellness per sqrt(s_hat) (no mass column exists) and the
+# arXiv:2606.23791 diagram encoder stays on; a held-out probe with a particle the pretraining never saw has no one-hot
+# input and is refused by its read (a ZERO_SHOT error line), listed, not scored
+if [ -n "$PIDQN" ]; then
+    [ "${LH:-}" = 8 ] && [ "${LF:-}" = 1 ] && [ -z "$LONG_LR$LONG_HP$GROW_K" ] || { echo "PIDQN: the 1x width-8 cell only (LONG_HEADS=8 LONG_FACTOR=1)"; exit 1; }
+    case "$PIDQN" in pid) NORM+=(++data.use_PIDs=true) ;; qn) ;; *) echo "PIDQN must be pid or qn"; exit 1 ;; esac
+    OUT="${OUT}_pidqn_${PIDQN}"; PRED="${PRED}_pidqn_${PIDQN}"
+fi
 [ -n "$SIGMA_FROM" ] && AXES+=(HD4 HD5)
 # mode eval may read a subset of the axes again (V3_AXES="H3p"), the trained model reused
 [ "$MODE" = eval ] && [ -n "$V3_AXES" ] && read -ra AXES <<< "$V3_AXES"

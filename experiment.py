@@ -208,6 +208,7 @@ class AmplitudeExperiment(BaseExperiment):
             pretrained_tok_path = os.path.join(pretrained_run_dir, "particle_tokenizer.json")
             if os.path.exists(pretrained_tok_path):
                 self.tokenizer = ParticleTokenizer.load(pretrained_tok_path)
+                self._parent_vocab_size = self.tokenizer.vocab_size
                 LOGGER.info(
                     f"Fine-tuning: loaded tokenizer from pretrained run at {pretrained_tok_path} "
                     f"(vocab_size={self.tokenizer.vocab_size})"
@@ -698,6 +699,11 @@ class AmplitudeExperiment(BaseExperiment):
         # Set model size — particle feature dimension depends on encoding mode
         # ------------------------------------------------------------------
         token_size = self.tokenizer.vocab_size
+        _pv = getattr(self, "_parent_vocab_size", None)
+        if self.cfg.data.get("use_PIDs", False) and _pv is not None and token_size > _pv:
+            # one-hot PIDs have no input for a particle the parent never saw: refuse, never a silent remap
+            raise ValueError(f"use_PIDs: this run's particles need {token_size} tokens, the parent's one-hot "
+                             f"vocabulary has {_pv}: a PDG id the parent never saw has no encoding")
         self.token_size = token_size
         with open_dict(self.cfg):
             self.cfg.model.token_size = token_size
@@ -759,10 +765,13 @@ class AmplitudeExperiment(BaseExperiment):
             # Feynman-diagram conditioning: load each process's diagram graphs and
             # widen the scalar channel by d_diag (the appended diagram embedding).
             # Requires the property encoding (use_PIDs=false). Off → no change.
-            self._use_diagrams = (
-                not use_pids and bool(self.cfg.model.get("use_diagrams", False))
-            )
+            # the 'ours' encoder builds its nodes from the property table; arXiv:2606.23791's (llm4lhc) labels edges
+            # by its own PDG vocabulary and adds its vector inside the backbone, so it runs under use_PIDs too
             self._diag_impl = str(self.cfg.model.get("diagram_encoder_impl", "ours"))
+            self._use_diagrams = (
+                (not use_pids or self._diag_impl == "llm4lhc")
+                and bool(self.cfg.model.get("use_diagrams", False))
+            )
             if self._diag_impl not in ("ours", "llm4lhc"):
                 raise ValueError(f"model.diagram_encoder_impl={self._diag_impl!r}; "
                                  "valid: 'ours', 'llm4lhc'")
@@ -1255,8 +1264,13 @@ class AmplitudeExperiment(BaseExperiment):
                     f"mass_col={spec['mass_col']}, replaces frozen table mass)"
                 )
             # data.dimensionless_inputs: masses as log10(m / sqrt(s_hat)) per event (wrappers.setup_dimless_mass)
-            if self.cfg.data.get("dimensionless_inputs", False):
-                assert not use_pids, "data.dimensionless_inputs requires the property encoding (use_PIDs=false)"
+            if self.cfg.data.get("dimensionless_inputs", False) and use_pids:
+                # one-hot PIDs carry no mass column: the momenta and off-shellness are per sqrt(s_hat) as with the
+                # property encoding, and the wrapper only takes the log10 sqrt(s_hat) column off the order features
+                assert self.modelname == "LLOCAMuPTransformer", "use_PIDs with dimensionless_inputs: LLoCa only"
+                model.setup_dimless_pids()
+                LOGGER.info("dimensionless_inputs under use_PIDs: no mass column; log10 sqrt(s_hat) column dropped")
+            elif self.cfg.data.get("dimensionless_inputs", False):
                 assert not self.cfg.data.get("mass_from_momenta", False), \
                     "data.dimensionless_inputs sets the mass column itself; data.mass_from_momenta must be off"
                 from particle_ids import mass_feature_spec, GLOBAL_PROPERTY_MATRIX, PARTICLE_FEATURE_NAMES, \
