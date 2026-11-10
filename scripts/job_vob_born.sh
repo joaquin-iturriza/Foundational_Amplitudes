@@ -5,8 +5,10 @@
 # Wall-time target: 6 pools in parallel, the largest 50000 rows of a 2->2 MadLoop point (estimate, at most
 # 10 ms per point: 8 min), plus the two standalone builds and pole checks (estimate 10-20 min each, serial): 0.8 h.
 # With arguments (plan pretrain_data_saving): one-loop processes as <mg process>:<lo>-<hi> (mg5_pipeline_final names,
-# e.g. v4_bg_ab_nlo:20-6000), each built and certified in parallel, then its three pools read in parallel; set
-# --cpus-per-task to 3 x the processes at submit.
+# e.g. v4_bbx_zz_nlo:183-6000), each built and certified in parallel, then its three pools read in parallel; submit
+# with --cpus-per-task=3N for N processes (the 6 above is the two-process default). Target there: the builds in
+# parallel (10-20 min) plus 5e4 rows at <= 2 ms per point (catalog_v4 generation, analysis/catalog_v4/data/
+# sampling_cost_gen.json: 92 s for the 2->3 train pools): 0.4 h. A process named twice is refused.
 #SBATCH --output=vob_born_%j.out
 #SBATCH --error=vob_born_%j.out
 #
@@ -25,6 +27,7 @@ OUT="$SCRATCH/zz_vob_born_${SLURM_JOB_ID:-local}"
 mkdir -p "$OUT"
 SPECS=("$@"); [ ${#SPECS[@]} -gt 0 ] || SPECS=(ee_uu_nlo:25-1000 ee_ttbar_nlo:362-1000)
 PROCS=(); for s in "${SPECS[@]}"; do PROCS+=("${s%%:*}"); done
+[ "$(printf '%s\n' "${PROCS[@]}" | sort | uniq -d)" = "" ] || { echo "a process is named twice: ${PROCS[*]}"; exit 2; }
 # the MadLoop standalones are not kept between generations (D208): build and pole-certify each once; distinct
 # standalones share no state (datagen.ensure_backends), so they build in parallel
 bpids=()

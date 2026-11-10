@@ -25,14 +25,26 @@ targets = {"trees": [
 ], "loops": [
     ("bbx_zz_nlo", r"$b\bar b\to ZZ$", ps.C.blue),
     ("uux_epemz_nlo", r"$u\bar u\to e^+e^-Z$", ps.C.vermillion),
-    ("bg_ab_nlo", r"$bg\to\gamma b$", ps.C.green),
-    ("epem_ddxz_nlo", r"$e^+e^-\to d\bar dZ$", ps.C.orange),
+    ("bbx_gg_nlo", r"$b\bar b\to gg$", ps.C.green),
+    ("dg_uwm_nlo", r"$dg\to uW^-$", ps.C.green),
+    ("bbx_avevex_nlo", r"$b\bar b\to\gamma\nu\bar\nu$", ps.C.green),
+    ("db_bdz_nlo", r"$db\to bdZ$", ps.C.green),
+    ("uc_cuz_nlo", r"$uc\to cuZ$", ps.C.green),
 ]}[arm]
 targets = [t for t in targets if any(r["target"] == t[0] for r in rows)]
 fig, ax = ps.figure()
 for t, lab, col in targets:
-    r = sorted((r for r in rows if r["target"] == t), key=lambda r: r["D"])
+    r = sorted((r for r in rows if r["target"] == t and "best" in r), key=lambda r: r["D"])
     ax.plot([x["D"] for x in r], [x["best"] for x in r], marker="o", color=col, label=lab)
+    # a run that blew up is shown apart at its D, at the top edge of the axis (never dropped; the caption says so); missing or non-ln|V| runs are printed
+    bl = [x for x in rows if x["target"] == t and "blowup_step" in x]
+    if bl:
+        ax.plot([x["D"] for x in bl], [ax.get_ylim()[1]] * len(bl), marker="x", linestyle="none", color=col)
+    for x in rows:
+        if x["target"] == t and "best" not in x and "blowup_step" not in x:
+            print("not plotted:", t, x.get("k"), "missing" if x.get("missing") else "not ln|V|" if x.get("not_ln_v") else "?")
+    for x in bl:
+        print("blowup:", t, "k", x["k"], "step", x["blowup_step"])
 ax.axhline(1e-4, color="gray", linestyle="--", label=r"$10^{-4}$")
 ax.axhline(1e-2, color="gray", linestyle=":", label=r"$10^{-2}$")
 ax.set_xscale("log")

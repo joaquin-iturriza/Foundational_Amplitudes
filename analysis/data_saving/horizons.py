@@ -8,6 +8,11 @@ with MSE <= 1e-4 (None if never), the step rate (traintime_hours / steps, the wh
 of the design recorded 2026-11-10 03:34:
     T(D) = 1.1 s_4 if the curve reaches 1e-4; else 1.1 s_b if best_frac < 0.8 (plateaued);
     else "extend": rerun at min(4 steps, 64000) (still improving at its cap; compute-limited at 64000).
+One-loop targets (*_nlo, trained on V/B; design passed 2026-11-10 09:15): a run whose data_stats.json is not a V/B run
+or whose target transform resolved to signedlog/abslog (V changes sign) is listed apart (not_ln_v: its curve is not
+the MSE of ln|V|); and a curve that does not reach 1e-4 but has its best in the last fifth still falling (the last
+point the minimum, or below 0.9 of the value at 0.8 of the run), or a best above 5.4e-4 at D=1e4 (hp58's tuned one-loop
+b b~), gives rule "to_dyhpo" (T from the stage-2 scratch DyHPO; no extend at a fixed lr).
 T is rounded up to a multiple of validate_every. A run whose curve holds a non-finite value is listed apart
 (blowup, with its first non-finite step).
 
@@ -22,7 +27,9 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from analysis.common.readers import site_python  # noqa: E402
 
-TARGETS = ["epem_ttx", "epem_ccxg", "epem_bbxgg", "bbx_zz_nlo", "uux_epemz_nlo", "bg_ab_nlo", "epem_ddxz_nlo"]
+TARGETS = ["epem_ttx", "epem_ccxg", "epem_bbxgg", "bbx_zz_nlo", "uux_epemz_nlo", "bbx_gg_nlo", "dg_uwm_nlo",
+           "bbx_avevex_nlo", "db_bdz_nlo", "uc_cuz_nlo"]
+LOOP_REF = 5.4e-4   # hp58's tuned one-loop b b~ scratch best at D=1e4 (results.tex, het_stage2.py @0b277b39)
 LEVEL = 1e-4
 
 REMOTE = r'''
@@ -39,6 +46,7 @@ for d in sorted(glob.glob("runs/data_saving/dsave_scratch_*_d*_t*_" + tag)):
         st = json.load(open(d + "/data_stats.json"))
         r.update(curve=res.get("val_mse_curve"), every=res.get("validate_every"), best_step=res.get("best_step"),
                  hours=res.get("traintime_hours"), prepd_std=st["prepd_std"][0],
+                 trafos=st.get("amp_trafos_pp") or [st.get("amp_trafos")], over_born=st.get("target_over_born"),
                  sigma_done=os.path.isdir(d + "/sigma_stage/models") and bool(os.listdir(d + "/sigma_stage/models")))
     except Exception as e:
         r["error"] = repr(e)
@@ -56,12 +64,24 @@ def horizon(r):
          "rate_s_per_step": 3600 * r["hours"] / n if r.get("hours") else None, "sigma_stage": r.get("sigma_done")}
     if bad is not None:
         return {**o, "blowup_step": (bad + 1) * ev}
+    loop = r["target"].endswith("_nlo")
+    if loop:
+        # the one-loop arm reads MSE of ln|V/B| = MSE of ln|V| only on a plain log target (a sign-changing V/B
+        # resolves to signedlog/abslog: another quantity) of a V/B run
+        flat = [str(t) for ts in (r.get("trafos") or []) for t in (ts or [])]
+        if not r.get("over_born") or any(t.startswith(("signedlog", "abslog")) for t in flat):
+            return {**o, "not_ln_v": True, "trafos": flat, "over_born": r.get("over_born")}
     i = min(range(len(y)), key=y.__getitem__)
     s_b, best = (i + 1) * ev, y[i]
     s_4 = next(((j + 1) * ev for j, v in enumerate(y) if v <= LEVEL), None)
     frac = s_b / n
     up = lambda s: int(ev * math.ceil(1.1 * s / ev))
-    if s_4 is not None:
+    falling = i == len(y) - 1 or y[-1] < 0.9 * y[int(0.8 * len(y)) - 1]
+    if loop and s_4 is None and ((frac >= 0.8 and falling) or (r["k"] == 8 and best > LOOP_REF)):
+        # the one-loop design's too-low-lr branch: a fixed-lr curve still falling at its end, or above hp58's tuned
+        # one-loop best at D=1e4, gives no horizon; T(D) comes from the stage-2 scratch DyHPO (no extend at fixed lr)
+        rule, T = "to_dyhpo", None
+    elif s_4 is not None:
         rule, T = "crossed", up(s_4)
     elif frac < 0.8:
         rule, T = "plateau", up(s_b)
@@ -88,6 +108,8 @@ def main():
     for r in res:
         if r.get("missing"):
             print(f"{r['target']:11s} k={r['k']:2d}  missing ({r.get('error')})")
+        elif r.get("not_ln_v"):
+            print(f"{r['target']:11s} k={r['k']:2d}  NOT MSE of ln|V| (trafos {r['trafos']}, over_born {r['over_born']})")
         elif "blowup_step" in r:
             print(f"{r['target']:11s} k={r['k']:2d}  BLOWUP at step {r['blowup_step']}")
         else:

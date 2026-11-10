@@ -1,16 +1,9 @@
-# pretrain_data_saving: the three held-out one-loop targets, for the train-split prebuild (entries of recipes/catalog_v4_heldout_H5.yaml); v4_bg_ab_nlo replaces v4_epem_bbx_nlo, whose massless V/B is a constant (step 6)
+# pretrain_data_saving: the three held-out one-loop targets, for the train-split prebuild (entries of recipes/catalog_v4_heldout_H5.yaml); v4_epem_bbx_nlo (massless, V/B constant) is out, and its replacement (step 6: std ln|V/B| >= 0.1, V of one sign) is added once chosen
 sampling:
   mode: mixture
   f_fwd: 0.15
   fwd_cand: 0.3333333333333333
 processes:
-- name: v4_bg_ab_nlo
-  sqrts:
-  - 20
-  - 6000
-  n_train: 50000
-  n_val: 5000
-  n_test: 5000
 - name: v4_bbx_zz_nlo
   sqrts:
   - 183
