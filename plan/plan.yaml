@@ -20485,6 +20485,19 @@ entries:
       and l2_*.npz for the uugg/bbg paragraphs. Online figure redrawn with short corner legends (61565cc0), caption defines
       every symbol (877adb20). Remaining: October het paragraphs (ttbar: het_ab/het_sweep/het_long/het_sigonly print text,
       need JSON; cells D47-D94), uugg-and-later paragraphs, uug/ee->uu label check in the pre-flight paragraph, header block.'
+  - at: '2026-11-10T00:40:15+00:00'
+    text: 'Step 1 provenance complete on sigma-gen (96ed66d5): src/claim lines for the D47-D94 het cell paragraphs (het_delta_summary,
+      het23_summary, het_shared_summary, het_mumse_summary, het_mumse22_summary, het_finale_s1, het_stage2 now print final
+      JSON lines) and the sigma-steering paragraphs (new analysis/divergences/steering_numbers.py over steering_eval_summary.json,
+      computed read-only on Jean Zay from 63 held-out eval npz, the l2_bbb_uugg and l2_poly_uugg sweeps and 6 satlogs). Corrected
+      in place: D47 2->2 het lower in 118/146 (not 119), D89 92/146 (not 91), D75 MSE EMA 0.90-0.92 in 4/6 (not 5), D91 high-lr
+      penalty 328x, D94 b bbar one-loop 231x and hp58 d dbar D=10 2.1 (not 2.2), uugg deepest ratio gamma=2 71% (not 70),
+      uuggg overall gamma=1 5.66e-2, b bbar g span 2.8e10 on the held-out set (not 7e10), polynomial sweep best three c2 1.30/2.40/1.42
+      with single-seed best 3.28e-2 2% under sigma^10 seed 0 (not best two 1.3-1.4, 3.25e-2, 3%), sigma floor 6-11% below
+      base (not ~8%), Bayes cost at sigma_rel~0.1 2.5-2.8x. New: b bbar g seeds 1 and 2 exist and agree (Z peak 0.57/0.48,
+      overall 0.62/0.54, contrast 2.61/2.57). Pre-flight label checked: the 4.48 contrast is e+e- -> u ubar g (heldout_eval_uug_base_s0),
+      correct as written. Marked without committed reader: t tbar threshold scan, Bayes z^2 and rank rho, saturation repeat,
+      D47 training-split pulls and blow-up log values, D89 step-80 NLLs, D91 MSE-cell lr.'
   step_why:
     1:
       feeds: 'whether the July studies carry over: what they found, recorded reproducibly'
