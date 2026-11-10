@@ -20955,6 +20955,11 @@ entries:
     paths: []
   dead_ends: []
   asks: []
+  owner:
+    agent: a41cde63f6d7e70de
+    state: working
+    since: '2026-11-10T02:21:42+00:00'
+    state_at: '2026-11-10T02:21:42+00:00'
 - id: virtual_over_born
   title: why learning the virtual over the Born fails for us, and making it work
   question: Why does training on V/B (finite one-loop virtual over the exact Born) not work for us when the literature finds
