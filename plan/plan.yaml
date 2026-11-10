@@ -21660,7 +21660,7 @@ entries:
     '4': '2026-11-12'
     '2': the design reviewer (three-target V/B design, ~12:10)
     '5': step 3 (stage 2 go)
-    '6': the design reviewer (third-target design of ~11:30)
+    '6': the design reviewer (three-target V/B design, ~12:10)
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
