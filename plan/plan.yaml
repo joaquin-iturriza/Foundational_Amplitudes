@@ -20902,6 +20902,48 @@ entries:
       if:
       - 'saving >= 10^0.5 on a target: the gap holds there'
       - 'saving < 10^0.5: not resolved or no gap, reported as such'
+  designs:
+  - at: '2026-11-10T02:35:09+00:00'
+    question: 'Step 1 (D356 horizons, tree arm): on catalog_v4''s held-out tree targets ee->ttbar (H3, 2->2 massive), ee->ccbar
+      g (H1, 2->3, the class of ee->uubar g) and ee->bbbar gg (H2, 2->4), trained from scratch on the current setup (the parent
+      pretraining''s model and inputs), where does each D=10^(k/2), k=2..10 stop improving (its best step) and at which step
+      does it first reach MSE(ln|M|^2)=1e-4, so that every later scratch and fine-tune cell of that (target, D) trains only
+      up to there (D356: up to scratch''s 1e-4, steps cut at low D as in the ladder)?'
+    prior: 'Draft fig 22 / docs/results.tex sec:transfer (compute_scan_eeuu_wt): 8- and 25-process foundations against scratch
+      on one-loop ee->uu, fine-tune 1-2 orders lower, no plateau; old setup (AdamW, catalog_v2-era pretrains, last-step reads).
+      sec:ladder: horizons calibrated on ee->dd~ alone (best step 160/640/2560/4160 of 8000 up to D=316, at the end from 1e3;
+      8000 kept for 1e3-1e4), applied to every probe, and the horizon test found they do not carry over (32k steps 4.3-4.8x
+      lower at 10^3.5 on three probes): this design calibrates per target instead. Ladder finale: fine-tune vs scratch 12.6x
+      at D=1e4 (4.9e-6 vs 6.2e-5). No single-target scratch or fine-tune on catalog_v4 pools found (results.tex catalog_v4
+      paragraphs searched for scratch/fine-tun: only the warm-start and width-growth studies, which retrain the whole catalog);
+      decisions D355, D356, D357, D360 searched; plan: kit_benchmark and virtual_over_born have no runs.'
+    measure: 'Per (target, D): the validation curve of MSE(ln|M|^2) of the mean (per_process_metrics, val_loss_no_reg x prepd_std^2
+      convention of sec:ladder), its best step s_b and best value, and s_4 = the first validation step with MSE <= 1e-4 (none
+      if never). Also the measured train step rate per (B, n) for stage 2''s GPU-h estimate.'
+    check: 'The best step moves with D on existing data: sec:ladder''s ee->dd~ calibration (calib_ee_ddbar.json) best at 160,
+      640, 2560, 4160 of 8000 steps for D=10..316, at the end from 1e3; ladder scratch cells cross 1e-4 between D=10^3 and
+      10^4 on several probes (e.g. 6.2e-5 at 1e4 in the finale), so a crossing is readable inside 1e5 events on 2->2. The
+      catalog_v4 pools are harder (sqrt s to 6 TeV, forward and flat-in-log|M|^2 components): whether 2->3/2->4 reach 1e-4
+      by 1e5 is part of the answer.'
+    fixed: 'Model and inputs exactly the parent''s (runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262/config.yaml
+      on CC: mu-P LLoCa width 8, 8 blocks, diagrams llm4lhc, dimensionless inputs, coupling/internal-mass/off-shellness levers,
+      het loss with its sigma stage, MuonAdamW, trial-1262 HPs: muon_weight_decay 0.04733, regularization_lambda 9.11e-8,
+      warmup 0.18, eta_min 1.38e-8, EMA off); lr = 7.82114e-3 (T/17056)^-0.55 (the parent''s law) times sec:ladder''s D factor
+      (gen_transfer_pilot.lr_surface''s D part); batch min(16384, D/2); D = prefixes of one shuffled 1e5 train pool (catalog_v4
+      mixture sampling, the target''s own recipe entry), val and test the fixed 1e4 splits; phase-space stats on the whole
+      pool, amplitude stats on the D events; horizon 8000 steps for k<=8, 12000 for k=9,10; seed 42; CC-IN2P3.'
+    control: 'None inside this step: it sets horizons. The matched control is stage 2''s: fine-tune and scratch of the same
+      (target, D) at the same T(D), same prefixes, same model and inputs, each the best of its own 8-trial DyHPO; only the
+      initialisation (parent weights vs mu-P init) and the searched space differ.'
+    seeds: 'Seed 42, one run per (target, D): 27 runs. Estimated 27 GPU-h (rate 1.0 s/step at B=16384, n=5 from the w8 catalog
+      run scaled by B and n, 0.125 s floor; under 30 GPU-h), longest run ~4 h (k=10 ee->bbbar gg), wall-time target 4 h, one
+      wave; disk ~0.1 GB per run plus 3 pools of ~30 MB on 44 GB free.'
+    outcome: 'Per (target, D): T(D) = 1.1 x s_4 if scratch reaches 1e-4; else 1.1 x s_b if the best sits before 0.8 of the
+      run (plateaued, as sec:ladder); else the cap (compute-limited, stated). YES for the readout (a 1e-4 crossing is measurable)
+      on a target when some D<=1e5 reaches 1e-4: stage 2 runs there with those T(D). NO on a target (scratch above 1e-4 at
+      every D): its saving can only be a lower bound D*_scratch > 1e5; the target is kept with that bound, or a 1e6 pool is
+      proposed to Joaquin with its generation and GPU cost. A run that blows up is listed apart with its step. Stage 2''s
+      GPU-h estimate uses these runs'' measured rates.'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
