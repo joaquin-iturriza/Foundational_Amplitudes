@@ -21446,6 +21446,70 @@ entries:
       GB vs 6.3 GB free; HETEROSC parent, V/B per D357/D366 and the virtual_over_born verdict; Born trees in both parents''
       recipes, target loops held out. Terms searched: bbx_zz, bg_ab, uux_epemz, epem_ddxz, data saving, over Born, V/B, one-loop/at
       one loop with fine-tune/scratch/horizon in results.tex; plan show; site decisions D315-D368.'
+  - at: '2026-11-10T10:12:33+00:00'
+    question: 'One-loop arm, step 2 for the third target (revision after the main session''s correction of 2026-11-10 ~11:20,
+      Joaquin having questioned the sign rule): b b~ > a ve ve~ at one loop (v4_bbx_avevex_nlo, H5, its Born v4_bbx_avevex
+      a training tree of both parents, the loop in neither) replaces e+e- > b b~ (constant V/B). Chosen as the closest analogue
+      of the two kept targets (b b~ > Z Z, u u~ > e+e- Z, whose 16 runs FA-ccin2p3-ba296372.. run under the design passed
+      09:15): q q~ annihilation into electroweak bosons and leptons, 2->3 like u u~ > e+e- Z, not a crossing of either; V<0
+      on 1.0% of its rows. Per D=10^(k/2), k=2..9, trained from scratch on V/B: at which horizon T(D) does its error stop
+      falling, and does it reach 1e-4, the error being that of the target it trains on: V/B through signedlog:<s> (s the 1%
+      quantile of |V/B| on the train pool), the same transform stage 2 uses in both arms, so the gap in D is read in one unit.'
+    prior: '(1) par:vob_june (results.tex 4331-4350): on e+e- > u u~ V/B = 2.49 = C_F(pi^2-8) at every event (relative std
+      5e-13); on t t~ V/B beats V at 4000 steps from scratch 4.58e-8 against 1.75e-7 MSE of ln|V| (3.82x), fine-tuned 6.89x.
+      (2) This entry''s finding 2026-11-10T08:58 (virtual_over_born at current defaults, e+e- > t t~): V/B below V in all
+      three seeds, median 3.9x; step rate 0.372 s/step at BS 16384 on V100. (3) Checked today on CC from the existing sidecars
+      (born_of_pool, 50000 train rows): std of ln|V|-ln B = 1.9e-12 on ee_uu_nlo_25-1000GeV, 0.132 on ee_ttbar_nlo_362-1000GeV
+      (p1..p99 3.53..3.98), no negative V in either. (4) This entry''s tree calibration cal2 (analysis/data_saving/data/horizons_cal2.json
+      @f280a9fc): same job script and lr law; e+e- > t t~ crosses 1e-4 from D=100; e+e- > c c~ g and b b~ g g never, best
+      inside the warm-up at k<=8 (horizons then from a DyHPO, stage 2). (5) par:v4_loop_born (results.tex 4215): removing
+      the Born halves a one-loop class''s level spread (2.55 to 1.01). (6) Draft fig 22 (old setup, ee > u u~ one loop): fine-tune
+      1-2 orders below scratch. (7) sec:ladder one-loop probes (results.tex 13688-13697): e+e- > d d~ and b b~ at one loop,
+      fine-tune below scratch in every cell, 1.4-9.3x, geometric means 3.3 and 2.7 (an 8-trial search per cell, older setup).
+      (8) The electroweak one-loop e+e- > d d~ from scratch flattens between D=1e2 and 10^2.5 at 7.6-8.5e-3 (results.tex 14194-14199).
+      (9) hp58 (results.tex 10770-10782, het_stage2.py @0b277b39): one-loop scratch bests move strongly with the lr: widening
+      the window lowered the one-loop b b~ best 52x at D=1e4 (0.028 to 5.4e-4), and the one-loop b b~ at 1e4 and d d~ at 1e2
+      kept their best at the highest rate tried. What they predict here: 1e-4 from scratch on a one-loop target is not shown
+      anywhere (best tuned one-loop scratch 5.4e-4 at D=1e4, on V not V/B); and a fixed lr can mislead the other way from
+      cal2 (too low: best at the run''s end, still falling), which the outcome branches on. No one-loop D-calibration on catalog_v4
+      exists. Searched: results.tex (V/B, over Born, one-loop, data saving, H5), plan show pretrain_data_saving and virtual_over_born,
+      site decisions --project FA (D315 D355 D356 D360 D366). (10) Sign-changing one-loop pools (results.tex 8318-8345, 12328-12345):
+      data.signedlog_quantile 0.01 sets s per pool and brings the standardized target''s kurtosis from a median 188 to 4.6;
+      the signed-log against sign-head A/B (one seed): magnitude error 0.78 against 0.45 on trained pools. No D-scan of a
+      sign-changing target exists. (11) The spreads of all 17 candidates read (analysis/data_saving/vb_spread.py, 3 rounds
+      of sidecars): only e+e- > u u~ and e+e- > b b~ are constant (2e-12); 12 of 14 varying candidates change sign; one-signed:
+      b b~ > Z Z 0.267, u u~ > e+e- Z 0.294, b b~ > H Z 0.305, b b > b b 0.455 (the last two read after the choice was set
+      to the closest analogue; b b~ > H Z is the one-signed alternative, nearly b b~ > Z Z again).'
+    measure: 'Per run (scripts/job_data_saving.sh bbx_avevex_nlo <k> <steps> scratch ++data.target_over_born=true tag=cal_vb):
+      the validation mu MSE curve (result.json) times prepd_std^2 = the MSE of signedlog(V/B) with s from data_stats.json
+      (amp_trafos_pp ''signedlog:<s>''), read by analysis/data_saving/horizons.py, which now carries each run''s unit (log
+      or signedlog:<s>) and lists a non-V/B run apart; s_b, best_frac, s_4 (first step <= 1e-4 in that unit), step rate, T(D)
+      by the passed rule, with the too-low-lr branch on the still-falling condition only (the 5.4e-4 reference is in ln units,
+      not comparable). sigma(ln|V/B|) = 0.684 reported beside the target (no cut: only a constant V/B is out).'
+    check: 'The unit matches ln|V| on most events: on the b b~ > a ve ve~ train pool s = 0.284 and 79.3% of rows have |V/B|
+      > 10 s, where signedlog(x) - ln(|x|/s) = ln(1 + s/|x|) <= 0.095, so there the signedlog error is the ln|V/B| error (B
+      exact: the ln|V| error) up to that offset''s variation; the rest (|V/B| < 2.8, 1.0% negative) is where it differs (vb_spread.py,
+      signedlog_s and share_above_10s). The ln error moves with D on existing data at this protocol (cal2: e+e- > t t~ 2.9e-3
+      at D=10 to 9.1e-7 at 1e4). The job command is the passed one, the recipe recipes/catalog_v4_datasaving_bbx_avevex_nlo.yaml,
+      its pools and the 3 sidecars on CC (FA-ccin2p3-35699fdd, every row reproduced).'
+    fixed: 'Parent config trial 1262 of cov_v4_long_hpo8_cc_68224 (base config, as cal2: model, inputs, HETEROSC + sigma stage,
+      checkpoint on val mu MSE, heterosc_select=mu_mse); lr = the parent''s law 7.82114e-3 (T/17056)^-0.55 times the transfer
+      D factor (as cal2); batch min(16384, D/2); D = prefixes of the 5e4 train pool, val/test the frozen 5e3; steps 8000 for
+      k<=8, 12000 for k=9 (as cal2); V/B target (data.target_over_born=true, virtual_over_born''s verdict); CC-IN2P3 only
+      (pools and sidecars there); scripts/job_data_saving.sh at the submitted commit. The target''s transform: signedlog:<s>,
+      resolved by preprocessing.py from its non-positive values (data.signedlog_quantile 0.01), the same in stage 2''s scratch
+      and fine-tune arms (fine_tune.target_stats=own).'
+    control: 'A calibration, not an A/B: it fixes T(D) for stage 2, where each fine-tune cell is matched to a scratch cell
+      at the same T(D), prefixes, model, inputs and checkpoint rule. Within it, the comparison is across D at one protocol;
+      e+e- > t t~ (cal2) is the reference curve of the same protocol on a tree.'
+    seeds: Seed 42, one run per cell (D315, settled).
+    outcome: 'Per k: s_b, best and T(D) in the signedlog unit; YES (1e-4 reachable from scratch in that unit) when some k<=9
+      has s_4, stage 2 reads D* at 1e-4; NO: stage 2 reads at 1e-2; a best inside the warm-up (best_frac < 0.2 at D >= 1e3)
+      or still falling at the end sends T(D) to stage 2''s scratch DyHPO. Figure: calibration_best_mse_loops (its label marked
+      (s)) with the two log-unit targets, the unit stated in the caption; the spreads figure vb_spread.png with sigma beside
+      each target. Cost: 8 runs, cal2''s 5-particle rates (0.084-0.095 s/step k<=7, 0.178 k=8, 0.461 k=9) + 0.08 h each: 3.9
+      GPU-h; limits 0:30 (k<=7), 0:45 (k=8), 2:30 (k=9), ~1.6x the need; one wave (site pick, CC). Disk 23 MB per run, 6.2
+      GB free.'
   step_waits:
     '3': '2026-11-12'
     '4': '2026-11-12'
