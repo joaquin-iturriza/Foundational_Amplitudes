@@ -21297,6 +21297,50 @@ entries:
       8 (no labels), 9/11/12/13 (no training or sweep), 10 (all rows of the pools the question names). Terms searched: virt_ratio,
       virtual over, V/B, over the Born, virt/born, born_of_pool, loop_born, times a constant, pi^2-8, ratio target, kinematics-independent
       in docs/results.tex; the entry''s evidence (empty) and decisions quoted on it.'
+  - at: '2026-11-10T02:35:35+00:00'
+    question: 'At current defaults (template sweep: LLoCa muP, MuonAdamW, HETEROSC, BS 16384, 8000 steps, from scratch), does
+      training on V/B (the stored one-loop virtual over MadLoop''s exact Born, event by event: data.target_over_born) give
+      a lower MSE of log|V| than training on V, on e+e- -> t t~ (where V/B varies) and on e+e- -> u u~ (where V/B is a constant,
+      a check that the new std floor lets it be learned exactly)? This is also the from-scratch V/B baseline with exact Born
+      that kit_benchmark''s NLO protocol needs. Step 0 (CPU, scripts/job_vob_born.sh @f18c5e39): the Born sidecars, the V/B
+      arm''s input, with the stored target reproduced on every row; its read: the spread of log|V/B| against log|V| on the
+      current pools (ee->tt''s stored target carries the mass-scheme shift delta|M0|^2, par:v4_loop_born_events).'
+    prior: '(1) docs/results.tex l.14536-14540: massless e+e- -> q q~ at mu=sqrt(s), finite over Born constant to 1e-16 (tools/ew_sudakov_check.py),
+      the ladder''s one-loop ee->dd pool is its tree pool times a constant; data/parse_dat.py: virt_fin/born = C_F(pi^2-8)
+      on eeuu. (2) The June 2026 V/B sweeps (2b81ee1e; analysis/hpo_optima/hpo_optima.json), re-read today from their own
+      datasets on Jean Zay (analysis/virtual_over_born/june_targets.py @d9b38f1c): ee->uu V/B = 2.4928058681, relative std
+      5.0e-13, so the standardized loss sat at 0.86 at every horizon in all six arms = MSE of log|V| 2.1e-25 (exact); ee->tt
+      std of the log target 0.140 (V/B) vs 0.622 (V), and in MSE of log|V| at t=4000 V/B beat V in all six arms: scratch 4.58e-8
+      vs 1.75e-7 (3.8x), fine-tune 6.9x, EWC 7.3x, freeze 11.9x, LoRA 7.3x, reset-head 35x. The June ''does not scale'' (results.tex
+      l.9054) and the 2026-10-15 note compared losses in standardized units, whose std differ between the targets. (3) par:v4_loop_born,
+      par:v4_loop_born_events: pool-level Born-relative levels for zero-shot, no V/B training. This design differs: the current
+      MadLoop pools (mu^2=s, alpha_s stripped, shift on tt), current defaults (Muon, HETEROSC, 8000 steps), the std floor,
+      best against best by DyHPO.'
+    measure: 'Per process and arm: MSE of log|V| on the test pool at the best trial''s model (analysis.common.trial_mse; for
+      the V/B arm the MSE of log|V/B| equals that of the recombined log|V| = log|V/B| + log B exactly, B exact), best trial
+      of each arm''s DyHPO sweep and its re-runs at seeds 43, 44; the ratio V over V/B beside the two values. Step 0: std
+      of log|V| and of log|V/B| per pool, n_rel_above_1e-6 = 0.'
+    check: 'June runs above: the same comparison (V against V/B, ee->tt, from scratch and fine-tuned) moved MSE of log|V|
+      by 3.8x-35x between the arms at t=4000, i.e. the measure separates the arms by far more than the June seed-free sweep
+      noise (six arms all one direction); on ee->uu the V/B arm reached the rounding floor. The std floor was checked on a
+      constant-up-to-rounding target in tests/test_target_over_born.py (vob branch @283ae614): standardized values below 1e-5,
+      inverse exact to 1e-12.'
+    fixed: Pools ee_ttbar_nlo_362-1000GeV and ee_uu_nlo_25-1000GeV (50000 train, 5000 val, 5000 test; recipes/vob_*.yaml),
+      template sweep_config_jeanzay_template.yaml (search space, 8 trials, single fidelity 8000 steps, MuonAdamW, BS 16384),
+      HETEROSC (default, final model after the sigma fit), single-process features (use_diagrams false, MLP embed off), per-dataset
+      log+standardization, data seed 42; the only change between arms is data.target_over_born.
+    control: 'The V arm: the same pools, same template sweep, target as stored (the virtual itself).'
+    seeds: 'Sweep trials at seed 42; each arm''s best config re-run at seeds 43 and 44. ee->uu V/B: no sweep (its target is
+      a constant, CLAUDE.md''s first branch: the feature at the baseline''s best HPs), the uu V arm''s best config at seeds
+      42, 43, 44.'
+    outcome: 'Yes: on ee->tt the V/B arm''s best-vs-best MSE of log|V| is below the V arm''s with the three seeds of each
+      not overlapping -> V/B works for us at current defaults; the June ''failure'' was the standardized-units comparison
+      plus the constant ee->uu target; the one-loop runs of pretrain_data_saving can train V/B (with sidecars) and report
+      MSE of log|V|. No: overlapping or higher -> at current defaults V/B gives no gain on ee->tt (unlike June), and the cause
+      is looked for in what changed (HETEROSC, Muon, the shift in the stored target). ee->uu V/B: MSE of log|V| below 1e-10
+      on all three seeds = the floor works (a constant is learned exactly); above = a defect to fix. Step 0: std(log|V/B|)/std(log|V|)
+      on ee->tt below 0.5 = the V/B target is narrower as in June (0.22), above 1 = the shift makes it wider, which would
+      predict a No.'
   findings:
   - at: '2026-11-10T02:33:03+00:00'
     text: 'Cause of the June V/B ''failure'' (june_targets.py @d9b38f1c): it was read in standardized units. ee->uu: V/B =
