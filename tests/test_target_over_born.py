@@ -35,10 +35,19 @@ def test_born_of_pool():
         np.save(pool, np.zeros((4, 21)))
         with pytest.raises(AssertionError):
             AmplitudeExperiment._born_of_pool(pool, 4)
+        import json
+        from keyed_aug import pool_identity
         np.save(pool[:-4] + ".born.npy", np.array([1.0, 2.0, 4.0, 8.0]))
+        with pytest.raises(AssertionError):          # no identity record
+            AmplitudeExperiment._born_of_pool(pool, 3)
+        json.dump({"pool_identity": pool_identity(pool), "n_rows": 4}, open(pool[:-4] + ".born.npy.json", "w"))
         b = AmplitudeExperiment._born_of_pool(pool, 3)
         assert b.shape == (3, 1) and np.allclose(b[:, 0], [1, 2, 4])
         np.save(pool[:-4] + ".born.npy", np.array([1.0, 0.0, 4.0, 8.0]))
+        with pytest.raises(AssertionError):
+            AmplitudeExperiment._born_of_pool(pool, 4)
+        np.save(pool[:-4] + ".born.npy", np.array([1.0, 2.0, 4.0, 8.0]))
+        np.save(pool, np.ones((4, 21)))              # the pool regenerated under the surviving sidecar
         with pytest.raises(AssertionError):
             AmplitudeExperiment._born_of_pool(pool, 4)
 

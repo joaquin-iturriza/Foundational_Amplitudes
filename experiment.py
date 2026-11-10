@@ -2713,10 +2713,18 @@ class AmplitudeExperiment(BaseExperiment):
 
     @staticmethod
     def _born_of_pool(pool, n):
-        """The first n rows of a one-loop pool's Born sidecar, (n, 1), checked positive (data.target_over_born)."""
+        """The first n rows of a one-loop pool's Born sidecar, (n, 1), checked positive and computed on this pool
+        (data.target_over_born). The sidecar's name is tools/nlo_virtual_pipeline.born_path's, not imported: that module
+        loads the MadGraph pipeline."""
         bp = pool[:-len(".npy")] + ".born.npy" if pool.endswith(".npy") else pool + ".born.npy"
         assert os.path.exists(bp), (f"data.target_over_born: no Born sidecar {bp} "
                                     f"(tools/nlo_virtual_pipeline.py <process> --born-of <pool> writes it)")
+        # the sidecar's record of the pool it was computed on (tools/nlo_virtual_pipeline.born_of_pool), so a pool
+        # regenerated under a surviving sidecar is refused instead of pairing one event's V with another's Born
+        assert os.path.exists(bp + ".json"), f"data.target_over_born: {bp} has no identity record {bp}.json"
+        rec = json.load(open(bp + ".json"))
+        assert list(rec["pool_identity"]) == list(pool_identity(pool)), \
+            f"data.target_over_born: {bp} was computed on another pool than {pool}"
         b = np.asarray(np.load(bp, mmap_mode="r")[:n], dtype=np.float64).reshape(-1, 1)
         assert b.shape[0] == n, f"data.target_over_born: {bp} has {b.shape[0]} rows, the pool {n}"
         assert np.all(np.isfinite(b)) and np.all(b > 0), f"data.target_over_born: non-positive Born in {bp}"

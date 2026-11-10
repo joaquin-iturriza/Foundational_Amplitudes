@@ -1,12 +1,14 @@
 # plan virtual_over_born (D366): ee_ttbar_nlo from scratch, target V/B (the virtual over its exact Born, data.target_over_born); the
 # template (sweep_config_jeanzay_template.yaml) as is, single-process features. Read: MSE of log|V| at the best trial.
+# Run only on ccin2p3 (drive.py --sites ccin2p3): the Born sidecars exist there only. vob_tt_VB is the second branch of
+# the A/B rule: it runs only if V/B at the vob_tt_V best config (seeds 42-44) is not better than V there.
 cluster:
   scheduler: slurm
   auto_submit: false
   request_gpus: 1
-  cpus_per_task: 4
+  cpus_per_task: 4         # CC-IN2P3 allows at most 5 CPUs per V100 (site facts); num_workers 2
   mem: 16G
-  time: "01:30:00"
+  time: "00:50:00"         # 8000 steps at 0.127 s/step = 17 min (single-process 2->2 sibling FA-ccin2p3-5f933ea3, ee_dd_nlo, BS 16384) + sigma stage and eval; target 0.4 h
 paths:
 sweep_name: vob_tt_VB
 n_trials: 8

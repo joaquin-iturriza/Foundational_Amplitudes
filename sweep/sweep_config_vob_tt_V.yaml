@@ -1,12 +1,13 @@
 # plan virtual_over_born (D366): ee_ttbar_nlo from scratch, target V (the stored one-loop virtual); the
 # template (sweep_config_jeanzay_template.yaml) as is, single-process features. Read: MSE of log|V| at the best trial.
+# Run only on ccin2p3 (drive.py --sites ccin2p3), where the V/B arm's Born sidecars are, so both arms share the hardware.
 cluster:
   scheduler: slurm
   auto_submit: false
   request_gpus: 1
-  cpus_per_task: 4
+  cpus_per_task: 4         # CC-IN2P3 allows at most 5 CPUs per V100 (site facts); num_workers 2
   mem: 16G
-  time: "01:30:00"
+  time: "00:50:00"         # 8000 steps at 0.127 s/step = 17 min (single-process 2->2 sibling FA-ccin2p3-5f933ea3, ee_dd_nlo, BS 16384) + sigma stage and eval; target 0.4 h
 paths:
 sweep_name: vob_tt_V
 n_trials: 8

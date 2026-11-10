@@ -87,7 +87,7 @@ def preprocess_amplitude(amplitude, trafos=None, mean=None, std=None):
                     out_mean, out_std = mean, std
                 else:
                     # the std floored at AMP_STD_FLOOR: a target constant up to rounding (e+e- -> q q~ massless at
-                    # mu^2 = s over its Born is C_F times a number, plan virtual_over_born) has a std of ~1e-16, and
+                    # mu^2 = s over its Born is C_F times a number, plan virtual_over_born) has a std of ~5e-13 (the June 2026 datasets), and
                     # dividing by it turns rounding noise into a unit-variance target nothing can learn (the June 2026
                     # V/B runs). In the transformed units (log|M|^2 in nat) a spread below 1e-6 carries nothing a fit
                     # could use; every real pool's std is O(1), so nothing else changes.
