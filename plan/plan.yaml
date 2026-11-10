@@ -21094,6 +21094,42 @@ entries:
       bound or not reached by either arm (then stated as not reached). Figures: per target L(D) scratch vs fine-tune with
       both levels drawn, and one MSE vs GPU-hours panel; write-up in docs/results.tex replacing the draft''s fig 22. A run
       that blows up is listed apart with its step.'
+    fix_at: '2026-11-10T06:43:41+00:00'
+    fix: '(3,4) The yes is D*_scratch/D*_ft > 1 at one seed per cell (D315 holds, so no more seeds), but the per-cell spread
+      is measured: sec:ladder ''One seed is not a measurement at a cell'' finds two independent 8-trial searches differing
+      by up to 5x per cell (single seeds at fixed HPs up to 75x). Through the scratch L(D) slopes of the calibration (horizons_cal2.json:
+      ccbar g 0.749 at D=316 to 0.040 at 1e4, about 0.85 decade per decade; bbbar gg 0.867 to 0.153, about 0.5), a 5x MSE
+      error moves D* by about 0.8 decades (ccbar g) to 1.4 decades (bbbar gg). A saving just above 1 is noise, and any result
+      would read as YES. Fix: per target and level, state the smallest saving that stands above this spread (search-to-search
+      5x divided by the local slope of both arms'' L(D)), with YES above it, NO when fine-tune is not below scratch, and ''not
+      resolved'' in between. Step 4 had 10^0.5; the design dropped it. Also define the crossing when L(D) hovers near L0.
+      ee->ttbar''s T(D) = 1.1x the first 1e-4 crossing puts scratch''s L(D) near 1e-4 at every D >= 100, so state which crossing
+      counts, e.g. the first D at which L <= L0 and stays below. (5) The prior leaves out the two results on this exact question.
+      First, par:v3_muon ''Fine-tunes at small D'': a current catalog pretraining fine-tuned against scratch at D=10..316,
+      every one of 128 fine-tune cells below scratch, scratch/fine-tune MSE 2.2 (AdamW parent) to 9.1 (Muon parent), 11.9
+      at D=10. Second, sec:ladder fig:gain_heatmap / par:nogain: geometric-mean gain L_scratch/L_ft 1.7 to 3.4, fine-tunes
+      ''reach scratch half a decade later'' where scratch''s curve is steep. Cite both with their numbers. sec:ladder is cited
+      only for horizons. Terms searched: data saving, D*, fine-tune vs scratch, scratch.*fine-tun, bbxgg/ccxg, seed spread,
+      in docs/results.tex, the entry and site decisions. (2) The check field shows no data where the saving measure moved
+      with pretraining. Use the two results above, converted to the saving in D they imply against the spread of (3). The
+      1e-2 claim ''falling ~2-3x per half decade'' does not hold for ee->bbbar gg: the calibration gives 1.7, 2.2, 1.5x per
+      half decade from D=316 to 1e4, extrapolating to about 0.07 at 1e5, so its 1e-2 scratch crossing is likely off the grid.
+      Its outcome should say a bound is expected there. That lr causes the warm-up best is asserted, not shown (overfitting
+      at about 240 epochs is the other reading). The rule copes with both, but say how an early best that survives the lr
+      search is read. (15) The stage-2 trials run through sweep/drive.py, trial_job.sh and run_trial.py from a sweep config
+      that is not written yet, not through scripts/job_data_saving.sh. Show with a CPU dry run on CC the exact trial command
+      for one scratch and one fine-tune cell. It must have base_config = the parent''s run dir (kit_benchmark''s held-out
+      parent for fine-tune; job_data_saving.sh still defaults DS_PARENT to trial 1262), data.processes_file, data.train_subsample=D,
+      heterosc_select=mu_mse, warm_start_idx=null, the fine-tune keys (pretrained_path, target_stats=own, offshell_stats=parent),
+      training.result_path written with val_mse_curve and best_step. It must also show that DyHPO observes the mu MSE (base_experiment.py:1301),
+      not the NLL. (14) There is no disk figure: give the disk per trial (run dir, checkpoints, any cache; data.memmap=false
+      in the job script) from the calibration runs, times the trials in flight, against CC''s free disk read now. (13) Neither
+      the sweep layout nor the finish time is stated: say drive.py''s rolling mode with 3 start-up trials and then guided
+      trials (or --wave-sizes 3,3,2) per sweep, the number of sweeps in flight, and when phase a and phase b end against when
+      Joaquin wants the result. Checks 1, 6, 7, 8, 9, 10, 11 and 12 hold: arms are matched on T(D), prefixes, model and checkpoint
+      rule, with only the initialisation and searched space differing; HETEROSC with the sigma stage; the parent''s preprocessing
+      as D355 asks; batch min(16384, D/2) and T(D) move with D as in sec:ladder and D356; D364''s AdamW-parent arm and its
+      cost are stated.'
   step_waits:
     '1': FA-ccin2p3-53bb43b9 FA-ccin2p3-fbec992c FA-ccin2p3-9da809e2 FA-ccin2p3-ad1b108d FA-ccin2p3-883309f7 FA-ccin2p3-72685d7d
       FA-ccin2p3-50cc73c3 FA-ccin2p3-43d4b67a FA-ccin2p3-5c6b6dcb FA-ccin2p3-01d9738a FA-ccin2p3-df5578c6 FA-ccin2p3-85c8280d
