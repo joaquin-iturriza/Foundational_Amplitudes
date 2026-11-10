@@ -13,7 +13,8 @@
 # law at <steps>, 7.82114e-3 (steps/17056)^-0.55 (the trial-1262 law of job_catalog_v3_short.sh LONG_HP), times the
 # transfer study's fitted D factor (sweep/gen_transfer_pilot.lr_surface's D part); a training.lr=... argument wins.
 # The batch is the parent's 16384, which experiment.py caps at D/2 (the transfer study's B = min(16384, D/2)).
-# The checkpoint is selected on the validation mu MSE (training.heterosc_select=mu_mse, as D85/D89), then the sigma
+# warm_start_idx=null: the parent (a sweep trial) saved warm_start_idx 0, which would reload a run dir of the same
+# name. The checkpoint is selected on the validation mu MSE (training.heterosc_select=mu_mse, as D85/D89), then the sigma
 # stage; the readout is the MSE of ln|M|^2 of the mean. Run dir runs/data_saving/dsave_<mode>_<target>_d<k>_t<steps>[_<tag>] (tag=<name> argument).
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
@@ -49,6 +50,6 @@ OUT="$PROJECT_DIR/runs/data_saving/dsave_${MODE}_${TGT}_d${K}_t${T}${TAG}"
 echo "DATA_SAVING target=$TGT k=$K D=$D steps=$T mode=$MODE parent=$PARENT args: ${ARGS[*]}"
 python run.py --config-path "$PROJECT_DIR/$PARENT" --config-name config run_dir="$OUT" run_name=null \
     data.processes_file="$RECIPE" data.train_subsample="$D" data.eval_subsample=null data.phase_space_on_pool=true \
-    data.memmap=false training.iterations="$T" training.heterosc_select=mu_mse evaluation.train_subsample=2000 seed=42 "${FT[@]}" "${ARGS[@]}"
+    data.memmap=false training.iterations="$T" training.heterosc_select=mu_mse evaluation.train_subsample=2000 seed=42 warm_start_idx=null "${FT[@]}" "${ARGS[@]}"
 RC=$?
 echo "DATA_SAVING_DONE rc=$RC $OUT"; exit $RC
