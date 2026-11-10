@@ -20940,6 +20940,11 @@ entries:
     paths: []
   dead_ends: []
   asks: []
+  owner:
+    agent: a146b0b19432572ea
+    state: working
+    since: '2026-11-10T02:22:02+00:00'
+    state_at: '2026-11-10T02:22:02+00:00'
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
