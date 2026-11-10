@@ -4147,6 +4147,8 @@ class AmplitudeExperiment(BaseExperiment):
         if self.cfg.training.loss == "HETEROSC":
             loss_agg = "mean"
         if os.environ.get("LLOCA_PROC_LOSS", "vectorized") == "loop" and loss_agg != "excess":
+            if self.cfg.training.get("is_weight_path", None):
+                raise NotImplementedError("LLOCA_PROC_LOSS=loop does not carry training.is_weight_path")
             unique_procs = torch.unique(process_ids)
             per_proc = [self.loss(y_pred[process_ids == p], y[process_ids == p])
                         for p in unique_procs]
