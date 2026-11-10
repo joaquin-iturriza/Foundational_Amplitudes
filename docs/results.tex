@@ -10658,11 +10658,34 @@ learning rates span $1.1\times10^{-3}$ to $3.6\times10^{-3}$ ($e^+e^-\to d\bar d
 and $1.3$, $Zggg$ $3.5$ and $2.8$, in $10^{-3}$, at $D=10^2$ and $10^4$), a factor $3$, and each probe's two cells agree within
 $25\%$; $\lambda$ sits at $2\times10^{-9}$ to $5\times10^{-8}$ in seven cells ($3\times10^{-7}$ in the eighth), the warm-up
 fraction at $0.10$ to $0.18$, and EMA is on in five. The optimum is not shared, though: at $D=10^4$ the trials at
-$\log_{10}\mathrm{lr}>-2.65$ are $29$ to $330$ times worse than the best for the two $d\bar d$ probes, while $W^+W^-$ is
+$\log_{10}\mathrm{lr}>-2.65$ are $29$ to $328$ times worse than the best for the two $d\bar d$ probes, while $W^+W^-$ is
 $2.9$ times worse at $D=10^2$ at the $d\bar d$ probes' learning rate, so no single point is within a factor $1.5$ of every
 cell's best. In $3$ of the $8$ cells the best trial is the lowest learning rate tried, so those optima are not bracketed.
-For the one probe whose MSE cell's best trial is on record at $D=10^4$ ($W^+W^-$, trial $193$, $\mathrm{lr}=8.5\times10^{-3}$),
+For the one probe whose MSE cell's best trial is on record at $D=10^4$ ($W^+W^-$, trial $193$, $\mathrm{lr}=8.5\times10^{-3}$, from its config on CC),
 the het optimum is $2.5$ times lower.
+% src: python3 analysis/transfer/het_finale_s1.py @6ca25630
+% claim: trials=40
+% claim: lr_min=1.1e-3
+% claim: lr_max=3.6e-3
+% claim: lr_e3.ee_ddbar_d4=1.3
+% claim: lr_e3.ee_ddbar_d8=1.1
+% claim: lr_e3.ee_WW_d4=3.6
+% claim: lr_e3.ee_WW_d8=3.4
+% claim: lr_e3.ee_dd_nlo_d4=1.5
+% claim: lr_e3.ee_dd_nlo_d8=1.3
+% claim: lr_e3.uubar_Zggg_d4=3.5
+% claim: lr_e3.uubar_Zggg_d8=2.8
+% claim: lr_factor=3
+% claim: lambda_low.0=2e-9
+% claim: lambda_low.6=5e-8
+% claim: lambda_top=3e-7
+% claim: warmup_min=0.10
+% claim: warmup_max=0.18
+% claim: ema_on=5
+% claim: dd_highlr_min=29
+% claim: dd_highlr_max=328
+% claim: ww_d4_lowlr.over_best=2.9
+% claim: best_at_lowest_lr=3
 
 \begin{figure}[H]
 \centering
