@@ -20855,8 +20855,9 @@ entries:
       k=2..10) on the parent''s model setup, 8000 steps at k<=8, 12000 at k=9,10 (27 runs, ~27 GPU-h); read per D the best
       step and the step where MSE(ln|M|^2) first reaches 1e-4 -> the per-target horizon T(D)'
     2: 'One-loop arm, stage 1 (horizon calibration): the same for three held-out one-loop targets whose Born is in the pretraining
-      (ee->bbbar H5, bbbar->ZZ H5, uubar->e+e-Z H5), D=10^(k/2), k=2..9 (5e4 pools); target representation from virtual_over_born
-      per D357'
+      (ee->bbbar H5, bbbar->ZZ H5, uubar->e+e-Z H5), D=10^(k/2), k=2..9 (5e4 pools), trained on V/B (data.target_over_born,
+      merge 5c35e4f5) and read as MSE of log|V|, gated on virtual_over_born''s current-defaults confirmation (sweeps vob_tt_V
+      / vob_uu_V and the V/B reruns; par:vob_june: V/B beats V on ee->tt 3.8x scratch, 6.9x fine-tuned in MSE of log|V|)'
     3: 'Stage 2: one single-fidelity 8-trial DyHPO per (target, D, arm), scratch over the template''s space, fine-tune (full
       retrain + layer decay from the w8 x16 catalog_v4 pretraining best_cov_v4_long_hpo8_cc_68224_trial_1262) over the fine-tune
       space, both at T(D); GPU-h estimate from stage 1''s measured step rate, to Joaquin if over 30 GPU-h without a covering
@@ -20890,10 +20891,10 @@ entries:
       - 'scratch never reaches 1e-4 on a target: its saving is a lower bound; the target stays, or a larger pool is generated
         (asked with its cost)'
     2:
-      feeds: the one-loop horizons and target (V or V/B) of the one-loop sweeps
+      feeds: the one-loop target and horizons of the one-loop sweeps (D357)
       if:
-      - 'virtual_over_born resolves (V/B works or is ruled out) by 2026-11-12: calibrate with its target'
-      - 'not resolved by then: calibrate on V as now (D357)'
+      - 'confirmation holds: calibrate on V/B (Born sidecars needed for the three targets'' pools first)'
+      - 'confirmation fails: calibrate on V as now (D357)'
     3:
       feeds: 'D360: the data saved at MSE(ln|M|^2)=1e-4, trees and one loops'
       if:
@@ -21033,7 +21034,6 @@ entries:
       calib_ee_ddbar, v3_muon/muon_ft.'
   step_waits:
     '1': a design reviewer
-    '2': '2026-11-12'
     '3': '2026-11-12'
     '4': '2026-11-12'
   findings:
