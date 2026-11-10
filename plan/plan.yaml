@@ -22024,6 +22024,12 @@ entries:
       Told him: the pretrained fine-tunes (A_ft from the heldout parent FA-ccin2p3-62c2443b, ~16:00 UTC) are the result that
       matters and go out the moment it ends; every KIT figure caption from now on says per curve whether it is from scratch
       or fine-tuned; off-shellness and preprocessing effects so far are scratch-only, not a verdict on the model'
+  - at: '2026-11-10T09:23:18+00:00'
+    text: '2026-11-10 ~10:30, told Joaquin (he read the uug soft panel as raw beating log): Bakar''s slide 9 deepest soft
+      bin log 0.32 (exponent -2.12) vs raw 89 (exponent -0.02, near our bulk-edge floor 115.9); kit_figures.py MLP dict matches
+      the slide. Our inputs are in the raw class (dimensionless momenta); the only log input is the off-shellness column log1p(o/eps)
+      of the min gluon-pair invariant, so it is more likely the useful input than the harmful one; if the no-off-shell arms
+      (c35a2199, ac436bba) get worse, the lever is log-invariant inputs (as Bakar''s MLP), not removing it'
   step_why:
     1:
       feeds: 'the numbers sent to KIT: whether hard_train fixes each family (B vs B_bulk)'
