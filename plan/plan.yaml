@@ -21352,25 +21352,21 @@ entries:
   decisions:
   - D363
   next:
-    1: 'Protocol A from scratch, 10 runs in flight on CC (design passed 2026-11-10 03:59, scripts/job_kit.sh at b2b18e01):
-      on their end read each log (step rate in float64, kit_predict scores), then submit B and B_bulk (12 x 3000 steps) from
-      the six n=9e5 runs at site pick''s width; then the readout against Bakar''s MLP table'
-    2: 'KIT pretrainings with whole families held out (design): one catalog_v4 pretraining without ee->qqbar g and ee->qqbar
-      gg of every flavour (incl. bbxg, ccxgg, accxg-free check) but with the ee->tt Born and at most 10 other one-loop pools
-      bulk only (Bakar''s fair NLO pretraining, also protocol A''s parent for uug/uugg), and one without the ee->tt family
-      (mt 50/300/600 variants included) for protocol A on tt; at trial 1262''s HPs and 68224 steps (~9 GPU-h each, estimate
-      from results.tex par:dancat''s 0.474 s/step catalog V100 step). The existing parent trial 1262 trains ee->tt at mt 50/300/600,
-      bbxg and ccxgg, so it fails the family hold-out; pretrain_data_saving''s targets (ee->ttbar, ee->ccbar g, ee->bbbar
-      gg) sit in these same families, so these two parents could serve it too'
-    3: 'Fair NLO D-scan (Bakar): ee->tt virtual, 1e2..1e4 bulk one-loop target points (D=10^(k/2), k=4..8), fine-tuned from
-      the fair NLO pretraining against the from-scratch V/B with exact Born baseline of virtual_over_born, scored on the hard
-      bins (bulk-only standardization and early stopping); design once the parent and the V/B baseline exist'
-    4: 'Threshold scan (Gudrun): sigma(sqrt s) of ee->tt around 2m_t (m_t=173, sqrt s 340-360 GeV) at LO and NLO, like Fig.
-      1 of arXiv:1506.06864; exact LO and fixed-order NLO from MG5_aMC (e+ e- > t t~ [QCD]) at a sqrt s grid, and the surrogate''s
-      NLO as exact NLO + integral over cos theta of (V_surrogate - V_exact) on a Born phase-space grid with MadLoop V at those
-      points; design once a tt virtual model exists'
-    5: 'Checkpoint + inference package for KIT (Joaquin sends it): the best protocol A/B checkpoints, a float64 predict script
-      taking momenta and quantum numbers, log10|M|^2 out'
+    1: 'Protocol B and B_bulk (design passed 03:59): 12 x 3000 steps from the six n=9e5 A runs (tt Born/virtual off-shellness
+      on and off, uug, uugg); submit when the uug/uugg A runs FA-ccin2p3-7d74d518, 366a4a98 (and the 1e5 f6b2ece9, 12a9d54b)
+      end and their scores are read, not before 2026-11-10T07:00 UTC (the 60-min budget window of the two pretrainings, 24
+      GPU-h requested); B path dry-run passed on CC; request --time 0:50 tt, 1:00 uug, 1:10 uugg; then the readout against
+      Bakar''s MLP table'
+    2: 'Family-held-out pretrainings running: heldout FA-ccin2p3-f0ca7a15 and fair_nlo FA-ccin2p3-95427201 (scripts/job_kit_pretrain.sh
+      at ea26f3fb, 68224 steps, 12 h requested, target 9 h); on their end, protocol A fine-tuned (A_ft) from heldout for tt,
+      uug, uugg, and tell pretrain_data_saving''s owner the heldout parent is ready'
+    3: 'Fair NLO D-scan (Bakar): ee->tt virtual, 1e2..1e4 bulk one-loop target points, fine-tuned from the fair_nlo parent
+      against virtual_over_born''s from-scratch V/B with exact Born; design once the fair_nlo parent and the V/B baseline
+      exist'
+    4: 'Threshold scan (Gudrun): sigma(sqrt s) of ee->tt around 2m_t at LO and NLO like Fig. 1 of arXiv:1506.06864, exact
+      from MG5_aMC and the surrogate''s NLO from its V; design once a tt virtual model exists'
+    5: 'Checkpoint + inference package for KIT (Joaquin sends it): best A/B checkpoints, a float64 predict script, log10|M|^2
+      out; after B'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -21459,41 +21455,32 @@ entries:
       stats and best weights loaded, training steps fine; the sigma stage is the A path.'
   step_why:
     1:
-      feeds: the from-scratch KIT numbers against Bakar's MLP and the control of every later arm
+      feeds: 'the numbers sent to KIT: whether hard_train fixes each family (B vs B_bulk)'
       if:
-      - 'exponents within 0.1 of exact and deep bins below the MLP: extrapolation holds'
-      - 'exponents flat or deep bins above the MLP: per-family failure; B and B_bulk say whether the hard data fixes it'
+      - 'B below B_bulk by >0.3 decades and within 10x of bulk: the deficit is data, report it so'
+      - 'B not below B_bulk: the deficit is in what the network represents (inputs, e.g. a threshold variable), report it
+        so'
     2:
-      feeds: protocol A pretrained and the fair NLO D-scan's parent
+      feeds: 'protocol A pretrained against from scratch: does pretraining with the family held out help extrapolation'
       if:
-      - 'designed and reviewed under 30 GPU-h: submit'
-      - 'over 30 GPU-h: the estimate to Joaquin'
+      - 'A_ft below A scratch by >0.3 decades in hard bins: pretraining transfers to hard regions'
+      - 'no difference: report pretraining as no help on hard bins'
     3:
-      feeds: whether pretraining helps the one-loop target in the hard bins under the fair protocol
+      feeds: 'Bakar''s fair NLO comparison: pretrained V against from-scratch V/B'
       if:
-      - 'parent and V/B baseline ready: design, review, submit'
-      - 'either not ready: waits on it'
+      - 'pretrained below V/B baseline on hard bins: report the gain per D'
+      - 'not below: report that V/B with exact Born wins'
     4:
-      feeds: Gudrun's threshold-scan figure
+      feeds: 'Gudrun''s request: is the surrogate''s NLO usable at threshold'
       if:
-      - 'tt virtual model trained: generate the grid and the NLO reference (CPU), plot'
-      - 'no model yet: waits on protocol A'
+      - 'surrogate NLO within MC error of exact: send the plot'
+      - 'surrogate off near threshold (expected: protocol A''s Coulomb exponent is ~0): send the plot with that deficit'
     5:
       feeds: what Joaquin sends KIT
       if:
-      - 'A runs done: build and test the package'
-      - 'not done: waits'
-  step_waits:
-    '1': FA-ccin2p3-ac4868da FA-ccin2p3-c8ac36f0 FA-ccin2p3-b99b09db FA-ccin2p3-de744946 FA-ccin2p3-7d74d518 FA-ccin2p3-366a4a98
-      FA-ccin2p3-2c922af4 FA-ccin2p3-88aa155a FA-ccin2p3-f6b2ece9 FA-ccin2p3-12a9d54b
-    '2': FA-ccin2p3-ac4868da FA-ccin2p3-c8ac36f0 FA-ccin2p3-b99b09db FA-ccin2p3-de744946 FA-ccin2p3-7d74d518 FA-ccin2p3-366a4a98
-      FA-ccin2p3-2c922af4 FA-ccin2p3-88aa155a FA-ccin2p3-f6b2ece9 FA-ccin2p3-12a9d54b
-    '3': FA-ccin2p3-ac4868da FA-ccin2p3-c8ac36f0 FA-ccin2p3-b99b09db FA-ccin2p3-de744946 FA-ccin2p3-7d74d518 FA-ccin2p3-366a4a98
-      FA-ccin2p3-2c922af4 FA-ccin2p3-88aa155a FA-ccin2p3-f6b2ece9 FA-ccin2p3-12a9d54b
-    '4': FA-ccin2p3-ac4868da FA-ccin2p3-c8ac36f0 FA-ccin2p3-b99b09db FA-ccin2p3-de744946 FA-ccin2p3-7d74d518 FA-ccin2p3-366a4a98
-      FA-ccin2p3-2c922af4 FA-ccin2p3-88aa155a FA-ccin2p3-f6b2ece9 FA-ccin2p3-12a9d54b
-    '5': FA-ccin2p3-ac4868da FA-ccin2p3-c8ac36f0 FA-ccin2p3-b99b09db FA-ccin2p3-de744946 FA-ccin2p3-7d74d518 FA-ccin2p3-366a4a98
-      FA-ccin2p3-2c922af4 FA-ccin2p3-88aa155a FA-ccin2p3-f6b2ece9 FA-ccin2p3-12a9d54b
+      - 'B''s best beats A: package B'
+      - 'else: package A'
+  step_waits: {}
   handoff:
     state: 'Protocol A from scratch: 10 runs on CC under the design passed 2026-11-10 03:59 (one seed per D315; 22 runs ~28
       GPU-h incl. B). Running: FA-ccin2p3-ac4868da (tt Born, off-shellness on, 9e5) and FA-ccin2p3-c8ac36f0 (tt virtual, on,
