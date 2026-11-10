@@ -21780,6 +21780,16 @@ entries:
       below its whole training range in every hard event: the one input that leaves its range by construction. Neither the
       T-target control (soft exponent +20.2) nor the plain arm (+0.78) extrapolates linearly in it, unlike Bakar''s MLP on
       log invariants (-2.12). eps 1e-12 would change only the deepest two decades.'
+  - at: '2026-11-10T08:49:33+00:00'
+    text: 'Figures of protocol A from scratch (tools/kit_figures.py at 144735ea; data analysis/kit_benchmark/data/kit_fig_A.json
+      collected on CC from each run''s kit_result.json, predictions.h5 and the KIT file; figures analysis/kit_benchmark/figs/kit_mse_<file>_<target>_{a..d}.png
+      (log10-MSE per hard_test stratum at the stratum''s median singular variable, one curve per arm, the floor = truth clipped
+      to its bulk_train [0.5%,99.5%] range, Bakar''s MLP deepest-bin points from slide 9) and kit_median_<...>.png (median
+      log10|M|^2 in bins of 4 per decade, truth and each arm). One seed each. Deepest-bin medians, truth vs prediction: uug
+      soft x~1.3e-7 truth +7.58, pred -153.5 (1e5), -12.0 (9e5), -5.4 (1e5 plain); uug coll y~1.3e-7 truth +0.16, pred -5.96
+      / -5.45 / -5.40; uugg soft truth +3.34, pred -107.3 (1e5), -19.6 (9e5); tt virtual threshold beta~1.3e-4 truth +1.69,
+      pred -1.33 (1e5 off), -1.31 (9e5 off), -1.61 (9e5 on): every arm stays at its bulk-edge level or dives below it, none
+      follows the rise of the truth.'
   step_why:
     1:
       feeds: 'the numbers sent to KIT: whether hard_train fixes each family (B vs B_bulk)'
