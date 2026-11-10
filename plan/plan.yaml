@@ -20911,6 +20911,8 @@ entries:
     state: working
     since: '2026-11-10T02:21:46+00:00'
     state_at: '2026-11-10T02:21:46+00:00'
+    context: 153886
+    context_at: '2026-11-10T02:25:30+00:00'
 - id: kit_benchmark
   title: the KIT hard phase-space benchmark and the fair NLO protocol (Bakar, Gudrun)
   question: 'On the KIT datasets (ee->tt Born and one-loop virtual, ee->uug, ee->uugg; hard bins by distance to the singularity):
