@@ -21335,6 +21335,20 @@ entries:
       on all three seeds = the floor works (a constant is learned exactly); above = a defect to fix. Step 0: std(log|V/B|)/std(log|V|)
       on ee->tt below 0.5 = the V/B target is narrower as in June (0.22), above 1 = the shift makes it wider, which would
       predict a No.'
+    fix_at: '2026-11-10T02:36:52+00:00'
+    fix: 'Everything else now passes; only two statements are missing from the design record. Check 13 (HPO layout and finish
+      time): the three sweeps (vob_tt_V, vob_tt_VB, vob_uu_V on branch vob @2d2925af) are the template''s coupled space with
+      8 trials, 3 start-up, which is right, but the design does not state their submission layout (sweep_manager with three
+      sweeps defaults to one interleaved wave, not the template''s 3 afterany waves 3/3/2; say which and why) nor when the
+      sweeps and the seed 43/44 re-runs finish against the ''report fast'' of the entry (D357): write the wall time per trial
+      (8000 steps at the step rate, from a sibling single-process run), the waves, the site and the expected finish. Check
+      14 (disk): the record names the step-0 CPU job''s disk (the agent''s message: about 5 MB of npz plus 0.5 MB of sidecars,
+      /sps/lpnhe 44 GB free) but not the GPU sweeps'' site and their disk per trial (single-process, 5e4-row caches, data.memmap
+      false) against that site''s free disk; put both in the design. Checked and passing: arms differ only in data.target_over_born
+      (diff of the two ee->tt sweep configs), HETEROSC from config/default.yaml; June data confirmed in analysis/virtual_over_born/data/june_targets_site.json
+      (ee->uu V/B rel std 5.0e-13, 1604 distinct values; ee->tt std of log target 0.140 for V/B against 0.622 for V), the
+      3.8x-35x June gap in MSE of log|V|, 3 seeds per arm with a non-overlap rule, the outcome for yes and no, prior now cites
+      results.tex l.14536-14540, l.9054, par:v4_loop_born(_events).'
   findings:
   - at: '2026-11-10T02:33:03+00:00'
     text: 'Cause of the June V/B ''failure'' (june_targets.py @d9b38f1c): it was read in standardized units. ee->uu: V/B =
