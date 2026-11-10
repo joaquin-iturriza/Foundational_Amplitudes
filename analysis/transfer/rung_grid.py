@@ -65,7 +65,7 @@ def draw_final(ax, f, p, *a, **kw):
     op = [x for x in pts if not x[2]]
     if op:
         col = kw.get("color")
-        ax.plot([x[0] for x in op], [x[1] for x in op], "o", color=col, mfc="white", zorder=kw.get("zorder", 2) + 3)
+        ax.plot([x[0] for x in op], [x[1] for x in op], "o", color=col, mfc="white", ms=kw.get("ms"), zorder=kw.get("zorder", 2) + 3)
     return op
 
 
@@ -73,7 +73,7 @@ if __name__ == "__main__":
     for part, order in (("ee", P[:6]), ("qcd", P[6:])):
         figs = ps.panels(len(order))
         for (fig, ax), p in zip(figs, order):
-            draw_final(ax, "scr", p, "o-", color="k", label="from scratch", zorder=10, lw=2.2, ms=6)   # D362: on top of every rung
+            draw_final(ax, "scr", p, "o-", color="k", label="from scratch", zorder=10, lw=2.2, ms=6)   # D362: on top of every rung and heavier, so it stays visible
             draw_final(ax, fam(0), p, "o-", color=ps.C.blue, label=r"rung 0")
             for r in RUNGS:
                 draw_final(ax, fam(r), p, "o-", color=cols[r], label=f"rung {r}")     # the structures: the text's table
