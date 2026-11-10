@@ -21510,6 +21510,28 @@ entries:
       each target. Cost: 8 runs, cal2''s 5-particle rates (0.084-0.095 s/step k<=7, 0.178 k=8, 0.461 k=9) + 0.08 h each: 3.9
       GPU-h; limits 0:30 (k<=7), 0:45 (k=8), 2:30 (k=9), ~1.6x the need; one wave (site pick, CC). Disk 23 MB per run, 6.2
       GB free.'
+    fix_at: '2026-11-10T10:14:54+00:00'
+    fix: '(1) Target preprocessing not settled for V/B on 2->3 (checks 11 and 2): the parent config carries data.target_physics_factor=true
+      with target_physics_dim_only=true, which multiplies every event''s target by the mass-dimension factor (s0/s_hat)^(4-N)
+      (experiment.py _physics_logF, applied to raw_amp before resolve_amp_trafos). V/B is dimensionless: for a 2->2 target
+      the factor is a constant (b b~ > Z Z: log F 4.71 for every event, harmless), but for N=5 it multiplies V/B by s_hat/s0.
+      On CC the running u u~ > e+e- Z run (dsave_scratch_uux_epemz_nlo_d6_t8000_cal_vb, data_stats.json) has prepd_std 2.57
+      against 0.257 on b b~ > Z Z, while std ln|V/B| on its pool is 0.294 (vb_spread.json): the trained target is ln s_hat
+      plus ln|V/B|, dominated by ln s_hat, so the 2->3 runs do not test V/B, and virtual_over_born''s verdict (e+e- > t t~,
+      2->2, constant factor) does not cover them. For the new target b b~ > a ve ve~ (also 2->3) signedlog acts on (V/B) s_hat/s0,
+      so s and the check ''79.3% of rows above 10 s, s=0.284'' (computed by vb_spread.py on bare V/B) do not describe the
+      unit that is trained or read. Fix (one correct answer, a dimensionless target takes no mass-dimension factor): run V/B
+      targets with the dimension part off (data.target_physics_factor=false, or dimension power 0; the coupling part is a
+      per-process constant either way), apply the same in stage 2''s both arms, redo the signedlog check on the transformed
+      quantity the run actually trains on (data_stats.json''s signedlog:<s>), and re-run the 8 u u~ > e+e- Z cal_vb runs (the
+      8 b b~ > Z Z runs stand: constant factor). Show on one CPU dry run (site run, login node) that data_stats.json then
+      carries prepd_std near std ln|V/B| for u u~ > e+e- Z. (2) Target choice under Joaquin''s 10:09 words (sign-changing
+      V not excluded): the design passed at 09:15 had b g > a b as third target (spare e+e- > d d~ Z), told to Joaquin; it
+      was dropped only for its sign changes, which his words now allow. State why b b~ > a ve ve~ rather than restoring b
+      g > a b (its 2->3 multiplicity matching u u~ > e+e- Z is a reason; say it), so the switch is a stated choice, not a
+      drift. Everything else holds: calibration protocol as cal2, one seed (D315), outcomes incl. the still-falling branch,
+      3.9 GPU-h at cal2''s 5-particle rates, disk 23 MB x 8 against 6.2 GB, Born and loop roles. Terms searched (unchanged
+      plus): signedlog, sign-changing, target_physics_factor, physics factor in results.tex and code; site decisions D369-D370.'
   step_waits:
     '3': '2026-11-12'
     '4': '2026-11-12'
