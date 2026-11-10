@@ -13920,6 +13920,28 @@ fine-tunes). A cell is its search's best of five trials. The from-scratch curve 
 \label{fig:rung_grid}
 \end{figure}
 
+\paragraph{The point of Fig.~\ref{fig:rung_grid}: any pretraining helps.} With scratch drawn on top, the figure shows
+that any pretraining, even one completely unrelated to the target process, in general helps: the fine-tuned curves sit
+below scratch on nearly every probe and $D$, whatever the pretraining contains. Of the $840$ (probe, $D$, pretraining)
+cells of the $8$k grid, $698$ fine-tune below scratch; averaged over $D$, $106$ of the $120$ probe--pretraining pairs
+gain. $ee\to u\bar u$ alone, which shares no structure with most probes, gains $1.7\times$ (geometric mean over its
+cells), rungs $1$--$6$ $2.1$--$2.4\times$ and rungs $7$--$9$ $3.2$--$3.4\times$ (\code{gain\_heatmap.py}).
+% src: python3 analysis/transfer/gain_heatmap.py @e9a7b4e5
+% claim: cells.n=840
+% claim: cells.below_scratch=698
+% claim: pairs.n=120
+% claim: pairs.gain=106
+% claim: gm_gain.rung0=1.7
+% claim: gm_gain.rung3=2.1
+% claim: gm_gain.rung6=2.4
+% claim: gm_gain.rung8=3.2
+% claim: gm_gain.rung9=3.4
+% allow: 1 because it is a rung index
+% allow: 6 because it is a rung index
+% allow: 7 because it is a rung index
+% allow: 8 because it is a rung index
+% allow: 9 because it is a rung index
+
 \paragraph{Each probe against the structure it needs.} Fig.~\ref{fig:rung_focus} (\code{rung\_focus.py}) draws, per
 probe, scratch, the first rung that adds the probe's structure, the rung below it (the same pretraining without it; $ee\to
 u\bar u$ below rung $1$), and the pretraining that does best overall, every other one grey. Best overall is the largest mean
