@@ -20,6 +20,8 @@ CACHE=$(python -c "import datagen; print(datagen.train_cache_dir())")
 FROZEN=$(python -c "import datagen; print(datagen.frozen_dir())")
 OUT="$SCRATCH/zz_vob_born_${SLURM_JOB_ID:-local}"
 mkdir -p "$OUT"
+# the MadLoop standalones are not kept between generations (D208): build and pole-certify each once, serially
+python -c "import datagen; [datagen.ensure_virt_backend(p) for p in ('ee_uu_nlo', 'ee_ttbar_nlo')]" || exit 1
 pids=()
 for spec in "ee_uu ee_uu_nlo_25-1000GeV" "ee_ttbar ee_ttbar_nlo_362-1000GeV"; do
   set -- $spec
