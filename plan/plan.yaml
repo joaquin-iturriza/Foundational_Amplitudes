@@ -21018,6 +21018,19 @@ entries:
       and stated. YES on a target when some D<=1e5 reaches 1e-4: stage 2 runs there at those T(D). NO on a target (above 1e-4
       at every D after extension): its saving is a lower bound D*_scratch > 1e5, the target kept with that bound, or a 1e6
       pool proposed to Joaquin with its cost. A run that blows up is listed apart with its step.'
+    passed_at: '2026-11-10T03:35:17+00:00'
+    reviewer: 'Revised design (recorded 03:34 UTC) addresses the 02:38 FIX. Checked: measure is the mean''s MSE with heterosc_select=mu_mse
+      (option exists, base_experiment.py:1174; the edit is in the working-copy job_data_saving.sh line 51, still to be committed
+      before submission), stage 2 selects the same way per D85/D89; the best step moves with D in calib_ee_ddbar.json (160/640/2560/4160
+      of 8000 for D=10..316, at the end from 1e3) and par:v3_muon (median 0.02 of the run); the cap can no longer censor the
+      crossing (extension at 4x steps up to 64k while the best is in the last fifth, matching the ladder horizon test''s 4.3-4.8x
+      drop at 32k); seeds: one seed for a step-valued horizon with a 1.1x margin plus the extension rule, the D89 spread (2->2
+      best mu MSE more than 2x apart in 69 of 146 cells, 2->3/2->4 within 0.90-1.15) cited, and the second-seed question for
+      stage 2 goes to Joaquin with all targets alike; outcome yes/no stated per target; HETEROSC with its sigma stage (D52/D71),
+      parent preprocessing (D355), only D-linked settings move, no sweep, disk ~0.1 GB per run on 44 GB, test sampling the
+      target''s own recipe. Residual risk to watch: a lucky 2->2 seed that crosses early sets T(D) short for stage 2''s scratch
+      arm. Searched: data saving, 1e-4, scratch/fine-tun near held-out, ttbar, v4_long/68224, muon_1e4, heterosc_select/mu_mse,
+      calib_ee_ddbar, v3_muon/muon_ft.'
   step_waits:
     '1': a design reviewer
     '2': '2026-11-12'
