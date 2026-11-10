@@ -1057,11 +1057,11 @@ class BaseExperiment:
         # best's loss; it seeds the best-so-far and is saved as this segment's best, so model_run<idx>_best.pt is the
         # best over all segments (a later validation replaces it only by beating the earlier segments too)
         if self.warm_start and bool(self.cfg.training.get("resume_seed_best", False)) and self.is_main_process():
+            v0 = self._validate_start()
+            # the quantity the selection below compares: the mu MSE under HETEROSC's mu_mse selection, else no-reg
             if (self.cfg.training.loss == "HETEROSC" and str(self.cfg.training.get("heterosc_select", "mu_mse")) == "mu_mse"
                     and not self.cfg.training.get("heterosc_sigma_only", False)):
-                raise RuntimeError("training.resume_seed_best seeds the no-reg validation loss; this run selects on "
-                                   "the mu MSE (heterosc_select=mu_mse)")
-            v0 = self._validate_start()
+                v0 = getattr(self, "_start_val_mse", None)
             if v0 is not None:
                 smallest_val_loss = smallest_val_loss_no_reg = v0
                 if self.cfg.training.es_load_best_model:
@@ -1362,7 +1362,10 @@ class BaseExperiment:
         lens = {k: len(getattr(self, k)) for k in self._START_CURVES if isinstance(getattr(self, k, None), list)}
         per = {k: {n: len(v) for n, v in getattr(self, k, {}).items()} for k in self._START_PER_PROCESS}
         n_nr, n_v = len(self.val_loss_no_reg), len(self.val_loss)
+        n_mse = len(getattr(self, "val_mse", None) or [])
         self._validate(-1)
+        vm = getattr(self, "val_mse", None) or []
+        self._start_val_mse = vm[-1] if len(vm) > n_mse else None     # the mu MSE of the same validation
         v0 = (self.val_loss_no_reg[-1] if len(self.val_loss_no_reg) > n_nr
               else self.val_loss[-1] if len(self.val_loss) > n_v else None)
         for k in self._START_CURVES:

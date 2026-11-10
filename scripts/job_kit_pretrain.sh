@@ -30,8 +30,8 @@ OUT="$PROJECT_DIR/runs/kit/kit_pretrain_${WHICH}${TAG}"
 if [ "${KIT_RESUME:-}" = 1 ]; then
     # KIT_RESUME=1 (site submit --env, with --hdr=--dependency=afterany:<the first job>): continue a pretraining its
     # time limit stopped (the first two ran 0.94 s/step on V100, 17.9 h for 68224 steps against a 12 h limit). It
-    # starts from the latest valid checkpoint with optimizer, scheduler and step (model_run0_best.pt, written at each
-    # validation that improved, every 1364 steps; else model_run0_current.pt), copied to model_run0.pt for run.py's
+    # starts from the best checkpoint, with optimizer, scheduler and step (model_run0_best.pt, written at each
+    # validation that improved, every 1364 steps; model_run0_current.pt only when the best cannot be read), copied to model_run0.pt for run.py's
     # warm start (warm_start_idx=0: run_idx 1, the same run dir), and trains the remaining steps of the same cosine
     # (training.increment_steps=68224 keeps T_max and the warmup; the scheduler's last_epoch is restored). A first job
     # that finished (model_run0.pt without resumed_from.txt) or a finished resume (model_run1.pt) ends at once.
@@ -42,7 +42,8 @@ if [ "${KIT_RESUME:-}" = 1 ]; then
     fi
     PICK=$(python - "$M" <<'PYEOF'
 import os, sys, torch
-best = None
+# the best checkpoint, the one resume_seed_best's seeded loss belongs to; the last log-spaced _current.pt (an older
+# step, possibly a worse model) only when the best cannot be read
 for f in ("model_run0_best.pt", "model_run0_current.pt"):
     try:
         ck = torch.load(os.path.join(sys.argv[1], f), map_location="cpu", weights_only=False)
@@ -51,11 +52,9 @@ for f in ("model_run0_best.pt", "model_run0_current.pt"):
     except Exception as e:
         print(f"KIT_PRETRAIN_RESUME: {f} not usable ({type(e).__name__}: {e})", file=sys.stderr)
         continue
-    if best is None or done > best[1]:
-        best = (f, done)
-if best is None:
-    sys.exit(1)
-print(best[0], best[1])
+    print(f, done)
+    sys.exit(0)
+sys.exit(1)
 PYEOF
 ) || { echo "KIT_PRETRAIN_RESUME: no usable checkpoint in $M"; exit 2; }
     read -r F DONE <<< "$PICK"

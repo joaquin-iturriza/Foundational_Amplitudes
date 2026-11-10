@@ -18,7 +18,8 @@
 #                     config.yaml is the base config, so every setting not overridden here is the parent's);
 #                     training.lr is the parent's lr law at <steps>, 7.82114e-3 (steps/17056)^-0.55, times the
 #                     transfer study's D factor (as scripts/job_data_saving.sh); a training.lr=... argument wins
-#            A_ft     protocol A fine-tuned from KIT_PARENT (a pretraining with the target's family held out)
+#            A_ft     protocol A fine-tuned from KIT_PARENT (a pretraining with the target's family held out), at the A
+#                     runs' lr (fine_tune.lr_scale=1.0; the parent config's 0.1 would change the lr with the start)
 #            B        protocol B: continued from the protocol A run KIT_FROM (its config is the base, its best
 #                     weights the start, its target and off-shellness stats kept) with every hard_train stratum
 #                     added to the train split (dataset kit_<file>__<target>__hard: the first 90% of each stratum;
@@ -72,7 +73,7 @@ print(f'{7.82114e-3 * (t / 17056) ** -0.55 * f:.6g}')") || exit 2
         PT=; for k in 9 8 7 6 5 4 3 2 1 0; do for f in "model_run${k}_best.pt" "model_run${k}_best.pt.gz"; do
             [ -z "$PT" ] && [ -e "$PROJECT_DIR/$PARENT/models/$f" ] && PT="$PROJECT_DIR/$PARENT/models/$f"; done; done
         [ -n "$PT" ] || { echo "A_ft: no model_run*_best.pt in $PARENT/models"; exit 2; }
-        FT=(fine_tune.pretrained_path="$PT" fine_tune.target_stats=own fine_tune.offshell_stats=parent)
+        FT=(fine_tune.pretrained_path="$PT" fine_tune.target_stats=own fine_tune.offshell_stats=parent fine_tune.lr_scale=1.0)
     fi
 fi
 echo "KIT dataset=$NAME n_train=$N steps=$T mode=$MODE base=$BASE args: ${ARGS[*]}"
