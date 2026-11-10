@@ -21292,6 +21292,15 @@ entries:
       branch kit: keyed_aug, _boost_com and particles_flat stored float32 momenta, base_experiment never set float64, lloca.py
       cast local features to float32, xformers has no float64 kernel. Branch kit (ffceebe6) fixes all; synthetic deep collinear
       y=3e-7: s_ug/s read back from the network momenta to 4.9e-10 in float64 against 1.5e-2 median in float32 (tests/test_kit_hardps.py).'
+  - at: '2026-11-10T03:43:25+00:00'
+    text: 'Real-bin precision check (tools/kit_precision_check.py at cc602bfc, CC CPU dry run, 2000 events per stratum, JSON
+      runs/kit_precision_check.json on CC): float64 holds on every KIT stratum. |s-variable read back from the network''s
+      momenta / file''s singular_var - 1|, float64 median <= 2.6e-10 (worst ee_tt threshold beta 1e-4..1e-3, max 2.0e-8, at
+      the definition floor 5.4e-9 of recomputing beta from the file''s own momenta), uug coll y 1e-7..1e-6 8.0e-11; float32
+      there: median 0.10 (max 2.9) for beta 1e-4..1e-3, 1.1e-3 for 1e-3..1e-2, 1.5e-2 for uug coll y 1e-7, 1.8e-2 for uugg
+      azimuth y 1e-7. Three uugg strata (coll_gg y 1e-4..1e-2, coll_qg y 1e-3..1e-2) show max 0.4-0.99 in both dtypes and
+      in the definition check alike: the check''s min-over-gluon-pairs differs from the file''s designated pair on a few events,
+      not a precision loss (float64 medians 4e-15).'
   step_why:
     1:
       feeds: whether the transformer can be scored on the KIT benchmark at float64 and at what cost
