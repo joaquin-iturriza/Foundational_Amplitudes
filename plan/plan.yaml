@@ -21464,6 +21464,14 @@ entries:
       10 seed runs in one wave, 0.4 h: about 2 h to the answer, 26 runs = 10.4 GPU-h (+ 4.4 if the tt V/B sweep is needed).
       Disk: 11 MB per run dir (sibling trial_0002), 26 runs = 0.3 GB, sidecars 0.5 MB, against 44 GB free on /sps/lpnhe (df
       today).'
+    passed_at: '2026-11-10T03:33:59+00:00'
+    reviewer: 'Arms differ only in data.target_over_born (sweep configs diffed, vob @2d2925af), A/B rule followed (V/B at
+      V''s best HPs on seeds 42-44, vob_tt_VB sweep only as the second branch), HETEROSC; check 2: june_targets_site.json,
+      ee->tt log-target std 0.140 (V/B) vs 0.622 (V), June MSE of log|V| gap 3.8x-35x across six arms, ee->uu V/B rel std
+      5.0e-13; check 3: 3 seeds per arm, non-overlap rule against a >=3.8x expected gap; layout 3/3/2 chained waves on ccin2p3,
+      0.4 h per trial from sibling FA-ccin2p3-5f933ea3 (single-process one-loop ee->dd), about 2 h, 10.4 GPU-h; disk 0.3 GB
+      against 44 GB free; searched results.tex for virt_ratio, V/B, over the Born, born_of_pool, loop_born, times a constant,
+      pi^2-8, ratio target (l.9054, l.14536-14540, par:v4_loop_born(_events) all cited).'
   findings:
   - at: '2026-11-10T02:33:03+00:00'
     text: 'Cause of the June V/B ''failure'' (june_targets.py @d9b38f1c): it was read in standardized units. ee->uu: V/B =
