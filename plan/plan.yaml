@@ -21651,6 +21651,13 @@ entries:
       plus orders target from trial 1262''s config (5907, 5833-5838). Disk ~17 GB against 44 GB free on CC; ~28 GPU-h, under
       30. Test events: KIT hard_test and bulk_test. Searched: KIT, hard phase, hard_train, extrapolat, holdout, add-back,
       Coulomb, off-shell, float64 in docs/results.tex, the plan and site decisions (D25, D315, D353, D363).'
+  targets:
+  - batch: kit_protoA_scratch
+    wall_h: 1.8
+    jobs: 10
+    units: null
+    start: '2026-11-10T04:10:59+00:00'
+    at: '2026-11-10T04:10:59+00:00'
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
