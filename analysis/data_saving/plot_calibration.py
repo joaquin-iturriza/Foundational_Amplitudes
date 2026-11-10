@@ -10,9 +10,9 @@ import plot_style as ps
 DATA = os.path.join(REPO, "analysis/data_saving/data/horizons_cal2.json")
 rows = json.load(open(DATA))
 targets = [
-    ("epem_ttx", r"$e^+e^-\to t\bar t$", ps.C.blue),
-    ("epem_ccxg", r"$e^+e^-\to c\bar c g$", ps.C.vermillion),
-    ("epem_bbxgg", r"$e^+e^-\to b\bar b gg$", ps.C.green),
+    ("epem_ttx", r"$t\bar t$", ps.C.blue),
+    ("epem_ccxg", r"$c\bar c g$", ps.C.vermillion),
+    ("epem_bbxgg", r"$b\bar b gg$", ps.C.green),
 ]
 fig, ax = ps.figure()
 for t, lab, col in targets:
@@ -24,6 +24,6 @@ ax.set_xscale("log")
 ax.set_yscale("log")
 ax.set_xlabel(r"$D$")
 ax.set_ylabel(r"best val MSE$(\ln|\mathcal{M}|^2)$")
-ps.legend(ax, "lower left")
+ps.legend(ax, "lower left", ncol=2)
 ps.save(fig, os.path.join(REPO, "analysis/data_saving/figs/calibration_best_mse"))
 print("ylim", ax.get_ylim())
