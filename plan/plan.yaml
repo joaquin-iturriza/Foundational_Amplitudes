@@ -21057,6 +21057,14 @@ entries:
   - at: '2026-11-10T03:49:35+00:00'
     text: 'Settled, not asked: one seed per cell in stage 2 (D315, ''I see no reason to keep doing multiple seeds''); the
       parent stays width 8 (par:v4_length''s choice, a method call inside the approved work).'
+  - at: '2026-11-10T04:30:20+00:00'
+    text: 'Stage 2 fine-tune parent: NOT trial 1262 (it trains near-duplicates of the tree targets: ee->tt at m_t 50/300/600,
+      ee->bbbar g, ee->ccbar gg) but kit_benchmark''s family-held-out pretraining (recipes/catalog_v4_kit_pretrain_heldout.yaml:
+      ee->tt, ee->qqbar g, ee->qqbar gg families out, 1139 pools, same trial-1262 setup; kit_benchmark submits it after its
+      current budget window). Scratch calibration unaffected. The 14 calibration FAILED events (E4474-E4487) were a sigma-stage-only
+      failure from the inherited warm_start_idx 0; main stages complete (8000 steps each), not resubmitted. Measured step
+      rates (V100, w8, scratch): ~0.075-0.087 s/step for B<=158 (k<=7), 0.146 s (ee->tt) and 0.172 s (ee->ccbar g) at B=5000
+      (k=8).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
