@@ -15728,6 +15728,12 @@ entries:
     answers_after: '2026-11-10T00:16:40+00:00'
     covers:
     - agent_redesign
+  - said_at: '2026-11-10T00:52:17.038000+00:00'
+    text: 8k is fine.
+    decision: D347
+    answers_after: '2026-11-10T00:49:03+00:00'
+    covers:
+    - agent_redesign
   decisions:
   - D186
   - D203
@@ -15742,6 +15748,7 @@ entries:
   - D330
   - D334
   - D346
+  - D347
   next:
     11: 'Close: write up in docs/results.tex what the redesign changed and measured (cut 1 replay and check, the main-session
       wake re-measure, the compaction leak fix, the model trial), with % src lines from push_replay.py, main_turns.py --split
@@ -16089,8 +16096,10 @@ entries:
     at: '2026-11-10T00:49:03+00:00'
     searched: 'fa-canonical-setup, CLAUDE.md, site decisions D241 D346, and his messages in the transcripts (2026-10-23 ''I
       never asked to run a multifidelity sweep''): none names a length'
-    blocks_steps: &id001
+    blocks_steps:
     - 22
+    answered_at: '2026-11-10T00:52:17.038000+00:00'
+    decision: D347
   step_why:
     11:
       feeds: whether the redesign is finished
@@ -16873,13 +16882,6 @@ entries:
     running: repo-reviewer a0b2da08acd94dae3 on the whole backlog
     files: sweep/sweep_config_template.yaml sweep/sweep_config_jeanzay_template.yaml tools/plan.py /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/proto_said.py
     written: '2026-11-10T00:48:15+00:00'
-  ask: 'Scope: the sweep template''s single training length (D346): no decision names it; recent sweep configs use 8000 steps
-    (29 configs), 2816 (24), 704 (10), 4264, 17056, 68224 among others; the old ladder''s top was 40000. Which should the
-    template carry? (recommend 8000, the length most sweeps actually use; each sweep config still sets its own)'
-  waiting_since: '2026-11-10T00:49:03+00:00'
-  searched: 'fa-canonical-setup, CLAUDE.md, site decisions D241 D346, and his messages in the transcripts (2026-10-23 ''I
-    never asked to run a multifidelity sweep''): none names a length'
-  blocks_steps: *id001
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
   question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
