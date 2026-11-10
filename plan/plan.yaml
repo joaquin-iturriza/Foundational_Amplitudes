@@ -21261,8 +21261,10 @@ entries:
     - kit_benchmark
   decisions:
   - D363
-  next: 'Merge branch kit after the repo reviewer passes, site sync CC, run tools/kit_precision_check.py on the real deepest
-    bins (CPU dry run on CC); then the protocol A design: float64 step rate needed for GPU-h'
+  next: Read the real-bin precision check (detached kit_precision, log ~/.local/share/ccorch/detached/20261110-043611_kit_precision.log,
+    JSON at $SCRATCH/kit_precision_check.json on CC); then the protocol A design (float64 step rate needed for GPU-h), the
+    KIT pretraining design (shared with pretrain_data_saving if held-out families permit), the fair NLO D-scan, the threshold
+    scan, the checkpoint + inference package for KIT
   done_when: null
   notes_ref: null
   match: kit_*
@@ -21296,11 +21298,9 @@ entries:
     1:
       feeds: whether the transformer can be scored on the KIT benchmark at float64 and at what cost
       if:
-      - 'precision holds and float64 step rate fits 30 GPU-h for protocol A: design and submit protocol A from scratch'
-      - 'precision fails on a stratum: trace and fix the step that loses it before any run'
-  step_waits:
-    '1': 'a reviewer: repo-reviewer re-check of branch kit (review fixes uncommitted in worktrees/wt-kit), and the Jean Zay
-      copy kit_copy_jz'
+      - 'float64 holds on every real stratum: design protocol A from scratch and the KIT pretraining'
+      - 'a stratum loses precision in float64: trace and fix the step that loses it before any run'
+  step_waits: {}
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
