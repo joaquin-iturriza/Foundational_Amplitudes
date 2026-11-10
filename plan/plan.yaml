@@ -21496,7 +21496,8 @@ entries:
     '1': 2026-11-10T08:00 (60 min after the pretrainings' resubmission; uugg A 9e5 scores read first)
     '2': 2026-11-10T07:00 (the budget window of the failed pair; then resubmit both pretrainings with --dependency=afterok
       on slurm jobs 63268392 heldout and 63268395 fair_nlo)
-    '3': FA-ccin2p3-95427201
+    '3': 2026-11-10T07:00 (the fair_nlo parent is resubmitted then; the D-scan designs when it and virtual_over_born's V/B
+      baseline exist)
     '4': FA-ccin2p3-7d74d518 FA-ccin2p3-366a4a98 FA-ccin2p3-f6b2ece9 FA-ccin2p3-12a9d54b
     '5': FA-ccin2p3-7d74d518 FA-ccin2p3-366a4a98
   handoff:
