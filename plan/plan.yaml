@@ -21102,7 +21102,8 @@ entries:
   - D362
   next:
     2: Close once the repo-reviewer passes its backlog containing ed3be235 (rung_grid.py zorder and line width)
-  done_when: null
+  done_when: 'grep -q ''The point of Fig.~\\ref{fig:rung_grid}: any pretraining helps'' docs/results.tex && grep -q ''zorder=10''
+    analysis/transfer/rung_grid.py && git merge-base --is-ancestor 623407c6 $(cut -d'' '' -f1 .claude/.review_state/notes-editor)'
   notes_ref: fig:rung_grid
   match: none
   evidence:
