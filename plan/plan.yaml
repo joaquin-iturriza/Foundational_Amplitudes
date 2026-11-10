@@ -21601,3 +21601,4 @@ entries:
       - 'a sibling result contradicts the story text: rewrite the story text around it and report it'
   step_waits:
     '1': results of pretrain_data_saving, optimizations_recap, kit_benchmark, virtual_over_born (none landed yet); 2026-11-17
+  checked_until: '2026-11-10T03:34:55+00:00'
