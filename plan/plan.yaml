@@ -22419,6 +22419,17 @@ entries:
       with [-1.5, -0.5] as the extrapolating band. The plain arm (off-shellness on, GeV inputs) gave s = +0.78, d = 145 (band
       b): if this arm also lands in (b), the runaway is tied to the dimensionless preprocessing together with the column;
       uug and uugg disagreeing is reported as such.'
+    passed_at: '2026-11-10T08:36:18+00:00'
+    reviewer: 'Re-check after FIX. One change (offshell_per_event and internal_mass_scalars true->false; control config.yaml
+      on CC: both true, HETEROSC, lr 0.0118605, seed 42, 8000 steps). Check 2: an input change moved the measure: tt Born
+      threshold 1.85 decades on/off, plain arm uug deep soft 14180 -> 145; controls'' kit_result.txt read on CC (uug soft
+      +20.175, deep 1.418e4; uugg +16.603, 9.067e3). Check 3: one seed (D315); cuts now 1 decade and exponent bands, set against
+      the observed 1e5-vs-9e5 variability of this measure (uug 14180 vs 1366, 1.0 decade; uugg 9067 vs 4241, 0.33). Outcome
+      bands (a)-(d) cover the soft exponent axis with a reading each; reading note: a deep bin more than 1 decade ABOVE the
+      control falls under (c). B resubmission: same passed 03:59 design, KIT_FROM now via site submit --env (the flag exists;
+      job_kit.sh line 48 refuses without it, which is the logged failure). Disk 8.4 GB free, arms 0.15 GB + B ~2 GB. Searched
+      for check 5: off-shellness, offshell_per_event, internal_mass_scalars, dimless_offshell_eps, massless propagator, KIT,
+      deep-IR/extrapolation seed spread in results.tex, the plan and decisions; no prior soft/collinear off-shellness test.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
