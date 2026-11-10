@@ -79,6 +79,8 @@ def main():
     json.dump(dict(summary=s, cells=pts, blew_up=blew, missing=missing),
               open(os.path.join(HERE, "het_mumse22_summary.json"), "w"), indent=1)
     fig, ax = ps.figure()
+    # the final JSON line results.tex claims from: the summary, and the blown-up D47 cell's rerun over its MSE cell
+    print(json.dumps(dict(s, blew_rerun_over_mse=[p["het_mumse"] / p["mse"] for p in blew])))
     ecdf = lambda v: (np.sort(v), np.arange(1, len(v) + 1) / len(v))
     for v, col, ls, lab in ((run22, ps.C.blue, "-", r"$2\to2$, two runs"),
                             (sel22, ps.C.blue, "--", r"$2\to2$, NLL pick"),
