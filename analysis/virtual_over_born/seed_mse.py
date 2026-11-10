@@ -66,16 +66,20 @@ def main():
         res.setdefault(proc, {}).setdefault(arm, {})[seed] = r and r["mse"]
         print("%-9s %-4s seed %d  %-28s MSE %s  (raw float32 %s)" % (
             proc, arm, seed, d, "%.3g" % r["mse"] if r else "missing", "%.3g" % r["mse_raw"] if r else "-"))
+    summ = {}
     for proc, a in res.items():
         v, vb = [x for x in a["V"].values() if x], [x for x in a["V/B"].values() if x]
         if v and vb:
+            mv, mvb = sorted(v)[len(v) // 2], sorted(vb)[len(vb) // 2]
+            summ[proc] = {"V_median": mv, "VB_median": mvb, "median_V_over_VB": mv / mvb,
+                          "all_VB_below_V": int(max(vb) < min(v)), "VB_max": max(vb)}
             print("%s: V %.3g..%.3g, V/B %.3g..%.3g; max(V/B) below min(V): %s; geo-mean V over V/B %.3g" % (
                 proc, min(v), max(v), min(vb), max(vb), max(vb) < min(v),
                 (_gm(v) / _gm(vb))))
     june = june_scratch()
     print("June from scratch, t=4000:", json.dumps(june))
     figure(res, june)
-    print(json.dumps({"june_scratch_t4000": june, "runs": {"|".join(map(str, k)): d for k, d in RUNS.items()}, "site": st, "mse": res}))
+    print(json.dumps({"summary": summ, "june_scratch_t4000": june, "runs": {"|".join(map(str, k)): d for k, d in RUNS.items()}, "site": st, "mse": res}))
 
 
 def june_scratch():
