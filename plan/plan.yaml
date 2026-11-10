@@ -16108,6 +16108,15 @@ entries:
     - 22
     answered_at: '2026-11-10T00:52:17.038000+00:00'
     decision: D347
+  - ask: 'Scope: CLAUDE.md change after the missing legends (2026-11-10): replace ''the main session sends it without opening
+      it'' with ''the main session opens it once, at low resolution, before sending, and checks that every curve is named
+      by a legend in that file and that the caption matches the axes''?'
+    at: '2026-11-10T09:11:41+00:00'
+    searched: 'CLAUDE.md line 28; site decisions D367, D368; his messages 2026-11-10T02:08, 08:42, 09:07, 2026-10-27T02:14
+      (figures: less text) and 2026-10-05T02:23 read; none changes his rule that the main session sends figures unopened'
+    blocks: the CLAUDE.md edit (step 22)
+    blocks_steps: &id001
+    - 22
   step_why:
     11:
       feeds: whether the redesign is finished
@@ -16885,6 +16894,14 @@ entries:
     running: repo-reviewer a0b2da08acd94dae3 on the whole backlog
     files: sweep/sweep_config_template.yaml sweep/sweep_config_jeanzay_template.yaml tools/plan.py /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/proto_said.py
     written: '2026-11-10T00:48:15+00:00'
+  ask: 'Scope: CLAUDE.md change after the missing legends (2026-11-10): replace ''the main session sends it without opening
+    it'' with ''the main session opens it once, at low resolution, before sending, and checks that every curve is named by
+    a legend in that file and that the caption matches the axes''?'
+  waiting_since: '2026-11-10T09:11:41+00:00'
+  searched: 'CLAUDE.md line 28; site decisions D367, D368; his messages 2026-11-10T02:08, 08:42, 09:07, 2026-10-27T02:14 (figures:
+    less text) and 2026-10-05T02:23 read; none changes his rule that the main session sends figures unopened'
+  blocks: the CLAUDE.md edit (step 22)
+  blocks_steps: *id001
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
   question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
@@ -20473,7 +20490,7 @@ entries:
       (approves the transfer study''s plan only), 2026-11-06T04:28 (worktree handling and other entries, no cost for this)'
     blocks: step 3's job submissions (the design's final form and its re-check depend on the stage-2 scope); the code rebuild
       in worktrees/wt-sigma-gen3 does not wait
-    blocks_steps: &id001
+    blocks_steps: &id002
     - 3
   owner:
     agent: a237615c421bbf029
@@ -20836,7 +20853,7 @@ entries:
     (approves the transfer study''s plan only), 2026-11-06T04:28 (worktree handling and other entries, no cost for this)'
   blocks: step 3's job submissions (the design's final form and its re-check depend on the stage-2 scope); the code rebuild
     in worktrees/wt-sigma-gen3 does not wait
-  blocks_steps: *id001
+  blocks_steps: *id002
   checked_until: '2026-11-10T03:34:52+00:00'
 - id: pretrain_data_saving
   title: 'pretraining saves target data: dataset-size scaling, fine-tuned against scratch, on the current catalog setup'
@@ -20905,7 +20922,7 @@ entries:
       and its horizons, names no GPU-h), 2026-10-06T00:17 (the old transfer study''s finish, approved items of that study
       only), 2026-11-06T19:52 (warm-start lr mismatch, another question); none covers 200-290 GPU-h'
     blocks: stage 2 submissions (phase a about 90 GPU-h, phase b, ee->ttbar 12.4 + 12.4)
-    blocks_steps: &id002
+    blocks_steps: &id003
     - 3
     - 4
   owner:
@@ -21446,7 +21463,7 @@ entries:
     and its horizons, names no GPU-h), 2026-10-06T00:17 (the old transfer study''s finish, approved items of that study only),
     2026-11-06T19:52 (warm-start lr mismatch, another question); none covers 200-290 GPU-h'
   blocks: stage 2 submissions (phase a about 90 GPU-h, phase b, ee->ttbar 12.4 + 12.4)
-  blocks_steps: *id002
+  blocks_steps: *id003
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
@@ -22938,7 +22955,7 @@ entries:
       about cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID,
       says nothing about the draft's sections)
     blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-    blocks_steps: &id003 []
+    blocks_steps: &id004 []
   owner:
     agent: afb073b8fc9460ec5
     state: stopped
@@ -22956,7 +22973,7 @@ entries:
     cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID, says
     nothing about the draft's sections)
   blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-  blocks_steps: *id003
+  blocks_steps: *id004
   step_why:
     1:
       feeds: the draft's results (D354)
