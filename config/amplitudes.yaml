@@ -52,6 +52,7 @@ data:
  eval_subsample: null
  phase_space_on_pool: false   # momentum scale + target propagators from the whole train pool's momenta, amplitude stats from the train_subsample events (data-scaling grids)
  memmap: false               # recipe path: the arrays built once into memory-mapped files under $SCRATCH and gathered per batch (data_mmap.py); host RAM scales with the batch
+ target_over_born: false      # the one-loop virtual over its exact Born, from each pool's <pool>.born.npy (plan virtual_over_born); in-memory path only
  memmap_dir: null            # the cache root (default $SCRATCH/amp_mmap_cache)
  memmap_prebuild: false      # true: build the memmap cache of this config (a CPU job, scripts/job_mmap_prebuild.sh) and exit; a run never builds one
  memmap_prefetch: true       # read the cache once sequentially at start (page cache), so shuffled batches do not fault pages one at a time
