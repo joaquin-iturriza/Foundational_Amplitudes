@@ -8,6 +8,9 @@ seeds 42, 43, 44. Each run's model is its final one, after the HETEROSC sigma st
 so its test predictions are the mean's), read from <run>/sigma_stage/preds_test.npz on CC:
     MSE = mean((pred - truth)^2) x prepd_std^2   (standardized log target back to log units, data_stats.json),
 which for V is the MSE of log|V| and for V/B the MSE of log|V/B|, equal to that of the recombined log|V| (B exact).
+June's from-scratch points beside them (the June 2026 V and V/B solo sweeps at t = 4000, scaling_solo_full, their best
+validation loss x the transformed target's std^2: june_targets.py's conversion, from its cached site read and
+analysis/hpo_optima/hpo_optima.json; a different setup: AdamW era, no sigma stage, other pools).
 The same MSE straight from the raw float32 columns, mean((log raw_pred - log raw_truth)^2), is printed beside it as a
 check.
 
@@ -69,8 +72,26 @@ def main():
             print("%s: V %.3g..%.3g, V/B %.3g..%.3g; max(V/B) below min(V): %s; geo-mean V over V/B %.3g" % (
                 proc, min(v), max(v), min(vb), max(vb), max(vb) < min(v),
                 (_gm(v) / _gm(vb))))
-    figure(res)
-    print(json.dumps({"runs": {"|".join(map(str, k)): d for k, d in RUNS.items()}, "site": st, "mse": res}))
+    june = june_scratch()
+    print("June from scratch, t=4000:", json.dumps(june))
+    figure(res, june)
+    print(json.dumps({"june_scratch_t4000": june, "runs": {"|".join(map(str, k)): d for k, d in RUNS.items()}, "site": st, "mse": res}))
+
+
+def june_scratch():
+    """{process: {arm: MSE of log|V|}} of June's from-scratch solo sweeps at t = 4000 (june_targets.py's conversion)."""
+    from analysis.virtual_over_born import june_targets as jt
+    st = json.load(open(jt.CACHE))
+    opt = json.load(open(os.path.join(ROOT, "analysis", "hpo_optima", "hpo_optima.json")))
+    out = {}
+    for proc in ("ee_ttbar", "ee_uu"):
+        for arm, tgt in (("V", "virt_e4"), ("V/B", "virt_ratio")):
+            name = "%s_nlo_%s" % (proc, tgt)
+            sw = "scaling_solo_full_%s_t04000" % jt.SWEEP_TAG[name]
+            r = [x for x in opt if x["sweep"] == sw and x.get("best_val_loss") is not None]
+            if r:
+                out.setdefault(proc, {})[arm] = r[0]["best_val_loss"] * st[name]["t_std"] ** 2
+    return out
 
 
 def _gm(x):
@@ -78,7 +99,7 @@ def _gm(x):
     return math.exp(sum(math.log(y) for y in x) / len(x))
 
 
-def figure(res):
+def figure(res, june):
     import matplotlib
     matplotlib.use("Agg")
     import plot_style as ps
@@ -87,8 +108,11 @@ def figure(res):
     for ax, proc in zip(axes, ("ee_ttbar", "ee_uu")):
         for i, (arm, col) in enumerate((("V", ps.C.blue), ("V/B", ps.C.vermillion))):
             pts = [(s, m) for s, m in sorted(res.get(proc, {}).get(arm, {}).items()) if m]
-            ax.plot([i + 0.08 * (s - 43) for s, _ in pts], [m for _, m in pts], "o", color=col, ms=4, label=arm)
-        ax.set_xticks([0, 1]); ax.set_xticklabels(["V", "V/B"]); ax.set_xlim(-0.5, 1.5)
+            ax.plot([i + 0.08 * (s - 43) for s, _ in pts], [m for _, m in pts], "o", color=col, ms=4,
+                    label="%s, now" % arm)
+            if arm in june.get(proc, {}):
+                ax.plot([i + 0.3], [june[proc][arm]], "s", mfc="none", color=col, ms=5, label="%s, June" % arm)
+        ax.set_xticks([0, 1]); ax.set_xticklabels(["V", "V/B"]); ax.set_xlim(-0.5, 1.6)
         ax.set_yscale("log")
     axes[0].set_ylabel(r"MSE of $\log|V|$ (test)")
     axes[0].legend(fontsize=7)
