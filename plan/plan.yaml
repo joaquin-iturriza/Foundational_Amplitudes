@@ -20933,8 +20933,13 @@ entries:
       (batches of three a scheduling choice); 2026-10-04T10:57 (arms must test what their names say: unrelated to count);
       site decisions D355, D356, D360; CLAUDE.md scope rule'
     blocks: only the third target's 8 calibration runs
-    blocks_steps: &id003
+    blocks_steps:
     - 6
+    answered_at: '2026-11-10T10:32:29+00:00'
+    decision: D372
+    withdrawn_at: '2026-11-10T10:32:29+00:00'
+    withdrawn_why: Joaquin's D372 restores e+e- > b b~ as the third one-loop target and stops the third-target search, so
+      a two-target arm is no longer in question
   owner:
     agent: a66d0d73cd29b8da3
     state: working
@@ -21835,15 +21840,6 @@ entries:
     files: scripts/job_data_saving.sh, scripts/job_vob_born.sh, analysis/data_saving/{horizons,vb_test_mse,vb_spread,plot_calibration,plot_vb_spread}.py,
       analysis/data_saving/data/vb_spread.json, recipes/catalog_v4_datasaving_{bbx_zz_nlo,uux_epemz_nlo,epem_bbx_nlo,loops}.yaml
     written: '2026-11-10T10:24:01+00:00'
-  ask: 'Scope: if none of the last seven candidates (bb->bb, bbbar->HZ, bbbar->ccbarH, bg->bgg, gg->bbbar g, ucbar->cbarHu,
-    udbar->ccbarW+) has a one-signed virtual, accept a one-loop arm with two targets (bbbar->ZZ, uubar->e+e-Z) instead of
-    three?'
-  waiting_since: '2026-11-10T09:52:10+00:00'
-  searched: 'his request 2026-11-10T02:08 (''one-loop targets with the trees in the pretraining'', no count); 2026-11-01T16:17
-    (batches of three a scheduling choice); 2026-10-04T10:57 (arms must test what their names say: unrelated to count); site
-    decisions D355, D356, D360; CLAUDE.md scope rule'
-  blocks: only the third target's 8 calibration runs
-  blocks_steps: *id003
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
@@ -23557,7 +23553,7 @@ entries:
       about cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID,
       says nothing about the draft's sections)
     blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-    blocks_steps: &id004 []
+    blocks_steps: &id003 []
   owner:
     agent: afb073b8fc9460ec5
     state: stopped
@@ -23575,7 +23571,7 @@ entries:
     cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID, says
     nothing about the draft's sections)
   blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-  blocks_steps: *id004
+  blocks_steps: *id003
   step_why:
     1:
       feeds: the draft's results (D354)
