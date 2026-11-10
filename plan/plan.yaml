@@ -20558,6 +20558,14 @@ entries:
       deleted under D338. origin/adaptive-ir NOT deleted: no decision of Joaquin''s names it (D338 covers heterosc and l2-gen);
       its one file is byte-identical at analysis/divergences/adaptive_ir.py on trunk. Next, step 3 (D339): sigma-driven generation
       on the folded work.'
+  - at: '2026-11-10T01:20:35+00:00'
+    text: 'Step 3 design (sigma-driven generation, ee->uugg, current HETEROSC loss) recorded and reviewed twice. FIX 1 (no
+      shared validation set, seed spread from base22 starts, no unresolved outcome, no stage-2 best-vs-best, missing disk
+      and sweep time) fixed in the revision. FIX 2: stage 2 must also sweep E3 (sigma on catalog density) and rerun each stage-2
+      best at seeds 1 and 2; with both the total is ~33 GPU-h at 0.5 h/run (66 at 1 h), over 30 -> asked Joaquin. Check reader
+      analysis/divergences/sigma_gen_design_check.py @ccede377 (branch sigma-gen3): July uugg base seed spread 1.14 (logflat);
+      worst sigma^3 / sigma^10 seed over best base seed 0.83 / 0.82. The July loop''s Jean Zay paths and BASE22 must be rebuilt
+      on siteconf; the round boundary is the existing exp._cycle monkeypatch.'
   step_why:
     1:
       feeds: 'whether the July studies carry over: what they found, recorded reproducibly'
