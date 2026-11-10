@@ -140,12 +140,13 @@ XLAB = {"threshold_beta": r"top velocity $\beta$", "sudakov_sqrts": r"$\sqrt{s}$
         "azimuth_gg_y": r"$g\to gg$ collinear $y=s_{gg}/s$"}
 
 
-def arm_label(r):
-    """legend text saying what the curve is (D368, D369): how the network was trained, then the bulk size"""
+def arm_label(r, with_n=True):
+    """legend text saying what the curve is (D368, D369): how the network was trained, then the bulk size (left out
+    when every curve of the figure has the same one; the caption gives it)"""
     n = r"$10^5$" if r["n"] == 100000 else r"$9\times10^5$"
     how = {"A": "scratch", "A_ft": "pretrained", "B": "scratch + hard events",
            "B_bulk": "scratch + bulk steps"}[r["mode"]]
-    lab = f"{how}, {n} bulk"
+    lab = f"{how}, {n} bulk" if with_n else how
     tag = r["tag"]
     if tag in ("offoff", "nooffshell"):
         lab += ",\nno off-shell input"
@@ -154,7 +155,7 @@ def arm_label(r):
     return lab
 
 
-def plot(path, outdir, prefix=""):
+def plot(path, outdir, prefix="", split_offshell=False):
     import plot_style as ps
     from matplotlib.ticker import NullFormatter
     d = json.load(open(path))
@@ -162,13 +163,17 @@ def plot(path, outdir, prefix=""):
     colors = [ps.C.blue, ps.C.vermillion, ps.C.green, ps.C.orange, ps.C.purple, ps.C.sky]
     by_proc = {}
     for name, r in sorted(d["runs"].items()):
-        by_proc.setdefault((r["file"], r["target"]), []).append((name, r))
+        off = split_offshell and r["tag"] in ("offoff", "nooffshell")
+        by_proc.setdefault((r["file"], r["target"], off), []).append((name, r))
     written = []
-    for (stem, target), runs in sorted(by_proc.items()):
+    for (stem, target, off), runs in sorted(by_proc.items()):
         tr = d["truth"][f"{stem}/{target}"]
         fams = sorted({family(k.split("/")[1]) for _, r in runs for k in r["strata"] if k.startswith("hard_test/")})
-        arms = [(arm_label(r), colors[i % len(colors)], r) for i, (_, r) in enumerate(runs)]
-        base = f"{stem}_{target}"
+        if off:     # every curve of this figure has the off-shellness input off: the caption says so, not the legend
+            runs = [(nm, dict(r, tag="")) for nm, r in runs]
+        with_n = len({r["n"] for _, r in runs}) > 1
+        arms = [(arm_label(r, with_n), colors[i % len(colors)], r) for i, (_, r) in enumerate(runs)]
+        base = f"{stem}_{target}" + ("_nooffshell" if off else "")
         # (1) log10-MSE per stratum
         figs = ps.panels(len(fams))
         for (fig, ax), fam in zip(figs, fams):
@@ -227,11 +232,13 @@ def main():
     p.add_argument("data")
     p.add_argument("--out", default=os.path.join(ROOT, "analysis", "kit_benchmark", "figs"))
     p.add_argument("--prefix", default="", help="file name prefix after kit_mse_ / kit_median_ (e.g. B_)")
+    p.add_argument("--split-offshell", action="store_true",
+                   help="the off-shellness-off runs in their own figures (<base>_nooffshell), not beside the on ones")
     a = ap.parse_args()
     if a.cmd == "collect":
         collect(a.run_dirs)
     else:
-        plot(a.data, a.out, a.prefix)
+        plot(a.data, a.out, a.prefix, a.split_offshell)
 
 
 if __name__ == "__main__":
