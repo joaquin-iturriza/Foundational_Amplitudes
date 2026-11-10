@@ -13,6 +13,10 @@
 # fair_nlo  recipes/catalog_v4_kit_pretrain_fair_nlo.yaml: Bakar's fair NLO parent (every tree, the target's tree ee->tt
 #           included, 10 one-loop pools)
 # Run dir runs/kit/kit_pretrain_<recipe>[_<tag>] (tag=<name> argument).
+# The parent config runs data.memmap=true, so each recipe needs its memmap cache built first on CPU (a GPU run
+# without it refuses at data loading): scripts/job_mmap_prebuild.sh --config-path <parent> --config-name config
+#   data.processes_file=recipes/catalog_v4_kit_pretrain_<recipe>.yaml fine_tune.pretrained_path=null
+#   training.iterations=68224 training.is_dyhpo_run=false, and this job submitted with --dependency=afterok:<its job>
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
