@@ -4358,6 +4358,72 @@ runs (plan \code{virtual\_over\_born}).
   \label{fig:vob_june}
 \end{figure}
 
+% src: python3 analysis/virtual_over_born/pool_targets.py --cached @0b33049e
+% claim: ee_ttbar_nlo_362-1000GeV_train.std_log_V=0.624
+% claim: ee_ttbar_nlo_362-1000GeV_train.std_log_VB=0.132
+% claim: ee_ttbar_nlo_362-1000GeV_train.ratio_std=0.212
+% claim: ee_uu_nlo_25-1000GeV_train.VB_rel_std=1.91e-12
+% claim: ee_uu_nlo_25-1000GeV_train.n=50000
+% allow: 0.5 because it is the design's threshold
+% allow: 2 8 because they are an exponent and the C_F(pi^2-8) constant
+\paragraph{The current pools' $V/B$ (2026-11-10, D366).}\label{par:vob_pools} Before the matched test of
+par.~\ref{par:vob_now}, MadLoop's Born was re-evaluated on every row of the current one-loop pools
+(\code{ee\_ttbar\_nlo\_362-1000GeV}, \code{ee\_uu\_nlo\_25-1000GeV}; train, validation and test;
+\code{scripts/job\_vob\_born.sh}), and the stored virtual reproduced on every row; the per-row Born is kept beside each
+pool as its sidecar. On the $50000$ training rows of $t\bar t$ the std of $\log|V|$ is $0.624$ and that of
+$\log|V/B|$ $0.132$, a ratio of $0.212$, as narrow as in June (par.~\ref{par:vob_june}), below the design's
+$0.5$: the mass-scheme shift in the stored target (par.~\ref{par:v4_loop_born_events}) does not widen it. On $u\bar u$,
+$V/B$ is the constant $C_F(\pi^2-8)$, relative std $1.91\times10^{-12}$
+(\code{analysis/virtual\_over\_born/pool\_targets.py}).
+
+% src: python3 analysis/virtual_over_born/seed_mse.py --cached @08305306
+% claim: mse.ee_ttbar.V.42=3.85e-10
+% claim: mse.ee_ttbar.V.43=8.80e-10
+% claim: mse.ee_ttbar.V.44=2.13e-07
+% claim: mse.ee_ttbar.V/B.42=1.78e-10
+% claim: mse.ee_ttbar.V/B.43=2.68e-10
+% claim: mse.ee_ttbar.V/B.44=2.27e-10
+% claim: summary.ee_ttbar.median_V_over_VB=3.9
+% claim: mse.ee_uu.V.42=3.32e-07
+% claim: mse.ee_uu.V.43=3.06e-06
+% claim: mse.ee_uu.V.44=1.12e-06
+% claim: summary.ee_uu.VB_max=1.8e-24
+% allow: 42 43 44 8000 16384 50000 5000 8 1600 because they are seeds, steps, the batch size, pool sizes, the trial count and the step of a spike
+% allow: 10^{-10} 4000 because they are the design's threshold and June's horizon in steps
+\paragraph{$V/B$ against $V$ at current defaults (2026-11-10, D366).}\label{par:vob_now} The question: at the
+template's setup (LLoCa $\mu$P, MuonAdamW, HETEROSC, batch $16384$, $8000$ steps, from scratch, $50000$ training
+events), does training on $V/B$ give a lower MSE of $\log|V|$ than training on $V$? Design: per process one DyHPO
+sweep on $V$ ($8$ trials, seed $42$; \code{sweep/sweep\_config\_vob\_\{tt,uu\}\_V.yaml}); its best configuration rerun
+at seeds $43$, $44$, and trained on $V/B$ (\code{data.target\_over\_born}, the stored virtual over the sidecar's Born)
+at the same configuration, seeds $42$--$44$ (\code{scripts/job\_vob\_seed.sh}); the target is the only difference. Read:
+the MSE of $\log|V|$ on the $5000$ test events at each run's final model, after the $\sigma$ fit (D276), from its
+saved test predictions (\code{analysis/virtual\_over\_born/seed\_mse.py}; for $V/B$ the MSE of $\log|V/B|$, which with
+$B$ exact is that of the recombined $\log|V|$). On $t\bar t$, $V$ gives $3.85\times10^{-10}$, $8.80\times10^{-10}$ and
+$2.13\times10^{-7}$ at seeds $42$, $43$, $44$ (seed $44$ took a loss spike near step $1600$ and did not recover by the
+end); $V/B$ gives $1.78\times10^{-10}$, $2.68\times10^{-10}$ and $2.27\times10^{-10}$: all three below all three, the
+design's yes, the median of $V$ over the median of $V/B$ $3.9$, the same gain as June's from-scratch pair, at errors
+far below June's (Fig.~\ref{fig:vob_seeds}). On $u\bar u$, $V$ gives $3.32\times10^{-7}$,
+$3.06\times10^{-6}$, $1.12\times10^{-6}$, and the constant $V/B$ is learned to at most $1.8\times10^{-24}$ on all three
+seeds, below the design's $10^{-10}$: the std floor works. So training on $V/B$ works for us and is the better target
+for the one-loop virtual: what made it look like a failure was the comparison in standardized units
+(par.~\ref{par:vob_june}). What it changes: the one-loop runs of the pretraining data-saving study train $V/B$ with
+Born sidecars and report the MSE of $\log|V|$, and the $V/B$ runs above are the from-scratch baseline with exact Born
+of the KIT benchmark. The first run of these $u\bar u$ $V/B$ seeds died in a histogram of \code{plots.py} on the
+constant target (fixed); the first wave of the sweeps timed out in their $\sigma$ stage, the design's step time having come from a sibling at a
+smaller batch, and was rerun.
+\begin{figure}[t]
+  \centering
+  \includegraphics{../analysis/virtual_over_born/figs/vob_seeds.pdf}
+  % src: python3 analysis/virtual_over_born/seed_mse.py --cached @08305306
+  \caption{Test MSE of $\log|V|$ ($5000$ events) for the one-loop QCD virtual of $e^+e^-\to t\bar t$ (left) and
+    $e^+e^-\to u\bar u$ (right), from scratch at the template's setup (LLoCa $\mu$P, MuonAdamW, HETEROSC, batch
+    $16384$, $8000$ steps, $50000$ training events), each run read at its final model after the $\sigma$ fit. Dots
+    (``now''): one per model seed $42$, $43$, $44$ from left to right; $V$ trained on the virtual at its DyHPO sweep's
+    best configuration, $V/B$ on the virtual over its exact Born at that same configuration. Open squares (``June''):
+    the June 2026 from-scratch sweeps at $4000$ steps (par.~\ref{par:vob_june}), another setup. Log scale.}
+  \label{fig:vob_seeds}
+\end{figure}
+
 % src: python3 analysis/catalog_v4/compare_pp_trained.py @c184e6d5
 % claim: n_classes=1396
 % allow: 42 43 2000 13 4.7 because they are the seeds, the events per read, the beam energy in TeV and the b mass in GeV, settings
