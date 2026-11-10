@@ -20832,3 +20832,34 @@ entries:
   blocks: step 3's job submissions (the design's final form and its re-check depend on the stage-2 scope); the code rebuild
     in worktrees/wt-sigma-gen3 does not wait
   blocks_steps: *id001
+- id: pretrain_data_saving
+  title: 'pretraining saves target data: dataset-size scaling, fine-tuned against scratch, on the current catalog setup'
+  question: 'On the current setup (big catalog, every accumulated optimization, the fixed single-fidelity DyHPO), how much
+    target data does pretraining save at a fixed precision MSE(ln|M|^2)=1e-4: the horizontal distance between the fine-tune
+    and the scratch L(D) curves where they cross 1e-4, for held-out tree-level targets and for one-loop targets with the tree
+    levels in the pretraining (D360, D355, D356)?'
+  status: running
+  quotes:
+  - said_at: '2026-11-10T02:08:07.285000+00:00'
+    text: We want to see that indeed the gap holds in this new setting, for the tree levels, and the one loops with the tree
+      levels in the pretraining.
+    decision: D360
+    covers:
+    - pretrain_data_saving
+  decisions:
+  - D360
+  next: 'Design (no jobs yet): the held-out tree-level and one-loop targets (whole families held out of the pretraining),
+    the pretraining (big catalog, current defaults, targets held out; for the one-loop arm the tree levels in), the D grid,
+    per-D horizons as in the ladder study (stop where scratch reaches 1e-4 or plateaus), a DyHPO sweep per scratch cell from
+    the template, the fine-tune protocol, the readout (D at 1e-4 per curve and their ratio; plus one compute or wall-time
+    panel); prior work: the draft''s fig 22 (compute_scan_eeuu_wt_min), docs/results.tex transfer and catalog_v4 sections;
+    GPU-h per batch. One-loop runs wait on virtual_over_born per D357 unless it does not resolve quickly.'
+  done_when: null
+  notes_ref: null
+  match: dsave_*
+  evidence:
+    runs: []
+    commit: null
+    paths: []
+  dead_ends: []
+  asks: []
