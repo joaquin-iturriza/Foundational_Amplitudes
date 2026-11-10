@@ -21784,7 +21784,7 @@ entries:
       - 'extrapolates: next arm T target with plain inputs'
       - 'saturates or fails: the next lever is the input representation (log invariants), not the target'
   step_waits:
-    '1': 2026-11-10T08:00 (60 min after the pretrainings' resubmission; uugg A 9e5 scores read first)
+    '1': 2026-11-10T08:05 (60 min after the pretrainings 62c2443b/d0b132b6 went out at 07:04 UTC; 24 GPU-h in the window)
     '2': FA-ccin2p3-62c2443b FA-ccin2p3-d0b132b6
     '3': FA-ccin2p3-d0b132b6
     '4': 2026-11-10T08:00 (the tt virtual model it uses is chosen from protocol B's runs, submitted then)
