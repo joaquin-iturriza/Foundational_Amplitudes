@@ -20770,3 +20770,19 @@ entries:
       and the geometric means differ by less than arm A''s seed spread -> neither yes nor no; the needed seed count (same
       in all arms) and its GPU-h go to Joaquin as a question. A D3-vs-A loss is reported as the change of loss/start undoing
       the July gain.'
+    fix_at: '2026-11-10T01:19:45+00:00'
+    fix: 'Re-check of the 01:19 revision. Fixed: shared validation set (20k events, seed 778, unweighted for every arm); an
+      UNRESOLVED outcome separate from NO, with more seeds going to Joaquin as a question; the July spread labelled as coming
+      from base22 starts, with arm A''s 3 seeds measuring this study''s spread; target named; sweep and batch wall times stated;
+      disk (0.3 GB or less per run, 15 GB or less in all, written once to a shared directory, no per-job cache). Two points
+      remain. (1) Matched control in stage 2 (A/B protocol): stage 2 sweeps D3, B and C but not E3, while YES requires E3
+      below B. If stage 2 runs, E3 at arm A''s settings would be compared with a B tuned by its own sweep, which is an untuned
+      arm against a tuned one. Fix: add E3 to stage 2 (8 more trials, about 4 GPU-h, total about 29 GPU-h at the target).
+      Alternatively, say that E3-vs-B is read only at stage 1''s shared settings and why that is enough. If the measured per-run
+      time puts the total over 30 GPU-h, the plan already sends it to Joaquin. (2) Stage-2 read against the spread: NO is
+      defined by ''controls'' seeds below or interleaved with the sigma seeds'' and by ''beyond arm A''s measured seed spread'',
+      but stage 2 gives one seed per trial: 24 runs, with no reruns of each sweep''s best at seeds 1 and 2. Fix: either rerun
+      each stage-2 best at seeds 1 and 2 (about 2 runs per arm, with their GPU-h; over 30 GPU-h goes to Joaquin), or restate
+      the stage-2 NO and UNRESOLVED rules for single-seed bests, compared against arm A''s 3-seed spread. Everything else
+      passes as in the first review (check reader @ccede377 reproduced: 0.834 and 0.817 log-flat MSE ratios, 0.75 and 0.669
+      deepest-decade ratios; prior search complete).'
