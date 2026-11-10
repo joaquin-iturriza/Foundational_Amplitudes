@@ -84,6 +84,7 @@ Final message, short, readable by someone who has forgotten this entry: the ques
 you did, what you found (numbers), what it changes next, the figure files (absolute paths of the .png; you looked at
 each once, at low resolution, and say what it shows), what you recorded, and any question.
 A result (any number read from runs) is reported only with its figure of the compared quantities, drawn with the figure-style skill and looked at once; 'no figures yet' next to numbers is not a report: draw the figure first.
+A target, arm, process or pool of the design is never dropped or swapped on a prediction of how training would behave (a spread, a constant, a sign): only on a measured run, and the drop or swap is Joaquin's call, asked before the configs are made (D372).
 A turn that only acked a routine event (a run or batch ended as planned: no result, no question, nothing finished)
 ends with one line starting "ROUTINE:" (e.g. "ROUTINE: E123 acked, batch 2 of 4 done; nothing for Joaquin"), which
 the main session passes on to no one.
