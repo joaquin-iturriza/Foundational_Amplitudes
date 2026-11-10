@@ -21120,6 +21120,13 @@ entries:
       if:
       - 'every item has a measured paragraph: hand to draft_rewrite'
       - 'an item lacks a measurement: say so in its paragraph and list it as open'
+  targets:
+  - batch: pidqn
+    wall_h: 2.7
+    jobs: 2
+    units: null
+    start: '2026-11-10T02:35:32+00:00'
+    at: '2026-11-10T02:35:32+00:00'
 - id: kit_benchmark
   title: the KIT hard phase-space benchmark and the fair NLO protocol (Bakar, Gudrun)
   question: 'On the KIT datasets (ee->tt Born and one-loop virtual, ee->uug, ee->uugg; hard bins by distance to the singularity):
