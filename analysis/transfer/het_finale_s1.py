@@ -53,6 +53,24 @@ def main():
           f"({', '.join(c for c, v in res.items() if v['best_at_lowest_lr'])})")
     ps.save(fig, os.path.join(HERE, "figs", "het_finale_s1"))
     json.dump(res, open(os.path.join(HERE, "het_finale_s1.json"), "w"), indent=1)
+    # results.tex numbers (D91): best lr per cell in 1e-3, the probes' D=10^2 over D=10^4 best-lr ratio, the HP ranges of
+    # the bests, the D=10^4 d dbar probes' trials above log10 lr = -2.65 over their best, and W+W- at D=10^2 at its
+    # lowest lr tried (the d dbar probes' range) over its best
+    lr = {c: v["best"]["training.lr"] for c, v in res.items()}
+    lam = sorted(v["best"]["training.regularization_lambda"] for v in res.values())
+    wu = [v["best"]["training.cosanneal_warmup_frac"] for v in res.values()]
+    hi = [x["val"] / res[c]["best"]["val"] for c in ("ee_ddbar_d8", "ee_dd_nlo_d8") for x in res[c]["trials"]
+          if math.log10(x["training.lr"]) > -2.65]
+    ww = min(res["ee_WW_d4"]["trials"], key=lambda x: x["training.lr"])
+    out = dict(lr_e3={c: x * 1e3 for c, x in lr.items()}, lr_min=min(lr.values()), lr_max=max(lr.values()),
+               lr_factor=max(lr.values()) / min(lr.values()),
+               probe_lr_ratio_max=max(max(lr[f"{p}_d4"], lr[f"{p}_d8"]) / min(lr[f"{p}_d4"], lr[f"{p}_d8"]) for p in PROBES),
+               lambda_low=lam[:-1], lambda_top=lam[-1], warmup_min=min(wu), warmup_max=max(wu),
+               ema_on=sum(v["best"]["ema"] in (True, "true", "True") for v in res.values()),
+               trials=sum(len(v["trials"]) for v in res.values()), best_at_lowest_lr=n,
+               dd_highlr_min=min(hi), dd_highlr_max=max(hi),
+               ww_d4_lowlr=dict(lr=ww["training.lr"], over_best=ww["val"] / res["ee_WW_d4"]["best"]["val"]))
+    print(json.dumps(out))
 
 
 if __name__ == "__main__":

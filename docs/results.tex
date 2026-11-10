@@ -10004,10 +10004,12 @@ temperature over seeds, and the $\sigma$-tail \emph{floors} at a level $8\times$
 rule for how much to generate. Tooling under \code{analysis/divergences/};
 heteroscedastic code on worktree \code{worktrees/wt-heterosc} (branch \code{heterosc}). Remaining/future
 work is collected in the hand-off, Sec.~\ref{sec:div-open}.}
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
+% claim: sat.budget_factor=8
 
 \paragraph{Deeper and antenna phase-space sampling.} The production
 $u\bar u g$ set is flat \textsc{rambo} (uniform in Lorentz-invariant phase space), so the deep
-IR is starved (median $y_{\min}\!\approx\!0.15$; only $\sim$5 of $10^6$ events below
+IR is starved (median $y_{\min}\!\approx\!0.15$, a figure of the July write-up that no committed summary holds; only $\sim$5 of $10^6$ events below
 $y_{\min}=10^{-5}$). \code{gen\_uug\_sampling.py} adds two samplers over a lowered-cut fiducial
 region ($p_T\!>\!1$, $m\!>\!0.3$, $\Delta R\!>\!0.05$): \emph{antenna}
 ($\mathrm{d}N\!\propto\!\mathrm{d}a/a\,\mathrm{d}b/b$ in the gluon invariants $a=1-x_u$,
@@ -10023,10 +10025,20 @@ relative error in $y_{\min}\!\in\![10^{-6},10^{-5})$ drops $47.9\%\!\to\!1.4\%$;
 MSE$(\Delta\ln|\mathcal{M}|^2)$ $0.108\!\to\!0.0017$ ($\sim$62$\times$; Fig.~\ref{fig:deep_sampling_antenna}). The fraction sweep
 $f\in\{0,.25,.5,.75,1\}$ (\code{plot\_fraction\_sweep.py}, fig
 \code{deep\_sampling\_fraction\_sweep}) shows a \emph{broad interior optimum} $f\in[0.25,0.75]$:
-$f{=}0$ catastrophic ($\sim$200$\times$), $f{=}1$ $\sim$2$\times$ worse than the basin; the fine
+$f{=}0$ catastrophic ($230\times$ the best log-flat MSE; this read $\sim$200$\times$ before the reader), $f{=}1$ $\sim$2$\times$ worse than the basin; the fine
 location inside the basin is single-seed noise ($f{=}0.5$ sits above both neighbours). Metrics
 reported: MSE and MAE of $\Delta\ln|\mathcal{M}|^2$ (both scale-invariant, since the residual is
 $\ln$ of the amplitude ratio) plus median relative error.
+% src: python3 analysis/divergences/sampling_numbers.py @d4e775ae
+% claim: deep.uniform_train_below_1e-5_per_1e6=5
+% claim: deep.uniform_medrel_deepest_pct=47.9
+% claim: deep.antenna_medrel_deepest_pct=1.4
+% claim: deep.uniform_mse=0.108
+% claim: deep.antenna_mse=0.0017
+% claim: deep.uniform_over_antenna=62
+% claim: fraction.f0_over_best=230
+% claim: fraction.f1_over_best=2
+% allow: 0.15 because it is the July write-up's median y_min, marked as not recomputed
 
 \begin{figure}[H]
   \centering
@@ -10047,11 +10059,14 @@ $\ln$ of the amplitude ratio) plus median relative error.
   \includegraphics{deep_sampling_fraction_sweep.pdf}
   \caption{\textbf{The antenna/uniform mixture has a broad interior optimum.} Deep-IR error vs
   the antenna fraction $f$. Both endpoints are bad: $f{=}0$ (pure \textsc{rambo}) is catastrophic
-  ($\sim\!200\times$) and $f{=}1$ (pure antenna) is $\sim\!2\times$ worse than the basin, because it
+  ($230\times$ the best log-flat MSE) and $f{=}1$ (pure antenna) is $\sim\!2\times$ worse than the basin, because it
   starves the $O(1)$ bulk, while any $f\in[0.25,0.75]$ sits in a flat basin. The fine location inside
   the basin is single-seed noise. This ``mix the coverage criterion in at a modest fraction, do not adopt
   it as the base'' shape recurs for the $Z$ resonance (Fig.~\ref{fig:eeuu_genmix_fraction_sweep}).}
   \label{fig:deep_sampling_fraction_sweep}
+% src: python3 analysis/divergences/sampling_numbers.py @d4e775ae
+% claim: fraction.f0_over_best=230
+% claim: fraction.f1_over_best=2
 \end{figure}
 
 \paragraph{Float32 label floor.} $s_{ij}=s\,y_{\min}$ is a near-cancellation of $O(s)$ momenta,
@@ -10061,6 +10076,9 @@ $[10^{-6},10^{-5})$, $\times{\sim}8$ per decade, negligible by $10^{-3}$. All cu
 well \emph{above} this (short trainings), so they are optimisation-limited, not precision-limited. If ever
 precision-limited, reparametrise (feed $\ln y_{\min}$ / pair masses as features) rather than store
 float64.
+% src: python3 analysis/divergences/sampling_numbers.py @d4e775ae
+% claim: float32.deepest_pct=0.39
+% claim: float32.per_decade_ratio.0=8
 
 \paragraph{Optimal allocation of a fixed data budget.} For a fixed data
 budget the optimum is the equimarginal (water-filling) allocation: sample until the marginal
@@ -10097,8 +10115,14 @@ sweep:} \code{sweep\_heterosc\_foundation.sh} (same 22-proc leave-uug-out recipe
 iters). After the fix $\mu$ fits: best lr$=4\mathrm{e}{-}3$, $\beta{=}1$ gives in-distribution val
 $\mu$-MSE $=0.025$, and $\beta$ dominates ($\beta1\!\ll\!\beta0.5\!\ll\!\beta0$, a $\sim$9$\times$
 gap $\Rightarrow$ the Seitzer $\sigma$-inflation effect is real). Rank: \code{rank\_mu\_mse.py}.
+% src: python3 analysis/divergences/sampling_numbers.py @d4e775ae
+% claim: foundation.best_mse=0.025
+% claim: foundation.b0_over_b1_lr0.004=9
 
 \paragraph{The coupled fit fails for a structural reason; two-stage $\sigma$ works. (Withdrawn 2026-10-15: the mechanism below is wrong, see the correction that follows.)}
+(The numbers of this paragraph are read from job logs that survive only in the Jean Zay worktree
+\code{wt-heterosc}: the gradient decomposition from \code{graddec\_*.out} and \code{clip\_*.out}, the two-stage results
+from \code{twostage\_*.out}, \code{twostage2\_*.out} and \code{calib\_*.out}; no committed reader recomputes them.)
 The coupled $(\mu,\sigma)$ NLL underfit $\mu$ ($\mu$-MSE $\sim$1 or $\gg$ the MSE baseline) across
 $\sim$40 GPU-h of runs and three sweeps. Mechanism (\code{grad\_decomp.py}, \code{clip\_test.sh}):
 amplitudes are \emph{deterministic} (no aleatoric noise), so the Gaussian likelihood is degenerate
@@ -10130,24 +10154,38 @@ user's loss (\code{training.loss=HETEROSC}, \code{heterosc\_beta=0}, the new
 $D=10^4$, $8$k steps, seed 2, at the MSE baseline's own HPs (\code{tp\_scr\_ee\_ttbar\_d8/trial\_0144},
 the best of its 8-trial DyHPO sweep), V100, \code{sign\_head} off (a positive probe): $\mu$-MSE (val, standardized
 $\log|\mathcal M|^2$) $1.37\times10^{-7}$ against the MSE baseline's $3.57\times10^{-7}$, i.e.\
-$2.6\times$ lower error; test $6.4\times10^{-8}$, mean $|\Delta|=10^{-4}$. The $\mu$-MSE falls steadily
+$2.6\times$ lower error (read from the two runs' results on CC, \code{runs/zz\_het\_ab} and
+\code{tp\_scr\_ee\_ttbar\_d8/trial\_0144}; no committed reader); test $6.4\times10^{-8}$, mean $|\Delta|=10^{-4}$. The $\mu$-MSE falls steadily
 to the last step, which is also the best checkpoint. On the test split (\code{analysis/transfer/het\_ab.py}, figures
 \code{het\_ab\_delta}, \code{het\_ab\_pull}, \code{het\_ab\_calib}; Fig.~\ref{fig:het_ab}) the median $|\Delta|$ is
-$5.0\times10^{-5}$ against the MSE model's $1.4\times10^{-4}$. Calibration is not there yet: pull mean
-$0.00$, std $0.46$, so $\sigma$ is about $2\times$ too large; $\sigma$ barely varies ($\approx4$ to
+$5.1\times10^{-5}$ against the MSE model's $1.4\times10^{-4}$ (this read $5.0\times10^{-5}$ before the reader). Calibration is not there yet: pull mean
+$0.01$, std $0.45$ (read $0.00$ and $0.46$ before), so $\sigma$ is about $2\times$ too large; $\sigma$ barely varies ($\approx4$ to
 $6\times10^{-4}$ over its deciles) while the actual error spans $10^{-4}$ to $6\times10^{-4}$, so it
 ranks events only weakly; the NLL was still falling at $8$k steps. One seed, one probe, HPs tuned for MSE. A first submission failed on
 \code{sign\_head} with \code{HETEROSC} (asserted incompatible) and left an empty
 \code{runs/zz\_het\_ab/tp\_scr\_ee\_ttbar\_d8\_\_trial\_0144\_s1}.
+% src: python3 analysis/transfer/het_ab.py @af216a04
+% claim: test_mu_mse_std=6.4e-8
+% claim: median_absdelta_het=5.1e-5
+% claim: median_absdelta_mse=1.4e-4
+% claim: pull_mean=0.01
+% claim: pull_std=0.45
+% claim: median_sigma_over_rms=2
+% claim: decile_sigma_min=4e-4
+% claim: decile_sigma_max=6e-4
+% claim: decile_rms_max=6e-4
+% allow: 5.0\times10^{-5} 0.00 0.46 because they are the superseded values, quoted as corrected
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.48\textwidth]{../analysis/transfer/figs/het_ab_pull.pdf}\hfill
 \includegraphics[width=0.48\textwidth]{../analysis/transfer/figs/het_ab_calib.pdf}
 \caption{The user's heteroscedastic loss against the MSE baseline on $e^+e^-\to t\bar t$, $D=10^4$, test split, one
-seed. Left: pulls $\Delta/\sigma$ (standard deviation $0.46$, a calibrated model has $1$). Right: predicted $\sigma$
+seed. Left: pulls $\Delta/\sigma$ (standard deviation $0.45$, a calibrated model has $1$). Right: predicted $\sigma$
 against the realised error per decile of $\sigma$.}
 \label{fig:het_ab}
+% src: python3 analysis/transfer/het_ab.py @af216a04
+% claim: pull_std=0.45
 \end{figure}
 
 \paragraph{The GP sweep of the user's loss (2026-10-15, D57).} The same setup swept for its own HPs: the MSE baseline's
@@ -10157,16 +10195,32 @@ ranking on the validation NLL, a plain GP over $2000$ candidates (the likelihood
 ``GP, 8 trials, 2000 candidates''). Before it, a signed objective was a silent random search: \code{-log10} mapped every
 NLL $\le0$ to one label (fixed by \code{dyhpo.objective\_scale}, commit \code{8d31b58}). Best trial \code{hp1550}: lr
 $2.3\times10^{-3}$, EMA off, validation NLL $-7.63$. On the test split, in MSE$(\log|\mathcal M|^2)$ from the raw
-predictions (\code{tools/eval\_delta.py}, V100): $2.0\times10^{-8}$ against the MSE baseline's $9.6\times10^{-8}$
+predictions (\code{tools/eval\_delta.py}, V100; the trials' test errors are read from their evaluations on CC, no
+committed reader): $2.0\times10^{-8}$ against the MSE baseline's $9.6\times10^{-8}$
 ($4.8\times$ lower; the one run at the baseline's HPs: $2.3\times10^{-8}$); median $|\Delta|$ $4.4\times10^{-5}$ against
 $1.4\times10^{-4}$ (\code{analysis/transfer/het\_ab.py --sweep}, figures \code{het\_ab\_sweep\_*}). Five of the eight
 trials beat the baseline's test error ($2.0$ to $4.8\times$ lower); the three with lr $\le3.1\times10^{-4}$ are $4$ to
 $6\times$ worse than it. Calibration is unchanged: pull
-std $0.42$, $\sigma$ $\approx2\times$ the realised error and nearly flat ($3.7$ to $5.7\times10^{-4}$ over its deciles,
+std $0.42$, $\sigma$ $\approx2\times$ the realised error and nearly flat ($3.6\times10^{-4}$ to $5.7\times10^{-4}$ over its deciles (read $3.7$ before the reader),
 against errors from $7\times10^{-5}$ to $6\times10^{-4}$), monotone in it. Every trial selected its last step: the NLL
 falls to $8$k (\code{analysis/transfer/het\_sweep.py}, Fig.~\ref{fig:het_sweep}), so the horizon is short for this loss.
 Scored with the validation weights (\code{training.track\_train\_eval}, D58), the training split sits at or just below
 validation; the earlier validation-below-training curve was the EMA weights against the live ones.
+% src: python3 analysis/transfer/het_sweep.py @1a42f4e6
+% claim: best_lr=2.3e-3
+% claim: best_val_nll=-7.63
+% src: python3 analysis/transfer/het_ab.py --sweep @af216a04
+% claim: median_absdelta_het=4.4e-5
+% claim: median_absdelta_mse=1.4e-4
+% claim: pull_std=0.42
+% claim: median_sigma_over_rms=2
+% claim: decile_sigma_min=3.6e-4
+% claim: decile_sigma_max=5.7e-4
+% claim: decile_rms_min=7e-5
+% claim: decile_rms_max=6e-4
+% src: python3 analysis/transfer/het_long.py @f7130695
+% claim: mse_baseline.8k=9.6e-8
+% allow: 3.7 because it is the superseded value, quoted as corrected
 
 \begin{figure}[H]
 \centering
@@ -10182,17 +10236,41 @@ same weights. Right: every trial's validation NLL, coloured by $\log_{10}$ lr; e
 cosine spanning the whole run (\code{scripts/job\_het\_ab.sh}; a first $16$k/$32$k attempt kept the trial's
 \code{increment\_steps}, restarted the cosine at $8$k and is discarded). Each run is best at its last step again
 (Fig.~\ref{fig:het_long}, top). Test MSE$(\log|\mathcal M|^2)$: $2.9\times10^{-8}$, $1.2\times10^{-8}$,
-$5.1\times10^{-9}$; median $|\Delta|$ $6.2$, $1.9$, $1.2\times10^{-5}$. The MSE baseline at the same length:
+$5.1\times10^{-9}$; median $|\Delta|$ $6.2\times10^{-5}$, $1.9\times10^{-5}$, $1.2\times10^{-5}$. The MSE baseline at the same length:
 $9.6\times10^{-8}$ at $8$k (\code{tp\_scr\_ee\_ttbar\_d8} trial $144$), $1.7\times10^{-8}$ at $32$k
 (\code{tp3\_scr32k\_ee\_ttbar\_d8}, the better of its two chosen points on validation); the het loss stays
 $3.3\times$ and $3.2\times$ lower. The $8$k run at seed $1$ ($2.9\times10^{-8}$) against the sweep trial at seed $42$
 ($2.0\times10^{-8}$) is compatible with the seed spread (two seeds). Calibration does improve with length (Fig.~\ref{fig:het_long}, bottom): at $8$k
-$\sigma$ spans $1.6\times$ over its deciles while the error spans $8\times$; at $32$k $\sigma$ spans $4.5\times$, the
-error $30\times$, and the deciles lie across the diagonal (median $\sigma$ over the RMS error $1.68$, $0.89$, $0.60$ at
+$\sigma$ spans $1.6\times$ over its deciles while the error spans $8\times$; at $32$k $\sigma$ spans $4.4\times$ (read $4.5\times$ before), the
+error $32\times$ (read $30\times$ before the reader), and the deciles lie across the diagonal (median $\sigma$ over the RMS error $1.68$, $0.89$, $0.60$ at
 $8$k, $16$k, $32$k; pull std $0.42$, $0.44$, $0.60$). $\sigma$ still varies less than the error: about $5\times$ too large
-on the best-predicted decile and $1.5\times$ too small on the worst. Since every horizon is still best at its last step, we
+on the best-predicted decile and $1.6\times$ (read $1.5\times$ before) too small on the worst. Since every horizon is still best at its last step, we
 speculate that $\sigma$ is calibrated only late because of the schedule: the NLL keeps spiking while the lr is high and
 $\sigma$ appears to resolve the per-event error only in the cosine's tail; no run tests this (\code{analysis/transfer/het\_long.py}).
+% src: python3 analysis/transfer/het_long.py @f7130695
+% claim: 8k.test_mse=2.9e-8
+% claim: 16k.test_mse=1.2e-8
+% claim: 32k.test_mse=5.1e-9
+% claim: 8k.median_absdelta=6.2e-5
+% claim: 16k.median_absdelta=1.9e-5
+% claim: 32k.median_absdelta=1.2e-5
+% claim: mse_baseline.8k=9.6e-8
+% claim: mse_baseline.32k=1.7e-8
+% claim: mse_over_het.8k=3.3
+% claim: mse_over_het.32k=3.2
+% claim: 8k.sigma_span=1.6
+% claim: 8k.err_span=8
+% claim: 32k.sigma_span=4.4
+% claim: 32k.err_span=32
+% claim: 8k.median_sigma_over_rms=1.68
+% claim: 16k.median_sigma_over_rms=0.89
+% claim: 32k.median_sigma_over_rms=0.60
+% claim: 8k.pull_std=0.42
+% claim: 16k.pull_std=0.44
+% claim: 32k.pull_std=0.60
+% claim: 32k.sigma_over_rms_best_decile=5
+% claim: 32k.rms_over_sigma_worst_decile=1.6
+% allow: 30\times 4.5\times 1.5\times because they are the superseded values, quoted as corrected
 
 \begin{figure}[H]
 \centering
@@ -10212,18 +10290,20 @@ on the validation split and scored on test, calibrates every horizon (Fig.~\ref{
 $8$k, $16$k, $32$k; test pull std $1.00$, $1.01$, $0.97$ (raw $0.42$, $0.44$, $0.60$); the RMS error over $\sigma'$
 per decile within $0.79$ to $1.15$ at $32$k ($0.76$ to $1.47$ at $16$k, $0.89$ to $1.34$ at $8$k); test NLL lower by
 $0.65$, $0.67$, $0.42$. The tails are heavier than Gaussian: $|{\rm pull}|<1$ holds for $0.72$ to $0.74$ of the events
-against $0.68$, with a few events beyond $4$. $\mu$ is unchanged, so the accuracy numbers above stand
+against $0.68$, with a few events beyond $4$ (the largest $|{\rm pull}|$ $8.6$ to $12.1$). $\mu$ is unchanged, so the accuracy numbers above stand
 (\code{analysis/transfer/het\_long.py}, figure \code{het\_long\_recal}). The map is a measurement of the miscalibration, not a fix: a Gaussian NLL trained
 to convergence should be calibrated without one. Diagnosis on the $32$k run: $\sigma$ is as compressed on the training
-split it was fitted on (pull std $0.59$, deciles $0.22$ to $1.42$), so this is not overfitting. Gradient clipping binds on
+split it was fitted on (pull std $0.59$, deciles $0.22$ to $1.42$; read from the run's training-split evaluation on
+CC, no committed reader), so this is not overfitting. Gradient clipping binds on
 every step of every het run (pre-clip median norm $417$ at $8$k, $731$ at $32$k, against \code{clip\_grad\_norm}$=5$; the
-MSE baseline binds on $4\%$), but it is not the cause: at $8$k and the same HPs, clip $1000$ ($14\%$ of steps) and no
+MSE baseline binds on $4\%$; these from the runs' training logs on CC, no committed reader), but it is not the cause: at $8$k and the same HPs, clip $1000$ ($14\%$ of steps) and no
 clipping leave $\sigma$ as compressed (test pull std $0.72$, $0.83$; worst decile $2.0$, $2.6$) and $\mu$ far worse
 (val MSE $8.2\times10^{-6}$, $4.7\times10^{-5}$ against $1.7\times10^{-7}$; the lr was found under full clipping, so this
 does not rank the clip values). Training only the $\sigma$ readout on the frozen $32$k trunk and $\mu$
 (\code{heterosc\_sigma\_only}, $4$k steps, no L2, clipping never binds) calibrates it: test pull std $1.03$,
 $|{\rm pull}|<1$ for $0.69$ of the events, deciles $0.65$ to $1.24$ except the worst at $2.4$; validation NLL $-9.68$
-against $-9.18$, $\mu$ unchanged. So the features carry the error, and joint training leaves $\sigma$ fitted to errors
+against $-9.18$ (validation NLLs, validation MSEs, the D68 and D69 sweeps' values and the stage timings in this
+paragraph are read from the runs' and sweeps' results on CC; no committed reader), $\mu$ unchanged. So the features carry the error, and joint training leaves $\sigma$ fitted to errors
 $\mu$ has since outgrown. The same refit with the trial's L2 ($\lambda=1.6\times10^{-8}$) ends at the same validation NLL
 ($-9.68005$ against $-9.68008$), so L2 on the readout plays no part; L2 on the trunk during joint training is not excluded
 but is of the same size. A DyHPO sweep with \code{clip\_grad\_norm} searched (D68, the user: ``maybe sweeping the value is
@@ -10246,6 +10326,45 @@ $1.5$ to $1.8\%$) and $12.6$\,min on the catalog's hp58 against its $281$\,min (
 loading the $1352$ pools). Checked on a $500$-step het run of $ee\to t\bar t$ ($D=10^4$,
 \code{runs/zz\_het\_ab/tp\_scr\_ee\_ttbar\_d8\_\_trial\_0144\_s1\_stagetest}): $258$ trainable parameters, validation
 NLL $-3.82\to-4.65$ in $16$\,s.
+% src: python3 analysis/transfer/het_long.py @f7130695
+% claim: 8k.recal.b=3.9
+% claim: 16k.recal.b=2.1
+% claim: 32k.recal.b=2.1
+% claim: 8k.recal.pull_std=1.00
+% claim: 16k.recal.pull_std=1.01
+% claim: 32k.recal.pull_std=0.97
+% claim: 32k.recal.rms_over_sigma_min=0.79
+% claim: 32k.recal.rms_over_sigma_max=1.15
+% claim: 16k.recal.rms_over_sigma_min=0.76
+% claim: 16k.recal.rms_over_sigma_max=1.47
+% claim: 8k.recal.rms_over_sigma_min=0.89
+% claim: 8k.recal.rms_over_sigma_max=1.34
+% claim: 8k.recal.nll_drop=0.65
+% claim: 16k.recal.nll_drop=0.67
+% claim: 32k.recal.nll_drop=0.42
+% claim: 8k.recal.frac_pull_lt1=0.72
+% claim: 16k.recal.frac_pull_lt1=0.74
+% claim: 32k.recal.max_abs_pull=8.6
+% claim: 16k.recal.max_abs_pull=12.1
+% src: python3 analysis/transfer/het_sigonly.py @665117a2
+% claim: clip1000_8k.pull_std=0.72
+% claim: noclip_8k.pull_std=0.83
+% claim: clip1000_8k.decile_worst=2.0
+% claim: noclip_8k.decile_worst=2.6
+% claim: refit4000.pull_std=1.03
+% claim: refit4000.frac_pull_lt1=0.69
+% claim: refit4000.decile_min=0.65
+% claim: refit4000.decile_max_but_worst=1.24
+% claim: refit4000.decile_worst=2.42
+% claim: refit250.pull_std=1.02
+% claim: refit250.frac_pull_lt1=0.67
+% claim: refit250.decile_min=0.73
+% claim: refit250.decile_max_but_worst=1.22
+% claim: refit250.decile_worst=2.15
+% claim: joint32k.pull_std=0.60
+% claim: joint32k.frac_pull_lt1=0.93
+% claim: joint32k.decile_min=0.22
+% claim: joint32k.decile_max=1.56
 
 \begin{figure}[H]
 \centering
@@ -10265,30 +10384,85 @@ $\sigma$ row zeroed (a \code{sign\_head} parent's second row is its sign logit),
 their signed-log target). All run on CC: the $72$ cells first trained on CC and lxplus in $18$ jobs (2026-10-16), the
 $107$ first trained on Jean Zay in $20$ (2026-10-21, after copying them and their $11$ parents to CC). One blew up:
 \code{tp3\_uu64fte\_ee\_nnbar\_d8} trial $114$, at step $1360$ (validation NLL $10^{12}$, then $50$ non-finite gradient
-steps and the run aborts); its best checkpoint, step $400$ at NLL $-2.65$ against $-7$ to $-9$ for the other cells, went
+steps and the run aborts, as its CC job log shows); its best checkpoint, step $400$ at NLL $-2.65$ against $-7$ to $-9$ for the other cells, went
 through the $\sigma$ stage on its own (\code{scripts/job\_het\_delta\_stage.sh}): $29\times$ the MSE cell's median
 $|\Delta|$, pull std $1.06$. It is drawn apart and left out of the numbers below. Fig.~\ref{fig:het_delta_summary}
 (\code{het\_delta\_summary.py}; per-probe figures \code{delta\_het\_*} from \code{delta\_plots.py --het},
 \code{pull\_het\_ladder\_*} and \code{pull\_het\_summary} from \code{het\_delta\_pulls.py}). Each het cell is compared with the MSE evaluation the $\Delta$ plots draw for it (\code{delta\_plots.pick}: the
 precision it was trained at; $3$ of them reruns of a pruned trial). On the $146$ $2\to2$ cells the het $\mu$ has a
-median $|\Delta|$ $0.64$ times the MSE cell's (median over cells; lower in $119$ of $146$, from $0.03\times$ on the
+median $|\Delta|$ $0.64$ times the MSE cell's (median over cells; lower in $118$ of $146$ (read $119$ before the reader), from $0.03\times$ on the
 one-loop $ee\to d\bar d$ synthetic cell to $7\times$ on $u\bar u\to Zg$ from rung 9; per probe from $0.15$ on the
 electroweak one-loop $ee\to d\bar d$ to $0.98$ on $ee\to d\bar d$), and the pulls are calibrated: std $1.01$, $1.02$,
 $1.03$ at the quartiles, $138$ of $146$ within $0.9$ to $1.2$, $|{\rm pull}|<1$ for $0.61$ to $0.80$ of the events. The
 eight outside: five between $0.81$ and $0.89$, and three above $1.2$ ($ee\to b\bar b$ one-loop from rungs 1 and 8,
-$3.42$ and $1.33$; $ee\to\nu\bar\nu$ from rung 7, $1.31$) whose std is set by a few events (largest $|{\rm pull}|$ $236$
-and $62$) while $|{\rm pull}|<1$ stays $0.65$ to $0.77$. With more final-state particles both fail. On the $19$
+$3.42$ and $1.33$; $ee\to\nu\bar\nu$ from rung 7, $1.31$) whose std is set by a few events (largest $|{\rm pull}|$ $236$,
+$62$ and $62$) while $|{\rm pull}|<1$ stays $0.65$ to $0.77$. With more final-state particles both fail. On the $19$
 $2\to3$ cells ($3$ each of $ee\to d\bar dg$ and $ee\to t\bar tg$, $13$ of $u\bar u\to Zgg$) the het $\mu$ is worse
 ($1.55\times$ the MSE median $|\Delta|$, $0.90$ to $3.78$, lower in $2$ of $19$) and $\sigma$ too small on test (pull
 std $2.14$ at the median, $0.99$ to $3.28$, $3$ of $19$ within $0.9$ to $1.2$; $|{\rm pull}|<1$ $0.46$ to $0.69$;
 $u\bar u\to Zgg$ worst). On the $13$ $2\to4$ cells ($u\bar u\to Zggg$) the same: $1.63\times$ ($1.16$ to $2.48$, lower in
 none), pull std $1.48$ at the median ($1.05$ to $3.45$, $2$ of $13$ within $0.9$ to $1.2$), $|{\rm pull}|<1$ $0.34$ to
 $0.62$. The cause appears to be overfitting rather than the stage, as measured on the first $12$ of these
-$32$ cells: the training split's pulls have std $0.46$ to $0.91$ (calibrated or wider than needed), validation and test $0.99$
+$32$ cells (read from their evaluations on CC, no committed reader): the training split's pulls have std $0.46$ to $0.91$ (calibrated or wider than needed), validation and test $0.99$
 to $2.99$, while the $15$ $2\to2$ cells checked ($ee\to d\bar d$, $u\bar u\to gg$) have $0.99$ to $1.12$ on all three
 splits. The stage fits $\sigma$ to the training residuals, which at $D=10^4$ on these processes are smaller than the
 residuals on unseen events. Under the A/B protocol the het loss losing at the MSE cell's HPs calls for its own sweep
 before a verdict on $\mu$; neither that nor a $\sigma$ fitted on held-out residuals is run.
+% src: python3 analysis/transfer/het_delta_summary.py @d7baad30
+% claim: cells=179
+% claim: reruns=3
+% claim: jobs_cclx=18
+% claim: cells_cclx=72
+% claim: jobs_jz=20
+% claim: cells_jz=107
+% claim: blowup_ratio.0=29
+% claim: blowup_pull_std.0=1.06
+% claim: 2to2.n=146
+% claim: 2to2.ratio_median=0.64
+% claim: 2to2.lower=118
+% claim: 2to2.ratio_min=0.03
+% claim: 2to2.ratio_max=7
+% claim: 2to2.probe_ratio_min=0.15
+% claim: 2to2.probe_ratio_max=0.98
+% claim: 2to2.std_q1=1.01
+% claim: 2to2.std_median=1.02
+% claim: 2to2.std_q3=1.03
+% claim: 2to2.within=138
+% claim: 2to2.f1_min=0.61
+% claim: 2to2.f1_max=0.80
+% claim: 2to2.below_n=5
+% claim: 2to2.below_min=0.81
+% claim: 2to2.below_max=0.89
+% claim: 2to2.above_std.0=3.42
+% claim: 2to2.above_std.1=1.33
+% claim: 2to2.above_std.2=1.31
+% claim: 2to2.above_max_abs_pull.0=236
+% claim: 2to2.above_max_abs_pull.1=62
+% claim: 2to2.above_f1_min=0.65
+% claim: 2to2.above_f1_max=0.77
+% claim: 2to3.n=19
+% claim: 2to3.ratio_median=1.55
+% claim: 2to3.ratio_min=0.90
+% claim: 2to3.ratio_max=3.78
+% claim: 2to3.lower=2
+% claim: 2to3.std_median=2.14
+% claim: 2to3.std_min=0.99
+% claim: 2to3.std_max=3.28
+% claim: 2to3.within=3
+% claim: 2to3.f1_min=0.46
+% claim: 2to3.f1_max=0.69
+% claim: 2to4.n=13
+% claim: 2to4.ratio_median=1.63
+% claim: 2to4.ratio_min=1.16
+% claim: 2to4.ratio_max=2.48
+% claim: 2to4.lower=0
+% claim: 2to4.std_median=1.48
+% claim: 2to4.std_min=1.05
+% claim: 2to4.std_max=3.45
+% claim: 2to4.within=2
+% claim: 2to4.f1_min=0.34
+% claim: 2to4.f1_max=0.62
+% allow: 119 because it is the superseded value, quoted as corrected
 
 \begin{figure}[H]
 \centering
@@ -10318,11 +10492,33 @@ stays behind at $2\to4$ ($1.23$, $1.57$). The NLL objective picks the trial whos
 fits best, not whose $\mu$ does, which can explain a best-NLL trial that loses on $|\Delta|$ to a trial at other HPs.
 The $\sigma$ of these best trials is too small: the pull std is $1.6$ to $3.0$ (a calibrated $\sigma$ gives $1$).
 HPs: the warmup splits apart between the two losses (het in the lower half of the range in $7$ of $8$ cells, MSE in
-its upper half in $5$), $\lambda$ sits near the top of its range for MSE in $7$ of $8$ and is spread for het, EMA is on in $6$
-of $8$ for both but at decay $0.95$ to $0.995$ for het against $0.90$ to $0.92$ for MSE in $5$ of its $6$, and lr
+its upper half in $5$), $\lambda$ sits in the upper half of its ($\log$) range for MSE in $7$ of $8$ and is spread for het, EMA is on in $6$
+of $8$ for both but at decay $0.95$ to $0.995$ for het against $0.90$ to $0.92$ for MSE in $4$ of its $6$ (read $5$ before the reader), and lr
 overlaps; the scratch sweeps of
 one probe pair chose one candidate twice ($e^+e^-\to d\bar dg$ and $t\bar tg$, the same point; $u\bar u\to Zgg$ and
 $Zggg$, the same point but for lr). So the het HPs are consistent among themselves and differ from the MSE ones.
+% src: python3 analysis/transfer/het23_summary.py @a46c7df9
+% claim: own_over_mse.0=0.99
+% claim: own_over_mse.1=1.21
+% claim: own_over_mse.2=1.07
+% claim: own_over_mse.3=1.59
+% claim: own_over_mse.4=0.85
+% claim: own_over_mse.5=1.04
+% claim: own_over_mse.6=1.23
+% claim: own_over_mse.7=1.57
+% claim: own_better_n=5
+% claim: own_worse_n=3
+% claim: mse_hp_over_own.2=3.5
+% claim: mse_hp_over_own.5=2.2
+% claim: pull_std_min=1.6
+% claim: pull_std_max=3.0
+% claim: het_warmup_lower_n=7
+% claim: mse_warmup_upper_n=5
+% claim: mse_lambda_upper_n=7
+% claim: het_ema_on_n=6
+% claim: het_ema_min=0.95
+% claim: het_ema_max=0.995
+% claim: mse_ema_090_092_n=4
 
 \begin{figure}[H]
 \centering
@@ -10345,6 +10541,17 @@ Median $|\Delta|$, het over MSE: median $1.39$ over the $13$ $2\to3$ cells and $
 against $1.59$ and $1.79$ for the het retrain at each MSE cell's own HPs; the shared HPs beat the het retrain at the MSE
 cell's HPs in $19$ of the $24$, and MSE in $1$ ($e^+e^-\to t\bar tg$ fine-tuned from the dead-cone star, $0.45$). So the het
 HPs help, and the het loss stays $30$ to $40\%$ behind MSE on $\mu$ at these multiplicities.
+% src: python3 analysis/transfer/het_shared_summary.py @257891cf
+% claim: n=24
+% claim: reruns=4
+% claim: 2to3.n=13
+% claim: 2to3.shared_median=1.39
+% claim: 2to4.n=11
+% claim: 2to4.shared_median=1.36
+% claim: 2to3.msehp_median=1.59
+% claim: 2to4.msehp_median=1.79
+% claim: shared_beats_msehp_n=19
+% claim: below_mse.0=0.45
 
 \begin{figure}[H]
 \centering
@@ -10364,8 +10571,22 @@ $|\Delta|$, het over MSE: $1.11$ over the $13$ $2\to3$ cells and $1.16$ over the
 $1.36$ when selected on the NLL. The $\mu$ MSE selection is lower than the NLL selection in $23$ of the $24$ cells (median
 ratio $0.81$ at $2\to3$, $0.90$ at $2\to4$), and below MSE in $3$ (the $t\bar tg$ cell of D82, $e^+e^-\to t\bar t g$ from the
 dead-cone star, plus $u\bar u\to Zgg$ at rung $8$ and $u\bar u\to Zggg$ at rung $2$, both within $4\%$). So
-the checkpoint choice was $71\%$ of the het loss's gap to MSE on $\mu$ at $2\to3$ and $54\%$ at $2\to4$: the two
+the checkpoint choice was $0.71$ of the het loss's gap to MSE on $\mu$ at $2\to3$ and $0.54$ at $2\to4$ ($(r_{\rm NLL}-r_{\mu})/(r_{\rm NLL}-1)$ on the medians): the two
 criteria pick different steps, and the NLL's has the worse $\mu$. The remaining gap is $11$ to $16\%$.
+% src: python3 analysis/transfer/het_mumse_summary.py @b97f07bd
+% claim: n=24
+% claim: 2to3.n=13
+% claim: 2to4.n=11
+% claim: 2to3.mumse_over_mse=1.11
+% claim: 2to4.mumse_over_mse=1.16
+% claim: 2to3.nll_over_mse=1.39
+% claim: 2to4.nll_over_mse=1.36
+% claim: mumse_below_nll=23
+% claim: 2to3.mumse_over_nll=0.81
+% claim: 2to4.mumse_over_nll=0.90
+% claim: 2to3.gap_closed=0.71
+% claim: 2to4.gap_closed=0.54
+% allow: -1 because it is the formula's constant (the MSE ratio of 1), no result
 
 \begin{figure}[H]
 \centering
@@ -10380,10 +10601,10 @@ against the MSE cell, with the main run's checkpoint picked on the validation $\
 D47's $2\to2$ cells retrained with the checkpoint on the validation $\mu$ MSE, everything else as D47 (config, HPs, data,
 seed, parent; the config files differ in \code{heterosc\_select} alone; \code{scripts/job\_het\_delta.sh --mumse},
 \code{analysis/transfer/het\_mumse22\_summary.py}, Fig.~\ref{fig:het_mumse22}). Read as D85 read its $24$ cells, the
-rerun is worse: median $|\Delta|$ $0.77$ times the MSE cell's ($91$ of $146$ below it) against D47's $0.64$ ($119$ of
+rerun is worse: median $|\Delta|$ $0.77$ times the MSE cell's ($92$ of $146$ below it; read $91$ before the reader) against D47's $0.64$ ($118$ of
 $146$), and $1.15$ times D47 cell by cell, lower in only $56$; on the one-loop probes up to $130\times$ (electroweak
 $e^+e^-\to d\bar d$). That reading is wrong, because the two runs of a cell are not the same run: they already differ at
-the first validation (step $80$: NLL $-0.59$ against $-0.70$ on the cell above), and their best validation $\mu$ MSE (each run's minimum)
+the first validation (step $80$: NLL $-0.59$ against $-0.70$ on the cell above, from the two runs' CC logs), and their best validation $\mu$ MSE (each run's minimum)
 differs by more than $2\times$ in $69$ of the $146$ cells ($10$ to $90\%$ of the ratio: $0.20$
 to $5.9$, median $0.97$). Inside one run the checkpoint choice barely matters at $2\to2$: the $\mu$ MSE at D47's NLL pick over its
 run's $\mu$-MSE minimum is $1.00$ at the median and $1.03$ at the $75$th percentile ($1.29$ at the $90$th). At $2\to3$ and $2\to4$ (the
@@ -10392,6 +10613,31 @@ costs $16\%$ in $\mu$ at the median, so D85's conclusion stands there. At $2\to2
 about $2$ either way per cell (D47's $0.64$ is one draw of it), and the selection is not what separates them. The pulls stay
 calibrated with either pick (std $0.99$, $1.01$, $1.02$ at the quartiles; $125$ of $146$ within $0.9$ to $1.2$, against
 $138$). The cell that blew up in D47 (\code{tp3\_uu64fte\_ee\_nnbar\_d8} trial $114$) is left out of these numbers, as there; its rerun is $51$ times the MSE cell's median $|\Delta|$.
+% src: python3 analysis/transfer/het_mumse22_summary.py @36296438
+% claim: n=146
+% claim: mumse_over_mse=0.77
+% claim: mumse_below_mse=92
+% claim: nll_over_mse=0.64
+% claim: nll_below_mse=118
+% claim: mumse_over_nll=1.15
+% claim: mumse_below_nll=56
+% claim: mumse_over_nll_by_probe.ee_dd_ew_nlo=130
+% claim: run22_2x=69
+% claim: run22_q.0=0.20
+% claim: run22_q.4=5.9
+% claim: run22_q.2=0.97
+% claim: sel22_q.2=1.00
+% claim: sel22_q.3=1.03
+% claim: sel22_q.4=1.29
+% claim: run24_q.0=0.90
+% claim: run24_q.4=1.15
+% claim: pull_mumse_q.0=0.99
+% claim: pull_mumse_q.1=1.01
+% claim: pull_mumse_q.2=1.02
+% claim: pull_mumse_in=125
+% claim: pull_nll_in=138
+% claim: blew_rerun_over_mse.0=51
+% allow: 91 because it is the superseded value, quoted as corrected
 
 \begin{figure}[H]
 \centering
@@ -10414,11 +10660,34 @@ learning rates span $1.1\times10^{-3}$ to $3.6\times10^{-3}$ ($e^+e^-\to d\bar d
 and $1.3$, $Zggg$ $3.5$ and $2.8$, in $10^{-3}$, at $D=10^2$ and $10^4$), a factor $3$, and each probe's two cells agree within
 $25\%$; $\lambda$ sits at $2\times10^{-9}$ to $5\times10^{-8}$ in seven cells ($3\times10^{-7}$ in the eighth), the warm-up
 fraction at $0.10$ to $0.18$, and EMA is on in five. The optimum is not shared, though: at $D=10^4$ the trials at
-$\log_{10}\mathrm{lr}>-2.65$ are $29$ to $330$ times worse than the best for the two $d\bar d$ probes, while $W^+W^-$ is
+$\log_{10}\mathrm{lr}>-2.65$ are $29$ to $328$ times worse than the best for the two $d\bar d$ probes, while $W^+W^-$ is
 $2.9$ times worse at $D=10^2$ at the $d\bar d$ probes' learning rate, so no single point is within a factor $1.5$ of every
 cell's best. In $3$ of the $8$ cells the best trial is the lowest learning rate tried, so those optima are not bracketed.
-For the one probe whose MSE cell's best trial is on record at $D=10^4$ ($W^+W^-$, trial $193$, $\mathrm{lr}=8.5\times10^{-3}$),
+For the one probe whose MSE cell's best trial is on record at $D=10^4$ ($W^+W^-$, trial $193$, $\mathrm{lr}=8.5\times10^{-3}$, from its config on CC),
 the het optimum is $2.5$ times lower.
+% src: python3 analysis/transfer/het_finale_s1.py @6ca25630
+% claim: trials=40
+% claim: lr_min=1.1e-3
+% claim: lr_max=3.6e-3
+% claim: lr_e3.ee_ddbar_d4=1.3
+% claim: lr_e3.ee_ddbar_d8=1.1
+% claim: lr_e3.ee_WW_d4=3.6
+% claim: lr_e3.ee_WW_d8=3.4
+% claim: lr_e3.ee_dd_nlo_d4=1.5
+% claim: lr_e3.ee_dd_nlo_d8=1.3
+% claim: lr_e3.uubar_Zggg_d4=3.5
+% claim: lr_e3.uubar_Zggg_d8=2.8
+% claim: lr_factor=3
+% claim: lambda_low.0=2e-9
+% claim: lambda_low.6=5e-8
+% claim: lambda_top=3e-7
+% claim: warmup_min=0.10
+% claim: warmup_max=0.18
+% claim: ema_on=5
+% claim: dd_highlr_min=29
+% claim: dd_highlr_max=328
+% claim: ww_d4_lowlr.over_best=2.9
+% claim: best_at_lowest_lr=3
 
 \begin{figure}[H]
 \centering
@@ -10447,24 +10716,67 @@ $e^+e^-\to\nu\bar\nu$ & $1.8$ & $0.87$ \\
 $e^+e^-\to t\bar t$ & $0.27$ & $0.67$ \\
 $u\bar u\to Zggg$ & $2.6$ & $0.71$ \\
 $e^+e^-\to d\bar d$, one loop & $7.8$ & $6.8$ \\
-$e^+e^-\to b\bar b$, one loop & $6.0$ & $230$ \\
+$e^+e^-\to b\bar b$, one loop & $6.0$ & $231$ \\
 \end{tabular}
 \end{center}
 In $13$ of hp58's $28$ cells the best of the first five trials was the highest learning rate tried, among them all four
 $d\bar d$ one-loop cells and $b\bar b$ at $D=10^3$ and $10^4$, where the loss still fell steeply with the rate. Those $13$
 sweeps were extended in place (D97, \code{sweep/extend\_sweep.py}: the window to $[7\times10^{-4},2\times10^{-2}]$, $50$ new
 candidates in the added zone, the five observations and the surrogate kept) and run five trials further; the table is
-after that. The extension lowered $9$ of the $13$ bests: $b\bar b$ at one loop by $50\times$ at $D=10^4$ ($0.028$ to
+after that. The extension lowered $9$ of the $13$ bests: $b\bar b$ at one loop by $52\times$ at $D=10^4$ ($0.028$ to
 $5.4\times10^{-4}$) and $8\times$ at $10^3$, $\nu\bar\nu$ by $3\times$ at $10^4$, the one-loop $d\bar d$ by $2\times$ at
 $10^2$; the other four were within $1\%$. Nine are now bracketed (a higher rate was tried and lost); in four the best is
 again the highest rate tried ($d\bar d$ at $D=10$, $\nu\bar\nu$ at $10^2$, the one-loop $b\bar b$ at $10^4$, the one-loop
 $d\bar d$ at $10^2$, at $1.7\times10^{-2}$), and in three of those the surrogate kept its new trials below $6\times10^{-3}$,
 so their optimum stays unbracketed. After the extension, on the five tree probes hp58 is level with the finale or better at
 $D=10^4$ ($0.67$ to $0.99$) and behind at $D=10^2$ ($1.3$ to $2.6$) except $t\bar t$, ahead at both. On the two one-loop
-probes it stays far behind ($7$ and $230\times$ at $10^4$). The finale's het cells sit at the other edge: $5$ of $14$ have
+probes it stays far behind ($7$ and $231\times$ at $10^4$). The finale's het cells sit at the other edge: $5$ of $14$ have
 their best at the lowest rate tried. Against the MSE cells (different losses, so only as context): at $D=10$ hp58 is below scratch on
 $\nu\bar\nu$, $t\bar t$, $Zggg$ and the one-loop $b\bar b$ ($0.51$ against $1.76$, $4.5\times10^{-4}$ against $5.4\times10^{-3}$, $0.34$ against
-$1.82$, $0.43$ against $0.63$), level on $W^+W^-$ and the one-loop $d\bar d$, and above on tree $d\bar d$ ($2.2$ against $0.80$).
+$1.82$, $0.43$ against $0.63$), level on $W^+W^-$ and the one-loop $d\bar d$, and above on tree $d\bar d$ ($2.1$ against $0.80$; read $2.2$ before the reader, the value before the extension).
+% src: python3 analysis/transfer/het_stage2.py @0b277b39
+% claim: stage2_sweeps=34
+% claim: stage2_trials=170
+% claim: ratio.ee_ddbar.4=1.3
+% claim: ratio.ee_ddbar.8=0.78
+% claim: ratio.ee_WW.4=1.3
+% claim: ratio.ee_WW.8=0.99
+% claim: ratio.ee_nnbar.4=1.8
+% claim: ratio.ee_nnbar.8=0.87
+% claim: ratio.ee_ttbar.4=0.27
+% claim: ratio.ee_ttbar.8=0.67
+% claim: ratio.uubar_Zggg.4=2.6
+% claim: ratio.uubar_Zggg.8=0.71
+% claim: ratio.ee_dd_nlo.4=7.8
+% claim: ratio.ee_dd_nlo.8=6.8
+% claim: ratio.ee_bb_nlo.4=6.0
+% claim: ratio.ee_bb_nlo.8=231
+% claim: ext_n=13
+% claim: ext_lowered=9
+% claim: ext_gain.tp3_hp58fte_ee_bb_nlo_d8_het=52
+% claim: bb_d8_old=0.028
+% claim: bb_d8_new=5.4e-4
+% claim: ext_gain.tp3_hp58fte_ee_bb_nlo_d6_het=8
+% claim: ext_gain.tp3_hp58fte_ee_nnbar_d8_het=3
+% claim: ext_gain.tp3_hp58fte_ee_dd_nlo_d4_het=2
+% claim: ext_bracketed=9
+% claim: ext_top=4
+% claim: ext_top_dd_nlo_lr=1.7e-2
+% claim: ext_top_below_6e3=3
+% claim: ratio.ee_dd_nlo.8=7
+% claim: finale_het_cells=14
+% claim: finale_het_lowest=5
+% claim: d10.ee_nnbar.hp58=0.51
+% claim: d10.ee_nnbar.scratch=1.76
+% claim: d10.ee_ttbar.hp58=4.5e-4
+% claim: d10.ee_ttbar.scratch=5.4e-3
+% claim: d10.uubar_Zggg.hp58=0.34
+% claim: d10.uubar_Zggg.scratch=1.82
+% claim: d10.ee_bb_nlo.hp58=0.43
+% claim: d10.ee_bb_nlo.scratch=0.63
+% claim: d10.ee_ddbar.hp58=2.1
+% claim: d10.ee_ddbar.scratch=0.80
+% allow: 2.2 because it is the superseded value, quoted as corrected
 
 \begin{figure}[H]
 \centering
@@ -10490,7 +10802,9 @@ diagonal. Right: the test pulls $(\mu-\log|\mathcal M|^2)/\sigma'$, with $\mathc
 \label{fig:het_recal}
 \end{figure}
 
-\paragraph{The $\sigma$ step costs $\sim$1 min, not the recipe's 600 iters.} $\sigma$-only is
+\paragraph{The $\sigma$ step costs $\sim$1 min, not the recipe's 600 iters.} (The numbers of this paragraph are
+read from the job logs \code{sigspeed\_*.out} of \code{runs/heterosc\_sigspeed}, which survive only in the Jean Zay
+worktree \code{wt-heterosc}; no committed reader recomputes them.) $\sigma$-only is
 a frozen-trunk 258-param readout, so the whole trajectory is one short run. Probing the
 $\sigma$-\emph{ranking} per validation step (\code{sigma\_speed\_probe.py} $\to$
 Spearman$(\sigma,|r|)$ global + per-process median; \code{sigma\_speed.sh}, constant-lr to avoid
@@ -10517,12 +10831,20 @@ below $y_{\min}\,10^{-3}$, so event-weighting is deep-IR-dominated
 \textbf{$\sim$80\% of the perfect-oracle reweighting gain} (event-weighted $87$\%) and improves
 \emph{every} decade including the bulk. But the rank/magnitude split \emph{flips} versus the
 event-weighted view: \textbf{magnitude dominates}: ordering-alone gives only $11$\%, because
-after antenna training the worst-fit decade is the \emph{bulk} $[10^{-1},10^0)$ (MSE $10^{-2}\!\gg\!$
-deep-IR $8\!\times\!10^{-4}$), and only $\sigma$'s calibrated magnitude targets it; deep-IR-following
+after antenna training the worst-fit decade is the \emph{bulk} $[10^{-1},10^0)$ (MSE $1.3\times10^{-2}\gg$
+deep-IR $8\times10^{-4}$), and only $\sigma$'s calibrated magnitude targets it; deep-IR-following
 heuristics (rank, weak $\sigma$) starve the bulk and can \emph{net-hurt} (a $\rho{=}0.29$ synthetic
 $\sigma$ scores $-9$\% under equal footing). So calibration matters more than a pure-rank framing
 suggests (Figs.~\ref{fig:q2_logflat}, \ref{fig:q2_rankmag}; supplementary \code{q2\_confirm},
 \code{q2\_dense}).
+% src: python3 analysis/divergences/sampling_numbers.py @d4e775ae
+% claim: q2.logflat_gain_pct.sigma=80
+% claim: q2.logflat_gain_pct.rank_real=11
+% claim: q2.logflat_gain_pct.deg029=-9
+% claim: q2.event_gain_pct.sigma=87
+% claim: q2.test_pct_below_1e-3=50
+% claim: deep.antenna_bulk_mse=1.3e-2
+% claim: deep.antenna_deepest_mse=8e-4
 
 \begin{figure}[H]
   \centering
@@ -10533,6 +10855,10 @@ suggests (Figs.~\ref{fig:q2_logflat}, \ref{fig:q2_rankmag}; supplementary \code{
   flatters any deep-IR-following heuristic. Under equal footing the real $\sigma$ head captures
   $\sim\!80\%$ of the perfect-oracle reweighting gain ($87\%$ event-weighted) and improves \emph{every}
   decade, bulk included.}
+% src: python3 analysis/divergences/sampling_numbers.py @d4e775ae
+% claim: q2.logflat_gain_pct.sigma=80
+% claim: q2.event_gain_pct.sigma=87
+% claim: q2.test_pct_below_1e-3=50
   \label{fig:q2_logflat}
 \end{figure}
 
@@ -10546,14 +10872,18 @@ suggests (Figs.~\ref{fig:q2_logflat}, \ref{fig:q2_rankmag}; supplementary \code{
   $8\times10^{-4}$), and only $\sigma$'s calibrated \emph{magnitude} points there. Deep-IR-following
   heuristics starve the bulk and can net-hurt: a $\rho{=}0.29$ synthetic $\sigma$ scores $-9\%$. This
   is why a pure-rank framing of $\sigma$ quality is misleading.}
+% src: python3 analysis/divergences/sampling_numbers.py @d4e775ae
+% claim: q2.logflat_gain_pct.rank_real=11
+% claim: q2.logflat_gain_pct.deg029=-9
+% claim: deep.antenna_deepest_mse=8e-4
   \label{fig:q2_rankmag}
 \end{figure}
 
 \paragraph{Coverage vs.\ emphasis, and the general default sampling.} The decisive
 structural finding: \textbf{$\sigma$-reweighting controls emphasis, not coverage: it cannot beat
 the coverage the training pool already has}. The antenna pool holds only $4$\% ($16$k) bulk events,
-so even the \emph{oracle} cannot fit the bulk ($8.6\!\times\!10^{-3}$) as well as the sampling-study
-mixture ($2.2\!\times\!10^{-3}$), which \emph{generates} bulk events (uniform/\textsc{rambo} fills
+so even the \emph{oracle} cannot fit the bulk ($8.6\times10^{-3}$) as well as the sampling-study
+$f=0.5$ mixture ($2.2\times10^{-3}$), which \emph{generates} bulk events (uniform/\textsc{rambo} fills
 $[10^{-1},10^0)$ at $63$\%, antenna at $4$\%; the two are complementary, $0$\% uniform coverage in
 the two deepest decades). The mixture ``wins overall'' by \emph{coverage}, which no reweighting of a
 starved pool can replicate. And the optimum is \emph{dynamic}: the worst region migrates IR$\to$bulk
@@ -10574,6 +10904,14 @@ $\sigma$-reweighting $\pi\!\propto\!\sigma^\alpha$ (no physical binning, process
 generation}, the only layer that lets $\sigma$ overcome the coverage ceiling, by generating where
 $\sigma$ is high \emph{and} data is sparse. The code and figure names for the steering layer carry an
 older \code{l2\_} prefix.
+% src: python3 analysis/divergences/sampling_numbers.py @d4e775ae
+% claim: coverage.antenna.pct.5=4
+% claim: q2.bulk_mse.oracle=8.6e-3
+% claim: coverage.antenna.bulk_events_k=16
+% claim: fraction.bulk_mse.f0.5=2.2e-3
+% claim: coverage.uniform.pct.5=63
+% claim: coverage.uniform.pct.0=0
+% allow: 0.5 because it is the mixture's antenna fraction, a setting
 
 \paragraph{Coverage validated on the $ee\to u\bar u$ $Z$ resonance, by generation rather than resampling.}
 The $s$-channel $Z$ pole ($|\mathcal{M}|^2$ peaks $\sim$$200\times$ at $\sqrt{s}\!\approx\!91$; flat
@@ -10589,12 +10927,14 @@ momenta, labels the exact tree $|\mathcal{M}|^2$ with the compiled \code{ee\_uu}
 ($14.5$k\,ev/s, scale verified vs production), and thins $3\mathrm{M}$ candidates to $400$k
 flat-in-$\log|\mathcal{M}|^2$ \emph{without replacement} (all unique). The shaper reads \emph{only}
 $|\mathcal{M}|^2$; $\sqrt{s}$ is eval-only. Generation lifts pole coverage $0.4\%\!\to\!32\%$ with genuinely
-new events, and beats resampling $2.6\times$ on the log-flat metric (Fig.~\ref{fig:eeuu_flatlogm_resonance}). \emph{Bug found + fixed (would have inverted the result):} the standalone expects
+new events, and beats resampling $2.58\times$ on the log-flat metric (Fig.~\ref{fig:eeuu_flatlogm_resonance}). \emph{Bug found + fixed (would have inverted the result):} the standalone expects
 the final-state quarks in the \emph{opposite} slot order from how production stores $[e^-,e^+,u,\bar u]$;
 a direct driver call mirror-flips the $Z$ forward-backward asymmetry, so the model trains perfectly on
 its own set (internal val $10^{-5}$) yet \emph{anti-correlates} on production test ($\rho_{\rm bulk}\!=\!-0.99$).
 Relabeling production AS-IS gives $\rho{=}0.94$ (mirrored); swapping the final two recovers the stored
 $|\mathcal{M}|^2$ exactly. Fix: swap for the driver, store unswapped ($\rho{=}+0.994$ post-fix).
+% src: python3 analysis/divergences/eeuu_resonance_numbers.py @71db9819
+% claim: generation.resampled_over_generated=2.58
 
 \begin{figure}[H]
   \centering
@@ -10621,15 +10961,31 @@ $f$ = fraction flat-$\log|\mathcal{M}|^2$ (rest uniform-$\sqrt{s}$), generated f
 ckpt/HPs/$N{=}400$k, common \textsc{rambo} test binned by $\sqrt{s}$, each arm de-standardized to true
 $\log|\mathcal{M}|^2$ (per-dataset standardization already handles the scale, so the earlier
 ``$\sigma$-scale confound'' worry was spurious). Under the equal-per-$\sqrt{s}$-decade (log-flat) metric:
-$f{=}0$ (raw) $1.0\mathrm{e}{-}3$; $f{=}0.25$ $3.5\mathrm{e}{-}5$; $\mathbf{f{=}0.5}$ $\mathbf{1.5\mathrm{e}{-}5}$
-(optimum); $f{=}0.75$ $7.9\mathrm{e}{-}5$; $f{=}1$ (pure flat) $1.1\mathrm{e}{-}4$. Event-weighted
+$f{=}0$ (raw) $1.0\times10^{-3}$; $f{=}0.25$ $3.5\times10^{-5}$; $\mathbf{f{=}0.5}$ $\mathbf{1.5\times10^{-5}}$
+(optimum); $f{=}0.75$ $7.9\times10^{-5}$; $f{=}1$ (pure flat) $1.1\times10^{-4}$. Event-weighted
 (bulk-heavy) overall bottoms at $f{=}0.25$. So the interior optimum is $f\!\approx\!0.25$--$0.5$, beating
-raw \textsc{rambo} $\sim$$30$--$70\times$ and \textbf{pure} flat-$\log|\mathcal{M}|^2$ $\sim$$4$--$7\times$:
+raw \textsc{rambo} $29$--$67\times$ and \textbf{pure} flat-$\log|\mathcal{M}|^2$ $3.1$--$7.1\times$:
 \emph{flat-$\log|\mathcal{M}|^2$ is the coverage criterion you mix in at a modest fraction, not a good
 pure base}: pure flat starves the bulk (mirror of \textsc{rambo} starving the pole), same shape as the
-uug antenna interior optimum. Generation still beats resampling $\sim$$8\times$ ($3.5\mathrm{e}{-}5$ vs
-$2.8\mathrm{e}{-}4$). Tooling: \code{gen\_uu\_sampling.py} (\code{uniform}/\code{flatlogm}/\code{mixture}),
-\code{finetune\_genmix.sh}, \code{plot\_genmix\_sweep.py} (Fig.~\ref{fig:eeuu_genmix_fraction_sweep}).
+uug antenna interior optimum. Generation still beats resampling $8.0\times$ ($3.5\times10^{-5}$ vs
+$2.8\times10^{-4}$). Tooling: \code{gen\_uu\_sampling.py} (\code{uniform}/\code{flatlogm}/\code{mixture}),
+\code{finetune\_genmix.sh}, \code{plot\_genmix\_sweep.py} (Fig.~\ref{fig:eeuu_genmix_fraction_sweep}). Corrected
+2026-11-10 against the committed reader: pure flat is $3.1$--$7.1\times$ worse than the optimum range, where an
+earlier version said $4$--$7\times$.
+% src: python3 analysis/divergences/eeuu_resonance_numbers.py @71db9819
+% claim: sweep.raw=1.0e-3
+% claim: sweep.mix025=3.5e-5
+% claim: sweep.mix050=1.5e-5
+% claim: sweep.mix075=7.9e-5
+% claim: sweep.genflat=1.1e-4
+% claim: sweep.raw_over_mix025=29
+% claim: sweep.raw_over_mix050=67
+% claim: sweep.genflat_over_mix025=3.1
+% claim: sweep.genflat_over_mix050=7.1
+% claim: generation.resampled_over_mix025=8.0
+% claim: generation.resampled_flat=2.8e-4
+% allow: 0 0.25 0.5 0.75 1 because they are the flat fractions f of the arms, settings
+% allow: 4 7 because they are the superseded ratio range the correction names
 
 \begin{figure}[H]
   \centering
@@ -10640,10 +10996,10 @@ $2.8\mathrm{e}{-}4$). Tooling: \code{gen\_uu\_sampling.py} (\code{uniform}/\code
   \emph{Left: the interior optimum.} Three metrics vs $f$. The objective is the \emph{log-flat}
   one: the mean of the per-$\sqrt s$-bin MSE, so every bin counts once
   however many events it holds; the plain event mean instead follows the bulk, which holds almost all
-  the events, and so barely sees the pole. Log-flat gives $1.0\mathrm{e}{-}3$, $3.5\mathrm{e}{-}5$,
-  $\mathbf{1.5\mathrm{e}{-}5}$, $7.9\mathrm{e}{-}5$, $1.1\mathrm{e}{-}4$ at $f=0,0.25,0.5,0.75,1$,
-  a minimum at $f{=}0.5$, beating raw \textsc{rambo} $\sim\!30$--$70\times$ and \emph{pure} flat
-  $\sim\!4$--$7\times$. The resonance-region curve ($\sqrt s<100$) tracks it; the event-weighted
+  the events, and so barely sees the pole. Log-flat gives $1.0\times10^{-3}$, $3.5\times10^{-5}$,
+  $\mathbf{1.5\times10^{-5}}$, $7.9\times10^{-5}$, $1.1\times10^{-4}$ at $f=0,0.25,0.5,0.75,1$,
+  a minimum at $f{=}0.5$, beating raw \textsc{rambo} $29$--$67\times$ and \emph{pure} flat
+  $3.1$--$7.1\times$. The resonance-region curve ($\sqrt s<100$) tracks it; the event-weighted
   ``overall'' curve, being bulk-heavy, bottoms earlier at $f{=}0.25$, which is exactly why the
   objective has to be the equal-per-bin one.
   \emph{Right: the mechanism, the bulk$\leftrightarrow$pole trade-off.} The same runs resolved per
@@ -10653,15 +11009,30 @@ $2.8\mathrm{e}{-}4$). Tooling: \code{gen\_uu\_sampling.py} (\code{uniform}/\code
   bulk exactly as \textsc{rambo} starves the pole. Same shape as the $u\bar u g$ antenna sweep
   (Fig.~\ref{fig:deep_sampling_fraction_sweep}).}
   \label{fig:eeuu_genmix_fraction_sweep}
+% src: python3 analysis/divergences/eeuu_resonance_numbers.py @71db9819
+% claim: sweep.raw=1.0e-3
+% claim: sweep.mix025=3.5e-5
+% claim: sweep.mix050=1.5e-5
+% claim: sweep.mix075=7.9e-5
+% claim: sweep.genflat=1.1e-4
+% claim: sweep.raw_over_mix025=29
+% claim: sweep.raw_over_mix050=67
+% claim: sweep.genflat_over_mix025=3.1
+% claim: sweep.genflat_over_mix050=7.1
+% allow: 0 0.25 0.5 0.75 1 100 because they are the flat fractions f of the arms and a bin edge in GeV, settings
 \end{figure}
 
 \paragraph{Eval bug (invalidated an earlier read): in-process state leak across tags.} The multi-tag
 resonance eval (\code{eval\_eeuu\_resonance.py}) corrupted \emph{every tag after the first}: the same
-\code{ft\_mix025} scored logflat $3.5\mathrm{e}{-}5$ as tag~1 but $2.1\mathrm{e}{-}4$ as tag~2, reproducibly
+\code{ft\_mix025} scored logflat $3.5\times10^{-5}$ as tag~1 but $2.1\times10^{-4}$ as tag~2, reproducibly
 (a module/$\mu$P\ global survives across \code{AmplitudeExperiment} instances; a per-tag \code{run\_dir} does
 \emph{not} fix it $\Rightarrow$ in-process, not file-based). Fix: self-dispatch one tag per subprocess,
 merge summaries. The corrected re-eval is what the numbers above report; the pre-fix ``$f{=}0.5$ noise
 bump'' was this corruption, not seed noise.
+% src: python3 analysis/divergences/sampling_numbers.py @d4e775ae
+% claim: leak.mix025_tag1_logflat=3.5e-5
+% claim: leak.mix025_tag2_logflat=2.1e-4
+% allow: 1 2 because they are tag positions, not results
 
 \paragraph{Emphasis: $\sigma$-reweighting the coverage base does not robustly help (3 seeds).} On the $f{=}0.25$
 base: grow a $\sigma$ row on the $\mu$ model, two-stage fit (frozen $\mu$, $\beta{=}0$; $\mu$ recovers
@@ -10669,32 +11040,217 @@ bit-identically), extract $\sigma$ over a fresh $1.5\mathrm{M}$ mix025 pool (glo
 subsample $400$k \emph{without replacement} by $\pi\!\propto\!\sigma^\alpha$ (no ceiling, since the pool is fresh).
 $\sigma$'s budget reallocation matches the oracle almost exactly (pole $20\%$ vs $18\%$). But over
 \textbf{3 seeds} $\times$\{base,$\sigma$,oracle\} (\code{finetune\_l1\_seeds.sh}): logflat base
-$4.6\mathrm{e}{-}5\!\pm\!3.4\mathrm{e}{-}5$, $\sigma$ $1.8\mathrm{e}{-}4\!\pm\!2.3\mathrm{e}{-}4$, oracle
-$3.1\mathrm{e}{-}5\!\pm\!3.3\mathrm{e}{-}6$; $\sigma$/base per-seed $=1.46\times,0.04\times,1.12\times$ (one
-seed $25\times$ \emph{worse}). \textbf{The seed-0 $1.5\times$ ``win'' was inside the $\sim$$4\times$
+$4.6\times10^{-5}\!\pm\!3.35\times10^{-5}$, $\sigma$ $1.78\times10^{-4}\!\pm\!2.33\times10^{-4}$, oracle
+$3.11\times10^{-5}\!\pm\!3.29\times10^{-6}$ (mean $\pm$ sample standard deviation over seeds); base over $\sigma$ per seed
+$=1.46,0.0447,1.12$ (one seed $22.3\times$ \emph{worse}; corrected 2026-11-10: the ratio was labelled $\sigma$/base and
+the worst seed given as $25\times$). \textbf{The seed-0 $1.5\times$ ``win'' was inside the $\sim$$4\times$
 run-to-run variance.} Even the oracle buys little on the mean and does not beat base's best draws. Conclusion:
 \textbf{coverage is the dominant lever; emphasis is second-order once coverage is good}, and the current $\sigma$ head is too weak a within-region signal to realize the oracle.
 $\sigma$-emphasis should earn its keep only where coverage is \emph{capped}: a starved,
 un-regenerable pool.
+% src: python3 analysis/divergences/eeuu_resonance_numbers.py @71db9819
+% claim: l1_mix025.logflat.base.mean=4.6e-5
+% claim: l1_mix025.logflat.base.std=3.35e-5
+% claim: l1_mix025.logflat.sigma.mean=1.78e-4
+% claim: l1_mix025.logflat.sigma.std=2.33e-4
+% claim: l1_mix025.logflat.oracle.mean=3.11e-5
+% claim: l1_mix025.logflat.oracle.std=3.29e-6
+% claim: l1_mix025.logflat.gain_sigma.0=1.46
+% claim: l1_mix025.logflat.gain_sigma.1=0.0447
+% claim: l1_mix025.logflat.gain_sigma.2=1.12
+% claim: l1_mix025.logflat.sigma_over_base_worst=22.3
+% allow: 25 because it is the superseded value the correction names
 
 \paragraph{Emphasis confirmed where coverage is capped: $\sigma\!\approx\!$oracle on a starved base (3-seed).}
 Repeating the emphasis pipeline on a \textbf{starved} $1.5\mathrm{M}$ \textsc{rambo} base (pole $0.44\%$;
 \code{sigma\_fit\_raw.sh}, $\rho(\sigma,|r|){=}0.52$; $\sigma$ lifts pole selection $0.4\%\!\to\!1.6\%$,
 the $4\times$ ceiling, $\approx$oracle's $1.5\%$) \emph{flips the verdict}. Over 3 seeds
-$\times$\{base,$\sigma$,oracle\}, logflat: base $1.4\mathrm{e}{-}4\!\pm\!1.3\mathrm{e}{-}4$, $\sigma$
-$4.1\mathrm{e}{-}5\!\pm\!2.8\mathrm{e}{-}5$, oracle $4.4\mathrm{e}{-}5\!\pm\!2.4\mathrm{e}{-}5$; $\sigma$/base
-per-seed $=1.10\times,1.89\times,12.65\times$ (\emph{helps every seed}, mean $5.2\times$ logflat / $5.7\times$
-resonance), and \textbf{$\sigma$ recovers $103$--$143\%$ of the oracle}: the real head is as good as the
-perfect error signal here. Contrast the covered $f{=}0.25$ base, where $\sigma$/base was
-$1.46\times,0.04\times,1.12\times$ (null). \textbf{This scopes emphasis precisely: $\sigma$-reweighting is the
+$\times$\{base,$\sigma$,oracle\}, logflat: base $1.39\times10^{-4}\!\pm\!1.28\times10^{-4}$, $\sigma$
+$4.09\times10^{-5}\!\pm\!2.8\times10^{-5}$, oracle $4.36\times10^{-5}\!\pm\!2.45\times10^{-5}$;
+per-seed $=1.10\times,1.89\times,12.6\times$ (base over $\sigma$; \emph{helps every seed}, arithmetic mean of the per-seed ratios, dominated by one seed, $5.21\times$ logflat / $5.67\times$
+on the bins below $100$\,GeV), and \textbf{$\sigma$ recovers $103\%$ (logflat) and $106\%$ (below $100$\,GeV) of the
+oracle's gain} on the seed means, $(\bar b-\bar\sigma)/(\bar b-\bar o)$: the real head is as good as the
+perfect error signal here (corrected 2026-11-10: an earlier version gave an upper end of $143\%$, which no summary
+reproduces). Contrast the covered $f{=}0.25$ base, where base over $\sigma$ was
+$1.46,0.0447,1.12$ (null). (Caveat, 2026-11-10: this study has no reweighting arm that ignores $\sigma$; in the online study below such an arm
+matches $\sigma$ on the same starved base, so what this paragraph credits to $\sigma$ may be emphasis in general.)
+\textbf{This scopes emphasis: $\sigma$-reweighting is the
 tool for when you cannot regenerate coverage (a starved, fixed pool); on a base you can generate
 well, emphasis adds nothing.} Mechanism = the coverage ceiling: on \textsc{rambo}, uniform barely touches
 the pole ($0.4\%$), so concentrating the \emph{limited} pole events fixes the resonance; on mix025 coverage
 is already balanced, leaving $\sigma$ nothing to reallocate.
+% src: python3 analysis/divergences/eeuu_resonance_numbers.py @71db9819
+% claim: l1_starved.logflat.base.mean=1.39e-4
+% claim: l1_starved.logflat.base.std=1.28e-4
+% claim: l1_starved.logflat.sigma.mean=4.09e-5
+% claim: l1_starved.logflat.sigma.std=2.8e-5
+% claim: l1_starved.logflat.oracle.mean=4.36e-5
+% claim: l1_starved.logflat.oracle.std=2.45e-5
+% claim: l1_starved.logflat.gain_sigma.0=1.10
+% claim: l1_starved.logflat.gain_sigma.1=1.89
+% claim: l1_starved.logflat.gain_sigma.2=12.6
+% claim: l1_starved.logflat.gain_sigma_mean=5.21
+% claim: l1_starved.resonance.gain_sigma_mean=5.67
+% claim: l1_starved.logflat.recovered_pct=103
+% claim: l1_starved.resonance.recovered_pct=106
+% claim: l1_mix025.logflat.gain_sigma.0=1.46
+% claim: l1_mix025.logflat.gain_sigma.1=0.0447
+% claim: l1_mix025.logflat.gain_sigma.2=1.12
+% allow: 100 because it is the bin edge in GeV, a setting
+% allow: 143\% because it is the superseded value the correction names
+% allow: 0.25 because it is the coverage fraction f, a setting
 
 \paragraph{Takeaway.} \emph{Generate a modest flat-$\log|\mathcal{M}|^2$ admixture
 ($f\!\approx\!0.25$--$0.5$) for coverage; add $\sigma$-reweighting only when the pool is starved and
-un-regenerable.}
+un-regenerable.} On a starved pool, reweighting toward the right objective without $\sigma$ did about as well in the
+online study below, so $\sigma$'s own share of that gain is not established.
+
+\paragraph{Online $\sigma$-driven generation on $ee\to u\bar u$: the design (branch \code{l2-gen}, 2026-07-18; two arms rerun 2026-09-07).}
+Before the $ee\to u\bar ugg$ loop below, the same idea was tried on the $Z$ resonance with
+\code{analysis/divergences/l2\_online.py}. One frozen candidate pool of $3\times10^{6}$ labelled $ee\to u\bar u$ events
+($\sqrt s$ from $91$ to $1000$\,GeV, half of it on the pole) feeds every arm. Each arm fine-tunes $\mu$ from \code{base22}
+in a warm chain of rounds of $1500$ steps; each round trains on $4\times10^{5}$ events drawn from the candidate pool
+without replacement, and round~0 is the same coverage draw for every arm. The arms differ only in how the later rounds
+draw: \emph{static} draws from the coverage base $p_{\rm cov}=f\cdot(\text{flat in }\log|\mathcal M|^2)+(1-f)\cdot(\text{uniform
+in }\sqrt s)$; \emph{$\sigma^\alpha$+IS} draws $\propto p_{\rm cov}\,\sigma^\alpha$, $\sigma$ from a $\sigma$-only fit on
+the previous round's $\mu$, and corrects the loss per $\log|\mathcal M|^2$ bin by $c_b=Q_b/\pi_b$ back to the objective
+$Q$ (\code{training.is\_weight\_path}); \emph{$|r|^\alpha$+IS} is the same with the true error $|r|$; \emph{IS} keeps the
+static draw and only applies the correction, which separates the objective from $\sigma$; \emph{$\sigma^\gamma$} draws
+$\propto\sigma^\gamma$ over the candidate pool with no base density and no correction (EMA-damped, coordinate-free). The
+score is the MSE of $\ln|\mathcal M|^2$ on a fixed uniform-$\sqrt s$ test set of $10^{5}$ events, in $8$ $\sqrt s$ bins
+dense on the peak, averaged with equal weight per bin; each round is read at its best checkpoint; seeds are combined by
+the geometric mean. \textbf{A fairness defect, and what it touches.} Until commit \code{35230574} (2026-07-18 23:08) the
+static and IS arms re-drew the \emph{same} pool every round (a fixed seed), so they saw $4\times10^{5}$ distinct events
+where the $\sigma$ and $|r|$ arms saw a fresh draw each round. Every July run of those two arms predates the fix (the
+starved-base ones ended 14:38 to 15:29 that day, read from their job logs); the starved-base static and IS arms and the
+$f=0.25$ static control of the coordinate-free arm were rerun after it on 2026-09-07, and the comparisons below use the
+reruns wherever they exist.
+% allow: 1500 because it is the number of steps per round, a setting
+% allow: 91 1000 because they are the window edges in GeV, a setting
+% allow: 8 because it is the number of evaluation bins, a setting
+% allow: 0.25 because it is the coverage fraction f, a setting
+% allow: 23:08 14:38 15:29 because they are clock times
+% allow: 3\times10^{6} 4\times10^{5} 10^{5} because they are pool and test-set sizes, settings
+% allow: 0 1 2 5 because they are round and seed indices and the square in log|M|^2, not results
+
+\paragraph{On a good coverage base, $\sigma$-emphasis hurts.}
+With $f=0.25$ (one seed, three rounds, static here the one-pool variant), the static arm ends at
+$1.82\times10^{-5}$. $\sigma^{1}$+IS ends at $5.54\times10^{-4}$, $30.5$ times the static arm, and even the true-error
+oracle $|r|^{1}$+IS ends at $1.46\times10^{-4}$ ($8.02$ times); both jump up at round~1, when the draw first
+concentrates (Fig.~\ref{fig:l2_eeuu_online}a). Softening the exponent only brings $\sigma$ back to the static arm:
+$\sigma^{0.5}$+IS $3.79\times10^{-5}$, $\sigma^{0.25}$+IS $1.96\times10^{-5}$. The static arm had fewer distinct events
+than these and still won, so the defect above does not change the verdict.
+% src: python3 analysis/divergences/l2_eeuu_online.py @c7b61a70
+% claim: f025.static=1.82e-5
+% claim: f025.sigma_a1=5.54e-4
+% claim: f025.sigma_a1_over_static=30.5
+% claim: f025.oracle_a1=1.46e-4
+% claim: f025.oracle_a1_over_static=8.02
+% claim: f025.sigma_a05=3.79e-5
+% claim: f025.sigma_a025=1.96e-5
+% allow: 0.25 because it is the coverage fraction f, a setting
+% allow: 0.5 because it is an exponent setting of an arm
+% allow: 0 1 2 5 because they are round and seed indices and the square in log|M|^2, not results
+
+\paragraph{On a starved base the gain is the objective, not $\sigma$.}
+Sampling base $f=0$ (uniform $\sqrt s$, $0.44\%$ on the pole), objective $Q$ the $f=0.25$ mixture, $\alpha=0.5$, three
+seeds, three rounds (Fig.~\ref{fig:l2_eeuu_online}b). After round~2 the static arm with a fresh draw per round is at
+$1.44\times10^{-4}$ (the one-pool July run $2.06\times10^{-4}$, $1.43$ times higher: the defect cost the static arm,
+not the conclusion), $\sigma^{0.5}$+IS at $2.75\times10^{-5}$, and the oracle (seed~0 only) at $2.3\times10^{-5}$. The
+IS arm, which never looks at $\sigma$, reaches $3.06\times10^{-5}$ with a fresh draw and $2.81\times10^{-5}$ with one
+pool. Static over $\sigma^{0.5}$+IS is $5.25$, static over IS $4.72$, IS over $\sigma^{0.5}$+IS $1.11$, inside the
+seed spread of the IS arm ($1.61\times10^{-5}$ to $5.84\times10^{-5}$). So on this base almost the whole gain comes from
+training toward the right objective; $\sigma$-resampling adds about $10\%$ on the geometric mean, inside that spread.
+This qualifies the starved-base $\sigma$-reweighting result above: that study had no reweighting arm that ignores
+$\sigma$, and here such an arm recovers nearly all of the gain, so the gain credited to $\sigma$ there may belong to
+emphasis toward the pole in general.
+% src: python3 analysis/divergences/l2_eeuu_online.py @c7b61a70
+% claim: starved.static_fair.gmean=1.44e-4
+% claim: starved.static_prefix.gmean=2.06e-4
+% claim: starved.static_prefix_over_fair=1.43
+% claim: starved.sigma_a05.gmean=2.75e-5
+% claim: starved.oracle_seed0=2.3e-5
+% claim: starved.reweight_fair.gmean=3.06e-5
+% claim: starved.reweight_prefix.gmean=2.81e-5
+% claim: starved.static_fair_over_sigma=5.25
+% claim: starved.static_fair_over_reweight_fair=4.72
+% claim: starved.reweight_fair_over_sigma=1.11
+% claim: starved.reweight_fair.seeds.2=1.61e-5
+% claim: starved.reweight_fair.seeds.1=5.84e-5
+% allow: 0.25 0.5 because they are the objective fraction and the exponent, settings
+% allow: 0.44\% because it is the pole share of the starved base, a property of the setup
+% allow: 10\% because it is the rounded IS over sigma ratio above, 1.11
+% allow: 0 1 2 5 because they are round and seed indices and the square in log|M|^2, not results
+
+\paragraph{The coordinate-free draw on $ee\to u\bar u$ does not beat a fresh static draw.}
+$\sigma^{\gamma}$ ($\gamma=1$, three seeds) against the $f=0.25$ static arm with a fresh draw per round (three seeds),
+six rounds each, the same $\mu$ steps per round (Fig.~\ref{fig:l2_eeuu_online}c): after round~5 $\sigma^{\gamma}$ is at
+$1.48\times10^{-5}$ and static at $1.11\times10^{-5}$, a ratio $\sigma^{\gamma}$ over static of $1.34$; the seeds of
+each overlap ($\sigma^{\gamma}$ $5.79\times10^{-6}$ to $2.57\times10^{-5}$, static $7.12\times10^{-6}$ to
+$2.12\times10^{-5}$), and the oracle $|r|^{\gamma}$ (seed~0) ends at $2.43\times10^{-5}$. The $\sigma^{\gamma}$ seed-0 value at round~5 comes
+from the same chain continued in a second job. On a $2\to2$ resonance the one-parameter coverage base is already near
+optimal, which is why the method was moved to $ee\to u\bar ugg$, where no single density is.
+% src: python3 analysis/divergences/l2_eeuu_online.py @c7b61a70
+% claim: coordfree.adapt.gmean=1.48e-5
+% claim: coordfree.static_fair.gmean=1.11e-5
+% claim: coordfree.adapt_over_static=1.34
+% claim: coordfree.adapt.seeds.2=5.79e-6
+% claim: coordfree.adapt.seeds.1=2.57e-5
+% claim: coordfree.static_fair.seeds.0=7.12e-6
+% claim: coordfree.static_fair.seeds.2=2.12e-5
+% claim: coordfree.adapt_oracle_seed0=2.43e-5
+% allow: 0.25 because it is the coverage fraction f, a setting
+% allow: 0 1 2 5 because they are round and seed indices and the square in log|M|^2, not results
+
+\paragraph{How the $ee\to u\bar u$ online study sits against the results above.} It agrees with the two
+$\sigma$-reweighting results on the $Z$ resonance: on the starved base $\sigma$ lands next to the true-error best
+case (the $3$-seed result above, and $\sigma^{0.5}$ with loss reweighting against the true-error arm here), and on the
+good $f=0.25$ base $\sigma$-emphasis buys nothing, here with the extra finding that the full exponent $\sigma^{1}$ is
+$30.5$ times worse and the softest one only matches the fixed draw. The new point is the control the earlier studies
+lacked: on the starved base, reweighting the loss toward the objective without any $\sigma$ recovers nearly all of the
+gain (an MSE $1.11$ times the $\sigma$ arm's, inside the seed spread), so emphasis toward the pole, not $\sigma$'s particular choice of events, carries
+it. Panel (a) is one seed, and round~0, the same coverage draw for every arm, already spreads $2.5$ times between the
+arms' runs, so of (a) only the order-of-magnitude losses of the $\sigma^{1}$ and true-error arms are beyond noise. The
+positive steering result below is a different setting: $ee\to u\bar ugg$, a coordinate-free loop that generates fresh
+events, against a uniform base, on overlapping soft and collinear singularities that no one-parameter density covers.
+On $ee\to u\bar u$ the coordinate-free draw, compared with a base that already puts a quarter of its events on the
+pole, does not win (panel c). The concentration principle (steering helps iff the hardness is concentrated) predicts a
+gain over a \emph{uniform} base here, since the $Z$ pole is the most concentrated hardness of the section, and panel (b)
+shows one ($5.25$ times over the fixed uniform draw); it does not predict the panel (c) null, because the principle
+compares against uniform generation while the control here already covers the pole, and it does not separate $\sigma$
+from plain loss reweighting, which no steering study ran as a control. The $\sigma$-contrast pre-flight was not measured
+on $ee\to u\bar u$.
+% src: python3 analysis/divergences/l2_eeuu_online.py @61b3420b
+% claim: f025.sigma_a1_over_static=30.5
+% claim: starved.reweight_fair_over_sigma=1.11
+% claim: f025.round0_max_over_min=2.5
+% claim: starved.static_fair_over_sigma=5.25
+% allow: 0.25 0.5 because they are the coverage fraction f and an exponent, settings
+% allow: 3 because it is the seed count of the earlier study, a design count
+% allow: 0 1 2 5 because they are round and seed indices and the square in log|M|^2, not results
+
+\begin{figure}[H]
+  \centering
+  \pnl{l2_eeuu_online_a.pdf}\hfill\pnl{l2_eeuu_online_b.pdf} \\[1ex]
+  \pnl{l2_eeuu_online_c.pdf}
+  \caption{Online $\sigma$-driven generation on $e^+e^-\to u\bar u$ ($\sqrt s$ from $91$ to $1000$\,GeV): the MSE of
+  $\ln|\mathcal M|^2$ averaged with equal weight over the $\sqrt s$ bins of the test set, after each round of
+  fine-tuning. Every round draws its training events from one labelled candidate pool. Legend: \emph{static}, every
+  round draws from the coverage base; \emph{reused}, the July runs that re-drew the same pool every round (before the
+  fairness fix), the others draw afresh; $\sigma^{\alpha}$ and $|r|^{\alpha}$, the base reweighted by the predicted
+  $\sigma$ or by $|r|$ to the power $\alpha$, where $r=\ln|\mathcal M|^2_{\rm pred}-\ln|\mathcal M|^2_{\rm true}$ is
+  the previous round's model's true residual (the best case a perfect $\sigma$ could reach); \emph{IS}, the loss
+  weighted per $\ln|\mathcal M|^2$ bin by the target density over the drawn density, which trains toward the objective
+  whatever the draw; \emph{IS only}, the static draw with that loss weight and no $\sigma$; $\sigma^{\gamma}$ and
+  $|r|^{\gamma}$, a draw $\propto\sigma^{\gamma}$ (or $|r|^{\gamma}$), $\gamma=1$, over the whole candidate pool with no
+  base density and no IS. (a) Coverage base $f=0.25$ (a quarter flat in $\log|\mathcal M|^2$, the rest uniform in
+  $\sqrt s$), one seed. (b) Starved base $f=0$ (uniform in $\sqrt s$) with the objective $f=0.25$, geometric mean of
+  three seeds ($|r|^{0.5}$: seed 0 only). (c) $\sigma^{\gamma}$ against the static $f=0.25$ draw, three seeds each
+  ($|r|^{\gamma}$: seed 0 only), six rounds. (\code{analysis/divergences/l2\_eeuu\_online.py --plot})}
+  \label{fig:l2_eeuu_online}
+% allow: 0 0.25 0.5 1 2 because they are the arms' settings f, alpha and gamma, and the square in log|M|^2
+% allow: 91 1000 because they are the window edges in GeV, a setting
+\end{figure}
 
 \paragraph{Steering validated on $ee\to u\bar u gg$: $\sigma$-informed on-the-fly generation beats
 uniform generation, coordinate-free.} Steering is the layer where $\sigma$ finally overcomes the
@@ -10770,7 +11326,7 @@ beats uniform, and the gain \textbf{concentrates in the deep IR and grows monoto
 concentration exponent $\gamma$}. Log-flat-per-decade MSE, $\sigma$/base (mean over the $7$ $y_{\min}$
 decades): $92\%,81\%,78\%,76\%,74\%$ at $\gamma{=}1,2,3,5,10$, a real but \emph{saturating} overall
 gain. The deepest decade ($y_{\min}\!<\!10^{-6}$) tells the sharper story: $\sigma$/base
-$=90\%,70\%,66\%,62\%,\mathbf{55\%}$: the deep-IR error is nearly \emph{halved} at $\gamma{=}10$.
+$=90\%,71\%,66\%,62\%,\mathbf{55\%}$ (the second read $70\%$ before the reader): the deep-IR error is nearly \emph{halved} at $\gamma{=}10$.
 \emph{Correction from the extended sweep:} an earlier reading of this series as ``still falling'' at
 $\gamma{=}10$ was too optimistic. Pushing to $\gamma=20,30$ (single seed, so compared within the seed-0
 series) shows the deepest decade \textbf{saturating}: ratio $0.529\to0.525\to0.509$ over
@@ -10788,6 +11344,28 @@ $\sigma$, raised to a power, generates a strictly better training set than unifo
 coordinate, no reference density, no loss correction, isolated from coverage- and loss-function
 confounds over $3$ seeds.} (This supersedes the confounded $ee\to u\bar u$ steering numbers from the earlier
 session, which are retracted.) See Figs.~\ref{fig:l2_uugg_perdecade}--\ref{fig:l2_uugg_perdecade_abs}.
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
+% claim: pct.uugg_logflat.0=92
+% claim: pct.uugg_logflat.1=81
+% claim: pct.uugg_logflat.2=78
+% claim: pct.uugg_logflat.3=76
+% claim: pct.uugg_logflat.4=74
+% claim: pct.uugg_deepest.0=90
+% claim: pct.uugg_deepest.1=71
+% claim: pct.uugg_deepest.2=66
+% claim: pct.uugg_deepest.3=62
+% claim: pct.uugg_deepest.4=55
+% claim: uugg_s0.10.deepest=0.529
+% claim: uugg_s0.20.deepest=0.525
+% claim: uugg_s0.30.deepest=0.509
+% claim: pct.uugg_deepest_gain_10_30=4
+% claim: uugg_s0.10.bulk=1.30
+% claim: uugg_s0.20.bulk=1.55
+% claim: uugg_s0.30.bulk=1.63
+% claim: pct.uugg_overall_worse_30=12
+% claim: pct.uugg_shallowest.0=107
+% claim: pct.uugg_shallowest.1=128
+% allow: 70 because it is the superseded value, quoted as corrected
 
 \begin{figure}[H]
   \centering
@@ -10807,13 +11385,21 @@ session, which are retracted.) See Figs.~\ref{fig:l2_uugg_perdecade}--\ref{fig:l
   \includegraphics{l2_uugg_gamma.pdf}
   \caption{\textbf{The concentration exponent $\gamma$ traverses a water-filling trade-off.} Per-decade
   $\sigma$/base ratio and the deep-vs-bulk split against $\gamma\in\{1,2,3,5,10\}$. The deepest decade
-  ($y_{\min}\!<\!10^{-6}$) falls to $\sim\!\mathbf{55}\%$ of base ($90,70,66,62,55\%$) while the
+  ($y_{\min}\!<\!10^{-6}$) falls to $\sim\!\mathbf{55}\%$ of base ($90,71,66,62,55\%$) while the
   shallowest bulk decade \emph{rises} $107\!\to\!128\%$. So the log-flat average is best around
   $\gamma\!\approx\!3$--$5$ and larger $\gamma$ buys deep-IR accuracy by paying in the bulk: one
   coordinate-free scalar knob sliding along the equimarginal allocation trade-off. Extending the sweep to
   $\gamma=20,30$ shows the deep gain \emph{saturating} rather than continuing
   (Fig.~\ref{fig:l2_gamma_response_extended}).}
   \label{fig:l2_uugg_gamma}
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
+% claim: pct.uugg_deepest.0=90
+% claim: pct.uugg_deepest.1=71
+% claim: pct.uugg_deepest.2=66
+% claim: pct.uugg_deepest.3=62
+% claim: pct.uugg_deepest.4=55
+% claim: pct.uugg_shallowest.0=107
+% claim: pct.uugg_shallowest.1=128
 \end{figure}
 
 \begin{figure}[H]
@@ -10846,18 +11432,44 @@ continuum \emph{untouched} ($8.6\times10^{-4}$, unchanged), with overall MSE $2.
 1.4\times10^{-2}\to9.3\times10^{-3}$ at $\gamma{=}0,1,3$. So one scalar $\sigma$ automatically identifies
 the resonance as the sparse region and reallocates there; it need \emph{not} be multi-modal.
 \emph{(ii) $u\bar u ggg$, higher multiplicity:} here $\sigma$-driven generation gives essentially
-\emph{nothing} (overall $5.68\!\to\!5.67\!\to\!5.65\times10^{-2}$ at $\gamma{=}0,1,3$), because with three
+\emph{nothing} (overall $5.68\times10^{-2}\!\to\!5.66\times10^{-2}\!\to\!5.65\times10^{-2}$ (the middle read $5.67$ before the reader) at $\gamma{=}0,1,3$), because with three
 gluons the divergence is \emph{diffuse}: every $y_{\min}$ decade is comparably hard
-($\sim\!3\times10^{-2}$--$1.5\times10^{-1}$), with no thin sparse region to target; reallocating within a
+($\sim\!3\times10^{-2}$--$1.6\times10^{-1}$; the upper end read $1.5\times10^{-1}$ before the reader), with no thin sparse region to target; reallocating within a
 uniformly-hard set cannot help (Figs.~\ref{fig:l2_uug_multiscale}, \ref{fig:l2_uuggg_perdecade}).
 The obvious objection, that $u\bar u ggg$ was simply not concentrated \emph{hard enough}, since
 $u\bar u gg$ needed $\gamma\!\approx\!3$--$10$, was tested directly and \textbf{fails}: pushing to
 $\gamma=10,20$ does not unlock a gain, it \emph{reverses} the small one. The deep-IR ratio turns over,
 $0.989,0.976,1.035,1.079$ at $\gamma=1,3,10,20$, so by $\gamma{=}20$ the $\sigma$ arm is $8\%$
-\emph{worse than uniform} (overall $5.65\!\to\!6.07\!\to\!6.48\times10^{-2}$). Harder concentration on a
+\emph{worse than uniform} (overall $5.65\times10^{-2}\!\to\!6.07\times10^{-2}\!\to\!6.48\times10^{-2}$). Harder concentration on a
 diffuse divergence just starves the rest of an already-uniformly-hard set. That contrast, saturation
 for $u\bar u gg$, and reversal for $u\bar u ggg$, is the sharpest evidence for the principle below
 (Fig.~\ref{fig:l2_gamma_response_extended}).
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
+% claim: uug.0.continuum=9e-4
+% claim: uug.0.peak=8.3e-2
+% claim: uug.3.peak=3.3e-2
+% claim: uug_gain.peak=2.5
+% claim: uug.0.peak_ir=9.0e-2
+% claim: uug.3.peak_ir=2.2e-2
+% claim: uug_gain.peak_ir=4
+% claim: uug.3.continuum=8.6e-4
+% claim: uug.0.mse=2.2e-2
+% claim: uug.1.mse=1.4e-2
+% claim: uug.3.mse=9.3e-3
+% claim: uuggg.0.mse=5.68e-2
+% claim: uuggg.1.mse=5.66e-2
+% allow: 5.67 because it is the superseded value, quoted as corrected
+% claim: uuggg.3.mse=5.65e-2
+% claim: uuggg_dec_min=3e-2
+% claim: uuggg_dec_max=1.6e-1
+% allow: 1.5e-1 because it is the superseded value, quoted as corrected
+% claim: uuggg.1.deep=0.989
+% claim: uuggg.3.deep=0.976
+% claim: uuggg.10.deep=1.035
+% claim: uuggg.20.deep=1.079
+% claim: pct.uuggg_worse_20=8
+% claim: uuggg.10.mse=6.07e-2
+% claim: uuggg.20.mse=6.48e-2
 
 \begin{figure}[H]
   \centering
@@ -10871,6 +11483,11 @@ for $u\bar u gg$, and reversal for $u\bar u ggg$, is the sharpest evidence for t
   concentration is actively worse. Concentration of the error, not depth of the divergence, is what
   decides whether $\sigma$-steering can pay.}
   \label{fig:l2_gamma_response_extended}
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
+% claim: uugg_s0.10.deepest=0.53
+% claim: uugg_s0.30.deepest=0.51
+% claim: uugg_s0.10.bulk=1.30
+% claim: uugg_s0.30.bulk=1.63
 \end{figure}
 
 \begin{figure}[H]
@@ -10884,6 +11501,10 @@ for $u\bar u gg$, and reversal for $u\bar u ggg$, is the sharpest evidence for t
   at the peak, $4\times$ in the deep-IR$\,\cap\,$peak corner), while leaving the easy continuum
   untouched. The steering density need \emph{not} be multi-modal to serve two competing extremes.}
   \label{fig:l2_uug_multiscale}
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
+% claim: uug.0.continuum=9e-4
+% claim: uug_gain.peak=2.5
+% claim: uug_gain.peak_ir=4
 \end{figure}
 
 \begin{figure}[H]
@@ -10902,13 +11523,13 @@ $\sigma$-contrast diagnostic.} The loop had only been stressed on massless final
 candidate, the $t\bar t$ threshold, is ruled out, and that is itself a measured result rather than a
 deferral: at tree level $ee\to t\bar t$ has \textbf{no threshold divergence at all}. $|\mathcal M|^2$
 spans only $8.7\times$ in total and is \emph{flattest} at threshold ($\mathrm{std}\log|\mathcal M|^2
-= 0.022$ for $\beta<0.05$ against $0.665$ in the bulk), because the $2m_t$ cusp is a phase-space and
+= 0.022$ for $\beta<0.05$ against $0.665$ in the bulk; a July scan of the standalone, no committed reader), because the $2m_t$ cusp is a phase-space and
 cross-section feature, not an amplitude one; running it would have produced a guaranteed null that
 says nothing about the method. $b\bar b g$ is the replacement, and the direct
 massive analogue of $u\bar u g$ (same $Z$ resonance, same soft gluon), but the \emph{collinear}
 limit is regulated by $m_b$ (the dead cone), which softens one of the two singular directions; the
 dead-cone scale $m_b^2/s\!\approx\!2\times10^{-5}$--$3\times10^{-3}$ sits inside the $y_{\min}$ window,
-so the mass reshapes the divergence rather than relabelling it ($|\mathcal M|^2$ spans $7\times10^{10}$).
+so the mass reshapes the divergence rather than relabelling it ($|\mathcal M|^2$ spans $2.8\times10^{10}$ over the held-out set; read $7\times10^{10}$ before the reader, from a sample not on disk).
 The generator needed \emph{no} change: \code{democratic\_draw} already yields exact on-shell massive
 momenta (verified to $10^{-13}$); only a registry row, the mass-correct collinear variable
 $y_{ij}=2p_i\!\cdot\!p_j/s$ (identical to $s_{ij}/s$ for massless legs, so nothing above moves), and a
@@ -10925,11 +11546,35 @@ massless $u\bar u g$; a deep-IR contrast of only $1.61$ $\Rightarrow$ a \emph{we
 having flattened the collinear enhancement. Both held: at $\gamma{=}3$ the $\sigma$ arm cuts the $Z$-peak
 MSE to $\mathbf{0.56\times}$ (predicted ${\sim}0.50$) and the shoulder to $0.50\times$, while the pure
 deep-IR ($y_{\min}<10^{-5}$) moves only to $0.85\times$ (predicted ${\sim}0.71$) and the continuum to
-$0.82\times$, with overall $2.15\!\to\!1.29\times10^{-2}$ ($0.60\times$), log-flat $0.80\times$. So the gain
+$0.82\times$, with overall $2.15\times10^{-2}\!\to\!1.29\times10^{-2}$ ($0.60\times$), log-flat $0.80\times$. So the gain
 is \textbf{$Z$-driven, exactly where the contrast pointed}, and the mass's suppression of the IR direction
 is visible as the weaker deep-IR gain: the diagnostic called both the \emph{magnitude} and the
-\emph{location} on a process it was never tuned on (Fig.~\ref{fig:l2_bbbarg}). \emph{Caveat: single seed;}
-a $3$-seed repeat would firm the numbers, but the sign and the region-ordering are the claim.
+\emph{location} on a process it was never tuned on (Fig.~\ref{fig:l2_bbbarg}). The prediction and the numbers above are seed $0$. Seeds $1$ and $2$ (same held-out set, evaluated alongside) agree: $Z$ peak
+$0.57$ and $0.48\times$, deep IR $0.91$ and $0.89\times$, overall $0.62$ and $0.54\times$, $Z$-peak contrast $2.61$ and $2.57$.
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
+% claim: bbg.0.contrast_peak=2.51
+% claim: preflight.uug_contrast=4.48
+% claim: preflight.uugg_contrast=1.83
+% claim: bbg.0.contrast_ir=1.61
+% claim: bbg.0.peak=0.56
+% claim: bbg.0.shoulder=0.50
+% claim: bbg.0.deep=0.85
+% claim: bbg.0.continuum=0.82
+% claim: bbg.0.mse_base=2.15e-2
+% claim: bbg.0.mse_g3=1.29e-2
+% claim: bbg.0.overall=0.60
+% claim: bbg.0.logflat=0.80
+% claim: bbg.0.span=2.8e10
+% claim: bbg.1.peak=0.57
+% claim: bbg.2.peak=0.48
+% claim: bbg.1.deep=0.91
+% claim: bbg.2.deep=0.89
+% claim: bbg.1.overall=0.62
+% claim: bbg.2.overall=0.54
+% claim: bbg.1.contrast_peak=2.61
+% claim: bbg.2.contrast_peak=2.57
+% allow: 0 1 2 because they are seed indices, no result
+% allow: 7 because it is the superseded span (7 x 10^10), quoted as corrected
 
 \begin{figure}[H]
   \centering
@@ -10943,6 +11588,10 @@ a $3$-seed repeat would firm the numbers, but the sign and the region-ordering a
   there is less to gain there. The contrast, computed from the base arm with no A/B, called both the
   size and the location of the effect on a process the diagnostic was never fit on.}
   \label{fig:l2_bbbarg}
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
+% claim: bbg.0.peak=0.56
+% claim: bbg.0.shoulder=0.50
+% claim: bbg.0.continuum=0.82
 \end{figure}
 
 \begin{principle}[$\sigma$-driven generation helps iff hardness is \emph{concentrated}]
@@ -10987,6 +11636,21 @@ $4.48\Rightarrow$ $\sigma$/base MSE $0.40$; $u\bar u gg$ (deep IR) $1.83\Rightar
 baseline model (no second arm, no A/B), it converts ``is this divergence concentrated?'' from a
 post-hoc reading of the outcome into a \textbf{cheap test you can run before committing the compute},
 and gives the concentration principle a directly measurable order parameter.
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
+% claim: preflight.uug_sigma_rise=4.5
+% claim: preflight.uug_rmse_rise=10
+% claim: preflight.uug_calib.peak=0.77
+% claim: preflight.uug_calib.shoulder=1.01
+% claim: preflight.uug_calib.continuum=1.69
+% claim: preflight.uugg_calib_rest_min=0.85
+% claim: preflight.uugg_calib_rest_max=1.24
+% claim: preflight.uugg_calib.0=0.53
+% claim: preflight.uug_contrast=4.48
+% claim: preflight.uug_gain=0.40
+% claim: preflight.uugg_contrast=1.83
+% claim: preflight.uugg_gain=0.53
+% claim: preflight.uuggg_contrast=1.29
+% claim: preflight.uuggg_gain=0.97
 
 \begin{figure}[H]
   \centering
@@ -11003,6 +11667,11 @@ and gives the concentration principle a directly measurable order parameter.
   alone, against the $\sigma$-arm/base MSE ratio actually measured in that region. They order
   monotonically, so the contrast decides the question with one forward pass and no A/B.}
   \label{fig:l2_sigma_vs_divergence}
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
+% claim: preflight.uug_sigma_rise=4.5
+% claim: preflight.uug_rmse_rise=10
+% claim: preflight.uugg_contrast=1.8
+% claim: preflight.uuggg_contrast=1.3
 \end{figure}
 
 \paragraph{A genuinely Bayesian $\sigma$ (full-network Bayes-by-backprop) does \emph{not} pay for
@@ -11032,8 +11701,9 @@ $\sigma_{\rm rel}\!\in\![5\!\times\!10^{-3},0.15]$, $\gamma\!\in\![1,5]$; object
 The tuned Bayesian network reaches $2.87\times10^{-2}$, versus $3.01\times10^{-2}$ for uniform generation
 ($0.95\times$, a real but modest win) and $2.65\times10^{-2}$ for the het-head $\sigma^{\gamma=3}$ baseline
 ($1.08\times$: \textbf{it loses}). The sweep's \emph{structure} is the informative part:
-$\sigma_{\rm rel}$ alone decides the outcome (Spearman $\rho=+0.965$ with the objective, monotone: wider
-posterior is uniformly worse; $\sigma_{\rm rel}\!\approx\!0.1$ costs a factor $\sim\!3$), while
+$\sigma_{\rm rel}$ alone decides the outcome (Spearman $\rho=+0.965$ with the objective: wider
+posterior is worse, close to monotonically; the sweep's three widest posteriors, $\sigma_{\rm rel}=0.090$, $0.099$ and $0.128$,
+cost $2.77$, $2.46$ and $3.07\times$ its best), while
 $\beta_{\rm KL}$ ($\rho=-0.05$) and even the keep exponent $\gamma$ ($\rho=-0.07$) are \emph{noise} by
 comparison, and the optimum sits \textbf{on the lower bound} of the $\sigma_{\rm rel}$ range, i.e.\ the
 optimiser is driving the weight posterior toward the \emph{deterministic limit} to buy back point accuracy.
@@ -11041,13 +11711,34 @@ That is the mechanism: Bayes-by-backprop trains under sampled weights, which deg
 only way to recover accuracy is to shrink the posterior, which simultaneously removes the epistemic
 signal that was the whole point. Calibration is respectable ($\langle z^2\rangle\!\approx\!1.26$, mildly
 under-covering as expected for an epistemic-only $\sigma$), but $\sigma_{\rm epi}$ \emph{ranks} the error at
-only $\rho\!\approx\!0.17$--$0.20$, barely above the het-head's $0.11$--$0.16$, so it never earns back
+only $\rho\!\approx\!0.17$--$0.20$ (this and $\langle z^2\rangle$ from the trials' Jean Zay job logs, no committed reader), barely above the het-head's $0.11$--$0.16$, so it never earns back
 the accuracy it costs, on top of $K$ forwards per scoring round ($\sim\!3\times$ slower runs).
 \emph{Caveat:} one seed per trial, and the gaps are $5$--$8\%$, comparable to seed scatter, so the safe
 claim is ``no evidence the Bayesian network beats the het head'', and ``it beats uniform'' is marginal
 (Figs.~\ref{fig:l2_uugg_bbb_vs_het}, \ref{fig:l2_bbb_sweep}). Tooling \code{bbb.py},
 \code{sweep/l2\_bbb\_trial.py}, \code{sweep/l2\_bbb\_sweep\_config.yaml} (the sweep drives the steering loop via
 \code{generate\_sweep}'s new \code{trial\_script} hook).
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
+% claim: bbb.trials=12
+% claim: bbb.best=2.87e-2
+% claim: bbb.uniform=3.01e-2
+% claim: bbb.over_uniform=0.95
+% claim: bbb.het=2.65e-2
+% claim: bbb.over_het=1.08
+% claim: bbb.spearman_bbb_sigma_rel=0.965
+% claim: bbb.widest_srel.0=0.090
+% claim: bbb.widest_srel.1=0.099
+% claim: bbb.widest_srel.2=0.128
+% claim: bbb.widest_cost.0=2.77
+% claim: bbb.widest_cost.1=2.46
+% claim: bbb.widest_cost.2=3.07
+% claim: bbb.spearman_bbb_beta=-0.05
+% claim: bbb.spearman_gamma=-0.07
+% claim: bbb.het_rank_min=0.11
+% claim: bbb.het_rank_max=0.16
+% claim: pct.bbb_gap.0=5
+% claim: pct.bbb_gap.1=8
+% allow: 2 because it is the exponent of z^2, no result
 
 \begin{figure}[H]
   \centering
@@ -11072,6 +11763,11 @@ claim is ``no evidence the Bayesian network beats the het head'', and ``it beats
   (circled) still sits above the het-head line: the accuracy$\leftrightarrow$uncertainty tension is
   structural, not a tuning artefact.}
   \label{fig:l2_bbb_sweep}
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
+% claim: bbb.trials=12
+% claim: bbb.spearman_bbb_sigma_rel=0.965
+% claim: bbb.spearman_bbb_beta=-0.05
+% claim: bbb.spearman_gamma=-0.07
 \end{figure}
 
 \begin{principle}[For steering generation, what matters is how well $\sigma$ \emph{ranks} error]
@@ -11094,10 +11790,10 @@ with \emph{positive} curvature, so positive $c_2$ should concentrate extra budge
 tail while staying mild at moderate $\sigma$, exactly what a single large $\gamma$ cannot do (it
 over-concentrates everywhere, the measured bulk penalty). A $12$-trial single-fidelity DyHPO sweep over
 $(c_1,c_2,c_3)$ on $u\bar u gg$ (objective the log-flat MSE, \emph{not} deep-only, which would just reward
-starving the bulk) confirms the \emph{direction}: the best two configs both sit at $c_2\!\approx\!+1.3$--$1.4$
-and every negative-$c_2$ config is mid-pack or worse (Fig.~\ref{fig:l2_poly_keep}a). \textbf{But the gain
-does not survive seeds.} The single-seed best ($c_2{=}1.30$, log-flat $3.25\times10^{-2}$) looked $3\%$
-under the best power law, until one notes that the \emph{$3$-seed} $\sigma^{10}$ arm already averages
+starving the bulk) points to the positive-$c_2$ direction without settling it: the best three configs sit at $c_2=1.30$, $2.40$ and $1.42$
+(read ``the best two at $1.3$--$1.4$'' before the reader) and the four negative-$c_2$ configs rank $4$, $5$, $8$ and $10$ of $12$ (Fig.~\ref{fig:l2_poly_keep}a). \textbf{But the gain
+does not survive seeds.} The single-seed best ($c_2{=}1.30$, log-flat $3.28\times10^{-2}$; read $3.25$ before the reader) looked $2\%$ (read $3\%$ before the reader)
+under the best power law's seed $0$ ($3.35\times10^{-2}$), until one notes that the \emph{$3$-seed} $\sigma^{10}$ arm already averages
 $3.25\times10^{-2}$: the ``win'' was against one unlucky power-law seed. Running the polynomial optimum at
 $3$ seeds gives $3.22\times10^{-2}\!\pm\!1.2\times10^{-3}$ vs $\sigma^{10}$'s $3.25\times10^{-2}\!\pm\!
 7\times10^{-4}$, a $1.0\%$ edge well inside the pooled seed scatter, i.e.\ a \textbf{wash}
@@ -11106,18 +11802,53 @@ but on the flat $\gamma$-basin it buys nothing a well-tuned exponent does not al
 temperature picture holds: $\sigma^\gamma$ stays the right practical family: one knob, no measurable
 loss.} Tooling: the polynomial keep rule and \code{--objective logflat} in \code{l2\_online\_uugg.py},
 \code{sweep/l2\_poly\_sweep\_config.yaml}, \code{plot\_poly\_keep.py}.
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
+% claim: poly.r2_uugg.1=0.89
+% claim: poly.r2_uugg.2=0.99
+% claim: poly.r2_uuggg.1=0.68
+% claim: poly.r2_uuggg.2=0.93
+% claim: poly.trials=12
+% claim: poly.best_c2.0=1.30
+% claim: poly.best_c2.1=2.40
+% claim: poly.best_c2.2=1.42
+% claim: poly.neg_c2_ranks.0=4
+% claim: poly.neg_c2_ranks.1=5
+% claim: poly.neg_c2_ranks.2=8
+% claim: poly.neg_c2_ranks.3=10
+% claim: poly.best_logflat=3.28e-2
+% claim: pct.poly_best_under_power_s0=2
+% claim: poly.power_s0=3.35e-2
+% claim: poly.power_mean=3.25e-2
+% claim: poly.poly_mean=3.22e-2
+% claim: poly.poly_std=1.2e-3
+% claim: poly.power_std=7e-4
+% claim: pct.poly_edge=1.0
+% allow: 1.3 1.4 3 3.25 because they are the superseded values, quoted as corrected
+% allow: 0 because it is a seed index, no result
 
 \begin{figure}[H]
   \centering
   \widerow{\pnl{l2_poly_keep_a.pdf}\hfill\pnl{l2_poly_keep_b.pdf}}
   \caption{\textbf{Polynomial keep rule vs the $\sigma^\gamma$ power law.} \emph{(a)} The $12$-trial DyHPO
   sweep: log-flat MSE vs the quadratic coefficient $c_2$, coloured by $c_1{=}\gamma$. The power law is the
-  nested $c_2{=}0$ line (red dashed); positive $c_2$ is the helpful direction (best two configs at
-  $c_2\!\approx\!+1.3$--$1.4$, negative-$c_2$ mid-pack), confirming the $\mathbb E[\mathrm{err}^2|\sigma]$
+  nested $c_2{=}0$ line (red dashed); positive $c_2$ is the favoured direction (best three configs at
+  $c_2=1.30$, $2.40$, $1.42$; the negative-$c_2$ ones rank $4$, $5$, $8$, $10$), in the direction of the $\mathbb E[\mathrm{err}^2|\sigma]$
   curvature. \emph{(b)} The honest $3$-seed comparison: the polynomial optimum ($3.22\times10^{-2}$) and the
   best power-law arm $\sigma^{10}$ ($3.25\times10^{-2}$) overlap heavily seed-to-seed: the $1\%$ edge is
-  inside the scatter. Curvature is the right direction but does not robustly beat a well-tuned exponent.}
+  inside the scatter. Curvature points the right way but does not robustly beat a well-tuned exponent.}
   \label{fig:l2_poly_keep}
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
+% claim: poly.trials=12
+% claim: poly.best_c2.0=1.30
+% claim: poly.best_c2.1=2.40
+% claim: poly.best_c2.2=1.42
+% claim: poly.neg_c2_ranks.0=4
+% claim: poly.neg_c2_ranks.1=5
+% claim: poly.neg_c2_ranks.2=8
+% claim: poly.neg_c2_ranks.3=10
+% claim: poly.poly_mean=3.22e-2
+% claim: poly.power_mean=3.25e-2
+% claim: pct.poly_edge=1
 \end{figure}
 
 \paragraph{Uncapped data: the uncertainty tail floors, and more data does not move it.}
@@ -11133,9 +11864,20 @@ bulk has long since left) is the stopping statistic, since a mean would call sat
 \textbf{floors at a level essentially independent of the data budget}: base arm $0.0448$, $0.0468$,
 $0.0477$ and $\sigma$ arm $0.0420$, $0.0418$, $0.0427$ at $N=75$k, $150$k, $600$k. \emph{$8\times$ more
 generated data does not lower the floor}; for the base arm it is marginally \emph{worse} ($+6.4\%$),
-against ${\sim}2\%$ run-to-run reproducibility on a repeat of the whole sweep. (The $\sigma$ arm also
-floors ${\sim}8\%$ \emph{below} base at every budget, an independent sign that $\sigma$-steering
+against ${\sim}2\%$ run-to-run reproducibility on a repeat of the whole sweep (its logs are not on disk). (The $\sigma$ arm also
+floors $6$ to $11\%$ \emph{below} base at every budget (read ${\sim}8\%$ before the reader), an independent sign that $\sigma$-steering
 removes more of the hard tail than uniform generation.)
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
+% claim: sat.p99.uugg_base_n75000=0.0448
+% claim: sat.p99.uugg_base_n150000=0.0468
+% claim: sat.p99.uugg_base_n600000=0.0477
+% claim: sat.p99.uugg_sigma_n75000=0.0420
+% claim: sat.p99.uugg_sigma_n150000=0.0418
+% claim: sat.p99.uugg_sigma_n600000=0.0427
+% claim: sat.budget_factor=8
+% claim: pct.sat_base_rise=6.4
+% claim: pct.sat_sigma_below.0=6
+% claim: pct.sat_sigma_below.1=11
 
 \emph{What this does and does not establish: the compute confound.} Every run here uses the
 \textbf{same $4000$ steps} at batch $16384$, i.e.\ ${\sim}65$M example-presentations regardless of pool
@@ -11172,6 +11914,14 @@ generating and grow the model or the horizon.
   fall in $p99$; crossing below the $2\%$ tolerance band is the stopping rule the
   \code{--stop\_on\_saturation} latch uses.}
   \label{fig:l2_saturation}
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
+% claim: sat.p99.uugg_base_n75000=0.0448
+% claim: sat.p99.uugg_base_n150000=0.0468
+% claim: sat.p99.uugg_base_n600000=0.0477
+% claim: sat.p99.uugg_sigma_n75000=0.0420
+% claim: sat.p99.uugg_sigma_n150000=0.0418
+% claim: sat.p99.uugg_sigma_n600000=0.0427
+% claim: sat.budget_factor=8
 \end{figure}
 
 \subsection{Hand-off: open items}\label{sec:div-open}

@@ -100,6 +100,33 @@ def main():
     for x in bad:
         print(f"blew up: {x['tag']} ({BLOWUP[x['tag']]}): het/MSE {(x['het'] / x['mse']) if x['mse'] else float('nan'):.2f}, "
               f"pull std {x['std']:.2f}, |pull|<1 {x['f1']:.2f}")
+    out = dict(cells=len(pts) + len(bad), reruns=reruns,     # the one blown-up cell: het/MSE median |Delta|, pull std
+               blowup_ratio=[x["het"] / x["mse"] for x in bad if x["mse"]], blowup_pull_std=[x["std"] for x in bad])
+    for nf, _ in GROUPS:
+        q = [x for x in pts if x["nf"] == nf]
+        rr = np.array([x["het"] / x["mse"] for x in q if x["mse"]])
+        st = np.array([x["std"] for x in q])
+        f1 = np.array([x["f1"] for x in q])
+        g = dict(n=len(q), ratio_median=np.median(rr), ratio_min=rr.min(), ratio_max=rr.max(),
+                 lower=int((rr < 1).sum()), std_q1=np.percentile(st, 25), std_median=np.median(st),
+                 std_q3=np.percentile(st, 75), std_min=st.min(), std_max=st.max(),
+                 within=int(((st >= 0.9) & (st <= 1.2)).sum()), f1_min=f1.min(), f1_max=f1.max())
+        if nf == 2:
+            # the per-probe medians of the 2->2 probes, and the cells outside 0.9 to 1.2 (below, above)
+            pm = [np.median([x["het"] / x["mse"] for x in q if x["probe"] == pr and x["mse"]])
+                  for pr in {x["probe"] for x in q}]
+            lo, hi = [x for x in q if x["std"] < 0.9], sorted([x for x in q if x["std"] > 1.2], key=lambda x: -x["std"])
+            g.update(probe_ratio_min=min(pm), probe_ratio_max=max(pm), below_n=len(lo),
+                     below_min=min(x["std"] for x in lo), below_max=max(x["std"] for x in lo), above_n=len(hi),
+                     above_std=[x["std"] for x in hi], above_f1_min=min(x["f1"] for x in hi),
+                     above_f1_max=max(x["f1"] for x in hi),
+                     above_max_abs_pull=[float(np.abs(het[x["tag"] + "__pull"]).max()) for x in hi])
+        out[f"2to{nf}"] = g
+    # the jobs and cells of the two retrain batches (one line per job after the header, its cells after the GPU-h)
+    for site, f in (("cclx", "het_delta_jobs_cclx.txt"), ("jz", "het_delta_jobs_jz.txt")):
+        jobs = [l.split()[1:] for l in open(os.path.join(HERE, f)) if l.strip() and not l.startswith("#")]
+        out[f"jobs_{site}"], out[f"cells_{site}"] = len(jobs), sum(map(len, jobs))
+    print(json.dumps(out, default=float))
     print("largest pull std:")
     for x in sorted(pts, key=lambda x: -x["std"])[:12]:
         print(f"  {x['probe']:16s} {x['arm']:24s} std {x['std']:.2f} |p|<1 {x['f1']:.2f} het/mse "
