@@ -10007,7 +10007,7 @@ work is collected in the hand-off, Sec.~\ref{sec:div-open}.}
 
 \paragraph{Deeper and antenna phase-space sampling.} The production
 $u\bar u g$ set is flat \textsc{rambo} (uniform in Lorentz-invariant phase space), so the deep
-IR is starved (median $y_{\min}\!\approx\!0.15$; only $\sim$5 of $10^6$ events below
+IR is starved (median $y_{\min}\!\approx\!0.15$, a figure of the July write-up that no committed summary holds; only $\sim$5 of $10^6$ events below
 $y_{\min}=10^{-5}$). \code{gen\_uug\_sampling.py} adds two samplers over a lowered-cut fiducial
 region ($p_T\!>\!1$, $m\!>\!0.3$, $\Delta R\!>\!0.05$): \emph{antenna}
 ($\mathrm{d}N\!\propto\!\mathrm{d}a/a\,\mathrm{d}b/b$ in the gluon invariants $a=1-x_u$,
@@ -10023,10 +10023,20 @@ relative error in $y_{\min}\!\in\![10^{-6},10^{-5})$ drops $47.9\%\!\to\!1.4\%$;
 MSE$(\Delta\ln|\mathcal{M}|^2)$ $0.108\!\to\!0.0017$ ($\sim$62$\times$; Fig.~\ref{fig:deep_sampling_antenna}). The fraction sweep
 $f\in\{0,.25,.5,.75,1\}$ (\code{plot\_fraction\_sweep.py}, fig
 \code{deep\_sampling\_fraction\_sweep}) shows a \emph{broad interior optimum} $f\in[0.25,0.75]$:
-$f{=}0$ catastrophic ($\sim$200$\times$), $f{=}1$ $\sim$2$\times$ worse than the basin; the fine
+$f{=}0$ catastrophic ($230\times$ the best log-flat MSE; this read $\sim$200$\times$ before the reader), $f{=}1$ $\sim$2$\times$ worse than the basin; the fine
 location inside the basin is single-seed noise ($f{=}0.5$ sits above both neighbours). Metrics
 reported: MSE and MAE of $\Delta\ln|\mathcal{M}|^2$ (both scale-invariant, since the residual is
 $\ln$ of the amplitude ratio) plus median relative error.
+% src: python3 analysis/divergences/sampling_numbers.py @fd9c36a2
+% claim: deep.uniform_train_below_1e-5_per_1e6=5
+% claim: deep.uniform_medrel_deepest_pct=47.9
+% claim: deep.antenna_medrel_deepest_pct=1.4
+% claim: deep.uniform_mse=0.108
+% claim: deep.antenna_mse=0.0017
+% claim: deep.uniform_over_antenna=62
+% claim: fraction.f0_over_best=230
+% claim: fraction.f1_over_best=2
+% allow: 0.15 because it is the July write-up's median y_min, marked as not recomputed
 
 \begin{figure}[H]
   \centering
@@ -10047,11 +10057,14 @@ $\ln$ of the amplitude ratio) plus median relative error.
   \includegraphics{deep_sampling_fraction_sweep.pdf}
   \caption{\textbf{The antenna/uniform mixture has a broad interior optimum.} Deep-IR error vs
   the antenna fraction $f$. Both endpoints are bad: $f{=}0$ (pure \textsc{rambo}) is catastrophic
-  ($\sim\!200\times$) and $f{=}1$ (pure antenna) is $\sim\!2\times$ worse than the basin, because it
+  ($230\times$ the best log-flat MSE) and $f{=}1$ (pure antenna) is $\sim\!2\times$ worse than the basin, because it
   starves the $O(1)$ bulk, while any $f\in[0.25,0.75]$ sits in a flat basin. The fine location inside
   the basin is single-seed noise. This ``mix the coverage criterion in at a modest fraction, do not adopt
   it as the base'' shape recurs for the $Z$ resonance (Fig.~\ref{fig:eeuu_genmix_fraction_sweep}).}
   \label{fig:deep_sampling_fraction_sweep}
+% src: python3 analysis/divergences/sampling_numbers.py @fd9c36a2
+% claim: fraction.f0_over_best=230
+% claim: fraction.f1_over_best=2
 \end{figure}
 
 \paragraph{Float32 label floor.} $s_{ij}=s\,y_{\min}$ is a near-cancellation of $O(s)$ momenta,
@@ -10061,6 +10074,9 @@ $[10^{-6},10^{-5})$, $\times{\sim}8$ per decade, negligible by $10^{-3}$. All cu
 well \emph{above} this (short trainings), so they are optimisation-limited, not precision-limited. If ever
 precision-limited, reparametrise (feed $\ln y_{\min}$ / pair masses as features) rather than store
 float64.
+% src: python3 analysis/divergences/sampling_numbers.py @fd9c36a2
+% claim: float32.deepest_pct=0.39
+% claim: float32.per_decade_ratio.0=8
 
 \paragraph{Optimal allocation of a fixed data budget.} For a fixed data
 budget the optimum is the equimarginal (water-filling) allocation: sample until the marginal
@@ -10097,6 +10113,9 @@ sweep:} \code{sweep\_heterosc\_foundation.sh} (same 22-proc leave-uug-out recipe
 iters). After the fix $\mu$ fits: best lr$=4\mathrm{e}{-}3$, $\beta{=}1$ gives in-distribution val
 $\mu$-MSE $=0.025$, and $\beta$ dominates ($\beta1\!\ll\!\beta0.5\!\ll\!\beta0$, a $\sim$9$\times$
 gap $\Rightarrow$ the Seitzer $\sigma$-inflation effect is real). Rank: \code{rank\_mu\_mse.py}.
+% src: python3 analysis/divergences/sampling_numbers.py @fd9c36a2
+% claim: foundation.best_mse=0.025
+% claim: foundation.b0_over_b1_lr0.004=9
 
 \paragraph{The coupled fit fails for a structural reason; two-stage $\sigma$ works. (Withdrawn 2026-10-15: the mechanism below is wrong, see the correction that follows.)}
 The coupled $(\mu,\sigma)$ NLL underfit $\mu$ ($\mu$-MSE $\sim$1 or $\gg$ the MSE baseline) across
@@ -10517,12 +10536,17 @@ below $y_{\min}\,10^{-3}$, so event-weighting is deep-IR-dominated
 \textbf{$\sim$80\% of the perfect-oracle reweighting gain} (event-weighted $87$\%) and improves
 \emph{every} decade including the bulk. But the rank/magnitude split \emph{flips} versus the
 event-weighted view: \textbf{magnitude dominates}: ordering-alone gives only $11$\%, because
-after antenna training the worst-fit decade is the \emph{bulk} $[10^{-1},10^0)$ (MSE $10^{-2}\!\gg\!$
-deep-IR $8\!\times\!10^{-4}$), and only $\sigma$'s calibrated magnitude targets it; deep-IR-following
+after antenna training the worst-fit decade is the \emph{bulk} $[10^{-1},10^0)$ (MSE $1.3\times10^{-2}\gg$
+deep-IR $8\times10^{-4}$), and only $\sigma$'s calibrated magnitude targets it; deep-IR-following
 heuristics (rank, weak $\sigma$) starve the bulk and can \emph{net-hurt} (a $\rho{=}0.29$ synthetic
 $\sigma$ scores $-9$\% under equal footing). So calibration matters more than a pure-rank framing
 suggests (Figs.~\ref{fig:q2_logflat}, \ref{fig:q2_rankmag}; supplementary \code{q2\_confirm},
 \code{q2\_dense}).
+% src: python3 analysis/divergences/sampling_numbers.py @fd9c36a2
+% claim: q2.event_gain_pct.sigma=87
+% claim: q2.test_pct_below_1e-3=50
+% claim: deep.antenna_bulk_mse=1.3e-2
+% claim: deep.antenna_deepest_mse=8e-4
 
 \begin{figure}[H]
   \centering
@@ -10552,8 +10576,9 @@ suggests (Figs.~\ref{fig:q2_logflat}, \ref{fig:q2_rankmag}; supplementary \code{
 \paragraph{Coverage vs.\ emphasis, and the general default sampling.} The decisive
 structural finding: \textbf{$\sigma$-reweighting controls emphasis, not coverage: it cannot beat
 the coverage the training pool already has}. The antenna pool holds only $4$\% ($16$k) bulk events,
-so even the \emph{oracle} cannot fit the bulk ($8.6\!\times\!10^{-3}$) as well as the sampling-study
-mixture ($2.2\!\times\!10^{-3}$), which \emph{generates} bulk events (uniform/\textsc{rambo} fills
+so even the \emph{oracle} cannot fit the bulk ($8.6\!\times\!10^{-3}$, from the per-decade evaluation files
+\code{q2rw\_eval\_oracle.npz}, which are deleted) as well as the sampling-study
+$f=0.5$ mixture ($2.2\times10^{-3}$), which \emph{generates} bulk events (uniform/\textsc{rambo} fills
 $[10^{-1},10^0)$ at $63$\%, antenna at $4$\%; the two are complementary, $0$\% uniform coverage in
 the two deepest decades). The mixture ``wins overall'' by \emph{coverage}, which no reweighting of a
 starved pool can replicate. And the optimum is \emph{dynamic}: the worst region migrates IR$\to$bulk
@@ -10574,6 +10599,13 @@ $\sigma$-reweighting $\pi\!\propto\!\sigma^\alpha$ (no physical binning, process
 generation}, the only layer that lets $\sigma$ overcome the coverage ceiling, by generating where
 $\sigma$ is high \emph{and} data is sparse. The code and figure names for the steering layer carry an
 older \code{l2\_} prefix.
+% src: python3 analysis/divergences/sampling_numbers.py @fd9c36a2
+% claim: coverage.antenna.pct.5=4
+% claim: coverage.antenna.bulk_events_k=16
+% claim: fraction.bulk_mse.f0.5=2.2e-3
+% claim: coverage.uniform.pct.5=63
+% claim: coverage.uniform.pct.0=0
+% allow: 0.5 because it is the mixture's antenna fraction, a setting
 
 \paragraph{Coverage validated on the $ee\to u\bar u$ $Z$ resonance, by generation rather than resampling.}
 The $s$-channel $Z$ pole ($|\mathcal{M}|^2$ peaks $\sim$$200\times$ at $\sqrt{s}\!\approx\!91$; flat
@@ -10686,11 +10718,15 @@ earlier version said $4$--$7\times$.
 
 \paragraph{Eval bug (invalidated an earlier read): in-process state leak across tags.} The multi-tag
 resonance eval (\code{eval\_eeuu\_resonance.py}) corrupted \emph{every tag after the first}: the same
-\code{ft\_mix025} scored logflat $3.5\mathrm{e}{-}5$ as tag~1 but $2.1\mathrm{e}{-}4$ as tag~2, reproducibly
+\code{ft\_mix025} scored logflat $3.5\times10^{-5}$ as tag~1 but $2.1\times10^{-4}$ as tag~2, reproducibly
 (a module/$\mu$P\ global survives across \code{AmplitudeExperiment} instances; a per-tag \code{run\_dir} does
 \emph{not} fix it $\Rightarrow$ in-process, not file-based). Fix: self-dispatch one tag per subprocess,
 merge summaries. The corrected re-eval is what the numbers above report; the pre-fix ``$f{=}0.5$ noise
 bump'' was this corruption, not seed noise.
+% src: python3 analysis/divergences/sampling_numbers.py @fd9c36a2
+% claim: leak.mix025_tag1_logflat=3.5e-5
+% claim: leak.mix025_tag2_logflat=2.1e-4
+% allow: 1 2 because they are tag positions, not results
 
 \paragraph{Emphasis: $\sigma$-reweighting the coverage base does not robustly help (3 seeds).} On the $f{=}0.25$
 base: grow a $\sigma$ row on the $\mu$ model, two-stage fit (frozen $\mu$, $\beta{=}0$; $\mu$ recovers
@@ -10891,18 +10927,23 @@ on $ee\to u\bar u$.
   \centering
   \pnl{l2_eeuu_online_a.pdf}\hfill\pnl{l2_eeuu_online_b.pdf} \\[1ex]
   \pnl{l2_eeuu_online_c.pdf}
-  \caption{Online generation on $ee\to u\bar u$: the MSE of $\ln|\mathcal M|^2$ averaged with equal weight over the
-  $\sqrt s$ bins of the test set, after each round of fine-tuning. ``Fixed draw'': every round draws from the coverage
-  base; ``$\sigma$-weighted'' and ``true-error-weighted'': the base reweighted by the predicted $\sigma$ or by the actual
-  error of the previous round's model (the latter is the best case a perfect $\sigma$ could reach); ``loss
-  reweighting'': the loss corrected per $\log|\mathcal M|^2$ bin back to the objective density; ``reused pool'': the
-  July runs that re-drew one pool every round (before the fairness fix). (a) Coverage base $f=0.25$, one seed, three
-  rounds. (b) Starved base $f=0$ (uniform in $\sqrt s$), objective $f=0.25$, geometric mean of three seeds (true-error
-  arm: seed 0 only). (c) Coordinate-free: the draw $\propto\sigma^{\gamma}$, $\gamma=1$, over the candidate pool with no
-  base density and no loss reweighting, against the fixed $f=0.25$ draw, three seeds each, six rounds (true-error arm:
-  seed 0). (\code{analysis/divergences/l2\_eeuu\_online.py --plot})}
+  \caption{Online $\sigma$-driven generation on $e^+e^-\to u\bar u$ ($\sqrt s$ from $91$ to $1000$\,GeV): the MSE of
+  $\ln|\mathcal M|^2$ averaged with equal weight over the $\sqrt s$ bins of the test set, after each round of
+  fine-tuning. Every round draws its training events from one labelled candidate pool. Legend: \emph{static}, every
+  round draws from the coverage base; \emph{reused}, the July runs that re-drew the same pool every round (before the
+  fairness fix), the others draw afresh; $\sigma^{\alpha}$ and $|r|^{\alpha}$, the base reweighted by the predicted
+  $\sigma$ or by $|r|$ to the power $\alpha$, where $r=\ln|\mathcal M|^2_{\rm pred}-\ln|\mathcal M|^2_{\rm true}$ is
+  the previous round's model's true residual (the best case a perfect $\sigma$ could reach); \emph{IS}, the loss
+  weighted per $\ln|\mathcal M|^2$ bin by the target density over the drawn density, which trains toward the objective
+  whatever the draw; \emph{IS only}, the static draw with that loss weight and no $\sigma$; $\sigma^{\gamma}$ and
+  $|r|^{\gamma}$, a draw $\propto\sigma^{\gamma}$ (or $|r|^{\gamma}$), $\gamma=1$, over the whole candidate pool with no
+  base density and no IS. (a) Coverage base $f=0.25$ (a quarter flat in $\log|\mathcal M|^2$, the rest uniform in
+  $\sqrt s$), one seed. (b) Starved base $f=0$ (uniform in $\sqrt s$) with the objective $f=0.25$, geometric mean of
+  three seeds ($|r|^{0.5}$: seed 0 only). (c) $\sigma^{\gamma}$ against the static $f=0.25$ draw, three seeds each
+  ($|r|^{\gamma}$: seed 0 only), six rounds. (\code{analysis/divergences/l2\_eeuu\_online.py --plot})}
   \label{fig:l2_eeuu_online}
 % allow: 0 0.25 0.5 1 2 because they are the arms' settings f, alpha and gamma, and the square in log|M|^2
+% allow: 91 1000 because they are the window edges in GeV, a setting
 \end{figure}
 
 \paragraph{Steering validated on $ee\to u\bar u gg$: $\sigma$-informed on-the-fly generation beats
