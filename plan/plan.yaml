@@ -16108,7 +16108,6 @@ entries:
       - 'committed: claudemd-keeper reviews it in its next backlog'
       - 'gate refuses: run the claudemd-keeper first'
   step_waits:
-    '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
     '14': 'Joaquin bringing back the deck cold-read agent (D261: ''we will do it later'')'
