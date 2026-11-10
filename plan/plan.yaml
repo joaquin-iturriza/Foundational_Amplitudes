@@ -20969,7 +20969,7 @@ entries:
   next:
     2: Close once the repo-reviewer passes its backlog containing ed3be235 (rung_grid.py zorder and line width)
   done_when: null
-  notes_ref: null
+  notes_ref: fig:rung_grid
   match: none
   evidence:
     runs: []
