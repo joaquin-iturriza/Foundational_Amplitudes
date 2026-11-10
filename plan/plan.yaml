@@ -20955,3 +20955,33 @@ entries:
     paths: []
   dead_ends: []
   asks: []
+- id: virtual_over_born
+  title: why learning the virtual over the Born fails for us, and making it work
+  question: Why does training on V/B (finite one-loop virtual over the exact Born) not work for us when the literature finds
+    it better than learning V alone, and what makes it work (D366)? It also gives the from-scratch V/B baseline with exact
+    Born that the KIT NLO protocol asks for.
+  status: running
+  quotes:
+  - said_at: '2026-11-10T02:08:07.285000+00:00'
+    text: In parallel to this we should really figure out why training on vitual/born doesn't work for us, or make it work,
+      everyone else who has done something like this does it, and claims it works better than learning the virtual corrections
+      by themselves, I see no reason why for us it doesn't, but that's what we saw many months ago.
+    decision: D366
+    covers:
+    - virtual_over_born
+  decisions:
+  - D366
+  next: 'Find the earlier V/B attempt (docs/results.tex, the draft line ''A virtual-over-Born ratio as the regression target
+    does not scale meaningfully'', the 2026-10-15 note), read its runs and code, state the cause with evidence (target range,
+    sign, standardization, loss, inputs, how V was recombined), then a matched test: V alone against V/B with exact Born on
+    ee->uu and ee->tt one loop at current defaults, read on MSE of the recombined V. Report fast: per D357 the one-loop runs
+    of pretrain_data_saving wait on it only if it resolves quickly.'
+  done_when: null
+  notes_ref: null
+  match: vob_*
+  evidence:
+    runs: []
+    commit: null
+    paths: []
+  dead_ends: []
+  asks: []
