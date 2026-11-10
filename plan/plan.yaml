@@ -21317,6 +21317,15 @@ entries:
       used. Context: the parent''s own median held-out 6-particle MSE after 68224 steps is 1.2e-2 (par:v4_length/size_figs),
       so 1e-4 at D<=1e5 from scratch on 2->3/2->4 catalog_v4 pools may be out of reach whatever the lr. Also ee->ttbar D=3162:
       last 7.8e-4 against best 3.3e-6 (a late spike).'
+  - at: '2026-11-10T07:04:51+00:00'
+    text: '2026-11-10 step 1 closed (analysis/data_saving/data/horizons_cal2.json @f280a9fc, 27 of 27, seed 42, fixed calibration
+      lr, val mu MSE x prepd_std^2). ee->ttbar: crosses 1e-4 from D=100; T(D) k=2..10 = 800, 1440, 4000, 2240, 2560, 1120,
+      4000, 1680, 1680; best 3.7e-9 at D=1e5. ee->ccbar g: best 4.1 (D=10) ... 4.0e-2 (1e4), 2.1e-2 (10^4.5, step 2400/12000),
+      3.8e-3 (1e5, 6240/12000): scratch crosses 1e-2 between 10^4.5 and 1e5. ee->bbbar gg: 4.1 ... 1.5e-1 (1e4), 5.3e-2 (10^4.5,
+      1200/12000), 1.7e-2 (1e5, 7920/12000): above 1e-2 at 1e5. Neither reaches 1e-4. Step rates at k=9,10: 0.40-0.42 (ttbar),
+      0.46-0.47 (ccbar g), 0.51-0.52 (bbbar gg) s/step. Their horizons come from phase a (the passed-rule T would be read
+      at a fixed lr whose best sits in the warm-up at k<=8). Phase a estimate from sweep/gen_data_saving.py @9f720993: 18
+      sweeps, 89.0 GPU-h.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
