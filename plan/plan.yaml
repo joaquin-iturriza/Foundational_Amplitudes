@@ -21283,10 +21283,9 @@ entries:
   decisions:
   - D363
   next:
-    1: 'Protocol A from scratch (10 runs) and protocol B (6 continuations), float64, design of 2026-11-10 (scripts/job_kit.sh
-      on branch kit_protoA): design review and repo review, merge, sync CC, CPU dry run of A and B on CC (off-shell mask line
-      N=P, float64, B''s parent stats), then submit A at site pick''s width and B on A''s end; ~23 GPU-h (estimate, float64
-      0.8 s/step assumed, read from the first jobs)'
+    1: 'Protocol A from scratch, 10 runs in flight on CC (design passed 2026-11-10 03:59, scripts/job_kit.sh at b2b18e01):
+      on their end read each log (step rate in float64, kit_predict scores), then submit B and B_bulk (12 x 3000 steps) from
+      the six n=9e5 runs at site pick''s width; then the readout against Bakar''s MLP table'
     2: 'KIT pretrainings with whole families held out (design): one catalog_v4 pretraining without ee->qqbar g and ee->qqbar
       gg of every flavour (incl. bbxg, ccxgg, accxg-free check) but with the ee->tt Born and at most 10 other one-loop pools
       bulk only (Bakar''s fair NLO pretraining, also protocol A''s parent for uug/uugg), and one without the ee->tt family
@@ -21362,9 +21361,8 @@ entries:
     1:
       feeds: the from-scratch KIT numbers against Bakar's MLP and the control of every later arm
       if:
-      - 'exponents within 0.1 of exact and deepest bins below the MLP: extrapolation holds, the pretrained arm tests the gain'
-      - 'exponents flat or deep bins above the MLP: report the failure per family; B says whether showing the region fixes
-        it'
+      - 'exponents within 0.1 of exact and deep bins below the MLP: extrapolation holds'
+      - 'exponents flat or deep bins above the MLP: per-family failure; B and B_bulk say whether the hard data fixes it'
     2:
       feeds: protocol A pretrained and the fair NLO D-scan's parent
       if:
