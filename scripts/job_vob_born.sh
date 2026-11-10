@@ -4,6 +4,9 @@
 #SBATCH --time=01:15:00
 # Wall-time target: 6 pools in parallel, the largest 50000 rows of a 2->2 MadLoop point (estimate, at most
 # 10 ms per point: 8 min), plus the two standalone builds and pole checks (estimate 10-20 min each, serial): 0.8 h.
+# With arguments (plan pretrain_data_saving): one-loop processes as <mg process>:<lo>-<hi> (mg5_pipeline_final names,
+# e.g. v4_bg_ab_nlo:20-6000), each built and certified in parallel, then its three pools read in parallel; set
+# --cpus-per-task to 3 x the processes at submit.
 #SBATCH --output=vob_born_%j.out
 #SBATCH --error=vob_born_%j.out
 #
@@ -20,16 +23,26 @@ CACHE=$(python -c "import datagen; print(datagen.train_cache_dir())")
 FROZEN=$(python -c "import datagen; print(datagen.frozen_dir())")
 OUT="$SCRATCH/zz_vob_born_${SLURM_JOB_ID:-local}"
 mkdir -p "$OUT"
-# the MadLoop standalones are not kept between generations (D208): build and pole-certify each once, serially
-python -c "import datagen; [datagen.ensure_virt_backend(p) for p in ('ee_uu_nlo', 'ee_ttbar_nlo')]" || exit 1
+SPECS=("$@"); [ ${#SPECS[@]} -gt 0 ] || SPECS=(ee_uu_nlo:25-1000 ee_ttbar_nlo:362-1000)
+PROCS=(); for s in "${SPECS[@]}"; do PROCS+=("${s%%:*}"); done
+# the MadLoop standalones are not kept between generations (D208): build and pole-certify each once; distinct
+# standalones share no state (datagen.ensure_backends), so they build in parallel
+bpids=()
+for p in "${PROCS[@]}"; do
+  python -c "import datagen; datagen.ensure_virt_backend('$p')" > "$OUT/build_$p.log" 2>&1 &
+  bpids+=($!)
+done
+for b in "${bpids[@]}"; do wait "$b" || { tail -n 30 "$OUT"/build_*.log; exit 1; }; done
 pids=()
-for spec in "ee_uu ee_uu_nlo_25-1000GeV" "ee_ttbar ee_ttbar_nlo_362-1000GeV"; do
-  set -- $spec
+for s in "${SPECS[@]}"; do
+  p="${s%%:*}"; w="${s#*:}"
+  base=$(python -c "import mg5_pipeline_final as mg; print(mg.PROCESSES['$p']['virt_base'])") || exit 1
   for role in train val test; do
     d=$FROZEN; [ "$role" = train ] && d=$CACHE
-    pool="$d/${2}_${role}_amplitudes.npy"
-    python tools/nlo_virtual_pipeline.py "$1" --born-of "$pool" --n 100000000 --out "$OUT/${2}_${role}.npz" \
-      > "$OUT/${2}_${role}.log" 2>&1 &
+    pool="$d/${p}_${w}GeV_${role}_amplitudes.npy"
+    [ -e "$pool" ] || { echo "no pool $pool"; exit 1; }
+    python tools/nlo_virtual_pipeline.py "$base" --born-of "$pool" --n 100000000 --out "$OUT/${p}_${w}GeV_${role}.npz" \
+      > "$OUT/${p}_${role}.log" 2>&1 &
     pids+=($!)
   done
 done

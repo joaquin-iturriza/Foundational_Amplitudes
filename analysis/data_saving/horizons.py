@@ -22,7 +22,7 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from analysis.common.readers import site_python  # noqa: E402
 
-TARGETS = ["epem_ttx", "epem_ccxg", "epem_bbxgg"]
+TARGETS = ["epem_ttx", "epem_ccxg", "epem_bbxgg", "bbx_zz_nlo", "uux_epemz_nlo", "bg_ab_nlo", "epem_ddxz_nlo"]
 LEVEL = 1e-4
 
 REMOTE = r'''
