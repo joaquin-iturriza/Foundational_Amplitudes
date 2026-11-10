@@ -20939,9 +20939,9 @@ entries:
     - 6
   owner:
     agent: a3907d6d36879af7b
-    state: working
+    state: stopped
     since: '2026-11-10T09:01:19+00:00'
-    state_at: '2026-11-10T09:58:00.136000+00:00'
+    state_at: '2026-11-10T10:00:03.507000+00:00'
     context: 241718
     context_at: '2026-11-10T10:00:02+00:00'
   step_why:
@@ -21881,7 +21881,7 @@ entries:
     agent: a674b9b77e97e3012
     state: working
     since: '2026-11-10T09:30:58+00:00'
-    state_at: '2026-11-10T09:57:58.203000+00:00'
+    state_at: '2026-11-10T09:59:57.272000+00:00'
     context: 193570
     context_at: '2026-11-10T09:58:02+00:00'
   findings:
