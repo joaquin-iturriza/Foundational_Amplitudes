@@ -163,6 +163,13 @@ def section1_pools(d):
     hb = np.load(datagen.ensure_dataset("kit_ee_uug__me2__hard", 1000, 1000, 500, role="train", seed=42))
     assert tr.shape[0] == 500 and va.shape[0] == 100 and te.shape[0] == 200 and hb.shape[0] == 550
     assert np.array_equal(hb[:500], tr), "the hard variant's bulk part differs"
+    assert "_n500_" in os.path.basename(datagen.ensure_dataset("kit_ee_uug__me2", 1000, 1000, 500, role="train",
+                                                                seed=42)), "the pool name lacks its event count"
+    try:
+        mg.register_recipe_processes([{"name": "kit_ee_uug__me2", "n_train": 550, "n_val": 100}])
+        raise AssertionError("an overlapping train/val layout was accepted")
+    except AssertionError as e:
+        assert "overlap" in str(e), e
     trs, vas = {r.tobytes() for r in tr}, {r.tobytes() for r in va}
     assert not trs & vas, "val shares events with train"
     print("section 1: pools (roles, hard variant, val disjoint, beams, alpha_s stripping, order vectors) OK")

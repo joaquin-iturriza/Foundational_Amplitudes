@@ -301,6 +301,9 @@ def register_recipe_processes(specs, default_sampling=None):
         base = s.get("base", name)
         if is_kit(base):
             register_kit(base)
+            if s.get("n_train") is not None and s.get("n_val") is not None:
+                from tools import kit_hardps
+                kit_hardps.check_disjoint(base, int(s["n_train"]), int(s["n_val"]))
         if is_synthetic(base):
             register_synthetic(base)
         physics = s.get("physics")
@@ -4955,6 +4958,9 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
     return recipe
 
 def recipe_output_path(recipe, out_dir):
+    if recipe.get("mode") == "kit":
+        from tools import kit_hardps
+        return kit_hardps.pool_path(recipe, out_dir)
     role_tag = f"_{recipe['role']}" if recipe.get("role") else ""
     # a shaped (mixture) pool never shares a path with the flat pool of the same spec
     mode = (recipe.get("sampling") or {}).get("mode", "flat")

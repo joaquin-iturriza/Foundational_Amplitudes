@@ -55,6 +55,9 @@ def predict(run_dir, splits, out):
     pool = os.path.join(out, "kit_strata_pool.npy")
     np.save(pool, rows)
     exp, loader = rebuild(run_dir, "test", pool, len(rows))
+    trafos = [list(t) for t in (getattr(exp, "_amp_trafos_pp", None) or [exp.cfg.data.amp_trafos])]
+    assert all(t == ["log", "standardization"] for t in trafos), (
+        f"the residual is ln-exact only under [log, standardization]; the run resolved {trafos}")
     with torch.no_grad():
         pred, truth, _ = exp._collect_predictions(loader)
     res_ln = (np.asarray(pred, np.float64).reshape(-1) - np.asarray(truth, np.float64).reshape(-1)) \

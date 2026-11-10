@@ -101,11 +101,37 @@ def catalog_entry(name):
     }
 
 
+def file_sha256(path):
+    """sha256 of a benchmark file, cached beside it in <file>.sha256 keyed on its size and mtime (hashed once per site
+    and release: a corrected release of the same size gets a new identity)"""
+    import hashlib
+    st = os.stat(path)
+    key = f"{st.st_size} {st.st_mtime_ns}"
+    side = path + ".sha256"
+    try:
+        k, h = open(side).read().split("\n")[:2]
+        if k == key:
+            return h
+    except (OSError, ValueError):
+        pass
+    d = hashlib.sha256()
+    with open(path, "rb") as f:
+        for b in iter(lambda: f.read(1 << 24), b""):
+            d.update(b)
+    h = d.hexdigest()
+    try:
+        tmp = f"{side}.tmp{os.getpid()}"
+        open(tmp, "w").write(f"{key}\n{h}\n")
+        os.replace(tmp, side)
+    except OSError:
+        pass
+    return h
+
+
 def recipe(name, sqrts_min, sqrts_max, n_events, role, seed):
-    """The identity of a KIT pool (recipe_id hashes it): the file (its size and mtime stand for its content), the
-    target, the variant, the role and the events."""
+    """The identity of a KIT pool (recipe_id hashes it): the file's sha256, the target, the variant, the role and the
+    events."""
     stem, target, variant = parse(name)
-    st = os.stat(h5_path(stem))
     cfg = catalog_entry(name)
     return {
         "process": name,
@@ -120,7 +146,7 @@ def recipe(name, sqrts_min, sqrts_max, n_events, role, seed):
         "alphas_power": cfg["alphas_power"],
         "amp_orders": cfg["order"],
         "kit_file": f"{stem}.h5",
-        "kit_file_size": int(st.st_size),
+        "kit_file_sha256": file_sha256(h5_path(stem)),
         "kit_target": target,
         "kit_variant": variant,
         "kit_strip": "alpha_s/2pi per loop",
@@ -165,7 +191,8 @@ def role_rows(name, role, n_events):
 
 
 def check_disjoint(name, n_train, n_val):
-    """train (the first n_train of bulk_train) and val (its last n_val) share no event."""
+    """train (the first n_train of bulk_train) and val (its last n_val) share no event: refused otherwise (called by
+    mg5_pipeline_final.register_recipe_processes for every KIT spec)."""
     import h5py
     stem, _, _ = parse(name)
     with h5py.File(h5_path(stem), "r") as f:
@@ -173,8 +200,15 @@ def check_disjoint(name, n_train, n_val):
     assert n_train + n_val <= N, f"{name}: n_train {n_train} + n_val {n_val} > bulk_train {N}: train and val overlap"
 
 
+def pool_path(rec, out_dir):
+    """A KIT pool's path: its event count in the name, so pools of one dataset at different sizes never share a file
+    (two runs of a data-size scan at once)"""
+    return (f"{out_dir}/{rec['process']}_{rec['sqrts_min']:.0f}-{rec['sqrts_max']:.0f}GeV"
+            f"_{rec['role']}_n{int(rec['n_events'])}_kit_amplitudes.npy")
+
+
 def build_pool(rec, out):
-    """Write the pool of recipe `rec` at `out` (atomically: concurrent trials may build the same pool)."""
+    """Write the pool of recipe `rec` at `out` (atomically: concurrent trials of one size build identical bytes)."""
     rows = role_rows(rec["process"], rec["role"], rec["n_events"])
     tmp = f"{out}.tmp{os.getpid()}.npy"
     np.save(tmp, rows)
