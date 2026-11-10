@@ -20913,6 +20913,42 @@ entries:
     state_at: '2026-11-10T02:21:46+00:00'
     context: 153886
     context_at: '2026-11-10T02:25:30+00:00'
+  designs:
+  - at: '2026-11-10T02:27:57+00:00'
+    question: 'Step pidqn (D364: ''I''d like to see the claim that pIDs and quantum numbers behave the same be tested again
+      on our latest setup''): on the latest catalog_v4 pretraining cell, does a one-hot PDG token (data.use_PIDs=true) reach
+      the same error as the quantum-number encoding in distribution, and on held-out classes whose particles were all seen;
+      how many held-out probes can the one-hot model not encode at all?'
+    prior: 'Searched docs/results.tex (use_PIDs, one-hot, pid_vs_phys, prin:zeroshot, tab:enc), plan show optimizations_recap,
+      site decisions --project FA (pid, quantum). Found: (1) analysis/pid_vs_phys/plot_pid_vs_phys.py, sweeps pretrain25_zs_pid_002
+      vs pretrain25_zs_phys_002, 25 LO e+e- processes, 15 trial pairs at identical HPs, AdamW, MSE, 3000 steps: the two encodings
+      overlap (draft fig pid_vs_phys; no number in results.tex). (2) prin:zeroshot: pretrain25_zs with ee->uu, ee->tt and
+      the top removed: quantum numbers zero-shot MSE 0.22 / 0.51 (standardized), one-hot cannot represent the top. (3) tab:enc:
+      encoding sub-options of the property vector, not one-hot. This design differs: catalog_v4 (1301 PP4 + 169 EE4 classes,
+      share 0.25), het loss, Muon, dimensionless inputs, arXiv:2606.23791 diagram encoder, whole train pool, and held-out
+      reads.'
+    measure: 'R = median over classes of the class geometric mean of MSE_pid / MSE_qn, MSE of ln|M|^2 at each run''s final
+      model (best checkpoint mean, then the sigma fit, D276), on PP4 and EE4 (test pools of the training classes: in distribution),
+      and on the held-out reads (H1-H7c, HD4, HD5) restricted to probes the pid model can encode; 95% class bootstrap widened
+      by |ln R_seed| as par:v4_width. Plus the count of held-out probes refused for an unseen PDG, and the pooled validation
+      MSE (geometric mean over training pools) of each run.'
+    check: 'The measure resolves changes of this size on existing data: on the same 1x width-8 cell the width-16 change moved
+      PP4 R to 0.565 [0.522, 0.614] over 1301 classes (par:v4_width), and analysis/catalog_v4/data/seed_spread.json gives
+      the seed-to-seed |ln R_seed| on het runs median 0.10, q90 0.23, so R outside [0.80, 1.26] is resolved and a 1.1x-1.3x
+      encoding effect (the size of tab:enc''s colour/MLP deltas) is at the edge.'
+    fixed: 'Everything of the 1x width-8 cell v4_het_default25 LONG_HEADS=8 LONG_FACTOR=1 (scripts/job_catalog_v3_short.sh
+      at the submission commit): catalog_v4 share 0.25 recipe, whole train pool, 4264 steps at batch 16384, het loss, MuonAdamW
+      at the Muon search best (lr 4.997e-3, wd 0.0217), dimensionless inputs and the emission-scale target, diagram encoder
+      llm4lhc, off-shellness, coupling-order scalars, seed 42, the same reads (H1 H2 H2p5 H3 H5 H6 H7E H7c PP4 EE4 HD4 HD5).
+      Only data.use_PIDs differs; under use_PIDs there is no mass column (one-hot has none), the rest identical.'
+    control: 'PIDQN=qn: the same cell, quantum-number encoding, rerun at the same commit in its own run dir (runs/catalog_v4_long/v4_het_default25_w8_x1_pidqn_qn);
+      also compared with the existing cell FA-ccin2p3-804a65bc as a rerun check.'
+    seeds: one seed (42) per arm, per D315 ('I see no reason to keep doing multiple seeds ... the variation seems to be pretty
+      consistent'); the seed spread is read from seed_spread.json (het |ln R_seed| median 0.10, q90 0.23).
+    outcome: 'Yes, they behave the same: in-distribution R on PP4 and EE4 inside [0.80, 1.26] (the seed q90 band) with its
+      interval overlapping 1. No: R outside it, the sign saying which encoding is better. Held out: R on encodable probes
+      read the same way; every probe with an unseen particle (if any) is a case one-hot cannot predict at all, which is the
+      extrapolation argument for quantum numbers.'
 - id: kit_benchmark
   title: the KIT hard phase-space benchmark and the fair NLO protocol (Bakar, Gudrun)
   question: 'On the KIT datasets (ee->tt Born and one-loop virtual, ee->uug, ee->uugg; hard bins by distance to the singularity):
