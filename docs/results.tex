@@ -10027,7 +10027,7 @@ $f{=}0$ catastrophic ($230\times$ the best log-flat MSE; this read $\sim$200$\ti
 location inside the basin is single-seed noise ($f{=}0.5$ sits above both neighbours). Metrics
 reported: MSE and MAE of $\Delta\ln|\mathcal{M}|^2$ (both scale-invariant, since the residual is
 $\ln$ of the amplitude ratio) plus median relative error.
-% src: python3 analysis/divergences/sampling_numbers.py @fd9c36a2
+% src: python3 analysis/divergences/sampling_numbers.py @d4e775ae
 % claim: deep.uniform_train_below_1e-5_per_1e6=5
 % claim: deep.uniform_medrel_deepest_pct=47.9
 % claim: deep.antenna_medrel_deepest_pct=1.4
@@ -10062,7 +10062,7 @@ $\ln$ of the amplitude ratio) plus median relative error.
   the basin is single-seed noise. This ``mix the coverage criterion in at a modest fraction, do not adopt
   it as the base'' shape recurs for the $Z$ resonance (Fig.~\ref{fig:eeuu_genmix_fraction_sweep}).}
   \label{fig:deep_sampling_fraction_sweep}
-% src: python3 analysis/divergences/sampling_numbers.py @fd9c36a2
+% src: python3 analysis/divergences/sampling_numbers.py @d4e775ae
 % claim: fraction.f0_over_best=230
 % claim: fraction.f1_over_best=2
 \end{figure}
@@ -10074,7 +10074,7 @@ $[10^{-6},10^{-5})$, $\times{\sim}8$ per decade, negligible by $10^{-3}$. All cu
 well \emph{above} this (short trainings), so they are optimisation-limited, not precision-limited. If ever
 precision-limited, reparametrise (feed $\ln y_{\min}$ / pair masses as features) rather than store
 float64.
-% src: python3 analysis/divergences/sampling_numbers.py @fd9c36a2
+% src: python3 analysis/divergences/sampling_numbers.py @d4e775ae
 % claim: float32.deepest_pct=0.39
 % claim: float32.per_decade_ratio.0=8
 
@@ -10113,11 +10113,14 @@ sweep:} \code{sweep\_heterosc\_foundation.sh} (same 22-proc leave-uug-out recipe
 iters). After the fix $\mu$ fits: best lr$=4\mathrm{e}{-}3$, $\beta{=}1$ gives in-distribution val
 $\mu$-MSE $=0.025$, and $\beta$ dominates ($\beta1\!\ll\!\beta0.5\!\ll\!\beta0$, a $\sim$9$\times$
 gap $\Rightarrow$ the Seitzer $\sigma$-inflation effect is real). Rank: \code{rank\_mu\_mse.py}.
-% src: python3 analysis/divergences/sampling_numbers.py @fd9c36a2
+% src: python3 analysis/divergences/sampling_numbers.py @d4e775ae
 % claim: foundation.best_mse=0.025
 % claim: foundation.b0_over_b1_lr0.004=9
 
 \paragraph{The coupled fit fails for a structural reason; two-stage $\sigma$ works. (Withdrawn 2026-10-15: the mechanism below is wrong, see the correction that follows.)}
+(The numbers of this paragraph are read from job logs that survive only in the Jean Zay worktree
+\code{wt-heterosc}: the gradient decomposition from \code{graddec\_*.out} and \code{clip\_*.out}, the two-stage results
+from \code{twostage\_*.out}, \code{twostage2\_*.out} and \code{calib\_*.out}; no committed reader recomputes them.)
 The coupled $(\mu,\sigma)$ NLL underfit $\mu$ ($\mu$-MSE $\sim$1 or $\gg$ the MSE baseline) across
 $\sim$40 GPU-h of runs and three sweeps. Mechanism (\code{grad\_decomp.py}, \code{clip\_test.sh}):
 amplitudes are \emph{deterministic} (no aleatoric noise), so the Gaussian likelihood is degenerate
@@ -10509,7 +10512,9 @@ diagonal. Right: the test pulls $(\mu-\log|\mathcal M|^2)/\sigma'$, with $\mathc
 \label{fig:het_recal}
 \end{figure}
 
-\paragraph{The $\sigma$ step costs $\sim$1 min, not the recipe's 600 iters.} $\sigma$-only is
+\paragraph{The $\sigma$ step costs $\sim$1 min, not the recipe's 600 iters.} (The numbers of this paragraph are
+read from the job logs \code{sigspeed\_*.out} of \code{runs/heterosc\_sigspeed}, which survive only in the Jean Zay
+worktree \code{wt-heterosc}; no committed reader recomputes them.) $\sigma$-only is
 a frozen-trunk 258-param readout, so the whole trajectory is one short run. Probing the
 $\sigma$-\emph{ranking} per validation step (\code{sigma\_speed\_probe.py} $\to$
 Spearman$(\sigma,|r|)$ global + per-process median; \code{sigma\_speed.sh}, constant-lr to avoid
@@ -10542,7 +10547,10 @@ heuristics (rank, weak $\sigma$) starve the bulk and can \emph{net-hurt} (a $\rh
 $\sigma$ scores $-9$\% under equal footing). So calibration matters more than a pure-rank framing
 suggests (Figs.~\ref{fig:q2_logflat}, \ref{fig:q2_rankmag}; supplementary \code{q2\_confirm},
 \code{q2\_dense}).
-% src: python3 analysis/divergences/sampling_numbers.py @fd9c36a2
+% src: python3 analysis/divergences/sampling_numbers.py @d4e775ae
+% claim: q2.logflat_gain_pct.sigma=80
+% claim: q2.logflat_gain_pct.rank_real=11
+% claim: q2.logflat_gain_pct.deg029=-9
 % claim: q2.event_gain_pct.sigma=87
 % claim: q2.test_pct_below_1e-3=50
 % claim: deep.antenna_bulk_mse=1.3e-2
@@ -10557,6 +10565,10 @@ suggests (Figs.~\ref{fig:q2_logflat}, \ref{fig:q2_rankmag}; supplementary \code{
   flatters any deep-IR-following heuristic. Under equal footing the real $\sigma$ head captures
   $\sim\!80\%$ of the perfect-oracle reweighting gain ($87\%$ event-weighted) and improves \emph{every}
   decade, bulk included.}
+% src: python3 analysis/divergences/sampling_numbers.py @d4e775ae
+% claim: q2.logflat_gain_pct.sigma=80
+% claim: q2.event_gain_pct.sigma=87
+% claim: q2.test_pct_below_1e-3=50
   \label{fig:q2_logflat}
 \end{figure}
 
@@ -10570,14 +10582,17 @@ suggests (Figs.~\ref{fig:q2_logflat}, \ref{fig:q2_rankmag}; supplementary \code{
   $8\times10^{-4}$), and only $\sigma$'s calibrated \emph{magnitude} points there. Deep-IR-following
   heuristics starve the bulk and can net-hurt: a $\rho{=}0.29$ synthetic $\sigma$ scores $-9\%$. This
   is why a pure-rank framing of $\sigma$ quality is misleading.}
+% src: python3 analysis/divergences/sampling_numbers.py @d4e775ae
+% claim: q2.logflat_gain_pct.rank_real=11
+% claim: q2.logflat_gain_pct.deg029=-9
+% claim: deep.antenna_deepest_mse=8e-4
   \label{fig:q2_rankmag}
 \end{figure}
 
 \paragraph{Coverage vs.\ emphasis, and the general default sampling.} The decisive
 structural finding: \textbf{$\sigma$-reweighting controls emphasis, not coverage: it cannot beat
 the coverage the training pool already has}. The antenna pool holds only $4$\% ($16$k) bulk events,
-so even the \emph{oracle} cannot fit the bulk ($8.6\!\times\!10^{-3}$, from the per-decade evaluation files
-\code{q2rw\_eval\_oracle.npz}, which are deleted) as well as the sampling-study
+so even the \emph{oracle} cannot fit the bulk ($8.6\times10^{-3}$) as well as the sampling-study
 $f=0.5$ mixture ($2.2\times10^{-3}$), which \emph{generates} bulk events (uniform/\textsc{rambo} fills
 $[10^{-1},10^0)$ at $63$\%, antenna at $4$\%; the two are complementary, $0$\% uniform coverage in
 the two deepest decades). The mixture ``wins overall'' by \emph{coverage}, which no reweighting of a
@@ -10599,8 +10614,9 @@ $\sigma$-reweighting $\pi\!\propto\!\sigma^\alpha$ (no physical binning, process
 generation}, the only layer that lets $\sigma$ overcome the coverage ceiling, by generating where
 $\sigma$ is high \emph{and} data is sparse. The code and figure names for the steering layer carry an
 older \code{l2\_} prefix.
-% src: python3 analysis/divergences/sampling_numbers.py @fd9c36a2
+% src: python3 analysis/divergences/sampling_numbers.py @d4e775ae
 % claim: coverage.antenna.pct.5=4
+% claim: q2.bulk_mse.oracle=8.6e-3
 % claim: coverage.antenna.bulk_events_k=16
 % claim: fraction.bulk_mse.f0.5=2.2e-3
 % claim: coverage.uniform.pct.5=63
@@ -10723,7 +10739,7 @@ resonance eval (\code{eval\_eeuu\_resonance.py}) corrupted \emph{every tag after
 \emph{not} fix it $\Rightarrow$ in-process, not file-based). Fix: self-dispatch one tag per subprocess,
 merge summaries. The corrected re-eval is what the numbers above report; the pre-fix ``$f{=}0.5$ noise
 bump'' was this corruption, not seed noise.
-% src: python3 analysis/divergences/sampling_numbers.py @fd9c36a2
+% src: python3 analysis/divergences/sampling_numbers.py @d4e775ae
 % claim: leak.mix025_tag1_logflat=3.5e-5
 % claim: leak.mix025_tag2_logflat=2.1e-4
 % allow: 1 2 because they are tag positions, not results
