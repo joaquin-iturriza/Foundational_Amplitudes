@@ -20505,6 +20505,15 @@ entries:
       win is a different setting (coordinate-free vs uniform base on uugg); the concentration principle predicts the starved-base
       gain over uniform (5.25x) but not the panel (c) null against a pole-covering base, and no study controls sigma against
       plain loss reweighting.'
+  - at: '2026-11-10T00:11:59+00:00'
+    text: 'Provenance pass (sigma-gen 4b9353f1): reader analysis/divergences/sampling_numbers.py (@d4e775ae) claims the deep-sampling,
+      fraction-sweep, float32-floor, foundation-grid, coverage, Q2 and eval-leak paragraphs; Q2 log-flat gains recomputed
+      from q2rw_eval_*.npz on the Jean Zay main checkout (q2_logflat_gains.json): sigma 80%, order only 11%, degraded sigma
+      -9%, oracle bulk 8.6e-3 all reproduce. Corrected: fraction sweep f=0 over best log-flat 230x, not ~200x. Marked as from
+      JZ job logs: sigma-speed paragraph, withdrawn two-stage paragraph. The JZ main checkout also holds heldout_eval_*.npz
+      and l2_*.npz for the uugg/bbg paragraphs. Online figure redrawn with short corner legends (61565cc0), caption defines
+      every symbol (877adb20). Remaining: October het paragraphs (ttbar: het_ab/het_sweep/het_long/het_sigonly print text,
+      need JSON; cells D47-D94), uugg-and-later paragraphs, uug/ee->uu label check in the pre-flight paragraph, header block.'
   step_why:
     1:
       feeds: 'whether the July studies carry over: what they found, recorded reproducibly'
