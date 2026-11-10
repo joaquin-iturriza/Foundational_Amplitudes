@@ -20449,7 +20449,7 @@ entries:
       covers this entry)
   owner:
     agent: a1c22b0fc38cc284c
-    state: working
+    state: closed
     since: '2026-11-10T00:45:23+00:00'
     state_at: '2026-11-10T00:45:27+00:00'
     context: 158283
@@ -20569,32 +20569,16 @@ entries:
     '2': 'step 1 (order set by the main session: step 1 first)'
     '1': repo-reviewer a437be4394e3e0f7d
   handoff:
-    state: 'Step 1 provenance DONE on branch sigma-gen (worktrees/wt-sigma-gen, pushed, tip after 1d203e8d + caption fix):
-      every numbered paragraph of sec:div-sampling has src/claim lines or a visible source mark; verify_claims 0 problems;
-      notes-editor PASSED (advanced to 692a1ee2; its non-blocking poly-wording note applied). repo-reviewer launched on the
-      sigma-gen code backlog (agent a437be4394e3e0f7d, lock held, running at hand-off): on PASS merge sigma-gen into trunk;
-      on FIX continue that same reviewer with the fix commits. Step 2 (D338) STARTED in worktrees/wt-july-port (branch july-port
-      from trunk, NOT committed): all 77 absent branch scripts copied from origin/l2-gen and mechanically ported (scratchpad
-      port.py: #SBATCH account/partition/qos dropped, module/conda lines replaced by the ccorch header + sites/activate.sh,
-      Jean Zay paths -> $PROJECT_DIR / siteconf.PROJECT_DIR / ${PROJECT_DIR}), 5 sweep configs renamed sweep_config_heterosc_*.yaml
-      / sweep_config_mse_scratch.yaml with paths blocks emptied (their comments still say project_dir must be the heterosc
-      worktree: rewrite), adaptive_ir.py placed at analysis/divergences/adaptive_ir.py; bash -n and py_compile pass. The commit
-      was REFUSED by dupcheck (e.g. rank_mu_mse.mu_mse_for_run ~ diag_ckpt_mu.eval_ckpt 0.88; slice_mu_head._load = extract_preds.load_finetuned_state
-      1.00): next owner resolves each (import the existing function, or ''# dup-ok: <reason>'' for a historical launcher),
-      then commits. Still to do in step 2: training.is_weight_path from l2-gen 5fe8545d and base_plots.plot_mse png+pdf onto
-      trunk core (CPU test), the 3 DIFF analysis scripts (grow_sigma_head, plot_genmix_sweep, plot_q2_rankmag: keep trunk''s
-      later form, check nothing lost), update results.tex mentions of branch adaptive-ir and worktree wt-heterosc (header
-      block, allocation paragraph) to the trunk paths, repo-reviewer, merge, then delete origin/heterosc, origin/l2-gen, origin/adaptive-ir.'
-    decisions: Numbers not reproduced are corrected in place quoting the old value; numbers without a committed reader are
-      marked in the text with their source. Jean Zay-only eval files are read through steering_numbers.py --fetch (site_python,
-      read-only) into a committed summary JSON. b bbar g seeds 1 and 2 (found on JZ) added to the text, replacing the single-seed
-      caveat. het_stage2.py reads trial HPs from driver_state.json (no surrogate pickle) so it runs in .venv-cpu. train_pool_sigma_antenna.npz
-      (12.8 MB, gitignored data, tracked only on l2-gen) copied untracked into the main checkout analysis/divergences/. Sweep
-      configs renamed without jeanzay_.
-    ruled_out: throwaway one-liners as sources; committing regenerated JSONs that differ only by float noise (het_mumse22_summary.json
-      reverted)
-    running: repo-reviewer a437be4394e3e0f7d on sigma-gen (no jobs)
-    files: 'worktrees/wt-sigma-gen: docs/results.tex sec:div-sampling, analysis/divergences/steering_numbers.py + steering_eval_summary.json,
-      analysis/transfer/het_{delta_summary,23_summary,shared_summary,mumse_summary,mumse22_summary,finale_s1,stage2}.py; worktrees/wt-july-port
-      (uncommitted port); scratchpad port.py and port_inventory.txt in /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/'
-    written: '2026-11-10T00:43:00+00:00'
+    state: 'Steps 1 and 2 DONE: the July heterosc/l2-gen work is on trunk (sigma-gen merge 95c90f29, july-port merge 13cbb9e3),
+      with every numbered paragraph of sec:div-sampling carrying src/claim lines or a visible source mark. origin/heterosc
+      and origin/l2-gen deleted. Open: origin/adaptive-ir waits on Joaquin''s word to delete it (its file is identical on
+      trunk); step 3, sigma-driven generation (D339), not started.'
+    decisions: Bayes cost reported for the sweep's three widest posteriors, not a hand-set sigma_rel band; is_weight_path
+      weights the training loss only, refused for multi-process runs and on the LLOCA_PROC_LOSS=loop path; extract_sigma_eeuu
+      folded into extract_train_pool_sigma --process; the 3 differing scripts keep trunk's later form; het_mumse22_summary
+      JSON at 6 significant digits
+    ruled_out: dup-ok overrides for the flagged duplicates (they were imported or merged instead)
+    running: nothing
+    files: experiment.py _is_weighted/_get_is_weights; config/default.yaml is_weight_path; base_plots._save_pair; tests/test_is_weight_path.py,
+      tests/test_base_plots_pair.py; analysis/divergences/* (ported); sweep/sweep_config_heterosc_*.yaml, sweep_config_mse_scratch.yaml
+    written: '2026-11-10T01:07:14+00:00'
