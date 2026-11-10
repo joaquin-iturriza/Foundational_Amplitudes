@@ -22550,11 +22550,19 @@ entries:
   match: vob_*
   evidence:
     runs:
+    - FA-ccin2p3-063dac3b
+    - FA-ccin2p3-14422e67
+    - FA-ccin2p3-598dfe92
+    - FA-ccin2p3-961f2e40
+    - FA-ccin2p3-9786b534
+    - FA-ccin2p3-a85d22e5
+    - FA-ccin2p3-b5d4830c
     - FA-ccin2p3-d0c0e4cd
-    commit: 9bcd69e3
+    commit: d767344e
     paths:
     - analysis/virtual_over_born/data/june_targets_site.json
     - analysis/virtual_over_born/data/pool_targets_site.json
+    - analysis/virtual_over_born/data/seed_mse_site.json
     - analysis/virtual_over_born/figs/june_vob.png
     - analysis/virtual_over_born/june_targets.py
     - analysis/virtual_over_born/pool_targets.py
