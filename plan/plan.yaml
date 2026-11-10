@@ -21375,8 +21375,14 @@ entries:
   notes_ref: null
   match: kit_*
   evidence:
-    runs: []
-    commit: cb1e385b
+    runs:
+    - FA-ccin2p3-2c922af4
+    - FA-ccin2p3-88aa155a
+    - FA-ccin2p3-ac4868da
+    - FA-ccin2p3-b99b09db
+    - FA-ccin2p3-c8ac36f0
+    - FA-ccin2p3-de744946
+    commit: 0e02e74a
     paths:
     - tests/test_kit_hardps.py
     - tools/kit_hardps.py
