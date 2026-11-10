@@ -10152,24 +10152,38 @@ user's loss (\code{training.loss=HETEROSC}, \code{heterosc\_beta=0}, the new
 $D=10^4$, $8$k steps, seed 2, at the MSE baseline's own HPs (\code{tp\_scr\_ee\_ttbar\_d8/trial\_0144},
 the best of its 8-trial DyHPO sweep), V100, \code{sign\_head} off (a positive probe): $\mu$-MSE (val, standardized
 $\log|\mathcal M|^2$) $1.37\times10^{-7}$ against the MSE baseline's $3.57\times10^{-7}$, i.e.\
-$2.6\times$ lower error; test $6.4\times10^{-8}$, mean $|\Delta|=10^{-4}$. The $\mu$-MSE falls steadily
+$2.6\times$ lower error (read from the two runs' results on CC, \code{runs/zz\_het\_ab} and
+\code{tp\_scr\_ee\_ttbar\_d8/trial\_0144}; no committed reader); test $6.4\times10^{-8}$, mean $|\Delta|=10^{-4}$. The $\mu$-MSE falls steadily
 to the last step, which is also the best checkpoint. On the test split (\code{analysis/transfer/het\_ab.py}, figures
 \code{het\_ab\_delta}, \code{het\_ab\_pull}, \code{het\_ab\_calib}; Fig.~\ref{fig:het_ab}) the median $|\Delta|$ is
-$5.0\times10^{-5}$ against the MSE model's $1.4\times10^{-4}$. Calibration is not there yet: pull mean
-$0.00$, std $0.46$, so $\sigma$ is about $2\times$ too large; $\sigma$ barely varies ($\approx4$ to
+$5.1\times10^{-5}$ against the MSE model's $1.4\times10^{-4}$ (this read $5.0\times10^{-5}$ before the reader). Calibration is not there yet: pull mean
+$0.01$, std $0.45$ (read $0.00$ and $0.46$ before), so $\sigma$ is about $2\times$ too large; $\sigma$ barely varies ($\approx4$ to
 $6\times10^{-4}$ over its deciles) while the actual error spans $10^{-4}$ to $6\times10^{-4}$, so it
 ranks events only weakly; the NLL was still falling at $8$k steps. One seed, one probe, HPs tuned for MSE. A first submission failed on
 \code{sign\_head} with \code{HETEROSC} (asserted incompatible) and left an empty
 \code{runs/zz\_het\_ab/tp\_scr\_ee\_ttbar\_d8\_\_trial\_0144\_s1}.
+% src: python3 analysis/transfer/het_ab.py @af216a04
+% claim: test_mu_mse_std=6.4e-8
+% claim: median_absdelta_het=5.1e-5
+% claim: median_absdelta_mse=1.4e-4
+% claim: pull_mean=0.01
+% claim: pull_std=0.45
+% claim: median_sigma_over_rms=2
+% claim: decile_sigma_min=4e-4
+% claim: decile_sigma_max=6e-4
+% claim: decile_rms_max=6e-4
+% allow: 5.0\times10^{-5} 0.00 0.46 because they are the superseded values, quoted as corrected
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.48\textwidth]{../analysis/transfer/figs/het_ab_pull.pdf}\hfill
 \includegraphics[width=0.48\textwidth]{../analysis/transfer/figs/het_ab_calib.pdf}
 \caption{The user's heteroscedastic loss against the MSE baseline on $e^+e^-\to t\bar t$, $D=10^4$, test split, one
-seed. Left: pulls $\Delta/\sigma$ (standard deviation $0.46$, a calibrated model has $1$). Right: predicted $\sigma$
+seed. Left: pulls $\Delta/\sigma$ (standard deviation $0.45$, a calibrated model has $1$). Right: predicted $\sigma$
 against the realised error per decile of $\sigma$.}
 \label{fig:het_ab}
+% src: python3 analysis/transfer/het_ab.py @af216a04
+% claim: pull_std=0.45
 \end{figure}
 
 \paragraph{The GP sweep of the user's loss (2026-10-15, D57).} The same setup swept for its own HPs: the MSE baseline's
@@ -10179,16 +10193,32 @@ ranking on the validation NLL, a plain GP over $2000$ candidates (the likelihood
 ``GP, 8 trials, 2000 candidates''). Before it, a signed objective was a silent random search: \code{-log10} mapped every
 NLL $\le0$ to one label (fixed by \code{dyhpo.objective\_scale}, commit \code{8d31b58}). Best trial \code{hp1550}: lr
 $2.3\times10^{-3}$, EMA off, validation NLL $-7.63$. On the test split, in MSE$(\log|\mathcal M|^2)$ from the raw
-predictions (\code{tools/eval\_delta.py}, V100): $2.0\times10^{-8}$ against the MSE baseline's $9.6\times10^{-8}$
+predictions (\code{tools/eval\_delta.py}, V100; the trials' test errors are read from their evaluations on CC, no
+committed reader): $2.0\times10^{-8}$ against the MSE baseline's $9.6\times10^{-8}$
 ($4.8\times$ lower; the one run at the baseline's HPs: $2.3\times10^{-8}$); median $|\Delta|$ $4.4\times10^{-5}$ against
 $1.4\times10^{-4}$ (\code{analysis/transfer/het\_ab.py --sweep}, figures \code{het\_ab\_sweep\_*}). Five of the eight
 trials beat the baseline's test error ($2.0$ to $4.8\times$ lower); the three with lr $\le3.1\times10^{-4}$ are $4$ to
 $6\times$ worse than it. Calibration is unchanged: pull
-std $0.42$, $\sigma$ $\approx2\times$ the realised error and nearly flat ($3.7$ to $5.7\times10^{-4}$ over its deciles,
+std $0.42$, $\sigma$ $\approx2\times$ the realised error and nearly flat ($3.6\times10^{-4}$ to $5.7\times10^{-4}$ over its deciles (read $3.7$ before the reader),
 against errors from $7\times10^{-5}$ to $6\times10^{-4}$), monotone in it. Every trial selected its last step: the NLL
 falls to $8$k (\code{analysis/transfer/het\_sweep.py}, Fig.~\ref{fig:het_sweep}), so the horizon is short for this loss.
 Scored with the validation weights (\code{training.track\_train\_eval}, D58), the training split sits at or just below
 validation; the earlier validation-below-training curve was the EMA weights against the live ones.
+% src: python3 analysis/transfer/het_sweep.py @1a42f4e6
+% claim: best_lr=2.3e-3
+% claim: best_val_nll=-7.63
+% src: python3 analysis/transfer/het_ab.py --sweep @af216a04
+% claim: median_absdelta_het=4.4e-5
+% claim: median_absdelta_mse=1.4e-4
+% claim: pull_std=0.42
+% claim: median_sigma_over_rms=2
+% claim: decile_sigma_min=3.6e-4
+% claim: decile_sigma_max=5.7e-4
+% claim: decile_rms_min=7e-5
+% claim: decile_rms_max=6e-4
+% src: python3 analysis/transfer/het_long.py @f7130695
+% claim: mse_baseline.8k=9.6e-8
+% allow: 3.7 because it is the superseded value, quoted as corrected
 
 \begin{figure}[H]
 \centering
@@ -10204,17 +10234,41 @@ same weights. Right: every trial's validation NLL, coloured by $\log_{10}$ lr; e
 cosine spanning the whole run (\code{scripts/job\_het\_ab.sh}; a first $16$k/$32$k attempt kept the trial's
 \code{increment\_steps}, restarted the cosine at $8$k and is discarded). Each run is best at its last step again
 (Fig.~\ref{fig:het_long}, top). Test MSE$(\log|\mathcal M|^2)$: $2.9\times10^{-8}$, $1.2\times10^{-8}$,
-$5.1\times10^{-9}$; median $|\Delta|$ $6.2$, $1.9$, $1.2\times10^{-5}$. The MSE baseline at the same length:
+$5.1\times10^{-9}$; median $|\Delta|$ $6.2\times10^{-5}$, $1.9\times10^{-5}$, $1.2\times10^{-5}$. The MSE baseline at the same length:
 $9.6\times10^{-8}$ at $8$k (\code{tp\_scr\_ee\_ttbar\_d8} trial $144$), $1.7\times10^{-8}$ at $32$k
 (\code{tp3\_scr32k\_ee\_ttbar\_d8}, the better of its two chosen points on validation); the het loss stays
 $3.3\times$ and $3.2\times$ lower. The $8$k run at seed $1$ ($2.9\times10^{-8}$) against the sweep trial at seed $42$
 ($2.0\times10^{-8}$) is compatible with the seed spread (two seeds). Calibration does improve with length (Fig.~\ref{fig:het_long}, bottom): at $8$k
-$\sigma$ spans $1.6\times$ over its deciles while the error spans $8\times$; at $32$k $\sigma$ spans $4.5\times$, the
-error $30\times$, and the deciles lie across the diagonal (median $\sigma$ over the RMS error $1.68$, $0.89$, $0.60$ at
+$\sigma$ spans $1.6\times$ over its deciles while the error spans $8\times$; at $32$k $\sigma$ spans $4.4\times$ (read $4.5\times$ before), the
+error $32\times$ (read $30\times$ before the reader), and the deciles lie across the diagonal (median $\sigma$ over the RMS error $1.68$, $0.89$, $0.60$ at
 $8$k, $16$k, $32$k; pull std $0.42$, $0.44$, $0.60$). $\sigma$ still varies less than the error: about $5\times$ too large
-on the best-predicted decile and $1.5\times$ too small on the worst. Since every horizon is still best at its last step, we
+on the best-predicted decile and $1.6\times$ (read $1.5\times$ before) too small on the worst. Since every horizon is still best at its last step, we
 speculate that $\sigma$ is calibrated only late because of the schedule: the NLL keeps spiking while the lr is high and
 $\sigma$ appears to resolve the per-event error only in the cosine's tail; no run tests this (\code{analysis/transfer/het\_long.py}).
+% src: python3 analysis/transfer/het_long.py @f7130695
+% claim: 8k.test_mse=2.9e-8
+% claim: 16k.test_mse=1.2e-8
+% claim: 32k.test_mse=5.1e-9
+% claim: 8k.median_absdelta=6.2e-5
+% claim: 16k.median_absdelta=1.9e-5
+% claim: 32k.median_absdelta=1.2e-5
+% claim: mse_baseline.8k=9.6e-8
+% claim: mse_baseline.32k=1.7e-8
+% claim: mse_over_het.8k=3.3
+% claim: mse_over_het.32k=3.2
+% claim: 8k.sigma_span=1.6
+% claim: 8k.err_span=8
+% claim: 32k.sigma_span=4.4
+% claim: 32k.err_span=32
+% claim: 8k.median_sigma_over_rms=1.68
+% claim: 16k.median_sigma_over_rms=0.89
+% claim: 32k.median_sigma_over_rms=0.60
+% claim: 8k.pull_std=0.42
+% claim: 16k.pull_std=0.44
+% claim: 32k.pull_std=0.60
+% claim: 32k.sigma_over_rms_best_decile=5
+% claim: 32k.rms_over_sigma_worst_decile=1.6
+% allow: 30\times 4.5\times 1.5\times because they are the superseded values, quoted as corrected
 
 \begin{figure}[H]
 \centering
@@ -10234,18 +10288,20 @@ on the validation split and scored on test, calibrates every horizon (Fig.~\ref{
 $8$k, $16$k, $32$k; test pull std $1.00$, $1.01$, $0.97$ (raw $0.42$, $0.44$, $0.60$); the RMS error over $\sigma'$
 per decile within $0.79$ to $1.15$ at $32$k ($0.76$ to $1.47$ at $16$k, $0.89$ to $1.34$ at $8$k); test NLL lower by
 $0.65$, $0.67$, $0.42$. The tails are heavier than Gaussian: $|{\rm pull}|<1$ holds for $0.72$ to $0.74$ of the events
-against $0.68$, with a few events beyond $4$. $\mu$ is unchanged, so the accuracy numbers above stand
+against $0.68$, with a few events beyond $4$ (the largest $|{\rm pull}|$ $8.6$ to $12.1$). $\mu$ is unchanged, so the accuracy numbers above stand
 (\code{analysis/transfer/het\_long.py}, figure \code{het\_long\_recal}). The map is a measurement of the miscalibration, not a fix: a Gaussian NLL trained
 to convergence should be calibrated without one. Diagnosis on the $32$k run: $\sigma$ is as compressed on the training
-split it was fitted on (pull std $0.59$, deciles $0.22$ to $1.42$), so this is not overfitting. Gradient clipping binds on
+split it was fitted on (pull std $0.59$, deciles $0.22$ to $1.42$; read from the run's training-split evaluation on
+CC, no committed reader), so this is not overfitting. Gradient clipping binds on
 every step of every het run (pre-clip median norm $417$ at $8$k, $731$ at $32$k, against \code{clip\_grad\_norm}$=5$; the
-MSE baseline binds on $4\%$), but it is not the cause: at $8$k and the same HPs, clip $1000$ ($14\%$ of steps) and no
+MSE baseline binds on $4\%$; these from the runs' training logs on CC, no committed reader), but it is not the cause: at $8$k and the same HPs, clip $1000$ ($14\%$ of steps) and no
 clipping leave $\sigma$ as compressed (test pull std $0.72$, $0.83$; worst decile $2.0$, $2.6$) and $\mu$ far worse
 (val MSE $8.2\times10^{-6}$, $4.7\times10^{-5}$ against $1.7\times10^{-7}$; the lr was found under full clipping, so this
 does not rank the clip values). Training only the $\sigma$ readout on the frozen $32$k trunk and $\mu$
 (\code{heterosc\_sigma\_only}, $4$k steps, no L2, clipping never binds) calibrates it: test pull std $1.03$,
 $|{\rm pull}|<1$ for $0.69$ of the events, deciles $0.65$ to $1.24$ except the worst at $2.4$; validation NLL $-9.68$
-against $-9.18$, $\mu$ unchanged. So the features carry the error, and joint training leaves $\sigma$ fitted to errors
+against $-9.18$ (validation NLLs, validation MSEs, the D68 and D69 sweeps' values and the stage timings in this
+paragraph are read from the runs' and sweeps' results on CC; no committed reader), $\mu$ unchanged. So the features carry the error, and joint training leaves $\sigma$ fitted to errors
 $\mu$ has since outgrown. The same refit with the trial's L2 ($\lambda=1.6\times10^{-8}$) ends at the same validation NLL
 ($-9.68005$ against $-9.68008$), so L2 on the readout plays no part; L2 on the trunk during joint training is not excluded
 but is of the same size. A DyHPO sweep with \code{clip\_grad\_norm} searched (D68, the user: ``maybe sweeping the value is
@@ -10268,6 +10324,45 @@ $1.5$ to $1.8\%$) and $12.6$\,min on the catalog's hp58 against its $281$\,min (
 loading the $1352$ pools). Checked on a $500$-step het run of $ee\to t\bar t$ ($D=10^4$,
 \code{runs/zz\_het\_ab/tp\_scr\_ee\_ttbar\_d8\_\_trial\_0144\_s1\_stagetest}): $258$ trainable parameters, validation
 NLL $-3.82\to-4.65$ in $16$\,s.
+% src: python3 analysis/transfer/het_long.py @f7130695
+% claim: 8k.recal.b=3.9
+% claim: 16k.recal.b=2.1
+% claim: 32k.recal.b=2.1
+% claim: 8k.recal.pull_std=1.00
+% claim: 16k.recal.pull_std=1.01
+% claim: 32k.recal.pull_std=0.97
+% claim: 32k.recal.rms_over_sigma_min=0.79
+% claim: 32k.recal.rms_over_sigma_max=1.15
+% claim: 16k.recal.rms_over_sigma_min=0.76
+% claim: 16k.recal.rms_over_sigma_max=1.47
+% claim: 8k.recal.rms_over_sigma_min=0.89
+% claim: 8k.recal.rms_over_sigma_max=1.34
+% claim: 8k.recal.nll_drop=0.65
+% claim: 16k.recal.nll_drop=0.67
+% claim: 32k.recal.nll_drop=0.42
+% claim: 8k.recal.frac_pull_lt1=0.72
+% claim: 16k.recal.frac_pull_lt1=0.74
+% claim: 32k.recal.max_abs_pull=8.6
+% claim: 16k.recal.max_abs_pull=12.1
+% src: python3 analysis/transfer/het_sigonly.py @665117a2
+% claim: clip1000_8k.pull_std=0.72
+% claim: noclip_8k.pull_std=0.83
+% claim: clip1000_8k.decile_worst=2.0
+% claim: noclip_8k.decile_worst=2.6
+% claim: refit4000.pull_std=1.03
+% claim: refit4000.frac_pull_lt1=0.69
+% claim: refit4000.decile_min=0.65
+% claim: refit4000.decile_max_but_worst=1.24
+% claim: refit4000.decile_worst=2.42
+% claim: refit250.pull_std=1.02
+% claim: refit250.frac_pull_lt1=0.67
+% claim: refit250.decile_min=0.73
+% claim: refit250.decile_max_but_worst=1.22
+% claim: refit250.decile_worst=2.15
+% claim: joint32k.pull_std=0.60
+% claim: joint32k.frac_pull_lt1=0.93
+% claim: joint32k.decile_min=0.22
+% claim: joint32k.decile_max=1.56
 
 \begin{figure}[H]
 \centering
