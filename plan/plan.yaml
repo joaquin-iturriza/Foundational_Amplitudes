@@ -21392,6 +21392,8 @@ entries:
       FA-ccin2p3-e3f2f12e FA-ccin2p3-d9ca7c6a FA-ccin2p3-304d0945 FA-ccin2p3-b12b6123
     '4': FA-ccin2p3-ac4868da FA-ccin2p3-fef0cb4c FA-ccin2p3-c8ac36f0 FA-ccin2p3-41de7470 FA-ccin2p3-63a54687 FA-ccin2p3-2a4e268e
       FA-ccin2p3-e3f2f12e FA-ccin2p3-d9ca7c6a FA-ccin2p3-304d0945 FA-ccin2p3-b12b6123
+    '5': FA-ccin2p3-ac4868da FA-ccin2p3-fef0cb4c FA-ccin2p3-c8ac36f0 FA-ccin2p3-41de7470 FA-ccin2p3-63a54687 FA-ccin2p3-2a4e268e
+      FA-ccin2p3-e3f2f12e FA-ccin2p3-d9ca7c6a FA-ccin2p3-304d0945 FA-ccin2p3-b12b6123
   handoff:
     state: Data on CC ($DATA_DIR/kit_hardps/hardps_benchmark) and lxplus; Jean Zay copy failed twice on ssh timeout (setup
       gap, not blocking). Loader, float64 model path and scoring script reviewed (repo-reviewer PASS) and merged into trunk
