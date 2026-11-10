@@ -20472,7 +20472,7 @@ entries:
     - 3
   owner:
     agent: a237615c421bbf029
-    state: working
+    state: closed
     since: '2026-11-10T01:09:45+00:00'
     state_at: '2026-11-10T01:23:01+00:00'
     context: 235521
@@ -20608,19 +20608,22 @@ entries:
     '1': repo-reviewer a437be4394e3e0f7d
     '3': the design-reviewer on the step-3 design
   handoff:
-    state: 'Steps 1 and 2 DONE: the July heterosc/l2-gen work is on trunk (sigma-gen merge 95c90f29, july-port merge 13cbb9e3),
-      with every numbered paragraph of sec:div-sampling carrying src/claim lines or a visible source mark. origin/heterosc
-      and origin/l2-gen deleted. Open: origin/adaptive-ir waits on Joaquin''s word to delete it (its file is identical on
-      trunk); step 3, sigma-driven generation (D339), not started.'
-    decisions: Bayes cost reported for the sweep's three widest posteriors, not a hand-set sigma_rel band; is_weight_path
-      weights the training loss only, refused for multi-process runs and on the LLOCA_PROC_LOSS=loop path; extract_sigma_eeuu
-      folded into extract_train_pool_sigma --process; the 3 differing scripts keep trunk's later form; het_mumse22_summary
-      JSON at 6 significant digits
-    ruled_out: dup-ok overrides for the flagged duplicates (they were imported or merged instead)
-    running: nothing
-    files: experiment.py _is_weighted/_get_is_weights; config/default.yaml is_weight_path; base_plots._save_pair; tests/test_is_weight_path.py,
-      tests/test_base_plots_pair.py; analysis/divergences/* (ported); sweep/sweep_config_heterosc_*.yaml, sweep_config_mse_scratch.yaml
-    written: '2026-11-10T01:07:14+00:00'
+    state: 'Steps 1 and 2 done (July heterosc/l2-gen work on trunk, results recorded, origin/heterosc, l2-gen, adaptive-ir
+      deleted). Step 3 STOPPED on the main session''s word: Joaquin says he never asked for the comparison study. The step-3
+      design (sigma^gamma-driven generation on ee->uugg against uniform keep, catalog density f_flat 0.35, IS-only reweighting,
+      sigma on catalog; 6 arms x 3 seeds + DyHPO, ~33 GPU-h) is recorded but NOT approved by him; the design reviewer gave
+      FIX twice (last: stage 2 must also sweep sigma-on-catalog and rerun each stage-2 best at 2 seeds). Code partly built
+      on branch sigma-gen3 (worktrees/wt-sigma-gen3, pushed, tip c10155c2): not CPU-tested, not reviewed, not merged. Nothing
+      submitted.'
+    decisions: 'Design held at its FIX after the one allowed revision; its GPU question went to the main session. Code: l2_online_uugg.py
+      labels through MG5_WORK_DIR standalones (datagen.ensure_backend) instead of Jean Zay WORK; --setup july keeps the July
+      configs reproducible'
+    ruled_out: none
+    running: none
+    files: 'worktrees/wt-sigma-gen3: analysis/divergences/sigma_gen_design_check.py (@ccede377, repo-reviewer passed), analysis/divergences/l2_online_uugg.py
+      (siteconf port, --setup current, catalog/isonly/sigma_catalog arms, --val_path, sigma stage; untested), analysis/divergences/make_shared_uugg_sets.py
+      (untested)'
+    written: '2026-11-10T01:27:47+00:00'
   designs:
   - at: '2026-11-10T01:15:54+00:00'
     question: 'Step 3 (D339, sigma-driven generation on the current HETEROSC loss): on e+e- -> u ubar g g, does drawing each
