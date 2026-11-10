@@ -20968,6 +20968,56 @@ entries:
       (calibration-only step with stage 2 as the matched control, HETEROSC loss per D52/D71, parent preprocessing per D355,
       only D-linked settings move, no sweep, disk fits, test sampling the target''s own recipe) still hold. Next: record a
       revised design addressing 1-4 with plan design, then ask for review.'
+  - at: '2026-11-10T03:34:35+00:00'
+    question: 'Step 1 (D356 horizons, tree arm), revised after the reviewer''s FIX: on catalog_v4''s held-out tree targets
+      ee->ttbar (H3, 2->2 massive), ee->ccbar g (H1, 2->3, the class of ee->uubar g) and ee->bbbar gg (H2, 2->4), trained
+      from scratch on the parent pretraining''s model and inputs, where does each D=10^(k/2), k=2..10 stop improving (best
+      step of the validation mu MSE) and at which step does its MSE(ln|M|^2) of the mean first reach 1e-4, so that every later
+      scratch and fine-tune cell of that (target, D) trains only up to there (D356)?'
+    prior: 'Draft fig 22 / sec:transfer (compute_scan_eeuu_wt): 8- and 25-process foundations against scratch on one-loop
+      ee->uu, fine-tune 1-2 orders lower, no plateau; old setup (AdamW, older foundations, last-step reads). sec:ladder: horizons
+      calibrated on ee->dd~ alone (best 160/640/2560/4160 of 8000 up to D=316, at the end from 1e3), and the horizon test
+      found 32k steps 4.3-4.8x lower at 10^3.5-10^4 with the best at the last step: hence per-target calibration and the extension
+      rule here. Ladder finale: 12.6x at D=1e4 (4.9e-6 vs 6.2e-5). par:v3_muon (catalog_v3 small-D held-out fine-tunes and
+      scratch, D=10-316, data/muon_ft.json): best checkpoints a median 0.02 of the way through their runs, so low-D horizons
+      will come out far below 8000; the 1.1 x best-step rule takes that. D62 (heterosc_select defaults to nll), D85 and D89
+      (the checkpoint taken on the validation mu MSE, then the sigma stage, for the Delta cells, 2->2 included): this study''s
+      readout is the MSE of the mean, so it selects on mu MSE as D85/D89. D89''s paragraph: at 2->2 under het two runs of
+      one config put the best mu MSE more than 2x apart in 69 of 146 cells (10-90%: 0.20-5.9), at 2->3/2->4 within 0.90-1.15.
+      optimizations_recap step 2 (muon_1e4) reuses this grid, targets and horizons for an AdamW-parent arm, so the horizons
+      set here serve it too. No single-target scratch or fine-tune on catalog_v4 pools found (results.tex searched for scratch/fine-tun
+      in the catalog_v4 paragraphs; D355-D360; plan).'
+    measure: 'Per (target, D): the validation curve of the mean''s MSE(ln|M|^2) (training.heterosc_select=mu_mse, val mu MSE
+      in the target''s units x prepd_std^2 as sec:ladder), its best step s_b and best value, and s_4 = the first validation
+      step with MSE <= 1e-4 (none if never); the measured train step rate per (B, n). Stage 2 selects every cell''s checkpoint
+      the same way (mu MSE, then the sigma stage).'
+    check: 'The best step moves with D on existing data: sec:ladder''s ee->dd~ calibration (calib_ee_ddbar.json) best at 160,
+      640, 2560, 4160 of 8000 for D=10..316, at the end from 1e3; par:v3_muon''s small-D cells best at a median 0.02 of their
+      runs; ladder scratch cells cross 1e-4 between 1e3 and 1e4 on several 2->2 probes, so a crossing is readable inside 1e5
+      events. The ladder horizon test shows the loss keeps falling past 8k at 10^3.5-10^4, which the extension rule covers.'
+    fixed: 'Model and inputs exactly the parent''s (its saved config.yaml as base config: runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262
+      on CC: mu-P LLoCa width 8, 8 blocks, diagrams llm4lhc, dimensionless inputs, coupling/internal-mass/off-shellness levers,
+      het loss with its sigma stage, MuonAdamW, trial-1262 HPs), except heterosc_select=mu_mse; lr = 7.82114e-3 (T/17056)^-0.55
+      times sec:ladder''s D factor; batch min(16384, D/2); D = prefixes of one shuffled 1e5 train pool of the target''s own
+      recipe entry, val and test the fixed 1e4 splits; phase-space stats on the whole pool, amplitude stats on the D events;
+      first horizon 8000 steps for k<=8, 12000 for k=9,10; seed 42; CC-IN2P3; scripts/job_data_saving.sh (mu_mse edit to be
+      committed with the submission).'
+    control: 'None inside this step: it sets horizons. Stage 2''s matched control: fine-tune and scratch of the same (target,
+      D) at the same T(D), same prefixes, model, inputs and checkpoint rule, each the best of its own 8-trial DyHPO; only
+      the initialisation and the searched space differ.'
+    seeds: 'Seed 42, one run per (target, D), 27 runs, ~27 GPU-h (estimate: 1.0 s/step at B=16384, n=5, scaled by B and n,
+      0.125 s floor), wall target 4 h, one wave. One seed suffices for a horizon: T(D) is a step, set with a 1.1x margin,
+      and a run that misses its crossing by run-to-run noise is caught by the extension rule; the 2x run-to-run spread of
+      D89 applies to the loss values of stage 2, so whether stage 2 runs a second seed per cell (all three targets alike;
+      it doubles stage 2) is asked of Joaquin with stage 2''s estimate. Extension rule: a run still above 1e-4 at its cap
+      with its best step in the last fifth is rerun at 4x steps (to at most 64k, the ladder''s cap) until it crosses 1e-4
+      or its best leaves the last fifth; that extension batch is estimated from these runs'' measured rates before submission
+      and goes to Joaquin if over 30 GPU-h.'
+    outcome: 'Per (target, D): T(D) = 1.1 x s_4 if the mean''s MSE reaches 1e-4; else 1.1 x s_b if the best sits before 0.8
+      of the run (plateaued); else extended per the rule; a cell still above 1e-4 and still improving at 64k is compute-limited
+      and stated. YES on a target when some D<=1e5 reaches 1e-4: stage 2 runs there at those T(D). NO on a target (above 1e-4
+      at every D after extension): its saving is a lower bound D*_scratch > 1e5, the target kept with that bound, or a 1e6
+      pool proposed to Joaquin with its cost. A run that blows up is listed apart with its step.'
   step_waits:
     '1': a design reviewer
     '2': '2026-11-12'
