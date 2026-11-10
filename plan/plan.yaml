@@ -21033,6 +21033,66 @@ entries:
       target''s own recipe. Residual risk to watch: a lucky 2->2 seed that crosses early sets T(D) short for stage 2''s scratch
       arm. Searched: data saving, 1e-4, scratch/fine-tun near held-out, ttbar, v4_long/68224, muon_1e4, heterosc_select/mu_mse,
       calib_ee_ddbar, v3_muon/muon_ft.'
+  - at: '2026-11-10T06:41:02+00:00'
+    question: 'Step 1 revised for ee->ccbar g (H1) and ee->bbbar gg (H2), and stage 2 for all three tree targets (D356, D360):
+      the fixed-HP calibration set ee->ttbar''s horizons but not those of the two multi-parton targets. Per (target, D=10^(k/2),
+      k=2..10): at which horizon T(D) does each train (D356: up to where scratch reaches 1e-4, or where it plateaus), and
+      how much target data does pretraining save, D*_scratch/D*_ft where the best-of-8 scratch and fine-tune L(D) curves cross
+      MSE(ln|M|^2) = 1e-4 (where reached) and = 1e-2 (the common looser level, all three targets)?'
+    prior: 'This entry''s calibration (analysis/data_saving/horizons.py @6d2a1794, analysis/data_saving/data/horizons_cal2.json;
+      27 scratch runs at the parent''s lr law, seed 42): ee->ttbar crosses 1e-4 from D=100 (first crossing 3520/1920/2240/960/3520/1440/1440
+      steps for k=4..10; best 9.1e-7 at D=1e4, 3.7e-9 at 1e5, best at the end from D=316), D=10 and 32 plateau at 2.9e-3 (640)
+      and 1.4e-3 (1280). ee->ccbar g and ee->bbbar gg, k=2..8: best 4.1 to 4.0e-2 and 4.1 to 1.5e-1, the best inside the 1440-step
+      warm-up in 13 of 14 runs (bbbar gg D=1e4 at step 480), never regained in the anneal (last/best 1.05-1.84); k=9,10 end
+      ~08:00 and are read into the same table. sec:ladder: ee->dd~ best at 160-4160 steps up to D=316, at the end from 1e3;
+      the horizon test 4.3-4.8x lower at 32k for 2->2 probes at 10^3.5-10^4. par:v4_length: the parent (trial 1262, 68224
+      steps) has median held-out 6-particle MSE 1.2e-2 (size_figs claim mse.w8_s68224_7=0.0123), so 1e-4 at D<=1e5 on 2->3/2->4
+      catalog_v4 pools may be out of reach. Draft fig 22/sec:transfer (old setup, ee->uu one loop): fine-tune 1-2 orders below
+      scratch. Previous design of this step (passed 2026-11-10 03:35): fixed-HP horizons for all three targets; this revision
+      keeps it for ee->ttbar and replaces it for the other two. D355, D356, D360, D315 (one seed), D85/D89 (checkpoint on
+      val mu MSE).'
+    measure: 'Per (target, D, arm): the best trial''s MSE(ln|M|^2) of the mean at its best checkpoint (val mu MSE x prepd_std^2,
+      heterosc_select=mu_mse, then the sigma stage), its best step, its trial''s GPU-h. Per target and arm L(D); D*(L0) by
+      log-log interpolation between the two grid points bracketing L0, for L0 = 1e-4 and 1e-2; the saving D*_scratch(L0)/D*_ft(L0),
+      a bound when one arm stays above L0 at 1e5 (scratch: saving > 1e5/D*_ft) or below it at D=10 (fine-tune: saving > D*_scratch/10).
+      For ee->ccbar g and ee->bbbar gg also phase a''s scratch best-trial curve: first step at 1e-2, at 1e-4, best step and
+      best_frac.'
+    check: 'The fixed-lr horizon readout fails on the two multi-parton targets and not on ee->ttbar at the same lr law (data
+      above: their best inside warm-up at every D up to 1e4, ee->ttbar''s at the end from D=316), so the change, an lr searched
+      per cell (gen_transfer_pilot.lr_space(T,k): one decade either side of the lr surface at the cell''s (T,D), 9.6e-3 at
+      k=8), is the one that moves their best step; the 1e-2 level is crossed or approached by every target''s scratch L(D)
+      in the calibration (ttbar below it from D=10; ccbar g 4.0e-2 and bbbar gg 1.5e-1 at D=1e4 at a fixed lr, falling ~2-3x
+      per half decade), so the 1e-2 readout is defined on all three; ee->ttbar''s crossing steps vary with D (960-3520), so
+      its T(D) is read, not assumed.'
+    fixed: 'Model and inputs of the parent''s saved config (trial 1262: muP LLoCa width 8, 8 blocks, llm4lhc diagrams, dimensionless
+      inputs, levers, HETEROSC with sigma stage, MuonAdamW) via scripts/job_data_saving.sh semantics (heterosc_select=mu_mse,
+      result.json, warm_start_idx=null); batch min(16384, D/2); D = prefixes of the target''s 1e5 pool, fixed 1e4 val/test;
+      single-fidelity 8-trial DyHPO per cell (sweep/drive.py), scratch over the template''s space with lr_space(T,k), fine-tune
+      over rule 4 (full retrain + layer decay, lr_scale [0.1,10], layer_decay [0.75,1]) from kit_benchmark''s family-held-out
+      pretraining (recipes/catalog_v4_kit_pretrain_heldout.yaml, FA-ccin2p3-f0ca7a15, running). Horizons: ee->ttbar T(D) =
+      1.1 x first 1e-4 crossing (k=4..10: 4000, 2240, 2560, 1120, 4000, 1680, 1680) and plateau 1.1 x best for k=2,3 (800,
+      1440), the passed rule. ee->ccbar g and ee->bbbar gg: phase a = the scratch 8-trial DyHPO at the calibration horizon
+      (8000 k<=8, 12000 k=9,10); from its best trial T(D) = 1.1 x first 1e-4 crossing, else 1.1 x best step if best before
+      0.8 of the run, else the full horizon (and the passed extension rule, a 4x rerun of the best trial''s config up to 64k
+      while the best stays in the last fifth, its cost to Joaquin first); phase b = both arms'' sweeps at T(D), phase a''s
+      sweep serving as the scratch arm where T(D) equals its horizon. CC-IN2P3, seed 42.'
+    control: 'Per (target, D): fine-tune against scratch at the same T(D), prefixes, model, inputs and checkpoint rule, each
+      the best of its own 8-trial DyHPO; only the initialisation and the searched space differ. Shared scratch cells serve
+      optimizations_recap''s AdamW-parent arm (D364), whose cost is one more fine-tune sweep per cell (about the fine-tune
+      arm''s GPU-h) plus its pretraining.'
+    seeds: 'Seed 42, one per cell (D315). Cost from the measured main-stage rates (0.073-0.097 s/step k<=7, 0.16-0.19 k=8,
+      0.40-0.51 k=9,10) plus 0.08 h per trial: ee->ttbar both arms at its T(D) ~25 GPU-h; phase a (scratch, two targets at
+      8000/12000) ~89 GPU-h; phase b fine-tune at most ~89 and scratch re-sweeps at most ~89 where T(D) < horizon; total 200-290
+      GPU-h before any extension. Above 30 GPU-h with no decision covering the cost: ee->ttbar scratch and phase a go to Joaquin
+      with this estimate before submission; the fine-tune arm waits on the held-out parent anyway. One wave per batch at site
+      pick''s width; wall targets recorded per batch.'
+    outcome: 'Per target and level L0 in {1e-4, 1e-2}: YES (pretraining saves data) when D*_scratch/D*_ft > 1 with both crossings
+      inside the grid, reported with its value; a bound when one arm misses L0 inside 10..1e5; NO when the fine-tune L(D)
+      is not below scratch at the crossing. Expected: ee->ttbar YES at 1e-4 (scratch crosses at D~100), unmeasurable at 1e-2
+      (both arms below it at D=10, reported as such); ee->ccbar g and ee->bbbar gg readable at 1e-2, at 1e-4 likely a lower
+      bound or not reached by either arm (then stated as not reached). Figures: per target L(D) scratch vs fine-tune with
+      both levels drawn, and one MSE vs GPU-hours panel; write-up in docs/results.tex replacing the draft''s fig 22. A run
+      that blows up is listed apart with its step.'
   step_waits:
     '1': FA-ccin2p3-53bb43b9 FA-ccin2p3-fbec992c FA-ccin2p3-9da809e2 FA-ccin2p3-ad1b108d FA-ccin2p3-883309f7 FA-ccin2p3-72685d7d
       FA-ccin2p3-50cc73c3 FA-ccin2p3-43d4b67a FA-ccin2p3-5c6b6dcb FA-ccin2p3-01d9738a FA-ccin2p3-df5578c6 FA-ccin2p3-85c8280d
