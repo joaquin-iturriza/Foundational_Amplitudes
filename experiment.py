@@ -764,7 +764,7 @@ class AmplitudeExperiment(BaseExperiment):
 
             # Feynman-diagram conditioning: load each process's diagram graphs and
             # widen the scalar channel by d_diag (the appended diagram embedding).
-            # Requires the property encoding (use_PIDs=false). Off → no change.
+            # The 'ours' encoder requires the property encoding (use_PIDs=false). Off → no change.
             # the 'ours' encoder builds its nodes from the property table; arXiv:2606.23791's (llm4lhc) labels edges
             # by its own PDG vocabulary and adds its vector inside the backbone, so it runs under use_PIDs too
             self._diag_impl = str(self.cfg.model.get("diagram_encoder_impl", "ours"))
@@ -1786,7 +1786,10 @@ class AmplitudeExperiment(BaseExperiment):
             # the train pools (the GeV column's frozen statistics would put it far off centre: the top at -4, the b
             # at -8 at sqrt(s_hat) = 1 TeV, and the massless neutral value above every massive one); frozen with the
             # data stats, so a fine-tune or a held-out process reads the parent's
-            if _dms_frozen is not None:
+            if self.cfg.data.get("use_PIDs", False):
+                # one-hot PIDs have no mass column (wrappers.setup_dimless_pids): no statistics, None is frozen
+                self._dimless_mass_stats = None
+            elif _dms_frozen is not None:
                 self._dimless_mass_stats = [float(_dms_frozen[0]), float(_dms_frozen[1])]
             else:
                 from particle_ids import GLOBAL_PROPERTY_MATRIX, PARTICLE_FEATURE_NAMES, MASS_MASSLESS_LOG10_THR
@@ -1800,8 +1803,11 @@ class AmplitudeExperiment(BaseExperiment):
                 mu = s1 / n1 if n1 else 0.0
                 sd = float(np.sqrt(max(s2 / n1 - mu ** 2, 0.0))) if n1 else 1.0
                 self._dimless_mass_stats = [mu, sd if sd > 1e-6 else 1.0]
-            LOGGER.info(f"dimensionless_inputs: log10(m / sqrt(s_hat)) over the massive train particles, mean "
-                        f"{self._dimless_mass_stats[0]:.3f}, std {self._dimless_mass_stats[1]:.3f}")
+            if self._dimless_mass_stats is None:
+                LOGGER.info("dimensionless_inputs under use_PIDs: no mass column, no mass statistics")
+            else:
+                LOGGER.info(f"dimensionless_inputs: log10(m / sqrt(s_hat)) over the massive train particles, mean "
+                            f"{self._dimless_mass_stats[0]:.3f}, std {self._dimless_mass_stats[1]:.3f}")
         if mom_div is None:
             # np.std / np.mean of the concatenated train momenta as the network reads them (augmented, per sqrt(s_hat)
             # under dimensionless_inputs), streamed pool by pool in numpy's own summation order (data_mmap.f32_mean_std)
