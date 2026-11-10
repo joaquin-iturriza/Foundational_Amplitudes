@@ -72,6 +72,9 @@ def main():
         i = int(np.argmin(d["val_curve"]))   # the best checkpoint's validation (CLAUDE.md "Reported values")
         print(f"{d['hp']}: val NLL {d['val_loss']:.3f} at step {d['best_step']}, val MSE(mu) {d['val_mse_curve'][i]:.3g}, "
               f"train-split MSE(mu) {d['train_eval_mse_curve'][i]:.3g}")
+    print(json.dumps({"best_hp": rs[0]["hp"], "best_val_nll": round(rs[0]["val_loss"], 2), "best_lr": float(f"{lr[rs[0]['hp']]:.2g}"),
+                      "trials": {d["hp"]: {"val_nll": round(d["val_loss"], 3), "lr": float(f"{lr[d['hp']]:.2g}"),
+                                           "best_step": d["best_step"]} for d in rs}}))
 
 
 if __name__ == "__main__":
