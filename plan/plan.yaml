@@ -16129,8 +16129,11 @@ entries:
     '17': 'the first real idle moment: plan next listing RESUME/LAUNCH with no FA job live; the supervisor''s own STALLED
       idle: event (or its absence after 45 min) is the trigger'
     '21': the date 2026-11-17 (a week after the 2026-11-09 23:54 restart on the batching code)
-    '22': repo-reviewer a0b2da08acd94dae3 on the whole backlog since 5e5b2788 plus the uncommitted template change (t_steps
-      [40000]); then add user_said() to tools/plan.py (plan ask path fix) and its re-check
+    '22': 'repo-reviewer a0b2da08acd94dae3 FIX (lock held) on the backlog: (1) .claude/hooks/review_backlog.sh reset_pillar:
+      advance --at on a diverged branch (sigma-gen 5e5b2788) overwrote trunk''s watermark; move only on fast-forward, else
+      append to .passed; then restore the watermark to f5ac899c; (2) worktree_fold_guard.sh 7395041f rm pattern misses /bin/rm,
+      rm -f -r, xargs rm, command rm: widen, test 5 cases. Template t_steps [40000] PASSED (uncommitted until the gate clears);
+      then user_said() in plan.py'
   owner:
     agent: a5f2aff63bd28c5a8
     state: closed
