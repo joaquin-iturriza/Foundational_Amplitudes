@@ -20877,7 +20877,7 @@ entries:
   asks: []
   owner:
     agent: a2a4836c90d93265b
-    state: working
+    state: closed
     since: '2026-11-10T02:21:50+00:00'
     state_at: '2026-11-10T04:27:52.386000+00:00'
     context: 270543
@@ -21072,6 +21072,31 @@ entries:
     units: null
     start: '2026-11-10T03:43:43+00:00'
     at: '2026-11-10T03:43:43+00:00'
+  handoff:
+    state: 'Tree calibration (step 1, design passed 2026-11-10 03:35): 18 of 27 scratch calibration runs submitted on CC (ee->ttbar,
+      ee->ccbar g; k=2..10; 8000 steps k<=8, 12000 k=9,10; seed 42). 14 ended with main stage complete and a sigma-stage-only
+      failure (inherited warm_start_idx 0 -> run index 1; their curves are in runs/data_saving/dsave_scratch_*_cal/ with models/model_run1*.pt.gz,
+      out_1.log, train_steps.npz); the 4 k=9,10 runs (68cf389d, 1dffc6c7, b2237a3a, 9a675320) will end the same way, main
+      stage usable. The 9 ee->bbbar gg runs are NOT submitted: refused by the site budget gate (counts wall limits; 30.7 GPU-h
+      counted in 60 min). A wake is armed (detach bbgg_window, sleep 3700 from 04:49 CET); on it: site pick FA --jobs 9, then
+      submit them with literal --est-gpu-hours and --hdr=--time from the measured rates (k<=7 ~0.1 s/step -> 8000 steps ~0.25
+      h, limit 00:30; k=8 ~0.2 s -> ~0.45 h, limit 00:45; k=9,10 from the running ttx/ccxg k=9,10 rates at 12000 steps), job
+      names dsave_cal_epem_bbxgg_d<k>, args ''epem_bbxgg <k> <T> scratch tag=cal''; record with plan run --next 1 and add
+      them to step 1''s wait. Then read per (target, D) the best step and first step at MSE<=1e-4 of the main stage''s val
+      mu-MSE curve, apply the T(D) and extension rules of the design, and record stage 2''s design.'
+    decisions: 'Parent for scratch setup: width-8 x16 trial 1262 config (par:v4_length; coordinator: method call inside approved
+      work). One seed per cell (D315). Checkpoint on val mu MSE (D85/D89). One-loop arm on V/B read as MSE of log|V|, gated
+      on virtual_over_born''s current-defaults confirmation (step 2). Stage-2 fine-tune parent: kit_benchmark''s family-held-out
+      pretraining (recipes/catalog_v4_kit_pretrain_heldout.yaml), not trial 1262, which trains near-duplicates of the tree
+      targets. Stage 2 leaves room for optimizations_recap''s AdamW-parent fine-tune arm (shared scratch cells) and states
+      its cost.'
+    ruled_out: 'Training a new pretraining for scratch calibration (not needed: scratch only uses the parent''s setup). Resubmitting
+      the 14 sigma-stage failures (main stages complete, sigma stage does not change mu).'
+    running: FA-ccin2p3-68cf389d, 1dffc6c7 (ee->ttbar k=9,10), b2237a3a, 9a675320 (ee->ccbar g k=9,10); wake bbgg_window (detached
+      sleep).
+    files: scripts/job_data_saving.sh (5ba7c3c5), recipes/catalog_v4_datasaving_*.yaml, /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/cal.tsv
+      (layout), docs/results.tex sec:ladder and par:v3_muon (prior), recipes/catalog_v4_roles.json
+    written: '2026-11-10T04:30:23+00:00'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
