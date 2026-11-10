@@ -21607,6 +21607,14 @@ entries:
       by the resume job FA-ccin2p3-78b8190c (same run dir, run_idx 1; its best checkpoint is models/model_run1_best.pt, the
       best over both segments), ETA ~02:00 UTC 2026-11-11. Use model_run1_best.pt, not model_run0_best.pt, once 78b8190c ends
       with RUN_DONE.'
+  - at: '2026-11-10T10:12:54+00:00'
+    text: '2026-11-10 ~11:30: target rule revised (main session''s correction after Joaquin questioned it): a sign change
+      is a limit of our log transform, not of the process, and excluding it biased the arm to easy cases (12 of 14 varying
+      candidates change sign); only a constant V/B (no gap in D possible) is out, sigma(ln|V/B|) is reported beside each target,
+      and a sign-changing target is read in the error of its own signedlog transform, the same in both arms. Third target:
+      b b~ > a ve ve~ (v4_bbx_avevex_nlo, sigma 0.684, V<0 1.0%), the closest analogue of b b~ > Z Z and u u~ > e+e- Z. The
+      question ''accept a two-target one-loop arm?'' (in my 11:00 report, never recorded with plan ask) is withdrawn. Third
+      round (FA-ccin2p3-326bc006): b b~ > H Z 0.305 and b b > b b 0.455 one-signed; bg > bgg no pool or sidecar read.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
