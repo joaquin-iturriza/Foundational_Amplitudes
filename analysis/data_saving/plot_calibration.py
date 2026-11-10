@@ -1,5 +1,6 @@
 """Best validation MSE vs training-set size D, per target: the tree arm's calibration (MSE of ln|M|^2), or with
---arm loops the one-loop arm's (trained on V/B, MSE of ln|V/B| = MSE of ln|V|, the Born exact).
+--arm loops the one-loop arm's (trained on V/B, f = ln|.|: MSE of ln|V/B| = MSE of ln|V|, the Born exact; f = the
+signedlog transform for a target whose V changes sign, its label marked (s)).
 
     python analysis/data_saving/plot_calibration.py [--arm trees|loops]
 """
@@ -38,14 +39,16 @@ fig, ax = ps.figure()
 blown = []
 for t, lab, col in targets:
     r = sorted((r for r in rows if r["target"] == t and "best" in r), key=lambda r: r["D"])
-    ax.plot([x["D"] for x in r], [x["best"] for x in r], marker="o", color=col, label=lab)
+    signed = any(str(x.get("unit", "log")).startswith(("signedlog", "abslog")) for x in r)
+    # a sign-changing V/B is trained (and read) through signedlog: its curve is that transform's MSE, marked "s"
+    ax.plot([x["D"] for x in r], [x["best"] for x in r], marker="o", color=col, label=lab + (" (s)" if signed else ""))
     # a run that blew up is shown apart at its D (drawn below, once the scales are set; never dropped); missing or
     # non-ln|V| runs are printed
     bl = [x for x in rows if x["target"] == t and "blowup_step" in x]
     blown += [(x["D"], col) for x in bl]
     for x in rows:
         if x["target"] == t and "best" not in x and "blowup_step" not in x:
-            print("not plotted:", t, x.get("k"), "missing" if x.get("missing") else "not ln|V|" if x.get("not_ln_v") else "?")
+            print("not plotted:", t, x.get("k"), "missing" if x.get("missing") else "not a V/B run" if x.get("not_vb") else "?")
     for x in bl:
         print("blowup:", t, "k", x["k"], "step", x["blowup_step"])
 ax.axhline(1e-4, color="gray", linestyle="--", label=r"$10^{-4}$")
@@ -58,7 +61,7 @@ if blown:
     for n, (D, col) in enumerate(blown):
         ax.plot([D], [top], marker="x", linestyle="none", color=col, label="blew up" if n == 0 else None)
 ax.set_xlabel(r"$D$")
-ax.set_ylabel(r"best val MSE$(\ln|\mathcal{M}|^2)$" if arm == "trees" else r"best val MSE$(\ln|V|)$")
+ax.set_ylabel(r"best val MSE$(\ln|\mathcal{M}|^2)$" if arm == "trees" else r"best val MSE$(f(V/B))$")
 ps.legend(ax, "lower left", ncol=2)
 ps.save(fig, os.path.join(REPO, "analysis/data_saving/figs/calibration_best_mse" + ("" if arm == "trees" else "_loops")))
 print("ylim", ax.get_ylim())

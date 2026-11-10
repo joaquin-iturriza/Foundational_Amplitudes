@@ -1,6 +1,5 @@
 """The one-loop candidates of pretrain_data_saving step 6: the spread of ln|V/B| on each train pool against the share
-of its events with V < 0, from analysis/data_saving/data/vb_spread.json (vb_spread.py). A target is kept when the
-spread is >= 0.1 and no V is negative (V/B then trains as a plain log target, read as the MSE of ln|V|).
+of its events with V < 0, from analysis/data_saving/data/vb_spread.json (vb_spread.py). Filled: the chosen targets.
 
     python analysis/data_saving/plot_vb_spread.py
 """
@@ -33,6 +32,7 @@ LABELS = {
     "v4_ucx_cxhu_nlo_145-6000GeV": r"$u\bar c\to\bar cHu$",
     "v4_udx_ccxwp_nlo_101-6000GeV": r"$u\bar d\to c\bar cW^+$",
 }
+CHOSEN = {"v4_bbx_zz_nlo_183-6000GeV", "v4_uux_epemz_nlo_112-6000GeV", "v4_bbx_avevex_nlo_20-6000GeV"}
 FLOOR = 1e-4   # a pool with no V < 0 is drawn at this share (log axis)
 
 rows = json.load(open(os.path.join(REPO, "analysis/data_saving/data/vb_spread.json")))
@@ -44,8 +44,7 @@ for i, (stem, lab) in enumerate(LABELS.items()):
         continue
     ax.plot([max(r["neg_frac"], FLOOR)], [max(r["std"], 1e-3)], linestyle="none",
             marker=markers[i % len(markers)], color=ps.CYCLE[i % len(ps.CYCLE)],
-            mfc=ps.CYCLE[i % len(ps.CYCLE)] if r.get("kept") else "none", label=lab)
-ax.axhline(0.1, color=ps.C.grey, linestyle="--", label=r"$\sigma=0.1$")
+            mfc=ps.CYCLE[i % len(ps.CYCLE)] if stem in CHOSEN else "none", label=lab)
 ax.set_xscale("log")
 ax.set_yscale("log")
 ax.set_xlabel(r"share of events with $V<0$")

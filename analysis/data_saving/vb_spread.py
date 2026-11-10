@@ -1,10 +1,10 @@
 """pretrain_data_saving step 6: the spread of the one-loop target over its Born, ln|V| - ln B, on each candidate
 one-loop target's train pool (5e4 rows) and its Born sidecar <pool>.born.npy (scripts/job_vob_born.sh), read on CC.
 
-Per target: std, p1, p99 of ln|V/B| and the share of V < 0, plus a histogram of ln|V/B| - its median (for the
-figure). The rule (design passed 2026-11-10, repaired for the sign the same day): a target is kept for the V/B arm
-when std >= 0.1 and V has one sign on every row (a sign-changing V/B resolves to signedlog, whose MSE is not that of
-ln|V|).
+Per target: std, p1, p99 of ln|V/B|, the share of V < 0, the signedlog scale s (1% quantile of |V/B|) and the share
+of rows with |V/B| > 10 s (where signedlog is within 0.1 of ln(|V/B|/s)), plus a histogram of ln|V/B| - its median (for the
+figure). The rule (revised 2026-11-10 by the main session's correction): only a constant V/B is out (std < 1e-6: nothing
+to learn, no gap in D); a sign-changing V/B stays in, trained and read through the signedlog transform in both arms.
 
     python analysis/data_saving/vb_spread.py [--out analysis/data_saving/data/vb_spread.json]
 """
@@ -22,7 +22,7 @@ POOLS = ["ee_uu_nlo_25-1000GeV", "ee_ttbar_nlo_362-1000GeV", "v4_epem_bbx_nlo_20
          "v4_bbx_avevex_nlo_20-6000GeV", "v4_db_bdz_nlo_112-6000GeV", "v4_uc_cuz_nlo_112-6000GeV",
          "v4_bb_bb_nlo_20-6000GeV", "v4_bbx_hz_nlo_217-6000GeV", "v4_bbx_ccxh_nlo_145-6000GeV", "v4_bg_bgg_nlo_30-6000GeV",
          "v4_gg_bbxg_nlo_30-6000GeV", "v4_ucx_cxhu_nlo_145-6000GeV", "v4_udx_ccxwp_nlo_101-6000GeV"]
-KEEP_STD = 0.1
+KEEP_STD = 1e-6   # only a constant V/B (no gap in D possible) is out; sigma is reported beside each target
 
 REMOTE = r'''
 import json, os, sys
@@ -38,10 +38,13 @@ for stem in sys.argv[1:]:
         out[stem] = None
         continue
     v = np.load(f, mmap_mode="r")[:, -1].astype(float)
-    r = np.log(np.abs(v)) - np.log(np.load(b))
+    x = v / np.load(b)
+    r = np.log(np.abs(x))
+    sq = float(np.quantile(np.abs(x), 0.01))   # data.signedlog_quantile 0.01: the signedlog scale of a signed pool
     h, _ = np.histogram(r - np.median(r), bins=edges)
     out[stem] = dict(n=int(len(r)), std=float(r.std()), median=float(np.median(r)), p1=float(np.percentile(r, 1)),
-                     p99=float(np.percentile(r, 99)), neg_frac=float((v < 0).mean()), hist=h.tolist(),
+                     p99=float(np.percentile(r, 99)), neg_frac=float((v < 0).mean()), signedlog_s=sq,
+                     share_above_10s=float((np.abs(x) > 10 * sq).mean()), hist=h.tolist(),
                      edges=edges.tolist())
 print("VBSPREAD " + json.dumps(out))
 '''
@@ -54,9 +57,9 @@ def main():
     res = site_python(REMOTE, POOLS, "VBSPREAD")
     for s, r in res.items():
         if r:
-            r["kept"] = r["std"] >= KEEP_STD and r["neg_frac"] == 0
+            r["kept"] = r["std"] >= KEEP_STD
             print(f"{s:32s} std {r['std']:.3g}  p1 {r['p1']:.3f}  p99 {r['p99']:.3f}  V<0 {r['neg_frac']:.3f}"
-                  f"  {'kept' if r['kept'] else 'dropped'}")
+                  f"  s {r['signedlog_s']:.3g}  >10s {r['share_above_10s']:.3f}  {'kept' if r['kept'] else 'dropped'}")
         else:
             print(f"{s:32s} no pool or sidecar")
     json.dump(res, open(a.out, "w"), indent=1)

@@ -8,10 +8,11 @@ with MSE <= 1e-4 (None if never), the step rate (traintime_hours / steps, the wh
 of the design recorded 2026-11-10 03:34:
     T(D) = 1.1 s_4 if the curve reaches 1e-4; else 1.1 s_b if best_frac < 0.8 (plateaued);
     else "extend": rerun at min(4 steps, 64000) (still improving at its cap; compute-limited at 64000).
-One-loop targets (*_nlo, trained on V/B; design passed 2026-11-10 09:15): a run whose data_stats.json is not a V/B run
-or whose target transform resolved to signedlog/abslog (V changes sign) is listed apart (not_ln_v: its curve is not
-the MSE of ln|V|); and a curve that does not reach 1e-4 but has its best in the last fifth still falling (the last
-point the minimum, or below 0.9 of the value at 0.8 of the run), or a best above 5.4e-4 at D=1e4 (hp58's tuned one-loop
+One-loop targets (*_nlo, trained on V/B; design passed 2026-11-10 09:15, revised the same day): a run whose
+data_stats.json is not a V/B run is listed apart (not_vb); each run carries the unit its curve is in (log: MSE of
+ln|V/B| = MSE of ln|V|; signedlog:<s> where V changes sign: the MSE of signedlog(V/B), the trained target's own error);
+and a curve that does not reach 1e-4 but has its best in the last fifth still falling (the last
+point the minimum, or below 0.9 of the value at 0.8 of the run), or (unit log only: another unit is not comparable) a best above 5.4e-4 at D=1e4 (hp58's tuned one-loop
 b b~), gives rule "to_dyhpo" (T from the stage-2 scratch DyHPO; no extend at a fixed lr).
 T is rounded up to a multiple of validate_every. A run whose curve holds a non-finite value is listed apart
 (blowup, with its first non-finite step).
@@ -66,18 +67,20 @@ def horizon(r):
         return {**o, "blowup_step": (bad + 1) * ev}
     loop = r["target"].endswith("_nlo")
     if loop:
-        # the one-loop arm reads MSE of ln|V/B| = MSE of ln|V| only on a plain log target (a sign-changing V/B
-        # resolves to signedlog/abslog: another quantity) of a V/B run
+        # the one-loop arm reads each target in the error of the target it trains on: V/B through log (MSE of
+        # ln|V/B| = MSE of ln|V|) or, where V changes sign, through signedlog (the MSE of signedlog(V/B), the same
+        # transform in both arms of stage 2); a run that is not a V/B run is listed apart
         flat = [str(t) for ts in (r.get("trafos") or []) for t in (ts or [])]
-        if not r.get("over_born") or any(t.startswith(("signedlog", "abslog")) for t in flat):
-            return {**o, "not_ln_v": True, "trafos": flat, "over_born": r.get("over_born")}
+        if not r.get("over_born"):
+            return {**o, "not_vb": True, "trafos": flat}
+        o["unit"] = next((t for t in flat if t.startswith(("signedlog", "abslog"))), "log")
     i = min(range(len(y)), key=y.__getitem__)
     s_b, best = (i + 1) * ev, y[i]
     s_4 = next(((j + 1) * ev for j, v in enumerate(y) if v <= LEVEL), None)
     frac = s_b / n
     up = lambda s: int(ev * math.ceil(1.1 * s / ev))
     falling = i == len(y) - 1 or y[-1] < 0.9 * y[int(0.8 * len(y)) - 1]
-    if loop and s_4 is None and ((frac >= 0.8 and falling) or (r["k"] == 8 and best > LOOP_REF)):
+    if loop and s_4 is None and ((frac >= 0.8 and falling) or (r["k"] == 8 and o.get("unit") == "log" and best > LOOP_REF)):
         # the one-loop design's too-low-lr branch: a fixed-lr curve still falling at its end, or above hp58's tuned
         # one-loop best at D=1e4, gives no horizon; T(D) comes from the stage-2 scratch DyHPO (no extend at fixed lr)
         rule, T = "to_dyhpo", None
@@ -108,8 +111,8 @@ def main():
     for r in res:
         if r.get("missing"):
             print(f"{r['target']:11s} k={r['k']:2d}  missing ({r.get('error')})")
-        elif r.get("not_ln_v"):
-            print(f"{r['target']:11s} k={r['k']:2d}  NOT MSE of ln|V| (trafos {r['trafos']}, over_born {r['over_born']})")
+        elif r.get("not_vb"):
+            print(f"{r['target']:11s} k={r['k']:2d}  NOT a V/B run (trafos {r['trafos']})")
         elif "blowup_step" in r:
             print(f"{r['target']:11s} k={r['k']:2d}  BLOWUP at step {r['blowup_step']}")
         else:
