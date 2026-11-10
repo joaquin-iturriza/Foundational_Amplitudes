@@ -20894,9 +20894,16 @@ entries:
     - optimizations_recap
   decisions:
   - D364
-  next: Collect from docs/results.tex what is already measured for each item of D364 with numbers and figures; design the
-    two reruns (pID vs quantum numbers on the current setup; the optimizer comparison extended to 1e-4) with GPU-h; then draft
-    the section text for the draft_rewrite owner.
+  next:
+    1: 'pidqn: submit the one-hot PID arm and its same-commit quantum-number control on the 1x width-8 catalog_v4 cell (PIDQN=pid|qn)
+      once the design reviewer passes; read R per class on PP4/EE4 and the held-out reads'
+    2: 'muon_1e4: the AdamW-parent arm of the pretrain_data_saving grid (same held-out targets, D grid, per-D horizons to
+      MSE 1e-4, fine-tune protocol): an AdamW pretraining of the data-saving parent''s setup at AdamW''s own searched HPs,
+      fine-tuned on every cell; its curves beside the Muon parent''s and scratch; design once pretrain_data_saving has its
+      design, GPU-h then'
+    3: 'writeup: a section in docs/results.tex with one paper-ready paragraph per D364 item (catalog, held-out classes, smart
+      sampling, sigma sampling, emission scales + coupling orders, adimensionalisation options, input conditionings failed
+      and off-shellness, Muon, zero-shot as the fine-tune''s starting point) for the draft_rewrite owner'
   done_when: null
   notes_ref: null
   match: optrec_*
@@ -20949,6 +20956,23 @@ entries:
       interval overlapping 1. No: R outside it, the sign saying which encoding is better. Held out: R on encodable probes
       read the same way; every probe with an unseen particle (if any) is a case one-hot cannot predict at all, which is the
       extrapolation argument for quantum numbers.'
+  step_why:
+    1:
+      feeds: D364 claim that pIDs and quantum numbers behave the same, on the latest setup
+      if:
+      - 'R inside [0.80,1.26] on PP4/EE4: the paper keeps the claim with the new numbers'
+      - 'R outside: the paper reports which encoding wins and by how much'
+    2:
+      feeds: 'D364: does the Muon pretraining transfer better down to MSE 1e-4'
+      if:
+      - 'the Muon parent''s fine-tunes reach 1e-4 with fewer target events than the AdamW parent''s: the paper states the
+        transfer gain at 1e-4'
+      - 'the two meet before 1e-4: the paper says Muon''s gain is in the pretraining and small-D start, not at 1e-4'
+    3:
+      feeds: 'D364/D365: the optimizations section of the rewritten draft'
+      if:
+      - 'every item has a measured paragraph: hand to draft_rewrite'
+      - 'an item lacks a measurement: say so in its paragraph and list it as open'
 - id: kit_benchmark
   title: the KIT hard phase-space benchmark and the fair NLO protocol (Bakar, Gudrun)
   question: 'On the KIT datasets (ee->tt Born and one-loop virtual, ee->uug, ee->uugg; hard bins by distance to the singularity):
