@@ -1,0 +1,6 @@
+# plan virtual_over_born (D366): the one-loop pool of ee_uu_nlo alone, for the virtual against virtual-over-Born test
+# (data.target_over_born). The existing pools (50000 / 5000 / 5000; one-loop pools are never shaped), with their Born
+# sidecars written by scripts/job_vob_born.sh.
+sampling: {mode: mixture}
+processes:
+  - {name: ee_uu_nlo, sqrts: [25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}

@@ -763,6 +763,13 @@ def born_of_pool(process, pool_file, n_events=None, seed=0, out=None, alphas_mz=
     if len(idx) == n and ok.all() and summary["n_rel_above_1e-6"] == 0:
         np.save(born_path(pool_file), rec["born"])
         summary["sidecar"] = born_path(pool_file)
+        # the pool the sidecar belongs to (data.target_over_born asserts it): a train pool in the purgeable cache can be
+        # regenerated while its sidecar survives, and V of one event would then be divided by the Born of another
+        import json
+        sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        from keyed_aug import pool_identity
+        with open(born_path(pool_file) + ".json", "w") as fh:
+            json.dump({"pool_identity": pool_identity(pool_file), "n_rows": int(n)}, fh)
     return summary
 
 

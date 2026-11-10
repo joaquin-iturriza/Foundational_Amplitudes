@@ -1,0 +1,79 @@
+# plan virtual_over_born (D366): ee_ttbar_nlo from scratch, target V/B (the virtual over its exact Born, data.target_over_born); the
+# template (sweep_config_jeanzay_template.yaml) as is, single-process features. Read: MSE of log|V| at the best trial.
+# Run only on ccin2p3 (drive.py --sites ccin2p3): the Born sidecars exist there only. vob_tt_VB is the second branch of
+# the A/B rule: it runs only if V/B at the vob_tt_V best config (seeds 42-44) is not better than V there.
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  request_gpus: 1
+  cpus_per_task: 4         # CC-IN2P3 allows at most 5 CPUs per V100 (site facts); num_workers 2
+  mem: 16G
+  time: "00:50:00"         # 8000 steps at 0.127 s/step = 17 min (single-process 2->2 sibling FA-ccin2p3-5f933ea3, ee_dd_nlo, BS 16384) + sigma stage and eval; target 0.4 h
+paths:
+sweep_name: vob_tt_VB
+n_trials: 8
+dyhpo:
+  surrogate: gp
+  n_candidates: 2000
+  objective_scale: auto
+  seed: 42
+  n_startup: 3
+  total_budget: 10000
+fidelity_schedule:
+  t_steps: [8000]
+fixed_params:
+  data.source: recipes
+  data.processes_file: ${PROJECT_DIR}/recipes/vob_ee_ttbar_nlo.yaml
+  data.require_cache: 'true'
+  data.memmap: 'false'
+  data.target_over_born: 'true'
+  data.preprocess_per_dataset: 'true'
+  data.seed: 42
+  data.eval_subsample: 5000
+  model: lloca
+  model.use_diagrams: 'false'
+  model.particle_encoder_hidden: 0
+  seed: 42
+  plot: 'true'
+  use_mlflow: 'false'
+  training.batchsize: 16384
+  evaluation.batchsize: 16384
+  evaluation.train_subsample: 2000
+  training.loss_aggregation: geometric_mean
+  training.validate_frac: '0.01'
+  training.get_ID: 'false'
+  training.regularization: L2
+  training.save_intermediate: 'false'
+  training.scheduler: CosineAnnealingLR
+  training.optimizer: MuonAdamW
+search_space:
+- name: training.lr
+  type: float_log
+  low: 1.667e-03    # [c/3, 3c] around c = 5e-3, the Muon search's best at 4264 steps
+  high: 1.5e-02
+- name: training.muon_weight_decay
+  type: float_log
+  low: 1.0e-03      # the Muon search's window (best 0.0217); decoupled, Muon's matrices only
+  high: 0.3
+- name: training.regularization_lambda
+  type: float_log
+  low: 1.0e-10      # optima p5-p95 within [2.5e-11, 9.8e-7]; cap high at 1e-6
+  high: 1.0e-06
+- name: training.cosanneal_warmup_frac
+  type: float_uniform
+  low: 0.05         # optima median 0.15; floor at 0.05 (was 0.0)
+  high: 0.2
+- name: training.cosanneal_eta_min
+  type: float_log
+  low: 1.0e-10      # weakest knob, spans full range; narrow (or fix ~1e-8)
+  high: 1.0e-07
+# EMA (weight averaging), gated by top-level `ema`: not settled (CLAUDE.md EMA row; docs/results.tex),
+# so it stays in the search. ema=false is "no EMA at all", ema=true uses ema_decay. Choices are strings so the Hydra override is lowercase
+# (ema=true/false); once settled, fix `ema` and drop from the search.
+- name: ema
+  type: categorical
+  choices: ["false", "true"]
+- name: training.ema_decay
+  type: float_uniform
+  low: 0.9          # inert on ema=false trials; ~100-10000 step averaging horizon when on
+  high: 0.999

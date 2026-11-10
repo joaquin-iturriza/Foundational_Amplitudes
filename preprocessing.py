@@ -5,6 +5,7 @@ from sklearn.preprocessing import QuantileTransformer
 
 
 SIGNEDLOG_QUANTILE = 0.01   # default scale: the 1% quantile of |x| on the train pool
+AMP_STD_FLOOR = 1e-6        # the floor of a target's standardization std (preprocess_amplitude)
 
 
 def resolve_amp_trafos(trafos, amplitude, scale_quantile=SIGNEDLOG_QUANTILE, sign_data=None,
@@ -85,9 +86,14 @@ def preprocess_amplitude(amplitude, trafos=None, mean=None, std=None):
                     amplitude = (amplitude - mean) / std
                     out_mean, out_std = mean, std
                 else:
-                    amplitude, out_mean, out_std = standardization(
-                        amplitude, return_mean_std=True, clip=False
-                    )
+                    # the std floored at AMP_STD_FLOOR: a target constant up to rounding (e+e- -> q q~ massless at
+                    # mu^2 = s over its Born is C_F times a number, plan virtual_over_born) has a std of ~5e-13 (the June 2026 datasets), and
+                    # dividing by it turns rounding noise into a unit-variance target nothing can learn (the June 2026
+                    # V/B runs). In the transformed units (log|M|^2 in nat) a spread below 1e-6 carries nothing a fit
+                    # could use; every real pool's std is O(1), so nothing else changes.
+                    out_mean = amplitude.mean(axis=0)
+                    out_std = np.maximum(amplitude.std(axis=0), AMP_STD_FLOOR)
+                    amplitude = (amplitude - out_mean) / out_std
             else:
                 fn = get_fn(fn_str)
                 amplitude = fn(amplitude, None)
