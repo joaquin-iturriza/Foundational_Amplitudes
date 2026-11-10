@@ -21494,7 +21494,8 @@ entries:
       - 'else: package A'
   step_waits:
     '1': FA-ccin2p3-7d74d518 FA-ccin2p3-366a4a98 FA-ccin2p3-f6b2ece9 FA-ccin2p3-12a9d54b
-    '2': FA-ccin2p3-f0ca7a15 FA-ccin2p3-95427201
+    '2': 2026-11-10T07:00 (the budget window of the failed pair; then resubmit both pretrainings with --dependency=afterok
+      on slurm jobs 63268392 heldout and 63268395 fair_nlo)
     '3': FA-ccin2p3-95427201
     '4': FA-ccin2p3-7d74d518 FA-ccin2p3-366a4a98 FA-ccin2p3-f6b2ece9 FA-ccin2p3-12a9d54b
     '5': FA-ccin2p3-7d74d518 FA-ccin2p3-366a4a98
