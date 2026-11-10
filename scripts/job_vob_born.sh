@@ -1,7 +1,9 @@
 #!/bin/bash
 #SBATCH --job-name=vob_born
 #SBATCH --cpus-per-task=6
-#SBATCH --time=02:00:00
+#SBATCH --time=00:45:00
+# Wall-time target 0.5 h: 6 pools in parallel, the largest 50000 rows of a 2->2 MadLoop point (estimate, at most
+# 10 ms per point: 8 min), plus the standalone builds if they are not cached.
 #SBATCH --output=vob_born_%j.out
 #SBATCH --error=vob_born_%j.out
 #
