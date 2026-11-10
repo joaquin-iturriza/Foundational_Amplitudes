@@ -10004,7 +10004,7 @@ temperature over seeds, and the $\sigma$-tail \emph{floors} at a level $8\times$
 rule for how much to generate. Tooling under \code{analysis/divergences/};
 heteroscedastic code on worktree \code{worktrees/wt-heterosc} (branch \code{heterosc}). Remaining/future
 work is collected in the hand-off, Sec.~\ref{sec:div-open}.}
-% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
 % claim: sat.budget_factor=8
 
 \paragraph{Deeper and antenna phase-space sampling.} The production
@@ -11344,7 +11344,7 @@ $\sigma$, raised to a power, generates a strictly better training set than unifo
 coordinate, no reference density, no loss correction, isolated from coverage- and loss-function
 confounds over $3$ seeds.} (This supersedes the confounded $ee\to u\bar u$ steering numbers from the earlier
 session, which are retracted.) See Figs.~\ref{fig:l2_uugg_perdecade}--\ref{fig:l2_uugg_perdecade_abs}.
-% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
 % claim: pct.uugg_logflat.0=92
 % claim: pct.uugg_logflat.1=81
 % claim: pct.uugg_logflat.2=78
@@ -11392,7 +11392,7 @@ session, which are retracted.) See Figs.~\ref{fig:l2_uugg_perdecade}--\ref{fig:l
   $\gamma=20,30$ shows the deep gain \emph{saturating} rather than continuing
   (Fig.~\ref{fig:l2_gamma_response_extended}).}
   \label{fig:l2_uugg_gamma}
-% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
 % claim: pct.uugg_deepest.0=90
 % claim: pct.uugg_deepest.1=71
 % claim: pct.uugg_deepest.2=66
@@ -11444,7 +11444,7 @@ $0.989,0.976,1.035,1.079$ at $\gamma=1,3,10,20$, so by $\gamma{=}20$ the $\sigma
 diffuse divergence just starves the rest of an already-uniformly-hard set. That contrast, saturation
 for $u\bar u gg$, and reversal for $u\bar u ggg$, is the sharpest evidence for the principle below
 (Fig.~\ref{fig:l2_gamma_response_extended}).
-% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
 % claim: uug.0.continuum=9e-4
 % claim: uug.0.peak=8.3e-2
 % claim: uug.3.peak=3.3e-2
@@ -11483,7 +11483,7 @@ for $u\bar u gg$, and reversal for $u\bar u ggg$, is the sharpest evidence for t
   concentration is actively worse. Concentration of the error, not depth of the divergence, is what
   decides whether $\sigma$-steering can pay.}
   \label{fig:l2_gamma_response_extended}
-% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
 % claim: uugg_s0.10.deepest=0.53
 % claim: uugg_s0.30.deepest=0.51
 % claim: uugg_s0.10.bulk=1.30
@@ -11501,7 +11501,7 @@ for $u\bar u gg$, and reversal for $u\bar u ggg$, is the sharpest evidence for t
   at the peak, $4\times$ in the deep-IR$\,\cap\,$peak corner), while leaving the easy continuum
   untouched. The steering density need \emph{not} be multi-modal to serve two competing extremes.}
   \label{fig:l2_uug_multiscale}
-% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
 % claim: uug.0.continuum=9e-4
 % claim: uug_gain.peak=2.5
 % claim: uug_gain.peak_ir=4
@@ -11551,7 +11551,7 @@ is \textbf{$Z$-driven, exactly where the contrast pointed}, and the mass's suppr
 is visible as the weaker deep-IR gain: the diagnostic called both the \emph{magnitude} and the
 \emph{location} on a process it was never tuned on (Fig.~\ref{fig:l2_bbbarg}). The prediction and the numbers above are seed $0$. Seeds $1$ and $2$ (same held-out set, evaluated alongside) agree: $Z$ peak
 $0.57$ and $0.48\times$, deep IR $0.91$ and $0.89\times$, overall $0.62$ and $0.54\times$, $Z$-peak contrast $2.61$ and $2.57$.
-% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
 % claim: bbg.0.contrast_peak=2.51
 % claim: preflight.uug_contrast=4.48
 % claim: preflight.uugg_contrast=1.83
@@ -11588,7 +11588,7 @@ $0.57$ and $0.48\times$, deep IR $0.91$ and $0.89\times$, overall $0.62$ and $0.
   there is less to gain there. The contrast, computed from the base arm with no A/B, called both the
   size and the location of the effect on a process the diagnostic was never fit on.}
   \label{fig:l2_bbbarg}
-% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
 % claim: bbg.0.peak=0.56
 % claim: bbg.0.shoulder=0.50
 % claim: bbg.0.continuum=0.82
@@ -11636,7 +11636,7 @@ $4.48\Rightarrow$ $\sigma$/base MSE $0.40$; $u\bar u gg$ (deep IR) $1.83\Rightar
 baseline model (no second arm, no A/B), it converts ``is this divergence concentrated?'' from a
 post-hoc reading of the outcome into a \textbf{cheap test you can run before committing the compute},
 and gives the concentration principle a directly measurable order parameter.
-% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
 % claim: preflight.uug_sigma_rise=4.5
 % claim: preflight.uug_rmse_rise=10
 % claim: preflight.uug_calib.peak=0.77
@@ -11667,7 +11667,7 @@ and gives the concentration principle a directly measurable order parameter.
   alone, against the $\sigma$-arm/base MSE ratio actually measured in that region. They order
   monotonically, so the contrast decides the question with one forward pass and no A/B.}
   \label{fig:l2_sigma_vs_divergence}
-% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
 % claim: preflight.uug_sigma_rise=4.5
 % claim: preflight.uug_rmse_rise=10
 % claim: preflight.uugg_contrast=1.8
@@ -11702,7 +11702,8 @@ The tuned Bayesian network reaches $2.87\times10^{-2}$, versus $3.01\times10^{-2
 ($0.95\times$, a real but modest win) and $2.65\times10^{-2}$ for the het-head $\sigma^{\gamma=3}$ baseline
 ($1.08\times$: \textbf{it loses}). The sweep's \emph{structure} is the informative part:
 $\sigma_{\rm rel}$ alone decides the outcome (Spearman $\rho=+0.965$ with the objective, monotone: wider
-posterior is uniformly worse; $\sigma_{\rm rel}\!\approx\!0.1$ costs a factor $2.5$ to $2.8$), while
+posterior is uniformly worse; the sweep's three widest posteriors, $\sigma_{\rm rel}=0.090$, $0.099$ and $0.128$,
+cost $2.77$, $2.46$ and $3.07\times$ its best), while
 $\beta_{\rm KL}$ ($\rho=-0.05$) and even the keep exponent $\gamma$ ($\rho=-0.07$) are \emph{noise} by
 comparison, and the optimum sits \textbf{on the lower bound} of the $\sigma_{\rm rel}$ range, i.e.\ the
 optimiser is driving the weight posterior toward the \emph{deterministic limit} to buy back point accuracy.
@@ -11717,7 +11718,7 @@ claim is ``no evidence the Bayesian network beats the het head'', and ``it beats
 (Figs.~\ref{fig:l2_uugg_bbb_vs_het}, \ref{fig:l2_bbb_sweep}). Tooling \code{bbb.py},
 \code{sweep/l2\_bbb\_trial.py}, \code{sweep/l2\_bbb\_sweep\_config.yaml} (the sweep drives the steering loop via
 \code{generate\_sweep}'s new \code{trial\_script} hook).
-% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
 % claim: bbb.trials=12
 % claim: bbb.best=2.87e-2
 % claim: bbb.uniform=3.01e-2
@@ -11725,8 +11726,12 @@ claim is ``no evidence the Bayesian network beats the het head'', and ``it beats
 % claim: bbb.het=2.65e-2
 % claim: bbb.over_het=1.08
 % claim: bbb.spearman_bbb_sigma_rel=0.965
-% claim: bbb.srel01_min=2.5
-% claim: bbb.srel01_max=2.8
+% claim: bbb.widest_srel.0=0.090
+% claim: bbb.widest_srel.1=0.099
+% claim: bbb.widest_srel.2=0.128
+% claim: bbb.widest_cost.0=2.77
+% claim: bbb.widest_cost.1=2.46
+% claim: bbb.widest_cost.2=3.07
 % claim: bbb.spearman_bbb_beta=-0.05
 % claim: bbb.spearman_gamma=-0.07
 % claim: bbb.het_rank_min=0.11
@@ -11758,7 +11763,7 @@ claim is ``no evidence the Bayesian network beats the het head'', and ``it beats
   (circled) still sits above the het-head line: the accuracy$\leftrightarrow$uncertainty tension is
   structural, not a tuning artefact.}
   \label{fig:l2_bbb_sweep}
-% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
 % claim: bbb.trials=12
 % claim: bbb.spearman_bbb_sigma_rel=0.965
 % claim: bbb.spearman_bbb_beta=-0.05
@@ -11797,7 +11802,7 @@ but on the flat $\gamma$-basin it buys nothing a well-tuned exponent does not al
 temperature picture holds: $\sigma^\gamma$ stays the right practical family: one knob, no measurable
 loss.} Tooling: the polynomial keep rule and \code{--objective logflat} in \code{l2\_online\_uugg.py},
 \code{sweep/l2\_poly\_sweep\_config.yaml}, \code{plot\_poly\_keep.py}.
-% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
 % claim: poly.r2_uugg.1=0.89
 % claim: poly.r2_uugg.2=0.99
 % claim: poly.r2_uuggg.1=0.68
@@ -11832,7 +11837,7 @@ loss.} Tooling: the polynomial keep rule and \code{--objective logflat} in \code
   best power-law arm $\sigma^{10}$ ($3.25\times10^{-2}$) overlap heavily seed-to-seed: the $1\%$ edge is
   inside the scatter. Curvature is the right direction but does not robustly beat a well-tuned exponent.}
   \label{fig:l2_poly_keep}
-% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
 % claim: poly.trials=12
 % claim: poly.best_c2.0=1.30
 % claim: poly.best_c2.1=2.40
@@ -11862,7 +11867,7 @@ generated data does not lower the floor}; for the base arm it is marginally \emp
 against ${\sim}2\%$ run-to-run reproducibility on a repeat of the whole sweep (its logs are not on disk). (The $\sigma$ arm also
 floors $6$ to $11\%$ \emph{below} base at every budget (read ${\sim}8\%$ before the reader), an independent sign that $\sigma$-steering
 removes more of the hard tail than uniform generation.)
-% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
 % claim: sat.p99.uugg_base_n75000=0.0448
 % claim: sat.p99.uugg_base_n150000=0.0468
 % claim: sat.p99.uugg_base_n600000=0.0477
@@ -11909,7 +11914,7 @@ generating and grow the model or the horizon.
   fall in $p99$; crossing below the $2\%$ tolerance band is the stopping rule the
   \code{--stop\_on\_saturation} latch uses.}
   \label{fig:l2_saturation}
-% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% src: python3 analysis/divergences/steering_numbers.py @40b69989
 % claim: sat.p99.uugg_base_n75000=0.0448
 % claim: sat.p99.uugg_base_n150000=0.0468
 % claim: sat.p99.uugg_base_n600000=0.0477
