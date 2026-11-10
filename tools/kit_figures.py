@@ -142,14 +142,14 @@ XLAB = {"threshold_beta": r"top velocity $\beta$", "sudakov_sqrts": r"$\sqrt{s}$
 
 def arm_label(r):
     """short legend symbol: the training size, then what differs (protocol, off-shellness off, plain target)"""
-    lab = r"$10^5$" if r["n"] == 100000 else r"$9{\times}10^5$"
+    lab = r"$N=10^5$" if r["n"] == 100000 else r"$N=9\times10^5$"
     if r["mode"] in ("B", "B_bulk", "A_ft"):
         lab = {"B": "hard+", "B_bulk": "bulk+", "A_ft": "pretr."}[r["mode"]] + " " + lab
     tag = r["tag"]
     if tag in ("offoff", "nooffshell"):
-        lab += ", off"
+        lab += ",\nno off-shell input"
     elif tag == "plain":
-        lab += ", plain"
+        lab += ",\nplain target"
     return lab
 
 
@@ -176,12 +176,12 @@ def plot(path, outdir):
                              if k.startswith("hard_test/") and family(k.split("/")[1]) == fam)
                 ax.plot(*zip(*pts), "o-", color=c, label=lab)
             fl = sorted((v["x"], v["mse"]) for st, v in tr["floor"].items() if family(st) == fam)
-            ax.plot(*zip(*fl), "--", color=ps.C.grey, label="floor")
+            ax.plot(*zip(*fl), "--", color=ps.C.grey, label="constant at bulk edge")
             ref = MLP.get((stem, target, fam))
             if ref:
                 x = np.sqrt(ref[0] * ref[1])
-                ax.plot([x], [ref[2]], "*", color="k", label="MLP log")
-                ax.plot([x], [ref[3]], "x", color="k", label="MLP raw")
+                ax.plot([x], [ref[2]], "*", color="k", label="KIT MLP (log inputs)")
+                ax.plot([x], [ref[3]], "x", color="k", label="KIT MLP (raw inputs)")
             ax.set_xscale("log")
             ax.xaxis.set_minor_formatter(NullFormatter())
             ax.set_yscale("log")
@@ -191,7 +191,7 @@ def plot(path, outdir):
         h0 = figs[0][1].get_legend_handles_labels()[0]
         for _, ax in figs:
             ps.legend(ax, "upper left", handles=h0)
-            ps.make_room(ax)
+            ps.make_room(ax, max_growth=3.0)
         written += ps.save_panels(figs, os.path.join(outdir, f"kit_mse_{base}"))
         # (2) median predicted vs truth log10|M|^2
         figs = ps.panels(len(fams))
@@ -211,7 +211,7 @@ def plot(path, outdir):
         h0 = figs[0][1].get_legend_handles_labels()[0]
         for _, ax in figs:
             ps.legend(ax, "upper left", handles=h0)
-            ps.make_room(ax)
+            ps.make_room(ax, max_growth=3.0)
         written += ps.save_panels(figs, os.path.join(outdir, f"kit_median_{base}"))
     for w in written:
         print(w)
