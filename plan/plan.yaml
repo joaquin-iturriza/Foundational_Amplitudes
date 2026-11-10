@@ -20875,7 +20875,15 @@ entries:
     - analysis/data_saving/horizons.py
     - recipes/catalog_v4_datasaving_trees.yaml
     - scripts/job_data_saving.sh
-  dead_ends: []
+  dead_ends:
+  - tried: Stage-2 design (revised 06:51) reading D* from the two grid points bracketing each crossing, one 8-trial search
+      per cell
+    why: 'Design reviewer FIX twice (check 3): by the design''s own expected savings (ttbar at 1e-4 S~1.5-3 against a YES
+      bar of 3.2; ccbar g at 1e-2 S~10 against a ~15x band from sec:ladder''s 5x search-to-search spread at slope 0.85; bbbar
+      gg only a bound) the 200-290 GPU-h would most likely read NOT RESOLVED. Remedy inside the work: a fit-based D* (log
+      L vs log D over 3-5 points per arm near the crossing, or A D^-a + L_inf), band from fit residuals and the 5x spread;
+      outside: more searches per cell (D315, Joaquin''s).'
+    at: '2026-11-10T06:52:51+00:00'
   asks: []
   owner:
     agent: ad04aefad1cbf46c9
