@@ -15722,6 +15722,12 @@ entries:
     answers_after: '2026-11-09T22:48:59+00:00'
     covers:
     - agent_redesign
+  - said_at: '2026-11-10T00:42:35.190000+00:00'
+    text: I already answered the sweep template question many weeks ago, yes, the template should be fixed
+    decision: D346
+    answers_after: '2026-11-10T00:16:40+00:00'
+    covers:
+    - agent_redesign
   decisions:
   - D186
   - D203
@@ -15735,6 +15741,7 @@ entries:
   - D321
   - D330
   - D334
+  - D346
   next:
     11: 'Close: write up in docs/results.tex what the redesign changed and measured (cut 1 replay and check, the main-session
       wake re-measure, the compaction leak fix, the model trial), with % src lines from push_replay.py, main_turns.py --split
@@ -16061,13 +16068,17 @@ entries:
     blocks: the remaining branch cleanup and the two hook installs (step 20)
     blocks_steps:
     - 20
+    answered_at: '2026-11-10T00:42:35.066000+00:00'
+    decision: D346
   - ask: 'Scope: the sweep template''s fidelity_schedule.t_steps is [1000, 10000, 40000] (multi-fidelity) while the HPO rule
       says single-fidelity, one value: which holds, the rule (cut the template to one length) or the template (change the
       rule)?'
     at: '2026-11-10T00:16:40+00:00'
     searched: CLAUDE.md HPO rule, fa-sweeps-and-hpo rule 6, D241; the claudemd-keeper flagged the contradiction 2026-11-10;
       none settles which side is right
-    blocks_steps: &id001 []
+    blocks_steps: []
+    answered_at: '2026-11-10T00:42:35.066000+00:00'
+    decision: D346
   step_why:
     11:
       feeds: whether the redesign is finished
@@ -16852,12 +16863,6 @@ entries:
       /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/leave_check_wip.patch /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/test_plan_leave_check.py
       /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/pfg.py /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/test_plan_files_guard_text.py
     written: '2026-11-09T23:06:32+00:00'
-  ask: 'Scope: the sweep template''s fidelity_schedule.t_steps is [1000, 10000, 40000] (multi-fidelity) while the HPO rule
-    says single-fidelity, one value: which holds, the rule (cut the template to one length) or the template (change the rule)?'
-  waiting_since: '2026-11-10T00:16:40+00:00'
-  searched: CLAUDE.md HPO rule, fa-sweeps-and-hpo rule 6, D241; the claudemd-keeper flagged the contradiction 2026-11-10;
-    none settles which side is right
-  blocks_steps: *id001
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
   question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
