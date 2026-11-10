@@ -22558,6 +22558,12 @@ entries:
     units: null
     start: '2026-11-10T04:57:20+00:00'
     at: '2026-11-10T04:57:20+00:00'
+  - batch: vob_seed_runs
+    wall_h: 0.9
+    jobs: 10
+    units: null
+    start: '2026-11-10T07:50:33+00:00'
+    at: '2026-11-10T07:50:33+00:00'
   step_waits:
     '1': the detached sweep driver vob_V_sweeps relaunched 05:57 (pid 2568906, --hours 0.9; sweeps vob_tt_V and vob_uu_V on
       ccin2p3, 16 trials in waves 3/3/2, target 2.7 h; its end comes back as a site event)
