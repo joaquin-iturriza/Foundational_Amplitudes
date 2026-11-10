@@ -19,7 +19,10 @@
 #            A_ft     protocol A fine-tuned from KIT_PARENT (a pretraining with the target's family held out)
 #            B        protocol B: continued from the protocol A run KIT_FROM (its config is the base, its best
 #                     weights the start, its target and off-shellness stats kept) with every hard_train stratum
-#                     added to the train split (dataset kit_<file>__<target>__hard); validation stays bulk
+#                     added to the train split (dataset kit_<file>__<target>__hard: the first 90% of each stratum;
+#                     validation is bulk plus the last 10%, so the checkpoint sees the hard fit)
+#            B_bulk   B's matched control: the same continuation from KIT_FROM (same steps, lr and restart) on the
+#                     bulk only
 # The checkpoint is selected on the validation mu MSE (training.heterosc_select=mu_mse), then the sigma stage.
 # Run dir runs/kit/kit_<mode>_<file>_<target>_n<n_train>_t<steps>[_<tag>] (tag=<name> argument).
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
@@ -28,7 +31,7 @@ cd "$PROJECT_DIR"
 DS="$1"; N="$2"; T="$3"; MODE="$4"; shift 4
 [[ "$DS" =~ ^kit_[A-Za-z0-9_]+__[A-Za-z0-9_]+$ ]] && [[ "$DS" != *__hard ]] || { echo "dataset kit_<file>__<target>"; exit 2; }
 [[ "$N" =~ ^[0-9]+$ ]] && [[ "$T" =~ ^[0-9]+$ ]] || { echo "n_train and steps are integers"; exit 2; }
-case "$MODE" in A|A_ft|B) ;; *) echo "mode A, A_ft or B"; exit 2 ;; esac
+case "$MODE" in A|A_ft|B|B_bulk) ;; *) echo "mode A, A_ft, B or B_bulk"; exit 2 ;; esac
 PARENT="${KIT_PARENT:-runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262}"
 NVAL=100000; NTEST=200000
 TAG=; ARGS=(); for x in "$@"; do case "$x" in tag=*) TAG="_${x#tag=}";; seed=*) TAG="${TAG}_seed${x#seed=}"; ARGS+=("$x");; *) ARGS+=("$x");; esac; done
@@ -40,7 +43,7 @@ case "$FILE" in *tt*) SQ="[346, 50000]" ;; *) SQ="[1000, 1000]" ;; esac
 mkdir -p "$PROJECT_DIR/runs/kit/recipes"
 RECIPE="$PROJECT_DIR/runs/kit/recipes/$(basename "$OUT").yaml"
 printf 'processes:\n- name: %s\n  sqrts: %s\n  n_train: %s\n  n_val: %s\n  n_test: %s\n' "$NAME" "$SQ" "$N" "$NVAL" "$NTEST" > "$RECIPE"
-if [ "$MODE" = B ]; then
+if [ "$MODE" = B ] || [ "$MODE" = B_bulk ]; then
     [ -n "$KIT_FROM" ] && [ -e "$PROJECT_DIR/$KIT_FROM/config.yaml" ] || { echo "B needs KIT_FROM=<protocol A run dir>"; exit 2; }
     BASE="$PROJECT_DIR/$KIT_FROM"
     PT="$BASE/models/model_run0_best.pt"; [ -e "$PT" ] || PT="$PT.gz"
