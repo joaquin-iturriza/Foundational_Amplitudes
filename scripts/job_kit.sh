@@ -80,4 +80,7 @@ if [ $RC -eq 0 ] && [ -z "$KIT_NO_SCORE" ]; then
     python tools/kit_predict.py "$OUT"
     RC=$?
 fi
-echo "KIT_DONE rc=$RC $OUT"; exit $RC
+echo "KIT_DONE rc=$RC $OUT"
+# the supervisor's clean-end marker (~/.config/ccorch/projects.toml end_markers), only on success
+[ "$RC" -eq 0 ] && echo "RUN_DONE $OUT"
+exit $RC
