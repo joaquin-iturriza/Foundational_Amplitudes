@@ -20946,6 +20946,35 @@ entries:
       every D): its saving can only be a lower bound D*_scratch > 1e5; the target is kept with that bound, or a 1e6 pool is
       proposed to Joaquin with its generation and GPU cost. A run that blows up is listed apart with its step. Stage 2''s
       GPU-h estimate uses these runs'' measured rates.'
+    fix_at: '2026-11-10T02:38:14+00:00'
+    fix: '1) Measure (check 2/9): the parent config (runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262/config.yaml
+      on CC, line 5909) has training.heterosc_select: nll, so val_loss_no_reg and the best step are the validation Gaussian
+      NLL, not MSE(ln|M|^2); ''val_loss_no_reg x prepd_std^2'' is not the measure named. Read s_4 and the MSE-best step from
+      the val_mse curve (mu MSE) x prepd_std^2, and say which checkpoint selection stage 2 uses (D62 makes nll the default;
+      D85/D89 in docs/results.tex near line 10567 found the NLL pick 16% worse in mu at the median at 2->3/2->4), since s_b
+      under nll and under mu_mse are different steps. 2) Horizon cap censors the quantity asked (checks 2/4/6): 8000 steps
+      at k<=8 and 12000 at k=9,10 are kept from the ladder''s fixed-compute rule, but D356 asks for training up to where scratch
+      reaches 1e-4, and sec:ladder''s horizon test shows 8000 is not converged at D>=10^3.5 (ee->ttbar 4.5x lower at 10^3.5
+      and 4.8x at 10^4 with 32k steps, best at the last step). A cell that would cross 1e-4 after the cap is read as ''never'',
+      which pushes D*_scratch up and inflates the saving, the direction of the hypothesis. Fix: a cap that can see the crossing
+      (the ladder''s 64k) or a stated extension rule (a cell above 1e-4 with its best in the last fifth is rerun longer until
+      it crosses or plateaus), with the GPU-h re-estimated and taken to Joaquin if over 30 GPU-h. 3) Spread (check 3): the
+      run-to-run spread of this loss is measured and not cited: het 2->2 cells, two runs of one config, best mu MSE >2x apart
+      in 69 of 146 cells (10-90%: 0.20 to 5.9), 2->3/2->4 0.90-1.15 (docs/results.tex, D89 paragraph). ee->ttbar is 2->2,
+      so a 1.1x margin on one run''s s_4 sits inside that spread. State it and why one run suffices (e.g. a margin set against
+      it), or ask Joaquin whether to run a second seed on the 2->2 target (worded as a question to him, all three targets
+      kept alike). 4) Prior (check 5): omits catalog_v3''s small-D held-out fine-tunes vs scratch (par:v3_muon, data/muon_ft.json,
+      runs FA-ccin2p3-00d080ba scratch and 8 fine-tune runs, D=10-316) and the follow-up search finding that every cell''s
+      best checkpoint sits a median 0.02 of the way through its run, a horizon finding at small D for this exact kind of cell;
+      omits D62/D85/D89 on het checkpoint selection; and should note that optimizations_recap step muon_1e4 will reuse this
+      grid and its horizons. Name these and what they change (likely: the low-D horizons can be much shorter than 8000). Searched:
+      data saving, 1e-4, scratch/fine-tun near held-out, ttbar, v4_long/68224, muon_1e4, heterosc_select/mu_mse, calib_ee_ddbar.
+      Checks that hold: one fixed-HP run per (target, D) is a calibration, the matched control is stage 2''s (same T(D), prefixes,
+      model and inputs, init and space differ, stated); calib_ee_ddbar.json confirms best steps 160/640/2560/4160 of 8000
+      for k=2..5 and at the end from k=6; loss HETEROSC with the sigma stage matches D52/D71; preprocessing is the parent''s
+      per D355; only D, batch min(16384,D/2), the lr D factor and the horizon move with D (all from the ladder protocol or
+      D356); no sweep in this step; disk 44 GB free on /sps/lpnhe read now, parent run dir 113 MB, 27 runs fit; test events
+      are the target''s own recipe-entry sampling, no user words name another.'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
