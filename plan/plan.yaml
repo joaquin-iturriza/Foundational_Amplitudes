@@ -20516,6 +20516,15 @@ entries:
       overall 0.62/0.54, contrast 2.61/2.57). Pre-flight label checked: the 4.48 contrast is e+e- -> u ubar g (heldout_eval_uug_base_s0),
       correct as written. Marked without committed reader: t tbar threshold scan, Bayes z^2 and rank rho, saturation repeat,
       D47 training-split pulls and blow-up log values, D89 step-80 NLLs, D91 MSE-cell lr.'
+  - at: '2026-11-10T00:44:05+00:00'
+    text: 'repo-reviewer a437be4394e3e0f7d on sigma-gen @96ed66d5: FIX, one blocking finding (lock still held; continue that
+      same reviewer with the fix commit). steering_numbers.py:527 picks its own band 0.08<=sigma_rel<=0.12, which keeps the
+      trials at 0.090 (2.77x) and 0.099 (2.46x) and drops the one at 0.128 (3.07x), so the ''corrected'' Bayes cost ''2.5
+      to 2.8'' in results.tex (~line 11705; claims bbb.srel01_min/max) comes from where the band was put. Fix: report the
+      top-of-range trials with their sigma_rel (''sigma_rel 0.09 to 0.13 costs 2.5 to 3.1x''), or use a selection the sweep
+      design sets, and rewrite the sentence and its claims to name it. Everything else checked clean: definitions match the
+      plotting scripts, no silent drops, het_stage2 output identical. Nit: het_sigonly.py:870 skips a run whose directory
+      is missing (verify_claims would catch it).'
   step_why:
     1:
       feeds: 'whether the July studies carry over: what they found, recorded reproducibly'
