@@ -21764,6 +21764,18 @@ entries:
       them; the next lever is the input representation, log invariants as in Bakar''s MLP), but the dimensionless target+inputs
       cost 2 decades of bulk accuracy on uug from scratch at 1e5 and cause the soft runaway. Exponent and bin numbers resolved
       at 0.3 decades / 0.1 (D315 one seed).'
+  - at: '2026-11-10T08:29:24+00:00'
+    text: 'What the uug inputs carry into the limits (tools/kit_target_slope.py FEAT lines at 412188b7, CC CPU, ee_uug me2,
+      truth only, 1e5 events per hard_test stratum, bulk from 2e5 bulk_train): the off-shellness column the model reads for
+      a massless parton propagator, o = min over final-state pairs with a gluon of 2p_i.p_j/s_hat, as log1p(o/eps) (eps =
+      data.dimless_offshell_eps 1e-6, default). Bulk range [0.5%,99.5%]: [9.33, 13.05]. Hard-bin medians: soft x 1e-3..1e-2
+      6.77, 1e-4..1e-3 4.48, 1e-5..1e-4 2.27, 1e-6..1e-5 0.63, 1e-7..1e-6 0.08; coll y 8.06 / 5.76 / 3.48 / 1.43 / 0.28. Outside
+      the bulk range: 1.000 in every hard bin of both families. Slope against log10 singular_var: 1.71 soft, 1.97 coll at
+      eps 1e-6 (2.302, 2.303 = ln10 at eps 1e-12, bulk then [23.1, 26.9]). So the model already reads a log invariant of the
+      limit (logarithmic down to ~1e-5, flattened by log1p only in the deepest 1-2 decades), and that column sits 3-13 units
+      below its whole training range in every hard event: the one input that leaves its range by construction. Neither the
+      T-target control (soft exponent +20.2) nor the plain arm (+0.78) extrapolates linearly in it, unlike Bakar''s MLP on
+      log invariants (-2.12). eps 1e-12 would change only the deepest two decades.'
   step_why:
     1:
       feeds: 'the numbers sent to KIT: whether hard_train fixes each family (B vs B_bulk)'
