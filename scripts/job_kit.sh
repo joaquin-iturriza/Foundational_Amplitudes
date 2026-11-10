@@ -9,6 +9,8 @@
 # benchmark scores (tools/kit_predict.py: predictions on every hard_test stratum and bulk_test, the benchmark's own
 # evaluate.py).
 #     site submit <site|auto> FA scripts/job_kit.sh -- <dataset> <n_train> <steps> <mode> [key=value ...]
+# KIT_FROM (B, B_bulk) and KIT_PARENT (A_ft) reach the job only through `site submit --env KIT_FROM=<run dir>`: a
+# shell variable set before `site submit` is not exported to the job (12 B jobs failed so, 2026-11-10).
 # <dataset>  kit_<file>__<target>, e.g. kit_ee_uug__me2, kit_ee_tt__virt_finite
 # <n_train>  the first n_train events of bulk_train; validation is the last 1e5 of bulk_train (bulk-only early
 #            stopping), test the 2e5 of bulk_test
