@@ -20956,6 +20956,26 @@ entries:
       interval overlapping 1. No: R outside it, the sign saying which encoding is better. Held out: R on encodable probes
       read the same way; every probe with an unseen particle (if any) is a case one-hot cannot predict at all, which is the
       extrapolation argument for quantum numbers.'
+    fix_at: '2026-11-10T02:29:35+00:00'
+    fix: '(1) Matched control / A/B protocol and outcome (checks 1, 4): both arms run at the Muon search best HPs (lr 4.997e-3,
+      wd 0.0217), which were tuned for the quantum-number encoding; the one-hot arm is untuned. Same HPs first is right, but
+      the ''No'' outcome concludes ''the sign says which encoding is better'' from that single untuned read. Fix: state that
+      if the one-hot arm is worse (R above the band) the result is not a verdict; the same DyHPO sweep (template coupled space,
+      sibling trial count) follows for the one-hot arm, best against best, and say its GPU-h; if the one-hot arm is same or
+      better at the shared HPs it is done. (2) Disk (check 14): the design gives no disk per job and no free disk. CC /sps/lpnhe
+      has 44 GB free of 512 GB (92% used, df read 2026-11-10); the whole-train-pool catalog_v4 cell built a ~20 GB memmap
+      cache per job in the long runs. Fix: read disk per job (cache included) from the existing cell FA-ccin2p3-804a65bc''s
+      run dir and cache, show the two arms open one shared cache (same key in both logs, or the key built twice the way the
+      two jobs would), and show 2 jobs plus the cache fit 44 GB with margin, or place them on a site with room (site pick).
+      (3) Wall-time target and GPU-h (CLAUDE.md clusters rule): not stated; give 4264 steps at the cell''s measured step rate
+      on the target GPU plus the reads, for 2 jobs. (4) Reads'' sampling (check 10): state for each read how its test events
+      were drawn (PP4/EE4: the training classes'' catalog_v4 mixture test pools; H1-H7c: catalog-sampled held-out; HD4/HD5:
+      default-sampled held-out) and that this matches D364''s ''our latest setup''. Checks that hold: measure resolution confirmed
+      (par:v4_width PP4 R 0.565 [0.522, 0.614]; seed_spread.json het |ln R_seed| median 0.102, q90 0.228; tab:enc encoding
+      deltas +12% to +18%), one seed per arm under D315, prior complete (searched use_PIDs, PIDs, pid arm, one-hot, pid_vs_phys,
+      pretrain25_zs_pid, quantum number in results.tex, plan.yaml and decisions; Suprio''s 2026-10-22 diagram-vs-pID note
+      is about diagrams, not this question), het loss and emission-scale target per D71/D234, only use_PIDs moves (mass column
+      absence is inherent and stated), no label in inputs.'
   step_why:
     1:
       feeds: D364 claim that pIDs and quantum numbers behave the same, on the latest setup
