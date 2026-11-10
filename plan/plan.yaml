@@ -22349,14 +22349,16 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-d0c0e4cd
-    commit: 0b33049e
+    commit: 9bcd69e3
     paths:
     - analysis/virtual_over_born/data/june_targets_site.json
     - analysis/virtual_over_born/data/pool_targets_site.json
     - analysis/virtual_over_born/figs/june_vob.png
     - analysis/virtual_over_born/june_targets.py
     - analysis/virtual_over_born/pool_targets.py
+    - analysis/virtual_over_born/seed_mse.py
     - docs/results.tex
+    - scripts/job_vob_seed.sh
   dead_ends: []
   asks: []
   owner:
