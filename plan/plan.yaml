@@ -15783,7 +15783,7 @@ entries:
   match: zz_redesign_*
   evidence:
     runs: []
-    commit: 700fe4fa
+    commit: cb0fd64a
     paths:
     - .claude/hooks/notification_absorb.py
     - .claude/hooks/owner_handoff.py
@@ -15816,6 +15816,14 @@ entries:
       mid-turn and cost nothing. One of the 3 (11-06 04:42) carried its report inline (no hand-back), which the hook passes
       by design; the other 2 not inspected. Step 23 done: plan_check skips reply_check while disabled.json lists it (700fe4fa,
       repo-reviewer PASS).'
+    - '2026-11-10 step 22: repo-reviewer a0b2da08acd94dae3''s two blockers fixed in d9158526: review_backlog.sh reset_pillar
+      moves the watermark only forward along the main checkout''s history (a diverged branch pass is listed in .passed only;
+      a stranded watermark is replaced), tests/test_review_advance_at.py new case fails on the old hook; watermark restored
+      by hand to f5ac899c (0 0, no hash). worktree_fold_guard.sh catches /bin/rm, \rm, rm -f -r, flags after the path, xargs/command/env/sudo
+      rm (tests/test_worktree_fold_guard.py 10 blocked, 5 passed; old hook missed 7 of 10). Templates e1b95b29 at [40000],
+      now [8000] per D347 uncommitted until the re-check passes. plan.user_said + _said_ok (cb0fd64a): plan ask / add --ask
+      refuse until --searched names each of the user''s messages sharing >=2 rare terms (top 3); tests/test_plan_user_said.py
+      tonight''s case (2026-10-23T02:12). Re-check sent to the reviewer.'
     - analysis/agent_redesign/agent_tasks.json
     - analysis/agent_redesign/context_breakdown.json
     - analysis/agent_redesign/figs/context_breakdown.png
