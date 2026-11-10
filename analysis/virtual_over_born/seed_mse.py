@@ -70,7 +70,7 @@ def main():
     for proc, a in res.items():
         v, vb = [x for x in a["V"].values() if x], [x for x in a["V/B"].values() if x]
         if v and vb:
-            mv, mvb = sorted(v)[len(v) // 2], sorted(vb)[len(vb) // 2]
+            import statistics; mv, mvb = statistics.median(v), statistics.median(vb)
             summ[proc] = {"V_median": mv, "VB_median": mvb, "median_V_over_VB": mv / mvb,
                           "all_VB_below_V": int(max(vb) < min(v)), "VB_max": max(vb)}
             print("%s: V %.3g..%.3g, V/B %.3g..%.3g; max(V/B) below min(V): %s; geo-mean V over V/B %.3g" % (
