@@ -4311,6 +4311,53 @@ cluster's project disk, which is full.
   \label{fig:v4_loop_born_events}
 \end{figure}
 
+% src: python3 analysis/virtual_over_born/june_targets.py --cached @d9b38f1c
+% claim: targets.ee_uu_nlo_virt_ratio.mean=2.49
+% claim: targets.ee_uu_nlo_virt_ratio.rel_std_raw=4.96e-13
+% claim: targets.ee_uu_nlo_virt_ratio.n_distinct=1604
+% claim: targets.ee_ttbar_nlo_virt_ratio.t_std=0.140
+% claim: targets.ee_ttbar_nlo_virt_e4.t_std=0.622
+% claim: t4000.scaling_solo_full_eeuunlovirtratio_t04000.loss_std_units=0.859
+% claim: t4000.scaling_solo_full_eeuunlovirtratio_t04000.mse_transformed_units=2.12e-25
+% claim: t4000.scaling_solo_full_eettbarnlovirtratio_t04000.mse_transformed_units=4.58e-08
+% claim: t4000.scaling_solo_full_eettbarnlovirte4_t04000.mse_transformed_units=1.75e-07
+% claim: pairs.scaling_solo_full_eettbarnlo_t04000.V_over_VB=3.82
+% claim: pairs.finetune_scaling_virt_002_eettbarnlo_t04000.V_over_VB=6.89
+% claim: pairs.finetune_resethead_scaling_virt_eettbarnlo_t04000.V_over_VB=35.3
+% claim: pairs.finetune_freeze_scaling_virt_eettbarnlo_t04000.V_over_VB=11.9
+% allow: 70000 4000 0.7 because they are the rows read (the 0.7 train share of 1e5), the horizon in steps and the share
+% allow: 8 because it is the C_F(pi^2-8) constant
+% allow: 10^{-6} 2 42 because they are the std floor (a setting), an exponent and the seed
+\paragraph{Why the June virtual-over-Born target looked like a failure (2026-11-10, D366).}\label{par:vob_june} The
+question (the user, 2026-11-10: why training on the virtual over the Born ``doesn't work for us'' when others find it
+better than the virtual alone): the June sweeps trained the one-loop QCD virtual $V$ and $V/B$ (the same \code{.dat}
+rows, $B$ the exact Born) on $e^+e^-\to u\bar u$ and $t\bar t$, from scratch and fine-tuned in five ways, and the
+$V/B$ cells were read as not scaling. Re-read from their own datasets ($70000$ rows each, the $0.7$ train share;
+\code{analysis/virtual\_over\_born/june\_targets.py}), with the sweeps' best validation losses converted from
+standardized units to the MSE of $\log|V|$ (loss $\times$ the std of the log target; for $V/B$, $B$ exact, the MSE of
+$\log|V/B|$ is that of the recombined $\log|V|$). On $u\bar u$, $V/B=2.49=C_F(\pi^2-8)$ at every event, relative std
+$4.96\times10^{-13}$ ($1604$ distinct values: rounding), as the electroweak Sudakov arm's check found for $d\bar d$ (\code{tools/ew\_sudakov\_check.py}); the
+standardization (no floor on its std) blew the rounding up to unit variance, so the loss sat at $0.859$ at every
+horizon, which is an MSE of $\log|V|$ of $2.12\times10^{-25}$: exact. On $t\bar t$ the log target's std is $0.140$ for
+$V/B$ against $0.622$ for $V$, so equal standardized losses are not equal errors; converted, $V/B$
+is below $V$ in all six arms at $4000$ steps: from scratch $4.58\times10^{-8}$ against $1.75\times10^{-7}$ ($V$ over
+$V/B$ $3.82$), fine-tuned $6.89$, frozen $11.9$, reset head $35.3$ (Fig.~\ref{fig:vob_june}). So the June attempt did
+not fail: it was compared in units that differ between the two targets by their variance, and on $u\bar u$ there was
+nothing to learn. What it changes: the amplitude std is floored at $10^{-6}$ (\code{preprocessing.AMP\_STD\_FLOOR}),
+\code{data.target\_over\_born} trains $V/B$ from a pool's Born sidecar, and the matched test at current defaults
+runs (plan \code{virtual\_over\_born}).
+\begin{figure}[t]
+  \centering
+  \includegraphics{../analysis/virtual_over_born/figs/june_vob.pdf}
+  % src: python3 analysis/virtual_over_born/june_targets.py --cached @d9b38f1c
+  \caption{The June 2026 one-loop sweeps on $e^+e^-\to t\bar t$ (left) and $u\bar u$ (right): per horizon the best
+    trial's validation loss converted to the MSE of $\log|V|$ (loss times the variance of the log target), $V$ the
+    one-loop QCD virtual and $V/B$ the virtual over its exact Born, from scratch (solid) and fine-tuned from the June
+    pretraining (dashed); one DyHPO sweep per point, seed $42$. On $u\bar u$ the $V/B$ target is a constant and its
+    points sit at rounding level.}
+  \label{fig:vob_june}
+\end{figure}
+
 % src: python3 analysis/catalog_v4/compare_pp_trained.py @c184e6d5
 % claim: n_classes=1396
 % allow: 42 43 2000 13 4.7 because they are the seeds, the events per read, the beam energy in TeV and the b mass in GeV, settings
@@ -9052,7 +9099,7 @@ with an irreducible loss $L_\infty$; the bare power law $L\approx A\,C^{-\alpha_
 diagnostic in the regime far above the floor. We report $\alpha_C$ as the local exponent over the
 sampled compute range (Fig.~\ref{fig:phase1scaling} shows the phase-1 joint-pretraining learning
 curves at each pretraining pool size $D$, and Figs.~\ref{fig:phase1detailA}--\ref{fig:phase1detailB} resolve every trial and per-width envelope fit within each $D$). A virtual/Born \emph{ratio} target was also tried as a learning
-objective; it does not scale meaningfully and is excluded from what follows.
+objective; read in standardized units it seemed not to scale, which par.~\ref{par:vob_june} traces to the units, and it is excluded from what follows.
 
 \begin{principle}[Compute exponent falls with final-state multiplicity]\label{prin:mult}
 The compute-scaling exponent $\alpha_C$ decreases with the number of final-state particles:
