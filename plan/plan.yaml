@@ -21031,9 +21031,11 @@ entries:
       arm. Searched: data saving, 1e-4, scratch/fine-tun near held-out, ttbar, v4_long/68224, muon_1e4, heterosc_select/mu_mse,
       calib_ee_ddbar, v3_muon/muon_ft.'
   step_waits:
-    '1': FA-ccin2p3-68cf389d FA-ccin2p3-1dffc6c7 FA-ccin2p3-b2237a3a FA-ccin2p3-9a675320 FA-ccin2p3-6dc90cf3 FA-ccin2p3-4d29a9cc
-      FA-ccin2p3-70650b0c FA-ccin2p3-6761fcbf FA-ccin2p3-6710d3fd FA-ccin2p3-f5adbfe8 FA-ccin2p3-357898e6 FA-ccin2p3-83e41a2f
-      FA-ccin2p3-165bbe58
+    '1': FA-ccin2p3-53bb43b9 FA-ccin2p3-fbec992c FA-ccin2p3-9da809e2 FA-ccin2p3-ad1b108d FA-ccin2p3-883309f7 FA-ccin2p3-72685d7d
+      FA-ccin2p3-50cc73c3 FA-ccin2p3-43d4b67a FA-ccin2p3-5c6b6dcb FA-ccin2p3-01d9738a FA-ccin2p3-df5578c6 FA-ccin2p3-85c8280d
+      FA-ccin2p3-1aab0bc9 FA-ccin2p3-c0eaea8a FA-ccin2p3-3535f5a7 FA-ccin2p3-7e72b5af FA-ccin2p3-d1574796 FA-ccin2p3-530f424f
+      FA-ccin2p3-b477d1f4 FA-ccin2p3-06090327 FA-ccin2p3-5907f86e FA-ccin2p3-fe3037a7 FA-ccin2p3-3bea3c86 FA-ccin2p3-2c4092c0
+      FA-ccin2p3-ebb936cf FA-ccin2p3-072c4aa8 FA-ccin2p3-5a1aac32
     '3': '2026-11-12'
     '4': '2026-11-12'
     '2': virtual_over_born
