@@ -21507,6 +21507,16 @@ entries:
       ee->bbbar (massless b in catalog_v4) has nothing to learn under V/B: replace it with a held-out one-loop target whose
       V/B varies (H5 list, Born in training), or keep it on V, before the one-loop design. Step rate at BS 16384: 0.372 s/step
       on V100.'
+  - at: '2026-11-10T09:22:12+00:00'
+    text: '2026-11-10 ~10:20, step 6 sidecars (FA-ccin2p3-abcc856c, scripts/job_vob_born.sh @e3732181, all 15 pools reproduced,
+      max rel 6e-11): std of ln|V/B| on the 5e4 train pools (analysis/data_saving/vb_spread.py): v4_epem_bbx_nlo 2.1e-12 (constant,
+      dropped, as ee_uu 1.9e-12), v4_bbx_zz_nlo 0.267, v4_uux_epemz_nlo 0.294, v4_bg_ab_nlo 0.966, v4_epem_ddxz_nlo 0.969
+      (ee_ttbar 0.132). But V changes sign on 28.7% of bg_ab rows and 13.9% of epem_ddxz rows (0 on the others): preprocessing.py
+      resolves a target with non-positive values to signedlog, so their validation MSE is not the MSE of ln|V| the design
+      reads; the design''s std rule missed the sign. Repair inside the passed design: the third target must also have V of
+      one sign on its train pool; sidecars (FA-ccin2p3-35699fdd) for v4_bbx_gg_nlo, v4_dg_uwm_nlo, v4_bbx_avevex_nlo, v4_db_bdz_nlo,
+      v4_uc_cuz_nlo (Born a training tree of both parents, loop in neither), the first in that order (2->2 first, as the replaced
+      e+e- > b b~) with std >= 0.1 and no V<0 is the third target.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
