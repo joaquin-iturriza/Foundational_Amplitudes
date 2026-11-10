@@ -16,7 +16,7 @@ import plot_style as ps
 ap = argparse.ArgumentParser()
 ap.add_argument("--arm", choices=["trees", "loops"], default="trees")
 arm = ap.parse_args().arm
-TAG = {"trees": "cal2", "loops": "cal_vb"}[arm]
+TAG = {"trees": "cal2", "loops": "cal_vb_cal_vb2"}[arm]
 DATA = os.path.join(REPO, f"analysis/data_saving/data/horizons_{TAG}.json")
 rows = json.load(open(DATA))
 targets = {"trees": [
@@ -26,8 +26,9 @@ targets = {"trees": [
 ], "loops": [
     ("bbx_zz_nlo", r"$b\bar b\to ZZ$", ps.C.blue),
     ("uux_epemz_nlo", r"$u\bar u\to e^+e^-Z$", ps.C.vermillion),
+    ("epem_bbx_nlo", r"$e^+e^-\to b\bar b$", ps.C.green),
 ] + [  # third-target candidates (only one is run): each its own colour from the cycle after blue and vermillion
-    (t, lab, ps.CYCLE[2 + n % (len(ps.CYCLE) - 2)]) for n, (t, lab) in enumerate([
+    (t, lab, ps.CYCLE[3 + n % (len(ps.CYCLE) - 3)]) for n, (t, lab) in enumerate([
         ("bbx_gg_nlo", r"$b\bar b\to gg$"), ("dg_uwm_nlo", r"$dg\to uW^-$"),
         ("bbx_avevex_nlo", r"$b\bar b\to\gamma\nu\bar\nu$"), ("db_bdz_nlo", r"$db\to bdZ$"), ("uc_cuz_nlo", r"$uc\to cuZ$"),
         ("bb_bb_nlo", r"$bb\to bb$"), ("bbx_hz_nlo", r"$b\bar b\to HZ$"), ("bbx_ccxh_nlo", r"$b\bar b\to c\bar cH$"),

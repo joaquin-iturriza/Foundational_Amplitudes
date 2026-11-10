@@ -43,6 +43,10 @@ f = float(np.exp(np.interp(np.log(np.clip(D, Ns.min(), Ns.max())), np.log(Ns), B
 print(f'{7.82114e-3 * (t / 17056) ** -0.55 * f:.6g}')") || exit 2
        ARGS+=("training.lr=$LR") ;;
 esac
+# V/B (data.target_over_born) is dimensionless: the parent's mass-dimension factor (target_physics_factor with
+# target_physics_dim_only, (s0/s_hat)^(4-N)) would multiply a 2->3 target by s_hat/s0, and its coupling orders
+# (target_physics_orders, which needs the factor) cancel in the ratio: both off for V/B runs
+case " ${ARGS[*]} " in *"target_over_born=true"*) ARGS+=("data.target_physics_factor=false" "data.target_physics_orders=false") ;; esac
 FT=(fine_tune.pretrained_path=null)
 if [ "$MODE" = ft ]; then
     PT="$PROJECT_DIR/$PARENT/models/model_run0_best.pt"; [ -e "$PT" ] || PT="$PT.gz"

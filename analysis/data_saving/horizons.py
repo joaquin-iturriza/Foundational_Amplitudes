@@ -28,8 +28,9 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 from analysis.common.readers import site_python  # noqa: E402
 
-TARGETS = ["epem_ttx", "epem_ccxg", "epem_bbxgg", "bbx_zz_nlo", "uux_epemz_nlo", "bbx_gg_nlo", "dg_uwm_nlo",
+TARGETS = ["epem_ttx", "epem_ccxg", "epem_bbxgg", "bbx_zz_nlo", "uux_epemz_nlo", "epem_bbx_nlo", "bbx_gg_nlo", "dg_uwm_nlo",
            "bbx_avevex_nlo", "db_bdz_nlo", "uc_cuz_nlo"]
+NPART = {"bbx_zz_nlo": 4, "uux_epemz_nlo": 5, "epem_bbx_nlo": 4}   # particles per one-loop target
 LOOP_REF = 5.4e-4   # hp58's tuned one-loop b b~ scratch best at D=1e4 (results.tex, het_stage2.py @0b277b39)
 LEVEL = 1e-4
 
@@ -48,6 +49,7 @@ for d in sorted(glob.glob("runs/data_saving/dsave_scratch_*_d*_t*_" + tag)):
         r.update(curve=res.get("val_mse_curve"), every=res.get("validate_every"), best_step=res.get("best_step"),
                  hours=res.get("traintime_hours"), prepd_std=st["prepd_std"][0],
                  trafos=st.get("amp_trafos_pp") or [st.get("amp_trafos")], over_born=st.get("target_over_born"),
+                 phys_factor=st.get("target_physics_factor"),
                  sigma_done=os.path.isdir(d + "/sigma_stage/models") and bool(os.listdir(d + "/sigma_stage/models")))
     except Exception as e:
         r["error"] = repr(e)
@@ -71,8 +73,10 @@ def horizon(r):
         # ln|V/B| = MSE of ln|V|) or, where V changes sign, through signedlog (the MSE of signedlog(V/B), the same
         # transform in both arms of stage 2); a run that is not a V/B run is listed apart
         flat = [str(t) for ts in (r.get("trafos") or []) for t in (ts or [])]
-        if not r.get("over_born"):
-            return {**o, "not_vb": True, "trafos": flat}
+        if not r.get("over_born") or (r.get("phys_factor") and NPART.get(r["target"], 5) != 4):
+            # not a V/B run, or V/B times the mass-dimension factor (s_hat/s0 on a 2->3; a constant on a 2->2, kept):
+            # listed apart
+            return {**o, "not_vb": True, "trafos": flat, "phys_factor": r.get("phys_factor")}
         o["unit"] = next((t for t in flat if t.startswith(("signedlog", "abslog"))), "log")
     i = min(range(len(y)), key=y.__getitem__)
     s_b, best = (i + 1) * ev, y[i]
@@ -97,10 +101,10 @@ def horizon(r):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("--tag", default="cal2")
+    ap.add_argument("--tag", nargs="+", default=["cal2"])
     ap.add_argument("--out", default=None)
     a = ap.parse_args()
-    rows = site_python(REMOTE, [a.tag], "HZN")
+    rows = [r for t in a.tag for r in site_python(REMOTE, [t], "HZN")]
     res = []
     for r in rows:
         if "error" in r or not r.get("curve"):
@@ -112,14 +116,14 @@ def main():
         if r.get("missing"):
             print(f"{r['target']:11s} k={r['k']:2d}  missing ({r.get('error')})")
         elif r.get("not_vb"):
-            print(f"{r['target']:11s} k={r['k']:2d}  NOT a V/B run (trafos {r['trafos']})")
+            print(f"{r['target']:11s} k={r['k']:2d}  NOT a plain V/B run (trafos {r['trafos']}, physics factor {r.get('phys_factor')})")
         elif "blowup_step" in r:
             print(f"{r['target']:11s} k={r['k']:2d}  BLOWUP at step {r['blowup_step']}")
         else:
             print(f"{r['target']:11s} k={r['k']:2d} D={r['D']:6d}  best {r['best']:.3e} at {r['s_b']:5d}/{r['steps']}"
                   f" ({r['best_frac']:.2f})  s_4 {r['s_4']}  -> {r['rule']:8s} T={r['T']}"
                   f"  {r['rate_s_per_step'] or float('nan'):.3f} s/step")
-    out = a.out or os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", f"horizons_{a.tag}.json")
+    out = a.out or os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", f"horizons_{'_'.join(a.tag)}.json")
     os.makedirs(os.path.dirname(out), exist_ok=True)
     with open(out, "w") as f:
         json.dump(res, f, indent=1)

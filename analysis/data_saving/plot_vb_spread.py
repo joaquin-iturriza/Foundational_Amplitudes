@@ -32,7 +32,7 @@ LABELS = {
     "v4_ucx_cxhu_nlo_145-6000GeV": r"$u\bar c\to\bar cHu$",
     "v4_udx_ccxwp_nlo_101-6000GeV": r"$u\bar d\to c\bar cW^+$",
 }
-CHOSEN = {"v4_bbx_zz_nlo_183-6000GeV", "v4_uux_epemz_nlo_112-6000GeV", "v4_bbx_avevex_nlo_20-6000GeV"}
+CHOSEN = {"v4_bbx_zz_nlo_183-6000GeV", "v4_uux_epemz_nlo_112-6000GeV", "v4_epem_bbx_nlo_20-6000GeV"}
 FLOOR = 1e-4   # a pool with no V < 0 is drawn at this share (log axis)
 
 rows = json.load(open(os.path.join(REPO, "analysis/data_saving/data/vb_spread.json")))
