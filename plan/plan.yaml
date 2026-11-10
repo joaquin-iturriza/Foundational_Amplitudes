@@ -15774,6 +15774,9 @@ entries:
       notifications after a hand-back were already absorbed; owner resumes by peer hand-backs cannot be held (Claude Code
       offers no delivery delay, an owner has no waiter). Also confirm the first run of a held item that ends gets its RUN
       event and RUN_DONE with no manual poll (next 19 fix).'
+    22: 'Legends on every panel file (Joaquin 2026-11-10): kit_figures.py and seed_mse.py legend per file, figure-style skill
+      row; then resend the KIT uug/tt panels and vob_seeds with legends; main-session rule diff (look at each figure once
+      before sending) shown to Joaquin'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16132,6 +16135,11 @@ entries:
       if:
       - 'saving within or above 11-30% on main per day: keep 10 min'
       - 'below: report to Joaquin with numbers and causes'
+    22:
+      feeds: figures Joaquin can read alone
+      if:
+      - 'redrawn: resend'
+      - 'a panel cannot fit its legend: fewer series per panel'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
