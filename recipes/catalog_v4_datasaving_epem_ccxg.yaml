@@ -1,0 +1,13 @@
+# pretrain_data_saving: the held-out target v4_epem_ccxg alone (its entry of recipes/catalog_v4_heldout_H1.yaml, copied by hand 2026-11-10)
+sampling:
+  mode: mixture
+  f_fwd: 0.15
+  fwd_cand: 0.3333333333333333
+processes:
+- name: v4_epem_ccxg
+  sqrts:
+  - 30
+  - 6000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000

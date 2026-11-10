@@ -1,0 +1,27 @@
+# pretrain_data_saving: the three held-out tree targets, for the train-split prebuild (entries of recipes/catalog_v4_heldout_H1/H2/H3.yaml)
+sampling:
+  mode: mixture
+  f_fwd: 0.15
+  fwd_cand: 0.3333333333333333
+processes:
+- name: v4_epem_ttx
+  sqrts:
+  - 345
+  - 6000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: v4_epem_ccxg
+  sqrts:
+  - 30
+  - 6000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: v4_epem_bbxgg
+  sqrts:
+  - 40
+  - 6000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
