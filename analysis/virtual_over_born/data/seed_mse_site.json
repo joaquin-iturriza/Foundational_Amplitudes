@@ -41,9 +41,24 @@
   "mse": 3.3230734997743246e-07,
   "mse_raw": 3.3230254549788554e-07
  },
- "vob_uu_VB_atVhp0670_s42_r2": null,
- "vob_uu_VB_atVhp0670_s43_r2": null,
- "vob_uu_VB_atVhp0670_s44_r2": null,
+ "vob_uu_VB_atVhp0670_s42_r2": {
+  "n": 5000,
+  "prepd_std": 1e-06,
+  "mse": 1.83797810605702e-24,
+  "mse_raw": 0.0
+ },
+ "vob_uu_VB_atVhp0670_s43_r2": {
+  "n": 5000,
+  "prepd_std": 1e-06,
+  "mse": 9.141881694823511e-26,
+  "mse_raw": 0.0
+ },
+ "vob_uu_VB_atVhp0670_s44_r2": {
+  "n": 5000,
+  "prepd_std": 1e-06,
+  "mse": 3.383305388469236e-26,
+  "mse_raw": 0.0
+ },
  "vob_uu_V_hp0670_s43": {
   "n": 5000,
   "prepd_std": 0.9591453912931202,
