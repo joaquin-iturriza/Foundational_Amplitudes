@@ -22019,6 +22019,11 @@ entries:
       the slide. Our inputs are in the raw class (dimensionless momenta); the only log input is the off-shellness column log1p(o/eps)
       of the min gluon-pair invariant, so it is more likely the useful input than the harmful one; if the no-off-shell arms
       (c35a2199, ac436bba) get worse, the lever is log-invariant inputs (as Bakar''s MLP), not removing it'
+  - at: '2026-11-10T09:45:36+00:00'
+    text: 'Score-only jobs (KIT_SCORE_ONLY=1, job_kit.sh) were sized wrong: the five B re-scorings FA-ccin2p3-9165f51b, fe5c6e7d,
+      5b5877e0, 21dc6836, 1974ee97 (SLURM 63278963-63278988) ran 34-48 s each (sacct Elapsed, all COMPLETED with RUN_DONE)
+      against a requested --time 0:20, a 25x margin. From now on a score-only job requests --hdr=--time=00:05:00 (measured
+      <=48 s plus start-up), never a round default. The five are not resubmitted.'
   step_why:
     1:
       feeds: 'the numbers sent to KIT: whether hard_train fixes each family (B vs B_bulk)'
