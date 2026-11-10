@@ -10714,24 +10714,67 @@ $e^+e^-\to\nu\bar\nu$ & $1.8$ & $0.87$ \\
 $e^+e^-\to t\bar t$ & $0.27$ & $0.67$ \\
 $u\bar u\to Zggg$ & $2.6$ & $0.71$ \\
 $e^+e^-\to d\bar d$, one loop & $7.8$ & $6.8$ \\
-$e^+e^-\to b\bar b$, one loop & $6.0$ & $230$ \\
+$e^+e^-\to b\bar b$, one loop & $6.0$ & $231$ \\
 \end{tabular}
 \end{center}
 In $13$ of hp58's $28$ cells the best of the first five trials was the highest learning rate tried, among them all four
 $d\bar d$ one-loop cells and $b\bar b$ at $D=10^3$ and $10^4$, where the loss still fell steeply with the rate. Those $13$
 sweeps were extended in place (D97, \code{sweep/extend\_sweep.py}: the window to $[7\times10^{-4},2\times10^{-2}]$, $50$ new
 candidates in the added zone, the five observations and the surrogate kept) and run five trials further; the table is
-after that. The extension lowered $9$ of the $13$ bests: $b\bar b$ at one loop by $50\times$ at $D=10^4$ ($0.028$ to
+after that. The extension lowered $9$ of the $13$ bests: $b\bar b$ at one loop by $52\times$ at $D=10^4$ ($0.028$ to
 $5.4\times10^{-4}$) and $8\times$ at $10^3$, $\nu\bar\nu$ by $3\times$ at $10^4$, the one-loop $d\bar d$ by $2\times$ at
 $10^2$; the other four were within $1\%$. Nine are now bracketed (a higher rate was tried and lost); in four the best is
 again the highest rate tried ($d\bar d$ at $D=10$, $\nu\bar\nu$ at $10^2$, the one-loop $b\bar b$ at $10^4$, the one-loop
 $d\bar d$ at $10^2$, at $1.7\times10^{-2}$), and in three of those the surrogate kept its new trials below $6\times10^{-3}$,
 so their optimum stays unbracketed. After the extension, on the five tree probes hp58 is level with the finale or better at
 $D=10^4$ ($0.67$ to $0.99$) and behind at $D=10^2$ ($1.3$ to $2.6$) except $t\bar t$, ahead at both. On the two one-loop
-probes it stays far behind ($7$ and $230\times$ at $10^4$). The finale's het cells sit at the other edge: $5$ of $14$ have
+probes it stays far behind ($7$ and $231\times$ at $10^4$). The finale's het cells sit at the other edge: $5$ of $14$ have
 their best at the lowest rate tried. Against the MSE cells (different losses, so only as context): at $D=10$ hp58 is below scratch on
 $\nu\bar\nu$, $t\bar t$, $Zggg$ and the one-loop $b\bar b$ ($0.51$ against $1.76$, $4.5\times10^{-4}$ against $5.4\times10^{-3}$, $0.34$ against
-$1.82$, $0.43$ against $0.63$), level on $W^+W^-$ and the one-loop $d\bar d$, and above on tree $d\bar d$ ($2.2$ against $0.80$).
+$1.82$, $0.43$ against $0.63$), level on $W^+W^-$ and the one-loop $d\bar d$, and above on tree $d\bar d$ ($2.1$ against $0.80$; read $2.2$ before the reader, the value before the extension).
+% src: python3 analysis/transfer/het_stage2.py @0b277b39
+% claim: stage2_sweeps=34
+% claim: stage2_trials=170
+% claim: ratio.ee_ddbar.4=1.3
+% claim: ratio.ee_ddbar.8=0.78
+% claim: ratio.ee_WW.4=1.3
+% claim: ratio.ee_WW.8=0.99
+% claim: ratio.ee_nnbar.4=1.8
+% claim: ratio.ee_nnbar.8=0.87
+% claim: ratio.ee_ttbar.4=0.27
+% claim: ratio.ee_ttbar.8=0.67
+% claim: ratio.uubar_Zggg.4=2.6
+% claim: ratio.uubar_Zggg.8=0.71
+% claim: ratio.ee_dd_nlo.4=7.8
+% claim: ratio.ee_dd_nlo.8=6.8
+% claim: ratio.ee_bb_nlo.4=6.0
+% claim: ratio.ee_bb_nlo.8=231
+% claim: ext_n=13
+% claim: ext_lowered=9
+% claim: ext_gain.tp3_hp58fte_ee_bb_nlo_d8_het=52
+% claim: bb_d8_old=0.028
+% claim: bb_d8_new=5.4e-4
+% claim: ext_gain.tp3_hp58fte_ee_bb_nlo_d6_het=8
+% claim: ext_gain.tp3_hp58fte_ee_nnbar_d8_het=3
+% claim: ext_gain.tp3_hp58fte_ee_dd_nlo_d4_het=2
+% claim: ext_bracketed=9
+% claim: ext_top=4
+% claim: ext_top_dd_nlo_lr=1.7e-2
+% claim: ext_top_below_6e3=3
+% claim: ratio.ee_dd_nlo.8=7
+% claim: finale_het_cells=14
+% claim: finale_het_lowest=5
+% claim: d10.ee_nnbar.hp58=0.51
+% claim: d10.ee_nnbar.scratch=1.76
+% claim: d10.ee_ttbar.hp58=4.5e-4
+% claim: d10.ee_ttbar.scratch=5.4e-3
+% claim: d10.uubar_Zggg.hp58=0.34
+% claim: d10.uubar_Zggg.scratch=1.82
+% claim: d10.ee_bb_nlo.hp58=0.43
+% claim: d10.ee_bb_nlo.scratch=0.63
+% claim: d10.ee_ddbar.hp58=2.1
+% claim: d10.ee_ddbar.scratch=0.80
+% allow: 2.2 because it is the superseded value, quoted as corrected
 
 \begin{figure}[H]
 \centering
