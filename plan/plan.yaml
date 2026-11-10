@@ -21280,7 +21280,7 @@ entries:
   asks: []
   owner:
     agent: a146b0b19432572ea
-    state: working
+    state: closed
     since: '2026-11-10T02:22:02+00:00'
     state_at: '2026-11-10T03:35:56.292000+00:00'
     context: 250903
@@ -21302,6 +21302,21 @@ entries:
       - 'a stratum loses precision in float64: trace and fix the step that loses it before any run'
   step_waits:
     '1': kit_precision detached CPU check on CC
+  handoff:
+    state: Data on CC ($DATA_DIR/kit_hardps/hardps_benchmark) and lxplus; Jean Zay copy failed twice on ssh timeout (setup
+      gap, not blocking). Loader, float64 model path and scoring script reviewed (repo-reviewer PASS) and merged into trunk
+      (cb1e385b), CC synced. Real-bin float32/float64 precision check running as a detached CPU dry run on CC. No GPU job
+      yet, no design recorded.
+    decisions: 'KIT datasets kit_<file>__<target>[__hard]: train first n of bulk_train (+hard_train for __hard), val last
+      n of bulk_train (bulk-only early stopping), test bulk_test; one-loop targets alpha_s/2pi-stripped like the catalog,
+      order [1,0,0,2] for ee->tt virtual; beams reordered to (e-, e+); KIT runs use training.dtype=float64 (README requirement;
+      float32 loses y=3e-7 at 1.5e-2 relative on the network''s momenta). NLO for the threshold scan, proposed: exact fixed-order
+      NLO plus the integral of (V_surrogate - V_exact), since V_finite alone is scheme-dependent.'
+    ruled_out: none
+    running: detached kit_precision (site run on CC, tools/kit_precision_check.py)
+    files: tools/kit_hardps.py tools/kit_predict.py tools/kit_precision_check.py tests/test_kit_hardps.py; KIT slides /home/joaquin/.claude/uploads/71602535-0955-42ad-a58f-23dc320798dc/12a84312-hardps_benchmark_slides.pdf;
+      KIT README/evaluate.py in the data dir on CC
+    written: '2026-11-10T03:36:40+00:00'
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
