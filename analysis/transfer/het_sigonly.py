@@ -5,7 +5,7 @@ het_ab_data/long_eval/<run>/sigma_test.npz. Figure analysis/transfer/figs/het_si
 median sigma per sigma decile (left), the test pulls against N(0,1) (right).
     python analysis/transfer/het_sigonly.py
 """
-import os, sys
+import json, os, sys
 
 import numpy as np
 
@@ -17,6 +17,31 @@ D = os.path.join(HERE, "het_ab_data", "long_eval")
 RUNS = (("joint, 32k", "zz_het_ab__tp_het_ee_ttbar_d8__trial_1550_s1_t32kfix", "k"),
         (r"$\sigma$ refit, 4000 steps", "zz_het_ab__tp_het_ee_ttbar_d8__trial_1550_s1_t32k_sigonly", ps.C.blue),
         (r"$\sigma$ refit, 250 steps", "tp_het_sigonly_ee_ttbar_d8__trial_1953", ps.C.vermillion))
+
+
+KEY = {"zz_het_ab__tp_het_ee_ttbar_d8__trial_1550_s1_t32kfix": "joint32k",
+       "zz_het_ab__tp_het_ee_ttbar_d8__trial_1550_s1_t32k_sigonly": "refit4000",
+       "tp_het_sigonly_ee_ttbar_d8__trial_1953": "refit250",
+       # not drawn: the 8k joint runs with the gradient clip at 1000 and without clipping (same HPs)
+       "zz_het_ab__tp_het_ee_ttbar_d8__trial_1550_s1_t8k_clip1e3": "clip1000_8k",
+       "zz_het_ab__tp_het_ee_ttbar_d8__trial_1550_s1_t8k_noclip": "noclip_8k"}
+
+
+def stats(run):
+    """Test-split calibration of one run's sigma: pull std, |pull|<1, RMS error over sigma per sigma decile."""
+    z = np.load(os.path.join(D, run, "sigma_test.npz"))
+    mu, tr, sg = (z[k].reshape(-1).astype(float) for k in ("pred", "truth", "sigma"))
+    r = np.abs(mu - tr)
+    q = np.quantile(sg, np.linspace(0, 1, 11))
+    idx = np.clip(np.digitize(sg, q[1:-1]), 0, 9)
+    cs = np.array([np.median(sg[idx == k]) for k in range(10)])
+    rms = np.array([np.sqrt(np.mean(r[idx == k] ** 2)) for k in range(10)])
+    pull = (mu - tr) / sg
+    g = lambda x: float(f"{x:.3g}")
+    ratio = rms / cs
+    return {"pull_std": g(pull.std()), "frac_pull_lt1": g(np.mean(np.abs(pull) < 1)),
+            "decile_min": g(ratio.min()), "decile_max_but_worst": g(np.sort(ratio)[-2]), "decile_worst": g(ratio[-1]),
+            "decile_max": g(ratio.max()), "test_nll": g(np.mean(np.log(sg) + r ** 2 / (2 * sg ** 2)))}
 
 
 def main():
@@ -52,6 +77,7 @@ def main():
     a2.set_xlabel(r"pull $(\mu-\log|\mathcal{M}|^2)/\sigma$"); a2.set_ylabel("density")
     ps.shared_legend(fig, a2, ncol=4); ps.process_label(a1, r"$e^+e^-\to t\bar t$", loc="lower right")
     ps.save(fig, os.path.join(HERE, "figs", "het_sigonly"))
+    print(json.dumps({k: stats(run) for run, k in KEY.items() if os.path.exists(os.path.join(D, run))}))
 
 
 if __name__ == "__main__":
