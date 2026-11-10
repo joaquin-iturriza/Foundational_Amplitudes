@@ -13,7 +13,8 @@
 # law at <steps>, 7.82114e-3 (steps/17056)^-0.55 (the trial-1262 law of job_catalog_v3_short.sh LONG_HP), times the
 # transfer study's fitted D factor (sweep/gen_transfer_pilot.lr_surface's D part); a training.lr=... argument wins.
 # The batch is the parent's 16384, which experiment.py caps at D/2 (the transfer study's B = min(16384, D/2)).
-# Run dir runs/data_saving/dsave_<mode>_<target>_d<k>_t<steps>[_<tag>] (tag=<name> argument).
+# The checkpoint is selected on the validation mu MSE (training.heterosc_select=mu_mse, as D85/D89), then the sigma
+# stage; the readout is the MSE of ln|M|^2 of the mean. Run dir runs/data_saving/dsave_<mode>_<target>_d<k>_t<steps>[_<tag>] (tag=<name> argument).
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
@@ -25,7 +26,8 @@ RECIPE="$PROJECT_DIR/recipes/catalog_v4_datasaving_${TGT}.yaml"
 [ -e "$PROJECT_DIR/$PARENT/config.yaml" ] || { echo "no parent config $PARENT/config.yaml"; exit 2; }
 [[ "$K" =~ ^([2-9]|10)$ ]] && [[ "$T" =~ ^[0-9]+$ ]] || { echo "k in 2..10, steps an integer"; exit 2; }
 D=$(python -c "print(round(10 ** ($K / 2)))")
-TAG=; ARGS=(); for x in "$@"; do case "$x" in tag=*) TAG="_${x#tag=}";; *) ARGS+=("$x");; esac; done
+TAG=; ARGS=(); for x in "$@"; do case "$x" in tag=*) TAG="_${x#tag=}";; seed=*) TAG="${TAG}_seed${x#seed=}"; ARGS+=("$x");; *) ARGS+=("$x");; esac; done
+case "$TGT" in *_nlo|*_loop) [ "$K" -le 9 ] || { echo "one-loop pools hold 5e4 train events: k <= 9"; exit 2; } ;; esac
 case " ${ARGS[*]} " in
     *" training.lr="*) ;;
     *) LR=$(PYTHONPATH=. python -c "
@@ -47,6 +49,6 @@ OUT="$PROJECT_DIR/runs/data_saving/dsave_${MODE}_${TGT}_d${K}_t${T}${TAG}"
 echo "DATA_SAVING target=$TGT k=$K D=$D steps=$T mode=$MODE parent=$PARENT args: ${ARGS[*]}"
 python run.py --config-path "$PROJECT_DIR/$PARENT" --config-name config run_dir="$OUT" run_name=null \
     data.processes_file="$RECIPE" data.train_subsample="$D" data.eval_subsample=null data.phase_space_on_pool=true \
-    data.memmap=false training.iterations="$T" evaluation.train_subsample=2000 seed=42 "${FT[@]}" "${ARGS[@]}"
+    data.memmap=false training.iterations="$T" training.heterosc_select=mu_mse evaluation.train_subsample=2000 seed=42 "${FT[@]}" "${ARGS[@]}"
 RC=$?
 echo "DATA_SAVING_DONE rc=$RC $OUT"; exit $RC
