@@ -46,7 +46,8 @@ for i, p in enumerate(P):
     for k in range(2, 9):
         s = scratch(p, k, steered=False)[0]
         if s:
-            cells += [(r, np.log10(s / v)) for r in R for v in [best(f"{fam(r)}_{p}_d{k}")[0]] if v]
+            cells += [(r, np.log10(s / v)) for j, r in enumerate(R) if np.isfinite(G[i, j])   # the drawn pairs only
+                      for v in [best(f"{fam(r)}_{p}_d{k}")[0]] if v]
 print(json.dumps({"cells": {"n": len(cells), "below_scratch": int(sum(g > 0 for _, g in cells))},
                   "pairs": {"n": int(np.isfinite(G).sum()), "gain": int((G > 0).sum())},
                   "gm_gain": {f"rung{r}": round(float(10 ** np.mean([g for q, g in cells if q == r])), 2) for r in R}}))
