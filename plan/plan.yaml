@@ -21152,6 +21152,7 @@ entries:
     at: '2026-11-10T02:35:32+00:00'
   step_waits:
     '2': '2026-11-11'
+    '1': repo-reviewer a908d9ab432d34127 re-check of 9ecbae9f, then merge pid_vs_qn, site sync, submit
 - id: kit_benchmark
   title: the KIT hard phase-space benchmark and the fair NLO protocol (Bakar, Gudrun)
   question: 'On the KIT datasets (ee->tt Born and one-loop virtual, ee->uug, ee->uugg; hard bins by distance to the singularity):
