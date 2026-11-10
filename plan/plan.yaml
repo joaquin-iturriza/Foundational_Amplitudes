@@ -21219,11 +21219,9 @@ entries:
     - virtual_over_born
   decisions:
   - D366
-  next: 'Find the earlier V/B attempt (docs/results.tex, the draft line ''A virtual-over-Born ratio as the regression target
-    does not scale meaningfully'', the 2026-10-15 note), read its runs and code, state the cause with evidence (target range,
-    sign, standardization, loss, inputs, how V was recombined), then a matched test: V alone against V/B with exact Born on
-    ee->uu and ee->tt one loop at current defaults, read on MSE of the recombined V. Report fast: per D357 the one-loop runs
-    of pretrain_data_saving wait on it only if it resolves quickly.'
+  next: 'Matched test at current defaults (design of 2026-11-10): Born sidecars (scripts/job_vob_born.sh, CPU), then DyHPO
+    sweeps vob_tt_V, vob_tt_VB, vob_uu_V (template, 8 trials, 8000 steps), each arm''s best re-run at seeds 43, 44, ee->uu
+    V/B at the uu V best config seeds 42-44; read MSE of log|V| best against best; merge branch vob after repo-reviewer PASS.'
   done_when: null
   notes_ref: null
   match: vob_*
@@ -21345,6 +21343,14 @@ entries:
       target 0.140 (V/B) vs 0.622 (V); converted to MSE of log|V| at t=4000, V/B beats V in all six arms: scratch 4.58e-8
       vs 1.75e-7 (3.8x), fine-tune 4.66e-8 vs 3.21e-7 (6.9x), EWC 7.3x, freeze 11.9x, LoRA 7.3x, reset-head 35x. Standardization
       had no std floor (preprocess_amplitude clip=False).'
+  step_why:
+    1:
+      feeds: whether V/B beats V for us at current defaults, and the V/B-with-exact-Born scratch baseline for kit_benchmark;
+        whether pretrain_data_saving's one-loop runs train V/B
+      if:
+      - 'V/B lower on ee->tt beyond seed spread: recommend V/B (with Born sidecars) for the one-loop runs and hand the baseline
+        to kit_benchmark'
+      - 'no gain: look for the cause in what changed since June (HETEROSC, Muon, the mass-scheme shift in the stored target)'
 - id: draft_rewrite
   title: rewrite of the paper draft around the new story
   question: 'Rewrite the draft (the 2026-11-10 zip) into the story of D365/D354: pretraining works (data saved at 1e-4), the
