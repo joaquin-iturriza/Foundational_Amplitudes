@@ -21171,10 +21171,8 @@ entries:
     - kit_benchmark
   decisions:
   - D363
-  next: Get the data (nextcloud link and password in Joaquin's message of 2026-11-10; not on the laptop) onto the sites with
-    the site tools; read README and src/evaluate.py; write the loader (HDF5 layout, float64 momenta, metadata particles, targets,
-    mu_R); make float64 hold through the model (frames included), checked on the deepest bins; protocol designs with GPU-h;
-    then the threshold scan and a checkpoint + inference script for KIT.
+  next: 'Merge branch kit after the repo reviewer passes, site sync CC, run tools/kit_precision_check.py on the real deepest
+    bins (CPU dry run on CC); then the protocol A design: float64 step rate needed for GPU-h'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -21204,6 +21202,12 @@ entries:
       branch kit: keyed_aug, _boost_com and particles_flat stored float32 momenta, base_experiment never set float64, lloca.py
       cast local features to float32, xformers has no float64 kernel. Branch kit (ffceebe6) fixes all; synthetic deep collinear
       y=3e-7: s_ug/s read back from the network momenta to 4.9e-10 in float64 against 1.5e-2 median in float32 (tests/test_kit_hardps.py).'
+  step_why:
+    1:
+      feeds: whether the transformer can be scored on the KIT benchmark at float64 and at what cost
+      if:
+      - 'precision holds and float64 step rate fits 30 GPU-h for protocol A: design and submit protocol A from scratch'
+      - 'precision fails on a stratum: trace and fix the step that loses it before any run'
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
