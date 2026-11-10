@@ -21653,6 +21653,19 @@ entries:
       the training-unit calibration figure. Cost: e+e- > b b~ 8 runs at the 4-particle rates (0.073-0.084 s/step k<=7, 0.16
       k=8, 0.40 k=9) + 0.08 h: 3.3 GPU-h; u u~ > e+e- Z 8 runs at the 5-particle rates: 3.9 GPU-h; 7.2 GPU-h; limits 0:30
       / 0:45 / 2:30 (~1.6x the need); one wave on CC. Disk 16 x 23 MB, 6.2 GB free.'
+    passed_at: '2026-11-10T10:26:47+00:00'
+    reviewer: 'cal_vb2 (16 scratch runs, u u~ > e+e- Z rerun with factors off + e+e- > b b~, k=2..9, seed 42): job_data_saving.sh
+      @cc288ee1 turns target_physics_factor/orders off for target_over_born and writes result.json; the 8 cal_vb b b~ > Z
+      Z runs of the same script wrote sigma_stage/preds_test.npz (log FA-ccin2p3-56508e36). Check 2, read myself with vb_test_mse.py
+      --tag cal_vb: on b b~ > Z Z, the same measure falls from 4.8 (k=2) to 2.9e-3 (k=8), var 63.9, MSE ln|V| 5.7e-3 to 4.6e-7,
+      with one non-monotone step (k=4 0.81, k=5 1.48, about 2x) that a power-of-ten L0 is well above. Check 3: seed 42, one
+      run per cell (D315); it is a calibration. D371 (common MSE of V/B, ln|V| beside) and D372 (e+e- > b b~ kept, measured
+      at small D) are both in the design; HETEROSC with the sigma stage, final model read (D276); test = frozen 5e3 pool.
+      Disk 16 x 23 MB against 6.5 GB free on /sps/lpnhe now, memmap off so no cache; rates from cal2 4-particle runs and the
+      cal_vb 5-particle runs at the same batch law and pools. Searched: results.tex (over_born, V/B, cal_vb, epem_bbx, uux_epemz;
+      par:vob_june, par:vob_pools, par:vob_now), plan show pretrain_data_saving (dead end, findings 08:58-10:22), site decisions
+      D360-D372: no earlier one-loop D-calibration on catalog_v4; the cal_vb u u~ > e+e- Z runs are rightly superseded (factor
+      on; k=9 FA-ccin2p3-adac4033 confirmed cancelled 11:18).'
   step_waits:
     '3': '2026-11-12'
     '4': '2026-11-12'
