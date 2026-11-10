@@ -21790,6 +21790,15 @@ entries:
       / -5.45 / -5.40; uugg soft truth +3.34, pred -107.3 (1e5), -19.6 (9e5); tt virtual threshold beta~1.3e-4 truth +1.69,
       pred -1.33 (1e5 off), -1.31 (9e5 off), -1.61 (9e5 on): every arm stays at its bulk-edge level or dives below it, none
       follows the rise of the truth.'
+  - at: '2026-11-10T08:58:14+00:00'
+    text: 'For the fair NLO D-scan, reported by the virtual_over_born owner (not checked by me): the from-scratch V/B baseline
+      with exact Born for ee->tt exists on CC. It ran on pool ee_ttbar_nlo_362-1000GeV (50k train / 5k test), template LLoCa
+      muP, 8000 steps, at V''s best HPs (vob_tt_V hp_1333). Runs: runs/vob_tt_VB_atVhp1333_s42..s44 (FA-ccin2p3-b5d4830c,
+      063dac3b, 961f2e40). Config: scripts/job_vob_seed.sh @6be5309f over sweep/sweep_config_vob_tt_V.yaml with data.target_over_born=true.
+      Test MSE of log|V| at the final model: V/B 1.78e-10, 2.68e-10, 2.27e-10 against V 3.85e-10, 8.80e-10, 2.13e-7 (seeds
+      42-44); median V over median V/B 3.9x. Readout: analysis/virtual_over_born/seed_mse.py @d767344e. Its Born sidecars
+      are on CC only. For KIT the baseline must be refit on the KIT ee_tt virtual bulk (m_t=173, mu_R=sqrt s) at each D, with
+      exact Born from the KIT file''s born target.'
   step_why:
     1:
       feeds: 'the numbers sent to KIT: whether hard_train fixes each family (B vs B_bulk)'
