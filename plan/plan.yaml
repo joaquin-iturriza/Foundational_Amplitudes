@@ -21734,6 +21734,15 @@ entries:
       0.001 / 0.024: the harmonic is learned where the bulk reaches (y 1e-3) and lost deeper. Same pattern as uug: soft runs
       away with the wrong sign, collinear flat, far behind the MLP; the plain-target arm on uug (FA-ccin2p3-2642b17b) decides
       whether the preprocessing is the cause.'
+  - at: '2026-11-10T06:55:49+00:00'
+    text: 'CC /sps/lpnhe disk (df 2026-11-10 ~06:45 UTC): 7.8 GB free, from 41 GB at 05:58. Cause: the two pretraining memmap
+      caches (prebuilds FA-ccin2p3-d995bd5a heldout -> amp_mmap_cache/82c4c27b..., 43e5fc44 fair_nlo -> 4f42278d...) are 20
+      GB each, not the ~2.5 GB the earlier caches suggested (those had smaller caps; trainall_val200_test200 of a whole catalog
+      recipe is ~20 GB, as plan notes on the 21 GB catalog caches said). Deleted our own duplicate: datasets/kit_hardps/hardps_benchmark.tar.gz
+      (1.0 GB; unpacked copy kept, also on lxplus) -> 8.7 GB free. Need: two pretraining run dirs ~0.2 GB (trial 1262''s is
+      113 MB), B batch 12 run dirs ~0.85 GB + six __hard train/val pools ~1.2 GB, plain arm 0.07 GB: ~2.5 GB, fits with ~6
+      GB left. Not ours, untouched: amp_data_cache 122 GB (KIT pools in it 0.95 GB, ours, needed by B), mmap caches 7d589cbf,
+      f5ccb555 (2.5 GB each).'
   step_why:
     1:
       feeds: 'the numbers sent to KIT: whether hard_train fixes each family (B vs B_bulk)'
