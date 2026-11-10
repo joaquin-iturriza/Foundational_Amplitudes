@@ -20974,9 +20974,6 @@ entries:
       MSE 1e-4, fine-tune protocol): an AdamW pretraining of the data-saving parent''s setup at AdamW''s own searched HPs,
       fine-tuned on every cell; its curves beside the Muon parent''s and scratch; design once pretrain_data_saving has its
       design, GPU-h then'
-    3: 'writeup: a section in docs/results.tex with one paper-ready paragraph per D364 item (catalog, held-out classes, smart
-      sampling, sigma sampling, emission scales + coupling orders, adimensionalisation options, input conditionings failed
-      and off-shellness, Muon, zero-shot as the fine-tune''s starting point) for the draft_rewrite owner'
   done_when: null
   notes_ref: null
   match: optrec_*
@@ -21117,11 +21114,6 @@ entries:
       - 'the Muon parent''s fine-tunes reach 1e-4 with fewer target events than the AdamW parent''s: the paper states the
         transfer gain at 1e-4'
       - 'the two meet before 1e-4: the paper says Muon''s gain is in the pretraining and small-D start, not at 1e-4'
-    3:
-      feeds: 'D364/D365: the optimizations section of the rewritten draft'
-      if:
-      - 'every item has a measured paragraph: hand to draft_rewrite'
-      - 'an item lacks a measurement: say so in its paragraph and list it as open'
   targets:
   - batch: pidqn
     wall_h: 2.7
