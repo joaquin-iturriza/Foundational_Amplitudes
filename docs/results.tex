@@ -10860,17 +10860,47 @@ optimal, which is why the method was moved to $ee\to u\bar ugg$, where no single
 % allow: 0.25 because it is the coverage fraction f, a setting
 % allow: 0 1 2 5 because they are round and seed indices and the square in log|M|^2, not results
 
+\paragraph{How the $ee\to u\bar u$ online study sits against the results above.} It agrees with the two
+$\sigma$-reweighting results on the $Z$ resonance: on the starved base $\sigma$ lands next to the true-error best
+case (the $3$-seed result above, and $\sigma^{0.5}$ with loss reweighting against the true-error arm here), and on the
+good $f=0.25$ base $\sigma$-emphasis buys nothing, here with the extra finding that the full exponent $\sigma^{1}$ is
+$30.5$ times worse and the softest one only matches the fixed draw. The new point is the control the earlier studies
+lacked: on the starved base, reweighting the loss toward the objective without any $\sigma$ recovers nearly all of the
+gain ($1.11$, inside the seed spread), so emphasis toward the pole, not $\sigma$'s particular choice of events, carries
+it. Panel (a) is one seed, and round~0, the same coverage draw for every arm, already spreads $2.5$ times between the
+arms' runs, so of (a) only the order-of-magnitude losses of the $\sigma^{1}$ and true-error arms are beyond noise. The
+positive steering result below is a different setting: $ee\to u\bar ugg$, a coordinate-free loop that generates fresh
+events, against a uniform base, on overlapping soft and collinear singularities that no one-parameter density covers.
+On $ee\to u\bar u$ the coordinate-free draw, compared with a base that already puts a quarter of its events on the
+pole, does not win (panel c). The concentration principle (steering helps iff the hardness is concentrated) predicts a
+gain over a \emph{uniform} base here, since the $Z$ pole is the most concentrated hardness of the section, and panel (b)
+shows one ($5.25$ times over the fixed uniform draw); it does not predict the panel (c) null, because the principle
+compares against uniform generation while the control here already covers the pole, and it does not separate $\sigma$
+from plain loss reweighting, which no steering study ran as a control. The $\sigma$-contrast pre-flight was not measured
+on $ee\to u\bar u$.
+% src: python3 analysis/divergences/l2_eeuu_online.py @61b3420b
+% claim: f025.sigma_a1_over_static=30.5
+% claim: starved.reweight_fair_over_sigma=1.11
+% claim: f025.round0_max_over_min=2.5
+% claim: starved.static_fair_over_sigma=5.25
+% allow: 0.25 0.5 because they are the coverage fraction f and an exponent, settings
+% allow: 3 because it is the seed count of the earlier study, a design count
+% allow: 0 1 2 5 because they are round and seed indices and the square in log|M|^2, not results
+
 \begin{figure}[H]
   \centering
   \pnl{l2_eeuu_online_a.pdf}\hfill\pnl{l2_eeuu_online_b.pdf} \\[1ex]
   \pnl{l2_eeuu_online_c.pdf}
-  \caption{Online generation on $ee\to u\bar u$: the MSE of $\ln|\mathcal M|^2$ averaged over the $\sqrt s$ bins of the
-  test set, after each round. (a) Coverage base $f=0.25$, one seed: static (one pool) against $\sigma^\alpha$+IS at
-  $\alpha=1,0.5,0.25$ and the oracle $|r|^1$+IS. (b) Starved base $f=0$, objective $f=0.25$, geometric mean of three
-  seeds (oracle: seed 0): static and IS-only, each with one pool (dashed, before the fairness fix) and a fresh draw
-  (solid), against $\sigma^{0.5}$+IS and $|r|^{0.5}$+IS. (c) Coordinate-free $\sigma^\gamma$ ($\gamma=1$) against the
-  static $f=0.25$ arm with a fresh draw, three seeds each, six rounds; oracle $|r|^\gamma$ seed 0.
-  (\code{analysis/divergences/l2\_eeuu\_online.py --plot})}
+  \caption{Online generation on $ee\to u\bar u$: the MSE of $\ln|\mathcal M|^2$ averaged with equal weight over the
+  $\sqrt s$ bins of the test set, after each round of fine-tuning. ``Fixed draw'': every round draws from the coverage
+  base; ``$\sigma$-weighted'' and ``true-error-weighted'': the base reweighted by the predicted $\sigma$ or by the actual
+  error of the previous round's model (the latter is the best case a perfect $\sigma$ could reach); ``loss
+  reweighting'': the loss corrected per $\log|\mathcal M|^2$ bin back to the objective density; ``reused pool'': the
+  July runs that re-drew one pool every round (before the fairness fix). (a) Coverage base $f=0.25$, one seed, three
+  rounds. (b) Starved base $f=0$ (uniform in $\sqrt s$), objective $f=0.25$, geometric mean of three seeds (true-error
+  arm: seed 0 only). (c) Coordinate-free: the draw $\propto\sigma^{\gamma}$, $\gamma=1$, over the candidate pool with no
+  base density and no loss reweighting, against the fixed $f=0.25$ draw, three seeds each, six rounds (true-error arm:
+  seed 0). (\code{analysis/divergences/l2\_eeuu\_online.py --plot})}
   \label{fig:l2_eeuu_online}
 % allow: 0 0.25 0.5 1 2 because they are the arms' settings f, alpha and gamma, and the square in log|M|^2
 \end{figure}
