@@ -22767,6 +22767,31 @@ entries:
       with where (which strata), next: the parent''s preprocessing against KIT''s ranges. The 9e5 and 1e5 rows read the same
       way; a gain at 1e5 that vanishes at 9e5 is reported as a data-saving gain, not an extrapolation gain. Families disagreeing
       are reported as such.'
+    fix_at: '2026-11-10T09:58:32+00:00'
+    fix: '(1, 12: one change at a time, only the asked axis moves) The A_ft arms do not run at the scratch lr the design states.
+      job_kit.sh A_ft passes fine_tune.pretrained_path, so base_experiment._init_optimizer sets every group''s lr to training.lr
+      * fine_tune.lr_scale (MuonAdamW honours the group lr, optim/muon.py), and the parent''s config.yaml (runs/kit/kit_pretrain_heldout/config.yaml
+      on CC, read today) carries fine_tune.lr_scale: 0.1. So A_ft trains at 1.19e-3 against the scratch controls'' 1.19e-2:
+      start weights AND a 10x lower lr move together, and ''fixed: lr 0.0118605 as every scratch run'' is wrong. Fix: either
+      pass fine_tune.lr_scale=1.0 so A_ft runs at the scratch runs'' HPs (the A/B protocol''s first step, same HPs), or keep
+      0.1 and state it in the design as the fine-tune''s lr with its reason (the project''s fine-tune convention) and why
+      a 10x lr difference is part of the question; whichever, check it in the first job''s log (the logged lr). (4: outcome)
+      Branches (b) and (c) conclude ''pretraining does not change extrapolation'' / ''the parent''s prior hurts'' from one
+      lr setting; per the A/B protocol a no or a worse result at one HP point is not a verdict on the feature: state what
+      follows a (b)/(c) result on the lr axis (e.g. the other lr_scale, 0.1 vs 1, on the deep-bin cells, or the same short
+      sweep for both) before ''no help'' is reported. (5: prior) The prior says pretrained extrapolation into singular limits
+      was never measured; docs/results.tex sec:divergences-holdout (lines ~9898-10100) is that study: a 22-process foundation
+      with the uug family (uug, uugg, uuggg, ddg, bbg) held out, fine-tuned on ee->uug outside the divergence region (f=0
+      add-back = pure extrapolation), deepest bin y_min<1e-3 MSE 11.1 (uug) and 0.98 (uugg, which partially tracks the 1/y_min
+      ramp), plateau/ceiling into the limit, add-back 5% cuts it 24x; no from-scratch control there. Name it in prior with
+      its numbers and say what differs (catalog_v4 parent, KIT bins to 1e-7, scratch control, float64) and what it predicts
+      for A_ft. Terms searched: KIT, A_ft, divergences, singular/soft/collinear limit, extrapolat, held out, pretrain/fine-tun/scratch
+      near sec:divergences. Checks that hold: 2 (deep-bin log10-MSE moved 1.85 decades with off-shellness on tt Born, 2 decades
+      with the plain arm on uug; step-0 val -0.58 vs 1.2e4 shows carry-over), 3 (one seed per D315, cuts 1 decade against
+      the 1e5-vs-9e5 move of 1.0 decade), 6, 7, 8, 9 (HETEROSC as the scratch runs), 10 (KIT bulk_test/hard_test, as asked),
+      11 (parent preprocessing, the emission-scales+coupling-orders target D364 names as converged), 13 (no sweep), 14 (1.2
+      GB vs 6.5 GB free on /sps/lpnhe today, memmap off, pools cached), 15 (rates from the float64 scratch runs of the same
+      config; offshell_zero after standardisation equals the removed column for the first Linear).'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
