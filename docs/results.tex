@@ -10490,11 +10490,33 @@ stays behind at $2\to4$ ($1.23$, $1.57$). The NLL objective picks the trial whos
 fits best, not whose $\mu$ does, which can explain a best-NLL trial that loses on $|\Delta|$ to a trial at other HPs.
 The $\sigma$ of these best trials is too small: the pull std is $1.6$ to $3.0$ (a calibrated $\sigma$ gives $1$).
 HPs: the warmup splits apart between the two losses (het in the lower half of the range in $7$ of $8$ cells, MSE in
-its upper half in $5$), $\lambda$ sits near the top of its range for MSE in $7$ of $8$ and is spread for het, EMA is on in $6$
-of $8$ for both but at decay $0.95$ to $0.995$ for het against $0.90$ to $0.92$ for MSE in $5$ of its $6$, and lr
+its upper half in $5$), $\lambda$ sits in the upper half of its ($\log$) range for MSE in $7$ of $8$ and is spread for het, EMA is on in $6$
+of $8$ for both but at decay $0.95$ to $0.995$ for het against $0.90$ to $0.92$ for MSE in $4$ of its $6$ (read $5$ before the reader), and lr
 overlaps; the scratch sweeps of
 one probe pair chose one candidate twice ($e^+e^-\to d\bar dg$ and $t\bar tg$, the same point; $u\bar u\to Zgg$ and
 $Zggg$, the same point but for lr). So the het HPs are consistent among themselves and differ from the MSE ones.
+% src: python3 analysis/transfer/het23_summary.py @a46c7df9
+% claim: own_over_mse.0=0.99
+% claim: own_over_mse.1=1.21
+% claim: own_over_mse.2=1.07
+% claim: own_over_mse.3=1.59
+% claim: own_over_mse.4=0.85
+% claim: own_over_mse.5=1.04
+% claim: own_over_mse.6=1.23
+% claim: own_over_mse.7=1.57
+% claim: own_better_n=5
+% claim: own_worse_n=3
+% claim: mse_hp_over_own.2=3.5
+% claim: mse_hp_over_own.5=2.2
+% claim: pull_std_min=1.6
+% claim: pull_std_max=3.0
+% claim: het_warmup_lower_n=7
+% claim: mse_warmup_upper_n=5
+% claim: mse_lambda_upper_n=7
+% claim: het_ema_on_n=6
+% claim: het_ema_min=0.95
+% claim: het_ema_max=0.995
+% claim: mse_ema_090_092_n=4
 
 \begin{figure}[H]
 \centering
