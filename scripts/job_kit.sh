@@ -68,7 +68,10 @@ print(f'{7.82114e-3 * (t / 17056) ** -0.55 * f:.6g}')") || exit 2
     esac
     FT=(fine_tune.pretrained_path=null)
     if [ "$MODE" = A_ft ]; then
-        PT="$PROJECT_DIR/$PARENT/models/model_run0_best.pt"; [ -e "$PT" ] || PT="$PT.gz"
+        # the parent's last segment (a pretraining resumed after its time limit, KIT_RESUME, writes model_run1_best.pt)
+        PT=; for k in 9 8 7 6 5 4 3 2 1 0; do for f in "model_run${k}_best.pt" "model_run${k}_best.pt.gz"; do
+            [ -z "$PT" ] && [ -e "$PROJECT_DIR/$PARENT/models/$f" ] && PT="$PROJECT_DIR/$PARENT/models/$f"; done; done
+        [ -n "$PT" ] || { echo "A_ft: no model_run*_best.pt in $PARENT/models"; exit 2; }
         FT=(fine_tune.pretrained_path="$PT" fine_tune.target_stats=own fine_tune.offshell_stats=parent)
     fi
 fi
@@ -82,7 +85,7 @@ fi
 python run.py --config-path "$BASE" --config-name config run_dir="$OUT" run_name=null \
     data.source=recipes data.processes_file="$RECIPE" data.train_subsample=null data.eval_subsample=null \
     data.memmap=false training.dtype=float64 training.iterations="$T" training.heterosc_select=mu_mse \
-    evaluation.train_subsample=2000 seed=42 warm_start_idx=null "${FT[@]}" "${ARGS[@]}"
+    evaluation.train_subsample=2000 seed=42 warm_start_idx=null training.increment_steps=null "${FT[@]}" "${ARGS[@]}"
 RC=$?
 if [ $RC -eq 0 ] && [ -z "$KIT_NO_SCORE" ]; then
     python tools/kit_predict.py "$OUT"
