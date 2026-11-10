@@ -20863,6 +20863,11 @@ entries:
     paths: []
   dead_ends: []
   asks: []
+  owner:
+    agent: a2a4836c90d93265b
+    state: working
+    since: '2026-11-10T02:21:50+00:00'
+    state_at: '2026-11-10T02:21:50+00:00'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
