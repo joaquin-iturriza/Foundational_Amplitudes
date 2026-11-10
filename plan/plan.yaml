@@ -21031,9 +21031,9 @@ entries:
       arm. Searched: data saving, 1e-4, scratch/fine-tun near held-out, ttbar, v4_long/68224, muon_1e4, heterosc_select/mu_mse,
       calib_ee_ddbar, v3_muon/muon_ft.'
   step_waits:
-    '1': FA-ccin2p3-3451a40f FA-ccin2p3-72a60653 FA-ccin2p3-a4217d77 FA-ccin2p3-e63bdd01 FA-ccin2p3-a0b12640 FA-ccin2p3-eb2e042c
-      FA-ccin2p3-db89ed25 FA-ccin2p3-68cf389d FA-ccin2p3-1dffc6c7 FA-ccin2p3-21cb4f72 FA-ccin2p3-393052af FA-ccin2p3-2be237c9
-      FA-ccin2p3-84581380 FA-ccin2p3-d22fe746 FA-ccin2p3-319aa188 FA-ccin2p3-10f64c66 FA-ccin2p3-b2237a3a FA-ccin2p3-9a675320
+    '1': FA-ccin2p3-68cf389d FA-ccin2p3-1dffc6c7 FA-ccin2p3-b2237a3a FA-ccin2p3-9a675320 FA-ccin2p3-6dc90cf3 FA-ccin2p3-4d29a9cc
+      FA-ccin2p3-70650b0c FA-ccin2p3-6761fcbf FA-ccin2p3-6710d3fd FA-ccin2p3-f5adbfe8 FA-ccin2p3-357898e6 FA-ccin2p3-83e41a2f
+      FA-ccin2p3-165bbe58
     '3': '2026-11-12'
     '4': '2026-11-12'
     '2': virtual_over_born
