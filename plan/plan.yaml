@@ -21138,6 +21138,26 @@ entries:
       is learned exactly) and the informative test is ee->tt. No: ee->uu V/B varies at >1e-6 -> the cause is elsewhere (standardization,
       signedlog scale, comparison units) and is read from the training test. Either way the log-spread ratio says how much
       narrower the V/B target is on ee->tt.'
+    fix_at: '2026-11-10T02:30:39+00:00'
+    fix: 'Check 5 (prior), check 4 (outcome): the prior omits docs/results.tex l.14536-14540: MadLoop''s QCD finite part over
+      the Born for massless e+e- -> q q~ at mu=sqrt(s) is a constant to 1e-16 at every point from 100 GeV to 3 TeV and three
+      angles (tools/ew_sudakov_check.py), and the ladder''s one-loop e+e- -> d d~ pool over 25-1000 GeV is its tree pool times
+      a constant. With data/parse_dat.py''s exact C_F(pi^2-8) this already settles the e+e- -> u u~ half of the question,
+      so its yes/no is fixed before the run: the No branch (V/B varies above 1e-6 on u u~) is ruled out by existing data.
+      Fix: cite l.14536-14540, drop the u u~ spread as a question (or keep it only as a consistency check of the sidecars),
+      and read the cause of the old u u~ failure from existing data: the standardization std of the stored ee_uu_nlo_virt_ratio
+      target in the June datasets (make_ratio_datasets.py output, commit 2b81ee1e) against its mean, which shows whether the
+      0.864 val loss is standardized rounding noise without any job. Restate the job''s question as what is open: the per-event
+      spread of log|V/B| against log|V| on the current e+e- -> t t~ one-loop pool (the stored target there includes the mass-scheme
+      shift delta|M0|^2, par:v4_loop_born_events), with a threshold fixed now for yes (V/B narrower by enough to expect a
+      training gain, say what ratio) and no, and what each changes for the matched V-against-V/B training test; and say that
+      the sidecars are the job''s other product for that test. Also state the batch''s wall-time target from the measured
+      MadLoop rate per event (par:v4_loop_born_events ran 2000 events per pool) for 5e4/5e3/5e3 rows, and the site and its
+      free disk (results.tex records the project disk as full; outputs here are small npz and 8-byte-per-row sidecars, say
+      where they are written). Passed: check 1 (control is log|V| on the same events), 3 (deterministic, no seeds needed),
+      8 (no labels), 9/11/12/13 (no training or sweep), 10 (all rows of the pools the question names). Terms searched: virt_ratio,
+      virtual over, V/B, over the Born, virt/born, born_of_pool, loop_born, times a constant, pi^2-8, ratio target, kinematics-independent
+      in docs/results.tex; the entry''s evidence (empty) and decisions quoted on it.'
 - id: draft_rewrite
   title: rewrite of the paper draft around the new story
   question: 'Rewrite the draft (the 2026-11-10 zip) into the story of D365/D354: pretraining works (data saved at 1e-4), the
