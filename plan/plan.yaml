@@ -21076,6 +21076,12 @@ entries:
     units: null
     start: '2026-11-10T04:59:18+00:00'
     at: '2026-11-10T04:59:18+00:00'
+  - batch: calib_trees_cal2
+    wall_h: 2.0
+    jobs: 27
+    units: null
+    start: '2026-11-10T05:11:50+00:00'
+    at: '2026-11-10T05:11:50+00:00'
   handoff:
     state: 'Tree calibration (step 1, design passed 2026-11-10 03:35): 18 of 27 scratch calibration runs submitted on CC (ee->ttbar,
       ee->ccbar g; k=2..10; 8000 steps k<=8, 12000 k=9,10; seed 42). 14 ended with main stage complete and a sigma-stage-only
