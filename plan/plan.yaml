@@ -20454,6 +20454,8 @@ entries:
     state: working
     since: '2026-11-10T00:45:23+00:00'
     state_at: '2026-11-10T00:45:27+00:00'
+    context: 95950
+    context_at: '2026-11-10T00:51:58+00:00'
   findings:
   - at: '2026-11-09T23:36:11+00:00'
     text: 'Inventory (2026-11-10, owner a74fb932): origin/l2-gen = 79 commits over trunk (67 of them origin/heterosc''s, 2026-07-11..07-18,
