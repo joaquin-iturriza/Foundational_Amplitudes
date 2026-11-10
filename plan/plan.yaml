@@ -22857,6 +22857,15 @@ entries:
       for both. (c) after that check: the parent''s prior hurts in the limit, reported with which strata; next the parent''s
       preprocessing against KIT''s ranges. The 9e5 and 1e5 rows read the same way; a gain at 1e5 that vanishes at 9e5 is a
       data-saving gain, not an extrapolation gain. Families disagreeing are reported as such.'
+    passed_at: '2026-11-10T10:03:45+00:00'
+    reviewer: 'Re-check after FIX: (1,12) job_kit.sh A_ft now passes fine_tune.lr_scale=1.0 (caeda81a line 76; parent config
+      has 0.1), so A_ft and scratch differ only in start weights at lr 0.0118605, first job''s lr log line to be read; (4)
+      branches b/c now require the lr_scale 0.1 rerun of uug/uugg 1e5 and tt virtual 1e5 off (3 jobs ~5 GPU-h) before ''no
+      help''/''hurts''; (5) prior names sec:divergences-holdout (uug f=0 deepest 11.1 flat, uugg 0.98, 5% add-back 24x, no
+      scratch control) and what differs. Check 2: deep-bin log10-MSE moved 1.85 decades (tt Born off-shellness) and 2 decades
+      (uug plain arm), step-0 val -0.58 vs 1.2e4 shows carry-over; check 3: one seed per D315, 1-decade cut against the 1.0-decade
+      1e5-vs-9e5 move. Disk 1.2 GB vs 6.5 GB free on /sps/lpnhe. Terms searched: KIT, A_ft, divergences, singular/soft/collinear
+      limit, extrapolat, held out, pretrain/fine-tun/scratch near sec:divergences, in results.tex, the entry and site decisions.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
