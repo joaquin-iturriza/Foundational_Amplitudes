@@ -75,9 +75,9 @@ class LLOCATransformer(nn.Module):
         features_local = (fourmomenta_local - mean) / std
 
 
-        # move everything to less safe dtype
-        features_local = features_local.to(torch.float32)
-        frames.to(torch.float32)
+        # the network's dtype (float32, or float64 for a training.dtype=float64 run): the local momenta keep the
+        # precision the frames were computed in only when the network runs in it
+        features_local = features_local.to(particle_type.dtype)
         features = torch.cat([features_local, particle_type], dim=-1)
         
         return self.net(features, frames)
@@ -247,9 +247,9 @@ class LLOCAMuPTransformer(nn.Module):
         features_local = (fourmomenta_local - mean) / std
 
 
-        # move everything to less safe dtype
-        features_local = features_local.to(torch.float32)
-        frames.to(torch.float32)
+        # the network's dtype (float32, or float64 for a training.dtype=float64 run): the local momenta keep the
+        # precision the frames were computed in only when the network runs in it
+        features_local = features_local.to(particle_type.dtype)
         features = torch.cat([features_local, particle_type], dim=-1)
 
         # Pass ptr so the transformer can build a block-diagonal attention mask,

@@ -648,6 +648,14 @@ class BaseExperiment:
             LOGGER.debug(
                 "Using dtype float16 (bfloat16 is not supported by environment)"
             )
+        elif str(self.cfg.training.get("dtype", "float32")) == "float64":
+            # the whole model in float64, frames and attention included (the KIT hard phase-space benchmark); wired
+            # for LLoCa only (its attention's padded float64 path; L-GATr's would reach xformers)
+            assert "lloca" in str(self.cfg.model.get("_target_", "")).lower() or \
+                "LLoCa" in str(self.cfg.model.get("_target_", "")), (
+                f"training.dtype=float64 is wired for model=lloca only, got {self.cfg.model.get('_target_')}")
+            self.dtype = torch.float64
+            LOGGER.info("Using dtype float64")
         else:
             self.dtype = torch.float32
             LOGGER.debug("Using dtype float32")

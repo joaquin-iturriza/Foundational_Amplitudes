@@ -128,25 +128,27 @@ def apply_components(T, mom):
     return out
 
 
-def augment(com, seed, uid, idx):
-    """Centre-of-mass momenta `com` (n, P, 4) float32 of the events idx (n,) of pool `uid`, augmented: float32"""
+def augment(com, seed, uid, idx, dtype=np.float32):
+    """Centre-of-mass momenta `com` (n, P, 4) of the events idx (n,) of pool `uid`, augmented, in `dtype` (float32;
+    float64 for a run with training.dtype=float64, whose invariants near a singularity float32 cannot resolve)"""
     uids = np.full(len(idx), np.uint64(uid), dtype=np.uint64)
-    return apply_components(trafo_components(seed, uids, idx), com).astype(np.float32)
+    return apply_components(trafo_components(seed, uids, idx), com).astype(dtype)
 
 
-def model_momenta(com, seed, uid, start, rs=None, mom_div=None):
+def model_momenta(com, seed, uid, start, rs=None, mom_div=None, dtype=np.float32):
     """What the network reads of the events start .. start + len(com) of pool `uid` (com: their centre-of-mass
     momenta, float32): augmented, in units of each event's sqrt(s_hat) when `rs` (their sqrt(s_hat), float64) is
     given, divided by the global momentum scale when `mom_div` is. Float32, the operations in the order both data
     paths apply them (data_mmap.MmapSource.gather does the same per particle)."""
-    a = augment(com, seed, uid, np.arange(start, start + len(com), dtype=np.int64))
+    a = augment(com, seed, uid, np.arange(start, start + len(com), dtype=np.int64), dtype=dtype)
     if rs is not None:
-        a = (a.astype(np.float64) / np.asarray(rs)[:, None, None]).astype(np.float32)
+        a = (a.astype(np.float64) / np.asarray(rs)[:, None, None]).astype(dtype)
     return a if mom_div is None else a / mom_div
 
 
-def model_momenta_chunks(com, seed, uid, rs=None, mom_div=None, chunk=1 << 16):
+def model_momenta_chunks(com, seed, uid, rs=None, mom_div=None, chunk=1 << 16, dtype=np.float32):
     """model_momenta over a whole pool in chunks of `chunk` events (bounded float64 temporaries), as (n, P, 4)
-    float32 pieces in order"""
+    pieces in `dtype` (float32 unless the run is float64), in order"""
     for i in range(0, len(com), chunk):
-        yield model_momenta(com[i:i + chunk], seed, uid, i, None if rs is None else rs[i:i + chunk], mom_div)
+        yield model_momenta(com[i:i + chunk], seed, uid, i, None if rs is None else rs[i:i + chunk], mom_div,
+                            dtype=dtype)

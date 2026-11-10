@@ -156,7 +156,9 @@ def _build(cfg, swap, path, name):
                 real(specs, role=role, seed=seed, dest_dir=dest_dir, require_cache=require_cache))
     datagen.ensure_split_set = split
     try:
-        torch.set_default_dtype(torch.float32)
+        # the run's own dtype (a training.dtype=float64 run, the KIT benchmark's, is rebuilt in float64)
+        torch.set_default_dtype(torch.float64 if str(cfg.training.get("dtype", "float32")) == "float64"
+                                else torch.float32)
         from experiment import AmplitudeExperiment
         exp = AmplitudeExperiment(cfg)
         exp._init(); exp.init_physics(); exp.init_geometric_algebra()

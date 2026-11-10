@@ -382,7 +382,14 @@ class AmplitudeExperiment(BaseExperiment):
         )
         to_com = restframe_boost(particles_t[..., :2, :].sum(dim=-2))
         particles_t = torch.einsum("...ij,...kj->...ki", to_com, particles_t)
-        return particles_t.numpy().astype(np.float32)
+        return particles_t.numpy().astype(AmplitudeExperiment._mom_np_dtype(self))
+
+    def _mom_np_dtype(self):
+        """The numpy dtype of the momenta the network reads: float64 for a training.dtype=float64 run (the KIT
+        hard phase-space benchmark: at y ~ 1e-7 or beta ~ 1e-4 float32 cannot resolve the singular invariants),
+        float32 otherwise"""
+        tr = self.cfg.get("training", None) or {}
+        return np.float64 if str(tr.get("dtype", "float32")) == "float64" else np.float32
 
     def _aug_seed(self):
         """The seed of the per-event augmentation draws (keyed_aug): the run's seed, or when the run has none the
@@ -393,7 +400,7 @@ class AmplitudeExperiment(BaseExperiment):
         """A store record's momenta as the network reads them, in chunks: its centre-of-mass momenta augmented
         (keyed_aug, per event), per sqrt(s_hat) under dimensionless_inputs, / mom_div when given"""
         return keyed_aug.model_momenta_chunks(rec["com"], self._aug_seed(), rec["uid"], rs=rec.get("rs"),
-                                              mom_div=mom_div)
+                                              mom_div=mom_div, dtype=self._mom_np_dtype())
 
     def _resolve_amp_orders(self, names):
         """Per-dataset coupling-order vector (see _AMP_ORDER_BY_NAME). An explicit, length-matched
@@ -1691,6 +1698,8 @@ class AmplitudeExperiment(BaseExperiment):
                 "data.target_over_born is built on the in-memory path (data.memmap=false)"
             # host memory that scales with the batch: the same arrays, built once per input set into
             # memory-mapped files and gathered by index (data_mmap.py)
+            assert self._mom_np_dtype() == np.float32, ("data.memmap gathers float32 momenta (data_mmap.py); a "
+                                                        "training.dtype=float64 run uses the in-memory path")
             from data_mmap import init_data_recipes_mmap
             assert float(self.cfg.training.get("sign_near_weight", 1.0) or 1.0) <= 1, \
                 "training.sign_near_weight is built on the in-memory path only (data.memmap=false)"
@@ -2156,7 +2165,7 @@ class AmplitudeExperiment(BaseExperiment):
             store[k].pop("com", None)
         # dtypes chosen so AmplitudeDataset (torch.as_tensor) shares these buffers
         # zero-copy across all loaders instead of copying per loader.
-        self.particles_flat   = np.concatenate(role_particles, axis=0).astype(np.float32, copy=False)
+        self.particles_flat   = np.concatenate(role_particles, axis=0).astype(self._mom_np_dtype(), copy=False)
         self.tokens_flat      = np.concatenate(role_tokens, axis=0).astype(np.int64, copy=False)
         self.offsets          = np.concatenate(role_offsets, axis=0)
         self.all_amplitudes   = np.concatenate(role_amp, axis=0).astype(np.float32, copy=False)
