@@ -20931,7 +20931,7 @@ entries:
     agent: a3907d6d36879af7b
     state: stopped
     since: '2026-11-10T09:01:19+00:00'
-    state_at: '2026-11-10T09:26:05+00:00'
+    state_at: '2026-11-10T09:26:29.374000+00:00'
     context: 180032
     context_at: '2026-11-10T09:21:10+00:00'
   step_why:
