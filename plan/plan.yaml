@@ -22364,6 +22364,61 @@ entries:
       are KIT''s hard_test strata as KIT asks; no prior soft/collinear off-shellness test found (searched results.tex, plan,
       decisions for off-shellness, offshell_per_event, internal_mass_scalars, dimless_offshell_eps, massless propagator, KIT,
       seed spread for deep IR / extrapolation).'
+  - at: '2026-11-10T08:35:48+00:00'
+    question: 'Is the off-shellness input column what makes the parent-preprocessed network run away into the ee->uug and
+      ee->uugg soft limits? Protocol A from scratch, n=1e5, on the parent''s setup (emission-scale target T, dimensionless
+      inputs, off-shellness columns on) gave soft exponents +20.2 (uug) and +16.6 (uugg) against exact -2, deepest soft bins
+      14180 and 9067 against Bakar''s MLP 0.32 and 0.40; T itself is flat and inside its bulk range in every hard bin (T flat-edge
+      floor 5.6e-4 soft uug). The off-shellness column log1p(o/eps) is outside its bulk range in 100% of hard events, 3-13
+      units below it (FEAT lines). One matched arm per process with the off-shellness columns removed (data.offshell_per_event=false
+      and data.internal_mass_scalars=false, the entry''s ''off'' definition), everything else of the control. Feeds: which
+      input carries the runaway, so the input-representation lever (the plain arm''s ''saturates'' branch) changes the right
+      thing; and whether a T-target network with in-range inputs reaches the floor that beats Bakar''s MLP, the number for
+      KIT. Also carries the protocol B batch''s resubmission (B and B_bulk, design passed 03:59, unchanged; the first submission
+      lost KIT_FROM, which site submit does not export: now passed with --env).'
+    prior: 'Searched docs/results.tex, the plan and site decisions for off-shellness, offshell_per_event, internal_mass_scalars,
+      dimensionless, KIT. results.tex 9025-9078: off-shellness adopted for resonances (flagship A/B over the 44-dataset Z/top/Higgs
+      mixture), D2 lever arms; never tested into massless soft/collinear limits. This entry: tt virtual 9e5 off-shellness
+      on vs off: Coulomb deep bin 8.68 vs 7.00, Sudakov 15-50 TeV 0.28 vs 64; tt Born threshold bins on 1.85 decades lower.
+      uug plain target+inputs arm FA-ccin2p3-2642b17b (off-shellness on, GeV inputs, plain target): soft +0.78, coll +0.17,
+      deepest soft bin 145, bulk 7.1e-6 vs control 8.2e-4.'
+    measure: 'KIT''s src/evaluate.py through tools/kit_predict.py on the run''s final model: soft_x and coll_y (uugg: coll_gg,
+      coll_qg) fitted exponents against exact (-2, -1), log10-MSE per hard_test stratum, deepest bins (x, y 1e-7..1e-6) and
+      bulk_test; against the 1e5 control, the 9e5 control (same setup, more data: uug 1366 / +1.81, uugg 4241 / +2.80, the
+      observed variability of this measure), the T flat-edge floors of tools/kit_target_slope.py (uug 5.6e-4 soft, 1.7e-3
+      coll deepest) and Bakar''s MLP at 1e5 (uug 0.32 / 0.11, uugg soft 0.40).'
+    check: 'tools/kit_target_slope.py at 412188b7 (CC CPU, ee_uug me2, truth, 1e5 per stratum): the off-shellness column the
+      model reads, log1p(o/eps) of o = min 2p_i.p_j/s_hat over pairs with a gluon at eps 1e-6: bulk range [9.33, 13.05], hard-bin
+      medians soft 6.77 / 4.48 / 2.27 / 0.63 / 0.08, coll 8.06 / 5.76 / 3.48 / 1.43 / 0.28, outside the bulk range 1.000 in
+      every hard bin; T outside 0.06-0.12, slope +0.000 soft / -0.029 coll. Removing the column leaves the dimensionless momenta
+      as the only route to the limit. Measure moves with an input-set change: off-shellness on/off moved tt Born threshold
+      bins 1.85 decades; the plain arm moved the uug deepest soft bin 14180 -> 145 (2 decades); Bakar''s raw vs log-invariant
+      inputs moved the soft exponent by 2.1. Noise: no seed spread of deep-extrapolation bins is measured; the same setup
+      at 1e5 vs 9e5 events moved the uug deepest soft bin by 1.0 decade (exponent +20.2 vs +1.8) and uugg by 0.33 (+16.6 vs
+      +2.8), so the cuts below use 1 decade for deep bins and exponent bands, not 0.3. One seed (D315).'
+    fixed: 'Everything of each control: scripts/job_kit.sh A mode at 412188b7, trial 1262''s saved config as base (muP LLoCa,
+      HETEROSC, MuonAdamW, batch 16384, diagrams through the sidecar, T target, dimensionless inputs), float64, seed 42, 8000
+      steps, lr 1.19e-2 (control config.yaml 0.0118605), n_train 1e5, val the last 1e5 of bulk_train, test bulk_test 2e5 and
+      every hard_test stratum. Only data.offshell_per_event and data.internal_mass_scalars change (true -> false). Rates from
+      the controls: uug 0.675 s/step (1.5 h + 3 min, --time 2:00), uugg 0.79 s/step (1.76 h + 4 min, --time 2:15); 2 jobs,
+      4.3 GPU-h requested. Disk: run dirs 70/85 MB, data.memmap=false; CC 8.4 GB free. tag=nooffshell. B batch: 12 jobs as
+      its 03:59 design, KIT_FROM via --env, ~11 GPU-h.'
+    control: 'FA-ccin2p3-f6b2ece9 (uug n=1e5 protocol A) and FA-ccin2p3-12a9d54b (uugg n=1e5): the same job, seed, steps,
+      lr and data with the off-shellness columns on. Reference: the 9e5 runs (variability), the plain arm 2642b17b, Bakar''s
+      MLP at 1e5.'
+    seeds: One seed (42), D315; cuts set against the observed 1-decade variability instead of a seed spread.
+    outcome: 'Per process, the soft exponent s (exact -2) falls in one band and the deepest soft bin d is compared with the
+      1e5 control''s: (a) s in [-2.5, -1.5] and d at least 1 decade below the control''s: off-shellness was the runaway and
+      T with in-range inputs extrapolates; d against the T floor and Bakar''s MLP is the number for KIT; next: keep the column
+      in range (off or clamped for massless lines) in A_ft, B and the package. (b) s in (-1.5, +1.0] (no runaway, limit not
+      learned) and d at least 1 decade below the control''s: the column drove the runaway, the momenta carry no limit; next
+      lever: how the momenta enter (architecture). (c) s > +1.0 (positive runaway) or d within 1 decade of the control''s:
+      the runaway is not the column''s (or not resolved against the 1e5-vs-9e5 variability); next lever: the momentum representation,
+      the column stays. (d) s below -2.5 (overshoot): reported as overshoot with d, read as (a) only if d is also below the
+      9e5 control''s. Collinear exponents are reported beside (exact -1; control +0.32 / -0.11..+0.03), banded the same way
+      with [-1.5, -0.5] as the extrapolating band. The plain arm (off-shellness on, GeV inputs) gave s = +0.78, d = 145 (band
+      b): if this arm also lands in (b), the runaway is tied to the dimensionless preprocessing together with the column;
+      uug and uugg disagreeing is reported as such.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
