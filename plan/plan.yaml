@@ -21652,7 +21652,7 @@ entries:
     agent: a14806e97524a48c9
     state: closed
     since: '2026-11-10T05:48:09+00:00'
-    state_at: '2026-11-10T07:04:03+00:00'
+    state_at: '2026-11-10T07:05:28+00:00'
     context: 211098
     context_at: '2026-11-10T07:03:57+00:00'
   findings:
