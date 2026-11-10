@@ -157,7 +157,7 @@ precisely what the reader notices.
 |---|---|
 | legend | **`ps.legend(ax, "upper left")` — inside the axes, in a CORNER.** `ps.legend` rejects anything else. `ps.make_room` then grows the y-range until it is clear of the data. |
 | legend that will not fit | let `ps.legend` drop the font (it goes to `LEGEND_MIN_PT`, 8.5pt). Do **not** rewrite the labels to save width if that costs the reader a distinction. |
-| legend, which panel | **one legend per figure**, in whichever panel has room — often not the one the series were drawn on. Pass `handles=other_ax.get_legend_handles_labels()[0]`. |
+| legend, which panel | **one legend per canvas**: a figure on one canvas (ps.figure 1x2, 2x2) carries one legend in whichever panel has room; panels saved as separate files (ps.panels / save_panels) each carry their own legend, since any file may be shown alone. |
 | process label | `ps.process_label(ax, ...)`, default **upper right**. Do not pick a corner per figure. |
 | colourbar | **`ps.colorbar(ax, mappable, label)` — vertical, immediately right of its own panel.** Always, and one per panel that needs a scale. Not below, not on top, not in an inset. |
 | headroom | `ps.headroom` gives every plot the same clear band above and below the data. Do not hand-tune `ylim` for appearance. |

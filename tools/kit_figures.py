@@ -188,8 +188,10 @@ def plot(path, outdir):
             ax.set_xlabel(XLAB.get(fam, fam.replace("_", " ")))
             ax.set_ylabel(r"log-MSE of $\log_{10}|\mathcal{M}|^2$")
             ps.process_label(ax, PROC.get((stem, target), stem))
-        ps.legend(figs[0][1], "upper left")
-        ps.make_room(figs[0][1])
+        h0 = figs[0][1].get_legend_handles_labels()[0]
+        for _, ax in figs:
+            ps.legend(ax, "upper left", handles=h0)
+            ps.make_room(ax)
         written += ps.save_panels(figs, os.path.join(outdir, f"kit_mse_{base}"))
         # (2) median predicted vs truth log10|M|^2
         figs = ps.panels(len(fams))
@@ -206,8 +208,10 @@ def plot(path, outdir):
             ax.set_xlabel(XLAB.get(fam, fam.replace("_", " ")))
             ax.set_ylabel(r"median $\log_{10}|\mathcal{M}|^2$")
             ps.process_label(ax, PROC.get((stem, target), stem))
-        ps.legend(figs[0][1], "upper left")
-        ps.make_room(figs[0][1])
+        h0 = figs[0][1].get_legend_handles_labels()[0]
+        for _, ax in figs:
+            ps.legend(ax, "upper left", handles=h0)
+            ps.make_room(ax)
         written += ps.save_panels(figs, os.path.join(outdir, f"kit_median_{base}"))
     for w in written:
         print(w)
