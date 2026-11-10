@@ -21152,7 +21152,7 @@ entries:
     at: '2026-11-10T02:35:32+00:00'
   step_waits:
     '2': '2026-11-11'
-    '1': repo-reviewer a908d9ab432d34127 re-check of 9ecbae9f, then merge pid_vs_qn, site sync, submit
+    '1': 'next owner: site sync, site pick FA --jobs 2 (sites timed out at last pick), submit PIDQN=pid and qn'
   handoff:
     state: 'pidqn design PASSED (design-reviewer, second look). Code on branch pid_vs_qn (worktree worktrees/pid_vs_qn: 5541a2ec
       + fix 9ecbae9f). The repo-reviewer (agent a908d9ab432d34127, holds the lock) BLOCKED on a wrong _dimless_mass_stats
