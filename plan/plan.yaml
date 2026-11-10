@@ -21311,6 +21311,15 @@ entries:
       0.46-0.47 (ccbar g), 0.51-0.52 (bbbar gg) s/step. Their horizons come from phase a (the passed-rule T would be read
       at a fixed lr whose best sits in the warm-up at k<=8). Phase a estimate from sweep/gen_data_saving.py @9f720993: 18
       sweeps, 89.0 GPU-h.'
+  - at: '2026-11-10T08:58:17+00:00'
+    text: 'virtual_over_born verdict (ee->ttbar, current defaults): V/B beats V, all three V/B seeds below all three V (median
+      ratio 3.9x, test MSE of log|V| after the sigma stage), so step 2''s gate is met: the one-loop arm trains on V/B (data.target_over_born=true,
+      data.memmap=false), read as MSE of log|V| from sigma_stage/preds_test.npz x prepd_std^2 (analysis/virtual_over_born/seed_mse.py).
+      Born sidecars exist on CC only for ee_ttbar_nlo and ee_uu_nlo; the three targets need scripts/job_vob_born.sh first
+      (CPU, ~0.8 h). Caveat for the next owner: massless ee->qqbar V/B is a constant (C_F(pi^2-8)), so the one-loop target
+      ee->bbbar (massless b in catalog_v4) has nothing to learn under V/B: replace it with a held-out one-loop target whose
+      V/B varies (H5 list, Born in training), or keep it on V, before the one-loop design. Step rate at BS 16384: 0.372 s/step
+      on V100.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
