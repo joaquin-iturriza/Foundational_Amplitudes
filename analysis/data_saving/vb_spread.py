@@ -19,7 +19,9 @@ from analysis.common.readers import site_python  # noqa: E402
 POOLS = ["ee_uu_nlo_25-1000GeV", "ee_ttbar_nlo_362-1000GeV", "v4_epem_bbx_nlo_20-6000GeV",
          "v4_bbx_zz_nlo_183-6000GeV", "v4_uux_epemz_nlo_112-6000GeV", "v4_bg_ab_nlo_20-6000GeV",
          "v4_epem_ddxz_nlo_112-6000GeV", "v4_bbx_gg_nlo_20-6000GeV", "v4_dg_uwm_nlo_92-6000GeV",
-         "v4_bbx_avevex_nlo_20-6000GeV", "v4_db_bdz_nlo_112-6000GeV", "v4_uc_cuz_nlo_112-6000GeV"]
+         "v4_bbx_avevex_nlo_20-6000GeV", "v4_db_bdz_nlo_112-6000GeV", "v4_uc_cuz_nlo_112-6000GeV",
+         "v4_bb_bb_nlo_20-6000GeV", "v4_bbx_hz_nlo_217-6000GeV", "v4_bbx_ccxh_nlo_145-6000GeV", "v4_bg_bgg_nlo_30-6000GeV",
+         "v4_gg_bbxg_nlo_30-6000GeV", "v4_ucx_cxhu_nlo_145-6000GeV", "v4_udx_ccxwp_nlo_101-6000GeV"]
 KEEP_STD = 0.1
 
 REMOTE = r'''

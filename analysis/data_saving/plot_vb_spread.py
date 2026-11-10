@@ -25,6 +25,13 @@ LABELS = {
     "v4_bbx_avevex_nlo_20-6000GeV": r"$b\bar b\to\gamma\nu\bar\nu$",
     "v4_db_bdz_nlo_112-6000GeV": r"$db\to bdZ$",
     "v4_uc_cuz_nlo_112-6000GeV": r"$uc\to cuZ$",
+    "v4_bb_bb_nlo_20-6000GeV": r"$bb\to bb$",
+    "v4_bbx_hz_nlo_217-6000GeV": r"$b\bar b\to HZ$",
+    "v4_bbx_ccxh_nlo_145-6000GeV": r"$b\bar b\to c\bar cH$",
+    "v4_bg_bgg_nlo_30-6000GeV": r"$bg\to bgg$",
+    "v4_gg_bbxg_nlo_30-6000GeV": r"$gg\to b\bar bg$",
+    "v4_ucx_cxhu_nlo_145-6000GeV": r"$u\bar c\to\bar cHu$",
+    "v4_udx_ccxwp_nlo_101-6000GeV": r"$u\bar d\to c\bar cW^+$",
 }
 FLOOR = 1e-4   # a pool with no V < 0 is drawn at this share (log axis)
 
