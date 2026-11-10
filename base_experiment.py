@@ -1052,6 +1052,21 @@ class BaseExperiment:
         if (not self.warm_start and _ft is not None and _ft.get("pretrained_path", None) is not None
                 and self.is_main_process()):
             self.val_loss_step0 = self._validate_start()
+        # training.resume_seed_best (a run resumed past its time limit, scripts/job_kit_pretrain.sh KIT_RESUME): the
+        # resume starts from the previous segment's best checkpoint, so its validation before any update is that
+        # best's loss; it seeds the best-so-far and is saved as this segment's best, so model_run<idx>_best.pt is the
+        # best over all segments (a later validation replaces it only by beating the earlier segments too)
+        if self.warm_start and bool(self.cfg.training.get("resume_seed_best", False)) and self.is_main_process():
+            if (self.cfg.training.loss == "HETEROSC" and str(self.cfg.training.get("heterosc_select", "mu_mse")) == "mu_mse"
+                    and not self.cfg.training.get("heterosc_sigma_only", False)):
+                raise RuntimeError("training.resume_seed_best seeds the no-reg validation loss; this run selects on "
+                                   "the mu MSE (heterosc_select=mu_mse)")
+            v0 = self._validate_start()
+            if v0 is not None:
+                smallest_val_loss = smallest_val_loss_no_reg = v0
+                if self.cfg.training.es_load_best_model:
+                    self._save_model(-1, f"model_run{self.cfg.run_idx}_best.pt")
+                LOGGER.info(f"resume_seed_best: best-so-far seeded with the resumed checkpoint's validation {v0:.6g}")
 
         # fine_tune.muon_warmup_steps (D303): the Muon groups' lr times min(1, step / N) on top of the schedule, AdamW
         # untouched; refused on an optimizer without Muon groups

@@ -35,6 +35,7 @@ if [ "${KIT_RESUME:-}" = 1 ]; then
     # warm start (warm_start_idx=0: run_idx 1, the same run dir), and trains the remaining steps of the same cosine
     # (training.increment_steps=68224 keeps T_max and the warmup; the scheduler's last_epoch is restored). A first job
     # that finished (model_run0.pt without resumed_from.txt) or a finished resume (model_run1.pt) ends at once.
+    # training.resume_seed_best makes model_run1_best.pt the best over both segments (A_ft takes the last segment's).
     M="$OUT/models"
     if { [ -e "$M/model_run0.pt" ] && [ ! -e "$M/resumed_from.txt" ]; } || [ -e "$M/model_run1.pt" ]; then
         echo "KIT_PRETRAIN_RESUME: $OUT already finished, nothing to resume"; echo "RUN_DONE $OUT"; exit 0
@@ -63,7 +64,8 @@ PYEOF
     cp "$M/$F" "$M/model_run0.pt" && echo "$F last_epoch=$DONE remaining=$REM $(date -u +%FT%TZ)" > "$M/resumed_from.txt"
     echo "KIT_PRETRAIN_RESUME from $F at step $DONE: $REM steps left, args: ${ARGS[*]}"
     python run.py --config-path "$OUT" --config-name config run_dir="$OUT" warm_start_idx=0 run_idx=0 \
-        training.iterations="$REM" training.increment_steps=68224 training.is_dyhpo_run=false "${ARGS[@]}"
+        training.iterations="$REM" training.increment_steps=68224 training.is_dyhpo_run=false \
+        ++training.resume_seed_best=true "${ARGS[@]}"
     RC=$?
     echo "KIT_PRETRAIN_DONE rc=$RC $OUT"
     [ "$RC" -eq 0 ] && echo "RUN_DONE $OUT"
