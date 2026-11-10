@@ -10,10 +10,13 @@ the parent's and only the keys below and the searched HPs move:
              own amplitude stats, the parent's off-shellness scale (as scripts/job_data_saving.sh ft)
 Both: training.heterosc_select=mu_mse (DyHPO observes the val mu MSE at the best checkpoint, base_experiment.py
 1182-1304), the sigma stage after, data.phase_space_on_pool, the fixed 1e4 val split, seed 42, warm_start_idx=null.
-lr window (scratch): [c/10, 3c] around c = 7.82114e-3 (T/17056)^-0.55 times the transfer study's D factor, the lr the
-calibration ran at (scripts/job_data_saving.sh): the parent's Muon law, not the AdamW-measured ladder surface
-(CLAUDE.md: a Muon sweep centres on its own law). The calibration put ee->ccbar g and ee->bbbar gg's best inside the
-warm-up at c (analysis/data_saving/data/horizons_cal2.json), so the window reaches a decade below and 3x above.
+lr window (scratch): one decade either side, [c/10, 10c], of c = 7.82114e-3 (T/17056)^-0.55 times the transfer
+study's D factor: the lr the calibration ran at (scripts/job_data_saving.sh, the design passed 2026-11-10 03:35),
+the parent's MuonAdamW law (CLAUDE.md: a Muon sweep centres on its own search; the AdamW-measured lr surface of
+gen_transfer_pilot.lr_space sits ~10x lower at T=8000, 9.6e-4 at k=2). The window's width is sec:ladder's one decade
+either side; the parent's law is censored at its own window's top (a lower bound), hence 10c above. The calibration
+put ee->ccbar g and ee->bbbar gg's best inside the warm-up at c (analysis/data_saving/data/horizons_cal2.json), hence
+c/10 below.
 The other searched HPs are the template's (sweep/sweep_config_jeanzay_template.yaml).
 
 Horizons: --phase a writes the scratch sweeps of ee->ccbar g and ee->bbbar gg at the calibration horizon (8000 steps
@@ -26,12 +29,14 @@ phase a's best trials, --horizons JSON {target: {k: T}}). Wall limits from the c
 import argparse
 import json
 import os
+import sys
 import zlib
 
 import numpy as np
 import yaml
 
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
+sys.path.insert(0, ROOT)
 TARGETS = ["epem_ttx", "epem_ccxg", "epem_bbxgg"]
 SCR_PARENT = "runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262"
 CAL = os.path.join(ROOT, "analysis", "data_saving", "data", "horizons_cal2.json")
@@ -70,7 +75,7 @@ def template_space():
 def write(name, tgt, k, T, arm, rate, ft_parent=None):
     c = lr_centre(T, k)
     space = template_space()
-    fixed = {"data.processes_file": f"${{PROJECT_DIR}}/recipes/catalog_v4_datasaving_{tgt}.yaml",
+    fixed = {"data.source": "recipes", "data.processes_file": f"${{PROJECT_DIR}}/recipes/catalog_v4_datasaving_{tgt}.yaml",
              "data.train_subsample": d_of(k), "data.eval_subsample": "null", "data.phase_space_on_pool": "true",
              "data.memmap": "false", "training.heterosc_select": "mu_mse", "evaluation.train_subsample": 2000,
              "seed": 42, "plot": "true"}
@@ -78,7 +83,7 @@ def write(name, tgt, k, T, arm, rate, ft_parent=None):
         base = f"${{PROJECT_DIR}}/{SCR_PARENT}"
         fixed["fine_tune.pretrained_path"] = "null"
         space = [{"name": "training.lr", "type": "float_log", "low": float(f"{c / 10:.3g}"),
-                  "high": float(f"{3 * c:.3g}")}] + space
+                  "high": float(f"{10 * c:.3g}")}] + space
     else:
         base = ft_parent
         fixed.update({"fine_tune.pretrained_path": f"{ft_parent}/models/model_run0_best.pt",
@@ -88,7 +93,8 @@ def write(name, tgt, k, T, arm, rate, ft_parent=None):
     hours = T * rate / 3600 + OVERHEAD_H
     cfg = {"cluster": {"scheduler": "slurm", "auto_submit": False, "request_gpus": 1, "mem": "32G",
                        "cpus_per_task": 4,
-                       "time": "%02d:%02d:00" % divmod(max(30, int(hours * 60 * 1.5 + 15)), 60)},
+                       # the estimate itself: sweep/drive.py applies the one margin (1.5x + 6 min)
+                       "time": "%02d:%02d:00" % divmod(max(1, int(round(hours * 60))), 60)},
            "paths": None, "sweep_name": name, "base_config": base, "n_trials": N_TRIALS,
            "dyhpo": {"surrogate": "gp", "n_candidates": 2000, "objective_scale": "auto",
                      "seed": zlib.crc32(name.encode()) % 2 ** 31, "n_startup": N_STARTUP, "total_budget": 10000},
@@ -130,6 +136,9 @@ def main():
                     if arm == "ft" and not a.ft_parent:
                         raise SystemExit("--ft-parent is needed for the fine-tune arm")
                     jobs.append((f"ds_{arm}_{t}_d{k}_t{T}", t, k, T, arm))
+    miss = sorted({(t, k) for _, t, k, _, _ in jobs if (t, k) not in R})
+    if miss:
+        raise SystemExit(f"no measured step rate for {miss} in {CAL}: rerun analysis/data_saving/horizons.py first")
     total = 0.0
     for name, t, k, T, arm in jobs:
         rate = R[(t, k)]
