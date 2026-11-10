@@ -323,6 +323,48 @@ def stop_conditions(inp, refused):
     return bad, notes
 
 
+TABLE_MSG = ("PLAN CHECK: a result table went to Joaquin without its figure (CLAUDE.md: a result reaches me with a "
+             "figure of the compared quantities). Send the figure with SendUserFile, or drop the table.")
+_ROW, _SEP = re.compile(r"^\s*\|.*\|\s*$"), re.compile(r"^\s*\|[\s:|-]+\|\s*$")
+_NUM = re.compile(r"\d+\.\d+|\d+[eE][-+]?\d+|\d+")
+
+
+def result_table_without_figure(inp):
+    """[TABLE_MSG] when the main session's last message of the turn has a markdown table with a numeric cell and the
+    turn made no SendUserFile call of a .png or .pdf; else []."""
+    import plan
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import stop_conditions as sc
+    recs = sc._tail_records(inp.get("transcript_path") or "")
+    start = 0
+    for i, r in enumerate(recs):
+        if sc.turn_of([r])[0]:
+            start = i + 1
+    turn = recs[start:]
+    last = sc.turn_of(turn)[1] or inp.get("last_assistant_message") or ""
+    lines = last.splitlines()
+    table = False
+    for i in range(len(lines) - 1):
+        if _ROW.match(lines[i]) and _SEP.match(lines[i + 1]):
+            body = []
+            for l in lines[i + 2:]:
+                if not _ROW.match(l):
+                    break
+                body.append(l)
+            if any(_NUM.search(l) for l in body):
+                table = True
+                break
+    if not table:
+        return []
+    for r in turn:
+        c = (r.get("message") or {}).get("content")
+        for b in c if isinstance(c, list) else []:
+            if isinstance(b, dict) and b.get("type") == "tool_use" and b.get("name") == "SendUserFile" \
+                    and re.search(r"\.(png|pdf)\b", json.dumps(b.get("input") or {}), re.I):
+                return []
+    return [TABLE_MSG]
+
+
 OPENER_STATE = {}
 
 
@@ -407,6 +449,8 @@ def main():
         OPENER_STATE.update(st.get("_opener") or {})
         more, notes = stop_conditions(inp, bad)
         bad += more
+        if main_session:
+            bad += result_table_without_figure(inp)
         plan.NOTES.extend(notes)
         if OPENER_STATE:
             plan._set_state("_opener", dict(OPENER_STATE))
