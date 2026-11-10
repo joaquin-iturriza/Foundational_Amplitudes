@@ -20877,9 +20877,9 @@ entries:
   asks: []
   owner:
     agent: a2a4836c90d93265b
-    state: working
+    state: stopped
     since: '2026-11-10T02:21:50+00:00'
-    state_at: '2026-11-10T03:44:33.924000+00:00'
+    state_at: '2026-11-10T03:49:27.547000+00:00'
     context: 270543
     context_at: '2026-11-10T03:49:26+00:00'
   step_why:
