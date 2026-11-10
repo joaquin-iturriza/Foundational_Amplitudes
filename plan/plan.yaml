@@ -22741,6 +22741,14 @@ entries:
       Restarted fresh at --hours 0.9 (limit 1.45 h): 16 trials x 0.9 h = 14.4 GPU-h, sweeps ~2.7 h; seed runs then 10 x 0.9
       h = 9 GPU-h. Cancelled 6 wave-2 trials (FA-ccin2p3-8a761211, -b9064781, -22e2edb0, -9b8f602a, -c70cd9f4, -ddd4bc8a)
       that carried the same limit and blind suggestions.'
+  - at: '2026-11-10T08:57:47+00:00'
+    text: 'Current-defaults V/B test on e+e- -> t t~ (seed_mse.py @d767344e; template sweep vob_tt_V best hp_1333, LLoCa muP,
+      MuonAdamW, HETEROSC, BS 16384, 8000 steps, 50k train events, test pool 5000): test MSE of log|V|, V arm seeds 42/43/44
+      = 3.85e-10 / 8.80e-10 / 2.13e-7 (seed 44: a loss spike near step 1600, NLL -3.06 -> -1.58, not recovered by step 8000),
+      V/B arm at the same HPs = 1.78e-10 / 2.68e-10 / 2.27e-10. All three V/B below all three V: the design''s Yes. Median
+      V over median V/B = 8.80e-10 / 2.27e-10 = 3.9x (geometric means 18.8x, the spike included). June from scratch t=4000:
+      V 1.75e-7, V/B 4.58e-8 (3.8x). e+e- -> u u~: V seeds 3.3e-7 / 3.1e-6 / 1.1e-6; V/B reruns pending (first attempt died
+      in plots.py on the constant target, fixed @7aa4659c).'
   step_why:
     1:
       feeds: whether V/B beats V for us at current defaults, and the V/B-with-exact-Born scratch baseline for kit_benchmark;
