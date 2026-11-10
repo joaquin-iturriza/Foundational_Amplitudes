@@ -21367,6 +21367,10 @@ entries:
       from MG5_aMC and the surrogate''s NLO from its V; design once a tt virtual model exists'
     5: 'Checkpoint + inference package for KIT (Joaquin sends it): best A/B checkpoints, a float64 predict script, log10|M|^2
       out; after B'
+    6: 'Plain target and inputs arm on uug 1e5 (FA-ccin2p3-2642b17b, scripts/job_kit.sh at c53a6608, design passed 06:24):
+      on its end read kit_result.txt against the control f6b2ece9 and the flat floors of tools/kit_target_slope.py, per the
+      design''s three branches (a result fitting none, exponents off but not near 0 with deep bins below the floor, reads
+      as partial)'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -21508,6 +21512,11 @@ entries:
       if:
       - 'B''s best beats A: package B'
       - 'else: package A'
+    6:
+      feeds: whether the parent's preprocessing breaks uug extrapolation, before the pretrained protocol A arm is read
+      if:
+      - 'extrapolates: next arm T target with plain inputs'
+      - 'saturates or fails: the next lever is the input representation (log invariants), not the target'
   step_waits:
     '1': 2026-11-10T08:00 (60 min after the pretrainings' resubmission; uugg A 9e5 scores read first)
     '2': 2026-11-10T07:00 (the budget window of the failed pair; then resubmit both pretrainings with --dependency=afterok
