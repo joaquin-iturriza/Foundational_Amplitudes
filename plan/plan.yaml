@@ -21990,6 +21990,13 @@ entries:
       target 0.140 (V/B) vs 0.622 (V); converted to MSE of log|V| at t=4000, V/B beats V in all six arms: scratch 4.58e-8
       vs 1.75e-7 (3.8x), fine-tune 4.66e-8 vs 3.21e-7 (6.9x), EWC 7.3x, freeze 11.9x, LoRA 7.3x, reset-head 35x. Standardization
       had no std floor (preprocess_amplitude clip=False).'
+  - at: '2026-11-10T04:57:45+00:00'
+    text: 'Step rate at the template''s batch 16384 on 50k-event single-process one-loop pools (V100): 0.372 s/step, 8000
+      steps = 50 min, against the design''s 0.127 s/step (sibling FA-ccin2p3-5f933ea3 ran batch 5000 on 10k events), 2.9x.
+      The first wave of vob_tt_V/vob_uu_V (6 trials) finished training but the 0.85 h limit cut the sigma stage; no result.
+      Restarted fresh at --hours 0.9 (limit 1.45 h): 16 trials x 0.9 h = 14.4 GPU-h, sweeps ~2.7 h; seed runs then 10 x 0.9
+      h = 9 GPU-h. Cancelled 6 wave-2 trials (FA-ccin2p3-8a761211, -b9064781, -22e2edb0, -9b8f602a, -c70cd9f4, -ddd4bc8a)
+      that carried the same limit and blind suggestions.'
   step_why:
     1:
       feeds: whether V/B beats V for us at current defaults, and the V/B-with-exact-Born scratch baseline for kit_benchmark;
