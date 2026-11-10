@@ -16108,7 +16108,6 @@ entries:
       - 'committed: claudemd-keeper reviews it in its next backlog'
       - 'gate refuses: run the claudemd-keeper first'
   step_waits:
-    '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
     '5': 'Joaquin: syncClaudeAiSkills false in ~/.claude/settings.json, and the CLAUDE.md line for low-effort lookup agents
       (asked 2026-10-31 ~00:30)'
