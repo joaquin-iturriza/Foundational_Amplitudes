@@ -21046,6 +21046,14 @@ entries:
       stage 2''s design states that arm''s cost (one more 8-trial fine-tune sweep per cell, about the Muon fine-tune arm''s
       GPU-h, plus its pretraining). kit_benchmark''s owner was asked whether its family-held-out pretraining can serve this
       entry.'
+  - at: '2026-11-10T03:48:23+00:00'
+    text: 'Calibration batch calib_trees: 18 of 27 runs submitted 2026-11-10 04:4x CET (ee->ttbar and ee->ccbar g, k=2..10);
+      the 9 ee->bbbar gg runs were refused by the site budget gate, which counts wall limits (1.5x estimate + 15 min, 30.7
+      GPU-h counted in 60 min) against 30, while the design''s work estimate is 26.7 GPU-h. They go out once the 60-min window
+      has rolled, with limits from the first runs'' measured rates. Measured: k=2 at B=5 runs 0.075 s/step (estimate 0.1).
+      Fixed: the parent config carries warm_start_idx 0 (it was a sweep trial), so a rerun into an existing run dir would
+      reload it; job_data_saving.sh now passes warm_start_idx=null (5ba7c3c5); the 18 running runs trained from scratch (log:
+      Cannot load model ... training model from scratch).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
