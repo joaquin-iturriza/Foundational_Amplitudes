@@ -21036,6 +21036,7 @@ entries:
     '1': a design reviewer
     '3': '2026-11-12'
     '4': '2026-11-12'
+    '2': virtual_over_born
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
