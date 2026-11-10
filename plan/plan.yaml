@@ -21037,9 +21037,31 @@ entries:
     commit: null
     paths: []
   dead_ends: []
-  asks: []
+  asks:
+  - ask: 'Scope: three sections of the draft are not in your new story: Sec. 2 ''Accuracy and precision benchmark'' (a placeholder
+      for Jonas and Suprio), Sec. 3 ''Extrapolating to more legs'' (the Z+ng autoregressive study, figs 1 to 5) and Sec. 6
+      ''Conditioning on Feynman diagrams'' (figs 41 to 49). Cut them, or keep them as co-authors'' sections after yours?'
+    at: '2026-11-10T02:22:50+00:00'
+    searched: CLAUDE.md; site decisions --project FA (D8 forbids draft edits unless asked; D365 and D354 approve the rewrite
+      but name none of these three sections); Joaquin's message of 2026-11-10T02:08 lists his order and says what goes for
+      the divergence section only; 2026-10-14T16:48 (Anja's chat on the benchmark section for the October deck, says nothing
+      about cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID,
+      says nothing about the draft's sections)
+    blocks: the cut or placement of those three sections; the rest of the rewrite goes on
+    blocks_steps: &id002 []
   owner:
     agent: afb073b8fc9460ec5
     state: working
     since: '2026-11-10T02:21:57+00:00'
     state_at: '2026-11-10T02:21:57+00:00'
+  ask: 'Scope: three sections of the draft are not in your new story: Sec. 2 ''Accuracy and precision benchmark'' (a placeholder
+    for Jonas and Suprio), Sec. 3 ''Extrapolating to more legs'' (the Z+ng autoregressive study, figs 1 to 5) and Sec. 6 ''Conditioning
+    on Feynman diagrams'' (figs 41 to 49). Cut them, or keep them as co-authors'' sections after yours?'
+  waiting_since: '2026-11-10T02:22:50+00:00'
+  searched: CLAUDE.md; site decisions --project FA (D8 forbids draft edits unless asked; D365 and D354 approve the rewrite
+    but name none of these three sections); Joaquin's message of 2026-11-10T02:08 lists his order and says what goes for the
+    divergence section only; 2026-10-14T16:48 (Anja's chat on the benchmark section for the October deck, says nothing about
+    cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID, says
+    nothing about the draft's sections)
+  blocks: the cut or placement of those three sections; the rest of the rewrite goes on
+  blocks_steps: *id002
