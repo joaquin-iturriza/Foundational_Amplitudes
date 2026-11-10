@@ -73,6 +73,12 @@ print(f'{7.82114e-3 * (t / 17056) ** -0.55 * f:.6g}')") || exit 2
     fi
 fi
 echo "KIT dataset=$NAME n_train=$N steps=$T mode=$MODE base=$BASE args: ${ARGS[*]}"
+if [ -n "$KIT_SCORE_ONLY" ]; then
+    # re-score a run that trained but whose scoring failed (same arguments name the same run dir); no training
+    [ -e "$OUT/config.yaml" ] || { echo "KIT_SCORE_ONLY: no trained run at $OUT"; exit 2; }
+    python tools/kit_predict.py "$OUT"; RC=$?
+    echo "KIT_DONE rc=$RC $OUT"; [ "$RC" -eq 0 ] && echo "RUN_DONE $OUT"; exit $RC
+fi
 python run.py --config-path "$BASE" --config-name config run_dir="$OUT" run_name=null \
     data.source=recipes data.processes_file="$RECIPE" data.train_subsample=null data.eval_subsample=null \
     data.memmap=false training.dtype=float64 training.iterations="$T" training.heterosc_select=mu_mse \
