@@ -20898,3 +20898,34 @@ entries:
     paths: []
   dead_ends: []
   asks: []
+- id: kit_benchmark
+  title: the KIT hard phase-space benchmark and the fair NLO protocol (Bakar, Gudrun)
+  question: 'On the KIT datasets (ee->tt Born and one-loop virtual, ee->uug, ee->uugg; hard bins by distance to the singularity):
+    per-bin log-MSE, bias, 99th percentile, |M|^2-weighted error and fitted exponents under protocol A (bulk only; pretrained
+    with the target family held out, and from scratch) and B (hard_train added), on Bakar''s fair NLO setup (tree for all
+    processes incl. the target''s tree, at most ~10 other one-loop processes bulk only, 100 to 1e4 one-loop bulk target points,
+    family held out, standardization, early stopping and features from bulk only, baseline from-scratch V/B with exact Born),
+    and the ee->tt threshold scan sigma(sqrt s) at LO and NLO around 2m_t like Fig. 1 of arXiv:1506.06864 (D363, D353)?'
+  status: running
+  quotes:
+  - said_at: '2026-11-10T02:08:07.285000+00:00'
+    text: Basically all the extrapolation and divergencies study, which is the most incomprehensible section in the draft,
+      gets superceded by what they are asking, with a clear procedure to follow and clear benchmarks.
+    decision: D363
+    covers:
+    - kit_benchmark
+  decisions:
+  - D363
+  next: Get the data (nextcloud link and password in Joaquin's message of 2026-11-10; not on the laptop) onto the sites with
+    the site tools; read README and src/evaluate.py; write the loader (HDF5 layout, float64 momenta, metadata particles, targets,
+    mu_R); make float64 hold through the model (frames included), checked on the deepest bins; protocol designs with GPU-h;
+    then the threshold scan and a checkpoint + inference script for KIT.
+  done_when: null
+  notes_ref: null
+  match: kit_*
+  evidence:
+    runs: []
+    commit: null
+    paths: []
+  dead_ends: []
+  asks: []
