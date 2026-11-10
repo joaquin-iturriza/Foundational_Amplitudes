@@ -43,15 +43,14 @@ def het(sweep):
 def extension():
     """D97: the 13 hp58 sweeps extended in place to lr 2e-2 (het_hp58_ext_cells.json): the best of the first 5 trials
     (trial_idx < 5, the stage-2 sweep) against the best of all 10, and whether the best is again the highest lr tried"""
-    sys.path.insert(0, ROOT)
-    from sweep.dyhpo_sampler import DyHPOSampler
     out = {}
     for sw in json.load(open(os.path.join(HERE, "het_hp58_ext_cells.json"))):
         d = os.path.join(ROOT, "sweeps_local", sw)
-        smp = DyHPOSampler.load(os.path.join(d, "dyhpo_state.pkl"), os.path.join(d, "dyhpo_surrogate"), force_cpu=True)
+        # each trial's HPs from the driver's state (no surrogate pickle: it loads only under the driver's numpy)
+        hps = {t["hp_idx"]: t["hp"] for t in json.load(open(os.path.join(d, "driver_state.json")))["trials"].values()}
         rs = [json.load(open(f)) for f in glob.glob(os.path.join(d, "results", "*.json"))]
         rs = [r for r in rs if r.get("val_loss") is not None]
-        lr = lambda r: float(smp.candidates_raw[r["hp_idx"]]["training.lr"])
+        lr = lambda r: float(hps[r["hp_idx"]]["training.lr"])
         old = [r for r in rs if r["trial_idx"] < 5]
         bo, bn = min(old, key=lambda r: r["val_loss"]), min(rs, key=lambda r: r["val_loss"])
         out[sw] = dict(n=len(rs), old=bo["val_loss"], new=bn["val_loss"], ratio=bn["val_loss"] / bo["val_loss"],
@@ -96,6 +95,33 @@ def main():
     ps.save_panels(figs, os.path.join(HERE, "figs", "het_stage2"))
     res["_extension"] = extension()
     json.dump(res, open(os.path.join(HERE, "het_stage2.json"), "w"), indent=1)
+    print(json.dumps(numbers(res)))
+
+
+def numbers(res):
+    """results.tex numbers (D94, D97): hp58 over the finale, both het, at D=10^2 and 10^4 (the table); hp58 het and
+    scratch MSE at D=10; the extension's counts and ratios (best of all 10 trials over best of the first 5); the
+    finale het cells whose best is the lowest lr tried; the stage-2 sweeps and their first-five trials"""
+    from het_finale_s1 import cell as s1cell
+    ratio = {p: {k: res[p]["hp58 (het)"][k] / res[p]["finale (het)"][k] for k in ("4", "8")} for p in PROBES}
+    d10 = {p: dict(hp58=res[p]["hp58 (het)"]["2"], scratch=res[p]["scratch (MSE)"]["2"]) for p in PROBES}
+    ext = res["_extension"]
+    fin_low = [f"{p}_d{k}" for p in PROBES for k in (4, 8)
+               if (lambda rows: rows[0]["training.lr"] == min(x["training.lr"] for x in rows))(s1cell(p, k))]
+    sweeps = [f"tp3_hp58fte_{p}_d{k}_het" for p in PROBES for k in (2, 4, 6, 8)] + \
+             [f"tp3_finfte_{p}_d{k}_het" for p in ("ee_nnbar", "ee_ttbar", "ee_bb_nlo") for k in (4, 8)]
+    first5 = sum(json.load(open(f)).get("trial_idx", 0) < 5 for sw in sweeps
+                 for f in glob.glob(os.path.join(ROOT, "sweeps_local", sw, "results", "*.json")))
+    lowered = [c for c, v in ext.items() if v["ratio"] < 1]
+    top = [c for c, v in ext.items() if v["new_at_top"]]
+    return dict(ratio=ratio, d10=d10, stage2_sweeps=len(sweeps), stage2_trials=first5, ext_n=len(ext),
+                ext_lowered=len(lowered), ext_unchanged_max=max(abs(1 - v["ratio"]) for c, v in ext.items() if c not in lowered),
+                ext_gain={c: 1 / v["ratio"] for c, v in ext.items()},
+                bb_d8_old=ext["tp3_hp58fte_ee_bb_nlo_d8_het"]["old"], bb_d8_new=ext["tp3_hp58fte_ee_bb_nlo_d8_het"]["new"],
+                ext_bracketed=len(ext) - len(top), ext_top=len(top),
+                ext_top_dd_nlo_lr=ext["tp3_hp58fte_ee_dd_nlo_d4_het"]["lr_new"],
+                ext_top_below_6e3=sum(ext[c]["lr_max_tried"] < 6e-3 for c in top),
+                finale_het_cells=len(PROBES) * 2, finale_het_lowest=len(fin_low))
 
 
 if __name__ == "__main__":
