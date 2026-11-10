@@ -20485,6 +20485,14 @@ entries:
       head and two-stage from the folded JSONs; Q2, deep sampling, sigma speed and the uugg loop from tracked summaries; the
       October het-loss paragraphs D47-D94 from CC runs of other entries), and the repo-reviewer (locked by another agent at
       2026-11-10).'
+  - at: '2026-11-10T00:02:51+00:00'
+    text: 'ee->uu online figure redrawn (l2_eeuu_online.py @61b3420b, results b8f31319 on sigma-gen): arms named in words,
+      legend strip above each panel; new paragraph places the study against sec:div-sampling: starved base sigma ~ true-error
+      best case (agrees), good base null with sigma^1 30.5x worse (agrees), loss reweighting without sigma matches sigma on
+      the starved base (IS over sigma 1.11, new), panel (a) round-0 spread 2.5x across arms at one seed, the uugg steering
+      win is a different setting (coordinate-free vs uniform base on uugg); the concentration principle predicts the starved-base
+      gain over uniform (5.25x) but not the panel (c) null against a pole-covering base, and no study controls sigma against
+      plain loss reweighting.'
   step_why:
     1:
       feeds: 'whether the July studies carry over: what they found, recorded reproducibly'
