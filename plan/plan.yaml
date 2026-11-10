@@ -21821,9 +21821,9 @@ entries:
   asks: []
   owner:
     agent: aa70fe4b5162f3a20
-    state: working
+    state: stopped
     since: '2026-11-10T03:53:00+00:00'
-    state_at: '2026-11-10T04:54:41+00:00'
+    state_at: '2026-11-10T04:58:16+00:00'
     context: 99317
     context_at: '2026-11-10T04:55:48+00:00'
   designs:
