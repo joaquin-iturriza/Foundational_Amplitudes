@@ -21888,6 +21888,29 @@ entries:
       as wrong (exponents off by more than 0.3, deep bins within 0.3 decades or worse): neither T nor the dimensionless inputs
       is the cause; the network''s response to momenta past the bulk is, and the next lever is the input representation (log
       invariants, as Bakar''s MLP). Either way reported.'
+    fix_at: '2026-11-10T06:23:25+00:00'
+    fix: 'Outcome (stated before the run, for yes and for no) fails: the yes branch fires on almost any result. Its second
+      clause, ''deepest soft/collinear bins more than 0.3 decades below the dimensionless arm'', compares against a control
+      that blew up: f6b2ece9''s kit_result.txt reads soft x 1e-7..1e-6 log10-MSE 1.418e4 with bias -98.8 decades (p99 269),
+      soft 1e-6..1e-5 846. Your own check (tools/kit_target_slope.py at 436952f2) says the plain truth leaves the bulk range
+      by at most ~10 decades, so a plain-target network that learns nothing about the limit and just saturates at the bulk
+      edge scores a deep soft MSE of order 1e2, two decades under the control, and the design would conclude ''the parent''s
+      preprocessing breaks it'' and go on to split T from the inputs. Fix: state yes/no on what a non-extrapolating network
+      cannot pass: the fitted soft and collinear exponents (yes: within 0.3 of -2 and -1; or a stated fraction of the way
+      from the control''s +20.2/+0.32 towards exact), and for the deep bins a reference that a flat predictor sets, e.g. the
+      log10-MSE of a constant-at-bulk-edge (or bulk-median) predictor per hard stratum computed on the truth with a committed
+      tool (kit_target_slope.py can print it), the plain arm counting as extrapolating only if it is below that floor by more
+      than 0.3 decades. Also say which reading follows if the plain arm beats the control in MSE but its exponents stay near
+      0 (the network saturates, the inputs still do not carry the limit). Disk (minor, fix while you are at it): the design
+      states no disk per job; CC /sps/lpnhe has 25 GB free now (df read 2026-11-10, down from the 44 GB in the hand-off) with
+      the two pretraining caches being prebuilt; state the plain arm''s disk (f6b2ece9''s run dir, and whether dimensionless_inputs=false
+      opens a new memmap cache and its size) against that. Checks that hold: one change, stated as the parent''s preprocessing
+      as a whole, same job/seed/steps/lr/HETEROSC/float64 as f6b2ece9; measure responds (off-shellness columns moved tt Born
+      Coulomb bins 1.85 decades in this entry, results.tex 459-463 dimensionless vs GeV extrapolation 0.03-0.07 ratios, Bakar''s
+      MLP representation change moved the soft exponent by 2.1); one seed per D315 against 0.148-decade spread; rate 0.675
+      s/step from f6b2ece9 itself and kit_result.txt confirmed written by job_kit.sh (read on CC); test events KIT''s own
+      bulk_test/hard_test strata; searched: dimensionless, plain target, target_physics_factor=false, dimensionless_inputs=false,
+      emission scale, KIT, Bakar in docs/results.tex and site decisions.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
