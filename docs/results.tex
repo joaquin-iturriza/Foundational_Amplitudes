@@ -10004,6 +10004,8 @@ temperature over seeds, and the $\sigma$-tail \emph{floors} at a level $8\times$
 rule for how much to generate. Tooling under \code{analysis/divergences/};
 heteroscedastic code on worktree \code{worktrees/wt-heterosc} (branch \code{heterosc}). Remaining/future
 work is collected in the hand-off, Sec.~\ref{sec:div-open}.}
+% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% claim: sat.budget_factor=8
 
 \paragraph{Deeper and antenna phase-space sampling.} The production
 $u\bar u g$ set is flat \textsc{rambo} (uniform in Lorentz-invariant phase space), so the deep
@@ -11324,7 +11326,7 @@ beats uniform, and the gain \textbf{concentrates in the deep IR and grows monoto
 concentration exponent $\gamma$}. Log-flat-per-decade MSE, $\sigma$/base (mean over the $7$ $y_{\min}$
 decades): $92\%,81\%,78\%,76\%,74\%$ at $\gamma{=}1,2,3,5,10$, a real but \emph{saturating} overall
 gain. The deepest decade ($y_{\min}\!<\!10^{-6}$) tells the sharper story: $\sigma$/base
-$=90\%,70\%,66\%,62\%,\mathbf{55\%}$: the deep-IR error is nearly \emph{halved} at $\gamma{=}10$.
+$=90\%,71\%,66\%,62\%,\mathbf{55\%}$ (the second read $70\%$ before the reader): the deep-IR error is nearly \emph{halved} at $\gamma{=}10$.
 \emph{Correction from the extended sweep:} an earlier reading of this series as ``still falling'' at
 $\gamma{=}10$ was too optimistic. Pushing to $\gamma=20,30$ (single seed, so compared within the seed-0
 series) shows the deepest decade \textbf{saturating}: ratio $0.529\to0.525\to0.509$ over
@@ -11342,6 +11344,28 @@ $\sigma$, raised to a power, generates a strictly better training set than unifo
 coordinate, no reference density, no loss correction, isolated from coverage- and loss-function
 confounds over $3$ seeds.} (This supersedes the confounded $ee\to u\bar u$ steering numbers from the earlier
 session, which are retracted.) See Figs.~\ref{fig:l2_uugg_perdecade}--\ref{fig:l2_uugg_perdecade_abs}.
+% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% claim: pct.uugg_logflat.0=92
+% claim: pct.uugg_logflat.1=81
+% claim: pct.uugg_logflat.2=78
+% claim: pct.uugg_logflat.3=76
+% claim: pct.uugg_logflat.4=74
+% claim: pct.uugg_deepest.0=90
+% claim: pct.uugg_deepest.1=71
+% claim: pct.uugg_deepest.2=66
+% claim: pct.uugg_deepest.3=62
+% claim: pct.uugg_deepest.4=55
+% claim: uugg_s0.10.deepest=0.529
+% claim: uugg_s0.20.deepest=0.525
+% claim: uugg_s0.30.deepest=0.509
+% claim: pct.uugg_deepest_gain_10_30=4
+% claim: uugg_s0.10.bulk=1.30
+% claim: uugg_s0.20.bulk=1.55
+% claim: uugg_s0.30.bulk=1.63
+% claim: pct.uugg_overall_worse_30=12
+% claim: pct.uugg_shallowest.0=107
+% claim: pct.uugg_shallowest.1=128
+% allow: 70 because it is the superseded value, quoted as corrected
 
 \begin{figure}[H]
   \centering
@@ -11361,13 +11385,21 @@ session, which are retracted.) See Figs.~\ref{fig:l2_uugg_perdecade}--\ref{fig:l
   \includegraphics{l2_uugg_gamma.pdf}
   \caption{\textbf{The concentration exponent $\gamma$ traverses a water-filling trade-off.} Per-decade
   $\sigma$/base ratio and the deep-vs-bulk split against $\gamma\in\{1,2,3,5,10\}$. The deepest decade
-  ($y_{\min}\!<\!10^{-6}$) falls to $\sim\!\mathbf{55}\%$ of base ($90,70,66,62,55\%$) while the
+  ($y_{\min}\!<\!10^{-6}$) falls to $\sim\!\mathbf{55}\%$ of base ($90,71,66,62,55\%$) while the
   shallowest bulk decade \emph{rises} $107\!\to\!128\%$. So the log-flat average is best around
   $\gamma\!\approx\!3$--$5$ and larger $\gamma$ buys deep-IR accuracy by paying in the bulk: one
   coordinate-free scalar knob sliding along the equimarginal allocation trade-off. Extending the sweep to
   $\gamma=20,30$ shows the deep gain \emph{saturating} rather than continuing
   (Fig.~\ref{fig:l2_gamma_response_extended}).}
   \label{fig:l2_uugg_gamma}
+% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% claim: pct.uugg_deepest.0=90
+% claim: pct.uugg_deepest.1=71
+% claim: pct.uugg_deepest.2=66
+% claim: pct.uugg_deepest.3=62
+% claim: pct.uugg_deepest.4=55
+% claim: pct.uugg_shallowest.0=107
+% claim: pct.uugg_shallowest.1=128
 \end{figure}
 
 \begin{figure}[H]
@@ -11400,18 +11432,44 @@ continuum \emph{untouched} ($8.6\times10^{-4}$, unchanged), with overall MSE $2.
 1.4\times10^{-2}\to9.3\times10^{-3}$ at $\gamma{=}0,1,3$. So one scalar $\sigma$ automatically identifies
 the resonance as the sparse region and reallocates there; it need \emph{not} be multi-modal.
 \emph{(ii) $u\bar u ggg$, higher multiplicity:} here $\sigma$-driven generation gives essentially
-\emph{nothing} (overall $5.68\!\to\!5.67\!\to\!5.65\times10^{-2}$ at $\gamma{=}0,1,3$), because with three
+\emph{nothing} (overall $5.68\times10^{-2}\!\to\!5.66\times10^{-2}\!\to\!5.65\times10^{-2}$ (the middle read $5.67$ before the reader) at $\gamma{=}0,1,3$), because with three
 gluons the divergence is \emph{diffuse}: every $y_{\min}$ decade is comparably hard
-($\sim\!3\times10^{-2}$--$1.5\times10^{-1}$), with no thin sparse region to target; reallocating within a
+($\sim\!3\times10^{-2}$--$1.6\times10^{-1}$; the upper end read $1.5\times10^{-1}$ before the reader), with no thin sparse region to target; reallocating within a
 uniformly-hard set cannot help (Figs.~\ref{fig:l2_uug_multiscale}, \ref{fig:l2_uuggg_perdecade}).
 The obvious objection, that $u\bar u ggg$ was simply not concentrated \emph{hard enough}, since
 $u\bar u gg$ needed $\gamma\!\approx\!3$--$10$, was tested directly and \textbf{fails}: pushing to
 $\gamma=10,20$ does not unlock a gain, it \emph{reverses} the small one. The deep-IR ratio turns over,
 $0.989,0.976,1.035,1.079$ at $\gamma=1,3,10,20$, so by $\gamma{=}20$ the $\sigma$ arm is $8\%$
-\emph{worse than uniform} (overall $5.65\!\to\!6.07\!\to\!6.48\times10^{-2}$). Harder concentration on a
+\emph{worse than uniform} (overall $5.65\times10^{-2}\!\to\!6.07\times10^{-2}\!\to\!6.48\times10^{-2}$). Harder concentration on a
 diffuse divergence just starves the rest of an already-uniformly-hard set. That contrast, saturation
 for $u\bar u gg$, and reversal for $u\bar u ggg$, is the sharpest evidence for the principle below
 (Fig.~\ref{fig:l2_gamma_response_extended}).
+% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% claim: uug.0.continuum=9e-4
+% claim: uug.0.peak=8.3e-2
+% claim: uug.3.peak=3.3e-2
+% claim: uug_gain.peak=2.5
+% claim: uug.0.peak_ir=9.0e-2
+% claim: uug.3.peak_ir=2.2e-2
+% claim: uug_gain.peak_ir=4
+% claim: uug.3.continuum=8.6e-4
+% claim: uug.0.mse=2.2e-2
+% claim: uug.1.mse=1.4e-2
+% claim: uug.3.mse=9.3e-3
+% claim: uuggg.0.mse=5.68e-2
+% claim: uuggg.1.mse=5.66e-2
+% allow: 5.67 because it is the superseded value, quoted as corrected
+% claim: uuggg.3.mse=5.65e-2
+% claim: uuggg_dec_min=3e-2
+% claim: uuggg_dec_max=1.6e-1
+% allow: 1.5e-1 because it is the superseded value, quoted as corrected
+% claim: uuggg.1.deep=0.989
+% claim: uuggg.3.deep=0.976
+% claim: uuggg.10.deep=1.035
+% claim: uuggg.20.deep=1.079
+% claim: pct.uuggg_worse_20=8
+% claim: uuggg.10.mse=6.07e-2
+% claim: uuggg.20.mse=6.48e-2
 
 \begin{figure}[H]
   \centering
@@ -11425,6 +11483,11 @@ for $u\bar u gg$, and reversal for $u\bar u ggg$, is the sharpest evidence for t
   concentration is actively worse. Concentration of the error, not depth of the divergence, is what
   decides whether $\sigma$-steering can pay.}
   \label{fig:l2_gamma_response_extended}
+% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% claim: uugg_s0.10.deepest=0.53
+% claim: uugg_s0.30.deepest=0.51
+% claim: uugg_s0.10.bulk=1.30
+% claim: uugg_s0.30.bulk=1.63
 \end{figure}
 
 \begin{figure}[H]
@@ -11438,6 +11501,10 @@ for $u\bar u gg$, and reversal for $u\bar u ggg$, is the sharpest evidence for t
   at the peak, $4\times$ in the deep-IR$\,\cap\,$peak corner), while leaving the easy continuum
   untouched. The steering density need \emph{not} be multi-modal to serve two competing extremes.}
   \label{fig:l2_uug_multiscale}
+% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% claim: uug.0.continuum=9e-4
+% claim: uug_gain.peak=2.5
+% claim: uug_gain.peak_ir=4
 \end{figure}
 
 \begin{figure}[H]
@@ -11456,13 +11523,13 @@ $\sigma$-contrast diagnostic.} The loop had only been stressed on massless final
 candidate, the $t\bar t$ threshold, is ruled out, and that is itself a measured result rather than a
 deferral: at tree level $ee\to t\bar t$ has \textbf{no threshold divergence at all}. $|\mathcal M|^2$
 spans only $8.7\times$ in total and is \emph{flattest} at threshold ($\mathrm{std}\log|\mathcal M|^2
-= 0.022$ for $\beta<0.05$ against $0.665$ in the bulk), because the $2m_t$ cusp is a phase-space and
+= 0.022$ for $\beta<0.05$ against $0.665$ in the bulk; a July scan of the standalone, no committed reader), because the $2m_t$ cusp is a phase-space and
 cross-section feature, not an amplitude one; running it would have produced a guaranteed null that
 says nothing about the method. $b\bar b g$ is the replacement, and the direct
 massive analogue of $u\bar u g$ (same $Z$ resonance, same soft gluon), but the \emph{collinear}
 limit is regulated by $m_b$ (the dead cone), which softens one of the two singular directions; the
 dead-cone scale $m_b^2/s\!\approx\!2\times10^{-5}$--$3\times10^{-3}$ sits inside the $y_{\min}$ window,
-so the mass reshapes the divergence rather than relabelling it ($|\mathcal M|^2$ spans $7\times10^{10}$).
+so the mass reshapes the divergence rather than relabelling it ($|\mathcal M|^2$ spans $2.8\times10^{10}$ over the held-out set; read $7\times10^{10}$ before the reader, from a sample not on disk).
 The generator needed \emph{no} change: \code{democratic\_draw} already yields exact on-shell massive
 momenta (verified to $10^{-13}$); only a registry row, the mass-correct collinear variable
 $y_{ij}=2p_i\!\cdot\!p_j/s$ (identical to $s_{ij}/s$ for massless legs, so nothing above moves), and a
@@ -11479,11 +11546,35 @@ massless $u\bar u g$; a deep-IR contrast of only $1.61$ $\Rightarrow$ a \emph{we
 having flattened the collinear enhancement. Both held: at $\gamma{=}3$ the $\sigma$ arm cuts the $Z$-peak
 MSE to $\mathbf{0.56\times}$ (predicted ${\sim}0.50$) and the shoulder to $0.50\times$, while the pure
 deep-IR ($y_{\min}<10^{-5}$) moves only to $0.85\times$ (predicted ${\sim}0.71$) and the continuum to
-$0.82\times$, with overall $2.15\!\to\!1.29\times10^{-2}$ ($0.60\times$), log-flat $0.80\times$. So the gain
+$0.82\times$, with overall $2.15\times10^{-2}\!\to\!1.29\times10^{-2}$ ($0.60\times$), log-flat $0.80\times$. So the gain
 is \textbf{$Z$-driven, exactly where the contrast pointed}, and the mass's suppression of the IR direction
 is visible as the weaker deep-IR gain: the diagnostic called both the \emph{magnitude} and the
-\emph{location} on a process it was never tuned on (Fig.~\ref{fig:l2_bbbarg}). \emph{Caveat: single seed;}
-a $3$-seed repeat would firm the numbers, but the sign and the region-ordering are the claim.
+\emph{location} on a process it was never tuned on (Fig.~\ref{fig:l2_bbbarg}). The prediction and the numbers above are seed $0$. Seeds $1$ and $2$ (same held-out set, evaluated alongside) agree: $Z$ peak
+$0.57$ and $0.48\times$, deep IR $0.91$ and $0.89\times$, overall $0.62$ and $0.54\times$, $Z$-peak contrast $2.61$ and $2.57$.
+% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% claim: bbg.0.contrast_peak=2.51
+% claim: preflight.uug_contrast=4.48
+% claim: preflight.uugg_contrast=1.83
+% claim: bbg.0.contrast_ir=1.61
+% claim: bbg.0.peak=0.56
+% claim: bbg.0.shoulder=0.50
+% claim: bbg.0.deep=0.85
+% claim: bbg.0.continuum=0.82
+% claim: bbg.0.mse_base=2.15e-2
+% claim: bbg.0.mse_g3=1.29e-2
+% claim: bbg.0.overall=0.60
+% claim: bbg.0.logflat=0.80
+% claim: bbg.0.span=2.8e10
+% claim: bbg.1.peak=0.57
+% claim: bbg.2.peak=0.48
+% claim: bbg.1.deep=0.91
+% claim: bbg.2.deep=0.89
+% claim: bbg.1.overall=0.62
+% claim: bbg.2.overall=0.54
+% claim: bbg.1.contrast_peak=2.61
+% claim: bbg.2.contrast_peak=2.57
+% allow: 0 1 2 because they are seed indices, no result
+% allow: 7 because it is the superseded span (7 x 10^10), quoted as corrected
 
 \begin{figure}[H]
   \centering
@@ -11497,6 +11588,10 @@ a $3$-seed repeat would firm the numbers, but the sign and the region-ordering a
   there is less to gain there. The contrast, computed from the base arm with no A/B, called both the
   size and the location of the effect on a process the diagnostic was never fit on.}
   \label{fig:l2_bbbarg}
+% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% claim: bbg.0.peak=0.56
+% claim: bbg.0.shoulder=0.50
+% claim: bbg.0.continuum=0.82
 \end{figure}
 
 \begin{principle}[$\sigma$-driven generation helps iff hardness is \emph{concentrated}]
@@ -11541,6 +11636,21 @@ $4.48\Rightarrow$ $\sigma$/base MSE $0.40$; $u\bar u gg$ (deep IR) $1.83\Rightar
 baseline model (no second arm, no A/B), it converts ``is this divergence concentrated?'' from a
 post-hoc reading of the outcome into a \textbf{cheap test you can run before committing the compute},
 and gives the concentration principle a directly measurable order parameter.
+% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% claim: preflight.uug_sigma_rise=4.5
+% claim: preflight.uug_rmse_rise=10
+% claim: preflight.uug_calib.peak=0.77
+% claim: preflight.uug_calib.shoulder=1.01
+% claim: preflight.uug_calib.continuum=1.69
+% claim: preflight.uugg_calib_rest_min=0.85
+% claim: preflight.uugg_calib_rest_max=1.24
+% claim: preflight.uugg_calib.0=0.53
+% claim: preflight.uug_contrast=4.48
+% claim: preflight.uug_gain=0.40
+% claim: preflight.uugg_contrast=1.83
+% claim: preflight.uugg_gain=0.53
+% claim: preflight.uuggg_contrast=1.29
+% claim: preflight.uuggg_gain=0.97
 
 \begin{figure}[H]
   \centering
@@ -11557,6 +11667,11 @@ and gives the concentration principle a directly measurable order parameter.
   alone, against the $\sigma$-arm/base MSE ratio actually measured in that region. They order
   monotonically, so the contrast decides the question with one forward pass and no A/B.}
   \label{fig:l2_sigma_vs_divergence}
+% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% claim: preflight.uug_sigma_rise=4.5
+% claim: preflight.uug_rmse_rise=10
+% claim: preflight.uugg_contrast=1.8
+% claim: preflight.uuggg_contrast=1.3
 \end{figure}
 
 \paragraph{A genuinely Bayesian $\sigma$ (full-network Bayes-by-backprop) does \emph{not} pay for
@@ -11587,7 +11702,7 @@ The tuned Bayesian network reaches $2.87\times10^{-2}$, versus $3.01\times10^{-2
 ($0.95\times$, a real but modest win) and $2.65\times10^{-2}$ for the het-head $\sigma^{\gamma=3}$ baseline
 ($1.08\times$: \textbf{it loses}). The sweep's \emph{structure} is the informative part:
 $\sigma_{\rm rel}$ alone decides the outcome (Spearman $\rho=+0.965$ with the objective, monotone: wider
-posterior is uniformly worse; $\sigma_{\rm rel}\!\approx\!0.1$ costs a factor $\sim\!3$), while
+posterior is uniformly worse; $\sigma_{\rm rel}\!\approx\!0.1$ costs a factor $2.5$ to $2.8$), while
 $\beta_{\rm KL}$ ($\rho=-0.05$) and even the keep exponent $\gamma$ ($\rho=-0.07$) are \emph{noise} by
 comparison, and the optimum sits \textbf{on the lower bound} of the $\sigma_{\rm rel}$ range, i.e.\ the
 optimiser is driving the weight posterior toward the \emph{deterministic limit} to buy back point accuracy.
@@ -11595,13 +11710,30 @@ That is the mechanism: Bayes-by-backprop trains under sampled weights, which deg
 only way to recover accuracy is to shrink the posterior, which simultaneously removes the epistemic
 signal that was the whole point. Calibration is respectable ($\langle z^2\rangle\!\approx\!1.26$, mildly
 under-covering as expected for an epistemic-only $\sigma$), but $\sigma_{\rm epi}$ \emph{ranks} the error at
-only $\rho\!\approx\!0.17$--$0.20$, barely above the het-head's $0.11$--$0.16$, so it never earns back
+only $\rho\!\approx\!0.17$--$0.20$ (this and $\langle z^2\rangle$ from the trials' Jean Zay job logs, no committed reader), barely above the het-head's $0.11$--$0.16$, so it never earns back
 the accuracy it costs, on top of $K$ forwards per scoring round ($\sim\!3\times$ slower runs).
 \emph{Caveat:} one seed per trial, and the gaps are $5$--$8\%$, comparable to seed scatter, so the safe
 claim is ``no evidence the Bayesian network beats the het head'', and ``it beats uniform'' is marginal
 (Figs.~\ref{fig:l2_uugg_bbb_vs_het}, \ref{fig:l2_bbb_sweep}). Tooling \code{bbb.py},
 \code{sweep/l2\_bbb\_trial.py}, \code{sweep/l2\_bbb\_sweep\_config.yaml} (the sweep drives the steering loop via
 \code{generate\_sweep}'s new \code{trial\_script} hook).
+% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% claim: bbb.trials=12
+% claim: bbb.best=2.87e-2
+% claim: bbb.uniform=3.01e-2
+% claim: bbb.over_uniform=0.95
+% claim: bbb.het=2.65e-2
+% claim: bbb.over_het=1.08
+% claim: bbb.spearman_bbb_sigma_rel=0.965
+% claim: bbb.srel01_min=2.5
+% claim: bbb.srel01_max=2.8
+% claim: bbb.spearman_bbb_beta=-0.05
+% claim: bbb.spearman_gamma=-0.07
+% claim: bbb.het_rank_min=0.11
+% claim: bbb.het_rank_max=0.16
+% claim: pct.bbb_gap.0=5
+% claim: pct.bbb_gap.1=8
+% allow: 2 because it is the exponent of z^2, no result
 
 \begin{figure}[H]
   \centering
@@ -11626,6 +11758,11 @@ claim is ``no evidence the Bayesian network beats the het head'', and ``it beats
   (circled) still sits above the het-head line: the accuracy$\leftrightarrow$uncertainty tension is
   structural, not a tuning artefact.}
   \label{fig:l2_bbb_sweep}
+% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% claim: bbb.trials=12
+% claim: bbb.spearman_bbb_sigma_rel=0.965
+% claim: bbb.spearman_bbb_beta=-0.05
+% claim: bbb.spearman_gamma=-0.07
 \end{figure}
 
 \begin{principle}[For steering generation, what matters is how well $\sigma$ \emph{ranks} error]
@@ -11648,10 +11785,10 @@ with \emph{positive} curvature, so positive $c_2$ should concentrate extra budge
 tail while staying mild at moderate $\sigma$, exactly what a single large $\gamma$ cannot do (it
 over-concentrates everywhere, the measured bulk penalty). A $12$-trial single-fidelity DyHPO sweep over
 $(c_1,c_2,c_3)$ on $u\bar u gg$ (objective the log-flat MSE, \emph{not} deep-only, which would just reward
-starving the bulk) confirms the \emph{direction}: the best two configs both sit at $c_2\!\approx\!+1.3$--$1.4$
-and every negative-$c_2$ config is mid-pack or worse (Fig.~\ref{fig:l2_poly_keep}a). \textbf{But the gain
-does not survive seeds.} The single-seed best ($c_2{=}1.30$, log-flat $3.25\times10^{-2}$) looked $3\%$
-under the best power law, until one notes that the \emph{$3$-seed} $\sigma^{10}$ arm already averages
+starving the bulk) confirms the \emph{direction}: the best three configs sit at $c_2=1.30$, $2.40$ and $1.42$
+(read ``the best two at $1.3$--$1.4$'' before the reader) and the four negative-$c_2$ configs rank $4$, $5$, $8$ and $10$ of $12$ (Fig.~\ref{fig:l2_poly_keep}a). \textbf{But the gain
+does not survive seeds.} The single-seed best ($c_2{=}1.30$, log-flat $3.28\times10^{-2}$; read $3.25$ before the reader) looked $2\%$
+under the best power law's seed $0$ ($3.35\times10^{-2}$; read $3\%$ before the reader), until one notes that the \emph{$3$-seed} $\sigma^{10}$ arm already averages
 $3.25\times10^{-2}$: the ``win'' was against one unlucky power-law seed. Running the polynomial optimum at
 $3$ seeds gives $3.22\times10^{-2}\!\pm\!1.2\times10^{-3}$ vs $\sigma^{10}$'s $3.25\times10^{-2}\!\pm\!
 7\times10^{-4}$, a $1.0\%$ edge well inside the pooled seed scatter, i.e.\ a \textbf{wash}
@@ -11660,18 +11797,53 @@ but on the flat $\gamma$-basin it buys nothing a well-tuned exponent does not al
 temperature picture holds: $\sigma^\gamma$ stays the right practical family: one knob, no measurable
 loss.} Tooling: the polynomial keep rule and \code{--objective logflat} in \code{l2\_online\_uugg.py},
 \code{sweep/l2\_poly\_sweep\_config.yaml}, \code{plot\_poly\_keep.py}.
+% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% claim: poly.r2_uugg.1=0.89
+% claim: poly.r2_uugg.2=0.99
+% claim: poly.r2_uuggg.1=0.68
+% claim: poly.r2_uuggg.2=0.93
+% claim: poly.trials=12
+% claim: poly.best_c2.0=1.30
+% claim: poly.best_c2.1=2.40
+% claim: poly.best_c2.2=1.42
+% claim: poly.neg_c2_ranks.0=4
+% claim: poly.neg_c2_ranks.1=5
+% claim: poly.neg_c2_ranks.2=8
+% claim: poly.neg_c2_ranks.3=10
+% claim: poly.best_logflat=3.28e-2
+% claim: pct.poly_best_under_power_s0=2
+% claim: poly.power_s0=3.35e-2
+% claim: poly.power_mean=3.25e-2
+% claim: poly.poly_mean=3.22e-2
+% claim: poly.poly_std=1.2e-3
+% claim: poly.power_std=7e-4
+% claim: pct.poly_edge=1.0
+% allow: 1.3 1.4 3 3.25 because they are the superseded values, quoted as corrected
+% allow: 0 because it is a seed index, no result
 
 \begin{figure}[H]
   \centering
   \widerow{\pnl{l2_poly_keep_a.pdf}\hfill\pnl{l2_poly_keep_b.pdf}}
   \caption{\textbf{Polynomial keep rule vs the $\sigma^\gamma$ power law.} \emph{(a)} The $12$-trial DyHPO
   sweep: log-flat MSE vs the quadratic coefficient $c_2$, coloured by $c_1{=}\gamma$. The power law is the
-  nested $c_2{=}0$ line (red dashed); positive $c_2$ is the helpful direction (best two configs at
-  $c_2\!\approx\!+1.3$--$1.4$, negative-$c_2$ mid-pack), confirming the $\mathbb E[\mathrm{err}^2|\sigma]$
+  nested $c_2{=}0$ line (red dashed); positive $c_2$ is the helpful direction (best three configs at
+  $c_2=1.30$, $2.40$, $1.42$; the negative-$c_2$ ones rank $4$, $5$, $8$, $10$), confirming the $\mathbb E[\mathrm{err}^2|\sigma]$
   curvature. \emph{(b)} The honest $3$-seed comparison: the polynomial optimum ($3.22\times10^{-2}$) and the
   best power-law arm $\sigma^{10}$ ($3.25\times10^{-2}$) overlap heavily seed-to-seed: the $1\%$ edge is
   inside the scatter. Curvature is the right direction but does not robustly beat a well-tuned exponent.}
   \label{fig:l2_poly_keep}
+% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% claim: poly.trials=12
+% claim: poly.best_c2.0=1.30
+% claim: poly.best_c2.1=2.40
+% claim: poly.best_c2.2=1.42
+% claim: poly.neg_c2_ranks.0=4
+% claim: poly.neg_c2_ranks.1=5
+% claim: poly.neg_c2_ranks.2=8
+% claim: poly.neg_c2_ranks.3=10
+% claim: poly.poly_mean=3.22e-2
+% claim: poly.power_mean=3.25e-2
+% claim: pct.poly_edge=1
 \end{figure}
 
 \paragraph{Uncapped data: the uncertainty tail floors, and more data does not move it.}
@@ -11687,9 +11859,20 @@ bulk has long since left) is the stopping statistic, since a mean would call sat
 \textbf{floors at a level essentially independent of the data budget}: base arm $0.0448$, $0.0468$,
 $0.0477$ and $\sigma$ arm $0.0420$, $0.0418$, $0.0427$ at $N=75$k, $150$k, $600$k. \emph{$8\times$ more
 generated data does not lower the floor}; for the base arm it is marginally \emph{worse} ($+6.4\%$),
-against ${\sim}2\%$ run-to-run reproducibility on a repeat of the whole sweep. (The $\sigma$ arm also
-floors ${\sim}8\%$ \emph{below} base at every budget, an independent sign that $\sigma$-steering
+against ${\sim}2\%$ run-to-run reproducibility on a repeat of the whole sweep (its logs are not on disk). (The $\sigma$ arm also
+floors $6$ to $11\%$ \emph{below} base at every budget (read ${\sim}8\%$ before the reader), an independent sign that $\sigma$-steering
 removes more of the hard tail than uniform generation.)
+% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% claim: sat.p99.uugg_base_n75000=0.0448
+% claim: sat.p99.uugg_base_n150000=0.0468
+% claim: sat.p99.uugg_base_n600000=0.0477
+% claim: sat.p99.uugg_sigma_n75000=0.0420
+% claim: sat.p99.uugg_sigma_n150000=0.0418
+% claim: sat.p99.uugg_sigma_n600000=0.0427
+% claim: sat.budget_factor=8
+% claim: pct.sat_base_rise=6.4
+% claim: pct.sat_sigma_below.0=6
+% claim: pct.sat_sigma_below.1=11
 
 \emph{What this does and does not establish: the compute confound.} Every run here uses the
 \textbf{same $4000$ steps} at batch $16384$, i.e.\ ${\sim}65$M example-presentations regardless of pool
@@ -11726,6 +11909,14 @@ generating and grow the model or the horizon.
   fall in $p99$; crossing below the $2\%$ tolerance band is the stopping rule the
   \code{--stop\_on\_saturation} latch uses.}
   \label{fig:l2_saturation}
+% src: python3 analysis/divergences/steering_numbers.py @e2e443f4
+% claim: sat.p99.uugg_base_n75000=0.0448
+% claim: sat.p99.uugg_base_n150000=0.0468
+% claim: sat.p99.uugg_base_n600000=0.0477
+% claim: sat.p99.uugg_sigma_n75000=0.0420
+% claim: sat.p99.uugg_sigma_n150000=0.0418
+% claim: sat.p99.uugg_sigma_n600000=0.0427
+% claim: sat.budget_factor=8
 \end{figure}
 
 \subsection{Hand-off: open items}\label{sec:div-open}
