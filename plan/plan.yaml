@@ -21438,8 +21438,8 @@ entries:
     state: working
     since: '2026-11-10T02:21:57+00:00'
     state_at: '2026-11-10T02:27:50.089000+00:00'
-    context: 121344
-    context_at: '2026-11-10T02:25:44+00:00'
+    context: 0
+    context_at: '2026-11-10T03:31:38+00:00'
   ask: 'Scope: three sections of the draft are not in your new story: Sec. 2 ''Accuracy and precision benchmark'' (a placeholder
     for Jonas and Suprio), Sec. 3 ''Extrapolating to more legs'' (the Z+ng autoregressive study, figs 1 to 5) and Sec. 6 ''Conditioning
     on Feynman diagrams'' (figs 41 to 49). Cut them, or keep them as co-authors'' sections after yours?'
