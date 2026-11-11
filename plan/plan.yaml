@@ -22827,6 +22827,25 @@ entries:
     text: '2026-11-11: pretrain_data_saving''s owner, to pass the repo review (watermark 96cfb862), changed tools/kit_readout.py:
       the unsourced 0.3-decade per-bin cut is removed; it now counts strata better or worse than the reference. Re-read the
       input-arm ''every bin'' counts with the new tool before writing them up.'
+  - at: '2026-11-11T06:36:08+00:00'
+    text: 'Input verdict (D392): both flags, soft rescale + pair logs (model.input_soft_eps=1e-8, model.input_pair_logs=<largest
+      multiplicity>). Combined arm FA-ccin2p3-c15b3337 (job_kit.sh kit_ee_uug__me2 100000 8000 A tag=softpair at b6794f35;
+      design passed), from scratch ee->uug 1e5, 8000 steps, seed 42, vs the control f6b2ece9 and the single arms 1a14c791
+      (soft rescale), 3fa9854a (pair logs); tools/kit_readout.py at 44e102dc (versus counts strata better/worse, no 0.3 cut)
+      on analysis/kit_benchmark/data/kit_fig_A_inputs.json @d5fe0079; figures analysis/kit_benchmark/figs/kit_{mse,median}_inputs_ee_uug_me2_{a,b}.png
+      with the legend strip *_legend.png. Deepest bins (1e-7..1e-6) control / pair logs / soft rescale / combined (Bakar MLP):
+      soft 14180 / 19100 / 0.393 / 0.200 (0.32), exponent +20.18 / -28.90 / -1.86 / -1.95 (exact -2); coll 30.1 / 10.1 / 47.2
+      / 2.21 (0.11), exponent +0.32 / -0.30 / +0.59 / -1.34 (exact -1); bulk_test 8.2e-4 / 5.1e-4 / 5.4e-4 / 1.09e-4. Per
+      stratum log10(arm/control), median [range], strata better/worse: combined soft -2.71 [-4.85,-1.22] 5/0, coll -1.25 [-1.35,-1.01]
+      5/0, bulk -0.88; soft rescale soft -2.88 5/0, coll +0.33 0/5, bulk -0.19; pair logs soft -0.01 3/2, coll -0.37 5/0,
+      bulk -0.21; local logs soft -0.12 3/2, coll -0.04 4/1, bulk +0.15 (worse); no off-shell column soft -0.36 3/2, coll
+      +0.20 0/5, bulk -0.29. The two flags compound rather than cancel: the combined arm keeps soft rescale''s soft gain (median
+      within 0.17 decades, deepest bin below it and below Bakar''s MLP, exponent -1.95), turns the collinear limit (deepest
+      1.13 decades below control, exponent -1.34 vs exact -1, every stratum better) and lowers bulk 0.88 decades (control
+      8.2e-4 -> 1.09e-4), beyond either flag alone. Design outcome: yes, adopt both for the held-out parent and the scaling
+      runs (pretrain_data_saving). Still above Bakar''s MLP on collinear (2.21 vs 0.11). One seed (D315); local logs dropped.
+      Catalog use: input_pair_logs = the largest multiplicity (pairs index-ordered, zero-padded; not permutation-symmetric
+      across identical legs); soft rescale takes Q = p_0 + p_1 (beams first).'
   step_why:
     3:
       feeds: Bakar's fair NLO comparison
