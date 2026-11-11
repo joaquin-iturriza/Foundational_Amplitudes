@@ -23472,6 +23472,16 @@ entries:
       pair logs alone (or better), bulk not worse than the control by >0.3: the held-out parent and scaling runs take both
       flags. Interference: one gain lost by >0.3 decades: adopt the flag whose gain is larger in its limit (soft rescale:
       2.88 vs 0.37 decades) alone, reported with the loss. Both lost: adopt soft rescale alone.'
+    passed_at: '2026-11-11T04:40:12+00:00'
+    reviewer: 'Combined input arm (soft rescale + pair logs) on ee->uug 1e5 from scratch, 8000 steps, seed 42, same job_kit.sh/base
+      config/lr 0.0118605/HETEROSC/float64 as control f6b2ece9 and single arms 1a14c791, 3fa9854a: only the two flags move.
+      Check 2 reproduced with tools/kit_readout.py --vs on kit_fig_A_inputs.json: soft rescale soft median -2.88 [-4.56,-1.58],
+      coll +0.33; pair logs coll -0.37 [-0.47,-0.28] 4/5 strata, bulk -0.21. Check 3: one seed per D315 (''in general''),
+      as sibling cells; the near-null local-logs arm gives a noise proxy (stratum medians -0.12 soft, -0.04 coll, bulk +0.15)
+      below the 0.3-decade cuts, bulk paired seed spreads in results.tex 0.05-0.08; caveat: the coll cut (within 0.3 of pair
+      logs'' -0.37) sits near that noise. Outcomes stated for yes/interference/both lost. Disk/time: 1 job, 1.9 GPU-h, rate
+      from the single arms on the same setup. Searched results.tex, plan, decisions for input_pair_logs, input_soft_eps, pair
+      logs, soft rescale, combined input, combin: no combined run found.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
