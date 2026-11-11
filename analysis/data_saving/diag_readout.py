@@ -80,7 +80,7 @@ def main():
     print(json.dumps(summ))
 
     fig, axs = ps.figure(ncols=2)
-    arms = [("val_own", LABEL, ps.C.vermillion, "s"), ("val_par", "parent scale", ps.C.blue, "o"),
+    arms = [("val_own", LABEL, ps.C.vermillion, "s"), ("val_par", "r4 parent" if ARM == "tops" else "parent scale", ps.C.blue, "o"),
             ("val_orig", "stage-2 best", ps.C.grey, "^")]
     for n, (ax, (tg, lab, _)) in enumerate(zip(axs, TARGETS)):
         cc = [r for r in rows if r["target"] == tg]

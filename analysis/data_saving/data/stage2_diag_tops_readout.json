@@ -1,0 +1,171 @@
+{
+ "cells": [
+  {
+   "target": "epem_ttx",
+   "k": 5,
+   "D": 316.22776601683796,
+   "own": "FA-ccin2p3-0ca51b6f",
+   "par": "FA-ccin2p3-6d9526c6",
+   "orig": "FA-ccin2p3-bbc4fcc6",
+   "val_own": 8.024880344237317e-06,
+   "val_par": 4.248373443260789e-06,
+   "val_orig": 4.175176627541077e-06,
+   "test_own": 6.556614817774892e-06,
+   "test_par": 3.8614267047446795e-06,
+   "test_orig": 3.522757178005361e-06,
+   "own_over_par": 1.888930069687545,
+   "par_over_orig": 1.0175314297452418
+  },
+  {
+   "target": "epem_ttx",
+   "k": 6,
+   "D": 1000.0,
+   "own": "FA-ccin2p3-e538bda9",
+   "par": "FA-ccin2p3-e70f826b",
+   "orig": "FA-ccin2p3-790990bf",
+   "val_own": 1.9544692975159705e-07,
+   "val_par": 6.505709109205782e-07,
+   "val_orig": 6.183119580782659e-07,
+   "test_own": 8.088670149255955e-08,
+   "test_par": 1.310567953549361e-06,
+   "test_orig": 1.2704778614563987e-06,
+   "own_over_par": 0.3004237147262449,
+   "par_over_orig": 1.0521726167848575
+  },
+  {
+   "target": "epem_ttx",
+   "k": 7,
+   "D": 3162.2776601683795,
+   "own": "FA-ccin2p3-f996c9e8",
+   "par": "FA-ccin2p3-c985b447",
+   "orig": "FA-ccin2p3-cc8c9a27",
+   "val_own": 1.2023344320155616e-08,
+   "val_par": 1.3561426293051682e-07,
+   "val_orig": 2.929297266973663e-07,
+   "test_own": 1.079793841234399e-08,
+   "test_par": 1.079142643395424e-06,
+   "test_orig": 3.9829063632170706e-07,
+   "own_over_par": 0.0886584055418705,
+   "par_over_orig": 0.46295834997526086
+  },
+  {
+   "target": "epem_ttx",
+   "k": 8,
+   "D": 10000.0,
+   "own": "FA-ccin2p3-35922ca9",
+   "par": "FA-ccin2p3-a155de3e",
+   "orig": "FA-ccin2p3-7ef89fea",
+   "val_own": 3.412747306974495e-09,
+   "val_par": 5.272465131156423e-08,
+   "val_orig": 1.0896272328864143e-08,
+   "test_own": 2.0793607006427495e-09,
+   "test_par": 4.795968753629324e-08,
+   "test_orig": 3.096884734621659e-08,
+   "own_over_par": 0.0647277359276906,
+   "par_over_orig": 4.838778778674339
+  },
+  {
+   "target": "ee_ttbar_nlo",
+   "k": 5,
+   "D": 316.22776601683796,
+   "own": "FA-ccin2p3-58307031",
+   "par": "FA-ccin2p3-9dc2dc3a",
+   "orig": "FA-ccin2p3-9dd6c6a5",
+   "val_own": 0.00010491466673556715,
+   "val_par": 0.00024625360674690455,
+   "val_orig": 0.00024628428946016356,
+   "test_own": 0.00389224754338793,
+   "test_par": 0.00963673509094515,
+   "test_orig": 0.009637947733697366,
+   "own_over_par": 0.42604316794188823,
+   "par_over_orig": 0.9998754174968844
+  },
+  {
+   "target": "ee_ttbar_nlo",
+   "k": 6,
+   "D": 1000.0,
+   "own": "FA-ccin2p3-1d03af0a",
+   "par": "FA-ccin2p3-c04b81a4",
+   "orig": "FA-ccin2p3-55311fa3",
+   "val_own": 0.00020278241572668776,
+   "val_par": 0.00010439796096761711,
+   "val_orig": 8.264624011644628e-05,
+   "test_own": 0.0035955199816555252,
+   "test_par": 0.0019300137644691858,
+   "test_orig": 0.002488350574177457,
+   "own_over_par": 1.942398240800778,
+   "par_over_orig": 1.2631906886571398
+  },
+  {
+   "target": "ee_ttbar_nlo",
+   "k": 7,
+   "D": 3162.2776601683795,
+   "own": "FA-ccin2p3-a400e6d5",
+   "par": "FA-ccin2p3-cca42cd5",
+   "orig": "FA-ccin2p3-ba3dadd6",
+   "val_own": 0.00013155973283573985,
+   "val_par": 9.203989793604705e-05,
+   "val_orig": 3.1333639526565094e-05,
+   "test_own": 0.005218363364797551,
+   "test_par": 0.003016939875265234,
+   "test_orig": 0.001880129614827456,
+   "own_over_par": 1.4293772134249076,
+   "par_over_orig": 2.9374148463670924
+  },
+  {
+   "target": "ee_ttbar_nlo",
+   "k": 8,
+   "D": 10000.0,
+   "own": "FA-ccin2p3-adbd0552",
+   "par": "FA-ccin2p3-4edf6ad3",
+   "orig": "FA-ccin2p3-d67b326e",
+   "val_own": 5.9571810155034655e-05,
+   "val_par": 5.1560682550189085e-06,
+   "val_orig": 1.5618449538123969e-06,
+   "test_own": 2.0687534246826544e-05,
+   "test_par": 0.00020708814685931428,
+   "test_orig": 2.9767838260158896e-05,
+   "own_over_par": 11.553727997500333,
+   "par_over_orig": 3.3012676722059804
+  }
+ ],
+ "summary": {
+  "n_below": 4,
+  "gmean_own_over_par": 0.677723683278235,
+  "verdict": "NO",
+  "par_over_orig_range": [
+   0.46295834997526086,
+   4.838778778674339
+  ],
+  "gmean_own_over_par_by_target": {
+   "epem_ttx": 0.23888567421210644,
+   "ee_ttbar_nlo": 1.9227163470187691
+  },
+  "by_target": {
+   "epem_ttx": {
+    "val": {
+     "n_below": 3,
+     "gmean": 0.23888567421210644
+    },
+    "test": {
+     "n_below": 3,
+     "gmean": 0.08211381572063577
+    }
+   },
+   "ee_ttbar_nlo": {
+    "val": {
+     "n_below": 1,
+     "gmean": 1.9227163470187691
+    },
+    "test": {
+     "n_below": 2,
+     "gmean": 0.6004795832287639
+    }
+   }
+  },
+  "test_par_over_orig_range": [
+   0.7756197155246769,
+   6.956774793300321
+  ]
+ }
+}
