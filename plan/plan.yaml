@@ -23494,7 +23494,7 @@ entries:
       - 'B best: package B'
   step_waits:
     '3': '2026-11-12'
-    '4': FA-ccin2p3-c364a7ae FA-ccin2p3-f21fa163 FA-ccin2p3-5515dc85
+    '4': FA-ccin2p3-84d3488e
     '5': FA-ccin2p3-c364a7ae FA-ccin2p3-f21fa163 FA-ccin2p3-5515dc85
   handoff:
     state: 'Input study done (findings 2026-11-11): soft rescale + pair logs (model.input_soft_eps=1e-8, input_pair_logs=n,
