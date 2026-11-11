@@ -23493,6 +23493,25 @@ entries:
       models for KIT and for the threshold scan; the Coulomb rise is still not represented (needs a beta-specific input, next
       lever), and the flags cost tt at high energy (Sudakov), a cost to watch in the catalog parent''s tt pools. One seed
       (D315).'
+  - at: '2026-11-11T21:24:13+00:00'
+    text: 'Threshold scan (step 4, Gudrun; threshold design passed 20:51, analytic extension passed): sigma(e+e- -> t t~)
+      at fixed-order NLO over beta = sqrt(1-4m_t^2/s) in [1e-3, 0.6] (32 points x 16 cos nodes; alpha_s 0.118 at mu_R = M_Z,
+      m_t 173). Exact = MG5_aMC 3.7.0 fixed order (batch FA-ccin2p3-f39a9e30 54b549e9 88952c69 e5952497 1ba063b2 326eadf3
+      497534b1 d07111de, job_kit_threshold.sh at 87fe61b7) from beta 0.0119 up; below it MG5_aMC stops (soft tests at 1e-3,
+      Poles do not cancel at 1.2e-3..9.7e-3) and the analytic O(alpha_s) is used (vector exact hep-ph/9606230 eq. 34, axial
+      threshold expansion). Surrogate NLO = exact + sigma[V_surr] - sigma[V_exact]. tools/kit_threshold_scan.py collect at
+      e5712122 on CC -> analysis/kit_benchmark/data/kit_threshold_scan.json @e57f28f7; figure analysis/kit_benchmark/figs/kit_threshold_scan.png.
+      Analytic vs MG5_aMC NLO at the 20 MG5_aMC points: at beta <= 0.094 (11 points) the ratio is -7.9e-4..+1.13e-3 with MC
+      error ~4.8e-4; one point (beta 0.027, +1.13e-3, 2.3 sigma) is past the design''s 2x MC / 1e-3 cut, its neighbours -4.5e-4
+      and -6.0e-4, so read as a fluctuation; above beta 0.3 +1.3e-3..+7.7e-3 where the axial expansion fails (analytic not
+      used there); band reproduced within 0.1%. Analytic design outcome: yes, the exact NLO reaches beta 1e-3 (sigma_NLO 0.427
+      pb, LO 1.72e-3 pb). sigma_NLO^surr/sigma_NLO^exact - 1 at beta 1e-3, and the lowest beta from which it stays in the
+      NLO scale band: B (hard points added, kit_B_ee_tt_virt_finite_n900000_t3000_offon) -0.90, 0.0119 (|ratio| <= 0.041 from
+      there; -0.098 at 9.7e-3 vs band -9.1%); A from scratch -0.99, 0.174; A_ft -0.99, 0.142; B_bulk -0.99, 0.214 (bulk-trained
+      models carry almost none of the Coulomb rise). beta_1pct A 0.214, A_ft 0.174, B_bulk 0.214, B 0.142; beta_10pct A 0.174,
+      A_ft 0.142, B_bulk 0.174, B 0.0097. Threshold-design branch: B in band down to 1.2e-2 (not to 1e-3), A not below 0.14:
+      B''s t t~ virtual is the threshold model for KIT (packaged as ttvirt_B_best_all_limits); protocol A''s gap is the Coulomb
+      limit, and a beta-specific input (log10 beta, KIT''s logthr baseline) is the next lever. One seed per model (D315).'
   step_why:
     3:
       feeds: Bakar's fair NLO comparison
