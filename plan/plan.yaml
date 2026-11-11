@@ -22827,18 +22827,18 @@ entries:
     units: null
     start: '2026-11-11T20:01:29+00:00'
     at: '2026-11-11T20:01:29+00:00'
-  - batch: dsave_diag_tops
-    wall_h: 0.3
-    jobs: 16
-    units: null
-    start: '2026-11-11T20:01:33+00:00'
-    at: '2026-11-11T20:01:33+00:00'
   - batch: dsave_r5smoke
     wall_h: 0.15
     jobs: 1
     units: null
     start: '2026-11-11T20:17:23+00:00'
     at: '2026-11-11T20:17:23+00:00'
+  - batch: dsave_diag_tops
+    wall_h: 0.3
+    jobs: 8
+    units: null
+    start: '2026-11-11T20:18:16+00:00'
+    at: '2026-11-11T20:18:16+00:00'
   handoff:
     state: 'D400 fix in progress. (1) Off-shellness diagnostic read NO (diag_readout.py @fdcfec3d, fig analysis/data_saving/figs/stage2_diag.png):
       own/parent-scale val 4 of 8 below, geomean 0.95 (LO 1.98, V 0.45); _resolve_offshell_stats unchanged. (2) Root cause
