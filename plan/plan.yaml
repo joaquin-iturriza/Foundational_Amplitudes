@@ -24602,6 +24602,21 @@ entries:
       NLO is the exact sigma_NLO below the lowest MG5_aMC beta and the figure and CLAIMs run to beta 1e-3 (analytic segment
       named in the caption). If not: report the deviation, the scan stays at the MG5_aMC range and the formula is debugged
       (axial exact form from Jersak-Laermann-Zerwas) before use.'
+    passed_at: '2026-11-11T21:13:11+00:00'
+    reviewer: 'Analytic exact-NLO extension of the threshold scan, code d0c3dd59, no job. Check 2: reproduced in .venv-cpu
+      (4 tests pass): analytic NLO / MG5_aMC NLO - 1 = -6.6e-4 at beta 0.0119 (MC error 4.7e-4) and -3.1e-4 at 0.062; LO quad
+      vs MG5_aMC LO within 1.1e-3; band 11.20/9.02 vs MG5_aMC 11.2/9.0 and 9.29/7.49 vs 9.3/7.5; vector R1 -> 0.75 at v->1
+      and equals pi^2(1+v^2)/(2v)-4 at v 1e-3; axial share of sigma_LO 2.9e-5 at 0.0119, 2.1e-7 at 1e-3, so the axial threshold
+      expansion''s O(v^2) error is negligible below 1.2e-2 (control''s ''axial share < 1e-3 up to 0.1'' is 2.1e-3 at 0.1,
+      still negligible: expansion error ~1e-5 of sigma). Check 1: analytic and MG5_aMC on the same settings (AMC_CARD fixed
+      mu_R=mu_F=M_Z, alpha_s 0.118, m_t 173 pole, loop_sm EW). Check 3: no training; spread is MG5_aMC''s MC error, carried
+      in the 2x-MC-error cut. Check 4: yes (within 2x MC or 1e-3 at every MG5_aMC point beta<=0.1 -> scan to 1e-3, analytic
+      segment in caption) and no (stays at MG5_aMC range, debug axial) stated. Check 5 searched docs/results.tex for threshold
+      scan, Coulomb, cross section, MG5_aMC, amc@nlo, fixed order, analytic, K-factor, 1506.06864 (only the catalog divergences
+      list and the tp3 threshold star arm, neither a sigma(sqrt s)); plan evidence/dead ends (MG5_aMC at beta 1e-3 ruled out,
+      which this design answers); site decisions (threshold, Coulomb, fixed order, analytic, cross section, D353/D363: no
+      conflicting call). Checks 7-15: no training, loss, preprocessing, sweep, disk or new job; collect runs on CPU on the
+      existing batch''s outputs.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
