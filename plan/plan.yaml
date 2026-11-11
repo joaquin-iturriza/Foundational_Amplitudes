@@ -23073,7 +23073,7 @@ entries:
   step_waits:
     '3': '2026-11-12'
     '4': FA-ccin2p3-c364a7ae FA-ccin2p3-f21fa163 FA-ccin2p3-5515dc85
-    '5': step 6 (flagged uugg/tt models decide what goes to KIT)
+    '5': FA-ccin2p3-c364a7ae FA-ccin2p3-f21fa163 FA-ccin2p3-5515dc85
     '6': FA-ccin2p3-c364a7ae FA-ccin2p3-f21fa163 FA-ccin2p3-5515dc85
   handoff:
     state: 'Protocol A scratch, plain arm, off-shellness-off arms (uug band a at the edge: soft -1.51, deep 516 vs 14180;
