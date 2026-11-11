@@ -23100,10 +23100,6 @@ entries:
   next:
     3: 'Fair NLO D-scan (Bakar): ee->tt virtual, 1e2..1e4 bulk one-loop target points, fine-tuned from the fair_nlo parent
       against a from-scratch V/B with exact Born refit on the KIT ee_tt virtual bulk; design once FA-ccin2p3-03ea3719 ends'
-    4: 'Threshold scan (Gudrun): sigma(sqrt s) of ee->tt around 2m_t at LO and NLO like Fig. 1 of arXiv:1506.06864: exact
-      fixed-order NLO (MG5_aMC or validated formulas, alpha_s 0.118 fixed, m_t 173) and the surrogate''s NLO = exact + integral
-      of (V_surr - V_exact) over 2-body phase space; design with the tt virtual model that goes to KIT (A_ft, after the A_ft
-      batch)'
     5: 'Checkpoint + inference package for KIT (Joaquin sends it): best A_ft/B checkpoints, a float64 predict script, log10|M|^2
       out; after the A_ft batch'
   done_when: null
@@ -23518,11 +23514,6 @@ entries:
       if:
       - 'fine-tune below V/B baseline at small D: pretraining saves one-loop data'
       - 'not below: report so'
-    4:
-      feeds: whether the surrogate reproduces the threshold cross section
-      if:
-      - 'surrogate NLO within the scale band of exact: report'
-      - 'outside near threshold: the Coulomb deficit (B readout) shows in the observable'
     5:
       feeds: what KIT receives
       if:
@@ -23530,8 +23521,6 @@ entries:
       - 'B best: package B'
   step_waits:
     '3': '2026-11-12'
-    '4': FA-ccin2p3-f39a9e30 FA-ccin2p3-54b549e9 FA-ccin2p3-88952c69 FA-ccin2p3-e5952497 FA-ccin2p3-1ba063b2 FA-ccin2p3-326eadf3
-      FA-ccin2p3-497534b1 FA-ccin2p3-d07111de
     '5': FA-ccin2p3-be5509bd
   handoff:
     state: 'Step 4 threshold scan: design passed (3rd review, code b63843c8, repo review passed at 248077cb). Scan file built
