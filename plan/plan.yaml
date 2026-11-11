@@ -23039,6 +23039,10 @@ entries:
       cell; so the input representation is the bigger lever and the pretrained parent should carry it (pretrain_data_saving
       builds that parent, D392). tt Born threshold with the off-shellness column on stays hurt by A_ft (2.5-3.4 decades above
       scratch at lr 1.0; not part of the lr check).'
+  - at: '2026-11-11T18:17:27+00:00'
+    text: '2026-11-11 19:17: the weekly usage reset (19:00) has passed: the step held under the main session''s usage narrowing
+      (both input flags carried to uugg, tt virtual and tt Born from scratch at 1e5, ~6 GPU-h, design and review) is released;
+      resume on the next kit_benchmark wake or by the main session.'
   step_why:
     3:
       feeds: Bakar's fair NLO comparison
