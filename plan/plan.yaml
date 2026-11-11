@@ -22222,6 +22222,15 @@ entries:
       ++model.input_soft_eps=1e-8 ++model.input_pair_logs=6, 02:30 limit, 32G, wall target 1 h; both past config, loading
       their recipes at 10:07. Stage-2 configs inherit the flags from the parents'' config.yaml (gen_data_saving.py base_config
       = parent).'
+  - at: '2026-11-11T09:34:34+00:00'
+    text: '2026-11-11 ~10:30 CET: resubmitted parents 65a02b18/b6adfcb3 FAILED at data load (10:13): AssertionError data.target_physics_orders:
+      no per-event alpha_s for amp_data_cache/v4_bb_abtwm__mt300_..._train_smix_amplitudes.npy. Cause: the lxplus copy took
+      the pools and .recipe.json but not their <pool>.alphas.npy sidecars; check_site_data --alphas: 1157 train pools without
+      alpha_s (the 2789 copied pools, plus 73 one-loop pools that the failed prebuild 4782624f rebuilt today with the same
+      recipe ids but no sidecar). Fix: copying 2862 .alphas.npy from lxplus (1.2 GB). For the 73 rebuilt one-loop pools, checked
+      first: 56 byte-identical to lxplus''s, 17 differ only in |M|^2 (momenta and PDG columns identical, md5), so their alpha_s
+      rows (per event, from the event) are valid. ee_uu val/test/train and v4_epem_ttx have alpha_s power 0 (exempt in experiment.py).
+      Not fixed: why the one-loop prebuild path writes no alphas sidecar.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
