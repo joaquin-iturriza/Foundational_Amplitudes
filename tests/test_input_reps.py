@@ -110,6 +110,19 @@ def test_pair_log_values():
     assert (f[0] == f[4]).all()                        # broadcast over the event
 
 
+def test_pair_threshold_log_beta():
+    """input_pair_threshold: a t t~ pair at sqrt s gives log(beta^2)/5, beta^2 = 1 - 4 m^2/s; massless pairs unchanged."""
+    m, sq = 173.0, 346.5
+    E, pz = sq / 2, (sq * sq / 4 - m * m) ** 0.5
+    p = torch.tensor([[E, 0, 0, E], [E, 0, 0, -E], [E, pz * 0.6, 0, pz * 0.8], [E, -pz * 0.6, 0, -pz * 0.8]],
+                     dtype=torch.float64)
+    ptr = torch.tensor([0, 4])
+    f, g = _pair_log_inputs(p, ptr, 4, threshold=True), _pair_log_inputs(p, ptr, 4)
+    beta2 = 1 - 4 * m * m / sq ** 2
+    assert torch.allclose(f[0, 5], torch.log(torch.tensor(beta2, dtype=torch.float64)) / 5)   # pair (2, 3)
+    assert torch.allclose(f[0, :5], g[0, :5])                                                  # pairs with a massless leg
+
+
 def test_soft_rescale_fixed_point():
     p, ptr = _events(4)
     q = _soft_rescale(p, ptr, 1e-8)

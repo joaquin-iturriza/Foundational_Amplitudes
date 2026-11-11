@@ -88,8 +88,10 @@ def _segment_mean(values, ptr):
 _ETA = (1.0, -1.0, -1.0, -1.0)
 
 
-def _pair_log_inputs(p, ptr, n):
+def _pair_log_inputs(p, ptr, n, threshold=False):
     """(N_total, n(n-1)/2): log(2 p_i.p_j / s)/5 of every pair i < j of each event, s = (p_0 + p_1)^2 of the two beams,
+    or with `threshold` log(((p_i + p_j)^2 - (m_i + m_j)^2) / s)/5 = log(2 (p_i.p_j - m_i m_j) / s)/5, m_i = sqrt|p_i^2|:
+    the same for a massless pair, log beta^2 of a massive pair at its threshold (model.input_pair_threshold),
     the event's row broadcast to each of its particles; pairs beyond an event's multiplicity are 0. Lorentz scalars,
     in float64 (a pair at 1e-7 of s is float32 rounding), floored at 1e-16 (model.input_pair_logs)."""
     cnt = ptr[1:] - ptr[:-1]
@@ -100,7 +102,11 @@ def _pair_log_inputs(p, ptr, n):
     dots = torch.einsum("bic,bjc,c->bij", P, P, torch.tensor(_ETA, device=p.device, dtype=P.dtype))
     s = (dots[:, 0, 0] + dots[:, 1, 1] + 2 * dots[:, 0, 1]).abs().clamp(min=1e-30)
     iu = torch.triu_indices(n, n, 1, device=p.device)
-    lp = torch.log((2 * dots[:, iu[0], iu[1]] / s[:, None]).abs().clamp(min=1e-16)) / 5
+    pij = dots[:, iu[0], iu[1]]
+    if threshold:
+        m = dots.diagonal(dim1=1, dim2=2).abs().sqrt()
+        pij = pij - m[:, iu[0]] * m[:, iu[1]]
+    lp = torch.log((2 * pij / s[:, None]).abs().clamp(min=1e-16)) / 5
     return (lp * (valid[:, iu[0]] & valid[:, iu[1]])).repeat_interleave(cnt, dim=0)
 
 
@@ -217,7 +223,8 @@ class AmplitudeLLoCaWrapper(nn.Module):
                  context_dim: int = 0, context_dropout: float = 0.5,   # read in experiment._post_instantiate_model
                  context_names_file=None,
                  sign_pair_dim: int = 0, sign_pair_hidden: int = 32, sign_pair_bound: bool = False,
-                 input_pair_logs: int = 0, input_soft_eps: float = 0.0, input_local_log_eps: float = 0.0):
+                 input_pair_logs: int = 0, input_soft_eps: float = 0.0, input_local_log_eps: float = 0.0,
+                 input_pair_threshold: bool = False):
         super().__init__()
         self.net = net
         # input representations for singular limits (D374, kit_benchmark input arms; all Lorentz-exact, 0 = off):
@@ -225,6 +232,7 @@ class AmplitudeLLoCaWrapper(nn.Module):
         # input_soft_eps: p_i -> p_i log1p(x_i/eps) / (x_i log1p(1/eps)), x_i = 2 p_i.Q/s (_soft_rescale);
         # input_local_log_eps: asinh(z/eps)/asinh(1/eps) of the standardized local-frame components (models/lloca.py)
         self.input_pair_logs = int(input_pair_logs or 0)
+        self.input_pair_threshold = bool(input_pair_threshold)   # pair logs of (p_i+p_j)^2 - (m_i+m_j)^2: log beta^2
         self.input_soft_eps = float(input_soft_eps or 0.0)
         net.local_log_eps = float(input_local_log_eps or 0.0)
         # Pair sign head (model.sign_pair_dim, training.sign_head): the net's last sign_pair_dim per-particle channels
@@ -971,7 +979,7 @@ class AmplitudeLLoCaWrapper(nn.Module):
 
         if self.input_pair_logs:   # appended last: layout [property | order | diagram | pair logs]
             particle_type = torch.cat([particle_type, _pair_log_inputs(
-                fourmomenta, ptr, self.input_pair_logs).to(particle_type.dtype)], dim=-1)
+                fourmomenta, ptr, self.input_pair_logs, self.input_pair_threshold).to(particle_type.dtype)], dim=-1)
         fm_net = _soft_rescale(fourmomenta, ptr, self.input_soft_eps) if self.input_soft_eps else fourmomenta
 
         net_kwargs = {} if token_add is None else {"token_add": token_add}
