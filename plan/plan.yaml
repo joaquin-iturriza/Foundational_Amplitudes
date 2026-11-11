@@ -15776,6 +15776,9 @@ entries:
       event and RUN_DONE with no manual poll (next 19 fix).'
     22: 'CLAUDE.md figure rule: on Joaquin''s yes, replace ''the main session sends it without opening it'' with the open-once-and-check
       text proposed 2026-11-10 (shown as a diff)'
+    23: 'Leftover /tmp dirs from tests and tools hung Joaquin''s WSL boot (2026-11-11); his words: ''Not only clean it up,
+      this can''t happen again'' (record with site decide once the transcript has it). Per-test cleanup plus tests/conftest.py
+      session temp dir removed at session end, push_replay/verify_claims cleanup, a test proving it; worker a4d13c2e2b746ae6e'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16148,6 +16151,11 @@ entries:
       if:
       - 'yes: edit CLAUDE.md, commit, show the diff'
       - 'no: keep, rely on the per-file legend rule'
+    23:
+      feeds: no temp dirs left in /tmp
+      if:
+      - 'done and tested: report to Joaquin with the before/after count'
+      - 'a non-pytest entry point still leaks: fix it the same way'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
