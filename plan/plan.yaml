@@ -21838,6 +21838,47 @@ entries:
       parents 2 x (~0.9 h at 0.93 s/step + load + sigma) ~ 3 GPU-h; sweeps 68 x 8 trials at T(D) x the calibration step rates
       (0.08 s/step k<=7, 0.15 k=8, 0.40 k=9, 0.42 k=10) + 0.08 h per trial = ~208 GPU-h, covered by D392/D394. Disk: ~25 MB
       per trial x 544 = ~14 GB on CC (read before submission).'
+    fix_at: '2026-11-11T04:59:33+00:00'
+    fix: '(1) Check 3, the band against the smallest effect worth acting on: the YES bar S >= 10^0.5 sits inside the design''s
+      own band on every target. Fitting the design''s L(D) = A D^-alpha + L_inf (weighted in log L) to the scratch calibration
+      bests (horizons_cal_f22_cal_f22_lrhalf.json, horizons_cal2_ladder.json) gives residual rms 0.42 / 0.64 / 0.78 / 0.41
+      decades and local slopes at 1e-4 of 2.2 / 1.5 / 2.6 / 1.4 (e+e- > u u~ LO, u u~ V, t t~ V, t t~ LO), so the S band by
+      the design''s rule (rms (+) 0.7, over the slope, both arms in quadrature) is 0.52 / 0.87 / 0.58 / 0.81 decades: a YES
+      needs S >= 3.3-7.4, and S ~ 3 (the low end of the design''s own 3-30) reads NOT RESOLVED everywhere. The band also counts
+      the search-to-search spread twice: each cell''s fit residual already contains it, and the 0.7 decades is added again
+      undivided although the fit uses 7-9 cells per arm. Fix inside the work: a band from the fit itself (bootstrap over cells,
+      or the standard error of log D* from the fit''s covariance), shown on the scratch calibration points to be below 0.5
+      decades; and/or, under D373 (''read off any other arbitrary performance value, since the scaling exponents will be similar''),
+      a joint fit with a shared exponent and per-arm prefactor, S = (A_scr/A_ft)^(1/alpha), which uses every cell of both
+      arms, with D* at 1e-4 kept beside it. (2) Check 2, the expected effect is asserted with slopes the data contradict:
+      the check says local slopes 0.9-1.5 decades of L per decade of D; the calibration it quotes gives 1.3-2.8 between the
+      bracketing cells (u u~ LO 1000->3162: 1.3; u u~ V 3162->1e4: 2.8; t t~ V 32->100: 1.7; t t~ LO 32->100: 2.8), so a 1-2
+      order vertical gap is S ~ 2.3-33, not 3-30, and 2.3-5 on the two steep targets. The vertical gap itself comes from draft
+      Fig. 22 at matched compute on other parents (94k-step 8-process, 15k-step 25-process), whose caption says its cells
+      were selected on test at the last step. The searched in-D fine-tune vs scratch data that exist (results.tex sec:ladder,
+      ~13755: L_scratch/L_fine-tune per D, 8-24-trial searches per cell: e+e- > d d~ 1.8-19x, geometric mean 5.3; one-loop
+      e+e- > d d~ and b b~ means 3.3 and 2.7; e+e- > t t~ 0.96, nothing) put the vertical gain at 1-5x, i.e. S ~ 1-2 at these
+      slopes. State the expected vertical gap from that in-D data as well and convert it with the fitted slopes; if it stays
+      below the band, the design must change (fix 1) before 208 GPU-h go out. (3) Check 5, prior: the design cites sec:ladder
+      only for the 5x spread and omits its fine-tune-vs-scratch-in-D results (above), including e+e- > t t~ gaining nothing,
+      the same target here; name them and say how a foundation parent differs. (4) Check 13, layout and finish time: the design
+      does not state the submission layout (sweep/drive.py or sweep_manager; 3 start-up then 2 sequential batches per sweep,
+      D244) nor when the 68 sweeps finish against D394 (''running or done when I wake up''); state both from site pick''s
+      width. The scratch lr window [c/10, 10c] is twice the template''s [c/3, 3c] in log (rule 2) with no reason given; give
+      one (e.g. the ladder''s lr windows needing extension in 31 scratch and 46 fine-tune cells, and c being a law from another
+      setup) or use the template''s. (5) Check 7, D371 (''Why would I want the error of the target it was trained on and not
+      make the comparison with the other processes?'', one common one-loop measure, MSE of V/B): the design reads the one-loops
+      in MSE ln|V| only; report MSE(V/B) for both one-loop targets beside it, or say why ln|V| is the common measure (both
+      are one-signed; draft Fig. 22''s measure). Smaller, to fix while at it: gen_data_saving.py fine-tunes from models/model_run0_best.pt
+      while its docstring says the parent''s final model (D276: a HETEROSC run''s model is its final one after the sigma stage),
+      make the two agree; the entry''s finding 2026-11-10T03:35 asked stage 2''s design to state the AdamW-parent fine-tune
+      arm''s cost for optimizations_recap, say whether it still applies after D385. Passing checks: 1 (scratch and fine-tune
+      on the same parent config, T(D), budget, 8 trials; only weights and fine-tune HPs differ), 4, 6 (trees held out with
+      their classes; one-loops with the trees in, D360), 8, 9 (HETEROSC + sigma stage; DyHPO observes the val mu-MSE under
+      heterosc_select=mu_mse, base_experiment.py ~1314), 10 (frozen test pools of the target), 11 (D392 inputs, conditional
+      on c15b3337 stated), 12 (D, T(D) per D391, batch min(16384, D/2) as the passed calibration), 14 (14 GB vs 103 GB free
+      on /sps/lpnhe read now, no shared cache, memmap off), 15 (rates from the calibration at the same batch and pools; k=9/10
+      rates still being read, the generator refuses without them).'
   step_waits:
     '3': '2026-11-12'
     '4': '2026-11-12'
