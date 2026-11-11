@@ -24529,22 +24529,20 @@ entries:
       beta-specific input (log10 beta, as KIT''s logthr baseline) becomes the next design. If MG5_aMC''s tests pass only above
       beta 1e-2: the analytic O(alpha_s) massive-quark total cross section, checked against MG5_aMC where both run, is designed
       to extend the exact NLO down.'
-    fix_at: '2026-11-11T20:50:10+00:00'
-    fix: 'Re-check of the 20:49 design: items 1 (MG5_aMC soft-test failure recorded per point, smoke over beta indices 0,3,6,9,12,
-      analytic O(alpha_s) follow-up if the lowest passing beta is above 1e-2) and 3 (K=8 x 4 points, 1.6 GB of 51 GB free,
-      0.35 h target, nb_core from SLURM_CPUS_PER_TASK) are answered. One failure remains, check 15 (the readout must be shown
-      written by the exact job): the scale band, now part of the outcome (in_scale_band, ''where the ratio leaves the NLO
-      scale band''), is not parsed from MG5_aMC''s real output. amc_sigma''s regex r''[Ss]cale variation[^:\n]*:\s*\+([0-9.]+)%\s*-([0-9.]+)%''
-      returns [] on the summary text of the dry run run_04 (runs/kit/threshold_scan/amc_dry/Events/run_04/summary.txt: ''Scale
-      variation (computed from histogram information):'' newline ''Dynamical_scale_choice -2 (envelope of 9 values):'' newline
-      ''5.102e-01 pb  +9.3% -7.5%''), tested locally on that text. With no band, collect sets up/dn to NaN and in_scale_band
-      to False at every point, silently, so every model would read as outside the band. Fix: parse the envelope line (e.g.
-      r''envelope of \d+ values\):\s*[0-9.eE+-]+ pb\s*\+([0-9.]+)%\s*-([0-9.]+)%''), make collect refuse (or flag) an NLO
-      point that has a sigma but no band, add a test on the run_04 summary text, and have the smoke job show scale_up/scale_dn
-      in its sqrts_XX.json. Minor: scripts/job_kit_threshold.sh still says --time 04:00:00 against the design''s --time 1:00;
-      set it in the script or state the --hdr=--time override at submission. Everything else holds as in the first review
-      (matched controls, the B dry ratio -0.901 at beta 1e-3 to +0.05 at 0.05-0.06 against MC error 1e-3, no training, prior
-      search clean).'
+    passed_at: '2026-11-11T20:51:28+00:00'
+    reviewer: 'Threshold scan, 20:49 design with code at b63843c8. Checked: matched controls (B_bulk for B, A for A_ft; all
+      four 9e5 offon tt virtual runs in kit_fig_A_ft.json and kit_fig_B.json), only the model differs between cells; the measure
+      moves: collect_test.json on CC, B offon sigma[V_surr]/sigma[V_exact]-1 = -0.901 at beta 1e-3, -0.10 at 9.7e-3, +0.05
+      at 0.05-0.06, |.|<4e-4 beyond 0.17, against MG5_aMC MC error 1e-3 (sigma[V_exact] 0.425 pb vs sigma_LO 1.7e-3 pb at
+      beta 1e-3, so not diluted in sigma_NLO); seeds: one per existing model (D315), no training, model gaps of decades against
+      a 1% cut and 2x MC error; MG5_aMC dry runs (amc_dry) at beta 0.6 and 0.062 equal the quadrature''s LO, beta 1e-3 fails
+      the soft test and is now recorded per point, smoke over beta indices 0,3,6,9,12 finds the lowest passing beta, analytic
+      O(alpha_s) follow-up stated; scale band parsed from the envelope line (regex checked on run_04 summary text: 9.3/7.5),
+      collect refuses an NLO point without a band, tests pass locally (.venv-cpu); disk 8 x 199 MB = 1.6 GB of 51 GB free,
+      0.35 h target per part, --time 1:00, nb_core = SLURM_CPUS_PER_TASK; scan grid is the quadrature a cross section needs;
+      no loss/preprocessing/HPO in play. Searched for check 5: results.tex for threshold scan, 1506.06864, Coulomb, cross
+      section, MG5_aMC, fixed order, kit_threshold (only the star-arm amplitude-level tt threshold probe, l.14765), the entry''s
+      findings, site decisions (D353, D363 name no comparison).'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
