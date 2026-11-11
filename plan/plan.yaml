@@ -22192,6 +22192,15 @@ entries:
       c15b3337 0.690 (0.690 at 1779): under 1%, so the sweep wall limits from the calibration rates stand. Final calibration
       (all 25 cells + the half-lr rerun): T(D) unchanged; the k=9,10 cells'' minima all sit at the 8500-step cap; u u~ V at
       D=3.2e4 reached 2.2e-3 at fixed lr against 9.4e-6 at 1e4, which is calibration noise for the searched runs.'
+  - at: '2026-11-11T08:46:27+00:00'
+    text: '2026-11-11 ~09:45 CET: trees-in pool prebuild FA-ccin2p3-4782624f FAILED: default share of dsh_bb_abbh (train)
+      missing. check_site_data --list (CC, @38a43324): 2754 train pools of recipes/catalog_v4_datasaving_parent_treesin.yaml
+      missing, not 230 (903 dsh_, 464 pp13v4_, 327 pp13_ MadEvent default-share pools, 1060 v4_ pools): the 2026-11-11 amp_data_cache
+      trim (dsh_*, pp13*, v4_* older than 11-01) removed them. Regenerating would take the MadEvent queue (898 core-h, par:v4_regen_time)
+      plus the prebuild; instead all 2754 (+ .recipe.json) are in lxplus''s amp_data_cache (copied 2026-10-30): site copy
+      lxplus->ccin2p3 --from-file (5508 files, 34 GB; CC 94 GB free), detached copy_parent_pools_lxplus_to_cc. e+e- > t t~
+      LO train prebuild a46978e2 COMPLETED. Input verdict (kit_benchmark, c15b3337): both flags, input_soft_eps=1e-8 and input_pair_logs=6.
+      Next: recheck check_site_data on both parent recipes, prebuild what remains, then both parents.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
