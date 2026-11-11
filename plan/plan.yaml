@@ -22354,6 +22354,14 @@ entries:
       trial there at 2.71e-2 is likely the same). Elsewhere t t~ V scratch trials up to 2.5e-2 (D=32), 2.2e-2 (D=10) and 1.1e-2
       (D=3162) trained. Fine-tune divergences so far all sit at lr_scale 8.5-9.1. The 24 init crashes were requeued by dsave_s2_drive2
       (pid 740209, 24 ''requeued'' lines); step 6 now waits on it, step 7 dropped.'
+  - at: '2026-11-11T16:46:59+00:00'
+    text: '2026-11-11 17:46 CET: CC access loss (/sps/lpnhe/jiturrizaramirez01 mode changed 17:14, restored by the coordinator
+      under D397; dsave_s2_drive2 stopped ~17:25) marked 111 stage-2 trials lost (no RESULT_JSON). Logs read one by one (site
+      logs): 16 COMPLETED with a readable RESULT_JSON -> recollected (drive.py --recollect, bc735802, test tests/test_drive_retry_failed.py),
+      67 FAILED on ''Permission denied'' (cd, output, train_steps.tmp.npz) + 27 with no log at all (the job could not write
+      it) -> requeued at their HPs (--retry-failed, which now takes lost trials), 1 real blow-up kept with its penalty (FA-ccin2p3-05384f67,
+      ft t t~ LO D=3162, diverged step 1299). Restarted as dsave_s2_drive3 (pid 807321), scratchpad restart_driver3.sh; step
+      6 waits on it.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
