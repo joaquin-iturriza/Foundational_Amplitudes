@@ -21879,6 +21879,11 @@ entries:
       ~40 per V, ~200 total, rates borrowed from the ee->ttbar calibration. Unchecked: which parent holds all four out; ee->uubar
       pool sizes. Disk: asked him to run ''bash scripts/prune_site.sh ccin2p3'' (the worker''s session predates his new permission);
       then a fresh worker redoes du under /sps/lpnhe/jiturrizaramirez01/tmp.'
+  - at: '2026-11-11T03:58:45+00:00'
+    text: 'Step rate vs D: batch = min(16384, D/2) (job_data_saving.sh line 15), so step time grows with D up to D~3.3e4;
+      the calibration''s 0.5 s/step at 1e5 vs 0.4 at 3e4 likely includes evaluation over a larger validation set (not checked):
+      check the pure training step rate before costing (CLAUDE.md: wall-time targets from the training step alone). Told Joaquin
+      2026-11-11.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
