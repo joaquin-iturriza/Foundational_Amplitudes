@@ -22155,6 +22155,9 @@ entries:
     '5': step 3 (stage 2 go)
     '6': 'the end of driver dsave_s2_drive3 (pid 807322, log ~/.local/share/ccorch/detached/20261111-174638_dsave_s2_drive3.log):
       then check 8 trials per search, rerun stage2_readout.py --fetch and plot_stage2.py, write-up'
+    '7': FA-ccin2p3-54d416c7 FA-ccin2p3-6d9526c6 FA-ccin2p3-0f3d0423 FA-ccin2p3-e70f826b FA-ccin2p3-36603e2b FA-ccin2p3-c985b447
+      FA-ccin2p3-4a70d55a FA-ccin2p3-a155de3e FA-ccin2p3-e024c471 FA-ccin2p3-9dc2dc3a FA-ccin2p3-23f95abb FA-ccin2p3-c04b81a4
+      FA-ccin2p3-05b47678 FA-ccin2p3-cca42cd5 FA-ccin2p3-b872f220 FA-ccin2p3-4edf6ad3
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
