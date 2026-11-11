@@ -22611,6 +22611,12 @@ entries:
     units: dsave_s2_*
     start: '2026-11-11T12:07:49+00:00'
     at: '2026-11-11T12:07:49+00:00'
+  - batch: dsave_diag_offshell
+    wall_h: 0.5
+    jobs: 16
+    units: null
+    start: '2026-11-11T19:07:34+00:00'
+    at: '2026-11-11T19:07:34+00:00'
   handoff:
     state: 'Stage 2 running on CC (2026-11-11 17:46 CET): 68 single-fidelity 8-trial DyHPO sweeps (4 targets x D x {scratch,
       fine-tune}), configs sweep/sweep_config_dsave_s2_*.yaml @7d6af9b3 (gen_data_saving.py, parents ${PROJECT_DIR}/runs/data_saving/dsave_parent_{heldout,treesin}_r4,
