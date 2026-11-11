@@ -20,7 +20,8 @@
 # the keys, so a plain override fails "not in struct"), e.g. ++model.input_soft_eps=1e-8
 # ++model.input_pair_logs=6 (6 = the recipe's largest multiplicity, checked on CC 2026-11-11: 100 pools of 4, 319 of
 # 5, 714 of 6 particles; beams first in every pool; the two LO targets add 4-particle pools). Run dir
-# runs/data_saving/dsave_parent_<which>[_<tag>].
+# runs/data_saving/dsave_parent_<which>[_<tag>]. lr=<value> replaces the law's lr: at the law's 1.88e-2 both parents
+# diverged near step 900-1000 (2026-11-11, r3), so they run at HPO rule 2's centre 1e-2 (T/3000)^-0.55.
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
@@ -29,7 +30,7 @@ case "$WHICH" in heldout) T=3458; LR=1.88126e-2 ;; treesin) T=3464; LR=1.87965e-
 PARENT="runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262"
 RECIPE="$PROJECT_DIR/recipes/catalog_v4_datasaving_parent_${WHICH}.yaml"
 [ -e "$RECIPE" ] && [ -e "$PROJECT_DIR/$PARENT/config.yaml" ] || { echo "no $RECIPE or $PARENT/config.yaml"; exit 2; }
-TAG=; ARGS=(); for x in "$@"; do case "$x" in tag=*) TAG="_${x#tag=}";; *) ARGS+=("$x");; esac; done
+TAG=; ARGS=(); for x in "$@"; do case "$x" in tag=*) TAG="_${x#tag=}";; lr=*) LR="${x#lr=}";; *) ARGS+=("$x");; esac; done
 OUT="$PROJECT_DIR/runs/data_saving/dsave_parent_${WHICH}${TAG}"
 echo "DATASAVING_PARENT recipe=$RECIPE base=$PARENT args: ${ARGS[*]}"
 python run.py --config-path "$PROJECT_DIR/$PARENT" --config-name config run_dir="$OUT" run_name=null \
