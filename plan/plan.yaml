@@ -22246,6 +22246,12 @@ entries:
     units: null
     start: '2026-11-11T04:11:45+00:00'
     at: '2026-11-11T04:11:45+00:00'
+  - batch: dsave_parents
+    wall_h: 1.0
+    jobs: 2
+    units: null
+    start: '2026-11-11T09:03:35+00:00'
+    at: '2026-11-11T09:03:35+00:00'
   handoff:
     state: 'Calibration cal_f22 complete (25 cells + half-lr rerun of e+e- > t t~ V k=8, whose first run blew up at step 1360).
       T(D) by D391 (horizons.py --ladder): u u~ LO 6120,6120,7310,7310,then 8500; t t~ LO 800,1440,7680,then 8500; u u~ V
