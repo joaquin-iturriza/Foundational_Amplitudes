@@ -15787,7 +15787,7 @@ entries:
   match: zz_redesign_*
   evidence:
     runs: []
-    commit: d56fb00b
+    commit: 7713be74
     paths:
     - .claude/hooks/notification_absorb.py
     - .claude/hooks/owner_handoff.py
@@ -15839,6 +15839,14 @@ entries:
       CCORCH_HOME for tests); sections: event rule, ordering with drive.py and the D396 gap, pruning once, ledger verbs; claudemd-keeper
       reads sections whole, conflict and truth checks. Step 23 cause: 0 hand-backs ever spooled (no spool dir, 0 HANDBACK
       events in E3432-E5426), absorb.log instrumented. Keeper blocked once (14 findings), fixed in d56fb00b, re-check sent.'
+    - '2026-11-11 step 23 fixed (7713be74): two causes. (a) the hook receives a hand-back as the bare ''<agent-message ...>''
+      (absorb.log 19:55Z), but HANDBACK required the transcript''s ''Another Claude session sent a message:'' line, so handback_of
+      never matched live; (b) waiter_alive required the waiter to start after ~/.local/bin/site''s mtime, false after every
+      site edit. Now: optional prefix; liveness only (pid, cmdline, start ticks). Replay: the last 8 turn-starting hand-backs
+      of 2026-11-11 (15:38-19:45) in hook form: old 0 of 8 spooled, new 8 of 8 against the waiter armed now (pid 1072507);
+      83 of 94 hand-backs 11-10..11 recognised (the 11 others, all 11-10 before 10:30, carry no [Subagent hand-back] header:
+      peer messages, pass by design); 0 of 257 other prompts recognised; spool() opens an event with a stub site. tests/test_handback_batch.py
+      6/6 (hook-form case added; one failure in 5 runs, not reproduced).'
     - analysis/agent_redesign/agent_tasks.json
     - analysis/agent_redesign/context_breakdown.json
     - analysis/agent_redesign/figs/context_breakdown.png
