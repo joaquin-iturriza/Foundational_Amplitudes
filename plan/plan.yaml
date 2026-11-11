@@ -22199,6 +22199,32 @@ entries:
       sweep/drive.py --item pretrain_data_saving --sites ccin2p3 once both parents are done: 88 GPU-h measured on stage 2''s
       same configs (gen_data_saving''s estimate 103). Whole rerun ~92-107 GPU-h, above 30: (1)-(3) (3.7 GPU-h) go under D400;
       (4) waits for Joaquin''s go on the cost. Disk: 0.7 GB pools + parents against 55 GB free on /sps/lpnhe (read 2026-11-11).'
+    fix_at: '2026-11-11T19:56:06+00:00'
+    fix: '(1) Check 5, prior incomplete: the design says no prior parent with a physical-mass top was tested for this question,
+      but sec:ladder in docs/results.tex tested it directly. tab:rung_focus_ratio, row e+e- > t t~ (rung 5, the first rung
+      with a massive top, u u~ > t t~), gives rung below over rung with the top as 6.86, 1.83, 3.78, 0.87, 0.24, 3.48, 2.50
+      at D=10..1e4, a geometric mean of about 1.9x, swinging within one seed''s spread. tab:ladder_transfer_all shows e+e-
+      > t t~ fine-tuned from the top-less e+e- > u u~ parent gaining a mean of 1.7x over scratch (0.58-8.1 per cell), so a
+      parent without a top did not cause a 6-33x deficit in that setup. Both bear on the hypothesis and on the expected effect.
+      Fix: name them in prior, state the expected ft(s3)/ft(s2) they imply (about 1/1.9, which falls in the design''s inconclusive
+      band between 1/3 and 1/1.5), and say why this setup may differ, or what result would separate the two. A cheap way to
+      read YES/NO before the 34 searches (about 88 GPU-h): fine-tune the 8 t t~ cells (LO and V, D=316..1e4) from the r5 parents
+      at the stage-2 best HPs, the same way as the off-shellness diagnostic (16 runs at about 0.5 h), against the parent-scale
+      reruns already in stage2_diag_readout.json (fixed-HP rerun spread: sd of ln 0.73 per cell, about 1.3x on the geometric
+      mean of 8 cells). (2) Checks 1 and 12, a second change: the r5 recipe differs from r4 in more than the physical-mass
+      tops. Diffing recipes/catalog_v4_datasaving_parent_heldout.yaml against its r4 version (@43e8517d), r5 adds the 278
+      H3 tops plus 11 pools from the e+e- > q q~ g and q q~ g g families that r4 held out: v4_bbx_epemg, v4_bg_bepem, v4_epem_bbxg
+      (and its __as090 and __as150 variants), v4_epem_ccxgg, v4_ug_epemgu, v4_ug_epemu, v4_ug_epemu_nlo, v4_uux_epemg, v4_uux_epemg_nlo.
+      Two of these are one-loops next to the u u~ targets. So ft(s3)/ft(s2) on u u~ and the rewritten S on all four targets
+      mix the tops with the return of those families. D400''s words cover the tops and the input scale only. Fix: build r5
+      as r4''s recipe plus the 278 H3 classes (the e+e- > t t~ family still out), or put the return of the 11 pools to Joaquin
+      as his call with what it does to the comparison. Recommended, not a failure: give the s3 searches the s2 DyHPO seeds
+      (now 281792619 against 132363435 on t t~ LO d5), so the 3 start-up trials match and ft(s3)/ft(s2) does not carry the
+      difference between two random searches. Passing: check 2 (the measure is the target''s own best val, stage 2 shows a
+      6-33x ft/scr deficit, and the diagnostic moved cells 0.11-4.0x); check 3 on noise (a YES bar of 3x on a geometric mean
+      of 8 cells against about 1.3x); s3 configs equal s2 except the parent, the name and the DyHPO seed (34 of 34 diffed);
+      HETEROSC with the sigma stage; 8 trials in waves 3/3/2; disk 52 GB free on /sps/lpnhe (read now); the parent''s step
+      rate is r4''s, at the same batch and precision.'
   step_waits:
     '4': step 6 and the D400 rerun's fine-tune searches
     '6': driver dsave_s2_drive3 (pid 807322) finishing the last stage-2 scratch trials
