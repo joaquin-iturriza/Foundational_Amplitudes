@@ -21695,6 +21695,7 @@ entries:
       FA-ccin2p3-9a1612f6 FA-ccin2p3-4a8a0d6c FA-ccin2p3-d1e00a87 FA-ccin2p3-e0add644 FA-ccin2p3-1dfa217f FA-ccin2p3-320bc5dd
       FA-ccin2p3-73fa5be0 FA-ccin2p3-d25b0baf FA-ccin2p3-59c11d82 FA-ccin2p3-468ef654 FA-ccin2p3-0dd9e90b
     '5': step 3 (stage 2 go)
+    '6': '2026-11-12'
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
