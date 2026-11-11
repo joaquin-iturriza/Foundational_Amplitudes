@@ -24638,6 +24638,43 @@ entries:
       which this design answers); site decisions (threshold, Coulomb, fixed order, analytic, cross section, D353/D363: no
       conflicting call). Checks 7-15: no training, loss, preprocessing, sweep, disk or new job; collect runs on CPU on the
       existing batch''s outputs.'
+  - at: '2026-11-11T21:26:28+00:00'
+    question: 'Does a beta-specific input fix protocol A''s missing Coulomb rise in the e+e- -> t t~ one-loop virtual? Arm:
+      the carry-over softpair setting (model.input_soft_eps=1e-8, model.input_pair_logs=4) plus model.input_pair_threshold=true
+      (pair logs of (p_i+p_j)^2-(m_i+m_j)^2: the t t~ pair''s log becomes log beta^2, massless pairs unchanged; code 62686198),
+      from scratch. Feeds which t t~ virtual model KIT gets for the threshold and whether the flag goes into the catalog parent
+      (D392: adopt what gains).'
+    prior: 'Threshold scan (finding today): bulk-trained tt virtual models carry almost none of the Coulomb rise: sigma_NLO^surr/sigma_NLO-1
+      at beta 1e-3 is -0.99 for A, A_ft, B_bulk, in the NLO scale band only from beta 0.14-0.21; B (hard points added) -0.90
+      at 1e-3, in band from 0.0119. KIT Coulomb strata (beta 1e-4..1e-3) deepest log10-MSE: A 7.0-8.7, A_ft 7.3-7.7, B 2.38
+      (exponent -0.43 vs exact -1.02); carry-over softpair from scratch f21fa163: 8.62 -> 7.06, exponent -0.03, Sudakov +1.00
+      worse; tt Born softpair 5515dc85: threshold -2.26 decades. Input options told to Joaquin 2026-11-11 (pair logs, soft
+      rescale, local logs) carried no beta input. results.tex: none (searched Coulomb, threshold, beta input, pair logs).'
+    measure: 'tools/kit_readout.py --vs the control on the KIT strata: per family median log10(arm/control) of log-MSE and
+      strata better/worse (Coulomb threshold, Sudakov, bulk_test), deepest Coulomb bin log10-MSE and fitted exponent vs exact
+      -1.02; and the threshold scan (kit_threshold_scan.py predict + collect): sigma_NLO^surr/sigma_NLO^exact-1 per beta,
+      lowest beta inside the NLO scale band. Same for tt Born (threshold, Sudakov, bulk).'
+    check: 'The input moves with the tested quantity: test_pair_threshold_log_beta (tests/test_input_reps.py, 7 pass) gives
+      log(beta^2)/5 exactly for the t t~ pair at sqrt s 346.5 and leaves the pairs with a massless leg unchanged; over KIT''s
+      Coulomb strata beta 1e-4..1e-3 the column spans log(beta^2)/5 = -3.7..-2.8 where the plain pair log of the t t~ pair,
+      log((1+beta^2)/2)/5, is constant at -0.139 (no beta information: why softpair''s exponent stayed -0.03). The measure
+      moves: the four existing models span -0.99 to -0.90 at beta 1e-3 and 0.012-0.21 for the band edge; Coulomb log-MSE spans
+      2.38-8.7 across models. Lorentz-exact (m_i from p_i^2).'
+    fixed: 'Everything of the carry-over arm f21fa163 / 5515dc85: job_kit.sh A, base config the catalog_v4_long parent best_cov_v4_long_hpo8_cc_68224_trial_1262,
+      n_train 1e5, 8000 steps, training.lr from the job''s law (0.0118605), seed 42, float64, off-shellness on, both softpair
+      flags, bulk-only training and early stopping; KIT evaluate.py through kit_predict; threshold scan grid and exact NLO
+      as collected (analysis/kit_benchmark/data/kit_threshold_scan.json).'
+    control: 'Matched: the softpair carry-over runs, tt virtual FA-ccin2p3-f21fa163 (kit_A_ee_tt_virt_finite_n100000_t8000_softpair)
+      and tt Born FA-ccin2p3-5515dc85 (kit_A_ee_tt_born_n100000_t8000_softpair); only input_pair_threshold differs. The threshold
+      scan also predicts the control f21fa163 so both are on one figure.'
+    seeds: One seed (D315), as the control. The arm-vs-control spread at the input-arm precedent is resolved at 0.3 decades
+      per family; the expected effect is several decades in the Coulomb bins (the column there spans 1 unit vs 0 now).
+    outcome: 'Yes (adopt, D392): tt virtual Coulomb family median log10(arm/control) < -0.3 with no family worse by > 0.3
+      (Sudakov, bulk), exponent closer to -1.02; then the flag goes into the catalog parent''s tt pools and the arm is the
+      A threshold model for KIT. Partial: Coulomb gains but a family worse: report both, the flag stays an option for t t~
+      only. No (Coulomb within +-0.3): the input alone does not teach the 1/beta rise; protocol B (hard points) stays the
+      threshold model and the next lever is the target side (dividing out the Sommerfeld factor), designed then. tt Born:
+      same rule, reported beside.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
