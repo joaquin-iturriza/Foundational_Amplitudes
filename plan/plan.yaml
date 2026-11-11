@@ -23156,7 +23156,7 @@ entries:
       30, so no budget question remains'
   owner:
     agent: a6c696e8d98075b7a
-    state: working
+    state: closed
     since: '2026-11-11T02:42:04+00:00'
     state_at: '2026-11-11T20:14:14.445000+00:00'
     context: 219476
@@ -23497,31 +23497,27 @@ entries:
     '4': FA-ccin2p3-c364a7ae FA-ccin2p3-f21fa163 FA-ccin2p3-5515dc85
     '5': FA-ccin2p3-c364a7ae FA-ccin2p3-f21fa163 FA-ccin2p3-5515dc85
   handoff:
-    state: 'Protocol A scratch, plain arm, off-shellness-off arms (uug band a at the edge: soft -1.51, deep 516 vs 14180;
-      uugg band c: +7.8, 3670 vs 9067) and protocol B (hard events fix tt Born threshold, tt Sudakov, uugg collinear; not
-      uug/uugg soft nor the tt virtual Coulomb rise: representation) are read, recorded as findings and drawn (analysis/kit_benchmark/figs
-      kit_*_B_*, kit_*_offshell_*; data kit_fig_{A,B,A_nooffshell}.json; tools/kit_readout.py). The pretrainings 62c2443b/d0b132b6
-      run 0.94/0.85 s/step and stop at their 12 h limit ~19:00 UTC at ~45k/~50k steps; resume jobs 78b8190c (heldout, ETA
-      ~02:00 UTC 11-11) and 03ea3719 (fair_nlo, ~00:30) finish them (KIT_RESUME, tested, reviewer PASS). A_ft design passed
-      (~11:10 UTC, after FIX: lr_scale 1.0, lr-axis check, divergences-holdout prior); its 12 jobs are queued as site launch
-      kit_aft_heldout on 78b8190c''s RUN_DONE; scratch controls tt on n=1e5 b3d27208, d083f5da running. On A_ft end: read
-      the first job''s lr line, readout + figures (A_ft beside scratch, caption per curve), bands, lr_scale 0.1 check (3 cells)
-      before any ''no help''. Error-panel y axes: legend room now default (was 3x growth), still to ~1e11 on uug soft where
-      the 5-entry legend needs room.'
-    decisions: One seed (D315). A_ft at fine_tune.lr_scale=1.0 (only the start weights differ from scratch). Off arms of A_ft
-      hold the off-shellness columns at 0 (data.offshell_zero), equivalent to removal for a first Linear. Resume from the
-      best checkpoint with resume_seed_best, sigma stage from model_run<idx>_best (88b5685b); the final parent model is models/model_run0_best.pt
-      after promotion. Score-only jobs request --time 0:05 (measured 34-48 s). KIT_FROM/KIT_PARENT only via site submit --env.
-      launch_kit_aft.sh needs site pick to allot all 12 to ccin2p3 and submits --no-sync.
-    ruled_out: float32; trial 1262 as parent; bulk-only checkpoint for B; emission-scale target as the uug runaway's cause;
-      dimless_offshell_eps 1e-12; the off-shellness column as the uugg runaway's cause (band c); hard events as a fix for
-      the soft limit (B 0.15 decades on uug)
-    running: FA-ccin2p3-62c2443b, d0b132b6 (pretrainings, to their limit), 78b8190c, 03ea3719 (resumes, afterany), b3d27208,
-      d083f5da (scratch controls); site launch kit_aft_heldout (12 A_ft)
-    files: scripts/job_kit.sh scripts/job_kit_pretrain.sh scripts/launch_kit_aft.sh tools/kit_figures.py tools/kit_readout.py
-      tools/kit_predict.py run.py base_experiment.py (resume_seed_best) experiment.py (offshell_zero) analysis/kit_benchmark/data/
-      analysis/kit_benchmark/figs/
-    written: '2026-11-10T10:47:45+00:00'
+    state: 'Input study done (findings 2026-11-11): soft rescale + pair logs (model.input_soft_eps=1e-8, input_pair_logs=n,
+      06b9353a) gain every limit on uug (soft 14180->0.200, coll 30.1->2.21, bulk 8.2e-4->1.09e-4) and uugg (soft 9070->0.411,
+      coll_gg 20.5->2.47, coll_qg 18.4->3.56, azimuth 29.2->3.5), not on tt (virtual: Coulomb unresolved -0.16, Sudakov +1.00
+      worse; Born: threshold -2.26 but Sudakov +0.305 worse); local logs no gain. A_ft verdict after the lr check: pretraining
+      helps soft at lr_scale 0.1 (uugg exponent -2.14), not collinear nor Coulomb; bulk transfer; tt Born threshold hurt by
+      A_ft with the off-shellness column on. Ready now: step 4 threshold scan (tt virtual model = its existing A/A_ft/B, per
+      the carry-over outcome) and step 5 KIT package (uug/uugg: the both-flags scratch models c15b3337 / c364a7ae; tt: A/A_ft/B
+      best per limit). Step 3 fair NLO D-scan: parent 03ea3719 done, not designed yet.'
+    decisions: 'D374 three input arms; D376 read bulk and every bin; D392 incorporate every gain (verdict: both flags; pretrain_data_saving
+      builds the parent with them); D394 do not ask Joaquin. Readout cut 0.3 decades of median log10(arm/control), sourced
+      to the 0.08-0.12 seed spread in results.tex ~l.1296 (reviewer FIX). D395 probe not needed for the flagged A path (ran
+      end to end in c15b3337).'
+    ruled_out: 'local-frame logs (model.input_local_log_eps): no gain on uug (bulk +0.15). Pair logs or soft rescale alone:
+      each loses a limit the combination keeps.'
+    running: none
+    files: wrappers.py (_pair_log_inputs, _soft_rescale), models/lloca.py (local_log_eps), experiment.py (n_scalars sizing),
+      config/model/lloca.yaml, tests/test_input_reps.py (4/5-particle invariance; 6 untested), scripts/job_kit.sh (KIT_LR_SCALE),
+      tools/kit_readout.py (--vs), tools/kit_figures.py (input/lr labels, legend strip), analysis/kit_benchmark/data/kit_fig_A_{inputs,inputs_carry,ft,ft_lr}.json,
+      analysis/kit_benchmark/figs/kit_{mse,median}_{inputs,carry,aft,aftlr}_*.png. Code since 06b9353a not yet through the
+      repo reviewer.
+    written: '2026-11-11T20:16:24+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
