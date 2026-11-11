@@ -22179,6 +22179,15 @@ entries:
       @43e8517d). T(D) by D391 (horizons.py --ladder): u u~ LO 6120,6120,7310,7310,8500...; t t~ LO 800,1440,7680,8500...;
       u u~ V 1190,1190,2720,2720,4420,8500...; t t~ V 1360,2380,5950,8500... Stage-2 design recorded (fit-based D*), reviewer
       running.'
+  - at: '2026-11-11T05:07:43+00:00'
+    text: '2026-11-11 ~05:10 UTC: stage-2 design PASS (3rd look, code @44e102dc): joint fit L_arm(D) = A_arm D^-alpha + L_inf,arm
+      with shared alpha (analysis/data_saving/dstar_fit.py), S = D*_scr/D*_ft at 1e-4 with a 16-84% cell-bootstrap band (YES
+      = lower edge above 1, ~84% one-sided, to be said in the write-up); calibration half-widths on log10 D* 0.12/0.10/0.31/0.10
+      (u u~ LO / t t~ LO / u u~ V / t t~ V), expected S 1.4-2.2 from sec:ladder (t t~ LO ~1). One-loop readout test MSE(V/B)
+      via vb_test_mse.py (V-trained u u~ V divided by the exact Born, rank-matched: born_check 8e-8). Sweeps: sweep/gen_data_saving.py
+      --parent-lo <heldout parent> --parent-nlo <treesin parent>, lr [c/3,3c], waves 3,3,2, ~208 GPU-h (item estimate 215,
+      D392/D394). Repo-reviewer backlog passed (96cfb862). Order now: cal_f22''s last cells (80815d00, 8526adb8, 36bf9e0c)
+      -> final T(D) + figure; c15b3337 -> parent flags -> both parents -> 68 sweeps.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
