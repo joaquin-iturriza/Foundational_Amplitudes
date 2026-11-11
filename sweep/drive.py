@@ -155,20 +155,28 @@ class Sweep:
         self.seed = int(fp.get("data.seed", 42))
         self.sp = os.path.join(self.dir, "driver_state.json")
         self.st = json.load(open(self.sp)) if os.path.exists(self.sp) else {"trials": {}, "prebuild": {}}
-        if (getattr(a, "retry_lost", False) or getattr(a, "retry_failed", None)) and not a.dry_run:
-            self.requeue_lost(getattr(a, "retry_lost", False), getattr(a, "retry_failed", None))
+        if (getattr(a, "retry_lost", False) or getattr(a, "retry_failed", None)
+                or getattr(a, "recollect", None)) and not a.dry_run:
+            self.requeue_lost(getattr(a, "retry_lost", False), getattr(a, "retry_failed", None),
+                              getattr(a, "recollect", None))
 
-    def requeue_lost(self, lost=True, failed_re=None):
+    def requeue_lost(self, lost=True, failed_re=None, recollect_re=None):
         """--retry-lost: every "lost" trial (no RESULT_JSON in its log: the job died without reporting, e.g. a full
         filesystem, 2026-10-23) is taken back: the failure penalty it was observed at is removed from the sampler and
         the surrogate, its config leaves the diverged set, and it is resubmitted at the same hp and t_steps under the
         same trial index. A "failed" trial (it reported a failure: diverged, NaN) keeps its penalty, unless
-        --retry-failed REGEX matches its run id and error (a crash of our code, fixed since: not a property of its hp)."""
+        --retry-failed REGEX matches its run id and error (a crash of our code, fixed since: not a property of its hp);
+        that also takes "lost" trials. --recollect REGEX: a failed or lost trial whose job did finish but whose log
+        could not be read then (site access lost) goes back to "submitted", penalty removed, so collect() reads its
+        RESULT_JSON again instead of rerunning it."""
         alg = self.sampler.algorithm
         todo = list(self.trials("lost")) if lost else []
-        if failed_re:
-            todo += [t for t in self.trials("failed") if re.search(failed_re, "%s %s" % (t.get("rid"), t.get("error") or ""))]
-        for t in todo:
+        back = []
+        for rx, out in ((failed_re, todo), (recollect_re, back)):
+            if rx:
+                out += [t for t in self.trials("failed", "lost") if t not in todo + back
+                        and re.search(rx, "%s %s" % (t.get("rid"), t.get("error") or ""))]
+        for t in todo + back:
             hp, combo = t["hp_idx"], self.sampler._to_combo(t["t_steps"])
             h = self.sampler._val_loss_history.get(hp, {})
             h.pop(combo, None)
@@ -181,6 +189,14 @@ class Sweep:
                 alg.observations.pop(hp)
             alg.diverged_configs.discard(hp)
             t.setdefault("lost_runs", []).append(t["rid"])
+            if t in back:
+                t["lost_runs"].pop()
+                t["status"] = "submitted"
+                self.sampler._in_flight.add(hp)
+                t.pop("finished", None); t.pop("error", None)
+                log("%s: trial %d (hp%04d t%d, %s) back to submitted to recollect its result, its penalty removed"
+                    % (self.name, t["idx"], hp, t["t_steps"], t["rid"]))
+                continue
             was, t["status"] = t["status"], "retry"
             log("%s: trial %d (hp%04d t%d, %s in %s) requeued, its penalty removed"
                 % (self.name, t["idx"], hp, t["t_steps"], was, t["rid"]))
@@ -425,6 +441,9 @@ def main():
     ap.add_argument("--retry-failed", metavar="REGEX",
                     help="resubmit every failed trial whose '<run id> <error>' matches REGEX (a code crash fixed since), as "
                          "--retry-lost does, its penalty taken back out")
+    ap.add_argument("--recollect", metavar="REGEX",
+                    help="failed or lost trials whose '<run id> <error>' matches REGEX and whose job finished: back to "
+                         "submitted, penalty removed, so the next collect reads their RESULT_JSON (no rerun)")
     ap.add_argument("--dry-run", action="store_true", help="print the first wave's submit commands; nothing written or sent")
     a = ap.parse_args()
     if a.dry_run:

@@ -7,7 +7,7 @@ from sweep import drive
 
 def _sweep():
     alg = types.SimpleNamespace(observations={1: {"c": 9.0}, 2: {"c": 9.0}, 3: {"c": 9.0}}, diverged_configs={1, 2, 3})
-    smp = types.SimpleNamespace(algorithm=alg, _to_combo=lambda t: "c", _eval_order=[(1, "c"), (2, "c"), (3, "c")],
+    smp = types.SimpleNamespace(algorithm=alg, _in_flight=set(), _to_combo=lambda t: "c", _eval_order=[(1, "c"), (2, "c"), (3, "c")],
                                 _val_loss_history={1: {"c": 9.0}, 2: {"c": 9.0}, 3: {"c": 9.0}})
     trials = {"0": dict(idx=0, hp_idx=1, t_steps=10, status="failed", rid="FA-x-aaa", error="run.py exited 1"),
               "1": dict(idx=1, hp_idx=2, t_steps=10, status="failed", rid="FA-x-bbb", error="diverged"),
@@ -26,5 +26,14 @@ def test_retry_failed_matches_only():
     assert s.sampler._eval_order == [(2, "c"), (3, "c")]
 
 
+def test_recollect_and_retry_lost_by_id():
+    s = _sweep()
+    drive.Sweep.requeue_lost(s, False, "ccc", "aaa")      # retry the lost one by id, recollect the failed one
+    st = {t["idx"]: t["status"] for t in s.st["trials"].values()}
+    assert st == {0: "submitted", 1: "failed", 2: "retry"}
+    assert s.sampler._in_flight == {1} and "error" not in s.st["trials"]["0"] and s.st["trials"]["0"]["lost_runs"] == []
+    assert 1 not in s.sampler.algorithm.observations and 3 not in s.sampler.algorithm.observations
+
+
 if __name__ == "__main__":
-    test_retry_failed_matches_only(); print("ok")
+    test_retry_failed_matches_only(); test_recollect_and_retry_lost_by_id(); print("ok")
