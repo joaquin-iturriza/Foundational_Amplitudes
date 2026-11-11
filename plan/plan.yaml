@@ -23074,7 +23074,7 @@ entries:
     '3': '2026-11-12'
     '4': step 6 (flagged uugg/tt models decide what goes to KIT)
     '5': step 6 (flagged uugg/tt models decide what goes to KIT)
-    '6': 'main session: token budget narrowing (until 19:00 UTC 2026-11-11); ready to design'
+    '6': FA-ccin2p3-c364a7ae FA-ccin2p3-f21fa163 FA-ccin2p3-5515dc85
   handoff:
     state: 'Protocol A scratch, plain arm, off-shellness-off arms (uug band a at the edge: soft -1.51, deep 516 vs 14180;
       uugg band c: +7.8, 3670 vs 9067) and protocol B (hard events fix tt Born threshold, tt Sudakov, uugg collinear; not
