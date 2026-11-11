@@ -22082,6 +22082,52 @@ entries:
       off-shellness columns (experiment.py _resolve_offshell_stats, non-varied columns are fitted in both modes); control
       run IDs and ratios match stage2_readout.json (t t~ LO 6.07, 12.5, 18.9, 2.4; t t~ V 8.08, 12.5, 33, 27.4); thresholds
       for yes/no stated; same loss, target, pools and test rows as the control.'
+  - at: '2026-11-11T19:02:02+00:00'
+    question: 'Diagnostic of the stage-2 t t~ readout (Joaquin: the t t~ results are wrong): is the fine-tunes'' loss to scratch
+      on e+e- > t t~ LO and t t~ V at D=316..1e4 (best val mu-MSE ft/scr 6-33x, while u u~ fine-tunes win 2.5-60x) caused
+      by the off-shellness input kept on the parent''s scale (fine_tune.offshell_stats=parent)? With dimensionless inputs
+      the t t~ Z column, signed-log((s-MZ^2)/s_hat / 1e-6), is near-constant (std 0.0177 on t t~ LO, 0.0145 on t t~ V) against
+      the parent''s std 9.77: its spread, which scratch sees at unit variance, reaches the fine-tuned backbone compressed
+      550-670x (t t~ V''s top column 9x); u u~''s own std 8.75 (1.1x).'
+    prior: 'sec:ladder (results.tex ~13745): refitting the off-shellness input on the probe instead of the parent''s scale
+      cost the seven internal-Z probes 1.3-2.1x and was neutral on e+e- > t t~ (0.96, geometric mean over D; parent e+e- >
+      u u~ tp3_pre_ee_uu_calib, Z column std 6.65). That run predates dimensionless inputs: its column was signed-log(s-MZ^2)
+      in GeV^2, which over t t~''s sqrt s 346-1000 has std ~0.61 (ESTIMATE, sqrt s uniform on the window, analytic, the old
+      run is on Jean Zay), compression ~11x against 550-670x now; so a neutral switch there does not predict one here: at
+      11x the column still carried s_hat to the backbone, at 550x it effectively does not (the dimensionless mass column,
+      the other s_hat carrier, is on the parent''s scale at 2x). b03ba783/f2aad286 set the parent-scale rule on that evidence.
+      This entry''s readout (stage2_readout.py @16965c23): ft/scr best val 6.1, 12.5, 18.9, 2.4 (t t~ LO D=316..1e4), 8.1,
+      12.5, 33, 27 (t t~ V); u u~ LO 0.08, 0.4, 0.04, 0.016. Checked on the runs: target stats refit identically in both arms,
+      test readout inverts the transform to 4e-7, same test rows, parents sound (median per-process test MSE 0.13, gg>t t~
+      1e-5). Searched results.tex (offshell_stats, off-shellness, parent''s scale, steering, tp3_ftp), the entry, site decisions.'
+    measure: Per cell (t t~ LO and t t~ V, k=5..8) the best validation mu-MSE (RESULT_JSON val_loss, DyHPO's objective; same
+      target stats in every arm) of a fine-tune with fine_tune.offshell_stats=own against a rerun of the same HPs with the
+      parent's scale (both new, unselected, seed 42); test MSE (ln|M|^2 LO, V/B for V) beside it; the rerun over the original
+      best trial = the measured selection/rerun spread.
+    check: 'sec:ladder measured this switch moving the loss 1.3-2.1x on probes whose column differs from the parent''s (same
+      quantity, same change). Here, the gap is largest where the error is small enough to need the s_hat dependence: at D<=100
+      both t t~ arms sit at 1e-3..1e-1 (ft/scr 0.8-1.9, data-limited, the compressed column cannot matter there), at D=316..1e4
+      ft/scr 6-33x; at D>=3e4 t t~ LO ft wins again (0.17-0.4) but those scratch searches have 2-3 of 6 trials in, not read.
+      Stated as the hypothesis the runs test, not as proof.'
+    fixed: 'Everything of each cell''s stage-2 fine-tune config (sweep/sweep_config_dsave_s2_ft_<target>_d<k>_t8500.yaml @7d6af9b3)
+      and its best trial''s sampled HPs (lr_scale, layer_decay, muon_weight_decay, regularization_lambda, warmup, eta_min,
+      ema, ema_decay), seed 42, T=8500, same parent, pools, test rows; the arms differ only in fine_tune.offshell_stats (configs
+      sweep/sweep_config_dsave_diag_{offown,parscale}_ft_<target>_d<k>_t8500.yaml: parscale = the stage-2 config renamed;
+      offown = it with offshell_stats own).'
+    control: The parent-scale rerun of the same HPs (unselected, same seed); the original best trials (FA-ccin2p3-bbc4fcc6,
+      790990bf, cc8c9a27, 7ef89fea; 9dd6c6a5, 55311fa3, ba3dadd6, d67b326e) and the cell's scratch best beside.
+    seeds: Seed 42 in both arms; 8 cells carry the replication; rerun/original gives the spread of a single run at fixed HPs.
+    outcome: 'YES: own below its parent-scale rerun in >=6 of 8 cells with geometric-mean own/rerun <= 1/3 (beyond the measured
+      rerun spread): the parent-scale rule is a defect for compressed columns; fix _resolve_offshell_stats to fit a column
+      on the target when its spread is far below the parent''s, rerun the 16 t t~ fine-tune searches (~25 GPU-h, Joaquin''s
+      go if over the item estimate). NO: geometric mean >= 1/1.5 or < 5 of 8 below: off-shellness ruled out; next suspects
+      the dimensionless-mass column on the parent''s scale and the optimizer. Between: inconclusive, said so. Launch: per
+      run ''site submit ccin2p3 FA sweep/trial_job.sh --item pretrain_data_saving --hdr=--time=<the config''s cluster.time>
+      --hdr=--mem=32G --hdr=--cpus-per-task=4 -- --sweep-config <config> --detached --trial-idx 0 --hp-idx <best hp_idx> --t-steps
+      8500 --hp k=v ...'', the exact path drive.py uses for the 544 stage-2 trials (run_trial.py --detached writes runs/<sweep>/trial_<hp>/
+      with sigma_stage/preds_test.npz and a RESULT_JSON log line), read by stage2_readout.py --diag (test MSE, remote glob
+      runs/dsave_diag_*/trial_*) and site logs (val). Cost 16 runs x 0.2-0.4 h ~5 GPU-h on CC; disk 15 MB per run (stage-2
+      d8 trials) x 16 = 0.24 GB against 52 GB free on /sps/lpnhe (read 2026-11-11).'
   step_waits:
     '3': '2026-11-12'
     '4': 'step 6: the end of driver dsave_s2_drive3 (pid 807322)'
