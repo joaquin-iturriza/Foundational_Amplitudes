@@ -23171,9 +23171,9 @@ entries:
     - 3
   owner:
     agent: a0a9411af0a5c385b
-    state: stopped
+    state: working
     since: '2026-11-11T22:06:53+00:00'
-    state_at: '2026-11-11T22:23:29.282000+00:00'
+    state_at: '2026-11-11T22:34:44.537000+00:00'
     context: 113239
     context_at: '2026-11-11T22:22:25+00:00'
   findings:
