@@ -23166,6 +23166,46 @@ entries:
       (uug plain arm), step-0 val -0.58 vs 1.2e4 shows carry-over; check 3: one seed per D315, 1-decade cut against the 1.0-decade
       1e5-vs-9e5 move. Disk 1.2 GB vs 6.5 GB free on /sps/lpnhe. Terms searched: KIT, A_ft, divergences, singular/soft/collinear
       limit, extrapolat, held out, pretrain/fine-tun/scratch near sec:divergences, in results.tex, the entry and site decisions.'
+  - at: '2026-11-11T02:46:32+00:00'
+    question: 'Input arms (D374, Joaquin ''Try all of them''): does an input representation that resolves the singular variables
+      logarithmically let the model, trained from scratch on ee->uug bulk only (protocol A, n=1e5), extrapolate into the KIT
+      soft and collinear bins? Three arms, each one Lorentz-exact config flag added to the A run f6b2ece9: (1) pair logs,
+      model.input_pair_logs=5: log(2 p_i.p_j/s)/5 of all 10 pairs as extra per-particle scalars; (2) soft rescale, model.input_soft_eps=1e-8:
+      p_i -> p_i log1p(x_i/eps)/(x_i log1p(1/eps)), x_i = 2 p_i.Q/s; (3) local logs, model.input_local_log_eps=1e-8: asinh(z/eps)/asinh(1/eps)
+      of the standardized LLoCa local-frame components z. Feeds: which input to carry into uugg, tt virtual, protocol B and
+      A_ft (next lever named by the B readout and the off-shellness arms).'
+    prior: 'Searched docs/results.tex (log invariant, pair log, input representation, local frame, log1p), the plan and site
+      decisions: no prior input-representation study; D374 approves these three arms (~1.5 GPU-h each). This entry: protocol
+      A scratch uug 1e5 f6b2ece9 (off-shellness on): soft exponent +20.18 vs exact -2, deepest soft bin x 1e-7..1e-6 log10-MSE
+      14180, collinear exponent +0.32, deep coll bin 30.1; no-off-shellness arm c35a2199: soft -1.51, deep soft 516, coll
+      +0.23, deep coll 34.5; plain arm deep soft 145; protocol B (hard events added) moves uug soft only 0.15 decades (representation
+      deficit); Bakar''s bulk-only MLP with log inputs at 1e5: soft 0.32, coll 0.11.'
+    measure: 'Per arm, from KIT evaluate.py via tools/kit_readout.py: deepest soft bin (x 1e-7..1e-6) and deepest collinear
+      bin (y 1e-7..1e-6) log10-MSE d, fitted soft and collinear exponents s, bulk_test MSE; figures median and log-MSE per
+      bin with every arm and both controls in the legend.'
+    check: 'Equivariance: tests/test_input_reps.py at 06b9353a (μP LLoCa wrapper, float64, random boost 0.7c + rotation, events
+      with a 1e-6 soft leg): output invariant to rel 4.2e-9 (pair logs), 4.6e-13 (soft rescale), 1.4e-8 (local logs, float64
+      rounding amplified by 1/(eps asinh(1/eps)) near 0); each flag moves the output (rel 1.0, 23, 1.0); pair-log values and
+      the soft rescale''s fixed point x=1 checked. CC login CPU dry run of all three flags together through job_kit.sh (sizing,
+      data path) launched (detached inputarms_dry). Measure moves with a change of this size: removing the off-shellness column
+      moved the uug deep soft bin 1.44 decades and the soft exponent from +20.2 to -1.5; the plain arm moved it 2 decades;
+      noise: 1e5 vs 9e5 moved it 1.0 decade, no seed spread (D315).'
+    fixed: 'Everything of f6b2ece9 but the flag: scripts/job_kit.sh kit_ee_uug__me2 100000 8000 A at 06b9353a (the catalog
+      pretraining''s config.yaml as base, trial-1262 LLoCa μP, off-shellness on), float64, seed 42, lr 0.0118605 (A lr law
+      at 8000 steps), HETEROSC with mu_mse selection then sigma stage, val last 1e5 of bulk_train, test bulk_test 2e5 and
+      every hard_test stratum, KIT evaluate.py. Rate uug 0.68 s/step V100 float64 (f6b2ece9): 1.52 h + ~10 min start, sigma
+      stage and scoring; --time 1:55 each; 3 jobs, target 5.1 GPU-h, 5.75 requested; disk ~85 MB per run.'
+    control: 'f6b2ece9 (same setup, no flag: the matched control of every arm); c35a2199 (off-shellness column removed) read
+      beside as the other single-input change; Bakar''s MLP (slide numbers in kit_figures.py) as the external reference.'
+    seeds: One seed (42) per arm, D315; cuts set against the 1.0-decade 1e5-vs-9e5 move instead of a seed spread.
+    outcome: 'Per arm against f6b2ece9: yes (the representation is the lever) if d at least 1 decade below the control in
+      the soft or collinear deep bin, or s inside the extrapolating band (soft [-2.5,-1.5], coll [-1.5,-0.5]) where the control
+      is outside, with bulk_test not worse by more than 0.3 decades; the best arm (lowest deep-bin d, ties by bulk_test) is
+      then carried to uugg 1e5 and tt virtual 1e5 from scratch and to B/A_ft. Also read against c35a2199: an arm that beats
+      f6b2ece9 but not c35a2199''s 516 means removing the column did as much. No: every arm within 1 decade of f6b2ece9 and
+      outside the bands, or bulk_test worse by >0.3 decades: the input representation alone does not give extrapolation at
+      1e5 bulk only; next: the target side (Bakar''s standardized log target, early stopping on bulk) and the arms combined
+      with the column removed. Arms disagreeing on soft vs collinear are reported per limit.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
