@@ -22201,8 +22201,7 @@ entries:
       (4) waits for Joaquin''s go on the cost. Disk: 0.7 GB pools + parents against 55 GB free on /sps/lpnhe (read 2026-11-11).'
   step_waits:
     '4': step 6 (driver dsave_s2_drive3 end) and step 7 (the t t~ diagnostic runs; no write-up before its verdict)
-    '6': 'the end of driver dsave_s2_drive3 (pid 807322, log ~/.local/share/ccorch/detached/20261111-174638_dsave_s2_drive3.log):
-      then check 8 trials per search, rerun stage2_readout.py --fetch and plot_stage2.py, write-up'
+    '6': driver dsave_s2_drive3 (pid 807322) finishing the last stage-2 scratch trials
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
