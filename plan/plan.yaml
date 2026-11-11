@@ -22547,6 +22547,15 @@ entries:
       transcript since 2026-11-10 22:00 for deviations, with rule, context and trigger class, counts and 3 structural causes;
       bring him the counts and causes, then decide the setup change with him. Hypothesis on the table: the main session''s
       low reasoning effort.'
+  - at: '2026-11-11T19:04:37+00:00'
+    text: '2026-11-11 ~20:45 open question to Joaquin: the main-session audit (Explore agent, transcript since 2026-11-11
+      02:01 UTC) found 16 deviation kinds, triggers: setup guessed 5, rules conflicting 4, hooks saying what but not who 3
+      (10 occurrences), pressure in his words 2, other 2. Asked which fixes to make: (1) one event rule in both CLAUDE.md
+      files (log-reading acks to the owner, or a mechanical worker when it is closed; the stop check counts routing, not a
+      bare ack); (2) every hook message names who does the work (context guard records only real decisions, the figure gate
+      goes to the owner, a misfiring hook goes to a worker); (3) one source per topic in the reference sections (ordering
+      with drive.py, pruning, the ledger''s verbs). Note: the figure gate fires on non-result tables (this audit table), an
+      instance of cause 2.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
