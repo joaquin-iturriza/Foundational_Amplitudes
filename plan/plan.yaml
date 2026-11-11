@@ -22511,7 +22511,6 @@ entries:
       batch)'
     5: 'Checkpoint + inference package for KIT (Joaquin sends it): best A_ft/B checkpoints, a float64 predict script, log10|M|^2
       out; after the A_ft batch'
-    8: Read the A_ft lr_scale 0.1 check (93ccd2c4 uug, 015da743 uugg, 81a52170 tt virt off) against A_ft at 1.0 and scratch
   done_when: null
   notes_ref: null
   match: kit_*
@@ -22876,13 +22875,7 @@ entries:
       if:
       - 'A_ft best: package A_ft'
       - 'B best: package B'
-    8:
-      feeds: whether pretraining helps extrapolation into the KIT limits (A_ft design)
-      if:
-      - '0.1 reaches band (a): pretraining helps at the fine-tune lr, both lr points reported'
-      - '0.1 in the same band: (b) no change into the limit / (c) hurts stand, bulk transfer read'
   step_waits:
-    '8': FA-ccin2p3-93ccd2c4 FA-ccin2p3-015da743 FA-ccin2p3-81a52170
     '3': '2026-11-12'
     '4': FA-ccin2p3-93ccd2c4 FA-ccin2p3-015da743 FA-ccin2p3-81a52170
     '5': FA-ccin2p3-93ccd2c4 FA-ccin2p3-015da743 FA-ccin2p3-81a52170
