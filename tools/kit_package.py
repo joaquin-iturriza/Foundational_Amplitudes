@@ -135,8 +135,27 @@ def cmd_check(a):
     finally:
         for k in ("DATA_DIR", "SCRATCH"):
             shutil.rmtree(env[k], ignore_errors=True)
+    if a.report:    # a diagnostic read: the deltas are the result, a mismatch is not a failure
+        print(f"REPORT worst {max(worst.values()):.2e}")
+        return
     assert max(worst.values()) < 1e-9, "the package does not reproduce the runs' predictions"
     print("PACKAGE_OK")
+
+
+def _subset(src, small, n_ev):
+    """The first n_ev events of every hard_test and bulk_test stratum of `src`, in its layout, at `small`"""
+    import h5py
+    with h5py.File(src, "r") as f, h5py.File(small, "w") as g:
+        g.attrs["metadata"] = f.attrs["metadata"]
+        for sp in ("hard_test", "bulk_test"):
+            for st in f[sp]:
+                grp = f[f"{sp}/{st}"]
+                # an azimuthal-scan stratum is scored in whole groups of its phi values (evaluate.py)
+                nphi = len(np.unique(grp["phi"][:])) if "phi" in grp else 1
+                n = max(n_ev // nphi, 1) * nphi
+                for k, v in grp.items():
+                    g[f"{sp}/{st}/{k}"] = v[:n]
+    return small
 
 
 def _check_all(a, meta, env, pkg, worst):
@@ -145,17 +164,9 @@ def _check_all(a, meta, env, pkg, worst):
         if a.only and m["run"] not in a.only:
             continue
         own = os.path.join(meta["built_from"], "runs", "kit", m["run"], "kit_benchmark", "predictions.h5")
-        small = os.path.join(env["SCRATCH"], f"{m['run']}_first{a.n}.h5")
-        with h5py.File(kh.h5_path(m["file"]), "r") as f, h5py.File(small, "w") as g:
-            g.attrs["metadata"] = f.attrs["metadata"]
-            for sp in ("hard_test", "bulk_test"):
-                for st in f[sp]:
-                    grp = f[f"{sp}/{st}"]
-                    # an azimuthal-scan stratum is scored in whole groups of its phi values (evaluate.py)
-                    nphi = len(np.unique(grp["phi"][:])) if "phi" in grp else 1
-                    n = max(a.n // nphi, 1) * nphi
-                    for k, v in grp.items():
-                        g[f"{sp}/{st}/{k}"] = v[:n]
+        # --n 0: the benchmark file itself, every event (the pool the job predicted)
+        small = _subset(kh.h5_path(m["file"]), os.path.join(env["SCRATCH"], f"{m['run']}_first{a.n}.h5"), a.n) \
+            if a.n else kh.h5_path(m["file"])
         out = os.path.join(env["SCRATCH"], m["run"])
         # --repo: the repository's own code on the original run dir (code drift since the predictions vs a package defect)
         src = meta["built_from"] if a.repo else pkg
@@ -182,8 +193,9 @@ def main():
     b.add_argument("--runs", nargs="+", required=True)
     c = sub.add_parser("check")
     c.add_argument("--pkg", required=True)
-    c.add_argument("--n", type=int, default=200)
+    c.add_argument("--n", type=int, default=200, help="first n events per stratum; 0: the whole file")
     c.add_argument("--only", nargs="*", default=None, help="these runs only (a quick end-to-end dry run)")
+    c.add_argument("--report", action="store_true", help="print the deltas and exit 0 (a diagnostic, not the gate)")
     c.add_argument("--threads", type=int, default=0, help="OMP_NUM_THREADS of the prediction (is it reproducible?)")
     c.add_argument("--repo", action="store_true", help="predict with the repository's kit_predict on the original runs")
     sub.add_parser("relocate")
