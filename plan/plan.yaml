@@ -22086,6 +22086,11 @@ entries:
       batch)'
     5: 'Checkpoint + inference package for KIT (Joaquin sends it): best A_ft/B checkpoints, a float64 predict script, log10|M|^2
       out; after the A_ft batch'
+    6: 'Input arms (D-next, Joaquin ''Try all of them''): from scratch on ee->uug 1e5, 8000 steps, one seed, against the A
+      run f6b2ece9 and the no-offshell arm c35a2199: (1) log(s_ij/s) of every pair as extra invariant scalar inputs, (2) p_i
+      -> p_i*log(1+x_i/eps)/x_i with x_i = 2 p_i.Q/s, (3) logs of LLoCa local-frame components; implement each as a config
+      flag (exact equivariance kept, a test per flag), design and review, ~1.5 GPU-h each; figures median and log-MSE per
+      bin with legends saying each arm'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -22369,6 +22374,11 @@ entries:
       if:
       - 'A_ft best: package A_ft'
       - 'B best: package B'
+    6:
+      feeds: which input representation lets the network extrapolate into the soft and collinear limits
+      if:
+      - 'an arm follows the truth: run it on uugg and tt, then into the pretrained setup'
+      - 'none does: report with figures, next lever to Joaquin'
   step_waits:
     '2': FA-ccin2p3-78b8190c FA-ccin2p3-03ea3719
     '7': FA-ccin2p3-c35a2199 FA-ccin2p3-ac436bba
