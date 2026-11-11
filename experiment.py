@@ -1593,16 +1593,20 @@ class AmplitudeExperiment(BaseExperiment):
             prepd_means = [float(x) for x in np.atleast_1d(np.asarray(stats["prepd_mean"], dtype=np.float64))]
             prepd_stds  = [float(x) for x in np.atleast_1d(np.asarray(stats["prepd_std"],  dtype=np.float64))]
             per_dataset = bool(stats.get("preprocess_per_dataset", len(prepd_means) > 1))
+            # a fine-tune with fine_tune.target_stats=own refits the whole target transform on its own train split
+            # (below), so only the momentum-side checks apply to the parent's stats
+            _own = (ft_path is not None and not self.warm_start
+                    and str(ft.get("target_stats", "parent")) == "own")
             # the target factor (data.target_propagators) is part of the target these stats
             # were fitted on: a mismatch would rescale the target under the parent's
             # standardization without a trace
             _pf_stats = bool(stats.get("target_physics_factor", False))
             _pf_cfg = bool(self.cfg.data.get("target_physics_factor", False))
-            assert _pf_stats == _pf_cfg, (f"frozen data stats were fitted with target_physics_factor={_pf_stats}, "
+            assert _own or _pf_stats == _pf_cfg, (f"frozen data stats were fitted with target_physics_factor={_pf_stats}, "
                                           f"this run sets {_pf_cfg}")
             # the factor's parameters too, when it is on: each one shifts the target by a per-N constant
             # ((4-N) log s0, (4-N) log of the reference) that the parent's standardization would hide
-            if _pf_cfg:
+            if _pf_cfg and not _own:
                 for _k, _d in (("target_physics_dim_only", False), ("target_physics_eikonal", False), ("target_physics_orders", False),
                                ("target_physics_hybrid", False), ("target_physics_hybrid_blend", 0.0),
                                ("target_physics_s0", 289.0),
@@ -1622,17 +1626,17 @@ class AmplitudeExperiment(BaseExperiment):
                                           f"this run sets {_di_cfg}")
             _vb_stats = bool(stats.get("target_over_born", False))
             _vb_cfg = bool(self.cfg.data.get("target_over_born", False))
-            assert _vb_stats == _vb_cfg, (f"frozen data stats were fitted with target_over_born={_vb_stats}, "
+            assert _own or _vb_stats == _vb_cfg, (f"frozen data stats were fitted with target_over_born={_vb_stats}, "
                                           f"this run sets {_vb_cfg}")
             _tp_stats = bool(stats.get("target_propagators", False))
             _tp_cfg = bool(self.cfg.data.get("target_propagators", False))
-            assert _tp_stats == _tp_cfg, (
+            assert _own or _tp_stats == _tp_cfg, (
                 f"frozen data stats were fitted with target_propagators={_tp_stats}, "
                 f"this run sets {_tp_cfg}")
             # the signed-log scale's shift (stats written before the key were fitted without one): a mismatch would
             # read the frozen signedlog strings under one convention and refit a probe's own under another
             _ss_stats = float(stats.get("signedlog_scale_shift", 0.0) or 0.0)
-            assert abs(_ss_stats - self._signedlog_scale_shift()) < 1e-12, (
+            assert _own or abs(_ss_stats - self._signedlog_scale_shift()) < 1e-12, (
                 f"frozen data stats were fitted with signedlog_scale_shift={_ss_stats}, "
                 f"this run sets {self._signedlog_scale_shift()}")
             LOGGER.info(f"Loaded frozen data stats from {stats_src}")
