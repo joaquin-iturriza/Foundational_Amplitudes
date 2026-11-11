@@ -20956,10 +20956,6 @@ entries:
       runs (8-trial single-fidelity DyHPO scratch + fine-tune per target and D, steps per D from the ladder-rule calibration,
       D391) on e+e- > u u~ and t t~, LO and one-loop V. The parent must hold all four out: neither trial 1262 nor the kit
       held-out parent does (v4_epem_ccx and v4_epem_ccx_nlo, in ee_uu''s equality class, and v4_zp_ee_uu are in both)'
-    7: 't t~ off-shellness diagnostic (design passed 2026-11-11 ~22:00): 16 runs (offown + parscale at the best stage-2 fine-tune
-      HPs, t t~ LO and t t~ V, k=5..8, configs sweep/sweep_config_dsave_diag_*_t8500.yaml @f8134b43, runs in analysis/data_saving/data/stage2_diag_runs.json);
-      read val (RESULT_JSON) and test (stage2_readout.py --diag), own/parscale and parscale/original per cell, figure; then
-      YES/NO per the design'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -21058,11 +21054,6 @@ entries:
         if the inputs change, then the searched runs'
       - 'no option gains: pretrain a parent holding all four out on the current inputs (or confirm one), then the searched
         runs'
-    7:
-      feeds: whether the stage-2 t t~ deficit is the parent-scale off-shellness input
-      if:
-      - 'YES: fix _resolve_offshell_stats for compressed columns, rerun the 16 t t~ fine-tune searches'
-      - 'NO: next suspects dimensionless-mass column scale, optimizer'
   designs:
   - at: '2026-11-10T02:35:09+00:00'
     question: 'Step 1 (D356 horizons, tree arm): on catalog_v4''s held-out tree targets ee->ttbar (H3, 2->2 massive), ee->ccbar
@@ -22221,9 +22212,6 @@ entries:
     '5': step 3 (stage 2 go)
     '6': 'the end of driver dsave_s2_drive3 (pid 807322, log ~/.local/share/ccorch/detached/20261111-174638_dsave_s2_drive3.log):
       then check 8 trials per search, rerun stage2_readout.py --fetch and plot_stage2.py, write-up'
-    '7': FA-ccin2p3-54d416c7 FA-ccin2p3-6d9526c6 FA-ccin2p3-0f3d0423 FA-ccin2p3-e70f826b FA-ccin2p3-36603e2b FA-ccin2p3-c985b447
-      FA-ccin2p3-4a70d55a FA-ccin2p3-a155de3e FA-ccin2p3-e024c471 FA-ccin2p3-9dc2dc3a FA-ccin2p3-23f95abb FA-ccin2p3-c04b81a4
-      FA-ccin2p3-05b47678 FA-ccin2p3-cca42cd5 FA-ccin2p3-b872f220 FA-ccin2p3-4edf6ad3
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
