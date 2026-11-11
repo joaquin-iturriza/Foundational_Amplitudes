@@ -285,7 +285,7 @@
   }
  },
  "dsave_diag_tops_ft_epem_ttx_d8_t8500": {
-  "rid": "FA-ccin2p3-bb248f6b",
+  "rid": "FA-ccin2p3-35922ca9",
   "control": "FA-ccin2p3-7ef89fea",
   "hp_idx": 1387,
   "hp": {
@@ -345,7 +345,7 @@
   }
  },
  "dsave_diag_tops_ft_ee_ttbar_nlo_d8_t8500": {
-  "rid": "FA-ccin2p3-391a6e00",
+  "rid": "FA-ccin2p3-adbd0552",
   "control": "FA-ccin2p3-d67b326e",
   "hp_idx": 406,
   "hp": {
