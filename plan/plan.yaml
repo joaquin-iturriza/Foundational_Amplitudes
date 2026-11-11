@@ -24566,6 +24566,41 @@ entries:
       no loss/preprocessing/HPO in play. Searched for check 5: results.tex for threshold scan, 1506.06864, Coulomb, cross
       section, MG5_aMC, fixed order, kit_threshold (only the star-arm amplitude-level tt threshold probe, l.14765), the entry''s
       findings, site decisions (D353, D363 name no comparison).'
+  - at: '2026-11-11T21:11:49+00:00'
+    question: 'Threshold scan (step 4), its exact-NLO extension: below the lowest beta where MG5_aMC''s fixed-order NLO e+e-
+      -> t t~ runs (smoke FA-ccin2p3-84d3488e: NLO at beta 1.2e-2, none at 1e-3 (soft tests 1, 2 fail), 1.9e-3, 3.5e-3, 6.4e-3
+      (''Poles do not cancel'', MadLoop''s pole check)), is the analytic O(alpha_s) cross section a valid exact sigma_NLO,
+      so the surrogate ratio sigma_NLO^surr/sigma_NLO^exact - 1 and the scale band reach beta 1e-3 as the passed threshold
+      design''s outcome (if lowest passing beta > 1e-2) prescribes? No job: code at d0c3dd59 used by the existing collect
+      step on the 8-part MG5_aMC batch already under the passed threshold design.'
+    prior: 'Passed threshold design (2026-11-11 20:49): MG5_aMC NLO as exact, analytic follow-up named for this case. MG5_aMC
+      points: beta 0.0119 LO 0.02047 NLO 0.4423+-0.00021 pb band +11.2/-9.0%; beta 0.062 (amc_dry) LO 0.1063 NLO 0.5102 band
+      +9.3/-7.5%; beta 0.6 LO 0.6260 NLO 0.7708. results.tex: no sigma(sqrt s) of t t~ (searched threshold scan, Coulomb,
+      cross section, MG5_aMC, fixed order). Literature: vector O(alpha_s) exact, hep-ph/9606230 eq. 34; axial threshold expansion
+      pi^2(1+v^2)/(2v) - 2, hep-ph/9705254 eq. 15.'
+    measure: 'Per sqrt s below the lowest MG5_aMC-NLO beta: sigma_NLO^exact = K(beta) x sigma_LO^quad (KIT-setting quadrature),
+      K = 1 + C_F alpha_s/pi (sigma_V R_V^(1)/R_V^(0) + sigma_A R_A^(1)/R_A^(0))/sigma_LO, V/A split from the gamma/Z couplings
+      of loop_sm (G_F, 1/alpha 132.507, M_Z, Gamma_Z); scale band = alpha_s(mu)/alpha_s(M_Z)-1 read off MG5_aMC''s own band
+      over the correction share (K-1)/K, times (K-1)/K. collect prints CLAIM analytic_vs_mg5_aMC (ratio, MC error, both bands)
+      at every MG5_aMC NLO point and marks analytic points source=analytic; then the same per-model ratio, beta_1pct, beta_10pct,
+      in_scale_band as the passed design.'
+    check: 'Checked on existing data (tests/test_kit_threshold_scan.py, .venv-cpu, 4 pass): vector formula -> 3/4 at v->1
+      (massless) and equals its threshold expansion pi^2(1+v^2)/(2v)-4 to 1e-3 at v 1e-3; analytic LO vs MG5_aMC LO -1e-3..+1e-3
+      at beta 0.012, 0.062, 0.6; analytic NLO/MG5_aMC NLO - 1 = -6.7e-4 at beta 0.0119 (MC error 4.7e-4), -3.1e-4 at 0.062;
+      +1.0e-2 at 0.6 where the axial share is 7.5% and its threshold expansion fails (not used there). Band: 2-loop running
+      gives +11.8/-9.4% vs MG5_aMC +11.2/-9.0 at 0.0119, so the alpha_s variation is taken from MG5_aMC''s band (+11.74/-9.46%
+      of alpha_s, same at both points), reproducing it to 0.1%. Axial share of sigma_LO 2.9e-5 at beta 0.012, so its expansion''s
+      O(v^2) error is < 1e-8 of sigma_NLO below 1.2e-2.'
+    fixed: alpha_s(M_Z) 0.118 at mu_R = M_Z, m_t 173, loop_sm EW defaults, the scan grid (32 beta x 16 cos nodes), sigma_LO
+      from the quadrature of KIT-setting MadLoop Born, the four tt virtual models and sigma[V_surr]-sigma[V_exact] as in the
+      passed design; analytic used only at betas below the lowest beta with an MG5_aMC NLO.
+    control: 'MG5_aMC fixed-order NLO at every beta it runs (the batch''s ~20-28 points) is the analytic''s control: their
+      ratio must stay within 2x MC error up to beta ~0.1 (axial share < 1e-3).'
+    seeds: No training, no seeds; one model per protocol as trained (D315).
+    outcome: 'If analytic/MG5_aMC - 1 is within 2x MC error (or 1e-3) at every MG5_aMC point with beta <= 0.1: the analytic
+      NLO is the exact sigma_NLO below the lowest MG5_aMC beta and the figure and CLAIMs run to beta 1e-3 (analytic segment
+      named in the caption). If not: report the deviation, the scan stays at the MG5_aMC range and the formula is debugged
+      (axial exact form from Jersak-Laermann-Zerwas) before use.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
