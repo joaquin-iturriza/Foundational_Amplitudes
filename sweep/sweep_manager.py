@@ -402,9 +402,6 @@ def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=Fa
     #     GPUs are never allocated to wait for data generation.
     sweep_dep = submit_prebuilds(list(sweep_dirs), dry_run=dry_run)
 
-    weights = {s: reg["sweeps"][s]["weight"] for s in new_items}
-    ordered = assign_rounds(new_items, weights)
-
     if chain:
         try:
             _submit_chained(new_items, reg, registry, sweep_dep, capacity or DEFAULT_CAPACITY, dry_run)
@@ -416,45 +413,41 @@ def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=Fa
             _rebalance(reg, registry, gap, dry_run=dry_run)
         return
 
-    # Sequential-batch fallback: default 3 waves for a lone sweep, off for multi-sweep.
-    if seq_batches is None:
-        seq_batches = 3 if len(new_items) == 1 else 1
-    seq_batches = max(1, min(int(seq_batches), len(ordered)))
-    # Contiguous waves over the round-ordered trials. batch_of[i] is the wave index of the
-    # i-th ordered trial. A lone sweep in 3 waves follows the layout rule (D244): wave 0 is
-    # its random start-up (dyhpo.n_startup of its sweep_config.yaml), the two sequential
-    # surrogate-guided batches split the rest (8 trials, 3 start-up -> 3, 3, 2); otherwise
-    # roughly equal waves.
-    n_start = _startup_of(sweep_dirs[0]) if (len(new_items) == 1 and seq_batches == 3) else None
-    if n_start is not None and not (0 < n_start < len(ordered) - 1):
-        n_start = None
-
-    def _batch_of(i):
-        if n_start is not None:
-            return 0 if i < n_start else 1 + ((i - n_start) * 2) // (len(ordered) - n_start)
-        return (i * seq_batches) // len(ordered)
-
-    print(f"Submitting {len(ordered)} trials across {len(new_items)} sweep(s), "
-          f"interleaved by round (gap={gap})"
-          + (f", in {seq_batches} sequential waves (afterany-chained)" if seq_batches > 1 else "")
-          + ":")
-
-    # 2. sbatch in round order, with provisional nice = round * gap. When seq_batches>1,
-    #    each wave depends (afterany) on all jobs of the previous wave, so DyHPO observes
-    #    before the next wave suggests.
-    prev_batch_jids, cur_batch_jids, cur_batch = [], [], 0
-    for i, (rnd, sweep, (idx, script)) in enumerate(ordered):
-        b = _batch_of(i)
-        if b != cur_batch:
-            prev_batch_jids, cur_batch_jids, cur_batch = cur_batch_jids, [], b
-        nice = rnd * gap
+    # The order of sweep/ordering.py, drive.py's too (D396): each sweep in waves (its start-up trials, then two
+    # guided batches; dyhpo.waves when its config names them, --seq-batches N equal waves), wave k+1 chained afterany
+    # on that sweep's wave k; the queue longest trials first, round-robin across sweeps of equal length (nice by
+    # rank, kept by _rebalance).
+    plan = {}                       # sweep -> [(wave, (idx, script)), ...]
+    minutes = {}
+    for sw, items in new_items.items():
+        n_startup, minutes[sw], waves, n_cfg = _sweep_layout(reg["sweeps"][sw]["dir"])
+        done = len(reg["sweeps"][sw]["jobs"])                      # trials of this sweep submitted before
+        n = max(n_cfg or 0, done + len(items))
+        if seq_batches:
+            k = max(1, min(int(seq_batches), n))
+            waves = [n // k + (1 if i < n % k else 0) for i in range(k)]
+        sizes = ordering.wave_sizes(n, n_startup, waves if waves and sum(waves) == n else None)
+        plan[sw] = [(ordering.wave_of(done + j, sizes), it) for j, it in enumerate(items)]
+    rank = {}
+    for r, sw in enumerate(ordering.dispatch_order({sw: len(v) for sw, v in plan.items()}, minutes)):
+        rank.setdefault(sw, []).append(r)
+    print(f"Submitting {sum(map(len, plan.values()))} trials across {len(plan)} sweep(s) in waves "
+          f"(afterany within each sweep), longest trials first:")
+    wave_jids = {}                  # (sweep, wave) -> job ids
+    for sw in plan:                 # an earlier submission's jobs of this sweep, by wave
+        for jid, info in reg["sweeps"][sw]["jobs"].items():
+            wave_jids.setdefault((sw, info.get("wave", 0)), []).append(jid)
+    todo = sorted(((rank[sw][j], sw, w, it) for sw, v in plan.items() for j, (w, it) in enumerate(v)),
+                  key=lambda x: (x[2], x[0]))                     # earlier waves first, so their ids exist
+    for i, (r, sweep, b, (idx, script)) in enumerate(todo):
+        nice = r * ORDER_NICE_STEP
         cmd = ["sbatch", "--parsable", f"--nice={nice}"]
         deps = []
-        pdep = sweep_dep.get(sweep)
-        if pdep:
-            deps.append(f"afterok:{pdep}")
-        if b > 0 and prev_batch_jids:
-            deps.append("afterany:" + ":".join(prev_batch_jids))
+        if sweep_dep.get(sweep):
+            deps.append(f"afterok:{sweep_dep[sweep]}")
+        prev = wave_jids.get((sweep, b - 1)) if b > 0 else None
+        if prev:
+            deps.append("afterany:" + ":".join(prev))
         if deps:
             cmd.append("--dependency=" + ",".join(deps))
         cmd.append(script)
@@ -468,22 +461,21 @@ def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=Fa
                     stamp_submitted(reg, before)
                     save_registry(registry, reg)
                 raise
-            print(f"  submit limit reached after {i} of {len(ordered)} trials; "
-                  f"{len(ordered) - i} left unsubmitted, `submit` again when the queue drains")
+            print(f"  submit limit reached after {i} of {len(todo)} trials; "
+                  f"{len(todo) - i} left unsubmitted, `submit` again when the queue drains")
             break
-        jid = out.split(";")[0].strip() if out else f"DRY{idx}"
-        cur_batch_jids.append(jid)
+        jid = out.split(";")[0].strip() if out else f"DRY{sweep}{idx}"
+        wave_jids.setdefault((sweep, b), []).append(jid)
         # Only record the submission when it actually happened: a dry-run must not
         # mutate the registry, or it marks these scripts as submitted and a later
         # real submit skips them ("no new trial scripts to submit").
         if not dry_run:
             reg["sweeps"][sweep]["jobs"][jid] = {
-                "trial_idx": idx, "script": script, "round": rnd, "nice": nice, "wave": b,
+                "trial_idx": idx, "script": script, "round": r, "nice": nice, "wave": b, "ordered": True,
             }
             reg["sweeps"][sweep]["submitted_scripts"].append(script)
             save_registry(registry, reg)   # per job: a failure later in the loop must not lose these
-        wtag = f"wave {b} " if seq_batches > 1 else ""
-        print(f"  {wtag}round {rnd:>3}  {sweep}  trial_{idx:04d}  nice={nice}  job={jid}")
+        print(f"  wave {b}  rank {r:>3}  {sweep}  trial_{idx:04d}  nice={nice}  deps={','.join(deps) or '-'}  job={jid}")
 
     # 3. Persist and globally re-interleave everything still pending (fixes nice
     #    across sweeps). Both are no-ops under dry-run.
