@@ -16899,6 +16899,9 @@ entries:
       dir removed at exit, conftest, 105 runners, test_tmp_session_dir.py; push_replay/verify_claims cleanup). Also ''I didn''t
       ask you to restart anything'' after the supervisor and waiter were restarted post-reboot; offered to stop them, no answer
       yet.'
+  - at: '2026-11-11T03:24:37+00:00'
+    text: '2026-11-11: D380 was recorded too broadly (''no agents for the re-cost and the disk question''); Joaquin corrected:
+      ''no agent'' meant only the agent recalculating the GPU-hours. Re-recorded with that scope.'
   handoff:
     state: '2026-11-10: step 20 closed (repo hygiene 1c051019 in maintain; leave-check 9fa60369/700fe4fa registered on SubagentStop
       by Joaquin 5759a43f; guard fix installed, test 1b06ad6f); steps 15, 23 dropped (double wake already fixed by notification_absorb:
