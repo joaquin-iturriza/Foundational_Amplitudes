@@ -85,7 +85,7 @@ def halved():
     return {(r["target"], r["k"]) for r in cal_rows() if r.get("T_D") and str(r.get("dir", "")).endswith("_lrhalf")}
 
 
-def write(name, tgt, k, T, arm, rate, parent, lr_factor=1.0):
+def write(name, tgt, k, T, arm, rate, parent, lr_factor=1.0, offshell="parent"):
     c = lr_centre(T, k) * lr_factor
     space = template_space()
     fixed = {"data.source": "recipes", "data.processes_file": f"${{PROJECT_DIR}}/recipes/catalog_v4_datasaving_{tgt}.yaml",
@@ -102,7 +102,7 @@ def write(name, tgt, k, T, arm, rate, parent, lr_factor=1.0):
                   "high": float(f"{3 * c:.3g}")}] + space
     else:
         fixed.update({"training.lr": float(f"{c:.4g}"), "fine_tune.pretrained_path": f"{parent}/models/model_run0_best.pt",
-                      "fine_tune.target_stats": "own", "fine_tune.offshell_stats": "parent"})
+                      "fine_tune.target_stats": "own", "fine_tune.offshell_stats": offshell})
         space = [{"name": "fine_tune.lr_scale", "type": "float_log", "low": 0.1, "high": 10.0},
                  {"name": "fine_tune.layer_decay", "type": "float_uniform", "low": 0.75, "high": 1.0}] + space
     hours = T * rate / 3600 + OVERHEAD_H
@@ -131,6 +131,8 @@ def main():
     ap.add_argument("--targets", nargs="*", default=TARGETS)
     ap.add_argument("--arms", nargs="*", default=["scr", "ft"])
     ap.add_argument("--stage", default="s2", help="sweep-name stage tag: s2, s3 (the fine-tunes from the D400 parents)")
+    ap.add_argument("--offshell-nlo", default="parent", choices=["parent", "own"],
+                    help="fine_tune.offshell_stats of the one-loop fine-tunes (s3: own, the t t~ V diagnostic read per target)")
     a = ap.parse_args()
     R, hz = rates(), horizons()
     jobs = []
@@ -147,7 +149,7 @@ def main():
     total, half = 0.0, halved()
     for name, t, k, T, arm in jobs:
         p, h = write(name, t, k, T, arm, R[(t, k)], a.parent_nlo if t.endswith("_nlo") else a.parent_lo,
-                     0.5 if (t, k) in half else 1.0)
+                     0.5 if (t, k) in half else 1.0, a.offshell_nlo if t.endswith("_nlo") else "parent")
         total += h
         print(f"{os.path.relpath(p, ROOT)}  {h:.1f} GPU-h")
     print(f"{len(jobs)} sweeps, {total:.1f} GPU-h estimated (8 trials each)")

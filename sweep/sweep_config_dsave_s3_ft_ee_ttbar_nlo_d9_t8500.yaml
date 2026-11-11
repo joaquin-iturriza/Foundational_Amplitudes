@@ -43,7 +43,7 @@ fixed_params:
   training.lr: 0.009882
   fine_tune.pretrained_path: ${PROJECT_DIR}/runs/data_saving/dsave_parent_treesin_r5/models/model_run0_best.pt
   fine_tune.target_stats: own
-  fine_tune.offshell_stats: parent
+  fine_tune.offshell_stats: own
 range_extension:
   enabled: false
 search_space:
