@@ -23460,6 +23460,24 @@ entries:
     text: '2026-11-11 19:17: the weekly usage reset (19:00) has passed: the step held under the main session''s usage narrowing
       (both input flags carried to uugg, tt virtual and tt Born from scratch at 1e5, ~6 GPU-h, design and review) is released;
       resume on the next kit_benchmark wake or by the main session.'
+  - at: '2026-11-11T20:15:51+00:00'
+    text: 'Input carry-over (both flags: model.input_soft_eps=1e-8, model.input_pair_logs=n) from scratch at 1e5, 8000 steps,
+      seed 42, off-shellness on, vs the matched scratch controls: uugg FA-ccin2p3-c364a7ae (n=6) vs 12a9d54b, tt virtual f21fa163
+      (n=4) vs kit_A_ee_tt_virt_finite_n100000_t8000_offon, tt Born 5515dc85 (n=4) vs kit_A_ee_tt_born_n100000_t8000_offon;
+      job_kit.sh A tag=softpair at 909ae494 (design passed after FIX); all three clean (KIT_DONE/RUN_DONE, 0.79/0.55/0.58
+      s/step, at the controls'' rates). Readout tools/kit_readout.py at da352e42 (--vs: per family median log10(arm/control),
+      strata better/worse) on analysis/kit_benchmark/data/kit_fig_A_inputs_carry.json; figures analysis/kit_benchmark/figs/kit_{mse,median}_carry_*.png.
+      uugg: soft median -2.60 (5/5 better; deepest x 1e-7..1e-6 9070 -> 0.411, exponent +16.60 -> -1.93 vs exact -2; Bakar
+      MLP 0.40), coll_gg -1.06 (5/5; 20.5 -> 2.47, exp +0.03 -> -0.95 vs -0.99), coll_qg -0.90 (5/5; 18.4 -> 3.56, exp -0.01
+      -> -0.60 vs -0.97), azimuth -1.06 (3/3; 29.2 -> 3.5), bulk -0.06 (unresolved, 2.27e-3 -> 1.97e-3): YES, every limit
+      gains. tt virtual: Coulomb threshold -0.16 (4/4 better but inside +-0.3: unresolved; deepest 8.62 -> 7.06, exponent
+      -0.03 vs -1.02), Sudakov +1.00 worse (0/3; 15-50 TeV 0.437 -> 7.98), bulk -0.11: NO (Sudakov worse). tt Born: threshold
+      -2.26 (4/4; beta 1e-4..1e-3 2.0e-6 -> 6.9e-9), Sudakov +0.305 (0/3, at the cut edge; 0.066 -> 0.224), bulk -0.02: by
+      the design''s rule NO (a family worse), though the threshold gain is 2.3 decades. Design outcome: uug and uugg flagged
+      models go to KIT and the flags stay in the parent (D392 holds beyond uug); tt virtual and tt Born keep their A/A_ft/B
+      models for KIT and for the threshold scan; the Coulomb rise is still not represented (needs a beta-specific input, next
+      lever), and the flags cost tt at high energy (Sudakov), a cost to watch in the catalog parent''s tt pools. One seed
+      (D315).'
   step_why:
     3:
       feeds: Bakar's fair NLO comparison
