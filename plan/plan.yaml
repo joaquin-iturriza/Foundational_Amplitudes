@@ -21987,6 +21987,12 @@ entries:
     units: null
     start: '2026-11-10T10:29:09+00:00'
     at: '2026-11-10T10:29:09+00:00'
+  - batch: cal_f22
+    wall_h: 1.0
+    jobs: 25
+    units: null
+    start: '2026-11-11T04:11:45+00:00'
+    at: '2026-11-11T04:11:45+00:00'
   handoff:
     state: 'One-loop arm stage 1. Targets (Joaquin''s corrections 2026-11-10): b b~ > Z Z, u u~ > e+e- Z, e+e- > b b~ (constant
       V/B kept: drop only on a measured run). Readout: common test MSE of V/B (vb_test_mse.py), MSE ln|V| beside; T(D) from
