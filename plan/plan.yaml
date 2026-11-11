@@ -22325,6 +22325,13 @@ entries:
       tests/test_drive_retry_failed.py) requeues them with the penalty removed; the running driver (pid 616031) needs a restart
       with it (scratchpad restart_driver.sh): my pkill was refused by the permission classifier. u u~ fine-tunes load the
       .gz parent and train (fe27fb59 past step 3660).'
+  - at: '2026-11-11T12:54:53+00:00'
+    text: '2026-11-11 ~14:05 CET: drive.py has no stop file or clean-exit signal, and the kill was refused by the permission
+      check (Joaquin''s call), so the running driver (dsave_s2_drive, pid 616031) stays. Cost for the 8 t t~ V fine-tune sweeps:
+      waves 2-3 are chosen by the surrogate against 3 failure penalties, not 3 results, and their 3 random start-up trials
+      run last, requeued with drive.py --retry-failed at their run ids (FA-ccin2p3-1d55834c ... 30ef66b6) when the driver
+      ends. If Joaquin restarts the driver himself: scratchpad restart_driver.sh (label dsave_s2_drive2), and step 6''s wait
+      moves there.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
