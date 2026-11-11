@@ -23510,7 +23510,7 @@ entries:
   step_waits:
     '3': '2026-11-12'
     '4': FA-ccin2p3-84d3488e
-    '5': FA-ccin2p3-4f3b24ef
+    '5': FA-ccin2p3-e2d5546b
   handoff:
     state: 'Step 4 threshold scan: design passed (3rd review, code b63843c8, repo review passed at 248077cb). Scan file built
       on CC (runs/kit/threshold_scan/ee_tt.h5: 32 beta in [1e-3,0.6] x 16 cos nodes; our MadLoop at KIT settings reproduces
