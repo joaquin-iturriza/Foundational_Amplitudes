@@ -22379,6 +22379,15 @@ entries:
       reads results from SWEEP_DIR/<sweep>/results on the site, drive.py keeps them in sweeps_local/ on the local machine,
       so drive searches are never pruned (read from code, not tested). Fix after this batch: drive.py also writes results
       where prune.py reads them, or prune.py reads the local copy.'
+  - at: '2026-11-11T18:22:32+00:00'
+    text: '2026-11-11 ~19:30, to keep across compaction: (1) Joaquin mid-turn: ''Why would you be handling each event yourself?
+      There is no reason for you to do that'' - site decide refused the quote twice (not yet in transcript); retry it. Meaning:
+      run events go to the entry''s owner (launch a fresh owner from the hand-off when it is closed) or the supervisor, never
+      handled by the main session. (2) Diverged search trials are now routine: ~/.local/bin/site_runends.py class ''trial''
+      (backup site_runends.bak.prediverge), acked by the supervisor, tested on e64dc4f6 (routine) and 1d55834c (broke); live
+      pass not yet seen. (3) D398: individual divergences never reported to Joaquin. (4) Searches: driver dsave_s2_drive3
+      running; owner closed with hand-off; readout owner launches when the driver ends. (5) KIT owner resumed at 19:17 for
+      the both-flags step.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
