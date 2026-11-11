@@ -23191,7 +23191,7 @@ entries:
     - 3
   owner:
     agent: a0a9411af0a5c385b
-    state: working
+    state: closed
     since: '2026-11-11T22:06:53+00:00'
     state_at: '2026-11-11T23:25:04.204000+00:00'
     context: 183069
@@ -23612,34 +23612,34 @@ entries:
     '5': FA-ccin2p3-6f94590d FA-ccin2p3-2d0c78fe
     '6': FA-ccin2p3-6f94590d
   handoff:
-    state: 'Step 4 threshold scan DONE (finding 2026-11-11, analysis/kit_benchmark/data/kit_threshold_scan.json @e57f28f7,
-      figure analysis/kit_benchmark/figs/kit_threshold_scan.png): B in the NLO band from beta 0.0119, A/A_ft/B_bulk only from
-      0.14-0.21; exact NLO below 0.0119 analytic (tools/kit_threshold_scan.py nlo_analytic, design passed). Step 6 beta input:
-      design passed, runs FA-ccin2p3-3fc1016a (tt virtual) and eb0f30db (tt Born), job_kit.sh A tag=softpairthr ++model.input_soft_eps=1e-8
-      ++model.input_pair_logs=4 ++model.input_pair_threshold=true at e75ca218, no D395 50-step smoke ran for the new flag
-      (same launch path, one new input column; risk: a crash at init or in kit_predict''s rebuild, which would show in minutes);
-      on their end: tools/kit_readout.py --vs the controls f21fa163 / 5515dc85, then kit_threshold_scan.py predict on the
-      tt virtual arm and on f21fa163 (one per site run), collect, figure; decide by the design''s rule. Step 5 KIT package:
-      four package jobs failed, each on a defect in the check or the package contents (KIT_HARDPS_DIR, cache dir, 9 unshipped
-      modules, diagram_couplings.json, azimuthal groups), all fixed (up to bc23db0a); the check now runs on the CC login node
-      one model per call: python tools/kit_package.py check --pkg runs/kit/kit_package_v1 --n 50 --only <run> (package at
-      runs/kit/kit_package_v1 built at 57e0e782; rebuild after code changes: rm the dir and tar.gz, then build with the 10
-      runs listed in models.json). Exact (0.0): uug softpair, tt Born A offoff, tt Born A_ft offoff. MISMATCH vs the runs''
-      own kit_benchmark/predictions.h5 (limit 1e-9): tt Born A softpair 0.41 decades, tt virt A offoff 9e5 1.1e-4, A offoff
-      1e5 1.6e-4, A_ft offon 3.8e-4, B offon 4.4e-5, tt Born B offon 4.7e-6; uugg softpair untested after the group fix (login
-      node times out at 120 s: test in a CPU job). Next: decide whether this is code drift since those predictions were made
-      (the Born sidecar b63843c8, stats rebuilt from bulk_train, off-shellness stats) by running the repo''s own kit_predict
-      on the same subset; fix, then one package job.'
-    decisions: 'Analytic exact NLO used only below the lowest MG5_aMC beta; its alpha_s band variation read from MG5_aMC''s
-      own band (two-loop running differs by ~0.5% of alpha_s). Beta input as a pair-log variant (massive pairs: (p_i+p_j)^2-(m_i+m_j)^2)
-      so massless pairs and existing runs are unchanged. One analytic-vs-MG5 point at 2.3 sigma read as MC fluctuation (neighbours
-      agree).'
-    ruled_out: MG5_aMC fixed-order NLO below beta 0.0119 (soft tests, pole check).
-    running: FA-ccin2p3-3fc1016a, FA-ccin2p3-eb0f30db (beta input, step 6)
-    files: tools/kit_threshold_scan.py, tests/test_kit_threshold_scan.py, tools/kit_package.py, tests/test_kit_package_imports.py,
-      tools/kit_hardps.py, tools/kit_predict.py, wrappers.py (input_pair_threshold), config/model/lloca.yaml, tests/test_input_reps.py,
-      analysis/kit_benchmark/data/kit_threshold_scan.json, analysis/kit_benchmark/fair_nlo_design_draft.sh
-    written: '2026-11-11T21:55:50+00:00'
+    state: 'Step 5 (KIT package): cause found and fixed. Two effects. (1) Pool-keyed test augmentation: experiment._model_momenta
+      applies keyed_aug''s Lorentz augmentation to the test role keyed on the pool''s identity, so a prediction depended on
+      the other events in the scored file; Lorentz-invariant models unaffected (0), softpair-input models up to 0.30 decades
+      on a 50-event subset (confirmed: whole-file GPU re-run d97ae1c0 reproduces the jobs'' predictions to <=1.2e-8). Fix
+      adf1742b: data.unaugmented_roles, rebuild(event_frame=True), used by kit_predict. All 51 KIT runs re-scored (old scores
+      in <run>/kit_benchmark_poolkeyed), figure files re-collected (b007c8de), compared (tools/kit_rescore_compare.py, figure
+      kit_rescore_old_new.png): only tt virt softpair Sudakov deepest 7.98 -> 6.05 and tt Born softpair <=0.006 decades moved;
+      every reported verdict stands (finding 2026-11-12). (2) ~1e-4 CPU deltas for invariant tt virtual models in two runs
+      without OMP_NUM_THREADS set, absent at 1 and 4 threads and on GPU: unresolved, being tested by the package gate 6f94590d
+      (default threads) and a 32-thread check 2d0c78fe. Package v2 (runs/kit/kit_package_v2, built at b6cf1e61, ttvirt_A_best_threshold
+      = the beta-input arm) building + its 1e-9 gate in 6f94590d; on PASS Joaquin sends it (runs/kit/kit_package_v2.tar.gz);
+      on a gate failure read the per-stratum deltas (CPU vs GPU rounding in the deepest bins ~1e-8 would need the limit stated,
+      not hidden). Step 6 beta input DONE (finding 2026-11-12): tt virtual YES (Coulomb -0.325, Sudakov -0.589, bulk -0.775;
+      deepest Coulomb 7.06 -> 3.55, exponent -0.32), tt Born NO (threshold +3.2); threshold scan ratio at beta 1e-3 -0.962
+      vs control -0.989, band from 0.142 for both. New step 6: Coulomb factor on the target side, design not yet written.
+      Step 3 waits on Joaquin''s GPU-budget go.'
+    decisions: 'Inference reads each event unaugmented (identity frame, the event as given) rather than an event-keyed random
+      frame: smallest change, event-only, and the training augmentation''s boost distribution is centred on it. Old predictions
+      kept beside the new for the comparison. The flag is set only by kit_predict through rebuild(event_frame=True); other
+      rebuild users (steer_pool, cross_eval) and training unchanged. kit_package check --report for diagnostic reads (exit
+      0), the build''s gate keeps the assert. Package v2 instead of deleting v1.'
+    ruled_out: Packaging defect (package and repo HEAD gave identical deltas); code drift since the predictions (whole-file
+      re-run exact); CPU-vs-GPU float64 for the invariant models (exact at 1 and 4 threads).
+    running: FA-ccin2p3-6f94590d (package v2 build + gate), FA-ccin2p3-2d0c78fe (32-thread check)
+    files: tools/kit_package.py, scripts/job_kit_package.sh, scripts/job_kit_rescore.sh, tools/kit_rescore_compare.py, tools/rebuild_run.py,
+      tools/kit_predict.py, experiment.py (_model_momenta, data.unaugmented_roles), keyed_aug.py, tests/test_mmap_key.py,
+      tools/kit_figures.py, tools/kit_threshold_scan.py, analysis/kit_benchmark/data/kit_fig_*.json, analysis/kit_benchmark/data/kit_threshold_scan.json
+    written: '2026-11-11T23:34:03+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
