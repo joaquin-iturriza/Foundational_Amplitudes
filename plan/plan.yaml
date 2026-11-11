@@ -22589,6 +22589,26 @@ entries:
     text: 'For the input-arm readout (3fa9854a, 1a14c791, 761cb2d8), Joaquin 2026-11-11: besides the design''s yes/no cut,
       report whether each arm helps in general: bulk test error, every hard bin (soft, collinear), against the control f6b2ece9
       and c35a2199, in the figures.'
+  - at: '2026-11-11T04:38:35+00:00'
+    text: 'Input arms (D374, D376), protocol A from scratch on ee->uug, 1e5 bulk, 8000 steps, seed 42, each = the control
+      f6b2ece9 (off-shellness on) + one Lorentz-exact flag at 06b9353a: pair logs FA-ccin2p3-3fa9854a (model.input_pair_logs=5),
+      soft rescale 1a14c791 (model.input_soft_eps=1e-8), local-frame logs 761cb2d8 (model.input_local_log_eps=1e-8); KIT evaluate.py
+      via kit_predict; tools/kit_readout.py at 2d7d93c4 on analysis/kit_benchmark/data/kit_fig_A_inputs.json (main table,
+      and --vs the control: log10 of arm/control log-MSE per stratum, 5 soft + 5 collinear strata + bulk_test); figures analysis/kit_benchmark/figs/kit_{mse,median}_inputs_ee_uug_me2_{a,b}.png.
+      Deepest bins (x or y 1e-7..1e-6) log10-MSE and exponents (exact soft -2, coll -1), control / pair logs / soft rescale
+      / local logs / no-offshell c35a2199: soft 14180 / 19100 / 0.393 / 4150 / 516, soft exponent +20.18 / -28.90 / -1.86
+      / +10.21 / -1.51; coll 30.1 / 10.1 / 47.2 / 20.0 / 34.5, coll exponent +0.32 / -0.30 / +0.59 / +0.07 / +0.23; bulk_test
+      8.24e-4 / 5.06e-4 / 5.35e-4 / 1.15e-3 / 4.25e-4. Every stratum vs control (median log10 ratio, strata better/worse by
+      >0.3 decades): soft rescale soft -2.88 (5/0, range -4.56..-1.58), coll +0.33 (0/3), bulk -0.19; pair logs soft -0.01
+      (0/0), coll -0.37 (4/0), bulk -0.21; local logs soft -0.12 (2/2), coll -0.04 (0/0), bulk +0.15. Cut: soft rescale passes
+      on soft (4.56 decades below the control in the deepest bin, at Bakar''s MLP 0.32, exponent -1.86 in [-2.5,-1.5]) and
+      gains bulk 0.19 decades, but costs collinear (+0.33 median, exponent +0.59); pair logs fail the 1-decade cut (coll deepest
+      0.48 decades lower, exponent -0.30 outside [-1.5,-0.5]) but gain in general: collinear 4 of 5 strata better by >0.3,
+      bulk -0.21, soft unchanged; local logs no gain (bulk 0.15 worse, bins mixed). Gains (D392, ''incorporate anything that
+      provides a gain''): soft rescale and pair logs; drop local logs. Their combination is not measured: soft rescale''s
+      collinear cost and pair logs'' collinear gain may cancel; next: the combined arm (both flags) on uug 1e5, same design.
+      For a catalog pretraining: input_pair_logs must be the largest multiplicity (pairs index-ordered, zero-padded) and soft
+      rescale takes Q = p_0 + p_1 (beams first, as the catalog rows).'
   step_why:
     1:
       feeds: the pretrained model's numbers for KIT and whether pretraining changes extrapolation into the limits
