@@ -20885,8 +20885,15 @@ entries:
     decision: D360
     covers:
     - pretrain_data_saving
+  - said_at: '2026-11-11T02:56:42.893000+00:00'
+    text: The ones that are literally constant then should be trained only on V.
+    decision: D377
+    answers_after: '2026-11-11T02:50:27+00:00'
+    covers:
+    - pretrain_data_saving
   decisions:
   - D360
+  - D377
   next:
     3: 'Stage 2: one single-fidelity 8-trial DyHPO per (target, D, arm), scratch over the template''s space, fine-tune (full
       retrain + layer decay from the w8 x16 catalog_v4 pretraining best_cov_v4_long_hpo8_cc_68224_trial_1262) over the fine-tune
@@ -20939,6 +20946,8 @@ entries:
     blocks_steps:
     - 3
     - 4
+    answered_at: '2026-11-11T02:56:42.893000+00:00'
+    decision: D377
   - ask: 'Scope: if none of the last seven candidates (bb->bb, bbbar->HZ, bbbar->ccbarH, bg->bgg, gg->bbbar g, ucbar->cbarHu,
       udbar->ccbarW+) has a one-signed virtual, accept a one-loop arm with two targets (bbbar->ZZ, uubar->e+e-Z) instead of
       three?'
@@ -20961,8 +20970,10 @@ entries:
     searched: D370-D373; his messages 2026-11-10T02:08 (no target named), 10:09, 10:13, 10:15 on this target; 2026-10-05T04:33
       and 2026-10-25T17:25 (lr scaling rule, unrelated to the target choice); CLAUDE.md scope rule
     blocks: the re-costing of the data-saving runs (step 6), for ee->bbbar's cells
-    blocks_steps: &id003
+    blocks_steps:
     - 6
+    answered_at: '2026-11-11T02:56:42.893000+00:00'
+    decision: D377
   owner:
     agent: a66d0d73cd29b8da3
     state: stopped
@@ -21877,14 +21888,6 @@ entries:
     files: scripts/job_data_saving.sh, scripts/job_vob_born.sh, analysis/data_saving/{horizons,vb_test_mse,vb_spread,plot_calibration,plot_vb_spread}.py,
       analysis/data_saving/data/vb_spread.json, recipes/catalog_v4_datasaving_{bbx_zz_nlo,uux_epemz_nlo,epem_bbx_nlo,loops}.yaml
     written: '2026-11-10T10:24:01+00:00'
-  ask: 'Scope: ee->bbbar (constant V/B) is now measured: error exactly 0 at every D from D=10, because the standardization''s
-    mean reproduces the constant whatever the network does, so no data saving can be read on it. Keep it in the data-saving
-    runs anyway, or replace it with bbbar->HZ (V/B varies, spread 0.305, V of one sign)?'
-  waiting_since: '2026-11-11T02:50:27+00:00'
-  searched: D370-D373; his messages 2026-11-10T02:08 (no target named), 10:09, 10:13, 10:15 on this target; 2026-10-05T04:33
-    and 2026-10-25T17:25 (lr scaling rule, unrelated to the target choice); CLAUDE.md scope rule
-  blocks: the re-costing of the data-saving runs (step 6), for ee->bbbar's cells
-  blocks_steps: *id003
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
@@ -23679,7 +23682,7 @@ entries:
       about cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID,
       says nothing about the draft's sections)
     blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-    blocks_steps: &id004 []
+    blocks_steps: &id003 []
   owner:
     agent: afb073b8fc9460ec5
     state: stopped
@@ -23697,7 +23700,7 @@ entries:
     cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID, says
     nothing about the draft's sections)
   blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-  blocks_steps: *id004
+  blocks_steps: *id003
   step_why:
     1:
       feeds: the draft's results (D354)
