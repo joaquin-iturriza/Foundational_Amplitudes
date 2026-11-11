@@ -22334,6 +22334,15 @@ entries:
       decades above Bakar''s MLP 0.32 and above the plain arm''s 145; uugg (c) (s +7.8 > +1, d within 1 decade): the runaway
       there is not the column''s. The families disagree; neither learns the collinear limit. Next: the momentum representation
       (log invariants) is the lever for both; A_ft keeps the parent''s inputs (its off arms hold the column at 0).'
+  - at: '2026-11-11T02:35:39+00:00'
+    text: '2026-11-11 ~03:30 told Joaquin (open question to him, no answer yet): input options for the KIT limits, ranked:
+      (1) log(s_ij/s) of every pair as extra invariant scalar inputs (collinear; generalises the off-shellness column), (2)
+      per-momentum invariant rescale p_i -> p_i*log(1+x_i/eps)/x_i with x_i = 2 p_i.Q/s (soft), (3) logs of LLoCa local-frame
+      components (invariant by construction; models/lloca.py hook not checked). Each from scratch on uug 1e5, ~1.5 GPU-h,
+      against the existing A runs. Asked: which to try, or wait for the A_ft fine-tunes (launching 2026-11-11 morning). Also
+      told him: wake batching did not cut usage (2.3->4.6 wakes/h, 1.18M->1.33M tokens/wake; tests/test_run_done_waiter.py::test_quiet_waiter
+      fails; replay says 126->57 wakes at 10 min), main cost is the main session''s ~500k context; fix deferred past the 19:00
+      reset.'
   step_why:
     1:
       feeds: the pretrained model's numbers for KIT and whether pretraining changes extrapolation into the limits
