@@ -21014,7 +21014,7 @@ entries:
     decision: D377
   owner:
     agent: add29192e1ba98d5b
-    state: stopped
+    state: closed
     since: '2026-11-11T12:02:47.553000+00:00'
     state_at: '2026-11-11T16:43:36.689000+00:00'
     context: 199557
@@ -22418,34 +22418,31 @@ entries:
     start: '2026-11-11T12:07:49+00:00'
     at: '2026-11-11T12:07:49+00:00'
   handoff:
-    state: 'Parents r4 running on CC (2026-11-11 ~11:35 CET): FA-ccin2p3-e8425579 = scripts/job_datasaving_parent.sh @361f8bef
-      -- heldout ++model.input_soft_eps=1e-8 ++model.input_pair_logs=6 tag=r4 lr=9.248e-3 (run dir runs/data_saving/dsave_parent_heldout_r4);
-      FA-ccin2p3-938b05ab = same with treesin lr=9.240e-3 (dsave_parent_treesin_r4); 02:30, 32G, ~1 s/step on V100, ~1 h (wall
-      target 1 h recorded, batch dsave_parents). Step 6 waits on both. A detached log read (parents_r4_25min_log) at ~12:00
-      resumes the owner: confirm no ''Skipping update, non-finite'' runs and val_loss_no_reg falling (r3 at 1.88e-2: heldout
-      -1.03 at step ~830 then inf grads, diverged step 1001; treesin val 1e12 spikes). If r4 also diverges: halve again (4.6e-3)
-      or check whether the D392 flags drive it (r3 inf grads started after ~900 steps). When both end cleanly: python sweep/gen_data_saving.py
-      --parent-lo runs/data_saving/dsave_parent_heldout_r4 --parent-nlo runs/data_saving/dsave_parent_treesin_r4 (on CC via
-      site run, configs dsave_s2_*, commit), check the ft configs carry the parent''s input flags (base_config = parent config.yaml),
-      site pick FA --jobs N, plan target, then sweep/drive.py --item pretrain_data_saving over the 68 configs (waves 3,3,2)
-      at site pick''s width; ~208 GPU-h (item estimate 215, D392/D394). Then step 4 readout (dstar_fit.py + saving() driver,
-      vb_test_mse.py), figures, write-up. CC 60 GB free at 10:10. Data: 2754+35 train pools and 2862 alpha_s sidecars copied
-      lxplus->CC today after the amp_data_cache trim; check_site_data --list --alphas clean on both parent recipes and catalog_v4_train
-      (ee_uu, v4_epem_ttx alpha_s^0, exempt).'
-    decisions: 'D392 both input flags in (kit_benchmark verdict on c15b3337), passed with ++ (trial 1262 config predates the
-      keys); D393 1e4/pool x 5 epochs; two parents (heldout for LO, treesin for one-loop). Repair inside approval: parent
-      lr from HPO rule 2 centre 1e-2 (T/3000)^-0.55 instead of the law''s 1.88e-2 after both r3 parents diverged. Missing
-      pools restored by copy from lxplus, not regenerated (898 core-h MadEvent avoided); 73 one-loop pools rebuilt on CC today
-      got lxplus''s alpha_s after a momentum md5 check (56 byte-identical, 17 differ only in |M|^2). Login-node CPU dry runs
-      of the parent abandoned (coordinator): login /tmp and run-dir collisions, not our code.'
-    ruled_out: Parent lr 1.88e-2 (diverged at step ~1000, r3); plain model.* overrides of the input flags (struct error);
-      regenerating the trimmed pools; login-node CPU dry run of a 1135-pool parent; prune.py main on an lxplus worker (condor_q
-      fails; job_prune_dryrun.sh runs prune.caches alone, @1dceb66b, lxplus dry run lists 0 files).
-    running: FA-ccin2p3-e8425579 (heldout parent r4), FA-ccin2p3-938b05ab (treesin parent r4), detached parents_r4_25min_log
-    files: scripts/job_datasaving_parent.sh (@361f8bef, tag= and lr= args), scripts/job_prune_dryrun.sh, sweep/prune.py (CACHE_DRY),
-      sweep/gen_data_saving.py, recipes/catalog_v4_datasaving_parent_{heldout,treesin}.yaml, analysis/data_saving/{horizons.py,dstar_fit.py,vb_test_mse.py,plot_horizons.py},
-      analysis/data_saving/data/{dstar_calib.json,horizons_cal_f22_cal_f22_lrhalf.json,horizons_cal2_ladder.json,vb_test_mse_cal_vb.json}
-    written: '2026-11-11T10:31:22+00:00'
+    state: 'Stage 2 running on CC (2026-11-11 17:46 CET): 68 single-fidelity 8-trial DyHPO sweeps (4 targets x D x {scratch,
+      fine-tune}), configs sweep/sweep_config_dsave_s2_*.yaml @7d6af9b3 (gen_data_saving.py, parents ${PROJECT_DIR}/runs/data_saving/dsave_parent_{heldout,treesin}_r4,
+      both clean: FA-ccin2p3-e8425579, 938b05ab), driven by sweep/drive.py @bc735802 as detached dsave_s2_drive3 (pid 807321,
+      log ~/.local/share/ccorch/detached/20261111-174638_dsave_s2_drive3.log, --sites ccin2p3, launched by scratchpad restart_driver3.sh).
+      Wall target 4 h on 52 GPUs (batch dsave_s2), ~207 GPU-h (D392/D394, item est 215). History: drive1 (t t~ V fine-tunes
+      crashed at init, fixed a08fef9d), drive2 (Joaquin restarted with longest-first dispatch 5401490e and --retry-failed
+      for those 24), drive3 after the CC access loss 17:14 (94 requeued, 16 recollected, 1 real blow-up kept). Divergences
+      so far are real outcomes at window edges: fine-tunes at lr_scale 8.5-9.1 (ff202789, 7fdc6fa7, ae0826ee, 05384f67), scratch
+      t t~ V D=5e4 at 2.65c (3cc8ed82). Next: when the driver ends (step 6), check every sweep has 8 finished trials (sweeps_local/dsave_s2_*/driver_state.json;
+      requeue any lost at their HPs with --retry-failed after reading the log), then step 4 readout: best trial per cell,
+      dstar_fit.py joint fit + bootstrap S, vb_test_mse.py for the one-loops, figures (figure-style), write-up in docs/results.tex
+      replacing draft Fig. 22.'
+    decisions: 'Design amended and passed 12:12 UTC: lr centre c follows HPO rule 2''s inverted U below t*=3000 (8 of 34 cells
+      lowered, up to 4.0x; t t~ LO D=10 6.10e-3), t t~ V D=1e4 centres on c/2 (its calibration blew up at c). D=5e4 t t~ V
+      kept at c (calibration trained cleanly at 9.88e-3). Trials on CC only (parents live there). experiment.py a08fef9d:
+      fine_tune.target_stats=own skips the parent stats'' target-side checks. drive.py: --retry-failed (214a90ba), longest-first
+      round-robin dispatch (5401490e, asked by Joaquin), --recollect and lost trials in --retry-failed (bc735802); tests tests/test_drive_retry_failed.py,
+      tests/test_drive_dispatch_order.py.'
+    ruled_out: 'Killing the driver by pkill (refused by the permission check; restarts are Joaquin''s or the coordinator''s
+      under D397); c/2 for t t~ V D=5e4 (its centre trained in calibration); treating the 27 no-log FAILED trials as real
+      (no log at all: the job could not write it during the access loss).'
+    running: dsave_s2_drive3 (pid 807321) over the 68 dsave_s2_* sweeps on CC
+    files: sweep/gen_data_saving.py, sweep/sweep_config_dsave_s2_*.yaml, sweep/drive.py, experiment.py, tests/test_drive_retry_failed.py,
+      tests/test_drive_dispatch_order.py, analysis/data_saving/{dstar_fit.py,vb_test_mse.py,horizons.py}, analysis/data_saving/data/{dstar_calib.json,horizons_cal_f22_cal_f22_lrhalf.json,horizons_cal2_ladder.json}
+    written: '2026-11-11T16:47:18+00:00'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
