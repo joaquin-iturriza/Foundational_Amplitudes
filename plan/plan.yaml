@@ -21982,6 +21982,16 @@ entries:
       trial 1262''s 68,224-step schedule via the KIT parent, unquestioned. Promised: the parent''s length is set from the
       pretraining of draft Fig. 22''s 8- and 25-process foundations (to check), before submission; the GPU-type question (V100
       vs H100) is secondary.'
+  - at: '2026-11-11T04:22:04+00:00'
+    text: '2026-11-11: (1) Parent length: trial 1262 trained 68224 steps in 17.58 h (sweeps/cov_v4_long_hpo8_cc_68224/results/hp1262_t68224_1793686584.json
+      traintime_hours) = 0.93 s/step on gpu_v100 (sacct: trial jobs 62936981/2 on ccwgslurm0106, 19.3 h), the same V100 rate
+      as the KIT pretrainings 62c2443b/d0b132b6 (0.94/0.85 s/step, Tesla V100-SXM2-32GB): the 18-24 h comes from the 68224-step
+      schedule over ~1150 pools at batch 16384, not the GPU type; 0.474 s/step is not the parent''s rate. (2) Draft Fig. 22
+      foundations (results.tex sec:transfer, 9262-9271): the 8-process one includes both targets'' LO, 94k steps at batch
+      16384; the 25-process one excludes both targets, 15k steps at batch 1024 (~20 min, ~1.2 epochs). The new held-out parent
+      (recipes/catalog_v4_datasaving_parent_heldout.yaml) takes the target-excluding foundation''s length, 15000 steps (cosine,
+      the parent''s lr law at T=15000), at the parent''s batch 16384: ~3.9 h on V100 at 0.93 s/step. Submitted only after
+      kit_benchmark''s input arms are read (step 6).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
