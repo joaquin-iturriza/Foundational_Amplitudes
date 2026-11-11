@@ -21943,7 +21943,7 @@ entries:
     '3': '2026-11-12'
     '4': '2026-11-12'
     '5': step 3 (stage 2 go)
-    '6': FA-ccin2p3-c15b3337 FA-ccin2p3-4782624f FA-ccin2p3-a46978e2
+    '6': copy_parent_pools_lxplus_to_cc
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
