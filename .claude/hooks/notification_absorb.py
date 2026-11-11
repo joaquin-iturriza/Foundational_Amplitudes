@@ -17,7 +17,7 @@ a background command, typed text) passes untouched. A crash exits 1 (non-blockin
 
 Hand-back batching (D324, Joaquin 2026-11-07: "10 minutes seems reasonable"): a prompt that is one agent's hand-back
 and nothing else, arriving in the main session (no agent_id) while its events waiter (`site events --wait`, pid file
-~/.local/share/ccorch/events_waiter.FA.pid) is alive and was started after `site` last changed, is written to ~/.local/share/ccorch/spool/FA/ and opened as a
+~/.local/share/ccorch/events_waiter.FA.pid) is alive, is written to ~/.local/share/ccorch/spool/FA/ and opened as a
 routine HANDBACK event (`site event`); the prompt is blocked. The waiter collects routine events for a fixed
 --debounce window (600 s) from the first, then prints each spooled report in full and acks it: hand-backs, run ends and
 other routine events of one 10-minute window wake the main session once. No waiter alive, a failed `site event`, a
@@ -70,7 +70,9 @@ def verdict(prompt, transcript):
     return True, agent
 
 
-HANDBACK = re.compile(r'\AAnother Claude session sent a message:\s*<agent-message from="(a[0-9a-f]{16})">\s*'
+# the hook receives the bare `<agent-message ...>` (absorb.log 2026-11-11T19:55Z); the transcript records it with the
+# harness's "Another Claude session sent a message:" line before it: both match
+HANDBACK = re.compile(r'\A(?:Another Claude session sent a message:\s*)?<agent-message from="(a[0-9a-f]{16})">\s*'
                       r'\[Subagent hand-back\]')
 TRAILER = 'That "other Claude session" is an agent working inside this same session'
 CCORCH = os.path.expanduser(os.environ.get("NOTIFY_CCORCH_HOME", "~/.local/share/ccorch"))
@@ -89,10 +91,10 @@ def proc_start(pid):
 
 
 def waiter_alive(project=PROJECT):
-    """The project's events waiter is armed with code that knows HANDBACK: its pid file names a live `site events
-    --wait` process (the start ticks it recorded match the live process's, so a reused pid does not pass) that
-    started after `site` was last changed (an older waiter runs the old code, which treats HANDBACK as urgent and
-    neither prints the report nor acks it)."""
+    """The project's events waiter is alive: its pid file names a live `site events --wait` process whose start ticks
+    match the ones it recorded (a reused pid does not pass). Liveness only: the earlier test that it started after
+    `site` last changed went false at every edit of `site` until the waiter was re-armed (agent_redesign step 23);
+    every waiter since 2026-11-09 knows HANDBACK."""
     try:
         f = open(os.path.join(CCORCH, "events_waiter.%s.pid" % project)).read().split()
         pid = int(f[0])
@@ -102,10 +104,7 @@ def waiter_alive(project=PROJECT):
     st = proc_start(pid)
     if not ("events" in cmd and "--wait" in cmd) or not st or (len(f) > 1 and f[1] != st[0]):
         return False
-    try:
-        return st[1] >= os.stat(SITE_BIN).st_mtime
-    except OSError:
-        return False
+    return True
 
 
 def handback_of(prompt):

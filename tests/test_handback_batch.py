@@ -33,6 +33,9 @@ HB = ('Another Claude session sent a message:\n<agent-message from="%s">\n[Subag
 
 def test_handback_of():
     assert na.handback_of(HB) == A
+    # the form the hook really receives (absorb.log 2026-11-11T19:55Z): no "Another Claude session" line before it
+    assert na.handback_of(HB.split("sent a message:\n", 1)[1]) == A
+    assert na.handback_of(HB.split("sent a message:\n", 1)[1].split("\n\nThat")[0]) == A
     assert na.handback_of(HB.split("\n\nThat")[0]) == A                         # no trailer
     assert na.handback_of(HB + "\n\nJoaquin typed this") is None                 # something after the note
     assert na.handback_of(HB.replace("[Subagent hand-back]", "Please re-check")) is None   # a peer message, not a report
@@ -81,23 +84,25 @@ def test_hook_spools_only_with_live_waiter():
     p = fake_waiter(alive=True)
     try:
         os.utime(na.SITE_BIN_TEST, (time.time() + 3600, time.time() + 3600))
-        assert run_hook(data, site) == "", "a waiter that started before its site code changed: passes"
+        assert na.waiter_alive(), "an edit of site after the waiter started no longer disables batching (step 23)"
         os.utime(na.SITE_BIN_TEST, (time.time() - 3600, time.time() - 3600))
         assert na.waiter_alive(), "a waiter started after the change"
         start = na.proc_start(p.pid)[1]
         assert abs(start - time.time()) < 30, "real start time, not the /proc inode's ctime: %.0f s off" % (
             start - time.time())
         os.utime(na.SITE_BIN_TEST, (start + 5, start + 5))
-        assert not na.waiter_alive(), "site changed 5 s after the waiter started"
+        assert na.waiter_alive(), "site changed 5 s after the waiter started: still alive"
         os.utime(na.SITE_BIN_TEST, (0, 0))
         assert run_hook(dict(data, agent_id="a0123456789abcdef"), site) == "", "inside an agent: passes"
         assert run_hook(dict(data, prompt="what is the state?"), site) == "", "typed text: passes"
         out = json.loads(run_hook(data, site))
         assert out["decision"] == "block" and A in out["reason"], out
+        bare = json.loads(run_hook(dict(data, prompt=HB.split("sent a message:\n", 1)[1]), site))
+        assert bare["decision"] == "block" and A in bare["reason"], "the hook's real prompt form is spooled too"
         call = open(log).read().strip().splitlines()[-1]
         assert "--kind HANDBACK" in call and "handback:%s:" % A in call and "| report: " in call, call
         spooled = call.split("| report: ")[1].strip()
-        assert open(spooled).read() == HB
+        assert open(spooled).read() == HB.split("sent a message:\n", 1)[1]   # the last call spooled the bare form
         bad, _ = stub_site(1)
         assert run_hook(data, bad) == "", "site event failed: the prompt goes through"
     finally:
