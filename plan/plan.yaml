@@ -22298,12 +22298,6 @@ entries:
   decisions:
   - D363
   next:
-    1: 'A_ft (design passed ~11:10 UTC): 12 fine-tunes from runs/kit/kit_pretrain_heldout, queued as site launch kit_aft_heldout
-      (scripts/launch_kit_aft.sh at caeda81a) on the heldout resume FA-ccin2p3-78b8190c''s RUN_DONE (ETA ~02:00 UTC 2026-11-11);
-      scratch controls tt Born/virtual on n=1e5 FA-ccin2p3-b3d27208, d083f5da running; on the batch''s end: read the first
-      job''s lr line, readout with tools/kit_readout.py, figures kit_figures.py (A_ft beside its scratch control, caption
-      per curve scratch or pretrained; the A figures redrawn with the tighter legend room), per the design''s bands, with
-      the lr_scale 0.1 check before any ''no help'''
     3: 'Fair NLO D-scan (Bakar): ee->tt virtual, 1e2..1e4 bulk one-loop target points, fine-tuned from the fair_nlo parent
       against a from-scratch V/B with exact Born refit on the KIT ee_tt virtual bulk; design once FA-ccin2p3-03ea3719 ends'
     4: 'Threshold scan (Gudrun): sigma(sqrt s) of ee->tt around 2m_t at LO and NLO like Fig. 1 of arXiv:1506.06864: exact
@@ -22625,11 +22619,6 @@ entries:
       KIT''s threshold range is the next suspect, design branch c). Not final: the design''s lr_scale 0.1 check (93ccd2c4
       uug, 015da743 uugg, 81a52170 tt virtual off, submitted) decides b/c.'
   step_why:
-    1:
-      feeds: the pretrained model's numbers for KIT and whether pretraining changes extrapolation into the limits
-      if:
-      - 'A_ft >=1 decade below scratch in deep bins or exponent in band: pretrained model goes to KIT, B continues from A_ft'
-      - 'within 1 decade or worse: rerun 3 cells at lr_scale 0.1 before reporting no help'
     3:
       feeds: Bakar's fair NLO comparison
       if:
@@ -22658,8 +22647,6 @@ entries:
   step_waits:
     '7': FA-ccin2p3-c35a2199 FA-ccin2p3-ac436bba
     '8': FA-ccin2p3-c35a2199 FA-ccin2p3-ac436bba
-    '1': 'FA-ccin2p3-53dc387b FA-ccin2p3-69d93512 FA-ccin2p3-67fadb15 FA-ccin2p3-f26df51b FA-ccin2p3-1416e62f FA-ccin2p3-30b7aa28
-      FA-ccin2p3-9957b9d6 FA-ccin2p3-eac27314 FA-ccin2p3-24d9729a FA-ccin2p3-fe485120 FA-ccin2p3-dcb7ecb0 FA-ccin2p3-1bd861e0 '
     '3': '2026-11-12'
     '4': FA-ccin2p3-1416e62f FA-ccin2p3-1bd861e0 FA-ccin2p3-24d9729a FA-ccin2p3-30b7aa28 FA-ccin2p3-53dc387b FA-ccin2p3-67fadb15
       FA-ccin2p3-69d93512 FA-ccin2p3-9957b9d6 FA-ccin2p3-dcb7ecb0 FA-ccin2p3-eac27314 FA-ccin2p3-f26df51b FA-ccin2p3-fe485120
