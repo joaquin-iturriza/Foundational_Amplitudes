@@ -22341,6 +22341,12 @@ entries:
       run last, requeued with drive.py --retry-failed at their run ids (FA-ccin2p3-1d55834c ... 30ef66b6) when the driver
       ends. If Joaquin restarts the driver himself: scratchpad restart_driver.sh (label dsave_s2_drive2), and step 6''s wait
       moves there.'
+  - at: '2026-11-11T15:08:36+00:00'
+    text: '2026-11-11 ~14:40 CET: stage-2 divergences so far: 3, all fine-tunes at the top of the lr_scale window [0.1, 10]:
+      ff202789 (ft u u~ V D=1e4, lr_scale 8.61), 7fdc6fa7 (ft t t~ LO D=1e3, 8.51), ae0826ee (ft t t~ LO D=1e5, 9.09, step
+      1112). Against finished trials (driver states): ft u u~ LO 0/34, ft u u~ V 1/39, ft t t~ LO 1/21 (+ ae0826ee not yet
+      collected), ft t t~ V 0/9 real (the 24 init crashes excluded), scratch none. One edge of the window, a few trials: a
+      real outcome of high fine-tune lr (~9c), not a window defect; the sampler holds their penalties.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
