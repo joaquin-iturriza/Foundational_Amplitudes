@@ -37,7 +37,8 @@ EXTRA = ["keyed_aug.py", "multiplicity_extrap.py", "physics_scales.py",
          "tools/kit_package.py", "tools/nlo_conventions.py",
          # imported by the code above but outside publish_main's public paths (tests/test_kit_package_imports.py)
          "data_mmap.py", "dirlock.py", "diagram_graphs.py", "optim/__init__.py", "mix_compose.py", "optim/muon.py", "tools/nlo_virtual_pipeline.py",
-         "tools/pool_physics.py", "tools/synthetic_amplitudes.py"]
+         "tools/pool_physics.py", "tools/synthetic_amplitudes.py",
+         "analysis/catalog_daniel/data/diagram_couplings.json"]   # read at init (data.target_physics_couplings)
 RUN_FILES = ["config.yaml", "data_stats.json", "particle_tokenizer.json", "base_shapes.bsh"]
 README = """FA surrogate models for the KIT hard phase-space benchmark (models.json lists them).
 
@@ -141,6 +142,8 @@ def cmd_check(a):
 def _check_all(a, meta, env, pkg, worst):
     import h5py
     for m in meta["models"]:
+        if a.only and m["run"] not in a.only:
+            continue
         own = os.path.join(meta["built_from"], "runs", "kit", m["run"], "kit_benchmark", "predictions.h5")
         small = os.path.join(env["SCRATCH"], f"{m['run']}_first{a.n}.h5")
         with h5py.File(kh.h5_path(m["file"]), "r") as f, h5py.File(small, "w") as g:
@@ -171,6 +174,7 @@ def main():
     c = sub.add_parser("check")
     c.add_argument("--pkg", required=True)
     c.add_argument("--n", type=int, default=200)
+    c.add_argument("--only", nargs="*", default=None, help="these runs only (a quick end-to-end dry run)")
     sub.add_parser("relocate")
     a = ap.parse_args()
     {"build": cmd_build, "check": cmd_check, "relocate": cmd_relocate}[a.cmd](a)
