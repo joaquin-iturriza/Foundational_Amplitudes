@@ -154,6 +154,9 @@ def arm_label(r, with_n=True):
            "B_bulk": "scratch + bulk steps"}[r["mode"]]
     lab = f"{how}, {n} bulk" if with_n else how
     tag = r["tag"]
+    if tag.endswith("lr0p1"):   # the A_ft design's lr-axis check (KIT_LR_SCALE=0.1)
+        lab += r", lr $\times0.1$"
+        tag = tag[:-len("lr0p1")].rstrip("_")
     if tag in ("offoff", "nooffshell"):
         lab += ",\nno off-shell input"
     elif tag == "plain":
