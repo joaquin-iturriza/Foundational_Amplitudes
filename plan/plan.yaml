@@ -22568,6 +22568,25 @@ entries:
       goes to the owner, a misfiring hook goes to a worker); (3) one source per topic in the reference sections (ordering
       with drive.py, pruning, the ledger''s verbs). Note: the figure gate fires on non-result tables (this audit table), an
       instance of cause 2.'
+  - at: '2026-11-11T19:10:13+00:00'
+    text: '2026-11-11 ~22:10 CET, t t~ checks asked by Joaquin (readout stage2_readout.py @f8134b43). (1) Input stats: the
+      fine-tunes take the parent''s momentum stats (mom_mean 0.348 vs own 0.386), dimensionless-mass stats (parent [-1.27,
+      0.70] vs t t~ own [-0.90, 0.36]: 2x compression) and the parent''s off-shellness scale on the Z column (parent std 9.77
+      vs t t~ LO own 0.0177, t t~ V 0.0145: 550-670x compression; t t~ V top column 9x); on u u~ the Z column''s own std 8.75/6.81
+      (1.1-1.4x) and the mass column is constant. Tokenizer from the parent (vocab 36 vs 5) is unused (use_PIDs false). (2)
+      a08fef9d bypass: under target_stats=own both arms refit the target transform identically (prepd mean/std equal in each
+      cell, log transform, physics factor ON for LO and OFF with V/B for t t~ V in both arms); ln raw_pred - ln raw_truth
+      = (pred-truth) x prepd_std to <4e-7 in both arms, so the test readout inverts the trained transform. (3) Readout: both
+      arms read the same test rows (pool_row sets identical), row-matched to the pool''s own target to <9e-7; one-event dominance
+      is real in both arms (scratch t t~ LO D=316 worst event 0.26 of 0.27 sum: row 4429, also the worst in 4 other scratch
+      cells) and moves single cells, not the trend: fits on val (no test outliers) give the same S (t t~ LO 0.52, t t~ V 0.41).
+      (4) lr windows: t t~ LO fine-tune bests at lr_scale 0.21-1.25, scratch at 0.37-1.64c, not at an edge; divergences sit
+      at lr_scale 6.7-9.7, above every best; within-search loss varies 10-100x between neighbouring HPs (figs stage2_lrval_*.png).
+      (5) Parents: sound, per-process test MSE(ln|M|^2) after the sigma stage median 0.13 (q10 7e-3, q90 1.3), gg > t t~ 1e-5,
+      treesin''s e+e- > t t~ 5.8e-6; fine-tunes load models/model_run0_best.pt (pre-sigma; mu identical, only the sigma head
+      differs, retrained anyway). The fine-tune''s loss to scratch is t t~ specific: ft/scr best val 6-33x at D=316..1e4 on
+      t t~ LO and V, while u u~ fine-tunes win 0.01-0.4x at every D (fig stage2_ratio.png). Diagnostic of the off-shellness
+      compression submitted (design PASS): 16 runs, step 7.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
