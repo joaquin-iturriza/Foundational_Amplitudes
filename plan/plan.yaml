@@ -24000,6 +24000,15 @@ entries:
       worse, bulk not worse): its flagged model goes to KIT and (tt virtual) to the threshold scan; the flags stay in the
       parent. Unresolved or worse on tt: tt keeps its A/A_ft/B models for KIT, and the threshold/Coulomb limit needs a beta-specific
       input, reported as the next lever; the parent keeps the flags if uug/uugg gain. Mixed families reported per family.'
+    passed_at: '2026-11-11T18:21:14+00:00'
+    reviewer: 'Re-check after FIX. Outcome now has a 0.3-decade cut (family median below -0.3 with most strata better by >0.3,
+      bulk not above +0.3, inside +-0.3 unresolved, keep A/A_ft/B models); the seed spread it cites is confirmed at results.tex
+      l.1294-1299 (0.09/0.12 and 0.11/0.08 decades between seeds), so 0.3 is 2.5-3.7x that, with the KIT-bins-no-noisier assumption
+      stated. Check 2: the flags moved this readout on uug by 2.71/1.25/0.88 decades (c15b3337 vs f6b2ece9). Unchanged from
+      the first review: one change (both flags, n the multiplicity) against matched scratch controls (same job_kit.sh A, lr,
+      seed 42, HETEROSC, float64, off-shellness on); 50-step launch rule (D395) not needed, since c15b3337 ran this path end
+      to end and each dataset ran A mode in its control. Searched results.tex for soft rescale, pair log, input_pair, softpair,
+      uugg/tt inputs, plus the entry''s findings: no prior on uugg/tt.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
