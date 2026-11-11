@@ -22757,6 +22757,15 @@ entries:
       augmented val/test events: no scoring effect enters r5/r4 or ft/scr. It can shift the level of the smallest test MSEs
       (tt Born max |dlog10| 1.5e-4, i.e. (ln)^2 up to ~1.2e-7 per event, near the 1e-8-1e-9 t t~ LO reads at D>=1e3) for all
       arms alike; an event-frame rescore (data.unaugmented_roles) would be a separate read of every arm.'
+  - at: '2026-11-11T23:48:32+00:00'
+    text: '2026-11-12 D400 stage A read (diag_readout.py tops @e190a6c1, fig figs/stage2_diag_tops.png): val mu-MSE r5-parent
+      fine-tune / r4-parent same-HP rerun, D=316,1e3,3162,1e4: t t~ LO 1.89, 0.30, 0.09, 0.06 (test 1.70, 0.06, 0.01, 0.04),
+      t t~ V 0.43, 1.94, 1.43, 11.6 (test 0.40, 1.87, 1.73, 0.10). Pre-set pooled rule: 4 of 8 below, geomean 0.68 >= 1/1.5:
+      NO (stage B not proposed by the design). Per target: LO geomean 0.24 val / 0.08 test, beyond the 0.46-4.84 rerun spread
+      in 2 cells; LO fine-tune over stage-2 scratch best now 11.7, 3.9, 0.77, 0.75 (was 6.1, 12.5, 18.9, 2.4). V geomean 1.92
+      val (0.60 test), D=1e4 11.6 above the spread. kit_benchmark candidate input for the one-loop t t~ cells: log beta^2
+      pair input (model.input_pair_threshold) passed on KIT t t~ V (Coulomb -0.33 dec, Sudakov -0.59, bulk -0.78; scratch
+      1e5, one seed), failed on the t t~ Born (Coulomb +3.2 dec); changes nothing in stage A or B''s passed designs.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
