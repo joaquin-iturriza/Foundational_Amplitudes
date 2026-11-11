@@ -22612,6 +22612,23 @@ entries:
       collinear cost and pair logs'' collinear gain may cancel; next: the combined arm (both flags) on uug 1e5, same design.
       For a catalog pretraining: input_pair_logs must be the largest multiplicity (pairs index-ordered, zero-padded) and soft
       rescale takes Q = p_0 + p_1 (beams first, as the catalog rows).'
+  - at: '2026-11-11T04:42:59+00:00'
+    text: 'A_ft readout at lr_scale 1.0 (12 fine-tunes from runs/kit/kit_pretrain_heldout, family held out; scripts/job_kit.sh
+      A_ft at caeda81a; matched scratch A runs; KIT evaluate.py via kit_predict; tools/kit_readout.py at 2d7d93c4 on analysis/kit_benchmark/data/kit_fig_A_ft.json;
+      figures analysis/kit_benchmark/figs/kit_{mse,median}_aft_*.png, off-shellness-held-at-0 arms in *_nooffshell_*). Deepest-bin
+      log10-MSE A_ft / scratch: uug soft x 1e-7..1e-6 1e5 2140 / 14180 (0.82 decades lower, exponent +6.7 vs +20.2, both outside
+      [-2.5,-1.5]: band b), 9e5 19400 / 1370 (1.15 higher: c, exponent +28.4); uug coll 20.5 / 30.1, 23.9 / 25.4; uugg soft
+      1e5 2450 / 9070 (0.57 lower), 9e5 760 / 4240 (0.75 lower), coll_gg 14.8 / 20.5, 10.1 / 16.9 (exponents ~0 vs exact -1:
+      b); tt virtual Coulomb beta 1e-4..1e-3 7.3-8.5 / 7.0-8.7 in every cell, exponent ~0 vs -1.02 (b); tt Born threshold,
+      off-shellness held at 0: 1e5 8.6e-5 / 5.1e-3 (1.77 decades lower: a), 9e5 1.85e-6 / 1.19e-3 (2.8 lower: a); off-shellness
+      on (parent''s off-shellness stats): 1e5 5.6e-3 / 2.0e-6 (3.4 higher: c), 9e5 4.9e-3 / 1.67e-5 (2.5 higher: c), flat
+      at ~5e-3 over the threshold strata. Bulk_test A_ft / scratch: uugg 9e5 8.3e-5 / 1.43e-3 (1.24 decades lower), uugg 1e5
+      1.12e-3 / 2.27e-3 (0.31), tt virtual on 1e5 9.0e-10 / 9.3e-9 (1.0), off 9e5 1.15e-9 / 6.0e-9 (0.72); uug 1e5 9.8e-4
+      / 8.2e-4, 9e5 1.27e-3 / 5.3e-4 (0.38 higher). Reading under the A_ft design: soft and collinear limits and the Coulomb
+      rise are not extrapolated by pretraining (b; uug 9e5 soft c), bulk transfer on uugg and tt virtual; tt Born threshold
+      helped only with the off-shellness column at 0 and hurt with it on (the parent''s off-shellness preprocessing against
+      KIT''s threshold range is the next suspect, design branch c). Not final: the design''s lr_scale 0.1 check (93ccd2c4
+      uug, 015da743 uugg, 81a52170 tt virtual off, submitted) decides b/c.'
   step_why:
     1:
       feeds: the pretrained model's numbers for KIT and whether pretraining changes extrapolation into the limits
