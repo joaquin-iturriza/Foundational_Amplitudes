@@ -22231,6 +22231,13 @@ entries:
       first: 56 byte-identical to lxplus''s, 17 differ only in |M|^2 (momenta and PDG columns identical, md5), so their alpha_s
       rows (per event, from the event) are valid. ee_uu val/test/train and v4_epem_ttx have alpha_s power 0 (exempt in experiment.py).
       Not fixed: why the one-loop prebuild path writes no alphas sidecar.'
+  - at: '2026-11-11T09:50:57+00:00'
+    text: '2026-11-11 10:50 CET: login-node CPU dry runs stopped (dryrun2: /tmp compose file vanished on the shared login
+      /tmp; dryrun3: its own leftover run dir). Parents resubmitted with tag=r3 (the 10:07 failures left dsave_parent_heldout/treesin
+      dirs that run.py refuses to reuse): FA-ccin2p3-5e748c7d = scripts/job_datasaving_parent.sh @4db39d05 -- heldout ++model.input_soft_eps=1e-8
+      ++model.input_pair_logs=6 tag=r3 (runs/data_saving/dsave_parent_heldout_r3); FA-ccin2p3-65fd2089 = same with treesin
+      (dsave_parent_treesin_r3); 02:30, 32G. Stage 2: gen_data_saving.py --parent-lo runs/data_saving/dsave_parent_heldout_r3
+      --parent-nlo runs/data_saving/dsave_parent_treesin_r3. Prune dry run fix @1dceb66b, rerun FA-lxplus-ac2bbf42.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
