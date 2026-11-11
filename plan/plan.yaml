@@ -23111,8 +23111,6 @@ entries:
       against a from-scratch V/B with exact Born refit on the KIT ee_tt virtual bulk; design once FA-ccin2p3-03ea3719 ends'
     5: 'Checkpoint + inference package for KIT (Joaquin sends it): best A_ft/B checkpoints, a float64 predict script, log10|M|^2
       out; after the A_ft batch'
-    6: 'Beta input for the t t~ Coulomb rise: softpair + model.input_pair_threshold=true from scratch (job_kit.sh A, 1e5,
-      8000 steps) on tt virtual and tt Born vs f21fa163 / 5515dc85; KIT readout --vs and the threshold scan with the arm added'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -23592,15 +23590,9 @@ entries:
       if:
       - 'A_ft best: package A_ft'
       - 'B best: package B'
-    6:
-      feeds: which t t~ virtual model KIT gets for the threshold; whether the beta input goes into the catalog parent
-      if:
-      - 'Coulomb median < -0.3 decades, no family worse: adopt (D392), arm is A''s threshold model'
-      - 'no Coulomb gain: B stays the threshold model; next lever on the target side (Sommerfeld factor divided out)'
   step_waits:
     '3': '2026-11-12'
     '5': FA-ccin2p3-6f94590d FA-ccin2p3-2d0c78fe
-    '6': FA-ccin2p3-a90e1ab4 FA-ccin2p3-0cc6b96c FA-ccin2p3-955131a5 FA-ccin2p3-00e5b77e FA-ccin2p3-27a68626
   handoff:
     state: 'Step 4 threshold scan DONE (finding 2026-11-11, analysis/kit_benchmark/data/kit_threshold_scan.json @e57f28f7,
       figure analysis/kit_benchmark/figs/kit_threshold_scan.png): B in the NLO band from beta 0.0119, A/A_ft/B_bulk only from
