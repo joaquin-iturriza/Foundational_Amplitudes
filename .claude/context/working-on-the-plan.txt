@@ -15,7 +15,8 @@ Roles
 - On every wake (the user's message, an event of an entry, an
   agent's hand-back) the main session runs `plan next`, which says per entry what moves: `resume <agent>` (SendMessage carrying the
   event), `launch` (a fresh owner from the entry's hand-off), `close <agent>` (context past the threshold), or nothing.
-  Routine events never reach it: the supervisor acks them.
+  Routine events never reach it: the supervisor acks them. A log-reading event (RUN, GAP, OVERRUN, a hook incident)
+  is sent to its owner with SendMessage naming it, or to a `mechanical-worker` in a brief naming it.
 - An owner is one background agent per entry in progress (Agent tool, `run_in_background`), its brief rendered by
   `plan brief <entry>` from `plan/step_prompt.txt`, recorded with `plan owner <entry> --agent <id>`. It covers all of
   the entry (analyses, fixes, designs, jobs, write-ups) and is never split into more agents for the same entry.
@@ -28,7 +29,7 @@ Roles
 - A compaction inside an owner's turn is a finding (its brief or scope was too large): `plan finding <entry>`, and the
   next brief is narrowed.
 - Delegated work goes to a fresh agent with a written brief, never a fork.
-- Mechanical steps (requeue or resubmit a job, read a log and ack, check a count, collect, sync and submit an
+- Mechanical steps (requeue or resubmit a job, read a log and ack an event with no live owner, check a count, collect, sync and submit an
   already-designed job, small tool fixes) go to a `mechanical-worker` agent (Sonnet) [D213]; anything needing judgment
   stays on the default model.
 
@@ -64,8 +65,9 @@ Done
   a comparison or a reference, with the result that answers it.
 
 The Stop gate refuses only what the turn can clear: a running entry with something to do and no owner; an open event
-of an entry whose owner was neither resumed nor launched; a `waiting_user` question in no message to the user; a
-running entry with no approval in force or a held one with no hold; trunk numbers failing the claims check; a figure
-without its pair; a context flush wanted; a reply that leaves the user's question unanswered (once per message); a
-main-session reply not opening with "Joaquin"; the supervisor down or no armed waiter. A job running, an agent
-working, a cluster's state and the user's answer are notes.
+handed to no agent (its owner resumed or launched, or a mechanical-worker whose brief names it); a RUN, GAP or OVERRUN
+event the main session acked without handing it to an agent; a table of results sent without its figure; a
+`waiting_user` question in no message to the user; a running entry with no approval in force or a held one with no
+hold; trunk numbers failing the claims check; a figure without its pair; a context flush wanted; a reply that leaves
+the user's question unanswered (once per message); a main-session reply not opening with "Joaquin"; the supervisor
+down or no armed waiter. A job running, an agent working, a cluster's state and the user's answer are notes.

@@ -114,7 +114,7 @@ def main(argv=None):
                     project_dir=os.environ.get("CLAUDE_PROJECT_DIR") or ROOT, inp=last.get("input"),
                     count=last.get("count"))
     if rec:
-        print("hook_incident: %s disabled; incident %s, an ALERT for the main session is open (--replay %s tests a "
+        print("hook_incident: %s disabled; incident %s, an ALERT is open for a mechanical-worker (--replay %s tests a "
               "fix on its last refusal, --resolve to enable it again)" % (a.hook, rec["id"], rec["id"]))
     else:
         print("hook_incident: %s was already disabled; nothing added" % a.hook)

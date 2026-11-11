@@ -1,20 +1,18 @@
 paths: sweep/**, analysis/hpo_optima/**
 cmds: \b(sweep_manager|generate_sweep|generate_scaling_sweep|generate_pretraining_scaling_sweeps|rebalance|drive|run_trial|extend_sweep|prune)\.py\b, \bsbatch\b.*--array
 ---
-Multi-fidelity HPO over training-step budgets, sharing a DyHPO surrogate across
-all jobs of a sweep via a lock file on the shared FS.
+DyHPO over a sweep's HP space, single-fidelity (rule 6), one surrogate per sweep: on one site's filesystem under a
+lock (`generate_sweep` + `sweep_manager`), or on the local machine with `sweep/drive.py` (trials on any site).
 Key files:
 - `generate_sweep.py` — initializes the sweep: samples HP candidates, writes the
   DyHPO state (`dyhpo_state.pkl`), and emits one SLURM script per trial into
   `<sweep_dir>/<sweep_name>/jobs/trial_XXXX.sh`. Flags: `--config`, `--n-trials`,
   `--extend` (add trials, reuse state), `--dry-run`.
 - `run_trial.py` — per-job entrypoint each SLURM job runs. It: locks state →
-  `sampler.suggest()` for `(hp_config, fidelity=t_steps)` → checkpoint-index
-  lookup to warm-start from a lower fidelity → runs `run.py` → locks state →
+  `sampler.suggest()` for `(hp_config, fidelity=t_steps)` → runs `run.py` → locks state →
   `sampler.observe(...)`. A SIGTERM handler reports the in-flight trial as failed
   so DyHPO can reuse the slot.
-- `dyhpo_sampler.py`, `dyhpo/hpo_method.py`, `checkpoint_index.py` — the sampler,
-  surrogate, and warm-start checkpoint index.
+- `dyhpo_sampler.py`, `dyhpo/hpo_method.py` — the sampler and surrogate.
 - Config template: `sweep/sweep_config_jeanzay_template.yaml` (cluster block,
   paths, `fidelity_schedule.t_steps`, `fixed_params`, `search_space`,
   `dyhpo.*`). The HPO objective can be a transfer-ratio geometric mean vs a
@@ -23,8 +21,7 @@ Key files:
   `generate_scaling_sweep.py`, `fit_scaling_law.py`, `analyze_*_scaling*.py`.
 - Resubmission helpers: `resubmit_timed_out.py`, `resubmit_scaling_jobs.py`.
 
-Submitting a sweep (GPU budget applies): through `sweep_manager.py`, so trials interleave round-robin across sweeps;
-never hand-loop `sbatch` over `jobs/*.sh`. The generators render the `#SBATCH` block for the site they run on
+Submitting a sweep (GPU budget applies): through `sweep_manager.py`; never hand-loop `sbatch` over `jobs/*.sh`. The generators render the `#SBATCH` block for the site they run on
 (`siteconf.slurm_header`) and submit through `sweep_manager.py`, so they run on that site's login node through
 `site run <site> FA -- python sweep/generate_sweep.py --config sweep/<my_config>.yaml`; locally they are dry-runs only.
 ```bash
@@ -37,22 +34,18 @@ python sweep/generate_pretraining_scaling_sweeps.py --phase both --auto-submit
 python sweep/sweep_manager.py submit <sweep_dir>/<sweepA> <sweep_dir>/<sweepB>
 ```
 
-**Known coupling issue (relevant to job ordering):** jobs share DyHPO state, but
-they only inform each other if earlier trials `observe()` before later trials
-`suggest()`. If all trials of one sweep start at once (which happens on Jean Zay
-when many GPUs free up), they all `suggest()` against an empty/stale surrogate.
-When running several sweeps at once, interleave submissions across sweeps
-(round-robin) and/or use SLURM priorities so each sweep stays partly serialized.
-**Fallback when interleaving can't help (a lone sweep, or abundant GPUs):**
-`sweep_manager submit` now defaults to **3 sequential waves** (`--seq-batches 3`)
-for a single-sweep submission — the trials are split into 3 groups chained by
-SLURM `afterany` dependencies, so wave *k+1* only starts after wave *k* has
-`observe()`d and the (single-fidelity) Bayesian optimiser actually has data to fit.
-Multi-sweep submissions default to `--seq-batches 1` (rely on interleaving); pass
-`--seq-batches N` to force, `1` to disable.
-**Chained submission (opt-in, `sweep_manager submit --chain [--capacity N]`).** Holds guided trials until the
-preceding trials have observed; use it when free GPUs would start a whole sweep blind. `--weight`/`boost` do not
-apply to chained jobs. On HTCondor the chain is the DAG (`cluster.chain_width`). Details: the script's docstring.
+**Ordering.** Trials suggested together are blind of each other (all at once is a random search): the `n_startup`
+random trials go first, a guided trial is suggested only after earlier ones are observed, and across sweeps the longest
+trials start first. D396 requires drive.py and sweep_manager.py to submit searches the same way; not met yet: their
+defaults differ (sweep_manager's several-sweep default starts blind on free GPUs):
+- `sweep_manager.py submit`: a lone sweep goes in 3 waves chained by `afterany` (`--seq-batches N`, 1 disables);
+  several sweeps default to 1 wave, interleaved by `nice` rounds (below); `--chain [--capacity N]`: the start-up trials run
+  together, the first guided trial waits for all of them, each later one for the trial W places back (W = min(3,
+  ceil(capacity / sweeps))), the queue longest first (`duration_nice`; HTCondor: the DAG, `cluster.chain_width`);
+  `--weight`/`boost` do not apply to chained jobs.
+- `drive.py`: rolling by default (`--parallel P`: guided trials once every start-up trial is observed, then P in
+  flight) or whole waves (`--wave-sizes 3,3,2` or `dyhpo.waves`, summing to n_trials: wave k+1 once waves 1..k have
+  all finished); each dispatch issues longest first, round-robin across sweeps of equal length (`dispatch_order`).
 **Cross-sweep submitter — `sweep/sweep_manager.py`**. Submits
 trials interleaved across sweeps and stamps each job with a SLURM `nice` value =
 `round × gap`, where a sweep's `j`-th pending trial has `round = j // weight`.
@@ -115,9 +108,11 @@ Sweeps across sites (`sweep/drive.py`):
 `generate_sweep` + `sweep_manager` keep the
 DyHPO state in a file that every trial locks on one site's filesystem; `sweep/drive.py`
 keeps that state on the local machine and sends stateless trials wherever `site pick` says:
-    python sweep/drive.py --config sweep/sweep_config_X.yaml [--config ...] \
-        [--n-trials N] [--parallel P] [--mem 8G] [--cpus 4] [--hours 0.5] \
-        [--sites ccin2p3 lxplus] [--allow-jeanzay] [--poll 60]
+    python sweep/drive.py --config sweep/sweep_config_X.yaml [--config ...] --item <work item> \
+        [--n-trials N] [--parallel P | --wave-sizes 3,3,2] [--mem 8G] [--cpus 4] [--hours 0.5] \
+        [--sites ccin2p3 lxplus] [--allow-jeanzay] [--poll 60] [--once] [--dry-run]
+- Ordering: the rule above. `--retry-failed REGEX` / `--retry-lost` requeue trials whose crash was fixed (penalty
+  removed); `--recollect REGEX` re-reads a finished trial whose log was unreadable.
 - State and results: `sweeps_local/<sweep_name>/` (dyhpo_state.pkl, driver_state.json,
   results/*.json, summary.txt). Resumable: run the same command again.
 - Placement per trial through `site pick` (fitting free GPUs, submit caps, expected waits);
@@ -126,9 +121,7 @@ keeps that state on the local machine and sends stateless trials wherever `site 
   (`run_trial.py --detached`): no shared state, result returned as one RESULT_JSON log line.
 - Pools: before the first trial on a site the recipe's datasets are checked there and, if
   missing, built by `scripts/prebuild_recipes.sh` as a CPU job on that site (SLURM or HTCondor).
-- Detached trials cold-start (no cross-fidelity warm start); fine for single-fidelity sweeps.
 - Code must be committed: the driver syncs each site once at start and submits with --no-sync.
 - The driver runs on the local machine in `.venv-driver` (CPU torch + scikit-learn); it builds it
   itself on first use via `sweep/driver_env.sh`.
-- The driver runs in the background on the local machine and needs nothing from Joaquin; the classic path (state on one site) is for a sweep that must stay on one site (multi-fidelity warm starts).
-- FA's pruning tool on a cluster is `sweep/prune.py`, under Joaquin's recorded decision [D19].
+- The driver runs in the background on the local machine and needs nothing from Joaquin; the classic path keeps the state on one site.

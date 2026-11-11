@@ -56,6 +56,28 @@ def own_questions(text):
     return [q.strip() for q in re.findall(r"[^.!?\n]*[.!?]?", QUOTED.sub(" ", text)) if q.strip().endswith("?")]
 
 
+def route_events(refuse, routed):
+    """(refusals, notes) of the open events no running entry's owner covers (D399 (1)): one handed to an agent this
+    turn (`routed`, ids named in a SendMessage or Agent prompt) is a note until that agent acks it; any other names
+    who acts: a mechanical-worker for a log-reading event or a hook incident, the owner for READY, else whoever it
+    reaches explains and acks."""
+    out, notes = [], []
+    for ev in refuse:
+        w = ev.split() + [""] * 7
+        e, kind = w[2], w[6]
+        if e in routed:
+            notes.append("%s handed to an agent this turn (a note until it acks)" % e)
+        elif kind in LOG_KINDS or (kind == "ALERT" and "HOOK INCIDENT" in ev):
+            out.append(ev + "  -> launch a mechanical-worker whose brief names %s: it reads the log, fixes or explains, "
+                       "and acks" % e)
+        elif kind == "READY":
+            out.append(ev + "  -> its entry's owner analyses and writes it up (resume or launch the owner, naming %s)" % e)
+        else:
+            out.append(ev + "  -> explain it and ack it (`site ack %s --note ...`), or hand it to the agent its fix "
+                       "needs" % e)
+    return out, notes
+
+
 def supervisor_running():
     """A live `site supervise` process for FA (or for every project): /proc/<pid>/cmdline, argv split on NUL. Tests
     point PLAN_PROC at a fake /proc."""
@@ -160,8 +182,13 @@ def problems():
     else:
         working = {e["id"] for e in d["entries"] if plan.step_working(st, e["id"], plan.now())}
         refuse, wait = split_events(open_events(), working)
-    out += refuse
-    plan.NOTES.extend(wait)
+    # routed in this turn or an earlier one still in the transcript's tail: a worker sent to an event of no entry is
+    # not booked as an owner, so a later wake must not ask for a second one (repo-reviewer 2026-11-11)
+    import stop_conditions as sc_
+    more, routed = route_events(refuse, routed_ids(sc_._tail_records(TURN_INP.get("transcript_path") or ""))
+                                if TURN_INP else set())
+    out += more
+    plan.NOTES.extend(wait + routed)
     return out, once, st
 
 
@@ -323,17 +350,20 @@ def stop_conditions(inp, refused):
     return bad, notes
 
 
-TABLE_MSG = ("PLAN CHECK: a result table went to Joaquin without its figure (CLAUDE.md: a result reaches me with a "
-             "figure of the compared quantities). Send the figure with SendUserFile, or drop the table.")
+TABLE_MSG = ("PLAN CHECK: a table of results went to Joaquin without its figure (CLAUDE.md: a result reaches me with a "
+             "figure of the compared quantities). Who acts: the entry's owner draws it with a committed tool "
+             "(SendMessage it the numbers' question); you send the file it returns (SendUserFile), never a figure of "
+             "your own. Until then end the turn on a message without the table.")
 _ROW, _SEP = re.compile(r"^\s*\|.*\|\s*$"), re.compile(r"^\s*\|[\s:|-]+\|\s*$")
-_NUM = re.compile(r"\d+\.\d+|\d+[eE][-+]?\d+|\d+")
-_CLOCK = re.compile(r"\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}:\d{2}\b")
+# a measured quantity opens its cell: a decimal, a power of ten, or a number with a unit or ratio (0.25, 1.5e-3, 3×10⁻⁷,
+# 12%, 72 s, 254M, 120×, about 0.8); bare counts ("18", "0 / 34", "20 of 200"), clock times and prose cells that
+# mention a number are bookkeeping: the audit and timeline tables of 2026-11-11 (main session 14:43, 15:09, 19:03)
+_RESULT = re.compile(r"^(?:about\s+|~\s*|≈\s*|[<>±+\-−]\s*)?(?:\d*\.\d+|\d+(?:\.\d+)?\s*(?:[eE][-+−]?\d+|[×x]\s*10)|"
+                     r"\d+(?:[.,]\d+)?\s*(?:%|×|x\b|s\b|min\b|h\b|dex\b|[kMG]\b))")
 
 
-def result_table_without_figure(inp):
-    """[TABLE_MSG] when the main session's last message of the turn has a markdown table with a numeric cell and the
-    turn made no SendUserFile call of a .png or .pdf; else []."""
-    import plan
+def _turn(inp):
+    """(the records of this turn, its last assistant text)."""
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     import stop_conditions as sc
     recs = sc._tail_records(inp.get("transcript_path") or "")
@@ -342,31 +372,88 @@ def result_table_without_figure(inp):
         if sc.turn_of([r])[0]:
             start = i + 1
     turn = recs[start:]
-    last = sc.turn_of(turn)[1] or inp.get("last_assistant_message") or ""
+    return turn, sc.turn_of(turn)[1] or inp.get("last_assistant_message") or ""
+
+
+def _tool_uses(turn, name=None):
+    for r in turn:
+        c = (r.get("message") or {}).get("content")
+        for b in c if isinstance(c, list) else []:
+            if isinstance(b, dict) and b.get("type") == "tool_use" and (name is None or b.get("name") == name):
+                yield b
+
+
+def result_table_without_figure(inp):
+    """[TABLE_MSG] when the main session's last message of the turn has a markdown table of results (a body cell
+    opening with a measured quantity, _RESULT) and the turn made no SendUserFile call of a .png or .pdf; else []."""
+    turn, last = _turn(inp)
     lines = last.splitlines()
     table = False
     for i in range(len(lines) - 1):
         if _ROW.match(lines[i]) and _SEP.match(lines[i + 1]):
-            body = []
             for l in lines[i + 2:]:
                 if not _ROW.match(l):
                     break
-                body.append(l)
-            if any(_NUM.search(_CLOCK.sub("", l)) for l in body):   # a timeline's clock times and dates are not results
-                table = True
+                if any(_RESULT.match(c.strip()) for c in l.strip().strip("|").split("|")):
+                    table = True
+            if table:
                 break
     if not table:
         return []
-    for r in turn:
-        c = (r.get("message") or {}).get("content")
-        for b in c if isinstance(c, list) else []:
-            if isinstance(b, dict) and b.get("type") == "tool_use" and b.get("name") == "SendUserFile" \
-                    and re.search(r"\.(png|pdf)\b", json.dumps(b.get("input") or {}), re.I):
-                return []
+    for b in _tool_uses(turn, "SendUserFile"):
+        if re.search(r"\.(png|pdf)\b", json.dumps(b.get("input") or {}), re.I):
+            return []
     return [TABLE_MSG]
 
 
+LOG_KINDS = ("RUN", "GAP", "OVERRUN")      # events whose fix starts with reading a run's log
+_QUOTES = re.compile(r"'[^']*'|\"(?:\\.|[^\"\\])*\"")   # quoted text is data: a commit message naming `site ack`
+_ACK = re.compile(r"\bsite\s+ack\s+((?:E\d+[\s,]*)+)")
+
+
+def routed_ids(turn):
+    """Event ids (E<n>) this turn handed to an agent: named in a SendMessage or in an Agent launch's prompt."""
+    out = set()
+    for b in _tool_uses(turn):
+        if b.get("name") in ("SendMessage", "Agent"):
+            out |= set(re.findall(r"\bE\d+\b", json.dumps(b.get("input") or {})))
+    return out
+
+
+def bare_acks(inp, kinds=None):
+    """D399 (1): the main session acked, this turn, an event whose fix means reading a log without handing it to an
+    agent; the refusal lines. `kinds` {E<n>: kind}, read from site only when the turn acked something."""
+    turn, _ = _turn(inp)
+    acked = [e for b in _tool_uses(turn, "Bash") for grp in _ACK.findall(_QUOTES.sub("''", (b.get("input") or {}).get("command") or ""))
+             for e in re.findall(r"E\d+", grp)]
+    if not acked:
+        return []
+    kinds = event_kinds() if kinds is None else kinds
+    routed = routed_ids(turn)
+    bare = [e for e in dict.fromkeys(acked) if kinds.get(e) in LOG_KINDS and e not in routed]
+    if not bare:
+        return []
+    return ["%s acked by you, not by the agent that reads the log: an event whose fix means reading a log goes to "
+            "its entry's owner (SendMessage naming it), or to a mechanical-worker when the entry has no live owner "
+            "(Agent, its brief naming it); send each there now to read the log and confirm or redo the ack" %
+            ", ".join("%s (%s)" % (e, kinds[e]) for e in bare)]
+
+
+def event_kinds():
+    """{E<n>: kind} of the project's recent events (open or acked), from `site events --all`."""
+    import plan
+    r = subprocess.run(shlex.split(plan.ENV.get("PLAN_EVENTS_ALL_CMD", "site events --project FA --all --limit 2000")),
+                       capture_output=True, text=True, timeout=60)
+    out = {}
+    for l in r.stdout.splitlines():
+        w = l.split()
+        if len(w) > 4 and re.fullmatch(r"E\d+", w[0]):
+            out[w[0]] = w[4]
+    return out
+
+
 OPENER_STATE = {}
+TURN_INP = {}
 
 
 def report_once(st, once):
@@ -430,6 +517,7 @@ def main():
         if inp.get("hook_event_name") == "SubagentStop":
             return leave_check(inp)
         main_session =not (inp.get("agent_id") or inp.get("agent_type"))
+        TURN_INP.update(inp if main_session else {})
         booked = bookkeep_owners(inp.get("transcript_path")) if main_session and inp.get("transcript_path") else []
         bad, once, st = problems()
         import plan
@@ -452,6 +540,7 @@ def main():
         bad += more
         if main_session:
             bad += result_table_without_figure(inp)
+            bad += bare_acks(inp)
         plan.NOTES.extend(notes)
         if OPENER_STATE:
             plan._set_state("_opener", dict(OPENER_STATE))

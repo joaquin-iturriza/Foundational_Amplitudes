@@ -16,11 +16,11 @@ stderr and exit code through unchanged, except:
     doing its job, not a loop (the agent can do something else; letting it through would make every guard
     bypassable by asking twice): the first repeat is recorded as an incident with one ALERT, the guard stays on and
     the refusal stands.
-An incident's ALERT is for the main session, never addressed to the user: it carries what a fix needs (the hook, the
-event, the tool call refused, the refusal's text, how many times in a row, the session and agent) and says what to
-do: fix the hook at once when the fix is obvious and test it on the recorded refusal (`tools/hook_incident.py --replay
+An incident's ALERT is for a mechanical-worker the main session launches with it, never addressed to the user: it
+carries what a fix needs (the hook, the event, the tool call refused, the refusal's text, how many times in a row, the
+session and agent) and says what to do: fix the hook at once when the fix is obvious and test it on the recorded refusal (`tools/hook_incident.py --replay
 <id>` runs the hook again on the recorded input), or ack saying the guard was right; it reaches the user only through
-`site ack E<n> --needs-user "<what>"` (a call that is the user's, or a fix that is not obvious).
+`site ack E<n> --needs-user "<what>"`, for a call that is the user's.
 A refusal is exit 2, or a JSON stdout with "decision": "block" or a PreToolUse permissionDecision "deny". "No other tool
 call in between" is read from the transcript (the subagent's own when the input names one) from where it ended at the
 previous refusal: every tool call written since must be the refused call itself. Without session_id or
@@ -129,11 +129,12 @@ def incident_msg(rec, user_level=False):
         "none (a %s refusal: the turn could not end)" % (rec.get("event") or "manual")
     state = "disabled, the call went through" if rec.get("disabled") else "still on, still refusing"
     tool_flag = " --user" if user_level else ""
-    return ("HOOK INCIDENT %s, for the main session to fix (not addressed to the user): %s [%s], %s; refused %s "
+    return ("HOOK INCIDENT %s, for a mechanical-worker the main session launches with this event (not addressed to "
+            "the user; the main session never edits a hook): %s [%s], %s; refused %s "
             "time(s) in a row in session %s%s. Why: %s. Call refused: %s. Refusal: %s. "
-            "Do: if the fix is obvious, fix the hook now, test it on this refusal (python3 tools/hook_incident.py%s "
+            "The worker: if the fix is obvious, fix the hook now, test it on this refusal (python3 tools/hook_incident.py%s "
             "--replay %s), commit%s, and ack with what changed and the replay's verdict; if the guard was right, ack "
-            "saying so and correct the caller. Only a call that is the user's or a fix that is not obvious: "
+            "saying so and say how the caller goes on. Only a call that is the user's (never a fix that is not obvious: disable the hook): "
             "site ack E<n> --needs-user \"<what he must decide>\". Full record: python3 tools/hook_incident.py%s "
             "--show %s" % (
                 rec["id"], rec["hook"], rec.get("event") or "manual", state,
@@ -411,7 +412,7 @@ def loop_through(spec, raw, r):
         return False
     disable(spec, why, HERE, **kw)
     sys.stderr.write("dispatch: %s refused the same thing twice with nothing done between; it is disabled and an "
-                     "incident is open for the main session to fix (python3 tools/hook_incident.py --list)\n" % spec)
+                     "incident is open for a mechanical-worker to fix (python3 tools/hook_incident.py --list)\n" % spec)
     return True
 
 if __name__ == "__main__":

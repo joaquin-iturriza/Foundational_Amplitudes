@@ -215,6 +215,7 @@ def incidents(hooks=HOOKS):
         return [], []
     if not off:
         return [], []
-    return [], ["hooks disabled by an incident (python3 tools/hook_incident.py --list; --resolve once fixed): " +
+    return [], ["hooks disabled by an incident, each a mechanical-worker's to fix (python3 tools/hook_incident.py --list; "
+                "--resolve once fixed): " +
                 "; ".join("%s since %s: %s" % (h, (v.get("time") or "")[:16], (v.get("why") or "")[:160])
                           for h, v in sorted(off.items()))]

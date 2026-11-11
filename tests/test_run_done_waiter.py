@@ -67,8 +67,20 @@ def test_run_done_one_event_per_entry():
         print("R2 ok: owner working, no event")
 
 
-def run_waiter(m, out):
-    a = types.SimpleNamespace(wait=True, project="FA", new_only=False, all=False, limit=20)
+_POLL = os.environ.get("SITE_WAIT_POLL_S")
+
+
+def teardown_module(module=None):
+    """Restore SITE_WAIT_POLL_S, which the waiter tests set to 1."""
+    if _POLL is None:
+        os.environ.pop("SITE_WAIT_POLL_S", None)
+    else:
+        os.environ["SITE_WAIT_POLL_S"] = _POLL
+
+
+def run_waiter(m, out, debounce=0):
+    # debounce 0: these cases test the quiet rule; the 10-minute batch (D324, default 600 s) is test_batch_window's
+    a = types.SimpleNamespace(wait=True, project="FA", new_only=False, all=False, limit=20, debounce=debounce)
     import io
     import contextlib
     buf = io.StringIO()
@@ -78,7 +90,7 @@ def run_waiter(m, out):
 
 
 def test_quiet_waiter():
-    os.environ["SITE_WAIT_POLL_S"] = "1"
+    os.environ["SITE_WAIT_POLL_S"] = "1"   # restored by the module fixture below
     with tempfile.TemporaryDirectory() as tmp:
         m = load_site(tmp)
         rx = m._rx()
@@ -112,6 +124,27 @@ def test_quiet_waiter():
         print("W3 ok: an ALERT returns whoever owns the entry")
 
 
+
+def test_batch_window():
+    """D324: a routine event (RUN_DONE, HANDBACK) is held for the debounce window, then returned with what came in."""
+    os.environ["SITE_WAIT_POLL_S"] = "1"
+    with tempfile.TemporaryDirectory() as tmp:
+        m = load_site(tmp)
+        m._rx().read_owners = lambda mm, pr, rules=None: world("stopped")[1]
+        c = m.ldb()
+        m.add_event(c, "FA", "catalog_coverage", "RUN_DONE", "runs:y", "3 run(s) recorded on catalog_coverage finished")
+        c.close()
+        out = []
+        t = threading.Thread(target=run_waiter, args=(m, out, 4), daemon=True)
+        t.start()
+        t.join(2)
+        assert t.is_alive() and not out, out
+        t.join(8)
+        assert not t.is_alive() and "RUN_DONE" in out[0], out
+
+
 if __name__ == "__main__":
     test_run_done_one_event_per_entry()
     test_quiet_waiter()
+    test_batch_window()
+    teardown_module()

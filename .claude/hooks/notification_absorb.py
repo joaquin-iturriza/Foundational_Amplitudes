@@ -153,6 +153,21 @@ def main():
         return 0
     prompt = str(d.get("prompt") or "")
     agent = None if d.get("agent_id") else handback_of(prompt)
+    if agent:
+        # agent_redesign step 23: no hand-back was ever spooled (no spool dir, no HANDBACK event since 10-31); one line
+        # per hand-back says which condition held, so the next ones show why
+        try:
+            with open(os.path.join(CCORCH, "absorb.log"), "a") as f:
+                f.write("%s %s waiter_alive=%s\n" % (time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), agent,
+                                                     waiter_alive()))
+        except OSError:
+            pass
+    elif not d.get("agent_id") and "<agent-message" in prompt[:400]:
+        try:
+            with open(os.path.join(CCORCH, "absorb.log"), "a") as f:
+                f.write("%s not-one-handback %r\n" % (time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), prompt[:120]))
+        except OSError:
+            pass
     if agent and waiter_alive():
         ok, line = spool(prompt, agent)
         if ok:

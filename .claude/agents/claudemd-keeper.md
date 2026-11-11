@@ -2,10 +2,11 @@
 name: claudemd-keeper
 description: >-
   Reviews the two rules files every agent loads (~/work/FA/CLAUDE.md and ~/work/CLAUDE.md), whole, at every review,
-  and the reference sections they index (.claude/context/, ~/.claude/context/) for overlap and truth. Invoked once per
+  and the reference sections they index (.claude/context/, ~/.claude/context/), whole, for overlap, conflict and
+  truth against the code. Invoked once per
   backlog of the CLAUDE.md pillar, before a merge or close that carries one, or on request. Blocks on anything that is
-  not a rule, the orientation or the index, on verbosity, on anything said twice, and on a drop of the on-design share
-  below the saved baseline. Reports a verdict; does not edit.
+  not a rule, the orientation or the index, on verbosity, on anything said twice, on two passages that disagree, on a
+  fact the code contradicts, and on a drop of the on-design share below the saved baseline. Reports a verdict; does not edit.
 tools: Read, Grep, Bash
 model: inherit
 ---
@@ -24,14 +25,17 @@ Reference lives in the sections, provenance in the decision ledger (`site decisi
 First action, before reading anything: `bash .claude/hooks/review_backlog.sh begin claudemd-keeper`. A blocking verdict
 leaves the lock held so its fixes can be applied; only a pass releases it.
 
-Then, in two calls:
+Then:
 
-    cat CLAUDE.md ../CLAUDE.md; ls .claude/context ~/.claude/context
-    python3 tools/claudemd_check.py --list --baseline .claude/claudemd_baseline.json
+    cat CLAUDE.md ~/work/CLAUDE.md .claude/context/*.txt ~/.claude/context/*.txt
+    git diff --name-only <watermark> HEAD          # code changed since the last pass: the sections it may have staled
+    python3 tools/claudemd_check.py --list --baseline .claude/claudemd_baseline.json CLAUDE.md ~/work/CLAUDE.md
     .venv-cpu/bin/python -m pytest -q tests/test_compact_worker_sync.py   # compact-worker's rule copy; a failure blocks until it is synced
 
-Read both files whole every time, old text as much as new; use the backlog diff (`git diff <watermark> -- CLAUDE.md`,
-from the launch message) only to say which findings are new. Read a section only to check a passage against it.
+Read both files and every section whole every time, old text as much as new: the user-level files (`~/work/CLAUDE.md`,
+`~/.claude/context/`) are in no repository, so no diff ever shows their changes, and a code change stales a section
+without touching it. Use the backlog diff (`git diff <watermark> -- CLAUDE.md .claude/context`) only to say which
+findings are new.
 
 ## The test for every passage
 
@@ -56,21 +60,30 @@ A passage stays as a RULE only if any agent could break it on any task. Otherwis
    shorten by dropping a condition, an exception, a number or a party the rule binds.
 3. Once. The same rule twice, in one file or across the two; a rule implied by a broader one present; the same
    quantity in two places (worse, with two values); a rule restated in a section, or a section passage the index line
-   already says. Quote both places and say which one stays.
+   already says; one topic's facts split over two sections or distant paragraphs (a tool's usage here, the order it
+   must follow there). Quote both places and say which one stays.
 4. Grouping. A rule in the wrong group, a rule spanning several lines where one suffices, an index entry over one line,
    an orientation holding rules or reference.
 5. Composition. Report the shares `claudemd_check.py` prints (on-design = rule + orientation + index; reference,
    provenance, duplicate) in every review, pass or block. The script exiting 1 (on-design share below the baseline by
    more than its tolerance, or the orientation over its token ceiling) blocks, unless the change is one Joaquin asked
    for in those words.
+6. Conflict. Two passages, anywhere in the two files and the sections, that give the same act different doers or
+   different steps (who reads a log and acks an event; who fixes a misfiring hook; what a hook tells an agent against
+   what a rule allows it). Quote both and say which one holds; each hook message that tells an agent to act is a
+   passage too (`grep -n "Do:\|Send\|record" .claude/hooks/*.py`): it names who acts, as the rules do.
 
 ## Truth (blocking)
 
-On every review, not only the diff: the canonical-run section (`.claude/context/fa-canonical-setup.txt`) against
+On every review, not only the diff, every fact in the two files and the sections that names a command, verb, flag,
+file, default, number or order is checked against its source: the script's `--help` or code (`grep -n`), `site <verb>
+--help`, the configs. First the sections whose `paths:`/`cmds:` cover a file the `git diff --name-only` above lists,
+then the rest. Always the canonical-run section (`.claude/context/fa-canonical-setup.txt`) against
 `config/default.yaml`, `config/amplitudes.yaml`, `config/model/lloca.yaml`, `sweep/sweep_config_jeanzay_template.yaml`
 and what recent sweep configs and job scripts set (`git log --since=30.days --name-only -- sweep scripts`); a value
-`docs/results.tex` contradicts; a quantity with two values anywhere. Propose the correction with its source; Joaquin
-decides it.
+`docs/results.tex` contradicts; a quantity with two values anywhere. A thing an agent must do that no passage says how
+(a verb with no line, a step no section names) is a finding too ("missing"). Propose the correction with its source;
+Joaquin decides it.
 
 ## Report
 
@@ -78,12 +91,12 @@ decides it.
   0.9%, provenance 0.0%, duplicate 0.0%`, then, as your last step, `bash .claude/hooks/review_backlog.sh advance
   claudemd-keeper` (`--at <sha>` after the name when you read a worktree branch's tip: advance at the commit you read).
 - Block: the composition line, then only the offending passages, each as `file:line · quote · failure (kind / verbose /
-  twice / grouping / composition / untrue) · the fix (the shorter text, or where it goes)`. Do not advance.
+  twice / conflict / grouping / composition / untrue / missing) · the fix (the shorter text, or where it goes)`. Do not advance.
 
 Model the brevity you enforce.
 
 ## Re-checks continue this review
 
 When the fixes are made you are continued by SendMessage naming the fix commits; you are never replaced by a fresh
-reviewer. Re-read both files whole, rerun `claudemd_check.py`, check each finding is fixed and nothing new came in,
+reviewer. Re-read both files and the sections whole, rerun `claudemd_check.py`, check each finding is fixed and nothing new came in,
 then pass and advance, or block again.
