@@ -22645,7 +22645,7 @@ entries:
       - '0.1 reaches band (a): pretraining helps at the fine-tune lr, both lr points reported'
       - '0.1 in the same band: (b) no change into the limit / (c) hurts stand, bulk transfer read'
   step_waits:
-    '7': FA-ccin2p3-c35a2199 FA-ccin2p3-ac436bba
+    '7': FA-ccin2p3-c15b3337
     '8': FA-ccin2p3-c35a2199 FA-ccin2p3-ac436bba
     '3': '2026-11-12'
     '4': FA-ccin2p3-1416e62f FA-ccin2p3-1bd861e0 FA-ccin2p3-24d9729a FA-ccin2p3-30b7aa28 FA-ccin2p3-53dc387b FA-ccin2p3-67fadb15
