@@ -16875,6 +16875,12 @@ entries:
       step). Also pending: the supervisor registry refresh fix (runs that ended stayed RUNNING until a manual site poll, so
       no RUN_DONE fired). Hook fixes this session: plan_check ask parts without ''?'' (58dd7542), send_check skips slide decks
       under talks/ (39458623).'
+  - at: '2026-11-11T02:10:33+00:00'
+    text: '2026-11-11: Joaquin, on leftover /tmp dirs hanging WSL boot: ''Not only clean it up, this can''t happen again''
+      (site decide refused: transcript lacks the mid-turn message). Done: 4bfe87bd, 14abe0d0, 84e97928 (tests/_tmpdir.py session
+      dir removed at exit, conftest, 105 runners, test_tmp_session_dir.py; push_replay/verify_claims cleanup). Also ''I didn''t
+      ask you to restart anything'' after the supervisor and waiter were restarted post-reboot; offered to stop them, no answer
+      yet.'
   handoff:
     state: '2026-11-10: step 20 closed (repo hygiene 1c051019 in maintain; leave-check 9fa60369/700fe4fa registered on SubagentStop
       by Joaquin 5759a43f; guard fix installed, test 1b06ad6f); steps 15, 23 dropped (double wake already fixed by notification_absorb:
