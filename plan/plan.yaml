@@ -22097,10 +22097,6 @@ entries:
       job''s lr line, readout with tools/kit_readout.py, figures kit_figures.py (A_ft beside its scratch control, caption
       per curve scratch or pretrained; the A figures redrawn with the tighter legend room), per the design''s bands, with
       the lr_scale 0.1 check before any ''no help'''
-    2: 'Pretraining resumes: heldout FA-ccin2p3-78b8190c and fair_nlo FA-ccin2p3-03ea3719 (KIT_RESUME=1, afterany on 62c2443b
-      / d0b132b6, which stop at their 12 h limit ~19:00 UTC at ~45k / ~50k of 68224 steps); on their end check each parent
-      per its 03:57 design (median shared-pool ratio to trial 1262 within 0.8-1.25, no pool blown up) and tell pretrain_data_saving
-      the heldout parent is ready (model_run0_best.pt after the sigma stage)'
     3: 'Fair NLO D-scan (Bakar): ee->tt virtual, 1e2..1e4 bulk one-loop target points, fine-tuned from the fair_nlo parent
       against a from-scratch V/B with exact Born refit on the KIT ee_tt virtual bulk; design once FA-ccin2p3-03ea3719 ends'
     4: 'Threshold scan (Gudrun): sigma(sqrt s) of ee->tt around 2m_t at LO and NLO like Fig. 1 of arXiv:1506.06864: exact
@@ -22384,11 +22380,6 @@ entries:
       if:
       - 'A_ft >=1 decade below scratch in deep bins or exponent in band: pretrained model goes to KIT, B continues from A_ft'
       - 'within 1 decade or worse: rerun 3 cells at lr_scale 0.1 before reporting no help'
-    2:
-      feeds: usable parents for A_ft and the fair NLO scan
-      if:
-      - 'ratio in 0.8-1.25: parents usable'
-      - 'outside: trace the recipe or the resume before any fine-tune'
     3:
       feeds: Bakar's fair NLO comparison
       if:
