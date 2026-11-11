@@ -23206,6 +23206,14 @@ entries:
       outside the bands, or bulk_test worse by >0.3 decades: the input representation alone does not give extrapolation at
       1e5 bulk only; next: the target side (Bakar''s standardized log target, early stopping on bulk) and the arms combined
       with the column removed. Arms disagreeing on soft vs collinear are reported per limit.'
+    passed_at: '2026-11-11T02:47:14+00:00'
+    reviewer: 'Each arm = f6b2ece9 + one Lorentz-exact flag (same job_kit.sh A, 1e5, 8000 steps, lr 0.0118605, seed 42, HETEROSC
+      + sigma stage per D71/D276, KIT hard_test strata); measure seen to move: off-shellness removal moved uug deep soft bin
+      1.44 decades (14180->516) and soft exponent +20.2->-1.5, plain arm 2 decades (finding 10:47, 08:21); cuts of 1 decade
+      vs the 1.0-decade 1e5-vs-9e5 move, one seed per D315 like every sibling; yes/no stated per arm with bulk 0.3-decade
+      guard; rate 0.68 s/step and kit_result.txt from f6b2ece9 same script; disk 85 MB/run; searched results.tex and decisions
+      for log invariant, pair log, input representation, log1p, local frame log, soft rescale, input_pair, log inputs: only
+      D374 found'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
