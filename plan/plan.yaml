@@ -20904,9 +20904,6 @@ entries:
     5: 'Before stage 2 goes out (after Joaquin''s budget go): read CC disk (8.7 GB free on 2026-11-10 after the KIT caches);
       if stage 2''s phase does not fit, bring Joaquin a concrete proposal for amp_data_cache (122 GB, other entries'' pools)
       or another site, told to him 2026-11-10'
-    6: Re-cost stage 2 under D373 (each target read at a precision it reaches, not 1e-4; shorter horizons) and put it to Joaquin
-      in plain words (what runs, per target and D, scratch vs fine-tune, GPU-h), after the extrapolation discussion; promised
-      2026-11-11
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -20997,11 +20994,6 @@ entries:
       if:
       - 'fits: submit the phase'
       - 'does not fit: the concrete pruning or site proposal goes to Joaquin before submission'
-    6:
-      feeds: Joaquin's go on the data-saving runs
-      if:
-      - 're-costed: ask him with the plain description'
-      - 'cost unchanged: say why'
   designs:
   - at: '2026-11-10T02:35:09+00:00'
     question: 'Step 1 (D356 horizons, tree arm): on catalog_v4''s held-out tree targets ee->ttbar (H3, 2->2 massive), ee->ccbar
