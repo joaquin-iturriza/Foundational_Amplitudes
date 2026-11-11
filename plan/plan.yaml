@@ -15782,6 +15782,9 @@ entries:
       find from its run history why no DISK alert reached the main session yesterday (41 GB free at 05:58 = past 90%); a pre-submission
       disk check of a batch''s need; after the 19:00 UTC reset, done by the main session itself, no agent; KIT caches 82c4c27b/4f42278d
       (40 GB) deleted 2026-11-11 -> 39 GB free'
+    25: 'D399 setup fixes: merge branch setup-fixes (worktree worktrees/wt-setup-fixes, d56fb00b; claudemd-keeper PASS) into
+      trunk once the repo-reviewer passes, remove the worktree with scripts/remove_worktree.sh, then report the diffs to Joaquin
+      (scratchpad setupfix/rules_d399.diff)'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16173,6 +16176,11 @@ entries:
       if:
       - 'fixed: report the change and the cause'
       - 'cause not found: say what was read'
+    25:
+      feeds: whether the D399 fixes are live
+      if:
+      - 'reviewer passes: merge, remove worktree, report'
+      - 'reviewer blocks: fix, re-check the same reviewer'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
