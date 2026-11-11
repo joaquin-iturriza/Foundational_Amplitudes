@@ -22305,6 +22305,13 @@ entries:
       ++model.input_pair_logs=6 tag=r3 (runs/data_saving/dsave_parent_heldout_r3); FA-ccin2p3-65fd2089 = same with treesin
       (dsave_parent_treesin_r3); 02:30, 32G. Stage 2: gen_data_saving.py --parent-lo runs/data_saving/dsave_parent_heldout_r3
       --parent-nlo runs/data_saving/dsave_parent_treesin_r3. Prune dry run fix @1dceb66b, rerun FA-lxplus-ac2bbf42.'
+  - at: '2026-11-11T12:12:53+00:00'
+    text: '2026-11-11 ~13:30 CET: r4 parents ended clean (FA-ccin2p3-e8425579 heldout 3458 steps, 938b05ab treesin 3464, 0
+      non-finite skips, sigma stage done, final model in models/model_run0_best.pt.gz, both input flags in config.yaml). Stage-2
+      lr centre amendment passed by the design reviewer: HPO rule 2 inverted U below t*=3000 lowers c in 8 of 34 cells by
+      up to 4.0x (t t~ LO D=10 2.45e-2 -> 6.10e-3, the only cell whose calibration lr leaves its window, 1.34x above the top);
+      t t~ V D=1e4 centres on c/2 = 4.648e-3 (its calibration blew up at c). Configs regenerated with ${PROJECT_DIR} parent
+      paths (rebalance.py''s parent regex), trials on CC only. CC /sps/lpnhe 58 GB free (design needs ~14 GB).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
