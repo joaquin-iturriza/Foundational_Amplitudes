@@ -22402,6 +22402,17 @@ entries:
       (supervisor classes routine run ends as routine), (2) owners kept alive through a batch (routine ends never wake them),
       (3) one stated tie-break: a rule protecting data, cost or his design beats speed, (4) one submitter (D396) and one source
       per topic in the reference sections (drive.py vs sweep_manager, pruning). Nothing changed until he answers.'
+  - at: '2026-11-11T18:45:35+00:00'
+    text: '2026-11-11 ~20:30 CET, PROVISIONAL (driver dsave_s2_drive3 still running, 12 of 544 trials left, all in k=9,10
+      searches): stage2_readout.py @16965c23 (best trial per search by val, test measure on the run''s own test pool, row-matched
+      to 1e-6; joint shared-alpha fit). S = D*_scr/D*_ft at 1e-4 on test [16-84% band]: u u~ LO 3.5 [2.6, 4.4], t t~ LO 0.43
+      [0.36, 1.07], u u~ V (MSE V/B) 3.1 [2.2, 5.0], t t~ V 0.90 [0.37, inf]; on val in ln units beside: 3.3, 0.52, 2.8, 0.41.
+      Test MSE at large D is often carried by one event (worst event 40-97% of the MSE in 12 cells, e.g. scratch t t~ LO D=316:
+      val 6.9e-7 vs test 2.7e-5, worst event 0.97), so test-based fits are noisier (rms 0.65-0.68 dec on t t~) than val-based
+      (0.32 on t t~ LO). Divergences (10 searches, 15 trials): fine-tune t t~ LO D=1e3, 3162, 1e5 (lr_scale 6.7-9.7) and one-offs
+      at lr_scale 8.6 / lr 1.4-2.7c; none below the trained range except scratch t t~ LO D=1e5 (diverged 1.63c, trained only
+      up to 0.38c so far). Fine-tune best lr_scale <= 0.2 in 6 of 9 u u~ LO cells: the window''s bottom may cut the fine-tune
+      optimum there (bias against fine-tune). Figures analysis/data_saving/figs/stage2_{LD,gpuh,lr}.png (provisional).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
