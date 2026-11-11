@@ -23513,6 +23513,23 @@ entries:
       A_ft 0.142, B_bulk 0.174, B 0.0097. Threshold-design branch: B in band down to 1.2e-2 (not to 1e-3), A not below 0.14:
       B''s t t~ virtual is the threshold model for KIT (packaged as ttvirt_B_best_all_limits); protocol A''s gap is the Coulomb
       limit, and a beta-specific input (log10 beta, KIT''s logthr baseline) is the next lever. One seed per model (D315).'
+  - at: '2026-11-11T23:06:29+00:00'
+    text: 'Test-time augmentation keyed on the pool (for the main session to route; affects pretrain_data_saving). experiment._model_momenta
+      applies keyed_aug''s Lorentz augmentation (uniform rotation, boost beta ~ N(0, 0.1) per component) to every role, test
+      and val included, for every model; each event''s transform is keyed on (seed, the pool''s content identity, its index
+      in the pool), so a test prediction depends on which other events are in the pool, through the model''s departure from
+      Lorentz invariance. Measured (tools/kit_package.py check, repo code, first 50 events per stratum vs the same events
+      scored in the whole benchmark file; whole-file GPU re-run FA-ccin2p3-d97ae1c0 reproduces the jobs'' predictions to <=1.2e-8):
+      models without the softpair inputs are invariant to rounding (|delta log10| 0 in every stratum: tt Born A offoff, tt
+      virt A 1e5 offoff, tt virt B offon); softpair models (model.input_soft_eps=1e-8 + model.input_pair_logs) are not: tt
+      Born softpair bulk_test max |delta log10| 1.5e-4 (CPU) / 1.5e-4 (GPU), threshold strata 1.4e-4..2.6e-4, Sudakov strata
+      (sqrt s 1.7-50 TeV) 0.09-0.30 (runs FA-ccin2p3-ab1442d0, 6f578ef2); uugg softpair max 8.3e-2 over 19 strata (b54cfaec).
+      For comparison the tt Born softpair bulk log10-MSE is ~1e-8..1e-7, i.e. errors ~1e-4: the pool dependence in the bulk
+      is of the order of the model error itself. The data-saving r5 parents and fine-tunes carry the softpair inputs, so their
+      test MSEs may carry the same dependence (a per-pool fixed draw, so a fixed pool is still reproducible, but the number
+      is one draw of the frame). Fix for KIT (adf1742b): data.unaugmented_roles / rebuild(event_frame=True) in kit_predict
+      reads the scored events unaugmented; training and the other rebuild users unchanged. All 51 KIT runs re-scored (batch
+      kit_rescore), every reported KIT number to be re-read.'
   step_why:
     3:
       feeds: Bakar's fair NLO comparison
