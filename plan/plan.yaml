@@ -15776,6 +15776,8 @@ entries:
       event and RUN_DONE with no manual poll (next 19 fix).'
     22: 'CLAUDE.md figure rule: on Joaquin''s yes, replace ''the main session sends it without opening it'' with the open-once-and-check
       text proposed 2026-11-10 (shown as a diff)'
+    23: 'Wake batching does not cut usage (2.3->4.6 wakes/h; tests/test_run_done_waiter.py::test_quiet_waiter fails; replay
+      126->57 at 10 min): find why the batching does not take effect and fix, after the 2026-11-11 19:00 UTC usage reset'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16148,6 +16150,11 @@ entries:
       if:
       - 'yes: edit CLAUDE.md, commit, show the diff'
       - 'no: keep, rely on the per-file legend rule'
+    23:
+      feeds: main-session token use
+      if:
+      - 'fixed: re-measure with tools/wake_batching.py'
+      - 'not fixable: revert the change'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
