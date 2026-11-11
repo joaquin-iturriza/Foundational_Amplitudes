@@ -22884,7 +22884,7 @@ entries:
       - 'gains do not hold on tt: tt keeps the A_ft/B models'
   step_waits:
     '3': '2026-11-12'
-    '4': FA-ccin2p3-93ccd2c4 FA-ccin2p3-015da743 FA-ccin2p3-81a52170
+    '4': step 6 (flagged uugg/tt models decide what goes to KIT)
     '5': FA-ccin2p3-93ccd2c4 FA-ccin2p3-015da743 FA-ccin2p3-81a52170
     '6': 'main session: token budget narrowing (until 19:00 UTC 2026-11-11); ready to design'
   handoff:
