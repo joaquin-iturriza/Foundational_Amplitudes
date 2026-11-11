@@ -399,7 +399,10 @@ class AmplitudeExperiment(BaseExperiment):
     def _model_momenta(self, rec, mom_div=None):
         """A store record's momenta as the network reads them, in chunks: its centre-of-mass momenta augmented
         (keyed_aug, per event), per sqrt(s_hat) under dimensionless_inputs, / mom_div when given"""
-        return keyed_aug.model_momenta_chunks(rec["com"], self._aug_seed(), rec["uid"], rs=rec.get("rs"),
+        # data.unaugmented_roles (tools/rebuild_run.py, inference): the role is read as given, so an event's
+        # prediction does not depend on the pool it is in (the augmentation is keyed on the pool's identity)
+        uid = None if rec.get("role") in (self.cfg.data.get("unaugmented_roles", None) or ()) else rec["uid"]
+        return keyed_aug.model_momenta_chunks(rec["com"], self._aug_seed(), uid, rs=rec.get("rs"),
                                               mom_div=mom_div, dtype=self._mom_np_dtype())
 
     def _resolve_amp_orders(self, names):
@@ -1772,6 +1775,7 @@ class AmplitudeExperiment(BaseExperiment):
                 # only the centre-of-mass momenta are kept (GeV): the frame-independent quantities read them, and the
                 # network's momenta (augmented, scaled) are made from them pool by pool at assembly (_model_momenta)
                 store[(role, name)] = {
+                    "role":    role,
                     "com":     com,
                     "uid":     keyed_aug.pool_uid(pool_identity(paths[role][name])),
                     "tokens":  toks,

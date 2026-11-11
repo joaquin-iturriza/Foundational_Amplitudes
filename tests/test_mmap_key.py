@@ -239,7 +239,16 @@ def test_fingerprint():
                         f"data_mmap.py and record the new fingerprint here")
 
 
+def test_unaugmented_is_the_event_alone():
+    """uid None (data.unaugmented_roles, inference): the momenta as given, whatever pool or index they are read at"""
+    com = np.random.default_rng(0).normal(size=(5, 4, 4))
+    for start in (0, 7):
+        assert np.array_equal(keyed_aug.model_momenta(com, 42, None, start, dtype=np.float64), com)
+    assert not np.allclose(keyed_aug.model_momenta(com, 42, 123, 0, dtype=np.float64), com)
+
+
 if __name__ == "__main__":
+    test_unaugmented_is_the_event_alone(); print("unaugmented: ok")
     test_lorentz_and_keys(); print("keyed_aug: ok")
     test_key_batches_openers_canary_prune(); print("key, batches, openers, canary, prune: ok")
     test_fingerprint(); print("fingerprint: ok")

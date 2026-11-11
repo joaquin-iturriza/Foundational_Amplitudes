@@ -71,7 +71,7 @@ def predict(run_dir, splits, out, h5=None):
         meta = kh.metadata(stem)
         kh.write_born(np.concatenate([kh.stratum_rows(stem, "born", sp, st, src)[:, -1] for sp, st, _ in blocks])
                       * kh.strip_factor(meta, "born"), pool)
-    exp, loader = rebuild(run_dir, "test", pool, len(rows))
+    exp, loader = rebuild(run_dir, "test", pool, len(rows), event_frame=True)
     trafos = [list(t) for t in (getattr(exp, "_amp_trafos_pp", None) or [exp.cfg.data.amp_trafos])]
     assert all(t == ["log", "standardization"] for t in trafos), (
         f"the residual is ln-exact only under [log, standardization]; the run resolved {trafos}")

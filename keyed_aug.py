@@ -140,7 +140,9 @@ def model_momenta(com, seed, uid, start, rs=None, mom_div=None, dtype=np.float32
     momenta, float32): augmented, in units of each event's sqrt(s_hat) when `rs` (their sqrt(s_hat), float64) is
     given, divided by the global momentum scale when `mom_div` is. Float32, the operations in the order both data
     paths apply them (data_mmap.MmapSource.gather does the same per particle)."""
-    a = augment(com, seed, uid, np.arange(start, start + len(com), dtype=np.int64), dtype=dtype)
+    # uid None: the events as given, unaugmented (inference on one event alone: data.unaugmented_roles)
+    a = np.asarray(com).astype(dtype) if uid is None else \
+        augment(com, seed, uid, np.arange(start, start + len(com), dtype=np.int64), dtype=dtype)
     if rs is not None:
         a = (a.astype(np.float64) / np.asarray(rs)[:, None, None]).astype(dtype)
     return a if mom_div is None else a / mom_div

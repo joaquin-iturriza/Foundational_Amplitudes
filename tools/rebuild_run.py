@@ -185,9 +185,11 @@ def own_offshell_stats(run_dir):
     return exp._offshell_stats
 
 
-def rebuild(run_dir, role, path, n_events):
+def rebuild(run_dir, role, path, n_events, event_frame=False):
     """(exp, loader): the run rebuilt with `role` ('val' or 'test') read from `path` (n_events rows),
-    in eval mode with its best weights; loader iterates that role in the order of exp._role_perm[role]."""
+    in eval mode with its best weights; loader iterates that role in the order of exp._role_perm[role].
+    event_frame: that role unaugmented (data.unaugmented_roles), each event read in its own centre-of-mass frame, so
+    its prediction depends on the event alone, not on the pool (the augmentation is keyed on the pool's identity)."""
     cfg = OmegaConf.load(os.path.join(run_dir, "config.yaml"))
     own_recipe = os.path.expandvars(str(cfg.data.processes_file))
     rec = yaml.safe_load(open(own_recipe))
@@ -202,6 +204,9 @@ def rebuild(run_dir, role, path, n_events):
         cfg.warm_start_idx = None; cfg.fine_tune.pretrained_path = None
         cfg.data.processes_file = tmp.name
         cfg.data.eval_subsample = None            # the swapped split is read whole (the recipe count caps it)
+        if event_frame:
+            assert not cfg.data.get("memmap", False), "event_frame is wired on the in-memory data path only"
+            cfg.data.unaugmented_roles = [role]
         cfg.run_dir = tempfile.mkdtemp(prefix="rebuild_", dir=os.environ["SCRATCH"])
     if OmegaConf.select(OmegaConf.load(os.path.join(run_dir, "config.yaml")), "fine_tune.pretrained_path"):
         # a fine-tuned run trained on frozen stats (its parent's, kept in its own data_stats.json), not on stats of
