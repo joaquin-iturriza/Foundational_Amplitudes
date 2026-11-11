@@ -22375,6 +22375,11 @@ entries:
       told him: wake batching did not cut usage (2.3->4.6 wakes/h, 1.18M->1.33M tokens/wake; tests/test_run_done_waiter.py::test_quiet_waiter
       fails; replay says 126->57 wakes at 10 min), main cost is the main session''s ~500k context; fix deferred past the 19:00
       reset.'
+  - at: '2026-11-11T02:48:19+00:00'
+    text: 'The supervisor''s setup check (T_max == iterations x scheduler_scale) misreads a resume: ALERTs E4683/E4684 on
+      the pretraining resumes 78b8190c (started at step 45012, 23212 left) and 03ea3719 (49104, 19120 left), whose T_max 68224
+      is the designed full cosine (increment_steps=68224); both ended at 68224 with RUN_DONE and their sigma stage. The check
+      should accept T_max = start step + iterations for a warm start; not fixed (main session''s instruction).'
   step_why:
     1:
       feeds: the pretrained model's numbers for KIT and whether pretraining changes extrapolation into the limits
