@@ -105,8 +105,8 @@ def evaluate(stem, pred_path, out, h5=None):
         return None
     res = os.path.join(out, "kit_result.json")
     # the benchmark's own scorer, run isolated (-I) from its directory's files
-    p = subprocess.run([sys.executable, "-I", ev, h5 or kh.h5_path(stem), pred_path, res], capture_output=True, text=True,
-                       check=True)
+    p = subprocess.run([sys.executable, "-I", ev, h5 or kh.h5_path(stem), pred_path, res], capture_output=True, text=True)
+    assert p.returncode == 0, f"the benchmark's evaluate.py failed:\n{p.stdout[-2000:]}\n{p.stderr[-4000:]}"
     open(os.path.join(out, "kit_result.txt"), "w").write(p.stdout)
     print(p.stdout)
     return res
