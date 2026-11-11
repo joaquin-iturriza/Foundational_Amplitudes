@@ -5,7 +5,8 @@ the ledger (Joaquin's approval of "1 2 and 3", 2026-10-31; it replaces the docs/
 Over the main session's messages since its last compaction, the turn cannot end, and an automatic compaction is held,
 while
   - a question the main session put to the user has no `plan ask` (or `plan answer`, `plan withdraw`) recording it;
-  - an answer or decision of the user's has no `site decide` (or `plan answer`) recording it;
+  - a decision of the user's (approve, refuse, scope, prefer, forbid; never a complaint or a correction) has no
+    `site decide` (or `plan answer`) recording it;
   - a commitment in a main-session message ("I'll do X") has no plan step (`plan add-next|set-next|step|wait|add`)
     and was not done later in the window.
 A model (reply_check's sonnet call) reads the user's messages, the main session's text and the recording commands,
@@ -34,9 +35,11 @@ WANTED = os.path.join(REPO, ".claude", ".compact_wanted")
 CHECKED = os.path.join(REPO, ".claude", ".compact_checked")
 
 INSTR = ("CONTEXT GUARD: the context is near compaction. Before it, record on the plan and the ledger what it would "
-         "lose: every question you put to Joaquin (`python3 tools/plan.py ask <entry> ...`), every answer or decision "
-         "of his (`site decide FA --kind K --quote \"<his words>\"`, or `plan answer`), every 'I'll do X' you told "
-         "him that is not done (a plan step: `plan add-next <entry> ...`). The check lists what it finds missing.")
+         "lose: every question you put to Joaquin (`python3 tools/plan.py ask <entry> ...`), every decision of his "
+         "(he approves, refuses, scopes, prefers or forbids work: `site decide FA --kind K --quote \"<his words>\"`, "
+         "or `plan answer`; a complaint, a correction or a question of his is no decision and is never recorded as "
+         "one), every 'I'll do X' you told him that is not done (a plan step: `plan add-next <entry> ...`). You (the "
+         "main session) record these yourself; the check lists what it finds missing.")
 AFTER = ("CONTEXT GUARD: this context was just compacted. The summary above is a lossy record of the CONVERSATION (what "
          "was in flight), not of the plan: work only from the plan printed below, not from the summary's "
          "pending list. CLAUDE.md's ground rules hold (0: start every message with 'Joaquin'; 0b: never narrow the scope). "
@@ -220,7 +223,8 @@ Answer ONLY with JSON: {{"questions": [...], "answers": [...], "commitments": [.
   "should I go on?" courtesy questions do not count.
 - answers: a message of JOAQUIN that answers a question or decides how work goes (approves, refuses, scopes,
   prefers, forbids), for which no later RECORDED `site decide` or `plan.py answer` carries his words. Questions of
-  his, complaints and remarks that decide nothing do not count.
+  his, complaints ("why are you doing it yourself?", "I didn't ask you to ..."), corrections of the assistant and
+  remarks that decide nothing do not count, even when they say what should have been done.
 - commitments: an ASSISTANT sentence to Joaquin promising work not done in the same message ("I'll run X", "next I
   will ...", "X comes next"), that no later ASSISTANT message reports done and no RECORDED plan step covers.
   Work that finished later in the log does not count.
@@ -259,8 +263,8 @@ def pending(path, ask=None, steps=None):
         v = (ask or rc.ask_model)(check_prompt(users, says, recs, steps=steps))
         if v is None:
             return []
-        how = {"questions": "a question to Joaquin with no `plan ask`", "answers": "Joaquin's words with no "
-               "`site decide`", "commitments": "a commitment with no plan step"}
+        how = {"questions": "a question to Joaquin with no `plan ask`", "answers": "a decision of Joaquin's "
+               "(approve, refuse, scope, prefer, forbid; never a complaint) with no `site decide`", "commitments": "a commitment with no plan step"}
         return ["%s: \"%s\" (%s)" % (how[k], q[:300], w) for k, q, w in items_of(v, users, says)]
     except Exception:                   # noqa: BLE001
         return []

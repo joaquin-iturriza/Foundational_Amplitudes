@@ -8,9 +8,9 @@ cmds: \bhook_incident\.py\b, \bswitch_settings\.py\b
   `.claude/hooks/disabled.json`; it detects a loop (the same refusal fingerprint twice with nothing changed in between:
   no tool call, the same HEAD, plan and open events), then disables that hook, opens an incident and lets the call
   through.
-- A misfiring hook is the main session's to fix, never sent straight to Joaquin. An obvious fix is made at once;
-  otherwise `tools/hook_incident.py <hook> --why "<why>"` (or the dispatcher's loop detector) disables the hook,
-  appends the incident to `.claude/hooks/incidents.jsonl` and opens an ALERT for the main session. A fix is tested on
+- A misfiring hook goes from the main session to a `mechanical-worker`, never straight to Joaquin. An obvious fix is
+  made at once; otherwise `tools/hook_incident.py <hook> --why "<why>"` (or the dispatcher's loop detector) disables
+  the hook, appends the incident to `.claude/hooks/incidents.jsonl` and opens an ALERT, routed the same way. A fix is tested on
   the recorded refusal (`hook_incident.py --replay <id>`; `--show <id>` prints the record) before `--resolve <hook>`
   re-enables it; a guard that was right is acked as such. Only a call that is his, or a fix that is not obvious,
   reaches him: `site ack E<n> --needs-user "<what>"`.

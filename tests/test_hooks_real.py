@@ -188,7 +188,7 @@ def incident_tool():
              "the session; its ALERT is for the main session", r.returncode == 0 and len(inc) == 1
              and inc[0]["call"] == list(cmd) and inc[0]["last_refusal"].startswith("lock guard: only")
              and inc[0]["session"] == "s1" and "review_backlog.sh advance" in msg and "lock guard: only" in msg
-             and "for the main session to fix" in msg and "--replay " + inc[0]["id"] in r.stdout, (r.stdout, inc, msg))
+             and "for a mechanical-worker the main session launches" in msg and "--replay " + inc[0]["id"] in r.stdout, (r.stdout, inc, msg))
 
 
 def _incident_cli(b, *a):
@@ -203,7 +203,7 @@ def incident_for_main_session(b, rec, call, hook, refusal_head, fixed_by, still_
     refusal with --replay."""
     alert = [c for c in b.site_calls() if "'event'" in c]
     msg = alert[-1] if alert else ""
-    need = ["HOOK INCIDENT " + rec["id"], "for the main session to fix (not addressed to the user)", hook,
+    need = ["HOOK INCIDENT " + rec["id"], "for a mechanical-worker the main session launches with this event (not addressed to the user", hook,
             "%s time(s) in a row" % rec.get("count"), "session s1", re.sub(r"\s+", " ", refusal_head)[:40], "--replay " + rec["id"],
             "--needs-user", "'--kind', 'ALERT'"]
     if call:
