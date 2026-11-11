@@ -16193,7 +16193,7 @@ entries:
     '25': repo-reviewer a0af33e5f98272099
   owner:
     agent: ad78a9793197e5abe
-    state: working
+    state: closed
     since: '2026-11-11T19:21:50+00:00'
     state_at: '2026-11-11T19:21:50+00:00'
     context: 239763
@@ -16949,26 +16949,23 @@ entries:
       in d56fb00b (absorb.log, one line per hand-back with waiter_alive). test_quiet_waiter was stale (D324 600 s default
       debounce), fixed with a batch-window test.'
   handoff:
-    state: '2026-11-10: step 20 closed (repo hygiene 1c051019 in maintain; leave-check 9fa60369/700fe4fa registered on SubagentStop
-      by Joaquin 5759a43f; guard fix installed, test 1b06ad6f); steps 15, 23 dropped (double wake already fixed by notification_absorb:
-      main_turns split 11-04 21:14, agent_done-started turns 19/$1.81 before vs 3/$0.19 after; reply_check skip 700fe4fa);
-      step 22 (figure caption rule, 541f6a86/699f441f, keeper PASS) dropped; date-wait fix c965a1f7 PASS. NEW step 22 (D346
-      sweep template): sweep/sweep_config_template.yaml and sweep_config_jeanzay_template.yaml set to t_steps [40000] in the
-      WORKING TREE, uncommitted: the review gate refuses commits (repo-reviewer watermark still 5e5b2788, 1262 lines, though
-      the reviewer said it advanced to f5ac899c); reviewer a0b2da08acd94dae3 asked to review the whole backlog and the template
-      diff. Canonical length ambiguous: no table or decision names one; recent configs use 8000 (29), 2816 (24), 704 (10)...;
-      40000 kept as the ladder''s full fidelity, report candidates to main. Joaquin''s earlier answer: 2026-10-23T02:12 main
-      transcript 71602535: ''What do you mean by "multi fidelity sweeps", as far as I know, I never asked to run a multifidelity
-      sweep''. Why it was asked again: it was a remark, not an answer to a recorded ask, so never went through site decide;
-      plan ask''s answered_asks reads only recorded answers. Path fix designed and prototyped (scratchpad proto_said.py, 2
-      s, finds the 10-23 message): plan.user_said(ask) over the user''s typed texts, rare words (df<=1%), >=2 shared, top
-      3 by idf; cmd_ask refuses unless --searched names the transcripts. The plan.py edit was blocked by the review gate;
-      apply after the reviewer advances, add a test, re-review, then drop step 22.'
-    decisions: 40000 kept for the template (the ladder's full fidelity) since nothing names a canonical length; plan ask must
-      search Joaquin's own messages before asking
-    running: repo-reviewer a0b2da08acd94dae3 on the whole backlog
-    files: sweep/sweep_config_template.yaml sweep/sweep_config_jeanzay_template.yaml tools/plan.py /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/proto_said.py
-    written: '2026-11-10T00:48:15+00:00'
+    state: '2026-11-11: D399 setup fixes merged into trunk 6ec67a05 and pushed (keeper PASS at d56fb00b after 14 findings
+      fixed; repo-reviewer PASS at 10ced0d3 after 2 fixes: undecide soft delete, waiter test runner). Out of repo, live: ~/work/CLAUDE.md
+      event rule; ~/.claude/context/ledger.txt and site-tool.txt; ~/.local/bin/site undecide (soft delete) + CCORCH_HOME (backup
+      site.bak-20261111-setupfix). Worktree worktrees/wt-setup-fixes not removed: remove_worktree.sh copied its untracked
+      files and asks for ''git worktree remove'' (branch already deleted); check and remove. Step 23: no hand-back ever spooled;
+      absorb.log now logs waiter_alive per hand-back; the main session must re-arm its waiter (site edited 19:33 UTC); read
+      absorb.log after the next hand-backs and fix the failing condition (candidate: waiter must start after site''s mtime).
+      D396 code gap (drive.py vs sweep_manager defaults) flagged to the main session for the sweeps owner.'
+    decisions: Figure gate fires on cells opening with a measured quantity (decimal, power of ten, unit or ratio); counts
+      and clock times are bookkeeping. Log-reading events (RUN/GAP/OVERRUN, hook incidents) go to the owner or a mechanical-worker;
+      READY to the owner; others explained and acked. Decision deletion is soft (in_force 0, note with his words).
+    ruled_out: none
+    running: none
+    files: .claude/hooks/plan_check.py .claude/hooks/context_guard.py .claude/hooks/dispatch.py .claude/hooks/notification_absorb.py
+      .claude/agents/claudemd-keeper.md tests/test_plan_check_event_routing.py tests/test_plan_check_table_figure.py tests/test_run_done_waiter.py
+      /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/setupfix/rules_d399.diff
+    written: '2026-11-11T19:51:05+00:00'
   ask: 'Scope: CLAUDE.md change after the missing legends (2026-11-10): replace ''the main session sends it without opening
     it'' with ''the main session opens it once, at low resolution, before sending, and checks that every curve is named by
     a legend in that file and that the caption matches the axes''?'
