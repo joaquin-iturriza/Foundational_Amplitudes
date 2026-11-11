@@ -20954,6 +20954,15 @@ entries:
     withdrawn_at: '2026-11-10T10:32:29+00:00'
     withdrawn_why: Joaquin's D372 restores e+e- > b b~ as the third one-loop target and stops the third-target search, so
       a two-target arm is no longer in question
+  - ask: 'Scope: ee->bbbar (constant V/B) is now measured: error exactly 0 at every D from D=10, because the standardization''s
+      mean reproduces the constant whatever the network does, so no data saving can be read on it. Keep it in the data-saving
+      runs anyway, or replace it with bbbar->HZ (V/B varies, spread 0.305, V of one sign)?'
+    at: '2026-11-11T02:50:27+00:00'
+    searched: D370-D373; his messages 2026-11-10T02:08 (no target named), 10:09, 10:13, 10:15 on this target; 2026-10-05T04:33
+      and 2026-10-25T17:25 (lr scaling rule, unrelated to the target choice); CLAUDE.md scope rule
+    blocks: the re-costing of the data-saving runs (step 6), for ee->bbbar's cells
+    blocks_steps: &id003
+    - 6
   owner:
     agent: a66d0d73cd29b8da3
     state: working
@@ -21864,6 +21873,14 @@ entries:
     files: scripts/job_data_saving.sh, scripts/job_vob_born.sh, analysis/data_saving/{horizons,vb_test_mse,vb_spread,plot_calibration,plot_vb_spread}.py,
       analysis/data_saving/data/vb_spread.json, recipes/catalog_v4_datasaving_{bbx_zz_nlo,uux_epemz_nlo,epem_bbx_nlo,loops}.yaml
     written: '2026-11-10T10:24:01+00:00'
+  ask: 'Scope: ee->bbbar (constant V/B) is now measured: error exactly 0 at every D from D=10, because the standardization''s
+    mean reproduces the constant whatever the network does, so no data saving can be read on it. Keep it in the data-saving
+    runs anyway, or replace it with bbbar->HZ (V/B varies, spread 0.305, V of one sign)?'
+  waiting_since: '2026-11-11T02:50:27+00:00'
+  searched: D370-D373; his messages 2026-11-10T02:08 (no target named), 10:09, 10:13, 10:15 on this target; 2026-10-05T04:33
+    and 2026-10-25T17:25 (lr scaling rule, unrelated to the target choice); CLAUDE.md scope rule
+  blocks: the re-costing of the data-saving runs (step 6), for ee->bbbar's cells
+  blocks_steps: *id003
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
@@ -23648,7 +23665,7 @@ entries:
       about cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID,
       says nothing about the draft's sections)
     blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-    blocks_steps: &id003 []
+    blocks_steps: &id004 []
   owner:
     agent: afb073b8fc9460ec5
     state: stopped
@@ -23666,7 +23683,7 @@ entries:
     cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID, says
     nothing about the draft's sections)
   blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-  blocks_steps: *id003
+  blocks_steps: *id004
   step_why:
     1:
       feeds: the draft's results (D354)
