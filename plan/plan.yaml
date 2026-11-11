@@ -23530,6 +23530,11 @@ entries:
       is one draw of the frame). Fix for KIT (adf1742b): data.unaugmented_roles / rebuild(event_frame=True) in kit_predict
       reads the scored events unaugmented; training and the other rebuild users unchanged. All 51 KIT runs re-scored (batch
       kit_rescore), every reported KIT number to be re-read.'
+  - at: '2026-11-11T23:06:43+00:00'
+    text: 'Correction to the previous finding: the sentence comparing with the tt Born softpair bulk log10-MSE (~1e-8..1e-7)
+      was not read from a run; drop it. What is read: the tt Born softpair threshold stratum beta 1e-4..1e-3 log10-MSE is
+      6.9e-9 (carry-over finding), i.e. errors ~8e-5, the same order as the 1.4e-4..2.6e-4 pool dependence measured there.
+      The bulk comparison comes with the re-score.'
   step_why:
     3:
       feeds: Bakar's fair NLO comparison
