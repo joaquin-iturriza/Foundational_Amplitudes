@@ -21997,6 +21997,12 @@ entries:
       ~3460 steps at batch 16384, ~1 h on V100 plus the sigma stage; cosine schedule with the parent''s lr law at T=3460.
       Goes out after kit_benchmark''s three input-arm runs (3fa9854a, 1a14c791, 761cb2d8) are read, with any input option
       that gains (D392). Calibration repair: fc60e27a (e+e- > t t~ V, k=8) diverged at step 1528, rerun at half lr as FA-ccin2p3-94b83643.'
+  - at: '2026-11-11T04:29:57+00:00'
+    text: '2026-11-11 ~07:30 Joaquin (D393 + this decision): the new held-out parent (recipes/catalog_v4_datasaving_parent_heldout.yaml,
+      1133 pools) pretrains on 1e4 events per pool, 5 epochs in total, ~3460 steps at batch 16384, ~1 h on V100 plus sigma
+      stage, cosine with the parent''s lr law at that T; NOT 15000 or 68224 steps. Goes out after kit_benchmark''s input arms
+      are read, with any input that gains (D392). The next owner must apply this; the closing owner''s hand-off may predate
+      it.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
