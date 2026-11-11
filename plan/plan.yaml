@@ -22345,6 +22345,15 @@ entries:
       into one shared function with one test. Driver restarted by the main session at 16:19 as dsave_s2_drive2 (pid 740209,
       log /home/joaquin/.local/share/ccorch/detached/20261111-161952_dsave_s2_drive2.log) with --retry-failed for the 24 t
       t~ V init crashes; old driver dsave_s2_drive stopped.'
+  - at: '2026-11-11T15:37:47+00:00'
+    text: '2026-11-11 ~16:40 CET: first scratch blow-up, FA-ccin2p3-3cc8ed82 (scratch t t~ V D=5e4, hp351, lr 2.62e-2, step
+      594). Checked every t t~ V cell against the calibration (horizons_cal_f22_cal_f22_lrhalf.json): only D=1e4 blew up at
+      its centre (9.30e-3), and that cell already centres on c/2 = 4.65e-3. D=5e4 calibration trained cleanly at its centre
+      c = 9.88e-3 (best val 4.3e-8 at 8500 steps), as did every other D. So D=5e4''s window [3.3e-3, 2.96e-2] is centred on
+      a trained lr: no c/2 repair. The blow-up is at 2.65c, near the top edge: a real outcome, penalty kept (a second wave-1
+      trial there at 2.71e-2 is likely the same). Elsewhere t t~ V scratch trials up to 2.5e-2 (D=32), 2.2e-2 (D=10) and 1.1e-2
+      (D=3162) trained. Fine-tune divergences so far all sit at lr_scale 8.5-9.1. The 24 init crashes were requeued by dsave_s2_drive2
+      (pid 740209, 24 ''requeued'' lines); step 6 now waits on it, step 7 dropped.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
