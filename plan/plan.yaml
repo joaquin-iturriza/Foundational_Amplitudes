@@ -21851,6 +21851,12 @@ entries:
     text: '2026-11-11 ~04:40: the revised re-cost (fine-tunes sized from their own convergence, x4 large-D extension capped
       to what the curves support, no ttbar extension where converged, phase-a duplicate removed) was promised to Joaquin,
       then stopped by D380 (''No, no agent''); nothing runs on it until he asks again.'
+  - at: '2026-11-11T03:34:33+00:00'
+    text: '2026-11-11 ~04:50: owners'' targets (ttbar H3, ccbar g, bbbar gg; bbbar->ZZ, uubar->e+e-Z, ee->bbbar) did not match
+      Joaquin''s request (draft Fig. 22 compute_scan_eeuu_wt_min and its eettbar twin: ee->uubar and ee->ttbar at LO + one-loop
+      V). Asked him to confirm the set {ee->uubar LO, ee->uubar V, ee->ttbar LO, ee->ttbar V}; on yes, the main session itself
+      redoes steps (monotonic in D, 1 h cap, fine-tunes same steps, D383) and the cost on those four, one number, no agent.
+      Pretraining must hold these targets out (parent choice not yet checked).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
