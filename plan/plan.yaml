@@ -21042,7 +21042,7 @@ entries:
     - 7
   owner:
     agent: a57bc60fe641a25e9
-    state: working
+    state: closed
     since: '2026-11-11T20:14:27+00:00'
     state_at: '2026-11-11T23:44:45.500000+00:00'
     context: 228714
@@ -22864,43 +22864,29 @@ entries:
     start: '2026-11-11T20:18:16+00:00'
     at: '2026-11-11T20:18:16+00:00'
   handoff:
-    state: 'D400 fix in progress. (1) Off-shellness diagnostic read NO (diag_readout.py @fdcfec3d, fig analysis/data_saving/figs/stage2_diag.png):
-      own/parent-scale val 4 of 8 below, geomean 0.95 (LO 1.98, V 0.45); _resolve_offshell_stats unchanged. (2) Root cause
-      of no physical-mass tops: catalog_v4 holds out every external-top class (axis H3, select_catalog_v4.py), trial 1262''s
-      recipe inherits it. Design (passed 2026-11-11 after one FIX): r5 parents = r4 recipes + the 278 H3 classes (1411/1413
-      pools, gen_datasaving_parent.py @c1ed8842), stage A = 16 fixed-HP fine-tunes from r5 (configs sweep/sweep_config_dsave_diag_tops_ft_*_t8500.yaml,
-      HPs/hp_idx in analysis/data_saving/data/stage2_diag_runs.json, control = the parscale reruns there); stage B = 34 s3
-      fine-tune searches (sweep/sweep_config_dsave_s3_ft_*.yaml, DyHPO seeds = stage 2''s) only after A and Joaquin''s go
-      (88 GPU-h measured, 103 estimated). DONE: H3 train pools prebuilt (4 CPU jobs FA-ccin2p3-332dde88/26eb1495/9d94f833/4f0e577e,
-      shard 0 built 66 in 20 s; check the other three logs for V4REGEN_DONE). NEXT: submit the D395 smoke run (site submit
-      ccin2p3 FA scripts/job_datasaving_parent.sh --item pretrain_data_saving --hdr=--time=01:00:00 --hdr=--mem=48G -- heldout
-      iters=50 tag=r5smoke ++model.input_soft_eps=1e-8 ++model.input_pair_logs=6; my afterok dependency on the CPU jobs failed:
-      they had already ended), then parents heldout and treesin tag=r5 (--time 03:00:00, mem 48G, same flags), then stage
-      A''s 16 runs via sweep/trial_job.sh --detached as the diagnostic did, then read with diag_readout.py adapted (tops vs
-      parscale). Targets recorded: dsave_h3train 1 h, dsave_parent_r5 1.6 h, dsave_diag_tops 0.3 h. Coordinator''s D396 task
-      (do now, in parallel): worktree worktrees/wt-sweep-order branch sweep-order, WIP commit: sweep/ordering.py (wave_sizes,
-      wave_of, dispatch_order), drive.py uses it (waves by default, rolling only with --parallel; mark_done writes DRIVE_DONE
-      on sites), sweep_manager.submit_sweeps default path rewritten to per-sweep waves + afterany + nice by dispatch rank
-      (needs ORDER_NICE_STEP constant, _sweep_layout(dir)->(n_startup, minutes, waves, n_trials) helper, import ordering,
-      _rebalance to skip info.get(''ordered''), and removal of the now-duplicated chain block and dead assign_rounds/seq path;
-      NOT run yet), prune.finished requires DRIVE_DONE for searches without jobs/. Still to do: one test (tests/test_ordering.py:
-      wave_sizes 8/3 -> 3,3,2, explicit waves, bad waves raise; dispatch_order longest first + round-robin; sweep_manager
-      dry-run vs drive dispatch same order), update the ordering paragraph of .claude/context/fa-sweeps-and-hpo.txt in the
-      same commit, repo-reviewer before merge.'
-    decisions: 'Off-shellness fix not made: the passed diagnostic read NO (opposite signs LO vs V, within the 0.46-4.84 rerun
-      spread). Parents change only by the tops (design reviewer FIX: the q q~ g / q q~ g g families r4 held out stay out;
-      their return is Joaquin''s call, unasked so far). Stage B waits for Joaquin''s go on cost (D400 approves the fix, not
-      the cost). I fixed tests/test_handback_batch.py:105 (another agent''s uncommitted WIP, with notification_absorb.py)
-      at the repo reviewer''s exact line so the backlog could pass; not committed by me.'
-    ruled_out: Parent fine-tunes' off-shellness Z column on the parent's scale as the cause of the t t~ deficit (diagnostic
-      NO).
-    running: Driver dsave_s2_drive3 (pid 807322, stage-2 last trials; step 6/4 wait on it). CPU prebuild jobs above (shard
-      0 done). Nothing on GPU from me.
-    files: recipes/gen_datasaving_parent.py, recipes/catalog_v4_datasaving_{parent_heldout,parent_treesin,h3_train}.yaml,
-      scripts/job_datasaving_parent.sh, sweep/gen_data_saving.py (--stage), sweep/sweep_config_dsave_{s3_ft,diag_tops_ft}_*.yaml,
-      analysis/data_saving/diag_readout.py, analysis/data_saving/data/stage2_diag_readout.json, analysis/data_saving/figs/stage2_diag.png,
-      worktrees/wt-sweep-order (D396 WIP)
-    written: '2026-11-11T20:04:53+00:00'
+    state: 'Stage 2 final and written up (sec:datasaving @bc1aec8c, stage2_readout.py @5555a0f0, 68 searches): S at 1e-4 test
+      u u~ LO 3.8 [2.7,4.8], t t~ LO 0.46, u u~ V 8.3 [3.2,inf] (val 2.7), t t~ V 0.45. D400: off-shellness diagnostic read
+      per target -> one-loop s3 configs take offshell_stats own (94c460b6). Stage A (8 fixed-HP fine-tunes from r5 parents
+      FA-ccin2p3-857e83c1 heldout / 030b2c3f treesin; runs in data/stage2_diag_runs.json) read by diag_readout.py tops @e190a6c1,
+      fig figs/stage2_diag_tops.png: pooled rule NO (geomean r5/r4 0.68, 4/8 below); per target t t~ LO 0.24 (fine-tune now
+      0.77x/0.75x of scratch at D=3162/1e4), t t~ V 1.92 (11.6x worse at 1e4). Step 7 HELD on the open question to Joaquin:
+      stage B''s 18 tree searches from r5 (~60 GPU-h) or not. If yes: drive.py over sweep/sweep_config_dsave_s3_ft_{ee_uu,epem_ttx}_*.yaml
+      (DyHPO seeds = stage 2''s; record design note, target, site pick), then stage2_readout.py with s3 fine-tunes against
+      s2 scratch and rewrite sec:datasaving. One-loop next suspects (design needed): dimensionless-mass column on parent scale,
+      fine-tune optimizer, kit_benchmark''s log beta^2 pair input (model.input_pair_threshold: passed KIT t t~ V, failed t
+      t~ Born). sec:datasaving still says the t t~ deficit is under test: update it with the stage A read.'
+    decisions: 'Stage A ran 8 cells (the design''s 8 configs; ''16'' was a miscount). D=1e4 cells rerun after my hand-set
+      16-min limit cut them (35922ca9, adbd0552 at 32 min). No event-frame rescoring: r4 and r5 parents and every stage-2
+      run carry the same softpair inputs and the pool-keyed augmentation is identical across arms. Off-shellness own scale
+      applied to one-loop fine-tunes only (V test 0.19 geomean, LO worse). D396 ordering merged (4c12189a) after repo-reviewer
+      and claudemd-keeper passes.'
+    ruled_out: Off-shellness scale as the t t~ LO deficit (own scale worse on LO); missing physical-mass tops as the t t~
+      V deficit (r5 worse on V).
+    running: none
+    files: analysis/data_saving/{stage2_readout.py,diag_readout.py,plot_stage2.py}, analysis/data_saving/data/{stage2_readout.json,stage2_diag_runs.json,stage2_diag_tops_readout.json,stage2_diag_readout.json},
+      analysis/data_saving/figs/{stage2_LD,stage2_diag,stage2_diag_tops}.png, sweep/gen_data_saving.py (--offshell-nlo), sweep/sweep_config_dsave_s3_ft_*.yaml,
+      docs/results.tex sec:datasaving
+    written: '2026-11-11T23:50:18+00:00'
   ask: 'GPU budget: about 60 GPU-h (estimated from the s3 configs) above 30 with no decision covering it. Stage A of the D400
     fix reads NO by its pre-set pooled rule (r5/r4 geomean 0.68, 4 of 8 cells below), so the design does not propose stage
     B; per target, t t~ LO gains 0.30x, 0.09x, 0.06x at D=1e3..1e4 (fine-tune now 0.77x, 0.75x of scratch from D=3162) and
