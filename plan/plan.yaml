@@ -20942,10 +20942,6 @@ entries:
   - D360
   - D377
   next:
-    3: 'Stage 2: one single-fidelity 8-trial DyHPO per (target, D, arm), scratch over the template''s space, fine-tune (full
-      retrain + layer decay from the w8 x16 catalog_v4 pretraining best_cov_v4_long_hpo8_cc_68224_trial_1262) over the fine-tune
-      space, both at T(D); GPU-h estimate from stage 1''s measured step rate, to Joaquin if over 30 GPU-h without a covering
-      decision'
     4: 'Readout: per target L(D) scratch vs fine-tune (best trial per cell), D*(1e-4) by log-log interpolation, saving D*_scratch/D*_ft,
       one MSE vs GPU-hours panel; figures replacing the draft''s fig 22; write-up in docs/results.tex'
     6: 'Stage 2 under D392 (go given): after kit_benchmark''s three input-arm runs (FA-ccin2p3-3fa9854a pair logs, 1a14c791
@@ -21029,11 +21025,6 @@ entries:
     since: '2026-11-11T19:37:06+00:00'
     state_at: '2026-11-11T19:37:06+00:00'
   step_why:
-    3:
-      feeds: 'D360: the data saved at MSE(ln|M|^2)=1e-4, trees and one loops'
-      if:
-      - 'estimate covered or <= 30 GPU-h: design, review, submit'
-      - 'over 30 and not covered: estimate to Joaquin'
     4:
       feeds: draft_rewrite's pretraining figure
       if:
@@ -22199,7 +22190,6 @@ entries:
       same configs (gen_data_saving''s estimate 103). Whole rerun ~92-107 GPU-h, above 30: (1)-(3) (3.7 GPU-h) go under D400;
       (4) waits for Joaquin''s go on the cost. Disk: 0.7 GB pools + parents against 55 GB free on /sps/lpnhe (read 2026-11-11).'
   step_waits:
-    '3': '2026-11-12'
     '4': step 6 (driver dsave_s2_drive3 end) and step 7 (the t t~ diagnostic runs; no write-up before its verdict)
     '6': 'the end of driver dsave_s2_drive3 (pid 807322, log ~/.local/share/ccorch/detached/20261111-174638_dsave_s2_drive3.log):
       then check 8 trials per search, rerun stage2_readout.py --fetch and plot_stage2.py, write-up'
