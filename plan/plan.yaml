@@ -21014,9 +21014,9 @@ entries:
     decision: D377
   owner:
     agent: ad22b7980a1852494
-    state: working
+    state: stopped
     since: '2026-11-11T18:36:56.382000+00:00'
-    state_at: '2026-11-11T18:36:56.382000+00:00'
+    state_at: '2026-11-11T18:46:24.785000+00:00'
   step_why:
     3:
       feeds: 'D360: the data saved at MSE(ln|M|^2)=1e-4, trees and one loops'
