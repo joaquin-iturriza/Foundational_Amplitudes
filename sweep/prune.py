@@ -294,6 +294,8 @@ def caches(days, apply):
             freed += _size(f)
             if apply:
                 os.remove(f)
+            else:
+                print("CACHE_DRY", f)       # print-only: what an --apply would delete (scripts/job_prune_dryrun.sh)
     return freed
 
 
