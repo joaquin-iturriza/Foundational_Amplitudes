@@ -238,5 +238,125 @@
    "ema": "true",
    "training.ema_decay": 0.9166535316444934
   }
+ },
+ "dsave_diag_tops_ft_epem_ttx_d5_t8500": {
+  "rid": "FA-ccin2p3-0ca51b6f",
+  "control": "FA-ccin2p3-bbc4fcc6",
+  "hp_idx": 1647,
+  "hp": {
+   "fine_tune.lr_scale": 0.76450032604544,
+   "fine_tune.layer_decay": 0.7568139291834086,
+   "training.muon_weight_decay": 0.17274051845435906,
+   "training.regularization_lambda": 1.0415351340535765e-08,
+   "training.cosanneal_warmup_frac": 0.18600225048139696,
+   "training.cosanneal_eta_min": 1.5494050809891875e-10,
+   "ema": "false",
+   "training.ema_decay": 0.9768689628532157
+  }
+ },
+ "dsave_diag_tops_ft_epem_ttx_d6_t8500": {
+  "rid": "FA-ccin2p3-e538bda9",
+  "control": "FA-ccin2p3-790990bf",
+  "hp_idx": 507,
+  "hp": {
+   "fine_tune.lr_scale": 0.20914944174475314,
+   "fine_tune.layer_decay": 0.7519897862803191,
+   "training.muon_weight_decay": 0.009539503878239122,
+   "training.regularization_lambda": 7.198768322545023e-08,
+   "training.cosanneal_warmup_frac": 0.19034543307498097,
+   "training.cosanneal_eta_min": 1.2444264717304867e-08,
+   "ema": "false",
+   "training.ema_decay": 0.9328678755685688
+  }
+ },
+ "dsave_diag_tops_ft_epem_ttx_d7_t8500": {
+  "rid": "FA-ccin2p3-f996c9e8",
+  "control": "FA-ccin2p3-cc8c9a27",
+  "hp_idx": 1817,
+  "hp": {
+   "fine_tune.lr_scale": 0.3368637272057274,
+   "fine_tune.layer_decay": 0.9206019206903875,
+   "training.muon_weight_decay": 0.05099830012684764,
+   "training.regularization_lambda": 5.360776615993696e-09,
+   "training.cosanneal_warmup_frac": 0.09509653029963375,
+   "training.cosanneal_eta_min": 1.3010222893452687e-09,
+   "ema": "true",
+   "training.ema_decay": 0.9312897192807869
+  }
+ },
+ "dsave_diag_tops_ft_epem_ttx_d8_t8500": {
+  "rid": "FA-ccin2p3-bb248f6b",
+  "control": "FA-ccin2p3-7ef89fea",
+  "hp_idx": 1387,
+  "hp": {
+   "fine_tune.lr_scale": 0.45742352433913624,
+   "fine_tune.layer_decay": 0.9535294894594699,
+   "training.muon_weight_decay": 0.007226605879547478,
+   "training.regularization_lambda": 6.847383091421764e-08,
+   "training.cosanneal_warmup_frac": 0.12147544617764654,
+   "training.cosanneal_eta_min": 1.016117843914658e-08,
+   "ema": "false",
+   "training.ema_decay": 0.9617516281418502
+  }
+ },
+ "dsave_diag_tops_ft_ee_ttbar_nlo_d5_t8500": {
+  "rid": "FA-ccin2p3-58307031",
+  "control": "FA-ccin2p3-9dd6c6a5",
+  "hp_idx": 340,
+  "hp": {
+   "fine_tune.lr_scale": 0.1224324291367089,
+   "fine_tune.layer_decay": 0.7588957857806236,
+   "training.muon_weight_decay": 0.0013957043420621787,
+   "training.regularization_lambda": 1.9767096568530845e-08,
+   "training.cosanneal_warmup_frac": 0.08882756954990328,
+   "training.cosanneal_eta_min": 9.276144627331754e-09,
+   "ema": "true",
+   "training.ema_decay": 0.9046396675854922
+  }
+ },
+ "dsave_diag_tops_ft_ee_ttbar_nlo_d6_t8500": {
+  "rid": "FA-ccin2p3-1d03af0a",
+  "control": "FA-ccin2p3-55311fa3",
+  "hp_idx": 1544,
+  "hp": {
+   "fine_tune.lr_scale": 7.411666559952677,
+   "fine_tune.layer_decay": 0.7818356410134584,
+   "training.muon_weight_decay": 0.034373173098222236,
+   "training.regularization_lambda": 9.994753822951773e-10,
+   "training.cosanneal_warmup_frac": 0.09270643410272897,
+   "training.cosanneal_eta_min": 9.813685946016085e-10,
+   "ema": "false",
+   "training.ema_decay": 0.9627266888944432
+  }
+ },
+ "dsave_diag_tops_ft_ee_ttbar_nlo_d7_t8500": {
+  "rid": "FA-ccin2p3-a400e6d5",
+  "control": "FA-ccin2p3-ba3dadd6",
+  "hp_idx": 120,
+  "hp": {
+   "fine_tune.lr_scale": 0.16373774272896718,
+   "fine_tune.layer_decay": 0.862270564539358,
+   "training.muon_weight_decay": 0.0010736412085852055,
+   "training.regularization_lambda": 5.406212926021067e-10,
+   "training.cosanneal_warmup_frac": 0.18088630139827733,
+   "training.cosanneal_eta_min": 6.679853497604928e-08,
+   "ema": "true",
+   "training.ema_decay": 0.9025982855027542
+  }
+ },
+ "dsave_diag_tops_ft_ee_ttbar_nlo_d8_t8500": {
+  "rid": "FA-ccin2p3-391a6e00",
+  "control": "FA-ccin2p3-d67b326e",
+  "hp_idx": 406,
+  "hp": {
+   "fine_tune.lr_scale": 0.10903841617438866,
+   "fine_tune.layer_decay": 0.9997763789724559,
+   "training.muon_weight_decay": 0.050752809643121836,
+   "training.regularization_lambda": 4.5173898909326057e-10,
+   "training.cosanneal_warmup_frac": 0.10231071072630585,
+   "training.cosanneal_eta_min": 3.726413546272236e-08,
+   "ema": "true",
+   "training.ema_decay": 0.9166535316444934
+  }
  }
 }

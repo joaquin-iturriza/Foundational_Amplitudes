@@ -8,8 +8,11 @@ three); test is data/stage2_diag_test.json (stage2_readout.py --diag) and, for t
 MSE(ln|M|^2) for LO, MSE(V/B) for V. Verdict by the design's rule: YES if offown < parscale in >= 6 of 8 cells and
 the geometric mean of offown/parscale <= 1/3; NO if the geometric mean >= 1/1.5 or fewer than 5 of 8 below; else
 inconclusive. Writes data/stage2_diag_readout.json and figs/stage2_diag.{png,pdf}.
+With the argument `tops` (D400 stage A, same rule): the fine-tunes from the r5 parents (catalog_v4's physical-mass
+top classes added) in place of offown, against the same parscale reruns from r4 (the 'own' fields then hold the tops
+arm); writes data/stage2_diag_tops_readout.json and figs/stage2_diag_tops.{png,pdf}.
 
-    python analysis/data_saving/diag_readout.py
+    python analysis/data_saving/diag_readout.py [tops]
 """
 import json
 import os
@@ -27,6 +30,9 @@ DATA = os.path.join(REPO, "analysis/data_saving/data")
 RUNS = json.load(open(os.path.join(DATA, "stage2_diag_runs.json")))
 TEST_DIAG = {r["sweep"]: r for r in json.load(open(os.path.join(DATA, "stage2_diag_test.json")))}
 TEST_S2 = {(r["sweep"], r["hp_idx"]): r for r in json.load(open(os.path.join(DATA, "stage2_test.json")))}
+ARM = sys.argv[1] if len(sys.argv) > 1 else "offown"
+SUF = "" if ARM == "offown" else "_" + ARM
+LABEL = {"offown": "own scale", "tops": "r5 parent"}[ARM]
 TARGETS = [("epem_ttx", r"$e^+e^-\to t\bar t$", "mse_ln"), ("ee_ttbar_nlo", r"$e^+e^-\to t\bar t$, $V$", "mse_vb")]
 
 
@@ -41,11 +47,11 @@ def main():
     rows = []
     for tg, _, key in TARGETS:
         for k in (5, 6, 7, 8):
-            own, par = (RUNS[f"dsave_diag_{a}_ft_{tg}_d{k}_t8500"] for a in ("offown", "parscale"))
+            own, par = (RUNS[f"dsave_diag_{a}_ft_{tg}_d{k}_t8500"] for a in (ARM, "parscale"))
             s2 = f"dsave_s2_ft_{tg}_d{k}_t8500"
             r = dict(target=tg, k=k, D=10 ** (k / 2), own=own["rid"], par=par["rid"], orig=own["control"],
                      val_own=val(own["rid"]), val_par=val(par["rid"]), val_orig=val(own["control"]),
-                     test_own=TEST_DIAG[f"dsave_diag_offown_ft_{tg}_d{k}_t8500"][key],
+                     test_own=TEST_DIAG[f"dsave_diag_{ARM}_ft_{tg}_d{k}_t8500"][key],
                      test_par=TEST_DIAG[f"dsave_diag_parscale_ft_{tg}_d{k}_t8500"][key],
                      test_orig=TEST_S2[(s2, own["hp_idx"])][key])
             r["own_over_par"] = r["val_own"] / r["val_par"]
@@ -66,7 +72,7 @@ def main():
                            for tg, _, _ in TARGETS},
                 test_par_over_orig_range=[min(r["test_par"] / r["test_orig"] for r in rows),
                                           max(r["test_par"] / r["test_orig"] for r in rows)])
-    json.dump(dict(cells=rows, summary=summ), open(os.path.join(DATA, "stage2_diag_readout.json"), "w"), indent=1)
+    json.dump(dict(cells=rows, summary=summ), open(os.path.join(DATA, f"stage2_diag{SUF}_readout.json"), "w"), indent=1)
     for r in rows:
         print(f"{r['target']:13s} D={r['D']:7.0f} val own {r['val_own']:.2e} par {r['val_par']:.2e} orig "
               f"{r['val_orig']:.2e}  own/par {r['own_over_par']:.2f}  par/orig {r['par_over_orig']:.2f}  "
@@ -74,7 +80,7 @@ def main():
     print(json.dumps(summ))
 
     fig, axs = ps.figure(ncols=2)
-    arms = [("val_own", "own scale", ps.C.vermillion, "s"), ("val_par", "parent scale", ps.C.blue, "o"),
+    arms = [("val_own", LABEL, ps.C.vermillion, "s"), ("val_par", "parent scale", ps.C.blue, "o"),
             ("val_orig", "stage-2 best", ps.C.grey, "^")]
     for n, (ax, (tg, lab, _)) in enumerate(zip(axs, TARGETS)):
         cc = [r for r in rows if r["target"] == tg]
@@ -87,7 +93,7 @@ def main():
         ps.process_label(ax, lab)
         if n == 0:
             ps.legend(ax, "lower left")
-    ps.save(fig, os.path.join(REPO, "analysis/data_saving/figs/stage2_diag"))
+    ps.save(fig, os.path.join(REPO, "analysis/data_saving/figs/stage2_diag" + SUF))
 
 
 if __name__ == "__main__":
