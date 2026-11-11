@@ -22844,6 +22844,22 @@ entries:
       runs (pretrain_data_saving). Still above Bakar''s MLP on collinear (2.21 vs 0.11). One seed (D315); local logs dropped.
       Catalog use: input_pair_logs = the largest multiplicity (pairs index-ordered, zero-padded; not permutation-symmetric
       across identical legs); soft rescale takes Q = p_0 + p_1 (beams first).'
+  - at: '2026-11-11T06:37:49+00:00'
+    text: 'A_ft verdict after the design''s lr-axis check: pretraining helps the soft limit at the fine-tune lr (lr_scale
+      0.1), not the collinear limit nor the tt Coulomb rise; bulk transfer everywhere. lr_scale 0.1 runs (job_kit.sh A_ft
+      KIT_LR_SCALE=0.1 at b6794f35, parent runs/kit/kit_pretrain_heldout, 1e5, seed 42): uug FA-ccin2p3-93ccd2c4, uugg 015da743,
+      tt virtual off-shellness at 0 81a52170; tools/kit_readout.py at 44e102dc on analysis/kit_benchmark/data/kit_fig_A_ft_lr.json
+      @f091a2d1; figures analysis/kit_benchmark/figs/kit_{mse,median}_aftlr_*.png. Deepest bin log10-MSE scratch / A_ft lr
+      1.0 / A_ft lr 0.1: uug soft 14180 / 2140 / 36.7 (0.1: 2.59 decades below scratch, exponent -0.77 vs exact -2), uug coll
+      30.1 / 20.5 / 22.8 (exponents +0.32/+0.09/+0.17); uugg soft 9070 / 2450 / 152 (1.78 decades below, exponent -2.14 in
+      [-2.5,-1.5]: band a), uugg coll_gg 20.5 / 14.8 / 14.5, coll_qg 18.4 / 14.9 / 13.9 (exponents ~-0.1 vs -1: b); tt virtual
+      Coulomb beta 1e-4..1e-3 7.12 / 7.66 / 9.02, exponent -0.02 / -0.00 / +0.04 vs -1.02 (b). Bulk_test: uug 8.2e-4 / 9.8e-4
+      / 1.55e-4, uugg 2.27e-3 / 1.12e-3 / 5.1e-4, tt virtual 1.15e-8 / 6.7e-9 / 1.95e-9 (0.1: 0.65-0.77 decades below scratch).
+      Design branch: (a) for soft at lr 0.1 (both lr points reported), (b) for collinear and Coulomb. Against the input arms:
+      from scratch with soft rescale + pair logs, uug reaches soft 0.200 and coll 2.21 (finding before), far below any A_ft
+      cell; so the input representation is the bigger lever and the pretrained parent should carry it (pretrain_data_saving
+      builds that parent, D392). tt Born threshold with the off-shellness column on stays hurt by A_ft (2.5-3.4 decades above
+      scratch at lr 1.0; not part of the lr check).'
   step_why:
     3:
       feeds: Bakar's fair NLO comparison
