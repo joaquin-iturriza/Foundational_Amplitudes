@@ -21010,12 +21010,10 @@ entries:
     answered_at: '2026-11-11T02:56:42.893000+00:00'
     decision: D377
   owner:
-    agent: adc41b4db89d6efe9
-    state: closed
-    since: '2026-11-11T08:35:21.156000+00:00'
-    state_at: '2026-11-11T10:31:30+00:00'
-    context: 199028
-    context_at: '2026-11-11T10:27:32+00:00'
+    agent: add29192e1ba98d5b
+    state: working
+    since: '2026-11-11T12:02:47.553000+00:00'
+    state_at: '2026-11-11T12:02:47.553000+00:00'
   step_why:
     3:
       feeds: 'D360: the data saved at MSE(ln|M|^2)=1e-4, trees and one loops'
