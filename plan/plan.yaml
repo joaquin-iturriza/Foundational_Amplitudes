@@ -21991,6 +21991,12 @@ entries:
       (recipes/catalog_v4_datasaving_parent_heldout.yaml) takes the target-excluding foundation''s length, 15000 steps (cosine,
       the parent''s lr law at T=15000), at the parent''s batch 16384: ~3.9 h on V100 at 0.93 s/step. Submitted only after
       kit_benchmark''s input arms are read (step 6).'
+  - at: '2026-11-11T04:29:20+00:00'
+    text: '2026-11-11 (D393/D394, supersedes the 15000-step parent length): the new held-out parent pretrains on 1e4 events
+      per pool over all 1133 pools of recipes/catalog_v4_datasaving_parent_heldout.yaml, 5 epochs in total: ~5.7e7 events,
+      ~3460 steps at batch 16384, ~1 h on V100 plus the sigma stage; cosine schedule with the parent''s lr law at T=3460.
+      Goes out after kit_benchmark''s three input-arm runs (3fa9854a, 1a14c791, 761cb2d8) are read, with any input option
+      that gains (D392). Calibration repair: fc60e27a (e+e- > t t~ V, k=8) diverged at step 1528, rerun at half lr as FA-ccin2p3-94b83643.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
