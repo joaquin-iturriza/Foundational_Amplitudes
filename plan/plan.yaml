@@ -21018,9 +21018,9 @@ entries:
     decision: D377
   owner:
     agent: ad22b7980a1852494
-    state: working
+    state: stopped
     since: '2026-11-11T18:36:56.382000+00:00'
-    state_at: '2026-11-11T18:53:03.266000+00:00'
+    state_at: '2026-11-11T19:11:03.334000+00:00'
     context: 245417
     context_at: '2026-11-11T18:59:43+00:00'
   step_why:
