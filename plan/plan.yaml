@@ -16900,6 +16900,13 @@ entries:
   - at: '2026-11-11T03:24:37+00:00'
     text: '2026-11-11: D380 was recorded too broadly (''no agents for the re-cost and the disk question''); Joaquin corrected:
       ''no agent'' meant only the agent recalculating the GPU-hours. Re-recorded with that scope.'
+  - at: '2026-11-11T03:43:23+00:00'
+    text: '2026-11-11 ~05:10: CC disk not fixed (39 GB free of 512). prune_site.sh wrapper refused by the permission check
+      (rule in .claude/settings.json covers ''site run * -- *sweep/prune.py*'' only); the main session''s message telling
+      the worker to run the allowed form was refused by the auto-mode classifier. Asked Joaquin to run it with ! or give a
+      plain go. Worker a0f0ed61b4d88299f has a background du on the CC login node (/tmp/du_top.txt, /tmp/du_ours.txt) to read.
+      Also: D380''s covers field was written broader than his words and acted on; rule for the main session: a covers field
+      restates his words, no additions.'
   handoff:
     state: '2026-11-10: step 20 closed (repo hygiene 1c051019 in maintain; leave-check 9fa60369/700fe4fa registered on SubagentStop
       by Joaquin 5759a43f; guard fix installed, test 1b06ad6f); steps 15, 23 dropped (double wake already fixed by notification_absorb:
