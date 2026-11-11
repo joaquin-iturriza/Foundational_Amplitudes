@@ -155,16 +155,20 @@ class Sweep:
         self.seed = int(fp.get("data.seed", 42))
         self.sp = os.path.join(self.dir, "driver_state.json")
         self.st = json.load(open(self.sp)) if os.path.exists(self.sp) else {"trials": {}, "prebuild": {}}
-        if getattr(a, "retry_lost", False) and not a.dry_run:
-            self.requeue_lost()
+        if (getattr(a, "retry_lost", False) or getattr(a, "retry_failed", None)) and not a.dry_run:
+            self.requeue_lost(getattr(a, "retry_lost", False), getattr(a, "retry_failed", None))
 
-    def requeue_lost(self):
+    def requeue_lost(self, lost=True, failed_re=None):
         """--retry-lost: every "lost" trial (no RESULT_JSON in its log: the job died without reporting, e.g. a full
         filesystem, 2026-10-23) is taken back: the failure penalty it was observed at is removed from the sampler and
         the surrogate, its config leaves the diverged set, and it is resubmitted at the same hp and t_steps under the
-        same trial index. A "failed" trial (it reported a failure: diverged, NaN) keeps its penalty."""
+        same trial index. A "failed" trial (it reported a failure: diverged, NaN) keeps its penalty, unless
+        --retry-failed REGEX matches its run id and error (a crash of our code, fixed since: not a property of its hp)."""
         alg = self.sampler.algorithm
-        for t in self.trials("lost"):
+        todo = list(self.trials("lost")) if lost else []
+        if failed_re:
+            todo += [t for t in self.trials("failed") if re.search(failed_re, "%s %s" % (t.get("rid"), t.get("error") or ""))]
+        for t in todo:
             hp, combo = t["hp_idx"], self.sampler._to_combo(t["t_steps"])
             h = self.sampler._val_loss_history.get(hp, {})
             h.pop(combo, None)
@@ -177,9 +181,9 @@ class Sweep:
                 alg.observations.pop(hp)
             alg.diverged_configs.discard(hp)
             t.setdefault("lost_runs", []).append(t["rid"])
-            t["status"] = "retry"
-            log("%s: trial %d (hp%04d t%d, lost in %s) requeued, its penalty removed"
-                % (self.name, t["idx"], hp, t["t_steps"], t["rid"]))
+            was, t["status"] = t["status"], "retry"
+            log("%s: trial %d (hp%04d t%d, %s in %s) requeued, its penalty removed"
+                % (self.name, t["idx"], hp, t["t_steps"], was, t["rid"]))
         self.save()
 
     # ---- persistence
@@ -406,6 +410,9 @@ def main():
                     help="resubmit every lost trial (no RESULT_JSON: the job died without reporting, which includes a "
                          "TIMEOUT or OUT_OF_MEM as well as a crash of the site) at its hp, its penalty taken back out of "
                          "the surrogate")
+    ap.add_argument("--retry-failed", metavar="REGEX",
+                    help="resubmit every failed trial whose '<run id> <error>' matches REGEX (a code crash fixed since), as "
+                         "--retry-lost does, its penalty taken back out")
     ap.add_argument("--dry-run", action="store_true", help="print the first wave's submit commands; nothing written or sent")
     a = ap.parse_args()
     if a.dry_run:
