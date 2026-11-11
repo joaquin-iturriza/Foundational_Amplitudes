@@ -23270,7 +23270,7 @@ entries:
     agent: aa70fe4b5162f3a20
     state: stopped
     since: '2026-11-10T03:53:00+00:00'
-    state_at: '2026-11-10T09:58:03.779000+00:00'
+    state_at: '2026-11-11T02:01:06.837000+00:00'
     context: 206484
     context_at: '2026-11-10T09:58:06+00:00'
   designs:
