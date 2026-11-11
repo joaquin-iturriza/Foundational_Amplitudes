@@ -21846,6 +21846,10 @@ entries:
       borrowed from ZZ. Asked him to choose: (1) full ~690, (2) drop the possible duplicate and ttbar''s long mid-D runs (~500-550
       estimated, to be re-run with the tool), (3) also cap D at 1e4 (~250-300 estimated). Estimates (2)(3) are mine, not from
       the tool.'
+  - at: '2026-11-11T03:23:58+00:00'
+    text: '2026-11-11 ~04:40: the revised re-cost (fine-tunes sized from their own convergence, x4 large-D extension capped
+      to what the curves support, no ttbar extension where converged, phase-a duplicate removed) was promised to Joaquin,
+      then stopped by D380 (''No, no agent''); nothing runs on it until he asks again.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
