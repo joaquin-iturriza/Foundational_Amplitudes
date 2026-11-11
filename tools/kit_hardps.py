@@ -238,6 +238,7 @@ def build_pool(rec, out):
     """Write the pool of recipe `rec` at `out` (atomically: concurrent trials of one size build identical bytes)."""
     rows = role_rows(rec["process"], rec["role"], rec["n_events"])
     tmp = f"{out}.tmp{os.getpid()}.npy"
+    os.makedirs(os.path.dirname(out) or ".", exist_ok=True)   # a fresh SCRATCH has no cache dir yet
     np.save(tmp, rows)
     os.replace(tmp, out)
     return out
