@@ -1,0 +1,119 @@
+#!/usr/bin/env python
+"""The three input representations for singular limits (D374, kit_benchmark input arms; config/model/lloca.yaml):
+model.input_pair_logs, model.input_soft_eps, model.input_local_log_eps. For each flag: the μP LLoCa wrapper's output is
+invariant under a random Lorentz transform of every momentum (float64), and the flag changes the output (it is wired).
+Plus the pair logs' values on a known event and the soft rescale's fixed point x = 1.
+
+Run:  .venv-cpu/bin/python tests/test_input_reps.py
+"""
+import os
+import sys
+
+import numpy as np
+import torch
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, ROOT)
+from wrappers import AmplitudeLLoCaWrapper, _pair_log_inputs, _soft_rescale  # noqa: E402
+
+torch.set_default_dtype(torch.float64)
+LENS = (5, 5, 4)
+
+
+def _events(seed):
+    """Events of LENS particles: two back-to-back massless beams, then massless outgoing momenta, one of them soft."""
+    rng = np.random.default_rng(seed)
+    out = []
+    for n in LENS:
+        p3 = rng.normal(size=(n - 2, 3))
+        p3[-1] *= 1e-6                                    # a soft leg
+        ev = [[1, 0, 0, 1], [1, 0, 0, -1]] + [[np.linalg.norm(v), *v] for v in p3]
+        out.append(ev)
+    return torch.tensor(np.concatenate(out)), torch.tensor(np.cumsum([0, *LENS]))
+
+
+def _lorentz(seed):
+    rng = np.random.default_rng(seed)
+    b = rng.normal(size=3)
+    b *= 0.7 / np.linalg.norm(b)
+    g = 1 / np.sqrt(1 - b @ b)
+    B = np.eye(4)
+    B[0, 0] = g
+    B[0, 1:] = B[1:, 0] = g * b
+    B[1:, 1:] += (g - 1) * np.outer(b, b) / (b @ b)
+    R = np.eye(4)
+    R[1:, 1:] = np.linalg.qr(rng.normal(size=(3, 3)))[0]
+    return torch.tensor(B @ R)
+
+
+def _wrapper(**flags):
+    from models.lloca import LLOCAMuPTransformer
+    n_pl = flags.get("input_pair_logs", 0)
+    ns = 16 + n_pl * (n_pl - 1) // 2
+    torch.manual_seed(0)
+    net = LLOCAMuPTransformer(num_scalars=ns, hidden_channels_mlp=16, num_layers_mlp=2, in_channels=ns + 4,
+                              attn_reps="8x0n+2x1n", out_channels=1, num_blocks=2, num_heads=2)
+    w = AmplitudeLLoCaWrapper(net, token_size=0, d_particle_hidden=16, **flags)
+    w.setup_particle_features(use_pids=False, property_matrix=torch.randn(5, 4).numpy())
+    return w.double().eval()
+
+
+def _out(w, p, ptr):
+    tok = torch.tensor([1, 1, 2, 3, 4, 1, 1, 2, 3, 4, 1, 1, 2, 3])
+    with torch.no_grad():
+        return w(p, tok, 0.0, 1.0, ptr).reshape(-1)
+
+
+FLAGS = {"pair_logs": dict(input_pair_logs=5), "soft_rescale": dict(input_soft_eps=1e-8),
+         "local_logs": dict(input_local_log_eps=1e-8)}
+
+
+def _check(name):
+    p, ptr = _events(1)
+    L = _lorentz(2)
+    w = _wrapper(**FLAGS[name])
+    a, b = _out(w, p, ptr), _out(w, p @ L.T, ptr)
+    rel = float((a - b).abs().max() / a.abs().max())
+    # float64 frame rounding (~1e-16) is amplified near z = 0 by up to 1/(eps asinh(1/eps)) ~ 5e6 under local_logs
+    assert rel < 1e-7, f"{name}: not Lorentz invariant, rel {rel:.2e}"
+    moved = float((a - _out(_wrapper(), p, ptr)).abs().max() / a.abs().max())
+    assert moved > 1e-6, f"{name}: the flag does not change the output"
+    print(f"{name}: invariant (rel {rel:.1e}), flag moves the output (rel {moved:.1e}): ok")
+
+
+def test_pair_logs_equivariant():
+    _check("pair_logs")
+
+
+def test_soft_rescale_equivariant():
+    _check("soft_rescale")
+
+
+def test_local_logs_equivariant():
+    _check("local_logs")
+
+
+def test_pair_log_values():
+    p, ptr = _events(3)
+    f = _pair_log_inputs(p, ptr, 5)
+    assert f.shape == (14, 10)
+    i, j, k = 2, 4, 0                                  # event 0: pair (2, 4) is column 7 of the i<j order
+    col = [(a, c) for a in range(5) for c in range(a + 1, 5)].index((i, j))
+    dot = p[i, 0] * p[j, 0] - (p[i, 1:] * p[j, 1:]).sum()
+    assert torch.allclose(f[k, col], torch.log(2 * dot / 4.0) / 5)
+    assert (f[10:, [3, 6, 8, 9]] == 0).all()           # the 4-particle event's pairs with leg 4 are 0
+    assert (f[0] == f[4]).all()                        # broadcast over the event
+
+
+def test_soft_rescale_fixed_point():
+    p, ptr = _events(4)
+    q = _soft_rescale(p, ptr, 1e-8)
+    assert torch.allclose(q[:2], p[:2])                # the beams have x = 1
+    assert float(q[4, 0] / p[4, 0]) > 1e5              # the soft leg is lifted (x ~ 1e-6: log1p(100)/(1e-6 log 1e8))
+
+
+if __name__ == "__main__":
+    for t in [test_pair_log_values, test_soft_rescale_fixed_point, test_pair_logs_equivariant,
+              test_soft_rescale_equivariant, test_local_logs_equivariant]:
+        t()
+    print("all ok")

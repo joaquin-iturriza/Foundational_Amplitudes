@@ -23,6 +23,13 @@ sign_pair_dim: 0
 sign_pair_hidden: 32
 # sign_pair_bound: tanh on the pair channels h_i before their sums and products (bounded inputs to the pair MLP)
 sign_pair_bound: false
+# --- Input representations for singular limits (D374, kit_benchmark input arms; 0 = off, all Lorentz-exact) ------
+# input_pair_logs n: log(2 p_i.p_j/s)/5 of every pair of an n-particle event, extra scalars on every particle
+# input_soft_eps: p_i -> p_i log1p(x_i/eps)/(x_i log1p(1/eps)), x_i = 2 p_i.Q/s, before the frames and the backbone
+# input_local_log_eps: asinh(z/eps)/asinh(1/eps) of the standardized LLoCa local-frame components z
+input_pair_logs: 0
+input_soft_eps: 0.0
+input_local_log_eps: 0.0
 context_dim: 0
 context_dropout: 0.5
 context_names_file: null

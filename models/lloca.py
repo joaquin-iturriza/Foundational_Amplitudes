@@ -245,7 +245,8 @@ class LLOCAMuPTransformer(nn.Module):
         )
         fourmomenta_local = self.trafo_fourmomenta(fourmomenta, frames)
         features_local = (fourmomenta_local - mean) / std
-
+        if getattr(self, "local_log_eps", 0.0):   # model.input_local_log_eps: log-compressed local components (invariant)
+            features_local = torch.asinh(features_local / self.local_log_eps) / float(np.arcsinh(1 / self.local_log_eps))
 
         # the network's dtype (float32, or float64 for a training.dtype=float64 run): the local momenta keep the
         # precision the frames were computed in only when the network runs in it

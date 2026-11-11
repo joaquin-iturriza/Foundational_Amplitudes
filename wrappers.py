@@ -1,5 +1,6 @@
 import os
 
+import math
 import torch
 from torch import nn
 from lgatr.interface import embed_vector, extract_scalar
@@ -82,6 +83,36 @@ def _segment_mean(values, ptr):
     summed.index_add_(0, seg, values)
     denom = counts.clamp(min=1).view((B,) + (1,) * (values.dim() - 1)).to(values.dtype)
     return summed / denom
+
+
+_ETA = (1.0, -1.0, -1.0, -1.0)
+
+
+def _pair_log_inputs(p, ptr, n):
+    """(N_total, n(n-1)/2): log(2 p_i.p_j / s)/5 of every pair i < j of each event, s = (p_0 + p_1)^2 of the two beams,
+    the event's row broadcast to each of its particles; pairs beyond an event's multiplicity are 0. Lorentz scalars,
+    in float64 (a pair at 1e-7 of s is float32 rounding), floored at 1e-16 (model.input_pair_logs)."""
+    cnt = ptr[1:] - ptr[:-1]
+    assert int(cnt.max()) <= n, f"model.input_pair_logs={n} is below an event's {int(cnt.max())} particles"
+    ar = torch.arange(n, device=p.device)
+    valid = ar[None, :] < cnt[:, None]                                           # (B, n)
+    P = p[(ptr[:-1, None] + ar[None, :]).clamp(max=p.shape[0] - 1)].to(torch.float64)
+    dots = torch.einsum("bic,bjc,c->bij", P, P, torch.tensor(_ETA, device=p.device, dtype=P.dtype))
+    s = (dots[:, 0, 0] + dots[:, 1, 1] + 2 * dots[:, 0, 1]).abs().clamp(min=1e-30)
+    iu = torch.triu_indices(n, n, 1, device=p.device)
+    lp = torch.log((2 * dots[:, iu[0], iu[1]] / s[:, None]).abs().clamp(min=1e-16)) / 5
+    return (lp * (valid[:, iu[0]] & valid[:, iu[1]])).repeat_interleave(cnt, dim=0)
+
+
+def _soft_rescale(p, ptr, eps):
+    """p_i -> p_i log1p(x_i/eps) / (x_i log1p(1/eps)), x_i = 2 p_i.Q/s, Q = p_0 + p_1, s = Q^2: an invariant factor per
+    momentum (equivariant), 1 at x_i = 1, so a soft momentum's scale reads logarithmically (model.input_soft_eps)."""
+    cnt = ptr[1:] - ptr[:-1]
+    eta = torch.tensor(_ETA, device=p.device, dtype=torch.float64)
+    p64 = p.to(torch.float64)
+    Q = (p64[ptr[:-1]] + p64[ptr[:-1] + 1]).repeat_interleave(cnt, dim=0)
+    x = (2 * (p64 * Q * eta).sum(-1) / (Q * Q * eta).sum(-1)).abs().clamp(min=1e-30)
+    return p * (torch.log1p(x / eps) / (x * math.log1p(1 / eps))).to(p.dtype)[:, None]
 
 
 def _pool_events(values, ptr):
@@ -185,9 +216,17 @@ class AmplitudeLLoCaWrapper(nn.Module):
                  diagram_encoder_llm4lhc=None,        # its hyperparameters; consumed by the experiment
                  context_dim: int = 0, context_dropout: float = 0.5,   # read in experiment._post_instantiate_model
                  context_names_file=None,
-                 sign_pair_dim: int = 0, sign_pair_hidden: int = 32, sign_pair_bound: bool = False):
+                 sign_pair_dim: int = 0, sign_pair_hidden: int = 32, sign_pair_bound: bool = False,
+                 input_pair_logs: int = 0, input_soft_eps: float = 0.0, input_local_log_eps: float = 0.0):
         super().__init__()
         self.net = net
+        # input representations for singular limits (D374, kit_benchmark input arms; all Lorentz-exact, 0 = off):
+        # input_pair_logs n: log(2 p_i.p_j/s)/5 of every pair of an n-particle event as extra scalars (_pair_log_inputs);
+        # input_soft_eps: p_i -> p_i log1p(x_i/eps) / (x_i log1p(1/eps)), x_i = 2 p_i.Q/s (_soft_rescale);
+        # input_local_log_eps: asinh(z/eps)/asinh(1/eps) of the standardized local-frame components (models/lloca.py)
+        self.input_pair_logs = int(input_pair_logs or 0)
+        self.input_soft_eps = float(input_soft_eps or 0.0)
+        net.local_log_eps = float(input_local_log_eps or 0.0)
         # Pair sign head (model.sign_pair_dim, training.sign_head): the net's last sign_pair_dim per-particle channels
         # are pair features; the sign logit gets the mean over the event's particle pairs of an MLP of them and of the
         # pair's invariants (see _sign_pair_logit). Output layer zeroed: at init the head is the pooled channel alone.
@@ -930,8 +969,13 @@ class AmplitudeLLoCaWrapper(nn.Module):
             pair_ctx = build_pair_ctx(ptr, fourmomenta.shape[0], seq_lens=seq_lens)
             pair_ctx["bias"] = self._pair_bias(fourmomenta, process_ids, pair_ctx)
 
+        if self.input_pair_logs:   # appended last: layout [property | order | diagram | pair logs]
+            particle_type = torch.cat([particle_type, _pair_log_inputs(
+                fourmomenta, ptr, self.input_pair_logs).to(particle_type.dtype)], dim=-1)
+        fm_net = _soft_rescale(fourmomenta, ptr, self.input_soft_eps) if self.input_soft_eps else fourmomenta
+
         net_kwargs = {} if token_add is None else {"token_add": token_add}
-        outputs = self.net(fourmomenta, particle_type, mean, std, ptr=ptr,
+        outputs = self.net(fm_net, particle_type, mean, std, ptr=ptr,
                            seq_lens=seq_lens, pair_ctx=pair_ctx, **net_kwargs)
 
         pair_feats = None

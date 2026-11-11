@@ -817,6 +817,9 @@ class AmplitudeExperiment(BaseExperiment):
                 self._pair_bias_specs = self._setup_pair_bias_specs(
                     list(self.cfg.data.dataset))
 
+            _npl = int(self.cfg.model.get("input_pair_logs", 0) or 0)
+            n_scalars += _npl * (_npl - 1) // 2   # model.input_pair_logs: one log invariant per pair (wrappers)
+
             with open_dict(self.cfg):
                 if self.modelname in ("MuPLGATr", "MuPLGATrSlim"):
                     # GATr nets: the 4-momentum is the (multi)vector input (in_*v_channels=1
