@@ -21815,6 +21815,10 @@ entries:
       Under D373 (each target at a precision it reaches), T(D) per run in horizons_cal_vb_cal_vb2.json: Z Z plateau T=640-4800
       (k<=6), crossed 1e-4 T=1440-4000 (k>=7); e+e- Z plateau T=1120-4000 (k<=8), k=9 T=3360. Step rates 0.074-0.091 (k<=7),
       0.15-0.17 (k=8), 0.38-0.43 s/step (k=9).'
+  - at: '2026-11-11T02:57:06+00:00'
+    text: 'Joaquin 2026-11-11: constant-V/B targets (ee->bbbar) are trained on V, not V/B; the open keep-or-replace question
+      is settled by this. Also: bbbar->ZZ flattening from D=1e4 needs more optimization; check it is not compute-limited (best
+      steps 1440-4000 of 8000-12000 at k>=7 under the fixed lr law).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
