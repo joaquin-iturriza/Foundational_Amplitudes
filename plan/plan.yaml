@@ -22200,7 +22200,7 @@ entries:
       same configs (gen_data_saving''s estimate 103). Whole rerun ~92-107 GPU-h, above 30: (1)-(3) (3.7 GPU-h) go under D400;
       (4) waits for Joaquin''s go on the cost. Disk: 0.7 GB pools + parents against 55 GB free on /sps/lpnhe (read 2026-11-11).'
   step_waits:
-    '4': step 6 (driver dsave_s2_drive3 end) and step 7 (the t t~ diagnostic runs; no write-up before its verdict)
+    '4': step 6 and the D400 rerun's fine-tune searches
     '6': driver dsave_s2_drive3 (pid 807322) finishing the last stage-2 scratch trials
   findings:
   - at: '2026-11-10T03:35:22+00:00'
