@@ -24789,6 +24789,12 @@ entries:
     units: null
     start: '2026-11-11T21:28:39+00:00'
     at: '2026-11-11T21:28:39+00:00'
+  - batch: kit_rescore
+    wall_h: 0.5
+    jobs: 5
+    units: null
+    start: '2026-11-11T23:05:17+00:00'
+    at: '2026-11-11T23:05:17+00:00'
   ask: 'GPU budget: ~50 GPU-h above 30 with no decision covering it. The fair NLO D-scan (Bakar''s protocol) on KIT''s t t~
     one-loop virtual: 5 sizes D = 1e2..1e4 x 2 arms (fine-tuned from the fair_nlo parent; Bakar''s baseline, from-scratch
     V/B with the exact Born), each an 8-trial DyHPO search as the data-saving study ran its cells: 80 trials, 24 GPU-h at
