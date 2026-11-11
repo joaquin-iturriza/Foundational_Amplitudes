@@ -21808,6 +21808,16 @@ entries:
       factor) 0.257 either way, its 8 cal_vb runs stand; e+e- > b b~ 1e-6 (the std floor). Fixed in scripts/job_data_saving.sh
       (both off for V/B runs); the 8 u u~ > e+e- Z cal_vb runs are superseded (k=9 FA-ccin2p3-adac4033 cancelled), the readouts
       list them apart.'
+  - at: '2026-11-11T02:48:54+00:00'
+    text: '2026-11-11: one-loop stage 1 done (24 scratch V/B runs, seed 42; vb_test_mse.py, plot_vb_test.py, horizons.py;
+      data @bfa4b187 and @450a2609; fig analysis/data_saving/figs/vb_test_mse_loops.png). Test MSE(V/B), D=10..3.2e4: b b~
+      > Z Z 4.8 -> 2.9e-3 (flat from 1e4: 3.4e-3 at 3.2e4; var 63.9), u u~ > e+e- Z 27 -> 6.9e-2 (still falling; var 70.3);
+      MSE ln|V| 5.7e-3 -> 4.6e-7 and 3.8e-2 -> 6.1e-5. e+e- > b b~ (constant V/B): test MSE exactly 0 at every D, val 1e-24
+      from step 160: the constant is carried by the target standardization''s mean (prepd_std at its 1e-6 floor), not learned
+      by the network; no D gap measurable. L0 by the design rule = 1 on MSE(V/B) (Z Z below from D=100, e+e- Z from D=3162).
+      Under D373 (each target at a precision it reaches), T(D) per run in horizons_cal_vb_cal_vb2.json: Z Z plateau T=640-4800
+      (k<=6), crossed 1e-4 T=1440-4000 (k>=7); e+e- Z plateau T=1120-4000 (k<=8), k=9 T=3360. Step rates 0.074-0.091 (k<=7),
+      0.15-0.17 (k=8), 0.38-0.43 s/step (k=9).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
