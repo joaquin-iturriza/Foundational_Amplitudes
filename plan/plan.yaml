@@ -22367,6 +22367,12 @@ entries:
       t t~ LO D=1e5 lr 1.87e-2 (~1.6c, mid-upper window, not the edge). Fine-tune blow-ups all at lr_scale 8.5-9.1. For the
       readout owner: count blow-ups per cell against sampled lr; if large-D scratch cells blow up inside their window often,
       the scratch window''s top is too high there and the best-of-8 may be biased low in trials; state it in the write-up.'
+  - at: '2026-11-11T17:21:24+00:00'
+    text: '2026-11-11 18:25: e+e- > t t~ LO concentrates the blow-ups: fine-tune D=3162 three trials (lr_scale 8.80, 8.09,
+      and 05384f67), fine-tune D=1e3 and D=1e5 one each, scratch D=3162 (lr 1.70e-2) and D=1e5 (1.87e-2). The D=3162 fine-tune
+      search keeps sampling lr_scale near 10 after two penalties: readout owner to check whether DyHPO''s failure penalty
+      steers it at all (penalty value vs observed losses) and whether t t~ LO''s best trials sit at the top of the windows
+      (window too low or instability edge).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
