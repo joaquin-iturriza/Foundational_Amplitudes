@@ -22347,6 +22347,13 @@ entries:
       1112). Against finished trials (driver states): ft u u~ LO 0/34, ft u u~ V 1/39, ft t t~ LO 1/21 (+ ae0826ee not yet
       collected), ft t t~ V 0/9 real (the 24 init crashes excluded), scratch none. One edge of the window, a few trials: a
       real outcome of high fine-tune lr (~9c), not a window defect; the sampler holds their penalties.'
+  - at: '2026-11-11T15:20:29+00:00'
+    text: '2026-11-11 16:20 D396: Joaquin: drive.py and sweep_manager.py must submit searches the same way (one ordering:
+      longest trials first, interleaved across all searches, waves), site spread changes placement only. To do (next owner,
+      after this batch, no mid-batch change): merge drive.py dispatch_order (5401490e) and sweep_manager duration_nice ordering
+      into one shared function with one test. Driver restarted by the main session at 16:19 as dsave_s2_drive2 (pid 740209,
+      log /home/joaquin/.local/share/ccorch/detached/20261111-161952_dsave_s2_drive2.log) with --retry-failed for the 24 t
+      t~ V init crashes; old driver dsave_s2_drive stopped.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
