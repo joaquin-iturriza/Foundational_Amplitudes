@@ -22,6 +22,7 @@ for each run: the old checkpoint's EMA weights as _ckpt_scored_state maps them (
 rebuild_run.load_best_weights' (by model.parameters() order), and _load_pretrained_weights loads them; then a
 new-format save of that model round-trips (save, best reload + average, fine-tune load, load_best_weights).
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os, sys, tempfile, importlib.machinery, types, logging.handlers  # logger.py uses logging.handlers
 from unittest import mock
 import torch

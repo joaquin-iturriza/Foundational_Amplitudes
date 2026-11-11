@@ -1,4 +1,5 @@
 """misc.wsd_scheduler: warmup, flat, (1 - sqrt) cooldown to eta_min, and base_experiment's WSD branch builds it."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import math, os, sys
 
 import torch

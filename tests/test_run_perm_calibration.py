@@ -1,6 +1,7 @@
 """short_run_bias.run_perm on iid events: with units of unequal size (66 runs of 1000 against 18 of 555) the raw binned
 KS made p too small (0.19 of 150 null draws under 0.05 at c. f537f0e0); scaled by sqrt(n_a n_b / (n_a + n_b)) it holds
 its level. Run: python tests/test_run_perm_calibration.py (prints the rates)."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os
 import sys
 

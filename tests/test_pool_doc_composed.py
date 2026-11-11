@@ -1,6 +1,7 @@
 """keyed_aug.pool_identity, the memmap cache key's pool identity (data_mmap format 3): a pool composed at load is
 identified by its rows' digest, a stored pool by its recipe_id, size and the bytes at both ends; neither by its path
 or mtime, so every job of the same data opens one cache wherever its pools lie."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import json, os, shutil, sys, tempfile, time
 import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

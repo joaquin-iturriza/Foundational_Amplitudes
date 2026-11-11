@@ -2,6 +2,7 @@
 
     .venv-cpu/bin/python tests/test_plan_check_table_figure.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import json, os, sys, tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

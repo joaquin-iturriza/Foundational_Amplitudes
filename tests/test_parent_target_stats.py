@@ -7,6 +7,7 @@ and run on stubs; needs numpy, torch (CPU), scipy and scikit-learn (preprocessin
 
     .venv-driver/bin/python tests/test_parent_target_stats.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import ast
 import os
 import sys

@@ -6,6 +6,7 @@ Stop parts are stubbed, so only the gate is tested. A temporary world (PLAN_TEST
 
     .venv-cpu/bin/python tests/test_plan_check_reply_disabled.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import importlib, json, os, sys, tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

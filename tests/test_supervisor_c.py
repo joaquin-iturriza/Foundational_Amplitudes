@@ -18,6 +18,7 @@ are tests/fixtures/supervisor_20261029/run_ends.json (tools/supervisor_fixture.p
 
 Run:  python3 tests/test_supervisor_c.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import importlib.machinery
 import importlib.util
 import json

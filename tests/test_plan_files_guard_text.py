@@ -5,6 +5,7 @@ still refuse.
     .venv-cpu/bin/python tests/test_plan_files_guard_text.py
     GUARD=<path to a copy> ...      tests that copy instead of the installed hook
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import json, os, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

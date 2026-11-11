@@ -15,6 +15,7 @@ and compares every event's momenta, tokens and order features, every statistic a
 after init_data, and the first batches of the train loader (2 workers), the val loader and the per-process loaders
 tensor by tensor.
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import argparse
 import os
 import shutil

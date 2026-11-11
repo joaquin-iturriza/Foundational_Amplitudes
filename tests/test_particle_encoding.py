@@ -6,6 +6,7 @@ the generator makes u, d, s, c, e, mu massless and b 4.7 GeV, and nothing else t
 from s or u from c, so dd->dd and ds->ds (or ud->ud and us->us, which differ by W
 exchange) were one input with two targets. The table now carries the generator's
 masses and a generation column; these tests pin both."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os, sys
 import numpy as np
 try:

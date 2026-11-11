@@ -1,5 +1,6 @@
 """The regeneration with the channel-grid flat sampler (plan catalog_coverage step 65): its pools get their own file
 (_smixq), never an old pool's path, and every chunk's flat fill reaches the assembled pool (<pool>.flatfill.json)."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import json, os, sys, tempfile
 
 import numpy as np

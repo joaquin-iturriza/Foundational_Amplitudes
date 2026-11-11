@@ -4,6 +4,7 @@ models/model_run<idx>_step<N>.pt exactly at the listed steps (1-based, after the
 the list is empty or missing; the file is _save_model's format, so with EMA on its "model" is the EMA average at that
 step, and _load_pretrained_weights (the warm start's loader) starts from those EMA weights.
 CPU, tiny model and a real torch_ema (the test_ema_checkpoint.py fixtures). Run: python tests/test_save_at_steps.py"""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os, sys, tempfile, types
 import torch
 

@@ -6,6 +6,7 @@ sign_loss_weight 0 the loss equals the het magnitude model's on a fixed batch (t
 (_freeze_all_but_sigma_head) leaves the mu and sign rows and the backbone bit-equal while the sigma row trains.
     .venv-cpu/bin/python -m pytest tests/test_het_sign_head.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os
 import sys
 import types

@@ -7,6 +7,7 @@ are fully allocated — giving realistic peak VRAM as seen during actual trainin
 Run on Jean-Zay with a GPU allocated:
     python test_vram_scaling.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 

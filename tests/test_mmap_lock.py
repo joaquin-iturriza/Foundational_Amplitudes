@@ -1,6 +1,7 @@
 """dirlock.dir_lock: the atomic-mkdir lock of the memmap cache and the sweep state (flock on CC-IN2P3's NFS /sps
 answers ENOLCK on some nodes, E3550): exclusion across processes, a dead holder's lock broken after STALE_S, a live
 holder's lock kept by its heartbeat past STALE_S, release on an exception."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import multiprocessing as mp
 import os
 import sys

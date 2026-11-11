@@ -4,6 +4,7 @@ and plan are never touched.
 
     .venv-cpu/bin/python tests/test_plan_ledger_sync.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os, sqlite3, sys, tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

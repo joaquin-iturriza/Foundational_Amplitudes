@@ -11,6 +11,7 @@ block's input and the frames detached.
 the sigma stage freezes sign_block and MuonAdamW steps with it frozen.
     .venv-cpu/bin/python -m pytest tests/test_sign_branch.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import importlib.util
 import os
 import subprocess

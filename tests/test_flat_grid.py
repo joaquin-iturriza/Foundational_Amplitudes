@@ -3,6 +3,7 @@ step 72): the grid map stays inside [0, 1) and is monotone; without flat_grid th
 drew before (same kept |M|^2 as the module before the change, f414c171, at the same seed); on the toy |M|^2 of
 tests/test_flat_mcmc.py through the multichannel proposal, the grids at the same budget fill at least as much of the
 quota as the plain quota sampler, with independent draws (near-copy share <= 2%)."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import importlib.util, os, sys
 
 import numpy as np

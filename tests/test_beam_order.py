@@ -17,6 +17,7 @@ C++ driver -- above the Z pole the u quark prefers the e- direction
 
 Run:  python tests/test_beam_order.py          (part 2 is skipped if no standalone)
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os
 import sys
 

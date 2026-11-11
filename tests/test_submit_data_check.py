@@ -1,5 +1,6 @@
 """submit_guard's data check (E3072): the training recipe an arm picks, and the pass for a job chained on its prebuild.
 The site read itself (tools/check_site_data.py over `site run`) is not run here."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os, sqlite3, sys, tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

@@ -10,6 +10,7 @@ the particle features, so the wrapper's own logic is what is tested:
   (f) kshot_context.subset / cat_batches rebuild ptr and the event slices exactly.
 Run: python tests/test_context_vector.py   (needs torch and lgatr, i.e. a site's env)
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os, sys
 
 import torch

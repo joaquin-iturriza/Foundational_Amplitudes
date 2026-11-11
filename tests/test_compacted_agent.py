@@ -5,6 +5,7 @@ agent_id; the agent gets a short note of its own, the main session's markers and
 Synthetic transcripts only. CONTEXT_HOOKS points the tests at a copy of the hooks (built and tested before install).
 
     .venv-cpu/bin/python -m pytest tests/test_compacted_agent.py      (or: python3 tests/test_compacted_agent.py)"""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import json, os, subprocess, sys, tempfile, time
 from datetime import datetime, timezone
 

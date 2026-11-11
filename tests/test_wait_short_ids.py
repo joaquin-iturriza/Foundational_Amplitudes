@@ -14,6 +14,7 @@ tools/plan.py (wait_run_ids, owners' "waits") and ~/.local/bin/site_runends.py (
 
 Run:  python3 tests/test_wait_short_ids.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import json
 import os
 import sqlite3

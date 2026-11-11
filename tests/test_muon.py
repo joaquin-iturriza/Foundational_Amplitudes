@@ -4,6 +4,7 @@ AdamW, the scheduler reaching both sides, a state_dict round trip, and, where mu
 parameter split on the real LLoCa muP model: Muon on exactly the blocks' 32 hidden matrices.
     python tests/test_muon.py        (or pytest tests/test_muon.py)
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import copy
 import os
 import sys

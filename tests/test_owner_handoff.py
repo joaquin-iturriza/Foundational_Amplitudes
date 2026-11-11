@@ -7,6 +7,7 @@ CONTEXT_CLOSE or more to write its hand-off and end. Synthetic transcripts and a
         call at which the hook would have fired, against the transcript's compaction boundaries)
 
 OWNER_HANDOFF_HOOK points the tests at a copy of the hook (it is built and tested in a copy before install)."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import json, os, re, subprocess, sys, tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

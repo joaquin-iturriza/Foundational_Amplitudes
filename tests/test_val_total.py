@@ -9,6 +9,7 @@ detached trial's RESULT_JSON reports val_loss_no_reg as `val_loss` and the objec
 run_trial.result_fields reads both the new lines and the ones written before the fix.
     python tests/test_val_total.py        (or pytest tests/test_val_total.py)
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os
 import sys
 import types

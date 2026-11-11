@@ -6,6 +6,7 @@ the labels are replaced by deterministic fakes keyed by each run's iseed and eve
 
 Run:  python tests/test_lhe_parts.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import argparse
 import glob
 import json

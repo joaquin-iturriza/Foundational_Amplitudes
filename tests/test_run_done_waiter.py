@@ -11,6 +11,7 @@ and event table; the code under test is ~/.local/bin/site_runends.py and its glu
 
 Run:  python3 tests/test_run_done_waiter.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import importlib.machinery
 import importlib.util
 import json

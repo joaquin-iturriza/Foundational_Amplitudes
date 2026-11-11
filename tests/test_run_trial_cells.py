@@ -3,6 +3,7 @@ muon_hp_ft): each cell is one run.py with its own steps (iterations and the sche
 the objective is the geometric mean of the cells' val_loss_no_reg, and a failed cell fails the trial.
     python tests/test_run_trial_cells.py        (or pytest tests/test_run_trial_cells.py)
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import json
 import math
 import os

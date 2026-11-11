@@ -13,6 +13,7 @@ old local ``lgatr/`` directory does not shadow the pip package):
 
 A PASS/FAIL verdict (|slope of log L1 vs log width|) is printed; PASS means flat.
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import argparse
 
 import numpy as np

@@ -2,6 +2,7 @@
 path the caller passes (port of l2-gen 29edaf2d; the project's figure-pair rule).
     .venv-cpu/bin/python -m pytest tests/test_base_plots_pair.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os
 import sys
 import tempfile

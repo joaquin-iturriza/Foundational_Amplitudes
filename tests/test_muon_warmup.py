@@ -3,6 +3,7 @@ while AdamW's parameters move as without it; at 1 (the default) a step equals th
 Muon matrix moves by a quarter of its full step (same momentum).
     python tests/test_muon_warmup.py        (or pytest tests/test_muon_warmup.py)
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os
 import sys
 

@@ -5,6 +5,7 @@ check. CPU only.
 
     .venv-cpu/bin/python -m pytest tests/test_ee_anchor.py -q
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os
 import sys
 import tempfile

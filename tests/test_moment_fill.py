@@ -4,6 +4,7 @@ non-finite step, restore each group's lr, and the first real step after a fill i
 than the fresh optimizer's lr-sized first step on a noisy gradient).
     python tests/test_moment_fill.py        (or pytest tests/test_moment_fill.py)
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import logging
 import os
 import sys

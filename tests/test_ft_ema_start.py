@@ -7,6 +7,7 @@ its entry back out of every curve, so the step-0 value is never a checkpoint can
 
     site run ccin2p3 FA --item muon_test -- python tests/test_ft_ema_start.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os
 import sys
 import types

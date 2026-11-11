@@ -1,4 +1,5 @@
 """The push hook's output limit, pending parts, and the 'agents: no' / 'on: write' header keys (agent_redesign step 5)."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import importlib.util, os, sys, tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

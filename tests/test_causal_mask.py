@@ -15,6 +15,7 @@ Part 2 (torch + lloca + mup; GPU node via scripts/job_test_causal.sh, the laptop
 
 Run:  python tests/test_causal_mask.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os
 import sys
 

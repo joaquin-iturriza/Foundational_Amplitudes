@@ -1,4 +1,5 @@
 """A bare queue name resolves to $SCRATCH/lhe_queue/<name> (the workers' directory); a path is kept."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os
 import sys
 

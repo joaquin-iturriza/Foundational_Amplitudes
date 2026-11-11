@@ -5,6 +5,7 @@ resumed run) keeps it; any other is fitted on its own momenta, as without frozen
 Run as a script (pytest is shadowed by the stray root-level py.py):
     python tests/test_hybrid_cp_frozen.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import json
 import os
 import re

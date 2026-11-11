@@ -20,6 +20,7 @@ where it came from (plan catalog_coverage, the repo review of the coupling-order
 
 Needs the project's env (torch, omegaconf): run on a site,  python tests/test_orders_source.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import importlib.util
 import json
 import os

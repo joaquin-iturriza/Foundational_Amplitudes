@@ -1,5 +1,6 @@
 """generate_sweep.next_available_name: only its own three-digit counter is read as a counter (plan catalog_coverage
 step 39a: cov_v4_long_hpo8_cc_17056 became cov_v4_long_hpo8_17057)."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os, sys, tempfile
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))

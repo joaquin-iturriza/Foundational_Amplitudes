@@ -3,6 +3,7 @@
 Run as a script (pytest is shadowed by the stray root-level py.py):
     python tests/test_signedlog_scale.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os
 import sys
 

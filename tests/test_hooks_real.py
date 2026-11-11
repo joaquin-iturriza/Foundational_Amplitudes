@@ -2,6 +2,7 @@
 tools/hook_fixtures.py; the night's transcripts read in place). Nothing live is touched: every hook runs from a copy in
 a temporary hooks directory or with its state, registry and `site` pointed at temporary stubs.
     python3 tests/test_hooks_real.py [group ...]"""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import atexit, json, os, re, shutil, sqlite3, subprocess, sys, tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

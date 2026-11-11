@@ -26,6 +26,7 @@ tests/test_synthetic_amplitudes.py (version 1's checks and its pool path). CPU o
       exactly those, every one non-zero, and |M|^2 = (1/4) sum over them of (|A(p)|^2 + |A(p~)|^2)/2 with p~
       the spatially inverted momenta, so every other configuration contributes exactly zero; |M|^2 is parity even.
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import argparse
 import json
 import os

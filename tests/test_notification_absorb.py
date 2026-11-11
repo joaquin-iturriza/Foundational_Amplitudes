@@ -7,6 +7,7 @@ notification only when the agent's report already came by its hand-back, and pas
           anything but an agent's delivered notification would be blocked, or a delivered one after its hand-back
           would pass. Read-only over ~/.claude/projects/-home-joaquin-work-FA; skipped when it is absent.
     python3 tests/test_notification_absorb.py [unit|replay] [--since ISO]"""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import collections, glob, json, os, subprocess, sys, tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

@@ -5,6 +5,7 @@ the gate measures the checkout's backlog from) moves only forward along the chec
 not in it is listed in .passed only (2026-11-10: sigma-gen's pass overwrote trunk's watermark).
 
 Run:  python3 tests/test_review_advance_at.py   (pytest also collects it)"""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os
 import shutil
 import subprocess

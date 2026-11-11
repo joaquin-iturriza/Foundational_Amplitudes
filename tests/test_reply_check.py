@@ -8,6 +8,7 @@ gave, kept in tests/fixtures/reply_check/<refusal line>.jsonl (tool outputs cut 
 
 FALSE: refusals the old check gave wrongly; the new check must pass them. REAL: refusals that were right (the next
 reply answered what was missing); the new check must still refuse them."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import json, os, sys, tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

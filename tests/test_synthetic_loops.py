@@ -12,6 +12,7 @@
 
     python tests/test_synthetic_loops.py          (a few minutes, one core)
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import json
 import os
 import subprocess

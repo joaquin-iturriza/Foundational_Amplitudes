@@ -7,6 +7,7 @@ s-channel Z decaying to two of three finals in a hand-made diagram; the joint-re
 channels (step 58's re-check) are exact in phase space and reach their regions.
     .venv-cpu/bin/python -m pytest tests/test_multichannel.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os
 import sys
 

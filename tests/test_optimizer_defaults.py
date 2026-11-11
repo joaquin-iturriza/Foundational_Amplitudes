@@ -4,6 +4,7 @@ fine-tunes with MuonAdamW at the Muon search's centre (lr window [c/3, 3c] aroun
 sweeps and reruns written before the switch keep their optimizer, and nothing forces a fine-tune onto AdamW.
     python tests/test_optimizer_defaults.py        (or pytest tests/test_optimizer_defaults.py)
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import math
 import os
 import sys

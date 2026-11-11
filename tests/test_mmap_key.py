@@ -16,6 +16,7 @@ section 2, on a site):
   prune       the least recently used depth is pruned first, a recently used one never.
   fingerprint the code writing the cache is pinned to MMAP_VERSION.
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import json
 import multiprocessing as mp
 import os

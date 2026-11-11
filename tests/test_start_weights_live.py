@@ -3,6 +3,7 @@ checkpoint's live training weights (model_live), with the default "scored" its E
 checkpoint without model_live is refused under "live".
     python tests/test_start_weights_live.py        (or pytest tests/test_start_weights_live.py)
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import gzip
 import os
 import sys

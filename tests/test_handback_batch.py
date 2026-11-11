@@ -6,6 +6,7 @@ directories, a temporary registry and a stub `site`; the live registry, spool an
     .venv-cpu/bin/python tests/test_handback_batch.py
     NOTIFY_HOOK=<path to a hook copy> ...      tests that copy instead of the installed hook
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import argparse, importlib.machinery, importlib.util, io, json, os, subprocess, sys, tempfile, threading, time
 from contextlib import redirect_stdout
 

@@ -4,6 +4,7 @@ subagent transcripts; `site` is a stub for every command that writes (decide, it
 rules (_typed_texts, _interactive, TERMINAL) are imported from it. The claims verifier and the git hooks run in
 temporary git repositories.
     python3 tests/test_setup_scenarios.py"""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import atexit, concurrent.futures as cf, datetime as dt, json, os, shutil, sqlite3, subprocess, sys, tempfile
 
 import yaml

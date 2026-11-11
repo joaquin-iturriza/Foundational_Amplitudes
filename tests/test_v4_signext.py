@@ -4,6 +4,7 @@ against recipes/catalog_v4_roles.json, the written entries against their trees, 
 
     python tests/test_v4_signext.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import json
 import os
 import sys

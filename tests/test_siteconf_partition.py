@@ -1,5 +1,6 @@
 """A sweep's cluster block may narrow the site's partition list to some of the site's own partitions; any other
 partition is dropped and the site's list is kept."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import siteconf
 
 

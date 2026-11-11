@@ -1,6 +1,7 @@
 """plan.acked_runs: a run is handled when an acked event of any kind names it (message or note, full id or its 8-hex
 suffix), when the registry has it CANCELLED, or when a finding or dead end of the entry records its cancel
 (2026-10-31: catalog_coverage's five cancelled runs, acked in one combined event E3164, were demanded again)."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os, sqlite3, sys, tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

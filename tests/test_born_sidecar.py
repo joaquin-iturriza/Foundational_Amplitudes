@@ -2,6 +2,7 @@
 MadLoop replaced by a deterministic fake of its Laurent array: generation writes <pool>.born.npy row-aligned and leaves
 the pool's target as before ((c0 + shift) x Born), and the re-evaluation of an existing pool recomputes the stored
 target exactly and returns the same Born, c0 and shift."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os
 import sys
 

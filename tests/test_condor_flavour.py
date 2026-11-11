@@ -1,5 +1,6 @@
 """A HTCondor job's flavour is the shortest whose limit covers its wall time, never the site's default
 ('tomorrow', 24 h): the 4 h and 12 h long-run trials, a 28 h one, and the D-HH:MM:SS form."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import importlib.machinery, importlib.util, os, sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "sweep"))

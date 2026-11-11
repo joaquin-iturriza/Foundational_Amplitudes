@@ -3,6 +3,7 @@ bit-identical while the Muon matrix moves as without it; at 1 (the default) a st
 the scheduler's lr is restored exactly after a scaled step; both multipliers at 0 freeze everything.
     python tests/test_adamw_warmup.py        (or pytest tests/test_adamw_warmup.py)
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os
 import sys
 

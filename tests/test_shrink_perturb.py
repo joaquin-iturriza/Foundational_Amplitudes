@@ -3,6 +3,7 @@ becomes lam * loaded + gamma * the same parameter of a fresh model built at seed
 run's own init at its seed, the global RNG stream is left as it was, and a parameter the fresh model lacks raises.
     python tests/test_shrink_perturb.py        (or pytest tests/test_shrink_perturb.py)
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os
 import sys
 

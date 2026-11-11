@@ -11,6 +11,7 @@ Checks
      module's floating output in the forward pass is float64, and the attention isolates events (a second event in the
      batch does not change the first's prediction).
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import json
 import os
 import sys

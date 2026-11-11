@@ -1,5 +1,6 @@
 """tools/short_wall.py: the short job's time limit counts the zero-shot reads (catalog_coverage, 2026-10-31: the
 mixture arms FA-ccin2p3-6c246603 and 1d46b938 were cut by TIMEOUT in their PP4 reads at 2.5 h)."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

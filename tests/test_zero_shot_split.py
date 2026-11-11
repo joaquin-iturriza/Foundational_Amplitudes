@@ -2,6 +2,7 @@
 every read taken so far reproduces; test scores the test loader, checks the test pool's physics and takes the test
 events' target factors. CPU, no model built.
     .venv-cpu/bin/pytest tests/test_zero_shot_split.py"""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os, subprocess, sys
 from types import SimpleNamespace
 

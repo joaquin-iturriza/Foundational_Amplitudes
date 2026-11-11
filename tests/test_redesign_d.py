@@ -4,6 +4,7 @@ owner's brief and its guard, the main session's delegation note and the supervis
 is written: the plan scenarios run in test_setup_scenarios' World (a temporary plan, registry, transcripts and a stub
 site), the hooks on temporary state directories; the night's real records (transcripts, ledger) are only read.
     python3 tests/test_redesign_d.py [group ...]"""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import copy, glob, json, os, sqlite3, subprocess, sys, tempfile
 
 import yaml

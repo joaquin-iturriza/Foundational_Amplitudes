@@ -1,4 +1,5 @@
 """compact-worker.md carries a hand-made copy of the rule lines of both CLAUDE.md files; keep it in sync."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 from pathlib import Path
 
 FA = Path(__file__).resolve().parents[1]

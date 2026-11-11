@@ -18,6 +18,7 @@ test) is still a cache hit at the current code (datagen.ensure_dataset with requ
 
 Run:  python tests/test_order_features.py      (FA_TEST_SITE=1 on a site for part 2)
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import json
 import os
 import sys

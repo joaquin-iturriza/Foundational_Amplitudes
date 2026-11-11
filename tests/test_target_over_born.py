@@ -1,5 +1,6 @@
 """plan virtual_over_born: the amplitude std floor (preprocessing.AMP_STD_FLOOR) and the Born sidecar read of
 data.target_over_born (AmplitudeExperiment._born_of_pool)."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os, sys, tempfile
 import numpy as np
 import pytest

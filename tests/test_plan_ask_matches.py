@@ -1,5 +1,6 @@
 """plan_check's 'a question open for the user, but no message sent to them asks it': a message that names the entry's
 step or shares half the question's terms counts, a question never sent still refuses."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

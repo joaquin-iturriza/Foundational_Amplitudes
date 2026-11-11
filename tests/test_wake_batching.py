@@ -17,6 +17,7 @@ and event table; the code under test is ~/.local/bin/site_runends.py (run_done_e
 
 Run:  python3 tests/test_wake_batching.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import glob
 import json
 import os

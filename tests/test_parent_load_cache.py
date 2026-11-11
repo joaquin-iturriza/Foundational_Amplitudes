@@ -3,6 +3,7 @@ read's containers copied and its tensors shared (container_copy), so a probe's e
 tensor, as the HETEROSC sigma row is) never reaches the next probe, the state dict keeps its _metadata, and the
 weights loaded equal a plain torch.load's. CPU only.
     python3 tests/test_parent_load_cache.py"""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os, shutil, sys, tempfile
 
 import torch

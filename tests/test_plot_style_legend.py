@@ -1,4 +1,5 @@
 """plot_style.save refuses a legend wider than its plot box (LegendOverflow, nothing written) and saves one that fits."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os
 import sys
 import tempfile

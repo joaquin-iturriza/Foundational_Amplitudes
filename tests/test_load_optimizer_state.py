@@ -4,6 +4,7 @@ on a copy of the model at another lr gets the parent's per-parameter state (Muon
 while keeping its own lr; its next step equals the parent's own next step rescaled by the lr; a mismatched layout raises.
     python tests/test_load_optimizer_state.py        (or pytest tests/test_load_optimizer_state.py)
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import gzip
 import logging
 import os

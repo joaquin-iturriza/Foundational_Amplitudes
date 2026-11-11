@@ -16,6 +16,7 @@
 Run (after `python prebuild_recipes.py recipes/synthetic_pilot.yaml` with the same env):
     AMP_FROZEN_DIR=... AMP_TRAIN_CACHE_DIR=... python tests/test_synthetic_amplitudes.py [--fig-dir D]
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import argparse
 import glob
 import json

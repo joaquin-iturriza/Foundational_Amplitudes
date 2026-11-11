@@ -6,6 +6,7 @@ CPU only, no MadGraph (the pools are written by hand).
 
 Run:  python tests/test_default_share.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import json
 import os
 import sys

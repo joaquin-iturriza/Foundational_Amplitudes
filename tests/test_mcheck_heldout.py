@@ -4,6 +4,7 @@ _pp reads only pools that exist, splits the out-of-support share into sqrt(s_hat
 the partonic frame; heldout_read counts held-out in-support events outside the kept range and gives 3/N only at 0.
     .venv-cpu/bin/python -m pytest tests/test_mcheck_heldout.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os
 import sys
 

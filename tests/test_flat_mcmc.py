@@ -2,6 +2,7 @@
 mass, the pair's mass, the other finals and the total momentum; on a toy |M|^2 with a collinear and a soft-like pole
 the chains, at the same label budget as the quota sampler, fill more of the quota without near-copies of one state
 (analysis/catalog_v4/flat_diversity.py: no more than 2% of kept events have another within 1% in every invariant)."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os, sys
 
 import numpy as np

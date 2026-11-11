@@ -9,6 +9,7 @@ ALERT at 5 failures among them.
 
 Run:  python3 tests/test_mechanical_watch.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import json
 import os
 import sys

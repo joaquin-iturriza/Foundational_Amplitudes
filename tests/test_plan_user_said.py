@@ -4,6 +4,7 @@ refuse until --searched names each by its time. Tonight's case (2026-11-10): the
 asked again although Joaquin had written on 2026-10-23 'I never asked to run a multifidelity sweep'.
 
 Run:  python3 tests/test_plan_user_said.py   (pytest also collects it)"""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import json
 import os
 import shutil

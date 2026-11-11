@@ -1,4 +1,5 @@
 """submit_guard's epoch check: a training job under one epoch is refused unless SUBEPOCH_OK=1."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

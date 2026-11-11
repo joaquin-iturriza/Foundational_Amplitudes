@@ -2,6 +2,7 @@
 writes the stored pool's recipe id, so the sidecar's derived_from is the only trace, and it sits in the job's $TMPDIR).
 CPU only.
     python3 tests/test_composed_record.py"""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import json, os, sys, tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

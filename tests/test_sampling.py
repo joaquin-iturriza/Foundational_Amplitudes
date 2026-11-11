@@ -7,6 +7,7 @@ checks what the divergence study asked of the sampler: the Z pole is covered by 
 much flatter in log|M|^2, the bulk is still there, and a seed reproduces the pool exactly.
 Run: python tests/test_sampling.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os, sys, tempfile
 import numpy as np
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); sys.path.insert(0, ROOT)

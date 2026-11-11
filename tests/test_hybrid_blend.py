@@ -6,6 +6,7 @@ events it was fitted on. CPU only, numpy, no torch.
 Run as a script (pytest is shadowed by the stray root-level py.py):
     python tests/test_hybrid_blend.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os
 import re
 import sys

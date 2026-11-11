@@ -4,6 +4,7 @@ and catalog_v4's models, trained on a massless b with every tree diagram, were s
 MadGraph backends are stub directories (a param_card, a proc_card, the compiled defaults of src/Parameters_*.cc) under
 a temporary WORK_DIR; no MadGraph, no torch, nothing on a site.
     python3 tests/test_pool_physics.py"""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import io, json, os, shutil, sys, tempfile, contextlib
 
 import numpy as np

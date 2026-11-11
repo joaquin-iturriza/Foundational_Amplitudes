@@ -7,6 +7,7 @@ every bin is full; on a toy 2 -> 3 label peaked in the collinear corner the roun
 first pass misses, and the kept events pass the cuts.
     .venv-cpu/bin/python -m pytest tests/test_flat_quota.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os
 import sys
 

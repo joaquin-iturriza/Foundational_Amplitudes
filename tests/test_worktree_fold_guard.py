@@ -4,6 +4,7 @@ takes (repo-reviewer 2026-11-10 on 7395041f: /bin/rm, rm -f -r, xargs rm and com
 naming a worktree path, or a non-recursive rm, through.
 
 Run:  python3 tests/test_worktree_fold_guard.py   (pytest also collects it)"""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import json
 import os
 import shutil

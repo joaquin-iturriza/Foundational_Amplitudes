@@ -6,6 +6,7 @@ more than one amplitude preprocessing is refused; and a pool drawn from pi with 
 mean loss in expectation (unbiased IS).
     .venv-cpu/bin/python -m pytest tests/test_is_weight_path.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import json
 import os
 import sys

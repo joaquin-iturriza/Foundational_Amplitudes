@@ -11,6 +11,7 @@ short mechanical rules block of plan/mechanical_prompt.txt, which brief_guard ac
 
 Run:  python3 tests/test_mechanical_brief.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import json
 import os
 import subprocess

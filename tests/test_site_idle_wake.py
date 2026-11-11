@@ -1,4 +1,5 @@
 """site supervise's idle wake (idle_pass): STALLED after 30 min when `plan next` lists RESUME/LAUNCH, no job live."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import importlib.machinery, importlib.util, sqlite3, os
 
 SITE = os.path.expanduser("~/.local/bin/site")

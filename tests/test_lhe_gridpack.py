@@ -7,6 +7,7 @@ generate_events and the gridpack's run.sh are replaced by shell fakes.
 
 Run:  python tests/test_lhe_gridpack.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import gzip
 import os
 import sys

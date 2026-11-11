@@ -1,4 +1,5 @@
 """tools/main_turns.py: the Bash classifier of the main session's calls (cases from its hand check)."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os, sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "tools"))
 import main_turns as m

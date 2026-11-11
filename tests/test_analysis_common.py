@@ -1,6 +1,7 @@
 """analysis/common: each reader, picker and statistic against a hand-computed case, and against the script whose rule
 it carries where that script's function still exists.
     .venv-cpu/bin/pytest tests/test_analysis_common.py   (or python3 tests/test_analysis_common.py)"""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import json, os, sys, tempfile
 
 import numpy as np

@@ -1,5 +1,6 @@
 """dipole_residual.pool_rows: a read's idx (positions in the role-contiguous train|val|test array, each role shuffled by
 one rng seeded 42 as experiment._init_data does) map back to the pool rows the events came from."""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os
 import sys
 

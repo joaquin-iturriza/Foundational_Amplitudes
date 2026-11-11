@@ -28,6 +28,7 @@ Run on Jean Zay (needs the `foundational` env, torch + mup + lloca):
 A PASS/FAIL verdict (slope of log L1 vs log width) is printed at the end, and a
 PDF (coord_<mode>.pdf) is written next to the CSV.
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import argparse
 import copy
 import os

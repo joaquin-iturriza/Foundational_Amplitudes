@@ -17,6 +17,7 @@ Part 2 (needs the full stack: models.lloca, experiment; a site, scripts/job_test
 
 Run:  python tests/test_bayesian_readout.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import math
 import os
 import sys

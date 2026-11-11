@@ -4,6 +4,7 @@ class geometric mean of the probes' MSE; a probe with an error, a non-finite MSE
 trial; a missing probe fails it; the objective and its block go together.
     python tests/test_zero_shot_objective.py        (or pytest tests/test_zero_shot_objective.py)
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import json
 import math
 import os

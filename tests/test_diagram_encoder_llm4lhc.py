@@ -4,6 +4,7 @@ Run: python tests/test_diagram_encoder_llm4lhc.py   (no GPU, no xformers; the wr
 forward is exercised only where lloca/lgatr/mup import).
 """
 
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import copy
 import math
 import os

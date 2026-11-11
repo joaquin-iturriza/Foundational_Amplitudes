@@ -10,6 +10,7 @@ never written.
 
     .venv-cpu/bin/python tests/test_plan_leave_check.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import atexit, datetime as dt, importlib, json, os, re, shutil, subprocess, sys, tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

@@ -9,6 +9,7 @@ with massive incoming b quarks), into a temporary directory.
 
 Run:  python tests/test_catalog_daniel.py      (FA_TEST_MG5=1 for part 2)
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import gzip
 import os
 import sys

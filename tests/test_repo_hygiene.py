@@ -14,6 +14,7 @@ git world (a bare origin and a clone holding copies of the scripts under test); 
 
     .venv-cpu/bin/python tests/test_repo_hygiene.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import atexit, json, os, shutil, subprocess, sys, tempfile, time
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

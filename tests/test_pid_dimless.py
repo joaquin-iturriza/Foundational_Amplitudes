@@ -5,6 +5,7 @@ backbone that returns a fixed nonlinear function of the particle features, so th
   (b) the other order columns do reach it, broadcast to every particle after the one-hot token.
 Run: python tests/test_pid_dimless.py   (needs torch and lgatr, i.e. a site's or the CPU env)
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os, sys
 
 import torch

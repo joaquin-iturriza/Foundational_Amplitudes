@@ -2,6 +2,7 @@
 spare event of the same collider energy, the block keeps its size and energy shares, the labels stay signed, and a
 pool above 2% unusable or out of spare events is refused. MadLoop is replaced by a stub (lhe_label_virt); CPU.
     .venv-cpu/bin/pytest tests/test_lhe_virt_label.py"""
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os, sys
 
 import numpy as np

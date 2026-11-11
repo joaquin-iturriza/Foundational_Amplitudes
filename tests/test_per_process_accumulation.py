@@ -24,6 +24,7 @@ Heavy imports missing on a CPU laptop (hydra, lgatr, lloca, mup, torch_ema, ...)
 stubbed for this test only; on a site the real modules are used.
 Run: python tests/test_per_process_accumulation.py
 """
+import _tmpdir  # noqa: F401  (temp files under one dir removed at exit)
 import os, sys, importlib.machinery, logging.handlers
 from unittest import mock
 import numpy as np
