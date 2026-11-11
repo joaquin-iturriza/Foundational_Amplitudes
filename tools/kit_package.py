@@ -34,7 +34,10 @@ from tools import kit_hardps as kh  # noqa: E402
 
 EXTRA = ["keyed_aug.py", "multiplicity_extrap.py", "physics_scales.py",
          "tools/__init__.py", "tools/kit_hardps.py", "tools/kit_predict.py", "tools/rebuild_run.py",
-         "tools/kit_package.py", "tools/nlo_conventions.py"]
+         "tools/kit_package.py", "tools/nlo_conventions.py",
+         # imported by the code above but outside publish_main's public paths (tests/test_kit_package_imports.py)
+         "data_mmap.py", "dirlock.py", "diagram_graphs.py", "optim/__init__.py", "mix_compose.py", "optim/muon.py", "tools/nlo_virtual_pipeline.py",
+         "tools/pool_physics.py", "tools/synthetic_amplitudes.py"]
 RUN_FILES = ["config.yaml", "data_stats.json", "particle_tokenizer.json", "base_shapes.bsh"]
 README = """FA surrogate models for the KIT hard phase-space benchmark (models.json lists them).
 
