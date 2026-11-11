@@ -21030,9 +21030,9 @@ entries:
     decision: D377
   owner:
     agent: a57bc60fe641a25e9
-    state: working
+    state: stopped
     since: '2026-11-11T20:14:27+00:00'
-    state_at: '2026-11-11T20:14:27+00:00'
+    state_at: '2026-11-11T20:43:06.628000+00:00'
     context: 129816
     context_at: '2026-11-11T20:26:15+00:00'
   step_why:
