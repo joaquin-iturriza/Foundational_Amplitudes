@@ -22022,7 +22022,7 @@ entries:
       commit halved() and the 68 configs (drive.py submits committed code only).'
   step_waits:
     '3': '2026-11-12'
-    '4': '2026-11-12'
+    '4': 'step 6: the end of driver dsave_s2_drive3 (pid 807322)'
     '5': step 3 (stage 2 go)
     '6': 'the end of driver dsave_s2_drive3 (pid 807322, log ~/.local/share/ccorch/detached/20261111-174638_dsave_s2_drive3.log):
       then check 8 trials per search, rerun stage2_readout.py --fetch and plot_stage2.py, write-up'
