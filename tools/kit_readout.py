@@ -65,7 +65,7 @@ def versus(path, ref):
         print(f"== {name} vs {ref}")
         for fam, x in sorted(fams.items()):
             x = np.array(x)
-            print(f"  {fam:14s} n={len(x):2d} median {np.median(x):+.2f} [{x.min():+.2f}, {x.max():+.2f}] "
+            print(f"  {fam:14s} n={len(x):2d} median {np.median(x):+.3f} [{x.min():+.2f}, {x.max():+.2f}] "
                   f"better: {(x < 0).sum()} worse: {(x > 0).sum()}")
 
 
