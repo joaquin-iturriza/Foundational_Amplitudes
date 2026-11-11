@@ -21886,6 +21886,11 @@ entries:
       the calibration''s 0.5 s/step at 1e5 vs 0.4 at 3e4 likely includes evaluation over a larger validation set (not checked):
       check the pure training step rate before costing (CLAUDE.md: wall-time targets from the training step alone). Told Joaquin
       2026-11-11.'
+  - at: '2026-11-11T04:04:01+00:00'
+    text: '2026-11-11 ~06:10 put to Joaquin for his go: steps 2000 at D=10,32 and 8000 at every D>=100 (non-decreasing, 8000
+      x 0.42 s/step = 56 min at D=1e5 under the 1 h cap), same for scratch and fine-tune; ~60 GPU-h per LO target (9 D), ~44
+      per V target (8 D), ~210 total, rates from the ee->ttbar calibration only (the one target of the four with measured
+      rates; per-trial sigma+eval 0.08 h included). Awaiting his go.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
