@@ -10,6 +10,8 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
+#     ... -- check <kit_package.py check args>                                         # the check alone
+if [ "$1" = check ]; then shift; python tools/kit_package.py check "$@" && echo "RUN_DONE"; exit; fi
 OUT="$1"; shift
 python tools/kit_package.py build --out "$OUT" --runs "$@" && python tools/kit_package.py check --pkg "$OUT" \
     && echo "RUN_DONE"

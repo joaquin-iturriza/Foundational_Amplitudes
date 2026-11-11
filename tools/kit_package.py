@@ -157,8 +157,10 @@ def _check_all(a, meta, env, pkg, worst):
                     for k, v in grp.items():
                         g[f"{sp}/{st}/{k}"] = v[:n]
         out = os.path.join(env["SCRATCH"], m["run"])
+        # --repo: the repository's own code on the original run dir (code drift since the predictions vs a package defect)
+        src = meta["built_from"] if a.repo else pkg
         subprocess.run([sys.executable, "tools/kit_predict.py", f"runs/kit/{m['run']}", "--h5", small, "--out", out],
-                       cwd=pkg, env=env, check=True, stdout=subprocess.DEVNULL)
+                       cwd=src, env=dict(env, PYTHONPATH=src), check=True, stdout=subprocess.DEVNULL)
         d = []
         with h5py.File(os.path.join(out, "predictions.h5"), "r") as p, h5py.File(own, "r") as o:
             for sp in p:
@@ -180,6 +182,7 @@ def main():
     c.add_argument("--pkg", required=True)
     c.add_argument("--n", type=int, default=200)
     c.add_argument("--only", nargs="*", default=None, help="these runs only (a quick end-to-end dry run)")
+    c.add_argument("--repo", action="store_true", help="predict with the repository's kit_predict on the original runs")
     sub.add_parser("relocate")
     a = ap.parse_args()
     {"build": cmd_build, "check": cmd_check, "relocate": cmd_relocate}[a.cmd](a)
