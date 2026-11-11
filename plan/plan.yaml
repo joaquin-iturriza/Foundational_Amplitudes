@@ -22820,6 +22820,12 @@ entries:
     units: null
     start: '2026-11-11T20:01:29+00:00'
     at: '2026-11-11T20:01:29+00:00'
+  - batch: dsave_diag_tops
+    wall_h: 0.3
+    jobs: 16
+    units: null
+    start: '2026-11-11T20:01:33+00:00'
+    at: '2026-11-11T20:01:33+00:00'
   handoff:
     state: 'Stage 2 nearly done; t t~ deficit under diagnosis, no write-up before its verdict. Readout tools @f8134b43: analysis/data_saving/stage2_readout.py
       (--fetch: every stage-2 trial''s test MSE on its own test pool, row-matched; failure causes from logs; GPU-h of every
