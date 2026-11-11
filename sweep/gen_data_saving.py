@@ -24,6 +24,7 @@ non-decreasing, cap 8500; fine-tunes the same steps, D383).
 import argparse
 import json
 import os
+import re
 import sys
 import zlib
 
@@ -111,7 +112,7 @@ def write(name, tgt, k, T, arm, rate, parent, lr_factor=1.0):
                        "time": "%02d:%02d:00" % divmod(max(1, int(round(hours * 60))), 60)},
            "paths": None, "sweep_name": name, "base_config": base, "n_trials": N_TRIALS,
            "dyhpo": {"surrogate": "gp", "n_candidates": 2000, "objective_scale": "auto",
-                     "seed": zlib.crc32(name.encode()) % 2 ** 31, "n_startup": N_STARTUP, "total_budget": 10000,
+                     "seed": zlib.crc32(re.sub(r"^dsave_s\d+_", "dsave_s2_", name).encode()) % 2 ** 31, "n_startup": N_STARTUP, "total_budget": 10000,
                      # D244/D245: the start-up trials, then two sequential batches over the rest
                      "waves": [N_STARTUP, (N_TRIALS - N_STARTUP + 1) // 2, (N_TRIALS - N_STARTUP) // 2]},
            "fidelity_schedule": {"t_steps": [int(T)]}, "fixed_params": fixed,

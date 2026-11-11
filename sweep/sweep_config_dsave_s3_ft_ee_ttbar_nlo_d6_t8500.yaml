@@ -15,7 +15,7 @@ dyhpo:
   surrogate: gp
   n_candidates: 2000
   objective_scale: auto
-  seed: 1310343025
+  seed: 688364006
   n_startup: 3
   total_budget: 10000
   waves:

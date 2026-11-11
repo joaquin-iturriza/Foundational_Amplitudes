@@ -1226,19 +1226,6 @@ processes:
     fwd_cand: 0.3333333333333333
     f_default: 0.25
     default_source: dsh_bbx_epem
-- name: v4_bbx_epemg
-  sqrts:
-  - 30
-  - 6000
-  n_train: 100000
-  n_val: 10000
-  n_test: 10000
-  sampling:
-    mode: mixture
-    f_fwd: 0.15
-    fwd_cand: 0.3333333333333333
-    f_default: 0.25
-    default_source: dsh_bbx_epemg
 - name: v4_bbx_epemgz
   sqrts:
   - 122
@@ -2253,19 +2240,6 @@ processes:
     fwd_cand: 0.3333333333333333
     f_default: 0.25
     default_source: dsh_bg_bccx
-- name: v4_bg_bepem
-  sqrts:
-  - 30
-  - 6000
-  n_train: 100000
-  n_val: 10000
-  n_test: 10000
-  sampling:
-    mode: mixture
-    f_fwd: 0.15
-    fwd_cand: 0.3333333333333333
-    f_default: 0.25
-    default_source: dsh_bg_bepem
 - name: v4_bg_bg
   sqrts:
   - 20
@@ -4983,19 +4957,6 @@ processes:
     fwd_cand: 0.3333333333333333
     f_default: 0.25
     default_source: dsh_epem_bbxepem
-- name: v4_epem_bbxg
-  sqrts:
-  - 30
-  - 6000
-  n_train: 100000
-  n_val: 10000
-  n_test: 10000
-  sampling:
-    mode: mixture
-    f_fwd: 0.15
-    fwd_cand: 0.3333333333333333
-    f_default: 0.25
-    default_source: dsh_epem_bbxg
 - name: v4_epem_bbxgz
   sqrts:
   - 122
@@ -5087,19 +5048,6 @@ processes:
     fwd_cand: 0.3333333333333333
     f_default: 0.25
     default_source: dsh_epem_ccxepem
-- name: v4_epem_ccxgg
-  sqrts:
-  - 40
-  - 6000
-  n_train: 100000
-  n_val: 10000
-  n_test: 10000
-  sampling:
-    mode: mixture
-    f_fwd: 0.15
-    fwd_cand: 0.3333333333333333
-    f_default: 0.25
-    default_source: dsh_epem_ccxgg
 - name: v4_epem_ccxgh
   sqrts:
   - 155
@@ -9416,19 +9364,6 @@ processes:
     fwd_cand: 0.3333333333333333
     f_default: 0.25
     default_source: dsh_ug_dwpzz
-- name: v4_ug_epemgu
-  sqrts:
-  - 40
-  - 6000
-  n_train: 100000
-  n_val: 10000
-  n_test: 10000
-  sampling:
-    mode: mixture
-    f_fwd: 0.15
-    fwd_cand: 0.3333333333333333
-    f_default: 0.25
-    default_source: dsh_ug_epemgu
 - name: v4_ug_epemhu
   sqrts:
   - 155
@@ -9442,19 +9377,6 @@ processes:
     fwd_cand: 0.3333333333333333
     f_default: 0.25
     default_source: dsh_ug_epemhu
-- name: v4_ug_epemu
-  sqrts:
-  - 30
-  - 6000
-  n_train: 100000
-  n_val: 10000
-  n_test: 10000
-  sampling:
-    mode: mixture
-    f_fwd: 0.15
-    fwd_cand: 0.3333333333333333
-    f_default: 0.25
-    default_source: dsh_ug_epemu
 - name: v4_ug_epemuz
   sqrts:
   - 122
@@ -11015,19 +10937,6 @@ processes:
     fwd_cand: 0.3333333333333333
     f_default: 0.25
     default_source: dsh_uux_duxwpz
-- name: v4_uux_epemg
-  sqrts:
-  - 30
-  - 6000
-  n_train: 100000
-  n_val: 10000
-  n_test: 10000
-  sampling:
-    mode: mixture
-    f_fwd: 0.15
-    fwd_cand: 0.3333333333333333
-    f_default: 0.25
-    default_source: dsh_uux_epemg
 - name: v4_uux_epemgh
   sqrts:
   - 155
@@ -13867,13 +13776,6 @@ processes:
   n_train: 50000
   n_val: 5000
   n_test: 5000
-- name: v4_ug_epemu_nlo
-  sqrts:
-  - 30
-  - 6000
-  n_train: 50000
-  n_val: 5000
-  n_test: 5000
 - name: v4_ug_taptamu_nlo
   sqrts:
   - 31
@@ -13903,13 +13805,6 @@ processes:
   n_val: 5000
   n_test: 5000
 - name: v4_uux_abbx_nlo
-  sqrts:
-  - 30
-  - 6000
-  n_train: 50000
-  n_val: 5000
-  n_test: 5000
-- name: v4_uux_epemg_nlo
   sqrts:
   - 30
   - 6000
@@ -14046,26 +13941,6 @@ processes:
   base: v4_dg_dhz
   sqrts:
   - 227
-  - 6000
-  n_train: 100000
-  n_val: 10000
-  n_test: 10000
-  physics:
-    alpha_s: 0.15
-- name: v4_epem_bbxg__as090
-  base: v4_epem_bbxg
-  sqrts:
-  - 30
-  - 6000
-  n_train: 100000
-  n_val: 10000
-  n_test: 10000
-  physics:
-    alpha_s: 0.09
-- name: v4_epem_bbxg__as150
-  base: v4_epem_bbxg
-  sqrts:
-  - 30
   - 6000
   n_train: 100000
   n_val: 10000

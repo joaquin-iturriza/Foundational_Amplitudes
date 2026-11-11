@@ -8,14 +8,14 @@
 # pretrain_data_saving: a parent of the stage-2 fine-tunes (D393): every pool of
 # recipes/catalog_v4_datasaving_parent_<which>.yaml on its first 1e4 train events, 5 epochs at the parent's batch
 # 16384, cosine at HPO rule 2's lr centre 1e-2 (T/3000)^-0.55 (see lr=<value> below):
-#   heldout  1422 pools (recipes/gen_datasaving_parent.py, D400): trial 1262's training recipe plus catalog_v4's
-#            physical-mass top classes, the e+e- > t t~ family and e+e- > u u~'s class out (the LO fine-tunes' parent):
-#            T = ceil(5 x 1422e4 / 16384) = 4340, lr 1e-2 (T/3000)^-0.55 = 8.162e-3
-#   treesin  1424 pools, the held-out recipe plus e+e- > u u~ and t t~ LO (the one-loop fine-tunes' parent: "the one
-#            loops with the tree levels in the pretraining"): T = 4346, lr 8.156e-3
+#   heldout  1411 pools (recipes/gen_datasaving_parent.py, D400): the r4 parents' 1133 plus catalog_v4's 278
+#            physical-mass top classes (the e+e- > t t~ family and e+e- > u u~'s class out; the LO fine-tunes' parent):
+#            T = ceil(5 x 1411e4 / 16384) = 4307, lr 1e-2 (T/3000)^-0.55 = 8.196e-3
+#   treesin  1413 pools, the held-out recipe plus e+e- > u u~ and t t~ LO (the one-loop fine-tunes' parent: "the one
+#            loops with the tree levels in the pretraining"): T = 4313, lr 8.190e-3
 # Base config:
 # trial 1262 of cov_v4_long_hpo8_cc_68224 (model, HPs, HETEROSC + sigma stage); in memory (data.memmap=false: the
-# 1e4-per-pool train split is ~1.42e7 events, 10 GB host memory at 1.13e7 in r4, and no memmap cache exists for this recipe).
+# 1e4-per-pool train split is ~1.41e7 events, 10 GB host memory at 1.13e7 in r4, and no memmap cache exists for this recipe).
 #     site submit <site|auto> FA scripts/job_datasaving_parent.sh -- <heldout|treesin> [key=value ...] [tag=<name>]
 # The input flags of D392 (kit_benchmark's arms with a gain) go as arguments with ++ (trial 1262's config predates
 # the keys, so a plain override fails "not in struct"), e.g. ++model.input_soft_eps=1e-8
@@ -28,7 +28,7 @@ _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 WHICH="$1"; shift
-case "$WHICH" in heldout) T=4340; LR=8.162e-3 ;; treesin) T=4346; LR=8.156e-3 ;; *) echo "heldout or treesin"; exit 2 ;; esac
+case "$WHICH" in heldout) T=4307; LR=8.196e-3 ;; treesin) T=4313; LR=8.190e-3 ;; *) echo "heldout or treesin"; exit 2 ;; esac
 PARENT="runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262"
 RECIPE="$PROJECT_DIR/recipes/catalog_v4_datasaving_parent_${WHICH}.yaml"
 [ -e "$RECIPE" ] && [ -e "$PROJECT_DIR/$PARENT/config.yaml" ] || { echo "no $RECIPE or $PARENT/config.yaml"; exit 2; }
