@@ -22319,6 +22319,7 @@ entries:
       bin with legends saying each arm'
     7: Read the combined input arm FA-ccin2p3-c15b3337 (soft rescale + pair logs, design passed) with kit_readout --vs against
       f6b2ece9 and the single arms, figures
+    8: Read the A_ft lr_scale 0.1 check (93ccd2c4 uug, 015da743 uugg, 81a52170 tt virt off) against A_ft at 1.0 and scratch
   done_when: null
   notes_ref: null
   match: kit_*
@@ -22642,6 +22643,11 @@ entries:
       if:
       - 'both gains kept: both flags go to pretrain_data_saving'
       - 'one gain lost: the larger-gain flag alone (soft rescale)'
+    8:
+      feeds: whether pretraining helps extrapolation into the KIT limits (A_ft design)
+      if:
+      - '0.1 reaches band (a): pretraining helps at the fine-tune lr, both lr points reported'
+      - '0.1 in the same band: (b) no change into the limit / (c) hurts stand, bulk transfer read'
   step_waits:
     '7': FA-ccin2p3-c35a2199 FA-ccin2p3-ac436bba
     '8': FA-ccin2p3-c35a2199 FA-ccin2p3-ac436bba
