@@ -23156,6 +23156,16 @@ entries:
     withdrawn_at: '2026-11-10T03:58:42+00:00'
     withdrawn_why: 'D315 (one seed, ''in general'') settles the seeds: the batch runs one seed per cell at ~28 GPU-h, under
       30, so no budget question remains'
+  - ask: 'GPU budget: ~50 GPU-h above 30 with no decision covering it. The fair NLO D-scan (Bakar''s protocol) on KIT''s t
+      t~ one-loop virtual: 5 sizes D = 1e2..1e4 x 2 arms (fine-tuned from the fair_nlo parent; Bakar''s baseline, from-scratch
+      V/B with the exact Born), each an 8-trial DyHPO search as the data-saving study ran its cells: 80 trials, 24 GPU-h at
+      the data-saving study''s measured rates, estimated 40-50 GPU-h in float64. Go?'
+    at: '2026-11-11T20:53:19+00:00'
+    searched: site decisions --project FA; Joaquin 2026-11-10T02:08 (the KIT request; its decisions D353 'if we need to run
+      new things, that's fine too' and D363 approve the work, name no cost); 2026-10-14T16:48 (benchmark framing with Anja,
+      no cost); 2026-10-05T04:33 (process equality, unrelated)
+    blocks_steps: &id003
+    - 3
   owner:
     agent: a23f21cb7aaa2a595
     state: working
@@ -24628,6 +24638,15 @@ entries:
     units: null
     start: '2026-11-11T20:52:14+00:00'
     at: '2026-11-11T20:52:14+00:00'
+  ask: 'GPU budget: ~50 GPU-h above 30 with no decision covering it. The fair NLO D-scan (Bakar''s protocol) on KIT''s t t~
+    one-loop virtual: 5 sizes D = 1e2..1e4 x 2 arms (fine-tuned from the fair_nlo parent; Bakar''s baseline, from-scratch
+    V/B with the exact Born), each an 8-trial DyHPO search as the data-saving study ran its cells: 80 trials, 24 GPU-h at
+    the data-saving study''s measured rates, estimated 40-50 GPU-h in float64. Go?'
+  waiting_since: '2026-11-11T20:53:19+00:00'
+  searched: site decisions --project FA; Joaquin 2026-11-10T02:08 (the KIT request; its decisions D353 'if we need to run
+    new things, that's fine too' and D363 approve the work, name no cost); 2026-10-14T16:48 (benchmark framing with Anja,
+    no cost); 2026-10-05T04:33 (process equality, unrelated)
+  blocks_steps: *id003
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
@@ -25010,7 +25029,7 @@ entries:
       about cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID,
       says nothing about the draft's sections)
     blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-    blocks_steps: &id003 []
+    blocks_steps: &id004 []
   owner:
     agent: afb073b8fc9460ec5
     state: stopped
@@ -25028,7 +25047,7 @@ entries:
     cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID, says
     nothing about the draft's sections)
   blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-  blocks_steps: *id003
+  blocks_steps: *id004
   step_why:
     1:
       feeds: the draft's results (D354)
