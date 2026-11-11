@@ -22591,6 +22591,12 @@ entries:
       16-run diagnostic running (configs dsave_diag_*_d{5,6,7,8}_t8500 @f8134b43); if yes, rerun of the 16 t t~ fine-tune
       searches (~25 GPU-h) needs Joaquin''s go (beyond the 215 GPU-h item estimate). Still open with him: which of the three
       setup fixes (event rule, hooks naming who acts, one source per topic).'
+  - at: '2026-11-11T19:22:02+00:00'
+    text: '2026-11-11 ~21:20 CORRECTION (read from the live source): the previous owner''s claim that the fine-tunes load
+      the parent model from before its sigma fit is FALSE. run.py promote_final_model (D70, D276) moves the sigma stage''s
+      checkpoints into <run>/models and links sigma_stage/models to it; on CC runs/data_saving/dsave_parent_heldout_r4/models
+      holds only model_run0.pt.gz and model_run0_best.pt.gz written 12:51 (after the sigma stage), sigma_stage/models -> ../models.
+      The fine-tunes loaded the final model; there is one model per run. Never write ''before the sigma fit'' in the readout.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
