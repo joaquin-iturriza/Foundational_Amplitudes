@@ -44,11 +44,13 @@ def d_of(k):
 
 
 def lr_centre(T, k):
-    """The calibration's lr (scripts/job_data_saving.sh): the parent's law at T times the D factor."""
+    """The calibration's lr (scripts/job_data_saving.sh): the parent's law at T times the D factor. Below the optimizer
+    timescale t* = 3000 steps the law's t^-0.55 branch does not hold: lr* rises as (T/3000)^0.5 up to t* (HPO rule 2,
+    the inverted U), so a horizon T < 3000 takes the law at 3000 times (T/3000)^0.5."""
     from sweep.gen_transfer_pilot import D_FACTOR
     Ns = np.array(sorted(D_FACTOR)); B = np.array([D_FACTOR[n] for n in Ns])
     D = d_of(k)
-    return 7.82114e-3 * (T / 17056) ** -0.55 * float(np.exp(np.interp(np.log(np.clip(D, Ns.min(), Ns.max())),
+    return 7.82114e-3 * (max(T, 3000) / 17056) ** -0.55 * min(1.0, T / 3000) ** 0.5 * float(np.exp(np.interp(np.log(np.clip(D, Ns.min(), Ns.max())),
                                                                        np.log(Ns), B)))
 
 
