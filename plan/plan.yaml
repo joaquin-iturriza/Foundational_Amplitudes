@@ -20949,6 +20949,10 @@ entries:
       runs (8-trial single-fidelity DyHPO scratch + fine-tune per target and D, steps per D from the ladder-rule calibration,
       D391) on e+e- > u u~ and t t~, LO and one-loop V. The parent must hold all four out: neither trial 1262 nor the kit
       held-out parent does (v4_epem_ccx and v4_epem_ccx_nlo, in ee_uu''s equality class, and v4_zp_ee_uu are in both)'
+    7: 'D400 rerun (design recorded 2026-11-11 ~22:30): CPU prebuild of the 278 physical-mass top train pools (recipes/catalog_v4_datasaving_h3_train.yaml,
+      job_catalog_v4_regen.sh x4 shards), D395 smoke run, parents r5 heldout (1422 pools) and treesin (1424) via job_datasaving_parent.sh;
+      then the 34 fine-tune searches sweep/sweep_config_dsave_s3_ft_*.yaml through drive.py (88-103 GPU-h, waits for Joaquin''s
+      go on cost); scratch searches of stage 2 reused'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -21037,6 +21041,12 @@ entries:
         if the inputs change, then the searched runs'
       - 'no option gains: pretrain a parent holding all four out on the current inputs (or confirm one), then the searched
         runs'
+    7:
+      feeds: S at 1e-4 per target from parents with the physical-mass tops (D400)
+      if:
+      - 'geomean ft(s3)/ft(s2) <= 1/3 on t t~ D=316..1e4: physical tops were the deficit; S from s3 written up'
+      - 'geomean >= 1/1.5: tops not the cause; next suspects the dimensionless-mass column and the fine-tune optimizer, S
+        from s3 still written up'
   designs:
   - at: '2026-11-10T02:35:09+00:00'
     question: 'Step 1 (D356 horizons, tree arm): on catalog_v4''s held-out tree targets ee->ttbar (H3, 2->2 massive), ee->ccbar
