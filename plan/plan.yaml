@@ -21937,6 +21937,26 @@ entries:
       (D394). Disk ~14 GB of 103 GB free on CC. Not in this design: optimizations_recap''s AdamW-parent fine-tune arm (D364,
       finding 2026-11-10T03:35): it would add one 8-trial fine-tune sweep per cell, 34 sweeps ~104 GPU-h, plus two AdamW parents
       ~3 GPU-h, scratch cells shared; still applicable on the new targets, left to that entry.'
+    fix_at: '2026-11-11T05:03:19+00:00'
+    fix: 'Re-check of the 05:01 revision. Checks 2, 3, 5 and 13 are now met. The joint fit with a shared exponent and a bootstrap
+      band (analysis/data_saving/dstar_fit.py --calib, data/dstar_calib.json read: log10 D* half-widths 0.12 / 0.10 / 0.31
+      / 0.12 decades, 494-500 resamples) puts the S band at 0.15-0.43 decades. The expected S of 1.4-2.2 from sec:ladder''s
+      in-D gains, converted with the fitted alpha 1.4-2.6, is stated against it honestly: resolved on u u~ LO and t t~ V,
+      marginal on u u~ V, likely no gap on t t~ LO. The ladder''s results, including t t~ 0.96, are in the prior. Waves [3,3,2]
+      and lr [c/3, 3c] are in the generator diff. The timing is stated. Still to fix: (1) Checks 15 and 7, the one-loop readout
+      of D371 is not what the named tool computes. The design reads e+e- > u u~ V, trained on V (D375), as test MSE(V/B) ''via
+      vb_test_mse.py, u u~ V''s prediction divided by the exact Born''. vb_test_mse.py takes sigma_stage/preds_test.npz raw_pred
+      and raw_truth as they are and divides by nothing, so on a V-trained run its mse_vb is the MSE of V, in V''s units, not
+      of V/B. Fix: add the Born division for runs with target_over_born off (the ee_uu_nlo Born sidecar exists on CC). Show
+      it on one cal_f22 e+e- > u u~ V run: list mse_vb and var_vb in V/B units, with V/B constant at C_F(pi^2-8). Then commit
+      it. (2) Check 2''s tool is not committed. The check cites ''dstar_fit.py --calib @ the committed tool'', but analysis/data_saving/dstar_fit.py
+      and data/dstar_calib.json are untracked and the generator change is uncommitted. Commit them, once the repo-reviewer
+      backlog allows, and give the commit in the design. (3) Correct this claim: ''models/model_run0_best.pt, which the sigma
+      stage ... leaves as its final model''. The sigma stage is its own run in <parent>/sigma_stage, as vb_test_mse.py reads
+      it, so run0_best.pt is the pre-sigma checkpoint. Either point the fine-tune at the sigma stage''s model or say why run0_best.pt
+      is equivalent (the sigma stage freezes everything but the sigma head, so the mu weights are the same). Note, not a FIX
+      on its own: YES is the lower edge of a 16-84% band above S=1, about an 84% one-sided bar. It is acceptable as stated,
+      but say so in the write-up.'
   step_waits:
     '3': '2026-11-12'
     '4': '2026-11-12'
