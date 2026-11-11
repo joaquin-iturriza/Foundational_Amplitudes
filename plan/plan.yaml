@@ -23173,7 +23173,7 @@ entries:
     - 3
   owner:
     agent: a23f21cb7aaa2a595
-    state: working
+    state: closed
     since: '2026-11-11T20:26:24+00:00'
     state_at: '2026-11-11T20:26:38+00:00'
   findings:
@@ -23512,27 +23512,35 @@ entries:
     '4': FA-ccin2p3-84d3488e
     '5': FA-ccin2p3-4f3b24ef
   handoff:
-    state: 'Input study done (findings 2026-11-11): soft rescale + pair logs (model.input_soft_eps=1e-8, input_pair_logs=n,
-      06b9353a) gain every limit on uug (soft 14180->0.200, coll 30.1->2.21, bulk 8.2e-4->1.09e-4) and uugg (soft 9070->0.411,
-      coll_gg 20.5->2.47, coll_qg 18.4->3.56, azimuth 29.2->3.5), not on tt (virtual: Coulomb unresolved -0.16, Sudakov +1.00
-      worse; Born: threshold -2.26 but Sudakov +0.305 worse); local logs no gain. A_ft verdict after the lr check: pretraining
-      helps soft at lr_scale 0.1 (uugg exponent -2.14), not collinear nor Coulomb; bulk transfer; tt Born threshold hurt by
-      A_ft with the off-shellness column on. Ready now: step 4 threshold scan (tt virtual model = its existing A/A_ft/B, per
-      the carry-over outcome) and step 5 KIT package (uug/uugg: the both-flags scratch models c15b3337 / c364a7ae; tt: A/A_ft/B
-      best per limit). Step 3 fair NLO D-scan: parent 03ea3719 done, not designed yet.'
-    decisions: 'D374 three input arms; D376 read bulk and every bin; D392 incorporate every gain (verdict: both flags; pretrain_data_saving
-      builds the parent with them); D394 do not ask Joaquin. Readout cut 0.3 decades of median log10(arm/control), sourced
-      to the 0.08-0.12 seed spread in results.tex ~l.1296 (reviewer FIX). D395 probe not needed for the flagged A path (ran
-      end to end in c15b3337).'
-    ruled_out: 'local-frame logs (model.input_local_log_eps): no gain on uug (bulk +0.15). Pair logs or soft rescale alone:
-      each loses a limit the combination keeps.'
-    running: none
-    files: wrappers.py (_pair_log_inputs, _soft_rescale), models/lloca.py (local_log_eps), experiment.py (n_scalars sizing),
-      config/model/lloca.yaml, tests/test_input_reps.py (4/5-particle invariance; 6 untested), scripts/job_kit.sh (KIT_LR_SCALE),
-      tools/kit_readout.py (--vs), tools/kit_figures.py (input/lr labels, legend strip), analysis/kit_benchmark/data/kit_fig_A_{inputs,inputs_carry,ft,ft_lr}.json,
-      analysis/kit_benchmark/figs/kit_{mse,median}_{inputs,carry,aft,aftlr}_*.png. Code since 06b9353a not yet through the
-      repo reviewer.
-    written: '2026-11-11T20:16:24+00:00'
+    state: 'Step 4 threshold scan: design passed (3rd review, code b63843c8, repo review passed at 248077cb). Scan file built
+      on CC (runs/kit/threshold_scan/ee_tt.h5: 32 beta in [1e-3,0.6] x 16 cos nodes; our MadLoop at KIT settings reproduces
+      KIT born/virt_finite to 3.6e-13). Smoke job FA-ccin2p3-84d3488e (MG5_aMC LO+NLO at beta indices 0,3,6,9,12) finds the
+      lowest beta whose MG5_aMC soft tests pass (beta 1e-3 fails: soft test 2, 68%); next: the batch, K=8 parts x 4 points
+      (job_kit_threshold.sh <k> 8, --hdr=--time=01:00:00, target 0.35 h/part, skip done points automatically), then on CC
+      login: kit_threshold_scan.py predict on the four models (A kit_A_ee_tt_virt_finite_n900000_t8000_offon, A_ft kit_A_ft_..._offon,
+      B kit_B_..._t3000_offon, B_bulk kit_B_bulk_..._offon; ~1 min each on CPU, site run 120 s limit: one model per call),
+      collect --out analysis/kit_benchmark/data/kit_threshold_scan.json (CLAIM lines), figure --out analysis/kit_benchmark/figs/kit_threshold_scan.
+      If lowest passing beta > 1e-2: design the analytic O(alpha_s) massive-quark sigma (checked vs MG5_aMC). Dry collect
+      on B: sigma[V_surr]/sigma[V_exact]-1 = -0.90 at beta 1e-3, -0.10 at 1e-2, +0.05 at 0.05-0.08. Step 5 package: job FA-ccin2p3-4f3b24ef
+      builds runs/kit/kit_package_v1(.tar.gz) with 10 models (uug/uugg softpair A; tt born A best threshold softpair 1e5,
+      A best Sudakov offoff 1e5, A best bulk A_ft offoff 9e5, B offon; tt virt A offoff 9e5 threshold, A offoff 1e5 Sudakov,
+      A_ft offon 9e5 bulk, B offon) and checks the package alone reproduces each run''s predictions (<1e-9); the tt virtual
+      choice may change after the threshold scan. Step 3 fair NLO D-scan: design drafted (analysis/kit_benchmark/fair_nlo_design_draft.sh,
+      not recorded: recording it would replace the threshold design before the batch goes); KIT Born sidecar for V/B written
+      (kit_hardps.ensure_born, datagen, kit_predict at b63843c8, untested on GPU: needs the D395 smoke per arm); needs a generator
+      like sweep/gen_data_saving.py for KIT (fair_nlo parent base config, float64, KIT recipe, V/B); waits on Joaquin''s GPU
+      go (~50 GPU-h, plan ask).'
+    decisions: 'Exact NLO = MG5_aMC fixed order at mu_R=mu_F=M_Z (alpha_s 0.118); surrogate NLO = exact + sigma[V_surr]-sigma[V_exact]
+      (design passed). Fair NLO: both arms V/B with exact Born (as pretrain_data_saving''s ee_ttbar_nlo, D375), 8-trial searches
+      per cell (the data-saving precedent), float64 (KIT precision). Code-review gap closed: kit code since 06b9353a was inside
+      the repo-reviewer passes of 2026-11-11 20:43-21:00 plus this owner''s pass at 248077cb. 6-particle Lorentz test added
+      (ff87b57a: both flags, 15 pair logs, rel 4.2e-13).'
+    ruled_out: MG5_aMC at beta 1e-3 as is (soft test 2 fails).
+    running: FA-ccin2p3-84d3488e (threshold smoke, CPU), FA-ccin2p3-4f3b24ef (KIT package build+check, CPU)
+    files: tools/kit_threshold_scan.py, tests/test_kit_threshold_scan.py, scripts/job_kit_threshold.sh, tools/kit_package.py,
+      scripts/job_kit_package.sh, tools/kit_predict.py (--h5), tools/kit_hardps.py (path=, ensure_born), datagen.py, tests/test_input_reps.py,
+      analysis/kit_benchmark/fair_nlo_design_draft.sh; on CC runs/kit/threshold_scan/{ee_tt.h5,scan_grid.json,amc_dry,collect_test.json}
+    written: '2026-11-11T20:53:46+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
