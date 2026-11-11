@@ -22161,6 +22161,60 @@ entries:
       = drive.py''s trial_job.sh --detached path that wrote RESULT_JSON and sigma_stage/preds_test.npz for the 544 stage-2
       trials. Check 14: 15 MB/run x16 vs 52 GB free. Before submission: commit the 16 configs and the stage2_readout.py --diag
       edit (both uncommitted now; detached trials need committed code).'
+  - at: '2026-11-11T19:53:04+00:00'
+    question: 'D400 fix of the t t~ fine-tune deficit (stage 2: t t~ fine-tunes 6-33x worse than scratch in best val at D=316..1e4,
+      u u~ fine-tunes 2.5-60x better): does a parent that pretrains on catalog_v4''s physical-mass top classes remove it,
+      and what saving S = D*_scr/D*_ft at 1e-4 does each of the four targets (e+e- > u u~ LO and V, e+e- > t t~ LO and V)
+      read with the new parents? Root cause found: catalog_v4 holds out every class with an external top at m_t=172.5 (axis
+      H3, recipes/select_catalog_v4.py:21,120; the heavy-quark layer at m_Q=50,300,600 brackets it), so trial 1262''s training
+      recipe (recipes/catalog_v4_default25_train.yaml), from which both r4 parents were cut, has no physical-mass top; H3''s
+      279 classes have val/test pools on CC but no train pool at their sampling. New parents (recipes/gen_datasaving_parent.py):
+      that recipe + the 278 H3 classes (n_train 1e4, what the parent reads) minus only the e+e- > t t~ family at every mass
+      (v4_epem_ttx, __mt50/300/600) and e+e- > u u~''s equality class with its Z'' and tau variants and one-loops: heldout
+      1422 pools, treesin 1424 (+ the two LO targets). The kit families ee->qqg/qqgg return (only the two Fig. 22 families
+      are held out, D400). Input-scale part of D400: the 16-run diagnostic read NO (own/parent-scale val 4 of 8 below, geomean
+      0.95; LO 1.98, V 0.45), so _resolve_offshell_stats stays as is; the physical-mass parent also changes the parent''s
+      top-column scale (the V target''s 9x compression).'
+    prior: 'Stage 2 (stage2_readout.py @f8134b43, analysis/data_saving/data/stage2_readout.json): S at 1e-4 on test u u~ LO
+      3.5, t t~ LO 0.43, u u~ V 3.1, t t~ V 0.48; ft/scr best val t t~ LO 6.1, 12.5, 18.9, 2.4 and t t~ V 8.1, 12.5, 33, 27
+      at D=316..1e4. Five checks clean (transforms, readout, rows, lr windows, parent soundness). Off-shellness diagnostic
+      (diag_readout.py @fdcfec3d, figs/stage2_diag.png): NO. results.tex tab:v3_short: the physical top (H3) is the worst-read
+      tree axis zero-shot (median MSE 1.86 baseline vs 1.01 H1, 1.12 H2), the heavy-quark bracket does not stand in for it.
+      Searched results.tex (H3, physical top, heavy-quark, parent), the entry, site decisions (top, ttbar, t t~, parent, held
+      out): no prior parent with physical-mass tops for this question.'
+    measure: Per (target, D) the best val mu-MSE of the 8-trial fine-tune search from the new parent (DyHPO's objective) and
+      its test MSE (ln|M|^2 LO, V/B for V, stage2_readout.py), against the stage-2 scratch search of the same cell (unchanged,
+      reused) and the stage-2 fine-tune from the r4 parent; S per target by dstar_fit's joint shared-alpha fit on test and
+      on val, as stage 2.
+    check: 'The change moves what the deficit depends on: the fine-tune''s head start comes from neighbours in the pretraining
+      (u u~ has e+e- > d d~, s s~, b b~, mu mu, the ccx/qqg families near it and wins 2.5-60x); t t~ at m_t=172.5 has none
+      in either r4 parent (102 top pools, all at m_t=50/300/600) and the physical top is the worst-read axis zero-shot (tab:v3_short,
+      1.86 vs 1.0-1.1). The treesin parent already contains v4_epem_ttx LO at the physical mass and its V fine-tunes still
+      lose 8-33x, so the measure is not guaranteed to move: that is what the runs test.'
+    fixed: 'Every stage-2 fine-tune config but the parent: sweep/sweep_config_dsave_s3_ft_<target>_d<k>_t<T>.yaml = the stage-2
+      dsave_s2_ft config (sweep/gen_data_saving.py --arms ft --stage s3, diffed: only sweep_name, the DyHPO seed from the
+      name, base_config and fine_tune.pretrained_path differ), search space (lr_scale [0.1,10], layer_decay [0.75,1], template
+      HPs), 8 trials in waves 3/3/2, T(D) ladder (D391), target recipes and pools, test rows, seed 42, fine_tune.target_stats
+      own, offshell_stats parent. Parents: scripts/job_datasaving_parent.sh as r4 (trial 1262''s config, 1e4 events per pool,
+      5 epochs, batch 16384, HETEROSC + sigma stage, D392 flags ++model.input_soft_eps=1e-8 ++model.input_pair_logs=6, lr
+      1e-2 (T/3000)^-0.55) at T=4340 (heldout) and 4346 (treesin), tag r5.'
+    control: 'The stage-2 scratch searches of each cell (same recipe, pools, T, seed; no parent weights) and the stage-2 fine-tunes
+      from the r4 parents (same everything but the parent): ft(s3)/ft(s2) isolates the parent change, ft(s3)/scr gives S.'
+    seeds: Seed 42 everywhere, as stage 2; replication is across the 34 cells (8-9 D per target); the fixed-HP rerun spread
+      is 0.46-4.84 (diagnostic, parent-scale rerun / stage-2 best).
+    outcome: 'YES (the physical-mass tops were the deficit): t t~ LO and V at D=316..1e4 (8 cells) geomean ft(s3)/ft(s2) <=
+      1/3 and geomean ft(s3)/scr <= 1. NO: geomean ft(s3)/ft(s2) >= 1/1.5: the tops'' absence is not the cause; next suspects
+      the dimensionless-mass column on the parent''s scale and the fine-tune optimizer. Between: inconclusive, said so. In
+      all cases S is re-read on all four targets from the s3 fine-tunes and written up (results.tex, replacing draft Fig.
+      22). Launch: (1) CPU prebuild of the 278 train pools: site submit ccin2p3 FA scripts/job_catalog_v4_regen.sh --item
+      pretrain_data_saving --hdr=--job-name=dsave_h3train --env V4REGEN_RECIPES=recipes/catalog_v4_datasaving_h3_train.yaml
+      --env V4REGEN_N=4 --env V4REGEN_K=k (k=0..3, 16 cores each; 2.78e6 events, ~2 ms core per event in the g12 regen x up
+      to 5 for 2->4 tops, under 1 h); (2) D395 smoke run: job_datasaving_parent.sh heldout iters=50 tag=smoke (+ the D392
+      flags), afterok on (1), ~0.3 GPU-h; (3) parents r5 heldout and treesin afterok on (2), ~1.7 h each (r4: 3458 steps in
+      1.36 h incl. load and sigma stage, x4340/3458), --time 03:00:00, 3.4 GPU-h; (4) 34 fine-tune searches, 272 trials, through
+      sweep/drive.py --item pretrain_data_saving --sites ccin2p3 once both parents are done: 88 GPU-h measured on stage 2''s
+      same configs (gen_data_saving''s estimate 103). Whole rerun ~92-107 GPU-h, above 30: (1)-(3) (3.7 GPU-h) go under D400;
+      (4) waits for Joaquin''s go on the cost. Disk: 0.7 GB pools + parents against 55 GB free on /sps/lpnhe (read 2026-11-11).'
   step_waits:
     '3': '2026-11-12'
     '4': step 6 (driver dsave_s2_drive3 end) and step 7 (the t t~ diagnostic runs; no write-up before its verdict)
