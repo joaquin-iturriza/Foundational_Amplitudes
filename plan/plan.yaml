@@ -23532,7 +23532,7 @@ entries:
   step_waits:
     '3': '2026-11-12'
     '5': FA-ccin2p3-a90e1ab4 FA-ccin2p3-0cc6b96c FA-ccin2p3-955131a5 FA-ccin2p3-00e5b77e FA-ccin2p3-27a68626 FA-ccin2p3-ce09d554
-    '6': FA-ccin2p3-3fc1016a FA-ccin2p3-eb0f30db
+    '6': FA-ccin2p3-a90e1ab4 FA-ccin2p3-0cc6b96c FA-ccin2p3-955131a5 FA-ccin2p3-00e5b77e FA-ccin2p3-27a68626
   handoff:
     state: 'Step 4 threshold scan DONE (finding 2026-11-11, analysis/kit_benchmark/data/kit_threshold_scan.json @e57f28f7,
       figure analysis/kit_benchmark/figs/kit_threshold_scan.png): B in the NLO band from beta 0.0119, A/A_ft/B_bulk only from
