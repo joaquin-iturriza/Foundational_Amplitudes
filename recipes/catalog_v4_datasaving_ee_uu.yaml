@@ -1,0 +1,4 @@
+# pretrain_data_saving (D385-D387): the draft Fig. 22 target ee_uu alone, copied from recipes/ref_solo_ee_uu.yaml
+sampling: {mode: mixture}
+processes:
+  - {name: ee_uu, sqrts: [  25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}

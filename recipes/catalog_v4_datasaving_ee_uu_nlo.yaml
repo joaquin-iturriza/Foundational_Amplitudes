@@ -1,0 +1,4 @@
+# pretrain_data_saving (D385-D387): the draft Fig. 22 target ee_uu_nlo alone, copied from recipes/vob_ee_uu_nlo.yaml
+sampling: {mode: mixture}
+processes:
+  - {name: ee_uu_nlo, sqrts: [25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
