@@ -21970,6 +21970,13 @@ entries:
       a66d0d73cd29b8da3 sent to calibrate ee->uubar LO, ee->uubar V, ee->ttbar V the same way (~10 GPU-h, one scratch run
       per D at 8500 steps), check which parent holds all four out, then cost the searched runs from those horizons for Joaquin''s
       go.'
+  - at: '2026-11-11T04:18:29+00:00'
+    text: '2026-11-11: stage-2 parent recipe recipes/catalog_v4_datasaving_parent_heldout.yaml (gen_datasaving_parent.py):
+      kit_benchmark''s held-out parent (ee->tt family out at every mass) minus v4_epem_ccx, v4_epem_ccx_nlo, v4_zp_ee_uu,
+      v4_zp_uux_mumu, v4_uux_taptam, v4_uux_taptam_nlo (ee->uubar''s equality class, its Z'' and tau-mass variants, one-loops);
+      pretrained under D392 (with any winning input option of kit_benchmark''s three arms, ~18-24 GPU-h) before the fine-tunes.
+      The old-target budget ask is superseded by D392 (no open question left on the entry). CC free disk 103 GB (coordinator,
+      2026-11-11).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
