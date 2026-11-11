@@ -327,6 +327,7 @@ TABLE_MSG = ("PLAN CHECK: a result table went to Joaquin without its figure (CLA
              "figure of the compared quantities). Send the figure with SendUserFile, or drop the table.")
 _ROW, _SEP = re.compile(r"^\s*\|.*\|\s*$"), re.compile(r"^\s*\|[\s:|-]+\|\s*$")
 _NUM = re.compile(r"\d+\.\d+|\d+[eE][-+]?\d+|\d+")
+_CLOCK = re.compile(r"\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}:\d{2}\b")
 
 
 def result_table_without_figure(inp):
@@ -351,7 +352,7 @@ def result_table_without_figure(inp):
                 if not _ROW.match(l):
                     break
                 body.append(l)
-            if any(_NUM.search(l) for l in body):
+            if any(_NUM.search(_CLOCK.sub("", l)) for l in body):   # a timeline's clock times and dates are not results
                 table = True
                 break
     if not table:
