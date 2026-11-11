@@ -23562,6 +23562,25 @@ entries:
       Not resolved: the CPU deltas of ~1e-4 for the invariant tt virtual models seen in two runs without OMP_NUM_THREADS set
       (package on the login node, FA-ccin2p3-e4eecead) and not with 1 or 4 threads or on GPU; tested by the package gate (default
       threads) and a 32-thread check.'
+  - at: '2026-11-11T23:33:05+00:00'
+    text: 'Step 6, beta input (design passed 2026-11-11 21:28): arm = softpair + model.input_pair_threshold=true (the t t~
+      pair log becomes log beta^2), from scratch, job_kit.sh A tag=softpairthr at e75ca218, 1e5, 8000 steps, seed 42; tt virtual
+      FA-ccin2p3-3fc1016a vs control f21fa163 (softpair), tt Born eb0f30db vs 5515dc85. Scored with the event-frame kit_predict
+      (re-score batch); tools/kit_readout.py --vs on analysis/kit_benchmark/data/kit_fig_A_betainput.json @b6cf1e61; figures
+      analysis/kit_benchmark/figs/kit_{mse,median}_beta_ee_tt_{virt_finite,born}_{a,b}.png; threshold scan analysis/kit_benchmark/data/kit_threshold_scan.json
+      @b6cf1e61, figure kit_threshold_scan.png. tt virtual, per family median log10(arm/control) [range], strata better/worse:
+      Coulomb threshold -0.325 [-0.44,-0.25] 4/0, Sudakov -0.589 [-0.92,-0.36] 3/0, bulk -0.775 (7.20e-9 -> 1.21e-9); deepest
+      Coulomb bin beta 1e-4..1e-3 7.06 -> 3.55, fitted exponent -0.03 -> -0.32 (exact -1.02); Sudakov 15-50 TeV 6.05 -> 0.72.
+      Rule: YES (Coulomb < -0.3, no family worse, exponent closer to -1.02): the flag goes into the catalog parent''s t t~
+      pools (pretrain_data_saving to route) and the arm is the protocol-A threshold model for KIT (packaged as ttvirt_A_best_threshold
+      in kit_package_v2). Size of the gain: modest; Coulomb median just past the 0.3 cut, the deepest bin 0.30 decades better,
+      exponent still far from -1.02. Threshold scan sigma_NLO^surr/sigma_NLO-1 at beta 1e-3: arm -0.962, control -0.989 (A
+      -0.992, B -0.897); in the NLO scale band from beta 0.142 for both (A 0.174, B 0.0119); beta_1pct 0.174 vs 0.214: the
+      input lifts the surrogate at beta 5e-3..0.1 but carries little of the Coulomb rise; protocol B stays the threshold model
+      below beta 0.14. tt Born (reported beside): threshold +3.195 [+0.67,+4.62] 0/4 (deepest 6.97e-9 -> 2.89e-4), Sudakov
+      +0.161 0/3 (15-50 TeV 0.227 -> 7.51), bulk -0.689 (1.48e-9 -> 3.02e-10): NO for Born (two families worse); the Born
+      threshold model stays softpair. One seed (D315). Next lever for the Coulomb rise per the design: the target side (dividing
+      out the Sommerfeld factor), to be designed.'
   step_why:
     3:
       feeds: Bakar's fair NLO comparison
