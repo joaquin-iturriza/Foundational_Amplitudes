@@ -21014,6 +21014,8 @@ entries:
     state: stopped
     since: '2026-11-11T08:35:21.156000+00:00'
     state_at: '2026-11-11T08:46:46+00:00'
+    context: 100571
+    context_at: '2026-11-11T08:47:25+00:00'
   step_why:
     3:
       feeds: 'D360: the data saved at MSE(ln|M|^2)=1e-4, trees and one loops'
