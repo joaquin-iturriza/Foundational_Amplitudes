@@ -257,6 +257,37 @@ def ensure_alphas(rec, out):
     return ap
 
 
+def write_born(rows_born, out):
+    """<pool>.born.npy and its identity record <pool>.born.npy.json (what data.target_over_born reads,
+    experiment._born_of_pool): the exact Born of the pool's events in its row order, from the file's `born` target."""
+    from keyed_aug import pool_identity
+    bp = out[:-len(".npy")] + ".born.npy"
+    b = np.asarray(rows_born, dtype=np.float64)
+    assert np.all(np.isfinite(b)) and np.all(b > 0), f"{out}: a non-positive Born"
+    tmp = f"{bp[:-len('.npy')]}.tmp{os.getpid()}.npy"
+    np.save(tmp, b)
+    os.replace(tmp, bp)
+    json.dump({"pool_identity": list(pool_identity(out))}, open(bp + ".json", "w"))
+    return bp
+
+
+def ensure_born(rec, out):
+    """The Born sidecar of a KIT pool whose target is a one-loop term of a file that carries `born` (ee_tt's
+    virt_finite): the same events' Born (role_rows of the born target, same slicing). Written when missing or when
+    its identity record names another pool; None for a file or target without one."""
+    stem, target, variant = parse(rec["process"])
+    meta = metadata(stem)
+    if target == "born" or "born" not in meta["targets"] or target_info(meta, target)[0] == 0:
+        return None
+    bp = out[:-len(".npy")] + ".born.npy"
+    if os.path.exists(bp + ".json"):
+        from keyed_aug import pool_identity
+        if list(json.load(open(bp + ".json"))["pool_identity"]) == list(pool_identity(out)):
+            return bp
+    name = f"{PREFIX}{stem}__born" + (f"__{variant}" if variant else "")
+    return write_born(role_rows(name, rec["role"], rec["n_events"])[:, -1] * strip_factor(meta, "born"), out)
+
+
 def stratum_rows(stem, target, split, stratum, path=None):
     """The FA pool rows of one stratum (for scoring); `path` another file in the benchmark's layout (default its own)."""
     import h5py

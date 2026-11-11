@@ -65,6 +65,12 @@ def predict(run_dir, splits, out, h5=None):
     with h5py.File(src, "r") as f:    # the scored file's alpha_s, as stratum_rows' strip factor
         a_s = float(json.loads(f.attrs["metadata"])["alpha_s"])
     np.save(pool[:-len(".npy")] + ".alphas.npy", np.full(len(rows), a_s))
+    import yaml
+    if yaml.safe_load(open(os.path.join(run_dir, "config.yaml")))["data"].get("target_over_born"):
+        # a V/B run: the scored events' exact Born beside the pool, from the same file's born target
+        meta = kh.metadata(stem)
+        kh.write_born(np.concatenate([kh.stratum_rows(stem, "born", sp, st, src)[:, -1] for sp, st, _ in blocks])
+                      * kh.strip_factor(meta, "born"), pool)
     exp, loader = rebuild(run_dir, "test", pool, len(rows))
     trafos = [list(t) for t in (getattr(exp, "_amp_trafos_pp", None) or [exp.cfg.data.amp_trafos])]
     assert all(t == ["log", "standardization"] for t in trafos), (

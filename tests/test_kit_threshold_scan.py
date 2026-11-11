@@ -31,7 +31,17 @@ def test_sigma_normalisation():
     assert np.allclose(got, ts.GEV2_PB * 4 * np.pi * alpha ** 2 / (3 * sq ** 2), rtol=1e-12)
 
 
+def test_scale_band():
+    # MG5_aMC's summary.txt layout (runs/kit/threshold_scan/amc_dry/Events/run_04 on CC)
+    txt = ("  Scale variation (computed from histogram information):\n"
+           "      Dynamical_scale_choice -2 (envelope of 9 values): \n"
+           "          5.102e-01 pb  +9.3% -7.5%\n")
+    assert ts.scale_band(txt) == (9.3, 7.5)
+    assert ts.scale_band("Total cross section: 1.0e-01 +- 1e-4 pb") is None
+
+
 if __name__ == "__main__":
+    test_scale_band()
     test_grid_kinematics()
     test_sigma_normalisation()
     print("all ok")

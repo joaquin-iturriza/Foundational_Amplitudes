@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=kit_thr
 #SBATCH --cpus-per-task=4
-#SBATCH --time=04:00:00
+#SBATCH --time=01:00:00
 #SBATCH --output=%x_%j.out
 #SBATCH --error=%x_%j.err
 # kit_benchmark threshold scan (tools/kit_threshold_scan.py nlo): MG5_aMC fixed-order LO and NLO e+ e- > t t~ [QCD]

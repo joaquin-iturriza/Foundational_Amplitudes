@@ -155,10 +155,18 @@ def amc_sigma(out, sq, order, acc):
         why = re.findall(r"(aMCatNLOError[^\n]*|Soft test[^\n]*FAILED[^\n]*)", p.stdout + p.stderr)
         return {"failed": "; ".join(dict.fromkeys(why))[:500] or "no cross section in MG5_aMC's output"}
     r = {"sigma": float(m[-1][0]), "err": float(m[-1][1])}
-    b = re.findall(r"[Ss]cale variation[^:\n]*:\s*\+([0-9.]+)%\s*-([0-9.]+)%", p.stdout)
-    if b:
-        r["scale_up"], r["scale_dn"] = float(b[-1][0]), float(b[-1][1])
+    runs = sorted(glob.glob(os.path.join(out, "Events", "run_*", "summary.txt")), key=os.path.getmtime)
+    band = scale_band(p.stdout) or (scale_band(open(runs[-1]).read()) if runs and order == "NLO" else None)
+    if band:
+        r["scale_up"], r["scale_dn"] = band
     return r
+
+
+def scale_band(text):
+    """(+%, -%) of MG5_aMC's scale-variation envelope ("Dynamical_scale_choice -2 (envelope of 9 values):" then
+    "5.102e-01 pb  +9.3% -7.5%"), None when the text has none."""
+    b = re.findall(r"envelope of \d+ values\):\s*[0-9.eE+-]+ pb\s*\+([0-9.]+)%\s*-([0-9.]+)%", text)
+    return (float(b[-1][0]), float(b[-1][1])) if b else None
 
 
 def cmd_nlo(a):
@@ -217,6 +225,8 @@ def cmd_collect(a):
     up = np.array([r.get("scale_up", np.nan) if r else np.nan for r in out["amc"]["nlo"]]) / 100
     dn = np.array([r.get("scale_dn", np.nan) if r else np.nan for r in out["amc"]["nlo"]]) / 100
     has = np.isfinite(nlo_s)
+    noband = [i for i in np.flatnonzero(has) if not np.isfinite(up[i])]
+    assert not noband, f"NLO points without a scale band (MG5_aMC's envelope not read): {noband}"
     vex = np.asarray(out["sigma_v_exact"])
     for name, sv in out["surrogates"].items():
         ratio = (np.asarray(sv["sigma_v"]) - vex) / nlo_s          # sigma_NLO^surr / sigma_NLO^exact - 1

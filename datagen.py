@@ -511,6 +511,7 @@ def ensure_dataset(process, sqrts_min, sqrts_max, n_events, role, seed,
             full["physics"] = {"source": "kit_hardps", "file": recipe["kit_file"], "target": recipe["kit_target"]}
             mg.write_recipe(out, full)
         kit_hardps.ensure_alphas(recipe, out)
+        kit_hardps.ensure_born(recipe, out)
         return out
     if _is_cached(out, wanted):
         return out
