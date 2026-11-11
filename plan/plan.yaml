@@ -22203,6 +22203,16 @@ entries:
       lxplus->ccin2p3 --from-file (5508 files, 34 GB; CC 94 GB free), detached copy_parent_pools_lxplus_to_cc. e+e- > t t~
       LO train prebuild a46978e2 COMPLETED. Input verdict (kit_benchmark, c15b3337): both flags, input_soft_eps=1e-8 and input_pair_logs=6.
       Next: recheck check_site_data on both parent recipes, prebuild what remains, then both parents.'
+  - at: '2026-11-11T09:07:47+00:00'
+    text: '2026-11-11 ~10:10 CET: copy_parent_pools_lxplus_to_cc wrote all 5508 files (11 chunks); check_site_data: both parent
+      recipes (heldout 1133, treesin 1135) prebuilt with sidecars. CC''s site verify still failed on the catalog recipe (35
+      train pools of other entries, same trim): copied the same way from lxplus (70 files, 433 MB), verify ok. CC 60 GB free.
+      Parents (D393, both D392 flags) first went as FA-ccin2p3-dc529e7d / b2472e52 and failed at once: Hydra ''Key input_soft_eps
+      is not in struct'' (trial 1262''s config predates the keys); fixed by passing ++ (job script note @e1d45ebd), resubmitted
+      as FA-ccin2p3-65a02b18 (heldout) and FA-ccin2p3-b6adfcb3 (treesin): scripts/job_datasaving_parent.sh @e1d45ebd -- <which>
+      ++model.input_soft_eps=1e-8 ++model.input_pair_logs=6, 02:30 limit, 32G, wall target 1 h; both past config, loading
+      their recipes at 10:07. Stage-2 configs inherit the flags from the parents'' config.yaml (gen_data_saving.py base_config
+      = parent).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
