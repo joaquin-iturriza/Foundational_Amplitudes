@@ -22373,6 +22373,12 @@ entries:
       search keeps sampling lr_scale near 10 after two penalties: readout owner to check whether DyHPO''s failure penalty
       steers it at all (penalty value vs observed losses) and whether t t~ LO''s best trials sit at the top of the windows
       (window too low or instability edge).'
+  - at: '2026-11-11T18:17:37+00:00'
+    text: '2026-11-11 19:20, promised to Joaquin (D396 scope): besides the shared ordering, prune.py must prune drive.py searches
+      like sweep_manager ones (D19: finished search keeps only its best trial''s models; non-best plots/preds deleted). prune.py
+      reads results from SWEEP_DIR/<sweep>/results on the site, drive.py keeps them in sweeps_local/ on the local machine,
+      so drive searches are never pruned (read from code, not tested). Fix after this batch: drive.py also writes results
+      where prune.py reads them, or prune.py reads the local copy.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
