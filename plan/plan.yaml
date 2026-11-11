@@ -24489,6 +24489,46 @@ entries:
       apply); scan points are a quadrature grid, which is what a cross section asks; not a repeat (searched results.tex for
       threshold scan, 1506.06864, Coulomb, cross section, MG5_aMC, fixed order, kit_threshold; only the star-arm t tbar threshold
       probe at the amplitude level, l.14765, no sigma(sqrt s)).'
+  - at: '2026-11-11T20:49:28+00:00'
+    question: 'Threshold scan (step 4, Gudrun): does the surrogate one-loop virtual of e+e- -> t t~ reproduce the fixed-order
+      NLO cross section sigma(sqrt s) around 2 m_t (like Fig. 1 of arXiv:1506.06864 at fixed order)? sigma_NLO^surr = sigma_NLO^exact
+      + sigma[V_surr] - sigma[V_exact], against sigma_NLO^exact and its scale band, for the existing t t~ virtual models:
+      A from scratch (kit_A_ee_tt_virt_finite_n900000_t8000_offon), A_ft (kit_A_ft_ee_tt_virt_finite_n900000_t8000_offon),
+      B (kit_B_ee_tt_virt_finite_n900000_t3000_offon), B_bulk (kit_B_bulk_ee_tt_virt_finite_n900000_t3000_offon). Feeds which
+      t t~ virtual model goes to KIT (step 5) and whether a beta-specific input is the next lever.'
+    prior: 'results.tex: no sigma(sqrt s) of t t~ (searched threshold scan, 1506.06864, Coulomb, cross section, MG5_aMC, fixed
+      order; only the star-arm amplitude-level threshold probe ~l.14765). Entry findings: KIT deepest Coulomb bin log10-MSE
+      A 7.0-8.7, A_ft 7.3-7.7, B offon 2.38 (exponent -0.43 vs -1.02), B_bulk 8.71. Dry collect (B offon): sigma[V_surr]/sigma[V_exact]-1
+      = -0.90 at beta 1e-3, -0.10 at 1e-2, +0.05 at 0.05-0.08, <4e-4 beyond 0.17. MG5_aMC dry runs (runs/kit/threshold_scan/amc_dry):
+      beta 0.6 LO 0.6260 NLO 0.7708 pb, beta 0.062 LO 0.1063 NLO 0.5102 pb (scale band +9.3% -7.5%), both LO equal to the
+      quadrature; beta 1e-3 stops: its soft test 2 fails on 68% of points (SubProcesses/P0_epem_ttx/test_ME.log), ''Some tests
+      failed''.'
+    measure: 'Per sqrt s: sigma_LO, sigma_NLO^exact with its scale band (MG5_aMC''s mu_R, mu_F variation) and MC error, each
+      model''s sigma_NLO^surr and ratio sigma_NLO^surr/sigma_NLO^exact - 1; per model (collect''s CLAIM lines) beta_1pct,
+      beta_10pct (the smallest beta from which |ratio| stays below 1%, 10% at every larger beta with an exact NLO), per point
+      in_scale_band and unresolved (|ratio| < 2 x MC error); the lowest beta with an exact NLO. Figure (plot_style, png+pdf):
+      sigma vs sqrt s with the band, ratio panel with the band and +-2 MC error.'
+    check: 'MadLoop at KIT''s settings reproduces KIT''s born and virt_finite to 3.6e-13 (build at 11d80566); quadrature normalisation
+      tested (tests/test_kit_threshold_scan.py) and equal to MG5_aMC LO at beta 0.062, 0.6; tool fixed after repo review (248077cb).
+      The measure moves: B''s dry ratio spans -0.90..+0.05 across beta. D395 smoke: one job through LO and NLO at beta indices
+      0,3,6,9,12 (beta 1e-3, 1.9e-3, 3.5e-3, 6.4e-3, 1.2e-2): it finds the lowest beta MG5_aMC''s soft tests pass, and checks
+      the launch dialog, the cross-section and scale-band parsing; then the batch whole.'
+    fixed: 'Grid 32 beta log-spaced in [1e-3, 0.6] x 16 Gauss-Legendre cos nodes; KIT settings (loop_sm defaults, m_t = ymt
+      = 173, alpha_s 0.118); MG5_aMC 3.7.0 fixed order e+ e- > t t~ [QCD], mu_R = mu_F = M_Z (alpha_s = 0.118), req_acc_FO
+      1e-3, nb_core = the job''s 4 CPUs; models as trained, scored by kit_predict (own stats, float64). Layout: K = 8 parts
+      of 4 points (i = k, k+8, ...), each its own output dir: 199 MB each, 1.6 GB against 51 GB free on /sps/lpnhe; time ~1
+      min per point (LO+NLO) at 40 cores in the dry run, at 4 cores taken as up to 5 min: target 0.35 h per part, --time 1:00.
+      CPU only, 0 GPU-h. Below the lowest beta whose tests pass, no exact NLO: sigma[V] differences only, reported as such.'
+    control: The exact curves (MG5_aMC NLO, MadLoop V) are the ratio's zero line; B_bulk is B's matched control, A is A_ft's.
+    seeds: One seed per model as trained (D315), no training; a ratio inside 2 x MG5_aMC's MC error is unresolved.
+    outcome: 'Per model, beta_1pct, beta_10pct and where the ratio leaves the NLO scale band (the target figure''s yardstick:
+      a surrogate inside the band is as good as fixed-order NLO''s own uncertainty). Expected: A, A_ft, B_bulk leave the band
+      below beta ~0.05 (no 1/beta rise), B closer. If B stays in the band (or within 1%) down to the lowest beta with an exact
+      NLO and A does not: B''s t t~ virtual goes to KIT for the threshold and A''s for the bulk, and protocol A''s gap is
+      the Coulomb limit needing a beta input (next lever). If none stays in the band below beta 0.05: all four reported, the
+      beta-specific input (log10 beta, as KIT''s logthr baseline) becomes the next design. If MG5_aMC''s tests pass only above
+      beta 1e-2: the analytic O(alpha_s) massive-quark total cross section, checked against MG5_aMC where both run, is designed
+      to extend the exact NLO down.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
