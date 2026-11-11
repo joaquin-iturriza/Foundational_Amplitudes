@@ -23125,16 +23125,18 @@ entries:
     - FA-ccin2p3-c8ac36f0
     - FA-ccin2p3-de744946
     - FA-ccin2p3-f6b2ece9
-    commit: 06b9353a
+    commit: ff87b57a
     paths:
     - analysis/kit_benchmark/data/kit_fig_A.json
     - tests/test_input_reps.py
     - tests/test_kit_hardps.py
+    - tests/test_kit_threshold_scan.py
     - tools/kit_figures.py
     - tools/kit_hardps.py
     - tools/kit_precision_check.py
     - tools/kit_predict.py
     - tools/kit_target_slope.py
+    - tools/kit_threshold_scan.py
   dead_ends: []
   asks:
   - ask: 'GPU budget: ~47 GPU-h above 30 with no decision covering it (D353 approves new KIT runs but names no cost). This
