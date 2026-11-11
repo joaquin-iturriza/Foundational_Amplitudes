@@ -129,6 +129,7 @@ def main():
     ap.add_argument("--parent-nlo", required=True, help="the trees-in parent's run dir on the site")
     ap.add_argument("--targets", nargs="*", default=TARGETS)
     ap.add_argument("--arms", nargs="*", default=["scr", "ft"])
+    ap.add_argument("--stage", default="s2", help="sweep-name stage tag: s2, s3 (the fine-tunes from the D400 parents)")
     a = ap.parse_args()
     R, hz = rates(), horizons()
     jobs = []
@@ -138,7 +139,7 @@ def main():
             if T is None:
                 raise SystemExit(f"no T(D) for {t} k={k}: rerun analysis/data_saving/horizons.py --ladder")
             for arm in a.arms:
-                jobs.append((f"dsave_s2_{arm}_{t}_d{k}_t{T}", t, k, T, arm))
+                jobs.append((f"dsave_{a.stage}_{arm}_{t}_d{k}_t{T}", t, k, T, arm))
     miss = sorted({(t, k) for _, t, k, _, _ in jobs if (t, k) not in R})
     if miss:
         raise SystemExit(f"no measured step rate for {miss} in {CALS}: rerun analysis/data_saving/horizons.py first")
