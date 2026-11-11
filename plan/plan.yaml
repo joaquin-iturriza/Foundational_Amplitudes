@@ -23509,7 +23509,8 @@ entries:
       - 'B best: package B'
   step_waits:
     '3': '2026-11-12'
-    '4': FA-ccin2p3-84d3488e
+    '4': FA-ccin2p3-f39a9e30 FA-ccin2p3-54b549e9 FA-ccin2p3-88952c69 FA-ccin2p3-e5952497 FA-ccin2p3-1ba063b2 FA-ccin2p3-326eadf3
+      FA-ccin2p3-497534b1 FA-ccin2p3-d07111de
     '5': FA-ccin2p3-e2d5546b
   handoff:
     state: 'Step 4 threshold scan: design passed (3rd review, code b63843c8, repo review passed at 248077cb). Scan file built
