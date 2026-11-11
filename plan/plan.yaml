@@ -22587,6 +22587,12 @@ entries:
       differs, retrained anyway). The fine-tune''s loss to scratch is t t~ specific: ft/scr best val 6-33x at D=316..1e4 on
       t t~ LO and V, while u u~ fine-tunes win 0.01-0.4x at every D (fig stage2_ratio.png). Diagnostic of the off-shellness
       compression submitted (design PASS): 16 runs, step 7.'
+  - at: '2026-11-11T19:12:24+00:00'
+    text: '2026-11-11 ~21:00 sent to Joaquin: t t~ fine-tune 6-33x worse than scratch at D=316..1e4 (stage2_ratio.png); five
+      checks clean except the parent''s input scales (Z off-shellness compressed 550-670x on t t~, t t~ V top column 9x);
+      16-run diagnostic running (configs dsave_diag_*_d{5,6,7,8}_t8500 @f8134b43); if yes, rerun of the 16 t t~ fine-tune
+      searches (~25 GPU-h) needs Joaquin''s go (beyond the 215 GPU-h item estimate). Still open with him: which of the three
+      setup fixes (event rule, hooks naming who acts, one source per topic).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
