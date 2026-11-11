@@ -20,16 +20,16 @@ torch.set_default_dtype(torch.float64)
 LENS = (5, 5, 4)
 
 
-def _events(seed):
-    """Events of LENS particles: two back-to-back massless beams, then massless outgoing momenta, one of them soft."""
+def _events(seed, lens=LENS):
+    """Events of `lens` particles: two back-to-back massless beams, then massless outgoing momenta, one of them soft."""
     rng = np.random.default_rng(seed)
     out = []
-    for n in LENS:
+    for n in lens:
         p3 = rng.normal(size=(n - 2, 3))
         p3[-1] *= 1e-6                                    # a soft leg
         ev = [[1, 0, 0, 1], [1, 0, 0, -1]] + [[np.linalg.norm(v), *v] for v in p3]
         out.append(ev)
-    return torch.tensor(np.concatenate(out)), torch.tensor(np.cumsum([0, *LENS]))
+    return torch.tensor(np.concatenate(out)), torch.tensor(np.cumsum([0, *lens]))
 
 
 def _lorentz(seed):
@@ -59,17 +59,18 @@ def _wrapper(**flags):
 
 
 def _out(w, p, ptr):
-    tok = torch.tensor([1, 1, 2, 3, 4, 1, 1, 2, 3, 4, 1, 1, 2, 3])
+    tok = torch.cat([torch.tensor([1, 1, 2, 3, 4, 2])[:n] for n in (ptr[1:] - ptr[:-1]).tolist()])
     with torch.no_grad():
         return w(p, tok, 0.0, 1.0, ptr).reshape(-1)
 
 
 FLAGS = {"pair_logs": dict(input_pair_logs=5), "soft_rescale": dict(input_soft_eps=1e-8),
-         "local_logs": dict(input_local_log_eps=1e-8)}
+         "local_logs": dict(input_local_log_eps=1e-8),
+         "both_6": dict(input_pair_logs=6, input_soft_eps=1e-8)}     # the uugg flags: 15 pair logs + soft rescale
 
 
-def _check(name):
-    p, ptr = _events(1)
+def _check(name, lens=LENS):
+    p, ptr = _events(1, lens)
     L = _lorentz(2)
     w = _wrapper(**FLAGS[name])
     a, b = _out(w, p, ptr), _out(w, p @ L.T, ptr)
@@ -93,6 +94,10 @@ def test_local_logs_equivariant():
     _check("local_logs")
 
 
+def test_both_flags_6particle_equivariant():
+    _check("both_6", lens=(6, 5, 4))
+
+
 def test_pair_log_values():
     p, ptr = _events(3)
     f = _pair_log_inputs(p, ptr, 5)
@@ -114,6 +119,6 @@ def test_soft_rescale_fixed_point():
 
 if __name__ == "__main__":
     for t in [test_pair_log_values, test_soft_rescale_fixed_point, test_pair_logs_equivariant,
-              test_soft_rescale_equivariant, test_local_logs_equivariant]:
+              test_soft_rescale_equivariant, test_local_logs_equivariant, test_both_flags_6particle_equivariant]:
         t()
     print("all ok")
