@@ -23495,7 +23495,7 @@ entries:
   step_waits:
     '3': '2026-11-12'
     '4': FA-ccin2p3-84d3488e
-    '5': FA-ccin2p3-c364a7ae FA-ccin2p3-f21fa163 FA-ccin2p3-5515dc85
+    '5': FA-ccin2p3-4f3b24ef
   handoff:
     state: 'Input study done (findings 2026-11-11): soft rescale + pair logs (model.input_soft_eps=1e-8, input_pair_logs=n,
       06b9353a) gain every limit on uug (soft 14180->0.200, coll 30.1->2.21, bulk 8.2e-4->1.09e-4) and uugg (soft 9070->0.411,
