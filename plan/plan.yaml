@@ -22803,6 +22803,10 @@ entries:
       helped only with the off-shellness column at 0 and hurt with it on (the parent''s off-shellness preprocessing against
       KIT''s threshold range is the next suspect, design branch c). Not final: the design''s lr_scale 0.1 check (93ccd2c4
       uug, 015da743 uugg, 81a52170 tt virtual off, submitted) decides b/c.'
+  - at: '2026-11-11T05:09:22+00:00'
+    text: '2026-11-11: pretrain_data_saving''s owner, to pass the repo review (watermark 96cfb862), changed tools/kit_readout.py:
+      the unsourced 0.3-decade per-bin cut is removed; it now counts strata better or worse than the reference. Re-read the
+      input-arm ''every bin'' counts with the new tool before writing them up.'
   step_why:
     3:
       feeds: Bakar's fair NLO comparison
