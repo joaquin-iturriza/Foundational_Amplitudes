@@ -22423,7 +22423,8 @@ entries:
     '1': 'FA-ccin2p3-53dc387b FA-ccin2p3-69d93512 FA-ccin2p3-67fadb15 FA-ccin2p3-f26df51b FA-ccin2p3-1416e62f FA-ccin2p3-30b7aa28
       FA-ccin2p3-9957b9d6 FA-ccin2p3-eac27314 FA-ccin2p3-24d9729a FA-ccin2p3-fe485120 FA-ccin2p3-dcb7ecb0 FA-ccin2p3-1bd861e0 '
     '3': FA-ccin2p3-03ea3719
-    '4': FA-ccin2p3-78b8190c
+    '4': FA-ccin2p3-1416e62f FA-ccin2p3-1bd861e0 FA-ccin2p3-24d9729a FA-ccin2p3-30b7aa28 FA-ccin2p3-53dc387b FA-ccin2p3-67fadb15
+      FA-ccin2p3-69d93512 FA-ccin2p3-9957b9d6 FA-ccin2p3-dcb7ecb0 FA-ccin2p3-eac27314 FA-ccin2p3-f26df51b FA-ccin2p3-fe485120
     '5': FA-ccin2p3-78b8190c
     '6': inputarms_dry (detached CC CPU dry run of the three flags), then submit the 3 arms (design passed)
   handoff:
