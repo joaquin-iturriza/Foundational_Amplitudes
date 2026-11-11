@@ -9,7 +9,7 @@
 # benchmark scores (tools/kit_predict.py: predictions on every hard_test stratum and bulk_test, the benchmark's own
 # evaluate.py).
 #     site submit <site|auto> FA scripts/job_kit.sh -- <dataset> <n_train> <steps> <mode> [key=value ...]
-# KIT_FROM (B, B_bulk) and KIT_PARENT (A_ft) reach the job only through `site submit --env KIT_FROM=<run dir>`: a
+# KIT_LR_SCALE (A_ft, default 1.0; the lr-axis check of the A_ft design runs 0.1) and KIT_FROM (B, B_bulk) and KIT_PARENT (A_ft) reach the job only through `site submit --env KIT_FROM=<run dir>`: a
 # shell variable set before `site submit` is not exported to the job (12 B jobs failed so, 2026-11-10).
 # <dataset>  kit_<file>__<target>, e.g. kit_ee_uug__me2, kit_ee_tt__virt_finite
 # <n_train>  the first n_train events of bulk_train; validation is the last 1e5 of bulk_train (bulk-only early
@@ -73,7 +73,7 @@ print(f'{7.82114e-3 * (t / 17056) ** -0.55 * f:.6g}')") || exit 2
         PT=; for k in 9 8 7 6 5 4 3 2 1 0; do for f in "model_run${k}_best.pt" "model_run${k}_best.pt.gz"; do
             [ -z "$PT" ] && [ -e "$PROJECT_DIR/$PARENT/models/$f" ] && PT="$PROJECT_DIR/$PARENT/models/$f"; done; done
         [ -n "$PT" ] || { echo "A_ft: no model_run*_best.pt in $PARENT/models"; exit 2; }
-        FT=(fine_tune.pretrained_path="$PT" fine_tune.target_stats=own fine_tune.offshell_stats=parent fine_tune.lr_scale=1.0)
+        FT=(fine_tune.pretrained_path="$PT" fine_tune.target_stats=own fine_tune.offshell_stats=parent fine_tune.lr_scale=${KIT_LR_SCALE:-1.0})
     fi
 fi
 echo "KIT dataset=$NAME n_train=$N steps=$T mode=$MODE base=$BASE args: ${ARGS[*]}"
