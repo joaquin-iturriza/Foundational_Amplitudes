@@ -22317,6 +22317,8 @@ entries:
       -> p_i*log(1+x_i/eps)/x_i with x_i = 2 p_i.Q/s, (3) logs of LLoCa local-frame components; implement each as a config
       flag (exact equivariance kept, a test per flag), design and review, ~1.5 GPU-h each; figures median and log-MSE per
       bin with legends saying each arm'
+    7: Read the combined input arm FA-ccin2p3-c15b3337 (soft rescale + pair logs, design passed) with kit_readout --vs against
+      f6b2ece9 and the single arms, figures
   done_when: null
   notes_ref: null
   match: kit_*
@@ -22635,6 +22637,11 @@ entries:
       if:
       - 'an arm follows the truth: run it on uugg and tt, then into the pretrained setup'
       - 'none does: report with figures, next lever to Joaquin'
+    7:
+      feeds: the input setup of the held-out parent and scaling runs (D392)
+      if:
+      - 'both gains kept: both flags go to pretrain_data_saving'
+      - 'one gain lost: the larger-gain flag alone (soft rescale)'
   step_waits:
     '7': FA-ccin2p3-c35a2199 FA-ccin2p3-ac436bba
     '8': FA-ccin2p3-c35a2199 FA-ccin2p3-ac436bba
