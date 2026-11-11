@@ -30,7 +30,7 @@ python sweep/generate_sweep.py --config sweep/<my_config>.yaml
 # scaling generators submit all their cells interleaved in one batch:
 python sweep/generate_scaling_sweep.py --config sweep/<scaling_config>.yaml
 python sweep/generate_pretraining_scaling_sweeps.py --phase both --auto-submit
-# submit manually later (interleaves with whatever is already queued):
+# submit later (this submission's waves, longest trials first):
 python sweep/sweep_manager.py submit <sweep_dir>/<sweepA> <sweep_dir>/<sweepB>
 ```
 
@@ -43,7 +43,8 @@ searches of equal length (`dispatch_order`). Only placement differs:
   by `nice` = dispatch rank × `ORDER_NICE_STEP` (kept by `rebalance`); `--seq-batches N` forces N equal waves, 1
   disables. `--chain [--capacity N]` (opt-in): the start-up trials together, the first guided trial after all of them,
   each later one after the trial W places back (W = min(3, ceil(capacity / sweeps))), longest first
-  (`duration_nice`; HTCondor: the DAG, `cluster.chain_width`). Jobs of older submissions keep `nice` = `round × gap`
+  (`duration_nice`; HTCondor: `cluster.chain_width`). On HTCondor the classic path is a DAG
+  (`generate_sweep.write_dag`) with the same waves. Jobs of older submissions keep `nice` = `round × gap`
   (`round = j // weight`, `boost <sweep> --weight N`). Commands: `submit <sweepdir>…`, `rebalance`, `boost`, `status`,
   `cancel`; `--dry-run` previews. Registry: `~/.sweep_manager/registry.json`.
 - `drive.py` (state on the local machine): the waves by default (`--wave-sizes 3,3,2` overrides `dyhpo.waves`); rolling
@@ -85,7 +86,7 @@ HPO search-space rules (harvested from 422 converged sweeps; derivation in `docs
      **extrapolation of the high-D row's decay**: ~2e-3 @30k, ~1.4e-3 @50k, ~9e-4
      @100k steps. The ±½-decade sweep then both centers the search AND *measures*
      that off-grid corner. Surface + numbers: `analysis/hpo_optima/`
-     (`make_fig_2d.py`, `hpo_optima.json`). Template default window `[1e-3, 3e-2]`.
+     (`make_fig_2d.py`, `hpo_optima.json`). Template window `[1.667e-3, 1.5e-2]` (Muon, centred at 5e-3).
 3. **lr is the dominant knob; narrow the rest, don't blindly fix them.** Optima:
    `regularization_lambda ∈ [1e-10, 1e-6]` (cap high at 1e-6; was 9 decades),
    `cosanneal_warmup_frac ∈ [0.05, 0.2]` (median 0.15), `cosanneal_eta_min`
@@ -97,7 +98,7 @@ HPO search-space rules (harvested from 422 converged sweeps; derivation in `docs
 5. **Net effect:** ~10–100× smaller search volume ⇒ halve the trial budget
    (e.g. 300→150 candidates, ~15→~8 obs) at equal resolution, or explore far
    denser at equal budget. Seed new cells from `lr_center(t)`, not a flat prior.
-   The `sweep_config*template.yaml` defaults already encode these ranges.
+   The template encodes the reg, warmup, eta_min and ema_decay ranges.
 6. Single-fidelity means `fidelity_schedule.t_steps: [T]`, one value; the multi-fidelity ladder is unused.
 
 Sweeps across sites (`sweep/drive.py`):

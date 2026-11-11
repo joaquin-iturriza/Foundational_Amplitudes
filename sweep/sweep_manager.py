@@ -428,10 +428,11 @@ def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=Fa
         rank.setdefault(sw, []).append(r)
     print(f"Submitting {sum(map(len, plan.values()))} trials across {len(plan)} sweep(s) in waves "
           f"(afterany within each sweep), longest trials first:")
-    wave_jids = {}                  # (sweep, wave) -> job ids
-    for sw in plan:                 # an earlier submission's jobs of this sweep, by wave
-        for jid, info in reg["sweeps"][sw]["jobs"].items():
-            wave_jids.setdefault((sw, info.get("wave", 0)), []).append(jid)
+    wave_jids = {}                  # (sweep, wave) -> job ids of this call
+    # a resumed submit (submit cap, --extend, an old registry): a later-wave trial waits on every earlier job of its
+    # sweep still in the queue (finished ones need no dependency, and SLURM may have forgotten their ids)
+    live = squeue_states() if not dry_run and any(reg["sweeps"][sw]["jobs"] for sw in plan) else {}
+    earlier = {sw: [j for j in reg["sweeps"][sw]["jobs"] if j in live] for sw in plan}
     todo = sorted(((rank[sw][j], sw, w, it) for sw, v in plan.items() for j, (w, it) in enumerate(v)),
                   key=lambda x: (x[2], x[0]))                     # earlier waves first, so their ids exist
     for i, (r, sweep, b, (idx, script)) in enumerate(todo):
@@ -440,7 +441,7 @@ def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=Fa
         deps = []
         if sweep_dep.get(sweep):
             deps.append(f"afterok:{sweep_dep[sweep]}")
-        prev = wave_jids.get((sweep, b - 1)) if b > 0 else None
+        prev = (wave_jids.get((sweep, b - 1), []) + earlier[sweep]) if b > 0 else None
         if prev:
             deps.append("afterany:" + ":".join(prev))
         if deps:

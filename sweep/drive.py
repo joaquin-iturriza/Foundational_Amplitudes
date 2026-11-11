@@ -397,14 +397,19 @@ def dispatch_order(want):
     return ordering.dispatch_order(want, {sw: sw.hours for sw in want})
 
 
+def mark_cmd(name):
+    """The command marking a driven search over, run on the site: its sweep dir is the site's siteconf.SWEEP_DIR
+    (where prune.finished looks), never the local machine's path in sw.cfg."""
+    return ("python -c \"import os, siteconf; d = os.path.join(siteconf.SWEEP_DIR, '%s'); os.makedirs(d, exist_ok=True); "
+            "open(os.path.join(d, 'DRIVE_DONE'), 'w').close(); print('MARKED')\"" % name)
+
+
 def mark_done(sw, a):
     """DRIVE_DONE in the search's sweep dir on every site it ran on: prune.py's sign that a driven search is over."""
     if a.dry_run or sw.st.get("done_marked"):
         return
-    d = "%s/%s" % (sw.cfg["paths"].get("sweep_dir") or sw.cfg["paths"].get("eos_sweep_dir"), sw.name)
     for s in sorted({t["site"] for t in sw.trials()}):
-        out = site("run", s, PROJECT, "--", "mkdir -p %s && touch %s/DRIVE_DONE && echo MARKED" % (d, d),
-                   timeout=300, check=False)
+        out = site("run", s, PROJECT, "--", mark_cmd(sw.name), timeout=300, check=False)
         if "MARKED" not in out:
             log("%s: DRIVE_DONE not written on %s: %s" % (sw.name, s, out.strip()[-160:]))
             return
