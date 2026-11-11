@@ -142,7 +142,8 @@ XLAB = {"threshold_beta": r"top velocity $\beta$", "sudakov_sqrts": r"$\sqrt{s}$
 
 # input-representation arms (D374, model.input_*): tag -> legend text
 INPUT_ARMS = {"pairlogs": r"+ $\log(s_{ij}/s)$ inputs", "softrescale": "+ soft log rescale",
-              "locallogs": "+ local-frame logs"}
+              "locallogs": "+ local-frame logs",
+              "softpair": r"+ soft rescale + $\log(s_{ij}/s)$"}
 
 
 def arm_label(r, with_n=True):
@@ -202,9 +203,12 @@ def plot(path, outdir, prefix="", split_offshell=False):
             ax.set_ylabel(r"log-MSE of $\log_{10}|\mathcal{M}|^2$")
             ps.process_label(ax, PROC.get((stem, target), stem))
         h0 = figs[0][1].get_legend_handles_labels()[0]
-        for _, ax in figs:
-            ps.legend(ax, "upper left", handles=h0)
-            ps.make_room(ax)
+        if len(arms) > 4:   # a long legend squeezes the panels: its own strip file (<base>_legend) above them
+            written += ps.legend_strip(figs[0][1], os.path.join(outdir, f"kit_mse_{prefix}{base}_legend")) or []
+        else:
+            for _, ax in figs:
+                ps.legend(ax, "upper left", handles=h0)
+                ps.make_room(ax)
         written += ps.save_panels(figs, os.path.join(outdir, f"kit_mse_{prefix}{base}"))
         # (2) median predicted vs truth log10|M|^2
         figs = ps.panels(len(fams))
@@ -222,9 +226,12 @@ def plot(path, outdir, prefix="", split_offshell=False):
             ax.set_ylabel(r"median $\log_{10}|\mathcal{M}|^2$")
             ps.process_label(ax, PROC.get((stem, target), stem))
         h0 = figs[0][1].get_legend_handles_labels()[0]
-        for _, ax in figs:
-            ps.legend(ax, "upper left", handles=h0)
-            ps.make_room(ax)
+        if len(arms) > 4:   # a long legend squeezes the panels: its own strip file (<base>_legend) above them
+            written += ps.legend_strip(figs[0][1], os.path.join(outdir, f"kit_median_{prefix}{base}_legend")) or []
+        else:
+            for _, ax in figs:
+                ps.legend(ax, "upper left", handles=h0)
+                ps.make_room(ax)
         written += ps.save_panels(figs, os.path.join(outdir, f"kit_median_{prefix}{base}"))
     for w in written:
         print(w)
