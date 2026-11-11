@@ -140,6 +140,11 @@ XLAB = {"threshold_beta": r"top velocity $\beta$", "sudakov_sqrts": r"$\sqrt{s}$
         "azimuth_gg_y": r"$g\to gg$ collinear $y=s_{gg}/s$"}
 
 
+# input-representation arms (D374, model.input_*): tag -> legend text
+INPUT_ARMS = {"pairlogs": r"+ $\log(s_{ij}/s)$ inputs", "softrescale": "+ soft log rescale",
+              "locallogs": "+ local-frame logs"}
+
+
 def arm_label(r, with_n=True):
     """legend text saying what the curve is (D368, D369): how the network was trained, then the bulk size (left out
     when every curve of the figure has the same one; the caption gives it)"""
@@ -152,6 +157,8 @@ def arm_label(r, with_n=True):
         lab += ",\nno off-shell input"
     elif tag == "plain":
         lab += ",\nplain target"
+    elif tag in INPUT_ARMS:
+        lab += ",\n" + INPUT_ARMS[tag]
     return lab
 
 
