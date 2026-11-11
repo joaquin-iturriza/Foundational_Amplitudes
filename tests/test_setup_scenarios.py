@@ -4,7 +4,7 @@ subagent transcripts; `site` is a stub for every command that writes (decide, it
 rules (_typed_texts, _interactive, TERMINAL) are imported from it. The claims verifier and the git hooks run in
 temporary git repositories.
     python3 tests/test_setup_scenarios.py"""
-import concurrent.futures as cf, datetime as dt, json, os, shutil, sqlite3, subprocess, sys, tempfile
+import atexit, concurrent.futures as cf, datetime as dt, json, os, shutil, sqlite3, subprocess, sys, tempfile
 
 import yaml
 
@@ -1449,6 +1449,7 @@ def slow_done_checks():
 def tooling_fixes():
     """The review backlog counts code at any depth; run ids are not numbers; a heredoc is judged by what it does."""
     repo = tempfile.mkdtemp(prefix="backlog_")
+    atexit.register(shutil.rmtree, repo, True)
     g = lambda *a: subprocess.run(["git", "-C", repo] + list(a), capture_output=True, text=True, env=GIT_ENV)
     g("init", "-q")
     for d in (".claude/hooks", ".claude/.review_state", "analysis/deep"):
@@ -1510,6 +1511,7 @@ def tooling_fixes():
 def reviewed_content():
     """A CLAUDE.md diff the reviewer passed uncommitted is not owed again once committed; a further edit is."""
     repo = tempfile.mkdtemp(prefix="backlog_content_")
+    atexit.register(shutil.rmtree, repo, True)
     g = lambda *a: subprocess.run(["git", "-C", repo] + list(a), capture_output=True, text=True, env=GIT_ENV)
     g("init", "-q")
     os.makedirs(os.path.join(repo, ".claude", "hooks"))

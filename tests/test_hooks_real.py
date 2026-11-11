@@ -2,7 +2,7 @@
 tools/hook_fixtures.py; the night's transcripts read in place). Nothing live is touched: every hook runs from a copy in
 a temporary hooks directory or with its state, registry and `site` pointed at temporary stubs.
     python3 tests/test_hooks_real.py [group ...]"""
-import json, os, re, shutil, sqlite3, subprocess, sys, tempfile
+import atexit, json, os, re, shutil, sqlite3, subprocess, sys, tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HOOKS = os.path.join(ROOT, ".claude", "hooks")
@@ -835,6 +835,7 @@ def submit_replay():
 def submit_budget():
     """B2: the GPU budget cases."""
     d = tempfile.mkdtemp(prefix="budget_")
+    atexit.register(shutil.rmtree, d, True)
     gpu, cpu = os.path.join(d, "gpu.sh"), os.path.join(d, "cpu.sh")
     open(gpu, "w").write("#!/bin/bash\n#SBATCH --gres=gpu:1\n#SBATCH --time=10:00:00\npython run.py\n")
     open(cpu, "w").write("#!/bin/bash\n#SBATCH --cpus-per-task=16\npython tools/lhe_parts.py work\n")
@@ -1219,6 +1220,7 @@ class SiteBox:
 
     def __init__(self):
         self.d = tempfile.mkdtemp(prefix="budget_")
+        atexit.register(shutil.rmtree, self.d, True)
         j = lambda *x: os.path.join(self.d, *x)
         self.home, self.bin, self.fake = j("home"), j("bin"), j("fakebin")
         for x in (self.bin, self.fake, os.path.join(self.home, ".config", "ccorch"),

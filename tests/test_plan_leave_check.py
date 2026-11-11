@@ -10,10 +10,11 @@ never written.
 
     .venv-cpu/bin/python tests/test_plan_leave_check.py
 """
-import datetime as dt, importlib, json, os, re, subprocess, sys, tempfile
+import atexit, datetime as dt, importlib, json, os, re, shutil, subprocess, sys, tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TMP = tempfile.mkdtemp(prefix="leave_check_")
+atexit.register(shutil.rmtree, TMP, True)
 PLAN = os.path.join(TMP, "plan", "plan.yaml")
 COMMIT = "e123833a^"    # plan after `add-next` of step 21 and before steps 18 and 19 were dropped
 src = subprocess.run(["git", "-C", ROOT, "show", "%s:plan/plan.yaml" % COMMIT], capture_output=True, text=True).stdout

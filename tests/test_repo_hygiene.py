@@ -14,7 +14,7 @@ git world (a bare origin and a clone holding copies of the scripts under test); 
 
     .venv-cpu/bin/python tests/test_repo_hygiene.py
 """
-import json, os, shutil, subprocess, sys, tempfile, time
+import atexit, json, os, shutil, subprocess, sys, tempfile, time
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -28,6 +28,7 @@ def sh(cmd, cwd, check=True, env=None):
 
 def world():
     t = tempfile.mkdtemp(prefix="repo_hygiene_")
+    atexit.register(shutil.rmtree, t, True)
     sh("git init -q --bare -b trunk origin.git", t)
     sh("git clone -q origin.git repo 2>/dev/null; true", t)
     r = os.path.join(t, "repo")

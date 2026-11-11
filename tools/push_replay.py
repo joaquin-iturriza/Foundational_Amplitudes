@@ -22,7 +22,7 @@ same tool calls. --revert REV replays the sections (--dirs, default live) with t
 window gives the same numbers when rerun while agents of it are still writing. The last line printed is the summary
 as one JSON object (tools/verify_claims.py reads it).
 """
-import argparse, glob, json, os, re, statistics, sys
+import argparse, atexit, glob, json, os, re, shutil, statistics, sys
 from datetime import datetime
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -44,6 +44,8 @@ def load_hook(dirs, hook=None, state=None):
     if dirs:
         os.environ["CONTEXT_DIRS"] = dirs
     os.environ["CONTEXT_STATE"] = state or tempfile.mkdtemp(prefix="push_replay_")
+    if not state:
+        atexit.register(shutil.rmtree, os.environ["CONTEXT_STATE"], True)
     live = os.path.join(ROOT, ".claude", "hooks", "context_push.py")
     path = hook or live
     if path.startswith("git:"):
@@ -75,6 +77,7 @@ def reverted_dirs(dirs, rev):
     out = []
     for i, d in enumerate(src):
         t = tempfile.mkdtemp(prefix="push_replay_rev%d_" % i)
+        atexit.register(shutil.rmtree, t, True)
         for f in glob.glob(os.path.join(d, "*")):
             shutil.copy(f, t)
         if os.path.realpath(d) == os.path.realpath(live[0]):

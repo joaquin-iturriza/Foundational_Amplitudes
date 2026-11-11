@@ -17,7 +17,7 @@ number moved in from another part of the file does):
     unit of its last digit).
 The generated plan view between % plan:begin and % plan:end is skipped. Exit 1 with the report on any failure.
     python3 tools/verify_claims.py [--root R] [--staged | --worktree | --rev A..B] [--file docs/results.tex]"""
-import argparse, json, os, re, shlex, subprocess, sys
+import argparse, json, os, re, shlex, shutil, subprocess, sys
 
 SKIP_CMDS = r"\\(?:label|ref|eqref|cite|code|texttt|url|includegraphics|pnl|input)\{[^}]*\}"
 SKIP = [SKIP_CMDS, r"\b[A-Z]+-[a-z0-9]+-[0-9a-f]{6,}\b",   # registry run ids (FA-ccin2p3-60b47206)
@@ -223,9 +223,9 @@ class Where:
             git(self.root, "worktree", "remove", "--force", self.tmp, check=False)
             try:
                 os.remove(os.path.join(os.path.dirname(self.tmp), "owner.pid"))
-                os.rmdir(os.path.dirname(self.tmp))
             except OSError:
                 pass
+            shutil.rmtree(os.path.dirname(self.tmp), ignore_errors=True)
 
 
 SCRIPT_TIMEOUT = [1800]       # seconds per source script (the git hooks); plan claims passes 0, no limit
