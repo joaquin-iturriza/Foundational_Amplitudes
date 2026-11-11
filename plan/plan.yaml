@@ -22757,6 +22757,15 @@ entries:
       (own better; test MSE(V/B) 6x, 7x, 11x, 1.5x better). Rerun spread parent-scale rerun / stage-2 best 0.46-4.84 (1.00
       at D=316 both targets). The fit-on-target fix of _resolve_offshell_stats is not made: it moves the two targets in opposite
       directions within the rerun spread.'
+  - at: '2026-11-11T20:34:51+00:00'
+    text: '2026-11-12, stage 2 final (stage2_readout.py @5555a0f0, 68 searches x 8 trials, best by val, test on the run''s
+      own test pool, final models): S=D*_scr/D*_ft at 1e-4, test [16-84%]: u u~ LO 3.8 [2.7,4.8], t t~ LO 0.46 [0.37,1.09],
+      u u~ V 8.3 [3.2,inf] (level 1.1e-4, scratch plateau), t t~ V 0.45 [0.26,0.58]; val in ln units: 3.5, 0.53, 2.7, 0.41.
+      Written up sec:datasaving @bc1aec8c (fig stage2_LD). Off-shellness diagnostic per target (diag_readout.py @5555a0f0):
+      t t~ V own/parent val gmean 0.45 (3/4 below), test MSE(V/B) 0.19 (4/4; cells 0.17,0.14,0.09,0.65) against rerun spread
+      0.46-4.84 val, 0.78-6.96 test; t t~ LO 1.98 / 1.72 (own worse). Applied to the one-loop targets: s3 one-loop configs
+      offshell_stats own (94c460b6); LO keeps parent. Stage A: 8 configs (the design''s 8 cells; ''16'' in the hand-off was
+      a miscount), smoke FA-ccin2p3-1ec384ab, parents r5 857e83c1 (heldout) 030b2c3f (treesin), 8 fine-tunes afterok on them.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
