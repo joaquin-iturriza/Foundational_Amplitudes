@@ -24672,6 +24672,18 @@ entries:
       only. No (Coulomb within +-0.3): the input alone does not teach the 1/beta rise; protocol B (hard points) stays the
       threshold model and the next lever is the target side (dividing out the Sommerfeld factor), designed then. tt Born:
       same rule, reported beside.'
+    passed_at: '2026-11-11T21:28:18+00:00'
+    reviewer: 'Matched: only model.input_pair_threshold differs from the softpair controls f21fa163/5515dc85 (job_kit.sh A,
+      same base, 1e5, 8000 steps, lr law, seed 42, float64, HETEROSC with mu_mse selection); code 62686198 changes only the
+      t t~ pair column (p_i.p_j - m_i m_j, zero for a massless leg) from the constant log((1+beta^2)/2)/5 to log(beta^2)/5.
+      Check 2: kit_readout --vs moved by input changes on existing runs (uug soft rescale soft family -2.88 decades, combined
+      -2.71/-1.25; tt Born softpair threshold -2.26), threshold scan spans -0.99..-0.90 at beta 1e-3 and band edge 0.012-0.21
+      across the four models. Check 3: one seed under D315, cut 0.3 decades per family, as the control and the input-arm precedent.
+      Rate from the controls themselves (0.55/0.58 s/step, 8000 steps ~1.3 h each); readout files present in the control run
+      dirs (kit_benchmark/, sigma_stage); no memmap cache, 65 MB per run vs ~50 GB free on /sps/lpnhe. Test events: KIT strata
+      as asked. Searched results.tex for Coulomb, Sommerfeld, logthr, pair_threshold, beta input, pair invariant: only the
+      transfer star arm''s t t~ threshold (a pretraining-data lever, no beta input), not this question; plan for logthr (KIT
+      baseline named in the design''s own lineage); decisions for threshold/beta/seed (D315, D392).'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
