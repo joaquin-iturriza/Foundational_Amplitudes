@@ -20942,9 +20942,6 @@ entries:
       runs (8-trial single-fidelity DyHPO scratch + fine-tune per target and D, steps per D from the ladder-rule calibration,
       D391) on e+e- > u u~ and t t~, LO and one-loop V. The parent must hold all four out: neither trial 1262 nor the kit
       held-out parent does (v4_epem_ccx and v4_epem_ccx_nlo, in ee_uu''s equality class, and v4_zp_ee_uu are in both)'
-    7: 'When the stage-2 driver (dsave_s2_drive) ends: rerun sweep/drive.py over the 68 dsave_s2_* configs (--sites ccin2p3)
-      with --retry-failed ''FA-ccin2p3-(1d55834c|3004572a|efefccc2|81bc2067|5cda00da|10e8b63e|4a12b136|a6201ca7|496580e4|f19b0888|8a2ea0a6|d27dc3fb|1d6e7884|f3a5bdd2|7378d848|709d8244|8ba92220|029a25f4|765ad686|8683e34a|10ae2b06|36cc7fb8|7d34d279|30ef66b6)''
-      to requeue the 24 t t~ V fine-tune start-up trials (crashed at init before a08fef9d)'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -21045,11 +21042,6 @@ entries:
         if the inputs change, then the searched runs'
       - 'no option gains: pretrain a parent holding all four out on the current inputs (or confirm one), then the searched
         runs'
-    7:
-      feeds: 'S for t t~ V: each fine-tune cell the best of its 8 trials, as the design'
-      if:
-      - 'all 24 requeued trials report a result: t t~ V cells complete at 8 trials, go to the readout'
-      - 'some fail again: read their logs, fix, requeue the same way'
   designs:
   - at: '2026-11-10T02:35:09+00:00'
     question: 'Step 1 (D356 horizons, tree arm): on catalog_v4''s held-out tree targets ee->ttbar (H3, 2->2 massive), ee->ccbar
@@ -22035,7 +22027,6 @@ entries:
     '4': '2026-11-12'
     '5': step 3 (stage 2 go)
     '6': detached dsave_s2_drive2 (pid 740209, sweep/drive.py @5401490e over the 68 dsave_s2_* configs)
-    '7': detached dsave_s2_drive (pid 616031) ending
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
