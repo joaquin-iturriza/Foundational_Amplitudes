@@ -23544,6 +23544,24 @@ entries:
       was not read from a run; drop it. What is read: the tt Born softpair threshold stratum beta 1e-4..1e-3 log10-MSE is
       6.9e-9 (carry-over finding), i.e. errors ~8e-5, the same order as the 1.4e-4..2.6e-4 pool dependence measured there.
       The bulk comparison comes with the re-score.'
+  - at: '2026-11-11T23:33:02+00:00'
+    text: 'Re-score after the event-frame fix (adf1742b: kit_predict reads each scored event unaugmented, so a prediction
+      depends on the event alone; before, the test augmentation was keyed on the scored pool''s identity). All 51 KIT runs
+      re-scored (job_kit_rescore.sh, FA-ccin2p3-a90e1ab4 0cc6b96c 955131a5 00e5b77e 27a68626; old scores kept in <run>/kit_benchmark_poolkeyed);
+      the 7 figure files re-collected (b007c8de) and compared with tools/kit_rescore_compare.py (old = the committed files
+      before b007c8de; figure analysis/kit_benchmark/figs/kit_rescore_old_new.png, every (run, stratum) log-MSE new vs old,
+      all on the diagonal). 47 of 49 compared runs: every stratum unchanged to 3 decimals in log10 (no softpair inputs: Lorentz-invariant
+      to rounding). Moved: tt virtual softpair (FA-ccin2p3-f21fa163) Sudakov 15-50 TeV deepest bin 7.98 -> 6.05 (0.12 decades),
+      other strata within 0.001; tt Born softpair (5515dc85) Sudakov 15-50 TeV 0.224 -> 0.227, threshold beta 1e-4..1e-3 6.94e-9
+      -> 6.97e-9, bulk 1.47e-9 -> 1.48e-9 (<=0.006 decades). uug and uugg softpair runs unchanged to 3 decimals. Re-read of
+      the carry-over finding (kit_readout --vs at b6cf1e61): tt virtual Sudakov family median +0.995 -> +0.996 (range max
+      +1.26 -> +1.14), Coulomb -0.163, bulk -0.113 unchanged; tt Born Sudakov +0.305 -> +0.309, threshold -2.257 -> -2.255,
+      bulk -0.019 -> -0.017: every verdict stands (tt virtual NO, Sudakov worse; tt Born NO by the rule, threshold -2.26).
+      Threshold scan: the four models of step 4 (A, A_ft, B_bulk, B, none with softpair inputs) unchanged (ratio at beta 1e-3
+      -0.992/-0.990/-0.992/-0.897, band edges as reported). Carry-over figures redrawn: analysis/kit_benchmark/figs/kit_{mse,median}_carry_*.png.
+      Not resolved: the CPU deltas of ~1e-4 for the invariant tt virtual models seen in two runs without OMP_NUM_THREADS set
+      (package on the login node, FA-ccin2p3-e4eecead) and not with 1 or 4 threads or on GPU; tested by the package gate (default
+      threads) and a 32-thread check.'
   step_why:
     3:
       feeds: Bakar's fair NLO comparison
