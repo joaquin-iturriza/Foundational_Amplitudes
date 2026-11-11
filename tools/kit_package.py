@@ -160,7 +160,8 @@ def _check_all(a, meta, env, pkg, worst):
         # --repo: the repository's own code on the original run dir (code drift since the predictions vs a package defect)
         src = meta["built_from"] if a.repo else pkg
         subprocess.run([sys.executable, "tools/kit_predict.py", f"runs/kit/{m['run']}", "--h5", small, "--out", out],
-                       cwd=src, env=dict(env, PYTHONPATH=src), check=True, stdout=subprocess.DEVNULL)
+                       cwd=src, env=dict(env, PYTHONPATH=src, **({"OMP_NUM_THREADS": str(a.threads)} if a.threads else {})),
+                       check=True, stdout=subprocess.DEVNULL)
         d = []
         with h5py.File(os.path.join(out, "predictions.h5"), "r") as p, h5py.File(own, "r") as o:
             for sp in p:
@@ -168,6 +169,7 @@ def _check_all(a, meta, env, pkg, worst):
                     for k in p[f"{sp}/{st}"]:
                         x = p[f"{sp}/{st}/{k}"][:]
                         d.append(np.max(np.abs(x - o[f"{sp}/{st}/{k}"][:len(x)])))
+                        print(f"  {sp}/{st}: max |delta log10| {d[-1]:.2e}")
         worst[m["run"]] = float(max(d))
         print(f"CHECK {m['run']}: max |delta log10| {worst[m['run']]:.2e} over {len(d)} strata x {a.n} events", flush=True)
 
@@ -182,6 +184,7 @@ def main():
     c.add_argument("--pkg", required=True)
     c.add_argument("--n", type=int, default=200)
     c.add_argument("--only", nargs="*", default=None, help="these runs only (a quick end-to-end dry run)")
+    c.add_argument("--threads", type=int, default=0, help="OMP_NUM_THREADS of the prediction (is it reproducible?)")
     c.add_argument("--repo", action="store_true", help="predict with the repository's kit_predict on the original runs")
     sub.add_parser("relocate")
     a = ap.parse_args()
