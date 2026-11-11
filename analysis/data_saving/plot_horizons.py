@@ -28,9 +28,11 @@ for n, (ax, (tgt, f, lab, ylab)) in enumerate(zip(axes.flat, PANELS)):
                   key=lambda r: r["k"])
     for r in rows:
         x = [(i + 1) * r["every"] for i in range(len(r["curve"]))]
-        ax.plot(x, r["curve"], color=COL[r["k"]], label=rf"$10^{{{r['k'] / 2:g}}}$" if n == 0 else None)
+        ax.plot(x, r["curve"], color=COL[r["k"]])
         ax.plot([r["s_b"]], [r["best"]], marker="o", linestyle="none", color=COL[r["k"]])
-    if n == 0:   # the minimum's marker, one legend entry
+    if n == 0:   # one legend for the canvas: every D of any panel, and the minimum's marker
+        for k in KS:
+            ax.plot([], [], color=COL[k], label=rf"$10^{{{k / 2:g}}}$")
         ax.plot([], [], marker="o", linestyle="none", color="gray", label="min")
     for r in json.load(open(os.path.join(DATA, f))):
         if r["target"] == tgt and not r.get("curve"):
