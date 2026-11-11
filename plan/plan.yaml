@@ -22747,6 +22747,16 @@ entries:
       0.46-4.84 val, 0.78-6.96 test; t t~ LO 1.98 / 1.72 (own worse). Applied to the one-loop targets: s3 one-loop configs
       offshell_stats own (94c460b6); LO keeps parent. Stage A: 8 configs (the design''s 8 cells; ''16'' in the hand-off was
       a miscount), smoke FA-ccin2p3-1ec384ab, parents r5 857e83c1 (heldout) 030b2c3f (treesin), 8 fine-tunes afterok on them.'
+  - at: '2026-11-11T23:14:33+00:00'
+    text: '2026-11-12: stage A''s two D=1e4 cells (FA-ccin2p3-bb248f6b, 391a6e00) hit the 16-min limit I set for all 8 by
+      hand (config estimates 16-27 min, drive.py adds 1.5x+6 min; the D=316 cells at 26-27 min finished, so their limit was
+      not the binding one); rerun as FA-ccin2p3-35922ca9, adbd0552 at 32 min. Scoring augmentation (kit_benchmark: softpair
+      models not invariant to the pool-keyed Lorentz augmentation): no rescoring needed for stage A/B. The r4 parents carry
+      the same softpair inputs as r5 (input_soft_eps 1e-8, input_pair_logs 6 in both config.yaml on CC), every stage-2 scratch
+      and fine-tune inherits them through base_config, and the augmentation is keyed on the pool, so every arm reads the same
+      augmented val/test events: no scoring effect enters r5/r4 or ft/scr. It can shift the level of the smallest test MSEs
+      (tt Born max |dlog10| 1.5e-4, i.e. (ln)^2 up to ~1.2e-7 per event, near the 1e-8-1e-9 t t~ LO reads at D>=1e3) for all
+      arms alike; an event-frame rescore (data.unaugmented_roles) would be a separate read of every arm.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
