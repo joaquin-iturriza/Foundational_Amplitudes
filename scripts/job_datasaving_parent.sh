@@ -16,8 +16,9 @@
 # trial 1262 of cov_v4_long_hpo8_cc_68224 (model, HPs, HETEROSC + sigma stage); in memory (data.memmap=false: the
 # 1e4-per-pool train split is ~1.1e7 events, and no memmap cache exists for this recipe).
 #     site submit <site|auto> FA scripts/job_datasaving_parent.sh -- <heldout|treesin> [key=value ...] [tag=<name>]
-# The input flags of D392 (kit_benchmark's arms with a gain) go as arguments, e.g. model.input_soft_eps=1e-8
-# model.input_pair_logs=6 (6 = the recipe's largest multiplicity, checked on CC 2026-11-11: 100 pools of 4, 319 of
+# The input flags of D392 (kit_benchmark's arms with a gain) go as arguments with ++ (trial 1262's config predates
+# the keys, so a plain override fails "not in struct"), e.g. ++model.input_soft_eps=1e-8
+# ++model.input_pair_logs=6 (6 = the recipe's largest multiplicity, checked on CC 2026-11-11: 100 pools of 4, 319 of
 # 5, 714 of 6 particles; beams first in every pool; the two LO targets add 4-particle pools). Run dir
 # runs/data_saving/dsave_parent_<which>[_<tag>].
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
