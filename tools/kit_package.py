@@ -152,8 +152,8 @@ def _check_all(a, meta, env, pkg, worst):
                 for st in f[sp]:
                     grp = f[f"{sp}/{st}"]
                     # an azimuthal-scan stratum is scored in whole groups of its phi values (evaluate.py)
-                    m = len(np.unique(grp["phi"][:])) if "phi" in grp else 1
-                    n = max(a.n // m, 1) * m
+                    nphi = len(np.unique(grp["phi"][:])) if "phi" in grp else 1
+                    n = max(a.n // nphi, 1) * nphi
                     for k, v in grp.items():
                         g[f"{sp}/{st}/{k}"] = v[:n]
         out = os.path.join(env["SCRATCH"], m["run"])
