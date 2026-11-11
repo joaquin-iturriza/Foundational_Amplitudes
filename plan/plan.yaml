@@ -21919,6 +21919,11 @@ entries:
       x 0.42 s/step = 56 min at D=1e5 under the 1 h cap), same for scratch and fine-tune; ~60 GPU-h per LO target (9 D), ~44
       per V target (8 D), ~210 total, rates from the ee->ttbar calibration only (the one target of the four with measured
       rates; per-trial sigma+eval 0.08 h included). Awaiting his go.'
+  - at: '2026-11-11T04:07:13+00:00'
+    text: '2026-11-11 ~06:20: ladder rule applied to ee->ttbar LO cal2: 704, 1408, 7568, then 8500 (cap) from D=316 up. Owner
+      a66d0d73cd29b8da3 sent to calibrate ee->uubar LO, ee->uubar V, ee->ttbar V the same way (~10 GPU-h, one scratch run
+      per D at 8500 steps), check which parent holds all four out, then cost the searched runs from those horizons for Joaquin''s
+      go.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
