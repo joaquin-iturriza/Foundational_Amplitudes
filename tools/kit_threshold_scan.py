@@ -350,8 +350,9 @@ def cmd_figure(a):
     import plot_style as ps
     ps.use()
     d = json.load(open(a.json))
-    sq = np.asarray(d["sqrts"])
+    sq = np.asarray(d["beta"])            # x axis: beta = sqrt(1 - 4 m_t^2 / s), log-spaced like the scan
     ok = np.array([x is not None for x in d["amc"]["nlo"]])
+    ana = [b for b, x in zip(sq, d["amc"]["nlo"]) if x and x.get("source") == "analytic"]
     get = lambda k, key, scale=1.0: np.array([x.get(key, np.nan) * scale if x else np.nan for x in d["amc"][k]])
     lo, nlo, err = get("lo", "sigma"), get("nlo", "sigma"), get("nlo", "err")
     up, dn = get("nlo", "scale_up", 0.01), get("nlo", "scale_dn", 0.01)
@@ -366,10 +367,14 @@ def cmd_figure(a):
         ax.plot(sq[ok], (nlo * (1 + r))[ok], color=col, ls=":", label=label(name))
         rx.plot(sq[ok], r[ok], color=col)
     rx.axhline(0, color="k", lw=0.8)
+    if ana:      # left of this line the exact NLO is the analytic O(alpha_s) one, right of it MG5_aMC's
+        for x in (ax, rx):
+            x.axvline(np.sqrt(max(ana) * sq[len(ana)]), color="0.4", lw=0.8, ls="-.")
+    ax.set_xscale("log")
     ax.set_ylabel(r"$\sigma(e^+e^-\to t\bar t)$ [pb]")
     rx.set_ylabel(r"$\sigma^{\rm surr}_{\rm NLO}/\sigma_{\rm NLO}-1$")
-    rx.set_xlabel(r"$\sqrt{s}$ [GeV]")
-    ps.legend(ax, "lower right")
+    rx.set_xlabel(r"$\beta=\sqrt{1-4m_t^2/s}$")
+    ps.legend(ax, "upper left")
     print(f"FIGURE {ps.save(fig, a.out)}")
 
 
