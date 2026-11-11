@@ -21747,6 +21747,20 @@ entries:
       marked; a best at the last step means the cap binds there (D383: accepted). Then the stage-2 cost from these T(D). Cost:
       25 runs x 8500 steps at the measured 4-particle rates (0.075-0.09 s/step k<=7, 0.16 k=8, 0.40 k=9, 0.42 k=10) + 0.08
       h each = about 10.5 GPU-h; limits 0:30 (k<=7), 0:45 (k=8), 1:30 (k=9), 1:45 (k=10); one wave on CC. Disk 25 x 23 MB.'
+    passed_at: '2026-11-11T04:09:09+00:00'
+    reviewer: 'Fig. 22 steps-per-D calibration (25 scratch runs, 8500 steps, seed 42: e+e- > u u~ LO k=2..10, e+e- > u u~
+      V on V (D375), e+e- > t t~ V on V/B k=2..9; e+e- > t t~ LO from cal2). Targets are the four of D385-D387. Rule T=1.1
+      s_b, non-decreasing in D, capped at 8500 = 1 h at the measured k=10 rate 0.42 s/step (D383, D390). Fine-tunes at the
+      same steps are left to stage 2. Check 2: the best step moves with D on this script and lr law: cal2 e+e- > t t~ 640
+      (D=10) to 7040 (D=3162); cal_vb b b~ > Z Z 480 to 11760; on cal_vb I read test MSE(V/B) 4.8 to 2.9e-3 myself. Check
+      3: one seed per cell (D315), a calibration. Recipes @bbb6c4ff copy ref_solo_ee_uu / vob_ee_uu_nlo / vob_ee_ttbar_nlo,
+      and those pools and Born sidecars are on CC (listed). job_data_saving.sh writes result.json and turns the factors off
+      for V/B; HETEROSC with the sigma stage. Disk 25 x 23 MB against 39 GB free now. Only D, with the batch law and lr D
+      factor of the protocol, moves between cells. Searched: results.tex (ee_uu, u bar u, vob_uu, ref_solo, compute_scan,
+      calibrat, sec:ladder 13380: an older setup whose horizons did not carry over, so a new calibration is warranted), the
+      plan findings, decisions D355-D390. Not in prior, not blocking: par:vob_now (results.tex 4393) has searched 8000-step
+      runs on e+e- > u u~ V (MSE ln|V| 3.3e-7 to 3.1e-6 over 3 seeds) and e+e- > t t~ V/B at D=5e4. That is one D, not a calibration,
+      but it is a cross-check of the k=9 cells and their seed spread; name it in the write-up.'
   step_waits:
     '3': '2026-11-12'
     '4': '2026-11-12'
