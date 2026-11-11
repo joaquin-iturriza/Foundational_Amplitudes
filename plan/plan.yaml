@@ -22388,6 +22388,13 @@ entries:
       pass not yet seen. (3) D398: individual divergences never reported to Joaquin. (4) Searches: driver dsave_s2_drive3
       running; owner closed with hand-off; readout owner launches when the driver ends. (5) KIT owner resumed at 19:17 for
       the both-flags step.'
+  - at: '2026-11-11T18:29:32+00:00'
+    text: '2026-11-11 ~19:45 open question to Joaquin (asked in the main session''s message): make delegation_note.py refuse
+      (not note) main-session entry work (code edits, analyses, submissions, acking RUN events, cluster deletions), and make
+      submit_guard.py refuse a batch whose job script + config keys + data set have no completed run (D395 smoke run enforced)?
+      On his yes: build both, test on today''s recorded cases, show him the diff before enabling. State at 19:45: 493/544
+      stage-2 trials observed, 26 submitted, 12 failed, 1 lost; driver dsave_s2_drive3 (pid 807322); KIT both-flags runs c364a7ae,
+      f21fa163, 5515dc85 queued.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
