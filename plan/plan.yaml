@@ -24424,6 +24424,45 @@ entries:
       seed 42, HETEROSC, float64, off-shellness on); 50-step launch rule (D395) not needed, since c15b3337 ran this path end
       to end and each dataset ran A mode in its control. Searched results.tex for soft rescale, pair log, input_pair, softpair,
       uugg/tt inputs, plus the entry''s findings: no prior on uugg/tt.'
+  - at: '2026-11-11T20:43:23+00:00'
+    question: 'Threshold scan (step 4, Gudrun): does the surrogate one-loop virtual of e+e- -> t t~ reproduce the fixed-order
+      NLO cross section sigma(sqrt s) around 2 m_t (like Fig. 1 of arXiv:1506.06864 at fixed order)? sigma_NLO^surr = sigma_NLO^exact
+      + sigma[V_surr] - sigma[V_exact], against sigma_NLO^exact, for the existing t t~ virtual models of each protocol: A
+      from scratch (kit_A_ee_tt_virt_finite_n900000_t8000_offon), A_ft (kit_A_ft_ee_tt_virt_finite_n900000_t8000_offon), B
+      (kit_B_ee_tt_virt_finite_n900000_t3000_offon) and its matched bulk-only continuation B_bulk (kit_B_bulk_ee_tt_virt_finite_n900000_t3000_offon).
+      Feeds which t t~ virtual model goes to KIT (step 5) and whether a beta-specific input is the next lever for the Coulomb
+      limit.'
+    prior: 'results.tex: no threshold scan, no sigma(sqrt s) of t t~ (searched threshold scan, 1506.06864, Coulomb, sigma(sqrt).
+      Entry findings: KIT deepest Coulomb bin (beta 1e-4..1e-3) log10-MSE A 7.0-8.7, A_ft 7.3-7.7, B offon 2.38 (exponent
+      -0.43 vs exact -1.02), B_bulk offon 8.71; input flags do not reach it (softpair 7.06). Dry collect of this tool on B
+      offon (CPU, commit d6c4760f): sigma[V_surr]/sigma[V_exact] - 1 = -0.90 at beta 1e-3, -0.10 at 1e-2, +0.05 at 0.05-0.08,
+      below 4e-4 in size beyond beta 0.17; sigma[V_exact] -> 0.425 pb at threshold (C_F pi alpha_s / (2 beta) times sigma_LO,
+      247 at beta 1e-3, KIT''s Coulomb check 0.247).'
+    measure: 'Per sqrt s: sigma_LO, sigma_NLO^exact and each model''s sigma_NLO^surr (pb), and sigma_NLO^surr / sigma_NLO^exact
+      - 1 = (sigma[V_surr] - sigma[V_exact]) / sigma_NLO^exact; per model the smallest beta above which |ratio - 1| stays
+      below 1% and below 10%. Figure: sigma vs sqrt s (LO, NLO exact, NLO per model) with the ratio panel (tools/kit_threshold_scan.py
+      figure).'
+    check: 'Tool: MadLoop standalone at KIT''s settings (loop_sm, m_t 173, alpha_s 0.118, mu_R = sqrt s) reproduces KIT''s
+      stored born and virt_finite to 3.6e-13 (100 bulk_test + 4 x 100 threshold events, build at 11d80566); quadrature normalisation
+      tested (tests/test_kit_threshold_scan.py: sigma(ee->mumu) = 4 pi alpha^2 / 3s to 1e-12); sigma_LO quadrature against
+      MG5_aMC LO at every point in collect. Moves: on the dry run the B model''s ratio spans -0.90 to +0.05 across beta, so
+      the measure separates models whose Coulomb exponents differ (A ~0, B -0.43). D395: the MG5_aMC part is a new launch
+      path: one smoke job at the hardest point (beta 1e-3, --only 0) through LO and NLO first, then the batch whole.'
+    fixed: 'Scan grid: 32 beta log-spaced in [1e-3, 0.6] (sqrt s 346.0002-432.5 GeV) x 16 Gauss-Legendre cos theta nodes (|M|^2
+      quadratic in cos theta: exact), phi 0, KIT momentum order; KIT settings (MG5 loop_sm defaults, m_t = ymt = 173, 1/alpha
+      132.507, M_Z 91.188); MG5_aMC 3.7.0 fixed order e+ e- > t t~ [QCD], mu_R = mu_F = M_Z (alpha_s = 0.118, sigma depends
+      on mu_R only through alpha_s here), req_acc_FO 1e-3; the four models as trained, scored by tools/kit_predict.py (their
+      own stats, float64), no training. CPU only (htc): 0 GPU-h.'
+    control: 'The exact curves: sigma_NLO^exact (MG5_aMC) and sigma[V_exact] (MadLoop) are the zero line of the ratio; B_bulk
+      is B''s matched control (same continuation without hard_train), A is A_ft''s (same data, from scratch).'
+    seeds: One seed per model as trained (D315), no new training; MG5_aMC's integration error (req_acc_FO 1e-3) is shown per
+      point and a ratio inside twice it is reported unresolved.
+    outcome: 'Per model the beta range where the surrogate NLO is within 1% (and 10%) of the exact. Expected from the Coulomb
+      exponents: A, A_ft, B_bulk fail below beta ~ 0.05 (the 1/beta rise is not learned: sigma_NLO^surr falls toward sigma_LO
+      + a constant), B closer. If B is within 1% down to beta ~ 1e-2 and A not: B''s t t~ virtual goes to KIT for the threshold,
+      A for the bulk, and the protocol-A gap is reported as the Coulomb limit needing a beta input (next lever). If no model
+      is within 1% below beta 0.05: all four reported, the beta-specific input (log10 beta or log10 (s - 4 m^2)/s0, as KIT''s
+      logthr baseline) becomes the next design.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
