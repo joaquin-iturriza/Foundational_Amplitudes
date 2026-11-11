@@ -24465,6 +24465,30 @@ entries:
       A for the bulk, and the protocol-A gap is reported as the Coulomb limit needing a beta input (next lever). If no model
       is within 1% below beta 0.05: all four reported, the beta-specific input (log10 beta or log10 (s - 4 m^2)/s0, as KIT''s
       logthr baseline) becomes the next design.'
+    fix_at: '2026-11-11T20:46:22+00:00'
+    fix: '1) Outcome and check (checks 4, 15): the design''s exact NLO cannot yet be read at its hardest point. The dry MG5_aMC
+      fixed-order runs already on CC (runs/kit/threshold_scan/amc_dry) show run_05_LO and run_06 at beta 1e-3 (ebeam 173.0000865)
+      stopping with aMCatNLOError ''Some tests failed, run cannot continue'' (run_05_LO_tag_1_debug.log line 48) and no summary,
+      while beta 0.6 (LO 0.6260 +- 4.9e-4, NLO 0.7708 pb) and beta ~0.062 (LO 0.1063, NLO 0.5102 pb) ran and match the quadrature''s
+      sigma_LO (0.626, 0.106). The design does not mention this and plans a smoke run at exactly that point, which would only
+      reproduce the failure. Fix: read which of MG5_aMC''s tests fails at beta 1e-3, find the smallest beta where its fixed-order
+      NLO passes (a few CPU dry points), and state the exact NLO below that: either a repair of the run, or the validated
+      analytic O(alpha_s) total cross section for massive quark pairs (the plan''s own ''or validated formulas''), checked
+      against MG5_aMC on the points where both run. Then smoke at the hardest point the method uses. 2) Outcome (checks 4,
+      6): the entry''s next step and the target figure (Fig. 1 of arXiv:1506.06864 draws scale bands) put the yes/no against
+      the scale band of the exact NLO; the design swaps it for 1%/10% without saying why. MG5_aMC already prints the band
+      (run_04: +9.3% -7.5% at beta 0.062). Fix: carry the band into the measure and the figure (parse the envelope line),
+      and state the outcome against it beside 1%/10%, or say why the band is dropped. 3) Disk and time (checks 14, 15): no
+      number of parts K, no wall-time target, no disk per part. From the dry run: 199 MB per MG5_aMC output dir, LO+NLO about
+      1 min per point at beta 0.06-0.6 (run_01..04 timestamps); /sps/lpnhe has 51 GB free (91% used). State K, the target
+      (and the 4 h limit against it), the disk K x 199 MB against the free disk, and set MG5_aMC''s nb_core to the job''s
+      CPUs (the dry run''s config has nb_core 40 against the script''s --cpus-per-task=4). Checks that hold: matched controls
+      (B_bulk for B, A for A_ft, all four run dirs exist in analysis/kit_benchmark/data/kit_fig_A_ft.json and kit_fig_B.json);
+      the measure moves (collect_test.json on CC: B offon sigma[V_surr]/sigma[V_exact]-1 = -0.901 at beta 1e-3, -0.10 at 9.7e-3,
+      +0.05 at 0.05-0.06, |.|<4e-4 beyond 0.17, against MC error 1e-3); no training (loss, preprocessing, HPO checks do not
+      apply); scan points are a quadrature grid, which is what a cross section asks; not a repeat (searched results.tex for
+      threshold scan, 1506.06864, Coulomb, cross section, MG5_aMC, fixed order, kit_threshold; only the star-arm t tbar threshold
+      probe at the amplitude level, l.14765, no sigma(sqrt s)).'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
