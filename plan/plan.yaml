@@ -22414,6 +22414,11 @@ entries:
       at lr_scale 8.6 / lr 1.4-2.7c; none below the trained range except scratch t t~ LO D=1e5 (diverged 1.63c, trained only
       up to 0.38c so far). Fine-tune best lr_scale <= 0.2 in 6 of 9 u u~ LO cells: the window''s bottom may cut the fine-tune
       optimum there (bias against fine-tune). Figures analysis/data_saving/figs/stage2_{LD,gpuh,lr}.png (provisional).'
+  - at: '2026-11-11T18:47:28+00:00'
+    text: '2026-11-11 ~20:10: the 20:00 question of setup changes is withdrawn: Joaquin points out the setup already has routine
+      acks by the supervisor, plan wait batching, and a one-command site ack; only diverged trials were misfiled (fixed today
+      in site_runends.py). Provisional stage-2 readout sent to him with figs/stage2_LD.png: S(test) u u~ LO 3.5 [2.6,4.4],
+      t t~ LO 0.43 [0.36,1.07], u u~ V 3.1 [2.2,5.0], t t~ V 0.90 [0.37,inf]; final readout after driver dsave_s2_drive3 ends.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
