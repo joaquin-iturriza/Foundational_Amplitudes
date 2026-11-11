@@ -22003,6 +22003,14 @@ entries:
       stage, cosine with the parent''s lr law at that T; NOT 15000 or 68224 steps. Goes out after kit_benchmark''s input arms
       are read, with any input that gains (D392). The next owner must apply this; the closing owner''s hand-off may predate
       it.'
+  - at: '2026-11-11T04:50:20+00:00'
+    text: '2026-11-11 ~05:00 UTC: Input arms (kit_benchmark finding 04:38, coordinator): soft log rescale (model.input_soft_eps=1e-8)
+      is in; pair logs (model.input_pair_logs) join only if the combined arm FA-ccin2p3-c15b3337 keeps both gains (else soft
+      rescale alone); local-frame logs out. Parent recipe checked on CC (find_pool, first 200 train rows of each of the 1133
+      pools): multiplicity 4 (100 pools), 5 (319), 6 (714), so input_pair_logs=6; beams are rows 0,1 in every pool (p0+p1
+      = sum of the rest and at rest, to 1e-4; none failed). Parent job scripts/job_datasaving_parent.sh @57638405: train_subsample
+      1e4, 3458 steps = ceil(5 x 1133e4/16384), lr 1.88e-2 (the parent''s law at 3458), in memory, trial 1262 config; waits
+      on c15b3337. horizons.py --ladder implements D391 (1.1 s_b, cap 8500, running max) with ee_uu_nlo read on V (D375).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
