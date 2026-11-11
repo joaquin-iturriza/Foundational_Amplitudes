@@ -16175,9 +16175,9 @@ entries:
     '24': '2026-11-12'
   owner:
     agent: a0f0ed61b4d88299f
-    state: working
+    state: stopped
     since: '2026-11-11T03:39:43+00:00'
-    state_at: '2026-11-11T03:51:22.242000+00:00'
+    state_at: '2026-11-11T03:51:58.793000+00:00'
     context: 20594
     context_at: '2026-11-11T03:51:36+00:00'
   designs:
