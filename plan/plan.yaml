@@ -22026,7 +22026,7 @@ entries:
     '3': '2026-11-12'
     '4': '2026-11-12'
     '5': step 3 (stage 2 go)
-    '6': detached dsave_s2_drive2 (pid 740209, sweep/drive.py @5401490e over the 68 dsave_s2_* configs)
+    '6': detached dsave_s2_drive3 (pid 807321, sweep/drive.py @bc735802 over the 68 dsave_s2_* configs)
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
