@@ -22304,7 +22304,8 @@ entries:
   step_waits:
     '4': step 6 and the D400 rerun's fine-tune searches
     '6': driver dsave_s2_drive3 (pid 807322) finishing the last stage-2 scratch trials
-    '7': the design reviewer and the repo reviewer (both running)
+    '7': FA-ccin2p3-0ca51b6f FA-ccin2p3-e538bda9 FA-ccin2p3-f996c9e8 FA-ccin2p3-bb248f6b FA-ccin2p3-58307031 FA-ccin2p3-1d03af0a
+      FA-ccin2p3-a400e6d5 FA-ccin2p3-391a6e00
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
