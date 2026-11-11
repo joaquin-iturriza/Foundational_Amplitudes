@@ -22034,7 +22034,7 @@ entries:
     '3': '2026-11-12'
     '4': '2026-11-12'
     '5': step 3 (stage 2 go)
-    '6': detached dsave_s2_drive (sweep/drive.py over the 68 dsave_s2_* configs @7d6af9b3, CC, pid 616031)
+    '6': dsave_s2_drive2
     '7': detached dsave_s2_drive (pid 616031) ending
   findings:
   - at: '2026-11-10T03:35:22+00:00'
