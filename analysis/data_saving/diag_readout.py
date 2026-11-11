@@ -58,7 +58,14 @@ def main():
     summ = dict(n_below=below, gmean_own_over_par=gm, verdict=verdict,
                 par_over_orig_range=[min(spread), max(spread)],
                 gmean_own_over_par_by_target={tg: float(np.exp(np.mean([np.log(r["own_over_par"]) for r in rows
-                                                                          if r["target"] == tg]))) for tg, _, _ in TARGETS})
+                                                                          if r["target"] == tg]))) for tg, _, _ in TARGETS},
+                # per target on both measures (the pre-set rule pools LO and V; read per target 2026-11-12)
+                by_target={tg: {m: {"n_below": int(sum(q < 1 for q in qq)), "gmean": float(np.exp(np.mean(np.log(qq))))}
+                                for m, qq in (("val", [r["own_over_par"] for r in rows if r["target"] == tg]),
+                                              ("test", [r["test_own"] / r["test_par"] for r in rows if r["target"] == tg]))}
+                           for tg, _, _ in TARGETS},
+                test_par_over_orig_range=[min(r["test_par"] / r["test_orig"] for r in rows),
+                                          max(r["test_par"] / r["test_orig"] for r in rows)])
     json.dump(dict(cells=rows, summary=summ), open(os.path.join(DATA, "stage2_diag_readout.json"), "w"), indent=1)
     for r in rows:
         print(f"{r['target']:13s} D={r['D']:7.0f} val own {r['val_own']:.2e} par {r['val_par']:.2e} orig "

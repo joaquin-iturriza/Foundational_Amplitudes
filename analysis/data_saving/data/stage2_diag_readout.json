@@ -140,6 +140,32 @@
   "gmean_own_over_par_by_target": {
    "epem_ttx": 1.984013900805409,
    "ee_ttbar_nlo": 0.45255402832973396
-  }
+  },
+  "by_target": {
+   "epem_ttx": {
+    "val": {
+     "n_below": 1,
+     "gmean": 1.984013900805409
+    },
+    "test": {
+     "n_below": 0,
+     "gmean": 1.7242469256181392
+    }
+   },
+   "ee_ttbar_nlo": {
+    "val": {
+     "n_below": 3,
+     "gmean": 0.45255402832973396
+    },
+    "test": {
+     "n_below": 4,
+     "gmean": 0.19012959025789983
+    }
+   }
+  },
+  "test_par_over_orig_range": [
+   0.7756197155246769,
+   6.956774793300321
+  ]
  }
 }

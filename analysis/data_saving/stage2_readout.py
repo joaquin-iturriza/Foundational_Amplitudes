@@ -194,6 +194,10 @@ def readout():
               f"{t['fail'] or 'no run dir read'}")
     json.dump({"fits": res, "cells": cells, "trials": trials}, open(OUT, "w"), indent=1, default=float)
     print("wrote", OUT)
+    # the claims line (tools/verify_claims.py reads the last {...} line)
+    print(json.dumps({m: {tg: {"S": 10 ** f["log10_S"], "lo": 10 ** f["band"][0], "hi": 10 ** f["band"][2],
+                               "level": f["level"], "alpha": f["fit"]["alpha"]} for tg, f in r.items()}
+                      for m, r in res.items()} | {"n_searches": len(cells)}, default=float))
 
 
 def fits(cells, key):
