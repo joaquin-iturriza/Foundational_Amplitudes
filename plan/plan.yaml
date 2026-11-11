@@ -22362,6 +22362,11 @@ entries:
       it) -> requeued at their HPs (--retry-failed, which now takes lost trials), 1 real blow-up kept with its penalty (FA-ccin2p3-05384f67,
       ft t t~ LO D=3162, diverged step 1299). Restarted as dsave_s2_drive3 (pid 807321), scratchpad restart_driver3.sh; step
       6 waits on it.'
+  - at: '2026-11-11T17:00:20+00:00'
+    text: '2026-11-11 18:05: scratch blow-ups at large D so far: t t~ V D=5e4 lr 2.62e-2 (2.65c), u u~ LO D=1e4 lr 2.42e-2,
+      t t~ LO D=1e5 lr 1.87e-2 (~1.6c, mid-upper window, not the edge). Fine-tune blow-ups all at lr_scale 8.5-9.1. For the
+      readout owner: count blow-ups per cell against sampled lr; if large-D scratch cells blow up inside their window often,
+      the scratch window''s top is too high there and the best-of-8 may be biased low in trials; state it in the write-up.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
