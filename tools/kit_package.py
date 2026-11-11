@@ -121,8 +121,9 @@ def cmd_check(a):
     import h5py
     pkg = os.path.abspath(a.pkg)
     meta = json.load(open(os.path.join(pkg, "models.json")))
+    # KIT_HARDPS_DIR as the README tells KIT to set it: the runs rebuild their statistics from the benchmark's file
     env = dict(os.environ, DATA_DIR=tempfile.mkdtemp(prefix="kitpkg_data_"), SCRATCH=tempfile.mkdtemp(prefix="kitpkg_"),
-               PYTHONPATH=pkg)
+               PYTHONPATH=pkg, KIT_HARDPS_DIR=kh.kit_dir())
     subprocess.run([sys.executable, "tools/kit_package.py", "relocate"], cwd=pkg, env=env, check=True)
     worst = {}
     try:

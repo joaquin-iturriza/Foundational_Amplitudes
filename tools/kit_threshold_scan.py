@@ -28,6 +28,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 
 import numpy as np
 
@@ -149,10 +150,13 @@ def amc_sigma(out, sq, order, acc):
     ncore = os.environ.get("SLURM_CPUS_PER_TASK", "4")
     script = (f"set nb_core {ncore}\nlaunch {out}\nfixed_order=ON\norder={order}\ndone\n"
               + AMC_CARD.format(e=sq / 2, mz=MZ, acc=acc, mt=MT))
+    t0 = time.time()
     p = subprocess.run([mg.MG5_BIN], input=script, text=True, capture_output=True, timeout=3600)
     m = re.findall(r"Total cross section:\s*([0-9.eE+-]+)\s*\+-\s*([0-9.eE+-]+)\s*pb", p.stdout)
     if not m:
-        why = re.findall(r"(aMCatNLOError[^\n]*|Soft test[^\n]*FAILED[^\n]*)", p.stdout + p.stderr)
+        dbg = [d for d in glob.glob(os.path.join(out, "run_*_debug.log")) if os.path.getmtime(d) >= t0]  # aMCatNLOError
+        why = re.findall(r"(aMCatNLOError[^\n]*|Soft test[^\n]*FAILED[^\n]*)",
+                         p.stdout + p.stderr + (open(dbg[-1]).read() if dbg else ""))
         return {"failed": "; ".join(dict.fromkeys(why))[:500] or "no cross section in MG5_aMC's output"}
     r = {"sigma": float(m[-1][0]), "err": float(m[-1][1])}
     runs = sorted(glob.glob(os.path.join(out, "Events", "run_*", "summary.txt")), key=os.path.getmtime)
