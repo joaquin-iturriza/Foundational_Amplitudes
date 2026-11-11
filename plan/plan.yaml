@@ -21873,6 +21873,14 @@ entries:
       V). Asked him to confirm the set {ee->uubar LO, ee->uubar V, ee->ttbar LO, ee->ttbar V}; on yes, the main session itself
       redoes steps (monotonic in D, 1 h cap, fine-tunes same steps, D383) and the cost on those four, one number, no agent.
       Pretraining must hold these targets out (parent choice not yet checked).'
+  - at: '2026-11-11T03:54:12+00:00'
+    text: '2026-11-11 ~05:40 plan put to Joaquin (asked for his go): targets ee->uubar and ee->ttbar at LO and one-loop V
+      (D387; constant V/B on V only); D 10..1e5 LO, 10..3e4 V, half decades; per (target, D) two 8-trial DyHPO (scratch, fine-tune
+      from the parent), same steps (D383); steps 2000 at D=10,32; 10000 at D=100..1e4; 1 h cap at 3e4 (~9000) and 1e5 (~7000);
+      readout: horizontal gap between best-trial curves at a precision both reach (D373). Estimate ~55 GPU-h per LO target,
+      ~40 per V, ~200 total, rates borrowed from the ee->ttbar calibration. Unchecked: which parent holds all four out; ee->uubar
+      pool sizes. Disk: asked him to run ''bash scripts/prune_site.sh ccin2p3'' (the worker''s session predates his new permission);
+      then a fresh worker redoes du under /sps/lpnhe/jiturrizaramirez01/tmp.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
