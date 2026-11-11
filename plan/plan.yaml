@@ -22396,6 +22396,12 @@ entries:
   - at: '2026-11-11T18:31:35+00:00'
     text: '2026-11-11 ~19:50: the hook question of 19:45 is withdrawn (Joaquin: rules, not blocking hooks; he may want main-session
       work at times). Nothing waits on him.'
+  - at: '2026-11-11T18:40:59+00:00'
+    text: '2026-11-11 ~20:00: D380, D381, D382, D399 deleted from the ledger at Joaquin''s request (backup runs.db.bak.pre-D380-399).
+      Open question to Joaquin (main session''s message): which setup changes to make among (1) only real breaks become events
+      (supervisor classes routine run ends as routine), (2) owners kept alive through a batch (routine ends never wake them),
+      (3) one stated tie-break: a rule protecting data, cost or his design beats speed, (4) one submitter (D396) and one source
+      per topic in the reference sections (drive.py vs sweep_manager, pruning). Nothing changed until he answers.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
