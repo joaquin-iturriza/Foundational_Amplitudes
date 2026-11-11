@@ -255,24 +255,24 @@ def ensure_alphas(rec, out):
     return ap
 
 
-def stratum_rows(stem, target, split, stratum):
-    """The FA pool rows of one stratum (for scoring)."""
+def stratum_rows(stem, target, split, stratum, path=None):
+    """The FA pool rows of one stratum (for scoring); `path` another file in the benchmark's layout (default its own)."""
     import h5py
-    with h5py.File(h5_path(stem), "r") as f:
+    with h5py.File(path or h5_path(stem), "r") as f:
         meta = json.loads(f.attrs["metadata"])
         return group_rows(f[f"{split}/{stratum}"], target, meta)
 
 
-def strata(stem, split):
+def strata(stem, split, path=None):
     import h5py
-    with h5py.File(h5_path(stem), "r") as f:
+    with h5py.File(path or h5_path(stem), "r") as f:
         return sorted(f[split]) if split in f else []
 
 
-def log10_name(stem, target):
+def log10_name(stem, target, path=None):
     """The truth's log10 dataset name in a group: log10_<target> or log10_abs_<target>."""
     import h5py
-    with h5py.File(h5_path(stem), "r") as f:
+    with h5py.File(path or h5_path(stem), "r") as f:
         g = f["bulk_test/bulk"]
         for k in (f"log10_{target}", f"log10_abs_{target}"):
             if k in g:

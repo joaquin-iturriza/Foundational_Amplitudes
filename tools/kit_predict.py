@@ -36,17 +36,20 @@ def run_target(run_dir):
     return spec["name"]
 
 
-def predict(run_dir, splits, out):
+def predict(run_dir, splits, out, h5=None):
+    """`h5`: score the strata of another file in the benchmark's layout and the run's file's metadata (default the
+    run's own file), e.g. tools/kit_threshold_scan.py's scan points"""
     import h5py
     import torch
     from tools.rebuild_run import rebuild
     name = run_target(run_dir)
     stem, target, _ = kh.parse(name)
-    lname = kh.log10_name(stem, target)
+    src = h5 or kh.h5_path(stem)
+    lname = kh.log10_name(stem, target, src)
     blocks, rows = [], []
     for split in splits:
-        for st in kh.strata(stem, split):
-            r = kh.stratum_rows(stem, target, split, st)
+        for st in kh.strata(stem, split, src):
+            r = kh.stratum_rows(stem, target, split, st, src)
             assert (r[:, -1] > 0).all(), f"{split}/{st}: a non-positive target (the signed case is not wired here)"
             blocks.append((split, st, len(r)))
             rows.append(r)
@@ -70,7 +73,7 @@ def predict(run_dir, splits, out):
     assert np.isfinite(res).all(), "an event without a prediction"
     path = os.path.join(out, "predictions.h5")
     i = 0
-    with h5py.File(kh.h5_path(stem), "r") as t, h5py.File(path, "w") as f:
+    with h5py.File(src, "r") as t, h5py.File(path, "w") as f:
         for split, st, n in blocks:
             tr = t[f"{split}/{st}/{lname}"][:]
             f[f"{split}/{st}/{lname}"] = tr + res[i:i + n] / np.log(10.0)

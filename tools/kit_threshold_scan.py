@@ -176,11 +176,10 @@ def cmd_nlo(a):
 
 
 def cmd_predict(a):
-    os.environ["KIT_HARDPS_DIR"] = os.path.abspath(a.dir)
     from tools import kit_predict
     for run in a.runs:
         out = os.path.join(a.dir, "pred", os.path.basename(run.rstrip("/")))
-        _, path = kit_predict.predict(run, ["scan"], out)
+        _, path = kit_predict.predict(run, ["scan"], out, h5=os.path.join(a.dir, "ee_tt.h5"))
         print(f"PREDICTED {run} -> {path}")
 
 
