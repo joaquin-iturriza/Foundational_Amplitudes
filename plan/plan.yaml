@@ -16916,6 +16916,12 @@ entries:
       was refused (self-modification); the exact allow rules + autoMode text were given to him to add; on his add, resume
       the disk worker a0f0ed61b4d88299f to run prune_site.sh ccin2p3, read its du outputs on the CC login node (/tmp/du_top.txt,
       /tmp/du_ours.txt) and report what was freed.'
+  - at: '2026-11-11T04:15:18+00:00'
+    text: '2026-11-11 ~06:40: amp_data_cache 104 GB (31k files): v4_* 49.9 GB (10-26) + 32.1 GB (11-07), dsh/pp13/d4 19.2
+      GB, kit/ee pools <2 GB. Prune freed 0 (all newer than --cache-days). Classifier refused the main session instructing
+      a trim; gave Joaquin one command deleting dsh_*, pp13*, d4* and v4_* older than 2026-11-01 (~69 GB, to ~108 GB free);
+      awaiting his run. The worker''s ''no FA jobs running'' was wrong: input arms 3fa9854a/1a14c791/761cb2d8 RUNNING, A_ft
+      53dc387b COMPLETED (site poll 06:40).'
   handoff:
     state: '2026-11-10: step 20 closed (repo hygiene 1c051019 in maintain; leave-check 9fa60369/700fe4fa registered on SubagentStop
       by Joaquin 5759a43f; guard fix installed, test 1b06ad6f); steps 15, 23 dropped (double wake already fixed by notification_absorb:
