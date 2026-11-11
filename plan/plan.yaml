@@ -21014,7 +21014,7 @@ entries:
     decision: D377
   owner:
     agent: a66d0d73cd29b8da3
-    state: working
+    state: closed
     since: '2026-11-10T10:24:52+00:00'
     state_at: '2026-11-11T04:27:09.751000+00:00'
     context: 193724
@@ -22035,26 +22035,30 @@ entries:
     start: '2026-11-11T04:11:45+00:00'
     at: '2026-11-11T04:11:45+00:00'
   handoff:
-    state: 'One-loop arm stage 1. Targets (Joaquin''s corrections 2026-11-10): b b~ > Z Z, u u~ > e+e- Z, e+e- > b b~ (constant
-      V/B kept: drop only on a measured run). Readout: common test MSE of V/B (vb_test_mse.py), MSE ln|V| beside; T(D) from
-      the trained-unit val curve (horizons.py); L0 on MSE_VB set from the scratch curves. b b~ > Z Z: 8 cal_vb runs done/running
-      (FA-ccin2p3-ba296372 56508e36 8ef62e68 b3c0cda3 310d8987 d3dd10e8 8e41af66 0dd9e90b), stand. u u~ > e+e- Z cal_vb runs
-      superseded (physics factor multiplied V/B by s_hat/s0; fixed @cc288ee1, k=9 cancelled). Design for the 16 new runs (u
-      u~ > e+e- Z rerun + e+e- > b b~, tag cal_vb2, 7.2 GPU-h, limits 0:30/0:45/2:30) recorded ~12:10, NOT yet reviewed: launch
-      the design-reviewer (it reviewed earlier versions as add953067bc1728ea), on PASS submit with the scratchpad pattern:
-      site submit ccin2p3 FA scripts/job_data_saving.sh --item pretrain_data_saving --hdr=--time=<0:30|0:45|2:30> -- <target>
-      <k> <8000|12000> scratch ++data.target_over_born=true tag=cal_vb2, after site pick FA --jobs 16 and plan target cal_vb2.
-      Then the figures (MSE_VB vs D, MSE ln|V| vs D). Stage 2 waits on Joaquin''s GPU budget. Stage-2 tree design: fit-based
-      D* revision drafted (bands 1.26x ttbar, 3.8x ccbar g at n=4), not recorded.'
-    decisions: 'V/B runs: target_physics_factor and target_physics_orders off (job_data_saving.sh). One-loop common measure
-      MSE((V/B)_pred-(V/B)_true) on test (D371 to come). Never drop a target on a prediction. Sign-changing targets allowed
-      (trained in their own transform).'
-    ruled_out: The sign rule and the sigma>=0.1 cut; b g > a b, e+e- > d d~ Z, b b~ > a ve ve~ as replacements (search stopped);
-      u u~ > e+e- Z cal_vb runs (physics factor); afterok dependencies from CPU jobs on CC.
-    running: b b~ > Z Z cal_vb runs (8); FA-ccin2p3-326bc006 (sidecars, not acted on)
-    files: scripts/job_data_saving.sh, scripts/job_vob_born.sh, analysis/data_saving/{horizons,vb_test_mse,vb_spread,plot_calibration,plot_vb_spread}.py,
-      analysis/data_saving/data/vb_spread.json, recipes/catalog_v4_datasaving_{bbx_zz_nlo,uux_epemz_nlo,epem_bbx_nlo,loops}.yaml
-    written: '2026-11-10T10:24:01+00:00'
+    state: 'Targets now the draft Fig. 22 set (D385-D387): e+e- > u u~ and t t~, LO and one-loop V. Steps per D by the ladder
+      rule (D383, D390, D391): T(D) = 1.1 x best step, non-decreasing in D, cap 8500; t t~ LO from cal2 (704, 1408, 7568,
+      then 8500 from D=316). Step 7: calibration cal_f22 (design PASS 2026-11-11 04:06), 25 scratch runs at 8500 steps, recipes
+      catalog_v4_datasaving_{ee_uu,ee_uu_nlo,ee_ttbar_nlo}.yaml @bbb6c4ff, site commit bfed8304; e+e- > t t~ V k=8 (fc60e27a)
+      diverged at step 1528 (lr 9.30e-3, end of warm-up): listed apart, cell rerun at half lr as FA-ccin2p3-94b83643 (tag
+      cal_f22_lrhalf; E4719 acked, its note lacks the new id). When step 7''s runs end: horizons.py --tag cal_f22 (and cal_f22_lrhalf),
+      the figure val MSE vs step per D with minima marked (figure-style), T(D) per target, then stage-2 cost (cost_stage2.py
+      needs its TARGETS changed to the four and the D383 rule: 1.1 s_b, running max, cap 8500; fine-tunes same steps). Step
+      6 (D392 go): waits on kit_benchmark''s input arms 3fa9854a/1a14c791/761cb2d8; winning options go into the inputs; new
+      held-out parent recipes/catalog_v4_datasaving_parent_heldout.yaml (gen_datasaving_parent.py @ecc76ca8, 1133 pools) at
+      15000 steps (the 25-process target-excluding Fig. 22 foundation''s length), batch 16384, ~3.9 h V100; then searched
+      runs (8-trial single-fidelity DyHPO scratch + fine-tune per target and D).'
+    decisions: D373 precision each target reaches; D375 constant V/B trained on V (e+e- > u u~ V on V; t t~ V on V/B, physics
+      factors off); D383/D390/D391 steps rule; D385-D387 targets; D392 go for searched runs after input arms; held-out parent
+      drops each target's whole equality class and variants (coordinator, one correct answer). Parent 18-24 h was the 68224-step
+      schedule at 0.93 s/step on V100, not GPU type.
+    ruled_out: Catalog targets (b b~ > Z Z, u u~ > e+e- Z, e+e- > b b~, c c~ g, b b~ g g) for stage 2 (D385); their cost 597+89
+      GPU-h (cost_stage2.py @4e0c3798) obsolete; trial 1262 and the kit held-out parent as stage-2 parent (leak ee->ccbar
+      class); 68224-step parent schedule.
+    running: 'cal_f22: 24 runs (see step 7 wait) + FA-ccin2p3-94b83643'
+    files: scripts/job_data_saving.sh, analysis/data_saving/{horizons,vb_test_mse,plot_vb_test,cost_stage2}.py, recipes/catalog_v4_datasaving_{ee_uu,ee_uu_nlo,ee_ttbar_nlo,parent_heldout}.yaml,
+      recipes/gen_datasaving_parent.py, analysis/data_saving/data/{horizons_cal2,horizons_cal_vb_cal_vb2,vb_test_mse_cal_vb_cal_vb2}.json,
+      figs/vb_test_mse_loops.png
+    written: '2026-11-11T04:28:37+00:00'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
