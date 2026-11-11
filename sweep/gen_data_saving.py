@@ -126,7 +126,7 @@ def main():
             if T is None:
                 raise SystemExit(f"no T(D) for {t} k={k}: rerun analysis/data_saving/horizons.py --ladder")
             for arm in a.arms:
-                jobs.append((f"ds22_{arm}_{t}_d{k}_t{T}", t, k, T, arm))
+                jobs.append((f"dsave_s2_{arm}_{t}_d{k}_t{T}", t, k, T, arm))
     miss = sorted({(t, k) for _, t, k, _, _ in jobs if (t, k) not in R})
     if miss:
         raise SystemExit(f"no measured step rate for {miss} in {CALS}: rerun analysis/data_saving/horizons.py first")
