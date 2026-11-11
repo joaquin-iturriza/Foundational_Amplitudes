@@ -21829,6 +21829,13 @@ entries:
       g g), ttbar 247.4, ccbar g 36.3, bbbar gg 37.5, ZZ 118.3, e+e-Z 32.9, ee->bbbar(V) 124.4; 491 GPU-h of it at D>=1e4
       (ttbar, ZZ, ee->bbbar at 32000-48000 steps). Wall ~10.1 h at site pick''s 59; disk 18.3 GB against 6.5 GB free on CC
       (step 5).'
+  - at: '2026-11-11T03:15:09+00:00'
+    text: '2026-11-11 ~04:30 told Joaquin the re-cost (cost_stage2.py @4e0c3798): 597 GPU-h stage 2 + 89 phase a ~ 686; D>=1e4
+      = 491; disk 18.3 GB vs 6.5 GB free on CC. Flagged unverified: phase a (89) may duplicate stage 2''s scratch searches
+      for ccbar g/bbbar gg (not checked); ttbar''s 32000 steps at D=100-1e3 likely unneeded under D373; ee->bbbar(V) steps
+      borrowed from ZZ. Asked him to choose: (1) full ~690, (2) drop the possible duplicate and ttbar''s long mid-D runs (~500-550
+      estimated, to be re-run with the tool), (3) also cap D at 1e4 (~250-300 estimated). Estimates (2)(3) are mine, not from
+      the tool.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
