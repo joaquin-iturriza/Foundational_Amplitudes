@@ -20942,9 +20942,6 @@ entries:
       runs (8-trial single-fidelity DyHPO scratch + fine-tune per target and D, steps per D from the ladder-rule calibration,
       D391) on e+e- > u u~ and t t~, LO and one-loop V. The parent must hold all four out: neither trial 1262 nor the kit
       held-out parent does (v4_epem_ccx and v4_epem_ccx_nlo, in ee_uu''s equality class, and v4_zp_ee_uu are in both)'
-    7: 'Calibration cal_f22 (design passed 2026-11-11 04:06): 25 scratch runs at 8500 steps of e+e- > u u~ LO (k=2..10), e+e-
-      > u u~ V on V, e+e- > t t~ V on V/B (k=2..9); readout T(D) = 1.1 x best step, non-decreasing, cap 8500 (D383, D390,
-      D391), figure val MSE vs step per D with minima marked, then the stage-2 cost'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -21042,11 +21039,6 @@ entries:
         if the inputs change, then the searched runs'
       - 'no option gains: pretrain a parent holding all four out on the current inputs (or confirm one), then the searched
         runs'
-    7:
-      feeds: the steps per D of the stage-2 searched runs
-      if:
-      - 'runs end clean: horizons + figure + cost, report'
-      - 'a run breaks: read its log, fix, resubmit that cell'
   designs:
   - at: '2026-11-10T02:35:09+00:00'
     question: 'Step 1 (D356 horizons, tree arm): on catalog_v4''s held-out tree targets ee->ttbar (H3, 2->2 massive), ee->ccbar
@@ -21954,7 +21946,6 @@ entries:
     '4': '2026-11-12'
     '5': step 3 (stage 2 go)
     '6': FA-ccin2p3-c15b3337 FA-ccin2p3-4782624f FA-ccin2p3-a46978e2
-    '7': FA-ccin2p3-80815d00 FA-ccin2p3-8526adb8 FA-ccin2p3-36bf9e0c
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
