@@ -21787,6 +21787,57 @@ entries:
       plan findings, decisions D355-D390. Not in prior, not blocking: par:vob_now (results.tex 4393) has searched 8000-step
       runs on e+e- > u u~ V (MSE ln|V| 3.3e-7 to 3.1e-6 over 3 seeds) and e+e- > t t~ V/B at D=5e4. That is one D, not a calibration,
       but it is a cross-check of the k=9 cells and their seed spread; name it in the write-up.'
+  - at: '2026-11-11T04:55:11+00:00'
+    question: 'Stage 2 of the Fig. 22 data-saving study (D385-D387, D392-D394): per target, how much target data does pretraining
+      save at MSE = 1e-4, S = D*_scratch / D*_ft, where each arm''s L(D) (the best of an 8-trial single-fidelity DyHPO per
+      D) crosses 1e-4? Targets: e+e- > u u~ and t t~ LO (held out of their parent with their equality classes), and their
+      one-loop V (e+e- > u u~ V trained on V, D375; t t~ V on V/B), whose parent holds the one-loops out but has the two LO
+      trees in (the entry''s words: ''the one loops with the tree levels in the pretraining''). Jobs: two parents (scripts/job_datasaving_parent.sh
+      heldout: 1133 pools; treesin: 1133 + e+e- > u u~, t t~ LO), each 1e4 events per pool, 5 epochs (3458/3464 steps at batch
+      16384, D393), with the D392 inputs (soft rescale input_soft_eps=1e-8; pair logs input_pair_logs=6 only if the combined
+      arm FA-ccin2p3-c15b3337 keeps both gains); then 68 sweeps (sweep/gen_data_saving.py): 4 targets x D = 10^(k/2) (LO k=2..10,
+      V k=2..9) x {scratch, fine-tune} x 8 trials.'
+    prior: 'Draft Fig. 22 (results.tex sec:transfer ~9260): fine-tuned one-loop ee->uu~ and ee->tt~ V lie 1-2 orders below
+      scratch at matched compute, same exponent, the advantage in prefactor and floor; that was compute, not D, on the 8-process
+      (LO targets in) and 25-process (targets out) foundations; this design reads it in D on the current catalog setup. sec:ladder:
+      an older-setup D-scan, 5x search-to-search spread of the best trial at slope 0.85. Dead end on this entry: a stage-2
+      design reading D* from the two grid points bracketing the crossing was FIXed twice (would read NOT RESOLVED); remedy
+      taken here: fit-based D*. Calibration cal_f22 + cal2 (horizons.py --ladder @57638405, analysis/data_saving/data/horizons_cal_f22_cal_f22_lrhalf.json,
+      horizons_cal2_ladder.json): scratch best val MSE at fixed lr, e+e- > u u~ LO 2.0 (D=10) to 7.7e-5 (3162) to 4.4e-7 (1e4);
+      u u~ V (ln|V|) 0.48 to 2.4e-4 (3162) to 9.4e-6 (1e4); t t~ V (ln|V/B|) 1.6e-3 (10) to 4.4e-5 (100) to 1.1e-8 (3162);
+      t t~ LO 2.9e-3 to 5.5e-5 (100) to 9.1e-7 (1e4). par:vob_now: searched 8000-step u u~ V at D=5e4 3.3e-7..3.1e-6 over
+      3 seeds (seed spread ~9x). Decisions D383, D390, D391 (steps), D392 (go, inputs), D393 (parent size), D394 (no asking).
+      Searched results.tex (transfer, ladder, vob, data_saving), plan entry, site decisions D355-D394.'
+    measure: 'Per cell (target, D, arm): the best trial''s validation mu-MSE at its best checkpoint in the trained target''s
+      unit (ln|M|^2 LO, ln|V| u u~ V, ln|V/B| t t~ V = MSE of ln|V|; prepd_std^2 x the standardized value), beside it the
+      same trial''s test MSE. Per arm: fit L(D) = A D^-alpha + L_inf (CLAUDE.md''s scaling form) over all D of the arm, weighted
+      in log L; D* = where the fit crosses 1e-4; cross-check: a straight log-log fit over the 3-5 cells nearest the crossing.
+      Band on log10 D*: the fit residual rms in log10 L, combined in quadrature with the 5x (0.7 decade) search-to-search
+      spread of sec:ladder, divided by the local slope |dlog L/dlog D| at the crossing; S''s band from both arms'' bands in
+      quadrature. An arm whose L_inf >= 1e-4 or whose largest D stays above 1e-4 gives a bound (D* > D_max), reported as such.'
+    check: 'The measure moves with D steeply on this protocol (calibration above: 4 to 7 decades over D=10..1e4 per target),
+      so the crossing at 1e-4 sits inside every target''s grid for scratch (u u~ LO between 3162 and 1e4; u u~ V near 3162-1e4;
+      t t~ V near 100; t t~ LO near 100); the fine-tune arm moves the prefactor by 1-2 orders on these same targets at matched
+      compute (draft Fig. 22), which at the local slopes (0.9-1.5 decades of L per decade of D) is S ~ 3-30, above the band
+      (~0.5-0.8 decades).'
+    fixed: 'Model, optimizer (MuonAdamW), HETEROSC + sigma stage, checkpoint on val mu-MSE (training.heterosc_select=mu_mse),
+      batch min(16384, D/2), inputs = the parent''s (incl. D392 flags), seed 42, the frozen val/test pools, D = prefixes of
+      the target''s train pool (data.train_subsample, data.phase_space_on_pool), T(D) per target by D391 (horizons.py --ladder:
+      u u~ LO 6120, 6120, 7310, 7310, then 8500; t t~ LO 800, 1440, 7680, then 8500; u u~ V 1190, 1190, 2720, 2720, 4420,
+      then 8500; t t~ V 1360, 2380, 5950, then 8500), the same for both arms (D383); t t~ V with target_over_born and physics
+      factors off. Searched: scratch training.lr in [c/10, 10c], c = the calibration''s lr (parent law at T x D factor); fine-tune
+      lr_scale [0.1, 10] around training.lr = c, layer_decay [0.75, 1] (full retrain); the template''s other HPs, both arms.
+      Configs sweep/gen_data_saving.py @ the submitted commit.'
+    control: Scratch at the same D, T(D), inputs, base config and search budget (8 trials) is the matched control of each
+      fine-tune cell; the only difference is the parent's weights (fine_tune.pretrained_path) and the fine-tune HPs.
+    seeds: One 8-trial search per cell, seed 42 (D315); the search-to-search spread enters the band from sec:ladder (5x),
+      not re-measured.
+    outcome: 'YES (the gap holds at 1e-4 on a target): S >= 10^0.5 with its band''s lower edge > 1; NO: S''s band includes
+      1 or S < 1; NOT RESOLVED otherwise; a bound when an arm does not reach 1e-4. Then figures: per target L(D) scratch vs
+      fine-tune with fits and D* marked, and MSE vs GPU-hours; write-up in results.tex replacing the draft Fig. 22. Cost:
+      parents 2 x (~0.9 h at 0.93 s/step + load + sigma) ~ 3 GPU-h; sweeps 68 x 8 trials at T(D) x the calibration step rates
+      (0.08 s/step k<=7, 0.15 k=8, 0.40 k=9, 0.42 k=10) + 0.08 h per trial = ~208 GPU-h, covered by D392/D394. Disk: ~25 MB
+      per trial x 544 = ~14 GB on CC (read before submission).'
   step_waits:
     '3': '2026-11-12'
     '4': '2026-11-12'
