@@ -21792,10 +21792,7 @@ entries:
     '4': '2026-11-12'
     '5': step 3 (stage 2 go)
     '6': FA-ccin2p3-3fa9854a FA-ccin2p3-1a14c791 FA-ccin2p3-761cb2d8
-    '7': FA-ccin2p3-24e10202 FA-ccin2p3-513f4965 FA-ccin2p3-3cdc4e6b FA-ccin2p3-b4db8732 FA-ccin2p3-0daf91cb FA-ccin2p3-ea0f3d38
-      FA-ccin2p3-d8f5b88c FA-ccin2p3-355d4fd0 FA-ccin2p3-36bf9e0c FA-ccin2p3-62befa87 FA-ccin2p3-759a6256 FA-ccin2p3-96db1f3d
-      FA-ccin2p3-abc905a5 FA-ccin2p3-3c55247c FA-ccin2p3-bc5aff4e FA-ccin2p3-98b80658 FA-ccin2p3-8526adb8 FA-ccin2p3-a492b5c3
-      FA-ccin2p3-623ee594 FA-ccin2p3-ff94de57 FA-ccin2p3-52327ed2 FA-ccin2p3-537b5266 FA-ccin2p3-b79551c2 FA-ccin2p3-80815d00  FA-ccin2p3-94b83643
+    '7': FA-ccin2p3-94b83643 FA-ccin2p3-80815d00 FA-ccin2p3-8526adb8 FA-ccin2p3-36bf9e0c FA-ccin2p3-355d4fd0
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
