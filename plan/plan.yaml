@@ -22059,6 +22059,15 @@ entries:
       = sum of the rest and at rest, to 1e-4; none failed). Parent job scripts/job_datasaving_parent.sh @57638405: train_subsample
       1e4, 3458 steps = ceil(5 x 1133e4/16384), lr 1.88e-2 (the parent''s law at 3458), in memory, trial 1262 config; waits
       on c15b3337. horizons.py --ladder implements D391 (1.1 s_b, cap 8500, running max) with ee_uu_nlo read on V (D375).'
+  - at: '2026-11-11T04:55:36+00:00'
+    text: '2026-11-11 ~05:10 UTC decision (one correct answer, D394 no asking): two parents, not one. The single held-out
+      parent of D393 drops the LO trees too, so its one-loop fine-tunes would have no tree levels in the pretraining, against
+      the entry''s words ''the one loops with the tree levels in the pretraining'' (2026-11-10). LO targets fine-tune from
+      recipes/catalog_v4_datasaving_parent_heldout.yaml (1133 pools, 3458 steps); one-loop targets from catalog_v4_datasaving_parent_treesin.yaml
+      (the same + e+e- > u u~ and t t~ LO, 1135 pools, 3464 steps), both D393''s 1e4/pool x 5 epochs, ~1.5 GPU-h each (scripts/job_datasaving_parent.sh
+      @43e8517d). T(D) by D391 (horizons.py --ladder): u u~ LO 6120,6120,7310,7310,8500...; t t~ LO 800,1440,7680,8500...;
+      u u~ V 1190,1190,2720,2720,4420,8500...; t t~ V 1360,2380,5950,8500... Stage-2 design recorded (fit-based D*), reviewer
+      running.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
