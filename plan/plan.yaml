@@ -15787,7 +15787,7 @@ entries:
   match: zz_redesign_*
   evidence:
     runs: []
-    commit: 219a2b60
+    commit: d56fb00b
     paths:
     - .claude/hooks/notification_absorb.py
     - .claude/hooks/owner_handoff.py
@@ -15830,6 +15830,15 @@ entries:
       now [8000] per D347 uncommitted until the re-check passes. plan.user_said + _said_ok (cb0fd64a): plan ask / add --ask
       refuse until --searched names each of the user''s messages sharing >=2 rare terms (top 3); tests/test_plan_user_said.py
       tonight''s case (2026-10-23T02:12). Re-check sent to the reviewer.'
+    - '2026-11-11 D399 setup fixes on branch setup-fixes (e089e5a5, d56fb00b): plan_check counts event routing (open events
+      with no running owner refused until handed to an agent named in a SendMessage/Agent brief; a main-session ack of RUN/GAP/OVERRUN
+      with no routing refused; replay on recorded acks E4673-4, E4746-7 refuses); figure gate fires only on tables whose cells
+      open with a measured quantity (old rule 495 tables flagged over the main transcript, new 376; the 4 recorded misfires
+      14:43, 15:08, 15:09, 19:03 pass, tests/test_plan_check_table_figure.py); context guard: decisions only (six kinds);
+      hook incidents go to a mechanical-worker; site undecide verb (~/.local/bin/site, backup site.bak-20261111-setupfix,
+      CCORCH_HOME for tests); sections: event rule, ordering with drive.py and the D396 gap, pruning once, ledger verbs; claudemd-keeper
+      reads sections whole, conflict and truth checks. Step 23 cause: 0 hand-backs ever spooled (no spool dir, 0 HANDBACK
+      events in E3432-E5426), absorb.log instrumented. Keeper blocked once (14 findings), fixed in d56fb00b, re-check sent.'
     - analysis/agent_redesign/agent_tasks.json
     - analysis/agent_redesign/context_breakdown.json
     - analysis/agent_redesign/figs/context_breakdown.png
