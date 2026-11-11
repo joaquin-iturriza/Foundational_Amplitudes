@@ -23946,6 +23946,21 @@ entries:
       parent. No on tt (Coulomb or threshold not better, or bulk worse): tt keeps its A/A_ft/B models for KIT, and the tt
       limit needs a threshold-specific input (beta), reported as the next lever; the parent keeps the flags if uug/uugg gain.
       Mixed families are reported per family.'
+    fix_at: '2026-11-11T18:19:36+00:00'
+    fix: 'Checks 3 and 4 (spread and outcome): one seed is fine under D315, but then the yes/no must stand above a resolution
+      threshold, and this design''s family verdict is ''median log10(arm/control) negative with most strata better, bulk not
+      worse'' with no threshold, so a -0.05 median on one seed reads as a gain and picks the model that goes to KIT. No seed-to-seed
+      spread of the KIT readout is measured for these processes; the entry''s own earlier readouts used a 0.3-decade rule
+      (strata better/worse by >0.3 decades, e.g. the 2026-11-11 04:38 input-arm finding and the 06:01 tt finding), which the
+      combined-arm readout dropped. Fix: state the threshold in the outcome (family gain = median below -0.3 decades with
+      most strata better by >0.3; bulk ''not worse'' = not above +0.3; anything inside +-0.3 reported as unresolved, keeping
+      the A/A_ft/B models), or cite a measured run-to-run spread of kit_readout that justifies another number. Everything
+      else holds: one change (the two flags; n is the process multiplicity, set by the D392 verdict) against matched scratch
+      controls at the same script, lr 0.0118605, seed 42, HETEROSC, float64, off-shellness on; measure shown to move by 2.71/1.25/0.88
+      decades on uug (c15b3337 vs f6b2ece9, kit_fig_A_inputs.json); controls present in kit_fig_A.json/kit_fig_A_ft.json;
+      no prior on uugg/tt found; the 50-step launch rule does not apply (job_kit.sh A mode with both flags ran end to end
+      through sigma stage and KIT scoring in c15b3337; each dataset ran through the same A mode in its control; only n differs,
+      and a shape error at n=6 fails at step 0).'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
