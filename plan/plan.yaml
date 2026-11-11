@@ -23117,22 +23117,27 @@ entries:
     - FA-ccin2p3-2c922af4
     - FA-ccin2p3-366a4a98
     - FA-ccin2p3-3fa9854a
+    - FA-ccin2p3-4f3b24ef
     - FA-ccin2p3-761cb2d8
     - FA-ccin2p3-7d74d518
+    - FA-ccin2p3-84d3488e
     - FA-ccin2p3-88aa155a
     - FA-ccin2p3-ac4868da
     - FA-ccin2p3-b99b09db
     - FA-ccin2p3-c8ac36f0
     - FA-ccin2p3-de744946
     - FA-ccin2p3-f6b2ece9
-    commit: ff87b57a
+    commit: b63843c8
     paths:
     - analysis/kit_benchmark/data/kit_fig_A.json
+    - scripts/job_kit_package.sh
+    - scripts/job_kit_threshold.sh
     - tests/test_input_reps.py
     - tests/test_kit_hardps.py
     - tests/test_kit_threshold_scan.py
     - tools/kit_figures.py
     - tools/kit_hardps.py
+    - tools/kit_package.py
     - tools/kit_precision_check.py
     - tools/kit_predict.py
     - tools/kit_target_slope.py
