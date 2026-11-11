@@ -20951,8 +20951,6 @@ entries:
   - D360
   - D377
   next:
-    4: 'Readout: per target L(D) scratch vs fine-tune (best trial per cell), D*(1e-4) by log-log interpolation, saving D*_scratch/D*_ft,
-      one MSE vs GPU-hours panel; figures replacing the draft''s fig 22; write-up in docs/results.tex'
     7: 'D400 rerun (design recorded 2026-11-11 ~22:30): CPU prebuild of the 278 physical-mass top train pools (recipes/catalog_v4_datasaving_h3_train.yaml,
       job_catalog_v4_regen.sh x4 shards), D395 smoke run, parents r5 heldout (1422 pools) and treesin (1424) via job_datasaving_parent.sh;
       then the 34 fine-tune searches sweep/sweep_config_dsave_s3_ft_*.yaml through drive.py (88-103 GPU-h, waits for Joaquin''s
@@ -21035,11 +21033,6 @@ entries:
     context: 129816
     context_at: '2026-11-11T20:26:15+00:00'
   step_why:
-    4:
-      feeds: draft_rewrite's pretraining figure
-      if:
-      - 'saving >= 10^0.5 on a target: the gap holds there'
-      - 'saving < 10^0.5: not resolved or no gap, reported as such'
     7:
       feeds: S at 1e-4 per target from parents with the physical-mass tops (D400)
       if:
@@ -22292,7 +22285,6 @@ entries:
       tab:ladder_transfer_all now in prior), kit/qqg, site decisions D360-D400. HETEROSC + sigma stage; disk 52 GB free on
       /sps/lpnhe; ~8.5 GPU-h under D400.'
   step_waits:
-    '4': step 6 and the D400 rerun's fine-tune searches
     '7': FA-ccin2p3-0ca51b6f FA-ccin2p3-e538bda9 FA-ccin2p3-f996c9e8 FA-ccin2p3-bb248f6b FA-ccin2p3-58307031 FA-ccin2p3-1d03af0a
       FA-ccin2p3-a400e6d5 FA-ccin2p3-391a6e00
   findings:
