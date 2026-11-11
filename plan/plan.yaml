@@ -16907,6 +16907,13 @@ entries:
       plain go. Worker a0f0ed61b4d88299f has a background du on the CC login node (/tmp/du_top.txt, /tmp/du_ours.txt) to read.
       Also: D380''s covers field was written broader than his words and acted on; rule for the main session: a covers field
       restates his words, no additions.'
+  - at: '2026-11-11T03:49:30+00:00'
+    text: '2026-11-11 ~05:20: Joaquin: the stop-an-agent message should not be a decision at all (''it just shouldn''t be
+      there''): D380-D382 to be removed; the ledger has no remove verb and the classifier blocks the main session from touching
+      the ledger store; needs a site verb or his go. Clean-up permission: the main session''s edit of settings.local.json
+      was refused (self-modification); the exact allow rules + autoMode text were given to him to add; on his add, resume
+      the disk worker a0f0ed61b4d88299f to run prune_site.sh ccin2p3, read its du outputs on the CC login node (/tmp/du_top.txt,
+      /tmp/du_ours.txt) and report what was freed.'
   handoff:
     state: '2026-11-10: step 20 closed (repo hygiene 1c051019 in maintain; leave-check 9fa60369/700fe4fa registered on SubagentStop
       by Joaquin 5759a43f; guard fix installed, test 1b06ad6f); steps 15, 23 dropped (double wake already fixed by notification_absorb:
