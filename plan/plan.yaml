@@ -23111,6 +23111,9 @@ entries:
       against a from-scratch V/B with exact Born refit on the KIT ee_tt virtual bulk; design once FA-ccin2p3-03ea3719 ends'
     5: 'Checkpoint + inference package for KIT (Joaquin sends it): best A_ft/B checkpoints, a float64 predict script, log10|M|^2
       out; after the A_ft batch'
+    6: 'Coulomb rise, target side: tt virtual target divided by its Coulomb factor (the exact O(alpha_s) 1/beta term) on top
+      of the beta-input arm, from scratch, job_kit.sh A 1e5 8000 steps vs FA-ccin2p3-3fc1016a; design first, then KIT readout
+      --vs and the threshold scan'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -23590,6 +23593,13 @@ entries:
       if:
       - 'A_ft best: package A_ft'
       - 'B best: package B'
+    6:
+      feeds: which protocol-A tt virtual model KIT gets for the threshold, and whether the catalog parent carries a threshold
+        target factor
+      if:
+      - 'Coulomb median log10(arm/control) < -0.3, no family worse: the factor goes to the parent''s tt pools, the arm replaces
+        ttvirt_A_best_threshold'
+      - 'within +-0.3: protocol B stays the only threshold model; report the limit of protocol A'
   step_waits:
     '3': '2026-11-12'
     '5': FA-ccin2p3-6f94590d FA-ccin2p3-2d0c78fe
