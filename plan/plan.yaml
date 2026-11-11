@@ -22312,11 +22312,6 @@ entries:
       batch)'
     5: 'Checkpoint + inference package for KIT (Joaquin sends it): best A_ft/B checkpoints, a float64 predict script, log10|M|^2
       out; after the A_ft batch'
-    6: 'Input arms (D-next, Joaquin ''Try all of them''): from scratch on ee->uug 1e5, 8000 steps, one seed, against the A
-      run f6b2ece9 and the no-offshell arm c35a2199: (1) log(s_ij/s) of every pair as extra invariant scalar inputs, (2) p_i
-      -> p_i*log(1+x_i/eps)/x_i with x_i = 2 p_i.Q/s, (3) logs of LLoCa local-frame components; implement each as a config
-      flag (exact equivariance kept, a test per flag), design and review, ~1.5 GPU-h each; figures median and log-MSE per
-      bin with legends saying each arm'
     7: Read the combined input arm FA-ccin2p3-c15b3337 (soft rescale + pair logs, design passed) with kit_readout --vs against
       f6b2ece9 and the single arms, figures
     8: Read the A_ft lr_scale 0.1 check (93ccd2c4 uug, 015da743 uugg, 81a52170 tt virt off) against A_ft at 1.0 and scratch
@@ -22650,11 +22645,6 @@ entries:
       if:
       - 'A_ft best: package A_ft'
       - 'B best: package B'
-    6:
-      feeds: which input representation lets the network extrapolate into the soft and collinear limits
-      if:
-      - 'an arm follows the truth: run it on uugg and tt, then into the pretrained setup'
-      - 'none does: report with figures, next lever to Joaquin'
     7:
       feeds: the input setup of the held-out parent and scaling runs (D392)
       if:
@@ -22675,7 +22665,6 @@ entries:
       FA-ccin2p3-69d93512 FA-ccin2p3-9957b9d6 FA-ccin2p3-dcb7ecb0 FA-ccin2p3-eac27314 FA-ccin2p3-f26df51b FA-ccin2p3-fe485120
     '5': FA-ccin2p3-1416e62f FA-ccin2p3-1bd861e0 FA-ccin2p3-24d9729a FA-ccin2p3-30b7aa28 FA-ccin2p3-53dc387b FA-ccin2p3-67fadb15
       FA-ccin2p3-69d93512 FA-ccin2p3-9957b9d6 FA-ccin2p3-dcb7ecb0 FA-ccin2p3-eac27314 FA-ccin2p3-f26df51b FA-ccin2p3-fe485120
-    '6': FA-ccin2p3-3fa9854a FA-ccin2p3-1a14c791 FA-ccin2p3-761cb2d8
   handoff:
     state: 'Protocol A scratch, plain arm, off-shellness-off arms (uug band a at the edge: soft -1.51, deep 516 vs 14180;
       uugg band c: +7.8, 3670 vs 9067) and protocol B (hard events fix tt Born threshold, tt Sudakov, uugg collinear; not
