@@ -22282,6 +22282,18 @@ entries:
       --time 03:00:00; (4) stage A: 16 runs via site submit ccin2p3 FA sweep/trial_job.sh --detached --trial-idx 0 --hp-idx
       <best> --t-steps 8500 --hp k=v (the diagnostic''s path), afterok on the parent of each, --time from the config. GPU:
       0.3 + 3.4 + 16 x ~0.3 = ~8.5 GPU-h. Disk: 0.7 GB pools + parents + 16 x 15 MB against 52 GB free.'
+    passed_at: '2026-11-11T19:58:37+00:00'
+    reviewer: 'Re-check after FIX. Parents r5 = r4 recipes + 278 physical-mass top classes and nothing else (diffed against
+      43e8517d: 1411/1413 vs 1133/1135, 0 removed, 0 changed, 0 non-H3 added); parent T 4307/4313 follows D393 (5 epochs of
+      1e4 per pool, every r4 pool sees the same exposure). Stage A configs dsave_diag_tops_ft_* = the parscale configs with
+      only name, base_config and pretrained_path r4->r5 (8 of 8 diffed); control = the same-HP same-seed parent-scale reruns
+      from r4. Check 2: ft/scr 6-33x deficit in stage 2, diagnostic moved cells 0.11-4.0x, ladder rung-5 top-carrying parent
+      ~1.9x on t t~. Check 3: fixed-HP rerun spread sd ln 0.73 per cell (stage2_diag_readout.json par_over_orig 0.46-4.84),
+      ~1.3x on the 8-cell geomean, against a YES bar of 1/3 and NO at >=1/1.5; HPs tuned on r4 bias against r5, so a YES is
+      conservative. Outcomes stated for yes/no/between, stage B (34 searches, s2 DyHPO seeds now equal: 34 of 34) only after
+      A and Joaquin''s go. Check 5 searched: H3, physical top, m_t=172, heldout_H3, epem_ttx, ttbar, t\bar t, sec:ladder (tab:rung_focus_ratio,
+      tab:ladder_transfer_all now in prior), kit/qqg, site decisions D360-D400. HETEROSC + sigma stage; disk 52 GB free on
+      /sps/lpnhe; ~8.5 GPU-h under D400.'
   step_waits:
     '4': step 6 and the D400 rerun's fine-tune searches
     '6': driver dsave_s2_drive3 (pid 807322) finishing the last stage-2 scratch trials
