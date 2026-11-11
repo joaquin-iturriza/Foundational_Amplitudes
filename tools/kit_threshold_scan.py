@@ -286,15 +286,15 @@ def cmd_collect(a):
     lo_q = np.asarray(out["sigma_lo_quad"])
     amc_b = [beta[i] for i, r in enumerate(out["amc"]["nlo"]) if r]
     # alpha_s(mu)/alpha_s(M_Z) - 1 at mu = M_Z/2, 2 M_Z as MG5_aMC runs it: its band over the correction's share (K-1)/K
-    share = {i: 1 - lo_q[i] / r["sigma"] for i, r in enumerate(out["amc"]["nlo"]) if r}
+    share = {i: 1 - lo_q[i] / r["sigma"] for i, r in enumerate(out["amc"]["nlo"]) if r and "scale_up" in r}
     as_var = ([float(np.median([out["amc"]["nlo"][i]["scale_up"] / 100 / f for i, f in share.items()])),
                -float(np.median([out["amc"]["nlo"][i]["scale_dn"] / 100 / f for i, f in share.items()]))]
               if share else None)
     out["alpha_s_var"] = as_var
     kf, kup, kdn = nlo_analytic(sq, as_var)
     out["analytic_check"] = [{"beta": float(beta[i]), "ratio": float(kf[i] * lo_q[i] / r["sigma"] - 1),
-                              "mc_err": r["err"] / r["sigma"], "scale_up": [float(kup[i]), r["scale_up"]],
-                              "scale_dn": [float(kdn[i]), r["scale_dn"]]} for i, r in enumerate(out["amc"]["nlo"]) if r]
+                              "mc_err": r["err"] / r["sigma"], "scale_up": [float(kup[i]), r.get("scale_up")],
+                              "scale_dn": [float(kdn[i]), r.get("scale_dn")]} for i, r in enumerate(out["amc"]["nlo"]) if r]
     for c in out["analytic_check"]:
         print("CLAIM " + json.dumps({"analytic_vs_mg5_aMC": c}))
     for i in range(len(sq)):
