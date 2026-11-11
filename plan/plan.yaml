@@ -21028,6 +21028,18 @@ entries:
     - 6
     answered_at: '2026-11-11T02:56:42.893000+00:00'
     decision: D377
+  - ask: 'GPU budget: about 60 GPU-h (estimated from the s3 configs) above 30 with no decision covering it. Stage A of the
+      D400 fix reads NO by its pre-set pooled rule (r5/r4 geomean 0.68, 4 of 8 cells below), so the design does not propose
+      stage B; per target, t t~ LO gains 0.30x, 0.09x, 0.06x at D=1e3..1e4 (fine-tune now 0.77x, 0.75x of scratch from D=3162)
+      and t t~ V loses (1.9x geomean). Run stage B''s 18 tree fine-tune searches from the r5 held-out parent (scratch reused)
+      to re-read S on u u~ and t t~ LO, the one-loop cells going to the next suspects instead?'
+    at: '2026-11-11T23:49:57+00:00'
+    searched: 'site decisions --project FA (D392, D396, D400: D400 approves the fix, not stage B''s cost), plan entry pretrain_data_saving
+      (design and its outcome rule), docs/results.tex sec:datasaving, sec:ladder; Joaquin''s messages 2026-10-05T02:23 (wording
+      of transfer claims), 2026-10-08T19:02 (gluons, synthetic generator), 2026-10-22T20:23 (sigma stage wording): none is
+      about this stage B or its cost'
+    blocks_steps: &id003
+    - 7
   owner:
     agent: a57bc60fe641a25e9
     state: working
@@ -22889,6 +22901,17 @@ entries:
       analysis/data_saving/diag_readout.py, analysis/data_saving/data/stage2_diag_readout.json, analysis/data_saving/figs/stage2_diag.png,
       worktrees/wt-sweep-order (D396 WIP)
     written: '2026-11-11T20:04:53+00:00'
+  ask: 'GPU budget: about 60 GPU-h (estimated from the s3 configs) above 30 with no decision covering it. Stage A of the D400
+    fix reads NO by its pre-set pooled rule (r5/r4 geomean 0.68, 4 of 8 cells below), so the design does not propose stage
+    B; per target, t t~ LO gains 0.30x, 0.09x, 0.06x at D=1e3..1e4 (fine-tune now 0.77x, 0.75x of scratch from D=3162) and
+    t t~ V loses (1.9x geomean). Run stage B''s 18 tree fine-tune searches from the r5 held-out parent (scratch reused) to
+    re-read S on u u~ and t t~ LO, the one-loop cells going to the next suspects instead?'
+  waiting_since: '2026-11-11T23:49:57+00:00'
+  searched: 'site decisions --project FA (D392, D396, D400: D400 approves the fix, not stage B''s cost), plan entry pretrain_data_saving
+    (design and its outcome rule), docs/results.tex sec:datasaving, sec:ladder; Joaquin''s messages 2026-10-05T02:23 (wording
+    of transfer claims), 2026-10-08T19:02 (gluons, synthetic generator), 2026-10-22T20:23 (sigma stage wording): none is about
+    this stage B or its cost'
+  blocks_steps: *id003
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
@@ -23196,7 +23219,7 @@ entries:
     searched: site decisions --project FA; Joaquin 2026-11-10T02:08 (the KIT request; its decisions D353 'if we need to run
       new things, that's fine too' and D363 approve the work, name no cost); 2026-10-14T16:48 (benchmark framing with Anja,
       no cost); 2026-10-05T04:33 (process equality, unrelated)
-    blocks_steps: &id003
+    blocks_steps: &id004
     - 3
   owner:
     agent: a0a9411af0a5c385b
@@ -24890,7 +24913,7 @@ entries:
   searched: site decisions --project FA; Joaquin 2026-11-10T02:08 (the KIT request; its decisions D353 'if we need to run
     new things, that's fine too' and D363 approve the work, name no cost); 2026-10-14T16:48 (benchmark framing with Anja,
     no cost); 2026-10-05T04:33 (process equality, unrelated)
-  blocks_steps: *id003
+  blocks_steps: *id004
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
@@ -25273,7 +25296,7 @@ entries:
       about cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID,
       says nothing about the draft's sections)
     blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-    blocks_steps: &id004 []
+    blocks_steps: &id005 []
   owner:
     agent: afb073b8fc9460ec5
     state: stopped
@@ -25291,7 +25314,7 @@ entries:
     cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID, says
     nothing about the draft's sections)
   blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-  blocks_steps: *id004
+  blocks_steps: *id005
   step_why:
     1:
       feeds: the draft's results (D354)
