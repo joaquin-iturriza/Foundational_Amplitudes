@@ -276,6 +276,10 @@ def submit_logs(sweep, apply):
     return freed
 
 
+# generated catalog pools (hours of MadEvent each): never pruned
+POOL_PREFIXES = ("v4_", "pp13v4_", "pp13_", "dsh_", "ee4_")
+
+
 def caches(days, apply):
     freed = 0
     pip = os.path.join(siteconf.SCRATCH, "pip-cache")
@@ -286,7 +290,7 @@ def caches(days, apply):
             shutil.rmtree(pip, ignore_errors=True)
     cut = time.time() - 86400 * days
     for f in glob.glob(os.path.join(siteconf.SCRATCH, "amp_data_cache", "**", "*"), recursive=True):
-        if os.path.isfile(f) and max(os.path.getmtime(f), os.path.getatime(f)) < cut:
+        if os.path.isfile(f) and not os.path.basename(f).startswith(POOL_PREFIXES) and max(os.path.getmtime(f), os.path.getatime(f)) < cut:
             freed += _size(f)
             if apply:
                 os.remove(f)
