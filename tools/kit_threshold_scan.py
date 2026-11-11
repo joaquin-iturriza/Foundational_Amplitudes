@@ -72,9 +72,7 @@ def madloop():
                                "m_finals": [MT, MT], "model": "loop_sm",
                                "param_card_patches": {"MT": MT, "ymt": MT}}
     sa = NV.build_virt_standalone(PROC)
-    cwd = os.getcwd()
-    full = ML.load(NV.find_p0(sa))
-    os.chdir(cwd)
+    full = ML.load(NV.find_p0(sa))   # stays in the P0 dir: MadLoop finds its resources from the cwd at each call
 
     def evaluate(mom):
         rs = [ML.evaluate(full, m, alphas=ALPHA_S) for m in mom]
@@ -89,6 +87,7 @@ def kit_file():
 
 def cmd_build(a):
     import h5py
+    a.dir = os.path.abspath(a.dir)
     ev = madloop()
     os.makedirs(a.dir, exist_ok=True)
     check = {}
