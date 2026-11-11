@@ -22419,6 +22419,7 @@ entries:
     '3': FA-ccin2p3-03ea3719
     '4': FA-ccin2p3-78b8190c
     '5': FA-ccin2p3-78b8190c
+    '6': inputarms_dry (detached CC CPU dry run of the three flags), then submit the 3 arms (design passed)
   handoff:
     state: 'Protocol A scratch, plain arm, off-shellness-off arms (uug band a at the edge: soft -1.51, deep 516 vs 14180;
       uugg band c: +7.8, 3670 vs 9067) and protocol B (hard events fix tt Born threshold, tt Sudakov, uugg collinear; not
