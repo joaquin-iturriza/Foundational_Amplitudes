@@ -22188,6 +22188,21 @@ entries:
       --parent-lo <heldout parent> --parent-nlo <treesin parent>, lr [c/3,3c], waves 3,3,2, ~208 GPU-h (item estimate 215,
       D392/D394). Repo-reviewer backlog passed (96cfb862). Order now: cal_f22''s last cells (80815d00, 8526adb8, 36bf9e0c)
       -> final T(D) + figure; c15b3337 -> parent flags -> both parents -> 68 sweeps.'
+  - at: '2026-11-11T05:18:27+00:00'
+    text: '2026-11-11 ~06:20 UTC, the three not-checked items. (1) RAM: in-memory parent load estimated from the 2026-11-01
+      profile (221 B per particle at the peak, 145 steady): ~1.18e7 events x ~5.6 particles = 6.6e7 particles -> ~15 GB peak,
+      ~10 GB steady, inside the 32G request (2.2x); measured analogue: in-memory short arms 10.4-11.1 GB MaxRSS. (2) Dry run
+      (CC login, CPU, run_trial.py --detached on a generated stage-2 ft config, trial 1262 as stand-in base): u u~ V passes
+      config resolution, recipe load, frozen stats and the pretrained-weight load, then stops at the first forward because
+      xformers has no CPU kernel (the GPU path the calibration runs use). It found a real gap: the parents'' recipes and e+e-
+      > t t~ LO''s recipe are not cached (230 pools of the parent recipes without a default share, e.g. the v4_*__mt mass
+      variants, pruned from amp_data_cache; v4_epem_ttx train). Fix: CPU prebuilds FA-ccin2p3-4782624f (parent_treesin, a
+      superset of heldout) and a46978e2 (epem_ttx), 32 CPUs, 4 h limit. It also found lr centres too high at short horizons
+      (the parent law''s t^-0.55 used below t*=3000), fixed per HPO rule 2 at 0a8a5374. (3) Step rates of the input flags,
+      uug 1e5 V100, s/step at 1000 steps: control f6b2ece9 0.686, soft rescale 1a14c791 0.686, pair logs 3fa9854a 0.690, combined
+      c15b3337 0.690 (0.690 at 1779): under 1%, so the sweep wall limits from the calibration rates stand. Final calibration
+      (all 25 cells + the half-lr rerun): T(D) unchanged; the k=9,10 cells'' minima all sit at the 8500-step cap; u u~ V at
+      D=3.2e4 reached 2.2e-3 at fixed lr against 9.4e-6 at 1e4, which is calibration noise for the searched runs.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
