@@ -22481,6 +22481,14 @@ entries:
       acks by the supervisor, plan wait batching, and a one-command site ack; only diverged trials were misfiled (fixed today
       in site_runends.py). Provisional stage-2 readout sent to him with figs/stage2_LD.png: S(test) u u~ LO 3.5 [2.6,4.4],
       t t~ LO 0.43 [0.36,1.07], u u~ V 3.1 [2.2,5.0], t t~ V 0.90 [0.37,inf]; final readout after driver dsave_s2_drive3 ends.'
+  - at: '2026-11-11T19:00:41+00:00'
+    text: '2026-11-11 ~20:25, open with Joaquin: (1) t t~ results are wrong per Joaquin; owner ad22b7980a1852494 sent 5 checks
+      (parent frozen stats without tops, the a08fef9d target-check bypass for t t~ V, the test readout and its one-event dominance,
+      the lr_scale window, the parent itself), with a figure; nothing written up until resolved. (2) Joaquin asks what to
+      change structurally so the main session stops going around rules; an Explore agent (a82706e3c18cbbbf3) audits the main-session
+      transcript since 2026-11-10 22:00 for deviations, with rule, context and trigger class, counts and 3 structural causes;
+      bring him the counts and causes, then decide the setup change with him. Hypothesis on the table: the main session''s
+      low reasoning effort.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
