@@ -20942,8 +20942,6 @@ entries:
       runs (8-trial single-fidelity DyHPO scratch + fine-tune per target and D, steps per D from the ladder-rule calibration,
       D391) on e+e- > u u~ and t t~, LO and one-loop V. The parent must hold all four out: neither trial 1262 nor the kit
       held-out parent does (v4_epem_ccx and v4_epem_ccx_nlo, in ee_uu''s equality class, and v4_zp_ee_uu are in both)'
-    7: 'E4745: read FA-lxplus-c624b304''s log (print-only prune.py --caches @64a19d72 with d00c1859) and check that no listed
-      file starts v4_, pp13v4_, pp13_, dsh_ or ee4_'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -21041,12 +21039,6 @@ entries:
         if the inputs change, then the searched runs'
       - 'no option gains: pretrain a parent holding all four out on the current inputs (or confirm one), then the searched
         runs'
-    7:
-      feeds: whether the CC/lxplus cache prune can run without deleting the catalog pools this entry's parents and sweeps
-        read
-      if:
-      - 'no catalog pool listed: report the fix holds to the coordinator'
-      - 'a catalog pool listed: fix prune.py''s keep rule, rerun the dry run, tell the coordinator before any --apply'
   designs:
   - at: '2026-11-10T02:35:09+00:00'
     question: 'Step 1 (D356 horizons, tree arm): on catalog_v4''s held-out tree targets ee->ttbar (H3, 2->2 massive), ee->ccbar
@@ -21954,7 +21946,6 @@ entries:
     '4': '2026-11-12'
     '5': step 3 (stage 2 go)
     '6': FA-ccin2p3-5e748c7d FA-ccin2p3-65fd2089
-    '7': FA-lxplus-ac2bbf42
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
