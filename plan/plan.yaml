@@ -22623,6 +22623,14 @@ entries:
       checkpoints into <run>/models and links sigma_stage/models to it; on CC runs/data_saving/dsave_parent_heldout_r4/models
       holds only model_run0.pt.gz and model_run0_best.pt.gz written 12:51 (after the sigma stage), sigma_stage/models -> ../models.
       The fine-tunes loaded the final model; there is one model per run. Never write ''before the sigma fit'' in the readout.'
+  - at: '2026-11-11T19:47:52+00:00'
+    text: '2026-11-11 ~21:50 step 7 read (diag_readout.py @fdcfec3d, fig analysis/data_saving/figs/stage2_diag.png): t t~
+      off-shellness diagnostic, 16 runs complete. Val mu-MSE own-scale / parent-scale rerun per cell D=316,1e3,3162,1e4: t
+      t~ LO 2.33, 2.30, 4.02, 0.72; t t~ V 0.25, 0.45, 0.11, 3.48. 4 of 8 below, geometric mean 0.95: NO by the design''s
+      rule (off-shellness scale ruled out as the cause of the t t~ deficit). By target: LO geomean 1.98 (own worse), V 0.45
+      (own better; test MSE(V/B) 6x, 7x, 11x, 1.5x better). Rerun spread parent-scale rerun / stage-2 best 0.46-4.84 (1.00
+      at D=316 both targets). The fit-on-target fix of _resolve_offshell_stats is not made: it moves the two targets in opposite
+      directions within the rerun spread.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
