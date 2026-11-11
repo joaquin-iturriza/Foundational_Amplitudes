@@ -9373,6 +9373,124 @@ logs that save, not the pre-resolution one, to MLflow), so a current run dir and
 both record the processes and coupling orders the run actually resolved to.
 \end{principle}
 
+\subsection{How much target data pretraining saves on the current setup}\label{sec:datasaving}
+
+The question (D355, D356, D360): at a fixed precision MSE$=10^{-4}$, by what factor does a fine-tune from a catalog
+parent need fewer target events than training from scratch, for held-out trees ($e^+e^-\to u\bar u$,
+$e^+e^-\to t\bar t$) and for their one-loop virtuals $V$ with the trees in the pretraining? Design: per target and
+$D=10^{k/2}$ target events, one 8-trial single-fidelity DyHPO search per arm (scratch, fine-tune), the best trial by
+validation, read on the test pool with its final model (the mean at the best checkpoint, then the sigma fit [D276]):
+MSE$(\ln|\mathcal M|^2)$ for the trees, MSE$(V/B)$ for the one loops. The fine-tunes start from parents cut from
+the catalog recipe of trial 1262 (\S\ref{sec:catalog}), all four targets held out for the tree fine-tunes, the two
+trees in for the one-loop ones. $D^*$ is read from a joint fit of $\log L$ against $\log D$ per target with one
+exponent shared by the arms (\code{analysis/data_saving/dstar\_fit.py}); the saving is
+$S=D^*_{\rm scratch}/D^*_{\rm fine\text{-}tune}$, its band the 16--84\% range of a bootstrap over cells. On
+$e^+e^-\to u\bar u$, $V$ scratch does not go below $1.1\times10^{-4}$, so $S$ is read there (the lowest level both
+arms reach, D373).
+% src: python3 analysis/data_saving/stage2_readout.py @5555a0f0
+% claim: test.ee_uu_nlo.level=1.1e-4
+% allow: 10^{-4} because it is the design's level, a setting
+% allow: 8 16 84 because they are the trials per search and the band's quantiles, settings
+% allow: 1262 because it is a trial's name
+% allow: 2 10 because they are an exponent and the grid's base and divisor, no result
+
+Table~\ref{tab:datasaving} gives $S$ over all 68 searches: the gap holds on $e^+e^-\to u\bar u$ (the design's bar
+is $S\ge10^{0.5}$) and, on the test measure, on its one loop; on $e^+e^-\to t\bar t$, tree and one loop, the fine-tune
+needs \emph{more} data than scratch (Fig.~\ref{fig:datasaving_LD}). The validation read, in $\ln$ units, agrees
+except on $e^+e^-\to u\bar u$, $V$, whose test read rests on the scratch plateau near $10^{-4}$ where a single test
+event carries most of the MSE. The $t\bar t$ deficit is under test (D400): the catalog holds out every class with a
+top at its physical mass (axis H3), so neither parent has one; parents with those classes added are being trained.
+% src: python3 analysis/data_saving/stage2_readout.py @5555a0f0
+% claim: n_searches=68
+% allow: 0.5 because it is the design's bar's exponent, a setting
+% allow: 10^{-4} because it is the design's level, a setting
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcc}
+\toprule
+target & $S$ on test [band] & $S$ on validation [band] \\
+\midrule
+$e^+e^-\to u\bar u$ & 3.8 [2.7, 4.8] & 3.5 [2.5, 4.4] \\
+$e^+e^-\to t\bar t$ & 0.46 [0.37, 1.09] & 0.53 [0.41, 0.72] \\
+$e^+e^-\to u\bar u$, $V$ & 8.3 [3.2, $\infty$] & 2.7 [2.0, 3.9] \\
+$e^+e^-\to t\bar t$, $V$ & 0.45 [0.26, 0.58] & 0.41 [0.33, 0.61] \\
+\bottomrule
+\end{tabular}
+\caption{Target-data saving $S=D^*_{\rm scratch}/D^*_{\rm fine\text{-}tune}$ at MSE$=10^{-4}$ ($e^+e^-\to u\bar
+u$, $V$: at the lowest level both arms reach), from the joint shared-exponent fit over the best trial of each 8-trial
+search. Test: MSE$(\ln|\mathcal M|^2)$ (trees), MSE$(V/B)$ (one loops); validation: the selection measure in $\ln$
+units. $S<1$: the fine-tune needs more data than scratch.}
+\label{tab:datasaving}
+% src: python3 analysis/data_saving/stage2_readout.py @5555a0f0
+% claim: test.ee_uu.S=3.8
+% claim: test.ee_uu.lo=2.7
+% claim: test.ee_uu.hi=4.8
+% claim: val_ln.ee_uu.S=3.5
+% claim: val_ln.ee_uu.lo=2.5
+% claim: val_ln.ee_uu.hi=4.4
+% claim: test.epem_ttx.S=0.46
+% claim: test.epem_ttx.lo=0.37
+% claim: test.epem_ttx.hi=1.09
+% claim: val_ln.epem_ttx.S=0.53
+% claim: val_ln.epem_ttx.lo=0.41
+% claim: val_ln.epem_ttx.hi=0.72
+% claim: test.ee_uu_nlo.S=8.3
+% claim: test.ee_uu_nlo.lo=3.2
+% claim: val_ln.ee_uu_nlo.S=2.7
+% claim: val_ln.ee_uu_nlo.lo=2.0
+% claim: val_ln.ee_uu_nlo.hi=3.9
+% claim: test.ee_ttbar_nlo.S=0.45
+% claim: test.ee_ttbar_nlo.lo=0.26
+% claim: test.ee_ttbar_nlo.hi=0.58
+% claim: val_ln.ee_ttbar_nlo.S=0.41
+% claim: val_ln.ee_ttbar_nlo.lo=0.33
+% claim: val_ln.ee_ttbar_nlo.hi=0.61
+% allow: 10^{-4} because it is the design's level, a setting
+% allow: 8 because it is the trials per search, a setting
+% allow: 1 because it is the ratio's threshold, no result
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{../analysis/data_saving/figs/stage2_LD.pdf}
+  \caption{\textbf{Target data against precision, scratch and fine-tune.} Per target, the test MSE of the best trial
+  of each 8-trial DyHPO search against the target events $D$ (circles: scratch; squares: fine-tune from the catalog
+  parent with the targets held out, trees, or with the trees in, one loops), the joint fit with one exponent per
+  target (dashed), $D^*$ where the fit crosses the level (triangles) and the level $10^{-4}$ (dotted). Trees:
+  MSE$(\ln|\mathcal M|^2)$; one loops: MSE$(V/B)$. Final models (the mean at the best checkpoint, then the sigma fit).}
+  \label{fig:datasaving_LD}
+% allow: 10^{-4} because it is the design's level, a setting
+% allow: 8 2 because they are the trials per search and an exponent, no result
+\end{figure}
+
+Off-shellness inputs on $t\bar t$: the fine-tunes take the parent's scale for the off-shellness column of the $Z$,
+hundreds of times wider than the column's spread on $t\bar t$. Eight fine-tunes with the column fitted on the target
+(own scale), at the stage-2 best trials' HPs and seed, against same-HP reruns on the parent's scale, at
+$D=10^{2.5}$--$10^4$: the design's rule, pooling $t\bar t$ and $t\bar t$, $V$, read no. Read per target, the
+validation own/parent ratio has a geometric mean 1.98 on $t\bar t$ (own worse, 1 of 4 cells below 1) and 0.45 on
+$t\bar t$, $V$ (3 of 4 below); on the test measure 1.72 (0 of 4) and 0.19 (4 of 4), against a same-HP rerun spread of
+0.46--4.84 (validation) and 0.78--6.96 (test). So the own scale helps the one loop beyond that spread on test and
+hurts the tree; the one-loop fine-tunes take it from the next searches on (\code{fine\_tune.offshell\_stats=own}), the
+tree fine-tunes keep the parent's scale.
+% src: python3 analysis/data_saving/diag_readout.py @5555a0f0
+% claim: by_target.epem_ttx.val.gmean=1.98
+% claim: by_target.epem_ttx.val.n_below=1
+% claim: by_target.ee_ttbar_nlo.val.gmean=0.45
+% claim: by_target.ee_ttbar_nlo.val.n_below=3
+% claim: by_target.epem_ttx.test.gmean=1.72
+% claim: by_target.epem_ttx.test.n_below=0
+% claim: by_target.ee_ttbar_nlo.test.gmean=0.19
+% claim: by_target.ee_ttbar_nlo.test.n_below=4
+% claim: par_over_orig_range.0=0.46
+% claim: par_over_orig_range.1=4.84
+% claim: test_par_over_orig_range.0=0.78
+% claim: test_par_over_orig_range.1=6.96
+% allow: 4 because it is the number of cells per target, a design count
+% allow: 10^{2.5} 10^4 because they are the grid's ends, settings
+% allow: 1 because it is the ratio's threshold
+% allow: 2 because it is the stage's name, no result
+
 % ==========================================================================
 \section{Architecture and encoding ablations}\label{sec:arch}
 % ==========================================================================
