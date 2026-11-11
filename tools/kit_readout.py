@@ -47,5 +47,31 @@ def main(path):
                   + "; ".join(cells) + (" | exp " + "; ".join(exps) if exps else ""))
 
 
+def versus(path, ref):
+    """Every stratum against the run `ref` (D376: bulk and every bin, not only the deepest): per arm and family,
+    log10(arm log-MSE / ref log-MSE) per stratum (negative = arm better), its median, and how many strata are better
+    or worse by more than 0.3 decades."""
+    import numpy as np
+    d = json.load(open(path))
+    R = d["runs"][ref]["strata"]
+    for name, r in sorted(d["runs"].items()):
+        if name == ref:
+            continue
+        fams = {}
+        for k, v in r["strata"].items():
+            if k in R:
+                fam = "bulk" if k.startswith("bulk_test/") else family(k.split("/")[1])
+                fams.setdefault(fam, []).append(np.log10(v["logmse"] / R[k]["logmse"]))
+        print(f"== {name} vs {ref}")
+        for fam, x in sorted(fams.items()):
+            x = np.array(x)
+            print(f"  {fam:14s} n={len(x):2d} median {np.median(x):+.2f} [{x.min():+.2f}, {x.max():+.2f}] "
+                  f"better>0.3: {(x < -0.3).sum()} worse>0.3: {(x > 0.3).sum()}")
+
+
 if __name__ == "__main__":
-    main(sys.argv[1])
+    # python tools/kit_readout.py <json> [--vs <run name>]
+    if "--vs" in sys.argv:
+        versus(sys.argv[1], sys.argv[sys.argv.index("--vs") + 1])
+    else:
+        main(sys.argv[1])
