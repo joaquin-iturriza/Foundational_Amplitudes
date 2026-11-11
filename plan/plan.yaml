@@ -21939,6 +21939,71 @@ entries:
       HETEROSC, D392 inputs, trees held out with their equality classes, one-loops with the trees in (D360), the MSE(V/B)
       readout (D371). Check 5 terms: search-to-search, spread, horizontal, data sav, fine-tune/scratch, sec:transfer, sec:ladder,
       vob; the entry''s dead end and findings; site decisions D315, D353-D394.'
+  - at: '2026-11-11T12:10:07+00:00'
+    question: 'Stage 2 of the Fig. 22 data-saving study (D385-D387, D392-D394), revised after the reviewer''s FIX: per target,
+      how much target data does pretraining save, S = D*_scratch / D*_ft at MSE = 1e-4 (D373: at another level where 1e-4
+      is out of reach), read from a joint fit of both arms'' L(D) (each cell the best of an 8-trial single-fidelity DyHPO)?
+      Targets: e+e- > u u~ and t t~ LO (held out of their parent with their equality classes), and their one-loop V (u u~
+      V trained on V, D375; t t~ V on V/B), whose parent holds the one-loops out but has the two LO trees in (the entry''s
+      ''the one loops with the tree levels in the pretraining''). Jobs: two parents (scripts/job_datasaving_parent.sh heldout:
+      1133 pools; treesin: + e+e- > u u~, t t~ LO), 1e4 events per pool, 5 epochs (3458/3464 steps, batch 16384, D393), D392
+      inputs (input_soft_eps=1e-8; input_pair_logs=6 only if the combined arm FA-ccin2p3-c15b3337 keeps both gains); then
+      68 sweeps (sweep/gen_data_saving.py): 4 targets x D = 10^(k/2) (LO k=2..10, V k=2..9) x {scratch, fine-tune} x 8 trials.'
+    prior: 'sec:ladder (results.tex ~13755): searched fine-tune vs scratch in D on an older setup: e+e- > d d~ 1.8-19x lower
+      MSE (geometric mean 5.3), one-loop d d~ and b b~ means 3.3 and 2.7, e+e- > t t~ 0.96 (no gain); converted with this
+      calibration''s slopes alpha (1.4-2.6) that is S = gain^(1/alpha) ~ 1.5-2.2, and ~1 for t t~ LO; search-to-search spread
+      5x. Draft Fig. 22 (sec:transfer ~9260): fine-tuned one-loop u u~ and t t~ V 1-2 orders below scratch at matched compute,
+      same exponent; compute, other parents, cells selected on test, so not a D prior. Dead end on this entry: the bracketing-point
+      D* (FIXed twice). Calibration cal_f22 + cal2 (horizons.py --ladder): scratch best val MSE at fixed lr per target, u
+      u~ LO 2.0 (D=10) to 4.4e-7 (1e4), u u~ V 0.48 to 9.4e-6, t t~ V 1.6e-3 to 1.1e-8 (3162), t t~ LO 2.9e-3 to 3.7e-9 (1e5).
+      par:vob_now: searched u u~ V at D=5e4 over 3 seeds 3.3e-7..3.1e-6. Decisions D244, D276, D315, D371, D373, D383, D390-D394.
+      Searched results.tex (search-to-search, spread, horizontal, data sav, fine-tune/scratch, sec:transfer, sec:ladder, vob),
+      the entry, site decisions D353-D394.'
+    measure: 'Per cell (target, D, arm): the best trial''s validation mu-MSE at its best checkpoint in the trained target''s
+      unit (DyHPO''s objective); for the one-loop targets the readout is the common measure of D371, the test MSE of V/B (analysis/data_saving/vb_test_mse.py,
+      the same tool for both V targets: u u~ V''s prediction divided by the exact Born), with ln|V| beside it; LO targets
+      test MSE(ln|M|^2). Per target: joint fit (analysis/data_saving/dstar_fit.py) of L_arm(D) = A_arm D^-alpha + L_inf,arm,
+      weighted in log10 L, one alpha shared by the arms (D373, draft Fig. 22: same exponent); D*_arm solves the fit = 1e-4;
+      S = D*_scr/D*_ft, beside it S_A = (A_scr/A_ft)^(1/alpha); band = bootstrap over cells (each arm''s cells resampled,
+      refit, 500 times), the 16-84% range of log10 S, from the fit alone (the search spread is inside each cell''s residual,
+      not added again). Separate per-arm exponents reported beside as the check of the shared one.'
+    check: 'On the scratch calibration (dstar_fit.py --calib @ the committed tool, data/dstar_calib.json, 7-9 cells, fixed
+      lr, noisier than searched bests): fitted alpha 2.20 / 1.41 / 1.53 / 2.57 (u u~ LO / t t~ LO / u u~ V / t t~ V), rms
+      0.42 / 0.41 / 0.64 / 0.78 decades, log10 D*(1e-4) = 3.22 / 2.05 / 3.89 / 1.61 with bootstrap half-widths 0.12 / 0.10
+      / 0.31 / 0.12 decades, so a saving''s band (two arms, x sqrt2) is 0.15 / 0.15 / 0.43 / 0.17 decades, under 0.5 everywhere.
+      Expected effect from sec:ladder''s in-D gains: log10 S ~ 0.15-0.35 (S ~ 1.4-2.2) on u u~ LO and the one-loops, ~0 on
+      t t~ LO; so the gap is resolved (band above 0) where S >~ 1.5 on u u~ LO and t t~ V, marginal on u u~ V, and t t~ LO
+      may read no gap, as the ladder''s t t~ did.'
+    fixed: 'Model, optimizer (MuonAdamW), HETEROSC + sigma stage, checkpoint on val mu-MSE, batch min(16384, D/2), inputs
+      = the parent''s (D392 flags), seed 42, frozen val/test pools, D = prefixes of the target''s train pool (train_subsample,
+      phase_space_on_pool), T(D) by D391 (horizons.py --ladder: u u~ LO 6120, 6120, 7310, 7310, then 8500; t t~ LO 800, 1440,
+      7680, then 8500; u u~ V 1190, 1190, 2720, 2720, 4420, then 8500; t t~ V 1360, 2380, 5950, then 8500), both arms the
+      same (D383); t t~ V with target_over_born, physics factors off. Searched: scratch training.lr in [c/3, 3c] (HPO rule
+      2), c = the calibration''s lr law (the parent''s law at T times the D factor, scripts/job_data_saving.sh) with HPO rule
+      2''s inverted U below t* = 3000 steps: c = law(max(T, 3000)) x min(1, T/3000)^0.5 (amended 2026-11-11 13:20, gen_data_saving.py
+      @0a8a5374: the law''s t^-0.55 branch extrapolated below t* rises where rule 2 says lr* falls; lowers c in 7 of 34 cells:
+      t t~ LO D=10, 32; u u~ V D=10..316; t t~ V D=10, 32, by up to 2.6x; the calibration lr stays inside or near the window''s
+      top, e.g. t t~ LO D=10 calibration 2.45e-2 against window [2.0e-3, 1.8e-2]); t t~ V at D=1e4, whose calibration blew
+      up at c (step 1360) and whose T(D) and rate come from the half-lr rerun, centres on c/2, the lr it trained at; fine-tune
+      training.lr = c with lr_scale [0.1, 10], layer_decay [0.75, 1], full retrain from the parent''s final model (models/model_run0_best.pt
+      after its sigma stage, D276); the template''s other HPs both arms. Layout D244: dyhpo waves [3, 3, 2] (3 start-up trials,
+      then 2 sequential batches) via sweep/drive.py. Configs sweep/gen_data_saving.py at the submitted commit, parents given
+      as ${PROJECT_DIR}/runs/data_saving/dsave_parent_{heldout,treesin}_r4 (FA-ccin2p3-e8425579, 938b05ab: both ended clean
+      with the sigma stage, 0 non-finite steps, lr 9.25e-3/9.24e-3), trials on CC only (the parents live there).'
+    control: Scratch at the same D, T(D), inputs, base config and 8-trial search is the matched control of each fine-tune
+      cell; only the parent's weights and the fine-tune HPs differ.
+    seeds: One 8-trial search per cell, seed 42 (D315); the search spread is inside the fit residual and so inside the bootstrap
+      band.
+    outcome: 'Per target S with its 16-84% band: gap holds (YES) when the band''s lower edge is above S = 1; no gap (NO) when
+      the band includes 1 or S < 1, reported with the band; an arm that does not reach 1e-4 is read at the lowest level both
+      reach (D373), said so. Figures: per target L(D) scratch vs fine-tune with the joint fit and D* marked, MSE vs GPU-hours;
+      write-up in results.tex replacing draft Fig. 22. Cost: parents ~2 x 1.5 GPU-h; sweeps 68 x 8 trials at T(D) x the calibration
+      rates + 0.08 h per trial = ~208 GPU-h (D392/D394 cover it; item estimate 215). Timing: each sweep is 3 waves of its
+      trial time (<= ~1.1 h at k=10, ~0.3 h at k<=7), so ~3.5 h per sweep once running; all 68 at the width site pick offers
+      at submission (read then, with the finish time recorded by plan target), aimed to be done or running when Joaquin wakes
+      (D394). Disk ~14 GB of 103 GB free on CC. Not in this design: optimizations_recap''s AdamW-parent fine-tune arm (D364,
+      finding 2026-11-10T03:35): it would add one 8-trial fine-tune sweep per cell, 34 sweeps ~104 GPU-h, plus two AdamW parents
+      ~3 GPU-h, scratch cells shared; still applicable on the new targets, left to that entry.'
   step_waits:
     '3': '2026-11-12'
     '4': '2026-11-12'
