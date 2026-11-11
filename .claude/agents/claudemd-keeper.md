@@ -25,14 +25,14 @@ Reference lives in the sections, provenance in the decision ledger (`site decisi
 First action, before reading anything: `bash .claude/hooks/review_backlog.sh begin claudemd-keeper`. A blocking verdict
 leaves the lock held so its fixes can be applied; only a pass releases it.
 
-Then, in two calls:
+Then:
 
-    cat CLAUDE.md ../CLAUDE.md .claude/context/*.txt ~/.claude/context/*.txt
+    cat CLAUDE.md ~/work/CLAUDE.md .claude/context/*.txt ~/.claude/context/*.txt
     git diff --name-only <watermark> HEAD          # code changed since the last pass: the sections it may have staled
-    python3 tools/claudemd_check.py --list --baseline .claude/claudemd_baseline.json
+    python3 tools/claudemd_check.py --list --baseline .claude/claudemd_baseline.json CLAUDE.md ~/work/CLAUDE.md
     .venv-cpu/bin/python -m pytest -q tests/test_compact_worker_sync.py   # compact-worker's rule copy; a failure blocks until it is synced
 
-Read both files and every section whole every time, old text as much as new: the user-level files (`../CLAUDE.md`,
+Read both files and every section whole every time, old text as much as new: the user-level files (`~/work/CLAUDE.md`,
 `~/.claude/context/`) are in no repository, so no diff ever shows their changes, and a code change stales a section
 without touching it. Use the backlog diff (`git diff <watermark> -- CLAUDE.md .claude/context`) only to say which
 findings are new.

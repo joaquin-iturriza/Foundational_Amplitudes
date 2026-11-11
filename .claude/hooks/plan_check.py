@@ -59,15 +59,22 @@ def own_questions(text):
 def route_events(refuse, routed):
     """(refusals, notes) of the open events no running entry's owner covers (D399 (1)): one handed to an agent this
     turn (`routed`, ids named in a SendMessage or Agent prompt) is a note until that agent acks it; any other names
-    who reads it, a mechanical-worker."""
+    who acts: a mechanical-worker for a log-reading event or a hook incident, the owner for READY, else whoever it
+    reaches explains and acks."""
     out, notes = [], []
     for ev in refuse:
-        e = (ev.split() + ["", "", ""])[2]
+        w = ev.split() + [""] * 7
+        e, kind = w[2], w[6]
         if e in routed:
             notes.append("%s handed to an agent this turn (a note until it acks)" % e)
-        else:
+        elif kind in LOG_KINDS or (kind == "ALERT" and "HOOK INCIDENT" in ev):
             out.append(ev + "  -> launch a mechanical-worker whose brief names %s: it reads the log, fixes or explains, "
                        "and acks" % e)
+        elif kind == "READY":
+            out.append(ev + "  -> its entry's owner analyses and writes it up (resume or launch the owner, naming %s)" % e)
+        else:
+            out.append(ev + "  -> explain it and ack it (`site ack %s --note ...`), or hand it to the agent its fix "
+                       "needs" % e)
     return out, notes
 
 

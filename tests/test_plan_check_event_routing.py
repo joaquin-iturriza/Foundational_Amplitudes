@@ -44,9 +44,12 @@ def test_other_kinds_and_no_ack_pass():
 
 
 def test_open_event_routing():
-    out, notes = plan_check.route_events(["open event: E5 11-11 20:00 FA ALERT - disk", "open event: E6 x"], {"E6"})
-    assert len(out) == 1 and "mechanical-worker whose brief names E5" in out[0] and notes == [
-        "E6 handed to an agent this turn (a note until it acks)"]
+    out, notes = plan_check.route_events(["open event: E5 11-11 20:00 FA RUN - FA-x ended FAILED", "open event: E6 x",
+                                          "open event: E7 11-11 20:00 FA READY kit 1 result",
+                                          "open event: E8 11-11 20:00 FA ALERT - site down"], {"E6"})
+    assert notes == ["E6 handed to an agent this turn (a note until it acks)"], notes
+    assert "mechanical-worker whose brief names E5" in out[0] and "owner analyses" in out[1] \
+        and "explain it and ack it" in out[2] and len(out) == 3, out
 
 
 def test_routed_ids():

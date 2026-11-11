@@ -5,7 +5,7 @@ the ledger (Joaquin's approval of "1 2 and 3", 2026-10-31; it replaces the docs/
 Over the main session's messages since its last compaction, the turn cannot end, and an automatic compaction is held,
 while
   - a question the main session put to the user has no `plan ask` (or `plan answer`, `plan withdraw`) recording it;
-  - a decision of the user's (approve, refuse, scope, prefer, forbid; never a complaint or a correction) has no
+  - a decision of the user's (approve, hold, release, forbid, prefer, scope; never a complaint or a correction) has no
     `site decide` (or `plan answer`) recording it;
   - a commitment in a main-session message ("I'll do X") has no plan step (`plan add-next|set-next|step|wait|add`)
     and was not done later in the window.
@@ -36,7 +36,7 @@ CHECKED = os.path.join(REPO, ".claude", ".compact_checked")
 
 INSTR = ("CONTEXT GUARD: the context is near compaction. Before it, record on the plan and the ledger what it would "
          "lose: every question you put to Joaquin (`python3 tools/plan.py ask <entry> ...`), every decision of his "
-         "(he approves, refuses, scopes, prefers or forbids work: `site decide FA --kind K --quote \"<his words>\"`, "
+         "(he approves, holds, releases, forbids, prefers or scopes work: `site decide FA --kind K --quote \"<his words>\"`, "
          "or `plan answer`; a complaint, a correction or a question of his is no decision and is never recorded as "
          "one), every 'I'll do X' you told him that is not done (a plan step: `plan add-next <entry> ...`). You (the "
          "main session) record these yourself; the check lists what it finds missing.")
@@ -264,7 +264,7 @@ def pending(path, ask=None, steps=None):
         if v is None:
             return []
         how = {"questions": "a question to Joaquin with no `plan ask`", "answers": "a decision of Joaquin's "
-               "(approve, refuse, scope, prefer, forbid; never a complaint) with no `site decide`", "commitments": "a commitment with no plan step"}
+               "(approve, hold, release, forbid, prefer, scope; never a complaint) with no `site decide`", "commitments": "a commitment with no plan step"}
         return ["%s: \"%s\" (%s)" % (how[k], q[:300], w) for k, q, w in items_of(v, users, says)]
     except Exception:                   # noqa: BLE001
         return []
