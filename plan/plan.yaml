@@ -21977,6 +21977,11 @@ entries:
       pretrained under D392 (with any winning input option of kit_benchmark''s three arms, ~18-24 GPU-h) before the fine-tunes.
       The old-target budget ask is superseded by D392 (no open question left on the entry). CC free disk 103 GB (coordinator,
       2026-11-11).'
+  - at: '2026-11-11T04:21:39+00:00'
+    text: '2026-11-11 ~07:00 Joaquin: ''why would you run such a long pretraining?'' The new held-out parent recipe inherited
+      trial 1262''s 68,224-step schedule via the KIT parent, unquestioned. Promised: the parent''s length is set from the
+      pretraining of draft Fig. 22''s 8- and 25-process foundations (to check), before submission; the GPU-type question (V100
+      vs H100) is secondary.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
