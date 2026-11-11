@@ -40,8 +40,27 @@ def test_scale_band():
     assert ts.scale_band("Total cross section: 1.0e-01 +- 1e-4 pb") is None
 
 
+
+def test_nlo_analytic_against_mg5_amc():
+    """The analytic NLO: the vector formula's massless limit (3/4) and threshold expansion (hep-ph/9705254 eq. 14),
+    and sigma_LO, sigma_NLO and the scale band against MG5_aMC's fixed-order runs on CC (smoke FA-ccin2p3-84d3488e
+    at beta 1.2e-2, dry run amc_dry at beta 0.062)."""
+    import numpy as np
+    from tools import kit_threshold_scan as ts
+    assert abs(ts.r1_vector(1 - 1e-7) - 0.75) < 1e-4
+    v = 1e-3
+    assert abs(ts.r1_vector(v) - (np.pi ** 2 * (1 + v * v) / (2 * v) - 4)) < 1e-3
+    for beta, lo, nlo, up, dn in ((0.0119, 0.02047, 0.4423, 11.2, 9.0), (0.062, 0.1063, 0.5102, 9.3, 7.5)):
+        sq = 2 * ts.MT / np.sqrt(1 - beta ** 2)
+        _, sv, sa = ts.lo_vector_axial(sq)
+        k, ku, kd = ts.nlo_analytic(sq, [0.1174, -0.0946])      # alpha_s variation read off MG5_aMC's band
+        assert abs((sv + sa) / lo - 1) < 2e-3 and abs(k * (sv + sa) / nlo - 1) < 1e-3
+        assert abs(ku - up) < 0.1 and abs(kd - dn) < 0.1
+
+
 if __name__ == "__main__":
     test_scale_band()
     test_grid_kinematics()
     test_sigma_normalisation()
+    test_nlo_analytic_against_mg5_amc()
     print("all ok")

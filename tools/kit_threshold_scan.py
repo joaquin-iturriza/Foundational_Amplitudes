@@ -166,6 +166,69 @@ def amc_sigma(out, sq, order, acc):
     return r
 
 
+# e+e- -> t t~ through gamma and Z at LO (loop_sm defaults: G_F, 1/alpha = 132.507, M_Z, Gamma_Z; m_W from them)
+GF, AEWM1, GZ, CF = 1.16639e-5, 132.507, 2.441404, 4 / 3
+
+
+def lo_vector_axial(sq):
+    """(beta, sigma_V, sigma_A) in pb at LO: the vector (beta (3 - beta^2)/2) and axial (beta^3) parts of the top current."""
+    a = 1 / AEWM1
+    mw2 = MZ ** 2 / 2 + np.sqrt(MZ ** 4 / 4 - a * np.pi * MZ ** 2 / (GF * np.sqrt(2)))
+    sw2 = 1 - mw2 / MZ ** 2
+    s = np.asarray(sq, float) ** 2
+    b = np.sqrt(1 - 4 * MT ** 2 / s)
+    chi = s / (s - MZ ** 2 + 1j * MZ * GZ) / (4 * sw2 * (1 - sw2))
+    qe, qt, ve, ae, vt, at = -1, 2 / 3, -0.5 + 2 * sw2, -0.5, 0.5 - 4 / 3 * sw2, 0.5
+    cv = qe ** 2 * qt ** 2 + 2 * qe * qt * ve * vt * chi.real + (ve ** 2 + ae ** 2) * vt ** 2 * abs(chi) ** 2
+    ca = (ve ** 2 + ae ** 2) * at ** 2 * abs(chi) ** 2
+    pt = 4 * np.pi * a ** 2 / (3 * s) * GEV2_PB * 3
+    return b, pt * b * (3 - b * b) / 2 * cv, pt * b ** 3 * ca
+
+
+def r1_vector(v):
+    """R_V^(1) / R_V^(0): the exact O(alpha_s) vector-current correction in units of C_F alpha_s / pi
+    (Chetyrkin, Kuehn, Steinhauser, hep-ph/9606230, eq. 34)."""
+    from scipy.special import spence                  # spence(1 - x) = Li2(x)
+    li2 = lambda x: spence(1 - x)
+    v = np.asarray(v, float)
+    p, lr = (1 - v) / (1 + v), np.log((1 + v) / (1 - v))
+    r1 = (3 - v ** 2) / 2 * ((1 + v ** 2) * (li2(p ** 2) + 2 * li2(p) + lr * np.log((1 + v) ** 3 / (8 * v ** 2)))
+                             + 3 * v * np.log((1 - v ** 2) / (4 * v)) - v * np.log(v)
+                             + (33 + 22 * v ** 2 - 7 * v ** 4) / (8 * (3 - v ** 2)) * lr + (15 * v - 9 * v ** 3) / (4 * (3 - v ** 2)))
+    return r1 / (v * (3 - v ** 2) / 2)
+
+
+def r1_axial_threshold(v):
+    """R_A^(1) / R_A^(0) near threshold, pi^2 (1 + v^2) / (2 v) - 2, relative error O(v^2) (hep-ph/9705254, eq. 15).
+    shortcut: the threshold expansion, not the exact axial result; used where the axial part is < 1e-3 of sigma_LO."""
+    v = np.asarray(v, float)
+    return np.pi ** 2 * (1 + v ** 2) / (2 * v) - 2
+
+
+def alpha_s_run(mu, n=200):
+    """alpha_s(mu), two-loop running with 5 flavours from alpha_s(M_Z) = ALPHA_S (RK4 in ln mu^2)."""
+    b0, b1 = 23 / (12 * np.pi), 116 / (24 * np.pi ** 2)
+    f = lambda x: -b0 * x * x - b1 * x ** 3
+    x, h = ALPHA_S, np.log(mu ** 2 / MZ ** 2) / n
+    for _ in range(n):
+        k1 = f(x); k2 = f(x + h * k1 / 2); k3 = f(x + h * k2 / 2); k4 = f(x + h * k3)
+        x += h * (k1 + 2 * k2 + 2 * k3 + k4) / 6
+    return x
+
+
+def nlo_analytic(sq, as_var=None):
+    """(K, scale_up %, scale_dn %) of the analytic fixed-order NLO: K = sigma_NLO / sigma_LO at alpha_s(M_Z) = ALPHA_S,
+    vector exact, axial at its threshold expansion; the band varies mu_R in {M_Z/2, 2 M_Z} as MG5_aMC does: sigma_LO
+    does not move and the correction scales with alpha_s(mu) / alpha_s(M_Z) - 1 = as_var (up, down), by default
+    two-loop running (MG5_aMC's own running differs by ~0.5% of alpha_s: collect takes as_var from its band)."""
+    b, sv, sa = lo_vector_axial(sq)
+    corr = CF / np.pi * (sv * r1_vector(b) + sa * r1_axial_threshold(b)) / (sv + sa)      # per unit alpha_s
+    k = 1 + ALPHA_S * corr
+    as_var = as_var or [alpha_s_run(m) / ALPHA_S - 1 for m in (MZ / 2, 2 * MZ)]
+    var = [x * (k - 1) / k for x in as_var]
+    return k, 100 * np.maximum(*var), -100 * np.minimum(*var)
+
+
 def scale_band(text):
     """(+%, -%) of MG5_aMC's scale-variation envelope ("Dynamical_scale_choice -2 (envelope of 9 values):" then
     "5.102e-01 pb  +9.3% -7.5%"), None when the text has none."""
@@ -218,6 +281,26 @@ def cmd_collect(a):
     got = {r["i"]: r for r in nlo}
     ok = lambda r: r if r and "sigma" in r else None      # a point MG5_aMC could not run (its tests failed): no exact NLO
     out["amc"] = {k: [ok(got[i][k]) if i in got else None for i in range(len(sq))] for k in ("lo", "nlo")}
+    # below the lowest beta where MG5_aMC's NLO runs, the exact NLO is the analytic one (K x the quadrature's sigma_LO)
+    kf, _, _ = nlo_analytic(sq)
+    lo_q = np.asarray(out["sigma_lo_quad"])
+    amc_b = [beta[i] for i, r in enumerate(out["amc"]["nlo"]) if r]
+    # alpha_s(mu)/alpha_s(M_Z) - 1 at mu = M_Z/2, 2 M_Z as MG5_aMC runs it: its band over the correction's share (K-1)/K
+    share = {i: 1 - lo_q[i] / r["sigma"] for i, r in enumerate(out["amc"]["nlo"]) if r}
+    as_var = ([float(np.median([out["amc"]["nlo"][i]["scale_up"] / 100 / f for i, f in share.items()])),
+               -float(np.median([out["amc"]["nlo"][i]["scale_dn"] / 100 / f for i, f in share.items()]))]
+              if share else None)
+    out["alpha_s_var"] = as_var
+    kf, kup, kdn = nlo_analytic(sq, as_var)
+    out["analytic_check"] = [{"beta": float(beta[i]), "ratio": float(kf[i] * lo_q[i] / r["sigma"] - 1),
+                              "mc_err": r["err"] / r["sigma"], "scale_up": [float(kup[i]), r["scale_up"]],
+                              "scale_dn": [float(kdn[i]), r["scale_dn"]]} for i, r in enumerate(out["amc"]["nlo"]) if r]
+    for c in out["analytic_check"]:
+        print("CLAIM " + json.dumps({"analytic_vs_mg5_aMC": c}))
+    for i in range(len(sq)):
+        if out["amc"]["nlo"][i] is None and (not amc_b or beta[i] < min(amc_b)):
+            out["amc"]["nlo"][i] = {"sigma": float(kf[i] * lo_q[i]), "err": 0.0, "scale_up": float(kup[i]),
+                                    "scale_dn": float(kdn[i]), "source": "analytic"}
     for p in sorted(glob.glob(os.path.join(a.dir, "pred", "*", "predictions.h5"))):
         with h5py.File(p, "r") as f:
             v = np.concatenate([10 ** f[k]["log10_abs_virt_finite"][:] for k in idx])
