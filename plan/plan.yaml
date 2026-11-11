@@ -23106,8 +23106,6 @@ entries:
       batch)'
     5: 'Checkpoint + inference package for KIT (Joaquin sends it): best A_ft/B checkpoints, a float64 predict script, log10|M|^2
       out; after the A_ft batch'
-    6: Carry soft rescale + pair logs (input_soft_eps=1e-8, input_pair_logs=n) to uugg (n=6), tt virtual and tt Born (n=4)
-      from scratch at 1e5, against their A controls; design + review, ~6 GPU-h
   done_when: null
   notes_ref: null
   match: kit_*
@@ -23494,11 +23492,6 @@ entries:
       if:
       - 'A_ft best: package A_ft'
       - 'B best: package B'
-    6:
-      feeds: which model goes to KIT (steps 4, 5) and whether the input gain holds beyond uug
-      if:
-      - 'gains hold: the flagged models go to KIT and the threshold scan'
-      - 'gains do not hold on tt: tt keeps the A_ft/B models'
   step_waits:
     '3': '2026-11-12'
     '4': FA-ccin2p3-c364a7ae FA-ccin2p3-f21fa163 FA-ccin2p3-5515dc85
