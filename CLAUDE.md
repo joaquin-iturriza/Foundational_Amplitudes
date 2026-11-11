@@ -59,6 +59,7 @@ on the sites (`~/work/CLAUDE.md`).
 
 - State every batch's wall-time target before submission and record it on its plan entry: the time of its work (training steps at the model's step rate in a plain training run on that GPU, one forward pass per read, generation at the probe's time per event), never a measured rate that includes overhead.
 - A batch goes out whole, never behind a separate probe: its time and disk per unit come from an earlier run of the same setup or are read from its own first jobs (generation keeps its probe); it is laid out to finish in one wave at the width `site pick` offers; disk per unit times the jobs, plus any cache they should share (shown shared by two jobs on the same data), must fit the site's free disk read at submission.
+- A data cache on a site is deleted only after checking that no recipe of an open plan entry reads it, besides no running job.
 - A margin above 2× (events asked over events kept, a run's or a stage's wall time over its target, a new method's cost over the one it replaces) is a finding to fix before it reaches me, never offered as an option.
 - A failed task goes to the agent that owns its work, which reads its cause in the log before anything is resubmitted.
 
