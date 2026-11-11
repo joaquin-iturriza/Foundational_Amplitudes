@@ -22317,6 +22317,14 @@ entries:
       up to 4.0x (t t~ LO D=10 2.45e-2 -> 6.10e-3, the only cell whose calibration lr leaves its window, 1.34x above the top);
       t t~ V D=1e4 centres on c/2 = 4.648e-3 (its calibration blew up at c). Configs regenerated with ${PROJECT_DIR} parent
       paths (rebalance.py''s parent regex), trials on CC only. CC /sps/lpnhe 58 GB free (design needs ~14 GB).'
+  - at: '2026-11-11T12:54:06+00:00'
+    text: '2026-11-11 13:55 CET: stage-2 launch: t t~ V fine-tunes (V/B, physics factor off) crashed at init on the trees-in
+      parent''s frozen stats check (target_physics_factor True vs False), though target_stats=own refits the target: 24 start-up
+      trials (FA-ccin2p3-1d55834c ... 30ef66b6) lost. Fixed in experiment.py a08fef9d (target-side checks skipped under target_stats=own;
+      tests test_parent_target_stats, test_hybrid_cp_frozen pass), synced to CC. drive.py --retry-failed REGEX (214a90ba,
+      tests/test_drive_retry_failed.py) requeues them with the penalty removed; the running driver (pid 616031) needs a restart
+      with it (scratchpad restart_driver.sh): my pkill was refused by the permission classifier. u u~ fine-tunes load the
+      .gz parent and train (fe27fb59 past step 3660).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
