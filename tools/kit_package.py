@@ -150,8 +150,12 @@ def _check_all(a, meta, env, pkg, worst):
             g.attrs["metadata"] = f.attrs["metadata"]
             for sp in ("hard_test", "bulk_test"):
                 for st in f[sp]:
-                    for k, v in f[f"{sp}/{st}"].items():
-                        g[f"{sp}/{st}/{k}"] = v[:a.n]
+                    grp = f[f"{sp}/{st}"]
+                    # an azimuthal-scan stratum is scored in whole groups of its phi values (evaluate.py)
+                    m = len(np.unique(grp["phi"][:])) if "phi" in grp else 1
+                    n = max(a.n // m, 1) * m
+                    for k, v in grp.items():
+                        g[f"{sp}/{st}/{k}"] = v[:n]
         out = os.path.join(env["SCRATCH"], m["run"])
         subprocess.run([sys.executable, "tools/kit_predict.py", f"runs/kit/{m['run']}", "--h5", small, "--out", out],
                        cwd=pkg, env=env, check=True, stdout=subprocess.DEVNULL)
@@ -160,7 +164,8 @@ def _check_all(a, meta, env, pkg, worst):
             for sp in p:
                 for st in p[sp]:
                     for k in p[f"{sp}/{st}"]:
-                        d.append(np.max(np.abs(p[f"{sp}/{st}/{k}"][:] - o[f"{sp}/{st}/{k}"][:a.n])))
+                        x = p[f"{sp}/{st}/{k}"][:]
+                        d.append(np.max(np.abs(x - o[f"{sp}/{st}/{k}"][:len(x)])))
         worst[m["run"]] = float(max(d))
         print(f"CHECK {m['run']}: max |delta log10| {worst[m['run']]:.2e} over {len(d)} strata x {a.n} events", flush=True)
 
