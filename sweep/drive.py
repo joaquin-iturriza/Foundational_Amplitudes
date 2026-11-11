@@ -368,6 +368,18 @@ class Sweep:
         _write_summary(self.cfg, self.sampler, self.dir)
 
 
+def dispatch_order(want):
+    """The trials all sweeps want now, one entry per trial: longest trial first (sw.hours, the config's estimate of
+    T x the step rate), round-robin across sweeps of equal length, so under a submit cap the long trials start first
+    and no sweep's whole wave goes before the others' (as sweep_manager's duration_nice)."""
+    out = []
+    for h in sorted({sw.hours for sw, n in want.items() if n > 0}, reverse=True):
+        group = [[sw] * n for sw, n in want.items() if n > 0 and sw.hours == h]
+        for r in range(max(len(g) for g in group)):
+            out += [g[r] for g in group if r < len(g)]
+    return out
+
+
 def plan(k, sweeps, a):
     """Sites for the next k trials, from `site pick`: each entry is one job's site."""
     s0 = sweeps[0]
@@ -440,19 +452,17 @@ def main():
             for r in rows:
                 if r.get("state") in ("UP", "HELD"):
                     log("  %-9s %-5s %s" % (r["site"], r["state"], r.get("reason", "")[:150]))
-            i = 0
-            for sw, n in want.items():
-                for _ in range(n):
-                    if i >= len(order):
-                        break
-                    s = order[i]; i += 1
-                    try:
-                        if sw.data_ready(s, a):
-                            sw.submit(s, a)
-                        else:
-                            log("%s: %s not ready (pools); trial deferred" % (sw.name, s))
-                    except Exception as e:
-                        log("%s: submit to %s failed: %s" % (sw.name, s, str(e)[-300:]))
+            for i, sw in enumerate(dispatch_order(want)):
+                if i >= len(order):
+                    break
+                s = order[i]
+                try:
+                    if sw.data_ready(s, a):
+                        sw.submit(s, a)
+                    else:
+                        log("%s: %s not ready (pools); trial deferred" % (sw.name, s))
+                except Exception as e:
+                    log("%s: submit to %s failed: %s" % (sw.name, s, str(e)[-300:]))
         if all(sw.done() for sw in sweeps):
             for sw in sweeps:
                 sw.summary()
