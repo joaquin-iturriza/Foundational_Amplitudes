@@ -20976,9 +20976,9 @@ entries:
     decision: D377
   owner:
     agent: a66d0d73cd29b8da3
-    state: stopped
+    state: working
     since: '2026-11-10T10:24:52+00:00'
-    state_at: '2026-11-11T02:49:33.830000+00:00'
+    state_at: '2026-11-11T03:04:28.212000+00:00'
     context: 114352
     context_at: '2026-11-11T03:03:25+00:00'
   step_why:
@@ -22184,9 +22184,9 @@ entries:
       30, so no budget question remains'
   owner:
     agent: a6c696e8d98075b7a
-    state: working
+    state: stopped
     since: '2026-11-11T02:42:04+00:00'
-    state_at: '2026-11-11T03:03:19.679000+00:00'
+    state_at: '2026-11-11T03:04:27.185000+00:00'
     context: 140603
     context_at: '2026-11-11T03:03:29+00:00'
   findings:
