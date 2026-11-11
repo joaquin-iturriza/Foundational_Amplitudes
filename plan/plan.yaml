@@ -20946,14 +20946,17 @@ entries:
   notes_ref: null
   match: dsave_*
   evidence:
-    runs: []
-    commit: b1ace2aa
+    runs:
+    - FA-ccin2p3-938b05ab
+    - FA-ccin2p3-e8425579
+    commit: 7d6af9b3
     paths:
     - analysis/data_saving/data/horizons_cal2.json
     - analysis/data_saving/horizons.py
     - analysis/data_saving/plot_vb_test.py
     - recipes/catalog_v4_datasaving_trees.yaml
     - scripts/job_data_saving.sh
+    - sweep/gen_data_saving.py
   dead_ends:
   - tried: Stage-2 design (revised 06:51) reading D* from the two grid points bracketing each crossing, one 8-trial search
       per cell
