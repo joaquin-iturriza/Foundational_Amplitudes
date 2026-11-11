@@ -6,7 +6,11 @@ the test pool of each run trained on V/B (data.target_over_born):
     MSE_lnV = mean((ln|(V/B)_pred| - ln|(V/B)_true|)^2) one-signed targets only (B exact: the MSE of ln|V|)
 
 from <run>/sigma_stage/preds_test.npz (raw_pred, raw_truth: the target's raw values, i.e. V/B, of the final model after
-the sigma stage, D276), for the runs runs/data_saving/dsave_<mode>_<target>_d<k>_t<steps>_<tag> on CC.
+the sigma stage, D276); a run trained on V (D375: e+e- > u u~ V, constant V/B) is divided by the exact Born of its test
+pool (the sidecar <pool>.born.npy; the predictions come shuffled, so each truth is matched to its pool row by rank of
+the stored V, the test pool read whole: eval_subsample null), and carries the relative spread of its true V/B
+(born_check: ~0 when the Born rows align with the predictions) and the largest relative V mismatch of the rank match
+(rank_check), for the runs runs/data_saving/dsave_<mode>_<target>_d<k>_t<steps>_<tag> on CC.
 
     python analysis/data_saving/vb_test_mse.py [--tag cal_vb] [--glob 'runs/vob_tt_VB_*'] [--out ...json]
 """
@@ -21,6 +25,9 @@ from analysis.common.readers import site_python  # noqa: E402
 REMOTE = r'''
 import glob, json, os, re, sys
 import numpy as np
+sys.path.insert(0, ".")
+from analysis.common.readers import find_pool
+from tools.nlo_virtual_pipeline import born_path
 tag = sys.argv[1]
 pat = sys.argv[2] if len(sys.argv) > 2 else "runs/data_saving/dsave_*_*_nlo_d*_t*_" + tag
 out = []
@@ -36,6 +43,17 @@ for d in sorted(glob.glob(pat)):
         z = np.load(f)
         p, t = z["raw_pred"].astype(float).ravel(), z["raw_truth"].astype(float).ravel()
         r["n"] = int(len(t))
+        if not r["over_born"]:
+            # trained on V: V/B = V / the exact Born of the same test rows
+            f = find_pool(r["target"], role="test")
+            v, b = np.load(f, mmap_mode="r")[:, -1].astype(float), np.load(born_path(f)).astype(float).ravel()
+            assert len(v) == len(t), f"test pool {len(v)} rows, predictions {len(t)}"
+            bt = np.empty_like(t)
+            bt[np.argsort(t)] = b[np.argsort(v)]
+            r["rank_check"] = float(np.max(np.abs(np.sort(t) - np.sort(v)) / np.abs(np.sort(v))))
+            p, t = p / bt, t / bt
+            r["divided_by_born"] = True
+            r["born_check"] = float(np.std(t) / abs(np.mean(t)))
         r["mse_vb"] = float(np.mean((p - t) ** 2))
         r["var_vb"] = float(np.var(t))
         r["one_signed"] = bool((t > 0).all() or (t < 0).all())
@@ -62,7 +80,7 @@ def main():
         if "error" in r:
             print(f"{r['mode']:7s} {r['target']:16s} k={r['k']}  {r['error']}")
             continue
-        if r.get("phys_factor") and r["target"] not in ("bbx_zz_nlo", "epem_bbx_nlo"):   # 2->2: the factor is a constant
+        if r.get("phys_factor") and not r.get("divided_by_born") and r["target"] not in ("bbx_zz_nlo", "epem_bbx_nlo"):   # 2->2: the factor is a constant
             print(f"{r['mode']:7s} {r['target']:16s} k={r['k']}  physics factor on: not a plain V/B run, not read")
             continue
         ln = f"  MSE ln|V| {r['mse_lnv']:.3e} (wrong sign {r['wrong_sign']})" if r.get("one_signed") else ""

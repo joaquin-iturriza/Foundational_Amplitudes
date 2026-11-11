@@ -49,8 +49,8 @@ def main(path):
 
 def versus(path, ref):
     """Every stratum against the run `ref` (D376: bulk and every bin, not only the deepest): per arm and family,
-    log10(arm log-MSE / ref log-MSE) per stratum (negative = arm better), its median, and how many strata are better
-    or worse by more than 0.3 decades."""
+    log10(arm log-MSE / ref log-MSE) per stratum (negative = arm better), its median and range, and how many strata are
+    better (below 0) or worse."""
     import numpy as np
     d = json.load(open(path))
     R = d["runs"][ref]["strata"]
@@ -66,7 +66,7 @@ def versus(path, ref):
         for fam, x in sorted(fams.items()):
             x = np.array(x)
             print(f"  {fam:14s} n={len(x):2d} median {np.median(x):+.2f} [{x.min():+.2f}, {x.max():+.2f}] "
-                  f"better>0.3: {(x < -0.3).sum()} worse>0.3: {(x > 0.3).sum()}")
+                  f"better: {(x < 0).sum()} worse: {(x > 0).sum()}")
 
 
 if __name__ == "__main__":

@@ -6,8 +6,9 @@ Both arms of a target start from its parent's saved config.yaml (scripts/job_dat
 flags in): the LO targets from the held-out parent (--parent-lo: the four targets' equality classes out), the one-loop
 targets from the trees-in parent (--parent-nlo: the same plus e+e- > u u~ and t t~ LO, the entry's "the one loops with
 the tree levels in the pretraining"), so model and inputs match and only the keys below and the searched HPs move:
-  scratch    no pretrained weights; training.lr searched over [c/10, 10c]
-  fine-tune  full retrain from the parent's final model with layer decay (fine_tune.lr_scale [0.1, 10] around
+  scratch    no pretrained weights; training.lr searched over [c/3, 3c] (HPO rule 2: half a decade either side)
+  fine-tune  full retrain from the parent's final model (models/model_run0_best.pt, which the sigma stage, the end of
+             the parent's training, leaves as its final model, D276) with layer decay (fine_tune.lr_scale [0.1, 10] around
              training.lr = c, fine_tune.layer_decay [0.75, 1]); the target's own amplitude stats, the parent's
              off-shellness scale (as scripts/job_data_saving.sh ft)
 c = 7.82114e-3 (T/17056)^-0.55 times the transfer study's D factor: the lr of the calibration (job_data_saving.sh).
@@ -87,8 +88,8 @@ def write(name, tgt, k, T, arm, rate, parent):
     base = parent
     if arm == "scr":
         fixed["fine_tune.pretrained_path"] = "null"
-        space = [{"name": "training.lr", "type": "float_log", "low": float(f"{c / 10:.3g}"),
-                  "high": float(f"{10 * c:.3g}")}] + space
+        space = [{"name": "training.lr", "type": "float_log", "low": float(f"{c / 3:.3g}"),
+                  "high": float(f"{3 * c:.3g}")}] + space
     else:
         fixed.update({"training.lr": float(f"{c:.4g}"), "fine_tune.pretrained_path": f"{parent}/models/model_run0_best.pt",
                       "fine_tune.target_stats": "own", "fine_tune.offshell_stats": "parent"})
@@ -101,7 +102,9 @@ def write(name, tgt, k, T, arm, rate, parent):
                        "time": "%02d:%02d:00" % divmod(max(1, int(round(hours * 60))), 60)},
            "paths": None, "sweep_name": name, "base_config": base, "n_trials": N_TRIALS,
            "dyhpo": {"surrogate": "gp", "n_candidates": 2000, "objective_scale": "auto",
-                     "seed": zlib.crc32(name.encode()) % 2 ** 31, "n_startup": N_STARTUP, "total_budget": 10000},
+                     "seed": zlib.crc32(name.encode()) % 2 ** 31, "n_startup": N_STARTUP, "total_budget": 10000,
+                     # D244/D245: the start-up trials, then two sequential batches over the rest
+                     "waves": [N_STARTUP, (N_TRIALS - N_STARTUP + 1) // 2, (N_TRIALS - N_STARTUP) // 2]},
            "fidelity_schedule": {"t_steps": [int(T)]}, "fixed_params": fixed,
            "range_extension": {"enabled": False}, "search_space": space}
     path = os.path.join(HERE, f"sweep_config_{name}.yaml")

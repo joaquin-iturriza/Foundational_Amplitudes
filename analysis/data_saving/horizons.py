@@ -58,6 +58,20 @@ for d in sorted(glob.glob("runs/data_saving/dsave_scratch_*_d*_t*_" + tag)):
                  sigma_done=os.path.isdir(d + "/sigma_stage/models") and bool(os.listdir(d + "/sigma_stage/models")))
     except Exception as e:
         r["error"] = repr(e)
+        # no result: a run that diverged is a blowup at the step its log shows (CLAUDE.md: listed apart, never dropped)
+        steps, bad = [], None
+        for lf in sorted(glob.glob(d + "/out_*.log")):
+            for line in open(lf, errors="replace"):
+                m2 = re.search(r"Val loss: (\S+) \| step (\d+)", line)
+                if m2:
+                    steps.append(int(m2.group(2)))
+                    if bad is None and m2.group(1).lower() in ("nan", "inf", "-inf"):
+                        bad = int(m2.group(2))
+                if bad is None and re.search(r"non-finite|diverg|NaN loss", line):
+                    bad = steps[-1] if steps else 0
+        if bad is not None:
+            r["blowup_step"] = bad
+        r["log_last_step"] = steps[-1] if steps else None
     out.append(r)
 print("HZN " + json.dumps(out))
 '''
@@ -68,7 +82,7 @@ def horizon(r):
     y = [v * r["prepd_std"] ** 2 for v in r["curve"]]
     ev, n = int(r["every"]), int(r["steps"])
     bad = next((i for i, v in enumerate(y) if not math.isfinite(v)), None)
-    o = {"target": r["target"], "k": r["k"], "D": round(10 ** (r["k"] / 2)), "steps": n, "every": ev,
+    o = {"target": r["target"], "k": r["k"], "dir": r["dir"], "D": round(10 ** (r["k"] / 2)), "steps": n, "every": ev,
          "rate_s_per_step": 3600 * r["hours"] / n if r.get("hours") else None, "sigma_stage": r.get("sigma_done")}
     if bad is not None:
         return {**o, "blowup_step": (bad + 1) * ev}
@@ -117,8 +131,12 @@ def main():
     rows = [r for t in a.tag for r in site_python(REMOTE, [t], "HZN")]
     res = []
     for r in rows:
+        if "blowup_step" in r:
+            res.append({k: r.get(k) for k in ("target", "k", "steps", "dir", "blowup_step", "log_last_step")}
+                       | {"D": round(10 ** (r["k"] / 2))})
+            continue
         if "error" in r or not r.get("curve"):
-            res.append({k: r.get(k) for k in ("target", "k", "steps", "error")} | {"missing": True})
+            res.append({k: r.get(k) for k in ("target", "k", "steps", "dir", "error", "log_last_step")} | {"missing": True})
             continue
         res.append(horizon(r))
     res.sort(key=lambda r: (TARGETS.index(r["target"]) if r["target"] in TARGETS else 99, r["k"]))
@@ -130,7 +148,7 @@ def main():
                 r["T_D"] = run[r["target"]] = max(run.get(r["target"], 0), r["T_ladder"])
     for r in res:
         if r.get("missing"):
-            print(f"{r['target']:11s} k={r['k']:2d}  missing ({r.get('error')})")
+            print(f"{r['target']:11s} k={r['k']:2d}  missing ({r.get('error')}; log to step {r.get('log_last_step')})")
         elif r.get("not_vb"):
             print(f"{r['target']:11s} k={r['k']:2d}  NOT a plain V/B run (trafos {r['trafos']}, physics factor {r.get('phys_factor')})")
         elif "blowup_step" in r:
