@@ -22395,6 +22395,10 @@ entries:
       the pretraining resumes 78b8190c (started at step 45012, 23212 left) and 03ea3719 (49104, 19120 left), whose T_max 68224
       is the designed full cosine (increment_steps=68224); both ended at 68224 with RUN_DONE and their sigma stage. The check
       should accept T_max = start step + iterations for a warm start; not fixed (main session''s instruction).'
+  - at: '2026-11-11T02:57:02+00:00'
+    text: 'For the input-arm readout (3fa9854a, 1a14c791, 761cb2d8), Joaquin 2026-11-11: besides the design''s yes/no cut,
+      report whether each arm helps in general: bulk test error, every hard bin (soft, collinear), against the control f6b2ece9
+      and c35a2199, in the figures.'
   step_why:
     1:
       feeds: the pretrained model's numbers for KIT and whether pretraining changes extrapolation into the limits
