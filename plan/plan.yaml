@@ -23961,6 +23961,45 @@ entries:
       no prior on uugg/tt found; the 50-step launch rule does not apply (job_kit.sh A mode with both flags ran end to end
       through sigma stage and KIT scoring in c15b3337; each dataset ran through the same A mode in its control; only n differs,
       and a shape error at n=6 fails at step 0).'
+  - at: '2026-11-11T18:20:49+00:00'
+    question: 'Carry-over of the input verdict: do soft rescale + pair logs (model.input_soft_eps=1e-8, model.input_pair_logs=n),
+      which on ee->uug from scratch at 1e5 cut the deepest soft bin 14180->0.200, the deepest collinear 30.1->2.21 and bulk
+      8.2e-4->1.09e-4, give the same gains on ee->uugg (n=6: soft, collinear gg/qg, azimuth), ee->tt virtual and ee->tt Born
+      (n=4: threshold beta, Sudakov)? Feeds which models go to KIT (step 5) and the threshold scan (step 4), and whether the
+      parent''s inputs (pretrain_data_saving, D392) hold beyond uug.'
+    prior: 'Findings on this entry: input arms and combined arm on uug (kit_fig_A_inputs.json, kit_readout --vs at 44e102dc:
+      combined soft median -2.71, coll -1.25, bulk -0.88 decades vs control); A_ft and lr check (kit_fig_A_ft.json, kit_fig_A_ft_lr.json:
+      pretraining does not reach collinear or the Coulomb rise; tt Born threshold helped only with the off-shellness column
+      at 0). Scratch controls at 1e5, off-shellness on: uugg kit_A_ee_uugg_me2_n100000_t8000 (12a9d54b: soft 9070, coll_gg
+      20.5, coll_qg 18.4, azimuth 29.2, bulk 2.27e-3), tt virtual offon (Coulomb 8.62, exponent +0.04 vs -1.02, Sudakov 0.437,
+      bulk 9.3e-9), tt Born offon (threshold 2.0e-6, Sudakov 0.066, bulk 1.5e-9). No other study of these inputs on uugg or
+      tt (results.tex, plan, decisions searched for input_soft_eps, input_pair_logs, soft rescale, pair log).'
+    measure: 'Per process, kit_readout --vs the matched scratch control: per family median log10(arm/control) over its strata
+      with counts better/worse, deepest-bin log10-MSE and fitted exponents (KIT evaluate.py), bulk_test; figures kit_{mse,median}_<proc>
+      with control and arm.'
+    check: 'The same flags moved this measure on uug by 2.71 (soft), 1.25 (collinear) and 0.88 (bulk) decades of median log10
+      ratio; flagged path ran end to end on GPU (c15b3337: training at 0.680 s/step vs control 0.675, sigma stage, KIT scoring);
+      Lorentz invariance tested for 4- and 5-particle events (tests/test_input_reps.py). D395: no new launch path (same job_kit.sh
+      A mode and flags as c15b3337; only the dataset and n differ), so no probe.'
+    fixed: 'Everything of each matched control but the two flags: scripts/job_kit.sh <dataset> 100000 8000 A tag=softpair
+      ++model.input_soft_eps=1e-8 ++model.input_pair_logs=n at trunk (catalog trial-1262 base config, off-shellness on as
+      the controls), float64, seed 42, lr 0.0118605, HETEROSC mu_mse then sigma stage, val last 1e5 of bulk_train, test bulk_test
+      + every hard_test stratum. Datasets/n: kit_ee_uugg__me2 n=6, kit_ee_tt__virt_finite n=4, kit_ee_tt__born n=4. Rates
+      from the scratch runs (V100 float64), flags cost nothing (uug 0.680 vs 0.675 s/step): uugg 0.80 s/step (1.78 h, --time
+      2:10), tt 0.56 (1.25 h, --time 1:40); 3 jobs, target 4.6 GPU-h, 5.5 requested; disk ~85 MB per run, 52 GB free on /sps/lpnhe.'
+    control: 'Scratch A at 1e5, off-shellness on, same script: uugg 12a9d54b (kit_A_ee_uugg_me2_n100000_t8000), tt virtual
+      and tt Born offon (kit_A_ee_tt_{virt_finite,born}_n100000_t8000_offon); Bakar''s MLP as external reference.'
+    seeds: 'One seed (42), D315, as every sibling cell. Resolution: the only measured seed spread of a per-pool MSE ratio
+      is 0.08-0.12 decades (median |log10| between two seeds, docs/results.tex ~l.1296-1300, catalog_v3/v4 comparison); a
+      0.3-decade cut is 2.5-3.7x that spread. Assumption (not measured): KIT hard-bin log-MSE is no noisier between seeds
+      than a pool MSE.'
+    outcome: 'Per process and family, against the matched control: gain = the family''s median log10(arm/control) below -0.3
+      decades with most strata better by more than 0.3; bulk not worse = bulk_test log10 ratio not above +0.3; a family or
+      bulk inside +-0.3 is reported unresolved (one seed); worse = median above +0.3. The A design''s deepest-bin cut (1 decade,
+      or the exponent into its band) is read beside it per limit. Yes on a process (gain in at least one family, no family
+      worse, bulk not worse): its flagged model goes to KIT and (tt virtual) to the threshold scan; the flags stay in the
+      parent. Unresolved or worse on tt: tt keeps its A/A_ft/B models for KIT, and the threshold/Coulomb limit needs a beta-specific
+      input, reported as the next lever; the parent keeps the flags if uug/uugg gain. Mixed families reported per family.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
