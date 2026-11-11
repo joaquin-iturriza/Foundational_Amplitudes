@@ -20962,11 +20962,14 @@ entries:
     runs:
     - FA-ccin2p3-938b05ab
     - FA-ccin2p3-e8425579
-    commit: 7d6af9b3
+    commit: bc1aec8c
     paths:
     - analysis/data_saving/data/horizons_cal2.json
+    - analysis/data_saving/data/stage2_readout.json
+    - analysis/data_saving/diag_readout.py
     - analysis/data_saving/horizons.py
     - analysis/data_saving/plot_vb_test.py
+    - analysis/data_saving/stage2_readout.py
     - recipes/catalog_v4_datasaving_trees.yaml
     - scripts/job_data_saving.sh
     - sweep/gen_data_saving.py
