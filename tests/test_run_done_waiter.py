@@ -67,6 +67,17 @@ def test_run_done_one_event_per_entry():
         print("R2 ok: owner working, no event")
 
 
+_POLL = os.environ.get("SITE_WAIT_POLL_S")
+
+
+def teardown_module(module=None):
+    """Restore SITE_WAIT_POLL_S, which the waiter tests set to 1."""
+    if _POLL is None:
+        os.environ.pop("SITE_WAIT_POLL_S", None)
+    else:
+        os.environ["SITE_WAIT_POLL_S"] = _POLL
+
+
 def run_waiter(m, out, debounce=0):
     # debounce 0: these cases test the quiet rule; the 10-minute batch (D324, default 600 s) is test_batch_window's
     a = types.SimpleNamespace(wait=True, project="FA", new_only=False, all=False, limit=20, debounce=debounce)
@@ -79,7 +90,7 @@ def run_waiter(m, out, debounce=0):
 
 
 def test_quiet_waiter():
-    os.environ["SITE_WAIT_POLL_S"] = "1"
+    os.environ["SITE_WAIT_POLL_S"] = "1"   # restored by the module fixture below
     with tempfile.TemporaryDirectory() as tmp:
         m = load_site(tmp)
         rx = m._rx()
@@ -135,3 +146,5 @@ def test_batch_window():
 if __name__ == "__main__":
     test_run_done_one_event_per_entry()
     test_quiet_waiter()
+    test_batch_window()
+    teardown_module()

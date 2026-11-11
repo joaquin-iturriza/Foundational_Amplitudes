@@ -182,7 +182,11 @@ def problems():
     else:
         working = {e["id"] for e in d["entries"] if plan.step_working(st, e["id"], plan.now())}
         refuse, wait = split_events(open_events(), working)
-    more, routed = route_events(refuse, routed_ids(_turn(TURN_INP)[0]) if TURN_INP else set())
+    # routed in this turn or an earlier one still in the transcript's tail: a worker sent to an event of no entry is
+    # not booked as an owner, so a later wake must not ask for a second one (repo-reviewer 2026-11-11)
+    import stop_conditions as sc_
+    more, routed = route_events(refuse, routed_ids(sc_._tail_records(TURN_INP.get("transcript_path") or ""))
+                                if TURN_INP else set())
     out += more
     plan.NOTES.extend(wait + routed)
     return out, once, st
