@@ -143,7 +143,8 @@ XLAB = {"threshold_beta": r"top velocity $\beta$", "sudakov_sqrts": r"$\sqrt{s}$
 # input-representation arms (D374, model.input_*): tag -> legend text
 INPUT_ARMS = {"pairlogs": r"+ $\log(s_{ij}/s)$ inputs", "softrescale": "+ soft log rescale",
               "locallogs": "+ local-frame logs",
-              "softpair": r"+ soft rescale + $\log(s_{ij}/s)$"}
+              "softpair": r"+ soft rescale + $\log(s_{ij}/s)$",
+              "softpairthr": r"+ soft rescale + $\log(s_{ij}/s)$" + "\n" + r"+ $\log\beta^2$ of massive pairs"}
 
 
 def arm_label(r, with_n=True):

@@ -342,7 +342,8 @@ def label(run):
     """A short legend label from a KIT run name: what its protocol (A, A_ft, B, B_bulk) trained on."""
     names = {"A": "from scratch", "A_ft": "fine-tuned", "B": "hard points added", "B_bulk": "bulk continuation"}
     m = re.match(r"kit_(A_ft|B_bulk|A|B)_", run)
-    return names[m.group(1)] if m else run
+    inputs = {"softpair": " + in", "softpairthr": r" + in + $\beta$"}    # the caption defines in and beta
+    return names[m.group(1)] + inputs.get(run.rsplit("_", 1)[-1], "") if m else run
 
 
 def cmd_figure(a):
