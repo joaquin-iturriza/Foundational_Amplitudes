@@ -7,12 +7,12 @@ the six largest directories of the user's own area there (WORK when it is on tha
 those paths on it), measured with `du -s` under a time budget and cached in .disk_watch_cache.json in the checkout
 for 6 h (a timed-out measurement is cached as partial, so a slow filesystem is not re-walked every pass).
 
-Exit status: 0 below --warn (90%); otherwise 1, last line "DISK <fs> at N%" (the supervisor turns a failing maintain
+Exit status: 0 below --warn (90%) and above --min-free-gb (60); otherwise 1, last line "DISK <fs> at N% (X GB free)" (the supervisor turns a failing maintain
 command into an ALERT). At --full (97%) or above it also writes .disk_full in the checkout: sweep/feed_capped.py
 submits nothing while that flag is under 30 min old. The flag is refreshed every pass while the disk is full and
 removed by this script once every filesystem is back below --full.
 
-    python scripts/disk_watch.py [--warn 90] [--full 97] [--du-budget 300] [--cache-hours 6]
+    python scripts/disk_watch.py [--warn 90] [--min-free-gb 60] [--full 97] [--du-budget 300] [--cache-hours 6]
 """
 import argparse, json, os, subprocess, sys, time
 
@@ -58,6 +58,10 @@ def filesystems():
     for e in fss.values():
         e["area"] = e["paths"][e["names"].index("WORK")] if "WORK" in e["names"] else min(e["paths"], key=len)
     return fss
+
+
+def free_gb(p):
+    return os.statvfs(p).f_bavail * os.statvfs(p).f_frsize / 1e9
 
 
 def usage(p):
@@ -136,6 +140,7 @@ def set_flag(msg):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--warn", type=float, default=90)
+    ap.add_argument("--min-free-gb", type=float, default=60, help="alarm below this much free space")
     ap.add_argument("--full", type=float, default=97)
     ap.add_argument("--du-budget", type=float, default=300, help="seconds of du per filesystem")
     ap.add_argument("--cache-hours", type=float, default=6)
@@ -155,8 +160,9 @@ def main():
                                                      ", partial: du ran out of time" if c["partial"] else ""))
         for b, d in c["top"][:TOP]:
             print("    %10s  %s" % (gb(b), d))
-        if pct >= a.warn:
-            alerts.append("DISK %s at %d%%" % (e["mount"], pct))
+        free = free_gb(e["paths"][0])
+        if pct >= a.warn or free < a.min_free_gb:
+            alerts.append("DISK %s at %d%% (%.0f GB free)" % (e["mount"], pct, free))
         if pct >= a.full:
             full.append("DISK %s at %d%%" % (e["mount"], pct))
     if dirty:
