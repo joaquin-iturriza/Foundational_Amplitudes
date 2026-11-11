@@ -23448,6 +23448,30 @@ entries:
       guard; rate 0.68 s/step and kit_result.txt from f6b2ece9 same script; disk 85 MB/run; searched results.tex and decisions
       for log invariant, pair log, input representation, log1p, local frame log, soft rescale, input_pair, log inputs: only
       D374 found'
+  - at: '2026-11-11T04:38:59+00:00'
+    question: 'Combined input arm (D392: incorporate every input that gains): do soft rescale (1a14c791) and pair logs (3fa9854a)
+      keep both gains together on ee->uug from scratch at 1e5, i.e. soft as soft rescale alone and collinear and bulk as pair
+      logs alone? Feeds the input setup of the held-out parent and the scaling runs (pretrain_data_saving).'
+    prior: 'Input-arm finding (kit_fig_A_inputs.json @2d7d93c4, kit_readout --vs): soft rescale soft median -2.88 decades
+      vs control (deepest 0.393, exponent -1.86), coll +0.33 (deepest 47.2), bulk -0.19; pair logs coll -0.37 (4/5 strata
+      better, deepest 10.1), soft -0.01, bulk -0.21; local logs no gain. No combined run exists (results.tex, plan, decisions
+      searched for input_pair_logs, input_soft_eps, combined input).'
+    measure: Per stratum log10(arm log-MSE / control log-MSE) for the 5 soft, 5 collinear strata and bulk_test (kit_readout
+      --vs), deepest-bin log10-MSE and exponents, against f6b2ece9 and each single arm; figures kit_{mse,median}_inputs_ee_uug_me2_*
+      with the combined arm added.
+    check: 'The single flags moved this measure: soft rescale -2.88 decades median on soft, pair logs -0.37 on collinear (4
+      of 5 strata past 0.3); code tested (tests/test_input_reps.py at 06b9353a, Lorentz invariance per flag) and both flags
+      ran together in the CC CPU dry run (n_scalars 25->35, 5 steps trained).'
+    fixed: 'Everything of f6b2ece9 and the single arms but the flags: scripts/job_kit.sh kit_ee_uug__me2 100000 8000 A at
+      trunk (trial-1262 LLoCa μP base config, off-shellness on), float64, seed 42, lr 0.0118605, HETEROSC mu_mse then sigma
+      stage, val last 1e5 of bulk_train, test bulk_test + every hard_test stratum. Rate from the single arms on CC (V100/H100,
+      finished within their 1:55); --time 1:55, 1 job, target 1.7 h, 1.9 GPU-h requested.'
+    control: f6b2ece9 (no flag) and the two single arms 1a14c791 (soft rescale) and 3fa9854a (pair logs).
+    seeds: One seed (42), D315, as every sibling cell.
+    outcome: 'Yes (adopt both): soft median within 0.3 decades of soft rescale alone and coll median within 0.3 decades of
+      pair logs alone (or better), bulk not worse than the control by >0.3: the held-out parent and scaling runs take both
+      flags. Interference: one gain lost by >0.3 decades: adopt the flag whose gain is larger in its limit (soft rescale:
+      2.88 vs 0.37 decades) alone, reported with the loss. Both lost: adopt soft rescale alone.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
