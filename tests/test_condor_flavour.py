@@ -65,9 +65,8 @@ def test_dag_waves_and_sub(tmp_path=None):
     sub = open(subs[0]).read()
     assert "gpus_minimum_memory     = 24576" in sub and "request_cpus          = 5" in sub
     assert '+JobFlavour           = "tomorrow"' in sub
-    del cfg["dyhpo"]["waves"]
-    assert [l for l in open(g.write_dag(cfg, d, subs)).read().splitlines() if l.startswith("PARENT")] == [
-        "PARENT trial_0000 trial_0001 trial_0002 CHILD " + " ".join("trial_%04d" % i for i in range(3, 8))]
+    del cfg["dyhpo"]["waves"]                     # no waves named: sweep/ordering.py's, the same 3, 3, 2 (D396)
+    assert [l for l in open(g.write_dag(cfg, d, subs)).read().splitlines() if l.startswith("PARENT")] == parents
 
 if __name__ == "__main__":
     test_generate_sweep(); test_site_tool(); test_gpu_min_mem(); test_dag_waves_and_sub(); print("ok")

@@ -5,7 +5,8 @@ Run on a site (through `site run`); without --apply it prints what it would dele
 (runs/<sweep>/ and runs_from_lxplus/<sweep>/):
   1. a trial with a result at the sweep's top fidelity loses its last model (model_run<i>.pt[.gz]): it is read only to
      warm-start a higher fidelity; reported values and fine-tune parents are the best checkpoint
-  2. once the sweep is finished here (nothing queued, running or unsubmitted, not HELD), every trial except its best
+  2. once the sweep is finished here (nothing queued, running or unsubmitted, not HELD; a sweep/drive.py search, which
+     has no jobs/ here, only once the driver wrote DRIVE_DONE in its sweep dir), every trial except its best
      (lowest val_loss at the top fidelity among this site's results) loses all its models
   4. ... and its plots (*.png, *.pdf) and prediction arrays (preds_*.npz)
 A trial named as a fine-tune parent (fine_tune.pretrained_path) by any sweep config in the checkout or on this site is
@@ -136,6 +137,10 @@ def finished(sweep, q, dags=frozenset()):
         return False
     if os.path.exists(os.path.join(d, "MOVED_TO")):
         return True                                  # what ran here is over; the rest runs elsewhere
+    if not os.path.isdir(os.path.join(d, "jobs")):
+        # a search sweep/drive.py runs: no jobs/ and no registry entry, its trials (sweep/trial_job.sh) invisible to
+        # the queue by name; over only once the driver wrote DRIVE_DONE
+        return os.path.exists(os.path.join(d, "DRIVE_DONE"))
     try:
         from sweep_manager import DEFAULT_REGISTRY, load_registry
         e = load_registry(DEFAULT_REGISTRY)["sweeps"].get(sweep)

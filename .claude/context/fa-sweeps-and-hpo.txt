@@ -30,30 +30,27 @@ python sweep/generate_sweep.py --config sweep/<my_config>.yaml
 # scaling generators submit all their cells interleaved in one batch:
 python sweep/generate_scaling_sweep.py --config sweep/<scaling_config>.yaml
 python sweep/generate_pretraining_scaling_sweeps.py --phase both --auto-submit
-# submit manually later (interleaves with whatever is already queued):
+# submit later (this submission's waves, longest trials first):
 python sweep/sweep_manager.py submit <sweep_dir>/<sweepA> <sweep_dir>/<sweepB>
 ```
 
-**Ordering.** Trials suggested together are blind of each other (all at once is a random search): the `n_startup`
-random trials go first, a guided trial is suggested only after earlier ones are observed, and across sweeps the longest
-trials start first. D396 requires drive.py and sweep_manager.py to submit searches the same way; not met yet: their
-defaults differ (sweep_manager's several-sweep default starts blind on free GPUs):
-- `sweep_manager.py submit`: a lone sweep goes in 3 waves chained by `afterany` (`--seq-batches N`, 1 disables);
-  several sweeps default to 1 wave, interleaved by `nice` rounds (below); `--chain [--capacity N]`: the start-up trials run
-  together, the first guided trial waits for all of them, each later one for the trial W places back (W = min(3,
-  ceil(capacity / sweeps))), the queue longest first (`duration_nice`; HTCondor: the DAG, `cluster.chain_width`);
-  `--weight`/`boost` do not apply to chained jobs.
-- `drive.py`: rolling by default (`--parallel P`: guided trials once every start-up trial is observed, then P in
-  flight) or whole waves (`--wave-sizes 3,3,2` or `dyhpo.waves`, summing to n_trials: wave k+1 once waves 1..k have
-  all finished); each dispatch issues longest first, round-robin across sweeps of equal length (`dispatch_order`).
-**Cross-sweep submitter — `sweep/sweep_manager.py`**. Submits
-trials interleaved across sweeps and stamps each job with a SLURM `nice` value =
-`round × gap`, where a sweep's `j`-th pending trial has `round = j // weight`.
-Same round ⇒ same nice ⇒ runs together (fills GPUs); higher round ⇒ runs later;
-`weight>1` ⇒ that sweep advances faster. Uses only user-level `nice` (no operator
-rights). Commands: `submit <sweepdir>…`, `rebalance` (re-interleave all pending,
-e.g. after adding a sweep), `boost <sweep> --weight N`, `status`, `cancel`.
-Add `--dry-run` to preview. Registry: `~/.sweep_manager/registry.json`.
+**Ordering** (`sweep/ordering.py`, one order for both submitters, D396). Trials suggested together are blind of each
+other (all at once is a random search), so each search goes in waves (`wave_sizes`): its `n_startup` random trials,
+then the guided trials in two batches (8 trials, 3 start-up: 3, 3, 2), or the config's `dyhpo.waves`; wave k+1 is
+suggested once waves 1..k have finished. Across searches the trials wanting out go longest first, round-robin across
+searches of equal length (`dispatch_order`). Only placement differs:
+- `sweep_manager.py submit` (state on one site): wave k+1 of a sweep chained `afterany` on its wave k, the queue ordered
+  by `nice` = dispatch rank × `ORDER_NICE_STEP` (kept by `rebalance`); `--seq-batches N` forces N equal waves, 1
+  disables. `--chain [--capacity N]` (opt-in): the start-up trials together, the first guided trial after all of them,
+  each later one after the trial W places back (W = min(3, ceil(capacity / sweeps))), longest first
+  (`duration_nice`; HTCondor: `cluster.chain_width`). On HTCondor the classic path is a DAG
+  (`generate_sweep.write_dag`) with the same waves. Jobs of older submissions keep `nice` = `round × gap`
+  (`round = j // weight`, `boost <sweep> --weight N`). Commands: `submit <sweepdir>…`, `rebalance`, `boost`, `status`,
+  `cancel`; `--dry-run` previews. Registry: `~/.sweep_manager/registry.json`.
+- `drive.py` (state on the local machine): the waves by default (`--wave-sizes 3,3,2` overrides `dyhpo.waves`); rolling
+  only with `--parallel P` (guided trials once every start-up trial is observed, then P in flight); it writes
+  `DRIVE_DONE` in each search's sweep dir on the sites when the search ends (`sweep/prune.py` prunes a driven search
+  only then).
 **Rebalancing across sites — `sweep/rebalance.py PREFIX... [--apply] [--allow-jeanzay]`.** `site pick` places a
 batch once; this moves trials that have not started from the latest-finishing site to the earliest (by backlog and
 achieved rate), deletes nothing (the source is cancelled and marked `MOVED_TO`), and copies a fine-tune parent's
@@ -89,7 +86,7 @@ HPO search-space rules (harvested from 422 converged sweeps; derivation in `docs
      **extrapolation of the high-D row's decay**: ~2e-3 @30k, ~1.4e-3 @50k, ~9e-4
      @100k steps. The ±½-decade sweep then both centers the search AND *measures*
      that off-grid corner. Surface + numbers: `analysis/hpo_optima/`
-     (`make_fig_2d.py`, `hpo_optima.json`). Template default window `[1e-3, 3e-2]`.
+     (`make_fig_2d.py`, `hpo_optima.json`). Template window `[1.667e-3, 1.5e-2]` (Muon, centred at 5e-3).
 3. **lr is the dominant knob; narrow the rest, don't blindly fix them.** Optima:
    `regularization_lambda ∈ [1e-10, 1e-6]` (cap high at 1e-6; was 9 decades),
    `cosanneal_warmup_frac ∈ [0.05, 0.2]` (median 0.15), `cosanneal_eta_min`
@@ -101,7 +98,7 @@ HPO search-space rules (harvested from 422 converged sweeps; derivation in `docs
 5. **Net effect:** ~10–100× smaller search volume ⇒ halve the trial budget
    (e.g. 300→150 candidates, ~15→~8 obs) at equal resolution, or explore far
    denser at equal budget. Seed new cells from `lr_center(t)`, not a flat prior.
-   The `sweep_config*template.yaml` defaults already encode these ranges.
+   The template encodes the reg, warmup, eta_min and ema_decay ranges.
 6. Single-fidelity means `fidelity_schedule.t_steps: [T]`, one value; the multi-fidelity ladder is unused.
 
 Sweeps across sites (`sweep/drive.py`):

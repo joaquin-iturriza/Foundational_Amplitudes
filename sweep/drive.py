@@ -24,16 +24,21 @@ Usage (from the checkout, code committed and pushed; the driver syncs each site 
         [--sites ccin2p3 lxplus] [--allow-jeanzay] [--poll 60] [--once] [--dry-run]
 Resumable: run it again and it continues from driver_state.json.
 
-Issuing trials, two modes:
-  rolling (default, --parallel P): the n_startup random trials first; once all of them are observed,
-      up to P guided trials in flight, a new one suggested as soon as any one finishes.
-  waves (--wave-sizes 3,3,2, or `dyhpo.waves: [3, 3, 2]` in the sweep config; the flag wins): trials go
+Issuing trials: the order of sweep/ordering.py, the same as sweep_manager.py's (D396).
+  waves (default; --wave-sizes 3,3,2 or `dyhpo.waves` in the sweep config name them, the flag wins; else
+      ordering.wave_sizes: the n_startup random trials, the rest in two guided waves): trials go
       out in whole waves, and wave k+1 is suggested and submitted only once EVERY trial of waves 1..k
       has finished (observed, or failed/lost and reported to the sampler), counted from this driver's
       own driver_state.json, never from a scheduler's view. The first wave should be the n_startup
       random trials; each later wave is the surrogate's picks given every earlier result. The sizes
       must add up to n_trials. This is the likelihoods project's rule: trials that run together are
-      suggested blind of each other, so all-at-once is a random search.
+      suggested blind of each other, so all-at-once is a random search. Across searches the trials
+      wanting out go longest first, round-robin across searches of equal length (ordering.dispatch_order).
+  rolling (only with --parallel P and no waves named): the n_startup random trials first; once all of
+      them are observed, up to P guided trials in flight, a new one suggested as soon as any one finishes.
+Pruning (sweep/prune.py, D19): the trials write their results under the site's sweep dir as any trial does;
+      once a search is done the driver writes DRIVE_DONE there on every site it ran on, which prune.py
+      requires before it treats a search without jobs/ (a driven one) as finished.
 --dry-run: no state written (a temporary directory), no sync, no pool check, no submission; prints the
       `site submit` commands of the first wave that would go out now and exits.
 Limits: detached trials always cold-start (no cross-fidelity warm start), which is how
@@ -70,6 +75,7 @@ except ImportError:
 import siteconf                                   # noqa: E402
 from sweep.dyhpo_sampler import DyHPOSampler     # noqa: E402
 from sweep.generate_sweep import init_sampler    # noqa: E402
+from sweep import ordering                        # noqa: E402
 
 SITE = os.path.expanduser("~/.local/bin/site")
 PROJECT = "FA"
@@ -132,11 +138,12 @@ class Sweep:
         waves = a.wave_sizes or dy.get("waves")
         if isinstance(waves, str):
             waves = [int(x) for x in waves.split(",") if x.strip()]
-        self.waves = [int(x) for x in waves] if waves else None
-        if self.waves:
-            if any(w <= 0 for w in self.waves) or sum(self.waves) != self.n_trials:
-                raise SystemExit("%s: wave sizes %s must be positive and add up to n_trials=%d"
-                                 % (self.name, self.waves, self.n_trials))
+        self.waves = None
+        if waves or not a.parallel:                   # rolling only when asked for (--parallel) and no waves named
+            try:
+                self.waves = ordering.wave_sizes(self.n_trials, self.n_startup, waves)
+            except ValueError as e:
+                raise SystemExit("%s: %s" % (self.name, e))
             if self.waves[0] != self.n_startup:
                 log("%s: WARNING first wave %d != n_startup %d: the random start-up trials and the first wave differ"
                     % (self.name, self.waves[0], self.n_startup))
@@ -385,15 +392,29 @@ class Sweep:
 
 
 def dispatch_order(want):
-    """The trials all sweeps want now, one entry per trial: longest trial first (sw.hours, the config's estimate of
-    T x the step rate), round-robin across sweeps of equal length, so under a submit cap the long trials start first
-    and no sweep's whole wave goes before the others' (as sweep_manager's duration_nice)."""
-    out = []
-    for h in sorted({sw.hours for sw, n in want.items() if n > 0}, reverse=True):
-        group = [[sw] * n for sw, n in want.items() if n > 0 and sw.hours == h]
-        for r in range(max(len(g) for g in group)):
-            out += [g[r] for g in group if r < len(g)]
-    return out
+    """The trials all sweeps want now, one entry per trial, in ordering.dispatch_order (sw.hours: the config's
+    estimate of T x the step rate)."""
+    return ordering.dispatch_order(want, {sw: sw.hours for sw in want})
+
+
+def mark_cmd(name):
+    """The command marking a driven search over, run on the site: its sweep dir is the site's siteconf.SWEEP_DIR
+    (where prune.finished looks), never the local machine's path in sw.cfg."""
+    return ("python -c \"import os, siteconf; d = os.path.join(siteconf.SWEEP_DIR, '%s'); os.makedirs(d, exist_ok=True); "
+            "open(os.path.join(d, 'DRIVE_DONE'), 'w').close(); print('MARKED')\"" % name)
+
+
+def mark_done(sw, a):
+    """DRIVE_DONE in the search's sweep dir on every site it ran on: prune.py's sign that a driven search is over."""
+    if a.dry_run or sw.st.get("done_marked"):
+        return
+    for s in sorted({t["site"] for t in sw.trials()}):
+        out = site("run", s, PROJECT, "--", mark_cmd(sw.name), timeout=300, check=False)
+        if "MARKED" not in out:
+            log("%s: DRIVE_DONE not written on %s: %s" % (sw.name, s, out.strip()[-160:]))
+            return
+    sw.st["done_marked"] = True
+    sw.save()
 
 
 def plan(k, sweeps, a):
@@ -423,7 +444,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--config", action="append", required=True)
     ap.add_argument("--n-trials", type=int)
-    ap.add_argument("--parallel", type=int, help="rolling mode: trials in flight per sweep (default: n_startup)")
+    ap.add_argument("--parallel", type=int, help="rolling mode (only when no waves are named): trials in flight per sweep")
     ap.add_argument("--wave-sizes", type=lambda v: [int(x) for x in v.split(",")],
                     help="whole waves, e.g. 3,3,2 (sum = n_trials): wave k+1 starts when waves 1..k are all observed; "
                          "overrides the config's dyhpo.waves")
@@ -482,6 +503,9 @@ def main():
                         log("%s: %s not ready (pools); trial deferred" % (sw.name, s))
                 except Exception as e:
                     log("%s: submit to %s failed: %s" % (sw.name, s, str(e)[-300:]))
+        for sw in sweeps:
+            if sw.done():
+                mark_done(sw, a)
         if all(sw.done() for sw in sweeps):
             for sw in sweeps:
                 sw.summary()

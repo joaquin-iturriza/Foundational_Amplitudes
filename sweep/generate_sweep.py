@@ -265,8 +265,8 @@ queue
 
 
 def write_dag(cfg, afs_dir, sub_paths, first_idx=0):
-    """HTCondor counterpart of sweep_manager's waves / chained submission. By default two waves:
-    the startup trials first, the surrogate-guided ones after every startup trial has ended. With
+    """HTCondor counterpart of sweep_manager's waves / chained submission. By default the waves of
+    sweep/ordering.py (D396: the startup trials, then the guided ones in two batches, or dyhpo.waves). With
     cluster.chain_width = W set, chained: the first W guided trials wait for every startup trial
     and each later one for the trial W places before it, so every suggestion sees all but the
     W-1 most recent results. A POST script that always succeeds makes each edge
@@ -274,7 +274,8 @@ def write_dag(cfg, afs_dir, sub_paths, first_idx=0):
     so --extend can submit again."""
     n_first = max(1, min(int(cfg.get("dyhpo", {}).get("n_startup", 3)), len(sub_paths)))
     width = cfg.get("cluster", {}).get("chain_width")
-    waves = cfg.get("dyhpo", {}).get("waves")
+    from sweep import ordering
+    waves = cfg.get("dyhpo", {}).get("waves") or ordering.wave_sizes(len(sub_paths), n_first)
     names = [os.path.splitext(os.path.basename(p))[0] for p in sub_paths]
     lines = [f"JOB {n} {p}" for n, p in zip(names, sub_paths)]
     if waves and width is None:
@@ -290,11 +291,6 @@ def write_dag(cfg, afs_dir, sub_paths, first_idx=0):
         lines += [f"SCRIPT POST {n} /bin/true" for g in groups[:-1] for n in g]
         for a, b in zip(groups, groups[1:]):
             lines.append(f"PARENT {' '.join(a)} CHILD {' '.join(b)}")
-    elif width is None:
-        # the default: two waves, the startup trials, then every other trial once they have ended
-        if len(names) > n_first:
-            lines += [f"SCRIPT POST {n} /bin/true" for n in names[:n_first]]
-            lines.append(f"PARENT {' '.join(names[:n_first])} CHILD {' '.join(names[n_first:])}")
     else:
         width = max(1, int(width))
         lines += [f"SCRIPT POST {n} /bin/true" for n in names[:-1]]
