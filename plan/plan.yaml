@@ -21011,7 +21011,7 @@ entries:
     decision: D377
   owner:
     agent: adc41b4db89d6efe9
-    state: working
+    state: closed
     since: '2026-11-11T08:35:21.156000+00:00'
     state_at: '2026-11-11T10:27:36+00:00'
     context: 199028
@@ -22279,44 +22279,34 @@ entries:
     start: '2026-11-11T09:03:35+00:00'
     at: '2026-11-11T09:03:35+00:00'
   handoff:
-    state: 'Calibration cal_f22 complete (25 cells + half-lr rerun of e+e- > t t~ V k=8, whose first run blew up at step 1360).
-      T(D) by D391 (horizons.py --ladder): u u~ LO 6120,6120,7310,7310,then 8500; t t~ LO 800,1440,7680,then 8500; u u~ V
-      1190,1190,2720,2720,4420,then 8500; t t~ V 1360,2380,5950,then 8500. Figure analysis/data_saving/figs/horizons_fig22_targets.png.
-      Stage-2 design PASSED (3rd look, code @44e102dc): two parents + 68 single-fidelity 8-trial DyHPO sweeps (4 targets x
-      D=10^(k/2), LO k=2..10, V k=2..9, x scratch/fine-tune), joint shared-exponent fit L_arm(D)=A_arm D^-alpha+L_inf,arm
-      (dstar_fit.py), S=D*_scr/D*_ft at 1e-4, 16-84% cell-bootstrap band (YES = lower edge above 1, ~84% one-sided: say so
-      in the write-up); one-loop readout test MSE(V/B) via vb_test_mse.py (D371; V-trained u u~ V divided by the exact Born,
-      rank-matched). Parents: heldout (recipes/catalog_v4_datasaving_parent_heldout.yaml, 1133 pools, 3458 steps, lr 1.88126e-2)
-      for the LO targets; treesin (catalog_v4_datasaving_parent_treesin.yaml = heldout + e+e- > u u~, t t~ LO, 1135 pools,
-      3464 steps) for the one-loop targets (''the one loops with the tree levels in the pretraining''); both 1e4 events/pool
-      x 5 epochs (D393), scripts/job_datasaving_parent.sh <heldout|treesin> [flags], in memory (~15 GB peak est., 32G request).
-      Input flags (D392): soft rescale model.input_soft_eps=1e-8 is in; pair logs model.input_pair_logs=6 only if the combined
-      arm FA-ccin2p3-c15b3337 keeps both gains (kit_benchmark readout), else soft rescale alone; local logs out. Flags cost
-      <1% step rate (0.686 vs 0.690 s/step). lr-centre repair at 0a8a5374: below t*=3000 steps the centre follows the inverted
-      U (law at 3000 x (T/3000)^0.5), HPO rule 2. NEXT: step 6 waits on c15b3337, prebuilds 4782624f and a46978e2. On their
-      end: choose the flags, site sync ccin2p3 FA, submit both parents (site submit ccin2p3 FA scripts/job_datasaving_parent.sh
-      --item pretrain_data_saving --hdr=--time=02:30:00 --hdr=--mem=32G -- heldout model.input_soft_eps=1e-8 [model.input_pair_logs=6];
-      same with treesin), record them, wait on them. When the parents end: python sweep/gen_data_saving.py --parent-lo <heldout
-      run dir> --parent-nlo <treesin run dir> (configs dsave_s2_*, commit them), site pick FA --jobs N, record the wall target
-      (plan target), then sweep/drive.py --item pretrain_data_saving over the 68 configs (waves 3,3,2 in the configs) at site
-      pick''s width; ~208 GPU-h, item estimate 215. Then step 4 readout with dstar_fit.py (needs a saving() driver over the
-      sweep bests) and vb_test_mse.py, figures, write-up. Joaquin D394: no stopping to ask.'
-    decisions: 'D383/D390/D391 steps rule; D385-D387 targets; D375 u u~ V trained on V, t t~ V on V/B factors off; D371 common
-      one-loop measure MSE(V/B); D373 level per target where 1e-4 is out of reach; D392 go for searched runs with every input
-      that gains; D393 parent 1e4/pool x 5 epochs; D394 no asking overnight. Owner decision (entry''s words): two parents,
-      held-out for LO targets, trees-in for one-loop targets. Coordinator: pair logs only if c15b3337 keeps both gains. Repairs:
-      lr centre inverted U below 3000 steps (0a8a5374); scratch lr window [c/3,3c] (template rule 2); ft training.lr = c with
-      lr_scale [0.1,10].'
-    ruled_out: 'Bracketing-point D* (dead end); single parent for all four targets (one-loops would lack their trees); trial
-      1262 / kit held-out parent as stage-2 parent (leak); 68224- and 15000-step parent schedules; parent law t^-0.55 below
-      3000 steps; local-frame log inputs; a separate AdamW-parent arm (optimizations_recap''s, D364: ~104 GPU-h + 3 for parents,
-      not in this design).'
-    running: FA-ccin2p3-c15b3337 (kit combined input arm, kit_benchmark's); FA-ccin2p3-4782624f (CPU prebuild of parent_treesin
-      pools, 230 missing pools), FA-ccin2p3-a46978e2 (CPU prebuild of epem_ttx train pool); plan step 6 waits on all three.
-    files: scripts/job_datasaving_parent.sh, recipes/gen_datasaving_parent.py, recipes/catalog_v4_datasaving_parent_{heldout,treesin}.yaml,
-      sweep/gen_data_saving.py, analysis/data_saving/{horizons.py,dstar_fit.py,vb_test_mse.py,plot_horizons.py}, analysis/data_saving/data/{horizons_cal_f22_cal_f22_lrhalf.json,horizons_cal2_ladder.json,dstar_calib.json},
-      analysis/data_saving/figs/horizons_fig22_targets.png
-    written: '2026-11-11T05:19:46+00:00'
+    state: 'Parents r4 running on CC (2026-11-11 ~11:35 CET): FA-ccin2p3-e8425579 = scripts/job_datasaving_parent.sh @361f8bef
+      -- heldout ++model.input_soft_eps=1e-8 ++model.input_pair_logs=6 tag=r4 lr=9.248e-3 (run dir runs/data_saving/dsave_parent_heldout_r4);
+      FA-ccin2p3-938b05ab = same with treesin lr=9.240e-3 (dsave_parent_treesin_r4); 02:30, 32G, ~1 s/step on V100, ~1 h (wall
+      target 1 h recorded, batch dsave_parents). Step 6 waits on both. A detached log read (parents_r4_25min_log) at ~12:00
+      resumes the owner: confirm no ''Skipping update, non-finite'' runs and val_loss_no_reg falling (r3 at 1.88e-2: heldout
+      -1.03 at step ~830 then inf grads, diverged step 1001; treesin val 1e12 spikes). If r4 also diverges: halve again (4.6e-3)
+      or check whether the D392 flags drive it (r3 inf grads started after ~900 steps). When both end cleanly: python sweep/gen_data_saving.py
+      --parent-lo runs/data_saving/dsave_parent_heldout_r4 --parent-nlo runs/data_saving/dsave_parent_treesin_r4 (on CC via
+      site run, configs dsave_s2_*, commit), check the ft configs carry the parent''s input flags (base_config = parent config.yaml),
+      site pick FA --jobs N, plan target, then sweep/drive.py --item pretrain_data_saving over the 68 configs (waves 3,3,2)
+      at site pick''s width; ~208 GPU-h (item estimate 215, D392/D394). Then step 4 readout (dstar_fit.py + saving() driver,
+      vb_test_mse.py), figures, write-up. CC 60 GB free at 10:10. Data: 2754+35 train pools and 2862 alpha_s sidecars copied
+      lxplus->CC today after the amp_data_cache trim; check_site_data --list --alphas clean on both parent recipes and catalog_v4_train
+      (ee_uu, v4_epem_ttx alpha_s^0, exempt).'
+    decisions: 'D392 both input flags in (kit_benchmark verdict on c15b3337), passed with ++ (trial 1262 config predates the
+      keys); D393 1e4/pool x 5 epochs; two parents (heldout for LO, treesin for one-loop). Repair inside approval: parent
+      lr from HPO rule 2 centre 1e-2 (T/3000)^-0.55 instead of the law''s 1.88e-2 after both r3 parents diverged. Missing
+      pools restored by copy from lxplus, not regenerated (898 core-h MadEvent avoided); 73 one-loop pools rebuilt on CC today
+      got lxplus''s alpha_s after a momentum md5 check (56 byte-identical, 17 differ only in |M|^2). Login-node CPU dry runs
+      of the parent abandoned (coordinator): login /tmp and run-dir collisions, not our code.'
+    ruled_out: Parent lr 1.88e-2 (diverged at step ~1000, r3); plain model.* overrides of the input flags (struct error);
+      regenerating the trimmed pools; login-node CPU dry run of a 1135-pool parent; prune.py main on an lxplus worker (condor_q
+      fails; job_prune_dryrun.sh runs prune.caches alone, @1dceb66b, lxplus dry run lists 0 files).
+    running: FA-ccin2p3-e8425579 (heldout parent r4), FA-ccin2p3-938b05ab (treesin parent r4), detached parents_r4_25min_log
+    files: scripts/job_datasaving_parent.sh (@361f8bef, tag= and lr= args), scripts/job_prune_dryrun.sh, sweep/prune.py (CACHE_DRY),
+      sweep/gen_data_saving.py, recipes/catalog_v4_datasaving_parent_{heldout,treesin}.yaml, analysis/data_saving/{horizons.py,dstar_fit.py,vb_test_mse.py,plot_horizons.py},
+      analysis/data_saving/data/{dstar_calib.json,horizons_cal_f22_cal_f22_lrhalf.json,horizons_cal2_ladder.json,vb_test_mse_cal_vb.json}
+    written: '2026-11-11T10:31:22+00:00'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
