@@ -22380,7 +22380,6 @@ entries:
       - 'an arm follows the truth: run it on uugg and tt, then into the pretrained setup'
       - 'none does: report with figures, next lever to Joaquin'
   step_waits:
-    '2': FA-ccin2p3-78b8190c FA-ccin2p3-03ea3719
     '7': FA-ccin2p3-c35a2199 FA-ccin2p3-ac436bba
     '8': FA-ccin2p3-c35a2199 FA-ccin2p3-ac436bba
     '1': 'FA-ccin2p3-53dc387b FA-ccin2p3-69d93512 FA-ccin2p3-67fadb15 FA-ccin2p3-f26df51b FA-ccin2p3-1416e62f FA-ccin2p3-30b7aa28
