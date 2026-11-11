@@ -21821,6 +21821,14 @@ entries:
     text: 'Joaquin 2026-11-11: constant-V/B targets (ee->bbbar) are trained on V, not V/B; the open keep-or-replace question
       is settled by this. Also: bbbar->ZZ flattening from D=1e4 needs more optimization; check it is not compute-limited (best
       steps 1440-4000 of 8000-12000 at k>=7 under the fixed lr law).'
+  - at: '2026-11-11T03:13:25+00:00'
+    text: '2026-11-11: stage-2 re-cost under D373/D375 (analysis/data_saving/cost_stage2.py @4e0c3798, fig analysis/data_saving/figs/cost_stage2.png):
+      102 sweeps of 8 single-fidelity trials (scratch + fine-tune from the heldout parent per target and D; trees k=2..10,
+      one-loop k=2..9; e+e- > b b~ on V), horizon by the passed rule (1.1 s_b plateau; min(4x steps, 64000) where the calibration
+      best is in the last fifth), 0.08 h per trial overhead: 816 trials, 596.9 GPU-h (+89.0 GPU-h phase a for c c~ g, b b~
+      g g), ttbar 247.4, ccbar g 36.3, bbbar gg 37.5, ZZ 118.3, e+e-Z 32.9, ee->bbbar(V) 124.4; 491 GPU-h of it at D>=1e4
+      (ttbar, ZZ, ee->bbbar at 32000-48000 steps). Wall ~10.1 h at site pick''s 59; disk 18.3 GB against 6.5 GB free on CC
+      (step 5).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
