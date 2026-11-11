@@ -114,7 +114,7 @@ HPO search-space rules (harvested from 422 converged sweeps; derivation in `docs
 Sweeps across sites (`sweep/drive.py`):
 `generate_sweep` + `sweep_manager` keep the
 DyHPO state in a file that every trial locks on one site's filesystem; `sweep/drive.py`
-keeps that state on the laptop and sends stateless trials wherever `site pick` says:
+keeps that state on the local machine and sends stateless trials wherever `site pick` says:
     python sweep/drive.py --config sweep/sweep_config_X.yaml [--config ...] \
         [--n-trials N] [--parallel P] [--mem 8G] [--cpus 4] [--hours 0.5] \
         [--sites ccin2p3 lxplus] [--allow-jeanzay] [--poll 60]
@@ -128,7 +128,7 @@ keeps that state on the laptop and sends stateless trials wherever `site pick` s
   missing, built by `scripts/prebuild_recipes.sh` as a CPU job on that site (SLURM or HTCondor).
 - Detached trials cold-start (no cross-fidelity warm start); fine for single-fidelity sweeps.
 - Code must be committed: the driver syncs each site once at start and submits with --no-sync.
-- The driver runs on the laptop in `.venv-driver` (CPU torch + scikit-learn); it builds it
+- The driver runs on the local machine in `.venv-driver` (CPU torch + scikit-learn); it builds it
   itself on first use via `sweep/driver_env.sh`.
-- The driver runs in the background on the laptop and needs nothing from Joaquin; the classic path (state on one site) is for a sweep that must stay on one site (multi-fidelity warm starts).
+- The driver runs in the background on the local machine and needs nothing from Joaquin; the classic path (state on one site) is for a sweep that must stay on one site (multi-fidelity warm starts).
 - FA's pruning tool on a cluster is `sweep/prune.py`, under Joaquin's recorded decision [D19].
