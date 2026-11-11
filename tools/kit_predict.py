@@ -12,6 +12,9 @@ the residual in the network's standardized ln target, exact for any per-event fa
 Writes <out>/predictions.h5 (<split>/<stratum>/log10_<...>, the truth's dataset name) and runs the benchmark's own
 src/evaluate.py on it into <out>/kit_result.json (its stdout table into kit_result.txt). <out> defaults to
 <run_dir>/kit_benchmark.
+--h5 <file>: the strata of another file in the benchmark's layout (new events of the run's process); a group without
+the target is predicted from a unit placeholder truth (log10 pred = the residual / ln 10, the same identity), and then
+nothing is scored.
 """
 import argparse
 import json
@@ -53,12 +56,15 @@ def predict(run_dir, splits, out, h5=None):
             assert (r[:, -1] > 0).all(), f"{split}/{st}: a non-positive target (the signed case is not wired here)"
             blocks.append((split, st, len(r)))
             rows.append(r)
+    assert rows, f"none of the splits {splits} in {src}"
     rows = np.concatenate(rows, axis=0)
     os.makedirs(out, exist_ok=True)
     pool = os.path.join(out, "kit_strata_pool.npy")
     np.save(pool, rows)
     # the per-event alpha_s sidecar data.target_physics_orders reads beside every pool (the file's fixed alpha_s)
-    np.save(pool[:-len(".npy")] + ".alphas.npy", np.full(len(rows), float(kh.metadata(stem)["alpha_s"])))
+    with h5py.File(src, "r") as f:    # the scored file's alpha_s, as stratum_rows' strip factor
+        a_s = float(json.loads(f.attrs["metadata"])["alpha_s"])
+    np.save(pool[:-len(".npy")] + ".alphas.npy", np.full(len(rows), a_s))
     exp, loader = rebuild(run_dir, "test", pool, len(rows))
     trafos = [list(t) for t in (getattr(exp, "_amp_trafos_pp", None) or [exp.cfg.data.amp_trafos])]
     assert all(t == ["log", "standardization"] for t in trafos), (
@@ -75,20 +81,25 @@ def predict(run_dir, splits, out, h5=None):
     i = 0
     with h5py.File(src, "r") as t, h5py.File(path, "w") as f:
         for split, st, n in blocks:
-            tr = t[f"{split}/{st}/{lname}"][:]
+            g = t[f"{split}/{st}"]
+            tr = g[lname][:] if lname in g else np.zeros(n)    # no truth: log10 of the unit placeholder
             f[f"{split}/{st}/{lname}"] = tr + res[i:i + n] / np.log(10.0)
             i += n
         f.attrs["run_dir"] = os.path.abspath(run_dir)
         f.attrs["dataset"] = name
     os.remove(pool)
+    os.remove(pool[:-len(".npy")] + ".alphas.npy")
     return stem, path
 
 
-def evaluate(stem, pred_path, out):
+def evaluate(stem, pred_path, out, h5=None):
     ev = os.path.join(os.path.dirname(os.path.dirname(kh.kit_dir())), "src", "evaluate.py")
+    if not os.path.exists(ev):
+        print(f"no benchmark scorer at {ev}: predictions only")
+        return None
     res = os.path.join(out, "kit_result.json")
     # the benchmark's own scorer, run isolated (-I) from its directory's files
-    p = subprocess.run([sys.executable, "-I", ev, kh.h5_path(stem), pred_path, res], capture_output=True, text=True,
+    p = subprocess.run([sys.executable, "-I", ev, h5 or kh.h5_path(stem), pred_path, res], capture_output=True, text=True,
                        check=True)
     open(os.path.join(out, "kit_result.txt"), "w").write(p.stdout)
     print(p.stdout)
@@ -100,6 +111,8 @@ def main():
     ap.add_argument("run_dir")
     ap.add_argument("--splits", nargs="+", default=["hard_test", "bulk_test"])
     ap.add_argument("--out", default=None)
+    ap.add_argument("--h5", default=None, help="score the strata of this file (the benchmark's layout and targets) "
+                    "instead of the run's own benchmark file, e.g. new events of the same process")
     ap.add_argument("--check-rebuild", type=int, default=0, metavar="N",
                     help="only rebuild the run on the first N bulk_test events (its stats asserted), then exit: a CPU check")
     a = ap.parse_args()
@@ -116,8 +129,12 @@ def main():
         print(f"REBUILD_OK {a.run_dir} mom_div {exp.mom_div}")
         return
     out = a.out or os.path.join(a.run_dir, "kit_benchmark")
-    stem, path = predict(a.run_dir, a.splits, out)
-    r = evaluate(stem, path, out)
+    stem, path = predict(a.run_dir, a.splits, out, a.h5)
+    import h5py
+    _, target, _ = kh.parse(run_target(a.run_dir))
+    with h5py.File(a.h5 or kh.h5_path(stem), "r") as f:
+        truth = all(target in f[f"{sp}/{st}"] for sp in a.splits if sp in f for st in f[sp])
+    r = evaluate(stem, path, out, a.h5) if truth else None
     print(json.dumps({"predictions": path, "result": r}))
 
 

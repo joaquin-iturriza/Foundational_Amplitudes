@@ -171,7 +171,9 @@ def group_rows(g, target, meta):
     parts = meta["particles"]
     perm = beam_perm([p["pdg"] for p in parts])
     mom = np.asarray(g["momenta"][:], dtype=np.float64)[:, perm]
-    y = np.asarray(g[target][:], dtype=np.float64) / strip_factor(meta, target)
+    # a group without the target (new events to predict): 1, whose prediction residual is then the prediction itself
+    y = (np.asarray(g[target][:], dtype=np.float64) if target in g else np.ones(len(g["momenta"]))) \
+        / strip_factor(meta, target)
     n, P = mom.shape[0], mom.shape[1]
     pdg = np.broadcast_to(np.asarray([parts[i]["pdg"] for i in perm], dtype=np.float64), (n, P))
     return np.concatenate([mom.reshape(n, 4 * P), pdg, y[:, None]], axis=1)
@@ -273,10 +275,12 @@ def log10_name(stem, target, path=None):
     """The truth's log10 dataset name in a group: log10_<target> or log10_abs_<target>."""
     import h5py
     with h5py.File(path or h5_path(stem), "r") as f:
-        g = f["bulk_test/bulk"]
+        g = f["bulk_test/bulk"] if "bulk_test/bulk" in f else {}
         for k in (f"log10_{target}", f"log10_abs_{target}"):
             if k in g:
                 return k
+    if path:                 # a file without truth: the benchmark file's name
+        return log10_name(stem, target)
     raise KeyError(f"{stem}: no log10 dataset for {target}")
 
 

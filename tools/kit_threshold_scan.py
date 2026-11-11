@@ -143,20 +143,28 @@ done
 
 
 def amc_sigma(out, sq, order, acc):
-    """(sigma, error) in pb of MG5_aMC fixed order at sqrt s, order LO or NLO, from its own output dir `out`."""
+    """{sigma, err, scale_up, scale_dn} (pb, scale band in %) of MG5_aMC fixed order at sqrt s (order LO or NLO) from its
+    own output dir `out`, or {failed: reason} when MG5_aMC stops (its soft-limit tests fail near threshold: beta 1e-3)."""
     import mg5_pipeline_final as mg
-    script = f"launch {out}\nfixed_order=ON\norder={order}\ndone\n" + AMC_CARD.format(e=sq / 2, mz=MZ, acc=acc, mt=MT)
+    ncore = os.environ.get("SLURM_CPUS_PER_TASK", "4")
+    script = (f"set nb_core {ncore}\nlaunch {out}\nfixed_order=ON\norder={order}\ndone\n"
+              + AMC_CARD.format(e=sq / 2, mz=MZ, acc=acc, mt=MT))
     p = subprocess.run([mg.MG5_BIN], input=script, text=True, capture_output=True, timeout=3600)
     m = re.findall(r"Total cross section:\s*([0-9.eE+-]+)\s*\+-\s*([0-9.eE+-]+)\s*pb", p.stdout)
     if not m:
-        sys.stderr.write(p.stdout[-3000:] + p.stderr[-2000:])
-        raise RuntimeError(f"MG5_aMC gave no cross section at sqrt s {sq} ({order})")
-    return float(m[-1][0]), float(m[-1][1])
+        why = re.findall(r"(aMCatNLOError[^\n]*|Soft test[^\n]*FAILED[^\n]*)", p.stdout + p.stderr)
+        return {"failed": "; ".join(dict.fromkeys(why))[:500] or "no cross section in MG5_aMC's output"}
+    r = {"sigma": float(m[-1][0]), "err": float(m[-1][1])}
+    b = re.findall(r"[Ss]cale variation[^:\n]*:\s*\+([0-9.]+)%\s*-([0-9.]+)%", p.stdout)
+    if b:
+        r["scale_up"], r["scale_dn"] = float(b[-1][0]), float(b[-1][1])
+    return r
 
 
 def cmd_nlo(a):
     import mg5_pipeline_final as mg
     k, K = (int(x) for x in a.part.split("/"))
+    a.dir = os.path.abspath(a.dir)
     sq = grid()[0]
     out = os.path.join(os.path.abspath(a.dir), f"amc_{k}")
     if not os.path.isdir(os.path.join(out, "SubProcesses")):
@@ -164,14 +172,14 @@ def cmd_nlo(a):
                            text=True)
         assert r.returncode == 0 and os.path.isdir(out), "MG5_aMC output failed"
     os.makedirs(os.path.join(a.dir, "nlo"), exist_ok=True)
-    for i in range(k, len(sq), K):
+    for i in (a.only if a.only else range(k, len(sq), K)):
         res = os.path.join(a.dir, "nlo", f"sqrts_{i:02d}.json")
         if os.path.exists(res):
             continue
         lo = amc_sigma(out, sq[i], "LO", a.acc)
         nlo = amc_sigma(out, sq[i], "NLO", a.acc)
         json.dump({"i": i, "sqrts": sq[i], "lo": lo, "nlo": nlo}, open(res, "w"))
-        print(f"AMC sqrt s {sq[i]:.6f}: LO {lo[0]:.6g} +- {lo[1]:.2g}, NLO {nlo[0]:.6g} +- {nlo[1]:.2g} pb", flush=True)
+        print(f"AMC sqrt s {sq[i]:.6f}: LO {lo}, NLO {nlo}", flush=True)
     print(f"AMC_DONE part {a.part}")
 
 
@@ -196,52 +204,76 @@ def cmd_collect(a):
            "sigma_v_exact": sigma_pb(sq, beta, w, vex).tolist(), "surrogates": {}}
     nlo = [json.load(open(p)) for p in sorted(glob.glob(os.path.join(a.dir, "nlo", "sqrts_*.json")))]
     got = {r["i"]: r for r in nlo}
-    out["amc"] = {k: [got[i][k] if i in got else None for i in range(len(sq))] for k in ("lo", "nlo")}
+    ok = lambda r: r if r and "sigma" in r else None      # a point MG5_aMC could not run (its tests failed): no exact NLO
+    out["amc"] = {k: [ok(got[i][k]) if i in got else None for i in range(len(sq))] for k in ("lo", "nlo")}
     for p in sorted(glob.glob(os.path.join(a.dir, "pred", "*", "predictions.h5"))):
         with h5py.File(p, "r") as f:
             v = np.concatenate([10 ** f[k]["log10_abs_virt_finite"][:] for k in idx])
             run = str(f.attrs["run_dir"])
         sv = sigma_pb(sq, beta, w, v)
         out["surrogates"][os.path.basename(run)] = {"run_dir": run, "sigma_v": sv.tolist()}
+    nlo_s = np.array([r["sigma"] if r else np.nan for r in out["amc"]["nlo"]])
+    nlo_e = np.array([r["err"] if r else np.nan for r in out["amc"]["nlo"]])
+    up = np.array([r.get("scale_up", np.nan) if r else np.nan for r in out["amc"]["nlo"]]) / 100
+    dn = np.array([r.get("scale_dn", np.nan) if r else np.nan for r in out["amc"]["nlo"]]) / 100
+    has = np.isfinite(nlo_s)
+    vex = np.asarray(out["sigma_v_exact"])
+    for name, sv in out["surrogates"].items():
+        ratio = (np.asarray(sv["sigma_v"]) - vex) / nlo_s          # sigma_NLO^surr / sigma_NLO^exact - 1
+        sv["ratio"] = [float(x) if np.isfinite(x) else None for x in ratio]
+        sv["unresolved"] = [bool(h and abs(r) < 2 * e / n) for h, r, e, n in zip(has, ratio, nlo_e, nlo_s)]
+        sv["in_scale_band"] = [bool(h and -d <= r <= u) for h, r, u, d in zip(has, ratio, up, dn)]
+        for lvl in (0.01, 0.10):
+            # the smallest beta from which |ratio| stays below lvl at every larger beta with an exact NLO
+            bad = [i for i in np.flatnonzero(has) if abs(ratio[i]) >= lvl]
+            good = [i for i in np.flatnonzero(has) if not bad or i > max(bad)]
+            sv[f"beta_{int(lvl * 100)}pct"] = float(beta[min(good)]) if good else None
+        print("CLAIM " + json.dumps({"run": name, "beta_1pct": sv["beta_1pct"], "beta_10pct": sv["beta_10pct"],
+                                     "lowest_beta_with_exact_nlo": float(beta[has].min()) if has.any() else None}))
     json.dump(out, open(a.out, "w"), indent=1)
     lo_q = np.asarray(out["sigma_lo_quad"])
     for i in range(len(sq)):
         amc = out["amc"]["lo"][i]
-        dev = f"{lo_q[i] / amc[0] - 1:+.1e} ({amc[1] / amc[0]:.0e} MC)" if amc else "no MG5_aMC"
+        dev = f"{lo_q[i] / amc['sigma'] - 1:+.1e} ({amc['err'] / amc['sigma']:.0e} MC)" if amc else "no MG5_aMC"
         print(f"sqrt s {sq[i]:.4f} beta {beta[i]:.2e}: sigma_LO quad {lo_q[i]:.5g} pb vs MG5_aMC {dev}; "
               f"sigma[V] {out['sigma_v_exact'][i]:.5g}; " +
-              " ".join(f"{k[-30:]} {s['sigma_v'][i] / out['sigma_v_exact'][i] - 1:+.2e}" for k, s in out["surrogates"].items()))
+              " ".join(f"{label(k)} {s['sigma_v'][i] / out['sigma_v_exact'][i] - 1:+.2e}" for k, s in out["surrogates"].items()))
     print(f"COLLECTED {a.out}")
 
 
+def label(run):
+    """A short legend label from a KIT run name: what its protocol (A, A_ft, B, B_bulk) trained on."""
+    names = {"A": "from scratch", "A_ft": "fine-tuned", "B": "hard points added", "B_bulk": "bulk continuation"}
+    m = re.match(r"kit_(A_ft|B_bulk|A|B)_", run)
+    return names[m.group(1)] if m else run
+
+
 def cmd_figure(a):
-    sys.path.insert(0, os.path.join(ROOT, "analysis"))
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
+    sys.path.insert(0, ROOT)
+    import plot_style as ps
+    ps.use()
     d = json.load(open(a.json))
     sq = np.asarray(d["sqrts"])
     ok = np.array([x is not None for x in d["amc"]["nlo"]])
-    lo = np.array([x[0] if x else np.nan for x in d["amc"]["lo"]])
-    nlo = np.array([x[0] if x else np.nan for x in d["amc"]["nlo"]])
-    vex = np.asarray(d["sigma_v_exact"])
-    fig, (ax, rx) = plt.subplots(2, 1, figsize=(6, 5.5), sharex=True, gridspec_kw={"height_ratios": [2, 1]})
+    get = lambda k, key, scale=1.0: np.array([x.get(key, np.nan) * scale if x else np.nan for x in d["amc"][k]])
+    lo, nlo, err = get("lo", "sigma"), get("nlo", "sigma"), get("nlo", "err")
+    up, dn = get("nlo", "scale_up", 0.01), get("nlo", "scale_dn", 0.01)
+    fig, (ax, rx) = ps.figure(1, 2, sharex=True, gridspec_kw={"height_ratios": [2, 1]})
+    ax.fill_between(sq[ok], (nlo * (1 - dn))[ok], (nlo * (1 + up))[ok], color="0.85", lw=0, label="NLO scale band")
     ax.plot(sq[ok], lo[ok], "k--", label="LO")
     ax.plot(sq[ok], nlo[ok], "k-", label="NLO")
-    for (name, s), col in zip(d["surrogates"].items(), plt.rcParams["axes.prop_cycle"].by_key()["color"]):
-        lab = a.labels.get(name, name) if a.labels else name
-        sur = nlo + np.asarray(s["sigma_v"]) - vex
-        ax.plot(sq[ok], sur[ok], color=col, ls=":", label=f"NLO, {lab}")
-        rx.plot(sq[ok], (sur / nlo - 1)[ok], color=col, label=lab)
+    rx.fill_between(sq[ok], -dn[ok], up[ok], color="0.85", lw=0)
+    rx.fill_between(sq[ok], (-2 * err / nlo)[ok], (2 * err / nlo)[ok], color="0.6", lw=0, label=r"$\pm2\,\delta_{\rm MC}$")
+    for (name, s), col in zip(d["surrogates"].items(), ps.sequence(len(d["surrogates"]))):
+        r = np.array([x if x is not None else np.nan for x in s["ratio"]])
+        ax.plot(sq[ok], (nlo * (1 + r))[ok], color=col, ls=":", label=label(name))
+        rx.plot(sq[ok], r[ok], color=col)
     rx.axhline(0, color="k", lw=0.8)
     ax.set_ylabel(r"$\sigma(e^+e^-\to t\bar t)$ [pb]")
     rx.set_ylabel(r"$\sigma^{\rm surr}_{\rm NLO}/\sigma_{\rm NLO}-1$")
     rx.set_xlabel(r"$\sqrt{s}$ [GeV]")
-    ax.legend(frameon=False)
-    fig.tight_layout()
-    for ext in ("png", "pdf"):
-        fig.savefig(f"{a.out}.{ext}", dpi=150)
-    print(f"FIGURE {a.out}.png")
+    ps.legend(ax, "lower right")
+    print(f"FIGURE {ps.save(fig, a.out)}")
 
 
 def main():
@@ -253,6 +285,7 @@ def main():
     n = sub.add_parser("nlo")
     n.add_argument("--part", default="0/1")
     n.add_argument("--acc", type=float, default=1e-3)
+    n.add_argument("--only", type=int, nargs="*", default=None, help="these sqrt s indices only (the smoke run)")
     p = sub.add_parser("predict")
     p.add_argument("runs", nargs="+")
     c = sub.add_parser("collect")
@@ -260,7 +293,6 @@ def main():
     f = sub.add_parser("figure")
     f.add_argument("json")
     f.add_argument("--out", required=True)
-    f.add_argument("--labels", type=json.loads, default=None, help='{"run name": "legend label"}')
     for s in (b, n, p, c):
         s.add_argument("--dir", default=DEFAULT_DIR)
     a = ap.parse_args()
