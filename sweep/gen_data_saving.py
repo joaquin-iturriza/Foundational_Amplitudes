@@ -11,7 +11,8 @@ the tree levels in the pretraining"), so model and inputs match and only the key
              the parent's training, leaves as its final model, D276) with layer decay (fine_tune.lr_scale [0.1, 10] around
              training.lr = c, fine_tune.layer_decay [0.75, 1]); the target's own amplitude stats, the parent's
              off-shellness scale (as scripts/job_data_saving.sh ft)
-c = 7.82114e-3 (T/17056)^-0.55 times the transfer study's D factor: the lr of the calibration (job_data_saving.sh).
+c = 7.82114e-3 (max(T,3000)/17056)^-0.55 min(1, T/3000)^0.5 times the transfer study's D factor (the calibration's law,
+job_data_saving.sh, with HPO rule 2's inverted U below t* = 3000 steps), halved where the calibration cell trained at half lr.
 Both: the target's first D train events (data.train_subsample) of recipes/catalog_v4_datasaving_<t>.yaml,
 training.heterosc_select=mu_mse, the sigma stage after, data.phase_space_on_pool, the frozen val split, seed 42.
 The other searched HPs are the template's (sweep/sweep_config_jeanzay_template.yaml).
@@ -44,7 +45,7 @@ def d_of(k):
 
 
 def lr_centre(T, k):
-    """The calibration's lr (scripts/job_data_saving.sh): the parent's law at T times the D factor. Below the optimizer
+    """The lr centre: the calibration's law (scripts/job_data_saving.sh), the parent's law at T times the D factor. Below the optimizer
     timescale t* = 3000 steps the law's t^-0.55 branch does not hold: lr* rises as (T/3000)^0.5 up to t* (HPO rule 2,
     the inverted U), so a horizon T < 3000 takes the law at 3000 times (T/3000)^0.5."""
     from sweep.gen_transfer_pilot import D_FACTOR
@@ -77,8 +78,14 @@ def template_space():
     return [s for s in t["search_space"] if s["name"] != "training.lr"]
 
 
-def write(name, tgt, k, T, arm, rate, parent):
-    c = lr_centre(T, k)
+def halved():
+    """{(target, k)} whose T(D) and rate come from a rerun at half the calibration lr (the cell blew up at full lr), so
+    the search centres on the lr that cell trained at."""
+    return {(r["target"], r["k"]) for r in cal_rows() if r.get("T_D") and str(r.get("dir", "")).endswith("_lrhalf")}
+
+
+def write(name, tgt, k, T, arm, rate, parent, lr_factor=1.0):
+    c = lr_centre(T, k) * lr_factor
     space = template_space()
     fixed = {"data.source": "recipes", "data.processes_file": f"${{PROJECT_DIR}}/recipes/catalog_v4_datasaving_{tgt}.yaml",
              "data.train_subsample": d_of(k), "data.eval_subsample": "null", "data.phase_space_on_pool": "true",
@@ -135,9 +142,10 @@ def main():
     miss = sorted({(t, k) for _, t, k, _, _ in jobs if (t, k) not in R})
     if miss:
         raise SystemExit(f"no measured step rate for {miss} in {CALS}: rerun analysis/data_saving/horizons.py first")
-    total = 0.0
+    total, half = 0.0, halved()
     for name, t, k, T, arm in jobs:
-        p, h = write(name, t, k, T, arm, R[(t, k)], a.parent_nlo if t.endswith("_nlo") else a.parent_lo)
+        p, h = write(name, t, k, T, arm, R[(t, k)], a.parent_nlo if t.endswith("_nlo") else a.parent_lo,
+                     0.5 if (t, k) in half else 1.0)
         total += h
         print(f"{os.path.relpath(p, ROOT)}  {h:.1f} GPU-h")
     print(f"{len(jobs)} sweeps, {total:.1f} GPU-h estimated (8 trials each)")

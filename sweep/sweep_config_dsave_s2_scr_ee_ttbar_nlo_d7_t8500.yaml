@@ -1,0 +1,75 @@
+# pretrain_data_saving stage 2: ee_ttbar_nlo D=3162 scr T=8500; est 0.29 GPU-h per trial.
+# Written by sweep/gen_data_saving.py.
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  request_gpus: 1
+  mem: 32G
+  cpus_per_task: 4
+  time: 00:17:00
+paths: null
+sweep_name: dsave_s2_scr_ee_ttbar_nlo_d7_t8500
+base_config: ${PROJECT_DIR}/runs/data_saving/dsave_parent_treesin_r4
+n_trials: 8
+dyhpo:
+  surrogate: gp
+  n_candidates: 2000
+  objective_scale: auto
+  seed: 218330228
+  n_startup: 3
+  total_budget: 10000
+  waves:
+  - 3
+  - 3
+  - 2
+fidelity_schedule:
+  t_steps:
+  - 8500
+fixed_params:
+  data.source: recipes
+  data.processes_file: ${PROJECT_DIR}/recipes/catalog_v4_datasaving_ee_ttbar_nlo.yaml
+  data.train_subsample: 3162
+  data.eval_subsample: 'null'
+  data.phase_space_on_pool: 'true'
+  data.memmap: 'false'
+  training.heterosc_select: mu_mse
+  evaluation.train_subsample: 2000
+  seed: 42
+  plot: 'true'
+  warm_start_idx: 'null'
+  data.target_over_born: 'true'
+  data.target_physics_factor: 'false'
+  data.target_physics_orders: 'false'
+  fine_tune.pretrained_path: 'null'
+range_extension:
+  enabled: false
+search_space:
+- name: training.lr
+  type: float_log
+  low: 0.00261
+  high: 0.0235
+- name: training.muon_weight_decay
+  type: float_log
+  low: 0.001
+  high: 0.3
+- name: training.regularization_lambda
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-06
+- name: training.cosanneal_warmup_frac
+  type: float_uniform
+  low: 0.05
+  high: 0.2
+- name: training.cosanneal_eta_min
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-07
+- name: ema
+  type: categorical
+  choices:
+  - 'false'
+  - 'true'
+- name: training.ema_decay
+  type: float_uniform
+  low: 0.9
+  high: 0.999
