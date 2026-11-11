@@ -23072,7 +23072,7 @@ entries:
       - 'gains do not hold on tt: tt keeps the A_ft/B models'
   step_waits:
     '3': '2026-11-12'
-    '4': step 6 (flagged uugg/tt models decide what goes to KIT)
+    '4': FA-ccin2p3-c364a7ae FA-ccin2p3-f21fa163 FA-ccin2p3-5515dc85
     '5': step 6 (flagged uugg/tt models decide what goes to KIT)
     '6': FA-ccin2p3-c364a7ae FA-ccin2p3-f21fa163 FA-ccin2p3-5515dc85
   handoff:
