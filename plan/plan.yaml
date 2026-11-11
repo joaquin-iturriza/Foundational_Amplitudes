@@ -22004,6 +22004,19 @@ entries:
       (D394). Disk ~14 GB of 103 GB free on CC. Not in this design: optimizations_recap''s AdamW-parent fine-tune arm (D364,
       finding 2026-11-10T03:35): it would add one 8-trial fine-tune sweep per cell, 34 sweeps ~104 GPU-h, plus two AdamW parents
       ~3 GPU-h, scratch cells shared; still applicable on the new targets, left to that entry.'
+    passed_at: '2026-11-11T12:12:22+00:00'
+    reviewer: '4th look, amendment only (rest as passed 05:07 @44e102dc). lr centre: gen_data_saving.lr_centre @0a8a5374 =
+      law(max(T,3000)) x min(1,T/3000)^0.5, HPO rule 2''s inverted U; recomputed old/new per cell: 8 of 34 cells lowered,
+      not 7, and by up to 4.0x, not 2.6x (t t~ LO D=10 2.45e-2 -> 6.10e-3; u u~ V D=10,32 2.64x; t t~ V D=10 2.29x; t t~ LO
+      D=32 2.16x; t t~ V D=32 1.28x; u u~ V D=100,316 1.11x); the design record and any report must carry 8 cells / 4.0x.
+      Only t t~ LO D=10''s calibration lr falls outside its window (1.34x above the top 1.83e-2). Matched control holds: in
+      all 68 regenerated configs the fine-tune training.lr equals the scratch window''s centre (e.g. t t~ V D=1e4 4.648e-3,
+      window [1.55e-3, 1.39e-2]), so scratch and fine-tune share c in every cell. halved() selects only t t~ V k=8 (the only
+      _lrhalf row with T_D; every other k=8 cell sits at 9.297e-3). Parents FA-ccin2p3-e8425579/938b05ab COMPLETED, logs end
+      with the sigma stage; the final model is in models/ and compressed to .gz, which _torch_load reads by path+''.gz'' (base_experiment.py:67).
+      Checks 2/3 unchanged: calibration bootstrap half-widths 0.12/0.10/0.31/0.12 decades against expected log10 S 0.15-0.35.
+      Prior search terms unchanged from the 05:07 pass (inverted U, t*, lr_centre added: rule 2 is the source). Before submission:
+      commit halved() and the 68 configs (drive.py submits committed code only).'
   step_waits:
     '3': '2026-11-12'
     '4': '2026-11-12'
