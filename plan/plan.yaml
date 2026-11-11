@@ -21953,7 +21953,7 @@ entries:
     '3': '2026-11-12'
     '4': '2026-11-12'
     '5': step 3 (stage 2 go)
-    '6': parent_cpu_dryrun3
+    '6': FA-ccin2p3-5e748c7d FA-ccin2p3-65fd2089
     '7': FA-lxplus-ac2bbf42
   findings:
   - at: '2026-11-10T03:35:22+00:00'
