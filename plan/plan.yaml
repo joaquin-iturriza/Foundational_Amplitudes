@@ -23127,7 +23127,7 @@ entries:
     - FA-ccin2p3-c8ac36f0
     - FA-ccin2p3-de744946
     - FA-ccin2p3-f6b2ece9
-    commit: b63843c8
+    commit: d0c3dd59
     paths:
     - analysis/kit_benchmark/data/kit_fig_A.json
     - scripts/job_kit_package.sh
