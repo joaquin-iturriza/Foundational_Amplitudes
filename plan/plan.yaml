@@ -22022,6 +22022,43 @@ entries:
       Checks 2/3 unchanged: calibration bootstrap half-widths 0.12/0.10/0.31/0.12 decades against expected log10 S 0.15-0.35.
       Prior search terms unchanged from the 05:07 pass (inverted U, t*, lr_centre added: rule 2 is the source). Before submission:
       commit halved() and the 68 configs (drive.py submits committed code only).'
+  - at: '2026-11-11T18:58:29+00:00'
+    question: 'Diagnostic of the stage-2 t t~ readout (Joaquin: the t t~ results are wrong): is the fine-tunes'' loss to scratch
+      on e+e- > t t~ LO and t t~ V (best val mu-MSE ft/scr 6-33x at D=316..1e4, while u u~ fine-tunes win 2.5-60x) caused
+      by the off-shellness input on the parent''s scale (fine_tune.offshell_stats=parent, b03ba783)? On t t~ the Z column
+      (s-MZ^2)/s_hat is near-constant (std 0.0177 on t t~ LO, 0.0145 on t t~ V, signed-log units) while the parent''s scale
+      is std 9.77, so under the parent''s scale the column''s spread, which the scratch arm sees at unit variance, is compressed
+      550-670x (t t~ V''s top column 9x); on u u~ the Z column''s own std 8.75 matches the parent''s (compression 1.1x).'
+    prior: 'b03ba783 / f2aad286 (sec:ladder fine-tunes): keeping the parent''s off-shellness scale on columns that vary in
+      both was chosen because refitting every column shifted the input under the pretrained weights; those probes had columns
+      of comparable spread, none compressed by 1e2-1e3. This entry''s stage-2 readout (stage2_readout.py @16965c23): ft/scr
+      best val 6.1, 12.5, 18.9, 2.4 (t t~ LO D=316..1e4), 8.1, 12.5, 33, 27 (t t~ V), against u u~ LO 0.08, 0.4, 0.04, 0.016.
+      Checks already done on the runs: target stats refit identically in both arms (prepd mean/std equal), test readout inverts
+      the transform to 4e-7 in both, both arms read the same test rows, parent per-process test MSE sound (median 0.13, gg>t
+      t~ 1e-5). Searched results.tex (steering, offshell_stats, parent''s scale, off-shellness fine-tune), the entry, site
+      decisions (off-shell): no test of offshell_stats=own on a compressed column found.'
+    measure: Per cell the best validation mu-MSE (DyHPO's objective, standardized target; same target stats in every arm of
+      a cell) of one fine-tune with fine_tune.offshell_stats=own, at the HPs of that cell's best stage-2 fine-tune trial,
+      against that trial; test MSE (ln|M|^2 for LO, V/B for V) beside it.
+    check: 'Existing data: the gap tracks the compression. t t~ (Z column compressed 550-670x under the parent''s scale) loses
+      6-33x in 8 of 8 cells at D>=316; u u~ (1.1x) wins in 4 of 4 at the same D; the fine-tunes'' first validations show the
+      input change (step 0 HETEROSC loss 9.8e4 on t t~ LO). Within-search spread at fixed D is up to 10-100x between neighbouring
+      HPs, so the test uses 8 cells and a control that is the best of 8 (biased in its favour).'
+    fixed: 'Everything of the stage-2 fine-tune config of each cell (sweep/sweep_config_dsave_s2_ft_<target>_d<k>_t8500.yaml
+      @7d6af9b3: parent, T=8500, data prefix, inputs, target_stats=own) and the best trial''s sampled HPs (lr_scale, layer_decay,
+      muon_weight_decay, regularization_lambda, warmup, eta_min, ema, ema_decay), seed 42; only fine_tune.offshell_stats parent
+      -> own (every off-shellness column fitted on the target, as the scratch arm does).'
+    control: The best stage-2 fine-tune trial of the same cell (FA-ccin2p3-bbc4fcc6, 790990bf, cc8c9a27, 7ef89fea for t t~
+      LO D=316, 1e3, 3162, 1e4; 9dd6c6a5, 55311fa3, ba3dadd6, d67b326e for t t~ V), same HPs; scratch best of the cell beside
+      (3bf34b08, 3434fdb2, 87fc7187, 41f9974d; c63cb88b, f96f4051, 1f94de90, cbc511d4).
+    seeds: Seed 42 (the control's); 8 cells (2 targets x k=5..8) carry the replication.
+    outcome: 'YES (the parent-scale off-shellness causes the t t~ deficit): own-scale val below the control''s in >=6 of 8
+      cells, with geometric-mean ratio own/control <= 1/3; then it is a defect of the fine-tune input for compressed columns:
+      fix _resolve_offshell_stats (fit a column on the target when its spread is far below the parent''s) and rerun the 16
+      t t~ fine-tune searches (~25 GPU-h). NO: geometric-mean ratio >= 1/1.5 or fewer than 5 of 8 below: the off-shellness
+      scale is ruled out, next suspects the dimensionless-mass column on the parent''s scale (2x) and the optimizer. In between:
+      inconclusive, said so. Cost: 8 runs, T=8500 at the stage-2 rates (0.2-0.4 h incl. sigma stage) ~2.5 GPU-h, CC (parents
+      there).'
   step_waits:
     '3': '2026-11-12'
     '4': 'step 6: the end of driver dsave_s2_drive3 (pid 807322)'
