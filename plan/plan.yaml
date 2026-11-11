@@ -23531,7 +23531,7 @@ entries:
       - 'no Coulomb gain: B stays the threshold model; next lever on the target side (Sommerfeld factor divided out)'
   step_waits:
     '3': '2026-11-12'
-    '5': FA-ccin2p3-ce09d554
+    '5': FA-ccin2p3-a90e1ab4 FA-ccin2p3-0cc6b96c FA-ccin2p3-955131a5 FA-ccin2p3-00e5b77e FA-ccin2p3-27a68626 FA-ccin2p3-ce09d554
     '6': FA-ccin2p3-3fc1016a FA-ccin2p3-eb0f30db
   handoff:
     state: 'Step 4 threshold scan DONE (finding 2026-11-11, analysis/kit_benchmark/data/kit_threshold_scan.json @e57f28f7,
