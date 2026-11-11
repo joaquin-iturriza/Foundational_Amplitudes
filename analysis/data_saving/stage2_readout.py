@@ -14,6 +14,7 @@ window centre sqrt(low high); fine-tune: lr_scale) and where the best trial sits
 
     python analysis/data_saving/stage2_readout.py --fetch     # read every trial's test predictions on CC (one call)
     python analysis/data_saving/stage2_readout.py             # the readout from the cached fetch
+    python analysis/data_saving/stage2_readout.py --diag      # test MSE of the diagnostic runs (dsave_diag_*)
 """
 import argparse
 import glob
@@ -43,13 +44,26 @@ import numpy as np, yaml
 sys.path.insert(0, ".")
 from tools.nlo_virtual_pipeline import born_path
 out, pools = [], {}
-for d in sorted(glob.glob("runs/dsave_s2_*/trial_*")):
+for d in sorted(glob.glob(sys.argv[1] if len(sys.argv) > 1 else "runs/dsave_s2_*/trial_*")):
     sw = os.path.basename(os.path.dirname(d))
-    m = re.match(r"dsave_s2_(scr|ft)_(.+)_d(\d+)_t(\d+)$", sw)
-    r = {"sweep": sw, "run": os.path.basename(d)}
+    m = re.match(r"dsave_(?:s2|diag_[a-z]+)_(scr|ft)_(.+)_d(\d+)_t(\d+)$", sw)
+    r = {"sweep": sw, "run": os.path.basename(d), "hp_idx": int(re.match(r"trial_(\d+)", os.path.basename(d)).group(1))}
     f = d + "/sigma_stage/preds_test.npz"
+    lg = d + "/out_0.log"
+    if os.path.exists(lg):
+        L = open(lg).read().splitlines()
+        try:
+            t0 = datetime.datetime.strptime(L[0][1:20], "%Y-%m-%d %H:%M:%S").timestamp()
+            r["gpu_h"] = ((os.path.getmtime(f) if os.path.exists(f) else os.path.getmtime(lg)) - t0) / 3600
+        except (IndexError, ValueError):
+            pass
     if not m or not os.path.exists(f):
         r["error"] = "no sigma_stage/preds_test.npz"
+        L = L if os.path.exists(lg) else []
+        dv = [l for l in L if "Training diverged" in l]
+        er = [l for l in L if " E] " in l or "Error" in l]
+        r["fail"] = ("diverged at step " + re.search(r"at step (\d+)", dv[-1]).group(1) if dv else
+                     (er[-1][:200] if er else "no error in the log (still running or killed)"))
         out.append(r)
         continue
     tg = m.group(2)
@@ -86,13 +100,10 @@ for d in sorted(glob.glob("runs/dsave_s2_*/trial_*")):
         r["mse_ln"] = float(np.mean(e2))
         r["top1_share_ln"] = float(e2.max() / e2.sum())   # the share of the MSE that its worst test event carries
         r["prepd_std"] = float(json.load(open(d + "/data_stats.json"))["prepd_std"][0])
+        r["trafo"] = json.load(open(d + "/data_stats.json"))["amp_trafos_pp"][0][0]   # log, or signedlog:<s>
         r["wrong_sign"] = int((~ok).sum())
         if tg.endswith("_nlo"):
             r["mse_vb"] = float(np.mean((p - t) ** 2))
-        # GPU time of the trial: first log line of the training to the test predictions of the sigma stage
-        l0 = open(d + "/out_0.log").readline()
-        t0 = datetime.datetime.strptime(l0[1:20], "%Y-%m-%d %H:%M:%S").timestamp()
-        r["gpu_h"] = (os.path.getmtime(f) - t0) / 3600
     except Exception as e:
         r["error"] = repr(e)[:200]
     out.append(r)
@@ -129,6 +140,15 @@ def x_lr(s, hp):
 def readout():
     S = searches()
     test = {(r["sweep"], r["run"]): r for r in json.load(open(TEST))}
+    rows = json.load(open(TEST))
+    gpu = {}
+    for r in rows:
+        gpu[r["sweep"]] = gpu.get(r["sweep"], 0) + (r.get("gpu_h") or 0)
+    # a failed trial's cause, from the run dirs of its hp without predictions (a requeued trial left one per attempt)
+    fail = {}
+    for r in rows:
+        if r.get("fail"):
+            fail.setdefault((r["sweep"], r["hp_idx"]), []).append(r["fail"])
     cells, trials = [], []
     for sw, s in S.items():
         obs = [t for t in s["trials"] if t.get("status") == "observed"]
@@ -138,7 +158,11 @@ def readout():
             trials.append({"sweep": sw, "arm": s["arm"], "target": s["target"], "k": s["k"], "D": s["D"],
                            "hp_idx": t["hp_idx"], "rid": t["rid"], "status": t.get("status"), "x_lr": x_lr(s, t["hp"]),
                            "val": t.get("val_loss"), "test": te.get("mse_vb", te.get("mse_ln")),
-                           "gpu_h": te.get("gpu_h")})
+                           "gpu_h": te.get("gpu_h"),
+                           "fail": "; ".join(fail.get((sw, t["hp_idx"]), [])) if t.get("status") in ("failed", "lost")
+                           else None,
+                           "diverged": t.get("status") in ("failed", "lost")
+                           and any(x.startswith("diverged") for x in fail.get((sw, t["hp_idx"]), []))})
         c = {k: s[k] for k in ("arm", "target", "k", "D", "T")}
         c.update(sweep=sw, n_trials=len(s["trials"]), n_observed=len(obs), n_failed=len(bad))
         if obs:
@@ -146,9 +170,11 @@ def readout():
             te = test.get((sw, run_of(sw, b)), {})
             c.update(best_rid=b["rid"], best_hp=b["hp_idx"], val=b["val_loss"], x_lr_best=x_lr(s, b["hp"]),
                      test=te.get("mse_vb", te.get("mse_ln")), test_ln=te.get("mse_ln"), row_check=te.get("row_check"),
-                     val_ln=b["val_loss"] * te["prepd_std"] ** 2 if te.get("prepd_std") else None,
+                     # val x prepd_std^2 is the MSE of ln|.| only under the log transform
+                     val_ln=b["val_loss"] * te["prepd_std"] ** 2 if te.get("prepd_std") and te.get("trafo") == "log"
+                     else None,
                      top1=te.get("top1_share_ln"), wrong_sign=te.get("wrong_sign"), pool=te.get("pool"), test_error=te.get("error"),
-                     search_gpu_h=sum(test.get((sw, run_of(sw, t)), {}).get("gpu_h") or 0 for t in s["trials"]))
+                     search_gpu_h=gpu.get(sw, 0))   # every run dir of the search: failed and requeued attempts too
         cells.append(c)
     # the readout (test: MSE ln|M|^2 for the trees, MSE V/B for the loops) and beside it the selection measure, the
     # best validation mu-MSE in ln units (val x prepd_std^2: MSE of ln|M|^2, of ln|V/B| for t t~ V, of ln|V| for u u~ V)
@@ -160,11 +186,12 @@ def readout():
               f"{c.get('x_lr_best', float('nan')):.2f}  search {c.get('search_gpu_h', 0):.2f} GPU-h"
               + (f"  row_check {c['row_check']:.1e} {c.get('pool')}" if c.get("row_check") is not None else "")
               + (f"  ERROR {c['test_error']}" if c.get("test_error") else ""))
-    print("\ndiverged or lost trials per search, sampled lr in window units (scratch lr/c, fine-tune lr_scale):")
-    for sw in sorted({t["sweep"] for t in trials if t["status"] in ("failed", "lost")}):
-        xs = sorted(t["x_lr"] for t in trials if t["sweep"] == sw and t["status"] in ("failed", "lost"))
-        xo = [t["x_lr"] for t in trials if t["sweep"] == sw and t["status"] == "observed"]
-        print(f"  {sw:36s} diverged at {', '.join(f'{x:.2f}' for x in xs)}; trained up to {max(xo, default=0):.2f}")
+    print("\nfailed or lost trials, sampled lr in window units (scratch lr/c, fine-tune lr_scale), with the cause read "
+          "in the run's log:")
+    for t in sorted((t for t in trials if t["status"] in ("failed", "lost")), key=lambda t: (t["sweep"], t["x_lr"])):
+        xo = [u["x_lr"] for u in trials if u["sweep"] == t["sweep"] and u["status"] == "observed"]
+        print(f"  {t['sweep']:36s} {t['rid']}  at {t['x_lr']:.2f} (trained up to {max(xo, default=0):.2f}): "
+              f"{t['fail'] or 'no run dir read'}")
     json.dump({"fits": res, "cells": cells, "trials": trials}, open(OUT, "w"), indent=1, default=float)
     print("wrote", OUT)
 
@@ -198,7 +225,14 @@ def fits(cells, key):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--fetch", action="store_true")
-    if ap.parse_args().fetch:
+    ap.add_argument("--diag", action="store_true", help="read the diagnostic runs runs/dsave_diag_*/trial_* into "
+                    "data/stage2_diag_test.json (test MSE per run; their val comes from each run's RESULT_JSON)")
+    a = ap.parse_args()
+    if a.diag:
+        rows = site_python(REMOTE, ["'runs/dsave_diag_*/trial_*'"], "S2T")
+        json.dump(rows, open(os.path.join(DATA, "stage2_diag_test.json"), "w"), indent=1)
+        sys.exit(f"wrote {len(rows)} diagnostic runs")
+    if a.fetch:
         rows = site_python(REMOTE, [], "S2T")
         json.dump(rows, open(TEST, "w"), indent=1)
         print("wrote", TEST, len(rows), "trials,", sum("error" in r for r in rows), "without test predictions")

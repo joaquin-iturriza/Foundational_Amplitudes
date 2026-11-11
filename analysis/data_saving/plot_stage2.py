@@ -12,6 +12,7 @@ import json
 import os
 import sys
 
+import matplotlib.ticker
 import numpy as np
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -67,7 +68,7 @@ def lr():
             sh = 10 ** (0.06 * (i - 1.5))             # targets side by side at each D
             tr = [t for t in R["trials"] if t["target"] == tg and t["arm"] == a]
             ok = [t for t in tr if t["status"] == "observed"]
-            bad = [t for t in tr if t["status"] in ("failed", "lost")]
+            bad = [t for t in tr if t["diverged"]]   # read in the log; other failures are listed by the readout
             best = [c for c in R["cells"] if c["target"] == tg and c["arm"] == a and "x_lr_best" in c]
             ax.plot([t["D"] * sh for t in ok], [t["x_lr"] for t in ok], marker=".", linestyle="none",
                     color=cols[tg], label=lab if a == "scr" else None)
@@ -79,7 +80,7 @@ def lr():
         ax.set_xscale("log")
         ax.set_yscale("log")
         ax.set_xlabel(r"$D$")
-        ax.set_ylabel(r"$\eta/c$" if a == "scr" else "lr_scale")
+        ax.set_ylabel(r"$\eta/c$" if a == "scr" else "lr scale")
     # marker key on the fine-tune panel: one legend per canvas, so the target colours join it
     axs[1].plot([], [], marker=".", linestyle="none", color=ps.C.grey, label="trained")
     axs[1].plot([], [], marker="x", linestyle="none", color=ps.C.grey, label="diverged")
@@ -91,6 +92,51 @@ def lr():
     ps.save(fig, FIG + "stage2_lr")
 
 
+def ratio():
+    """best val mu-MSE fine-tune / scratch per D (same target statistics in both arms of a cell)"""
+    fig, ax = ps.figure()
+    for (tg, lab, _), col in zip(T, ps.CYCLE):
+        r = {a: {c["k"]: c["val"] for c in R["cells"] if c["target"] == tg and c["arm"] == a and c.get("val")}
+             for a in ARM}
+        ks = sorted(set(r["scr"]) & set(r["ft"]))
+        ax.plot([10 ** (k / 2) for k in ks], [r["ft"][k] / r["scr"][k] for k in ks], marker="o", color=col, label=lab)
+    ax.axhline(1, color=ps.C.grey, linestyle=":", label="equal")
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xlabel(r"$D$")
+    ax.set_ylabel(r"$L_{\rm ft}/L_{\rm scr}$")
+    ps.legend(ax, "upper left")
+    ps.save(fig, FIG + "stage2_ratio")
+
+
+def lr_val(tg, lab):
+    """every trial's best val mu-MSE against its sampled lr (scratch lr/c, fine-tune lr_scale), one colour per D"""
+    fig, axs = ps.figure(ncols=2)
+    ks = sorted({t["k"] for t in R["trials"] if t["target"] == tg})
+    cols = dict(zip(ks, ps.sequence(len(ks))))
+    for ax, a in zip(axs, ("scr", "ft")):
+        for k in ks:
+            tr = [t for t in R["trials"] if t["target"] == tg and t["arm"] == a and t["k"] == k and t.get("val")]
+            ax.plot([t["x_lr"] for t in tr], [t["val"] for t in tr], marker="o", linestyle="none", color=cols[k],
+                    label=rf"$D=10^{{{k / 2:g}}}$" if a == "ft" else None)
+            bad = [t for t in R["trials"] if t["target"] == tg and t["arm"] == a and t["k"] == k and t["diverged"]]
+            top = 3 * max(t["val"] for t in R["trials"] if t["target"] == tg and t.get("val"))
+            ax.plot([t["x_lr"] for t in bad], [top] * len(bad), marker="x", linestyle="none", color=cols[k],
+                    label="diverged" if a == "ft" and k == ks[-1] and bad else None)
+        ax.set_xscale("log")
+        ax.set_yscale("log")
+        ax.set_xlabel(r"$\eta/c$" if a == "scr" else "lr scale")
+        ax.set_ylabel(r"best val $\mu$-MSE")
+        ax.xaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
+    ps.process_label(axs[0], lab)   # one process per canvas; the right panel's corner holds the legend
+    ps.legend(axs[1], "upper left", ncol=3)
+    ps.make_room(axs[1])
+    ps.save(fig, FIG + "stage2_lrval_" + tg)
+
+
 ld(False)
 ld(True)
 lr()
+ratio()
+for tg, lab, _ in T[1::2]:
+    lr_val(tg, lab)
