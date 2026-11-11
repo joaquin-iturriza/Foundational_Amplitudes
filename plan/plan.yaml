@@ -21719,6 +21719,34 @@ entries:
       par:vob_june, par:vob_pools, par:vob_now), plan show pretrain_data_saving (dead end, findings 08:58-10:22), site decisions
       D360-D372: no earlier one-loop D-calibration on catalog_v4; the cal_vb u u~ > e+e- Z runs are rightly superseded (factor
       on; k=9 FA-ccin2p3-adac4033 confirmed cancelled 11:18).'
+  - at: '2026-11-11T04:06:50+00:00'
+    question: 'Calibration of the steps per D for the draft Fig. 22 targets (D385-D387): e+e- > u u~ LO, e+e- > u u~ one-loop
+      V (constant V/B, trained on V, D375), e+e- > t t~ one-loop V (trained on V/B). Per target and D: at which step does
+      the scratch validation MSE reach its minimum, giving T(D) = 1.1 x that step, made non-decreasing in D and capped at
+      8500 steps (D383, D390, the ladder''s rule)? e+e- > t t~ LO has it from cal2 (704, 1408, 7568, then 8500 from D=316).'
+    prior: 'cal2 (horizons_cal2.json @f280a9fc): e+e- > t t~ LO best steps 640, 1280, 6880, 8000*, 8000*, 5600, 7040, 11760*,
+      12000* (k=2..10). sec:ladder: same rule on ee->dd~. One-loop cal_vb/cal_vb2 (@bfa4b187, @450a2609): best steps 480-11760;
+      the constant V/B of e+e- > b b~ is carried by the standardization mean (no learning), hence D375 trains constant-V/B
+      targets on V. par:vob_june: e+e- > t t~ V/B beats V 3.8x scratch. No calibration of e+e- > u u~ LO, its V, or e+e- >
+      t t~ V on the current parent setup exists (searched results.tex, plan, site decisions D355-D390).'
+    measure: 'Per run, result.json val_mse_curve x prepd_std^2 (val mu MSE in the trained target''s unit: ln|M|^2 for LO,
+      ln|V| for e+e- > u u~ V, ln|V/B| for e+e- > t t~ V), its minimum step s_b (horizons.py); T(D) = 1.1 s_b rounded up to
+      validate_every, then the running maximum over D, capped at 8500. Beside it the test MSE (vb_test_mse.py for the V/B
+      target).'
+    check: 'The measure moves with D on the same protocol: cal2 e+e- > t t~ LO best step 640 (D=10) to 7040 (D=3162), best
+      MSE 2.9e-3 to 9.1e-7; cal_vb b b~ > Z Z best step 480 (D=10) to 11760 (D=3.2e4).'
+    fixed: 'Parent config trial 1262 of cov_v4_long_hpo8_cc_68224 (model, inputs, HETEROSC + sigma stage, checkpoint on val
+      mu MSE); lr = the parent''s law at T=8500 times the transfer D factor (job script); batch min(16384, D/2); 8500 steps
+      every run; D = prefixes of the train pools (e+e- > u u~ LO 1e5: k=2..10; ee_uu_nlo and ee_ttbar_nlo 5e4: k=2..9), val/test
+      frozen; scripts/job_data_saving.sh @ the submitted commit, recipes catalog_v4_datasaving_{ee_uu,ee_uu_nlo,ee_ttbar_nlo}.yaml;
+      e+e- > t t~ V with data.target_over_born=true (physics factors off, as cal_vb2); CC-IN2P3 (pools and Born sidecars there).'
+    control: 'A calibration, not an A/B: one protocol across D and targets; e+e- > t t~ LO''s cal2 horizons (8000-12000 steps,
+      same rule) complete the four; the fine-tunes of stage 2 run the same steps as scratch (D383).'
+    seeds: Seed 42, one run per cell (D315).
+    outcome: 'Per target T(D) (non-decreasing, <= 8500) and a figure of validation MSE against step per D with each minimum
+      marked; a best at the last step means the cap binds there (D383: accepted). Then the stage-2 cost from these T(D). Cost:
+      25 runs x 8500 steps at the measured 4-particle rates (0.075-0.09 s/step k<=7, 0.16 k=8, 0.40 k=9, 0.42 k=10) + 0.08
+      h each = about 10.5 GPU-h; limits 0:30 (k<=7), 0:45 (k=8), 1:30 (k=9), 1:45 (k=10); one wave on CC. Disk 25 x 23 MB.'
   step_waits:
     '3': '2026-11-12'
     '4': '2026-11-12'
