@@ -15,7 +15,8 @@ scan    bulk_train events with ONE input pushed past its range, everything else 
         column (the dimensionless mass column's source, shifted by k decades of sqrt s); per k the same block stats
         and the readout's move d mu = mu(k) - mu(0) in log10|M|^2. A linear continuation keeps d mu / k constant.
 
-    python tools/kit_saturation_probe.py <run_dir> [--n 200] [--scan-n 200] --out <json>     (CPU, site checkout)
+    python tools/kit_saturation_probe.py <run_dir> [--n 200] [--scan-n 200]     (CPU, site checkout; prints 'KITSAT <json>', taken home with
+        site run ... | sed -n 's/^KITSAT //p' > analysis/kit_benchmark/data/kit_sat_<x>.json)
     python tools/kit_saturation_probe.py plot <uug json> <tt json> --figs <dir>
     python tools/kit_saturation_probe.py compare <uug ctrl> <uug arm> <tt ctrl> <tt arm> --figs <dir>
 """
@@ -110,7 +111,8 @@ class Probe:
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("run_dir"); ap.add_argument("--n", type=int, default=200); ap.add_argument("--scan-n", type=int, default=200)
-    ap.add_argument("--out", required=True)
+    ap.add_argument("--out", help="also write the JSON here (local runs only: a file written into a site checkout's "
+                    "tracked tree blocks site sync once the same path is committed)")
     a = ap.parse_args()
     import torch
     torch.set_num_threads(4)
@@ -122,7 +124,8 @@ def main():
             r = r[:2000] if split == "bulk_train" else r[:a.n]
             blocks.append((f"{split}/{st}", len(r))); rows.append(r)
     rows = np.concatenate(rows)
-    out_dir = os.path.dirname(os.path.abspath(a.out)); os.makedirs(out_dir, exist_ok=True)
+    if a.out:
+        os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
     pool = os.path.join(out_dir, f"satprobe_{os.getpid()}.npy")
     np.save(pool, rows)
     import h5py
@@ -196,7 +199,9 @@ def _probe(a, pool, rows, blocks, stem):
         print(f"{name:45s} err {e['err']:+.3f} h_rms {e['h_rms']:.3g} " + "  ".join(
             f"b{b} off {e[f'b{b}/gelu_off']:.2f} lin {e[f'b{b}/gelu_lin']:.2f} att {e.get(f'b{b}/attn_max', float('nan')):.2f} "
             f"x {e[f'b{b}/x_rms']:.3g}" for b in (0, len(probe.blocks) - 1)))
-    json.dump(res, open(a.out, "w"), indent=1)
+    if a.out:
+        json.dump(res, open(a.out, "w"), indent=1)
+    print("KITSAT " + json.dumps(res))
 
 
 def plot(uug, tt, figs):
