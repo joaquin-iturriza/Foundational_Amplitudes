@@ -27027,8 +27027,7 @@ entries:
       design with kit_extrap_read (arm gmax4 to wire in ARMS), kit_figures collect + kit_readout --vs, and kit_transformer_probe
       on the arms (frame and relative gamma)
     '5': 'FA-ccin2p3-cb111375 FA-ccin2p3-e7dca162 (11c fine-tunes: the package takes the best A_ft/B once they are read)'
-    '13': 'FA-ccin2p3-95be8db2 FA-ccin2p3-88b9334a (12(ii) gamma bound: whether the linear-only skip is designed alone or
-      combined with frames_gamma_max=4)'
+    '13': FA-ccin2p3-c4fc1d6f FA-ccin2p3-6bc05a40
   handoff:
     state: '2026-11-12 ~19:10 @7656e687. 11c one-loop tt pretraining: pools built and checked (kit_loop_pool_check.json bf8d88c5:
       beta decades 16-21%, V/B slope -0.89..-1.06); first chain died on missing diagram sidecars v4_{gg,ddx}_ttx_nlo (written
