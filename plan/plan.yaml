@@ -21280,11 +21280,8 @@ entries:
     8: 'One-loop t t~ V suspects batch, design PASS 2026-11-12 (configs sweep/sweep_config_dsave_diag_{massown,adamw,pairthr}_ft_ee_ttbar_nlo_d{5..8}_t8500.yaml
       + smoke ..._smoke3_..._t50.yaml @7d56534c, controls the offown runs, ~5.5 GPU-h): smoke then 12 runs via trial_job.sh,
       --hdr=--time=00:40:00; held by the main session (''before more arms'') until the defect read is seen'
-    9: 'Step 9: head map in (cec3610c, used by every target_stats=own fine-tune); parent_shared batch running (superseded
-      as an arm, read as the effect of the parent-function start at fixed HPs); open: the house-style training-curve figure
-      Joaquin asked for (every D of the study, every curve labelled, axes as stage2_LD''s, the words for ''stage-2 best''
-      and ''parent-scale rerun'', the 0.46-4.84 same-HP rerun spread as instability), then the corrected fine-tune rerun (cost
-      to Joaquin)'
+    9: 'Step 9: read the last two tree head-map runs (FA-ccin2p3-425ef3b2, 58feec4f; D=3.16e4, 1e5) into hmap_readout.py and
+      hmap_LD; the design''s pooled rule already reads NO CHANGE on its 8 exact-control cells (val gmean 1.29, test 0.64)'
     10: 'Joaquin''s review 2026-11-12: fine-tunes start from the parent''s function (affine head rescale at load under target_stats=own,
       unit-tested); find why the one-loop fine-tune blows up (training, not sigma); plots from run curves, house style, every
       D; D=316 outliers; rerun corrected fine-tunes'
@@ -21407,12 +21404,10 @@ entries:
         to Joaquin as in the design'
       - 'all NO: no gain at the control''s HPs; the deficit goes to the defect hunt'
     9:
-      feeds: whether the fine-tunes, started from the parent's function (head map cec3610c), save target data against scratch
-        (S at 1e-4)
+      feeds: whether the head map changes the fine-tune deficit (rerun as correctness or as expected gain)
       if:
-      - 'Joaquin''s go on ~88 GPU-h: rerun the 34 fine-tune searches (sweep/sweep_config_dsave_s2_ft_*.yaml, same design,
-        scratch reused) through drive.py at cec3610c or later, then re-read S with stage2_readout.py'
-      - 'no go: re-read only what the parent_shared batch gives at the controls'' HPs'
+      - 'hmap at D=3.16e4,1e5 within the 0.46-4.84 rerun spread of its control: NO CHANGE stands, figure updated'
+      - 'outside the spread: reported per cell beside the pooled rule, which stays the design''s'
     10:
       feeds: whether pretraining saves t t~ data once the fine-tune starts from the parent's function
       if:
@@ -23116,9 +23111,6 @@ entries:
   step_waits:
     '8': the main session's read of the defect hunt (its 'before more arms'); then launched as designed
     '10': FA-ccin2p3-36d2d504 FA-ccin2p3-9e430b68 FA-ccin2p3-71f185d0 FA-ccin2p3-21f6beca FA-ccin2p3-425ef3b2 FA-ccin2p3-4672cb66
-      FA-ccin2p3-43f7b951 FA-ccin2p3-8ea8817f FA-ccin2p3-f6de1654 FA-ccin2p3-e9f9c5c1 FA-ccin2p3-39daf895 FA-ccin2p3-a6eea808
-      FA-ccin2p3-58feec4f
-    '9': FA-ccin2p3-36d2d504 FA-ccin2p3-9e430b68 FA-ccin2p3-71f185d0 FA-ccin2p3-21f6beca FA-ccin2p3-425ef3b2 FA-ccin2p3-4672cb66
       FA-ccin2p3-43f7b951 FA-ccin2p3-8ea8817f FA-ccin2p3-f6de1654 FA-ccin2p3-e9f9c5c1 FA-ccin2p3-39daf895 FA-ccin2p3-a6eea808
       FA-ccin2p3-58feec4f
   findings:
