@@ -22932,6 +22932,71 @@ entries:
       so a pooled geomean over 8 cells has ln-sd about 0.3 and the 1/3 bar is about 3.5 sd; disk 15-35 MB per run on CC (du)
       against 31 GB free; time limits 1.3x config time against measured 12-24 min at D=316..1e4 and 62 min at D=1e5 (FA-ccin2p3-95ec0d73);
       HETEROSC, own val/test pools, no sweep.'
+  - at: '2026-11-12T01:45:26+00:00'
+    question: 'Step 9, Joaquin 2026-11-12 (fine-tunes start from the parent''s function; the head map at load is in, cec3610c,
+      unit-tested on a toy model only): (1) does the head map work on a real parent (log line ''head mapped to this run''s
+      target stats'', step-0 validation = the parent''s function), (2) at the stage-2 best HPs and seed, how does a fine-tune
+      with the head map compare with the same-HP fine-tune without it on e+e- > t t~ tree and one-loop V/B at every D of the
+      study, and (3) does the head map remove the one-loop late validation-NLL blow-up (the inherited-sigma candidate: the
+      parent''s sigma row read 42x too small under own stats)? Feeds the open question to Joaquin: the ~88 GPU-h rerun of
+      the 34 fine-tune searches with the head map.'
+    prior: 'Searched results.tex (sec:datasaving, target_stats, parent_shared, zero-shot, clip_grad_norm), the entry, site
+      decisions --project FA. (a) catalog_v3 kept-vs-refit standardization read (results.tex ~7418-7553): kept better at small
+      D (1.23-1.34 at D=316), tie at larger D. (b) The parent_shared batch (this entry, design 2026-11-12 00:47; read now
+      with analysis/data_saving/hmap_readout.py): start at the parent''s function in the parent''s units, at the controls''
+      HPs, t t~ tree D=316..1e4; val MSE(ln) over the same-HP own control: r4 7.00, 0.51, 1.00, 0.28 (gmean 1.00), r5 0.95,
+      1.22, 12.5, 4568 (gmean 16; test 0.78, 1.00, 1.03, 1.65): no gain, own kept. The head map differs from parent_shared
+      in the loss units only (own stats; clipping binds on every step and Muon/Adam are scale-invariant, so the dynamics are
+      close) and it also applies to the one-loop targets, which parent_shared cannot. (c) Same-HP rerun spread 0.46-4.84 (stage2_diag_readout.json).
+      (d) clip_grad_norm 5 on every step is the measured choice for HETEROSC (D68 sweep, results.tex ~10624: the four best
+      trials clip on 100% of steps; D72 keeps 5); scratch is clipped on every step too (pre-clip median 77-700). (e) Late
+      val-NLL rise (end minus minimum, main stage): one-loop fine-tunes 57, 27, 177, 0 (stage-2 best, D=316..1e4), parscale
+      57, 220, 155, 0, tops 30, 36, 358, 0; scratch one-loop 2020, 86, 390, 9 at D=10..316, 0 above; tree ft 1486, 249, 150,
+      5.6 at D=10..316.'
+    measure: 'Per cell (target, D, parent): the final model''s (D276) val MSE(ln) of the run''s log target re-based by prepd_std
+      (hmap_readout.py; equals stage2_readout''s val_ln on the stage-2 runs to 3 digits) and the test MSE in stage2_LD''s
+      units (MSE(ln|M|^2) tree, MSE(V/B) one-loop; stage2_readout.py --diag), R = head map / control; the late val-NLL rise
+      (last minus minimum of the main stage''s validation HETEROSC loss) per run; step-0 val loss and the head-map log line
+      from out_0.log. Smoke: step-0 val loss under the head map against the parent_shared smoke''s 6504.25 (same parent, cell,
+      HPs): equal up to ln(s_p/s_o) (the sigma-term shift; the r^2/sigma^2 term is unchanged when the map is exact). Rule
+      quantities computed by hmap_readout.py @1f0b1f7c: out[''pooled''][''headmap/<target>''] (8-cell geomean of R on val
+      and test, count below 1) and out[''blowup''] (rise per run).'
+    check: 'The val/test MSE ratio moved with a change of the start at fixed HPs on existing data: parent_shared over own
+      0.28-12.5 per cell (one 4568 outlier), same-HP reruns 0.46-4.84. The late rise moves across arms and D on existing data
+      (0 to 358 in the fine-tunes, none at D=1e4), so a removal by the head map reads as a rise <1 where the controls rise
+      27-358 (one-loop D=316..3162). Step-0 val loss moves with the start: 8.3e4 (own, unmapped) vs 6504 (parent_shared) on
+      the same cell, so the smoke''s step-0 value separates mapped from unmapped by 10x.'
+    fixed: 'Each cell''s stage-2 best fine-tune HPs (hp_idx and values from sweeps_local/<stage-2 sweep>/driver_state.json),
+      seed 42, T and pools of the cell, MuonAdamW, HETEROSC with heterosc_select mu_mse and the sigma stage, clip 5. hmap:
+      the stage-2 configs (sweep/sweep_config_dsave_s2_ft_<target>_d<k>_*.yaml = parscale''s, r4 parents dsave_parent_heldout_r4
+      / treesin_r4, offshell_stats parent) renamed dsave_diag_hmap_*; hmaptops: the tops configs (r5 parents) renamed dsave_diag_hmaptops_*.
+      Code: trunk at submission (cec3610c head map; later commits since stage 2 touch kit inference, an off-by-default pair
+      input and the one-loop parent checks only).'
+    control: 'Per cell, the same config and HPs without the head map: parscale reruns (r4, D=316..1e4: tree FA-ccin2p3-6d9526c6
+      e70f826b c985b447 a155de3e; one-loop the four parscale ee_ttbar_nlo runs in stage2_diag_runs.json) and tops (r5, D=316..1e4:
+      tree 0ca51b6f e538bda9 f996c9e8 35922ca9 and the one-loop four): the 8 exact-control cells per target the rule reads.
+      At every D the stage-2 best trial itself (r4; also on the then no-op own off-shellness scale) is shown beside, not read
+      by the rule; its run directories for one-loop D=10, 32, 100, 3.16e4 (trials 0434, 0528, 0332, 0396) are gone on CC,
+      so those four hmap runs have only stage2_readout.json''s val/test numbers as reference and no curve. Scratch stage-2
+      best beside as reference.'
+    seeds: 'One seed (42) per cell as in the controls: 17 r4 cells (tree D=10..1e5, 9; one-loop D=10..3.16e4, 8) + 8 r5 cells
+      (D=316..1e4) = 25 runs, read pooled per target; the 0.46-4.84 same-HP spread is the per-cell noise band, so only geomeans
+      over cells and counts are read.'
+    outcome: 'Smoke passes if the log has the head-map line with mu row x a, a = s_p/s_o, and step-0 val loss within 0.5 of
+      6504.25 + ln a (exact where softplus ~ exp; a miss beyond that is read against the logged sigma shift before calling
+      the map wrong), else the map is fixed before the batch. (2) Per target, the pooled 8-cell val geomean G of R (head map
+      over its exact control) with n< = cells below 1: GAIN if G <= 1/3 and n< >= 6: the head map removes the fine-tune deficit,
+      the rerun of the 34 searches goes to Joaquin with these plots as the expected gain; WORSE if G >= 3: reported, rerun
+      not proposed until understood; otherwise (G in (1/3, 3), or G <= 1/3 with n< < 6, i.e. carried by a few cells inside
+      the 0.46-4.84 spread) NO CHANGE: the rerun goes to Joaquin as a correctness rerun (the code''s start is now the parent''s
+      function) with no expected gain, and the t t~ deficit stays open on the generalisation floor. Test geomean reported
+      beside. (3) The six one-loop paired cells at D=316, 1e3, 3162 (r4 vs parscale rising 57, 220, 155; r5 vs tops rising
+      30, 36, 358): inherited-sigma CONFIRMED if >= 5 of the 6 head-map runs rise < 1 nat; REFUTED if >= 4 of 6 rise > 10
+      (the blow-up is the fine-tune''s own late overfit of sigma, as in scratch at small D; the next lead is the training,
+      per Joaquin''s ''training, not sigma''); any other split PARTIAL: the map reduces but does not remove it, reported per
+      cell with the rises, and the rerun question carries it. Launch: smoke dsave_diag_hmsmoke_ft_epem_ttx_d5_t50 (hp 1647,
+      50 steps, every stage), then the 25 runs afterok on it through sweep/trial_job.sh --detached at the cells'' HPs, --hdr=--time
+      1.3x the config time; ~8 GPU-h, under D400.'
   step_waits:
     '8': the main session's read of the defect hunt (its 'before more arms'); then launched as designed
   findings:
