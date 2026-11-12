@@ -31355,6 +31355,12 @@ entries:
     units: null
     start: '2026-11-12T18:11:27+00:00'
     at: '2026-11-12T18:11:27+00:00'
+  - batch: kit_hpo
+    wall_h: 3.5
+    jobs: 32
+    units: null
+    start: '2026-11-12T18:49:51+00:00'
+    at: '2026-11-12T18:49:51+00:00'
   ask: 'GPU budget: 54 GPU-h above 30 with no decision covering it. The four KIT searches (uug plain, tt virtual, uug T target,
     uugg T target) run at 300 epochs = 1831 steps, batch 16384. One trial takes 0.35 h (tt) to 0.48 h (uugg), so one trial
     of each of the four costs 1.70 GPU-h. At 32 trials per search that is 54 GPU-h, about 3.5 h of wall time if CC gives 32
