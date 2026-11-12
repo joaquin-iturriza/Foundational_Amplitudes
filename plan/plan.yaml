@@ -21349,9 +21349,6 @@ entries:
   - D377
   - D407
   next:
-    2: 'Null-parent 2x2 (fresh init vs parent weights through the fine-tune configs at the scratch''s HPs, t t~ tree and V/B,
-      D=316..1e4, 16 runs + 2 smokes, 7.6 GPU-h; analysis/data_saving/submit_nullparent.py @eaacb51f): design review of the
-      version with E = report only'
     3: 'Why the fine-tune HPO fails to find well-trained runs (Joaquin 2026-11-12 ~10:30: none of the runs are well optimized):
       diagnose from the 34 searches'' trial curves (lr_scale window under Muon, warmup/horizon vs val minimum, sampled trials,
       objective pick, layer decay, restart optimizer state), fix the template, show well-trained fine-tune curves on a couple
@@ -23794,9 +23791,6 @@ entries:
       layer_decay, layer decay, LLRD, lr_scale, fine-tune search, search space; entry dead ends; site decisions (layer, lr_scale,
       template, D407-D412).'
   step_waits:
-    '2': FA-ccin2p3-dbd0ef14 FA-ccin2p3-9aa32fc7 FA-ccin2p3-5b23c48c FA-ccin2p3-06f25f84 FA-ccin2p3-be096b2b FA-ccin2p3-df21f86b
-      FA-ccin2p3-6ec29bc9 FA-ccin2p3-7a60851a FA-ccin2p3-ace664ae FA-ccin2p3-d239df18 FA-ccin2p3-b2d0c0d3 FA-ccin2p3-3c7a44de
-      FA-ccin2p3-20083504 FA-ccin2p3-be4be805 FA-ccin2p3-65852d55 FA-ccin2p3-8a3c31a9
     '3': 'a fresh owner: this owner closed near the context limit, hand-off written'
   findings:
   - at: '2026-11-10T03:35:22+00:00'
@@ -24599,13 +24593,6 @@ entries:
       data/{suspects_readout.json,suspects_runs.json,nullparent_runs.json,trial_overfit.json}, figs/suspects_*
     written: '2026-11-12T09:31:02+00:00'
   step_why:
-    2:
-      feeds: whether the fine-tune deficit on t t~ sits in the fine-tune path, the fine-tune search, or the parent's weights
-      if:
-      - 'PATH: bisect the path''s input stats on the null arm'
-      - 'WEIGHTS: a design on the parent'
-      - 'SEARCH: finding to Joaquin with the search rerun as a proposal'
-      - 'NOT RESOLVED: report per cell, stop'
     3:
       feeds: whether fine-tuning saves data on tt once both arms are properly optimized (D408)
       if:
