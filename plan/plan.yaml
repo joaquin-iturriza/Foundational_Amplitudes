@@ -23556,6 +23556,12 @@ entries:
     units: null
     start: '2026-11-12T00:50:14+00:00'
     at: '2026-11-12T00:50:14+00:00'
+  - batch: hmap_check
+    wall_h: 1.1
+    jobs: 26
+    units: null
+    start: '2026-11-12T01:42:53+00:00'
+    at: '2026-11-12T01:42:53+00:00'
   handoff:
     state: 'Step 9 defect hunt. Head map implemented and unit-tested (cec3610c: every target_stats=own fine-tune loads the
       parent''s readout mapped to its own target stats, step 0 = parent''s prediction; tests/test_head_map_own_stats.py).
