@@ -22449,6 +22449,17 @@ entries:
       threshold taking effect (input_pair_logs=6 in the parent); (2) the 12 runs afterok on it: site submit ccin2p3 FA sweep/trial_job.sh
       -- --sweep-config <cfg> --trial-idx 0 --detached --hp-idx <idx> --t-steps 8500 --hp k=v..., --hdr=--time=00:40:00 (stage
       A''s 1e4 cell: 22 min training + sigma). GPU 12 x ~0.45 h + 0.1 = ~5.5 GPU-h under D400. Disk 13 x ~15 MB.'
+    passed_at: '2026-11-12T00:17:44+00:00'
+    reviewer: 'Second look, revision @7d56534c. Each arm = offown control + one fixed_param (diffed), same r4 trees-in parent,
+      stage-2 best HPs, seed 42, T=8500, HETEROSC+sigma. Check 2: event_share.json @7d56534c shows the w/o-worst val read
+      moving 0.07-1.08 (own/parent off-shellness) and 0.22-1.62 (stage A tops). Check 3: same-HP rerun spread 0.46-4.84 over
+      8 cells, sd ln 0.78, 4-cell geomean ~1.47x, so the YES bar of 0.4 is ~2.3 sd out; one seed over 4 cells, as the sibling
+      diagnostics (D315). Fixes made: AdamW on YES goes to Joaquin (D155/D158 cited); a pair-threshold YES needs t t~ V scratch
+      searches with the input before S is re-read, and a NO there is worded fine-tune-only; NO worded ''no gain at the control''s
+      HPs'', with its reason for no follow-up search; inconclusive goes to Joaquin with an 8-trial search per cell; tool,
+      knob and configs committed. Searched: results.tex (v3_muon, AdamW fine, mass column, dimless mass, mass_stats, pair
+      threshold, beta^2, sec:datasaving), plan.yaml (pair_threshold, mass_stats, dimless_mass), site decisions (AdamW, Muon,
+      D355-D400).'
   step_waits:
     '7': FA-ccin2p3-35922ca9 FA-ccin2p3-adbd0552
   findings:
