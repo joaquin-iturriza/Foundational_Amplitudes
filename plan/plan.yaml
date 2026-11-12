@@ -22601,6 +22601,53 @@ entries:
       controls), 10 (same val pool as the controls), 11 (target_stats is the axis), 13 (no search), 14 (memmap false, parent_shared
       asserts it; no new cache), 15 (the controls'' configs, preds_val.npz and data_stats.json read by ft_defect.py; prepd_std
       there is the parent''s sigma under parent_shared, so ln units stay right; the smoke checks the files).'
+  - at: '2026-11-12T00:47:06+00:00'
+    question: 'D400 defect hunt, step 9 lead (a) (Joaquin 2026-11-12: ''there is no way a pretrained model just performs worse
+      ... something has to be wrong''): under fine_tune.target_stats=own the parent''s readout is loaded unchanged and read
+      on the target''s own scale (s_parent/s_own = 7.4 on e+e- > t t~ tree), so step 0 is far from the parent''s function
+      (val HETEROSC 8.3e4, grad norms 5.6e3 clipped to 5 for ~100 steps). Does keeping the parent''s target standardization
+      (fine_tune.target_stats=parent_shared: step 0 = the parent''s zero-shot) remove the t t~ tree fine-tune''s deficit against
+      scratch?'
+    prior: 'Prior read of this exact change: docs/results.tex ~7418-7553 (catalog_v3 small-D fine-tunes, analysis/catalog_v3/muon_compare.py
+      @f4e6a54a; parent_shared added for it, 96a53d89): own refit over parent standardization kept, Muon parent median 1.83
+      (9.6-9.8 at D=10, 1.23 and 1.34 at D=316), AdamW parent 1.09 (tie at D=316): kept is better, mostly at small D where
+      the zero-shot is good. What differs here: the current Muon catalog_v4 parent, a held-out t t~ tree target with a 7.4x
+      scale mismatch, D=316..1e4, the stage-2 tuned HPs. Step-9 finding 2026-11-12 (ft_defect.py): lr as applied is as designed;
+      the head mismatch does not order the outcome across targets (u u~ one-loop at 5.8 wins, t t~ tree at 7.4 loses); the
+      one-loop val NLL blow-up is sigma overconfidence; the deficit tracks scratch level (ft loses wherever scratch val MSE
+      < 1e-6). Step 7 off-shellness diag: own/parent-scale t t~ tree 2.33, 2.30, 4.02, 0.72; same-HP rerun spread 1.02, 1.05,
+      0.46, 4.84 (stage2_diag_readout.json). Stage A (r5 tops): t t~ tree r5/r4 0.24 gmean val.'
+    measure: 'Per cell (parent, D): val MSE(ln|M|^2) of the final model (D276) on the 10000-event val pool, (rms of pred -
+      truth in standardized units x prepd_std)^2 from sigma_stage/preds_val.npz (as ft_defect.py), the arm over its same-HP
+      target_stats=own control; test beside. Also the step-0 val HETEROSC loss from out_0.log.'
+    check: 'Expected read: NO. The one read of this change on the measure (catalog_v3 above) moved the final val loss 1.0-1.34x
+      at D=316 and less at larger D, inside this grid''s per-cell rerun spread (about 0.9 in ln); the cross-target pattern
+      (finding 2026-11-12) also says the start does not separate winning from losing targets. The read is still worth its
+      3.6 GPU-h: the head mismatch is the only code-level difference left between the arms'' starts (weights strict, pool
+      physics, lr groups checked) and Joaquin asked whether something is wrong in the fine-tune path; 8 cells give a geomean
+      standard error ~0.3 in ln against the YES bar ln 3 = 1.1, so a 3x effect, if the 7.4x mismatch (far above v3''s) made
+      one, reads clearly, and a NO closes lead (a) at these HPs.'
+    fixed: 'Stage-2 best HPs of each cell (hp_idx 1647, 507, 1817, 1387 for D=316, 1e3, 3162, 1e4), seed 42, T=8500, target
+      e+e- > t t~ tree (recipes/catalog_v4_datasaving_epem_ttx.yaml), offshell_stats parent, MuonAdamW, HETEROSC with heterosc_select
+      mu_mse and the sigma stage; parents runs/data_saving/dsave_parent_heldout_r4 and _r5 (model_run0_best.pt). Configs sweep/sweep_config_dsave_diag_{pshared,psharedtops}_ft_epem_ttx_d{5..8}_t8500.yaml,
+      identical to the controls'' but target_stats=parent_shared. One-loop targets excluded: their parents'' stats are of
+      ln|M|^2 with the physics factor, a different quantity from ln(V/B) (parent_shared asserts on it).'
+    control: 'The same-HP target_stats=own reruns: r4 parscale FA-ccin2p3-6d9526c6, e70f826b, c985b447, a155de3e; r5 tops
+      FA-ccin2p3-0ca51b6f, e538bda9, f996c9e8, 35922ca9; scratch stage-2 best beside (8.5e-9 val at D=3162).'
+    seeds: 'One seed (42) per cell, 8 cells, read pooled: the same-HP rerun spread 0.46-4.84 per cell is the noise band, so
+      only the 8-cell geomean and the count below 1 are read.'
+    outcome: 'R = parent_shared / own per cell (the re-based val MSE(ln), never RESULT_JSON val_loss, which is in the parent''s
+      units under parent_shared). YES (the head mismatch is the defect): geomean R <= 1/3 and >= 6 of 8 cells below 1: parent_shared
+      becomes the tree fine-tune setting and the tree fine-tune searches are rerun with it (cost to Joaquin). NO: geomean
+      R in (1/3, 3): no gain from keeping the parent''s standardization at the control''s HPs (not a proof that no HP setting
+      gains); it does not go on to a parent_shared search: with the catalog_v3 read and the cross-target pattern the start
+      is then unlikely as the cause, and the next design goes to the fine-tune''s generalisation floor on t t~ (what the parent''s
+      features impose: mass column own, step 8''s massown arm extended to t t~ tree); a parent_shared search stays a proposal
+      to Joaquin with its cost. WORSE: geomean R >= 3: own stays. r4 and r5 disagreeing (one 4-cell geomean <= 1/3, the other
+      >= 1): INCONCLUSIVE, both numbers reported. Launch: smoke dsave_diag_pshsmoke_ft_epem_ttx_d5_t50 (log must show the
+      parent''s target standardization kept, the step-0 val loss, the sigma stage and preds written), then the 8 runs afterok
+      on it via sweep/trial_job.sh --detached at the cells'' HPs, --hdr=--time=00:40:00 (D=1e4: 00:50:00); ~3.6 GPU-h, under
+      D400.'
   step_waits:
     '8': the main session's read of the defect hunt (its 'before more arms'); then launched as designed
     '9': the next owner after this hand-off (context near its limit), and the main session's read of the defect hunt
