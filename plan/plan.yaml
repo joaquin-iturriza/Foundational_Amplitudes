@@ -24075,9 +24075,8 @@ entries:
       holds at D>=1e3. Outcome partition ordered, every case mapped. Searched: lr x1/10, lr x1/3, suspects, lower lr, lr window,
       Muon lr, spike, jitter, lrtenth, lrthird, curve_quality in results.tex, the entry''s findings/dead ends, decisions D405-D412.'
   step_waits:
-    '2': 'the CC sync: two untracked kit_benchmark files (analysis/kit_benchmark/data/kit_sat_{ttvirt,uug}_scalars.json) block
-      the merge, routed to the main session; then the owner starts drive.py over sweep/sweep_config_dsave_lr{third,tenth}_{scr,ft}_epem_ttx_d7_t8500.yaml
-      (design PASSED 2026-11-12, target 1.2 h / 32 jobs, 8.8 GPU-h)'
+    '2': the detached driver lr_centre_test (sweep/drive.py over dsave_lrthird_{scr,ft}_epem_ttx_d7_t8500 and dsave_lrtenth_{scr,ft}_epem_ttx_d7_t8500,
+      CC, 32 trials)
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
