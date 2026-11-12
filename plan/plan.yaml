@@ -25456,12 +25456,15 @@ entries:
     - FA-ccin2p3-d97ae1c0
     - FA-ccin2p3-dc799c8e
     - FA-ccin2p3-de744946
+    - FA-ccin2p3-e1c19b4d
     - FA-ccin2p3-e4eecead
+    - FA-ccin2p3-e8088a7d
     - FA-ccin2p3-eb0f30db
     - FA-ccin2p3-f6b2ece9
-    commit: dddeacff
+    commit: 2ac85502
     paths:
     - analysis/kit_benchmark/data/kit_fig_A.json
+    - analysis/kit_benchmark/data/kit_threshold_scan.json
     - models/lloca.py
     - scripts/job_kit_package.sh
     - scripts/job_kit_rescore.sh
