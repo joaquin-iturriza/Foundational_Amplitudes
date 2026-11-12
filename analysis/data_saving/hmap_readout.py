@@ -37,11 +37,15 @@ TLAB = {"epem_ttx": (r"$e^+e^-\to t\bar t$", r"MSE$(\ln|\mathcal{M}|^2)$"),
         "ee_ttbar_nlo": (r"$e^+e^-\to t\bar t$, $V$", r"MSE$(V/B)$")}
 # arm: legend, colour, marker (the words Joaquin asked for: 'stage-2 best' is the selected search trial, a 'rerun'
 # repeats it at the same HPs and seed; 'head map' starts from the parent's function)
-STYLE = {"scr": ("scratch, stage-2 best", ps.C.blue, "o"), "s2": ("fine-tune, stage-2 best", ps.C.vermillion, "s"),
-         "parscale": ("fine-tune rerun", ps.C.orange, "^"), "hmap": ("fine-tune rerun, head map", ps.C.green, "D"),
-         "tops": ("fine-tune rerun, r5", ps.C.purple, "v"), "hmaptops": ("fine-tune rerun, r5, head map", ps.C.sky, "P")}
+STYLE = {"scr": ("scratch, best of its 8-trial search", ps.C.blue, "o"),
+         "s2": ("fine-tune, best of its 8-trial search", ps.C.vermillion, "s"),
+         "parscale": ("fine-tune, same settings rerun from the same parent", ps.C.orange, "^"),
+         "offown": ("fine-tune, same settings, off-shell inputs on its own scale", ps.C.yellow, "<"),
+         "hmap": ("fine-tune, same settings, starting at the parent's prediction", ps.C.green, "D"),
+         "tops": ("fine-tune, same settings, parent with top quarks", ps.C.purple, "v"),
+         "hmaptops": ("fine-tune, same settings, parent with top quarks, starting at its prediction", ps.C.sky, "P")}
 TARGETS = ("epem_ttx", "ee_ttbar_nlo")
-DIAG_ARMS = ("parscale", "tops", "hmap", "hmaptops", "pshared", "psharedtops")
+DIAG_ARMS = ("offown", "parscale", "tops", "hmap", "hmaptops", "pshared", "psharedtops")
 
 REMOTE = r'''
 import glob, json, os, re, sys
@@ -157,8 +161,7 @@ def main():
 
 
 def figures(R):
-    """hmap_LD: test (stage2_LD's units) and val MSE(ln) against D per arm; hmap_curves_<target>_<x>: the validation
-    HETEROSC loss against step at each D of the study; hmap_gradnorm: the pre-clip gradient norm's median and 10%
+    """hmap_LD: test (stage2_LD's units) and val MSE(ln) against D per arm; hmap_gradnorm: the pre-clip gradient norm's median and 10%
     quantile against D, with the clipping bound."""
     s2 = {(("s2" if c["arm"] == "ft" else "scr"), c["target"], round(2 * np.log10(c["D"]))): c
           for c in json.load(open(os.path.join(DATA, "stage2_readout.json")))["cells"] if c["target"] in TARGETS}
@@ -176,9 +179,11 @@ def figures(R):
 
     fig, axs = ps.figure(ncols=2, nrows=2)
     for j, tg in enumerate(TARGETS):
-        for i, (get, ylab) in enumerate(((test, TLAB[tg][1] + ", test"), (val, r"MSE$(\ln)$, val"))):
+        for i, (get, ylab) in enumerate(((test, "test " + TLAB[tg][1]), (val, "val " + (r"MSE$(\ln|\mathcal{M}|^2)$" if tg == "epem_ttx" else r"MSE$(\ln(V/B))$")))):
             ax = axs[i, j]
             for arm, (lab, col, m) in STYLE.items():
+                if arm.startswith("hmap") and tg == "ee_ttbar_nlo":
+                    continue   # its two runs that ended before the cancel mapped a tree head onto V/B (fixed in ed7c42c6)
                 ks = sorted(k for k in range(2, 11) if get((arm, tg, k)) is not None)
                 ax.plot([10 ** (k / 2) for k in ks], [get((arm, tg, k)) for k in ks], marker=m, color=col,
                         linestyle="-" if arm in ("scr", "s2") else "none", label=lab)
@@ -187,22 +192,9 @@ def figures(R):
             ax.set_xlabel(r"$D$")
             ax.set_ylabel(ylab)
             ps.process_label(ax, TLAB[tg][0])
-    ps.legend(axs[0, 0], "lower left")
+    ps.shared_legend(fig, axs[0, 0], ncol=1)
     ps.save(fig, FIGS + "hmap_LD")
 
-    for tg in TARGETS:
-        ks = sorted({k for (a, t, k) in R if t == tg})
-        figs = ps.panels(len(ks))
-        for (f, ax), k in zip(figs, ks):
-            for arm, (lab, col, m) in STYLE.items():
-                if (arm, tg, k) in R:
-                    ax.plot(*zip(*R[(arm, tg, k)]["val_curve"][1:]), color=col, label=lab)
-            ax.set_yscale("symlog", linthresh=1.0)
-            ax.set_xlabel("step")
-            ax.set_ylabel("val HETEROSC loss")
-            ps.process_label(ax, TLAB[tg][0] + rf", $D=10^{{{k / 2:g}}}$")
-            ps.legend(ax, "upper left")
-        ps.save_panels(figs, FIGS + f"hmap_curves_{tg}")
 
     fig, axs = ps.figure(ncols=2)
     for ax, tg in zip(axs, TARGETS):

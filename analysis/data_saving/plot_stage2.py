@@ -25,7 +25,8 @@ T = [("ee_uu", r"$e^+e^-\to u\bar u$", r"MSE$(\ln|\mathcal{M}|^2)$"),
      ("epem_ttx", r"$e^+e^-\to t\bar t$", r"MSE$(\ln|\mathcal{M}|^2)$"),
      ("ee_uu_nlo", r"$e^+e^-\to u\bar u$, $V$", r"MSE$(V/B)$"),
      ("ee_ttbar_nlo", r"$e^+e^-\to t\bar t$, $V$", r"MSE$(V/B)$")]
-ARM = {"scr": ("scratch", ps.C.blue, "o"), "ft": ("fine-tune", ps.C.vermillion, "s")}
+ARM = {"scr": ("scratch, best of its 8-trial search", ps.C.blue, "o"),
+       "ft": ("fine-tune, best of its 8-trial search", ps.C.vermillion, "s")}
 
 
 def cells(tg, a):
@@ -44,9 +45,9 @@ def ld(gpu):
                 A, Linf = f["fit"][a]
                 D = np.logspace(np.log10(min(x)), np.log10(max(x)), 100)
                 ax.plot(D, A * D ** -f["fit"]["alpha"] + Linf, linestyle="--", color=col,
-                        label="joint fit" if a == "scr" else None)
+                        label=r"fit $A D^{-\alpha}+L_\infty$" if a == "scr" else None)
                 ax.plot([10 ** f["log10_Dstar"][a]], [f["level"]], marker="v", linestyle="none", color=col,
-                        label=r"$D^*$" if a == "scr" else None)
+                        label=r"where the fit crosses $10^{-4}$" if a == "scr" else None)
         if f:
             ax.axhline(f["level"], color=ps.C.grey, linestyle=":", label=r"$10^{-4}$")
         ax.set_xscale("log")
