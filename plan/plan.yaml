@@ -23989,7 +23989,9 @@ entries:
       a bar: name the failing bar; next the matching suspect alone (gap: horizon/regularization at small batch count; steady:
       warm-up or schedule; spike: a further decade or clip). NO CHANGE: medians within 2x of the control''s: lr is not the
       cause; next warm-up/schedule and batch size. Each arm read on its own; no rerun (D315).'
-  step_waits: {}
+  step_waits:
+    '2': 'a reviewer: design-reviewer on the lower-lr template test (recorded 12:41 UTC), and the CC sync (two untracked kit_benchmark
+      files block the merge, routed to the main session); configs dsave_lrtenth_{scr,ft}_epem_ttx_d7_t8500 @979ad4e4'
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
