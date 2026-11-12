@@ -23242,6 +23242,35 @@ entries:
       and the paper keeps it with these numbers; above 1.26: per the A/B rule the one-hot arm gets the 8-trial Muon-space
       DyHPO (~22 GPU-h) best against best; held out: R on encodable probes, every probe with an unseen particle a case one-hot
       cannot predict.'
+    fix_at: '2026-11-12T00:16:34+00:00'
+    fix: 'Part (B) pidqn is fine as re-recorded (the passed design plus the 50-step smoke; disk read again: 49 GB free on
+      /sps/lpnhe against ~2.3 GB). Part (A) muon_long fails on four points. (1) Check 15, the curve is not written: the design
+      measures val mu-MSE against step and AdamW''s steps-to-level from ''the run''s val_mse, every 2% of T''. Nothing in
+      the r5 parent''s setup writes that curve. Its config has training.result_path: null, plots_0/per_process_metrics.json
+      has no val_mse key, and the log has 77 ''Val loss (combined)'' lines (the HETEROSC NLL) and no val_mse. Only the end-of-run
+      per-pool MSE exists (sigma_stage/preds_val.npz, 282200 = 1411 x 200 rows). Fix: pass ++training.result_path=<run_dir>/result.json
+      to every new arm, and show on the 50-step smoke that the file holds val_mse_curve. The Muon short arm''s curve cannot
+      be recovered from r5. Either rerun Muon short at the same commit (1.8 GPU-h; this also removes the commit mismatch of
+      the short pair, but takes the batch to ~31 GPU-h, which needs Joaquin''s go under the budget rule), or draw the curves
+      in the logged validation NLL and read mu-MSE only at each run''s final model. Say which. (2) Check 6, scope: the horizon
+      of 34000 is set as ''the longest pair under 30 GPU-h'', not by the stop that was asked for (1e-4 or plateau), and the
+      design itself expects neither by then. Either show from existing data that about 34000 steps reaches a plateau on 1e4
+      events per pool (the step where the validation minimum falls at about 40 epochs), or size the horizon to the plateau
+      and put that horizon and its GPU-h to Joaquin before submitting. Also, comparing ''at the lowest level both reach, as
+      D373'' borrows a decision whose scope is pretrain_data_saving. Either cite his words for this entry or ask him. (3)
+      Check 5: the prior leaves out par:v4_length (results.tex line 2609): on catalog_v4, width 8, Muon, 68224 steps against
+      17056 (16x over 4x), PP4 R=0.671 and EE4 0.677, and neither run had converged (best checkpoints at the last validation).
+      It also leaves out D292 (''the longest run seems to be plateauing already''). This is the existing measurement of what
+      training length buys on this model family. It bears directly on whether 1e-4 or a plateau is in reach and on sizing
+      the horizon. Name it and use it. (4) State why the long pair trains 39.5 epochs on the parent''s 1e4-per-pool subsample
+      rather than the full training set (the default since 2026-11-01). Consistency with step 2''s parents is a valid reason,
+      but it has to be written down. Under that choice a plateau caused by over-fitting is a data limit, and the outcome has
+      to read it as one. Minor: both runs of a pair go to the same GPU partition (CC sends to gpu_v100 or gpu_h100, and tf32
+      is active only on H100), or the design states that they may differ. Checks that hold for (A): one change per pair (optimizer
+      only; AdamW at Muon''s HPs, its limit stated from par:v3_muon''s 1.1x tuning gain); the measure responds (par:v3_muon
+      per-pool median 8.03x, 4.91x best against best); seeds (0.065 decades per-pool seed spread against a 1.5x bar); HETEROSC;
+      D392 inputs present in r5''s config (input_soft_eps 1e-8, input_pair_logs 6); step rate 1.0579 s/iter read from r5''s
+      own log on V100; disk fine (in memory, ~0.6 GB).'
   step_why:
     1:
       feeds: D364 claim that pIDs and quantum numbers behave the same, on the latest setup
