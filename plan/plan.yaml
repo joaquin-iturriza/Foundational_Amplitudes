@@ -25193,7 +25193,7 @@ entries:
     decision: D401
   owner:
     agent: a7e157e9f019a138b
-    state: working
+    state: closed
     since: '2026-11-12T09:15:48+00:00'
     state_at: '2026-11-12T10:36:12.680000+00:00'
     context: 228779
@@ -25812,25 +25812,32 @@ entries:
     '13': FA-ccin2p3-dc799c8e
     '14': FA-ccin2p3-dc799c8e
   handoff:
-    state: '2026-11-12 ~10:20. E5849 fixed (write_own_alphas registered store_tag pools wrongly: 286c0183, 248594f0; 278 alpha_s
-      sidecars written on CC); re-smoke FA-ccin2p3-fc0c4eed, parents 63543723/24 re-pointed afterok:63560193 (scontrol via
-      site run), so the D405 chain is live (step 9 waits on 62dcf910 done, bf3d593c, 8d1429bf). ReZero (step 10) read: uug
-      STAYED (+1.36 -> +1.10) and underfits (train MSE 1e-3 vs 4e-7), tt virtual MOVED (-1.08 -> +0.36) with bulk +2.44 decades:
-      Mixed, sibling tt Born ReZero FA-ccin2p3-d322922b running (step 12, wait set). Step 6 read: target V x beta Coulomb
-      -3.16, exponent -1.01, scan within the NLO band to beta 1e-3; bulk +0.56 and Sudakov +0.57: NO by the letter, inside
-      the transformer''s own seed noise (findings ~09:40, ~10:20). Step 14 (inputs-only transformer, D411 input side) is ready
-      and needs code + design. Step 5 package waits on the A_ft batch; the V x beta model is the candidate threshold model
-      for it (Joaquin''s call via the main session, given step 6 reads NO by the letter).'
-    decisions: 'Seed check dropped: D315 (Joaquin 2026-11-06T22:31) settles it. Eikonal target dropped: the control already
-      trains on the flat emission-scale target. ReZero sibling submitted per the passed design''s Mixed branch.'
-    ruled_out: Pre-LayerNorm as the uug cause (ReZero STAYED); target power law as the uug cause (target already flat); extra
-      seeds (D315).
-    running: 'FA-ccin2p3-fc0c4eed (smoke) -> 4ab99f50, 66a2efda -> bf3d593c, 8d1429bf (D405); FA-ccin2p3-d322922b (ReZero
-      tt Born). 36a30e0c ended (COMPLETED), no cancel needed. Debris not deleted (not in the way, 66 GB free): 556 _val/_test_smix_n1e4
-      pools in /sps/lpnhe/jiturrizaramirez01/datasets.'
-    files: tools/write_own_alphas.py, tools/kit_figures.py (labels), tools/kit_threshold_scan.py (label), analysis/kit_benchmark/data/kit_fig_A_{rezero,vbeta}.json,
-      kit_extrap.json, kit_threshold_scan.json (7adcd6f8)
-    written: '2026-11-12T09:14:20+00:00'
+    state: '2026-11-12 ~11:55. Step 13 (inputs-only transformer, design PASS by design-reviewer a92960393f8855689): tt virtual
+      arm FA-ccin2p3-4a1cb4a2 read = YES (Sudakov family -1.72 decades vs softpairthr 3fc1016a, deepest log-MSE 0.72 -> 0.026
+      at MLP level, signed -0.53 -> -0.13, bulk equal; Coulomb +0.35 worse); uug arm FA-ccin2p3-dc799c8e running: read it
+      by the design''s rule (deepest coll_y 1e-7..1e-6 median signed error: YES <= +0.30, NO >= +1.02; control +1.36) with
+      python3 tools/kit_extrap_read.py collect --out analysis/kit_benchmark/data/kit_extrap.json (arm ''scalars'' wired),
+      kit_figures collect of runs/kit/kit_A_ee_uug_me2_n100000_t8000_softpair{,_scalars} + kit_readout --vs kit_A_ee_uug_me2_n100000_t8000_softpair,
+      figures, finding. Step 14: run tools/kit_saturation_probe.py on both inputs-only arms (as for the controls: site run
+      ... python tools/kit_saturation_probe.py runs/kit/<run> --out analysis/kit_benchmark/data/kit_sat_<x>.json, then ''plot''),
+      compare residual growth and scans to the controls (finding ~11:40: no component saturates, readout-input rms grows 4x
+      into uug collinear, one-input scans flatten). Step 12 closed (ReZero tt Born STAYED, outliers +4 decades; finding ~11:50).
+      D405 chain: smoke fc0c4eed COMPLETED, parents 4ab99f50/66a2efda RUNNING, fine-tunes bf3d593c/8d1429bf afterok (step
+      9 waits). Joaquin (via coordinator, 2026-11-12): V x beta is a case fix, a diagnostic only; prioritise the general mechanism
+      on undivided targets. If uug is also YES, next: KIT A/A_ft models on the invariant inputs only and an uugg arm (own
+      design); if NO on uug: target the residual growth at the readout (e.g. a final norm before linear_out), own design.'
+    decisions: Inputs-only arm zeroes off-shellness too (data.offshell_zero), passed review as 'only Bakar's inputs'. Revised
+      outcome bars after reviewer FIX (reachable gaps, disjoint bands). tt matched control is softpairthr 3fc1016a (median
+      signed deepest Sudakov -0.527, kit_extrap.json). E5849-type partial registration fixed in tools (020bad27); analysis/catalog_v4
+      scripts left (other entries, read-only, no store_tag).
+    ruled_out: ReZero (uug STAYED, tt Born STAYED with outliers, tt virt underfit); textbook saturation (GELU off-share falls,
+      attention not one-hot) on the control limits; on tt virtual Sudakov the stack itself (inputs-only fixes it).
+    running: FA-ccin2p3-dc799c8e (uug inputs-only, step 13/14 wait); FA-ccin2p3-4ab99f50, 66a2efda -> bf3d593c, 8d1429bf (D405,
+      step 9).
+    files: models/lloca.py, wrappers.py, config/model/lloca.yaml (input_scalars_only, 54288f8f), tests/test_input_reps.py,
+      tools/kit_saturation_probe.py, tools/kit_extrap_read.py, tools/kit_figures.py (labels), analysis/kit_benchmark/data/kit_sat_*.json,
+      kit_extrap.json, kit_fig_A_scalars_tt.json, kit_fig_A_rezero_born.json (55c1d312)
+    written: '2026-11-12T10:41:29+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
