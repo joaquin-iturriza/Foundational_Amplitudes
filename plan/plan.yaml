@@ -22648,6 +22648,15 @@ entries:
       parent''s target standardization kept, the step-0 val loss, the sigma stage and preds written), then the 8 runs afterok
       on it via sweep/trial_job.sh --detached at the cells'' HPs, --hdr=--time=00:40:00 (D=1e4: 00:50:00); ~3.6 GPU-h, under
       D400.'
+    passed_at: '2026-11-12T00:47:39+00:00'
+    reviewer: 'Re-review of the revised design. Configs differ from the parscale and tops controls only in comments, sweep_name
+      and target_stats=parent_shared (8 of 8). Check 2: cites the catalog_v3 kept-vs-refit read (results.tex ~7418-7553, 1.23-1.34
+      at D=316 from the Muon parent) and states the expected read is NO. Check 3: t t~ tree same-HP rerun ratios 1.02, 1.05,
+      0.46, 4.84 (stage2_diag_readout.json), about 0.9 in ln per cell, so the 8-cell geomean SE is about 0.3 against the ln
+      3 bar. Check 4: NO is worded as no gain at the control''s HPs, and a parent_shared search stays a proposal to Joaquin.
+      R uses the re-based val MSE(ln) (prepd_std from the run''s data_stats.json, the parent''s sigma). Check 5 searched:
+      parent_shared, target_stats, zero-shot, standardization kept, parent''s standardization, head mismatch in results.tex;
+      site decisions --project FA; the entry''s evidence and dead ends.'
   step_waits:
     '8': the main session's read of the defect hunt (its 'before more arms'); then launched as designed
     '9': the next owner after this hand-off (context near its limit), and the main session's read of the defect hunt
