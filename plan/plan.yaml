@@ -27377,6 +27377,20 @@ entries:
       past the failing region as the cosine lr falls; at the same risk in principle, nothing in its trace predicts it. If
       the rerun diverges again: the one-loop pools make the pair unstable at this lr, and the next attempt (lower lr for the
       loop parents and their controls) is a design revision.'
+  - at: '2026-11-12T18:00:40+00:00'
+    text: '2026-11-12 ~19:30 @daa54068. Step 15 curve check (tools/kit_curves.py on analysis/kit_benchmark/data/kit_curves.json,
+      67 KIT runs on CC; fig analysis/kit_benchmark/figs/kit_curves_nll.png). The KIT runs kept only the HETEROSC NLL curves
+      (val from the log, train = median per-batch NLL per validation interval; val mu-MSE never written: job_kit.sh had no
+      training.result_path, fixed in daa54068 so new KIT runs keep val_mse_curve/train_eval_mse_curve). curve_quality''s bars
+      as NLL differences (sigma^2 = MSE: factor F = 1/2 ln F nats; separation <= 0.55, end_up <= 0.35; an estimate assuming
+      sigma tracks the residuals). All at lr 0.0118605 (MuonAdamW, wd 0.0473, reg 9.1e-8, warmup 0.18, no EMA). uug 1e5: every
+      run fails, control c15b3337 separation 40.4 / end_up 36.9 nats (val with train to ~5600, flat, then up from ~7000),
+      plain 203a274f 3.59/1.20 (val leaves at ~6000), plain+P2 7b891d10 11.2/8.1, gmax4 95be8db2 160.6/157.1, every route/input
+      arm 6.8-111; uugg 1e5: c364a7ae 2851/2845 (val leaves train at ~1000), gmax4 88b9334a 376/372; tt virtual 1e5: val falls
+      with train to the end (end_up 0 in every run), separation 0.40-0.95 (3fc1016a 0.60, f21fa163 0.53, P2 eb870ad4 0.81),
+      borderline on the 0.55 bar; at 9e5 uug passes (0.60/0.00), uugg nearly (1.84/0.25). Reading: the late separation is
+      a uug/uugg at 1e5 events failure at this lr and HP point; tt holds. Next (D422): single-fidelity DyHPO over the template''s
+      space on the step-14 setups.'
   step_why:
     5:
       feeds: what KIT receives
