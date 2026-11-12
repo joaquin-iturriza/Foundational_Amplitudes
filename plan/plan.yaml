@@ -23388,7 +23388,7 @@ entries:
     processes incl. the target''s tree, at most ~10 other one-loop processes bulk only, 100 to 1e4 one-loop bulk target points,
     family held out, standardization, early stopping and features from bulk only, baseline from-scratch V/B with exact Born),
     and the ee->tt threshold scan sigma(sqrt s) at LO and NLO around 2m_t like Fig. 1 of arXiv:1506.06864 (D363, D353)?'
-  status: running
+  status: held
   quotes:
   - said_at: '2026-11-10T02:08:07.285000+00:00'
     text: Basically all the extrapolation and divergencies study, which is the most incomprehensible section in the draft,
@@ -23396,8 +23396,15 @@ entries:
     decision: D363
     covers:
     - kit_benchmark
+  - said_at: '2026-11-12T00:17:18.510000+00:00'
+    text: we clearly haven't converged on something that does what we want, so no.
+    decision: D401
+    answers_after: '2026-11-11T20:53:19+00:00'
+    covers:
+    - kit_benchmark
   decisions:
   - D363
+  - D401
   next:
     3: 'Fair NLO D-scan (Bakar): ee->tt virtual, 1e2..1e4 bulk one-loop target points, fine-tuned from the fair_nlo parent
       against a from-scratch V/B with exact Born refit on the KIT ee_tt virtual bulk; design once FA-ccin2p3-03ea3719 ends'
@@ -23479,8 +23486,10 @@ entries:
     searched: site decisions --project FA; Joaquin 2026-11-10T02:08 (the KIT request; its decisions D353 'if we need to run
       new things, that's fine too' and D363 approve the work, name no cost); 2026-10-14T16:48 (benchmark framing with Anja,
       no cost); 2026-10-05T04:33 (process equality, unrelated)
-    blocks_steps: &id004
+    blocks_steps:
     - 3
+    answered_at: '2026-11-12T00:17:18.510000+00:00'
+    decision: D401
   owner:
     agent: a0a9411af0a5c385b
     state: closed
@@ -25165,15 +25174,7 @@ entries:
     units: null
     start: '2026-11-11T23:05:17+00:00'
     at: '2026-11-11T23:05:17+00:00'
-  ask: 'GPU budget: ~50 GPU-h above 30 with no decision covering it. The fair NLO D-scan (Bakar''s protocol) on KIT''s t t~
-    one-loop virtual: 5 sizes D = 1e2..1e4 x 2 arms (fine-tuned from the fair_nlo parent; Bakar''s baseline, from-scratch
-    V/B with the exact Born), each an 8-trial DyHPO search as the data-saving study ran its cells: 80 trials, 24 GPU-h at
-    the data-saving study''s measured rates, estimated 40-50 GPU-h in float64. Go?'
-  waiting_since: '2026-11-11T20:53:19+00:00'
-  searched: site decisions --project FA; Joaquin 2026-11-10T02:08 (the KIT request; its decisions D353 'if we need to run
-    new things, that's fine too' and D363 approve the work, name no cost); 2026-10-14T16:48 (benchmark framing with Anja,
-    no cost); 2026-10-05T04:33 (process equality, unrelated)
-  blocks_steps: *id004
+  hold_decision: D401
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
@@ -25556,7 +25557,7 @@ entries:
       about cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID,
       says nothing about the draft's sections)
     blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-    blocks_steps: &id005 []
+    blocks_steps: &id004 []
   owner:
     agent: afb073b8fc9460ec5
     state: stopped
@@ -25574,7 +25575,7 @@ entries:
     cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID, says
     nothing about the draft's sections)
   blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-  blocks_steps: *id005
+  blocks_steps: *id004
   step_why:
     1:
       feeds: the draft's results (D354)
