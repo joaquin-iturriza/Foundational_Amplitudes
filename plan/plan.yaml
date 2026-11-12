@@ -21282,9 +21282,10 @@ entries:
       --hdr=--time=00:40:00; held by the main session (''before more arms'') until the defect read is seen'
     9: 'Step 9: read the last two tree head-map runs (FA-ccin2p3-425ef3b2, 58feec4f; D=3.16e4, 1e5) into hmap_readout.py and
       hmap_LD; the design''s pooled rule already reads NO CHANGE on its 8 exact-control cells (val gmean 1.29, test 0.64)'
-    10: 'Joaquin''s review 2026-11-12: fine-tunes start from the parent''s function (affine head rescale at load under target_stats=own,
-      unit-tested); find why the one-loop fine-tune blows up (training, not sigma); plots from run curves, house style, every
-      D; D=316 outliers; rerun corrected fine-tunes'
+    10: 'Step 10: the one-loop ''blow-up'' enters no reported number (best-mu checkpoint loaded before the sigma stage); the
+      every-trial read (trial_overfit.py @2c7ea02e) finds the fine-tune lr window too high (27/34 fine-tune searches: lower
+      lr_scale, lower val; 11/34 bests in [0.1,0.16]). Rerun of the 34 fine-tune searches with the head map and lr_scale window
+      [0.02,2], ~88 GPU-h: Joaquin''s go'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -21409,10 +21410,10 @@ entries:
       - 'hmap at D=3.16e4,1e5 within the 0.46-4.84 rerun spread of its control: NO CHANGE stands, figure updated'
       - 'outside the spread: reported per cell beside the pooled rule, which stays the design''s'
     10:
-      feeds: whether pretraining saves t t~ data once the fine-tune starts from the parent's function
+      feeds: how much target data pretraining saves at MSE 1e-4 (the fine-tune L(D) curves at a correct start and lr window)
       if:
-      - 'fine-tunes beat or match scratch on t t~: re-read S at the study''s design'
-      - 'still worse: the next defect, shown with the runs'' curves'
+      - 'go: designs and configs of the rerun, design review, submit at site pick''s width'
+      - 'no: the stage-2 L(D) stays as read, with the window finding written beside it'
   designs:
   - at: '2026-11-10T02:35:09+00:00'
     question: 'Step 1 (D356 horizons, tree arm): on catalog_v4''s held-out tree targets ee->ttbar (H3, 2->2 massive), ee->ccbar
@@ -23110,9 +23111,6 @@ entries:
       zero-shot start, sigma head, output head, refit, own/parent stats, warm start; entry dead ends; site decisions.'
   step_waits:
     '8': the main session's read of the defect hunt (its 'before more arms'); then launched as designed
-    '10': FA-ccin2p3-36d2d504 FA-ccin2p3-9e430b68 FA-ccin2p3-71f185d0 FA-ccin2p3-21f6beca FA-ccin2p3-425ef3b2 FA-ccin2p3-4672cb66
-      FA-ccin2p3-43f7b951 FA-ccin2p3-8ea8817f FA-ccin2p3-f6de1654 FA-ccin2p3-e9f9c5c1 FA-ccin2p3-39daf895 FA-ccin2p3-a6eea808
-      FA-ccin2p3-58feec4f
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
