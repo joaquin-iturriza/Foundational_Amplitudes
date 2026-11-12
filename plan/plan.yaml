@@ -26682,6 +26682,8 @@ entries:
       v_end/min v <= 2, on running-median-3 curves) to the KIT runs'' train_steps.npz / val curves (c15b3337, c364a7ae, f21fa163,
       3fc1016a, 203a274f, 7b891d10, eb870ad4, gmax4 and linear-term arms), and choose the lr for the new arms where validation
       stays with training. Note: HETEROSC val is an NLL whose late rise may be sigma collapse; read the mu-MSE val curve too.'
+    16: 'HP search for uugg and uug with the T target (same single-fidelity DyHPO template as step 15, WSD, ~16 GPU-h): only
+      on Joaquin''s yes to the 40 GPU-h total (D412)'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -27668,6 +27670,11 @@ entries:
       - 'controls fail the curve bars: pick the lr at which they pass (from existing runs, or a short DyHPO over the template''s
         space if none, D241) and use it for every new KIT arm'
       - 'controls pass: keep lr 0.0118605'
+    16:
+      feeds: uugg and uug-T results at an HP point where validation stays with training (D422)
+      if:
+      - 'yes: launch beside step 15''s searches'
+      - 'no: uugg and uug-T stay at the old HP point, said wherever shown'
   step_waits:
     '11': FA-ccin2p3-dcf42ad6 FA-ccin2p3-e7dca162
     '5': FA-ccin2p3-dcf42ad6 FA-ccin2p3-e7dca162 (the A_ft batch of step 11c)
