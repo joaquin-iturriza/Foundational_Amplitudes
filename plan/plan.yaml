@@ -25032,6 +25032,16 @@ entries:
       at D>=3162 (7.9e-8, 1.5e-8 vs 6.9e-9, 2.6e-9) - the HETEROSC 1/sigma^2 weighting of the mu gradient is the next suspect
       for the spikes. EMA on lowers median jitter on u u~ (0.30 vs 0.68), u u~ V (0.25 vs 0.41), t t~ V/B (0.14 vs 0.52),
       not on t t~ LO (0.76 vs 0.63).'
+  - at: '2026-11-12T14:16:37+00:00'
+    text: '2026-11-12 16:20 CET: track 1 (D413/D414). Candidates with stage-2 searches of both arms are only u u~ V and t
+      t~ V/B (c c~ g, b b~ g g, b b~ Z Z, u u~ e+e- Z have calibration runs only). Per-cell ft/scr (test, stage2_readout.json):
+      u u~ V 0.29, 0.19, 0.42, 0.38, 0.18, 0.50, 0.019, 0.0058 at D=10..31623 (S 8.3 test, band lower 3.2 upper unbounded;
+      2.7 on val_ln, 2.0-3.9); t t~ V/B 1.05, 1.34, 1.27, 12.8, 5.8, 57, 7.7, 2.2 (S < 1). Curve quality (curve_quality.json):
+      u u~ V 4/62 scratch and 2/63 fine-tune trials well (best of all targets), t t~ V/B 0/63 and 1/64. Chosen: u u~ V. Its
+      best trials pass spike/jitter at D<=316 (fail only gap: memorising <=316 events) and fail spike/jitter at D>=1e3 (the
+      lr-noise signature). Mu-only MSE test designed (PASS on second look), merged with the fine_tune.map_head switch (f61d3f8d,
+      repo-reviewer PASS), started as detach muonly_mse_test: 6 searches, 48 trials, ~13.5 GPU-h, target 1.2 h; readout lr_centre_readout.py
+      --test muonly @1f1cdef1.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
