@@ -21336,9 +21336,9 @@ entries:
     - 9
   owner:
     agent: a0ffaf4de4b7f54ac
-    state: stopped
+    state: working
     since: '2026-11-12T01:31:29+00:00'
-    state_at: '2026-11-12T02:17:28.757000+00:00'
+    state_at: '2026-11-12T02:21:06.380000+00:00'
     context: 270529
     context_at: '2026-11-12T02:21:40+00:00'
   step_why:
@@ -23789,9 +23789,9 @@ entries:
   asks: []
   owner:
     agent: a87ebdd2344eb92d7
-    state: stopped
+    state: working
     since: '2026-11-12T00:02:58+00:00'
-    state_at: '2026-11-12T02:12:26.345000+00:00'
+    state_at: '2026-11-12T02:21:16.509000+00:00'
     context: 252025
     context_at: '2026-11-12T02:10:43+00:00'
   designs:
