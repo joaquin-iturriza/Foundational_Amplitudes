@@ -21379,9 +21379,11 @@ entries:
       L(D) figure + S with band; tt kept in the background'
     4: b b~ > Z Z LO fine-tune searches launched when the held-out parent dsave_parent_heldoutbbzz (FA-ccin2p3-0d698e4b) ends;
       design PASS 2026-11-12 (revised)
-    5: 'Template read (design PASS 18:05, D422/D423): 8 searches on t t~ LO D=316, 3162 (WSD-only vs stage 2; template 2 =
-      WSD + batch size searched + fine-tune ranges opened vs WSD-only), driver detach tmpl2_wsd2; read with lr_centre_readout.py
-      --test tmpl2 (fetch), figure, report'
+    5: 'Template test at 16 trials (design PASS 19:2x, D426/D427/D429): 4 WSD-only searches t t~ LO D=316, 3162 scr/ft extended
+      8->16 (relaunch drive.py --n-trials 16 --wave-sizes 3,3,2,4,4 on the 4 dsave_wsd configs when detach tmpl2_wsd2 ends;
+      the withdrawn batch-searching dsave_tmpl2_* run to 8 in that driver, not read), 2 wide fine-tune searches dsave_wideft_ft
+      (lr_scale [0.03,30], layer_decay [0.5,1]) at 16, detach wideft16; read lr_centre_readout.py --test tmpl2 (A: 16 vs first
+      8; B: wide vs WSD; C: WSD first 8 vs stage 2), curves figure, report'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -25395,7 +25397,6 @@ entries:
   step_waits:
     '3': bbx_zz_lo_scr3, bbx_zz_lo_ft drivers (detach events)
     '4': detach bbx_zz_lo_ft (LO fine-tune driver; its FA DONE event)
-    '5': detach tmpl2_wsd2 (drive.py, 8 searches on CC; its FA DONE event)
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
@@ -26552,11 +26553,11 @@ entries:
       - 'parent ends clean: generate and launch the 7 fine-tune searches (and the scratch ones if not yet out)'
       - 'parent breaks: read its log, fix, resubmit; LO fine-tune arm waits'
     5:
-      feeds: which HPs, ranges and trial count make the search bests' validation go down with training (the template for every
-        data-saving search)
+      feeds: 'the template for the remaining cells: trial count and fine-tune ranges (D422, D427)'
       if:
-      - 'TEMPLATE 2 FIXES: extend the template to the remaining cells (cost to Joaquin)'
-      - 'NO: next candidate (horizon) designed from these 64 trials'
+      - 'A LOWER or best good at 16: 16 trials into the template, cost to Joaquin'
+      - 'B LOWER: wide ranges into the template'
+      - 'NO/within: reported, nothing more run'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
