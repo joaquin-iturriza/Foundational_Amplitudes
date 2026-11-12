@@ -2,7 +2,7 @@
 """How our transformer and Bakar's MLP extrapolate into the KIT limits (eval-only, existing predictions): per stratum
 the median truth log10|M|^2, each model's median prediction and median signed error (prediction - truth), for the
 softpair transformer runs and the D403 ladder's mlp and ours arms (seeds 0-2); and the transformer's validation curve
-(val_loss_no_reg per validation, from per_process_metrics.json) to read whether 8000 steps converged.
+(train_steps.npz: its val and train losses) to read whether 8000 steps converged.
 
     python tools/kit_extrap_read.py collect --out analysis/kit_benchmark/data/kit_extrap.json    (reads CC)
     python tools/kit_extrap_read.py plot analysis/kit_benchmark/data/kit_extrap.json --figs analysis/kit_benchmark/figs
@@ -26,7 +26,6 @@ import glob, json, os, sys
 import numpy as np, h5py
 sys.path.insert(0, ".")
 from tools import kit_hardps as kh
-from analysis.common.readers import run_metrics
 RUNS = json.loads(open(sys.argv[1]).read()) if sys.argv[1].endswith(".json") else dict(a.split("=") for a in sys.argv[1:])
 out = {}
 def read(pred_path, stem, target):
@@ -42,9 +41,9 @@ def read(pred_path, stem, target):
 for proc, run in RUNS.items():
     stem, target = (proc[:-4], "me2") if proc.endswith("_me2") else ("ee_tt", "virt_finite")
     d = f"runs/kit/{run}"
-    m = run_metrics(d)
+    z = np.load(f"{d}/train_steps.npz")
     e = {"transformer": read(f"{d}/kit_benchmark/predictions.h5", stem, target),
-         "val_curve": [float(x) for x in m["val_loss_no_reg"]]}
+         "curves": {k: [float(x) for x in np.ravel(z[k])] for k in z.files if "val" in k or "train_loss" in k}}
     for arm in ("mlp", "ours"):
         for s in range(3):
             g = glob.glob(f"runs/kit_mlp/kit_A_{proc}_n100000_t*_mlp{arm}_s{s}/kit_benchmark/predictions.h5")
