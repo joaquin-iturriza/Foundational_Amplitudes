@@ -23008,6 +23008,7 @@ entries:
       zero-shot start, sigma head, output head, refit, own/parent stats, warm start; entry dead ends; site decisions.'
   step_waits:
     '8': the main session's read of the defect hunt (its 'before more arms'); then launched as designed
+    '10': the design reviewer's re-check of the head-map check design
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
