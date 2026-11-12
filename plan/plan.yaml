@@ -21349,10 +21349,6 @@ entries:
   - D377
   - D407
   next:
-    3: 'Why the fine-tune HPO fails to find well-trained runs (Joaquin 2026-11-12 ~10:30: none of the runs are well optimized):
-      diagnose from the 34 searches'' trial curves (lr_scale window under Muon, warmup/horizon vs val minimum, sampled trials,
-      objective pick, layer decay, restart optimizer state), fix the template, show well-trained fine-tune curves on a couple
-      of tt cells'
     4: 'Redo the e+e- > t t~ LO fine-tune L(D) arm with the fixed fine-tune space (design 2026-11-12 12:25: 7 new 8-trial
       searches dsave_s5_ft_epem_ttx_d{2,3,4,6,8,9,10}, s4''s D=316/3162 reused, 26.3 GPU-h), then read S = D*_scr/D*_ft at
       1e-4 (dstar_fit.py) with the L(D) figure'
@@ -23836,8 +23832,7 @@ entries:
       t t~ LO answer of the current setup (and against sec:ladder''s earlier gap, which was against a scratch 10-100x worse).
       WORSE: band below 1; report. D* at 1e-4 not reached by an arm: read at the precision both reach (D373), said so. Any
       branch: the readout goes to Joaquin with the L(D) figure; no reruns (D315).'
-  step_waits:
-    '3': detach s4_ft_template4 DONE event (drive.py over the 5 dsave_s4_ft searches, 40 trials in waves 3,3,2)
+  step_waits: {}
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
@@ -24678,11 +24673,6 @@ entries:
       sweep/gen_data_saving.py, sweep/sweep_config_dsave_s4_ft_*_t8500.yaml
     written: '2026-11-12T10:11:07+00:00'
   step_why:
-    3:
-      feeds: whether fine-tuning saves data on tt once both arms are properly optimized (D408)
-      if:
-      - 'a search defect found: fix the template and rerun what the conclusions need'
-      - 'no defect: report the curves and what limits the fine-tune'
     4:
       feeds: 'the entry''s answer for held-out tree targets: how much e+e- > t t~ LO data pretraining saves at 1e-4'
       if:
