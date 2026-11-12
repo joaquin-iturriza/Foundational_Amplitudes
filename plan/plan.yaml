@@ -25088,9 +25088,6 @@ entries:
       v4_{gg,ddx,bbx}_ttx__thr (gen_datasaving_parent.py heldoutthr variant), generate (CPU); r5thr parent (job_datasaving_parent.sh
       heldoutthr; smoke iters=50, D395); job_kit.sh A_ft tt virt_finite 1e5 8000 from r5 and r5thr with fine_tune.offshell_stats=own;
       kit_readout --vs vs f21fa163 and the threshold scan'
-    12: 'D411 ReZero on tt Born (design''s Mixed branch: tt virt MOVED, uug STAYED): read kit_A_ee_tt_born_n100000_t8000_softpair_rezero
-      (FA-ccin2p3-d322922b) vs 5515dc85 with kit_extrap_read/kit_figures collect + kit_readout --vs; MOVED/STAYED on the deepest
-      Sudakov bin''s median signed error; bulk fit beside it'
     13: 'D411 input side (uug, then tt virtual): the transformer fed only Bakar''s inputs (log10 s_ij/s0 per pair, logthr
       on tt) as scalars, no momenta/frames, vs c15b3337/f21fa163 and Bakar''s MLP; needs a model input path (none exists:
       config/model/lloca.yaml has input_soft_eps, input_pair_logs, input_pair_threshold, input_local_log_eps) and its own
@@ -25793,12 +25790,6 @@ entries:
       - 'ft_thr Coulomb median < -0.3 vs scratch and vs ft_r5: threshold sampling goes into the catalog parent''s top-pair
         pools'
       - 'both NO: design one-loop top pairs at physical mass near threshold (gg/qq~ > tt~ virtual)'
-    12:
-      feeds: 'D411: whether the pre-norms bend the transformer''s continuation past the trained range'
-      if:
-      - 'MOVED on tt Born too: the norm effect holds on both tt targets; weigh against the bulk-fit loss (ReZero underfits
-        at this lr)'
-      - 'STAYED: the tt virtual move is not a norm effect that carries; next lever the transformer fed Bakar''s inputs only'
     13:
       feeds: 'D411: whether the transformer''s extrapolation failure is in how it reads out-of-range inputs (its momentum/frame
         path) rather than its target or its norms'
@@ -25818,7 +25809,6 @@ entries:
   step_waits:
     '5': '2026-11-13'
     '9': FA-ccin2p3-62dcf910 FA-ccin2p3-bf3d593c FA-ccin2p3-8d1429bf
-    '12': FA-ccin2p3-d322922b
     '13': FA-ccin2p3-dc799c8e FA-ccin2p3-4a1cb4a2
     '14': FA-ccin2p3-dc799c8e FA-ccin2p3-4a1cb4a2
   handoff:
