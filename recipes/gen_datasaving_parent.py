@@ -88,7 +88,7 @@ for b in LOOPTT:
     # 2->2 off by up to 25%, gen_catalog_v4 QCD_BORN): it takes the pure-QCD born, as the signext entries do
     born = re.sub(r"\s+QED<=\d+$", "", e["mg5_generate"][0]) if b == "v4_ddx_ttx" else e["mg5_generate"][0]
     virt[b] = {"mg5": born + " [virt=QCD]", **({"qcd_born": True} if b == "v4_ddx_ttx" else {}),
-               "model": "loop_sm-no_b_mass", "certified": False, "param_card_patches": dict(e["param_card_patches"]), **keep()}
+               "model": "loop_sm-no_b_mass", "certified": False, "no_shift": True, "param_card_patches": dict(e["param_card_patches"]), **keep()}
     lp[b + "_nlo"] = {"kind": "virt", "virt": True, "virt_base": b, "nfinal": int(e["nfinal"]), "n_loops": 1,
                       "alphas_power": int(e["alphas_power"]) + 1, "param_card_patches": {}, "layer": "nlo",
                       "why": f"one-loop QCD of {b} (kit_benchmark 11c)", "role": "kit", "certified": False, **keep()}

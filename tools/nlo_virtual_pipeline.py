@@ -535,7 +535,8 @@ def scheme_shift_mass(cfg):
     """The heavy mass m of the mass-scheme shift C_F(3 ln(s/m^2) + 5) that virt_evaluator's evaluate_point adds to c0
     for this VIRT_PROCESSES entry (with mass_shift on), 0 where it adds none: catalog_v3 (_v3), loop-induced and
     electroweak entries never shift; otherwise m is the first massive final of any kind (a W, Z, H or tau too)."""
-    if cfg.get("_v3") or cfg.get("loopind") or cfg.get("ew"):
+    # no_shift: MadLoop's own finite part (D111), kit_benchmark's one-loop top pairs, in the KIT target's convention
+    if cfg.get("_v3") or cfg.get("loopind") or cfg.get("ew") or cfg.get("no_shift"):
         return 0.0
     return next((m for m in cfg["m_finals"] if m and m > 0), 0.0)
 

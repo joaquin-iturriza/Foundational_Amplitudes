@@ -77,6 +77,7 @@ virt:
     - 172.5
     mg5: generate d d~ > t t~ [virt=QCD]
     model: loop_sm-no_b_mass
+    no_shift: true
     param_card_patches:
       MT: 172.5
       WT: 1.4915
@@ -104,6 +105,7 @@ virt:
     - 172.5
     mg5: generate g g > t t~ QED<=0 [virt=QCD]
     model: loop_sm-no_b_mass
+    no_shift: true
     param_card_patches:
       MT: 172.5
       WT: 1.4915
