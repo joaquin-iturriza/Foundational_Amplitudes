@@ -21121,7 +21121,7 @@ entries:
     - 9
   owner:
     agent: ae6f048973934c6c3
-    state: stopped
+    state: closed
     since: '2026-11-12T00:31:29+00:00'
     state_at: '2026-11-12T01:07:25+00:00'
     context: 219409
@@ -23329,27 +23329,28 @@ entries:
     start: '2026-11-12T00:50:14+00:00'
     at: '2026-11-12T00:50:14+00:00'
   handoff:
-    state: 'Stage A written up in sec:datasaving @db167a55 (figs stage2_diag_tops, event_share): physical-mass tops help t
-      t~ LO (r5/r4 val gmean 0.24, test 0.08), t t~ V within the rerun spread. The t t~ V D=1e4 val/test 100x disagreement
-      is one val event (pool row 4523, 98% of the r5 run''s val MSE; worst val event in 10/16 t t~ V runs); w/o each run''s
-      worst event r5/r4 = 0.39, 1.11, 1.62, 0.22 val (gmean 0.63). Defect hunt asked by Joaquin (ft_curves.py, event_share.py
-      --gap @bfb2bd4e): weights load strictly, pool physics match, both arms lead scratch by step 170; the t t~ fine-tunes
-      memorise (t t~ LO train MSE 3e-10..3e-9 at every D, val/train 18-884 vs scratch 2.7-42) and the one-loop fine-tunes''
-      val NLL blows up after step ~6000 (t t~ V and u u~ V). Step 9 is the next work: find the path or setting that lets the
-      fine-tune fit t t~ training events below scratch, then one design. Step 8 (one-loop suspects, design PASS, ~5.5 GPU-h)
-      held by the main session until the defect read is seen. Stage B tree half (step 7) still waits on Joaquin''s go (~60
-      GPU-h).'
-    decisions: 'Stage-A wording: r4/r5 renamed stage-2 parent / top parent in text and legends. Primary measure for t t~ V
-      val reads: without each run''s worst event (one event dominates). fine_tune.mass_stats knob added (default parent).
-      AdamW arm never adopted on a YES (D158), pair-threshold YES needs scratch-with-input searches before S. Zero-shot read
-      dropped: the curves already show the start is good (reviewer FIX).'
-    ruled_out: Weight loading (strict), pool physics mismatch, heavy-quark species clash, a bad zero-shot start on t t~ (fine-tunes
-      lead scratch early), physical-mass tops as the t t~ V cause.
-    running: none
-    files: analysis/data_saving/{event_share.py,ft_curves.py,diag_readout.py}, analysis/data_saving/data/{event_share.json,train_val_gap.json,ft_curves.json},
-      analysis/data_saving/figs/{event_share,ft_curves,stage2_diag_tops}.png, sweep/sweep_config_dsave_diag_{massown,adamw,pairthr,smoke3}_*.yaml,
-      experiment.py (fine_tune.mass_stats), scripts/job_zero_shot_parent.sh (PROBE_RECIPES), docs/results.tex sec:datasaving
-    written: '2026-11-12T00:29:40+00:00'
+    state: 'Step 9 defect hunt. Head map implemented and unit-tested (cec3610c: every target_stats=own fine-tune loads the
+      parent''s readout mapped to its own target stats, step 0 = parent''s prediction; tests/test_head_map_own_stats.py).
+      Leads read (findings 2026-11-12 step 9 and ~03:00): lr groups as designed; one-loop val NLL blow-up starts deep in the
+      cosine anneal (lr 3-5e-4, falling), not at high lr or lr_scale''s top, grad norms 2e2-9e3 pre-clip in every run of both
+      arms; ft loses where scratch val < 1e-6 (all t t~), wins where > 1e-5 (all u u~); D=316 off-trend: t t~ tree scratch
+      test is one event (97%), u u~ V D=316 shares T=2720 with D=100 (horizon-limited). parent_shared batch (8 runs + smoke
+      017c3f8a) running, superseded as an arm, read on RUN_DONE as the effect of starting from the parent''s function at the
+      controls'' HPs (ft_defect-style re-based val MSE). Open question to Joaquin: ~88 GPU-h rerun of the 34 fine-tune searches
+      with the head map. Not done: Joaquin''s house-style training-curve figure (every D of the study, every curve labelled,
+      axes as stage2_LD, words for ''stage-2 best'' and ''parent-scale rerun'', the 0.46-4.84 same-HP rerun spread as instability).'
+    decisions: 'Head map is the default for target_stats=own (Joaquin 2026-11-12: one correct choice, not an arm); for one-loop
+      targets the parent''s stats are of tree ln|M|^2, so the map reproduces the parent''s tree prediction there. parent_shared
+      not adopted; its batch read only as evidence. No new tweak arms (Joaquin). Rerun cost above 30 GPU-h goes to Joaquin.'
+    ruled_out: 'lr groups as applied (as designed); step-0 gradient spike as the blow-up cause (ends by step ~170); lr_scale
+      at its top (t t~ V/B 0.16, u u~ V 0.79 of [0.1,10]); earlier: weight loading, pool physics, species clash, tops for
+      t t~ V.'
+    running: FA-ccin2p3-017c3f8a (smoke), FA-ccin2p3-31468dbb 538569e2 762f0029 cce86735 e22a4dc3 bf99b2f0 6a30b085 265173f8
+      (parent_shared, t t~ tree, r4/r5, D=316..1e4), step 9 waits on the 8
+    files: base_experiment.py (_map_head_to_own_stats), tests/test_head_map_own_stats.py, analysis/data_saving/{ft_defect.py,ft_curves.py},
+      data/{ft_defect.json,ft_defect_summary.json,ft_curves.json,stage2_readout.json,stage2_diag_runs.json}, figs/{ft_vs_scratch,ft_sigma,ft_defect_curves,ft_curves}.png,
+      sweep/sweep_config_dsave_diag_{pshared,psharedtops}_ft_epem_ttx_d{5..8}_t8500.yaml
+    written: '2026-11-12T01:25:03+00:00'
   ask: 'GPU budget: rerunning the 34 fine-tune searches of the study''s design (4 targets x D=10..1e4/3e4, 8 trials each,
     scratch searches reused) with the fine-tune now starting from the parent''s function (head map, cec3610c) costs ~88 GPU-h
     (stage 2 measured: t t~ tree 24.4, t t~ one-loop 20.7, u u~ tree 28.0, u u~ one-loop 14.7), above 30 with no decision
