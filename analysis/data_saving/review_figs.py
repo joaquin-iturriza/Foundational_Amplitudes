@@ -66,7 +66,7 @@ def mismatch():
                 ys.append(c[f] / by[("scr", D)][f])
                 cs.append(np.log10(D))
             sc = ax.scatter(xs, ys, c=cs, cmap="viridis", vmin=1, vmax=5, marker=marks[tg],
-                            label=lab + rf" (${np.median(xs):.1f}$)")
+                            label=lab)
         ax.axhline(1, color=ps.C.grey, linestyle=":", label="equal")
         ax.set_xscale("log")
         ax.set_yscale("log")

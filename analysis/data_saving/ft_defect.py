@@ -65,6 +65,10 @@ print("FTDEF " + json.dumps(out))
 TARGETS = {"epem_ttx": r"$e^+e^-\to t\bar t$ tree", "ee_ttbar_nlo": r"$e^+e^-\to t\bar t$ one-loop/tree",
            "ee_uu": r"$e^+e^-\to u\bar u$ tree", "ee_uu_nlo": r"$e^+e^-\to u\bar u$ one-loop"}
 
+# stage2_LD's process labels, short enough for the legend to sit beside the data
+SHORT = {"epem_ttx": r"$e^+e^-\to t\bar t$", "ee_ttbar_nlo": r"$e^+e^-\to t\bar t$, $V$",
+         "ee_uu": r"$e^+e^-\to u\bar u$", "ee_uu_nlo": r"$e^+e^-\to u\bar u$, $V$"}
+
 
 def key(run_dir):
     m = re.search(r"dsave_s2_(ft|scr)_(.+)_d(\d+)_t\d+", run_dir)
@@ -145,32 +149,35 @@ def main():
     ps.legend(np.ravel(axs)[0], "lower left")
     ps.save(fig, os.path.join(FIGS, "ft_sigma"))
 
-    # --- figure 3: ft/scr val MSE vs scratch level (lead d) and vs head mismatch (lead a)
+    # --- figure 3: ft/scr test MSE vs scratch level (lead d) and vs head mismatch (lead a), in stage2_LD's quantities
+    # (test MSE(ln|M|^2) tree, MSE(V/B) one-loop, stage2_readout.json), so the left x values are stage2_LD's scratch points
+    TEST = {(c["target"], c["arm"], round(c["D"])): c.get("test")
+            for c in json.load(open(os.path.join(DATA, "stage2_readout.json")))["cells"]}
     fig, (axL, axR) = ps.figure(ncols=2)
     cols = dict(zip(TARGETS, (ps.C.vermillion, ps.C.orange, ps.C.blue, ps.C.green)))
     out = []
     for tg in TARGETS:
         pts = []
         for D in sorted({k[2] for k in R if k[0] == tg}):
-            f, s = R.get((tg, "ft", D)), R.get((tg, "scr", D))
-            if f and s:   # val MSE of the transformed target (ln|M|^2, ln(V/B) or ln|V|): (rms r x own std)^2
-                mf, ms = ((x["val"]["rms_r"] * x["prepd"][1]) ** 2 for x in (f, s))
+            f = R.get((tg, "ft", D))
+            mf, ms = TEST.get((tg, "ft", D)), TEST.get((tg, "scr", D))
+            if f and mf and ms:
                 pts.append((D, ms, mf / ms, f["parent_prepd"][1] / f["prepd"][1]))
         if not pts:
             continue
-        out += [dict(target=tg, D=p[0], scr_val=p[1], ft_over_scr=p[2], head_mismatch=p[3]) for p in pts]
-        axL.plot([p[1] for p in pts], [p[2] for p in pts], color=cols[tg], marker="o", ls="none", label=TARGETS[tg])
+        out += [dict(target=tg, D=p[0], scr_test=p[1], ft_over_scr=p[2], head_mismatch=p[3]) for p in pts]
+        axL.plot([p[1] for p in pts], [p[2] for p in pts], color=cols[tg], marker="o", ls="none", label=SHORT[tg])
         axR.plot([p[3] for p in pts], [p[2] for p in pts], color=cols[tg], marker="o", ls="none")
     for ax in (axL, axR):
         ax.set_xscale("log")
         ax.set_yscale("log")
-        ax.axhline(1.0, color=ps.C.grey, ls=":", label="ft = scr" if ax is axL else None)
-        ax.set_ylabel(r"MSE$_{\rm ft}$ / MSE$_{\rm scr}$ (val)")
-    axL.set_xlabel(r"MSE$_{\rm scr}$ (val, $\ln$ target)")
+        ax.axhline(1.0, color=ps.C.grey, ls=":", label="equal" if ax is axL else None)
+        ax.set_ylabel(r"test MSE$_{\rm fine-tune}$ / MSE$_{\rm scratch}$")
+    axL.set_xlabel(r"test MSE$_{\rm scratch}$")
     axR.set_xlabel(r"$\sigma_{\rm parent} / \sigma_{\rm own}$")
     from matplotlib.ticker import NullFormatter
     axR.xaxis.set_minor_formatter(NullFormatter())
-    ps.legend(axL, "upper left")
+    ps.legend(axL, "lower left")
     ps.save(fig, os.path.join(FIGS, "ft_vs_scratch"))
     json.dump({"runs": rows, "ft_vs_scratch": out}, open(cache.replace(".json", "_summary.json"), "w"))
     for o in out:
