@@ -34,7 +34,7 @@ for g in sys.argv[1:]:
             # ln(V/B) and mu = ln / prepd_std^2 hold only for a log transform of a V/B (or tree) target
             assert s["amp_trafos_pp"][0][0] == "log", s["amp_trafos_pp"][0][0]
             assert "_nlo" not in d or s.get("target_over_born"), "one loop trained on V, not V/B"
-            for role in ("val", "test"):
+            for role in ("train", "val", "test"):   # train: the 2000 train events the run scores
                 z = np.load(d + f"/sigma_stage/preds_{role}.npz")
                 p, t = z["raw_pred"].astype(float).ravel(), z["raw_truth"].astype(float).ravel()
                 e2 = (np.log(np.abs(p)) - np.log(np.abs(t))) ** 2
@@ -56,8 +56,25 @@ print("EVSHARE " + json.dumps(out))
 
 
 def main():
+    out = "event_share"
+    if sys.argv[1] == "--gap":
+        # train/val gap of every run given (any target): data/train_val_gap.json, no figure
+        out = "train_val_gap"
+        del sys.argv[1]
     rows = site_python(REMOTE, [f"'{g}'" for g in sys.argv[1:]], "EVSHARE")
-    json.dump(rows, open(os.path.join(REPO, "analysis/data_saving/data/event_share.json"), "w"), indent=1)
+    json.dump(rows, open(os.path.join(REPO, f"analysis/data_saving/data/{out}.json"), "w"), indent=1)
+    if out == "train_val_gap":
+        gap = {}
+        for r in rows:
+            if "error" not in r:
+                n = "/".join(r["run_dir"].split("/")[-2:])
+                gap[n] = {"train": r["train"]["mse_ln"], "val": r["val"]["mse_ln"],
+                          "val_over_train": r["val"]["mse_ln"] / r["train"]["mse_ln"]}
+                print(f"{n:60s} train {gap[n]['train']:.3e} val {gap[n]['val']:.3e} val/train {gap[n]['val_over_train']:.2f}")
+            else:
+                print(r["run_dir"], r["error"])
+        print(json.dumps(gap))
+        return
     for r in rows:
         if "error" in r:
             print(r["run_dir"], r["error"])
