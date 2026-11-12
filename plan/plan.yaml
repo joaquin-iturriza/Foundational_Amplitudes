@@ -21350,10 +21350,7 @@ entries:
   - D360
   - D377
   - D407
-  next:
-    8: 'One-loop t t~ V suspects batch, design PASS 2026-11-12 (configs sweep/sweep_config_dsave_diag_{massown,adamw,pairthr}_ft_ee_ttbar_nlo_d{5..8}_t8500.yaml
-      + smoke ..._smoke3_..._t50.yaml @7d56534c, controls the offown runs, ~5.5 GPU-h): smoke then 12 runs via trial_job.sh,
-      --hdr=--time=00:40:00; held by the main session (''before more arms'') until the defect read is seen'
+  next: null
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -21496,13 +21493,6 @@ entries:
     state_at: '2026-11-12T03:22:33+00:00'
     context: 248851
     context_at: '2026-11-12T03:41:14+00:00'
-  step_why:
-    8:
-      feeds: whether a one-loop input or optimizer change removes the t t~ V fine-tune deficit (D400)
-      if:
-      - 'an arm YES (w/o-worst val geomean <= 0.4, >=3/4 below): mass column into s3 one-loop configs; AdamW or pair input
-        to Joaquin as in the design'
-      - 'all NO: no gain at the control''s HPs; the deficit goes to the defect hunt'
   designs:
   - at: '2026-11-10T02:35:09+00:00'
     question: 'Step 1 (D356 horizons, tree arm): on catalog_v4''s held-out tree targets ee->ttbar (H3, 2->2 massive), ee->ccbar
@@ -23454,8 +23444,7 @@ entries:
       reason); site decisions D408/D409/D411/D412. Disk 15-35 MB per run against 69 GB free on CC. Limits 0:25 and 0:32 against
       12-24 min measured, 26.6 GPU-h at limits, under D412''s 30. Two 50-step smokes (tree and one-loop) carry the new overrides
       (D395).'
-  step_waits:
-    '8': the main session's read of the defect hunt (its 'before more arms'); then launched as designed
+  step_waits: {}
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
