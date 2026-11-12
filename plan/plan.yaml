@@ -26339,6 +26339,17 @@ entries:
       CC trials; those trials marked lost in driver_state and requeued with --retry-lost (penalty removed). Relaunched as
       detach tt_bbzz_allsites (3 drivers, --sites ccin2p3 lxplus): WSD x4 and wide x2 at --n-trials 16 --wave-sizes 3,3,2,4,4,
       b b~ ZZ LO fine-tunes x7.'
+  - at: '2026-11-12T22:59:28+00:00'
+    text: '2026-11-12 ~23:55 CET step 4: b b~ > Z Z read (stage2_readout.py --fetch, curve_quality.py --cells @12089d4a, plot_stage2.py
+      --second). LO best test MSE(ln|M|^2) scratch / fine-tune at D=10..1e4: 2.6e-1/6.1e-2, 8.3e-2/3.0e-2, 1.7e-3/3.9e-3,
+      8.4e-6/1.1e-5, 7.4e-7/6.1e-7, 5.5e-7/6.1e-7, 6.5e-8/1.3e-7; S = D*_scr/D*_ft at 1e-4 = 1.14 [0.81, 1.60] (test), 1.06
+      [0.75, 1.53] (val): NO SAVING (band includes 1); fine-tune ahead 4.3x at D=10, 2.7x at 32, behind 2.3x at 100, level
+      from 316. V/B unchanged: S 1.23 [0.88, 1.71]. Curves (D421): search bests good LO scratch 1/7 (D=1e4), fine-tune 0/7;
+      V/B 0/7 both; LO D>=1000 val follows train until the last ~10%, V/B train falls 3-6 decades below a flat val at every
+      D. Diverged LO fine-tune trials: d4 1, d6 2, d7 1, d8 2 (lr_scale 1.37-1.81); scratch d7 1, d8 1. Possible defect: several
+      V/B trials list ''AssertionError: data.target_over_born ... born.npy was computed on another pool'' (CC cache) next
+      to their divergence: not a sampled-HP failure, not yet resolved. Figures figs/stage2_LD_bbx_zz, figs/cell_curves_bbx_zz,
+      figs/cell_curves_bbx_zz_nlo.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
