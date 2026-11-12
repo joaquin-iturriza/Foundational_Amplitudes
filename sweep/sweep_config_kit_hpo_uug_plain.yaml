@@ -4,8 +4,8 @@
 # Everything else is the run's own config (base_config): inputs, target, HETEROSC + sigma stage, float64.
 # The template's space, WSD with cooldown 0.125 (D423), batch fixed at the template's 16384 (Joaquin 2026-11-12: 'Why
 # would you change batch size?'). Horizon 300 epochs over the 1e5 training events, as Bakar's MLP (Joaquin: 'then we
-# should match the number of epochs'): 300 x 1e5 / 16384 = 1831 steps. 32 trials, 8 start-up then guided waves of 4
-# (D427: 8 trials were not enough to find one good training in most cells).
+# should match the number of epochs'): 300 x 1e5 / 16384 = 1831 steps. 16 trials, 6 start-up then two guided waves of 5
+# (D427: 8 were not enough; D428: 'let's do 16 for now').
 cluster:
   scheduler: slurm
   auto_submit: false
@@ -16,15 +16,15 @@ cluster:
 paths: null
 sweep_name: kit_hpo_uug_plain
 base_config: ${PROJECT_DIR}/runs/kit/kit_A_ee_uug_me2_n100000_t8000_softpair_plain
-n_trials: 32
+n_trials: 16
 dyhpo:
   surrogate: gp
   n_candidates: 2000
   objective_scale: auto
   seed: 42
-  n_startup: 8
+  n_startup: 6
   total_budget: 10000
-  waves: [8, 4, 4, 4, 4, 4, 4]
+  waves: [6, 5, 5]
 fidelity_schedule:
   t_steps: [1831]
 fixed_params:
