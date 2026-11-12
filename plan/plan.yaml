@@ -21106,8 +21106,19 @@ entries:
       (design and its outcome rule), docs/results.tex sec:datasaving, sec:ladder; Joaquin''s messages 2026-10-05T02:23 (wording
       of transfer claims), 2026-10-08T19:02 (gluons, synthetic generator), 2026-10-22T20:23 (sigma stage wording): none is
       about this stage B or its cost'
-    blocks_steps: &id003
+    blocks_steps:
     - 7
+  - ask: 'GPU budget: rerunning the 34 fine-tune searches of the study''s design (4 targets x D=10..1e4/3e4, 8 trials each,
+      scratch searches reused) with the fine-tune now starting from the parent''s function (head map, cec3610c) costs ~88
+      GPU-h (stage 2 measured: t t~ tree 24.4, t t~ one-loop 20.7, u u~ tree 28.0, u u~ one-loop 14.7), above 30 with no decision
+      covering it. Go?'
+    at: '2026-11-12T01:24:46+00:00'
+    searched: 'site decisions --project FA (D400 approves the defect fix, not a rerun cost; D392, D396), stage2_readout.json
+      search_gpu_h, docs/results.tex sec:datasaving; Joaquin 2026-11-10T02:08 (the study''s request: which targets, not this
+      rerun''s cost), 2026-11-12T01:19 (his review of the plots: asks the fix and the rerun, its cost above 30 GPU-h to him),
+      2026-11-06T04:28 (worktrees and agent rules, unrelated)'
+    blocks_steps: &id003
+    - 9
   owner:
     agent: ae6f048973934c6c3
     state: stopped
@@ -23339,16 +23350,15 @@ entries:
       analysis/data_saving/figs/{event_share,ft_curves,stage2_diag_tops}.png, sweep/sweep_config_dsave_diag_{massown,adamw,pairthr,smoke3}_*.yaml,
       experiment.py (fine_tune.mass_stats), scripts/job_zero_shot_parent.sh (PROBE_RECIPES), docs/results.tex sec:datasaving
     written: '2026-11-12T00:29:40+00:00'
-  ask: 'GPU budget: about 60 GPU-h (estimated from the s3 configs) above 30 with no decision covering it. Stage A of the D400
-    fix reads NO by its pre-set pooled rule (r5/r4 geomean 0.68, 4 of 8 cells below), so the design does not propose stage
-    B; per target, t t~ LO gains 0.30x, 0.09x, 0.06x at D=1e3..1e4 (fine-tune now 0.77x, 0.75x of scratch from D=3162) and
-    t t~ V loses (1.9x geomean). Run stage B''s 18 tree fine-tune searches from the r5 held-out parent (scratch reused) to
-    re-read S on u u~ and t t~ LO, the one-loop cells going to the next suspects instead?'
-  waiting_since: '2026-11-11T23:49:57+00:00'
-  searched: 'site decisions --project FA (D392, D396, D400: D400 approves the fix, not stage B''s cost), plan entry pretrain_data_saving
-    (design and its outcome rule), docs/results.tex sec:datasaving, sec:ladder; Joaquin''s messages 2026-10-05T02:23 (wording
-    of transfer claims), 2026-10-08T19:02 (gluons, synthetic generator), 2026-10-22T20:23 (sigma stage wording): none is about
-    this stage B or its cost'
+  ask: 'GPU budget: rerunning the 34 fine-tune searches of the study''s design (4 targets x D=10..1e4/3e4, 8 trials each,
+    scratch searches reused) with the fine-tune now starting from the parent''s function (head map, cec3610c) costs ~88 GPU-h
+    (stage 2 measured: t t~ tree 24.4, t t~ one-loop 20.7, u u~ tree 28.0, u u~ one-loop 14.7), above 30 with no decision
+    covering it. Go?'
+  waiting_since: '2026-11-12T01:24:46+00:00'
+  searched: 'site decisions --project FA (D400 approves the defect fix, not a rerun cost; D392, D396), stage2_readout.json
+    search_gpu_h, docs/results.tex sec:datasaving; Joaquin 2026-11-10T02:08 (the study''s request: which targets, not this
+    rerun''s cost), 2026-11-12T01:19 (his review of the plots: asks the fix and the rerun, its cost above 30 GPU-h to him),
+    2026-11-06T04:28 (worktrees and agent rules, unrelated)'
   blocks_steps: *id003
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
