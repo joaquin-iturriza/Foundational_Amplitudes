@@ -16948,6 +16948,20 @@ entries:
     outcome: 'Yes: 0 not prebuilt on all listed recipes; parts gc''d only after; optimizations_recap''s owner told its reads
       can be redone. No: read the log; B failing leaves the parts untouched (nothing deleted) and the pools still missing
       are reported with why. Disk: B ~3 GB more while parts are kept, total ~21 GB of 52.9 GB free.'
+    fix_at: '2026-11-12T01:50:53+00:00'
+    fix: 'B (dsh_eea re-assembly) only; A, C1 and C2 stay as passed at 01:37. The parts are now kept until the check (LHE_PARTS_AUTO_GC=0
+      at 22d37fa5, read), but the check cannot see what the re-assembly risks. tools/lhe_parts.py _run_task calls mg.lhe_assemble(name,
+      items) with the queue''s stored spec, which holds every role, then write_recipe on each output. So the 115 processes''
+      val and test pools, the pools the held-out and EE reads already score, are overwritten in place, and their labels come
+      from a standalone rebuilt now (the originals were deleted under D209 after the first assembly). A recipe id is a hash
+      of the recipe, not of the file''s contents, so ''the rewritten val/test keep their recipe ids'' passes whatever the
+      rebuilt standalone computes, and the original val/test are gone by then. Fix: before the job, copy the 115 processes''
+      existing val and test pools with their sidecars aside (a manifest; their size read with du, a small fraction of the
+      3.06 GB parts). After assembly, compare each rewritten val/test against its copy, momenta and IDs exactly and labels
+      to a stated relative tolerance (e.g. 1e-10). Yes: all equal, so the train pools come from the same events and labels;
+      then gc --parts, then drop the copies. No: put the copies back and report which processes differ and by how much, with
+      the parts kept. Alternative: make the re-assembly write only the missing train pools and leave cached val/test untouched,
+      tested on the unit case.'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
