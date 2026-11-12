@@ -23451,6 +23451,56 @@ entries:
       reason); site decisions D408/D409/D411/D412. Disk 15-35 MB per run against 69 GB free on CC. Limits 0:25 and 0:32 against
       12-24 min measured, 26.6 GPU-h at limits, under D412''s 30. Two 50-step smokes (tree and one-loop) carry the new overrides
       (D395).'
+  - at: '2026-11-12T08:53:50+00:00'
+    question: 'D408/D409 (why fine-tuning loses to scratch on e+e- > t t~; fix it; quick tests), after the suspects batch
+      found no recipe knob that fixes it: is the deficit in the pretrained weights or in the fine-tune path itself? A 2x2
+      at each cell, both arms run through the fine-tune configs (parent''s input stats, tokenizer, target_stats own, head
+      map on tree) at the scratch''s stage-2 best HPs (lr_scale = scratch lr / the configs'' fixed training.lr 0.007817, layer_decay
+      1, scratch''s muon_weight_decay, reg, warmup, eta_min, ema, ema_decay): (null) every parameter a fresh init (fine_tune.shrink_perturb=[0,1],
+      buffers as loaded), (pre) the parent''s weights as loaded, against the stage-2 scratch best of the cell. Feeds: whether
+      the next fix is in the fine-tune path (inputs/stats), in the fine-tune HP window, or in the parent (pretraining set
+      and length, a new parent).'
+    prior: 'Suspects batch (suspects_readout.py @8e8bb7d1, data e5a05de9, figs suspects_LD, suspects_curves_*): no knob FIXES
+      on either target (tree: lr x1/3 G 3.31 NOT RESOLVED, lr x1/10 3.95, WSD 5.06, AdamW 8.19 HURTS, mu-only MSE 1.77 NONE;
+      V/B: WSD 0.51 4/4 below 1 but above the 1/3 bar, the rest NONE or HURTS); the V/B fine-tunes of every arm stall at val
+      ~1e-6..1e-5 after step ~2000-3000 while scratch keeps falling to 1e-9..3e-8. Before it: head map NO CHANGE pooled (hmap_readout),
+      parent_shared gmean 4.0, offown (own off-shellness scale), tops parent (r5) 4/8 below 1; the fine-tunes memorise (train
+      MSE 3e-10..3e-9, val/train 18-884 on tree, event_share --gap); old vs new (old_vs_new.py): today''s scratch improved
+      10-100x, the fine-tune did not move. No run on this entry or in results.tex has fine-tuned from a fresh init or run
+      the parent''s weights at the scratch''s HPs (searched results.tex for shrink_perturb, null parent, random init, fresh
+      init: par:v4 warm_start step 14 used shrink_perturb [0.4,0.1] on a restart of the same catalog, not a held-out target).
+      Site decisions D408, D409, D411, D412.'
+    measure: 'As the suspects batch: per run the minimum of result.json''s val_mse_curve x prepd_std^2 (val mu-MSE in ln units
+      at the best-mu checkpoint), test MSE and the worst-val-event-removed MSE from sigma_stage/preds_*.npz beside. Per arm
+      and target R = arm / stage-2 scratch best of the cell, G = geometric mean over cells, n> = cells with R > 1; also R_pn
+      = pre / null. Figure: per target val mu-MSE against D, null, pre, scratch best and the suspects'' fine-tune control;
+      curves per D.'
+    check: 'The measure moved with one change on existing data: suspects arms 0.07x-77x of their control per cell (AdamW tree
+      D=3162 77x, lr x1/10 tree D=316 0.07x), the head map 0.04-0.09x at tree D=3162; same-HP reruns 0.46-4.84 per cell (pooled
+      4-cell ln-sd ~0.4), so the 1/3 and 3 bars are ~2.7 sd of the pooled noise.'
+    fixed: 'Cells D=316, 1e3, 3162, 1e4 (k=5..8), T=8500, seed 42 (shrink_perturb''s fresh init draws at seed+1), the stage-2
+      pools. Configs: tree sweep/sweep_config_dsave_diag_hmap_ft_epem_ttx_d{5..8}_t8500.yaml (parent r4, head map on), one-loop
+      sweep/sweep_config_dsave_diag_parscale_ft_ee_ttbar_nlo_d{5..8}_t8500.yaml (parent treesin r4, no head map); HPs from
+      the stage-2 scratch best trials (tree hp 1605, 844, 640, 657; V/B 1663, 713, 358, 816): training.muon_weight_decay,
+      regularization_lambda, cosanneal_warmup_frac, cosanneal_eta_min, ema, ema_decay as the trial; fine_tune.lr_scale = trial
+      training.lr / 0.007817; fine_tune.layer_decay = 1. Arm null adds fine_tune.shrink_perturb=[0.0,1.0]. Launch sweep/trial_job.sh
+      --detached, hp-idx 9107 (null) and 9108 (pre), arm and cell in each --note and in data/nullparent_runs.json. Smoke first
+      (D395, shrink_perturb not yet run on this path): one tree and one V/B null run at D=316, 50 steps, every stage; log
+      must show SHRINK_PERTURB lambda=0.0 gamma=1.0.'
+    control: 'The stage-2 scratch best trial of each cell (FA-ccin2p3-3bf34b08, 3434fdb2, 87fc7187, 41f9974d tree; c63cb88b,
+      f96f4051 (pruned on CC: V/B D=1e3 read on 3 cells), 1f94de90, cbc511d4 V/B), same HPs, seed and pools; null and pre
+      are each other''s matched pair (only the weights differ).'
+    seeds: 'One seed (42) per cell, as the controls and the suspects batch; 2 arms x 4 cells x 2 targets = 16 runs + 2 smokes.
+      Rate from the suspects runs 12-24 min; limits 0:25 (D<=1e3) / 0:32 (D>=3162): 16 x ~0.47 h = 7.6 GPU-h at limits, under
+      D412''s 30.'
+    outcome: 'Per target, on val and on val without each run''s worst event (both must agree, else NOT RESOLVED per cell).
+      PATH: G(null) >= 3 with n> >= 3 of 4 (all of 3 on V/B): the fine-tune path loses to scratch even without the parent''s
+      weights, so the defect is in what the path changes (the parent''s input/mass/off-shellness stats, tokenizer, param groups):
+      next bisect those on the null arm. NEUTRAL path: 1/3 < G(null) < 3, then WEIGHTS: G(pre) >= 3 with n> >= 3 and G(pre/null)
+      >= 3: the parent''s weights hurt at the scratch''s optimization (negative transfer): next the parent (pretraining set
+      and length). HPs: G(pre) < 3: at the scratch''s HPs the fine-tune is at scratch''s level, so the deficit came from the
+      fine-tune search (its HP window): next the window change, with these runs as the expected gain. G(null) <= 1/3: the
+      path helps a fresh init (would be a scratch defect): report and re-check the scratch control.'
   step_waits:
     '2': FA-ccin2p3-b5cd9548 FA-ccin2p3-efde3ab8 FA-ccin2p3-a89bdd38 FA-ccin2p3-a94de54f FA-ccin2p3-456471f3 FA-ccin2p3-d42ee990
       FA-ccin2p3-e3079c8a FA-ccin2p3-17ffe0f9 FA-ccin2p3-4a59ead8 FA-ccin2p3-3d0756ce FA-ccin2p3-18649448 FA-ccin2p3-47f58510
