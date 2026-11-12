@@ -318,6 +318,9 @@ def register_recipe_processes(specs, default_sampling=None):
             # a pool stored under its own file name (recipe_output_path), its recipe id unchanged: a non-catalog size of a
             # catalog entry (the data-saving parents' 1e4-event top train pools) never overwrites the catalog's pool
             PROCESSES[name]["store_tag"] = str(s["store_tag"])
+        elif name in PROCESSES:
+            # the tag is the entry's own: never inherited from a base registered earlier (v4_gg_ttx__thr from v4_gg_ttx)
+            PROCESSES[name].pop("store_tag", None)
         samp = s.get("sampling") or default_sampling
         if samp is not None and name in PROCESSES:
             PROCESSES[name]["sampling"] = dict(samp)
@@ -4966,7 +4969,8 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
     # catalog_v4 (D130): the sqrt(s) measure and the beam masses, recorded only where an entry sets them
     if cfg.get("sqrts_measure", "uniform") != "uniform":
         recipe["sqrts_measure"] = cfg["sqrts_measure"]
-    if cfg.get("store_tag"):
+    if cfg.get("store_tag") and role not in ("val", "test"):
+        # train only: a frozen val/test pool of the same spec is the catalog's own file (one physical sample per spec)
         recipe["store_tag"] = cfg["store_tag"]
     if cfg.get("beam_masses") is not None:
         recipe["beam_masses"] = {str(k): float(v) for k, v in sorted(cfg["beam_masses"].items())}

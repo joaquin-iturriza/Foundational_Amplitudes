@@ -66,6 +66,21 @@ _AMP_ORDER_BY_NAME = [
     ("nlo_virt", [1, 0, 0, 0]),   # absolute-virt (e4) and the virt/born ratio
 ]
 
+def pair_beta(particles, pdg_ids, pdg=6):
+    """Velocity of the pdg / anti-pdg pair in its rest frame, lambda^(1/2)(s, m1^2, m2^2) / s (sqrt(1 - 4 m^2 / s) for
+    equal masses), per event; particles (N, 4n) flat four-momenta, pdg_ids (N, n). data.target_times_beta's factor."""
+    p = np.asarray(particles, np.float64).reshape(len(particles), -1, 4)
+    has = [(pdg_ids == q) for q in (pdg, -pdg)]
+    assert all(h.any(1).all() for h in has), f"an event without its {pdg} / {-pdg} pair"
+    r = np.arange(len(p))
+    a, b = p[r, has[0].argmax(1)], p[r, has[1].argmax(1)]
+    m2 = lambda q: q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(1)
+    s, ma, mb = m2(a + b), m2(a), m2(b)
+    beta = np.sqrt(np.clip((s - ma - mb) ** 2 - 4 * ma * mb, 0, None)) / s
+    assert (beta > 0).all(), "a pair at threshold (beta = 0): the target times beta would vanish"
+    return beta
+
+
 def _reg_params(model):
     """The parameters under the L2/L1 penalty: all of them except a Bayesian readout's log-variances
     (models/bayesian_readout.py), whose prior is the KL term (_reg_term). Same tensors, same order as
@@ -1710,6 +1725,8 @@ class AmplitudeExperiment(BaseExperiment):
         if bool(self.cfg.data.get("memmap", False)):
             assert not bool(self.cfg.data.get("target_over_born", False)), \
                 "data.target_over_born is built on the in-memory path (data.memmap=false)"
+            assert not bool(self.cfg.data.get("target_times_beta", False)), \
+                "data.target_times_beta is built on the in-memory path (data.memmap=false)"
             # host memory that scales with the batch: the same arrays, built once per input set into
             # memory-mapped files and gathered by index (data_mmap.py)
             assert self._mom_np_dtype() == np.float32, ("data.memmap gathers float32 momenta (data_mmap.py); a "
@@ -1759,6 +1776,12 @@ class AmplitudeExperiment(BaseExperiment):
                     # sidecar <pool>.born.npy (tools/nlo_virtual_pipeline.born_path). Every relative error (log-space MSE,
                     # |pred/true - 1|) of V/B is that of the recombined V = (V/B) B, B being exact.
                     amplitudes = amplitudes / self._born_of_pool(paths[role][name], amplitudes.shape[0])
+                if bool(self.cfg.data.get("target_times_beta", False)):
+                    # kit_benchmark step 6 (Coulomb rise, target side): the one-loop virtual times the top pair's beta,
+                    # which removes its exact O(alpha_s) Coulomb term's 1/beta (V/B -> C_F alpha_s pi / (2 beta) at
+                    # threshold), so the target stays finite there; an exact per-event factor of the momenta, so
+                    # kit_predict's log-space residual is that of V itself
+                    amplitudes = amplitudes * pair_beta(particles, pdg_ids)[:, None]
 
                 if use_pids:
                     toks = self.tokenizer.register_and_encode(pdg_ids)
