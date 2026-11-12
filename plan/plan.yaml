@@ -24661,6 +24661,8 @@ entries:
       v4_{gg,ddx,bbx}_ttx__thr (gen_datasaving_parent.py heldoutthr variant), generate (CPU); r5thr parent (job_datasaving_parent.sh
       heldoutthr; smoke iters=50, D395); job_kit.sh A_ft tt virt_finite 1e5 8000 from r5 and r5thr with fine_tune.offshell_stats=own;
       kit_readout --vs vs f21fa163 and the threshold scan'
+    10: 'D411 no-LayerNorm arm (design passed ~07:30): read FA-ccin2p3-8fa85b40 (uug) and cd01787c (tt virt) vs c15b3337/f21fa163
+      and Bakar''s MLP with kit_extrap_read (arms added to RUNS) and kit_readout --vs'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -25274,6 +25276,13 @@ entries:
       - 'ft_thr Coulomb median < -0.3 vs scratch and vs ft_r5: threshold sampling goes into the catalog parent''s top-pair
         pools'
       - 'both NO: design one-loop top pairs at physical mass near threshold (gg/qq~ > tt~ virtual)'
+    10:
+      feeds: why the small MLP beats our transformer (D411)
+      if:
+      - 'YES (both headline bins |median error| <= 0.5): the norms are the cause; re-run uugg, tt Born and threshold without
+        them and design it for the catalog parent'
+      - 'NO: not the norms at the baseline HPs; next the transformer without attention (per-particle MLP + mean pool), designed
+        then'
   step_waits:
     '5': FA-ccin2p3-538eeb1e
     '6': FA-ccin2p3-d277f7f5 FA-ccin2p3-7a63ea88 FA-ccin2p3-1df8bd16
