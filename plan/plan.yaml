@@ -25402,7 +25402,7 @@ entries:
       n_trials, more trials, running best, lr_scale, layer_decay in results.tex, dead ends, site decisions.'
   step_waits:
     '3': bbx_zz_lo_scr3, bbx_zz_lo_ft drivers (detach events)
-    '4': detach bbzz_lo_ft_pick end (b b~ ZZ LO fine-tunes, 8 requeued trials)
+    '4': detach bbzz_lo_ft_repick end
     '5': detach ttx16_repick end
   findings:
   - at: '2026-11-10T03:35:22+00:00'
