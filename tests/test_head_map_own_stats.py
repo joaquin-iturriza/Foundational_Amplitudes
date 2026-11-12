@@ -66,6 +66,25 @@ def test_step0_is_parent_zero_shot():
     torch.testing.assert_close(SO * sg_o, SP * sg_p, rtol=1e-3, atol=0)              # sigma in y units
 
 
+def test_no_map_when_parent_predicts_another_quantity():
+    """A tree parent (target_over_born false) under a V/B run: readout loaded unchanged."""
+    torch.manual_seed(0)
+    parent = _Toy()
+    with tempfile.TemporaryDirectory() as tmp:
+        os.makedirs(os.path.join(tmp, "models"))
+        json.dump({"prepd_mean": [MP], "prepd_std": [SP]}, open(os.path.join(tmp, "data_stats.json"), "w"))
+        OmegaConf.save(OmegaConf.create({"training": {"loss": "HETEROSC"}}), os.path.join(tmp, "config.yaml"))
+        p = os.path.join(tmp, "models", "m.pt.gz")
+        with gzip.open(p, "wb") as f:
+            torch.save({"model": parent.state_dict()}, f)
+        s = _Stub()
+        s.cfg.data = {"target_over_born": True}
+        s._load_pretrained_weights(p)
+    for k, v in parent.state_dict().items():
+        torch.testing.assert_close(s.model.state_dict()[k], v, rtol=0, atol=0)
+
+
 if __name__ == "__main__":
     test_step0_is_parent_zero_shot()
+    test_no_map_when_parent_predicts_another_quantity()
     print("ok")

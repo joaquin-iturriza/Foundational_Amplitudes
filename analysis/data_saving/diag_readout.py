@@ -82,16 +82,21 @@ def main():
     print(json.dumps(summ))
 
     fig, axs = ps.figure(ncols=2)
-    arms = [("val_own", LABEL, ps.C.vermillion, "s"), ("val_par", "stage-2 parent" if ARM == "tops" else "parent scale", ps.C.blue, "o"),
-            ("val_orig", "stage-2 best", ps.C.grey, "^")]
+    # words for the arms (Joaquin 2026-11-12): what each run is, no internal names; one seed and the same HPs in all three
+    par = "parent without tops, rerun" if ARM == "tops" else "parent's off-shell scale, rerun"
+    arms = [("val_own", "parent with tops" if ARM == "tops" else "own off-shell scale", ps.C.vermillion, "s"),
+            ("val_par", par, ps.C.blue, "o"), ("val_orig", "parent without tops, search's pick", ps.C.grey, "^")]
     for n, (ax, (tg, lab, _)) in enumerate(zip(axs, TARGETS)):
         cc = [r for r in rows if r["target"] == tg]
+        # val is in the target's standardized units (same stats in the three arms): re-based to ln units
+        sd2 = [TEST_DIAG[f"dsave_diag_parscale_ft_{tg}_d{r['k']}_t8500"]["prepd_std"] ** 2 for r in cc]
         for f, name, col, m in arms:
-            ax.plot([r["D"] for r in cc], [r[f] for r in cc], marker=m, linestyle="-", color=col, label=name)
+            ax.plot([r["D"] for r in cc], [r[f] * s for r, s in zip(cc, sd2)], marker=m, linestyle="-", color=col,
+                    label=name)
         ax.set_xscale("log")
         ax.set_yscale("log")
         ax.set_xlabel(r"$D$")
-        ax.set_ylabel(r"val MSE$(\hat y)$")
+        ax.set_ylabel(r"val MSE$(\ln|\mathcal{M}|^2)$" if tg == "epem_ttx" else r"val MSE$(\ln(V/B))$")
         ps.process_label(ax, lab)
         if n == 0:
             ps.legend(ax, "lower left")

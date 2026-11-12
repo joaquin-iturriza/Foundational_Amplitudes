@@ -1639,6 +1639,13 @@ class BaseExperiment:
         pdir = os.path.dirname(os.path.dirname(os.path.abspath(pretrained_path)))
         with open(os.path.join(pdir, "data_stats.json")) as f:
             pst = json.load(f)
+        data = self.cfg.get("data") or {}
+        diff = [k for k in ("target_over_born", "target_physics_factor", "target_propagators")
+                if bool(pst.get(k, False)) != bool(data.get(k, False))]
+        if diff:   # the parent predicts another quantity (e.g. tree ln|M|^2 for a V/B run): no function to preserve
+            LOGGER.info(f"Fine-tuning: head NOT mapped (target_stats=own): the parent's target differs in {diff}; "
+                        f"its readout is loaded unchanged")
+            return
         pm, psd = np.unique(np.round(pst["prepd_mean"], 12)), np.unique(np.round(pst["prepd_std"], 12))
         om, osd = (np.unique(np.round(np.ravel(np.asarray(x, dtype=float)), 12)) for x in (self.prepd_mean, self.prepd_std))
         assert len(pm) == len(psd) == len(om) == len(osd) == 1, (
