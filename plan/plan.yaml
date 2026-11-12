@@ -24387,8 +24387,10 @@ entries:
     - FA-ccin2p3-3d3fb9c6
     - FA-ccin2p3-65103811
     - FA-ccin2p3-882757e3
-    commit: 9d887002
+    commit: 88d7c954
     paths:
+    - analysis/catalog_v4/data/pidqn.json
+    - analysis/catalog_v4/plot_pidqn.py
     - data_mmap.py
     - docs/results.tex
     - scripts/job_catalog_v3_short.sh
