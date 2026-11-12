@@ -89,7 +89,7 @@ def halved():
 
 
 def write(name, tgt, k, T, arm, rate, parent, lr_factor=1.0, offshell="parent", ft_space="llrd", tmpl2=False,
-          wsd=False):
+          wsd=False, batch_search=True):
     c = lr_centre(T, k) * lr_factor
     space = template_space()
     fixed = {"data.source": "recipes", "data.processes_file": f"${{PROJECT_DIR}}/recipes/catalog_v4_datasaving_{tgt}.yaml",
@@ -122,7 +122,7 @@ def write(name, tgt, k, T, arm, rate, parent, lr_factor=1.0, offshell="parent", 
         # D423 (Joaquin 2026-11-12): WSD as the schedule for both arms, its cooldown fixed at the last eighth as the
         # WSD parent's recipe (results.tex par. v4 WSD, FA-ccin2p3-388dcd45); warmup and floor stay searched
         fixed.update({"training.scheduler": "WSD", "training.wsd_cooldown_frac": 0.125})
-    if tmpl2:
+    if tmpl2 and batch_search:
         # batch size, fixed at D/2 in stage 2, searched: no searched HP moves the val/train separation within its
         # range (|rho| <= 0.10 but lr's -0.30), while it is set by D, and batch size and horizon are what follow D
         space = [{"name": "training.batchsize", "type": "int_log", "low": max(4, round(d_of(k) / 64)),
@@ -168,6 +168,9 @@ def main():
                          "lr_scale [0.03, 10] and layer_decay [0.5, 1]")
     ap.add_argument("--wsd", action="store_true", help="the stage-2 space under WSD (cooldown 1/8) only: the matched "
                     "control of --tmpl2's batch and ranges")
+    ap.add_argument("--no-batch-search", action="store_true",
+                    help="--tmpl2 without the batch-size search (batch stays D/2): Joaquin 2026-11-12, searching batch "
+                         "beside lr confounds the two and adds little")
     ap.add_argument("--ks", type=int, nargs="*", help="only these D exponents k (D = 10^(k/2))")
     a = ap.parse_args()
     R, hz = rates(), horizons()
@@ -188,7 +191,7 @@ def main():
     for name, t, k, T, arm in jobs:
         p, h = write(name, t, k, T, arm, R[(t, k)], a.parent_nlo if t.endswith("_nlo") else a.parent_lo,
                      (0.5 if (t, k) in half else 1.0) * a.lr_factor, a.offshell_nlo if t.endswith("_nlo") else "parent",
-                     a.ft_space or ("llrd" if t.endswith("_nlo") else "scratch"), a.tmpl2, a.wsd)
+                     a.ft_space or ("llrd" if t.endswith("_nlo") else "scratch"), a.tmpl2, a.wsd, not a.no_batch_search)
         total += h
         print(f"{os.path.relpath(p, ROOT)}  {h:.1f} GPU-h")
     print(f"{len(jobs)} sweeps, {total:.1f} GPU-h estimated (8 trials each)")

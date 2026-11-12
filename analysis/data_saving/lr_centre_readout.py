@@ -37,8 +37,9 @@ TESTS = {"lr": ({"epem_ttx_d7_t8500": TTX}, {"c/3": "lrthird", "c/10": "lrtenth"
          # lrx3 = the lr window x3 (gen_data_saving --lr-factor 3), validation-with-training test after D420
          "lrx3": ({c: UUV for c in ("epem_ttx_d5_t8500", "epem_ttx_d7_t8500", "ee_uu_d5_t7310", "ee_uu_d7_t8500",
                                     "bbx_zz_nlo_d5_t3840", "bbx_zz_nlo_d7_t6400")}, {"lr x3": "lrx3"}),
-         # tmpl2 = the revised template (hp_ranges_readout.py): batch size searched, fine-tune ranges opened downward
-         "tmpl2": ({"epem_ttx_d5_t8500": UUV, "epem_ttx_d7_t8500": UUV}, {"WSD": "wsd", "template 2": "tmpl2"})}
+         # tmpl2 = the revised template (hp_ranges_readout.py) without the batch search (Joaquin 2026-11-12): WSD, and for
+         # the fine-tunes lr_scale and layer_decay opened downward (dsave_wideft_ft; scratch has no such search)
+         "tmpl2": ({"epem_ttx_d5_t8500": UUV, "epem_ttx_d7_t8500": UUV}, {"WSD": "wsd", "wide ft ranges": "wideft"})}
 TEST = sys.argv[sys.argv.index("--test") + 1] if "--test" in sys.argv else "lr"
 CELLS, VARIANTS = TESTS[TEST]
 SUFFIX = "" if TEST == "lr" else f"_{TEST}"
