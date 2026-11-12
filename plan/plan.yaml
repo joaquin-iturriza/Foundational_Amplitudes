@@ -25092,6 +25092,10 @@ entries:
       tt control 3fc1016a (detached batch satprobe_controls, outputs analysis/kit_benchmark/data/kit_sat_{uug_softpair,ttvirt_softpairthr}.json
       on CC), then on the inputs-only arms; per stratum and per one-input scan: GELU off/linear shares, attention max weight,
       residual and branch rms per block, readout move dmu per decade'
+    15: 'D411 route isolation (design recorded 2026-11-12 ~12:05, reviewer running): six from-scratch A runs, uug softpair
+      and tt virtual softpairthr, each with ONE route cut: tag _nolocal ++model.input_route_off=local, _noframes ++model.input_route_off=frames
+      (5d509b13), _nooffshell ++data.offshell_zero=true; read by kit_extrap_read collect (arms wired ccaf7e21) + kit_figures
+      collect/kit_readout --vs per arm; figures kit_extrap_route_<proc>_{a,b}'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -25804,6 +25808,12 @@ entries:
         an arm that changes that component (its own design)'
       - 'nothing flattens while dmu/k stays constant: the continuation is linear and the error is in the trend''s slope learned
         in range; compare dmu/k to the MLP''s'
+    15:
+      feeds: which input the KIT A/A_ft models drop to extrapolate like the MLP
+      if:
+      - 'one cut fixes a process: KIT models drop that route'
+      - 'none fixes alone: pairwise cuts, own design'
+      - 'several fix: take the cut that costs bulk/soft/Coulomb least'
   step_waits:
     '5': '2026-11-13'
     '9': FA-ccin2p3-62dcf910 FA-ccin2p3-bf3d593c FA-ccin2p3-8d1429bf
