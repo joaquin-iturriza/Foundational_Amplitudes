@@ -26508,8 +26508,8 @@ entries:
     wall_h: 0.5
     jobs: 32
     units: null
-    start: '2026-11-12T19:10:39+00:00'
-    at: '2026-11-12T19:10:39+00:00'
+    start: '2026-11-12T19:10:48+00:00'
+    at: '2026-11-12T19:10:48+00:00'
   handoff:
     state: 'Draft due 2026-11-13 (D413). Curve measure rebuilt and confirmed by Joaquin (D421): good = separation (val/train
       at end over its min, 3-check running medians) <= 3 and val end <= 2x best (curve_quality.py @155d1ab8). Figures: curve_examples_{good,bad}.
