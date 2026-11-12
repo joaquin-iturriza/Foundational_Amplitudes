@@ -24069,6 +24069,13 @@ entries:
       Seed 42 at the same HPs reproduces a run, so neither is resubmitted; both are listed apart in the readout (suspects_readout.py
       @55aeb931). At 05:13 the sibling one-loop AdamW fine-tunes (D=316, 3162, 1e4) and one-loop WSD scratch runs (D=316,
       1e3, 1e4) had no non-finite step; tree AdamW D=316 and 1e3 completed.'
+  - at: '2026-11-12T04:53:28+00:00'
+    text: '2026-11-12 reviewer findings (1) and (2) fixed at bcd8350f: suspects_readout.py skips a missing rerun (it was written
+      as pair/control 0); old_vs_new.py reads only the best trial''s own config.yaml (it used to fall back to any trial''s).
+      (3) is open: the old Jean Zay cscan result JSONs (sweeps/<sweep>/results/hp*.json) hold only test_loss, val_loss and
+      traintime_hours, with no prepd_std. That sweep directory also holds jobs/, output/, summary.txt and sweep_config.yaml.
+      Look for the run''s prepd_std under output/, or check the proxy (std of the log target over the first S rows) against
+      it on a few runs. Repo-reviewer not yet continued; E5844 not acked.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
