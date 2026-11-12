@@ -24724,6 +24724,60 @@ entries:
       3, L2 to 1e-3, coupled template space), each designed and reviewed. False alarm: a no-effect arm''s log G has sd ~ sigma/sqrt(12)
       while log S ~ 0.8 sigma, so G < 1/(2S) or G > S by chance at ~0.3% one-sided. Every arm reported per cell with both
       numbers; diverged runs listed apart.'
+  - at: '2026-11-12T17:54:02+00:00'
+    question: 'D414/D420 and Joaquin 2026-11-12 on the good/bad examples (''Good HPs, in particular lr, behave like the first
+      ones''): what makes validation go down together with training (curve_quality.py: separation = (val/train at end)/(min
+      val/train) <= 3, val at end <= 2x its best) without raising the best validation: (A) the schedule or horizon at each
+      cell''s baseline HPs (warmup-stable-decay in place of the cosine''s long decay; T/2), and (B) the lr window: the same
+      8-trial template search with the lr window x3 (scratch [c, 9c], fine-tune training.lr x3 under lr_scale [0.1, 10]);
+      (C) whether the search objective should penalise separation, read on existing and new searches (no runs). Cells t t~
+      LO, u u~ LO, b b~ > Z Z V/B at D=316 and 3162, scratch and fine-tune.'
+    prior: 'Existing 723 stage-2 trials (curve_quality.json @155d1ab8): within a search, separation falls with peak lr: Spearman
+      -0.39 (D<1e3, 44 searches), -0.25 (1e3-1e4), -0.12 (>=1e4); at D<1e4 by the lr''s place in its window: lowest quarter
+      median separation 3.8e4 (2 good of 160), top quarter 1.1e3 (10 of 123); good trials sit at window place 0.89 (D<1e3)
+      and 0.66 (1e3-1e4) vs bad 0.48/0.40, so good curves sit at the top edge and the window may stop below them. Only 6 of
+      44 (D<1e3) and 7 of 22 (1e3-1e4) searches hold any good trial; the best good trial''s val is 2.3x / 4.5x (median) above
+      the search best. Objective penalising separation (best val before val/train first exceeds 3x its running min, over all
+      trials of a search), per cell over the search best: 1.0-5.8x, one 44x (t t~ LO scratch D=316). Weight decay [0.001,0.3]
+      and L2 [1e-10,1e-6] do not move separation within a search (|rho| <= 0.1). Early stop at separation onset per trial
+      costs 1.4-2.3x. This entry''s c/3, c/10 searches (t t~ LO D=3162) moved the window down: scratch 15x/7.3x higher val,
+      separation 35/715 vs control 8.7; the upward direction is untested. Fine-tune lr window too high by the every-trial
+      read (trial_overfit @2c7ea02e: lower lr_scale lower val) judged the val minimum alone, not separation. results.tex ~l.7650:
+      fine-tune cells overfit early, best checkpoint a median 0.02 of the run; ~l.14327: early stopping not the cause of the
+      fine-tune deficit. WSD only as a pretraining parent schedule (sec. ws_fixes). Reported loss stays at the best checkpoint.'
+    measure: '(A) per run: best val MSE (ln units, val mu-MSE x prepd_std^2 at its min = best checkpoint), test MSE beside,
+      separation, end_up, end-of-run train MSE over control''s (together_readout.py). (B) per search (lr_centre_readout.py
+      --test lrx3): best val, its trial''s separation, good-trial count, together_min (C''s objective) against the stage-2
+      control search of the same cell; verdict LOWER/HIGHER at 2x else SAME. (C) together_min over the search best per cell,
+      on stage-2 and lrx3 searches.'
+    check: 'The measure moves with lr inside a search (above: rho -0.39, separation 3.8e4 -> 1.1e3 from the window''s bottom
+      to top quarter); the c/3, c/10 searches moved it 4-80x on one cell; by eye it calls bad every visibly separating curve
+      shown to Joaquin, and he confirmed the good/bad examples (2026-11-12, ''this is in general what I was saying'').'
+    fixed: '(A) each cell''s stage-2 search best HPs (stage2_readout.json best_hp, sweeps_local driver_state), its own config
+      dsave_s2_{scr,ft}_<target>_d{5,7}_t<T>, seed 42, pools, parents (HETEROSC mu_mse select, sigma stage); path sweep/trial_job.sh
+      --detached; submitter analysis/data_saving/submit_together.py; arms control, wsd (training.scheduler WSD, wsd_cooldown_frac
+      0.125 as this entry''s suspects-batch WSD arm), half (T/2); lr not retuned (stated in the read); 12 cells x 3 = 36 runs;
+      2T dropped to stay under D412 (results.tex ~l.7650 already finds the runs go past where they stop improving). (B) configs
+      sweep/sweep_config_dsave_lrx3_{scr,ft}_{epem_ttx_d5_t8500,epem_ttx_d7_t8500,ee_uu_d5_t7310,ee_uu_d7_t8500,bbx_zz_nlo_d5_t3840,bbx_zz_nlo_d7_t6400}.yaml
+      from gen_data_saving.py --stage lrx3 --lr-factor 3 --ft-space llrd --offshell-nlo own, same parents (heldout_r4, treesin_r4);
+      diff against the s2 configs: only the lr window (scratch) or training.lr (fine-tune), sweep name and DyHPO seed (name-derived);
+      8 trials, waves 3,3,2, drive.py on CC. Site: CC (site pick FA --jobs 48: CC 46 at ~4.2 h, lxplus 2; parents and Born-sidecar
+      pools on CC only, a setup gap; same end time on CC alone). Disk: CC 65 GB free; 36 runs + 96 trials ~4 GB.'
+    control: '(A) the control rerun per cell beside the original search best: per-cell spread max(c/o,o/c), pooled S = its
+      geometric mean (prior rerun spread at fixed HPs 0.46-4.84x). (B) the stage-2 search of the same cell (same template,
+      config, D, T; only the lr window differs).'
+    seeds: 'Seed 42 (D315). (A) 36 runs, work 5.1 GPU-h (steps x 0.085 s/step, V100 k<=7, cal_vb rates), wall limits 16.4
+      GPU-h. (B) 12 searches x 8 trials, 23.2 GPU-h by the generator (incl. its overhead), 16.3 GPU-h of steps. Total ~28
+      GPU-h (D412). Order: (A) now; (B) drive.py 61 min later (the site gate''s 60-min window on wall limits). Wall-time targets:
+      (A) 1 h; (B) 3 waves x ~0.35 h = ~1.2 h after its start.'
+    outcome: '(A) per cell BETTER = arm/control <= 1/2 and beyond the cell''s spread, WORSE = >= 2 and beyond it, else SAME;
+      GOOD/BAD; each arm''s end train MSE over control''s beside (a fix by underfitting shows there). Per arm: FIX = good
+      in >= 8 of 12 and G < S; GAIN WITHOUT FIX = G <= 1/(2S); else NOT FIXED AT THE BASELINE''S HPs. False alarm ~0.3% one-sided
+      (log G sd ~ sigma/sqrt 12 vs log S ~ 0.8 sigma). (B) LR WINDOW: lrx3 search bests good in >= 8 of 12 cells and best
+      val not HIGHER (2x) in more than 2 -> the window moves up for every search (stage-2 re-run cost to Joaquin); GOOD BUT
+      WORSE: >= 8 good but HIGHER in >= 3 -> together curves cost val at these D: report the price per cell, the objective
+      question (C) goes to Joaquin with it; NO: < 8 good -> lr alone does not bring the curves together; next suspect named
+      from (A) and the curves. (C) reported per cell for both windows whatever the branch. Diverged trials listed apart (D398).'
   step_waits:
     '3': bbx_zz_lo_scr3, bbx_zz_lo_ft drivers (detach events)
     '4': bbx_zz_lo_ft driver (detach event)
