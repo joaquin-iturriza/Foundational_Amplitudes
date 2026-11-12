@@ -31153,6 +31153,36 @@ entries:
       cost. Step 14 unchanged from round 3 (kit_extrap.json @7656e687: uug coll 17.70->2.24, tt Coulomb 3.55->1.72). Searched
       D424-D427 in site decisions and the four kit_hpo configs. Not checked: CC''s free GPU width for a 32-job first wave
       (site pick).'
+  - at: '2026-11-12T19:04:20+00:00'
+    question: 'Round 5 = round 4 (passed) with each of the four searches cut from 32 to 16 trials (Joaquin D428: ''32 seems
+      a bit too much, let''s do 16 for now''). (A) Steps 15+16: at which HPs (single-fidelity DyHPO, template space, 1831
+      steps = 300 epochs D425, batch 16384 D426) does a KIT from-scratch run''s validation mu-MSE fall with its training to
+      the end, with the lowest validation, on uug plain softpair (203a274f), tt virtual softpairthr (3fc1016a), uug T (c15b3337),
+      uugg T (c364a7ae)? (B) Step 14: do divergence-form inputs (model.input_div_form @6cdec219) close uug soft/collinear
+      and tt Coulomb/Sudakov at each setup''s chosen trial?'
+    prior: 'As round 4 (kit_curves NLL @daa54068; hp_ranges_readout; curve_quality.json 105/684 good; controls'' cosine curves;
+      Bakar''s MLP 300 epochs; step-14 priors: degree-2 log term PARTIAL, degree-1 running, target x eikonal dead end, gamma<=4
+      not adopted). D395 smoke of the search path FA-ccin2p3-f81cb1d0 COMPLETED: WSD, result json with val_mse_curve and train_eval_mse_curve
+      (50 points each), sigma stage and plots ran; read by tools/kit_curves.py sweep (separation 1.06, end_up 1).'
+    measure: 'As round 4: (A) curve_quality separation/end_up on the mu-MSE curves (good <= 3 and <= 2), best val mu-MSE;
+      kit_curves.py sweep -> analysis/kit_benchmark/data/kit_hpo.json; chosen = lowest best val among good; chosen vs old-HP
+      control by kit_predict REREAD and the NLL curve form. (B) deepest-bin signed error and log-MSE by kit_extrap_read, exponents,
+      family ratios by kit_readout --vs, bulk_test, both sides'' curves.'
+    check: 'As round 4: good and bad trials inside the same searches in curve_quality.json (21/71, 14/70, 12/63); at a 15-30%
+      good share the chance of no good trial is 0.3-7% at 16 trials (0.85^16 = 0.074, 0.7^16 = 0.003); (B) kit_extrap.json
+      @7656e687 and test_div_form.'
+    fixed: 'As round 4 except the count: configs sweep/sweep_config_kit_hpo_{uug_plain,ttvirt_thr,uug_T,uugg_T}.yaml @bc1a475c,
+      16 trials, n_startup 6, waves [6,5,5] (start-up share 6/16 as the template''s 3/8), t_steps [1831], batch 16384, WSD
+      0.125, template space; one sweep/drive.py driver for all four (--sites ccin2p3 --hours 1). Cost 16 x 1.70 = 27.2 GPU-h
+      (per trial uug 0.44, uug T 0.43, tt 0.35, uugg 0.48 h), inside D412''s 30. Wall: 3 waves x ~0.5 h = ~1.5 h of run time
+      plus queue. Disk ~6.4 GB vs 65 GB free. (B) unchanged from round 4 (arms ~0.8 GPU-h; own 16-trial searches if needed,
+      ~13 GPU-h, a budget question then).'
+    control: As round 4.
+    seeds: Seed 42 per trial and arm (D315); the 16 trials are the HP axis; (B) bands 0.34 uug, 0.22 tt.
+    outcome: 'As round 4. (A) YES per setup: at least one good trial; its HPs go to that setup''s later runs and it is their
+      control. NO (no good trial in 16): extend by 16 trials (drive --n-trials 32, a budget question if over 30 GPU-h); still
+      none: widen lr on the side the separation shrinks toward. (B) FIXES bands as round 3; NO EFFECT, worse or failing curves
+      at the control''s HPs: the arm''s own search, best against best; only a NO there stops the input.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
