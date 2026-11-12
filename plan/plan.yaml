@@ -23715,8 +23715,7 @@ entries:
     at: '2026-11-12T00:30:53+00:00'
   step_waits:
     '2': '2026-11-13'
-    '1': FA-ccin2p3-c3205cee (D395 smoke of PIDQN=pid), then the two arms afterok; held at submission by site submit's 60
-      GB disk floor on CC (52 GB free)
+    '1': FA-ccin2p3-01d337b5 FA-ccin2p3-e39d21ec
     '3': FA-ccin2p3-71cdfc9b (D395 smoke of LONG_OPT=adamw), then the AdamW x16 run afterok; held at submission by site submit's
       60 GB disk floor on CC (52 GB free)
   handoff:
