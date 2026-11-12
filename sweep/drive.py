@@ -379,6 +379,10 @@ class Sweep:
     def result_of(self, t):
         out = site("logs", t["rid"], "-n", "200", timeout=120, check=False)
         hits = [l for l in out.splitlines() if l.strip().startswith("RESULT_JSON ")]
+        # the run's own exception, digits blanked, for failure_streak (run_trial's wrapper RuntimeError says nothing)
+        errs = [re.sub(r"\d+", "N", l.strip())[:200] for l in out.splitlines()
+                if re.match(r"\s*\w+(Error|Exception): ", l) and "run.py exited with code" not in l]
+        t["cause"] = errs[-1] if errs else None
         if not hits:
             return None
         try:
@@ -389,6 +393,18 @@ class Sweep:
     def summary(self):
         from sweep.run_trial import _write_summary
         _write_summary(self.cfg, self.sampler, self.dir)
+
+
+def failure_streak(trials, n):
+    """The cause shared by the last n finished trials of all searches when every one of them failed with it (a crash
+    of the setup, not of a trial's hp: 84 b b~ > Z Z V/B trials went out on one stale Born record, 2026-11-12), else
+    None. Divergences are a property of the sampled hp and never count."""
+    done = sorted((t for t in trials if t.get("finished")), key=lambda t: (t["finished"], t.get("idx", 0)))[-n:]
+    causes = {t.get("cause") for t in done if t.get("status") in ("failed", "lost")}
+    if n and len(done) == n and len(causes) == 1 and all(t.get("status") in ("failed", "lost") for t in done):
+        c = causes.pop()
+        return c if c and "diverg" not in c.lower() else None
+    return None
 
 
 def dispatch_order(want):
@@ -453,6 +469,8 @@ def main():
     ap.add_argument("--item", required=True, help="the work item these trials belong to (`site items FA`)")
     ap.add_argument("--allow-jeanzay", action="store_true")
     ap.add_argument("--poll", type=int, default=60)
+    ap.add_argument("--stop-after", type=int, default=6,
+                    help="stop submitting when the last N finished trials all failed with the same error (0: never)")
     ap.add_argument("--no-fetch", dest="fetch", action="store_false", help="do not mirror each trial's tier-0 outputs locally")
     ap.add_argument("--once", action="store_true", help="one pass (collect, then submit what fits) and exit")
     ap.add_argument("--retry-lost", action="store_true",
@@ -486,6 +504,11 @@ def main():
     while True:
         for sw in sweeps:
             sw.collect(a)
+        c = failure_streak([t for sw in sweeps for t in sw.trials("observed", "failed", "lost")], a.stop_after)
+        if c:
+            sys.exit("drive.py: the last %d trials all failed with the same error, nothing more submitted: %s\n"
+                     "fix it, then rerun the same command with --retry-failed '.' (penalties taken back out)"
+                     % (a.stop_after, c))
         want = {sw: sw.may_issue(parallel) for sw in sweeps if not sw.done()}
         k = sum(want.values())
         if k:
