@@ -710,7 +710,10 @@ def _run_task(q, t):
                 shutil.rmtree(lock, ignore_errors=True)
                 return t, msg, None
             try:
-                res = mg.lhe_assemble(name, items, write_sidecars=False)
+                # only the pools not on disk: a re-assembly (pools deleted, parts kept) never rewrites a val/test pool
+                # that reads already score (a queue planned before any pool existed stores every role in its spec)
+                todo = [(r, o) for r, o in items if not datagen._is_cached(o, mg.recipe_id(r))]
+                res = mg.lhe_assemble(name, todo, write_sidecars=False) if todo else []
                 for out, full in res:
                     mg.write_recipe(out, full)
                 with open(os.path.join(D["assembled"], name), "w") as f:

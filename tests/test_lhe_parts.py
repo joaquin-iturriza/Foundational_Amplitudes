@@ -1429,6 +1429,49 @@ def test_assemble_pending_pools_gone():
     print("[assemble pending, pools gone] ok")
 
 
+def test_reassembly_keeps_scored_pools():
+    """2026-11-12 (dsh_eea): a queue whose train pool was deleted, parts kept, is assembled again by a worker; the val
+    and test pools on disk are not rewritten (same bytes, same mtime), only the missing train pool is built."""
+    _register(run_events=400)
+    saved = (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
+             datagen.dest_for_role, lhe_parts.ASSEMBLE_S, lhe_parts.AUTO_GC)
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            _fakes(d, short=False)
+            datagen.dest_for_role = lambda role: os.path.join(d, "pools", role)
+            os.environ["AMP_LHE_PARTS_DIR"] = os.path.join(d, "parts_store")
+            os.environ["AMP_LHE_WORK_DIR"] = os.path.join(d, "work")
+            lhe_parts.ASSEMBLE_S, lhe_parts.AUTO_GC = 0, False
+            spec = os.path.join(d, "spec.yaml")
+            yaml.safe_dump({"processes": [{"name": NAME, "sqrts": [13000, 13000], "n_train": 800, "n_val": 100,
+                                           "n_test": 100}]}, open(spec, "w"))
+            q = os.path.join(d, "queue")
+            rates = os.path.join(d, "rates.json")
+            json.dump({"x": {"nfinal": 3, "core_s_per_event": 0.01}}, open(rates, "w"))
+            lhe_parts.cmd_plan(argparse.Namespace(specs=[spec], queue=q, seed=42, rates=rates, cores=[f"{NAME}=1"]))
+            ctx = mp.get_context("fork"); res = ctx.Queue()
+            p = ctx.Process(target=_worker, args=(q, res)); p.start(); p.join(120)
+            assert res.get(timeout=5) == 0
+            paths = {rec["role"]: path for rec, path in _items()}
+            kept = {r: (os.path.getmtime(paths[r]), open(paths[r], "rb").read()) for r in ("val", "test")}
+            os.remove(paths["train"]); os.remove(paths["train"] + ".recipe.json")
+            time.sleep(1.1)
+            p = ctx.Process(target=_worker, args=(q, res)); p.start(); p.join(120)
+            assert res.get(timeout=5) == 0
+            for rec, path in _items():
+                assert datagen._is_cached(path, mg.recipe_id(rec)), path
+            for r, (mt, b) in kept.items():
+                assert os.path.getmtime(paths[r]) == mt and open(paths[r], "rb").read() == b, r
+            assert os.listdir(os.path.join(q, "assembled_superseded"))
+    finally:
+        (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
+         datagen.dest_for_role, lhe_parts.ASSEMBLE_S, lhe_parts.AUTO_GC) = saved
+        for v in ("AMP_LHE_PARTS_DIR", "AMP_LHE_WORK_DIR"):
+            os.environ.pop(v, None)
+        del mg.PROCESSES[NAME]
+    print("[re-assembly keeps scored pools] ok")
+
+
 if __name__ == "__main__":
     test_runs_and_identity()
     test_parts_equal_serial()
@@ -1448,3 +1491,4 @@ if __name__ == "__main__":
     test_failed_builds_and_workdirs()
     test_gc_parts()
     test_assemble_pending_pools_gone()
+    test_reassembly_keeps_scored_pools()
