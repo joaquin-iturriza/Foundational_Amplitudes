@@ -60,7 +60,8 @@ on the sites (`~/work/CLAUDE.md`).
 - State every batch's wall-time target before submission and record it on its plan entry: the time of its work (training steps at the model's step rate in a plain training run on that GPU, one forward pass per read, generation at the probe's time per event), never a measured rate that includes overhead.
 - A batch goes out whole, never behind a separate probe: its time and disk per unit come from an earlier run of the same setup or are read from its own first jobs (generation keeps its probe, a new launch path its smoke run); it is laid out to finish in one wave at the width `site pick` offers; disk per unit times the jobs, plus any cache they should share (shown shared by two jobs on the same data), must fit the site's free disk read at submission.
 - A launch path not yet run end to end (new job script, config, data or post-training stage) first runs once on one GPU for ~50 steps through every stage (σ fit, scoring, plots) [D395].
-- FA's results pruning tool is `sweep/prune.py` [D19]; a data cache on a site is deleted only when no running job and no recipe of an open plan entry reads it.
+- Results are pruned only by `scripts/prune_site.sh <site>`, which runs `sweep/prune.py` and `tools/prune_copies.py` [D19]; a pruning command is run bare, alone in its call.
+- A data cache on a site is deleted only when no running job and no recipe of an open plan entry reads it.
 - A margin above 2× (events asked over events kept, a run's or a stage's wall time over its target, a new method's cost over the one it replaces) is a finding to fix before it reaches me, never offered as an option.
 
 ## Code and git

@@ -47,7 +47,7 @@ authorise live in its ledger (`site decisions`, `site items`), and `site supervi
 - Login nodes have no GPU: `site run` is for sweep generators, submitters and CPU dry runs, never training, CUDA code or a shell loop.
 - Never hardcode a path: Python uses `siteconf`, Hydra configs `${oc.env:DATA_DIR}`; a job script holds only the job's business (name, time, CPUs, `--gres=gpu:N`, output), and the site's directives come at submit time.
 - Nobody waits on jobs, in the foreground or the background: the watch is `site supervise` and one `site events --wait`, run by the main session; an agent records its jobs and ends its turn.
-- An event whose fix means reading a log goes to the agent that owns its work, or a worker when there is none, which reads the log before anything is resubmitted, fixes it and acks it with what was done (`site ack`); any other event is explained and acked by whoever it reaches.
+- An event whose fix means reading a log goes to the agent that owns its work, or a worker when there is none, which reads the log before anything is resubmitted, fixes it and acks it with what was done (`site ack`); a READY goes to its owner, a hook incident to a worker; any other event is explained and acked by whoever it reaches.
 - Verify before claiming: a run's state is read in that turn from `site runs` (sweep trials: `site status` or the item's check) and its log (`site logs`); RUNNING with an empty log is not working. A site that does not answer is retried once (`site list`, or `site run <site> <project> -- hostname`) before it is reported down.
 - CC-IN2P3's login notice never stops work or prompts a question, unless it changes or addresses the user [D176].
 
