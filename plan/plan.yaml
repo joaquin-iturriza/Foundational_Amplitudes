@@ -15797,7 +15797,7 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-046cc7d3
-    commit: ea24b3cc
+    commit: d3a0b8a4
     paths:
     - .claude/hooks/notification_absorb.py
     - .claude/hooks/owner_handoff.py
@@ -15873,6 +15873,10 @@ entries:
       resubmitted at the same hp/index with no penalty, logged ''moved <run> <from> -> <to>''; home dead only at cap 0 or
       fit_ever 0, down/held home keeps, 12 h stay after a move, re-check pick --no-record (~/.local/bin/site, backup site.bak-20261112-picknorecord).
       tests/test_drive_repick.py 11 cases. Not live yet: running drivers load it at their next relaunch.'
+    - '2026-11-12 drive.py start-up sync: a site whose sync fails or times out is logged and left out of placement (a.sites
+      = synced -> pick --only); no site synced: exit, nothing submitted. d3a0b8a4 on trunk, tests/test_drive_sync_fail.py::test_site_down_at_sync_is_left_out;
+      repo-reviewer a847424422f5bffc8 PASS, watermark d3a0b8a4. Not fixed: a down site still costs up to 11 min (660 s) at
+      each start-up before it is dropped.'
     - '2026-11-12 restore of CC pools deleted 2026-11-11: check_site_data --list on CC: missing train pools H1 62, H2 218,
       H2p5 38, H3 278 (1e4 copies only, recipe 1e5), H5 28, H6 8, H7E 34, H7c 34; PP4 504 (494 series-built + 10 one-run part
       processes); dsh_eea 115 (parts kept, 115/115 complete, 3.06 GB). HD4/HD5 train/val missing was a false report (n=0 in
