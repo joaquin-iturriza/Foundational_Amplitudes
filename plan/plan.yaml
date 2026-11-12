@@ -25182,6 +25182,10 @@ entries:
       one-loop V is already the first example; the second must be a different process. The constant V/B is a further reason,
       not the stated one. The proposed rule gains: ''a second example is a process not already shown''. Choice unchanged:
       b b~ > Z Z one-loop V/B (a different process).'
+  - at: '2026-11-12T14:45:06+00:00'
+    text: '2026-11-12 ~16:50: the draft''s second data-saving example is ONE new process (not ee->uu, not tt) at LO and one-loop
+      V, both arms, run tonight (D413, and Joaquin: ''You pick one process, any process, at LO and V, it''s not complicated.'');
+      ee->uu V was wrongly offered as the second example: ee->uu LO+V is the first.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
