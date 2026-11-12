@@ -126,7 +126,8 @@ def main():
     rows = np.concatenate(rows)
     if a.out:
         os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
-    pool = os.path.join(out_dir, f"satprobe_{os.getpid()}.npy")
+    import tempfile
+    pool = os.path.join(tempfile.gettempdir(), f"satprobe_{os.getpid()}.npy")   # removed after the probe
     np.save(pool, rows)
     import h5py
     with h5py.File(kh.h5_path(stem), "r") as f:
