@@ -24063,8 +24063,9 @@ entries:
       or fewer epochs at small batch count; steady with clean curves: under-training, a longer horizon). NO CHANGE: none of
       the above: lr is not the cause; next warm-up/schedule and batch size. No rerun (D315).'
   step_waits:
-    '2': 'a reviewer: design-reviewer on the lower-lr template test (recorded 12:41 UTC), and the CC sync (two untracked kit_benchmark
-      files block the merge, routed to the main session); configs dsave_lrtenth_{scr,ft}_epem_ttx_d7_t8500 @979ad4e4'
+    '2': 'a reviewer: design-reviewer re-check of the revised lower-lr design (c/3 and c/10, 4 searches, 8.8 GPU-h, recorded
+      12:46 UTC); and the CC sync (two untracked kit_benchmark files block the merge; CC at ff934d7c), routed to the main
+      session'
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
