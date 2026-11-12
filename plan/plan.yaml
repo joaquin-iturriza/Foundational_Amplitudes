@@ -25954,6 +25954,17 @@ entries:
       ours reproduces our failure but no single arm is worse -> the two-factor arms next. No: no arm worse and ours as good
       as mlp -> the MLP form is not the cause; the transformer''s architecture and the non-portable recipe parts (muP Adam,
       L2, EMA) are, next tested by feeding the transformer his inputs only.'
+    passed_at: '2026-11-12T01:52:29+00:00'
+    reviewer: 'Re-check after FIX: port matches his src/baseline.py line by line; arms one knob each (cur = current softpair
+      inputs, recipe = 8000 steps + best mu-MSE checkpoint on a held-out 10%, as job_kit.sh''s heterosc_select=mu_mse; ours
+      on them) at 576750c5-era HEAD; one rule (3-seed ranges disjoint and medians > 0.3 decades), port gate (mlp within 0.3
+      decades of his numpy run, else ladder not read), ours-reproduces cut 0.5 decades vs c15b3337/c364a7ae/f21fa163. Check
+      2: existing spread uug coll deepest 0.11 (his) to 30.1 (f6b2ece9), softpair 2.21; dry run kept on CC runs/kit_mlp_dry
+      (uug mlp, uug ours, tt cur; kit_result.json present, 8.6-12 MB per run). Check 3: 3 seeds every arm, MLP spread unmeasured,
+      reason vs D315 stated. Disk ~1 GB of 45 GB free. Searched Bakar, MLP, baseline, leaky, log invariant, plain target,
+      kit in results.tex, plan and site decisions; prior now names 2642b17b, c35a2199, his tt Coulomb 7.8/2.4. Notes, not
+      blocking: tt cur has no off-shellness column (feats is gluon-only) while f21fa163 ran off-shellness on; recipe arm also
+      trains on 90% of the 1e5 (stated); time per run (1-2 min) to be read from the first job.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
