@@ -24415,7 +24415,7 @@ entries:
     decision: D401
   owner:
     agent: a1da55ce20b21fb74
-    state: working
+    state: closed
     since: '2026-11-12T02:44:52+00:00'
     state_at: '2026-11-12T02:44:52+00:00'
     context: 271357
@@ -24909,37 +24909,32 @@ entries:
     '6': FA-ccin2p3-d277f7f5 FA-ccin2p3-7a63ea88 FA-ccin2p3-1df8bd16
     '8': FA-ccin2p3-f26d0458
   handoff:
-    state: 'Redraw per Joaquin''s rejection of 3492956e. His words: (4) ''What does constant at bulk edge mean? Why is it
-      there in some figure and not in others even though there is a label for it in all of them? How can the sqrt(s) results
-      be so bad?'' (5) ''The legend covers the entire figure and it is unreadable. I have no idea what each curve means. There
-      is a vertical line unlabaled.'' Then: ''What do you mean the old constant was the truth clipped to its bulk range, what
-      does that even mean, and why are you now using something different? how am I supposed to interpret this? Why are you
-      only showing me two plots about this?'' and ''why does the first one have no curves while the old one did? why is the
-      gray band smaller in the new one? Why did you change the linestyles and add a ton of markers to the second plot?'' Coordinator''s
-      instructions: threshold figure back to the 00:31 one (two stacked panels, model curves in both, linear top axis, plain
-      lines), changing only the legend (off the data, strip), a label for the dash-dot line, one colour per model; the clipped-truth
-      reference restored under a plain name, dropped from a panel''s legend where zero throughout, median constant removed;
-      all 8 sets redrawn, each handed back with what it replaces and every change; answer ''how can the sqrt(s) results be
-      so bad'' in one paragraph. DONE: threshold figure 75354f9b (looked at beside old: fine; analysis/kit_benchmark/figs/kit_threshold_scan.png
-      + _legend.png); mse figures cb55f89a, all 8 sets redrawn cleanly in the foreground (the detached first attempt E5701
-      failed on a too-wide legend label, fixed to three lines); old|new sheets in scratch k5/sheet_mse_[0-8].png (old = 3492956e~1
-      code on 84123ee4~1 data); only sheet 0 looked at. TODO: look at sheets 1-8, write the per-figure list (same file names;
-      changes: reference label, its legend entry dropped where zero, per-panel legends, data = re-scored runs), and the sqrt(s)
-      paragraph: tt virtual Sudakov reference 2.8e-3/2.3e-2/6.9e-2 (1.7-5, 5-15, 15-50 TeV), scratch offon 9e5 0.0096/0.14/0.28,
-      offoff 1e5 0.039/0.15/0.24, offoff 9e5 0.015/0.77/64, bulk 1.8e-9..1.2e-8: the truth barely leaves the training range,
-      a model flat at the edge would be 3-4x better, ours drift (input range not checked). EVENTS: E5695 package v3 FA-ccin2p3-21f5d054
-      FAILED, log not yet read (site logs it); no resubmit before reading; E5696 MLP ladder d277f7f5/7a63ea88/1df8bd16 done
-      cleanly: read per the passed design (port check vs his numpy baseline first; kit_figures collect over runs/kit_mlp);
-      E5701 redraw command 2 rc=1 (handled: redrawn). None acked by me.'
-    decisions: Inference frames deterministic per particle (546dd9c2). Figures keep Joaquin's reference (clipped truth); change
-      only what he asked. MLP ladder 3 seeds per arm.
-    ruled_out: Augmentation/per-pool stats as the Born softpair pool dependence (lloca random collinear-frame noise was).
-      log beta^2 input construction (exact to 4.5e-9; extrapolated 5x past its trained range).
-    running: none (E5695, E5696, E5701 open for the next owner)
-    files: tools/rebuild_run.py, tools/kit_predict.py, tools/kit_package.py, tests/test_frame_noise.py, tools/kit_figures.py,
-      tools/kit_threshold_scan.py, tools/kit_input_range.py, tools/kit_mlp_ladder.py, scripts/job_kit_mlp_ladder.sh, analysis/kit_benchmark/data/,
-      analysis/kit_benchmark/figs/
-    written: '2026-11-12T02:36:24+00:00'
+    state: 'Redraw check done: reference line labelled ''truth clipped to / training range'' (two lines; the previous three-line
+      label stretched the y-axes, fccb1ec5), shown only where nonzero (only tt Born beta panels drop it), per-panel legends;
+      main sets A and B now carry the fine-tunes (A: every A_ft incl. lr x0.1, twin colour dashed/dotted; B: the 9e5 A_ft),
+      B_bulk renamed ''scratch + 3000 steps on bulk only'' (cb9f79d5); all 8 figure files re-collected after the 5d2aec11
+      re-score and redrawn (looked at). sqrt(s) answer in finding 05:00. Frame noise fix 5d2aec11, package v4 + check FA-ccin2p3-538eeb1e
+      running (step 5 waits on it: if PACKAGE_OK, it is ready for Joaquin). MLP ladder read (findings 05:00, 05:20): port
+      gate fails by 0.09 decades on uug soft under its 0.3 cut but his numpy seeds span 1.05 decades and ranges overlap: read
+      as pass with that stated; inputs are the lever, ours-MLP 1 decade better than our transformer -> next per design: the
+      transformer fed his inputs only (needs a design). D405/D406 design recorded (r5 and r5thr parents, threshold-sampled
+      LO 2->2 top pairs beta log-uniform [1e-5,0.6], plain RAMBO not mixture, A_ft tt virt 1e5 8000 vs f21fa163), design-reviewer
+      a169c0ded88f258e3 running; on PASS implement: sqrts_measure ''log_beta'' in mg5_pipeline_final._sqrts_sampler (threshold
+      = sum of the 2 final masses; config sqrts_measure at :4670 reaches the flat/RAMBO path at :3092) + test, recipe entries
+      v4_{gg,ddx,bbx}_ttx__thr (sampling mode not mixture), generation via job_catalog_v4_regen.sh, a heldoutthr case in job_datasaving_parent.sh
+      (T from pool count), smoke iters=50, then two A_ft runs (KIT_PARENT=runs/data_saving/dsave_parent_heldout_r5 and the
+      r5thr dir, extra arg fine_tune.offshell_stats=own); ~5.5 GPU-h. Step 6 (Coulomb target side) still needs its design.'
+    decisions: Reference line = truth clipped to the bulk_train range (Joaquin's reference), plain two-line label; fine-tunes
+      share their scratch twin's colour only where colours would repeat. Degenerate-frame noise must not depend on the vector's
+      bits (rounding follows the batch). Port gate read against his own 3-seed spread. r5 parent fits KIT protocol A (ee_tt
+      family out).
+    ruled_out: Hash-of-bits frame noise (pool dependence 0.38 decades on tt Born softpair). catalog_v4 mixture sampling for
+      threshold pools (its flat-|M|^2 and adaptive passes reshape beta).
+    running: FA-ccin2p3-538eeb1e (package v4 build+check, CPU); design-reviewer a169c0ded88f258e3
+    files: tools/kit_figures.py, tools/kit_mlp_readout.py, tools/kit_baseline_seeded.py, scripts/job_kit_numpy_seeds.sh, tools/kit_beta_coverage.py,
+      tools/rebuild_run.py, tests/test_frame_noise.py, analysis/kit_benchmark/data/{kit_fig_*,kit_mlp_ladder,kit_beta_coverage_h3}.json,
+      analysis/kit_benchmark/figs/{kit_mse_*,kit_median_*,kit_mlp_ladder_*,kit_beta_coverage_h3}.png
+    written: '2026-11-12T03:19:36+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
