@@ -30790,6 +30790,25 @@ entries:
       log-MSE within 0.34 uug / 0.22 tt of the control and exponents within 0.3 on every limit): the network already reaches
       these forms from the pair logs, and the hard-region gap is not an input-form problem; this input stops. Either way read
       only if both curves pass the curve bars; a failing arm is reported with its curves, not scored as an effect.'
+    fix_at: '2026-11-12T18:33:02+00:00'
+    fix: '(1) One change at a time / outcome (CLAUDE.md A/B protocol: a feature is judged first at the baseline''s best HPs,
+      done if better, else the same sweep for the feature, best against best): the control is step 15''s tuned chosen trial
+      and the arm runs only at the control''s HPs, which is the right first step, but the NO EFFECT branch concludes ''this
+      input stops'' and the failing-curve branch (''reported with its curves, not scored'') has no next step. That would close
+      the input on an untuned arm, the 2026-10-26 failure (arms left untuned). Fix: in the outcome, the NO, worse and failing-curve
+      cases at the control''s HPs lead to the same single-fidelity DyHPO search for the arm (copy sweep_config_kit_hpo_uug_plain
+      / _ttvirt_thr with ++model.input_div_form=true fixed, 8 trials, 3/3/2, the same objective and the same chosen-trial
+      rule), compared best against best. State its cost (about 12 GPU-h uug and 10 GPU-h tt, from step 15''s targets) against
+      D412''s 30 GPU-h line, which step 15''s 24 GPU-h already nearly uses. If it goes over, the arm''s search goes to Joaquin
+      as a question with that cost, and until he answers, a NO is reported as ''no effect at the control''s HPs'', not as
+      ''this input stops''. (2) Time per unit: the wall-time target uses 203a274f (98 min) and 3fc1016a (75 min), both at
+      batch 16384, but each arm runs at its chosen trial''s batch, which the search draws from [1562, 16384]. Fix: take each
+      arm''s training time from its chosen trial''s own run (same batch, pool, float64, steps; the div-form columns add only
+      a few scalars) and record it as the target before submission. Checks that hold: (2) the degree-2 log term moved the
+      deepest bins, confirmed in kit_extrap.json @7656e687: uug coll log-MSE 17.70 -> 2.24, soft signed -8.40 -> +5.00 (241
+      -> 25.6), tt Coulomb 3.55 -> 1.72, Sudakov -0.53 -> +0.77; (3) seed 42 under D315, MLP bands 0.34/0.22, effects in the
+      check are decades; (5) prior is complete; (8) through (14) are fine: HETEROSC, plain target as the step-14 brief allows,
+      KIT bulk_test and hard_test, only input_div_form moves (config diff gate), ~75 MB per run, no HP search in the arm itself.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
