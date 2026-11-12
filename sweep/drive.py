@@ -45,6 +45,11 @@ Re-pick: every REPICK_S, each trial still queued (PENDING/IDLE) on its site is w
       pick`'s model (finish_h): when another allowed site (--sites, --allow-jeanzay) ends it more than MOVE_H hours
       sooner and in under 1/MOVE_X of the time, its job is cancelled there and it is resubmitted at the same hp, t_steps
       and index on that site, with no penalty (it never ran), logged 'moved <run> <from> -> <to>'.
+First trial per site: for each search, the first trial sent to a site at this commit goes alone; the rest wait until
+      its log shows TRAINING_STARTED (printed by BaseExperiment.train(), past data load and model build) or it is
+      observed. If it ends without that line, nothing more of that search goes to that site in this driver run
+      (an ALERT event carries its error); with no site left the driver stops. 2026-11-12: two whole waves (42 trials)
+      failed on a stale checkout and a stale Born record before any reached training.
 Limits: detached trials always cold-start (no cross-fidelity warm start), which is how
 nearly every sweep runs anyway (single fidelity).
 """
@@ -89,6 +94,7 @@ FINAL = ("COMPLETED", "FAILED", "CANCELLED", "TIMEOUT", "REMOVED")
 QUEUED = ("PENDING", "IDLE")      # not started (SLURM, HTCondor): a trial in one may be re-picked
 MOVE_H, MOVE_X = 1.0, 2.0         # a queued trial moves when another site ends it > 1 h sooner and in < half the time
 REPICK_S = 600                    # one re-pick `site pick` per 10 min at most: each one probes every site over ssh
+MARKER = "TRAINING_STARTED"        # BaseExperiment.train() prints it once data and model are built
 STAY_S = 12 * 3600                # a moved trial stays where it arrived this long (a move gives up its queue age)
 
 
@@ -170,6 +176,10 @@ class Sweep:
         self.seed = int(fp.get("data.seed", 42))
         self.sp = os.path.join(self.dir, "driver_state.json")
         self.st = json.load(open(self.sp)) if os.path.exists(self.sp) else {"trials": {}, "prebuild": {}}
+        # first trial per site: {site: {"state": "probe", "rid": ..} | {"state": "ok"}} at this commit (kept across
+        # restarts at the same code); "failed" lives only in this run, so a restart after a data fix tries again
+        self.commit = a.commit if hasattr(a, "commit") else None
+        self.gate = dict(self.st.get("gate", {}).get(self.commit or "", {}))
         if (getattr(a, "retry_lost", False) or getattr(a, "retry_failed", None)
                 or getattr(a, "recollect", None)) and not a.dry_run:
             self.requeue_lost(getattr(a, "retry_lost", False), getattr(a, "retry_failed", None),
@@ -215,6 +225,50 @@ class Sweep:
             was, t["status"] = t["status"], "retry"
             log("%s: trial %d (hp%04d t%d, %s in %s) requeued, its penalty removed"
                 % (self.name, t["idx"], hp, t["t_steps"], was, t["rid"]))
+        self.save()
+
+    # ---- first trial per site
+    def gate_state(self, s):
+        return self.gate.get(s, {}).get("state")
+
+    def gate_check(self, a):
+        """Settle each probe trial: ok once its log shows MARKER or it is observed; failed when it ended without
+        MARKER (a setup fault: data, checkout, environment), with an ALERT naming its error."""
+        for s, g in list(self.gate.items()):
+            if g.get("state") != "probe":
+                continue
+            t = next((t for t in self.trials() if t.get("rid") == g["rid"]), None)
+            if t is None:                     # its record was replaced (requeued): the next trial there probes again
+                self.gate.pop(s)
+                self.save_gate()
+                continue
+            if t["status"] == "observed":
+                self.gate_set(s, "ok")
+                continue
+            ended = t["status"] in ("failed", "lost")
+            if not ended and t.get("sched_state") != "RUNNING":
+                continue
+            out = site("logs", g["rid"], "-n", "5000", timeout=180, check=False)
+            if MARKER in out:
+                self.gate_set(s, "ok")
+                log("%s: first trial on %s (%s) reached training; the rest of the search may go there" % (self.name, s, g["rid"]))
+            elif ended:
+                self.gate[s] = {"state": "failed", "rid": g["rid"]}
+                self.save_gate()                      # persisted without it: a restart after a fix probes again
+                msg = ("drive.py %s: first trial %s on %s ended before training (%s): %s; nothing more of this search "
+                       "goes to %s in this driver run" % (self.name, g["rid"], s, t.get("sched_state"),
+                                                        (t.get("cause") or t.get("error") or "?")[:300], s))
+                log(msg)
+                if not a.dry_run:
+                    site("event", "--project", PROJECT, "--kind", "ALERT", "--msg", msg, "--item", a.item,
+                         "--key", "drive-gate %s %s %s" % (self.name, s, g["rid"]), timeout=60, check=False)
+
+    def gate_set(self, s, state, rid=None):
+        self.gate[s] = {"state": state, **({"rid": rid} if rid else {})}
+        self.save_gate()
+
+    def save_gate(self):
+        self.st["gate"] = {self.commit or "": {k: v for k, v in self.gate.items() if v["state"] != "failed"}}
         self.save()
 
     # ---- persistence
@@ -352,6 +406,7 @@ class Sweep:
                                        **({"moved": t0["moved"]} if t0 and t0.get("moved") else {})}
         self.save()
         log("%s: trial %d -> %s  (hp%04d t%d, run %s)" % (self.name, idx, s, hp_idx, t_steps, m.group(1)))
+        return m.group(1)
 
     def move(self, t, dest, a):
         """Cancel trial t's job, still queued on its site, and submit it on dest at the same hp, t_steps and index: lost
@@ -540,10 +595,12 @@ def repick(sweeps, a, rows, now=None):
     moved in the last STAY_S stays."""
     now = now or time.time()
     for sw in sweeps:
+        probes = {g.get("rid") for g in sw.gate.values() if g.get("state") == "probe"}
+        ok = [r for r in rows if sw.gate_state(r["site"]) == "ok"]
         for t in sw.in_flight():
-            if t.get("sched_state") not in QUEUED or now - t.get("moved", 0) < STAY_S:
+            if t.get("sched_state") not in QUEUED or now - t.get("moved", 0) < STAY_S or t["rid"] in probes:
                 continue
-            dest = repick_dest(t["site"], rows, sw.hours)
+            dest = repick_dest(t["site"], ok + [r for r in rows if r["site"] == t["site"] and r not in ok], sw.hours)
             if dest and sw.move(t, dest, a):
                 took(rows, dest)
 
@@ -606,6 +663,7 @@ def main():
     a = ap.parse_args()
     if a.dry_run:
         a.once = True
+    a.commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True, stdout=subprocess.PIPE).stdout.strip()
 
     sweeps = [Sweep(c, a) for c in a.config]
     parallel = a.parallel or max(s.n_startup for s in sweeps)
@@ -637,6 +695,14 @@ def main():
     while True:
         for sw in sweeps:
             sw.collect(a)
+            sw.gate_check(a)
+        dead = [s for s in (a.sites or []) if all(sw.gate_state(s) == "failed" for sw in sweeps)]
+        if dead:
+            a.sites = [s for s in a.sites if s not in dead]
+            log("left out of placement (first trial failed before training): %s" % ", ".join(dead))
+            if not a.sites:
+                sys.exit("drive.py: the first trial failed before training on every site, nothing more submitted; "
+                         "fix the setup (see the ALERT events) and rerun the same command")
         c = failure_streak([t for sw in sweeps for t in sw.trials("observed", "failed", "lost")], a.stop_after)
         if c:
             sys.exit("drive.py: the last %d trials all failed with the same error, nothing more submitted: %s\n"
@@ -652,14 +718,24 @@ def main():
             for r in rows:
                 if r.get("state") in ("UP", "HELD"):
                     log("  %-9s %-5s %s" % (r["site"], r["state"], r.get("reason", "")[:150]))
+            held = set()
             for i, sw in enumerate(dispatch_order(want)):
                 if i >= len(order):
                     break
                 s = order[i]
+                g = sw.gate_state(s)
+                if g in ("probe", "failed"):
+                    if (sw, s) not in held:
+                        held.add((sw, s))
+                        log("%s: trials held from %s (%s)" % (sw.name, s, "its first trial has not reached training yet"
+                                                              if g == "probe" else "its first trial failed before training"))
+                    continue
                 try:
                     if sw.data_ready(s, a):
-                        sw.submit(s, a)
+                        rid = sw.submit(s, a)
                         took(rows, s)
+                        if rid and g is None:
+                            sw.gate_set(s, "probe", rid)
                     else:
                         log("%s: %s not ready (pools); trial deferred" % (sw.name, s))
                 except Exception as e:
