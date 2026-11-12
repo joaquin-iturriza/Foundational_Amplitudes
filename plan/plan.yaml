@@ -22997,6 +22997,15 @@ entries:
       cell with the rises, and the rerun question carries it. Launch: smoke dsave_diag_hmsmoke_ft_epem_ttx_d5_t50 (hp 1647,
       50 steps, every stage), then the 25 runs afterok on it through sweep/trial_job.sh --detached at the cells'' HPs, --hdr=--time
       1.3x the config time; ~8 GPU-h, under D400.'
+    passed_at: '2026-11-12T01:45:56+00:00'
+    reviewer: 'Re-review after FIX: outcome now disjoint (six named one-loop paired cells; CONFIRMED >=5/6 rise<1 vs REFUTED
+      >=4/6 rise>10 cannot both hold; GAIN needs G<=1/3 and >=6/8 below; pooled 8-cell geomean computed in hmap_readout.py
+      @1f0b1f7c); configs differ from parscale/tops controls only in sweep_name, later code knobs off by default. Check 2:
+      step-0 val loss 83477 unmapped vs 6504 parent_shared; val ratio moved 0.24 (tops/r4 tree), 0.19 test (off-shellness
+      one-loop); late rise 0-358. Check 3: same-HP rerun ratios 1.02,1.05,0.46,4.84,1.00, pooled 8-cell ln-sd ~0.3, the 1/3
+      bar ~3.5 sd. Disk 15-35 MB/run vs 31 GB free on CC; limits 1.3x config vs measured 12-24 min (D=316..1e4), 62 min (D=1e5).
+      Searched results.tex for head map, readout rescale, parent''s function, target_stats, parent_shared, kept standardization,
+      zero-shot start, sigma head, output head, refit, own/parent stats, warm start; entry dead ends; site decisions.'
   step_waits:
     '8': the main session's read of the defect hunt (its 'before more arms'); then launched as designed
   findings:
