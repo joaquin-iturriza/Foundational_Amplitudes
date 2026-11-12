@@ -25315,7 +25315,7 @@ entries:
       - 'NO: B stays; threshold data (D405) is the lever'
   step_waits:
     '5': '2026-11-13'
-    '9': FA-ccin2p3-62dcf910 FA-ccin2p3-6390978c FA-ccin2p3-5433329e
+    '9': FA-ccin2p3-62dcf910 FA-ccin2p3-bf3d593c FA-ccin2p3-8d1429bf
     '10': FA-ccin2p3-dc15b6bc FA-ccin2p3-4cab2100
   handoff:
     state: 'D411 why the MLP beats our transformer: eval-only reads done (findings ~07:00 + correction): frames conditioned,
