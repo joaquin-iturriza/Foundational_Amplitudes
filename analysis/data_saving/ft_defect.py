@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """pretrain_data_saving step 9 (D400 defect hunt): why the fine-tunes lose to scratch on e+e- > t t~. Per stage-2 best
-trial (both arms, four targets, D=316..1e4; the run list of data/train_val_gap.json), read on CC:
+trial (both arms, four targets, every D of the study; stage2_readout.json's best trials), read on CC:
   - the curves: train HETEROSC loss (train_steps.npz) and validation HETEROSC loss (out_0.log, main stage);
   - the final model's (D276, sigma_stage/preds_{train,val}.npz) standardized residual r = pred - truth and sigma
     on the 2000 scored train events and on the val pool: rms(r), median(sigma), mean((r/sigma)^2);
@@ -64,12 +64,25 @@ print("FTDEF " + json.dumps(out))
 
 TARGETS = {"epem_ttx": r"$e^+e^-\to t\bar t$ tree", "ee_ttbar_nlo": r"$e^+e^-\to t\bar t$ one-loop/tree",
            "ee_uu": r"$e^+e^-\to u\bar u$ tree", "ee_uu_nlo": r"$e^+e^-\to u\bar u$ one-loop"}
-DS = {"d5": 316, "d6": 1000, "d7": 3162, "d8": 10000}
 
 
 def key(run_dir):
-    m = re.search(r"dsave_s2_(ft|scr)_(.+)_(d\d)_t\d+", run_dir)
-    return m.group(2), m.group(1), DS[m.group(3)]
+    m = re.search(r"dsave_s2_(ft|scr)_(.+)_d(\d+)_t\d+", run_dir)
+    return m.group(2), m.group(1), round(10 ** (int(m.group(3)) / 2))
+
+
+def best_runs():
+    """The run dir of every stage-2 search's best trial, every D of the study (stage2_readout.json)."""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from stage2_readout import run_of, searches
+    S = searches()
+    out = []
+    for c in json.load(open(os.path.join(DATA, "stage2_readout.json")))["cells"]:
+        t = next((t for t in S[c["sweep"]]["trials"] if int(t["hp_idx"]) == c["best_hp"]), None)
+        rd = t and run_of(c["sweep"], t)
+        if rd:
+            out.append(f"runs/{c['sweep']}/{rd}")
+    return out
 
 
 def main():
@@ -77,7 +90,7 @@ def main():
     if "--cached" in sys.argv:
         rows = json.load(open(cache))
     else:
-        runs = [r["run_dir"] for r in json.load(open(os.path.join(DATA, "train_val_gap.json")))]
+        runs = best_runs()
         rows = site_python(REMOTE, runs, "FTDEF")
         json.dump(rows, open(cache, "w"))
     R = {}
@@ -129,7 +142,7 @@ def main():
         ax.set_xlabel(r"$D$")
         ax.set_ylabel(r"standardized units")
         ps.process_label(ax, TARGETS[tg])
-    ps.legend(np.ravel(axs)[0], "upper left")
+    ps.legend(np.ravel(axs)[0], "lower left")
     ps.save(fig, os.path.join(FIGS, "ft_sigma"))
 
     # --- figure 3: ft/scr val MSE vs scratch level (lead d) and vs head mismatch (lead a)
@@ -138,7 +151,7 @@ def main():
     out = []
     for tg in TARGETS:
         pts = []
-        for D in DS.values():
+        for D in sorted({k[2] for k in R if k[0] == tg}):
             f, s = R.get((tg, "ft", D)), R.get((tg, "scr", D))
             if f and s:   # val MSE of the transformed target (ln|M|^2, ln(V/B) or ln|V|): (rms r x own std)^2
                 mf, ms = ((x["val"]["rms_r"] * x["prepd"][1]) ** 2 for x in (f, s))
