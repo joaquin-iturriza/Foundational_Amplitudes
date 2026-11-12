@@ -26797,8 +26797,18 @@ entries:
       2026-11-10T02:08 starts the KIT benchmark, no search or cost; 2026-11-12T01:19 is about the data-saving tt LO / uu V
       points, not KIT; 2026-11-12T17:57 says tune further (D422) but names no setups or cost'
     blocks: the uugg and uug-T searches only
-    blocks_steps: &id002
+    blocks_steps:
     - 15
+  - ask: 'Scope: the KIT HP search (step 15) covers uug with the plain target and tt virtual (~24 GPU-h). Should it also cover
+      uugg and uug with the T target (step 16)? About 16 GPU-h more, ~40 GPU-h in all, over the 30 GPU-h line. Without it
+      uugg stays at the HP point where validation leaves training at about step 1000.'
+    at: '2026-11-12T18:25:20+00:00'
+    searched: 'site decisions --project FA all (D412 budget, D419, D422, D423): none approves a 40 GPU-h KIT search. His messages:
+      2026-11-10T02:08 starts the KIT benchmark, no search or cost; 2026-11-12T01:19 is about the data-saving tt LO / uu V
+      points, not KIT; 2026-11-12T17:57 says tune further (D422) but names no setups or cost'
+    blocks: step 16 only; step 15's two searches go ahead
+    blocks_steps: &id002
+    - 16
   owner:
     agent: a42647ffbe02fdac5
     state: closed
@@ -30975,13 +30985,13 @@ entries:
     start: '2026-11-12T18:11:27+00:00'
     at: '2026-11-12T18:11:27+00:00'
   ask: 'Scope: the KIT HP search (step 15) covers uug with the plain target and tt virtual (~24 GPU-h). Should it also cover
-    uugg and uug with the T target? About 16 GPU-h more, ~40 GPU-h in all, over the 30 GPU-h line. Without it uugg stays at
-    the HP point where validation leaves training at about step 1000.'
-  waiting_since: '2026-11-12T18:24:27+00:00'
+    uugg and uug with the T target (step 16)? About 16 GPU-h more, ~40 GPU-h in all, over the 30 GPU-h line. Without it uugg
+    stays at the HP point where validation leaves training at about step 1000.'
+  waiting_since: '2026-11-12T18:25:20+00:00'
   searched: 'site decisions --project FA all (D412 budget, D419, D422, D423): none approves a 40 GPU-h KIT search. His messages:
     2026-11-10T02:08 starts the KIT benchmark, no search or cost; 2026-11-12T01:19 is about the data-saving tt LO / uu V points,
     not KIT; 2026-11-12T17:57 says tune further (D422) but names no setups or cost'
-  blocks: the uugg and uug-T searches only
+  blocks: step 16 only; step 15's two searches go ahead
   blocks_steps: *id002
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
