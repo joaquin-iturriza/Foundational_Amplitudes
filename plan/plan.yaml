@@ -26051,6 +26051,12 @@ entries:
       size, control runs, eval-only); (b) reproduce every plot Bakar sent, ours vs his MLP; (c) one-loop processes covering
       Coulomb (massive pair near threshold, non-tt) and Sudakov added to the pretraining, one design; (d) a general divergence-form
       input (eikonal logs, splitting variables, 1/beta per massive pair), one short test on uug and tt virtual'
+    12: 'Weak spots with full LLoCa (Joaquin 2026-11-12: ''removing the functionality of lloca is not the way''): q-g collinear
+      (uug, uugg), sqrt(s) extrapolation (tt virtual), beta near threshold. (i) read log-skip runs 203a274f/7b891d10/eb870ad4
+      under their passed design; (ii) frames boost bound model.net.frames_gamma_max @da59ef1b (hard clamp, untested on CC)
+      on uug+uugg softpair 1e5 vs c15b3337/c364a7ae, G ~4 (uug bulk_train gamma median 1.25, q90 1.65, max 10.2; collinear
+      overshoot starts at gamma ~4), own design+review+D395 smoke; (iii) tt high sqrt(s): lightlike-tops guess, eval-only
+      first; (iv) step 11 continues'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -26901,6 +26907,11 @@ entries:
       if:
       - 'a route helps: adopt it in the KIT models'
       - 'none helps: report the comparison against all of Bakar''s plots as the KIT answer'
+    12:
+      feeds: which change fixes the KIT weak spots with the frames kept, and so what the KIT models and package take
+      if:
+      - 'a test fixes its spot within the MLP bands: it goes into the KIT models'
+      - 'none fixes: the KIT answer is the comparison against all of Bakar''s plots with the weak spots stated'
   step_waits:
     '5': FA-ccin2p3-203a274f FA-ccin2p3-7b891d10 FA-ccin2p3-eb870ad4
     '10': FA-ccin2p3-203a274f FA-ccin2p3-7b891d10 FA-ccin2p3-eb870ad4
