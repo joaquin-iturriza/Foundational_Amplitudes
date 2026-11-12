@@ -21531,12 +21531,10 @@ entries:
     answered_at: '2026-11-12T03:19:43.198000+00:00'
     decision: D407
   owner:
-    agent: ab42424f5211e65de
-    state: closed
-    since: '2026-11-12T14:54:41+00:00'
-    state_at: '2026-11-12T15:28:17.409000+00:00'
-    context: 296265
-    context_at: '2026-11-12T15:39:15+00:00'
+    agent: afc3a7a4d8d0de53b
+    state: working
+    since: '2026-11-12T15:41:13+00:00'
+    state_at: '2026-11-12T15:41:13+00:00'
   designs:
   - at: '2026-11-10T02:35:09+00:00'
     question: 'Step 1 (D356 horizons, tree arm): on catalog_v4''s held-out tree targets ee->ttbar (H3, 2->2 massive), ee->ccbar
