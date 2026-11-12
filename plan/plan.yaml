@@ -16226,8 +16226,12 @@ entries:
       08:42, 09:07, 2026-10-27T02:14, 2026-10-05T02:23 and 2026-10-26T18:58 (hook flags, not this rule) read; none changes
       his rule that the main session sends figures unopened
     blocks: the CLAUDE.md edit (step 22)
-    blocks_steps: &id001
+    blocks_steps:
     - 22
+    answered_at: '2026-11-12T08:56:18+00:00'
+    decision: D412
+    withdrawn_at: '2026-11-12T08:56:18+00:00'
+    withdrawn_why: Joaquin does not want this asked again; the current figure rule stays
   step_why:
     11:
       feeds: whether the redesign is finished
@@ -17368,15 +17372,6 @@ entries:
     files: tools/lhe_parts.py tools/check_site_data.py scripts/job_catalog_v4_regen.sh recipes/catalog_v4_pp4_restore.yaml
       analysis/agent_redesign/cache_census.py tests/test_lhe_parts.py .claude/hooks/notification_absorb.py
     written: '2026-11-12T02:23:30+00:00'
-  ask: 'Scope (still unanswered: D410 answered only the pool deletion of the joint question): may the figure rule in CLAUDE.md
-    change so that the main session looks at each figure once, small, before sending it, checking each curve has a legend
-    entry and the caption describes the axes, instead of sending figures unopened?'
-  waiting_since: '2026-11-12T03:33:38+00:00'
-  searched: CLAUDE.md line 28; site decisions D367, D368, D410 (answers the deletion only); his messages 2026-11-10T02:08,
-    08:42, 09:07, 2026-10-27T02:14, 2026-10-05T02:23 and 2026-10-26T18:58 (hook flags, not this rule) read; none changes his
-    rule that the main session sends figures unopened
-  blocks: the CLAUDE.md edit (step 22)
-  blocks_steps: *id001
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
   question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
@@ -20965,7 +20960,7 @@ entries:
       (approves the transfer study''s plan only), 2026-11-06T04:28 (worktree handling and other entries, no cost for this)'
     blocks: step 3's job submissions (the design's final form and its re-check depend on the stage-2 scope); the code rebuild
       in worktrees/wt-sigma-gen3 does not wait
-    blocks_steps: &id002
+    blocks_steps: &id001
     - 3
   owner:
     agent: a237615c421bbf029
@@ -21328,7 +21323,7 @@ entries:
     (approves the transfer study''s plan only), 2026-11-06T04:28 (worktree handling and other entries, no cost for this)'
   blocks: step 3's job submissions (the design's final form and its re-check depend on the stage-2 scope); the code rebuild
     in worktrees/wt-sigma-gen3 does not wait
-  blocks_steps: *id002
+  blocks_steps: *id001
   checked_until: '2026-11-12T02:24:45+00:00'
 - id: pretrain_data_saving
   title: 'pretraining saves target data: dataset-size scaling, fine-tuned against scratch, on the current catalog setup'
@@ -27813,7 +27808,7 @@ entries:
       about cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID,
       says nothing about the draft's sections)
     blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-    blocks_steps: &id003 []
+    blocks_steps: &id002 []
   owner:
     agent: afb073b8fc9460ec5
     state: stopped
@@ -27831,7 +27826,7 @@ entries:
     cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID, says
     nothing about the draft's sections)
   blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-  blocks_steps: *id003
+  blocks_steps: *id002
   step_why:
     1:
       feeds: the draft's results (D354)
