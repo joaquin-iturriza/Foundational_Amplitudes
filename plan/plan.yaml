@@ -22330,6 +22330,50 @@ entries:
       A and Joaquin''s go. Check 5 searched: H3, physical top, m_t=172, heldout_H3, epem_ttx, ttbar, t\bar t, sec:ladder (tab:rung_focus_ratio,
       tab:ladder_transfer_all now in prior), kit/qqg, site decisions D360-D400. HETEROSC + sigma stage; disk 52 GB free on
       /sps/lpnhe; ~8.5 GPU-h under D400.'
+  - at: '2026-11-12T00:12:40+00:00'
+    question: 'D400, one-loop half: the t t~ V fine-tunes read 8-33x worse than scratch in stage 2 (best val), the off-shellness
+      own scale helped (test MSE(V/B) 0.19x) and the physical-mass tops (r5 parents, stage A) did not (val 1.92x all events,
+      0.63x without each run''s worst event, within the rerun spread). Does any of the three next suspects, each alone on
+      top of the own off-shellness scale, lower the t t~ V fine-tune''s error: (a) the dimensionless-mass column refit on
+      the target instead of the parent''s scale (fine_tune.mass_stats=own; parent [-1.27, 0.70] vs t t~ own [-0.90, 0.36],
+      2x compression of the top''s value), (b) an AdamW fine-tune in place of MuonAdamW (training.optimizer=AdamW), (c) the
+      pair-log inputs at the pair threshold, log beta^2 of the t t~ pair (model.input_pair_threshold=true)?'
+    prior: 'Stage A (diag_readout.py tops @e190a6c1): r5/r4 t t~ V val 0.43, 1.94, 1.43, 11.6 at D=316..1e4; event_share.py:
+      the 11.6 is one val event (pool row 4523, 98% of the r5 run''s val MSE; worst val event in 10 of 16 t t~ V runs), without
+      each run''s worst event 0.39, 1.11, 1.62, 0.22 val (geomean 0.63), 0.36, 1.98, 1.86, 0.04 test. Off-shellness diagnostic:
+      own/parent t t~ V val geomean 0.45, test 0.19 (adopted for one-loop fine-tunes). (b) prior: par:v3_muon (results.tex):
+      AdamW fine-tune over Muon fine-tune 0.986 / 0.935 on the v3 short probes (the fine-tune optimizer added nothing there;
+      not on t t~ or one loop). (c) prior: kit_benchmark scratch at 1e5, one seed: log beta^2 pair input lowered KIT t t~
+      V Coulomb -0.33 dec, Sudakov -0.59, bulk -0.78; raised t t~ Born Coulomb +3.2 dec. (a) no prior run with the mass column
+      refit. Searched results.tex (mass column, dimless, input_pair_threshold, AdamW fine-tune, ttbar V), the entry, site
+      decisions D355-D400.'
+    measure: 'Per cell (t t~ V, D=316, 1e3, 3162, 1e4) and arm: MSE of ln(V/B) on the 5000 val events without the run''s single
+      worst event (event_share.py, sigma-stage final model), arm/control; beside it the same with all events, and test MSE(V/B)
+      and MSE(ln V/B) w/o worst. Primary is w/o-worst because one val event (row 4523) carries up to 98% of a run''s val MSE.'
+    check: 'The measure moves with input-scale changes on these cells: off-shellness own/parent moved t t~ V cells 0.11-4.0x
+      val and 0.09-0.65x test (stage2_diag_readout.json); r5/r4 moved them 0.04-1.98x w/o worst (event_share.json). Rerun
+      spread (same HPs, same seed, r4 rerun / stage-2 best): 0.46-4.84 per cell val, sd ln 0.73, i.e. ~1.44x on a 4-cell geomean
+      (2 sd ~2.1x).'
+    fixed: 'Configs sweep/sweep_config_dsave_diag_{massown,adamw,pairthr}_ft_ee_ttbar_nlo_d{5,6,7,8}_t8500.yaml = the offown
+      configs (r4 treesin parent, fine_tune.offshell_stats own, target_stats own, V/B, T=8500, pools, seed 42) with only sweep_name
+      and one fixed_param added (diffed). HPs per cell = the stage-2 best trial''s (hp_idx 340, 1544, 120, 406, as the offown
+      runs), passed with --hp. Code: experiment.py fine_tune.mass_stats (own: _dms_frozen None, refit as a scratch run does).
+      HETEROSC + sigma stage.'
+    control: 'The offown runs at the same HPs and seed from the same r4 parent: FA-ccin2p3-e024c471, 23f95abb, 05b47678, b872f220
+      (each arm differs from its control by exactly one fixed_param). Stage-2 scratch best per cell beside (ft/scr).'
+    seeds: 'Seed 42 in every arm and the control; the 4 cells carry the replication. Per-cell rerun spread sd ln 0.73: one
+      cell alone decides nothing; the 4-cell geomean has ~1.44x sd.'
+    outcome: 'Per arm (3 arms, read separately, multiplicity said): YES if arm/control w/o-worst val < 1 in >= 3 of 4 cells
+      and geomean <= 0.4 (beyond 2 sd of the rerun spread): that suspect carries part of the t t~ V deficit; it is added to
+      the s3 one-loop configs (sweep_config_dsave_s3_ft_ee_ttbar_nlo_*) and the one-loop stage-B searches (8 V cells, ~25
+      GPU-h) go out under D400 with it. NO if geomean >= 0.67 or < 2 of 4 below: ruled out. Between: inconclusive, said so;
+      at most one second seed of that arm''s 4 cells (~2 GPU-h) before any adoption. If none is YES: the one-loop deficit
+      stays unexplained; next is reading where the error sits (per-region error by beta, Coulomb vs bulk, ft vs scratch) before
+      more arms. Launch: (1) smoke (D395) sweep_config_dsave_diag_smoke3_ft_ee_ttbar_nlo_d5_t50.yaml, all three overrides,
+      50 steps through trial_job.sh with the sigma stage; (2) the 12 runs afterok on it via site submit ccin2p3 FA sweep/trial_job.sh
+      -- --sweep-config <cfg> --trial-idx 0 --detached --hp-idx <idx> --t-steps 8500 --hp k=v..., --hdr=--time=00:40:00 (stage
+      A''s 1e4 cell ran 22 min training + sigma; a 16-min limit cut it). GPU: 12 x ~0.45 h + 0.1 = ~5.5 GPU-h under D400.
+      Disk: 13 x ~15 MB.'
   step_waits:
     '7': FA-ccin2p3-35922ca9 FA-ccin2p3-adbd0552
   findings:
