@@ -25391,6 +25391,12 @@ entries:
       recipe 11-12 02:44, record 11-10) rewritten; 6 loop-induced *_loop pools have non-positive Born sidecars (no Born, never
       a V/B target). Step 5 done: muonly_curves_epem_{a,b} redrawn (864873c6): the legend sat over the process label and OCR
       read ''val3162''; legend moved to the lower left.'
+  - at: '2026-11-12T16:05:25+00:00'
+    text: '2026-11-12 17:06 CET: LO scratch launch failed twice at drive.py''s start-up sync (bbx_zz_lo_scr, _scr2: other
+      agents'' uncommitted files in the shared checkout; the 4th such refusal today). Fix c7b7322e: the sync passes --allow-dirty
+      (sends commits only) and drive.py refuses only when the launch''s own configs are uncommitted (tests/test_drive_sync_fail.py).
+      Relaunched as detach bbx_zz_lo_scr3, configs @b7f17788, trials submitting from 17:05. E6278/E6282: two V/B fine-tune
+      D=1e4 trials diverged at lr_scale 4.45 and 9.99 (routine, D398).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
