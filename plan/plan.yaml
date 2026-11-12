@@ -25425,11 +25425,6 @@ entries:
   next:
     5: 'Checkpoint + inference package for KIT (Joaquin sends it): best A_ft/B checkpoints, a float64 predict script, log10|M|^2
       out; after the A_ft batch'
-    9: 'D405/D406 transfer test (design recorded 2026-11-12, design-reviewer a169c0ded88f258e3): implement sqrts_measure log_beta
-      (mg5_pipeline_final._sqrts_sampler, plain RAMBO path, 2->2 equal masses, beta log-uniform [1e-5,0.6]) + test; recipe
-      v4_{gg,ddx,bbx}_ttx__thr (gen_datasaving_parent.py heldoutthr variant), generate (CPU); r5thr parent (job_datasaving_parent.sh
-      heldoutthr; smoke iters=50, D395); job_kit.sh A_ft tt virt_finite 1e5 8000 from r5 and r5thr with fine_tune.offshell_stats=own;
-      kit_readout --vs vs f21fa163 and the threshold scan'
     10: 'D411 follow-up (own design): KIT models without the attention frames (model.input_route_off=frames): A on uugg (not
       yet run with the cut) and A_ft/B on the four KIT targets, against their softpair(thr) controls; and why the frame cut
       loses the uug soft limit (deepest soft -0.28 -> -0.93) while off-shellness off gains it (-> -0.04): an arm with both
@@ -26208,13 +26203,6 @@ entries:
       if:
       - 'A_ft best: package A_ft'
       - 'B best: package B'
-    9:
-      feeds: whether pretraining with the helpful inputs and physical-mass, threshold-covering top data transfers to the KIT
-        t t~ virtual (D405)
-      if:
-      - 'ft_thr Coulomb median < -0.3 vs scratch and vs ft_r5: threshold sampling goes into the catalog parent''s top-pair
-        pools'
-      - 'both NO: design one-loop top pairs at physical mass near threshold (gg/qq~ > tt~ virtual)'
     10:
       feeds: which input set the KIT A/A_ft models (and the package for KIT) use
       if:
@@ -26222,7 +26210,6 @@ entries:
       - 'the soft loss stays: KIT models take the frame cut and report the soft trade'
   step_waits:
     '5': '2026-11-13'
-    '9': detached batch thrscan_d405 (threshold scan of the three D405 fine-tunes)
     '10': FA-ccin2p3-e8088a7d FA-ccin2p3-e1c19b4d
   handoff:
     state: '2026-11-12 ~14:05. D411 settled to one route: the transformer''s extrapolation failure into KIT limits (uug collinear
