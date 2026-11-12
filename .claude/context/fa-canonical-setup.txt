@@ -24,7 +24,7 @@ run config disagrees with this table, the table wins.
 | `num_workers` | `2` | fixed |
 | `dtype` / `allow_tf32` / `fused_optimizer` | `float32` / `true` (no-op V100) / `true` | fixed |
 | optimizer / betas / eps / weight_decay | `MuonAdamW` (`optim/muon.py`; Muon on μP hidden matrices, AdamW `[0.9,0.999]` / `1e-8` / `0` on the rest) for pretraining and fine-tuning, set in the template's `fixed_params` (`training.optimizer`) [D155, D158]. HPO rules 2 and 4 were measured with AdamW: a Muon sweep centres on its own search, not on them | optimizer fixed; `muon_weight_decay` swept |
-| `scheduler` / `clip_grad_norm` | `CosineAnnealingLR` / `5` | fixed |
+| `scheduler` / `clip_grad_norm` | WSD (`wsd_cooldown_frac` 1/8) / `5` | fixed [D423] |
 | `training.lr` | run-design: centre on `lr*(t,D)` surface at your (t,D), sweep ±½ decade (see rule #2) | per-run |
 | EMA (`ema` top-level flag) | swept `{false,true}` × `ema_decay∈[0.9,0.999]`; not settled (the big-run DyHPO and the catalog quick sweeps chose it on, the catalog wave's best had it off) | open |
 | fine-tune | full retrain + layer-decay; `lr_scale∈[0.1,10]@1`, `layer_decay∈[0.75,1.0]` | fixed |
