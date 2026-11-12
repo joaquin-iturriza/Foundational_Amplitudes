@@ -23041,6 +23041,23 @@ entries:
       t t~ fine-tunes fit their training events far better than scratch and generalise worse: an overfitting/memorisation
       signature, not a bad start. Not yet checked: the parent''s zero-shot mu-MSE on the t t~ val pool vs a fresh init (tools/zero_shot_parent.py,
       a GPU job), lr per param group as applied (build_ft_param_groups not logged).'
+  - at: '2026-11-12T00:42:47+00:00'
+    text: '2026-11-12 step 9 defect read (analysis/data_saving/ft_defect.py, data/ft_defect.json, figs ft_curves, ft_sigma,
+      ft_vs_scratch; 31 of 32 stage-2 best trials, scratch t t~ one-loop D=1e3 has no preds). (c) lr as applied: MuonAdamW,
+      groups base 7.8e-3 x lr_scale x layer_decay^depth, head depth 0 to framesnet 10, diagram/particle encoders and property_matrix
+      at depth 11 (the fallback): t t~ tree D=3162 ft 2.6e-3 (head) .. 1.06e-3 vs scratch 5.6e-3; as designed, no defect.
+      (a) head: under target_stats=own the parent''s mu/sigma rows load unchanged (base_experiment.py ~1580-1610, no rescale):
+      a code-level mismatch of s_parent/s_own = 2.9 (u u~ tree), 5.8 (u u~ one-loop V), 7.4 (t t~ tree), 42 (t t~ V/B); fine_tune.target_stats=parent_shared
+      (experiment.py ~1664) already keeps the parent''s standardization (step 0 = zero-shot) and was never used here. It does
+      not order the outcome: u u~ one-loop at 5.8 wins (ft/scr val MSE 0.29, 0.05, 0.33, 0.012 at D=316..1e4) while t t~ tree
+      at 7.4 loses (3.0, 12.5, 18.9, 2.4). (b) the one-loop val NLL blow-up after step ~6000 is HETEROSC sigma overconfidence,
+      not a mu failure: u u~ one-loop blows up the same way and still wins on mu; final-model sigma (after the sigma stage)
+      tracks the train residual in every run (mean (r/sigma)^2 on train 0.6-1.1), val (r/sigma)^2 up to 1207. (d) what u u~
+      has: scratch''s level. ft/scr > 1 in every cell where scratch val MSE(ln) < 1e-6 (all t t~ cells: scratch 2.5e-9..7.5e-7)
+      and < 1 in every cell where it is > 1e-5 (all u u~ cells: 2.9e-5..7e-2); the fine-tunes'' own val MSE sits at 6e-9..2e-6
+      on t t~ (t t~ tree D=3162: train rms r 2.8e-5 standardized for ft vs 4.3e-5 scratch, val 5.4e-4 vs 1.25e-4): the fine-tune
+      does not generalise below a floor that t t~ scratch passes; u u~ scratch never reaches it. Next: one arm on lead (a),
+      target_stats=parent_shared on t t~ tree at the stage-2 best HPs (r4 and r5 parents), against the same-HP own reruns.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
