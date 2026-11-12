@@ -25075,6 +25075,28 @@ entries:
       NO: wide-ranges good in neither -> the ranges are not the missing axis, next candidate read from these trials (horizon
       or trial count, D422); one of two good: not resolved, reported with numbers, nothing more run. Every search reported
       with best val, separation, good count and curves figure; diverged trials apart (D398).'
+    fix_at: '2026-11-12T18:41:52+00:00'
+    fix: 'Check 2 (measure responds to the change, in the direction tested): the check cites the within-search Spearman of
+      fine_tune.lr_scale with separation, -0.36 (analysis/data_saving/data/hp_ranges_readout.json, ft/fine_tune.lr_scale),
+      but reads its sign backwards. The rank is of the HP''s place in its range against log separation, so a negative rho
+      means HIGHER lr_scale gives LOWER separation: the good fine-tune trials sit at place median 0.955 (top of the range),
+      the bad ones at 0.47, and rho_val is +0.34 (lower lr_scale gives lower val). The 9 of 30 bests at the low edge are picked
+      by val, the side where the curves separate. Opening lr_scale down to 0.03 therefore pushes the val-picked best toward
+      more separation by the entry''s own data. layer_decay does not move separation (rho +0.02); its good trials sit high
+      too (0.79). Fix: state the expected direction from these numbers and why opening downward could still give good curves,
+      or change the opened side (e.g. let the search reach the high-lr_scale region where good trials sit, or say why val-selection
+      must be changed to read it). Then the NO branch must not conclude ''the ranges are not the missing axis'' when only
+      the low side was opened. Check 5 (prior incomplete, a near-repeat): the prior omits the lower-lr-centre test on this
+      same cell (t t~ LO D=3162, fine-tune, lr_centre_readout.json, curve_quality separation): c/3 best separation 3.76, 0
+      of 8 good; c/10 (effective fine-tune lr about 0.03-0.3 of the centre, the range the wide search opens) best separation
+      12.8, 0 of 8 good; control 25.5, 0 of 7. It also omits the step-10 dead end (rerun with lr_scale window [0.02,2], dropped
+      by D407) and the trial_overfit read (27 of 34 searches: lower lr_scale, lower val). Fix: name these and say what differs
+      this time (WSD instead of cosine, layer_decay searched instead of fixed at 1, D=316 added) and why that difference could
+      turn 0 of 16 good trials at the low lr side into good ones. Checks that hold: 1 (wideft vs wsd ft configs @649e2dc8
+      differ only in lr_scale low 0.1->0.03, layer_decay low 0.75->0.5, name, DyHPO seed), 3 (one 8-trial search per cell
+      as siblings, 5x search spread, pooled bar 3.13 on 2 cells), 6/7 (D426 respected: no batch search), 9/11 (same HETEROSC
+      setup and preprocessing as the running WSD searches), 12, 13 (waves 3,3,2, 8 trials, template space), 14/15 (same setup
+      as the running WSD searches; readout lr_centre_readout.py --test tmpl2 reads dsave_wideft_ft).'
   step_waits:
     '3': bbx_zz_lo_scr3, bbx_zz_lo_ft drivers (detach events)
     '4': detach bbx_zz_lo_ft (LO fine-tune driver; its FA DONE event)
