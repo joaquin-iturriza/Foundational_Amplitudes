@@ -21576,7 +21576,7 @@ entries:
     decision: D420
   owner:
     agent: a76faebcc01af3f14
-    state: working
+    state: closed
     since: '2026-11-12T18:37:37+00:00'
     state_at: '2026-11-12T22:54:10.261000+00:00'
     context: 245519
@@ -26562,35 +26562,28 @@ entries:
     start: '2026-11-12T19:10:48+00:00'
     at: '2026-11-12T19:10:48+00:00'
   handoff:
-    state: 'Draft due 2026-11-13 (D413). Curve measure rebuilt and confirmed by Joaquin (D421): good = separation (val/train
-      at end over its min, 3-check running medians) <= 3 and val end <= 2x best (curve_quality.py @155d1ab8). Figures: curve_examples_{good,bad}.
-      Joaquin''s line (D422): separation means bad HPs; the search is the fix (which HPs, ranges, trial count). HP read (hp_ranges_readout.py
-      @05546263, D<1e4): only lr moves separation within a search (rho -0.30 scratch, -0.36 fine-tune lr_scale); other searched
-      HPs |rho| <= 0.10; separation follows D; batch (= D/2) and horizon unsearched; fine-tune lr_scale/layer_decay bests
-      at the low edge 9/30; 8 trials enough (best by trial 5 in the median). RUNNING: 8 DyHPO searches on t t~ LO D=316, 3162
-      scr/ft: WSD-only (D423) vs stage 2, and template 2 (WSD + training.batchsize searched [D/64, D/2] + fine-tune lr_scale
-      [0.03,10], layer_decay [0.5,1]) vs WSD-only; configs @05546263, design PASS 18:05 (outcome rules recorded), detach tmpl2_wsd2
-      on CC, ~17.6 GPU-h. b b~ > Z Z: V/B half read (S 1.23 [0.88,1.71], NO SAVING; 0/7 search bests good per arm); LO scratch
-      driver done (E6480), LO fine-tune driver bbx_zz_lo_ft running (divergences at lr_scale 1.37, 1.46 acked E6522/E6523).
-      NEXT: (step 5) when tmpl2_wsd2 ends: python analysis/data_saving/lr_centre_readout.py --test tmpl2 (fetches; per search
-      best val, separation, batch, good count, curves figs tmpl2_curves_*), apply the design''s branches, report with figures.
-      (step 4) when bbx_zz_lo_ft ends: stage2_readout.py --fetch; trial_overfit.py (fetch, now also reads batchsize); curve_quality.py
-      --cells bbx_zz and bbx_zz_nlo; plot_stage2.py --second; look once; report both halves with S, bands, per-cell good/bad
-      (open markers = val leaves train).'
-    decisions: 'Measure: Joaquin''s ''train and val loss go down together'' (D421 confirmed the examples; u u~ V fine-tune
-      2.97x ''a bit iffy''). D420: no larger-D cells (step 6 dropped). D422: the fix is the HP search, not schedule/regularisation/early-stop
-      tests (those designs withdrawn, never run: submit_together.py, together_readout.py, dsave_lrx3 configs). D423: WSD as
-      the schedule (cooldown fixed 1/8, the WSD parent''s recipe) for scratch and fine-tune. Early stopping irrelevant: val
-      still falls while curves separate (stopping costs 1.4-2.3x).'
-    ruled_out: 'As before; plus within searched ranges weight decay and L2 do not move separation (|rho| <= 0.1); early stopping
-      (costs val); old curve bars (end/best + last-quarter change: passed separating curves; ''100 of 151'' withdrawn -> 24
-      of 151).'
-    running: detach tmpl2_wsd2 (8 template searches, CC, from 19:09); detach bbx_zz_lo_ft (7 LO fine-tune searches, CC)
-    files: analysis/data_saving/{curve_quality.py,hp_ranges_readout.py,lr_centre_readout.py,trial_overfit.py,plot_stage2.py,stage2_readout.py},
-      analysis/data_saving/data/{curve_quality.json,hp_ranges_readout.json,curve_quality_cells_*.json}, analysis/data_saving/figs/{curve_examples_good,curve_examples_bad,hp_ranges_scr_*,hp_ranges_ft_*},
-      sweep/gen_data_saving.py (--wsd, --tmpl2), sweep/sweep_config_dsave_{wsd,tmpl2}_{scr,ft}_epem_ttx_d{5,7}_t8500.yaml,
-      tests/test_curve_quality.py
-    written: '2026-11-12T18:12:13+00:00'
+    state: 'Draft due 2026-11-13 (D413). b b~ > Z Z read done (step 4, finding 23:55): LO S 1.14 [0.81,1.60], V/B S 1.23 [0.88,1.71]:
+      no saving at 1e-4 on either; fine-tune ahead only at D<=32; search bests good LO scr 1/7, ft 0/7, V/B 0/7. Figures figs/stage2_LD_bbx_zz
+      (L(D), open = val leaves train), figs/cell_curves_bbx_zz{,_nlo} (each cell''s best, val solid/train dashed). Template
+      test (step 5, design PASS 16-trial version, D426/D427/D429): 4 WSD-only searches t t~ LO D=316,3162 scr/ft extended
+      8->16, 2 wide fine-tune range searches (lr_scale [0.03,30], layer_decay [0.5,1], batch D/2) at 16; configs @f88017c5;
+      driver detach ttx16_repick (re-picks every 10 min); trials sat IDLE on lxplus at 23:45. When it ends: python analysis/data_saving/lr_centre_readout.py
+      --test tmpl2 (A: 16 vs first 8 by issue order, B: wide vs WSD, C: WSD first 8 vs stage 2; per-cell 5x, pooled 5^(1/sqrt
+      n)), curves figure, apply the design''s outcome rules, report.'
+    decisions: 'D426: batch size never searched beside lr (template-2 batch searches withdrawn, cancelled, not read). D427/D429:
+      8 trials not enough; extend to 16 (as KIT D428). D431: all sites. D421 curve measure; D422 the fix is the HP search;
+      D423 WSD. Wide fine-tune lr_scale opened up to 30 as well as down (reviewer FIX: stage-2 good fine-tune trials sat at
+      the top of [0.1,10]). Trial-count record (trial_count_readout.py @bf88c4d8, JZ, 23 searches N 24-40): best@8/final median
+      1.26, best@16 1.00; no ~50-trial search found.'
+    ruled_out: As before; plus the batch-size search (D426); b b~ > Z Z as the second data-saving example at 1e-4 on the current
+      HPs (no saving, both halves).
+    running: detach ttx16_repick (6 t t~ LO searches to 16 trials, CC/lxplus)
+    files: 'analysis/data_saving/{lr_centre_readout.py,trial_count_readout.py,curve_quality.py,stage2_readout.py,plot_stage2.py},
+      data/{stage2_readout.json,curve_quality_cells_bbx_zz*.json,trial_count_readout_jeanzay.json}, figs/{stage2_LD_bbx_zz,cell_curves_bbx_zz,cell_curves_bbx_zz_nlo,trial_count},
+      sweep/gen_data_saving.py (--no-batch-search), sweep/sweep_config_dsave_{wsd,wideft}_*_epem_ttx_d{5,7}_t8500.yaml. Open
+      defects: Jean Zay copy (relay->jean-zay.idris.fr times out); V/B trials with a target_over_born cache AssertionError
+      listed among divergences (rerun once the Born cache is rebuilt).'
+    written: '2026-11-12T22:59:55+00:00'
   step_why:
     3:
       feeds: the draft's data-saving claim (D413)
