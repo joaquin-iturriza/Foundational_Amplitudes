@@ -21492,9 +21492,9 @@ entries:
     decision: D407
   owner:
     agent: a1341471cb6caf07b
-    state: working
+    state: stopped
     since: '2026-11-12T03:22:24+00:00'
-    state_at: '2026-11-12T03:22:33+00:00'
+    state_at: '2026-11-12T03:44:46+00:00'
     context: 248851
     context_at: '2026-11-12T03:41:14+00:00'
   designs:
