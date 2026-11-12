@@ -65,10 +65,9 @@ def main():
             "train": os.path.join(os.environ["SCRATCH"], "amp_data_cache")}
     done = 0
     spec = yaml.safe_load(open(a.spec))
-    # entries with a base or a physics block (catalog_v3's heavy-quark layer, alpha_s points, H7) are addressed by name
-    mg.register_recipe_processes([{"name": p["name"], "base": p.get("base", p["name"]), "physics": p.get("physics"),
-                                   "sampling": p.get("sampling")} for p in spec["processes"]],
-                                 default_sampling=spec.get("sampling"))
+    # whole entries, as prebuild_recipes registers them: base, physics, sampling, sqrts_measure and store_tag all decide
+    # the pool's path (E5849: the store_tag 1e4 train pools were missed, the catalog's 1e5 pool got the sidecar check)
+    mg.register_recipe_processes(spec["processes"], default_sampling=spec.get("sampling"))
     for p in spec["processes"]:
         lo, hi = p["sqrts"]
         for role in a.roles:
