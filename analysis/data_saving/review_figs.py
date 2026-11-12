@@ -85,7 +85,9 @@ def d316():
             cc = sorted((c for c in CELLS if c["target"] == tg and c["arm"] == a and c.get("test")), key=lambda c: c["D"])
             ax.plot([c["D"] for c in cc], [c["test"] for c in cc], marker="o", color=col, label=name)
             ax.plot([c["D"] for c in cc], [c["test"] * (1 - c["top1"]) for c in cc], marker="x", linestyle="--",
-                    color=col, label=f"{name}, w/o worst event")
+                    color=col)
+        # one entry for the dashed style instead of one per arm: a 3-line legend fits beside the data
+        ax.plot([], [], marker="x", linestyle="--", color=ps.C.grey, label="w/o worst event")
         ax.set_xscale("log")
         ax.set_yscale("log")
         ax.set_xlabel(r"$D$")

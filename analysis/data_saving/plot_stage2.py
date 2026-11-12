@@ -55,8 +55,11 @@ def ld(gpu):
         ax.set_xlabel("search GPU-h" if gpu else r"$D$")
         ax.set_ylabel(ylab)
         ps.process_label(ax, lab)
-        if n == 0:
-            ps.legend(ax, "lower left")
+    # one legend above the panels: in a panel's corner it stretched the y axis far past the data
+    if gpu:
+        ps.legend(axs.ravel()[0], "lower left")
+    else:
+        ps.shared_legend(fig, axs.ravel()[0], ncol=2)
     ps.save(fig, FIG + ("stage2_gpuh" if gpu else "stage2_LD"))
 
 
