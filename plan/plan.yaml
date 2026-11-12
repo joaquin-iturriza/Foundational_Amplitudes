@@ -27141,6 +27141,25 @@ entries:
       beyond its band: the 1/beta is not what the network fails to extrapolate; protocol B stays the threshold model and the
       next lever is threshold data in training (D405''s transfer test, in flight). Cost ~1.5 GPU-h (f21fa163-type tt virtual
       run, 8000 steps), disk ~150 MB against 72 GB free.'
+    passed_at: '2026-11-12T04:42:34+00:00'
+    reviewer: 'PASS step 6 (t t~ virtual target times the pair''s beta, data.target_times_beta, vs softpairthr FA-ccin2p3-3fc1016a).
+      (1) One change: same job_kit.sh A, 1e5, 8000 steps, seed 42, lr 1.18605e-2, HETEROSC mu_mse + sigma stage, float64,
+      trial 1262, same three input flags (control''s RUN_SUMMARY and args read in its log); only the target factor moves,
+      no tuning on either arm. (2) Measure moves: kit_fig_A_betainput.json, softpairthr vs softpair Coulomb strata log10 ratios
+      -0.30/-0.35/-0.44/-0.25 (median -0.325), deepest 7.06 -> 3.55; kit_fig_B.json B vs B_bulk Coulomb median about -1.2
+      decades, so the statistic does reach past the 0.84 band when a change touches the threshold; kit_predict''s residual
+      is ln(pred)-ln(truth) on the rebuilt pool, which carries the same beta factor, so the score is V''s own (placeholder-truth
+      scan path also exact). (3) Spread reproduced: kit_mlp_readout spread on kit_mlp_ladder.json, threshold_beta 90% 0.841,
+      Sudakov 0.607, bulk 0.225; one seed in both cells, matched; no transformer spread, stated. (4) YES/UNRESOLVED/NO stated
+      with numbers; uncovered corner (Coulomb < -0.84, nothing worse, but exponent not closer than -0.32) to be reported as
+      UNRESOLVED. (5) Searched results.tex for Coulomb, Sommerfeld, times beta, target_times, Coulomb factor, stripped, target_over_born
+      (only the star arms'' t t~ threshold data arm, a data lever, not a target factor); whole plan for coulomb, times beta,
+      x beta, target side, sommerfeld, dead ends; site decisions D353/D363/D395/D405-D412: no prior target-side beta factor.
+      (6,7) Answers next 6 inside D363/D353; D405 transfer test is the separate lever. (9) HETEROSC. (10) KIT hard_test strata,
+      the benchmark''s own. (12,13) only the target flag moves; no HP search. (14) ~150 MB vs 66 GB free on /sps/lpnhe (df
+      now). (15) rate and readout from the control (same script, base, batch 16384, float64, V100; kit_result.json written).
+      Before submitting: commit the code after the repo-reviewer, and a short CPU dry run of the load with the flag (KIT pools''
+      +-6 ids, as earlier KIT flags were dry-run) is cheap insurance.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
