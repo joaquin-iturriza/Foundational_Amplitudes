@@ -24900,6 +24900,9 @@ entries:
     11: 'Step 6 Coulomb rise, target side (design passed 2026-11-12 ~05:45): read kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr_vbeta
       (data.target_times_beta, 9df60812) vs 3fc1016a with kit_figures collect + kit_readout --vs and kit_threshold_scan; YES/UNRESOLVED/NO
       per the design (Coulomb median vs 0.84, exponent vs -0.32 and -1.02; median < -0.84 with exponent not closer reads UNRESOLVED)'
+    12: 'D411 ReZero on tt Born (design''s Mixed branch: tt virt MOVED, uug STAYED): read kit_A_ee_tt_born_n100000_t8000_softpair_rezero
+      (FA-ccin2p3-d322922b) vs 5515dc85 with kit_extrap_read/kit_figures collect + kit_readout --vs; MOVED/STAYED on the deepest
+      Sudakov bin''s median signed error; bulk fit beside it'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -25527,6 +25530,12 @@ entries:
       if:
       - 'YES: package it as the protocol-A threshold model, redraw the scan'
       - 'NO: B stays; threshold data (D405) is the lever'
+    12:
+      feeds: 'D411: whether the pre-norms bend the transformer''s continuation past the trained range'
+      if:
+      - 'MOVED on tt Born too: the norm effect holds on both tt targets; weigh against the bulk-fit loss (ReZero underfits
+        at this lr)'
+      - 'STAYED: the tt virtual move is not a norm effect that carries; next lever the transformer fed Bakar''s inputs only'
   step_waits:
     '5': '2026-11-13'
     '9': FA-ccin2p3-62dcf910 FA-ccin2p3-bf3d593c FA-ccin2p3-8d1429bf
