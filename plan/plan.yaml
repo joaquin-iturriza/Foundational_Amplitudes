@@ -24889,9 +24889,6 @@ entries:
       v4_{gg,ddx,bbx}_ttx__thr (gen_datasaving_parent.py heldoutthr variant), generate (CPU); r5thr parent (job_datasaving_parent.sh
       heldoutthr; smoke iters=50, D395); job_kit.sh A_ft tt virt_finite 1e5 8000 from r5 and r5thr with fine_tune.offshell_stats=own;
       kit_readout --vs vs f21fa163 and the threshold scan'
-    10: 'D411 ReZero arm (design passed 2026-11-12 ~05:33; layer_norm=false diverged, finding ~05:30): read the uug and tt
-      virtual softpair_rezero runs vs c15b3337/f21fa163 and Bakar''s MLP with kit_extrap_read (arm added to its collect) and
-      kit_readout --vs; MOVED/STAYED per the design'
     12: 'D411 ReZero on tt Born (design''s Mixed branch: tt virt MOVED, uug STAYED): read kit_A_ee_tt_born_n100000_t8000_softpair_rezero
       (FA-ccin2p3-d322922b) vs 5515dc85 with kit_extrap_read/kit_figures collect + kit_readout --vs; MOVED/STAYED on the deepest
       Sudakov bin''s median signed error; bulk fit beside it'
@@ -25531,11 +25528,6 @@ entries:
       - 'ft_thr Coulomb median < -0.3 vs scratch and vs ft_r5: threshold sampling goes into the catalog parent''s top-pair
         pools'
       - 'both NO: design one-loop top pairs at physical mass near threshold (gg/qq~ > tt~ virtual)'
-    10:
-      feeds: whether the KIT models change their normalisation; D411's next lever
-      if:
-      - 'both MOVED: the arm on uugg and tt Born'
-      - 'both STAYED or inconclusive: transformer fed Bakar''s inputs only'
     12:
       feeds: 'D411: whether the pre-norms bend the transformer''s continuation past the trained range'
       if:
@@ -25545,7 +25537,6 @@ entries:
   step_waits:
     '5': '2026-11-13'
     '9': FA-ccin2p3-62dcf910 FA-ccin2p3-bf3d593c FA-ccin2p3-8d1429bf
-    '10': FA-ccin2p3-dc15b6bc FA-ccin2p3-4cab2100
   handoff:
     state: '2026-11-12 ~05:50. D411: plain no-LayerNorm arm diverged (uug bba9a61e aborted step 1485, val 6e11 from step 160;
       tt virt 36a30e0c val up to 3e22 from step 960; finding recorded). ReZero arm (model.net.layer_norm=rezero, 9e63d86f;
