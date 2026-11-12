@@ -27703,6 +27703,18 @@ entries:
       inputs, uugg arm. NO: the stack itself continues out-of-range scalars wrongly given the MLP''s own inputs; next tools/kit_saturation_probe.py
       on the control and this arm (which component flattens: GELU off-share, attention max weight, residual growth under pre-LN,
       readout) and the arm that changes that component. Each process read on its own, side by side.'
+    passed_at: '2026-11-12T09:26:34+00:00'
+    reviewer: 'Re-check of the step-13 inputs-only design: one change against matched controls (c15b3337 / 3fc1016a configs
+      read on CC: lr 0.0118605, 8000 steps, batch 16384, float64, HETEROSC mu_mse + sigma stage, seed 42, same input flags);
+      the arm differs by input_scalars_only + data.offshell_zero (existing flag, experiment.py:2270), both stated as the question''s
+      ''only Bakar''s inputs''. Check 2: ReZero moved tt deepest Sudakov signed error -1.08 -> +0.36 and the MLP ladder moved
+      deep bins 2.2-3.2 decades (kit_extrap.json, kit_mlp_ladder). Check 3/4: bands now reachable and disjoint: uug deepest
+      collinear control +1.36 vs MLP -0.38..-0.04 (span 0.34): YES <= +0.30, NO >= +1.02; tt matched control 3fc1016a deepest
+      Sudakov log-MSE 0.72 vs MLP 0.035-0.058, ''ours'' span 0.010..0.063 (0.8 decades): YES log-MSE <= 0.11 and signed in
+      [-0.22,+0.48], NO log-MSE >= 0.33 and signed within 0.34 of the control''s; seeds per D315. Check 5 searched results.tex
+      for scalars only, scalars-only, no momenta, without momenta, invariants only, identity frame, IdentityFrames, non-equivariant,
+      inputs only, input_scalars, log invariants, Mandelstam, and decisions D374/D403/D411/D412: no prior transformer-without-momenta
+      run. Loss HETEROSC (D71), no HPO, 2 x 75 MB, rate from c15b3337 at same batch/dtype, KIT strata as asked.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
