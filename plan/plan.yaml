@@ -21348,10 +21348,7 @@ entries:
   - D360
   - D377
   - D407
-  next:
-    3: 'Null-parent 2x2 (design 2026-11-12 after the suspects read): through the fine-tune configs at each cell''s stage-2
-      scratch best HPs, fresh init (shrink_perturb [0,1]) vs the parent''s weights, t t~ tree and V/B, D=316..1e4, 16 runs
-      + 2 smokes (analysis/data_saving/submit_nullparent.py @eaacb51f), ~7.6 GPU-h at limits; design review pending'
+  next: null
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -23591,8 +23588,7 @@ entries:
       per cell with its numbers and run nothing further, or word the second seed as a question to Joaquin (what it costs:
       7.6 GPU-h; what it buys: the 0.46-4.84 same-HP spread halved in ln-sd by sqrt 2 on the pooled read), recorded with plan
       ask, not as a pre-approved step.'
-  step_waits:
-    '3': a design-reviewer
+  step_waits: {}
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
@@ -24350,13 +24346,6 @@ entries:
     files: analysis/data_saving/{submit_suspects.py,suspects_readout.py,old_vs_new.py}, data/suspects_runs.json (56 run ids,
       configs), commits b66c446a, 55aeb931
     written: '2026-11-12T04:53:05+00:00'
-  step_why:
-    3:
-      feeds: whether the fine-tune deficit on t t~ sits in the fine-tune path, the fine-tune HP window, or the parent's weights
-      if:
-      - 'PATH: bisect the path''s input stats on the null arm'
-      - 'WEIGHTS: the parent (pretraining set and length)'
-      - 'HPs: change the fine-tune window'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
