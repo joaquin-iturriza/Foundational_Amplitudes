@@ -27096,6 +27096,51 @@ entries:
       framesnet''s EquiMLP keeps its LayerNorm). Searched: results.tex for rezero, layernorm, layer.norm, norm-free, pre-norm,
       extrapolat; the kit_benchmark entry; site decisions for norm and rezero. No prior norm work beyond the diverged layer_norm=false
       arm (bba9a61e, 36a30e0c), which the design cites.'
+  - at: '2026-11-12T04:39:54+00:00'
+    question: 'Step 6 (Coulomb rise, target side): does taking the exact 1/beta of the O(alpha_s) Coulomb term off the KIT
+      t t~ one-loop virtual target (train on V x beta of the t t~ pair, predict V = output / beta, exact per event) let the
+      protocol-A model follow the Coulomb rise towards threshold, on top of the beta-input arm? Feeds: the KIT protocol-A
+      t t~ virtual threshold model (and the package), and whether the target-side lever replaces protocol B as the threshold
+      model below beta 0.14.'
+    prior: 'Searched docs/results.tex (Coulomb, threshold, beta, target_over_born, V/B, Sommerfeld), the plan (kit_benchmark
+      findings 2026-11-11 23:33, 01:52, D405 design) and site decisions (D363, D353, D405-D412). Beta-input arm softpairthr
+      FA-ccin2p3-3fc1016a vs softpair f21fa163 (finding 23:33): Coulomb median -0.325 [-0.44,-0.25] 4/0, deepest bin beta
+      1e-4..1e-3 log-MSE 7.06 -> 3.55, fitted exponent -0.03 -> -0.32 against the exact -1.02 (tools/kit_target_slope.py);
+      threshold scan sigma_NLO^surr/sigma_NLO - 1 at beta 1e-3: -0.962 (arm), -0.989 (softpair), -0.992 (A), -0.897 (B); in
+      the NLO scale band from beta 0.142 (B from 0.0119). The beta input''s span on bulk_train is [-0.64,-0.008] (beta >=
+      0.2), the strata need -3.68..-0.64 (kit_input_range @0723b848): the network must extrapolate a 1/beta rise it never
+      sees. No prior run trained on a Coulomb-stripped target (data.target_over_born, V/B with exact Born, is protocol B''s
+      baseline, a different factor that needs the Born at prediction).'
+    measure: 'tools/kit_readout.py --vs on the kit_figures collect (event-frame kit_predict, 5d2aec11+): per family (threshold_beta
+      = Coulomb, sudakov_sqrts, bulk) the median over strata of log10(arm log-MSE / control log-MSE), range, strata better/worse,
+      the deepest Coulomb bin and its fitted exponent vs exact -1.02; tools/kit_threshold_scan.py: sigma_NLO^surr/sigma_NLO
+      - 1 at beta 1e-3 and the lowest beta in the NLO scale band. kit_predict''s residual is in log space of the trained target;
+      V x beta / beta is exact per event, so it is V''s residual.'
+    check: 'The target''s own shape moves with the change by construction: V''s fitted exponent in beta over the Coulomb strata
+      is -1.02 (kit_target_slope); V x beta''s is -1.02 + 1 = -0.02, i.e. the target the network must extrapolate past bulk_train''s
+      beta >= 0.2 becomes flat instead of rising 3 decades from beta 0.2 to 1e-4. The readout measure moved with the last
+      threshold change on existing runs (beta input: Coulomb median -0.325, deepest 7.06 -> 3.55; B vs B_bulk deepest 2.38
+      vs 8.71). Code: experiment.pair_beta + data.target_times_beta (uncommitted until the repo-reviewer pass that the review-backlog
+      hook requires; tests/test_pair_beta.py passes: beta 1e-5..0.6 to 1e-5 relative, boost invariant); applied in the in-memory
+      load beside target_over_born, so train, val, test and kit_predict''s scored pool all get the factor.'
+    fixed: 'job_kit.sh A (from scratch), kit_ee_tt__virt_finite, first 1e5 bulk_train events, 8000 steps, seed 42, lr 1.18605e-2
+      (job_kit''s A rule), HETEROSC with mu_mse selection and the sigma stage, float64, base trial 1262; the control''s arguments
+      ++model.input_soft_eps=1e-8 ++model.input_pair_logs=4 ++model.input_pair_threshold=true plus the only change ++data.target_times_beta=true;
+      tag=softpairthr_vbeta. Command: site submit ccin2p3 FA scripts/job_kit.sh -- kit_ee_tt__virt_finite 100000 8000 A ++model.input_soft_eps=1e-8
+      ++model.input_pair_logs=4 ++model.input_pair_threshold=true ++data.target_times_beta=true tag=softpairthr_vbeta.'
+    control: kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr (FA-ccin2p3-3fc1016a), identical but for the target factor;
+      protocol B (the threshold model below beta 0.14) and softpair f21fa163 reported beside.
+    seeds: 'Seed 42, one run (D412: no second seed); two-sided band of the family log-MSE median from the measured MLP seed
+      spread (kit_mlp_readout spread @c42a8908, MLP seeds on KIT t t~ virtual, 90%): Coulomb 0.84, Sudakov 0.61, bulk 0.23;
+      no transformer seed spread exists, said with the verdict.'
+    outcome: 'YES: Coulomb family median below -0.84 and no family above its band, and the deepest bin''s fitted exponent
+      closer to -1.02 than the control''s -0.32: the arm becomes the protocol-A t t~ virtual threshold model (packaged), the
+      threshold scan redrawn with it, and the factor proposed for the A_ft runs. UNRESOLVED: Coulomb median within +-0.84
+      and nothing worse: reported with its number, the exponent and the scan read beside it (the scan''s beta 1e-3 ratio and
+      band onset are read as the physics result either way); the model stays softpairthr. NO: Coulomb or any family worse
+      beyond its band: the 1/beta is not what the network fails to extrapolate; protocol B stays the threshold model and the
+      next lever is threshold data in training (D405''s transfer test, in flight). Cost ~1.5 GPU-h (f21fa163-type tt virtual
+      run, 8000 steps), disk ~150 MB against 72 GB free.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
