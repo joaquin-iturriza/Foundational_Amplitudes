@@ -23953,7 +23953,9 @@ entries:
       at fa846b4d, the tp3 refit result (~13945-13950), and the unread massown configs (7d56534c). HETEROSC, the s4 coupled
       space, 8 trials in waves 3,3,2 as siblings, 69 GB free on /sps/lpnhe, rates and readout from s4''s identical configs.'
   step_waits:
-    '4': detach s5_ft_ttx_LD DONE event (drive.py over the 7 dsave_s5_ft_epem_ttx searches, 56 trials, waves 3,3,2)
+    '4': 'CC sync blocked: two untracked kit_benchmark files in the CC checkout (analysis/kit_benchmark/data/kit_sat_{ttvirt,uug}_scalars.json)
+      differ from their committed versions at dddeacff, so git refuses the merge; their owner (kit_benchmark) or the main
+      session clears them, then the owner restarts drive.py over the 7 dsave_s5_ft_epem_ttx configs @23664d71'
     '5': 'a reviewer: design-reviewer on the V/B offshell-own design (recorded 12:29 CET)'
   findings:
   - at: '2026-11-10T03:35:22+00:00'
