@@ -27451,6 +27451,51 @@ entries:
       [-3.94,-2.76]); seed override reaches the run (job_kit.sh line 41 appends seed= after seed=42 at line 89, run dir _softpairthr_seed43
       with tag before seed); HETEROSC, float64, same launch path, scoring and KIT test strata as the controls; ~75 MB per
       run.'
+  - at: '2026-11-12T09:11:02+00:00'
+    question: 'D411 (why the transformer extrapolates worse than Bakar''s MLP), target side on uug: the t t~ virtual result
+      says the transformer follows a limit when the target is flat there (target V x beta: Coulomb log-MSE -3.16 decades,
+      fitted exponent -1.01 vs exact -1.02) and fails when it must continue a power-law rise past the trained range. Does
+      the same hold on e+e- > u u~ g: training on |M|^2 x (2p_g.p_u/s)(2p_g.p_u~/s) (data.target_times_eikonal, exact per
+      event; the KIT strata''s target then lies inside bulk_train''s range) remove the transformer''s collinear overshoot
+      (+1.36 in the deepest bin) and soft undershoot? Feeds: whether the KIT models carry the known singular factor on the
+      target (the answer to D411 being ''the transformer does not extrapolate power laws; take them off analytically''), and
+      the uugg follow-up.'
+    prior: 'Searched docs/results.tex (eikonal, soft factor, target_times, singular factor, target_over_born, extrapolat),
+      the plan (kit_benchmark findings ~07:00, ~09:40, D403 ladder) and site decisions (D353, D363, D403, D411, D412): no
+      run trained on an eikonal-stripped target. Step 6 (target V x beta, 3c2996dc vs 3fc1016a): Coulomb -3.16 [-3.94,-2.76],
+      scan within the NLO band down to beta 1e-3; bulk +0.56, Sudakov +0.57 (within the 1.1x-30x single-process seed spread
+      of results.tex ~13232-13245). ReZero on uug (dc15b6bc): deepest collinear error +1.36 -> +1.10 (STAYED) and underfits.
+      Transformer c15b3337 deepest-bin median signed errors: collinear y 1e-3..1e-7 +0.05, +0.26, +0.78, +1.36; soft x 1e-3..1e-7
+      -0.06..-0.28; Bakar''s MLP -0.04..-0.38.'
+    measure: 'tools/kit_extrap_read.py (arm added) deepest-bin median signed error per family (coll_y, soft_x) and tools/kit_readout.py
+      --vs on a kit_figures collect: per family median over strata of log10(arm / control log-MSE), strata better/worse, bulk
+      log-MSE. kit_predict''s residual is ln(pred) - ln(truth) of the trained target; the factor is exact per event, so it
+      is |M|^2''s residual.'
+    check: 'The target moves with the change on the KIT data (CPU probe on CC, eik_check over kit_hardps strata, 27a6ca7a):
+      log10|M|^2 median per collinear stratum y 1e-3..1e-7 -3.23 .. -0.23 and soft x 1e-3..1e-7 -1.16 .. +6.84 (outside bulk_train''s
+      1-99% [-6.97,-4.14]); times the factor every collinear stratum has median -7.07 [1%-99% -7.64,-6.44] and every soft
+      one -6.88 [-7.36,-6.32], inside bulk_train''s [-7.74,-6.51] (median -7.19): flat in both limits. Code: experiment.gluon_eikonal
+      + data.target_times_eikonal (27a6ca7a; tests/test_gluon_eikonal.py: equals the explicit dot products, boost invariant,
+      refuses two gluons), applied beside target_times_beta in the in-memory load, so train, val, test and kit_predict''s
+      pool get it. The readout moved with the last target change (step 6: Coulomb -3.16).'
+    fixed: 'job_kit.sh A (from scratch), kit_ee_uug__me2, first 1e5 bulk_train events, 8000 steps, seed 42, lr 1.18605e-2
+      (job_kit''s A rule), HETEROSC with mu_mse selection and the sigma stage, float64, base trial 1262; the control''s inputs
+      ++model.input_soft_eps=1e-8 ++model.input_pair_logs=5; the only change ++data.target_times_eikonal=true. Command: site
+      submit ccin2p3 FA scripts/job_kit.sh -- kit_ee_uug__me2 100000 8000 A ++model.input_soft_eps=1e-8 ++model.input_pair_logs=5
+      ++data.target_times_eikonal=true tag=softpair_eik'
+    control: kit_A_ee_uug_me2_n100000_t8000_softpair (FA-ccin2p3-c15b3337), identical but for the target factor; Bakar's MLP
+      (kit_mlp_ladder mlp seeds 0-2) as reference.
+    seeds: 'Seed 42, one run as the control (D315: no extra seeds; seed noise quoted from results.tex ~13232-13245, single-process
+      transformer runs 1.1x-30x in loss, i.e. up to 1.5 decades); signed-error band from the MLP seeds in kit_extrap.json
+      (0.34 on the deepest collinear bin).'
+    outcome: 'YES: deepest collinear bin''s median signed error within 0.34 of zero (from +1.36) and the soft and collinear
+      family log-MSE medians below -1.5 decades against the control (beyond the largest seed spread), bulk not worse than
+      +1.5: the transformer''s extrapolation failure on uug is the power-law continuation; next the same factor idea on uugg
+      (two-gluon antenna factor, its own design) and the KIT models get the factor (package). NO: collinear deepest error
+      still above +0.6 or family medians above -0.3: flattening the target does not help on uug, so the uug failure is in
+      how the network reads the out-of-range inputs (pair logs past their span), not the target''s rise; next the transformer
+      fed Bakar''s inputs only. Between: reported with numbers, no follow-up from this arm alone. Cost ~1.5 GPU-h (c15b3337''s
+      rate), disk ~75 MB.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
