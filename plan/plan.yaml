@@ -25570,6 +25570,23 @@ entries:
       factor, finding 2026-11-10T06:22) and still overshoots +1.36 in the deepest collinear bin, so on uug the transformer''s
       failure is input-side, not a power-law target; on tt virtual it was target-side (V x beta). Eikonal code reverted (68b6e74a).
       Next: inputs-only transformer (step 14, needs a model input path and a design).'
+  - at: '2026-11-12T09:33:15+00:00'
+    text: '2026-11-12 ~11:40. D411 component read of the controls (tools/kit_saturation_probe.py @b29d480a, eval-only CPU
+      on CC, best weights, 200 events per stratum + 2000 bulk_train; data analysis/kit_benchmark/data/kit_sat_{uug_softpair,ttvirt_softpairthr}.json;
+      figs analysis/kit_benchmark/figs/kit_sat_{resid,scan}_{uug,tt}.png). (1) Nothing saturates in the usual sense on the
+      physical limit events: uug collinear y 1e-3 -> 1e-7, GELU off-share (pre-activation < -2) falls 0.06 -> 0.02, linear
+      share rises 0.01 -> 0.04; attention max weight sharpens 0.33 -> 0.51 (block 0) and 0.31 -> 0.46 (block 7), not one-hot.
+      What grows is the residual stream: rms entering the readout (no final norm before linear_out) 3.9 bulk, 4.0/3.7/5.7/8.9/15.8
+      over the five collinear strata, from block 1 on (embedding 0.43 -> 1.14); the median signed error grows with it (+0.05,
+      +0.01, +0.26, +0.70, +1.38). tt virtual softpairthr: readout-input rms 2.9 bulk, 2.6/3.1/4.8 over the Sudakov bins (errors
+      -0.10, -0.40, -0.61), 6.2-8.6 in the threshold bins (errors -0.39..-1.80). (2) One-input scans on bulk_train events,
+      all else held: uug, the most collinear pair''s log invariant pushed k decades down moves the readout -0.02, -0.06, -0.10,
+      -0.12, -0.13 (k=1..5), flat after (-0.15 at k=8): the response to the log invariant alone saturates within ~4 decades
+      where a ReLU MLP stays linear, and is far from the +1.38 the real collinear events give, so the overshoot comes with
+      what moves together with the event (the local-frame momenta), which the inputs-only arm dc799c8e tests. tt, log10 sqrt(s_hat)
+      column pushed k decades up: +0.05..+0.18 (k=0.25..2), flattening past 1.5 decades, against a truth rising ~0.65 from
+      the bulk edge to the deepest bin. Scans are unphysical (one input moved alone): read as how the network continues that
+      input.'
   step_why:
     5:
       feeds: what KIT receives
