@@ -24574,6 +24574,14 @@ entries:
       1.1-1.8 (V/B). Caveat: tree cells carry the head map (alone NO CHANGE, hmap_readout gmean 1.29). Followed: gen_data_saving.py
       default --ft-space scratch on tree targets, llrd kept on one-loop (@470d147e); the HPO rule 4 / canonical fine-tune
       row diff goes to Joaquin; t t~ LO fine-tune L(D) redo designed (7 new searches, 26.3 GPU-h, s4''s D=316/3162 reused).'
+  - at: '2026-11-12T11:29:24+00:00'
+    text: '2026-11-12 12:30: t t~ LO fine-tune L(D) redo submitted through drive.py (detach s5_ft_ttx_LD), configs sweep/sweep_config_dsave_s5_ft_epem_ttx_*.yaml
+      @23664d71 (design PASS 12:2x; repo-reviewer backlog PASS, watermark db51a01c), site pick: ccin2p3, 56 jobs, ~0.9 h;
+      target 3 h. Readout notes from the reviewers: (a) per-cell ft/scr at D=10-100 beside S (the fit''s S is driven by mid
+      D); (b) u u~ LO and the one-loop arms stay at the old fine-tune template: every figure or table with S of several targets
+      says which template each arm ran at. s4_readout.py now lists failed trials apart (@bf6f1712). V/B offshell-own design
+      recorded, reviewer running; its configs parked outside the checkout until it passes (an untracked file makes the driver''s
+      start-up sync refuse).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
