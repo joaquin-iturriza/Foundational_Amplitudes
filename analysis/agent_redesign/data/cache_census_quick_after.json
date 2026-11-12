@@ -1,0 +1,19 @@
+{
+ "chunk_dirs": 924,
+ "chunk_dirs_gb": 0.0,
+ "chunk_dirs_pool_built": 0,
+ "chunk_dirs_pool_built_gb": 0.0,
+ "set_aside_gb": 0.49,
+ "recipe_ids_in_several_files": 0,
+ "duplicate_gb": 0.0,
+ "pool_files_without_recipe_json": 0,
+ "process_roles_with_variants": 27,
+ "pool_gb_by_sampling_tag": {
+  "smix": 41.29,
+  "lhe": 14.47,
+  "flat": 1.81,
+  "n900000_kit": 1.46,
+  "n100000_kit": 0.08,
+  "n2000_kit": 0.0
+ }
+}
