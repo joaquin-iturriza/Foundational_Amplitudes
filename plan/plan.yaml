@@ -23651,6 +23651,15 @@ entries:
       RESOLVED: everything else (e.g. Gn 1/3-3 with Gp 1-3 and Gs >= 3, or a branch holding on one read only); next: reported
       per target and cell with its numbers (Gn, Gp, Gs, each cell''s ratios on both reads), and no further run on this question
       (one seed as the sibling cells, D315).'
+    passed_at: '2026-11-12T08:59:53+00:00'
+    reviewer: 'Null-parent 2x2 (fresh init vs parent weights through the fine-tune configs at scratch''s stage-2 best HPs;
+      t t~ tree and V/B, D=316..1e4), round 3. Single param group at lr0 x lr_scale with layer_decay 1 equals scratch''s optimizer
+      (base_experiment._init_optimizer 681-700); submit_nullparent.py divides by each config''s own training.lr; shrink_perturb
+      [0,1] after the head map, so pre and null differ only in weights. Check 2: suspects_readout.json tree arms G 1.77-8.19,
+      scratch arms 50-68x, stage-2 ft/scr tree 3.0-18.9. Check 3: V/B same-HP reruns 0.30-1.0, others 0.46-4.84, factor-3
+      bars on 4-cell geomeans; one seed as the controls (D315). Outcome a complete partition A-E; D and E start no rerun (D407,
+      D315). 7.6 GPU-h; smoke first. Check 5 searched results.tex/plan for shrink perturb, random init, fresh init, null parent,
+      reinit, and D405-D412: only the warm-start step 14 shrink-perturb (same-catalog restart), named in prior.'
   step_waits: {}
   findings:
   - at: '2026-11-10T03:35:22+00:00'
