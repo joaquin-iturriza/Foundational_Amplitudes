@@ -24464,6 +24464,27 @@ entries:
       and steady (gap read apart at D<=316); otherwise the result goes out labelled ''existing template, not well trained
       by curve_quality'' with the failing bars per cell (D413 deadline; template fix stays open, D414). A fine-tune whose
       minimum sits in the first checkpoints is named.'
+    fix_at: '2026-11-12T15:08:27+00:00'
+    fix: 'Check 12/15 (horizon and step rate borrowed, against D391): T(D) = 640..8500 and the step rates are the b b~ > Z
+      Z one-loop V/B ladder''s, but D391 (Joaquin: ''find when it gets to a minimum, then 10% more than that'') sets each
+      target''s horizon by its own calibration, and existing data show the LO target of the same process needs 2-5x the V/B
+      horizon: e+e- > u u~ LO calibration T = 6120 (k=2), 7310 (k=4) against e+e- > u u~ V 1190, 2720 (horizons_cal_f22_cal_f22_lrhalf.json);
+      b b~ > Z Z V/B''s raw minima are 640 at k=2 (horizons_cal_vb_ladder.json). Short LO horizons cut scratch more than the
+      fine-tune and bias S upward, and ''name a cell that ends far from its minimum'' does not repair it. Fix: run the LO
+      scratch calibration k=2..8 (7 runs at the 8500 cap, ~2 GPU-h, ~15-25 min each) alongside the new parent, which the fine-tunes
+      wait on anyway (~1.2 h); T(D) from horizons.py --ladder, step rates and wall limits from those same runs; regenerate
+      the 14 configs. Launch order: the scratch configs'' base_config is runs/data_saving/dsave_parent_heldoutbbzz, which
+      does not exist until the parent writes its config.yaml, so ''scratch searches go now'' would fail on submission; scratch
+      (and the calibration runs) go after the parent''s config.yaml exists, or take dsave_parent_heldout_r4''s config (identical
+      except pools, which the target recipe overrides), stated. Check 14 (minor): state disk; read now CC /sps/lpnhe 68 GB
+      free, an r4 parent run is 152 MB, so it fits. Note for the write-up (not failing): the fine-tune space here (lr_scale
+      [1/3,3], layer_decay 1, the scratch window) differs from the first example''s u u~ LO fine-tunes (lr_scale [0.1,10],
+      layer_decay [0.75,1]); scratch vs fine-tune within b b~ > Z Z is matched, but the figure placing the two examples''
+      S side by side must say so. Passing: check 2 (u u~ LO test S = 10^0.58 [0.43, 0.68], t t~ V/B 10^-0.35 [-0.59, -0.24]
+      in stage2_readout.json fits.test), check 3 (one 8-trial search per cell as every sibling, D315), 5 (searched results.tex
+      for bbx_zz, b b~ > Z Z, ZZ, f f~ > Z Z; decisions for zz/bbx; only the one-loop pole/coverage notes and the transfer-ladder
+      rung, as prior says), 9 (HETEROSC mu_mse + sigma stage), 10/11 (target''s own pool test split, target_stats own, offshell
+      parent as the u u~ LO stage 2), 13 (template coupled space, 8 trials, waves 3,3,2).'
   step_waits:
     '2': 'detached drivers muonly_mse_test and bbx_zz_v_LD; step 3''s LO arm: the next owner''s design'
     '3': 'detached drivers muonly_mse_test and bbx_zz_v_LD; step 3''s LO arm: the next owner''s design'
