@@ -285,6 +285,8 @@ def gen_virt_chunk(task):
            "--n", str(task["count"]), "--seed", str(task["seed"]),
            "--sqrts-min", repr(task["sqrts_min"]), "--sqrts-max", repr(task["sqrts_max"]),
            "--out", out_path]
+    if cfg.get("sqrts_measure"):   # the recipe entry's measure (log_beta), not only the one-loop table entry's
+        cmd += ["--sqrts-measure", str(cfg["sqrts_measure"])]
     # Per-dataset α_s scan (register_scan_process sets alphas_mz/alphas_prefactor on
     # a virt scan): restore the physical α_s weighting at the scanned reference so
     # the NLO target depends on the coupling. The α_s scan shares the base virt

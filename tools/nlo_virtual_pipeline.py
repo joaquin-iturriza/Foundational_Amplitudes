@@ -643,7 +643,7 @@ def virt_evaluator(process, mass_shift=True, alphas_mz=0.118, alphas_prefactor=F
 
 def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
                           seed=42, mass_shift=True, alphas_mz=0.118,
-                          alphas_prefactor=False):
+                          alphas_prefactor=False, sqrts_measure=None):
     """Sample phase space, evaluate the virtual, apply the heavy-quark mass
     shift, and write a 21-col virt dataset (momenta in [e-,e+,finals] order).
 
@@ -666,7 +666,8 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
     # the perturbative-order axis (and matches the fiducial_cuts recorded in recipe_id).
     # catalog_v4: the entry's own cuts, sqrt(s) measure and beam masses (absent: the global ones, uniform, BEAM_MASS)
     cuts = (cfg.get("fiducial_cuts") or mg.FIDUCIAL_CUTS) if mg.FIDUCIAL_CUTS_ENABLED else None
-    measure, bm = cfg.get("sqrts_measure", "uniform"), beam_masses(cfg)
+    # a recipe entry's own measure (sqrts_measure: log_beta on a named entry) wins over the one-loop table's
+    measure, bm = sqrts_measure or cfg.get("sqrts_measure", "uniform"), beam_masses(cfg)
     events, sqrts = mg.sample_nbody_phase_space(
         n_events, sqrts_min, sqrts_max, m_finals, pdg, rng=rng, cuts=cuts, sqrts_measure=measure,
         beam_mass=cfg.get("beam_masses"))
@@ -823,6 +824,8 @@ def main():
     ap.add_argument("--no-mass-shift", action="store_true")
     ap.add_argument("--alphas-mz", type=float, default=0.118,
                     help="reference α_s(M_Z) for the per-event running (scan knob)")
+    ap.add_argument("--sqrts-measure", default=None,
+                    help="the recipe entry's sqrt(s) measure (default: the one-loop table entry's)")
     ap.add_argument("--alphas-prefactor", action="store_true",
                     help="store the physical α_s-weighted virtual (target depends "
                          "on α_s); default off keeps the legacy α_s-stripped virt_e4")
@@ -864,7 +867,8 @@ def main():
             generate_virt_dataset(args.process, smin, args.sqrts_max, args.n, out,
                                   seed=args.seed, mass_shift=not args.no_mass_shift,
                                   alphas_mz=args.alphas_mz,
-                                  alphas_prefactor=args.alphas_prefactor)
+                                  alphas_prefactor=args.alphas_prefactor,
+                                  sqrts_measure=args.sqrts_measure)
         except PoleGuardError as e:
             print(f"[POLE GUARD] {e}", file=sys.stderr)
             sys.exit(3)                      # deterministic: do not retry

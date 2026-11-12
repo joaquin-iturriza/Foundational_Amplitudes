@@ -1,0 +1,260 @@
+{
+ "../datasets/v4_ddx_ttx_nlo__hi_431-50000GeV_test_amplitudes.npy": {
+  "n": 50,
+  "beta_min": 0.639892285295107,
+  "beta_max": 0.9999722149765972,
+  "sqrts_min": 448.9471520767768,
+  "sqrts_max": 46280.8930378081,
+  "per_beta_decade": {
+   "-1": 50
+  },
+  "per_half_decade_sqrts": {
+   "2.5": 11,
+   "3.0": 13,
+   "3.5": 10,
+   "4.0": 13,
+   "4.5": 3
+  },
+  "median_log10_absVB_per_beta_decade": {
+   "-1": 2.0104858244947446
+  },
+  "slope_per_beta_decade": null,
+  "neg_share": 0.0,
+  "finite": true
+ },
+ "../datasets/v4_ddx_ttx_nlo__hi_431-50000GeV_val_amplitudes.npy": {
+  "n": 50,
+  "beta_min": 0.758426128485002,
+  "beta_max": 0.9999630160645746,
+  "sqrts_min": 529.3367556067054,
+  "sqrts_max": 40114.515545320384,
+  "per_beta_decade": {
+   "-1": 50
+  },
+  "per_half_decade_sqrts": {
+   "2.5": 7,
+   "3.0": 17,
+   "3.5": 9,
+   "4.0": 15,
+   "4.5": 2
+  },
+  "median_log10_absVB_per_beta_decade": {
+   "-1": 1.9664740380141106
+  },
+  "slope_per_beta_decade": null,
+  "neg_share": 0.0,
+  "finite": true
+ },
+ "../datasets/v4_ddx_ttx_nlo__thr_345-431GeV_test_amplitudes.npy": {
+  "n": 50,
+  "beta_min": 0.06139249076478407,
+  "beta_max": 0.5961026323188717,
+  "sqrts_min": 345.65200268871786,
+  "sqrts_max": 429.68795208228033,
+  "per_beta_decade": {
+   "-2": 4,
+   "-1": 46
+  },
+  "per_half_decade_sqrts": {
+   "2.5": 50
+  },
+  "median_log10_absVB_per_beta_decade": {
+   "-1": 1.2153727459181103
+  },
+  "slope_per_beta_decade": null,
+  "neg_share": 0.06,
+  "finite": true
+ },
+ "../datasets/v4_ddx_ttx_nlo__thr_345-431GeV_val_amplitudes.npy": {
+  "n": 50,
+  "beta_min": 0.1380521903618499,
+  "beta_max": 0.5887484642184004,
+  "sqrts_min": 348.3353262037566,
+  "sqrts_max": 426.813115943286,
+  "per_beta_decade": {
+   "-1": 50
+  },
+  "per_half_decade_sqrts": {
+   "2.5": 50
+  },
+  "median_log10_absVB_per_beta_decade": {
+   "-1": 1.203695449568964
+  },
+  "slope_per_beta_decade": null,
+  "neg_share": 0.0,
+  "finite": true
+ },
+ "../datasets/v4_gg_ttx_nlo__hi_431-50000GeV_test_amplitudes.npy": {
+  "n": 50,
+  "beta_min": 0.639892285295107,
+  "beta_max": 0.9999722149765972,
+  "sqrts_min": 448.9471520767768,
+  "sqrts_max": 46280.8930378081,
+  "per_beta_decade": {
+   "-1": 50
+  },
+  "per_half_decade_sqrts": {
+   "2.5": 11,
+   "3.0": 13,
+   "3.5": 10,
+   "4.0": 13,
+   "4.5": 3
+  },
+  "median_log10_absVB_per_beta_decade": {
+   "-1": 1.9780877660054288
+  },
+  "slope_per_beta_decade": null,
+  "neg_share": 0.0,
+  "finite": true
+ },
+ "../datasets/v4_gg_ttx_nlo__hi_431-50000GeV_val_amplitudes.npy": {
+  "n": 50,
+  "beta_min": 0.758426128485002,
+  "beta_max": 0.9999630160645746,
+  "sqrts_min": 529.3367556067054,
+  "sqrts_max": 40114.515545320384,
+  "per_beta_decade": {
+   "-1": 50
+  },
+  "per_half_decade_sqrts": {
+   "2.5": 7,
+   "3.0": 17,
+   "3.5": 9,
+   "4.0": 15,
+   "4.5": 2
+  },
+  "median_log10_absVB_per_beta_decade": {
+   "-1": 1.9705221785580165
+  },
+  "slope_per_beta_decade": null,
+  "neg_share": 0.0,
+  "finite": true
+ },
+ "../datasets/v4_gg_ttx_nlo__thr_345-431GeV_test_amplitudes.npy": {
+  "n": 50,
+  "beta_min": 0.06139249076478407,
+  "beta_max": 0.5961026323188717,
+  "sqrts_min": 345.65200268871786,
+  "sqrts_max": 429.68795208228033,
+  "per_beta_decade": {
+   "-2": 4,
+   "-1": 46
+  },
+  "per_half_decade_sqrts": {
+   "2.5": 50
+  },
+  "median_log10_absVB_per_beta_decade": {
+   "-1": 1.5008325858152451
+  },
+  "slope_per_beta_decade": null,
+  "neg_share": 0.0,
+  "finite": true
+ },
+ "../datasets/v4_gg_ttx_nlo__thr_345-431GeV_val_amplitudes.npy": {
+  "n": 50,
+  "beta_min": 0.1380521903618499,
+  "beta_max": 0.5887484642184004,
+  "sqrts_min": 348.3353262037566,
+  "sqrts_max": 426.813115943286,
+  "per_beta_decade": {
+   "-1": 50
+  },
+  "per_half_decade_sqrts": {
+   "2.5": 50
+  },
+  "median_log10_absVB_per_beta_decade": {
+   "-1": 1.5199656965720143
+  },
+  "slope_per_beta_decade": null,
+  "neg_share": 0.0,
+  "finite": true
+ },
+ "../tmp/amp_data_cache/v4_ddx_ttx_nlo__hi_431-50000GeV_train_probe_amplitudes.npy": {
+  "n": 200,
+  "beta_min": 0.6052935149959865,
+  "beta_max": 0.9999739719887919,
+  "sqrts_min": 433.4157992017042,
+  "sqrts_max": 47817.452009848246,
+  "per_beta_decade": {
+   "-1": 200
+  },
+  "per_half_decade_sqrts": {
+   "2.5": 30,
+   "3.0": 61,
+   "3.5": 47,
+   "4.0": 40,
+   "4.5": 22
+  },
+  "median_log10_absVB_per_beta_decade": {
+   "-1": 1.9721199392666602
+  },
+  "slope_per_beta_decade": null,
+  "neg_share": 0.0,
+  "finite": true
+ },
+ "../tmp/amp_data_cache/v4_ddx_ttx_nlo__thr_345-431GeV_train_probe_amplitudes.npy": {
+  "n": 200,
+  "beta_min": 0.021685454014791508,
+  "beta_max": 0.597756067851062,
+  "sqrts_min": 345.0811482846304,
+  "sqrts_max": 430.3473237869947,
+  "per_beta_decade": {
+   "-2": 6,
+   "-1": 194
+  },
+  "per_half_decade_sqrts": {
+   "2.5": 200
+  },
+  "median_log10_absVB_per_beta_decade": {
+   "-2": 0.6919151409061277,
+   "-1": 1.1983354210809667
+  },
+  "slope_per_beta_decade": 0.5064202801748384,
+  "neg_share": 0.02,
+  "finite": true
+ },
+ "../tmp/amp_data_cache/v4_gg_ttx_nlo__hi_431-50000GeV_train_probe_amplitudes.npy": {
+  "n": 200,
+  "beta_min": 0.6052935149959865,
+  "beta_max": 0.9999739719887919,
+  "sqrts_min": 433.4157992017042,
+  "sqrts_max": 47817.452009848246,
+  "per_beta_decade": {
+   "-1": 200
+  },
+  "per_half_decade_sqrts": {
+   "2.5": 30,
+   "3.0": 61,
+   "3.5": 47,
+   "4.0": 40,
+   "4.5": 22
+  },
+  "median_log10_absVB_per_beta_decade": {
+   "-1": 1.9741988284047025
+  },
+  "slope_per_beta_decade": null,
+  "neg_share": 0.0,
+  "finite": true
+ },
+ "../tmp/amp_data_cache/v4_gg_ttx_nlo__thr_345-431GeV_train_probe_amplitudes.npy": {
+  "n": 200,
+  "beta_min": 0.021685454014791508,
+  "beta_max": 0.597756067851062,
+  "sqrts_min": 345.0811482846304,
+  "sqrts_max": 430.3473237869947,
+  "per_beta_decade": {
+   "-2": 6,
+   "-1": 194
+  },
+  "per_half_decade_sqrts": {
+   "2.5": 200
+  },
+  "median_log10_absVB_per_beta_decade": {
+   "-2": 1.7872251151779177,
+   "-1": 1.5141327951667416
+  },
+  "slope_per_beta_decade": -0.273092320011176,
+  "neg_share": 0.0,
+  "finite": true
+ }
+}

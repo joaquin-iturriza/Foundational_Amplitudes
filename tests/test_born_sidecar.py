@@ -69,3 +69,16 @@ def test_generation_keeps_born_and_reeval_reproduces(patched, tmp_path, process)
 
 if __name__ == "__main__":
     sys.exit(pytest.main([__file__, "-q"]))
+
+
+def test_recipe_measure_reaches_threshold(patched, tmp_path):
+    """a recipe entry's sqrts_measure (log_beta, kit_benchmark 11c) reaches the virt sampler: the one-loop table entry's
+    own measure drew the threshold pools log-uniform in sqrt(s) (beta >= 2e-2 in 200 events instead of down to 1e-5)"""
+    patched("ee_ttbar")
+    thr = float(sum(NV.VIRT_PROCESSES["ee_ttbar"]["m_finals"]))
+    lo, hi = thr / (1 - 1e-10) ** 0.5, thr / (1 - 0.36) ** 0.5
+    out = str(tmp_path / "thr.npy")
+    NV.generate_virt_dataset("ee_ttbar", lo, hi, 200, out, seed=3, sqrts_measure="log_beta")
+    p = np.load(out)[:, 8:16].reshape(-1, 2, 4).sum(1)
+    beta = np.sqrt(np.clip(1 - thr ** 2 / (p[:, 0] ** 2 - (p[:, 1:] ** 2).sum(1)), 0, None))
+    assert beta.min() < 1e-3 and (beta < 1e-2).mean() > 0.5
