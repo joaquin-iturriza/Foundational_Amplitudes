@@ -25254,6 +25254,13 @@ entries:
       span; the mass column log10(m_t/sqrt(s_hat)), 2.5x past), where a ReLU MLP continues linearly. Next: the transformer
       without its pre-LayerNorms (model.net.layer_norm=false, e618f235), which divide out the size of an out-of-range input,
       from scratch on uug and tt virtual (design follows).'
+  - at: '2026-11-12T03:46:53+00:00'
+    text: 'Correction to the 05:20 finding (repo-reviewer): the D403 port gate is, as designed, the mlp seed median against
+      his single numpy run (seed 0), and it FAILS on uug soft (-0.75 decades; coll -0.26, bulk +0.22). Reading it against
+      his three seeds was a change of the design that was never reviewed, so it is withdrawn: kit_mlp_readout @3050087f withholds
+      the ladder verdicts on uug when the gate fails. uugg and tt virtual have no numpy run, so no gate there. What still
+      stands, read directly rather than through the gate: the MLP with all our choices (''ours'') against our transformer,
+      by deepest-bin log-MSE and by median signed error (kit_extrap_read, finding ~07:00).'
   step_why:
     5:
       feeds: what KIT receives
