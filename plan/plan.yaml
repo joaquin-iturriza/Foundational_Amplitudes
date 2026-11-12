@@ -25947,6 +25947,12 @@ entries:
     units: null
     start: '2026-11-12T17:57:14+00:00'
     at: '2026-11-12T17:57:14+00:00'
+  - batch: together_lrx3
+    wall_h: 1.2
+    jobs: 96
+    units: null
+    start: '2026-11-12T17:57:18+00:00'
+    at: '2026-11-12T17:57:18+00:00'
   handoff:
     state: 'Second example (D413/D417) b b~ > Z Z, draft due 2026-11-13. One-loop V/B half READ (stage2_readout.py @cb3c96a5):
       test MSE(ln(V/B)) S = D*_scr/D*_ft at 1e-4 = 1.23 [0.88, 1.71] (val 1.21 [0.87, 1.67]), NO SAVING by the rule; fine-tune
