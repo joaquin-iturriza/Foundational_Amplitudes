@@ -27647,6 +27647,7 @@ entries:
       trial''s result json curves, then drive kit_hpo_uug_plain + kit_hpo_ttvirt_thr detached)'
     '14': step 15's chosen HPs (searches kit_hpo_uug_plain, kit_hpo_ttvirt_thr after the smoke); code model.input_div_form
       ready @6cdec219
+    '16': 'step 14 (same work: 16 duplicates 14 + 15)'
   handoff:
     state: '2026-11-12 ~19:40 @950f6522. Closed at the context limit (main session''s request). READY for the next owner,
       in order: step 15 (curve check of the KIT controls with analysis/data_saving/curve_quality.py''s separation/end_up bars,
