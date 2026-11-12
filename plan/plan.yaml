@@ -23536,11 +23536,11 @@ entries:
       - 'Joaquin holds it: wait'
   targets:
   - batch: pidqn
-    wall_h: 2.7
+    wall_h: 2.8
     jobs: 2
-    units: null
-    start: '2026-11-10T02:35:32+00:00'
-    at: '2026-11-10T02:35:32+00:00'
+    units: optrec_pidqn_*
+    start: '2026-11-12T00:30:50+00:00'
+    at: '2026-11-12T00:30:50+00:00'
   step_waits:
     '2': '2026-11-13'
     '1': the design reviewer (af9efea1918f58f93)
