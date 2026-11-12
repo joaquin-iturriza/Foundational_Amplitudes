@@ -31067,6 +31067,17 @@ entries:
       coll |signed| <= 0.38, soft in [-0.46,+0.46], exponents soft [-2.5,-1.5], coll [-1.5,-0.5]; tt Sudakov [-0.22,+0.48]
       with log-MSE <= 0.154, Coulomb log-MSE <= 2.41 and exponent <= -0.44); NO EFFECT, worse or failing curves at the control''s
       HPs: the arm''s own search, best against best; only a NO there stops the input.'
+    passed_at: '2026-11-12T18:45:42+00:00'
+    reviewer: 'Round 4 = passed round 3 with each of the four KIT searches at 32 trials (n_startup 8, waves [8,4,4,4,4,4,4])
+      on D427 (''8 was a compromise ... it''s clear that right now it''s not enough''), batch fixed under D426. Diff 4d1a213d..69e944dc
+      on the four kit_hpo configs: only n_trials 8->32, n_startup 3->8, waves and a comment moved; space, t_steps [1831],
+      WSD, batch 16384 and base configs unchanged. Check 3: with a 15-30% good share (curve_quality.json: 21/71, 14/70, 12/63),
+      P(no good trial) falls from 6-27% at 8 trials to <=0.6% at 32. Check 13: the larger count rests on Joaquin''s words.
+      Finish time is stated (7 waves x ~0.5 h, ~3.5 h if CC gives 32 GPUs). Step 14''s arm search, if needed, also uses 32
+      trials, matching the controls. Cost: 32 x 1.70 = 54.4 GPU-h, over the 30 GPU-h line and held for Joaquin''s go at that
+      cost. Step 14 unchanged from round 3 (kit_extrap.json @7656e687: uug coll 17.70->2.24, tt Coulomb 3.55->1.72). Searched
+      D424-D427 in site decisions and the four kit_hpo configs. Not checked: CC''s free GPU width for a 32-job first wave
+      (site pick).'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
