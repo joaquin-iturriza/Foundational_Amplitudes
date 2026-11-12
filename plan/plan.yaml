@@ -26493,6 +26493,15 @@ entries:
       LO mass-scan trees at m 50/300/600, beta down to 4e-3); every b in a one-loop pool is massless (catalog_v4 sm-no_b_mass),
       so no one-loop massive coloured pair exists anywhere, and sqrt(s) stops at 6 TeV (KIT Sudakov to 50 TeV). Coordinator''s
       reading confirmed.'
+  - at: '2026-11-12T14:19:45+00:00'
+    text: '2026-11-12 ~15:50: log-skip design (11d) got FIX from design-reviewer a9837bbf79a4c200f (recorded with design-fix).
+      uug arm: the control trains on the emission-scale target T, which is flat in both uug limits (slope +0.000 soft, -0.029
+      collinear), so a readout linear in the logs has no slope to learn there, and the +1.36 overshoot is prediction minus
+      a flat truth carried by the frames. Revise once: either test the skip on uug with the plain log10|M|^2 target (slopes
+      -2, -1), which needs a new matched plain-target softpair control (~1.4 GPU-h; 2642b17b lacks pair logs and soft rescale),
+      or restate the uug arm as ''can the skip cancel the frames overshoot'', with an outcome whose NO does not generalize.
+      The tt virtual arm passes check 2. Also state the commits between the controls (b6794f35 uug, e75ca218 tt) and d14643c6,
+      and that they are no-ops with the new flags off. Not done by me (closed at the context limit); the next owner revises.'
   step_why:
     5:
       feeds: what KIT receives
