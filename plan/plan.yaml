@@ -16973,6 +16973,15 @@ entries:
       the rules only ~6 GB is cleanable debris; amp_data_cache is mostly catalog pools (v4_ 59 GB, dsh_ 10 GB) of open entries,
       protected by prune.py POOL_PREFIXES (d00c1859). Reaching 60 GB needs prune.py (D19) run by Joaquin or a permission,
       or his call on pools/results. E5530 acked with that note.'
+  - at: '2026-11-12T00:28:52+00:00'
+    text: '2026-11-12 figure gate (Joaquin: ''PLOTS PLOTS PLOTS ... I DON''T WANT TABLES I NEED PLOTS''): plan_check.result_table
+      (be45115e) refuses a main-session turn whose any text block holds a markdown table with a measured-quantity cell, whether
+      or not a .png/.pdf was sent (the figure exemption of e089e5a5 removed; it let tables go as the body with figures attached).
+      Cases (tests/test_plan_check_table_figure.py): the main session''s last six result-table messages (2026-11-11 21:41,
+      22:07, 22:49, 23:45 and 2026-11-12 00:01, 00:25 UTC), replayed from the transcript with a png sent, all refused; their
+      cell shapes as fixed cases; a table in an earlier block with a plain last block refused; the four bookkeeping tables
+      of 2026-11-11 (audit, timeline, counts, triggers) and plain-sentence numbers pass. Not covered: a table written without
+      leading pipes, or results as a bullet list of numbers. Steps 23/24 files committed a79e5eff.'
   handoff:
     state: '2026-11-11: D399 setup fixes merged into trunk 6ec67a05 and pushed (keeper PASS at d56fb00b after 14 findings
       fixed; repo-reviewer PASS at 10ced0d3 after 2 fixes: undecide soft delete, waiter test runner). Out of repo, live: ~/work/CLAUDE.md
