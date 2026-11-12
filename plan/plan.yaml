@@ -22946,6 +22946,24 @@ entries:
       0.39, 1.11, 1.62, 0.22 on val (geomean 0.63, was 1.92) and 0.36, 1.98, 1.86, 0.04 on test (0.49): within the 0.46-4.84
       rerun spread, so the tops neither help nor hurt t t~ V. Fig analysis/data_saving/figs/event_share.png. Repo-reviewer
       PASS (watermark cd7d4667) after guards in event_share.py and diag_readout.py.'
+  - at: '2026-11-12T00:25:21+00:00'
+    text: '2026-11-12 defect hunt on the t t~ fine-tune deficit (Joaquin: ''something has to be wrong''), tools @bfb2bd4e.
+      Checked: (1) weights: fine-tunes load the parent with load_state_dict strict (base_experiment.py ~1612), only the HETEROSC
+      readout rows remapped; no missing/unexpected keys possible. (2) pool physics: t t~ LO/V pools MT=ymt=172.5, WT 1.4915
+      (sidecars), as catalog_v4; heavy-quark tops are separate species 6000000+m (particle_ids.species_pdgs), so no mass-row
+      clash. (3) start: step-0 val HETEROSC loss 8.3e4 (t t~ LO), 2.3e4 (t t~ V), 2.4e4 (u u~ LO), grad norm 1.4-3.3e6 at
+      step 0 and median 5.6e3 (t t~ LO) / 4.7e5 (t t~ V) / 2.3e5 (u u~ LO) over the first 100 steps (clip 5) vs scratch 45-180:
+      target_stats own reinterprets the parent''s head (parent pooled std 5.47 vs own 0.74 LO, 0.13 V) on t t~ and u u~ alike;
+      both arms lead scratch by step 170. Mass column: fine-tunes on parent [-1.27, 0.70], scratch t t~ LO own [-0.90, 0.36],
+      t t~ V [-0.58, 0.12]. (4) curves (ft_curves.py, D=3162, fig figs/ft_curves.png): t t~ LO fine-tune below scratch until
+      ~7000 steps, then ends -6.54 vs -7.98 val NLL while its train loss is lower (-8.34 vs -8.02); one-loop fine-tunes''
+      val NLL blows up after step ~6000 (t t~ V) / ~7200 (u u~ V) to +170 with train at -7.2; scratch none. (5) train/val
+      gap (event_share.py --gap, final models, 2000 train vs 5000/10000 val events): t t~ LO fine-tune train MSE(ln) 3e-10
+      to 3e-9 at every D (memorised) with val/train 884, 171, 366, 18 at D=316..1e4 vs scratch 10, 42, 8, 2.7; t t~ V ft 3.8,
+      1947, 2.6, 7.2 vs scratch 815, -, 2.4, 0.6; u u~ LO ft 825, 55, 2.7, 1.3 vs scratch 6.7, 9.0, 2.8, 10. Reading: the
+      t t~ fine-tunes fit their training events far better than scratch and generalise worse: an overfitting/memorisation
+      signature, not a bad start. Not yet checked: the parent''s zero-shot mu-MSE on the t t~ val pool vs a fresh init (tools/zero_shot_parent.py,
+      a GPU job), lr per param group as applied (build_ft_param_groups not logged).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
