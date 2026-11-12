@@ -16298,9 +16298,9 @@ entries:
     '25': FA-ccin2p3-046cc7d3
   owner:
     agent: ad08ebc12f4da937f
-    state: working
+    state: stopped
     since: '2026-11-12T14:43:04+00:00'
-    state_at: '2026-11-12T14:43:04+00:00'
+    state_at: '2026-11-12T14:44:53.555000+00:00'
     context: 64925
     context_at: '2026-11-12T14:44:06+00:00'
   designs:
