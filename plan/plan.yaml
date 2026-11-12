@@ -24796,33 +24796,37 @@ entries:
     '6': FA-ccin2p3-d277f7f5 FA-ccin2p3-7a63ea88 FA-ccin2p3-1df8bd16
     '8': FA-ccin2p3-d277f7f5 FA-ccin2p3-7a63ea88 FA-ccin2p3-1df8bd16
   handoff:
-    state: 'Step 5: frame-noise fix 546dd9c2 (lloca degenerate-frame noise made a function of the particle at inference; threads
-      pinned to 4; README+check state rounding limit 2e-6); 51 runs re-scored (49 unchanged, tt Born/virt softpair moved <=0.06
-      decades); package v3 build+check FA-ccin2p3-21f5d054 running; after it a 32-thread --report check of v3. Joaquin rejected
-      the redraws of 3492956e: threshold scan redone at 75354f9b (old 00:31 layout restored, legend strip, labelled dash-dot,
-      categorical colours, labels with size+inputs; looked at beside old: fine); KIT mse figures at cb55f89a: reference restored
-      to truth clipped to bulk_train [0.5%,99.5%], named ''exact inside the training range, flat at its edge outside'', drawn
-      and in the legend only where nonzero, per-panel legends, median constant removed; all 8 sets redrawn (67 mse panels
-      + strips + median figures) into analysis/kit_benchmark/figs; side-by-side old|new sheets in scratch k5/sheet_mse_[0-8].png;
-      only sheet 0 (B sets) looked at: changes are only the reference label and its dropped entry in the threshold panels.
-      TODO for the next owner: look at sheets 1-8, hand Joaquin the per-figure list (what each replaces: same file name, drawn
-      from 3492956e~1 code + 84123ee4~1 data; what changed: reference label renamed, entry dropped where zero, per-panel legends;
-      data = re-scored runs) and the sqrt(s) paragraph: tt virtual Sudakov, the reference scores 2.8e-3/2.3e-2/6.9e-2 (1.7-5,
-      5-15, 15-50 TeV), the scratch models 0.0096-0.28 (offon 9e5) and 0.04-0.24 (offoff 1e5), offoff 9e5 64 at 15-50 TeV,
-      vs bulk 1.8e-9..1.2e-8: the truth barely leaves the training range there, so a model that stayed flat at the edge would
-      do 3-4x better; ours drift (input range in sqrt s not checked). D403 MLP ladder running: FA-ccin2p3-d277f7f5 (uug +
-      his numpy baseline), 7a63ea88 (uugg), 1df8bd16 (tt virt); design passed; read per its rule (port check first). Step
-      6 waits on the ladder.'
-    decisions: 'Inference frames deterministic per particle (546dd9c2). Figures: Joaquin''s reference kept (clipped truth),
-      not replaced; threshold figure only changed where he asked. MLP ladder: 3 seeds per arm (cheap, spread unmeasured).'
-    ruled_out: Augmentation and per-pool statistics as the Born softpair pool dependence (it was lloca's random collinear-frame
-      regularization). log beta^2 input construction (exact to 4.5e-9; its loss on the Born is extrapolation 5x past its trained
-      range).
-    running: FA-ccin2p3-21f5d054 (package v3 check), FA-ccin2p3-d277f7f5 7a63ea88 1df8bd16 (MLP ladder)
+    state: 'Redraw per Joaquin''s rejection of 3492956e. His words: (4) ''What does constant at bulk edge mean? Why is it
+      there in some figure and not in others even though there is a label for it in all of them? How can the sqrt(s) results
+      be so bad?'' (5) ''The legend covers the entire figure and it is unreadable. I have no idea what each curve means. There
+      is a vertical line unlabaled.'' Then: ''What do you mean the old constant was the truth clipped to its bulk range, what
+      does that even mean, and why are you now using something different? how am I supposed to interpret this? Why are you
+      only showing me two plots about this?'' and ''why does the first one have no curves while the old one did? why is the
+      gray band smaller in the new one? Why did you change the linestyles and add a ton of markers to the second plot?'' Coordinator''s
+      instructions: threshold figure back to the 00:31 one (two stacked panels, model curves in both, linear top axis, plain
+      lines), changing only the legend (off the data, strip), a label for the dash-dot line, one colour per model; the clipped-truth
+      reference restored under a plain name, dropped from a panel''s legend where zero throughout, median constant removed;
+      all 8 sets redrawn, each handed back with what it replaces and every change; answer ''how can the sqrt(s) results be
+      so bad'' in one paragraph. DONE: threshold figure 75354f9b (looked at beside old: fine; analysis/kit_benchmark/figs/kit_threshold_scan.png
+      + _legend.png); mse figures cb55f89a, all 8 sets redrawn cleanly in the foreground (the detached first attempt E5701
+      failed on a too-wide legend label, fixed to three lines); old|new sheets in scratch k5/sheet_mse_[0-8].png (old = 3492956e~1
+      code on 84123ee4~1 data); only sheet 0 looked at. TODO: look at sheets 1-8, write the per-figure list (same file names;
+      changes: reference label, its legend entry dropped where zero, per-panel legends, data = re-scored runs), and the sqrt(s)
+      paragraph: tt virtual Sudakov reference 2.8e-3/2.3e-2/6.9e-2 (1.7-5, 5-15, 15-50 TeV), scratch offon 9e5 0.0096/0.14/0.28,
+      offoff 1e5 0.039/0.15/0.24, offoff 9e5 0.015/0.77/64, bulk 1.8e-9..1.2e-8: the truth barely leaves the training range,
+      a model flat at the edge would be 3-4x better, ours drift (input range not checked). EVENTS: E5695 package v3 FA-ccin2p3-21f5d054
+      FAILED, log not yet read (site logs it); no resubmit before reading; E5696 MLP ladder d277f7f5/7a63ea88/1df8bd16 done
+      cleanly: read per the passed design (port check vs his numpy baseline first; kit_figures collect over runs/kit_mlp);
+      E5701 redraw command 2 rc=1 (handled: redrawn). None acked by me.'
+    decisions: Inference frames deterministic per particle (546dd9c2). Figures keep Joaquin's reference (clipped truth); change
+      only what he asked. MLP ladder 3 seeds per arm.
+    ruled_out: Augmentation/per-pool stats as the Born softpair pool dependence (lloca random collinear-frame noise was).
+      log beta^2 input construction (exact to 4.5e-9; extrapolated 5x past its trained range).
+    running: none (E5695, E5696, E5701 open for the next owner)
     files: tools/rebuild_run.py, tools/kit_predict.py, tools/kit_package.py, tests/test_frame_noise.py, tools/kit_figures.py,
       tools/kit_threshold_scan.py, tools/kit_input_range.py, tools/kit_mlp_ladder.py, scripts/job_kit_mlp_ladder.sh, analysis/kit_benchmark/data/,
       analysis/kit_benchmark/figs/
-    written: '2026-11-12T02:35:49+00:00'
+    written: '2026-11-12T02:36:24+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
