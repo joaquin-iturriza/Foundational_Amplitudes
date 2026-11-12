@@ -342,7 +342,8 @@ def label(run):
     """A short legend label from a KIT run name: what its protocol (A, A_ft, B, B_bulk) trained on."""
     names = {"A": "from scratch", "A_ft": "fine-tuned", "B": "hard points added", "B_bulk": "bulk continuation"}
     m = re.match(r"kit_(A_ft|B_bulk|A|B)_", run)
-    inputs = {"softpair": ", log inputs", "softpairthr": r", log inputs + $\log\beta^2$"}
+    inputs = {"softpair": ", log inputs", "softpairthr": r", log inputs + $\log\beta^2$",
+              "vbeta": r", log inputs + $\log\beta^2$, target $V\beta$"}
     n = re.search(r"_n(\d+)_", run)
     size = {"100000": r", $10^5$ events", "900000": r", $9\times10^5$ events"}.get(n.group(1), "") if n else ""
     return names[m.group(1)] + size + inputs.get(run.rsplit("_", 1)[-1], "") if m else run
