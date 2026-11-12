@@ -115,7 +115,10 @@ def write(name, tgt, k, T, arm, rate, parent, lr_factor=1.0, offshell="parent", 
         else:
             # tmpl2 (hp_ranges_readout.py, 2026-11-12): the stage-2 bests sat at the low edge of both in 9 of 30
             # searches at D < 1e4, so both ranges open downward
-            space = [{"name": "fine_tune.lr_scale", "type": "float_log", "low": 0.03 if tmpl2 else 0.1, "high": 10.0},
+            # wide (no batch search): also opened upward, where the stage-2 good fine-tune trials sat (place 0.955 of
+            # [0.1, 10], hp_ranges_readout.json; design FIX 2026-11-12)
+            space = [{"name": "fine_tune.lr_scale", "type": "float_log", "low": 0.03 if tmpl2 else 0.1,
+                      "high": 30.0 if tmpl2 and not batch_search else 10.0},
                      {"name": "fine_tune.layer_decay", "type": "float_uniform", "low": 0.5 if tmpl2 else 0.75,
                       "high": 1.0}] + space
     if tmpl2 or wsd:
