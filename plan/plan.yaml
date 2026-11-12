@@ -23721,6 +23721,12 @@ entries:
       bests; median best position in the window 0.09-0.28 fine-tune vs 0.26-0.58 scratch. Prior: results.tex HPO rule (lr_scale
       optimum ~1, range 0.13-7.7, window [0.1,10]) and the tp3 probes (best lr_scale at the window''s top) went the other
       way; here the held-out-target fine-tunes want lr_scale at or below 0.1.'
+  - at: '2026-11-12T03:03:46+00:00'
+    text: '2026-11-12 tree head-map batch complete (hmap_readout.py, data @16cb16c4, fig hmap_LD): the last two runs, head
+      map over the stage-2 best fine-tune at the same HPs (a reference, not the exact control), D=3.16e4 val 6.03 / test 0.04,
+      D=1e5 val 0.97 / test 1.04; D=3.16e4 val and test disagree (the stage-2 D=3.16e4 test carries one event at 55-80%).
+      The design''s rule on its 8 exact-control cells is unchanged: NO CHANGE (pooled val gmean 1.29, 5 of 8 below 1; test
+      0.64). Over all 9 D against the stage-2 best: val gmean 1.01, test 0.71.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
