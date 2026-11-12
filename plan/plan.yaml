@@ -27236,12 +27236,10 @@ entries:
     withdrawn_at: '2026-11-12T20:56:52+00:00'
     withdrawn_why: 'Joaquin: use all available clusters'
   owner:
-    agent: ac46d0b7530cd12d9
-    state: closed
-    since: '2026-11-12T18:25:52+00:00'
-    state_at: '2026-11-12T21:09:41.967000+00:00'
-    context: 300360
-    context_at: '2026-11-12T21:22:17+00:00'
+    agent: ad1a12dcf02712802
+    state: working
+    since: '2026-11-12T21:29:09+00:00'
+    state_at: '2026-11-12T21:29:09+00:00'
   findings:
   - at: '2026-11-10T03:33:04+00:00'
     text: 'Data: KIT package (888 MB tar, 2.7 GB with the tar) on CC at $DATA_DIR/kit_hardps/hardps_benchmark (fetched by
