@@ -24854,6 +24854,19 @@ entries:
       and the curves. Diverged trials (expected for fine-tune lr_scale above ~1-3 at training.lr x3: this entry''s divergences
       sit at lr_scale 2.6-3.0 and 6.7-9.7) counted apart per search (D398). Readout lr_centre_readout.py --test lrx3 @bc1a1197.
       (C) reported per cell for both windows whatever the branch. Diverged trials listed apart (D398).'
+    passed_at: '2026-11-12T17:56:54+00:00'
+    reviewer: 'Third look (design 17:56). All 12 lr-window-times-3 configs differ from their stage-2 configs only in the sweep
+      name, the DyHPO seed, and the lr window (scratch) or training.lr (fine-tune). The searches use the template''s 8 trials
+      in waves 3,3,2. Arms are at each cell''s search-best HPs; the weight-decay and L2 single values were removed (D241).
+      Check 2: inside a search, separation falls with peak lr (Spearman -0.39 at D<1e3; median 3.8e4 in the window''s lowest
+      quarter against 1.1e3 in its top quarter, curve_quality.json @155d1ab8), and the stage-2 search bests in the 12 cells
+      sit at separation 3.6-5e4 against a bar of 3. Check 3: (A) judged per cell beyond the control-vs-original spread, and
+      pooled G against S. (B) pooled G_B against 5^(1/sqrt 12)=1.59, from the 5x spread between two 8-trial searches (results.tex
+      ladder ~l.13700), coded in lr_centre_readout.py @bc1a1197. The good-count bar is 8 of 12 against 0 of 12 now. The outcome
+      covers both yes and no, and the NOT FIXED branch claims no data limit. Prior work searched in results.tex, the plan
+      and the decisions for: WSD, weight decay, regularization_lambda, early stop, overfit, memoris, val/train, separation,
+      horizon, cooldown, go down together. Cited: ~l.7650 and ~l.14327. D421 is answered by part (B). About 28 GPU-h (D412).
+      CC has 65 GB free. Code committed (5a42a430, bc1a1197).'
   step_waits:
     '3': bbx_zz_lo_scr3, bbx_zz_lo_ft drivers (detach events)
     '4': bbx_zz_lo_ft driver (detach event)
