@@ -431,7 +431,8 @@ def _registry(project, item):
     covered = None
     try:
         c = sqlite3.connect("file:%s?mode=ro" % RUNS_DB, uri=True, timeout=10)
-        for s, h in c.execute("SELECT site, est_gpu_hours FROM runs WHERE project=? AND item IS ? AND submitted >= ?",
+        for s, h in c.execute("SELECT site, est_gpu_hours FROM runs WHERE project=? AND item IS ? AND submitted >= ? "
+                              "AND NOT (state = 'CANCELLED' AND running_seen IS NULL)",
                               (project, item, int(time.time()) - BUDGET_WINDOW_S)):
             recent += h or 0.0
             recent_jz += (h or 0.0) if s == "jeanzay" else 0.0
