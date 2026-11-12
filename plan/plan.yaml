@@ -25336,6 +25336,18 @@ entries:
       heldoutbbzz at r4''s T=3458 and lr 9.248e-3; LO target recipe = v4_bbx_zz''s r4 entry; 14 configs sweep/sweep_config_dsave_s2_{scr,ft}_bbx_zz_d{2..8}_t*.yaml
       on the V/B ladder''s T(D) (no LO calibration, stated). Design recorded 16:20; design reviewer and repo-reviewer (overdue
       backlog gates the commit) running.'
+  - at: '2026-11-12T15:26:00+00:00'
+    text: '2026-11-12 16:30 CET: the restarted V/B L(D) (bbx_zz_v_LD2) failed whole: 84 trials refused at data load (AssertionError
+      data.target_over_born: the v4_bbx_zz_nlo train pool in amp_data_cache, regenerated 2026-11-12 02:46 with its Born sidecar,
+      kept the 11-10 identity record of the pool it replaced: datagen wrote the sidecar but never its record), and the driver
+      went on suggesting waves 2 and 3 off penalties only. Fix: datagen writes the record with the sidecar (0e5a650b); instance:
+      tools/born_record.py checked the sidecar (50000 rows, all positive, std ln|V/B| 0.267 = vb_spread''s 0.267; val pool
+      0.270) and rewrote the record (record_matches true). 28 queued trials cancelled, the failed searches'' local state moved
+      to sweeps_local/zz_bornrecord_*, the 14 searches restarted fresh (detach bbx_zz_v_LD3, configs @79578039, FA_NEW_SWEEP_REASON
+      given). Not checked: other one-loop pools regenerated at 02:46 may carry stale records too (ee_ttbar_nlo, uux_epemz_nlo...):
+      tools/born_record.py <pool> reads it. LO: design revised after FIX (own calibration, D391) and PASSED; parent FA-ccin2p3-0d698e4b
+      (job_datasaving_parent.sh heldoutbbzz @15486032) and calibration FA-ccin2p3-{39823ff8,6293be00,f28fe38e,c7213cbd,56381216,714db3a4,148ccdb9}
+      (job_data_saving.sh bbx_zz k 8000 scratch tag=cal_lo, k=2..8) submitted.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
