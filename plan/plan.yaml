@@ -25799,7 +25799,7 @@ entries:
     decision: D401
   owner:
     agent: a297b297f5d87f1d6
-    state: working
+    state: closed
     since: '2026-11-12T13:05:18+00:00'
     state_at: '2026-11-12T14:16:24.053000+00:00'
     context: 290454
@@ -26514,30 +26514,39 @@ entries:
     '10': FA-ccin2p3-e8088a7d FA-ccin2p3-e1c19b4d
     '11': design-reviewer a9837bbf79a4c200f
   handoff:
-    state: '2026-11-12 ~14:05. D411 settled to one route: the transformer''s extrapolation failure into KIT limits (uug collinear
-      overshoot +1.36, tt virtual Sudakov -0.53) is carried by the learned frames acting on the attention''s vector messages:
-      model.input_route_off=frames (5d509b13) fixes uug (deepest collinear -0.25) and nearly tt (Sudakov +0.06, log-MSE 0.154
-      vs bar 0.11); local momenta and off-shellness cuts do not (finding ~14:30). Costs of the frame cut: uug soft deepest
-      -0.28 -> -0.93 (the inputs-only arm''s soft loss), tt threshold +0.47, tt bulk +0.34. Off-shellness off gains uug soft
-      (-0.28 -> -0.04) but bulk +1.0. Step 10 next (needs a design): uug and tt virtual with frames AND off-shellness cut,
-      then KIT A/A_ft/B models and uugg with the chosen input set. Step 9 (D405) read: all three fine-tunes NO on Coulomb
-      (+0.05/+0.06/+0.27), Sudakov helped by ft_thr (-0.80); threshold scan running detached (thrscan_d405: its collect writes
-      /tmp/kts_d405_<pid>.json on CC, only CLAIM lines in the local detach log; rerun collect with --out /tmp/... and cat
-      it home if the ratio at beta 1e-3 is needed). After step 9''s scan: per the D405 NO branch, one-loop top pairs log-uniform
-      in beta (own design) or close step 9. Step 5 (package for KIT) waits on which input set wins.'
-    decisions: Route isolation read by the passed design's bands (one seed, D315). Route figure uses the matched control (tt
-      softpairthr). kit_saturation_probe now prints a KITSAT line instead of writing into the CC checkout's tracked tree (that
-      blocked site sync, coordinator 2026-11-12; untested end to end on CC since the change 7d2c457a/7cc4e105). Never write
-      --out of a site-run tool into analysis/** on CC.
-    ruled_out: local-frame momenta alone and off-shellness alone as carriers of the extrapolation failure (both NO on uug
-      and tt); LO threshold top pools / beta input in pretraining as a Coulomb fix (D405 all NO); ReZero; textbook saturation;
-      uug target side
-    running: detached thrscan_d405 (CC login node CPU)
-    files: models/lloca.py, wrappers.py, config/model/lloca.yaml (input_route_off), tests/test_input_reps.py, tools/kit_extrap_read.py
-      (route set), tools/kit_saturation_probe.py (compare, KITSAT), analysis/kit_benchmark/data/kit_extrap.json, kit_fig_A_route_{uug,tt}.json,
-      kit_fig_A_scalars_uug.json, kit_sat_{uug,ttvirt}_scalars.json, kit_fig_Aft_thr.json; figs kit_extrap_route_*, route_{uug,tt}/,
-      kit_sat_cmp_*, aft_thr/
-    written: '2026-11-12T13:00:37+00:00'
+    state: '2026-11-12 ~15:45. Step 10 double cut (frames + off-shellness; design PASS) running: tt virtual FA-ccin2p3-e1c19b4d
+      COMPLETED (not read), uug FA-ccin2p3-e8088a7d RUNNING; read both with tools/kit_extrap_read.py collect/plot (arm noframesoff,
+      figure set kit_extrap_double_<proc>) against the passed bands, then pick the KIT input set. Step 11 (Joaquin ~15:00
+      via coordinator): (a) DONE, finding 15:40 (uug collinear frames boost gamma 10.7 vs bulk max 10.2, tracks the overshoot;
+      tt Sudakov frames in range, so not the tt mechanism; local momenta in range everywhere), fig analysis/kit_benchmark/figs/kit_frames_boost_{a,b}.png.
+      (b) D415: Bakar''s slides 5-9 reproduced by tools/kit_bakar_figs.py @d14643c6 (figs analysis/kit_benchmark/figs/bakar/slide{5,6,7,8}*.png,
+      slide-9 table printed by plot). MUST re-collect (collect --out analysis/kit_benchmark/data/kit_bakar_figs.json, detached)
+      after the uug double-cut run ends: the JSON predates relabelling the tt ''mlp'' rerun as the logthr MLP (it has the
+      threshold column) and the noframesoff arms. Slides 1 (needs uncut flat phase space, not in the KIT file) and 12 (truth
+      validation table) have no model curve: not made. Deepest-bin log-MSE so far: uug soft/coll transformer 0.20/2.21, no
+      frames 1.0/0.16, our MLP rerun 0.062/0.058, his 0.325/0.108; uugg soft/qg/gg transformer 0.41/3.56/2.47, his 0.405/0.080/0.054;
+      tt Coulomb/Sudakov transformer(thr) 3.55/0.72, no frames 6.63/0.154, our logthr MLP rerun 0.81/0.052, his logthr 2.41/0.046;
+      uugg azimuth rms of h: truth 0.025 flat, transformer 4e-3..7e-3, MLPs 1e-5..4e-4. Figures looked at once: shapes as
+      these numbers. (c) coverage checked (finding 15:40): no one-loop top pair, no massive b in the parent. Design NOT yet
+      recorded: one-loop g g / d d~ > t t~ [virt=QCD] pools (no catalog entry exists; add like the signext virt entries in
+      recipes/gen_catalog_v4.py) drawn log_beta on [1e-5,0.6] and log sqrt(s) to 50 TeV, added to the r5 held-out parent (recipes/gen_datasaving_parent.py
+      variant like heldoutthr; scripts/job_datasaving_parent.sh T=4307), A_ft tt virtual vs ft_r5 and ft_thr; cite protocol
+      B (target''s own threshold events still missed Coulomb) as prior. (d) model.input_log_skip implemented @d14643c6 (repo-reviewer
+      passed); design recorded ~15:42, design-reviewer a9837bbf79a4c200f running. On PASS: plan target, smoke 50 steps on
+      uug (D395, tag softpair_logskip_smoke), then the two runs (uug tag softpair_logskip, tt softpairthr_logskip; commands
+      in the design''s fixed field); wire arm ''logskip'' in tools/kit_extrap_read.py ARMS and tools/kit_bakar_figs.py MODELS.'
+    decisions: 'Double cut read by its passed bands. Frames probe reads gamma = Lambda_00 and relative gamma of Lambda_i Lambda_j^-1
+      (the attention''s message transform). Skip coefficients come from the static property table (repo-reviewer: never the
+      per-event dimensionless mass column). Step 9 closed (D405 NO); the one-loop threshold pretraining is now Joaquin''s
+      11c and gets its own design. Figures are gitignored (force-added scan figs untracked).'
+    ruled_out: local momenta out of range (in range in every stratum); frames boost blow-up as the tt Sudakov cause (frames
+      in range there); LO threshold tops or the beta input as a Coulomb fix (D405)
+    running: FA-ccin2p3-e8088a7d (uug double cut); design-reviewer a9837bbf79a4c200f (log-skip design)
+    files: tools/kit_transformer_probe.py (--plot), tools/kit_bakar_figs.py, tools/kit_beta_coverage.py (--pdg), tools/kit_extrap_read.py
+      (noframesoff, double_ set), tools/kit_threshold_scan.py (--runs), wrappers.py (_log_skip), config/model/lloca.yaml (input_log_skip),
+      tests/test_input_reps.py, analysis/kit_benchmark/data/kit_frames_probe_{uug,ttvirt}.json, kit_bakar_figs.json, kit_loop_cov_heldout_{top,bottom}.json,
+      kit_threshold_scan.json; figs kit_frames_boost_*, bakar/, kit_threshold_scan_d405*
+    written: '2026-11-12T14:18:40+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
