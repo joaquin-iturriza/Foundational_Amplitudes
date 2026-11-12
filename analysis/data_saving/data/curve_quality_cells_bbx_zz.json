@@ -1,0 +1,28 @@
+{
+ "scr": {
+  "cells": 7,
+  "good": 1,
+  "per_cell": {
+   "10": false,
+   "32": false,
+   "100": false,
+   "316": false,
+   "1000": false,
+   "3162": false,
+   "10000": true
+  }
+ },
+ "ft": {
+  "cells": 7,
+  "good": 0,
+  "per_cell": {
+   "10": false,
+   "32": false,
+   "100": false,
+   "316": false,
+   "1000": false,
+   "3162": false,
+   "10000": false
+  }
+ }
+}

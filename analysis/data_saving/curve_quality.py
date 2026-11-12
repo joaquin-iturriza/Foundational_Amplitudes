@@ -148,7 +148,39 @@ def cells(target):
         out[arm] = {"cells": len(rr), "good": n, "per_cell": {f"{r['D']:.0f}": r["well"] for r in rr}}
         print(f"{target} {arm}: {n} of {len(rr)} search bests good")
     json.dump(out, open(os.path.join(DATA, f"curve_quality_cells_{target}.json"), "w"), indent=1)
+    cell_curves(target, rows)
     return out
+
+
+def cell_curves(target, rows):
+    """figs/cell_curves_<target>: one panel per D, each arm's search best, validation solid and training dashed, in
+    ln units; the eighth panel holds the legend."""
+    sys.path.insert(0, os.path.abspath(os.path.join(HERE, "..", "..")))
+    import plot_style as ps
+    ps.use()
+    Ds = sorted({r["D"] for r in rows})
+    fig, axs = ps.figure(4, 2)
+    col = {"scr": ps.C.blue, "ft": ps.C.vermillion}
+    for ax, D in zip(axs.flat, Ds):
+        for arm in ("scr", "ft"):
+            for r in (x for x in rows if x["D"] == D and x["arm"] == arm):
+                p, st = r["prepd_std"] ** 2, np.arange(len(r["val"])) * (r.get("every") or 1)
+                ax.plot(st, np.array(r["val"]) * p, color=col[arm])
+                if r.get("train"):
+                    ax.plot(st[:len(r["train"])], np.array(r["train"]) * p, color=col[arm], ls="--")
+        ax.set_yscale("log")
+        ax.set_title(f"$D={D:.0f}$", fontsize=8)
+        ax.set_xlabel("step")
+    for ax in axs.flat[len(Ds):]:
+        ax.axis("off")
+    leg = axs.flat[-1]
+    for arm, lab in (("scr", "scratch"), ("ft", "fine-tune")):
+        leg.plot([], [], color=col[arm], label=f"{lab}, val")
+        leg.plot([], [], color=col[arm], ls="--", label=f"{lab}, train")
+    leg.legend(loc="center")
+    axs.flat[0].set_ylabel("MSE (ln)")
+    axs.flat[4].set_ylabel("MSE (ln)")
+    ps.save(fig, os.path.join(HERE, "figs", f"cell_curves_{target}"))
 
 
 if __name__ == "__main__":
