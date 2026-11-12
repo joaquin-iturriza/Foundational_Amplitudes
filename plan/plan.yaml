@@ -27422,6 +27422,28 @@ entries:
       if Joaquin wants that, asked once. NO: Coulomb gain not at every seed: one-seed effect; B stays. The spread_T per family
       is reported as the transformer''s band for the D411 one-seed readings (ReZero) and the earlier ones. Cost: 4 runs x
       ~1.5 h (3c2996dc''s 8000 steps + sigma stage + scoring on V100) = 6 GPU-h, disk ~4 x 75 MB against tens of GB free.'
+    fix_at: '2026-11-12T09:07:33+00:00'
+    fix: '(3, seeds) The design adds seeds 43 and 44 to two arms while every other KIT arm runs one seed, and D315 (in force,
+      ''For the scaling grid, and in general. I see no reason to keep doing multiple seeds, we have plenty of multiple seeded
+      runs and the variation seems to be pretty consistent.'') says one seed in general; no quote on the entry names these
+      seeds (D411/D412 ask for depth, not seeds) and the design never mentions D315. This is Joaquin''s call: record it with
+      plan ask, worded as the question, e.g. ''The target V x beta arm gains 3.2 decades at the t t~ Coulomb threshold but
+      loses 0.56 decades in the bulk and 0.57 on Sudakov at one seed; single-process transformer runs have shown seed spreads
+      of a factor 1.1-30 at fixed HPs (results.tex, Seed noise and the best-of-trials bias), which D315''s consistent variation
+      (multi-process pools, 0.05-0.15 decades) does not cover. Two more seeds of both arms (4 runs, ~6 GPU-h) would say whether
+      the loss is real; run them, or read the trade at one seed?'' The runs wait on his answer; the rest of the entry continues.
+      (5, prior) The prior says no transformer seed spread exists; docs/results.tex ~13232-13245 (Seed noise and the best-of-trials
+      bias: solo 2->2 references rerun at fixed HPs with three more seeds, loss spreads by a factor 1.1-30, ee->dd at 4000
+      steps 2.4e-6..4.6e-4) is a measured transformer seed spread on single-process runs, the closest setup to a KIT from-scratch
+      run, and the catalog studies give per-pool seed spreads 0.054 (~2068), 0.09/0.12 (~1299), 0.148 (~7413). Name them with
+      their numbers and say what they leave open (in-distribution only; none on extrapolation strata), which is also the argument
+      for the question above. (4, outcome) The branches leave a gap: bulk or Sudakov worse than the band at some seeds but
+      not all is neither YES (needs within at the median) nor NO-trade (needs worse at every seed); state which branch it
+      falls in. Checks that hold: one change per pair (only data.target_times_beta differs, matched seeds); measure moves
+      (kit_readout --vs on kit_fig_A_vbeta.json @7adcd6f8 reproduces bulk +0.562, Sudakov +0.568 [+0.15,+1.74], Coulomb -3.163
+      [-3.94,-2.76]); seed override reaches the run (job_kit.sh line 41 appends seed= after seed=42 at line 89, run dir _softpairthr_seed43
+      with tag before seed); HETEROSC, float64, same launch path, scoring and KIT test strata as the controls; ~75 MB per
+      run.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
