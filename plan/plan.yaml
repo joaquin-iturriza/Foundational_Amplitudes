@@ -23772,7 +23772,7 @@ entries:
     at: '2026-11-12T00:30:53+00:00'
   step_waits:
     '2': '2026-11-13'
-    '1': FA-ccin2p3-01d337b5 FA-ccin2p3-e39d21ec
+    '1': FA-ccin2p3-cf880cbe FA-ccin2p3-3e0ddcc3
     '3': '2026-11-12T02:15 the site gate''s 60-min window clears (pID arms'' 2 x 3:45 limits plus this run''s 25:30 limit
       count 33.2 > 30; estimated use of the batch 26.5 GPU-h, under budget): then submit the AdamW x16 twin as designed (optrec_adamw_x16,
       LONG_OPT=adamw LONG_HEADS=8 LONG_FACTOR=16 LONG_HP=1262 LONG_MEMMAP=true, --time 25:30:00, gpu_v100, --est-gpu-hours
