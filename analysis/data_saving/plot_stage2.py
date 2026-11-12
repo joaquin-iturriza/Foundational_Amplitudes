@@ -8,7 +8,7 @@
 
     stage2_LD_bbx_zz  D413's second example (b b~ > Z Z, LO and one-loop V/B) on test_ln, alone with --second
 
-    python analysis/data_saving/plot_stage2.py [--second]
+    python analysis/data_saving/plot_stage2.py [--second [--only bbx_zz_nlo]]
 """
 import json
 import os
@@ -46,7 +46,9 @@ def tex_level(x):
 
 
 def ld(gpu, panels=T, key="test", name="stage2_LD"):
-    fig, axs = ps.figure(ncols=2, nrows=len(panels) // 2)
+    fig, axs = ps.figure(ncols=min(2, len(panels)), nrows=max(1, len(panels) // 2),
+                         width="full" if len(panels) > 1 else "half")
+    axs = np.atleast_1d(axs)
     for n, (ax, (tg, lab, ylab)) in enumerate(zip(axs.ravel(), panels)):
         f = R["fits"].get(key, {}).get(tg)
         lv = tex_level(f["level"]) if f else None    # the readout level: max(1e-4, the lowest both arms reach), D373
@@ -54,6 +56,13 @@ def ld(gpu, panels=T, key="test", name="stage2_LD"):
             cc = cells(tg, a, key)
             x = [c["search_gpu_h"] for c in cc] if gpu else [c["D"] for c in cc]
             ax.plot(x, [c[key] for c in cc], marker=m, linestyle="none" if not gpu else "-", color=col, label=name_)
+            # curve_quality.py --cells: a search best whose validation turns up at the end is drawn open
+            cq = os.path.join(REPO, f"analysis/data_saving/data/curve_quality_cells_{tg}.json")
+            if not gpu and os.path.exists(cq):
+                up = json.load(open(cq))[a]["per_cell"]
+                xo = [xx for xx, c in zip(x, cc) if up.get(f"{c['D']:.0f}") is False]
+                ax.plot(xo, [c[key] for c in cc if up.get(f"{c['D']:.0f}") is False], marker=m, linestyle="none",
+                        color="white", markeredgecolor=col, label="val turns up at the end" if a == "ft" else None)
             if f and not gpu:
                 A, Linf = f["fit"][a]
                 D = np.logspace(np.log10(min(x)), np.log10(max(x)), 100)
@@ -73,7 +82,7 @@ def ld(gpu, panels=T, key="test", name="stage2_LD"):
     if gpu:
         ps.legend(axs.ravel()[0], "lower left")
     else:
-        ps.shared_legend(fig, axs.ravel()[0], ncol=2)
+        ps.shared_legend(fig, axs.ravel()[0], ncol=2 if len(panels) > 1 else 1)
     ps.save(fig, FIG + ("stage2_gpuh" if gpu else name))
 
 
@@ -153,7 +162,9 @@ def lr_val(tg, lab):
 
 
 if "--second" in sys.argv:
-    ld(False, SECOND, "test_ln", "stage2_LD_bbx_zz")
+    # --only <target>: one half alone (the one-loop half was read while the LO searches still ran)
+    only = sys.argv[sys.argv.index("--only") + 1] if "--only" in sys.argv else None
+    ld(False, [p for p in SECOND if only in (None, p[0])], "test_ln", "stage2_LD_bbx_zz" + (f"_{only}" if only else ""))
     sys.exit()
 ld(False)
 ld(True)

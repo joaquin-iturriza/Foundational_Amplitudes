@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 """pretrain_data_saving lower-lr-centre test readout (design passed 2026-11-12 12:47): e+e- > t t~ LO, D=3162, T=8500,
-scratch and fine-tune searches at the lr centre c/3 and c/10, each read by curve_quality.py's bars on every trial
-against its control search (scratch: dsave_s2_scr, fine-tune: dsave_s4_ft, same cell), in the design's order:
-  WELL             best trial passes all four bars, >= 3 of its trials pass, best val min <= 2x the control's best
-  CLEAN BUT WORSE  best passes the bars (or >= 3 trials do), best val min > 2x the control's best
-  BETTER, NOT WELL >= 3 trials at or below the spike bar (control fewer), or median jitter < control's / 3
-  NO CHANGE        none of the above
+scratch and fine-tune searches at the lr centre c/3 and c/10, each against its control search (scratch: dsave_s2_scr,
+fine-tune: dsave_s4_ft, same cell), by Joaquin's two reads (2026-11-12, curve_quality.py): the best validation loss of
+the search (LOWER / HIGHER beyond 2x the control's, else SAME) and whether that best trial's validation falls with
+training to the end (tracks / turns up); per search the trials that track.
 Validation minimum in ln units (min of the val mu-MSE curve x prepd_std^2). Failed trials (diverged) listed apart.
 Figure figs/lr_centre_curves_{a,b} (a scratch, b fine-tune): each search's best trial, val solid and train dashed.
 
@@ -22,7 +20,7 @@ REPO = os.path.abspath(os.path.join(HERE, "..", ".."))
 sys.path.insert(0, REPO)
 sys.path.insert(0, HERE)
 from analysis.common.readers import site_python  # noqa: E402
-from curve_quality import BAR, quality  # noqa: E402
+from curve_quality import quality  # noqa: E402
 from s4_readout import failed  # noqa: E402
 from suspects_readout import YLAB, ps  # noqa: E402
 from trial_overfit import REMOTE  # noqa: E402
@@ -67,28 +65,23 @@ def search(rr, arm, name):
         r["val_min"] = min(r["val_ln"])
         hp = r["hp"]
         r["peak_lr"] = hp["lr"] * (hp["lr_scale"] if arm == "ft" else 1.0)
-        r.update(quality(r["val"], r.get("train"), hp["warmup_frac"] or 0.0))
+        r.update(quality(r["val"], r.get("train")))
         out.append(r)
     return out
 
 
 def summary(g):
     b = min(g, key=lambda r: r["val_min"])
-    return {"n": len(g), "n_well": sum(r["well"] for r in g), "n_spike_ok": sum(r["spike"] <= BAR["spike"] for r in g),
-            "median_jitter": float(np.median([r["jitter"] for r in g])), "best_min": b["val_min"],
-            "best": {k: b[k] for k in ("run_dir", "peak_lr", "steady", "spike", "jitter", "gap", "well")}}
+    return {"n": len(g), "n_tracks": sum(r["well"] for r in g), "best_min": b["val_min"],
+            "best": {k: b[k] for k in ("run_dir", "peak_lr", "end_over_best", "late_val", "late_train", "well", "stalls")}}
 
 
 def verdict(s, c):
-    level = s["best_min"] <= 2 * c["best_min"]
-    if s["best"]["well"] and s["n_well"] >= 3 and level:
-        return "WELL"
-    if s["best"]["well"] or s["n_well"] >= 3:
-        if not level:
-            return "CLEAN BUT WORSE"
-    if (s["n_spike_ok"] >= 3 > c["n_spike_ok"]) or s["median_jitter"] < c["median_jitter"] / 3:
-        return "BETTER, NOT WELL"
-    return "NO CHANGE"
+    """The arm against its control by Joaquin's two reads (curve_quality.py): the best validation loss (LOWER / HIGHER
+    at 2x, else SAME) and whether that best trial's validation falls with training to the end."""
+    r = s["best_min"] / c["best_min"]
+    return ("LOWER" if r < 0.5 else "HIGHER" if r > 2 else "SAME") + f" ({r:.2g}x)" + \
+        (", best tracks" if s["best"]["well"] else ", best turns up")
 
 
 def main():
@@ -109,9 +102,9 @@ def main():
             for centre, s in S.items():
                 s["verdict"] = None if centre == "control" or "control" not in S else verdict(s, S["control"])
                 b = s["best"]
-                print(f"{cell:20s} {arm:3s} {centre:7s} n={s['n']} well {s['n_well']} spike<=3 {s['n_spike_ok']} "
-                      f"median jitter {s['median_jitter']:.2f}  best min {s['best_min']:.2e} (peak lr {b['peak_lr']:.2e}: "
-                      f"steady {b['steady']:.2f} spike {b['spike']:.1f} jitter {b['jitter']:.2f} gap {b['gap'] or 0:.1f})"
+                print(f"{cell:20s} {arm:3s} {centre:7s} n={s['n']} tracks {s['n_tracks']}  best min {s['best_min']:.2e} "
+                      f"(peak lr {b['peak_lr']:.2e}: end/best {b['end_over_best']:.2f} late val {b['late_val']:.2f} "
+                      f"late train {b['late_train'] or float('nan'):.2f}{', stalls' if b['stalls'] else ''})"
                       + (f"  failed {s['failed']}" if s["failed"] else "") + (f"  -> {s['verdict']}" if s["verdict"] else ""))
             res[f"{cell}/{arm}"] = S
     json.dump(res, open(os.path.join(DATA, f"lr_centre_readout{SUFFIX}.json"), "w"), indent=1)

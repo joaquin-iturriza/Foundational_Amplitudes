@@ -2,18 +2,16 @@
  "epem_ttx_d7_t8500/scr": {
   "control": {
    "n": 9,
-   "n_well": 0,
-   "n_spike_ok": 0,
-   "median_jitter": 0.7359594307588919,
+   "n_tracks": 6,
    "best_min": 8.539538591395683e-09,
    "best": {
     "run_dir": "runs/dsave_s2_scr_epem_ttx_d7_t8500/trial_0640",
     "peak_lr": 0.005622732,
-    "steady": 0.4190742082626378,
-    "spike": 21.269597703291407,
-    "jitter": 0.7028284910290394,
-    "gap": 5.067362892407218,
-    "well": false
+    "end_over_best": 1.001929752747487,
+    "late_val": 0.0017389428733691514,
+    "late_train": 0.00020276620838120783,
+    "well": true,
+    "stalls": false
    },
    "failed": [
     [
@@ -25,38 +23,34 @@
   },
   "mu-only": {
    "n": 8,
-   "n_well": 0,
-   "n_spike_ok": 4,
-   "median_jitter": 0.17306434131021664,
+   "n_tracks": 8,
    "best_min": 4.055650790288099e-08,
    "best": {
     "run_dir": "runs/dsave_muonlymse_scr_epem_ttx_d7_t8500/trial_0233",
     "peak_lr": 0.003733585,
-    "steady": 0.4809262833100518,
-    "spike": 250.24278769337886,
-    "jitter": 0.27932964924407244,
-    "gap": 2.480357917313203,
-    "well": false
+    "end_over_best": 1.0,
+    "late_val": 0.000224196012303635,
+    "late_train": 0.0007303139455982709,
+    "well": true,
+    "stalls": false
    },
    "failed": [],
-   "verdict": "BETTER, NOT WELL"
+   "verdict": "HIGHER (4.7x), best tracks"
   }
  },
  "epem_ttx_d7_t8500/ft": {
   "control": {
    "n": 7,
-   "n_well": 0,
-   "n_spike_ok": 0,
-   "median_jitter": 0.9246992798268934,
+   "n_tracks": 5,
    "best_min": 8.219863874168195e-09,
    "best": {
     "run_dir": "runs/dsave_s4_ft_epem_ttx_d7_t8500/trial_1545",
     "peak_lr": 0.0031777316634999993,
-    "steady": 0.7295951908918893,
-    "spike": 72.2844125222063,
-    "jitter": 0.5171338484429873,
-    "gap": 7.704678610047622,
-    "well": false
+    "end_over_best": 1.0,
+    "late_val": 0.09910262524148719,
+    "late_train": 0.004796759094599548,
+    "well": true,
+    "stalls": false
    },
    "failed": [
     [
@@ -68,114 +62,102 @@
   },
   "mu-only": {
    "n": 8,
-   "n_well": 1,
-   "n_spike_ok": 1,
-   "median_jitter": 0.310244997373879,
+   "n_tracks": 6,
    "best_min": 4.8934149159537734e-08,
    "best": {
     "run_dir": "runs/dsave_muonlymse_ft_epem_ttx_d7_t8500/trial_1554",
     "peak_lr": 0.0030528933917999997,
-    "steady": 0.6263510171802059,
-    "spike": 633.2337744035843,
-    "jitter": 0.3298775861394274,
-    "gap": 11.533594901335956,
-    "well": false
+    "end_over_best": 3.7846825543442826,
+    "late_val": 0.9606343914839633,
+    "late_train": 0.028755695080826166,
+    "well": false,
+    "stalls": false
    },
    "failed": [],
-   "verdict": "NO CHANGE"
+   "verdict": "HIGHER (6x), best turns up"
   }
  },
  "ee_uu_nlo_d7_t8500/scr": {
   "control": {
    "n": 8,
-   "n_well": 0,
-   "n_spike_ok": 0,
-   "median_jitter": 0.3274618169382595,
+   "n_tracks": 8,
    "best_min": 0.0001660323336144938,
    "best": {
     "run_dir": "runs/dsave_s2_scr_ee_uu_nlo_d7_t8500/trial_1978",
     "peak_lr": 0.004945222,
-    "steady": 0.8637488568544333,
-    "spike": 20.672402076757134,
-    "jitter": 0.41119941511765745,
-    "gap": 8.12384785163683,
-    "well": false
+    "end_over_best": 1.050253975163345,
+    "late_val": 0.2658269998069835,
+    "late_train": 0.021432607182630597,
+    "well": true,
+    "stalls": false
    },
    "failed": [],
    "verdict": null
   },
   "mu-only": {
    "n": 8,
-   "n_well": 0,
-   "n_spike_ok": 1,
-   "median_jitter": 0.15506604512619715,
+   "n_tracks": 7,
    "best_min": 0.000991142054549247,
    "best": {
     "run_dir": "runs/dsave_muonlymse_scr_ee_uu_nlo_d7_t8500/trial_0678",
     "peak_lr": 0.006654779,
-    "steady": 0.7876814381220256,
-    "spike": 7.285126244030484,
-    "jitter": 0.1474674989872451,
-    "gap": 523.5133315690119,
-    "well": false
+    "end_over_best": 1.0,
+    "late_val": 0.5764433775379273,
+    "late_train": 0.0004720799845726194,
+    "well": true,
+    "stalls": false
    },
    "failed": [],
-   "verdict": "NO CHANGE"
+   "verdict": "HIGHER (6x), best tracks"
   }
  },
  "ee_uu_nlo_d7_t8500/ft": {
   "control": {
    "n": 8,
-   "n_well": 0,
-   "n_spike_ok": 1,
-   "median_jitter": 0.371222823651129,
+   "n_tracks": 8,
    "best_min": 5.52248516333559e-05,
    "best": {
     "run_dir": "runs/dsave_s2_ft_ee_uu_nlo_d7_t8500/trial_0629",
     "peak_lr": 0.006153729226299999,
-    "steady": 0.8528349255805725,
-    "spike": 2.358776889850101,
-    "jitter": 0.14708585579208489,
-    "gap": 74.89869636166843,
-    "well": false
+    "end_over_best": 1.0,
+    "late_val": 0.6780571402787899,
+    "late_train": 0.013351367227691547,
+    "well": true,
+    "stalls": false
    },
    "failed": [],
    "verdict": null
   },
   "mu-only": {
    "n": 8,
-   "n_well": 1,
-   "n_spike_ok": 3,
-   "median_jitter": 0.06744378084518488,
+   "n_tracks": 6,
    "best_min": 7.6087676613462554e-06,
    "best": {
     "run_dir": "runs/dsave_muonlymse_ft_ee_uu_nlo_d7_t8500/trial_1539",
     "peak_lr": 0.0008892736454999999,
-    "steady": 0.8183910469983112,
-    "spike": 1.3158857535277921,
-    "jitter": 0.07269815583517936,
-    "gap": 12.810621982551309,
-    "well": false
+    "end_over_best": 1.0033188236286863,
+    "late_val": 0.49112961554380824,
+    "late_train": 0.03993154980111266,
+    "well": true,
+    "stalls": false
    },
    "failed": [],
-   "verdict": "BETTER, NOT WELL"
+   "verdict": "LOWER (0.14x), best tracks"
   }
  },
  "ee_uu_nlo_d8_t8500/scr": {
   "control": {
    "n": 7,
-   "n_well": 0,
-   "n_spike_ok": 0,
-   "median_jitter": 0.5460363718894472,
+   "n_tracks": 7,
    "best_min": 2.7282589254317528e-05,
    "best": {
     "run_dir": "runs/dsave_s2_scr_ee_uu_nlo_d8_t8500/trial_0398",
     "peak_lr": 0.02784405,
-    "steady": 0.5536703643848385,
-    "spike": 227.85127443071698,
-    "jitter": 0.9562958112869335,
-    "gap": 1.2544309676079672,
-    "well": false
+    "end_over_best": 1.0,
+    "late_val": 0.025643931948769648,
+    "late_train": 0.0016856761879064765,
+    "well": true,
+    "stalls": false
    },
    "failed": [
     [
@@ -187,38 +169,34 @@
   },
   "mu-only": {
    "n": 8,
-   "n_well": 1,
-   "n_spike_ok": 2,
-   "median_jitter": 0.25111939553313434,
+   "n_tracks": 8,
    "best_min": 4.3409732240892816e-05,
    "best": {
     "run_dir": "runs/dsave_muonlymse_scr_ee_uu_nlo_d8_t8500/trial_0177",
     "peak_lr": 0.02444346,
-    "steady": 0.8057017184091141,
-    "spike": 2.494440679588612,
-    "jitter": 0.3432171952324421,
-    "gap": 2.9184655086940383,
-    "well": true
+    "end_over_best": 1.216411195063363,
+    "late_val": 0.23535841546755498,
+    "late_train": 0.012516828236410567,
+    "well": true,
+    "stalls": false
    },
    "failed": [],
-   "verdict": "NO CHANGE"
+   "verdict": "SAME (1.6x), best tracks"
   }
  },
  "ee_uu_nlo_d8_t8500/ft": {
   "control": {
    "n": 7,
-   "n_well": 0,
-   "n_spike_ok": 0,
-   "median_jitter": 0.4644444277492301,
+   "n_tracks": 7,
    "best_min": 3.537312303671902e-07,
    "best": {
     "run_dir": "runs/dsave_s2_ft_ee_uu_nlo_d8_t8500/trial_1522",
     "peak_lr": 0.0010182966912,
-    "steady": 0.7569803850241523,
-    "spike": 40.74148972982565,
-    "jitter": 0.4644444277492301,
-    "gap": 1.9138131366278401,
-    "well": false
+    "end_over_best": 1.0001245052024772,
+    "late_val": 0.1058967202855464,
+    "late_train": 0.03916543639901126,
+    "well": true,
+    "stalls": false
    },
    "failed": [
     [
@@ -230,21 +208,19 @@
   },
   "mu-only": {
    "n": 8,
-   "n_well": 1,
-   "n_spike_ok": 2,
-   "median_jitter": 0.28429793408681747,
+   "n_tracks": 8,
    "best_min": 2.082418158341556e-06,
    "best": {
     "run_dir": "runs/dsave_muonlymse_ft_ee_uu_nlo_d8_t8500/trial_1386",
     "peak_lr": 0.0009413537894999999,
-    "steady": 0.9003269842593725,
-    "spike": 1.4450548190598858,
-    "jitter": 0.07070929006428095,
-    "gap": 2.866156001702304,
-    "well": true
+    "end_over_best": 1.0,
+    "late_val": 0.7900885733319342,
+    "late_train": 0.537333428594445,
+    "well": true,
+    "stalls": false
    },
    "failed": [],
-   "verdict": "CLEAN BUT WORSE"
+   "verdict": "HIGHER (5.9x), best tracks"
   }
  }
 }
