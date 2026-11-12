@@ -27092,6 +27092,7 @@ entries:
     - FA-ccin2p3-4f3b24ef
     - FA-ccin2p3-6f578ef2
     - FA-ccin2p3-761cb2d8
+    - FA-ccin2p3-7aff4018
     - FA-ccin2p3-7d74d518
     - FA-ccin2p3-84d3488e
     - FA-ccin2p3-88aa155a
@@ -27104,23 +27105,27 @@ entries:
     - FA-ccin2p3-ce09d554
     - FA-ccin2p3-d97ae1c0
     - FA-ccin2p3-dc799c8e
+    - FA-ccin2p3-dcf42ad6
     - FA-ccin2p3-de744946
     - FA-ccin2p3-e1c19b4d
     - FA-ccin2p3-e4eecead
+    - FA-ccin2p3-e7dca162
     - FA-ccin2p3-e8088a7d
     - FA-ccin2p3-eb0f30db
     - FA-ccin2p3-f45f434a
     - FA-ccin2p3-f6b2ece9
-    commit: 69e944dc
+    commit: e88e79d7
     paths:
     - analysis/kit_benchmark/data/kit_curves_read.json
     - analysis/kit_benchmark/data/kit_fig_A.json
     - analysis/kit_benchmark/data/kit_fig_A_gmax4_uug.json
+    - analysis/kit_benchmark/data/kit_fig_Aft_thrloop.json
     - analysis/kit_benchmark/data/kit_threshold_scan.json
     - models/lloca.py
     - scripts/job_kit_package.sh
     - scripts/job_kit_rescore.sh
     - scripts/job_kit_threshold.sh
+    - sweep/drive.py
     - sweep/sweep_config_kit_hpo_ttvirt_thr.yaml
     - sweep/sweep_config_kit_hpo_uug_T.yaml
     - sweep/sweep_config_kit_hpo_uug_plain.yaml
