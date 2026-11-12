@@ -15788,10 +15788,6 @@ entries:
       notifications after a hand-back were already absorbed; owner resumes by peer hand-backs cannot be held (Claude Code
       offers no delivery delay, an owner has no waiter). Also confirm the first run of a held item that ends gets its RUN
       event and RUN_DONE with no manual poll (next 19 fix).'
-    24: 'Live measure of the waiter rule (URGENT_KINDS, 2026-11-12): once the main session re-armed its waiter on the new
-      site code, python3 tools/waiter_replay.py --since <re-arm> --until <+12 h> against the waiter''s actual returns in that
-      time (HANDBACK acks ''delivered by the events waiter'' and the main-session wakes); step 23 closes only if the returns
-      are fewer than the old rule''s on the same events'
     25: 'Restore of CC pools deleted 2026-11-11 (design passed 2026-11-12T01:37; batches heldout_train_regen 32, pp4_series_regen
       32, pp4_parts 2 @0b4bbd63). At 03:00 local: H 684/700 train pools built, PP4 431/504; shard 12 (FA-ccin2p3-0c2d61c6)
       refused 2 pools by prebuild''s 20 GB free floor (/sps/lpnhe 17 GB free: amp_mmap_cache 26 GB, lhe_parts 15 GB). When
@@ -16286,12 +16282,6 @@ entries:
       if:
       - 'saving within or above 11-30% on main per day: keep 10 min'
       - 'below: report to Joaquin with numbers and causes'
-    24:
-      feeds: whether the hand-back batching cuts main-session wakes
-      if:
-      - 'new < old on the same events: close step 23, report the cut'
-      - 'new = old: ask Joaquin for a longer window than D324''s 10 minutes, with the replay''s 20/15/13/11 returns at 10/20/30/60
-        min'
     25:
       feeds: whether the held-out reads (optimizations_recap, PP4/H axes) can run again on CC
       if:
