@@ -24252,7 +24252,7 @@ entries:
     start: '2026-11-12T03:17:01+00:00'
     at: '2026-11-12T03:17:01+00:00'
   step_waits:
-    '2': '2026-11-13'
+    '2': step 3's AdamW long run (designed after its read, per the hand-off)
     '1': FA-ccin2p3-882757e3 FA-ccin2p3-3d3fb9c6
     '3': 'detach:optrec_gpuh_window (65-min timer, then submit the AdamW twin: the 30 GPU-h-per-60-min submit gate)'
   handoff:
