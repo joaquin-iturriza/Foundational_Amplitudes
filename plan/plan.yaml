@@ -27095,6 +27095,19 @@ entries:
       on each particle''s static property encoding (code: model.input_log_skip=2, wrappers._log_skip). Degree 2 (P_2(L)) =
       runs 7b891d10, eb870ad4; degree 1 (P_1(L), c2 = b2 = 0, model.input_log_skip_linear) = runs c4fc1d6f, 6bc05a40. Figures
       renamed kit_extrap_logpoly_* / kit_extrap_logpolylin_*, data kit_fig_A_logpoly_{uug,tt}.json (99b96f4b).'
+  - at: '2026-11-12T17:48:46+00:00'
+    text: '2026-11-12 ~19:00. 11c parent r5loop FA-ccin2p3-066f8539 FAILED: training ran clean to step 1263 (train loss -1.6,
+      grad norm 8-23, lr 7.7e-3 just past the 775-step warmup), then at step 1264-1265 a loss runaway (grad 450 -> 1.1e5 ->
+      1.2e6, loss -1.55 -> +4.9 in 3 steps, 1e5 by step 1282), non-finite gradients from ~1300, aborted at 1451 by the 50-step
+      non-finite guard (log; runs/data_saving/dsave_parent_heldoutthrloop_r5loop/train_steps.npz). No data or code fault:
+      no NaN input, no precursor (step-to-step grad jitter 0.57 vs controls'' 1.02/0.77 in steps 1100-1260); the controls
+      r5 4ab99f50 / r5beta 66a2efda at the same lr and dtype show the same isolated 1e12-1e15 grad spikes and recovered. Repair
+      inside the 11c approval: parent rerun unchanged (new run dir tag r5loop_rerun, code 950f6522: only default-off flags
+      on the training path since c9ff1dbd) FA-ccin2p3-2d653209, its A_ft FA-ccin2p3-dcf42ad6 (afterok, KIT_PARENT=runs/data_saving/dsave_parent_heldoutthrloop_r5loop_rerun,
+      tag ftr5thrloopown); dead cb111375 cancelled. Sister ca5873f3 (r5loopbeta) at step 1719 healthy (loss -1.8, grad 10-29),
+      past the failing region as the cosine lr falls; at the same risk in principle, nothing in its trace predicts it. If
+      the rerun diverges again: the one-loop pools make the pair unstable at this lr, and the next attempt (lower lr for the
+      loop parents and their controls) is a design revision.'
   step_why:
     5:
       feeds: what KIT receives
