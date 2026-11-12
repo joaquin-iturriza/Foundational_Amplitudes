@@ -24683,6 +24683,9 @@ entries:
     10: 'D411 ReZero arm (design passed 2026-11-12 ~05:33; layer_norm=false diverged, finding ~05:30): read the uug and tt
       virtual softpair_rezero runs vs c15b3337/f21fa163 and Bakar''s MLP with kit_extrap_read (arm added to its collect) and
       kit_readout --vs; MOVED/STAYED per the design'
+    11: 'Step 6 Coulomb rise, target side (design passed 2026-11-12 ~05:45): read kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr_vbeta
+      (data.target_times_beta, 9df60812) vs 3fc1016a with kit_figures collect + kit_readout --vs and kit_threshold_scan; YES/UNRESOLVED/NO
+      per the design (Coulomb median vs 0.84, exponent vs -0.32 and -1.02; median < -0.84 with exponent not closer reads UNRESOLVED)'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -25304,6 +25307,12 @@ entries:
       if:
       - 'both MOVED: the arm on uugg and tt Born'
       - 'both STAYED or inconclusive: transformer fed Bakar''s inputs only'
+    11:
+      feeds: the KIT protocol-A t t~ virtual threshold model and the package; whether B stays the threshold model below beta
+        0.14
+      if:
+      - 'YES: package it as the protocol-A threshold model, redraw the scan'
+      - 'NO: B stays; threshold data (D405) is the lever'
   step_waits:
     '5': '2026-11-13'
     '9': FA-ccin2p3-62dcf910 FA-ccin2p3-6390978c FA-ccin2p3-5433329e
