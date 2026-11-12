@@ -25348,6 +25348,16 @@ entries:
       tools/born_record.py <pool> reads it. LO: design revised after FIX (own calibration, D391) and PASSED; parent FA-ccin2p3-0d698e4b
       (job_datasaving_parent.sh heldoutbbzz @15486032) and calibration FA-ccin2p3-{39823ff8,6293be00,f28fe38e,c7213cbd,56381216,714db3a4,148ccdb9}
       (job_data_saving.sh bbx_zz k 8000 scratch tag=cal_lo, k=2..8) submitted.'
+  - at: '2026-11-12T15:34:24+00:00'
+    text: '2026-11-12 16:45 CET: mu-only MSE test read (lr_centre_readout.py --test muonly, data @0608a929; figs analysis/data_saving/figs/muonly_curves_{epem,ee_uu_nlo_d7,ee_uu_nlo_d8}_{a,b}).
+      t t~ LO D=3162, best val mu-MSE (ln) / well / spike<=3 / median jitter: scratch control 8.5e-9 / 0 of 9 / 0 / 0.74;
+      mu-only 4.1e-8 / 0 of 8 / 4 / 0.17 -> BETTER, NOT WELL (best trial spike 250 at step ~6000: val 1e-6 -> 1e-3, then falls
+      in the anneal). Fine-tune control 8.2e-9 / 0 of 7 / 0 / 0.92; mu-only 4.9e-8 / 1 of 8 / 1 / 0.31 -> NO CHANGE (best
+      trial spikes at ~2900 and ~4200, val flat at ~2e-7 from step ~7600 while train falls to ~1.5e-9: gap 11.5). Diagnostic
+      u u~ V: D=3162 scratch NO CHANGE, fine-tune BETTER NOT WELL (7.6e-6 vs 5.5e-5, jitter 0.07); D=1e4 scratch NO CHANGE,
+      fine-tune CLEAN BUT WORSE (2.1e-6 vs 3.5e-7). Removing the HETEROSC 1/sigma^2 weighting lowers jitter 3-4x but leaves
+      the large spikes and loses 5x at the minimum: it is not the fix. By the design''s outcome rule (not all WELL), the next
+      suspect is EMA fixed on.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
