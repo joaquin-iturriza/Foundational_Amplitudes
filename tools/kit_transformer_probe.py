@@ -17,6 +17,7 @@ and the dtypes. Per stratum: medians and maxima, and feat over bulk_train's 99.5
 
     python tools/kit_transformer_probe.py <run_dir> [--n 200] [--out <json>]    (CPU, in the site checkout; prints KITPROBE <json>)
     python tools/kit_transformer_probe.py --plot <uug json> <tt json> --figs <dir>   (local: the frames-boost figure)
+    python tools/kit_transformer_probe.py --plot-mE <tt json> --figs <dir>   (local: the lightlike-tops figure)
 """
 import argparse
 import json
@@ -69,7 +70,36 @@ def plot(paths, figs):
     ps.save_panels(panels, os.path.join(figs, "kit_frames_boost"))
 
 
+def plot_mE(path, figs):
+    """kit_tt_lightlike_{a,b}: tt virtual Sudakov strata against sqrt s: median log10 m/E of the tops (a; grey band
+    bulk_train's min to median) and median signed error pred - truth in log10|M|^2 (b)"""
+    import plot_style as ps
+    from tools.kit_figures import edges
+    ps.use()
+    d = json.load(open(path))["strata"]
+    tr = d["bulk_train/bulk"]
+    ks = sorted((k for k in d if k.startswith("hard_test/sudakov_sqrts")), key=lambda k: edges(k.split("/")[1])[0])
+    x = [np.sqrt(np.prod(edges(k.split("/")[1]))) for k in ks]
+    panels = ps.panels(2)
+    (fa, a), (fb, b) = panels
+    a.axhspan(tr["mE_min"], tr["mE_median"], color=ps.C.grey, alpha=0.25, lw=0, label="bulk train")
+    a.plot(x, [d[k]["mE_median"] for k in ks], "o-", color=ps.C.vermillion, label="Sudakov strata")
+    a.set_ylabel(r"median $\log_{10} m_t/E_t$")
+    a.set_ylim(min(d[k]["mE_median"] for k in ks) - 0.1, tr["mE_median"] + 0.1)   # axhspan does not autoscale
+    b.axhline(0, color=ps.C.grey, lw=1)
+    b.plot(x, [d[k]["err_median"] for k in ks], "o-", color=ps.C.vermillion, label="Sudakov strata")
+    b.set_ylabel(r"median signed error [$\log_{10}|M|^2$]")
+    for ax in (a, b):
+        from matplotlib.ticker import NullFormatter
+        ax.set_xscale("log"); ax.xaxis.set_minor_formatter(NullFormatter())   # ~1 decade: minor labels overlap
+        ax.set_xlabel(r"$\sqrt{s}$ [GeV]"); ps.legend(ax, "lower left")
+    ps.save_panels(panels, os.path.join(figs, "kit_tt_lightlike"))
+
+
 def main():
+    if "--plot-mE" in sys.argv:
+        i = sys.argv.index("--plot-mE")
+        return plot_mE(sys.argv[i + 1], sys.argv[sys.argv.index("--figs") + 1])
     if "--plot" in sys.argv:
         i = sys.argv.index("--plot")
         return plot(sys.argv[i + 1:i + 3], sys.argv[sys.argv.index("--figs") + 1])
