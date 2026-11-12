@@ -23782,6 +23782,15 @@ entries:
       point/path (null-parent read: pre at scratch HPs 9-122x scratch on V/B), the next design bisects the path on V/B. WORSE:
       gmean r_old >= 3: the old window held something scratch''s lacks; report. Read r_scr beside: within 3x of scratch =
       the fine-tune trains as well as scratch. No rerun of any search on any branch (one seed, D315).'
+    passed_at: '2026-11-12T09:56:21+00:00'
+    reviewer: 'Re-check of the 5-cell version: configs @10a63eea/fe43003f differ from dsave_s2_ft siblings only in layer_decay
+      fixed 1 and lr_scale [0.333,3] (V/B D=316 config checked by diff), full template space, 8 trials 3,3,2, HETEROSC mu_mse+sigma;
+      check 2: null-parent pre arm r_old tree 0.18/0.05 (gmean 0.095, read 4.08e-7/2.30e-6, 7.38e-9/1.61e-7), V/B 15/0.45/0.27,
+      D=1e4 1.37/0.92 confirmed in nullparent_readout.json vs ft_hpo_diag.json; check 3: tree expected 0.095 clears the 1/3
+      bar against rerun spread 0.46-4.84 (ln-sd ~0.4-0.6), V/B direction open and now covered by IMPROVED/NOT RESOLVED and
+      NO CHANGE branches, every case assigned; one seed and 8 trials as siblings (D315); 70 GB free on CC. Searched results.tex:
+      layer_decay, layer decay, LLRD, lr_scale, fine-tune search, search space; entry dead ends; site decisions (layer, lr_scale,
+      template, D407-D412).'
   step_waits:
     '2': FA-ccin2p3-dbd0ef14 FA-ccin2p3-9aa32fc7 FA-ccin2p3-5b23c48c FA-ccin2p3-06f25f84 FA-ccin2p3-be096b2b FA-ccin2p3-df21f86b
       FA-ccin2p3-6ec29bc9 FA-ccin2p3-7a60851a FA-ccin2p3-ace664ae FA-ccin2p3-d239df18 FA-ccin2p3-b2d0c0d3 FA-ccin2p3-3c7a44de
