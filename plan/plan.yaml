@@ -23956,7 +23956,8 @@ entries:
     '4': 'CC sync blocked: two untracked kit_benchmark files in the CC checkout (analysis/kit_benchmark/data/kit_sat_{ttvirt,uug}_scalars.json)
       differ from their committed versions at dddeacff, so git refuses the merge; their owner (kit_benchmark) or the main
       session clears them, then the owner restarts drive.py over the 7 dsave_s5_ft_epem_ttx configs @23664d71'
-    '5': 'a reviewer: design-reviewer on the V/B offshell-own design (recorded 12:29 CET)'
+    '5': same CC sync block; design PASSED, configs dsave_s6_ft_ee_ttbar_nlo_d{5,6,7} @dd45a677, target 1 h / 24 jobs; one
+      driver for both batches once CC syncs
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
