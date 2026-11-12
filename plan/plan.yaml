@@ -24449,6 +24449,17 @@ entries:
       deficit was in the search template, and pretraining gives no gain over scratch on t t~ tree at these HPs. On V/B the
       parent''s weights stay 9-122x above scratch even at scratch''s HPs; the V/B fine-tune control''s val is flat from step
       ~1000 while its train falls 1000x (memorisation).'
+  - at: '2026-11-12T10:18:41+00:00'
+    text: '2026-11-12 ~11:15 CET (owner aa6ece09678b3a02b): step-3 template test repaired inside its passed design. The 26
+      FAILED events of the first two drivers (E5900-E5925) are all FileNotFoundError on the dsave_s4_ft sweep config (trials
+      started 11:00-11:04 on the stale CC checkout, synced 11:08). Defect: with every earlier trial failed, the drivers had
+      suggested guided trials 3-7 of each search blind (_suggest_gp''s no-observation branch = random picks), and the --retry-failed
+      restart (s4_ft_template3) sent all 8 trials of each search at once: a random search, not the design''s waves 3,3,2.
+      Repair: driver stopped, the 19 queued/running guided trials scancelled, trials 3-7 dropped from sweeps_local/dsave_s4_ft_*/driver_state.json
+      and retracted from dyhpo_state.pkl (backups *.pre_rollback), CC synced to 473abb2e, driver restarted as detach s4_ft_template4
+      (no retry flags): the 15 start-up trials keep running, guided waves follow on their results. A real divergence, not
+      a defect: t t~ tree D=3162 start-up trial 2 (FA-ccin2p3-c61f4268, hp1932) aborted after 50 non-finite-gradient steps
+      at step 1439; it stays a failed trial (penalty).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
