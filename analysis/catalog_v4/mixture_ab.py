@@ -1667,6 +1667,65 @@ def warm_single():
     print(json.dumps(strip(out)))
 
 
+PIDQN = {"pid": "FA-ccin2p3-1805e04b", "qn": "FA-ccin2p3-65103811"}    # plan optimizations_recap step 1 (D364)
+
+
+def _pdgs_of(probe):
+    """The PDG ids of a probe's process (mg5_pipeline_final.PROCESSES), its read prefix (pp13_, pp13v4_, ee4_, hd_) and
+    variant suffix (__as130, __E20, __mt300) mapped to the v4_ entry; None when not found"""
+    import mg5_pipeline_final as mg
+    n = re.sub(r"^(pp13v4|pp13|ee4|hd|v4)_", "v4_", probe)
+    for c in (n, n.split("__")[0]):
+        if c in mg.PROCESSES and mg.PROCESSES[c].get("pdg_ids"):
+            return {abs(int(x)) for x in mg.PROCESSES[c]["pdg_ids"]}
+    return None
+
+
+def pidqn():
+    """One-hot PDG tokens (data.use_PIDs=true) over the quantum-number encoding at the same commit, the 1x width-8
+    cell, seed 42 each: R = median over classes of the class gmean MSE_pid/MSE_qn of ln|M|^2 per read, interval
+    widened by the width-8 seed pair's R_seed (par:v4_width's convention); held-out probes split by whether every
+    particle (|PDG|) is in the training recipe (one-hot has a trained token for it) -> data/pidqn.json"""
+    sys.path.insert(0, ROOT)
+    cls = class_of()
+    train = yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v4_default25_train.yaml")))["processes"]
+    seen, unknown_train = set(), []
+    for q in train:
+        g = _pdgs_of(q.get("base", q["name"]))
+        (unknown_train.append(q["name"]) if g is None else seen.update(g))
+    reads = {r: {k: read_of(run, r) for k, run in {**PIDQN, **dict(zip(("c42", "c43"), WIDTH["w8"]))}.items()}
+             for r in ("PP4", "EE4", "held", "HD4", "HD5")}
+    missing = [f"{r} {k}" for r, v in reads.items() for k, x in v.items() if x is None]
+    if missing:
+        sys.exit("pidqn: reads missing (extract them first): " + "; ".join(missing))
+    out = {"design": "plan optimizations_recap step 1 (pidqn), design passed 2026-11-12 00:25", "runs": PIDQN,
+           "seed_pair": WIDTH["w8"], "train_pdgs": sorted(seen), "train_unresolved": unknown_train, "reads": {}}
+    for r, v in reads.items():
+        keys = sorted(set(v["pid"]) & set(v["qn"]) & set(v["c42"]) & set(v["c43"]), key=str)
+        g = {k: _pdgs_of(probe_name(k)) for k in keys}
+        enc = [k for k in keys if g[k] is not None and g[k] <= seen]
+        unseen = [k for k in keys if g[k] is not None and not g[k] <= seen]
+        parts = {"all": keys, "encodable": enc, "unseen_particle": unseen}
+        if r == "held":
+            parts.update({ax: [k for k in enc if k[0] == ax] for ax in HELD})
+        res = {n: compare(v["pid"], v["qn"], v["c42"], v["c43"], ks, cls) for n, ks in parts.items() if ks}
+        res["n_probes"] = {"read": len(keys), "encodable": len(enc), "unseen_particle": len(unseen),
+                           "unresolved": sum(g[k] is None for k in keys),
+                           "unmatched": len((set(v["pid"]) ^ set(v["qn"])))}
+        res["unseen_pdgs"] = sorted({x for k in unseen for x in g[k] - seen})
+        res["median_mse"] = {a: round(float(np.median([v[a][k] for k in keys])), 5) for a in ("pid", "qn")}
+        res["qn_over_earlier_w8"] = compare(v["qn"], v["c42"], v["c42"], v["c43"], keys, cls)    # rerun check
+        out["reads"][r] = res
+    out["val_nll_best"] = {}
+    for a, run in PIDQN.items():
+        b = json.load(open(os.path.join(READS, f"{run}_val.json")))["blocks"]
+        out["val_nll_best"][a] = {"main": min(x for _, x in b[0]["vals"]), "sigma_stage": min(x for _, x in b[-1]["vals"])}
+    out["blowups"] = blowups(list(PIDQN.values()))
+    json.dump(out, open(os.path.join(DATA, "pidqn.json"), "w"), indent=1)
+    print(json.dumps({r: {n: x.get("R") if isinstance(x, dict) else x for n, x in v.items()
+                          if n not in ("qn_over_earlier_w8",)} for r, v in out["reads"].items()}, default=str))
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -1683,6 +1742,7 @@ def main():
     m.add_argument("--partial", action="store_true")
     m.add_argument("--het", action="store_true")
     sub.add_parser("width")
+    sub.add_parser("pidqn")
     sub.add_parser("arms")
     sub.add_parser("length")
     sub.add_parser("loader")
@@ -1706,6 +1766,8 @@ def main():
         heldout_default(a.het)
     elif a.cmd == "width":
         width()
+    elif a.cmd == "pidqn":
+        pidqn()
     elif a.cmd == "arms":
         arms()
     elif a.cmd == "length":

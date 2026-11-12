@@ -1,0 +1,532 @@
+{
+ "design": "plan optimizations_recap step 1 (pidqn), design passed 2026-11-12 00:25",
+ "runs": {
+  "pid": "FA-ccin2p3-1805e04b",
+  "qn": "FA-ccin2p3-65103811"
+ },
+ "seed_pair": [
+  "FA-ccin2p3-804a65bc",
+  "FA-ccin2p3-66e8c31f"
+ ],
+ "train_pdgs": [
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  21,
+  22,
+  23,
+  24,
+  25,
+  35,
+  36,
+  37,
+  5000001
+ ],
+ "train_unresolved": [],
+ "reads": {
+  "PP4": {
+   "all": {
+    "R": 0.7992,
+    "n_classes": 1300,
+    "boot95": [
+     0.7774,
+     0.8218
+    ],
+    "widened": [
+     0.7363,
+     0.8677
+    ],
+    "frac_classes_below_1": 0.7046,
+    "n_probes": 1300,
+    "R_seed": 1.0558
+   },
+   "encodable": {
+    "R": 0.7992,
+    "n_classes": 1300,
+    "boot95": [
+     0.7774,
+     0.8218
+    ],
+    "widened": [
+     0.7363,
+     0.8677
+    ],
+    "frac_classes_below_1": 0.7046,
+    "n_probes": 1300,
+    "R_seed": 1.0558
+   },
+   "n_probes": {
+    "read": 1300,
+    "encodable": 1300,
+    "unseen_particle": 0,
+    "unresolved": 0,
+    "unmatched": 0
+   },
+   "unseen_pdgs": [],
+   "median_mse": {
+    "pid": 0.21499,
+    "qn": 0.27449
+   },
+   "qn_over_earlier_w8": {
+    "R": 1.0078,
+    "n_classes": 1300,
+    "boot95": [
+     0.993,
+     1.0244
+    ],
+    "widened": [
+     0.9405,
+     1.0816
+    ],
+    "frac_classes_below_1": 0.4946,
+    "n_probes": 1300,
+    "R_seed": 1.0558
+   }
+  },
+  "EE4": {
+   "all": {
+    "R": 0.8618,
+    "n_classes": 169,
+    "boot95": [
+     0.8116,
+     0.9069
+    ],
+    "widened": [
+     0.7857,
+     0.9368
+    ],
+    "frac_classes_below_1": 0.7101,
+    "n_probes": 169,
+    "R_seed": 0.9681
+   },
+   "encodable": {
+    "R": 0.8618,
+    "n_classes": 169,
+    "boot95": [
+     0.8116,
+     0.9069
+    ],
+    "widened": [
+     0.7857,
+     0.9368
+    ],
+    "frac_classes_below_1": 0.7101,
+    "n_probes": 169,
+    "R_seed": 0.9681
+   },
+   "n_probes": {
+    "read": 169,
+    "encodable": 169,
+    "unseen_particle": 0,
+    "unresolved": 0,
+    "unmatched": 0
+   },
+   "unseen_pdgs": [],
+   "median_mse": {
+    "pid": 0.30216,
+    "qn": 0.39988
+   },
+   "qn_over_earlier_w8": {
+    "R": 0.9491,
+    "n_classes": 169,
+    "boot95": [
+     0.921,
+     0.9936
+    ],
+    "widened": [
+     0.8916,
+     1.0263
+    ],
+    "frac_classes_below_1": 0.5976,
+    "n_probes": 169,
+    "R_seed": 0.9681
+   }
+  },
+  "held": {
+   "all": {
+    "R": 0.9208,
+    "n_classes": 701,
+    "boot95": [
+     0.8963,
+     0.9624
+    ],
+    "widened": [
+     0.8509,
+     1.0137
+    ],
+    "frac_classes_below_1": 0.5706,
+    "n_probes": 701,
+    "R_seed": 1.0533
+   },
+   "encodable": {
+    "R": 0.9208,
+    "n_classes": 701,
+    "boot95": [
+     0.8963,
+     0.9624
+    ],
+    "widened": [
+     0.8509,
+     1.0137
+    ],
+    "frac_classes_below_1": 0.5706,
+    "n_probes": 701,
+    "R_seed": 1.0533
+   },
+   "H1": {
+    "R": 0.9206,
+    "n_classes": 62,
+    "boot95": [
+     0.8009,
+     1.0693
+    ],
+    "widened": [
+     0.7256,
+     1.1802
+    ],
+    "frac_classes_below_1": 0.5484,
+    "n_probes": 62,
+    "R_seed": 1.1038
+   },
+   "H2": {
+    "R": 0.8646,
+    "n_classes": 218,
+    "boot95": [
+     0.8096,
+     0.9236
+    ],
+    "widened": [
+     0.7455,
+     1.003
+    ],
+    "frac_classes_below_1": 0.6789,
+    "n_probes": 218,
+    "R_seed": 1.0859
+   },
+   "H2p5": {
+    "R": 0.8493,
+    "n_classes": 38,
+    "boot95": [
+     0.7479,
+     0.9467
+    ],
+    "widened": [
+     0.6503,
+     1.0888
+    ],
+    "frac_classes_below_1": 0.7368,
+    "n_probes": 38,
+    "R_seed": 1.1501
+   },
+   "H3": {
+    "R": 1.137,
+    "n_classes": 279,
+    "boot95": [
+     1.0153,
+     1.2361
+    ],
+    "widened": [
+     1.0129,
+     1.2389
+    ],
+    "frac_classes_below_1": 0.4301,
+    "n_probes": 279,
+    "R_seed": 0.9977
+   },
+   "H5": {
+    "R": 0.9119,
+    "n_classes": 28,
+    "boot95": [
+     0.7944,
+     1.0813
+    ],
+    "widened": [
+     0.7604,
+     1.1296
+    ],
+    "frac_classes_below_1": 0.6071,
+    "n_probes": 28,
+    "R_seed": 1.0447
+   },
+   "H6": {
+    "R": 0.6263,
+    "n_classes": 8,
+    "boot95": [
+     0.1293,
+     0.9071
+    ],
+    "widened": [
+     0.1211,
+     0.9685
+    ],
+    "frac_classes_below_1": 1.0,
+    "n_probes": 8,
+    "R_seed": 1.0676
+   },
+   "H7E": {
+    "R": 0.8888,
+    "n_classes": 34,
+    "boot95": [
+     0.692,
+     1.0115
+    ],
+    "widened": [
+     0.6886,
+     1.0164
+    ],
+    "frac_classes_below_1": 0.6471,
+    "n_probes": 34,
+    "R_seed": 1.0049
+   },
+   "H7c": {
+    "R": 0.8797,
+    "n_classes": 34,
+    "boot95": [
+     0.8062,
+     0.9499
+    ],
+    "widened": [
+     0.7992,
+     0.9582
+    ],
+    "frac_classes_below_1": 0.6765,
+    "n_probes": 34,
+    "R_seed": 1.0087
+   },
+   "n_probes": {
+    "read": 701,
+    "encodable": 701,
+    "unseen_particle": 0,
+    "unresolved": 0,
+    "unmatched": 0
+   },
+   "unseen_pdgs": [],
+   "median_mse": {
+    "pid": 0.80905,
+    "qn": 0.77131
+   },
+   "qn_over_earlier_w8": {
+    "R": 1.0093,
+    "n_classes": 701,
+    "boot95": [
+     0.9858,
+     1.0342
+    ],
+    "widened": [
+     0.9359,
+     1.0893
+    ],
+    "frac_classes_below_1": 0.485,
+    "n_probes": 701,
+    "R_seed": 1.0533
+   }
+  },
+  "HD4": {
+   "all": {
+    "R": 0.7693,
+    "n_classes": 114,
+    "boot95": [
+     0.7056,
+     0.8749
+    ],
+    "widened": [
+     0.6917,
+     0.8924
+    ],
+    "frac_classes_below_1": 0.7281,
+    "n_probes": 114,
+    "R_seed": 1.02
+   },
+   "encodable": {
+    "R": 0.7693,
+    "n_classes": 114,
+    "boot95": [
+     0.7056,
+     0.8749
+    ],
+    "widened": [
+     0.6917,
+     0.8924
+    ],
+    "frac_classes_below_1": 0.7281,
+    "n_probes": 114,
+    "R_seed": 1.02
+   },
+   "n_probes": {
+    "read": 114,
+    "encodable": 114,
+    "unseen_particle": 0,
+    "unresolved": 0,
+    "unmatched": 0
+   },
+   "unseen_pdgs": [],
+   "median_mse": {
+    "pid": 0.47801,
+    "qn": 0.81677
+   },
+   "qn_over_earlier_w8": {
+    "R": 1.0305,
+    "n_classes": 114,
+    "boot95": [
+     0.9375,
+     1.12
+    ],
+    "widened": [
+     0.9191,
+     1.1424
+    ],
+    "frac_classes_below_1": 0.4825,
+    "n_probes": 114,
+    "R_seed": 1.02
+   }
+  },
+  "HD5": {
+   "all": {
+    "R": 0.9512,
+    "n_classes": 28,
+    "boot95": [
+     0.7165,
+     1.2089
+    ],
+    "widened": [
+     0.6465,
+     1.3399
+    ],
+    "frac_classes_below_1": 0.5714,
+    "n_probes": 28,
+    "R_seed": 1.1084
+   },
+   "encodable": {
+    "R": 0.9512,
+    "n_classes": 28,
+    "boot95": [
+     0.7165,
+     1.2089
+    ],
+    "widened": [
+     0.6465,
+     1.3399
+    ],
+    "frac_classes_below_1": 0.5714,
+    "n_probes": 28,
+    "R_seed": 1.1084
+   },
+   "n_probes": {
+    "read": 28,
+    "encodable": 28,
+    "unseen_particle": 0,
+    "unresolved": 0,
+    "unmatched": 0
+   },
+   "unseen_pdgs": [],
+   "median_mse": {
+    "pid": 15.37686,
+    "qn": 10.74888
+   },
+   "qn_over_earlier_w8": {
+    "R": 0.9342,
+    "n_classes": 28,
+    "boot95": [
+     0.7669,
+     1.1211
+    ],
+    "widened": [
+     0.692,
+     1.2426
+    ],
+    "frac_classes_below_1": 0.6071,
+    "n_probes": 28,
+    "R_seed": 1.1084
+   }
+  }
+ },
+ "val_nll_best": {
+  "pid": {
+   "main": -2.853936,
+   "sigma_stage": -2.856644
+  },
+  "qn": {
+   "main": -2.808217,
+   "sigma_stage": -2.81528
+  }
+ },
+ "blowups": {
+  "rule": "non-finite val_loss_no_reg, or after step 500 (a block shorter than that: after its first validation) above 10x the reference validation; het NLL: above the reference + 0.5 ln 10 = 1.151; blown up when the block's best checkpoint is before that validation, spiked and recovered (listed, not flagged) when it is after",
+  "runs": {
+   "FA-ccin2p3-1805e04b": {
+    "train_run": "FA-ccin2p3-1805e04b",
+    "loss": "HETEROSC",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": -0.9554079,
+      "early_max": 5052025.0,
+      "best_step": 4264,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": -0.9554079
+     },
+     {
+      "ref_step": 10,
+      "ref": -2.853883,
+      "early_max": null,
+      "best_step": 100,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": -2.849162
+     }
+    ],
+    "spiked_recovered": [],
+    "blew_up": null
+   },
+   "FA-ccin2p3-65103811": {
+    "train_run": "FA-ccin2p3-65103811",
+    "loss": "HETEROSC",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": -0.9669125,
+      "early_max": 0.1459494,
+      "best_step": 4264,
+      "spike_at": 1360,
+      "blew_up_at": null,
+      "at_value": 242017300.0,
+      "max_after_ref": 242017300.0
+     },
+     {
+      "ref_step": 10,
+      "ref": -2.80817,
+      "early_max": null,
+      "best_step": 250,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": -2.806977
+     }
+    ],
+    "spiked_recovered": [
+     {
+      "block": 0,
+      "step": 1360
+     }
+    ],
+    "blew_up": null
+   }
+  },
+  "flagged": [],
+  "spiked_recovered": [
+   "FA-ccin2p3-65103811: training run FA-ccin2p3-65103811 block 0 step 1360"
+  ]
+ }
+}
