@@ -1,0 +1,42 @@
+[
+ {
+  "note": "nullparent smoke dsave_diag_hmap_ft_epem_ttx_d5_t8500 50 steps",
+  "cfg": "sweep/sweep_config_dsave_diag_hmap_ft_epem_ttx_d5_t8500.yaml",
+  "run_dir": "runs/dsave_diag_hmap_ft_epem_ttx_d5_t8500/trial_9197",
+  "hp_idx": 9197,
+  "hp": {
+   "training.muon_weight_decay": 0.004579475033922946,
+   "training.regularization_lambda": 1.5265223700780931e-09,
+   "training.cosanneal_warmup_frac": 0.061290066922083504,
+   "training.cosanneal_eta_min": 5.097387713092614e-09,
+   "ema": "false",
+   "training.ema_decay": 0.9110171637469903,
+   "fine_tune.lr_scale": 1.6406983769241195,
+   "fine_tune.layer_decay": 1.0,
+   "fine_tune.shrink_perturb": "[0.0,1.0]"
+  },
+  "t_steps": 50,
+  "rid": "FA-ccin2p3-c69dfb51",
+  "err": null
+ },
+ {
+  "note": "nullparent smoke dsave_diag_parscale_ft_ee_ttbar_nlo_d5_t8500 50 steps",
+  "cfg": "sweep/sweep_config_dsave_diag_parscale_ft_ee_ttbar_nlo_d5_t8500.yaml",
+  "run_dir": "runs/dsave_diag_parscale_ft_ee_ttbar_nlo_d5_t8500/trial_9197",
+  "hp_idx": 9197,
+  "hp": {
+   "training.muon_weight_decay": 0.005785891345957641,
+   "training.regularization_lambda": 1.9536085896836016e-10,
+   "training.cosanneal_warmup_frac": 0.07657384863123298,
+   "training.cosanneal_eta_min": 1.6380637651653482e-09,
+   "ema": "false",
+   "training.ema_decay": 0.9040982127087192,
+   "fine_tune.lr_scale": 0.6001340672059555,
+   "fine_tune.layer_decay": 1.0,
+   "fine_tune.shrink_perturb": "[0.0,1.0]"
+  },
+  "t_steps": 50,
+  "rid": "FA-ccin2p3-00dc7d42",
+  "err": null
+ }
+]
