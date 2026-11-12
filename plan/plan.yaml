@@ -16780,6 +16780,29 @@ entries:
       wake, main session, orchestration, task-notification, stop hook, nothing_new, inline work, fork (only line 13401, review
       launches); usage_report.py nothing_new; site decisions for usage, wake, attribut, main session, agents (D177, D185,
       D202 related, none on this measure).'
+  - at: '2026-11-12T01:28:10+00:00'
+    question: Restore the catalog_v4 held-out train pools deleted on CC on 2026-11-11 (H1 62, H2 218, H2p5 38, H3 278 at 1e5
+      [only 1e4 copies now], H5 28 one-loop, H6 8, H7E 34, H7c 34 = 700 pools), so optimizations_recap's held-out reads (zero_shot_parent
+      reads each probe's train split for its own target statistics) and every study reading them run again. Repair of approved
+      data, no training.
+    prior: Same procedure as pretrain_data_saving's H3 1e4 prebuild 2026-11-11 (FA-ccin2p3-4f0e577e etc., 70 entries in 61
+      s per shard) and the catalog_v4_g12_regen of 2026-11-07 (32 shards of 36-44 entries, 379-389 s each on 16 cores, FA-ccin2p3-7c4df684,
+      8dacfaf8); fa-generation 'Regenerating catalog_v4' step 2; par:v4_regen_time. HD4/HD5 train/val 'missing' is a false
+      report (recipes give n_train=n_val=0), fixed in check_site_data 79644e86.
+    measure: 'tools/check_site_data.py --list on CC over recipes/catalog_v4_heldout_{H1,H2,H2p5,H3,H5,H6,H7E,H7c}.yaml: pools
+      not prebuilt, now 700 train (plus 0 val/test); after the batch 0, every pool''s recipe id the recipe''s (datagen._is_cached).'
+    check: 'Ran check_site_data --list on CC 2026-11-12 ~05:30: 62/218/38/278/28/8/34/34 train pools not prebuilt, all val/test
+      present; the measure is the same cache check a require_cache run makes, so it moves exactly with the pools built.'
+    fixed: Recipes as committed (n_train 1e5 trees, 5e4 one-loop; seed 42; sampling as the recipe), scripts/job_catalog_v4_regen.sh
+      at 79644e86 with V4REGEN_RECIPES=the 8 held-out recipes, V4REGEN_N=32, 16 cores, htc CPU, --time 02:00:00; built val/test
+      pools are cache hits, untouched.
+    control: 'Not a comparison: the pools'' recipe ids are those the deleted pools had (same recipe, same seed); val/test
+      already on disk from the same recipes.'
+    seeds: data seed 42 (catalog), one build
+    outcome: 'Yes: check_site_data reports 0 not prebuilt on the 8 recipes and V4REGEN_DONE in 32 logs; optimizations_recap''s
+      owner is told its reads can be redone. No (a shard fails, CERT_FAILED one-loop group, disk refusal): read the log, rerun
+      the shard (resumable) or report the pools still missing with why. Disk: ~17 GB (val pools 1.66 GB at 1e4 x 10) of 53.7
+      GB free.'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
