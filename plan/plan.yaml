@@ -29858,6 +29858,55 @@ entries:
       entry findings/dead ends, site decisions (frame, boost, gamma; D374, D418, D419): no prior boost bound run. Note: uugg
       azimuth_gg deepest stratum also sits at gamma 11.2 with +1.62; the azimuth family bound covers it, worth reading in
       the result.'
+  - at: '2026-11-12T17:15:51+00:00'
+    question: 'Step 13 (D411 follow-up, D419 full LLoCa): does a linear-only log skip (model.input_log_skip=2 with model.input_log_skip_linear=true,
+      @7b4f8bd9: mu += sum_{i<j} c1_ij L_ij + sum_i b1_i M_i, the quadratic L^2/M^2 terms dropped; coefficients from the static
+      particle encoding, defined for any process) keep the log skip''s tt Coulomb fix while removing the overshoots the quadratic
+      skip produced (uug soft +5.00 with exponent -3.20 vs truth -2; tt Sudakov sign flip +0.77)? A power law in an invariant
+      is linear in its log, so the linear readout carries the soft/collinear/Coulomb slopes without a curvature that continues
+      past the truth. Feeds: whether the KIT models (and a catalog proposal) take the linear skip as the general extrapolation
+      fix, or the skip idea stops here.'
+    prior: 'Searched docs/results.tex (log_skip, linear skip, power-law readout: none), plan show kit_benchmark, site decisions
+      (D315, D395, D411, D412, D419). Found: the quadratic skip read (finding 2026-11-12 ~19:00 @7656e687, kit_extrap.json):
+      uug plain control 203a274f deepest coll +0.81/17.7, soft -8.40/241, exponents coll -1.41 soft -0.28; + quadratic skip
+      7b891d10 coll +1.21/2.24, soft +5.00/25.6, exponents coll -1.31 soft -3.20 (truth -1/-2); tt softpairthr 3fc1016a Sudakov
+      15-50 TeV -0.53/0.72, Coulomb beta 1e-4..1e-3 log-MSE 3.55 exponent -0.32; + quadratic skip eb870ad4 Sudakov +0.77/0.696,
+      Coulomb 1.72 exponent -0.55 (truth -1.02); bulk +0.28 (uug) / +0.61 (tt) decades. Route cuts closed by D419. No linear-only
+      run before.'
+    measure: 'As in the passed log-skip design (2026-11-12T14:36): per arm vs its control, deepest-bin median signed error
+      (pred - truth, log10|M|^2) and log-MSE by tools/kit_extrap_read.py (new arms plain_logskiplin on uug, logskiplin on
+      tt): uug coll_y and soft_x 1e-7..1e-6; tt Sudakov 15-50 TeV and Coulomb beta 1e-4..1e-3; fitted exponents per family
+      from kit_result.json (exact soft -2, coll -1, Coulomb -1.02); per family median log10(arm/control log-MSE) by kit_readout
+      --vs on a kit_figures collect; bulk_test log-MSE. The quadratic arms 7b891d10/eb870ad4 read beside them.'
+    check: 'The measure moved with the readout''s form on existing data: adding the quadratic skip moved uug''s soft exponent
+      -0.28 -> -3.20 and deepest soft -8.40 -> +5.00 (the curvature continuing past truth -2), tt Coulomb log-MSE 3.55 ->
+      1.72 and Sudakov -0.53 -> +0.77. The linear-only path is exactly the full skip with c2=b2=0 (tests/test_input_reps.py::test_log_skip
+      @7b4f8bd9: quadratic columns of the head do not reach the output, differs from the full skip, Lorentz invariant to 1e-7).
+      Training path between the quadratic arms (@2ceb9012) and 7b4f8bd9: only this default-off flag; frames_gamma_max passthrough
+      (da59ef1b) default null is a no-op.'
+    fixed: 'Everything of the quadratic arms'' commands (job_kit.sh A from scratch, first 1e5 bulk_train, 8000 steps, seed
+      42, training.lr=0.0118605, batch 16384, HETEROSC mu_mse + sigma stage, float64, base trial 1262). uug: kit_ee_uug__me2
+      100000 8000 A ++model.input_soft_eps=1e-8 ++model.input_pair_logs=5 data.target_physics_factor=false data.target_physics_orders=false
+      training.lr=0.0118605 ++model.input_log_skip=2 ++model.input_log_skip_linear=true tag=softpair_plain_logskiplin. tt:
+      kit_ee_tt__virt_finite 100000 8000 A ++model.input_soft_eps=1e-8 ++model.input_pair_logs=4 ++model.input_pair_threshold=true
+      training.lr=0.0118605 ++model.input_log_skip=2 ++model.input_log_skip_linear=true tag=softpairthr_logskiplin. D395:
+      the new key first runs 50 steps through every stage on uug (tag softpair_plain_logskiplin_smoke), the two arms chained
+      afterok. Cost: smoke ~0.2 h + 2 x ~1.4 h (quadratic arms'' wall) = ~3 GPU-h on CC; ~75 MB per run.'
+    control: 'uug: plain-target softpair 203a274f (same command without the skip); tt: softpairthr 3fc1016a. The quadratic-skip
+      arms 7b891d10 (uug) and eb870ad4 (tt) as the direct comparison (one switch apart). References: Bakar''s MLP (his evaluate.py:
+      uug soft/coll 0.325/0.108; tt logthr Coulomb 2.41, Sudakov 0.046).'
+    seeds: Seed 42, one run per arm (D315); bands from the MLP family's deepest-bin spread (0.34 uug, 0.22 tt) as in the passed
+      log-skip design.
+    outcome: 'Same bands as the passed log-skip design. uug (vs plain control 203a274f): FIXES if deepest coll |signed| <=
+      0.38 AND deepest soft signed in [-0.46,+0.46], exponents in [-2.5,-1.5] soft / [-1.5,-0.5] coll. tt: Sudakov FIXES if
+      signed in [-0.22,+0.48] with log-MSE <= 0.154; Coulomb FIXES if deepest log-MSE <= 2.41 and exponent <= -0.44. Bulk
+      worse than its control by > 1.5 decades: the skip fights the backbone. YES on all (uug soft+coll, tt Sudakov and Coulomb):
+      the linear skip is the general fix, goes into the KIT models and is proposed for catalog pretraining. PARTIAL: reported
+      per limit against the quadratic arm: if the overshoots go (soft exponent back in band, Sudakov sign not flipped) but
+      Coulomb is lost (log-MSE > 2.41), the Coulomb fix needed the curvature (the 1/beta rise is not a pure power law in log
+      beta^2 at this range) and the two terms are read as limit-specific; if the overshoots stay, the curvature was not their
+      cause and the skip idea stops (the backbone sets them). NO EFFECT vs the plain controls (deepest log-MSE within 0.34
+      uug / 0.22 tt and exponents within 0.3): the linear terms alone do nothing; the skip stops.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
