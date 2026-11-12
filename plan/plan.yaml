@@ -16298,7 +16298,7 @@ entries:
     agent: a8dbddc87318bf574
     state: stopped
     since: '2026-11-12T21:30:31+00:00'
-    state_at: '2026-11-12T21:47:29+00:00'
+    state_at: '2026-11-12T21:47:55.866000+00:00'
     context: 164383
     context_at: '2026-11-12T21:58:32+00:00'
   designs:
@@ -27248,9 +27248,9 @@ entries:
     withdrawn_why: 'Joaquin: use all available clusters'
   owner:
     agent: ad1a12dcf02712802
-    state: working
+    state: stopped
     since: '2026-11-12T21:29:09+00:00'
-    state_at: '2026-11-12T22:03:04.758000+00:00'
+    state_at: '2026-11-12T22:05:45.767000+00:00'
     context: 166252
     context_at: '2026-11-12T21:58:35+00:00'
   findings:
