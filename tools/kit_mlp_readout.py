@@ -10,7 +10,7 @@ reference (softpair inputs).
 
 Rules (the design): an arm differs from mlp in a family when its 3-seed range is disjoint from mlp's and the seed
 medians differ by more than 0.3 decades; the port passes when mlp's median is within 0.3 decades of the numpy run in
-every family's deepest bin; ours reproduces our failure when its median is within 0.5 decades of the transformer
+every family's deepest bin (the ladder verdicts are withheld when it fails); ours reproduces our failure when its median is within 0.5 decades of the transformer
 reference in every family where his MLP wins (mlp's median below the reference by more than 0.3 decades).
 """
 import argparse
@@ -78,12 +78,12 @@ def table(d):
                 p["arms"].setdefault(m["arm"], {}).setdefault(f, []).append(v)
     for proc, p in out.items():
         p["ref"] = deepest(d[REFS[proc]]) if REFS.get(proc) in d else None
-        # his numpy runs: the seeded ones (baseline_<proc>_s<seed>, kit_baseline_seeded.py) when present, else the
-        # single seed-0 run of the ladder job; per family the seed median and the list
+        # the port gate's reference is the design's: his single numpy run of the ladder job (baseline_<proc>, seed 0);
+        # the seeded runs (baseline_<proc>_s<seed>, kit_baseline_seeded.py) are shown beside it, never gate it
+        one = deepest(d["baseline_" + proc]) if "baseline_" + proc in d else None
         seeded = [deepest(v) for k, v in sorted(d.items()) if re.fullmatch(f"baseline_{proc}_s\\d", k)]
-        runs = seeded or ([deepest(d["baseline_" + proc])] if "baseline_" + proc in d else [])
-        p["numpy_all"] = {f: [r[f] for r in runs] for f in runs[0]} if runs else None
-        p["numpy"] = {f: float(np.median(v)) for f, v in p["numpy_all"].items()} if runs else None
+        p["numpy"] = one
+        p["numpy_all"] = {f: [r[f] for r in seeded] for f in seeded[0]} if seeded else None
     return out
 
 
@@ -98,12 +98,19 @@ def read(path, figs):
         fams = sorted(mlp, key=lambda f: (f == "bulk", f))
         print(f"\n== {proc}  (deepest-bin log-MSE of log10|M|^2; seed median [min, max]; d = log10(arm / mlp))")
         wins = [f for f in fams if f != "bulk" and p["ref"] and lg(np.median(mlp[f]), p["ref"][f]) < -0.3]
+        gate = True
         if p["numpy"]:
             port = {f: lg(np.median(mlp[f]), p["numpy"][f]) for f in fams}
-            print("his numpy runs per family:", {f: [float(f"{x:.3g}") for x in v] for f, v in p["numpy_all"].items()})
-            print("port gate (mlp median vs his numpy median, |d| <= 0.3):",
-                  {f: round(v, 3) for f, v in port.items()}, "PASS" if all(abs(v) <= 0.3 for v in port.values()) else "FAIL")
-        print("families where his MLP wins (mlp < our transformer by > 0.3 decades):", wins)
+            gate = all(abs(v) <= 0.3 for v in port.values())
+            if p["numpy_all"]:
+                print("his seeded numpy runs per family (context, not the gate):",
+                      {f: [float(f"{x:.3g}") for x in v] for f, v in p["numpy_all"].items()})
+            print("port gate (mlp median vs his numpy run, |d| <= 0.3):",
+                  {f: round(v, 3) for f, v in port.items()}, "PASS" if gate else "FAIL")
+        if not gate:
+            print("ladder verdicts WITHHELD: the port gate fails (the design's rule); values only")
+        if gate:
+            print("families where his MLP wins (mlp < our transformer by > 0.3 decades):", wins)
         for f in fams:
             ref = p["ref"][f] if p["ref"] else None
             print(f"  {f}: transformer {ref:.3g}" if ref is not None else f"  {f}:",
@@ -115,7 +122,7 @@ def read(path, figs):
                     continue
                 d = lg(np.median(v), np.median(mlp[f]))
                 disj = max(v) < lo0 or min(v) > hi0
-                flag = ("WORSE" if d > 0 else "BETTER") if (a != "mlp" and disj and abs(d) > 0.3) else ""
+                flag = ("WORSE" if d > 0 else "BETTER") if (gate and a != "mlp" and disj and abs(d) > 0.3) else ""
                 extra = ""
                 if a == "ours" and ref is not None:
                     extra = f"  vs transformer {lg(np.median(v), ref):+.2f}"
