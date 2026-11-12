@@ -24995,7 +24995,7 @@ entries:
     agent: a7e157e9f019a138b
     state: working
     since: '2026-11-12T09:15:48+00:00'
-    state_at: '2026-11-12T09:15:48+00:00'
+    state_at: '2026-11-12T09:22:14.837000+00:00'
     context: 148746
     context_at: '2026-11-12T09:22:19+00:00'
   findings:
