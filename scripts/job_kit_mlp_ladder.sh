@@ -12,7 +12,7 @@ _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 F="$1"; T="$2"; RC=0
-for ARM in mlp target mom raw gelu het ours; do
+for ARM in mlp target mom raw gelu het cur recipe ours; do
     for S in 0 1 2; do
         python tools/kit_mlp_ladder.py "$F" "$T" --arm "$ARM" --seed "$S" | grep MLP_DONE || { echo "MLP_FAILED $ARM $S"; RC=1; }
     done

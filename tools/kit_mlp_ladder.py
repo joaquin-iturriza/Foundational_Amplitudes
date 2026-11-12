@@ -14,11 +14,17 @@ epochs of batch 2048 over the first n_train bulk_train events, MSE; float64. Arm
   raw      inputs: s_ij/s0 without the log (his 'raw')
   gelu     activation GELU (our transformer's) for the leaky ReLU
   het      loss: Gaussian NLL with a learned per-event sigma (our HETEROSC), mu scored
-  ours     mom + target + gelu + het together
+  cur      inputs: our current best (softpair): the log pair invariants, every momentum over sqrt(s) soft-rescaled
+           (p log1p(x/eps)/(x log1p(1/eps)), x = 2 p.Q/s, eps 1e-8) and, with a gluon, the off-shellness
+           log1p(min 2 p_i.p_j/s / 1e-6) (tools/kit_target_slope.feats)
+  recipe   our training recipe's horizon and selection: 8000 steps, the best checkpoint on a held-out 10% of the
+           training sample (his: 300 epochs, final weights)
+  ours     cur + target + gelu + het + recipe together
 The run is written as <runs>/kit_A_<file>_<target>_n<N>_t<steps>_mlp<arm>_s<seed>/kit_benchmark/{predictions.h5,
 kit_result.json} (tools/kit_predict.evaluate: the benchmark's own evaluate.py), so tools/kit_figures.py collects it.
 """
 import argparse
+import copy
 import json
 import os
 import sys
@@ -32,7 +38,10 @@ from tools import kit_hardps as kh  # noqa: E402
 
 ARMS = {"mlp": {}, "target": {"target": "T"}, "mom": {"features": "mom"}, "raw": {"features": "raw"},
         "gelu": {"act": "gelu"}, "het": {"loss": "het"},
-        "ours": {"features": "mom", "target": "T", "act": "gelu", "loss": "het"}}
+        "cur": {"features": "cur"}, "recipe": {"recipe": "ours"},
+        "ours": {"features": "cur", "target": "T", "act": "gelu", "loss": "het", "recipe": "ours"}}
+SOFT_EPS, OFFSHELL_EPS = 1e-8, 1e-6   # model.input_soft_eps and data.dimless_offshell_eps of the softpair runs
+OUR_STEPS, VAL_FRAC = 8000, 0.1       # our KIT runs' horizon; best-validation checkpoint on a held-out share
 EPOCHS, BATCH, WIDTH = int(os.environ.get("KIT_MLP_EPOCHS", 300)), 2048, 128   # epochs: 1 for a dry run
 
 
@@ -42,7 +51,16 @@ def invariants(p):
     return q[..., 0] ** 2 - np.sum(q[..., 1:] ** 2, -1)
 
 
-def featurize(p, s0, kind, mass):
+def featurize(p, s0, kind, mass, rows=None):
+    if kind == "cur":
+        P = p[:, 0] + p[:, 1]
+        s = P[:, 0] ** 2 - (P[:, 1:] ** 2).sum(-1)
+        x = np.abs(2 * (p[..., 0] * P[:, None, 0] - (p[..., 1:] * P[:, None, 1:]).sum(-1)) / s[:, None]).clip(1e-30)
+        q = p / np.sqrt(s)[:, None, None] * (np.log1p(x / SOFT_EPS) / (x * np.log1p(1 / SOFT_EPS)))[..., None]
+        cols = [featurize(p, s0, "log", mass), q.reshape(len(p), -1)]
+        from tools.kit_target_slope import feats
+        o = feats(rows, p.shape[1]) if rows is not None else None
+        return np.column_stack(cols + ([o[OFFSHELL_EPS]] if o is not None else []))
     if kind == "mom":
         P = p[:, 0] + p[:, 1]
         return (p / np.sqrt(P[:, 0] ** 2 - (P[:, 1:] ** 2).sum(-1))[:, None, None]).reshape(len(p), -1)
@@ -69,6 +87,9 @@ def train(x, y, cfg, seed, device):
     import torch
     torch.manual_seed(seed)
     dt = torch.float64
+    if cfg["recipe"] == "ours":       # a held-out share for the best-checkpoint selection
+        nv = int(len(x) * VAL_FRAC)
+        xv, yv, x, y = x[:nv], y[:nv], x[nv:], y[nv:]
     sizes = [x.shape[1], WIDTH, WIDTH, WIDTH, 2 if cfg["loss"] == "het" else 1]
     layers = []
     for a, b in zip(sizes[:-1], sizes[1:]):
@@ -79,10 +100,12 @@ def train(x, y, cfg, seed, device):
     X, Y = torch.tensor(x, dtype=dt, device=device), torch.tensor(y, dtype=dt, device=device)
     opt = torch.optim.Adam(net.parameters(), lr=2e-3, betas=(0.9, 0.999), eps=1e-8)
     nb = len(X) // BATCH
-    steps = EPOCHS * max(1, nb)
+    steps = OUR_STEPS if cfg["recipe"] == "ours" else EPOCHS * max(1, nb)
+    epochs = -(-steps // max(1, nb))
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda k: (0.5 * (1 + np.cos(np.pi * k / steps)) + 5e-4))
     g = torch.Generator(device="cpu").manual_seed(seed)
-    for _ in range(EPOCHS):
+    best, k = (np.inf, None), 0
+    for _ in range(epochs):
         perm = torch.randperm(len(X), generator=g).to(device)
         for i in range(nb):
             b = perm[i * BATCH:(i + 1) * BATCH]
@@ -93,6 +116,19 @@ def train(x, y, cfg, seed, device):
             else:
                 loss = ((out[:, 0] - Y[b]) ** 2).mean()
             opt.zero_grad(); loss.backward(); opt.step(); sched.step()
+            k += 1
+            if cfg["recipe"] == "ours" and (k % 100 == 0 or k == steps):   # validated every 100 steps, mu's MSE
+                with torch.no_grad():
+                    v = float(((net(torch.tensor(xv, dtype=dt, device=device))[:, 0]
+                                - torch.tensor(yv, dtype=dt, device=device)) ** 2).mean())
+                if v < best[0]:
+                    best = (v, copy.deepcopy(net.state_dict()))
+            if k == steps:
+                break
+        if k == steps:
+            break
+    if best[1] is not None:
+        net.load_state_dict(best[1])
     net.eval()
     return lambda z: np.concatenate([net(torch.tensor(z[i:i + 50000], dtype=dt, device=device))[:, 0]
                                      .detach().cpu().numpy() for i in range(0, len(z), 50000)]), steps
@@ -108,7 +144,8 @@ def main():
     a = ap.parse_args()
     import h5py
     import torch
-    cfg = dict(dict(features="logthr" if a.file == "ee_tt" else "log", target="plain", act="leaky", loss="mse"),
+    cfg = dict(dict(features="logthr" if a.file == "ee_tt" else "log", target="plain", act="leaky", loss="mse",
+                    recipe="his"),
                **ARMS[a.arm])
     if cfg["features"] == "log" and a.file == "ee_tt":
         cfg["features"] = "logthr"
@@ -119,7 +156,7 @@ def main():
     n = (tr.shape[1] - 1) // 5
     mom = lambda r: r[:, :4 * n].reshape(-1, n, 4)
     s0 = float(np.max(invariants(mom(tr))))
-    xtr = featurize(mom(tr), s0, cfg["features"], mass)
+    xtr = featurize(mom(tr), s0, cfg["features"], mass, tr)
     ytr, _ = target_of(tr, n, cfg["target"])
     mx, sx, my, sy = xtr.mean(0), xtr.std(0) + 1e-12, ytr.mean(), ytr.std()
     dev = "cuda" if torch.cuda.is_available() else "cpu"
@@ -134,7 +171,7 @@ def main():
             for st in kh.strata(a.file, split, src):
                 r = kh.stratum_rows(a.file, a.target, split, st, src)
                 y, off = target_of(r, n, cfg["target"])
-                z = f_pred((featurize(mom(r), s0, cfg["features"], mass) - mx) / sx) * sy + my
+                z = f_pred((featurize(mom(r), s0, cfg["features"], mass, r) - mx) / sx) * sy + my
                 # log10 pred in the file's target: its truth plus the residual (exact for the stripped constant)
                 w[f"{split}/{st}/{lname}"] = t[f"{split}/{st}"][lname][:] + (z + off - np.log10(r[:, -1]))
     json.dump(dict(cfg, arm=a.arm, seed=a.seed, n_train=a.n_train, steps=steps, s0=s0), open(os.path.join(rd, "mlp.json"), "w"))
