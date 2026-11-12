@@ -22399,6 +22399,56 @@ entries:
       mass_stats and the 13 configs. Searched: results.tex (v3_muon, AdamW fine, fine-tune optimizer, mass column, dimless
       mass, mass_stats, pair threshold, beta^2, sec:datasaving), plan.yaml (pair_threshold, mass_stats, dimless_mass, kit_benchmark
       step 6), site decisions (AdamW, Muon, D355-D400): found D158 not cited.'
+  - at: '2026-11-12T00:17:23+00:00'
+    question: 'D400, one-loop half: the t t~ V fine-tunes read 8-33x worse than scratch in stage 2 (best val), the off-shellness
+      own scale helped (test MSE(V/B) 0.19x) and the physical-mass tops (stage A) did not (val 1.92x all events, 0.63x without
+      each run''s worst event, within the rerun spread). At the control''s HPs, does any of three next suspects, each alone
+      on top of the own off-shellness scale, lower the t t~ V fine-tune''s error: (a) the dimensionless-mass column refit
+      on the target instead of the parent''s scale (fine_tune.mass_stats=own; parent [-1.27, 0.70] vs t t~ own [-0.90, 0.36]),
+      (b) an AdamW fine-tune in place of MuonAdamW (training.optimizer=AdamW), (c) the pair-log inputs at the pair threshold,
+      log beta^2 of the t t~ pair (model.input_pair_threshold=true, fine-tune only)?'
+    prior: 'Stage A (diag_readout.py tops @e190a6c1): top/stage-2 parent t t~ V val 0.43, 1.94, 1.43, 11.6 at D=316..1e4;
+      event_share.py @7d56534c: the 11.6 is one val event (pool row 4523, 98% of the run''s val MSE; worst val event in 10
+      of 16 t t~ V runs), without each run''s worst event 0.39, 1.11, 1.62, 0.22 val (geomean 0.63), 0.36, 1.98, 1.86, 0.04
+      test. Off-shellness diagnostic: own/parent t t~ V w/o-worst val 0.21, 0.07, 0.08, 1.08 (adopted for one-loop fine-tunes).
+      (b): D155 + D158 put pretraining and fine-tunes on MuonAdamW (Joaquin: ''why would finetunes stay on adamW?''); par:v3_muon:
+      AdamW over Muon fine-tune 0.986 / 0.935 at the same lr on the v3 short probes (no gain there; not on t t~ or a one loop).
+      (c): kit_benchmark scratch at 1e5, one seed: log beta^2 input lowered KIT t t~ V Coulomb -0.33 dec, Sudakov -0.59, bulk
+      -0.78; raised t t~ Born Coulomb +3.2 dec; never fine-tuned. (a): no prior run refits the mass column. Searched results.tex
+      (mass column, dimless, mass_stats, pair threshold, beta^2, AdamW fine-tune, v3_muon, sec:datasaving), plan (kit_benchmark
+      step 6), site decisions (AdamW, Muon, D355-D400).'
+    measure: 'Per cell (t t~ V, D=316, 1e3, 3162, 1e4) and arm: MSE of ln(V/B) on the 5000 val events without the run''s single
+      worst event (event_share.py, sigma-stage final model), arm/control; beside it the same with all events, and test MSE(V/B)
+      and MSE(ln V/B) without the worst. Primary is w/o-worst because one val event (row 4523) carries up to 98% of a run''s
+      val MSE.'
+    check: 'The measure moves with input-scale changes on these cells: off-shellness own/parent 0.07-1.08 w/o-worst val; top/stage-2
+      parent 0.22-1.62 w/o-worst val, 0.04-1.98 test (event_share.json @7d56534c). Rerun spread (same HPs and seed, stage2_diag_readout.json):
+      0.46-4.84 per cell, sd ln 0.78, ~1.47x on a 4-cell geomean; the YES bar 0.4 is ~2.3 sd out.'
+    fixed: 'Configs sweep/sweep_config_dsave_diag_{massown,adamw,pairthr}_ft_ee_ttbar_nlo_d{5,6,7,8}_t8500.yaml @7d56534c
+      = the offown configs (r4 trees-in parent, offshell_stats own, target_stats own, V/B, T=8500, pools, seed 42) plus one
+      fixed_param each (diffed). HPs per cell = the stage-2 best trial''s (hp_idx 340, 1544, 120, 406, as the offown runs)
+      via --hp; the AdamW arm keeps them (par:v3_muon: same-lr AdamW vs Muon fine-tunes within 0.94-0.99). Code: experiment.py
+      fine_tune.mass_stats @7d56534c. HETEROSC + sigma stage.'
+    control: 'The offown runs at the same HPs and seed from the same parent: FA-ccin2p3-e024c471, 23f95abb, 05b47678, b872f220
+      (each arm differs by exactly one fixed_param). Stage-2 scratch best per cell beside (ft/scr).'
+    seeds: Seed 42 in every arm and the control (as stage A and the off-shellness diagnostic, D315 one seed); the 4 cells
+      carry the replication; 4-cell geomean sd ~1.47x.
+    outcome: 'Per arm, read separately (3 comparisons, multiplicity said). YES: arm/control w/o-worst val < 1 in >= 3 of 4
+      cells and geomean <= 0.4. NO: geomean >= 0.67 or < 2 of 4 below, worded ''no gain at the control''s HPs'' (not ruled
+      out); no follow-up search for a NO, since a cause of an 8-33x deficit should show at fixed HPs as the tops did on t
+      t~ LO (0.06-0.30x). Between: inconclusive, said so; then one 8-trial fine-tune search per cell for that arm (~13 GPU-h,
+      estimate from stage 2''s t t~ V fine-tune searches) goes to Joaquin with the read. On YES: (a) mass column refit is
+      added to the s3 one-loop fine-tune configs and the 8 one-loop stage-B searches (~25 GPU-h, under D400 within 30) go
+      out with it; (b) AdamW is NOT adopted (D158): the read goes to Joaquin as a question with its numbers; (c) the input
+      changes what the network sees, so before S is re-read the t t~ V scratch cells need it too: 4 scratch searches with
+      the input (~13 GPU-h estimated from stage 2''s t t~ V scratch searches) beside the fine-tune ones, proposed with the
+      read; a NO on (c) means ''not as a fine-tune-only input onto a parent trained without it''. None YES: next is where
+      the t t~ V fine-tune''s error sits (per-region error by beta, ft vs scratch) before more arms. Launch: (1) smoke (D395)
+      sweep_config_dsave_diag_smoke3_ft_ee_ttbar_nlo_d5_t50.yaml, all three overrides, 50 steps through trial_job.sh with
+      the sigma stage; its log must show the mass column refit line with values differing from the parent''s and the pair
+      threshold taking effect (input_pair_logs=6 in the parent); (2) the 12 runs afterok on it: site submit ccin2p3 FA sweep/trial_job.sh
+      -- --sweep-config <cfg> --trial-idx 0 --detached --hp-idx <idx> --t-steps 8500 --hp k=v..., --hdr=--time=00:40:00 (stage
+      A''s 1e4 cell: 22 min training + sigma). GPU 12 x ~0.45 h + 0.1 = ~5.5 GPU-h under D400. Disk 13 x ~15 MB.'
   step_waits:
     '7': FA-ccin2p3-35922ca9 FA-ccin2p3-adbd0552
   findings:
