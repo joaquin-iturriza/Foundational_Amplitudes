@@ -24906,6 +24906,49 @@ entries:
       size and the opened ranges do not bring the curves together; the next candidate from the data (the horizon, the other
       D-following HP) is designed. Every search reported with best val, separation, batch size, good count and its curves
       figure; diverged trials apart (D398).'
+  - at: '2026-11-12T18:02:38+00:00'
+    question: 'Joaquin 2026-11-12 (D422 context: separation is a bad HP combination; the cause is which HPs are searched,
+      their ranges or too few trials): does the revised search template (WSD schedule for both arms with cooldown fixed at
+      the last eighth, D423 ''I believe we had settled on the new scheduler as generally better''; training.batchsize searched
+      in [D/64, D/2] in place of fixed D/2; fine-tune lr_scale [0.03, 10] and layer_decay [0.5, 1]; 8 trials as before) find
+      search bests whose validation goes down together with training (curve_quality.py) at no higher best val, on t t~ LO
+      at D=316 and 3162, scratch and fine-tune? Replaces the withdrawn schedule/lr-x3 design (Joaquin dropped the schedule,
+      regularisation and early-stopping tests).'
+    prior: 'hp_ranges_readout.py (stage-2 trials at D<1e4: 283 scratch, 230 fine-tune, joined to full HPs and ranges): which
+      HPs: of the searched HPs only lr moves separation within a search (scratch Spearman -0.30, fine-tune lr_scale -0.36);
+      muon weight decay, L2, warmup, lr floor, EMA, EMA decay, layer decay |rho| <= 0.10; none moves best val beyond |rho|
+      0.10 except fine-tune lr_scale (+0.34: lower lr_scale lower val) and layer decay (+0.25). Separation is set by D (search
+      bests good: D<1e3 1 of 44 searches, 1e3-1e4 1 of 22, >=1e4 13 of 23); the HPs that follow D are fixed: batch size =
+      D/2 and the horizon. Ranges: scratch lr bests at an edge 6 of 36; fine-tune lr_scale bests at the low edge 9 of 30,
+      layer_decay low edge 9 of 30. Trials: best after n of 8 trials over the final, median (75%): scratch n=4 1.01 (1.31),
+      n=5 1.00 (1.11); fine-tune n=4 1.07 (1.34), n=5 1.00 (1.16): 8 trials reach the search''s own best in most searches,
+      so the count stays (D244/D245). Within a search val and separation: Spearman +0.61 at D=1e3-1e4 (lower val, closer curves),
+      +0.07 at D<1e3 (best good in 1 of 44). Batch size never searched in this entry or results.tex (searched: ''batch'' in
+      results.tex HPO passages: width/BS transfer only at pretraining); the template''s batch 16384 is the pretraining operating
+      point. Earlier this entry: lr c/3, c/10 searches (window down: worse val, more separation). WSD: D423; results.tex par.
+      v4 WSD: WSD parents pretrain better (~0.76) and a fine-tune sweep drew WSD in all 8 trials (cooldown best 0.164); cosine
+      HPs (warmup, floor) move neither val nor separation here (|rho| <= 0.10), so WSD''s cooldown is fixed, not searched.'
+    measure: 'Per search (lr_centre_readout.py --test tmpl2, @ this commit): best val (ln units at the best checkpoint), its
+      trial''s separation and good/bad, its batch size, good-trial count, against the stage-2 search of the same cell (dsave_s2_{scr,ft}_epem_ttx_d{5,7}_t8500).'
+    check: 'The measure moves with an HP inside a search (lr: separation 3.8e4 -> 1.1e3 from the window''s bottom to top quarter
+      at D<1e4) and Joaquin confirmed its good/bad examples (2026-11-12). The stage-2 searches of these 4 cells: bests separation
+      8.7-25 at D=3162 (lr_centre control), bad at D=316 (curve_quality_cells_epem_ttx.json).'
+    fixed: 'Configs sweep/sweep_config_dsave_tmpl2_{scr,ft}_epem_ttx_d{5,7}_t8500.yaml from gen_data_saving.py --stage tmpl2
+      --ft-space llrd --tmpl2 (parents heldout_r4); diff against the stage-2 configs: training.scheduler WSD and wsd_cooldown_frac
+      0.125 fixed (the WSD parent''s recipe, FA-ccin2p3-388dcd45), training.batchsize added (int_log [5,158] at D=316, [49,1581]
+      at D=3162), fine-tune lr_scale low 0.1->0.03 and layer_decay low 0.75->0.5, name and DyHPO seed; all else identical
+      (T 8500, pools, HETEROSC mu_mse select, sigma stage, seed 42). drive.py on CC (parents and pools on CC only; site pick
+      earlier gave CC the same finish). Disk ~1 GB of 65 GB.'
+    control: The stage-2 search of the same cell (same T, pools, parent, objective; 8 trials).
+    seeds: 'Seed 42; one 8-trial search per cell and arm, waves 3,3,2 (D244/D245): 4 searches, 32 trials, 8.8 GPU-h by the
+      generator (incl. overhead; smaller batches run faster). Wall-time target ~1.2 h (3 waves x ~0.4 h).'
+    outcome: 'TEMPLATE FIXES: the search best is good (separation <= 3, end <= 2x best) in >= 3 of the 4 searches and its
+      best val is not higher than the stage-2 best beyond the 5x search-to-search spread (results.tex ladder) -> the revised
+      template goes to the remaining cells (cost to Joaquin) and replaces stage 2''s. PARTLY: good in 1-2 -> which cells and
+      arms, with their batch sizes; next: the trial count or the batch range read on these 32 trials. NO: 0 good -> batch
+      size and the opened ranges do not bring the curves together; the next candidate from the data (the horizon, the other
+      D-following HP) is designed. Every search reported with best val, separation, batch size, good count and its curves
+      figure; diverged trials apart (D398).'
   step_waits:
     '3': bbx_zz_lo_scr3, bbx_zz_lo_ft drivers (detach events)
     '4': bbx_zz_lo_ft driver (detach event)
