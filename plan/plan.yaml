@@ -24201,6 +24201,7 @@ entries:
   step_waits:
     '2': the detached driver lr_centre_test (sweep/drive.py over dsave_lrthird_{scr,ft}_epem_ttx_d7_t8500 and dsave_lrtenth_{scr,ft}_epem_ttx_d7_t8500,
       CC, 32 trials)
+    '3': the design reviewer and the repo-reviewer of the mu-only MSE test (branch lrcentre @541bea53), then its 6 searches
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
