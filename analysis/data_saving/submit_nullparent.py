@@ -2,10 +2,10 @@
 cell's stage-2 scratch best HPs (lr_scale = scratch lr / the configs' fixed training.lr, layer_decay 1), arm null
 (fine_tune.shrink_perturb=[0,1]: every parameter a fresh init) and arm pre (the parent's weights), 16 runs on CC.
 --smoke: one tree and one V/B null run at D=316, 50 steps. --dry: print only."""
-import json, re, subprocess, sys
+import json, os, re, subprocess, sys
 import yaml
 
-R = "/home/joaquin/work/FA"
+R = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 K = (5, 6, 7, 8)
 SCR_HP = {"epem_ttx": dict(zip(K, (1605, 844, 640, 657))), "ee_ttbar_nlo": dict(zip(K, (1663, 713, 358, 816)))}
 ARMS = [("null", 9107, {"fine_tune.shrink_perturb": "[0.0,1.0]"}), ("pre", 9108, {})]
@@ -33,7 +33,7 @@ if "--smoke" in sys.argv:
             for c, i, hp, n, _, _ in jobs if i == 9107 and "_d5_" in c]
 out = []
 for cfg, idx, hp, note, lim, T in jobs:
-    cmd = ["site", "submit", "ccin2p3", "FA", "--no-sync", "--allow-dirty", "sweep/trial_job.sh", "--item",
+    cmd = ["site", "submit", "ccin2p3", "FA", "sweep/trial_job.sh", "--item",
            "pretrain_data_saving", "--note", note, f"--hdr=--time={lim}", "--hdr=--mem=16G", "--hdr=--cpus-per-task=4",
            "--", "--sweep-config", f"sweep/sweep_config_{cfg}.yaml", "--detached", "--trial-idx", str(idx),
            "--hp-idx", str(idx), "--t-steps", str(T)]

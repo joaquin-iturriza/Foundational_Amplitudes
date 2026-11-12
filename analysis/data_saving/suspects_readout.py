@@ -81,8 +81,9 @@ def dirs():
     return out
 
 
-def load(cached):
-    cache = os.path.join(DATA, "suspects_runs_read.json")
+def load(cached, dirs=dirs, cache_name="suspects_runs_read.json"):
+    """{key: run read} for the runs of dirs(); nullparent_readout.py passes its own dirs and cache."""
+    cache = os.path.join(DATA, cache_name)
     if not cached:
         import base64
         dd = dirs()
