@@ -25534,6 +25534,17 @@ entries:
       branch (FA-ccin2p3-d322922b). (3) E5849: parent smoke failed on missing alpha_s sidecars of the n1e4 store_tag pools;
       fixed in write_own_alphas (286c0183, 248594f0), 278 written, re-smoke fc0c4eed, parents re-pointed. Figures: analysis/kit_benchmark/figs/kit_extrap_ee_{uug_me2,tt_virt_finite}_a.png,
       kit_mse_A_rezero_*.png, kit_mse_A_vbeta_ee_tt_virt_finite_{a,b}.png, kit_threshold_scan.png.'
+  - at: '2026-11-12T09:14:16+00:00'
+    text: '2026-11-12 ~10:20. (1) Step-6 seed check not run: Joaquin''s 2026-11-06T22:31 (D315) settles it (no extra seeds;
+      seed noise quoted from existing examples): the target V x beta arm''s bulk loss +0.56 and Sudakov +0.57 decades lie
+      inside the measured single-process transformer seed spread (results.tex ~13232-13245: 1.1x-30x, up to 1.5 decades);
+      its Coulomb gain -3.16 decades and the scan (sigma_NLO^surr/sigma_NLO - 1 = -0.082 at beta 1e-3, inside the NLO scale
+      band over the whole scan) lie far outside it. By the step-6 design''s letter (MLP band 0.23 on bulk) it reads NO; against
+      the transformer''s own measured noise the bulk loss is not resolved. (2) uug target side closed without a run (reviewer
+      FIX of the eikonal design, dead end recorded): the uug control already trains on a target flat into both limits (emission-scale
+      factor, finding 2026-11-10T06:22) and still overshoots +1.36 in the deepest collinear bin, so on uug the transformer''s
+      failure is input-side, not a power-law target; on tt virtual it was target-side (V x beta). Eikonal code reverted (68b6e74a).
+      Next: inputs-only transformer (step 14, needs a model input path and a design).'
   step_why:
     5:
       feeds: what KIT receives
