@@ -17,6 +17,8 @@ source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 PROBES=${PROBES:-udbar_Wgggg,uubar_Zg,uubar_Zgg,uubar_Zggg,uubar_Zgggg,uubar_Zggggg}
 recipes=$(for p in ${PROBES//,/ }; do echo recipes/transfer_probe_$p.yaml; done)
+# PROBE_RECIPES: comma-separated recipe paths, in place of PROBES (e.g. the data-saving targets)
+[ -n "${PROBE_RECIPES:-}" ] && recipes=${PROBE_RECIPES//,/ }
 for parent in ${PARENTS//,/ } "$@"; do
   [ -f "$parent/data_stats.json" ] || { echo "ZERO_SHOT_MISSING $parent"; continue; }
   python tools/zero_shot_parent.py --parent "$parent" $recipes
