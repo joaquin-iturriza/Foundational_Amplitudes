@@ -25035,6 +25035,46 @@ entries:
       lr_centre_readout.py --test tmpl2 holds both variants. Terms searched: WSD, wsd_cooldown, scheduler, batchsize/batch
       size, lr_scale, layer_decay, tmpl2, template, in results.tex, the entry''s findings and dead ends, and site decisions
       D241, D244/D245, D412, D420-D423.'
+  - at: '2026-11-12T18:40:12+00:00'
+    question: 'Revision of the 18:05 template test after D426 (Joaquin 2026-11-12: batch size is not searched alongside lr).
+      On t t~ LO at D=316 and 3162, 8-trial single-fidelity DyHPO searches: (1) WSD: the stage-2 space under WSD (cooldown
+      1/8) against the stage-2 cosine searches, scratch and fine-tune (unchanged, running); (2) WIDE FINE-TUNE RANGES: fine-tune
+      only, WSD plus lr_scale opened to [0.03,10] and layer_decay to [0.5,1], batch fixed at D/2 as in the template, against
+      the WSD-only fine-tune search. Scratch has no second comparison: without the batch search template 2 is the WSD-only
+      space, so no duplicate is run. The four batch-searching template-2 searches are withdrawn (D426). Do the search bests''
+      validation curves go down together with training (curve_quality.py) at no higher best val?'
+    prior: 'As the 18:05 design (hp_ranges_readout.py: only lr moves separation within a search, scratch Spearman -0.30, fine-tune
+      lr_scale -0.36; fine-tune lr_scale and layer_decay bests at the low edge in 9 of 30 searches each; search bests good
+      D<1e3 1 of 44, 1e3-1e4 1 of 22; suspects batch: WSD at cosine-tuned HPs fine-tune 5.06x, scratch 68x worse; results.tex
+      par. v4 WSD). D426 forbids the batch search; batch size never searched in this entry or results.tex. The 18:05 test''s
+      template-2 searches (dsave_tmpl2_*) had 12 trials submitted, none finished; they are not read.'
+    measure: 'Per search (lr_centre_readout.py --test tmpl2 @649e2dc8, reads dsave_wsd_* and dsave_wideft_ft_*): best val
+      (ln units, best checkpoint), its trial''s separation and good/bad (curve_quality.py), good-trial count, curves figure;
+      (1) WSD best val / stage-2 best val per cell and arm; (2) wide-ranges best val / WSD best val per fine-tune cell, with
+      good/bad of each best.'
+    check: 'The measure moves with an HP inside a search (lr -0.30 / lr_scale -0.36 Spearman on separation, hp_ranges_readout.json)
+      and Joaquin confirmed its good/bad examples (D421). Stage-2 searches of these cells: bests bad (curve_quality_cells_epem_ttx.json;
+      D=3162 separations 8.7 scratch, 25 fine-tune). The opened ranges target the one HP that moves separation (lr_scale)
+      where the bests sat at the low edge.'
+    fixed: 'Configs sweep/sweep_config_dsave_wsd_{scr,ft}_epem_ttx_d{5,7}_t8500.yaml @05546263 (running) and sweep/sweep_config_dsave_wideft_ft_epem_ttx_d{5,7}_t8500.yaml
+      @649e2dc8 (gen_data_saving.py --stage wideft --arms ft --ft-space llrd --tmpl2 --no-batch-search). wideft vs wsd diff:
+      fine_tune.lr_scale low 0.03 (was 0.1), fine_tune.layer_decay low 0.5 (was 0.75), name, DyHPO seed; batch D/2, WSD cooldown
+      0.125, T 8500, pools, parent heldout_r4, HETEROSC mu_mse select, sigma stage, seed 42 all as the WSD search. drive.py
+      on CC.'
+    control: (1) the stage-2 cosine search of the same cell and arm; (2) the WSD-only fine-tune search of the same cell (same
+      schedule and batch, space minus the opened ranges).
+    seeds: 'Seed 42; one 8-trial search per cell, waves 3,3,2 (D244/D245), as the sibling searches. New: 2 searches, 16 trials,
+      4.4 GPU-h by the generator (incl. overhead); the four WSD searches continue (~8.8 GPU-h of the 18:05 test''s 17.6).
+      Wall-time target ~1.2 h (3 waves x ~0.4 h). D412 30 GPU-h bar: 4.4 new, ~13 with the running WSD searches.'
+    outcome: 'Search-to-search spread up to 5x per cell (results.tex ladder): a best-val ratio counts only beyond 5x per cell;
+      pooled over cells by geometric mean against 5^(1/sqrt(n)) (4 cells: 2.24; 2 cells: 3.13). (1) WSD as the 18:05 design:
+      HELPS CURVES if WSD bests good in >= 3 of 4 (stage 2: 0 of 4) and pooled WSD/s2 <= 2.24; NO if <= 2 good (kept under
+      D423); WORSE if pooled > 2.24 (to Joaquin, D423 is his). (2) WIDE RANGES FIX: wide-ranges bests good in both fine-tune
+      cells, WSD-only fine-tune bests good in fewer, and pooled wide/WSD <= 3.13 -> the opened fine-tune ranges go into the
+      template (cost of the remaining cells to Joaquin); SAME: both good alike -> the schedule did it, ranges kept as before;
+      NO: wide-ranges good in neither -> the ranges are not the missing axis, next candidate read from these trials (horizon
+      or trial count, D422); one of two good: not resolved, reported with numbers, nothing more run. Every search reported
+      with best val, separation, good count and curves figure; diverged trials apart (D398).'
   step_waits:
     '3': bbx_zz_lo_scr3, bbx_zz_lo_ft drivers (detach events)
     '4': detach bbx_zz_lo_ft (LO fine-tune driver; its FA DONE event)
