@@ -24730,7 +24730,7 @@ entries:
       - 'no arm fails: feed the transformer his inputs only (architecture rung)'
   step_waits:
     '5': FA-ccin2p3-21f5d054
-    '6': the next owner, from the hand-off
+    '6': FA-ccin2p3-d277f7f5 FA-ccin2p3-7a63ea88 FA-ccin2p3-1df8bd16
     '8': FA-ccin2p3-d277f7f5 FA-ccin2p3-7a63ea88 FA-ccin2p3-1df8bd16
   handoff:
     state: 'Joaquin released the entry (D403): understand why our models do not extrapolate into the limits and match Bakar''s
