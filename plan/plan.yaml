@@ -24544,7 +24544,8 @@ entries:
       and decisions for zz/bbx: only one-loop pole/coverage notes and the transfer-ladder rung. Fine-tune space differs from
       the u u~ example, stated.'
   step_waits:
-    '2': 'detached drivers muonly_mse_test and bbx_zz_v_LD; step 3''s LO arm: the next owner''s design'
+    '2': FA-ccin2p3-39823ff8 FA-ccin2p3-6293be00 FA-ccin2p3-f28fe38e FA-ccin2p3-c7213cbd FA-ccin2p3-56381216 FA-ccin2p3-714db3a4
+      FA-ccin2p3-148ccdb9
     '3': FA-ccin2p3-39823ff8 FA-ccin2p3-6293be00 FA-ccin2p3-f28fe38e FA-ccin2p3-c7213cbd FA-ccin2p3-56381216 FA-ccin2p3-714db3a4
       FA-ccin2p3-148ccdb9
     '4': FA-ccin2p3-0d698e4b
