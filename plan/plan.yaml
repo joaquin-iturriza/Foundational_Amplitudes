@@ -24878,6 +24878,21 @@ entries:
       failure (1 decade better on uug coll and every uugg collinear family): by the design''s outcome, the MLP form and inputs
       are not what our current transformer loses on; next per the design: the transformer fed his inputs only (log10 s_ij/s0,
       logthr on tt).'
+  - at: '2026-11-12T03:19:52+00:00'
+    text: '2026-11-12 ~05:40 D405 design: reviewer a169c0ded88f258e3 FIX (recorded with plan design-fix). Revise once, for
+      the next owner: (1) the prior must name the star arms'' t t~ threshold arm (results.tex ~14809-14846: rung 1 + u u~
+      > t t~ tree and one loop at sqrt s 363-450 GeV, beta 0.2-0.65, probe e+e- > t t~ one loop near threshold: 2-4x better
+      than rung 1 from D=1e3, still above scratch at small D; rung 1 and the 64k ee>uu parent 2.5-20x worse than scratch at
+      D<=10^2.5), say what differs now (softpair inputs, beta to 1e-5, KIT strata at 1e5), and rewrite the NO branch in its
+      light; (2) add the beta input (model.input_pair_threshold, YES on tt virt in 3fc1016a) to the arms, e.g. r5thr with
+      the flag fine-tuned vs 3fc1016a, or say why not; (3) control matching: f21fa163 has input_pair_logs=4 vs the parent''s
+      6 (state the zero-padding equivalence), list the r5 vs trial-1262 config differences that reach an A_ft (job_kit.sh
+      takes the parent''s config.yaml as base), and the smoke run must show fine_tune.offshell_stats=own in its config (job_kit.sh:76
+      hard-codes parent before the override); (4) the 0.3-decade cut needs a measured spread (the ladder''s 3-seed per-stratum
+      spread on tt virt 1df8bd16, or the data-saving tt rerun spread); (5) keep r5thr''s T=4307 and lr 8.196e-3 or state the
+      change, and say how r5thr is launched (job_datasaving_parent.sh knows only heldout|treesin); (6) write the plain beta
+      sampling (no mixture, no adaptive pass, sqrt s = 2 m_t/sqrt(1-beta^2), beta log-uniform [1e-5, 0.6]; catalog_v4 cuts
+      do not cut tops) into fixed.'
   step_why:
     5:
       feeds: what KIT receives
