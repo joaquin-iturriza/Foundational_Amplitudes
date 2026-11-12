@@ -16307,12 +16307,10 @@ entries:
     '21': the date 2026-11-17 (a week after the 2026-11-09 23:54 restart on the batching code)
     '25': FA-ccin2p3-046cc7d3
   owner:
-    agent: aefaf94baeb410c64
-    state: closed
-    since: '2026-11-12T02:25:26+00:00'
-    state_at: '2026-11-12T14:02:09.204000+00:00'
-    context: 245423
-    context_at: '2026-11-12T08:51:43+00:00'
+    agent: ad08ebc12f4da937f
+    state: working
+    since: '2026-11-12T14:43:04+00:00'
+    state_at: '2026-11-12T14:43:04+00:00'
   designs:
   - at: '2026-10-30T19:52:22+00:00'
     question: 'Can lxplus''s HTCondor GPU nodes run FA jobs: does the env activate, the GPU show, the xformers attention kernel
