@@ -15786,9 +15786,6 @@ entries:
       the 22 running end: check_site_data --list on the 9 recipes, rerun the shards that refused once disk allows (resumable),
       then tell optimizations_recap''s owner a87ebdd2344eb92d7 its held-out reads can be redone. dsh_eea (115) waits on its
       own design (reviewer FIX: rewrite overwrites scored val/test; copy-and-compare or train-only assembly)'
-    26: 'Cache census answer for Joaquin (his 2026-11-12 question: how data caches exceed 100 GB): read $SCRATCH/zz_redesign_cache_census_v2.json
-      (analysis/agent_redesign/cache_census.py @cc80833e, detached cache_census_v2 started 03:41), draw plot_cache_census.py,
-      say per cache what it holds, what no running job or open recipe reads, the duplicates, and the fix with numbers'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16210,11 +16207,6 @@ entries:
       - '0 pools missing: tell a87ebdd2344eb92d7 the reads can be redone'
       - 'pools still missing (disk floor or a failed build): rerun those shards when free space allows, or report to the main
         session the disk call'
-    26:
-      feeds: what is deleted or kept on CC to get the disk back above the 60 GB alarm
-      if:
-      - 'files read by no recipe found: propose their deletion to Joaquin with GB'
-      - 'everything read by a recipe: propose which recipes'' pools to retire, his call'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
@@ -16224,8 +16216,6 @@ entries:
     '21': the date 2026-11-17 (a week after the 2026-11-09 23:54 restart on the batching code)
     '24': 2026-11-12T14:00 (12 h after the main session's waiter re-arms on the new site code)
     '25': FA-ccin2p3-d83d7f30 FA-ccin2p3-bb6707de
-    '26': detached job cache_census_v2 (pid 2343322, log ~/.local/share/ccorch/detached/20261112-034150_cache_census_v2.log;
-      its DONE event resumes the owner)
   owner:
     agent: aefaf94baeb410c64
     state: working
