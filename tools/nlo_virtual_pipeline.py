@@ -148,7 +148,7 @@ def _load_catalog_v4_virt():
     import yaml as _yaml
     n = 0
     # the layer, and the one-loop sign extension (gen_catalog_v4.py --write-loops-signext)
-    for f in ("catalog_v4_loops.yaml", "catalog_v4_loops_signext.yaml"):
+    for f in ("catalog_v4_loops.yaml", "catalog_v4_loops_signext.yaml", "catalog_v4_loops_kit.yaml"):
         path = os.path.join(ROOT, "recipes", f)
         if not os.path.exists(path):
             continue

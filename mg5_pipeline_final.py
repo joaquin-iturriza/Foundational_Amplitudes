@@ -1875,7 +1875,7 @@ def _load_catalog_v4():
     n = 0
     # the one-loop sign extension (gen_catalog_v4.py --write-loops-signext) too
     # and the multiplicity extension's trees (recipes/gen_catalog_v4_multext.py --write)
-    for f in ("catalog_v4_processes.yaml", "catalog_v4_loops.yaml", "catalog_v4_loops_signext.yaml",
+    for f in ("catalog_v4_processes.yaml", "catalog_v4_loops.yaml", "catalog_v4_loops_signext.yaml", "catalog_v4_loops_kit.yaml",
               "catalog_v4_multext_processes.yaml"):
         path = os.path.join(here, f)
         if not os.path.exists(path):
