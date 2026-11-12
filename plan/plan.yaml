@@ -28133,34 +28133,31 @@ entries:
     '14': FA-ccin2p3-8c1223c0 FA-ccin2p3-f45f434a
     '16': detach:kit_hpo (sweeps kit_hpo_uug_T, kit_hpo_uugg_T)
   handoff:
-    state: '2026-11-12 ~22:30 @68ccb875. Closed at the context limit. IN ORDER for the next owner. (1) Steps 15+16: four single-fidelity
-      DyHPO searches run through ONE detached sweep/drive.py (detach:kit_hpo, launched ~22:25 with --sites ccin2p3 lxplus
-      --hours 0.6 --mem 32G --cpus 4; configs sweep/sweep_config_kit_hpo_{uug_plain,ttvirt_thr,uug_T,uugg_T}.yaml @68ccb875:
-      16 trials, waves 6,5,5, 1831 steps = 300 epochs (D425), batch 16384 (D426), WSD 0.125, base configs from git sweep/kit_base/
-      so every site has them; design round 5 PASS; ~27 GPU-h, D428). State: 18 first-wave trials submitted on CC (1:36 limit),
-      6 trials in ''retry'' status refused by the 30 GPU-h/60-min budget gate (the 18 at 1.6 h limit count 28.8); they go
-      once the window clears (~23:20 UTC). If the gate still refuses, check the driver log ~/.local/share/ccorch/detached/*_kit_hpo.log.
-      Read on the driver''s DONE: .venv-cpu/bin/python tools/kit_curves.py sweep kit_hpo_uug_plain kit_hpo_ttvirt_thr kit_hpo_uug_T
-      kit_hpo_uugg_T --out analysis/kit_benchmark/data/kit_hpo.json (reads each trial on its site); chosen = lowest best val
-      among good (sep <= 3, end_up <= 2); kit_predict REREAD of chosen trials vs old controls; figure of the chosen trials''
-      val/train mu-MSE curves. Jean Zay excluded: it has no KIT raw data (/kit_hardps, 1.7 GB) and site copy fails (CC->JZ
-      ssh timeout; any copy run on lxplus has no ssh agent, needs Joaquin''s 2FA cluster_up). Once lxplus is reopened: site
-      copy FA lxplus jeanzay /eos/user/j/joiturri/datasets/kit_hardps --to /lustre/fswork/projects/rech/itg/ulm49ia/datasets,
-      then restart the driver with --allow-jeanzay and no --sites (D431). (2) Step 14: div-form D395 smokes FA-ccin2p3-8c1223c0
-      (uug) and f45f434a (tt) pending; on their end check training, sigma, kit_predict, plots ran; arms = each setup''s chosen
-      trial config + ++model.input_div_form=true via job_kit.sh A with that trial''s HPs at 1831 steps, config diff vs trial
-      config.yaml before submission, wall target from the trial''s time (design round 5). (3) 11c fine-tunes dcf42ad6/e7dca162
-      and step 5 wait on runs.'
-    decisions: 'D424 search uug T and uugg; D425 horizon 300 epochs; D426 batch fixed (gen_data_saving.py batch search now
-      opt-in); D427/D428 16 trials; D431 Jean Zay allowed, no per-site cap. Step 13 degree-1 log term PARTIAL (finding @6583d0bb):
-      overshoots gone, no limit fixed, Coulomb lost; not adopted. Step 12 dropped (finished).'
+    state: '2026-11-12 ~22:35 @68ccb875. Closed at the context limit. (1) Steps 15+16, kit_hpo driver: one detached sweep/drive.py
+      (detach:kit_hpo, relaunched ~22:25: --sites ccin2p3 lxplus --hours 0.6 --mem 32G --cpus 4) over sweep/sweep_config_kit_hpo_{uug_plain,ttvirt_thr,uug_T,uugg_T}.yaml
+      @68ccb875 (16 trials, waves 6,5,5, 1831 steps, batch 16384, WSD 0.125, base configs from git sweep/kit_base/; design
+      round 5 PASS; ~27 GPU-h, D428). Driver state: 18 first-wave trials submitted on CC (site pick put all there; 1:36 limit),
+      6 in ''retry'' refused by the 30 GPU-h/60-min gate (the 18 at 1.6 h count 28.8); they go when the window clears (~23:20
+      UTC); log ~/.local/share/ccorch/detached/*_kit_hpo.log. On the driver''s DONE: tools/kit_curves.py sweep kit_hpo_uug_plain
+      kit_hpo_ttvirt_thr kit_hpo_uug_T kit_hpo_uugg_T --out analysis/kit_benchmark/data/kit_hpo.json; chosen = lowest best
+      val among good (sep <= 3, end_up <= 2); kit_predict REREAD vs old controls; figure of the chosen trials'' curves. Jean
+      Zay copy blocker (worker a7421d9f on it): JZ lacks /kit_hardps (1.7 GB); site copy CC->JZ times out, copies run on lxplus
+      have no ssh agent (2FA). Once the data is there: restart the driver with --allow-jeanzay and no --sites (D431). Site
+      pick fix (worker a6bfbb55 on it): pick placed every trial on CC despite Slurm''s ~30 h estimate. (2) Step 14: div-form
+      50-step checks FA-ccin2p3-8c1223c0 (uug) and f45f434a (tt) pending; on their end check training, sigma, kit_predict,
+      plots; then arms = chosen trial config + ++model.input_div_form=true via job_kit.sh A at that trial''s HPs and 1831
+      steps, config diff vs the trial''s config.yaml, wall target from the trial''s time. (3) 11c fine-tunes: 2d653209 ->
+      dcf42ad6 and ca5873f3 -> e7dca162 running/pending; step 5 after them.'
+    decisions: 'D424 search uug T and uugg; D425 300 epochs; D426 batch fixed (gen_data_saving.py batch search now opt-in);
+      D427/D428 16 trials; D431 Jean Zay allowed. Step 13 degree-1 log term PARTIAL (finding @6583d0bb): overshoots gone,
+      no limit fixed, Coulomb lost; not adopted. Step 12 dropped (finished).'
     ruled_out: route cuts (D419); degree-2 and degree-1 log-invariant polynomial terms as general fixes; per-frame gamma bound
-      4; shorter horizon read from cosine prefixes (not informative)
-    running: kit_hpo driver (detach:kit_hpo; 18 trials on CC + 6 retry); smokes FA-ccin2p3-8c1223c0, f45f434a (step 14); 2d653209
-      -> dcf42ad6, ca5873f3 -> e7dca162 (11c)
-    files: sweep/sweep_config_kit_hpo_*.yaml, sweep/kit_base/**, tools/kit_curves.py (sweep reader per site), analysis/kit_benchmark/data/kit_fig_A_logpolylin_{uug,tt}.json,
+      4; horizon from cosine-run prefixes (not informative)
+    running: kit_hpo driver (18 trials on CC + 6 retry); FA-ccin2p3-8c1223c0, f45f434a (step 14 checks); 2d653209 -> dcf42ad6,
+      ca5873f3 -> e7dca162 (11c)
+    files: sweep/sweep_config_kit_hpo_*.yaml, sweep/kit_base/**, tools/kit_curves.py, analysis/kit_benchmark/data/kit_fig_A_logpolylin_{uug,tt}.json,
       kit_extrap.json, kit_curves.json, figs kit_extrap_logpolylin_*
-    written: '2026-11-12T21:22:30+00:00'
+    written: '2026-11-12T21:23:00+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
