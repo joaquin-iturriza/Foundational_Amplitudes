@@ -25020,6 +25020,20 @@ entries:
       template goes to the remaining cells (cost to Joaquin); SAME: both good alike -> the schedule did it; NO: tmpl2 good
       in <= 1 -> neither batch nor the opened ranges; next candidate from these 64 trials (horizon). Every search reported
       with best val, separation, batch size, good count and curves figure; diverged trials apart (D398).'
+    passed_at: '2026-11-12T18:05:54+00:00'
+    reviewer: 'Re-check after FIX (design 18:05). Check 1: configs diffed. wsd vs stage-2 = WSD + cooldown 0.125 only; tmpl2
+      vs wsd = batchsize int_log [5,158]/[49,1581], plus fine-tune lr_scale low 0.03 and layer_decay low 0.5; otherwise name
+      and DyHPO seed only. The fine-tune moving batch and ranges together is stated in the question. The stage-2 control ran
+      cosine at batch 1581 = D/2 (FA-ccin2p3-87fc7187 RUN_SUMMARY). Check 2: hp_ranges_readout.json, separation Spearman lr
+      -0.30 scratch, lr_scale -0.36 fine-tune; good/bad examples confirmed by Joaquin (D421). Check 3: one 8-trial search
+      per cell, as the siblings; 5x per-cell / 2.24x pooled bar; search bests good only 1 of 44 (D<1e3) and 1 of 22 (1e3-1e4),
+      so 3 of 4 good stands far above the base rate. Check 4: yes/no given for both comparisons; open middle cases (template
+      2 good in exactly 2, or good in 3+ at pooled >2.24) to be reported as not resolved. Check 5: the suspects-batch WSD
+      finding (08:53: fine-tune 5.06x, scratch 68x worse at fixed cosine HPs) is now in the prior, with what differs (WSD
+      searched). Checks 13, 14: template space, 8 trials 3,3,2, 17.6 GPU-h < 30 (D412); CC 65 GB free (df), ~2 GB. Readout
+      lr_centre_readout.py --test tmpl2 holds both variants. Terms searched: WSD, wsd_cooldown, scheduler, batchsize/batch
+      size, lr_scale, layer_decay, tmpl2, template, in results.tex, the entry''s findings and dead ends, and site decisions
+      D241, D244/D245, D412, D420-D423.'
   step_waits:
     '3': bbx_zz_lo_scr3, bbx_zz_lo_ft drivers (detach events)
     '4': bbx_zz_lo_ft driver (detach event)
