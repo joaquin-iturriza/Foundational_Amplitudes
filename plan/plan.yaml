@@ -21014,6 +21014,9 @@ entries:
       on t t~ tree, smoke dsave_diag_pshsmoke_ft_epem_ttx_d5_t50 then 8 runs sweep/sweep_config_dsave_diag_{pshared,psharedtops}_ft_epem_ttx_d{5..8}_t8500.yaml
       at the stage-2 best HPs (design PASS ~00:50), read R = parent_shared/own (re-based val MSE(ln)) against the parscale/tops
       controls'
+    10: 'Joaquin''s review 2026-11-12: fine-tunes start from the parent''s function (affine head rescale at load under target_stats=own,
+      unit-tested); find why the one-loop fine-tune blows up (training, not sigma); plots from run curves, house style, every
+      D; D=316 outliers; rerun corrected fine-tunes'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -21133,6 +21136,11 @@ entries:
       - 'NO (geomean in (1/3,3)): no gain at the control''s HPs; next design on the fine-tune''s generalisation floor on t
         t~ (mass column own on t t~ tree)'
       - 'WORSE or r4/r5 disagree: own stays / inconclusive, both numbers reported'
+    10:
+      feeds: whether pretraining saves t t~ data once the fine-tune starts from the parent's function
+      if:
+      - 'fine-tunes beat or match scratch on t t~: re-read S at the study''s design'
+      - 'still worse: the next defect, shown with the runs'' curves'
   designs:
   - at: '2026-11-10T02:35:09+00:00'
     question: 'Step 1 (D356 horizons, tree arm): on catalog_v4''s held-out tree targets ee->ttbar (H3, 2->2 massive), ee->ccbar
