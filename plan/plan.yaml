@@ -16861,6 +16861,26 @@ entries:
       be redone. No: a shard fails or one-loop CERT_FAILED: read the log, rerun (resumable); a pool failing the moment test
       is reported with its z and std ratio and the reads on it are flagged not comparable. Disk: A ~17 GB, B ~3 GB pools (parts
       freed after), C ~1.3 GB, against 52.9 GB free; the prebuild stops itself at 16.5 GB free.'
+    fix_at: '2026-11-12T01:36:38+00:00'
+    fix: 'Re-check of the 01:35 design. Settled: time (A and C1 at 08:00:00 with the one-loop estimate behind a 2.5 h target;
+      C1''s longest pool pp13v4_uc_cggu 0.99 h on 8 cores; C2 2.74 h longest task in 04:00:00), recipe sameness (the current
+      code reproduces the stored recipe_id of all 1402 held-out val/test pools built from 2026-10-26 on; role sampling is
+      one policy in mg5_pipeline_final.sampling_policy, one-loop never shaped), disk (52.9 GB free, about 21 GB to write,
+      floor 16.5 GB; MadEvent dirs node-local through the existing AMP_LHE_WORK_DIR). Two things still fail. (1) The new train-vs-val
+      moment test (measure 2) has not been shown on existing data (check 2): its yes/no threshold (|z|<4, std ratio 0.9-1.1,
+      ''expected 0 of 1300'') is asserted. These pools are not plain i.i.d. draws: the mixture''s flat quota fills short bins
+      from bins with spare candidates differently per pool (g12 regen log: ''2 of 9 bins short (777 events)'' in one test
+      pool), and the pp pools carry a default-share and kept-fraction layout, so train and val of the same recipe can differ
+      in log|M|^2 mean by more than 4 sigma at n_train 1e5. A false fail would mark reads ''not comparable'' for no reason.
+      Fix: run the same test now, before the batch, on existing pairs built by the same code path where both train and val
+      are on disk (the 1301 catalog_v4 training pools, the remaining 1e4 H3 copies against their val, some PP4 pools still
+      present), report the spread of z and of the std ratio, and set the threshold from it, or drop the test and rely on the
+      recipe-id check. (2) B deletes the only copy of dsh_eea''s events before checking them: the worker that assembles a
+      process deletes its parts once its pools are built (92448c07), and the re-assembly path (lhe_parts 131a0fea) is new
+      and has run only in unit tests. The design runs the moment test after the batch, when the parts are already gone, and
+      the hand-off of 2026-11-12 says these parts are the only source of the 115 train pools. Fix: run B with the parts''
+      auto-deletion off (lhe_parts.AUTO_GC, as the tests do), check the re-assembled pools (check_site_data and the calibrated
+      moment test), and only then run lhe_parts gc --parts under D208.'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
