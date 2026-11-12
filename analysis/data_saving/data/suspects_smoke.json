@@ -1,0 +1,48 @@
+[
+ {
+  "note": "suspects smoke ft mse+wsd+adamw dsave_diag_hmap_ft_epem_ttx_d5_t8500 50 steps",
+  "cfg": "sweep/sweep_config_dsave_diag_hmap_ft_epem_ttx_d5_t8500.yaml",
+  "run_dir": "runs/dsave_diag_hmap_ft_epem_ttx_d5_t8500/trial_9199",
+  "hp_idx": 9199,
+  "hp": {
+   "fine_tune.lr_scale": 0.2548334420151467,
+   "fine_tune.layer_decay": 0.7568139291834086,
+   "training.muon_weight_decay": 0.17274051845435906,
+   "training.regularization_lambda": 1.0415351340535765e-08,
+   "training.cosanneal_warmup_frac": 0.18600225048139696,
+   "training.cosanneal_eta_min": 1.5494050809891875e-10,
+   "ema": "false",
+   "training.ema_decay": 0.9768689628532157,
+   "training.scheduler": "WSD",
+   "training.wsd_cooldown_frac": 0.125,
+   "training.optimizer": "AdamW",
+   "training.heterosc_mu_only": true
+  },
+  "t_steps": 50,
+  "rid": "FA-ccin2p3-65bd454d",
+  "err": null
+ },
+ {
+  "note": "suspects smoke ft mse+wsd+adamw dsave_diag_parscale_ft_ee_ttbar_nlo_d5_t8500 50 steps",
+  "cfg": "sweep/sweep_config_dsave_diag_parscale_ft_ee_ttbar_nlo_d5_t8500.yaml",
+  "run_dir": "runs/dsave_diag_parscale_ft_ee_ttbar_nlo_d5_t8500/trial_9199",
+  "hp_idx": 9199,
+  "hp": {
+   "fine_tune.lr_scale": 0.0408108097122363,
+   "fine_tune.layer_decay": 0.7588957857806236,
+   "training.muon_weight_decay": 0.0013957043420621787,
+   "training.regularization_lambda": 1.9767096568530845e-08,
+   "training.cosanneal_warmup_frac": 0.08882756954990328,
+   "training.cosanneal_eta_min": 9.276144627331754e-09,
+   "ema": "true",
+   "training.ema_decay": 0.9046396675854922,
+   "training.scheduler": "WSD",
+   "training.wsd_cooldown_frac": 0.125,
+   "training.optimizer": "AdamW",
+   "training.heterosc_mu_only": true
+  },
+  "t_steps": 50,
+  "rid": "FA-ccin2p3-dd952e7a",
+  "err": null
+ }
+]
