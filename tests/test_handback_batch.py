@@ -89,6 +89,10 @@ def test_leaks_20261112():
     assert na.verdict(note, "/nonexistent") == (False, "no hand-back from %s in the transcript" % A)
     open(os.path.join(d, "1794442966_%s_213b93b13d.txt" % A), "w").close()
     assert na.verdict(note, "/nonexistent") == (True, A)
+    # an older run's spool file of the same agent id does not absorb a later run's notice (repo-reviewer 2026-11-12)
+    old = time.time() - na.SPOOL_FRESH_S - 60
+    os.utime(os.path.join(d, "1794442966_%s_213b93b13d.txt" % A), (old, old))
+    assert na.verdict(note, "/nonexistent") == (False, "no hand-back from %s in the transcript" % A)
     os.remove(os.path.join(d, "1794442966_%s_213b93b13d.txt" % A))
     # (3) between a waiter's return and its re-arm: alive for GRACE_S after the return stamp
     stamp = os.path.join(TMP, "events_waiter.FA.returned")

@@ -31,12 +31,19 @@ AGENT = re.compile(r"<task-id>(a[0-9a-f]{16})</task-id>")
 DELIVERED = re.compile(r"report was delivered to you as a message from \"?(a[0-9a-f]{16})\"? \(its SubagentHandback call\)")
 
 
+SPOOL_FRESH_S = 900
+
+
 def handed_back(transcript, agent):
     """True when the transcript holds a hand-back message from `agent` (a queued message or a turn-starting one), or
     the hand-back was spooled for the batch (2026-11-12: a spooled report never reaches the transcript, so the agent's
     'finished' notification after it woke the main session on its own, 00:11, 00:22 and 00:23 UTC)."""
-    import glob
-    if glob.glob(os.path.join(CCORCH, "spool", PROJECT, "*_%s_*.txt" % agent)):
+    import glob, time
+    # only a report spooled by this run: an owner resumed many times under one id keeps its older spool files, and a
+    # later run that ends with no hand-back must still wake the main session (repo-reviewer 2026-11-12); the notice
+    # follows its hand-back within seconds (median 0.17 s, at most 64 s, 2026-11-04)
+    if any(time.time() - os.path.getmtime(f) < SPOOL_FRESH_S
+           for f in glob.glob(os.path.join(CCORCH, "spool", PROJECT, "*_%s_*.txt" % agent))):
         return True
     tag = 'agent-message from=\\"%s\\"' % agent      # as written inside a JSON string
     tag_plain = 'agent-message from="%s"' % agent
