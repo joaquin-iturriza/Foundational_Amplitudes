@@ -23332,6 +23332,83 @@ entries:
       per-pool median 8.03x, 4.91x best against best); seeds (0.065 decades per-pool seed spread against a 1.5x bar); HETEROSC;
       D392 inputs present in r5''s config (input_soft_eps 1e-8, input_pair_logs 6); step rate 1.0579 s/iter read from r5''s
       own log on V100; disk fine (in memory, ~0.6 GB).'
+  - at: '2026-11-12T00:21:28+00:00'
+    question: 'Two steps of optimizations_recap (D364), one batch. (A) muon_long, step 3 (D364: ''the change to muon and how
+      it trains a network that transfers better (ideally extend the plots that compare the optimizers to this arbitrary 1e-4
+      value)''; Joaquin 2026-11-11: no need to wait for the data-saving grid; it was held only for the extrapolation/extra-inputs
+      discussion, settled 2026-11-11 by kit_benchmark''s verdict, D392): on the longest catalog_v4 pretraining we have, the
+      width-8 cell at 16x (68224 steps, the whole training set), trained with AdamW in place of Muon, does Muon''s lower error
+      hold at the lower errors and the plateau a long run reaches, and does its zero-shot (transfer) lead hold? (B) pidqn,
+      step 1: the design passed 2026-11-10 re-recorded unchanged in substance (only the D395 smoke and today''s disk read
+      added): on the latest catalog_v4 1x width-8 cell, does a one-hot PDG token (data.use_PIDs=true) reach the quantum-number
+      encoding''s error in distribution and on encodable held-out classes; how many held-out probes can one-hot not encode?'
+    prior: '(A) par:v3_muon (results.tex): catalog_v3 short pretraining, 4264 steps, MSE loss: stage 1 at AdamW''s HPs Muon
+      7.88x/7.07x lower best val (seeds 42/43), per pool median 8.03x, Muon lower at both seeds on 99.4% of 1397 pools, seed
+      spread 0.065 decades; stage 2 best against best (8-trial searches each) 4.91x, tuning AdamW gained only 1.1x; zero-shot
+      median 4.47x over 617 probes; small-D fine-tunes AdamW parent over Muon parent 3.2x. None past 4264 steps. par:v4_length
+      (results.tex l.2609): catalog_v4 width 8, Muon, 16x (68224 steps, trial 1262 of cov_v4_long_hpo8_cc_68224) over 4x (17056):
+      PP4 R=0.671, EE4 0.677, held out default-sampled 0.921, H2p5 3.07 (worse); neither sweep converged (best lr at the window
+      top, best checkpoint at the last validation). Joaquin D292 on that width x length map: ''the longest run seems to be
+      plateauing already''. The map''s hp1262 cells exist (w8 x2, x8; w16/w32 x2..x16). The data-saving r5 parent (5 epochs
+      of 1e4 per pool) reads per-pool gmean MSE(ln|M|^2) 0.085, train = val. Step 2 of this entry (AdamW-parent fine-tunes
+      on the data-saving grid) is separate and not in this batch. (B) as passed 2026-11-10: pid_vs_phys (25 LO e+e- processes,
+      the encodings overlap), prin:zeroshot (one-hot cannot represent the held-out top), tab:enc (+12..18%). Searched: results.tex
+      (muon, AdamW, par:v3_muon, par:v4_length, sec:optrecap, 1e-4, plateau, use_PIDs, one-hot), plan show optimizations_recap
+      and pretrain_data_saving, site decisions (D144-D160, D236, D292, D293, D315, D364, D373, D392, D395).'
+    measure: '(A) The curve: val mu-MSE against step (val_mse_curve of result.json, the AdamW run''s training.result_path=<run
+      dir>/result.json set by the script; the Muon run''s from sweeps/cov_v4_long_hpo8_cc_68224/results/hp1262_t68224_1793686584.json,
+      which holds val_mse_curve) on one axis, the extension of fig:v3_muon a to 68224 steps; from it, the step at which AdamW
+      first reaches Muon''s val mu-MSE at 8528, 17056, 34112 and 68224 steps (steps-to-level), and the ratio AdamW/Muon at
+      each validation. The level: each run''s final model (best checkpoint, then the sigma fit, D276) read as the cell''s
+      reads (PP4, EE4: test splits of the training classes; H1-H7c catalog-sampled and HD4/HD5 default-sampled held out):
+      per class MSE of ln|M|^2; R = median over classes of the class geometric mean MSE_AdamW/MSE_Muon per read with the 95%
+      class bootstrap widened by |ln R_seed| (par:v4_width''s convention), the share of classes Muon is lower, and each run''s
+      median per-class MSE of ln|M|^2 on PP4 and EE4 (the level against 1e-4). Plateau, per run: best val mu-MSE within 10%
+      of its value at 0.75 T, or best checkpoint before 0.9 T. (B) unchanged: R = median over classes of the class gmean MSE_pid/MSE_qn
+      of ln|M|^2 at each final model, per read PP4, EE4, H1-H7c, HD4, HD5 (held-out reads on encodable probes), 95% class
+      bootstrap widened by |ln R_seed|; the count of refused held-out probes; each run''s pooled validation MSE.'
+    check: '(A) The optimizer moves these measures far beyond noise on existing data: par:v3_muon per-pool median ratio 8.03
+      (stage 1), 4.91 best against best, zero-shot 4.47, seed spread 0.065 decades per pool; the reads resolve 0.67x on this
+      exact cell family (par:v4_length PP4 [0.623, 0.734]); the seed scale is seed_spread.json het |ln R_seed| median 0.10,
+      q90 0.23. So R outside [0.80, 1.26] is resolved. (B) as passed: par:v4_width PP4 R 0.565 [0.522, 0.614] over 1301 classes.'
+    fixed: '(A) The AdamW arm is the cell scripts/job_catalog_v3_short.sh v4_het_default25 LONG_HEADS=8 LONG_FACTOR=16 LONG_HP=1262
+      LONG_MEMMAP=true LONG_OPT=adamw (LONG_OPT added at e9f5aade: only training.optimizer=MuonAdamW -> AdamW, i.e. MuAdamW
+      on every parameter; run dir runs/catalog_v4_long/v4_het_default25_w8_x16_hp1262_adamw): catalog_v4 default share 0.25
+      recipe, the whole training set (1e5 per tree class, 5e4 one-loop; D236: every length trains on the full set), 68224
+      steps at batch 16384, HETEROSC + sigma stage, width 8, trial 1262''s HPs (lr 7.82114e-3 (68224/17056)^-0.55 = 3.649e-3,
+      L2 9.11e-8, warmup 0.18, eta_min 1.38e-8, ema off), dimensionless inputs and emission-scale target, llm4lhc diagrams,
+      off-shellness, seed 42, the reads above. Same lr and L2 for AdamW: MuonAdamW scales Muon''s update to AdamW''s RMS so
+      one lr number serves both (par:v3_muon stage 1); best against best is not repeated: stage 2 found AdamW''s own search
+      gains 1.1x, so a gap under 1.25x is stated as unresolved, not as a tie. No D392 kit inputs: the Muon run predates them
+      and the pair must match. The x2 short pair (AdamW twin of w8_x2_hp1262, ~4 h) is not in this batch: it would take it
+      to ~30.5 GPU-h; the long run''s own curve gives the comparison at every length up to 68224. D395: one smoke (mode smoke,
+      LONG_OPT=adamw, 40 steps through training, sigma stage and two read axes) first, the long run afterok on it; its config.yaml
+      diffed against trial 1262''s (only the optimizer, run_dir, result_path and read settings may differ). Partition: the
+      Muon run''s GPU is read from its log and the AdamW run pinned to the same partition (gpu_v100 or gpu_h100: tf32 differs).
+      Wall: tools/short_wall.py 25.35 h with its 1.25 margin (20.3 h real; 0.983 s/step measured on V100), slurm 25:30:00.
+      Disk: the existing 2.5 GB memmap cache of this recipe, ~1 GB run dir + predictions. (B) as passed: the 1x width-8 cell
+      v4_het_default25 LONG_HEADS=8 LONG_FACTOR=1 LONG_MEMMAP=true, only data.use_PIDs differs; both arms reuse the existing
+      memmap cache; D395 smoke PIDQN=pid mode smoke first, both arms afterok; wall 2.8 h each (short_wall 3.52 h incl. 1.25
+      margin, slurm 03:45:00; the identical cell measured 2.67 h); 2 x 0.86 GB. Disk read today: 49 GB free on /sps/lpnhe;
+      batch ~3 GB. GPU-h: A 20.3 + 0.3 smoke, B 5.6 + 0.3 smoke = 26.5 GPU-h, CC.'
+    control: '(A) Muon: trial 1262 of cov_v4_long_hpo8_cc_68224 (run dir runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262,
+      its reads FA-ccin2p3-1a46f3e0, used in par:v4_length), the identical cell with MuonAdamW; it ran at an older commit
+      (a same-commit Muon rerun is another ~20 GPU-h, above the budget, put to Joaquin if the read is borderline); the code
+      paths between the two commits that touch training are listed from git log at submission. (B) PIDQN=qn at the same commit
+      (runs/catalog_v4_long/v4_het_default25_w8_x1_pidqn_qn), and the existing cell FA-ccin2p3-804a65bc as a rerun check.'
+    seeds: 'One seed (42) per arm, D315; scale: par:v3_muon seed spread 0.065 decades per pool, 7.88 vs 7.07 between seeds;
+      seed_spread.json het |ln R_seed| median 0.10, q90 0.23.'
+    outcome: '(A) YES, Muon''s lead holds at the long run''s lower error: R >= 1.26 (interval above 1) on PP4 and EE4 at 68224
+      steps; the optimizations section extends fig:v3_muon''s curves to 68224 steps with R at the end, the steps-to-level,
+      and the zero-shot R on the held-out reads (the transfer part). CLOSES: R inside [0.80, 1.26] at 68224 while the curves
+      are apart early: Muon''s gain is speed, not the floor; the section says so with the steps-to-level. AdamW better (R
+      < 0.80): reported as such, the Muon claim revised. The level: each run''s median per-class MSE of ln|M|^2 on PP4/EE4
+      and whether either reaches 1e-4; if neither does and a run is not plateaued by the rule above, the longer horizon and
+      its GPU-h go to Joaquin as a question; if both plateau above 1e-4, that is the setup''s floor at the full training set,
+      said so (how to read 1e-4 then is Joaquin''s call, asked with the read). Transfer at 1e-4 by fine-tuning stays step
+      2. (B) R on PP4 and EE4 inside [0.80, 1.26] or below: the claim holds (or one-hot better), the paper keeps it with these
+      numbers; above 1.26: the one-hot arm gets the 8-trial Muon-space DyHPO (~22 GPU-h) best against best; held out: R on
+      encodable probes, every probe with an unseen particle a case one-hot cannot predict.'
   step_why:
     1:
       feeds: D364 claim that pIDs and quantum numbers behave the same, on the latest setup
