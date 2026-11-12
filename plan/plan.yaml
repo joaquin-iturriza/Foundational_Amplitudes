@@ -25422,6 +25422,15 @@ entries:
       c/3 LOWER, best min 1.9e-9 vs 8.2e-9 (0.23x), best tracks; c/10 SAME (0.87x); scratch c/3 HIGHER 15x, c/10 HIGHER 7.3x
       (turns up). mu-only test: t t~ LO scratch HIGHER 4.7x, fine-tune HIGHER 6x (turns up); u u~ V D=3162 fine-tune LOWER
       0.14x, D=1e4 fine-tune HIGHER 5.9x; scratch HIGHER 6x / SAME.'
+  - at: '2026-11-12T17:39:34+00:00'
+    text: '2026-11-12 curve measure rebuilt (155d1ab8) on Joaquin''s ''train and val loss go down together'': good = separation
+      (val/train at the end over the smallest val/train in the run, 3-check running median) <= 3 and val at end <= 2x its
+      best. Checked on the 48 curves of s4/lr_centre/muonly/nullparent figures: only 4 at or under 3x (t t~ V/B D=3162 scratch
+      1.9, u u~ V D=1e4 FT control 2.95, nullparent t t~ V/B D=3162 parent weights 2.9, t t~ LO D=3162 FT c/3 3.7 just over);
+      every curve visibly separating is 10-3e5x. WITHDRAWN: ''100 of 151 t t~ LO trials track'' -> 24 of 151 good. Search
+      bests good: t t~ LO scr 2/9 ft 2/9; t t~ V/B scr 3/8 ft 1/8; u u~ LO scr 2/9 ft 3/9; u u~ V scr 0/8 ft 1/8; b b~ ZZ
+      V/B 0/7 both; b b~ ZZ LO scr 1/7. Typical failure: val follows train until the cosine tail (last ~15% of steps), then
+      train drops 1-4 decades and val flattens. Figures figs/curve_examples_{good,bad}.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
