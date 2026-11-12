@@ -21348,7 +21348,10 @@ entries:
   - D360
   - D377
   - D407
-  next: null
+  next:
+    2: 'Null-parent 2x2 (fresh init vs parent weights through the fine-tune configs at the scratch''s HPs, t t~ tree and V/B,
+      D=316..1e4, 16 runs + 2 smokes, 7.6 GPU-h; analysis/data_saving/submit_nullparent.py @eaacb51f): design review of the
+      version with E = report only'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -24406,6 +24409,14 @@ entries:
     files: analysis/data_saving/{submit_suspects.py,suspects_readout.py,old_vs_new.py}, data/suspects_runs.json (56 run ids,
       configs), commits b66c446a, 55aeb931
     written: '2026-11-12T04:53:05+00:00'
+  step_why:
+    2:
+      feeds: whether the fine-tune deficit on t t~ sits in the fine-tune path, the fine-tune search, or the parent's weights
+      if:
+      - 'PATH: bisect the path''s input stats on the null arm'
+      - 'WEIGHTS: a design on the parent'
+      - 'SEARCH: finding to Joaquin with the search rerun as a proposal'
+      - 'NOT RESOLVED: report per cell, stop'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
