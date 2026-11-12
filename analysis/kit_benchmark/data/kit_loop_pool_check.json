@@ -1,0 +1,302 @@
+{
+ "../datasets/v4_ddx_ttx_nlo__hi_431-50000GeV_test_amplitudes.npy": {
+  "n": 1000,
+  "beta_min": 0.6014298018984353,
+  "beta_max": 0.9999758780944407,
+  "sqrts_min": 431.82992087797425,
+  "sqrts_max": 49670.771983642284,
+  "per_beta_decade": {
+   "-1": 1000
+  },
+  "per_half_decade_sqrts": {
+   "2.5": 183,
+   "3.0": 235,
+   "3.5": 256,
+   "4.0": 241,
+   "4.5": 85
+  },
+  "median_log10_absVB_per_beta_decade": {
+   "-1": 1.8615968466527926
+  },
+  "slope_per_beta_decade": null,
+  "neg_share": 0.0,
+  "finite": true
+ },
+ "../datasets/v4_ddx_ttx_nlo__hi_431-50000GeV_val_amplitudes.npy": {
+  "n": 1000,
+  "beta_min": 0.6020055496116328,
+  "beta_max": 0.9999760073751546,
+  "sqrts_min": 432.0644942705735,
+  "sqrts_max": 49804.41239600575,
+  "per_beta_decade": {
+   "-1": 1000
+  },
+  "per_half_decade_sqrts": {
+   "2.5": 172,
+   "3.0": 263,
+   "3.5": 203,
+   "4.0": 266,
+   "4.5": 96
+  },
+  "median_log10_absVB_per_beta_decade": {
+   "-1": 1.8519329500210997
+  },
+  "slope_per_beta_decade": null,
+  "neg_share": 0.0,
+  "finite": true
+ },
+ "../datasets/v4_ddx_ttx_nlo__thr_345-431GeV_test_amplitudes.npy": {
+  "n": 1000,
+  "beta_min": 1.0031154701039103e-05,
+  "beta_max": 0.5908946855093158,
+  "sqrts_min": 345.00000001735765,
+  "sqrts_max": 427.6424597810968,
+  "per_beta_decade": {
+   "-5": 208,
+   "-4": 210,
+   "-3": 224,
+   "-2": 194,
+   "-1": 164
+  },
+  "per_half_decade_sqrts": {
+   "2.5": 1000
+  },
+  "median_log10_absVB_per_beta_decade": {
+   "-5": 4.652085000462537,
+   "-4": 3.7125078638293383,
+   "-3": 2.6872548454578222,
+   "-2": 1.6448243795701987,
+   "-1": 0.5824492310881424
+  },
+  "slope_per_beta_decade": -1.0206955023007926,
+  "neg_share": 0.934,
+  "finite": true
+ },
+ "../datasets/v4_ddx_ttx_nlo__thr_345-431GeV_val_amplitudes.npy": {
+  "n": 1000,
+  "beta_min": 1.004378059062925e-05,
+  "beta_max": 0.5945811847401065,
+  "sqrts_min": 345.00000001740136,
+  "sqrts_max": 429.08548869685876,
+  "per_beta_decade": {
+   "-5": 198,
+   "-4": 237,
+   "-3": 171,
+   "-2": 241,
+   "-1": 153
+  },
+  "per_half_decade_sqrts": {
+   "2.5": 1000
+  },
+  "median_log10_absVB_per_beta_decade": {
+   "-5": 4.716093115392998,
+   "-4": 3.7715028752082445,
+   "-3": 2.7670043241079245,
+   "-2": 1.6314309213265303,
+   "-1": 0.4669090316190929
+  },
+  "slope_per_beta_decade": -1.0638440121429524,
+  "neg_share": 0.919,
+  "finite": true
+ },
+ "../datasets/v4_gg_ttx_nlo__hi_431-50000GeV_test_amplitudes.npy": {
+  "n": 1000,
+  "beta_min": 0.6014298018984353,
+  "beta_max": 0.9999758780944407,
+  "sqrts_min": 431.82992087797425,
+  "sqrts_max": 49670.771983642284,
+  "per_beta_decade": {
+   "-1": 1000
+  },
+  "per_half_decade_sqrts": {
+   "2.5": 183,
+   "3.0": 235,
+   "3.5": 256,
+   "4.0": 241,
+   "4.5": 85
+  },
+  "median_log10_absVB_per_beta_decade": {
+   "-1": 1.841549536106732
+  },
+  "slope_per_beta_decade": null,
+  "neg_share": 0.008,
+  "finite": true
+ },
+ "../datasets/v4_gg_ttx_nlo__hi_431-50000GeV_val_amplitudes.npy": {
+  "n": 1000,
+  "beta_min": 0.6020055496116328,
+  "beta_max": 0.9999760073751546,
+  "sqrts_min": 432.0644942705735,
+  "sqrts_max": 49804.41239600575,
+  "per_beta_decade": {
+   "-1": 1000
+  },
+  "per_half_decade_sqrts": {
+   "2.5": 172,
+   "3.0": 263,
+   "3.5": 203,
+   "4.0": 266,
+   "4.5": 96
+  },
+  "median_log10_absVB_per_beta_decade": {
+   "-1": 1.8124508940631412
+  },
+  "slope_per_beta_decade": null,
+  "neg_share": 0.007,
+  "finite": true
+ },
+ "../datasets/v4_gg_ttx_nlo__thr_345-431GeV_test_amplitudes.npy": {
+  "n": 1000,
+  "beta_min": 1.0031154701039103e-05,
+  "beta_max": 0.5908946855093158,
+  "sqrts_min": 345.00000001735765,
+  "sqrts_max": 427.6424597810968,
+  "per_beta_decade": {
+   "-5": 208,
+   "-4": 210,
+   "-3": 224,
+   "-2": 194,
+   "-1": 164
+  },
+  "per_half_decade_sqrts": {
+   "2.5": 1000
+  },
+  "median_log10_absVB_per_beta_decade": {
+   "-5": 4.878423016671905,
+   "-4": 3.900270118308124,
+   "-3": 2.8891782792325857,
+   "-2": 1.9577354819957065,
+   "-1": 1.3966001986826553
+  },
+  "slope_per_beta_decade": -0.8906180272290918,
+  "neg_share": 0.0,
+  "finite": true
+ },
+ "../datasets/v4_gg_ttx_nlo__thr_345-431GeV_val_amplitudes.npy": {
+  "n": 1000,
+  "beta_min": 1.004378059062925e-05,
+  "beta_max": 0.5945811847401065,
+  "sqrts_min": 345.00000001740136,
+  "sqrts_max": 429.08548869685876,
+  "per_beta_decade": {
+   "-5": 198,
+   "-4": 237,
+   "-3": 171,
+   "-2": 241,
+   "-1": 153
+  },
+  "per_half_decade_sqrts": {
+   "2.5": 1000
+  },
+  "median_log10_absVB_per_beta_decade": {
+   "-5": 4.928817840147312,
+   "-4": 3.958949876955051,
+   "-3": 2.9666462833716505,
+   "-2": 1.9480892554078184,
+   "-1": 1.3539108738676124
+  },
+  "slope_per_beta_decade": -0.916067455410663,
+  "neg_share": 0.0,
+  "finite": true
+ },
+ "../tmp/amp_data_cache/v4_ddx_ttx_nlo__hi_431-50000GeV_train_amplitudes.npy": {
+  "n": 10000,
+  "beta_min": 0.6012057128862456,
+  "beta_max": 0.999976143343987,
+  "sqrts_min": 431.7387854803026,
+  "sqrts_max": 49946.13689645035,
+  "per_beta_decade": {
+   "-1": 10000
+  },
+  "per_half_decade_sqrts": {
+   "2.5": 1754,
+   "3.0": 2428,
+   "3.5": 2445,
+   "4.0": 2390,
+   "4.5": 983
+  },
+  "median_log10_absVB_per_beta_decade": {
+   "-1": 1.8572771843020641
+  },
+  "slope_per_beta_decade": null,
+  "neg_share": 0.0,
+  "finite": true
+ },
+ "../tmp/amp_data_cache/v4_ddx_ttx_nlo__thr_345-431GeV_train_amplitudes.npy": {
+  "n": 10000,
+  "beta_min": 1.0026261562556706e-05,
+  "beta_max": 0.5985049197229614,
+  "sqrts_min": 345.0000000173407,
+  "sqrts_max": 430.64756153629594,
+  "per_beta_decade": {
+   "-5": 2081,
+   "-4": 2098,
+   "-3": 2112,
+   "-2": 2110,
+   "-1": 1599
+  },
+  "per_half_decade_sqrts": {
+   "2.5": 10000
+  },
+  "median_log10_absVB_per_beta_decade": {
+   "-5": 4.697805902053741,
+   "-4": 3.713664004941164,
+   "-3": 2.708616823347638,
+   "-2": 1.6574262374598834,
+   "-1": 0.4834886032286059
+  },
+  "slope_per_beta_decade": -1.0484872365131548,
+  "neg_share": 0.9212,
+  "finite": true
+ },
+ "../tmp/amp_data_cache/v4_gg_ttx_nlo__hi_431-50000GeV_train_amplitudes.npy": {
+  "n": 10000,
+  "beta_min": 0.6012057128862456,
+  "beta_max": 0.999976143343987,
+  "sqrts_min": 431.7387854803026,
+  "sqrts_max": 49946.13689645035,
+  "per_beta_decade": {
+   "-1": 10000
+  },
+  "per_half_decade_sqrts": {
+   "2.5": 1754,
+   "3.0": 2428,
+   "3.5": 2445,
+   "4.0": 2390,
+   "4.5": 983
+  },
+  "median_log10_absVB_per_beta_decade": {
+   "-1": 1.8392289154219177
+  },
+  "slope_per_beta_decade": null,
+  "neg_share": 0.0056,
+  "finite": true
+ },
+ "../tmp/amp_data_cache/v4_gg_ttx_nlo__thr_345-431GeV_train_amplitudes.npy": {
+  "n": 10000,
+  "beta_min": 1.0026261562556706e-05,
+  "beta_max": 0.5985049197229614,
+  "sqrts_min": 345.0000000173407,
+  "sqrts_max": 430.64756153629594,
+  "per_beta_decade": {
+   "-5": 2081,
+   "-4": 2098,
+   "-3": 2112,
+   "-2": 2110,
+   "-1": 1599
+  },
+  "per_half_decade_sqrts": {
+   "2.5": 10000
+  },
+  "median_log10_absVB_per_beta_decade": {
+   "-5": 4.90123741921862,
+   "-4": 3.901243730100159,
+   "-3": 2.909896220334223,
+   "-2": 1.9677098548940835,
+   "-1": 1.3614708879072355
+  },
+  "slope_per_beta_decade": -0.9013066937828842,
+  "neg_share": 0.0001,
+  "finite": true
+ }
+}
