@@ -16924,6 +16924,30 @@ entries:
       prebuild floor 16.5 GB. The uncalibrated moment check was dropped, and dsh_eea''s parts-deleting re-assembly is out
       of this batch. Searched: heldout, held-out, regen, restore, delete, amp_data_cache in results.tex, the plan and the
       decisions; the overlap with pretrain_data_saving''s 1e4 H3 copies (another recipe, done 11-11 21:01) is named in prior.'
+  - at: '2026-11-12T01:50:02+00:00'
+    question: 'Restore on CC the catalog pools deleted 2026-11-11 that held-out reads need: (A) 700 catalog_v4 held-out train
+      pools, (C1) 494 PP4 series-built train pools, (C2) PP4 parts queue zz_redesign_pp4_parts (all three passed 2026-11-12T01:37
+      and running, unchanged here), and now (B) catalog_v4_dsh_eea''s 115 train pools re-assembled from their kept lhe_parts
+      (115/115 processes with all parts, 3.06 GB, the only copy of these events) with the parts kept (LHE_PARTS_AUTO_GC=0,
+      22d37fa5) until the pools are checked. No training.'
+    prior: 'Design passed 2026-11-12T01:37 for A, C1, C2 (reviewer a0b4805efd940c3d2, who asked for B as its own design with
+      an off switch for the parts'' auto-deletion); lhe_parts re-assembly path 131a0fea (repo-reviewer: correct under concurrency,
+      marker moved never deleted); D208 (parts deleted once pools are built).'
+    measure: 'check_site_data --list on CC over catalog_v4_heldout_{H1..H7c}, catalog_v4_pp_test and catalog_v4_eea_lhe: pools
+      not prebuilt, now 700 + 504 + 115 train; after 0. B also: the parts are all still present after assembly (same count
+      as before, 115/115), and the re-assembled val/test pools keep their recipe ids (check_site_data passes on them).'
+    check: 'Same cache test a require_cache run makes (datagen._is_cached), which listed exactly these train pools on 2026-11-12
+      with all val/test present; sameness by recipe id (the current code reproduces the stored ids of every val/test pool
+      of these recipes). B: lhe_assemble builds every role from the same parts with the same seed, so the val/test it rewrites
+      must keep their recipe ids, a direct check of the path on the pools the reads already score.'
+    fixed: 'A, C1, C2 as passed. B: scripts/job_lhe_parts.sh LHE_QUEUE=catalog_v4_dsh_eea --env LHE_PARTS_AUTO_GC=0, 1 job
+      of 16 cores, --time 02:00:00, target 1 h, code at 22d37fa5; only after measure B passes: lhe_parts gc --queue catalog_v4_dsh_eea
+      --parts (D208), never before. Job names zz_redesign_*.'
+    control: Not an A/B; sameness by recipe id; for B the rewritten val/test pools' ids against those stored.
+    seeds: data seed 42, one build
+    outcome: 'Yes: 0 not prebuilt on all listed recipes; parts gc''d only after; optimizations_recap''s owner told its reads
+      can be redone. No: read the log; B failing leaves the parts untouched (nothing deleted) and the pools still missing
+      are reported with why. Disk: B ~3 GB more while parts are kept, total ~21 GB of 52.9 GB free.'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
