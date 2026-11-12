@@ -83,10 +83,12 @@ if [ -n "$KIT_SCORE_ONLY" ]; then
     python tools/kit_predict.py "$OUT"; RC=$?
     echo "KIT_DONE rc=$RC $OUT"; [ "$RC" -eq 0 ] && echo "RUN_DONE $OUT"; exit $RC
 fi
+# result.json keeps the val mu-MSE and train mu-MSE curves (val_mse_curve, train_eval_mse_curve): the HETEROSC log has
+# only the NLL (kit_benchmark step 15, tools/kit_curves.py)
 python run.py --config-path "$BASE" --config-name config run_dir="$OUT" run_name=null \
     data.source=recipes data.processes_file="$RECIPE" data.train_subsample=null data.eval_subsample=null \
     data.memmap=false training.dtype=float64 training.iterations="$T" training.heterosc_select=mu_mse \
-    evaluation.train_subsample=2000 seed=42 warm_start_idx=null training.increment_steps=null "${FT[@]}" "${ARGS[@]}"
+    evaluation.train_subsample=2000 training.result_path="$OUT/result.json" seed=42 warm_start_idx=null training.increment_steps=null "${FT[@]}" "${ARGS[@]}"
 RC=$?
 if [ $RC -eq 0 ] && [ -z "$KIT_NO_SCORE" ]; then
     python tools/kit_predict.py "$OUT"
