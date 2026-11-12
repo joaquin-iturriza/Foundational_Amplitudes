@@ -27628,7 +27628,7 @@ entries:
   step_waits:
     '11': FA-ccin2p3-dcf42ad6 FA-ccin2p3-e7dca162
     '12': FA-ccin2p3-95be8db2 FA-ccin2p3-88b9334a
-    '5': 'FA-ccin2p3-dcf42ad6 FA-ccin2p3-e7dca162 (11c fine-tunes: the package takes the best A_ft/B once they are read)'
+    '5': FA-ccin2p3-dcf42ad6 FA-ccin2p3-e7dca162 (the A_ft batch of step 11c)
     '13': FA-ccin2p3-c4fc1d6f FA-ccin2p3-6bc05a40
     '15': 'detach:kit_hpo_smoke (drive.py, sweep kit_hpo_smoke, D395 smoke of the step-15 searches; on its DONE: read the
       trial''s result json curves, then drive kit_hpo_uug_plain + kit_hpo_ttvirt_thr detached)'
