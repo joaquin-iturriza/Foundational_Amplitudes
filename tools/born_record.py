@@ -20,12 +20,15 @@ for pool in [a for a in sys.argv[1:] if not a.startswith("--")]:
     bp = pool[:-len(".npy")] + ".born.npy"
     v = np.load(pool, mmap_mode="r")[:, -1].astype(float)
     b = np.load(bp).astype(float).ravel()
-    assert len(b) == len(v), f"{bp}: {len(b)} rows, the pool {len(v)}"
-    assert np.all(b > 0), f"{bp}: non-positive Born"
+    bad = f"{len(b)} rows, the pool {len(v)}" if len(b) != len(v) else "non-positive Born" if not np.all(b > 0) else None
+    if bad:  # reported, never written; the other pools are still checked
+        print("BORN_RECORD " + json.dumps({"pool": pool, "bad": bad}))
+        continue
     old = json.load(open(bp + ".json")) if os.path.exists(bp + ".json") else None
     new = {"pool_identity": pool_identity(pool), "n_rows": int(len(v))}
     print("BORN_RECORD " + json.dumps({"pool": pool, "rows": len(v), "std_ln_vb": float(np.std(np.log(np.abs(v / b)))),
-                                       "record_matches": bool(old and list(old["pool_identity"]) == list(new["pool_identity"]))}))
+                                       "record_matches": bool(old and list(old["pool_identity"]) == list(new["pool_identity"])),
+                                       "record_exists": old is not None}))
     if "--write" in sys.argv:
         json.dump(new, open(bp + ".json", "w"))
         print("wrote", bp + ".json")
