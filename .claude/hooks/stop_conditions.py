@@ -126,6 +126,62 @@ def ledger(repo=REPO, site=None):
     return [" ".join(lines)] if lines else ["site ledger guard refused without a reason"], []
 
 
+# ------------------------------------------------------------------ figures handed back
+SPOOL = os.path.expanduser("~/.local/share/ccorch/spool/FA")
+_FIG = re.compile(r"[\w./-]*analysis/[\w./-]*figs/[\w.-]+\.png")
+
+
+def _epoch(ts):
+    import datetime
+    return datetime.datetime.fromisoformat((ts or "").replace("Z", "+00:00")).timestamp()
+
+
+def figures_handed_back(inp, records=None, spool=SPOOL):
+    """a hand-back in the spool newer than Joaquin's last message names a figure (analysis/**/figs/*.png) for him
+    and the main session has not SendUserFile'd it since; "ROUTINE:" reports are exempt. Passes when the turn's
+    user message lies beyond the tail read."""
+    if inp.get("agent_id") or inp.get("agent_type"):
+        return [], []
+    records = _tail_records(inp.get("transcript_path") or "") if records is None else records
+    since = None
+    for r in records:
+        if turn_of([r])[0]:
+            since = r.get("timestamp")
+    try:
+        since = _epoch(since)
+        names = sorted(os.listdir(spool))
+    except (TypeError, ValueError, OSError):
+        return [], []
+    sent = []                       # (time, basename) of each SendUserFile'd file
+    for r in records:
+        c = (r.get("message") or {}).get("content")
+        for b in c if isinstance(c, list) else []:
+            if isinstance(b, dict) and b.get("type") == "tool_use" and "SendUserFile" in (b.get("name") or ""):
+                try:
+                    sent += [(_epoch(r.get("timestamp")), os.path.basename(f)) for f in b["input"].get("files") or []]
+                except (ValueError, TypeError, AttributeError):
+                    pass
+    missing = []
+    for n in names:
+        try:
+            t = int(n.split("_")[0])
+            text = open(os.path.join(spool, n)).read()
+        except (ValueError, OSError):
+            continue
+        if t <= since:
+            continue
+        body = re.sub(r"\s*<agent-message[^>]*>.*?follows:\s*", "", text, count=1, flags=re.S).lstrip()
+        if body.startswith("ROUTINE:") or "Joaquin" not in body:
+            continue
+        for f in _FIG.findall(body):
+            if f not in missing and not any(st >= t and b == os.path.basename(f) for st, b in sent):
+                missing.append(f)
+    if not missing:
+        return [], []
+    return ["figures handed back for Joaquin not sent: %s; send them (SendUserFile) or say why not"
+            % ", ".join(missing)], []
+
+
 # ------------------------------------------------------------------ opener
 SKIP = ("<system-reminder", "[SYSTEM NOTIFICATION", "Stop hook feedback", "<task-notification", "<command-",
         "<local-command", "Caveat:", "[Request interrupted", "Another Claude session sent")

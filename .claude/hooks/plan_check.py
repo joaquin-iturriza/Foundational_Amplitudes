@@ -547,6 +547,8 @@ def main():
         if main_session:
             bad += result_table(inp)
             bad += bare_acks(inp)
+            import stop_conditions as sc_f
+            bad += sc_f.figures_handed_back(inp)[0]
         plan.NOTES.extend(notes)
         if OPENER_STATE:
             plan._set_state("_opener", dict(OPENER_STATE))
