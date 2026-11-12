@@ -17039,6 +17039,12 @@ entries:
     units: null
     start: '2026-11-12T01:39:58+00:00'
     at: '2026-11-12T01:39:58+00:00'
+  - batch: heldout_train_rerun
+    wall_h: 2.5
+    jobs: 5
+    units: null
+    start: '2026-11-12T02:28:51+00:00'
+    at: '2026-11-12T02:28:51+00:00'
   findings:
   - at: '2026-10-30T22:13:12+00:00'
     text: 'lxplus repair, 2026-10-30. (1) Copy margin about 2x: the queued jobs need 26668 frozen-pool files, 13334 train-cache
