@@ -25818,6 +25818,7 @@ entries:
     '5': '2026-11-13'
     '9': FA-ccin2p3-62dcf910 FA-ccin2p3-bf3d593c FA-ccin2p3-8d1429bf
     '14': detached batch satprobe_scalars (kit_saturation_probe on dc799c8e and 4a1cb4a2)
+    '15': a reviewer
   handoff:
     state: '2026-11-12 ~11:55. Step 13 (inputs-only transformer, design PASS by design-reviewer a92960393f8855689): tt virtual
       arm FA-ccin2p3-4a1cb4a2 read = YES (Sudakov family -1.72 decades vs softpairthr 3fc1016a, deepest log-MSE 0.72 -> 0.026
