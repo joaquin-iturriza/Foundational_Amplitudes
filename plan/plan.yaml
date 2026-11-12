@@ -15798,7 +15798,7 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-046cc7d3
-    commit: d3a0b8a4
+    commit: 57eff4a5
     paths:
     - .claude/hooks/notification_absorb.py
     - .claude/hooks/owner_handoff.py
@@ -15868,6 +15868,14 @@ entries:
       pools with their .recipe.json, .alphas.npy and .flatfill.json (5204 files, 32.05 GB; pools alone 30.89 GB per census_quick).
       Checked first: no running or pending job''s recipe reads a smixq pool (squeue: optrec_prebuild_v4d25, optrec_pidqn_qn/pid,
       kit_pkg, zz_redesign_pp4_parts; their 10 recipes resolve 0 smixq files). /sps/lpnhe free after: 69 GB (87%).'
+    - '2026-11-12 drive.py first trial per (site, search) merged 57eff4a5 (bbc89d5f + review fixes c9d92daf; repo-reviewer
+      a847424422f5bffc8 FIX then PASS, watermark c9d92daf): BaseExperiment.train() prints TRAINING_STARTED; a search''s first
+      trial on a site goes alone, the rest take another open site or wait until its log shows the marker or it is observed;
+      a first trial ending without the marker closes that site to the search with an ALERT (site event); a search failed on
+      every site stops alone, the driver exits when all are; pending probes may move (gate follows); gate persisted per HEAD
+      commit. tests/test_drive_first_trial.py 10 cases (6 fail on the old code). Cases: 2026-11-12 ~11:00 26+ FileNotFoundError
+      (stale CC checkout), ~16:00 84+ target_over_born AssertionError, whole 42-trial waves. Not live: running drivers load
+      it at relaunch; sites get the marker at their next sync.'
     - '2026-11-12 drive.py re-pick merged (ea24b3cc; b71880f1 + review fixes e1ff3aa5, repo-reviewer a847424422f5bffc8 FIX
       then PASS, watermark e1ff3aa5): every 10 min a trial still PENDING/IDLE moves to the site site pick''s model says ends
       it > 1 h sooner and < half the time (margin: the main session''s brief, a method choice), cancelled via site run scancel/condor_rm,
