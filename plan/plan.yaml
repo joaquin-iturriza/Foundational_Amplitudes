@@ -25039,7 +25039,7 @@ entries:
       D241, D244/D245, D412, D420-D423.'
   step_waits:
     '3': bbx_zz_lo_scr3, bbx_zz_lo_ft drivers (detach events)
-    '4': bbx_zz_lo_ft driver (detach event)
+    '4': detach bbx_zz_lo_ft (LO fine-tune driver; its FA DONE event)
     '5': detach tmpl2_wsd2 (drive.py, 8 searches on CC; its FA DONE event)
   findings:
   - at: '2026-11-10T03:35:22+00:00'
