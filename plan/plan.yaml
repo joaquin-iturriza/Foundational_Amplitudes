@@ -26500,6 +26500,22 @@ entries:
       or restate the uug arm as ''can the skip cancel the frames overshoot'', with an outcome whose NO does not generalize.
       The tt virtual arm passes check 2. Also state the commits between the controls (b6794f35 uug, e75ca218 tt) and d14643c6,
       and that they are no-ops with the new flags off. Not done by me (closed at the context limit); the next owner revises.'
+  - at: '2026-11-12T14:36:42+00:00'
+    text: '2026-11-12 ~16:40 @488dcfeb. Step 10 double cut read (design PASS 2026-11-12T13:09; model.input_route_off=frames
+      + data.offshell_zero=true, local momenta kept; from scratch 1e5, 8000 steps, seed 42; uug FA-ccin2p3-e8088a7d, tt virtual
+      e1c19b4d, both KIT_DONE/RUN_DONE; tools/kit_extrap_read.py collect on analysis/kit_benchmark/data/kit_extrap.json, arm
+      noframesoff). Deepest-bin median signed error (pred - truth, log10|M|^2) / log-MSE, control / frames cut / off-shellness
+      cut / both: uug collinear y 1e-7..1e-6 +1.36/2.21, -0.25/0.161, +1.98/12.7, -0.51/0.31; uug soft x 1e-7..1e-6 -0.28/0.20,
+      -0.93/1.00, -0.04/0.090, -0.71/0.65; tt virtual Sudakov 15-50 TeV (control softpairthr 3fc1016a) -0.53/0.72, +0.07/0.154,
+      -0.69/0.506, -0.46/0.306; tt Coulomb beta 1e-4..1e-3 log-MSE 3.55, 6.63, 4.35, 7.22. Bulk_test log-MSE uug 1.09e-4,
+      7.4e-5, 1.1e-3, 6.4e-5; tt 1.2e-9, 2.7e-9, 3.0e-9, 2.3e-9. By the passed bands: uug collinear KEPT (-0.51 <= +0.30,
+      now an undershoot of 0.5), uug soft NOT recovered (-0.71 <= -0.59), tt Sudakov neither KEPT nor LOST (log-MSE 0.306
+      between 0.154 and 0.33, signed -0.46 back near the control''s -0.53): the off-shellness cut undoes most of the frames
+      cut''s Sudakov gain. Reading (both the ''kept, not recovered'' and the ''lost on either'' branches give the same pick):
+      the KIT models take the frames cut alone (model.input_route_off=frames); its uug soft loss (deepest -0.93) is reported
+      as its cost; off-shellness stays on. Figures analysis/kit_benchmark/figs/kit_extrap_double_ee_uug_me2_{a,b}.png, kit_extrap_double_ee_tt_virt_finite_{a,b}.png
+      (control, frames cut, off-shellness cut, both, MLP), looked at once: uug the ''both'' curve undershoots and falls to
+      -0.5 in collinear y, tt ''both'' lies between control and frames cut, -0.46 at 15-50 TeV.'
   step_why:
     5:
       feeds: what KIT receives
