@@ -22374,6 +22374,31 @@ entries:
       -- --sweep-config <cfg> --trial-idx 0 --detached --hp-idx <idx> --t-steps 8500 --hp k=v..., --hdr=--time=00:40:00 (stage
       A''s 1e4 cell ran 22 min training + sigma; a 16-min limit cut it). GPU: 12 x ~0.45 h + 0.1 = ~5.5 GPU-h under D400.
       Disk: 13 x ~15 MB.'
+    fix_at: '2026-11-12T00:15:31+00:00'
+    fix: 'Checks 1, 2, 3, 5, 9-15 hold: each arm config differs from its offown control by one fixed_param (diffed d5: fine_tune.mass_stats
+      own / training.optimizer AdamW / model.input_pair_threshold true), same r4 trees-in parent, HPs, seed, T=8500, HETEROSC
+      + sigma stage; event_share.json reproduces the cited numbers (stage-A r5/r4 w/o-worst val 0.39, 1.11, 1.62, 0.22; offown/parent-scale
+      w/o-worst 0.21, 0.07, 0.08, 1.08); the same-HP rerun spread in stage2_diag_readout.json (8 cells, 0.46-4.84) gives sd
+      ln 0.78, so a 4-cell geomean has sd ~1.47x and the YES bar 0.4 sits ~2.3 sd out; one seed and 4 cells as the sibling
+      stage-A and off-shellness diagnostics (D315). What fails: (a) Check 7 / decisions in force, AdamW arm: Joaquin''s D158
+      (''Huh? why would finetunes stay on adamW?'') puts fine-tunes on MuonAdamW; the outcome adopts AdamW into the s3 one-loop
+      fine-tune configs on YES. Fix: on YES the AdamW result goes to Joaquin as a question (with the numbers), not adopted;
+      say so in the outcome. Prior should also cite D155/D158. (b) Check 1/4, pair-threshold arm: adding model.input_pair_threshold
+      to the one-loop fine-tunes only, while stage 2''s scratch t t~ V searches are reused without it, makes S compare fine-tune-with-input
+      against scratch-without: the input change rides along with pretraining. Also the arm changes an input the parent was
+      trained without (its pair-log embedding saw log s_ij), so a NO does not rule out the input with a parent trained on
+      it, and the KIT prior is scratch-only. Fix: state that a YES needs the t t~ V scratch cells (searches or at least same-HP
+      scratch reruns at D=316..1e4) with the input before S is re-read, with their cost, or measure scratch-with-input beside
+      this arm now (4 more fixed-HP runs, ~2 GPU-h) so the deficit ft/scr is what is read; and word NO as ''not as a fine-tune-only
+      input''. (c) Check 4 / CLAUDE.md A/B protocol: all three arms run at the control''s (Muon-tuned) best HPs; that is the
+      protocol''s first step, but a NO there is ''no gain at the control''s HPs'', not ''ruled out'' (protocol: else the same
+      sweep for the feature). Fix: reword NO accordingly and say whether the second step (an 8-trial fine-tune search per
+      cell for an arm that reads NO or inconclusive) follows or why it is not worth its cost (par:v3_muon''s same-lr AdamW/Muon
+      fine-tune 0.935-0.986 supports lr transfer for (b); say so). (d) Before launch: commit analysis/data_saving/event_share.py
+      and data/event_share.json (the design''s measure and its check numbers come from an uncommitted tool), plus experiment.py/config/default.yaml
+      mass_stats and the 13 configs. Searched: results.tex (v3_muon, AdamW fine, fine-tune optimizer, mass column, dimless
+      mass, mass_stats, pair threshold, beta^2, sec:datasaving), plan.yaml (pair_threshold, mass_stats, dimless_mass, kit_benchmark
+      step 6), site decisions (AdamW, Muon, D355-D400): found D158 not cited.'
   step_waits:
     '7': FA-ccin2p3-35922ca9 FA-ccin2p3-adbd0552
   findings:
