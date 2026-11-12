@@ -17005,6 +17005,17 @@ entries:
     outcome: 'Yes: 0 not prebuilt on all listed recipes, dsh_eea val/test byte-identical, then gc --parts and optimizations_recap''s
       owner told its reads can be redone. No: a refused or failed shard is read and rerun once disk allows; a changed val/test
       pool stops B: parts kept, reported with which processes.'
+    passed_at: '2026-11-12T02:23:04+00:00'
+    reviewer: 'Finishing the restore, not an A/B. A'' reruns 5 held-out shards refused at the free-space floor, same setup
+      as the pass of 01:37 (08:00:00 limit, 2.5 h target), ~4 GB to write against 32 GB free. C2'' is one parts worker for
+      pp13v4_udx_uuxwpz run 0 (2.74 h from lhe_rates, 04:00:00 limit). B: 22226958 makes the worker call lhe_assemble only
+      on the pools not cached (read), so the scored dsh_eea val/test pools are not rewritten; test_reassembly_keeps_scored_pools
+      checks val/test bytes and mtime. The rebuilt train equals a full assembly: lhe_layout puts train last (val [0,nv), test,
+      train), so the blocks'' need is unchanged; the shuffle is over all n_lhe events with SeedSequence([seed, iseed]); lhe_equal_shares
+      cuts by the fewest events per energy, not by need. Cards are in the recipe id (run/param card sha256). Parts kept (LHE_PARTS_AUTO_GC=0)
+      and gc --parts only after the sha256 comparison of val/test and check_site_data pass. Searched: heldout, held-out, regen,
+      restore, delete, amp_data_cache, dsh_eea in results.tex, the plan and the decisions; the prior names the earlier pass
+      and both FIXes.'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
