@@ -82,6 +82,7 @@ on the sites (`~/work/CLAUDE.md`).
 - A proxy is checked on a few cases before it is reported; an estimate says it is one, with its assumption.
 - Every reported loss is read at the best checkpoint (lowest aggregate `val_loss_no_reg`, each process at that step); a `HETEROSC` run's model is its final one, after the σ fit that ends its training [D276]; a run that blows up is listed apart with where it blew up, never dropped.
 - A claim that runs are fixed or well trained rests on their own curves (validation falling steadily through the run, not only in the anneal, without spikes), never only on a ratio to another arm; the main session looks at the figure before repeating such a claim.
+- A target shown as evidence of transfer is never a rescaling of what the parent saw (an equal process, a constant V/B); before relaying an agent's choice of example, the main session checks it against the entry's findings.
 - Every scaling fit uses `L(C) = A·C^(−α) + L_∞`; the bare power law is a labelled diagnostic only.
 - A feature is judged against the existing baseline (the best of a short HPO sweep, never retrained): first at the baseline's best HPs, done if better; else the same sweep for the feature, best against best, on `val_loss_no_reg`, re-based when preprocessing differs.
 - Every figure is saved as both `.png` and `.pdf`, and no run is configured with plotting off.
