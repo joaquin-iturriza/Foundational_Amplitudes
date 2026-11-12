@@ -24873,6 +24873,21 @@ entries:
       would mix its old-window observations into the surrogate. Readout analysis/data_saving/lr_centre_readout.py on branch
       lrcentre (worktrees/wt-lrcentre @10cbc336; checked on the control searches'' cached rows: scr 9 trials 0 well, ft 7
       trials 0 well, best 8.54e-9 / 8.22e-9), merged after the repo-reviewer.'
+  - at: '2026-11-12T14:06:07+00:00'
+    text: '2026-11-12 15:10 CET: lower-lr-centre test read (lr_centre_readout.py @10cbc336, data @50544432 on branch lrcentre;
+      figs analysis/data_saving/figs/lr_centre_curves_{a,b} in worktrees/wt-lrcentre). t t~ LO D=3162, 32 trials, 0 failed,
+      done in ~50 min. Best val mu-MSE (ln) / well trials / trials with spike<=3 / median jitter: scratch control 8.5e-9 /
+      0 of 9 / 0 / 0.74; c/3 1.3e-7 / 0 / 0 / 0.41 -> NO CHANGE; c/10 6.2e-8 / 0 / 1 / 0.29 -> NO CHANGE. Fine-tune control
+      8.2e-9 / 0 of 7 / 0 / 0.92; c/3 1.9e-9 / 0 / 1 / 0.41 -> NO CHANGE (best min 4.4x below control, best trial steady 0.43
+      spike 4.8 jitter 0.62); c/10 7.2e-9 / 1 / 2 / 0.21 -> BETTER, NOT WELL (jitter below control/3; failing bars steady
+      and spike). Spikes persist at low lr (scratch spike 26-62 at peak lr 2.3e-3..3.9e-3, 32 at 3.6e-4): lr is not the cause
+      of the spikes. Batch size is ruled out as a suspect here: the sweeps inherit the parent''s batchsize 16384 > D, so every
+      step is full-batch (curve_quality.py''s batch column, min(16384, D/2), is wrong for these sweeps). Existing-data lead
+      (suspects batch, curve_quality bars): the mu-only MSE loss arm (HETEROSC off, fixed HPs) is the only one-change arm
+      clean on all 4 t t~ LO cells: spike 1.5/3.4/3.7/1.3 vs control 3.9/19.7/12.1/9.7, jitter 0.11-0.22, at worse minima
+      at D>=3162 (7.9e-8, 1.5e-8 vs 6.9e-9, 2.6e-9) - the HETEROSC 1/sigma^2 weighting of the mu gradient is the next suspect
+      for the spikes. EMA on lowers median jitter on u u~ (0.30 vs 0.68), u u~ V (0.25 vs 0.41), t t~ V/B (0.14 vs 0.52),
+      not on t t~ LO (0.76 vs 0.63).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
