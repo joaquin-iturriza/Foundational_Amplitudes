@@ -197,6 +197,9 @@ def test_queue_end_to_end(run_events=400, short=False):
             assert os.listdir(os.path.join(q, "assembled")) == [NAME] and not os.listdir(os.path.join(q, "locks"))
             for rec, path in _items():
                 assert datagen._is_cached(path, mg.recipe_id(rec)), path
+            # D201/D208, 2026-11-12: the worker that assembled deleted the process's parts, with a manifest
+            assert not any(os.path.exists(p) for p, _ in mg.lhe_part_paths(NAME, _items()))
+            assert any(f.startswith("parts_") and NAME in f for f in os.listdir(os.path.join(q, "gc")))
             plan()                                                      # built: nothing left to queue
             assert not os.listdir(os.path.join(q, "todo"))
     finally:
@@ -983,6 +986,7 @@ def test_gridpack_queue():
              datagen.dest_for_role, lhe_parts.ASSEMBLE_S, lhe_parts.POLL_S, mg.lhe_make_gridpack, mg.lhe_run_gridpack,
              mg.lhe_gridpack_header)
     scratch = os.environ.get("SCRATCH")
+    lhe_parts.AUTO_GC = False     # the parts are read after assembly here; the worker's own gc: test_queue_end_to_end
     try:
         with tempfile.TemporaryDirectory() as d:
             _fakes(d, short=False)
@@ -1070,6 +1074,7 @@ def test_gridpack_queue():
             plan()
             assert not os.listdir(os.path.join(q, "todo"))
     finally:
+        lhe_parts.AUTO_GC = True
         (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
          datagen.dest_for_role, lhe_parts.ASSEMBLE_S, lhe_parts.POLL_S, mg.lhe_make_gridpack, mg.lhe_run_gridpack,
          mg.lhe_gridpack_header) = saved
@@ -1301,10 +1306,12 @@ def test_failed_builds_and_workdirs():
 def test_gc_parts():
     """gc --parts [D208]: after the queue assembled and its pools are built, the dry run writes its manifest and
     deletes nothing; a sibling queue holding the process unassembled keeps every file; without it the part files go,
-    with lhe_parts/<process>, and the pools stay cache hits. A queue not assembled loses nothing."""
+    with lhe_parts/<process>, and the pools stay cache hits. A queue not assembled loses nothing. (The worker's own
+    gc after assembly is off here: test_queue_end_to_end checks it.)"""
     _register()
     saved = (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
              datagen.dest_for_role, lhe_parts.ASSEMBLE_S)
+    lhe_parts.AUTO_GC = False
     try:
         with tempfile.TemporaryDirectory() as d:
             _fakes(d, short=False)
@@ -1360,6 +1367,7 @@ def test_gc_parts():
             for rec, path in _items():
                 assert datagen._is_cached(path, mg.recipe_id(rec)), path
     finally:
+        lhe_parts.AUTO_GC = True
         (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
          datagen.dest_for_role, lhe_parts.ASSEMBLE_S) = saved
         for v in ("AMP_LHE_PARTS_DIR", "AMP_LHE_WORK_DIR"):

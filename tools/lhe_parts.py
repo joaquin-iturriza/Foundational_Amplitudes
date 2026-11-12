@@ -162,6 +162,7 @@ def live_claims(q):
     return out
 
 
+AUTO_GC = True    # the assembling worker deletes the process's parts once its pools are built (tests turn it off)
 PARK_MARK = os.path.join("parked", ".active")    # written by park, removed by the next plan that completes
 
 
@@ -713,6 +714,14 @@ def _run_task(q, t):
                 with open(os.path.join(D["assembled"], name), "w") as f:
                     f.write("\n".join(o for o, _ in res) + "\n")
                 msg += f"; assembled {len(res)} pools"
+                # D201/D208: the parts go once the pools are built, here and not by a later manual `gc --parts` that
+                # never ran (2026-11-12: 17 GB of parts of assembled queues on CC); kept while another queue needs them
+                try:
+                    g = gc_parts(q, only=name) if AUTO_GC else {"files": 0, "held_by_other_queue": 0}
+                    msg += f"; parts deleted {g['files']} files {g['freed_gb']} GB" if g["files"] else \
+                        ("; parts kept for another queue" if g["held_by_other_queue"] else "")
+                except Exception as e:      # a failed tidy never fails the assembly
+                    msg += f"; parts gc failed: {e}"
             finally:
                 shutil.rmtree(lock, ignore_errors=True)
         return t, msg, None
@@ -818,7 +827,7 @@ def cmd_work(a):
     sys.exit(1 if n_fail or n_stale else 0)
 
 
-def parts_plan(q):
+def parts_plan(q, only=None):
     """The part files and gridpacks in lhe_parts of the queue's assembled processes whose pools are all built (every
     spec item a cache hit), which nothing reads after the assembly [D208]: [{process, paths, bytes}]. A process is left
     whole while another queue next to this one (same parent directory) holds a spec of it whose pools are not built,
@@ -831,6 +840,8 @@ def parts_plan(q):
     out, held = [], []
     for sf in sorted(glob.glob(os.path.join(D["specs"], "*.json"))):
         name = os.path.basename(sf)[:-5]
+        if only and name != only:
+            continue
         items = _spec(D, name)
         if not os.path.exists(os.path.join(D["assembled"], name)) or not built(items):
             continue
@@ -846,17 +857,18 @@ def parts_plan(q):
     return out, held
 
 
-def cmd_gc_parts(a):
-    """gc --parts: parts_plan's files deleted (manifest under Q/gc/ first; with --dry-run only the manifest), then
-    each emptied lhe_parts/<process> directory."""
-    todo, held = parts_plan(a.queue)
+def gc_parts(q, dry_run=False, only=None):
+    """parts_plan's files deleted (manifest under Q/gc/ first; with dry_run only the manifest), then each emptied
+    lhe_parts/<process> directory. The summary dict."""
+    todo, held = parts_plan(q, only)
     pdir = os.path.realpath(mg.lhe_parts_dir())
-    os.makedirs(os.path.join(a.queue, "gc"), exist_ok=True)
-    man = os.path.join(a.queue, "gc", f"parts_{time.strftime('%Y%m%d_%H%M%S')}{'_dry' if a.dry_run else ''}.json")
+    os.makedirs(os.path.join(q, "gc"), exist_ok=True)
+    man = os.path.join(q, "gc", f"parts_{time.strftime('%Y%m%d_%H%M%S')}{'_' + only if only else ''}"
+                       f"{'_dry' if dry_run else ''}.json")
     with open(man, "w") as f:
-        json.dump({"root": pdir, "dry_run": a.dry_run, "held_by_other_queue": held, "entries": todo}, f)
+        json.dump({"root": pdir, "dry_run": dry_run, "held_by_other_queue": held, "entries": todo}, f)
     freed = 0
-    if not a.dry_run:
+    if not dry_run:
         for e in todo:
             for p in e["paths"]:
                 _under(pdir, p)
@@ -866,9 +878,14 @@ def cmd_gc_parts(a):
             d = os.path.join(pdir, e["process"])
             if os.path.isdir(d) and not os.listdir(d):
                 os.rmdir(d)
-    print(json.dumps({"manifest": man, "dry_run": a.dry_run, "processes": len(todo),
-                      "files": sum(len(e["paths"]) for e in todo), "gb": round(sum(e["bytes"] for e in todo) / 1e9, 2),
-                      "held_by_other_queue": len(held), "freed_gb": round(freed / 1e9, 2)}))
+    return {"manifest": man, "dry_run": dry_run, "processes": len(todo),
+            "files": sum(len(e["paths"]) for e in todo), "gb": round(sum(e["bytes"] for e in todo) / 1e9, 2),
+            "held_by_other_queue": len(held), "freed_gb": round(freed / 1e9, 2)}
+
+
+def cmd_gc_parts(a):
+    """gc --parts: gc_parts over every assembled process of the queue."""
+    print(json.dumps(gc_parts(a.queue, a.dry_run)))
 
 
 def cmd_gc(a):
