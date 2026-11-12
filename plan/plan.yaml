@@ -23573,6 +23573,15 @@ entries:
       RESOLVED: everything else (e.g. Gn 1/3-3 with Gp 1-3 and Gs >= 3, or a branch holding on one read only); next: a second
       seed (43) of both arms at the same cells (7.6 GPU-h), read pooled over the two seeds by the same partition; if still
       NOT RESOLVED, reported per cell with its numbers and no further run on this question.'
+    fix_at: '2026-11-12T08:57:41+00:00'
+    fix: 'Round 2: the outcome is now a complete partition (A to D, everything else in E), branch D calls no rerun and goes
+      to Joaquin with its cost, the lr_scale text matches submit_nullparent.py, and the selection caveat is in the measure;
+      checks 1, 2, 4-15 hold. One fail left, check 3: branch E (NOT RESOLVED) adds a second seed (43) of both arms, so the
+      arms would carry two seeds against single-seed controls and sibling cells, against Joaquin''s ''I see no reason to keep
+      doing multiple seeds ... in general'' (D315, 2026-11-06). Seeds beyond the sibling cells are his call. Fix: make E report
+      per cell with its numbers and run nothing further, or word the second seed as a question to Joaquin (what it costs:
+      7.6 GPU-h; what it buys: the 0.46-4.84 same-HP spread halved in ln-sd by sqrt 2 on the pooled read), recorded with plan
+      ask, not as a pre-approved step.'
   step_waits:
     '3': a design-reviewer
   findings:
