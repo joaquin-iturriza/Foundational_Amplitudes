@@ -23683,6 +23683,27 @@ entries:
       by the design''s rule; D=3.16e4, 1e5 hmap runs pending at read time. D=316 outliers: t t~ tree scratch test one event
       97% (removed: on trend); also D=3.16e4 test in both arms (top1 0.55/0.80); u u~ V D=316 no single event (top1 0.03/0.06):
       T=2720 shared with D=100, both arms reach val min at step 972/1890 then overfit.'
+  - at: '2026-11-12T02:38:02+00:00'
+    text: '2026-11-12 (owner a357b4c1d8b2d16bc) Review figures looked at once, low res, no redraw: stage2_mse_curves_<target>_<a..i>
+      (34 panels, replaces stage2_curves_<target>: val HETEROSC NLL, faint unlabelled lines, one panel per target) now one
+      panel per D, val and train mu-MSE from each run''s own val_mse_curve/train_eval_mse_curve in ln units, every line labelled,
+      cells whose run dir is gone on CC say ''pruned'' (t t~ V fine-tune D=10,32,100,3.16e4; t t~ V scratch D=1e3); y axis
+      is MSE(ln(V/B)) for one-loop, not stage2_LD''s MSE(V/B) (a log-target curve cannot be put in V/B units). stage2_d316_{a,b,c}
+      (new; answers ''the fourth point of tt LO and uu V are off''): test MSE with and without each cell''s worst event, and
+      T against D. CORRECTION to the 02:28 finding: the reported model does NOT carry the late overfit. es_load_best_model=true
+      (config/default.yaml) loads the best-mu checkpoint (heterosc_select mu_mse, base_experiment.py ~1194-1210, 1303) before
+      the sigma stage; t t~ V fine-tune D=3162 reports 5.35e-7 = its val minimum at step 3060, not the end 5.22e-6; all 63
+      cells with curves report their curve minimum (and hmap_readout''s final-model val agrees to 3 digits). The blow-up in
+      the curves is after the selected checkpoint and enters no L(D) number; the t t~ V fine-tune is 33x scratch (1.62e-8)
+      at its own minimum. Every-trial read (trial_overfit.py @2c7ea02e, data/trial_overfit.json, 532 trials of the 68 stage-2
+      searches, figs trial_overfit_<a..d>, trial_lrwindow_<a..d>): (1) late rise (val end/min) does not track the peak lr:
+      Spearman over trials -0.04 (t t~ V ft), +0.11..+0.18 elsewhere; (2) the fine-tune lr window is too high: within a search
+      a lower lr_scale reaches a lower val minimum in 27 of 34 fine-tune searches (median Spearman +0.30 t t~, +0.21 t t~
+      V, +0.71 u u~, +0.67 u u~ V) against 20 of 34 scratch searches (median -0.40..+0.43); 11 of 34 fine-tune bests sit in
+      the lowest 10% of the lr_scale window [0.1, 0.16] (17% of all fine-tune trials sampled there) against 4 of 34 scratch
+      bests; median best position in the window 0.09-0.28 fine-tune vs 0.26-0.58 scratch. Prior: results.tex HPO rule (lr_scale
+      optimum ~1, range 0.13-7.7, window [0.1,10]) and the tp3 probes (best lr_scale at the window''s top) went the other
+      way; here the held-out-target fine-tunes want lr_scale at or below 0.1.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
