@@ -26428,7 +26428,7 @@ entries:
     decision: D401
   owner:
     agent: af87a27c4f768396f
-    state: working
+    state: closed
     since: '2026-11-12T17:11:12+00:00'
     state_at: '2026-11-12T17:51:17.906000+00:00'
     context: 192728
@@ -27264,28 +27264,36 @@ entries:
     '5': 'FA-ccin2p3-dcf42ad6 FA-ccin2p3-e7dca162 (11c fine-tunes: the package takes the best A_ft/B once they are read)'
     '13': FA-ccin2p3-c4fc1d6f FA-ccin2p3-6bc05a40
   handoff:
-    state: '2026-11-12 ~19:10 @7656e687. 11c one-loop tt pretraining: pools built and checked (kit_loop_pool_check.json bf8d88c5:
-      beta decades 16-21%, V/B slope -0.89..-1.06); first chain died on missing diagram sidecars v4_{gg,ddx}_ttx_nlo (written
-      on CC with dump_diagrams); rerun chain smoke af3c9ca5 -> parents 066f8539 (r5loop), ca5873f3 (r5loopbeta) -> A_ft cb111375
-      (ftr5thrloopown), e7dca162 (ftr5thrloopbetaown); read under the 11c design (14:54 PASS) vs ft_thr bf3d593c / ft_thrbeta
-      8d1429bf with kit_figures collect + kit_readout --vs, kit_extrap_read (wire arms), then the threshold scan (tools/kit_threshold_scan.py
-      --runs) as for D405. 12(i) log-skip read: PARTIAL (finding ~19:00): tt Coulomb fixed (3.55 -> 1.72, exponent -0.55),
-      uug soft overshoot +5.00, tt Sudakov +0.77; step 13 (linear-only skip) waits on 12(ii). 12(ii) frames_gamma_max=4 design
-      PASS (revised, uugg probe kit_frames_probe_uugg.json): smoke 18da5c47 -> uug 95be8db2, uugg 88b9334a; read: add arm
-      ''gmax4'' to tools/kit_extrap_read.py ARMS (uug, uugg), kit_figures collect vs c15b3337/c364a7ae, kit_readout --vs,
-      kit_transformer_probe REREAD on both arms (frame and relative gamma). 12(iii) lightlike tops read (finding ~18:10):
-      tops'' m/E in Sudakov strata below every bulk_train event, error tracks it, frames flat; cannot separate from sqrt(s)
-      range (m/E = 2 m_t/sqrt s).'
-    decisions: 'KIT models keep full LLoCa (D419): no route cuts, so the log-skip design''s partial branch (combine with frames
-      cut) is closed; follow-up is a linear-only skip (step 13). Repo-reviewer passed at c6985407 with datagen Born-record
-      fix (d5f9c78d, gated on wrote_born) and the probe''s m/E from float64 rows.'
-    ruled_out: route cuts (D419); the quadratic log-skip as a general fix (overshoots uug soft and tt Sudakov)
-    running: FA-ccin2p3-af3c9ca5, 066f8539, ca5873f3, cb111375, e7dca162 (11c chain); 18da5c47, 95be8db2, 88b9334a (gamma
-      bound)
-    files: tools/kit_transformer_probe.py (m/E column, --plot-mE), tools/kit_extrap_read.py, tools/kit_readout.py, tools/kit_figures.py,
-      tools/kit_loop_pool_check.py, datagen.py, analysis/kit_benchmark/data/{kit_loop_pool_check,kit_frames_probe_uugg,kit_frames_probe_ttvirt_mE,kit_extrap,kit_fig_A_logskip_uug,kit_fig_A_logskip_tt}.json,
-      figs kit_extrap_logskip_*, kit_tt_lightlike_{a,b}
-    written: '2026-11-12T17:09:39+00:00'
+    state: '2026-11-12 ~19:40 @950f6522. Closed at the context limit (main session''s request). READY for the next owner,
+      in order: step 15 (curve check of the KIT controls with analysis/data_saving/curve_quality.py''s separation/end_up bars,
+      Joaquin: validation must fall with training; controls'' val turns up late, c15b3337 -4.1@6400 -> +25@7680, c364a7ae
+      +0.3@5120 -> 2069@7680; pick the lr where it stays with training, read the mu-MSE val curve beside the HETEROSC NLL)
+      then step 14 (divergence-form input features through the whole network: eikonal s_ik/(s_ij s_jk) per coloured triple,
+      1/s_ij and P(z) per coloured pair, 1/beta per massive pair, log^2(s/m^2) per massive leg; extend wrappers._pair_log_inputs
+      behind a default-off flag + invariance test; one short test uug + tt virtual vs 203a274f/c15b3337 and 3fc1016a at step
+      15''s lr; design + review + D395 smoke). IN FLIGHT: step 13 linear log-invariant polynomial term (smoke acddacca ->
+      uug c4fc1d6f, tt 6bc05a40; design PASS 17:15; read with kit_extrap_read set logpolylin_, kit_figures collect + kit_readout
+      --vs; uug control 203a274f, tt 3fc1016a, degree-2 arms 7b891d10/eb870ad4); step 12(ii) frames gamma_max=4 (95be8db2
+      uug, 88b9334a uugg, read under the 15:55 PASS design, kit_extrap_read set gmax4_, kit_transformer_probe REREAD); step
+      11c one-loop parents: r5loop 066f8539 DIVERGED at step 1264 (loss runaway at peak lr, no data/code fault; finding ~19:00),
+      rerun unchanged 2d653209 (tag r5loop_rerun) -> A_ft dcf42ad6; r5loopbeta ca5873f3 healthy at step 1719 -> A_ft e7dca162;
+      read vs ft_thr bf3d593c / ft_thrbeta 8d1429bf + threshold scan (tools/kit_threshold_scan.py --runs). Naming: never ''skip''
+      to Joaquin; it is the log-invariant polynomial term P_2(L) / P_1(L) (finding ~19:20).'
+    decisions: 'D419 full LLoCa, no route cuts. Linear-only term = model.input_log_skip_linear (7b4f8bd9) under design PASS
+      17:15. 066f8539 rerun unchanged as a repair inside the 11c approval (lowering lr for the loop parents alone would break
+      the comparison; if it diverges again the lr change is a design revision for loop parents and controls). Joaquin: log
+      invariants as inputs are not the functional form of the divergence (step 14); good lr = validation falls with training
+      (step 15).'
+    ruled_out: route cuts (D419); degree-2 log-invariant polynomial term as a general fix (overshoots uug soft +5.00 and tt
+      Sudakov +0.77)
+    running: FA-ccin2p3-acddacca (smoke) -> c4fc1d6f, 6bc05a40 (step 13); 95be8db2, 88b9334a (step 12 ii); 2d653209 -> dcf42ad6,
+      ca5873f3 -> e7dca162 (step 11c)
+    files: 'wrappers.py (_log_skip quadratic switch, _pair_log_inputs), tests/test_input_reps.py, tools/kit_extrap_read.py
+      (arms gmax4, plain_logskiplin, logskiplin; sets logpoly_, logpolylin_, gmax4_), tools/kit_figures.py (INPUT_ARMS labels
+      P_2/P_1), analysis/kit_benchmark/data/{kit_extrap,kit_fig_A_logpoly_uug,kit_fig_A_logpoly_tt}.json, figs kit_extrap_logpoly_*,
+      analysis/data_saving/curve_quality.py; known tool bug: site logs of a never-started job returned another run''s log
+      (cb111375 -> 95be8db2''s)'
+    written: '2026-11-12T17:52:42+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
