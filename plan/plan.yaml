@@ -21348,7 +21348,12 @@ entries:
   - D360
   - D377
   - D407
-  next: null
+  next:
+    2: 'Define ''well optimized'' by the validation curve itself (committed tool: steady fall through the run not only in
+      the anneal, no spike above ~3x the running minimum, no val/train gap opening while val is flat), read it on every existing
+      stage-2 and s4 trial of both arms (scratch too), find why no trial is well trained (lr window centre under Muon, warmup,
+      schedule, batch size), fix the template, and show one t t~ tree cell trained well by that measure with the smallest
+      test, before any L(D) batch (Joaquin 2026-11-12: ''the tree runs are not fixed at all''; D412)'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -24818,6 +24823,13 @@ entries:
       data/{ft_hpo_diag.json,nullparent_readout.json,nullparent_runs_read.json}, figs/{ft_hpo_diag_*,nullparent_LD,nullparent_curves_*},
       sweep/gen_data_saving.py, sweep/sweep_config_dsave_s4_ft_*_t8500.yaml
     written: '2026-11-12T10:11:07+00:00'
+  step_why:
+    2:
+      feeds: 'whether any L(D) arm (scratch or fine-tune) can be read at all: the data saving needs both arms well trained'
+      if:
+      - 'a template change makes the cell well trained by the measure: adopt it for both arms, then cost the L(D) redo of
+        both arms'
+      - 'no change tried makes it well trained: report the measure''s numbers per suspect and what remains'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
