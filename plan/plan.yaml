@@ -23846,7 +23846,8 @@ entries:
       ratios there beside the shared-alpha fit''s S; u u~ tree and the one-loop arms stay at the old template, said wherever
       targets are compared.'
   step_waits:
-    '4': 'a reviewer: design-reviewer on the t t~ LO fine-tune redo design (recorded 12:14 CET)'
+    '4': 'a reviewer: repo-reviewer backlog pass (the commit of the passed s5 configs is blocked by the overdue backlog);
+      design PASSED, target 3 h / 56 jobs recorded'
     '5': 'a reviewer: the step-4 design''s verdict (one latest design per entry; the V/B offshell-own design, configs sweep/sweep_config_dsave_s6_ft_ee_ttbar_nlo_d{5,6,7}_t8500.yaml
       generated, is recorded after it)'
   findings:
