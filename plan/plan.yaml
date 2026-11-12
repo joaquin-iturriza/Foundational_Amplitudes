@@ -24235,18 +24235,18 @@ entries:
       - 'designed: review and submit'
       - 'Joaquin holds it: wait'
   targets:
-  - batch: muon_long
-    wall_h: 20.3
-    jobs: 1
-    units: optrec_adamw_x16
-    start: '2026-11-12T00:30:53+00:00'
-    at: '2026-11-12T00:30:53+00:00'
   - batch: pidqn
     wall_h: 2.8
     jobs: 2
     units: null
     start: '2026-11-12T03:15:36+00:00'
     at: '2026-11-12T03:15:36+00:00'
+  - batch: muon_long
+    wall_h: 20.3
+    jobs: 1
+    units: null
+    start: '2026-11-12T03:17:01+00:00'
+    at: '2026-11-12T03:17:01+00:00'
   step_waits:
     '2': '2026-11-13'
     '1': the next owner's fix of the memmap key mismatch between prebuild mode and the GPU run (see hand-off), then this step's
