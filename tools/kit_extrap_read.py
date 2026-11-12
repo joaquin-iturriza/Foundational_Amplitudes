@@ -88,7 +88,7 @@ def plot(path, figs):
             ax.plot(x, [e["transformer"][k]["err"] for k in ks], "o-", color=ps.C.vermillion, label="transformer")
             for arm, mk, c, lab in (("rezero", "D-", ps.C.orange, "ReZero"),
                                     ("thr", "v-", ps.C.purple, r"$\beta$ input"),
-                                    ("scalars", "P-", ps.C.sky, "MLP inputs only")):
+                                    ("scalars", "P-", ps.C.sky, "transformer, MLP inputs")):
                 if f"transformer_{arm}" in e:
                     ax.plot(x, [e[f"transformer_{arm}"][k]["err"] for k in ks], mk, color=c, label=lab)
             for arm, mk, c in (("mlp", "s-", ps.C.blue), ("ours", "^--", ps.C.green)):

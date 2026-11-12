@@ -142,6 +142,30 @@ def test_scalars_only_reads_no_momentum():
     assert moved > 1e-6, "input_scalars_only does not change the output"
 
 
+def test_route_off():
+    """input_route_off: each cut keeps the output Lorentz invariant and changes it against the pair logs alone; with
+    'local' the momenta still reach the backbone through the learned frames (unlike input_scalars_only)."""
+    import wrappers
+    p, ptr = _events(1)
+    L = _lorentz(2)
+    base = _out(_wrapper(input_pair_logs=5), p, ptr)
+    for r in ("local", "frames"):
+        w = _wrapper(input_pair_logs=5, input_route_off=r)
+        a, b = _out(w, p, ptr), _out(w, p @ L.T, ptr)
+        assert float((a - b).abs().max() / a.abs().max()) < 1e-7, f"route_off={r}: not Lorentz invariant"
+        assert float((a - base).abs().max() / a.abs().max()) > 1e-6, f"route_off={r} does not change the output"
+    q, _ = _events(5)
+    fixed = _pair_log_inputs(p, ptr, 5)
+    w = _wrapper(input_pair_logs=5, input_route_off="local")
+    orig = wrappers._pair_log_inputs
+    wrappers._pair_log_inputs = lambda *a, **k: fixed
+    try:
+        a, b = _out(w, p, ptr), _out(w, q, ptr)
+    finally:
+        wrappers._pair_log_inputs = orig
+    assert not torch.equal(a, b), "route_off=local: the frames carry no momentum"
+
+
 def test_soft_rescale_fixed_point():
     p, ptr = _events(4)
     q = _soft_rescale(p, ptr, 1e-8)
@@ -150,7 +174,7 @@ def test_soft_rescale_fixed_point():
 
 
 if __name__ == "__main__":
-    for t in [test_scalars_only_reads_no_momentum, test_pair_log_values, test_soft_rescale_fixed_point, test_pair_logs_equivariant,
+    for t in [test_route_off, test_scalars_only_reads_no_momentum, test_pair_log_values, test_soft_rescale_fixed_point, test_pair_logs_equivariant,
               test_soft_rescale_equivariant, test_local_logs_equivariant, test_both_flags_6particle_equivariant]:
         t()
     print("all ok")

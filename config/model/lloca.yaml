@@ -34,6 +34,9 @@ input_soft_eps: 0.0
 input_local_log_eps: 0.0
 # input_scalars_only: the backbone sees only the scalars above (no momenta: local momenta zeroed, identity frames)
 input_scalars_only: false
+# input_route_off: '' | local (local momenta zeroed, learned frames kept in the attention) | frames (identity frames
+# in the attention, local momenta kept)
+input_route_off: ""
 context_dim: 0
 context_dropout: 0.5
 context_names_file: null

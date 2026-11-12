@@ -224,7 +224,8 @@ class AmplitudeLLoCaWrapper(nn.Module):
                  context_names_file=None,
                  sign_pair_dim: int = 0, sign_pair_hidden: int = 32, sign_pair_bound: bool = False,
                  input_pair_logs: int = 0, input_soft_eps: float = 0.0, input_local_log_eps: float = 0.0,
-                 input_pair_threshold: bool = False, input_scalars_only: bool = False):
+                 input_pair_threshold: bool = False, input_scalars_only: bool = False,
+                 input_route_off: str = ""):
         super().__init__()
         self.net = net
         # input representations for singular limits (D374, kit_benchmark input arms; all Lorentz-exact, 0 = off):
@@ -238,6 +239,10 @@ class AmplitudeLLoCaWrapper(nn.Module):
         # input_scalars_only: the backbone reads only the per-particle scalars (properties, orders, pair logs): local
         # momenta zeroed, identity frames (models/lloca.py), so no momentum reaches it but through the pair logs
         net.scalars_only = bool(input_scalars_only)
+        # input_route_off: cut one route of the momenta into the backbone (D411 isolation): 'local' zeroes the local-frame
+        # momenta (learned frames kept in the attention), 'frames' passes identity frames to the attention (local momenta kept)
+        assert input_route_off in ("", "local", "frames"), input_route_off
+        net.route_off = input_route_off
         # Pair sign head (model.sign_pair_dim, training.sign_head): the net's last sign_pair_dim per-particle channels
         # are pair features; the sign logit gets the mean over the event's particle pairs of an MLP of them and of the
         # pair's invariants (see _sign_pair_logit). Output layer zeroed: at init the head is the pooled channel alone.

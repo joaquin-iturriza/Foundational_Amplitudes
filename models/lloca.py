@@ -262,6 +262,11 @@ class LLOCAMuPTransformer(nn.Module):
             )
             fourmomenta_local = self.trafo_fourmomenta(fourmomenta, frames)
             features_local = (fourmomenta_local - mean) / std
+            route_off = getattr(self, "route_off", "")   # model.input_route_off (wrappers.py): one momentum route cut
+            if route_off == "local":        # no local-frame momenta; the learned frames still act in the attention
+                features_local = torch.zeros_like(features_local)
+            elif route_off == "frames":     # local momenta kept; the attention's vector messages see identity frames
+                frames = IdentityFrames()(fourmomenta)
         if getattr(self, "local_log_eps", 0.0):   # model.input_local_log_eps: log-compressed local components (invariant)
             features_local = torch.asinh(features_local / self.local_log_eps) / float(np.arcsinh(1 / self.local_log_eps))
 
