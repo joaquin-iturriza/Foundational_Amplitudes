@@ -30809,6 +30809,73 @@ entries:
       -> 25.6), tt Coulomb 3.55 -> 1.72, Sudakov -0.53 -> +0.77; (3) seed 42 under D315, MLP bands 0.34/0.22, effects in the
       check are decades; (5) prior is complete; (8) through (14) are fine: HETEROSC, plain target as the step-14 brief allows,
       KIT bulk_test and hard_test, only input_div_form moves (config diff gate), ~75 MB per run, no HP search in the arm itself.'
+  - at: '2026-11-12T18:36:08+00:00'
+    question: 'Round 3, two parts. (A) Steps 15+16 (D421, D422, D424, D425): at which HPs, by single-fidelity DyHPO over the
+      template''s space, does a KIT from-scratch run''s validation mu-MSE fall with its training mu-MSE to the end, with the
+      lowest validation, on four setups: uug plain target softpair (control 203a274f), tt virtual softpairthr (3fc1016a),
+      uug T target softpair (c15b3337), uugg T target softpair (c364a7ae)? Changed from the passed round 2: batch fixed at
+      the template''s 16384, not searched (Joaquin: ''Why would you change batch size?''), horizon 300 epochs = 300 x 1e5
+      / 16384 = 1831 steps, as Bakar''s MLP (D425), two setups added (D424). (B) Step 14 (Joaquin ~19:30 ''passing the functional
+      form of the divergence as an input''; D419): do divergence-form inputs (model.input_div_form @6cdec219: eikonal per
+      coloured triple, log P(z) per light coloured final pair, log 1/beta per heavy pair, log^2(s/m^2) per heavy leg) close
+      uug soft/collinear (plain target) and tt Coulomb/Sudakov, at each setup''s chosen trial of (A)? Feeds: the KIT models''
+      HPs and inputs.'
+    prior: 'As round 2 (passed 2026-11-12T18:07) and the step-14 FIX of 19:3x: kit_curves NLL read @daa54068 (uug 1e5 fails
+      the curve bars at lr 0.0118605, tt borderline, uugg 2851 nats); hp_ranges_readout (only lr moves separation within searches);
+      template 2. Horizon read on the controls'' NLL curves (kit_curves.json): best validation at step 5600-7040 (uug), 8000
+      (tt), 2080 (uugg, val leaves training at ~1000); this read is on cosine runs whose lr at step 2000-4000 is still high,
+      so it cannot say what a WSD run of that length reaches; D425 sets the horizon. Bakar''s MLP: 300 epochs at batch 2048
+      (~14.7k steps), lr 2e-3 cosine. Step-14 priors: degree-2 log polynomial term PARTIAL (uug soft overshoot +5.00, tt Coulomb
+      3.55 -> 1.72), degree-1 running (c4fc1d6f/6bc05a40), target x eikonal dead end, gamma<=4 not adopted. No KIT search
+      and no div-form run before (searched docs/results.tex, plan, site decisions: div_form, eikonal, P(z), splitting, 1/beta,
+      kit_hpo, epochs, horizon).'
+    measure: '(A) per trial (result json by run_trial''s training.result_path: val_mse_curve, train_eval_mse_curve on 2000
+      training events): curve_quality separation = (v/t end)/min(v/t), end_up = v_end/min v on running-median-3 curves; good
+      = separation <= 3 and end_up <= 2; best val mu-MSE (the objective). Reader tools/kit_curves.py sweep @fbc81659 (drive.py''s
+      observed trials from sweeps_local, curves from their result_path on CC) -> analysis/kit_benchmark/data/kit_hpo.json;
+      chosen per setup = lowest best val among good. Chosen trial vs its old-HP control: bulk_test log10-MSE and hard-bin
+      readout by kit_predict REREAD on the trial''s run dir vs the control''s kit_result.json, and the NLL-form curve. (B)
+      as the passed step-13 design: deepest-bin median signed error and log-MSE by tools/kit_extrap_read.py (uug coll_y, soft_x
+      1e-7..1e-6; tt Sudakov 15-50 TeV, Coulomb beta 1e-4..1e-3), exponents per family (exact soft -2, coll -1, Coulomb -1.02),
+      family median log10(arm/control) by kit_readout --vs, bulk_test log-MSE, and both sides'' mu-MSE curves through curve_quality.'
+    check: '(A) curve_quality.json holds good and bad trials inside the same stage-2 searches (ee_uu scr 21/71, epem_ttx 14/70,
+      ee_ttbar_nlo 12/63), separation follows lr within searches (rho -0.30); on KIT the NLL form moves with setup and D at
+      one HP point (uug 1e5 3.6-160 nats, 9e5 0.60). (B) kit_extrap.json @7656e687: the degree-2 log term moved uug deepest
+      soft -8.40 -> +5.00 (log-MSE 241 -> 25.6), coll 17.7 -> 2.24, tt Coulomb 3.55 -> 1.72, Sudakov -0.53 -> +0.77; Bakar''s
+      log-threshold MLP reaches Coulomb 2.41; tests/test_input_reps.py::test_div_form checks formulas, Lorentz invariance
+      1e-9, flag-off identity.'
+    fixed: '(A) Each setup''s run config (base_config = the control''s run dir runs/kit/kit_A_<...>; inputs, target flags,
+      HETEROSC mu_mse select + sigma stage, float64, first 1e5 bulk_train, 1e5 val, seed 42, validate_frac 0.02, MuonAdamW,
+      from scratch); WSD cooldown 0.125 (D423); batch 16384 (template); t_steps 1831 single fidelity (D425); space lr [1.667e-3,
+      1.5e-2], muon wd [1e-3, 0.3], reg [1e-10, 1e-6], warmup [0.05, 0.2], eta_min [1e-10, 1e-7], ema, ema_decay [0.9, 0.999];
+      8 trials each, waves 3,3,2; configs sweep/sweep_config_kit_hpo_{uug_plain,ttvirt_thr,uug_T,uugg_T}.yaml @4d1a213d, through
+      sweep/drive.py --sites ccin2p3. D395: the sweep-trial path on a KIT base with WSD is smoked by FA-ccin2p3-f81cb1d0 (50
+      steps, batch 1562; the batch value does not change the path); the four searches go after it. Cost (rates at 16384 float64
+      from the controls: uug 0.67 s/step, tt 0.56, uugg 0.80; plus ~4 min start, sigma stage and plots read in their logs):
+      per trial uug 0.42 h, tt 0.37 h, uugg 0.5 h; 8 x (0.42 + 0.37 + 0.42 + 0.5) = 13.7 GPU-h. Disk <= 3.2 GB (32 x ~0.1
+      GB). (B) Each arm = its setup''s chosen trial''s config + ++model.input_div_form=true, through job_kit.sh A with that
+      trial''s HPs (lr, muon wd, reg, warmup, eta_min, ema, ema_decay, WSD 0.125, batch 16384, 1831 steps), resolved config
+      diffed against the trial''s config.yaml before submission (only input_div_form, run_dir/name may differ; otherwise launched
+      through run_trial''s command). Wall target per arm = its chosen trial''s own measured time, recorded before submission.
+      D395 smokes of the new key now: 50 steps each on uug plain and tt softpairthr through training, sigma, kit_predict scoring,
+      plots. Cost (B): smokes 2 x 0.2 + arms ~0.42 + 0.37 = ~1.2 GPU-h; if the arms'' own search is needed (outcome), 2 x
+      8 x ~0.4 = ~6.3 GPU-h. All of (A) + (B) <= ~21 GPU-h on CC.'
+    control: (A) the old-HP runs 203a274f, 3fc1016a, c15b3337, c364a7ae on shared quantities (kit_result.json bulk/hard bins,
+      NLL-form curve); the mu-MSE curve bars are read on the trials. (B) each setup's chosen trial (same HPs, no div form);
+      references 203a274f/3fc1016a, the degree-2 and degree-1 log-term arms, Bakar's MLP.
+    seeds: Seed 42 per trial and arm (D315); the 8 trials are the HP axis; (B) bands from the MLP family's deepest-bin spread
+      (0.34 uug, 0.22 tt).
+    outcome: '(A) YES per setup: at least one good trial; its HPs go to that setup''s later runs (step 14 arms on uug plain
+      and tt) and it is their control; read beside it its bulk_test and deepest-bin errors against the old-HP control (within
+      2x on bulk: costs nothing; worse by > 2x: reported as the cost) and which HPs moved. NO per setup (no good trial in
+      8): extend the search by 8 trials; still none: widen lr on the side separation shrinks toward (design revision). (B)
+      uug FIXES if deepest coll |signed| <= 0.38 and soft signed in [-0.46,+0.46], exponents soft [-2.5,-1.5], coll [-1.5,-0.5];
+      tt Sudakov FIXES if signed in [-0.22,+0.48] with log-MSE <= 0.154, Coulomb if log-MSE <= 2.41 and exponent <= -0.44;
+      bulk worse by > 1.5 decades reported as the cost. YES on all four: the input goes into the KIT models and is proposed
+      for catalog pretraining. PARTIAL: per limit which column closed which. NO EFFECT, worse, or an arm whose curves fail
+      the bars at the control''s HPs: not a verdict on the input; the arm gets the same single-fidelity search (configs copied
+      with input_div_form=true fixed, 8 trials 3/3/2, same chosen-trial rule, ~6.3 GPU-h, within budget) and is judged best
+      against best (CLAUDE.md feature rule); only a NO best against best stops the input.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
