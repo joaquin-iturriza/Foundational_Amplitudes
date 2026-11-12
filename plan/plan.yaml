@@ -25397,6 +25397,11 @@ entries:
       (sends commits only) and drive.py refuses only when the launch''s own configs are uncommitted (tests/test_drive_sync_fail.py).
       Relaunched as detach bbx_zz_lo_scr3, configs @b7f17788, trials submitting from 17:05. E6278/E6282: two V/B fine-tune
       D=1e4 trials diverged at lr_scale 4.45 and 9.99 (routine, D398).'
+  - at: '2026-11-12T17:06:09+00:00'
+    text: '2026-11-12 ~17:40: Joaquin asked what criteria judge a curve well trained; told: curve_quality.py''s four bars
+      (steady >=2/3 by 75% of the run, spike <=3x, jitter <=2x, train/val gap <=10x), thresholds the agent''s own choice,
+      never checked against curves he calls well trained; shape only, best error read beside. If he gives his criteria, rebuild
+      the measure around them.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
