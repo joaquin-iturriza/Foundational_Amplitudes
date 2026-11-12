@@ -21506,7 +21506,7 @@ entries:
     agent: aa6ece09678b3a02b
     state: closed
     since: '2026-11-12T10:12:28+00:00'
-    state_at: '2026-11-12T12:37:45.186000+00:00'
+    state_at: '2026-11-12T12:53:53+00:00'
     context: 300945
     context_at: '2026-11-12T12:53:26+00:00'
   designs:
