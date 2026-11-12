@@ -23661,7 +23661,7 @@ entries:
       D315). 7.6 GPU-h; smoke first. Check 5 searched results.tex/plan for shrink perturb, random init, fresh init, null parent,
       reinit, and D405-D412: only the warm-start step 14 shrink-perturb (same-catalog restart), named in prior.'
   step_waits:
-    '2': a design-reviewer
+    '2': FA-ccin2p3-c69dfb51 FA-ccin2p3-00dc7d42
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
