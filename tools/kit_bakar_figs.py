@@ -220,13 +220,17 @@ def plot(path, figs):
                                       (r"soft gluon in $u\bar ugg$: $x=2E_g/\sqrt{s}$",
                                        r"$t\bar t$ virtual at threshold: $\beta$")):
         for lab, rows, his in table_rows(d[proc]):
-            mk, c = style.get(lab.replace(" (rerun)", ""), ("o-", ps.C.grey))
+            if lab.endswith(" (rerun)"):   # his own evaluate.py numbers are drawn; our reruns of them stay in the table
+                continue
+            mk, c = style.get(lab, ("o-", ps.C.grey))
             dash = "--" if his else "-"
-            st = sorted((k, v) for k, v in rows.items() if k.startswith(f))
+            # by the bin's lower edge, numerically: a string sort put 1e-05 after 0.001 and the line ran back over itself
+            st = sorted(((k, v) for k, v in rows.items() if k.startswith(f)), key=lambda kv: edges(kv[0])[0])
             xs = [np.sqrt(np.prod(edges(k))) for k, _ in st]
-            ax.plot(xs, [v for _, v in st], marker=mk[0], ls=dash, color=c, ms=3, label=lab)
+            ax.plot(xs, [v for _, v in st], marker=mk[0], ls=dash, color=c, ms=3, label=lab + (", Bakar" if his else ""))
             if "bulk" in rows:
                 ax.axhline(rows["bulk"], color=c, ls=":", lw=1)
+        ax.plot([], [], ls=":", color=ps.C.grey, lw=1, label="bulk (dotted, same colour)")
         lo = min([r["bulk"] for _, r, _ in table_rows(d[proc]) if "bulk" in r] + [ax.get_ylim()[0]])
         ax.set_yscale("log"); ax.set_ylim(lo / 3, None)     # the bulk lines are inside the axes, as on his slide
         ax.set_xscale("log"); ax.set_xlabel(xl); ax.set_ylabel("log-MSE per bin")
