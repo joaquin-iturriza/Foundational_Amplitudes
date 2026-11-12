@@ -25316,7 +25316,7 @@ entries:
     '5': '2026-11-13'
     '6': '2026-11-13'
     '10': FA-ccin2p3-bba9a61e FA-ccin2p3-36a30e0c
-    '9': FA-ccin2p3-bacdb4a8 FA-ccin2p3-ec74d56d FA-ccin2p3-62dcf910
+    '9': FA-ccin2p3-62dcf910 FA-ccin2p3-6390978c FA-ccin2p3-5433329e
   handoff:
     state: 'D411 why the MLP beats our transformer: eval-only reads done (findings ~07:00 + correction): frames conditioned,
       float64 throughout, momentum features in range, undertraining not the cause (tt bulk 17x better than MLP yet extrapolates
