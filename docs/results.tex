@@ -9399,7 +9399,8 @@ is $S\ge10^{0.5}$) and, on the test measure, on its one loop; on $e^+e^-\to t\ba
 needs \emph{more} data than scratch (Fig.~\ref{fig:datasaving_LD}). The validation read, in $\ln$ units, agrees
 except on $e^+e^-\to u\bar u$, $V$, whose test read rests on the scratch plateau near $10^{-4}$ where a single test
 event carries most of the MSE. The $t\bar t$ deficit is under test (D400): the catalog holds out every class with a
-top at its physical mass (axis H3), so neither parent has one; parents with those classes added are being trained.
+top at its physical mass (axis H3), so neither parent has one; parents with those classes added are tested at the end of
+this section.
 % src: python3 analysis/data_saving/stage2_readout.py @5555a0f0
 % claim: n_searches=68
 % allow: 0.5 because it is the design's bar's exponent, a setting
@@ -9490,6 +9491,86 @@ tree fine-tunes keep the parent's scale.
 % allow: 10^{2.5} 10^4 because they are the grid's ends, settings
 % allow: 1 because it is the ratio's threshold
 % allow: 2 because it is the stage's name, no result
+
+Physical-mass tops in the parents (D400, stage A). catalog\_v4 holds out every class with an external top at
+$m_t=172.5$ (axis H3), so the stage-2 parents saw tops only at the heavy-quark masses. New parents, the top parents, are the stage-2
+recipes plus the 278 physical-mass top classes and nothing else, trained the same way. Eight fine-tunes from the top parents at the
+stage-2 best trials' HPs and seed, against the same-HP reruns from the stage-2 parents, at
+$D=10^{2.5}$--$10^4$ (Fig.~\ref{fig:datasaving_tops}). The design's pooled rule reads no: 4 of 8 cells below 1,
+geometric mean of top parent over stage-2 parent on validation 0.68. Read per target it splits. On $t\bar t$ the top parent helps: geometric
+mean 0.24 on validation (3 of 4 cells below 1) and 0.08 on test; on validation the two largest cells lie beyond the
+same-HP rerun spread of 0.46--4.84. On $t\bar t$, $V$ it reads 1.92 on validation (1 of 4 below) and 0.60 on test, the validation
+mean carried by the $D=10^4$ cell, which the next paragraph traces to one event. So the physical-mass tops fix part of
+the tree's deficit and leave the one loop's within the rerun spread.
+% src: python3 analysis/data_saving/diag_readout.py tops @e190a6c1
+% claim: n_below=4
+% claim: gmean_own_over_par=0.68
+% claim: by_target.epem_ttx.val.gmean=0.24
+% claim: by_target.epem_ttx.val.n_below=3
+% claim: by_target.epem_ttx.test.gmean=0.08
+% claim: by_target.ee_ttbar_nlo.val.gmean=1.92
+% claim: by_target.ee_ttbar_nlo.val.n_below=1
+% claim: by_target.ee_ttbar_nlo.test.gmean=0.60
+% claim: par_over_orig_range.0=0.46
+% claim: par_over_orig_range.1=4.84
+% allow: 172.5 because it is the top mass, a setting
+% allow: 278 because it is the number of classes added by the recipe, a setting
+% allow: 8 4 because they are the design's cell counts
+% allow: 1 because it is the ratio's threshold
+% allow: 2 because it is the stage's name, no result
+% allow: 10^{2.5} 10^4 because they are the grid's ends, settings
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{../analysis/data_saving/figs/stage2_diag_tops.pdf}
+  \caption{\textbf{Physical-mass tops in the parent, fixed-HP fine-tunes.} Validation $\mu$-MSE (the selection
+  measure, in the target's standardized units) against the target events $D$, left $e^+e^-\to t\bar t$, right its
+  one-loop virtual $V$ (trained on $V/B$). Squares: fine-tune from the top parent (stage-2 recipes plus catalog\_v4's
+  physical-mass top classes); circles: fine-tune from the stage-2 parent at the same HPs and seed; triangles: the
+  stage-2 search's best trial (same HPs, stage-2 parent; its distance to the circles is the rerun spread). One seed per
+  point, final models.}
+  \label{fig:datasaving_tops}
+% allow: 2 because it is the stage's name, no result
+\end{figure}
+
+One event in the $t\bar t$, $V$ validation pool. At $D=10^4$ the top parent's fine-tune reads 11.6 times the stage-2
+parent's on validation but 0.11 of it on test. Per run, from the final model's predictions on the 5000 validation
+and test events: one validation event carries 0.98 of that run's validation MSE$(\ln V/B)$, and the same event is the
+worst validation event in 10 of the 16 $t\bar t$, $V$ runs of the two diagnostics (all arms, Fig.~\ref{fig:event_share}).
+It is not an extreme of the target: its $V/B$ lies inside the pool's bulk, above the median. Without each run's worst event,
+top parent over stage-2 parent reads 0.39, 1.11, 1.62, 0.22 on validation at $D=10^{2.5}$--$10^4$ (geometric mean 0.63,
+2 of 4 below 1) and 0.49 on test, inside the rerun spread: the physical-mass tops neither help nor hurt the one loop
+measurably. A validation read on this target is therefore given beside its value without the worst event.
+% src: python3 analysis/data_saving/event_share.py 'runs/dsave_diag_*_ft_ee_ttbar_nlo_d*_t8500/trial_*' runs/dsave_s2_ft_ee_ttbar_nlo_d5_t8500/trial_0340 runs/dsave_s2_ft_ee_ttbar_nlo_d6_t8500/trial_1544 runs/dsave_s2_ft_ee_ttbar_nlo_d7_t8500/trial_0120 runs/dsave_s2_ft_ee_ttbar_nlo_d8_t8500/trial_0406 @7d56534c
+% claim: cells.10000.val_all=11.6
+% claim: cells.10000.test_all=0.11
+% claim: cells.10000.tops_val_top1_share=0.98
+% claim: n_runs_val_worst_4523=10
+% claim: n_runs=16
+% claim: cells.316.val_wo1=0.39
+% claim: cells.1000.val_wo1=1.11
+% claim: cells.3162.val_wo1=1.62
+% claim: cells.10000.val_wo1=0.22
+% claim: gmean_val_wo1=0.63
+% claim: n_below_val_wo1=2
+% claim: gmean_test_wo1=0.49
+% allow: 5000 because it is the pool size, a setting
+% allow: 2 because it is the stage's name, no result
+% allow: 4 1 because they are the cell count and the ratio's threshold
+% allow: 10^{2.5} 10^4 because they are the grid's ends, settings
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{../analysis/data_saving/figs/event_share.pdf}
+  \caption{\textbf{One validation event dominates $e^+e^-\to t\bar t$, $V$.} MSE$(\ln V/B)$ of fixed-HP fine-tunes
+  (each cell at its stage-2 best trial's HPs, seed 42, final models) against the target events $D$; left validation,
+  right test, 5000 events each. Solid: all events; dotted, open markers: without that run's worst event. Diamonds:
+  stage-2 parent, off-shellness column on the target's own scale; circles: stage-2 parent, the parent's scale; squares:
+  top parent (stage-2 recipes plus the physical-mass top classes), the parent's scale; triangles: the stage-2 search's
+  best trial.}
+  \label{fig:event_share}
+% allow: 5000 42 2 because they are the pool size, the seed and the stage's name
+\end{figure}
 
 % ==========================================================================
 \section{Architecture and encoding ablations}\label{sec:arch}
