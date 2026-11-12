@@ -21503,9 +21503,9 @@ entries:
     decision: D407
   owner:
     agent: aa6ece09678b3a02b
-    state: stopped
+    state: working
     since: '2026-11-12T10:12:28+00:00'
-    state_at: '2026-11-12T10:37:36.112000+00:00'
+    state_at: '2026-11-12T11:12:00.040000+00:00'
     context: 130283
     context_at: '2026-11-12T10:35:14+00:00'
   designs:
@@ -25191,9 +25191,9 @@ entries:
     decision: D401
   owner:
     agent: a1441fe6f27448d3c
-    state: working
+    state: stopped
     since: '2026-11-12T10:46:29+00:00'
-    state_at: '2026-11-12T10:46:29+00:00'
+    state_at: '2026-11-12T11:01:58.621000+00:00'
     context: 155391
     context_at: '2026-11-12T11:12:13+00:00'
   findings:
