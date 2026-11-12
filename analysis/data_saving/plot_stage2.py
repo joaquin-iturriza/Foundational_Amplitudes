@@ -56,13 +56,13 @@ def ld(gpu, panels=T, key="test", name="stage2_LD"):
             cc = cells(tg, a, key)
             x = [c["search_gpu_h"] for c in cc] if gpu else [c["D"] for c in cc]
             ax.plot(x, [c[key] for c in cc], marker=m, linestyle="none" if not gpu else "-", color=col, label=name_)
-            # curve_quality.py --cells: a search best whose validation turns up at the end is drawn open
+            # curve_quality.py --cells: a search best whose validation leaves its training curve (separation > 3 or end > 2x best) is drawn open
             cq = os.path.join(REPO, f"analysis/data_saving/data/curve_quality_cells_{tg}.json")
             if not gpu and os.path.exists(cq):
                 up = json.load(open(cq))[a]["per_cell"]
                 xo = [xx for xx, c in zip(x, cc) if up.get(f"{c['D']:.0f}") is False]
                 ax.plot(xo, [c[key] for c in cc if up.get(f"{c['D']:.0f}") is False], marker=m, linestyle="none",
-                        color="white", markeredgecolor=col, label="val turns up at the end" if a == "ft" else None)
+                        color="white", markeredgecolor=col, label="val leaves train" if a == "ft" else None)
             if f and not gpu:
                 A, Linf = f["fit"][a]
                 D = np.logspace(np.log10(min(x)), np.log10(max(x)), 100)

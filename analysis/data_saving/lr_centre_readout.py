@@ -20,7 +20,7 @@ REPO = os.path.abspath(os.path.join(HERE, "..", ".."))
 sys.path.insert(0, REPO)
 sys.path.insert(0, HERE)
 from analysis.common.readers import site_python  # noqa: E402
-from curve_quality import quality  # noqa: E402
+from curve_quality import quality, together_min  # noqa: E402
 from s4_readout import failed  # noqa: E402
 from suspects_readout import YLAB, ps  # noqa: E402
 from trial_overfit import REMOTE  # noqa: E402
@@ -33,7 +33,10 @@ TESTS = {"lr": ({"epem_ttx_d7_t8500": TTX}, {"c/3": "lrthird", "c/10": "lrtenth"
          "muonly": ({"epem_ttx_d7_t8500": TTX, "ee_uu_nlo_d7_t8500": UUV, "ee_uu_nlo_d8_t8500": UUV},
                     {"mu-only": "muonlymse"}),
          # adamw = the one-change Muon-off test (training.optimizer AdamW, muon_weight_decay out of the space)
-         "adamw": ({"epem_ttx_d7_t8500": TTX}, {"AdamW": "adamw"})}
+         "adamw": ({"epem_ttx_d7_t8500": TTX}, {"AdamW": "adamw"}),
+         # lrx3 = the lr window x3 (gen_data_saving --lr-factor 3), validation-with-training test after D420
+         "lrx3": ({c: UUV for c in ("epem_ttx_d5_t8500", "epem_ttx_d7_t8500", "ee_uu_d5_t7310", "ee_uu_d7_t8500",
+                                    "bbx_zz_nlo_d5_t3840", "bbx_zz_nlo_d7_t6400")}, {"lr x3": "lrx3"})}
 TEST = sys.argv[sys.argv.index("--test") + 1] if "--test" in sys.argv else "lr"
 CELLS, VARIANTS = TESTS[TEST]
 SUFFIX = "" if TEST == "lr" else f"_{TEST}"
@@ -66,6 +69,7 @@ def search(rr, arm, name):
         hp = r["hp"]
         r["peak_lr"] = hp["lr"] * (hp["lr_scale"] if arm == "ft" else 1.0)
         r.update(quality(r["val"], r.get("train")))
+        r["together_min"] = together_min(r["val"], r["train"]) * p
         out.append(r)
     return out
 
@@ -73,6 +77,7 @@ def search(rr, arm, name):
 def summary(g):
     b = min(g, key=lambda r: r["val_min"])
     return {"n": len(g), "n_good": sum(r["well"] for r in g), "best_min": b["val_min"],
+            "together_min": min(r["together_min"] for r in g),
             "best": {k: b[k] for k in ("run_dir", "peak_lr", "separation", "end_up", "well")}}
 
 

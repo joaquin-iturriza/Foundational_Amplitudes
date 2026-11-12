@@ -46,6 +46,16 @@ def quality(v, t):
     return q
 
 
+def together_min(v, t):
+    """The lowest validation before it leaves training: min of v over the checks before val/train first exceeds 3x
+    its running minimum (the search objective that would penalise separation, read on existing curves)."""
+    lv, lt = smooth(v), smooth(t)
+    n = min(len(lv), len(lt))
+    g = lv[:n] - lt[:n]
+    off = np.where(g - np.minimum.accumulate(g) > np.log10(BAR["separation"]))[0]
+    return float(np.min(v[:max(off[0], 1)] if len(off) else v))
+
+
 def trials():
     """Every trial with curves: the stage-2 searches (trial_overfit.json) and the s4 fine-tune searches."""
     from trial_overfit import load
