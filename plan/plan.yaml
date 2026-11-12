@@ -20992,9 +20992,10 @@ entries:
     8: 'One-loop t t~ V suspects batch, design PASS 2026-11-12 (configs sweep/sweep_config_dsave_diag_{massown,adamw,pairthr}_ft_ee_ttbar_nlo_d{5..8}_t8500.yaml
       + smoke ..._smoke3_..._t50.yaml @7d56534c, controls the offown runs, ~5.5 GPU-h): smoke then 12 runs via trial_job.sh,
       --hdr=--time=00:40:00; held by the main session (''before more arms'') until the defect read is seen'
-    9: 'Memorisation of the t t~ fine-tunes (finding 2026-11-12, ft_curves.py / event_share.py --gap @bfb2bd4e): per D and
-      target, the train/val curves of ft vs scratch (D=316..1e4), where val turns up, and which input or inherited statistic
-      differs between the arms; then one design'
+    9: 'Step-9 defect hunt: leads (a)-(d) read (finding 2026-11-12 step 9, ft_defect.py); lead (a) arm running: target_stats=parent_shared
+      on t t~ tree, smoke dsave_diag_pshsmoke_ft_epem_ttx_d5_t50 then 8 runs sweep/sweep_config_dsave_diag_{pshared,psharedtops}_ft_epem_ttx_d{5..8}_t8500.yaml
+      at the stage-2 best HPs (design PASS ~00:50), read R = parent_shared/own (re-based val MSE(ln)) against the parscale/tops
+      controls'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -21106,12 +21107,14 @@ entries:
         to Joaquin as in the design'
       - 'all NO: no gain at the control''s HPs; the deficit goes to the defect hunt'
     9:
-      feeds: what is wrong with the t t~ fine-tunes (D400, Joaquin 2026-11-12)
+      feeds: whether a defect in the fine-tune path makes the t t~ fine-tunes lose to scratch (D400 defect hunt), before any
+        S is re-read
       if:
-      - 'a path lets the fine-tune memorise t t~ (an input or stat inherited from the parent): fix it, rerun the t t~ fine-tunes
-        at fixed HPs against scratch'
-      - 'no such path: overfitting of a sound start; a regularisation/horizon arm at fixed HPs (e.g. the val-best step vs
-        T, weight decay toward the parent) against the same-HP reruns'
+      - 'YES (geomean parent_shared/own <= 1/3, >= 6 of 8 below 1): parent_shared becomes the tree fine-tune setting, tree
+        fine-tune searches rerun with it (cost to Joaquin)'
+      - 'NO (geomean in (1/3,3)): no gain at the control''s HPs; next design on the fine-tune''s generalisation floor on t
+        t~ (mass column own on t t~ tree)'
+      - 'WORSE or r4/r5 disagree: own stays / inconclusive, both numbers reported'
   designs:
   - at: '2026-11-10T02:35:09+00:00'
     question: 'Step 1 (D356 horizons, tree arm): on catalog_v4''s held-out tree targets ee->ttbar (H3, 2->2 massive), ee->ccbar
@@ -22659,7 +22662,6 @@ entries:
       site decisions --project FA; the entry''s evidence and dead ends.'
   step_waits:
     '8': the main session's read of the defect hunt (its 'before more arms'); then launched as designed
-    '9': the next owner after this hand-off (context near its limit), and the main session's read of the defect hunt
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
