@@ -29626,6 +29626,59 @@ entries:
       disk fits (in-memory parent, /sps/lpnhe 68G free). Searched for check 5: ttx_nlo, one-loop top, Coulomb, Sommerfeld,
       heldoutthr/r5thr, virt=QCD, loop.*pretrain in results.tex; entry findings/dead ends; site decisions (D405, D411, D412,
       D418); the star threshold arm is now in prior.'
+  - at: '2026-11-12T15:48:12+00:00'
+    question: 'Step 12(ii), D419 (full LLoCa, no route cuts): on KIT e+e- > u u~ g and u u~ g g from scratch, does bounding
+      the learned local frames'' boost (model.net.frames_gamma_max=4, lloca clamp_boost hard clamp of each frame''s gamma,
+      frames still learned and used) remove the q-g collinear overshoot (uug deepest collinear y 1e-7..1e-6 median signed
+      error +1.36 decades, log-MSE 2.21) while keeping the soft limit and bulk that the frames cut lost? Feeds: whether the
+      boost size is the carrier of the collinear failure and a bounded boost becomes the KIT models'' (and a candidate catalog)
+      setting, or the frames carry it through something gamma does not bound (orientation, the relative transforms).'
+    prior: 'Searched docs/results.tex (gamma_max, clamp_boost, frames boost, boost bound), plan show kit_benchmark, site decisions
+      (D411, D412, D419). results.tex: none found. Entry: (1) route isolation (finding 2026-11-12T12:57): cutting the attention
+      frames (identity frames, the G -> 1 limit) took uug deepest collinear from +1.36/2.21 to -0.25/0.161 (collinear family
+      median log10(arm/control) -0.24, 3/5 better) but cost the soft family +0.70 (deepest soft -0.28 -> -0.93) and tt threshold
+      +0.47; local momenta and off-shellness cuts did not fix it. (2) Frames probe (finding 2026-11-12T14:17, tools/kit_transformer_probe.py
+      on c15b3337): frame gamma medians collinear y 1e-3..1e-7 1.7, 2.6, 4.1, 6.6, 10.7 vs bulk_train median 1.26 (max 10.2),
+      share of bulk_train at or above the stratum median 10%, 1.7%, 0.5%, 0.1%, 0.0%; signed error +0.01, +0.05, +0.26, +0.69,
+      +1.38 in step with it; soft strata gamma 1.3-1.5 (in range). (3) Double cut (finding 14:36) and D419: route cuts are
+      ruled out; this arm keeps every route and only bounds the boost. Differs from (1): the frames are kept (learned rotations
+      and boosts up to gamma 4), so the soft limit''s use of the frames is not removed.'
+    measure: 'Per process, arm vs its control, on the KIT hard_test strata scored by job_kit.sh (KIT evaluate.py, kit_result.json):
+      per family (collinear, soft, bulk) median log10(arm/control log-MSE) with strata better/worse by tools/kit_readout.py
+      --vs on a kit_figures collect; deepest collinear and deepest soft median signed error (pred - truth, log10|M|^2) and
+      log-MSE by tools/kit_extrap_read.py collect (new arm gmax4 on analysis/kit_benchmark/data/kit_extrap.json); bulk_test
+      log-MSE; and, eval-only on the arm''s best weights, the frames'' gamma per stratum (tools/kit_transformer_probe.py)
+      to show the clamp is active (collinear gamma at 4, bulk unchanged).'
+    check: 'Existing data moved this measure with the frames'' boost: the G -> 1 limit (identity frames, a2cba8d7) moved the
+      deepest collinear signed error +1.36 -> -0.25 and the collinear family -0.24; across the control''s own strata the signed
+      error rises with the frame gamma (+0.26 at gamma 4.1, +0.69 at 6.6, +1.38 at 10.7) while the local momenta stay in range
+      (probe, finding 14:17). G = 4 is where the overshoot starts (y 1e-5..1e-4 stratum, gamma 4.1, +0.26) and touches at
+      most ~0.5% of bulk_train frames (share of bulk_train at or above that stratum''s median gamma). lloca''s LearnedPDFrames
+      on CC has gamma_max (grep in CC .venv equi_frames.py, 19 hits, 2026-11-12); the passthrough is @da59ef1b (default null
+      = no-op). Commits between the controls (b6794f35 uug, 909ae494 uugg) and now that touch training are default-off flags
+      (input_route_off, input_scalars_only, input_pair_threshold, input_log_skip, layer_norm, target_times_beta, fine-tune
+      head map) or scoring (546dd9c2 deterministic frame noise, adf1742b unaugmented scoring), under which the controls were
+      rescored (job_kit_rescore.sh) as for the route isolation.'
+    fixed: 'Everything of the controls'' commands: scripts/job_kit.sh kit_ee_uug__me2 100000 8000 A ++model.input_soft_eps=1e-8
+      ++model.input_pair_logs=5 training.lr=0.0118605 (uugg: kit_ee_uugg__me2, ++model.input_pair_logs=6), seed 42, 1e5 bulk
+      train, 8000 steps, float64, HETEROSC with mu_mse selection then sigma stage; the only change ++model.net.frames_gamma_max=4,
+      tag=softpair_gmax4. D395: the new key''s path runs first once for 50 steps on uug through every stage (train, sigma
+      fit, scoring, plots), tag=softpair_gmax4_smoke. Cost: smoke ~0.3 GPU-h, uug ~1.7, uugg ~1.9 (controls c15b3337 1.72
+      h, c364a7ae 1.86 h): ~4 GPU-h on CC.'
+    control: 'c15b3337 (uug softpair, kit_A_ee_uug_me2_n100000_t8000_softpair) and c364a7ae (uugg softpair): identical command
+      without the bound. References: frames cut a2cba8d7 (uug), Bakar''s MLP.'
+    seeds: 'One per arm, seed 42 as the controls (D315: no more seeds; noise quoted from docs/results.tex ~13232-13245, single-process
+      reruns 1.1x-30x in loss, so only family shifts beyond 0.3 decades are read).'
+    outcome: 'Per process. YES: collinear family median <= -0.3 with deepest collinear signed error <= +0.30 (the frames cut''s
+      band), soft family median < +0.3 and bulk_test not worse by > 0.5 decades: the boost size carries the collinear failure
+      and a bounded boost fixes it without the frames cut''s soft cost; frames_gamma_max=4 becomes the KIT uug/uugg setting,
+      proposed for the catalog parent, and tt is not rerun (its frames stay at gamma 1.2-1.3, the clamp is a no-op there).
+      PARTIAL: deepest signed error falls by >= 0.5 decades but stays above +0.30, or the soft family worsens by >= 0.3: the
+      bound helps but is not the whole carrier or costs the soft limit; reported with both. NO: collinear family within +-0.3
+      with the probe showing the clamp active (collinear gamma at 4): the boost size is not the carrier; the frames act through
+      orientation or the relative transforms, which is what the next design targets. If the probe shows the clamp inactive,
+      the test is void and reported so. WORSE (bulk or any family >= +0.5): the bound breaks the frames'' learning, reported
+      as such.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
