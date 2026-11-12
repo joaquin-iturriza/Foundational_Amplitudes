@@ -39,7 +39,13 @@ ARMS = {"rezero": {"ee_uug_me2": "kit_A_ee_uug_me2_n100000_t8000_softpair_rezero
         # tt virtual: the skip on softpairthr
         "plain": {"ee_uug_me2": "kit_A_ee_uug_me2_n100000_t8000_softpair_plain"},
         "plain_logskip": {"ee_uug_me2": "kit_A_ee_uug_me2_n100000_t8000_softpair_plain_logskip"},
-        "logskip": {"ee_tt_virt_finite": "kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr_logskip"}}
+        "logskip": {"ee_tt_virt_finite": "kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr_logskip"},
+        # step 12(ii): frames boost bound model.net.frames_gamma_max=4 on the softpair controls
+        "gmax4": {"ee_uug_me2": "kit_A_ee_uug_me2_n100000_t8000_softpair_gmax4",
+                  "ee_uugg_me2": "kit_A_ee_uugg_me2_n100000_t8000_softpair_gmax4"},
+        # step 13: linear-only log skip (model.input_log_skip_linear)
+        "plain_logskiplin": {"ee_uug_me2": "kit_A_ee_uug_me2_n100000_t8000_softpair_plain_logskiplin"},
+        "logskiplin": {"ee_tt_virt_finite": "kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr_logskiplin"}}
 # figure sets: kit_extrap_<proc> (the earlier arms) and kit_extrap_route_<proc> (the one-route cuts)
 SETS = {"": (("rezero", "D-", "orange", "ReZero"), ("thr", "v-", "purple", r"$\beta$ input"),
              ("scalars", "P-", "sky", "transformer, MLP inputs")),
@@ -49,7 +55,11 @@ SETS = {"": (("rezero", "D-", "orange", "ReZero"), ("thr", "v-", "purple", r"$\b
         "double_": (("noframes", "v-", "purple", "no frames"), ("nooffshell", "X-", "grey", "no off-shellness"),
                     ("noframesoff", "D-", "orange", "neither")),
         "logskip_": (("plain", "D-", "orange", "plain target"), ("plain_logskip", "v-", "purple", "plain + skip"),
-                     ("logskip", "v-", "purple", "skip"))}
+                     ("logskip", "v-", "purple", "skip")),
+        "gmax4_": (("gmax4", "v-", "purple", r"$\gamma \leq 4$"),),
+        "logskiplin_": (("plain", "D-", "orange", "plain target"), ("plain_logskip", "v-", "purple", "plain + skip"),
+                        ("plain_logskiplin", "X-", "sky", "plain + linear skip"),
+                        ("logskip", "v-", "purple", "skip"), ("logskiplin", "X-", "sky", "linear skip"))}
 
 SITE = r'''
 import glob, json, os, sys
