@@ -23792,6 +23792,44 @@ entries:
       NO CHANGE branches, every case assigned; one seed and 8 trials as siblings (D315); 70 GB free on CC. Searched results.tex:
       layer_decay, layer decay, LLRD, lr_scale, fine-tune search, search space; entry dead ends; site decisions (layer, lr_scale,
       template, D407-D412).'
+  - at: '2026-11-12T11:14:39+00:00'
+    question: 'Step 3 consequence (s4 test FIXED on e+e- > t t~ tree): with the fine-tune template fixed (scratch''s space:
+      layer_decay 1, lr_scale [1/3,3]), how much target data does pretraining save on held-out e+e- > t t~ at LO, the entry''s
+      question for this target: S = D*_scr / D*_ft at MSE(ln|M|^2) = 1e-4 from the fine-tune and scratch L(D) curves. Redo
+      of the stage-2 fine-tune L(D) arm on this target only (design outcome FIXED: ''the L(D) fine-tune arm is redone on that
+      target''); one-loop V/B stays as is (IMPROVED, NOT RESOLVED).'
+    prior: '(1) s4 test (s4_readout.py, data @470d147e, figs s4_curves_epem_ttx_{a,b}): new fine-tune search best val MSE(ln|M|^2)
+      7.98e-7 at D=316, 8.22e-9 at D=3162 against the stage-2 fine-tune 2.30e-6, 1.61e-7 (r_old 0.35, 0.05, gmean 0.13 ->
+      FIXED) and scratch 3.78e-7, 8.54e-9 (r_scr 2.11, 0.96). (2) Stage 2 (stage2_readout.py, design passed 2026-11-11): scratch
+      and old-template fine-tune, 8-trial searches per D, k=2..10, t t~ LO; old fine-tune 2.4-18.9x above scratch (ft_hpo_diag.py).
+      (3) Null-parent (nullparent_readout.py): parent weights at scratch HPs = scratch on tree (1.08, 2.36, 0.86, 3.28x).
+      (4) results.tex sec:ladder (catalog_v3): fine-tune better at small D, the earlier gap; old_vs_new.py: today''s scratch
+      10-100x better than the old ladder''s. Searched results.tex (fine-tune, layer_decay, data saving, D*), the entry''s
+      dead ends, site decisions D373, D383, D391, D407-D412.'
+    measure: Per (D, arm) the best val mu-MSE in ln units over the search's trials (the objective, best-mu checkpoint), and
+      the test MSE after the sigma stage as stage2_readout.py reads it; S = D*_scr/D*_ft at 1e-4 from dstar_fit.py's joint
+      fit L_arm(D) = A_arm D^-alpha + L_inf,arm (shared alpha) over the 9 D per arm, 16-84% cell-bootstrap band; beside it
+      per-cell ft/scr and the L(D) figure of both arms (and the old fine-tune arm, faint).
+    check: 'On existing data the measure moves with this change: the two s4 cells (D=316, 3162) moved the fine-tune arm 0.35x
+      and 0.05x (to 2.11x and 0.96x scratch); with the old arm the fine-tune sat above scratch at D>=316, so the fit''s S
+      moves from below 1 toward or above 1. Calibration half-width of log10 D*(1e-4) on t t~ LO is 0.10 (dstar_fit.py --calib,
+      stage-2 design), so a factor 1.6 saving clears the band edge; single-search spread up to ~5x per cell (sec:ladder) enters
+      through the bootstrap.'
+    fixed: 'Everything of the stage-2 t t~ LO fine-tune configs (sweep/gen_data_saving.py @470d147e, --stage s5 --targets
+      epem_ttx --arms ft, tree default --ft-space scratch): parent dsave_parent_heldout_r4, T(D) = 800, 1440, 7680, 8500 x6
+      (horizons.py --ladder, D391), first-D train events of the stage-2 pools, target_stats own (head map on, as s4), offshell_stats
+      parent, seed 42, heterosc_select mu_mse + sigma stage, 8 trials (waves 3,3,2), the template''s other HPs; only the space
+      differs from stage 2. The D=316 and D=3162 cells are the s4 searches (configs identical but the name, diffed), not rerun;
+      7 new searches k=2,3,4,6,8,9,10: sweep/sweep_config_dsave_s5_ft_epem_ttx_d{2_t800,3_t1440,4_t7680,6_t8500,8_t8500,9_t8500,10_t8500}.yaml.'
+    control: 'The stage-2 scratch searches of the same target and D (dsave_s2_scr_epem_ttx_*: same pools, T, seed, trial count),
+      best against best; the stage-2 old-template fine-tune arm beside it.'
+    seeds: Seed 42, one 8-trial search per D, as every stage-2 sibling (D315). 7 new searches x 8 = 56 trials, estimate 26.3
+      GPU-h (generator's rates; s4's 5 searches took ~1 h wall), under D412's 30.
+    outcome: 'YES (pretraining saves t t~ LO data at the fixed template): the 16-84% band of S lies above 1; report S with
+      its band and per-cell ft/scr. NO SAVING: the band contains 1 (fine-tune = scratch within the band); report it as the
+      t t~ LO answer of the current setup (and against sec:ladder''s earlier gap, which was against a scratch 10-100x worse).
+      WORSE: band below 1; report. D* at 1e-4 not reached by an arm: read at the precision both reach (D373), said so. Any
+      branch: the readout goes to Joaquin with the L(D) figure; no reruns (D315).'
   step_waits:
     '3': detach s4_ft_template4 DONE event (drive.py over the 5 dsave_s4_ft searches, 40 trials in waves 3,3,2)
   findings:
