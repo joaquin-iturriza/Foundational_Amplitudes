@@ -148,8 +148,17 @@ for name in sys.argv[1:]:
             j = json.load(open(f))
         except Exception:
             continue
-        rows.append({"file": os.path.basename(f), "hp": j.get("hp") or j.get("config") or j.get("params"),
-                     "val_loss": j.get("val_loss"), "best_step": j.get("best_step"), "run_dir": j.get("run_dir"),
+        hp_idx = int(os.path.basename(f)[2:6])          # results/hp<idx>_t<T>_<time>.json; run dir runs/<sweep>/trial_<idx>
+        rd = f"runs/{name}/trial_{hp_idx:04d}"
+        hp = {}
+        if os.path.exists(rd + "/config.yaml"):
+            import yaml
+            c = yaml.safe_load(open(rd + "/config.yaml")); t = c.get("training", {})
+            hp = {f"training.{k}": t.get(k) for k in ("lr", "batchsize", "muon_weight_decay", "regularization_lambda",
+                                                      "cosanneal_warmup_frac", "cosanneal_eta_min", "ema_decay", "scheduler")}
+            hp["ema"] = c.get("ema")
+        rows.append({"file": os.path.basename(f), "hp": hp,
+                     "val_loss": j.get("val_loss"), "best_step": j.get("best_step"), "run_dir": rd,
                      "val": j.get("val_mse_curve"), "train": j.get("train_eval_mse_curve")})
     out[name] = rows
 print("KITHPO " + json.dumps(out))
@@ -170,8 +179,8 @@ def sweep_read(names, out):
         ch = min(good, key=lambda r: r["val_loss"]) if good else None
         print(f"{name}: {len(rows)} trials, {len(good)} good; chosen {ch and ch['file']}")
         for r in sorted(rows, key=lambda r: r["val_loss"] if r["val_loss"] is not None else 1e99):
-            lr = (r["hp"] or {}).get("training.lr")
-            print(f"  {r['file']:28s} lr {lr}  best val {r['val_loss']}  sep {r.get('separation', float('nan')):.3g}  "
+            lr, bs = (r["hp"] or {}).get("training.lr"), (r["hp"] or {}).get("training.batchsize")
+            print(f"  {r['file']:28s} lr {lr} batch {bs}  best val {r['val_loss']}  sep {r.get('separation', float('nan')):.3g}  "
                   f"end_up {r.get('end_up', float('nan')):.3g}  " + ("good" if r.get("well") else "BAD")
                   + ("  <- chosen" if r is ch else ""))
         d[name] = {"trials": rows, "chosen": ch and ch["file"]}
