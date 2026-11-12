@@ -24062,6 +24062,20 @@ entries:
       jitter falls below control/3 (beyond the 2.9x neighbour spread): name the failing bar; next its suspect (gap: regularization
       or fewer epochs at small batch count; steady with clean curves: under-training, a longer horizon). NO CHANGE: none of
       the above: lr is not the cause; next warm-up/schedule and batch size. No rerun (D315).'
+    passed_at: '2026-11-12T12:47:03+00:00'
+    reviewer: 'Re-check of the lower-lr test (c/3 and c/10, scratch and fine-tune, t t~ LO D=3162, 4 x 8-trial searches, 8.8
+      GPU-h). One change: diffed lrthird/lrtenth configs against dsave_s2_scr / dsave_s4_ft: lr window (scr [8.68e-4,7.81e-3]
+      / [2.61e-4,2.35e-3]; ft lr 2.603e-3 / 7.817e-4) and the name-derived DyHPO seed only, committed @979ad4e4/0d593de5.
+      Check 2: reran curve_quality @0d593de5: scratch spike median 5.7 below peak lr 3e-3 vs 26-75 above, Spearman(spike,
+      lr) +0.65/+0.79; the one-change x1/10 run at D=3162 goes spike 12.1->3.4, jitter ->0.10, at a 30x worse minimum, which
+      the new level bar (best min <= 2x control) and the CLEAN BUT WORSE branch now catch. Gap fixed (train fall while val
+      within 1.5x of its final min): trial_0640 18.4 -> 5.1. 8 positive controls pass all bars, e.g. dsave_s2_ft_ee_ttbar_nlo_d8
+      trial_0406 (steady 0.96, spike 2.4, jitter 0.12, gap 3.3; curve read). Check 3: median spike too noisy across neighbouring
+      searches (ratio 0.05-15), so read as a count; jitter called only below control/3 against the 2.9x neighbour spread;
+      the 2x level bar sits inside the ~5x search-to-search spread, so a CLEAN BUT WORSE within 5x is a lead, not a verdict.
+      Prior misstatement: at D=316 the x1/10 run (2.6e-6) is below its listed control (3.9e-5), not worse; the prediction
+      holds at D>=1e3. Outcome partition ordered, every case mapped. Searched: lr x1/10, lr x1/3, suspects, lower lr, lr window,
+      Muon lr, spike, jitter, lrtenth, lrthird, curve_quality in results.tex, the entry''s findings/dead ends, decisions D405-D412.'
   step_waits:
     '2': 'a reviewer: design-reviewer re-check of the revised lower-lr design (c/3 and c/10, 4 searches, 8.8 GPU-h, recorded
       12:46 UTC); and the CC sync (two untracked kit_benchmark files block the merge; CC at ff934d7c), routed to the main
