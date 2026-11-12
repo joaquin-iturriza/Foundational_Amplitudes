@@ -89,7 +89,7 @@ def halved():
 
 
 def write(name, tgt, k, T, arm, rate, parent, lr_factor=1.0, offshell="parent", ft_space="llrd", tmpl2=False,
-          wsd=False, batch_search=True):
+          wsd=False, batch_search=False):
     c = lr_centre(T, k) * lr_factor
     space = template_space()
     fixed = {"data.source": "recipes", "data.processes_file": f"${{PROJECT_DIR}}/recipes/catalog_v4_datasaving_{tgt}.yaml",
@@ -167,13 +167,14 @@ def main():
                     help="multiplies the lr centre c of every config (both arms); curve_quality.py: the current c gives "
                          "spiking, jittering val curves in every t t~ / u u~ search at D>=316")
     ap.add_argument("--tmpl2", action="store_true",
-                    help="the revised template (hp_ranges_readout.py, D423): WSD (cooldown 1/8) for both arms, batch size searched in [D/64, D/2], fine-tune "
+                    help="the revised template (hp_ranges_readout.py, D423): WSD (cooldown 1/8) for both arms, batch D/2 (searched only with --batch-search), fine-tune "
                          "lr_scale [0.03, 10] and layer_decay [0.5, 1]")
     ap.add_argument("--wsd", action="store_true", help="the stage-2 space under WSD (cooldown 1/8) only: the matched "
                     "control of --tmpl2's batch and ranges")
-    ap.add_argument("--no-batch-search", action="store_true",
-                    help="--tmpl2 without the batch-size search (batch stays D/2): Joaquin 2026-11-12, searching batch "
-                         "beside lr confounds the two and adds little")
+    ap.add_argument("--batch-search", action="store_true",
+                    help="--tmpl2 with the batch size searched in [D/64, D/2]: forbidden by D426 (searching batch beside lr "
+                         "confounds the two); kept only to reproduce the 4 tmpl2 configs made before it")
+    ap.add_argument("--no-batch-search", action="store_true", help="the default since D426; kept so old commands run")
     ap.add_argument("--ks", type=int, nargs="*", help="only these D exponents k (D = 10^(k/2))")
     a = ap.parse_args()
     R, hz = rates(), horizons()
@@ -194,7 +195,7 @@ def main():
     for name, t, k, T, arm in jobs:
         p, h = write(name, t, k, T, arm, R[(t, k)], a.parent_nlo if t.endswith("_nlo") else a.parent_lo,
                      (0.5 if (t, k) in half else 1.0) * a.lr_factor, a.offshell_nlo if t.endswith("_nlo") else "parent",
-                     a.ft_space or ("llrd" if t.endswith("_nlo") else "scratch"), a.tmpl2, a.wsd, not a.no_batch_search)
+                     a.ft_space or ("llrd" if t.endswith("_nlo") else "scratch"), a.tmpl2, a.wsd, a.batch_search)
         total += h
         print(f"{os.path.relpath(p, ROOT)}  {h:.1f} GPU-h")
     print(f"{len(jobs)} sweeps, {total:.1f} GPU-h estimated (8 trials each)")

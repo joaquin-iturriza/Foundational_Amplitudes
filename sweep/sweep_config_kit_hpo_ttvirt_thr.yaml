@@ -15,7 +15,7 @@ cluster:
   time: "01:00:00"
 paths: null
 sweep_name: kit_hpo_ttvirt_thr
-base_config: ${PROJECT_DIR}/runs/kit/kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr
+base_config: ${PROJECT_DIR}/sweep/kit_base/kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr
 n_trials: 16
 dyhpo:
   surrogate: gp
@@ -29,7 +29,7 @@ fidelity_schedule:
   t_steps: [1831]
 fixed_params:
   data.source: recipes
-  data.processes_file: ${PROJECT_DIR}/runs/kit/recipes/kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr.yaml
+  data.processes_file: ${PROJECT_DIR}/sweep/kit_base/kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr.recipe.yaml
   data.train_subsample: 'null'
   data.eval_subsample: 'null'
   data.memmap: 'false'

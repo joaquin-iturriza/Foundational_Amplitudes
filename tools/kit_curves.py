@@ -166,12 +166,21 @@ def sweep_read(names, out):
     from curve_quality import quality as q_mse
     from analysis.common.readers import site_python
     import base64, glob
-    # drive.py keeps each observed trial's RESULT_JSON locally; its result_path (the curves) and run_dir are on CC
-    todo = [[n, os.path.basename(f), j["result_path"], j["run_dir"]]
-            for n in names for f in sorted(glob.glob(os.path.join(ROOT, "sweeps_local", n, "results", "*.json")))
-            for j in [json.load(open(f))]]
+    # drive.py keeps each observed trial's RESULT_JSON locally; its result_path (the curves) and run_dir are on the
+    # site that ran it (driver_state.json's trial "site")
+    todo = {}
+    for n in names:
+        st = json.load(open(os.path.join(ROOT, "sweeps_local", n, "driver_state.json")))["trials"].values()
+        where = {(t["hp_idx"], t["t_steps"]): t["site"] for t in st if t["status"] == "observed"}
+        for f in sorted(glob.glob(os.path.join(ROOT, "sweeps_local", n, "results", "*.json"))):
+            j = json.load(open(f))
+            todo.setdefault(where[(j["hp_idx"], j["t_steps"])], []).append(
+                [n, os.path.basename(f), j["result_path"], j["run_dir"]])
     d = {n: [] for n in names}
-    d.update(site_python(SWEEP_SITE, [base64.b64encode(json.dumps(todo).encode()).decode()], "KITHPO"))
+    for site, rows in todo.items():
+        for n, r in site_python(SWEEP_SITE, [base64.b64encode(json.dumps(rows).encode()).decode()], "KITHPO",
+                                site=site).items():
+            d[n] += [dict(x, site=site) for x in r]
     for name, rows in d.items():
         for r in rows:
             if r["val"] and r["train"]:
