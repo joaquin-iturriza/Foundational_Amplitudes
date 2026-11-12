@@ -1,0 +1,32 @@
+{
+ "scr": {
+  "cells": 8,
+  "tracks": 6,
+  "stalls": 0,
+  "per_cell": {
+   "10": false,
+   "32": true,
+   "100": false,
+   "316": true,
+   "1000": true,
+   "3162": true,
+   "10000": true,
+   "31623": true
+  }
+ },
+ "ft": {
+  "cells": 8,
+  "tracks": 4,
+  "stalls": 1,
+  "per_cell": {
+   "10": false,
+   "32": false,
+   "100": false,
+   "316": true,
+   "1000": true,
+   "3162": false,
+   "10000": true,
+   "31623": true
+  }
+ }
+}
