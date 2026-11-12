@@ -423,6 +423,11 @@ def finalize_dataset(process, sqrts_min, sqrts_max, n_events, role, seed,
     borns = [p[:-len(".npy")] + ".born.npy" for p in ordered_chunk_paths]
     if is_virt(process) and all(os.path.exists(b) for b in borns):
         np.save(final[:-len(".npy")] + ".born.npy", np.concatenate([np.load(b) for b in borns]))
+        # its identity record (experiment._born_of_pool asserts it): without it a regenerated pool kept the record of
+        # the pool it replaced and every V/B run on it was refused (b b~ > Z Z, 2026-11-12)
+        from keyed_aug import pool_identity
+        with open(final[:-len(".npy")] + ".born.npy.json", "w") as fh:
+            json.dump({"pool_identity": pool_identity(final), "n_rows": int(data.shape[0])}, fh)
     # the quota-filled flat part's fill per chunk (_write_flat_fill), kept when every chunk wrote one
     # (one written when any chunk has one; a chunk without it, e.g. reused after a kill between its .npy and its fill,
     # is a null entry and a [WARN], so the read sees the gap)
