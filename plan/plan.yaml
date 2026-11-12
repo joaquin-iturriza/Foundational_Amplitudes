@@ -24153,6 +24153,12 @@ entries:
     units: null
     start: '2026-11-12T03:38:25+00:00'
     at: '2026-11-12T03:38:25+00:00'
+  - batch: suspects
+    wall_h: 0.4
+    jobs: 56
+    units: null
+    start: '2026-11-12T04:01:37+00:00'
+    at: '2026-11-12T04:01:37+00:00'
   handoff:
     state: 'D408 investigation. (1) Old vs new side by side (draft tool scratchpad ovn/old_vs_new.py, data/old_vs_new.json
       @77271ee4, fig figs/old_vs_new.png, legend in words): today''s scratch is 10-100x better than the old scratch at D>=1e3
