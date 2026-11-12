@@ -28453,6 +28453,22 @@ entries:
       comes with the frames cut whatever off-shellness does; the KIT models take the frames cut alone (cheaper bulk: noframes
       bulk +0.34 vs off-shellness +1.0) and the soft limit is reported as its cost. LOST on either: the two cuts interact;
       the KIT models take the frames cut alone and the interaction is reported.'
+    passed_at: '2026-11-12T13:09:14+00:00'
+    reviewer: 'Double cut (input_route_off=frames + data.offshell_zero=true) on uug and tt virtual, from scratch 1e5/8000
+      steps/seed 42/lr 0.0118605/batch 16384/float64/HETEROSC mu_mse+sigma, as the passed route arms (registry summaries of
+      a2cba8d7, 011d6333, 0262bec5, 13266d91, c15b3337, 3fc1016a identical in these; nooffshell arms used the same data.offshell_zero
+      flag per the passed route design). Check 1: the frames-only and off-shellness-only arms are each a one-flag control,
+      the two-flag move is the question. Check 2 (kit_extrap.json read): uug deepest soft signed control -0.278, noframes
+      -0.930, nooffshell -0.036; deepest coll +1.364 / -0.248 / +1.979; tt Sudakov 15-50 TeV -0.527 (log-MSE 0.720) / +0.065
+      (0.154) / -0.693 (0.506). Check 3: D315 holds seeds at one; the effects to tell apart (soft -0.93 vs -0.04, coll +1.36
+      vs -0.25) are 0.9-1.6 decades against the MLP seed bands 0.34 uug / 0.22 tt (mlp_s0-2 in kit_extrap.json: uug soft +0.04/-0.09/-0.46,
+      coll -0.38/-0.19/-0.04). Check 4: bands for kept/lost/recovered stated with what the KIT models take; partial soft (-0.59..-0.46)
+      and tt middle cases are unmapped but narrow. Check 5 searched results.tex (route_off, noframes, noframesoff, double
+      cut, both cuts, offshell_zero, nooffshell, frames cut, identity frame, off-shellness off: only the catalog lever-arm
+      fine-tunes at ~15305, another question), the entry (16 frame mentions, dead ends), site decisions (frame/off-shell:
+      D2, D90, D364, D374, D400): no double-cut run. Checks 9/11/10: HETEROSC, controls'' preprocessing, KIT bulk_test/hard_test.
+      Check 14: ~75 MB/run, memmap off, /sps/lpnhe 69 GB free now. Check 15: rate from the same-setup route arms (1.14-1.38
+      h), readout wired (tools/kit_extrap_read.py noframesoff, 90831f05). No sweep (13).'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
