@@ -126,21 +126,21 @@ def read(path, figs):
 def plot(proc, p, fams, outdir):
     import plot_style as ps
     figs = ps.panels(len(fams))
-    y = np.arange(len(ARMS))
+    y = np.arange(len(ARMS))[::-1]      # mlp at the top; the axis not inverted, so make_room grows it downwards
     for (fig, ax), f in zip(figs, fams):
         for i, a in enumerate(ARMS):
             v = p["arms"].get(a, {}).get(f, [])
             c = ps.C.blue if a == "mlp" else ps.C.vermillion
-            ax.plot(v, [i] * len(v), "o", color=c, mfc="none", label="seed" if i == 1 else None)
+            ax.plot(v, [y[i]] * len(v), "o", color=c, mfc="none", label="seed" if i == 1 else None)
             if v:
-                ax.plot([np.median(v)], [i], "|", color=c, markersize=14, label="seed median" if i == 1 else None)  # the median tick encodes the statistic
+                ax.plot([np.median(v)], [y[i]], "|", color=c, markersize=14, label="seed median" if i == 1 else None)  # the median tick encodes the statistic
         if p["ref"]:
             ax.axvline(p["ref"][f], ls="--", color=ps.C.grey, label="transformer, softpair")
         if p["numpy"]:
             ax.axvline(p["numpy"][f], ls=":", color=ps.C.green, label="his numpy MLP")
         ax.set_xscale("log")
         ax.set_yticks(y, ARMS)
-        ax.set_ylim(len(ARMS) - 0.5, -0.5)
+        ax.set_ylim(-0.5, len(ARMS) - 0.5)
         ax.set_xlabel("deepest-bin log-MSE" if f != "bulk" else "bulk log-MSE")
         ax.set_ylabel(XLAB.get(f, f.replace("_", " ")) if f != "bulk" else "bulk")
         e, f2, tg = proc.split("_", 2)
