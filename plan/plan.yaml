@@ -16238,6 +16238,19 @@ entries:
     decision: D412
     withdrawn_at: '2026-11-12T08:56:18+00:00'
     withdrawn_why: Joaquin does not want this asked again; the current figure rule stays
+  - ask: 'Scope: the batch window you set at 10 minutes (D324): live measure 2026-11-12 00:19-12:19 UTC: on the same 196 events
+      the waiter returns 56 times under both the old and the new rule (the new one cut nothing); the replay gives 41 at 20
+      min, 37 at 30 min, 34 at 60 min, against 103 with no batching; the main session actually woke 32 times from the waiter
+      (figure analysis/agent_redesign/figs/waiter_live_20261112.png). Keep 10 minutes, or lengthen the window (each step costs
+      that much more delay on routine events; RUN, GAP, OVERRUN and ALERT still return at once)?'
+    at: '2026-11-12T14:05:29+00:00'
+    searched: 'site decisions --project FA (D324 10-minute batch; D412 no useless questions); his messages 2026-11-07T16:59
+      (''10 minutes seems reasonable ... keep track of the usage before and after''), 2026-11-07T17:03 (asks how a batch costs
+      its biggest wake, not a window change), 2026-10-06T00:17 (transfer study plan), 2026-11-10T02:08 (uploaded slides):
+      none settles a window change'
+    blocks: step 24 (window length)
+    blocks_steps: &id001
+    - 24
   step_why:
     11:
       feeds: whether the redesign is finished
@@ -17372,6 +17385,18 @@ entries:
     files: tools/lhe_parts.py tools/check_site_data.py scripts/job_catalog_v4_regen.sh recipes/catalog_v4_pp4_restore.yaml
       analysis/agent_redesign/cache_census.py tests/test_lhe_parts.py .claude/hooks/notification_absorb.py
     written: '2026-11-12T02:23:30+00:00'
+  ask: 'Scope: the batch window you set at 10 minutes (D324): live measure 2026-11-12 00:19-12:19 UTC: on the same 196 events
+    the waiter returns 56 times under both the old and the new rule (the new one cut nothing); the replay gives 41 at 20 min,
+    37 at 30 min, 34 at 60 min, against 103 with no batching; the main session actually woke 32 times from the waiter (figure
+    analysis/agent_redesign/figs/waiter_live_20261112.png). Keep 10 minutes, or lengthen the window (each step costs that
+    much more delay on routine events; RUN, GAP, OVERRUN and ALERT still return at once)?'
+  waiting_since: '2026-11-12T14:05:29+00:00'
+  searched: 'site decisions --project FA (D324 10-minute batch; D412 no useless questions); his messages 2026-11-07T16:59
+    (''10 minutes seems reasonable ... keep track of the usage before and after''), 2026-11-07T17:03 (asks how a batch costs
+    its biggest wake, not a window change), 2026-10-06T00:17 (transfer study plan), 2026-11-10T02:08 (uploaded slides): none
+    settles a window change'
+  blocks: step 24 (window length)
+  blocks_steps: *id001
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
   question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
@@ -20960,7 +20985,7 @@ entries:
       (approves the transfer study''s plan only), 2026-11-06T04:28 (worktree handling and other entries, no cost for this)'
     blocks: step 3's job submissions (the design's final form and its re-check depend on the stage-2 scope); the code rebuild
       in worktrees/wt-sigma-gen3 does not wait
-    blocks_steps: &id001
+    blocks_steps: &id002
     - 3
   owner:
     agent: a237615c421bbf029
@@ -21323,7 +21348,7 @@ entries:
     (approves the transfer study''s plan only), 2026-11-06T04:28 (worktree handling and other entries, no cost for this)'
   blocks: step 3's job submissions (the design's final form and its re-check depend on the stage-2 scope); the code rebuild
     in worktrees/wt-sigma-gen3 does not wait
-  blocks_steps: *id001
+  blocks_steps: *id002
   checked_until: '2026-11-12T02:24:45+00:00'
 - id: pretrain_data_saving
   title: 'pretraining saves target data: dataset-size scaling, fine-tuned against scratch, on the current catalog setup'
@@ -29157,7 +29182,7 @@ entries:
       about cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID,
       says nothing about the draft's sections)
     blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-    blocks_steps: &id002 []
+    blocks_steps: &id003 []
   owner:
     agent: afb073b8fc9460ec5
     state: stopped
@@ -29175,7 +29200,7 @@ entries:
     cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID, says
     nothing about the draft's sections)
   blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-  blocks_steps: *id002
+  blocks_steps: *id003
   step_why:
     1:
       feeds: the draft's results (D354)
