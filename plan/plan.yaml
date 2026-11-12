@@ -29696,6 +29696,69 @@ entries:
       - add that line to the design. Searched for check 5: gamma_max, clamp_boost, frames boost, boost bound, gamma in docs/results.tex
       (none), the entry''s findings and dead ends, site decisions (D315, D395, D411, D412, D419): no prior run of a frames
       boost bound.'
+  - at: '2026-11-12T15:55:39+00:00'
+    question: 'Step 12(ii), D419 (full LLoCa, no route cuts): on KIT e+e- > u u~ g and u u~ g g from scratch, does bounding
+      the learned local frames'' boost (model.net.frames_gamma_max=4, lloca clamp_boost hard clamp of each frame''s gamma;
+      frames still learned and used) remove the collinear failure each process has where its frames boost out of the trained
+      range: uug q-g collinear overshoot (deepest y 1e-7..1e-6 median signed error +1.36 decades, log-MSE 2.21) and uugg q-g
+      collinear undershoot (deepest -1.47, log-MSE 3.84 on the probe''s 200 events; -1.36 / 3.57 on the full stratum, kit_extrap.json),
+      keeping the soft limit and bulk that the frames cut lost? Feeds: whether the boost size carries the collinear failure
+      and a bounded boost becomes the KIT models'' (and a candidate catalog) setting, or the frames carry it through what
+      a per-frame bound does not reach (orientation, relative transforms).'
+    prior: 'Searched docs/results.tex (gamma_max, clamp_boost, frames boost, boost bound, gamma), plan show kit_benchmark,
+      site decisions (D315, D395, D411, D412, D419): no boost bound run before. Entry: (1) route isolation (finding 2026-11-12T12:57):
+      cutting the attention frames (identity frames, the G -> 1 limit) took uug deepest collinear +1.36/2.21 -> -0.25/0.161
+      (collinear family median log10(arm/control) -0.24) but cost the soft family +0.70 (deepest soft -0.28 -> -0.93) and
+      tt threshold +0.47. (2) Frames probe uug (finding 2026-11-12T14:17, kit_frames_probe_uug.json): collinear y 1e-3..1e-7
+      gamma medians 1.65, 2.59, 4.06, 6.54, 10.65, signed error +0.01, +0.05, +0.26, +0.69, +1.38; bulk_train max 10.2, share
+      at or above 4.06: 0.55%; soft in range. (3) New, frames probe uugg (REREAD of c364a7ae, analysis/kit_benchmark/data/kit_frames_probe_uugg.json
+      @HEAD): bulk_train gamma median 1.31, q90 1.63, max 7.18, relative max 16.1; coll_qg y 1e-3..1e-7 gamma 1.53, 2.15,
+      3.39, 5.58, 9.50 (relative 2.2, 3.1, 5.1, 8.3, 14.0) with signed error +0.03, +0.06, -0.23, -0.61, -1.47; coll_gg gamma
+      1.46..9.32 with error -0.01..+0.23 (small); bulk_train share at or above 3.39: 0.3%, above 4.01: 0.25%; soft x strata
+      gamma 1.35-1.44, in range (24-39% of bulk_train above), soft errors -0.04..-0.32. So on uugg the q-g collinear error
+      also grows with the frame gamma past the trained range, with the opposite sign; g-g collinear barely errs. (4) D419:
+      route cuts ruled out; this arm keeps every route and bounds only the boost.'
+    measure: 'Per process, arm vs its control, on the KIT hard_test strata scored by job_kit.sh (KIT evaluate.py, kit_result.json):
+      per family median log10(arm/control log-MSE) with strata better/worse by tools/kit_readout.py --vs on a kit_figures
+      collect (uug: collinear, soft, bulk; uugg: coll_qg, coll_gg, azimuth, soft, bulk); deepest q-g collinear and deepest
+      soft median signed error and log-MSE by tools/kit_extrap_read.py collect (new arm gmax4 in analysis/kit_benchmark/data/kit_extrap.json);
+      bulk_test log-MSE; and eval-only on the arm''s best weights tools/kit_transformer_probe.py (REREAD) per stratum: frame
+      gamma (the clamp active: collinear at 4, bulk unchanged) AND gamma of the relative transforms Lambda_i Lambda_j^-1 (a
+      per-frame bound of 4 allows a relative gamma up to 2*16-1 = 31, above the bulk_train relative max 13.8 uug / 16.1 uugg).'
+    check: 'Existing data moved this measure with the frames'' boost: the G -> 1 limit (identity frames, a2cba8d7) moved uug''s
+      deepest collinear +1.36 -> -0.25 and its family -0.24; on both controls the q-g collinear signed error grows with the
+      frame gamma once it leaves the trained range (uug +0.26 at gamma 4.1 to +1.38 at 10.7; uugg -0.23 at 3.4 to -1.47 at
+      9.5) while the local momenta stay in range (uug probe). G = 4 is where both failures start and touches 0.55% (uug) /
+      ~0.25% (uugg) of bulk_train frames. lloca''s LearnedPDFrames on CC has gamma_max (grep in the CC .venv equi_frames.py,
+      19 hits, 2026-11-12); passthrough @da59ef1b, default null a no-op (repo-reviewer confirmed clamp_boost returns its input
+      with gamma_max None). Commits between the controls (b6794f35 uug, 909ae494 uugg) and now on the training path are default-off
+      flags (input_route_off, input_scalars_only, input_pair_threshold, input_log_skip, layer_norm, target_times_beta, fine-tune
+      head map) or scoring (546dd9c2, adf1742b), under which the controls were rescored (job_kit_rescore.sh) as for the route
+      isolation.'
+    fixed: 'Everything of the controls'' commands: scripts/job_kit.sh kit_ee_uug__me2 100000 8000 A ++model.input_soft_eps=1e-8
+      ++model.input_pair_logs=5 training.lr=0.0118605 (uugg: kit_ee_uugg__me2, ++model.input_pair_logs=6), seed 42, 1e5 bulk
+      train, 8000 steps, float64, HETEROSC with mu_mse selection then sigma stage; the only change ++model.net.frames_gamma_max=4,
+      tag=softpair_gmax4. D395: the new key runs first once for 50 steps on uug through every stage (train, sigma fit, scoring,
+      plots), tag=softpair_gmax4_smoke; the two arms chained afterok on it. Cost: smoke ~0.3 GPU-h, uug ~1.7, uugg ~1.9 (controls
+      1.72 h, 1.86 h): ~4 GPU-h on CC. Disk: control run dirs 81 MB and 104 MB on CC, /sps/lpnhe 67 GB free (2026-11-12):
+      fits.'
+    control: 'c15b3337 (uug softpair) and c364a7ae (uugg softpair): identical command without the bound. References: frames
+      cut a2cba8d7 (uug), Bakar''s MLP.'
+    seeds: 'One per arm, seed 42 as the controls (D315: no more seeds; noise quoted from docs/results.tex ~13232-13245, single-process
+      reruns 1.1x-30x in loss, so only family shifts beyond 0.3 decades are read).'
+    outcome: 'uug: YES if collinear family median <= -0.3 with deepest collinear |signed| <= 0.30 (the frames cut''s band),
+      soft family < +0.3 and bulk_test not worse by > 0.5 decades. uugg: YES if coll_qg family median <= -0.3 with deepest
+      coll_qg |signed| <= 0.30 (control -1.36), coll_gg, azimuth and soft families each < +0.3, bulk not worse by > 0.5 decades.
+      Both YES: the boost size carries the collinear failure on both and a bounded boost fixes it without the frames cut''s
+      soft cost; frames_gamma_max=4 becomes the KIT uug/uugg setting and is proposed for the catalog parent; tt is not rerun
+      (its frames sit at gamma 1.0-1.3, the clamp is a no-op there). PARTIAL (per process): the deepest q-g |signed| falls
+      by >= 0.5 decades but stays above 0.30, or a kept family worsens by >= 0.3: the bound helps but is not the whole carrier
+      or costs elsewhere; reported with both. NO (per process): the q-g collinear family within +-0.3 with the probe showing
+      frame gamma clamped at 4 in the collinear strata. Then if the relative-transform gamma there is still above the bulk_train
+      relative max, boost size is not ruled out (the per-frame bound leaves the relative boost free) and the next design bounds
+      the relative transforms; if the relative gamma is back in range too, the boost size is not the carrier and the frames
+      act through orientation. If the probe shows the clamp inactive, the test is void and reported so. WORSE (bulk or any
+      family >= +0.5): the bound breaks the frames'' learning, reported as such.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
