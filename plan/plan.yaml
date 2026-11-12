@@ -24176,10 +24176,10 @@ entries:
   step_waits:
     '2': '2026-11-13'
     '1': FA-ccin2p3-fcbbd1bd FA-ccin2p3-2e611342
-    '3': 'the training-pool regeneration zz_redesign_regen_pp4 (slurm 63537119, agent_redesign) to end and room on /sps/lpnhe
-      for the 21 GB memmap cache of catalog_v4_default25 (16 GB free; our stale 21 GB key f3bedd61 to delete, deletion refused
-      by the permission classifier): then CPU prebuild (job_catalog_v3_short_prebuild.sh v4_het_default25 LONG_HEADS=8 LONG_FACTOR=1
-      LONG_MEMMAP=true) and the arms afterok on it; then the AdamW x16 twin as designed (alone in the gate''s 60-min window)'
+    '3': '2026-11-12T03:25 the site gate''s 60-min window clears of the pidqn arms (02:23 UTC, 2 x 3:45 limits): then submit
+      the AdamW x16 twin as designed (optrec_adamw_x16, LONG_OPT=adamw LONG_HEADS=8 LONG_FACTOR=16 LONG_HP=1262 LONG_MEMMAP=true,
+      --time 25:30:00, gpu_v100, --est-gpu-hours 20.3, --hdr=--dependency=afterok:63539880 while the cache rebuild FA-ccin2p3-5b88c9ff
+      has not ended)'
   handoff:
     state: 'pidqn design PASSED (design-reviewer, second look). Code on branch pid_vs_qn (worktree worktrees/pid_vs_qn: 5541a2ec
       + fix 9ecbae9f). The repo-reviewer (agent a908d9ab432d34127, holds the lock) BLOCKED on a wrong _dimless_mass_stats
