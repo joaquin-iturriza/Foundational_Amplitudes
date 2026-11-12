@@ -15776,8 +15776,6 @@ entries:
       event and RUN_DONE with no manual poll (next 19 fix).'
     22: 'CLAUDE.md figure rule: on Joaquin''s yes, replace ''the main session sends it without opening it'' with the open-once-and-check
       text proposed 2026-11-10 (shown as a diff)'
-    23: 'Wake batching does not cut usage (2.3->4.6 wakes/h; tests/test_run_done_waiter.py::test_quiet_waiter fails; replay
-      126->57 at 10 min): find why the batching does not take effect and fix, after the 2026-11-11 19:00 UTC usage reset'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16167,11 +16165,6 @@ entries:
       if:
       - 'yes: edit CLAUDE.md, commit, show the diff'
       - 'no: keep, rely on the per-file legend rule'
-    23:
-      feeds: main-session token use
-      if:
-      - 'fixed: re-measure with tools/wake_batching.py'
-      - 'not fixable: revert the change'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
@@ -16179,8 +16172,6 @@ entries:
     '17': 'the first real idle moment: plan next listing RESUME/LAUNCH with no FA job live; the supervisor''s own STALLED
       idle: event (or its absence after 45 min) is the trigger'
     '21': the date 2026-11-17 (a week after the 2026-11-09 23:54 restart on the batching code)
-    '23': 'live confirmation: the next main-session hand-back opens a HANDBACK event (site events --all) and absorb.log shows
-      it'
   owner:
     agent: a6a10b9aac169049a
     state: working
