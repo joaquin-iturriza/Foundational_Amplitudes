@@ -22535,6 +22535,44 @@ entries:
       but it runs both parents with two probes each; say what its log must show (each probe scored, the physics check passing
       on t t~) before the result is read. Searched: results.tex (zero_shot_parent, H3, zero-shot, sec:ladder transfer), the
       entry''s 2026-11-12 findings, site decisions D400.'
+  - at: '2026-11-12T00:43:12+00:00'
+    question: 'D400 defect hunt, step 9 lead (a) (Joaquin 2026-11-12: ''there is no way a pretrained model just performs worse
+      ... something has to be wrong''): under fine_tune.target_stats=own the parent''s readout is loaded unchanged and read
+      on the target''s own scale (s_parent/s_own = 7.4 on e+e- > t t~ tree), so step 0 is far from the parent''s function
+      (val HETEROSC 8.3e4, grad norms 5.6e3 clipped to 5 for ~100 steps). Does keeping the parent''s target standardization
+      (fine_tune.target_stats=parent_shared: step 0 = the parent''s zero-shot) remove the t t~ tree fine-tune''s deficit against
+      scratch?'
+    prior: 'Finding 2026-11-12 step 9 (ft_defect.py @ this commit): lr as applied is as designed; the head mismatch does not
+      order the outcome across targets (u u~ one-loop at 5.8 wins, t t~ tree at 7.4 loses) but is the only code-level difference
+      left between the arms'' starts; the one-loop val NLL blow-up is sigma overconfidence. Step 7 off-shellness diag (diag_readout.py):
+      own/parent-scale reruns t t~ tree 2.33, 2.30, 4.02, 0.72; same-HP rerun spread 0.46-4.84. Stage A (r5 tops parent):
+      t t~ tree r5/r4 0.24 gmean val. parent_shared: never used in this entry; results.tex has no parent_shared fine-tune
+      read (searched parent_shared, target_stats, zero-shot in sec:datasaving, sec:ladder).'
+    measure: 'Per cell (parent, D): val MSE(ln|M|^2) of the final model (D276) on the 10000-event val pool, (rms of pred -
+      truth in standardized units x prepd_std)^2 from sigma_stage/preds_val.npz (as ft_defect.py), the arm over its same-HP
+      target_stats=own control; test beside. Also the step-0 val HETEROSC loss from out_0.log.'
+    check: 'The change moves the start on existing data: step-0 val loss is 8.3e4 under own (FA t t~ tree D=3162 trial_1817)
+      and by construction the parent''s zero-shot NLL under parent_shared; the smoke shows it. The final val MSE moved 0.1-4.8x
+      between same-HP fine-tune variants of these cells in step 7 (offown vs parscale), so the read can resolve a 3x effect
+      only as a pooled 8-cell geomean.'
+    fixed: 'Stage-2 best HPs of each cell (hp_idx 1647, 507, 1817, 1387 for D=316, 1e3, 3162, 1e4), seed 42, T=8500, target
+      e+e- > t t~ tree (recipes/catalog_v4_datasaving_epem_ttx.yaml), offshell_stats parent, MuonAdamW, HETEROSC with heterosc_select
+      mu_mse and the sigma stage; parents runs/data_saving/dsave_parent_heldout_r4 and _r5 (model_run0_best.pt). Configs sweep/sweep_config_dsave_diag_{pshared,psharedtops}_ft_epem_ttx_d{5..8}_t8500.yaml,
+      identical to the controls'' but target_stats=parent_shared. One-loop targets excluded: their parents'' stats are of
+      ln|M|^2 with the physics factor, a different quantity from ln(V/B) (parent_shared asserts on it).'
+    control: 'The same-HP target_stats=own reruns: r4 parscale FA-ccin2p3-6d9526c6, e70f826b, c985b447, a155de3e; r5 tops
+      FA-ccin2p3-0ca51b6f, e538bda9, f996c9e8, 35922ca9; scratch stage-2 best beside (8.5e-9 val at D=3162).'
+    seeds: 'One seed (42) per cell, 8 cells, read pooled: the same-HP rerun spread 0.46-4.84 per cell is the noise band, so
+      only the 8-cell geomean and the count below 1 are read.'
+    outcome: 'R = parent_shared / own per cell. YES (the head mismatch is the defect): geomean R <= 1/3 and >= 6 of 8 cells
+      below 1: target_stats=parent_shared becomes the tree fine-tune setting, and the tree fine-tune searches are rerun with
+      it (cost to Joaquin). NO: geomean R in (1/3, 3): the start is ruled out as the cause; the deficit is the fine-tune''s
+      generalisation floor (ft val 6e-9..2e-6 on t t~ against scratch below it), next a design on what the parent''s features
+      impose on t t~ (mass column own: step 8''s massown arm extended to t t~ tree). WORSE: geomean R >= 3: ruled out, own
+      stays. Any r4/r5 disagreement (one parent''s 4-cell geomean <= 1/3, the other''s >= 1) is reported as INCONCLUSIVE for
+      that parent pair with both numbers. Launch: smoke dsave_diag_pshsmoke_ft_epem_ttx_d5_t50 (log must show ''the parent''s
+      target standardization kept'', step-0 val loss, the sigma stage and preds written), then the 8 runs afterok on it via
+      sweep/trial_job.sh --detached at the cells'' HPs, --hdr=--time=00:40:00 (D=1e4: 00:50:00); ~3.6 GPU-h, under D400.'
   step_waits:
     '7': FA-ccin2p3-35922ca9 FA-ccin2p3-adbd0552
     '8': the main session's read of the defect hunt (its 'before more arms'); then launched as designed
