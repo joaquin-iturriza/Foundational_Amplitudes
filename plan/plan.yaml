@@ -25121,9 +25121,10 @@ entries:
     - FA-ccin2p3-e4eecead
     - FA-ccin2p3-eb0f30db
     - FA-ccin2p3-f6b2ece9
-    commit: 9df60812
+    commit: dddeacff
     paths:
     - analysis/kit_benchmark/data/kit_fig_A.json
+    - models/lloca.py
     - scripts/job_kit_package.sh
     - scripts/job_kit_rescore.sh
     - scripts/job_kit_threshold.sh
@@ -25139,6 +25140,7 @@ entries:
     - tools/kit_precision_check.py
     - tools/kit_predict.py
     - tools/kit_rescore_compare.py
+    - tools/kit_saturation_probe.py
     - tools/kit_target_slope.py
     - tools/kit_threshold_scan.py
   dead_ends:
