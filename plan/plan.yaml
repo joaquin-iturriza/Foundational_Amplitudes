@@ -27007,6 +27007,14 @@ entries:
       softpairthr_logskiplin), afterok, 2:30 limit, target 1.8 h. Read: tools/kit_extrap_read.py arms plain_logskiplin/logskiplin
       and figure set logskiplin_ (237a09f6), gmax4 arm and set gmax4_ wired too. Running unchanged: 11c parents 066f8539/ca5873f3
       training (est 3.4/4.7 h), fine-tunes cb111375/e7dca162 pending; gmax4 95be8db2 (step 4800/8000), 88b9334a (4000/8000).'
+  - at: '2026-11-12T17:37:50+00:00'
+    text: 'Naming (Joaquin 2026-11-12, ''What does skip mean?''): what the earlier findings and designs of this entry call
+      the ''log skip'' is the log-invariant polynomial term: a learned polynomial in the logs of the pair invariants L_ij
+      = log(2 p_i.p_j/s)/5 and of the mass ratios M_i = log(m_i^2/s)/5, added to the network''s output mu, mu += sum_{i<j}
+      [c1_ij L_ij + c2_ij L_ij^2] + sum_i [b1_i M_i + b2_i M_i^2], coefficients c_ij = <a_i, a_j> and b_i from a linear layer
+      on each particle''s static property encoding (code: model.input_log_skip=2, wrappers._log_skip). Degree 2 (P_2(L)) =
+      runs 7b891d10, eb870ad4; degree 1 (P_1(L), c2 = b2 = 0, model.input_log_skip_linear) = runs c4fc1d6f, 6bc05a40. Figures
+      renamed kit_extrap_logpoly_* / kit_extrap_logpolylin_*, data kit_fig_A_logpoly_{uug,tt}.json (99b96f4b).'
   step_why:
     5:
       feeds: what KIT receives
