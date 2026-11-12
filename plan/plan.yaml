@@ -24273,7 +24273,7 @@ entries:
         ttvirt_A_best_threshold'
       - 'within +-0.3: protocol B stays the only threshold model; report the limit of protocol A'
   step_waits:
-    '5': FA-ccin2p3-6f94590d FA-ccin2p3-2d0c78fe
+    '5': '2026-11-12'
     '6': FA-ccin2p3-6f94590d
   handoff:
     state: 'Joaquin released the entry (D403): understand why our models do not extrapolate into the limits and match Bakar''s
