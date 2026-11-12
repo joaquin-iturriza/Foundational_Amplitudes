@@ -15874,6 +15874,13 @@ entries:
       the recipes), fixed 79644e86 and confirmed on CC. Fixes 131a0fea (lhe_parts re-assembles pools gone, test), 679b856a
       (regen MadEvent dirs on TMPDIR), 0b4bbd63 (catalog_v4_pp4_restore.yaml); parts queue zz_redesign_pp4_parts planned (12
       processes, est 6.8 core-h). Design FIX once, revised; incident I-a13b58f9 resolved, E5536 acked.'
+    - '2026-11-12 ~09:50 restore step 25: dsh_eea d83d7f30 COMPLETED, 115/115 train pools assembled; val/test sha256 230/230
+      identical to $SCRATCH/zz_redesign_dsh_eea_valtest.sha256 (none modified after 03:20); check_site_data --list: catalog_v4_heldout_H1,H2,H2p5,H3,H5,H6,H7E,H7c
+      all prebuilt (0 missing), catalog_v4_pp_test 1 missing (pp13v4_udx_uuxwpz/train), catalog_v4_eea_lhe pools prebuilt
+      (285 processes without a diagram sidecar: not a pool, pre-existing, not touched by the deletion); lhe_parts gc --queue
+      catalog_v4_dsh_eea --parts freed 5.45 GB (18736 files). PP4 last run: bb6707de TIMEOUT at 05:00 mid-run (est 2.74 h
+      from the 4-final multiplicity median, real >4.9 h); resubmitted FA-ccin2p3-046cc7d3 on 1 core (byte-identical to the
+      original one-core build at the same iseed), 24:00 limit, target 12 h. /sps/lpnhe 71 GB free.'
     - analysis/agent_redesign/agent_tasks.json
     - analysis/agent_redesign/context_breakdown.json
     - 'analysis/agent_redesign/figs/cache_census_a.png, cache_census_b.png: CC cache census 2026-11-12 ~04:20 (data/cache_census_v2.json
