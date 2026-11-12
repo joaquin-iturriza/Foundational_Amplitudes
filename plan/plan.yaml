@@ -26683,6 +26683,19 @@ entries:
       as its cost; off-shellness stays on. Figures analysis/kit_benchmark/figs/kit_extrap_double_ee_uug_me2_{a,b}.png, kit_extrap_double_ee_tt_virt_finite_{a,b}.png
       (control, frames cut, off-shellness cut, both, MLP), looked at once: uug the ''both'' curve undershoots and falls to
       -0.5 in collinear y, tt ''both'' lies between control and frames cut, -0.46 at 15-50 TeV.'
+  - at: '2026-11-12T15:02:38+00:00'
+    text: '2026-11-12 ~17:30. (b) Bakar''s slides redrawn (tools/kit_bakar_figs.py @cc54583f, data kit_bakar_figs.json @c0b04692
+      with the double-cut arms and the logthr MLP-rerun label): slide 8 had a plotting fault: strata sorted as strings, so
+      each curve ran 3e-4 -> 3e-3 -> 3e-5 -> 3e-6 -> 3e-7 and back over itself on the uugg soft panel; fixed (numeric order),
+      our reruns of his MLP dropped from slide 8 (they lay on his own evaluate.py curves; kept in the slide-9 table), bulk
+      dotted lines in the legend; slides 5-7 legends moved to strips (boxes covered curves). Slides 5-7 and 9 checked: no
+      stratum sort there (binned arrays in x order). (c) 11c started on Joaquin''s ''just start'': entries @bc1330bd (one-loop
+      g g / d d~ > t t~ [virt=QCD], d d~ on its pure-QCD born), probe 9a70779c found the one-loop sampler ignored the recipe''s
+      log_beta measure (beta >= 2.2e-2) and the top pools would carry the mass-scheme shift: fixed @20a1b3e6 (test) and @ca719a6
+      (no_shift, D111), probe debris deleted on CC (48 files), probe rerun FA-ccin2p3-8717848b; design PASS (r5thrloop and
+      r5thrloopbeta parents vs r5thr/r5thrbeta fine-tunes, ~16.5 GPU-h). (d) log-skip design PASS after two FIXes; smoke a3c7bd5b
+      clean through every stage; runs 203a274f (uug plain control), 7b891d10 (uug plain + skip), eb870ad4 (tt softpairthr
+      + skip) submitted @2ceb9012, 2:30 limit, target 1.4 h.'
   step_why:
     5:
       feeds: what KIT receives
