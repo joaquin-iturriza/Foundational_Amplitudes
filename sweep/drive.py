@@ -248,7 +248,8 @@ class Sweep:
             ended = t["status"] in ("failed", "lost")
             if not ended and t.get("sched_state") != "RUNNING":
                 continue
-            out = site("logs", g["rid"], "-n", "5000", timeout=180, check=False)
+            # running: the tail (early in the run the marker is in it); ended: the whole log, once
+            out = site("logs", g["rid"], "-n", "10000000" if ended else "5000", timeout=600, check=False)
             if MARKER in out:
                 self.gate_set(s, "ok")
                 log("%s: first trial on %s (%s) reached training; the rest of the search may go there" % (self.name, s, g["rid"]))
@@ -429,9 +430,9 @@ class Sweep:
         t.setdefault("lost_runs", []).append(rid)
         t["status"], t["moved"] = "retry", int(time.time())
         self.save()
-        self.submit(dest, a, t)
+        new = self.submit(dest, a, t)
         log("moved %s %s -> %s" % (rid, src, dest))
-        return True
+        return new or True
 
     # ---- results back
     def collect(self, a):
@@ -595,14 +596,21 @@ def repick(sweeps, a, rows, now=None):
     moved in the last STAY_S stays."""
     now = now or time.time()
     for sw in sweeps:
-        probes = {g.get("rid") for g in sw.gate.values() if g.get("state") == "probe"}
-        ok = [r for r in rows if sw.gate_state(r["site"]) == "ok"]
-        for t in sw.in_flight():
-            if t.get("sched_state") not in QUEUED or now - t.get("moved", 0) < STAY_S or t["rid"] in probes:
+        for t in list(sw.in_flight()):
+            if t.get("sched_state") not in QUEUED or now - t.get("moved", 0) < STAY_S:
                 continue
-            dest = repick_dest(t["site"], ok + [r for r in rows if r["site"] == t["site"] and r not in ok], sw.hours)
-            if dest and sw.move(t, dest, a):
-                took(rows, dest)
+            src, rid = t["site"], t["rid"]
+            dest = repick_dest(src, [r for r in rows if r["site"] == src or sw.gate_state(r["site"]) in ("ok", None)],
+                               sw.hours)
+            new = dest and sw.move(t, dest, a)
+            if not new:
+                continue
+            took(rows, dest)
+            if sw.gate.get(src, {}).get("rid") == rid:       # a moved probe: its site waits for a new first trial
+                sw.gate.pop(src)
+                sw.save_gate()
+            if sw.gate_state(dest) is None and isinstance(new, str):
+                sw.gate_set(dest, "probe", new)
 
 
 repick.last = 0.0
@@ -708,7 +716,16 @@ def main():
             sys.exit("drive.py: the last %d trials all failed with the same error, nothing more submitted: %s\n"
                      "fix it, then rerun the same command with --retry-failed '.' (penalties taken back out)"
                      % (a.stop_after, c))
-        want = {sw: sw.may_issue(parallel) for sw in sweeps if not sw.done()}
+        blocked = [sw for sw in sweeps if not sw.done() and a.sites
+                   and all(sw.gate_state(s) == "failed" for s in a.sites)]
+        for sw in blocked:
+            if not getattr(sw, "blocked_logged", False):
+                sw.blocked_logged = True
+                log("%s: first trial failed before training on every site; nothing more of it submitted" % sw.name)
+        if blocked and all(sw in blocked for sw in sweeps if not sw.done()):
+            sys.exit("drive.py: every open search failed before training on every site, nothing more submitted; "
+                     "fix the setup (see the ALERT events) and rerun the same command")
+        want = {sw: sw.may_issue(parallel) for sw in sweeps if not sw.done() and sw not in blocked}
         k = sum(want.values())
         rows = None
         if k:
@@ -722,13 +739,18 @@ def main():
             for i, sw in enumerate(dispatch_order(want)):
                 if i >= len(order):
                     break
-                s = order[i]
-                g = sw.gate_state(s)
-                if g in ("probe", "failed"):
-                    if (sw, s) not in held:
-                        held.add((sw, s))
-                        log("%s: trials held from %s (%s)" % (sw.name, s, "its first trial has not reached training yet"
-                                                              if g == "probe" else "its first trial failed before training"))
+                # a site whose first trial of this search is pending or failed is passed over for the next site open
+                # to the search: the pick's other sites, then any site it found taking work
+                open_ = [x for x in [order[i]] + order + [r["site"] for r in rows if r.get("state") == "UP"
+                                                          and not r.get("skip") and r.get("cap") != 0]
+                         if sw.gate_state(x) not in ("probe", "failed") and (not a.sites or x in a.sites)]
+                s = open_[0] if open_ else None
+                g = sw.gate_state(s) if s else None
+                if s is None:
+                    if sw not in held:
+                        held.add(sw)
+                        log("%s: trials held: no site open (first trials pending or failed before training: %s)"
+                            % (sw.name, ", ".join("%s %s" % (x, v["state"]) for x, v in sorted(sw.gate.items()))))
                     continue
                 try:
                     if sw.data_ready(s, a):

@@ -32,7 +32,7 @@ class FakeSweep(drive.Sweep):
         return rid
 
 
-def _run(monkeypatch, sw, order, logs="", sites=("ccin2p3",)):
+def _run(monkeypatch, sw, order, logs="", sites=("ccin2p3",), rows=()):
     calls = []
 
     def fake_site(*a, **k):
@@ -40,7 +40,7 @@ def _run(monkeypatch, sw, order, logs="", sites=("ccin2p3",)):
         return logs if a[0] == "logs" else ""
     monkeypatch.setattr(drive, "site", fake_site)
     monkeypatch.setattr(drive, "Sweep", lambda c, a: sw)
-    monkeypatch.setattr(drive, "plan", lambda k, sweeps, a, record=True: (list(order), []))
+    monkeypatch.setattr(drive, "plan", lambda k, sweeps, a, record=True: (list(order), [dict(r) for r in rows]))
     monkeypatch.setattr(drive.subprocess, "run", lambda *a, **k: types.SimpleNamespace(stdout=""))
     monkeypatch.setattr(sys, "argv", ["drive.py", "--config", "x.yaml", "--item", "i", "--once", "--sites"] + list(sites))
     drive.main()
@@ -101,20 +101,45 @@ def test_diverged_after_training_is_ok(monkeypatch):
     assert sw.gate["ccin2p3"]["state"] == "ok" and len(sw.sent) == 4
 
 
-def test_repick_never_moves_a_probe_nor_into_an_unproven_site():
-    moved = []
+UP = lambda s, **kw: dict(site=s, state="UP", wait_now=kw.get("w", 0) * 3600, slots_now=kw.get("slots", 0))
+
+
+def test_held_trial_takes_another_open_site(monkeypatch):
+    # pick orders all three to CC: the first is CC's probe, the second becomes lxplus's probe, the third is held
     sw = FakeSweep()
-    sw.gate = {"ccin2p3": {"state": "probe", "rid": "FA-ccin2p3-0"}}
-    sw.st["trials"] = {"0": dict(idx=0, rid="FA-ccin2p3-0", site="ccin2p3", status="submitted", sched_state="PENDING"),
-                       "1": dict(idx=1, rid="FA-ccin2p3-1", site="ccin2p3", status="submitted", sched_state="PENDING")}
-    sw.move = lambda t, dest, a: moved.append((t["rid"], dest)) or True
-    row = lambda s, **kw: dict(site=s, state="UP", wait_now=kw.get("w", 0) * 3600, slots_now=kw.get("slots", 0))
-    rows = [row("ccin2p3", w=10), row("lxplus", slots=5)]
+    _run(monkeypatch, sw, ["ccin2p3"] * 3, sites=("ccin2p3", "lxplus"), rows=[UP("ccin2p3"), UP("lxplus", slots=4)])
+    assert sw.sent == ["ccin2p3", "lxplus"]
+    assert {k: v["state"] for k, v in sw.gate.items()} == {"ccin2p3": "probe", "lxplus": "probe"}
+
+
+def test_failed_site_never_holds_forever(monkeypatch):
+    # reviewer case: the first trial failed on CC (CC still pick's best): the rest go to lxplus once it is proven
+    sw = FakeSweep()
+    sw.gate = {"ccin2p3": {"state": "failed", "rid": "FA-x"}, "lxplus": {"state": "ok"}}
+    _run(monkeypatch, sw, ["ccin2p3"] * 3, sites=("ccin2p3", "lxplus"), rows=[UP("ccin2p3"), UP("lxplus")])
+    assert sw.sent == ["lxplus"] * 3
+
+
+def test_repick_moves_a_pending_probe_and_the_gate_follows():
+    sw = FakeSweep()
+    sw.gate = {"ccin2p3": {"state": "probe", "rid": "FA-ccin2p3-0"}, "jeanzay": {"state": "failed", "rid": "y"}}
+    sw.st["trials"] = {"0": dict(idx=0, rid="FA-ccin2p3-0", site="ccin2p3", status="submitted", sched_state="PENDING")}
+    moved = []
+    sw.move = lambda t, dest, a: moved.append((t["rid"], dest)) or "FA-%s-new" % dest
+    rows = [UP("ccin2p3", w=20), UP("jeanzay", slots=9), UP("lxplus", w=1)]
     drive.repick([sw], None, rows, now=1e9)
-    assert moved == []                                   # lxplus not proven for this search
-    sw.gate["lxplus"] = {"state": "ok"}
-    drive.repick([sw], None, rows, now=1e9)
-    assert moved == [("FA-ccin2p3-1", "lxplus")]         # the probe itself stays
+    assert moved == [("FA-ccin2p3-0", "lxplus")]         # never into jeanzay, where the search failed
+    assert "ccin2p3" not in sw.gate and sw.gate["lxplus"] == {"state": "probe", "rid": "FA-lxplus-new"}
+
+
+def test_repick_into_a_site_with_a_pending_probe_never():
+    sw = FakeSweep()
+    sw.gate = {"lxplus": {"state": "probe", "rid": "p"}}
+    sw.st["trials"] = {"0": dict(idx=0, rid="FA-ccin2p3-0", site="ccin2p3", status="submitted", sched_state="PENDING")}
+    moved = []
+    sw.move = lambda t, dest, a: moved.append(dest) or "n"
+    drive.repick([sw], None, [UP("ccin2p3", w=20), UP("lxplus", slots=9)], now=1e9)
+    assert moved == []
 
 
 if __name__ == "__main__":
