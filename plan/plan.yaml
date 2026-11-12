@@ -28142,7 +28142,8 @@ entries:
       - 'no: uugg and uug-T stay at the old HP point, said wherever shown'
   step_waits:
     '5': FA-ccin2p3-dcf42ad6 FA-ccin2p3-e7dca162 (the A_ft batch of step 11c)
-    '15': detach:kit_hpo (sweeps kit_hpo_uug_plain, kit_hpo_ttvirt_thr)
+    '15': kit_hpo driver DONE event (detach:kit_hpo, log ~/.local/share/ccorch/detached/20261112-224604_kit_hpo.log); live
+      trial FA-lxplus-39d3ed3e
     '14': FA-ccin2p3-7aff4018 (uug div-form 50-step check, rerun with ++training.wsd_cooldown_frac); the tt check is submitted
       on that wake (refused at 22:43 by the 60-min GPU-h gate, which still counts the kit_hpo trials cancelled on CC at 22:18
       local)
