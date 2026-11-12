@@ -16201,10 +16201,8 @@ entries:
       idle: event (or its absence after 45 min) is the trigger'
     '21': the date 2026-11-17 (a week after the 2026-11-09 23:54 restart on the batching code)
     '24': 2026-11-12T14:00 (12 h after the main session's waiter re-arms on the new site code)
-    '25': 'FA-ccin2p3-5b9963c5 FA-ccin2p3-420963db FA-ccin2p3-e576c6a4 FA-ccin2p3-9922b7e8 FA-ccin2p3-1ce53e3d FA-ccin2p3-e9c9e073
-      FA-ccin2p3-8283d8ae FA-ccin2p3-3450ee31 FA-ccin2p3-96328169 FA-ccin2p3-ecaca908 FA-ccin2p3-cc771131 FA-ccin2p3-a9466cc9
-      FA-ccin2p3-2b6e7ab1 FA-ccin2p3-66afc398 FA-ccin2p3-47f06add FA-ccin2p3-4eca009b FA-ccin2p3-c300ac77 FA-ccin2p3-45f202e8
-      FA-ccin2p3-d7ae9889 FA-ccin2p3-afa3c959 FA-ccin2p3-3a3b0003 FA-ccin2p3-4484c44d '
+    '25': 'FA-ccin2p3-47f06add FA-ccin2p3-fd82ba72 FA-ccin2p3-8e14fdbf FA-ccin2p3-7a1260be FA-ccin2p3-71ea39a0 FA-ccin2p3-5732a7f8
+      FA-ccin2p3-9458124b FA-ccin2p3-d83d7f30 '
   owner:
     agent: aefaf94baeb410c64
     state: working
