@@ -27237,7 +27237,7 @@ entries:
     withdrawn_why: 'Joaquin: use all available clusters'
   owner:
     agent: ac46d0b7530cd12d9
-    state: working
+    state: closed
     since: '2026-11-12T18:25:52+00:00'
     state_at: '2026-11-12T21:09:41.967000+00:00'
     context: 300360
@@ -28133,33 +28133,34 @@ entries:
     '14': FA-ccin2p3-8c1223c0 FA-ccin2p3-f45f434a
     '16': detach:kit_hpo (sweeps kit_hpo_uug_T, kit_hpo_uugg_T)
   handoff:
-    state: '2026-11-12 ~20:45 @1f810cd6. Closed at the context limit. IN ORDER for the next owner: (1) step 15: the D395 smoke
-      of the HP searches runs through sweep/drive.py detached (detach:kit_hpo_smoke, trial FA-ccin2p3-f81cb1d0, pending at
-      close); on its DONE check runs/kit_hpo_smoke/trial_0000''s result json carries val_mse_curve and train_eval_mse_curve
-      and that the sigma stage and plots ran, then detach: python3 tools/detach.py --entry kit_benchmark --name kit_hpo --
-      .venv-cpu/bin/python sweep/drive.py --config sweep/sweep_config_kit_hpo_uug_plain.yaml --config sweep/sweep_config_kit_hpo_ttvirt_thr.yaml
-      --item kit_benchmark --sites ccin2p3 --mem 32G --cpus 4 --hours 2.75 (design PASS 2026-11-12 2nd round; targets recorded
-      1.7 h / 1.3 h per trial, ~24 GPU-h); read with tools/kit_curves.py sweep kit_hpo_uug_plain kit_hpo_ttvirt_thr --out
-      analysis/kit_benchmark/data/kit_hpo.json (the reader reads results on CC''s SWEEP_DIR; under drive.py the results live
-      in sweeps_local/<name>/results: adapt the reader to read those locally first); chosen = lowest best val among good (sep
-      <= 3, end_up <= 2 on mu-MSE); score the chosen trials with kit_predict (REREAD) vs controls 203a274f/3fc1016a kit_result.json;
-      figure of the chosen trials'' val/train mu-MSE curves. (2) step 14: design the divergence-form arms (model.input_div_form=true
-      @6cdec219) on uug plain and tt softpairthr at each setup''s chosen trial HPs (the trial = control), design-reviewer,
-      D395 smoke, then the arms. (3) steps 13 (c4fc1d6f/6bc05a40 linear polynomial term), 11c (dcf42ad6, e7dca162 A_ft) and
-      5 wait on runs. Joaquin''s question on searching uugg and uug T-target (~16 GPU-h more, over 30) goes from the main
-      session.'
-    decisions: 'Step 15 curve check: KIT 1e5 uug/uugg runs fail the curve bars (NLL form), tt holds (finding @daa54068). D422/D423:
-      HPs by single-fidelity DyHPO on template 2 (template space + batch [1562,16384], WSD cooldown 0.125), only uug plain
-      and tt virtual (D412 30 GPU-h). job_kit.sh writes result.json (mu-MSE curves) from daa54068. Step 12(ii) gamma<=4: uug
-      WORSE, uugg NO, not adopted (finding @1f810cd6). Step 16 dropped (duplicate of 14+15).'
-    ruled_out: route cuts (D419); degree-2 log-invariant polynomial term as a general fix; per-frame gamma bound 4 (uug worse
-      bulk +0.59, uugg q-g unchanged)
-    running: smoke FA-ccin2p3-f81cb1d0 (detach:kit_hpo_smoke drive.py); c4fc1d6f, 6bc05a40 (step 13); 2d653209 -> dcf42ad6,
-      ca5873f3 -> e7dca162 (step 11c)
-    files: tools/kit_curves.py (collect/read/sweep), analysis/kit_benchmark/data/kit_curves*.json, figs/kit_curves_nll.png,
-      sweep/sweep_config_kit_hpo_{uug_plain,ttvirt_thr,smoke}.yaml, wrappers.py (_div_form_inputs, input_div_form), tests/test_input_reps.py::test_div_form,
-      scripts/job_kit.sh (result_path), analysis/kit_benchmark/data/kit_fig_A_gmax4_{uug,uugg}.json, kit_frames_probe_{uug,uugg}_gmax4.json
-    written: '2026-11-12T18:24:24+00:00'
+    state: '2026-11-12 ~22:30 @68ccb875. Closed at the context limit. IN ORDER for the next owner. (1) Steps 15+16: four single-fidelity
+      DyHPO searches run through ONE detached sweep/drive.py (detach:kit_hpo, launched ~22:25 with --sites ccin2p3 lxplus
+      --hours 0.6 --mem 32G --cpus 4; configs sweep/sweep_config_kit_hpo_{uug_plain,ttvirt_thr,uug_T,uugg_T}.yaml @68ccb875:
+      16 trials, waves 6,5,5, 1831 steps = 300 epochs (D425), batch 16384 (D426), WSD 0.125, base configs from git sweep/kit_base/
+      so every site has them; design round 5 PASS; ~27 GPU-h, D428). State: 18 first-wave trials submitted on CC (1:36 limit),
+      6 trials in ''retry'' status refused by the 30 GPU-h/60-min budget gate (the 18 at 1.6 h limit count 28.8); they go
+      once the window clears (~23:20 UTC). If the gate still refuses, check the driver log ~/.local/share/ccorch/detached/*_kit_hpo.log.
+      Read on the driver''s DONE: .venv-cpu/bin/python tools/kit_curves.py sweep kit_hpo_uug_plain kit_hpo_ttvirt_thr kit_hpo_uug_T
+      kit_hpo_uugg_T --out analysis/kit_benchmark/data/kit_hpo.json (reads each trial on its site); chosen = lowest best val
+      among good (sep <= 3, end_up <= 2); kit_predict REREAD of chosen trials vs old controls; figure of the chosen trials''
+      val/train mu-MSE curves. Jean Zay excluded: it has no KIT raw data (/kit_hardps, 1.7 GB) and site copy fails (CC->JZ
+      ssh timeout; any copy run on lxplus has no ssh agent, needs Joaquin''s 2FA cluster_up). Once lxplus is reopened: site
+      copy FA lxplus jeanzay /eos/user/j/joiturri/datasets/kit_hardps --to /lustre/fswork/projects/rech/itg/ulm49ia/datasets,
+      then restart the driver with --allow-jeanzay and no --sites (D431). (2) Step 14: div-form D395 smokes FA-ccin2p3-8c1223c0
+      (uug) and f45f434a (tt) pending; on their end check training, sigma, kit_predict, plots ran; arms = each setup''s chosen
+      trial config + ++model.input_div_form=true via job_kit.sh A with that trial''s HPs at 1831 steps, config diff vs trial
+      config.yaml before submission, wall target from the trial''s time (design round 5). (3) 11c fine-tunes dcf42ad6/e7dca162
+      and step 5 wait on runs.'
+    decisions: 'D424 search uug T and uugg; D425 horizon 300 epochs; D426 batch fixed (gen_data_saving.py batch search now
+      opt-in); D427/D428 16 trials; D431 Jean Zay allowed, no per-site cap. Step 13 degree-1 log term PARTIAL (finding @6583d0bb):
+      overshoots gone, no limit fixed, Coulomb lost; not adopted. Step 12 dropped (finished).'
+    ruled_out: route cuts (D419); degree-2 and degree-1 log-invariant polynomial terms as general fixes; per-frame gamma bound
+      4; shorter horizon read from cosine prefixes (not informative)
+    running: kit_hpo driver (detach:kit_hpo; 18 trials on CC + 6 retry); smokes FA-ccin2p3-8c1223c0, f45f434a (step 14); 2d653209
+      -> dcf42ad6, ca5873f3 -> e7dca162 (11c)
+    files: sweep/sweep_config_kit_hpo_*.yaml, sweep/kit_base/**, tools/kit_curves.py (sweep reader per site), analysis/kit_benchmark/data/kit_fig_A_logpolylin_{uug,tt}.json,
+      kit_extrap.json, kit_curves.json, figs kit_extrap_logpolylin_*
+    written: '2026-11-12T21:22:30+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
