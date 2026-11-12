@@ -25175,6 +25175,12 @@ entries:
     units: null
     start: '2026-11-12T13:10:10+00:00'
     at: '2026-11-12T13:10:10+00:00'
+  - batch: muonly_mse_test
+    wall_h: 1.2
+    jobs: 48
+    units: null
+    start: '2026-11-12T14:15:20+00:00'
+    at: '2026-11-12T14:15:20+00:00'
   handoff:
     state: 'Step 2 (Joaquin 2026-11-12: ''the tree runs are not fixed at all''): the s4 ''FIXED'' verdict is withdrawn (it
       was an arm ratio against two badly trained references). New measure analysis/data_saving/curve_quality.py @0d593de5
