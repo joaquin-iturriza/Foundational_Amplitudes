@@ -25951,7 +25951,7 @@ entries:
     agent: a6b28beec18d559db
     state: working
     since: '2026-11-12T14:30:34+00:00'
-    state_at: '2026-11-12T14:38:01.362000+00:00'
+    state_at: '2026-11-12T14:45:59.453000+00:00'
     context: 202426
     context_at: '2026-11-12T14:46:10+00:00'
   findings:
