@@ -24559,7 +24559,7 @@ entries:
   step_waits:
     '2': FA-ccin2p3-0d698e4b
     '3': bbx_zz_lo_scr3, bbx_zz_lo_ft drivers (detach events)
-    '4': FA-ccin2p3-0d698e4b
+    '4': bbx_zz_lo_ft driver (detach event)
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
