@@ -421,7 +421,9 @@ def finalize_dataset(process, sqrts_min, sqrts_max, n_events, role, seed,
     os.replace(tmp, final)
     # a one-loop pool's Born per event (tools/nlo_virtual_pipeline.born_path), kept when every chunk wrote one
     borns = [p[:-len(".npy")] + ".born.npy" for p in ordered_chunk_paths]
-    if is_virt(process) and all(os.path.exists(b) for b in borns):
+    # wrote_born gates the record below: a predecessor's sidecar left on disk keeps its old record, so a read refuses it
+    wrote_born = is_virt(process) and all(os.path.exists(b) for b in borns)
+    if wrote_born:
         np.save(final[:-len(".npy")] + ".born.npy", np.concatenate([np.load(b) for b in borns]))
     # the quota-filled flat part's fill per chunk (_write_flat_fill), kept when every chunk wrote one
     # (one written when any chunk has one; a chunk without it, e.g. reused after a kill between its .npy and its fill,
@@ -442,7 +444,7 @@ def finalize_dataset(process, sqrts_min, sqrts_max, n_events, role, seed,
     full["chunk_size"]     = process_chunk_size(process)
     full["gen_weight"]     = process_gen_weight(process)
     mg.write_recipe(final, full)
-    if is_virt(process) and os.path.exists(final[:-len(".npy")] + ".born.npy"):
+    if wrote_born:
         # the Born sidecar's identity record (experiment._born_of_pool asserts it), written after the .recipe.json it
         # reads: without it a regenerated pool kept the record of the pool it replaced and every V/B run on it was
         # refused (b b~ > Z Z, 2026-11-12)

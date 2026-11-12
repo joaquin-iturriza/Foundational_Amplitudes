@@ -29,5 +29,27 @@ def test_finalize_writes_a_matching_born_record():
         assert np.allclose(b[:, 0], [2, 2, 2, 3, 3, 3])
 
 
+
+def test_finalize_without_borns_keeps_no_record_for_a_stale_sidecar():
+    """A regenerated pool whose chunks lack Borns never gets a record for its predecessor's sidecar (repo-reviewer)."""
+    pytest.importorskip("torch")
+    import json
+    import datagen
+    proc = "v4_bbx_zz_nlo"
+    with tempfile.TemporaryDirectory() as d:
+        work, dest = os.path.join(d, "work"), os.path.join(d, "dest")
+        os.makedirs(work)
+        p = os.path.join(work, "c0.npy")
+        np.save(p, np.random.default_rng(0).random((3, 21)) + 1)
+        out = datagen.finalize_dataset(proc, 200.0, 6000.0, 3, "train", 0, [p], dest, work)
+        stale = out[:-4] + ".born.npy"
+        np.save(stale, np.full(3, 9.0))
+        json.dump({"pool_identity": "old", "n_rows": 3}, open(stale + ".json", "w"))
+        os.makedirs(work, exist_ok=True)
+        np.save(p, np.random.default_rng(1).random((3, 21)) + 1)
+        datagen.finalize_dataset(proc, 200.0, 6000.0, 3, "train", 0, [p], dest, work)
+        assert json.load(open(stale + ".json"))["pool_identity"] == "old"
+
+
 if __name__ == "__main__":
     sys.exit(pytest.main([__file__, "-q"]))
