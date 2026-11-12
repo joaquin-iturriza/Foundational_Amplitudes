@@ -161,6 +161,8 @@ def figures_handed_back(inp, records=None, spool=SPOOL):
                     sent += [(_epoch(r.get("timestamp")), os.path.basename(f)) for f in b["input"].get("files") or []]
                 except (ValueError, TypeError, AttributeError):
                     pass
+    said = [(_epoch(r.get("timestamp")), "".join(_texts((r.get("message") or {}).get("content"))))
+            for r in records if r.get("type") == "assistant"]     # a text message naming the file counts as "say why not"
     missing = []
     for n in names:
         try:
@@ -174,7 +176,8 @@ def figures_handed_back(inp, records=None, spool=SPOOL):
         if body.startswith("ROUTINE:") or "Joaquin" not in body:
             continue
         for f in _FIG.findall(body):
-            if f not in missing and not any(st >= t and b == os.path.basename(f) for st, b in sent):
+            if f not in missing and not any(st >= t and b == os.path.basename(f) for st, b in sent) \
+                    and not any(st >= t and os.path.basename(f) in tx for st, tx in said):
                 missing.append(f)
     if not missing:
         return [], []
