@@ -15794,7 +15794,7 @@ entries:
   match: zz_redesign_*
   evidence:
     runs: []
-    commit: cc80833e
+    commit: 010205bd
     paths:
     - .claude/hooks/notification_absorb.py
     - .claude/hooks/owner_handoff.py
@@ -15868,6 +15868,14 @@ entries:
       processes, est 6.8 core-h). Design FIX once, revised; incident I-a13b58f9 resolved, E5536 acked.'
     - analysis/agent_redesign/agent_tasks.json
     - analysis/agent_redesign/context_breakdown.json
+    - 'analysis/agent_redesign/figs/cache_census.png: CC cache census 2026-11-12 ~04:20. amp_data_cache 96.75 GB, 20607 files,
+      train pools only (5613 train files, 4279 pools): by reader open plan entry 86.87, other catalog_v4 recipe 3.30, older
+      recipe only 1.10, no recipe 5.49 (chunk dirs and set_aside 3.88, kit pools 1.61 read by kit jobs'' own configs). By
+      sampling tag: smix 41.29, smixq 30.89 (the second copy of 1301 catalog_v4 train pools, step-65 flat-quota regeneration,
+      read only by catalog_v4_g12_regen of catalog_coverage, held), lhe 14.47, flat 1.81, kit 1.54. 1328 pools have several
+      files, 63.01 GB, 31.04 GB beyond each pool''s largest. Chunk work dirs 1082, 3.12 GB all in the 158 whose pool is built:
+      removed 04:30 (free 53 -> 56 GB). memmap 22.33 GB at census (f3bedd61 18.03, deleted since; 7d589cbf and f5ccb555 2.15
+      each, 11-05). datasets 52.96 GB (val 14.31, test 14.59).'
     - analysis/agent_redesign/figs/context_breakdown.png
     - analysis/agent_redesign/model_trial.json
     - analysis/agent_redesign/push_replay.json
