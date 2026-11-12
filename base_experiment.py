@@ -1609,7 +1609,7 @@ class BaseExperiment:
                         state_dict[k] = torch.stack(rows, 0)
                         LOGGER.info(f"Fine-tuning: {k} from a {ploss} parent{' with a sign head' if p_sign else ''} "
                                     f"(rows {p_roles}) into rows {own_roles}: rows by role, missing ones zeroed")
-                if ft is not None and str(ft.get("target_stats", "parent")) == "own":
+                if ft is not None and str(ft.get("target_stats", "parent")) == "own" and ft.get("map_head", True):
                     self._map_head_to_own_stats(state_dict, pretrained_path)
                 self.model.load_state_dict(state_dict)
         except FileNotFoundError:
