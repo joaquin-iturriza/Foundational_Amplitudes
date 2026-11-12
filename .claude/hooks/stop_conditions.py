@@ -67,7 +67,7 @@ def figure_pairs(repo=REPO):
             except OSError:
                 continue
             rel = os.path.relpath(p, repo)
-            if rel in ign or f in ign:
+            if rel in ign or f in ign or "run_plots" in rel.split(os.sep):   # fetched run outputs, copies not our figures
                 continue
             stem = rel[:-4]
             for ext in (".png", ".pdf"):
