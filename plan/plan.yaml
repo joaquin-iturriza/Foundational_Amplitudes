@@ -23427,6 +23427,21 @@ entries:
       2. (B) R on PP4 and EE4 inside [0.80, 1.26] or below: the claim holds (or one-hot better), the paper keeps it with these
       numbers; above 1.26: the one-hot arm gets the 8-trial Muon-space DyHPO (~22 GPU-h) best against best; held out: R on
       encodable probes, every probe with an unseen particle a case one-hot cannot predict.'
+    passed_at: '2026-11-12T00:25:30+00:00'
+    reviewer: 'Re-check after FIX. (A) The only change is the optimizer: AdamW twin (LONG_OPT=adamw at e9f5aade, which swaps
+      only training.optimizer) against Muon trial 1262 of cov_v4_long_hpo8_cc_68224 (width 8, 68224 steps, whole training
+      set per D236). Stated limits: AdamW runs at Muon''s lr (par:v3_muon tuning gain 1.1x); the Muon run is at an older commit
+      (smoke config diffed against it, and part B''s qn arm against FA-ccin2p3-804a65bc reruns the same cell family across
+      commits); D392 inputs left out so the pair matches. Curve verified on CC: sweeps/cov_v4_long_hpo8_cc_68224/results/hp1262_t68224_1793686584.json
+      holds val_mse_curve, 50 points every 1364 steps, 0.328 to 9.36e-3, best_step 68200, 17.58 h. The script sets training.result_path=<run
+      dir>/result.json with validate_frac 0.02, so both curves are on the same grid. Measure responds: par:v3_muon per-pool
+      8.03x and 4.91x best against best, zero-shot 4.47x; par:v4_length resolves 0.67x on this cell family ([0.623,0.734]).
+      Seeds: one per arm (D315) against seed_spread het |ln R_seed| median 0.10, q90 0.23, YES bar R>=1.26 with interval above
+      1. Outcome stated for yes, speed-only, AdamW better, and the not-plateaued/above-1e-4 question to Joaquin. Rate 0.983
+      s/step on V100, partition pinned; disk: existing memmap cache, 49 GB free; 26.5 GPU-h. (B) unchanged from the 2026-11-10
+      pass plus the smoke run. Searched: results.tex (muon, adamw with v4/68224/17056/long, par:v4_length, 1e-4, plateau),
+      plan show optimizations_recap and pretrain_data_saving, site decisions (D144-D160, D236, D292, D315, D356, D364, D373,
+      D392, D395); no earlier long AdamW run on catalog_v4 found.'
   step_why:
     1:
       feeds: D364 claim that pIDs and quantum numbers behave the same, on the latest setup
