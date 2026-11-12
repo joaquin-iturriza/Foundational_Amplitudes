@@ -25164,6 +25164,61 @@ entries:
       two range bounds, name, DyHPO seed), 3, 9/11, 12, 14/15 (readout --test tmpl2 reads dsave_wideft_ft); searched: lr_scale,
       layer_decay, wideft, lrthird, lrtenth, tmpl2, trial count / 8 trials in decisions D400-D426 and Joaquin''s messages
       17:30-18:43.'
+  - at: '2026-11-12T19:00:41+00:00'
+    question: 'New design after D427 (Joaquin 2026-11-12 18:42: 8 trials is not enough, for most cells no search finds a single
+      good training) and D426 (no batch search beside lr); replaces the 18:42 revision (FIX: trial count, and only the low
+      side opened). On t t~ LO at D=316 and 3162: (A) TRIAL COUNT: the four running WSD-only searches (scratch, fine-tune)
+      extended from 8 to 20 trials: does the search''s best at 20 trials have validation going down with training (curve_quality.py
+      good) where its best at 8 did not, and how much lower is its best val? (B) WIDE FINE-TUNE RANGES: fine-tune only, 20-trial
+      searches with lr_scale [0.03,30] and layer_decay [0.5,1] (both sides of lr_scale opened: the stage-2 good fine-tune
+      trials sat at the top of [0.1,10], the val-picked bests at the bottom), batch D/2, WSD, against the WSD-only fine-tune
+      search at the same 20 trials. (C) WSD against stage-2 cosine, both at 8 trials (WSD''s first 8), as passed at 18:05.
+      Scratch has no (B): without the batch search template 2 is the WSD-only space. The batch-searching template-2 searches
+      are withdrawn (D426) and not read.'
+    prior: 'Trial count: trial_count_readout.py @bf88c4d8 over every search on record with >= 24 observed trials at one horizon
+      (Jean Zay SWEEP_DIR: 23 searches, N 24-40, median 28, the pretraining-scaling and dvirt searches; CC SWEEP_DIR has none
+      above 20; lxplus not searched; no ~50-trial search found): running best after n over the best after all N, median (25-75%):
+      n=8 1.26 (1.00-1.47), already the final best in 7 of 23; n=16 1.00 (1.00-1.25), 12 of 23; n=20 1.00 (1.00-1.00), 17
+      of 19 (searches with N >= 28); the final best found in the last third of the trials in 26%. Figure figs/trial_count.
+      This entry: 8-trial searches throughout (D244/D245); the ''best by trial 5'' read measured 8 against itself and is withdrawn
+      (D427). Ranges: hp_ranges_readout.json, fine-tune lr_scale Spearman on separation -0.36 (higher lr_scale, less separation),
+      on val +0.34; good trials at range place 0.955 (top of [0.1,10]), bad 0.47; layer_decay separation +0.02, val +0.25,
+      good place 0.79. lr-centre test on t t~ LO D=3162 fine-tune (cosine, layer_decay 1): c/3 separation 3.76, c/10 12.8,
+      control 25.5, 0 of 23 good; step-10 lr_scale [0.02,2] rerun declined (D407); trial_overfit 27 of 34 searches lower lr_scale
+      lower val. WSD: suspects batch at cosine-tuned HPs fine-tune 5.06x, scratch 68x worse (WSD now tuned inside the search,
+      D423).'
+    measure: 'lr_centre_readout.py --test tmpl2 (reads dsave_wsd_* and dsave_wideft_ft_*), extended to read each search at
+      its first 8 and at all 20 trials: best val (ln units, best checkpoint), that trial''s separation and good/bad (curve_quality.py,
+      D421), good-trial count, every trial''s lr_scale/layer_decay/lr against separation; curves figure of each best. (A)
+      best@20/best@8 and good@20 vs good@8 per WSD search; (B) wide/WSD best val at 20 per fine-tune cell with good/bad; (C)
+      WSD@8/stage-2 best val per cell and arm.'
+    check: 'The measure moves with an HP inside a search (lr -0.30 scratch / lr_scale -0.36 fine-tune Spearman on separation,
+      hp_ranges_readout.json) and Joaquin confirmed its good/bad examples (D421); stage-2 search bests of these cells bad
+      (D=3162 separations 8.7 scratch, 25 fine-tune). Trial count moves the best: on record best@8 over best@N median 1.26,
+      16 of 23 searches still improved after 8 (trial_count_readout).'
+    fixed: 'WSD configs sweep/sweep_config_dsave_wsd_{scr,ft}_epem_ttx_d{5,7}_t8500.yaml @05546263 (same searches continued:
+      same DyHPO state, seed, space); wide configs sweep/sweep_config_dsave_wideft_ft_epem_ttx_d{5,7}_t8500.yaml @bf88c4d8
+      (gen_data_saving.py --stage wideft --arms ft --ft-space llrd --tmpl2 --no-batch-search; vs the WSD fine-tune config:
+      lr_scale [0.03,30] for [0.1,10], layer_decay low 0.5 for 0.75, name, DyHPO seed). Both run with drive.py --n-trials
+      20 --wave-sizes 3,3,2,4,4,4. Batch D/2, WSD cooldown 1/8, T 8500, pools, parent heldout_r4, HETEROSC mu_mse select,
+      sigma stage, run seed 42. CC only (parents and pools there).'
+    control: (A) each WSD search's own state at 8 trials; (B) the WSD-only fine-tune search of the same cell at 20 trials
+      (same schedule, batch, trial count and waves); (C) the stage-2 cosine search of the same cell and arm (8 trials).
+    seeds: 'Run seed 42; one search per cell and arm, 20 trials in waves 3,3,2,4,4,4 (wide and WSD alike). New trials: WSD
+      extension 4 x 12 = 48, wide 2 x 20 = 40: 88 trials x 0.275 GPU-h (the generator''s 2.2 GPU-h per 8-trial search, overhead
+      included) = 24.2 GPU-h, under D412''s 30. Wall-time target: wide searches 6 waves x 0.4 h = 2.4 h; WSD extension 3 waves
+      x 0.4 h = 1.2 h after its first 8 end.'
+    outcome: 'Search-to-search spread up to 5x per cell (results.tex ladder): a best-val ratio counts only beyond 5x per cell,
+      pooled by geometric mean against 5^(1/sqrt(n)) (4 cells 2.24, 2 cells 3.13). (A) MORE TRIALS HELP: best@20 good in >=
+      3 of the 4 WSD searches where best@8 was good in fewer, or pooled best@20/best@8 < 1/2.24 -> 20 trials becomes the template''s
+      count for the remaining cells (cost to Joaquin); NO: good in <= 1 at 20 and pooled ratio within 2.24 -> trial count
+      to 20 is not what is missing, reported with the per-trial HP against separation read; otherwise not resolved, reported.
+      (B) WIDE RANGES HELP: wide best good in both fine-tune cells, WSD@20 best good in fewer, pooled wide/WSD <= 3.13 ->
+      the wide ranges go into the template; the side the good trials take (lr_scale above or below 1) is reported; SAME: both
+      alike -> ranges kept; NO: wide good in neither -> the fine-tune lr_scale/layer_decay ranges are not the missing axis;
+      one of two: not resolved. (C) as at 18:05: WSD bests good >= 3 of 4 and pooled WSD/s2 <= 2.24 HELPS; <= 2 good NO (kept
+      under D423); pooled > 2.24 WORSE, to Joaquin. Diverged trials listed apart (D398); nothing further is run on NO or not
+      resolved.'
   step_waits:
     '3': bbx_zz_lo_scr3, bbx_zz_lo_ft drivers (detach events)
     '4': detach bbx_zz_lo_ft (LO fine-tune driver; its FA DONE event)
