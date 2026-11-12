@@ -343,7 +343,10 @@ def label(run):
     names = {"A": "from scratch", "A_ft": "fine-tuned", "B": "hard points added", "B_bulk": "bulk continuation"}
     m = re.match(r"kit_(A_ft|B_bulk|A|B)_", run)
     inputs = {"softpair": ", log inputs", "softpairthr": r", log inputs + $\log\beta^2$",
-              "vbeta": r", log inputs + $\log\beta^2$, target $V\beta$"}
+              "vbeta": r", log inputs + $\log\beta^2$, target $V\beta$",
+              # D405 fine-tunes: parent pretraining r5, + LO top pairs log-uniform in beta, + the beta input
+              "ftr5own": ", parent r5", "ftr5thrown": ", parent r5 + threshold tops",
+              "ftr5thrbetaown": r", parent r5 + threshold tops, $\log\beta^2$"}
     n = re.search(r"_n(\d+)_", run)
     size = {"100000": r", $10^5$ events", "900000": r", $9\times10^5$ events"}.get(n.group(1), "") if n else ""
     return names[m.group(1)] + size + inputs.get(run.rsplit("_", 1)[-1], "") if m else run
@@ -369,7 +372,9 @@ def cmd_figure(a):
     ax.fill_between([], [], [], color="0.6", lw=0, label=r"$\pm2\,\delta_{\rm MC}$ of the NLO (lower panel)")
     # one categorical colour per model, the same in both panels (a sequential ramp made them indistinguishable)
     cols = [ps.C.blue, ps.C.vermillion, ps.C.green, ps.C.orange, ps.C.purple, ps.C.sky]
-    for (name, s), col in zip(d["surrogates"].items(), cols):
+    sur = {k: v for k, v in d["surrogates"].items() if not a.runs or k in a.runs}
+    assert len(sur) <= len(cols), f"{len(sur)} models, {len(cols)} colours: pick them with --runs"
+    for (name, s), col in zip(sur.items(), cols):
         r = np.array([x if x is not None else np.nan for x in s["ratio"]])
         ax.plot(sq[ok], (nlo * (1 + r))[ok], color=col, ls=":", label=label(name))
         rx.plot(sq[ok], r[ok], color=col)
@@ -403,6 +408,7 @@ def main():
     f = sub.add_parser("figure")
     f.add_argument("json")
     f.add_argument("--out", required=True)
+    f.add_argument("--runs", nargs="*", help="these surrogates only (run names), at most six")
     for s in (b, n, p, c):
         s.add_argument("--dir", default=DEFAULT_DIR)
     a = ap.parse_args()
