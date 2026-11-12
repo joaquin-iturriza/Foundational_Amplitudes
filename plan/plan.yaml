@@ -25433,6 +25433,12 @@ entries:
     units: null
     start: '2026-11-12T14:46:49+00:00'
     at: '2026-11-12T14:46:49+00:00'
+  - batch: bbx_zz_v_LD2
+    wall_h: 1.5
+    jobs: 112
+    units: null
+    start: '2026-11-12T15:08:34+00:00'
+    at: '2026-11-12T15:08:34+00:00'
   handoff:
     state: 'Track 1 (D413, draft tomorrow): second example = b b~ > Z Z at LO and one-loop V (Joaquin: ''You pick one process,
       any process, at LO and V''; u u~ is the first example). One-loop V/B L(D) RUNNING (detach bbx_zz_v_LD, started 16:47
