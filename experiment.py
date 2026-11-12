@@ -297,6 +297,7 @@ class AmplitudeExperiment(BaseExperiment):
                 "physics":   physics,
                 "sampling":  p.get("sampling", None),
                 "sqrts_measure": p.get("sqrts_measure", None),     # an entry's own measure (log_beta: kit threshold pools)
+                "store_tag": p.get("store_tag", None),     # the pool's own file name (mg.register_recipe_processes)
                 # monitor process (scored at validation, never trained on; see _monitor_names below)
                 "monitor":   bool(p.get("monitor", False)),
                 # a monitor's train events used in training (default 0): a replay buffer of the old processes, drawn

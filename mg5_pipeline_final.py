@@ -314,6 +314,10 @@ def register_recipe_processes(specs, default_sampling=None):
             if name == base:
                 raise ValueError(f"{name}: an entry-level sqrts_measure needs its own name (base: <catalog entry>)")
             PROCESSES[name]["sqrts_measure"] = s["sqrts_measure"]
+        if s.get("store_tag"):
+            # a pool stored under its own file name (recipe_output_path), its recipe id unchanged: a non-catalog size of a
+            # catalog entry (the data-saving parents' 1e4-event top train pools) never overwrites the catalog's pool
+            PROCESSES[name]["store_tag"] = str(s["store_tag"])
         samp = s.get("sampling") or default_sampling
         if samp is not None and name in PROCESSES:
             PROCESSES[name]["sampling"] = dict(samp)
@@ -386,7 +390,9 @@ def recipe_id(recipe):
                 # `physics`: the model, card values, coupling-order clause and alpha_s rule the labels were computed
                 # with, read back from the backend (tools/pool_physics.py): a record of what the backend did, written
                 # after the fact (and backfilled into older sidecars), so it must not move a pool's id.
-                "physics"}
+                "physics",
+                # `store_tag`: where the pool is stored (recipe_output_path), not what it is
+                "store_tag"}
     core = {k: recipe[k] for k in sorted(recipe) if k not in volatile}
     blob = json.dumps(core, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(blob.encode()).hexdigest()[:16]
@@ -4960,6 +4966,8 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
     # catalog_v4 (D130): the sqrt(s) measure and the beam masses, recorded only where an entry sets them
     if cfg.get("sqrts_measure", "uniform") != "uniform":
         recipe["sqrts_measure"] = cfg["sqrts_measure"]
+    if cfg.get("store_tag"):
+        recipe["store_tag"] = cfg["store_tag"]
     if cfg.get("beam_masses") is not None:
         recipe["beam_masses"] = {str(k): float(v) for k, v in sorted(cfg["beam_masses"].items())}
     ceil_div    = lambda a, b: -(-a // b)
@@ -5000,9 +5008,10 @@ def recipe_output_path(recipe, out_dir):
         samp_tag += f"d{int(round(100 * f_def)):02d}"     # a default-share pool never shadows its catalog's _smix pool
     if recipe.get("mode") == "lhe_pp":
         samp_tag = "_lhe"          # MadEvent pp events (catalog_daniel), never a sampler's pool
+    store = f"_{recipe['store_tag']}" if recipe.get("store_tag") else ""
     return (f"{out_dir}/{recipe['process']}"
             f"_{recipe['sqrts_min']:.0f}-{recipe['sqrts_max']:.0f}GeV"
-            f"{role_tag}{samp_tag}_amplitudes.npy")
+            f"{role_tag}{samp_tag}{store}_amplitudes.npy")
 
 def generate_from_recipe(recipe, out_dir=None, reuse=True, compile_if_needed=True):
     """Materialize the variable-energy dataset described by `recipe` into
