@@ -24400,6 +24400,12 @@ entries:
     units: null
     start: '2026-11-12T04:01:37+00:00'
     at: '2026-11-12T04:01:37+00:00'
+  - batch: nullparent
+    wall_h: 0.4
+    jobs: 16
+    units: null
+    start: '2026-11-12T09:25:31+00:00'
+    at: '2026-11-12T09:25:31+00:00'
   handoff:
     state: 'Suspects batch (D408, design PASS 03:42) ended 05:3x: 54 clean + 2 diverged (ft AdamW V/B D=1e3 FA-ccin2p3-9bdc2cf9,
       scr WSD V/B D=3162 d28960d4; finding 05:15, acked E5770/E5771/E5762). E5844 (batch done) NOT yet acked, batch NOT yet
