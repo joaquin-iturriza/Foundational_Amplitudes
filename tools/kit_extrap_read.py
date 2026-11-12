@@ -20,13 +20,18 @@ sys.path.insert(0, ROOT)
 RUNS = {"ee_uug_me2": "kit_A_ee_uug_me2_n100000_t8000_softpair",              # FA-ccin2p3-c15b3337
         "ee_uugg_me2": "kit_A_ee_uugg_me2_n100000_t8000_softpair",            # FA-ccin2p3-c364a7ae
         "ee_tt_virt_finite": "kit_A_ee_tt_virt_finite_n100000_t8000_softpair"}  # FA-ccin2p3-f21fa163
+# transformer arms read beside the control, per process (D411): ReZero, norm-free blocks (model.net.layer_norm=rezero)
+ARMS = {"rezero": {"ee_uug_me2": "kit_A_ee_uug_me2_n100000_t8000_softpair_rezero",
+                   "ee_tt_virt_finite": "kit_A_ee_tt_virt_finite_n100000_t8000_softpair_rezero"}}
 
 SITE = r'''
 import glob, json, os, sys
 import numpy as np, h5py
 sys.path.insert(0, ".")
 from tools import kit_hardps as kh
-RUNS = json.loads(open(sys.argv[1]).read()) if sys.argv[1].endswith(".json") else dict(a.split("=") for a in sys.argv[1:])
+ALL = dict(a.split("=") for a in sys.argv[1:])
+RUNS = {k: v for k, v in ALL.items() if "@" not in k}
+EXTRA = {k: v for k, v in ALL.items() if "@" in k}      # "<proc>@<arm>" = run
 out = {}
 def read(pred_path, stem, target):
     src = kh.h5_path(stem); r = {}
@@ -44,6 +49,11 @@ for proc, run in RUNS.items():
     z = np.load(f"{d}/train_steps.npz")
     e = {"transformer": read(f"{d}/kit_benchmark/predictions.h5", stem, target),
          "curves": {k: [float(x) for x in np.ravel(z[k])] for k in z.files if "val" in k or "train_loss" in k}}
+    for k, run_ in EXTRA.items():
+        p_, arm = k.split("@")
+        pp = f"runs/kit/{run_}/kit_benchmark/predictions.h5"
+        if p_ == proc and os.path.exists(pp):
+            e[f"transformer_{arm}"] = read(pp, stem, target)
     for arm in ("mlp", "ours"):
         for s in range(3):
             g = glob.glob(f"runs/kit_mlp/kit_A_{proc}_n100000_t*_mlp{arm}_s{s}/kit_benchmark/predictions.h5")
@@ -69,6 +79,9 @@ def plot(path, figs):
             ks = sorted(ks, key=lambda k: edges(k.split("/")[1])[0])
             x = np.array([np.sqrt(np.prod([max(v, 1e-12) for v in edges(k.split("/")[1])])) for k in ks])
             ax.plot(x, [e["transformer"][k]["err"] for k in ks], "o-", color=ps.C.vermillion, label="transformer")
+            if "transformer_rezero" in e:
+                ax.plot(x, [e["transformer_rezero"][k]["err"] for k in ks], "D-", color=ps.C.orange,
+                        label="transformer, ReZero")
             for arm, mk, c in (("mlp", "s-", ps.C.blue), ("ours", "^--", ps.C.green)):
                 v = [[e[f"{arm}_s{s}"][k]["err"] for k in ks] for s in range(3) if f"{arm}_s{s}" in e]
                 ax.plot(x, np.median(v, 0), mk, color=c, label={"mlp": "MLP", "ours": "MLP, our choices"}[arm])
@@ -93,7 +106,8 @@ def main():
     a = ap.parse_args()
     if a.cmd == "collect":
         from analysis.common.readers import site_python
-        d = site_python(SITE, [f"{k}={v}" for k, v in RUNS.items()], "KITEXTRAP")
+        d = site_python(SITE, [f"{k}={v}" for k, v in RUNS.items()]
+                        + [f"{p}@{arm}={r}" for arm, m in ARMS.items() for p, r in m.items()], "KITEXTRAP")
         json.dump(d, open(a.out, "w"))
         print(f"-> {a.out}")
     else:
