@@ -971,6 +971,7 @@ class BaseExperiment:
         print("RUN_SUMMARY " + json.dumps(summary, default=str, sort_keys=True), flush=True)
 
     def train(self):
+        print("TRAINING_STARTED", flush=True)      # data and model built: sweep/drive.py's first-trial check reads it
         self.train_lr, self.train_loss, self.val_loss = [], [], []
         self.train_grad_norm, self.train_loss_no_reg, self.train_mse = [], [], []
         self._step_log = []

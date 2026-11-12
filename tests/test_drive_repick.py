@@ -63,7 +63,7 @@ def test_repick_moves_queued_only_and_fills_destination():
     moved = []
     t = lambda i, st: dict(idx=i, rid="FA-ccin2p3-%d" % i, site="ccin2p3", status="submitted", sched_state=st)
     trials = [t(0, "PENDING"), t(1, "RUNNING"), t(2, "PENDING")]
-    sw = types.SimpleNamespace(hours=2.0, in_flight=lambda: trials,
+    sw = types.SimpleNamespace(gate={"lxplus": {"state": "ok"}, "ccin2p3": {"state": "ok"}}, gate_state=lambda s: "ok", hours=2.0, in_flight=lambda: trials,
                                move=lambda tr, dest, a: moved.append((tr["idx"], dest)) or True)
     # lxplus has one free GPU and nothing queued: the first queued trial takes it, the second then sees 1 queued there
     # ahead of it at 2 h (0 + 1*2 + 2 = 4 h vs 12 h stay: still moves); the running one never moves
@@ -76,7 +76,7 @@ def test_repick_moves_queued_only_and_fills_destination():
 def test_recently_moved_stays():
     moved = []
     tr = dict(idx=0, rid="FA-lxplus-0", site="lxplus", status="submitted", sched_state="IDLE", moved=1000)
-    sw = types.SimpleNamespace(hours=2.0, in_flight=lambda: [tr],
+    sw = types.SimpleNamespace(gate={"lxplus": {"state": "ok"}, "ccin2p3": {"state": "ok"}}, gate_state=lambda s: "ok", hours=2.0, in_flight=lambda: [tr],
                                move=lambda t, dest, a: moved.append(dest) or True)
     rows = [row("lxplus", wait_h=10), row("ccin2p3", slots=1)]
     drive.repick([sw], None, rows, now=1000 + drive.STAY_S - 1)
