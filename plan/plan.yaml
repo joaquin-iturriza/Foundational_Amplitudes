@@ -24941,7 +24941,14 @@ entries:
     - tools/kit_rescore_compare.py
     - tools/kit_target_slope.py
     - tools/kit_threshold_scan.py
-  dead_ends: []
+  dead_ends:
+  - tried: 'Design 2026-11-12 09:06: seeds 43, 44 of softpairthr and target V x beta (tt virtual) to measure the transformer''s
+      seed spread (reviewer FIX)'
+    why: 'Joaquin settled it on 2026-11-06T22:31 (D315): no more multiple seeds, the seed noise is quoted from existing examples.
+      Existing measure: docs/results.tex ~13232-13245, single-process transformer references rerun at fixed HPs spread 1.1x-30x
+      in loss; the V x beta arm''s bulk loss (3.6x, +0.56 decades) and Sudakov loss (+0.57) sit inside it, its Coulomb gain
+      (3.16 decades, ~1400x) far outside'
+    at: '2026-11-12T09:09:23+00:00'
   asks:
   - ask: 'GPU budget: ~47 GPU-h above 30 with no decision covering it (D353 approves new KIT runs but names no cost). This
       is the KIT protocol A (from scratch) and protocol B batch. A is 20 runs: ee->tt Born and ee->tt virtual each with off-shellness
