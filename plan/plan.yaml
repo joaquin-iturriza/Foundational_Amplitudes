@@ -21502,7 +21502,7 @@ entries:
     decision: D407
   owner:
     agent: acb7a3d407b6435d6
-    state: working
+    state: closed
     since: '2026-11-12T09:23:07+00:00'
     state_at: '2026-11-12T09:28:11.273000+00:00'
     context: 217679
@@ -24414,24 +24414,27 @@ entries:
     start: '2026-11-12T09:25:31+00:00'
     at: '2026-11-12T09:25:31+00:00'
   handoff:
-    state: 'Suspects batch (D408, design PASS 03:42) ended 05:3x: 54 clean + 2 diverged (ft AdamW V/B D=1e3 FA-ccin2p3-9bdc2cf9,
-      scr WSD V/B D=3162 d28960d4; finding 05:15, acked E5770/E5771/E5762). E5844 (batch done) NOT yet acked, batch NOT yet
-      read. Before any number: fix repo-reviewer''s 3 blocking findings then continue that reviewer (holds the lock): (1)
-      suspects_readout.py pair/control written as 0 for a missing rerun (R.get(''val_min'', 0)) -> skip missing; (2) old_vs_new.py
-      JZ_PROBE configs glob falls back to any trial''s config.yaml -> use only the best hp''s; (3) old_vs_new.py divisor =
-      std of log target over first S rows is a proxy -> use the run''s prepd_std or check the proxy against it (old cscan
-      runs on Jean Zay: results in sweeps/<sweep>/results/hp*.json, no runs/<sweep> dir found; probe of result keys was in
-      flight). If (3) moves figs/old_vs_new, redraw and list changes. Then: python analysis/data_saving/suspects_readout.py
-      (reads CC, writes data/suspects_readout.json, figs suspects_LD, suspects_curves_<target>_<ft|scr>), look at each fig
-      once, apply the design rule (FIXES G<=1/3 & n<>=3; HURTS G>=3 & n<<=1; val and worst-event-removed must agree), follow
-      the answer under D411/D412 (<30 GPU-h, no questions).'
-    decisions: 'No resubmit of the two diverged runs: deterministic at seed 42 and same HPs, listed apart (CLAUDE.md: blow-ups
-      listed apart, never dropped). One-loop scratch D=1e3 control pruned: scratch V/B arms read on 3 cells (WSD on 2).'
-    ruled_out: as before
-    running: none (batch done)
-    files: analysis/data_saving/{submit_suspects.py,suspects_readout.py,old_vs_new.py}, data/suspects_runs.json (56 run ids,
-      configs), commits b66c446a, 55aeb931
-    written: '2026-11-12T04:53:05+00:00'
+    state: 'PRIORITY is step 3 (Joaquin ~10:30: none of the runs are well optimized; why does the fine-tune HPO fail). Not
+      started beyond one read: in trial_overfit.json at T=8500, t t~ and u u~, the val minimum sits at a median 0.91-0.98
+      of the run in both fine-tune and scratch trials (fraction with the minimum before 40% of the run: ft LO 0.05, ft V 0.25,
+      scratch LO 0.00, scratch V 0.15), so ''min at step 2000-3000'' is a V fine-tune minority, not the rule; the other checks
+      (lr window/centre under Muon, warmup, the 8 sampled trials and objective, layer_decay, restart without optimizer state)
+      are open. Suspects batch read (finding 2026-11-12, suspects_readout.py @8e8bb7d1, data e5a05de9, figs suspects_LD, suspects_curves_*):
+      no recipe knob FIXES; V/B WSD 0.51 (4/4 below 1). Null-parent 2x2 (design PASS 08:59, third version; earlier two FIXed
+      = dead end): smokes c69dfb51/00dc7d42 clean (SHRINK_PERTURB lambda=0.0 gamma=1.0 in both, head map on tree, not on V/B),
+      16 runs submitted ~10:15 (data/nullparent_runs.json @326ae83e), step 2 waits on them; Joaquin''s message says interpret
+      them only after step 3 (a test on badly optimized runs cannot separate parent from setup). Readout for them: adapt suspects_readout.py
+      (arms null/pre against scratch best, the design''s partition A-E).'
+    decisions: 'D411/D412: tests under 30 GPU-h, no questions. Two diverged suspects runs listed apart, not resubmitted (deterministic).
+      Null-parent design E branch = report and stop (D315 one seed). Repo-reviewer findings fixed: (1)(2) bcd8350f, (3) 8e8bb7d1
+      (old_vs_new divisor = the old runs'' prepd_std by their files-path code at accef58a; figure unchanged); the re-check
+      message was sent to the reviewer holding the lock (a38eab2e7dafcdb5f), verdict not seen by this owner.'
+    ruled_out: 'As before, plus: lr x1/3, x1/10, WSD, AdamW, mu-only MSE as single fixes of the fine-tune recipe (suspects
+      batch); a second seed for the null-parent test (D315).'
+    running: 16 null-parent runs (step 2), ids in analysis/data_saving/data/nullparent_runs.json
+    files: analysis/data_saving/{suspects_readout.py,submit_suspects.py,submit_nullparent.py,old_vs_new.py,trial_overfit.py},
+      data/{suspects_readout.json,suspects_runs.json,nullparent_runs.json,trial_overfit.json}, figs/suspects_*
+    written: '2026-11-12T09:31:02+00:00'
   step_why:
     2:
       feeds: whether the fine-tune deficit on t t~ sits in the fine-tune path, the fine-tune search, or the parent's weights
