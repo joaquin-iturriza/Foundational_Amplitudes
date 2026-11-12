@@ -20983,6 +20983,9 @@ entries:
     8: 'One-loop t t~ V suspects batch, design PASS 2026-11-12 (configs sweep/sweep_config_dsave_diag_{massown,adamw,pairthr}_ft_ee_ttbar_nlo_d{5..8}_t8500.yaml
       + smoke ..._smoke3_..._t50.yaml @7d56534c, controls the offown runs, ~5.5 GPU-h): smoke then 12 runs via trial_job.sh,
       --hdr=--time=00:40:00; held by the main session (''before more arms'') until the defect read is seen'
+    9: 'Memorisation of the t t~ fine-tunes (finding 2026-11-12, ft_curves.py / event_share.py --gap @bfb2bd4e): per D and
+      target, the train/val curves of ft vs scratch (D=316..1e4), where val turns up, and which input or inherited statistic
+      differs between the arms; then one design'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -21088,6 +21091,13 @@ entries:
       - 'an arm YES (w/o-worst val geomean <= 0.4, >=3/4 below): mass column into s3 one-loop configs; AdamW or pair input
         to Joaquin as in the design'
       - 'all NO: no gain at the control''s HPs; the deficit goes to the defect hunt'
+    9:
+      feeds: what is wrong with the t t~ fine-tunes (D400, Joaquin 2026-11-12)
+      if:
+      - 'a path lets the fine-tune memorise t t~ (an input or stat inherited from the parent): fix it, rerun the t t~ fine-tunes
+        at fixed HPs against scratch'
+      - 'no such path: overfitting of a sound start; a regularisation/horizon arm at fixed HPs (e.g. the val-best step vs
+        T, weight decay toward the parent) against the same-HP reruns'
   designs:
   - at: '2026-11-10T02:35:09+00:00'
     question: 'Step 1 (D356 horizons, tree arm): on catalog_v4''s held-out tree targets ee->ttbar (H3, 2->2 massive), ee->ccbar
