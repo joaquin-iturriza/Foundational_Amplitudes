@@ -22680,6 +22680,8 @@ entries:
       site decisions --project FA; the entry''s evidence and dead ends.'
   step_waits:
     '8': the main session's read of the defect hunt (its 'before more arms'); then launched as designed
+    '9': FA-ccin2p3-31468dbb FA-ccin2p3-538569e2 FA-ccin2p3-762f0029 FA-ccin2p3-cce86735 FA-ccin2p3-e22a4dc3 FA-ccin2p3-bf99b2f0
+      FA-ccin2p3-6a30b085 FA-ccin2p3-265173f8
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
