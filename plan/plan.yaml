@@ -15798,7 +15798,7 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-046cc7d3
-    commit: 9edb252f
+    commit: ea24b3cc
     paths:
     - .claude/hooks/notification_absorb.py
     - .claude/hooks/owner_handoff.py
@@ -15868,6 +15868,12 @@ entries:
       pools with their .recipe.json, .alphas.npy and .flatfill.json (5204 files, 32.05 GB; pools alone 30.89 GB per census_quick).
       Checked first: no running or pending job''s recipe reads a smixq pool (squeue: optrec_prebuild_v4d25, optrec_pidqn_qn/pid,
       kit_pkg, zz_redesign_pp4_parts; their 10 recipes resolve 0 smixq files). /sps/lpnhe free after: 69 GB (87%).'
+    - '2026-11-12 drive.py re-pick merged (ea24b3cc; b71880f1 + review fixes e1ff3aa5, repo-reviewer a847424422f5bffc8 FIX
+      then PASS, watermark e1ff3aa5): every 10 min a trial still PENDING/IDLE moves to the site site pick''s model says ends
+      it > 1 h sooner and < half the time (margin: the main session''s brief, a method choice), cancelled via site run scancel/condor_rm,
+      resubmitted at the same hp/index with no penalty, logged ''moved <run> <from> -> <to>''; home dead only at cap 0 or
+      fit_ever 0, down/held home keeps, 12 h stay after a move, re-check pick --no-record (~/.local/bin/site, backup site.bak-20261112-picknorecord).
+      tests/test_drive_repick.py 11 cases. Not live yet: running drivers load it at their next relaunch.'
     - '2026-11-12 restore of CC pools deleted 2026-11-11: check_site_data --list on CC: missing train pools H1 62, H2 218,
       H2p5 38, H3 278 (1e4 copies only, recipe 1e5), H5 28, H6 8, H7E 34, H7c 34; PP4 504 (494 series-built + 10 one-run part
       processes); dsh_eea 115 (parts kept, 115/115 complete, 3.06 GB). HD4/HD5 train/val missing was a false report (n=0 in
