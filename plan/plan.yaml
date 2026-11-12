@@ -25919,6 +25919,19 @@ entries:
       see that in most of the curves you''ve shown''. The v_end/min v measure is withdrawn (it never compared val to train);
       owner af9e7383 rebuilds it on val falling together with train, checked by eye on the curves already shown, and shows
       good/bad examples before use. The larger-D question was re-asked plainly (he had not seen it).'
+  - at: '2026-11-12T18:10:26+00:00'
+    text: '2026-11-12 ~19:10 HP read of the stage-2 searches (hp_ranges_readout.py @05546263, D<1e4: 283 scratch, 230 fine-tune
+      trials). Which HPs: only lr moves separation within a search (Spearman scratch -0.30, fine-tune lr_scale -0.36); weight
+      decay, L2, warmup, lr floor, EMA, EMA decay, layer decay |rho| <= 0.10. Separation follows D (search bests good: D<1e3
+      1/44, 1e3-1e4 1/22, >=1e4 13/23); batch size (= D/2) and horizon follow D and are not searched. Ranges: scratch lr bests
+      at an edge 6/36; fine-tune lr_scale and layer_decay bests at the low edge 9/30 each. Trials: best after 5 of 8 = final
+      in the median (75%: 1.11 scratch, 1.16 fine-tune). Within a search: val vs separation Spearman +0.61 at D=1e3-1e4 (best
+      val closest curves), +0.07 at D<1e3 (best good 1/44). Early stopping: not used (val still falls while the curves separate;
+      stopping at separation onset costs 1.4-2.3x). Withdrawn before submission (Joaquin dropped schedule/regularisation/early-stop
+      tests): the 36-run schedule test (submit_together.py) and the lr-x3 searches (dsave_lrx3 configs @5a42a430), never run.
+      Launched: 8 searches t t~ LO D=316, 3162 scr/ft, WSD-only (D423) and template 2 (WSD + batch searched [D/64, D/2] +
+      fine-tune lr_scale [0.03,10], layer_decay [0.5,1]), configs @05546263, design PASS 18:05, 17.6 GPU-h, detach tmpl2_wsd2
+      on CC (first launch refused by cell_guard, relaunched with reason).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
