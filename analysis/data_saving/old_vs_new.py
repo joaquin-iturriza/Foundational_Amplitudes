@@ -50,6 +50,10 @@ for arm, per in OLD.items():
     for s, prefs in per.items():
         a = amp[:SUB[s]]
         v = np.sign(a) * np.log1p(np.abs(a)) if (a <= 0).any() else np.log(a)
+        # = the run's prepd_std: these runs used the .npy files path (data.data_path), which at their commit
+        # (accef58a, 2026-06-26) took the first S rows, log (no |M|^2 <= 0 here) and np.std over all S rows,
+        # fine-tunes included (only the recipes path loaded the parent's data_stats.json); the result JSONs
+        # and pruned run dirs keep no prepd_std to read.
         div = float(v.std())
         for pre in prefs:
             for d in glob.glob(f"sweeps/{pre}_eettbarnlovirte4_t*"):
