@@ -24949,6 +24949,32 @@ entries:
       size and the opened ranges do not bring the curves together; the next candidate from the data (the horizon, the other
       D-following HP) is designed. Every search reported with best val, separation, batch size, good count and its curves
       figure; diverged trials apart (D398).'
+    fix_at: '2026-11-12T18:04:13+00:00'
+    fix: 'Check 1 (one change against a matched control) and check 4 (outcome): the 18:02 design changes three things at once
+      against the stage-2 control (cosine -> WSD with cooldown 1/8, batch size fixed at D/2 -> searched in [D/64, D/2], and
+      for the fine-tunes lr_scale and layer_decay opened downward). Confirmed from the configs: the stage-2 trials ran CosineAnnealingLR
+      at batch 1581 = D/2 (FA-ccin2p3-87fc7187 RUN_SUMMARY), and the tmpl2 configs fix WSD. The outcome then attributes the
+      result to batch and ranges alone (''NO: batch size and the opened ranges do not bring the curves together''), which
+      a NO cannot show when WSD changed too, and a YES cannot say which of the three did it, though D422 asks which cause
+      it is (which HPs, which ranges, or the trial count). Fix: add the WSD-only arm per cell, the stage-2 search space under
+      WSD with cooldown 0.125 (4 searches, 8 trials each, waves 3,3,2, about 8.8 GPU-h, about 17.6 GPU-h in total, within
+      D412''s 30). Under D423, WSD-only is then the matched control for batch plus ranges, and WSD-only against stage 2 isolates
+      WSD. Write the outcome for each comparison (WSD alone; batch plus ranges under WSD). The fine-tune arm still moves batch
+      and the two ranges together. Either state that as part of the question or split it out. Check 5 (prior, searched independently):
+      the prior names only D423 and results.tex''s v4 WSD paragraph for WSD. It omits this entry''s own suspects-batch finding
+      (2026-11-12 08:53, suspects_readout.py @8e8bb7d1), which measured WSD on these very t t~ LO cells: fine-tune WSD at
+      the stage-2 best HPs G = 5.06 (HURTS), scratch WSD 68x worse on tree; on one-loop V/B, fine-tune 0.51 and scratch 17x
+      worse. Those runs were at fixed cosine-tuned HPs, not searched, which is a reason to run the WSD-only arm, not to leave
+      it out. Name the finding in the prior and say what is different this time (WSD inside a search). Terms searched: WSD,
+      wsd_cooldown, scheduler, batchsize/batch size, lr_scale, layer_decay, tmpl2, template, in docs/results.tex, the entry''s
+      findings and dead ends, and site decisions (D241, D244/D245, D412, D420-D423). Passing checks, for the record: 2 (hp_ranges_readout.json:
+      lr rho on separation -0.30 scratch, lr_scale -0.36 fine-tune; Joaquin confirmed the good/bad examples, D421); 3 (one
+      search per cell like the siblings; search bests are good in 1 of 44 at D<1e3 and 1 of 22 at 1e3-1e4, so 3 of 4 good
+      is far above chance); 9 (HETEROSC mu_mse select); 10 and 11 (same pools and preprocessing as stage 2); 13 (template
+      coupled space plus batch, 8 trials, waves 3,3,2, ~1.2 h); 14 (CC /sps/lpnhe 65 GB free, ~1 GB needed); 15 (curves are
+      written by the same base config as stage 2; batch D/2 confirmed in a stage-2 RUN_SUMMARY, so smaller batches are no
+      slower per step). Minor: the generator''s --tmpl2 help and the design say ''gen_data_saving.py --stage tmpl2''; check
+      that the flag exists or drop it from the fixed text.'
   step_waits:
     '3': bbx_zz_lo_scr3, bbx_zz_lo_ft drivers (detach events)
     '4': bbx_zz_lo_ft driver (detach event)
