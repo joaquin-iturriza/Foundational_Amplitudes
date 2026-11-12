@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Figure of the CC cache census (analysis/agent_redesign/cache_census.py's JSON): GB per pool family of
+"""Figure of the CC cache census (analysis/agent_redesign/cache_census.py). Left: GB per pool family of
 $SCRATCH/amp_data_cache, stacked by what reads it (a recipe of an open plan entry, another catalog_v4 recipe, an older
-recipe only, no recipe), next to the training-set memmap cache and the val/test pools in datasets.
-    python analysis/agent_redesign/plot_cache_census.py <census.json> <out base>"""
+recipe only, no recipe), beside the training-set memmap cache and $DATA_DIR. Right (from --quick): the same cache's
+pool GB by sampling tag, and the chunk work dirs.
+    python analysis/agent_redesign/plot_cache_census.py <census.json> <quick.json> <out base>"""
 import json, os, sys
 from collections import defaultdict
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -11,35 +12,38 @@ import plot_style as ps  # noqa: E402
 CLASSES = ("open plan entry", "other catalog_v4 recipe", "older recipe only", "no recipe")
 
 
-def main(src, base):
-    c = json.load(open(src))
+def main(src, qsrc, base):
+    c, q = json.load(open(src)), json.load(open(qsrc))
     fam = defaultdict(lambda: dict.fromkeys(CLASSES, 0.0))
     for k, gb in c["data_cache_by_prefix_class_gb"].items():
         pre, cls = k.split(" | ")
         fam["other" if pre.startswith("other") else pre][cls] += gb
-    rows = sorted(fam, key=lambda p: sum(fam[p].values()))
-    rows = [p for p in rows if sum(fam[p].values()) >= 0.5]   # families under 0.5 GB are not visible at this scale
-    small = sum(sum(v.values()) for p, v in fam.items() if p not in rows)
-    fig, ax = ps.figure()
-    y = list(range(len(rows)))
+    rows = [p for p in sorted(fam, key=lambda p: sum(fam[p].values())) if sum(fam[p].values()) >= 0.5]
+    small = sum(sum(v.values()) for p, v in fam.items() if p not in rows)   # families under 0.5 GB: invisible here
+    fig, (ax, ax2) = ps.figure(ncols=2)
     left = [0.0] * len(rows)
-    cols = (ps.C.blue, ps.C.sky, ps.C.orange, ps.C.vermillion)
-    for cls, col in zip(CLASSES, cols):
+    for cls, col in zip(CLASSES, (ps.C.blue, ps.C.sky, ps.C.orange, ps.C.vermillion)):
         w = [fam[p][cls] for p in rows]
-        ax.barh(y, w, left=left, color=col, label=cls)
+        ax.barh(range(len(rows)), w, left=left, color=col, label=cls.replace("_", " "))   # cmr10 has no underscore
         left = [a + b for a, b in zip(left, w)]
-    extra = [("memmap cache", sum(c["mmap_cache_gb"].values())), ("datasets val+test", c["datasets_gb"]["all"])]
+    extra = [("memmap", sum(c["mmap_cache_gb"].values())), ("datasets", c["datasets_gb"]["all"])]
     for i, (lab, gb) in enumerate(extra):
-        ax.barh(len(rows) + i, gb, color=ps.C.grey,
-                label="memmap / datasets" if i == 0 else None)
+        ax.barh(len(rows) + i, gb, color=ps.C.grey, label="other cache" if i == 0 else None)
     ax.set_yticks(range(len(rows) + len(extra)))
-    ax.set_yticklabels([f"{p}_" for p in rows] + [e[0] for e in extra])
-    ax.set_xlabel("GB on /sps/lpnhe")
+    ax.set_yticklabels([p.replace("_", " ") for p in rows] + [e[0] for e in extra])
+    ax.set_xlabel("GB")
     ps.legend(ax, "lower right")
+    tags = {k: v for k, v in q["pool_gb_by_sampling_tag"].items() if v >= 0.5}
+    tags["chunk dirs"] = q["chunk_dirs_gb"]
+    names = sorted(tags, key=tags.get)
+    ax2.barh(range(len(names)), [tags[n] for n in names], color=ps.C.blue)
+    ax2.set_yticks(range(len(names)))
+    ax2.set_yticklabels([n.replace("_", " ") for n in names])
+    ax2.set_xlabel("GB")
     ps.save(fig, base)
-    print(json.dumps({"rows": {p: round(sum(fam[p].values()), 1) for p in rows}, "under_0.5GB_total": round(small, 2),
-                      "extra": dict(extra)}))
+    print(json.dumps({"rows": {p: round(sum(fam[p].values()), 2) for p in rows}, "under_0.5GB_total": round(small, 2),
+                      "extra": dict(extra), "tags": tags}))
 
 
 if __name__ == "__main__":
-    main(*sys.argv[1:3])
+    main(*sys.argv[1:4])
