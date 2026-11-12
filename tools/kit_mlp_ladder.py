@@ -101,6 +101,8 @@ def train(x, y, cfg, seed, device):
     opt = torch.optim.Adam(net.parameters(), lr=2e-3, betas=(0.9, 0.999), eps=1e-8)
     nb = len(X) // BATCH
     steps = OUR_STEPS if cfg["recipe"] == "ours" else EPOCHS * max(1, nb)
+    if "KIT_MLP_EPOCHS" in os.environ:    # a dry run caps every arm's horizon, ours included
+        steps = min(steps, EPOCHS * max(1, nb))
     epochs = -(-steps // max(1, nb))
     sched = torch.optim.lr_scheduler.LambdaLR(opt, lambda k: (0.5 * (1 + np.cos(np.pi * k / steps)) + 5e-4))
     g = torch.Generator(device="cpu").manual_seed(seed)
