@@ -1,7 +1,10 @@
 # kit_benchmark step 15 (D421, D422): single-fidelity DyHPO over the template's space on the KIT from-scratch setup of
 # run 203a274f, plain log10|M|^2 target, softpair inputs (runs/kit/kit_A_ee_uug_me2_n100000_t8000_softpair_plain, 1e5 events, 8000 steps), to choose the HPs (lr first) at which validation falls with
 # training (curve_quality's separation/end_up on val_mse_curve / train_eval_mse_curve) and the best validation.
-# Everything else is the run's own config (base_config): inputs, target, HETEROSC + sigma stage, float64, batch 16384.
+# Everything else is the run's own config (base_config): inputs, target, HETEROSC + sigma stage, float64.
+# As pretrain_data_saving's template 2 (sweep/sweep_config_dsave_tmpl2_*): WSD with cooldown 0.125 fixed (D423) and the
+# batch size searched over [D/64, D/2] = [1562, 50000], capped at 16384 (the template's biggest that fits: 14 GB of a
+# V100's 32 GB at float64 in 203a274f/3fc1016a); the rest is the template's space.
 cluster:
   scheduler: slurm
   auto_submit: false
@@ -37,9 +40,12 @@ fixed_params:
   warm_start_idx: 'null'
   fine_tune.pretrained_path: 'null'
   training.optimizer: MuonAdamW
+  training.scheduler: WSD
+  training.wsd_cooldown_frac: 0.125
 range_extension:
   enabled: false
 search_space:
+- {name: training.batchsize, type: int_log, low: 1562, high: 16384}
 - {name: training.lr, type: float_log, low: 1.667e-03, high: 1.5e-02}
 - {name: training.muon_weight_decay, type: float_log, low: 1.0e-03, high: 0.3}
 - {name: training.regularization_lambda, type: float_log, low: 1.0e-10, high: 1.0e-06}

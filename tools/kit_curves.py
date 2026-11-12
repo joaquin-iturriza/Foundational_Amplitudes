@@ -15,6 +15,9 @@ without the mu-MSE, so a failing NLL curve can still hide a sound mu-MSE curve (
 
     python tools/kit_curves.py collect --out analysis/kit_benchmark/data/kit_curves.json   (reads CC)
     python tools/kit_curves.py read analysis/kit_benchmark/data/kit_curves.json [--figs analysis/kit_benchmark/figs]
+    python tools/kit_curves.py sweep kit_hpo_uug_plain kit_hpo_ttvirt_thr --out analysis/kit_benchmark/data/kit_hpo.json
+        (step 15's searches, reads CC: per trial its HPs, best val mu-MSE and curve_quality on the mu-MSE curves
+         val_mse_curve / train_eval_mse_curve; chosen = the lowest best val among the good trials)
 """
 import argparse
 import json
@@ -133,16 +136,61 @@ def plot(d, figs):
     ps.save(fig, os.path.join(figs, "kit_curves_nll"))
 
 
+SWEEP_SITE = r'''
+import glob, json, os, sys
+sys.path.insert(0, ".")
+import siteconf
+out = {}
+for name in sys.argv[1:]:
+    rows = []
+    for f in sorted(glob.glob(os.path.join(siteconf.SWEEP_DIR, name, "results", "*.json"))):
+        try:
+            j = json.load(open(f))
+        except Exception:
+            continue
+        rows.append({"file": os.path.basename(f), "hp": j.get("hp") or j.get("config") or j.get("params"),
+                     "val_loss": j.get("val_loss"), "best_step": j.get("best_step"), "run_dir": j.get("run_dir"),
+                     "val": j.get("val_mse_curve"), "train": j.get("train_eval_mse_curve")})
+    out[name] = rows
+print("KITHPO " + json.dumps(out))
+'''
+
+
+def sweep_read(names, out):
+    """Per search: each trial's curve_quality (separation, end_up on the mu-MSE curves) and best val; the chosen trial."""
+    sys.path.insert(0, os.path.join(ROOT, "analysis", "data_saving"))
+    from curve_quality import quality as q_mse
+    from analysis.common.readers import site_python
+    d = site_python(SWEEP_SITE, list(names), "KITHPO")
+    for name, rows in d.items():
+        for r in rows:
+            if r["val"] and r["train"]:
+                r.update(q_mse(r["val"], r["train"]))
+        good = [r for r in rows if r.get("well") and r["val_loss"] is not None]
+        ch = min(good, key=lambda r: r["val_loss"]) if good else None
+        print(f"{name}: {len(rows)} trials, {len(good)} good; chosen {ch and ch['file']}")
+        for r in sorted(rows, key=lambda r: r["val_loss"] if r["val_loss"] is not None else 1e99):
+            lr = (r["hp"] or {}).get("training.lr")
+            print(f"  {r['file']:28s} lr {lr}  best val {r['val_loss']}  sep {r.get('separation', float('nan')):.3g}  "
+                  f"end_up {r.get('end_up', float('nan')):.3g}  " + ("good" if r.get("well") else "BAD")
+                  + ("  <- chosen" if r is ch else ""))
+        d[name] = {"trials": rows, "chosen": ch and ch["file"]}
+    json.dump(d, open(out, "w"), indent=1)
+
+
 def main():  # dup-ok: argparse boilerplate (collect/read), no shared logic
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
     c = sub.add_parser("collect"); c.add_argument("--out", required=True)
     r = sub.add_parser("read"); r.add_argument("data"); r.add_argument("--figs")
+    w = sub.add_parser("sweep"); w.add_argument("names", nargs="+"); w.add_argument("--out", required=True)
     a = ap.parse_args()
     if a.cmd == "collect":
         from analysis.common.readers import site_python
         json.dump(site_python(SITE, [], "KITCURVES"), open(a.out, "w"))
         print(f"-> {a.out}")
+    elif a.cmd == "sweep":
+        sweep_read(a.names, a.out)
     else:
         read(a.data, a.figs)
 
