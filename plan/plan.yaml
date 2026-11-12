@@ -25682,6 +25682,38 @@ entries:
       as asked. Searched results.tex for Coulomb, Sommerfeld, logthr, pair_threshold, beta input, pair invariant: only the
       transfer star arm''s t t~ threshold (a pretraining-data lever, no beta input), not this question; plan for logthr (KIT
       baseline named in the design''s own lineage); decisions for threshold/beta/seed (D315, D392).'
+  - at: '2026-11-12T01:41:26+00:00'
+    question: 'D403: why does Bakar''s 3x128 MLP (KIT src/baseline.py) extrapolate into the limits where our models do not
+      (uug collinear deepest bin his 0.11 vs our best 2.21, soft 0.32; uugg soft 0.40, coll_qg 0.08; tt virtual Coulomb)?
+      A one-change ladder from his exact setup towards ours, on the same 1e5 bulk_train events: which single difference (target,
+      inputs, activation, loss) destroys his extrapolation, and does our full combination on an MLP reproduce our failure.
+      Feeds what the catalog parent and the KIT models change next (inputs, target or loss).'
+    prior: 'kit_benchmark findings: protocol A scratch uug soft 14180 / coll 30.1, uugg soft 9067; input arms (pair logs,
+      soft rescale) carried to uug/uugg (uugg soft 9070 -> 0.411, coll_gg 20.5 -> 2.47), still behind his coll numbers; the
+      parent''s emission-scale target T is flat into the uug limits and a flat predictor of T would beat his MLP (finding
+      2026-11-10 06:24), so the failure was read as the inputs'' extrapolation. His code read 2026-11-12 (src/baseline.py):
+      log10 of every s_ij/s0, standardized; plain log10|M|^2 standardized; leaky ReLU; MSE; Adam 2e-3 cosine, 300 epochs x
+      batch 2048. results.tex: none on Bakar/MLP ladder (searched Bakar, MLP, baseline).'
+    measure: KIT evaluate.py log10-MSE per hard_test stratum (deepest bin of each family) and fitted exponent vs exact, per
+      arm, median over 3 seeds; tools/kit_figures.py collect/plot over runs/kit_mlp (arms as curves) beside our transformer
+      runs; his numpy baseline.py run once on uug reproduces the port's mlp arm (its slide numbers 0.11 coll / 0.32 soft).
+    check: 'Dry run on CC (2 steps, 5e3 events) for ee_uug arm ours and ee_tt arm mlp: end to end through evaluate.py, exponents
+      printed. The measure moves: across existing models the uug coll deepest bin spans 0.11 (his MLP) to 30 (ours scratch),
+      soft 0.32 to 14180; the T-target arm''s offset carries the exact singular scaling (with 2 training steps the predicted
+      soft exponent was -2.001), so the target arm and the inputs arm separate cleanly.'
+    fixed: 'His exact training: first 1e5 bulk_train events, 3x128, He init, Adam (0.9,0.999,1e-8), lr 2e-3 cosine to 1e-6,
+      300 epochs, batch 2048 (14.6k steps), float64, standardization from the training sample; features log10 s_ij/s0 (logthr
+      on ee_tt, his tt baseline); scored by the benchmark''s own evaluate.py on the full hard_test and bulk_test.'
+    control: The arm mlp (his setup in the port) is the control of every other arm; his own numpy baseline.py on uug is the
+      port's control; our transformer runs (kit_A_* scratch at 1e5, softpair arms) are the reference the arm ours should reproduce.
+    seeds: 3 seeds per arm (0,1,2); cheap (about 1 min per run). An arm differs when its seed range is disjoint from mlp's
+      and the median differs by > 0.3 decades in the deepest bin.
+    outcome: 'Yes for a factor: the arm that changes only that factor loses his extrapolation (deepest-bin log-MSE > 10x mlp''s,
+      exponent off by > 0.3) -> that factor is the lever for our models, the next design carries his choice for it into the
+      transformer (e.g. log-invariant-only inputs, or leaky activation). If ours reproduces our failure but no single arm
+      does: interaction, then the two-factor arms next. If no arm (and not ours) fails: the MLP form is not the cause; the
+      transformer''s architecture (frames, attention, momenta path) is, next tested by feeding the transformer his inputs
+      only.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
