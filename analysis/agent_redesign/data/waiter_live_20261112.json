@@ -1,0 +1,85 @@
+{
+ "replay_by_window_s": {
+  "600": {
+   "since": "2026-11-12 00:19",
+   "until": "2026-11-12 12:19",
+   "events": 196,
+   "by_kind": {
+    "HANDBACK": 87,
+    "ALERT": 4,
+    "RUN": 70,
+    "RUN_DONE": 11,
+    "STALLED": 7,
+    "DONE": 17
+   },
+   "none": 103,
+   "old": 56,
+   "new": 56
+  },
+  "1200": {
+   "since": "2026-11-12 00:19",
+   "until": "2026-11-12 12:19",
+   "events": 196,
+   "by_kind": {
+    "HANDBACK": 87,
+    "ALERT": 4,
+    "RUN": 70,
+    "RUN_DONE": 11,
+    "STALLED": 7,
+    "DONE": 17
+   },
+   "none": 103,
+   "old": 41,
+   "new": 41
+  },
+  "1800": {
+   "since": "2026-11-12 00:19",
+   "until": "2026-11-12 12:19",
+   "events": 196,
+   "by_kind": {
+    "HANDBACK": 87,
+    "ALERT": 4,
+    "RUN": 70,
+    "RUN_DONE": 11,
+    "STALLED": 7,
+    "DONE": 17
+   },
+   "none": 103,
+   "old": 38,
+   "new": 37
+  },
+  "3600": {
+   "since": "2026-11-12 00:19",
+   "until": "2026-11-12 12:19",
+   "events": 196,
+   "by_kind": {
+    "HANDBACK": 87,
+    "ALERT": 4,
+    "RUN": 70,
+    "RUN_DONE": 11,
+    "STALLED": 7,
+    "DONE": 17
+   },
+   "none": 103,
+   "old": 36,
+   "new": 34
+  }
+ },
+ "actual": {
+  "since": "2026-11-12T00:19:00Z",
+  "until": "2026-11-12T12:19:00Z",
+  "wakes_before": 36,
+  "wakes_after": 34,
+  "by_kind": {
+   "agent_done": 2,
+   "other": 1,
+   "shell": 1,
+   "waiter": 32
+  },
+  "absorb_log": {
+   "spooled": 87,
+   "passed_no_waiter": 1,
+   "passed_mid_run_msg": 2
+  }
+ }
+}
