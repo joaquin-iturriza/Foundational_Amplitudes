@@ -21358,6 +21358,9 @@ entries:
       then 56 runs (ft arms lr/3, lr/10, WSD, AdamW, mu-only MSE; scratch arms WSD, mu-only MSE; t t~ tree and V/B, D=316..1e4),
       configs sweep/sweep_config_dsave_diag_{hmap_ft_epem_ttx,parscale_ft_ee_ttbar_nlo}_d{5..8}_t8500.yaml and sweep_config_dsave_s2_scr_*
       + --hp overrides; 26.6 GPU-h at limits'
+    3: 'Null-parent 2x2 (design 2026-11-12 after the suspects read): through the fine-tune configs at each cell''s stage-2
+      scratch best HPs, fresh init (shrink_perturb [0,1]) vs the parent''s weights, t t~ tree and V/B, D=316..1e4, 16 runs
+      + 2 smokes (analysis/data_saving/submit_nullparent.py @eaacb51f), ~7.6 GPU-h at limits; design review pending'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -24276,6 +24279,12 @@ entries:
       - 'an arm FIXES (G<=1/3, >=3/4 below, also without worst event): that knob is the fix, into the fine-tune template,
         rerun question with the evidence'
       - 'none FIXES: the parent (pretraining set, length) is the next test, designed then'
+    3:
+      feeds: whether the fine-tune deficit on t t~ sits in the fine-tune path, the fine-tune HP window, or the parent's weights
+      if:
+      - 'PATH: bisect the path''s input stats on the null arm'
+      - 'WEIGHTS: the parent (pretraining set and length)'
+      - 'HPs: change the fine-tune window'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
