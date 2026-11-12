@@ -29363,6 +29363,17 @@ entries:
       needs the beta input to be usable (D405''s inputs that help). Bulk worse than the control by > 0.5 decades: the new
       pools cost the target, reported beside any gain. The star arm''s bulk gain (2-4x) at beta >= 0.2 is the prior: a YES
       here extends it to the KIT limits, a NO says that gain stops at the trained beta range.'
+    passed_at: '2026-11-12T14:55:01+00:00'
+    reviewer: 'Re-check of 11c after FIX: one change per pair (heldoutthrloop recipe = heldoutthr''s 1414 pools unchanged
+      + 4 one-loop top pools, same T 4307, lr 8.196e-3, inputs, seed; second pair adds the beta input vs ft_thrbeta 8d1429bf,
+      answering D405 ''inputs that help''); check 2: measure moved with pretraining content on this fine-tune (ft_thr vs ft_r5
+      Sudakov -0.35, beta parent Coulomb -0.10, finding 13:00) and V x beta moved Coulomb -3.16; check 3: one seed per D315,
+      siblings matched, 0.3-decade cut; outcome now covers YES/PARTIAL/NO/WORSE per family; pool check is the committed tools/kit_loop_pool_check.py
+      @20a1b3e6 (wrote kit_loop_pool_check_probe.json; it caught the log_beta sampler defect, fixed in nlo_virtual_pipeline.py
+      with a test; rerun probe must show >=15% per beta decade 1e-5..1e-1 and finite V/B before the parent); ~16.5 GPU-h;
+      disk fits (in-memory parent, /sps/lpnhe 68G free). Searched for check 5: ttx_nlo, one-loop top, Coulomb, Sommerfeld,
+      heldoutthr/r5thr, virt=QCD, loop.*pretrain in results.tex; entry findings/dead ends; site decisions (D405, D411, D412,
+      D418); the star threshold arm is now in prior.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
