@@ -34,7 +34,12 @@ if env_missing:
     print(f"env: missing {' '.join(env_missing)}"); ok = False
 import datagen
 import mg5_pipeline_final as mg
+import copy
+_registry = copy.deepcopy(mg.PROCESSES)
 for spec in ARGS or DEFAULT:
+    # each recipe from the same registry: register_recipe_processes writes a recipe's sampling onto the shared
+    # entries, which would otherwise carry into the next recipe and change its pools' recipe ids
+    mg.PROCESSES.clear(); mg.PROCESSES.update(copy.deepcopy(_registry))
     doc = yaml.safe_load(open(os.path.join(ROOT, spec)))
     procs = doc["processes"] if isinstance(doc, dict) else doc
     # as training does: scan variants into the registry, the recipe's sampling onto every
@@ -59,6 +64,10 @@ for spec in ARGS or DEFAULT:
                     path = mg.recipe_output_path(rec, datagen.dest_for_role(role))
                 src = mg.sampling_policy(mg.PROCESSES[p["name"]], role)["default_source"]
                 for nm, r2, p2 in mg.default_share_pools(src, role, SEED):
+                    if PATHS:   # the composed mixture reads these, so sizing and site copy need them too
+                        for f in (p2, p2 + ".recipe.json"):
+                            if f not in seen:
+                                seen.add(f); print(f"POOL {f}")
                     if not datagen._is_cached(p2, mg.recipe_id(r2)):
                         uncached.append(f"{nm}/{role} (default share of {p['name']})")
             if PATHS:
