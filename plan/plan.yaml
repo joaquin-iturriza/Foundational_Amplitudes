@@ -26914,6 +26914,18 @@ entries:
       minutes); 2 parents x ~1.9 GPU-h (r5 1.81 h); 3 fine-tunes x ~1.6 GPU-h; 2 smokes ~0.3: ~9.2 GPU-h, under 30. Disk:
       the parents run in memory (data.memmap=false, no cache); the 3 pools x 3e4 events x 21 float64 columns ~15 MB; 2 parent
       + 3 fine-tune run dirs ~150 MB each; /sps/lpnhe 41 GB free (read 2026-11-12).'
+    passed_at: '2026-11-12T03:53:38+00:00'
+    reviewer: 'D405/D406 transfer test, third version: the earlier FIX is addressed. One seed for every cell (D412). Two-sided
+      read on every pair against the measured seed band. I re-ran kit_mlp_readout spread on kit_mlp_ladder.json: Coulomb 90%
+      0.841, Sudakov 0.607, bulk 0.225, 27 pairs; these are MLP seeds, which the design says. The D408 caveat holds: attribution
+      comes only from fine-tune vs fine-tune pairs. Disk is stated: in-memory parents, ~15 MB of pools, run dirs ~0.75 GB
+      against 41 GB free. Check 2: the measure moved on existing runs (beta input vs softpair Coulomb median -0.325; B vs
+      B_bulk deepest bin 2.38 vs 8.71). Caveat: -0.325 falls inside the 0.84 band. An effect that size will read as unresolved,
+      and the outcome covers that case. Matched controls: f21fa163 and 3fc1016a. Only the pools differ between r5 and r5thr
+      (T and lr kept, job_datasaving_parent.sh at 9a023b54), and only the flag between r5thr and r5thrbeta. The input_pair_logs
+      6 vs 4 difference is stated and argued. HETEROSC with the sigma stage; no sweep; ~9.2 GPU-h. Check 5 searched results.tex
+      for log beta, log-uniform in beta, r5thr, threshold pools and pair_threshold (no prior work found), plus the star arms''
+      threshold arm, kit_pretrain_heldout A_ft and r5, all of which prior names, and decisions D405-D412.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
