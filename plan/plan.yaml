@@ -15778,10 +15778,6 @@ entries:
       text proposed 2026-11-10 (shown as a diff)'
     23: 'Wake batching does not cut usage (2.3->4.6 wakes/h; tests/test_run_done_waiter.py::test_quiet_waiter fails; replay
       126->57 at 10 min): find why the batching does not take effect and fix, after the 2026-11-11 19:00 UTC usage reset'
-    24: 'Disk watch (Joaquin 2026-11-11, CC /sps/lpnhe filled to 6 GB with no alarm): alarm on free GB (< 60 GB) not percent;
-      find from its run history why no DISK alert reached the main session yesterday (41 GB free at 05:58 = past 90%); a pre-submission
-      disk check of a batch''s need; after the 19:00 UTC reset, done by the main session itself, no agent; KIT caches 82c4c27b/4f42278d
-      (40 GB) deleted 2026-11-11 -> 39 GB free'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16176,11 +16172,6 @@ entries:
       if:
       - 'fixed: re-measure with tools/wake_batching.py'
       - 'not fixable: revert the change'
-    24:
-      feeds: disk never fills unwarned
-      if:
-      - 'fixed: report the change and the cause'
-      - 'cause not found: say what was read'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
