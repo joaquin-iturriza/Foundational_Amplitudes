@@ -28115,6 +28115,19 @@ entries:
       Caveat: all six runs are at the old HP point that fails the step-15 curve check (NLL separation uug c4fc1d6f 6.60 /
       end_up 3.97, 203a274f 3.59/1.20; tt 0.60-0.81, end_up 0). Figures analysis/kit_benchmark/figs/kit_extrap_logpolylin_ee_uug_me2_{a,b}.png,
       kit_extrap_logpolylin_ee_tt_virt_finite_{a,b}.png.'
+  - at: '2026-11-12T21:47:18+00:00'
+    text: '2026-11-12 ~22:50 @e88e79d7. Step 11c read (one-loop top pairs g g / d d~ > t t~ in the held-out parent; tt virtual
+      A_ft, 1e5, 8000 steps cosine, lr 0.0118605, seed 42; tools/kit_figures.py collect -> analysis/kit_benchmark/data/kit_fig_Aft_thrloop.json,
+      kit_readout --vs; figs analysis/kit_benchmark/figs/kit_mse_Aft_thrloop_ee_tt_virt_finite_{a,b}.png). Both fine-tunes
+      clean (KIT_DONE rc=0): dcf42ad6 (parent r5loop_rerun 2d653209) and e7dca162 (parent r5loopbeta ca5873f3). Per family
+      median log10(arm/control): thrloop vs ft_thr: Coulomb -0.07 (4/4 better), Sudakov +0.23 (1/3), bulk -0.07; deepest Coulomb
+      (beta 1e-4..1e-3) log-MSE 6.87 vs 7.53, exponent -0.05 (truth -1.02). thrloopbeta vs ft_thrbeta: Coulomb +0.12 (0/4),
+      Sudakov +0.29 (0/3), bulk +1.11 (2.56e-9 -> 3.31e-8); deepest 7.94 vs 6.01, exponent +0.02. Scratch softpairthr 3fc1016a
+      deepest 3.55, beside it thrloop +0.31 and thrloopbeta +0.47 Coulomb. By the passed 11c outcome: both pairs NO on Coulomb
+      (within +-0.3), Sudakov none, and the beta pair''s bulk is worse by 1.1 decades (> 0.5: the new pools cost the target).
+      Covering the threshold with one-loop data in pretraining does not transfer the Coulomb rise; the KIT parent keeps r5thr.
+      Caveat: one seed (D315; measured MLP seed spread Coulomb 90% 0.84 decades), runs at the old HP point step 15 replaces;
+      their curve quality not read.'
   step_why:
     5:
       feeds: what KIT receives
