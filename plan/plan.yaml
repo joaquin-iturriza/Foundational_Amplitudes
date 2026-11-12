@@ -25272,6 +25272,19 @@ entries:
       the ladder verdicts on uug when the gate fails. uugg and tt virtual have no numpy run, so no gate there. What still
       stands, read directly rather than through the gate: the MLP with all our choices (''ours'') against our transformer,
       by deepest-bin log-MSE and by median signed error (kit_extrap_read, finding ~07:00).'
+  - at: '2026-11-12T04:27:31+00:00'
+    text: '2026-11-12 ~05:30 (E5774) The no-pre-LayerNorm arm (model.net.layer_norm=false, D411 step 10, job_kit.sh A 1e5
+      8000 steps, lr 1.18605e-2, warmup 1440) does not train: uug FA-ccin2p3-bba9a61e val loss 6.1e11 at step 160 (lr then
+      1.3e-3 in warmup), 8.5 at 320, 4.6e12..1.9e63 from 480, non-finite gradients from ~step 1435, aborted at 1485 (patience
+      50); tt virtual FA-ccin2p3-36a30e0c val 6.6 -> 8.6 over steps 160-640 (rising), 3.9e14 at 960, up to 3.0e22 at 1760,
+      16-23 at 1920-2080 (left running: cancel refused by the permission classifier). So removing the norms alone is not a
+      usable arm at this recipe: the test of D411''s hypothesis needs a norm-free stack that trains. Next (design follows):
+      model.net.layer_norm=rezero (9e63d86f, ReZero arXiv:2003.04887: norms identities, each residual branch times a learned
+      scalar starting at 0, so nothing divides out an input''s size and each block starts as the identity), same recipe, uug
+      and tt virtual, vs c15b3337 / f21fa163. E5769: the r5thrbeta parent smoke failed on require_cache: the 278 physical-mass
+      top 1e4 train pools were overwritten at 02:43 by a catalog regen''s 1e5 pools under the same file name (one cache path
+      per process, window, role); fixed b78715db (entry-level store_tag: own file, recipe id unchanged = 7cd06c31, the id
+      r5 read; test_store_tag), pools prebuilt FA-ccin2p3-1ef21c15 d05aaed9 b57afb9b 18ac9616, re-smoke b6cc4ebb afterok.'
   step_why:
     5:
       feeds: what KIT receives
