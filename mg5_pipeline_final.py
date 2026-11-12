@@ -309,6 +309,11 @@ def register_recipe_processes(specs, default_sampling=None):
         physics = s.get("physics")
         if physics or base != name:
             register_scan_process(name, base, physics or {})
+        if s.get("sqrts_measure"):
+            # an entry's own sqrt(s) measure (identity-bearing through recipe["sqrts_measure"]), e.g. log_beta
+            if name == base:
+                raise ValueError(f"{name}: an entry-level sqrts_measure needs its own name (base: <catalog entry>)")
+            PROCESSES[name]["sqrts_measure"] = s["sqrts_measure"]
         samp = s.get("sampling") or default_sampling
         if samp is not None and name in PROCESSES:
             PROCESSES[name]["sampling"] = dict(samp)
@@ -2936,7 +2941,8 @@ def _beams(sqrts, pdg_ids, beam_mass=None):
     return np.stack([np.stack([E1, z, z, p], 1), np.stack([E2, z, z, -p], 1)], axis=1)
 
 
-def sample_2to2_phase_space(n, sqrts_min, sqrts_max, m_final, pdg_ids, rng=None, cuts=None):
+def sample_2to2_phase_space(n, sqrts_min, sqrts_max, m_final, pdg_ids, rng=None, cuts=None,
+                            sqrts_measure="uniform", beam_mass=None):
     """
     Sample uniform phase space for a 2→2 partonic process with a massless,
     back-to-back initial state (e+e-, gg, qq~, …).
@@ -2949,7 +2955,7 @@ def sample_2to2_phase_space(n, sqrts_min, sqrts_max, m_final, pdg_ids, rng=None,
     which reduces to E3 = E4 = √s/2, |p| = √(E²−m²) when m3 = m4 — so the
     scalar path is unchanged.
 
-    √s ~ U[sqrts_min, sqrts_max]; cos θ, φ uniform over the sphere. Returns a
+    √s ~ U[sqrts_min, sqrts_max] (or as `sqrts_measure`, _sqrts_sampler); cos θ, φ uniform over the sphere. Returns a
     list of (momenta_array, pdg_ids_array) plus the per-event √s array.
 
     Column ordering matches the .npy convention and the NLO .dat files:
@@ -2969,8 +2975,10 @@ def sample_2to2_phase_space(n, sqrts_min, sqrts_max, m_final, pdg_ids, rng=None,
     pdg_arr = np.array(pdg_ids, dtype=int)
     m_finals = [m3, m4]
 
+    sq_draw = _sqrts_sampler(sqrts_min, sqrts_max, sqrts_measure, rng, thr=m3 + m4)
+
     def draw(nb):
-        sqrts  = rng.uniform(sqrts_min, sqrts_max, nb)
+        sqrts  = sq_draw(nb)
         cos_t  = rng.uniform(-1.0, 1.0, nb)
         phi    = rng.uniform(0.0, 2.0 * np.pi, nb)
         s      = sqrts ** 2
@@ -2981,7 +2989,7 @@ def sample_2to2_phase_space(n, sqrts_min, sqrts_max, m_final, pdg_ids, rng=None,
         px = p_mag * sin_t * np.cos(phi)
         py = p_mag * sin_t * np.sin(phi)
         pz = p_mag * cos_t
-        P = np.concatenate([_beams(sqrts, pdg_arr), np.stack([
+        P = np.concatenate([_beams(sqrts, pdg_arr, beam_mass), np.stack([
             np.stack([E3,     px,    py,    pz],     axis=1),    # X
             np.stack([E4,    -px,   -py,   -pz],     axis=1),    # Xbar
         ], axis=1)], axis=1)                                    # (nb, 4, 4): beam-, beam+, X, Xbar
@@ -3089,7 +3097,7 @@ def sample_nbody_phase_space(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, 
     all_zero = np.all(masses == 0.0)
     pdg_arr  = np.array(pdg_ids, dtype=int)
 
-    sq_draw = _sqrts_sampler(sqrts_min, sqrts_max, sqrts_measure, rng)
+    sq_draw = _sqrts_sampler(sqrts_min, sqrts_max, sqrts_measure, rng, thr=float(masses.sum()))
 
     def draw(nb):
         sqrts   = sq_draw(nb)
@@ -3277,9 +3285,11 @@ def default_share_rows(f_default, counts):
     return [(edge[i], edge[i + 1]) for i in range(len(counts))]
 
 
-def _sqrts_sampler(lo, hi, measure, rng):
-    """n -> sqrt(s) draws on [lo, hi]: "uniform" (every catalog up to v3; the same random stream as before) or "log"
-    (log-uniform, catalog_v4)"""
+def _sqrts_sampler(lo, hi, measure, rng, thr=None):
+    """n -> sqrt(s) draws on [lo, hi]: "uniform" (every catalog up to v3; the same random stream as before), "log"
+    (log-uniform, catalog_v4) or "log_beta" (beta = sqrt(1 - thr^2/s) log-uniform between the window's edges,
+    sqrt(s) = thr / sqrt(1 - beta^2), thr the sum of the final masses: a 2->2 equal-mass pair's velocity, kit_benchmark's
+    threshold pools)"""
     lo, hi = float(lo), float(hi)
     if measure in (None, "uniform"):
         return lambda n: rng.uniform(lo, hi, n)
@@ -3288,6 +3298,11 @@ def _sqrts_sampler(lo, hi, measure, rng):
             raise ValueError(f"log-uniform sqrt(s) needs a positive lower edge (got {lo})")
         a, b = np.log(lo), np.log(hi)
         return lambda n: np.exp(rng.uniform(a, b, n))
+    if measure == "log_beta":
+        if not thr or lo <= thr:
+            raise ValueError(f"log-uniform beta needs massive finals and a window above their threshold {thr} (got {lo})")
+        a, b = (np.log(np.sqrt(1.0 - (thr / x) ** 2)) for x in (lo, hi))
+        return lambda n: thr / np.sqrt(1.0 - np.exp(2.0 * rng.uniform(a, b, n)))
     raise ValueError(f"unknown sqrts_measure {measure!r}")
 
 
@@ -4713,9 +4728,6 @@ def build_dataset_variable_energy(n_events, sqrts_min, sqrts_max,
         print(f"[DATA] Saved {n_events:,} events → {output_file}  |M|² ∈ [{w.min():.4e}, {w.max():.4e}]  neg: {(w < 0).sum()}")
         return
 
-    if measure != "uniform" or beam_mass is not None:
-        raise ValueError(f"{config.get('mg5_generate')}: sqrts_measure / beam_masses are implemented on the mixture "
-                         f"path only (catalog_v4's policy)")
     if nfinal == 2:
         # Prefer an explicit (m3, m4) pair for unequal-mass 2→2 (e.g. e+ e- > z h);
         # fall back to the scalar m_final for an equal-mass pair (X X~).
@@ -4723,14 +4735,16 @@ def build_dataset_variable_energy(n_events, sqrts_min, sqrts_max,
         print(f"\n[DATA] Sampling {n_events:,} events  √s ∈ [{sqrts_min}, {sqrts_max}] GeV{cut_msg}")
         print(f"[DATA] m_final = {m_final} GeV   backend = {backend}")
         events, sqrts_arr = sample_2to2_phase_space(
-            n_events, sqrts_min, sqrts_max, m_final, pdg_ids, rng=rng, cuts=cuts
+            n_events, sqrts_min, sqrts_max, m_final, pdg_ids, rng=rng, cuts=cuts,
+            sqrts_measure=measure, beam_mass=beam_mass
         )
     else:
         m_finals = config["m_finals"]
         print(f"\n[DATA] Sampling {n_events:,} events  √s ∈ [{sqrts_min}, {sqrts_max}] GeV{cut_msg}")
         print(f"[DATA] nfinal = {nfinal}  m_finals = {m_finals}  backend = {backend}")
         events, sqrts_arr = sample_nbody_phase_space(
-            n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng=rng, cuts=cuts
+            n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng=rng, cuts=cuts,
+            sqrts_measure=measure, beam_mass=beam_mass
         )
 
     os.makedirs(os.path.dirname(output_file) or ".", exist_ok=True)

@@ -296,6 +296,7 @@ class AmplitudeExperiment(BaseExperiment):
                 "n_test":    int(p["n_test"]),
                 "physics":   physics,
                 "sampling":  p.get("sampling", None),
+                "sqrts_measure": p.get("sqrts_measure", None),     # an entry's own measure (log_beta: kit threshold pools)
                 # monitor process (scored at validation, never trained on; see _monitor_names below)
                 "monitor":   bool(p.get("monitor", False)),
                 # a monitor's train events used in training (default 0): a replay buffer of the old processes, drawn
