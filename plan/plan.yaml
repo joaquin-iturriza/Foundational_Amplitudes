@@ -21542,12 +21542,10 @@ entries:
     blocks_steps: &id002
     - 6
   owner:
-    agent: afc3a7a4d8d0de53b
-    state: closed
-    since: '2026-11-12T15:41:13+00:00'
-    state_at: '2026-11-12T17:17:46.056000+00:00'
-    context: 255066
-    context_at: '2026-11-12T17:17:55+00:00'
+    agent: af9e7383d68f88657
+    state: working
+    since: '2026-11-12T17:35:36+00:00'
+    state_at: '2026-11-12T17:35:36+00:00'
   designs:
   - at: '2026-11-10T02:35:09+00:00'
     question: 'Step 1 (D356 horizons, tree arm): on catalog_v4''s held-out tree targets ee->ttbar (H3, 2->2 massive), ee->ccbar
