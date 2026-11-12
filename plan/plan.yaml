@@ -21379,6 +21379,8 @@ entries:
       test, before any L(D) batch (Joaquin 2026-11-12: ''the tree runs are not fixed at all''; D412)'
     3: 'Draft by 2026-11-13 (D413/D414): a second data-saving example besides ee->uu, both arms well trained by curve_quality.py,
       L(D) figure + S with band; tt kept in the background'
+    4: b b~ > Z Z LO fine-tune searches launched when the held-out parent dsave_parent_heldoutbbzz (FA-ccin2p3-0d698e4b) ends;
+      design PASS 2026-11-12 (revised)
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -25555,6 +25557,11 @@ entries:
       if:
       - 'a target shows S>1 with both arms well trained: its figure goes to Joaquin for the draft'
       - 'none: fix the optimization on the most promising target and redo its L(D) tonight'
+    4:
+      feeds: 'the LO half of D413''s second example (b b~ > Z Z): the fine-tune arm needs its held-out parent'
+      if:
+      - 'parent ends clean: generate and launch the 7 fine-tune searches (and the scratch ones if not yet out)'
+      - 'parent breaks: read its log, fix, resubmit; LO fine-tune arm waits'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
