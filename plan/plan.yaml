@@ -30876,6 +30876,20 @@ entries:
       the bars at the control''s HPs: not a verdict on the input; the arm gets the same single-fidelity search (configs copied
       with input_div_form=true fixed, 8 trials 3/3/2, same chosen-trial rule, ~6.3 GPU-h, within budget) and is judged best
       against best (CLAUDE.md feature rule); only a NO best against best stops the input.'
+    passed_at: '2026-11-12T18:37:10+00:00'
+    reviewer: 'Round 3 (searches plus step-14 div-form arms). Both earlier FIX points are closed: a NO, worse or failing-curve
+      arm gets the same 8-trial search and is judged best against best; each arm''s wall target is its chosen trial''s measured
+      time. Changes on Joaquin''s words: batch fixed at 16384 (the template''s own value), horizon 300 epochs = 1831 steps
+      (D425), uug T and uugg T added (D424). The configs @4d1a213d match the template (8 trials, 3 start-up, waves 3/3/2,
+      t_steps [1831], WSD 0.125, lr window [1.667e-3, 1.5e-2]); job limit 1 h against 0.37-0.5 h per trial. Check 2: curve_quality.json
+      has good and bad trials inside the same searches (ee_uu scr 21/71, epem_ttx 14/70, ee_ttbar_nlo 12/63). kit_extrap.json
+      @7656e687 deepest bins: uug coll log-MSE 17.70 -> 2.24, soft -8.40 -> +5.00, tt Coulomb 3.55 -> 1.72, Sudakov -0.53
+      -> +0.77. Check 3: seed 42 under D315, MLP bands 0.34/0.22 against effects of decades; with a 20-30% good rate, P(no
+      good trial in 8) is about 6-17%, covered by the extend-by-8 branch. Rates are from same-setup controls (batch 16384,
+      float64, 1e5). Cost ~21 GPU-h, under D412''s 30. Disk ~3.2 GB, no cache. Searched: div_form, input_div, divergence form,
+      functional form, eikonal, splitting function, P(z), 1/beta, log^2(s/m, kit_hpo, epochs; none of these inputs or searches
+      has run before. Not checked: no finish time is stated against a deadline (Joaquin gave none for KIT; about 3 waves x
+      0.5 h); the trial readout (val_mse_curve) waits on smoke f81cb1d0, which the searches are gated on.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
