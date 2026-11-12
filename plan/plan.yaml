@@ -23082,7 +23082,6 @@ entries:
   step_waits:
     '2': '2026-11-13'
     '1': 'next owner: site sync, site pick FA --jobs 2 (sites timed out at last pick), submit PIDQN=pid and qn'
-    '3': '2026-11-12'
   handoff:
     state: 'pidqn design PASSED (design-reviewer, second look). Code on branch pid_vs_qn (worktree worktrees/pid_vs_qn: 5541a2ec
       + fix 9ecbae9f). The repo-reviewer (agent a908d9ab432d34127, holds the lock) BLOCKED on a wrong _dimless_mass_stats
