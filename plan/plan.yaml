@@ -15788,12 +15788,6 @@ entries:
       notifications after a hand-back were already absorbed; owner resumes by peer hand-backs cannot be held (Claude Code
       offers no delivery delay, an owner has no waiter). Also confirm the first run of a held item that ends gets its RUN
       event and RUN_DONE with no manual poll (next 19 fix).'
-    25: 'Restore of CC pools deleted 2026-11-11 (design passed 2026-11-12T01:37; batches heldout_train_regen 32, pp4_series_regen
-      32, pp4_parts 2 @0b4bbd63). At 03:00 local: H 684/700 train pools built, PP4 431/504; shard 12 (FA-ccin2p3-0c2d61c6)
-      refused 2 pools by prebuild''s 20 GB free floor (/sps/lpnhe 17 GB free: amp_mmap_cache 26 GB, lhe_parts 15 GB). When
-      the 22 running end: check_site_data --list on the 9 recipes, rerun the shards that refused once disk allows (resumable),
-      then tell optimizations_recap''s owner a87ebdd2344eb92d7 its held-out reads can be redone. dsh_eea (115) waits on its
-      own design (reviewer FIX: rewrite overwrites scored val/test; copy-and-compare or train-only assembly)'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16283,12 +16277,6 @@ entries:
       if:
       - 'saving within or above 11-30% on main per day: keep 10 min'
       - 'below: report to Joaquin with numbers and causes'
-    25:
-      feeds: whether the held-out reads (optimizations_recap, PP4/H axes) can run again on CC
-      if:
-      - '0 pools missing: tell a87ebdd2344eb92d7 the reads can be redone'
-      - 'pools still missing (disk floor or a failed build): rerun those shards when free space allows, or report to the main
-        session the disk call'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
