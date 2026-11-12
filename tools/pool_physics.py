@@ -934,9 +934,7 @@ def main(argv=None):
     for f in a.probes:
         doc = yaml.safe_load(open(f))
         procs = doc.get("processes", doc) if isinstance(doc, dict) else doc
-        mg.register_recipe_processes([{"name": p["name"], "base": p.get("base", p["name"]), "physics": p.get("physics")}
-                                      for p in procs],
-                                     default_sampling=recipe_sampling(doc))
+        mg.register_recipe_processes(procs, default_sampling=recipe_sampling(doc))   # whole entries (E5849)
         for p in procs:
             name = p["name"]
             if name in DROPPED:

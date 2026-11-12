@@ -112,8 +112,7 @@ names = NAMES
 specs = {}
 for f in %(stages)r:
     s = yaml.safe_load(open(os.path.join("recipes", f)))
-    mg.register_recipe_processes([{"name": p["name"], "base": p.get("base", p["name"]), "physics": p.get("physics"),
-                                   "sampling": p.get("sampling")} for p in s["processes"] if p["name"] in names],
+    mg.register_recipe_processes([p for p in s["processes"] if p["name"] in names],   # whole entries (E5849)
                                  default_sampling=s.get("sampling"))
     for p in s["processes"]:
         specs[p["name"]] = p
@@ -233,8 +232,7 @@ def _ids(path, strip_default=False):
     import datagen
     spec = yaml.safe_load(open(path)); had = set(hadronic()); out = {}
     procs = [p for p in spec["processes"] if p["name"] in had]
-    mg.register_recipe_processes([{"name": p["name"], "base": p.get("base", p["name"]), "physics": p.get("physics"),
-                                   "sampling": p.get("sampling")} for p in procs], default_sampling=spec.get("sampling"))
+    mg.register_recipe_processes(procs, default_sampling=spec.get("sampling"))   # whole entries (E5849)
     for p in procs:
         if strip_default:
             s = dict(mg.PROCESSES[p["name"]]["sampling"]); s.pop("f_default", None); s.pop("default_source", None)

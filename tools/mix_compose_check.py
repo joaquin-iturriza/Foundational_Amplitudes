@@ -60,9 +60,7 @@ def timing(name, lo, hi, n, role, seed):
 def split_check(a):
     import glob, shutil, tempfile
     spec = yaml.safe_load(open(a.recipe))
-    mg.register_recipe_processes([{"name": p["name"], "base": p.get("base", p["name"]), "physics": p.get("physics"),
-                                   "sampling": p.get("sampling")} for p in spec["processes"]],
-                                 default_sampling=spec.get("sampling"))
+    mg.register_recipe_processes(spec["processes"], default_sampling=spec.get("sampling"))   # whole entries (E5849)
     ents = spec["processes"] if a.names == ["all"] else [p for p in spec["processes"] if p["name"] in a.names]
     cpus = sorted(os.sched_getaffinity(0))[:a.split]
     for role in a.roles:
@@ -100,9 +98,7 @@ def main():
     if a.split:
         return split_check(a)
     spec = yaml.safe_load(open(a.recipe))
-    mg.register_recipe_processes([{"name": p["name"], "base": p.get("base", p["name"]), "physics": p.get("physics"),
-                                   "sampling": p.get("sampling")} for p in spec["processes"]],
-                                 default_sampling=spec.get("sampling"))
+    mg.register_recipe_processes(spec["processes"], default_sampling=spec.get("sampling"))   # whole entries (E5849)
     ent = {p["name"]: p for p in spec["processes"]}
     for name in a.names:
         p = ent[name]; lo, hi = map(float, p["sqrts"]); k = int(mg.PROCESSES[name]["nfinal"]) + 2
