@@ -21503,7 +21503,7 @@ entries:
     decision: D407
   owner:
     agent: abfb986f647252d8e
-    state: working
+    state: closed
     since: '2026-11-12T09:42:02+00:00'
     state_at: '2026-11-12T10:08:28.033000+00:00'
     context: 218779
@@ -24573,27 +24573,32 @@ entries:
     start: '2026-11-12T09:56:17+00:00'
     at: '2026-11-12T09:56:17+00:00'
   handoff:
-    state: 'PRIORITY is step 3 (Joaquin ~10:30: none of the runs are well optimized; why does the fine-tune HPO fail). Not
-      started beyond one read: in trial_overfit.json at T=8500, t t~ and u u~, the val minimum sits at a median 0.91-0.98
-      of the run in both fine-tune and scratch trials (fraction with the minimum before 40% of the run: ft LO 0.05, ft V 0.25,
-      scratch LO 0.00, scratch V 0.15), so ''min at step 2000-3000'' is a V fine-tune minority, not the rule; the other checks
-      (lr window/centre under Muon, warmup, the 8 sampled trials and objective, layer_decay, restart without optimizer state)
-      are open. Suspects batch read (finding 2026-11-12, suspects_readout.py @8e8bb7d1, data e5a05de9, figs suspects_LD, suspects_curves_*):
-      no recipe knob FIXES; V/B WSD 0.51 (4/4 below 1). Null-parent 2x2 (design PASS 08:59, third version; earlier two FIXed
-      = dead end): smokes c69dfb51/00dc7d42 clean (SHRINK_PERTURB lambda=0.0 gamma=1.0 in both, head map on tree, not on V/B),
-      16 runs submitted ~10:15 (data/nullparent_runs.json @326ae83e), step 2 waits on them; Joaquin''s message says interpret
-      them only after step 3 (a test on badly optimized runs cannot separate parent from setup). Readout for them: adapt suspects_readout.py
-      (arms null/pre against scratch best, the design''s partition A-E).'
-    decisions: 'D411/D412: tests under 30 GPU-h, no questions. Two diverged suspects runs listed apart, not resubmitted (deterministic).
-      Null-parent design E branch = report and stop (D315 one seed). Repo-reviewer findings fixed: (1)(2) bcd8350f, (3) 8e8bb7d1
-      (old_vs_new divisor = the old runs'' prepd_std by their files-path code at accef58a; figure unchanged); the re-check
-      message was sent to the reviewer holding the lock (a38eab2e7dafcdb5f), verdict not seen by this owner.'
-    ruled_out: 'As before, plus: lr x1/3, x1/10, WSD, AdamW, mu-only MSE as single fixes of the fine-tune recipe (suspects
-      batch); a second seed for the null-parent test (D315).'
-    running: 16 null-parent runs (step 2), ids in analysis/data_saving/data/nullparent_runs.json
-    files: analysis/data_saving/{suspects_readout.py,submit_suspects.py,submit_nullparent.py,old_vs_new.py,trial_overfit.py},
-      data/{suspects_readout.json,suspects_runs.json,nullparent_runs.json,trial_overfit.json}, figs/suspects_*
-    written: '2026-11-12T09:31:02+00:00'
+    state: 'Step 3 (why the fine-tune HPO fails; Joaquin 2026-11-12 ~10:30) diagnosed: ft_hpo_diag.py @7baf7573 (objective
+      pick correct; t t~ fine-tune searches flat, bests 2.4-19x tree / 8-33x V/B above scratch; tree memorises, V/B under-fits
+      train). Null-parent 2x2 read, all 16 runs (nullparent_readout.py, data @10a63eea): parent weights at scratch''s HPs
+      (layer_decay 1, scratch lr) = scratch on tree (1.08, 2.36, 0.86, 3.28x; 0.05-0.19x the old fine-tune best at D<=3162),
+      so the tree deficit was the fine-tune template; V/B stays 9-122x scratch. Template fix gen_data_saving --ft-space scratch
+      (layer_decay 1, lr_scale [1/3,3]) @fe43003f; test design PASSED (second version, after one FIX): 5 searches x 8 trials,
+      configs sweep/sweep_config_dsave_s4_ft_{epem_ttx_d5,d7,ee_ttbar_nlo_d5,d6,d7}_t8500.yaml @10a63eea, target 1.3 h / 40
+      jobs, ~11 GPU-h. First driver''s trials all failed (CC not synced: the driver''s start-up sync is refused by any local
+      untracked file, e.g. .claude/.compact_checked); CC synced by hand to fa7cb1b2, driver restarted with --retry-lost --retry-failed
+      ''.*'' (detach s4_ft_template3). Next on its DONE: run analysis/data_saving/s4_readout.py, apply the design''s partition
+      per target (FIXED / IMPROVED NOT RESOLVED / NO CHANGE / WORSE), figure s4_curves_<target>; on tree FIXED: make --ft-space
+      scratch the default, send Joaquin the diff of HPO rule 4 (fa-sweeps-and-hpo) and the canonical-setup fine-tune row,
+      cost the L(D) fine-tune redo; on V/B NO CHANGE: design a path bisect on V/B (parent momentum/off-shellness stats to
+      own).'
+    decisions: 'Step 2 dropped: null-parent read done (finding 2026-11-12). Test cells: tree D=316, 3162; V/B D=316, 1e3,
+      3162 (reviewer FIX added V/B D=316 and an IMPROVED branch). D411/D412: under 30 GPU-h, no questions. Old repo-reviewer
+      backlog passed (watermark 9345563c), its nits fixed.'
+    ruled_out: 'As before, plus: the HPO objective pick (always the lowest-val trial); more trials or a different lr window
+      inside the old LLRD template (searches flat across lr_scale 0.12-7.4, layer_decay 0.76-1); the fresh-init arm''s B PATH
+      verdict is not trusted as is (shrink_perturb fresh init is not scratch''s muP init).'
+    running: drive.py detach s4_ft_template3 (pid 3312356) over the 5 dsave_s4_ft_* searches on CC; earlier drivers s4_ft_template/s4_ft_template2
+      killed (their DONE events are routine).
+    files: analysis/data_saving/{ft_hpo_diag.py,nullparent_readout.py,s4_readout.py,submit_nullparent.py,suspects_readout.py},
+      data/{ft_hpo_diag.json,nullparent_readout.json,nullparent_runs_read.json}, figs/{ft_hpo_diag_*,nullparent_LD,nullparent_curves_*},
+      sweep/gen_data_saving.py, sweep/sweep_config_dsave_s4_ft_*_t8500.yaml
+    written: '2026-11-12T10:11:07+00:00'
   step_why:
     3:
       feeds: whether fine-tuning saves data on tt once both arms are properly optimized (D408)
