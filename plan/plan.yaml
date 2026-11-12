@@ -22853,6 +22853,13 @@ entries:
       val (0.60 test), D=1e4 11.6 above the spread. kit_benchmark candidate input for the one-loop t t~ cells: log beta^2
       pair input (model.input_pair_threshold) passed on KIT t t~ V (Coulomb -0.33 dec, Sudakov -0.59, bulk -0.78; scratch
       1e5, one seed), failed on the t t~ Born (Coulomb +3.2 dec); changes nothing in stage A or B''s passed designs.'
+  - at: '2026-11-12T00:13:01+00:00'
+    text: '2026-11-12 t t~ V D=1e4 val/test disagreement (event_share.py; commit pending on the notes-editor pass): one val
+      event, pool row 4523 (V/B 47.85, quantile 0.71 of the val pool), carries 98% of the r5 fine-tune''s val MSE (FA-ccin2p3-adbd0552;
+      pred 44.54); it is the worst val event in 10 of 16 t t~ V runs (all arms). Without each run''s worst event r5/r4 reads
+      0.39, 1.11, 1.62, 0.22 on val (geomean 0.63, was 1.92) and 0.36, 1.98, 1.86, 0.04 on test (0.49): within the 0.46-4.84
+      rerun spread, so the tops neither help nor hurt t t~ V. Fig analysis/data_saving/figs/event_share.png. Repo-reviewer
+      PASS (watermark cd7d4667) after guards in event_share.py and diag_readout.py.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
