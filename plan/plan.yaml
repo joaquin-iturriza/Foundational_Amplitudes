@@ -26129,10 +26129,13 @@ entries:
       on uug+uugg softpair 1e5 vs c15b3337/c364a7ae, G ~4 (uug bulk_train gamma median 1.25, q90 1.65, max 10.2; collinear
       overshoot starts at gamma ~4), own design+review+D395 smoke; (iii) tt high sqrt(s): lightlike-tops guess, eval-only
       first; (iv) step 11 continues'
-    13: 'Log-skip follow-up (finding 2026-11-12 ~19:00, PARTIAL): the skip fixed tt Coulomb (log-MSE 3.55 -> 1.72, exponent
-      -0.55) but overshoots uug soft (+5.00, exponent -3.20 vs -2) and flips tt Sudakov to +0.77: the quadratic term continues
-      past the truth. Next: a linear-only variant (a small wrappers._log_skip switch for the quadratic term + test) on the
-      same pairs (uug plain 203a274f, tt softpairthr 3fc1016a), own design + review + D395 smoke'
+    13: 'Log-invariant polynomial term, linear only (finding 2026-11-12 ~19:00 PARTIAL for degree 2: mu += sum_{i<j} [c1_ij
+      L_ij + c2_ij L_ij^2] + sum_i [b1_i M_i + b2_i M_i^2], L_ij = log(2 p_i.p_j/s)/5, M_i = log(m_i^2/s)/5, coefficients
+      learned from the particle types; it fixed tt Coulomb (log-MSE 3.55 -> 1.72, exponent -0.55) but overshoots uug soft
+      (+5.00, exponent -3.20 vs -2) and flips tt Sudakov to +0.77, the L^2 term continuing past the truth). Running: the degree-1
+      term (c2 = b2 = 0, model.input_log_skip_linear @7b4f8bd9) on uug plain target FA-ccin2p3-c4fc1d6f vs 203a274f and tt
+      softpairthr FA-ccin2p3-6bc05a40 vs 3fc1016a, after smoke acddacca; read with kit_extrap_read (figure set logpolylin_),
+      kit_figures collect + kit_readout --vs'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -27020,11 +27023,13 @@ entries:
       - 'a test fixes its spot within the MLP bands: it goes into the KIT models'
       - 'none fixes: the KIT answer is the comparison against all of Bakar''s plots with the weak spots stated'
     13:
-      feeds: whether a general divergence readout is the KIT fix with full LLoCa (D419)
+      feeds: whether a learned polynomial in the logs of the pair invariants and mass ratios, added to the network's output,
+        is the KIT fix for extrapolating into the limits with full LLoCa (D419)
       if:
-      - 'linear-only keeps Coulomb and removes the overshoots: it goes into the KIT models, combined with frames_gamma_max
+      - 'the linear term keeps the Coulomb gain and removes the overshoots: it goes into the KIT models, combined with frames_gamma_max
         if 12(ii) says YES'
-      - 'it loses Coulomb or keeps the overshoot: the readout is not the lever; the skip stays a tt-Coulomb-only option'
+      - 'it loses Coulomb or keeps the overshoots: the output term is not the lever; the degree-2 term stays a tt-Coulomb-only
+        option'
   step_waits:
     '11': FA-ccin2p3-cb111375 FA-ccin2p3-e7dca162 (11c A_ft fine-tunes; chain smoke af3c9ca5 -> parents 066f8539 r5loop, ca5873f3
       r5loopbeta -> these; first chain died on missing diagram sidecars, fixed); then threshold scan
