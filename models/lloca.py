@@ -99,6 +99,7 @@ class LLOCAMuPTransformer(nn.Module):
         dropout_prob: float = 0.0,
         freeze_framesnet: bool = False,
         checkpoint_blocks: bool = False,
+        layer_norm: bool = True,
         parametrization: str = "mup",
         detach_sigma_backbone: bool = False,
         sigma_after_pool: bool = True,
@@ -222,6 +223,13 @@ class LLOCAMuPTransformer(nn.Module):
                         t[:k].copy_(r[:k])
                         t[k + 1:].copy_(r[k:])
             del ref
+        if not layer_norm:
+            # model.net.layer_norm=false: the blocks' pre-norms become identities (kit_benchmark: does normalisation
+            # stop the transformer extrapolating its out-of-range log inputs, as a ReLU MLP does?)
+            from models.transformer_lloca_mup import BaselineTransformerBlock
+            for m in self.net.modules():
+                if isinstance(m, BaselineTransformerBlock):
+                    m.norm1, m.norm2 = nn.Identity(), nn.Identity()
 
     def forward(
         self,
