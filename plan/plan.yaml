@@ -26174,6 +26174,19 @@ entries:
       the next lever is the target side (V x beta, step 6, already a diagnostic only per Joaquin) and one-loop top pairs log-uniform
       in beta, each designed then. Threshold scan of the three arms launched detached (thrscan_d405; collect writes to /tmp
       on CC, only CLAIM lines come home). Fig analysis/kit_benchmark/figs/aft_thr/kit_mse_ee_tt_virt_finite_{a,b}.png (+ _legend).'
+  - at: '2026-11-12T13:09:21+00:00'
+    text: '2026-11-12 ~14:40 @2ac85502. Step 9 threshold scan of the D405 fine-tunes (tools/kit_threshold_scan.py predict+collect
+      on CC login CPU; first try E6030 died on site run''s 120 s default ssh timeout, rerun with site --timeout; analysis/kit_benchmark/data/kit_threshold_scan.json,
+      the earlier surrogates'' sigma_v identical). sigma_NLO^surr/sigma_NLO - 1 (surrogate V integrated over the scan''s phase
+      space, exact Born and exact NLO from MG5_aMC above beta~0.011, analytic below) at beta 1e-3 / 1e-2 / 5e-2 / 0.094: scratch
+      softpair f21fa163 -0.989 / -0.893 / -0.499 / -0.231; ft_r5 -0.990 / -0.902 / -0.550 / -0.263; ft_thr (r5 + LO threshold
+      tops) -0.990 / -0.906 / -0.554 / -0.258; ft_thrbeta -0.986 / -0.889 / -0.463 / -0.159; scratch softpairthr 3fc1016a
+      -0.962 / -0.750 / -0.394 / -0.181. Smallest beta above which |ratio| < 10%: 0.142 for all but ft_thrbeta 0.115. Reading:
+      no fine-tune reproduces the Coulomb part of sigma_NLO near threshold (all miss ~99% of sigma_NLO at beta 1e-3, as the
+      scratch models); the per-bin read (Coulomb NO on all three) holds at the cross-section level; the beta input (scratch
+      or fine-tuned) helps only at beta >~ 0.05. Fig analysis/kit_benchmark/figs/kit_threshold_scan_d405.png (+ _legend).
+      Also fixed: the scan figure zipped surrogates with six colours and silently dropped the seventh; now --runs picks them
+      and an assert refuses more than six.'
   step_why:
     5:
       feeds: what KIT receives
