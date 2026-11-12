@@ -25287,6 +25287,7 @@ entries:
     '5': FA-ccin2p3-538eeb1e
     '6': FA-ccin2p3-d277f7f5 FA-ccin2p3-7a63ea88 FA-ccin2p3-1df8bd16
     '8': FA-ccin2p3-f26d0458
+    '10': FA-ccin2p3-8fa85b40 FA-ccin2p3-cd01787c
   handoff:
     state: 'Redraw check done: reference line labelled ''truth clipped to / training range'' (two lines; the previous three-line
       label stretched the y-axes, fccb1ec5), shown only where nonzero (only tt Born beta panels drop it), per-panel legends;
