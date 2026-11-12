@@ -24247,6 +24247,18 @@ entries:
       +0.161 0/3 (15-50 TeV 0.227 -> 7.51), bulk -0.689 (1.48e-9 -> 3.02e-10): NO for Born (two families worse); the Born
       threshold model stays softpair. One seed (D315). Next lever for the Coulomb rise per the design: the target side (dividing
       out the Sommerfeld factor), to be designed.'
+  - at: '2026-11-12T01:06:11+00:00'
+    text: 'Package v2 gate (FA-ccin2p3-6f94590d, CPU default threads, 200 events per stratum, vs the GPU event-frame re-score)
+      and the 32-thread check (2d0c78fe). (a) tt Born softpair (5515dc85) still depends on the scored pool after the event-frame
+      fix: subset vs whole file 0.29 decades (Sudakov 0.22-0.29, bulk and threshold 1.9e-4..2.9e-4), the same size as before
+      the fix, and its whole-file scores moved only <=0.006 decades under the fix: so this model''s pool dependence is not
+      the augmentation; uugg softpair''s was (8.3e-2 -> 1.5e-6). Something else keyed on the scored pool reaches this model
+      (it has offshell on + soft rescale + pair logs on massive legs); not found. (b) CPU thread count: the Lorentz-invariant
+      tt virtual models give deltas 4.4e-5..3.8e-4 at OMP_NUM_THREADS=32 (and with threads unset on the login node and node
+      ccwslurm0350), exactly 0 at 1 or 4 threads, unset on ccwslurm0151, and on GPU: deterministic, thread-count dependent,
+      cause not found. (c) Rounding: Born B offon 3.6e-8, uugg softpair 1.5e-6 in the deepest collinear bin (CPU vs GPU).
+      Package v2 is built (runs/kit/kit_package_v2.tar.gz) but not to be sent until (a) is fixed and (b) is fixed or pinned
+      (OMP_NUM_THREADS in the README) and the limit for (c) stated.'
   step_why:
     5:
       feeds: what KIT receives
