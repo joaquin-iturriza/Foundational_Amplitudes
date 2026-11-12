@@ -24370,8 +24370,6 @@ entries:
   decisions:
   - D364
   next:
-    1: 'pidqn: submit the one-hot PID arm and its same-commit quantum-number control on the 1x width-8 catalog_v4 cell (PIDQN=pid|qn)
-      once the design reviewer passes; read R per class on PP4/EE4 and the held-out reads'
     2: 'muon_1e4: the AdamW-parent arm of the pretrain_data_saving grid (same held-out targets, D grid, per-D horizons to
       MSE 1e-4, fine-tune protocol): an AdamW pretraining of the data-saving parent''s setup at AdamW''s own searched HPs,
       fine-tuned on every cell; its curves beside the Muon parent''s and scratch; design once pretrain_data_saving has its
@@ -24713,11 +24711,6 @@ entries:
       plan show optimizations_recap and pretrain_data_saving, site decisions (D144-D160, D236, D292, D315, D356, D364, D373,
       D392, D395); no earlier long AdamW run on catalog_v4 found.'
   step_why:
-    1:
-      feeds: D364 claim that pIDs and quantum numbers behave the same, on the latest setup
-      if:
-      - 'R inside [0.80,1.26] on PP4/EE4: the paper keeps the claim with the new numbers'
-      - 'R outside: the paper reports which encoding wins and by how much'
     2:
       feeds: 'D364: does the Muon pretraining transfer better down to MSE 1e-4'
       if:
@@ -24744,7 +24737,6 @@ entries:
     at: '2026-11-12T03:17:01+00:00'
   step_waits:
     '2': step 3's AdamW long run (designed after its read, per the hand-off)
-    '1': FA-ccin2p3-1805e04b FA-ccin2p3-65103811
     '3': FA-ccin2p3-f08e90e8
   handoff:
     state: 'Design of 2026-11-12 PASSED (design-reviewer, second look) for two parts. (B) pidqn: one-hot PIDs vs quantum numbers
