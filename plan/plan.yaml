@@ -24416,8 +24416,7 @@ entries:
       caveat, not blocking the batch: stage2_readout.py fits only ''test'' (MSE(V/B) for the loops) and ''val_ln'' (line 181).
       The test_ln fit must be added along with the TARGETS entries (line 39, dstar_fit.py line 92) before S is read.'
   step_waits:
-    '2': the detached driver muonly_mse_test (6 searches dsave_muonlymse_{scr,ft}_{epem_ttx_d7,ee_uu_nlo_d7,ee_uu_nlo_d8}_t8500,
-      CC, 48 trials)
+    '2': 'detached drivers muonly_mse_test and bbx_zz_v_LD; step 3''s LO arm: the next owner''s design'
     '3': the detached driver muonly_mse_test (6 searches dsave_muonlymse_{scr,ft}_{epem_ttx_d7,ee_uu_nlo_d7,ee_uu_nlo_d8}_t8500,
       CC, 48 trials)
   findings:
