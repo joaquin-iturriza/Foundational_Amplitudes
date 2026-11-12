@@ -27592,6 +27592,21 @@ entries:
       borderline on the 0.55 bar; at 9e5 uug passes (0.60/0.00), uugg nearly (1.84/0.25). Reading: the late separation is
       a uug/uugg at 1e5 events failure at this lr and HP point; tt holds. Next (D422): single-fidelity DyHPO over the template''s
       space on the step-14 setups.'
+  - at: '2026-11-12T18:19:22+00:00'
+    text: '2026-11-12 ~20:20. State: step 15 design PASS (2nd round; configs @631d6f72: template space + batch int_log [1562,16384],
+      WSD cooldown 0.125 per D423, 8 trials 3/3/2 each, uug plain on 203a274f''s config, tt virtual on 3fc1016a''s). Smoke
+      (D395) via sweep/drive.py detached (detach:kit_hpo_smoke), trial FA-ccin2p3-f81cb1d0 pending; a first classic-path smoke
+      was cancelled before it started (classic sweeps wake no owner). On its DONE: check runs/kit_hpo_smoke/trial_* result
+      json has val_mse_curve and train_eval_mse_curve, then detach drive.py --config both searches --item kit_benchmark --sites
+      ccin2p3 --mem 32G --cpus 4 --hours 2.75; read with tools/kit_curves.py sweep @ffd40c13. Step 14 code: model.input_div_form
+      @6cdec219 (wrappers._div_form_inputs, tests/test_input_reps.py::test_div_form, 11 tests pass); design waits on step
+      15''s chosen trials (arms at their HPs, the trial = control, kit_predict REREAD on it). Step 12(ii) gamma<=4 read (kit_extrap.json
+      + kit_fig_A_gmax4_{uug,uugg}.json @ef89a077; figs kit_extrap_gmax4_*): uug deepest collinear +1.36/2.21 -> -0.84/1.84
+      (overshoot flipped to undershoot below y 1e-5), collinear family +0.33 (4 of 5 strata worse, 1e-5 bin 0.23 -> 1.24),
+      soft -0.31 (5/5 better, deepest -0.28 -> -0.04), bulk 1.09e-4 -> 4.28e-4 (+0.59 decades): WORSE by the design''s bulk
+      band. uugg: coll_qg family +0.08 (deepest -1.36/3.56 -> -1.11/1.79), coll_gg -0.08, azimuth -0.16, soft -0.09, bulk
+      +0.12: coll_qg within +-0.3, NO pending the frames probe (detach:kit_gmax4_probes). Both gmax4 runs fail the step-15
+      curve bars on NLL (separation 161 / 376 nats), so this read is at the HP point step 15 is replacing.'
   step_why:
     5:
       feeds: what KIT receives
