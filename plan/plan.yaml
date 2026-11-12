@@ -28143,7 +28143,9 @@ entries:
   step_waits:
     '5': FA-ccin2p3-dcf42ad6 FA-ccin2p3-e7dca162 (the A_ft batch of step 11c)
     '15': detach:kit_hpo (sweeps kit_hpo_uug_plain, kit_hpo_ttvirt_thr)
-    '14': FA-ccin2p3-8c1223c0 FA-ccin2p3-f45f434a
+    '14': FA-ccin2p3-7aff4018 (uug div-form 50-step check, rerun with ++training.wsd_cooldown_frac); the tt check is submitted
+      on that wake (refused at 22:43 by the 60-min GPU-h gate, which still counts the kit_hpo trials cancelled on CC at 22:18
+      local)
     '16': detach:kit_hpo (sweeps kit_hpo_uug_T, kit_hpo_uugg_T)
   handoff:
     state: '2026-11-12 ~22:35 @68ccb875. Closed at the context limit. (1) Steps 15+16, kit_hpo driver: one detached sweep/drive.py
