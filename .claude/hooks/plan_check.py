@@ -350,10 +350,11 @@ def stop_conditions(inp, refused):
     return bad, notes
 
 
-TABLE_MSG = ("PLAN CHECK: a table of results went to Joaquin without its figure (CLAUDE.md: a result reaches me with a "
-             "figure of the compared quantities). Who acts: the entry's owner draws it with a committed tool "
-             "(SendMessage it the numbers' question); you send the file it returns (SendUserFile), never a figure of "
-             "your own. Until then end the turn on a message without the table.")
+TABLE_MSG = ("PLAN CHECK: a table of measured results went to Joaquin (Joaquin 2026-11-12: \"I don't want tables I need "
+             "plots\"). A result goes as its plot, with a caption saying what it shows and at most one or two numbers in a "
+             "sentence; a figure sent beside the table does not make the table pass. Who acts: the entry's owner draws "
+             "it with a committed tool (SendMessage it the question); you send the file it returns (SendUserFile). "
+             "Rewrite the message without the table.")
 _ROW, _SEP = re.compile(r"^\s*\|.*\|\s*$"), re.compile(r"^\s*\|[\s:|-]+\|\s*$")
 # a measured quantity opens its cell: a decimal, a power of ten, or a number with a unit or ratio (0.25, 1.5e-3, 3×10⁻⁷,
 # 12%, 72 s, 254M, 120×, about 0.8); bare counts ("18", "0 / 34", "20 of 200"), clock times and prose cells that
@@ -383,27 +384,26 @@ def _tool_uses(turn, name=None):
                 yield b
 
 
-def result_table_without_figure(inp):
-    """[TABLE_MSG] when the main session's last message of the turn has a markdown table of results (a body cell
-    opening with a measured quantity, _RESULT) and the turn made no SendUserFile call of a .png or .pdf; else []."""
-    turn, last = _turn(inp)
-    lines = last.splitlines()
-    table = False
+def _has_result_table(text):
+    """A markdown table with a body cell opening with a measured quantity (_RESULT)."""
+    lines = text.splitlines()
     for i in range(len(lines) - 1):
         if _ROW.match(lines[i]) and _SEP.match(lines[i + 1]):
             for l in lines[i + 2:]:
                 if not _ROW.match(l):
                     break
                 if any(_RESULT.match(c.strip()) for c in l.strip().strip("|").split("|")):
-                    table = True
-            if table:
-                break
-    if not table:
-        return []
-    for b in _tool_uses(turn, "SendUserFile"):
-        if re.search(r"\.(png|pdf)\b", json.dumps(b.get("input") or {}), re.I):
-            return []
-    return [TABLE_MSG]
+                    return True
+    return False
+
+
+def result_table(inp):
+    """[TABLE_MSG] when any text the main session wrote this turn has a markdown table of measured results, whatever
+    figure went with it (2026-11-12: tables sent as the body with the figures attached); else []."""
+    turn, last = _turn(inp)
+    texts = [b.get("text") or "" for r in turn if r.get("type") == "assistant"
+             for b in ((r.get("message") or {}).get("content") or []) if isinstance(b, dict) and b.get("type") == "text"]
+    return [TABLE_MSG] if any(_has_result_table(t) for t in texts + [last]) else []
 
 
 LOG_KINDS = ("RUN", "GAP", "OVERRUN")      # events whose fix starts with reading a run's log
@@ -539,7 +539,7 @@ def main():
         more, notes = stop_conditions(inp, bad)
         bad += more
         if main_session:
-            bad += result_table_without_figure(inp)
+            bad += result_table(inp)
             bad += bare_acks(inp)
         plan.NOTES.extend(notes)
         if OPENER_STATE:

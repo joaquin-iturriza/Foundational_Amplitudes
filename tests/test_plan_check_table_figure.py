@@ -1,4 +1,5 @@
-"""plan_check refuses a Stop whose last message has a numeric markdown table and no SendUserFile png/pdf in the turn.
+"""plan_check refuses a Stop whose turn has a markdown table of measured results, with or without a figure
+(Joaquin 2026-11-12: "I don't want tables I need plots"); bookkeeping tables pass.
 
     .venv-cpu/bin/python tests/test_plan_check_table_figure.py
 """
@@ -20,7 +21,7 @@ def check(text, tools=()):
     recs.append({"type": "assistant", "message": {"content": [{"type": "text", "text": text}]}})
     p = os.path.join(tempfile.mkdtemp(), "t.jsonl")
     open(p, "w").write("\n".join(json.dumps(r) for r in recs) + "\n")
-    return plan_check.result_table_without_figure({"transcript_path": p})
+    return plan_check.result_table({"transcript_path": p})
 
 
 def test_table_without_figure_refused():
@@ -28,9 +29,42 @@ def test_table_without_figure_refused():
     assert check(TABLE, [("SendUserFile", {"file_path": "/x/notes.txt"})]) == [plan_check.TABLE_MSG]
 
 
-def test_table_with_png_passes():
-    assert check(TABLE, [("SendUserFile", {"file_path": "/x/fig.png"})]) == []
-    assert check(TABLE, [("SendUserFile", {"file_path": "/x/fig.pdf"})]) == []
+def test_table_with_png_refused():
+    assert check(TABLE, [("SendUserFile", {"file_path": "/x/fig.png"})]) == [plan_check.TABLE_MSG]
+    assert check(TABLE, [("SendUserFile", {"file_path": "/x/fig.pdf"})]) == [plan_check.TABLE_MSG]
+
+
+def test_table_earlier_in_turn_refused():
+    """A table in an earlier text block of the turn reached Joaquin too, even when the last block is plain."""
+    recs = [{"type": "user", "uuid": "u1", "message": {"content": "go"}},
+            {"type": "assistant", "message": {"content": [{"type": "text", "text": TABLE}]}},
+            {"type": "assistant", "message": {"content": [{"type": "text", "text": "Joaquin, the plot is above."}]}}]
+    p = os.path.join(tempfile.mkdtemp(), "t.jsonl")
+    open(p, "w").write("\n".join(json.dumps(r) for r in recs) + "\n")
+    assert plan_check.result_table({"transcript_path": p}) == [plan_check.TABLE_MSG]
+
+
+# the cell shapes of the main session's last six result tables up to 2026-11-12 00:25 UTC (21:41, 22:07, 22:49, 23:45,
+# 00:01, 00:25), each sent with figures: interval, raised-dot power of ten, signed decimal, a decimal behind a count
+REAL = ("| target | median [10%, 90%] | best |\n|---|---|---|\n| uū LO | 3.8 [2.7, 4.8] | 3.5 |\n",
+        "| setup | MSE |\n|---|---|\n| tt̄ virtual from scratch, 10⁵ events | 1.6·10⁻⁴ |\n",
+        "| bin | median against control |\n|---|---|\n| high-energy | +0.995 |\n",
+        "| D | r5/r4 val | r5/r4 test |\n|---|---|---|\n| 316 | 1.89 | 1.70 |\n",
+        "| arm | slope | MSE |\n|---|---|---|\n| Hard points added | −0.90 | 0.012 (within ±4% from there) |\n")
+
+
+def test_replay_20261112():
+    """Each real table shape is refused with a figure sent in the same turn. With TABLE_REPLAY=<json list of
+    {ts, text}> (the six messages extracted from the main session's transcript, kept out of the repo) they are
+    replayed whole."""
+    for t in REAL:
+        assert check("Joaquin, result:\n\n" + t, [("SendUserFile", {"file_path": "/x/fig.png"})]) == \
+            [plan_check.TABLE_MSG], t
+    if os.environ.get("TABLE_REPLAY"):
+        msgs = json.load(open(os.environ["TABLE_REPLAY"]))
+        for m in msgs:
+            assert check(m["text"], [("SendUserFile", {"file_path": "/x/fig.png"})]) == [plan_check.TABLE_MSG], m["ts"]
+        print("replayed %d real messages, all refused" % len(msgs))
 
 
 # the four tables the gate refused on 2026-11-11 (main session 14:43, 15:09, 15:08 and the 19:03 audit): bookkeeping
