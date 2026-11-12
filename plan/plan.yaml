@@ -21439,7 +21439,7 @@ entries:
     decision: D407
   owner:
     agent: a357b4c1d8b2d16bc
-    state: working
+    state: closed
     since: '2026-11-12T02:30:35+00:00'
     state_at: '2026-11-12T02:30:35+00:00'
     context: 229085
@@ -23835,25 +23835,43 @@ entries:
     start: '2026-11-12T01:42:53+00:00'
     at: '2026-11-12T01:42:53+00:00'
   handoff:
-    state: 'Step 9/10. Head map restricted to same-quantity parents (ed7c42c6; V/B fine-tunes load unmapped as in stage 2).
-      Tree head-map batch (13 runs, design PASS) mostly done, read partially: NO CHANGE (pooled val gmean 1.29, test 0.64).
-      Review figures drawn @6cad6fba, not yet all looked at by me: stage2_LD (relabelled), hmap_LD (every D, plain labels,
-      = the diag figure at every D), stage2_mismatch, stage2_mse_curves_<target>_<a..> (per D, val+train mu-MSE from the runs''
-      own logs), stage2_d316_<a..c>; looked at: stage2_LD, hmap_LD, stage2_mismatch. Repo-reviewer ad1bfac42d24610b9 still
-      FIX: scope (ft_defect.py DS d5..d8 -> every D; pshared/hmaptops only exist at d5..d8 because their controls do), hook
-      glob and kit_figures median (not ours). Rerun question (~88 GPU-h, 34 searches) still open to Joaquin; with NO CHANGE
-      it is a correctness rerun with no expected gain.'
-    decisions: Head map only where parent and run predict the same quantity (one correct answer; reviewer finding); one-loop
-      hmap runs cancelled. Clipping at 5 on every step is intended (D68/D72), same in scratch. One-loop blow-up = train/val
-      gap opening in the anneal (memorisation), not sigma alone (finding 2026-11-12).
-    ruled_out: parent_shared start (pooled val gmean 4.0, test 0.88); head map on tree (NO CHANGE, partial); inherited sigma
-      as the one-loop blow-up cause cannot be tested by the map (V/B).
-    running: FA-ccin2p3-425ef3b2 (hmap tree D=1e5), FA-ccin2p3-58feec4f (hmap tree D=3.16e4) if not yet ended; steps 9 and
-      10 wait on the 13 tree runs
-    files: analysis/data_saving/{hmap_readout.py,stage2_mse_curves.py,review_figs.py,plot_stage2.py,diag_readout.py,stage2_curves.py},
-      data/{hmap_runs.json,hmap_readout.json,stage2_mse_curves.json,stage2_diag_test.json}, figs/{stage2_LD,hmap_LD,stage2_mismatch,stage2_mse_curves_*,stage2_d316_*,hmap_gradnorm,stage2_diag_tops}.png,
-      figs/run_plots/, base_experiment.py _map_head_to_own_stats, tests/test_head_map_own_stats.py
-    written: '2026-11-12T02:28:25+00:00'
+    state: 'Step 9 done, step 10 rerun refused by Joaquin (D407: ''No, we wont rerun that now.''); new task D408/D409: find
+      why fine-tune now loses to scratch on t t~ when the original Fig. 22 test had pretraining better everywhere (changes
+      since: pretraining set, optimizer, inputs, preprocessing, loss, scheduler, the HPO lr window), quick targeted tests,
+      not hour-long cells. Findings for that: (1) the late one-loop ''blow-up'' enters no reported number: es_load_best_model=true
+      loads the best-mu checkpoint before the sigma stage; t t~ V ft D=3162 reports its curve minimum 5.35e-7 (step 3060)
+      and is still 33x scratch there. (2) Every-trial read (trial_overfit.py @2c7ea02e): the late rise does not track peak
+      lr (Spearman -0.04 t t~ V ft); a lower fine-tune lr_scale reaches a lower val minimum in 27/34 fine-tune searches (scratch
+      20/34), 11/34 fine-tune bests at the window floor 0.1-0.16: the fine-tune lr window [0.1,10] sits too high; the lead
+      D408 names. (3) Head map (start at the parent''s function, cec3610c/ed7c42c6): tree batch complete, design rule NO CHANGE
+      (8 exact-control cells D=316..1e4, pooled val gmean 1.29, 5/8 below 1, test 0.64); D=3.16e4 val 6.03 / test 0.04, D=1e5
+      0.97/1.04 vs the stage-2 best (reference only); hmap_readout @e779451f. (4) ft/scr test (ft_vs_scratch): t t~ tree 1.9,
+      0.73, 0.83, 0.13, 34, 57, 6.7, 1.17, 1.18 at D=10..1e5; u u~ and u u~ V below 1 at every D; t t~ V >= 1; orders with
+      sigma_parent/sigma_own (2.9, 5.8, 7.4, 42). Figures sent to Joaquin: stage2_LD (best test MSE per D both arms, fits
+      A D^-a + L_inf, crossings of 1e-4; legend strip above, 80477b84), stage2_d316_a/b (test MSE with and without each cell''s
+      worst event: t t~ scratch D=316 back on trend without one event at 97%; u u~ V D=316 unchanged), stage2_d316_c (T vs
+      D: u u~ V shares T=2720 at D=100 and 316), ft_vs_scratch (left ft/scr test vs scratch test, right vs sigma_parent/sigma_own,
+      every D), hmap_LD (every arm, test and val, every D). Not sent: stage2_mse_curves_* (house-style redraw; Joaquin has
+      the runs'' own plots figs/run_plots/), stage2_mismatch (duplicate of ft_vs_scratch''s right panel), trial_overfit_<a..d>,
+      trial_lrwindow_<a..d> (the lr-window evidence, looked at, not yet shown).'
+    decisions: 'D407 no rerun now; D408 get to the bottom of the t t~ fine-tune deficit with quick targeted tests; D409 no
+      hour-long cells per test. Head map kept (correct start, no gain). Reported model = best-mu checkpoint (code, not a choice).
+      Step 8 one-loop t t~ V suspects batch (massown, adamw, pairthr at D=316..1e4, design PASS 2026-11-12, configs sweep/sweep_config_dsave_diag_{massown,adamw,pairthr}_ft_ee_ttbar_nlo_d{5..8}_t8500.yaml
+      + smoke ..._smoke3_..._t50.yaml @7d56534c, controls the offown runs, ~5.5 GPU-h, trial_job.sh --hdr=--time=00:40:00)
+      never submitted: held by the main session (''before more arms''); under D409 its 8500-step cells are what Joaquin does
+      not want, so re-scope to short tests before any launch.'
+    ruled_out: parent_shared start (pooled val gmean 4.0); head map on tree (NO CHANGE, complete); late blow-up as a cause
+      of the reported deficit (best checkpoint is reported); lr as the cause of the late rise (no correlation over 532 trials);
+      inherited sigma (the map does not apply to V/B runs); zero-shot read (dead end, design FIX).
+    running: none
+    files: 'analysis/data_saving/{trial_overfit.py,ft_defect.py,hmap_readout.py,review_figs.py,plot_stage2.py,stage2_readout.py,stage2_mse_curves.py};
+      data/{trial_overfit.json (532 trials'' curves+HPs),ft_defect.json,hmap_runs.json,hmap_readout.json,stage2_readout.json
+      (68 cells, best trial per search),stage2_diag_test.json}; figs/{stage2_LD,stage2_d316_*,ft_vs_scratch,hmap_LD,trial_overfit_*,trial_lrwindow_*,run_plots/}.
+      Runs: stage-2 searches sweeps_local/dsave_s2_{scr,ft}_<target>_d<k>_t<T>/ (driver_state.json, results/), run dirs on
+      CC runs/dsave_s2_*/trial_<hp>[_r<n>] (some pruned: t t~ V ft D=10,32,100,3.16e4, scr D=1e3); diagnostic arms sweep/sweep_config_dsave_diag_{parscale,tops,offown,pshared,psharedtops,hmap,hmaptops}_ft_<target>_d<k>_*.yaml,
+      run dirs runs/dsave_diag_*/ on CC, run ids in data/hmap_runs.json and stage2_diag_runs.json; parents dsave_parent_heldout_r4
+      / treesin_r4 (r4), r5 tops parent; head map base_experiment._map_head_to_own_stats, tests/test_head_map_own_stats.py.'
+    written: '2026-11-12T03:21:24+00:00'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
