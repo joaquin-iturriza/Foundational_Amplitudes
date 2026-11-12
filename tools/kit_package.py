@@ -54,7 +54,12 @@ the target. Output: <outdir>/predictions.h5, <split>/<stratum>/log10_<target> (l
 name; with the target present, also src/evaluate.py's scores (kit_result.json). Without --h5 the benchmark's own file
 is scored. Each run is rebuilt on its own statistics from the benchmark's bulk_train (the first n_train events of its
 recipe), which needs KIT_HARDPS_DIR.
+Reproducibility: a prediction depends on the event alone (read in its own frame, no augmentation; the frames'
+degeneracy regularization uses noise that is a function of the particle, not of a random generator). CPU threads are
+pinned to 4 (KIT_THREADS): at 32 threads some predictions moved by up to 3.8e-4 in log10, at 1 or 4 not at all.
+CPU and GPU predictions agree to {tol:.0e} in log10 (rounding; the largest seen 1.5e-6, ee_uugg's deepest collinear bin).
 """
+TOL = 2e-6   # CPU vs GPU rounding limit of the check (README)
 
 
 def public_paths():
@@ -106,7 +111,7 @@ def cmd_build(a):
             shutil.copy2(src, os.path.join(out, "data", "diagrams"))
         models.append({"run": name, "label": label, "file": stem, "target": target})
     json.dump({"commit": commit, "models": models, "built_from": ROOT}, open(os.path.join(out, "models.json"), "w"), indent=1)
-    open(os.path.join(out, "README.txt"), "w").write(README.format(name=os.path.basename(out)))
+    open(os.path.join(out, "README.txt"), "w").write(README.format(name=os.path.basename(out), tol=TOL))
     subprocess.run(["tar", "czf", out + ".tar.gz", "-C", os.path.dirname(out), os.path.basename(out)], check=True)
     print(f"PACKAGE {out}.tar.gz: {len(models)} runs at {commit[:8]}; {os.path.getsize(out + '.tar.gz') / 1e6:.1f} MB")
 
@@ -138,7 +143,7 @@ def cmd_check(a):
     if a.report:    # a diagnostic read: the deltas are the result, a mismatch is not a failure
         print(f"REPORT worst {max(worst.values()):.2e}")
         return
-    assert max(worst.values()) < 1e-9, "the package does not reproduce the runs' predictions"
+    assert max(worst.values()) < TOL, f"the package does not reproduce the runs' predictions to the rounding limit {TOL}"
     print("PACKAGE_OK")
 
 
@@ -171,7 +176,8 @@ def _check_all(a, meta, env, pkg, worst):
         # --repo: the repository's own code on the original run dir (code drift since the predictions vs a package defect)
         src = meta["built_from"] if a.repo else pkg
         subprocess.run([sys.executable, "tools/kit_predict.py", f"runs/kit/{m['run']}", "--h5", small, "--out", out],
-                       cwd=src, env=dict(env, PYTHONPATH=src, **({"OMP_NUM_THREADS": str(a.threads)} if a.threads else {})),
+                       cwd=src, env=dict(env, PYTHONPATH=src, **({"OMP_NUM_THREADS": str(a.threads), "KIT_THREADS": str(a.threads)}
+                                                       if a.threads else {})),
                        check=True, stdout=subprocess.DEVNULL)
         d = []
         with h5py.File(os.path.join(out, "predictions.h5"), "r") as p, h5py.File(own, "r") as o:

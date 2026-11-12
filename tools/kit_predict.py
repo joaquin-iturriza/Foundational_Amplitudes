@@ -45,6 +45,9 @@ def predict(run_dir, splits, out, h5=None):
     import h5py
     import torch
     from tools.rebuild_run import rebuild
+    # CPU predictions of the tt virtual models moved by up to 3.8e-4 in log10 at 32 threads, not at 1 or 4 or on GPU
+    # (kit package v2 check, FA-ccin2p3-2d0c78fe): the thread count is pinned (README)
+    torch.set_num_threads(int(os.environ.get("KIT_THREADS", 4)))
     name = run_target(run_dir)
     stem, target, _ = kh.parse(name)
     src = h5 or kh.h5_path(stem)

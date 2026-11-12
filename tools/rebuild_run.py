@@ -185,11 +185,59 @@ def own_offshell_stats(run_dir):
     return exp._offshell_stats
 
 
+def _hash_like(x, salt=0):
+    """Noise the shape of x, each component of magnitude in [1, 2] (an eps-scaled vector of it keeps a norm above
+    eps, which lloca's normalisation needs; randn's can fall below it), a deterministic function of each row's (last
+    axis's) bits and `salt` (broadcast against the rows): stands in for the torch.randn_like draws of lloca's degenerate-frame regularizers,
+    so a frame (hence a prediction) depends on the particle alone, not on the RNG state or its place in the batch."""
+    b = x.detach().to(torch.float64).contiguous().view(torch.int64)
+    ar = torch.arange(x.shape[-1], device=x.device)
+    h = b.sum(-1, keepdim=True) * 6364136223846793005 + ar * 1442695040888963407 + torch.as_tensor(salt, device=x.device) * 7046029254386353131
+    for k in (33, 29, 32):      # int64 products wrap: a splitmix-style mix of the row's bits
+        h = (h ^ (h >> k)) * -4658895280553007687
+    u = (h & ((1 << 53) - 1)).to(torch.float64) / 2.0 ** 52 - 1.0
+    return (torch.sign(u) + u).to(x.dtype)
+
+
+def deterministic_frame_noise():
+    """lloca's frame regularizers (a lightlike boost vector, coplanar or collinear rotation references) break the
+    degeneracy with eps-sized torch.randn_like noise. In a 2->2 event the learned rotation references can be collinear
+    for every particle (kit tt Born softpair FA-ccin2p3-5515dc85: every event, references ~1e-122), so the frame's
+    orientation is that noise and the prediction followed the global RNG, i.e. the event's place in the scored pool
+    (0.29 decades at the Sudakov strata). For inference, the same regularizers with _hash_like noise (each vector of a
+    stack salted by its index, so two equal vectors still separate)."""
+    import lloca.utils.orthogonalize_3d as o3, lloca.utils.orthogonalize_4d as o4, lloca.utils.polar_decomposition as pd
+    from lloca.utils.lorentz import lorentz_cross, lorentz_squarednorm
+
+    def lightlike(vecs, eps=None):
+        eps = torch.finfo(vecs.dtype).eps if eps is None else eps
+        mask = lorentz_squarednorm(vecs).abs() < eps
+        r = _hash_like(vecs, torch.arange(vecs.shape[-2], device=vecs.device)[:, None] if vecs.dim() > 2 else 0).abs()
+        r = torch.cat([(2 * (r[..., 1:] ** 2).sum(-1, keepdim=True)).sqrt(), r[..., 1:]], -1)   # timelike, as lloca's
+        return vecs + mask.unsqueeze(-1) * eps * r, mask.any(dim=-1).sum() if vecs.dim() > 2 else mask.sum()
+
+    def coplanar(vecs, eps=None):
+        eps = torch.finfo(vecs.dtype).eps if eps is None else eps
+        mask = lorentz_squarednorm(lorentz_cross(*vecs.unbind(dim=-2))).abs() < eps
+        r = _hash_like(vecs, torch.arange(vecs.shape[-2], device=vecs.device)[:, None])
+        return vecs + mask[..., None, None] * eps * r, mask.sum()
+
+    def collinear(vecs, eps=None):
+        eps = torch.finfo(vecs.dtype).eps if eps is None else eps
+        v0, v1 = vecs.unbind(dim=-2)
+        mask = (torch.cross(v0, v1, dim=-1) ** 2).sum(dim=-1) < eps
+        out = [torch.where(mask[..., None], v + eps * _hash_like(v, k + 1), v) for k, v in enumerate((v0, v1))]
+        return torch.stack(out, dim=-2), mask.sum()
+    o4.regularize_lightlike = pd.regularize_lightlike = lightlike
+    o4.regularize_coplanar, o3.regularize_collinear = coplanar, collinear
+
+
 def rebuild(run_dir, role, path, n_events, event_frame=False):
     """(exp, loader): the run rebuilt with `role` ('val' or 'test') read from `path` (n_events rows),
     in eval mode with its best weights; loader iterates that role in the order of exp._role_perm[role].
     event_frame: that role unaugmented (data.unaugmented_roles), each event read in its own centre-of-mass frame, so
-    its prediction depends on the event alone, not on the pool (the augmentation is keyed on the pool's identity)."""
+    its prediction depends on the event alone, not on the pool (the augmentation is keyed on the pool's identity), and
+    the frames' degeneracy noise a function of each particle (deterministic_frame_noise)."""
     cfg = OmegaConf.load(os.path.join(run_dir, "config.yaml"))
     own_recipe = os.path.expandvars(str(cfg.data.processes_file))
     rec = yaml.safe_load(open(own_recipe))
@@ -207,6 +255,7 @@ def rebuild(run_dir, role, path, n_events, event_frame=False):
         if event_frame:
             assert not cfg.data.get("memmap", False), "event_frame is wired on the in-memory data path only"
             cfg.data.unaugmented_roles = [role]
+            deterministic_frame_noise()
         cfg.run_dir = tempfile.mkdtemp(prefix="rebuild_", dir=os.environ["SCRATCH"])
     if OmegaConf.select(OmegaConf.load(os.path.join(run_dir, "config.yaml")), "fine_tune.pretrained_path"):
         # a fine-tuned run trained on frozen stats (its parent's, kept in its own data_stats.json), not on stats of
