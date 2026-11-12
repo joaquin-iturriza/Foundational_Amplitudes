@@ -15797,7 +15797,7 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-046cc7d3
-    commit: 57eff4a5
+    commit: 866e644d
     paths:
     - .claude/hooks/notification_absorb.py
     - .claude/hooks/owner_handoff.py
@@ -15885,6 +15885,11 @@ entries:
       = synced -> pick --only); no site synced: exit, nothing submitted. d3a0b8a4 on trunk, tests/test_drive_sync_fail.py::test_site_down_at_sync_is_left_out;
       repo-reviewer a847424422f5bffc8 PASS, watermark d3a0b8a4. Not fixed: a down site still costs up to 11 min (660 s) at
       each start-up before it is dropped.'
+    - '2026-11-12 first-trial hold reverted on Joaquin''s decision (''"send one trial first for each search on each site"
+      I really think this is not necessary...''): revert 31831d2e of 57eff4a5 (drive.py gate, TRAINING_STARTED, test) merged;
+      re-pick, sync-failure drop, --stop-after kept; repo-reviewer PASS, watermark 31831d2e; drive tests 21 pass. drive.py
+      and run_trial.py compose no Hydra config locally before submitting (no compose/initialize in sweep/), so a ++ mistake
+      is caught only on the site.'
     - '2026-11-12 restore of CC pools deleted 2026-11-11: check_site_data --list on CC: missing train pools H1 62, H2 218,
       H2p5 38, H3 278 (1e4 copies only, recipe 1e5), H5 28, H6 8, H7E 34, H7c 34; PP4 504 (494 series-built + 10 one-run part
       processes); dsh_eea 115 (parts kept, 115/115 complete, 3.06 GB). HD4/HD5 train/val missing was a false report (n=0 in
