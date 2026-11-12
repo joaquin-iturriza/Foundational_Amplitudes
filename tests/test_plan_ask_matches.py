@@ -175,3 +175,13 @@ def test_numbered_ask_last_part_without_question_mark_quoted_passes():
 
 def test_numbered_ask_last_part_missing_refuses():
     assert not plan.ask_matches_set(COV, ["Joaquin, " + COV_ASK.split(" (3)")[0]])
+
+
+def test_ask_quoted_verbatim_with_semicolon():
+    # 2026-11-12: the ";" split the ask, only "Add them?" asked, and the verbatim quote was refused three times
+    ask = ("Scope: the b b~ > Z Z grid stops at D=1e4 at both orders under D412; adding D=31623 at one loop (~15 GPU-h) "
+           "and D=31623, 1e5 at tree level (~14 GPU-h), as the sibling tree targets have, costs ~29 GPU-h more. Add them?")
+    e = {"id": "pretrain_data_saving", "ask": ask}
+    assert plan.ask_matches(e, 'Joaquin, the open question in the plan\'s exact wording:\n\n"%s"' % ask)
+    assert plan.ask_matches_set(e, ["Joaquin, nothing new.", 'Joaquin: "%s"' % ask])
+    assert not plan.ask_matches(e, "Joaquin, the grid stops at D=1e4; nothing needs you.")

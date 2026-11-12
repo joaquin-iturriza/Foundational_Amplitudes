@@ -483,6 +483,11 @@ def ask_matches(e, text):
     and one of the steps the question holds (`warm_start step 1`), or it shares at least half of the question's
     non-stopword terms (a question sent first and recorded later in other words was demanded again, 2026-11-05)."""
     w = ask_terms(e.get("ask"))
+    # the ask quoted whole: its ";" split it into sentences, leaving "Add them?" as the only one asking, which no branch
+    # below matches (2026-11-12: three replies, the last one verbatim, refused)
+    flat = lambda s: re.sub(r"\s+", " ", re.sub(r"[\"'`*_>]", "", s or "")).strip().lower()
+    if "?" in (text or "") and flat(e.get("ask")) and flat(e.get("ask")) in flat(text):
+        return True
     eid = (e.get("id") or "").lower()
     keys = blocked_steps(e) or set(step_keys(e))
     # the two looser branches count only a sentence that asks: a "?" or words addressing the user's call
