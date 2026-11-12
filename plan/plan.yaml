@@ -24892,6 +24892,8 @@ entries:
     12: 'D411 ReZero on tt Born (design''s Mixed branch: tt virt MOVED, uug STAYED): read kit_A_ee_tt_born_n100000_t8000_softpair_rezero
       (FA-ccin2p3-d322922b) vs 5515dc85 with kit_extrap_read/kit_figures collect + kit_readout --vs; MOVED/STAYED on the deepest
       Sudakov bin''s median signed error; bulk fit beside it'
+    13: 'Step 6 seed check (design FIX: D315 says no extra seeds; Joaquin''s call): seeds 43, 44 of softpairthr and target
+      V x beta on KIT tt virtual, 4 runs ~6 GPU-h, read the bulk/Sudakov loss against the transformer''s own spread'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -25534,6 +25536,11 @@ entries:
       - 'MOVED on tt Born too: the norm effect holds on both tt targets; weigh against the bulk-fit loss (ReZero underfits
         at this lr)'
       - 'STAYED: the tt virtual move is not a norm effect that carries; next lever the transformer fed Bakar''s inputs only'
+    13:
+      feeds: whether target V x beta becomes the protocol-A tt virtual threshold model (package, A_ft)
+      if:
+      - 'loss within the transformer spread: V x beta is the threshold model, packaged'
+      - 'loss beyond it: reported as a trade, per-region model only if Joaquin wants it'
   step_waits:
     '5': '2026-11-13'
     '9': FA-ccin2p3-62dcf910 FA-ccin2p3-bf3d593c FA-ccin2p3-8d1429bf
