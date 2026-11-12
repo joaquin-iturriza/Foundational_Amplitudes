@@ -23845,6 +23845,39 @@ entries:
       not a repeat. Notes for the readout: near the 1e-4 crossing (k=2..4) old ft/scr was 1.9, 0.78, 1.05, so report the per-cell
       ratios there beside the shared-alpha fit''s S; u u~ tree and the one-loop arms stay at the old template, said wherever
       targets are compared.'
+  - at: '2026-11-12T11:28:50+00:00'
+    question: 'Step 5: after the space fix the t t~ one-loop V/B fine-tune is still 4.6-38x above scratch (s4: IMPROVED, NOT
+      RESOLVED). Does the parent''s off-shellness input scale (fine_tune.offshell_stats parent), the one path element whose
+      own-vs-parent switch already moved V on existing runs, hold the V/B fine-tune above scratch? Feeds: whether the one-loop
+      fine-tune configs switch to offshell_stats own before the one-loop L(D) fine-tune arm is redone.'
+    prior: '(1) s4 test (s4_readout.py @bf6f1712): V/B new-space fine-tune best val MSE(ln(V/B)) 1.91e-5, 3.97e-7, 7.38e-8
+      at D=316, 1e3, 3162 = 38, 5.7, 4.6x scratch; D=316 best trial''s val minimum at the first checkpoint, train to 4e-10.
+      (2) Off-shellness diagnostic (diag_readout.py @5555a0f0, stage2_diag_readout.json, runs dsave_diag_offown): t t~ V own/parent
+      at fixed HPs, old template, D=316, 1e3, 3162, 1e4: val 0.25, 0.45, 0.11, 3.48 (gmean 0.45), test 0.17, 0.14, 0.09, 0.65;
+      t t~ LO 2.3, 2.3, 4.0 (own worse, so LO keeps parent). s3 one-loop configs took own (94c460b6); the D400 stage A read
+      with own on V: r5/r4 parent 0.43, 1.94, 1.43, 11.6 (another change, the parent). (3) Null-parent: parent weights at
+      scratch HPs 9-122x scratch on V/B, fresh init through the same path 2.1-97x: the path, not only the weights. Searched
+      results.tex (off-shellness, offshell_stats, V/B fine-tune), the entry''s findings and dead ends, site decisions D373-D412.'
+    measure: 'Per search the best val mu-MSE in ln(V/B) units over its trials (the objective, best-mu checkpoint); per cell
+      r_s4 = new best / s4 best (same space, offshell parent), r_scr = new / stage-2 scratch best; gmean over the 3 cells.
+      Beside: test MSE, each best''s val and train curves against s4 and scratch (figure), failed trials listed apart.'
+    check: 'Existing runs move with exactly this switch on this target: own/parent val 0.25, 0.45, 0.11 at D=316, 1e3, 3162
+      (gmean 0.23) under the old template at fixed HPs; same-HP rerun spread 0.30-1.0 on V/B (ln-sd ~0.4 per cell), single-search
+      spread up to ~5x.'
+    fixed: 'The s4 V/B configs (sweep/sweep_config_dsave_s4_ft_ee_ttbar_nlo_d{5,6,7}_t8500.yaml @10a63eea) with one change,
+      fine_tune.offshell_stats own (configs sweep/sweep_config_dsave_s6_ft_ee_ttbar_nlo_d{5,6,7}_t8500.yaml, gen_data_saving.py
+      @470d147e --stage s6 --ft-space scratch --offshell-nlo own; repo-reviewer checked the diff): parent dsave_parent_treesin_r4,
+      T=8500, the stage-2 pools and first-D events, target_stats own, layer_decay 1, lr_scale [1/3,3], seed 42, heterosc_select
+      mu_mse + sigma stage, 8 trials waves 3,3,2.'
+    control: The s4 searches of the same cells (offshell parent, same space), best against best; stage-2 scratch beside (r_scr).
+    seeds: Seed 42, one 8-trial search per cell as every sibling (D315); 3 x 8 = 24 trials, 6.9 GPU-h (generator's rates;
+      s4's same configs ran ~1 h wall), under D412's 30.
+    outcome: 'CLOSES: r_scr <= 3 in every cell: the parent''s off-shellness scale was the V/B path defect; next: one-loop
+      fine-tune configs take offshell own and the t t~ V/B L(D) fine-tune arm is redone (a costed batch of its own). HELPS:
+      gmean r_s4 <= 1/2 with r_s4 < 1 in all but at most one cell, r_scr > 3 somewhere: adopt own for one-loop and bisect
+      the rest of the path (momentum standardization, readout); reported. NO CHANGE: gmean r_s4 in (1/2, 2): not this element;
+      next design tests the momentum standardization or the readout. WORSE: gmean r_s4 >= 2: keep parent; report. No rerun
+      of any search (D315).'
   step_waits:
     '4': 'a reviewer: repo-reviewer backlog pass (the commit of the passed s5 configs is blocked by the overdue backlog);
       design PASSED, target 3 h / 56 jobs recorded'
