@@ -25775,6 +25775,19 @@ entries:
       as the control''s (a 1/beta rise the MLP with logthr also misses at beta 1e-4: ladder log-MSE 6.9). Training 0.42 s/step
       vs 0.68 (no frames net). uug arm dc799c8e still running. Figs analysis/kit_benchmark/figs/scalars_tt/kit_mse_ee_tt_virt_finite_{a,b}.png,
       kit_extrap_ee_tt_virt_finite_a.png.'
+  - at: '2026-11-12T10:52:05+00:00'
+    text: '2026-11-12 ~12:00 @9e5d7d8b. Step 13 uug inputs-only arm (FA-ccin2p3-dc799c8e: model.input_scalars_only + data.offshell_zero
+      vs softpair c15b3337, one seed; kit_extrap.json, kit_fig_A_scalars_uug.json, kit_readout --vs). Collinear y 1e-3..1e-7
+      median signed error (pred - truth, log10|M|^2): -0.02, -0.04, -0.05, -0.05 (control +0.05, +0.26, +0.78, +1.36; Bakar''s
+      MLP seeds median -0.04..-0.19); deepest log-MSE 2.21 -> 0.057 (MLP seeds 0.033-0.167); collinear family median log10(arm/control
+      log-MSE) -0.89 [-1.59,-0.28], 5/5 better; bulk 1.09e-4 -> 8.2e-5 (-0.13). By the design''s rule YES on uug (<= +0.30),
+      as on tt virtual: fed only the MLP''s inputs, the transformer extrapolates into both collinear and Sudakov limits like
+      the MLP. Cost: the soft family worsens, x 1e-3..1e-7 signed -0.15, -0.45, -0.77, -0.98, -1.08 (control -0.06..-0.28),
+      family +0.69 [+0.32,+0.79] 0/5 better, deepest log-MSE 0.20 -> 1.25; the ''ours'' MLP seed 0 sits at -1.08 too (seeds
+      -1.08..-0.14, Bakar''s -0.46..+0.04), so the soft read is within the MLP family''s seed spread but the control (soft-rescaled
+      local momenta) held it better. Next: which of the three cut routes (local momenta, attention frames, off-shellness)
+      carries the failure: model.input_route_off (5d509b13), design recorded, under review. Figs analysis/kit_benchmark/figs/kit_extrap_ee_uug_me2_{a,b}.png,
+      scalars_uug/kit_mse_ee_uug_me2_{a,b}.png.'
   step_why:
     5:
       feeds: what KIT receives
