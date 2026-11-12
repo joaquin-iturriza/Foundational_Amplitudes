@@ -24077,6 +24077,48 @@ entries:
       Prior misstatement: at D=316 the x1/10 run (2.6e-6) is below its listed control (3.9e-5), not worse; the prediction
       holds at D>=1e3. Outcome partition ordered, every case mapped. Searched: lr x1/10, lr x1/3, suspects, lower lr, lr window,
       Muon lr, spike, jitter, lrtenth, lrthird, curve_quality in results.tex, the entry''s findings/dead ends, decisions D405-D412.'
+  - at: '2026-11-12T14:03:27+00:00'
+    question: 'D413 (Joaquin 2026-11-12: ''just use another second example to show the data savings''): for the draft, the
+      data saving S = D*_scr/D*_ft at MSE = 1e-4 on a second target with both arms well trained by curve_quality.py. Target:
+      e+e- > u u~ one-loop V (trained on V, D375; fine-tuned from the trees-in parent, ''the one loops with the tree levels
+      in the pretraining''). Does its L(D), redone at the lr centre the running t t~ test fixes, train well in both arms and
+      keep S > 1? Feeds: the draft''s second data-saving figure (Joaquin edits the draft, D8).'
+    prior: 'Searched results.tex (sec. data saving 9386-9441), the entry''s findings, D405-D415. Stage-2 u u~ V (stage2_readout.py
+      @5555a0f0): S = 8.3 on test (16-84% band lower edge 3.2, upper unbounded; scratch''s test level 1.1e-4 at D=1e4), 2.7
+      on val_ln (10^[0.30,0.59]); fine-tune below scratch in all 8 cells (ft/scr test 0.006-0.50). Of the four stage-2 targets
+      only u u~ LO, u u~ V, t t~ LO, t t~ V/B have searches; c c~ g, b b~ g g, b b~ Z Z, u u~ e+e- Z have calibration runs
+      only, so no L(D) of both arms. t t~ V/B: fine-tune 2-57x above scratch (S < 1), excluded. curve_quality.py @0d593de5
+      on u u~ V: scratch 4/62 well, fine-tune 2/63 (best u u~ V of all targets: median spike 3.6/3.6, jitter 0.13/0.10, steady
+      0.94/0.76); per-cell best trials: D>=1e3 fail spike/jitter/steady at peak lr 4.4e-3..2.8e-2 (scratch spike 7-228, jitter
+      0.36-0.96; fine-tune D=1e4 spike 41) = the lr-too-high signature of t t~ LO; D<=316 pass spike/jitter (<=2.5, <=0.13)
+      and fail only gap (memorisation of 316 events: scratch 195, fine-tune 7184).'
+    measure: 'curve_quality.py bars on every trial (steady >= 2/3, spike <= 3, jitter <= ln2, gap <= 10), per cell and arm
+      the best trial''s four numbers and the count of well trials; the L(D) of both arms (best val mu-MSE per cell -> test
+      MSE of ln|V| after the sigma stage, stage2_readout.py''s read), the shared-exponent fit and S with its 16-84% cell-bootstrap
+      band (dstar_fit.py), on test and val_ln. Figure: L(D) of both arms (old stage-2 points faint, new solid) with the fit
+      and D* marked; the best trials'' val/train curves per cell.'
+    check: 'On the existing u u~ V searches the bars separate the cells the way the t t~ test''s change targets: D>=1e3 best
+      trials fail spike/jitter at peak lr >= 4.4e-3, D<=316 pass them; stage2_readout.py reproduces S = 8.3 / 2.7 from the
+      cached fetch (the measure moves with the cells, as the stage-2 read showed: ft/scr 0.006-0.5).'
+    fixed: 'Stage-2 u u~ V configs (sweep/gen_data_saving.py --targets ee_uu_nlo, trees-in parent dsave_parent_treesin_r4,
+      T(D) of the ladder 2720/4420/8500/8500/8500, fine-tune llrd space, offshell_stats parent as stage 2, seed 42, 8 trials
+      waves 3,3,2, heterosc mu_mse + sigma stage) with one change: training.lr centre x f per arm, f = the centre the t t~
+      LO lr test reads WELL for that arm (c/3 or c/10; the lower only when its minimum is lower). Cells D = 316, 1e3, 3162,
+      1e4, 31623 (k = 5..9): the 1e-4 crossings of both arms lie inside (fine-tune ~1e3-3162, scratch ~1e4); k = 2..4 (D <=
+      100, losses 0.07-2.3) dropped to stay under D412''s 30 GPU-h, costing only the fit''s low-D lever arm. Configs generated
+      in worktrees/wt-lrcentre: sweep/sweep_config_dsave_{lrthird,lrtenth}_{scr,ft}_ee_uu_nlo_d{5..9}_t*.yaml.'
+    control: The same cells' stage-2 searches (dsave_s2_{scr,ft}_ee_uu_nlo_d{5..9}), read by the same tools; S from all 8
+      stage-2 cells (8.3 / 2.7) and from the same 5 cells for a like-for-like.
+    seeds: 'Seed 42, one 8-trial search per (arm, D), as the siblings (D315): 10 searches, 80 trials, 29.2 GPU-h measured
+      on the stage-2 searches of these cells (0.54+0.55+0.76+0.87+1.80+1.71+2.83+2.73+9.65+7.75), wall ~3.6 h (3 waves of
+      the D=31623 trial, 1.2 h each).'
+    outcome: 'Runs only if the t t~ test gives WELL for an arm (that arm''s f; the other arm takes the same f if it is WELL
+      or CLEAN BUT WORSE there, else stays at c and is read as is). Then: DRAFT-READY: in >= 4 of 5 cells per arm the best
+      trial passes spike, jitter, steady (gap read apart at D<=316, where 316 events are memorised whatever the lr) and S''s
+      band lower edge > 1: the figure goes to Joaquin. SAVING WITH CAVEAT: S > 1 but the bars pass in < 4 cells of an arm:
+      the figure goes with the failing cells named. NO SAVING: S band includes 1: reported with both arms'' curves. If no
+      arm is WELL in the t t~ test: nothing runs; the draft figure is the stage-2 u u~ V L(D) with its curve-quality numbers
+      stated, and the next lr/schedule test follows the t t~ outcome rule.'
   step_waits:
     '2': the detached driver lr_centre_test (sweep/drive.py over dsave_lrthird_{scr,ft}_epem_ttx_d7_t8500 and dsave_lrtenth_{scr,ft}_epem_ttx_d7_t8500,
       CC, 32 trials)
