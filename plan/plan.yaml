@@ -24274,7 +24274,7 @@ entries:
       - 'within +-0.3: protocol B stays the only threshold model; report the limit of protocol A'
   step_waits:
     '5': '2026-11-12'
-    '6': FA-ccin2p3-6f94590d
+    '6': '2026-11-12'
   handoff:
     state: 'Joaquin released the entry (D403): understand why our models do not extrapolate into the limits and match Bakar''s
       simple MLP; his no (D402) covers only the fair NLO D-scan (step 3, drop or keep held per D402). Step 5 package: event-frame
