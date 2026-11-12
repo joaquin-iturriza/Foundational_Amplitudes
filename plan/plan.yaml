@@ -24993,7 +24993,7 @@ entries:
     decision: D401
   owner:
     agent: a5d7215c7f7553fba
-    state: working
+    state: closed
     since: '2026-11-12T08:48:04+00:00'
     state_at: '2026-11-12T08:48:04+00:00'
     context: 173366
@@ -25577,31 +25577,25 @@ entries:
     '9': FA-ccin2p3-62dcf910 FA-ccin2p3-bf3d593c FA-ccin2p3-8d1429bf
     '12': FA-ccin2p3-d322922b
   handoff:
-    state: '2026-11-12 ~05:50. D411: plain no-LayerNorm arm diverged (uug bba9a61e aborted step 1485, val 6e11 from step 160;
-      tt virt 36a30e0c val up to 3e22 from step 960; finding recorded). ReZero arm (model.net.layer_norm=rezero, 9e63d86f;
-      design PASS after one FIX: MOVED = halfway to MLP, STAYED = within 0.3 of control, between inconclusive) running: uug
-      FA-ccin2p3-dc15b6bc vs c15b3337, tt virt 4cab2100 vs f21fa163, both healthy to step 480; read with kit_extrap_read (ARMS
-      rezero added, 74615265) + kit_readout --vs (step 10). D405: E5769 cause = catalog regen at 02:43 overwrote the 278 top
-      1e4 train pools (same file name); fixed by entry store_tag (b78715db, 9df60812: train only, not inherited, recipe id
-      unchanged 7cd06c31), pools rebuilt; chain resubmitted @b50ea913: smoke 6e4a2b16 -> parents r5thr 4ab99f50, r5thrbeta
-      66a2efda -> ft_thr bf3d593c, ft_thrbeta 8d1429bf; ft_r5 62dcf910 running (step 9 waits on 62dcf910 bf3d593c 8d1429bf).
-      Step 6 (design PASS): data.target_times_beta (9df60812, V x pair beta, CPU-checked on KIT pools) run FA-ccin2p3-3c2996dc
-      vs 3fc1016a (step 11); the reviewer''s note: Coulomb median < -0.84 with exponent not closer than -0.32 reads UNRESOLVED.
-      Step 5 package unchanged (v4 check failed earlier, not sent).'
-    decisions: 'D412 one seed, bands from MLP seed spread (signed-error band from kit_extrap.json for D411: MLP 0.34/0.02,
-      ours 0.19/0.22). ReZero chosen over lr cut: noLN blew up at warmup lr 1.3e-3 already. Step 6 target factor = pair beta
-      (exact, needs no Born). store_tag rather than regenerating at the catalog path (would clobber catalog 1e5 pools).'
-    ruled_out: Removing the pre-LayerNorms alone (diverges at the LN recipe).
-    running: 'FA-ccin2p3-dc15b6bc 4cab2100 (ReZero); 62dcf910, 6e4a2b16 -> 4ab99f50 66a2efda -> bf3d593c 8d1429bf (D405);
-      3c2996dc (step 6); 36a30e0c = diverged noLN tt still running (slurm 63543593): cancel it (my scancel of a running job
-      was refused by the permission classifier). To delete once no job reads them: 556 duplicate _val/_test_smix_n1e4 pools
-      in /sps/lpnhe/jiturrizaramirez01/datasets (our debris from the 05:23 h3_train prebuild, unread since 9df60812; keep
-      the _train_smix_n1e4 ones), report the deletion. Repo-reviewer lock held on pretrain_data_saving findings 2-4 (suspects_readout.py:473,
-      old_vs_new.py:97-99,117,126); kit''s part passed.'
-    files: models/lloca.py, models/transformer_lloca_mup.py, tests/test_layer_norm_switch.py, mg5_pipeline_final.py (store_tag),
-      experiment.py (pair_beta, target_times_beta), tests/test_store_tag.py, tests/test_pair_beta.py, recipes/gen_datasaving_parent.py
-      + catalog_v4_datasaving_*.yaml, tools/kit_extrap_read.py, .claude/hooks/submit_guard.py (fac9e2b9)
-    written: '2026-11-12T04:53:00+00:00'
+    state: '2026-11-12 ~10:20. E5849 fixed (write_own_alphas registered store_tag pools wrongly: 286c0183, 248594f0; 278 alpha_s
+      sidecars written on CC); re-smoke FA-ccin2p3-fc0c4eed, parents 63543723/24 re-pointed afterok:63560193 (scontrol via
+      site run), so the D405 chain is live (step 9 waits on 62dcf910 done, bf3d593c, 8d1429bf). ReZero (step 10) read: uug
+      STAYED (+1.36 -> +1.10) and underfits (train MSE 1e-3 vs 4e-7), tt virtual MOVED (-1.08 -> +0.36) with bulk +2.44 decades:
+      Mixed, sibling tt Born ReZero FA-ccin2p3-d322922b running (step 12, wait set). Step 6 read: target V x beta Coulomb
+      -3.16, exponent -1.01, scan within the NLO band to beta 1e-3; bulk +0.56 and Sudakov +0.57: NO by the letter, inside
+      the transformer''s own seed noise (findings ~09:40, ~10:20). Step 14 (inputs-only transformer, D411 input side) is ready
+      and needs code + design. Step 5 package waits on the A_ft batch; the V x beta model is the candidate threshold model
+      for it (Joaquin''s call via the main session, given step 6 reads NO by the letter).'
+    decisions: 'Seed check dropped: D315 (Joaquin 2026-11-06T22:31) settles it. Eikonal target dropped: the control already
+      trains on the flat emission-scale target. ReZero sibling submitted per the passed design''s Mixed branch.'
+    ruled_out: Pre-LayerNorm as the uug cause (ReZero STAYED); target power law as the uug cause (target already flat); extra
+      seeds (D315).
+    running: 'FA-ccin2p3-fc0c4eed (smoke) -> 4ab99f50, 66a2efda -> bf3d593c, 8d1429bf (D405); FA-ccin2p3-d322922b (ReZero
+      tt Born). 36a30e0c ended (COMPLETED), no cancel needed. Debris not deleted (not in the way, 66 GB free): 556 _val/_test_smix_n1e4
+      pools in /sps/lpnhe/jiturrizaramirez01/datasets.'
+    files: tools/write_own_alphas.py, tools/kit_figures.py (labels), tools/kit_threshold_scan.py (label), analysis/kit_benchmark/data/kit_fig_A_{rezero,vbeta}.json,
+      kit_extrap.json, kit_threshold_scan.json (7adcd6f8)
+    written: '2026-11-12T09:14:20+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
