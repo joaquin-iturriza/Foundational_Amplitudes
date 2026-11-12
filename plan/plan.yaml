@@ -26976,6 +26976,25 @@ entries:
       as a range statement. Limit: at 2->2 m/E = 2 m_t/sqrt(s) exactly, so the probe cannot tell ''tops look lightlike'' from
       ''sqrt(s) beyond the bulk''; separating them needs an arm (an explicit log(m^2/s) per massive leg, step 11d''s divergence-form
       input). Threshold strata sit at m/E ~1, above every bulk_train event.'
+  - at: '2026-11-12T17:07:41+00:00'
+    text: '2026-11-12 ~19:00 @7656e687. Step 11d / 12(i) log-skip read (design PASS 14:39; model.input_log_skip=2: mu += per-pair
+      c1 L + c2 L^2 and per-leg mass-log terms, coefficients from the static particle encoding; from scratch 1e5, 8000 steps,
+      seed 42; uug plain control 203a274f, uug plain + skip 7b891d10, tt softpairthr + skip eb870ad4; tools/kit_extrap_read.py
+      collect, kit_figures collect -> kit_fig_A_logskip_{uug,tt}.json, kit_readout --vs). Deepest-bin median signed error
+      (pred - truth, log10|M|^2) / log-MSE. uug, arm vs plain control: collinear y 1e-7..1e-6 +1.21/2.24 vs +0.81/17.7; soft
+      x 1e-7..1e-6 +5.00/25.6 vs -8.40/241; exponents coll -1.31 vs -1.41 (truth -1.00), soft -3.20 vs -0.28 (truth -2.00);
+      families coll -0.90 (5/5 better), soft -1.22 (5/5), bulk +0.28 (5.9e-6 -> 1.1e-5). tt virtual vs softpairthr 3fc1016a:
+      Sudakov 15-50 TeV +0.77/0.696 vs -0.53/0.72 (5-15 TeV 0.116 vs 0.373); Coulomb beta 1e-4..1e-3 log-MSE 1.72 vs 3.55,
+      exponent -0.55 vs -0.32 (truth -1.02); families Sudakov -0.51 (3/3), threshold -0.08 (2/4), bulk +0.61 (1.2e-9 -> 4.9e-9).
+      By the passed bands: uug NOT FIXED and not NO EFFECT (each deepest log-MSE ~1 decade better than the plain control,
+      but the soft limit overshoots +5.00 with exponent -3.20: the quadratic term continues past the truth, the failure the
+      design named; collinear +1.21 > 0.38); tt Coulomb FIXES (1.72 <= Bakar''s logthr MLP 2.41, exponent -0.55 <= -0.44),
+      Sudakov not fixed (sign flips: +0.77, log-MSE 0.696 > 0.154); bulk costs within 1.5 decades. Overall PARTIAL. The plain
+      control alone confirms the plain target saturates (soft exponent -0.28 vs -2, -8.40 deepest), far worse than the T-target
+      softpair c15b3337 (soft -0.28 deepest). The design''s partial branch (''combined with the frames cut'') is closed by
+      D419; the readout''s overshoot points to the quadratic term (a linear-only skip is the next candidate, to be designed).
+      Figures analysis/kit_benchmark/figs/kit_extrap_logskip_ee_uug_me2_{a,b}.png, kit_extrap_logskip_ee_tt_virt_finite_{a,b}.png
+      (control, plain target, plain + skip / skip, MLP).'
   step_why:
     5:
       feeds: what KIT receives
