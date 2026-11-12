@@ -26682,11 +26682,6 @@ entries:
       v_end/min v <= 2, on running-median-3 curves) to the KIT runs'' train_steps.npz / val curves (c15b3337, c364a7ae, f21fa163,
       3fc1016a, 203a274f, 7b891d10, eb870ad4, gmax4 and linear-term arms), and choose the lr for the new arms where validation
       stays with training. Note: HETEROSC val is an NLL whose late rise may be sigma collapse; read the mu-MSE val curve too.'
-    16: 'Divergence functional form as an INPUT through the whole network (Joaquin 2026-11-12 ~19:00: ''I know that log invariants
-      go as inputs, this is not necessarily the same as passing the functional form of the divergence as an input''): general
-      per-pair/per-triple features from the universal limits (eikonal s_ik/(s_ij s_jk), collinear splitting variables, 1/beta
-      per massive pair, log^2(s/m^2)), full LLoCa (D419); one short test on uug and tt virtual vs controls; also check the
-      KIT controls with the data-saving curve measure (val separates from train late) and use an lr where val stays with train'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -27630,11 +27625,6 @@ entries:
       - 'controls fail the curve bars: pick the lr at which they pass (from existing runs, or a short DyHPO over the template''s
         space if none, D241) and use it for every new KIT arm'
       - 'controls pass: keep lr 0.0118605'
-    16:
-      feeds: how to help the transformer extrapolate into the KIT limits (D411, D419)
-      if:
-      - 'the features fix a limit: adopt them in the KIT models'
-      - 'no gain: report it with the figures'
   step_waits:
     '11': FA-ccin2p3-dcf42ad6 FA-ccin2p3-e7dca162 (11c A_ft fine-tunes, after parents 2d653209 r5loop_rerun and ca5873f3 r5loopbeta);
       then threshold scan
