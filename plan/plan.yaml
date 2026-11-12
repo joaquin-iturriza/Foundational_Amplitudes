@@ -24788,6 +24788,15 @@ entries:
       its driver stopped at the CC sync, 0 trials, no run in site runs) and the s6 one-loop off-shellness-own test (design
       passed, not submitted). Change that stops it recurring: a committed curve-quality measure (well-trained by the curve
       itself) is read on every trial before any verdict or L(D) batch (new step).'
+  - at: '2026-11-12T13:13:42+00:00'
+    text: '2026-11-12 ~15:15 CET (owner a30d7264e9acbd802): lower-lr-centre test started as detached driver lr_centre_test
+      (log ~/.local/share/ccorch/detached/20261112-141149_lr_centre_test.log): sweep/drive.py --config sweep/sweep_config_dsave_lr{third,tenth}_{scr,ft}_epem_ttx_d7_t8500.yaml
+      (@0d593de5 / @979ad4e4) --item pretrain_data_saving --sites ccin2p3; site pick: ccin2p3, 21 GPUs fit, ~0.2 h per wave;
+      target 1.2 h / 32 jobs recorded. First start refused by cell_guard (same fixed_params as the control searches; E6034
+      acked); restarted with FA_NEW_SWEEP_REASON citing D412: separate searches are the passed design, extending the control
+      would mix its old-window observations into the surrogate. Readout analysis/data_saving/lr_centre_readout.py on branch
+      lrcentre (worktrees/wt-lrcentre @10cbc336; checked on the control searches'' cached rows: scr 9 trials 0 well, ft 7
+      trials 0 well, best 8.54e-9 / 8.22e-9), merged after the repo-reviewer.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
