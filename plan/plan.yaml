@@ -21396,6 +21396,15 @@ entries:
       window [0.02,2], ~88 GPU-h: Joaquin''s go'
     why: 'step 10 dropped by D407: the user answered no to the question that blocked it'
     at: '2026-11-12T03:20:33+00:00'
+  - tried: 'Null-parent 2x2 (designs 2026-11-12 after the suspects read): fresh init (shrink_perturb [0,1]) vs the parent''s
+      weights through the fine-tune configs at each cell''s scratch best HPs, t t~ tree and V/B, D=316..1e4, 16 runs, 7.6
+      GPU-h (submitter analysis/data_saving/submit_nullparent.py @eaacb51f, not run)'
+    why: 'Design reviewer FIX twice. First: outcome rule left cases open, the search branch implied the declined rerun, and
+      the lr text was wrong; all revised. Second: branch E (NOT RESOLVED) ran a second seed (43) beyond the sibling cells''
+      one, against D315. The remaining fix is one line: E reports each cell with its numbers and runs nothing more, or the
+      second seed becomes Joaquin''s question. The owner''s one revision is used, so a new design needs his go or a fresh
+      review.'
+    at: '2026-11-12T08:58:11+00:00'
   asks:
   - ask: 'GPU budget: 200-290 GPU-h above 30 with no decision covering it. Stage 2 of the data-saving study (three held-out
       tree targets, scratch against fine-tuned, an 8-trial DyHPO per cell, one seed per cell). The data saved expected from
