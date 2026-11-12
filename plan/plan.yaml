@@ -16279,9 +16279,9 @@ entries:
     '25': FA-ccin2p3-046cc7d3
   owner:
     agent: aefaf94baeb410c64
-    state: working
+    state: stopped
     since: '2026-11-12T02:25:26+00:00'
-    state_at: '2026-11-12T08:47:20.061000+00:00'
+    state_at: '2026-11-12T08:56:01.801000+00:00'
     context: 245423
     context_at: '2026-11-12T08:51:43+00:00'
   designs:
@@ -24333,7 +24333,7 @@ entries:
     agent: ab9dff3db5cb856c2
     state: working
     since: '2026-11-12T03:05:02+00:00'
-    state_at: '2026-11-12T08:47:17.890000+00:00'
+    state_at: '2026-11-12T08:56:29.666000+00:00'
     context: 260603
     context_at: '2026-11-12T08:56:41+00:00'
   designs:
