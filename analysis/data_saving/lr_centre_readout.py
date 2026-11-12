@@ -9,7 +9,7 @@ against its control search (scratch: dsave_s2_scr, fine-tune: dsave_s4_ft, same 
 Validation minimum in ln units (min of the val mu-MSE curve x prepd_std^2). Failed trials (diverged) listed apart.
 Figure figs/lr_centre_curves_{a,b} (a scratch, b fine-tune): each search's best trial, val solid and train dashed.
 
-    python analysis/data_saving/lr_centre_readout.py [--test lr|muonly] [--cached]
+    python analysis/data_saving/lr_centre_readout.py [--test lr|muonly|adamw] [--cached]
 """
 import json
 import os
@@ -33,7 +33,9 @@ TTX = {"scr": "dsave_s2_scr", "ft": "dsave_s4_ft"}
 UUV = {"scr": "dsave_s2_scr", "ft": "dsave_s2_ft"}
 TESTS = {"lr": ({"epem_ttx_d7_t8500": TTX}, {"c/3": "lrthird", "c/10": "lrtenth"}),
          "muonly": ({"epem_ttx_d7_t8500": TTX, "ee_uu_nlo_d7_t8500": UUV, "ee_uu_nlo_d8_t8500": UUV},
-                    {"mu-only": "muonlymse"})}
+                    {"mu-only": "muonlymse"}),
+         # adamw = the one-change Muon-off test (training.optimizer AdamW, muon_weight_decay out of the space)
+         "adamw": ({"epem_ttx_d7_t8500": TTX}, {"AdamW": "adamw"})}
 TEST = sys.argv[sys.argv.index("--test") + 1] if "--test" in sys.argv else "lr"
 CELLS, VARIANTS = TESTS[TEST]
 SUFFIX = "" if TEST == "lr" else f"_{TEST}"
