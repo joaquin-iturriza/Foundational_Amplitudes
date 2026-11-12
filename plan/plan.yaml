@@ -24683,6 +24683,9 @@ entries:
       v4_{gg,ddx,bbx}_ttx__thr (gen_datasaving_parent.py heldoutthr variant), generate (CPU); r5thr parent (job_datasaving_parent.sh
       heldoutthr; smoke iters=50, D395); job_kit.sh A_ft tt virt_finite 1e5 8000 from r5 and r5thr with fine_tune.offshell_stats=own;
       kit_readout --vs vs f21fa163 and the threshold scan'
+    10: 'D411 ReZero arm (design passed 2026-11-12 ~05:33; layer_norm=false diverged, finding ~05:30): read the uug and tt
+      virtual softpair_rezero runs vs c15b3337/f21fa163 and Bakar''s MLP with kit_extrap_read (arm added to its collect) and
+      kit_readout --vs; MOVED/STAYED per the design'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -25303,6 +25306,11 @@ entries:
       - 'ft_thr Coulomb median < -0.3 vs scratch and vs ft_r5: threshold sampling goes into the catalog parent''s top-pair
         pools'
       - 'both NO: design one-loop top pairs at physical mass near threshold (gg/qq~ > tt~ virtual)'
+    10:
+      feeds: whether the KIT models change their normalisation; D411's next lever
+      if:
+      - 'both MOVED: the arm on uugg and tt Born'
+      - 'both STAYED or inconclusive: transformer fed Bakar''s inputs only'
   step_waits:
     '5': '2026-11-13'
     '6': '2026-11-13'
