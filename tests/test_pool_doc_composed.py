@@ -62,6 +62,22 @@ def test_composed_alphas_key_ignores_node_rounding():
         assert key(pa) != key(pb)
 
 
+def test_features_key_ignores_mass_rounding():
+    """The derived-inputs key holds the internal masses; a table mass is 10**log10(m), 172.49999999999991 on one node
+    and 172.50000000000009 on another (CC, 2026-11-12): the key must be the same, and differ for another mass."""
+    import types
+    from omegaconf import OmegaConf
+    import data_mmap as dm
+    def key(masses):
+        e = types.SimpleNamespace(cfg=OmegaConf.create({"data": {"dimensionless_inputs": True}}),
+                                  _internal_mass_pdgs=[23, 6], _internal_mass_by_proc=masses)
+        return dm._hash(dm.features_key_doc(e, ["x"], True, []))
+    assert key([[91.18799999999999, 172.49999999999991]]) == key([[91.18799999999999, 172.50000000000009]])
+    assert key([[91.188, 172.5]]) != key([[91.188, 172.6]])
+    assert dm._key_floats(None) is None
+
+
 if __name__ == "__main__":
+    test_features_key_ignores_mass_rounding()
     test_composed_pool_identity_stable_across_jobs(); test_stored_pool_identity_is_content()
     test_composed_alphas_key_ignores_node_rounding(); print("ok")

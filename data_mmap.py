@@ -413,6 +413,12 @@ def _orders_inputs(exp, names):
     return out
 
 
+def _key_floats(x):
+    """nested lists of floats to 12 significant digits (None kept): computed values keyed by what they mean"""
+    return None if x is None else [_key_floats(v) if isinstance(v, (list, tuple)) else float(f"{float(v):.12g}")
+                                   for v in x]
+
+
 def features_key_doc(exp, names, want_offshell, sidecars):
     """What the derived per-event inputs are computed from (besides the base arrays): the target factor's
     definition and the off-shellness masks' inputs. Their standardization is the run's, at open."""
@@ -436,7 +442,9 @@ def features_key_doc(exp, names, want_offshell, sidecars):
         "offshell": ({
             "pdgs": exp._internal_mass_pdgs,
             "sidecars": [_small_file_id(p) for p in sidecars],
-            "internal_masses": getattr(exp, "_internal_mass_by_proc", None),
+            # to 12 digits: a table mass is 10**log10(m) (mg5_pipeline_final._table_mass), whose last bits differ between
+            # nodes (172.49999999999991 on CC htc, 172.50000000000009 on its GPU nodes, 2026-11-12)
+            "internal_masses": _key_floats(getattr(exp, "_internal_mass_by_proc", None)),
             "per_shat": bool(cfg.data.get("dimensionless_inputs", False)),
         } if want_offshell else None),
     })
