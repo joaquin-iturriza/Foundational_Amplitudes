@@ -25439,6 +25439,10 @@ entries:
       yet run with the cut) and A_ft/B on the four KIT targets, against their softpair(thr) controls; and why the frame cut
       loses the uug soft limit (deepest soft -0.28 -> -0.93) while off-shellness off gains it (-> -0.04): an arm with both
       cuts (frames + off-shellness) on uug and tt virtual is the smallest next test'
+    11: 'Joaquin 2026-11-12 ~15:00 (D415 + his questions): (a) measure the frames mechanism per stratum (boost size, local-momentum
+      size, control runs, eval-only); (b) reproduce every plot Bakar sent, ours vs his MLP; (c) one-loop processes covering
+      Coulomb (massive pair near threshold, non-tt) and Sudakov added to the pretraining, one design; (d) a general divergence-form
+      input (eikonal logs, splitting variables, 1/beta per massive pair), one short test on uug and tt virtual'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -26223,6 +26227,11 @@ entries:
       if:
       - 'frames+offshell cut keeps collinear/Sudakov fixed and the soft limit: KIT models take that input set'
       - 'the soft loss stays: KIT models take the frame cut and report the soft trade'
+    11:
+      feeds: how far our transformer can match or beat Bakar's MLP in the KIT limits, D411/D415
+      if:
+      - 'a route helps: adopt it in the KIT models'
+      - 'none helps: report the comparison against all of Bakar''s plots as the KIT answer'
   step_waits:
     '5': '2026-11-13'
     '10': FA-ccin2p3-e8088a7d FA-ccin2p3-e1c19b4d
