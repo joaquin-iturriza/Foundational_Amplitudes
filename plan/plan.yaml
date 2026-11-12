@@ -23507,6 +23507,25 @@ entries:
       and length). HPs: G(pre) < 3: at the scratch''s HPs the fine-tune is at scratch''s level, so the deficit came from the
       fine-tune search (its HP window): next the window change, with these runs as the expected gain. G(null) <= 1/3: the
       path helps a fresh init (would be a scratch defect): report and re-check the scratch control.'
+    fix_at: '2026-11-12T08:56:07+00:00'
+    fix: '(1) Outcome leaves cases open (check 4; the same reason the zero-shot design was turned down): with the null arm
+      neutral (1/3 < G(null) < 3), G(pre) >= 3 with G(pre/null) < 3 (e.g. G(null)=2, G(pre)=4), or G(pre) >= 3 with n> < 3,
+      matches neither WEIGHTS nor HPs, and a PATH or WEIGHTS read that fails its n> condition has no branch either. Fix: write
+      the rule as a complete partition per target (every combination of G(null), G(pre), G(pre/null) and n> lands in a named
+      outcome, the leftovers in an explicit NOT RESOLVED), and say for each outcome, NOT RESOLVED included, what is done next.
+      (2) The HPs branch''s next step, ''the window change, with these runs as the expected gain'', is the rerun of the fine-tune
+      searches that Joaquin turned down on this entry (''No, we wont rerun that now'', 2026-11-12 03:19; dead end step 10).
+      Fix: on that branch, the finding goes to Joaquin with these runs as the evidence and the rerun as a proposal with its
+      cost, or the design names a test under 30 GPU-h that is not that rerun. Also name the branch correctly: the scratch
+      HPs fall inside the fine-tune window (lr_scale = scratch lr / config lr, about 0.28-3 for scratch lr in [0.00222, 0.02],
+      within [0.1, 10]; layer_decay 1 is the window''s top edge), so pre matching scratch there would point at the 8-trial
+      search or at layer_decay < 1, not at the window''s bounds. (3) Text fix, not a run change: the design says lr_scale
+      = scratch lr / 0.007817, but the configs'' fixed training.lr differs per cell (tree 0.006665, 0.006833, 0.007817, 0.009297;
+      V/B 0.006665, 0.006833, 0.007817, 0.004648); analysis/data_saving/submit_nullparent.py @eaacb51f already divides by
+      each config''s own value, which is correct; write the design to match. Checks 1, 2, 3, 5, 8-15 hold: single param group
+      at lr0 x lr_scale with layer_decay 1 equals scratch''s optimizer; null vs pre differ only in weights (shrink_perturb
+      [0,1] at seed+1 after the head map); suspects readout shows the measure moving (G 1.77-8.19 tree, scratch arms 50-68x)
+      and V/B same-HP reruns 0.30-1.0; 7.6 GPU-h under the 30 of D412; smoke planned.'
   step_waits:
     '3': a design-reviewer
   findings:
