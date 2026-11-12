@@ -201,7 +201,7 @@ def plot(path, figs):
         mk, c = style[lab]
         a1.plot(ev["phi"], np.median(ev[lab], 0), mk, color=c, ms=2, label=lab)
     a1.set_xticks([0, np.pi, 2 * np.pi], ["0", r"$\pi$", r"$2\pi$"])
-    a1.set_xlabel(r"azimuth $\varphi$ from the (parent $g$, $u$) plane")
+    a1.set_xlabel(r"azimuth $\varphi$ of the $gg$ pair")
     a1.set_ylabel(r"$\log_{10}|\mathcal{M}|^2-$ mean over $\varphi$")
     rows = sorted(az.values(), key=lambda v: v["y"])
     y = [v["y"] for v in rows]
