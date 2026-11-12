@@ -21400,8 +21400,6 @@ entries:
   next:
     3: 'Draft by 2026-11-13 (D413/D414): a second data-saving example besides ee->uu, both arms well trained by curve_quality.py,
       L(D) figure + S with band; tt kept in the background'
-    4: b b~ > Z Z LO fine-tune searches launched when the held-out parent dsave_parent_heldoutbbzz (FA-ccin2p3-0d698e4b) ends;
-      design PASS 2026-11-12 (revised)
     5: 'Template test at 16 trials (design PASS 19:2x, D426/D427/D429): 4 WSD-only searches t t~ LO D=316, 3162 scr/ft extended
       8->16 (relaunch drive.py --n-trials 16 --wave-sizes 3,3,2,4,4 on the 4 dsave_wsd configs when detach tmpl2_wsd2 ends;
       the withdrawn batch-searching dsave_tmpl2_* run to 8 in that driver, not read), 2 wide fine-tune searches dsave_wideft_ft
@@ -25419,7 +25417,6 @@ entries:
       n_trials, more trials, running best, lr_scale, layer_decay in results.tex, dead ends, site decisions.'
   step_waits:
     '3': bbx_zz_lo_scr3, bbx_zz_lo_ft drivers (detach events)
-    '4': detach bbzz_lo_ft_repick end
     '5': detach ttx16_repick end
   findings:
   - at: '2026-11-10T03:35:22+00:00'
@@ -26600,11 +26597,6 @@ entries:
       if:
       - 'a target shows S>1 with both arms well trained: its figure goes to Joaquin for the draft'
       - 'none: fix the optimization on the most promising target and redo its L(D) tonight'
-    4:
-      feeds: 'the LO half of D413''s second example (b b~ > Z Z): the fine-tune arm needs its held-out parent'
-      if:
-      - 'parent ends clean: generate and launch the 7 fine-tune searches (and the scratch ones if not yet out)'
-      - 'parent breaks: read its log, fix, resubmit; LO fine-tune arm waits'
     5:
       feeds: 'the template for the remaining cells: trial count and fine-tune ranges (D422, D427)'
       if:
