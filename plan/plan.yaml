@@ -15793,9 +15793,6 @@ entries:
       the 22 running end: check_site_data --list on the 9 recipes, rerun the shards that refused once disk allows (resumable),
       then tell optimizations_recap''s owner a87ebdd2344eb92d7 its held-out reads can be redone. dsh_eea (115) waits on its
       own design (reviewer FIX: rewrite overwrites scored val/test; copy-and-compare or train-only assembly)'
-    26: 'Retire the 1301 catalog_v4 _smixq train pools on CC (30.89 GB, the flat-quota regeneration of catalog_coverage step
-      65, read only by recipes/catalog_v4_g12_regen.yaml of the held entry catalog_coverage; no running job reads them), on
-      Joaquin''s yes: deletion through prune.py''s pool rule, then census --quick again'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16250,11 +16247,6 @@ entries:
       - '0 pools missing: tell a87ebdd2344eb92d7 the reads can be redone'
       - 'pools still missing (disk floor or a failed build): rerun those shards when free space allows, or report to the main
         session the disk call'
-    26:
-      feeds: what is deleted on CC to get the disk back above the 60 GB alarm
-      if:
-      - 'yes: delete, re-run census, report freed GB'
-      - 'no: keep; the disk stays near 56 GB free, under the 60 GB alarm'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
