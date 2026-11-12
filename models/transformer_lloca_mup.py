@@ -306,6 +306,7 @@ class BaselineTransformerBlock(nn.Module):
 
         self.norm1 = BaselineLayerNorm()
         self.norm2 = BaselineLayerNorm()
+        self.gate1 = self.gate2 = None
 
         hidden_channels = channels // num_heads * attention_factor
 
@@ -353,15 +354,15 @@ class BaselineTransformerBlock(nn.Module):
             Outputs
         """
 
-        # Residual attention
+        # Residual attention (gate1/gate2: model.net.layer_norm=rezero's learned branch scalars, else None)
         h = self.norm1(inputs)
         h = self.attention(h, **attn_kwargs)
-        outputs = inputs + h
+        outputs = inputs + (h if self.gate1 is None else self.gate1 * h)
 
         # Residual MLP
         h = self.norm2(outputs)
         h = self.mlp(h)
-        outputs = outputs + h
+        outputs = outputs + (h if self.gate2 is None else self.gate2 * h)
 
         return outputs
 

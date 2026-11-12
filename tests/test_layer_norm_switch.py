@@ -22,5 +22,26 @@ def test_layer_norm_off():
     assert sa.keys() == sb.keys() and all(torch.equal(sa[k], sb[k]) for k in sa)
 
 
+
+def test_layer_norm_rezero():
+    """=rezero: identities plus a learned scalar per residual branch, 0 at init (each block starts as the identity)."""
+    from models.lloca import LLOCAMuPTransformer
+    from models.transformer_lloca_mup import BaselineTransformerBlock
+    kw = dict(num_scalars=4, hidden_channels_mlp=16, num_layers_mlp=2, in_channels=8, attn_reps="8x0n+2x1n",
+              out_channels=1, num_blocks=2, num_heads=2)
+    torch.manual_seed(0); a = LLOCAMuPTransformer(**kw)
+    torch.manual_seed(0); b = LLOCAMuPTransformer(layer_norm="rezero", **kw)
+    blocks = [m for m in b.net.modules() if isinstance(m, BaselineTransformerBlock)]
+    gates = {k for k, _ in b.named_parameters() if k.endswith(("gate1", "gate2"))}
+    assert len(gates) == 4 and all(float(m.gate1) == 0 and float(m.gate2) == 0 for m in blocks)
+    assert not [k for k, _ in a.named_parameters() if "gate" in k]
+    try:
+        LLOCAMuPTransformer(layer_norm="nope", **kw)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("an unknown layer_norm value passed")
+
+
 if __name__ == "__main__":
-    test_layer_norm_off(); print("ok")
+    test_layer_norm_off(); test_layer_norm_rezero(); print("ok")

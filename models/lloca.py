@@ -223,13 +223,18 @@ class LLOCAMuPTransformer(nn.Module):
                         t[:k].copy_(r[:k])
                         t[k + 1:].copy_(r[k:])
             del ref
-        if not layer_norm:
+        if layer_norm is not True:
             # model.net.layer_norm=false: the blocks' pre-norms become identities (kit_benchmark: does normalisation
-            # stop the transformer extrapolating its out-of-range log inputs, as a ReLU MLP does?)
+            # stop the transformer extrapolating its out-of-range log inputs, as a ReLU MLP does?); =rezero also gates
+            # each residual branch by a learned scalar starting at 0 (ReZero, arXiv:2003.04887), which trains a norm-free
+            # stack stably (false diverged at the LN run's lr, FA-ccin2p3-bba9a61e)
+            assert layer_norm in (False, "rezero"), f"model.net.layer_norm={layer_norm!r}: true, false or rezero"
             from models.transformer_lloca_mup import BaselineTransformerBlock
             for m in self.net.modules():
                 if isinstance(m, BaselineTransformerBlock):
                     m.norm1, m.norm2 = nn.Identity(), nn.Identity()
+                    if layer_norm == "rezero":
+                        m.gate1, m.gate2 = nn.Parameter(torch.zeros(1)), nn.Parameter(torch.zeros(1))
 
     def forward(
         self,
