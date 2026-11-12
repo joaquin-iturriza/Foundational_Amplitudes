@@ -75,7 +75,11 @@ def main():
             # name, and several shapings of one class can sit side by side: _smix_, _smixd50_, _smixd25_)
             rec0 = mg.variable_energy_recipe(p["name"], float(lo), float(hi), int(p["n_" + role]), role=role, seed=a.seed)
             fs = [mg.recipe_output_path(rec0, datagen.dest_for_role(role))]
-            assert os.path.exists(fs[0]), (p["name"], role, fs[0])
+            if not os.path.exists(fs[0]):
+                # never stored: a default-share mixture (_smixd50/_smixd25) is composed at load with its own sidecar
+                # (mix_compose); any other missing pool fails the run's own load, not here
+                print(f"[ALPHAS] no pool: {os.path.basename(fs[0])}")
+                continue
             out = fs[0][:-len(".npy")] + ".alphas.npy"
             if os.path.exists(out):
                 continue
