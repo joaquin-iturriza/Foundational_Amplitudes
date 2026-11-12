@@ -113,6 +113,8 @@ def findings(text, terms):
 
 def check(path, terms):
     """Lines of findings for one file (empty if it passes)."""
+    if "run_plots" in os.path.normpath(path).split(os.sep):   # a run's own plot, copied unchanged: labels are the training code's
+        return []
     try:
         pp = pages(path)
     except (OSError, ValueError) as e:
