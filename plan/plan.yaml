@@ -16978,6 +16978,33 @@ entries:
       then gc --parts, then drop the copies. No: put the copies back and report which processes differ and by how much, with
       the parts kept. Alternative: make the re-assembly write only the missing train pools and leave cached val/test untouched,
       tested on the unit case.'
+  - at: '2026-11-12T02:22:11+00:00'
+    question: 'Finish the restore of the CC pools deleted 2026-11-11: (A'') rerun the 5 held-out regen shards that the prebuild''s
+      20 GB free floor refused (K=2,4,8,11,12 of 32; ~16 pools, ~0.4 GB); (C2'') one more worker for the PP4 parts queue''s
+      last run (pp13v4_udx_uuxwpz run 0, 558880 events, est 2.74 h on 1 core; 11 of 12 processes assembled); (B) catalog_v4_dsh_eea''s
+      115 train pools re-assembled from their kept parts. Passed A/C1/C2 of 2026-11-12T01:37 unchanged. No training.'
+    prior: 'Design passed 01:37 (A, C1, C2: 684/700 H and 431/504 PP4 built, 5 A shards refused at 16-18 GB free, logs read
+      E5600/E5602/E5606/E5608/E5609); design-reviewer FIX on B (re-assembly rewrites scored val/test). Fix 22226958: an assembly
+      writes only the pools not on disk; tests/test_lhe_parts.py test_reassembly_keeps_scored_pools: val/test same bytes and
+      mtime after a re-assembly, train rebuilt; fails on the old code (val rewritten). C2''s own logs show the same subset
+      path live (''assembled 1 pools'' per process: its plan stored only the missing train). Parts kept by LHE_PARTS_AUTO_GC=0
+      (22d37fa5).'
+    measure: 'check_site_data --list on CC over catalog_v4_heldout_{H1..H7c}, catalog_v4_pp_test, catalog_v4_eea_lhe: not
+      prebuilt now 16 + 73 + 115 (approx, C1 shard 7 still running); after 0. B: dsh_eea val/test pools unchanged (size, mtime
+      and sha256 of each, recorded before the job and compared after); parts still 115/115 after.'
+    check: 'The cache test is the one a require_cache run makes (datagen._is_cached); the val/test unchanged test is byte-level
+      and was shown to catch a rewrite on the unit case (fails on the old code). Sameness of train: same parts, same seeds
+      as the original assembly, recipe ids reproduced.'
+    fixed: 'A'': scripts/job_catalog_v4_regen.sh @22226958, the same 8 held-out recipes, V4REGEN_N=32, K in {2,4,8,11,12},
+      16 cores, --time 08:00:00 (H5 one-loop at most ~1.8 h), target 2.5 h. C2'': scripts/job_lhe_parts.sh LHE_QUEUE=zz_redesign_pp4_parts,
+      1 job, --time 04:00:00, target 3 h. B: scripts/job_lhe_parts.sh LHE_QUEUE=catalog_v4_dsh_eea --env LHE_PARTS_AUTO_GC=0,
+      1 job of 16 cores, --time 02:00:00, target 1 h; lhe_parts gc --parts only after the measure passes (D208). Free space
+      read at submission (32 GB on 2026-11-12 ~03:40) above the 20 GB floor; ~4 GB to write. Job names zz_redesign_*.'
+    control: 'Not an A/B: the recipe ids and the val/test byte comparison.'
+    seeds: data seed 42, one build
+    outcome: 'Yes: 0 not prebuilt on all listed recipes, dsh_eea val/test byte-identical, then gc --parts and optimizations_recap''s
+      owner told its reads can be redone. No: a refused or failed shard is read and rerun once disk allows; a changed val/test
+      pool stops B: parts kept, reported with which processes.'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
