@@ -24715,7 +24715,7 @@ entries:
     - FA-ccin2p3-e4eecead
     - FA-ccin2p3-eb0f30db
     - FA-ccin2p3-f6b2ece9
-    commit: b6cf1e61
+    commit: 9df60812
     paths:
     - analysis/kit_benchmark/data/kit_fig_A.json
     - scripts/job_kit_package.sh
@@ -24724,6 +24724,9 @@ entries:
     - tests/test_input_reps.py
     - tests/test_kit_hardps.py
     - tests/test_kit_threshold_scan.py
+    - tests/test_layer_norm_switch.py
+    - tests/test_pair_beta.py
+    - tests/test_store_tag.py
     - tools/kit_figures.py
     - tools/kit_hardps.py
     - tools/kit_package.py
