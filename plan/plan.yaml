@@ -25245,6 +25245,16 @@ entries:
       (v4_bbx_zz with its catalog sampling, val/test pools) and T(D) (no LO calibration: take the V ladder''s T(D) as a stated
       assumption, or the s4 tree default). Cost: LO at k=2..8 ~21 GPU-h: with the V batch 42 > 30, so LO at 5 points (k=2,4,5,6,7,
       ~12.4 GPU-h) + parent 1.5.'
+  - at: '2026-11-12T15:07:55+00:00'
+    text: '2026-11-12 16:05 CET (owner ab42424f5211e65de): the b b~ > Z Z one-loop V/B L(D) had NOT gone out at 15:53 (detach
+      bbx_zz_v_LD exited rc=1: drive.py''s CC sync refused on another agent''s uncommitted files, nothing submitted; the hand-off
+      said RUNNING). Restarted with the same 14 configs @79578039 as detach bbx_zz_v_LD2 at 16:02; 42 first-wave trials on
+      CC by 16:06. LO arm: new parent recipe recipes/catalog_v4_datasaving_parent_heldoutbbzz.yaml = the r4 held-out recipe
+      (1133 pools, reproduced exactly from catalog_v4_kit_pretrain_heldout minus DROP) minus v4_bbx_zz (its f f~ > Z Z class:
+      ee_ZZ = uubar_ZZ in equal_processes.json, plus d d~/b b~ > Z Z with massless b; none of the others is in r4), job case
+      heldoutbbzz at r4''s T=3458 and lr 9.248e-3; LO target recipe = v4_bbx_zz''s r4 entry; 14 configs sweep/sweep_config_dsave_s2_{scr,ft}_bbx_zz_d{2..8}_t*.yaml
+      on the V/B ladder''s T(D) (no LO calibration, stated). Design recorded 16:20; design reviewer and repo-reviewer (overdue
+      backlog gates the commit) running.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
