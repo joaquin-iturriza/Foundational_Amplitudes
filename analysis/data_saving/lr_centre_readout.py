@@ -37,8 +37,8 @@ TESTS = {"lr": ({"epem_ttx_d7_t8500": TTX}, {"c/3": "lrthird", "c/10": "lrtenth"
          # lrx3 = the lr window x3 (gen_data_saving --lr-factor 3), validation-with-training test after D420
          "lrx3": ({c: UUV for c in ("epem_ttx_d5_t8500", "epem_ttx_d7_t8500", "ee_uu_d5_t7310", "ee_uu_d7_t8500",
                                     "bbx_zz_nlo_d5_t3840", "bbx_zz_nlo_d7_t6400")}, {"lr x3": "lrx3"}),
-         # tmpl2 = the revised template (hp_ranges_readout.py) without the batch search (Joaquin 2026-11-12): WSD, and for
-         # the fine-tunes lr_scale and layer_decay opened downward (dsave_wideft_ft; scratch has no such search)
+         # tmpl2 = the revised template (hp_ranges_readout.py) without the batch search (D426): WSD, and for the
+         # fine-tunes lr_scale [0.03, 30] and layer_decay [0.5, 1] (dsave_wideft_ft; scratch has no such search)
          "tmpl2": ({"epem_ttx_d5_t8500": UUV, "epem_ttx_d7_t8500": UUV}, {"WSD": "wsd", "wide ft ranges": "wideft"})}
 TEST = sys.argv[sys.argv.index("--test") + 1] if "--test" in sys.argv else "lr"
 CELLS, VARIANTS = TESTS[TEST]
@@ -77,6 +77,21 @@ def search(rr, arm, name):
     return out
 
 
+def issue_order(name, r):
+    """A trial's place in its search's issue order: the driver's trial idx (sweeps_local/<search>/driver_state.json);
+    the trial_NNNN of the run dir is the candidate index, not the order."""
+    st = json.load(open(os.path.join(REPO, "sweeps_local", name, "driver_state.json")))["trials"].values()
+    by_hp = {t["hp_idx"]: t["idx"] for t in st}
+    return by_hp[int(r["run_dir"].rstrip("/").rsplit("_", 1)[1])]
+
+
+def ratio(a, b, bar):
+    """a's best val over b's, read against the per-cell 5x spread: LOWER / HIGHER beyond `bar`, else WITHIN."""
+    r = a["best_min"] / b["best_min"]
+    return {"ratio": r, "read": "LOWER" if r < 1 / bar else "HIGHER" if r > bar else "WITHIN",
+            "a_best_good": a["best"]["well"], "b_best_good": b["best"]["well"]}
+
+
 def summary(g):
     b = min(g, key=lambda r: r["val_min"])
     return {"n": len(g), "n_good": sum(r["well"] for r in g), "best_min": b["val_min"],
@@ -105,8 +120,8 @@ def main():
                     print(f"{cell} {arm} {centre}: no trials with curves ({name})")
                     continue
                 S[centre] = summary(g)
-                if len(g) > 8:   # D427 test: the same search read at its first 8 trials (trial_NNNN = issue order)
-                    S[centre]["first8"] = summary(sorted(g, key=lambda r: r["run_dir"])[:8])
+                if len(g) > 8:   # D427 test: the same search read at its first 8 issued trials
+                    S[centre]["first8"] = summary(sorted(g, key=lambda r: issue_order(name, r))[:8])
                 S[centre]["failed"] = failed(name)
                 best[(cell, arm, centre)] = min(g, key=lambda r: r["val_min"])
             for centre, s in S.items():
@@ -116,6 +131,29 @@ def main():
                       f"(peak lr {b['peak_lr']:.2e}: separation {b['separation']:.3g} end_up {b['end_up']:.3g})"
                       + (f"  failed {s['failed']}" if s["failed"] else "") + (f"  -> {s['verdict']}" if s["verdict"] else ""))
             res[f"{cell}/{arm}"] = S
+    if TEST == "tmpl2":
+        # design after D427: (A) each WSD search at 20 trials over its first 8; (B) wide fine-tune ranges over WSD at
+        # 20, per fine-tune cell; (C) WSD's first 8 over the stage-2 control; per cell 5x, pooled 5^(1/sqrt(n))
+        cmp = {"A": [], "B": [], "C": []}
+        for k, S in res.items():
+            w = S.get("WSD")
+            if w and "first8" in w:
+                cmp["A"].append((k, ratio(w, w["first8"], 5)))
+            if w and "wide ft ranges" in S:
+                cmp["B"].append((k, ratio(S["wide ft ranges"], w, 5)))
+            if w and "control" in S:
+                cmp["C"].append((k, ratio(w.get("first8", w), S["control"], 5)))
+        res["comparisons"] = {}
+        for part, L in cmp.items():
+            if not L:
+                continue
+            G = float(np.exp(np.mean([np.log(r["ratio"]) for _, r in L])))
+            bar = 5 ** (1 / np.sqrt(len(L)))
+            res["comparisons"][part] = {"cells": dict(L), "pooled": G, "bar": bar,
+                                        "read": "LOWER" if G < 1 / bar else "HIGHER" if G > bar else "WITHIN"}
+            for k, r in L:
+                print(f"({part}) {k:24s} ratio {r['ratio']:.3g} {r['read']}  best good {r['a_best_good']} vs {r['b_best_good']}")
+            print(f"({part}) pooled {G:.3g} (bar {bar:.3g}) {res['comparisons'][part]['read']}")
     q = [S["control"]["best_min"] and S[v]["best_min"] / S["control"]["best_min"] for S in res.values() for v in VARIANTS
          if v in S and "control" in S]
     if TEST == "lrx3" and len(q) > 1:
