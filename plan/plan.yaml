@@ -24651,9 +24651,6 @@ entries:
     6: 'Coulomb rise, target side: tt virtual target divided by its Coulomb factor (the exact O(alpha_s) 1/beta term) on top
       of the beta-input arm, from scratch, job_kit.sh A 1e5 8000 steps vs FA-ccin2p3-3fc1016a; design first, then KIT readout
       --vs and the threshold scan'
-    8: 'D403 MLP ladder (design passed 2026-11-12): read FA-ccin2p3-d277f7f5 (uug + his numpy baseline.py port check), 7a63ea88
-      (uugg), 1df8bd16 (tt virtual): kit_figures collect/plot over runs/kit_mlp, deepest bin per arm vs mlp by the design''s
-      rule'
     9: 'D405/D406 transfer test (design recorded 2026-11-12, design-reviewer a169c0ded88f258e3): implement sqrts_measure log_beta
       (mg5_pipeline_final._sqrts_sampler, plain RAMBO path, 2->2 equal masses, beta log-uniform [1e-5,0.6]) + test; recipe
       v4_{gg,ddx,bbx}_ttx__thr (gen_datasaving_parent.py heldoutthr variant), generate (CPU); r5thr parent (job_datasaving_parent.sh
@@ -25261,12 +25258,6 @@ entries:
       - 'Coulomb median log10(arm/control) < -0.3, no family worse: the factor goes to the parent''s tt pools, the arm replaces
         ttvirt_A_best_threshold'
       - 'within +-0.3: protocol B stays the only threshold model; report the limit of protocol A'
-    8:
-      feeds: which difference between Bakar's MLP and our setup stops our models extrapolating (D403)
-      if:
-      - 'a single arm loses his extrapolation: carry his choice for that factor into the transformer (next design)'
-      - 'only ours fails: two-factor arms'
-      - 'no arm fails: feed the transformer his inputs only (architecture rung)'
     9:
       feeds: whether pretraining with the helpful inputs and physical-mass, threshold-covering top data transfers to the KIT
         t t~ virtual (D405)
@@ -25284,7 +25275,6 @@ entries:
   step_waits:
     '5': FA-ccin2p3-538eeb1e
     '6': FA-ccin2p3-d277f7f5 FA-ccin2p3-7a63ea88 FA-ccin2p3-1df8bd16
-    '8': FA-ccin2p3-f26d0458
     '10': FA-ccin2p3-bba9a61e FA-ccin2p3-36a30e0c
   handoff:
     state: 'Redraw check done: reference line labelled ''truth clipped to / training range'' (two lines; the previous three-line
