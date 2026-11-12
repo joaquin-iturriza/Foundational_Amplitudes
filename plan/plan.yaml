@@ -27077,6 +27077,10 @@ entries:
       stays with training. Note: HETEROSC val is an NLL whose late rise may be sigma collapse; read the mu-MSE val curve too.'
     16: 'HP search for uugg and uug with the T target (same single-fidelity DyHPO template as step 15, WSD, ~16 GPU-h): only
       on Joaquin''s yes to the 40 GPU-h total (D412)'
+    17: 'Redo of 11c (fine-tunes from the held-out-catalog parents, with LO tops / LO and one-loop tops, with and without
+      log beta^2, and their scratch controls) at the step-15/16 chosen settings for t t~ virtual: the 11c runs (8000 cosine
+      steps) are not converged (NLL still falling 1.1-2.0 nats over the last 800 steps; 3 of 7 fail separation narrowly),
+      finding 2026-11-12 ~23:30. Own design after kit_hpo''s read.'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -28155,6 +28159,11 @@ entries:
       if:
       - 'yes: launch beside step 15''s searches'
       - 'no: uugg and uug-T stay at the old HP point, said wherever shown'
+    17:
+      feeds: whether one-loop top pairs in pretraining transfer the Coulomb rise, read on converged runs
+      if:
+      - 'Coulomb transfer appears on converged runs: one-loop tops go into the KIT parent'
+      - 'still none: 11c''s NO stands, now on converged runs'
   step_waits:
     '5': 'kit_hpo driver DONE event: the package takes the chosen trials'' models'
     '15': kit_hpo driver DONE event (detach:kit_hpo, log ~/.local/share/ccorch/detached/20261112-224604_kit_hpo.log); live
