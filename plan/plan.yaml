@@ -15788,6 +15788,9 @@ entries:
       notifications after a hand-back were already absorbed; owner resumes by peer hand-backs cannot be held (Claude Code
       offers no delivery delay, an owner has no waiter). Also confirm the first run of a held item that ends gets its RUN
       event and RUN_DONE with no manual poll (next 19 fix).'
+    22: 'drive.py start-up sync failure (kit_hpo driver died 2026-11-12 22:30 on a timed-out jeanzay sync): fix d3a0b8a4 already
+      on trunk (failed/timed-out site left out of placement, logged; test_site_down_at_sync_is_left_out); repo-reviewer check
+      of it'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16283,6 +16286,11 @@ entries:
       if:
       - 'saving within or above 11-30% on main per day: keep 10 min'
       - 'below: report to Joaquin with numbers and causes'
+    22:
+      feeds: whether a driver survives a site down at start-up
+      if:
+      - 'reviewer PASS: done, nothing to merge (already on trunk)'
+      - 'reviewer FIX: fix on trunk, re-check with the same reviewer'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
