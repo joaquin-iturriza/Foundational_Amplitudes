@@ -29679,6 +29679,30 @@ entries:
       orientation or the relative transforms, which is what the next design targets. If the probe shows the clamp inactive,
       the test is void and reported so. WORSE (bulk or any family >= +0.5): the bound breaks the frames'' learning, reported
       as such.'
+    fix_at: '2026-11-12T15:51:09+00:00'
+    fix: 'Check 2 and 4 fail on the uugg arm; uug passes. (1) The uugg control c364a7ae has no collinear overshoot to remove:
+      analysis/kit_benchmark/data/kit_extrap.json gives deepest y 1e-7..1e-6 median signed error coll_gg +0.05 (log-MSE 2.47)
+      and coll_qg -1.36 (log-MSE 3.57, an undershoot), soft -0.31. The design''s question (remove the q-g collinear overshoot)
+      and its YES bound (deepest collinear signed <= +0.30) are written from uug; on uugg the control already meets that bound,
+      so YES there would hang on the family median alone and the overshoot logic does not apply. Also no frames probe exists
+      for uugg (only kit_frames_probe_uug.json and _ttvirt.json), so neither the link between frame gamma and the uugg error
+      nor the share of uugg bulk_train frames above gamma 4 (the clamp''s reach into the bulk) is shown. Fix: run tools/kit_transformer_probe.py
+      eval-only on c364a7ae (CPU on CC, as for uug) and quote per-stratum gamma, gamma of the relative transforms, and the
+      bulk_train share above 4; then either keep uugg with an outcome written for its own failure (qg undershoot -1.36: e.g.
+      |deepest qg signed| <= 0.30 and family median <= -0.3, plus the gg and soft bounds), with G chosen from its own bulk
+      distribution, or drop uugg from this arm and say why (the clamp is only tied to the error on uug). (2) NO branch: gamma_max
+      bounds each frame''s gamma, not the relative transforms Lambda_i Lambda_j^-1 the attention applies (two gamma-4 frames
+      can give a relative gamma up to 2*16-1 = 31; uug bulk_train relative max 13.8, deepest collinear stratum median 17).
+      State that the probe on the arm''s weights reads the relative gamma in the collinear strata too, and that a NO with
+      relative gamma still above the bulk range does not rule out boost size. Read and found fine: uug control and arm differ
+      only in model.net.frames_gamma_max=4 at the controls'' HPs (A/B at fixed HPs); measure moves with the frames (frames
+      cut a2cba8d7: deepest coll +1.36 -> -0.25, family -0.24; kit_frames_probe_uug.json: gamma median 1.65/2.59/4.06/6.54/10.65
+      with signed error +0.01/+0.05/+0.26/+0.69/+1.38, bulk_train share above 4.06 = 0.55%); one seed per D315 with the 0.3-decade
+      read; HETEROSC; lloca clamp_boost present (.venv-cpu equi_frames.py, passthrough models/lloca.py:178); step rate from
+      the controls themselves (1.72/1.86 h); disk: control run dirs 81 MB and 104 MB on CC, /sps/lpnhe 67 GB free (2026-11-12)
+      - add that line to the design. Searched for check 5: gamma_max, clamp_boost, frames boost, boost bound, gamma in docs/results.tex
+      (none), the entry''s findings and dead ends, site decisions (D315, D395, D411, D412, D419): no prior run of a frames
+      boost bound.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
