@@ -176,7 +176,11 @@ def figures_handed_back(inp, records=None, spool=SPOOL):
         if body.startswith("ROUTINE:") or "Joaquin" not in body:
             continue
         for f in _FIG.findall(body):
-            if f not in missing and not any(b == os.path.basename(f) for st, b in sent) \
+            try:
+                mt = os.path.getmtime(f)    # a send older than the file is of an earlier version
+            except OSError:
+                mt = 0                      # file not here: any send counts
+            if f not in missing and not any(b == os.path.basename(f) and st >= mt for st, b in sent) \
                     and not any(st >= t and os.path.basename(f) in tx for st, tx in said):
                 missing.append(f)
     if not missing:
