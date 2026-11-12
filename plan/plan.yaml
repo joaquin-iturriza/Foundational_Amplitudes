@@ -23551,7 +23551,8 @@ entries:
     '2': '2026-11-13'
     '1': FA-ccin2p3-c3205cee (D395 smoke of PIDQN=pid), then the two arms afterok; held at submission by site submit's 60
       GB disk floor on CC (52 GB free)
-    '3': the design reviewer (af9efea1918f58f93)
+    '3': FA-ccin2p3-71cdfc9b (D395 smoke of LONG_OPT=adamw), then the AdamW x16 run afterok; held at submission by site submit's
+      60 GB disk floor on CC (52 GB free)
   handoff:
     state: 'pidqn design PASSED (design-reviewer, second look). Code on branch pid_vs_qn (worktree worktrees/pid_vs_qn: 5541a2ec
       + fix 9ecbae9f). The repo-reviewer (agent a908d9ab432d34127, holds the lock) BLOCKED on a wrong _dimless_mass_stats
