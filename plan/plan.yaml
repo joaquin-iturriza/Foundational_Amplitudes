@@ -21367,16 +21367,23 @@ entries:
     answers_after: '2026-11-12T02:39:42+00:00'
     covers:
     - pretrain_data_saving
+  - said_at: '2026-11-12T17:40:42.419000+00:00'
+    text: And no, if we still don't see a gain, and you can't guarantee that you can properly train these networks, I see
+      no reason to run the large data trainings
+    decision: D420
+    answers_after: '2026-11-12T15:42:33+00:00'
+    covers:
+    - pretrain_data_saving
   decisions:
   - D360
   - D377
   - D407
+  - D420
   next:
     3: 'Draft by 2026-11-13 (D413/D414): a second data-saving example besides ee->uu, both arms well trained by curve_quality.py,
       L(D) figure + S with band; tt kept in the background'
     4: b b~ > Z Z LO fine-tune searches launched when the held-out parent dsave_parent_heldoutbbzz (FA-ccin2p3-0d698e4b) ends;
       design PASS 2026-11-12 (revised)
-    6: 'b b~ > Z Z larger-D cells: D=31623 at one loop, D=31623 and 1e5 at tree level, ~29 GPU-h (only on Joaquin''s yes)'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -21441,6 +21448,9 @@ entries:
       AdamW arm at Muon''s HPs reached a 77x worse minimum at D=3162 (suspects_readout); turning up at the end sits at small
       D (D<200: 70/144 scratch, 78/120 fine-tune; D>=2000: 12/132, 12/117), not with the optimizer. Not run.'
     at: '2026-11-12T17:14:26+00:00'
+  - tried: 'b b~ > Z Z larger-D cells: D=31623 at one loop, D=31623 and 1e5 at tree level, ~29 GPU-h (only on Joaquin''s yes)'
+    why: 'step 6 dropped by D420: the user answered no to the question that blocked it'
+    at: '2026-11-12T17:40:55+00:00'
   asks:
   - ask: 'GPU budget: 200-290 GPU-h above 30 with no decision covering it. Stage 2 of the data-saving study (three held-out
       tree targets, scratch against fine-tuned, an 8-trial DyHPO per cell, one seed per cell). The data saved expected from
@@ -21539,8 +21549,10 @@ entries:
       (catalog design ideas), 2026-11-10T02:08 (the data-saving request, sets trees and one loops, not the D grid), 2026-09-30T01:01
       (narrative planning): none sets the D range of this example'
     blocks: the larger-D cells
-    blocks_steps: &id002
+    blocks_steps:
     - 6
+    answered_at: '2026-11-12T17:40:42.419000+00:00'
+    decision: D420
   owner:
     agent: af9e7383d68f88657
     state: working
@@ -25665,19 +25677,6 @@ entries:
       if:
       - 'parent ends clean: generate and launch the 7 fine-tune searches (and the scratch ones if not yet out)'
       - 'parent breaks: read its log, fix, resubmit; LO fine-tune arm waits'
-    6:
-      feeds: the b b~ > Z Z L(D) range for the draft's second example (D413/D417)
-      if:
-      - 'yes: generate and send the extra searches'
-      - 'no: the figure stops at 1e4, said in its caption'
-  ask: 'Scope: the b b~ > Z Z grid stops at D=1e4 at both orders under D412; adding D=31623 at one loop (~15 GPU-h) and D=31623,
-    1e5 at tree level (~14 GPU-h), as the sibling tree targets have, costs ~29 GPU-h more. Add them?'
-  waiting_since: '2026-11-12T15:42:33+00:00'
-  searched: 'site decisions --project FA (D412 30 GPU-h, D413/D417 second example; none sets this grid); his messages 2026-09-30T02:14
-    (catalog design ideas), 2026-11-10T02:08 (the data-saving request, sets trees and one loops, not the D grid), 2026-09-30T01:01
-    (narrative planning): none sets the D range of this example'
-  blocks: the larger-D cells
-  blocks_steps: *id002
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
@@ -30569,7 +30568,7 @@ entries:
       about cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID,
       says nothing about the draft's sections)
     blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-    blocks_steps: &id003 []
+    blocks_steps: &id002 []
   owner:
     agent: afb073b8fc9460ec5
     state: stopped
@@ -30587,7 +30586,7 @@ entries:
     cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID, says
     nothing about the draft's sections)
   blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-  blocks_steps: *id003
+  blocks_steps: *id002
   step_why:
     1:
       feeds: the draft's results (D354)
