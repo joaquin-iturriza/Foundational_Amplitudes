@@ -153,7 +153,7 @@ def arm_label(r, with_n=True):
     when every curve of the figure has the same one; the caption gives it)"""
     n = r"$10^5$" if r["n"] == 100000 else r"$9\times10^5$"
     how = {"A": "scratch", "A_ft": "pretrained", "B": "scratch + hard events",
-           "B_bulk": "scratch + bulk steps"}[r["mode"]]
+           "B_bulk": "scratch + 3000 steps\non bulk only"}[r["mode"]]
     lab = f"{how}, {n} bulk" if with_n else how
     tag = r["tag"]
     if tag.endswith("lr0p1"):   # the A_ft design's lr-axis check (KIT_LR_SCALE=0.1)
@@ -186,6 +186,18 @@ def plot(path, outdir, prefix="", split_offshell=False):
             runs = [(nm, dict(r, tag="")) for nm, r in runs]
         with_n = len({r["n"] for _, r in runs}) > 1
         arms = [(arm_label(r, with_n), colors[i % len(colors)], r) for i, (_, r) in enumerate(runs)]
+        ls = {}
+        if len(runs) > len(colors):   # colours would repeat: a fine-tune takes its scratch twin's colour, dashed (lr x0.1 dotted)
+            twin = {(r["n"], r["tag"]): c for _, c, r in arms if r["mode"] == "A"}
+            free = iter([c for c in colors if c not in twin.values()] * 2)
+            for i, (lab, c, r) in enumerate(arms):
+                if r["mode"] == "A_ft":
+                    lr = r["tag"].endswith("lr0p1")
+                    key = (r["n"], r["tag"][:-len("lr0p1")].rstrip("_") if lr else r["tag"])
+                    arms[i] = (lab, twin.get(key) or next(free), r)
+                    ls[id(r)] = ":" if lr else "--"
+                elif r["mode"] != "A":
+                    arms[i] = (lab, next(free), r)
         base = f"{stem}_{target}" + ("_nooffshell" if off else "")
         # (1) log10-MSE per stratum
         figs = ps.panels(len(fams))
@@ -193,7 +205,7 @@ def plot(path, outdir, prefix="", split_offshell=False):
             for lab, c, r in arms:
                 pts = sorted((v["x"], v["logmse"]) for k, v in r["strata"].items()
                              if k.startswith("hard_test/") and family(k.split("/")[1]) == fam)
-                ax.plot(*zip(*pts), "o-", color=c, label=lab)
+                ax.plot(*zip(*pts), "o", ls=ls.get(id(r), "-"), color=c, label=lab)
             fl = sorted((v["x"], v["mse"]) for st, v in tr["floor"].items() if family(st) == fam)
             if any(m > 0 for _, m in fl):   # zero in every bin (truth inside the training range): not drawn, no entry
                 ax.plot(*zip(*fl), "--", color=ps.C.grey, label="truth clipped to\ntraining range")
@@ -227,7 +239,7 @@ def plot(path, outdir, prefix="", split_offshell=False):
             for lab, c, r in arms:
                 rows = r["medians"].get(fam, [])
                 if rows:
-                    ax.plot([q[0] for q in rows], [q[2] for q in rows], "o-", color=c, label=lab)
+                    ax.plot([q[0] for q in rows], [q[2] for q in rows], "o", ls=ls.get(id(r), "-"), color=c, label=lab)
             ax.set_xscale("log")
             ax.xaxis.set_minor_formatter(NullFormatter())
             ax.set_xlabel(XLAB.get(fam, fam.replace("_", " ")))
