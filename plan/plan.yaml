@@ -26512,6 +26512,7 @@ entries:
   step_waits:
     '5': '2026-11-13'
     '10': FA-ccin2p3-e8088a7d FA-ccin2p3-e1c19b4d
+    '11': design-reviewer a9837bbf79a4c200f
   handoff:
     state: '2026-11-12 ~14:05. D411 settled to one route: the transformer''s extrapolation failure into KIT limits (uug collinear
       overshoot +1.36, tt virtual Sudakov -0.53) is carried by the learned frames acting on the attention''s vector messages:
