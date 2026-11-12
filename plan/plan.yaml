@@ -24319,6 +24319,11 @@ entries:
     8: 'D403 MLP ladder (design passed 2026-11-12): read FA-ccin2p3-d277f7f5 (uug + his numpy baseline.py port check), 7a63ea88
       (uugg), 1df8bd16 (tt virtual): kit_figures collect/plot over runs/kit_mlp, deepest bin per arm vs mlp by the design''s
       rule'
+    9: 'D405/D406 transfer test (design recorded 2026-11-12, design-reviewer a169c0ded88f258e3): implement sqrts_measure log_beta
+      (mg5_pipeline_final._sqrts_sampler, plain RAMBO path, 2->2 equal masses, beta log-uniform [1e-5,0.6]) + test; recipe
+      v4_{gg,ddx,bbx}_ttx__thr (gen_datasaving_parent.py heldoutthr variant), generate (CPU); r5thr parent (job_datasaving_parent.sh
+      heldoutthr; smoke iters=50, D395); job_kit.sh A_ft tt virt_finite 1e5 8000 from r5 and r5thr with fine_tune.offshell_stats=own;
+      kit_readout --vs vs f21fa163 and the threshold scan'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -24850,6 +24855,13 @@ entries:
       - 'a single arm loses his extrapolation: carry his choice for that factor into the transformer (next design)'
       - 'only ours fails: two-factor arms'
       - 'no arm fails: feed the transformer his inputs only (architecture rung)'
+    9:
+      feeds: whether pretraining with the helpful inputs and physical-mass, threshold-covering top data transfers to the KIT
+        t t~ virtual (D405)
+      if:
+      - 'ft_thr Coulomb median < -0.3 vs scratch and vs ft_r5: threshold sampling goes into the catalog parent''s top-pair
+        pools'
+      - 'both NO: design one-loop top pairs at physical mass near threshold (gg/qq~ > tt~ virtual)'
   step_waits:
     '5': FA-ccin2p3-538eeb1e
     '6': FA-ccin2p3-d277f7f5 FA-ccin2p3-7a63ea88 FA-ccin2p3-1df8bd16
