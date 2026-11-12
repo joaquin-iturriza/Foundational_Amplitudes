@@ -26967,8 +26967,6 @@ entries:
       - 'none fixes: the KIT answer is the comparison against all of Bakar''s plots with the weak spots stated'
   step_waits:
     '5': FA-ccin2p3-203a274f FA-ccin2p3-7b891d10 FA-ccin2p3-eb870ad4
-    '11': 'FA-ccin2p3-6a926573 (D395 smoke of heldoutthrloop; the two parents and fine-tunes go after it once the boost-bound
-      design is re-passed: design_guard ties submissions to the latest design)'
     '12': FA-ccin2p3-203a274f FA-ccin2p3-7b891d10 FA-ccin2p3-eb870ad4 (log skip); detached probe_uugg (frames probe on c364a7ae
       for the boost-bound design's FIX); repo-reviewer (backlog blocks committing the probe's m/E column for the lightlike-tops
       check)
