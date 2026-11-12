@@ -25529,9 +25529,9 @@ entries:
     decision: D401
   owner:
     agent: a1441fe6f27448d3c
-    state: stopped
+    state: working
     since: '2026-11-12T10:46:29+00:00'
-    state_at: '2026-11-12T11:01:58.621000+00:00'
+    state_at: '2026-11-12T12:53:17.047000+00:00'
     context: 155391
     context_at: '2026-11-12T11:12:13+00:00'
   findings:
