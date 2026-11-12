@@ -147,7 +147,9 @@ INPUT_ARMS = {"pairlogs": r"+ $\log(s_{ij}/s)$ inputs", "softrescale": "+ soft l
               "softpair": r"+ soft rescale + $\log(s_{ij}/s)$",
               "softpairthr": r"+ soft rescale + $\log(s_{ij}/s)$" + "\n" + r"+ $\log\beta^2$ of massive pairs",
               "softpairthr_vbeta": r"+ soft rescale + $\log(s_{ij}/s)$" + "\n" + r"+ $\log\beta^2$, target $V\beta$",
-              "softpair_rezero": r"+ soft rescale + $\log(s_{ij}/s)$" + "\n" + "ReZero"}
+              "softpair_rezero": r"+ soft rescale + $\log(s_{ij}/s)$" + "\n" + "ReZero",
+              "softpair_scalars": "MLP inputs only",
+              "softpairthr_scalars": "MLP inputs only"}
 
 
 def arm_label(r, with_n=True):

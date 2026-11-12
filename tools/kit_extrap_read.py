@@ -86,16 +86,16 @@ def plot(path, figs):
             ks = sorted(ks, key=lambda k: edges(k.split("/")[1])[0])
             x = np.array([np.sqrt(np.prod([max(v, 1e-12) for v in edges(k.split("/")[1])])) for k in ks])
             ax.plot(x, [e["transformer"][k]["err"] for k in ks], "o-", color=ps.C.vermillion, label="transformer")
-            for arm, mk, c, lab in (("rezero", "D-", ps.C.orange, "transformer, ReZero"),
-                                    ("thr", "v-", ps.C.purple, r"transformer, $\beta$ input"),
-                                    ("scalars", "P-", ps.C.sky, "transformer, MLP inputs only")):
+            for arm, mk, c, lab in (("rezero", "D-", ps.C.orange, "ReZero"),
+                                    ("thr", "v-", ps.C.purple, r"$\beta$ input"),
+                                    ("scalars", "P-", ps.C.sky, "MLP inputs only")):
                 if f"transformer_{arm}" in e:
                     ax.plot(x, [e[f"transformer_{arm}"][k]["err"] for k in ks], mk, color=c, label=lab)
             for arm, mk, c in (("mlp", "s-", ps.C.blue), ("ours", "^--", ps.C.green)):
                 v = [[e[f"{arm}_s{s}"][k]["err"] for k in ks] for s in range(3) if f"{arm}_s{s}" in e]
                 if not v:
                     continue
-                ax.plot(x, np.median(v, 0), mk, color=c, label={"mlp": "MLP", "ours": "MLP, our choices"}[arm])
+                ax.plot(x, np.median(v, 0), mk, color=c, label={"mlp": "MLP", "ours": "MLP, ours"}[arm])
             ax.axhline(0, color=ps.C.grey, lw=0.8)
             ax.set_xscale("log")
             from matplotlib.ticker import NullFormatter
