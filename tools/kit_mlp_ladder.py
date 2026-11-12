@@ -115,7 +115,6 @@ def main():
     src = kh.h5_path(a.file)
     with h5py.File(src, "r") as f:
         mass = json.loads(f.attrs["metadata"])["particles"][2]["mass"]
-    n = None
     tr = kh.stratum_rows(a.file, a.target, "bulk_train", "bulk", src)[:a.n_train]
     n = (tr.shape[1] - 1) // 5
     mom = lambda r: r[:, :4 * n].reshape(-1, n, 4)
