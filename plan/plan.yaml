@@ -23507,7 +23507,8 @@ entries:
       and length). HPs: G(pre) < 3: at the scratch''s HPs the fine-tune is at scratch''s level, so the deficit came from the
       fine-tune search (its HP window): next the window change, with these runs as the expected gain. G(null) <= 1/3: the
       path helps a fresh init (would be a scratch defect): report and re-check the scratch control.'
-  step_waits: {}
+  step_waits:
+    '3': a design-reviewer
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
