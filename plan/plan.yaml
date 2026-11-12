@@ -28061,6 +28061,22 @@ entries:
       sweeps_local results (fbc81659). Step 14: div-form D395 smokes FA-ccin2p3-8c1223c0 (uug) and f45f434a (tt), 50 steps
       at WSD, batch 16384, ema on. The KIT raw benchmark was already on lxplus. A duplicate copy I made there (kit_hardps/kit_hardps,
       1.7 GB) was removed. Smoke FA-ccin2p3-f81cb1d0 is still PENDING on CC.'
+  - at: '2026-11-12T20:26:00+00:00'
+    text: '2026-11-12 ~20:30 @6583d0bb. Step 13 read: degree-1 log-invariant term P_1(L) (model.input_log_skip_linear), uug
+      plain c4fc1d6f vs plain control 203a274f, tt softpairthr 6bc05a40 vs 3fc1016a, degree-2 arms 7b891d10/eb870ad4 beside
+      them. Setup: from scratch, 1e5, 8000 steps cosine, lr 0.0118605, seed 42. Tools: kit_figures collect -> kit_fig_A_logpolylin_{uug,tt}.json;
+      kit_readout --vs; kit_extrap_read (figure set logpolylin_). Deepest bin, signed error / log-MSE, P_1 vs control (P_2):
+      uug collinear y 1e-7..1e-6 -0.94/1.48 vs +0.81/17.7 (+1.21/2.24); uug soft x 1e-7..1e-6 -2.10/4.48 vs -8.40/241 (+5.00/25.6).
+      Exponents: coll -0.78 (truth -1), soft -1.56 (truth -2; P_2 -3.20). Families vs control: coll -0.52, soft -1.58 decades
+      (5/5 better each); bulk +0.33 decades (5.9e-6 -> 1.3e-5). tt Sudakov 15-50 TeV -0.30/0.107 vs -0.53/0.72 (P_2 +0.77/0.696);
+      Coulomb beta 1e-4..1e-3 -1.68/2.85 vs -1.87/3.55 (P_2 -1.31/1.72), exponent -0.40 (truth -1.02; P_2 -0.55). Families:
+      Sudakov -0.74 (3/3), threshold +0.08 (2/4), bulk +0.53. By the passed bands this is PARTIAL, the design''s ''overshoots
+      go, Coulomb lost'' branch: soft and coll exponents back in band and the Sudakov sign not flipped, but no limit is fixed.
+      uug deepest |signed| 0.94 > 0.38 and soft -2.10 outside +-0.46. Sudakov log-MSE 0.107 <= 0.154, signed -0.30 just outside
+      [-0.22,+0.48]. Coulomb 2.85 > 2.41, so the Coulomb gain needed the quadratic term. The two terms read as limit-specific.
+      Caveat: all six runs are at the old HP point that fails the step-15 curve check (NLL separation uug c4fc1d6f 6.60 /
+      end_up 3.97, 203a274f 3.59/1.20; tt 0.60-0.81, end_up 0). Figures analysis/kit_benchmark/figs/kit_extrap_logpolylin_ee_uug_me2_{a,b}.png,
+      kit_extrap_logpolylin_ee_tt_virt_finite_{a,b}.png.'
   step_why:
     5:
       feeds: what KIT receives
