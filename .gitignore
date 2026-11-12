@@ -182,3 +182,4 @@ talks/progress_oct2026b/data/
 .claude/.main_work.jsonl
 analysis/agent_redesign/mechanical_watch.json
 .claude/hooks/.owner_handoff_test
+.claude/.compact_checked

@@ -479,7 +479,10 @@ def main():
     if not a.dry_run:
         for s in sorted(set(a.sites or ["ccin2p3", "lxplus"] + (["jeanzay"] if a.allow_jeanzay else []))):
             log("sync %s" % s)
-            site("sync", s, PROJECT, timeout=600, check=False)
+            try:
+                site("sync", s, PROJECT, timeout=600)
+            except RuntimeError as e:  # never submit on an unsynced site (stale checkout)
+                sys.exit("drive.py: start-up sync of %s failed, nothing submitted:\n%s" % (s, e))
     while True:
         for sw in sweeps:
             sw.collect(a)
