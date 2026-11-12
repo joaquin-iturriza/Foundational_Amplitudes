@@ -25765,6 +25765,21 @@ entries:
       column pushed k decades up: +0.05..+0.18 (k=0.25..2), flattening past 1.5 decades, against a truth rising ~0.65 from
       the bulk edge to the deepest bin. Scans are unphysical (one input moved alone): read as how the network continues that
       input.'
+  - at: '2026-11-12T10:40:50+00:00'
+    text: '2026-11-12 ~11:50 @55c1d312. (1) Step 12, ReZero on tt Born (FA-ccin2p3-d322922b vs softpair 5515dc85, one seed):
+      deepest Sudakov median signed error +0.09 -> +0.003 (the control is already near 0: STAYED, nothing to move); log-MSE
+      per family (kit_readout --vs, kit_fig_A_rezero_born.json): Sudakov +4.25 decades (0/3 better; deepest 0.23 -> 5.4e5),
+      threshold +4.05 (0/4), bulk +0.17: outliers as on uug, ReZero unusable at this recipe. ReZero arm closed: uug STAYED,
+      tt Born STAYED, tt virtual MOVED but underfit. Fig analysis/kit_benchmark/figs/kit_extrap_ee_tt_born_a.png, kit_mse_ee_tt_born_a.png.
+      (2) Step 13, tt virtual inputs-only (FA-ccin2p3-4a1cb4a2: model.input_scalars_only + data.offshell_zero vs softpairthr
+      3fc1016a): deepest Sudakov 15-50 TeV log-MSE 0.72 -> 0.026 (MLP seeds 0.035-0.058), median signed error -0.53 -> -0.13;
+      Sudakov family -1.72 decades [-1.79,-1.44], 3/3 better; bulk 1.21e-9 -> 1.20e-9 (-0.005); threshold family +0.35 [+0.26,+0.53],
+      0/4 better (deepest beta 1e-4..1e-3 signed -1.87 -> -2.67). By the design''s rule: YES on tt (log-MSE <= 0.11 and signed
+      in [-0.22,+0.48]): fed only the MLP''s inputs, the transformer extrapolates in sqrt(s) like the MLP; what bent it was
+      what it reads beyond the log invariants (local-frame momenta / frames / off-shellness). The Coulomb limit stays as poor
+      as the control''s (a 1/beta rise the MLP with logthr also misses at beta 1e-4: ladder log-MSE 6.9). Training 0.42 s/step
+      vs 0.68 (no frames net). uug arm dc799c8e still running. Figs analysis/kit_benchmark/figs/scalars_tt/kit_mse_ee_tt_virt_finite_{a,b}.png,
+      kit_extrap_ee_tt_virt_finite_a.png.'
   step_why:
     5:
       feeds: what KIT receives
