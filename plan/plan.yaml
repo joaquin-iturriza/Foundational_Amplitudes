@@ -21543,7 +21543,7 @@ entries:
     - 6
   owner:
     agent: afc3a7a4d8d0de53b
-    state: working
+    state: closed
     since: '2026-11-12T15:41:13+00:00'
     state_at: '2026-11-12T17:17:46.056000+00:00'
     context: 255066
@@ -25616,45 +25616,30 @@ entries:
     start: '2026-11-12T17:05:28+00:00'
     at: '2026-11-12T17:05:28+00:00'
   handoff:
-    state: 'Second example (D413/D417) = b b~ > Z Z at LO and one-loop V/B, draft due 2026-11-13. V/B L(D): restarted fresh
-      16:22 as detach bbx_zz_v_LD3 (14 searches, configs @79578039, design PASS 14:43); first 42 trials out 16:32; 5 diverged
-      by 16:35 (routine, D398); one trial log checked training, the others not checked past data load. Earlier attempts: LD
-      (15:53) never submitted (sync refused, dirty tree); LD2 (16:02) all 84 trials failed on a stale Born identity record
-      (fixed, see decisions), 28 queued cancelled, state moved to sweeps_local/zz_bornrecord_*. LO: design revised after FIX
-      (own calibration per D391) and PASSED. Parent FA-ccin2p3-0d698e4b (job_datasaving_parent.sh heldoutbbzz @15486032; r4
-      held-out minus v4_bbx_zz; r4''s T=3458, lr 9.248e-3, D392 flags) running since 16:25, ~1.2 h; step 4 waits on it. LO
-      calibration FA-ccin2p3-{39823ff8,6293be00,f28fe38e,c7213cbd,56381216,714db3a4,148ccdb9} (job_data_saving.sh bbx_zz k
-      8000 scratch tag=cal_lo, k=2..8) running; steps 2 and 3 wait on them. NEXT on calibration end: analysis/data_saving/horizons.py
-      --ladder --tag cal_lo --out analysis/data_saving/data/horizons_cal_lo_ladder.json (check the flag names; gen_data_saving.py
-      CALS already lists that file), then python sweep/gen_data_saving.py --parent-lo ''${PROJECT_DIR}/runs/data_saving/dsave_parent_heldoutbbzz''
-      --parent-nlo ''${PROJECT_DIR}/runs/data_saving/dsave_parent_treesin_r4'' --targets bbx_zz --ks 2 3 4 5 6 7 8, commit,
-      site pick, drive.py the 7 scratch configs (the parent''s config.yaml exists); the 7 fine-tune configs when the parent
-      ends. Readout: stage2_readout.py --fetch (bbx_zz, bbx_zz_nlo in TARGETS; test_ln fit added), trial_overfit.py + curve_quality.py
-      for the well-trained label, figure plot_stage2.py --second (stage2_LD_bbx_zz, tested on stand-in data only). Step 2
-      (template): mu-only MSE test read (0608a929): t t~ LO scratch BETTER NOT WELL, fine-tune NO CHANGE, not the fix; EMA
-      already negative on existing t t~ LO data; next suspect Muon (fixed-size update at full batch). Muon-off configs committed
-      @aa2af061 (sweep/sweep_config_dsave_adamw_{scr,ft}_epem_ttx_d7_t8500.yaml, readout lr_centre_readout.py --test adamw,
-      ~4.5 GPU-h): design and review AFTER the LO searches are out (a new design replaces the LO one as latest). Diagnostic
-      only (Muon is D155/D158). OPEN QUESTION for Joaquin (in the last report, not yet recorded with plan ask): the b b~ >
-      Z Z grid is D=10..1e4 at both orders; D=31623 (V/B, calibrated) and D=31623, 1e5 (LO, pool holds 1e5; sibling tree targets
-      ran to 1e5) are cut on D412''s 30 GPU-h sentence; ~+14 GPU-h LO, ~+15 GPU-h V/B; keep or run the full grid?'
-    decisions: 'LO parent = r4 held-out (not r5 with tops) minus the f f~ > Z Z class, so the LO and V/B parents are both
-      r4-family and only the pool set differs from the r4 parent the u u~ example used. LO horizons from the target''s own
-      calibration (design reviewer FIX against borrowing V/B horizons, D391). LO fine-tune space = generator''s tree default
-      (lr_scale [1/3,3], layer_decay 1), which differs from u u~ LO''s llrd space: say so where both S stand side by side.
-      Born record: datagen now writes <pool>.born.npy.json with the sidecar (0e5a650b); tools/born_record.py checks and rewrites
-      a record (b b~ Z Z train: 50000 rows, std ln|V/B| 0.267 = vb_spread). drive.py --stop-after N (default 6): stops when
-      the last N finished trials share one non-divergence exception (367dbf70). Fresh restart of the V/B searches instead
-      of --retry-failed so waves 3,3,2 guide on real values. stop_conditions.py figure-send regression fixed by a mechanical-worker
-      (8aae77de); repo-reviewer advanced to 8aae77de.'
-    ruled_out: 'As before. Plus: borrowed V/B horizons for LO (D391); HETEROSC 1/sigma^2 weighting as the cause of the spikes
-      (mu-only test); EMA (existing t t~ LO data).'
-    running: detach bbx_zz_v_LD3 (14 V/B searches, CC); parent FA-ccin2p3-0d698e4b; LO calibration FA-ccin2p3-{39823ff8,6293be00,f28fe38e,c7213cbd,56381216,714db3a4,148ccdb9}
-    files: recipes/gen_datasaving_parent.py, recipes/catalog_v4_datasaving_{parent_heldoutbbzz,bbx_zz}.yaml, scripts/job_datasaving_parent.sh
-      (heldoutbbzz), sweep/gen_data_saving.py (SECOND bbx_zz, CALS horizons_cal_lo_ladder.json), analysis/data_saving/{stage2_readout.py,dstar_fit.py,plot_stage2.py
-      --second,lr_centre_readout.py --test muonly|adamw}, data/lr_centre_*_muonly.json, figs/muonly_curves_*, sweep/sweep_config_dsave_adamw_*,
-      tools/born_record.py, datagen.py, sweep/drive.py
-    written: '2026-11-12T15:39:37+00:00'
+    state: 'Second example (D413/D417) b b~ > Z Z, draft due 2026-11-13. One-loop V/B half READ (stage2_readout.py @cb3c96a5):
+      test MSE(ln(V/B)) S = D*_scr/D*_ft at 1e-4 = 1.23 [0.88, 1.71] (val 1.21 [0.87, 1.67]), NO SAVING by the rule; fine-tune
+      3-5x lower at D=32-100, higher at 316 and 1e4; figure figs/stage2_LD_bbx_zz_bbx_zz_nlo (plot_stage2.py --second --only
+      bbx_zz_nlo; open markers = search best whose val turns up at the end; the legend''s open-marker entry shows only a square).
+      LO half RUNNING: horizons from its own calibration (horizons_cal_lo_ladder.json: T = 2240, 4960, 4960, 7840, 8500 x3),
+      14 configs @b7f17788; scratch driver detach bbx_zz_lo_scr3 (from 17:05), fine-tune driver detach bbx_zz_lo_ft (from
+      ~18:10; parent FA-ccin2p3-0d698e4b ended clean); LO divergences so far at scratch lr 1.1-2.0e-2 and fine-tune lr_scale
+      2.6-3.0 (routine, D398, acked). NEXT when both drivers end: stage2_readout.py --fetch; trial_overfit.py (fetch); curve_quality.py
+      --cells bbx_zz and --cells bbx_zz_nlo (writes data/curve_quality_cells_<tg>.json, read by the figure); plot_stage2.py
+      --second (both panels; check the shared legend fits); look once; report both halves with S, bands, per-cell tracks.
+      curve_quality.py rebuilt on Joaquin''s criterion and re-read reported (finding 18:25).'
+    decisions: 'Curve quality = Joaquin''s end-of-run criterion (2026-11-12, relayed by the coordinator): tracks = v_end/min
+      v <= 2 and last-quarter val change <= 1 (bars chosen by this owner, in the docstring); stalls listed apart; steady/spike/jitter/gap
+      dropped. Step 2 (AdamW test) recorded as a dead end: its premise came from the dropped bars. drive.py syncs with --allow-dirty,
+      refusing only when its own configs are uncommitted (c7b7322e). datagen writes the Born record after .recipe.json (KIT
+      owner''s d5f9c78d, gated on wrote_born; tested). born_record.py takes several pools; 4 stale cache records rewritten.
+      Muonly figure legend moved (864873c6), step 5 done.'
+    ruled_out: As before; plus the AdamW one-change test (superseded by the end-of-run criterion; AdamW at Muon's HPs 77x
+      worse at D=3162).
+    running: detach bbx_zz_lo_scr3 (7 LO scratch searches, CC), detach bbx_zz_lo_ft (7 LO fine-tune searches, CC)
+    files: analysis/data_saving/{curve_quality.py,lr_centre_readout.py,plot_stage2.py,stage2_readout.py,trial_overfit.py},
+      analysis/data_saving/data/{stage2_readout.json,curve_quality.json,curve_quality_cells_*.json,horizons_cal_lo_ladder.json},
+      sweep/sweep_config_dsave_s2_{scr,ft}_bbx_zz_d*_t*.yaml, sweep/drive.py, tools/born_record.py, datagen.py, tests/test_{curve_quality,finalize_born_record,drive_sync_fail}.py
+    written: '2026-11-12T17:18:38+00:00'
   step_why:
     3:
       feeds: the draft's data-saving claim (D413)
