@@ -53,7 +53,6 @@ def plot(path, out):
     ax.set_ylabel("test bin")
     ax.set_yticks([])
     ps.legend(ax, "upper left")
-    ps.process_label(ax, r"$e^+e^-\to t\bar t$")
     print(ps.save(fig, out))
 
 
