@@ -55,6 +55,14 @@ def best_rows(cached):
     return out
 
 
+def failed(name):
+    """The searched trials that ended without a result (diverged or crashed), listed apart: [(trial, run id)]."""
+    f = os.path.join(REPO, "sweeps_local", name, "driver_state.json")
+    if not os.path.exists(f):
+        return []
+    return [(int(i), t["rid"]) for i, t in json.load(open(f))["trials"].items() if t["status"] in ("failed", "lost")]
+
+
 def main():
     B = best_rows("--cached" in sys.argv)
     res = {"cells": [], "targets": {}}
@@ -65,12 +73,14 @@ def main():
             c = {"target": t, "D": round(10 ** (k / 2)), "n_trials": {"new": nn, "old": no, "scr": ns},
                  "new": n and n["val_min"], "old": o and o["val_min"], "scr": s and s["val_min"],
                  "new_best_hp": n and n["hp"]}
+            c["failed_new"] = failed(f"dsave_s4_ft_{t}_d{k}_t8500")
             c["r_old"] = c["new"] / c["old"] if n and o else None
             c["r_scr"] = c["new"] / c["scr"] if n and s else None
             res["cells"].append(c)
             ro += [c["r_old"]] if c["r_old"] else []
             print(f"{t:13s} D={c['D']:6d} new {c['new'] or np.nan:.2e} ({nn}) old {c['old'] or np.nan:.2e} ({no}) "
-                  f"scr {c['scr'] or np.nan:.2e} ({ns})  r_old {c['r_old'] or np.nan:.2f} r_scr {c['r_scr'] or np.nan:.2f}")
+                  f"scr {c['scr'] or np.nan:.2e} ({ns})  r_old {c['r_old'] or np.nan:.2f} r_scr {c['r_scr'] or np.nan:.2f}"
+                  + (f"  new failed: {c['failed_new']}" if c["failed_new"] else ""))
         if ro:
             g, b = branch(ro)
             res["targets"][t] = {"gmean_r_old": g, "n_cells": len(ro), "branch": b}
