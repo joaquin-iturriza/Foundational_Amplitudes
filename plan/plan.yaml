@@ -25787,6 +25787,21 @@ entries:
       local momenta) held it better. Next: which of the three cut routes (local momenta, attention frames, off-shellness)
       carries the failure: model.input_route_off (5d509b13), design recorded, under review. Figs analysis/kit_benchmark/figs/kit_extrap_ee_uug_me2_{a,b}.png,
       scalars_uug/kit_mse_ee_uug_me2_{a,b}.png.'
+  - at: '2026-11-12T11:00:04+00:00'
+    text: '2026-11-12 ~12:15 @dddeacff. Step 14, component probe of the inputs-only arms against their controls (tools/kit_saturation_probe.py,
+      eval-only CPU on CC, best weights, 200 events per stratum + 2000 bulk_train; kit_sat_{uug,ttvirt}_scalars.json; fig
+      analysis/kit_benchmark/figs/kit_sat_cmp_{uug,tt}_{a,b}.png). (1) Residual growth: uug rms of the readout input, bulk
+      3.93 -> collinear y 1e-3..1e-7 strata 4.04, 5.69, 8.93, 15.78 in the control, 2.60 -> 2.30, 2.54, 2.68, 2.79 in the
+      inputs-only arm: the 4x growth that tracked the overshoot is gone with the momenta and frames. tt virtual Sudakov 1.7-5/5-15/15-50
+      TeV: control 2.64, 3.12, 4.81 (bulk 2.94), arm 3.33, 3.92, 4.55 (bulk 3.57): no difference in growth, so on tt residual
+      growth is not the marker. (2) One-input scans (unphysical, one input moved alone): tt log10 sqrt(s_hat) column pushed
+      k decades: arm dmu +0.14, +0.28, +0.39, +0.47 at k=0.25..1, +0.65 at k=2 (0.47 per decade in the first decade) vs control
+      +0.05, +0.04, +0.06, +0.09, +0.18 (k=2); the truth rises ~0.65 from the bulk edge to the deepest bin: the inputs-only
+      arm continues the sqrt(s) trend at about the truth''s rate, the control does not. uug most collinear pair log pushed
+      k decades: arm +0.07, +0.13, +0.15, then flat +0.17 at k=8; control -0.02..-0.15, flat after k~4: both saturate in a
+      single pair log, so on uug the correct collinear continuation of the arm comes from the inputs moving together, and
+      the control''s overshoot from what else moves (the route arms test which). Steps 13/14 done; route isolation running
+      (step 15).'
   step_why:
     5:
       feeds: what KIT receives
