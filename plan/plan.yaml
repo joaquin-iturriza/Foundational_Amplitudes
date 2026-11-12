@@ -24731,6 +24731,7 @@ entries:
   step_waits:
     '5': FA-ccin2p3-21f5d054
     '6': the next owner, from the hand-off
+    '8': FA-ccin2p3-d277f7f5 FA-ccin2p3-7a63ea88 FA-ccin2p3-1df8bd16
   handoff:
     state: 'Joaquin released the entry (D403): understand why our models do not extrapolate into the limits and match Bakar''s
       simple MLP; his no (D402) covers only the fair NLO D-scan (step 3, drop or keep held per D402). Step 5 package: event-frame
