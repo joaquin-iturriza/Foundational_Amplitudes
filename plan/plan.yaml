@@ -26949,6 +26949,16 @@ entries:
       r5thrloopbeta parents vs r5thr/r5thrbeta fine-tunes, ~16.5 GPU-h). (d) log-skip design PASS after two FIXes; smoke a3c7bd5b
       clean through every stage; runs 203a274f (uug plain control), 7b891d10 (uug plain + skip), eb870ad4 (tt softpairthr
       + skip) submitted @2ceb9012, 2:30 limit, target 1.4 h.'
+  - at: '2026-11-12T16:04:53+00:00'
+    text: '2026-11-12 ~18:10 @0c0fd8fd. Step 12(iii) lightlike tops, eval-only (tools/kit_transformer_probe.py REREAD of softpairthr
+      3fc1016a, 200 events per stratum + 2000 bulk_train; data analysis/kit_benchmark/data/kit_frames_probe_ttvirt_mE.json;
+      fig analysis/kit_benchmark/figs/kit_tt_lightlike_{a,b}.png). Median log10 m_t/E_t of the tops: bulk_train -0.48 (min
+      -0.70, sqrt(s) <= ~1.7 TeV); Sudakov 1.7-5 / 5-15 / 15-50 TeV -0.95 / -1.40 / -1.93, every stratum below every bulk_train
+      event (share 0.0); median signed error -0.10 / -0.40 / -0.61 in step; frame gamma 1.23-1.29 (bulk 1.31). Reading: the
+      tops reach m/E 3-30x below anything trained and the error grows with it while the frames do not move: the guess holds
+      as a range statement. Limit: at 2->2 m/E = 2 m_t/sqrt(s) exactly, so the probe cannot tell ''tops look lightlike'' from
+      ''sqrt(s) beyond the bulk''; separating them needs an arm (an explicit log(m^2/s) per massive leg, step 11d''s divergence-form
+      input). Threshold strata sit at m/E ~1, above every bulk_train event.'
   step_why:
     5:
       feeds: what KIT receives
