@@ -32,6 +32,8 @@ input_pair_logs: 0
 input_pair_threshold: false
 input_soft_eps: 0.0
 input_local_log_eps: 0.0
+# input_scalars_only: the backbone sees only the scalars above (no momenta: local momenta zeroed, identity frames)
+input_scalars_only: false
 context_dim: 0
 context_dropout: 0.5
 context_names_file: null

@@ -123,6 +123,25 @@ def test_pair_threshold_log_beta():
     assert torch.allclose(f[0, :5], g[0, :5])                                                  # pairs with a massless leg
 
 
+def test_scalars_only_reads_no_momentum():
+    """input_scalars_only: with the pair logs held fixed, two different event sets give the same output (no momentum
+    reaches the backbone but through the pair logs), and the flag changes the output against the pair logs alone."""
+    import wrappers
+    p, ptr = _events(1)
+    q, _ = _events(5)
+    fixed = _pair_log_inputs(p, ptr, 5)
+    w = _wrapper(input_pair_logs=5, input_scalars_only=True)
+    orig = wrappers._pair_log_inputs
+    wrappers._pair_log_inputs = lambda *a, **k: fixed
+    try:
+        a, b = _out(w, p, ptr), _out(w, q, ptr)
+    finally:
+        wrappers._pair_log_inputs = orig
+    assert torch.equal(a, b), f"scalars_only reads the momenta: {float((a - b).abs().max()):.2e}"
+    moved = float((a - _out(_wrapper(input_pair_logs=5), p, ptr)).abs().max() / a.abs().max())
+    assert moved > 1e-6, "input_scalars_only does not change the output"
+
+
 def test_soft_rescale_fixed_point():
     p, ptr = _events(4)
     q = _soft_rescale(p, ptr, 1e-8)
@@ -131,7 +150,7 @@ def test_soft_rescale_fixed_point():
 
 
 if __name__ == "__main__":
-    for t in [test_pair_log_values, test_soft_rescale_fixed_point, test_pair_logs_equivariant,
+    for t in [test_scalars_only_reads_no_momentum, test_pair_log_values, test_soft_rescale_fixed_point, test_pair_logs_equivariant,
               test_soft_rescale_equivariant, test_local_logs_equivariant, test_both_flags_6particle_equivariant]:
         t()
     print("all ok")

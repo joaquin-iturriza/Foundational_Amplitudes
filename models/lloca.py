@@ -253,11 +253,15 @@ class LLOCAMuPTransformer(nn.Module):
             assert pair_ctx is None, "causal_mask and the pairwise attention bias are not combined"
             if self.causal_frames == "prefix":
                 frames_kwargs["causal_min_prefix"] = self.causal_frames_min
-        frames = self.framesnet(
-            fourmomenta, scalars=particle_type, ptr=ptr, return_tracker=False, **frames_kwargs
-        )
-        fourmomenta_local = self.trafo_fourmomenta(fourmomenta, frames)
-        features_local = (fourmomenta_local - mean) / std
+        if getattr(self, "scalars_only", False):   # model.input_scalars_only: no momenta, no frames (wrappers.py)
+            frames = IdentityFrames()(fourmomenta)
+            features_local = torch.zeros_like(fourmomenta)
+        else:
+            frames = self.framesnet(
+                fourmomenta, scalars=particle_type, ptr=ptr, return_tracker=False, **frames_kwargs
+            )
+            fourmomenta_local = self.trafo_fourmomenta(fourmomenta, frames)
+            features_local = (fourmomenta_local - mean) / std
         if getattr(self, "local_log_eps", 0.0):   # model.input_local_log_eps: log-compressed local components (invariant)
             features_local = torch.asinh(features_local / self.local_log_eps) / float(np.arcsinh(1 / self.local_log_eps))
 
