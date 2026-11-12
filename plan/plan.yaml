@@ -28008,6 +28008,7 @@ entries:
     '13': FA-ccin2p3-c4fc1d6f FA-ccin2p3-6bc05a40
     '15': detach:kit_hpo (sweeps kit_hpo_uug_plain, kit_hpo_ttvirt_thr)
     '14': FA-ccin2p3-8c1223c0 FA-ccin2p3-f45f434a
+    '16': detach:kit_hpo (sweeps kit_hpo_uug_T, kit_hpo_uugg_T)
   handoff:
     state: '2026-11-12 ~20:45 @1f810cd6. Closed at the context limit. IN ORDER for the next owner: (1) step 15: the D395 smoke
       of the HP searches runs through sweep/drive.py detached (detach:kit_hpo_smoke, trial FA-ccin2p3-f81cb1d0, pending at
