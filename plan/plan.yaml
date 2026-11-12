@@ -26146,6 +26146,24 @@ entries:
       this is not really a general way to fix the extrapolation problem other than in this case''. V·β is a diagnostic only,
       never the answer to D411; the general mechanism is what the inputs-only and route-isolation arms (steps 13, 15) test.
       The package question on V·β is moot unless he raises it.'
+  - at: '2026-11-12T12:57:58+00:00'
+    text: '2026-11-12 ~14:30 @17f52004. Step 15, D411 route isolation (design PASS 2026-11-12; one seed each, from scratch,
+      1e5, 8000 steps; each arm = control with ONE route cut). Deepest-bin median signed error (pred - truth, log10|M|^2)
+      / log-MSE, kit_extrap.json: uug collinear y 1e-7..1e-6, control softpair c15b3337 +1.36 / 2.21: no local momenta (60391401)
+      +2.17 / 8.58 NO; no attention frames (a2cba8d7) -0.25 / 0.161 FIXES (<= +0.30; Bakar''s MLP seeds -0.04..-0.38); no
+      off-shellness (0262bec5) +1.98 / 12.7 NO. tt virtual Sudakov 15-50 TeV, control softpairthr 3fc1016a -0.53 / 0.72: no
+      local momenta (16956fa0) -0.56 / 0.448 NO; no attention frames (011d6333) +0.06 / 0.154 partial (signed in the YES band,
+      log-MSE 0.15 just above the 0.11 bar, 0.67 decades below control); no off-shellness (13266d91) -0.69 / 0.506 NO. Per
+      family median log10(arm/control log-MSE) (kit_readout --vs on kit_fig_A_route_{uug,tt}.json): no frames: uug collinear
+      -0.24 (3/5 better), soft +0.70 (0/5), bulk -0.17; tt Sudakov -0.61 (3/3), threshold +0.47 (0/4), bulk +0.34. No local
+      momenta: uug coll +0.30, soft +0.09, bulk +1.16; tt Sudakov -0.21, threshold +0.43, bulk +0.75. No off-shellness: uug
+      coll +0.24, soft -0.51 (5/5 better: deepest soft -0.28 -> -0.04), bulk +1.00; tt Sudakov -0.34, threshold +0.08, bulk
+      +0.40. Reading by the design: one route carries the extrapolation failure on both processes, the learned frames acting
+      on the attention''s vector messages (attn_reps 2x1n); local momenta and off-shellness alone neither fix it nor cause
+      it. Cutting the frames also carries the soft-limit loss the inputs-only arm showed (uug deepest soft -0.93 vs all-cut
+      -1.08, control -0.28) and costs tt threshold +0.47 and tt bulk +0.34 (inside the catalog seed spread, up to 1.5 decades).
+      Figures analysis/kit_benchmark/figs/kit_extrap_route_ee_uug_me2_{a,b}.png, kit_extrap_route_ee_tt_virt_finite_{a,b}.png,
+      route_{uug,tt}/kit_mse_*.png.'
   step_why:
     5:
       feeds: what KIT receives
