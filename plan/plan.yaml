@@ -26299,6 +26299,14 @@ entries:
       @bf88c4d8, Jean Zay, 23 searches with N 24-40, none ~50 found on CC or JZ): best after 8 over final median 1.26 (25-75%
       1.00-1.47), final in 7 of 23; after 16 median 1.00 (1.00-1.25), 12 of 23; figs/trial_count. (4) lr_centre_readout.py
       @0bd23fdc: first 8 by the driver''s issue order; comparisons A/B/C.'
+  - at: '2026-11-12T21:17:39+00:00'
+    text: '2026-11-12 22:17 CET (D431, all sites): pools (122 v4_epem_ttx*/v4_bbx_zz* files) and parents dsave_parent_heldout_r4,
+      dsave_parent_heldoutbbzz copied CC -> lxplus; lxplus copy fixed first (site ensure_agent_on: stale forwarded agent socket
+      on lxplus, removed before the forward). Jean Zay copy fails: relay -> jean-zay.idris.fr ''server not responding'' (from
+      lpnclaude03 and via lxplus, retried), not fixed; JZ out. The worker stopped the 3 CC-only drivers and cancelled 24 pending
+      CC trials; those trials marked lost in driver_state and requeued with --retry-lost (penalty removed). Relaunched as
+      detach tt_bbzz_allsites (3 drivers, --sites ccin2p3 lxplus): WSD x4 and wide x2 at --n-trials 16 --wave-sizes 3,3,2,4,4,
+      b b~ ZZ LO fine-tunes x7.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
