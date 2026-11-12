@@ -110,6 +110,71 @@ def _pair_log_inputs(p, ptr, n, threshold=False):
     return (lp * (valid[:, iu[0]] & valid[:, iu[1]])).repeat_interleave(cnt, dim=0)
 
 
+def _div_form_width(n):
+    """Columns of _div_form_inputs for an n-particle event: eikonal per (i<k, j), splitting and 1/beta per pair, per leg."""
+    return n * (n - 1) * (n - 2) // 2 + n * (n - 1) + n
+
+
+_CF, _CA, _TR = 4.0 / 3.0, 3.0, 0.5
+
+
+def _div_form_inputs(p, ptr, n, cas, heavy):
+    """(N_total, _div_form_width(n)): the functional forms of the universal singular limits as Lorentz-scalar inputs
+    (model.input_div_form, kit_benchmark step 14), from the momenta and each particle's colour Casimir `cas` (0, C_F,
+    C_A) and `heavy` flag (table mass >= 1 GeV), s = (p_0 + p_1)^2, s_ij = 2 p_i.p_j, the event's row on its particles:
+      soft      per (i < k, j not i, k), j a gluon and i, k coloured: log(s s_ik / (s_ij s_jk))/5, the eikonal factor
+      collinear per final pair i < j (legs >= 2) of light coloured partons: log P(z)/5, z = p_i.Q/(p_i + p_j).Q, Q = p_0 + p_1,
+                P = C_F (1 + z_q^2)/(1 - z_q) (q g, z_q the quark's), C_A (z/(1-z) + (1-z)/z + z(1-z)) (g g),
+                T_R (z^2 + (1-z)^2) (q q); the 1/s_ij that multiplies it is the pair log already (input_pair_logs)
+      Coulomb   per pair i < j of heavy legs: log(1/beta)/5, beta = sqrt(lambda(M^2, m_i^2, m_j^2))/(M^2 - (m_i - m_j)^2),
+                M^2 = (p_i + p_j)^2 (= sqrt(1 - 4m^2/M^2) for equal masses)
+      Sudakov   per heavy leg: log^2(s/m_i^2)/25
+    Every other entry, and every column beyond an event's multiplicity, is 0. Logs because the inputs must stay O(1)
+    where the factors run over decades; the combinations (eikonal, P(z), 1/beta, the squared log) are the functional
+    form, which the pair logs alone give only after the network learns them.
+    shortcut: the splitting z is taken w.r.t. Q for final-state pairs only; an initial-state coloured leg (pp) needs the
+    crossed form, add it when a pp process enters the KIT models."""
+    cnt = ptr[1:] - ptr[:-1]
+    assert int(cnt.max()) <= n, f"model.input_pair_logs={n} is below an event's {int(cnt.max())} particles"
+    ar = torch.arange(n, device=p.device)
+    valid = ar[None, :] < cnt[:, None]                                           # (B, n)
+    idx = (ptr[:-1, None] + ar[None, :]).clamp(max=p.shape[0] - 1)
+    P = p[idx].to(torch.float64)
+    c, hv = cas[idx].to(torch.float64) * valid, heavy[idx] & valid
+    dots = torch.einsum("bic,bjc,c->bij", P, P, torch.tensor(_ETA, device=p.device, dtype=P.dtype))
+    s = (dots[:, 0, 0] + dots[:, 1, 1] + 2 * dots[:, 0, 1]).abs().clamp(min=1e-30)
+    sij = (2 * dots).abs().clamp(min=1e-30)
+    col, glu, qrk = c > 0, (c - _CA).abs() < 1e-3, (c - _CF).abs() < 1e-3
+    lg = lambda x: torch.log(x.clamp(min=1e-300)) / 5
+    # soft: ordered triples (i < k, j)
+    tri = torch.tensor([(i, j, k) for i in range(n) for k in range(i + 1, n) for j in range(n) if j not in (i, k)],
+                       device=p.device, dtype=torch.long).reshape(-1, 3)
+    i, j, k = tri[:, 0], tri[:, 1], tri[:, 2]
+    eik = lg(s[:, None] * sij[:, i, k] / (sij[:, i, j] * sij[:, j, k])) * (col[:, i] & col[:, k] & glu[:, j])
+    # collinear and Coulomb: pairs i < j
+    iu = torch.triu_indices(n, n, 1, device=p.device)
+    a, b = iu[0], iu[1]
+    Q = P[:, 0] + P[:, 1]
+    xq = torch.einsum("bic,bc,c->bi", P, Q, torch.tensor(_ETA, device=p.device, dtype=P.dtype))   # p_i.Q
+    z = (xq[:, a] / (xq[:, a] + xq[:, b])).clamp(1e-300, 1 - 1e-16)
+    zq = torch.where(qrk[:, a], z, 1 - z)                                        # the quark's fraction in a q g pair
+    Pqg = _CF * (1 + zq ** 2) / (1 - zq).clamp(min=1e-300)
+    Pgg = _CA * (z / (1 - z) + (1 - z) / z + z * (1 - z))
+    Pqq = _TR * (z ** 2 + (1 - z) ** 2)
+    fin = (a >= 2) & (b >= 2)
+    qg = (qrk[:, a] & glu[:, b]) | (glu[:, a] & qrk[:, b])
+    spl = torch.where(qg, Pqg, torch.where(glu[:, a] & glu[:, b], Pgg, Pqq))
+    spl = lg(spl) * (col[:, a] & col[:, b] & fin & ~hv[:, a] & ~hv[:, b])   # a heavy leg has no collinear limit
+    m2 = dots.diagonal(dim1=1, dim2=2).abs()
+    m = m2.sqrt()
+    M2 = m2[:, a] + m2[:, b] + 2 * dots[:, a, b]
+    lam = ((M2 - (m[:, a] + m[:, b]) ** 2) * (M2 - (m[:, a] - m[:, b]) ** 2)).abs()
+    beta = lam.sqrt() / (M2 - (m[:, a] - m[:, b]) ** 2).abs().clamp(min=1e-300)
+    coul = -lg(beta) * (hv[:, a] & hv[:, b])
+    sud = (torch.log(s[:, None] / m2.clamp(min=1e-300)) ** 2 / 25) * hv
+    return torch.cat([eik, spl, coul, sud], dim=1).repeat_interleave(cnt, dim=0)
+
+
 def _soft_rescale(p, ptr, eps):
     """p_i -> p_i log1p(x_i/eps) / (x_i log1p(1/eps)), x_i = 2 p_i.Q/s, Q = p_0 + p_1, s = Q^2: an invariant factor per
     momentum (equivariant), 1 at x_i = 1, so a soft momentum's scale reads logarithmically (model.input_soft_eps)."""
@@ -255,7 +320,8 @@ class AmplitudeLLoCaWrapper(nn.Module):
                  sign_pair_dim: int = 0, sign_pair_hidden: int = 32, sign_pair_bound: bool = False,
                  input_pair_logs: int = 0, input_soft_eps: float = 0.0, input_local_log_eps: float = 0.0,
                  input_pair_threshold: bool = False, input_scalars_only: bool = False,
-                 input_route_off: str = "", input_log_skip: int = 0, input_log_skip_linear: bool = False):
+                 input_route_off: str = "", input_log_skip: int = 0, input_log_skip_linear: bool = False,
+                 input_div_form: bool = False):
         super().__init__()
         self.net = net
         # input representations for singular limits (D374, kit_benchmark input arms; all Lorentz-exact, 0 = off):
@@ -277,6 +343,10 @@ class AmplitudeLLoCaWrapper(nn.Module):
         # (_log_skip; rank-k pair coefficients); needs input_pair_logs (its multiplicity) and the property encoding
         self.input_log_skip = int(input_log_skip or 0)
         self.input_log_skip_linear = bool(input_log_skip_linear)   # drop the quadratic terms (step 13)
+        # input_div_form: the singular limits' functional forms per triple / pair / leg (_div_form_inputs, step 14); needs
+        # input_pair_logs (its multiplicity) and the property encoding (colour Casimir and table mass of each particle)
+        self.input_div_form = bool(input_div_form)
+        assert not self.input_div_form or self.input_pair_logs, "model.input_div_form needs model.input_pair_logs"
         if self.input_log_skip:
             assert self.input_pair_logs, "model.input_log_skip needs model.input_pair_logs (the event multiplicity)"
             self.log_skip_head = nn.Linear(d_particle_hidden, 2 * self.input_log_skip + 2)
@@ -1030,6 +1100,12 @@ class AmplitudeLLoCaWrapper(nn.Module):
         if self.input_pair_logs:   # appended last: layout [property | order | diagram | pair logs]
             particle_type = torch.cat([particle_type, _pair_log_inputs(
                 fourmomenta, ptr, self.input_pair_logs, self.input_pair_threshold).to(particle_type.dtype)], dim=-1)
+        if self.input_div_form:    # appended after the pair logs
+            from particle_ids import GLOBAL_PROPERTY_MATRIX as _G
+            G = torch.as_tensor(_G, device=fourmomenta.device)
+            particle_type = torch.cat([particle_type, _div_form_inputs(
+                fourmomenta, ptr, self.input_pair_logs, G[particle_type_indices, 7],
+                G[particle_type_indices, 2] >= 0).to(particle_type.dtype)], dim=-1)
         fm_net = _soft_rescale(fourmomenta, ptr, self.input_soft_eps) if self.input_soft_eps else fourmomenta
 
         net_kwargs = {} if token_add is None else {"token_add": token_add}

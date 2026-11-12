@@ -14,7 +14,7 @@ import torch
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-from wrappers import AmplitudeLLoCaWrapper, _pair_log_inputs, _soft_rescale  # noqa: E402
+from wrappers import AmplitudeLLoCaWrapper, _div_form_inputs, _div_form_width, _pair_log_inputs, _soft_rescale  # noqa: E402
 
 torch.set_default_dtype(torch.float64)
 LENS = (5, 5, 4)
@@ -49,7 +49,7 @@ def _lorentz(seed):
 def _wrapper(**flags):
     from models.lloca import LLOCAMuPTransformer
     n_pl = flags.get("input_pair_logs", 0)
-    ns = 16 + n_pl * (n_pl - 1) // 2
+    ns = 16 + n_pl * (n_pl - 1) // 2 + (_div_form_width(n_pl) if flags.get("input_div_form") else 0)
     torch.manual_seed(0)
     net = LLOCAMuPTransformer(num_scalars=ns, hidden_channels_mlp=16, num_layers_mlp=2, in_channels=ns + 4,
                               attn_reps="8x0n+2x1n", out_channels=1, num_blocks=2, num_heads=2)
@@ -58,8 +58,8 @@ def _wrapper(**flags):
     return w.double().eval()
 
 
-def _out(w, p, ptr):
-    tok = torch.cat([torch.tensor([1, 1, 2, 3, 4, 2])[:n] for n in (ptr[1:] - ptr[:-1]).tolist()])
+def _out(w, p, ptr, kinds=(1, 1, 2, 3, 4, 2)):
+    tok = torch.cat([torch.tensor(kinds)[:n] for n in (ptr[1:] - ptr[:-1]).tolist()])
     with torch.no_grad():
         return w(p, tok, 0.0, 1.0, ptr).reshape(-1)
 
@@ -217,8 +217,72 @@ def test_soft_rescale_fixed_point():
     assert float(q[4, 0] / p[4, 0]) > 1e5              # the soft leg is lifted (x ~ 1e-6: log1p(100)/(1e-6 log 1e8))
 
 
+def test_div_form():
+    """input_div_form: values of each block against the formulas written out, Lorentz invariance of the features and
+    of the wrapper's output, and the flag moves the output. Event 0: e+ e- > u u~ g g (soft last gluon), event 1:
+    e+ e- > t t~ near threshold."""
+    from particle_ids import GLOBAL_PROPERTY_MATRIX as G, global_encode
+    eta = torch.tensor([1.0, -1, -1, -1], dtype=torch.float64)
+    dot = lambda x, y: float((x * y * eta).sum())
+    p0, _ = _events(5, (6,))
+    m, sq = 172.5, 2 * 172.5 * 1.0001
+    E, pz = sq / 2, (sq * sq / 4 - m * m) ** 0.5
+    tt = torch.tensor([[E, 0, 0, E], [E, 0, 0, -E], [E, pz * 0.6, 0, pz * 0.8], [E, -pz * 0.6, 0, -pz * 0.8]]) / 100
+    p = torch.cat([p0, tt]); ptr = torch.tensor([0, 6, 10])
+    tok = torch.tensor(np.concatenate([global_encode(np.array([-11, 11, 2, -2, 21, 21])),
+                                       global_encode(np.array([-11, 11, 6, -6]))]))
+    Gt = torch.as_tensor(G)
+    cas, heavy = Gt[tok, 7], Gt[tok, 2] >= 0
+    f = _div_form_inputs(p, ptr, 6, cas, heavy)
+    assert f.shape == (10, _div_form_width(6))
+    tri = [(i, j, k) for i in range(6) for k in range(i + 1, 6) for j in range(6) if j not in (i, k)]
+    prs = [(a, b) for a in range(6) for b in range(a + 1, 6)]
+    nt, npr = len(tri), len(prs)
+    q = p[:6]; s = dot(q[0] + q[1], q[0] + q[1])
+    # soft: (u=2, g=5, u~=3) is the eikonal of the soft gluon between the quarks; (e+=0, g, u) is 0 (e+ colourless)
+    c = tri.index((2, 5, 3))
+    want = np.log(s * 2 * dot(q[2], q[3]) / (2 * dot(q[2], q[5]) * 2 * dot(q[5], q[3]))) / 5
+    assert abs(float(f[0, c]) - want) < 1e-9, (float(f[0, c]), want)
+    assert float(f[0, tri.index((0, 5, 2))]) == 0 and float(f[0, tri.index((2, 3, 4))]) == 0   # j = u~ is no gluon
+    # collinear: (u=2, g=4) q g, (g=4, g=5) g g, (u, u~) q q; beams 0
+    Q = q[0] + q[1]
+    z = dot(q[2], Q) / (dot(q[2], Q) + dot(q[4], Q))
+    assert abs(float(f[1, nt + prs.index((2, 4))]) - np.log(4 / 3 * (1 + z * z) / (1 - z)) / 5) < 1e-9
+    z = dot(q[4], Q) / (dot(q[4], Q) + dot(q[5], Q))
+    assert abs(float(f[1, nt + prs.index((4, 5))]) - np.log(3 * (z / (1 - z) + (1 - z) / z + z * (1 - z))) / 5) < 1e-9
+    z = dot(q[2], Q) / (dot(q[2], Q) + dot(q[3], Q))
+    assert abs(float(f[1, nt + prs.index((2, 3))]) - np.log(0.5 * (z * z + (1 - z) ** 2)) / 5) < 1e-9
+    assert (f[0, nt:nt + npr][[prs.index((0, 2)), prs.index((0, 1))]] == 0).all()
+    assert (f[0, nt + npr:] == 0).all()                         # no heavy leg in the u u~ g g event
+    # t t~: Coulomb log(1/beta)/5 with beta = sqrt(1 - 4 m^2/s); Sudakov log^2(s/m^2)/25 on the tops; no colour blocks
+    beta = np.sqrt(1 - 4 * m * m / sq ** 2)
+    assert abs(float(f[6, nt + npr + prs.index((2, 3))]) - np.log(1 / beta) / 5) < 1e-6
+    assert abs(float(f[6, nt + npr + npr + 2]) - np.log(sq ** 2 / m ** 2) ** 2 / 25) < 1e-9
+    assert (f[6, :nt + npr] == 0).all() and (f[6, nt + npr + npr + 4:] == 0).all()   # columns past 4 legs
+    assert (f[6] == f[9]).all()
+    L = _lorentz(2)
+    assert torch.allclose(f, _div_form_inputs(p @ L.T, ptr, 6, cas, heavy), atol=1e-9, rtol=1e-9), "not Lorentz invariant"
+    # through the wrapper (its property table indexed by the same global tokens)
+    def wrap(**fl):
+        from models.lloca import LLOCAMuPTransformer
+        ns = 16 + 15 + (_div_form_width(6) if fl else 0)
+        torch.manual_seed(0)
+        net = LLOCAMuPTransformer(num_scalars=ns, hidden_channels_mlp=16, num_layers_mlp=2, in_channels=ns + 4,
+                                  attn_reps="8x0n+2x1n", out_channels=1, num_blocks=2, num_heads=2)
+        w = AmplitudeLLoCaWrapper(net, token_size=0, d_particle_hidden=16, input_pair_logs=6, **fl)
+        w.setup_particle_features(use_pids=False, property_matrix=G)
+        return w.double().eval()
+    def out(w, x):
+        with torch.no_grad():
+            return w(x, tok, 0.0, 1.0, ptr).reshape(-1)
+    w = wrap(input_div_form=True)
+    a, b = out(w, p), out(w, p @ L.T)
+    assert float((a - b).abs().max() / a.abs().max()) < 1e-7, "div form wrapper: not Lorentz invariant"
+    assert float((a - out(wrap(), p)).abs().max() / a.abs().max()) > 1e-6, "div form does not change the output"
+
+
 if __name__ == "__main__":
-    for t in [test_log_skip, test_route_off, test_scalars_only_reads_no_momentum, test_pair_log_values, test_soft_rescale_fixed_point, test_pair_logs_equivariant,
+    for t in [test_div_form, test_log_skip, test_route_off, test_scalars_only_reads_no_momentum, test_pair_log_values, test_soft_rescale_fixed_point, test_pair_logs_equivariant,
               test_soft_rescale_equivariant, test_local_logs_equivariant, test_both_flags_6particle_equivariant]:
         t()
     print("all ok")

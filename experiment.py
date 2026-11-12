@@ -839,6 +839,9 @@ class AmplitudeExperiment(BaseExperiment):
 
             _npl = int(self.cfg.model.get("input_pair_logs", 0) or 0)
             n_scalars += _npl * (_npl - 1) // 2   # model.input_pair_logs: one log invariant per pair (wrappers)
+            if self.cfg.model.get("input_div_form", False):   # wrappers._div_form_inputs columns
+                from wrappers import _div_form_width
+                n_scalars += _div_form_width(_npl)
 
             with open_dict(self.cfg):
                 if self.modelname in ("MuPLGATr", "MuPLGATrSlim"):

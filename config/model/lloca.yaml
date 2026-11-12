@@ -42,6 +42,9 @@ input_route_off: ""
 input_log_skip: 0
 # input_log_skip_linear: keep only the linear terms of the log skip (no L^2, M^2)
 input_log_skip_linear: false
+# input_div_form: the singular limits' functional forms as scalars (wrappers._div_form_inputs: eikonal per triple,
+# log P(z) per final coloured pair, log 1/beta per heavy pair, log^2(s/m^2) per heavy leg; needs input_pair_logs)
+input_div_form: false
 context_dim: 0
 context_dropout: 0.5
 context_names_file: null
