@@ -24604,6 +24604,34 @@ entries:
       is reported as a data limit of the fixed setup (validation keeps improving while it separates, early stop costs 1.4-2.3x),
       and the next suspect named from the curves. Every arm reported per cell with both numbers whatever the branch; diverged
       runs listed apart.'
+    fix_at: '2026-11-12T17:47:41+00:00'
+    fix: '(1) Check 3/4, the WORSE veto sits inside the noise. The FIX branch needs an arm that is ''not WORSE in any'' of
+      12 cells, with WORSE meaning best val >= 2x the control. But the same-HP rerun spread already measured on this entry
+      is 0.46-4.84x (diag_readout, parent-scale rerun over stage-2 best). So a real fix would be vetoed by one noisy cell.
+      Define WORSE the way BETTER is defined (beyond each cell''s control-vs-original ratio), or pool it (geometric mean over
+      the 12 cells of arm/control against the pooled rerun spread), and state how often a null arm trips it. (2) Check 1/4,
+      a NO from untuned arms is read as a data limit. Every arm runs at HPs the stage-2 search tuned for the control: lr,
+      warmup and eta_min for the cosine schedule at horizon T, weight decay and L2 inside their old ranges. The half/double
+      arms also keep an lr that HPO rule 2 ties to t. NONE concludes ''a data limit of the fixed setup'', which an untuned
+      arm cannot show (the A/B protocol: first at the baseline''s HPs, then the same sweep for the feature; the 2026-10-26
+      lesson about untuned arms). Reword NONE: not fixed at the baseline''s HPs. The next step is the same 8-trial template
+      search for the most promising arm on the worst cells, inside the budget, before any data-limit claim. (3) Check 13 (D241),
+      single HP values outside the search. The wd arm (Muon weight decay 1.0) and the l2 arm (L2 1e-4) are single hand-set
+      values of searched HPs outside the template ranges, so they are hand-rolled HP points. D241: an HP question goes through
+      the template''s coupled sweep, or a one-HP probe on Joaquin''s yes to an explicit proposal. Either replace these two
+      arms with a template sweep whose weight-decay/L2 ranges are widened upward (the coupled space, 8 trials, 3 start-up
+      then 3, 2), or ask Joaquin with the reason (prior: within-range wd/L2 do not move separation, |rho|<=0.1). WSD is an
+      ablation flag and stays. (4) Check 5, prior work left out. docs/results.tex around line 7650 (Muon fine-tune cells):
+      ''Every cell, tuned or not, overfits early: the best checkpoint is a median 0.02 of the way through the run ... the
+      last validation ends a median 7.25 times above it ... the cells'' step counts ... run far past the point where these
+      fine-tunes stop improving''. Also line ~14327: early stopping is not the cause of the fine-tune deficit. Both bear on
+      the half-horizon arm and on the early-stopping-not-run argument. The prior field should name them and say what this
+      test adds. Smaller items, which do not decide the verdict on their own: the check field should cite the evidence that
+      the measure moves with an optimizer change inside a cell, not only across D (I read curve_quality.json: within each
+      of the 12 cells separation spans 1.5-5 decades across trials, and Spearman rho(separation, peak lr) is -0.39 at D<100
+      and -0.38 at 100-1000). together_readout.py does not exist yet and submit_together.py is uncommitted: commit both before
+      submission (D237). The wall target 0.12 s/step includes overhead; state the work time. Disk was not stated (CC /sps/lpnhe
+      65 GB free now; 72 stage-2-sized trials are well under it).'
   step_waits:
     '3': bbx_zz_lo_scr3, bbx_zz_lo_ft drivers (detach events)
     '4': bbx_zz_lo_ft driver (detach event)
