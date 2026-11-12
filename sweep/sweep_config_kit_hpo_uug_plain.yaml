@@ -1,17 +1,17 @@
 # kit_benchmark step 15 (D421, D422): single-fidelity DyHPO over the template's space on the KIT from-scratch setup of
-# run 203a274f, plain log10|M|^2 target, softpair inputs (runs/kit/kit_A_ee_uug_me2_n100000_t8000_softpair_plain, 1e5 events, 8000 steps), to choose the HPs (lr first) at which validation falls with
+# run 203a274f, plain log10|M|^2 target, softpair inputs (runs/kit/kit_A_ee_uug_me2_n100000_t8000_softpair_plain, 1e5 events), to choose the HPs (lr first) at which validation falls with
 # training (curve_quality's separation/end_up on val_mse_curve / train_eval_mse_curve) and the best validation.
 # Everything else is the run's own config (base_config): inputs, target, HETEROSC + sigma stage, float64.
-# As pretrain_data_saving's template 2 (sweep/sweep_config_dsave_tmpl2_*): WSD with cooldown 0.125 fixed (D423) and the
-# batch size searched over [D/64, D/2] = [1562, 50000], capped at 16384 (the template's biggest that fits: 14 GB of a
-# V100's 32 GB at float64 in 203a274f/3fc1016a); the rest is the template's space.
+# The template's space, WSD with cooldown 0.125 (D423), batch fixed at the template's 16384 (Joaquin 2026-11-12: 'Why
+# would you change batch size?'). Horizon 300 epochs over the 1e5 training events, as Bakar's MLP (Joaquin: 'then we
+# should match the number of epochs'): 300 x 1e5 / 16384 = 1831 steps.
 cluster:
   scheduler: slurm
   auto_submit: false
   request_gpus: 1
   mem: 32G
   cpus_per_task: 4
-  time: "02:45:00"
+  time: "01:00:00"
 paths: null
 sweep_name: kit_hpo_uug_plain
 base_config: ${PROJECT_DIR}/runs/kit/kit_A_ee_uug_me2_n100000_t8000_softpair_plain
@@ -25,7 +25,7 @@ dyhpo:
   total_budget: 10000
   waves: [3, 3, 2]
 fidelity_schedule:
-  t_steps: [8000]
+  t_steps: [1831]
 fixed_params:
   data.source: recipes
   data.processes_file: ${PROJECT_DIR}/runs/kit/recipes/kit_A_ee_uug_me2_n100000_t8000_softpair_plain.yaml
@@ -42,10 +42,10 @@ fixed_params:
   training.optimizer: MuonAdamW
   training.scheduler: WSD
   training.wsd_cooldown_frac: 0.125
+  training.batchsize: 16384
 range_extension:
   enabled: false
 search_space:
-- {name: training.batchsize, type: int_log, low: 1562, high: 16384}
 - {name: training.lr, type: float_log, low: 1.667e-03, high: 1.5e-02}
 - {name: training.muon_weight_decay, type: float_log, low: 1.0e-03, high: 0.3}
 - {name: training.regularization_lambda, type: float_log, low: 1.0e-10, high: 1.0e-06}
