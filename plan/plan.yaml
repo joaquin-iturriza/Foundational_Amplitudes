@@ -24632,6 +24632,50 @@ entries:
       and -0.38 at 100-1000). together_readout.py does not exist yet and submit_together.py is uncommitted: commit both before
       submission (D237). The wall target 0.12 s/step includes overhead; state the work time. Disk was not stated (CC /sps/lpnhe
       65 GB free now; 72 stage-2-sized trials are well under it).'
+  - at: '2026-11-12T17:48:54+00:00'
+    question: 'D414/D420 (Joaquin: ''you can''t guarantee that you can properly train these networks''): does one change of
+      schedule or horizon (warmup-stable-decay in place of the cosine''s long decay; T/2; 2T) make validation go down together
+      with training (curve_quality.py @155d1ab8: separation = (val/train at end)/(min val/train) <= 3, val at end <= 2x its
+      best) without raising the best validation loss, at each cell''s baseline HPs, on t t~ LO, u u~ LO and b b~ > Z Z V/B
+      at D=316 and 3162, scratch and fine-tune? Revision after FIX: the single-value weight-decay and L2 arms are out (D241);
+      regularisation above the searched ranges goes to a widened-range DyHPO sweep, designed after this read.'
+    prior: 'results.tex ~l.7650 (Muon fine-tune cells): every cell overfits early, best checkpoint a median 0.02 of the run,
+      last val 7.25x above it; the step counts run past where fine-tunes stop improving -> the half-horizon arm tests this
+      on the stage-2 setup. results.tex ~l.14327: early stopping is not the cause of the fine-tune deficit (ee->dd~ stops
+      early 88-94% and still gains a decade). WSD only as a pretraining parent schedule (sec. ws_fixes, ~0.76x). This entry''s
+      lr c/3, c/10, mu-only, AdamW tests judged other bars. From 723 stage-2 trials (curve_quality.json @155d1ab8): good by
+      D: D<100 3/176, 100-1000 5/174, 1e3-1e4 13/163, >=1e4 84/171; Muon weight decay [0.001,0.3] and L2 [1e-10,1e-6] do not
+      move separation within a search (|rho| <= 0.1). Early stopping where val/train first exceeds 3x its running min costs
+      val 1.4x (D<100), 2.3x (100-1000), 1.9x (1e3-1e4), 1.0x (>=1e4) against the best checkpoint: validation still improves
+      while it separates, so it is not run. What this test adds: whether the schedule''s long decay or the horizon causes
+      the separation at the stage-2 setup. Reported loss stays at the best checkpoint.'
+    measure: 'Per run: best validation MSE (ln units, val mu-MSE x prepd_std^2 at its minimum = best checkpoint), test MSE
+      after the sigma stage beside; separation and end_up by curve_quality.quality on the val and train-eval curves. Readout
+      analysis/data_saving/together_readout.py (committed before submission): per cell arm/control ratio and good/bad; pooled
+      G = geometric mean over the 12 cells of arm/control.'
+    check: 'The measure moves with an optimizer change inside a cell, not only across D: within each of the 12 cells separation
+      spans 1.5-5 decades across trials, Spearman with peak lr -0.39 (D<100) and -0.38 (100-1000) (reviewer''s read of curve_quality.json);
+      by eye on the 49 curves shown to Joaquin it calls bad every visibly separating curve; the 12 cells'' search bests are
+      3.6-5e4 against the bar 3 (0 of 12 good).'
+    fixed: 'Each cell''s stage-2 search best HPs (stage2_readout.json best_hp, sweeps_local driver_state), its own sweep config
+      dsave_s2_{scr,ft}_<target>_d{5,7}_t<T>, pools, seed 42, parents as stage 2 (HETEROSC mu_mse select, sigma stage). Path
+      sweep/trial_job.sh --detached as the nullparent runs; submitter analysis/data_saving/submit_together.py. Arms: control
+      (unchanged), wsd (training.scheduler WSD, wsd_cooldown_frac 0.2, same warmup and eta_min), half (T/2), double (2T);
+      lr held at the cell''s best (the horizon arms'' lr is not retuned: stated in the read). Cells epem_ttx, ee_uu, bbx_zz_nlo
+      x k=5,7 x scr, ft: 12 x 4 = 48 runs. Disk: CC /sps/lpnhe 65 GB free, 48 runs ~1.5 GB.'
+    control: 'The control rerun per cell (same HPs, config, seed) beside the original search best: per-cell spread max(c/o,
+      o/c) and pooled S = its geometric mean over cells (prior rerun spread at fixed HPs 0.46-4.84x, diag_readout).'
+    seeds: Seed 42, one run per arm and cell (D315). Work 9.1 GPU-h (training steps x 0.085 s/step, V100 at k<=7 from the
+      cal_vb runs); wall limits 27 GPU-h (1.5 x T x 0.12 s/step + 10 min), one submission, wall-time target 1 h (one wave
+      on CC).
+    outcome: 'Per cell: BETTER = arm/control <= 1/2 and beyond the cell''s spread; WORSE = >= 2 and beyond the spread; else
+      SAME; GOOD/BAD by the measure. Per arm: FIX = good in >= 8 of 12 cells and G < S -> candidate setup; next its 8-trial
+      template search per cell (cost to Joaquin if over budget). GAIN WITHOUT FIX = G <= 1/(2S): val gain, separation open.
+      Otherwise NOT FIXED AT THE BASELINE''S HPs (never read as a data limit): next the 8-trial template search for the most
+      promising arm (by G and good count) on these cells, and the widened-range regularisation sweep (Muon weight decay to
+      3, L2 to 1e-3, coupled template space), each designed and reviewed. False alarm: a no-effect arm''s log G has sd ~ sigma/sqrt(12)
+      while log S ~ 0.8 sigma, so G < 1/(2S) or G > S by chance at ~0.3% one-sided. Every arm reported per cell with both
+      numbers; diverged runs listed apart.'
   step_waits:
     '3': bbx_zz_lo_scr3, bbx_zz_lo_ft drivers (detach events)
     '4': bbx_zz_lo_ft driver (detach event)
