@@ -29,7 +29,17 @@ ARMS = {"rezero": {"ee_uug_me2": "kit_A_ee_uug_me2_n100000_t8000_softpair_rezero
         "thr": {"ee_tt_virt_finite": "kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr"},
         # inputs-only: Bakar's inputs alone (model.input_scalars_only, data.offshell_zero)
         "scalars": {"ee_uug_me2": "kit_A_ee_uug_me2_n100000_t8000_softpair_scalars",
-                    "ee_tt_virt_finite": "kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr_scalars"}}
+                    "ee_tt_virt_finite": "kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr_scalars"},
+        # one route cut each (D411 isolation): local momenta (model.input_route_off=local), attention frames
+        # (input_route_off=frames), off-shellness (data.offshell_zero)
+        **{a: {"ee_uug_me2": f"kit_A_ee_uug_me2_n100000_t8000_softpair_{a}",
+               "ee_tt_virt_finite": f"kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr_{a}"}
+           for a in ("nolocal", "noframes", "nooffshell")}}
+# figure sets: kit_extrap_<proc> (the earlier arms) and kit_extrap_route_<proc> (the one-route cuts)
+SETS = {"": (("rezero", "D-", "orange", "ReZero"), ("thr", "v-", "purple", r"$\beta$ input"),
+             ("scalars", "P-", "sky", "transformer, MLP inputs")),
+        "route_": (("scalars", "P-", "sky", "all cut"), ("nolocal", "D-", "orange", "no local momenta"),
+                   ("noframes", "v-", "purple", "no attention frames"), ("nooffshell", "X-", "grey", "no off-shellness"))}
 
 SITE = r'''
 import glob, json, os, sys
@@ -79,18 +89,18 @@ def plot(path, figs):
     import plot_style as ps
     from tools.kit_figures import family, edges, XLAB, PROC
     d = json.load(open(path))
-    for proc, e in d.items():
+    for (proc, e), (fs, arms) in ((pe, st) for pe in d.items() for st in SETS.items()):
+        if fs and not any(f"transformer_{a}" in e for a, *_ in arms[1:]):
+            continue
         panels = ps.panels(len(FAMS[proc]))
         for (fig, ax), fam in zip(panels, FAMS[proc]):
             ks = [k for k in e["transformer"] if k.startswith("hard_test/") and family(k.split("/")[1]) == fam]
             ks = sorted(ks, key=lambda k: edges(k.split("/")[1])[0])
             x = np.array([np.sqrt(np.prod([max(v, 1e-12) for v in edges(k.split("/")[1])])) for k in ks])
             ax.plot(x, [e["transformer"][k]["err"] for k in ks], "o-", color=ps.C.vermillion, label="transformer")
-            for arm, mk, c, lab in (("rezero", "D-", ps.C.orange, "ReZero"),
-                                    ("thr", "v-", ps.C.purple, r"$\beta$ input"),
-                                    ("scalars", "P-", ps.C.sky, "transformer, MLP inputs")):
+            for arm, mk, c, lab in arms:
                 if f"transformer_{arm}" in e:
-                    ax.plot(x, [e[f"transformer_{arm}"][k]["err"] for k in ks], mk, color=c, label=lab)
+                    ax.plot(x, [e[f"transformer_{arm}"][k]["err"] for k in ks], mk, color=getattr(ps.C, c), label=lab)
             for arm, mk, c in (("mlp", "s-", ps.C.blue), ("ours", "^--", ps.C.green)):
                 v = [[e[f"{arm}_s{s}"][k]["err"] for k in ks] for s in range(3) if f"{arm}_s{s}" in e]
                 if not v:
@@ -106,7 +116,7 @@ def plot(path, figs):
             ps.process_label(ax, PROC.get((f"{e_}_{f2}", tg), proc))
             ps.legend(ax, "lower left" if e["transformer"][ks[-1]]["err"] > 0 else "upper left")
             ps.make_room(ax)
-        ps.save_panels(panels, os.path.join(figs, f"kit_extrap_{proc}"))
+        ps.save_panels(panels, os.path.join(figs, f"kit_extrap_{fs}{proc}"))
 
 
 def main():
