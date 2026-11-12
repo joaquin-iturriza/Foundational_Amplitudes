@@ -30632,6 +30632,18 @@ entries:
       moved (batch, lr) against the base point. NO per setup (no good trial in 8): by D422 the cause is ranges or trial count;
       next attempt inside this design''s aim: extend the same search by 8 trials (generate_sweep --extend); if still none,
       widen the range on the side the separation shrinks toward (lr or batch; a design revision).'
+    passed_at: '2026-11-12T18:07:11+00:00'
+    reviewer: 'Round 2 @631d6f72: configs run WSD cooldown 0.125 (D423 in force on kit_benchmark) and search batch size int_log
+      [1562,16384] plus the template''s lr/wd/reg/warmup/eta_min/EMA, 8 trials waves 3,3,2 (D244); prior now names hp_ranges_readout
+      (only lr moves separation, rho -0.30; batch never searched) and template 2. Check 2: curve_quality.json good and bad
+      trials in the same stage-2 searches (ee_uu scr 21/71, epem_ttx 14/70, ee_ttbar_nlo 12/63), read. Check 3: HPO axis,
+      D315, selection not an effect size. Control on shared quantities (kit_predict bulk_test and hard bins vs the controls''
+      kit_result.json, NLL-form curve); timing ~5.1 h uug / 3.9 h tt; disk <=3.2 GB vs 65 GB free (df read); rate from 203a274f/3fc1016a
+      at the cap batch, smaller batches no slower; run_trial sets result_path (run_trial.py:340); D395 smoke first. Caveat
+      for the report: WSD is in every trial, so ''whether the controls'' separation was an HP point'' is read with the scheduler
+      changed too and must say so. Searched: kit_hpo, KIT sweep/DyHPO, curve_quality, separation, lr_scale, lr 0.0118605,
+      scheduler, WSD, tmpl2, batchsize in docs/results.tex, plan show kit_benchmark and pretrain_data_saving, site decisions
+      D241 D244 D315 D412 D421-D423.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
