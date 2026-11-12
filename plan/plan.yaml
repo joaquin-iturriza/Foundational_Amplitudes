@@ -24150,6 +24150,54 @@ entries:
       the figure goes with the failing cells named. NO SAVING: S band includes 1: reported with both arms'' curves. If no
       arm is WELL in the t t~ test: nothing runs; the draft figure is the stage-2 u u~ V L(D) with its curve-quality numbers
       stated, and the next lr/schedule test follows the t t~ outcome rule.'
+  - at: '2026-11-12T14:07:58+00:00'
+    question: 'Training quality before the draft''s second data-saving example (D413/D414; Joaquin 2026-11-12 ''the tree runs
+      are not fixed at all''). The lr-centre test ruled out lr as the cause of the spikes (scratch spikes 26-62 at c/3 and
+      c/10, 32 at peak lr 3.6e-4). Does training mu with plain MSE (training.heterosc_mu_only=true: the 2-channel HETEROSC
+      net kept, the sigma channel out of the gradient, so no 1/sigma^2 weighting of the mu gradient), with the other HPs retuned
+      by the search, give well-trained runs by curve_quality.py at no worse a validation minimum? Read on t t~ LO D=3162 (the
+      background problem) and on the draft''s second example e+e- > u u~ one-loop V (trained on V, fine-tuned from the trees-in
+      parent) at D=3162 and 1e4, the cells whose stage-2 best trials fail spike/jitter. Feeds: the template''s loss for the
+      u u~ V L(D) redo of the draft figure, and the t t~ diagnosis.'
+    prior: 'Searched results.tex (heterosc_mu_only, mu-only, spike, jitter, curve quality, data saving 9386-9441), the entry''s
+      findings and dead ends, D405-D415. (1) Lower-lr test (lr_centre_readout.py @10cbc336, data @50544432): scratch NO CHANGE
+      at c/3 and c/10 (best 1.3e-7, 6.2e-8 vs control 8.5e-9; 0 well), fine-tune c/3 NO CHANGE (best 1.9e-9 vs 8.2e-9), c/10
+      BETTER, NOT WELL (1 well trial, jitter 0.21 vs 0.92). (2) Suspects batch one-change mu-only MSE arm at the fine-tune
+      best''s fixed HPs (curve_quality bars, t t~ LO D=316/1e3/3162/1e4): spike 1.5/3.4/3.7/1.3 against control 3.9/19.7/12.1/9.7,
+      jitter 0.11-0.22: the only one-change arm with clean curves in all four cells; minima 3.5e-6/3.2e-7/7.9e-8/1.5e-8 against
+      3.9e-5/1.9e-7/6.9e-9/2.6e-9, worse at D>=3162 at fixed HPs (the retuning is what this test adds). (3) Batch size is
+      not a suspect: the sweeps inherit the parent''s batchsize 16384 > D, every step is full-batch. (4) Stage-2 u u~ V best
+      trials (curve_quality.py @0d593de5): D=3162 scratch spike 20.7 jitter 0.41, fine-tune spike 2.4 jitter 0.15 gap 75;
+      D=1e4 scratch spike 228 jitter 0.96, fine-tune spike 41 jitter 0.46; S (stage2_readout.py @5555a0f0) 8.3 on test (band
+      lower 3.2, upper unbounded), 2.7 on val_ln [2.0, 3.9].'
+    measure: 'curve_quality.py bars (steady >= 2/3, spike <= 3, jitter <= ln2, gap <= 10) on every trial of each search; per
+      search: number well, number with spike <= 3, median jitter, best trial''s four numbers and its validation minimum in
+      ln units (val mu-MSE x prepd_std^2), against the control search by the same tool (lr_centre_readout.py extended to these
+      searches). Figure: per cell and arm the best trial''s val and train curves, control beside.'
+    check: 'On existing data the bars move with this change in the tested direction: the suspects mu-only runs drop spike
+      from 3.9-19.7 to 1.3-3.7 in 4 of 4 t t~ LO cells (above), so the measure can see it; the spread between neighbouring
+      searches (median jitter ratio 0.73-2.88, spike too noisy, read as counts) is the lr test''s.'
+    fixed: 'One change, training.heterosc_mu_only=''true'', on the controls'' configs: t t~ LO D=3162 scratch = dsave_s2_scr
+      config, fine-tune = dsave_s4_ft config (layer_decay 1, lr_scale [1/3,3], head map as s4); u u~ V D=3162, 1e4 = the stage-2
+      configs (sweep/gen_data_saving.py --targets ee_uu_nlo, trees-in parent, llrd fine-tune space, offshell_stats parent)
+      with fine_tune.map_head=''false'' (new switch, default true: the head map came in after stage 2, so the u u~ V fine-tune
+      would otherwise differ from its control in two things). T = 8500, seed 42, 8 trials waves 3,3,2, heterosc_select mu_mse
+      (no sigma stage under mu-only: read on validation). Configs on branch lrcentre @541bea53: sweep/sweep_config_dsave_muonlymse_{scr,ft}_epem_ttx_d7_t8500.yaml,
+      sweep/sweep_config_dsave_muonlymse_{scr,ft}_ee_uu_nlo_d{7,8}_t8500.yaml (diffed against the controls: the new key(s)
+      and the name-derived DyHPO seed only). Merged into trunk after the repo-reviewer passes.'
+    control: 'Same cells'' searches: dsave_s2_scr_epem_ttx_d7_t8500 (best 8.5e-9, 0 of 9 well), dsave_s4_ft_epem_ttx_d7_t8500
+      (8.2e-9, 0 of 7), dsave_s2_{scr,ft}_ee_uu_nlo_d{7,8}_t8500, read by the same tool.'
+    seeds: 'Seed 42, one 8-trial search per (cell, arm) as the siblings (D315): 6 searches, 48 trials, ~13.5 GPU-h from the
+      controls'' measured search costs (t t~ 2 x ~2.2, u u~ V D=3162 1.80+1.71, D=1e4 2.83+2.73), under D412''s 30; wall ~1.2
+      h at site pick''s width (the lr test''s 32 trials took 50 min); disk ~0.2 GB per search (stage 2: ~14 GB over 68), 1.2
+      GB against 69 GB free on CC /sps/lpnhe (df, 2026-11-12 15:3x).'
+    outcome: 'Per (cell, arm), the lr test''s order: WELL (best passes all four bars, >= 3 of 8 pass, best min <= 2x control''s
+      best); CLEAN BUT WORSE (best or >= 3 trials pass, min > 2x control); BETTER, NOT WELL (>= 3 trials at spike <= 3 with
+      control fewer, or median jitter < control/3); NO CHANGE. Then: if u u~ V is WELL (or CLEAN within 2x) in both arms at
+      both cells: the u u~ V L(D) redo at mu-only (cells D=316..31623, ~29 GPU-h) goes next, after the sigma-stage readout
+      question is settled (mu-only has no sigma stage: read the L(D) on val_ln, the read the stage-2 reviewer called resolvable).
+      If NO CHANGE on u u~ V: the draft figure is the stage-2 u u~ V L(D) with its curve numbers stated; the next suspect
+      is EMA fixed on (lower median jitter on u u~, u u~ V, t t~ V/B in the existing trials). t t~ read the same way, behind.'
   step_waits:
     '2': the detached driver lr_centre_test (sweep/drive.py over dsave_lrthird_{scr,ft}_epem_ttx_d7_t8500 and dsave_lrtenth_{scr,ft}_epem_ttx_d7_t8500,
       CC, 32 trials)
