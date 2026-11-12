@@ -15776,6 +15776,11 @@ entries:
       event and RUN_DONE with no manual poll (next 19 fix).'
     22: 'CLAUDE.md figure rule: on Joaquin''s yes, replace ''the main session sends it without opening it'' with the open-once-and-check
       text proposed 2026-11-10 (shown as a diff)'
+    23: 'Commit the step 23/24 files left uncommitted in the trunk checkout (tests/test_disk_alarm.py, tests/test_run_done_waiter.py,
+      tools/waiter_replay.py): review_backlog.sh bashpre refuses every git commit while the notes-editor pillar is overdue
+      with another entry''s uncommitted docs/results.tex (pretrain_data_saving''s write-up), and the mechanical-worker fix
+      (pass a commit whose named -- paths miss the pillar''s paths) was refused by the auto-mode classifier as self-modification;
+      then the repo-reviewer reviews them with the ~/.local/bin/site diff against site.bak-20261112-diskwatch'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16165,6 +16170,11 @@ entries:
       if:
       - 'yes: edit CLAUDE.md, commit, show the diff'
       - 'no: keep, rely on the per-file legend rule'
+    23:
+      feeds: whether the disk alarm and waiter fixes hold
+      if:
+      - 'the commit check lets the named commit through: commit and push'
+      - 'still refused: the hook fix goes to Joaquin as a diff'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
