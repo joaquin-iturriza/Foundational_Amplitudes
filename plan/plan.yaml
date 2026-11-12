@@ -21529,7 +21529,7 @@ entries:
     decision: D407
   owner:
     agent: a30d7264e9acbd802
-    state: working
+    state: closed
     since: '2026-11-12T13:05:22+00:00'
     state_at: '2026-11-12T14:44:00.586000+00:00'
     context: 279451
@@ -25354,32 +25354,35 @@ entries:
     start: '2026-11-12T14:46:49+00:00'
     at: '2026-11-12T14:46:49+00:00'
   handoff:
-    state: 'Step 2 (Joaquin 2026-11-12: ''the tree runs are not fixed at all''): the s4 ''FIXED'' verdict is withdrawn (it
-      was an arm ratio against two badly trained references). New measure analysis/data_saving/curve_quality.py @0d593de5
-      (data/curve_quality.json): a trial is well trained when steady >= 2/3, spike <= 3, jitter <= ln2, and gap <= 10 (gap
-      read only while val is within 1.5x of its final min). 0 of 151 t t~ LO trials are well; spike and jitter grow with peak
-      lr. The one-change lr x1/10 runs are clean but reach worse minima (D=3162: 2.1e-7 vs 6.9e-9). Lower-lr test design PASSED
-      (second version): t t~ LO D=3162, scratch and fine-tune at c/3 and c/10, 4 searches x 8 trials, 8.8 GPU-h, target 1.2
-      h / 32 jobs. Configs sweep/sweep_config_dsave_lrthird_{scr,ft}_epem_ttx_d7_t8500.yaml @0d593de5 and sweep/sweep_config_dsave_lrtenth_{scr,ft}_epem_ttx_d7_t8500.yaml
-      @979ad4e4. NOT SUBMITTED: CC sync blocked by two untracked kit_benchmark files (analysis/kit_benchmark/data/kit_sat_{ttvirt,uug}_scalars.json,
-      differing from dddeacff); the KIT owner is clearing them; CC at ff934d7c. Next owner: once ''site sync ccin2p3 FA''
-      succeeds, start the driver: python3 tools/detach.py --entry pretrain_data_saving --name lr_centre_test -- python3 -u
-      sweep/drive.py with --config for each of the 4 configs, --item pretrain_data_saving --sites ccin2p3. Read with curve_quality.py
-      extended to the new searches, in the design''s order WELL / CLEAN BUT WORSE / BETTER NOT WELL / NO CHANGE, with the
-      level bar (best min <= 2x control best). Reviewer caveats: the 2x level bar is inside the ~5x search spread; at D=316
-      the x1/10 run beat its control.'
-    decisions: 's5 t t~ LO L(D) redo and s6 one-loop offshell-own test dropped (held by the main session after Joaquin''s
-      correction; never submitted, 0 runs). gen_data_saving: tree fine-tune space default scratch''s (470d147e; from the withdrawn
-      verdict, revisit), one-loop offshell_stats default own as results.tex adopts (fa846b4d), new --lr-factor. Repo-reviewer
-      backlog passed (watermark db51a01c). D412: tests under 30 GPU-h, no questions.'
-    ruled_out: 'As before. Plus: the arm-ratio verdicts (r_old, r_scr) as a measure of training quality; the HPO rule 4 diff
-      from the withdrawn verdict (superseded); the earlier tp lr x1/3 and x1/10 one-change runs as proof of the lr cause (clean
-      but worse at fixed other HPs).'
-    running: none (no driver alive; s4_ft_template4 ended rc=0; s5 driver stopped at sync with 0 trials)
-    files: analysis/data_saving/{curve_quality.py,s4_readout.py}, data/{curve_quality.json,s4_readout.json,s4_readout_rows.json,suspects_runs_read.json},
-      figs/{curve_quality_lr_*,s4_curves_*}, sweep/gen_data_saving.py, sweep/sweep_config_dsave_lr{third,tenth}_{scr,ft}_epem_ttx_d7_t8500.yaml,
-      sweep/sweep_config_dsave_s5_ft_epem_ttx_*.yaml, sweep/sweep_config_dsave_s6_ft_ee_ttbar_nlo_d{5,6,7}_t8500.yaml
-    written: '2026-11-12T12:53:46+00:00'
+    state: 'Track 1 (D413, draft tomorrow): second example = b b~ > Z Z at LO and one-loop V (Joaquin: ''You pick one process,
+      any process, at LO and V''; u u~ is the first example). One-loop V/B L(D) RUNNING (detach bbx_zz_v_LD, started 16:47
+      CET, configs sweep/sweep_config_dsave_s2_{scr,ft}_bbx_zz_nlo_d{2..8}_t*.yaml @79578039, design PASS 14:43, 21.3 GPU-h,
+      D=31623 dropped under D412). LO arm NOT STARTED, do it first: (1) new held-out parent = recipes/catalog_v4_datasaving_parent_heldout.yaml
+      minus b b~ > Z Z''s equality class (check equal_processes and d d~/s s~ > Z Z with massless b), job scripts/job_datasaving_parent.sh
+      (~1.5 GPU-h, same D393 flags); (2) LO target recipe recipes/catalog_v4_datasaving_bbx_zz.yaml from v4_bbx_zz''s catalog
+      entry; (3) gen_data_saving.py LO target bbx_zz with T(D) (no LO calibration: state the assumption, e.g. the V ladder''s
+      640..6400) and k=2,4,5,6,7 (~12.4 GPU-h; with V 21.3 the evening is ~35 GPU-h, say it); scratch LO can go at once, fine-tune
+      after the parent; (4) design + review, submit. Readout: stage2_readout.py needs bbx_zz/bbx_zz_nlo in TARGETS (line 39;
+      dstar_fit.py:92) and a test_ln fit for one-loop (line ~181); read S at MSE(ln)=1e-4 on val_ln and test_ln, with curve_quality
+      counts; label ''existing template, not well trained by curve_quality'' if the best trials fail (coordinator''s instruction,
+      not Joaquin''s words). Track 2 (t t~, background): lower-lr test read (NO CHANGE scratch, fine-tune c/10 BETTER NOT
+      WELL; lr not the cause of spikes; full-batch so not batch noise). Mu-only MSE test RUNNING (detach muonly_mse_test,
+      6 searches t t~ LO D3162 + u u~ V D3162/1e4, design PASS second look): read with python analysis/data_saving/lr_centre_readout.py
+      --test muonly by its outcome rule (A all WELL -> question to Joaquin; else next suspect EMA fixed on); its u u~ V cells
+      are now diagnostic only.'
+    decisions: 'u u~ V dropped as the second example (Joaquin: it is the first example). b b~ > Z Z chosen: V/B std 0.267
+      (not constant), loop in neither parent, Born in the trees-in parent; scratch V/B crosses 1e-4 at D=1e3-3162; c c~ g
+      / b b~ g g never reach 1e-4 in calibration. New switch fine_tune.map_head (default true) to keep fine-tunes identical
+      to pre-head-map controls (f61d3f8d). gen_data_saving.py: SECOND=[bbx_zz_nlo], CALS + horizons_cal_vb_ladder.json. cell_guard
+      refusals routed with FA_NEW_SWEEP_REASON (D412/D413). Proposed CLAUDE.md rule (to Joaquin): a transfer/second example
+      is checked first against the parent recipe, equality classes, constant V/B, and is a process not already shown.'
+    ruled_out: 'As before. Plus: lower lr centre (c/3, c/10) as the fix for the curves; batch-size noise (full batch); u u~
+      V as a second example; c c~ g and b b~ g g (no 1e-4 crossing).'
+    running: detach bbx_zz_v_LD (14 searches, CC, target 1.5 h); detach muonly_mse_test (6 searches, CC, target 1.2 h)
+    files: analysis/data_saving/lr_centre_readout.py (--test lr|muonly), data/lr_centre_readout*.json, data/lr_centre_rows*.json,
+      data/horizons_cal_vb_ladder.json, figs/lr_centre_curves_{a,b}; sweep/gen_data_saving.py; sweep/sweep_config_dsave_muonlymse_*;
+      sweep/sweep_config_dsave_s2_*_bbx_zz_nlo_*; base_experiment.py + config/default.yaml (fine_tune.map_head)
+    written: '2026-11-12T14:47:49+00:00'
   step_why:
     2:
       feeds: 'whether any L(D) arm (scratch or fine-tune) can be read at all: the data saving needs both arms well trained'
