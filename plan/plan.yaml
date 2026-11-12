@@ -23832,7 +23832,8 @@ entries:
       t t~ LO answer of the current setup (and against sec:ladder''s earlier gap, which was against a scratch 10-100x worse).
       WORSE: band below 1; report. D* at 1e-4 not reached by an arm: read at the precision both reach (D373), said so. Any
       branch: the readout goes to Joaquin with the L(D) figure; no reruns (D315).'
-  step_waits: {}
+  step_waits:
+    '4': 'a reviewer: design-reviewer on the t t~ LO fine-tune redo design (recorded 12:14 CET)'
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
