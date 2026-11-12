@@ -19,10 +19,12 @@ sys.path.insert(0, ROOT)
 
 RUNS = {"ee_uug_me2": "kit_A_ee_uug_me2_n100000_t8000_softpair",              # FA-ccin2p3-c15b3337
         "ee_uugg_me2": "kit_A_ee_uugg_me2_n100000_t8000_softpair",            # FA-ccin2p3-c364a7ae
-        "ee_tt_virt_finite": "kit_A_ee_tt_virt_finite_n100000_t8000_softpair"}  # FA-ccin2p3-f21fa163
+        "ee_tt_virt_finite": "kit_A_ee_tt_virt_finite_n100000_t8000_softpair",  # FA-ccin2p3-f21fa163
+        "ee_tt_born": "kit_A_ee_tt_born_n100000_t8000_softpair"}                # FA-ccin2p3-5515dc85
 # transformer arms read beside the control, per process (D411): ReZero, norm-free blocks (model.net.layer_norm=rezero)
 ARMS = {"rezero": {"ee_uug_me2": "kit_A_ee_uug_me2_n100000_t8000_softpair_rezero",
-                   "ee_tt_virt_finite": "kit_A_ee_tt_virt_finite_n100000_t8000_softpair_rezero"},
+                   "ee_tt_virt_finite": "kit_A_ee_tt_virt_finite_n100000_t8000_softpair_rezero",
+                   "ee_tt_born": "kit_A_ee_tt_born_n100000_t8000_softpair_rezero"},
         # tt's matched control of the inputs-only arm: pair logs with the threshold column (FA-ccin2p3-3fc1016a)
         "thr": {"ee_tt_virt_finite": "kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr"},
         # inputs-only: Bakar's inputs alone (model.input_scalars_only, data.offshell_zero)
@@ -49,7 +51,7 @@ def read(pred_path, stem, target):
                                       "err": float(np.median(p - t)), "logmse": float(np.mean((p - t) ** 2))}
     return r
 for proc, run in RUNS.items():
-    stem, target = (proc[:-4], "me2") if proc.endswith("_me2") else ("ee_tt", "virt_finite")
+    stem, target = (proc[:-4], "me2") if proc.endswith("_me2") else ("ee_tt", proc[len("ee_tt_"):])
     d = f"runs/kit/{run}"
     z = np.load(f"{d}/train_steps.npz")
     e = {"transformer": read(f"{d}/kit_benchmark/predictions.h5", stem, target),
@@ -70,7 +72,7 @@ print("KITEXTRAP " + json.dumps(out))
 
 
 FAMS = {"ee_uug_me2": ["coll_y", "soft_x"], "ee_uugg_me2": ["coll_qg_y", "coll_gg_y"],
-        "ee_tt_virt_finite": ["sudakov_sqrts", "threshold_beta"]}
+        "ee_tt_virt_finite": ["sudakov_sqrts", "threshold_beta"], "ee_tt_born": ["sudakov_sqrts", "threshold_beta"]}
 
 
 def plot(path, figs):
@@ -91,6 +93,8 @@ def plot(path, figs):
                     ax.plot(x, [e[f"transformer_{arm}"][k]["err"] for k in ks], mk, color=c, label=lab)
             for arm, mk, c in (("mlp", "s-", ps.C.blue), ("ours", "^--", ps.C.green)):
                 v = [[e[f"{arm}_s{s}"][k]["err"] for k in ks] for s in range(3) if f"{arm}_s{s}" in e]
+                if not v:
+                    continue
                 ax.plot(x, np.median(v, 0), mk, color=c, label={"mlp": "MLP", "ours": "MLP, our choices"}[arm])
             ax.axhline(0, color=ps.C.grey, lw=0.8)
             ax.set_xscale("log")
