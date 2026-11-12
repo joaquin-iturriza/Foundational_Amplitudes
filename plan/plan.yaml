@@ -30479,6 +30479,34 @@ entries:
       next attempt (no new go, inside this design''s aim): extend the same search by 8 trials (generate_sweep --extend), and
       if still none, widen the range on the side the separation shrinks toward (a design revision). tt: if the controls''
       HP point is among the good, keep it (step-15 branch ''controls pass: keep lr 0.0118605'').'
+    fix_at: '2026-11-12T18:05:04+00:00'
+    fix: 'Check 5 (prior, searched independently) and check 7/9 (decisions in force): D423 (''I believe we had settled on
+      the new scheduler as generally better, and good for warm starting from, which I think can''t hurt for fine tuning'',
+      2026-11-12T18:01, covers kit_benchmark) is in force and the design runs CosineAnnealingLR (template, base config) without
+      naming it. The prior also omits the sibling work on this same D422 question in pretrain_data_saving: analysis/data_saving/hp_ranges_readout.py
+      (283 scratch stage-2 trials: within a search only lr moves separation, Spearman -0.30; muon wd, L2, warmup, lr floor,
+      EMA, EMA decay |rho| <= 0.10; separation is set by D and by the HPs that follow D and were never searched, batch size
+      and horizon) and that entry''s revised search template answering D422 (tmpl2: WSD with wsd_cooldown_frac 0.125 fixed,
+      training.batchsize searched in [D/64, D/2], sweep/sweep_config_dsave_tmpl2_*.yaml; its own review asked for a WSD-only
+      arm). This design searches exactly the six knobs that readout found inert and keeps batch 16384 (D/6 at 1e5, ~1300 epochs
+      in 8000 steps) and the cosine schedule fixed. Fix: name hp_ranges_readout and tmpl2 in the prior; under D423 run the
+      search with training.scheduler WSD (cooldown 0.125, as tmpl2) or state why cosine is kept for KIT; say whether batch
+      size enters the space (D422: ''a bad choice of which HPs to search''), and if it does, keep it one change from the template
+      or state the coupled change as part of the question. Check 1/4 (control and outcome on the same quantity): the outcome
+      compares the chosen trial''s best val (mu-MSE objective) to ''the control run''s best val'', but 203a274f and 3fc1016a
+      never recorded a val mu-MSE curve (finding 2026-11-12T18:00: only the HETEROSC NLL), and DyHPO need not draw a trial
+      near lr 0.0118605. State which number of the controls is compared (e.g. kit_predict''s bulk_test log10-MSE on the chosen
+      trial against the controls'' kit_result.txt, same events), or seed the controls'' HP point as one of the trials so ''whether
+      the late separation was an HP point'' is read on mu-MSE. Check 13 (sweep timing): state the finish time of the 3,3,2
+      waves (about 3 x 1.7 h uug, 3 x 1.3 h tt, plus queue) against when the step-14 arms need it. Check 14 (disk): state
+      disk per trial (run dirs ~0.07-0.2 GB, memmap false) against CC /sps/lpnhe 65 GB free read now; it fits, write it down.
+      Passing for the record: 2 (curve_quality.json: good and bad trials inside the same stage-2 searches, ee_uu scr 21/71,
+      epem_ttx scr 14/70, ee_ttbar_nlo scr 12/63, confirmed); 3 (HPO axis, D315, the selection acts on the chosen trial, not
+      an effect size); 8, 10 (bulk val, as the question asks), 11 and 12 (base config = the control''s, only HPs move), 15
+      (rate from 203a274f/3fc1016a, same batch 16384, 1e5, float64; run_trial sets training.result_path itself, sweep/run_trial.py:340,
+      and the D395 smoke lists the result json before the batch). Search terms: kit_hpo, KIT + sweep/DyHPO, curve_quality,
+      separation, lr_scale, lr 0.0118605, scheduler, WSD, tmpl2, batchsize, in docs/results.tex, plan show kit_benchmark and
+      pretrain_data_saving, site decisions (D241, D244, D315, D412, D421, D422, D423).'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
