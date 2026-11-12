@@ -28957,6 +28957,18 @@ entries:
       sits). Partial: reported per limit, combined with the frames cut as the next arm. NO: the backbone, not the readout,
       sets the extrapolation; the frames/inputs route stays the answer. The plain control alone also reads whether pair logs
       + soft rescale beat 2642b17b''s saturation on the plain target.'
+    fix_at: '2026-11-12T14:38:39+00:00'
+    fix: 'Check 4 (outcome) only; checks 1-3 and 5-15 pass as written. The uug FIXES rule bounds the deepest soft bin on one
+      side only: ''deepest soft signed >= -0.46'' has no upper limit, and the exponent window [-2.5,-1.5] allows a slope error
+      of 0.5 over the ~6 decades from the bulk edge to x 1e-7, i.e. a soft overshoot of up to ~+3 decades would read FIXES.
+      That is the failure mode most likely from this arm: the skip''s quadratic term c2*L^2 curves away past the trained range,
+      and the earlier T-target runs failed by soft overshoot (+20 exponent). Fix: make the soft band two-sided as the collinear
+      one is, e.g. deepest soft signed in [-0.46, +0.46] (or |signed| <= 0.46), and/or add a deepest-bin log-MSE bar to both
+      uug limits as the tt Sudakov rule has (e.g. <= the MLP seeds'' worst, soft 0.325, coll 0.167). Nothing else needs changing:
+      plain control matched (same flags minus input_log_skip, same commit; plain-target flags as 2642b17b); tt arm args equal
+      3fc1016a''s plus the skip, commits e75ca218..HEAD on the training path are the flags listed, all default off, plus fine-tune/eval-only
+      ones; 2642b17b soft 144.9 vs floor 115.9, coll 25.5 vs 13.9 confirmed in the 2026-11-10T08:21 finding; CC 68 GB free
+      vs ~0.25 GB.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
