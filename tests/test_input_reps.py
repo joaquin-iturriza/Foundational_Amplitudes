@@ -195,6 +195,19 @@ def test_log_skip():
                 Lij = np.log(max(abs(2 * (float((q[i] * q[j] * eta).sum()) - mm) / s), 1e-16)) / 5
                 want += float(he[i, :2] @ he[j, :2]) * Lij + float(he[i, 2:4] @ he[j, 2:4]) * Lij ** 2
         assert abs(float(got[e]) - want) < 1e-9 * max(1.0, abs(want)), (e, float(got[e]), want)
+    # linear only: head columns of the quadratic terms (2:4 pair, 5 mass) must not matter
+    head2 = torch.nn.Linear(16, 6).double()
+    with torch.no_grad():
+        head2.weight[[0, 1, 4]] = head.weight[[0, 1, 4]]
+        head2.bias[[0, 1, 4]] = head.bias[[0, 1, 4]]
+    for thr in (False, True):
+        a = wrappers._log_skip(p, ptr, types, 5, head, thr, quadratic=False)
+        b = wrappers._log_skip(p, ptr, types, 5, head2, thr, quadratic=False)
+        assert torch.allclose(a, b, atol=1e-12), "linear-only skip reads the quadratic coefficients"
+        assert not torch.allclose(a, wrappers._log_skip(p, ptr, types, 5, head, thr)), "linear-only equals the full skip"
+    wl = _wrapper(input_pair_logs=5, input_log_skip=2, input_log_skip_linear=True)
+    a, b = _out(wl, p, ptr), _out(wl, p @ L.T, ptr)
+    assert float((a - b).abs().max() / a.abs().max()) < 1e-7, "linear-only log skip: not Lorentz invariant"
 
 
 def test_soft_rescale_fixed_point():

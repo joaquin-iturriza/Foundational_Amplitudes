@@ -121,13 +121,14 @@ def _soft_rescale(p, ptr, eps):
     return p * (torch.log1p(x / eps) / (x * math.log1p(1 / eps))).to(p.dtype)[:, None]
 
 
-def _log_skip(p, ptr, types, n, head, threshold=False):
+def _log_skip(p, ptr, types, n, head, threshold=False, quadratic=True):
     """(B,) a linear readout of the event's singular logarithms, added to mu (model.input_log_skip, D411/step 13):
     sum_{i<j} [c1_ij L_ij + c2_ij L_ij^2] + sum_i [b1_i M_i + b2_i M_i^2], L_ij = log(2 p_i.p_j / s)/5 (with `threshold`
     log(2 (p_i.p_j - m_i m_j)/s)/5: log beta^2 of a massive pair), M_i = log(m_i^2/s)/5 of a massive particle (0 if
     massless), s = (p_0 + p_1)^2. The coefficients come from the particles' types only, c_ij = <a_i, a_j> and b_i from
     `head` on each particle's encoded properties, so the same readout applies to any process: a power law or a double log
-    in an invariant is linear or quadratic here and continues past the trained range, where a saturating backbone does not."""
+    in an invariant is linear or quadratic here and continues past the trained range, where a saturating backbone does not.
+    quadratic=False keeps only the linear terms (c1, b1; model.input_log_skip_linear, step 13)."""
     cnt = ptr[1:] - ptr[:-1]
     ar = torch.arange(n, device=p.device)
     valid = (ar[None, :] < cnt[:, None]).to(torch.float64)                      # (B, n)
@@ -145,8 +146,9 @@ def _log_skip(p, ptr, types, n, head, threshold=False):
     c1 = torch.einsum("bik,bjk->bij", h[..., :k], h[..., :k])
     c2 = torch.einsum("bik,bjk->bij", h[..., k:2 * k], h[..., k:2 * k])
     up = torch.triu(torch.ones(n, n, device=p.device, dtype=torch.float64), 1)
-    pair = ((c1 * L + c2 * L ** 2) * up).sum((1, 2))
-    return pair + (h[..., -2] * Mm + h[..., -1] * Mm ** 2).sum(1)
+    q = float(quadratic)
+    pair = ((c1 * L + q * c2 * L ** 2) * up).sum((1, 2))
+    return pair + (h[..., -2] * Mm + q * h[..., -1] * Mm ** 2).sum(1)
 
 
 def _pool_events(values, ptr):
@@ -253,7 +255,7 @@ class AmplitudeLLoCaWrapper(nn.Module):
                  sign_pair_dim: int = 0, sign_pair_hidden: int = 32, sign_pair_bound: bool = False,
                  input_pair_logs: int = 0, input_soft_eps: float = 0.0, input_local_log_eps: float = 0.0,
                  input_pair_threshold: bool = False, input_scalars_only: bool = False,
-                 input_route_off: str = "", input_log_skip: int = 0):
+                 input_route_off: str = "", input_log_skip: int = 0, input_log_skip_linear: bool = False):
         super().__init__()
         self.net = net
         # input representations for singular limits (D374, kit_benchmark input arms; all Lorentz-exact, 0 = off):
@@ -274,6 +276,7 @@ class AmplitudeLLoCaWrapper(nn.Module):
         # input_log_skip k: a type-dependent linear + quadratic readout of the pair logs and mass logs added to mu
         # (_log_skip; rank-k pair coefficients); needs input_pair_logs (its multiplicity) and the property encoding
         self.input_log_skip = int(input_log_skip or 0)
+        self.input_log_skip_linear = bool(input_log_skip_linear)   # drop the quadratic terms (step 13)
         if self.input_log_skip:
             assert self.input_pair_logs, "model.input_log_skip needs model.input_pair_logs (the event multiplicity)"
             self.log_skip_head = nn.Linear(d_particle_hidden, 2 * self.input_log_skip + 2)
@@ -1045,7 +1048,7 @@ class AmplitudeLLoCaWrapper(nn.Module):
 
         if self.input_log_skip:
             skip = _log_skip(fourmomenta, ptr, skip_types, self.input_pair_logs, self.log_skip_head,
-                             self.input_pair_threshold).to(pooled.dtype)
+                             self.input_pair_threshold, not self.input_log_skip_linear).to(pooled.dtype)
             pooled = torch.cat([pooled[:, :1] + skip[:, None], pooled[:, 1:]], dim=-1)   # mu is column 0
 
         # HETEROSC + sigma_after_pool: the net handed us a RAW per-particle sigma logit, so the

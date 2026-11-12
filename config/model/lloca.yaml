@@ -40,6 +40,8 @@ input_route_off: ""
 # input_log_skip k: type-dependent linear + quadratic readout of the pair logs and mass logs added to mu (wrappers._log_skip;
 # rank-k pair coefficients; needs input_pair_logs); 0 = off
 input_log_skip: 0
+# input_log_skip_linear: keep only the linear terms of the log skip (no L^2, M^2)
+input_log_skip_linear: false
 context_dim: 0
 context_dropout: 0.5
 context_names_file: null
