@@ -23989,6 +23989,34 @@ entries:
       a bar: name the failing bar; next the matching suspect alone (gap: horizon/regularization at small batch count; steady:
       warm-up or schedule; spike: a further decade or clip). NO CHANGE: medians within 2x of the control''s: lr is not the
       cause; next warm-up/schedule and batch size. Each arm read on its own; no rerun (D315).'
+    fix_at: '2026-11-12T12:44:02+00:00'
+    fix: '(1) Outcome and measure (checks 4, 2): ''well'' is a stability measure blind to the loss level, so a lower lr can
+      pass it while training worse. Existing data at this very cell: the suspects lr x1/10 fine-tune, t t~ LO D=3162 (runs/dsave_diag_hmap_ft_epem_ttx_d7_t8500/trial_9102,
+      curves in analysis/data_saving/data/suspects_runs_read.json) reads steady 0.97, spike 3.4, jitter 0.10, gap 3.6 by curve_quality.quality
+      (misses only spike, by 0.4) with val minimum 2.1e-7 against its control trial_1817''s 6.9e-9 (30x worse). Fix: WELL
+      also requires the arm''s best val minimum (ln units) no worse than the control search''s best (or within a stated, measured
+      search-to-search spread), and a stated branch for ''clean but worse'' (lr too low / under-trained) with what it changes.
+      (2) Prior incomplete (check 5): the lr x1/3 and x1/10 suspects runs (tree t t~ D=316..1e4, one change at fixed HPs,
+      curves cached) were never read by curve_quality; read them first (no GPU) and state them. Also the 49 existing t t~/u
+      u~ LO trials at D>=316 with peak lr < 3e-3 (0 well) fail on steady and gap, not only spike: fine-tune band median steady
+      0.57, gap 16; scratch band gap 867 against 41 at 3e-3..6e-3 (curve_quality.json @372820aa). The prior quotes only spike/jitter.
+      State these, the outcome they predict (BETTER, NOT WELL on steady/gap), and what the new search adds beyond them (the
+      other HPs retuned at the low centre) or test the next suspect with it. (3) The measure''s bars (asked to judge): spike
+      and jitter capture instability and agree with the curves I read (stage-2 scratch D=3162 best trial_0640: val jumps 8x
+      off its running min mid-run, spike 21, jitter 0.67). But gap does not implement ''no val/train gap opening while val
+      is flat'': it is the ratio of second-half falls with no flatness condition, so trial_0640, whose val still falls ~400x
+      in the second half, fails it (18.4). Condition it on val being flat (e.g. train fall over the checks where val''s running
+      min moves less than 2x). Steady cannot tell an lr-too-high noise floor from under-training at low lr (fine-tune trials
+      at peak lr ~1e-3, D=1e4-1e5: spike/jitter clean, steady 0.22-0.57), yet the outcome sends a steady failure to warm-up/schedule.
+      And no positive control: the bars were never shown to pass a curve known to be well trained (13 of 570 trials pass,
+      all u u~ one-loop); show one, e.g. those or the parent''s pretraining curve. Minor: a dead first ''fall ='' line in
+      quality(). (4) Outcome partition (check 4): ''medians within 2x'' names no metric. Medians moving in opposite directions
+      (spike down, gap or steady worse, which the low-lr band predicts) and medians worse by more than 2x are not mapped.
+      (5) Seeds (check 3): the NO CHANGE bar of 2x on an 8-trial median has no measured spread. Give the spread of the per-search
+      median spike/jitter between neighbouring stage-2 searches (D=1e3..1e4) beside the 2x. Passing: one change (diffed: lr
+      window x0.1 and the DyHPO seed only), full 8-trial 3,3,2 search over the template space, HETEROSC + sigma stage, same
+      preprocessing, pools and horizon as the s2/s4 controls, 4.4 GPU-h. The configs and the --lr-factor edit are uncommitted;
+      the driver''s sync refuses untracked files.'
   step_waits:
     '2': 'a reviewer: design-reviewer on the lower-lr template test (recorded 12:41 UTC), and the CC sync (two untracked kit_benchmark
       files block the merge, routed to the main session); configs dsave_lrtenth_{scr,ft}_epem_ttx_d7_t8500 @979ad4e4'
