@@ -21506,6 +21506,8 @@ entries:
     state: stopped
     since: '2026-11-12T10:12:28+00:00'
     state_at: '2026-11-12T10:20:41.964000+00:00'
+    context: 130283
+    context_at: '2026-11-12T10:35:14+00:00'
   designs:
   - at: '2026-11-10T02:35:09+00:00'
     question: 'Step 1 (D356 horizons, tree arm): on catalog_v4''s held-out tree targets ee->ttbar (H3, 2->2 massive), ee->ccbar
