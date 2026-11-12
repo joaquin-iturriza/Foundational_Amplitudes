@@ -21354,10 +21354,6 @@ entries:
   - D377
   - D407
   next:
-    2: 'Fine-tune suspects batch (design PASS 2026-11-12 03:42): smokes FA-ccin2p3-2b5e3bab (tree) + 49cbbbda (one-loop),
-      then 56 runs (ft arms lr/3, lr/10, WSD, AdamW, mu-only MSE; scratch arms WSD, mu-only MSE; t t~ tree and V/B, D=316..1e4),
-      configs sweep/sweep_config_dsave_diag_{hmap_ft_epem_ttx,parscale_ft_ee_ttbar_nlo}_d{5..8}_t8500.yaml and sweep_config_dsave_s2_scr_*
-      + --hp overrides; 26.6 GPU-h at limits'
     3: 'Null-parent 2x2 (design 2026-11-12 after the suspects read): through the fine-tune configs at each cell''s stage-2
       scratch best HPs, fresh init (shrink_perturb [0,1]) vs the parent''s weights, t t~ tree and V/B, D=316..1e4, 16 runs
       + 2 smokes (analysis/data_saving/submit_nullparent.py @eaacb51f), ~7.6 GPU-h at limits; design review pending'
@@ -23504,17 +23500,7 @@ entries:
       and length). HPs: G(pre) < 3: at the scratch''s HPs the fine-tune is at scratch''s level, so the deficit came from the
       fine-tune search (its HP window): next the window change, with these runs as the expected gain. G(null) <= 1/3: the
       path helps a fresh init (would be a scratch defect): report and re-check the scratch control.'
-  step_waits:
-    '2': FA-ccin2p3-b5cd9548 FA-ccin2p3-efde3ab8 FA-ccin2p3-a89bdd38 FA-ccin2p3-a94de54f FA-ccin2p3-456471f3 FA-ccin2p3-d42ee990
-      FA-ccin2p3-e3079c8a FA-ccin2p3-17ffe0f9 FA-ccin2p3-4a59ead8 FA-ccin2p3-3d0756ce FA-ccin2p3-18649448 FA-ccin2p3-47f58510
-      FA-ccin2p3-2ecfb6c4 FA-ccin2p3-8617b80e FA-ccin2p3-4d3a204e FA-ccin2p3-248ef33a FA-ccin2p3-3fb699a3 FA-ccin2p3-13f4c217
-      FA-ccin2p3-2bea2a1f FA-ccin2p3-5ab5e727 FA-ccin2p3-8de5e123 FA-ccin2p3-4a70bb7f FA-ccin2p3-a9d4210d FA-ccin2p3-651f1161
-      FA-ccin2p3-54f6d474 FA-ccin2p3-85812538 FA-ccin2p3-84888621 FA-ccin2p3-2b9d98a1 FA-ccin2p3-f232d811 FA-ccin2p3-135f59b9
-      FA-ccin2p3-d8e0b16f FA-ccin2p3-127413c7 FA-ccin2p3-c4fa5f61 FA-ccin2p3-9774fea7 FA-ccin2p3-1c6dcf76 FA-ccin2p3-485bc7e5
-      FA-ccin2p3-7a34b2c6 FA-ccin2p3-5fb697e3 FA-ccin2p3-9bdc2cf9 FA-ccin2p3-d05394f2 FA-ccin2p3-c44a51c1 FA-ccin2p3-ebe91a9b
-      FA-ccin2p3-82f631ad FA-ccin2p3-ac10ee3a FA-ccin2p3-d91b278e FA-ccin2p3-d3a33259 FA-ccin2p3-7becd940 FA-ccin2p3-d28960d4
-      FA-ccin2p3-f9d9e36a FA-ccin2p3-cfa53102 FA-ccin2p3-e2ed44b6 FA-ccin2p3-0de17363 FA-ccin2p3-8ddca4cd FA-ccin2p3-4a202d76
-      FA-ccin2p3-e1b4ed6d FA-ccin2p3-63ec8fde
+  step_waits: {}
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
@@ -24273,12 +24259,6 @@ entries:
       configs), commits b66c446a, 55aeb931
     written: '2026-11-12T04:53:05+00:00'
   step_why:
-    2:
-      feeds: which knob of the fine-tune recipe causes the t t~ deficit (D408)
-      if:
-      - 'an arm FIXES (G<=1/3, >=3/4 below, also without worst event): that knob is the fix, into the fine-tune template,
-        rerun question with the evidence'
-      - 'none FIXES: the parent (pretraining set, length) is the next test, designed then'
     3:
       feeds: whether the fine-tune deficit on t t~ sits in the fine-tune path, the fine-tune HP window, or the parent's weights
       if:
