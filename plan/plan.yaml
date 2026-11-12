@@ -21388,8 +21388,24 @@ entries:
       search_gpu_h, docs/results.tex sec:datasaving; Joaquin 2026-11-10T02:08 (the study''s request: which targets, not this
       rerun''s cost), 2026-11-12T01:19 (his review of the plots: asks the fix and the rerun, its cost above 30 GPU-h to him),
       2026-11-06T04:28 (worktrees and agent rules, unrelated)'
-    blocks_steps: &id003
+    blocks_steps:
     - 9
+  - ask: 'GPU budget: rerun the 34 fine-tune searches of the study''s design (4 targets x every D, 8 trials each, scratch
+      searches reused) with the fine-tune starting from the parent''s function (head map, cec3610c) and the fine-tune lr window
+      moved from lr_scale [0.1,10] to [0.02,2] (the every-trial read: in 27 of 34 fine-tune searches a lower lr_scale reaches
+      a lower validation minimum, 11 of 34 bests sit at the window''s floor 0.1-0.16), ~88 GPU-h (stage 2 measured: t t~ tree
+      24.4, t t~ one-loop 20.7, u u~ tree 28.0, u u~ one-loop 14.7), above 30 with no decision covering it. Go?'
+    at: '2026-11-12T02:39:42+00:00'
+    searched: 'site decisions --project FA (D400 approves the defect fix, not a rerun cost; D159 the Muon HP exploration on
+      catalog_v3, not this); docs/results.tex HPO rule 4 (lr_scale optimum ~1, window [0.1,10], ~8977-9003) and the tp3 probes
+      (~13913-13966, bests at the window top: the opposite direction); stage2_readout.json search_gpu_h; Joaquin 2026-11-12T01:19
+      (his review: ''bad HPs, bad learning rate'', and ''If these are bad here, I wouldn''t be surprised that the LO aren''t
+      optimal either'': asks the training fixed, not this rerun''s cost above 30 GPU-h); 2026-11-06T19:52 (warm start of a
+      pretraining: lr mismatch as the mechanism, neither a high nor a low lr called correct; no cost or window decided); 2026-11-06T04:28
+      (worktrees and agent rules, unrelated)'
+    blocks: the corrected fine-tune rerun (step 10)
+    blocks_steps: &id003
+    - 10
   owner:
     agent: a357b4c1d8b2d16bc
     state: working
@@ -23811,17 +23827,21 @@ entries:
       data/{hmap_runs.json,hmap_readout.json,stage2_mse_curves.json,stage2_diag_test.json}, figs/{stage2_LD,hmap_LD,stage2_mismatch,stage2_mse_curves_*,stage2_d316_*,hmap_gradnorm,stage2_diag_tops}.png,
       figs/run_plots/, base_experiment.py _map_head_to_own_stats, tests/test_head_map_own_stats.py
     written: '2026-11-12T02:28:25+00:00'
-  ask: 'GPU budget: rerunning the 34 fine-tune searches of the study''s design (4 targets x D=10..1e4/3e4, 8 trials each,
-    scratch searches reused) with the fine-tune now starting from the parent''s function (head map, cec3610c) costs ~88 GPU-h
-    (stage 2 measured: t t~ tree 24.4, t t~ one-loop 20.7, u u~ tree 28.0, u u~ one-loop 14.7), above 30 with no decision
-    covering it. Go?'
-  waiting_since: '2026-11-12T01:24:46+00:00'
-  searched: 'site decisions --project FA (D400 approves the defect fix, not a rerun cost; D392, D396), stage2_readout.json
-    search_gpu_h, docs/results.tex sec:datasaving; Joaquin 2026-11-10T02:08 (the study''s request: which targets, not this
-    rerun''s cost), 2026-11-12T01:19 (his review of the plots: asks the fix and the rerun, its cost above 30 GPU-h to him),
-    2026-11-06T04:28 (worktrees and agent rules, unrelated)'
+  ask: 'GPU budget: rerun the 34 fine-tune searches of the study''s design (4 targets x every D, 8 trials each, scratch searches
+    reused) with the fine-tune starting from the parent''s function (head map, cec3610c) and the fine-tune lr window moved
+    from lr_scale [0.1,10] to [0.02,2] (the every-trial read: in 27 of 34 fine-tune searches a lower lr_scale reaches a lower
+    validation minimum, 11 of 34 bests sit at the window''s floor 0.1-0.16), ~88 GPU-h (stage 2 measured: t t~ tree 24.4,
+    t t~ one-loop 20.7, u u~ tree 28.0, u u~ one-loop 14.7), above 30 with no decision covering it. Go?'
+  waiting_since: '2026-11-12T02:39:42+00:00'
+  searched: 'site decisions --project FA (D400 approves the defect fix, not a rerun cost; D159 the Muon HP exploration on
+    catalog_v3, not this); docs/results.tex HPO rule 4 (lr_scale optimum ~1, window [0.1,10], ~8977-9003) and the tp3 probes
+    (~13913-13966, bests at the window top: the opposite direction); stage2_readout.json search_gpu_h; Joaquin 2026-11-12T01:19
+    (his review: ''bad HPs, bad learning rate'', and ''If these are bad here, I wouldn''t be surprised that the LO aren''t
+    optimal either'': asks the training fixed, not this rerun''s cost above 30 GPU-h); 2026-11-06T19:52 (warm start of a pretraining:
+    lr mismatch as the mechanism, neither a high nor a low lr called correct; no cost or window decided); 2026-11-06T04:28
+    (worktrees and agent rules, unrelated)'
+  blocks: the corrected fine-tune rerun (step 10)
   blocks_steps: *id003
-  checked_until: '2026-11-12T02:24:49+00:00'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
