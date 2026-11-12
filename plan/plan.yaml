@@ -16304,9 +16304,9 @@ entries:
     '21': the date 2026-11-17 (a week after the 2026-11-09 23:54 restart on the batching code)
   owner:
     agent: a8dbddc87318bf574
-    state: stopped
+    state: working
     since: '2026-11-12T21:30:31+00:00'
-    state_at: '2026-11-12T22:56:29+00:00'
+    state_at: '2026-11-12T22:57:56.534000+00:00'
     context: 208790
     context_at: '2026-11-12T22:56:34+00:00'
   designs:
