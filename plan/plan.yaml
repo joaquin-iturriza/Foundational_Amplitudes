@@ -24338,7 +24338,7 @@ entries:
       - 'a defect found: fix, re-score, redraw'
       - 'no defect: report the comparison with the MLP'
   step_waits:
-    '5': the next owner, from the hand-off
+    '5': FA-ccin2p3-cca3ca1b FA-ccin2p3-74403c74 FA-ccin2p3-eef4c20a FA-ccin2p3-c2d1005f FA-ccin2p3-843447d2
     '6': the next owner, from the hand-off
   handoff:
     state: 'Joaquin released the entry (D403): understand why our models do not extrapolate into the limits and match Bakar''s
