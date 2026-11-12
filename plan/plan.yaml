@@ -23448,7 +23448,8 @@ entries:
       reason); site decisions D408/D409/D411/D412. Disk 15-35 MB per run against 69 GB free on CC. Limits 0:25 and 0:32 against
       12-24 min measured, 26.6 GPU-h at limits, under D412''s 30. Two 50-step smokes (tree and one-loop) carry the new overrides
       (D395).'
-  step_waits: {}
+  step_waits:
+    '2': FA-ccin2p3-2b5e3bab FA-ccin2p3-49cbbbda
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
