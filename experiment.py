@@ -1582,6 +1582,8 @@ class AmplitudeExperiment(BaseExperiment):
             with open(stats_src) as f:
                 stats = json.load(f)
             _dms_frozen = stats.get("dimless_mass_stats")
+            if ft_path is not None and not self.warm_start and str(ft.get("mass_stats", "parent")) == "own":
+                _dms_frozen = None   # fine_tune.mass_stats=own: the mass column refit on this run's train pools
             _cp_frozen = stats.get("target_physics_hybrid_cp")
             mom_div    = float(stats["mom_div"])
             mom_mean   = float(stats["mom_mean"])

@@ -28,11 +28,13 @@ import plot_style as ps  # noqa: E402
 
 DATA = os.path.join(REPO, "analysis/data_saving/data")
 RUNS = json.load(open(os.path.join(DATA, "stage2_diag_runs.json")))
-TEST_DIAG = {r["sweep"]: r for r in json.load(open(os.path.join(DATA, "stage2_diag_test.json")))}
+_ok = [r for r in json.load(open(os.path.join(DATA, "stage2_diag_test.json"))) if "error" not in r]
+assert len({r["sweep"] for r in _ok}) == len(_ok), "two good attempts of one diagnostic sweep: key the test by run dir"
+TEST_DIAG = {r["sweep"]: r for r in _ok}
 TEST_S2 = {(r["sweep"], r["hp_idx"]): r for r in json.load(open(os.path.join(DATA, "stage2_test.json")))}
 ARM = sys.argv[1] if len(sys.argv) > 1 else "offown"
 SUF = "" if ARM == "offown" else "_" + ARM
-LABEL = {"offown": "own scale", "tops": "r5 parent"}[ARM]
+LABEL = {"offown": "own scale", "tops": "top parent"}[ARM]
 TARGETS = [("epem_ttx", r"$e^+e^-\to t\bar t$", "mse_ln"), ("ee_ttbar_nlo", r"$e^+e^-\to t\bar t$, $V$", "mse_vb")]
 
 
@@ -80,7 +82,7 @@ def main():
     print(json.dumps(summ))
 
     fig, axs = ps.figure(ncols=2)
-    arms = [("val_own", LABEL, ps.C.vermillion, "s"), ("val_par", "r4 parent" if ARM == "tops" else "parent scale", ps.C.blue, "o"),
+    arms = [("val_own", LABEL, ps.C.vermillion, "s"), ("val_par", "stage-2 parent" if ARM == "tops" else "parent scale", ps.C.blue, "o"),
             ("val_orig", "stage-2 best", ps.C.grey, "^")]
     for n, (ax, (tg, lab, _)) in enumerate(zip(axs, TARGETS)):
         cc = [r for r in rows if r["target"] == tg]
