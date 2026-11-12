@@ -24289,6 +24289,16 @@ entries:
       l.377, init check l.830-856), keyed_aug.py pool_identity, datagen.py/mix_compose ensure_composed, docs/results.tex sec:optrecap
       and par:v3_muon/par:v4_length
     written: '2026-11-12T03:03:55+00:00'
+  findings:
+  - at: '2026-11-12T03:17:43+00:00'
+    text: 'Cache key mismatch cause (2026-11-12): the composed pools'' rows hash identically on htc and GPU nodes (2736/2736
+      equal, prebuild key_doc vs GPU composed_pools.json), but their per-event alpha_s (mix_compose.alphas_of_rows, np.log)
+      differs in bytes between nodes: v4_bb_abbh val composed on the login node gives alphas_sha256 af823c33 = the GPU run''s,
+      while the htc prebuild''s alphas file hashes differently (head/tail fa359955 vs 6aa74a88). The key hashed alpha_s bytes;
+      fixed at 4f0d9608 (data_mmap._alphas_identity: a composed pool''s alpha_s keyed by its rows), test tests/test_pool_doc_composed.py::test_composed_alphas_key_ignores_node_rounding
+      (fails before, passes after). Also repaired two misfiring tests in tests/test_mmap_key.py (fingerprint re-recorded for
+      884d7eb7, memmap content unchanged; prune test stubs the slurm cache guard). Stale cache f3bedd61 (21 GB) deleted; rebuild
+      FA-ccin2p3-3b8e8c7d (slurm 63541716); pidqn arms afterok on it.'
 - id: kit_benchmark
   title: the KIT hard phase-space benchmark and the fair NLO protocol (Bakar, Gudrun)
   question: 'On the KIT datasets (ee->tt Born and one-loop virtual, ee->uug, ee->uugg; hard bins by distance to the singularity):
