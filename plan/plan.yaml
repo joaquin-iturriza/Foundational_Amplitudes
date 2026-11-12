@@ -22912,6 +22912,26 @@ entries:
       if >= 3 of them still rise > 10 (then the blow-up is the training''s own overfit of sigma, seen in scratch too at small
       D). Launch: smoke dsave_diag_hmsmoke_ft_epem_ttx_d5_t50 (hp 1647, 50 steps, every stage), then the 25 runs afterok on
       it through sweep/trial_job.sh --detached at the cells'' HPs, --hdr=--time 1.3x the config time; ~8 GPU-h, under D400.'
+    fix_at: '2026-11-12T01:43:47+00:00'
+    fix: 'Check 4 (outcome stated for yes and no) fails, the rest holds. (a) Part (3), the inherited-sigma test, reads ''>=
+      3 of the 4 parscale/tops-paired cells at D=316..3162 where the controls rise 27-358'', but the paired one-loop cells
+      at D=316..3162 are six (hmap_readout.json blowup: parscale 57, 220, 155; tops 30, 36, 358; the 27 is the stage-2 best
+      at D=1e3, not a paired control), so a 3/3 split satisfies CONFIRMED and REFUTED at once, and a mix of rises in 1-10
+      nats is in neither. Fix: name the six cells, give CONFIRMED and REFUTED thresholds that cannot both hold (e.g. CONFIRMED
+      >= 5 of 6 with rise < 1, REFUTED >= 4 of 6 with rise > 10), and state what the remaining case means and changes. (b)
+      Part (2) leaves geomean <= 1/3 with fewer than 75% of cells below 1 unassigned; say which bin it falls in. Also state
+      that the pooled per-target geomean over the 8 exact-control cells (4 parscale + 4 tops) is what is read: hmap_readout.py
+      writes it per arm only (hmap/parscale, hmaptops/tops, 4 cells each); add the pooled number to the script or to the rule.
+      Smaller points to fix in the same revision: the stage-2 best trial dirs of the one-loop cells D=10, 32, 100, 3.16e4
+      are gone on CC (hmap_runs.json: FileNotFoundError for trials 0434, 0528, 0332, 0396), so those four hmap runs have only
+      stage2_readout.json''s val/test numbers as reference and no late-rise curve; say so in the control field. Checked and
+      passing: configs differ from parscale/tops only in sweep_name (diff at c566b4ab), code commits since the controls add
+      only off-by-default knobs (mass_stats parent, input_pair_threshold false, unaugmented_roles unset); measure moved on
+      existing data (tops/r4 t t~ tree val geomean 0.24, off-shellness one-loop test 0.19; step-0 val loss 83477 unmapped
+      vs 6504 parent_shared on the same cell); per-cell same-HP rerun ratios 1.02, 1.05, 0.46, 4.84, 1.00 (stage2_diag_readout.json),
+      so a pooled geomean over 8 cells has ln-sd about 0.3 and the 1/3 bar is about 3.5 sd; disk 15-35 MB per run on CC (du)
+      against 31 GB free; time limits 1.3x config time against measured 12-24 min at D=316..1e4 and 62 min at D=1e5 (FA-ccin2p3-95ec0d73);
+      HETEROSC, own val/test pools, no sweep.'
   step_waits:
     '8': the main session's read of the defect hunt (its 'before more arms'); then launched as designed
   findings:
