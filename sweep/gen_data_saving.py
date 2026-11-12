@@ -35,9 +35,10 @@ import yaml
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
 sys.path.insert(0, ROOT)
 TARGETS = ["ee_uu", "epem_ttx", "ee_uu_nlo", "ee_ttbar_nlo"]
+SECOND = ["bbx_zz_nlo"]                 # D413: the draft's second example (b b~ > Z Z one-loop V/B), opt-in by --targets
 CALS = [os.path.join(ROOT, "analysis", "data_saving", "data", f) for f in
-        ("horizons_cal_f22_cal_f22_lrhalf.json", "horizons_cal2_ladder.json")]
-VB = {"ee_ttbar_nlo"}                   # trained on V/B (D375), physics factors off (job_data_saving.sh)
+        ("horizons_cal_f22_cal_f22_lrhalf.json", "horizons_cal2_ladder.json", "horizons_cal_vb_ladder.json")]
+VB = {"ee_ttbar_nlo", "bbx_zz_nlo"}                   # trained on V/B (D375), physics factors off (job_data_saving.sh)
 N_TRIALS, N_STARTUP = 8, 3
 OVERHEAD_H = 0.08                       # data load, test pass, sigma stage per trial (calibration runs)
 
@@ -58,7 +59,7 @@ def lr_centre(T, k):
 
 
 def cal_rows():
-    return [r for f in CALS for r in json.load(open(f)) if r["target"] in TARGETS]
+    return [r for f in CALS for r in json.load(open(f)) if r["target"] in TARGETS + SECOND]
 
 
 def rates():
