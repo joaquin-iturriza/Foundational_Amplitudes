@@ -39,7 +39,7 @@ for sw in sys.argv[1:]:
             tr, ft = c["training"], (c.get("fine_tune") or {})
             r["hp"] = {"lr": tr.get("lr"), "lr_scale": ft.get("lr_scale"), "layer_decay": ft.get("layer_decay"),
                        "muon_weight_decay": tr.get("muon_weight_decay"), "warmup_frac": tr.get("cosanneal_warmup_frac"),
-                       "reg": tr.get("regularization_lambda"), "ema": c.get("ema")}
+                       "reg": tr.get("regularization_lambda"), "ema": c.get("ema"), "batchsize": tr.get("batchsize")}
         except Exception as e:
             r["error"] = repr(e)[:160]
         out.append(r)

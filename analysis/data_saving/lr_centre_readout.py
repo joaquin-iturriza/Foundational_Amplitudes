@@ -36,7 +36,9 @@ TESTS = {"lr": ({"epem_ttx_d7_t8500": TTX}, {"c/3": "lrthird", "c/10": "lrtenth"
          "adamw": ({"epem_ttx_d7_t8500": TTX}, {"AdamW": "adamw"}),
          # lrx3 = the lr window x3 (gen_data_saving --lr-factor 3), validation-with-training test after D420
          "lrx3": ({c: UUV for c in ("epem_ttx_d5_t8500", "epem_ttx_d7_t8500", "ee_uu_d5_t7310", "ee_uu_d7_t8500",
-                                    "bbx_zz_nlo_d5_t3840", "bbx_zz_nlo_d7_t6400")}, {"lr x3": "lrx3"})}
+                                    "bbx_zz_nlo_d5_t3840", "bbx_zz_nlo_d7_t6400")}, {"lr x3": "lrx3"}),
+         # tmpl2 = the revised template (hp_ranges_readout.py): batch size searched, fine-tune ranges opened downward
+         "tmpl2": ({"epem_ttx_d5_t8500": UUV, "epem_ttx_d7_t8500": UUV}, {"WSD": "wsd", "template 2": "tmpl2"})}
 TEST = sys.argv[sys.argv.index("--test") + 1] if "--test" in sys.argv else "lr"
 CELLS, VARIANTS = TESTS[TEST]
 SUFFIX = "" if TEST == "lr" else f"_{TEST}"
@@ -78,7 +80,7 @@ def summary(g):
     b = min(g, key=lambda r: r["val_min"])
     return {"n": len(g), "n_good": sum(r["well"] for r in g), "best_min": b["val_min"],
             "together_min": min(r["together_min"] for r in g),
-            "best": {k: b[k] for k in ("run_dir", "peak_lr", "separation", "end_up", "well")}}
+            "best": {**{k: b[k] for k in ("run_dir", "peak_lr", "separation", "end_up", "well")}, "batchsize": b["hp"].get("batchsize")}}
 
 
 def verdict(s, c):
