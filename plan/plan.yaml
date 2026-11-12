@@ -26008,6 +26008,11 @@ entries:
       single pair log, so on uug the correct collinear continuation of the arm comes from the inputs moving together, and
       the control''s overshoot from what else moves (the route arms test which). Steps 13/14 done; route isolation running
       (step 15).'
+  - at: '2026-11-12T11:41:32+00:00'
+    text: '2026-11-12 ~10:25: Joaquin on the V·β target: ''Okay but that seems rather an obvious way to get rid of the problem,
+      this is not really a general way to fix the extrapolation problem other than in this case''. V·β is a diagnostic only,
+      never the answer to D411; the general mechanism is what the inputs-only and route-isolation arms (steps 13, 15) test.
+      The package question on V·β is moot unless he raises it.'
   step_why:
     5:
       feeds: what KIT receives
