@@ -26957,7 +26957,8 @@ entries:
       - 'none fixes: the KIT answer is the comparison against all of Bakar''s plots with the weak spots stated'
   step_waits:
     '5': FA-ccin2p3-203a274f FA-ccin2p3-7b891d10 FA-ccin2p3-eb870ad4
-    '11': FA-ccin2p3-54c78039 FA-ccin2p3-203a274f FA-ccin2p3-7b891d10 FA-ccin2p3-eb870ad4
+    '11': 'FA-ccin2p3-6a926573 (D395 smoke of heldoutthrloop; the two parents and fine-tunes go after it once the boost-bound
+      design is re-passed: design_guard ties submissions to the latest design)'
     '12': FA-ccin2p3-203a274f FA-ccin2p3-7b891d10 FA-ccin2p3-eb870ad4
   handoff:
     state: '2026-11-12 ~18:00. Bakar''s slides (D415) corrected and handed back (tools/kit_bakar_figs.py @cc54583f; slide
