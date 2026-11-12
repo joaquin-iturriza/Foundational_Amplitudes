@@ -24657,6 +24657,18 @@ entries:
       says which template each arm ran at. s4_readout.py now lists failed trials apart (@bf6f1712). V/B offshell-own design
       recorded, reviewer running; its configs parked outside the checkout until it passes (an untracked file makes the driver''s
       start-up sync refuse).'
+  - at: '2026-11-12T12:38:08+00:00'
+    text: '2026-11-12 ~12:50 Joaquin on s4_curves_epem_ttx_a: ''Are we looking at the same plot? the tree runs are not fixed
+      at all''. He is right; the s4 FIXED verdict is withdrawn as a statement about training quality. Cause in the process:
+      the design''s measure was a ratio to the old template''s best (r_old) and to scratch''s best (r_scr), and both reference
+      arms are themselves badly trained; the owner looked at the figure but judged it only by those ratios (''falls through
+      the anneal to scratch''s level''), never by the curve''s own shape. The curves show: D=316 new fine-tune val flat at
+      ~1e-6 from step ~4000 while train falls to ~1e-8, a spike at ~6500; D=3162 new fine-tune and scratch make most of their
+      progress in the last ~2000 steps of the anneal; validation jumps ~10x between consecutive checks. That signature is
+      an lr too high for most of the run in both arms, which no arm ratio can show. Held: s5 t t~ LO L(D) redo (never submitted:
+      its driver stopped at the CC sync, 0 trials, no run in site runs) and the s6 one-loop off-shellness-own test (design
+      passed, not submitted). Change that stops it recurring: a committed curve-quality measure (well-trained by the curve
+      itself) is read on every trial before any verdict or L(D) batch (new step).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
