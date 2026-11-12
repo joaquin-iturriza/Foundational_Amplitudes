@@ -21533,9 +21533,9 @@ entries:
     decision: D407
   owner:
     agent: a30d7264e9acbd802
-    state: stopped
+    state: working
     since: '2026-11-12T13:05:22+00:00'
-    state_at: '2026-11-12T14:17:37.767000+00:00'
+    state_at: '2026-11-12T14:37:57.591000+00:00'
     context: 228233
     context_at: '2026-11-12T14:16:32+00:00'
   designs:
@@ -25798,7 +25798,7 @@ entries:
     agent: a6b28beec18d559db
     state: working
     since: '2026-11-12T14:30:34+00:00'
-    state_at: '2026-11-12T14:30:34+00:00'
+    state_at: '2026-11-12T14:38:01.362000+00:00'
     context: 143918
     context_at: '2026-11-12T14:38:06+00:00'
   findings:
