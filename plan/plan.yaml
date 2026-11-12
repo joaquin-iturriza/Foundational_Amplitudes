@@ -23903,12 +23903,10 @@ entries:
   dead_ends: []
   asks: []
   owner:
-    agent: a87ebdd2344eb92d7
-    state: closed
-    since: '2026-11-12T00:02:58+00:00'
-    state_at: '2026-11-12T02:25:01.326000+00:00'
-    context: 252025
-    context_at: '2026-11-12T02:10:43+00:00'
+    agent: ab9dff3db5cb856c2
+    state: working
+    since: '2026-11-12T03:05:02+00:00'
+    state_at: '2026-11-12T03:05:02+00:00'
   designs:
   - at: '2026-11-10T02:27:57+00:00'
     question: 'Step pidqn (D364: ''I''d like to see the claim that pIDs and quantum numbers behave the same be tested again
