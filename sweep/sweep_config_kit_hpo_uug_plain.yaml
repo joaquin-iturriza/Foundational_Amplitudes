@@ -1,0 +1,49 @@
+# kit_benchmark step 15 (D421, D422): single-fidelity DyHPO over the template's space on the KIT from-scratch setup of
+# run 203a274f, plain log10|M|^2 target, softpair inputs (runs/kit/kit_A_ee_uug_me2_n100000_t8000_softpair_plain, 1e5 events, 8000 steps), to choose the HPs (lr first) at which validation falls with
+# training (curve_quality's separation/end_up on val_mse_curve / train_eval_mse_curve) and the best validation.
+# Everything else is the run's own config (base_config): inputs, target, HETEROSC + sigma stage, float64, batch 16384.
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  request_gpus: 1
+  mem: 32G
+  cpus_per_task: 4
+  time: "02:45:00"
+paths: null
+sweep_name: kit_hpo_uug_plain
+base_config: ${PROJECT_DIR}/runs/kit/kit_A_ee_uug_me2_n100000_t8000_softpair_plain
+n_trials: 8
+dyhpo:
+  surrogate: gp
+  n_candidates: 2000
+  objective_scale: auto
+  seed: 42
+  n_startup: 3
+  total_budget: 10000
+  waves: [3, 3, 2]
+fidelity_schedule:
+  t_steps: [8000]
+fixed_params:
+  data.source: recipes
+  data.processes_file: ${PROJECT_DIR}/runs/kit/recipes/kit_A_ee_uug_me2_n100000_t8000_softpair_plain.yaml
+  data.train_subsample: 'null'
+  data.eval_subsample: 'null'
+  data.memmap: 'false'
+  training.dtype: float64
+  training.heterosc_select: mu_mse
+  evaluation.train_subsample: 2000
+  seed: 42
+  plot: 'true'
+  warm_start_idx: 'null'
+  fine_tune.pretrained_path: 'null'
+  training.optimizer: MuonAdamW
+range_extension:
+  enabled: false
+search_space:
+- {name: training.lr, type: float_log, low: 1.667e-03, high: 1.5e-02}
+- {name: training.muon_weight_decay, type: float_log, low: 1.0e-03, high: 0.3}
+- {name: training.regularization_lambda, type: float_log, low: 1.0e-10, high: 1.0e-06}
+- {name: training.cosanneal_warmup_frac, type: float_uniform, low: 0.05, high: 0.2}
+- {name: training.cosanneal_eta_min, type: float_log, low: 1.0e-10, high: 1.0e-07}
+- {name: ema, type: categorical, choices: ["false", "true"]}
+- {name: training.ema_decay, type: float_uniform, low: 0.9, high: 0.999}
