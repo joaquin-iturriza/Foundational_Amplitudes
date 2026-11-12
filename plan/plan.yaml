@@ -24909,6 +24909,12 @@ entries:
     units: null
     start: '2026-11-12T11:33:18+00:00'
     at: '2026-11-12T11:33:18+00:00'
+  - batch: dsave_lr_centre_test
+    wall_h: 1.2
+    jobs: 32
+    units: null
+    start: '2026-11-12T12:46:21+00:00'
+    at: '2026-11-12T12:46:21+00:00'
   handoff:
     state: 'Step 3 (why the fine-tune HPO fails; Joaquin 2026-11-12 ~10:30) diagnosed: ft_hpo_diag.py @7baf7573 (objective
       pick correct; t t~ fine-tune searches flat, bests 2.4-19x tree / 8-33x V/B above scratch; tree memorises, V/B under-fits
