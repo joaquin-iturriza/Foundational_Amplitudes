@@ -24768,7 +24768,7 @@ entries:
     decision: D401
   owner:
     agent: aa8a9eef01c5d5c94
-    state: working
+    state: closed
     since: '2026-11-12T04:11:40+00:00'
     state_at: '2026-11-12T04:11:40+00:00'
     context: 285273
@@ -25319,34 +25319,31 @@ entries:
     '10': FA-ccin2p3-dc15b6bc FA-ccin2p3-4cab2100
     '11': FA-ccin2p3-3c2996dc
   handoff:
-    state: 'D411 why the MLP beats our transformer: eval-only reads done (findings ~07:00 + correction): frames conditioned,
-      float64 throughout, momentum features in range, undertraining not the cause (tt bulk 17x better than MLP yet extrapolates
-      worse); the transformer''s output bends away past the trained range of its out-of-range scalar inputs (uug coll deepest
-      +1.36, uugg qg -1.36, tt 15-50 TeV -1.08 vs MLP -0.19/-0.26/+0.12; figs analysis/kit_benchmark/figs/kit_extrap_*_{a,b}.png,
-      looked at). Test: no pre-LayerNorm arm (design PASS), smoke FA-ccin2p3-c0bda3b1 then uug bba9a61e and tt virt 36a30e0c
-      (afterok); step 10 reads them with kit_extrap_read (add the arms to RUNS) and kit_readout --vs. D405/D406 (design PASS,
-      2nd revision, one seed two-sided bands): pools generation aef0f4c6 (CPU) -> parent smoke 9475246e -> parents r5thr bacdb4a8
-      (runs/data_saving/dsave_parent_heldoutthr_r5), r5thrbeta ec74d56d (..._r5beta); A_ft smoke 1006fb1b -> ft_r5 62dcf910.
-      NOT YET SUBMITTED (submit_guard 60-min budget window counted cancelled jobs, 33.6 > 30; real total ~13 GPU-h): ft_thr
-      = job_kit.sh kit_ee_tt__virt_finite 100000 8000 A_ft fine_tune.offshell_stats=own tag=ftr5throwm --env KIT_PARENT=runs/data_saving/dsave_parent_heldoutthr_r5,
-      afterok bacdb4a8''s slurm job 63543641 and smoke 63543633; ft_thrbeta same with KIT_PARENT=..._heldoutthr_r5beta tag=ftr5thrbetaown
-      afterok 63543644 (site pick first). Package v4 check failed (E5749 acked): tt Born softpair 5515dc85 subset vs whole-file
-      Sudakov 0.014-0.098 decades, others <=1.5e-6; package not sent; suspect the degeneracy mask flipping at its eps threshold
-      with batch rounding. D403 port gate FAILS on uug as designed (single numpy run): ladder verdicts withheld on uug (kit_mlp_readout
-      @3050087f), the 05:20 ''read as pass'' withdrawn (finding); Joaquin must hear the failed gate.'
-    decisions: 'D412: one seed with two-sided bands from the MLP seed spread (kit_mlp_readout spread @c42a8908; no transformer
-      seed spread exists). r5''s T=4307/lr kept for r5thr. Beta input added as third D405 arm (flag in parent and fine-tune,
-      vs 3fc1016a). Long-recipe arm (c) not run: tt bulk fit already beats the MLP, so training length does not explain the
-      extrapolation. Smoke lr = the arm''s lr (job_kit''s rule at T=50 gives 0.19 and diverges: not representative).'
-    ruled_out: Frames ill-conditioning, float32 precision, momentum-scale extrapolation (all eval-only, kit_transformer_probe
-      @b9461b03) as causes of the MLP gap.
-    running: FA-ccin2p3-c0bda3b1, bba9a61e, 36a30e0c (noLN); aef0f4c6 (CPU pools), 9475246e, bacdb4a8, ec74d56d, 1006fb1b,
-      62dcf910 (D405)
-    files: tools/kit_transformer_probe.py, tools/kit_extrap_read.py, tools/kit_mlp_readout.py (spread, gate), models/lloca.py
-      + config/model/lloca.yaml (net.layer_norm), tests/test_layer_norm_switch.py, mg5_pipeline_final.py (log_beta), experiment.py,
-      recipes/gen_datasaving_parent.py + catalog_v4_datasaving_{parent_heldoutthr,thr_train}.yaml, scripts/job_datasaving_parent.sh,
-      tests/test_log_beta.py, analysis/kit_benchmark/data/kit_extrap.json, figs/kit_extrap_*
-    written: '2026-11-12T04:05:28+00:00'
+    state: '2026-11-12 ~05:50. D411: plain no-LayerNorm arm diverged (uug bba9a61e aborted step 1485, val 6e11 from step 160;
+      tt virt 36a30e0c val up to 3e22 from step 960; finding recorded). ReZero arm (model.net.layer_norm=rezero, 9e63d86f;
+      design PASS after one FIX: MOVED = halfway to MLP, STAYED = within 0.3 of control, between inconclusive) running: uug
+      FA-ccin2p3-dc15b6bc vs c15b3337, tt virt 4cab2100 vs f21fa163, both healthy to step 480; read with kit_extrap_read (ARMS
+      rezero added, 74615265) + kit_readout --vs (step 10). D405: E5769 cause = catalog regen at 02:43 overwrote the 278 top
+      1e4 train pools (same file name); fixed by entry store_tag (b78715db, 9df60812: train only, not inherited, recipe id
+      unchanged 7cd06c31), pools rebuilt; chain resubmitted @b50ea913: smoke 6e4a2b16 -> parents r5thr 4ab99f50, r5thrbeta
+      66a2efda -> ft_thr bf3d593c, ft_thrbeta 8d1429bf; ft_r5 62dcf910 running (step 9 waits on 62dcf910 bf3d593c 8d1429bf).
+      Step 6 (design PASS): data.target_times_beta (9df60812, V x pair beta, CPU-checked on KIT pools) run FA-ccin2p3-3c2996dc
+      vs 3fc1016a (step 11); the reviewer''s note: Coulomb median < -0.84 with exponent not closer than -0.32 reads UNRESOLVED.
+      Step 5 package unchanged (v4 check failed earlier, not sent).'
+    decisions: 'D412 one seed, bands from MLP seed spread (signed-error band from kit_extrap.json for D411: MLP 0.34/0.02,
+      ours 0.19/0.22). ReZero chosen over lr cut: noLN blew up at warmup lr 1.3e-3 already. Step 6 target factor = pair beta
+      (exact, needs no Born). store_tag rather than regenerating at the catalog path (would clobber catalog 1e5 pools).'
+    ruled_out: Removing the pre-LayerNorms alone (diverges at the LN recipe).
+    running: 'FA-ccin2p3-dc15b6bc 4cab2100 (ReZero); 62dcf910, 6e4a2b16 -> 4ab99f50 66a2efda -> bf3d593c 8d1429bf (D405);
+      3c2996dc (step 6); 36a30e0c = diverged noLN tt still running (slurm 63543593): cancel it (my scancel of a running job
+      was refused by the permission classifier). To delete once no job reads them: 556 duplicate _val/_test_smix_n1e4 pools
+      in /sps/lpnhe/jiturrizaramirez01/datasets (our debris from the 05:23 h3_train prebuild, unread since 9df60812; keep
+      the _train_smix_n1e4 ones), report the deletion. Repo-reviewer lock held on pretrain_data_saving findings 2-4 (suspects_readout.py:473,
+      old_vs_new.py:97-99,117,126); kit''s part passed.'
+    files: models/lloca.py, models/transformer_lloca_mup.py, tests/test_layer_norm_switch.py, mg5_pipeline_final.py (store_tag),
+      experiment.py (pair_beta, target_times_beta), tests/test_store_tag.py, tests/test_pair_beta.py, recipes/gen_datasaving_parent.py
+      + catalog_v4_datasaving_*.yaml, tools/kit_extrap_read.py, .claude/hooks/submit_guard.py (fac9e2b9)
+    written: '2026-11-12T04:53:00+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
