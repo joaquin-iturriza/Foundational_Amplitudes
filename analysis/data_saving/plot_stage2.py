@@ -6,7 +6,9 @@
     stage2_lr     every trial's sampled lr in window units against D (scratch lr/c, fine-tune lr_scale): trained,
                   diverged, best of the search
 
-    python analysis/data_saving/plot_stage2.py
+    stage2_LD_bbx_zz  D413's second example (b b~ > Z Z, LO and one-loop V/B) on test_ln, alone with --second
+
+    python analysis/data_saving/plot_stage2.py [--second]
 """
 import json
 import os
@@ -29,25 +31,31 @@ ARM = {"scr": ("scratch, best of its 8-trial search", ps.C.blue, "o"),
        "ft": ("fine-tune, best of its 8-trial search", ps.C.vermillion, "s")}
 
 
-def cells(tg, a):
-    return sorted((c for c in R["cells"] if c["target"] == tg and c["arm"] == a and c.get("test")), key=lambda c: c["D"])
+# D413's second example, b b~ > Z Z at LO and one-loop V/B, read on test_ln (MSE in ln units at both orders)
+SECOND = [("bbx_zz", r"$b\bar b\to ZZ$, LO", r"MSE$(\ln|\mathcal{M}|^2)$"),
+          ("bbx_zz_nlo", r"$b\bar b\to ZZ$, $V/B$", r"MSE$(\ln(V/B))$")]
 
 
-def ld(gpu):
-    fig, axs = ps.figure(ncols=2, nrows=2)
-    for n, (ax, (tg, lab, ylab)) in enumerate(zip(axs.ravel(), T)):
-        f = R["fits"]["test"].get(tg)
-        for a, (name, col, m) in ARM.items():
-            cc = cells(tg, a)
+def cells(tg, a, key="test"):
+    return sorted((c for c in R["cells"] if c["target"] == tg and c["arm"] == a and c.get(key)), key=lambda c: c["D"])
+
+
+def ld(gpu, panels=T, key="test", name="stage2_LD"):
+    fig, axs = ps.figure(ncols=2, nrows=len(panels) // 2)
+    for n, (ax, (tg, lab, ylab)) in enumerate(zip(axs.ravel(), panels)):
+        f = R["fits"].get(key, {}).get(tg)
+        for a, (name_, col, m) in ARM.items():
+            cc = cells(tg, a, key)
             x = [c["search_gpu_h"] for c in cc] if gpu else [c["D"] for c in cc]
-            ax.plot(x, [c["test"] for c in cc], marker=m, linestyle="none" if not gpu else "-", color=col, label=name)
+            ax.plot(x, [c[key] for c in cc], marker=m, linestyle="none" if not gpu else "-", color=col, label=name_)
             if f and not gpu:
                 A, Linf = f["fit"][a]
                 D = np.logspace(np.log10(min(x)), np.log10(max(x)), 100)
                 ax.plot(D, A * D ** -f["fit"]["alpha"] + Linf, linestyle="--", color=col,
                         label=r"fit $A D^{-\alpha}+L_\infty$" if a == "scr" else None)
-                ax.plot([10 ** f["log10_Dstar"][a]], [f["level"]], marker="v", linestyle="none", color=col,
-                        label=r"where the fit crosses $10^{-4}$" if a == "scr" else None)
+                if np.isfinite(f["log10_Dstar"][a]):
+                    ax.plot([10 ** f["log10_Dstar"][a]], [f["level"]], marker="v", linestyle="none", color=col,
+                            label=r"where the fit crosses $10^{-4}$" if a == "scr" else None)
         if f:
             ax.axhline(f["level"], color=ps.C.grey, linestyle=":", label=r"$10^{-4}$")
         ax.set_xscale("log")
@@ -60,7 +68,7 @@ def ld(gpu):
         ps.legend(axs.ravel()[0], "lower left")
     else:
         ps.shared_legend(fig, axs.ravel()[0], ncol=2)
-    ps.save(fig, FIG + ("stage2_gpuh" if gpu else "stage2_LD"))
+    ps.save(fig, FIG + ("stage2_gpuh" if gpu else name))
 
 
 def lr():
@@ -138,6 +146,9 @@ def lr_val(tg, lab):
     ps.save(fig, FIG + "stage2_lrval_" + tg)
 
 
+if "--second" in sys.argv:
+    ld(False, SECOND, "test_ln", "stage2_LD_bbx_zz")
+    sys.exit()
 ld(False)
 ld(True)
 lr()
