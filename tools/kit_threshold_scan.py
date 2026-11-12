@@ -347,8 +347,13 @@ def label(run):
 
 
 def cmd_figure(a):
+    """Two panels, each its own file (<out>_a, <out>_b) and the surrogates' legend as a strip (<out>_legend):
+    (a) the exact sigma at LO and NLO with the NLO scale band; (b) each surrogate's sigma_NLO^surr/sigma_NLO - 1, the
+    same band and twice the MC error, and a dash-dot line where the exact NLO switches from the analytic O(alpha_s)
+    (left) to MG5_aMC (right)."""
     sys.path.insert(0, ROOT)
     import plot_style as ps
+    from tools.kit_figures import RUN_RE, arm_label
     ps.use()
     d = json.load(open(a.json))
     sq = np.asarray(d["beta"])            # x axis: beta = sqrt(1 - 4 m_t^2 / s), log-spaced like the scan
@@ -357,26 +362,37 @@ def cmd_figure(a):
     get = lambda k, key, scale=1.0: np.array([x.get(key, np.nan) * scale if x else np.nan for x in d["amc"][k]])
     lo, nlo, err = get("lo", "sigma"), get("nlo", "sigma"), get("nlo", "err")
     up, dn = get("nlo", "scale_up", 0.01), get("nlo", "scale_dn", 0.01)
-    fig, (ax, rx) = ps.figure(1, 2, sharex=True, gridspec_kw={"height_ratios": [2, 1]})
+    edge = np.sqrt(max(ana) * sq[len(ana)]) if ana else None
+    (fa, ax), (fb, rx) = ps.panels(2)
     ax.fill_between(sq[ok], (nlo * (1 - dn))[ok], (nlo * (1 + up))[ok], color="0.85", lw=0, label="NLO scale band")
     ax.plot(sq[ok], lo[ok], "k--", label="LO")
     ax.plot(sq[ok], nlo[ok], "k-", label="NLO")
-    rx.fill_between(sq[ok], -dn[ok], up[ok], color="0.85", lw=0)
-    rx.fill_between(sq[ok], (-2 * err / nlo)[ok], (2 * err / nlo)[ok], color="0.6", lw=0, label=r"$\pm2\,\delta_{\rm MC}$")
-    for (name, s), col in zip(d["surrogates"].items(), ps.sequence(len(d["surrogates"]))):
+    rx.fill_between(sq[ok], -dn[ok], up[ok], color="0.85", lw=0, label="NLO scale band")
+    rx.fill_between(sq[ok], (-2 * err / nlo)[ok], (2 * err / nlo)[ok], color="0.6", lw=0,
+                    label=r"$\pm2\,\delta_{\rm MC}$ of the exact NLO")
+    cols = [ps.C.blue, ps.C.vermillion, ps.C.green, ps.C.orange, ps.C.purple, ps.C.sky]
+    marks = "osD^vP"
+    for i, (name, s) in enumerate(d["surrogates"].items()):
         r = np.array([x if x is not None else np.nan for x in s["ratio"]])
-        ax.plot(sq[ok], (nlo * (1 + r))[ok], color=col, ls=":", label=label(name))
-        rx.plot(sq[ok], r[ok], color=col)
+        m = RUN_RE.match(name)
+        lab = arm_label(dict(mode=m["mode"], n=int(m["n"]), tag=m["tag"] or "")).replace(",\n", ", ") if m else name
+        rx.plot(sq[ok], r[ok], marker=marks[i % len(marks)], color=cols[i % len(cols)], label=lab)
     rx.axhline(0, color="k", lw=0.8)
-    if ana:      # left of this line the exact NLO is the analytic O(alpha_s) one, right of it MG5_aMC's
-        for x in (ax, rx):
-            x.axvline(np.sqrt(max(ana) * sq[len(ana)]), color="0.4", lw=0.8, ls="-.")
-    ax.set_xscale("log")
+    if edge:    # the switch of the exact NLO's source, on the ratio panel (its legend strip names it)
+        rx.axvline(edge, color="0.4", lw=0.8, ls="-.", label="exact NLO: analytic (left), MadGraph (right)")
+    for x in (ax, rx):
+        x.set_xscale("log")
+        x.set_xlabel(r"$\beta=\sqrt{1-4m_t^2/s}$")
+    ax.set_yscale("log")
     ax.set_ylabel(r"$\sigma(e^+e^-\to t\bar t)$ [pb]")
     rx.set_ylabel(r"$\sigma^{\rm surr}_{\rm NLO}/\sigma_{\rm NLO}-1$")
-    rx.set_xlabel(r"$\beta=\sqrt{1-4m_t^2/s}$")
     ps.legend(ax, "upper left")
-    print(f"FIGURE {ps.save(fig, a.out)}")
+    ps.make_room(ax)
+    ps.process_label(rx, r"$e^+e^-\to t\bar t$")     # (a) names the process on its y axis
+    written = ps.legend_strip(rx, a.out + "_legend", ncol=2) or []
+    written += ps.save_panels([(fa, ax), (fb, rx)], a.out)
+    for w in written:
+        print(f"FIGURE {w}")
 
 
 def main():

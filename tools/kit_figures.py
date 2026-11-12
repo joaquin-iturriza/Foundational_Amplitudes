@@ -9,13 +9,14 @@ collect, per run dir (runs/kit/kit_<mode>_<file>_<target>_n<N>_t<T>[_tag]): its 
 (KIT's src/evaluate.py numbers, through tools/kit_predict.py) and predictions.h5, and the KIT file's truth and
 singular_var per hard_test event. Per stratum: log-MSE, bias, the median of singular_var (the x of the MSE figure).
 Per family (stratum name without its two bin edges), events of all its strata in bins of 4 per decade of
-singular_var: the median truth and median prediction of log10|M|^2. Per process: the 'learned nothing' floor, the
-log10-MSE of the truth clipped to its bulk_train [0.5%, 99.5%] range (tools/kit_target_slope.py's plain_edge), and
-the same binned truth median. Prints one line 'KITFIG <json>'.
+singular_var: the median truth and median prediction of log10|M|^2. Per process: the 'learned nothing' baseline, the
+log10-MSE of one constant, the median log10|M|^2 of the bulk_train events, predicted for every event, and the same
+binned truth median. (Until 2026-11-12 the baseline was the truth clipped to its bulk_train [0.5%, 99.5%] range, which
+is exact wherever the truth stays in that range: an oracle, not a constant.) Prints one line 'KITFIG <json>'.
 
 plot: one panel set per process and figure kind (ps.panels, one panel per family):
   kit_mse_<file>_<target>_{a,b,...}     log10-MSE per stratum against the median singular_var, one curve per arm,
-                                        Bakar's reference MLP (slide 9) at its deepest bin, the floor
+                                        Bakar's reference MLP (slide 9) at its deepest bin, the constant baseline
   kit_median_<file>_<target>_{a,b,...}  median log10|M|^2 per bin, truth and each arm
 """
 import argparse
@@ -105,11 +106,13 @@ def collect(run_dirs):
                 b = f["bulk_train/bulk"]
                 tb = truth(b, dsname, target)[:200000]
                 lo, hi = np.quantile(tb, [0.005, 0.995])
+                c = float(np.median(tb))
                 floor, tmed = {}, {}
                 for fam, parts in fams.items():
                     for sv, t, _, st in parts:
-                        floor[st] = {"x": float(np.median(sv)), "mse": float(np.mean((np.clip(t, lo, hi) - t) ** 2))}
-                out["truth"][key] = {"bulk_range": [float(lo), float(hi)], "floor": floor, "median": tmed}
+                        floor[st] = {"x": float(np.median(sv)), "mse": float(np.mean((c - t) ** 2))}
+                out["truth"][key] = {"bulk_range": [float(lo), float(hi)], "bulk_median": c, "floor": floor,
+                                     "median": tmed}
         meds = {}
         for fam, parts in fams.items():
             sv = np.concatenate([q[0] for q in parts])
@@ -194,7 +197,7 @@ def plot(path, outdir, prefix="", split_offshell=False):
                              if k.startswith("hard_test/") and family(k.split("/")[1]) == fam)
                 ax.plot(*zip(*pts), "o-", color=c, label=lab)
             fl = sorted((v["x"], v["mse"]) for st, v in tr["floor"].items() if family(st) == fam)
-            ax.plot(*zip(*fl), "--", color=ps.C.grey, label="constant at bulk edge")
+            ax.plot(*zip(*fl), "--", color=ps.C.grey, label="constant (bulk median)")
             ref = MLP.get((stem, target, fam))
             if ref:
                 x = np.sqrt(ref[0] * ref[1])
