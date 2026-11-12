@@ -23731,6 +23731,57 @@ entries:
       (and from dsave_s2_scr only by the parent weights, lr window identical, e.g. [0.00228,0.0205] at V/B D=1000); full coupled
       template space, 8 trials 3,3,2 as siblings; HETEROSC mu_mse + sigma stage; 70 GB free on CC; tree power fine (expected
       gmean ~0.095 vs bar 1/3).'
+  - at: '2026-11-12T09:55:53+00:00'
+    question: 'Step 3 (Joaquin 2026-11-12: none of the fine-tune runs are well optimized; why does the HPO have such a hard
+      time): does the fine-tune search template, not the fine-tune itself, keep the t t~ fine-tunes 6-33x above scratch? The
+      template searches lr_scale log-uniform [0.1,10] around c and layer_decay uniform [0.75,1] (LLRD: block at c x lr_scale
+      x ld^depth, framesnet up to 0.75^10 = 0.06x); scratch searches lr in [c/3,3c] with one param group. Test: the same stage-2
+      fine-tune configs with only the space changed to scratch''s (layer_decay fixed 1, lr_scale [1/3,3]), one 8-trial single-fidelity
+      DyHPO search per cell on 5 cells: e+e- > t t~ tree D=316, 3162; t t~ one-loop V/B D=316, 1000, 3162. Feeds: whether
+      the fine-tune template becomes scratch''s space (and HPO rule 4 changes) before any L(D) fine-tune arm is redone.'
+    prior: '(1) ft_hpo_diag.py @fe43003f (finding 2026-11-12): in every stage-2 search the objective is the trial''s val minimum
+      (pick correct); t t~ fine-tune searches flat (median/best 2.2-7.5 tree, 3.0-25 V/B), bests 2.4-18.9x (tree) / 8.1-33x
+      (V/B) above scratch; tree fine-tunes fit train 3-9x better than scratch with val/train 30-456 (scratch 2-48); V/B fit
+      train 3.6-57x worse. (2) Null-parent 2x2, all 16 runs (nullparent_readout.py, data @10a63eea): the parent''s weights
+      through the fine-tune path at the scratch best HPs (layer_decay 1, scratch lr) reach val 4.1e-7, 6.6e-8, 7.4e-9, 8.2e-9
+      on tree D=316..1e4 = 1.08, 2.36, 0.86, 3.28 x scratch and 0.18, 0.19, 0.05, 1.4 x the stage-2 fine-tune best; on V/B
+      6.1e-5, 6.2e-7, 1.4e-7, 2.5e-8 = 122, -, 8.9, 25 x scratch and 15, 0.45, 0.27, 0.93 x the fine-tune best. Fresh init
+      through the same path 5.8-97x scratch (design''s branch B on both targets; the fresh init also differs from scratch''s
+      muP init path, so B is read with care). (3) Suspects batch: lr x1/3, x1/10, WSD, AdamW, mu-only MSE at the fine-tune
+      best HPs fix nothing. (4) results.tex muon_hp_ft (catalog_v3, four probes, D=10-316, 12 trials over the same [0.1,10]
+      x [0.75,1] window): flat, best lr_scale 0.343 ld 0.825, 1.19x over untuned: the origin of HPO rule 4''s window; other
+      targets and D range. results.tex ''Full layer-decay fine-tuning wins'' (~l.9284) compares against LoRA/freezing/EWC,
+      not decay against none. (5) Step-10 dead end: rerun of all 34 fine-tune searches with lr_scale [0.02,2] and head map
+      (~88 GPU-h), declined (D407); this is 5 searches, scratch''s space, ~11 GPU-h under D408/D411/D412. (6) Design review
+      FIX 2026-11-12 on the 4-cell version: V/B bar on the expected 0.35 and V/B D=316 left out; both revised here.'
+    measure: 'Per search the best val mu-MSE in ln units over its trials (min of val_mse_curve x prepd_std^2 = the objective,
+      best-mu checkpoint). Per cell r_old = new fine-tune best / stage-2 fine-tune best (old template; note the old tree D=3162
+      search kept 5 of 8 trials), r_scr = new best / stage-2 scratch best; per target gmean over its cells (tree 2, V/B 3).
+      Beside: each best trial''s val and train curves against the stage-2 scratch and old fine-tune bests (figure), and the
+      new search''s median/best spread.'
+    check: 'On existing runs the measure moves with exactly this change: the null-parent pre arm (the new space''s one point,
+      the scratch HPs) gives r_old 0.18 and 0.05 on the tree test cells (D=316, 3162; gmean 0.095) and 15, 0.45, 0.27 on V/B
+      D=316, 1000, 3162 (gmean 1.2: the V/B direction is not known in advance). Noise: same-HP reruns 0.30-1.0 on V/B and
+      0.46-4.84 elsewhere (ln-sd ~0.4 per cell pooled over 4 cells); single-search spread up to ~5x (sec:ladder).'
+    fixed: 'Everything of the stage-2 fine-tune configs (sweep/gen_data_saving.py @fe43003f, --stage s4 --ft-space scratch
+      --ks): parents dsave_parent_heldout_r4 (tree) and dsave_parent_treesin_r4 (V/B), T=8500, the stage-2 pools and first-D
+      train events, target_stats own, offshell_stats parent, no head map, seed 42, heterosc_select mu_mse + sigma stage, the
+      template''s other searched HPs and ranges, c as stage 2, 8 trials (3 start-up, waves 3,3,2), DyHPO seed as the stage-2
+      sibling. Only the space changes: fine_tune.layer_decay fixed 1.0, fine_tune.lr_scale [0.333,3]. Configs sweep/sweep_config_dsave_s4_ft_{epem_ttx_d5,epem_ttx_d7,ee_ttbar_nlo_d5,ee_ttbar_nlo_d6,ee_ttbar_nlo_d7}_t8500.yaml
+      @10a63eea.'
+    control: 'The same cell''s stage-2 fine-tune search (dsave_s2_ft_*: same configs, parent, pools, T, seed, trial count)
+      and the stage-2 scratch search (dsave_s2_scr_*), best against best.'
+    seeds: Seed 42, one 8-trial search per cell, as every stage-2 sibling search. 5 searches x 8 = 40 trials; estimate 11.3
+      GPU-h (configs' rates), at most ~18 GPU-h at the stage-2 limits; under D412's 30.
+    outcome: 'Per target, on the val best, each cell with its figure. FIXED: gmean r_old <= 1/3 and r_old < 1 in every cell:
+      the template''s space was the HPO''s failure on that target; next: gen_data_saving''s fine-tune default becomes --ft-space
+      scratch, HPO rule 4 changes (diff to Joaquin), the L(D) fine-tune arm is redone on that target (a costed batch of its
+      own). IMPROVED, NOT RESOLVED: gmean r_old in (1/3, 1) with r_old < 1 in all but at most one cell: the new space helps
+      but under the bar; reported with its numbers, no default change on that target from this alone. NO CHANGE: gmean r_old
+      in [1, 3) or cells split otherwise: the space is not what holds that target; next: the deficit stays with the starting
+      point/path (null-parent read: pre at scratch HPs 9-122x scratch on V/B), the next design bisects the path on V/B. WORSE:
+      gmean r_old >= 3: the old window held something scratch''s lacks; report. Read r_scr beside: within 3x of scratch =
+      the fine-tune trains as well as scratch. No rerun of any search on any branch (one seed, D315).'
   step_waits:
     '2': FA-ccin2p3-dbd0ef14 FA-ccin2p3-9aa32fc7 FA-ccin2p3-5b23c48c FA-ccin2p3-06f25f84 FA-ccin2p3-be096b2b FA-ccin2p3-df21f86b
       FA-ccin2p3-6ec29bc9 FA-ccin2p3-7a60851a FA-ccin2p3-ace664ae FA-ccin2p3-d239df18 FA-ccin2p3-b2d0c0d3 FA-ccin2p3-3c7a44de
