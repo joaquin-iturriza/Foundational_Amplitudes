@@ -16803,6 +16803,23 @@ entries:
       owner is told its reads can be redone. No (a shard fails, CERT_FAILED one-loop group, disk refusal): read the log, rerun
       the shard (resumable) or report the pools still missing with why. Disk: ~17 GB (val pools 1.66 GB at 1e4 x 10) of 53.7
       GB free.'
+    fix_at: '2026-11-12T01:33:29+00:00'
+    fix: 'Time per unit (check 15): the 02:00:00 limit rests on tree rates only (g12 regen 1301 tree entries at 1e5 in 32
+      shards of ~380 s; H3 1e4 prebuild 51 s for 70 pools). The 28 H5 one-loop train pools at 5e4 have no rate from the same
+      setup: the H5 val sidecar on CC (v4_gg_bbxg_nlo val, built 2026-10-26 at 929e1a97) shows chunk_size 2500, so a 5e4 train
+      pool is 20 chunks, and the only measured MadLoop cost on these classes (catalog_coverage step 19, FA-ccin2p3-a82278d8)
+      is 0.17-0.31 core-s/point, 1.23-1.32 for bg_bgg, dg_dgz, gg_bbxg: 2500 x 1.3 s = 54 min per chunk, two waves on 16 cores
+      = about 1.8 h before the backend build and certification and the shard''s ~21 tree pools. Fix: read the one-loop train
+      rate from a log or sidecar of the original H5 train build (or the H5 val build), size the limit of the shards holding
+      the 2->3 one-loop pools from it (or keep the script''s 08:00:00 for all 32), and state the wall-time target. Same recipe
+      as before (control, asserted not shown): zero_shot_parent takes each probe''s target statistics from the train pool
+      while scoring the val/test pools on disk, built 2026-10-26 and later by older code; show that a rebuilt train pool samples
+      as the deleted one did: the recipe id the current code computes for a few H1..H7c train pools against the deletion manifest
+      of 2026-11-11 (or the pools'' old sidecars), and that the held-out sampler path (mixture f_fwd 0.15, no flat_grid/multichannel
+      keys in these recipes) did not change between the val/test builds and now; otherwise say the earlier held-out reads
+      are not comparable and that the reads must all be redone. Disk is fine: /sps/lpnhe 52.9 GB free now (df 2026-11-12),
+      ~17 GB to write (val pools 1.66 GB at 1e4 x 10; H3 1e4 batch dropped free by 0.6 GB for 280 pools), floor max(3% of
+      512 GiB, 15 GB) = 16.5 GB, leaves ~36 GB.'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
