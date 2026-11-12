@@ -30566,6 +30566,66 @@ entries:
       and the D395 smoke lists the result json before the batch). Search terms: kit_hpo, KIT + sweep/DyHPO, curve_quality,
       separation, lr_scale, lr 0.0118605, scheduler, WSD, tmpl2, batchsize, in docs/results.tex, plan show kit_benchmark and
       pretrain_data_saving, site decisions (D241, D244, D315, D412, D421, D422, D423).'
+  - at: '2026-11-12T18:06:30+00:00'
+    question: 'Step 15 (D421 ''Good HPs, in particular lr, behave like the first ones''; D422 ''the solution is just to tune
+      it further''; D423 the new scheduler): at which HPs, searched by a single-fidelity DyHPO over pretrain_data_saving''s
+      template 2 (the template''s space plus batch size, WSD cooldown 0.125), does a KIT from-scratch run''s validation mu-MSE
+      fall together with its training mu-MSE to the end, and with the lowest validation? Two setups, the ones step 14''s divergence-form
+      arms are tested on: uug plain log10|M|^2 target with softpair inputs (control 203a274f) and tt virtual with softpairthr
+      inputs (control 3fc1016a). Feeds: the HPs of every step-14 arm (each arm judged at its setup''s chosen trial, which
+      is also its control, CLAUDE.md feature rule), and whether the KIT controls'' late separation was an HP point.'
+    prior: 'Searched docs/results.tex (kit + sweep/DyHPO/lr: none), plan show kit_benchmark (no KIT sweep; every KIT run at
+      lr 0.0118605, MuonAdamW wd 0.0473, reg 9.1e-8, warmup 0.18, eta_min 1.4e-8, no EMA, cosine, batch 16384 = base trial
+      1262''s point), plan show pretrain_data_saving, site decisions (D241, D244, D315, D412, D421, D422, D423). Found: (1)
+      finding 2026-11-12 ~19:30 @daa54068 (tools/kit_curves.py, kit_curves.json): on the NLL curves (val mu-MSE never recorded)
+      uug 1e5 fails in every run (203a274f separation 3.59 / end_up 1.20 nats, c15b3337 40/37), uugg 1e5 fails (c364a7ae 2851),
+      tt virtual borderline (3fc1016a 0.60/0.00 against 0.55/0.35); at 9e5 events uug passes. (2) pretrain_data_saving''s
+      analysis/data_saving/hp_ranges_readout.py (283 from-scratch stage-2 trials, uncommitted, the sibling''s): within a search
+      only lr moves separation (Spearman -0.30); muon wd, L2, warmup, eta_min, EMA, ema_decay |rho| <= 0.10; separation is
+      set by D and the HPs that follow it (batch size, horizon), never searched there. (3) Its answer, template 2 (sweep/sweep_config_dsave_tmpl2_*,
+      its design under review since 18:04, not yet read): WSD cooldown 0.125 fixed, batch size searched [D/64, D/2]. (4) curve_quality.json:
+      105 of 684 stage-2 trials good, good and bad inside the same searches. This design takes template 2''s changes (WSD
+      under D423, batch searched) on KIT; no KIT search before.'
+    measure: 'Per trial (result json written by run_trial''s training.result_path, sweep/run_trial.py:340: val_mse_curve,
+      train_eval_mse_curve on 2000 training events with the validation weights): analysis/data_saving/curve_quality.quality(v,
+      t): separation = (v/t at end)/(min v/t), end_up = v_end / min v on running-median-3 curves; good = separation <= 3 and
+      end_up <= 2. Best val mu-MSE (the objective). Reader: tools/kit_curves.py sweep @631d6f72 -> analysis/kit_benchmark/data/kit_hpo.json.
+      Chosen per setup: the lowest best val among the good trials. Against the controls: the chosen trial''s bulk_test log10-MSE
+      and hard-bin readout by tools/kit_predict.py (eval-only REREAD job on its run dir) against the controls'' kit_benchmark/kit_result.json
+      (same bulk_test and hard_test events), and its NLL curve by the same NLL form as the controls'' (kit_curves.py read)
+      so both sides have one shared curve quantity.'
+    check: 'The measure moves with HPs inside one search on existing data: data-saving stage-2 searches (curve_quality.json)
+      hold good and bad trials in the same search (ee_uu scratch 21 of 71 good, epem_ttx 14 of 70, ee_ttbar_nlo 12 of 63);
+      separation follows lr within searches (hp_ranges_readout: Spearman -0.30) and D across them, and batch size (the HP
+      that follows D) was never searched, so its range enters here. On KIT the NLL form moves with setup and D (uug 1e5 3.6-160
+      nats, uug 9e5 0.60) at one HP point.'
+    fixed: 'Each setup''s run config (base_config = runs/kit/kit_A_ee_uug_me2_n100000_t8000_softpair_plain and runs/kit/kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr):
+      inputs (pair logs 5 / 4 + pair_threshold, soft_eps 1e-8, plain target flags for uug), HETEROSC mu_mse select + sigma
+      stage, float64, first 1e5 bulk_train events (recipe runs/kit/recipes/<run>.yaml), 1e5 val, 8000 steps single fidelity,
+      seed 42, validate_frac 0.02, MuonAdamW, from scratch. Scheduler WSD, cooldown 0.125 (D423, template 2). Search space:
+      batch size int_log [1562, 16384] (template 2''s [D/64, D/2] = [1562, 50000], capped at 16384: the controls use 14 GB
+      of a V100''s 32 GB at float64 at 16384, 50000 does not fit), lr [1.667e-3, 1.5e-2] (template; contains 0.0118605), muon_weight_decay
+      [1e-3, 0.3], reg [1e-10, 1e-6], warmup [0.05, 0.2], eta_min [1e-10, 1e-7], ema {false,true}, ema_decay [0.9, 0.999];
+      8 trials each, waves 3,3,2 (D244). Configs sweep/sweep_config_kit_hpo_uug_plain.yaml, sweep/sweep_config_kit_hpo_ttvirt_thr.yaml
+      @631d6f72. D395: the sweep-trial path on a KIT base config with WSD and a searched batch is new: one 50-step trial (uug
+      config, t_steps 50, batch 1562, sweep kit_hpo_smoke) first, through training, sigma stage, plots and the result json
+      with both curves. Cost (batch <= 16384 runs no slower per step): smoke ~0.2 + uug 8 x 1.7 h (203a274f 98 min training)
+      + tt 8 x 1.3 h (3fc1016a 75 min) <= ~24 GPU-h on CC, under D412''s 30. Timing: three waves each, uug ~3 x 1.7 = 5.1
+      h, tt ~3.9 h plus queue: the HPs reach step 14 about 6 h after submission; step 14''s arms wait on them. Disk: ~0.07-0.2
+      GB per trial (memmap off, two gz checkpoints), 16 trials <= 3.2 GB against 65 GB free on CC /sps/lpnhe (df read by the
+      reviewer 2026-11-12).'
+    control: 'The controls 203a274f (uug plain) and 3fc1016a (tt virtual) on the quantities both sides have: bulk_test log10-MSE
+      and hard-bin readout from kit_result.json (chosen trial scored by kit_predict on the same events) and the NLL-form curve
+      measure; they carry no val mu-MSE curve, so the mu-MSE bars are read on the trials only.'
+    seeds: 'Seed 42 per trial (D315: no seed replicas); the search''s 8 trials are the HP axis; the choice acts on the selected
+      trial, not on an effect size.'
+    outcome: 'YES per setup: at least one good trial (separation <= 3 and end_up <= 2 on mu-MSE); the lowest-best-val good
+      trial''s HPs go to the step-14 arms of that setup and that trial is their control. Read beside it: its bulk_test log10-MSE
+      against the control''s (within 2x or better: the change costs nothing on the bulk; worse by more than 2x: reported as
+      the cost of curves that stay together), its hard-bin deepest-bin signed errors against the control''s, and which HPs
+      moved (batch, lr) against the base point. NO per setup (no good trial in 8): by D422 the cause is ranges or trial count;
+      next attempt inside this design''s aim: extend the same search by 8 trials (generate_sweep --extend); if still none,
+      widen the range on the side the separation shrinks toward (lr or batch; a design revision).'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
