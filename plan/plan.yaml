@@ -27949,6 +27949,63 @@ entries:
       for scalars only, scalars-only, no momenta, without momenta, invariants only, identity frame, IdentityFrames, non-equivariant,
       inputs only, input_scalars, log invariants, Mandelstam, and decisions D374/D403/D411/D412: no prior transformer-without-momenta
       run. Loss HETEROSC (D71), no HPO, 2 x 75 MB, rate from c15b3337 at same batch/dtype, KIT strata as asked.'
+  - at: '2026-11-12T10:51:36+00:00'
+    question: 'D411 isolation (Joaquin 2026-11-12: why our transformer does not continue a trend past its trained range where
+      Bakar''s MLP does; D412 short tests). The inputs-only arms read YES on both processes (tt virtual 4a1cb4a2: deepest
+      Sudakov log-MSE 0.72 -> 0.026, signed -0.53 -> -0.13; uug dc799c8e: deepest collinear y 1e-7..1e-6 signed +1.36 -> -0.045,
+      log-MSE 2.21 -> 0.057, bulk 1.1e-4 -> 8.2e-5), but they cut three routes at once by which the event''s kinematics reaches
+      the backbone beyond the pair logs: (L) the local-frame momenta as per-particle inputs, (F) the learned frames acting
+      on the attention''s vector messages (attn_reps 8x0n+2x1n: frame-to-frame transforms between particles), (O) the off-shellness
+      column. Which single route carries the extrapolation failure? Three arms per process, each the control with ONE route
+      cut: L via model.input_route_off=local (local momenta zeroed, learned frames kept in attention; 5d509b13), F via model.input_route_off=frames
+      (local momenta from the learned frames kept, identity frames passed to the attention), O via data.offshell_zero=true.
+      Feeds: which input the KIT A/A_ft models drop (and whether the fix is general: one route vs needing all three cut).'
+    prior: 'Searched docs/results.tex (identity frame, off-shellness off, offshell_zero, without frames, frames off, global
+      frame), plan show kit_benchmark, site decisions (D315, D395, D411, D412). Found: (1) the inputs-only arms (this entry,
+      design PASS 2026-11-12T09:26): all three routes cut, YES on tt virtual and on uug collinear (numbers in question); on
+      uug soft they are worse (deepest soft x 1e-7..1e-6 signed -0.28 -> -1.08, log-MSE 0.20 -> 1.25; the ''ours'' MLP seed
+      0 sits at -1.08 too, its seeds -1.08..-0.14). (2) Off-shellness off on uug in a run without pair logs (finding 2026-11-10
+      10:47, kit_fig_A_nooffshell.json): deep collinear log-MSE 34.5 vs 30.1, unchanged; never with pair logs, never on tt.
+      (3) results.tex ~15305-15324: off-shellness off as a transfer lever (fine-tune losses worse, -0.29 dex), bulk interpolation,
+      not extrapolation. (4) Probe ~07:00 (kit_transformer_probe): frames well conditioned (largest entry <= 22), local momenta
+      in range in every stratum; saturation probe ~11:40: readout-input rms grows 3.9 -> 15.8 into uug collinear with the
+      error, one-input pair-log scans flatten. No run cuts the local momenta or the attention frames alone. Differs: one route
+      per arm, same recipe as both controls and the inputs-only arms.'
+    measure: 'Primary, per process and arm: deepest-bin median signed error (pred - truth, log10|M|^2) by tools/kit_extrap_read.py
+      (arms nolocal, noframes, nooffshell wired before the read): uug coll_y 1e-7..1e-6, tt virtual Sudakov 15-50 TeV; with
+      tt deepest Sudakov log-MSE. Secondary: per family median log10(arm/control log-MSE) by tools/kit_readout.py --vs on
+      a tools/kit_figures.py collect (uug soft family, tt Coulomb family), bulk log-MSE. Figures kit_extrap_<proc>_{a,b}.png
+      (all arms beside control, inputs-only and MLPs) and kit_mse per arm.'
+    check: 'The measure moves with these inputs on existing data: cutting all three routes moved uug deepest collinear signed
+      error +1.36 -> -0.045 and tt deepest Sudakov -0.53 -> -0.13 (log-MSE 0.72 -> 0.026), kit_extrap.json @ this commit.
+      Each flag changes what the backbone reads: tests/test_input_reps.py::test_route_off (5d509b13, CPU float64): both cuts
+      keep the output Lorentz invariant (rel < 1e-7) and change it against pair logs alone; with ''local'' two event sets
+      with equal pair logs still give different outputs (momenta reach the backbone through the frames), unlike input_scalars_only.
+      data.offshell_zero is the flag the inputs-only arms ran with (experiment.py:2270).'
+    fixed: 'job_kit.sh A from scratch, first 1e5 bulk_train events, 8000 steps, seed 42, lr 1.18605e-2, batch 16384, HETEROSC
+      with mu_mse selection and the sigma stage, float64, base trial 1262 config, the controls'' input flags (uug ++model.input_soft_eps=1e-8
+      ++model.input_pair_logs=5; tt ++model.input_soft_eps=1e-8 ++model.input_pair_logs=4 ++model.input_pair_threshold=true).
+      Per arm one change: tag _nolocal ++model.input_route_off=local; _noframes ++model.input_route_off=frames; _nooffshell
+      ++data.offshell_zero=true. Six runs: site submit ccin2p3 FA scripts/job_kit.sh --item kit_benchmark --hdr=--time=02:30:00
+      -- kit_ee_uug__me2 100000 8000 A <uug flags> <arm flag> tag=softpair_<arm>; -- kit_ee_tt__virt_finite 100000 8000 A
+      <tt flags> <arm flag> tag=softpairthr_<arm>. Launch path as the controls'' and the inputs-only arms'' (model flag on
+      the same script, data, stages; kit_predict rebuilds from the saved config). Cost 6 x ~1.6 h (control c15b3337: 8000
+      steps at 0.68 s/step V100 + ~2 min sigma stage) = ~9.6 GPU-h, ~75 MB per run.'
+    control: 'uug: kit_A_ee_uug_me2_n100000_t8000_softpair (FA-ccin2p3-c15b3337; deepest collinear signed +1.36). tt virtual:
+      kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr (FA-ccin2p3-3fc1016a; deepest Sudakov signed -0.53, log-MSE 0.72).
+      The all-cut ends: inputs-only arms dc799c8e (uug) and 4a1cb4a2 (tt). Reference: Bakar''s MLP and ''ours'' MLP seeds
+      0-2 (kit_extrap.json).'
+    seeds: 'Seed 42, one run per arm and process (D315). Bands as in the passed inputs-only design: MLP-family deepest signed
+      error spans 0.34 (uug) and 0.22 (tt), log-MSE 0.70 / 0.80 decades; the transformer''s own KIT seed spread unmeasured
+      (D315), catalog single-process spread (results.tex ~13232-13245, up to 1.5 decades in bulk loss) quoted beside.'
+    outcome: 'Per process, per arm, the inputs-only design''s bands: uug deepest collinear signed: CUT FIXES <= +0.30, NO
+      EFFECT >= +1.02; tt deepest Sudakov: CUT FIXES signed in [-0.22,+0.48] AND log-MSE <= 0.11, NO EFFECT log-MSE >= 0.33
+      AND signed within 0.34 of -0.53; between: partial. Bulk worse than control by > 1.5 decades: underfit, not resolving.
+      Reading: exactly one arm FIXES on a process: that route carries the failure there; KIT models drop it (cheapest cut
+      that keeps the rest). Two or more FIX: each suffices (redundant carriers); the KIT models take the cut that costs the
+      bulk and soft/Coulomb families least. None FIXES while all-cut does: the failure needs the routes together (interaction);
+      next the pairwise cuts (L+F keeping O etc.), own design. Each process read on its own; the uug soft family and the tt
+      Coulomb family reported beside (the inputs-only arm lost 0.8 decades on uug soft: which route held it).'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
