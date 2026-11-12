@@ -24558,7 +24558,7 @@ entries:
       the u u~ example, stated.'
   step_waits:
     '2': FA-ccin2p3-0d698e4b
-    '3': FA-ccin2p3-0d698e4b
+    '3': bbx_zz_lo_scr3, bbx_zz_lo_ft drivers (detach events)
     '4': FA-ccin2p3-0d698e4b
   findings:
   - at: '2026-11-10T03:35:22+00:00'
