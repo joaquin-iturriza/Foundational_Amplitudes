@@ -363,6 +363,9 @@ _RESULT = re.compile(r"^(?:about\s+|~\s*|≈\s*|[<>±+\-−]\s*)?(?:\d*\.\d+|\d+
                      r"\d+(?:[.,]\d+)?\s*(?:%|×|x\b|s\b|min\b|h\b|dex\b|[kMG]\b))")
 
 
+_SIZE = re.compile(r"^[\d.,]+\s*[kMGT]i?B\b")   # a file size (11.8 GB) is storage bookkeeping, not a result
+
+
 def _turn(inp):
     """(the records of this turn, its last assistant text)."""
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -392,7 +395,7 @@ def _has_result_table(text):
             for l in lines[i + 2:]:
                 if not _ROW.match(l):
                     break
-                if any(_RESULT.match(c.strip()) for c in l.strip().strip("|").split("|")):
+                if any(_RESULT.match(c.strip()) and not _SIZE.match(c.strip()) for c in l.strip().strip("|").split("|")):
                     return True
     return False
 
@@ -401,7 +404,10 @@ def result_table(inp):
     """[TABLE_MSG] when any text the main session wrote this turn has a markdown table of measured results, whatever
     figure went with it (2026-11-12: tables sent as the body with the figures attached); else []."""
     turn, last = _turn(inp)
-    texts = [b.get("text") or "" for r in turn if r.get("type") == "assistant"
+    # a refusal for a table already in the turn is cleared by a later message without one: only texts after it count
+    cut = max([i + 1 for i, r in enumerate(turn) if "a table of measured results went to Joaquin" in json.dumps(r)
+               and "Stop hook feedback" in json.dumps(r)] or [0])
+    texts = [b.get("text") or "" for r in turn[cut:] if r.get("type") == "assistant"
              for b in ((r.get("message") or {}).get("content") or []) if isinstance(b, dict) and b.get("type") == "text"]
     return [TABLE_MSG] if any(_has_result_table(t) for t in texts + [last]) else []
 

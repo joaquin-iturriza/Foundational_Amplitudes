@@ -92,6 +92,24 @@ def test_plain_numbers_pass():
     assert check("| a | b |\n|---|---|\n| x | y |\n") == []
 
 
+def test_storage_sizes_pass():
+    assert check("| tar | size |\n|---|---|\n| a | 11.8 GB |\n| b | 0.5 TB |\n") == []
+
+
+def test_refusal_cleared_by_later_prose():
+    """Incident I-6d27a85e: after a refusal for a table, a later message without one clears it."""
+    def run(second):
+        recs = [{"type": "user", "uuid": "u1", "message": {"content": "go"}},
+                {"type": "assistant", "message": {"content": [{"type": "text", "text": TABLE}]}},
+                {"type": "user", "message": {"content": "Stop hook feedback:\n" + plan_check.TABLE_MSG}},
+                {"type": "assistant", "message": {"content": [{"type": "text", "text": second}]}}]
+        p = os.path.join(tempfile.mkdtemp(), "t.jsonl")
+        open(p, "w").write("\n".join(json.dumps(r) for r in recs) + "\n")
+        return plan_check.result_table({"transcript_path": p})
+    assert run("Joaquin, the same in prose.") == []
+    assert run(TABLE) == [plan_check.TABLE_MSG]
+
+
 if __name__ == "__main__":
     for k, f in list(globals().items()):
         if k.startswith("test_"):
