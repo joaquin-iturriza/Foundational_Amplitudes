@@ -25752,6 +25752,40 @@ entries:
       does: interaction, then the two-factor arms next. If no arm (and not ours) fails: the MLP form is not the cause; the
       transformer''s architecture (frames, attention, momenta path) is, next tested by feeding the transformer his inputs
       only.'
+    fix_at: '2026-11-12T01:44:09+00:00'
+    fix: '1 (one change / answers the question, checks 1 and 6): the question is the gap of our current best (softpair: log
+      pair invariants + soft-rescaled momenta, off-shellness column on; uug coll deepest 2.21 vs his 0.11), but the arms mom
+      and ours use the old control representation (every 4-momentum over sqrt(s), no off-shellness column, no pair logs),
+      so a yes or no on them explains the abandoned setup''s 30.1, not 2.21. Add an arm with our current inputs (log pair
+      invariants + soft-rescaled momenta + off-shellness column, as model.input_pair_logs / input_soft_eps / offshell_per_event
+      compute them) and an ours arm built on them (current inputs + T + GELU + HETEROSC), or restate the question as the old
+      setup. 2 (missing rung, check 4 no-branch): the training recipe is not in the ladder: horizon (his 300 epochs = 14.6k
+      steps at batch 2048 vs our 8000 steps at our batch), optimizer and schedule (muP Adam, our lr, warmup, L2, EMA), checkpoint
+      selection (his final weights vs our best val_loss_no_reg; our 1e5 uug/uugg runs overfit with the best checkpoint early,
+      finding 2026-11-10 06:01) and target standardization. The no-branch then blames the transformer architecture without
+      testing these; add a recipe arm (the MLP trained with our batch, steps, lr schedule, regularization and best-val selection)
+      or make the no-branch name the recipe as the next rung. 3 (outcome, check 4): two different cuts (outcome: deepest bin
+      > 10x mlp and exponent off by > 0.3; seeds: disjoint seed ranges and > 0.3 decades): state one rule. Define the numbers
+      ours must reproduce to count as our failure (which run: f6b2ece9 30.1/14180, or softpair c15b3337 2.21/0.200, or the
+      uugg/tt equivalents). State the port check''s pass (port mlp vs his numpy baseline.py per deepest bin within a stated
+      tolerance, and against his 0.11/0.32/0.40) and what happens if it fails (stop, find the difference, no ladder reading).
+      4 (measure shown, checks 2 and 15): the dry run cited (2 steps, 5e3 events, evaluate.py end to end, soft exponent -2.001
+      on the target arm) left no output: runs/kit_mlp does not exist on CC (read 2026-11-12). Point to the saved output (path)
+      or redo it keeping kit_result.json, and take the time per run from it (1 min per run is asserted; his numpy baseline
+      on 4 CPUs is not timed) for the job''s wall-time target. 5 (prior, check 5; searched Bakar, MLP, baseline, leaky, log
+      invariant, plain target, kit in results.tex, the entry and site decisions): prior omits the transformer plain target-and-inputs
+      arm FA-ccin2p3-2642b17b (soft deepest 14180 -> 144.9, coll 30.1 -> 25.5, bulk 8.2e-4 -> 7.1e-6, below his MLP''s 2.1e-5:
+      the target rung already measured on the transformer, near its flat floor), the off-shellness-off arm c35a2199 (soft
+      14180 -> 516) and his tt numbers in finding 2026-11-10 06:01 (Coulomb 7.8, 2.4 with the threshold variable, exponent
+      -0.02/-0.44; our beta-input arm 3fc1016a 3.55, exponent -0.32): name them and say what the MLP target rung adds over
+      2642b17b and whether the tt Coulomb family is still a place where his MLP wins. 6 (seeds, check 3): 3 seeds per arm
+      against D315 (''I see no reason to keep doing multiple seeds ... in general''): equal across arms, so no sibling issue,
+      but state the reason (the MLP''s seed spread is unmeasured and a run costs about a minute) or drop to one seed with
+      the 0.3-decade rule. 7 (disk, check 14): state disk per run (one predictions.h5 + json) times runs per process, against
+      CC /sps/lpnhe 45 GB free (92% used, df 2026-11-12). Passing: port matches baseline.py line by line (leaky 0.01, He-normal,
+      Adam 0.9/0.999/1e-8, lr 2e-3 cosine + 1e-6, batch 2048, 300 epochs, s0, logthr on the last invariant); no label in inputs
+      (T offset from momenta only, prediction = z + offset); het arm = plain Gaussian NLL as HETEROSC at beta 0; reads on
+      KIT hard_test/bulk_test as asked; D403 comparison with the MLP included; no HPO.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
