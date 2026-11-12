@@ -17283,6 +17283,7 @@ entries:
     less text) and 2026-10-05T02:23 read; none changes his rule that the main session sends figures unopened'
   blocks: the CLAUDE.md edit (step 22)
   blocks_steps: *id001
+  checked_until: '2026-11-12T02:24:41+00:00'
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
   question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
