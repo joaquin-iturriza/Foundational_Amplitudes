@@ -24222,6 +24222,64 @@ entries:
       template space, 8 trials 3,3,2; control bars verified (u u~ V D=3162/1e4 0 of 8 well in both arms; best spike 20.7/2.4,
       228/41); fine-tune mu-only spike numbers verified; disk 69 GB free on CC now against ~1.2 GB; result_path set by run_trial;
       ++ overrides take the new key on the old parent config.'
+  - at: '2026-11-12T14:12:36+00:00'
+    question: 'Training quality before the draft''s second data-saving example (D413/D414; Joaquin 2026-11-12 ''the tree runs
+      are not fixed at all''). The lr-centre test ruled out lr as the cause of the spikes (scratch spikes 26-62 at c/3 and
+      c/10, 32 at peak lr 3.6e-4). Does training mu with plain MSE (training.heterosc_mu_only=true: the 2-channel HETEROSC
+      net kept, sigma out of the gradient, so no 1/sigma^2 weighting of the mu gradient), with the other HPs retuned by the
+      search, give well-trained runs by curve_quality.py at no worse a validation minimum? Read on e+e- > u u~ one-loop V
+      (the draft''s second example: trained on V, fine-tuned from the trees-in parent) at D=3162 and 1e4, the cells whose
+      stage-2 best trials fail spike/jitter, and on t t~ LO D=3162 (the background problem). Feeds: whether the loss is a
+      cause of the badly shaped curves; adopting it for the u u~ V L(D) is Joaquin''s call (D52/D71/D276).'
+    prior: 'Searched results.tex (heterosc_mu_only, mu-only, plain MSE, MSE arm, HETEROSC/MSE, spike, jitter, curve quality,
+      data saving 9386-9441), the entry''s findings and dead ends, D400-D415. (1) results.tex 10460-10530 (2026-10-15, D57):
+      on e+e- > t t~ at D=1e4, 8k steps, HETEROSC (beta 0) beat plain MSE 2.6x at the MSE baseline''s HPs (val mu-MSE 1.37e-7
+      vs 3.57e-7) and 4.8x best against best on test (2.0e-8 vs 9.6e-8, each an 8-trial GP sweep); HETEROSC''s mu-MSE fell
+      steadily to the last step. What differs now: Muon (MuonAdamW) instead of AdamW, catalog_v4 parents and inputs, and the
+      mu-only arm here keeps the 2-channel net with sigma out of the gradient rather than a 1-channel MSE net. (2) Suspects
+      batch, one-change mu-only at fixed HPs (curve_quality bars): fine-tune t t~ LO D=316/1e3/3162/1e4 spike 1.5/3.4/3.7/1.3
+      vs control 3.9/19.7/12.1/9.7, jitter 0.11-0.22, minima 3.5e-6/3.2e-7/7.9e-8/1.5e-8 vs 3.9e-5/1.9e-7/6.9e-9/2.6e-9 (10-11x
+      worse at D>=3162); scratch t t~ LO D=3162 mu-only spike 29.4 vs control 21.3, minimum 1.9e-7 vs 8.5e-9: mu-only did
+      not clean the scratch curve. (3) Lower-lr test (lr_centre_readout.py, data @50544432): scratch NO CHANGE at c/3, c/10;
+      fine-tune c/3 NO CHANGE (best 1.9e-9 vs 8.2e-9), c/10 BETTER, NOT WELL. (4) Batch size is not a suspect: batchsize 16384
+      > D, full batch. (5) Stage-2 u u~ V best trials: D=3162 scratch spike 20.7 jitter 0.41, fine-tune spike 2.4 jitter 0.15
+      gap 75; D=1e4 scratch spike 228 jitter 0.96, fine-tune spike 41 jitter 0.46; 0 of 8 well in each of the four searches.
+      Prediction from (1)+(2): CLEAN BUT WORSE on the t t~ fine-tune, NO CHANGE or CLEAN BUT WORSE on t t~ scratch; u u~ V
+      open (no mu-only run on it).'
+    measure: 'curve_quality.py bars (steady >= 2/3, spike <= 3, jitter <= ln2, gap <= 10) on every trial of each search; per
+      search: number well, number with spike <= 3, median jitter, best trial''s four numbers and its validation minimum in
+      ln units (val mu-MSE x prepd_std^2), against the control search by the same tool (lr_centre_readout.py extended to these
+      searches). Figure: per cell and arm the best trial''s val and train curves, control beside.'
+    check: 'The bars can see this change: the suspects mu-only fine-tunes drop spike from 3.9-19.7 to 1.3-3.7 in 4 of 4 t
+      t~ LO cells. Counter-evidence kept in view: the one scratch mu-only run (t t~ LO D=3162) did not move (spike 29.4 vs
+      21.3), so a NO CHANGE on scratch is a live outcome. Spread between neighbouring searches as in the lr test (median jitter
+      ratio 0.73-2.88; spike read as counts).'
+    fixed: 'One change, training.heterosc_mu_only=''true'', on the controls'' configs: t t~ LO D=3162 scratch = dsave_s2_scr
+      config, fine-tune = dsave_s4_ft config (layer_decay 1, lr_scale [1/3,3], head map as s4); u u~ V D=3162, 1e4 = the stage-2
+      configs (gen_data_saving.py --targets ee_uu_nlo, trees-in parent, llrd fine-tune space, offshell_stats parent as stage
+      2) with fine_tune.map_head=''false'' (the head map came after stage 2; the new switch keeps the fine-tune identical
+      to its control). T = 8500, seed 42, 8 trials waves 3,3,2, heterosc_select mu_mse; mu-only has no sigma stage (run.py),
+      so the test is read on validation. Configs sweep/sweep_config_dsave_muonlymse_{scr,ft}_epem_ttx_d7_t8500.yaml and sweep/sweep_config_dsave_muonlymse_{scr,ft}_ee_uu_nlo_d{7,8}_t8500.yaml
+      @541bea53, on trunk (merge f61d3f8d, repo-reviewer PASS); diffed against the controls: the new key(s) and the name-derived
+      DyHPO seed only.'
+    control: 'Same cells'' searches: dsave_s2_scr_epem_ttx_d7_t8500 (best 8.5e-9, 0 of 9 well), dsave_s4_ft_epem_ttx_d7_t8500
+      (8.2e-9, 0 of 7), dsave_s2_{scr,ft}_ee_uu_nlo_d{7,8}_t8500 (0 of 8 well each), read by the same tool.'
+    seeds: 'Seed 42, one 8-trial search per (cell, arm) as the siblings (D315): 6 searches, 48 trials, ~13.5 GPU-h from the
+      controls'' measured search costs (t t~ 2 x ~2.2, u u~ V D=3162 1.80+1.71, D=1e4 2.83+2.73), under D412''s 30; wall ~1.2
+      h (the lr test''s 32 trials took 50 min); disk ~1.2 GB against 69 GB free on CC /sps/lpnhe.'
+    outcome: 'Each (cell, arm) gets the lr test''s label: WELL (best passes all four bars, >= 3 of 8 pass, best min <= 2x
+      control''s best); CLEAN BUT WORSE (best or >= 3 trials pass the bars, best min > 2x control''s); BETTER, NOT WELL (>=
+      3 trials at spike <= 3 with the control fewer, or median jitter < control/3); NO CHANGE. Both arms of an L(D) need the
+      same loss, so u u~ V is read over its four (cell, arm) labels: A) all four WELL: mu-only fixes the curves at no loss
+      of level; the u u~ V L(D) redo with mu-only training followed by the sigma stage (run.py change: the stage runs after
+      a mu-only phase, keeping D276) goes to Joaquin as a question with these numbers, since the loss is his decision (D52/D71);
+      nothing runs before his yes. B) every label WELL or BETTER, NOT WELL, none CLEAN BUT WORSE: a lead, reported with the
+      numbers; the draft figure stays the stage-2 u u~ V L(D). C) any CLEAN BUT WORSE or NO CHANGE on u u~ V (including fine-tune
+      better and scratch not, or one cell only): mu-only is not the fix; the draft figure is the stage-2 u u~ V L(D) on val_ln
+      (S = 2.7, band 2.0-3.9) with its curve-quality numbers stated; the next suspect is EMA fixed on (lower median jitter
+      and spike in the existing EMA-on trials of u u~ V: 0.25 vs 0.41, 13.2 vs 18.4). t t~ LO is labelled the same way and
+      feeds only the t t~ diagnosis (D413 track 2): CLEAN BUT WORSE there confirms the prior; WELL on t t~ fine-tune would
+      contradict results.tex''s 2.6-4.8x and is reported as such.'
   step_waits:
     '2': the design reviewer and the repo-reviewer of the mu-only MSE test (branch lrcentre @541bea53), then its 6 searches
     '3': the design reviewer and the repo-reviewer of the mu-only MSE test (branch lrcentre @541bea53), then its 6 searches
