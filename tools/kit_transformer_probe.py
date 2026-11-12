@@ -9,6 +9,9 @@ training (bulk_train), and the error it makes there. Per event (n per stratum, e
   gam      log10 of the largest boost factor gamma = Lambda_00 of the event's local frames (D411 frames mechanism)
   gamrel   log10 of the largest gamma of the relative transforms Lambda_i Lambda_j^-1 over particle pairs: what the
            attention's vector messages from j to i are transformed by (the route model.input_route_off=frames cuts)
+  mE       log10 of the smallest m/E = sqrt(p^2)/E over the event's massive particles (stored float64 momenta, the
+           stored rows' frame; a top pair at 2->2 gives 2 m_t/sqrt(s): how lightlike the tops look); None
+           when none is massive
   res      |prediction - truth| in log10|M|^2
 and the dtypes. Per stratum: medians and maxima, and feat over bulk_train's 99.5% quantile.
 
@@ -140,6 +143,12 @@ def main():
     npart = sij.shape[1]
     nfin = (rows.shape[1] - 1) // 5
     truth_s = sij_over_s(rows[:, :4 * nfin].reshape(-1, nfin, 4).astype(np.float64))
+    # m/E of the massive legs from the stored float64 rows, in row order (the network's float32 input would let a
+    # massless leg's rounding, m^2/E^2 ~ 1e-7, pass as mass); scale-free, in the stored rows' frame
+    p4 = rows[:, :4 * nfin].reshape(-1, nfin, 4).astype(np.float64)
+    m2E2 = (p4[..., 0] ** 2 - (p4[..., 1:] ** 2).sum(-1)) / p4[..., 0] ** 2
+    mE_row = np.where(m2E2 > 1e-10, 0.5 * np.log10(np.where(m2E2 > 1e-10, m2E2, 1.0)), np.inf).min(1)
+    mE_row = np.where(np.isinf(mE_row), np.nan, mE_row)
     err = np.abs(sij[o] / truth_s - 1).max(1)
     if getattr(exp.model, "input_soft_eps", 0):    # the net reads soft-rescaled vectors: s_ij/s is not theirs to keep
         err = np.full(len(err), np.nan)
@@ -153,20 +162,26 @@ def main():
              "logmse": float(np.mean(res[k] ** 2)), "err_median": float(np.median(sgn[k])),
              **{f"{q}_{f}": float(fn(v[k])) for q, v in (("gam", gam), ("gamrel", gamrel))
                 for f, fn in (("median", np.median), ("q90", lambda x: np.quantile(x, 0.9)), ("max", np.max))},
+             **({"mE_median": float(np.nanmedian(mE_row[i - n:i])), "mE_min": float(np.nanmin(mE_row[i - n:i]))}
+                if np.isfinite(mE_row[i - n:i]).any() else {"mE_median": None, "mE_min": None}),
              "corr_res_lam": float(np.corrcoef(res[k], lam[k])[0, 1]) if lam[k].std() > 0 else None,
              "corr_res_feat": float(np.corrcoef(res[k], feat[k])[0, 1]) if feat[k].std() > 0 else None}
         if name.startswith("bulk_train"):
             q995 = float(np.quantile(feat[k], 0.995))
             tr = {q: v[k] for q, v in (("gam", gam), ("gamrel", gamrel), ("feat", feat))}
+            tr_mE = mE_row[i - n:i][np.isfinite(mE_row[i - n:i])]
         for q, v in (("gam", gam), ("gamrel", gamrel), ("feat", feat)):   # share of bulk_train events above the median
             e[f"{q}_train_share_above"] = float(np.mean(tr[q] >= np.median(v[k])))
+        e["mE_train_share_below"] = (float(np.mean(tr_mE <= e["mE_median"]))   # None for massless events
+                                     if e["mE_median"] is not None and len(tr_mE) else None)
         e["feat_over_train_q995"] = float(np.median(feat[k]) / q995) if q995 else None
         out["strata"][name] = e
         print(f"{name:45s} lam med {e['lam_median']:6.2f} max {e['lam_max']:6.2f} | feat med {e['feat_median']:9.3g} "
               f"max {e['feat_max']:9.3g} (x{e['feat_over_train_q995'] or 0:.2g} train q995) | sij err {e['sij_err_max']:.1e} "
               f"| res med {e['res_median']:.3g} logmse {e['logmse']:.3g} | corr lam {e['corr_res_lam'] or 0:+.2f} "
               f"feat {e['corr_res_feat'] or 0:+.2f} | log10 gamma med {e['gam_median']:.2f} max {e['gam_max']:.2f} "
-              f"rel med {e['gamrel_median']:.2f} max {e['gamrel_max']:.2f}")
+              f"rel med {e['gamrel_median']:.2f} max {e['gamrel_max']:.2f} | log10 m/E med {e['mE_median']} "
+              f"(bulk_train share below {e['mE_train_share_below']})")
     print("dtypes", sorted(dt))
     print("KITPROBE " + json.dumps(out))
     if a.out:
