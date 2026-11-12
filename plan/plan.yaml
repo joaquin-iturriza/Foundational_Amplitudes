@@ -26714,20 +26714,25 @@ entries:
     - FA-ccin2p3-e8088a7d
     - FA-ccin2p3-eb0f30db
     - FA-ccin2p3-f6b2ece9
-    commit: 2ac85502
+    commit: ffd40c13
     paths:
+    - analysis/kit_benchmark/data/kit_curves_read.json
     - analysis/kit_benchmark/data/kit_fig_A.json
+    - analysis/kit_benchmark/data/kit_fig_A_gmax4_uug.json
     - analysis/kit_benchmark/data/kit_threshold_scan.json
     - models/lloca.py
     - scripts/job_kit_package.sh
     - scripts/job_kit_rescore.sh
     - scripts/job_kit_threshold.sh
+    - sweep/sweep_config_kit_hpo_ttvirt_thr.yaml
+    - sweep/sweep_config_kit_hpo_uug_plain.yaml
     - tests/test_input_reps.py
     - tests/test_kit_hardps.py
     - tests/test_kit_threshold_scan.py
     - tests/test_layer_norm_switch.py
     - tests/test_pair_beta.py
     - tests/test_store_tag.py
+    - tools/kit_curves.py
     - tools/kit_figures.py
     - tools/kit_hardps.py
     - tools/kit_package.py
