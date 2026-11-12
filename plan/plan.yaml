@@ -24076,6 +24076,21 @@ entries:
       traintime_hours, with no prepd_std. That sweep directory also holds jobs/, output/, summary.txt and sweep_config.yaml.
       Look for the run''s prepd_std under output/, or check the proxy (std of the log target over the first S rows) against
       it on a few runs. Repo-reviewer not yet continued; E5844 not acked.'
+  - at: '2026-11-12T08:53:04+00:00'
+    text: '2026-11-12 suspects batch read (suspects_readout.py @8e8bb7d1, data @e5a05de9, figs suspects_LD, suspects_curves_<target>_<ft|scr>).
+      Measure: best val mu-MSE in ln units (min of val_mse_curve x prepd_std^2); G = geometric mean over cells of arm/control;
+      design rule FIXES G<=1/3 with n<>=3, HURTS G>=3 with n<<=1; val and worst-val-event-removed must agree. No arm FIXES
+      on either target. Tree t t~ (control = head-map fine-tune): lr x1/3 G 3.31 (n< 1/4; worst-removed 2.87) NOT RESOLVED;
+      lr x1/10 3.95 HURTS; WSD 5.06 HURTS; AdamW 8.19 HURTS; mu-only MSE 1.77 NONE (val only: mu-only runs have no sigma stage
+      so no preds; FIXES already excluded by n< 1/4). One-loop V/B (control = parscale rerun): lr x1/3 2.12 NONE; lr x1/10
+      6.60 HURTS; WSD 0.51 with 4/4 below 1 (worst-removed 0.42, test 0.44) NONE by the 1/3 bar, a 2x gain that leaves the
+      fine-tune 8-37x above scratch; AdamW 1.30 NONE on 3 cells (D=1e3 diverged); mu-only 2.77 NONE. Scratch arms at the scratch''s
+      best HPs: WSD 68x (tree) / 17x (V/B, 2 cells) and mu-only 50x / 37x worse: both changes hurt scratch far more. The lower-lr
+      lead from the HPO read (27/34 searches) does not hold at fixed other HPs: lower lr is worse at D>=1e3 on tree. Curves:
+      the one-loop fine-tunes of every arm reach their val minimum near steps 2000-3000 at ~1e-6..1e-5 and stay flat or rise
+      after, while scratch keeps falling through the anneal to 1e-9..3e-8; the tree fine-tunes fall through the anneal but
+      end 6-60x above scratch. By the design: no recipe knob explains the deficit; next the pretrained weights against the
+      fine-tune path itself (a fine-tune from a fresh init, shrink_perturb [0,1], at scratch''s HPs).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
