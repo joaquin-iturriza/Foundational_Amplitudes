@@ -17357,6 +17357,12 @@ entries:
       00:38:32); the three agent-finished notices made no call. Fixes a44d46c4: mid-run agent messages spooled, finished notice
       absorbed when the hand-back was spooled, spooling 15 min after a waiter returns, the waiter never returns an emptied
       window. After: 3 (the empty return gone).'
+  - at: '2026-11-12T14:43:51+00:00'
+    text: '2026-11-12 steps 23/24 closed under D416 (''The 10 min batch is fine.''): live measure (analysis/agent_redesign/data/waiter_live_20261112.json,
+      figs/waiter_live_20261112.png @9edb252f): waiter returns replayed at 600 s = 56 under both the old rule and URGENT_KINDS
+      (41/37/34 at 20/30/60 min, 103 unbatched), 32 actual waiter wakes. The URGENT_KINDS rule cut nothing on this traffic
+      and costs nothing; it stays. Window stays 600 s (D324, D416). Tokens before/after are tracked by step 21 (on or after
+      2026-11-17).'
   handoff:
     state: '2026-11-12 ~15:10 local. Restore of CC pools deleted 2026-11-11: held-out H1..H7c all prebuilt (check_site_data
       0 missing); dsh_eea 115/115 train rebuilt, val/test sha256 230/230 unchanged, its parts gc''d (5.45 GB); PP4: 1 pool
