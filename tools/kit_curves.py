@@ -16,7 +16,7 @@ without the mu-MSE, so a failing NLL curve can still hide a sound mu-MSE curve (
     python tools/kit_curves.py collect --out analysis/kit_benchmark/data/kit_curves.json   (reads CC)
     python tools/kit_curves.py read analysis/kit_benchmark/data/kit_curves.json [--figs analysis/kit_benchmark/figs]
     python tools/kit_curves.py sweep kit_hpo_uug_plain kit_hpo_ttvirt_thr --out analysis/kit_benchmark/data/kit_hpo.json
-        (step 15's searches, reads CC: per trial its HPs, best val mu-MSE and curve_quality on the mu-MSE curves
+        (step 15's searches, driven by sweep/drive.py: the trials in sweeps_local/<name>/results, their curves read on CC: per trial its HPs, best val mu-MSE and curve_quality on the mu-MSE curves
          val_mse_curve / train_eval_mse_curve; chosen = the lowest best val among the good trials)
 """
 import argparse
@@ -137,30 +137,25 @@ def plot(d, figs):
 
 
 SWEEP_SITE = r'''
-import glob, json, os, sys
-sys.path.insert(0, ".")
-import siteconf
+import base64, json, os, sys
 out = {}
-for name in sys.argv[1:]:
-    rows = []
-    for f in sorted(glob.glob(os.path.join(siteconf.SWEEP_DIR, name, "results", "*.json"))):
-        try:
-            j = json.load(open(f))
-        except Exception:
-            continue
-        hp_idx = int(os.path.basename(f)[2:6])          # results/hp<idx>_t<T>_<time>.json; run dir runs/<sweep>/trial_<idx>
-        rd = f"runs/{name}/trial_{hp_idx:04d}"
-        hp = {}
-        if os.path.exists(rd + "/config.yaml"):
-            import yaml
-            c = yaml.safe_load(open(rd + "/config.yaml")); t = c.get("training", {})
-            hp = {f"training.{k}": t.get(k) for k in ("lr", "batchsize", "muon_weight_decay", "regularization_lambda",
-                                                      "cosanneal_warmup_frac", "cosanneal_eta_min", "ema_decay", "scheduler")}
-            hp["ema"] = c.get("ema")
-        rows.append({"file": os.path.basename(f), "hp": hp,
-                     "val_loss": j.get("val_loss"), "best_step": j.get("best_step"), "run_dir": rd,
-                     "val": j.get("val_mse_curve"), "train": j.get("train_eval_mse_curve")})
-    out[name] = rows
+# the trials drive.py observed: [name, file, result_path, run_dir] each, from sweeps_local/<name>/results (local)
+for name, fname, f, rd in json.loads(base64.b64decode(sys.argv[1])):
+    rows = out.setdefault(name, [])
+    try:
+        j = json.load(open(f))
+    except Exception:
+        continue
+    hp = {}
+    if os.path.exists(rd + "/config.yaml"):
+        import yaml
+        c = yaml.safe_load(open(rd + "/config.yaml")); t = c.get("training", {})
+        hp = {f"training.{k}": t.get(k) for k in ("lr", "batchsize", "muon_weight_decay", "regularization_lambda",
+                                                  "cosanneal_warmup_frac", "cosanneal_eta_min", "ema_decay", "scheduler")}
+        hp["ema"] = c.get("ema")
+    rows.append({"file": fname, "hp": hp,
+                 "val_loss": j.get("val_loss"), "best_step": j.get("best_step"), "run_dir": rd,
+                 "val": j.get("val_mse_curve"), "train": j.get("train_eval_mse_curve")})
 print("KITHPO " + json.dumps(out))
 '''
 
@@ -170,7 +165,13 @@ def sweep_read(names, out):
     sys.path.insert(0, os.path.join(ROOT, "analysis", "data_saving"))
     from curve_quality import quality as q_mse
     from analysis.common.readers import site_python
-    d = site_python(SWEEP_SITE, list(names), "KITHPO")
+    import base64, glob
+    # drive.py keeps each observed trial's RESULT_JSON locally; its result_path (the curves) and run_dir are on CC
+    todo = [[n, os.path.basename(f), j["result_path"], j["run_dir"]]
+            for n in names for f in sorted(glob.glob(os.path.join(ROOT, "sweeps_local", n, "results", "*.json")))
+            for j in [json.load(open(f))]]
+    d = {n: [] for n in names}
+    d.update(site_python(SWEEP_SITE, [base64.b64encode(json.dumps(todo).encode()).decode()], "KITHPO"))
     for name, rows in d.items():
         for r in rows:
             if r["val"] and r["train"]:
