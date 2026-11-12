@@ -111,6 +111,17 @@ def main():
                       f"(peak lr {b['peak_lr']:.2e}: separation {b['separation']:.3g} end_up {b['end_up']:.3g})"
                       + (f"  failed {s['failed']}" if s["failed"] else "") + (f"  -> {s['verdict']}" if s["verdict"] else ""))
             res[f"{cell}/{arm}"] = S
+    q = [S["control"]["best_min"] and S[v]["best_min"] / S["control"]["best_min"] for S in res.values() for v in VARIANTS
+         if v in S and "control" in S]
+    if TEST == "lrx3" and len(q) > 1:
+        # pooled read (design 2026-11-12, after review): geometric mean of variant/control over cells, against the 5x
+        # search-to-search spread (results.tex ladder) taken as 2 sd per cell: sd/sqrt(n), bar at 2 pooled sd
+        G, bar = float(np.exp(np.mean(np.log(q)))), 10 ** (2 * np.log10(5) / 2 / np.sqrt(len(q)))
+        good = sum(S[v]["best"]["well"] for S in res.values() for v in VARIANTS if v in S)
+        res["pooled"] = {"G": G, "bar": bar, "n": len(q), "best_good": good,
+                         "branch": ("LR WINDOW" if G <= bar else "GOOD BUT WORSE") if good >= 8 else "NO"}
+        print(f"pooled variant/control G {G:.2f} over {len(q)} cells (bar {bar:.2f}); search bests good {good}"
+              f" -> {res['pooled']['branch']}")
     json.dump(res, open(os.path.join(DATA, f"lr_centre_readout{SUFFIX}.json"), "w"), indent=1)
     COL = dict(zip(["control", *VARIANTS], ["black", ps.C.vermillion, ps.C.blue]))
     for cell in CELLS:
