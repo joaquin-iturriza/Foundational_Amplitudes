@@ -24273,7 +24273,7 @@ entries:
         ttvirt_A_best_threshold'
       - 'within +-0.3: protocol B stays the only threshold model; report the limit of protocol A'
   step_waits:
-    '5': '2026-11-12'
+    '5': the next owner, from the hand-off
     '6': '2026-11-12'
   handoff:
     state: 'Joaquin released the entry (D403): understand why our models do not extrapolate into the limits and match Bakar''s
