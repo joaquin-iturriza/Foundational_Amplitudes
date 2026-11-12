@@ -24352,6 +24352,57 @@ entries:
       seed per D315; HETEROSC + sigma stage; V/B with physics factors off as t t~ V/B; b b~ > Z Z one-loop is in neither parent
       recipe, its Born v4_bbx_zz is in trees-in; 21.3 GPU-h under D412''s 30; disk ~3 GB against 68 GB free on /sps/lpnhe
       (df now); step rates are from the same-D calibration runs at the same batch rule.'
+  - at: '2026-11-12T14:43:56+00:00'
+    question: 'D413 (Joaquin 2026-11-12: ''just use another second example to show the data savings''; ''I asked you for a
+      NEW example, since we had ee to uu LO and V already as one''): how much target data does pretraining save at MSE(ln(V/B))
+      = 1e-4 on b b~ > Z Z one-loop, a process different from the first example, trained on V/B, fine-tuned from the trees-in
+      parent (its Born b b~ > Z Z is a parent tree, its loop is in neither parent: ''the one loops with the tree levels in
+      the pretraining'')? S = D*_scr / D*_ft with its band. Feeds the draft''s second data-saving figure (Joaquin edits the
+      draft, D8).'
+    prior: 'Searched results.tex (data saving 9386-9441, bbx_zz, ZZ, V/B spread), the entry''s findings and dead ends, D355-D416,
+      equal_processes.json, the parent recipes. Candidates: e+e- > c c~ g and b b~ g g are in no parent recipe and no equality
+      class, but their scratch calibrations never reach 1e-4 (best 3.8e-3 and 1.7e-2 at D=1e5, finding 2026-11-10 07:04):
+      S at 1e-4 undefined. u u~ > e+e- Z V/B (std ln|V/B| 0.294) reaches 2.0e-4 only at D=1e4 and 7.0e-5 at 31623: crossing
+      at the grid''s top. b b~ > Z Z V/B: std ln|V/B| 0.267, V one-signed (vb_spread.py @325cce0d): not a constant, not a
+      rescaling; its loop is in neither parent recipe (the nearest is v4_bbx_zzz_nlo, another process), its Born v4_bbx_zz
+      is in the trees-in parent. Scratch calibration, val MSE(ln(V/B)) (horizons_cal_vb_ladder.json): 6.5e-3, 2.9e-3, 8.1e-4,
+      1.9e-4, 1.7e-4, 4.5e-6, 1.2e-5, 4.5e-6 at D=10..31623: crosses 1e-4 between D=1e3 and 3162. The entry''s finding of
+      2026-11-11 notes ''bbbar->ZZ flattening from D=1e4 needs more optimization; check it is not compute-limited'' (best
+      steps 1440-4000 of 8000-12000 at k>=7 under the fixed lr law); the calibration is non-monotonic (4.5e-6 at 3162, 1.2e-5
+      at 1e4). Here D=1e4 runs at T=8500 with the lr searched (not fixed), and the fit''s L_inf absorbs a floor; the 1e-4
+      crossings sit at D=1e3-3162, below the flattening, so they do not rest on the top cell. The stage-1 scratch test MSE(V/B)
+      in linear units is 30x above 1e-4 at its floor (V/B ~ 30), so the test read is MSE(ln(V/B)) (stage2_readout.py''s test_ln),
+      the entry''s own unit. Closest earlier result: t t~ V/B at this template, S < 1 (fine-tune 2-57x above scratch, stage2_readout.py
+      @5555a0f0), so NO SAVING is live. Curve quality at this template (curve_quality.json): u u~ V 4/62 and 2/63 trials well,
+      t t~ V/B 0/63 and 1/64. The mu-only test running now has not read; adopting its loss is Joaquin''s call (D52/D71), so
+      this batch runs at the existing template.'
+    measure: 'stage2_readout.py for one-loop V/B targets (bbx_zz_nlo added to its and dstar_fit.py''s TARGETS before the read):
+      val_ln and test_ln = MSE(ln(V/B)) after the sigma stage (test MSE(V/B) beside it, not used for S); dstar_fit.py''s shared-exponent
+      fit L = A D^-alpha + L_inf per arm, D* at 1e-4 and S = D*_scr/D*_ft with its 16-84% cell-bootstrap band, on val_ln and
+      test_ln; curve_quality.py bars on every trial, each search''s well count and each cell''s best trial''s four numbers
+      stated beside S. Figure: L(D) of both arms with the fits and the 1e-4 crossings.'
+    check: 'The pipeline resolves S where one exists: stage-2 u u~ LO S = 10^0.58 [0.43, 0.68] and t t~ V/B 10^-0.35 [-0.59,
+      -0.24], bands excluding 1; the b b~ Z Z scratch calibration crosses 1e-4 in MSE(ln(V/B)) mid-grid (1.7e-4 at D=1e3,
+      4.5e-6 at 3162), with cells on both sides.'
+    fixed: 'The stage-2 one-loop template (sweep/gen_data_saving.py --targets bbx_zz_nlo, stage s2, @79578039): V/B with physics
+      factors off (as t t~ V/B), HETEROSC heterosc_select mu_mse + sigma stage (D276), trees-in parent dsave_parent_treesin_r4,
+      fine-tune llrd space (lr_scale [0.1,10], layer_decay [0.75,1]) with target_stats own and offshell_stats own (fa846b4d),
+      scratch lr [c/3, 3c] by the calibration law, T(D) = 640, 1440, 1600, 3840, 4800, 6400, 8500 (horizons.py --ladder, data/horizons_cal_vb_ladder.json),
+      seed 42, 8 trials waves 3,3,2. D grid k = 2..8 (D = 10..1e4, 7 points); D = 31623 dropped (D412: it alone costs 15.5
+      of 36.8 GPU-h; the crossings lie at 1e3-3162). Configs sweep/sweep_config_dsave_s2_{scr,ft}_bbx_zz_nlo_d{2..8}_t*.yaml
+      @79578039.'
+    control: Scratch arm against fine-tune arm, cell by cell, same D, T and pools; reference result t t~ V/B at the same template.
+    seeds: 'Seed 42, one 8-trial search per (D, arm) as the siblings (D315): 14 searches, 112 trials, 21.3 GPU-h by the generator
+      (calibration rates 0.075-0.148 s/step + 0.08 h per trial), under D412''s 30; wall ~1.5 h; disk ~3 GB against 68 GB free
+      on CC.'
+    outcome: 'Levels fixed now: MSE(ln(V/B)) = 1e-4 on val_ln and on test_ln. SAVING: the S band''s lower edge > 1 on both.
+      SAVING ON ONE READ: on one of them; the figure carries both and says which resolves. NO SAVING: a band includes 1 or
+      S < 1; reported with both arms'' curves, as t t~ V/B. Curve quality, read in every case: WELL-TRAINED if in >= 5 of
+      7 cells per arm the best trial passes spike, jitter and steady (gap read apart at D <= 316, where the events are memorised);
+      otherwise the result goes out labelled ''existing template, not well trained by curve_quality'', with each arm''s failing
+      bars per cell, as the coordinator''s instruction for tonight says (D413 deadline), and the template fix stays open (D414).
+      A fine-tune whose minimum sits in the first checkpoints (memorising) is named. If the mu-only test reads all WELL, a
+      rerun of this target with mu-only goes to Joaquin as a question, not run.'
   step_waits:
     '2': the detached driver muonly_mse_test (6 searches dsave_muonlymse_{scr,ft}_{epem_ttx_d7,ee_uu_nlo_d7,ee_uu_nlo_d8}_t8500,
       CC, 48 trials)
