@@ -16915,6 +16915,15 @@ entries:
     outcome: 'Yes: 0 not prebuilt on the 9 recipes; optimizations_recap''s owner told its reads can be redone. No: a shard
       fails or one-loop CERT_FAILED: read the log, rerun (resumable), or report the pools still missing with why. Disk: ~18.3
       GB of 52.9 GB free; the prebuild stops itself at 16.5 GB free.'
+    passed_at: '2026-11-12T01:37:37+00:00'
+    reviewer: 'Data restore, not an A/B. Measure: check_site_data --list, which listed exactly the 700 held-out + 504 PP4
+      missing train pools on 2026-11-12. Sameness: the current code reproduces the stored recipe ids of all 1402 held-out
+      val/test pools, and sampling_policy (mg5_pipeline_final.py:3133) gives every role one sampling. Time: 08:00:00 limits;
+      the held-out target is 2.5 h with H5 one-loop at ~1.8 h (20 chunks of 2500 at <=1.3 core-s/point, 16 cores); C1''s longest
+      pool is 0.99 h on 8 cores; C2''s longest task is 2.74 h in 04:00:00. Disk: ~18.3 GB to write of 52.9 GB free (df 2026-11-12),
+      prebuild floor 16.5 GB. The uncalibrated moment check was dropped, and dsh_eea''s parts-deleting re-assembly is out
+      of this batch. Searched: heldout, held-out, regen, restore, delete, amp_data_cache in results.tex, the plan and the
+      decisions; the overlap with pretrain_data_saving''s 1e4 H3 copies (another recipe, done 11-11 21:01) is named in prior.'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
