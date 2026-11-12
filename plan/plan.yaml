@@ -25501,6 +25501,26 @@ entries:
       top 1e4 train pools were overwritten at 02:43 by a catalog regen''s 1e5 pools under the same file name (one cache path
       per process, window, role); fixed b78715db (entry-level store_tag: own file, recipe id unchanged = 7cd06c31, the id
       r5 read; test_store_tag), pools prebuilt FA-ccin2p3-1ef21c15 d05aaed9 b57afb9b 18ac9616, re-smoke b6cc4ebb afterok.'
+  - at: '2026-11-12T09:05:12+00:00'
+    text: '2026-11-12 ~09:40. (1) Step 6, target V x beta (FA-ccin2p3-3c2996dc, data.target_times_beta) vs softpairthr 3fc1016a,
+      one seed each (kit_fig_A_vbeta.json, kit_readout --vs @7adcd6f8): per family median log10(arm log-MSE / control log-MSE):
+      Coulomb -3.16 [-3.94,-2.76] 4 better/0 worse, deepest bin beta 1e-4..1e-3 log-MSE 3.55 -> 4.1e-4, fitted exponent -1.01
+      (exact -1.02; control -0.32); Sudakov +0.57 [+0.15,+1.74] 0/3 (deepest 15-50 TeV 0.72 -> 39.8; band 0.61); bulk +0.56
+      (1.21e-9 -> 4.41e-9; band 0.23, still below softpair f21fa163''s 7.2e-9). Threshold scan (kit_threshold_scan collect
+      on CC, kit_threshold_scan.json @7adcd6f8): sigma_NLO^surr/sigma_NLO - 1 at beta 1e-3 = -0.082 (softpairthr -0.962, B
+      -0.897), within the NLO scale band over the whole scan (from beta 1e-3; B from 0.0119), within 1% from beta 0.076. Verdict
+      by the design''s letter: NO (bulk worse beyond its 0.23 band, the MLP''s seed spread; the transformer''s own is unmeasured);
+      the design''s NO reading (1/beta not what the network fails to extrapolate) is contradicted by the Coulomb numbers,
+      so the bulk loss is the open point: a trade at one seed. (2) D411 ReZero arm (kit_extrap.json, kit_fig_A_rezero.json):
+      deepest-bin median signed error (pred - truth, log10|M|^2): uug collinear y 1e-7..1e-6 +1.36 -> +1.10 (move 0.26 < 0.3:
+      STAYED); tt virtual 15-50 TeV -1.08 -> +0.36 (MOVED, past the MLP''s +0.12). But ReZero underfits at the LayerNorm recipe''s
+      lr: uug train MSE (prepd) 1.0e-3 vs control 4.3e-7, bulk log-MSE +4.5 decades, every uug stratum +2..+9 decades (outliers:
+      mean |rel err| 5e31 with median error -0.02); tt virtual bulk +2.44 decades (7.2e-9 -> 2.0e-6), Coulomb +0.10, Sudakov
+      -0.43. So Mixed per design (tt MOVED, uug STAYED), with a bulk-fit trade beyond band on both; the tt move comes from
+      a model that fits 270x worse, so it cannot be told from underfitting. Sibling arm on tt Born submitted per the Mixed
+      branch (FA-ccin2p3-d322922b). (3) E5849: parent smoke failed on missing alpha_s sidecars of the n1e4 store_tag pools;
+      fixed in write_own_alphas (286c0183, 248594f0), 278 written, re-smoke fc0c4eed, parents re-pointed. Figures: analysis/kit_benchmark/figs/kit_extrap_ee_{uug_me2,tt_virt_finite}_a.png,
+      kit_mse_A_rezero_*.png, kit_mse_A_vbeta_ee_tt_virt_finite_{a,b}.png, kit_threshold_scan.png.'
   step_why:
     5:
       feeds: what KIT receives
