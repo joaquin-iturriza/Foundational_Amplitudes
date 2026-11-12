@@ -129,8 +129,8 @@ def main():
                 if r["train_ln"]:
                     ax.plot(st[:len(r["train_ln"])], r["train_ln"], color=col, linestyle="--", label=f"{centre}, train")
             ax.set_yscale("log"); ax.set_xlabel("step"); ax.set_ylabel(YLAB.get(target, r"val MSE$(\ln|V|)$"))  # u u~ V is trained on V (D375)
-            ps.process_label(ax, {"scr": "scratch", "ft": "fine-tune"}[arm] + rf", $D={D}$")
-            ps.legend(ax, "upper right")
+            ps.process_label(ax, {"scr": "scratch", "ft": "fine-tune"}[arm] + rf", $D={D}$", loc="upper right")
+            ps.legend(ax, "lower left")
         name = "lr_centre_curves" if TEST == "lr" else f"{TEST}_curves_{cell.split('_t')[0]}"
         ps.save_panels(figs, os.path.join(HERE, "figs", name))
 
