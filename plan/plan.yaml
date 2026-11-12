@@ -26193,6 +26193,15 @@ entries:
       or fine-tuned) helps only at beta >~ 0.05. Fig analysis/kit_benchmark/figs/kit_threshold_scan_d405.png (+ _legend).
       Also fixed: the scan figure zipped surrogates with six colours and silently dropped the seventh; now --runs picks them
       and an assert refuses more than six.'
+  - at: '2026-11-12T13:12:46+00:00'
+    text: '2026-11-12 ~14:50. Step 9 (D405) closed: per-bin read and threshold scan both NO on Coulomb for all three fine-tunes.
+      Its NO branch (one-loop top pairs at physical mass near threshold in pretraining) is not designed: the measured protocol
+      B run (finding 2026-11-10T10:20, kit_B_ee_tt_virt_finite_n900000_t3000_offon) trained on the target''s own hard threshold
+      events and still misses the Coulomb rise (deepest bin 2.38 vs B_bulk 8.71, exponent -0.43 vs truth -1.02; scan ratio
+      -0.90 at beta 1e-3), and the frames cut does not help it (tt threshold family +0.47 decades worse, route finding 12:57).
+      Threshold data, the target''s own included, does not teach the 1/beta rise to this model; pretraining data near threshold
+      cannot transfer what direct training does not reach. Only the target side (V x beta, a diagnostic per Joaquin 2026-11-12
+      ~10:25) has moved it.'
   step_why:
     5:
       feeds: what KIT receives
