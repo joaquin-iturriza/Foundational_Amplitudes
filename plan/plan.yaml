@@ -26289,6 +26289,16 @@ entries:
       Launched: 8 searches t t~ LO D=316, 3162 scr/ft, WSD-only (D423) and template 2 (WSD + batch searched [D/64, D/2] +
       fine-tune lr_scale [0.03,10], layer_decay [0.5,1]), configs @05546263, design PASS 18:05, 17.6 GPU-h, detach tmpl2_wsd2
       on CC (first launch refused by cell_guard, relaunched with reason).'
+  - at: '2026-11-12T19:11:29+00:00'
+    text: '2026-11-12 ~20:10 CET. D426 (no batch search) and D427/D429 (8 trials not enough; extend to 16): template test
+      redesigned (design FIX x2 then fresh design, FIX, revised, PASS; 16-trial version PASS). (1) Could not stop the old
+      driver (detach tmpl2_wsd2, pid 346550): kill refused by the permission classifier; so the 4 batch-searching dsave_tmpl2_*
+      searches run on to 8 trials (<= 8.8 GPU-h), withdrawn and not read; the 4 WSD searches are extended to 16 when that
+      driver ends (drive.py resumes state). (2) Launched detach wideft16: dsave_wideft_ft_epem_ttx_d{5,7}_t8500 @bf88c4d8
+      (lr_scale [0.03,30], layer_decay [0.5,1], batch D/2, WSD), 16 trials, waves 3,3,2,4,4, CC. (3) Trial-count read (trial_count_readout.py
+      @bf88c4d8, Jean Zay, 23 searches with N 24-40, none ~50 found on CC or JZ): best after 8 over final median 1.26 (25-75%
+      1.00-1.47), final in 7 of 23; after 16 median 1.00 (1.00-1.25), 12 of 23; figs/trial_count. (4) lr_centre_readout.py
+      @0bd23fdc: first 8 by the driver''s issue order; comparisons A/B/C.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
