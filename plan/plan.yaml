@@ -28120,6 +28120,16 @@ entries:
       Covering the threshold with one-loop data in pretraining does not transfer the Coulomb rise; the KIT parent keeps r5thr.
       Caveat: one seed (D315; measured MLP seed spread Coulomb 90% 0.84 decades), runs at the old HP point step 15 replaces;
       their curve quality not read.'
+  - at: '2026-11-12T22:44:55+00:00'
+    text: '2026-11-12 ~23:30 @664429fe. 11c runs'' training (Joaquin: ''Are these runs even remotely well trained?''). tools/kit_curves.py
+      read on re-collected kit_curves.json (NLL only: none of the 7 runs wrote a val mu-MSE curve, their code predates daa54068),
+      bars separation <= 0.55, end_up <= 0.35 nats: scratch log inputs f21fa163 0.53/0.00 good; scratch + log beta^2 3fc1016a
+      0.60/0.00 BAD; pretrained held-out catalog 0.54 good; + LO tops 0.39 good; + LO tops + beta 0.70 BAD; + LO and one-loop
+      tops 0.27 good; + one-loop tops + beta 0.64 BAD; end_up 0 in all (validation lowest at step 8000). Curves (figs kit_curves_nll_Aft_thrloop_{a..g}):
+      validation follows training throughout, no late rise, but every run''s NLL still falls 1.1-2.0 nats over the last 800
+      of 8000 steps (factor ~9-55 in MSE if sigma tracks residuals): the cosine anneal ends while the loss is dropping fast,
+      so none is converged. The 11c verdict (no Coulomb transfer) is read at a setting where the runs are not trained to convergence;
+      to be redone at the step-15/16 chosen settings.'
   step_why:
     5:
       feeds: what KIT receives
