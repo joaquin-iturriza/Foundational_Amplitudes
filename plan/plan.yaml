@@ -24510,6 +24510,19 @@ entries:
       carried the head map too, so the runs match the check. The head map alone was measured against the stage-2 fine-tune:
       NO CHANGE (hmap_readout, val gmean 1.29 over 8 cells, test 0.64), so a tree FIXED (gmean r_old <= 1/3) cannot come from
       it; the readout reports the tree r_old with this caveat. V/B cells match the design exactly.'
+  - at: '2026-11-12T11:14:59+00:00'
+    text: '2026-11-12 12:20 step-3 template test read (s4_readout.py @906a70a6, data @470d147e, figs analysis/data_saving/figs/s4_curves_{epem_ttx_a,b;
+      ee_ttbar_nlo_a,b,c}). Best val MSE in ln units, new fine-tune search (layer_decay 1, lr_scale [1/3,3]) / stage-2 old-template
+      fine-tune / stage-2 scratch: t t~ LO D=316 7.98e-7 / 2.30e-6 / 3.78e-7 (r_old 0.35, r_scr 2.11), D=3162 8.22e-9 / 1.61e-7
+      / 8.54e-9 (0.05, 0.96; 7 of 8 trials, trial 2 diverged): gmean r_old 0.13 -> FIXED, the fine-tune trains as well as
+      scratch (within 3x). t t~ one-loop V/B (MSE ln(V/B)) D=316 1.91e-5 / 4.03e-6 / 4.99e-7 (4.74, 38), D=1e3 3.97e-7 / 1.39e-6
+      / 6.96e-8 (0.29, 5.7), D=3162 7.38e-8 / 5.35e-7 / 1.62e-8 (0.14, 4.6): gmean 0.57 -> IMPROVED, NOT RESOLVED. Curves:
+      tree new fine-tunes fall through the anneal to scratch''s level (D=3162 min at the last checkpoint); V/B D=1e3, 3162
+      new also fall to the end (min at 47/50, 49/50 checkpoints), V/B D=316 new best trial''s val minimum is at the first
+      checkpoint (1.9e-5, last 6.2e-5) while its train reaches 4e-10: memorises from the start. Best lr_scale 0.35, 0.41 (tree),
+      1.1-1.8 (V/B). Caveat: tree cells carry the head map (alone NO CHANGE, hmap_readout gmean 1.29). Followed: gen_data_saving.py
+      default --ft-space scratch on tree targets, llrd kept on one-loop (@470d147e); the HPO rule 4 / canonical fine-tune
+      row diff goes to Joaquin; t t~ LO fine-tune L(D) redo designed (7 new searches, 26.3 GPU-h, s4''s D=316/3162 reused).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
