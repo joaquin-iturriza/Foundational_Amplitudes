@@ -24293,7 +24293,8 @@ entries:
       with the sigma stage (run.py change, D276) is Joaquin''s question under D52/D71 and nothing runs before his yes. Disk:
       69 GB free on CC read today against ~1.2 GB; 13.5 GPU-h is under D412''s 30.'
   step_waits:
-    '2': the design reviewer and the repo-reviewer of the mu-only MSE test (branch lrcentre @541bea53), then its 6 searches
+    '2': the detached driver muonly_mse_test (6 searches dsave_muonlymse_{scr,ft}_{epem_ttx_d7,ee_uu_nlo_d7,ee_uu_nlo_d8}_t8500,
+      CC, 48 trials)
     '3': the design reviewer and the repo-reviewer of the mu-only MSE test (branch lrcentre @541bea53), then its 6 searches
   findings:
   - at: '2026-11-10T03:35:22+00:00'
