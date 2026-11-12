@@ -97,11 +97,14 @@ def plot(path, figs):
             ks = [k for k in e["transformer"] if k.startswith("hard_test/") and family(k.split("/")[1]) == fam]
             ks = sorted(ks, key=lambda k: edges(k.split("/")[1])[0])
             x = np.array([np.sqrt(np.prod([max(v, 1e-12) for v in edges(k.split("/")[1])])) for k in ks])
-            ax.plot(x, [e["transformer"][k]["err"] for k in ks], "o-", color=ps.C.vermillion, label="transformer")
+            # the route figure's control is the matched one (tt: softpairthr, the 'thr' arm)
+            base = "transformer_thr" if fs and "transformer_thr" in e else "transformer"
+            ax.plot(x, [e[base][k]["err"] for k in ks], "o-", color=ps.C.vermillion,
+                    label="control" if fs else "transformer")
             for arm, mk, c, lab in arms:
                 if f"transformer_{arm}" in e:
                     ax.plot(x, [e[f"transformer_{arm}"][k]["err"] for k in ks], mk, color=getattr(ps.C, c), label=lab)
-            for arm, mk, c in (("mlp", "s-", ps.C.blue), ("ours", "^--", ps.C.green)):
+            for arm, mk, c in (("mlp", "s-", ps.C.blue),) + (() if fs else (("ours", "^--", ps.C.green),)):
                 v = [[e[f"{arm}_s{s}"][k]["err"] for k in ks] for s in range(3) if f"{arm}_s{s}" in e]
                 if not v:
                     continue
@@ -114,7 +117,11 @@ def plot(path, figs):
             ax.set_ylabel(r"median prediction $-$ truth, $\log_{10}|\mathcal{M}|^2$")
             e_, f2, tg = proc.split("_", 2)
             ps.process_label(ax, PROC.get((f"{e_}_{f2}", tg), proc))
-            ps.legend(ax, "lower left" if e["transformer"][ks[-1]]["err"] > 0 else "upper left")
+            loc = "lower left" if e["transformer"][ks[-1]]["err"] > 0 else "upper left"
+            if fs:   # the route figure: one legend per process, on the panel with a free corner
+                loc = {"coll_y": "lower left", "threshold_beta": "lower right"}.get(fam)
+            if loc:
+                ps.legend(ax, loc)
             ps.make_room(ax)
         ps.save_panels(panels, os.path.join(figs, f"kit_extrap_{fs}{proc}"))
 
