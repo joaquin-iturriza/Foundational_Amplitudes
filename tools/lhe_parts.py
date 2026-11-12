@@ -162,7 +162,9 @@ def live_claims(q):
     return out
 
 
-AUTO_GC = True    # the assembling worker deletes the process's parts once its pools are built (tests turn it off)
+# the assembling worker deletes the process's parts once its pools are built (tests turn it off; LHE_PARTS_AUTO_GC=0 keeps
+# them, e.g. a re-assembly from the only copy of a process's events, checked before `gc --parts`)
+AUTO_GC = os.environ.get("LHE_PARTS_AUTO_GC", "1") != "0"
 PARK_MARK = os.path.join("parked", ".active")    # written by park, removed by the next plan that completes
 
 
