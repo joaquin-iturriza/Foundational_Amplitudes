@@ -25584,6 +25584,12 @@ entries:
     units: null
     start: '2026-11-12T15:55:54+00:00'
     at: '2026-11-12T15:55:54+00:00'
+  - batch: bbx_zz_lo_ft
+    wall_h: 1.5
+    jobs: 56
+    units: null
+    start: '2026-11-12T17:05:28+00:00'
+    at: '2026-11-12T17:05:28+00:00'
   handoff:
     state: 'Second example (D413/D417) = b b~ > Z Z at LO and one-loop V/B, draft due 2026-11-13. V/B L(D): restarted fresh
       16:22 as detach bbx_zz_v_LD3 (14 searches, configs @79578039, design PASS 14:43); first 42 trials out 16:32; 5 diverged
