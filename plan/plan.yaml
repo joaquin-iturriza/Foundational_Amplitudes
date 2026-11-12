@@ -24949,6 +24949,13 @@ entries:
       in loss; the V x beta arm''s bulk loss (3.6x, +0.56 decades) and Sudakov loss (+0.57) sit inside it, its Coulomb gain
       (3.16 decades, ~1400x) far outside'
     at: '2026-11-12T09:09:23+00:00'
+  - tried: 'Design 2026-11-12 09:11: uug from scratch on |M|^2 x gluon eikonal factor (data.target_times_eikonal, 27a6ca7a)
+      vs c15b3337 (reviewer FIX, no run)'
+    why: 'The control already trains on a target flat into both uug limits: the emission-scale physics factor (target_physics_factor,
+      dim_ref qperp; kit_target_slope @436952f2, finding 2026-11-10T06:22: slope +0.000 soft, -0.029 collinear, deep-bin medians
+      -1.21..-1.12 inside bulk [-4.24,-0.48]); the eikonal factor on top would over-cancel (x^2, y^1). So on uug the overshoot
+      (+1.36 deepest collinear) is not the target''s power-law continuation: it is input-side'
+    at: '2026-11-12T09:13:38+00:00'
   asks:
   - ask: 'GPU budget: ~47 GPU-h above 30 with no decision covering it (D353 approves new KIT runs but names no cost). This
       is the KIT protocol A (from scratch) and protocol B batch. A is 20 runs: ee->tt Born and ee->tt virtual each with off-shellness
