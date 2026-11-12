@@ -16279,9 +16279,9 @@ entries:
     '25': FA-ccin2p3-046cc7d3
   owner:
     agent: aefaf94baeb410c64
-    state: stopped
+    state: working
     since: '2026-11-12T02:25:26+00:00'
-    state_at: '2026-11-12T08:56:01.801000+00:00'
+    state_at: '2026-11-12T14:02:09.204000+00:00'
     context: 245423
     context_at: '2026-11-12T08:51:43+00:00'
   designs:
@@ -21354,6 +21354,8 @@ entries:
       stage-2 and s4 trial of both arms (scratch too), find why no trial is well trained (lr window centre under Muon, warmup,
       schedule, batch size), fix the template, and show one t t~ tree cell trained well by that measure with the smallest
       test, before any L(D) batch (Joaquin 2026-11-12: ''the tree runs are not fixed at all''; D412)'
+    3: 'Draft by 2026-11-13 (D413/D414): a second data-saving example besides ee->uu, both arms well trained by curve_quality.py,
+      L(D) figure + S with band; tt kept in the background'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -21506,7 +21508,9 @@ entries:
     agent: a30d7264e9acbd802
     state: working
     since: '2026-11-12T13:05:22+00:00'
-    state_at: '2026-11-12T13:05:22+00:00'
+    state_at: '2026-11-12T14:00:40.472000+00:00'
+    context: 133397
+    context_at: '2026-11-12T14:02:15+00:00'
   designs:
   - at: '2026-11-10T02:35:09+00:00'
     question: 'Step 1 (D356 horizons, tree arm): on catalog_v4''s held-out tree targets ee->ttbar (H3, 2->2 massive), ee->ccbar
@@ -24075,9 +24079,8 @@ entries:
       holds at D>=1e3. Outcome partition ordered, every case mapped. Searched: lr x1/10, lr x1/3, suspects, lower lr, lr window,
       Muon lr, spike, jitter, lrtenth, lrthird, curve_quality in results.tex, the entry''s findings/dead ends, decisions D405-D412.'
   step_waits:
-    '2': 'the CC sync: two untracked kit_benchmark files (analysis/kit_benchmark/data/kit_sat_{ttvirt,uug}_scalars.json) block
-      the merge, routed to the main session; then the owner starts drive.py over sweep/sweep_config_dsave_lr{third,tenth}_{scr,ft}_epem_ttx_d7_t8500.yaml
-      (design PASSED 2026-11-12, target 1.2 h / 32 jobs, 8.8 GPU-h)'
+    '2': the detached driver lr_centre_test (sweep/drive.py over dsave_lrthird_{scr,ft}_epem_ttx_d7_t8500 and dsave_lrtenth_{scr,ft}_epem_ttx_d7_t8500,
+      CC, 32 trials)
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
@@ -24789,6 +24792,15 @@ entries:
       its driver stopped at the CC sync, 0 trials, no run in site runs) and the s6 one-loop off-shellness-own test (design
       passed, not submitted). Change that stops it recurring: a committed curve-quality measure (well-trained by the curve
       itself) is read on every trial before any verdict or L(D) batch (new step).'
+  - at: '2026-11-12T13:13:42+00:00'
+    text: '2026-11-12 ~15:15 CET (owner a30d7264e9acbd802): lower-lr-centre test started as detached driver lr_centre_test
+      (log ~/.local/share/ccorch/detached/20261112-141149_lr_centre_test.log): sweep/drive.py --config sweep/sweep_config_dsave_lr{third,tenth}_{scr,ft}_epem_ttx_d7_t8500.yaml
+      (@0d593de5 / @979ad4e4) --item pretrain_data_saving --sites ccin2p3; site pick: ccin2p3, 21 GPUs fit, ~0.2 h per wave;
+      target 1.2 h / 32 jobs recorded. First start refused by cell_guard (same fixed_params as the control searches; E6034
+      acked); restarted with FA_NEW_SWEEP_REASON citing D412: separate searches are the passed design, extending the control
+      would mix its old-window observations into the surrogate. Readout analysis/data_saving/lr_centre_readout.py on branch
+      lrcentre (worktrees/wt-lrcentre @10cbc336; checked on the control searches'' cached rows: scr 9 trials 0 well, ft 7
+      trials 0 well, best 8.54e-9 / 8.22e-9), merged after the repo-reviewer.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
@@ -24968,6 +24980,11 @@ entries:
       - 'a template change makes the cell well trained by the measure: adopt it for both arms, then cost the L(D) redo of
         both arms'
       - 'no change tried makes it well trained: report the measure''s numbers per suspect and what remains'
+    3:
+      feeds: the draft's data-saving claim (D413)
+      if:
+      - 'a target shows S>1 with both arms well trained: its figure goes to Joaquin for the draft'
+      - 'none: fix the optimization on the most promising target and redo its L(D) tonight'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
@@ -25425,15 +25442,14 @@ entries:
   next:
     5: 'Checkpoint + inference package for KIT (Joaquin sends it): best A_ft/B checkpoints, a float64 predict script, log10|M|^2
       out; after the A_ft batch'
-    9: 'D405/D406 transfer test (design recorded 2026-11-12, design-reviewer a169c0ded88f258e3): implement sqrts_measure log_beta
-      (mg5_pipeline_final._sqrts_sampler, plain RAMBO path, 2->2 equal masses, beta log-uniform [1e-5,0.6]) + test; recipe
-      v4_{gg,ddx,bbx}_ttx__thr (gen_datasaving_parent.py heldoutthr variant), generate (CPU); r5thr parent (job_datasaving_parent.sh
-      heldoutthr; smoke iters=50, D395); job_kit.sh A_ft tt virt_finite 1e5 8000 from r5 and r5thr with fine_tune.offshell_stats=own;
-      kit_readout --vs vs f21fa163 and the threshold scan'
     10: 'D411 follow-up (own design): KIT models without the attention frames (model.input_route_off=frames): A on uugg (not
       yet run with the cut) and A_ft/B on the four KIT targets, against their softpair(thr) controls; and why the frame cut
       loses the uug soft limit (deepest soft -0.28 -> -0.93) while off-shellness off gains it (-> -0.04): an arm with both
       cuts (frames + off-shellness) on uug and tt virtual is the smallest next test'
+    11: 'Joaquin 2026-11-12 ~15:00 (D415 + his questions): (a) measure the frames mechanism per stratum (boost size, local-momentum
+      size, control runs, eval-only); (b) reproduce every plot Bakar sent, ours vs his MLP; (c) one-loop processes covering
+      Coulomb (massive pair near threshold, non-tt) and Sudakov added to the pretraining, one design; (d) a general divergence-form
+      input (eikonal logs, splitting variables, 1/beta per massive pair), one short test on uug and tt virtual'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -25461,12 +25477,15 @@ entries:
     - FA-ccin2p3-d97ae1c0
     - FA-ccin2p3-dc799c8e
     - FA-ccin2p3-de744946
+    - FA-ccin2p3-e1c19b4d
     - FA-ccin2p3-e4eecead
+    - FA-ccin2p3-e8088a7d
     - FA-ccin2p3-eb0f30db
     - FA-ccin2p3-f6b2ece9
-    commit: dddeacff
+    commit: 2ac85502
     paths:
     - analysis/kit_benchmark/data/kit_fig_A.json
+    - analysis/kit_benchmark/data/kit_threshold_scan.json
     - models/lloca.py
     - scripts/job_kit_package.sh
     - scripts/job_kit_rescore.sh
@@ -25535,7 +25554,9 @@ entries:
     agent: a297b297f5d87f1d6
     state: working
     since: '2026-11-12T13:05:18+00:00'
-    state_at: '2026-11-12T13:05:18+00:00'
+    state_at: '2026-11-12T14:00:50.967000+00:00'
+    context: 142156
+    context_at: '2026-11-12T14:02:21+00:00'
   findings:
   - at: '2026-11-10T03:33:04+00:00'
     text: 'Data: KIT package (888 MB tar, 2.7 GB with the tar) on CC at $DATA_DIR/kit_hardps/hardps_benchmark (fetched by
@@ -26208,21 +26229,18 @@ entries:
       if:
       - 'A_ft best: package A_ft'
       - 'B best: package B'
-    9:
-      feeds: whether pretraining with the helpful inputs and physical-mass, threshold-covering top data transfers to the KIT
-        t t~ virtual (D405)
-      if:
-      - 'ft_thr Coulomb median < -0.3 vs scratch and vs ft_r5: threshold sampling goes into the catalog parent''s top-pair
-        pools'
-      - 'both NO: design one-loop top pairs at physical mass near threshold (gg/qq~ > tt~ virtual)'
     10:
       feeds: which input set the KIT A/A_ft models (and the package for KIT) use
       if:
       - 'frames+offshell cut keeps collinear/Sudakov fixed and the soft limit: KIT models take that input set'
       - 'the soft loss stays: KIT models take the frame cut and report the soft trade'
+    11:
+      feeds: how far our transformer can match or beat Bakar's MLP in the KIT limits, D411/D415
+      if:
+      - 'a route helps: adopt it in the KIT models'
+      - 'none helps: report the comparison against all of Bakar''s plots as the KIT answer'
   step_waits:
     '5': '2026-11-13'
-    '9': detached batch thrscan_d405 (threshold scan of the three D405 fine-tunes)
     '10': FA-ccin2p3-e8088a7d FA-ccin2p3-e1c19b4d
   handoff:
     state: '2026-11-12 ~14:05. D411 settled to one route: the transformer''s extrapolation failure into KIT limits (uug collinear
