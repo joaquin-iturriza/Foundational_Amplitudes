@@ -22486,6 +22486,37 @@ entries:
       knob and configs committed. Searched: results.tex (v3_muon, AdamW fine, mass column, dimless mass, mass_stats, pair
       threshold, beta^2, sec:datasaving), plan.yaml (pair_threshold, mass_stats, dimless_mass), site decisions (AdamW, Muon,
       D355-D400).'
+  - at: '2026-11-12T00:27:01+00:00'
+    question: 'D400 defect hunt (Joaquin 2026-11-12: ''there is no way a pretrained model just performs worse ... something
+      has to be wrong''): what does the t t~ fine-tune start from? Is the held-out parent''s zero-shot prediction on e+e-
+      > t t~ (LO) as good, relative to the target''s spread, as on e+e- > u u~, where the fine-tunes win 2.5-60x? Eval only,
+      no training.'
+    prior: 'Defect-hunt finding 2026-11-12 (ft_curves.py, event_share.py --gap @bfb2bd4e): weights load strictly; pool physics
+      match (MT 172.5); step-0 val HETEROSC loss 8.3e4 t t~ LO vs 2.4e4 u u~ LO (NLL, dominated by the parent''s sigma under
+      target_stats own, not a mu read); t t~ LO fine-tunes memorise (train MSE 3e-10..3e-9 at every D, val/train 18-884 vs
+      scratch 3-42). sec:ladder tab:ladder_transfer_all: e+e- > t t~ from a u u~ parent gained 1.7x over scratch. tab:v3_short:
+      H3 (physical top) the worst-read tree axis zero-shot (1.86 vs 1.0-1.1). No zero-shot of the data-saving parents on these
+      targets yet.'
+    measure: 'Per (parent, probe): zero-shot MSE(ln|M|^2) on the probe''s val pool, the parent''s mean mapped with its own
+      pooled stats (mse of q) and with the probe''s own affine refit (q_aff), each over the probe''s own variance of ln|M|^2
+      (a fresh init that predicts the mean scores 1); test split beside.'
+    check: 'The read separates a bad start from overfitting: a relative zero-shot error near or above 1 on t t~ against well
+      below 1 on u u~ says the parent gives t t~ nothing to start from; the tool has scored held-out probes on catalog parents
+      before (sec:ladder zero-shot, tab:v3_short H3 1.86).'
+    fixed: tools/zero_shot_parent.py as committed, scripts/job_zero_shot_parent.sh with PROBE_RECIPES=recipes/catalog_v4_datasaving_epem_ttx.yaml,recipes/catalog_v4_datasaving_ee_uu.yaml;
+      parent runs/data_saving/dsave_parent_heldout_r4 (both targets held out; the stage-2 tree fine-tunes' parent) and, beside,
+      runs/data_saving/dsave_parent_heldout_r5 (with the physical-mass tops). Val split, full pools.
+    control: 'e+e- > u u~ on the same parent (fine-tunes win there): the comparison is t t~ against u u~, each relative to
+      its own variance.'
+    seeds: No training, deterministic eval; the probes' val pools (10000 events) as the fine-tunes read them.
+    outcome: 't t~ relative zero-shot >= 0.5 while u u~ <= 0.1: the parent''s start on t t~ is no better than a mean predictor:
+      the fine-tune''s head start is absent there, and the next step is the input or path the parent reads wrong for t t~
+      (mass column, off-shellness, top species); compare r5. Both well below 1 (t t~ within 3x of u u~): the start is sound
+      and the deficit is the memorisation seen in the train/val gap: next a design on the fine-tune''s regularisation and
+      horizon. A physics-check refusal on u u~ (MT 173 in its sm card, no top in the process) is allowed with that reason.
+      Launch: site submit ccin2p3 FA scripts/job_zero_shot_parent.sh --env PARENTS=runs/data_saving/dsave_parent_heldout_r4,runs/data_saving/dsave_parent_heldout_r5
+      --env PROBE_RECIPES=... --env ZS_ALLOW_PHYSICS_MISMATCH=''u u~ card MT 173, process has no top'' --hdr=--time=01:00:00;
+      ~0.3 GPU-h under D400.'
   step_waits:
     '7': FA-ccin2p3-35922ca9 FA-ccin2p3-adbd0552
   findings:
