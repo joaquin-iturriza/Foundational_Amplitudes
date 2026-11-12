@@ -15781,6 +15781,10 @@ entries:
       with another entry''s uncommitted docs/results.tex (pretrain_data_saving''s write-up), and the mechanical-worker fix
       (pass a commit whose named -- paths miss the pillar''s paths) was refused by the auto-mode classifier as self-modification;
       then the repo-reviewer reviews them with the ~/.local/bin/site diff against site.bak-20261112-diskwatch'
+    24: 'Live measure of the waiter rule (URGENT_KINDS, 2026-11-12): once the main session re-armed its waiter on the new
+      site code, python3 tools/waiter_replay.py --since <re-arm> --until <+12 h> against the waiter''s actual returns in that
+      time (HANDBACK acks ''delivered by the events waiter'' and the main-session wakes); step 23 closes only if the returns
+      are fewer than the old rule''s on the same events'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16175,6 +16179,12 @@ entries:
       if:
       - 'the commit check lets the named commit through: commit and push'
       - 'still refused: the hook fix goes to Joaquin as a diff'
+    24:
+      feeds: whether the hand-back batching cuts main-session wakes
+      if:
+      - 'new < old on the same events: close step 23, report the cut'
+      - 'new = old: ask Joaquin for a longer window than D324''s 10 minutes, with the replay''s 20/15/13/11 returns at 10/20/30/60
+        min'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
