@@ -24339,7 +24339,7 @@ entries:
     decision: D401
   owner:
     agent: a2021b8418347ee24
-    state: working
+    state: closed
     since: '2026-11-12T01:17:18+00:00'
     state_at: '2026-11-12T02:29:18.024000+00:00'
     context: 301055
@@ -24796,28 +24796,33 @@ entries:
     '6': FA-ccin2p3-d277f7f5 FA-ccin2p3-7a63ea88 FA-ccin2p3-1df8bd16
     '8': FA-ccin2p3-d277f7f5 FA-ccin2p3-7a63ea88 FA-ccin2p3-1df8bd16
   handoff:
-    state: 'Joaquin released the entry (D403): understand why our models do not extrapolate into the limits and match Bakar''s
-      simple MLP; his no (D402) covers only the fair NLO D-scan (step 3, drop or keep held per D402). Step 5 package: event-frame
-      fix in (adf1742b), all 51 runs re-scored (verdicts unchanged, finding 2026-11-12), package v2 built at b6cf1e61 but
-      its gate fails (finding 2026-11-12 ''Package v2 gate''): (a) tt Born softpair 5515dc85 still pool-dependent by 0.29
-      decades after the fix, not the augmentation: find what else in the rebuild/scoring depends on the scored pool for that
-      model (compare its build log on a 200-event subset vs the whole file: offshell stats pinning, any test-pool statistic,
-      batch composition; first check whether the ordering/perm or a per-pool statistic differs), fix, re-score that run; (b)
-      CPU thread count >4 changes Lorentz-invariant tt virtual predictions by up to 3.8e-4 deterministically (0 at 1/4 threads
-      and GPU): find the kernel (e.g. torch.set_num_threads sweep on one model, op by op), else pin threads in kit_predict
-      and say so in the README; (c) state the CPU-vs-GPU rounding limit (up to 1.5e-6 in the deepest collinear bin) in the
-      README and the gate. Then rebuild (kit_package_v3) and one gate job. Step 6 beta input DONE (YES for tt virtual, NO
-      for tt Born). Next step 6 (new): Coulomb factor on the target side, needs a design. D403 direction: compare our setup
-      to Bakar''s MLP point by point (inputs: his log inputs; target: his normalisation; training density; loss) on the families
-      where his MLP wins (uug coll 2.21 vs 0.11, tt Coulomb).'
-    decisions: Inference reads each event unaugmented (event frame). Old KIT scores kept in kit_benchmark_poolkeyed. Package
-      not sent while the gate fails for a real cause.
-    ruled_out: Packaging defect; code drift; augmentation as the cause of the Born softpair pool dependence (fix did not change
-      it).
-    running: none
-    files: tools/kit_package.py, scripts/job_kit_package.sh, scripts/job_kit_rescore.sh, tools/kit_rescore_compare.py, tools/rebuild_run.py,
-      tools/kit_predict.py, experiment.py, keyed_aug.py, tools/kit_figures.py, tools/kit_threshold_scan.py, analysis/kit_benchmark/data/
-    written: '2026-11-12T01:06:16+00:00'
+    state: 'Step 5: frame-noise fix 546dd9c2 (lloca degenerate-frame noise made a function of the particle at inference; threads
+      pinned to 4; README+check state rounding limit 2e-6); 51 runs re-scored (49 unchanged, tt Born/virt softpair moved <=0.06
+      decades); package v3 build+check FA-ccin2p3-21f5d054 running; after it a 32-thread --report check of v3. Joaquin rejected
+      the redraws of 3492956e: threshold scan redone at 75354f9b (old 00:31 layout restored, legend strip, labelled dash-dot,
+      categorical colours, labels with size+inputs; looked at beside old: fine); KIT mse figures at cb55f89a: reference restored
+      to truth clipped to bulk_train [0.5%,99.5%], named ''exact inside the training range, flat at its edge outside'', drawn
+      and in the legend only where nonzero, per-panel legends, median constant removed; all 8 sets redrawn (67 mse panels
+      + strips + median figures) into analysis/kit_benchmark/figs; side-by-side old|new sheets in scratch k5/sheet_mse_[0-8].png;
+      only sheet 0 (B sets) looked at: changes are only the reference label and its dropped entry in the threshold panels.
+      TODO for the next owner: look at sheets 1-8, hand Joaquin the per-figure list (what each replaces: same file name, drawn
+      from 3492956e~1 code + 84123ee4~1 data; what changed: reference label renamed, entry dropped where zero, per-panel legends;
+      data = re-scored runs) and the sqrt(s) paragraph: tt virtual Sudakov, the reference scores 2.8e-3/2.3e-2/6.9e-2 (1.7-5,
+      5-15, 15-50 TeV), the scratch models 0.0096-0.28 (offon 9e5) and 0.04-0.24 (offoff 1e5), offoff 9e5 64 at 15-50 TeV,
+      vs bulk 1.8e-9..1.2e-8: the truth barely leaves the training range there, so a model that stayed flat at the edge would
+      do 3-4x better; ours drift (input range in sqrt s not checked). D403 MLP ladder running: FA-ccin2p3-d277f7f5 (uug +
+      his numpy baseline), 7a63ea88 (uugg), 1df8bd16 (tt virt); design passed; read per its rule (port check first). Step
+      6 waits on the ladder.'
+    decisions: 'Inference frames deterministic per particle (546dd9c2). Figures: Joaquin''s reference kept (clipped truth),
+      not replaced; threshold figure only changed where he asked. MLP ladder: 3 seeds per arm (cheap, spread unmeasured).'
+    ruled_out: Augmentation and per-pool statistics as the Born softpair pool dependence (it was lloca's random collinear-frame
+      regularization). log beta^2 input construction (exact to 4.5e-9; its loss on the Born is extrapolation 5x past its trained
+      range).
+    running: FA-ccin2p3-21f5d054 (package v3 check), FA-ccin2p3-d277f7f5 7a63ea88 1df8bd16 (MLP ladder)
+    files: tools/rebuild_run.py, tools/kit_predict.py, tools/kit_package.py, tests/test_frame_noise.py, tools/kit_figures.py,
+      tools/kit_threshold_scan.py, tools/kit_input_range.py, tools/kit_mlp_ladder.py, scripts/job_kit_mlp_ladder.sh, analysis/kit_benchmark/data/,
+      analysis/kit_benchmark/figs/
+    written: '2026-11-12T02:35:49+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
