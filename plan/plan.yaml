@@ -21356,6 +21356,14 @@ entries:
       diagnose from the 34 searches'' trial curves (lr_scale window under Muon, warmup/horizon vs val minimum, sampled trials,
       objective pick, layer decay, restart optimizer state), fix the template, show well-trained fine-tune curves on a couple
       of tt cells'
+    4: 'PRIORITY (Joaquin 2026-11-12: ''none of the runs are well optimized ... I don''t understand why the hpo has such a
+      hard time with these finetunes''): from the existing trial curves of the 34 t t~/u u~ fine-tune searches (analysis/data_saving/data/trial_overfit.json,
+      618 trials with val curves, hp, peak_lr, every), find why the single-fidelity DyHPO does not find a schedule that trains
+      the fine-tunes well: the lr_scale window [0.1,10]@1 and its centre under Muon; warmup and the 8500-step cosine against
+      where the val minimum falls; what the 8 trials sampled and whether the objective picks flat or diverging runs; layer_decay;
+      the restart without the parent''s optimizer state (fine_tune.load_optimizer_state, moment_fill_steps, muon/adamw_warmup_steps
+      exist). Fix the fine-tune sweep template, prove it with the smallest test showing well-trained fine-tune curves on a
+      couple of t t~ cells (design + review), then rerun what the conclusions need (<30 GPU-h, no questions, D411/D412)'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -24444,6 +24452,12 @@ entries:
       if:
       - 'a search defect found: fix the template and rerun what the conclusions need'
       - 'no defect: report the curves and what limits the fine-tune'
+    4:
+      feeds: why the fine-tune searches give badly optimized runs and the fixed template; every fine-tune vs scratch conclusion
+        of this entry rests on it
+      if:
+      - 'a template defect found: fix, prove on 2 t t~ cells, rerun what the conclusions need within 30 GPU-h'
+      - 'no defect in the search: the fine-tune curves are what the parent gives; read the null-parent 2x2 next'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
