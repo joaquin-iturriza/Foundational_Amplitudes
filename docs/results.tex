@@ -17053,9 +17053,8 @@ $1/\nh$.
 % ==========================================================================
 The user (D364): ``Then we show all the work behind all the optimizations we did along the way, \dots\ everything well
 explained in formulas that are clear''. One paragraph per choice, adopted or rejected, with its formula and where its
-measurement lives in these notes; the numbers are read in the paragraphs referenced (their provenance is there). Two
-items wait on runs of plan entry \code{optimizations\_recap}: the one-hot against quantum-number rerun (step pidqn)
-and the optimizer comparison down to MSE $10^{-4}$ (step muon\_1e4).
+measurement lives in these notes; the numbers are read in the paragraphs referenced (their provenance is there). One item waits on a run of plan entry \code{optimizations\_recap}: the optimizer comparison on the longest
+pretraining, towards MSE $10^{-4}$.
 % allow: 10^{-4} because it is the precision the comparison is set to (D356), a setting
 
 \paragraph{Notation and the error we quote.} An event has $N$ external particles ($2\to N-2$), momenta $p_i$, partonic
@@ -17142,8 +17141,55 @@ trained multiplicities.
 $[Q,s,\log_{10}(m/\sqrt{\hat s}),T_3,B,L,\text{colour rep.},C_2(R),\text{generation}]$, labels one-hot, magnitudes
 standardized (Def.~\ref{def:enc}, Table~\ref{tab:enc}), against a one-hot token per PDG id: alike in distribution on the
 small set, but a token has no input for a particle outside training while the quantum numbers place it in the same space,
-which in principle allows arbitrary extrapolation in particle content (Principle~\ref{prin:zeroshot}). The rerun on the
-current setup is step pidqn.
+which in principle allows arbitrary extrapolation in particle content (Principle~\ref{prin:zeroshot}). Rerun on the
+current setup (2026-11-12; the $1\times$ width-8 catalog\_v4 cell, 4264 steps, seed 42 each, one commit, only
+\code{data.use\_PIDs} differing; Fig.~\ref{fig:pidqn}): with $R$ the median over classes of the class geometric mean
+of $\mathrm{MSE}_{\rm pid}/\mathrm{MSE}_{\rm qn}$, interval widened by the width-8 seed pair, the one-hot token is
+lower on the training classes' test pools, $R=0.80$ $[0.74,0.87]$ on 1300 $pp$ classes and $0.86$ $[0.79,0.94]$ on
+169 $e^+e^-$ classes, and level with the quantum numbers on the held-out classes pooled, $0.92$ $[0.85,1.01]$ over 701,
+and on their MadEvent pools, $0.77$ $[0.69,0.89]$ (HD4) and $0.95$ $[0.65,1.34]$ (HD5). It is worse on H3, a physical
+top, $1.14$ $[1.01,1.24]$ over 279 classes: one token stands for the top at every mass the catalog trains (50, 300,
+600\,GeV), and with dimensionless inputs no mass column tells them apart. No held-out probe carries a particle the
+training lacks (all are among its 21 species), so the extrapolation in particle content that only the quantum numbers
+allow is not tested by these axes. The quantum-number arm reproduces the earlier cell (\code{FA-ccin2p3-804a65bc}):
+$R=1.01$ on $pp$ and $0.95$ on $e^+e^-$. So ``pIDs and quantum numbers behave the same'' holds within the trained
+classes, with the edge above for the token, and the quantum numbers keep the held-out top.
+% src: python3 analysis/catalog_v4/mixture_ab.py pidqn @51088d70
+% claim: reads.PP4.all.R=0.80
+% claim: reads.PP4.all.widened.0=0.74
+% claim: reads.PP4.all.widened.1=0.87
+% claim: reads.PP4.all.n_classes=1300
+% claim: reads.EE4.all.R=0.86
+% claim: reads.EE4.all.n_classes=169
+% claim: reads.held.H3.n_classes=279
+% claim: reads.HD4.all.widened.0=0.69
+% claim: reads.HD4.all.widened.1=0.89
+% claim: reads.HD5.all.widened.0=0.65
+% claim: reads.HD5.all.widened.1=1.34
+% claim: reads.EE4.all.widened.0=0.79
+% claim: reads.EE4.all.widened.1=0.94
+% claim: reads.held.all.R=0.92
+% claim: reads.held.all.widened.0=0.85
+% claim: reads.held.all.widened.1=1.01
+% claim: reads.held.all.n_classes=701
+% claim: reads.held.H3.R=1.14
+% claim: reads.held.H3.widened.0=1.01
+% claim: reads.held.H3.widened.1=1.24
+% claim: reads.HD4.all.R=0.77
+% claim: reads.HD5.all.R=0.95
+% claim: reads.PP4.qn_over_earlier_w8.R=1.01
+% claim: reads.EE4.qn_over_earlier_w8.R=0.95
+% allow: 8 4264 42 1 because they are the cell's width, steps, seed and length factor, settings
+% allow: 2 because it is the exponent of a squared quantity, a constant
+% allow: 50 300 600 21 because they are the catalog's heavy-quark masses and its species count, settings
+\begin{figure}[htbp]\centering
+\includegraphics{../analysis/catalog_v4/figs/pidqn_classes.pdf}
+\caption{One-hot PDG tokens against the quantum-number encoding on the $1\times$ width-8 catalog\_v4 cell (4264 steps,
+seed 42 each, same commit): each point is one class, its MSE of $\ln|\mathcal M|^2$ (geometric mean over the class's
+probes) with the token ($y$) against the quantum numbers ($x$), at each run's final model. Panels: the training
+classes' $pp$ and $e^+e^-$ test pools (default-sampled), the catalog-sampled held-out classes (physical top, H3, in
+orange) and the held-out classes' MadEvent pools (HD4, HD5). Dashed: $y=x$.}\label{fig:pidqn}
+\end{figure}
 
 \paragraph{Input conditionings.} A feature helps when it carries what the momenta cannot, in a form the network can use
 % allow: 2 because it is the exponent of a squared quantity, a constant
