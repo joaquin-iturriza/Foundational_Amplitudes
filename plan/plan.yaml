@@ -24405,6 +24405,16 @@ entries:
       bars per cell, as the coordinator''s instruction for tonight says (D413 deadline), and the template fix stays open (D414).
       A fine-tune whose minimum sits in the first checkpoints (memorising) is named. If the mu-only test reads all WELL, a
       rerun of this target with mu-only goes to Joaquin as a question, not run.'
+    passed_at: '2026-11-12T14:44:29+00:00'
+    reviewer: 'Re-check of the 14:43 revision (configs @79578039). All three fixes are addressed. Levels are fixed before
+      the run: MSE(ln(V/B)) = 1e-4 on val_ln and test_ln. The scratch calibration crosses it mid-grid (1.7e-4 at D=1e3, 4.5e-6
+      at D=3162), and this pipeline resolved u u~ LO S = 10^0.58 [0.43, 0.68] and t t~ V/B S = 10^-0.35 [-0.59, -0.24]. The
+      prior now names the 2026-11-11 flattening note and the non-monotonic calibration. The outcome has a not-well-trained
+      branch (5 of 7 cells per arm), stated with the failing bars. Arms differ only in the parent, own stats and the fine-tune
+      lr space. 8 trials in waves 3,3,2 as the siblings, seed 42 per D315, 21.3 GPU-h, ~3 GB against 68 GB free. Searched:
+      bbx_zz, ZZ, Z Z, b b~ > Z Z in results.tex, the entry''s findings and dead ends, D355-D416, the parent recipes. Readout
+      caveat, not blocking the batch: stage2_readout.py fits only ''test'' (MSE(V/B) for the loops) and ''val_ln'' (line 181).
+      The test_ln fit must be added along with the TARGETS entries (line 39, dstar_fit.py line 92) before S is read.'
   step_waits:
     '2': the detached driver muonly_mse_test (6 searches dsave_muonlymse_{scr,ft}_{epem_ttx_d7,ee_uu_nlo_d7,ee_uu_nlo_d8}_t8500,
       CC, 48 trials)
