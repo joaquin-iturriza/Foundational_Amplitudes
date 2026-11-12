@@ -26133,6 +26133,56 @@ entries:
       kit in results.tex, plan and site decisions; prior now names 2642b17b, c35a2199, his tt Coulomb 7.8/2.4. Notes, not
       blocking: tt cur has no off-shellness column (feats is gluon-only) while f21fa163 ran off-shellness on; recipe arm also
       trains on 90% of the 1e5 (stated); time per run (1-2 min) to be read from the first job.'
+  - at: '2026-11-12T03:16:15+00:00'
+    question: 'D405/D406: does a pretraining that has the inputs that helped (softpair: log pair invariants + soft rescale,
+      the from-scratch 1e5 log-inputs arm) AND physical-mass top data reaching towards threshold (LO, beta as wide as possible)
+      transfer anything to the KIT t t~ virtual target (protocol A: e+e- > t t~ family held out, 1e5 KIT bulk, 8000 steps),
+      against the matched from-scratch run with the same inputs? Two parents, to separate the inputs+physical-mass tops (existing
+      r5) from the threshold coverage (new): ft_r5 = fine-tune from dsave_parent_heldout_r5; ft_thr = fine-tune from r5thr
+      = r5''s recipe plus 3 LO 2->2 top-pair classes (gg, d d~, b b~ > t t~, m_t 172.5) re-sampled log-uniform in beta in
+      [1e-5, 0.6]. Feeds: whether the KIT tt protocol-A model and the catalog parent''s top pools change (threshold sampling),
+      and the next lever (one-loop top pairs) if not.'
+    prior: 'Searched results.tex (KIT, threshold, Coulomb, top parent, physical mass, beta), the plan (kit_benchmark findings,
+      pretrain_data_saving) and site decisions. (a) KIT A_ft from kit_pretrain_heldout (catalog trial-1262 recipe, tops only
+      at m 50/300/600, no softpair inputs): tt virt Coulomb deepest 7-8.6 like scratch; threshold scan A_ft -0.990 vs A -0.992
+      at beta 1e-3 (pretraining helped marginally, Joaquin''s words). (b) softpair scratch f21fa163: Coulomb 7.06, Sudakov
+      15-50 TeV 7.21 (after the 5d2aec11 re-score), bulk 7.2e-9; softpairthr 3fc1016a Coulomb 3.55. (c) pretrain_data_saving
+      r5 parents (FA-ccin2p3-857e83c1 heldout, 1.81 h, softpair inputs, + the 278 physical-mass top tree classes of H3, e+e-
+      > t t~ family and u u~ class out, D400): catalog t t~ fine-tunes behind scratch (S 0.46 LO, 0.45 V), own off-shellness
+      stats better on t t~ V (gmean 0.45). (d) beta coverage of r5''s tops (tools/kit_beta_coverage.py, analysis/kit_benchmark/data/kit_beta_coverage_h3.json,
+      fig kit_beta_coverage_h3): 123 of 278 pools have a t t~ pair, 1.23e6 val events, beta < 0.1: 20290 (1.6%), < 1e-2: 208,
+      < 1e-3: 16; the three 2->2 classes start at beta 0.0265 (the v4 sqrt(s) floor), 1% quantile 0.23-0.25. KIT bulk_train
+      beta >= 0.2, threshold strata 1e-4..0.2. r5 fits KIT protocol A: the e+e- > t t~ family (gen_kit_pretrain.family_of)
+      is out; no one-loop top pair at physical mass exists in catalog_v4 but e+e- > t t~ (held out).'
+    measure: 'tools/kit_readout.py --vs on the collected figure file (kit_figures collect of the three runs): per family (threshold_beta
+      = Coulomb, sudakov_sqrts, bulk) median log10(arm/control) of the per-stratum log-MSE, strata better/worse, deepest Coulomb
+      bin, fitted exponent vs exact -1.02; and tools/kit_threshold_scan.py: sigma_NLO^surr/sigma_NLO - 1 at beta 1e-3 and
+      the lowest beta in the NLO scale band.'
+    check: 'The measure moves with the pretraining on existing data: Coulomb deepest bin 3.55 (softpairthr) .. 8.62 (offon);
+      A_ft vs A per-family medians moved up to +-0.3 on tt; threshold scan ratio at beta 1e-3 -0.897 (B) .. -0.992 (A). r5
+      parent exists with models/model_run0_best.pt (softpair flags in its config.yaml, read 2026-11-11 by pretrain_data_saving);
+      job_kit.sh A_ft takes KIT_PARENT. The new pools need sqrts_measure ''log_beta'' in mg5_pipeline_final._sqrts_sampler
+      (2->2: sqrt(s) = 2 m_t / sqrt(1 - beta^2), beta log-uniform), a unit test on the drawn beta range, then each new launch
+      path once on one GPU for ~50 steps through every stage (D395): the r5thr parent smoke (iters=50) and one A_ft smoke.'
+    fixed: Target KIT ee_tt virt_finite, protocol A, first 1e5 bulk_train events, 8000 steps, seed 42, job_kit.sh A_ft (target_stats
+      own, lr_scale 1.0) with fine_tune.offshell_stats=own (the data-saving finding on t t~ V), softpair inputs inherited
+      from the parent (model.input_soft_eps=1e-8, model.input_pair_logs=6), event-frame scoring (kit_predict at 5d2aec11+).
+      r5thr = scripts/job_datasaving_parent.sh with the r5 arguments (++model.input_soft_eps=1e-8 ++model.input_pair_logs=6,
+      T from its pool count, lr rule as r5) on recipes/catalog_v4_datasaving_parent_heldout.yaml plus v4_gg_ttx__thr, v4_ddx_ttx__thr,
+      v4_bbx_ttx__thr (catalog_v4 cuts and mixture, sqrt(s) from beta log-uniform in [1e-5, 0.6], m_t 172.5, WT 1.4915, n
+      1e4 train / 1e4 val / 1e4 test like r5's tops; train_subsample 1e4 as every pool). Only the 3 threshold pools differ
+      between r5 and r5thr.
+    control: 'Matched from-scratch run with the same inputs: kit_A_ee_tt_virt_finite_n100000_t8000_softpair (FA-ccin2p3-f21fa163,
+      re-scored at 5d2aec11). ft_thr is also read against ft_r5 (the only difference: the threshold pools).'
+    seeds: One seed (42) per arm, D315 (single seeds; this entry's KIT runs are all one seed); the 3-seed MLP spreads are
+      not a guide for the transformer.
+    outcome: 'Per arm vs scratch: YES (transfers) if the Coulomb family median log10(arm/control) < -0.3 with no family >
+      +0.3 (as the carry-over rule); NO otherwise. Attribution: ft_thr vs ft_r5 Coulomb median < -0.3 -> the threshold coverage
+      is what transfers (the catalog parent''s top-pair pools get the log-beta component next); ft_r5 YES and ft_thr ~ ft_r5
+      -> inputs + physical-mass tops suffice; both NO -> nothing relevant transfers at LO: the next lever is one-loop top
+      pairs at physical mass (gg/q q~ > t t~ virtual near threshold, carries the Coulomb 1/beta), designed then. Cost: generation
+      of 3 tree 2->2 pools (CPU, minutes), r5thr ~1.9 GPU-h (r5 1.81 h), 2 fine-tunes ~1.6 h each at 0.55-0.8 s/step, 2 smokes
+      ~0.2: ~5.5 GPU-h, under 30.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
