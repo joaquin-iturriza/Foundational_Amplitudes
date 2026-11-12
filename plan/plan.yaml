@@ -26707,7 +26707,7 @@ entries:
   step_waits:
     '5': '2026-11-13'
     '10': FA-ccin2p3-e8088a7d FA-ccin2p3-e1c19b4d
-    '11': design-reviewer a9837bbf79a4c200f
+    '11': FA-ccin2p3-8717848b FA-ccin2p3-203a274f FA-ccin2p3-7b891d10 FA-ccin2p3-eb870ad4
   handoff:
     state: '2026-11-12 ~15:45. Step 10 double cut (frames + off-shellness; design PASS) running: tt virtual FA-ccin2p3-e1c19b4d
       COMPLETED (not read), uug FA-ccin2p3-e8088a7d RUNNING; read both with tools/kit_extrap_read.py collect/plot (arm noframesoff,
