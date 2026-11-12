@@ -23127,6 +23127,7 @@ entries:
       zero-shot start, sigma head, output head, refit, own/parent stats, warm start; entry dead ends; site decisions.'
   step_waits:
     '8': the main session's read of the defect hunt (its 'before more arms'); then launched as designed
+    '9': FA-ccin2p3-425ef3b2 FA-ccin2p3-58feec4f
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
