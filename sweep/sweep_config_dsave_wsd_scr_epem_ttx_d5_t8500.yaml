@@ -10,7 +10,7 @@ cluster:
 paths: null
 sweep_name: dsave_wsd_scr_epem_ttx_d5_t8500
 base_config: ${PROJECT_DIR}/runs/data_saving/dsave_parent_heldout_r4
-n_trials: 8
+n_trials: 16
 dyhpo:
   surrogate: gp
   n_candidates: 2000
@@ -22,6 +22,8 @@ dyhpo:
   - 3
   - 3
   - 2
+  - 4
+  - 4
 fidelity_schedule:
   t_steps:
   - 8500
