@@ -29268,6 +29268,30 @@ entries:
       representation question. Bulk worse than ft_thr by > 0.5 decades: the new pools cost the target, reported. If the parent
       itself does not fit the Coulomb rise of its own gg/dd~ pools (secondary measure, its val per beta bin flat), the NO
       is a representation failure inside pretraining, read so.'
+    fix_at: '2026-11-12T14:50:40+00:00'
+    fix: 'Check 5 (prior): the prior omits the transfer ladder''s t t~ threshold star arm (docs/results.tex ~14809-14846:
+      rung 1 + u u~ > t t~ tree AND one loop at sqrt s 363-450 GeV in pretraining, probe e+e- > t t~ one loop near threshold:
+      2-4x better than rung 1 from D=1e3 up, still above scratch at small D). It is the one earlier test of exactly this question
+      (one-loop top-pair virtuals in pretraining, transfer to the ee->tt one-loop near threshold), and the D405 design was
+      already sent back for not naming it (finding 2026-11-12T03:19, item 1). Name it with its numbers, say what differs now
+      (beta to 1e-5 instead of 0.2-0.65, sqrt s to 50 TeV, softpair inputs, KIT hard strata at 1e5 instead of bulk MSE), and
+      write the YES/NO branches in its light (it measured bulk transfer, not the Coulomb strata). Check 7 (D405, ''have the
+      inputs that help''): the arm carries softpair only, while the beta input (model.input_pair_threshold) is the one input
+      with a Coulomb YES on tt virtual (3fc1016a, -0.325) and its fine-tune ft_thrbeta exists; either add the matched pair
+      r5thrloop+beta fine-tune vs ft_thrbeta, or state why the softpair-only pair answers D405''s ''inputs that help''. Check
+      4 (outcome): the branches leave cases unread: Coulomb median <= -0.3 with exponent > -0.44 or scan ratio <= -0.75 (partial
+      Coulomb), and Coulomb or Sudakov worse than ft_thr by > 0.3; say what each of those means for the entry. Check 15 (readout
+      shown written): the secondary measure (the parent''s own val log-MSE on the four new pools per beta / sqrt(s) bin) and
+      the pre-run V/B-vs-beta check on the probe pools name no committed tool or output file; name the tool (or the eval-only
+      command, e.g. a kit_transformer_probe/kit_beta_coverage variant) and show it lists the file on a dry run, since the
+      NO-inside-pretraining branch rests on it. The V/B check should also report per-decade beta coverage of the probe pools
+      after MadLoop (the certification is one setup-level pole check; MG5_aMC fixed order failed its pole checks at beta 1.2e-3..9.7e-3
+      in the threshold scan), so the thr pools are shown to reach 1e-5 with sane V/B before the parent runs. Passed: one change
+      against a matched control (heldoutthrloop recipe = heldoutthr''s 1414 pools unchanged + 4 loop pools, same T 4307, lr
+      8.196e-3, inputs, seed; checked by diffing the two recipes @bc1330bd); measure moved with pretraining content on this
+      fine-tune (ft_thr vs ft_r5 Sudakov -0.35, finding 13:00); seeds per D315 matching sibling cells; HETEROSC via trial
+      1262 base; disk fits (in-memory parent, 4x1.2e4-event pools; /sps/lpnhe 68 G free); time from r5thr''s own run; KIT
+      strata as the question asks.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
