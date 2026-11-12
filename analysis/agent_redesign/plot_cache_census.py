@@ -9,12 +9,12 @@ from collections import defaultdict
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import plot_style as ps  # noqa: E402
 
-NAMES = {"v4": "catalog-v4 pools", "dsh": "MadEvent default-share pools", "pp13v4": "MadEvent pp pools (v4)",
-         "pp13": "MadEvent pp pools (v3)", "kit": "KIT benchmark pools", "other": "leftover build folders",
-         "ee": "old v2/v3 pools", "memmap": "packed training sets", "datasets": "datasets folder (val, test)",
-         "smix": "catalog-v4 mixture pools", "smixq": "flat-quota second set (held coverage)",
+NAMES = {"v4": "catalog 4 pools", "dsh": "MadEvent default-share pools", "pp13v4": "MadEvent pp pools (catalog 4)",
+         "pp13": "MadEvent pp pools (catalog 3)", "kit": "KIT benchmark pools", "other": "leftover build folders",
+         "ee": "older catalog (2 and 3) pools", "memmap": "packed training sets", "datasets": "datasets folder (val, test)",
+         "smix": "catalog 4 mixture pools", "smixq": "flat-quota second set (held coverage)",
          "lhe": "MadEvent pools read by mixtures", "flat": "unshaped pools", "n900000_kit": "KIT benchmark pools",
-         "chunk dirs": "leftover build folders", "other catalog_v4 recipe": "other catalog-v4 recipe"}
+         "chunk dirs": "leftover build folders", "other catalog_v4 recipe": "other catalog 4 recipe"}
 CLASSES = ("open plan entry", "other catalog_v4 recipe", "older recipe only", "no recipe")
 
 
