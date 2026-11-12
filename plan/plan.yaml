@@ -30717,6 +30717,68 @@ entries:
       changed too and must say so. Searched: kit_hpo, KIT sweep/DyHPO, curve_quality, separation, lr_scale, lr 0.0118605,
       scheduler, WSD, tmpl2, batchsize in docs/results.tex, plan show kit_benchmark and pretrain_data_saving, site decisions
       D241 D244 D315 D412 D421-D423.'
+  - at: '2026-11-12T18:30:34+00:00'
+    question: 'Step 14 (Joaquin 2026-11-12 ~19:30: ''I know that log invariants go as inputs, this is not necessarily the
+      same as passing the functional form of the divergence as an input''; D419 full LLoCa): do inputs that carry the functional
+      form of the universal singular limits, fed per particle into the whole transformer (model.input_div_form @6cdec219,
+      wrappers._div_form_inputs: per coloured triple the eikonal log(s s_ik/(s_ij s_jk))/5; per light coloured final pair
+      log P(z)/5 with the flavour''s splitting function, z w.r.t. Q; per heavy pair log(1/beta)/5; per heavy leg log^2(s/m^2)/25),
+      close the hard-region failures the pair logs leave: uug soft and q-g collinear (plain target) and tt virtual Coulomb
+      and Sudakov? Feeds: whether this input goes into the KIT models (and is proposed for catalog pretraining) or the hard-region
+      gap is not an input-form problem.'
+    prior: 'Searched docs/results.tex (eikonal, splitting function, P(z), div_form, divergence form: only analysis text of
+      the catalog surrogates ~8031 and the limit formulas ~15883, no run with these inputs), plan show kit_benchmark, site
+      decisions (D405, D411, D412, D419, D421-D423). Found: (1) degree-2 log-invariant polynomial term on the output (7b891d10
+      uug, eb870ad4 tt; finding @7656e687): PARTIAL, uug deepest coll +1.21/2.24 vs +0.81/17.7, soft +5.00/25.6 vs -8.40/241
+      (exponent -3.20 vs truth -2), tt Coulomb log-MSE 3.55 -> 1.72 FIXED, Sudakov sign flipped +0.77; this design differs:
+      the forms enter as inputs through the whole network, not as a readout added to mu, and they are the limits'' own combinations
+      (eikonal, P(z), 1/beta, log^2), not polynomials in the pair logs. (2) degree-1 term (c4fc1d6f, 6bc05a40, step 13) running,
+      unread. (3) dead end 2026-11-12 09:11: target x eikonal on uug (would over-cancel; the overshoot is input-side) -> this
+      design changes the input, not the target. (4) step 12(iii): tt Sudakov errors grow as m_t/E_t falls below anything trained;
+      separating that from sqrt(s) extrapolation needs an explicit per-leg mass log, which the Sudakov column is. (5) frame
+      boost cap gamma<=4 (95be8db2/88b9334a): not adopted. (6) step 15 (D421/D422): the KIT 1e5 uug controls fail the curve
+      bars at lr 0.0118605; the HPs of this design''s arms and control come from its searches (kit_hpo_uug_plain, kit_hpo_ttvirt_thr).'
+    measure: 'Per arm vs its control, as the passed step-13 design: deepest-bin median signed error (pred - truth, log10|M|^2)
+      and log-MSE by tools/kit_extrap_read.py (new arms divform on uug plain and tt softpairthr): uug coll_y and soft_x 1e-7..1e-6;
+      tt Sudakov 15-50 TeV and Coulomb beta 1e-4..1e-3; fitted exponents per family from kit_result.json (exact soft -2, coll
+      -1, Coulomb -1.02); per family median log10(arm/control log-MSE) by kit_readout --vs on a kit_figures collect; bulk_test
+      log-MSE. The control is scored by tools/kit_predict.py (REREAD of the chosen trial''s run dir) on the same bulk_test
+      and hard_test events. Both sides'' mu-MSE curves (val_mse_curve / train_eval_mse_curve) through curve_quality: an arm
+      whose validation leaves training is reported as such, not read as an effect of the input.'
+    check: 'The deepest-bin measure moved with an input/readout change in the singular logs on existing data: the degree-2
+      log term moved uug deepest soft -8.40 -> +5.00 (log-MSE 241 -> 25.6), coll log-MSE 17.7 -> 2.24, tt Coulomb 3.55 ->
+      1.72, Sudakov -0.53 -> +0.77 (kit_extrap.json @7656e687); Bakar''s MLP with log-threshold inputs reaches Coulomb 2.41
+      where our softpair gets 3.55, so the input form alone moves Coulomb. The features themselves: tests/test_input_reps.py::test_div_form
+      @6cdec219 checks each block against the written formulas, Lorentz invariance to 1e-9, zero beyond the multiplicity,
+      and that the flag off leaves the model unchanged (11 tests pass).'
+    fixed: 'Each arm = its control''s exact config with ++model.input_div_form=true only. Control per setup = step 15''s chosen
+      trial (lowest best val mu-MSE among trials with separation <= 3 and end_up <= 2), its run dir runs/kit_hpo_<setup>/trial_<idx>,
+      config.yaml read before submission. The arm goes through scripts/job_kit.sh A with that trial''s HPs as overrides (training.lr,
+      batchsize, muon_weight_decay, regularization_lambda, cosanneal_warmup_frac, cosanneal_eta_min, ema, ema_decay, scheduler
+      WSD, wsd_cooldown_frac 0.125) on the control''s command: uug kit_ee_uug__me2 100000 8000 A ++model.input_soft_eps=1e-8
+      ++model.input_pair_logs=5 data.target_physics_factor=false data.target_physics_orders=false tag=softpair_plain_divform;
+      tt kit_ee_tt__virt_finite 100000 8000 A ++model.input_soft_eps=1e-8 ++model.input_pair_logs=4 ++model.input_pair_threshold=true
+      tag=softpairthr_divform; float64, HETEROSC mu_mse select + sigma stage, first 1e5 bulk_train, 1e5 val, 8000 steps, seed
+      42, from scratch. Before submission the arm''s resolved config is diffed against the trial''s config.yaml (job_kit.sh
+      dry run): only input_div_form, run_dir/name and the train-split eval subsample may differ, else the arm is relaunched
+      through sweep/run_trial.py''s command instead. D395: the new key runs 50 steps first through every stage (training,
+      sigma, kit_predict scoring, plots) on both setups (tags softpair_plain_divform_smoke, softpairthr_divform_smoke) at
+      WSD, batch 1562, ema on, now, before step 15''s HPs exist. Cost: smokes 2 x 0.2 + uug ~1.7 h + tt ~1.3 h (203a274f 98
+      min, 3fc1016a 75 min training) ~3.4 GPU-h on CC; ~75 MB per run.'
+    control: 'uug: step 15''s chosen trial of kit_hpo_uug_plain (plain target, softpair inputs, same HPs, no div form); tt:
+      chosen trial of kit_hpo_ttvirt_thr (softpairthr). References beside them: the old-HP controls 203a274f / 3fc1016a, the
+      degree-2 and degree-1 log-term arms, Bakar''s MLP (uug soft/coll 0.325/0.108; tt logthr Coulomb 2.41, Sudakov 0.046).'
+    seeds: Seed 42, one run per arm (D315); bands from the MLP family's deepest-bin spread (0.34 uug, 0.22 tt), as in the
+      passed step-13 design.
+    outcome: 'Per setup vs its chosen-trial control. uug: FIXES if deepest coll |signed| <= 0.38 AND deepest soft signed in
+      [-0.46,+0.46], exponents in [-2.5,-1.5] soft / [-1.5,-0.5] coll. tt: Sudakov FIXES if deepest signed in [-0.22,+0.48]
+      with log-MSE <= 0.154; Coulomb FIXES if deepest log-MSE <= 2.41 and exponent <= -0.44. Bulk worse than the control by
+      > 1.5 decades: the inputs cost the bulk, reported as such. YES on all four limits: the divergence-form input goes into
+      the KIT models and is proposed for catalog pretraining. PARTIAL: reported per limit (which column closed which limit);
+      the open limits get the next input form (crossed splitting, relative-boost bound) designed separately. NO EFFECT (deepest
+      log-MSE within 0.34 uug / 0.22 tt of the control and exponents within 0.3 on every limit): the network already reaches
+      these forms from the pair logs, and the hard-region gap is not an input-form problem; this input stops. Either way read
+      only if both curves pass the curve bars; a failing arm is reported with its curves, not scored as an effect.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
