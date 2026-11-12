@@ -23353,6 +23353,21 @@ entries:
       to Joaquin). (d) or (e) FIXES: Muon or HETEROSC is what the fine-tune does not tolerate; fix = that knob for fine-tunes.
       None FIXES on a target: no recipe knob explains the deficit there; the remaining suspect is the parent (pretraining
       set and length: the old parent ran 94k steps at B=16384), designed next.'
+    fix_at: '2026-11-12T03:41:04+00:00'
+    fix: 'Only one item left; everything else in the 03:39 revision passes. (1, 15) Arm (e) as recorded is training.loss=MSE.
+      The owner''s own amendment (message 2026-11-12) shows it changes two things: a 1-channel MSE net cannot strictly load
+      the HETEROSC parent''s 2-channel readout, so the start moves along with the loss. Also, base_experiment.py ~1330 writes
+      val_mse_curve only when self.val_mse is filled (the HETEROSC mu-MSE), so the measure''s field may not exist for a loss=MSE
+      run. Fix: record (e) as training.heterosc_mu_only=true (config/default.yaml:164; experiment.py ~4135: the 2-channel
+      net kept, plain MSE on mu, sigma gets no gradient) on both the fine-tune and the scratch arm, with heterosc_select mu_mse
+      as in the configs, and include it in the smoke''s overrides. With that the revision passes. Checked and holding: tree
+      controls are the head-map runs and the arms launch from the hmap configs, so only the knob differs (the one-loop runs
+      are unmapped, ed7c42c6, confirmed in the smoke log); four cells pooled with n-below and the read without each run''s
+      worst event, FIXES G<=1/3 with n>=3/4 against same-HP pairs 0.46-4.84 per cell (pooled ln-sd ~0.4); the prior now names
+      step 8, par:v3_muon and the head-map runs; inputs and preprocessing are answered or listed as untested; disk 15-35 MB
+      per run against 69 GB free; the measure is the val_mse_curve minimum. Note, not a failure: the 31 GPU-h at wall limits
+      may trip the site gate''s 30 GPU-h per 60 min (it counts limits, as on 2026-11-10); set the item estimate or split the
+      submission across the window.'
   step_waits:
     '8': the main session's read of the defect hunt (its 'before more arms'); then launched as designed
   findings:
