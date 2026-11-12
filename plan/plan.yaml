@@ -27645,6 +27645,8 @@ entries:
     '13': FA-ccin2p3-c4fc1d6f FA-ccin2p3-6bc05a40
     '15': 'detach:kit_hpo_smoke (drive.py, sweep kit_hpo_smoke, D395 smoke of the step-15 searches; on its DONE: read the
       trial''s result json curves, then drive kit_hpo_uug_plain + kit_hpo_ttvirt_thr detached)'
+    '14': step 15's chosen HPs (searches kit_hpo_uug_plain, kit_hpo_ttvirt_thr after the smoke); code model.input_div_form
+      ready @6cdec219
   handoff:
     state: '2026-11-12 ~19:40 @950f6522. Closed at the context limit (main session''s request). READY for the next owner,
       in order: step 15 (curve check of the KIT controls with analysis/data_saving/curve_quality.py''s separation/end_up bars,
