@@ -61,7 +61,7 @@ def plot(path, stem):
     x = 10 ** (0.5 * (EDGES[1:] + EDGES[:-1]))
     fig, ax = ps.figure()
     ax.step(x, np.maximum(h, 0.5), where="mid", color=ps.C.blue, label="top-pair events")
-    ax.axvspan(0.2, 1.0, color=ps.C.grey, alpha=0.2, label="KIT bulk_train")
+    ax.axvspan(0.2, 1.0, color=ps.C.grey, alpha=0.2, label="KIT bulk training")
     ax.axvspan(1e-4, 0.2, color=ps.C.vermillion, alpha=0.15, label="KIT threshold strata")
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlabel(r"top velocity $\beta=\sqrt{1-4m_t^2/m_{t\bar t}^2}$")
