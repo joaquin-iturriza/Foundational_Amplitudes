@@ -24276,34 +24276,28 @@ entries:
     '5': FA-ccin2p3-6f94590d FA-ccin2p3-2d0c78fe
     '6': FA-ccin2p3-6f94590d
   handoff:
-    state: 'Step 5 (KIT package): cause found and fixed. Two effects. (1) Pool-keyed test augmentation: experiment._model_momenta
-      applies keyed_aug''s Lorentz augmentation to the test role keyed on the pool''s identity, so a prediction depended on
-      the other events in the scored file; Lorentz-invariant models unaffected (0), softpair-input models up to 0.30 decades
-      on a 50-event subset (confirmed: whole-file GPU re-run d97ae1c0 reproduces the jobs'' predictions to <=1.2e-8). Fix
-      adf1742b: data.unaugmented_roles, rebuild(event_frame=True), used by kit_predict. All 51 KIT runs re-scored (old scores
-      in <run>/kit_benchmark_poolkeyed), figure files re-collected (b007c8de), compared (tools/kit_rescore_compare.py, figure
-      kit_rescore_old_new.png): only tt virt softpair Sudakov deepest 7.98 -> 6.05 and tt Born softpair <=0.006 decades moved;
-      every reported verdict stands (finding 2026-11-12). (2) ~1e-4 CPU deltas for invariant tt virtual models in two runs
-      without OMP_NUM_THREADS set, absent at 1 and 4 threads and on GPU: unresolved, being tested by the package gate 6f94590d
-      (default threads) and a 32-thread check 2d0c78fe. Package v2 (runs/kit/kit_package_v2, built at b6cf1e61, ttvirt_A_best_threshold
-      = the beta-input arm) building + its 1e-9 gate in 6f94590d; on PASS Joaquin sends it (runs/kit/kit_package_v2.tar.gz);
-      on a gate failure read the per-stratum deltas (CPU vs GPU rounding in the deepest bins ~1e-8 would need the limit stated,
-      not hidden). Step 6 beta input DONE (finding 2026-11-12): tt virtual YES (Coulomb -0.325, Sudakov -0.589, bulk -0.775;
-      deepest Coulomb 7.06 -> 3.55, exponent -0.32), tt Born NO (threshold +3.2); threshold scan ratio at beta 1e-3 -0.962
-      vs control -0.989, band from 0.142 for both. New step 6: Coulomb factor on the target side, design not yet written.
-      Step 3 waits on Joaquin''s GPU-budget go.'
-    decisions: 'Inference reads each event unaugmented (identity frame, the event as given) rather than an event-keyed random
-      frame: smallest change, event-only, and the training augmentation''s boost distribution is centred on it. Old predictions
-      kept beside the new for the comparison. The flag is set only by kit_predict through rebuild(event_frame=True); other
-      rebuild users (steer_pool, cross_eval) and training unchanged. kit_package check --report for diagnostic reads (exit
-      0), the build''s gate keeps the assert. Package v2 instead of deleting v1.'
-    ruled_out: Packaging defect (package and repo HEAD gave identical deltas); code drift since the predictions (whole-file
-      re-run exact); CPU-vs-GPU float64 for the invariant models (exact at 1 and 4 threads).
-    running: FA-ccin2p3-6f94590d (package v2 build + gate), FA-ccin2p3-2d0c78fe (32-thread check)
+    state: 'Joaquin released the entry (D403): understand why our models do not extrapolate into the limits and match Bakar''s
+      simple MLP; his no (D402) covers only the fair NLO D-scan (step 3, drop or keep held per D402). Step 5 package: event-frame
+      fix in (adf1742b), all 51 runs re-scored (verdicts unchanged, finding 2026-11-12), package v2 built at b6cf1e61 but
+      its gate fails (finding 2026-11-12 ''Package v2 gate''): (a) tt Born softpair 5515dc85 still pool-dependent by 0.29
+      decades after the fix, not the augmentation: find what else in the rebuild/scoring depends on the scored pool for that
+      model (compare its build log on a 200-event subset vs the whole file: offshell stats pinning, any test-pool statistic,
+      batch composition; first check whether the ordering/perm or a per-pool statistic differs), fix, re-score that run; (b)
+      CPU thread count >4 changes Lorentz-invariant tt virtual predictions by up to 3.8e-4 deterministically (0 at 1/4 threads
+      and GPU): find the kernel (e.g. torch.set_num_threads sweep on one model, op by op), else pin threads in kit_predict
+      and say so in the README; (c) state the CPU-vs-GPU rounding limit (up to 1.5e-6 in the deepest collinear bin) in the
+      README and the gate. Then rebuild (kit_package_v3) and one gate job. Step 6 beta input DONE (YES for tt virtual, NO
+      for tt Born). Next step 6 (new): Coulomb factor on the target side, needs a design. D403 direction: compare our setup
+      to Bakar''s MLP point by point (inputs: his log inputs; target: his normalisation; training density; loss) on the families
+      where his MLP wins (uug coll 2.21 vs 0.11, tt Coulomb).'
+    decisions: Inference reads each event unaugmented (event frame). Old KIT scores kept in kit_benchmark_poolkeyed. Package
+      not sent while the gate fails for a real cause.
+    ruled_out: Packaging defect; code drift; augmentation as the cause of the Born softpair pool dependence (fix did not change
+      it).
+    running: none
     files: tools/kit_package.py, scripts/job_kit_package.sh, scripts/job_kit_rescore.sh, tools/kit_rescore_compare.py, tools/rebuild_run.py,
-      tools/kit_predict.py, experiment.py (_model_momenta, data.unaugmented_roles), keyed_aug.py, tests/test_mmap_key.py,
-      tools/kit_figures.py, tools/kit_threshold_scan.py, analysis/kit_benchmark/data/kit_fig_*.json, analysis/kit_benchmark/data/kit_threshold_scan.json
-    written: '2026-11-11T23:34:03+00:00'
+      tools/kit_predict.py, experiment.py, keyed_aug.py, tools/kit_figures.py, tools/kit_threshold_scan.py, analysis/kit_benchmark/data/
+    written: '2026-11-12T01:06:16+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
