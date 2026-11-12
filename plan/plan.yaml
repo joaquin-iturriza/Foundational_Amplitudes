@@ -27793,6 +27793,18 @@ entries:
       the design''s branch: boost size not ruled out, the per-frame bound leaves the relative boost free; the next test would
       bound the relative transforms. Not adopted for the KIT models. Caveat: both runs fail the step-15 curve bars (NLL separation
       161 / 376 nats), so this is read at the HP point step 15 is replacing.'
+  - at: '2026-11-12T18:50:48+00:00'
+    text: '2026-11-12 ~20:00 @69e944dc. Steps 15/16 redesigned on Joaquin''s D424-D427. Batch fixed at 16384, no longer searched
+      (D426). Horizon 300 epochs = 300 x 1e5 / 16384 = 1831 steps (D425). Four searches with 32 trials each (D427), 8 start-up
+      then waves of 4: uug plain, tt virtual softpairthr, uug T, uugg T. Configs sweep/sweep_config_kit_hpo_{uug_plain,ttvirt_thr,uug_T,uugg_T}.yaml.
+      Design round 4 PASSED. Cost: per trial uug 0.44 h, uug T 0.43, tt 0.35, uugg 0.48, from the controls'' 8000-step logs
+      (training 98/107/75 min incl. validation, plus ~4 min). 32 x 1.70 = 54 GPU-h, over 30: asked Joaquin (plan ask). Horizon
+      read on the old cosine controls (kit_curves.json NLL): best val step uug 5600-7040, tt 8000, uugg 2080; NLL min by step
+      4000 vs best, uug plain -3.36 vs -5.72 nats, tt -3.80 vs -8.08. Cosine lr is still high at 4000, so this prefix does
+      not say what a 1831-step WSD run reaches; superseded by D425. Reader tools/kit_curves.py sweep now reads drive.py''s
+      sweeps_local results (fbc81659). Step 14: div-form D395 smokes FA-ccin2p3-8c1223c0 (uug) and f45f434a (tt), 50 steps
+      at WSD, batch 16384, ema on. The KIT raw benchmark was already on lxplus. A duplicate copy I made there (kit_hardps/kit_hardps,
+      1.7 GB) was removed. Smoke FA-ccin2p3-f81cb1d0 is still PENDING on CC.'
   step_why:
     5:
       feeds: what KIT receives
