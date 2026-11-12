@@ -24674,6 +24674,29 @@ entries:
       cause not found. (c) Rounding: Born B offon 3.6e-8, uugg softpair 1.5e-6 in the deepest collinear bin (CPU vs GPU).
       Package v2 is built (runs/kit/kit_package_v2.tar.gz) but not to be sent until (a) is fixed and (b) is fixed or pinned
       (OMP_NUM_THREADS in the README) and the limit for (c) stated.'
+  - at: '2026-11-12T01:52:33+00:00'
+    text: 'Package v2 gate failure (a) found and fixed: the tt Born softpair model (FA-ccin2p3-5515dc85) has collinear rotation
+      references in every event of every KIT stratum (norm ~1e-122; probe of lloca''s regularizers on 200 events per stratum),
+      so lloca''s regularize_collinear sets its local frames from eps-sized torch.randn_like noise: the prediction followed
+      the global RNG and the event''s place in the batch (same inputs and weights, one Sudakov event: outputs -1.24..+0.26
+      in standardized units over four RNG states). Other models: tt virtual softpair hits it in some strata (up to 96%), tt
+      Born softpairthr up to 34%, A_ft tt Born offon up to 100%; uug, uugg, tt offon scratch and B never (50 events per stratum).
+      Fix 546dd9c2: rebuild(event_frame=True) replaces the noise of lloca''s lightlike, coplanar and collinear regularizers
+      by a deterministic function of each vector''s bits (tools/rebuild_run.deterministic_frame_noise, tests/test_frame_noise.py:
+      frames independent of the batch and the RNG, orthonormal). kit_predict pins CPU threads to 4 (KIT_THREADS; README),
+      the package check and README state the CPU-GPU rounding limit 2e-6 (largest seen 1.5e-6). All 51 KIT runs re-scored
+      (FA-ccin2p3-cca3ca1b 74403c74 eef4c20a c2d1005f 843447d2, 546dd9c2); tools/kit_rescore_compare.py on the 8 figure files:
+      49 runs unchanged to 3 decimals in every stratum, tt Born softpair <=0.016 decades (threshold deepest 6.97e-9 -> 7.12e-9),
+      tt virtual softpair Sudakov 15-50 TeV 6.05 -> 6.93 (0.059 decades); every verdict and package label stands. Figure baseline:
+      the ''constant at bulk edge'' was the truth clipped to its bulk range, exact wherever the truth stays in range (an oracle;
+      0, hence not drawn, in several panels; why networks seemed to lose to it on tt virtual Sudakov): replaced by a real
+      constant, the bulk_train median log10|M|^2 (3492956e), drawn in every panel; on tt virtual vs sqrt s the scratch models
+      are now at or below it (except 9e5 without off-shell input at 15-50 TeV), on uug collinear our scratch models equal
+      it in the deepest bin. Threshold-scan figure redrawn (two panels + legend strip, markers, the analytic/MadGraph switch
+      labelled). The log beta^2 input (d): built right (equals log(1-4m^2/s)/5 to 4.5e-9 on the KIT events, tools/kit_input_range.py
+      at 0723b848), but bulk_train gives it only [-0.64, -0.008] (beta >= 0.2): the threshold strata need -3.68..-0.64, up
+      to 5x the trained span past its edge, so the Born''s 3-decade loss is the input''s extrapolation, not a construction
+      defect (figure analysis/kit_benchmark/figs/kit_input_range.png).'
   step_why:
     5:
       feeds: what KIT receives
