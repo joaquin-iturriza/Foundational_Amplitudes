@@ -28762,6 +28762,56 @@ entries:
       D2, D90, D364, D374, D400): no double-cut run. Checks 9/11/10: HETEROSC, controls'' preprocessing, KIT bulk_test/hard_test.
       Check 14: ~75 MB/run, memmap off, /sps/lpnhe 69 GB free now. Check 15: rate from the same-setup route arms (1.14-1.38
       h), readout wired (tools/kit_extrap_read.py noframesoff, 90831f05). No sweep (13).'
+  - at: '2026-11-12T14:17:07+00:00'
+    question: 'Joaquin 2026-11-12 ~15:00 (D411 follow-up, step 11d): can a general, process-independent readout of the divergences''
+      functional form fix our transformer''s extrapolation into the KIT limits? Soft, collinear, Coulomb and Sudakov limits
+      are power laws or (double) logs in invariants the pair logs already carry (eikonal factor = linear combination of pair
+      logs; log beta^2 from the threshold column; log(m^2/s) per massive leg). model.input_log_skip=2 adds to mu a readout
+      linear and quadratic in those logs, mu += sum_{i<j} [c1_ij L_ij + c2_ij L_ij^2] + sum_i [b1_i M_i + b2_i M_i^2], whose
+      coefficients come from the particles'' static property encoding only (c_ij = <a_i,a_j>, rank 2; wrappers._log_skip @d14643c6),
+      so it is defined for any process and continues a power law or a double log past the trained range, where the backbone''s
+      response to a log input saturates. Not a target division (the eikonal-target design was a dead end). Feeds: whether
+      the KIT models and catalog pretrainings take the skip (general fix) or the extrapolation stays a frames/inputs question.'
+    prior: 'Searched docs/results.tex (log_skip, linear skip, power-law readout, skip connection: none), plan show kit_benchmark,
+      site decisions (D315, D395, D411, D412, D415). Found: (1) one-input scans (finding 2026-11-12 ~11:40): the control''s
+      readout moves -0.02..-0.15 for the most collinear pair log pushed 1..8 decades and flattens after ~4 decades, against
+      +1.38 in the truth''s direction needed; the tt log sqrt(s) column scan flattens past 1.5 decades. (2) Bakar''s ReLU
+      MLP on the same log invariants gets exponents -2.12/-0.93 (uug soft/coll), our reruns -1.97/-0.95, and our transformer
+      control -1.95/-1.34 (kit_bakar_figs.json @d14643c6). (3) Route cuts (frames) fix uug collinear and tt Sudakov but cost
+      uug soft and tt threshold; nothing so far moved the tt Coulomb rise but the V x beta target (diagnostic only). (4) dead
+      end 2026-11-12 09:11: eikonal factor as a target division over-cancels. No run has a linear/quadratic readout of the
+      logs.'
+    measure: 'Per process, deepest-bin median signed error (pred - truth, log10|M|^2) and log-MSE by tools/kit_extrap_read.py
+      (arm logskip wired before the read): uug coll_y and soft_x 1e-7..1e-6; tt virtual Sudakov 15-50 TeV and threshold beta
+      1e-4..1e-3; fitted exponents per family from kit_result.json (KIT evaluate.py). Secondary: per family median log10(arm/control
+      log-MSE) (tools/kit_readout.py --vs), bulk log-MSE; the slide-5/6/8 figures of tools/kit_bakar_figs.py with the arm
+      added.'
+    check: 'The measure moves with the tested change: the readout''s continuation of a log input is what the existing scans
+      show failing (control flat within ~4 decades, -0.13 at k=5 vs the +1.38 needed; tt flat past 1.5 decades), and the skip''s
+      output is exactly linear + quadratic in each log by construction (tests/test_input_reps.py::test_log_skip: explicit
+      pair-by-pair sum, both threshold modes, Lorentz invariant to 1e-7, changes the output). On existing data a linearly
+      continuing readout of the same logs (Bakar''s MLP, our reruns) gives exponents -1.97/-0.95 vs the control''s -1.95/-1.34,
+      so the quantity responds to how the logs are read.'
+    fixed: 'job_kit.sh A from scratch, first 1e5 bulk_train events, 8000 steps, seed 42, lr 1.18605e-2, batch 16384, HETEROSC
+      with mu_mse selection and the sigma stage, float64, base trial 1262 config, the controls'' input flags (uug ++model.input_soft_eps=1e-8
+      ++model.input_pair_logs=5; tt ++model.input_soft_eps=1e-8 ++model.input_pair_logs=4 ++model.input_pair_threshold=true)
+      plus ++model.input_log_skip=2. D395: the new model path first runs once for 50 steps through every stage on uug (smoke,
+      tag softpair_logskip_smoke), then the two runs: site submit ccin2p3 FA scripts/job_kit.sh --item kit_benchmark --hdr=--time=02:30:00
+      -- kit_ee_uug__me2 100000 8000 A <uug flags> ++model.input_log_skip=2 tag=softpair_logskip; -- kit_ee_tt__virt_finite
+      100000 8000 A <tt flags> ++model.input_log_skip=2 tag=softpairthr_logskip. Cost: 2 x ~1.4 h (route arms 1.14-1.38 h)
+      + smoke ~0.1 h = ~3 GPU-h; ~75 MB per run.'
+    control: 'uug: softpair c15b3337 (coll +1.36, soft -0.28; exponents -1.95/-1.34); tt virtual: softpairthr 3fc1016a (Sudakov
+      -0.53, log-MSE 0.72; Coulomb deepest log-MSE 3.55, exponent -0.32). References: Bakar''s MLP (his evaluate.py files:
+      uug 0.325/0.108, tt logthr Coulomb 2.41, Sudakov 0.046) and our reruns (seeds 0-2), the frames-cut arms a2cba8d7/011d6333.'
+    seeds: Seed 42, one run per process (D315); bands from the MLP family's deepest-bin spread (0.34 uug, 0.22 tt) as in the
+      passed route design.
+    outcome: 'uug: FIXES if deepest coll signed <= +0.30 AND deepest soft signed >= -0.46; NO EFFECT if coll >= +1.02. tt:
+      Sudakov FIXES if signed in [-0.22,+0.48] with log-MSE <= 0.154; Coulomb FIXES if deepest log-MSE <= 2.41 (Bakar''s logthr
+      MLP) and the fitted exponent <= -0.44; NO EFFECT if Coulomb log-MSE >= 3.0 and Sudakov log-MSE >= 0.5. Bulk worse than
+      control by > 1.5 decades: the skip fights the backbone, not resolving. YES on both processes (coll + soft + Sudakov
+      fixed, Coulomb at or below his MLP): the skip is the general fix; it goes into the KIT A/A_ft/B models and is proposed
+      for catalog pretraining. Partial (some limits fixed): reported per limit; combined with the frames cut as the next arm.
+      NO: the backbone, not the readout, sets the extrapolation; the frames/inputs route stays the answer.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
