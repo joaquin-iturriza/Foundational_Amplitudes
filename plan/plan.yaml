@@ -23541,6 +23541,12 @@ entries:
     units: optrec_pidqn_*
     start: '2026-11-12T00:30:50+00:00'
     at: '2026-11-12T00:30:50+00:00'
+  - batch: muon_long
+    wall_h: 20.3
+    jobs: 1
+    units: optrec_adamw_x16
+    start: '2026-11-12T00:30:53+00:00'
+    at: '2026-11-12T00:30:53+00:00'
   step_waits:
     '2': '2026-11-13'
     '1': the design reviewer (af9efea1918f58f93)
