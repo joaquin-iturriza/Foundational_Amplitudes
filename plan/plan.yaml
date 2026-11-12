@@ -24175,10 +24175,7 @@ entries:
     at: '2026-11-12T00:30:53+00:00'
   step_waits:
     '2': '2026-11-13'
-    '1': 'the training-pool regeneration zz_redesign_regen_pp4 (slurm 63537119, agent_redesign) to end and room on /sps/lpnhe
-      for the 21 GB memmap cache of catalog_v4_default25 (16 GB free; our stale 21 GB key f3bedd61 to delete, deletion refused
-      by the permission classifier): then CPU prebuild (job_catalog_v3_short_prebuild.sh v4_het_default25 LONG_HEADS=8 LONG_FACTOR=1
-      LONG_MEMMAP=true) and the arms afterok on it; arms PIDQN=pid|qn as designed'
+    '1': FA-ccin2p3-fcbbd1bd FA-ccin2p3-2e611342
     '3': 'the training-pool regeneration zz_redesign_regen_pp4 (slurm 63537119, agent_redesign) to end and room on /sps/lpnhe
       for the 21 GB memmap cache of catalog_v4_default25 (16 GB free; our stale 21 GB key f3bedd61 to delete, deletion refused
       by the permission classifier): then CPU prebuild (job_catalog_v3_short_prebuild.sh v4_het_default25 LONG_HEADS=8 LONG_FACTOR=1
