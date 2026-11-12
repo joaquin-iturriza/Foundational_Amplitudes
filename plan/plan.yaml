@@ -28407,6 +28407,52 @@ entries:
       met (~9.6 GPU-h, short), HETEROSC, KIT hard_test/bulk_test strata as the controls, target/preprocessing the controls'',
       only the flag moves. Check 14/15: ~75 MB x 6 vs 70 GB free on /sps/lpnhe; rate 0.68 s/step from the control itself,
       2:30 limit. Note: tag/arm names must not collide with the older kit_fig_A_nooffshell.json (no-pair-logs arm).'
+  - at: '2026-11-12T13:07:21+00:00'
+    question: 'D411 step 10: the one-route cuts showed the learned attention frames carry the extrapolation failure (frames
+      cut: uug deepest collinear +1.36 -> -0.25, tt virtual deepest Sudakov -0.53 -> +0.06) but cost the uug soft limit (deepest
+      soft x 1e-7..1e-6 signed -0.28 -> -0.93), while the off-shellness cut alone gained the soft limit (-0.28 -> -0.04) and
+      fixed nothing else. With BOTH cuts (model.input_route_off=frames + data.offshell_zero, local momenta kept): does the
+      collinear/Sudakov fix stay AND the soft limit come back? Feeds: which input set the KIT A/A_ft/B models and the uugg
+      A run use (rest of step 10) and what the KIT package (step 5) ships.'
+    prior: 'Searched docs/results.tex (route_off, noframes, double cut, both cuts, frames and off), plan show kit_benchmark,
+      site decisions (D315, D395, D411, D412). Found: (1) one-route cuts (this entry, design PASS 2026-11-12T10:53, finding
+      12:57): noframes a2cba8d7 uug coll -0.25 / soft -0.93, tt 011d6333 Sudakov +0.06 (log-MSE 0.154), tt threshold +0.47,
+      bulk +0.34 decades; nooffshell 0262bec5 uug coll +1.98 / soft -0.04, bulk +1.00; tt 13266d91 Sudakov -0.69; nolocal
+      NO on both. (2) inputs-only arms (all three cut) dc799c8e uug coll -0.05 / soft -1.08, 4a1cb4a2 tt Sudakov -0.13 (log-MSE
+      0.026). No run cuts frames and off-shellness together while keeping the local momenta; results.tex has none. Differs:
+      two flags at once, local momenta kept (the all-cut minus the local cut).'
+    measure: 'Per process, deepest-bin median signed error (pred - truth, log10|M|^2) by tools/kit_extrap_read.py (arm noframesoff
+      wired before the read): uug coll_y 1e-7..1e-6 AND soft_x 1e-7..1e-6; tt virtual Sudakov 15-50 TeV with its log-MSE.
+      Secondary: per family median log10(arm/control log-MSE) by tools/kit_readout.py --vs on a kit_figures collect (uug soft,
+      collinear; tt Coulomb, Sudakov), bulk log-MSE. Figure kit_extrap_double_<proc>_{a,b}.png: control, frames cut, off-shellness
+      cut, both, MLP.'
+    check: 'On existing data each flag alone moved exactly the quantities read here (kit_extrap.json @HEAD): frames cut moved
+      uug deepest collinear +1.36 -> -0.25 and soft -0.28 -> -0.93, tt Sudakov -0.53 -> +0.06; off-shellness cut moved uug
+      soft -0.28 -> -0.04 (collinear +1.98, tt Sudakov -0.69). The two flags act on different places (input_route_off=frames
+      swaps IdentityFrames into the attention, models/lloca.py ~265; data.offshell_zero holds the off-shellness columns at
+      0 in experiment.py:2270), both ran end to end through job_kit.sh A with every stage (sigma fit, kit_predict scoring,
+      plots) in a2cba8d7/011d6333 and 0262bec5/13266d91, so the combination is no new launch path (D395 smoke not needed).'
+    fixed: 'job_kit.sh A from scratch, first 1e5 bulk_train events, 8000 steps, seed 42, lr 1.18605e-2, batch 16384, HETEROSC
+      with mu_mse selection and the sigma stage, float64, base trial 1262 config, the controls'' input flags (uug ++model.input_soft_eps=1e-8
+      ++model.input_pair_logs=5; tt ++model.input_soft_eps=1e-8 ++model.input_pair_logs=4 ++model.input_pair_threshold=true),
+      plus ++model.input_route_off=frames ++data.offshell_zero=true. Two runs: site submit ccin2p3 FA scripts/job_kit.sh --item
+      kit_benchmark --hdr=--time=02:30:00 -- kit_ee_uug__me2 100000 8000 A <uug flags> <both flags> tag=softpair_noframesoff;
+      -- kit_ee_tt__virt_finite 100000 8000 A <tt flags> <both flags> tag=softpairthr_noframesoff. Cost: the one-route arms
+      ran 1.14 h (011d6333) and 1.38 h (a2cba8d7) wall incl. stages -> ~2.8 GPU-h, ~75 MB per run.'
+    control: 'uug: softpair c15b3337 (coll +1.36, soft -0.28) and its one-route arms noframes a2cba8d7, nooffshell 0262bec5;
+      tt virtual: softpairthr 3fc1016a (Sudakov -0.53, log-MSE 0.72) and noframes 011d6333, nooffshell 13266d91. Inputs-only
+      arms dc799c8e / 4a1cb4a2 (all three cut) as the other end; Bakar''s MLP seeds 0-2 as reference.'
+    seeds: Seed 42, one run per process (D315). Bands from the MLP family's deepest-bin spread (0.34 uug, 0.22 tt), as in
+      the passed route design; the transformer's KIT seed spread unmeasured (D315), catalog single-process spread (results.tex
+      ~13232-13245) quoted beside.
+    outcome: 'uug collinear KEPT if deepest coll signed <= +0.30, LOST if >= +1.02. uug soft RECOVERED if deepest soft signed
+      >= -0.46 (Bakar''s MLP seeds'' lower end), NOT if <= -0.59 (the frames-only -0.93 plus the 0.34 MLP spread); between
+      partial. tt Sudakov KEPT if signed in [-0.22,+0.48] with log-MSE <= 0.154 (frames-only''s), LOST if log-MSE >= 0.33
+      and signed within 0.34 of -0.53. Bulk worse than control by > 1.5 decades: underfit, not resolving. Reading: KEPT on
+      both and RECOVERED: the KIT models take both cuts (frames + off-shellness off). KEPT but NOT recovered: the soft loss
+      comes with the frames cut whatever off-shellness does; the KIT models take the frames cut alone (cheaper bulk: noframes
+      bulk +0.34 vs off-shellness +1.0) and the soft limit is reported as its cost. LOST on either: the two cuts interact;
+      the KIT models take the frames cut alone and the interaction is reported.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
