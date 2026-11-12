@@ -730,15 +730,24 @@ def _run_task(q, t):
 
 
 def _assemble_pending(D, q):
-    """Processes whose parts are all there and nobody assembled (an assembler that died, or a lock that was held)."""
+    """Processes whose parts are all there and nobody assembled (an assembler that died, or a lock that was held), or
+    whose assembled pools are gone from disk (2026-11-11: pools deleted, parts kept): that marker is moved to
+    Q/assembled_superseded/<process>.<time> (never deleted) so the process is assembled again from its parts."""
     out = []
     for sf in glob.glob(os.path.join(D["specs"], "*.json")):
         name = os.path.basename(sf)[:-5]
-        if os.path.exists(os.path.join(D["assembled"], name)):
-            continue
+        marker = os.path.join(D["assembled"], name)
         try:
-            if all(os.path.exists(p) for p, _ in mg.lhe_part_paths(name, _spec(D, name))):
-                out.append(name)
+            if not all(os.path.exists(p) for p, _ in mg.lhe_part_paths(name, _spec(D, name))):
+                continue
+            if os.path.exists(marker):
+                pools = [x for x in open(marker).read().split() if x]
+                if not pools or all(os.path.exists(x) for x in pools):
+                    continue
+                sup = os.path.join(q, "assembled_superseded")
+                os.makedirs(sup, exist_ok=True)
+                os.rename(marker, os.path.join(sup, f"{name}.{time.strftime('%Y%m%dT%H%M%S')}"))
+            out.append(name)
         except Exception:
             continue
     return out

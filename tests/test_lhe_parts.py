@@ -1401,6 +1401,34 @@ def test_unplan_keeps_claimed():
         assert os.listdir(os.path.join(moved, "specs")) == ["dsh_eea_b.json"]
 
 
+def test_assemble_pending_pools_gone():
+    """2026-11-12: a process assembled once whose pools were deleted (parts kept) is assembled again: its marker moved to
+    assembled_superseded/, never deleted; a marker whose pools exist, or whose parts are gone, stays."""
+    saved = (mg.lhe_part_paths, lhe_parts._spec)
+    with tempfile.TemporaryDirectory() as q:
+        D = {k: os.path.join(q, k) for k in ("specs", "assembled")}
+        for x in D.values():
+            os.makedirs(x)
+        parts = {n: os.path.join(q, f"{n}.part") for n in ("gone", "kept", "noparts", "fresh")}
+        pools = {n: os.path.join(q, f"{n}.npy") for n in parts}
+        for n in parts:
+            open(os.path.join(D["specs"], n + ".json"), "w").write("{}")
+            if n != "noparts":
+                open(parts[n], "w").close()
+            if n != "fresh":
+                open(os.path.join(D["assembled"], n), "w").write(pools[n] + "\n")
+        open(pools["kept"], "w").close()
+        mg.lhe_part_paths = lambda name, items: [(parts[name], None)]
+        lhe_parts._spec = lambda D_, name: None
+        try:
+            assert sorted(lhe_parts._assemble_pending(D, q)) == ["fresh", "gone"]
+        finally:
+            mg.lhe_part_paths, lhe_parts._spec = saved
+        assert sorted(os.listdir(D["assembled"])) == ["kept", "noparts"]
+        assert [f.split(".")[0] for f in os.listdir(os.path.join(q, "assembled_superseded"))] == ["gone"]
+    print("[assemble pending, pools gone] ok")
+
+
 if __name__ == "__main__":
     test_runs_and_identity()
     test_parts_equal_serial()
@@ -1419,3 +1447,4 @@ if __name__ == "__main__":
     test_kept_by_energy_and_sizing()
     test_failed_builds_and_workdirs()
     test_gc_parts()
+    test_assemble_pending_pools_gone()
