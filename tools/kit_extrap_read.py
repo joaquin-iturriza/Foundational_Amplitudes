@@ -34,12 +34,15 @@ ARMS = {"rezero": {"ee_uug_me2": "kit_A_ee_uug_me2_n100000_t8000_softpair_rezero
         # (input_route_off=frames), off-shellness (data.offshell_zero)
         **{a: {"ee_uug_me2": f"kit_A_ee_uug_me2_n100000_t8000_softpair_{a}",
                "ee_tt_virt_finite": f"kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr_{a}"}
-           for a in ("nolocal", "noframes", "nooffshell")}}
+           for a in ("nolocal", "noframes", "nooffshell", "noframesoff")}}
 # figure sets: kit_extrap_<proc> (the earlier arms) and kit_extrap_route_<proc> (the one-route cuts)
 SETS = {"": (("rezero", "D-", "orange", "ReZero"), ("thr", "v-", "purple", r"$\beta$ input"),
              ("scalars", "P-", "sky", "transformer, MLP inputs")),
         "route_": (("scalars", "P-", "sky", "all cut"), ("nolocal", "D-", "orange", "no local momenta"),
-                   ("noframes", "v-", "purple", "no attention frames"), ("nooffshell", "X-", "grey", "no off-shellness"))}
+                   ("noframes", "v-", "purple", "no attention frames"), ("nooffshell", "X-", "grey", "no off-shellness")),
+        # step 10: the frames cut and the off-shellness cut together (local momenta kept)
+        "double_": (("noframes", "v-", "purple", "no frames"), ("nooffshell", "X-", "grey", "no off-shellness"),
+                    ("noframesoff", "D-", "orange", "neither"))}
 
 SITE = r'''
 import glob, json, os, sys
@@ -90,7 +93,7 @@ def plot(path, figs):
     from tools.kit_figures import family, edges, XLAB, PROC
     d = json.load(open(path))
     for (proc, e), (fs, arms) in ((pe, st) for pe in d.items() for st in SETS.items()):
-        if fs and not any(f"transformer_{a}" in e for a, *_ in arms[1:]):
+        if fs and f"transformer_{arms[-1][0]}" not in e:   # a set is drawn once its last arm has run
             continue
         panels = ps.panels(len(FAMS[proc]))
         for (fig, ax), fam in zip(panels, FAMS[proc]):
