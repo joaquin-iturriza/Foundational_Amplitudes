@@ -24331,6 +24331,33 @@ entries:
       In every case the curve-quality numbers (well trials per search, failing bars of each best trial) are stated beside
       S; a fine-tune whose minimum sits in the first checkpoints (memorising, as t t~ V/B D=316) is named. If the mu-only
       test reads A (all WELL) on u u~ V, a rerun of this target with mu-only goes to Joaquin as a question, not run.'
+    fix_at: '2026-11-12T14:42:56+00:00'
+    fix: '(1) Measure cannot reach the level on the test read (checks 2 and 4). The outcome needs the S band above 1 on val_ln
+      AND on test at MSE = 1e-4, but the test read for one-loop targets is MSE(V/B) in linear units (stage2_readout.py line
+      6, D371). For b b~ > Z Z, ln(V/B) has median 3.39 (V/B about 30; vb_spread.json), so MSE(V/B) is about 900 x MSE(ln).
+      The stage-1 scratch test MSE(V/B) goes 4.8 -> 2.9e-3 and is flat from D=1e4 (3.4e-3 at 3.2e4; finding 2026-11-11 02:48).
+      That is 30x above 1e-4. On that read, stage2_readout.py''s D373 fallback sets the level at the scratch floor, where
+      D*_scr runs to infinity (as on u u~ V: upper edge unbounded). The check only shows the val_ln crossing (calibration
+      1.7e-4 at D=1e3, 4.5e-6 at D=3162). Fix: before the run, state the test read''s level under D373 (Joaquin: ''read off
+      any other arbitrary performance value''). Either test MSE(ln(V/B)) at 1e-4, already computed as test_ln, or test MSE(V/B)
+      at a level both arms cross mid-grid on the stage-1 curve (around 1e-2; show the D where scratch crosses it). Then reword
+      SAVING / ONE READ / NO SAVING for those levels. (2) Prior omits work on this exact target (check 5). Joaquin, 2026-11-11
+      02:57 on the entry: ''bbbar->ZZ flattening from D=1e4 needs more optimization; check it is not compute-limited'' (best
+      steps 1440-4000 of 8000-12000 at k>=7). The design runs D=1e4 at T=8500 under the same template with no word on that
+      flattening. The calibration is also non-monotonic: 4.5e-6 at D=3162 but 1.16e-5 at D=1e4. Fix: name that finding and
+      Joaquin''s words in prior, and say whether the top cells (D=3162, 1e4) can be read on the fit, or why the flattening
+      does not reach the crossing. (3) Outcome has no branch for arms that are not well trained (check 4). Next 3 and D414
+      (''Still the optimization issues should be fully fixed'') ask for both arms well trained by curve_quality.py. On the
+      existing template, 0-6% of trials pass (u u~ V 4/62 and 2/63, t t~ V/B 0/63 and 1/64), and Joaquin rejected today''s
+      figure of badly trained arms. As written, SAVING sends the figure to the draft whatever the curve quality. Fix: say
+      what happens when S resolves but neither arm''s best trials are well trained: figure with the counts as a stated caveat,
+      or the optimization fix first. (4) Minor, not blocking: stage2_readout.py TARGETS (line 39) and dstar_fit.py (line 92)
+      do not list bbx_zz_nlo; extend them before the read. Checks that hold: one change (scratch vs fine-tune configs differ
+      only in the parent, target_stats/offshell_stats own, and the lr_scale/layer_decay space in place of the lr window; T
+      matched per D); 8 trials in waves 3,3,2 with the template''s coupled space, as the sibling ee_ttbar_nlo searches; one
+      seed per D315; HETEROSC + sigma stage; V/B with physics factors off as t t~ V/B; b b~ > Z Z one-loop is in neither parent
+      recipe, its Born v4_bbx_zz is in trees-in; 21.3 GPU-h under D412''s 30; disk ~3 GB against 68 GB free on /sps/lpnhe
+      (df now); step rates are from the same-D calibration runs at the same batch rule.'
   step_waits:
     '2': the detached driver muonly_mse_test (6 searches dsave_muonlymse_{scr,ft}_{epem_ttx_d7,ee_uu_nlo_d7,ee_uu_nlo_d8}_t8500,
       CC, 48 trials)
