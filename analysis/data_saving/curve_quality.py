@@ -8,9 +8,11 @@ after the warm-up (checks past warmup_frac of the run):
            well >= 2/3 (the fall is not left to the cosine tail)
   spike    largest v_i / min(v_0..v_{i-1}); well <= 3
   jitter   median |ln(v_i / v_{i-1})|; well <= ln 2 (consecutive checks within 2x)
-  gap      over the second half: train's fall over val's fall, (t_mid / t_end) / (runmin_mid / runmin_end);
-           well <= 10 (no val/train gap opening while val is flat)
-Well optimized = all four. Shown beside the trial's peak lr (lr x lr_scale), warm-up, batch size and horizon.
+  gap      train's fall while val is flat: from the first check i* whose running minimum is within 1.5x of the final
+           minimum to the end, t_{i*} / t_end; well <= 10 (no val/train gap opening while val is flat)
+Well optimized = all four. The bars judge the shape only: a clean curve at a worse minimum is not better, so every
+comparison reads the validation minimum beside them. steady fails both for a noise floor at a high lr (spiking, the
+fall left to the tail) and for under-training at a low lr (clean, still falling at the end): read it with spike/jitter. Shown beside the trial's peak lr (lr x lr_scale), warm-up, batch size and horizon.
 
     python analysis/data_saving/curve_quality.py      # reads the cached curves (trial_overfit.json, s4_readout_rows.json)
 """
@@ -32,15 +34,14 @@ def quality(v, t, warmup_frac):
     n = len(v)
     w = min(n - 2, int(np.ceil(warmup_frac * n)))          # first check past the warm-up
     run = np.minimum.accumulate(v)
-    fall = np.log(v[0] / run[-1])
     fall = np.log(run[w] / run[-1])                      # the fall after the warm-up
     q = {"steady": float(np.log(run[w] / run[int(0.75 * (n - 1))]) / fall) if fall > 0 else 0.0,
          "spike": float(max(v[i] / run[i - 1] for i in range(max(w, 1), n))),
          "jitter": float(np.median(np.abs(np.diff(np.log(v[w:]))))),
          "gap": None}
     if t and len(t) == n and min(t) > 0:
-        m = n // 2
-        q["gap"] = float((t[m] / t[-1]) / (run[m] / run[-1]))
+        i = int(np.argmax(run <= 1.5 * run[-1]))
+        q["gap"] = float(t[i] / t[-1])
     q["well"] = bool(q["steady"] >= BAR["steady"] and q["spike"] <= BAR["spike"] and q["jitter"] <= BAR["jitter"]
                      and (q["gap"] is None or q["gap"] <= BAR["gap"]))
     return q
@@ -88,8 +89,33 @@ def main():
         out["trials"].append({k: r.get(k) for k in ("sweep", "run_dir", "stage", "arm", "target", "D", "T", "batch",
                                                      "peak_lr", "best", "steady", "spike", "jitter", "gap", "well")}
                              | {"warmup_frac": r["hp"]["warmup_frac"], "ema": r["hp"]["ema"]})
+    out["suspects"] = suspects()
+    out["positive"] = [{k: r.get(k) for k in ("run_dir", "target", "arm", "D", "peak_lr", "steady", "spike", "jitter",
+                                              "gap")} for r in rows if r["well"]]
+    print(f"positive controls (well by all four): {len(out['positive'])}, e.g. "
+          + "; ".join(f"{p['run_dir']} steady {p['steady']:.2f} spike {p['spike']:.1f} jitter {p['jitter']:.2f} "
+                      f"gap {p['gap']:.1f}" for p in out["positive"][:3]))
     json.dump(out, open(os.path.join(DATA, "curve_quality.json"), "w"), indent=1)
     figure(rows)
+
+
+def suspects():
+    """The one-change lr runs of the suspects batch (x1/3, x1/10 at the fine-tune best's other HPs, old template) and
+    their controls, read by the same bars, with each run's validation minimum in ln units beside."""
+    read = json.load(open(os.path.join(DATA, "suspects_runs_read.json")))
+    meta = {m["run_dir"]: m for m in json.load(open(os.path.join(DATA, "suspects_runs.json")))}
+    out = []
+    for d, r in sorted(read.items()):
+        note = meta.get(d, {}).get("note", "control")
+        if "epem_ttx" not in d or not r.get("val_mse_curve") or not ("lr" in note or note == "control"):
+            continue
+        wf = float(meta.get(d, {}).get("hp", {}).get("training.cosanneal_warmup_frac", 0.15))
+        q = quality(r["val_mse_curve"], r.get("train_eval_mse_curve"), wf)
+        q.update(run_dir=d, note=note, val_min_ln=min(r["val_mse_curve"]) * r["prepd_std"] ** 2)
+        out.append(q)
+        print(f"  {note[:40]:40s} {d[-40:]:40s} min {q['val_min_ln']:.2e} steady {q['steady']:.2f} "
+              f"spike {q['spike']:.1f} jitter {q['jitter']:.2f} gap {q['gap'] or 0:.1f} well {q['well']}")
+    return out
 
 
 def figure(rows):
