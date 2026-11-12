@@ -24608,7 +24608,7 @@ entries:
   step_waits:
     '2': step 3's AdamW long run (designed after its read, per the hand-off)
     '1': FA-ccin2p3-1805e04b FA-ccin2p3-65103811
-    '3': detach:optrec_gpuh_window2 (timer to ~06:06, then submit the AdamW twin under the 30 GPU-h-per-60-min gate)
+    '3': FA-ccin2p3-f08e90e8
   handoff:
     state: 'Design of 2026-11-12 PASSED (design-reviewer, second look) for two parts. (B) pidqn: one-hot PIDs vs quantum numbers
       on the 1x width-8 cell v4_het_default25 (scripts/job_catalog_v3_short.sh, env PIDQN=pid|qn LONG_HEADS=8 LONG_FACTOR=1
