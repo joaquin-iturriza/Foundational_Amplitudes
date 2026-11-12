@@ -25377,6 +25377,20 @@ entries:
       --test adamw; 16 trials ~4.5 GPU-h. Design to be recorded and reviewed after the b b~ > Z Z LO searches are out (a new
       design replaces the LO one as the entry''s latest). Diagnostic only: Muon for fine-tunes is Joaquin''s D155/D158; any
       change of optimizer goes to him.'
+  - at: '2026-11-12T15:57:31+00:00'
+    text: '2026-11-12 17:00 CET: b b~ > Z Z LO calibration read (horizons.py --ladder --tag cal_lo, analysis/data_saving/data/horizons_cal_lo_ladder.json
+      @b7f17788): best val MSE(ln|M|^2) at k=2..8 (D=10..1e4) 3.2e-1, 1.9e-2, 1.3e-3, 4.0e-4, 5.0e-6, 1.2e-4, 1.6e-6; T(D)
+      by D391 = 2240, 4960, 4960, 7840, 8500, 8500, 8500 (k=7 worse than k=6: one seed, fixed lr; T capped either way). 14
+      configs sweep/sweep_config_dsave_s2_{scr,ft}_bbx_zz_d{2..8}_t*.yaml @b7f17788, 28.9 GPU-h by the generator (design said
+      ~21 at V/B rates; LO horizons are longer). Scratch searches out as detach bbx_zz_lo_scr (drive.py, CC, target 1.5 h,
+      56 trials, ~14.5 GPU-h); fine-tunes when the parent FA-ccin2p3-0d698e4b ends (~17:35). Repo-reviewer FIX then PASS (c5b88bd9):
+      datagen wrote the Born identity record before the .recipe.json it reads (0e5a650b''s fix could not work on a new pool;
+      moved after; tests/test_finalize_born_record.py fails on the old order, passes now); plot_stage2 labelled the crossing
+      level 1e-4 whatever the fit''s level (now the fit''s own). Born records in the CC cache (tools/born_record.py over all
+      110 sidecars): 17 match, 83 have no record, 4 stale (bbx_gg_nlo, bg_ab_nlo, dg_uwm_nlo, udx_ccxwp_nlo: pool, sidecar,
+      recipe 11-12 02:44, record 11-10) rewritten; 6 loop-induced *_loop pools have non-positive Born sidecars (no Born, never
+      a V/B target). Step 5 done: muonly_curves_epem_{a,b} redrawn (864873c6): the legend sat over the process label and OCR
+      read ''val3162''; legend moved to the lower left.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
