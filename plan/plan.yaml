@@ -16820,6 +16820,47 @@ entries:
       are not comparable and that the reads must all be redone. Disk is fine: /sps/lpnhe 52.9 GB free now (df 2026-11-12),
       ~17 GB to write (val pools 1.66 GB at 1e4 x 10; H3 1e4 batch dropped free by 0.6 GB for 280 pools), floor max(3% of
       512 GiB, 15 GB) = 16.5 GB, leaves ~36 GB.'
+  - at: '2026-11-12T01:35:29+00:00'
+    question: 'Restore on CC the catalog pools deleted 2026-11-11 that held-out reads need (zero_shot_parent reads each probe''s
+      train split for its own target statistics; optimizations_recap''s runs and any study on these pools): (A) the 700 catalog_v4
+      held-out train pools (H1 62, H2 218, H2p5 38, H3 278 [1e4 copies only], H5 28 one-loop, H6 8, H7E 34, H7c 34); (B) catalog_v4_dsh_eea''s
+      115 train pools, re-assembled from their kept lhe_parts (115/115 processes have all parts, 3.06 GB); (C) the 504 PP4
+      train pools (recipes/catalog_v4_pp_test.yaml): 494 series-built (recipes/catalog_v4_pp4_restore.yaml @0b4bbd63) and
+      the one-run part-job processes of recipes/catalog_v4_pp_parts.yaml (queue zz_redesign_pp4_parts, planned: 12 processes,
+      199 runs + 11 gridpacks). No training. HD4/HD5 train/val were never pools (n=0), a false report fixed in check_site_data
+      79644e86.'
+    prior: 'pretrain_data_saving''s H3 1e4 prebuild 2026-11-11 (FA-ccin2p3-4f0e577e: 70 pools in 61 s per shard); catalog_v4_g12_regen
+      2026-11-07 (32 shards, 379-389 s each, 1301 tree pools at 1e5, FA-ccin2p3-7c4df684); fa-generation ''Regenerating catalog_v4'';
+      par:v4_regen_time (MadEvent 898 core-h for 3448 pools). Design-reviewer FIX 2026-11-12 (one-loop time not backed; same
+      sampling as the deleted pools not shown): answered in measure/check/fixed below.'
+    measure: '(1) check_site_data --list on CC over catalog_v4_heldout_{H1..H7c}, catalog_v4_pp_test, catalog_v4_eea_lhe:
+      pools not prebuilt, now 700 + 504 + 115 train; after: 0. (2) Sampling of the rebuilt train pools equals the val pools
+      the reads score: per pool, mean and std of log|M|^2 (what zero_shot_parent''s own target statistics are) of the train
+      pool against its val pool, z = (mean_train - mean_val)/(std_val*sqrt(1/n_tr+1/n_val)); pass when |z| < 4 in all but
+      chance (expected 0 of 1300 at 4 sigma) and std ratio within 0.9-1.1. (3) LHE: V4REGEN_DONE / LHE_PARTS_DONE failed 0
+      in every log.'
+    check: '(1) Same cache test a require_cache run makes (datagen._is_cached: sidecar recipe_id equals the recipe''s); 2026-11-12
+      it listed exactly the 700/504/115 train pools, all val/test present. (2) Recipe ids: the current code reproduces the
+      stored recipe_id of every H val/test pool (1402 of 1402 ''prebuilt'' in check_site_data, built from 2026-10-26 at 929e1a97)
+      and of every PP4/eea val/test, so the content-determining fields, sampling policy included, are unchanged; the sampler
+      work since (2026-11-07 r1-r6, flat_grid, multichannel) is keyed on sampling fields these recipes do not carry, so their
+      pools stay on the plain mixture. The moment check (2) is new and run on the built pools before the owner is told.'
+    fixed: 'Recipes as committed, seed 42. A: scripts/job_catalog_v4_regen.sh @679b856a, V4REGEN_RECIPES=the 8 held-out recipes,
+      N=32, 16 cores, --time 08:00:00 (H5 one-loop: 20 chunks of 2500 per pool at 0.2-1.3 core-s/point, ~1.8 h; reviewer),
+      target 2.5 h. C1: same script, V4REGEN_RECIPES=recipes/catalog_v4_pp4_restore.yaml, N=32, AMP_LHE_CORES=8, MadEvent
+      dirs on node-local TMPDIR (679b856a), --time 08:00:00, 88.8 core-h from lhe_rates.json (longest pp13v4_uc_cggu 7.95
+      core-h = 0.99 h on 8 cores), target 2 h. C2: scripts/job_lhe_parts.sh LHE_QUEUE=zz_redesign_pp4_parts, 2 jobs x 16 cores,
+      --time 04:00:00, est 6.8 core-h, longest task 2.74 h, target 3 h; plan ran with --probe '''' because these processes
+      were built before with this layout (lhe_rates measured, runs json), not a new queue. B: job_lhe_parts.sh LHE_QUEUE=catalog_v4_dsh_eea,
+      1 job, re-assembly by lhe_parts 131a0fea (marker of a process whose pools are gone moved to assembled_superseded/, parts
+      deleted after per D208), --time 02:00:00, target 1 h. Job names zz_redesign_*.'
+    control: 'Not an A/B. Control of sameness: recipe ids (check 2) and the train-vs-val moment test (measure 2) on every
+      rebuilt pool.'
+    seeds: data seed 42, one build
+    outcome: 'Yes: 0 not prebuilt on all listed recipes, moment test passes, optimizations_recap''s owner told its reads can
+      be redone. No: a shard fails or one-loop CERT_FAILED: read the log, rerun (resumable); a pool failing the moment test
+      is reported with its z and std ratio and the reads on it are flagged not comparable. Disk: A ~17 GB, B ~3 GB pools (parts
+      freed after), C ~1.3 GB, against 52.9 GB free; the prebuild stops itself at 16.5 GB free.'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
