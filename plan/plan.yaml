@@ -21439,6 +21439,13 @@ entries:
       second seed becomes Joaquin''s question. The owner''s one revision is used, so a new design needs his go or a fresh
       review.'
     at: '2026-11-12T08:58:11+00:00'
+  - tried: 'Step 2: Muon-off (AdamW) one-change test on t t~ LO D=3162 (configs @aa2af061, ~4.5 GPU-h), designed to remove
+      spikes and jitter judged by curve_quality''s old bars'
+    why: 'Superseded by Joaquin''s criterion (2026-11-12: ''If the val loss is better than any other, why would I care it''s
+      jittery?''): by the end-of-run read the t t~ LO search bests already track (scratch 8/9, fine-tune 7/9); the earlier
+      AdamW arm at Muon''s HPs reached a 77x worse minimum at D=3162 (suspects_readout); turning up at the end sits at small
+      D (D<200: 70/144 scratch, 78/120 fine-tune; D>=2000: 12/132, 12/117), not with the optimizer. Not run.'
+    at: '2026-11-12T17:14:26+00:00'
   asks:
   - ask: 'GPU budget: 200-290 GPU-h above 30 with no decision covering it. Stage 2 of the data-saving study (three held-out
       tree targets, scratch against fine-tuned, an 8-trial DyHPO per cell, one seed per cell). The data saved expected from
