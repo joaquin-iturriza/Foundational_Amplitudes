@@ -23654,6 +23654,17 @@ entries:
       step in both arms (the D68-measured choice, D72); late val-NLL rise (end minus min) in scratch too at small D (one-loop
       2020, 86, 390, 9 at D=10..316; tree 50, 47, 74 at D=10..100), the fine-tunes'' one-loop up to D=3162 (57, 27, 177 stage-2;
       220/155 parscale, 30/36/358 tops) and tree to D=316 (tops 32).'
+  - at: '2026-11-12T02:28:21+00:00'
+    text: '2026-11-12 one-loop blow-up read on mu (stage2_mse_curves.py @6cad6fba, the runs'' own val_mse_curve/train_eval_mse_curve):
+      t t~ V fine-tunes D=316,1e3,3162,1e4: val mu-MSE end/min 1.10, 1.00, 9.77 (min at step 3060), 1.08 while train mu-MSE
+      falls to its minimum at the end; val/train at the end 4378, 1947, 7899, 15 (scratch same D 3807, -, 0.8, 0.6). The NLL
+      blow-up is the train/val gap opening during the anneal (memorisation), sigma fitted to train residuals; at D=3162 mu
+      itself overfits 9.8x after step 3060 and the reported final model carries it. Same pattern in scratch at D<=316 and
+      in u u~ V fine-tunes D<=3162. Head-map tree batch partial (hmap_readout @6cad6fba): hmap/parscale t t~ tree val 16.8,
+      0.51, 0.09, 0.09; hmaptops/tops 0.31, 0.57, 37, 17; pooled 8 cells val gmean 1.29 (5 below 1), test 0.64: NO CHANGE
+      by the design''s rule; D=3.16e4, 1e5 hmap runs pending at read time. D=316 outliers: t t~ tree scratch test one event
+      97% (removed: on trend); also D=3.16e4 test in both arms (top1 0.55/0.80); u u~ V D=316 no single event (top1 0.03/0.06):
+      T=2720 shared with D=100, both arms reach val min at step 972/1890 then overfit.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
