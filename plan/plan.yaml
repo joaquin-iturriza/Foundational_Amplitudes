@@ -24745,7 +24745,7 @@ entries:
     decision: D401
   owner:
     agent: a89aa6cb1fe5aee75
-    state: working
+    state: closed
     since: '2026-11-12T03:21:40+00:00'
     state_at: '2026-11-12T03:21:40+00:00'
     context: 286696
@@ -25286,32 +25286,34 @@ entries:
     '10': FA-ccin2p3-bba9a61e FA-ccin2p3-36a30e0c
     '9': FA-ccin2p3-bacdb4a8 FA-ccin2p3-ec74d56d FA-ccin2p3-62dcf910
   handoff:
-    state: 'Redraw check done: reference line labelled ''truth clipped to / training range'' (two lines; the previous three-line
-      label stretched the y-axes, fccb1ec5), shown only where nonzero (only tt Born beta panels drop it), per-panel legends;
-      main sets A and B now carry the fine-tunes (A: every A_ft incl. lr x0.1, twin colour dashed/dotted; B: the 9e5 A_ft),
-      B_bulk renamed ''scratch + 3000 steps on bulk only'' (cb9f79d5); all 8 figure files re-collected after the 5d2aec11
-      re-score and redrawn (looked at). sqrt(s) answer in finding 05:00. Frame noise fix 5d2aec11, package v4 + check FA-ccin2p3-538eeb1e
-      running (step 5 waits on it: if PACKAGE_OK, it is ready for Joaquin). MLP ladder read (findings 05:00, 05:20): port
-      gate fails by 0.09 decades on uug soft under its 0.3 cut but his numpy seeds span 1.05 decades and ranges overlap: read
-      as pass with that stated; inputs are the lever, ours-MLP 1 decade better than our transformer -> next per design: the
-      transformer fed his inputs only (needs a design). D405/D406 design recorded (r5 and r5thr parents, threshold-sampled
-      LO 2->2 top pairs beta log-uniform [1e-5,0.6], plain RAMBO not mixture, A_ft tt virt 1e5 8000 vs f21fa163), design-reviewer
-      a169c0ded88f258e3 running; on PASS implement: sqrts_measure ''log_beta'' in mg5_pipeline_final._sqrts_sampler (threshold
-      = sum of the 2 final masses; config sqrts_measure at :4670 reaches the flat/RAMBO path at :3092) + test, recipe entries
-      v4_{gg,ddx,bbx}_ttx__thr (sampling mode not mixture), generation via job_catalog_v4_regen.sh, a heldoutthr case in job_datasaving_parent.sh
-      (T from pool count), smoke iters=50, then two A_ft runs (KIT_PARENT=runs/data_saving/dsave_parent_heldout_r5 and the
-      r5thr dir, extra arg fine_tune.offshell_stats=own); ~5.5 GPU-h. Step 6 (Coulomb target side) still needs its design.'
-    decisions: Reference line = truth clipped to the bulk_train range (Joaquin's reference), plain two-line label; fine-tunes
-      share their scratch twin's colour only where colours would repeat. Degenerate-frame noise must not depend on the vector's
-      bits (rounding follows the batch). Port gate read against his own 3-seed spread. r5 parent fits KIT protocol A (ee_tt
-      family out).
-    ruled_out: Hash-of-bits frame noise (pool dependence 0.38 decades on tt Born softpair). catalog_v4 mixture sampling for
-      threshold pools (its flat-|M|^2 and adaptive passes reshape beta).
-    running: FA-ccin2p3-538eeb1e (package v4 build+check, CPU); design-reviewer a169c0ded88f258e3
-    files: tools/kit_figures.py, tools/kit_mlp_readout.py, tools/kit_baseline_seeded.py, scripts/job_kit_numpy_seeds.sh, tools/kit_beta_coverage.py,
-      tools/rebuild_run.py, tests/test_frame_noise.py, analysis/kit_benchmark/data/{kit_fig_*,kit_mlp_ladder,kit_beta_coverage_h3}.json,
-      analysis/kit_benchmark/figs/{kit_mse_*,kit_median_*,kit_mlp_ladder_*,kit_beta_coverage_h3}.png
-    written: '2026-11-12T03:19:36+00:00'
+    state: 'D411 why the MLP beats our transformer: eval-only reads done (findings ~07:00 + correction): frames conditioned,
+      float64 throughout, momentum features in range, undertraining not the cause (tt bulk 17x better than MLP yet extrapolates
+      worse); the transformer''s output bends away past the trained range of its out-of-range scalar inputs (uug coll deepest
+      +1.36, uugg qg -1.36, tt 15-50 TeV -1.08 vs MLP -0.19/-0.26/+0.12; figs analysis/kit_benchmark/figs/kit_extrap_*_{a,b}.png,
+      looked at). Test: no pre-LayerNorm arm (design PASS), smoke FA-ccin2p3-c0bda3b1 then uug bba9a61e and tt virt 36a30e0c
+      (afterok); step 10 reads them with kit_extrap_read (add the arms to RUNS) and kit_readout --vs. D405/D406 (design PASS,
+      2nd revision, one seed two-sided bands): pools generation aef0f4c6 (CPU) -> parent smoke 9475246e -> parents r5thr bacdb4a8
+      (runs/data_saving/dsave_parent_heldoutthr_r5), r5thrbeta ec74d56d (..._r5beta); A_ft smoke 1006fb1b -> ft_r5 62dcf910.
+      NOT YET SUBMITTED (submit_guard 60-min budget window counted cancelled jobs, 33.6 > 30; real total ~13 GPU-h): ft_thr
+      = job_kit.sh kit_ee_tt__virt_finite 100000 8000 A_ft fine_tune.offshell_stats=own tag=ftr5throwm --env KIT_PARENT=runs/data_saving/dsave_parent_heldoutthr_r5,
+      afterok bacdb4a8''s slurm job 63543641 and smoke 63543633; ft_thrbeta same with KIT_PARENT=..._heldoutthr_r5beta tag=ftr5thrbetaown
+      afterok 63543644 (site pick first). Package v4 check failed (E5749 acked): tt Born softpair 5515dc85 subset vs whole-file
+      Sudakov 0.014-0.098 decades, others <=1.5e-6; package not sent; suspect the degeneracy mask flipping at its eps threshold
+      with batch rounding. D403 port gate FAILS on uug as designed (single numpy run): ladder verdicts withheld on uug (kit_mlp_readout
+      @3050087f), the 05:20 ''read as pass'' withdrawn (finding); Joaquin must hear the failed gate.'
+    decisions: 'D412: one seed with two-sided bands from the MLP seed spread (kit_mlp_readout spread @c42a8908; no transformer
+      seed spread exists). r5''s T=4307/lr kept for r5thr. Beta input added as third D405 arm (flag in parent and fine-tune,
+      vs 3fc1016a). Long-recipe arm (c) not run: tt bulk fit already beats the MLP, so training length does not explain the
+      extrapolation. Smoke lr = the arm''s lr (job_kit''s rule at T=50 gives 0.19 and diverges: not representative).'
+    ruled_out: Frames ill-conditioning, float32 precision, momentum-scale extrapolation (all eval-only, kit_transformer_probe
+      @b9461b03) as causes of the MLP gap.
+    running: FA-ccin2p3-c0bda3b1, bba9a61e, 36a30e0c (noLN); aef0f4c6 (CPU pools), 9475246e, bacdb4a8, ec74d56d, 1006fb1b,
+      62dcf910 (D405)
+    files: tools/kit_transformer_probe.py, tools/kit_extrap_read.py, tools/kit_mlp_readout.py (spread, gate), models/lloca.py
+      + config/model/lloca.yaml (net.layer_norm), tests/test_layer_norm_switch.py, mg5_pipeline_final.py (log_beta), experiment.py,
+      recipes/gen_datasaving_parent.py + catalog_v4_datasaving_{parent_heldoutthr,thr_train}.yaml, scripts/job_datasaving_parent.sh,
+      tests/test_log_beta.py, analysis/kit_benchmark/data/kit_extrap.json, figs/kit_extrap_*
+    written: '2026-11-12T04:05:28+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
