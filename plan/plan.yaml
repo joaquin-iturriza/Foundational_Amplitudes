@@ -23252,6 +23252,36 @@ entries:
       with the old-vs-new figure. If none FIXES on a target: no single recipe knob explains it there; the remaining suspect
       is the parent itself (weaker, shorter pretraining than the old 94k-step one) and the next test is the parent, designed
       then.'
+    fix_at: '2026-11-12T03:38:04+00:00'
+    fix: '(1) One change at a time: the tree fine-tune controls (cc8c9a27 stage-2, c985b447 rerun) ran before the head map
+      (cec3610c, 2026-11-12 02:22), but at trunk sweep/sweep_config_dsave_diag_parscale_ft_epem_ttx_d7_t8500.yaml is identical
+      to the hmap d7 config apart from its name and target_stats=own maps the head unconditionally, so every tree arm is head
+      map + its knob. At this very cell the head map alone reads val 0.092 of the parent-scale rerun and 0.043 of the stage-2
+      best (analysis/data_saving/data/hmap_readout.json, pairs hmap/parscale and hmap/s2, D=3162), already past the design''s
+      FIXES bar (R<=1/5, ft/scr<=3): any tree arm would read FIXES. Fix: the tree control is the head-map run at D=3162, and
+      the cell is re-chosen from current-code data (with the head map the tree val deficit at D=3162 is about 19x0.04-0.09,
+      i.e. ~1-2x; test 0.94-2.6x disagrees). The one-loop arms are not mapped (ed7c42c6: tree parent under a V/B run), so
+      their controls stand; say so and confirm it in one arm''s log. (3) Seeds against the spread: one run at one cell against
+      a R<=1/5 bar, while single-cell val ratios of changes judged no-effect at these cells run 0.04 (hmap/s2 D=3162), 37
+      (hmaptops/tops D=3162), 4568 (psharedtops D=1e4); the same-HP pair at tree D=3162 is 0.46; one val event carries 98%
+      of t t~ V D=1e4 val MSE (event_share). The HELPS band (1/5 to 1/2) overlaps the 0.46 pair spread. Fix: read each arm
+      over the four cells the sibling diagnostic batches used (D=316..1e4, 8500 steps, ~19 min each, not hour-long), pooled
+      val geomean with n-below and the without-worst-event read as the step-8 design did, with a HELPS bar outside the measured
+      spread; more seeds than the siblings would be a question for Joaquin, not a design choice. (5) Not a repeat: prior omits
+      (i) the step-8 batch, design passed and held, never submitted, which has an AdamW fine-tune arm on t t~ V at D=316..1e4
+      (sweep/sweep_config_dsave_diag_adamw_ft_ee_ttbar_nlo_d{5..8}_t8500.yaml, with offshell_stats own): say whether arm (d)
+      replaces it and why its off-shellness setting differs; (ii) results.tex par:v3_muon, the 2x2 of parent and fine-tune
+      optimizer (AdamW against Muon fine-tune from the Muon parent, median fine-tune/zero-shot 0.487 vs 0.553, ~lines 7418-7560),
+      prior evidence on (d); (iii) the head-map runs at this cell (above). (7) D408 names pretraining set, optimizer, inputs,
+      preprocessing, loss, scheduler and the HPO lr: optimizer, loss, scheduler, lr are arms and the pretraining set is deferred
+      with a reason; inputs and preprocessing are neither arms nor stated as answered: name the runs that answer them (offown,
+      tops, head map, parent_shared, step 8''s massown/pairthr) and state what of the target preprocessing (target_physics_factor/orders
+      on the tree target, against the old catalog_v3 ladder''s) is untested. (14) Disk: state disk per job from a control
+      run; CC /sps/lpnhe has 69 GB free now (df read 2026-11-12), which will fit, but the design must say it. Minor: name
+      the result field the measure reads (val_mse_curve min / best-mu val), since val_loss of a HETEROSC run is the NLL, not
+      the mu-MSE. Checks 2, 4, 6, 8-13, 15 hold: the measure is the quantity the deficit is defined on and moved 0.04-0.09x
+      at this cell with the head map; outcomes stated per arm; D408 names the lr, so the two-point lr arm is within his words;
+      HETEROSC control and MSE arm is D408''s loss item; rate 1123 s from c985b447, same config.'
   step_waits:
     '8': the main session's read of the defect hunt (its 'before more arms'); then launched as designed
   findings:
