@@ -21339,6 +21339,8 @@ entries:
     state: stopped
     since: '2026-11-12T01:31:29+00:00'
     state_at: '2026-11-12T01:51:50.429000+00:00'
+    context: 206313
+    context_at: '2026-11-12T01:55:48+00:00'
   step_why:
     8:
       feeds: whether a one-loop input or optimizer change removes the t t~ V fine-tune deficit (D400)
