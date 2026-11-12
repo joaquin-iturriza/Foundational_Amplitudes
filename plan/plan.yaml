@@ -25088,10 +25088,6 @@ entries:
       v4_{gg,ddx,bbx}_ttx__thr (gen_datasaving_parent.py heldoutthr variant), generate (CPU); r5thr parent (job_datasaving_parent.sh
       heldoutthr; smoke iters=50, D395); job_kit.sh A_ft tt virt_finite 1e5 8000 from r5 and r5thr with fine_tune.offshell_stats=own;
       kit_readout --vs vs f21fa163 and the threshold scan'
-    14: 'D411 component read (eval-only, CPU on CC): tools/kit_saturation_probe.py @58a0efaa on the uug control c15b3337 and
-      tt control 3fc1016a (detached batch satprobe_controls, outputs analysis/kit_benchmark/data/kit_sat_{uug_softpair,ttvirt_softpairthr}.json
-      on CC), then on the inputs-only arms; per stratum and per one-input scan: GELU off/linear shares, attention max weight,
-      residual and branch rms per block, readout move dmu per decade'
     15: 'D411 route isolation (design recorded 2026-11-12 ~12:05, reviewer running): six from-scratch A runs, uug softpair
       and tt virtual softpairthr, each with ONE route cut: tag _nolocal ++model.input_route_off=local, _noframes ++model.input_route_off=frames
       (5d509b13), _nooffshell ++data.offshell_zero=true; read by kit_extrap_read collect (arms wired ccaf7e21) + kit_figures
@@ -25815,14 +25811,6 @@ entries:
       - 'ft_thr Coulomb median < -0.3 vs scratch and vs ft_r5: threshold sampling goes into the catalog parent''s top-pair
         pools'
       - 'both NO: design one-loop top pairs at physical mass near threshold (gg/qq~ > tt~ virtual)'
-    14:
-      feeds: 'D411 general mechanism (Joaquin 2026-11-12: V x beta is a case fix): which component of the transformer stops
-        continuing an input''s trend past its trained range'
-      if:
-      - 'a component flattens (GELU off-share rises, attention max weight -> 1, readout/residual saturates) where dmu/k drops:
-        an arm that changes that component (its own design)'
-      - 'nothing flattens while dmu/k stays constant: the continuation is linear and the error is in the trend''s slope learned
-        in range; compare dmu/k to the MLP''s'
     15:
       feeds: which input the KIT A/A_ft models drop to extrapolate like the MLP
       if:
@@ -25832,7 +25820,6 @@ entries:
   step_waits:
     '5': '2026-11-13'
     '9': FA-ccin2p3-62dcf910 FA-ccin2p3-bf3d593c FA-ccin2p3-8d1429bf
-    '14': detached batch satprobe_scalars (kit_saturation_probe on dc799c8e and 4a1cb4a2)
     '15': FA-ccin2p3-60391401 FA-ccin2p3-16956fa0 FA-ccin2p3-a2cba8d7 FA-ccin2p3-011d6333 FA-ccin2p3-0262bec5 FA-ccin2p3-13266d91
   handoff:
     state: '2026-11-12 ~11:55. Step 13 (inputs-only transformer, design PASS by design-reviewer a92960393f8855689): tt virtual
