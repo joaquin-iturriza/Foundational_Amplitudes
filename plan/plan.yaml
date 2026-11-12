@@ -22574,7 +22574,6 @@ entries:
       target standardization kept'', step-0 val loss, the sigma stage and preds written), then the 8 runs afterok on it via
       sweep/trial_job.sh --detached at the cells'' HPs, --hdr=--time=00:40:00 (D=1e4: 00:50:00); ~3.6 GPU-h, under D400.'
   step_waits:
-    '7': FA-ccin2p3-35922ca9 FA-ccin2p3-adbd0552
     '8': the main session's read of the defect hunt (its 'before more arms'); then launched as designed
     '9': the next owner after this hand-off (context near its limit), and the main session's read of the defect hunt
   findings:
