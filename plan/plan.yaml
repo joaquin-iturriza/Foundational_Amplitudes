@@ -15776,11 +15776,6 @@ entries:
       event and RUN_DONE with no manual poll (next 19 fix).'
     22: 'CLAUDE.md figure rule: on Joaquin''s yes, replace ''the main session sends it without opening it'' with the open-once-and-check
       text proposed 2026-11-10 (shown as a diff)'
-    23: 'Commit the step 23/24 files left uncommitted in the trunk checkout (tests/test_disk_alarm.py, tests/test_run_done_waiter.py,
-      tools/waiter_replay.py): review_backlog.sh bashpre refuses every git commit while the notes-editor pillar is overdue
-      with another entry''s uncommitted docs/results.tex (pretrain_data_saving''s write-up), and the mechanical-worker fix
-      (pass a commit whose named -- paths miss the pillar''s paths) was refused by the auto-mode classifier as self-modification;
-      then the repo-reviewer reviews them with the ~/.local/bin/site diff against site.bak-20261112-diskwatch'
     24: 'Live measure of the waiter rule (URGENT_KINDS, 2026-11-12): once the main session re-armed its waiter on the new
       site code, python3 tools/waiter_replay.py --since <re-arm> --until <+12 h> against the waiter''s actual returns in that
       time (HANDBACK acks ''delivered by the events waiter'' and the main-session wakes); step 23 closes only if the returns
@@ -16174,11 +16169,6 @@ entries:
       if:
       - 'yes: edit CLAUDE.md, commit, show the diff'
       - 'no: keep, rely on the per-file legend rule'
-    23:
-      feeds: whether the disk alarm and waiter fixes hold
-      if:
-      - 'the commit check lets the named commit through: commit and push'
-      - 'still refused: the hook fix goes to Joaquin as a diff'
     24:
       feeds: whether the hand-back batching cuts main-session wakes
       if:
@@ -16192,8 +16182,6 @@ entries:
     '17': 'the first real idle moment: plan next listing RESUME/LAUNCH with no FA job live; the supervisor''s own STALLED
       idle: event (or its absence after 45 min) is the trigger'
     '21': the date 2026-11-17 (a week after the 2026-11-09 23:54 restart on the batching code)
-    '23': 'a reviewer: the notes-editor pass over pretrain_data_saving''s uncommitted docs/results.tex, which frees the commit
-      check'
     '24': 2026-11-12T14:00 (12 h after the main session's waiter re-arms on the new site code)
   owner:
     agent: a6a10b9aac169049a
