@@ -23941,6 +23941,17 @@ entries:
       own stays (adopted in writing on the test measure, 0.19), next design the same massown read. NO CHANGE: 1 <= G < 3:
       the departure explains none of the gap; own stays per the written adoption, next the massown read. WORSE: G >= 3: own
       hurts at the fixed space; report against the written adoption to Joaquin with both reads. No rerun of any search (D315).'
+    passed_at: '2026-11-12T11:32:53+00:00'
+    reviewer: 'Re-check of the V/B off-shellness-own test (3 cells x 8 trials). One change against s4: the s6 configs differ
+      only in offshell_stats and sweep_name. Check 2: in stage2_diag_readout.json own/parent moved V/B val 0.25, 0.45, 0.11;
+      against the original search best 0.25, 0.57, 0.31 (gmean 0.36). Check 3: same-HP rerun spread from that file 1.00, 1.26,
+      2.94 (3.30 at 1e4), per-cell ln-sd 0.6-1.1, so a 3-cell gmean has ln-sd ~0.35-0.65; the HELPS bar G<=1/3 is 1.7-3 sd
+      from 1, and NOT RESOLVED is its own branch. Check 4: CLOSES (r_scr<=3 in every cell) is tested first, then G partitions
+      every value (<=1/3, (1/3,1), [1,3), >=3), with no rerun. Check 5: searched results.tex for off-shell, offshell_stats,
+      offown, massown, mass_stats and search-to-search, plus the entry''s findings and dead ends, sweep/ and site decisions.
+      The prior now cites the written own adoption (results.tex ~9468-9476) with the s4 departure and the gen default fixed
+      at fa846b4d, the tp3 refit result (~13945-13950), and the unread massown configs (7d56534c). HETEROSC, the s4 coupled
+      space, 8 trials in waves 3,3,2 as siblings, 69 GB free on /sps/lpnhe, rates and readout from s4''s identical configs.'
   step_waits:
     '4': detach s5_ft_ttx_LD DONE event (drive.py over the 7 dsave_s5_ft_epem_ttx searches, 56 trials, waves 3,3,2)
     '5': 'a reviewer: design-reviewer on the V/B offshell-own design (recorded 12:29 CET)'
