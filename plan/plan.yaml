@@ -23879,8 +23879,7 @@ entries:
       next design tests the momentum standardization or the readout. WORSE: gmean r_s4 >= 2: keep parent; report. No rerun
       of any search (D315).'
   step_waits:
-    '4': 'a reviewer: repo-reviewer backlog pass (the commit of the passed s5 configs is blocked by the overdue backlog);
-      design PASSED, target 3 h / 56 jobs recorded'
+    '4': detach s5_ft_ttx_LD DONE event (drive.py over the 7 dsave_s5_ft_epem_ttx searches, 56 trials, waves 3,3,2)
     '5': 'a reviewer: the step-4 design''s verdict (one latest design per entry; the V/B offshell-own design, configs sweep/sweep_config_dsave_s6_ft_ee_ttbar_nlo_d{5,6,7}_t8500.yaml
       generated, is recorded after it)'
   findings:
