@@ -1609,6 +1609,8 @@ class BaseExperiment:
                         state_dict[k] = torch.stack(rows, 0)
                         LOGGER.info(f"Fine-tuning: {k} from a {ploss} parent{' with a sign head' if p_sign else ''} "
                                     f"(rows {p_roles}) into rows {own_roles}: rows by role, missing ones zeroed")
+                if ft is not None and str(ft.get("target_stats", "parent")) == "own":
+                    self._map_head_to_own_stats(state_dict, pretrained_path)
                 self.model.load_state_dict(state_dict)
         except FileNotFoundError:
             raise FileNotFoundError(f"Pretrained checkpoint not found: {pretrained_path}")
@@ -1627,6 +1629,34 @@ class BaseExperiment:
 
         # No μP bookkeeping needed: base shapes were set when the backbone was
         # constructed and load_state_dict preserves the per-parameter infshapes.
+
+    def _map_head_to_own_stats(self, state_dict, pretrained_path):
+        """Under fine_tune.target_stats=own the parent's head predicts z_p = (y - m_p)/s_p while this run reads its
+        output as z_o = (y - m_o)/s_o. The readout is rewritten so the loaded model predicts the parent's y (Joaquin
+        2026-11-12: the fine-tune starts from the parent's function): mu row w, b -> a w, a b + c with a = s_p/s_o,
+        c = (m_p - m_o)/s_o (exact: the per-particle mean pooling and the muP readout, which scales only its input,
+        commute with it); a HETEROSC parent's sigma row bias += ln a, so sigma -> a sigma where softplus ~ exp."""
+        pdir = os.path.dirname(os.path.dirname(os.path.abspath(pretrained_path)))
+        with open(os.path.join(pdir, "data_stats.json")) as f:
+            pst = json.load(f)
+        pm, psd = np.unique(np.round(pst["prepd_mean"], 12)), np.unique(np.round(pst["prepd_std"], 12))
+        om, osd = (np.unique(np.round(np.ravel(np.asarray(x, dtype=float)), 12)) for x in (self.prepd_mean, self.prepd_std))
+        assert len(pm) == len(psd) == len(om) == len(osd) == 1, (
+            f"target_stats=own head map needs one target standardization on each side: parent {pm}, {psd}; run {om}, {osd}")
+        a, c = float(psd[0]) / float(osd[0]), (float(pm[0]) - float(om[0])) / float(osd[0])
+        kw = [k for k in state_dict if k.endswith("linear_out.weight") and "sign" not in k]
+        kb = [k for k in state_dict if k.endswith("linear_out.bias") and "sign" not in k]
+        assert len(kw) == len(kb) == 1, f"target_stats=own head map: readout tensors {kw} {kb}"
+        W, b = state_dict[kw[0]].clone(), state_dict[kb[0]].clone()
+        W[0], b[0] = a * W[0], a * b[0] + c   # row 0 is mu in every role layout (mu[, sign][, sigma])
+        pcfg_f = os.path.join(pdir, "config.yaml")
+        p_het = os.path.exists(pcfg_f) and str(OmegaConf.load(pcfg_f).training.get("loss")) == "HETEROSC"
+        het = str(self.cfg.training.get("loss")) == "HETEROSC" and p_het and W.shape[0] > 1
+        if het:
+            b[-1] = b[-1] + math.log(a)   # shortcut: sigma scales by exactly a only where softplus ~ exp (sigma << 1)
+        state_dict[kw[0]], state_dict[kb[0]] = W, b
+        LOGGER.info(f"Fine-tuning: head mapped to this run's target stats (target_stats=own): mu row x{a:.4g}, "
+                    f"bias {c:+.4g}" + (f", sigma bias {math.log(a):+.4g}" if het else ""))
 
     def _shrink_perturb(self, lam: float, gamma: float):
         """fine_tune.shrink_perturb (plan warm_start step 14): every parameter p <- lam * p + gamma * p0, p0 the same
