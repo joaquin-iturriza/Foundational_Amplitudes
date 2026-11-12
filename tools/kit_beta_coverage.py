@@ -26,6 +26,7 @@ sys.path.insert(0, ".")
 from analysis.common.readers import find_pool, split_pool
 EDGES = np.arange(-5.0, 0.01, 0.25)
 out = {}
+Q = int(sys.argv[2]) if len(sys.argv) > 2 else 6          # the massive coloured quark of the pair (6 top, 5 bottom)
 for p in yaml.safe_load(open(sys.argv[1]))["processes"]:
     f = find_pool(p["name"], p.get("sqrts"), role="val", any_window=True)
     if f is None:
@@ -34,8 +35,8 @@ for p in yaml.safe_load(open(sys.argv[1]))["processes"]:
     r = np.load(f, mmap_mode="r")
     n = (r.shape[1] - 1) // 5
     mom, pdg, _ = split_pool(np.asarray(r), n)
-    it, itx = np.argmax(pdg == 6, 1), np.argmax(pdg == -6, 1)
-    ok = (pdg == 6).any(1) & (pdg == -6).any(1)
+    it, itx = np.argmax(pdg == Q, 1), np.argmax(pdg == -Q, 1)
+    ok = (pdg == Q).any(1) & (pdg == -Q).any(1)
     if not ok.any():
         out[p["name"]] = {"n": int(len(r)), "pair": 0}
         continue
@@ -48,6 +49,8 @@ for p in yaml.safe_load(open(sys.argv[1]))["processes"]:
     lb = np.log10(np.clip(b, 1e-12, None))
     out[p["name"]] = {"n": int(len(r)), "pair": int(ok.sum()), "mt": float(np.median(np.sqrt(m2[ok]))),
                       "q": [float(x) for x in np.quantile(b, [0.0, 0.01, 0.5])],
+                      # the pair's mass over 2m (the Sudakov side: log(s_pair/m^2)), quantiles 0.5, 0.99, max
+                      "mrat": [float(x) for x in np.quantile(np.sqrt(mtt2[ok] / (4 * m2[ok])), [0.5, 0.99, 1.0])],
                       "hist": np.histogram(lb, EDGES)[0].tolist(), "below": int((lb < EDGES[0]).sum())}
 print("KITBETA " + json.dumps(out))
 '''
@@ -76,11 +79,12 @@ def main():
     c = sub.add_parser("collect")
     c.add_argument("--recipe", default="recipes/catalog_v4_datasaving_h3_train.yaml")
     c.add_argument("--out", required=True)
+    c.add_argument("--pdg", type=int, default=6, help="the pair's quark: 6 (top) or 5 (bottom)")
     p = sub.add_parser("plot"); p.add_argument("data"); p.add_argument("--out", required=True)
     a = ap.parse_args()
     if a.cmd == "collect":
         from analysis.common.readers import site_python
-        d = site_python(SITE, [a.recipe], "KITBETA")
+        d = site_python(SITE, [a.recipe, str(a.pdg)], "KITBETA")
         json.dump(d, open(a.out, "w"))
         rows = {k: v for k, v in d.items() if v and v.get("pair")}
         tot = np.sum([v["hist"] for v in rows.values()], 0)

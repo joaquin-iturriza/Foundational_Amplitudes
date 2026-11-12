@@ -6,10 +6,13 @@ training (bulk_train), and the error it makes there. Per event (n per stratum, e
   feat     the largest |standardized local-frame momentum component| the transformer reads (features_local)
   sij_err  the largest relative error of s_ij/s computed from the momenta as the network receives them (its dtype,
            after the rebuild's preprocessing) against float64 from the stored momenta (nan for a soft-rescaled run)
+  gam      log10 of the largest boost factor gamma = Lambda_00 of the event's local frames (D411 frames mechanism)
+  gamrel   log10 of the largest gamma of the relative transforms Lambda_i Lambda_j^-1 over particle pairs: what the
+           attention's vector messages from j to i are transformed by (the route model.input_route_off=frames cuts)
   res      |prediction - truth| in log10|M|^2
 and the dtypes. Per stratum: medians and maxima, and feat over bulk_train's 99.5% quantile.
 
-    python tools/kit_transformer_probe.py <run_dir> [--n 200] --out <json>      (CPU, in the site checkout)
+    python tools/kit_transformer_probe.py <run_dir> [--n 200] [--out <json>]    (CPU, in the site checkout; prints KITPROBE <json>)
 """
 import argparse
 import json
@@ -35,7 +38,7 @@ def sij_over_s(p):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("run_dir"); ap.add_argument("--n", type=int, default=200); ap.add_argument("--out", required=True)
+    ap.add_argument("run_dir"); ap.add_argument("--n", type=int, default=200); ap.add_argument("--out")
     a = ap.parse_args()
     import torch
     from tools.rebuild_run import rebuild
@@ -48,8 +51,10 @@ def main():
             r = r[:2000] if split == "bulk_train" else r[:a.n]
             blocks.append((f"{split}/{st}", len(r))); rows.append(r)
     rows = np.concatenate(rows)
-    out_dir = os.path.dirname(os.path.abspath(a.out)); os.makedirs(out_dir, exist_ok=True)
-    pool = os.path.join(out_dir, f"probe_{os.getpid()}.npy")
+    import atexit, shutil, tempfile
+    tmp = tempfile.mkdtemp()                       # never inside the checkout; removed however the probe ends
+    atexit.register(shutil.rmtree, tmp, True)
+    pool = os.path.join(tmp, f"probe_{os.getpid()}.npy")
     np.save(pool, rows)
     import h5py
     with h5py.File(kh.h5_path(stem), "r") as f:
@@ -71,7 +76,7 @@ def main():
     h2 = net.framesnet.register_forward_hook(post)
     with torch.no_grad():
         pred, truth, _ = exp._collect_predictions(loader)
-        lam, feat, sij, dt = [], [], [], set()
+        lam, feat, sij, gam, gamrel, dt = [], [], [], [], [], set()
         for c in cap:
             fr = c["frames"]; M = fr.matrices if hasattr(fr, "matrices") else fr
             loc = (net.trafo_fourmomenta(c["fm"], fr) - c["mean"]) / c["std"]
@@ -80,15 +85,24 @@ def main():
             dt |= {str(c["fm"].dtype), str(loc.dtype), str(M.dtype)}
             lm = torch.log10(M.abs().flatten(1).max(1).values.clamp(min=1e-300)).cpu().numpy()
             fl = loc.abs().max(1).values.cpu().numpy()
-            for arr, dst in ((lm, lam), (fl, feat)):
+            g0 = torch.log10(M[:, 0, 0].abs()).cpu().numpy()
+            for arr, dst in ((lm, lam), (fl, feat), (g0, gam)):
                 v = np.full(len(cnt), -np.inf); np.maximum.at(v, ev, arr); dst.append(v)
+            Mi = fr.inv if hasattr(fr, "inv") else torch.linalg.inv(M)
+            gr = np.empty(len(cnt))
+            for e in range(len(cnt)):                 # (Lambda_i Lambda_j^-1)_00 over all pairs of the event
+                a_, b_ = ptr[e], ptr[e + 1]
+                gr[e] = torch.einsum("ia,ja->ij", M[a_:b_, 0, :], Mi[a_:b_, :, 0]).abs().max().log10().item()
+            gamrel.append(gr)
             fm = c["fm"].cpu().numpy(); n = int(cnt.max())
             sij.append(np.stack([sij_over_s(fm[ptr[i]:ptr[i + 1]][None])[0] for i in range(len(cnt))]))
     h1.remove(); h2.remove()
     lam, feat, sij = np.concatenate(lam), np.concatenate(feat), np.concatenate(sij)
+    gam, gamrel = np.concatenate(gam), np.concatenate(gamrel)
     perm = np.asarray(exp._role_perm["test"])[:len(lam)]
-    res = np.abs(np.asarray(pred, np.float64).reshape(-1) - np.asarray(truth, np.float64).reshape(-1)) \
-        * float(exp.prepd_std[0]) / np.log(10.0)
+    sgn = (np.asarray(pred, np.float64).reshape(-1) - np.asarray(truth, np.float64).reshape(-1)) \
+        * float(exp.prepd_std[0]) / np.log(10.0)       # prediction - truth, log10|M|^2
+    res = np.abs(sgn)
     o = np.empty(len(rows), int); o[perm] = np.arange(len(perm))     # row -> loader position
     npart = sij.shape[1]
     nfin = (rows.shape[1] - 1) // 5
@@ -103,21 +117,27 @@ def main():
         e = {"n": n, "lam_median": float(np.median(lam[k])), "lam_max": float(lam[k].max()),
              "feat_median": float(np.median(feat[k])), "feat_max": float(feat[k].max()),
              "sij_err_max": float(err[i - n:i].max()), "res_median": float(np.median(res[k])),
-             "logmse": float(np.mean(res[k] ** 2)),
+             "logmse": float(np.mean(res[k] ** 2)), "err_median": float(np.median(sgn[k])),
+             **{f"{q}_{f}": float(fn(v[k])) for q, v in (("gam", gam), ("gamrel", gamrel))
+                for f, fn in (("median", np.median), ("q90", lambda x: np.quantile(x, 0.9)), ("max", np.max))},
              "corr_res_lam": float(np.corrcoef(res[k], lam[k])[0, 1]) if lam[k].std() > 0 else None,
              "corr_res_feat": float(np.corrcoef(res[k], feat[k])[0, 1]) if feat[k].std() > 0 else None}
         if name.startswith("bulk_train"):
             q995 = float(np.quantile(feat[k], 0.995))
+            tr = {q: v[k] for q, v in (("gam", gam), ("gamrel", gamrel), ("feat", feat))}
+        for q, v in (("gam", gam), ("gamrel", gamrel), ("feat", feat)):   # share of bulk_train events above the median
+            e[f"{q}_train_share_above"] = float(np.mean(tr[q] >= np.median(v[k])))
         e["feat_over_train_q995"] = float(np.median(feat[k]) / q995) if q995 else None
         out["strata"][name] = e
         print(f"{name:45s} lam med {e['lam_median']:6.2f} max {e['lam_max']:6.2f} | feat med {e['feat_median']:9.3g} "
               f"max {e['feat_max']:9.3g} (x{e['feat_over_train_q995'] or 0:.2g} train q995) | sij err {e['sij_err_max']:.1e} "
               f"| res med {e['res_median']:.3g} logmse {e['logmse']:.3g} | corr lam {e['corr_res_lam'] or 0:+.2f} "
-              f"feat {e['corr_res_feat'] or 0:+.2f}")
+              f"feat {e['corr_res_feat'] or 0:+.2f} | log10 gamma med {e['gam_median']:.2f} max {e['gam_max']:.2f} "
+              f"rel med {e['gamrel_median']:.2f} max {e['gamrel_max']:.2f}")
     print("dtypes", sorted(dt))
-    json.dump(out, open(a.out, "w"), indent=1)
-    for f in (pool, pool[:-4] + ".alphas.npy"):
-        os.remove(f)
+    print("KITPROBE " + json.dumps(out))
+    if a.out:
+        json.dump(out, open(a.out, "w"), indent=1)
 
 
 if __name__ == "__main__":
