@@ -24892,6 +24892,11 @@ entries:
     12: 'D411 ReZero on tt Born (design''s Mixed branch: tt virt MOVED, uug STAYED): read kit_A_ee_tt_born_n100000_t8000_softpair_rezero
       (FA-ccin2p3-d322922b) vs 5515dc85 with kit_extrap_read/kit_figures collect + kit_readout --vs; MOVED/STAYED on the deepest
       Sudakov bin''s median signed error; bulk fit beside it'
+    13: 'D411 input side (uug, then tt virtual): the transformer fed only Bakar''s inputs (log10 s_ij/s0 per pair, logthr
+      on tt) as scalars, no momenta/frames, vs c15b3337/f21fa163 and Bakar''s MLP; needs a model input path (none exists:
+      config/model/lloca.yaml has input_soft_eps, input_pair_logs, input_pair_threshold, input_local_log_eps) and its own
+      design. Evidence for it: the uug control''s target is already flat into both limits (finding 2026-11-10T06:22) yet overshoots
+      +1.36; ReZero STAYED on uug; target V x beta fixed tt Coulomb'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -25548,6 +25553,14 @@ entries:
       - 'MOVED on tt Born too: the norm effect holds on both tt targets; weigh against the bulk-fit loss (ReZero underfits
         at this lr)'
       - 'STAYED: the tt virtual move is not a norm effect that carries; next lever the transformer fed Bakar''s inputs only'
+    13:
+      feeds: 'D411: whether the transformer''s extrapolation failure is in how it reads out-of-range inputs (its momentum/frame
+        path) rather than its target or its norms'
+      if:
+      - 'inputs-only transformer extrapolates like the MLP: the momentum/frame path is what bends; KIT models get the log-invariant
+        inputs only'
+      - 'still overshoots: the failure is the attention/MLP stack itself on out-of-range scalars; compare activation (GELU
+        vs ReLU) next'
   step_waits:
     '5': '2026-11-13'
     '9': FA-ccin2p3-62dcf910 FA-ccin2p3-bf3d593c FA-ccin2p3-8d1429bf
