@@ -81,27 +81,6 @@ def pair_beta(particles, pdg_ids, pdg=6):
     return beta
 
 
-def gluon_eikonal(particles, pdg_ids, gluon=21):
-    """prod over the final quarks and antiquarks q of s_qg / s for the event's one final gluon g (s: the incoming pair's
-    invariant), per event: the soft (1/x^2) and collinear (1/y) denominators of |M|^2 for one gluon emitted off a
-    quark line, e+e- > q q~ g. data.target_times_eikonal's factor (an exact function of the momenta)."""
-    p = np.asarray(particles, np.float64).reshape(len(particles), -1, 4)
-    ids = np.asarray(pdg_ids)
-    fin = np.zeros(ids.shape, bool)
-    fin[:, 2:] = True
-    g = fin & (ids == gluon)
-    assert (g.sum(1) == 1).all(), "target_times_eikonal: needs exactly one final gluon per event"
-    q = fin & (np.abs(ids) >= 1) & (np.abs(ids) <= 6)
-    assert q.any(1).all(), "target_times_eikonal: an event without a final quark"
-    m2 = lambda v: v[..., 0] ** 2 - (v[..., 1:] ** 2).sum(-1)
-    s = m2(p[:, 0] + p[:, 1])
-    pg = p[np.arange(len(p)), g.argmax(1)]
-    y = 2 * (pg[:, None, 0] * p[..., 0] - (pg[:, None, 1:] * p[..., 1:]).sum(-1)) / s[:, None]   # 2 p_g.p_i / s
-    f = np.where(q, y, 1.0).prod(1)
-    assert (f > 0).all(), "a gluon exactly soft or collinear: the target times the eikonal factor would vanish"
-    return f
-
-
 def _reg_params(model):
     """The parameters under the L2/L1 penalty: all of them except a Bayesian readout's log-variances
     (models/bayesian_readout.py), whose prior is the KL term (_reg_term). Same tensors, same order as
@@ -1748,8 +1727,6 @@ class AmplitudeExperiment(BaseExperiment):
                 "data.target_over_born is built on the in-memory path (data.memmap=false)"
             assert not bool(self.cfg.data.get("target_times_beta", False)), \
                 "data.target_times_beta is built on the in-memory path (data.memmap=false)"
-            assert not bool(self.cfg.data.get("target_times_eikonal", False)), \
-                "data.target_times_eikonal is built on the in-memory path (data.memmap=false)"
             # host memory that scales with the batch: the same arrays, built once per input set into
             # memory-mapped files and gathered by index (data_mmap.py)
             assert self._mom_np_dtype() == np.float32, ("data.memmap gathers float32 momenta (data_mmap.py); a "
@@ -1805,10 +1782,6 @@ class AmplitudeExperiment(BaseExperiment):
                     # threshold), so the target stays finite there; an exact per-event factor of the momenta, so
                     # kit_predict's log-space residual is that of V itself
                     amplitudes = amplitudes * pair_beta(particles, pdg_ids)[:, None]
-                if bool(self.cfg.data.get("target_times_eikonal", False)):
-                    # D411 (why the transformer extrapolates worse than an MLP): the KIT e+e- > u u~ g |M|^2 times its
-                    # soft/collinear denominators (gluon_eikonal), flat in both limits, as target_times_beta is at threshold
-                    amplitudes = amplitudes * gluon_eikonal(particles, pdg_ids)[:, None]
 
                 if use_pids:
                     toks = self.tokenizer.register_and_encode(pdg_ids)
