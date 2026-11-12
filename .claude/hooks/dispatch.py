@@ -8,6 +8,9 @@ stderr and exit code through unchanged, except:
   - a hook listed in <hooks dir>/disabled.json (by its name, or its name with these arguments) is not run: exit 0 and
     a one-line note on stderr;
   - a hook script that does not exist: exit 0 and a note (a missing guard never blocks a turn);
+  - a hook that prints "DISPATCH-CONDITIONS disableable=a,b core=c" on stderr names the conditions that refused: a loop
+    then disables only the disableable ones (disabled.json "<hook>:<condition>", which the hook reads itself), and a
+    loop with a core condition among them stays a refusal and opens the incident without disabling anything;
   - a loop: the same Stop (or SubagentStop) refusal (hook, sha1 of its message) twice in a row in one session or
     subagent, with no tool call in between and the same state (git HEAD, sha1 of plan/plan.yaml, the project's open
     event ids): the turn cannot end. The hook is disabled through the incident record (disabled.json, incidents.jsonl,
@@ -410,6 +413,18 @@ def loop_through(spec, raw, r):
         if loop == "new":
             report(spec, why, HERE, **kw)
         return False
+    conds = re.search(r"^DISPATCH-CONDITIONS disableable=(\S*) core=(\S*)$", r.stderr.decode("utf-8", "replace"), re.M)
+    if conds:                                # a hook that names its refusing conditions: only those go off, never a core one
+        free, core = (set(filter(None, g.split(","))) for g in conds.groups())
+        if core or not free:
+            if loop == "new":
+                report(spec, why, HERE, **kw)
+            return False
+        for c in sorted(free):
+            disable("%s:%s" % (spec, c), why, HERE, **kw)
+        sys.stderr.write("dispatch: %s refused twice; only its condition(s) %s are disabled, an incident is open\n" % (
+            spec, ", ".join(sorted(free))))
+        return True
     disable(spec, why, HERE, **kw)
     sys.stderr.write("dispatch: %s refused the same thing twice with nothing done between; it is disabled and an "
                      "incident is open for a mechanical-worker to fix (python3 tools/hook_incident.py --list)\n" % spec)

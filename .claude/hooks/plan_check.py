@@ -320,6 +320,14 @@ def split_events(lines, working):
     return refuse, wait
 
 
+# What refused at this Stop, {condition: core}, printed for the dispatcher (dispatch.py): a loop disables only the
+# non-core conditions that refused, as plan_check.py:<condition> in disabled.json. Core conditions can never be disabled:
+# the armed waiter and live supervisor (ledger), a running entry without an owner, open events handed to no agent, and
+# everything else problems() refuses on (an unlisted refusal is core).
+CORE = {"ledger", "plan_state"}
+REFUSED = {}
+
+
 def stop_conditions(inp, refused):
     """(refusals, notes) of the Stop conditions taken over from the standalone hooks (stop_conditions.py); each is
     skipped while its own hook is still registered for Stop (before switch-over B), so nothing is asked twice. The
@@ -329,23 +337,30 @@ def stop_conditions(inp, refused):
     import stop_conditions as sc
     repo = plan.ENV.get("PLAN_ROOT") if plan.ENV.get("PLAN_TEST") == "1" else sc.REPO
     bad, notes = [], []
-    parts = [("figure_pair_guard.sh", lambda: sc.figure_pairs(repo)),
-             ("context_guard.py", lambda: sc.context(inp, repo)),
-             (None, lambda: sc.ledger(repo, plan.SITE) if (plan.ENV.get("PLAN_TEST") == "1" or sc.ledger_deferred())
-              else ([], [])),                       # LEDGER_MARK: ledger: site guard --stop
-             (None, lambda: sc.incidents(os.path.join(repo, ".claude", "hooks")))]
-    for hook, f in parts:
+    hooks = os.path.join(repo, ".claude", "hooks")
+    parts = [("figure_pair_guard.sh", "figure_pairs", lambda: sc.figure_pairs(repo)),
+             ("context_guard.py", "context", lambda: sc.context(inp, repo)),
+             (None, "ledger", lambda: sc.ledger(repo, plan.SITE) if (plan.ENV.get("PLAN_TEST") == "1" or sc.ledger_deferred())
+              else ([], [])),                       # LEDGER_MARK: ledger: site guard --stop (supervisor, armed waiter)
+             (None, "incidents", lambda: sc.incidents(hooks))]
+    for hook, cond, f in parts:
         if hook and sc.registered_at_stop(hook, repo):
             continue
+        if cond not in CORE and sc.disabled("plan_check.py:" + cond, hooks):
+            continue
         b, n = f()
+        if b:
+            REFUSED[cond] = cond in CORE
         bad += b
         notes += n
     # a check disabled by an incident (.claude/hooks/disabled.json) is off here too: the dispatcher skips only the
     # standalone hook, and reply_check kept refusing through plan_check while disabled (D335; 2026-11-09 23:45,
     # "what do you mean you can't kill it?")
     if not refused and not bad and not sc.registered_at_stop("reply_check.py", repo) \
-            and not sc.disabled("reply_check.py", os.path.join(repo, ".claude", "hooks")):
+            and not sc.disabled("reply_check.py", hooks) and not sc.disabled("plan_check.py:reply", hooks):
         b, n = sc.reply(inp)
+        if b:
+            REFUSED["reply"] = False
         bad += b
     return bad, notes
 
@@ -542,13 +557,20 @@ def main():
                     bad.append("%s is STALLED (%s): resume its owner (SendMessage) or launch one (plan brief %s, then "
                                "plan owner %s --agent <id>)" % (eid, text, eid, eid))
         OPENER_STATE.update(st.get("_opener") or {})
+        if bad:
+            REFUSED["plan_state"] = True
         more, notes = stop_conditions(inp, bad)
         bad += more
         if main_session:
-            bad += result_table(inp)
-            bad += bare_acks(inp)
             import stop_conditions as sc_f
-            bad += sc_f.figures_handed_back(inp)[0]
+            hooks = os.path.join(plan.ENV.get("PLAN_ROOT") if plan.ENV.get("PLAN_TEST") == "1" else sc_f.REPO,
+                                 ".claude", "hooks")
+            for cond, f in (("result_table", result_table), ("bare_acks", bare_acks),
+                            ("figures_handed_back", lambda i: sc_f.figures_handed_back(i)[0])):
+                b = [] if sc_f.disabled("plan_check.py:" + cond, hooks) else f(inp)
+                if b:
+                    REFUSED[cond] = False
+                bad += b
         plan.NOTES.extend(notes)
         if OPENER_STATE:
             plan._set_state("_opener", dict(OPENER_STATE))
@@ -570,6 +592,9 @@ def main():
         if len(ev) > 5:
             shown.append("open event: ... and %d more (site events --project FA)" % (len(ev) - 5))
         sys.stderr.write("PLAN CHECK: the turn cannot end yet.\n" + "\n".join("  " + b for b in shown) + "\n")
+        if REFUSED:                               # for dispatch.py: which conditions refused, which are core
+            sys.stderr.write("DISPATCH-CONDITIONS disableable=%s core=%s\n" % (
+                ",".join(sorted(c for c, k in REFUSED.items() if not k)), ",".join(sorted(c for c, k in REFUSED.items() if k))))
         return 2
     # Notes never reach the user: a passing check prints nothing (a systemMessage is shown on their screen; the user,
     # 2026-10-25 and 2026-10-26: "Why are you back again with this?"). They are kept for `plan next`, which prints them
