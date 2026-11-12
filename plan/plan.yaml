@@ -24198,6 +24198,30 @@ entries:
       question is settled (mu-only has no sigma stage: read the L(D) on val_ln, the read the stage-2 reviewer called resolvable).
       If NO CHANGE on u u~ V: the draft figure is the stage-2 u u~ V L(D) with its curve numbers stated; the next suspect
       is EMA fixed on (lower median jitter on u u~, u u~ V, t t~ V/B in the existing trials). t t~ read the same way, behind.'
+    fix_at: '2026-11-12T14:11:32+00:00'
+    fix: '(check 5, prior) The prior omits the HETEROSC-against-MSE comparison already in docs/results.tex (~lines 10460-10530,
+      ''Correction (2026-10-15)'' and ''The GP sweep of the user''s loss (D57)''): e+e- > t t~, D=1e4, the joint HETEROSC
+      fit gave val mu-MSE 1.37e-7 against the MSE baseline''s 3.57e-7 at the MSE baseline''s HPs (2.6x lower), and best against
+      best after an 8-trial GP sweep test 2.0e-8 against 9.6e-8 (4.8x lower), with the HETEROSC mu-MSE falling steadily to
+      the last step. That is the ''at no worse a validation minimum'' half of this question, answered once for a plain-MSE
+      arm on the same process. Cite it, say what differs now (Muon, catalog_v4 pools, the 2-channel net with sigma out of
+      the gradient against the old 1-channel MSE, curve shape never read then), and what it predicts (CLEAN BUT WORSE is the
+      expected t t~ outcome). Also state the scratch side of the suspects evidence: the mu-only scratch run at t t~ LO D=3162
+      has spike 29.4 against its control''s 21.3 and min 1.9e-7 against 8.5e-9 (curve_quality.quality on suspects_runs_read.json);
+      only the fine-tune arm cleaned up (spike 1.5/3.4/3.7/1.3). (check 4, outcome) The rule maps only ''WELL in both arms
+      at both u u~ V cells'' and ''NO CHANGE''; the mixed results this evidence makes likely (fine-tune WELL, scratch NO CHANGE
+      or CLEAN BUT WORSE; BETTER, NOT WELL; one cell only) have no stated consequence, and ''CLEAN within 2x'' contradicts
+      the CLEAN BUT WORSE definition (> 2x). Since the data-saving L(D) needs one loss for both arms, state what each mixed
+      case changes (e.g. arm-split = NO CHANGE for the template, report the bars, next suspect EMA). (check 9, YES branch)
+      Adopting mu-only for the u u~ V L(D) redo departs from the decided HETEROSC default (D52, D71) and from D276 (the sigma
+      fit is the end of training; run.py''s sigma_stage_cfg returns None under heterosc_mu_only). The YES branch must either
+      keep the sigma stage after a mu-only training (the two-stage recipe results.tex describes: mu by MSE, then the frozen-trunk
+      sigma fit) or name the adoption as Joaquin''s question; ''after the sigma-stage readout question is settled'' does not
+      say who settles it. Checked and fine: configs diff to heterosc_mu_only (+ map_head=false on u u~ V fine-tunes, matching
+      stage 2''s unmapped head; s4 t t~ fine-tune keeps the map as its control) and the name-derived DyHPO seed only; same
+      template space, 8 trials 3,3,2; control bars verified (u u~ V D=3162/1e4 0 of 8 well in both arms; best spike 20.7/2.4,
+      228/41); fine-tune mu-only spike numbers verified; disk 69 GB free on CC now against ~1.2 GB; result_path set by run_trial;
+      ++ overrides take the new key on the old parent config.'
   step_waits:
     '2': the design reviewer and the repo-reviewer of the mu-only MSE test (branch lrcentre @541bea53), then its 6 searches
     '3': the design reviewer and the repo-reviewer of the mu-only MSE test (branch lrcentre @541bea53), then its 6 searches
