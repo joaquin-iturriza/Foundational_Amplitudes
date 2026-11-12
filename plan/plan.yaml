@@ -26789,7 +26789,7 @@ entries:
     decision: D401
   owner:
     agent: a42647ffbe02fdac5
-    state: stopped
+    state: closed
     since: '2026-11-12T17:53:55+00:00'
     state_at: '2026-11-12T18:18:47+00:00'
     context: 279339
@@ -27667,36 +27667,33 @@ entries:
     '14': step 15's chosen HPs (searches kit_hpo_uug_plain, kit_hpo_ttvirt_thr after the smoke); code model.input_div_form
       ready @6cdec219
   handoff:
-    state: '2026-11-12 ~19:40 @950f6522. Closed at the context limit (main session''s request). READY for the next owner,
-      in order: step 15 (curve check of the KIT controls with analysis/data_saving/curve_quality.py''s separation/end_up bars,
-      Joaquin: validation must fall with training; controls'' val turns up late, c15b3337 -4.1@6400 -> +25@7680, c364a7ae
-      +0.3@5120 -> 2069@7680; pick the lr where it stays with training, read the mu-MSE val curve beside the HETEROSC NLL)
-      then step 14 (divergence-form input features through the whole network: eikonal s_ik/(s_ij s_jk) per coloured triple,
-      1/s_ij and P(z) per coloured pair, 1/beta per massive pair, log^2(s/m^2) per massive leg; extend wrappers._pair_log_inputs
-      behind a default-off flag + invariance test; one short test uug + tt virtual vs 203a274f/c15b3337 and 3fc1016a at step
-      15''s lr; design + review + D395 smoke). IN FLIGHT: step 13 linear log-invariant polynomial term (smoke acddacca ->
-      uug c4fc1d6f, tt 6bc05a40; design PASS 17:15; read with kit_extrap_read set logpolylin_, kit_figures collect + kit_readout
-      --vs; uug control 203a274f, tt 3fc1016a, degree-2 arms 7b891d10/eb870ad4); step 12(ii) frames gamma_max=4 (95be8db2
-      uug, 88b9334a uugg, read under the 15:55 PASS design, kit_extrap_read set gmax4_, kit_transformer_probe REREAD); step
-      11c one-loop parents: r5loop 066f8539 DIVERGED at step 1264 (loss runaway at peak lr, no data/code fault; finding ~19:00),
-      rerun unchanged 2d653209 (tag r5loop_rerun) -> A_ft dcf42ad6; r5loopbeta ca5873f3 healthy at step 1719 -> A_ft e7dca162;
-      read vs ft_thr bf3d593c / ft_thrbeta 8d1429bf + threshold scan (tools/kit_threshold_scan.py --runs). Naming: never ''skip''
-      to Joaquin; it is the log-invariant polynomial term P_2(L) / P_1(L) (finding ~19:20).'
-    decisions: 'D419 full LLoCa, no route cuts. Linear-only term = model.input_log_skip_linear (7b4f8bd9) under design PASS
-      17:15. 066f8539 rerun unchanged as a repair inside the 11c approval (lowering lr for the loop parents alone would break
-      the comparison; if it diverges again the lr change is a design revision for loop parents and controls). Joaquin: log
-      invariants as inputs are not the functional form of the divergence (step 14); good lr = validation falls with training
-      (step 15).'
-    ruled_out: route cuts (D419); degree-2 log-invariant polynomial term as a general fix (overshoots uug soft +5.00 and tt
-      Sudakov +0.77)
-    running: FA-ccin2p3-acddacca (smoke) -> c4fc1d6f, 6bc05a40 (step 13); 95be8db2, 88b9334a (step 12 ii); 2d653209 -> dcf42ad6,
+    state: '2026-11-12 ~20:45 @1f810cd6. Closed at the context limit. IN ORDER for the next owner: (1) step 15: the D395 smoke
+      of the HP searches runs through sweep/drive.py detached (detach:kit_hpo_smoke, trial FA-ccin2p3-f81cb1d0, pending at
+      close); on its DONE check runs/kit_hpo_smoke/trial_0000''s result json carries val_mse_curve and train_eval_mse_curve
+      and that the sigma stage and plots ran, then detach: python3 tools/detach.py --entry kit_benchmark --name kit_hpo --
+      .venv-cpu/bin/python sweep/drive.py --config sweep/sweep_config_kit_hpo_uug_plain.yaml --config sweep/sweep_config_kit_hpo_ttvirt_thr.yaml
+      --item kit_benchmark --sites ccin2p3 --mem 32G --cpus 4 --hours 2.75 (design PASS 2026-11-12 2nd round; targets recorded
+      1.7 h / 1.3 h per trial, ~24 GPU-h); read with tools/kit_curves.py sweep kit_hpo_uug_plain kit_hpo_ttvirt_thr --out
+      analysis/kit_benchmark/data/kit_hpo.json (the reader reads results on CC''s SWEEP_DIR; under drive.py the results live
+      in sweeps_local/<name>/results: adapt the reader to read those locally first); chosen = lowest best val among good (sep
+      <= 3, end_up <= 2 on mu-MSE); score the chosen trials with kit_predict (REREAD) vs controls 203a274f/3fc1016a kit_result.json;
+      figure of the chosen trials'' val/train mu-MSE curves. (2) step 14: design the divergence-form arms (model.input_div_form=true
+      @6cdec219) on uug plain and tt softpairthr at each setup''s chosen trial HPs (the trial = control), design-reviewer,
+      D395 smoke, then the arms. (3) steps 13 (c4fc1d6f/6bc05a40 linear polynomial term), 11c (dcf42ad6, e7dca162 A_ft) and
+      5 wait on runs. Joaquin''s question on searching uugg and uug T-target (~16 GPU-h more, over 30) goes from the main
+      session.'
+    decisions: 'Step 15 curve check: KIT 1e5 uug/uugg runs fail the curve bars (NLL form), tt holds (finding @daa54068). D422/D423:
+      HPs by single-fidelity DyHPO on template 2 (template space + batch [1562,16384], WSD cooldown 0.125), only uug plain
+      and tt virtual (D412 30 GPU-h). job_kit.sh writes result.json (mu-MSE curves) from daa54068. Step 12(ii) gamma<=4: uug
+      WORSE, uugg NO, not adopted (finding @1f810cd6). Step 16 dropped (duplicate of 14+15).'
+    ruled_out: route cuts (D419); degree-2 log-invariant polynomial term as a general fix; per-frame gamma bound 4 (uug worse
+      bulk +0.59, uugg q-g unchanged)
+    running: smoke FA-ccin2p3-f81cb1d0 (detach:kit_hpo_smoke drive.py); c4fc1d6f, 6bc05a40 (step 13); 2d653209 -> dcf42ad6,
       ca5873f3 -> e7dca162 (step 11c)
-    files: 'wrappers.py (_log_skip quadratic switch, _pair_log_inputs), tests/test_input_reps.py, tools/kit_extrap_read.py
-      (arms gmax4, plain_logskiplin, logskiplin; sets logpoly_, logpolylin_, gmax4_), tools/kit_figures.py (INPUT_ARMS labels
-      P_2/P_1), analysis/kit_benchmark/data/{kit_extrap,kit_fig_A_logpoly_uug,kit_fig_A_logpoly_tt}.json, figs kit_extrap_logpoly_*,
-      analysis/data_saving/curve_quality.py; known tool bug: site logs of a never-started job returned another run''s log
-      (cb111375 -> 95be8db2''s)'
-    written: '2026-11-12T17:52:42+00:00'
+    files: tools/kit_curves.py (collect/read/sweep), analysis/kit_benchmark/data/kit_curves*.json, figs/kit_curves_nll.png,
+      sweep/sweep_config_kit_hpo_{uug_plain,ttvirt_thr,smoke}.yaml, wrappers.py (_div_form_inputs, input_div_form), tests/test_input_reps.py::test_div_form,
+      scripts/job_kit.sh (result_path), analysis/kit_benchmark/data/kit_fig_A_gmax4_{uug,uugg}.json, kit_frames_probe_{uug,uugg}_gmax4.json
+    written: '2026-11-12T18:24:24+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
