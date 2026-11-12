@@ -16982,6 +16982,20 @@ entries:
       cell shapes as fixed cases; a table in an earlier block with a plain last block refused; the four bookkeeping tables
       of 2026-11-11 (audit, timeline, counts, triggers) and plain-sentence numbers pass. Not covered: a table written without
       leading pipes, or results as a bullet list of numbers. Steps 23/24 files committed a79e5eff.'
+  - at: '2026-11-12T00:53:40+00:00'
+    text: '2026-11-12 generation parts (Joaquin: ''aren''t them supposed to be deleted?'', D201): lhe_parts gc --parts (the
+      D208 deletion) was a manual step after assembly that no one ran. Fix 92448c07: the worker that assembles a process deletes
+      its parts and gridpacks once its pools are built (manifest under Q/gc/), tested in test_queue_end_to_end (parts gone
+      after assembly) and test_gc_parts/test_gridpack_queue (manual path); test_tidy_and_gc fails at HEAD before the change
+      too (not fixed). Deleted on CC by gc --parts: catalog_v4_eea 1.29 GB (170 processes), hd_test_h5 0.27, hd_test_5body
+      0.04, hd_test_5body_b 0.02, hd_test_e20_small_runs 0.03 = 1.65 GB; hd_test_measured 1.14 GB refused by the classifier.
+      Kept: catalog_v4_dsh_eea parts 5.7 GB, since none of its 115 train pools exists in amp_data_cache (val/test in datasets
+      do): the parts are their only source; the gridpack queues'' parts are held by sibling queues whose specs are not built.
+      Free after: 51 GB. Wakes 00:00-00:40 UTC (tools/wake_replay.py, a44d46c4): 4 model-calling wakes (waiter 00:00:44, waiter
+      00:21:06 that returned ''no open events'', artifact notice at the 00:25 interrupt, the main session''s background prune
+      00:38:32); the three agent-finished notices made no call. Fixes a44d46c4: mid-run agent messages spooled, finished notice
+      absorbed when the hand-back was spooled, spooling 15 min after a waiter returns, the waiter never returns an emptied
+      window. After: 3 (the empty return gone).'
   handoff:
     state: '2026-11-11: D399 setup fixes merged into trunk 6ec67a05 and pushed (keeper PASS at d56fb00b after 14 findings
       fixed; repo-reviewer PASS at 10ced0d3 after 2 fixes: undecide soft delete, waiter test runner). Out of repo, live: ~/work/CLAUDE.md
