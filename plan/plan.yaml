@@ -23204,9 +23204,9 @@ entries:
   asks: []
   owner:
     agent: a87ebdd2344eb92d7
-    state: working
+    state: stopped
     since: '2026-11-12T00:02:58+00:00'
-    state_at: '2026-11-12T00:02:58+00:00'
+    state_at: '2026-11-12T00:29:03.635000+00:00'
     context: 195233
     context_at: '2026-11-12T00:22:27+00:00'
   designs:
