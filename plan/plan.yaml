@@ -31211,6 +31211,16 @@ entries:
       control. NO (no good trial in 16): extend by 16 trials (drive --n-trials 32, a budget question if over 30 GPU-h); still
       none: widen lr on the side the separation shrinks toward. (B) FIXES bands as round 3; NO EFFECT, worse or failing curves
       at the control''s HPs: the arm''s own search, best against best; only a NO there stops the input.'
+    passed_at: '2026-11-12T19:05:52+00:00'
+    reviewer: 'Round 5 = passed round 4 with each of the four KIT searches cut from 32 to 16 trials (n_startup 6, waves [6,5,5])
+      on D428 (''32 seems a bit too much, let''s do 16 for now''). Diff 69e944dc..bc1a475c on the four kit_hpo configs: only
+      n_trials, n_startup, waves and a comment; three waves as in the sibling layout. Check 3: with a 15-30% good share (curve_quality.json
+      21/71, 14/70, 12/63), P(no good trial in 16) is 0.3-7%, and NO has an extend branch. Cost 16 x 1.70 = 27.2 GPU-h, under
+      30; the arm''s own search, if needed, also has 16 trials (~13 GPU-h, a budget question then). Check 15 readout shown:
+      smoke FA-ccin2p3-f81cb1d0 COMPLETED (site runs); its result json on CC (sweeps/kit_hpo_smoke/results/hp1860_t50_1794509611.json)
+      holds val_mse_curve and train_eval_mse_curve; the log shows the trial stage with heterosc_select mu_mse and ema on,
+      then the sigma stage, and val/test/train predictions; sigma_stage/plots_0 exists. Step 14 unchanged (kit_extrap.json
+      @7656e687). Searched D424-D428 in site decisions.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
