@@ -24061,6 +24061,14 @@ entries:
       4.6e-8, 4.3e-8; new scratch 1.6e-8 (3162), 1.0e-9 (1e4), 3.6e-10 (3.2e4); new ft 5.3e-7, 2.7e-8, 6.8e-10. The old ''fine-tune
       better everywhere'' was against a scratch that plateaued near 1e-7. WSD never reached the default: no decision or step
       adopted par:v4_warm_start_fixes'' WSD-parent result as the default (canonical setup lists CosineAnnealingLR as fixed).'
+  - at: '2026-11-12T04:14:04+00:00'
+    text: '2026-11-12 05:15 suspects batch: two arm runs diverged (aborted after 50 non-finite-gradient steps), real outcomes
+      of their one change, not defects: (1) fine-tune AdamW, t t~ one-loop V/B D=1e3 (FA-ccin2p3-9bdc2cf9, trial 9105, hp1544):
+      val HETEROSC -0.91 at step 340, -0.30, 1.12, then 1.3e14 at 850, abort at 951; (2) scratch WSD, t t~ one-loop V/B D=3162
+      (FA-ccin2p3-d28960d4, trial 9204, hp358): val 1.02 at 850, 4.9/3.5/4.4 at 1020-1360, 1.0e14 at 1530, abort at 1668.
+      Seed 42 at the same HPs reproduces a run, so neither is resubmitted; both are listed apart in the readout (suspects_readout.py
+      @55aeb931). At 05:13 the sibling one-loop AdamW fine-tunes (D=316, 3162, 1e4) and one-loop WSD scratch runs (D=316,
+      1e3, 1e4) had no non-finite step; tree AdamW D=316 and 1e3 completed.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
