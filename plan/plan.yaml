@@ -21492,7 +21492,7 @@ entries:
     decision: D407
   owner:
     agent: a1341471cb6caf07b
-    state: stopped
+    state: closed
     since: '2026-11-12T03:22:24+00:00'
     state_at: '2026-11-12T03:44:46+00:00'
     context: 266571
@@ -24153,43 +24153,27 @@ entries:
     start: '2026-11-12T03:38:25+00:00'
     at: '2026-11-12T03:38:25+00:00'
   handoff:
-    state: 'Step 9 done, step 10 rerun refused by Joaquin (D407: ''No, we wont rerun that now.''); new task D408/D409: find
-      why fine-tune now loses to scratch on t t~ when the original Fig. 22 test had pretraining better everywhere (changes
-      since: pretraining set, optimizer, inputs, preprocessing, loss, scheduler, the HPO lr window), quick targeted tests,
-      not hour-long cells. Findings for that: (1) the late one-loop ''blow-up'' enters no reported number: es_load_best_model=true
-      loads the best-mu checkpoint before the sigma stage; t t~ V ft D=3162 reports its curve minimum 5.35e-7 (step 3060)
-      and is still 33x scratch there. (2) Every-trial read (trial_overfit.py @2c7ea02e): the late rise does not track peak
-      lr (Spearman -0.04 t t~ V ft); a lower fine-tune lr_scale reaches a lower val minimum in 27/34 fine-tune searches (scratch
-      20/34), 11/34 fine-tune bests at the window floor 0.1-0.16: the fine-tune lr window [0.1,10] sits too high; the lead
-      D408 names. (3) Head map (start at the parent''s function, cec3610c/ed7c42c6): tree batch complete, design rule NO CHANGE
-      (8 exact-control cells D=316..1e4, pooled val gmean 1.29, 5/8 below 1, test 0.64); D=3.16e4 val 6.03 / test 0.04, D=1e5
-      0.97/1.04 vs the stage-2 best (reference only); hmap_readout @e779451f. (4) ft/scr test (ft_vs_scratch): t t~ tree 1.9,
-      0.73, 0.83, 0.13, 34, 57, 6.7, 1.17, 1.18 at D=10..1e5; u u~ and u u~ V below 1 at every D; t t~ V >= 1; orders with
-      sigma_parent/sigma_own (2.9, 5.8, 7.4, 42). Figures sent to Joaquin: stage2_LD (best test MSE per D both arms, fits
-      A D^-a + L_inf, crossings of 1e-4; legend strip above, 80477b84), stage2_d316_a/b (test MSE with and without each cell''s
-      worst event: t t~ scratch D=316 back on trend without one event at 97%; u u~ V D=316 unchanged), stage2_d316_c (T vs
-      D: u u~ V shares T=2720 at D=100 and 316), ft_vs_scratch (left ft/scr test vs scratch test, right vs sigma_parent/sigma_own,
-      every D), hmap_LD (every arm, test and val, every D). Not sent: stage2_mse_curves_* (house-style redraw; Joaquin has
-      the runs'' own plots figs/run_plots/), stage2_mismatch (duplicate of ft_vs_scratch''s right panel), trial_overfit_<a..d>,
-      trial_lrwindow_<a..d> (the lr-window evidence, looked at, not yet shown).'
-    decisions: 'D407 no rerun now; D408 get to the bottom of the t t~ fine-tune deficit with quick targeted tests; D409 no
-      hour-long cells per test. Head map kept (correct start, no gain). Reported model = best-mu checkpoint (code, not a choice).
-      Step 8 one-loop t t~ V suspects batch (massown, adamw, pairthr at D=316..1e4, design PASS 2026-11-12, configs sweep/sweep_config_dsave_diag_{massown,adamw,pairthr}_ft_ee_ttbar_nlo_d{5..8}_t8500.yaml
-      + smoke ..._smoke3_..._t50.yaml @7d56534c, controls the offown runs, ~5.5 GPU-h, trial_job.sh --hdr=--time=00:40:00)
-      never submitted: held by the main session (''before more arms''); under D409 its 8500-step cells are what Joaquin does
-      not want, so re-scope to short tests before any launch.'
-    ruled_out: parent_shared start (pooled val gmean 4.0); head map on tree (NO CHANGE, complete); late blow-up as a cause
-      of the reported deficit (best checkpoint is reported); lr as the cause of the late rise (no correlation over 532 trials);
-      inherited sigma (the map does not apply to V/B runs); zero-shot read (dead end, design FIX).
-    running: none
-    files: 'analysis/data_saving/{trial_overfit.py,ft_defect.py,hmap_readout.py,review_figs.py,plot_stage2.py,stage2_readout.py,stage2_mse_curves.py};
-      data/{trial_overfit.json (532 trials'' curves+HPs),ft_defect.json,hmap_runs.json,hmap_readout.json,stage2_readout.json
-      (68 cells, best trial per search),stage2_diag_test.json}; figs/{stage2_LD,stage2_d316_*,ft_vs_scratch,hmap_LD,trial_overfit_*,trial_lrwindow_*,run_plots/}.
-      Runs: stage-2 searches sweeps_local/dsave_s2_{scr,ft}_<target>_d<k>_t<T>/ (driver_state.json, results/), run dirs on
-      CC runs/dsave_s2_*/trial_<hp>[_r<n>] (some pruned: t t~ V ft D=10,32,100,3.16e4, scr D=1e3); diagnostic arms sweep/sweep_config_dsave_diag_{parscale,tops,offown,pshared,psharedtops,hmap,hmaptops}_ft_<target>_d<k>_*.yaml,
-      run dirs runs/dsave_diag_*/ on CC, run ids in data/hmap_runs.json and stage2_diag_runs.json; parents dsave_parent_heldout_r4
-      / treesin_r4 (r4), r5 tops parent; head map base_experiment._map_head_to_own_stats, tests/test_head_map_own_stats.py.'
-    written: '2026-11-12T03:21:24+00:00'
+    state: 'D408 investigation. (1) Old vs new side by side (draft tool scratchpad ovn/old_vs_new.py, data/old_vs_new.json
+      @77271ee4, fig figs/old_vs_new.png, legend in words): today''s scratch is 10-100x better than the old scratch at D>=1e3
+      (tree 2.6e-7->2.8e-8 at 1e3, 1.3e-7->2.5e-9 at 1e4; one-loop old scratch plateau ~1.6e-7 vs new 1.0e-9 at 1e4) while
+      the fine-tune is where it was (tree 3.7e-7/1.4e-7 -> 3.5e-7 at 1e3; one-loop old ft8 2.8e-8 at 7e3 vs new 2.7e-8 at
+      1e4). (2) WSD never reached the default: only par:v4_warm_start_fixes'' result, no decision or step adopted it. (3)
+      Suspects batch, design PASS 03:42: re-smokes FA-ccin2p3-65bd454d (tree) + dd952e7a (one-loop), 50 steps, heterosc_mu_only+WSD+AdamW
+      (first smokes failed: submitter lacked --trial-idx, fixed, E5743/E5744 acked). On their clean end: check out_0.log (V/B
+      run: no ''head mapped'' line; tree: the head-map line), then submit the 56 runs: python3 /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/submit_suspects.py
+      (writes data/suspects_runs.json; site pick FA --jobs 56 first; plan target --batch suspects --wall 0.4 --jobs 56; plan
+      run each; plan wait step 2 on all). Readout draft scratchpad ovn/suspects_readout.py (fetch only; read val_mse_curve
+      min x prepd_std^2, controls listed in the design).'
+    decisions: 'D408/D409/D411/D412: quick tests under 30 GPU-h, no questions overnight. Tree controls = head-map runs (current
+      code); wd arm dropped (wd tracks val equally in both arms, Spearman +0.29); loss arm = heterosc_mu_only (loss=MSE cannot
+      load the 2-ch parent); step 8''s AdamW arm replaced by this batch; limits 0:25/0:32 = 26.6 GPU-h.'
+    ruled_out: 'as before, plus: the scheduler question is answered (never adopted); Muon wd not fine-tune specific.'
+    running: FA-ccin2p3-65bd454d, FA-ccin2p3-dd952e7a (smokes)
+    files: 'scratchpad /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/{ovn/old_vs_new.py,ovn/suspects_readout.py,submit_suspects.py}
+      (to be committed as analysis/data_saving/*.py once the repo-reviewer backlog clears: findings in tools/kit_mlp_readout.py
+      and analysis/agent_redesign/cache_census.py, routed by the main session); analysis/data_saving/data/old_vs_new.json;
+      figs/old_vs_new.png'
+    written: '2026-11-12T03:47:32+00:00'
   step_why:
     2:
       feeds: which knob of the fine-tune recipe causes the t t~ deficit (D408)
