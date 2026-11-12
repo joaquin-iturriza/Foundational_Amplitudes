@@ -23453,6 +23453,18 @@ entries:
       the cell is horizon-limited, not data-limited. Rerun of the 34 fine-tune searches at the study design with the head
       map: stage-2 measured 87.8 GPU-h (t t~ V/B 20.7, u u~ tree 28.0, u u~ V 14.7, t t~ tree 24.4), above 30: Joaquin''s
       go.'
+  - at: '2026-11-12T01:41:46+00:00'
+    text: '2026-11-12 parent_shared batch read (hmap_readout.py @c566b4ab, data/hmap_readout.json; design 00:47, lead a):
+      fine_tune.target_stats=parent_shared (start = the parent''s function in its units) over the same-HP own control, final-model
+      val MSE(ln) re-based, e+e- > t t~ tree D=316,1e3,3162,1e4: r4 7.00, 0.51, 1.00, 0.28 (gmean 1.00; test 4.38, 0.45, 1.04,
+      0.14, gmean 0.73), r5 0.95, 1.22, 12.5, 4568 (gmean 16; test 0.78, 1.00, 1.03, 1.65, gmean 1.07; the r5 D=1e4 val 8.6e-6
+      against test 3.4e-9 is a val outlier). Pooled 8-cell val gmean 4.0 (WORSE by the design''s rule, driven by the r5 D=1e4
+      cell; test pooled 0.89): starting from the parent''s function at the controls'' HPs does not remove the t t~ tree deficit;
+      own kept. Step-0 val HETEROSC 6504 (r4) / 2971 (r5) against 8.3e4 / 2.3e5 unmapped own. Side reads (same tool, stage-2
+      best trials): pre-clip grad norm median 77-700 in scratch and 169-1550 in fine-tunes, so clip_grad_norm 5 binds on every
+      step in both arms (the D68-measured choice, D72); late val-NLL rise (end minus min) in scratch too at small D (one-loop
+      2020, 86, 390, 9 at D=10..316; tree 50, 47, 74 at D=10..100), the fine-tunes'' one-loop up to D=3162 (57, 27, 177 stage-2;
+      220/155 parscale, 30/36/358 tops) and tree to D=316 (tops 32).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
