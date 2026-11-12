@@ -27639,6 +27639,70 @@ entries:
       75 MB; step rate from c15b3337 at the same batch and dtype; KIT test strata as the question asks; prior search: results.tex
       for scalars only, no momenta, invariants only, identity frame, non-equivariant, inputs only, log invariants, Mandelstam,
       and decisions (D374, D403, D411): no prior transformer-without-momenta run.'
+  - at: '2026-11-12T09:25:57+00:00'
+    question: 'D411 input side, general mechanism (Joaquin 2026-11-12: V x beta is a case fix, not a general one; the question
+      is why our transformer does not continue a trend past its trained range where Bakar''s MLP does): fed only Bakar''s
+      inputs, i.e. the log pair invariants (tt: with the threshold log beta^2) and nothing of the momenta (model.input_scalars_only,
+      54288f8f: local momenta zeroed, identity frames) and no off-shellness column (data.offshell_zero=true), does our transformer
+      extrapolate into the KIT limits like the MLP? Targets plain (uug: the control''s emission-scale target; tt virtual:
+      log|V|, no V x beta). Feeds: whether the failure sits in what the transformer reads beyond the log invariants (momenta,
+      frames, off-shellness: then KIT models take the invariant inputs only) or in the stack itself (attention / GELU MLP
+      / pre-LN / readout continuing out-of-range scalars; then tools/kit_saturation_probe.py''s per-component read and an
+      activation arm).'
+    prior: 'Searched docs/results.tex (scalars only, scalars-only, no momenta, without momenta, invariants only, identity
+      frame, IdentityFrames, non-equivariant, inputs only, input_scalars, log invariants, Mandelstam), plan show kit_benchmark,
+      site decisions (D374, D403, D411, D412): no transformer run without its momenta (results.tex 7805 statistics predictor
+      and 8677 LLoCa definition are not this question). Related: D403 MLP ladder (kit_mlp_ladder.json): momenta inputs 2.2-3.2
+      decades worse than log invariants for the MLP; the MLP with all our choices (''ours'') deepest collinear signed error
+      +0.26..+0.44 vs the transformer''s +1.36. Off-shellness off (finding 2026-11-10 10:47, kit_fig_A_nooffshell.json) left
+      uug deep collinear log-MSE unchanged (34.5 vs 30.1) but in a run without pair logs. Probe ~07:00: frames well conditioned,
+      float64, local momenta in range; pair logs and the tt mass column leave range. ReZero: uug STAYED (+1.36 -> +1.10),
+      tt virtual MOVED (-1.08 -> +0.36) but underfit. uug target already flat (2026-11-10T06:22). V x beta: Coulomb fixed
+      by a known factor, a diagnostic only (Joaquin). This design: same transformer and recipe, the inputs cut to Bakar''s
+      set.'
+    measure: 'Primary: deepest-bin median signed error (pred - truth, log10|M|^2) by tools/kit_extrap_read.py (arms ''scalars''
+      for uug and tt and the tt matched control softpairthr 3fc1016a added; read before the arm is judged): uug coll_y 1e-7..1e-6,
+      tt Sudakov 15-50 TeV. Secondary: deepest-bin log-MSE and per family median log10(arm/control log-MSE) by tools/kit_readout.py
+      --vs on a tools/kit_figures.py collect, bulk log-MSE. Figures kit_extrap_<proc>_a.png and kit_mse_A_scalars_<proc>_{a,b}.png.'
+    check: 'Moves with an input change on existing data: in the D403 ladder swapping the MLP''s log invariants for momenta
+      moves deepest-bin log-MSE 2.2-3.2 decades; ReZero moved tt''s deepest Sudakov signed error by 1.44 (kit_extrap.json).
+      The flag removes the momenta: tests/test_input_reps.py::test_scalars_only_reads_no_momentum (54288f8f, CPU float64:
+      with the pair logs held fixed two different event sets give bit-equal outputs; the flag moves the output). What the
+      arm reads, against Bakar''s: the pair logs log(2 p_i.p_j/s)/5 = his log10 s_ij/s0 up to an affine map per column (massless
+      legs; at uug''s fixed 1 TeV s/s0 is a constant); tt with input_pair_threshold: the t t~ pair column is his logthr log
+      beta^2; the tt dimensionless mass column log10(m_t/sqrt s_hat), standardized, is affine in his beam-pair log s/s0; uug''s
+      mass column is constant (massless); particle properties and the order vector are constant per process; off-shellness
+      zeroed (data.offshell_zero, experiment.py: the column held at 0, as a column removed). Left different: affine scales
+      (/5 vs his bulk standardization), which the first Linear absorbs.'
+    fixed: 'job_kit.sh A from scratch, first 1e5 bulk_train events, 8000 steps, seed 42, lr 1.18605e-2 (as both controls),
+      batch 16384, HETEROSC with mu_mse selection and the sigma stage, float64, base trial 1262 config, the controls'' input
+      flags kept. Changes: ++model.input_scalars_only=true ++data.offshell_zero=true (both serve ''only Bakar''s inputs'').
+      uug: site submit ccin2p3 FA scripts/job_kit.sh --item kit_benchmark --hdr=--time=02:30:00 -- kit_ee_uug__me2 100000
+      8000 A ++model.input_soft_eps=1e-8 ++model.input_pair_logs=5 ++model.input_scalars_only=true ++data.offshell_zero=true
+      tag=softpair_scalars. tt: -- kit_ee_tt__virt_finite 100000 8000 A ++model.input_soft_eps=1e-8 ++model.input_pair_logs=4
+      ++model.input_pair_threshold=true ++model.input_scalars_only=true ++data.offshell_zero=true tag=softpairthr_scalars.
+      Launch path as the controls'' and the ReZero arms'' (model flag on the same script, data, stages; kit_predict rebuilds
+      from the saved config). Cost 2 x ~1.6 h (c15b3337: 8000 steps at 0.68 s/step on V100 + 1.7 min sigma stage) = ~3.2 GPU-h,
+      ~75 MB per run.'
+    control: 'uug: kit_A_ee_uug_me2_n100000_t8000_softpair (FA-ccin2p3-c15b3337). tt virtual: kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr
+      (FA-ccin2p3-3fc1016a; deepest Sudakov log-MSE 0.72, mean bias -0.52, kit_fig_A_betainput.json; its median signed error
+      read by kit_extrap_read before the arm), softpair f21fa163 beside it. Reference: Bakar''s MLP seeds 0-2 and ''ours''
+      MLP seeds 0-2 (kit_extrap.json).'
+    seeds: 'Seed 42, one run per process (D315). Noise bands from existing seeds: the MLP-family deepest-bin signed error
+      spans 0.34 (uug mlp -0.38..-0.04) and 0.22 (tt ours +0.01..+0.24); log-MSE spans 0.70 decades (uug mlp 0.033..0.167)
+      and 0.80 (tt ours 0.010..0.063). The gaps the arm must cross exceed them: uug signed +1.36 vs the MLP''s [-0.38,-0.04]
+      (1.40-1.74, 4x the band); tt log-MSE 0.72 vs MLP 0.035-0.058 (1.1-1.3 decades). The transformer''s own KIT seed spread
+      is unmeasured (D315); the catalog single-process spread (results.tex ~13232-13245, up to 1.5 decades in bulk loss) is
+      quoted beside the read.'
+    outcome: 'uug (deepest collinear signed error): YES <= +0.30 (within 0.34 of the MLP''s range); NO >= +1.02 (moved less
+      than 0.34 from +1.36); between: reported with the log-MSE ladder. tt (deepest Sudakov): YES signed error in [-0.22,
+      +0.48] (within 0.34 of the MLP''s +0.12..+0.14) AND log-MSE <= 0.11 (0.8 decades, the MLP-family span, below the control''s
+      0.72); NO log-MSE >= 0.33 (moved less than 0.34 decades) AND signed error within 0.34 of the control''s; between otherwise.
+      Bulk log-MSE worse than the control by more than 1.5 decades: underfit, read as not resolving. YES: what bends is what
+      the transformer reads beyond the log invariants (momenta/frames/off-shellness); next the KIT A/A_ft models on the invariant
+      inputs, uugg arm. NO: the stack itself continues out-of-range scalars wrongly given the MLP''s own inputs; next tools/kit_saturation_probe.py
+      on the control and this arm (which component flattens: GELU off-share, attention max weight, residual growth under pre-LN,
+      readout) and the arm that changes that component. Each process read on its own, side by side.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
