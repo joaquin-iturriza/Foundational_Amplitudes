@@ -128,6 +128,22 @@ def main():
             print(f"{arm:11s}/{ctrl:8s} {tg:13s} D=" + ",".join(f"{D(k):.0f}" for k in ks) + "  val " +
                   " ".join(f"{x:.2f}" for x in rv) + f"  gmean {gmean(rv):.2f}  test " + " ".join(f"{x:.2f}" for x in rt) +
                   f"  gmean {gmean(rt):.2f}")
+    # the design's rule: per target, pooled over the cells with an exact no-head-map control (r4 parscale, r5 tops)
+    out["pooled"] = {}
+    for arms, ctrls, name in ((("hmap", "hmaptops"), ("parscale", "tops"), "headmap"),
+                              (("pshared", "psharedtops"), ("parscale", "tops"), "pshared")):
+        for tg in TARGETS:
+            rv, rt = [], []
+            for a, c in zip(arms, ctrls):
+                p = out["pairs"].get(f"{a}/{c}/{tg}")
+                if p:
+                    rv += p["val"]
+                    rt += p["test"]
+            if rv:
+                out["pooled"][f"{name}/{tg}"] = {"n": len(rv), "gmean_val": gmean(rv), "gmean_test": gmean(rt),
+                                                 "n_below_val": int(sum(x < 1 for x in rv))}
+                print(f"pooled {name:8s} {tg:13s} n={len(rv)} val gmean {gmean(rv):.2f} ({sum(x < 1 for x in rv)} below 1)"
+                      f"  test gmean {gmean(rt):.2f}")
     # the one-loop late blow-up: validation HETEROSC loss at the end over its minimum, per run
     out["blowup"] = {}
     for (a, tg, k), r in sorted(R.items()):
@@ -194,16 +210,19 @@ def figures(R):
             lab, col, m = STYLE[arm]
             ks = sorted(k for (a, t, k) in R if a == arm and t == tg)
             x = [10 ** (k / 2) for k in ks]
-            ax.plot(x, [R[(arm, tg, k)]["gn_pct"][1] for k in ks], marker=m, color=col, label=lab + ", median")
+            ax.plot(x, [R[(arm, tg, k)]["gn_pct"][1] for k in ks], marker=m, color=col, label=lab.split(",")[0] + (", head map" if arm == "hmap" else ""))
             ax.plot(x, [R[(arm, tg, k)]["gn_pct"][0] for k in ks], marker=m, color=col, linestyle=":",
-                    markerfacecolor="none", label=lab + ", 10%")
+                    markerfacecolor="none")
+        ax.plot([], [], color=ps.C.grey, linestyle=":", marker="o", markerfacecolor="none", label="10% quantile")
         ax.axhline(5, color=ps.C.grey, linestyle="--", label="clip bound")
         ax.set_xscale("log")
         ax.set_yscale("log")
+        ax.set_ylim(1, 1e5)
         ax.set_xlabel(r"$D$")
         ax.set_ylabel(r"$\|g\|$ before clipping")
         ps.process_label(ax, TLAB[tg][0])
-    ps.legend(axs[0], "lower left")
+    ps.legend(axs[0], "upper left", ncol=2)
+    ps.make_room(axs[0])
     ps.save(fig, FIGS + "hmap_gradnorm")
 
 

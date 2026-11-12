@@ -47,6 +47,14 @@
    "n_below_val": 1
   }
  },
+ "pooled": {
+  "pshared/epem_ttx": {
+   "n": 8,
+   "gmean_val": 4.007229746530137,
+   "gmean_test": 0.884566871821247,
+   "n_below_val": 4
+  }
+ },
  "blowup": {
   "parscale/ee_ttbar_nlo/316": {
    "min": -3.950878,
