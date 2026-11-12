@@ -28019,6 +28019,22 @@ entries:
       bulk and soft/Coulomb families least. None FIXES while all-cut does: the failure needs the routes together (interaction);
       next the pairwise cuts (L+F keeping O etc.), own design. Each process read on its own; the uug soft family and the tt
       Coulomb family reported beside (the inputs-only arm lost 0.8 decades on uug soft: which route held it).'
+    passed_at: '2026-11-12T10:53:11+00:00'
+    reviewer: 'Read design 10:51 (D411 one-route cuts: input_route_off=local / frames, data.offshell_zero; uug vs softpair
+      c15b3337, tt virtual vs softpairthr 3fc1016a). Check 1: each arm = control + one flag at the same job_kit.sh A recipe
+      (1e5, 8000 steps, seed 42, lr 1.18605e-2, HETEROSC, float64, controls'' input flags); code at 5d509b13 (models/lloca.py:
+      local zeroes features_local only, frames swaps in IdentityFrames only; framesnet still runs, so step rate as control).
+      Check 2: kit_extrap.json @HEAD confirms the all-cut moved the measure: uug deepest collinear signed +1.364 -> -0.045
+      (log-MSE 2.21 -> 0.057), tt virtual deepest Sudakov signed -0.527 -> -0.127 (log-MSE 0.72 -> 0.026). Check 3: D315 one
+      seed, sibling cells all single seed 42; effects 1.4 and 0.4 signed against MLP spreads 0.34 / 0.22 (mlp/ours seeds in
+      kit_extrap.json), bands disjoint with a partial zone. Check 4: CUT FIXES / NO EFFECT / partial per process, with readings
+      for one, several or no route fixing. Check 5 searched docs/results.tex for identity frame, IdentityFrames, local momenta,
+      route_off, no/without frames, frames off, global frame, frameless, offshell_zero, off-shellness off, scalars_only, inputs-only;
+      plan show (all entries) and site decisions for frame/route terms: only the off-shellness-off hits the prior names (results.tex
+      15305-15324, finding 2026-11-10 10:47 without pair logs); no single-route cut exists. Checks 7/9/10/11/12: D411/D412
+      met (~9.6 GPU-h, short), HETEROSC, KIT hard_test/bulk_test strata as the controls, target/preprocessing the controls'',
+      only the flag moves. Check 14/15: ~75 MB x 6 vs 70 GB free on /sps/lpnhe; rate 0.68 s/step from the control itself,
+      2:30 limit. Note: tag/arm names must not collide with the older kit_fig_A_nooffshell.json (no-pair-logs arm).'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
