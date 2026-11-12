@@ -143,8 +143,67 @@ def test_batch_window():
         assert not t.is_alive() and "RUN_DONE" in out[0], out
 
 
+def test_batch_holds_non_urgent():
+    """2026-11-12: a HANDBACK is held for the whole window even when a non-urgent event (STALLED) arrives in it; a RUN
+    (urgent: RUN, GAP, OVERRUN, ALERT) ends the window at once."""
+    os.environ["SITE_WAIT_POLL_S"] = "1"
+    for late, held in (("STALLED", True), ("RUN", False)):
+        with tempfile.TemporaryDirectory() as tmp:
+            m = load_site(tmp)
+            m._rx().read_owners = lambda mm, pr, rules=None: world("stopped")[1]
+            c = m.ldb()
+            m.add_event(c, "FA", None, "HANDBACK", "hb:1", "hand-back of a0 | report: /nonexistent")
+            c.close()
+            out = []
+            t = threading.Thread(target=run_waiter, args=(m, out, 6), daemon=True)
+            t.start()
+            t.join(1.5)
+            c = m.ldb()
+            m.add_event(c, "FA", "catalog_coverage", late, "late:1", "a %s event" % late)
+            c.close()
+            t.join(2.5)
+            assert t.is_alive() == held, (late, out)
+            t.join(8)
+            assert not t.is_alive() and "HANDBACK" in out[0] and late in out[0], out
+            print("B ok: %s mid-window %s" % (late, "held to the window's end" if held else "ends it at once"))
+
+
+def test_supervisor_reloads():
+    """2026-11-12: the supervise loop re-executes itself when ~/.local/bin/site (or site_runends.py) changes."""
+    with tempfile.TemporaryDirectory() as tmp:
+        m = load_site(tmp)
+        fake = os.path.join(tmp, "site")
+        open(fake, "w").close()
+        m.__file__ = fake
+        passes = []
+
+        def one(*a, **k):
+            passes.append(1)
+            os.utime(fake, (time.time() + 10, time.time() + 10))
+            return 0
+        m.supervise_pass = one
+        m.time = types.SimpleNamespace(**{k: getattr(time, k) for k in ("strftime", "time")}, sleep=lambda s: None)
+
+        class Exec(Exception):
+            pass
+
+        def ex(*a):
+            raise Exec(a)
+        m.os = types.SimpleNamespace(**{k: getattr(os, k) for k in dir(os) if not k.startswith("__")})
+        m.os.execv = ex
+        a = types.SimpleNamespace(launches_only=False, quick=False, project="FA", once=False, interval=0)
+        try:
+            m.cmd_supervise(a)
+            raise AssertionError("no reload")
+        except Exec as e:
+            assert passes == [1] and e.args[0][1][1] == fake, (passes, e.args)
+        print("S ok: one pass, then re-exec of", os.path.basename(fake))
+
+
 if __name__ == "__main__":
     test_run_done_one_event_per_entry()
     test_quiet_waiter()
     test_batch_window()
+    test_batch_holds_non_urgent()
+    test_supervisor_reloads()
     teardown_module()
