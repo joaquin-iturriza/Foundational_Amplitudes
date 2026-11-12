@@ -17,6 +17,7 @@ scan    bulk_train events with ONE input pushed past its range, everything else 
 
     python tools/kit_saturation_probe.py <run_dir> [--n 200] [--scan-n 200] --out <json>     (CPU, site checkout)
     python tools/kit_saturation_probe.py plot <uug json> <tt json> --figs <dir>
+    python tools/kit_saturation_probe.py compare <uug ctrl> <uug arm> <tt ctrl> <tt arm> --figs <dir>
 """
 import argparse
 import json
@@ -240,8 +241,47 @@ def plot(uug, tt, figs):
         ps.save(fig, os.path.join(figs, f"kit_sat_scan_{tag}"))
 
 
+def compare(pairs, figs):
+    """kit_sat_cmp_<tag>_a: rms of the residual entering the readout per stratum of the singular family (bulk_train at
+    the family's in-range end), _b: the one-input scan's readout move dmu(k); one curve per run (control, arm)"""
+    import plot_style as ps
+    from tools.kit_figures import family, edges, XLAB
+    for tag, runs in pairs.items():
+        fam = {"uug": "coll_y", "tt": "sudakov_sqrts"}[tag]
+        panels = ps.panels(2)
+        for (path, lab), c, mk in zip(runs, [ps.C.vermillion, ps.C.sky], ["o-", "P-"]):
+            d = json.load(open(path))
+            ks = sorted([k for k in d["strata"] if k.startswith("hard_test/") and family(k.split("/")[1]) == fam],
+                        key=lambda k: edges(k.split("/")[1])[0])
+            x = [float(np.sqrt(np.prod(edges(k.split("/")[1])))) for k in ks]
+            panels[0][1].plot(x, [d["strata"][k]["h_rms"] for k in ks], mk, color=c, label=lab)
+            sk = sorted(d["scan"], key=float)
+            panels[1][1].plot([float(k) for k in sk], [d["scan"][k]["dmu"] for k in sk], mk, color=c, label=lab)
+        ax = panels[0][1]
+        from matplotlib.ticker import NullFormatter
+        ax.set_xscale("log"); ax.xaxis.set_minor_formatter(NullFormatter())   # the Sudakov axis spans one decade
+        ax.set_xlabel(XLAB.get(fam, fam)); ax.set_ylabel(r"rms of readout input $h$")
+        ax = panels[1][1]
+        ax.axhline(0, color=ps.C.grey, lw=0.8)
+        ax.set_xlabel({"uug": r"$k$: shift of one $\log_{10} s_{ij}$ input", "tt": r"$k$: shift of $\log_{10}\sqrt{\hat s}$ input"}[tag])
+        ax.set_ylabel(r"$\Delta\mu$, $\log_{10}|\mathcal{M}|^2$")
+        for _, ax in panels:
+            ps.process_label(ax, {"uug": r"$e^+e^-\to u\bar u g$", "tt": r"$e^+e^-\to t\bar t$ virtual"}[tag])
+            ps.legend(ax, "lower right" if tag == "tt" else "upper left" if ax is panels[0][1] else "lower left")
+            ps.make_room(ax)
+        ps.save_panels(panels, os.path.join(figs, f"kit_sat_cmp_{tag}"))
+
+
 if __name__ == "__main__":
-    if sys.argv[1:2] == ["plot"]:
+    if sys.argv[1:2] == ["compare"]:
+        # compare <uug ctrl> <uug arm> <tt ctrl> <tt arm> --figs <dir> [--labels "ctrl;arm"]
+        ap = argparse.ArgumentParser()
+        ap.add_argument("cmd"); ap.add_argument("paths", nargs=4); ap.add_argument("--figs", required=True)
+        ap.add_argument("--labels", default="transformer;transformer, MLP inputs")
+        a = ap.parse_args()
+        L = a.labels.split(";")
+        compare({"uug": list(zip(a.paths[:2], L)), "tt": list(zip(a.paths[2:], L))}, a.figs)
+    elif sys.argv[1:2] == ["plot"]:
         ap = argparse.ArgumentParser()
         ap.add_argument("cmd"); ap.add_argument("uug"); ap.add_argument("tt"); ap.add_argument("--figs", required=True)
         a = ap.parse_args()
