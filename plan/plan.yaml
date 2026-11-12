@@ -27028,6 +27028,8 @@ entries:
       design with kit_extrap_read (arm gmax4 to wire in ARMS), kit_figures collect + kit_readout --vs, and kit_transformer_probe
       on the arms (frame and relative gamma)
     '5': 'FA-ccin2p3-cb111375 FA-ccin2p3-e7dca162 (11c fine-tunes: the package takes the best A_ft/B once they are read)'
+    '13': 'FA-ccin2p3-95be8db2 FA-ccin2p3-88b9334a (12(ii) gamma bound: whether the linear-only skip is designed alone or
+      combined with frames_gamma_max=4)'
   handoff:
     state: '2026-11-12 ~18:00. Bakar''s slides (D415) corrected and handed back (tools/kit_bakar_figs.py @cc54583f; slide
       8 string-sorted strata fixed). Double cut read (finding ~16:40): moot now, Joaquin decided the KIT models keep full
