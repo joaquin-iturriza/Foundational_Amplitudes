@@ -25358,6 +25358,16 @@ entries:
       fine-tune CLEAN BUT WORSE (2.1e-6 vs 3.5e-7). Removing the HETEROSC 1/sigma^2 weighting lowers jitter 3-4x but leaves
       the large spikes and loses 5x at the minimum: it is not the fix. By the design''s outcome rule (not all WELL), the next
       suspect is EMA fixed on.'
+  - at: '2026-11-12T15:35:58+00:00'
+    text: '2026-11-12 16:55 CET, step 2 next: EMA as the next suspect is already read negative on existing data for t t~ LO
+      (EMA-on trials of the control searches: median jitter 0.76 vs 0.63 off, curve_quality.json, finding 14:06), so it is
+      not run. Next suspect, mechanistic: Muon. Its orthogonalised update has a fixed spectral size whatever the gradient''s
+      magnitude, so near a minimum each full-batch step keeps its size and kicks the model out (spikes that persist at c/10,
+      lr not their cause, most of the fall left to the cosine tail). One-change test configs committed @aa2af061: sweep/sweep_config_dsave_adamw_{scr,ft}_epem_ttx_d7_t8500.yaml
+      (controls dsave_s2_scr / dsave_s4_ft with training.optimizer AdamW, muon_weight_decay out of the space), readout lr_centre_readout.py
+      --test adamw; 16 trials ~4.5 GPU-h. Design to be recorded and reviewed after the b b~ > Z Z LO searches are out (a new
+      design replaces the LO one as the entry''s latest). Diagnostic only: Muon for fine-tunes is Joaquin''s D155/D158; any
+      change of optimizer goes to him.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
