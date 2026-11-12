@@ -23980,6 +23980,12 @@ entries:
     units: null
     start: '2026-11-12T01:42:53+00:00'
     at: '2026-11-12T01:42:53+00:00'
+  - batch: suspects_d7
+    wall_h: 0.33
+    jobs: 16
+    units: null
+    start: '2026-11-12T03:38:25+00:00'
+    at: '2026-11-12T03:38:25+00:00'
   handoff:
     state: 'Step 9 done, step 10 rerun refused by Joaquin (D407: ''No, we wont rerun that now.''); new task D408/D409: find
       why fine-tune now loses to scratch on t t~ when the original Fig. 22 test had pretraining better everywhere (changes
