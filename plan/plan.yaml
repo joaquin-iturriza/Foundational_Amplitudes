@@ -25081,6 +25081,17 @@ entries:
       lr-noise signature). Mu-only MSE test designed (PASS on second look), merged with the fine_tune.map_head switch (f61d3f8d,
       repo-reviewer PASS), started as detach muonly_mse_test: 6 searches, 48 trials, ~13.5 GPU-h, target 1.2 h; readout lr_centre_readout.py
       --test muonly @1f1cdef1.'
+  - at: '2026-11-12T14:41:05+00:00'
+    text: '2026-11-12 ~16:50 CET: Joaquin on the proposed second example (''ee->uu one-loop V''): ''Sorry is this a joke?''.
+      He is right: e+e- > u u~ V/B is a constant (std ln|V/B| 1.9e-12, this entry''s finding 2026-11-10 09:22, D375), so V
+      is a fixed multiple of the Born the trees-in parent trains on; a fine-tune learns one constant, which shows nothing
+      about data saving. Cause in the process: the owner ranked candidates only by what existed (stage-2 searches) and by
+      S and curve quality, and never asked what the target is relative to the parent''s data, although the entry''s own evidence
+      said it. Change: candidates are now checked against the parent recipes, the equality classes and V/B constancy before
+      anything else (b b~ > Z Z V/B: std 0.267, loop in neither parent, Born in the trees-in parent; chosen; u u~ V dropped
+      as an example, its L(D) not redrawn). Proposed rule for Joaquin (CLAUDE.md, Results and reporting): ''A transfer or
+      data-saving target is checked first against the parent''s recipe: not in it, not in an equality class of a process in
+      it (tools/equal_processes.py), and for a one-loop target not a constant V/B (std ln|V/B| on its train pool, vb_spread.py).'''
   targets:
   - batch: calib_trees
     wall_h: 4.0
