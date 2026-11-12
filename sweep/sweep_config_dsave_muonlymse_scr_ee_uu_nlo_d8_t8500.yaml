@@ -1,4 +1,4 @@
-# pretrain_data_saving stage 2: ee_uu_nlo D=316 scr T=2720; est 0.14 GPU-h per trial.
+# pretrain_data_saving stage 2: ee_uu_nlo D=10000 scr T=8500; est 0.45 GPU-h per trial.
 # Written by sweep/gen_data_saving.py.
 cluster:
   scheduler: slurm
@@ -6,16 +6,16 @@ cluster:
   request_gpus: 1
   mem: 32G
   cpus_per_task: 4
-  time: 00:08:00
+  time: 00:27:00
 paths: null
-sweep_name: dsave_lrtenth_scr_ee_uu_nlo_d5_t2720
-base_config: runs/data_saving/dsave_parent_treesin_r4
+sweep_name: dsave_muonlymse_scr_ee_uu_nlo_d8_t8500
+base_config: ${PROJECT_DIR}/runs/data_saving/dsave_parent_treesin_r4
 n_trials: 8
 dyhpo:
   surrogate: gp
   n_candidates: 2000
   objective_scale: auto
-  seed: 1939846119
+  seed: 1397820550
   n_startup: 3
   total_budget: 10000
   waves:
@@ -24,15 +24,16 @@ dyhpo:
   - 2
 fidelity_schedule:
   t_steps:
-  - 2720
+  - 8500
 fixed_params:
   data.source: recipes
   data.processes_file: ${PROJECT_DIR}/recipes/catalog_v4_datasaving_ee_uu_nlo.yaml
-  data.train_subsample: 316
+  data.train_subsample: 10000
   data.eval_subsample: 'null'
   data.phase_space_on_pool: 'true'
   data.memmap: 'false'
   training.heterosc_select: mu_mse
+  training.heterosc_mu_only: 'true'
   evaluation.train_subsample: 2000
   seed: 42
   plot: 'true'
@@ -43,8 +44,8 @@ range_extension:
 search_space:
 - name: training.lr
   type: float_log
-  low: 0.000375
-  high: 0.00338
+  low: 0.0031
+  high: 0.0279
 - name: training.muon_weight_decay
   type: float_log
   low: 0.001

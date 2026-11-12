@@ -1,4 +1,4 @@
-# pretrain_data_saving stage 2: ee_uu_nlo D=3162 ft T=8500; est 0.28 GPU-h per trial.
+# pretrain_data_saving stage 2: epem_ttx D=3162 scr T=8500; est 0.28 GPU-h per trial.
 # Written by sweep/gen_data_saving.py.
 cluster:
   scheduler: slurm
@@ -8,14 +8,14 @@ cluster:
   cpus_per_task: 4
   time: 00:17:00
 paths: null
-sweep_name: dsave_lrthird_ft_ee_uu_nlo_d7_t8500
-base_config: runs/data_saving/dsave_parent_treesin_r4
+sweep_name: dsave_muonlymse_scr_epem_ttx_d7_t8500
+base_config: ${PROJECT_DIR}/runs/data_saving/dsave_parent_heldout_r4
 n_trials: 8
 dyhpo:
   surrogate: gp
   n_candidates: 2000
   objective_scale: auto
-  seed: 1290648566
+  seed: 1852893630
   n_startup: 3
   total_budget: 10000
   waves:
@@ -27,31 +27,25 @@ fidelity_schedule:
   - 8500
 fixed_params:
   data.source: recipes
-  data.processes_file: ${PROJECT_DIR}/recipes/catalog_v4_datasaving_ee_uu_nlo.yaml
+  data.processes_file: ${PROJECT_DIR}/recipes/catalog_v4_datasaving_epem_ttx.yaml
   data.train_subsample: 3162
   data.eval_subsample: 'null'
   data.phase_space_on_pool: 'true'
   data.memmap: 'false'
   training.heterosc_select: mu_mse
+  training.heterosc_mu_only: 'true'
   evaluation.train_subsample: 2000
   seed: 42
   plot: 'true'
   warm_start_idx: 'null'
-  training.lr: 0.002606
-  fine_tune.pretrained_path: runs/data_saving/dsave_parent_treesin_r4/models/model_run0_best.pt
-  fine_tune.target_stats: own
-  fine_tune.offshell_stats: parent
+  fine_tune.pretrained_path: 'null'
 range_extension:
   enabled: false
 search_space:
-- name: fine_tune.lr_scale
+- name: training.lr
   type: float_log
-  low: 0.1
-  high: 10.0
-- name: fine_tune.layer_decay
-  type: float_uniform
-  low: 0.75
-  high: 1.0
+  low: 0.00261
+  high: 0.0235
 - name: training.muon_weight_decay
   type: float_log
   low: 0.001
