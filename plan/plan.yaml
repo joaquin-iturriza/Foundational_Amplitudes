@@ -21565,9 +21565,9 @@ entries:
     decision: D420
   owner:
     agent: a76faebcc01af3f14
-    state: stopped
+    state: working
     since: '2026-11-12T18:37:37+00:00'
-    state_at: '2026-11-12T21:29:24.741000+00:00'
+    state_at: '2026-11-12T21:33:27.068000+00:00'
     context: 235057
     context_at: '2026-11-12T21:34:09+00:00'
   designs:
@@ -27249,7 +27249,7 @@ entries:
     agent: ad1a12dcf02712802
     state: working
     since: '2026-11-12T21:29:09+00:00'
-    state_at: '2026-11-12T21:29:09+00:00'
+    state_at: '2026-11-12T21:33:28.506000+00:00'
     context: 87808
     context_at: '2026-11-12T21:33:47+00:00'
   findings:
