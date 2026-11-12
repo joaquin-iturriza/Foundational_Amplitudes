@@ -26834,6 +26834,7 @@ entries:
     - FA-ccin2p3-7d74d518
     - FA-ccin2p3-84d3488e
     - FA-ccin2p3-88aa155a
+    - FA-ccin2p3-8c1223c0
     - FA-ccin2p3-a90e1ab4
     - FA-ccin2p3-ab1442d0
     - FA-ccin2p3-ac4868da
@@ -26847,8 +26848,9 @@ entries:
     - FA-ccin2p3-e4eecead
     - FA-ccin2p3-e8088a7d
     - FA-ccin2p3-eb0f30db
+    - FA-ccin2p3-f45f434a
     - FA-ccin2p3-f6b2ece9
-    commit: ffd40c13
+    commit: 69e944dc
     paths:
     - analysis/kit_benchmark/data/kit_curves_read.json
     - analysis/kit_benchmark/data/kit_fig_A.json
@@ -26859,7 +26861,9 @@ entries:
     - scripts/job_kit_rescore.sh
     - scripts/job_kit_threshold.sh
     - sweep/sweep_config_kit_hpo_ttvirt_thr.yaml
+    - sweep/sweep_config_kit_hpo_uug_T.yaml
     - sweep/sweep_config_kit_hpo_uug_plain.yaml
+    - sweep/sweep_config_kit_hpo_uugg_T.yaml
     - tests/test_input_reps.py
     - tests/test_kit_hardps.py
     - tests/test_kit_threshold_scan.py
