@@ -15788,10 +15788,6 @@ entries:
       notifications after a hand-back were already absorbed; owner resumes by peer hand-backs cannot be held (Claude Code
       offers no delivery delay, an owner has no waiter). Also confirm the first run of a held item that ends gets its RUN
       event and RUN_DONE with no manual poll (next 19 fix).'
-    22: 'drive.py re-pick of queued trials (Joaquin 2026-11-12: ''this is the third time you tell me you are fixing the site
-      picker to fix this exact issue. Can you actually do it for once?''): b71880f1 on branch drive-repick (worktrees/wt-drive-repick),
-      tests/test_drive_repick.py 7 cases; repo-reviewer, then merge into trunk and remove the worktree; running drivers pick
-      it up at their next relaunch (none restarted by the owner)'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16287,11 +16283,6 @@ entries:
       if:
       - 'saving within or above 11-30% on main per day: keep 10 min'
       - 'below: report to Joaquin with numbers and causes'
-    22:
-      feeds: whether drive.py moves trials stuck in a site's queue
-      if:
-      - 'reviewer PASS: merge into trunk, push, remove the worktree'
-      - 'reviewer FIX: fix the findings, re-check with the same reviewer'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
@@ -16299,7 +16290,6 @@ entries:
     '17': 'the first real idle moment: plan next listing RESUME/LAUNCH with no FA job live; the supervisor''s own STALLED
       idle: event (or its absence after 45 min) is the trigger'
     '21': the date 2026-11-17 (a week after the 2026-11-09 23:54 restart on the batching code)
-    '22': a reviewer
   owner:
     agent: a8dbddc87318bf574
     state: working
