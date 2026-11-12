@@ -23198,6 +23198,60 @@ entries:
       bar ~3.5 sd. Disk 15-35 MB/run vs 31 GB free on CC; limits 1.3x config vs measured 12-24 min (D=316..1e4), 62 min (D=1e5).
       Searched results.tex for head map, readout rescale, parent''s function, target_stats, parent_shared, kept standardization,
       zero-shot start, sigma head, output head, refit, own/parent stats, warm start; entry dead ends; site decisions.'
+  - at: '2026-11-12T03:34:52+00:00'
+    question: 'D408/D409 (Joaquin 2026-11-12: why does fine-tuning now lose to scratch on e+e- > t t~, which change since
+      the original transfer figures does it, fix it): at the cell with the largest deficit, D=3162 (k=7), e+e- > t t~ tree
+      (ft/scr val 19x) and one-loop V/B (33x), which single change of today''s fine-tune recipe, applied to the stage-2 best
+      fine-tune at its HPs and seed, closes the gap to scratch: (a) lower lr (lr_scale x1/3, x1/10; the HPO lead: fine-tune
+      bests at the window floor), (b) Muon decoupled weight decay 0 (wd pulls the parent''s weights to zero; tree best 0.051),
+      (c) scheduler WSD instead of cosine (the agreed switch, par:v4_warm_start_fixes, never reached the default), (d) optimizer
+      AdamW instead of MuonAdamW (the old recipe''s optimizer family), (e) loss MSE instead of HETEROSC (the old loss); (c)
+      and (e) also on scratch at its stage-2 best HPs, to see whether a change moves both arms. Feeds: which knob of the fine-tune
+      recipe is wrong, the fix, and what the 34 fine-tune searches would need.'
+    prior: 'Side-by-side read (analysis/data_saving/old_vs_new.py draft, data/old_vs_new.json; tool commit pending on the
+      repo-reviewer backlog): today''s scratch improved, the fine-tune did not. Tree t t~ val MSE(ln|M|^2), old ladder (catalog_v3,
+      sec:ladder) vs stage 2: scratch D=1e3 2.6e-7 -> 2.8e-8, 3162 2.2e-7 -> 8.5e-9, 1e4 1.3e-7 -> 2.5e-9; fine-tune (old
+      rung 5 / rung 9) 3.7e-7/1.4e-7 -> 3.5e-7, 3.2e-8/4.0e-8 -> 1.6e-7, 2.3e-8/1.6e-8 -> 6.0e-9. One-loop t t~ (old cscan,
+      ee_ttbar_nlo_virt_e4 alone, best over horizons up to 29k steps, D=0.7 S): old scratch 2.6e-7 (D=7e3), 1.6e-7 (7e4),
+      plateau; old ft8 2.8e-8 (7e3), 4.6e-8 (7e4); new scratch 1.6e-8 (3162), 1.0e-9 (1e4); new ft 5.3e-7 (3162), 2.7e-8 (1e4).
+      Old recipe (Jean Zay run lines): MSE loss (geometric_mean), CosineAnnealingLR, Adam-family muP optimizer, lr 1.08e-3
+      x lr_scale [0.005,50], layer_decay [0.65,1], L2 1e-11..1e-6, batch min(16384, 0.35 S), es_load_best_model false, 8-process
+      parent 94k steps at B=16384 (tree t t~ in it). Entry: same-HP reruns spread 0.46-4.84; head map NO CHANGE (gmean 1.29);
+      parent_shared start no gain; off-shellness own scale (offown) run; lr_scale lower -> lower val in 27/34 fine-tune searches
+      (trial_overfit.py @2c7ea02e), 11/34 bests in [0.1,0.16]; Muon wd vs val-min per search (trial_overfit.json, this design''s
+      check): median Spearman +0.29 t t~ tree and V in both arms, so wd hurts t t~ scratch as much as ft. results.tex par:v4_warm_start_fixes:
+      WSD parent better (PP4 0.759, EE4 0.832 of the cosine control); canonical setup still CosineAnnealingLR (no decision
+      moved it: site decisions searched for WSD/scheduler: D302/D303 only). D52/D71: HETEROSC beat MSE (on pretraining). Searched
+      results.tex (transfer, ladder, warm_start, WSD, AdamW, Muon, weight decay), plan entry, site decisions --project FA.'
+    measure: 'Per run the val mu-MSE of the run''s log target in ln units at the best checkpoint (val_loss x prepd_std^2 from
+      the run''s RESULT_JSON/result.json; for one-loop ln|V/B|), and test MSE beside (stage2_readout.py --diag units); R_arm
+      = arm / control, control = the geometric mean of the two same-HP runs at the cell (tree ft: FA-ccin2p3-cc8c9a27 stage-2,
+      c985b447 rerun; V ft: ba3dadd6, cca42cd5); scratch arms over the stage-2 scratch best (tree 87fc7187, V 1f94de90). Deficit
+      after the change: arm ft / scratch-best. Val and train mu-MSE curves of every run drawn beside its control.'
+    check: 'On existing data the val read moves with each knob at fixed cell: lr_scale vs val minimum within fine-tune searches
+      (Spearman median +0.30 t t~, +0.21 t t~ V; 27/34 searches), Muon wd +0.29 (both arms); the same-HP pair spread at these
+      two cells is cc8c9a27/c985b447 and ba3dadd6/cca42cd5 (read in the readout); across the entry same-HP ratios 0.46-4.84.
+      The deficits to close are 19x (tree) and 33x (V), above that spread, so a change that removes them reads as R <= 1/5.'
+    fixed: 'Cell D=3162, T=8500, seed 42, pools and recipes of the stage-2 configs; fine-tunes from dsave_parent_heldout_r4
+      (tree) / treesin_r4 (V) via sweep/sweep_config_dsave_diag_parscale_ft_{epem_ttx,ee_ttbar_nlo}_d7_t8500.yaml at the stage-2
+      best HPs (hp 1817 tree, 120 V); scratch via sweep/sweep_config_dsave_s2_scr_{epem_ttx,ee_ttbar_nlo}_d7_t8500.yaml at
+      hp 640 / 358; everything but the one override per arm: (a) fine_tune.lr_scale x1/3 and x1/10, (b) training.muon_weight_decay=0,
+      (c) training.scheduler=WSD training.wsd_cooldown_frac=0.125 (the WSD parent''s 533/4264), (d) training.optimizer=AdamW,
+      (e) training.loss=MSE. Code trunk at submission.'
+    control: 'Same config, HPs and seed without the override: tree ft cc8c9a27 + c985b447, V ft ba3dadd6 + cca42cd5, scratch
+      tree 87fc7187, V 1f94de90.'
+    seeds: 'One seed (42) per arm and target, as the controls; 12 fine-tune runs (6 arms x 2 targets) + 4 scratch runs (WSD,
+      MSE x 2 targets) = 16 runs, ~19 min each measured (c985b447: 1123 s), limit 0:35, ~5 GPU-h work, 9.3 GPU-h at limits,
+      under D408''s 30 GPU-h.'
+    outcome: 'Per arm and target: FIXES if R <= 1/5 on the fine-tune and the fine-tune lands within 3x of scratch (ft/scr
+      <= 3, from 19x/33x); HELPS if 1/5 < R <= 1/2; NONE if 1/2 < R < 2; HURTS if R >= 2. A change that also moves scratch
+      by the same factor (c, e) is a better recipe, not a fine-tune fix: read as such. If (a) FIXES or HELPS on both targets:
+      the fine-tune lr window is the defect; the fix is the window (and the HPO question goes to Joaquin with these runs as
+      evidence). If (b) FIXES: decay toward zero erases the parent; fix = wd 0 or decay toward the parent. If (c) FIXES on
+      ft: WSD into the fine-tune template. If (d)/(e) FIXES: Muon or HETEROSC is what the fine-tune does not tolerate, reported
+      with the old-vs-new figure. If none FIXES on a target: no single recipe knob explains it there; the remaining suspect
+      is the parent itself (weaker, shorter pretraining than the old 94k-step one) and the next test is the parent, designed
+      then.'
   step_waits:
     '8': the main session's read of the defect hunt (its 'before more arms'); then launched as designed
   findings:
