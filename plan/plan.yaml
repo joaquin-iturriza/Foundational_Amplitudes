@@ -26800,6 +26800,17 @@ entries:
       the transformer''s other non-MLP parts, the attention (the transformer with its attention blocks removed, per-particle
       MLP and mean pool) designed then. A run that diverges is reported with where it blew up and counts as ''not trainable
       without norms at these HPs''. Cost: smoke ~0.1 GPU-h, 2 runs x ~1.8 h (0.55-0.8 s/step at 8000 steps): ~3.7 GPU-h.'
+    passed_at: '2026-11-12T03:44:42+00:00'
+    reviewer: 'One change (++model.net.layer_norm=false, e618f235: only BaselineTransformerBlock norm1/norm2 become identities,
+      no other norm in the backbone or readout) against the softpair scratch controls c15b3337/f21fa163 at the same job_kit
+      A config, HPs, seed, steps, HETEROSC, inputs and KIT hard_test strata; Bakar''s MLP seeds 0-2 as the reference D403
+      asks for. Check 2: kit_extrap.json confirms the measure separates architectures: uug coll y 1e-7..1e-6 transformer err
+      +1.364 (log-MSE 2.21) vs MLP -0.38/-0.19/-0.04 (0.17/0.058/0.033); tt 15-50 TeV -1.076 (7.21) vs +0.12..+0.14 (0.035-0.058).
+      Check 3: one seed per D315 as the controls; MLP seed-pair 90% spread 0.54 (uug coll) / 0.61 (tt Sudakov) decades against
+      an expected gap of ~1.6-2.1 decades. Outcome stated both ways; a NO is at the controls'' HPs only (A/B step 1), to be
+      said so when reported. Cost ~3.7 GPU-h, under D412''s 30. Prior searched: results.tex ''layer.?norm|pre-norm|prenorm|without
+      norm|no.?ln'' (only an unrelated LLM final-LayerNorm line 12304), site decisions (D315, D403, D411, D412), the entry''s
+      findings: no earlier run without the norms.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
