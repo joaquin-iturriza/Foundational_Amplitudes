@@ -22520,6 +22520,7 @@ entries:
   step_waits:
     '7': FA-ccin2p3-35922ca9 FA-ccin2p3-adbd0552
     '8': the main session's read of the defect hunt (its 'before more arms'); then launched as designed
+    '9': 'a reviewer: design-reviewer on the zero-shot eval design'
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
