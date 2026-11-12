@@ -24199,8 +24199,7 @@ entries:
       If NO CHANGE on u u~ V: the draft figure is the stage-2 u u~ V L(D) with its curve numbers stated; the next suspect
       is EMA fixed on (lower median jitter on u u~, u u~ V, t t~ V/B in the existing trials). t t~ read the same way, behind.'
   step_waits:
-    '2': the detached driver lr_centre_test (sweep/drive.py over dsave_lrthird_{scr,ft}_epem_ttx_d7_t8500 and dsave_lrtenth_{scr,ft}_epem_ttx_d7_t8500,
-      CC, 32 trials)
+    '2': the design reviewer and the repo-reviewer of the mu-only MSE test (branch lrcentre @541bea53), then its 6 searches
     '3': the design reviewer and the repo-reviewer of the mu-only MSE test (branch lrcentre @541bea53), then its 6 searches
   findings:
   - at: '2026-11-10T03:35:22+00:00'
