@@ -21203,10 +21203,6 @@ entries:
   - D360
   - D377
   next:
-    7: 'D400 rerun (design recorded 2026-11-11 ~22:30): CPU prebuild of the 278 physical-mass top train pools (recipes/catalog_v4_datasaving_h3_train.yaml,
-      job_catalog_v4_regen.sh x4 shards), D395 smoke run, parents r5 heldout (1422 pools) and treesin (1424) via job_datasaving_parent.sh;
-      then the 34 fine-tune searches sweep/sweep_config_dsave_s3_ft_*.yaml through drive.py (88-103 GPU-h, waits for Joaquin''s
-      go on cost); scratch searches of stage 2 reused'
     8: 'One-loop t t~ V suspects batch, design PASS 2026-11-12 (configs sweep/sweep_config_dsave_diag_{massown,adamw,pairthr}_ft_ee_ttbar_nlo_d{5..8}_t8500.yaml
       + smoke ..._smoke3_..._t50.yaml @7d56534c, controls the offown runs, ~5.5 GPU-h): smoke then 12 runs via trial_job.sh,
       --hdr=--time=00:40:00; held by the main session (''before more arms'') until the defect read is seen'
@@ -21325,12 +21321,6 @@ entries:
     since: '2026-11-12T01:31:29+00:00'
     state_at: '2026-11-12T01:51:50.429000+00:00'
   step_why:
-    7:
-      feeds: S at 1e-4 per target from parents with the physical-mass tops (D400)
-      if:
-      - 'geomean ft(s3)/ft(s2) <= 1/3 on t t~ D=316..1e4: physical tops were the deficit; S from s3 written up'
-      - 'geomean >= 1/1.5: tops not the cause; next suspects the dimensionless-mass column and the fine-tune optimizer, S
-        from s3 still written up'
     8:
       feeds: whether a one-loop input or optimizer change removes the t t~ V fine-tune deficit (D400)
       if:
