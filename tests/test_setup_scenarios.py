@@ -389,6 +389,18 @@ def answers():
              rc == 0 and e["status"] == "running" and e["next"] == "run it" and e["quotes"][0]["decision"] == "D900"
              and e["asks"][0]["answered_at"], out)
     scenario("once answered, plan next no longer lists the reply", "the user wrote" not in w.plan_cmd("next")[1])
+    # a no to a question blocking only step 2 drops step 2 and leaves the entry running; one blocking all of it holds it
+    no = [(ago(29), "assistant", "Joaquin, should step 2 run?"), (ago(3), "user", "no, not that one please")]
+    steps3 = {"1": "one", "2": "two", "3": "three"}
+    for bs, held in (([2], False), ([1, 2, 3], True)):
+        w = World([E("ps", next=dict(steps3), blocks_steps=bs, blocks="step 2", **wait())], items=[("ps", None)],
+                  transcript=no)
+        rc, out = w.plan_cmd("answer", "ps", "--kind", "hold", "--quote", "no, not that one please")
+        e = w.entries()["ps"]
+        scenario("answer --kind hold on a question blocking %s: %s" % (bs, "whole entry held" if held else "step 2 dropped"),
+                 rc == 0 and "ask" not in e and (e["status"] == "held") == held
+                 and (held or (e["next"] == {"1": "one", "3": "three"} and "D900" in e["dead_ends"][0]["why"]
+                               and e["dead_ends"][0]["tried"] == "two")), out + str(e))
     w = World([E("ng", **wait())], transcript=say[:1] + [(ago(3), "user", "Unrelated: how is the pp generation going")])
     r = subprocess.run([sys.executable, CHECK], input="{}", env=w.env, capture_output=True, text=True)
     scenario("a non-answer while a question is open does not block and prints nothing",

@@ -2616,9 +2616,13 @@ def cmd_answer(a):
             sys.exit("plan: not recorded: the user typed these words before %s (%s)" % (
                 what, since.isoformat()[:16] if since else "?"))
         made_item = False
+        # a no to a question that blocks only some steps drops those steps; the entry keeps running (the user, D401)
+        part = blocked_steps(e) if a.kind in ("hold", "forbid") and open_question(e) else set()
+        part = part if part < set(step_keys(e)) else set()
+        kind = "scope" if part else a.kind        # a hold/forbid decision would hold the whole item in the ledger
         if a.kind == "release" and not item_exists(e["id"]):
             sys.exit("plan: %s has no site item to release; attach one first (plan item)" % e["id"])
-        if a.kind in ("hold", "forbid") and not item_exists(e["id"]):
+        if kind in ("hold", "forbid") and not item_exists(e["id"]):
             # an entry paused before it had an item: the item is filed under the entry's own approval or scope in
             # force (site item add takes no hold), then the hold puts it on hold; undone if the hold fails
             under = next((x for x in e.get("decisions") or [] for dx in [decision(x)]
@@ -2630,7 +2634,7 @@ def cmd_answer(a):
             if not ok:
                 sys.exit("plan: site item %s not created (%s); nothing recorded" % (e["id"], why))
             made_item = True
-        rc, out, err = site_call("decide", PROJECT, "--kind", a.kind, "--quote", a.quote, "--covers", e["id"])
+        rc, out, err = site_call("decide", PROJECT, "--kind", kind, "--quote", a.quote, "--covers", e["id"])
         m = re.search(r"\b(D\d+)\b", out)
         if rc != 0 or not m:
             if made_item:
@@ -2660,7 +2664,17 @@ def cmd_answer(a):
             e[k] = v
         if "next" in sets:                        # a new text: its old feeds and branches no longer describe it
             e.pop("step_why", None)
-        if a.kind in ("hold", "forbid"):
+        if part:
+            items = dict(nexts(e))
+            for k in sorted(part):
+                e.setdefault("dead_ends", []).append({"tried": items.pop(k), "why": "step %d dropped by %s: the user "
+                                                      "answered no to the question that blocked it" % (k, did),
+                                                      "at": now().isoformat()})
+                (e.get("step_waits") or {}).pop(str(k), None)
+            put_nexts(e, sorted(items.items()))
+            if e.get("status") == "waiting_user":
+                e["status"] = "running"
+        elif a.kind in ("hold", "forbid"):
             e["status"], e["hold_decision"] = "held", did
         elif a.kind == "release" and e.get("status") == "held":
             e["status"] = "running"
