@@ -16199,7 +16199,7 @@ entries:
     agent: a6a10b9aac169049a
     state: stopped
     since: '2026-11-12T00:02:54+00:00'
-    state_at: '2026-11-12T00:25:55+00:00'
+    state_at: '2026-11-12T00:26:22.023000+00:00'
     context: 174268
     context_at: '2026-11-12T00:26:23+00:00'
   designs:
