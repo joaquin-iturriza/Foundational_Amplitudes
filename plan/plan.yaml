@@ -26132,6 +26132,10 @@ entries:
       on uug+uugg softpair 1e5 vs c15b3337/c364a7ae, G ~4 (uug bulk_train gamma median 1.25, q90 1.65, max 10.2; collinear
       overshoot starts at gamma ~4), own design+review+D395 smoke; (iii) tt high sqrt(s): lightlike-tops guess, eval-only
       first; (iv) step 11 continues'
+    13: 'Log-skip follow-up (finding 2026-11-12 ~19:00, PARTIAL): the skip fixed tt Coulomb (log-MSE 3.55 -> 1.72, exponent
+      -0.55) but overshoots uug soft (+5.00, exponent -3.20 vs -2) and flips tt Sudakov to +0.77: the quadratic term continues
+      past the truth. Next: a linear-only variant (a small wrappers._log_skip switch for the quadratic term + test) on the
+      same pairs (uug plain 203a274f, tt softpairthr 3fc1016a), own design + review + D395 smoke'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -27011,6 +27015,12 @@ entries:
       if:
       - 'a test fixes its spot within the MLP bands: it goes into the KIT models'
       - 'none fixes: the KIT answer is the comparison against all of Bakar''s plots with the weak spots stated'
+    13:
+      feeds: whether a general divergence readout is the KIT fix with full LLoCa (D419)
+      if:
+      - 'linear-only keeps Coulomb and removes the overshoots: it goes into the KIT models, combined with frames_gamma_max
+        if 12(ii) says YES'
+      - 'it loses Coulomb or keeps the overshoot: the readout is not the lever; the skip stays a tt-Coulomb-only option'
   step_waits:
     '5': FA-ccin2p3-203a274f FA-ccin2p3-7b891d10 FA-ccin2p3-eb870ad4
     '11': FA-ccin2p3-cb111375 FA-ccin2p3-e7dca162 (11c A_ft fine-tunes; chain smoke af3c9ca5 -> parents 066f8539 r5loop, ca5873f3
