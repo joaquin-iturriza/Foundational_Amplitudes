@@ -153,7 +153,10 @@ INPUT_ARMS = {"pairlogs": r"+ $\log(s_{ij}/s)$ inputs", "softrescale": "+ soft l
               # + the learned log-invariant polynomial term on the output (degree 2, or 1 for _logskiplin)
               "softpair_plain": "plain target",
               "softpair_plain_logskip": r"plain target + $P_2(L)$", "softpair_plain_logskiplin": r"plain target + $P_1(L)$",
-              "softpairthr_logskip": r"+ $\log\beta^2$ + $P_2(L)$", "softpairthr_logskiplin": r"+ $\log\beta^2$ + $P_1(L)$"}
+              "softpairthr_logskip": r"+ $\log\beta^2$ + $P_2(L)$", "softpairthr_logskiplin": r"+ $\log\beta^2$ + $P_1(L)$",
+              # A_ft parents (D405, step 11c): r5, + LO top pairs log-uniform in beta, + one-loop top pairs; beta input
+              "ftr5own": "r5", "ftr5thrown": "r5 + LO tops", "ftr5thrbetaown": r"r5 + LO tops, $\log\beta^2$",
+              "ftr5thrloopown": "r5 + LO, loop tops", "ftr5thrloopbetaown": r"r5 + LO, loop tops, $\log\beta^2$"}
 
 
 def arm_label(r, with_n=True):
@@ -197,7 +200,8 @@ def plot(path, outdir, prefix="", split_offshell=False):
         ls = {}
         if len(runs) > len(colors):   # colours would repeat: a fine-tune takes its scratch twin's colour, dashed (lr x0.1 dotted)
             twin = {(r["n"], r["tag"]): c for _, c, r in arms if r["mode"] == "A"}
-            free = iter([c for c in colors if c not in twin.values()] * 2)
+            # yellow only here, as a 7th colour: cycling the six repeated a colour on two arms (11c set, 2026-11-12)
+            free = iter([c for c in colors + [ps.C.yellow] if c not in twin.values()] * 2)
             for i, (lab, c, r) in enumerate(arms):
                 if r["mode"] == "A_ft":
                     lr = r["tag"].endswith("lr0p1")
@@ -228,13 +232,13 @@ def plot(path, outdir, prefix="", split_offshell=False):
             ax.set_xlabel(XLAB.get(fam, fam.replace("_", " ")))
             ax.set_ylabel(r"log-MSE of $\log_{10}|\mathcal{M}|^2$")
             ps.process_label(ax, PROC.get((stem, target), stem))
-        # each panel's legend lists what that panel draws (the reference line is absent where it is zero throughout);
-        # the shared strip takes the panel with the most entries
-        if len(arms) > 4:   # a long legend squeezes the panels: its own strip file (<base>_legend) above them
-            richest = max((ax for _, ax in figs), key=lambda x: len(x.get_legend_handles_labels()[0]))
-            written += ps.legend_strip(richest, os.path.join(outdir, f"kit_mse_{prefix}{base}_legend")) or []
-        else:
-            for _, ax in figs:
+        # each panel file carries its own legend (any file may be shown alone; Joaquin 2026-11-12: 'The figure has no
+        # legend'), listing what that panel draws (the reference line is absent where it is zero); inside the axes up
+        # to 4 arms, else a strip above the panel on the same canvas (more entries fit in no 2.4 x 1.92 in box)
+        for fig, ax in figs:
+            if len(arms) > 4:
+                ps.shared_legend(fig, ax, ncol=2)
+            else:
                 ps.legend(ax, "upper left")
                 ps.make_room(ax)
         written += ps.save_panels(figs, os.path.join(outdir, f"kit_mse_{prefix}{base}"))
@@ -254,10 +258,10 @@ def plot(path, outdir, prefix="", split_offshell=False):
             ax.set_ylabel(r"median $\log_{10}|\mathcal{M}|^2$")
             ps.process_label(ax, PROC.get((stem, target), stem))
         h0 = figs[0][1].get_legend_handles_labels()[0]
-        if len(arms) > 4:   # a long legend squeezes the panels: its own strip file (<base>_legend) above them
-            written += ps.legend_strip(figs[0][1], os.path.join(outdir, f"kit_median_{prefix}{base}_legend")) or []
-        else:
-            for _, ax in figs:
+        for fig, ax in figs:
+            if len(arms) > 4:
+                ps.shared_legend(fig, figs[0][1], ncol=2)
+            else:
                 ps.legend(ax, "upper left", handles=h0)
                 ps.make_room(ax)
         written += ps.save_panels(figs, os.path.join(outdir, f"kit_median_{prefix}{base}"))
