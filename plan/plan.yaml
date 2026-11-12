@@ -26998,6 +26998,13 @@ entries:
       D419; the readout''s overshoot points to the quadratic term (a linear-only skip is the next candidate, to be designed).
       Figures analysis/kit_benchmark/figs/kit_extrap_logskip_ee_uug_me2_{a,b}.png, kit_extrap_logskip_ee_tt_virt_finite_{a,b}.png
       (control, plain target, plain + skip / skip, MLP).'
+  - at: '2026-11-12T17:22:55+00:00'
+    text: '2026-11-12 ~18:30 @baef37dd. Step 13 linear-only log skip: model.input_log_skip_linear (7b4f8bd9, wrappers._log_skip
+      quadratic switch, test_log_skip extended, 10 tests pass); design PASS 17:15; smoke FA-ccin2p3-acddacca (uug, 50 steps)
+      -> c4fc1d6f (uug plain + linear skip, tag softpair_plain_logskiplin) and 6bc05a40 (tt softpairthr + linear skip, tag
+      softpairthr_logskiplin), afterok, 2:30 limit, target 1.8 h. Read: tools/kit_extrap_read.py arms plain_logskiplin/logskiplin
+      and figure set logskiplin_ (237a09f6), gmax4 arm and set gmax4_ wired too. Running unchanged: 11c parents 066f8539/ca5873f3
+      training (est 3.4/4.7 h), fine-tunes cb111375/e7dca162 pending; gmax4 95be8db2 (step 4800/8000), 88b9334a (4000/8000).'
   step_why:
     5:
       feeds: what KIT receives
