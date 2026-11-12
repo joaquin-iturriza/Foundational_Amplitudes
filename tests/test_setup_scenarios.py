@@ -389,6 +389,14 @@ def answers():
              rc == 0 and e["status"] == "running" and e["next"] == "run it" and e["quotes"][0]["decision"] == "D900"
              and e["asks"][0]["answered_at"], out)
     scenario("once answered, plan next no longer lists the reply", "the user wrote" not in w.plan_cmd("next")[1])
+    # two open asks: one plan answer settles only the current one, the older stays open
+    old = "Should the figure rule change?"
+    w = World([E("tw", status="running", ask=ask, waiting_since=ago(30), blocks="step 1", blocks_steps=[1],
+                 asks=[{"ask": old, "at": ago(60)}, {"ask": ask, "at": ago(30)}])], transcript=say)
+    rc, out = w.plan_cmd("answer", "tw", "--kind", "scope", "--quote", "Yes, run it on every rung please")
+    e = w.entries()["tw"]
+    scenario("plan answer stamps only the current ask; an older open ask stays unanswered",
+             rc == 0 and e["asks"][1].get("answered_at") and not e["asks"][0].get("answered_at"), out)
     # a no to a question blocking only step 2 drops step 2 and leaves the entry running; one blocking all of it holds it
     no = [(ago(29), "assistant", "Joaquin, should step 2 run?"), (ago(3), "user", "no, not that one please")]
     steps3 = {"1": "one", "2": "two", "3": "three"}

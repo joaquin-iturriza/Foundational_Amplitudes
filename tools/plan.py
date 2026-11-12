@@ -2682,11 +2682,23 @@ def cmd_answer(a):
         elif e.get("status") == "waiting_user":
             e["status"] = "running"
         if e["status"] != "waiting_user":
-            for x in e.get("asks") or []:
-                x.setdefault("answered_at", after[0].isoformat())
-                x.setdefault("decision", did)
-            for k in ("ask", "waiting_since", "checked_until", "searched", "blocks", "blocks_steps", "holds_all"):
-                e.pop(k, None)
+            # only the current open ask (the entry-level `ask`, the latest) or the one --ask-index names; older
+            # unanswered asks stay open (D410 and D412 were stamped on a figure-rule question they did not answer)
+            asks = e.get("asks") or []
+            if a.ask_index is not None:
+                tgt = asks[a.ask_index] if -len(asks) <= a.ask_index < len(asks) else None
+                if tgt is None:
+                    rollback(did, "no ask %s" % a.ask_index)
+                    sys.exit("plan: entry %s has no ask %s (%d asks); %s rolled back" % (e["id"], a.ask_index, len(asks), did))
+            else:
+                tgt = next((x for x in reversed(asks) if not x.get("answered_at")
+                            and (not e.get("ask") or x.get("ask") == e["ask"])), None)
+            if tgt is not None:
+                tgt.setdefault("answered_at", after[0].isoformat())
+                tgt.setdefault("decision", did)
+            if a.ask_index is None:
+                for k in ("ask", "waiting_since", "checked_until", "searched", "blocks", "blocks_steps", "holds_all"):
+                    e.pop(k, None)
     print("plan: %s recorded as %s; entry %s now %s" % (a.kind, did, e["id"], e["status"]))
 
 
@@ -3418,6 +3430,7 @@ def main(argv=None):
     cmd("answer", cmd_answer, "record the user's answer: site decide, then the entry, all or nothing", ID,
         A("--quote", required=True, help="the user's exact words"),
         A("--kind", required=True, choices=KINDS, help="the kind of decision the words make"),
+        A("--ask-index", type=int, help="answer this older ask of the entry (index in asks) instead of the open one"),
         A("--set", action="append", metavar="FIELD=VALUE", help="title|question|next=VALUE to change with it "
           "(repeatable)"))
     cmd("withdraw", cmd_withdraw, "withdraw the entry's open question: a decision already in force settles it", ID,
