@@ -16277,7 +16277,7 @@ entries:
     agent: aefaf94baeb410c64
     state: working
     since: '2026-11-12T02:25:26+00:00'
-    state_at: '2026-11-12T02:25:26+00:00'
+    state_at: '2026-11-12T08:47:20.061000+00:00'
     context: 223807
     context_at: '2026-11-12T03:58:10+00:00'
   designs:
@@ -24262,9 +24262,9 @@ entries:
   asks: []
   owner:
     agent: ab9dff3db5cb856c2
-    state: stopped
+    state: working
     since: '2026-11-12T03:05:02+00:00'
-    state_at: '2026-11-12T04:04:49+00:00'
+    state_at: '2026-11-12T08:47:17.890000+00:00'
     context: 212075
     context_at: '2026-11-12T04:11:14+00:00'
   designs:
