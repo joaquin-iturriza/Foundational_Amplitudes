@@ -21557,7 +21557,7 @@ entries:
     agent: af9e7383d68f88657
     state: working
     since: '2026-11-12T17:35:36+00:00'
-    state_at: '2026-11-12T17:51:12.035000+00:00'
+    state_at: '2026-11-12T17:57:55.559000+00:00'
     context: 229776
     context_at: '2026-11-12T17:58:03+00:00'
   designs:
@@ -26590,7 +26590,7 @@ entries:
     agent: a42647ffbe02fdac5
     state: working
     since: '2026-11-12T17:53:55+00:00'
-    state_at: '2026-11-12T17:53:55+00:00'
+    state_at: '2026-11-12T17:57:57.519000+00:00'
     context: 123709
     context_at: '2026-11-12T17:58:08+00:00'
   findings:
