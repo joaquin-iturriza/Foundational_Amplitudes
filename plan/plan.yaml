@@ -26164,6 +26164,20 @@ entries:
       -1.08, control -0.28) and costs tt threshold +0.47 and tt bulk +0.34 (inside the catalog seed spread, up to 1.5 decades).
       Figures analysis/kit_benchmark/figs/kit_extrap_route_ee_uug_me2_{a,b}.png, kit_extrap_route_ee_tt_virt_finite_{a,b}.png,
       route_{uug,tt}/kit_mse_*.png.'
+  - at: '2026-11-12T13:00:03+00:00'
+    text: '2026-11-12 ~14:00 @91064348. Step 9, D405 transfer test read (protocol A_ft, KIT tt virtual, 1e5, 8000 steps, one
+      seed; kit_fig_Aft_thr.json, kit_readout --vs): per family median log10(arm/control log-MSE). ft_r5 (FA-ccin2p3 run kit_A_ft_..._ftr5own,
+      parent r5) vs scratch softpair f21fa163: Coulomb +0.05 (0/4 better), Sudakov -0.45 (3/3), bulk -0.10. ft_thr (bf3d593c/8d1429bf
+      chain, kit_A_ft_..._ftr5thrown: r5 + 3 LO top-pair pools log-uniform in beta to 1e-5) vs f21fa163: Coulomb +0.06 (0/4),
+      Sudakov -0.80 (3/3), bulk -0.16. ft_thrbeta (..._ftr5thrbetaown, + beta input in parent and fine-tune) vs softpairthr
+      3fc1016a: Coulomb +0.27 (1/4), Sudakov -0.05, bulk +0.33. Attribution: ft_thr vs ft_r5 Coulomb +0.01, Sudakov -0.35;
+      ft_thrbeta vs ft_thr Coulomb -0.10, Sudakov +0.16, bulk -0.29. Deepest Coulomb beta 1e-4..1e-3 log-MSE: scratch 7.06,
+      softpairthr 3.55, ft_r5 7.36, ft_thr 7.53, ft_thrbeta 6.01; fitted exponent -0.02/-0.01/-0.10 (exact -1.02). By the
+      design''s rule all three NO (no Coulomb median < -0.3): LO threshold-covering top pairs in pretraining transfer nothing
+      to the one-loop Coulomb rise; they do help the Sudakov family (ft_thr -0.80 vs scratch). Per the design''s NO branch
+      the next lever is the target side (V x beta, step 6, already a diagnostic only per Joaquin) and one-loop top pairs log-uniform
+      in beta, each designed then. Threshold scan of the three arms launched detached (thrscan_d405; collect writes to /tmp
+      on CC, only CLAIM lines come home). Fig analysis/kit_benchmark/figs/aft_thr/kit_mse_ee_tt_virt_finite_{a,b}.png (+ _legend).'
   step_why:
     5:
       feeds: what KIT receives
