@@ -25410,6 +25410,20 @@ entries:
       and that''s what we care about, the validation going down with the training loss. If the val loss is better than any
       other, why would I care it''s jittery?'' The measure is rebuilt around: validation keeps falling with training through
       the end (no end divergence), and the best validation; steady/spike/jitter dropped; earlier verdicts re-read.'
+  - at: '2026-11-12T17:12:50+00:00'
+    text: '2026-11-12 18:25 CET. (1) b b~ > Z Z one-loop V/B L(D) read (stage2_readout.py, data/stage2_readout.json @cb3c96a5;
+      14 searches, 89 trials observed of 112, 9 diverged at sampled HPs): best test MSE(ln(V/B)) scratch / fine-tune at D=10..1e4:
+      3.1e-3/3.6e-3, 2.7e-3/8.7e-4, 7.3e-4/1.6e-4, 9.0e-6/5.1e-5, 7.9e-6/2.3e-6, 1.4e-6/1.7e-6, 6.6e-8/5.7e-7. Shared-exponent
+      fit (alpha 1.58): S = D*_scr/D*_ft at 1e-4 = 1.23 [0.88, 1.71] on test, 1.21 [0.87, 1.67] on val: NO SAVING by the design''s
+      rule (band includes 1); fine-tune ahead 3-5x at D=32-100, behind at 316 and 1e4. Figure figs/stage2_LD_bbx_zz_bbx_zz_nlo.
+      (2) curve_quality.py rebuilt on Joaquin''s criterion (2026-11-12, ''the validation going down with the training loss
+      ... why would I care it''s jittery?''): tracks = v_end/min v <= 2 and the last quarter''s val change <= 1; stalls (val
+      flat within 10% while train halves) listed apart; steady/spike/jitter/gap dropped (cb3c96a5, tests/test_curve_quality.py).
+      Re-read: t t~ LO 100 of 151 trials track (was ''0 of 151 well''); search bests t t~ LO scratch 8/9, fine-tune 7/9; t
+      t~ V scratch 6/8, fine-tune 4/8; b b~ > Z Z V/B scratch 3/7, fine-tune 2/7. lr-centre test (t t~ LO D=3162): fine-tune
+      c/3 LOWER, best min 1.9e-9 vs 8.2e-9 (0.23x), best tracks; c/10 SAME (0.87x); scratch c/3 HIGHER 15x, c/10 HIGHER 7.3x
+      (turns up). mu-only test: t t~ LO scratch HIGHER 4.7x, fine-tune HIGHER 6x (turns up); u u~ V D=3162 fine-tune LOWER
+      0.14x, D=1e4 fine-tune HIGHER 5.9x; scratch HIGHER 6x / SAME.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
