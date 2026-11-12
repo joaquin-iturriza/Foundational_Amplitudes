@@ -44,6 +44,8 @@ for spec in ARGS or DEFAULT:
     uncached, nosidecar, noalphas = [], [], []
     for p in procs:
         for role in ("train", "val", "test"):
+            if int(p[n_key[role]]) == 0:   # a role the recipe gives no events (HD4/HD5, EE4: test only) has no pool
+                continue
             rec = mg.variable_energy_recipe(p["name"], float(p["sqrts"][0]), float(p["sqrts"][1]),
                                             int(p[n_key[role]]), role=role, seed=SEED)
             path = mg.recipe_output_path(rec, datagen.dest_for_role(role))
