@@ -28141,7 +28141,7 @@ entries:
       - 'yes: launch beside step 15''s searches'
       - 'no: uugg and uug-T stay at the old HP point, said wherever shown'
   step_waits:
-    '5': FA-ccin2p3-dcf42ad6 FA-ccin2p3-e7dca162 (the A_ft batch of step 11c)
+    '5': 'kit_hpo driver DONE event: the package takes the chosen trials'' models'
     '15': kit_hpo driver DONE event (detach:kit_hpo, log ~/.local/share/ccorch/detached/20261112-224604_kit_hpo.log); live
       trial FA-lxplus-39d3ed3e
     '14': FA-ccin2p3-7aff4018 (uug div-form 50-step check, rerun with ++training.wsd_cooldown_frac); the tt check is submitted
