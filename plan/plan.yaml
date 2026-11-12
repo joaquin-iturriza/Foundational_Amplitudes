@@ -24251,11 +24251,8 @@ entries:
     at: '2026-11-12T00:30:53+00:00'
   step_waits:
     '2': '2026-11-13'
-    '1': 'a fix of the memmap key mismatch: scripts/job_catalog_v3_short_prebuild.sh (CPU, 4 CPUs) builds key f3bedd61 while
-      every GPU run of the same cell at the same commit looks for 547c3e73 (prebuilds 53eb792f, 5b88c9ff; GPU runs cf880cbe,
-      3e0ddcc3, fcbbd1bd, 2e611342, all at load). Suspect: mix_compose at load differs with CPU count (4 vs 5); test by a
-      prebuild with --hdr=--cpus-per-task=5, or compare composed_pools.json rows_sha256 of the two modes; then rebuild, delete
-      the stale key f3bedd61 (21 GB, ours); then the pid/qn arms as designed (afterok on the prebuild)'
+    '1': the next owner's fix of the memmap key mismatch between prebuild mode and the GPU run (see hand-off), then this step's
+      runs as designed
     '3': 'a fix of the memmap key mismatch: scripts/job_catalog_v3_short_prebuild.sh (CPU, 4 CPUs) builds key f3bedd61 while
       every GPU run of the same cell at the same commit looks for 547c3e73 (prebuilds 53eb792f, 5b88c9ff; GPU runs cf880cbe,
       3e0ddcc3, fcbbd1bd, 2e611342, all at load). Suspect: mix_compose at load differs with CPU count (4 vs 5); test by a
