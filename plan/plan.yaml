@@ -24914,6 +24914,10 @@ entries:
       config/model/lloca.yaml has input_soft_eps, input_pair_logs, input_pair_threshold, input_local_log_eps) and its own
       design. Evidence for it: the uug control''s target is already flat into both limits (finding 2026-11-10T06:22) yet overshoots
       +1.36; ReZero STAYED on uug; target V x beta fixed tt Coulomb'
+    14: 'D411 component read (eval-only, CPU on CC): tools/kit_saturation_probe.py @58a0efaa on the uug control c15b3337 and
+      tt control 3fc1016a (detached batch satprobe_controls, outputs analysis/kit_benchmark/data/kit_sat_{uug_softpair,ttvirt_softpairthr}.json
+      on CC), then on the inputs-only arms; per stratum and per one-input scan: GELU off/linear shares, attention max weight,
+      residual and branch rms per block, readout move dmu per decade'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -25589,6 +25593,14 @@ entries:
         inputs only'
       - 'still overshoots: the failure is the attention/MLP stack itself on out-of-range scalars; compare activation (GELU
         vs ReLU) next'
+    14:
+      feeds: 'D411 general mechanism (Joaquin 2026-11-12: V x beta is a case fix): which component of the transformer stops
+        continuing an input''s trend past its trained range'
+      if:
+      - 'a component flattens (GELU off-share rises, attention max weight -> 1, readout/residual saturates) where dmu/k drops:
+        an arm that changes that component (its own design)'
+      - 'nothing flattens while dmu/k stays constant: the continuation is linear and the error is in the trend''s slope learned
+        in range; compare dmu/k to the MLP''s'
   step_waits:
     '5': '2026-11-13'
     '9': FA-ccin2p3-62dcf910 FA-ccin2p3-bf3d593c FA-ccin2p3-8d1429bf
