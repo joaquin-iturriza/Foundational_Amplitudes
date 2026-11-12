@@ -16,6 +16,7 @@ scan    bulk_train events with ONE input pushed past its range, everything else 
         and the readout's move d mu = mu(k) - mu(0) in log10|M|^2. A linear continuation keeps d mu / k constant.
 
     python tools/kit_saturation_probe.py <run_dir> [--n 200] [--scan-n 200] --out <json>     (CPU, site checkout)
+    python tools/kit_saturation_probe.py plot <uug json> <tt json> --figs <dir>
 """
 import argparse
 import json
@@ -197,5 +198,53 @@ def _probe(a, pool, rows, blocks, stem):
     json.dump(res, open(a.out, "w"), indent=1)
 
 
+def plot(uug, tt, figs):
+    """kit_sat_resid_{uug,tt}: rms of the residual stream entering each block and the readout, per stratum of the
+    singular family and bulk_train; kit_sat_scan_{uug,tt}: the readout's move dmu against the one-input shift k"""
+    import plot_style as ps
+    from tools.kit_figures import family, edges
+    for tag, path, fam in (("uug", uug, "coll_y"), ("tt", tt, "sudakov_sqrts")):
+        d = json.load(open(path))
+        nb = d["n_blocks"]
+        fig, ax = ps.figure()
+        ks = sorted([k for k in d["strata"] if k.startswith("hard_test/") and family(k.split("/")[1]) == fam],
+                    key=lambda k: edges(k.split("/")[1])[0], reverse=(fam == "coll_y"))
+        cols = [ps.C.sky, ps.C.blue, ps.C.green, ps.C.orange, ps.C.vermillion]
+        for k, c in zip(["bulk_train/bulk"] + ks, [ps.C.grey] + cols[-len(ks):]):
+            e = d["strata"][k]
+            y = [e[f"b{b}/x_rms"] for b in range(nb)] + [e["h_rms"]]
+            if k.startswith("bulk"):
+                lab = "bulk train"
+            else:
+                lo, hi = edges(k.split("/")[1])
+                lab = (rf"$y\in[10^{{{np.log10(lo):.0f}}},10^{{{np.log10(hi):.0f}}}]$" if fam == "coll_y"
+                       else rf"$\sqrt{{s}}\in[{lo / 1e3:.1f},{hi / 1e3:.0f}]$ TeV")
+            ax.plot(range(nb + 1), y, "o-", color=c, label=lab)
+        ax.set_yscale("log")
+        ax.set_xlabel(r"block $b$ ($8$ = readout input)")
+        ax.set_ylabel(r"rms of residual stream $x_b$")
+        ps.process_label(ax, {"uug": r"$e^+e^-\to u\bar u g$", "tt": r"$e^+e^-\to t\bar t$ virtual"}[tag])
+        ps.legend(ax, "upper left" if tag == "uug" else "lower right")
+        ps.make_room(ax)
+        ps.save(fig, os.path.join(figs, f"kit_sat_resid_{tag}"))
+        fig, ax = ps.figure()
+        sk = sorted(d["scan"], key=float)
+        ax.plot([float(k) for k in sk], [d["scan"][k]["dmu"] for k in sk], "o-", color=ps.C.vermillion,
+                label=r"readout $\Delta\mu(k)$")
+        ax.axhline(0, color=ps.C.grey, lw=0.8)
+        ax.set_xlabel({"uug": r"$k$: shift of one $\log_{10} s_{ij}$ input", "tt": r"$k$: shift of $\log_{10}\sqrt{\hat s}$ input"}[tag])
+        ax.set_ylabel(r"$\Delta\mu$, $\log_{10}|\mathcal{M}|^2$")
+        ps.process_label(ax, {"uug": r"$e^+e^-\to u\bar u g$", "tt": r"$e^+e^-\to t\bar t$ virtual"}[tag])
+        ps.legend(ax, "lower right" if tag == "tt" else "lower left")
+        ps.make_room(ax)
+        ps.save(fig, os.path.join(figs, f"kit_sat_scan_{tag}"))
+
+
 if __name__ == "__main__":
-    main()
+    if sys.argv[1:2] == ["plot"]:
+        ap = argparse.ArgumentParser()
+        ap.add_argument("cmd"); ap.add_argument("uug"); ap.add_argument("tt"); ap.add_argument("--figs", required=True)
+        a = ap.parse_args()
+        plot(a.uug, a.tt, a.figs)
+    else:
+        main()
