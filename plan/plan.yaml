@@ -21352,6 +21352,10 @@ entries:
     2: 'Null-parent 2x2 (fresh init vs parent weights through the fine-tune configs at the scratch''s HPs, t t~ tree and V/B,
       D=316..1e4, 16 runs + 2 smokes, 7.6 GPU-h; analysis/data_saving/submit_nullparent.py @eaacb51f): design review of the
       version with E = report only'
+    3: 'Why the fine-tune HPO fails to find well-trained runs (Joaquin 2026-11-12 ~10:30: none of the runs are well optimized):
+      diagnose from the 34 searches'' trial curves (lr_scale window under Muon, warmup/horizon vs val minimum, sampled trials,
+      objective pick, layer decay, restart optimizer state), fix the template, show well-trained fine-tune curves on a couple
+      of tt cells'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -24433,6 +24437,11 @@ entries:
       - 'WEIGHTS: a design on the parent'
       - 'SEARCH: finding to Joaquin with the search rerun as a proposal'
       - 'NOT RESOLVED: report per cell, stop'
+    3:
+      feeds: whether fine-tuning saves data on tt once both arms are properly optimized (D408)
+      if:
+      - 'a search defect found: fix the template and rerun what the conclusions need'
+      - 'no defect: report the curves and what limits the fine-tune'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
