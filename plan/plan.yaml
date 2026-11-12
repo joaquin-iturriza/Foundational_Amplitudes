@@ -29212,6 +29212,60 @@ entries:
       numbers in prior match finding 2026-11-12T14:36. CC 68 GB free vs ~0.25 GB. Check 5 searched: log_skip, log skip, logskip,
       linear readout, log readout, skip connection, power-law readout, plain target, plain log, linear head, slope head, asymptotic
       readout, divergence head in docs/results.tex, plan/plan.yaml, entry dead ends: none prior.'
+  - at: '2026-11-12T14:47:19+00:00'
+    question: 'Joaquin 2026-11-12 ~14:59 (step 11c: ''adding some loop datasets to the pretraining that may have something
+      to transfer ... ideally we cover the region that we are trying to transfer''; ''why? just start''): does pretraining
+      that contains one-loop QCD virtuals of a top pair covering the KIT target''s regions (beta down to 1e-5, sqrt(s) to
+      50 TeV) transfer the Coulomb rise and the Sudakov behaviour to the KIT ee->tt virtual fine-tune, where LO threshold
+      tops (D405) transferred nothing to Coulomb? Feeds: whether loop data covering the target region is the lever for the
+      KIT one-loop target (and for the catalog parent), or the representation is.'
+    prior: 'Searched docs/results.tex (one-loop top, gg_ttx_nlo, threshold pretraining, heldoutthr, r5thr, Coulomb), plan
+      show kit_benchmark, site decisions (D405, D406, D411, D412, D315, D395). Found: (1) D405 test (finding 2026-11-12T13:00):
+      parent r5thr = r5 held-out + 3 LO top pairs log-uniform in beta to 1e-5 (4ab99f50), fine-tune ft_thr (bf3d593c) vs ft_r5
+      vs scratch f21fa163: Coulomb per-family median log10(arm/scratch log-MSE) +0.06 (0/4 better), Sudakov -0.80 (3/3), deepest
+      Coulomb log-MSE 7.53 vs 7.06, exponent -0.01 (exact -1.02); threshold scan: every arm misses ~99% of sigma_NLO at beta
+      1e-3. (2) Protocol B (finding 2026-11-10T10:20): training on the target''s own hard threshold events still misses Coulomb
+      (deepest 2.38, exponent -0.43). (3) Coverage (finding 2026-11-12T14:17): the parent has 106 one-loop pools, none with
+      a top pair or any massive coloured pair, sqrt(s) <= 6 TeV. Differs: the pretraining now contains one-loop targets with
+      the 1/beta Coulomb term and the Sudakov logs themselves (gg and d d~ > t t~ virtuals), not LO trees; prior (2) says
+      direct training does not reach it, so a NO is the expected outcome and says the representation, not the data, limits.'
+    measure: 'A_ft tt virtual from the new parent (r5thrloop) vs ft_thr (its matched control: same recipe minus the four one-loop
+      pools) and ft_r5, by tools/kit_readout.py --vs on a kit_figures collect: per family (Coulomb threshold, Sudakov, bulk)
+      median log10(arm/control log-MSE) with strata better/worse; deepest Coulomb beta 1e-4..1e-3 log-MSE and fitted exponent
+      (kit_result.json, KIT evaluate.py); deepest Sudakov 15-50 TeV signed error and log-MSE (tools/kit_extrap_read.py); the
+      threshold scan sigma_NLO^surr/sigma_NLO - 1 at beta 1e-3..0.094 (tools/kit_threshold_scan.py --runs). Secondary: the
+      parent''s own val log-MSE on the four new pools per beta/sqrt(s) bin (does the parent itself fit the Coulomb rise of
+      gg/dd~ > tt~).'
+    check: 'The measure moved with pretraining content on this same fine-tune: ft_thr vs ft_r5 moved Sudakov -0.35 decades
+      (LO high-energy tops) and the beta-input parent moved Coulomb -0.10, bulk -0.29 (finding 2026-11-12T13:00); the target-side
+      V x beta moved Coulomb -3.16 decades, so the Coulomb measure resolves a change in what the model represents near threshold.
+      The one-loop pools'' Coulomb term is in the data: one-loop V/B of a top pair grows like C_F pi alpha_s/(2 beta) (the
+      same Sommerfeld term as KIT''s, slide 5 truth), checked on the generated pools by their V/B vs beta before the parent
+      runs (the probe''s pools, 200 events each).'
+    fixed: 'Parent: scripts/job_datasaving_parent.sh heldoutthrloop (recipes/catalog_v4_datasaving_parent_heldoutthrloop.yaml
+      @bc1330bd = heldoutthr''s 1414 pools + v4_gg_ttx_nlo__{thr,hi}, v4_ddx_ttx_nlo__{thr,hi}; 1e4 train / 1e3 / 1e3 each,
+      flat sampling; thr: beta log-uniform on [1e-5, 0.6]; hi: sqrt(s) log-uniform on [431.25 GeV, 50 TeV]; d d~ on its pure-QCD
+      born, gg at QED<=0), r5''s T = 4307 steps and lr 8.196e-3, softpair inputs as r5thr (4ab99f50), seed as r5thr. Fine-tune:
+      scripts/job_kit.sh A_ft kit_ee_tt__virt_finite 100000 8000 with KIT_PARENT=<r5thrloop run dir>, KIT_LR_SCALE 1.0, offshell
+      own, every flag as ft_thr''s (bf3d593c) command; tag ftr5thrloopown. Threshold scan as for D405. Generation: scripts/job_catalog_v4_regen.sh
+      V4REGEN_RECIPES=recipes/catalog_v4_datasaving_looptt_train.yaml (CPU, pole certification inline), after the probe FA-ccin2p3-9a70779c
+      (200/50/50 per pool) gives time per event. D395: the new parent recipe path runs a 50-step smoke through every stage
+      first (as fc0c4eed for r5thrbeta). Cost: parent <= 6.8 GPU-h (r5thr 4ab99f50 ran 6.77 h submit-to-end), fine-tune ~1.3
+      GPU-h (KIT A runs 1.14-1.38 h), smoke ~0.3 h: ~8.4 GPU-h; generation CPU only.'
+    control: 'ft_thr (bf3d593c, parent r5thr 4ab99f50: identical recipe minus the four one-loop pools, same T, lr, inputs,
+      seed): the one-loop pools are the only change. References: ft_r5, scratch softpair f21fa163, softpairthr 3fc1016a, Bakar''s
+      logthr MLP (Coulomb 2.41, Sudakov 0.046).'
+    seeds: 'One parent and one fine-tune, seed as the control''s (D315: no more seeds; noise quoted from results.tex ~13232-13245,
+      single-process reruns 1.1x-30x in loss, so only family shifts beyond 0.3 decades in the D405 rule are read).'
+    outcome: 'YES (loop data transfers): Coulomb family median log10(arm/ft_thr) <= -0.3 with >= 3/4 strata better, deepest
+      Coulomb exponent <= -0.44 (half the exact -1.02, Bakar''s logthr MLP -0.44), and the threshold scan ratio at beta 1e-2
+      above -0.75 (softpairthr''s level, vs ft_thr -0.906): one-loop top pairs go into the KIT parent and the catalog parent''s
+      coverage is extended at loop level. SUDAKOV ONLY: Sudakov family <= -0.3 vs ft_thr, Coulomb not: high-energy loop data
+      transfers, the Coulomb rise needs the representation (log skip / beta form, step 11d). NO: both families within +-0.3
+      of ft_thr: covering the region with one-loop data does not transfer, as protocol B predicts; the extrapolation is a
+      representation question. Bulk worse than ft_thr by > 0.5 decades: the new pools cost the target, reported. If the parent
+      itself does not fit the Coulomb rise of its own gg/dd~ pools (secondary measure, its val per beta bin flat), the NO
+      is a representation failure inside pretraining, read so.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
