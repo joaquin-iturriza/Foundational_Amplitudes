@@ -168,6 +168,34 @@ def test_batch_holds_non_urgent():
             print("B ok: %s mid-window %s" % (late, "held to the window's end" if held else "ends it at once"))
 
 
+def test_empty_window_keeps_waiting():
+    """2026-11-12 00:21 UTC: every event of a window acked before it ended made the waiter return 'no open events' and
+    wake the main session for nothing; it now keeps waiting."""
+    os.environ["SITE_WAIT_POLL_S"] = "1"
+    with tempfile.TemporaryDirectory() as tmp:
+        m = load_site(tmp)
+        m._rx().read_owners = lambda mm, pr, rules=None: world("stopped")[1]
+        c = m.ldb()
+        m.add_event(c, "FA", "catalog_coverage", "RUN_DONE", "runs:z", "3 run(s) finished")
+        c.close()
+        out = []
+        t = threading.Thread(target=run_waiter, args=(m, out, 3), daemon=True)
+        t.start()
+        t.join(1.2)
+        c = m.ldb()
+        c.execute("UPDATE events SET acked=? WHERE key='runs:z'", (int(time.time()),))
+        c.commit()
+        c.close()
+        t.join(5)
+        assert t.is_alive() and not out, out
+        c = m.ldb()
+        m.add_event(c, "FA", None, "ALERT", "a:1", "an alert")
+        c.close()
+        t.join(4)
+        assert not t.is_alive() and "ALERT" in out[0] and "no open events" not in out[0], out
+        print("E ok: an emptied window keeps waiting, returns on the next event")
+
+
 def test_supervisor_reloads():
     """2026-11-12: the supervise loop re-executes itself when ~/.local/bin/site (or site_runends.py) changes."""
     with tempfile.TemporaryDirectory() as tmp:
@@ -205,5 +233,6 @@ if __name__ == "__main__":
     test_quiet_waiter()
     test_batch_window()
     test_batch_holds_non_urgent()
+    test_empty_window_keeps_waiting()
     test_supervisor_reloads()
     teardown_module()

@@ -38,7 +38,7 @@ def test_handback_of():
     assert na.handback_of(HB.split("sent a message:\n", 1)[1].split("\n\nThat")[0]) == A
     assert na.handback_of(HB.split("\n\nThat")[0]) == A                         # no trailer
     assert na.handback_of(HB + "\n\nJoaquin typed this") is None                 # something after the note
-    assert na.handback_of(HB.replace("[Subagent hand-back]", "Please re-check")) is None   # a peer message, not a report
+    assert na.handback_of(HB.replace("[Subagent hand-back]", "Please re-check")) == A   # a mid-run message: batched too
     two = HB.split("\n\nThat")[0] + "\n" + HB
     assert na.handback_of(two) is None                                           # two messages in one prompt
     assert na.handback_of("Joaquin here, what is the state?") is None
@@ -74,6 +74,30 @@ def run_hook(data, site):
     finally:
         na.spool, sys.stdin = real, sys.__stdin__
     return out.getvalue()
+
+
+def test_leaks_20261112():
+    """The three leaks of 2026-11-12 00:00-00:40 UTC."""
+    # (1) a mid-run SendMessage, the exact form the hook got at 00:30:11 (no hand-back marker, no trailer)
+    mid = '<agent-message from="%s">\nJoaquin, the disk-usage count has finished.\n\n- tmp: 322\n</agent-message>' % A
+    assert na.handback_of(mid) == A
+    # (2) the agent's 'finished' notification after its hand-back was spooled (never in the transcript): absorbed
+    note = ('<task-notification>\n<task-id>%s</task-id>\n<status>completed</status>\n<result>Your report was delivered '
+            'to you as a message from %s (its SubagentHandback call)</result>\n</task-notification>' % (A, A))
+    d = os.path.join(TMP, "spool", "FA")
+    os.makedirs(d, exist_ok=True)
+    assert na.verdict(note, "/nonexistent") == (False, "no hand-back from %s in the transcript" % A)
+    open(os.path.join(d, "1794442966_%s_213b93b13d.txt" % A), "w").close()
+    assert na.verdict(note, "/nonexistent") == (True, A)
+    os.remove(os.path.join(d, "1794442966_%s_213b93b13d.txt" % A))
+    # (3) between a waiter's return and its re-arm: alive for GRACE_S after the return stamp
+    stamp = os.path.join(TMP, "events_waiter.FA.returned")
+    open(stamp, "w").write("%d\n" % (time.time() - 60))
+    assert na.waiter_alive()
+    open(stamp, "w").write("%d\n" % (time.time() - na.GRACE_S - 5))
+    assert not na.waiter_alive() or na._waiter_live()
+    os.remove(stamp)
+    print("leaks ok: mid-run message batched, finished-after-spool absorbed, re-arm gap covered")
 
 
 def test_hook_spools_only_with_live_waiter():

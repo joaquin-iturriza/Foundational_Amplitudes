@@ -31,3 +31,8 @@ cmds: \bhook_incident\.py\b, \bswitch_settings\.py\b
   diff `tools/switch_settings.py` prints; any other registration change goes to him as that diff first.
 - A new doc Joaquin approved goes in `.claude/md_allowlist.txt`; a single-format figure he accepts goes in
   `.claude/figure_pair_ignore.txt`.
+- Clean-up permission rules match the bare command only: `bash scripts/prune_site.sh <site>`,
+  `site run <site> FA -- python sweep/prune.py ...`, `site run <site> FA -- python tools/prune_copies.py ...` (any
+  `site run` flags before the site are fine). A `cd ...;` or `timeout` prefix, a pipe, a `;` or `&&` chain, or `rm`
+  inside the remote command falls to the auto-mode classifier, which refuses deletions (2026-11-11/12: the main
+  session's first prune and the owner's mmap-cache `rm`). Run the bare form, alone in its call.

@@ -32,7 +32,12 @@ DELIVERED = re.compile(r"report was delivered to you as a message from \"?(a[0-9
 
 
 def handed_back(transcript, agent):
-    """True when the transcript holds a hand-back message from `agent` (a queued message or a turn-starting one)."""
+    """True when the transcript holds a hand-back message from `agent` (a queued message or a turn-starting one), or
+    the hand-back was spooled for the batch (2026-11-12: a spooled report never reaches the transcript, so the agent's
+    'finished' notification after it woke the main session on its own, 00:11, 00:22 and 00:23 UTC)."""
+    import glob
+    if glob.glob(os.path.join(CCORCH, "spool", PROJECT, "*_%s_*.txt" % agent)):
+        return True
     tag = 'agent-message from=\\"%s\\"' % agent      # as written inside a JSON string
     tag_plain = 'agent-message from="%s"' % agent
     try:
@@ -72,8 +77,10 @@ def verdict(prompt, transcript):
 
 # the hook receives the bare `<agent-message ...>` (absorb.log 2026-11-11T19:55Z); the transcript records it with the
 # harness's "Another Claude session sent a message:" line before it: both match
-HANDBACK = re.compile(r'\A(?:Another Claude session sent a message:\s*)?<agent-message from="(a[0-9a-f]{16})">\s*'
-                      r'\[Subagent hand-back\]')
+# any one agent's message is batched, its final hand-back or a mid-run SendMessage (2026-11-12 00:29 and 00:30 UTC:
+# two mid-run reports went straight through)
+HANDBACK = re.compile(r'\A(?:Another Claude session sent a message:\s*)?<agent-message from="(a[0-9a-f]{16})">')
+GRACE_S = 900   # a waiter that returned this recently is being re-armed by the main session: keep spooling
 TRAILER = 'That "other Claude session" is an agent working inside this same session'
 CCORCH = os.path.expanduser(os.environ.get("NOTIFY_CCORCH_HOME", "~/.local/share/ccorch"))
 PROJECT = "FA"
@@ -91,6 +98,19 @@ def proc_start(pid):
 
 
 def waiter_alive(project=PROJECT):
+    """A live waiter, or one that returned less than GRACE_S ago (between a waiter's return and the main session's
+    re-arm nothing absorbed: 00:34 UTC 2026-11-12). The Stop hook makes the main session re-arm, and the new waiter
+    delivers the open HANDBACK events."""
+    try:
+        if time.time() - float(open(os.path.join(CCORCH, "events_waiter.%s.returned" % project)).read().split()[0]) \
+                < GRACE_S:
+            return True
+    except (OSError, ValueError, IndexError):
+        pass
+    return _waiter_live(project)
+
+
+def _waiter_live(project=PROJECT):
     """The project's events waiter is alive: its pid file names a live `site events --wait` process whose start ticks
     match the ones it recorded (a reused pid does not pass). Liveness only: the earlier test that it started after
     `site` last changed went false at every edit of `site` until the waiter was re-armed (agent_redesign step 23);
@@ -132,7 +152,7 @@ def spool(prompt, agent, site=("site",)):
     path = os.path.join(d, "%d_%s_%s.txt" % (time.time(), agent, h))
     with open(path, "w") as f:
         f.write(prompt)
-    body = prompt.split("The report follows:", 1)[-1].strip().splitlines()
+    body = re.sub(r"\A[^>]*<agent-message[^>]*>", "", prompt.split("The report follows:", 1)[-1].strip()).strip().splitlines()
     first = " ".join((body[0] if body else "").split())[:160]
     r = subprocess.run(list(site) + ["event", "--project", PROJECT, "--kind", "HANDBACK", "--key",
                                      "handback:%s:%s" % (agent, h), "--msg",
