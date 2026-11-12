@@ -173,6 +173,18 @@
    "well": false
   },
   {
+   "run": "kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr_logskiplin",
+   "id": "6bc05a40",
+   "lr": 0.0118605,
+   "lr_scale": 0.1,
+   "separation": 0.6230455805664064,
+   "end_up": 0.0,
+   "v_min": -7.9593935,
+   "v_min_step": 8000,
+   "v_end": -7.9593935,
+   "well": false
+  },
+  {
    "run": "kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr_noframes",
    "id": "",
    "lr": 0.0118605,
@@ -293,6 +305,18 @@
    "well": false
   },
   {
+   "run": "kit_A_ee_uug_me2_n100000_t50_softpair_plain_divform_smoke",
+   "id": "",
+   "lr": 0.005,
+   "lr_scale": 0.1,
+   "separation": 2.1052295093143467,
+   "end_up": 0.0,
+   "v_min": -0.7602941999999999,
+   "v_min_step": 50,
+   "v_end": -0.7602941999999999,
+   "well": false
+  },
+  {
    "run": "kit_A_ee_uug_me2_n100000_t50_softpair_plain_logskip_smoke",
    "id": "",
    "lr": 0.0118605,
@@ -302,6 +326,18 @@
    "v_min": -1.070871,
    "v_min_step": 50,
    "v_end": -1.070871,
+   "well": false
+  },
+  {
+   "run": "kit_A_ee_uug_me2_n100000_t50_softpair_plain_logskiplin_smoke",
+   "id": "",
+   "lr": 0.0118605,
+   "lr_scale": 0.1,
+   "separation": 1634833.3586159204,
+   "end_up": 0.0,
+   "v_min": -0.6935673,
+   "v_min_step": 50,
+   "v_end": -0.6935673,
    "well": false
   },
   {
@@ -473,6 +509,18 @@
    "well": false
   },
   {
+   "run": "kit_A_ee_uug_me2_n100000_t8000_softpair_plain_logskiplin",
+   "id": "c4fc1d6f",
+   "lr": 0.0118605,
+   "lr_scale": 0.1,
+   "separation": 6.5961028792953496,
+   "end_up": 3.974545,
+   "v_min": -5.65146,
+   "v_min_step": 6880,
+   "v_end": -1.6769150000000002,
+   "well": false
+  },
+  {
    "run": "kit_A_ee_uug_me2_n100000_t8000_softpair_rezero",
    "id": "",
    "lr": 0.0118605,
@@ -561,11 +609,11 @@
    "id": "88b9334a",
    "lr": 0.0118605,
    "lr_scale": 0.1,
-   "separation": 375.51840708787154,
-   "end_up": 371.522475,
+   "separation": 3656.589698601315,
+   "end_up": 3650.8737250000004,
    "v_min": -2.193725,
    "v_min_step": 1920,
-   "v_end": 369.32875,
+   "v_end": 3648.6800000000003,
    "well": false
   },
   {
@@ -663,6 +711,30 @@
    "v_min_step": 8000,
    "v_end": -7.2052435,
    "well": false
+  },
+  {
+   "run": "kit_A_ft_ee_tt_virt_finite_n100000_t8000_ftr5thrloopbetaown",
+   "id": "",
+   "lr": 0.0118605,
+   "lr_scale": 1.0,
+   "separation": 0.6353950888166429,
+   "end_up": 0.0,
+   "v_min": -7.5162865,
+   "v_min_step": 8000,
+   "v_end": -7.5162865,
+   "well": false
+  },
+  {
+   "run": "kit_A_ft_ee_tt_virt_finite_n100000_t8000_ftr5thrloopown",
+   "id": "",
+   "lr": 0.0118605,
+   "lr_scale": 1.0,
+   "separation": 0.2732229519958498,
+   "end_up": 0.0,
+   "v_min": -7.4543015,
+   "v_min_step": 8000,
+   "v_end": -7.4543015,
+   "well": true
   },
   {
    "run": "kit_A_ft_ee_tt_virt_finite_n100000_t8000_ftr5thrown",

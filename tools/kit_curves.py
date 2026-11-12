@@ -113,6 +113,19 @@ def read(path, figs=None):
     return rows
 
 
+def curve_panel(ax, e):
+    """one run's validation and training NLL against step (running median of 3), y range 6 nats above the lowest"""
+    import plot_style as ps
+    st = np.array(e["steps"])
+    tr = smooth(np.array([np.nan if x is None else x for x in e["train"]], float))
+    va = smooth(e["val"])
+    ax.plot(st, va, color=ps.C.vermillion, label="validation")
+    ax.plot(st, tr, color=ps.C.blue, linestyle="--", label="training")
+    lo = np.nanmin(np.r_[va, tr])
+    ax.set_ylim(lo - 0.5, lo + 6)
+    ax.set_xlabel("training step"); ax.set_ylabel("NLL")
+
+
 def plot(d, figs):
     """kit_curves_nll: the four KIT controls' validation and training NLL against step (running median of 3); the y
     range stops 6 nats above the lowest point so the late rises (up to +2800 nats on u u~ g g) leave the box."""
@@ -123,17 +136,23 @@ def plot(d, figs):
     fig, axs = ps.figure(ncols=2, nrows=2)
     for ax, rid in zip(axs.ravel(), four):
         e = d[NAMED[rid]]
-        st = np.array(e["steps"])
-        tr = smooth(np.array([np.nan if x is None else x for x in e["train"]], float))
-        va = smooth(e["val"])
-        ax.plot(st, va, color=ps.C.vermillion, label="validation")
-        ax.plot(st, tr, color=ps.C.blue, linestyle="--", label="training")
-        lo = np.nanmin(np.r_[va, tr])
-        ax.set_ylim(lo - 0.5, lo + 6)
-        ax.set_xlabel("training step"); ax.set_ylabel("NLL")
+        curve_panel(ax, e)
         ps.process_label(ax, lab[rid])
     ps.legend(axs[1, 1], "lower left")
     ps.save(fig, os.path.join(figs, "kit_curves_nll"))
+
+
+def plot_runs(d, runs, base):
+    """one panel file per run (<base>_a, _b, ... in the order given): its validation and training NLL against step
+    (running median of 3), the y range 6 nats above the lowest point as kit_curves_nll"""
+    import plot_style as ps
+    figs = ps.panels(len(runs))
+    for (fig, ax), run in zip(figs, runs):
+        e = d[run]
+        curve_panel(ax, e)
+        ps.legend(ax, "upper right")
+    for w in ps.save_panels(figs, base):
+        print(w)
 
 
 SWEEP_SITE = r'''
@@ -203,11 +222,14 @@ def main():  # dup-ok: argparse boilerplate (collect/read), no shared logic
     c = sub.add_parser("collect"); c.add_argument("--out", required=True)
     r = sub.add_parser("read"); r.add_argument("data"); r.add_argument("--figs")
     w = sub.add_parser("sweep"); w.add_argument("names", nargs="+"); w.add_argument("--out", required=True)
+    p = sub.add_parser("curves"); p.add_argument("data"); p.add_argument("runs", nargs="+"); p.add_argument("--out", required=True)
     a = ap.parse_args()
     if a.cmd == "collect":
         from analysis.common.readers import site_python
         json.dump(site_python(SITE, [], "KITCURVES"), open(a.out, "w"))
         print(f"-> {a.out}")
+    elif a.cmd == "curves":
+        plot_runs(json.load(open(a.data)), a.runs, a.out)
     elif a.cmd == "sweep":
         sweep_read(a.names, a.out)
     else:

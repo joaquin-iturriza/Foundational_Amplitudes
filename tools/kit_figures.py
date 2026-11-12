@@ -154,9 +154,13 @@ INPUT_ARMS = {"pairlogs": r"+ $\log(s_{ij}/s)$ inputs", "softrescale": "+ soft l
               "softpair_plain": "plain target",
               "softpair_plain_logskip": r"plain target + $P_2(L)$", "softpair_plain_logskiplin": r"plain target + $P_1(L)$",
               "softpairthr_logskip": r"+ $\log\beta^2$ + $P_2(L)$", "softpairthr_logskiplin": r"+ $\log\beta^2$ + $P_1(L)$",
-              # A_ft parents (D405, step 11c): r5, + LO top pairs log-uniform in beta, + one-loop top pairs; beta input
-              "ftr5own": "r5", "ftr5thrown": "r5 + LO tops", "ftr5thrbetaown": r"r5 + LO tops, $\log\beta^2$",
-              "ftr5thrloopown": "r5 + LO, loop tops", "ftr5thrloopbetaown": r"r5 + LO, loop tops, $\log\beta^2$"}
+              # A_ft: the parent's pretraining (catalog_v4 with the KIT families held out, + LO / one-loop top pairs near
+              # threshold), then the inputs every such arm has (input_soft_eps, input_pair_logs=6; beta where tagged)
+              "ftr5own": "held-out catalog\n" + r"+ soft rescale + $\log(s_{ij}/s)$",
+              "ftr5thrown": "held-out catalog + LO tops\n" + r"+ soft rescale + $\log(s_{ij}/s)$",
+              "ftr5thrbetaown": "held-out catalog + LO tops\n" + r"+ soft rescale + $\log(s_{ij}/s)$" + "\n" + r"+ $\log\beta^2$",
+              "ftr5thrloopown": "held-out catalog\n+ LO and one-loop tops\n" + r"+ soft rescale + $\log(s_{ij}/s)$",
+              "ftr5thrloopbetaown": "held-out catalog\n+ LO and one-loop tops\n" + r"+ soft rescale + $\log(s_{ij}/s)$" + "\n" + r"+ $\log\beta^2$"}
 
 
 def arm_label(r, with_n=True):
