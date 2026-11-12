@@ -20992,6 +20992,9 @@ entries:
       job_catalog_v4_regen.sh x4 shards), D395 smoke run, parents r5 heldout (1422 pools) and treesin (1424) via job_datasaving_parent.sh;
       then the 34 fine-tune searches sweep/sweep_config_dsave_s3_ft_*.yaml through drive.py (88-103 GPU-h, waits for Joaquin''s
       go on cost); scratch searches of stage 2 reused'
+    8: 'One-loop t t~ V suspects batch, design PASS 2026-11-12 (configs sweep/sweep_config_dsave_diag_{massown,adamw,pairthr}_ft_ee_ttbar_nlo_d{5..8}_t8500.yaml
+      + smoke ..._smoke3_..._t50.yaml @7d56534c, controls the offown runs, ~5.5 GPU-h): smoke then 12 runs via trial_job.sh,
+      --hdr=--time=00:40:00; held by the main session (''before more arms'') until the defect read is seen'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -21091,6 +21094,12 @@ entries:
       - 'geomean ft(s3)/ft(s2) <= 1/3 on t t~ D=316..1e4: physical tops were the deficit; S from s3 written up'
       - 'geomean >= 1/1.5: tops not the cause; next suspects the dimensionless-mass column and the fine-tune optimizer, S
         from s3 still written up'
+    8:
+      feeds: whether a one-loop input or optimizer change removes the t t~ V fine-tune deficit (D400)
+      if:
+      - 'an arm YES (w/o-worst val geomean <= 0.4, >=3/4 below): mass column into s3 one-loop configs; AdamW or pair input
+        to Joaquin as in the design'
+      - 'all NO: no gain at the control''s HPs; the deficit goes to the defect hunt'
   designs:
   - at: '2026-11-10T02:35:09+00:00'
     question: 'Step 1 (D356 horizons, tree arm): on catalog_v4''s held-out tree targets ee->ttbar (H3, 2->2 massive), ee->ccbar
