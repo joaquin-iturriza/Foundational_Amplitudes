@@ -24778,6 +24778,23 @@ entries:
       WORSE: >= 8 good but HIGHER in >= 3 -> together curves cost val at these D: report the price per cell, the objective
       question (C) goes to Joaquin with it; NO: < 8 good -> lr alone does not bring the curves together; next suspect named
       from (A) and the curves. (C) reported per cell for both windows whatever the branch. Diverged trials listed apart (D398).'
+    fix_at: '2026-11-12T17:55:20+00:00'
+    fix: 'Re-check of the 17:54 design. Fixed since the last review: part (A)''s WORSE bar is now beyond each cell''s control-vs-original
+      spread, with a pooled G against S; NONE now reads NOT FIXED AT THE BASELINE''S HPs; the single-value weight-decay and
+      L2 arms are gone; the prior cites results.tex ~7650/~14327 and the in-search lr-vs-separation data; work rate, disk
+      and site are stated. I checked: the lrx3 configs differ from stage 2 only in the lr window or training.lr, the sweep
+      name and the DyHPO seed (diffed scr_epem_ttx_d5 and ft_ee_uu_d7); D421 is addressed by part (B); the total is 28 GPU-h.
+      One check still fails. Check 3, part (B)''s best-val verdict sits inside the known search-to-search spread. Each lrx3
+      search is compared with one stage-2 search per cell, with HIGHER at 2x, and the LR WINDOW branch allows no more than
+      2 HIGHER cells of 12 (GOOD BUT WORSE at >= 3). But results.tex sec:ladder (~l.13700) measures ''Two independent 8-trial
+      searches ... differ by up to 5x per cell'', and the search best sits a median 1.5x (up to 23x) from fresh seeds at its
+      HPs. So with no lr effect at all, 3 or more cells of 12 can land at >= 2x by noise. The GOOD BUT WORSE branch would
+      then send Joaquin a per-cell ''price'' that is noise, or block the LR WINDOW branch. Fix: judge (B)''s val on the pooled
+      geometric mean over the 12 cells of lrx3-best / stage-2-best, against the search-to-search spread (5x per cell, scaled
+      by 1/sqrt(12) for the pooled read, as (A) does with S). Report each cell beside with the 5x band, and state the false-alarm
+      rate as in (A). The good-count bar (>= 8 of 12 against 0 of 12 stage-2 bests good) is fine as is. Not decisive: under
+      x3, fine-tune trials above lr_scale ~0.9-3 fall where this entry''s divergences sit (LO lr_scale 2.6-3.0, t t~ 6.7-9.7),
+      so a third to a half of the [0.1,10] log window may diverge. Say so in the read, and count diverged trials apart (D398).'
   step_waits:
     '3': bbx_zz_lo_scr3, bbx_zz_lo_ft drivers (detach events)
     '4': bbx_zz_lo_ft driver (detach event)
