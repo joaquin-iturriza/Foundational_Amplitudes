@@ -24460,6 +24460,16 @@ entries:
       (no retry flags): the 15 start-up trials keep running, guided waves follow on their results. A real divergence, not
       a defect: t t~ tree D=3162 start-up trial 2 (FA-ccin2p3-c61f4268, hp1932) aborted after 50 non-finite-gradient steps
       at step 1439; it stays a failed trial (penalty).'
+  - at: '2026-11-12T10:20:07+00:00'
+    text: '2026-11-12 ~11:25 CET: deviation in the running step-3 template test, kept and to be stated with its result. The
+      design''s fixed list says ''no head map'', but since cec3610c/ed7c42c6 (2026-11-12 02:22/02:58) every fine-tune with
+      target_stats=own maps the readout to the run''s stats at load whenever the parent predicts the same quantity: the two
+      tree cells'' trials log ''head mapped ... mu row x7.388'' (FA-ccin2p3-dc9237a9), the three V/B cells log ''head NOT
+      mapped'' (parent target differs; FA-ccin2p3-a2c8fecd). So on tree the new search differs from the stage-2 fine-tune
+      control in two things (space and head map); the design''s own check arm (null-parent pre, runs/dsave_diag_hmap_ft_*)
+      carried the head map too, so the runs match the check. The head map alone was measured against the stage-2 fine-tune:
+      NO CHANGE (hmap_readout, val gmean 1.29 over 8 cells, test 0.64), so a tree FIXED (gmean r_old <= 1/3) cannot come from
+      it; the readout reports the tree r_old with this caveat. V/B cells match the design exactly.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
