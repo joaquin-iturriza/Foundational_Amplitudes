@@ -21376,7 +21376,7 @@ entries:
     - 9
   owner:
     agent: a0ffaf4de4b7f54ac
-    state: working
+    state: closed
     since: '2026-11-12T01:31:29+00:00'
     state_at: '2026-11-12T02:21:06.380000+00:00'
     context: 298506
@@ -23763,28 +23763,25 @@ entries:
     start: '2026-11-12T01:42:53+00:00'
     at: '2026-11-12T01:42:53+00:00'
   handoff:
-    state: 'Step 9 defect hunt. Head map implemented and unit-tested (cec3610c: every target_stats=own fine-tune loads the
-      parent''s readout mapped to its own target stats, step 0 = parent''s prediction; tests/test_head_map_own_stats.py).
-      Leads read (findings 2026-11-12 step 9 and ~03:00): lr groups as designed; one-loop val NLL blow-up starts deep in the
-      cosine anneal (lr 3-5e-4, falling), not at high lr or lr_scale''s top, grad norms 2e2-9e3 pre-clip in every run of both
-      arms; ft loses where scratch val < 1e-6 (all t t~), wins where > 1e-5 (all u u~); D=316 off-trend: t t~ tree scratch
-      test is one event (97%), u u~ V D=316 shares T=2720 with D=100 (horizon-limited). parent_shared batch (8 runs + smoke
-      017c3f8a) running, superseded as an arm, read on RUN_DONE as the effect of starting from the parent''s function at the
-      controls'' HPs (ft_defect-style re-based val MSE). Open question to Joaquin: ~88 GPU-h rerun of the 34 fine-tune searches
-      with the head map. Not done: Joaquin''s house-style training-curve figure (every D of the study, every curve labelled,
-      axes as stage2_LD, words for ''stage-2 best'' and ''parent-scale rerun'', the 0.46-4.84 same-HP rerun spread as instability).'
-    decisions: 'Head map is the default for target_stats=own (Joaquin 2026-11-12: one correct choice, not an arm); for one-loop
-      targets the parent''s stats are of tree ln|M|^2, so the map reproduces the parent''s tree prediction there. parent_shared
-      not adopted; its batch read only as evidence. No new tweak arms (Joaquin). Rerun cost above 30 GPU-h goes to Joaquin.'
-    ruled_out: 'lr groups as applied (as designed); step-0 gradient spike as the blow-up cause (ends by step ~170); lr_scale
-      at its top (t t~ V/B 0.16, u u~ V 0.79 of [0.1,10]); earlier: weight loading, pool physics, species clash, tops for
-      t t~ V.'
-    running: FA-ccin2p3-017c3f8a (smoke), FA-ccin2p3-31468dbb 538569e2 762f0029 cce86735 e22a4dc3 bf99b2f0 6a30b085 265173f8
-      (parent_shared, t t~ tree, r4/r5, D=316..1e4), step 9 waits on the 8
-    files: base_experiment.py (_map_head_to_own_stats), tests/test_head_map_own_stats.py, analysis/data_saving/{ft_defect.py,ft_curves.py},
-      data/{ft_defect.json,ft_defect_summary.json,ft_curves.json,stage2_readout.json,stage2_diag_runs.json}, figs/{ft_vs_scratch,ft_sigma,ft_defect_curves,ft_curves}.png,
-      sweep/sweep_config_dsave_diag_{pshared,psharedtops}_ft_epem_ttx_d{5..8}_t8500.yaml
-    written: '2026-11-12T01:25:03+00:00'
+    state: 'Step 9/10. Head map restricted to same-quantity parents (ed7c42c6; V/B fine-tunes load unmapped as in stage 2).
+      Tree head-map batch (13 runs, design PASS) mostly done, read partially: NO CHANGE (pooled val gmean 1.29, test 0.64).
+      Review figures drawn @6cad6fba, not yet all looked at by me: stage2_LD (relabelled), hmap_LD (every D, plain labels,
+      = the diag figure at every D), stage2_mismatch, stage2_mse_curves_<target>_<a..> (per D, val+train mu-MSE from the runs''
+      own logs), stage2_d316_<a..c>; looked at: stage2_LD, hmap_LD, stage2_mismatch. Repo-reviewer ad1bfac42d24610b9 still
+      FIX: scope (ft_defect.py DS d5..d8 -> every D; pshared/hmaptops only exist at d5..d8 because their controls do), hook
+      glob and kit_figures median (not ours). Rerun question (~88 GPU-h, 34 searches) still open to Joaquin; with NO CHANGE
+      it is a correctness rerun with no expected gain.'
+    decisions: Head map only where parent and run predict the same quantity (one correct answer; reviewer finding); one-loop
+      hmap runs cancelled. Clipping at 5 on every step is intended (D68/D72), same in scratch. One-loop blow-up = train/val
+      gap opening in the anneal (memorisation), not sigma alone (finding 2026-11-12).
+    ruled_out: parent_shared start (pooled val gmean 4.0, test 0.88); head map on tree (NO CHANGE, partial); inherited sigma
+      as the one-loop blow-up cause cannot be tested by the map (V/B).
+    running: FA-ccin2p3-425ef3b2 (hmap tree D=1e5), FA-ccin2p3-58feec4f (hmap tree D=3.16e4) if not yet ended; steps 9 and
+      10 wait on the 13 tree runs
+    files: analysis/data_saving/{hmap_readout.py,stage2_mse_curves.py,review_figs.py,plot_stage2.py,diag_readout.py,stage2_curves.py},
+      data/{hmap_runs.json,hmap_readout.json,stage2_mse_curves.json,stage2_diag_test.json}, figs/{stage2_LD,hmap_LD,stage2_mismatch,stage2_mse_curves_*,stage2_d316_*,hmap_gradnorm,stage2_diag_tops}.png,
+      figs/run_plots/, base_experiment.py _map_head_to_own_stats, tests/test_head_map_own_stats.py
+    written: '2026-11-12T02:28:25+00:00'
   ask: 'GPU budget: rerunning the 34 fine-tune searches of the study''s design (4 targets x D=10..1e4/3e4, 8 trials each,
     scratch searches reused) with the fine-tune now starting from the parent''s function (head map, cec3610c) costs ~88 GPU-h
     (stage 2 measured: t t~ tree 24.4, t t~ one-loop 20.7, u u~ tree 28.0, u u~ one-loop 14.7), above 30 with no decision
