@@ -27058,10 +27058,6 @@ entries:
   next:
     5: 'Checkpoint + inference package for KIT (Joaquin sends it): best A_ft/B checkpoints, a float64 predict script, log10|M|^2
       out; after the A_ft batch'
-    11: 'Joaquin 2026-11-12 ~15:00 (D415 + his questions): (a) measure the frames mechanism per stratum (boost size, local-momentum
-      size, control runs, eval-only); (b) reproduce every plot Bakar sent, ours vs his MLP; (c) one-loop processes covering
-      Coulomb (massive pair near threshold, non-tt) and Sudakov added to the pretraining, one design; (d) a general divergence-form
-      input (eikonal logs, splitting variables, 1/beta per massive pair), one short test on uug and tt virtual'
     14: 'Joaquin 2026-11-12 (~19:30, via coordinator): ''I know that log invariants go as inputs, this is not necessarily
       the same as passing the functional form of the divergence as an input''. Design one arm of divergence-form input features,
       general for any process and built from the universal limits, fed per particle or per pair into the transformer (full
@@ -28125,11 +28121,6 @@ entries:
       if:
       - 'A_ft best: package A_ft'
       - 'B best: package B'
-    11:
-      feeds: how far our transformer can match or beat Bakar's MLP in the KIT limits, D411/D415
-      if:
-      - 'a route helps: adopt it in the KIT models'
-      - 'none helps: report the comparison against all of Bakar''s plots as the KIT answer'
     14:
       feeds: whether feeding the divergences' functional form as inputs through the whole network (not added at the output)
         fixes the KIT limits with full LLoCa (D419)
@@ -28150,7 +28141,6 @@ entries:
       - 'yes: launch beside step 15''s searches'
       - 'no: uugg and uug-T stay at the old HP point, said wherever shown'
   step_waits:
-    '11': FA-ccin2p3-dcf42ad6 FA-ccin2p3-e7dca162
     '5': FA-ccin2p3-dcf42ad6 FA-ccin2p3-e7dca162 (the A_ft batch of step 11c)
     '15': detach:kit_hpo (sweeps kit_hpo_uug_plain, kit_hpo_ttvirt_thr)
     '14': FA-ccin2p3-8c1223c0 FA-ccin2p3-f45f434a
