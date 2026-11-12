@@ -655,6 +655,15 @@ if [ -n "$LONG_HEADS$LONG_FACTOR$LONG_LR" ]; then
         OUT="${OUT}_hp1262"; PRED="${PRED}_hp1262"
         echo "LONG_HP 1262: steps $ITERS lr $HLR"
     fi
+    # LONG_OPT=adamw (plan optimizations_recap step 3, D364 "extend the plots that compare the optimizers"): the same
+    # cell with AdamW (MuAdamW on every parameter) in place of MuonAdamW, every other setting and the lr unchanged
+    # (MuonAdamW scales Muon's update to AdamW's RMS, so one lr number serves both); own run dir _adamw
+    if [ -n "$LONG_OPT" ]; then
+        [ "$LONG_OPT" = adamw ] && [ -z "$GROW_K$PIDQN" ] || { echo "LONG_OPT: only adamw, not with GROW_K or PIDQN"; exit 1; }
+        NORM=("${NORM[@]/#training.optimizer=*/training.optimizer=AdamW}")
+        OUT="${OUT}_adamw"; PRED="${PRED}_adamw"
+        echo "LONG_OPT adamw: ${NORM[*]}"
+    fi
     AXES+=(HD4 HD5)
     # width growth (plan warm_start step 4, D285): GROW_K=<533|1066|2132> with LONG_HEADS=16 starts from the 1x cell at
     # half the width and the same seed (its final model, after its sigma stage), grown function-preservingly
