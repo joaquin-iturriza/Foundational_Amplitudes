@@ -16979,6 +16979,12 @@ entries:
       s. So on that traffic the new rule cuts nothing more; a cut beyond 20 needs a longer window than D324''s 10 minutes
       (Joaquin''s call) or fewer urgent RUN events reaching the main session (10 RUN events with notes, owners'' runs). Live
       measure pending: the waiter loads the new code at its next re-arm.'
+  - at: '2026-11-12T00:25:49+00:00'
+    text: '2026-11-12 E5530 (new disk ALERT fired live after the supervisor restart: 52 GB free): free-space attempt refused
+      by the auto-mode classifier (rm of tmp/amp_mmap_cache 7d589cbf/f5ccb555, 5 GB; and a sweep/prune.py dry run). Under
+      the rules only ~6 GB is cleanable debris; amp_data_cache is mostly catalog pools (v4_ 59 GB, dsh_ 10 GB) of open entries,
+      protected by prune.py POOL_PREFIXES (d00c1859). Reaching 60 GB needs prune.py (D19) run by Joaquin or a permission,
+      or his call on pools/results. E5530 acked with that note.'
   handoff:
     state: '2026-11-11: D399 setup fixes merged into trunk 6ec67a05 and pushed (keeper PASS at d56fb00b after 14 findings
       fixed; repo-reviewer PASS at 10ced0d3 after 2 fixes: undecide soft delete, waiter test runner). Out of repo, live: ~/work/CLAUDE.md
