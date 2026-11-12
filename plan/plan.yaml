@@ -21350,7 +21350,11 @@ entries:
   - D360
   - D377
   - D407
-  next: null
+  next:
+    2: 'Fine-tune suspects batch (design PASS 2026-11-12 03:42): smokes FA-ccin2p3-2b5e3bab (tree) + 49cbbbda (one-loop),
+      then 56 runs (ft arms lr/3, lr/10, WSD, AdamW, mu-only MSE; scratch arms WSD, mu-only MSE; t t~ tree and V/B, D=316..1e4),
+      configs sweep/sweep_config_dsave_diag_{hmap_ft_epem_ttx,parscale_ft_ee_ttbar_nlo}_d{5..8}_t8500.yaml and sweep_config_dsave_s2_scr_*
+      + --hp overrides; 26.6 GPU-h at limits'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -24185,6 +24189,13 @@ entries:
       run dirs runs/dsave_diag_*/ on CC, run ids in data/hmap_runs.json and stage2_diag_runs.json; parents dsave_parent_heldout_r4
       / treesin_r4 (r4), r5 tops parent; head map base_experiment._map_head_to_own_stats, tests/test_head_map_own_stats.py.'
     written: '2026-11-12T03:21:24+00:00'
+  step_why:
+    2:
+      feeds: which knob of the fine-tune recipe causes the t t~ deficit (D408)
+      if:
+      - 'an arm FIXES (G<=1/3, >=3/4 below, also without worst event): that knob is the fix, into the fine-tune template,
+        rerun question with the evidence'
+      - 'none FIXES: the parent (pretraining set, length) is the next test, designed then'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
