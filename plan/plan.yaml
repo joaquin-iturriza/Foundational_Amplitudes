@@ -25431,6 +25431,11 @@ entries:
       bests good: t t~ LO scr 2/9 ft 2/9; t t~ V/B scr 3/8 ft 1/8; u u~ LO scr 2/9 ft 3/9; u u~ V scr 0/8 ft 1/8; b b~ ZZ
       V/B 0/7 both; b b~ ZZ LO scr 1/7. Typical failure: val follows train until the cosine tail (last ~15% of steps), then
       train drops 1-4 decades and val flattens. Figures figs/curve_examples_{good,bad}.'
+  - at: '2026-11-12T17:39:45+00:00'
+    text: '2026-11-12 ~18:40: Joaquin: ''there is no way 100 trainings pass ... train and val loss go down together, I don''t
+      see that in most of the curves you''ve shown''. The v_end/min v measure is withdrawn (it never compared val to train);
+      owner af9e7383 rebuilds it on val falling together with train, checked by eye on the curves already shown, and shows
+      good/bad examples before use. The larger-D question was re-asked plainly (he had not seen it).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
