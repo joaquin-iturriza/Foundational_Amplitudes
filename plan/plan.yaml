@@ -21381,7 +21381,6 @@ entries:
       L(D) figure + S with band; tt kept in the background'
     4: b b~ > Z Z LO fine-tune searches launched when the held-out parent dsave_parent_heldoutbbzz (FA-ccin2p3-0d698e4b) ends;
       design PASS 2026-11-12 (revised)
-    5: Redraw muonly_curves_epem_{a,b} (a code-like label 'val3162' in the figure; plain words) and hand it back for Joaquin
     6: 'b b~ > Z Z larger-D cells: D=31623 at one loop, D=31623 and 1e5 at tree level, ~29 GPU-h (only on Joaquin''s yes)'
   done_when: null
   notes_ref: null
@@ -24558,8 +24557,6 @@ entries:
     '2': a reviewer
     '3': a reviewer
     '4': FA-ccin2p3-0d698e4b
-    '5': FA-ccin2p3-39823ff8 FA-ccin2p3-6293be00 FA-ccin2p3-f28fe38e FA-ccin2p3-c7213cbd FA-ccin2p3-56381216 FA-ccin2p3-714db3a4
-      FA-ccin2p3-148ccdb9
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
@@ -25618,11 +25615,6 @@ entries:
       if:
       - 'parent ends clean: generate and launch the 7 fine-tune searches (and the scratch ones if not yet out)'
       - 'parent breaks: read its log, fix, resubmit; LO fine-tune arm waits'
-    5:
-      feeds: the plain-MSE-on-the-mean diagnostic on tt LO (D=3162), shown to Joaquin
-      if:
-      - 'redrawn: hand back'
-      - 'cannot: say why'
     6:
       feeds: the b b~ > Z Z L(D) range for the draft's second example (D413/D417)
       if:
