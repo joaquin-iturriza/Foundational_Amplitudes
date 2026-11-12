@@ -138,7 +138,7 @@ def _epoch(ts):
 
 def figures_handed_back(inp, records=None, spool=SPOOL):
     """a hand-back in the spool newer than Joaquin's last message names a figure (analysis/**/figs/*.png) for him
-    and the main session has not SendUserFile'd it since; "ROUTINE:" reports are exempt. Passes when the turn's
+    and the main session has not SendUserFile'd it (at any time in the session); "ROUTINE:" reports are exempt. Passes when the turn's
     user message lies beyond the tail read."""
     if inp.get("agent_id") or inp.get("agent_type"):
         return [], []
@@ -176,7 +176,7 @@ def figures_handed_back(inp, records=None, spool=SPOOL):
         if body.startswith("ROUTINE:") or "Joaquin" not in body:
             continue
         for f in _FIG.findall(body):
-            if f not in missing and not any(st >= t and b == os.path.basename(f) for st, b in sent) \
+            if f not in missing and not any(b == os.path.basename(f) for st, b in sent) \
                     and not any(st >= t and os.path.basename(f) in tx for st, tx in said):
                 missing.append(f)
     if not missing:

@@ -46,6 +46,7 @@ def replay(m, d, rec):
         return 1, "incident %s has no recorded hook input (opened by hand with no refusal seen); nothing to replay" \
             % rec["id"]
     name, *args = rec["hook"].split()
+    name = name.split(":")[0]      # a condition id plan_check.py:<condition> replays its hook
     path = os.path.join(d, name)
     if not os.path.isfile(path):
         return 1, "no hook %s in %s" % (name, d)

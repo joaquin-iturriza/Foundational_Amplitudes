@@ -48,6 +48,18 @@ def test_loop_on_core_condition_is_not_disabled():
     assert dis() == {}
 
 
+def test_figure_sent_earlier_in_session_counts():
+    sys.path.insert(0, HOOKS)
+    import stop_conditions as sc
+    d = tempfile.mkdtemp(prefix="figsent_")
+    open(os.path.join(d, "9999999999_x"), "w").write("Joaquin, see /w/analysis/e/figs/a.png")
+    user = {"type": "user", "timestamp": "2026-11-12T10:00:00Z", "uuid": "u", "message": {"content": "hi"}}
+    send = {"type": "assistant", "timestamp": "2026-11-12T09:00:00Z", "message": {"content": [
+        {"type": "tool_use", "name": "SendUserFile", "input": {"files": ["/w/analysis/e/figs/a.png"]}}]}}
+    assert sc.figures_handed_back({}, [send, user], d)[0] == []          # sent before the hand-back: counts
+    assert sc.figures_handed_back({}, [user], d)[0] != []                # never sent: still refused
+
+
 def test_plan_check_skips_disabled_condition_but_not_core():
     off = {"plan_check.py:figures_handed_back": {}, "plan_check.py:ledger": {}, "plan_check.py:context": {}}
     pc = base.world(off)
