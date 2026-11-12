@@ -24196,6 +24196,9 @@ entries:
       --vs and the threshold scan'
     7: 'Joaquin''s review 2026-11-12: networks worse than the bulk-edge constant on t t~ virtual vs sqrt(s); beta^2 input
       wrecking the Born; figure fixes'
+    8: 'D403 MLP ladder (design passed 2026-11-12): read FA-ccin2p3-d277f7f5 (uug + his numpy baseline.py port check), 7a63ea88
+      (uugg), 1df8bd16 (tt virtual): kit_figures collect/plot over runs/kit_mlp, deepest bin per arm vs mlp by the design''s
+      rule'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -24726,6 +24729,12 @@ entries:
       if:
       - 'a defect found: fix, re-score, redraw'
       - 'no defect: report the comparison with the MLP'
+    8:
+      feeds: which difference between Bakar's MLP and our setup stops our models extrapolating (D403)
+      if:
+      - 'a single arm loses his extrapolation: carry his choice for that factor into the transformer (next design)'
+      - 'only ours fails: two-factor arms'
+      - 'no arm fails: feed the transformer his inputs only (architecture rung)'
   step_waits:
     '5': FA-ccin2p3-cca3ca1b FA-ccin2p3-74403c74 FA-ccin2p3-eef4c20a FA-ccin2p3-c2d1005f FA-ccin2p3-843447d2
     '6': the next owner, from the hand-off
