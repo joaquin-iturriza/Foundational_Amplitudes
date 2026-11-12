@@ -16947,6 +16947,23 @@ entries:
       every site edit disables spooling until the waiter is re-armed (the owner''s site edit at 19:33 UTC today did so). Instrumented
       in d56fb00b (absorb.log, one line per hand-back with waiter_alive). test_quiet_waiter was stale (D324 600 s default
       debounce), fixed with a batch-window test.'
+  - at: '2026-11-12T00:09:39+00:00'
+    text: '2026-11-12 step 24 (D384), why no DISK alert reached the main session on 2026-11-11 (supervisor log tasks/bpz3pk7ki.output,
+      events table): (1) 03:03 local an ssh reset of the disk watch opened MAINTAIN E4668, acked 03:04 with a 2 h mute; every
+      maintain event of a command shares one key (the command), so the DISK failures of 03:09-04:18 (/sps/lpnhe 99%) were
+      swallowed by that mute; (2) maint_state then held the DISK signature, so from 04:26 (93%, 42 GB) and 05:08 (41 GB) every
+      pass was a ''repeat'' and opened nothing (the same suppression hid 2026-11-07..11 after E4035); (3) E4920 (15:19 UTC,
+      59 GB) opened once the signature changed (''(N GB free)'', 70c1fe66), was acked routine, and after its mute the running
+      supervisor (started 2026-11-11 02:16 local) kept suppressing: the ''a disk alarm is never a repeat'' edit to ~/.local/bin/site
+      was on disk but never loaded, as a long-lived python loop never re-reads its code. At 01:00 local 2026-11-12 the watch
+      reads 52 GB free every pass and no event is open. Fixes in ~/.local/bin/site (backup site.bak-20261112-diskwatch): a
+      DISK line opens an ALERT under its own key ''DISK <cmd>'' (one open per key, a new one after each ack''s mute); supervise
+      re-execs itself when site or site_runends.py changes; site submit --disk-gb <batch need> reads df on the site checkout
+      and refuses when free - need < 60 GB (prints free GB always, warns under 60 without --disk-gb). Tests: tests/test_disk_alarm.py
+      D1 (replay of E4668 then DISK -> ALERT), D2 (one open, new after mute), S1-S4 (52/20 refused, 250/20 goes, 52/none warns,
+      df unreadable goes); tests/test_run_done_waiter.py S (reload on mtime change). Not tested: the reload live (the running
+      supervisor predates it, one restart by the main session needed), lxplus EOS df, sweep_manager submissions (they do not
+      pass site submit''s check), site pick does not use free disk.'
   handoff:
     state: '2026-11-11: D399 setup fixes merged into trunk 6ec67a05 and pushed (keeper PASS at d56fb00b after 14 findings
       fixed; repo-reviewer PASS at 10ced0d3 after 2 fixes: undecide soft delete, waiter test runner). Out of repo, live: ~/work/CLAUDE.md
