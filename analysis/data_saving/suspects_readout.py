@@ -109,10 +109,11 @@ def verdict(G, n):
 
 def main():
     R = load("--cached" in sys.argv)
-    for key, r in sorted(R.items()):
-        if "val_min" not in r:
-            print("MISSING", key, r.get("error"))
-    res = {"cells": [], "arms": []}
+    # a run without a val curve (diverged, or a pruned control) is listed apart with its log's reason, never dropped
+    res = {"cells": [], "arms": [], "missing": {f"{k[0]} {k[1]} d{k[2]}": r.get("error") for k, r in sorted(R.items())
+                                                if "val_min" not in r}}
+    for k, why in res["missing"].items():
+        print("MISSING", k, why)
     for tg in TARGETS:
         for arm in FT_ARMS + tuple("scr_" + a for a in SCR_ARMS):
             ctl = "scr" if arm.startswith("scr_") else "ctl"
