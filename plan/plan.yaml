@@ -21495,9 +21495,9 @@ entries:
     decision: D407
   owner:
     agent: acb7a3d407b6435d6
-    state: closed
+    state: working
     since: '2026-11-12T03:58:47+00:00'
-    state_at: '2026-11-12T04:14:08+00:00'
+    state_at: '2026-11-12T08:47:49+00:00'
     context: 122898
     context_at: '2026-11-12T04:24:38+00:00'
   designs:
