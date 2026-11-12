@@ -23264,6 +23264,12 @@ entries:
     units: null
     start: '2026-11-11T20:18:16+00:00'
     at: '2026-11-11T20:18:16+00:00'
+  - batch: pshared_tt_tree
+    wall_h: 0.6
+    jobs: 9
+    units: null
+    start: '2026-11-12T00:50:14+00:00'
+    at: '2026-11-12T00:50:14+00:00'
   handoff:
     state: 'Stage A written up in sec:datasaving @db167a55 (figs stage2_diag_tops, event_share): physical-mass tops help t
       t~ LO (r5/r4 val gmean 0.24, test 0.08), t t~ V within the rerun spread. The t t~ V D=1e4 val/test 100x disagreement
