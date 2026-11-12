@@ -25281,7 +25281,7 @@ entries:
       - 'NO: not the norms at the baseline HPs; next the transformer without attention (per-particle MLP + mean pool), designed
         then'
   step_waits:
-    '5': '2026-11-12'
+    '5': '2026-11-13'
     '6': '2026-11-13'
     '10': FA-ccin2p3-bba9a61e FA-ccin2p3-36a30e0c
     '9': FA-ccin2p3-bacdb4a8 FA-ccin2p3-ec74d56d FA-ccin2p3-62dcf910
