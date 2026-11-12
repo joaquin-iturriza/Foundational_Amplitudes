@@ -21143,12 +21143,10 @@ entries:
     blocks_steps: &id003
     - 9
   owner:
-    agent: ae6f048973934c6c3
-    state: closed
-    since: '2026-11-12T00:31:29+00:00'
-    state_at: '2026-11-12T01:25:14+00:00'
-    context: 219409
-    context_at: '2026-11-12T00:54:10+00:00'
+    agent: a0ffaf4de4b7f54ac
+    state: working
+    since: '2026-11-12T01:31:29+00:00'
+    state_at: '2026-11-12T01:31:29+00:00'
   step_why:
     7:
       feeds: S at 1e-4 per target from parents with the physical-mass tops (D400)
