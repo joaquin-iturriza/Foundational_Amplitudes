@@ -26237,6 +26237,33 @@ entries:
       pairs at physical mass (gg/q q~ > t t~ virtual near threshold, carries the Coulomb 1/beta), designed then. Cost: generation
       of 3 tree 2->2 pools (CPU, minutes), r5thr ~1.9 GPU-h (r5 1.81 h), 2 fine-tunes ~1.6 h each at 0.55-0.8 s/step, 2 smokes
       ~0.2: ~5.5 GPU-h, under 30.'
+    fix_at: '2026-11-12T03:19:13+00:00'
+    fix: '(1) Not a repeat / prior incomplete: prior omits the star arms'' t t~ threshold arm (docs/results.tex ~l.14809-14846,
+      par ''The star arms'' four new probes'' and ''design''): rung 1 + u u~ > t t~ tree AND one loop at sqrt s 363-450 GeV
+      (beta ~0.2-0.65), probe e+e- > t t~ one loop near threshold: 2-4x better than rung 1 from D=1e3 up, still above scratch
+      at small D; rung 1 and the 64k ee->uu parent 2.5-20x worse than scratch at D<=10^2.5. That is prior work on this question
+      (near-threshold top-pair pretraining -> ee->tt virtual) and on the NO branch''s ''next lever'' (one-loop top pairs).
+      Name it with its numbers, say what differs now (softpair inputs, beta down to 1e-5 instead of >=0.2, KIT strata at 1e5)
+      and why that matters, and rewrite the NO branch in its light. Terms searched: threshold, Coulomb, log-uniform, beta,
+      physical-mass top, near threshold, sqrts_measure. (2) D405 ''have the inputs that help'': the beta input (model.input_pair_threshold,
+      softpairthr FA-ccin2p3-3fc1016a) was YES on tt virtual (Coulomb median -0.325, bulk -0.775) and its finding sends the
+      flag to the catalog parent''s t t~ pools; its limit was extrapolation past the trained beta>=0.2 (tools/kit_input_range.py),
+      which is exactly what r5thr''s threshold pools would cover. The design leaves it out without a reason: either add it
+      (e.g. r5thr with the flag, fine-tune vs 3fc1016a) or state why not. (3) Matched control: f21fa163 has model.input_pair_logs=4,
+      the fine-tunes 6 (from the r5 parent); job_kit.sh A_ft takes the parent''s config.yaml as base, so list the r5-vs-trial-1262
+      config differences that reach the fine-tune and state the pair_logs 4/6 difference and why it is equivalent (zero padding).
+      job_kit.sh A_ft hard-codes fine_tune.offshell_stats=parent; the design''s ''own'' rides as a later override: the A_ft
+      smoke must show ''own'' in the run''s config. (4) Seeds vs spread: the 0.3-decade cut on the family median stands on
+      no measured spread (the same unsourced 0.3 per-bin cut was removed from kit_readout by the repo review, 2026-11-11).
+      Keep one seed (D315) but name the measured spread the cut is compared to (e.g. the MLP ladder''s 3-seed per-stratum
+      spread on tt virtual, 1df8bd16, or the data-saving t t~ rerun spread in results.tex). (5) Only the pools move: r5thr
+      ''T from its pool count, lr rule as r5'' moves T (4307 -> ~4316) and lr with the added pools; keep r5''s T=4307 and
+      lr 8.196e-3 or state the move. job_datasaving_parent.sh only knows heldout|treesin (T, lr, recipe hard-wired): say how
+      r5thr is launched. (6) Write the owner''s amendment into ''fixed'': the 3 threshold pools drawn plainly (no catalog_v4
+      mixture, no adaptive pass), sqrt(s)=2 m_t/sqrt(1-beta^2), beta log-uniform [1e-5,0.6], catalog_v4 cuts (tops are not
+      in cut_pdgs [5,15], so the cuts do not remove near-threshold tops). Checks that hold: measure moves with threshold data
+      (B vs B_bulk Coulomb 2.38 vs 8.71; softpairthr -0.325), outcome stated both ways, loss HETEROSC via trial 1262, rates
+      from r5 (1.81 h) and the softpair tt runs, no cache (memmap off), KIT strata as test events, ~5.5 GPU-h under budget.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
