@@ -31487,11 +31487,11 @@ entries:
     start: '2026-11-12T18:11:27+00:00'
     at: '2026-11-12T18:11:27+00:00'
   - batch: kit_hpo
-    wall_h: 3.5
-    jobs: 32
+    wall_h: 4.0
+    jobs: 9
     units: null
-    start: '2026-11-12T18:49:51+00:00'
-    at: '2026-11-12T18:49:51+00:00'
+    start: '2026-11-12T19:06:30+00:00'
+    at: '2026-11-12T19:06:30+00:00'
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
