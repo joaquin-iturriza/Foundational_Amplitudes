@@ -27177,8 +27177,8 @@ entries:
       - 'it loses Coulomb or keeps the overshoots: the output term is not the lever; the degree-2 term stays a tt-Coulomb-only
         option'
   step_waits:
-    '11': FA-ccin2p3-dcf42ad6 FA-ccin2p3-e7dca162 (11c A_ft fine-tunes; dcf42ad6 after parent rerun 2d653209 r5loop_rerun,
-      replacing cb111375 whose parent 066f8539 diverged; e7dca162 after ca5873f3 r5loopbeta); then threshold scan
+    '11': FA-ccin2p3-dcf42ad6 FA-ccin2p3-e7dca162 (11c A_ft fine-tunes, after parents 2d653209 r5loop_rerun and ca5873f3 r5loopbeta);
+      then threshold scan
     '12': FA-ccin2p3-95be8db2 FA-ccin2p3-88b9334a (frames_gamma_max=4 uug, uugg; after smoke 18da5c47); read under the 16:5x
       design with kit_extrap_read (arm gmax4 to wire in ARMS), kit_figures collect + kit_readout --vs, and kit_transformer_probe
       on the arms (frame and relative gamma)
