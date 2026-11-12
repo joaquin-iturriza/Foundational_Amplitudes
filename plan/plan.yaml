@@ -27218,9 +27218,9 @@ entries:
     decision: D428
   owner:
     agent: ac46d0b7530cd12d9
-    state: stopped
+    state: working
     since: '2026-11-12T18:25:52+00:00'
-    state_at: '2026-11-12T19:09:32.043000+00:00'
+    state_at: '2026-11-12T20:23:13.937000+00:00'
     context: 214516
     context_at: '2026-11-12T19:07:29+00:00'
   findings:
