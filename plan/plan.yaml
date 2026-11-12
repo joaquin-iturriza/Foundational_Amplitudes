@@ -27248,9 +27248,9 @@ entries:
     withdrawn_why: 'Joaquin: use all available clusters'
   owner:
     agent: ad1a12dcf02712802
-    state: stopped
+    state: working
     since: '2026-11-12T21:29:09+00:00'
-    state_at: '2026-11-12T21:49:32.342000+00:00'
+    state_at: '2026-11-12T21:59:13.728000+00:00'
     context: 166252
     context_at: '2026-11-12T21:58:35+00:00'
   findings:
