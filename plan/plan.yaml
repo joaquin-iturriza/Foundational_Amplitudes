@@ -21295,8 +21295,6 @@ entries:
     8: 'One-loop t t~ V suspects batch, design PASS 2026-11-12 (configs sweep/sweep_config_dsave_diag_{massown,adamw,pairthr}_ft_ee_ttbar_nlo_d{5..8}_t8500.yaml
       + smoke ..._smoke3_..._t50.yaml @7d56534c, controls the offown runs, ~5.5 GPU-h): smoke then 12 runs via trial_job.sh,
       --hdr=--time=00:40:00; held by the main session (''before more arms'') until the defect read is seen'
-    9: 'Step 9: read the last two tree head-map runs (FA-ccin2p3-425ef3b2, 58feec4f; D=3.16e4, 1e5) into hmap_readout.py and
-      hmap_LD; the design''s pooled rule already reads NO CHANGE on its 8 exact-control cells (val gmean 1.29, test 0.64)'
     10: 'Step 10: the one-loop ''blow-up'' enters no reported number (best-mu checkpoint loaded before the sigma stage); the
       every-trial read (trial_overfit.py @2c7ea02e) finds the fine-tune lr window too high (27/34 fine-tune searches: lower
       lr_scale, lower val; 11/34 bests in [0.1,0.16]). Rerun of the 34 fine-tune searches with the head map and lr_scale window
@@ -21438,11 +21436,6 @@ entries:
       - 'an arm YES (w/o-worst val geomean <= 0.4, >=3/4 below): mass column into s3 one-loop configs; AdamW or pair input
         to Joaquin as in the design'
       - 'all NO: no gain at the control''s HPs; the deficit goes to the defect hunt'
-    9:
-      feeds: whether the head map changes the fine-tune deficit (rerun as correctness or as expected gain)
-      if:
-      - 'hmap at D=3.16e4,1e5 within the 0.46-4.84 rerun spread of its control: NO CHANGE stands, figure updated'
-      - 'outside the spread: reported per cell beside the pooled rule, which stays the design''s'
     10:
       feeds: how much target data pretraining saves at MSE 1e-4 (the fine-tune L(D) curves at a correct start and lr window)
       if:
@@ -23145,7 +23138,6 @@ entries:
       zero-shot start, sigma head, output head, refit, own/parent stats, warm start; entry dead ends; site decisions.'
   step_waits:
     '8': the main session's read of the defect hunt (its 'before more arms'); then launched as designed
-    '9': FA-ccin2p3-425ef3b2 FA-ccin2p3-58feec4f
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
