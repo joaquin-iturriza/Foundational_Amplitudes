@@ -23578,8 +23578,6 @@ entries:
   - D363
   - D401
   next:
-    3: 'Fair NLO D-scan (Bakar): ee->tt virtual, 1e2..1e4 bulk one-loop target points, fine-tuned from the fair_nlo parent
-      against a from-scratch V/B with exact Born refit on the KIT ee_tt virtual bulk; design once FA-ccin2p3-03ea3719 ends'
     5: 'Checkpoint + inference package for KIT (Joaquin sends it): best A_ft/B checkpoints, a float64 predict script, log10|M|^2
       out; after the A_ft batch'
     6: 'Coulomb rise, target side: tt virtual target divided by its Coulomb factor (the exact O(alpha_s) 1/beta term) on top
@@ -24063,11 +24061,6 @@ entries:
       threshold model stays softpair. One seed (D315). Next lever for the Coulomb rise per the design: the target side (dividing
       out the Sommerfeld factor), to be designed.'
   step_why:
-    3:
-      feeds: Bakar's fair NLO comparison
-      if:
-      - 'fine-tune below V/B baseline at small D: pretraining saves one-loop data'
-      - 'not below: report so'
     5:
       feeds: what KIT receives
       if:
@@ -24081,7 +24074,6 @@ entries:
         ttvirt_A_best_threshold'
       - 'within +-0.3: protocol B stays the only threshold model; report the limit of protocol A'
   step_waits:
-    '3': '2026-11-12'
     '5': FA-ccin2p3-6f94590d FA-ccin2p3-2d0c78fe
     '6': FA-ccin2p3-6f94590d
   handoff:
