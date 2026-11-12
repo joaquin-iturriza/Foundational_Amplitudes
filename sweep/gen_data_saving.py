@@ -9,7 +9,8 @@ the tree levels in the pretraining"), so model and inputs match and only the key
   scratch    no pretrained weights; training.lr searched over [c/3, 3c] (HPO rule 2: half a decade either side)
   fine-tune  full retrain from the parent's final model (models/model_run0_best.pt, which the sigma stage, the end of
              the parent's training, leaves as its final model, D276) with layer decay (fine_tune.lr_scale [0.1, 10] around
-             training.lr = c, fine_tune.layer_decay [0.75, 1]); the target's own amplitude stats, the parent's
+             training.lr = c, fine_tune.layer_decay [0.75, 1]; --ft-space scratch: layer_decay 1 and lr_scale [1/3, 3],
+             scratch's window); the target's own amplitude stats, the parent's
              off-shellness scale (as scripts/job_data_saving.sh ft)
 c = 7.82114e-3 (max(T,3000)/17056)^-0.55 min(1, T/3000)^0.5 times the transfer study's D factor (the calibration's law,
 job_data_saving.sh, with HPO rule 2's inverted U below t* = 3000 steps), halved where the calibration cell trained at half lr.
@@ -85,7 +86,7 @@ def halved():
     return {(r["target"], r["k"]) for r in cal_rows() if r.get("T_D") and str(r.get("dir", "")).endswith("_lrhalf")}
 
 
-def write(name, tgt, k, T, arm, rate, parent, lr_factor=1.0, offshell="parent"):
+def write(name, tgt, k, T, arm, rate, parent, lr_factor=1.0, offshell="parent", ft_space="llrd"):
     c = lr_centre(T, k) * lr_factor
     space = template_space()
     fixed = {"data.source": "recipes", "data.processes_file": f"${{PROJECT_DIR}}/recipes/catalog_v4_datasaving_{tgt}.yaml",
@@ -103,8 +104,14 @@ def write(name, tgt, k, T, arm, rate, parent, lr_factor=1.0, offshell="parent"):
     else:
         fixed.update({"training.lr": float(f"{c:.4g}"), "fine_tune.pretrained_path": f"{parent}/models/model_run0_best.pt",
                       "fine_tune.target_stats": "own", "fine_tune.offshell_stats": offshell})
-        space = [{"name": "fine_tune.lr_scale", "type": "float_log", "low": 0.1, "high": 10.0},
-                 {"name": "fine_tune.layer_decay", "type": "float_uniform", "low": 0.75, "high": 1.0}] + space
+        if ft_space == "scratch":
+            # step 3 (2026-11-12): the scratch arm's space, the parent's weights the only difference: one param group
+            # (layer_decay 1) and lr = c x lr_scale over scratch's [c/3, 3c]
+            fixed["fine_tune.layer_decay"] = 1.0
+            space = [{"name": "fine_tune.lr_scale", "type": "float_log", "low": 0.333, "high": 3.0}] + space
+        else:
+            space = [{"name": "fine_tune.lr_scale", "type": "float_log", "low": 0.1, "high": 10.0},
+                     {"name": "fine_tune.layer_decay", "type": "float_uniform", "low": 0.75, "high": 1.0}] + space
     hours = T * rate / 3600 + OVERHEAD_H
     cfg = {"cluster": {"scheduler": "slurm", "auto_submit": False, "request_gpus": 1, "mem": "32G",
                        "cpus_per_task": 4,
@@ -133,11 +140,17 @@ def main():
     ap.add_argument("--stage", default="s2", help="sweep-name stage tag: s2, s3 (the fine-tunes from the D400 parents)")
     ap.add_argument("--offshell-nlo", default="parent", choices=["parent", "own"],
                     help="fine_tune.offshell_stats of the one-loop fine-tunes (s3: own, the t t~ V diagnostic read per target)")
+    ap.add_argument("--ft-space", default="llrd", choices=["llrd", "scratch"],
+                    help="fine-tune search space: llrd (lr_scale [0.1,10], layer_decay [0.75,1]) or scratch (layer_decay 1, "
+                         "lr_scale [1/3,3]: scratch's lr window)")
+    ap.add_argument("--ks", type=int, nargs="*", help="only these D exponents k (D = 10^(k/2))")
     a = ap.parse_args()
     R, hz = rates(), horizons()
     jobs = []
     for t in a.targets:
         for k in range(2, 10 if t.endswith("_nlo") else 11):
+            if a.ks and k not in a.ks:
+                continue
             T = hz.get(t, {}).get(k)
             if T is None:
                 raise SystemExit(f"no T(D) for {t} k={k}: rerun analysis/data_saving/horizons.py --ladder")
@@ -149,7 +162,7 @@ def main():
     total, half = 0.0, halved()
     for name, t, k, T, arm in jobs:
         p, h = write(name, t, k, T, arm, R[(t, k)], a.parent_nlo if t.endswith("_nlo") else a.parent_lo,
-                     0.5 if (t, k) in half else 1.0, a.offshell_nlo if t.endswith("_nlo") else "parent")
+                     0.5 if (t, k) in half else 1.0, a.offshell_nlo if t.endswith("_nlo") else "parent", a.ft_space)
         total += h
         print(f"{os.path.relpath(p, ROOT)}  {h:.1f} GPU-h")
     print(f"{len(jobs)} sweeps, {total:.1f} GPU-h estimated (8 trials each)")

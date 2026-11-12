@@ -58,12 +58,13 @@ def summary(R):
                         "max_over_best": float(v.max() / v.min()), "median_train": float(np.median(tr)),
                         "median_val_over_train": float(np.median(v / tr)),
                         "objective_picks_lowest_val": bool(np.allclose([r["objective_over_valmin"] for r in q], 1,
-                                                                        rtol=1e-6))}
+                                                                        rtol=1e-6)),
+                        "objective_missing": int(sum(np.isnan(r["objective_over_valmin"]) for r in q))}
             if "scr" in c and "ft" in c:
                 c["ft_best_over_scr_best"] = c["ft"]["best_val"] / c["scr"]["best_val"]
                 c["ft_train_over_scr_train"] = c["ft"]["median_train"] / c["scr"]["median_train"]
             cells.append(c)
-            if D in DS:
+            if D in DS and "ft_best_over_scr_best" in c:
                 s, f = c.get("scr"), c.get("ft")
                 print(f"{tg:13s} D={D:>6d}  ft/scr best val {c['ft_best_over_scr_best']:6.1f}  median train ft/scr "
                       f"{c['ft_train_over_scr_train']:5.2f}  median/best scr {s['median_over_best']:5.1f} ft "

@@ -34,7 +34,7 @@ def load(cached):
     return sus_load(cached, dirs, "nullparent_runs_read.json")
 
 
-def branch(G, n):
+def branch(G):
     """The design's partition A-E from the three geomeans and their cells-above-1 counts (n of m)."""
     (Gn, nn, m_n), (Gp, np_, m_p), (Gs, _, _) = G["null/scr"], G["pre/null"], G["pre/scr"]
     if Gn <= 1 / 3 and m_n - nn >= m_n - 1:
@@ -59,7 +59,7 @@ def main():
                 rr = [R[(a, tg, k)][key] / R[(b, tg, k)][key] for k in K
                       if R[(a, tg, k)].get(key) and R[(b, tg, k)].get(key)]
                 G[name] = (gmean(rr), sum(x > 1 for x in rr), len(rr))
-            reads[read] = {"G": G, "branch": branch(G, None)}
+            reads[read] = {"G": G, "branch": branch(G)}
         b = reads["val"]["branch"]
         res["targets"][tg] = dict(reads, verdict=b if reads["val_x"]["branch"] == b else "E NOT RESOLVED")
         for k in K:
