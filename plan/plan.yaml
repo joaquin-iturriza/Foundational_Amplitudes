@@ -26199,6 +26199,7 @@ entries:
   step_waits:
     '5': '2026-11-13'
     '9': detached batch thrscan_d405 (threshold scan of the three D405 fine-tunes)
+    '10': 'next owner: design not yet recorded (hand-off 2026-11-12 ~14:05)'
   handoff:
     state: '2026-11-12 ~11:55. Step 13 (inputs-only transformer, design PASS by design-reviewer a92960393f8855689): tt virtual
       arm FA-ccin2p3-4a1cb4a2 read = YES (Sudakov family -1.72 decades vs softpairthr 3fc1016a, deepest log-MSE 0.72 -> 0.026
