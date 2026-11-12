@@ -27044,13 +27044,6 @@ entries:
       size, control runs, eval-only); (b) reproduce every plot Bakar sent, ours vs his MLP; (c) one-loop processes covering
       Coulomb (massive pair near threshold, non-tt) and Sudakov added to the pretraining, one design; (d) a general divergence-form
       input (eikonal logs, splitting variables, 1/beta per massive pair), one short test on uug and tt virtual'
-    13: 'Log-invariant polynomial term, linear only (finding 2026-11-12 ~19:00 PARTIAL for degree 2: mu += sum_{i<j} [c1_ij
-      L_ij + c2_ij L_ij^2] + sum_i [b1_i M_i + b2_i M_i^2], L_ij = log(2 p_i.p_j/s)/5, M_i = log(m_i^2/s)/5, coefficients
-      learned from the particle types; it fixed tt Coulomb (log-MSE 3.55 -> 1.72, exponent -0.55) but overshoots uug soft
-      (+5.00, exponent -3.20 vs -2) and flips tt Sudakov to +0.77, the L^2 term continuing past the truth). Running: the degree-1
-      term (c2 = b2 = 0, model.input_log_skip_linear @7b4f8bd9) on uug plain target FA-ccin2p3-c4fc1d6f vs 203a274f and tt
-      softpairthr FA-ccin2p3-6bc05a40 vs 3fc1016a, after smoke acddacca; read with kit_extrap_read (figure set logpolylin_),
-      kit_figures collect + kit_readout --vs'
     14: 'Joaquin 2026-11-12 (~19:30, via coordinator): ''I know that log invariants go as inputs, this is not necessarily
       the same as passing the functional form of the divergence as an input''. Design one arm of divergence-form input features,
       general for any process and built from the universal limits, fed per particle or per pair into the transformer (full
@@ -28088,14 +28081,6 @@ entries:
       if:
       - 'a route helps: adopt it in the KIT models'
       - 'none helps: report the comparison against all of Bakar''s plots as the KIT answer'
-    13:
-      feeds: whether a learned polynomial in the logs of the pair invariants and mass ratios, added to the network's output,
-        is the KIT fix for extrapolating into the limits with full LLoCa (D419)
-      if:
-      - 'the linear term keeps the Coulomb gain and removes the overshoots: it goes into the KIT models, combined with frames_gamma_max
-        if 12(ii) says YES'
-      - 'it loses Coulomb or keeps the overshoots: the output term is not the lever; the degree-2 term stays a tt-Coulomb-only
-        option'
     14:
       feeds: whether feeding the divergences' functional form as inputs through the whole network (not added at the output)
         fixes the KIT limits with full LLoCa (D419)
@@ -28118,7 +28103,6 @@ entries:
   step_waits:
     '11': FA-ccin2p3-dcf42ad6 FA-ccin2p3-e7dca162
     '5': FA-ccin2p3-dcf42ad6 FA-ccin2p3-e7dca162 (the A_ft batch of step 11c)
-    '13': FA-ccin2p3-c4fc1d6f FA-ccin2p3-6bc05a40
     '15': detach:kit_hpo (sweeps kit_hpo_uug_plain, kit_hpo_ttvirt_thr)
     '14': FA-ccin2p3-8c1223c0 FA-ccin2p3-f45f434a
     '16': detach:kit_hpo (sweeps kit_hpo_uug_T, kit_hpo_uugg_T)
