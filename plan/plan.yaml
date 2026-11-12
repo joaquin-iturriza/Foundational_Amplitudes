@@ -16176,7 +16176,23 @@ entries:
       smixq: none decides their deletion; his messages 2026-10-04T10:57 (arms testing less than their names), 2026-11-10T02:08
       (uploaded slides), 2026-10-29T02:58 (reviewer counts) read: none is about these pools'
     blocks: step 26 (retire the smixq pools)
+    blocks_steps:
+    - 26
+  - ask: 'Your hold: (1) catalog_coverage is held, and its recipe recipes/catalog_v4_g12_regen.yaml is the only reader of
+      1301 catalog_v4 training pools with the smixq sampling on CC (30.89 GB, generated for its step 65, flat-quota sampling);
+      no running job reads them and the regular smix pools of the same processes stay. Delete them (catalog_coverage regenerates
+      them if it resumes) to bring CC from 56 GB free to ~87 GB, above the 60 GB alarm, or keep them? (2) Scope, asked 2026-11-10:
+      CLAUDE.md change after the missing legends: replace ''the main session sends it without opening it'' with ''the main
+      session opens it once, at low resolution, before sending, and checks that every curve is named by a legend in that file
+      and that the caption matches the axes''?'
+    at: '2026-11-12T03:24:56+00:00'
+    searched: 'site decisions --project FA (D19 pruning, D404 archive, D367, D368), plan catalog_coverage (held), docs/results.tex
+      for smixq: none decides the deletion; his messages 2026-10-04T10:57, 2026-11-10T02:08, 2026-10-29T02:58 read, none about
+      these pools; for (2) CLAUDE.md line 28 and his messages 2026-11-10T02:08, 08:42, 09:07, 2026-10-27T02:14 and 2026-10-05T02:23
+      (figures: less text, no stray ratios) read, none changes the rule'
+    blocks: step 26 (retire the smixq pools), step 22 (the CLAUDE.md edit)
     blocks_steps: &id001
+    - 22
     - 26
   step_why:
     11:
@@ -17323,15 +17339,19 @@ entries:
     files: tools/lhe_parts.py tools/check_site_data.py scripts/job_catalog_v4_regen.sh recipes/catalog_v4_pp4_restore.yaml
       analysis/agent_redesign/cache_census.py tests/test_lhe_parts.py .claude/hooks/notification_absorb.py
     written: '2026-11-12T02:23:30+00:00'
-  ask: 'Your hold: catalog_coverage is held, and its recipe recipes/catalog_v4_g12_regen.yaml is the only reader of 1301 catalog_v4
-    training pools with the smixq sampling on CC (30.89 GB, generated for its step 65, flat-quota sampling); no running job
-    reads them and the regular smix pools of the same processes stay. Delete them (catalog_coverage regenerates them if it
-    resumes) to bring CC from 56 GB free to ~87 GB, above the 60 GB alarm, or keep them?'
-  waiting_since: '2026-11-12T03:24:07+00:00'
-  searched: 'site decisions --project FA (D19 pruning, D404 archive), plan catalog_coverage (held), docs/results.tex for smixq:
-    none decides their deletion; his messages 2026-10-04T10:57 (arms testing less than their names), 2026-11-10T02:08 (uploaded
-    slides), 2026-10-29T02:58 (reviewer counts) read: none is about these pools'
-  blocks: step 26 (retire the smixq pools)
+  ask: 'Your hold: (1) catalog_coverage is held, and its recipe recipes/catalog_v4_g12_regen.yaml is the only reader of 1301
+    catalog_v4 training pools with the smixq sampling on CC (30.89 GB, generated for its step 65, flat-quota sampling); no
+    running job reads them and the regular smix pools of the same processes stay. Delete them (catalog_coverage regenerates
+    them if it resumes) to bring CC from 56 GB free to ~87 GB, above the 60 GB alarm, or keep them? (2) Scope, asked 2026-11-10:
+    CLAUDE.md change after the missing legends: replace ''the main session sends it without opening it'' with ''the main session
+    opens it once, at low resolution, before sending, and checks that every curve is named by a legend in that file and that
+    the caption matches the axes''?'
+  waiting_since: '2026-11-12T03:24:56+00:00'
+  searched: 'site decisions --project FA (D19 pruning, D404 archive, D367, D368), plan catalog_coverage (held), docs/results.tex
+    for smixq: none decides the deletion; his messages 2026-10-04T10:57, 2026-11-10T02:08, 2026-10-29T02:58 read, none about
+    these pools; for (2) CLAUDE.md line 28 and his messages 2026-11-10T02:08, 08:42, 09:07, 2026-10-27T02:14 and 2026-10-05T02:23
+    (figures: less text, no stray ratios) read, none changes the rule'
+  blocks: step 26 (retire the smixq pools), step 22 (the CLAUDE.md edit)
   blocks_steps: *id001
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
