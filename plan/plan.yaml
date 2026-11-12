@@ -24865,6 +24865,19 @@ entries:
       read. Provisional: inputs mom/raw worse than mlp by 2.2-3.2 decades in every uug/uugg limit; cur (softpair inputs) within
       0.1-0.4 of mlp on uugg collinear; target T worse on uugg (+0.8..+1.3); ours-MLP 0.6-0.8 decades worse than mlp but ~1
       decade better than our transformer; tt Coulomb: cur +0.93 (no logthr feature).'
+  - at: '2026-11-12T03:19:09+00:00'
+    text: '2026-11-12 ~05:20 D403 port gate re-read with his numpy baseline at seeds 0-2 (FA-ccin2p3-f26d0458, tools/kit_baseline_seeded.py;
+      kit_mlp_readout @HEAD on kit_mlp_ladder.json): uug deepest-bin log-MSE, his numpy seeds soft 0.314/0.028/0.152, coll
+      0.119/0.027/0.030, bulk 2.1e-5/2.0e-5/3.0e-5; our port''s mlp seeds soft [0.021, 0.234] median 0.062, coll [0.033, 0.167]
+      median 0.058, bulk median 3.5e-5. His own seeds span 1.05 decades on soft, so the gate''s 0.3-decade median cut is below
+      the reference''s own seed noise: the medians differ by -0.39 (soft), +0.29 (coll), +0.21 (bulk), and the ranges overlap
+      in every family, i.e. by the design''s own difference rule (disjoint ranges and > 0.3) the port does not differ from
+      his code. Read as a pass with that stated; the gate as written (|d| <= 0.3) fails on soft by 0.09 decades. Ladder verdicts
+      per the rule (provisional finding 05:00): inputs are the lever (mom and raw worse by 2.2-3.2 decades in every uug/uugg
+      limit and on tt), target T worse on uugg (+0.76..+1.30), the rest within noise; ours-MLP does not reproduce our transformer''s
+      failure (1 decade better on uug coll and every uugg collinear family): by the design''s outcome, the MLP form and inputs
+      are not what our current transformer loses on; next per the design: the transformer fed his inputs only (log10 s_ij/s0,
+      logthr on tt).'
   step_why:
     5:
       feeds: what KIT receives
