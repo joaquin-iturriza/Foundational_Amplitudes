@@ -27626,8 +27626,7 @@ entries:
         space if none, D241) and use it for every new KIT arm'
       - 'controls pass: keep lr 0.0118605'
   step_waits:
-    '11': FA-ccin2p3-dcf42ad6 FA-ccin2p3-e7dca162 (11c A_ft fine-tunes, after parents 2d653209 r5loop_rerun and ca5873f3 r5loopbeta);
-      then threshold scan
+    '11': FA-ccin2p3-dcf42ad6 FA-ccin2p3-e7dca162
     '12': FA-ccin2p3-95be8db2 FA-ccin2p3-88b9334a
     '5': 'FA-ccin2p3-dcf42ad6 FA-ccin2p3-e7dca162 (11c fine-tunes: the package takes the best A_ft/B once they are read)'
     '13': FA-ccin2p3-c4fc1d6f FA-ccin2p3-6bc05a40
