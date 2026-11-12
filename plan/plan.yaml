@@ -16206,12 +16206,10 @@ entries:
       FA-ccin2p3-2b6e7ab1 FA-ccin2p3-66afc398 FA-ccin2p3-47f06add FA-ccin2p3-4eca009b FA-ccin2p3-c300ac77 FA-ccin2p3-45f202e8
       FA-ccin2p3-d7ae9889 FA-ccin2p3-afa3c959 FA-ccin2p3-3a3b0003 FA-ccin2p3-4484c44d '
   owner:
-    agent: a3d362cbafc652839
-    state: closed
-    since: '2026-11-12T01:17:22+00:00'
-    state_at: '2026-11-12T02:19:02.832000+00:00'
-    context: 291151
-    context_at: '2026-11-12T02:21:10+00:00'
+    agent: aefaf94baeb410c64
+    state: working
+    since: '2026-11-12T02:25:26+00:00'
+    state_at: '2026-11-12T02:25:26+00:00'
   designs:
   - at: '2026-10-30T19:52:22+00:00'
     question: 'Can lxplus''s HTCondor GPU nodes run FA jobs: does the env activate, the GPU show, the xformers attention kernel
