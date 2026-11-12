@@ -25426,6 +25426,10 @@ entries:
       v4_{gg,ddx,bbx}_ttx__thr (gen_datasaving_parent.py heldoutthr variant), generate (CPU); r5thr parent (job_datasaving_parent.sh
       heldoutthr; smoke iters=50, D395); job_kit.sh A_ft tt virt_finite 1e5 8000 from r5 and r5thr with fine_tune.offshell_stats=own;
       kit_readout --vs vs f21fa163 and the threshold scan'
+    10: 'D411 follow-up (own design): KIT models without the attention frames (model.input_route_off=frames): A on uugg (not
+      yet run with the cut) and A_ft/B on the four KIT targets, against their softpair(thr) controls; and why the frame cut
+      loses the uug soft limit (deepest soft -0.28 -> -0.93) while off-shellness off gains it (-> -0.04): an arm with both
+      cuts (frames + off-shellness) on uug and tt virtual is the smallest next test'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -26173,6 +26177,11 @@ entries:
       - 'ft_thr Coulomb median < -0.3 vs scratch and vs ft_r5: threshold sampling goes into the catalog parent''s top-pair
         pools'
       - 'both NO: design one-loop top pairs at physical mass near threshold (gg/qq~ > tt~ virtual)'
+    10:
+      feeds: which input set the KIT A/A_ft models (and the package for KIT) use
+      if:
+      - 'frames+offshell cut keeps collinear/Sudakov fixed and the soft limit: KIT models take that input set'
+      - 'the soft loss stays: KIT models take the frame cut and report the soft trade'
   step_waits:
     '5': '2026-11-13'
     '9': FA-ccin2p3-62dcf910 FA-ccin2p3-bf3d593c FA-ccin2p3-8d1429bf
