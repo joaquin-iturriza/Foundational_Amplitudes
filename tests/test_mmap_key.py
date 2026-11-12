@@ -36,8 +36,9 @@ import keyed_aug  # noqa: E402
 import data_mmap as dm  # noqa: E402
 
 # format_fingerprint() of MMAP_VERSION 3; a change to the cache-writing code must bump MMAP_VERSION and record its
-# new fingerprint here
-FINGERPRINT = {3: "9490734cb325c629a2376cefd8351bd1461a3632e912a02a4f0fab6d50df99e1"}
+# new fingerprint here. Re-recorded without a bump for 884d7eb7 (_boost_com's dtype from _mom_np_dtype: float32 on the
+# memmap path, which asserts it, so what the cache holds is unchanged)
+FINGERPRINT = {3: "75060079fd275d564db4906c64eb04ee737638a7e70e602b0a93d25bc3c88f4a"}
 ETA = np.diag([1.0, -1.0, -1.0, -1.0])
 
 
@@ -199,6 +200,9 @@ def test_key_batches_openers_canary_prune():
         os.utime(os.path.join(dA, "last_used"), (time.time() - 5 * 86400,) * 2)
         os.utime(os.path.join(dB, "last_used"), (time.time() - 3 * 86400,) * 2)
         free = shutil.disk_usage(root).free
+        sys.path.insert(0, os.path.join(ROOT, "tools"))
+        import cache_guard
+        cache_guard.site_users = lambda key: []      # no slurm here: prune fails closed on an unreadable squeue
         assert dm.prune(root, free + 1, keep=d, min_idle_s=4 * 86400) == [dA]
         assert os.path.exists(dB) and os.path.exists(d)
         # never the depth a features build sits in (keep = its feat_ dir), however idle

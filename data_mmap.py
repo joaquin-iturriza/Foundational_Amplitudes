@@ -374,6 +374,17 @@ def _hash(doc):
     return hashlib.sha256(json.dumps(doc, sort_keys=True).encode()).hexdigest()[:24]
 
 
+def _alphas_identity(pool):
+    """The identity of a pool's per-event alpha_s file, None when it has none. A pool composed at load gets its alpha_s
+    from its rows (mix_compose.alphas_of_rows), whose bytes differ by an ulp between nodes (numpy's SIMD log: CC's htc
+    and GPU nodes, 2026-11-12, so a CPU prebuild never matched its GPU run): it is keyed by the rows it is made from."""
+    a = _alphas_path(pool)
+    if not os.path.exists(a):
+        return None
+    pid = pool_identity(pool)
+    return ["alphas_of_rows", pid] if str(pid[2]).startswith("rows:") else pool_identity(a)
+
+
 def base_key_doc(cfg, names, roles, paths):
     """What the base arrays are made of: the pools' content, their layout and the format. Nothing a run chooses."""
     porder = str(cfg.data.get("particle_order", "none"))
@@ -382,8 +393,7 @@ def base_key_doc(cfg, names, roles, paths):
         "roles": list(roles),
         "names": list(names),
         "pools": {r: [pool_identity(paths[r][n]) for n in names] for r in roles},
-        "alphas": {r: [pool_identity(a) if os.path.exists(a) else None
-                       for a in (_alphas_path(paths[r][n]) for n in names)] for r in roles},
+        "alphas": {r: [_alphas_identity(paths[r][n]) for n in names] for r in roles},
         "particle_order": porder,
         # particle_order=shuffle draws the slot order from data.seed (a data choice, not the run's seed)
     }
