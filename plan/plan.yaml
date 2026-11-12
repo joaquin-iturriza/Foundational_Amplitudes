@@ -24138,10 +24138,10 @@ entries:
       for the 21 GB memmap cache of catalog_v4_default25 (16 GB free; our stale 21 GB key f3bedd61 to delete, deletion refused
       by the permission classifier): then CPU prebuild (job_catalog_v3_short_prebuild.sh v4_het_default25 LONG_HEADS=8 LONG_FACTOR=1
       LONG_MEMMAP=true) and the arms afterok on it; arms PIDQN=pid|qn as designed'
-    '3': '2026-11-12T02:40 the site gate''s 60-min window clears of the pidqn resubmissions (01:31 UTC, 2 x 3:45 limits; with
-      this run''s 25:30 limit 33 > 30, estimated use 26.5 GPU-h, under budget): then submit the AdamW x16 twin as designed
-      (optrec_adamw_x16, LONG_OPT=adamw LONG_HEADS=8 LONG_FACTOR=16 LONG_HP=1262 LONG_MEMMAP=true, --time 25:30:00, gpu_v100,
-      --est-gpu-hours 20.3, --hdr=--dependency=afterok:63536102 if the memmap prebuild FA-ccin2p3-53eb792f has not ended)'
+    '3': 'the training-pool regeneration zz_redesign_regen_pp4 (slurm 63537119, agent_redesign) to end and room on /sps/lpnhe
+      for the 21 GB memmap cache of catalog_v4_default25 (16 GB free; our stale 21 GB key f3bedd61 to delete, deletion refused
+      by the permission classifier): then CPU prebuild (job_catalog_v3_short_prebuild.sh v4_het_default25 LONG_HEADS=8 LONG_FACTOR=1
+      LONG_MEMMAP=true) and the arms afterok on it; then the AdamW x16 twin as designed (alone in the gate''s 60-min window)'
   handoff:
     state: 'pidqn design PASSED (design-reviewer, second look). Code on branch pid_vs_qn (worktree worktrees/pid_vs_qn: 5541a2ec
       + fix 9ecbae9f). The repo-reviewer (agent a908d9ab432d34127, holds the lock) BLOCKED on a wrong _dimless_mass_stats
