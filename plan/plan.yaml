@@ -24771,12 +24771,10 @@ entries:
     answered_at: '2026-11-12T00:17:18.510000+00:00'
     decision: D401
   owner:
-    agent: aa8a9eef01c5d5c94
-    state: closed
-    since: '2026-11-12T04:11:40+00:00'
-    state_at: '2026-11-12T04:11:40+00:00'
-    context: 285273
-    context_at: '2026-11-12T04:52:36+00:00'
+    agent: a5d7215c7f7553fba
+    state: working
+    since: '2026-11-12T08:48:04+00:00'
+    state_at: '2026-11-12T08:48:04+00:00'
   findings:
   - at: '2026-11-10T03:33:04+00:00'
     text: 'Data: KIT package (888 MB tar, 2.7 GB with the tar) on CC at $DATA_DIR/kit_hardps/hardps_benchmark (fetched by
