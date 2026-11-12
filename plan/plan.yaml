@@ -25537,6 +25537,7 @@ entries:
   step_waits:
     '5': '2026-11-13'
     '9': FA-ccin2p3-62dcf910 FA-ccin2p3-bf3d593c FA-ccin2p3-8d1429bf
+    '12': FA-ccin2p3-d322922b
   handoff:
     state: '2026-11-12 ~05:50. D411: plain no-LayerNorm arm diverged (uug bba9a61e aborted step 1485, val 6e11 from step 160;
       tt virt 36a30e0c val up to 3e22 from step 960; finding recorded). ReZero arm (model.net.layer_norm=rezero, 9e63d86f;
