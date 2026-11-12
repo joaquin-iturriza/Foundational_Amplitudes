@@ -31,6 +31,8 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+# an lhe_pp entry's MadEvent directory on node-local disk (D180/D183), not the 16 at once on $SCRATCH (/sps at 50 GB free, 2026-11-12)
+export AMP_LHE_WORK_DIR="${AMP_LHE_WORK_DIR:-${TMPDIR:+$TMPDIR/lhe_work}}"
 cd "$PROJECT_DIR"
 K="${V4REGEN_K:?V4REGEN_K (shard index) not set}"
 N="${V4REGEN_N:?V4REGEN_N (number of shards) not set}"
