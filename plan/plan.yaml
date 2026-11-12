@@ -17366,6 +17366,13 @@ entries:
       (41/37/34 at 20/30/60 min, 103 unbatched), 32 actual waiter wakes. The URGENT_KINDS rule cut nothing on this traffic
       and costs nothing; it stays. Window stays 600 s (D324, D416). Tokens before/after are tracked by step 21 (on or after
       2026-11-17).'
+  - at: '2026-11-12T18:52:51+00:00'
+    text: '2026-11-12 step 25 done: restore of the CC pools deleted 2026-11-11 complete. Last pool pp13v4_udx_uuxwpz/train
+      built by FA-ccin2p3-046cc7d3 (one-core MadEvent 34991 s = 9.7 h against the 12 h target, 558880 events, recipe_id e23cfeecf6a89988,
+      queue 210/210 done, 12/12 assembled, 0 failed). check_site_data --list recipes/catalog_v4_pp_test.yaml on CC: 1301 processes,
+      pools prebuilt, sidecars present. Held-out H1..H7c and dsh_eea were already complete (hand-off 2026-11-12T14:05). lhe_parts
+      gc --queue zz_redesign_pp4_parts --parts: 0 files left (the worker deleted its part, 0.11 GB), 6 held by other queues
+      kept.'
   handoff:
     state: '2026-11-12 ~15:10 local. Restore of CC pools deleted 2026-11-11: held-out H1..H7c all prebuilt (check_site_data
       0 missing); dsh_eea 115/115 train rebuilt, val/test sha256 230/230 unchanged, its parts gc''d (5.45 GB); PP4: 1 pool
