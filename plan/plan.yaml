@@ -21504,7 +21504,7 @@ entries:
     decision: D407
   owner:
     agent: aa6ece09678b3a02b
-    state: working
+    state: closed
     since: '2026-11-12T10:12:28+00:00'
     state_at: '2026-11-12T12:37:45.186000+00:00'
     context: 300945
@@ -24931,32 +24931,32 @@ entries:
     start: '2026-11-12T12:46:21+00:00'
     at: '2026-11-12T12:46:21+00:00'
   handoff:
-    state: 'Step 3 (why the fine-tune HPO fails; Joaquin 2026-11-12 ~10:30) diagnosed: ft_hpo_diag.py @7baf7573 (objective
-      pick correct; t t~ fine-tune searches flat, bests 2.4-19x tree / 8-33x V/B above scratch; tree memorises, V/B under-fits
-      train). Null-parent 2x2 read, all 16 runs (nullparent_readout.py, data @10a63eea): parent weights at scratch''s HPs
-      (layer_decay 1, scratch lr) = scratch on tree (1.08, 2.36, 0.86, 3.28x; 0.05-0.19x the old fine-tune best at D<=3162),
-      so the tree deficit was the fine-tune template; V/B stays 9-122x scratch. Template fix gen_data_saving --ft-space scratch
-      (layer_decay 1, lr_scale [1/3,3]) @fe43003f; test design PASSED (second version, after one FIX): 5 searches x 8 trials,
-      configs sweep/sweep_config_dsave_s4_ft_{epem_ttx_d5,d7,ee_ttbar_nlo_d5,d6,d7}_t8500.yaml @10a63eea, target 1.3 h / 40
-      jobs, ~11 GPU-h. First driver''s trials all failed (CC not synced: the driver''s start-up sync is refused by any local
-      untracked file, e.g. .claude/.compact_checked); CC synced by hand to fa7cb1b2, driver restarted with --retry-lost --retry-failed
-      ''.*'' (detach s4_ft_template3). Next on its DONE: run analysis/data_saving/s4_readout.py, apply the design''s partition
-      per target (FIXED / IMPROVED NOT RESOLVED / NO CHANGE / WORSE), figure s4_curves_<target>; on tree FIXED: make --ft-space
-      scratch the default, send Joaquin the diff of HPO rule 4 (fa-sweeps-and-hpo) and the canonical-setup fine-tune row,
-      cost the L(D) fine-tune redo; on V/B NO CHANGE: design a path bisect on V/B (parent momentum/off-shellness stats to
-      own).'
-    decisions: 'Step 2 dropped: null-parent read done (finding 2026-11-12). Test cells: tree D=316, 3162; V/B D=316, 1e3,
-      3162 (reviewer FIX added V/B D=316 and an IMPROVED branch). D411/D412: under 30 GPU-h, no questions. Old repo-reviewer
-      backlog passed (watermark 9345563c), its nits fixed.'
-    ruled_out: 'As before, plus: the HPO objective pick (always the lowest-val trial); more trials or a different lr window
-      inside the old LLRD template (searches flat across lr_scale 0.12-7.4, layer_decay 0.76-1); the fresh-init arm''s B PATH
-      verdict is not trusted as is (shrink_perturb fresh init is not scratch''s muP init).'
-    running: drive.py detach s4_ft_template3 (pid 3312356) over the 5 dsave_s4_ft_* searches on CC; earlier drivers s4_ft_template/s4_ft_template2
-      killed (their DONE events are routine).
-    files: analysis/data_saving/{ft_hpo_diag.py,nullparent_readout.py,s4_readout.py,submit_nullparent.py,suspects_readout.py},
-      data/{ft_hpo_diag.json,nullparent_readout.json,nullparent_runs_read.json}, figs/{ft_hpo_diag_*,nullparent_LD,nullparent_curves_*},
-      sweep/gen_data_saving.py, sweep/sweep_config_dsave_s4_ft_*_t8500.yaml
-    written: '2026-11-12T10:11:07+00:00'
+    state: 'Step 2 (Joaquin 2026-11-12: ''the tree runs are not fixed at all''): the s4 ''FIXED'' verdict is withdrawn (it
+      was an arm ratio against two badly trained references). New measure analysis/data_saving/curve_quality.py @0d593de5
+      (data/curve_quality.json): a trial is well trained when steady >= 2/3, spike <= 3, jitter <= ln2, and gap <= 10 (gap
+      read only while val is within 1.5x of its final min). 0 of 151 t t~ LO trials are well; spike and jitter grow with peak
+      lr. The one-change lr x1/10 runs are clean but reach worse minima (D=3162: 2.1e-7 vs 6.9e-9). Lower-lr test design PASSED
+      (second version): t t~ LO D=3162, scratch and fine-tune at c/3 and c/10, 4 searches x 8 trials, 8.8 GPU-h, target 1.2
+      h / 32 jobs. Configs sweep/sweep_config_dsave_lrthird_{scr,ft}_epem_ttx_d7_t8500.yaml @0d593de5 and sweep/sweep_config_dsave_lrtenth_{scr,ft}_epem_ttx_d7_t8500.yaml
+      @979ad4e4. NOT SUBMITTED: CC sync blocked by two untracked kit_benchmark files (analysis/kit_benchmark/data/kit_sat_{ttvirt,uug}_scalars.json,
+      differing from dddeacff); the KIT owner is clearing them; CC at ff934d7c. Next owner: once ''site sync ccin2p3 FA''
+      succeeds, start the driver: python3 tools/detach.py --entry pretrain_data_saving --name lr_centre_test -- python3 -u
+      sweep/drive.py with --config for each of the 4 configs, --item pretrain_data_saving --sites ccin2p3. Read with curve_quality.py
+      extended to the new searches, in the design''s order WELL / CLEAN BUT WORSE / BETTER NOT WELL / NO CHANGE, with the
+      level bar (best min <= 2x control best). Reviewer caveats: the 2x level bar is inside the ~5x search spread; at D=316
+      the x1/10 run beat its control.'
+    decisions: 's5 t t~ LO L(D) redo and s6 one-loop offshell-own test dropped (held by the main session after Joaquin''s
+      correction; never submitted, 0 runs). gen_data_saving: tree fine-tune space default scratch''s (470d147e; from the withdrawn
+      verdict, revisit), one-loop offshell_stats default own as results.tex adopts (fa846b4d), new --lr-factor. Repo-reviewer
+      backlog passed (watermark db51a01c). D412: tests under 30 GPU-h, no questions.'
+    ruled_out: 'As before. Plus: the arm-ratio verdicts (r_old, r_scr) as a measure of training quality; the HPO rule 4 diff
+      from the withdrawn verdict (superseded); the earlier tp lr x1/3 and x1/10 one-change runs as proof of the lr cause (clean
+      but worse at fixed other HPs).'
+    running: none (no driver alive; s4_ft_template4 ended rc=0; s5 driver stopped at sync with 0 trials)
+    files: analysis/data_saving/{curve_quality.py,s4_readout.py}, data/{curve_quality.json,s4_readout.json,s4_readout_rows.json,suspects_runs_read.json},
+      figs/{curve_quality_lr_*,s4_curves_*}, sweep/gen_data_saving.py, sweep/sweep_config_dsave_lr{third,tenth}_{scr,ft}_epem_ttx_d7_t8500.yaml,
+      sweep/sweep_config_dsave_s5_ft_epem_ttx_*.yaml, sweep/sweep_config_dsave_s6_ft_ee_ttbar_nlo_d{5,6,7}_t8500.yaml
+    written: '2026-11-12T12:53:46+00:00'
   step_why:
     2:
       feeds: 'whether any L(D) arm (scratch or fine-tune) can be read at all: the data saving needs both arms well trained'
