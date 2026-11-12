@@ -21531,6 +21531,15 @@ entries:
     - 10
     answered_at: '2026-11-12T03:19:43.198000+00:00'
     decision: D407
+  - ask: 'Scope: the b b~ > Z Z grid stops at D=1e4 at both orders under D412; adding D=31623 at one loop (~15 GPU-h) and
+      D=31623, 1e5 at tree level (~14 GPU-h), as the sibling tree targets have, costs ~29 GPU-h more. Add them?'
+    at: '2026-11-12T15:42:33+00:00'
+    searched: 'site decisions --project FA (D412 30 GPU-h, D413/D417 second example; none sets this grid); his messages 2026-09-30T02:14
+      (catalog design ideas), 2026-11-10T02:08 (the data-saving request, sets trees and one loops, not the D grid), 2026-09-30T01:01
+      (narrative planning): none sets the D range of this example'
+    blocks: the larger-D cells
+    blocks_steps: &id002
+    - 6
   owner:
     agent: afc3a7a4d8d0de53b
     state: working
@@ -25619,6 +25628,14 @@ entries:
       if:
       - 'yes: generate and send the extra searches'
       - 'no: the figure stops at 1e4, said in its caption'
+  ask: 'Scope: the b b~ > Z Z grid stops at D=1e4 at both orders under D412; adding D=31623 at one loop (~15 GPU-h) and D=31623,
+    1e5 at tree level (~14 GPU-h), as the sibling tree targets have, costs ~29 GPU-h more. Add them?'
+  waiting_since: '2026-11-12T15:42:33+00:00'
+  searched: 'site decisions --project FA (D412 30 GPU-h, D413/D417 second example; none sets this grid); his messages 2026-09-30T02:14
+    (catalog design ideas), 2026-11-10T02:08 (the data-saving request, sets trees and one loops, not the D grid), 2026-09-30T01:01
+    (narrative planning): none sets the D range of this example'
+  blocks: the larger-D cells
+  blocks_steps: *id002
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
@@ -30210,7 +30227,7 @@ entries:
       about cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID,
       says nothing about the draft's sections)
     blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-    blocks_steps: &id002 []
+    blocks_steps: &id003 []
   owner:
     agent: afb073b8fc9460ec5
     state: stopped
@@ -30228,7 +30245,7 @@ entries:
     cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID, says
     nothing about the draft's sections)
   blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-  blocks_steps: *id002
+  blocks_steps: *id003
   step_why:
     1:
       feeds: the draft's results (D354)
