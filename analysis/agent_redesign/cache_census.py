@@ -21,10 +21,11 @@ def main():
     pat = a[a.index("--recipes") + 1] if "--recipes" in a else "recipes/*.yaml"
     out = a[a.index("--out") + 1]
     wanted = set()
-    for r in sorted(glob.glob(os.path.join(ROOT, pat))):
+    for r in sorted(glob.glob(os.path.join(ROOT, pat))):   # one call per recipe: a recipe that does not parse is skipped
         p = subprocess.run([sys.executable, "tools/check_site_data.py", "--paths", os.path.relpath(r, ROOT)],
                            cwd=ROOT, capture_output=True, text=True)
         wanted |= {l.split()[1] for l in p.stdout.splitlines() if l.startswith("POOL ") and l.endswith(".npy")}
+        print(f"CENSUS_RECIPE {os.path.basename(r)} {len(wanted)}", flush=True)
     cache = os.path.join(S, "amp_data_cache")
     g = defaultdict(float)
     by_key = defaultdict(list)
