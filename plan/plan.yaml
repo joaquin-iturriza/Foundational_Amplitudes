@@ -24567,6 +24567,43 @@ entries:
       8-trial search per cell as every sibling (D315). Check 5 searched results.tex for bbx_zz, b b~ > Z Z, ZZ, f f~ > Z Z,
       and decisions for zz/bbx: only one-loop pole/coverage notes and the transfer-ladder rung. Fine-tune space differs from
       the u u~ example, stated.'
+  - at: '2026-11-12T17:44:59+00:00'
+    question: 'D414/D420 (Joaquin: ''you can''t guarantee that you can properly train these networks''): which one change
+      (schedule without the long decay, horizon T/2 or 2T, strong weight decay, strong L2) makes validation go down together
+      with training (curve_quality.py @155d1ab8: separation = (val/train at end)/(min val/train) <= 3, val at end <= 2x its
+      best) without raising the best validation loss, on t t~ LO, u u~ LO and b b~ > Z Z V/B at D=316 and 3162, scratch and
+      fine-tune? Early stopping is answered without runs (prior).'
+    prior: 'No earlier test of the val/train separation (results.tex: WSD only as a pretraining parent schedule, sec. ws_fixes,
+      WSD parent ~0.76x better; the entry''s lr c/3, c/10, mu-only, AdamW tests judged other bars). From the 723 existing
+      stage-2 trials (curve_quality.py, analysis @155d1ab8 data): good fraction by D: D<100 3/176, 100-1000 5/174, 1e3-1e4
+      13/163, >=1e4 84/171 (median separation 3.0); within a search, Muon weight decay over [0.001,0.3] and L2 over [1e-10,1e-6]
+      do not move separation (Spearman |rho| <= 0.1 in every D band), so only values above the searched ranges are tested.
+      Early stopping: stopping each search best where val/train first exceeds 3x its running min costs val 1.4x (D<100), 2.3x
+      (100-1000), 1.9x (1e3-1e4), 1.0x (>=1e4) against the best checkpoint: validation still improves while it separates,
+      so early stopping is not run. Reported loss stays at the best checkpoint.'
+    measure: 'Per run: best validation MSE (ln units, val mu-MSE x prepd_std^2, at the best checkpoint) and test MSE after
+      the sigma stage beside; separation and end_up by curve_quality.quality on the val and train-eval curves (readout analysis/data_saving/together_readout.py,
+      written before the read). Per arm and cell: ratio of best val to the control rerun''s, and good/bad.'
+    check: 'The measure moves on existing data: separation spans 1.04 to 3e5 over the 723 trials and is 1.0-3.0 for D>=1e4
+      search bests vs 10-1e5 below (curve_examples_good/bad figures); by eye on the 49 curves shown to Joaquin it calls bad
+      every visibly separating curve. The best-val read is the stage-2 readout''s own (stage2_readout.py).'
+    fixed: 'Each cell''s stage-2 search best HPs (stage2_readout.json best_hp, from sweeps_local driver_state), its own sweep
+      config (dsave_s2_{scr,ft}_<target>_d{5,7}_t<T>), data pools, seed 42, parents as in stage 2; path sweep/trial_job.sh
+      --detached (as the nullparent runs), submitter analysis/data_saving/submit_together.py. Arms: control (unchanged), wsd
+      (training.scheduler WSD, wsd_cooldown_frac 0.2), half (T/2), double (2T), wd (training.muon_weight_decay 1.0), l2 (training.regularization_lambda
+      1e-4). Cells: epem_ttx, ee_uu, bbx_zz_nlo x k=5,7 (D=316, 3162) x scr, ft = 12 cells x 6 arms = 72 runs.'
+    control: 'The control rerun of each cell (same HPs, config, seed) beside the original search best: their ratio is the
+      rerun spread a change must exceed.'
+    seeds: Seed 42, one run per arm and cell (D315). 72 runs, work 18.7 GPU-h (T x 0.12 s/step, the nullparent runs' submit-to-end
+      on CC); wall limits 39 GPU-h, sent as two submissions (scratch, then fine-tune 61 min later) under the site gate's 60-min
+      window.
+    outcome: 'Per arm, per cell: BETTER = best val <= control/2 and beyond the control-vs-original spread; WORSE = >= 2x;
+      else SAME; GOOD/BAD by the measure. FIX: an arm GOOD in >= 8 of 12 cells and not WORSE in any -> it becomes the candidate
+      setup, next a stage-2 re-run of the searches with it (cost to Joaquin). GAIN WITHOUT FIX: an arm BETTER in >= 8 of 12
+      but still BAD -> reported as a val gain, separation unresolved. NONE: no arm meets either -> the separation at D<=3162
+      is reported as a data limit of the fixed setup (validation keeps improving while it separates, early stop costs 1.4-2.3x),
+      and the next suspect named from the curves. Every arm reported per cell with both numbers whatever the branch; diverged
+      runs listed apart.'
   step_waits:
     '3': bbx_zz_lo_scr3, bbx_zz_lo_ft drivers (detach events)
     '4': bbx_zz_lo_ft driver (detach event)
