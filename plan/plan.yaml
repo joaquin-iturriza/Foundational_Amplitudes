@@ -23514,6 +23514,65 @@ entries:
       at lr0 x lr_scale with layer_decay 1 equals scratch''s optimizer; null vs pre differ only in weights (shrink_perturb
       [0,1] at seed+1 after the head map); suspects readout shows the measure moving (G 1.77-8.19 tree, scratch arms 50-68x)
       and V/B same-HP reruns 0.30-1.0; 7.6 GPU-h under the 30 of D412; smoke planned.'
+  - at: '2026-11-12T08:57:11+00:00'
+    question: 'D408/D409 (why fine-tuning loses to scratch on e+e- > t t~; fix it; quick tests), after the suspects batch
+      found no recipe knob that fixes it: is the deficit in the pretrained weights, in the fine-tune path itself, or in the
+      fine-tune search? A 2x2 at each cell, both arms through the fine-tune configs (parent''s input stats, tokenizer, target_stats
+      own, head map on tree) at the cell''s stage-2 scratch best HPs (fine_tune.lr_scale = scratch lr / that config''s own
+      fixed training.lr: tree 0.006665, 0.006833, 0.007817, 0.009297; V/B 0.006665, 0.006833, 0.007817, 0.004648 at D=316..1e4;
+      layer_decay 1 = one param group at training.lr x lr_scale, as scratch; scratch''s muon_weight_decay, reg, warmup, eta_min,
+      ema, ema_decay): (null) every parameter a fresh init (fine_tune.shrink_perturb=[0,1], after the head map, buffers as
+      loaded), (pre) the parent''s weights as loaded; against each other and the stage-2 scratch best. Feeds: whether the
+      next fix is in the fine-tune path (inputs/stats), the fine-tune search, or the parent.'
+    prior: 'Suspects batch (suspects_readout.py @8e8bb7d1, data e5a05de9, figs suspects_LD, suspects_curves_*): no knob FIXES
+      on either target (tree: lr x1/3 G 3.31 NOT RESOLVED, lr x1/10 3.95, WSD 5.06, AdamW 8.19 HURTS, mu-only MSE 1.77 NONE;
+      V/B: WSD 0.51 4/4 below 1 but above the 1/3 bar, the rest NONE or HURTS); the V/B fine-tunes of every arm stall at val
+      ~1e-6..1e-5 after step ~2000-3000 while scratch keeps falling to 1e-9..3e-8. Before it: head map NO CHANGE pooled (hmap_readout),
+      parent_shared gmean 4.0, offown, tops parent (r5) 4/8 below 1; the fine-tunes memorise (train MSE 3e-10..3e-9, val/train
+      18-884 on tree); old vs new: today''s scratch improved 10-100x, the fine-tune did not move. Searched results.tex (shrink
+      perturb, random/fresh init, null parent, reinit), the plan, D405-D412: only par:v4 warm_start step 14 (shrink_perturb
+      [0.4,0.1] on a same-catalog restart, worse); no fresh-init fine-tune on a held-out target. Joaquin declined the rerun
+      of the 34 fine-tune searches (2026-11-12 03:19, step-10 dead end).'
+    measure: 'As the suspects batch: per run the minimum of result.json''s val_mse_curve x prepd_std^2 (val mu-MSE in ln units
+      at the best-mu checkpoint); the worst-val-event-removed MSE and test MSE from sigma_stage/preds_*.npz beside. Per target,
+      over cells (4 tree, 3 V/B where the scratch D=1e3 run is pruned; pre/null on all 4): Gn = geometric mean of null / scratch,
+      Gp = of pre / null, Gs = of pre / scratch, with the count of cells above 1 for each. pre/null is the clean pair (only
+      the weights differ); the scratch best is chosen on this measure among 8 trials, so ratios over it lean upward. Figure:
+      per target val mu-MSE against D, null, pre, scratch best and the suspects'' fine-tune control; val curves per D.'
+    check: 'The measure moved with one change on existing data: suspects arms G 1.77-8.19 on tree and scratch arms 50-68x;
+      per cell 0.07x (lr x1/10 tree D=316) to 77x (AdamW tree D=3162); the stage-2 fine-tune / scratch on tree 3.0, 12.5,
+      18.9, 2.4; same-HP reruns 0.30-1.0 on V/B and 0.46-4.84 elsewhere (pooled 4-cell ln-sd ~0.4), so the factor-3 bars are
+      ~2.7 sd of the pooled noise.'
+    fixed: 'Cells D=316, 1e3, 3162, 1e4 (k=5..8), T=8500, seed 42 (shrink_perturb''s fresh init draws at seed+1), the stage-2
+      pools. Configs: tree sweep/sweep_config_dsave_diag_hmap_ft_epem_ttx_d{5..8}_t8500.yaml (parent r4, head map on), V/B
+      sweep/sweep_config_dsave_diag_parscale_ft_ee_ttbar_nlo_d{5..8}_t8500.yaml (parent treesin r4, no head map); HPs from
+      the stage-2 scratch best trials (tree hp 1605, 844, 640, 657; V/B 1663, 713, 358, 816), lr_scale and layer_decay as
+      in the question; arm null adds fine_tune.shrink_perturb=[0.0,1.0]. Submitter analysis/data_saving/submit_nullparent.py
+      @eaacb51f (divides by each config''s own training.lr), sweep/trial_job.sh --detached, hp-idx 9107 (null) and 9108 (pre),
+      data/nullparent_runs.json. Smoke first (D395, shrink_perturb new on this path): one tree and one V/B null run at D=316,
+      50 steps, every stage; log must show SHRINK_PERTURB lambda=0.0 gamma=1.0.'
+    control: The stage-2 scratch best trial of each cell (FA-ccin2p3-3bf34b08, 3434fdb2, 87fc7187, 41f9974d tree; c63cb88b,
+      f96f4051 (pruned on CC), 1f94de90, cbc511d4 V/B), same HPs, seed and pools; null and pre are each other's matched pair
+      (only the weights differ).
+    seeds: 'One seed (42) per cell, as the controls and the suspects batch; 2 arms x 4 cells x 2 targets = 16 runs + 2 smokes.
+      Rate from the suspects runs 12-24 min; limits 0:25 (D<=1e3) / 0:32 (D>=3162): 16 x ~0.47 h = 7.6 GPU-h at limits, under
+      D412''s 30.'
+    outcome: 'Per target, a complete partition, tested in this order; a branch holds only if it holds both on val and on val
+      without each run''s worst event, else that target is NOT RESOLVED. ''k of n'' means cells above 1 (below 1 for A) out
+      of the cells read. (A) SCRATCH SUSPECT: Gn <= 1/3, null below scratch in all but at most one cell: the path helps a
+      fresh init; next: report it, and read the scratch control''s same-HP rerun before anything else. (B) PATH: Gn >= 3,
+      null above scratch in all but at most one cell: the fine-tune path loses even without the parent''s weights; next: a
+      design (under 30 GPU-h) that bisects what the path changes on the null arm (the parent''s momentum, mass and off-shellness
+      stats to own, then the tokenizer). (C) WEIGHTS: not A or B, Gp >= 3, pre above null in all but at most one cell: the
+      parent''s weights hurt under the scratch''s optimization (negative transfer); next: a design on the parent (pretraining
+      set and length), going to Joaquin for his go if above 30 GPU-h. (D) SEARCH: not A, B or C, Gs < 3 and Gp < 3: at the
+      scratch''s HPs the pretrained fine-tune is within a factor 3 of scratch, so the deficit comes from the fine-tune search
+      (its 8 trials or layer_decay < 1; the scratch HPs sit inside the fine-tune window, lr_scale ~0.3-3 in [0.1,10], layer_decay
+      1 at its top); next: no rerun (Joaquin declined the search rerun on 2026-11-12); the finding goes to him with these
+      runs as evidence and the rerun of the 34 fine-tune searches (measured 87.8 GPU-h) as a proposal with its cost. (E) NOT
+      RESOLVED: everything else (e.g. Gn 1/3-3 with Gp 1-3 and Gs >= 3, or a branch holding on one read only); next: a second
+      seed (43) of both arms at the same cells (7.6 GPU-h), read pooled over the two seeds by the same partition; if still
+      NOT RESOLVED, reported per cell with its numbers and no further run on this question.'
   step_waits:
     '3': a design-reviewer
   findings:
