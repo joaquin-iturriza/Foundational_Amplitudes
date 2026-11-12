@@ -25383,6 +25383,15 @@ entries:
       -> wide WORSE, ranges kept, whatever the curves. The side of lr_scale the bests take (above or below 1) reported. (C)
       as at 18:05: WSD bests good >= 3 of 4 and pooled WSD/s2 <= 2.24 HELPS; <= 2 good NO (kept under D423); pooled > 2.24
       WORSE, to Joaquin. Diverged trials listed apart (D398); nothing further run on NO or not resolved.'
+    passed_at: '2026-11-12T19:08:24+00:00'
+    reviewer: 'Re-check of the 16-trial version (D429 ''It can also just extend those searches...'', D428 16 as KIT): only
+      the trial count (20->16), waves 3,3,2,4,4 (start-up then two batches of 4, 3-of-16 start-up stated against D245) and
+      cost (17.6 new + 3.3-8.8 withdrawn = 20.9-26.4 GPU-h, under 30 and D429''s ~35) changed; D429''s ''8 searches'' are
+      4 WSD extended + the 4 batch-searching ones withdrawn under D426 and replaced by 2 wide fine-tune searches, stated.
+      Readout @0bd23fdc reads first 8 by issue order (tested: trial_1126->0, trial_0124->1), A/B/C at 5x per cell and pooled
+      5^(1/sqrt n). Check 2: best@8/best@N median 1.26, 16 of 23 improved after 8, best@16 median 1.00 (trial_count_readout_jeanzay.json);
+      lr_scale Spearman -0.36 on separation. Check 3: A same-search monotone, B/C against the 5x spread. Searched: trial count,
+      n_trials, more trials, running best, lr_scale, layer_decay in results.tex, dead ends, site decisions.'
   step_waits:
     '3': bbx_zz_lo_scr3, bbx_zz_lo_ft drivers (detach events)
     '4': detach bbx_zz_lo_ft (LO fine-tune driver; its FA DONE event)
