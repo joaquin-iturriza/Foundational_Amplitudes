@@ -24533,6 +24533,14 @@ entries:
       in >= 5 of 7 cells per arm the best trial passes spike, jitter and steady (gap apart at D<=316); otherwise labelled
       ''existing template, not well trained by curve_quality'' with the failing bars per cell (D413 deadline; D414 fix stays
       open). A fine-tune whose minimum sits in the first checkpoints is named.'
+    passed_at: '2026-11-12T15:11:16+00:00'
+    reviewer: 'Second look: LO horizons now from b b~ > Z Z LO''s own scratch calibration k=2..8 by D391 via job_data_saving.sh
+      (same path, base and seed as the cal_vb siblings; LO recipe exists), BORROW removed, configs regenerated after it, rates
+      from the same runs (check 15); launch order fixes the missing base_config; disk stated (CC 68 GB free, parent 152 MB).
+      Check 2: stage2_readout.json test fits u u~ LO log10 S 0.58 [0.43,0.68], t t~ V/B -0.35 [-0.59,-0.24]. Check 3: one
+      8-trial search per cell as every sibling (D315). Check 5 searched results.tex for bbx_zz, b b~ > Z Z, ZZ, f f~ > Z Z,
+      and decisions for zz/bbx: only one-loop pole/coverage notes and the transfer-ladder rung. Fine-tune space differs from
+      the u u~ example, stated.'
   step_waits:
     '2': 'detached drivers muonly_mse_test and bbx_zz_v_LD; step 3''s LO arm: the next owner''s design'
     '3': 'detached drivers muonly_mse_test and bbx_zz_v_LD; step 3''s LO arm: the next owner''s design'
