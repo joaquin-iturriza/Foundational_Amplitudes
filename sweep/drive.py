@@ -495,10 +495,16 @@ def main():
             sw.name, sw.n_trials, sw.n_startup, sw.sampler.surrogate, sw.sampler.objective_scale,
             "waves %s" % sw.waves if sw.waves else "rolling, %d in flight" % parallel))
     if not a.dry_run:
+        # the sync sends commits only, so other agents' uncommitted files in this shared checkout never reach a site and
+        # do not stop the launch (they did three times on 2026-11-12); this launch's own configs must be committed
+        mine = subprocess.run(["git", "status", "--porcelain", "--"] + list(a.config), cwd=ROOT, text=True,
+                              stdout=subprocess.PIPE).stdout.strip()
+        if mine:
+            sys.exit("drive.py: commit the configs first, nothing submitted:\n" + mine)
         for s in sorted(set(a.sites or ["ccin2p3", "lxplus"] + (["jeanzay"] if a.allow_jeanzay else []))):
             log("sync %s" % s)
             try:
-                site("sync", s, PROJECT, timeout=600)
+                site("sync", s, PROJECT, "--allow-dirty", timeout=600)
             except RuntimeError as e:  # never submit on an unsynced site (stale checkout)
                 sys.exit("drive.py: start-up sync of %s failed, nothing submitted:\n%s" % (s, e))
     while True:
