@@ -23442,6 +23442,18 @@ entries:
       to Joaquin). (d) or (e) FIXES: Muon or HETEROSC is what the fine-tune does not tolerate; fix = that knob for fine-tunes.
       None FIXES on a target: no recipe knob explains the deficit there; the remaining suspect is the parent (pretraining
       set and length: the old parent ran 94k steps at B=16384), designed next.'
+    passed_at: '2026-11-12T03:42:41+00:00'
+    reviewer: 'Design of 2026-11-12 03:41. One knob per arm against a matched control on current code: the tree controls are
+      the head-map runs (the head map alone read val 0.04-0.09x at D=3162, hmap_readout.json), and the one-loop runs get no
+      head map (ed7c42c6). Arm (e) is heterosc_mu_only, so the start is kept and val_mse_curve is still written (base_experiment
+      ~1330). Check 2: val mu-MSE moved 0.04-0.09x at tree D=3162 with one change; lr_scale tracks the val minimum in 27/34
+      fine-tune searches. Check 3: four cells pooled, FIXES at G<=1/3 with 3 of 4 below, and the read without each run''s
+      worst event must agree; same-HP pairs 0.46-4.84 per cell, about 0.4 ln-sd pooled, so the bar is about 2.7 sd. Check
+      5 searched: results.tex for muon_weight_decay, weight decay, WSD, AdamW, fine-tune MSE, fine-tune lr_scale, head map,
+      old recipe (par:v3_muon is now in the prior); the entry''s findings and dead ends (step 8 AdamW arm, replaced with a
+      reason); site decisions D408/D409/D411/D412. Disk 15-35 MB per run against 69 GB free on CC. Limits 0:25 and 0:32 against
+      12-24 min measured, 26.6 GPU-h at limits, under D412''s 30. Two 50-step smokes (tree and one-loop) carry the new overrides
+      (D395).'
   step_waits:
     '8': the main session's read of the defect hunt (its 'before more arms'); then launched as designed
   findings:
