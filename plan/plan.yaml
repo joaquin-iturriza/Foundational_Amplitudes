@@ -15788,6 +15788,10 @@ entries:
       notifications after a hand-back were already absorbed; owner resumes by peer hand-backs cannot be held (Claude Code
       offers no delivery delay, an owner has no waiter). Also confirm the first run of a held item that ends gets its RUN
       event and RUN_DONE with no manual poll (next 19 fix).'
+    22: 'drive.py first trial per (site, search): one trial goes first, the rest wait for TRAINING_STARTED in its log; a failure
+      before training closes the site with an ALERT (2026-11-12: ~140 data-saving trials failed on a stale checkout and a
+      stale Born record, whole 42-trial waves sent). bbc89d5f on branch drive-gate (worktrees/wt-drive-gate), tests/test_drive_first_trial.py
+      6 cases; repo-reviewer, merge, remove the worktree; no driver restarted'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16287,6 +16291,11 @@ entries:
       if:
       - 'saving within or above 11-30% on main per day: keep 10 min'
       - 'below: report to Joaquin with numbers and causes'
+    22:
+      feeds: whether a setup fault costs one trial per site instead of a wave
+      if:
+      - 'reviewer PASS: merge into trunk, push, remove the worktree'
+      - 'reviewer FIX: fix, re-check with the same reviewer'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
