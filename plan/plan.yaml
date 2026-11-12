@@ -24253,11 +24253,8 @@ entries:
     '2': '2026-11-13'
     '1': the next owner's fix of the memmap key mismatch between prebuild mode and the GPU run (see hand-off), then this step's
       runs as designed
-    '3': 'a fix of the memmap key mismatch: scripts/job_catalog_v3_short_prebuild.sh (CPU, 4 CPUs) builds key f3bedd61 while
-      every GPU run of the same cell at the same commit looks for 547c3e73 (prebuilds 53eb792f, 5b88c9ff; GPU runs cf880cbe,
-      3e0ddcc3, fcbbd1bd, 2e611342, all at load). Suspect: mix_compose at load differs with CPU count (4 vs 5); test by a
-      prebuild with --hdr=--cpus-per-task=5, or compare composed_pools.json rows_sha256 of the two modes; then rebuild, delete
-      the stale key f3bedd61 (21 GB, ours); then the AdamW x16 twin as designed, alone in the gate''s 60-min window'
+    '3': the next owner's fix of the memmap key mismatch between prebuild mode and the GPU run (see hand-off), then this step's
+      runs as designed
   handoff:
     state: 'pidqn design PASSED (design-reviewer, second look). Code on branch pid_vs_qn (worktree worktrees/pid_vs_qn: 5541a2ec
       + fix 9ecbae9f). The repo-reviewer (agent a908d9ab432d34127, holds the lock) BLOCKED on a wrong _dimless_mass_stats
