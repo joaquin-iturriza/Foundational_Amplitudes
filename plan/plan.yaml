@@ -21022,6 +21022,11 @@ entries:
       L vs log D over 3-5 points per arm near the crossing, or A D^-a + L_inf), band from fit residuals and the 5x spread;
       outside: more searches per cell (D315, Joaquin''s).'
     at: '2026-11-10T06:52:51+00:00'
+  - tried: Zero-shot read of the held-out parents (r4, r5) on the t t~ LO and u u~ val pools (design 2026-11-12 00:27)
+    why: 'Design reviewer FIX: the fine-tune curves already answer bad start or not (both arms lead scratch by step 170; t
+      t~ LO fine-tune below scratch until ~7000 steps, then memorises: train MSE 3e-10..3e-9, val/train 18-884 vs scratch
+      2.7-42), and the outcome rule left cases open; not run'
+    at: '2026-11-12T00:29:03+00:00'
   asks:
   - ask: 'GPU budget: 200-290 GPU-h above 30 with no decision covering it. Stage 2 of the data-saving study (three held-out
       tree targets, scratch against fine-tuned, an 8-trial DyHPO per cell, one seed per cell). The data saved expected from
