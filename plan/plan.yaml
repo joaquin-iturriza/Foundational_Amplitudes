@@ -23046,7 +23046,11 @@ entries:
       zero-shot start, sigma head, output head, refit, own/parent stats, warm start; entry dead ends; site decisions.'
   step_waits:
     '8': the main session's read of the defect hunt (its 'before more arms'); then launched as designed
-    '10': the design reviewer's re-check of the head-map check design
+    '10': FA-ccin2p3-7827e233 FA-ccin2p3-cd9721ed FA-ccin2p3-92c61201 FA-ccin2p3-cdfa6451 FA-ccin2p3-d62172ad FA-ccin2p3-386a6195
+      FA-ccin2p3-05ea13bf FA-ccin2p3-a30ab96f FA-ccin2p3-67279f45 FA-ccin2p3-208d7c8a FA-ccin2p3-821d7387 FA-ccin2p3-eabb5d11
+      FA-ccin2p3-425ef3b2 FA-ccin2p3-4672cb66 FA-ccin2p3-43f7b951 FA-ccin2p3-8ea8817f FA-ccin2p3-f6de1654 FA-ccin2p3-36d2d504
+      FA-ccin2p3-e9f9c5c1 FA-ccin2p3-9e430b68 FA-ccin2p3-39daf895 FA-ccin2p3-71f185d0 FA-ccin2p3-a6eea808 FA-ccin2p3-21f6beca
+      FA-ccin2p3-58feec4f
     '9': FA-ccin2p3-7827e233 FA-ccin2p3-cd9721ed FA-ccin2p3-92c61201 FA-ccin2p3-cdfa6451 FA-ccin2p3-d62172ad FA-ccin2p3-386a6195
       FA-ccin2p3-05ea13bf FA-ccin2p3-a30ab96f FA-ccin2p3-67279f45 FA-ccin2p3-208d7c8a FA-ccin2p3-821d7387 FA-ccin2p3-eabb5d11
       FA-ccin2p3-425ef3b2 FA-ccin2p3-4672cb66 FA-ccin2p3-43f7b951 FA-ccin2p3-8ea8817f FA-ccin2p3-f6de1654 FA-ccin2p3-36d2d504
