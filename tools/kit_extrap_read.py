@@ -35,7 +35,7 @@ ARMS = {"rezero": {"ee_uug_me2": "kit_A_ee_uug_me2_n100000_t8000_softpair_rezero
         **{a: {"ee_uug_me2": f"kit_A_ee_uug_me2_n100000_t8000_softpair_{a}",
                "ee_tt_virt_finite": f"kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr_{a}"}
            for a in ("nolocal", "noframes", "nooffshell", "noframesoff")},
-        # step 11d (log-skip design PASS 2026-11-12): uug on the plain log10|M|^2 target, its control and the skip arm;
+        # step 11d (log-invariant polynomial term, design PASS 2026-11-12): uug on the plain log10|M|^2 target, its control and the skip arm;
         # tt virtual: the skip on softpairthr
         "plain": {"ee_uug_me2": "kit_A_ee_uug_me2_n100000_t8000_softpair_plain"},
         "plain_logskip": {"ee_uug_me2": "kit_A_ee_uug_me2_n100000_t8000_softpair_plain_logskip"},
@@ -43,10 +43,11 @@ ARMS = {"rezero": {"ee_uug_me2": "kit_A_ee_uug_me2_n100000_t8000_softpair_rezero
         # step 12(ii): frames boost bound model.net.frames_gamma_max=4 on the softpair controls
         "gmax4": {"ee_uug_me2": "kit_A_ee_uug_me2_n100000_t8000_softpair_gmax4",
                   "ee_uugg_me2": "kit_A_ee_uugg_me2_n100000_t8000_softpair_gmax4"},
-        # step 13: linear-only log skip (model.input_log_skip_linear)
+        # step 13: linear log-invariant polynomial term (model.input_log_skip_linear)
         "plain_logskiplin": {"ee_uug_me2": "kit_A_ee_uug_me2_n100000_t8000_softpair_plain_logskiplin"},
         "logskiplin": {"ee_tt_virt_finite": "kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr_logskiplin"}}
-# figure sets: kit_extrap_<proc> (the earlier arms) and kit_extrap_route_<proc> (the one-route cuts)
+# figure sets: kit_extrap_<set><proc>; P_2(L) / P_1(L): the learned polynomial (degree 2 / 1) in the logs L of the pair
+# invariants and mass ratios added to the network's output
 SETS = {"": (("rezero", "D-", "orange", "ReZero"), ("thr", "v-", "purple", r"$\beta$ input"),
              ("scalars", "P-", "sky", "transformer, MLP inputs")),
         "route_": (("scalars", "P-", "sky", "all cut"), ("nolocal", "D-", "orange", "no local momenta"),
@@ -54,12 +55,14 @@ SETS = {"": (("rezero", "D-", "orange", "ReZero"), ("thr", "v-", "purple", r"$\b
         # step 10: the frames cut and the off-shellness cut together (local momenta kept)
         "double_": (("noframes", "v-", "purple", "no frames"), ("nooffshell", "X-", "grey", "no off-shellness"),
                     ("noframesoff", "D-", "orange", "neither")),
-        "logskip_": (("plain", "D-", "orange", "plain target"), ("plain_logskip", "v-", "purple", "plain + skip"),
-                     ("logskip", "v-", "purple", "skip")),
+        # log-invariant polynomial term added to the output (model.input_log_skip; _lin: linear only)
+        "logpoly_": (("plain", "D-", "orange", "plain target"),
+                     ("plain_logskip", "v-", "purple", r"plain + $P_2(L)$"), ("logskip", "v-", "purple", r"$+\,P_2(L)$")),
         "gmax4_": (("gmax4", "v-", "purple", r"$\gamma \leq 4$"),),
-        "logskiplin_": (("plain", "D-", "orange", "plain target"), ("plain_logskip", "v-", "purple", "plain + skip"),
-                        ("plain_logskiplin", "X-", "sky", "plain + linear skip"),
-                        ("logskip", "v-", "purple", "skip"), ("logskiplin", "X-", "sky", "linear skip"))}
+        "logpolylin_": (("plain", "D-", "orange", "plain target"),
+                        ("plain_logskip", "v-", "purple", r"plain + $P_2(L)$"),
+                        ("plain_logskiplin", "X-", "sky", r"plain + $P_1(L)$"),
+                        ("logskip", "v-", "purple", r"$+\,P_2(L)$"), ("logskiplin", "X-", "sky", r"$+\,P_1(L)$"))}
 
 SITE = r'''
 import glob, json, os, sys

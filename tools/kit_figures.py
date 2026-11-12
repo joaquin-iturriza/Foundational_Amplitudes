@@ -149,7 +149,11 @@ INPUT_ARMS = {"pairlogs": r"+ $\log(s_{ij}/s)$ inputs", "softrescale": "+ soft l
               "softpairthr_vbeta": r"+ soft rescale + $\log(s_{ij}/s)$" + "\n" + r"+ $\log\beta^2$, target $V\beta$",
               "softpair_rezero": r"+ soft rescale + $\log(s_{ij}/s)$" + "\n" + "ReZero",
               "softpair_scalars": "MLP inputs only",
-              "softpairthr_scalars": "MLP inputs only"}
+              "softpairthr_scalars": "MLP inputs only",
+              # + the learned log-invariant polynomial term on the output (degree 2, or 1 for _logskiplin)
+              "softpair_plain": "plain target",
+              "softpair_plain_logskip": r"plain target + $P_2(L)$", "softpair_plain_logskiplin": r"plain target + $P_1(L)$",
+              "softpairthr_logskip": r"+ $\log\beta^2$ + $P_2(L)$", "softpairthr_logskiplin": r"+ $\log\beta^2$ + $P_1(L)$"}
 
 
 def arm_label(r, with_n=True):
