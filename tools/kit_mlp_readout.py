@@ -6,6 +6,7 @@ reference (softpair inputs).
 
     python tools/kit_mlp_readout.py collect --out analysis/kit_benchmark/data/kit_mlp_ladder.json   (reads CC)
     python tools/kit_mlp_readout.py read analysis/kit_benchmark/data/kit_mlp_ladder.json [--figs <dir>]
+    python tools/kit_mlp_readout.py spread analysis/kit_benchmark/data/kit_mlp_ladder.json [--proc ee_tt_virt_finite]
 
 Rules (the design): an arm differs from mlp in a family when its 3-seed range is disjoint from mlp's and the seed
 medians differ by more than 0.3 decades; the port passes when mlp's median is within 0.3 decades of the numpy run in
@@ -150,17 +151,46 @@ def plot(proc, p, fams, outdir):
     ps.save_panels(figs, os.path.join(outdir, f"kit_mlp_ladder_{proc}"))
 
 
+def spread(path, proc):
+    """Seed noise of kit_readout --vs's statistic: for every arm of `proc` and every pair of its seeds, per family the
+    median over strata of log10(seed a log-MSE / seed b log-MSE) (every stratum, as --vs); per family the largest |.|
+    and the median |.| over all arms and pairs."""
+    from itertools import combinations
+    runs = {}
+    for name, st in json.load(open(path)).items():
+        m = NAME.match(name)
+        if m and m["proc"] == proc:
+            runs.setdefault(m["arm"], {})[m["seed"]] = st
+    per = {}
+    for arm, seeds in sorted(runs.items()):
+        for a, b in combinations(sorted(seeds), 2):
+            fams = {}
+            for k, v in seeds[a].items():
+                if k in seeds[b]:
+                    fam = "bulk" if k.startswith("bulk_test/") else family(k.split("/")[1])
+                    fams.setdefault(fam, []).append(np.log10(v / seeds[b][k]))
+            for fam, x in fams.items():
+                per.setdefault(fam, []).append((abs(float(np.median(x))), arm, a, b))
+    print(f"== {proc}: seed-pair median log10(seed a / seed b) per family, {len(runs)} arms")
+    for fam, v in sorted(per.items()):
+        x = np.array([t[0] for t in v]); w = max(v)
+        print(f"  {fam:14s} pairs={len(x):2d} median |d| {np.median(x):.3f}  90% {np.quantile(x, 0.9):.3f}  max |d| {x.max():.3f} ({w[1]} s{w[2]}/s{w[3]})")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
     c = sub.add_parser("collect"); c.add_argument("--out", required=True)
     r = sub.add_parser("read"); r.add_argument("data"); r.add_argument("--figs", default=None)
+    sp = sub.add_parser("spread"); sp.add_argument("data"); sp.add_argument("--proc", default="ee_tt_virt_finite")
     a = ap.parse_args()
     if a.cmd == "collect":
         from analysis.common.readers import site_python
         d = site_python(SITE, list(REFS.values()), "KITMLP")
         json.dump(d, open(a.out, "w"))
         print(f"{len(d)} runs -> {a.out}")
+    elif a.cmd == "spread":
+        spread(a.data, a.proc)
     else:
         read(a.data, a.figs)
 
