@@ -29765,6 +29765,18 @@ entries:
       the relative transforms; if the relative gamma is back in range too, the boost size is not the carrier and the frames
       act through orientation. If the probe shows the clamp inactive, the test is void and reported so. WORSE (bulk or any
       family >= +0.5): the bound breaks the frames'' learning, reported as such.'
+    passed_at: '2026-11-12T15:56:53+00:00'
+    reviewer: 'Re-check of 12(ii) after FIX: one change (model.net.frames_gamma_max=4) vs c15b3337/c364a7ae at their own command,
+      HPs, seed 42, 1e5, 8000 steps, float64, HETEROSC; D395 smoke chained. Check 2: uug frames cut moved deepest collinear
+      +1.36 -> -0.25; kit_frames_probe_uugg.json (f7466fc1) read: coll_qg gamma 1.53/2.15/3.39/5.58/9.50 (relative 2.2..14.0)
+      with signed error +0.03/+0.06/-0.23/-0.61/-1.47, bulk_train gamma median 1.31, max 7.18, relative max 16.05, share at
+      >=4.01 0.25%; coll_gg error -0.01..+0.23; soft gamma 1.35-1.44 in range. uugg outcome now written for its undershoot
+      with coll_gg/azimuth/soft/bulk bounds; NO branch reads relative gamma (per-frame bound 4 allows 31 > 16.1). Probe tool
+      at HEAD computes gamrel. Check 3: one seed per D315, 0.3-decade cut against the quoted 1.1x-30x rerun spread. Disk 81/104
+      MB per run, 67 GB free. Check 5 searched gamma_max, clamp_boost, frames_gamma, boost bound in docs/results.tex (none),
+      entry findings/dead ends, site decisions (frame, boost, gamma; D374, D418, D419): no prior boost bound run. Note: uugg
+      azimuth_gg deepest stratum also sits at gamma 11.2 with +1.62; the azimuth family bound covers it, worth reading in
+      the result.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
