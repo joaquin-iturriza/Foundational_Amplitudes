@@ -124,6 +124,7 @@ net:
   num_blocks: 8
   num_heads: 8
   freeze_framesnet: false
+  frames_gamma_max: null      # bound on the learned frames' boost gamma (hard clamp); null = unbounded
   causal_mask: false         # autoregressive attention within each event: particle i attends to 1..i (draft Sec. 5,
                              # "Extrapolating to more legs"); pair with data.particle_order
   causal_frames: prefix      # with causal_mask: "prefix" = particle i's local frame from particles 1..max(i, K) only

@@ -100,6 +100,7 @@ class LLOCAMuPTransformer(nn.Module):
         freeze_framesnet: bool = False,
         checkpoint_blocks: bool = False,
         layer_norm: bool = True,
+        frames_gamma_max: float | None = None,
         parametrization: str = "mup",
         detach_sigma_backbone: bool = False,
         sigma_after_pool: bool = True,
@@ -173,7 +174,8 @@ class LLOCAMuPTransformer(nn.Module):
                 dropout_prob=dropout_prob,
             )
 
-        self.framesnet = LearnedPDFrames(equivectors=equivectors_constructor)
+        # frames_gamma_max: the learned frames' boost gamma clamped (lloca clamp_boost), kit_benchmark: keep the boosts in range
+        self.framesnet = LearnedPDFrames(equivectors=equivectors_constructor, gamma_max=frames_gamma_max)
         if freeze_framesnet:
             for param in self.framesnet.parameters():
                 param.requires_grad = False
