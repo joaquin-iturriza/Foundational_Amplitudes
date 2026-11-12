@@ -60,17 +60,20 @@ def quick():
                 pass
     ch = [(d, du(os.path.join(cache, d))) for d in os.listdir(cache) if d.startswith(".chunks_")]
     done = [(d, s) for d, s in ch if d[len(".chunks_"):] in built]
-    by_key = defaultdict(list)
+    by_key, by_tag = defaultdict(list), defaultdict(float)
     for f in os.listdir(cache):
         m = POOL.match(f)
         if m:
-            by_key[(m["name"], m["role"])].append(os.lstat(os.path.join(cache, f)).st_size)
+            sz = os.lstat(os.path.join(cache, f)).st_size
+            by_key[(m["name"], m["role"])].append(sz)
+            by_tag[m["tag"].rstrip("_") or "flat"] += sz
     sev = {k: v for k, v in by_key.items() if len(v) > 1}
     return {"chunk_dirs": len(ch), "chunk_dirs_gb": round(sum(s for _, s in ch) / 1e9, 2),
             "chunk_dirs_pool_built": len(done), "chunk_dirs_pool_built_gb": round(sum(s for _, s in done) / 1e9, 2),
             "set_aside_gb": round(du(os.path.join(cache, "set_aside")) / 1e9, 2),
             "pools_several_files": len(sev), "pools_several_files_gb": round(sum(sum(v) for v in sev.values()) / 1e9, 2),
-            "beyond_largest_gb": round(sum(sum(v) - max(v) for v in sev.values()) / 1e9, 2)}
+            "beyond_largest_gb": round(sum(sum(v) - max(v) for v in sev.values()) / 1e9, 2),
+            "pool_gb_by_sampling_tag": {k: round(v / 1e9, 2) for k, v in sorted(by_tag.items(), key=lambda x: -x[1])}}
 
 
 def main():
