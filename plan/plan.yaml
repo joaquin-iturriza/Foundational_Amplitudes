@@ -24478,7 +24478,7 @@ entries:
   asks: []
   owner:
     agent: ab9dff3db5cb856c2
-    state: stopped
+    state: closed
     since: '2026-11-12T03:05:02+00:00'
     state_at: '2026-11-12T08:59:32+00:00'
     context: 273804
@@ -24820,37 +24820,32 @@ entries:
     '2': step 3's AdamW long run (designed after its read, per the hand-off)
     '3': FA-ccin2p3-f08e90e8
   handoff:
-    state: 'Design of 2026-11-12 PASSED (design-reviewer, second look) for two parts. (B) pidqn: one-hot PIDs vs quantum numbers
-      on the 1x width-8 cell v4_het_default25 (scripts/job_catalog_v3_short.sh, env PIDQN=pid|qn LONG_HEADS=8 LONG_FACTOR=1
-      LONG_MEMMAP=true SUBEPOCH_OK=1, --mem 32G, --time 03:45:00, --est-gpu-hours 2.8). (A) muon_long (step 3): AdamW twin
-      of the Muon run trial 1262 of cov_v4_long_hpo8_cc_68224 (width 8, 68224 steps, whole set) via LONG_OPT=adamw (commit
-      e9f5aade) LONG_HEADS=8 LONG_FACTOR=16 LONG_HP=1262 LONG_MEMMAP=true, --time 25:30:00, gpu_v100, --est-gpu-hours 20.3;
-      Muon control curve in sweeps/cov_v4_long_hpo8_cc_68224/results/hp1262_t68224_1793686584.json (val_mse_curve). D395 smokes
-      passed (FA-ccin2p3-c3205cee, 71cdfc9b; AdamW config = trial 1262''s but optimizer). BLOCKER: every GPU run fails at
-      load: data.memmap finds no cache at amp_mmap_cache/547c3e73c1b1522472bf53f8 (the old cache, deleted in the 2026-11-11
-      clean-up), while scripts/job_catalog_v3_short_prebuild.sh v4_het_default25 (same env, CPU, 4 CPUs) builds key f3bedd61
-      (21 GB) twice, the second at the SAME commit 22226958 as the GPU runs and after zz_redesign_regen_pp4 ended: prebuild
-      mode and GPU run hash the same recipe (1153 processes, 2736 at-load composed pools) to different base keys (data_mmap.base_key_doc,
-      keyed_aug.pool_identity: composed pools keyed by sidecar rows_sha256). Suspect (unverified): at-load mix_compose output
-      depends on CPU count (prebuild 4, GPU 5). Next: find the cause (prebuild with --hdr=--cpus-per-task=5, or compare composed_pools.json
-      rows_sha256 from both modes), fix it in code if composition depends on CPU count, rebuild, check the key in the first
-      GPU log, delete stale f3bedd61 (21 GB, ours; my rm was refused by the permission classifier once, Joaquin deleted the
-      first copy). Site gate: the two pidqn arms (2 x 3:45) and the AdamW 25:30 limit in one 60-min window = 33 > 30: submit
-      AdamW >= 60 min after the arms (estimated use 26.5 GPU-h, under budget). Held-out reads: CC lacked every held-out train
-      pool and 504/1301 PP4 (2026-11-12 01:00; agent_redesign rebuilding): reread with mode eval once restored. Step 2 (AdamW-parent
-      fine-tunes on the data-saving grid) not designed; cost after step 3''s read.'
-    decisions: 'D364 scope; D315 one seed; A redesigned after reviewer FIX: the longest existing cell (D236 full set, D292
-      ''plateauing'') instead of a budget-sized horizon on the data-saving parent; AdamW at Muon''s lr (stage 2 AdamW tuning
-      gained 1.1x); no same-commit Muon rerun (+20 GPU-h over budget, stated); the x2 short pair dropped (would make 30.5
-      GPU-h); the extrapolation discussion that held step 3 was settled by kit_benchmark D392'
-    ruled_out: data-saving parent setup for step 3 (no val_mse curve, 1e4/pool, budget horizon); the pp4 regeneration as the
-      cause of the key mismatch (same mismatch after it ended at the same commit); in-memory loading of the whole set (~78
-      GB host)
-    running: 'none (all failed runs acked: E5541, E5567, E5568, E5597, E5598, E5717, E5718)'
-    files: scripts/job_catalog_v3_short.sh (LONG_OPT, PIDQN), scripts/job_catalog_v3_short_prebuild.sh, data_mmap.py (base_key_doc
-      l.377, init check l.830-856), keyed_aug.py pool_identity, datagen.py/mix_compose ensure_composed, docs/results.tex sec:optrecap
-      and par:v3_muon/par:v4_length
-    written: '2026-11-12T03:03:55+00:00'
+    state: 'pidqn DONE and written up (results.tex sec:optrecap ''Particle encoding'', fig:pidqn, commit 88d7c954; mixture_ab.py
+      pidqn, plot_pidqn.py; PP4 R=0.80 [0.74,0.87], EE4 0.86, held pooled 0.92 [0.85,1.01], H3 1.14 [1.01,1.24], no held-out
+      probe with an unseen particle). Step 3 (Muon vs AdamW on the longest pretraining) IN FLIGHT: AdamW twin FA-ccin2p3-f08e90e8
+      (slurm 63558966, gpu_v100, 25:30:00, @fbadd4b5; scripts/job_catalog_v3_short.sh v4_het_default25 LONG_OPT=adamw LONG_HEADS=8
+      LONG_FACTOR=16 LONG_HP=1262 LONG_MEMMAP=true; run dir runs/catalog_v4_long/v4_het_default25_w8_x16_hp1262_adamw; target
+      20.3 h). When it ends, read it under the design passed 2026-11-12 00:25: (1) its first log lines show the memmap cache
+      522bb4e8 opened (base and feat); (2) val_mse_curve of <run dir>/result.json against the Muon control sweeps/cov_v4_long_hpo8_cc_68224/results/hp1262_t68224_1793686584.json
+      (50 points every 1364 steps): one-axis curve figure (extension of fig:v3_muon a), ratio AdamW/Muon per validation, steps-to-level
+      at 8528/17056/34112/68224; (3) extract its reads (mixture_ab.py extract <run> <log> <axis> for PP4 EE4 H1..H7c HD4 HD5;
+      full log via site logs -n 3000000) and compare against the Muon run''s reads FA-ccin2p3-1a46f3e0 (par:v4_length) with
+      R = median over classes of class gmean MSE_AdamW/MSE_Muon, widened by seed_spread het |ln R_seed| (add a mixture_ab
+      subcommand like pidqn); (4) level: each run''s median per-class MSE of ln|M|^2 on PP4/EE4 vs 1e-4 and the plateau rule
+      (best within 10% of its 0.75T value, or best before 0.9T); then the outcome branch (YES R>=1.26 / speed-only / AdamW
+      better; not plateaued and above 1e-4 -> longer horizon and GPU-h as a question to Joaquin). Write into results.tex sec:optrecap
+      ''The optimizer'' with % src/% claim. Step 2 (AdamW-parent fine-tunes on the data-saving grid) waits on step 3''s read;
+      pretrain_data_saving now has a design recorded (c6871c48), check it before designing step 2.'
+    decisions: 'D364 scope; D315 one seed; pidqn outcome branch: R on PP4/EE4 at or below 0.80 -> claim holds (one-hot slightly
+      better), no one-hot DyHPO; memmap cache keys made node-independent (4f0d9608 composed alpha_s keyed by rows; 9d887002
+      internal masses to 12 digits) because numpy/libm rounding differs between CC htc and GPU nodes; both pidqn arms pinned
+      to gpu_v100'
+    ruled_out: CPU count as the key-mismatch cause; pp4 regeneration as the cause; code drift between commits (diffs touched
+      no run code)
+    running: FA-ccin2p3-f08e90e8 (AdamW twin, 68224 steps, ~20 h from 2026-11-12 ~09:55)
+    files: data_mmap.py (_alphas_identity, _key_floats), tests/test_pool_doc_composed.py, tests/test_mmap_key.py, analysis/catalog_v4/mixture_ab.py
+      (pidqn), analysis/catalog_v4/plot_pidqn.py, analysis/catalog_v4/data/pidqn.json, docs/results.tex sec:optrecap, scripts/job_catalog_v3_short.sh
+    written: '2026-11-12T09:03:30+00:00'
   findings:
   - at: '2026-11-12T03:17:43+00:00'
     text: 'Cache key mismatch cause (2026-11-12): the composed pools'' rows hash identically on htc and GPU nodes (2736/2736
