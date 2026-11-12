@@ -16207,7 +16207,7 @@ entries:
       FA-ccin2p3-d7ae9889 FA-ccin2p3-afa3c959 FA-ccin2p3-3a3b0003 FA-ccin2p3-4484c44d '
   owner:
     agent: a3d362cbafc652839
-    state: working
+    state: closed
     since: '2026-11-12T01:17:22+00:00'
     state_at: '2026-11-12T02:19:02.832000+00:00'
     context: 291151
@@ -17251,27 +17251,30 @@ entries:
       absorbed when the hand-back was spooled, spooling 15 min after a waiter returns, the waiter never returns an emptied
       window. After: 3 (the empty return gone).'
   handoff:
-    state: '2026-11-12 ~03:10 local. Done today: disk alarm (DISK ALERT own key, supervisor self-reload, site submit --disk-gb;
-      live, E5530 fired), waiter URGENT_KINDS and no empty-window return, absorb leaks (mid-run messages spooled, finished
-      notice absorbed after a spooled hand-back, 15 min grace after a waiter returns; a44d46c4), table gate refuses any result
-      table (be45115e), lhe_parts worker deletes parts after assembly (92448c07, not yet synced to CC: site sync blocked by
-      another agent''s uncommitted sweep configs), keeper findings 1-3,5,6 fixed (54a969a6); claudemd-keeper a076d9e5f5f226c95
-      resumed for its re-check (SendMessage it, do not launch a new one). Freed on CC 1.65 GB parts; CC at 51 GB free (<60).
-      Open: keeper re-check result; CLAUDE.md:26 diff to Joaquin (results as a figure, never a table), not committed without
-      his yes; step 24 live waiter measure (date wait 2026-11-12T14:00, tools/waiter_replay.py and tools/wake_replay.py);
-      window-length question parked by the main session; disk: dsh_eea parts 5.7 GB kept (its 115 train pools gone from amp_data_cache,
-      parts are the only source), hd_test_measured gc 1.14 GB refused by the classifier, lhe_queue dirs ~11 GB of manifests
-      not deleted (no allowed form), results pruning needs Joaquin''s run or permission.'
-    decisions: Disk alarm is an ALERT (urgent) under key 'DISK <cmd>'; parts of a process are deleted only when its pools
-      are built and no sibling queue needs them; a dsh_eea parts deletion would lose the only copy of its train pools, so
-      kept for Joaquin's call; tests that read parts after assembly turn lhe_parts.AUTO_GC off
-    ruled_out: a fixed 10-min window cannot merge hand-backs 8-25 min apart (replay 20 returns old and new at 600 s; 15/13/11
-      at 20/30/60 min)
-    running: none (claudemd-keeper a076d9e5f5f226c95 re-checking)
-    files: ~/.local/bin/site (backup site.bak-20261112-diskwatch) .claude/hooks/notification_absorb.py .claude/hooks/plan_check.py
-      tools/lhe_parts.py tools/waiter_replay.py tools/wake_replay.py tests/test_disk_alarm.py tests/test_run_done_waiter.py
-      tests/test_handback_batch.py tests/test_plan_check_table_figure.py tests/test_lhe_parts.py
-    written: '2026-11-12T00:55:30+00:00'
+    state: '2026-11-12 ~03:45 local. Restore of CC pools deleted 2026-11-11: H held-out train 684/700, PP4 431/504 (C1 shard
+      7 FA-ccin2p3-47f06add still running), dsh_eea 0/115. 5 A shards (K=2,4,8,11,12: 4484c44d,3a3b0003,afa3c959,d7ae9889,0c2d61c6)
+      refused by prebuild''s 20 GB floor, events acked; free now 32 GB. PP4 parts queue zz_redesign_pp4_parts: 11/12 assembled,
+      1 run left. Finishing design (A'' reruns, C2'' one worker, B dsh_eea with 22226958 subset assembly, dsh_eea val/test
+      sha256 recorded in $SCRATCH/zz_redesign_dsh_eea_valtest.sha256, 230 files) recorded ~03:40, design-reviewer a0b4805efd940c3d2
+      re-checking: on PASS submit A'' (same command as before, K list), C2'' (job_lhe_parts.sh LHE_QUEUE=zz_redesign_pp4_parts
+      --time 04:00:00), B (LHE_QUEUE=catalog_v4_dsh_eea --env LHE_PARTS_AUTO_GC=0 --time 02:00:00), job names zz_redesign_*;
+      after B compare sha256, then lhe_parts gc --parts. Archive deletion (D404): rm -rf /sps/lpnhe/jiturrizaramirez01/tmp/zz_archive_lxera
+      refused by the classifier, sent to the main session for Joaquin. Cache audit (Joaquin: why >100 GB caches): census running
+      detached on CC login ($SCRATCH/zz_redesign_cache_census.log/.json, analysis/agent_redesign/cache_census.py @7ea32f3c);
+      first facts: amp_data_cache 111 GB = the train pools (10x val size, datasets holds only val/test 71 GB), mmap 26 GB
+      was 21 GB optimizations_recap key f3bedd61 (now deleted) + two 2.5 GB old keys. mmap key-change question (owner a87ebdd2344eb92d7:
+      f3bedd61 -> 547c3e73): default-share mixtures read pp13v4/pp13 ''reuse'' pools (default_share_pools); check detached
+      in $SCRATCH/zz_redesign_d25.log (default25 reads vs files changed after 02:30); pool_identity hashes content+alphas,
+      so a rebuilt or newly alphas-written pool the key lists changes it. Repo-reviewer ad1bfac42d24610b9 holds the lock (FIX;
+      my finding 4 fixed c84ce822; others to other owners).'
+    decisions: Disk floor refusals not resubmitted until >20 GB free; assembly writes only missing pools (22226958) so scored
+      val/test are never rewritten; HD4/HD5 n=0 roles are not pools (79644e86)
+    ruled_out: 'dsh_eea re-assembly of all roles (reviewer FIX: rewrites scored val/test); train-vs-val moment check (not
+      calibrated)'
+    running: 'FA-ccin2p3-47f06add (C1 shard 7); detached CC login: cache_census, d25 check'
+    files: tools/lhe_parts.py tools/check_site_data.py scripts/job_catalog_v4_regen.sh recipes/catalog_v4_pp4_restore.yaml
+      analysis/agent_redesign/cache_census.py tests/test_lhe_parts.py .claude/hooks/notification_absorb.py
+    written: '2026-11-12T02:23:30+00:00'
   ask: 'Scope: CLAUDE.md change after the missing legends (2026-11-10): replace ''the main session sends it without opening
     it'' with ''the main session opens it once, at low resolution, before sending, and checks that every curve is named by
     a legend in that file and that the caption matches the axes''?'
