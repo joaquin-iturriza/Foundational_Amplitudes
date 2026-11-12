@@ -138,8 +138,9 @@ def main():
     ap.add_argument("--targets", nargs="*", default=TARGETS)
     ap.add_argument("--arms", nargs="*", default=["scr", "ft"])
     ap.add_argument("--stage", default="s2", help="sweep-name stage tag: s2, s3 (the fine-tunes from the D400 parents)")
-    ap.add_argument("--offshell-nlo", default="parent", choices=["parent", "own"],
-                    help="fine_tune.offshell_stats of the one-loop fine-tunes (s3: own, the t t~ V diagnostic read per target)")
+    ap.add_argument("--offshell-nlo", default="own", choices=["parent", "own"],
+                    help="fine_tune.offshell_stats of the one-loop fine-tunes: own, as results.tex adopts for the one-loop "
+                         "fine-tunes from the s3 searches on (diag_readout.py @5555a0f0); parent reproduces s2/s4")
     ap.add_argument("--ft-space", choices=["llrd", "scratch"],
                     help="fine-tune search space: llrd (lr_scale [0.1,10], layer_decay [0.75,1]) or scratch (layer_decay 1, "
                          "lr_scale [1/3,3]: scratch's lr window); default scratch for tree targets (step-3 test FIXED on "
