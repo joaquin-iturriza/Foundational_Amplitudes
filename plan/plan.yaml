@@ -25092,6 +25092,12 @@ entries:
       as an example, its L(D) not redrawn). Proposed rule for Joaquin (CLAUDE.md, Results and reporting): ''A transfer or
       data-saving target is checked first against the parent''s recipe: not in it, not in an equality class of a process in
       it (tools/equal_processes.py), and for a one-loop target not a constant V/B (std ln|V/B| on its train pool, vb_spread.py).'''
+  - at: '2026-11-12T14:41:42+00:00'
+    text: 'Correction to the 16:50 finding (Joaquin 2026-11-12: ''I asked you for a NEW example, since we had ee to uu LO
+      and V already as one, and you tell me your new example is ee to uu V?''): u u~ V is out because e+e- > u u~ at LO and
+      one-loop V is already the first example; the second must be a different process. The constant V/B is a further reason,
+      not the stated one. The proposed rule gains: ''a second example is a process not already shown''. Choice unchanged:
+      b b~ > Z Z one-loop V/B (a different process).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
