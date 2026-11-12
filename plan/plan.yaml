@@ -28149,9 +28149,7 @@ entries:
     '5': 'kit_hpo driver DONE event: the package takes the chosen trials'' models'
     '15': kit_hpo driver DONE event (detach:kit_hpo, log ~/.local/share/ccorch/detached/20261112-224604_kit_hpo.log); live
       trial FA-lxplus-39d3ed3e
-    '14': FA-ccin2p3-7aff4018 (uug div-form 50-step check, rerun with ++training.wsd_cooldown_frac); the tt check is submitted
-      on that wake (refused at 22:43 by the 60-min GPU-h gate, which still counts the kit_hpo trials cancelled on CC at 22:18
-      local)
+    '14': FA-ccin2p3-7aff4018 FA-ccin2p3-06fc43d3 (div-form 50-step checks uug and tt, rerun with ++training.wsd_cooldown_frac)
     '16': kit_hpo driver DONE event (uug_T and uugg_T searches in the same driver, D424/D428)
   handoff:
     state: '2026-11-12 ~22:35 @68ccb875. Closed at the context limit. (1) Steps 15+16, kit_hpo driver: one detached sweep/drive.py
