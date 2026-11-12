@@ -196,7 +196,7 @@ def plot(path, outdir, prefix="", split_offshell=False):
                 ax.plot(*zip(*pts), "o-", color=c, label=lab)
             fl = sorted((v["x"], v["mse"]) for st, v in tr["floor"].items() if family(st) == fam)
             if any(m > 0 for _, m in fl):   # zero in every bin (truth inside the training range): not drawn, no entry
-                ax.plot(*zip(*fl), "--", color=ps.C.grey, label="exact inside the training\nrange, flat at its edge\noutside")
+                ax.plot(*zip(*fl), "--", color=ps.C.grey, label="truth clipped to\ntraining range")
             ref = MLP.get((stem, target, fam))
             if ref:
                 x = np.sqrt(ref[0] * ref[1])
