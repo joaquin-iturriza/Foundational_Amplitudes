@@ -15,12 +15,14 @@
 #            loops with the tree levels in the pretraining"): T = 4313, lr 8.190e-3
 #   heldoutthr  1414 pools, the held-out recipe plus kit_benchmark's three threshold top pairs (v4_{gg,ddx,bbx}_ttx__thr,
 #            beta log-uniform on [1e-5, 0.6], D405/D406): r5's T = 4307 and lr 8.196e-3 kept, so only the pools differ
+#   heldoutbbzz  1132 pools, the r4 held-out recipe (1133 pools, no physical-mass tops) minus the f f~ > Z Z class: the
+#            parent of b b~ > Z Z LO's fine-tunes (D413, D417); r4's T = 3458 and lr 9.248e-3 kept, so only the pools differ
 # Base config:
 # trial 1262 of cov_v4_long_hpo8_cc_68224 (model, HPs, HETEROSC + sigma stage); in memory (data.memmap=false: the
 # 1e4-per-pool train split is ~1.41e7 events, 10 GB host memory at 1.13e7 in r4, and no memmap cache exists for this recipe).
 #   heldoutthrloop  heldoutthr plus kit_benchmark 11c's four one-loop top-pair pools (g g, d d~ > t t~ [virt=QCD], beta
 #            log-uniform on [1e-5, 0.6] and sqrt(s) log-uniform to 50 TeV): r5's T and lr kept, so only the pools differ
-#     site submit <site|auto> FA scripts/job_datasaving_parent.sh -- <heldout|heldoutthr|heldoutthrloop|treesin> [key=value ...] [tag=<name>]
+#     site submit <site|auto> FA scripts/job_datasaving_parent.sh -- <heldout|heldoutbbzz|heldoutthr|heldoutthrloop|treesin> [key=value ...] [tag=<name>]
 # The input flags of D392 (kit_benchmark's arms with a gain) go as arguments with ++ (trial 1262's config predates
 # the keys, so a plain override fails "not in struct"), e.g. ++model.input_soft_eps=1e-8
 # ++model.input_pair_logs=6 (6 = the recipe's largest multiplicity, catalog_v4 goes to 2->4, wrappers.py asserts it
@@ -32,7 +34,7 @@ _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 WHICH="$1"; shift
-case "$WHICH" in heldout|heldoutthr|heldoutthrloop) T=4307; LR=8.196e-3 ;; treesin) T=4313; LR=8.190e-3 ;; *) echo "heldout, heldoutthr, heldoutthrloop or treesin"; exit 2 ;; esac
+case "$WHICH" in heldoutbbzz) T=3458; LR=9.248e-3 ;; heldout|heldoutthr|heldoutthrloop) T=4307; LR=8.196e-3 ;; treesin) T=4313; LR=8.190e-3 ;; *) echo "heldout, heldoutbbzz, heldoutthr, heldoutthrloop or treesin"; exit 2 ;; esac
 PARENT="runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262"
 RECIPE="$PROJECT_DIR/recipes/catalog_v4_datasaving_parent_${WHICH}.yaml"
 [ -e "$RECIPE" ] && [ -e "$PROJECT_DIR/$PARENT/config.yaml" ] || { echo "no $RECIPE or $PARENT/config.yaml"; exit 2; }

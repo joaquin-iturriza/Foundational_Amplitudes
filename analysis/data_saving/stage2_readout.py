@@ -36,7 +36,7 @@ DATA = os.path.join(REPO, "analysis/data_saving/data")
 TEST = os.path.join(DATA, "stage2_test.json")
 OUT = os.path.join(DATA, "stage2_readout.json")
 NAME = re.compile(r"dsave_s2_(scr|ft)_(.+)_d(\d+)_t(\d+)$")
-TARGETS = ["ee_uu", "epem_ttx", "ee_uu_nlo", "ee_ttbar_nlo"]
+TARGETS = ["ee_uu", "epem_ttx", "ee_uu_nlo", "ee_ttbar_nlo", "bbx_zz", "bbx_zz_nlo"]   # + D413's second example
 
 REMOTE = r'''
 import datetime, glob, json, os, re, sys
@@ -178,7 +178,8 @@ def readout():
         cells.append(c)
     # the readout (test: MSE ln|M|^2 for the trees, MSE V/B for the loops) and beside it the selection measure, the
     # best validation mu-MSE in ln units (val x prepd_std^2: MSE of ln|M|^2, of ln|V/B| for t t~ V, of ln|V| for u u~ V)
-    res = {"test": fits(cells, "test"), "val_ln": fits(cells, "val_ln")}
+    # test_ln: MSE(ln|M|^2) for the trees (= test), MSE(ln|V/B|) for the loops, the entry's unit for the V/B targets
+    res = {"test": fits(cells, "test"), "val_ln": fits(cells, "val_ln"), "test_ln": fits(cells, "test_ln")}
     print("\ncells (best of each search by val, test measure):")
     for c in sorted(cells, key=lambda c: (c["target"], c["arm"], c["k"])):
         print(f"  {c['sweep']:36s} obs {c['n_observed']}/{c['n_trials']} failed {c['n_failed']}  val "

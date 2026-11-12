@@ -82,14 +82,14 @@ def saving(arms, level=LEVEL):
 
 
 def calib():
-    files = ["horizons_cal_f22_cal_f22_lrhalf.json", "horizons_cal2_ladder.json"]
+    files = ["horizons_cal_f22_cal_f22_lrhalf.json", "horizons_cal2_ladder.json", "horizons_cal_vb_ladder.json"]
     allr = [r for f in files for r in json.load(open(os.path.join(HERE, "data", f)))]
     # the calibration's fixed-lr protocol only: a rerun at another lr (tag *_lrhalf) is listed apart, as are cells
     # without a result (blowup, missing)
     other_lr = lambda r: str(r.get("dir", "")).endswith("_lrhalf")
     rows = [r for r in allr if r.get("best") and not other_lr(r)]
     out = {}
-    for t in ["ee_uu", "epem_ttx", "ee_uu_nlo", "ee_ttbar_nlo"]:
+    for t in ["ee_uu", "epem_ttx", "ee_uu_nlo", "ee_ttbar_nlo", "bbx_zz_nlo"]:
         for r in allr:
             if r["target"] == t and not (r.get("best") and not other_lr(r)):
                 why = ("other lr (" + os.path.basename(r["dir"]) + ")" if other_lr(r) and r.get("best") else
