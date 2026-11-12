@@ -16887,6 +16887,34 @@ entries:
       the hand-off of 2026-11-12 says these parts are the only source of the 115 train pools. Fix: run B with the parts''
       auto-deletion off (lhe_parts.AUTO_GC, as the tests do), check the re-assembled pools (check_site_data and the calibrated
       moment test), and only then run lhe_parts gc --parts under D208.'
+  - at: '2026-11-12T01:37:17+00:00'
+    question: 'Restore on CC the catalog pools deleted 2026-11-11 that held-out reads need (zero_shot_parent reads each probe''s
+      train split for its own target statistics): (A) the 700 catalog_v4 held-out train pools (H1 62, H2 218, H2p5 38, H3
+      278 [1e4 copies only], H5 28 one-loop, H6 8, H7E 34, H7c 34); (C1) 494 PP4 train pools built in series (recipes/catalog_v4_pp4_restore.yaml
+      @0b4bbd63); (C2) the one-run part-job PP4 processes of recipes/catalog_v4_pp_parts.yaml (queue zz_redesign_pp4_parts:
+      12 processes, 199 runs + 11 gridpacks). (B) dsh_eea''s 115 train pools from kept parts is NOT in this batch: it goes
+      once lhe_parts has an off switch for the parts'' auto-deletion (file under the repo-reviewer''s lock now), as its own
+      design. No training.'
+    prior: 'pretrain_data_saving H3 1e4 prebuild (FA-ccin2p3-4f0e577e); catalog_v4_g12_regen 2026-11-07 (32 shards, 379-389
+      s, FA-ccin2p3-7c4df684); par:v4_regen_time; design-reviewer FIX x2 2026-11-12: time and recipe-id sameness answered;
+      the train-vs-val moment check dropped (not calibrated); dsh_eea moved out (parts deletion before checking).'
+    measure: 'check_site_data --list on CC over catalog_v4_heldout_{H1..H7c} and catalog_v4_pp_test: pools not prebuilt, now
+      700 + 504 train; after the batch 0, every pool''s sidecar recipe_id the recipe''s. V4REGEN_DONE in the 64 regen logs,
+      LHE_PARTS_DONE failed 0 in the parts logs.'
+    check: 'Same cache test a require_cache run makes (datagen._is_cached); on 2026-11-12 it listed exactly these train pools
+      and all val/test present. Sameness: the current code reproduces the stored recipe_id of all 1402 H val/test pools (built
+      from 2026-10-26 at 929e1a97) and every PP4 val/test pool; sampling_policy gives every role one sampling and one-loop
+      pools are never shaped (reviewer read mg5_pipeline_final.py:3133).'
+    fixed: 'Recipes as committed, seed 42. A: scripts/job_catalog_v4_regen.sh @679b856a, V4REGEN_RECIPES=the 8 held-out recipes,
+      N=32, 16 cores, --time 08:00:00, target 2.5 h (H5 one-loop ~1.8 h). C1: same script, V4REGEN_RECIPES=recipes/catalog_v4_pp4_restore.yaml,
+      N=32, AMP_LHE_CORES=8, MadEvent dirs on node-local TMPDIR, --time 08:00:00, 88.8 core-h from lhe_rates.json (longest
+      0.99 h on 8 cores), target 2 h. C2: scripts/job_lhe_parts.sh LHE_QUEUE=zz_redesign_pp4_parts, 2 jobs x 16 cores, --time
+      04:00:00, est 6.8 core-h, longest task 2.74 h, target 3 h (new parts, deleted after assembly per D208). Job names zz_redesign_*.'
+    control: Not an A/B; sameness by recipe id (check).
+    seeds: data seed 42, one build
+    outcome: 'Yes: 0 not prebuilt on the 9 recipes; optimizations_recap''s owner told its reads can be redone. No: a shard
+      fails or one-loop CERT_FAILED: read the log, rerun (resumable), or report the pools still missing with why. Disk: ~18.3
+      GB of 52.9 GB free; the prebuild stops itself at 16.5 GB free.'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
