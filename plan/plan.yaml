@@ -27005,6 +27005,28 @@ entries:
       but fits the bulk worse beyond its band is a trade, said so. Divergence again: recorded with where; the repair is lr
       x0.3 in the same arm (inside this design). Cost: uug 1.5 h (88 min measured on bba9a61e''s step rate), tt virtual 1.3
       h: ~2.8 GPU-h (+ the D405 chain''s 7.3 under its own design), under 30; disk 2 run dirs ~150 MB against 72 GB free.'
+    fix_at: '2026-11-12T04:31:25+00:00'
+    fix: 'Checks 1, 2, 5-15 hold. Two small gaps in the yes/no reading; the arm itself is fine and can go out as soon as they
+      are fixed. (A) Check 4, outcome has an undefined middle and a NO that says too much: YES needs the deepest bin to move
+      at least halfway to the MLP (uug coll y 1e-7..1e-6 from +1.36 to <= +0.6, a move >= 0.76; tt 15-50 TeV from -1.08 to
+      >= -0.5, a move >= 0.58), NO needs both within 0.3 of the control, and ''Mixed (one target moves)'' never says what
+      ''moves'' means. So a move of 0.3 to 0.76 on uug or 0.3 to 0.58 on tt has no reading. Fix: define ''moved'' per target
+      (e.g. at least halfway), name the middle zone ''inconclusive at one seed'' and say what follows it. Also limit NO to
+      ''not the pre-norms at the LayerNorm run''s HPs (lr 1.18605e-2, the arm untuned)'' and say why no sweep follows (D411/D412:
+      no long tests) rather than ''the norms are not the cause''. If the lr x0.3 divergence repair is used, the arm differs
+      from the control in lr too: say that a NO from the repaired arm cannot be read as norms-not-the-cause. (B) Check 3,
+      the band comes from the wrong measure: the seeds field gives the MLP spread of the family log-MSE median (Sudakov 0.61,
+      bulk 0.23), but the verdict reads the median signed error in the deepest bin. That error''s seed spread is already in
+      analysis/kit_benchmark/data/kit_extrap.json. Bakar''s MLP s0/s1/s2: uug coll y 1e-7..1e-6 -0.38/-0.19/-0.04 (range 0.34),
+      tt 15-50 TeV +0.137/+0.121/+0.116 (0.02). The MLP with our choices: +0.44/+0.29/+0.26 (0.19) and +0.235/+0.090/+0.011
+      (0.22). Fix: cite these as the band behind the 0.3 NO threshold and say that the transformer''s own seed spread is not
+      measured (one seed, as the controls c15b3337/f21fa163). Notes, no change needed: the code at 9e63d86f was read. The
+      gates get standard-parametrization infshapes from lloca.mup.finalize. kit_predict rebuilds the model from the run''s
+      config.yaml, so a missing flag fails loudly on the gate keys, never silently. The c0bda3b1 smoke ran the layer_norm
+      override through the sigma stage and KIT_DONE. The framesnet''s EquiMLP keeps its own LayerNorm, so ''norm-free'' means
+      the transformer stack only: say so with the result. Prior search (mine): results.tex for rezero, layernorm, layer.norm,
+      norm-free, pre-norm, extrapolat (only an unrelated LLM final-LayerNorm line, 12304); the kit_benchmark entry; site decisions
+      for norm and rezero. Nothing omitted.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
