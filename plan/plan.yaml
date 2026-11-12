@@ -24280,6 +24280,18 @@ entries:
       and spike in the existing EMA-on trials of u u~ V: 0.25 vs 0.41, 13.2 vs 18.4). t t~ LO is labelled the same way and
       feeds only the t t~ diagnosis (D413 track 2): CLEAN BUT WORSE there confirms the prior; WELL on t t~ fine-tune would
       contradict results.tex''s 2.6-4.8x and is reported as such.'
+    passed_at: '2026-11-12T14:13:03+00:00'
+    reviewer: 'Revised design (14:12) re-checked against the three earlier fixes, all addressed. Configs on trunk @f61d3f8d
+      identical to the reviewed @541bea53. They diff from the controls only in heterosc_mu_only, map_head=false on the u u~
+      V fine-tunes (matching stage 2''s unmapped head) and the name-derived DyHPO seed; same template space, 8 trials in waves
+      3,3,2. Check 2: fine-tune t t~ LO mu-only spike 1.5/3.4/3.7/1.3 against control 3.9/19.7/12.1/9.7, recomputed with curve_quality.quality
+      on suspects_runs_read.json; the scratch counter-evidence (D=3162 spike 29.4 vs 21.3) is now stated. Check 3: one search
+      per cell as the siblings (D315); the controls have 0 of 8-9 trials well, verified in curve_quality.json. Check 5: the
+      HETEROSC-against-MSE result in results.tex ~10460-10530 (D57, 2.6x and 4.8x) is now cited with what differs and the
+      prediction it gives; terms searched: heterosc_mu_only, mu-only, plain MSE, MSE arm, HETEROSC/MSE, D400-D415. Check 4:
+      u u~ V is read over its four (cell, arm) labels in branches A/B/C, with every mixed case going to C; adopting mu-only
+      with the sigma stage (run.py change, D276) is Joaquin''s question under D52/D71 and nothing runs before his yes. Disk:
+      69 GB free on CC read today against ~1.2 GB; 13.5 GPU-h is under D412''s 30.'
   step_waits:
     '2': the design reviewer and the repo-reviewer of the mu-only MSE test (branch lrcentre @541bea53), then its 6 searches
     '3': the design reviewer and the repo-reviewer of the mu-only MSE test (branch lrcentre @541bea53), then its 6 searches
