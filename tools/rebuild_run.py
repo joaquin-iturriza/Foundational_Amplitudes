@@ -187,12 +187,14 @@ def own_offshell_stats(run_dir):
 
 def _hash_like(x, salt=0):
     """Noise the shape of x, each component of magnitude in [1, 2] (an eps-scaled vector of it keeps a norm above
-    eps, which lloca's normalisation needs; randn's can fall below it), a deterministic function of each row's (last
-    axis's) bits and `salt` (broadcast against the rows): stands in for the torch.randn_like draws of lloca's degenerate-frame regularizers,
-    so a frame (hence a prediction) depends on the particle alone, not on the RNG state or its place in the batch."""
-    b = x.detach().to(torch.float64).contiguous().view(torch.int64)
+    eps, which lloca's normalisation needs; randn's can fall below it), a fixed function of the component index and
+    `salt` (broadcast against the rows), never of x's bits: a degenerate reference is rounding noise (~1e-122), whose
+    bits move with the batch size and the BLAS threads, so a hash of them was as random as randn_like (package v3 check
+    FA-ccin2p3-21f5d054: tt Born softpair still 0.38 decades subset vs whole file). Stands in for the torch.randn_like
+    draws of lloca's degenerate-frame regularizers, so a frame depends neither on the RNG nor on the batch."""
     ar = torch.arange(x.shape[-1], device=x.device)
-    h = b.sum(-1, keepdim=True) * 6364136223846793005 + ar * 1442695040888963407 + torch.as_tensor(salt, device=x.device) * 7046029254386353131
+    h = (ar + 1) * 1442695040888963407 + (torch.as_tensor(salt, device=x.device) + 1) * 7046029254386353131 \
+        + torch.zeros(x.shape[:-1] + (1,), dtype=torch.int64, device=x.device)
     for k in (33, 29, 32):      # int64 products wrap: a splitmix-style mix of the row's bits
         h = (h ^ (h >> k)) * -4658895280553007687
     u = (h & ((1 << 53) - 1)).to(torch.float64) / 2.0 ** 52 - 1.0

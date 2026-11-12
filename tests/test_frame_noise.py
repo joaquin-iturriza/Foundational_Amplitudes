@@ -23,7 +23,9 @@ def test_frames_depend_on_the_particle_alone():
     t1 = polar_decomposition(p, refs); torch.manual_seed(9)
     t2 = polar_decomposition(torch.cat([torch.randn(3, 4).abs() + 5, p]), torch.cat([torch.zeros(3, 2, 4), refs]))[3:]
     assert torch.isfinite(t1).all() and torch.equal(t1, t2)
-    u = _hash_like(torch.randn(10000, 3))
+    c = o3.orthogonalize_3d(v * (1 + 1e-15))       # the degenerate references' bits moved (another batch's rounding)
+    assert torch.equal(a[:3], c[:3]) and torch.equal(a[4], c[4]), "the frame follows the rounding of a degenerate reference"
+    u = _hash_like(torch.randn(10000, 3), torch.arange(10000)[:, None])
     assert (u.abs() >= 1).all() and (u.abs() <= 2).all() and abs(float(u.mean())) < 0.05
 
 
