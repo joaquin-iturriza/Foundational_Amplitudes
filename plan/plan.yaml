@@ -21353,6 +21353,9 @@ entries:
       diagnose from the 34 searches'' trial curves (lr_scale window under Muon, warmup/horizon vs val minimum, sampled trials,
       objective pick, layer decay, restart optimizer state), fix the template, show well-trained fine-tune curves on a couple
       of tt cells'
+    4: 'Redo the e+e- > t t~ LO fine-tune L(D) arm with the fixed fine-tune space (design 2026-11-12 12:25: 7 new 8-trial
+      searches dsave_s5_ft_epem_ttx_d{2,3,4,6,8,9,10}, s4''s D=316/3162 reused, 26.3 GPU-h), then read S = D*_scr/D*_ft at
+      1e-4 (dstar_fit.py) with the L(D) figure'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -24677,6 +24680,12 @@ entries:
       if:
       - 'a search defect found: fix the template and rerun what the conclusions need'
       - 'no defect: report the curves and what limits the fine-tune'
+    4:
+      feeds: 'the entry''s answer for held-out tree targets: how much e+e- > t t~ LO data pretraining saves at 1e-4'
+      if:
+      - 'S band above 1: report the saving on t t~ LO, then the same redo for u u~ LO is not needed (its old fine-tune already
+        0-0.4x scratch)'
+      - 'S band contains 1: report no data saving on t t~ LO at the current setup, against sec:ladder''s earlier gap'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
