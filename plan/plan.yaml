@@ -27607,6 +27607,32 @@ entries:
       -> leaky ReLU in the blocks) on the same inputs-only arm. Between, or the bulk log-MSE worse than the control by more
       than 1.5 decades (underfit, as ReZero): reported with numbers, an underfit arm read as not resolving the question. uug
       and tt may differ: each read on its own, reported side by side.'
+    fix_at: '2026-11-12T09:23:52+00:00'
+    fix: '(1) Outcome (check 4) and seeds against spread (check 3): the YES bar ''limit family log-MSE median below the control
+      by more than 1.5 decades'' cannot be reached even by an arm that matches Bakar''s MLP exactly. kit_extrap.json: uug
+      collinear per-stratum gap control c15b3337 over MLP median seed = 0.58, 0.90, 1.14, 1.35, 1.58 decades (family median
+      1.14); tt virtual matched control 3fc1016a (kit_fig_A_betainput.json) deepest Sudakov log-MSE 0.72 vs MLP 0.035-0.058
+      (about 1.1 decades). So any result reads Between or NO. Fix: set the log-MSE bar against the reachable gap (e.g. arm
+      within the MLP''s seed range per stratum, or a fraction of the control-to-MLP gap) and show it stands above the noise
+      you quote; the 1.5-decade transformer spread from the catalog 2->2 references cannot be both the noise floor and below
+      the largest possible effect. (2) tt virtual control (checks 1 and 4): the question and the bands quote f21fa163''s deepest
+      Sudakov signed error -1.08, but the matched control is 3fc1016a (softpairthr), whose deepest Sudakov bin is already
+      log-MSE 0.72 with mean bias -0.52 (kit_fig_A_betainput.json); its median signed error is not stated, and kit_extrap_read.py
+      has no entry for it yet. State 3fc1016a''s median signed error per family from a committed read before the run, and
+      write YES/NO against it; with the control near -0.5, YES (>= -0.22, within 0.34 of the MLP''s +0.12) and NO (move <
+      0.3) touch with no gap, so give the band between them and the noise behind it (the MLP''s 0.34 seed range on the deepest
+      bin). Also quote the uug MLP deepest collinear range as -0.38..-0.04 (seeds 0-2), not -0.04..-0.19. (3) Interpretation
+      of NO (check 6): the arm is not ''exactly the scalars Bakar''s MLP reads'': the off-shellness column (propagator virtuality
+      over s_hat, log1p-compressed, i.e. a near-linear invariant, the kind the D403 ladder found 2.2-3.2 decades worse than
+      logs), the dimensionless mass column and the /5 scaling remain. Either word NO as ''the stack, or the remaining non-log
+      columns'' with the next step that separates them, or state why those columns cannot carry the overshoot (on uug the
+      off-shellness-off arm left the deep collinear bins unchanged, 34.5 vs 30.1, finding 2026-11-10T10:47, without pair logs).
+      Checks that hold: one change (both control configs on CC read: lr 0.0118605, 8000 steps, batch 16384, float64, HETEROSC
+      mu_mse with sigma stage, seed 42, same input flags; only input_scalars_only differs); measure responds (ReZero moved
+      tt deepest Sudakov -1.08 -> +0.36, ladder 2.2-3.2 decades); seeds per D315; loss HETEROSC per D71; no HPO; disk 2 x
+      75 MB; step rate from c15b3337 at the same batch and dtype; KIT test strata as the question asks; prior search: results.tex
+      for scalars only, no momenta, invariants only, identity frame, non-equivariant, inputs only, log invariants, Mandelstam,
+      and decisions (D374, D403, D411): no prior transformer-without-momenta run.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
