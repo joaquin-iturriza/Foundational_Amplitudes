@@ -24298,6 +24298,21 @@ entries:
       after, while scratch keeps falling through the anneal to 1e-9..3e-8; the tree fine-tunes fall through the anneal but
       end 6-60x above scratch. By the design: no recipe knob explains the deficit; next the pretrained weights against the
       fine-tune path itself (a fine-tune from a fresh init, shrink_perturb [0,1], at scratch''s HPs).'
+  - at: '2026-11-12T09:48:18+00:00'
+    text: '2026-11-12 step 3 diagnosis (ft_hpo_diag.py @7baf7573, data/ft_hpo_diag.json, figs ft_hpo_diag_<target>; 532 trials
+      of the stage-2 searches at their val minimum, ln units). (1) The objective is right: in every search it equals the trial''s
+      val mu-MSE minimum, so the pick is the lowest-val trial. (2) The t t~ fine-tune searches are flat: median trial / best
+      2.2-7.5 (tree) and 3.0-25 (V/B) at D=316..1e4, the top three trials spanning lr_scale 0.12-7.4 and layer_decay 0.76-1.0
+      at near-equal val, while the best fine-tune sits 2.4-18.9x (tree) and 8.1-33x (V/B) above the best scratch. No HP the
+      template varies moves that floor, so more trials, another lr window or layer_decay cannot fix it. (3) The floor is not
+      under-training on tree: at the val minimum the tree fine-tunes fit their training events 3-9x better than scratch (median
+      train ft/scr 0.11-0.33) but val/train is 30-456 against scratch''s 2-48 (memorisation). On V/B they also fit the training
+      events 3.6-57x worse than scratch (median train ft/scr 3.6-57): a stall in train and val. u u~ (tree and V) shows the
+      opposite: fine-tune best 0.0-0.4x scratch. (4) Earlier reads fit: lower lr_scale within a search a little better (27/34),
+      but lr x1/3, x1/10, WSD, AdamW, mu-only MSE at fixed HPs do not fix it (suspects batch). Conclusion: the deficit is
+      a property of the fine-tune''s starting point or its fine-tune path on t t~ (parent''s weights, or the parent''s momentum/off-shellness
+      standardisation the fine-tune inherits), not of the search; the null-parent 2x2 (fresh init vs parent weights through
+      the same path at the scratch HPs) is the test that separates the two.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
