@@ -27607,6 +27607,19 @@ entries:
       band. uugg: coll_qg family +0.08 (deepest -1.36/3.56 -> -1.11/1.79), coll_gg -0.08, azimuth -0.16, soft -0.09, bulk
       +0.12: coll_qg within +-0.3, NO pending the frames probe (detach:kit_gmax4_probes). Both gmax4 runs fail the step-15
       curve bars on NLL (separation 161 / 376 nats), so this read is at the HP point step 15 is replacing.'
+  - at: '2026-11-12T18:23:58+00:00'
+    text: '2026-11-12 ~20:40 @1f810cd6. Step 12(ii) frame-boost cap gamma<=4 (model.net.frames_gamma_max=4; uug 95be8db2,
+      uugg 88b9334a vs c15b3337/c364a7ae; design PASS 15:56). Probe REREAD (tools/kit_transformer_probe.py, 200 events per
+      stratum; kit_frames_probe_{uug,uugg}_gmax4.json): the clamp is active: max frame gamma = 4 (log10 0.602) in every collinear
+      stratum and bulk_train. Largest relative-transform gamma, deepest collinear vs bulk_train max: uug 25 vs 12.6; uugg
+      q-g 21.8 vs 18.2 (control 55 vs 16.1). Scored read @ef89a077 (kit_extrap.json, kit_fig_A_gmax4_{uug,uugg}.json, kit_readout
+      --vs; figs kit_extrap_gmax4_*): uug WORSE: bulk 1.09e-4 -> 4.28e-4 (+0.59 decades, band 0.5); deepest collinear +1.36/2.21
+      -> -0.84/1.84 (overshoot flipped to undershoot); collinear family log-MSE +0.33 (4 of 5 strata worse); soft -0.31 (5/5
+      better, deepest -0.28 -> -0.04). uugg NO: q-g collinear family +0.08 (deepest -1.36/3.56 -> -1.11/1.79), g-g -0.08,
+      azimuth -0.16, soft -0.09, bulk +0.12, with the clamp active and the relative gamma still above bulk_train''s max, so
+      the design''s branch: boost size not ruled out, the per-frame bound leaves the relative boost free; the next test would
+      bound the relative transforms. Not adopted for the KIT models. Caveat: both runs fail the step-15 curve bars (NLL separation
+      161 / 376 nats), so this is read at the HP point step 15 is replacing.'
   step_why:
     5:
       feeds: what KIT receives
