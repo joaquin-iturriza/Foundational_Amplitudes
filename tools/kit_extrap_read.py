@@ -22,7 +22,12 @@ RUNS = {"ee_uug_me2": "kit_A_ee_uug_me2_n100000_t8000_softpair",              # 
         "ee_tt_virt_finite": "kit_A_ee_tt_virt_finite_n100000_t8000_softpair"}  # FA-ccin2p3-f21fa163
 # transformer arms read beside the control, per process (D411): ReZero, norm-free blocks (model.net.layer_norm=rezero)
 ARMS = {"rezero": {"ee_uug_me2": "kit_A_ee_uug_me2_n100000_t8000_softpair_rezero",
-                   "ee_tt_virt_finite": "kit_A_ee_tt_virt_finite_n100000_t8000_softpair_rezero"}}
+                   "ee_tt_virt_finite": "kit_A_ee_tt_virt_finite_n100000_t8000_softpair_rezero"},
+        # tt's matched control of the inputs-only arm: pair logs with the threshold column (FA-ccin2p3-3fc1016a)
+        "thr": {"ee_tt_virt_finite": "kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr"},
+        # inputs-only: Bakar's inputs alone (model.input_scalars_only, data.offshell_zero)
+        "scalars": {"ee_uug_me2": "kit_A_ee_uug_me2_n100000_t8000_softpair_scalars",
+                    "ee_tt_virt_finite": "kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr_scalars"}}
 
 SITE = r'''
 import glob, json, os, sys
@@ -79,9 +84,11 @@ def plot(path, figs):
             ks = sorted(ks, key=lambda k: edges(k.split("/")[1])[0])
             x = np.array([np.sqrt(np.prod([max(v, 1e-12) for v in edges(k.split("/")[1])])) for k in ks])
             ax.plot(x, [e["transformer"][k]["err"] for k in ks], "o-", color=ps.C.vermillion, label="transformer")
-            if "transformer_rezero" in e:
-                ax.plot(x, [e["transformer_rezero"][k]["err"] for k in ks], "D-", color=ps.C.orange,
-                        label="transformer, ReZero")
+            for arm, mk, c, lab in (("rezero", "D-", ps.C.orange, "transformer, ReZero"),
+                                    ("thr", "v-", ps.C.purple, r"transformer, $\beta$ input"),
+                                    ("scalars", "P-", ps.C.sky, "transformer, MLP inputs only")):
+                if f"transformer_{arm}" in e:
+                    ax.plot(x, [e[f"transformer_{arm}"][k]["err"] for k in ks], mk, color=c, label=lab)
             for arm, mk, c in (("mlp", "s-", ps.C.blue), ("ours", "^--", ps.C.green)):
                 v = [[e[f"{arm}_s{s}"][k]["err"] for k in ks] for s in range(3) if f"{arm}_s{s}" in e]
                 ax.plot(x, np.median(v, 0), mk, color=c, label={"mlp": "MLP", "ours": "MLP, our choices"}[arm])
