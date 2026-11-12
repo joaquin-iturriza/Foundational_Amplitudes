@@ -77,7 +77,7 @@ for arm in ("scratch", "ft8"):
             continue
         c = min(cs, key=lambda c: c["val"])
         hp = int(re.match(r"hp(\d+)_", c["file"]).group(1))
-        hits = sorted(glob.glob(f"runs/{c['sweep']}/*{hp:04d}*/config.yaml") + glob.glob(f"runs/{c['sweep']}/*/config.yaml"))
+        hits = sorted(glob.glob(f"runs/{c['sweep']}/*{hp:04d}*/config.yaml"))  # the best trial's own config or none
         out["configs"][f"old_V_{arm}_{s}"] = {"path": hits[0] if hits else None, "cell": c["sweep"], "hp": hp,
                                               "cfg": yaml.safe_load(open(hits[0])) if hits else None}
 print("OVN " + json.dumps(out))

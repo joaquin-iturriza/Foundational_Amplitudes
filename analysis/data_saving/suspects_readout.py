@@ -148,8 +148,8 @@ def main():
     for a in res["arms"]:
         print(f"{a['target']:13s} {a['arm']:9s} G {a['G']:.2f} n< {a['n_below']}/{a['n_cells']} "
               f"G_x {a['G_x'] if a['G_x'] is None else round(a['G_x'], 2)} G_test {a['G_test'] if a['G_test'] is None else round(a['G_test'], 2)} -> {a['verdict']}")
-    pair = {f"{tg} d{k}": R[("pair", tg, k)].get("val_min", 0) / R[("ctl", tg, k)]["val_min"]
-            for tg in TARGETS for k in K if "val_min" in R[("ctl", tg, k)]}
+    pair = {f"{tg} d{k}": R[("pair", tg, k)]["val_min"] / R[("ctl", tg, k)]["val_min"]
+            for tg in TARGETS for k in K if "val_min" in R[("ctl", tg, k)] and "val_min" in R[("pair", tg, k)]}
     res["pair_over_ctl"] = pair
     print("same-HP pair / control:", {k: round(v, 2) for k, v in pair.items()})
     json.dump(res, open(os.path.join(DATA, "suspects_readout.json"), "w"), indent=1)
