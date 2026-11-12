@@ -9,7 +9,7 @@ against its control search (scratch: dsave_s2_scr, fine-tune: dsave_s4_ft, same 
 Validation minimum in ln units (min of the val mu-MSE curve x prepd_std^2). Failed trials (diverged) listed apart.
 Figure figs/lr_centre_curves_{a,b} (a scratch, b fine-tune): each search's best trial, val solid and train dashed.
 
-    python analysis/data_saving/lr_centre_readout.py [--cached]
+    python analysis/data_saving/lr_centre_readout.py [--test lr|muonly] [--cached]
 """
 import json
 import os
@@ -27,22 +27,28 @@ from s4_readout import failed  # noqa: E402
 from suspects_readout import YLAB, ps  # noqa: E402
 from trial_overfit import REMOTE  # noqa: E402
 
-CELL = "epem_ttx_d7_t8500"
-ARMS = {"scr": "dsave_s2_scr", "ft": "dsave_s4_ft"}           # control search per arm
-CENTRES = {"control": None, "c/3": "lrthird", "c/10": "lrtenth"}
+# test -> (cells: {cell: {arm: control search prefix}}, variants: {label: sweep tag}); the design of each test is on the
+# plan entry: lr = the lower-lr-centre test, muonly = the one-change mu-only MSE test (training.heterosc_mu_only)
+TTX = {"scr": "dsave_s2_scr", "ft": "dsave_s4_ft"}
+UUV = {"scr": "dsave_s2_scr", "ft": "dsave_s2_ft"}
+TESTS = {"lr": ({"epem_ttx_d7_t8500": TTX}, {"c/3": "lrthird", "c/10": "lrtenth"}),
+         "muonly": ({"epem_ttx_d7_t8500": TTX, "ee_uu_nlo_d7_t8500": UUV, "ee_uu_nlo_d8_t8500": UUV},
+                    {"mu-only": "muonlymse"})}
+TEST = sys.argv[sys.argv.index("--test") + 1] if "--test" in sys.argv else "lr"
+CELLS, VARIANTS = TESTS[TEST]
+SUFFIX = "" if TEST == "lr" else f"_{TEST}"
 DATA = os.path.join(HERE, "data")
 
 
-def sweep(arm, centre):
-    tag = CENTRES[centre]
-    return f"{ARMS[arm]}_{CELL}" if tag is None else f"dsave_{tag}_{arm}_{CELL}"
+def sweep(cell, arm, centre):
+    return f"{CELLS[cell][arm]}_{cell}" if centre == "control" else f"dsave_{VARIANTS[centre]}_{arm}_{cell}"
 
 
 def rows(cached):
-    cache = os.path.join(DATA, "lr_centre_rows.json")
+    cache = os.path.join(DATA, f"lr_centre_rows{SUFFIX}.json")
     if cached:
         return json.load(open(cache))
-    names = sorted(sweep(a, c) for a in ARMS for c in CENTRES)
+    names = sorted(sweep(c, a, v) for c in CELLS for a in CELLS[c] for v in ["control", *VARIANTS])
     r = site_python(REMOTE, names, "TOVF", timeout=1800)
     json.dump(r, open(cache, "w"))
     return r
@@ -86,41 +92,45 @@ def verdict(s, c):
 def main():
     rr = rows("--cached" in sys.argv)
     res, best = {}, {}
-    for arm in ARMS:
-        S = {}
-        for centre in CENTRES:
-            name = sweep(arm, centre)
-            g = search(rr, arm, name)
-            if not g:
-                print(f"{arm} {centre}: no trials with curves ({name})")
-                continue
-            S[centre] = summary(g)
-            S[centre]["failed"] = failed(name)
-            best[(arm, centre)] = min(g, key=lambda r: r["val_min"])
-        for centre, s in S.items():
-            s["verdict"] = None if centre == "control" or "control" not in S else verdict(s, S["control"])
-            b = s["best"]
-            print(f"{arm:3s} {centre:7s} n={s['n']} well {s['n_well']} spike<=3 {s['n_spike_ok']} "
-                  f"median jitter {s['median_jitter']:.2f}  best min {s['best_min']:.2e} (peak lr {b['peak_lr']:.2e}: "
-                  f"steady {b['steady']:.2f} spike {b['spike']:.1f} jitter {b['jitter']:.2f} gap {b['gap'] or 0:.1f})"
-                  + (f"  failed {s['failed']}" if s["failed"] else "") + (f"  -> {s['verdict']}" if s["verdict"] else ""))
-        res[arm] = S
-    json.dump(res, open(os.path.join(DATA, "lr_centre_readout.json"), "w"), indent=1)
-    COL = {"control": "black", "c/3": ps.C.vermillion, "c/10": ps.C.blue}
-    figs = ps.panels(len(ARMS))
-    for (fig, ax), arm in zip(figs, ARMS):
-        for centre, col in COL.items():
-            r = best.get((arm, centre))
-            if r is None:
-                continue
-            st = np.arange(len(r["val_ln"])) * (r.get("every") or 1)
-            ax.plot(st, r["val_ln"], color=col, label=f"{centre}, val")
-            if r["train_ln"]:
-                ax.plot(st[:len(r["train_ln"])], r["train_ln"], color=col, linestyle="--", label=f"{centre}, train")
-        ax.set_yscale("log"); ax.set_xlabel("step"); ax.set_ylabel(YLAB["epem_ttx"])
-        ps.process_label(ax, {"scr": "scratch", "ft": "fine-tune"}[arm] + r", $D=3162$")
-        ps.legend(ax, "upper right")
-    ps.save_panels(figs, os.path.join(HERE, "figs", "lr_centre_curves"))
+    for cell in CELLS:
+        for arm in CELLS[cell]:
+            S = {}
+            for centre in ["control", *VARIANTS]:
+                name = sweep(cell, arm, centre)
+                g = search(rr, arm, name)
+                if not g:
+                    print(f"{cell} {arm} {centre}: no trials with curves ({name})")
+                    continue
+                S[centre] = summary(g)
+                S[centre]["failed"] = failed(name)
+                best[(cell, arm, centre)] = min(g, key=lambda r: r["val_min"])
+            for centre, s in S.items():
+                s["verdict"] = None if centre == "control" or "control" not in S else verdict(s, S["control"])
+                b = s["best"]
+                print(f"{cell:20s} {arm:3s} {centre:7s} n={s['n']} well {s['n_well']} spike<=3 {s['n_spike_ok']} "
+                      f"median jitter {s['median_jitter']:.2f}  best min {s['best_min']:.2e} (peak lr {b['peak_lr']:.2e}: "
+                      f"steady {b['steady']:.2f} spike {b['spike']:.1f} jitter {b['jitter']:.2f} gap {b['gap'] or 0:.1f})"
+                      + (f"  failed {s['failed']}" if s["failed"] else "") + (f"  -> {s['verdict']}" if s["verdict"] else ""))
+            res[f"{cell}/{arm}"] = S
+    json.dump(res, open(os.path.join(DATA, f"lr_centre_readout{SUFFIX}.json"), "w"), indent=1)
+    COL = dict(zip(["control", *VARIANTS], ["black", ps.C.vermillion, ps.C.blue]))
+    for cell in CELLS:
+        target, D = cell.rsplit("_d", 1)[0], round(10 ** (int(cell.rsplit("_d", 1)[1].split("_")[0]) / 2))
+        figs = ps.panels(len(CELLS[cell]))
+        for (fig, ax), arm in zip(figs, CELLS[cell]):
+            for centre, col in COL.items():
+                r = best.get((cell, arm, centre))
+                if r is None:
+                    continue
+                st = np.arange(len(r["val_ln"])) * (r.get("every") or 1)
+                ax.plot(st, r["val_ln"], color=col, label=f"{centre}, val")
+                if r["train_ln"]:
+                    ax.plot(st[:len(r["train_ln"])], r["train_ln"], color=col, linestyle="--", label=f"{centre}, train")
+            ax.set_yscale("log"); ax.set_xlabel("step"); ax.set_ylabel(YLAB.get(target, r"val MSE$(\ln|V|)$"))  # u u~ V is trained on V (D375)
+            ps.process_label(ax, {"scr": "scratch", "ft": "fine-tune"}[arm] + rf", $D={D}$")
+            ps.legend(ax, "upper right")
+        name = "lr_centre_curves" if TEST == "lr" else f"{TEST}_curves_{cell.split('_t')[0]}"
+        ps.save_panels(figs, os.path.join(HERE, "figs", name))
 
 
 if __name__ == "__main__":

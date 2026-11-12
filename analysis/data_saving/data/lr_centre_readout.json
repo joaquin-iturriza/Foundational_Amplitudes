@@ -1,5 +1,5 @@
 {
- "scr": {
+ "epem_ttx_d7_t8500/scr": {
   "control": {
    "n": 9,
    "n_well": 0,
@@ -60,7 +60,7 @@
    "verdict": "NO CHANGE"
   }
  },
- "ft": {
+ "epem_ttx_d7_t8500/ft": {
   "control": {
    "n": 7,
    "n_well": 0,
