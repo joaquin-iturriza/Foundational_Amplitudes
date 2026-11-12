@@ -24442,6 +24442,19 @@ entries:
       a property of the fine-tune''s starting point or its fine-tune path on t t~ (parent''s weights, or the parent''s momentum/off-shellness
       standardisation the fine-tune inherits), not of the search; the null-parent 2x2 (fresh init vs parent weights through
       the same path at the scratch HPs) is the test that separates the two.'
+  - at: '2026-11-12T09:58:11+00:00'
+    text: '2026-11-12 null-parent 2x2 read, all 16 runs (nullparent_readout.py, data @10a63eea, figs nullparent_LD, nullparent_curves_<target>).
+      Val mu-MSE ln units at the stage-2 scratch best HPs through the fine-tune configs (layer_decay 1). Tree t t~ D=316/1e3/3162/1e4:
+      parent weights 4.1e-7, 6.6e-8, 7.4e-9, 8.2e-9 = 1.08, 2.36, 0.86, 3.28 x scratch (Gs 1.64) and 0.18, 0.19, 0.05, 1.4
+      x the stage-2 fine-tune best; fresh init 16, 34, 36, 5.8 x scratch (Gn 18.4), Gp 0.09. V/B: parent weights 6.1e-5, 6.2e-7,
+      1.4e-7, 2.5e-8 = 122, -, 8.9, 25 x scratch (Gs 30) and 15, 0.45, 0.27, 0.93 x the fine-tune best; fresh init 54, -,
+      2.1, 97 x scratch (Gn 22), Gp 0.87. Design branch B PATH on both targets on val and worst-removed val; caveat: the fresh
+      init here (shrink_perturb after loading) is not scratch''s muP init path, so Gn may measure the init, not the inputs.
+      The reading that matters for step 3: on tree, the fine-tune from the parent at scratch''s HPs trains like scratch (curves
+      fall through the anneal to scratch''s level), 5-20x below the fine-tune searches'' bests at D<=3162; so the tree fine-tune
+      deficit was in the search template, and pretraining gives no gain over scratch on t t~ tree at these HPs. On V/B the
+      parent''s weights stay 9-122x above scratch even at scratch''s HPs; the V/B fine-tune control''s val is flat from step
+      ~1000 while its train falls 1000x (memorisation).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
