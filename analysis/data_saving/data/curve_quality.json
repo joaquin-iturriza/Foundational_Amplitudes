@@ -12480,6 +12480,50 @@
    "stalls": false
   }
  ],
+ "by_D": [
+  {
+   "arm": "scr",
+   "D_lo": 0,
+   "D_hi": 200,
+   "n": 144,
+   "turn_up": 70
+  },
+  {
+   "arm": "scr",
+   "D_lo": 200,
+   "D_hi": 2000,
+   "n": 95,
+   "turn_up": 31
+  },
+  {
+   "arm": "scr",
+   "D_lo": 2000,
+   "D_hi": 200000.0,
+   "n": 132,
+   "turn_up": 12
+  },
+  {
+   "arm": "ft",
+   "D_lo": 0,
+   "D_hi": 200,
+   "n": 120,
+   "turn_up": 78
+  },
+  {
+   "arm": "ft",
+   "D_lo": 200,
+   "D_hi": 2000,
+   "n": 76,
+   "turn_up": 27
+  },
+  {
+   "arm": "ft",
+   "D_lo": 2000,
+   "D_hi": 200000.0,
+   "n": 117,
+   "turn_up": 12
+  }
+ ],
  "suspects": [
   {
    "end_over_best": 1.0,

@@ -82,6 +82,14 @@ def main():
         out["trials"].append({k: r.get(k) for k in ("sweep", "run_dir", "stage", "arm", "target", "D", "T", "peak_lr",
                                                      "best", "val_min_ln", "end_over_best", "late_val", "late_train",
                                                      "well", "stalls")})
+    # where the turning up sits: stage-2 trials by arm and D band (the reported loss is read at the best checkpoint)
+    out["by_D"] = []
+    for arm in ("scr", "ft"):
+        for lo, hi in ((0, 200), (200, 2000), (2000, 2e5)):
+            g = [r for r in rows if r["stage"] == "s2" and r["arm"] == arm and lo <= r["D"] < hi]
+            b = {"arm": arm, "D_lo": lo, "D_hi": hi, "n": len(g), "turn_up": sum(not r["well"] for r in g)}
+            out["by_D"].append(b)
+            print(f"  stage 2 {arm:3s} D in [{lo}, {hi:.0f}): {b['turn_up']} of {b['n']} trials turn up at the end")
     out["suspects"] = suspects()
     json.dump(out, open(os.path.join(DATA, "curve_quality.json"), "w"), indent=1)
     figure(rows)
