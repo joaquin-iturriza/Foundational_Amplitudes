@@ -26309,6 +26309,16 @@ entries:
       term (c2 = b2 = 0, model.input_log_skip_linear @7b4f8bd9) on uug plain target FA-ccin2p3-c4fc1d6f vs 203a274f and tt
       softpairthr FA-ccin2p3-6bc05a40 vs 3fc1016a, after smoke acddacca; read with kit_extrap_read (figure set logpolylin_),
       kit_figures collect + kit_readout --vs'
+    14: 'Joaquin 2026-11-12 (~19:30, via coordinator): ''I know that log invariants go as inputs, this is not necessarily
+      the same as passing the functional form of the divergence as an input''. Design one arm of divergence-form input features,
+      general for any process and built from the universal limits, fed per particle or per pair into the transformer (full
+      LLoCa, D419), through the whole network: per coloured triple (i,j,k) the eikonal factor s_ik/(s_ij s_jk) (or its log,
+      standardized); per coloured pair the collinear splitting variables (1/s_ij and the splitting function P(z), z the momentum
+      fraction w.r.t. a reference direction, flavour-dependent q->qg, g->gg); per massive pair 1/beta (Coulomb); per massive
+      leg the Sudakov double log log^2(s/m^2). Implementation point: wrappers._pair_log_inputs (pair scalars; extend with
+      these columns behind a new default-off flag + Lorentz-invariance test as tests/test_input_reps.py). One short test:
+      uug (plain target and/or T target, controls 203a274f / c15b3337) and tt virtual (control softpairthr 3fc1016a), from
+      scratch 1e5, at an lr where validation stays with training (step 15), own design + design-reviewer + D395 smoke.'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -27224,6 +27234,13 @@ entries:
         if 12(ii) says YES'
       - 'it loses Coulomb or keeps the overshoots: the output term is not the lever; the degree-2 term stays a tt-Coulomb-only
         option'
+    14:
+      feeds: whether feeding the divergences' functional form as inputs through the whole network (not added at the output)
+        fixes the KIT limits with full LLoCa (D419)
+      if:
+      - 'fixes uug soft+coll and tt Coulomb/Sudakov within the MLP bands: the features go into the KIT models and are proposed
+        for catalog pretraining'
+      - 'no or partial: reported per limit against the existing input arms and the log-invariant polynomial term'
   step_waits:
     '11': FA-ccin2p3-dcf42ad6 FA-ccin2p3-e7dca162 (11c A_ft fine-tunes, after parents 2d653209 r5loop_rerun and ca5873f3 r5loopbeta);
       then threshold scan
