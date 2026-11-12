@@ -54,34 +54,35 @@ print("KITEXTRAP " + json.dumps(out))
 '''
 
 
+FAMS = {"ee_uug_me2": ["coll_y", "soft_x"], "ee_uugg_me2": ["coll_qg_y", "coll_gg_y"],
+        "ee_tt_virt_finite": ["sudakov_sqrts", "threshold_beta"]}
+
+
 def plot(path, figs):
-    import matplotlib.pyplot as plt
-    sys.path.insert(0, os.path.join(ROOT, "analysis"))
-    from tools.kit_figures import family, edges
     import plot_style as ps
+    from tools.kit_figures import family, edges, XLAB, PROC
     d = json.load(open(path))
     for proc, e in d.items():
-        fams = {}
-        for k in e["transformer"]:
-            if k.startswith("hard_test/"):
-                fams.setdefault(family(k.split("/")[1]), []).append(k)
-        for fam, ks in fams.items():
-            ks = sorted(ks, key=lambda k: edges(k.split("/")[1])[0], reverse=fam != "sudakov_sqrts")
-            x = np.arange(len(ks))
-            fig, ax = ps.figure() if hasattr(ps, "figure") else plt.subplots()
-            ax.plot(x, [e["transformer"][k]["err"] for k in ks], "o-", label="transformer")
-            for arm, mk in (("mlp", "s-"), ("ours", "^-")):
+        panels = ps.panels(len(FAMS[proc]))
+        for (fig, ax), fam in zip(panels, FAMS[proc]):
+            ks = [k for k in e["transformer"] if k.startswith("hard_test/") and family(k.split("/")[1]) == fam]
+            ks = sorted(ks, key=lambda k: edges(k.split("/")[1])[0])
+            x = np.array([np.sqrt(np.prod([max(v, 1e-12) for v in edges(k.split("/")[1])])) for k in ks])
+            ax.plot(x, [e["transformer"][k]["err"] for k in ks], "o-", color=ps.C.vermillion, label="transformer")
+            for arm, mk, c in (("mlp", "s-", ps.C.blue), ("ours", "^--", ps.C.green)):
                 v = [[e[f"{arm}_s{s}"][k]["err"] for k in ks] for s in range(3) if f"{arm}_s{s}" in e]
-                if v:
-                    ax.plot(x, np.median(v, 0), mk, label={"mlp": "MLP", "ours": "MLP, our choices"}[arm])
-            ax.axhline(0, color="0.6", lw=0.8)
-            ax.set_xticks(x, [k.split("/")[1].split("_", 2)[-1].replace("_", "-") for k in ks], rotation=30)
-            ax.set_ylabel("median (pred - truth) [log10|M|^2]")
-            ax.legend()
-            base = os.path.join(figs, f"kit_extrap_{proc}_{fam}")
-            fig.savefig(base + ".png", dpi=150, bbox_inches="tight"); fig.savefig(base + ".pdf", bbox_inches="tight")
-            plt.close(fig)
-            print(base + ".png")
+                ax.plot(x, np.median(v, 0), mk, color=c, label={"mlp": "MLP", "ours": "MLP, our choices"}[arm])
+            ax.axhline(0, color=ps.C.grey, lw=0.8)
+            ax.set_xscale("log")
+            from matplotlib.ticker import NullFormatter
+            ax.xaxis.set_minor_formatter(NullFormatter())   # the Sudakov axis spans one decade: minor labels overlap
+            ax.set_xlabel(XLAB.get(fam, fam))
+            ax.set_ylabel(r"median prediction $-$ truth, $\log_{10}|\mathcal{M}|^2$")
+            e_, f2, tg = proc.split("_", 2)
+            ps.process_label(ax, PROC.get((f"{e_}_{f2}", tg), proc))
+            ps.legend(ax, "lower left" if e["transformer"][ks[-1]]["err"] > 0 else "upper left")
+            ps.make_room(ax)
+        ps.save_panels(panels, os.path.join(figs, f"kit_extrap_{proc}"))
 
 
 def main():
