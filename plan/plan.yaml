@@ -26822,7 +26822,7 @@ entries:
     agent: ac46d0b7530cd12d9
     state: working
     since: '2026-11-12T18:25:52+00:00'
-    state_at: '2026-11-12T18:25:52+00:00'
+    state_at: '2026-11-12T18:31:56.681000+00:00'
     context: 113882
     context_at: '2026-11-12T18:32:11+00:00'
   findings:
