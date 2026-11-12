@@ -27496,6 +27496,27 @@ entries:
       how the network reads the out-of-range inputs (pair logs past their span), not the target''s rise; next the transformer
       fed Bakar''s inputs only. Between: reported with numbers, no follow-up from this arm alone. Cost ~1.5 GPU-h (c15b3337''s
       rate), disk ~75 MB.'
+    fix_at: '2026-11-12T09:13:13+00:00'
+    fix: 'Check 2 and 11 (the measure and the trained target): the check read log10(|M|^2 x eikonal) on the KIT strata, but
+      that is not what the arm trains on. The control''s config (CC runs/kit/kit_A_ee_uug_me2_n100000_t8000_softpair/config.yaml
+      lines 73-78) has target_physics_factor=true, target_physics_dim_ref=qperp, target_physics_orders=true: the emission-scale
+      target, which already multiplies |M|^2 by the emission''s invariant scale. data.target_times_eikonal is applied at load
+      (experiment.py ~1808) before the physics factor (~2024), so the arm''s target is |M|^2 x (2pg.pu/s)(2pg.pu~/s) x the
+      qperp factor. That cancels the singularity twice: roughly x^+2 in the soft limit and y^+1 in the collinear one, several
+      decades outside bulk_train in the deep bins. That is the opposite of the flat target the design argues for. Fix: a CPU
+      dry run of the actual load (control config plus the flag) on the KIT strata, showing the final trained target per stratum
+      against bulk_train''s range. If the emission-scale factor has to go too, that is a second change against the control
+      and must be stated and argued. Check 5 (repeat / prior): the prior omits the finding of 2026-11-10T06:22 (tools/kit_target_slope.py
+      at 436952f2). It shows the parent''s emission-scale target, the one c15b3337 trains on, is already flat into both uug
+      limits: slope soft +0.000, collinear -0.029, deep-bin medians -1.21..-1.12 inside the bulk range [-4.24,-0.48]. The
+      prior also omits the plain target and inputs arm FA-ccin2p3-2642b17b (finding 2026-11-10T08:21). Together these already
+      answer this design''s question: the control fits a target that is flat and in range in both limits and still overshoots
+      +1.36 in the deepest collinear bin. So on uug the failure is not a power-law continuation of the target, which is the
+      design''s own NO reading. A new design must name these two results and say what an eikonal factor tests that they do
+      not. If nothing, record the uug target-side answer from the existing evidence and move to the input side (D411), with
+      no run. Checks that held: one flag against the matched control c15b3337 (HETEROSC, mu_mse, float64, same lr/steps/seed);
+      one seed under D315; yes/no/between stated; KIT strata as test events; cost ~1.5 GPU-h and ~75 MB, rate and readout
+      from c15b3337''s own setup.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
