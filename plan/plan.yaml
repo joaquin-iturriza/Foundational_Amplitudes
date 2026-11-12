@@ -23898,6 +23898,49 @@ entries:
       1, 2, 6-15 pass: the s6 configs differ from s4 only in offshell_stats and sweep_name; own/parent moved V/B val 0.25,
       0.45, 0.11 at fixed HPs; 8 trials in waves 3,3,2 as siblings; the s4 space minus layer_decay as the control; HETEROSC
       with mu_mse selection; the s4 readout from the same configs; 69 GB free on /sps/lpnhe for 3 small fine-tunes.'
+  - at: '2026-11-12T11:32:27+00:00'
+    question: 'Step 5: after the space fix the t t~ one-loop V/B fine-tune is still 4.6-38x above scratch (s4: IMPROVED, NOT
+      RESOLVED). The s4 test (and stage 2) ran the one-loop fine-tunes with the parent''s off-shellness scale, although results.tex
+      (~l.9466-9476, diag_readout.py @5555a0f0) adopts offshell_stats own for one-loop fine-tunes ''from the next searches
+      on'' (s3 configs took it, 94c460b6): s4 held stage 2''s configs fixed and so departed from that adoption, and gen_data_saving''s
+      default stayed parent (now own, fa846b4d). Question: how much of the remaining V/B gap does that departure explain,
+      i.e. does the own scale at the fixed space bring the V/B fine-tune to scratch? Whether to use own is settled in writing;
+      this feeds whether the one-loop L(D) fine-tune arm can be redone now (CLOSES) or the path needs the next suspect first.'
+    prior: '(1) s4 (s4_readout.py @bf6f1712): V/B new-space fine-tune best val MSE(ln(V/B)) 1.91e-5, 3.97e-7, 7.38e-8 at D=316,
+      1e3, 3162 = 38, 5.7, 4.6x scratch; D=316 best val at the first checkpoint, train to 4e-10. (2) Off-shellness diagnostic
+      (stage2_diag_readout.json, runs dsave_diag_offown, old template, fixed HPs): own/par val 0.25, 0.45, 0.11, 3.48 at D=316..1e4;
+      against the original search best 0.25, 0.57, 0.31 (gmean 0.36); test 0.17, 0.14, 0.09, 0.65; t t~ LO own worse (gmean
+      1.98), so trees keep parent; results.tex adopts own for one-loop. (3) tp3 probes (results.tex ~l.13945-13950): refitting
+      the off-shellness input cost 1.3-2.1x where the probe''s off-shellness differs from the parent''s, neutral on ee->ttbar
+      (0.96). (4) Null-parent: fresh init through the same path 2.1-97x scratch on V/B: the path. (5) Not yet read: one-loop
+      mass_stats own suspect configs sweep/sweep_config_dsave_diag_massown_ft_ee_ttbar_nlo_d{5..8}_t8500.yaml (7d56534c),
+      no recorded runs. Searched results.tex (off-shell, offshell_stats, mass_stats, search-to-search), the entry''s findings
+      and dead ends, sweep/, site decisions D373-D412.'
+    measure: 'Per search the best val mu-MSE in ln(V/B) units over its trials (the objective, best-mu checkpoint); per cell
+      r_s4 = new best / s4 best (same space, parent scale), r_scr = new / stage-2 scratch best; G = gmean r_s4 over the 3
+      cells. Beside: test MSE, each best''s val and train curves against s4 and scratch (figure), failed trials listed apart.'
+    check: 'Existing runs move with exactly this switch on this target: own/par val 0.25, 0.45, 0.11 at D=316, 1e3, 3162 (same-HP
+      pairs), 0.25, 0.57, 0.31 against the original search best (gmean 0.36). Noise (diag par_over_orig, same HPs, stage2_diag_readout.json):
+      1.00, 1.26, 2.94 at these D, 3.30 at 1e4; pooled over both targets 0.46-4.84 (results.tex ~l.9472), per-cell ln-sd ~0.6-1.1;
+      for a 3-cell gmean of best-of-8 over best-of-8 the ln-sd is ~0.35-0.65, so the HELPS bar is G <= 1/3 (ln -1.1, ~1.7-3
+      sd from 1), and the null band is read as not resolved, not as a change. The expected G ~0.23-0.36 sits at the bar: a
+      NOT RESOLVED read is a real possibility and is a branch, not a rerun.'
+    fixed: 'The s4 V/B configs (sweep/sweep_config_dsave_s4_ft_ee_ttbar_nlo_d{5,6,7}_t8500.yaml @10a63eea) with one change,
+      fine_tune.offshell_stats own (configs sweep/sweep_config_dsave_s6_ft_ee_ttbar_nlo_d{5,6,7}_t8500.yaml from gen_data_saving.py
+      --stage s6 --ft-space scratch --offshell-nlo own, diffed: only sweep_name and offshell_stats): parent dsave_parent_treesin_r4,
+      T=8500, stage-2 pools and first-D events, target_stats own, layer_decay 1, lr_scale [1/3,3], seed 42, heterosc_select
+      mu_mse + sigma stage, 8 trials waves 3,3,2. The one code commit since 10a63eea touching the model, model.input_route_off
+      (5d509b13), is off by default (checked before submission in the run''s config.yaml).'
+    control: The s4 searches of the same cells (parent scale, same space), best against best; stage-2 scratch beside (r_scr).
+    seeds: Seed 42, one 8-trial search per cell as every sibling (D315); 3 x 8 = 24 trials, 6.9 GPU-h (s4's identical configs
+      ran ~1 h wall), under D412's 30.
+    outcome: 'Every result has one branch, checked in this order. CLOSES: r_scr <= 3 in every cell: the departure from the
+      own adoption was the remaining V/B gap; next: the t t~ V/B L(D) fine-tune arm is redone with own and the fixed space
+      (a costed batch of its own). Otherwise by G alone: HELPS: G <= 1/3: own explains part of the gap; it stays (as adopted),
+      next design reads the mass_stats own suspect (massown configs) on top. NOT RESOLVED: 1/3 < G < 1: within the noise;
+      own stays (adopted in writing on the test measure, 0.19), next design the same massown read. NO CHANGE: 1 <= G < 3:
+      the departure explains none of the gap; own stays per the written adoption, next the massown read. WORSE: G >= 3: own
+      hurts at the fixed space; report against the written adoption to Joaquin with both reads. No rerun of any search (D315).'
   step_waits:
     '4': detach s5_ft_ttx_LD DONE event (drive.py over the 7 dsave_s5_ft_epem_ttx searches, 56 trials, waves 3,3,2)
     '5': 'a reviewer: design-reviewer on the V/B offshell-own design (recorded 12:29 CET)'
