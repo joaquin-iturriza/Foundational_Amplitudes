@@ -105,6 +105,8 @@ def main():
                     print(f"{cell} {arm} {centre}: no trials with curves ({name})")
                     continue
                 S[centre] = summary(g)
+                if len(g) > 8:   # D427 test: the same search read at its first 8 trials (trial_NNNN = issue order)
+                    S[centre]["first8"] = summary(sorted(g, key=lambda r: r["run_dir"])[:8])
                 S[centre]["failed"] = failed(name)
                 best[(cell, arm, centre)] = min(g, key=lambda r: r["val_min"])
             for centre, s in S.items():
