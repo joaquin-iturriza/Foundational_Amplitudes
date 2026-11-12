@@ -25582,6 +25582,7 @@ entries:
     '5': '2026-11-13'
     '9': FA-ccin2p3-62dcf910 FA-ccin2p3-bf3d593c FA-ccin2p3-8d1429bf
     '12': FA-ccin2p3-d322922b
+    '13': design-reviewer a92960393f8855689 (re-check of the revised inputs-only design)
   handoff:
     state: '2026-11-12 ~10:20. E5849 fixed (write_own_alphas registered store_tag pools wrongly: 286c0183, 248594f0; 278 alpha_s
       sidecars written on CC); re-smoke FA-ccin2p3-fc0c4eed, parents 63543723/24 re-pointed afterok:63560193 (scontrol via
