@@ -34,7 +34,12 @@ ARMS = {"rezero": {"ee_uug_me2": "kit_A_ee_uug_me2_n100000_t8000_softpair_rezero
         # (input_route_off=frames), off-shellness (data.offshell_zero)
         **{a: {"ee_uug_me2": f"kit_A_ee_uug_me2_n100000_t8000_softpair_{a}",
                "ee_tt_virt_finite": f"kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr_{a}"}
-           for a in ("nolocal", "noframes", "nooffshell", "noframesoff")}}
+           for a in ("nolocal", "noframes", "nooffshell", "noframesoff")},
+        # step 11d (log-skip design PASS 2026-11-12): uug on the plain log10|M|^2 target, its control and the skip arm;
+        # tt virtual: the skip on softpairthr
+        "plain": {"ee_uug_me2": "kit_A_ee_uug_me2_n100000_t8000_softpair_plain"},
+        "plain_logskip": {"ee_uug_me2": "kit_A_ee_uug_me2_n100000_t8000_softpair_plain_logskip"},
+        "logskip": {"ee_tt_virt_finite": "kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr_logskip"}}
 # figure sets: kit_extrap_<proc> (the earlier arms) and kit_extrap_route_<proc> (the one-route cuts)
 SETS = {"": (("rezero", "D-", "orange", "ReZero"), ("thr", "v-", "purple", r"$\beta$ input"),
              ("scalars", "P-", "sky", "transformer, MLP inputs")),
@@ -42,7 +47,9 @@ SETS = {"": (("rezero", "D-", "orange", "ReZero"), ("thr", "v-", "purple", r"$\b
                    ("noframes", "v-", "purple", "no attention frames"), ("nooffshell", "X-", "grey", "no off-shellness")),
         # step 10: the frames cut and the off-shellness cut together (local momenta kept)
         "double_": (("noframes", "v-", "purple", "no frames"), ("nooffshell", "X-", "grey", "no off-shellness"),
-                    ("noframesoff", "D-", "orange", "neither"))}
+                    ("noframesoff", "D-", "orange", "neither")),
+        "logskip_": (("plain", "D-", "orange", "plain target"), ("plain_logskip", "v-", "purple", "plain + skip"),
+                     ("logskip", "v-", "purple", "skip"))}
 
 SITE = r'''
 import glob, json, os, sys
@@ -93,7 +100,8 @@ def plot(path, figs):
     from tools.kit_figures import family, edges, XLAB, PROC
     d = json.load(open(path))
     for (proc, e), (fs, arms) in ((pe, st) for pe in d.items() for st in SETS.items()):
-        if fs and f"transformer_{arms[-1][0]}" not in e:   # a set is drawn once its last arm has run
+        mine = [a for a, *_ in arms if proc in ARMS[a]]
+        if fs and (not mine or any(f"transformer_{a}" not in e for a in mine)):   # drawn once its arms have run
             continue
         panels = ps.panels(len(FAMS[proc]))
         for (fig, ax), fam in zip(panels, FAMS[proc]):
