@@ -15785,7 +15785,7 @@ entries:
   match: zz_redesign_*
   evidence:
     runs: []
-    commit: 7713be74
+    commit: 0b4bbd63
     paths:
     - .claude/hooks/notification_absorb.py
     - .claude/hooks/owner_handoff.py
@@ -15845,6 +15845,12 @@ entries:
       83 of 94 hand-backs 11-10..11 recognised (the 11 others, all 11-10 before 10:30, carry no [Subagent hand-back] header:
       peer messages, pass by design); 0 of 257 other prompts recognised; spool() opens an event with a stub site. tests/test_handback_batch.py
       6/6 (hook-form case added; one failure in 5 runs, not reproduced).'
+    - '2026-11-12 restore of CC pools deleted 2026-11-11: check_site_data --list on CC: missing train pools H1 62, H2 218,
+      H2p5 38, H3 278 (1e4 copies only, recipe 1e5), H5 28, H6 8, H7E 34, H7c 34; PP4 504 (494 series-built + 10 one-run part
+      processes); dsh_eea 115 (parts kept, 115/115 complete, 3.06 GB). HD4/HD5 train/val missing was a false report (n=0 in
+      the recipes), fixed 79644e86 and confirmed on CC. Fixes 131a0fea (lhe_parts re-assembles pools gone, test), 679b856a
+      (regen MadEvent dirs on TMPDIR), 0b4bbd63 (catalog_v4_pp4_restore.yaml); parts queue zz_redesign_pp4_parts planned (12
+      processes, est 6.8 core-h). Design FIX once, revised; incident I-a13b58f9 resolved, E5536 acked.'
     - analysis/agent_redesign/agent_tasks.json
     - analysis/agent_redesign/context_breakdown.json
     - analysis/agent_redesign/figs/context_breakdown.png
