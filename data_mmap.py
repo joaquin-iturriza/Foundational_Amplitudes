@@ -885,6 +885,10 @@ def init_data_recipes_mmap(exp, c):
         fdir = os.path.join(d, "feat_" + _hash(fkd))
         if not os.path.exists(os.path.join(fdir, "meta.json")):
             if not prebuild:
+                if cfg.get("run_dir"):          # what this run hashed, to diff against <fdir>/meta.json's key_doc
+                    os.makedirs(cfg.run_dir, exist_ok=True)
+                    with open(os.path.join(cfg.run_dir, "memmap_feat_key_doc.json"), "w") as f:
+                        json.dump(fkd, f, indent=1)
                 raise RuntimeError(f"data.memmap: the cache {d} has no derived inputs for this run's target factor / "
                                    f"off-shellness ({fdir}); build them with a CPU prebuild job first: {rebuild}")
             nb = meta["N"] * (8 + 4 * len(exp._internal_mass_pdgs))
