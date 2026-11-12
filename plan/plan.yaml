@@ -16207,9 +16207,9 @@ entries:
       FA-ccin2p3-d7ae9889 FA-ccin2p3-afa3c959 FA-ccin2p3-3a3b0003 FA-ccin2p3-4484c44d '
   owner:
     agent: a3d362cbafc652839
-    state: working
+    state: stopped
     since: '2026-11-12T01:17:22+00:00'
-    state_at: '2026-11-12T01:55:38.743000+00:00'
+    state_at: '2026-11-12T01:57:50.572000+00:00'
     context: 248585
     context_at: '2026-11-12T01:55:44+00:00'
   designs:
@@ -21336,9 +21336,9 @@ entries:
     - 9
   owner:
     agent: a0ffaf4de4b7f54ac
-    state: working
+    state: stopped
     since: '2026-11-12T01:31:29+00:00'
-    state_at: '2026-11-12T01:57:08.933000+00:00'
+    state_at: '2026-11-12T02:01:05.122000+00:00'
     context: 206313
     context_at: '2026-11-12T01:55:48+00:00'
   step_why:
@@ -24272,9 +24272,9 @@ entries:
     decision: D401
   owner:
     agent: a2021b8418347ee24
-    state: working
+    state: stopped
     since: '2026-11-12T01:17:18+00:00'
-    state_at: '2026-11-12T01:20:33.826000+00:00'
+    state_at: '2026-11-12T01:58:19.797000+00:00'
     context: 270339
     context_at: '2026-11-12T01:55:59+00:00'
   findings:
