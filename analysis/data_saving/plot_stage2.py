@@ -40,10 +40,16 @@ def cells(tg, a, key="test"):
     return sorted((c for c in R["cells"] if c["target"] == tg and c["arm"] == a and c.get(key)), key=lambda c: c["D"])
 
 
+def tex_level(x):
+    m, e = f"{x:.1e}".split("e")
+    return rf"$10^{{{int(e)}}}$" if m == "1.0" else rf"${m}\times10^{{{int(e)}}}$"
+
+
 def ld(gpu, panels=T, key="test", name="stage2_LD"):
     fig, axs = ps.figure(ncols=2, nrows=len(panels) // 2)
     for n, (ax, (tg, lab, ylab)) in enumerate(zip(axs.ravel(), panels)):
         f = R["fits"].get(key, {}).get(tg)
+        lv = tex_level(f["level"]) if f else None    # the readout level: max(1e-4, the lowest both arms reach), D373
         for a, (name_, col, m) in ARM.items():
             cc = cells(tg, a, key)
             x = [c["search_gpu_h"] for c in cc] if gpu else [c["D"] for c in cc]
@@ -55,9 +61,9 @@ def ld(gpu, panels=T, key="test", name="stage2_LD"):
                         label=r"fit $A D^{-\alpha}+L_\infty$" if a == "scr" else None)
                 if np.isfinite(f["log10_Dstar"][a]):
                     ax.plot([10 ** f["log10_Dstar"][a]], [f["level"]], marker="v", linestyle="none", color=col,
-                            label=r"where the fit crosses $10^{-4}$" if a == "scr" else None)
+                            label=f"where the fit crosses {lv}" if a == "scr" else None)
         if f:
-            ax.axhline(f["level"], color=ps.C.grey, linestyle=":", label=r"$10^{-4}$")
+            ax.axhline(f["level"], color=ps.C.grey, linestyle=":", label=lv)
         ax.set_xscale("log")
         ax.set_yscale("log")
         ax.set_xlabel("search GPU-h" if gpu else r"$D$")
