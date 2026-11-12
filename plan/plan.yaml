@@ -21088,9 +21088,9 @@ entries:
     - 7
   owner:
     agent: ae6f048973934c6c3
-    state: working
+    state: stopped
     since: '2026-11-12T00:31:29+00:00'
-    state_at: '2026-11-12T00:31:40+00:00'
+    state_at: '2026-11-12T00:50:51+00:00'
     context: 187867
     context_at: '2026-11-12T00:43:40+00:00'
   step_why:
