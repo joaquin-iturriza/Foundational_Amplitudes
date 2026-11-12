@@ -15798,7 +15798,8 @@ entries:
   notes_ref: null
   match: zz_redesign_*
   evidence:
-    runs: []
+    runs:
+    - FA-ccin2p3-046cc7d3
     commit: 9edb252f
     paths:
     - .claude/hooks/notification_absorb.py
