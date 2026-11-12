@@ -23640,9 +23640,9 @@ entries:
   asks: []
   owner:
     agent: a87ebdd2344eb92d7
-    state: working
+    state: stopped
     since: '2026-11-12T00:02:58+00:00'
-    state_at: '2026-11-12T01:30:46.451000+00:00'
+    state_at: '2026-11-12T01:32:48.415000+00:00'
     context: 228863
     context_at: '2026-11-12T01:17:10+00:00'
   designs:
