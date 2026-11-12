@@ -21321,9 +21321,9 @@ entries:
     - 9
   owner:
     agent: a0ffaf4de4b7f54ac
-    state: working
+    state: stopped
     since: '2026-11-12T01:31:29+00:00'
-    state_at: '2026-11-12T01:31:29+00:00'
+    state_at: '2026-11-12T01:51:50.429000+00:00'
   step_why:
     7:
       feeds: S at 1e-4 per target from parents with the physical-mass tops (D400)
