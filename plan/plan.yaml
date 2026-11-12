@@ -25219,6 +25219,34 @@ entries:
       one of two: not resolved. (C) as at 18:05: WSD bests good >= 3 of 4 and pooled WSD/s2 <= 2.24 HELPS; <= 2 good NO (kept
       under D423); pooled > 2.24 WORSE, to Joaquin. Diverged trials listed apart (D398); nothing further is run on NO or not
       resolved.'
+    fix_at: '2026-11-12T19:05:20+00:00'
+    fix: '(1) Search layout (D245, template comment ''any trial count'': start-up = n_trials/3, then TWO sequential batches
+      covering the rest): waves 3,3,2,4,4,4 are six waves, four guided batches, for both the extended WSD searches and the
+      fresh wide ones, with no stated reason. Fix: the 12 added WSD trials in two batches (6,6), the wide searches matched
+      at 3,3,2,6,6, and the design states the remaining difference from D245 (3 start-up of 20, inherited because the WSD
+      searches are continued; the wide ones keep 3 to stay matched to their control) and the wall time it gives (5 waves at
+      about 0.25 h of work each). (2) The measure''s first-8 cut is wrong: lr_centre_readout.py line 109 sorts by run_dir
+      ''trial_NNNN = issue order'', but NNNN is the DyHPO candidate index (hp_idx), not issue order (dsave_wsd_scr_epem_ttx_d7_t8500:
+      trial_1126 was issued first, trial_idx 0; trial_0124 second). Fix: order by trial_idx (RESULT_JSON or driver_state order)
+      and commit it. Also the readout''s verdict compares every variant only to the stage-2 control; (B) wide@20 against WSD@20
+      and (C) WSD''s first 8 against stage-2 are not computed yet; commit that extension (and fix line 41''s ''opened downward'')
+      before the run, name the commit in the design. (3) The running driver (pid 346550) still drives the four withdrawn batch-searching
+      template-2 searches (dsave_tmpl2_*: 12 trials submitted, 9 not yet observed, 8 trials each by default). Under D426 they
+      are forbidden; the design must cancel them and relaunch the driver with the WSD searches at --n-trials 20 plus the wide
+      ones only, and count what tmpl2 already spent next to the 24.2 GPU-h (D412''s 30). (4) Prior (check 5, searched ''trial
+      count'', ''n_trials'', ''lr_scale'', ''layer_decay'', ''running best'' in docs/results.tex): the Muon fine-tune HP search
+      (results.tex ~l.7578, muon_hp_ft.py @feaaedbb: lr_scale [0.1,10] x layer_decay [0.75,1], 12 trials; best 0.343 / 0.825,
+      inside both windows, not at an edge; 10 of 12 trials within 6%) is prior work on whether these fine-tune windows are
+      wide enough, not named; add it and how it fits the hp_ranges_readout edge read (different catalog, objective over 16
+      cells). (5) Outcome (B) leaves Joaquin''s val criterion (''If the val loss is better than any other, why would I care
+      it''s jittery?'') unhandled: wide best >3.13x lower val but not good is read NO (''ranges not the missing axis''), and
+      HELP admits a wide best up to 3.13x higher val. State the verdict for each of: wide lower val beyond 3.13 good/bad,
+      within 3.13 good/bad, higher beyond 3.13. Checks that hold: trial-count effect confirmed in trial_count_readout_jeanzay.json
+      (best@8/best@N median 1.26, 7 of 23 at final at n=8, 17 of 19 at n=20); lr_scale Spearman on separation -0.36, scratch
+      lr -0.30 (hp_ranges_readout.json); step rate from the WSD searches'' own first trials (8500 steps in 12.0-12.4 min at
+      0.083-0.086 s/step on V100, about 0.23 GPU-h per trial with sigma stage, consistent with 0.275); disk 15 MB per trial
+      against 65 GB free on /sps/lpnhe; HETEROSC; wide config differs from WSD only in the two ranges and DyHPO seed (stated);
+      trial count raised under D427.'
   step_waits:
     '3': bbx_zz_lo_scr3, bbx_zz_lo_ft drivers (detach events)
     '4': detach bbx_zz_lo_ft (LO fine-tune driver; its FA DONE event)
