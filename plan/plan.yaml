@@ -16964,6 +16964,16 @@ entries:
       df unreadable goes); tests/test_run_done_waiter.py S (reload on mtime change). Not tested: the reload live (the running
       supervisor predates it, one restart by the main session needed), lxplus EOS df, sweep_manager submissions (they do not
       pass site submit''s check), site pick does not use free disk.'
+  - at: '2026-11-12T00:09:43+00:00'
+    text: '2026-11-12 step 23: absorb.log shows 15 hand-backs 20:03-23:50 UTC 2026-11-11 all spooled (waiter_alive=True) and
+      each HANDBACK event acked ~10 min after arrival: the 10-minute window works, but hand-backs came 8-25 min apart, so
+      it merged only 20:03+20:05; STALLED/RUN arrivals ended windows early. Waiter changed: only RUN, GAP, OVERRUN, ALERT
+      end a window at once (URGENT_KINDS), any other kind waits it out (test_run_done_waiter B: STALLED held, RUN ends it).
+      Replay tools/waiter_replay.py over 20:00-24:00 UTC (44 events open >5 s: 16 HANDBACK, 10 DONE, 10 RUN, 6 RUN_DONE, 2
+      STALLED): waiter returns with no batch 35, old rule 20, new rule 20 at 600 s; 15 at 1200 s, 13 at 1800 s, 11 at 3600
+      s. So on that traffic the new rule cuts nothing more; a cut beyond 20 needs a longer window than D324''s 10 minutes
+      (Joaquin''s call) or fewer urgent RUN events reaching the main session (10 RUN events with notes, owners'' runs). Live
+      measure pending: the waiter loads the new code at its next re-arm.'
   handoff:
     state: '2026-11-11: D399 setup fixes merged into trunk 6ec67a05 and pushed (keeper PASS at d56fb00b after 14 findings
       fixed; repo-reviewer PASS at 10ced0d3 after 2 fixes: undecide soft delete, waiter test runner). Out of repo, live: ~/work/CLAUDE.md
