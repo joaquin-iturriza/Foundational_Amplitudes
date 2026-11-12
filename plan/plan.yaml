@@ -22517,6 +22517,23 @@ entries:
       Launch: site submit ccin2p3 FA scripts/job_zero_shot_parent.sh --env PARENTS=runs/data_saving/dsave_parent_heldout_r4,runs/data_saving/dsave_parent_heldout_r5
       --env PROBE_RECIPES=... --env ZS_ALLOW_PHYSICS_MISMATCH=''u u~ card MT 173, process has no top'' --hdr=--time=01:00:00;
       ~0.3 GPU-h under D400.'
+    fix_at: '2026-11-12T00:28:05+00:00'
+    fix: 'Holds: eval only, no training, so checks 1, 3, 9, 12 and 13 are moot. tools/zero_shot_parent.py writes mse_over_var
+      (line 269). The probes are the fine-tunes'' own val pools (check 10). About 0.3 GPU-h under D400. Fails: (1) Check 5
+      / evidence already in hand: the defect-hunt finding 2026-11-12T00:25 (item 4, ft_curves.py, D=3162) says the t t~ LO
+      fine-tune stays below scratch until ~7000 steps and both arms lead scratch by step 170. Item 5 shows train MSE 3e-10..3e-9
+      with val/train 18-884 against scratch 2.7-42. That already reads ''not a bad start, memorisation''. The design must
+      say what the zero-shot adds beyond those curves, and how a t t~ relative zero-shot >= 0.5 could mean ''the head start
+      is absent'' when the fine-tune measurably led scratch for 7000 steps. Fix: either drop the read and go to the regularisation/horizon
+      design the curves point to, or restate the question as one the curves leave open (e.g. whether the start is good at
+      small D only, with the D=316/1e3 curves beside) and make the outcome consistent with them. (2) Check 4 / outcome does
+      not cover every result: only ''t t~ >= 0.5 and u u~ <= 0.1'' and ''both well below 1, t t~ within 3x of u u~'' are named.
+      Unassigned: t t~ in (0.1, 0.5) at more than 3x u u~; u u~ > 0.1; r4 and r5 disagreeing; mse (parent stats) and q_aff
+      (affine refit) disagreeing. Fix: name the primary of the two maps, and give a yes / no / inconclusive rule that covers
+      every value, with what each changes. Note on check 15: PROBE_RECIPES is a new launch path (52d02993). The job is short,
+      but it runs both parents with two probes each; say what its log must show (each probe scored, the physics check passing
+      on t t~) before the result is read. Searched: results.tex (zero_shot_parent, H3, zero-shot, sec:ladder transfer), the
+      entry''s 2026-11-12 findings, site decisions D400.'
   step_waits:
     '7': FA-ccin2p3-35922ca9 FA-ccin2p3-adbd0552
     '8': the main session's read of the defect hunt (its 'before more arms'); then launched as designed
