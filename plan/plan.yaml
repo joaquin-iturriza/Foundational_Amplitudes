@@ -25186,6 +25186,18 @@ entries:
     text: '2026-11-12 ~16:50: the draft''s second data-saving example is ONE new process (not ee->uu, not tt) at LO and one-loop
       V, both arms, run tonight (D413, and Joaquin: ''You pick one process, any process, at LO and V, it''s not complicated.'');
       ee->uu V was wrongly offered as the second example: ee->uu LO+V is the first.'
+  - at: '2026-11-12T14:47:08+00:00'
+    text: '2026-11-12 16:47 CET: second example per Joaquin (''You pick one process, any process, at LO and V, it''s not complicated''):
+      b b~ > Z Z. One-loop V/B L(D) submitted under the passed design (14:43, PASS): detach bbx_zz_v_LD, sweep/drive.py over
+      sweep/sweep_config_dsave_s2_{scr,ft}_bbx_zz_nlo_d{2..8}_t*.yaml @79578039, CC, 14 searches, 112 trials, 21.3 GPU-h,
+      target 1.5 h. Deviation from the stage-2 one-loop grid: D=31623 dropped (D412; 15.5 of 36.8 GPU-h). Readout needs a
+      test_ln fit in stage2_readout.py (line ~181) and bbx_zz_nlo in TARGETS (stage2_readout.py:39, dstar_fit.py:92). LO arm
+      NOT yet designed: v4_bbx_zz is in both r4 parents'' recipes, so the LO fine-tune needs a new held-out parent = heldout_r4
+      recipe minus b b~ > Z Z''s equality class (check d d~/s s~ > Z Z, ee_ZZ = uubar_ZZ class) via recipes/gen_datasaving_parent.py
+      (now has another agent''s uncommitted edits), ~1.5 GPU-h (scripts/job_datasaving_parent.sh); an LO target recipe recipes/catalog_v4_datasaving_bbx_zz.yaml
+      (v4_bbx_zz with its catalog sampling, val/test pools) and T(D) (no LO calibration: take the V ladder''s T(D) as a stated
+      assumption, or the s4 tree default). Cost: LO at k=2..8 ~21 GPU-h: with the V batch 42 > 30, so LO at 5 points (k=2,4,5,6,7,
+      ~12.4 GPU-h) + parent 1.5.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
