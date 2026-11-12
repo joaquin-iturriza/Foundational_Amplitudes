@@ -26166,7 +26166,7 @@ entries:
     decision: D401
   owner:
     agent: a6b28beec18d559db
-    state: working
+    state: closed
     since: '2026-11-12T14:30:34+00:00'
     state_at: '2026-11-12T15:33:46.817000+00:00'
     context: 290102
@@ -26919,39 +26919,31 @@ entries:
     '11': FA-ccin2p3-54c78039 FA-ccin2p3-203a274f FA-ccin2p3-7b891d10 FA-ccin2p3-eb870ad4
     '12': FA-ccin2p3-203a274f FA-ccin2p3-7b891d10 FA-ccin2p3-eb870ad4
   handoff:
-    state: '2026-11-12 ~15:45. Step 10 double cut (frames + off-shellness; design PASS) running: tt virtual FA-ccin2p3-e1c19b4d
-      COMPLETED (not read), uug FA-ccin2p3-e8088a7d RUNNING; read both with tools/kit_extrap_read.py collect/plot (arm noframesoff,
-      figure set kit_extrap_double_<proc>) against the passed bands, then pick the KIT input set. Step 11 (Joaquin ~15:00
-      via coordinator): (a) DONE, finding 15:40 (uug collinear frames boost gamma 10.7 vs bulk max 10.2, tracks the overshoot;
-      tt Sudakov frames in range, so not the tt mechanism; local momenta in range everywhere), fig analysis/kit_benchmark/figs/kit_frames_boost_{a,b}.png.
-      (b) D415: Bakar''s slides 5-9 reproduced by tools/kit_bakar_figs.py @d14643c6 (figs analysis/kit_benchmark/figs/bakar/slide{5,6,7,8}*.png,
-      slide-9 table printed by plot). MUST re-collect (collect --out analysis/kit_benchmark/data/kit_bakar_figs.json, detached)
-      after the uug double-cut run ends: the JSON predates relabelling the tt ''mlp'' rerun as the logthr MLP (it has the
-      threshold column) and the noframesoff arms. Slides 1 (needs uncut flat phase space, not in the KIT file) and 12 (truth
-      validation table) have no model curve: not made. Deepest-bin log-MSE so far: uug soft/coll transformer 0.20/2.21, no
-      frames 1.0/0.16, our MLP rerun 0.062/0.058, his 0.325/0.108; uugg soft/qg/gg transformer 0.41/3.56/2.47, his 0.405/0.080/0.054;
-      tt Coulomb/Sudakov transformer(thr) 3.55/0.72, no frames 6.63/0.154, our logthr MLP rerun 0.81/0.052, his logthr 2.41/0.046;
-      uugg azimuth rms of h: truth 0.025 flat, transformer 4e-3..7e-3, MLPs 1e-5..4e-4. Figures looked at once: shapes as
-      these numbers. (c) coverage checked (finding 15:40): no one-loop top pair, no massive b in the parent. Design NOT yet
-      recorded: one-loop g g / d d~ > t t~ [virt=QCD] pools (no catalog entry exists; add like the signext virt entries in
-      recipes/gen_catalog_v4.py) drawn log_beta on [1e-5,0.6] and log sqrt(s) to 50 TeV, added to the r5 held-out parent (recipes/gen_datasaving_parent.py
-      variant like heldoutthr; scripts/job_datasaving_parent.sh T=4307), A_ft tt virtual vs ft_r5 and ft_thr; cite protocol
-      B (target''s own threshold events still missed Coulomb) as prior. (d) model.input_log_skip implemented @d14643c6 (repo-reviewer
-      passed); design recorded ~15:42, design-reviewer a9837bbf79a4c200f running. On PASS: plan target, smoke 50 steps on
-      uug (D395, tag softpair_logskip_smoke), then the two runs (uug tag softpair_logskip, tt softpairthr_logskip; commands
-      in the design''s fixed field); wire arm ''logskip'' in tools/kit_extrap_read.py ARMS and tools/kit_bakar_figs.py MODELS.'
-    decisions: 'Double cut read by its passed bands. Frames probe reads gamma = Lambda_00 and relative gamma of Lambda_i Lambda_j^-1
-      (the attention''s message transform). Skip coefficients come from the static property table (repo-reviewer: never the
-      per-event dimensionless mass column). Step 9 closed (D405 NO); the one-loop threshold pretraining is now Joaquin''s
-      11c and gets its own design. Figures are gitignored (force-added scan figs untracked).'
-    ruled_out: local momenta out of range (in range in every stratum); frames boost blow-up as the tt Sudakov cause (frames
-      in range there); LO threshold tops or the beta input as a Coulomb fix (D405)
-    running: FA-ccin2p3-e8088a7d (uug double cut); design-reviewer a9837bbf79a4c200f (log-skip design)
-    files: tools/kit_transformer_probe.py (--plot), tools/kit_bakar_figs.py, tools/kit_beta_coverage.py (--pdg), tools/kit_extrap_read.py
-      (noframesoff, double_ set), tools/kit_threshold_scan.py (--runs), wrappers.py (_log_skip), config/model/lloca.yaml (input_log_skip),
-      tests/test_input_reps.py, analysis/kit_benchmark/data/kit_frames_probe_{uug,ttvirt}.json, kit_bakar_figs.json, kit_loop_cov_heldout_{top,bottom}.json,
-      kit_threshold_scan.json; figs kit_frames_boost_*, bakar/, kit_threshold_scan_d405*
-    written: '2026-11-12T14:18:40+00:00'
+    state: '2026-11-12 ~18:00. Bakar''s slides (D415) corrected and handed back (tools/kit_bakar_figs.py @cc54583f; slide
+      8 string-sorted strata fixed). Double cut read (finding ~16:40): moot now, Joaquin decided the KIT models keep full
+      LLoCa (no route cuts; step 10 dropped). Running: log-skip runs (design PASS 14:39) 203a274f uug plain-target control,
+      7b891d10 uug plain+skip, eb870ad4 tt softpairthr+skip; read with tools/kit_extrap_read.py collect/plot (arms plain,
+      plain_logskip, logskip; set logskip_) and kit_figures/kit_readout, against the design''s bands. 11c one-loop tt pretraining
+      (design PASS ~15:00, two pairs: r5thrloop vs ft_thr, r5thrloopbeta vs ft_thrbeta, ~16.5 GPU-h): probe rerun 8717848b
+      passed kit_loop_pool_check (beta to 1e-5, 15-27% per decade, |V/B| slope -0.90/-1.09); full generation FA-ccin2p3-54c78039
+      running (CPU). Next on it: kit_loop_pool_check on the built pools (no --tag ''probe'' now; pools are under final names),
+      D395 50-step smoke of job_datasaving_parent.sh heldoutthrloop, then both parents (r5thrbeta was r5thr + model.input_pair_threshold=true:
+      copy 66a2efda''s submit args, note in runs.db) and the A_ft fine-tunes as bf3d593c/8d1429bf with KIT_PARENT the new
+      parents, then threshold scan. Step 12 (weak spots with full LLoCa): frames gamma bound knob model.net.frames_gamma_max
+      committed @da59ef1b (passthrough to lloca LearnedPDFrames gamma_max, hard clamp; tests/test_input_reps.py passes, no
+      dedicated test yet; CC''s lloca version not checked to have gamma_max) - needs its design (uug+uugg softpair vs c15b3337/c364a7ae,
+      G~4) and review; lightlike-tops guess for tt Sudakov to test eval-only.'
+    decisions: 'KIT models keep full LLoCa (Joaquin 2026-11-12, decision recorded by the main session): no frames/local/off-shellness
+      cuts. One-loop top pools store MadLoop''s own finite part (no_shift, D111); the virt sampler now takes the recipe entry''s
+      sqrts_measure (20a1b3e6). Slide 8 shows his evaluate.py curves only, reruns in the table.'
+    ruled_out: route cuts as the KIT fix (Joaquin); log_beta via the one-loop table entry's measure (defect, fixed)
+    running: FA-ccin2p3-203a274f, 7b891d10, eb870ad4 (log skip); FA-ccin2p3-54c78039 (11c generation, CPU)
+    files: tools/kit_bakar_figs.py, tools/kit_extrap_read.py, tools/kit_loop_pool_check.py, recipes/gen_datasaving_parent.py,
+      recipes/catalog_v4_loops_kit.yaml, recipes/catalog_v4_datasaving_{looptt_train,looptt_probe,parent_heldoutthrloop}.yaml,
+      scripts/job_datasaving_parent.sh (heldoutthrloop), tools/nlo_virtual_pipeline.py (--sqrts-measure, no_shift), datagen.py,
+      models/lloca.py + config/model/lloca.yaml (frames_gamma_max), analysis/kit_benchmark/data/kit_extrap.json, kit_bakar_figs.json,
+      kit_loop_pool_check_probe{,2}.json
+    written: '2026-11-12T15:36:32+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
