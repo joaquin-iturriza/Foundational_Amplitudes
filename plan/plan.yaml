@@ -21348,10 +21348,7 @@ entries:
   - D360
   - D377
   - D407
-  next:
-    4: 'Redo the e+e- > t t~ LO fine-tune L(D) arm with the fixed fine-tune space (design 2026-11-12 12:25: 7 new 8-trial
-      searches dsave_s5_ft_epem_ttx_d{2,3,4,6,8,9,10}, s4''s D=316/3162 reused, 26.3 GPU-h), then read S = D*_scr/D*_ft at
-      1e-4 (dstar_fit.py) with the L(D) figure'
+  next: null
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -23949,10 +23946,7 @@ entries:
       The prior now cites the written own adoption (results.tex ~9468-9476) with the s4 departure and the gen default fixed
       at fa846b4d, the tp3 refit result (~13945-13950), and the unread massown configs (7d56534c). HETEROSC, the s4 coupled
       space, 8 trials in waves 3,3,2 as siblings, 69 GB free on /sps/lpnhe, rates and readout from s4''s identical configs.'
-  step_waits:
-    '4': 'CC sync blocked: two untracked kit_benchmark files in the CC checkout (analysis/kit_benchmark/data/kit_sat_{ttvirt,uug}_scalars.json)
-      differ from their committed versions at dddeacff, so git refuses the merge; their owner (kit_benchmark) or the main
-      session clears them, then the owner restarts drive.py over the 7 dsave_s5_ft_epem_ttx configs @23664d71'
+  step_waits: {}
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
@@ -24824,13 +24818,6 @@ entries:
       data/{ft_hpo_diag.json,nullparent_readout.json,nullparent_runs_read.json}, figs/{ft_hpo_diag_*,nullparent_LD,nullparent_curves_*},
       sweep/gen_data_saving.py, sweep/sweep_config_dsave_s4_ft_*_t8500.yaml
     written: '2026-11-12T10:11:07+00:00'
-  step_why:
-    4:
-      feeds: 'the entry''s answer for held-out tree targets: how much e+e- > t t~ LO data pretraining saves at 1e-4'
-      if:
-      - 'S band above 1: report the saving on t t~ LO, then the same redo for u u~ LO is not needed (its old fine-tune already
-        0-0.4x scratch)'
-      - 'S band contains 1: report no data saving on t t~ LO at the current setup, against sec:ladder''s earlier gap'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
