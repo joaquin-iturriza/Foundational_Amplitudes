@@ -13,6 +13,7 @@ training (bulk_train), and the error it makes there. Per event (n per stratum, e
 and the dtypes. Per stratum: medians and maxima, and feat over bulk_train's 99.5% quantile.
 
     python tools/kit_transformer_probe.py <run_dir> [--n 200] [--out <json>]    (CPU, in the site checkout; prints KITPROBE <json>)
+    python tools/kit_transformer_probe.py --plot <uug json> <tt json> --figs <dir>   (local: the frames-boost figure)
 """
 import argparse
 import json
@@ -36,7 +37,39 @@ def sij_over_s(p):
     return m2(q) / m2(p[:, 0] + p[:, 1])[:, None]
 
 
+def plot(paths, figs):
+    """kit_frames_boost_{a,b}: per stratum median log10 gamma of the frames (solid) and of their relative transforms
+    (dashed) against the stratum's distance variable, uug collinear y and soft x (a), tt virtual sqrt s (b); the grey band
+    is bulk_train's median to maximum of gamma, the dotted line its maximum of the relative gamma; signed error beside"""
+    import plot_style as ps
+    from tools.kit_figures import edges
+    ps.use()
+    panels = ps.panels(2)
+    for (fig, ax), path, fams in zip(panels, paths, ((("coll_y", ps.C.vermillion, "collinear $y$"),
+                                                       ("soft_x", ps.C.blue, "soft $x$")),
+                                                      (("sudakov_sqrts", ps.C.vermillion, r"$\sqrt{s}$ [GeV]"),))):
+        d = json.load(open(path))["strata"]
+        tr = d["bulk_train/bulk"]
+        ax.axhspan(tr["gam_median"], tr["gam_max"], color=ps.C.grey, alpha=0.25, lw=0, label=r"bulk train $\gamma$")
+        ax.axhline(tr["gamrel_max"], color=ps.C.grey, ls=":", lw=1, label=r"bulk train max rel. $\gamma$")
+        for fam, c, lab in fams:
+            ks = sorted((k for k in d if k.startswith("hard_test/" + fam)), key=lambda k: edges(k.split("/")[1])[0])
+            x = [np.sqrt(np.prod(edges(k.split("/")[1]))) for k in ks]
+            ax.plot(x, [d[k]["gam_median"] for k in ks], "o-", color=c, label=r"$\gamma$, " + lab)
+            ax.plot(x, [d[k]["gamrel_median"] for k in ks], "s--", color=c, label=r"rel. $\gamma$, " + lab)
+        ax.set_xscale("log")
+        from matplotlib.ticker import NullFormatter
+        ax.xaxis.set_minor_formatter(NullFormatter())      # the sqrt s axis spans ~1 decade: minor labels overlap
+        ax.set_xlabel("distance variable of the stratum")
+        ax.set_ylabel(r"median $\log_{10}\gamma$ of the frames")
+        ps.legend(ax, "upper right" if "uug" in path else "upper left")
+    ps.save_panels(panels, os.path.join(figs, "kit_frames_boost"))
+
+
 def main():
+    if "--plot" in sys.argv:
+        i = sys.argv.index("--plot")
+        return plot(sys.argv[i + 1:i + 3], sys.argv[sys.argv.index("--figs") + 1])
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("run_dir"); ap.add_argument("--n", type=int, default=200); ap.add_argument("--out")
     a = ap.parse_args()

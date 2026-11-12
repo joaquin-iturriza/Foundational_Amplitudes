@@ -166,6 +166,37 @@ def test_route_off():
     assert not torch.equal(a, b), "route_off=local: the frames carry no momentum"
 
 
+def test_log_skip():
+    """input_log_skip: Lorentz invariant, changes the output, and equals the sum written out pair by pair."""
+    import wrappers
+    p, ptr = _events(1)
+    L = _lorentz(2)
+    for thr in (False, True):
+        w = _wrapper(input_pair_logs=5, input_log_skip=2, input_pair_threshold=thr)
+        a, b = _out(w, p, ptr), _out(w, p @ L.T, ptr)
+        assert float((a - b).abs().max() / a.abs().max()) < 1e-7, "log skip: not Lorentz invariant"
+    w0, w = _wrapper(input_pair_logs=5), _wrapper(input_pair_logs=5, input_log_skip=2)
+    assert float((_out(w, p, ptr) - _out(w0, p, ptr)).abs().max()) > 1e-6, "log skip does not change the output"
+    types = torch.randn(p.shape[0], 16, dtype=torch.float64)
+    head = torch.nn.Linear(16, 6).double()
+    eta = torch.tensor([1.0, -1, -1, -1], dtype=torch.float64)
+    h = head(types).detach()
+    for thr, e in ((t, e) for t in (False, True) for e in range(len(ptr) - 1)):
+        got = wrappers._log_skip(p, ptr, types, 5, head, thr)
+        q, he = p[ptr[e]:ptr[e + 1]].double(), h[ptr[e]:ptr[e + 1]]
+        s = float(((q[0] + q[1]) ** 2 * eta).sum())
+        want = 0.0
+        for i in range(len(q)):
+            m2 = float((q[i] ** 2 * eta).sum())
+            Mi = np.log(max(abs(m2) / s, 1e-16)) / 5 if abs(m2) / s > 1e-12 else 0.0
+            want += float(he[i, 4]) * Mi + float(he[i, 5]) * Mi ** 2
+            for j in range(i + 1, len(q)):
+                mm = np.sqrt(abs(float((q[i] ** 2 * eta).sum())) * abs(float((q[j] ** 2 * eta).sum()))) if thr else 0.0
+                Lij = np.log(max(abs(2 * (float((q[i] * q[j] * eta).sum()) - mm) / s), 1e-16)) / 5
+                want += float(he[i, :2] @ he[j, :2]) * Lij + float(he[i, 2:4] @ he[j, 2:4]) * Lij ** 2
+        assert abs(float(got[e]) - want) < 1e-9 * max(1.0, abs(want)), (e, float(got[e]), want)
+
+
 def test_soft_rescale_fixed_point():
     p, ptr = _events(4)
     q = _soft_rescale(p, ptr, 1e-8)
@@ -174,7 +205,7 @@ def test_soft_rescale_fixed_point():
 
 
 if __name__ == "__main__":
-    for t in [test_route_off, test_scalars_only_reads_no_momentum, test_pair_log_values, test_soft_rescale_fixed_point, test_pair_logs_equivariant,
+    for t in [test_log_skip, test_route_off, test_scalars_only_reads_no_momentum, test_pair_log_values, test_soft_rescale_fixed_point, test_pair_logs_equivariant,
               test_soft_rescale_equivariant, test_local_logs_equivariant, test_both_flags_6particle_equivariant]:
         t()
     print("all ok")

@@ -37,6 +37,9 @@ input_scalars_only: false
 # input_route_off: '' | local (local momenta zeroed, learned frames kept in the attention) | frames (identity frames
 # in the attention, local momenta kept)
 input_route_off: ""
+# input_log_skip k: type-dependent linear + quadratic readout of the pair logs and mass logs added to mu (wrappers._log_skip;
+# rank-k pair coefficients; needs input_pair_logs); 0 = off
+input_log_skip: 0
 context_dim: 0
 context_dropout: 0.5
 context_names_file: null

@@ -121,6 +121,34 @@ def _soft_rescale(p, ptr, eps):
     return p * (torch.log1p(x / eps) / (x * math.log1p(1 / eps))).to(p.dtype)[:, None]
 
 
+def _log_skip(p, ptr, types, n, head, threshold=False):
+    """(B,) a linear readout of the event's singular logarithms, added to mu (model.input_log_skip, D411/step 13):
+    sum_{i<j} [c1_ij L_ij + c2_ij L_ij^2] + sum_i [b1_i M_i + b2_i M_i^2], L_ij = log(2 p_i.p_j / s)/5 (with `threshold`
+    log(2 (p_i.p_j - m_i m_j)/s)/5: log beta^2 of a massive pair), M_i = log(m_i^2/s)/5 of a massive particle (0 if
+    massless), s = (p_0 + p_1)^2. The coefficients come from the particles' types only, c_ij = <a_i, a_j> and b_i from
+    `head` on each particle's encoded properties, so the same readout applies to any process: a power law or a double log
+    in an invariant is linear or quadratic here and continues past the trained range, where a saturating backbone does not."""
+    cnt = ptr[1:] - ptr[:-1]
+    ar = torch.arange(n, device=p.device)
+    valid = (ar[None, :] < cnt[:, None]).to(torch.float64)                      # (B, n)
+    idx = (ptr[:-1, None] + ar[None, :]).clamp(max=p.shape[0] - 1)
+    P = p[idx].to(torch.float64)
+    dots = torch.einsum("bic,bjc,c->bij", P, P, torch.tensor(_ETA, device=p.device, dtype=P.dtype))
+    s = (dots[:, 0, 0] + dots[:, 1, 1] + 2 * dots[:, 0, 1]).abs().clamp(min=1e-30)
+    m2 = dots.diagonal(dim1=1, dim2=2).abs()
+    pij = dots - (m2[:, :, None] * m2[:, None, :]).sqrt() if threshold else dots
+    L = torch.log((2 * pij / s[:, None, None]).abs().clamp(min=1e-16)) / 5
+    massive = (m2 / s[:, None] > 1e-12).to(torch.float64)
+    Mm = torch.log((m2 / s[:, None]).clamp(min=1e-16)) / 5 * massive
+    h = head(types)[idx].to(torch.float64) * valid[..., None]                 # (B, n, 2k + 2)
+    k = (h.shape[-1] - 2) // 2
+    c1 = torch.einsum("bik,bjk->bij", h[..., :k], h[..., :k])
+    c2 = torch.einsum("bik,bjk->bij", h[..., k:2 * k], h[..., k:2 * k])
+    up = torch.triu(torch.ones(n, n, device=p.device, dtype=torch.float64), 1)
+    pair = ((c1 * L + c2 * L ** 2) * up).sum((1, 2))
+    return pair + (h[..., -2] * Mm + h[..., -1] * Mm ** 2).sum(1)
+
+
 def _pool_events(values, ptr):
     """Per-event mean pooling.
 
@@ -225,7 +253,7 @@ class AmplitudeLLoCaWrapper(nn.Module):
                  sign_pair_dim: int = 0, sign_pair_hidden: int = 32, sign_pair_bound: bool = False,
                  input_pair_logs: int = 0, input_soft_eps: float = 0.0, input_local_log_eps: float = 0.0,
                  input_pair_threshold: bool = False, input_scalars_only: bool = False,
-                 input_route_off: str = ""):
+                 input_route_off: str = "", input_log_skip: int = 0):
         super().__init__()
         self.net = net
         # input representations for singular limits (D374, kit_benchmark input arms; all Lorentz-exact, 0 = off):
@@ -243,6 +271,14 @@ class AmplitudeLLoCaWrapper(nn.Module):
         # momenta (learned frames kept in the attention), 'frames' passes identity frames to the attention (local momenta kept)
         assert input_route_off in ("", "local", "frames"), input_route_off
         net.route_off = input_route_off
+        # input_log_skip k: a type-dependent linear + quadratic readout of the pair logs and mass logs added to mu
+        # (_log_skip; rank-k pair coefficients); needs input_pair_logs (its multiplicity) and the property encoding
+        self.input_log_skip = int(input_log_skip or 0)
+        if self.input_log_skip:
+            assert self.input_pair_logs, "model.input_log_skip needs model.input_pair_logs (the event multiplicity)"
+            self.log_skip_head = nn.Linear(d_particle_hidden, 2 * self.input_log_skip + 2)
+            nn.init.normal_(self.log_skip_head.weight, std=0.1)     # c_ij = <a_i, a_j>: zero init would never move
+            nn.init.zeros_(self.log_skip_head.bias)
         # Pair sign head (model.sign_pair_dim, training.sign_head): the net's last sign_pair_dim per-particle channels
         # are pair features; the sign logit gets the mean over the event's particle pairs of an MLP of them and of the
         # pair's invariants (see _sign_pair_logit). Output layer zeroed: at init the head is the pooled channel alone.
@@ -913,6 +949,7 @@ class AmplitudeLLoCaWrapper(nn.Module):
                                 GPU→CPU sync (see build_block_diagonal_bias).
         """
         ev_lrs = None
+        assert not (self.input_log_skip and self.use_pids), "model.input_log_skip reads the property encoding"
         if self.use_pids:
             particle_type = torch.nn.functional.one_hot(
                 particle_type_indices, num_classes=self.token_size
@@ -927,6 +964,8 @@ class AmplitudeLLoCaWrapper(nn.Module):
                 ev_lrs = order_labels[:, -1]                           # log10 sqrt(s_hat) per event, GeV
                 raw_props, order_labels = self._apply_dimless_mass(raw_props, particle_type_indices, ptr, order_labels)
             particle_type = self.particle_encoder(raw_props)           # (N_total, d_particle_hidden)
+            if self.input_log_skip:   # coefficients from the static property table, never the per-event mass column
+                skip_types = self.particle_encoder(self.property_matrix[particle_type_indices])
             if self.context is not None:
                 ctx = self._context_per_particle(process_ids, ptr, particle_type.dtype)
                 if ctx is not None:
@@ -1003,6 +1042,11 @@ class AmplitudeLLoCaWrapper(nn.Module):
             # the last pooled channel is the sign logit (training.sign_head)
             pooled = torch.cat([pooled[:, :-1], pooled[:, -1:] + self._sign_pair_logit(
                 pair_feats, fourmomenta, ptr, seq_lens).to(pooled.dtype)], dim=-1)
+
+        if self.input_log_skip:
+            skip = _log_skip(fourmomenta, ptr, skip_types, self.input_pair_logs, self.log_skip_head,
+                             self.input_pair_threshold).to(pooled.dtype)
+            pooled = torch.cat([pooled[:, :1] + skip[:, None], pooled[:, 1:]], dim=-1)   # mu is column 0
 
         # HETEROSC + sigma_after_pool: the net handed us a RAW per-particle sigma logit, so the
         # positivity nonlinearity is applied here — ONCE, to the pooled per-event value:
