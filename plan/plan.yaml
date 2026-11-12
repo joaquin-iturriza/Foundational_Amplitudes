@@ -25146,6 +25146,29 @@ entries:
       separation; the high side (where stage-2 good trials sit) and the trial count are the remaining candidates of D422,
       put to Joaquin, nothing run; one of two good: not resolved, reported, nothing more run. Every search reported with best
       val, separation, good count and curves figure; diverged trials apart (D398).'
+    fix_at: '2026-11-12T18:43:23+00:00'
+    fix: 'Re-check of the 18:42 revision. Fixed from the last FIX: the prior now names the lr-centre test (c/3 3.76, c/10
+      12.8, control 25.5; 0 of 16 good), the step-10 rerun declined (D407), trial_overfit 27/34, and the sign of the lr_scale
+      rank; the NO branch is limited to the low side. Still failing: (a) Check 13/6, trial count: Joaquin wrote at 2026-11-12T18:42:39,
+      after this design''s ground was laid: ''Also, I don''t know why you claim that 8 trials is enough, we know it''s not
+      we have results where we searched for ~50 trials and results kept improving, 8 was a compromise to find something relatively
+      quickly and good enough, but it''s clear that right now it''s not enough, given that for most cells we can''t find a
+      single good training''. The design keeps 8-trial searches (and its prior cites ''8 trials enough (best by trial 5 in
+      the median)'' in the hand-off) and leaves trial count as a later question to him. His words now settle it is not enough:
+      the design must take his message in (record it with site decide in his whole words), size the wide-range search AND
+      its WSD-only control at the same larger trial budget (the running 8-trial WSD searches extended to match, or a matched
+      count stated), and state the GPU-h against D412''s 30 GPU-h bar and the wall time; the exact count, if not in his words,
+      is the question to him. (b) Check 2/4, direction: the design now expects NO from its own data (higher lr_scale = less
+      separation; good trials at place 0.955; the low side gave 0 of 16 good in the lr-centre test) and runs only the low
+      side, sending the high side ''to Joaquin, nothing run''. That is not Joaquin''s call: which ranges to search is method
+      inside D422 (''bad ranges ... too few trials''), tried, not asked (FA CLAUDE.md). The claim that the downward opening
+      is ''the test Joaquin asked for'' rests on no words of his I found (D422 names ranges generically; D426 only removes
+      the batch search). Fix: open the fine-tune ranges on the side the data point to as well (e.g. lr_scale and layer_decay
+      both wide, low and high, in one search), or state a measured reason the low side alone can answer the question; the
+      outcome then reads which side the good trials take. Checks that hold as before: 1 (wideft vs wsd ft differ only in the
+      two range bounds, name, DyHPO seed), 3, 9/11, 12, 14/15 (readout --test tmpl2 reads dsave_wideft_ft); searched: lr_scale,
+      layer_decay, wideft, lrthird, lrtenth, tmpl2, trial count / 8 trials in decisions D400-D426 and Joaquin''s messages
+      17:30-18:43.'
   step_waits:
     '3': bbx_zz_lo_scr3, bbx_zz_lo_ft drivers (detach events)
     '4': detach bbx_zz_lo_ft (LO fine-tune driver; its FA DONE event)
