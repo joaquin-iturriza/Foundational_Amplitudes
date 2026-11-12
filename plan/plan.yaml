@@ -21356,6 +21356,9 @@ entries:
     4: 'Redo the e+e- > t t~ LO fine-tune L(D) arm with the fixed fine-tune space (design 2026-11-12 12:25: 7 new 8-trial
       searches dsave_s5_ft_epem_ttx_d{2,3,4,6,8,9,10}, s4''s D=316/3162 reused, 26.3 GPU-h), then read S = D*_scr/D*_ft at
       1e-4 (dstar_fit.py) with the L(D) figure'
+    5: 'One-loop V/B fine-tune still 4.6-38x above scratch after the space fix (s4: IMPROVED, NOT RESOLVED; D=316 best val
+      at the first checkpoint, train to 4e-10): design the bisect of the one-loop fine-tune path (parent momentum/off-shellness
+      stats vs own, readout, starting weights), after searching the s3 offshell-own diagnostic'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -24686,6 +24689,13 @@ entries:
       - 'S band above 1: report the saving on t t~ LO, then the same redo for u u~ LO is not needed (its old fine-tune already
         0-0.4x scratch)'
       - 'S band contains 1: report no data saving on t t~ LO at the current setup, against sec:ladder''s earlier gap'
+    5:
+      feeds: 'the entry''s answer for one-loop targets with the trees in the pretraining: whether the one-loop fine-tune deficit
+        is the path (fixable) or the pretraining''s real value on V/B'
+      if:
+      - 'a path element closes the gap to within 3x of scratch: fix it in the fine-tune configs and redo the one-loop fine-tune
+        arm'
+      - 'no element closes it: report that the trees-in pretraining gives no data saving on t t~ V/B, with the bisect''s numbers'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
