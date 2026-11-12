@@ -24485,6 +24485,54 @@ entries:
       for bbx_zz, b b~ > Z Z, ZZ, f f~ > Z Z; decisions for zz/bbx; only the one-loop pole/coverage notes and the transfer-ladder
       rung, as prior says), 9 (HETEROSC mu_mse + sigma stage), 10/11 (target''s own pool test split, target_stats own, offshell
       parent as the u u~ LO stage 2), 13 (template coupled space, 8 trials, waves 3,3,2).'
+  - at: '2026-11-12T15:10:50+00:00'
+    question: 'D413/D417 (Joaquin 2026-11-12: ''You pick one process, any process, at LO and V, it''s not complicated.''):
+      the LO half of the draft''s second data-saving example. How much target data does pretraining save at MSE(ln|M|^2) =
+      1e-4 on b b~ > Z Z at tree level, held out of its parent with its whole equality class (massless f f~ > Z Z: v4_bbx_zz,
+      v4_ddx_zz, v4_uux_zz, v4_epem_zz; only v4_bbx_zz is in the r4 recipe)? S = D*_scr / D*_ft with its band. Feeds the draft''s
+      second data-saving figure beside the one-loop V/B half (running, design PASS 14:44, driver bbx_zz_v_LD2). Revision of
+      the 15:06 design after its FIX: own LO calibration (D391) instead of the V/B ladder''s horizons; launch order; disk.'
+    prior: 'As the 15:06 design: no b b~ > Z Z LO L(D) and no LO calibration exist (results.tex, the entry, D355-D418, equal_processes.json).
+      First example u u~ LO stage 2 from the r4 held-out parent: S = 10^0.58 [0.43, 0.68]. The design reviewer showed LO horizons
+      do not track V/B ones (u u~ LO T = 6120/7310 at k=2/4 vs u u~ V 1190/2720; t t~ LO 800/1440/7680 vs V 1360/2380/5950),
+      so this revision calibrates the LO target itself. The r4 held-out parent reaches val MSE 1.22e-4 (standardized), mean
+      |rel err| 0.020 on v4_bbx_zz from 1e4 events (FA-ccin2p3-e8425579): the crossing should lie inside D = 10..1e4.'
+    measure: '(1) LO calibration: horizons.py --ladder --tag cal_lo on the 7 scratch runs -> T(D) = 1.1 x the validation-minimum
+      step, non-decreasing, cap 8500 (D391), and step rates, into analysis/data_saving/data/horizons_cal_lo_ladder.json (gen_data_saving.py''s
+      CALS). (2) The L(D) read: stage2_readout.py (bbx_zz in TARGETS): val and test MSE(ln|M|^2) of each search''s best trial
+      after the sigma stage; dstar_fit.py''s shared-exponent fit L = A D^-alpha + L_inf per arm, D* at 1e-4, S = D*_scr/D*_ft
+      with its 16-84% cell-bootstrap band on val and test; curve_quality.py bars on every trial beside S. Figure plot_stage2.py
+      --second: L(D) of both arms at LO and V/B with fits and crossings.'
+    check: 'The pipeline resolves S where one exists: u u~ LO stage 2 S = 10^0.58 [0.43, 0.68], t t~ V/B 10^-0.35 [-0.59,
+      -0.24] (stage2_readout.json, same generator, parent family r4, readout). The calibration rule is the one that produced
+      every sibling''s T(D) (horizons_cal2_ladder.json, horizons_cal_vb_ladder.json); the b b~ > Z Z V/B ladder from the same
+      job path crosses 1e-4 at D = 1e3-3162.'
+    fixed: 'Calibration: scripts/job_data_saving.sh bbx_zz <k> 8000 scratch tag=cal_lo, k = 2..8, exactly as the V/B ladder''s
+      cal_vb runs (FA-ccin2p3-ba296372..8e41af66: trial-1262 base config, 8000 steps, lr by the script''s law x D factor,
+      seed 42), only the target differs (LO, no target_over_born). Sweeps: sweep/gen_data_saving.py --targets bbx_zz --ks
+      2..8 on that T(D) (configs regenerated after the calibration, committed, path given at submission): target recipe recipes/catalog_v4_datasaving_bbx_zz.yaml
+      (v4_bbx_zz''s r4 entry and sampling, existing pools), HETEROSC mu_mse + sigma stage (D276), scratch lr [c/3, 3c] by
+      the calibration law, fine-tune full retrain from the new parent with target_stats own, offshell_stats parent, the tree
+      fine-tune space (layer_decay 1, lr_scale [1/3, 3], the generator''s tree default since s4; it differs from the first
+      example''s u u~ LO llrd space, said wherever the two S stand side by side). D grid k = 2..8 (D = 10..1e4) as the V/B
+      half. Parent: job_datasaving_parent.sh heldoutbbzz = recipes/catalog_v4_datasaving_parent_heldoutbbzz.yaml (r4''s 1133
+      pools minus v4_bbx_zz, checked identical otherwise by the repo-reviewer), r4''s T = 3458, lr 9.248e-3, 1e4 events per
+      pool, 5 epochs, ++model.input_soft_eps=1e-8 ++model.input_pair_logs=6, as dsave_parent_heldout_r4. Launch order: parent
+      and calibration now; scratch searches when the calibration is read and the parent''s run dir holds config.yaml (base_config
+      of every config); fine-tune searches when the parent ends. Disk: CC /sps/lpnhe 68 GB free; parent ~152 MB (r4), calibration
+      7 x <0.1 GB, 112 trials ~3 GB.'
+    control: Scratch against fine-tune cell by cell, same D, T, pools and template; the first example (u u~ LO) and the V/B
+      half as reference results.
+    seeds: 'Seed 42; one 8-trial search per (D, arm), waves 3,3,2 as the siblings (D315): 14 searches, 112 trials, ~21 GPU-h
+      by the generator at the V/B rates (recomputed from the calibration''s own rates) + parent ~1.2 GPU-h + calibration 7
+      runs ~1.8 GPU-h (V/B: 10-20 min each) = ~24 GPU-h, under 30 (D412). One calibration run per k as every sibling ladder.'
+    outcome: 'Calibration: each k''s T(D) by the D391 rule, no judgement. L(D), level fixed now: MSE(ln|M|^2) = 1e-4 on val
+      and test. SAVING: S band lower edge > 1 on both. SAVING ON ONE READ: on one; the figure carries both and says which
+      resolves. NO SAVING: band includes 1 or S < 1, reported with both arms'' curves. Fine-tune below 1e-4 already at D=10
+      or scratch never reaching it by 1e4: S is a bound, stated as one. Curve quality read in every case: WELL-TRAINED if
+      in >= 5 of 7 cells per arm the best trial passes spike, jitter and steady (gap apart at D<=316); otherwise labelled
+      ''existing template, not well trained by curve_quality'' with the failing bars per cell (D413 deadline; D414 fix stays
+      open). A fine-tune whose minimum sits in the first checkpoints is named.'
   step_waits:
     '2': 'detached drivers muonly_mse_test and bbx_zz_v_LD; step 3''s LO arm: the next owner''s design'
     '3': 'detached drivers muonly_mse_test and bbx_zz_v_LD; step 3''s LO arm: the next owner''s design'
