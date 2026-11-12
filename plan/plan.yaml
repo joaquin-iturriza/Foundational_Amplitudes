@@ -21382,9 +21382,6 @@ entries:
     4: b b~ > Z Z LO fine-tune searches launched when the held-out parent dsave_parent_heldoutbbzz (FA-ccin2p3-0d698e4b) ends;
       design PASS 2026-11-12 (revised)
     6: 'b b~ > Z Z larger-D cells: D=31623 at one loop, D=31623 and 1e5 at tree level, ~29 GPU-h (only on Joaquin''s yes)'
-    7: Rebuild curve_quality.py on Joaquin's criterion (validation falls with training through the end, no end divergence;
-      best validation), drop steady/spike/jitter; re-read tt LO/V, lr-centre, muonly and bbZZ searches with it and report
-      again
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -25679,11 +25676,6 @@ entries:
       if:
       - 'yes: generate and send the extra searches'
       - 'no: the figure stops at 1e4, said in its caption'
-    7:
-      feeds: whether the fine-tune and scratch runs are well optimized by Joaquin's own criterion (2026-11-12 ~17:45)
-      if:
-      - 'runs diverge at the end: name the setting that causes it and fix the template'
-      - 'they do not: the earlier ''not well trained'' verdicts are withdrawn and said so'
   ask: 'Scope: the b b~ > Z Z grid stops at D=1e4 at both orders under D412; adding D=31623 at one loop (~15 GPU-h) and D=31623,
     1e5 at tree level (~14 GPU-h), as the sibling tree targets have, costs ~29 GPU-h more. Add them?'
   waiting_since: '2026-11-12T15:42:33+00:00'
