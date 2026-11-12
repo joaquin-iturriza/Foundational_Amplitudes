@@ -26124,11 +26124,12 @@ entries:
       Coulomb (massive pair near threshold, non-tt) and Sudakov added to the pretraining, one design; (d) a general divergence-form
       input (eikonal logs, splitting variables, 1/beta per massive pair), one short test on uug and tt virtual'
     12: 'Weak spots with full LLoCa (Joaquin 2026-11-12: ''removing the functionality of lloca is not the way''): q-g collinear
-      (uug, uugg), sqrt(s) extrapolation (tt virtual), beta near threshold. (i) read log-skip runs 203a274f/7b891d10/eb870ad4
-      under their passed design; (ii) frames boost bound model.net.frames_gamma_max @da59ef1b (hard clamp, untested on CC)
-      on uug+uugg softpair 1e5 vs c15b3337/c364a7ae, G ~4 (uug bulk_train gamma median 1.25, q90 1.65, max 10.2; collinear
-      overshoot starts at gamma ~4), own design+review+D395 smoke; (iii) tt high sqrt(s): lightlike-tops guess, eval-only
-      first; (iv) step 11 continues'
+      (uug, uugg), sqrt(s) extrapolation (tt virtual), beta near threshold. (i) done: degree-2 log-invariant polynomial term
+      on the output, runs 203a274f/7b891d10/eb870ad4, read PARTIAL (step 13 follows); (ii) frames boost bound model.net.frames_gamma_max=4
+      (hard clamp of each learned frame''s gamma) on uug+uugg softpair 1e5, runs FA-ccin2p3-95be8db2 / FA-ccin2p3-88b9334a
+      vs c15b3337/c364a7ae, design PASS, after smoke 18da5c47; read with kit_extrap_read (figure set gmax4_), kit_figures
+      collect + kit_readout --vs, kit_transformer_probe REREAD (frame and relative gamma); (iii) done: tt high sqrt(s) lightlike-tops
+      read; (iv) step 11 continues'
     13: 'Log-invariant polynomial term, linear only (finding 2026-11-12 ~19:00 PARTIAL for degree 2: mu += sum_{i<j} [c1_ij
       L_ij + c2_ij L_ij^2] + sum_i [b1_i M_i + b2_i M_i^2], L_ij = log(2 p_i.p_j/s)/5, M_i = log(m_i^2/s)/5, coefficients
       learned from the particle types; it fixed tt Coulomb (log-MSE 3.55 -> 1.72, exponent -0.55) but overshoots uug soft
