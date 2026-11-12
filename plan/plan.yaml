@@ -23843,6 +23843,16 @@ entries:
       D=1e5 val 0.97 / test 1.04; D=3.16e4 val and test disagree (the stage-2 D=3.16e4 test carries one event at 55-80%).
       The design''s rule on its 8 exact-control cells is unchanged: NO CHANGE (pooled val gmean 1.29, 5 of 8 below 1; test
       0.64). Over all 9 D against the stage-2 best: val gmean 1.01, test 0.71.'
+  - at: '2026-11-12T03:35:20+00:00'
+    text: '2026-11-12 (owner a1341471cb6caf07b) old-vs-new side by side (draft analysis/data_saving/old_vs_new.py, data/old_vs_new.json,
+      fig figs/old_vs_new.png; commit blocked by the repo-reviewer backlog, findings in kit_mlp_readout.py and cache_census.py):
+      today''s scratch got 10-100x better, today''s fine-tune did not move. Tree t t~ val MSE(ln|M|^2) old ladder (catalog_v3)
+      -> stage 2: scratch D=1e3 2.6e-7 -> 2.8e-8, 3162 2.2e-7 -> 8.5e-9, 1e4 1.3e-7 -> 2.5e-9; fine-tune (rung 5/rung 9) 3.7e-7/1.4e-7
+      -> 3.5e-7, 3.2e-8/4.0e-8 -> 1.6e-7, 2.3e-8/1.6e-8 -> 6.0e-9. One-loop t t~ (old cscan on Jean Zay, V alone, best over
+      horizons, D=0.7 S): old scratch 3.0e-6 (700), 2.6e-7 (7e3), 1.6e-7 (7e4), 7.8e-8 (7e5) plateau; old ft8 4.6e-6, 2.8e-8,
+      4.6e-8, 4.3e-8; new scratch 1.6e-8 (3162), 1.0e-9 (1e4), 3.6e-10 (3.2e4); new ft 5.3e-7, 2.7e-8, 6.8e-10. The old ''fine-tune
+      better everywhere'' was against a scratch that plateaued near 1e-7. WSD never reached the default: no decision or step
+      adopted par:v4_warm_start_fixes'' WSD-parent result as the default (canonical setup lists CosineAnnealingLR as fixed).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
