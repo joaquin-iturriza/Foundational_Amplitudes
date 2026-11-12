@@ -23951,6 +23951,44 @@ entries:
       The prior now cites the written own adoption (results.tex ~9468-9476) with the s4 departure and the gen default fixed
       at fa846b4d, the tp3 refit result (~13945-13950), and the unread massown configs (7d56534c). HETEROSC, the s4 coupled
       space, 8 trials in waves 3,3,2 as siblings, 69 GB free on /sps/lpnhe, rates and readout from s4''s identical configs.'
+  - at: '2026-11-12T12:41:05+00:00'
+    question: 'Joaquin 2026-11-12 (''the tree runs are not fixed at all''): no trial of either arm is well trained by its
+      own validation curve. Is the lr too high for most of the run in both arms, under Muon, so that moving the lr centre
+      c of the template down one decade (window [c/30, 3c/10]) gives a well-trained e+e- > t t~ LO cell? Feeds: the template''s
+      lr centre for both arms before any L(D) batch.'
+    prior: '(1) curve_quality.py @372820aa (data/curve_quality.json), 570 trials of the stage-2 and s4 searches: 0 well-trained
+      on t t~ LO (scr 0/70, ft 0/66, s4 ft 0/15) and t t~ V/B, 0-10 on u u~; the failing criteria are spike (median v_i over
+      running min 25x scr, 7.8x ft, 255x s4 ft on t t~ LO) and the val/train gap (median 431-505); scratch t t~ LO by D: jitter
+      (median |ln v_i/v_{i-1}|) 0.07 at D=10 rising to 0.71-0.88 at D>=316, steady (share of post-warm-up fall reached by
+      75% of the run) 0.35-0.68 at D>=3162 (progress left to the cosine tail). (2) By peak-lr band over t t~ and u u~ LO trials
+      at D>=316: scratch lr<3e-3 spike 5.7 jitter 0.34 steady 0.94 (10 trials); 3e-3..6e-3 26, 0.71, 0.67; 6e-3..1.2e-2 75,
+      0.81, 0.64; fine-tune lr<3e-3 5.4, 0.29; >=1.2e-2 37.5, 0.54: monotone in lr, no band below 3e-3 sampled enough to be
+      clean; EMA does not explain it (scr jitter 0.65 on, 0.72 off). (3) Suspects batch lr x1/3, x1/10 ran on the old fine-tune
+      template at fixed HPs and were read by an arm ratio only (Joaquin''s coordinator: they do not settle this). (4) HPO
+      rule 2 (lr surface measured with AdamW; canonical setup: a Muon sweep centres on its own search). Searched results.tex
+      (Muon lr, lr window, spike, jitter), the entry''s findings and dead ends, site decisions D373-D412.'
+    measure: 'curve_quality.py on every trial of each new search: per trial steady, spike, jitter, gap and ''well'' (all four
+      bars: steady >= 2/3, spike <= 3, jitter <= ln 2, gap <= 10); per search the count well and the best trial''s four numbers
+      and val minimum (ln units), against the stage-2/s4 search of the same cell; figure: each new search''s best trial val
+      and train curves beside the old best''s.'
+    check: 'On existing trials the measure moves with lr in the direction tested: spike median 5.7 (lr<3e-3) vs 26-75 (above),
+      jitter 0.34 vs 0.66-0.81, steady 0.94 vs 0.64-0.67 (scratch, D>=316); Spearman(spike, peak lr) +0.65 / +0.79 within
+      the stage-2 / s4 fine-tune t t~ LO searches.'
+    fixed: 'The stage-2 scratch and s4 fine-tune configs of t t~ LO D=3162 (T=8500, batch 1581, parent dsave_parent_heldout_r4
+      for the fine-tune, scratch''s fine-tune space layer_decay 1 lr_scale [1/3,3], target_stats own, head map as s4, seed
+      42, heterosc_select mu_mse + sigma stage, the template''s other HPs, 8 trials waves 3,3,2) with one change: c x 0.1
+      (scratch training.lr window [2.61e-4, 2.35e-3] for [2.61e-3, 2.35e-2]; fine-tune training.lr 7.82e-4 for 7.82e-3). Configs
+      sweep/sweep_config_dsave_lrtenth_{scr,ft}_epem_ttx_d7_t8500.yaml (gen_data_saving.py --stage lrtenth --targets epem_ttx
+      --ks 7 --lr-factor 0.1; diffed: lr and the DyHPO seed, which follows the sweep name as in every sibling).'
+    control: The same cell's stage-2 scratch search (dsave_s2_scr_epem_ttx_d7_t8500) and s4 fine-tune search (dsave_s4_ft_epem_ttx_d7_t8500),
+      read by the same tool.
+    seeds: Seed 42, one 8-trial search per arm, as the siblings (D315); 16 trials, 4.4 GPU-h, under D412's 30.
+    outcome: 'WELL: in an arm, the best trial passes all four bars and at least 3 of 8 trials do: the lower centre is adopted
+      for that arm in the template (gen_data_saving default and the HPO rule text to Joaquin as a diff), then the L(D) batches
+      are re-costed at it. BETTER, NOT WELL: the median spike and jitter fall below the control''s but the best trial fails
+      a bar: name the failing bar; next the matching suspect alone (gap: horizon/regularization at small batch count; steady:
+      warm-up or schedule; spike: a further decade or clip). NO CHANGE: medians within 2x of the control''s: lr is not the
+      cause; next warm-up/schedule and batch size. Each arm read on its own; no rerun (D315).'
   step_waits: {}
   findings:
   - at: '2026-11-10T03:35:22+00:00'
