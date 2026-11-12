@@ -25402,6 +25402,11 @@ entries:
       (steady >=2/3 by 75% of the run, spike <=3x, jitter <=2x, train/val gap <=10x), thresholds the agent''s own choice,
       never checked against curves he calls well trained; shape only, best error read beside. If he gives his criteria, rebuild
       the measure around them.'
+  - at: '2026-11-12T17:09:34+00:00'
+    text: '2026-11-12 ~17:45 Joaquin on the curve bars: ''I didn''t point any of these, I just said that by the end they diverge,
+      and that''s what we care about, the validation going down with the training loss. If the val loss is better than any
+      other, why would I care it''s jittery?'' The measure is rebuilt around: validation keeps falling with training through
+      the end (no end divergence), and the best validation; steady/spike/jitter dropped; earlier verdicts re-read.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
