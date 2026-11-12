@@ -46,6 +46,10 @@ print("FTC " + json.dumps(out))
 '''
 
 
+LABELS = {"ttLO": r"$e^+e^-\to t\bar t$ tree", "ttV": r"$e^+e^-\to t\bar t$ one-loop/tree",
+          "uuLO": r"$e^+e^-\to u\bar u$ tree", "uuV": r"$e^+e^-\to u\bar u$ one-loop"}
+
+
 def main():
     runs = site_python(REMOTE, [f"'{a}'" for a in sys.argv[1:]], "FTC")
     json.dump(runs, open(os.path.join(REPO, "analysis/data_saving/data/ft_curves.json"), "w"))
@@ -80,7 +84,7 @@ def main():
         ax.set_yscale("symlog", linthresh=1.0)
         ax.set_xlabel("step")
         ax.set_ylabel("HETEROSC loss")
-        ps.process_label(ax, tg)
+        ps.process_label(ax, LABELS.get(tg, tg))
     ps.legend(axs[0], "upper right")
     ps.save(fig, os.path.join(REPO, "analysis/data_saving/figs/ft_curves"))
     print(json.dumps(summ))
