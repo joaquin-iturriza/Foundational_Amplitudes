@@ -3,7 +3,7 @@
 scratch and fine-tune searches at the lr centre c/3 and c/10, each against its control search (scratch: dsave_s2_scr,
 fine-tune: dsave_s4_ft, same cell), by Joaquin's two reads (2026-11-12, curve_quality.py): the best validation loss of
 the search (LOWER / HIGHER beyond 2x the control's, else SAME) and whether that best trial's validation falls with
-training to the end (tracks / turns up); per search the trials that track.
+training (curve_quality.py: good / bad); per search the trials it calls good.
 Validation minimum in ln units (min of the val mu-MSE curve x prepd_std^2). Failed trials (diverged) listed apart.
 Figure figs/lr_centre_curves_{a,b} (a scratch, b fine-tune): each search's best trial, val solid and train dashed.
 
@@ -72,8 +72,8 @@ def search(rr, arm, name):
 
 def summary(g):
     b = min(g, key=lambda r: r["val_min"])
-    return {"n": len(g), "n_tracks": sum(r["well"] for r in g), "best_min": b["val_min"],
-            "best": {k: b[k] for k in ("run_dir", "peak_lr", "end_over_best", "late_val", "late_train", "well", "stalls")}}
+    return {"n": len(g), "n_good": sum(r["well"] for r in g), "best_min": b["val_min"],
+            "best": {k: b[k] for k in ("run_dir", "peak_lr", "separation", "end_up", "well")}}
 
 
 def verdict(s, c):
@@ -81,7 +81,7 @@ def verdict(s, c):
     at 2x, else SAME) and whether that best trial's validation falls with training to the end."""
     r = s["best_min"] / c["best_min"]
     return ("LOWER" if r < 0.5 else "HIGHER" if r > 2 else "SAME") + f" ({r:.2g}x)" + \
-        (", best tracks" if s["best"]["well"] else ", best turns up")
+        (", best good" if s["best"]["well"] else ", best bad")
 
 
 def main():
@@ -102,9 +102,8 @@ def main():
             for centre, s in S.items():
                 s["verdict"] = None if centre == "control" or "control" not in S else verdict(s, S["control"])
                 b = s["best"]
-                print(f"{cell:20s} {arm:3s} {centre:7s} n={s['n']} tracks {s['n_tracks']}  best min {s['best_min']:.2e} "
-                      f"(peak lr {b['peak_lr']:.2e}: end/best {b['end_over_best']:.2f} late val {b['late_val']:.2f} "
-                      f"late train {b['late_train'] or float('nan'):.2f}{', stalls' if b['stalls'] else ''})"
+                print(f"{cell:20s} {arm:3s} {centre:7s} n={s['n']} good {s['n_good']}  best min {s['best_min']:.2e} "
+                      f"(peak lr {b['peak_lr']:.2e}: separation {b['separation']:.3g} end_up {b['end_up']:.3g})"
                       + (f"  failed {s['failed']}" if s["failed"] else "") + (f"  -> {s['verdict']}" if s["verdict"] else ""))
             res[f"{cell}/{arm}"] = S
     json.dump(res, open(os.path.join(DATA, f"lr_centre_readout{SUFFIX}.json"), "w"), indent=1)

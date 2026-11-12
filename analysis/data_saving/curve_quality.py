@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
-"""pretrain_data_saving: does a trial's validation keep falling with its training to the end of the run (Joaquin
-2026-11-12: "I just said that by the end they diverge, and that's what we care about, the validation going down with
-the training loss. If the val loss is better than any other, why would I care it's jittery?").
+"""pretrain_data_saving: does a trial's validation loss go down together with its training loss through the run
+(Joaquin 2026-11-12: "train and val loss go down together, I don't see that in most of the curves you've shown").
 
-Per trial, on the validation mu-MSE curve v_i and the train-eval curve t_i (checks i = 0..n-1):
-  end_over_best  v_end / min v: the validation at the end of the run over its best; tracks <= 2 (it did not turn up
-                 or diverge at the end)
-  late_val       median of the last 3 checks over the median of the 3 checks around 75% of the run: validation's
-                 change over the last quarter; tracks <= 1 (still falling, or flat, at the end)
-  late_train     the same for training (the val/train pair: val turning up while train falls is the failure)
-  stalls         tracks, but val within 10% over the last quarter while training halves (val flat, train falling)
-Tracks = both bars. The other read is the best validation loss itself (val_min), shown beside: no shape bar ranks it.
-The earlier bars (steady, spike, jitter, gap) are dropped: they judged noise along the way, not the end.
+Per trial, on the validation curve v_i and the training curve t_i (MSE on the validation and on the training events at
+each check i), each first smoothed by a running median over 3 checks so that one spike does not decide:
+  separation   (v/t at the end) / (smallest v/t in the run): how many times further validation sits above training at
+               the end than where the two were closest. Good <= 3: validation pulled away from training by no more
+               than a factor 3 (half a decade). A curve whose validation flattens while training keeps falling fails
+               here, and so does one whose validation turns up.
+  end_up       (v at the end) / (smallest v in the run). Good <= 2: validation did not turn up at the end.
+Good = both. The bars were set by eye on the curves shown to Joaquin (s4_curves, lr_centre_curves, muonly_curves,
+nullparent_curves): every curve whose validation visibly leaves its training curve has separation > 3; those he would
+see as together (t t~ V/B D=3162 scratch 1.9, u u~ V D=1e4 fine-tune control 3.0) fall at or under it.
+The best validation loss itself is read beside, never ranked by a shape bar.
+The earlier reads (v_end/min v with a last-quarter change, 2026-11-12 afternoon; steady/spike/jitter/gap before it)
+are withdrawn: they passed curves whose validation flattens while training falls by decades.
 
     python analysis/data_saving/curve_quality.py                # every cached trial (trial_overfit.json, s4 rows)
     python analysis/data_saving/curve_quality.py --cells <tg>   # the L(D) label per cell's best trial
@@ -25,22 +28,21 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 DATA = os.path.join(HERE, "data")
-BAR = {"end_over_best": 2.0, "late_val": 1.0}
+BAR = {"separation": 3.0, "end_up": 2.0}
 
 
-def late(x):
-    x = np.asarray(x, float)
-    q = int(0.75 * (len(x) - 1))
-    return float(np.median(x[-3:]) / np.median(x[max(q - 1, 0):q + 2]))
+def smooth(x):
+    """log10 of x, each point the median of itself and its two neighbours."""
+    x = np.log10(np.asarray(x, float))
+    return np.array([np.median(x[max(i - 1, 0):i + 2]) for i in range(len(x))])
 
 
-def quality(v, t=None):
-    v = np.asarray(v, float)
-    q = {"end_over_best": float(v[-1] / v.min()), "late_val": late(v),
-         "late_train": late(t) if t is not None and len(t) == len(v) and min(t) > 0 else None}
-    q["well"] = bool(q["end_over_best"] <= BAR["end_over_best"] and q["late_val"] <= BAR["late_val"])
-    # tracks by the bars, yet val stalls (within 10% over the last quarter) while training still halves: listed apart
-    q["stalls"] = bool(q["well"] and q["late_val"] > 0.9 and q["late_train"] is not None and q["late_train"] < 0.5)
+def quality(v, t):
+    lv, lt = smooth(v), smooth(t)
+    n = min(len(lv), len(lt))
+    g = lv[:n] - lt[:n]                        # log10 (val / train) at each check
+    q = {"separation": float(10 ** (g[-1] - g.min())), "end_up": float(10 ** (lv[-1] - lv.min()))}
+    q["well"] = bool(q["separation"] <= BAR["separation"] and q["end_up"] <= BAR["end_up"])
     return q
 
 
@@ -67,86 +69,74 @@ def trials():
 def main():
     rows = trials()
     out = {"bars": BAR, "groups": [], "trials": []}
-    print(f"{len(rows)} trials with curves; tracks = end/best <= 2 and late val <= 1")
+    print(f"{len(rows)} trials with curves; good = separation <= {BAR['separation']:g} and end_up <= {BAR['end_up']:g}")
     for key in sorted({(r["target"], r["stage"], r["arm"]) for r in rows}):
         g = [r for r in rows if (r["target"], r["stage"], r["arm"]) == key]
         b = [r for r in g if r.get("best")]
-        gr = {"target": key[0], "stage": key[1], "arm": key[2], "n": len(g), "tracks": sum(r["well"] for r in g), "stalls": sum(r["stalls"] for r in g),
-              "best_n": len(b), "best_tracks": sum(r["well"] for r in b),
+        gr = {"target": key[0], "stage": key[1], "arm": key[2], "n": len(g), "good": sum(r["well"] for r in g),
+              "best_n": len(b), "best_good": sum(r["well"] for r in b),
               "median": {c: float(np.median([r[c] for r in g])) for c in BAR}}
         out["groups"].append(gr)
-        print(f"{key[0]:13s} {key[1]} {key[2]:3s} n={len(g):3d} tracks {gr['tracks']:3d} (stalls {gr['stalls']:2d})"
-              + (f"  search bests {gr['best_tracks']} of {gr['best_n']}" if b else "")
-              + "  median: " + " ".join(f"{c} {gr['median'][c]:.2f}" for c in BAR))
+        print(f"{key[0]:13s} {key[1]} {key[2]:3s} n={len(g):3d} good {gr['good']:3d}"
+              + (f"  search bests good {gr['best_good']} of {gr['best_n']}" if b else "")
+              + "  median: " + " ".join(f"{c} {gr['median'][c]:.3g}" for c in BAR))
     for r in rows:
         out["trials"].append({k: r.get(k) for k in ("sweep", "run_dir", "stage", "arm", "target", "D", "T", "peak_lr",
-                                                     "best", "val_min_ln", "end_over_best", "late_val", "late_train",
-                                                     "well", "stalls")})
-    # where the turning up sits: stage-2 trials by arm and D band (the reported loss is read at the best checkpoint)
-    out["by_D"] = []
-    for arm in ("scr", "ft"):
-        for lo, hi in ((0, 200), (200, 2000), (2000, 2e5)):
-            g = [r for r in rows if r["stage"] == "s2" and r["arm"] == arm and lo <= r["D"] < hi]
-            b = {"arm": arm, "D_lo": lo, "D_hi": hi, "n": len(g), "turn_up": sum(not r["well"] for r in g)}
-            out["by_D"].append(b)
-            print(f"  stage 2 {arm:3s} D in [{lo}, {hi:.0f}): {b['turn_up']} of {b['n']} trials turn up at the end")
-    out["suspects"] = suspects()
+                                                     "best", "val_min_ln", "separation", "end_up", "well")})
     json.dump(out, open(os.path.join(DATA, "curve_quality.json"), "w"), indent=1)
-    figure(rows)
+    examples(rows)
 
 
-def suspects():
-    """The one-change lr runs of the suspects batch (x1/3, x1/10 at the fine-tune best's other HPs, old template) and
-    their controls, read by the same bars, with each run's validation minimum in ln units beside."""
-    read = json.load(open(os.path.join(DATA, "suspects_runs_read.json")))
-    meta = {m["run_dir"]: m for m in json.load(open(os.path.join(DATA, "suspects_runs.json")))}
-    out = []
-    for d, r in sorted(read.items()):
-        note = meta.get(d, {}).get("note", "control")
-        if "epem_ttx" not in d or not r.get("val_mse_curve") or not ("lr" in note or note == "control"):
-            continue
-        q = quality(r["val_mse_curve"], r.get("train_eval_mse_curve"))
-        q.update(run_dir=d, note=note, val_min_ln=min(r["val_mse_curve"]) * r["prepd_std"] ** 2)
-        out.append(q)
-        print(f"  {note[:40]:40s} {d[-40:]:40s} min {q['val_min_ln']:.2e} end/best {q['end_over_best']:.2f} "
-              f"late val {q['late_val']:.2f} late train {q['late_train'] or float('nan'):.2f} tracks {q['well']}")
-    return out
+TLAB = {"epem_ttx": r"$e^+e^-\to t\bar t$", "ee_ttbar_nlo": r"$e^+e^-\to t\bar t$, $V/B$",
+        "ee_uu_nlo": r"$e^+e^-\to u\bar u$, $V$", "bbx_zz_nlo": r"$b\bar b\to ZZ$, $V/B$",
+        "ee_uu": r"$e^+e^-\to u\bar u$", "bbx_zz": r"$b\bar b\to ZZ$"}
+EX_TARGETS = ("epem_ttx", "ee_ttbar_nlo", "ee_uu", "ee_uu_nlo")  # b b~ > Z Z V/B has no good trial at all
 
 
-def figure(rows):
-    """figs/curve_quality_end_{a,b}: every t t~ LO trial at D >= 316, end/best and late val against its peak lr."""
+def examples(rows):
+    """figs/curve_examples_{good,bad}: per target one stage-2 search best at D >= 1000 that the measure calls good (the
+    one with the lowest separation) and one it calls bad (the bad one with the median separation, a typical failure):
+    training and validation MSE against step, in the units of the reported loss."""
     from suspects_readout import ps
-    g = [r for r in rows if r["target"] == "epem_ttx" and r["D"] >= 316]
-    sty = {("s2", "scr"): ("scratch", ps.C.blue, "o"), ("s2", "ft"): ("FT old", "black", "s"),
-           ("s4", "ft"): ("FT new", ps.C.vermillion, "^")}
-    figs = ps.panels(2)
-    for (fig, ax), (c, lab) in zip(figs, (("end_over_best", r"$v_{\rm end}/\min v$"),
-                                          ("late_val", r"$v$, last quarter change"))):
-        for key, (name, col, m) in sty.items():
-            h = [r for r in g if (r["stage"], r["arm"]) == key]
-            ax.scatter([r["peak_lr"] for r in h], [r[c] for r in h], color=col, marker=m, s=12, label=name)
-        ax.axhline(BAR[c], color="grey", linestyle="--", label="bar")
-        ax.set_xscale("log"); ax.set_yscale("log"); ax.set_xlabel("peak lr")
-        ax.set_ylabel(lab)
-        ps.legend(ax, "upper left")
-    ps.save_panels(figs, os.path.join(HERE, "figs", "curve_quality_end"))
+    pick = {}
+    for tg in EX_TARGETS:
+        g = [r for r in rows if r["stage"] == "s2" and r["target"] == tg and r.get("best") and r["D"] >= 1000]
+        good = sorted((r for r in g if r["well"]), key=lambda r: r["separation"])
+        bad = sorted((r for r in g if not r["well"]), key=lambda r: r["separation"])
+        pick[tg] = (good[0] if good else None, bad[len(bad) // 2] if bad else None)
+    for i, kind in enumerate(("good", "bad")):
+        fig, axs = ps.figure(ncols=2, nrows=2)
+        for ax, tg in zip(axs.ravel(), EX_TARGETS):
+            r = pick[tg][i]
+            if r is None:
+                print(f"  {kind} {tg}: none at D >= 1000")
+                continue
+            p = r["prepd_std"] ** 2
+            st = np.arange(len(r["val"])) * (r.get("every") or 1)
+            ax.plot(st, np.array(r["val"]) * p, color=ps.C.vermillion, label="validation")
+            ax.plot(st[:len(r["train"])], np.array(r["train"]) * p, color=ps.C.blue, linestyle="--", label="training")
+            ax.set_yscale("log"); ax.set_xlabel("training step"); ax.set_ylabel("MSE")
+            arm = "scratch" if r["arm"] == "scr" else "fine-tune"
+            ps.process_label(ax, TLAB[tg] + f", {arm}, " + rf"$D={r['D']:.0f}$")
+            print(f"  {kind} {tg} {arm} D={r['D']:.0f} {r['run_dir']}: separation {r['separation']:.3g}, "
+                  f"end_up {r['end_up']:.3g}, val min {r['val_min_ln']:.2e}")
+        ps.legend(axs[0, 0], "lower left")
+        ps.save(fig, os.path.join(HERE, "figs", f"curve_examples_{kind}"))
 
 
 def cells(target):
-    """The L(D) label (b b~ > Z Z, design PASS 2026-11-12 15:11, bars per Joaquin 2026-11-12): per cell its search's
-    best trial; an arm TRACKS when in >= 5 of its 7 cells that trial's validation falls with training to the end."""
+    """The L(D) label (b b~ > Z Z, design PASS 2026-11-12 15:11, measure per Joaquin 2026-11-12): per cell its search's
+    best trial; an arm is well trained when in >= 5 of its 7 cells that trial's validation goes down with training."""
     rows = [r for r in trials() if r["stage"] == "s2" and r["target"] == target and r.get("best")]
     out = {}
     for arm in ("scr", "ft"):
         rr = sorted((r for r in rows if r["arm"] == arm), key=lambda r: r["D"])
         for r in rr:
-            print(f"{target} {arm:3s} D={r['D']:7.0f}  val min {r['val_min_ln']:.2e}  end/best {r['end_over_best']:6.2f}"
-                  f"  late val {r['late_val']:5.2f}  late train {r['late_train'] or float('nan'):5.2f}  "
-                  + ("TURNS UP" if not r["well"] else "tracks, val stalls" if r["stalls"] else "tracks"))
+            print(f"{target} {arm:3s} D={r['D']:7.0f}  val min {r['val_min_ln']:.2e}  separation {r['separation']:8.3g}"
+                  f"  end_up {r['end_up']:6.3g}  " + ("good" if r["well"] else "BAD"))
         n = sum(r["well"] for r in rr)
-        out[arm] = {"cells": len(rr), "tracks": n, "stalls": sum(r["stalls"] for r in rr),
-                    "per_cell": {f"{r['D']:.0f}": r["well"] for r in rr}}
-        print(f"{target} {arm}: {n} of {len(rr)} search bests track to the end")
+        out[arm] = {"cells": len(rr), "good": n, "per_cell": {f"{r['D']:.0f}": r["well"] for r in rr}}
+        print(f"{target} {arm}: {n} of {len(rr)} search bests good")
     json.dump(out, open(os.path.join(DATA, f"curve_quality_cells_{target}.json"), "w"), indent=1)
     return out
 
