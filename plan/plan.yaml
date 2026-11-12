@@ -23714,6 +23714,23 @@ entries:
       point or path (V/B: the null-parent read already shows pre 8.9x scratch at scratch HPs); next: report, and the next
       design from the null-parent read (path bisect on V/B). WORSE: gmean r_old >= 3: the old window held something scratch''s
       lacks; report. No rerun of a search on any branch (one seed as the sibling searches, D315).'
+    fix_at: '2026-11-12T09:54:32+00:00'
+    fix: 'Checks 3 and 4 (one-loop V/B half). The design''s own check data (nullparent_readout.json against ft_hpo_diag.json)
+      give the scratch-space point at r_old 0.45 (V/B D=1000: 6.23e-7 / 1.39e-6) and 0.27 (D=3162: 1.44e-7 / 5.35e-7), gmean
+      0.35: the expected V/B effect sits on the 1/3 FIXED bar, about 1.7 sd (the stated ln-sd 0.6 for 2 cells) below 1, so
+      V/B reads FIXED or NO CHANGE about as often whatever the truth, and NO CHANGE is labelled ''the space is not the cause''
+      for exactly the result the evidence predicts. Fix: either a V/B branch for 1/3 < gmean r_old < 1 with both cells below
+      1 that says ''improves, below the bar: not resolved on V/B, report'' (not ''not the cause''), or a V/B bar the expected
+      0.35 clears with its noise, stated. Check 2/selection: the V/B cells are D=1000 and 3162, the two where the scratch-space
+      point beat the old template; the third measured V/B cell, D=316, where it was 15x worse (6.1e-5 / 4.0e-6), is dropped
+      as ''not a test cell'' with no reason, while the tree side tests D=316. Use V/B D=316, 1000, 3162 (one more 8-trial
+      search, ~2-3 GPU-h, still well under 30), or state why D=316 is out on grounds other than its result. Note for the revision:
+      the control searches are short of trials (stage-2 fine-tune tree D=3162 read 5 of 8, D=1000 7 of 8 in ft_hpo_diag.json);
+      state it beside r_old. The generator change (--ft-space, --ks) and the four configs are uncommitted: ''fixed: @ this
+      commit'' needs a commit. Passed: configs differ from dsave_s2_ft siblings only in layer_decay fixed 1 and lr_scale [0.333,3]
+      (and from dsave_s2_scr only by the parent weights, lr window identical, e.g. [0.00228,0.0205] at V/B D=1000); full coupled
+      template space, 8 trials 3,3,2 as siblings; HETEROSC mu_mse + sigma stage; 70 GB free on CC; tree power fine (expected
+      gmean ~0.095 vs bar 1/3).'
   step_waits:
     '2': FA-ccin2p3-dbd0ef14 FA-ccin2p3-9aa32fc7 FA-ccin2p3-5b23c48c FA-ccin2p3-06f25f84 FA-ccin2p3-be096b2b FA-ccin2p3-df21f86b
       FA-ccin2p3-6ec29bc9 FA-ccin2p3-7a60851a FA-ccin2p3-ace664ae FA-ccin2p3-d239df18 FA-ccin2p3-b2d0c0d3 FA-ccin2p3-3c7a44de
