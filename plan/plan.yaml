@@ -26815,6 +26815,105 @@ entries:
       said so when reported. Cost ~3.7 GPU-h, under D412''s 30. Prior searched: results.tex ''layer.?norm|pre-norm|prenorm|without
       norm|no.?ln'' (only an unrelated LLM final-LayerNorm line 12304), site decisions (D315, D403, D411, D412), the entry''s
       findings: no earlier run without the norms.'
+  - at: '2026-11-12T03:52:37+00:00'
+    question: 'D405/D406 (revised after the FIXes of 2026-11-12 03:19 and ~06:30; D412: no question, calls made here): does
+      a pretraining that has the inputs that helped and physical-mass top data reaching towards threshold transfer anything
+      to the KIT t t~ one-loop virtual target (protocol A: e+e- > t t~ family held out, first 1e5 KIT bulk_train events, 8000
+      steps), against the matched from-scratch run with the same inputs? Three fine-tunes separate the parts: ft_r5 = A_ft
+      from the existing r5 parent (softpair inputs + the 278 physical-mass top tree classes); ft_thr = A_ft from r5thr = r5''s
+      recipe plus 3 LO 2->2 top-pair classes (gg, d d~, b b~ > t t~, m_t 172.5) drawn log-uniform in beta in [1e-5, 0.6];
+      ft_thrbeta = A_ft from r5thrbeta = r5thr pretrained AND fine-tuned with the beta input (model.input_pair_threshold=true,
+      the step-6 arm that was YES on t t~ virtual from scratch, whose limit was extrapolation past the trained beta >= 0.2,
+      which the threshold pools now cover). Feeds: the KIT t t~ protocol-A model, whether the catalog parent''s top pools
+      get the log-beta component and the beta input, and the next lever if not.'
+    prior: 'Searched docs/results.tex (KIT, threshold, Coulomb, star arms, t t~ threshold arm, top parent, physical mass,
+      beta, log-uniform, sqrts_measure, pair threshold), the plan (kit_benchmark findings, pretrain_data_saving designs and
+      findings) and site decisions --project FA. (a) The star arms'' t t~ threshold arm (results.tex par ''The star arms''
+      four new probes'' and ''design'', ~l.14809-14846): rung 1 + u u~ > t t~ tree AND one loop at sqrt s 363-450 GeV (beta
+      ~0.2-0.65), probe e+e- > t t~ one loop there: 2-4x better than rung 1 from D=1e3 up, still above scratch at small D;
+      rung 1 and the 64k ee>uu parent 2.5-20x WORSE than scratch at D<=10^2.5 (rung 1 1.6-3.6x better than scratch from 1e3
+      up). What differs now: the target is KIT''s (1e5 bulk points, D far above the star arms'' 1e4 top), the readout is the
+      hard strata down to beta 1e-4 (KIT threshold strata 1e-4..0.2) not a beta >= 0.2 val pool, the pretraining tops reach
+      beta 1e-5 (LO) instead of >= 0.2, and the inputs are softpair (+ beta input in one arm), which the star arms lacked;
+      it matters because the star arm never showed the parent anything below beta 0.2, so it could not transfer the Coulomb
+      region KIT reads. (b) KIT A_ft from kit_pretrain_heldout (trial-1262 recipe, tops only at m 50/300/600, no softpair
+      inputs): tt virt Coulomb deepest 7-8.6 like scratch; threshold scan A_ft -0.990 vs A -0.992 at beta 1e-3. (c) Scratch
+      softpair f21fa163: Coulomb deepest 7.06, Sudakov 15-50 TeV 7.21 (5d2aec11 re-score), bulk 7.2e-9; softpairthr 3fc1016a
+      (beta input) vs f21fa163: Coulomb median -0.325, Sudakov -0.589, bulk -0.775, deepest 3.55; its input spans only [-0.64,-0.008]
+      on bulk_train (beta >= 0.2), the strata need -3.68..-0.64 (tools/kit_input_range.py). (d) pretrain_data_saving r5 parent
+      FA-ccin2p3-857e83c1 (1.81 h, softpair, + 278 physical-mass top tree classes, ee>tt family and u u~ class out, D400):
+      catalog t t~ fine-tunes behind scratch (S 0.46 LO, 0.45 V); own off-shellness stats better on t t~ V (w/o-worst val
+      0.21, 0.07, 0.08, 1.08 own/parent); the pair-threshold input as a fine-tune-only arm there was found confounded by its
+      reviewer (parent trained without it), which is why here the flag is in the parent too. (e) r5''s tops'' beta coverage
+      (tools/kit_beta_coverage.py, kit_beta_coverage_h3.json): 123 of 278 pools carry a t t~ pair, beta < 0.1 1.6%, < 1e-2
+      208 events, < 1e-3 16; 2->2 classes start at beta 0.0265, 1% quantile 0.23-0.25.'
+    measure: 'tools/kit_readout.py --vs on the kit_figures collect of the arms and controls: per family (threshold_beta =
+      Coulomb, sudakov_sqrts, bulk) the median over strata of log10(arm log-MSE / control log-MSE), its range, strata better/worse,
+      the deepest Coulomb bin and its fitted exponent vs exact -1.02; and tools/kit_threshold_scan.py: sigma_NLO^surr/sigma_NLO
+      - 1 at beta 1e-3 and the lowest beta in the NLO scale band. Noise reference for the family median (measured, tools/kit_mlp_readout.py
+      spread @c42a8908 on kit_mlp_ladder.json: the same statistic between two seeds of one setup, 9 MLP arms x 3 seed pairs
+      on KIT t t~ virtual, the only KIT seed spread measured; no transformer KIT run has two seeds): |seed-pair median| Coulomb
+      median 0.094, 90% quantile 0.84; Sudakov 0.160 / 0.607; bulk 0.085 / 0.225.'
+    check: 'The measure moves with the tested changes on existing data: Coulomb deepest bin 3.55 (softpairthr) .. 8.62 (offon);
+      beta input vs softpair Coulomb median -0.325; A_ft vs A per-family medians moved up to +-0.3 on tt; B vs B_bulk Coulomb
+      2.38 vs 8.71 (threshold data in training moves it); scan ratio at beta 1e-3 -0.897 (B) .. -0.992 (A). r5 has models/model_run0_best.pt
+      and its config.yaml carries the softpair flags (read 2026-11-12, diff below). Hydra: a later override wins (compose
+      of config/amplitudes with fine_tune.offshell_stats=parent then =own gives own, checked 2026-11-12 in .venv-cpu), so
+      job_kit.sh''s hard-coded fine_tune.offshell_stats=parent is replaced by the trailing fine_tune.offshell_stats=own; the
+      A_ft smoke''s saved config.yaml must show own. New code before any job: sqrts_measure ''log_beta'' (mg5_pipeline_final._sqrts_sampler,
+      threshold = sum of the final masses, passed through the flat 2->2 RAMBO-free path sample_2to2_phase_space) with a unit
+      test on the drawn beta range and log-uniformity, an entry-level sqrts_measure in recipe entries, a heldoutthr case in
+      job_datasaving_parent.sh; then D395: the r5thrbeta parent once for ~50 steps (iters=50, with the flag: the superset
+      of r5thr''s path) and one A_ft smoke (50 steps, from r5, offshell own) through training, sigma fit and KIT scoring.'
+    fixed: 'Target KIT ee_tt virt_finite, protocol A, first 1e5 bulk_train events, 8000 steps, seed 42, scripts/job_kit.sh
+      A_ft (target_stats own, fine_tune.lr_scale 1.0, training.lr = job_kit''s A rule 1.18605e-2 at 8000 steps / 1e5, as f21fa163)
+      with the extra argument fine_tune.offshell_stats=own (pretrain_data_saving''s finding on t t~ V), event-frame scoring
+      (kit_predict at 5d2aec11+), HETEROSC with mu_mse checkpoint selection and the sigma stage. Parents (scripts/job_datasaving_parent.sh,
+      base trial 1262 of cov_v4_long_hpo8_cc_68224): r5 = existing dsave_parent_heldout_r5 (FA-ccin2p3-857e83c1, heldout recipe,
+      1411 pools); r5thr = new case heldoutthr (recipes/catalog_v4_datasaving_parent_heldoutthr.yaml = the heldout recipe
+      + v4_gg_ttx__thr, v4_ddx_ttx__thr, v4_bbx_ttx__thr, 1414 pools) with r5''s arguments ++model.input_soft_eps=1e-8 ++model.input_pair_logs=6
+      and r5''s T=4307 and lr 8.196e-3 kept (not re-derived from the pool count: 5 epochs of 1414 pools would be 4316, 0.2%
+      more; kept so only the pools differ); r5thrbeta = r5thr + ++model.input_pair_threshold=true (in the parent, hence inherited
+      by its fine-tune; the flag acts on every massive pair of every pool: log((p_i+p_j)^2-(m_i+m_j)^2)/s, unchanged for massless
+      pairs). Threshold pools: base = the catalog_v4 entries v4_{gg,ddx,bbx}_ttx (MT 172.5, WT 1.4915, sm-no_b_mass, massless
+      beams, catalog_v4 cuts V4_CUTS hadronic with cut_pdgs [5,15]: tops are massive and not in cut_pdgs, so no cut acts on
+      these 2->2 events), drawn PLAINLY: sampling mode flat (no catalog_v4 mixture, no forward component, no flat-|M|^2 part,
+      no adaptive sqrt s pass), cos theta and phi uniform (isotropic 2->2, sample_2to2_phase_space), beta = sqrt(1 - 4 m_t^2/s)
+      log-uniform on [1e-5, 0.6], sqrt s = 2 m_t / sqrt(1 - beta^2) (window [345.0000000173, 431.25] GeV); n_train 1e4, n_val
+      1e4, n_test 1e4 like r5''s tops; data.train_subsample 1e4 as every pool. Only the 3 pools differ between r5 and r5thr;
+      only the flag between r5thr and r5thrbeta.'
+    control: 'Each arm against the matched from-scratch run with the same inputs: ft_r5 and ft_thr vs kit_A_ee_tt_virt_finite_n100000_t8000_softpair
+      (FA-ccin2p3-f21fa163); ft_thrbeta vs kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr (FA-ccin2p3-3fc1016a; differs
+      from f21fa163 only by model.input_pair_threshold, diffed 2026-11-12). Attribution pairs: ft_thr vs ft_r5 (only the threshold
+      pools), ft_thrbeta vs ft_thr (only the beta input). What differs between an A_ft and its scratch control (r5 config.yaml
+      vs trial 1262''s, diffed 2026-11-12: data pools, data.memmap, data.train_subsample, training.iterations, training.lr,
+      ++model.input_soft_eps=1e-8, ++model.input_pair_logs=6; job_kit.sh overrides all but the two input flags, and eval_subsample,
+      dtype float64, heterosc_select mu_mse): the start weights, the target and off-shellness statistics (own, as scratch
+      computes them), and model.input_pair_logs 6 vs the controls'' 4. The 4 vs 6 is equivalent in function: _pair_log_inputs
+      zeroes every pair beyond an event''s multiplicity, so a 4-particle KIT event gets the same 6 pair logs in other column
+      positions plus 9 zero columns, which a linear input layer maps identically; only the input layer''s fan-in at init differs,
+      which the fine-tune does not re-initialise anyway.'
+    seeds: 'Seed 42 for every arm and both controls, one run per cell (D315; D412: no second-seed question). Two-sided read
+      against the measured seed noise (tools/kit_mlp_readout.py spread @c42a8908, seed-pair |median log10 ratio| of the family
+      statistic, 9 MLP arms x 3 pairs on KIT t t~ virtual; no transformer KIT seed spread exists, said with every verdict):
+      Coulomb 90% quantile 0.84, Sudakov 0.61, bulk 0.23. For every pair read (each fine-tune vs its scratch control, and
+      ft_thr vs ft_r5, ft_thrbeta vs ft_thr): a family median below -(its 90%) reads better, above +(its 90%) worse, in between
+      ''within seed noise'' with its number.'
+    outcome: 'Per pair (the rule of seeds): YES (transfers) if the Coulomb family reads better and no family reads worse;
+      NO if the Coulomb family reads worse or any family reads worse; UNRESOLVED if the Coulomb median sits within its band
+      (|d| < 0.84) and nothing reads worse: reported with its number; an unresolved pair changes nothing in the catalog parent
+      and the KIT model stays as it is. Attribution from the fine-tune vs fine-tune pairs only (D408 caveat: pretrain_data_saving''s
+      open question on why t t~ fine-tunes lose to scratch, with the head-map change cec3610c now in the fine-tune path, means
+      a fine-tune vs scratch NO may be that general fine-tune deficit, not an absence of transfer): ft_thr vs ft_r5 YES ->
+      the threshold coverage transfers (the catalog parent''s top-pair pools get the log-beta component); ft_thrbeta vs ft_thr
+      YES -> the beta input adds to it (into the catalog parent with the pools; ft_thrbeta becomes the KIT protocol-A t t~
+      virtual model if it also beats its scratch control); both fine-tune vs fine-tune pairs NO or unresolved -> nothing at
+      LO adds transfer of the Coulomb rise; in the star arms'' light (one-loop top pairs at beta >= 0.2 helped over a parent
+      without them, 2-4x from D=1e3, never beat scratch) the next levers are the target side (step 6, no pretraining) first
+      and one-loop top pairs drawn log-uniform in beta second, each designed then. Cost: generation of 3 tree 2->2 pools (CPU,
+      minutes); 2 parents x ~1.9 GPU-h (r5 1.81 h); 3 fine-tunes x ~1.6 GPU-h; 2 smokes ~0.3: ~9.2 GPU-h, under 30. Disk:
+      the parents run in memory (data.memmap=false, no cache); the 3 pools x 3e4 events x 21 float64 columns ~15 MB; 2 parent
+      + 3 fine-tune run dirs ~150 MB each; /sps/lpnhe 41 GB free (read 2026-11-12).'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
