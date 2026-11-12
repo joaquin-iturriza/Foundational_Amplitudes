@@ -21384,6 +21384,9 @@ entries:
       L(D) figure + S with band; tt kept in the background'
     4: b b~ > Z Z LO fine-tune searches launched when the held-out parent dsave_parent_heldoutbbzz (FA-ccin2p3-0d698e4b) ends;
       design PASS 2026-11-12 (revised)
+    5: 'Template read (design PASS 18:05, D422/D423): 8 searches on t t~ LO D=316, 3162 (WSD-only vs stage 2; template 2 =
+      WSD + batch size searched + fine-tune ranges opened vs WSD-only), driver detach tmpl2_wsd2; read with lr_centre_readout.py
+      --test tmpl2 (fetch), figure, report'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -26162,6 +26165,12 @@ entries:
       if:
       - 'parent ends clean: generate and launch the 7 fine-tune searches (and the scratch ones if not yet out)'
       - 'parent breaks: read its log, fix, resubmit; LO fine-tune arm waits'
+    5:
+      feeds: which HPs, ranges and trial count make the search bests' validation go down with training (the template for every
+        data-saving search)
+      if:
+      - 'TEMPLATE 2 FIXES: extend the template to the remaining cells (cost to Joaquin)'
+      - 'NO: next candidate (horizon) designed from these 64 trials'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
