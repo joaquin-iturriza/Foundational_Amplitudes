@@ -89,6 +89,28 @@ def main():
                                                      "peak_lr", "best", "steady", "spike", "jitter", "gap", "well")}
                              | {"warmup_frac": r["hp"]["warmup_frac"], "ema": r["hp"]["ema"]})
     json.dump(out, open(os.path.join(DATA, "curve_quality.json"), "w"), indent=1)
+    figure(rows)
+
+
+def figure(rows):
+    """figs/curve_quality_lr_{a,b}: spike and jitter of every t t~ LO trial at D >= 316 against its peak lr."""
+    from suspects_readout import ps
+    g = [r for r in rows if r["target"] == "epem_ttx" and r["D"] >= 316]
+    sty = {("s2", "scr"): ("scratch", ps.C.blue, "o"), ("s2", "ft"): ("FT old", "black", "s"),
+           ("s4", "ft"): ("FT new", ps.C.vermillion, "^")}
+    figs = ps.panels(2)
+    for (fig, ax), (c, lab) in zip(figs, (("spike", r"$\max_i v_i/\min_{j<i} v_j$"),
+                                          ("jitter", r"median $|\ln(v_i/v_{i-1})|$"))):
+        for key, (name, col, m) in sty.items():
+            h = [r for r in g if (r["stage"], r["arm"]) == key]
+            ax.scatter([r["peak_lr"] for r in h], [r[c] for r in h], color=col, marker=m, s=12, label=name)
+        ax.axhline(BAR[c], color="grey", linestyle="--", label="bar")
+        ax.set_xscale("log"); ax.set_xlabel("peak lr")
+        if c == "spike":
+            ax.set_yscale("log")
+        ax.set_ylabel(lab)
+        ps.legend(ax, "upper left")
+    ps.save_panels(figs, os.path.join(HERE, "figs", "curve_quality_lr"))
 
 
 def ok(r, c):

@@ -145,6 +145,9 @@ def main():
                     help="fine-tune search space: llrd (lr_scale [0.1,10], layer_decay [0.75,1]) or scratch (layer_decay 1, "
                          "lr_scale [1/3,3]: scratch's lr window); default scratch for tree targets (step-3 test FIXED on "
                          "t t~ tree, s4_readout.py), llrd for one-loop (IMPROVED, NOT RESOLVED: no default change)")
+    ap.add_argument("--lr-factor", type=float, default=1.0,
+                    help="multiplies the lr centre c of every config (both arms); curve_quality.py: the current c gives "
+                         "spiking, jittering val curves in every t t~ / u u~ search at D>=316")
     ap.add_argument("--ks", type=int, nargs="*", help="only these D exponents k (D = 10^(k/2))")
     a = ap.parse_args()
     R, hz = rates(), horizons()
@@ -164,7 +167,7 @@ def main():
     total, half = 0.0, halved()
     for name, t, k, T, arm in jobs:
         p, h = write(name, t, k, T, arm, R[(t, k)], a.parent_nlo if t.endswith("_nlo") else a.parent_lo,
-                     0.5 if (t, k) in half else 1.0, a.offshell_nlo if t.endswith("_nlo") else "parent",
+                     (0.5 if (t, k) in half else 1.0) * a.lr_factor, a.offshell_nlo if t.endswith("_nlo") else "parent",
                      a.ft_space or ("llrd" if t.endswith("_nlo") else "scratch"))
         total += h
         print(f"{os.path.relpath(p, ROOT)}  {h:.1f} GPU-h")
