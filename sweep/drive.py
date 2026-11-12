@@ -89,6 +89,7 @@ FINAL = ("COMPLETED", "FAILED", "CANCELLED", "TIMEOUT", "REMOVED")
 QUEUED = ("PENDING", "IDLE")      # not started (SLURM, HTCondor): a trial in one may be re-picked
 MOVE_H, MOVE_X = 1.0, 2.0         # a queued trial moves when another site ends it > 1 h sooner and in < half the time
 REPICK_S = 600                    # one re-pick `site pick` per 10 min at most: each one probes every site over ssh
+STAY_S = 12 * 3600                # a moved trial stays where it arrived this long (a move gives up its queue age)
 
 
 def log(msg):
@@ -339,12 +340,16 @@ class Sweep:
         out = site(*args, timeout=300)
         m = re.search(r"\brun\s+(\S+)", out)
         if not m:
-            self.sampler.report_failure(hp_idx)
+            if retry:      # a requeued trial stays "retry" with its hp healthy: report_failure would mark it diverged
+                self.sampler._in_flight.discard(hp_idx)
+            else:
+                self.sampler.report_failure(hp_idx)
             raise RuntimeError("submit gave no run id:\n" + out)
         prev = self.st["trials"].get(str(idx), {}).get("lost_runs") if retry else None
         self.st["trials"][str(idx)] = {"idx": idx, "rid": m.group(1), "site": s, "hp_idx": hp_idx,
                                        "hp": hp, "t_steps": t_steps, "status": "submitted",
-                                       "submitted": int(time.time()), **({"lost_runs": prev} if prev else {})}
+                                       "submitted": int(time.time()), **({"lost_runs": prev} if prev else {}),
+                                       **({"moved": t0["moved"]} if t0 and t0.get("moved") else {})}
         self.save()
         log("%s: trial %d -> %s  (hp%04d t%d, run %s)" % (self.name, idx, s, hp_idx, t_steps, m.group(1)))
 
@@ -367,7 +372,7 @@ class Sweep:
             log("%s: could not cancel %s on %s, it stays: %s" % (self.name, rid, src, str(e)[-200:]))
             return False
         t.setdefault("lost_runs", []).append(rid)
-        t["status"] = "retry"
+        t["status"], t["moved"] = "retry", int(time.time())
         self.save()
         self.submit(dest, a, t)
         log("moved %s %s -> %s" % (rid, src, dest))
@@ -469,8 +474,9 @@ def mark_done(sw, a):
 def finish_h(r, hours, stays=False):
     """Hours until one trial of `hours` ends on the site of `site pick` row r, by pick's own model (plan_batch's finish
     of one job). A trial that stays counts none of my queued jobs ahead of it (it may be first in line), so a move must
-    beat the stay's best case. None: the site takes no work (not UP, held, submit cap 0, no GPU fits: pick's skip)."""
-    if r.get("state") != "UP" or r.get("cap") == 0 or r.get("skip"):
+    beat the stay's best case, and pick's skips (no GPU fits now, verify timed out) do not count against staying: they
+    pass. None: a destination that takes no work (not UP, held, submit cap 0, a skip)."""
+    if not stays and (r.get("state") != "UP" or r.get("cap") == 0 or r.get("skip")):
         return None
     if (r.get("slots_now") or 0) > 0:
         return float(hours)
@@ -491,8 +497,13 @@ def repick_dest(cur, rows, hours):
     best = min(((f, s) for s, r in by.items() if s != cur for f in [finish_h(r, hours)] if f is not None), default=None)
     if best is None:
         return None
-    stay = finish_h(by[cur], hours, stays=True)
-    if stay is None or (stay - best[0] > MOVE_H and stay > MOVE_X * best[0]):
+    home = by[cur]
+    if home.get("cap") == 0 or home.get("fit_ever") == 0:
+        return best[1]                         # never starts there (submit cap 0, no node holds the request)
+    if home.get("state") != "UP":
+        return None                            # down or held for now: its queue is unknown, the trial keeps its place
+    stay = finish_h(home, hours, stays=True)
+    if stay - best[0] > MOVE_H and stay > MOVE_X * best[0]:
         return best[1]
     return None
 
@@ -516,28 +527,36 @@ def cancel_cmd(s, job):
     return "%s %s" % ("condor_rm" if sched == "htcondor" else "scancel", int(job))
 
 
-def repick(sweeps, a, rows):
-    """Move each trial still queued on its site to the site `site pick` (rows) says ends it clearly sooner."""
+def took(rows, s):
+    """Site s's pick row after one more job of mine went there: queued, one free slot fewer."""
+    for r in rows:
+        if r["site"] == s:
+            r["mine_q"] = (r.get("mine_q") or 0) + 1
+            r["slots_now"] = max(0, (r.get("slots_now") or 0) - 1)
+
+
+def repick(sweeps, a, rows, now=None):
+    """Move each trial still queued on its site to the site `site pick` (rows) says ends it clearly sooner; a trial
+    moved in the last STAY_S stays."""
+    now = now or time.time()
     for sw in sweeps:
         for t in sw.in_flight():
-            if t.get("sched_state") not in QUEUED:
+            if t.get("sched_state") not in QUEUED or now - t.get("moved", 0) < STAY_S:
                 continue
             dest = repick_dest(t["site"], rows, sw.hours)
             if dest and sw.move(t, dest, a):
-                for r in rows:                     # the destination's queue now holds it: the next trial sees that
-                    if r["site"] == dest:
-                        r["mine_q"] = (r.get("mine_q") or 0) + 1
-                        r["slots_now"] = max(0, (r.get("slots_now") or 0) - 1)
+                took(rows, dest)
 
 
 repick.last = 0.0
 
 
-def plan(k, sweeps, a):
-    """Sites for the next k trials, from `site pick`: each entry is one job's site."""
+def plan(k, sweeps, a, record=True):
+    """Sites for the next k trials, from `site pick`: each entry is one job's site. record=False: a re-check that
+    leaves the placement quota other agents submit under untouched."""
     s0 = sweeps[0]
     args = ["pick", PROJECT, "--jobs", str(k), "--mem", s0.mem, "--cpus", str(s0.cpus),
-            "--hours", "%.2f" % s0.hours, "--json"]
+            "--hours", "%.2f" % s0.hours, "--json"] + ([] if record else ["--no-record"])
     if s0.gpu_min_mem:
         args += ["--gpu-min-mem", str(s0.gpu_min_mem)]     # count only the GPUs the trials may run on
     if a.sites:
@@ -632,6 +651,7 @@ def main():
                 try:
                     if sw.data_ready(s, a):
                         sw.submit(s, a)
+                        took(rows, s)
                     else:
                         log("%s: %s not ready (pools); trial deferred" % (sw.name, s))
                 except Exception as e:
@@ -640,7 +660,7 @@ def main():
                 and time.time() - repick.last >= REPICK_S:
             repick.last = time.time()
             try:
-                repick(sweeps, a, rows if rows is not None else plan(1, sweeps, a)[1])
+                repick(sweeps, a, rows if rows is not None else plan(1, sweeps, a, record=False)[1])
             except Exception as e:
                 log("re-pick failed: %s" % str(e)[-300:])
         for sw in sweeps:

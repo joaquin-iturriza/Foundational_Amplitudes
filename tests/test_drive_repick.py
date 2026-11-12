@@ -46,6 +46,17 @@ def test_dead_home_and_closed_destinations():
     assert drive.repick_dest("ccin2p3", rows, 2.0) is None
     # home not probed (outside --sites): kept
     assert drive.repick_dest("jeanzay", [row("lxplus", slots=9)], 2.0) is None
+    # no node can ever hold the request at home: moves
+    assert drive.repick_dest("ccin2p3", [row("ccin2p3", fit_ever=0), row("lxplus", wait_h=5)], 2.0) == "lxplus"
+
+
+def test_temporary_home_states_keep():
+    # reviewer case: 48G trials pending on CC with no GPU free now (pick's skip "0 GPUs fit"), lxplus ends in 20 h:
+    # stay by the queue model (1 + 2 = 3 h), kept; a down or held home probe keeps its trial too
+    far = row("lxplus", wait_h=18)
+    assert drive.repick_dest("ccin2p3", [row("ccin2p3", wait_h=1, skip="0 GPUs fit 48G/4cpu"), far], 2.0) is None
+    assert drive.repick_dest("ccin2p3", [row("ccin2p3", state="DOWN"), row("lxplus", slots=9)], 2.0) is None
+    assert drive.repick_dest("ccin2p3", [row("ccin2p3", state="HELD"), row("lxplus", slots=9)], 2.0) is None
 
 
 def test_repick_moves_queued_only_and_fills_destination():
@@ -62,13 +73,50 @@ def test_repick_moves_queued_only_and_fills_destination():
     assert rows[1]["mine_q"] == 2 and rows[1]["slots_now"] == 0
 
 
+def test_recently_moved_stays():
+    moved = []
+    tr = dict(idx=0, rid="FA-lxplus-0", site="lxplus", status="submitted", sched_state="IDLE", moved=1000)
+    sw = types.SimpleNamespace(hours=2.0, in_flight=lambda: [tr],
+                               move=lambda t, dest, a: moved.append(dest) or True)
+    rows = [row("lxplus", wait_h=10), row("ccin2p3", slots=1)]
+    drive.repick([sw], None, rows, now=1000 + drive.STAY_S - 1)
+    assert moved == []
+    drive.repick([sw], None, rows, now=1000 + drive.STAY_S)
+    assert moved == ["ccin2p3"]
+
+
+def test_retry_submit_without_run_id_keeps_hp_healthy(monkeypatch):
+    # a moved trial (cancelled, now "retry") whose resubmission prints no run id: still retry, hp not diverged
+    smp = types.SimpleNamespace(_in_flight={7}, algorithm=types.SimpleNamespace(diverged_configs=set()))
+    smp.report_failure = lambda h: smp.algorithm.diverged_configs.add(h)
+    t = dict(idx=3, hp_idx=7, hp={}, t_steps=10, status="retry", rid="FA-ccin2p3-x", lost_runs=["FA-ccin2p3-x"])
+    sw = types.SimpleNamespace(sampler=smp, st={"trials": {"3": t}}, name="t", mem="8G", time="01:00:00", cpus=4,
+                               gpu_min_mem=None, hours=1.0, config_rel="c.yaml", issued=lambda: 4,
+                               trials=lambda *st: [t])
+    monkeypatch.setattr(drive, "site", lambda *a, **k: "submitted nothing")
+    a = types.SimpleNamespace(item="x", dry_run=False)
+    try:
+        drive.Sweep.submit(sw, "lxplus", a, t)
+        raise AssertionError("no error")
+    except RuntimeError:
+        pass
+    assert t["status"] == "retry" and 7 not in smp.algorithm.diverged_configs and 7 not in smp._in_flight
+
+
+def test_took_counts_new_submissions():
+    rows = [row("lxplus", slots=3)]
+    for _ in range(3):
+        drive.took(rows, "lxplus")
+    assert rows[0]["slots_now"] == 0 and rows[0]["mine_q"] == 3
+    # a CC trial (12 h stay) now sees lxplus at 0 + 3*2 + 2 = 8 h: not 2x sooner, kept
+    assert drive.repick_dest("ccin2p3", [row("ccin2p3", wait_h=10)] + rows, 2.0) is None
+
+
 def test_cancel_cmd():
     assert drive.cancel_cmd("ccin2p3", "123") == "scancel 123"
     assert drive.cancel_cmd("lxplus", "456") == "condor_rm 456"
 
 
 if __name__ == "__main__":
-    for k, f in list(globals().items()):
-        if k.startswith("test_"):
-            f()
-    print("ok")
+    import pytest
+    sys.exit(pytest.main([__file__, "-q"]))
