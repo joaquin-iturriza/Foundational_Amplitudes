@@ -51,3 +51,26 @@ def test_foreign_dirty_files_do_not_stop_the_sync(monkeypatch):
     with pytest.raises(SystemExit):
         drive.main()
     assert calls == [("sync", "ccin2p3", drive.PROJECT, "--allow-dirty")]
+
+
+def test_site_down_at_sync_is_left_out(monkeypatch):
+    """a site whose sync times out (Jean Zay down) is dropped from placement, the others go on"""
+    calls = []
+
+    def fake_site(*a, **k):
+        calls.append(a)
+        if a[0] == "sync" and a[1] == "jeanzay":
+            raise drive.subprocess.TimeoutExpired("site sync jeanzay", 660)
+        if a[0] == "sync":
+            return ""
+        raise RuntimeError("stop after sync")
+    sw = types.SimpleNamespace(name="t", n_trials=1, n_startup=1, sampler=types.SimpleNamespace(surrogate="s", objective_scale=1),
+                               waves=None, collect=lambda a: (_ for _ in ()).throw(SystemExit("past sync")))
+    monkeypatch.setattr(drive, "site", fake_site)
+    monkeypatch.setattr(drive, "Sweep", lambda c, a: sw)
+    monkeypatch.setattr(drive.subprocess, "run", lambda *a, **k: types.SimpleNamespace(stdout=""))
+    monkeypatch.setattr(sys, "argv", ["drive.py", "--config", "x.yaml", "--item", "i", "--allow-jeanzay"])
+    with pytest.raises(SystemExit) as e:
+        drive.main()
+    assert str(e.value) == "past sync"
+    assert [c[1] for c in calls if c[0] == "sync"] == ["ccin2p3", "jeanzay", "lxplus"]

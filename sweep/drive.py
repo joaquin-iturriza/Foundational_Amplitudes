@@ -620,12 +620,20 @@ def main():
                               stdout=subprocess.PIPE).stdout.strip()
         if mine:
             sys.exit("drive.py: commit the configs first, nothing submitted:\n" + mine)
+        synced, failed = [], []
         for s in sorted(set(a.sites or ["ccin2p3", "lxplus"] + (["jeanzay"] if a.allow_jeanzay else []))):
             log("sync %s" % s)
             try:
                 site("sync", s, PROJECT, "--allow-dirty", timeout=600)
-            except RuntimeError as e:  # never submit on an unsynced site (stale checkout)
-                sys.exit("drive.py: start-up sync of %s failed, nothing submitted:\n%s" % (s, e))
+                synced.append(s)
+            except (RuntimeError, subprocess.TimeoutExpired) as e:
+                # never submit on an unsynced site (stale checkout): a site down at start-up (Jean Zay's probe timing
+                # out, 2026-11-12) is left out of this driver's placement; a restart syncs and includes it again
+                failed.append("start-up sync of %s failed: %s" % (s, str(e)[-300:]))
+                log(failed[-1] + "; site left out")
+        if not synced:
+            sys.exit("drive.py: %s; nothing submitted" % "; ".join(failed))
+        a.sites = synced
     while True:
         for sw in sweeps:
             sw.collect(a)
