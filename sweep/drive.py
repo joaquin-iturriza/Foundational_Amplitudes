@@ -41,6 +41,10 @@ Pruning (sweep/prune.py, D19): the trials write their results under the site's s
       requires before it treats a search without jobs/ (a driven one) as finished.
 --dry-run: no state written (a temporary directory), no sync, no pool check, no submission; prints the
       `site submit` commands of the first wave that would go out now and exits.
+Re-pick: every REPICK_S, each trial still queued (PENDING/IDLE) on its site is weighed against the others by `site
+      pick`'s model (finish_h): when another allowed site (--sites, --allow-jeanzay) ends it more than MOVE_H hours
+      sooner and in under 1/MOVE_X of the time, its job is cancelled there and it is resubmitted at the same hp, t_steps
+      and index on that site, with no penalty (it never ran), logged 'moved <run> <from> -> <to>'.
 Limits: detached trials always cold-start (no cross-fidelity warm start), which is how
 nearly every sweep runs anyway (single fidelity).
 """
@@ -82,6 +86,9 @@ PROJECT = "FA"
 JOB = "sweep/trial_job.sh"
 PREBUILD = "scripts/prebuild_recipes.sh"
 FINAL = ("COMPLETED", "FAILED", "CANCELLED", "TIMEOUT", "REMOVED")
+QUEUED = ("PENDING", "IDLE")      # not started (SLURM, HTCondor): a trial in one may be re-picked
+MOVE_H, MOVE_X = 1.0, 2.0         # a queued trial moves when another site ends it > 1 h sooner and in < half the time
+REPICK_S = 600                    # one re-pick `site pick` per 10 min at most: each one probes every site over ssh
 
 
 def log(msg):
@@ -302,8 +309,8 @@ class Sweep:
         return False
 
     # ---- one trial out
-    def submit(self, s, a):
-        retry = self.trials("retry")
+    def submit(self, s, a, t0=None):
+        retry = [t0] if t0 else self.trials("retry")
         if retry:
             t0 = retry[0]
             hp_idx, hp, t_steps, idx = t0["hp_idx"], t0["hp"], t0["t_steps"], t0["idx"]
@@ -341,6 +348,31 @@ class Sweep:
         self.save()
         log("%s: trial %d -> %s  (hp%04d t%d, run %s)" % (self.name, idx, s, hp_idx, t_steps, m.group(1)))
 
+    def move(self, t, dest, a):
+        """Cancel trial t's job, still queued on its site, and submit it on dest at the same hp, t_steps and index: lost
+        with no penalty (none was observed, it never ran), as --retry-lost takes a trial back. False: it stays."""
+        src, rid = t["site"], t["rid"]
+        if a.dry_run:
+            log("[dry-run] would move %s %s -> %s" % (rid, src, dest)); return False
+        if not self.data_ready(dest, a):
+            return False                               # pools building there: moves on a later pass
+        out = site("poll", rid, timeout=120, check=False)
+        m = re.search(r"->\s+(\S+)", out)
+        if not m or m.group(1) not in QUEUED:
+            return False                               # started (or ended) since the last poll
+        job = sched_id(rid)
+        try:
+            site("run", src, PROJECT, "--", cancel_cmd(src, job), timeout=300)
+        except (RuntimeError, ValueError, TypeError) as e:
+            log("%s: could not cancel %s on %s, it stays: %s" % (self.name, rid, src, str(e)[-200:]))
+            return False
+        t.setdefault("lost_runs", []).append(rid)
+        t["status"] = "retry"
+        self.save()
+        self.submit(dest, a, t)
+        log("moved %s %s -> %s" % (rid, src, dest))
+        return True
+
     # ---- results back
     def collect(self, a):
         fl = self.in_flight()
@@ -351,6 +383,7 @@ class Sweep:
         for t in fl:
             stt = states.get(t["rid"], "")
             if stt not in FINAL:
+                t["sched_state"] = stt
                 continue
             res = self.result_of(t)
             if res and not res.get("failed"):
@@ -431,6 +464,73 @@ def mark_done(sw, a):
             return
     sw.st["done_marked"] = True
     sw.save()
+
+
+def finish_h(r, hours, stays=False):
+    """Hours until one trial of `hours` ends on the site of `site pick` row r, by pick's own model (plan_batch's finish
+    of one job). A trial that stays counts none of my queued jobs ahead of it (it may be first in line), so a move must
+    beat the stay's best case. None: the site takes no work (not UP, held, submit cap 0, no GPU fits: pick's skip)."""
+    if r.get("state") != "UP" or r.get("cap") == 0 or r.get("skip"):
+        return None
+    if (r.get("slots_now") or 0) > 0:
+        return float(hours)
+    conc = max(1, r.get("mine_run") or 0)
+    run_h = (r.get("med_run") or hours * 3600.0) / 3600.0
+    ahead = 0 if stays else (r.get("mine_q") or 0)
+    return (r.get("wait_now") or 0) / 3600.0 + ahead / float(conc) * run_h + hours
+
+
+def repick_dest(cur, rows, hours):
+    """The site a trial queued on `cur` should move to, or None to keep it: the other site of the pick's rows (already
+    limited to --sites / --allow-jeanzay) that ends it soonest, when that beats staying by > MOVE_H hours and MOVE_X
+    times. A current site that takes no work (cap 0, held, no GPU fits) loses to any that does; one the pick did not
+    probe keeps its trial (its queue is unknown)."""
+    by = {r["site"]: r for r in rows}
+    if cur not in by:
+        return None
+    best = min(((f, s) for s, r in by.items() if s != cur for f in [finish_h(r, hours)] if f is not None), default=None)
+    if best is None:
+        return None
+    stay = finish_h(by[cur], hours, stays=True)
+    if stay is None or (stay - best[0] > MOVE_H and stay > MOVE_X * best[0]):
+        return best[1]
+    return None
+
+
+def sched_id(rid):
+    """The scheduler's job id of a run, from the site registry."""
+    import sqlite3
+    db = os.path.join(os.environ.get("CCORCH_HOME") or os.path.expanduser("~/.local/share/ccorch"), "runs.db")
+    c = sqlite3.connect("file:%s?mode=ro" % db, uri=True)
+    try:
+        r = c.execute("SELECT sched_id FROM runs WHERE id=?", (rid,)).fetchone()
+    finally:
+        c.close()
+    return r[0] if r else None
+
+
+def cancel_cmd(s, job):
+    """The command cancelling scheduler job `job` on site s (its scheduler from sites/sites.yaml)."""
+    with open(os.path.join(ROOT, "sites", "sites.yaml")) as f:
+        sched = yaml.safe_load(f)[s]["cluster"]["scheduler"]
+    return "%s %s" % ("condor_rm" if sched == "htcondor" else "scancel", int(job))
+
+
+def repick(sweeps, a, rows):
+    """Move each trial still queued on its site to the site `site pick` (rows) says ends it clearly sooner."""
+    for sw in sweeps:
+        for t in sw.in_flight():
+            if t.get("sched_state") not in QUEUED:
+                continue
+            dest = repick_dest(t["site"], rows, sw.hours)
+            if dest and sw.move(t, dest, a):
+                for r in rows:                     # the destination's queue now holds it: the next trial sees that
+                    if r["site"] == dest:
+                        r["mine_q"] = (r.get("mine_q") or 0) + 1
+                        r["slots_now"] = max(0, (r.get("slots_now") or 0) - 1)
+
+
+repick.last = 0.0
 
 
 def plan(k, sweeps, a):
@@ -517,6 +617,7 @@ def main():
                      % (a.stop_after, c))
         want = {sw: sw.may_issue(parallel) for sw in sweeps if not sw.done()}
         k = sum(want.values())
+        rows = None
         if k:
             order, rows = plan(k, sweeps, a)
             if a.dry_run and not order:
@@ -535,6 +636,13 @@ def main():
                         log("%s: %s not ready (pools); trial deferred" % (sw.name, s))
                 except Exception as e:
                     log("%s: submit to %s failed: %s" % (sw.name, s, str(e)[-300:]))
+        if any(t.get("sched_state") in QUEUED for sw in sweeps for t in sw.in_flight()) \
+                and time.time() - repick.last >= REPICK_S:
+            repick.last = time.time()
+            try:
+                repick(sweeps, a, rows if rows is not None else plan(1, sweeps, a)[1])
+            except Exception as e:
+                log("re-pick failed: %s" % str(e)[-300:])
         for sw in sweeps:
             if sw.done():
                 mark_done(sw, a)
