@@ -1722,8 +1722,7 @@ def pidqn():
         out["val_nll_best"][a] = {"main": min(x for _, x in b[0]["vals"]), "sigma_stage": min(x for _, x in b[-1]["vals"])}
     out["blowups"] = blowups(list(PIDQN.values()))
     json.dump(out, open(os.path.join(DATA, "pidqn.json"), "w"), indent=1)
-    print(json.dumps({r: {n: x.get("R") if isinstance(x, dict) else x for n, x in v.items()
-                          if n not in ("qn_over_earlier_w8",)} for r, v in out["reads"].items()}, default=str))
+    print(json.dumps(out, default=str))
 
 
 def main():
