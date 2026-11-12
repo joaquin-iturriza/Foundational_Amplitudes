@@ -29907,6 +29907,18 @@ entries:
       beta^2 at this range) and the two terms are read as limit-specific; if the overshoots stay, the curvature was not their
       cause and the skip idea stops (the backbone sets them). NO EFFECT vs the plain controls (deepest log-MSE within 0.34
       uug / 0.22 tt and exponents within 0.3): the linear terms alone do nothing; the skip stops.'
+    passed_at: '2026-11-12T17:17:41+00:00'
+    reviewer: 'Linear-only log skip, step 13. Check 1: arms are the quadratic-skip commands read from the logs of 7b891d10
+      (uug) and eb870ad4 (tt), with only ++model.input_log_skip_linear=true added. git diff 2ceb9012..7b4f8bd9 on wrappers/lloca/config/datagen:
+      the q=0 switch, frames_gamma_max default null, and a datagen Born-record change that touches generation only. Controls:
+      plain 203a274f, softpairthr 3fc1016a. Check 2: kit_extrap.json confirms the readout''s form moves the measure: uug deepest
+      coll +0.81/17.7 -> +1.21/2.24, soft exponent -0.28 -> -3.20; tt Sudakov 15-50 TeV +0.77/0.696 against -0.53, Coulomb
+      log-MSE 3.55 -> 1.72. Check 3: one seed under D315, bands 0.34/0.22 from the MLP family spread, same as the passed design.
+      Check 4: YES, PARTIAL (two branches) and NO EFFECT stated. HETEROSC, KIT hard_test strata, no sweep, D395 smoke, ~75
+      MB per run. Note: the uug wall is 1.78 h (7b891d10 running to finished), not 1.4 h, so the cost is ~3.5 GPU-h; within
+      2x. Check 5 terms: log skip, log_skip, logskip, linear-only, linear readout, skip readout, power-law readout in docs/results.tex
+      (none); plan show kit_benchmark (quadratic read 2026-11-12T17:07, the FIX of 14:19); site decisions (skip, linear, readout,
+      D315/D395/D411/D419): no linear-only run before.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
