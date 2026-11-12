@@ -24289,6 +24289,48 @@ entries:
       u u~ V is read over its four (cell, arm) labels in branches A/B/C, with every mixed case going to C; adopting mu-only
       with the sigma stage (run.py change, D276) is Joaquin''s question under D52/D71 and nothing runs before his yes. Disk:
       69 GB free on CC read today against ~1.2 GB; 13.5 GPU-h is under D412''s 30.'
+  - at: '2026-11-12T14:40:26+00:00'
+    question: 'D413 (Joaquin 2026-11-12: ''just use another second example to show the data savings''; on u u~ V: ''Sorry
+      is this a joke?'', its V/B is a constant): how much target data does pretraining save at MSE = 1e-4 on b b~ > Z Z one-loop,
+      trained on V/B, fine-tuned from the trees-in parent (its Born b b~ > Z Z is a parent tree, its loop is in neither parent:
+      ''the one loops with the tree levels in the pretraining'')? S = D*_scr / D*_ft with its band. Feeds the draft''s second
+      data-saving figure (Joaquin edits the draft, D8).'
+    prior: 'Searched results.tex (data saving 9386-9441, bbx_zz, V/B spread), the entry''s findings, D405-D415, equal_processes.json.
+      Candidates: e+e- > c c~ g and b b~ g g are in no parent recipe and no equality class, but their scratch calibrations
+      never reach 1e-4 (best 3.8e-3 and 1.7e-2 at D=1e5, finding 2026-11-10 07:04), so S at 1e-4 is undefined; u u~ > e+e-
+      Z V/B (std ln|V/B| 0.294, one-signed) reaches 2.0e-4 only at D=1e4, 7.0e-5 at 31623 (horizons_cal_vb_ladder.json): the
+      crossing sits at the grid''s top. b b~ > Z Z V/B: std ln|V/B| 0.267 on the 5e4 train pool, V one-signed (vb_spread.py
+      @325cce0d), so not a constant and not a rescaling; neither b b~ > Z Z one-loop nor anything in its equality class (ee_ZZ
+      = uubar_ZZ is the tree class) is in either parent; scratch calibration (val MSE ln(V/B)) 6.5e-3, 2.9e-3, 8.1e-4, 1.9e-4,
+      1.7e-4, 4.5e-6, 1.2e-5, 4.5e-6 at D=10..31623: crosses 1e-4 between D=1e3 and 3162, mid-grid. Closest earlier result:
+      t t~ V/B at the same one-loop template, S < 1 (fine-tune 2-57x above scratch, stage2_readout.py @5555a0f0), so a NO
+      SAVING outcome is live. The mu-only test running now has not read; adopting its loss is Joaquin''s call (D52/D71), so
+      this batch runs at the existing template.'
+    measure: 'stage2_readout.py''s read for one-loop V/B targets (test MSE(V/B) after the sigma stage, MSE(ln(V/B)) beside
+      it, and val_ln), dstar_fit.py''s shared-exponent fit L = A D^-alpha + L_inf per arm, D* at 1e-4 and S = D*_scr/D*_ft
+      with its 16-84% cell-bootstrap band, on test and val_ln; curve_quality.py bars on every trial, the counts and each cell''s
+      best trial''s numbers stated beside. Figure: L(D) of both arms with the fits and the 1e-4 crossings, S in the caption.'
+    check: 'The measure resolves a saving where one exists: stage-2 u u~ LO gives S = 10^0.58 [10^0.43, 10^0.68] and t t~
+      V/B S = 10^-0.35 [-0.59, -0.24] on the same pipeline, both bands excluding 1; the b b~ Z Z scratch calibration crosses
+      1e-4 mid-grid (D=1e3-3162), with cells on both sides.'
+    fixed: 'The stage-2 one-loop template (sweep/gen_data_saving.py --targets bbx_zz_nlo, stage s2): trained on V/B with physics
+      factors off (as t t~ V/B), heterosc_select mu_mse + sigma stage (D276), trees-in parent dsave_parent_treesin_r4, fine-tune
+      llrd space (lr_scale [0.1,10], layer_decay [0.75,1]) with target_stats own and offshell_stats own (results.tex''s one-loop
+      default, fa846b4d), scratch lr [c/3, 3c] by the calibration law, T(D) = 640, 1440, 1600, 3840, 4800, 6400, 8500 (horizons.py
+      --ladder on cal_vb/cal_vb2, data/horizons_cal_vb_ladder.json), seed 42, 8 trials waves 3,3,2. D grid k = 2..8 (D = 10..1e4,
+      7 points); D = 31623 dropped (D412: it alone costs 15.5 of 36.8 GPU-h; the 1e-4 crossings lie inside 1e3-1e4). Configs
+      sweep/sweep_config_dsave_s2_{scr,ft}_bbx_zz_nlo_d{2..8}_t*.yaml.'
+    control: Scratch arm against fine-tune arm, cell by cell, same D, same T, same pools; the reference result is t t~ V/B
+      at the same template.
+    seeds: 'Seed 42, one 8-trial search per (D, arm) as the siblings (D315): 14 searches, 112 trials, 21.3 GPU-h by the generator
+      (calibration rates 0.075-0.148 s/step + 0.08 h per trial), under D412''s 30; wall ~1.5 h (3 waves of the D=1e4 trials,
+      0.43 h each) at site pick''s width; disk ~0.2 GB per search, ~3 GB against 69 GB free on CC.'
+    outcome: 'SAVING: S band lower edge > 1 on val_ln and on test: the figure goes to the draft with S, its band and the curve-quality
+      counts. SAVING ON ONE READ: the band excludes 1 on one of val_ln/test only: reported with both, the figure carries the
+      one that resolves and says why. NO SAVING: the band includes 1 or S < 1: reported with both arms'' curves, as t t~ V/B.
+      In every case the curve-quality numbers (well trials per search, failing bars of each best trial) are stated beside
+      S; a fine-tune whose minimum sits in the first checkpoints (memorising, as t t~ V/B D=316) is named. If the mu-only
+      test reads A (all WELL) on u u~ V, a rerun of this target with mu-only goes to Joaquin as a question, not run.'
   step_waits:
     '2': the detached driver muonly_mse_test (6 searches dsave_muonlymse_{scr,ft}_{epem_ttx_d7,ee_uu_nlo_d7,ee_uu_nlo_d8}_t8500,
       CC, 48 trials)
