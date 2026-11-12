@@ -173,7 +173,7 @@ def plot(path, figs):
     ax.axvspan(0.2, 1.0, color=ps.C.grey, alpha=0.2, lw=0)
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlabel(r"top velocity $\beta$"); ax.set_ylabel(r"$V/B$ (median per bin)")
-    ps.legend(ax, "upper right")
+    ps.legend_strip(ax, os.path.join(figs, "slide5_tt_coulomb_legend"), ncol=2)   # a legend box covers the curves
     print("FIGURE", ps.save(fig, os.path.join(figs, "slide5_tt_coulomb")))
 
     # slide 6: uug median log10|M|^2 per soft x and collinear y bin
@@ -187,7 +187,8 @@ def plot(path, figs):
             mk, c = style[lab]
             ax.plot(x, seeds(b[f], lab), mk, color=c, ms=3, label=lab)
         ax.set_xscale("log"); ax.set_xlabel(xl); ax.set_ylabel(r"median $\log_{10}(|\mathcal{M}|^2/\mathrm{GeV}^{-2})$")
-        ps.legend(ax, "upper right" if f == "soft_x" else "lower left")
+        if f == "soft_x":
+            ps.legend_strip(ax, os.path.join(figs, "slide6_uug_limits_legend"), ncol=3)
     ps.save_panels(panels, os.path.join(figs, "slide6_uug_limits"))
 
     # slide 7: uugg g->gg azimuth
@@ -202,7 +203,6 @@ def plot(path, figs):
     a1.set_xticks([0, np.pi, 2 * np.pi], ["0", r"$\pi$", r"$2\pi$"])
     a1.set_xlabel(r"azimuth $\varphi$ from the (parent $g$, $u$) plane")
     a1.set_ylabel(r"$\log_{10}|\mathcal{M}|^2-$ mean over $\varphi$")
-    ps.legend(a1, "upper left")
     rows = sorted(az.values(), key=lambda v: v["y"])
     y = [v["y"] for v in rows]
     a2.plot(y, [v["rms"]["truth"] for v in rows], "o-", color="k", label="MadGraph truth")
@@ -211,7 +211,7 @@ def plot(path, figs):
         a2.plot(y, [np.median(v["rms"][lab]) for v in rows], mk, color=c, label=lab)   # true values, no floor
     a2.set_xscale("log"); a2.set_yscale("log")
     a2.set_xlabel(r"collinearity $y=s_{gg}/s$"); a2.set_ylabel(r"rms over events of $h$")
-    ps.legend(a2, "lower right")
+    ps.legend_strip(a2, os.path.join(figs, "slide7_uugg_azimuth_legend"), ncol=4)
     ps.save_panels(panels, os.path.join(figs, "slide7_uugg_azimuth"))
 
     # slide 8: log-MSE per stratum, bulk dotted (ours from kit_result.json, his from his evaluate.py files)
