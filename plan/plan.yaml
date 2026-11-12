@@ -23209,6 +23209,26 @@ entries:
       on t t~ (t t~ tree D=3162: train rms r 2.8e-5 standardized for ft vs 4.3e-5 scratch, val 5.4e-4 vs 1.25e-4): the fine-tune
       does not generalise below a floor that t t~ scratch passes; u u~ scratch never reaches it. Next: one arm on lead (a),
       target_stats=parent_shared on t t~ tree at the stage-2 best HPs (r4 and r5 parents), against the same-HP own reruns.'
+  - at: '2026-11-12T01:23:18+00:00'
+    text: '2026-11-12 ~03:00, Joaquin''s review of the step-9 plots acted on. (1) Head map implemented (cec3610c, base_experiment._map_head_to_own_stats):
+      every fine-tune with target_stats=own now loads the parent''s readout mapped to its own target stats, mu row w*s_p/s_o,
+      b*s_p/s_o + (m_p-m_o)/s_o (exact), sigma bias + ln(s_p/s_o) (exact where softplus ~ exp); tests/test_head_map_own_stats.py
+      checks step-0 y equals the parent''s zero-shot (atol 1e-5) and sigma to 1e-3. Caveat: for the one-loop targets (V/B,
+      V) the parent''s stats are of tree ln|M|^2, so step 0 then reproduces the parent''s tree prediction, not a one-loop
+      one. The parent_shared batch (FA-ccin2p3-017c3f8a smoke, 31468dbb 538569e2 762f0029 cce86735 e22a4dc3 bf99b2f0 6a30b085
+      265173f8) is superseded as an arm; it runs on (sunk) and reads, at the controls'' HPs, what a start at the parent''s
+      function changes. (2) One-loop val NLL blow-up (ft_curves.json, D=3162): it starts at step ~6000 (t t~ V/B, lr 3.2e-4
+      of peak 1.1e-3, lr_scale 0.16) and ~7000 (u u~ V, lr 5.1e-4 of peak 5.1e-3, lr_scale 0.79, mid-range of [0.1,10]), i.e.
+      deep in the cosine anneal at falling lr, while train NLL falls -4.7 -> -7.2; pre-clip grad norms are 2e2..9e3 in every
+      run of both arms through the whole run (clip 5), and the step-0 spike ends by step ~170. Not lr too high and not lr_scale
+      at its top; the blow-up is a late overfit of the fine-tune during the anneal (scratch at the same train NLL keeps val
+      -7.6). Candidate it ties to: the inherited sigma head starts 42x (t t~ V/B) and 5.8x (u u~ V) too small under own stats,
+      which the head map now removes. (4) Off-trend D=316 in stage2_LD: t t~ tree scratch D=316 test 2.7e-5 against val 3.8e-7
+      is one test event carrying 97% of the test MSE (top1 0.97); u u~ V D=316 shares its horizon T=2720 with D=100 (T ladder
+      1190, 1190, 2720, 2720, 4420, 8500), and both arms'' losses step with T (scratch 0.19/0.18 at D=100/316 test, ft 0.079/0.068):
+      the cell is horizon-limited, not data-limited. Rerun of the 34 fine-tune searches at the study design with the head
+      map: stage-2 measured 87.8 GPU-h (t t~ V/B 20.7, u u~ tree 28.0, u u~ V 14.7, t t~ tree 24.4), above 30: Joaquin''s
+      go.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
