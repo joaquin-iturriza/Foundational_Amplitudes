@@ -23793,8 +23793,7 @@ entries:
       layer_decay, layer decay, LLRD, lr_scale, fine-tune search, search space; entry dead ends; site decisions (layer, lr_scale,
       template, D407-D412).'
   step_waits:
-    '3': detach:s4_ft_template2 (sweep/drive.py --retry-lost over the 5 dsave_s4_ft_* searches, log ~/.local/share/ccorch/detached/20261112-111009_s4_ft_template2.log;
-      first driver's trials all failed on an unsynced CC, fixed)
+    '3': detach:s4_ft_template3 (sweep/drive.py --retry-lost --retry-failed over the 5 dsave_s4_ft_* searches, log ~/.local/share/ccorch/detached/20261112-111044_s4_ft_template3.log)
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
