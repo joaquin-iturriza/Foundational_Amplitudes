@@ -23791,10 +23791,7 @@ entries:
       layer_decay, layer decay, LLRD, lr_scale, fine-tune search, search space; entry dead ends; site decisions (layer, lr_scale,
       template, D407-D412).'
   step_waits:
-    '3': detach s4_ft_template4 DONE (drive.py over the 5 dsave_s4_ft searches, 40 trials); start-up runs FA-ccin2p3-abf93f76
-      FA-ccin2p3-5924fc52 FA-ccin2p3-725ad99d FA-ccin2p3-2af35e90 FA-ccin2p3-978cd5b9 FA-ccin2p3-083bbdd5 FA-ccin2p3-b91f87bd
-      FA-ccin2p3-20c24e85 FA-ccin2p3-03c52e2b FA-ccin2p3-bbc70510 FA-ccin2p3-88042aa4 FA-ccin2p3-dc9237a9 FA-ccin2p3-7a1cbe9f
-      FA-ccin2p3-ace721d0
+    '3': detach s4_ft_template4 DONE event (drive.py over the 5 dsave_s4_ft searches, 40 trials in waves 3,3,2)
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
