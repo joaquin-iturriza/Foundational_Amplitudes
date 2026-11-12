@@ -24017,6 +24017,51 @@ entries:
       window x0.1 and the DyHPO seed only), full 8-trial 3,3,2 search over the template space, HETEROSC + sigma stage, same
       preprocessing, pools and horizon as the s2/s4 controls, 4.4 GPU-h. The configs and the --lr-factor edit are uncommitted;
       the driver''s sync refuses untracked files.'
+  - at: '2026-11-12T12:46:01+00:00'
+    question: 'Joaquin 2026-11-12 (''the tree runs are not fixed at all''): no trial of either arm is well trained by its
+      own validation curve. At e+e- > t t~ LO D=3162, does a lower lr centre with the other HPs retuned by the search (not
+      fixed, as in the suspects batch) give a well-trained run at no worse a validation minimum than the current searches''
+      best? Two centres bracket it: c/3 and c/10. Feeds: the template''s lr centre for both arms before any L(D) batch.'
+    prior: '(1) curve_quality.py @0d593de5 (data/curve_quality.json), 570 stage-2 and s4 trials: 0 well on t t~ LO (scr 0/70,
+      ft 0/66, s4 ft 0/15); 8 well over all targets (positive controls, e.g. runs/dsave_s2_ft_ee_ttbar_nlo_d8_t8500/trial_0406
+      steady 0.96 spike 2.4 jitter 0.12 gap 3.3; dsave_s2_ft_ee_uu_d7/trial_0100; dsave_s2_ft_ee_uu_nlo_d4/trial_1194): the
+      bars do pass real curves. t t~ LO medians: spike 25 scr / 7.8 ft / 255 s4 ft; by peak lr (t t~ and u u~ LO, D>=316,
+      scratch) spike 5.7 / 26 / 75 / 36 and jitter 0.34 / 0.71 / 0.81 / 0.66 for <3e-3, 3-6e-3, 6-12e-3, >=1.2e-2; trials
+      below 3e-3 still fail steady and gap (ft median steady 0.57, gap 16). (2) The one-change suspects runs (old template,
+      fine-tune best''s other HPs fixed, curve_quality read @0d593de5), t t~ LO D=316, 1e3, 3162, 1e4: lr x1/10 clean (spike
+      2.2, 1.4, 3.4, 3.8; jitter 0.06-0.21) but worse minima 2.6e-6, 1.4e-6, 2.1e-7, 4.3e-8 against their head-map controls
+      3.9e-5, 1.9e-7, 6.9e-9, 2.6e-9; lr x1/3 spike 5.3, 20.9, 1.1, 10.0, minima 5.8e-6, 1.7e-6, 7.4e-8, 2.1e-8. So a lower
+      lr at fixed other HPs predicts CLEAN BUT WORSE; what the search adds is the other HPs (warm-up, muon weight decay, reg,
+      EMA, eta_min) retuned at the lower centre. (3) Scratch control at D=3162 (dsave_s2_scr trial_0640): min 8.5e-9, spike
+      21, jitter 0.67, steady 0.41. Searched results.tex (Muon lr, lr window, spike, jitter), the entry''s findings and dead
+      ends, site decisions D373-D412.'
+    measure: 'curve_quality.py (bars: steady >= 2/3, spike <= 3, jitter <= ln 2, gap <= 10 with gap = train''s fall while
+      val is within 1.5x of its final minimum) on every trial of each new search; per search: the number of well trials, the
+      best trial''s four numbers and its validation minimum (ln units), the median jitter; read against the control search''s
+      same numbers. steady is read beside spike/jitter: clean and still falling = under-training, spiking = noise floor.'
+    check: 'On existing trials the bars move with lr in the tested direction (spike and jitter medians above; Spearman(spike,
+      peak lr) +0.65 / +0.79 in the stage-2 / s4 fine-tune t t~ LO searches) and the one-change x1/10 runs moved spike from
+      12.1 to 3.4 and jitter from 0.48 to 0.10 at D=3162. Spread for the medians (stage-2 t t~ LO, neighbouring-D searches
+      of one arm): median jitter ratio 0.73-2.88, median spike ratio 0.05-15 (too noisy to call a change on; spike is read
+      as the count of trials at or below its bar).'
+    fixed: 'The stage-2 scratch and s4 fine-tune configs of t t~ LO D=3162 (T=8500, batch 1581, parent dsave_parent_heldout_r4,
+      fine-tune layer_decay 1 lr_scale [1/3,3], target_stats own, head map as s4, seed 42, heterosc_select mu_mse + sigma
+      stage, the template''s other HPs and ranges, 8 trials waves 3,3,2) with one change, c x 1/3 or x 1/10: configs sweep/sweep_config_dsave_lrthird_{scr,ft}_epem_ttx_d7_t8500.yaml
+      (scratch lr window [8.7e-4, 7.8e-3]) and sweep/sweep_config_dsave_lrtenth_{scr,ft}_epem_ttx_d7_t8500.yaml ([2.6e-4,
+      2.35e-3]) @0d593de5/979ad4e4 (gen_data_saving.py --lr-factor; diffed: lr and the name-derived DyHPO seed).'
+    control: 'The same cell''s stage-2 scratch search (dsave_s2_scr_epem_ttx_d7_t8500: best 8.5e-9, 0 of 7 well) and s4 fine-tune
+      search (dsave_s4_ft_epem_ttx_d7_t8500: best 8.2e-9, 0 of 7 well), read by the same tool.'
+    seeds: 'Seed 42, one 8-trial search per (arm, centre) as the siblings (D315): 4 searches, 32 trials, 8.8 GPU-h, under
+      D412''s 30.'
+    outcome: 'Per (arm, centre), in this order. WELL: best trial passes all four bars, >= 3 of 8 trials pass, and its validation
+      minimum <= 2x the control''s best: adopt that centre for that arm (the lower of the two if both qualify only when its
+      minimum is lower); the gen_data_saving default changes, the rule text goes to Joaquin as a diff, the L(D) batches are
+      re-costed. CLEAN BUT WORSE: best passes the bars (or >= 3 trials do) but its minimum > 2x the control''s: the lower
+      lr alone trades level for shape; next the horizon (longer T at that centre) or the schedule, as the smallest next test.
+      BETTER, NOT WELL: no trial set qualifies above, but trials at or below the spike bar rise to >= 3 of 8 or the median
+      jitter falls below control/3 (beyond the 2.9x neighbour spread): name the failing bar; next its suspect (gap: regularization
+      or fewer epochs at small batch count; steady with clean curves: under-training, a longer horizon). NO CHANGE: none of
+      the above: lr is not the cause; next warm-up/schedule and batch size. No rerun (D315).'
   step_waits:
     '2': 'a reviewer: design-reviewer on the lower-lr template test (recorded 12:41 UTC), and the CC sync (two untracked kit_benchmark
       files block the merge, routed to the main session); configs dsave_lrtenth_{scr,ft}_epem_ttx_d7_t8500 @979ad4e4'
