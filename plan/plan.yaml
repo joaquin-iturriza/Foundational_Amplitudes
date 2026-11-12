@@ -25900,6 +25900,52 @@ entries:
       Adam 0.9/0.999/1e-8, lr 2e-3 cosine + 1e-6, batch 2048, 300 epochs, s0, logthr on the last invariant); no label in inputs
       (T offset from momenta only, prediction = z + offset); het arm = plain Gaussian NLL as HETEROSC at beta 0; reads on
       KIT hard_test/bulk_test as asked; D403 comparison with the MLP included; no HPO.'
+  - at: '2026-11-12T01:51:32+00:00'
+    question: 'D403: why does Bakar''s 3x128 MLP (KIT src/baseline.py) extrapolate into the limits where our current best
+      models (softpair inputs) do not: uug collinear deepest bin his 0.11 vs ours 2.21 (c15b3337; our soft 0.200 already beats
+      his 0.32), uugg coll_qg his 0.08 vs 3.56 and coll_gg vs 2.47 (c364a7ae), tt virtual Coulomb his 7.8 (2.4 with the threshold
+      variable) vs ours 3.55 (3fc1016a) / 7.06 (f21fa163). A one-change ladder from his exact setup towards ours on the same
+      1e5 bulk_train events, processes ee_uug, ee_uugg, ee_tt virt_finite (Born not: our Born models beat the limits he reports):
+      which single difference (target, inputs old or current, activation, loss, training recipe) destroys his extrapolation,
+      and does the full combination on an MLP reproduce our transformer''s numbers. Feeds what the KIT models and the catalog
+      parent change next.'
+    prior: 'Transformer arms on the same question: plain target + plain inputs 2642b17b (soft 14180 -> 144.9, coll 30.1 ->
+      25.5, bulk 8.2e-4 -> 7.1e-6 below his 2.1e-5): the target rung measured on the transformer, from our side; off-shellness
+      off c35a2199 (soft 14180 -> 516); softpair inputs c15b3337 uug (coll 2.21, soft 0.200), c364a7ae uugg (soft 0.411, coll_gg
+      2.47, coll_qg 3.56), f21fa163 / 3fc1016a tt virtual (Coulomb 7.06 / 3.55, exponent -0.03 / -0.32); his tt numbers (finding
+      2026-11-10 06:01): Coulomb 7.8, 2.4 with logthr, exponent -0.02 / -0.44, so on the Coulomb rise his MLP does not clearly
+      win; the parent''s target T is flat into the uug limits (finding 06:24). What the MLP ladder adds over 2642b17b: each
+      factor tested from his side (an MLP that extrapolates), one at a time, so the factor that breaks extrapolation is isolated
+      from the transformer''s architecture. His code read 2026-11-12. results.tex: nothing (searched Bakar, MLP, baseline,
+      leaky, log invariant, plain target).'
+    measure: KIT evaluate.py log10-MSE per hard_test stratum, deepest bin of each family, and fitted exponents, per arm and
+      seed; tools/kit_figures.py collect/plot over runs/kit_mlp beside our transformer runs.
+    check: 'Dry run on CC kept (runs/kit_mlp_dry: ee_uug arms mlp and ours, ee_tt arm cur, 2 steps on 5e3 events): end to
+      end through evaluate.py, kit_result.json written; scoring takes ~8 s per run; tt cur arm printed threshold exponent
+      pred -0.001 (untrained). Disk 12 MB per run (predictions.h5 + json): 81 runs ~1 GB of 45 GB free. The measure moves:
+      across existing models the uug coll deepest bin spans 0.11 (his MLP) to 30 (our scratch), soft 0.20 to 14180; the T
+      arm''s offset carries the exact singular scaling.'
+    fixed: 'His training: first 1e5 bulk_train events, 3x128, He init, Adam (0.9,0.999,1e-8), lr 2e-3 cosine to 1e-6, 300
+      epochs of batch 2048 (14.6k steps), final weights, float64, standardization on the training sample, features log10 s_ij/s0
+      (logthr on ee_tt); full hard_test and bulk_test scored by the benchmark''s evaluate.py. Arms: target (T), mom (old control
+      inputs: momenta/sqrt s), raw (s_ij/s0), gelu, het (Gaussian NLL), cur (our current softpair inputs: log pair invariants
+      + soft-rescaled momenta eps 1e-8 + off-shellness log1p(o/1e-6) with a gluon), recipe (our horizon and selection: 8000
+      steps, best checkpoint on a held-out 10%), ours (cur+target+gelu+het+recipe). Not portable to an MLP and named as the
+      next rung if needed: muP Adam, L2, EMA, frames/attention.'
+    control: 'Arm mlp (his setup in the port) is every arm''s control. Port check: his own numpy baseline.py on ee_uug (same
+      job) and his slide numbers 0.11 coll / 0.32 soft: the port passes when the mlp arm''s seed median is within 0.3 decades
+      of his numpy run in each family''s deepest bin; if not, the ladder is not read and the difference is found first. Our
+      transformer reference for ours: c15b3337 (uug), c364a7ae (uugg), f21fa163 (tt virtual): ours reproduces our failure
+      when its deepest-bin median is within 0.5 decades of that run''s in each family where his MLP wins.'
+    seeds: '3 seeds per arm (0,1,2), equal in every cell: the MLP''s seed-to-seed spread is unmeasured and a run is cheap
+      (~1-2 min on GPU), so the one-seed rule of D315 (about our expensive runs) is not what limits here; the spread sets
+      the rule below.'
+    outcome: 'One rule: an arm differs from mlp in a family when its 3-seed range is disjoint from mlp''s and the medians
+      of the deepest-bin log10-MSE differ by more than 0.3 decades. Yes for a factor: its arm is worse than mlp in a family
+      where his MLP wins -> that factor is the lever; the next design carries his choice for it into the transformer. Interaction:
+      ours reproduces our failure but no single arm is worse -> the two-factor arms next. No: no arm worse and ours as good
+      as mlp -> the MLP form is not the cause; the transformer''s architecture and the non-portable recipe parts (muP Adam,
+      L2, EMA) are, next tested by feeding the transformer his inputs only.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
