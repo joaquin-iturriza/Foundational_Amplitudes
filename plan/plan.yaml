@@ -25860,6 +25860,8 @@ entries:
       size, control runs, eval-only); (b) reproduce every plot Bakar sent, ours vs his MLP; (c) one-loop processes covering
       Coulomb (massive pair near threshold, non-tt) and Sudakov added to the pretraining, one design; (d) a general divergence-form
       input (eikonal logs, splitting variables, 1/beta per massive pair), one short test on uug and tt virtual'
+    12: 'Bakar''s slides (D415), corrected and complete, sent to Joaquin first: tt MLP-rerun label fixed (it includes the
+      threshold input), the frames+off-shellness arm added once e8088a7d ends, each slide''s axes checked against the figure'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -26697,6 +26699,11 @@ entries:
       if:
       - 'a route helps: adopt it in the KIT models'
       - 'none helps: report the comparison against all of Bakar''s plots as the KIT answer'
+    12:
+      feeds: how we stand against Bakar's MLP on every plot he sent (D415)
+      if:
+      - 'all slides made: hand them back for Joaquin'
+      - 'a slide cannot be made: say which and why'
   step_waits:
     '5': '2026-11-13'
     '10': FA-ccin2p3-e8088a7d FA-ccin2p3-e1c19b4d
