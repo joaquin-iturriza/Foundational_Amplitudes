@@ -22573,6 +22573,34 @@ entries:
       that parent pair with both numbers. Launch: smoke dsave_diag_pshsmoke_ft_epem_ttx_d5_t50 (log must show ''the parent''s
       target standardization kept'', step-0 val loss, the sigma stage and preds written), then the 8 runs afterok on it via
       sweep/trial_job.sh --detached at the cells'' HPs, --hdr=--time=00:40:00 (D=1e4: 00:50:00); ~3.6 GPU-h, under D400.'
+    fix_at: '2026-11-12T00:45:41+00:00'
+    fix: 'Check 5 (repeat, prior omitted): the prior says results.tex has no parent_shared fine-tune read; it has one. docs/results.tex
+      lines ~7418-7553 (catalog_v3 small-D fine-tunes, analysis/catalog_v3/muon_compare.py @f4e6a54a, runs FA-ccin2p3-13e57de7,
+      e5265e31 kept vs 60177afb, 29e8ad2f refit; target_stats=parent_shared came in with commit 96a53d89 for that study) compares
+      the parent''s standardization kept against refit on the target''s own D events, which is this design''s arm against
+      its control. Result: refit over kept, Muon parent, a median 1.83 (kept lower in 15 of 16), 9.6-9.8 at D=10 but only
+      1.23 and 1.34 at D=316; AdamW parent 1.09, a tie (1.02, 0.986) at D=316; conclusion there ''keeping the parent''s standardization
+      is the better fine-tune, and matters most where the zero-shot is good and D small''. Fix: cite it in prior, and say
+      what is different here (current Muon parent, t t~ tree, D=316..1e4, tuned HPs, s_parent/s_own 7.4) and why that difference
+      could make the effect 3x where the earlier read found 1.0-1.3x at D=316. Searched: parent_shared, target_stats, zero-shot,
+      ''standardization kept'', "parent''s standardization", head mismatch in docs/results.tex; site decisions --project FA;
+      the entry''s evidence and dead ends. Check 2 (measure shown to respond): the check field cites the step-0 loss (moves
+      by construction, not the measure) and the offown-vs-parscale step-7 reruns (another change, offshell stats; on t t~
+      tree 2.33, 2.30, 4.02, 0.72, which overlaps the same-HP rerun spread 1.02, 1.05, 0.46, 4.84 in stage2_diag_readout.json).
+      The existing data for this exact change is the catalog_v3 read above, and it shows the final val MSE moving 1.0-1.34x
+      at D=316 and shrinking with D, i.e. below the YES bar of geomean R <= 1/3 and inside the noise. Fix: point the check
+      at that read, state the expected effect from it at D=316..1e4, and either argue from the differences why a 3x effect
+      is plausible here or state that the expected read is NO and what that NO is worth to the defect hunt. Check 4 / A-B
+      protocol (outcome overclaims an untuned arm): both arms run at the own arm''s stage-2 best HPs; parent_shared multiplies
+      the head''s target scale by 7.4, so those HPs need not suit it. A NO at these HPs means ''no gain at the control''s
+      HPs'', not ''the start is ruled out as the cause''. Fix: word NO that way (as step 8''s design does), and per the A/B
+      protocol say whether a NO goes on to the same search for parent_shared (its cost to Joaquin) or why it does not. Checks
+      that hold: 1 and 12 (diff of the 8 configs and the smoke against parscale/tops: only sweep_name, a comment, target_stats;
+      smoke only T=50), 3 (one seed as the sibling cells and D315; t t~ tree rerun ln spread ~0.9 per cell gives an 8-cell
+      geomean SE ~0.3 in ln against a YES bar of ln 3 = 1.1), 6, 7 (D400 names no comparison), 8, 9 (HETEROSC, mu_mse as the
+      controls), 10 (same val pool as the controls), 11 (target_stats is the axis), 13 (no search), 14 (memmap false, parent_shared
+      asserts it; no new cache), 15 (the controls'' configs, preds_val.npz and data_stats.json read by ft_defect.py; prepd_std
+      there is the parent''s sigma under parent_shared, so ln units stay right; the smoke checks the files).'
   step_waits:
     '8': the main session's read of the defect hunt (its 'before more arms'); then launched as designed
     '9': the next owner after this hand-off (context near its limit), and the main session's read of the defect hunt
