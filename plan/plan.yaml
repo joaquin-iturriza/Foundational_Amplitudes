@@ -15864,6 +15864,10 @@ entries:
       limit, resubmitted as bb6707de with 05:00:00 (target 3 h unchanged); B dsh_eea d83d7f30 RUNNING (LHE_PARTS_AUTO_GC=0).
       cc80833e: check_site_data --paths lists default-share component pools and resets the process registry per recipe (tests/test_check_site_data_paths.py,
       fails on old code). E5702 acked (16 GB free = optimizations_recap''s mmap key f3bedd61 rebuilt 03:26-03:32).'
+    - '2026-11-12 D410 (''Yes, please delete those flat quota copies.''): deleted on CC the 1301 catalog_v4 _train_smixq_
+      pools with their .recipe.json, .alphas.npy and .flatfill.json (5204 files, 32.05 GB; pools alone 30.89 GB per census_quick).
+      Checked first: no running or pending job''s recipe reads a smixq pool (squeue: optrec_prebuild_v4d25, optrec_pidqn_qn/pid,
+      kit_pkg, zz_redesign_pp4_parts; their 10 recipes resolve 0 smixq files). /sps/lpnhe free after: 69 GB (87%).'
     - '2026-11-12 restore of CC pools deleted 2026-11-11: check_site_data --list on CC: missing train pools H1 62, H2 218,
       H2p5 38, H3 278 (1e4 copies only, recipe 1e5), H5 28, H6 8, H7E 34, H7c 34; PP4 504 (494 series-built + 10 one-run part
       processes); dsh_eea 115 (parts kept, 115/115 complete, 3.06 GB). HD4/HD5 train/val missing was a false report (n=0 in
