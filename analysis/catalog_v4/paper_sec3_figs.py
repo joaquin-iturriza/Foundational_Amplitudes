@@ -276,12 +276,10 @@ def inputs():
     rows = sorted(BIGRUN.items(), key=lambda kv: kv[1][0])
     fig, ax = ps.figure(width="half")
     y = np.arange(len(rows))
-    ax.plot([v[0] for _, v in rows], y, "o", color=ps.C.blue, label="geometric mean")
-    ax.plot([v[1] for _, v in rows], y, "^", mfc="none", color=ps.C.vermillion, label="90th percentile")
+    ax.plot([1e4 * v[0] for _, v in rows], y, "o", color=ps.C.blue)
     ax.set_yticks(y); ax.set_yticklabels([k for k, _ in rows])
-    ax.set_ylim(len(rows) - 0.5, -0.5); ax.set_xscale("log")
-    ax.set_xlabel(r"validation MSE of standardized $\log|\mathcal{M}|^2$")
-    ps.shared_legend(fig, ax, ncol=2)
+    ax.set_ylim(len(rows) - 0.5, -0.5)
+    ax.set_xlabel(r"geometric-mean validation MSE [$10^{-4}$]")
     ps.save(fig, os.path.join(FIGS, "paper_inputs"))
 
 
