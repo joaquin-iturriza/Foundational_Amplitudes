@@ -25605,7 +25605,7 @@ entries:
       warm start; plan entry WSD, suspect (suspects_readout WSD arm now cited); site decisions D414, D422, D423.'
   step_waits:
     '5': the coordinator's go to relaunch the template-test driver after the draft reruns
-    '6': FA-ccin2p3-7453b4ef
+    '6': 'detach dsave_step6_and_ttx16 (pid 807668): step-6 driver, 6 searches dsave_s5{wsdparent,cosparent}_ft_bbx_zz'
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
