@@ -21617,9 +21617,9 @@ entries:
     decision: D441
   owner:
     agent: a75868725fdec3ff2
-    state: stopped
+    state: working
     since: '2026-11-13T01:20:06+00:00'
-    state_at: '2026-11-13T02:30:41.459000+00:00'
+    state_at: '2026-11-13T04:56:57.816000+00:00'
     context: 206802
     context_at: '2026-11-13T04:57:40+00:00'
   designs:
@@ -26912,9 +26912,9 @@ entries:
     blocks_steps: &id002 []
   owner:
     agent: aae459c53427a36b0
-    state: working
+    state: stopped
     since: '2026-11-13T04:23:28+00:00'
-    state_at: '2026-11-13T04:23:28+00:00'
+    state_at: '2026-11-13T04:43:36.384000+00:00'
     context: 250775
     context_at: '2026-11-13T04:57:06+00:00'
   designs:
@@ -27556,7 +27556,7 @@ entries:
     agent: a9e82ab69626a9a4f
     state: stopped
     since: '2026-11-13T04:23:22+00:00'
-    state_at: '2026-11-13T04:41:08+00:00'
+    state_at: '2026-11-13T04:41:45.891000+00:00'
     context: 263626
     context_at: '2026-11-13T04:57:12+00:00'
   findings:
