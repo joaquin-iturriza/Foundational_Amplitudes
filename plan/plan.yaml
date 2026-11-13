@@ -21405,6 +21405,8 @@ entries:
       8; B: wide vs WSD; C: WSD first 8 vs stage 2), curves figure, report'
     6: 'Retrain the held-out data-saving parent with WSD and fine-tune from it (bbZZ head-start loss = cosine parent + cosine
       fine-tune; par:v4_warm_start_fixes: WSD parent BETTER, restart jump ~1000 -> ~60). Cost shown to Joaquin before submission.'
+    7: 'Draft figure old_setup_examples: Joaquin chooses shared-exponent savings (15.9, 6.8, 4.1, 3.7; median 5.4) or per-curve
+      exponents (11.3, 5.5, 4.4, 5.6)'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -26647,6 +26649,11 @@ entries:
       if:
       - 'head start kept: use WSD parents for the data-saving grid'
       - 'still lost: look at the fine-tune warmup next'
+    7:
+      feeds: the draft's data-saving numbers (D413, D438)
+      if:
+      - 'shared: keep the figure as drawn'
+      - 'per-curve: redraw with each curve''s own exponent'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
