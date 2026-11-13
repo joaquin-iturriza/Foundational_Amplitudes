@@ -32676,3 +32676,14 @@ entries:
     outcome: 'Yes (usable as examples): each rerun''s validation MSE within 2x of its cell''s recorded value; the figure shows
       them. No: a rerun off by more than 2x is flagged in the caption and redone once from its config; the figure never shows
       an unreproduced cell as the line''s value without saying so.'
+    passed_at: '2026-11-13T03:21:12+00:00'
+    reviewer: 'Rerun of the draft data-saving figure''s 24 cells from their own configs for per-event examples. Check 2: arm
+      gaps 2.3-45x in MSE at equal D (median 11.5); the existing cold rerun of tp3_finfte_uubar_Zggg_d8 trial_0096 rebuilds
+      1.27292e-4 against the record 1.27227e-4 (0.05%, eval_delta.json on CC, read), and ladder rung 6 hp15 reruns to 6% (results.tex
+      near line 14054). Check 3: a 2x reproduction threshold is far above both and far below the gaps. Checks 14-15: layout
+      all on CC, 6 off-site trial dirs copied (lxplus 5, Jean Zay 1, verified by ls), parent tp3_finale/trial_0073 best checkpoint
+      on CC, records'' training 3.6 h in total (max 0.71 h) against a 1.5 h limit, ~8 GPU-h expected, a few MB each against
+      65 GB free; preds_val.npz written by this exact script (FA-ccin2p3-2ed18ab8 and the trial_0096 rerun logs). Check 10:
+      each cell''s own validation split. Searched: rerun, re-run, eval_delta, 2ed18ab8, residual map, old_setup_examples,
+      delta histogram, representative, example_cells, preds_val (results.tex, plan.yaml), site decisions D433-D445, site runs
+      job_rerun_trial, CC zz_delta.'
