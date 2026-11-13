@@ -21621,7 +21621,7 @@ entries:
     decision: D441
   owner:
     agent: a6bd7d6113b9fd0de
-    state: working
+    state: closed
     since: '2026-11-13T09:11:01+00:00'
     state_at: '2026-11-13T11:08:00.648000+00:00'
     context: 177823
@@ -26905,29 +26905,24 @@ entries:
     start: '2026-11-13T08:56:26+00:00'
     at: '2026-11-13T08:56:26+00:00'
   handoff:
-    state: '2026-11-13 ~10:00. Draft figure old_setup_examples final per Joaquin: separate exponents (dstar_fit.fit_each,
-      @3b3c3ab6), muted gap colour (@3208aa79): S 11.3 [10.4,14.1], 5.5 [3.9,7.5], 4.4 [3.4,5.6], 5.6 [4.6,6.8], median 5.55.
-      ft_constraint fixed (best checkpoint, no 3x cut, @505ae9af); head-start-lost fractions unchanged. Step 6 (design PASS
-      after one FIX): WSD bbZZ parent FA-ccin2p3-7453b4ef done (best val -2.723 vs cosine -2.749, both at the last step; WSD
-      flat ~-1.7 until its cooldown; per process WSD-cosine median -0.03, WSD lower in 59% of 1132; parent_curves.py @27b07e60,
-      figs/parent_curves; config diff and checkpoint gate pass); its 6 fine-tune searches running (D=100,316,3162, 8 trials
-      each). Step 5 template-test driver relaunched at 11G (15 lxplus trials requeued, no penalty). Next: when detach dsave_step6_and_ttx16
-      ends, extend ft_constraint.py to read stages s5wsdparent/s5cosparent (curve_quality.trials only reads s2/s4) and read
-      step 6 by its outcome rule (head-start-lost fraction per search best vs stage-2 scratch best; kept = never or after
-      0.5 at >=2 of 3 D; branches a-d); zero shot of each parent on bbZZ = step-0 val of its fine-tune trials; and lr_centre_readout.py
-      --test tmpl2 for step 5 (A/B/C).'
-    decisions: 'D438 fitted gap; Joaquin ''Separate exponents'' (step 7 closed); muted gap colour; ''8 trials is fine'' for
-      step 6. The D subset of step 6 (3 of the 7 D, full grid +16.8 GPU-h = 30.3 total) was put to Joaquin by the coordinator,
-      unanswered (''I have no idea what you are asking'', re-asked): do not extend until he answers. Draft GPU jobs take priority
-      over everything (Joaquin).'
-    ruled_out: As before; WSD fine-tune at cosine-tuned HPs (suspects test) worse at D>=1e3 on t t~; not rerun.
-    running: 'detach dsave_step6_and_ttx16 (pid 807668): driver 1 = 6 searches sweep/sweep_config_dsave_s5{wsdparent,cosparent}_ft_bbx_zz_d{4_t4960,5_t7840,7_t8500}.yaml
-      (@a3ecbcc3, 11G @8fbcbdb8), CC+lxplus (WSD parent copied to lxplus); driver 2 = template test, 6 dsave_{wsd,wideft}
-      t t~ configs to 16 trials, waves 3,3,2,4,4. Jean Zay not used: the parents and pools are not there (copy failed earlier).'
-    files: analysis/data_saving/{old_setup_examples,dstar_fit,ft_constraint,parent_curves,check_parent_ckpt,lr_centre_readout,curve_quality}.py;
-      data/{ft_constraint,parent_curves}.json; figs/{old_setup_examples,parent_curves,ft_constraint}; sweep/gen_data_saving.py;
-      scripts/job_datasaving_parent.sh
-    written: '2026-11-13T08:57:45+00:00'
+    state: '2026-11-13 ~13:30. Step 6 READ, branch (d): neither the WSD parent nor the WSD fine-tune keeps the b b~ ZZ tree
+      head start (lost-at fraction R 0.16/0.10/0.08, C 0.33/0.14/0.82, W 0.16/0.14/0.18 at D=100/316/3162); W/C best val pooled
+      6.0 (HIGHER, WSD parent worse), C/R 0.54 (within); C below scratch at D=316/3162 (0.59x, 0.51x). Unexplained: W at D=3162
+      val >> test (9.8e-6 vs 9.2e-8), other arms agree; check val worst-event share before quoting test. Divergences: W 7/24
+      (all lr_scale >= 1.6), C 1/24, R 2/24. Readout step6_readout.py @this commit, data @5c1b33e2, figs step6_{curves,ratio}_{a,b,c},
+      step6_best. Next step 6 (new): design the fine-tune warmup test (ready, not started). Step 5 template test: driver pid
+      807670 still running (wsd_ft d5, wideft d5, wsd_scr d5 short of 16); read lr_centre_readout.py --test tmpl2 (now reads
+      lxplus trials too) when it ends.'
+    decisions: 'WSD parents dropped by the design''s branch (d). lr_scale not narrowed mid-search (the design fixes one window
+      across R/C/W); if WSD parents return, their ft window [1/3,1.5]. Step-6 D extension to 7 D still unanswered by Joaquin:
+      moot after branch (d) unless he asks. All divergences acked as HP properties, not requeued (D398).'
+    ruled_out: WSD parent for keeping the head start (step 6); site causes for the lxplus failures (all were divergences,
+      W fails on CC too); lxplus memory for E7087 (12000 MB fits; it was a wait for GPU capacity).
+    running: 'detach dsave_step6_and_ttx16: driver 2 (template test, pid 807670); driver 1 (step 6) ended.'
+    files: 'analysis/data_saving/step6_readout.py; analysis/data_saving/trial_overfit.py (driven_rows: both sites); analysis/data_saving/lr_centre_readout.py;
+      analysis/data_saving/stage2_readout.py; data/step6_readout.json, step6_rows.json; figs/step6_curves_*, step6_ratio_*,
+      step6_best'
+    written: '2026-11-13T11:08:52+00:00'
   step_why:
     5:
       feeds: 'the template for the remaining cells: trial count and fine-tune ranges (D422, D427)'
