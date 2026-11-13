@@ -142,15 +142,22 @@ def plot():
         if not have:
             continue
         tr = by[p, have[0][1], have[0][0]]["true"]   # every cell of a probe scores the same validation split
-        e = np.linspace(*np.quantile(tr, [0.001, 0.999]), 41)
+        every = np.concatenate([tr] + [by[p, D, a]["pred"] for a, D in have])
+        e = np.linspace(every.min(), every.max(), 41)   # the full range: no true or predicted event outside it
         t = np.histogram(tr, e)[0].astype(float)
-        ax.stairs(t, e, color="k", label="truth")
+        ax.stairs(t, e, color="k", label="truth", zorder=5)   # on top: the best fine-tune otherwise hides it
         for a, D in have:
             h = np.histogram(by[p, D, a]["pred"], e)[0]
             ax.stairs(h, e, color=col[a], linestyle=D_STYLE[D], label=f"{lab[a]}, $D=${D_LAB[D]}")
             with np.errstate(divide="ignore", invalid="ignore"):
-                # ratio only on bins with >= 10 true events, as paper_sec3_figs.examples (e93beb91)
-                r.stairs(np.where(t >= 10, h / t, np.nan), e, color=col[a], linestyle=D_STYLE[D])
+                rat = np.where(t > 0, h / t, np.nan)   # defined wherever the truth has events
+            r.stairs(np.clip(rat, 0.45, 1.55), e, color=col[a], linestyle=D_STYLE[D])
+            mid = 0.5 * (e[:-1] + e[1:])
+            for off, y, mk in ((rat > 1.55, 1.5, "^"), (rat < 0.45, 0.5, "v")):   # off the panel: a marker at its edge
+                r.plot(mid[off], np.full(off.sum(), y), mk, ms=3, color=col[a], clip_on=False)
+        for i in np.nonzero(t == 0)[0]:   # no true event: ratio undefined, shaded
+            r.axvspan(e[i], e[i + 1], color="0.85", lw=0)
+        ax.set_ylim(bottom=0.5)   # one-event bins above the frame, not on it
         r.axhline(1, color="k", lw=0.8)   # the truth line, as thin as the papers' ratio reference
         r.set_ylim(0.5, 1.5); r.set_yticks([0.5, 1, 1.5]); r.set_yticklabels(["0.5", "1", "1.5"])
         ax.set_xlim(e[0], e[-1])
