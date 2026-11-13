@@ -28562,6 +28562,15 @@ entries:
       the existing run dirs, so tags softpairthr_asym_plainlog / asym_cont_plainlog). Wall target 2.75 h, ~12.6 GPU-h. Debris
       on CC: runs/kit/kit_A_ee_tt_virt_finite_n100000_t8000_{softpairthr_asym,asym_cont} (init-only failed dirs). kit_hpo
       driver pid 3726617 still SIGSTOPped for draft priority.'
+  - at: '2026-11-13T09:33:31+00:00'
+    text: '2026-11-13 ~10:35 @818fd569. Step 21 REREAD: threshold scan sigma(sqrt s) of e+e- -> t t~ at NLO with the surrogate''s
+      virtual (tools/kit_threshold_scan.py predict+collect on CC -> analysis/kit_benchmark/data/kit_threshold_scan_asym.json;
+      figure analysis/kit_benchmark/figs/kit_threshold_scan_asym.png). sigma_NLO^surr/sigma_NLO - 1 at beta 1e-3 / 1e-2 /
+      0.09: asymptotic-factor A1 (log inputs + log beta^2, 09576b49) -0.960 / -0.797 / -0.198 (beta_10pct 0.14), no better
+      than its control scratch softpairthr (3fc1016a) -0.962 / -0.750 / -0.181; A2 (factor, plain momenta, gamma<=4, 5ce19348)
+      -0.202 / -0.144 / +0.091 (beta_10pct 0.018, overshoot +9% near beta 0.1, outside the scale band); target V x beta -0.082
+      / -0.059 / -0.003 (beta_10pct 0.001, the best); B (hard points added, 9e5) -0.897 / -0.098 / +0.026. One seed, 8000
+      cosine steps at the old HP point. Step-18 verdict (hard-bin strata, all 7 arms) still waits on the uug/uugg arms.'
   step_why:
     5:
       feeds: what KIT receives
