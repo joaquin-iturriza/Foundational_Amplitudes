@@ -21365,7 +21365,7 @@ entries:
     target data does pretraining save at a fixed precision MSE(ln|M|^2)=1e-4: the horizontal distance between the fine-tune
     and the scratch L(D) curves where they cross 1e-4, for held-out tree-level targets and for one-loop targets with the tree
     levels in the pretraining (D360, D355, D356)?'
-  status: running
+  status: waiting_user
   quotes:
   - said_at: '2026-11-10T02:08:07.285000+00:00'
     text: We want to see that indeed the gap holds in this new setting, for the tree levels, and the one loops with the tree
@@ -21611,6 +21611,19 @@ entries:
     - 7
     answered_at: '2026-11-13T02:28:01.336000+00:00'
     decision: D441
+  - ask: 'Scope: the data-saving grid''s remaining larger-D cells, held by D420 until we see a gain with properly trained
+      networks. Since then: on b b~ > Z Z the fine-tune''s lead over scratch goes at a fixed ~15% of the run whatever the
+      warmup (0.06-0.6), because scratch catches up; on t t~ LO, 16 trials and wider fine-tune ranges do no better than 8
+      trials of the WSD template. Best val, WSD fine-tune over scratch: b b~ ZZ tree 0.59x at D=316, 0.51x at D=3162; t t~
+      LO 1.06x at D=316, 0.22x at D=3162. Run the grid on the WSD template (8 trials per cell, cost given before submission),
+      or stop and use the old-setup examples for the draft (D433)?'
+    at: '2026-11-13T13:53:48+00:00'
+    searched: 'CLAUDE.md; site decisions --project FA: D360, D413, D414, D420, D422, D423, D430, D433, D439. D420 holds the
+      large-data runs on these reads; none settles whether they suffice. His messages 2026-10-06T00:17 (the transfer study''s
+      32k grid, another entry), 2026-11-13T00:03 (the head start is lost, ''something in our finetuning process is constraining
+      the network''; old-setup examples for the draft) and 2026-11-13T00:57 (draft figure edits; ''Didn''t we already find
+      ... the different scheduler'') set the head-start investigation and the draft figure, not whether the grid now runs'
+    holds_all: the entry's next work is Joaquin's call under D420
   owner:
     agent: a615bb43cac09b049
     state: working
@@ -27104,6 +27117,19 @@ entries:
       analysis/data_saving/stage2_readout.py; data/step6_readout.json, step6_rows.json; figs/step6_curves_*, step6_ratio_*,
       step6_best'
     written: '2026-11-13T11:08:52+00:00'
+  ask: 'Scope: the data-saving grid''s remaining larger-D cells, held by D420 until we see a gain with properly trained networks.
+    Since then: on b b~ > Z Z the fine-tune''s lead over scratch goes at a fixed ~15% of the run whatever the warmup (0.06-0.6),
+    because scratch catches up; on t t~ LO, 16 trials and wider fine-tune ranges do no better than 8 trials of the WSD template.
+    Best val, WSD fine-tune over scratch: b b~ ZZ tree 0.59x at D=316, 0.51x at D=3162; t t~ LO 1.06x at D=316, 0.22x at D=3162.
+    Run the grid on the WSD template (8 trials per cell, cost given before submission), or stop and use the old-setup examples
+    for the draft (D433)?'
+  waiting_since: '2026-11-13T13:53:48+00:00'
+  searched: 'CLAUDE.md; site decisions --project FA: D360, D413, D414, D420, D422, D423, D430, D433, D439. D420 holds the
+    large-data runs on these reads; none settles whether they suffice. His messages 2026-10-06T00:17 (the transfer study''s
+    32k grid, another entry), 2026-11-13T00:03 (the head start is lost, ''something in our finetuning process is constraining
+    the network''; old-setup examples for the draft) and 2026-11-13T00:57 (draft figure edits; ''Didn''t we already find ...
+    the different scheduler'') set the head-start investigation and the draft figure, not whether the grid now runs'
+  holds_all: the entry's next work is Joaquin's call under D420
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
