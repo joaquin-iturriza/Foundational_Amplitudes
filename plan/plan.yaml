@@ -32598,12 +32598,9 @@ entries:
   decisions:
   - D365
   - D445
-  next:
-    1: 'Sec. 2 representative examples: from the 23 reruns (+ the trial_0096 rerun) draw Delta histograms and true vs predicted
-      log|M|^2 with ratio panel, scratch vs fine-tune, 4 probes x D=10^2,10^3,10^4; check each rerun within 2x of its record;
-      fill the slot in Sec. 2'
-    2: 'Fresh reviewer (general-purpose; CLAUDE.md, scratchpad joaquin_draft_comments_0613.txt, refpapers/*.pdf) on Sec. 2
-      and the front matter (not Sec. 4: Joaquin keeps it as it was) once Sec. 2''s examples are final'
+  next: 'Sec. 2 representative examples: from the 23 reruns (+ the trial_0096 rerun) draw Delta histograms and true vs predicted
+    log|M|^2 with ratio panel, scratch vs fine-tune, 4 probes x D=10^2,10^3,10^4; check each rerun within 2x of its record;
+    fill the slot in Sec. 2'
   done_when: null
   notes_ref: null
   match: none
@@ -32645,14 +32642,8 @@ entries:
       if:
       - 'all reruns within 2x: figure in, slot filled, pages to Joaquin'
       - 'a rerun off by >2x: flag it in the caption, rerun once'
-    2:
-      feeds: the draft's Sec. 2 and front matter go to Joaquin
-      if:
-      - 'PASS: hand back draft_sec2_pages.pdf and draft_abstract_outlook_pages.pdf'
-      - 'FIX: revise and continue the same reviewer'
   step_waits:
     '1': FA-lxplus-611aa1ec FA-lxplus-53ebf389 FA-lxplus-07859ad1 FA-lxplus-2363ccef FA-ccin2p3-4fa87893
-    '2': FA-lxplus-611aa1ec FA-lxplus-53ebf389 FA-lxplus-07859ad1 FA-lxplus-2363ccef FA-ccin2p3-4fa87893
   findings:
   - at: '2026-11-13T02:46:58+00:00'
     text: '2026-11-13 ~03:50 Joaquin: ''we should start actually doing the work on the draft with what we have ... Let''s
