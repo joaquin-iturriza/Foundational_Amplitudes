@@ -27511,12 +27511,13 @@ entries:
     - FA-ccin2p3-eb0f30db
     - FA-ccin2p3-f45f434a
     - FA-ccin2p3-f6b2ece9
-    commit: 0b50d251
+    commit: f19986f9
     paths:
     - analysis/kit_benchmark/data/kit_curves_read.json
     - analysis/kit_benchmark/data/kit_fig_A.json
     - analysis/kit_benchmark/data/kit_fig_A_gmax4_uug.json
     - analysis/kit_benchmark/data/kit_fig_Aft_thrloop.json
+    - analysis/kit_benchmark/data/kit_hpo.json
     - analysis/kit_benchmark/data/kit_threshold_scan.json
     - models/lloca.py
     - scripts/job_kit_package.sh
