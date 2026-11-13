@@ -32502,8 +32502,15 @@ entries:
     decision: D365
     covers:
     - draft_rewrite
+  - said_at: '2026-11-13T03:05:03.243000+00:00'
+    text: 1. Yes, they stay completely untouched.
+    decision: D445
+    answers_after: '2026-11-10T02:22:50+00:00'
+    covers:
+    - draft_rewrite
   decisions:
   - D365
+  - D445
   next: Fill the draft's slots (~/drafts/fm_amplitudes_2026-11/paper.tex, \slot{...}) as pretrain_data_saving, optimizations_recap,
     kit_benchmark and virtual_over_born land their results; then the abstract's and outlook's numbers
   done_when: null
@@ -32526,7 +32533,9 @@ entries:
       about cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID,
       says nothing about the draft's sections)
     blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-    blocks_steps: &id002 []
+    blocks_steps: []
+    answered_at: '2026-11-13T03:05:03.243000+00:00'
+    decision: D445
   owner:
     agent: afb073b8fc9460ec5
     state: stopped
@@ -32534,17 +32543,6 @@ entries:
     state_at: '2026-11-10T03:34:01.336000+00:00'
     context: 188313
     context_at: '2026-11-10T03:32:37+00:00'
-  ask: 'Scope: three sections of the draft are not in your new story: Sec. 2 ''Accuracy and precision benchmark'' (a placeholder
-    for Jonas and Suprio), Sec. 3 ''Extrapolating to more legs'' (the Z+ng autoregressive study, figs 1 to 5) and Sec. 6 ''Conditioning
-    on Feynman diagrams'' (figs 41 to 49). Cut them, or keep them as co-authors'' sections after yours?'
-  waiting_since: '2026-11-10T02:22:50+00:00'
-  searched: CLAUDE.md; site decisions --project FA (D8 forbids draft edits unless asked; D365 and D354 approve the rewrite
-    but name none of these three sections); Joaquin's message of 2026-11-10T02:08 lists his order and says what goes for the
-    divergence section only; 2026-10-14T16:48 (Anja's chat on the benchmark section for the October deck, says nothing about
-    cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID, says
-    nothing about the draft's sections)
-  blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-  blocks_steps: *id002
   step_why:
     1:
       feeds: the draft's results (D354)
@@ -32553,7 +32551,6 @@ entries:
       - 'a sibling result contradicts the story text: rewrite the story text around it and report it'
   step_waits:
     '1': results of pretrain_data_saving, optimizations_recap, kit_benchmark, virtual_over_born (none landed yet); 2026-11-17
-  checked_until: '2026-11-12T02:24:54+00:00'
   findings:
   - at: '2026-11-13T02:46:58+00:00'
     text: '2026-11-13 ~03:50 Joaquin: ''we should start actually doing the work on the draft with what we have ... Let''s
