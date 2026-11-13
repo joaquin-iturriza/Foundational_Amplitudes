@@ -28431,6 +28431,15 @@ entries:
     text: '2026-11-13: Joaquin asked to be reminded what the fair NLO protocol and Gudrun''s threshold scan are (''3. Can
       you remind me what this is?''); main session re-explained both from the 2026-11-10 emails; awaiting whether to run them
       before the KIT draft section.'
+  - at: '2026-11-13T04:41:05+00:00'
+    text: '2026-11-13 draft Sec. 5 written (draft repo 4a86295; figures by tools/kit_paper_figs.py @3752e145 from kit_bakar_figs.json,
+      kit_fig_*.json and new kit_paper_examples.json collected on CC). Protocol A, transformer (softpair; tt + log beta^2)
+      vs Bakar''s log MLP, log-MSE: tt virt bulk 1.2e-9 vs 1.1e-7 (-1.95 decades), uug soft 0.20 vs 0.33, uugg soft 0.41 vs
+      0.41, Coulomb 3.55 vs 2.41, uug bulk 1.1e-4 vs 2.1e-5 (+0.71), uugg bulk 2.0e-3 vs 1.9e-4 (+1.03), Sudakov 0.72 vs 0.046
+      (+1.19), uug coll 2.21 vs 0.108 (+1.31), uugg qg 3.56 vs 0.080 (+1.65), gg 2.47 vs 0.054 (+1.66). ''Better in the bulk''
+      holds only on tt virtual; plain-target uug 5.9e-6 beats the MLP but loses soft (241). Examples (MLP rerun seed 0): median
+      Delta uug coll +1.36 vs -0.38, uugg qg -1.36 vs -0.26, Sudakov -0.53 vs +0.14, Coulomb -1.87 vs -0.73; tt bulk p99 9.2e-5
+      vs 1.1e-3. Draft layout: SciPost text block is off-centre (left margin 47 pt), wide rows shifted into the right margin.'
   step_why:
     5:
       feeds: what KIT receives
