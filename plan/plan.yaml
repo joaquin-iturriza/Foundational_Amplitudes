@@ -31554,6 +31554,87 @@ entries:
       holds val_mse_curve and train_eval_mse_curve; the log shows the trial stage with heterosc_select mu_mse and ema on,
       then the sigma stage, and val/test/train predictions; sigma_stage/plots_0 exists. Step 14 unchanged (kit_extrap.json
       @7656e687). Searched D424-D428 in site decisions.'
+  - at: '2026-11-13T01:14:38+00:00'
+    question: 'Step 18 (D435, D436): does the asymptotic-factor model, log|M|^2 = log A(x) + g(x) with A = sum_t exp(c_t)
+      D_t the universal singular factors (Catani-Seymour massless final-final dipoles for q->qg and g->gg per (emitter, gluon,
+      spectator); 1/beta per heavy pair and log^2(s/m^2) per heavy leg on a one-loop target), c_t a bounded per-leg LLoCa
+      readout, g = log(1 + exp(r)/A) with r the bounded pooled readout (so g -> 0 wherever a D_t diverges), fit the KIT hard
+      bins: uug soft and collinear, uugg q-g/g-g collinear, azimuth, soft, tt virtual Coulomb and Sudakov, from scratch, protocol
+      A, at the current HP point? Two arms per setup: (A1) the factor on the control''s inputs (pair logs, soft rescale, threshold
+      logs on tt): the factor alone; (A2) the model as designed: the factor with plain momenta (no log inputs) and the frames''
+      boost capped (model.net.frames_gamma_max=4), the two conditions under which the coefficients converge at the limit (test_asym_factor:
+      uncapped, at init the per-leg readouts grow ~y^-0.25 collinear and ~x^-0.5 soft; capped, flat to 1e-3 over 4 decades,
+      and mu''s slope is -1.000 in log y, -1.995 in log x). Feeds: whether the KIT models (and catalog runs) take the factor,
+      D435 ''intentional and reproducible'' asymptotics; redone at the step-15/16 chosen HPs when the searches end.'
+    prior: 'Searched docs/results.tex (dipole, ansatz, Maitre, Catani, eikonal, asymptotic), plan show kit_benchmark, site
+      decisions (D411-D437). (1) par:v4_dipole (results.tex ~2270): the colour-blind soft-dipole factor log D explains 0.705
+      of log|M|^2 but 0.094 of the emission-scale target over the catalog multiplicity cells: a feature-variance read, not
+      a model; dead end there. (2) results.tex ~8243 names factorisation-aware emulators (2107.06625, 2302.04005) as the single-process
+      remedy, never tried here. (3) Step 13 degree-1/2 log-invariant readout added to mu (input_log_skip, PARTIAL: uug coll
+      exponent -0.78 vs truth -1, soft -1.56 vs -2, Coulomb needs the quadratic, bulk +0.33 decades): a learned power, not
+      a fixed one; this design fixes the power by construction. (4) Step 14 div-form inputs (input_div_form @6cdec219): same
+      functional forms as inputs, smokes passed, arms wait on kit_hpo. (5) Dead end: target x eikonal on the T target (over-cancels).
+      (6) Step 12(ii) gamma<=4 alone (95be8db2/88b9334a, T target): uug bulk +0.59 decades worse, not adopted; here the cap
+      is used only as the continuity condition of the coefficients, read against A1 and the control. (7) Literature finding
+      2026-11-13 ~01:10: 2604.18686''s naive multiplicative ansatz failed, so g is bounded and switched off by construction
+      here. Controls fail the step-15 curve bars at this HP point (uug plain 203a274f NLL separation 3.59 / end_up 1.20; tt
+      3fc1016a 0.60 / 0); said with every number.'
+    measure: 'As every KIT arm: kit_predict scores at the end of each job; tools/kit_figures.py collect -> analysis/kit_benchmark/data/kit_fig_A_asym_{uug,uugg,tt}.json;
+      tools/kit_extrap_read.py (arms added to RUNS): median signed error (pred - truth, log10|M|^2) and log-MSE per hard bin
+      and the fitted exponent per family against the truth''s; tools/kit_readout.py --vs: per family the median over strata
+      of log10(arm log-MSE / control log-MSE), strata better/worse; bulk_test log-MSE; tools/kit_curves.py on each run''s
+      train/val mu-MSE curves (separation, end_up). Figures: error and median figures together per setup (kit_figures), legends
+      on the canvas, labels naming the inputs and the factor.'
+    check: 'Existing runs show the measure separates the failure from the target: uug plain 203a274f deepest collinear y 1e-7..1e-6
+      signed +0.81 / log-MSE 17.7, deepest soft x 1e-7..1e-6 -8.40 / 241, exponents off; tt 3fc1016a Sudakov 15-50 TeV -0.53
+      / 0.72, Coulomb beta 1e-4..1e-3 -1.87 / 3.55, exponent -0.40 vs truth -1.02 (kit_extrap.json, step 13 finding); truth
+      medians of tt virtual rise +0.21, +0.19 decades per Sudakov bin and +1.0 per Coulomb decade, matching log^2(s/m^2) and
+      1/beta (kit_extrap.json truth column). The code (wrappers._asym_terms/_asym_mu, lloca extra_main) passes test_asym_factor:
+      q g dipole x s_qg/s -> C_F(1+z^2)/(1-z) to 3y, the two dipoles'' sum -> 2 C_F s s_qq/(s_qg s_qg) to 3x, 1/beta and log^2
+      exact at beta 1e-3 on a one-loop t t~ event and absent at tree, g -> 0 (gap 3.9e-5 at beta 1e-6, <1e-5 at y 1e-7), Lorentz
+      invariant, sigma stays the last row; all of test_input_reps and test_het_sign_head pass.'
+    fixed: 'job_kit.sh A from scratch, first 1e5 KIT bulk_train events, 8000 steps cosine, lr 0.0118605 (the controls''),
+      seed 42, HETEROSC with mu_mse selection and the sigma stage, float64, base config trial 1262 of cov_v4_long_hpo8_cc_68224.
+      Plain targets for uug and uugg (data.target_physics_factor=false data.target_physics_orders=false, as 203a274f): the
+      factor carries the singularity the T target divides out, so the T setups (c15b3337, c364a7ae) get no factor arm, shown
+      only as references. Commands (site submit <pick> FA scripts/job_kit.sh -- ...): uug A1 kit_ee_uug__me2 100000 8000 A
+      ++model.input_soft_eps=1e-8 ++model.input_pair_logs=5 data.target_physics_factor=false data.target_physics_orders=false
+      training.lr=0.0118605 ++model.input_asym_factor=true tag=softpair_asym; uug A2 kit_ee_uug__me2 100000 8000 A data.target_physics_factor=false
+      data.target_physics_orders=false training.lr=0.0118605 ++model.input_asym_factor=true ++model.net.frames_gamma_max=4
+      tag=asym_cont; uugg plain control kit_ee_uugg__me2 100000 8000 A ++model.input_soft_eps=1e-8 ++model.input_pair_logs=6
+      data.target_physics_factor=false data.target_physics_orders=false training.lr=0.0118605 tag=softpair_plain; uugg A1
+      = that + ++model.input_asym_factor=true tag=softpair_plain_asym; uugg A2 kit_ee_uugg__me2 100000 8000 A data.target_physics_factor=false
+      data.target_physics_orders=false training.lr=0.0118605 ++model.input_asym_factor=true ++model.net.frames_gamma_max=4
+      tag=asym_cont; tt A1 kit_ee_tt__virt_finite 100000 8000 A ++model.input_soft_eps=1e-8 ++model.input_pair_logs=4 ++model.input_pair_threshold=true
+      training.lr=0.0118605 ++model.input_asym_factor=true tag=softpairthr_asym; tt A2 kit_ee_tt__virt_finite 100000 8000
+      A training.lr=0.0118605 ++model.input_asym_factor=true ++model.net.frames_gamma_max=4 tag=asym_cont. Before them the
+      D395 50-step check through every stage (training, sigma stage, kit_predict scoring) on uugg A2 (both dipole kinds, gamma
+      cap, no logs) and tt A1 (loop gating of Coulomb/Sudakov, log inputs): same commands with 50 steps and tag=smoke_asym.
+      Cost from the controls'' logs (training 98 / 107 / 75 min + sigma stage + scoring): uug 1.85 h x 2, uugg 2.0 h x 3,
+      tt 1.45 h x 2 = 12.6 GPU-h, smokes ~0.2; under 30. Wall 2.5 h (uug), 2.75 h (uugg), 2.0 h (tt) per job, one wave of
+      7 at site pick''s width. Disk ~75 MB per run dir.'
+    control: 'uug: 203a274f (kit_A_ee_uug_me2_n100000_t8000 plain target, softpair inputs, same lr/steps/seed). uugg: the
+      new plain-target softpair run (identical to A1 but without the factor; c364a7ae on the T target and Bakar''s MLP as
+      references). tt virtual: 3fc1016a (softpairthr). A1 differs from its control only by the factor; A2 from A1 by the continuity
+      conditions (no log inputs, gamma<=4), so A2 vs control is the model as designed and A2 vs A1 says whether continuity
+      matters. References: Bakar''s MLP seeds (kit_extrap.json mlp_s0..s2), gmax4 arms for the cap alone (T target).'
+    seeds: 'Seed 42, one run per arm, as the controls (D315, D412). Band: the seed spread of the deepest-bin median signed
+      error in kit_extrap.json, Bakar''s MLP uug coll y 1e-7..1e-6 range 0.34, tt 15-50 TeV 0.02, MLP with our choices 0.19
+      / 0.22; hence 0.3 as the no-move band; family log-MSE medians against the MLP seed band (Sudakov 0.61, bulk 0.23, Coulomb
+      0.84 at 90%); the transformer''s own seed spread is unmeasured.'
+    outcome: 'Per limit family and arm against its control: FIXED = the fitted exponent within 0.1 of the truth''s and the
+      deepest bin''s median signed error within +-0.3 (the MLP band), bulk_test log-MSE no more than 0.5 decades worse; MOVED
+      = deepest |signed error| at least halved and the exponent closer to truth, not FIXED; STAYED = within 0.3 of the control;
+      else inconclusive at one seed. YES (the factor model works): A2 FIXED on uug soft and collinear and tt Coulomb and Sudakov,
+      and on uugg q-g and g-g collinear and soft (azimuth reported: the spin-averaged dipole leaves the azimuthal modulation
+      to the coefficient), bulk within band: the factor goes into the KIT models at the step-15/16 chosen HPs (redone there,
+      against the chosen trials), CDST massive dipoles added when a t t~ g target enters, proposed for catalog runs. PARTIAL:
+      per family, reported with which arm fixes what; A1 FIXED where A2 is not says the continuity conditions cost the bulk
+      fit (reported with both curves). NO (STAYED or worse everywhere): the bounded per-leg coefficient is not enough at this
+      HP point; next is the redo at the chosen HPs (the arms'' bulk may be HP-limited, the controls fail the curve bars here),
+      then the reduced-kinematics coefficient (one LLoCa forward per dipole''s mapped event). A blow-up: listed with where,
+      the repair lr x0.3 in the same arm (a NO from it is not read). Curve form (kit_curves separation/end_up) reported beside
+      every verdict.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
