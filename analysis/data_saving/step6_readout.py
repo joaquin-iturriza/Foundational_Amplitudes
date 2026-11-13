@@ -33,6 +33,7 @@ DATA = os.path.join(HERE, "data")
 CELLS = {100: (4, 4960), 316: (5, 7840), 3162: (7, 8500)}          # D: (k, T) of the stage-2 twins
 NEW = {"C": "s5cosparent", "W": "s5wsdparent", "L": "s6cosparentlongwu"}   # L: the warmup test, C with warmup [0.05, 0.6]
 BAR = 5 ** (1 / np.sqrt(3))
+LAG = 0.25   # run fraction past the own warmup end; the record lags 0.005-0.04 (median), 54-69% within 0.05
 
 
 def name(arm, D):
@@ -98,7 +99,9 @@ def main():
             if a != "scr":
                 lost, _, ratio = lost_at(b, sc)
                 c.update(start_ft_over_scr=float(ratio[0]), lost_at=lost,
-                         kept=lost is None or lost > 0.5, best_rise=rise(b),
+                         kept=lost is None or lost > 0.5, best_rise=rise(b), best_warmup_frac=b["hp"]["warmup_frac"],
+                         # the warmup test's rule: kept past the trial's own warmup end by more than LAG of the run
+                         kept_after_warmup=lost is None or lost - b["hp"]["warmup_frac"] > LAG,
                          trials=[{"run": os.path.basename(r["run_dir"].rstrip("/")), "lost_at": lost_at(r, sc)[0],
                                   "rise": rise(r), "val": r["val_min"], "warmup_frac": r["hp"]["warmup_frac"],
                                   "peak_lr": r["hp"]["lr"] * (r["hp"]["lr_scale"] or 1)} for r in v],
@@ -111,6 +114,8 @@ def main():
     for a in ("R", "C", "W", "L"):
         ks = [c[a]["kept"] for c in out["cells"].values() if a in c]
         out["arms"][a] = {"kept_at": sum(ks), "of": len(ks), "kept": len(ks) == 3 and sum(ks) >= 2}
+        kw = [c[a]["kept_after_warmup"] for c in out["cells"].values() if a in c]
+        out["arms"][a].update(kept_after_warmup_at=sum(kw), kept_after_warmup=len(kw) == 3 and sum(kw) >= 2)
     for q in ("W/C", "C/R", "W/R", "L/C"):
         v = [c[q] for c in out["cells"].values() if q in c]
         if v:
@@ -125,7 +130,8 @@ def main():
             wf = np.array([t["warmup_frac"] for t in T_])
             out["arms"][a]["lost_vs_warmup"] = {
                 "n": len(T_), "spearman": float(spearmanr(wf, lo)[0]), "median_lost_minus_wf": float(np.median(lo - wf)),
-                "share_within_0.05": float(np.mean(np.abs(lo - wf) <= 0.05))}
+                "share_within_0.05": float(np.mean(np.abs(lo - wf) <= 0.05)),
+                "share_lag_above": float(np.mean(lo - wf > LAG))}
     A = out["arms"]
     if all(A.get(a, {}).get("of") == 3 for a in "CW"):
         out["branch"] = {(True, False): "a: WSD parent keeps it", (True, True): "b: WSD fine-tune keeps it",
