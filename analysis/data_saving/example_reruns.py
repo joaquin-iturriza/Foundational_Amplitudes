@@ -90,17 +90,17 @@ def plot():
     col = {"scratch": ps.C.blue, "fine-tune": ps.C.vermillion}
     lab = {"scratch": "from scratch", "fine-tune": "fine-tuned"}
     for k, D in ((2, 100), (3, 1000), (4, 10000)):
-        # Delta histograms: one panel per probe, both arms on the panel's own symmetric range
+        # Delta histograms: one panel per probe, both arms on the panel's own range
         fig, axs = ps.figure(ncols=2, nrows=2)
         for ax, p in zip(np.ravel(axs), PROBES):
             arms = [a for a in ("scratch", "fine-tune") if (p, D, a) in by]
             if not arms:
                 continue
             ds = {a: np.exp(by[p, D, a]["pred"] - by[p, D, a]["true"]) - 1 for a in arms}
-            lim = max(np.quantile(np.abs(v), 0.995) for v in ds.values())
-            edges = np.linspace(-lim, lim, 61)
+            allv = np.concatenate(list(ds.values()))
+            edges = np.linspace(*np.quantile(allv, [0.0005, 0.9995]), 61)   # the central 99.9% of both arms' events
             for a, v in ds.items():
-                ax.stairs(np.histogram(np.clip(v, -lim, lim), edges)[0], edges, color=col[a], label=lab[a])
+                ax.stairs(np.histogram(v, edges)[0], edges, color=col[a], label=lab[a])
             ax.set_yscale("log"); ax.set_ylabel("events")
             ax.set_xlabel(r"$\Delta=|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2_{\rm true}-1$")
             ps.process_label(ax, NAME[p])
