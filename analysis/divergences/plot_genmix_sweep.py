@@ -48,7 +48,7 @@ def main():
     axL.plot(f, overall, "^--", color=ps.C.grey, label="mean over events")
     axL.set_yscale("log")
     axL.set_xlabel(r"$f$ = fraction flat-$\log|\mathcal{M}|^2$")
-    axL.set_ylabel(r"MSE of $\log|\mathcal{M}|^2$")
+    axL.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
     axL.legend(loc="upper center")
     ps.process_label(axL, r"$e^+e^-\to u\bar u$", loc="lower right")
 
@@ -60,7 +60,7 @@ def main():
     axR.set_xscale("log"); axR.set_yscale("log")
     axR.set_xticks(XTICKS); axR.set_xticklabels([str(t) for t in XTICKS]); axR.minorticks_off()
     axR.set_xlabel(r"$\sqrt{s}$ [GeV]")
-    axR.set_ylabel(r"MSE of $\log|\mathcal{M}|^2$")
+    axR.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
     axR.legend(loc="lower left", ncol=2)
 
     ps.save(fig, os.path.join(AN, "eeuu_genmix_fraction_sweep"))

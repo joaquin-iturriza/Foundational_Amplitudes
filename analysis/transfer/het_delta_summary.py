@@ -79,7 +79,7 @@ def main():
     a1.fill_between([], [], [], color="grey", alpha=0.25, lw=0, label=r"$10$ to $90\%$ (right)")
     a2.set_yscale("log"); a2.set_ylim(1e-5, 1.5)
     a1.set_xscale("log"); a1.set_yscale("log")
-    a1.set_xlabel(r"MSE of $\log|\mathcal{M}|^2$, MSE loss"); a1.set_ylabel(r"MSE of $\log|\mathcal{M}|^2$, heteroscedastic")
+    a1.set_xlabel(r"MSE$(\log|\mathcal{M}|^2)$, MSE loss"); a1.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$, heteroscedastic")
     a2.set_xlabel(r"$k$"); a2.set_ylabel(r"fraction with $|{\rm pull}|>k$")
     ps.shared_legend(fig, a1, ncol=4)
     ps.save(fig, os.path.join(HERE, "figs", "het_delta_summary"))

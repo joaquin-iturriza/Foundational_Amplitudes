@@ -34,7 +34,7 @@ import mixture_ab as m
 import plot_style as ps
 
 FIGS = os.path.join(HERE, "figs")
-MSE_LAB = r"MSE of $\log|\mathcal{M}|^2$"
+MSE_LAB = r"MSE$(\log|\mathcal{M}|^2)$"
 
 
 def by_class(x, cls):
@@ -140,7 +140,7 @@ def examples():
         pad = 0.08 * (hi - lo)               # margin beyond the outermost filled bin
         ax.set_xlim(lo - pad, hi + pad)
         ax.set_yscale("log"); ax.set_ylabel("events")
-        r.set_xlabel(r"$\log|\mathcal{M}|^2$"); r.set_ylabel("ratio")
+        r.set_xlabel(r"$\log|\mathcal{M}|^2$"); r.set_ylabel("pred/true")
         ps.process_label(ax, ml.process_tex(p))
         ps.legend(ax, "upper left")
     ps.save_panels(figs, os.path.join(FIGS, "paper_muon_examples"))
@@ -276,10 +276,11 @@ def inputs():
     rows = sorted(BIGRUN.items(), key=lambda kv: kv[1][0])
     fig, ax = ps.figure(width="half")
     y = np.arange(len(rows))
-    ax.plot([1e4 * v[0] for _, v in rows], y, "o", color=ps.C.blue)
+    ax.plot([v[0] for _, v in rows], y, "o", color=ps.C.blue)
     ax.set_yticks(y); ax.set_yticklabels([k for k, _ in rows])
-    ax.set_ylim(len(rows) - 0.5, -0.5)
-    ax.set_xlabel(r"geometric-mean validation MSE [$10^{-4}$]")
+    ax.set_ylim(len(rows) - 0.5, -0.5); ax.set_xscale("log")
+    ax.set_xticks([4e-4, 6e-4, 8e-4], [r"$4\cdot10^{-4}$", r"$6\cdot10^{-4}$", r"$8\cdot10^{-4}$"]); ax.minorticks_off()
+    ax.set_xlabel(r"MSE$(\log|\mathcal{M}|^2)$, standardized")
     ps.save(fig, os.path.join(FIGS, "paper_inputs"))
 
 
