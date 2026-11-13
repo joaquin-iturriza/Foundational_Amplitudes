@@ -133,10 +133,12 @@ def examples():
             ax.stairs(q, ek, color=col[k], label=lab[k])
             with np.errstate(divide="ignore", invalid="ignore"):
                 r.stairs(np.where(t >= 10, q / t, np.nan), ek, color=col[k])
-            lo, hi = min(lo, ek[0]), max(hi, ek[-1])
+            filled = np.nonzero((t > 0) | (q > 0))[0]
+            lo, hi = min(lo, ek[filled[0]]), max(hi, ek[filled[-1] + 1])
         r.axhline(1, color="k", lw=0.8)
-        r.set_ylim(0.5, 1.5); r.set_yticks([0.5, 1, 1.5]); r.set_yticklabels(["0.5", "1", "1.5"])
-        ax.set_xlim(lo, hi)
+        r.set_ylim(0, 2); r.set_yticks([0, 1, 2]); r.set_yticklabels(["0", "1", "2"])
+        pad = 0.08 * (hi - lo)               # margin beyond the outermost filled bin
+        ax.set_xlim(lo - pad, hi + pad)
         ax.set_yscale("log"); ax.set_ylabel("events")
         r.set_xlabel(r"$\log|\mathcal{M}|^2$"); r.set_ylabel("ratio")
         ps.process_label(ax, ml.process_tex(p))
@@ -150,8 +152,8 @@ FT_PROBES = {"v3_dg_dgwpwm": r"$dg\to dgW^+W^-$", "v3_usx_cxuwpz": r"$u\bar s\to
 
 def ft():
     d = json.load(open(os.path.join(ROOT, "analysis", "catalog_v3", "data", "muon_ft.json")))
-    arms = (("dimensionless", "AdamW", ps.C.vermillion, "AdamW parent"),
-            ("dimensionless_muon", "MuonAdamW", ps.C.blue, "Muon parent"))
+    arms = (("dimensionless", "AdamW", ps.C.vermillion, "AdamW pretraining"),
+            ("dimensionless_muon", "MuonAdamW", ps.C.blue, "Muon pretraining"))
     fig, axs = ps.figure(ncols=2, nrows=2)
     for ax, (p, name) in zip(axs.flat, FT_PROBES.items()):
         for parent, opt, c, lab in arms:
@@ -165,7 +167,7 @@ def ft():
         ax.plot([r["D"] for r in sc], [r["mse_log"] for r in sc], "s--", color=ps.C.grey, label="scratch")
         ax.set_xscale("log"); ax.set_yscale("log")
         ys = [l.get_ydata() for l in ax.lines]
-        ax.set_ylim(0.7 * min(np.min(y) for y in ys), 1.4 * max(np.max(y) for y in ys))
+        ax.set_ylim(0.7 * min(np.min(y) for y in ys), 4 * max(np.max(y) for y in ys))   # headroom: the process label sits above the zero-shot lines
         ax.set_xlabel(r"training events $D$"); ax.set_ylabel(MSE_LAB)
         ps.process_label(ax, name)
     ps.shared_legend(fig, axs.flat[0], ncol=3)
@@ -259,11 +261,12 @@ def unseen():
 # percentile over processes of the per-process validation loss at the best checkpoint, as docs/results.tex
 # tab:bigrun_arms (analysis/bigrun/arms_best.py, run on the site holding the runs) and the pair-bias table of
 # sec:bigrun (whose reference is the 'no diagram encoder, linear embedding' arm, GM 3.85e-4 in both tables)
-BIGRUN = {"linear embedding, no diagram encoder": (3.85e-4, 0.12),
-          "no diagram encoder": (3.88e-4, 0.10),
+# adopted = linear embedding, no diagram encoder; pair bias = added to the adopted configuration
+BIGRUN = {"adopted": (3.85e-4, 0.12),
+          "no diagrams": (3.88e-4, 0.10),
           "linear embedding": (4.86e-4, 0.056),
-          "+ pair attention bias": (5.26e-4, 0.084),
-          "+ pair attention bias, capped": (5.74e-4, 0.077),
+          "pair bias": (5.26e-4, 0.084),
+          "pair bias, capped": (5.74e-4, 0.077),
           "all inputs": (5.79e-4, 0.085),
           "no colour one-hot": (6.81e-4, 0.094),
           "no off-shellness": (8.63e-4, 0.067)}
@@ -277,7 +280,7 @@ def inputs():
     ax.plot([v[1] for _, v in rows], y, "^", mfc="none", color=ps.C.vermillion, label="90th percentile")
     ax.set_yticks(y); ax.set_yticklabels([k for k, _ in rows])
     ax.set_ylim(len(rows) - 0.5, -0.5); ax.set_xscale("log")
-    ax.set_xlabel("validation loss over processes")
+    ax.set_xlabel(r"validation MSE of standardized $\log|\mathcal{M}|^2$")
     ps.shared_legend(fig, ax, ncol=2)
     ps.save(fig, os.path.join(FIGS, "paper_inputs"))
 

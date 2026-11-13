@@ -59,7 +59,7 @@ def main():
         a2.fill_between(KS, np.percentile(T, 10, 0), np.percentile(T, 90, 0), color=c, alpha=0.25, lw=0)
     for x in bad:
         if x["mse"]:
-            a1.plot([x["mse"]], [x["het"]], "x", color="k", label="blew up")
+            a1.plot([x["mse"]], [x["het"]], "x", color="k", label="diverged")
     lo = min(min(x["mse"] for x in pts if x["mse"]), min(x["het"] for x in pts))
     hi = max(max(x["mse"] for x in pts if x["mse"]), max(x["het"] for x in pts))
     lim = (lo / 1.5, hi * 1.5)          # the same limits on both axes: "equal" is the plot box's diagonal
@@ -74,7 +74,7 @@ def main():
     a1.fill_between([], [], [], color="grey", alpha=0.25, lw=0, label=r"$10$ to $90\%$ (right)")
     a2.set_yscale("log"); a2.set_ylim(1e-5, 1.5)
     a1.set_xscale("log"); a1.set_yscale("log")
-    a1.set_xlabel(r"median $|\Delta|$, MSE"); a1.set_ylabel(r"median $|\Delta|$, heteroscedastic")
+    a1.set_xlabel(r"median $|r-1|$, MSE"); a1.set_ylabel(r"median $|r-1|$, heteroscedastic")
     a2.set_xlabel(r"$k$"); a2.set_ylabel(r"fraction with $|{\rm pull}|>k$")
     ps.shared_legend(fig, a1, ncol=4)
     ps.save(fig, os.path.join(HERE, "figs", "het_delta_summary"))
