@@ -32673,6 +32673,12 @@ entries:
   - at: '2026-11-13T03:36:24+00:00'
     text: 'Joaquin 2026-11-13 on the ee->ttbar threshold scan (analysis/kit_benchmark/figs/kit_threshold_scan*): ''But yes,
       indeed this doesn''t go to the draft for now''. Sec. 5 KIT leaves it out; at most one line among the open items.'
+  - at: '2026-11-13T05:05:35+00:00'
+    text: 'Example reruns moved CC -> lxplus at 06:0x on the coordinator''s order (draft due today; CC queue ~28 h): Jean
+      Zay''s sync failed twice (push and bundle timed out; its checkout is at 8fb002e, 2026-10-15), so all 23 went to lxplus
+      (site pick''s placement), trial dirs copied site to site, parent and pools present there; 22 at 1 h (condor microcentury),
+      tp3_scr_ee_bb_nlo_d8 at 2 h; 25 GPU-h at the limits. The 23 CC copies (slurm 63723301..63723345, all PENDING) cancelled
+      by id. Same configs, same design otherwise.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
