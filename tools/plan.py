@@ -485,7 +485,7 @@ def ask_matches(e, text):
     w = ask_terms(e.get("ask"))
     # the ask quoted whole: its ";" split it into sentences, leaving "Add them?" as the only one asking, which no branch
     # below matches (2026-11-12: three replies, the last one verbatim, refused)
-    flat = lambda s: re.sub(r"\s+", " ", re.sub(r"[\"'`*_>]", "", s or "")).strip().lower()
+    flat = lambda s: re.sub(r"\s+", " ", re.sub(r"[\"'`*_>\u2018\u2019\u201c\u201d~]", "", s or "")).strip().lower()
     if "?" in (text or "") and flat(e.get("ask")) and flat(e.get("ask")) in flat(text):
         return True
     eid = (e.get("id") or "").lower()
