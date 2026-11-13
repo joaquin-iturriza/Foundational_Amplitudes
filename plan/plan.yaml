@@ -27441,11 +27441,6 @@ entries:
       log beta^2, and their scratch controls) at the step-15/16 chosen settings for t t~ virtual: the 11c runs (8000 cosine
       steps) are not converged (NLL still falling 1.1-2.0 nats over the last 800 steps; 3 of 7 fail separation narrowly),
       finding 2026-11-12 ~23:30. Own design after kit_hpo''s read.'
-    18: 'D435 (Joaquin 2026-11-13: ''I like the dipole idea, and maybe the layernorm stuff ... we want to be very intentional
-      and reproducible''): (a) dipole ansatz on LLoCa, Maitre-Truong style (arXiv:2107.06625; massive 2301.13562; one-loop
-      2302.04005): the network predicts Catani-Seymour dipole coefficients for uug/uugg, CDST massive dipoles where a top
-      is involved, so the singular limits are exact by construction. No MLP branch. Design at the step-15/16 chosen HPs, with
-      the literature agent''s findings on enforcing Coulomb/Sudakov.'
     19: 'D435: (b) finish the ReZero (model.net.layer_norm=rezero, 9e63d86f) test at the step-15/16 chosen HPs on uug and
       tt virtual (earlier: tt Born ReZero d322922b read 2026-11-12 ~11:50, nothing to move; uug/tt virtual reads at the old
       HP point).'
@@ -28614,12 +28609,6 @@ entries:
       if:
       - 'Coulomb transfer appears on converged runs: one-loop tops go into the KIT parent'
       - 'still none: 11c''s NO stands, now on converged runs'
-    18:
-      feeds: 'whether singular limits can be built in exactly rather than learned (D435: intentional, reproducible asymptotics)'
-      if:
-      - 'the dipole ansatz fixes uug/uugg soft+collinear (and tt Coulomb/Sudakov with CDST massive dipoles) within the MLP
-        bands: it becomes the KIT model and is proposed for catalog runs'
-      - 'no or partial: reported per limit against the input arms; the literature agent''s methods are next'
     19:
       feeds: whether removing LayerNorm (ReZero) is what fixes the input-scale dependence in the limits (D411, D435 'maybe
         the layernorm stuff')
@@ -28639,8 +28628,6 @@ entries:
       passed every stage, 2026-11-13)'
     '16': kit_hpo driver DONE event (uug_T and uugg_T searches in the same driver, D424/D428)
     '17': 'kit_hpo driver DONE event: the chosen t t~ virtual settings'
-    '18': FA-ccin2p3-d5fb3d78 FA-ccin2p3-3bbda50a FA-ccin2p3-fec28926 FA-ccin2p3-1ad20d13 FA-ccin2p3-602ce14f FA-ccin2p3-09576b49
-      FA-ccin2p3-5ce19348
     '19': kit_hpo driver DONE event (chosen HPs); literature agent's findings for (a)
     '20': '2026-11-14'
   handoff:
