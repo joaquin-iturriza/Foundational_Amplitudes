@@ -5,7 +5,7 @@ tools/eval_delta.py at the best checkpoint).
 
     python analysis/data_saving/example_reruns.py collect   # read-only site run on lxplus and CC-IN2P3
                                                             #   -> data/example_reruns.npz (ln|M|^2 true, pred per cell)
-    python analysis/data_saving/example_reruns.py plot      # -> figs/example_delta_d{2,3,4}, example_dist_d{2,3,4}{a,b}
+    python analysis/data_saving/example_reruns.py plot      # -> figs/example_delta_{a..d}, example_dist_{a..d} (+ _legend)
 
 Per cell it prints the rerun's MSE of ln|M|^2 = mean (ln|M|^2_pred - ln|M|^2_true)^2 against the cell's recorded
 value (the design's reproduction check: within 2x). Delta = |M|^2_pred / |M|^2_true - 1.
@@ -22,14 +22,22 @@ NPZ = os.path.join(DATA, "example_reruns.npz")
 CELLS = json.load(open(os.path.join(DATA, "example_cells.json")))
 # the one cell rerun earlier, on CC (design: reused, 0.05% of its record)
 ON_CC = {("tp3_finfte_uubar_Zggg_d8", 96)}
+# the design's one repeat of a rerun off its record by more than 2x (job_rerun_trial.sh third argument)
+REPEAT = {("tp3_scr_ee_bb_nlo_d8", 154): "2"}
 NAME = {"uubar_Zggg": r"$u\bar u\to Zggg$", "ee_ddbarg": r"$e^+e^-\to d\bar dg$",
-        "udbar_enu": r"$u\bar d\to e^+\nu_e$", "ee_bb_nlo": r"$e^+e^-\to b\bar b$ (1-loop)"}
+        "udbar_enu": r"$u\bar d\to e^+\nu_e$", "ee_bb_nlo": r"$e^+e^-\to b\bar b$, one loop"}
 PROBES = list(NAME)
 
 
-def tag(c):
+def tag(c, rep=""):
     """The rerun's zz_delta directory name: tools/eval_delta.py joins the run dir's last two path parts."""
-    return f"runs__{c['sweep']}_rerun" if c["hp"] < 0 else f"{c['sweep']}__trial_{c['hp']:04d}_rerun"
+    return (f"runs__{c['sweep']}_rerun" if c["hp"] < 0 else f"{c['sweep']}__trial_{c['hp']:04d}_rerun") + rep
+
+
+def tags(c):
+    """The cell's reruns, the first one and its repeat if it has one."""
+    r = REPEAT.get((c["sweep"], c["hp"]))
+    return [tag(c)] + ([tag(c, r)] if r else [])
 
 
 REMOTE = r'''
@@ -52,25 +60,41 @@ def collect():
     from common.readers import site_python
     have = dict(np.load(NPZ)) if os.path.exists(NPZ) else {}
     for site in ("lxplus", "ccin2p3"):
-        tags = [tag(c) for c in CELLS if ((c["sweep"], c["hp"]) in ON_CC) == (site == "ccin2p3")]
-        got = site_python(REMOTE, tags, "EXAMPLE_PREDS", site=site)
+        want = [t for c in CELLS if ((c["sweep"], c["hp"]) in ON_CC) == (site == "ccin2p3") for t in tags(c)]
+        got = site_python(REMOTE, want, "EXAMPLE_PREDS", site=site)
         for t, s in got.items():
             z = np.load(io.BytesIO(base64.b64decode(s)))
             have[t + "/true"], have[t + "/pred"] = z["true"], z["pred"]
-        print(f"{site}: {len(got)} of {len(tags)} reruns have preds_val.npz; missing: {sorted(set(tags) - set(got))}")
+        print(f"{site}: {len(got)} of {len(want)} reruns have preds_val.npz; missing: {sorted(set(want) - set(got))}")
     np.savez_compressed(NPZ, **have)
 
 
 def cells_with_preds():
+    """Each cell with its rerun's predictions; a repeated rerun is shown by its repeat, both MSEs kept."""
     z = np.load(NPZ)
     out = []
     for c in CELLS:
-        t = tag(c)
-        if t + "/true" in z:
-            c = dict(c, true=z[t + "/true"], pred=z[t + "/pred"])
-            c["mse"] = float(np.mean((c["pred"] - c["true"]) ** 2))
+        c = dict(c, mses=[])
+        for t in tags(c):
+            if t + "/true" in z:
+                c["true"], c["pred"] = z[t + "/true"], z[t + "/pred"]
+                c["mses"].append(float(np.mean((c["pred"] - c["true"]) ** 2)))
+        if c["mses"]:
+            c["mse"] = c["mses"][-1]
         out.append(c)
     return out
+
+
+D_STYLE = {100: ":", 1000: "--", 10000: "-"}
+D_LAB = {100: r"$10^2$", 1000: r"$10^3$", 10000: r"$10^4$"}
+
+
+def hist_ratio(ax):
+    """The ratio panel under a histogram, a quarter of the plot box's height, sharing its x axis (as
+    analysis/catalog_v4/paper_sec3_figs.hist_ratio, the papers' layout)."""
+    r = ax.inset_axes([0, -0.31, 1, 0.25], sharex=ax)
+    ax.tick_params(labelbottom=False)
+    return r
 
 
 def plot():
@@ -82,53 +106,54 @@ def plot():
             print(f"CELL {c['probe']} D={c['D']} {c['arm']}: no rerun predictions yet")
             continue
         d = np.exp(c["pred"] - c["true"]) - 1
-        r = c["mse"] / c["loss"]
-        print(f"CELL {c['probe']} D={c['D']} {c['arm']} n={c['true'].size}: rerun MSE(ln|M|^2) {c['mse']:.3g}, "
-              f"recorded {c['loss']:.3g}, rerun/recorded {r:.2f}{'' if 0.5 <= r <= 2 else '  !! outside 2x'}; "
-              f"Delta rms {np.sqrt(np.mean(d ** 2)):.3g}, median |Delta| {np.median(np.abs(d)):.3g}")
+        r = [m / c["loss"] for m in c["mses"]]
+        print(f"CELL {c['probe']} D={c['D']} {c['arm']} n={c['true'].size}: rerun MSE(ln|M|^2) "
+              + ", ".join(f"{m:.3g}" for m in c["mses"]) + f" (repeat last), recorded {c['loss']:.3g}, rerun/recorded "
+              + ", ".join(f"{x:.2f}" for x in r) + ("" if 0.5 <= r[-1] <= 2 else "  !! outside 2x")
+              + f"; Delta rms {np.sqrt(np.mean(d ** 2)):.3g}, median |Delta| {np.median(np.abs(d)):.3g}, "
+              f"|Delta| > 10: {np.mean(np.abs(d) > 10):.2%}, < 1e-6: {np.mean(np.abs(d) < 1e-6):.2%}")
     by = {(c["probe"], c["D"], c["arm"]): c for c in cells if "mse" in c}
     col = {"scratch": ps.C.blue, "fine-tune": ps.C.vermillion}
-    lab = {"scratch": "from scratch", "fine-tune": "fine-tuned"}
-    for k, D in ((2, 100), (3, 1000), (4, 10000)):
-        # Delta histograms: one panel per probe, both arms on the panel's own range
-        fig, axs = ps.figure(ncols=2, nrows=2)
-        for ax, p in zip(np.ravel(axs), PROBES):
-            arms = [a for a in ("scratch", "fine-tune") if (p, D, a) in by]
-            if not arms:
-                continue
-            ds = {a: np.exp(by[p, D, a]["pred"] - by[p, D, a]["true"]) - 1 for a in arms}
-            allv = np.concatenate(list(ds.values()))
-            edges = np.linspace(*np.quantile(allv, [0.0005, 0.9995]), 61)   # the central 99.9% of both arms' events
-            for a, v in ds.items():
-                ax.stairs(np.histogram(v, edges)[0], edges, color=col[a], label=lab[a])
-            ax.set_yscale("log"); ax.set_ylabel("events")
-            ax.set_xlabel(r"$\Delta=|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2_{\rm true}-1$")
-            ps.process_label(ax, NAME[p])
-        ps.legend_strip(np.ravel(axs)[0], os.path.join(figs, f"example_delta_d{k}_legend"), ncol=2)
-        print("FIGURE", ps.save(fig, os.path.join(figs, f"example_delta_d{k}")))
-        # distributions: per canvas two probes, top true and predicted ln|M|^2, bottom predicted / true per bin
-        for part, sel in (("a", PROBES[:2]), ("b", PROBES[2:])):
-            fig, axs = ps.figure(ncols=2, nrows=2)
-            for j, p in enumerate(sel):
-                arms = [a for a in ("scratch", "fine-tune") if (p, D, a) in by]
-                if not arms:
-                    continue
-                tr = by[p, D, arms[0]]["true"]
-                edges = np.linspace(*np.quantile(tr, [0.001, 0.999]), 41)
-                t = np.histogram(tr, edges)[0].astype(float)
-                top, bot = axs[0][j], axs[1][j]
-                top.stairs(t, edges, color="k", label="truth")
-                for a in arms:
-                    h = np.histogram(by[p, D, a]["pred"], edges)[0]
-                    top.stairs(h, edges, color=col[a], label=lab[a])
-                    bot.stairs(np.where(t > 0, h / np.where(t > 0, t, 1), np.nan), edges, color=col[a])
-                top.set_yscale("log"); top.set_ylabel("events")
-                bot.set_ylabel("pred / truth")
-                for ax in (top, bot):
-                    ax.set_xlabel(r"$\log|\mathcal{M}|^2$")
-                ps.process_label(top, NAME[p])
-            ps.legend_strip(axs[0][0], os.path.join(figs, f"example_dist_d{k}{part}_legend"), ncol=3)
-            print("FIGURE", ps.save(fig, os.path.join(figs, f"example_dist_d{k}{part}")))
+    lab = {"scratch": "scratch", "fine-tune": "fine-tune"}
+    edges = np.logspace(-6, 1, 57)   # |Delta| from 10^-6 to 10, eight bins a decade
+    # |Delta| histograms on a log axis, one panel per probe: colour the arm, line style D
+    fd = ps.panels(4)
+    for (fig, ax), p in zip(fd, PROBES):
+        for a in ("scratch", "fine-tune"):
+            for D in D_STYLE:
+                if (p, D, a) in by:
+                    c = by[p, D, a]
+                    ax.stairs(np.histogram(np.abs(np.exp(c["pred"] - c["true"]) - 1), edges)[0], edges, color=col[a],
+                              linestyle=D_STYLE[D], label=f"{lab[a]}, $D=${D_LAB[D]}")
+        ax.set_xscale("log"); ax.set_xlim(edges[0], edges[-1])
+        ax.set_yscale("log"); ax.set_ylabel("events")
+        ax.set_xlabel(r"$|\Delta|$, $\Delta=|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2_{\rm true}-1$")
+        ps.process_label(ax, NAME[p])
+    print("FIGURE", ps.save_panels(fd, os.path.join(figs, "example_delta")))
+    # true and predicted log|M|^2 with the ratio below, one panel per probe
+    fh = ps.panels(4)
+    for (fig, ax), p in zip(fh, PROBES):
+        r = hist_ratio(ax)
+        have = [(a, D) for a in ("scratch", "fine-tune") for D in D_STYLE if (p, D, a) in by]
+        if not have:
+            continue
+        tr = by[p, have[0][1], have[0][0]]["true"]   # every cell of a probe scores the same validation split
+        e = np.linspace(*np.quantile(tr, [0.001, 0.999]), 41)
+        t = np.histogram(tr, e)[0].astype(float)
+        ax.stairs(t, e, color="k", label="truth")
+        for a, D in have:
+            h = np.histogram(by[p, D, a]["pred"], e)[0]
+            ax.stairs(h, e, color=col[a], linestyle=D_STYLE[D], label=f"{lab[a]}, $D=${D_LAB[D]}")
+            with np.errstate(divide="ignore", invalid="ignore"):
+                r.stairs(np.where(t > 0, h / t, np.nan), e, color=col[a], linestyle=D_STYLE[D])
+        r.axhline(1, color="k", lw=0.8)   # the truth line, as thin as the papers' ratio reference
+        r.set_ylim(0.5, 1.5); r.set_yticks([0.5, 1, 1.5]); r.set_yticklabels(["0.5", "1", "1.5"])
+        ax.set_xlim(e[0], e[-1])
+        ax.set_yscale("log"); ax.set_ylabel("events")
+        r.set_xlabel(r"$\log|\mathcal{M}|^2$"); r.set_ylabel(r"$\frac{\rm model}{\rm truth}$")
+        ps.process_label(ax, NAME[p])
+    ps.legend_strip(fh[0][1], os.path.join(figs, "example_legend"), ncol=4)   # one strip for both figures
+    print("FIGURE", ps.save_panels(fh, os.path.join(figs, "example_dist")))
 
 
 if __name__ == "__main__":
