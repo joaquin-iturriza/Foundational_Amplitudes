@@ -21404,11 +21404,7 @@ entries:
   - D407
   - D420
   - D441
-  next:
-    7: 'Step 6 warmup test running (design PASS 2026-11-13 ~12:20, configs @a85a7210, reader @20260f1c): arm L dsave_s6cosparentlongwu_ft_bbx_zz_d{4,5,7}
-      (cosine parent, WSD fine-tune, warmup [0.05,0.6]) vs C, 8 trials each, detach dsave_s6_longwarmup (drive.py, 6.0 GPU-h,
-      target 0.65 h / 9 jobs). Read: step6_readout.py (uncached), branches a-d of the design (lag = lost_at - own warmup >
-      0.25; L/C pooled vs 2.53), figures step6_lost_vs_warmup, step6_curves, step6_ratio, step6_best; report'
+  next: null
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -25752,8 +25748,7 @@ entries:
       searched warmup, damped, ramp, muon_warmup, adamw_warmup, fine-tune warmup, long warmup in results.tex, plan.yaml, site
       decisions --all. Checks 9-15 as before: HETEROSC mu_mse, same recipe/pools as C, 6.0 GPU-h, ~1.1 h, 75 MB/search vs
       63 GB free, rate from C''s own trials.'
-  step_waits:
-    '7': detach dsave_s6_longwarmup (drive.py pid 1348472; its DONE event)
+  step_waits: {}
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
@@ -27109,12 +27104,6 @@ entries:
       analysis/data_saving/stage2_readout.py; data/step6_readout.json, step6_rows.json; figs/step6_curves_*, step6_ratio_*,
       step6_best'
     written: '2026-11-13T11:08:52+00:00'
-  step_why:
-    7:
-      feeds: the fine-tune template's warmup range (D414)
-      if:
-      - 'val LOWER: wide warmup into the fine-tune template'
-      - 'WITHIN: reported, nothing more run'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
