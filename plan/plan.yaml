@@ -21579,6 +21579,19 @@ entries:
     - 6
     answered_at: '2026-11-12T17:40:42.419000+00:00'
     decision: D420
+  - ask: 'Scope: on b b~ > Z Z tree level the fine-tune loses its 3-70x head start during the warmup (4-16% of the run, following
+      the peak learning rate), and Muon''s weight decay then shrinks the parent''s weights at large D. Design a one-change
+      test at D = 316 and 3162: the fine-tune with no re-warmup and a peak learning rate 0.1x the pretraining''s (or weight
+      decay toward the parent instead of toward zero), against the current fine-tune, one 16-trial search each, about 18 GPU-h?'
+    at: '2026-11-13T00:19:10+00:00'
+    searched: 'site decisions --project FA all: D407 declined a lower lr_scale rerun; D422 (''the solution is just to tune
+      it further'') dropped schedule/regularisation tests; neither covers a no-re-warmup or decay-toward-parent fine-tune.
+      His messages: 2026-10-26T02:03 is about Muon weight decay in another study (qcd-only pools); 2026-11-10T02:08 is the
+      KIT benchmark kickoff with the draft zip; 2026-11-12T01:19 is about the stage-2 points and naming; 2026-11-13 ~00:30
+      asks what constrains fine-tuning, not for this test'
+    blocks: only this test (step 6)
+    blocks_steps: &id002
+    - 6
   owner:
     agent: a4ba6827868644ef8
     state: working
@@ -26621,6 +26634,18 @@ entries:
       if:
       - 'yes: design, review, run'
       - 'no: dropped'
+  ask: 'Scope: on b b~ > Z Z tree level the fine-tune loses its 3-70x head start during the warmup (4-16% of the run, following
+    the peak learning rate), and Muon''s weight decay then shrinks the parent''s weights at large D. Design a one-change test
+    at D = 316 and 3162: the fine-tune with no re-warmup and a peak learning rate 0.1x the pretraining''s (or weight decay
+    toward the parent instead of toward zero), against the current fine-tune, one 16-trial search each, about 18 GPU-h?'
+  waiting_since: '2026-11-13T00:19:10+00:00'
+  searched: 'site decisions --project FA all: D407 declined a lower lr_scale rerun; D422 (''the solution is just to tune it
+    further'') dropped schedule/regularisation tests; neither covers a no-re-warmup or decay-toward-parent fine-tune. His
+    messages: 2026-10-26T02:03 is about Muon weight decay in another study (qcd-only pools); 2026-11-10T02:08 is the KIT benchmark
+    kickoff with the draft zip; 2026-11-12T01:19 is about the stage-2 points and naming; 2026-11-13 ~00:30 asks what constrains
+    fine-tuning, not for this test'
+  blocks: only this test (step 6)
+  blocks_steps: *id002
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
@@ -32184,7 +32209,7 @@ entries:
       about cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID,
       says nothing about the draft's sections)
     blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-    blocks_steps: &id002 []
+    blocks_steps: &id003 []
   owner:
     agent: afb073b8fc9460ec5
     state: stopped
@@ -32202,7 +32227,7 @@ entries:
     cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID, says
     nothing about the draft's sections)
   blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-  blocks_steps: *id002
+  blocks_steps: *id003
   step_why:
     1:
       feeds: the draft's results (D354)
