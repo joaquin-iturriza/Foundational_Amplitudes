@@ -69,7 +69,7 @@ for j, (tg, lab) in enumerate(TG.items()):
                        "spearman_min_val": float(spearmanr(y, [min(r["val"]) for r in F])[0])}
 ax = axs[1, 0]
 ax.set_xscale("log"); ax.set_yscale("log")
-ax.set_xlabel(r"peak lr $=\mathrm{lr}\cdot\mathrm{lr\_scale}$"); ax.set_ylabel("warmup rise")
+ax.set_xlabel("peak fine-tune learning rate"); ax.set_ylabel("warmup rise")
 ps.legend(ax, "upper left")
 ax = axs[1, 1]
 ax.scatter([], [], color=ps.C.vermillion, marker="o", label="tree")
