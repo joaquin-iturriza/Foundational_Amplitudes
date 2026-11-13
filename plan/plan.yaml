@@ -32764,6 +32764,13 @@ entries:
       3.7; Sec. 4 minimal: rung-0 sentence, ladder pools'' rule, 478-entry catalog. Full draft scratchpad draft_full.pdf.
       Not changed (front matter, co-authors): empty abstract and outlook, intro lists Sec. 4 before Sec. 2 and calls Sec.
       2 a catalog pretraining.'
+  - at: '2026-11-13T09:32:45+00:00'
+    text: '2026-11-13 Fig. 9 check (analysis/transfer/het_eval_check.py @HEAD, CC zz_delta_het, 4 worst cells: ee_ddbar scratch
+      trial_0010, ee_ddbar finale fine-tune, ee_dd_nlo scratch trial_0030, ee_bb_nlo r1 trial_0089): no evaluation bug. Mean
+      column only (preds mu = sigma-file mu to 4e-4), no negative or zero values, same tf32 setting as trained; raw ln r =
+      2.14 x standardized residual. The bad events (|ln r|>1: 899, 1142, 234, 57 of 10000/5000) have standardized residual
+      ~1.2-1.9 and sigma ~0.9-3.0 against 1e-4 on the rest: the het network leaves them unfitted under a large sigma. Sec.
+      3.6 text (draft) states both metrics: median |Delta| better in 118/146, MSE higher in 103/146.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
