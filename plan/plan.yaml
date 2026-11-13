@@ -28486,6 +28486,12 @@ entries:
       holds only on tt virtual; plain-target uug 5.9e-6 beats the MLP but loses soft (241). Examples (MLP rerun seed 0): median
       Delta uug coll +1.36 vs -0.38, uugg qg -1.36 vs -0.26, Sudakov -0.53 vs +0.14, Coulomb -1.87 vs -0.73; tt bulk p99 9.2e-5
       vs 1.1e-3. Draft layout: SciPost text block is off-centre (left margin 47 pt), wide rows shifted into the right margin.'
+  - at: '2026-11-13T07:00:20+00:00'
+    text: '2026-11-13 ~08:00 @638c42a9. E6895: kit_hpo lxplus trials idle 6 h because 32G becomes 11 CPUs / 33000 MB at the
+      lxplus schedd (3000 MB per CPU), which no V100 node (4 CPUs / 16 GB) offers; trials peak ~2 GB RSS. Configs now 11G;
+      site pick''s condor slot count models the per-CPU rule. 16 trials cancelled and set to retry without penalty; driver
+      relaunched with --mem 11G (pid 3726617), SIGSTOPped by the coordinator until draft_rewrite''s GPU jobs run (resume:
+      kill -CONT 3726617).'
   step_why:
     5:
       feeds: what KIT receives
