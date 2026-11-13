@@ -32626,9 +32626,10 @@ entries:
       - 'all reruns within 2x: figure in, slot filled, pages to Joaquin'
       - 'a rerun off by >2x: flag it in the caption, rerun once'
   step_waits:
-    '1': 'FA-lxplus-90226a49 FA-lxplus-11159d5e FA-lxplus-aae72a70 FA-lxplus-57edacab FA-lxplus-9f9be8e6 FA-lxplus-99843ab7
-      FA-lxplus-bb1a62e7 FA-lxplus-df754b65 FA-lxplus-9544b441 FA-lxplus-a49704a1 FA-lxplus-e87fff27 FA-lxplus-eedb887c FA-lxplus-961e86e0
-      FA-lxplus-77194f42 FA-lxplus-0bc7969e FA-lxplus-91b58316 '
+    '1': FA-lxplus-99843ab7 FA-lxplus-57edacab FA-lxplus-9f9be8e6 FA-lxplus-9544b441 FA-lxplus-a49704a1 FA-lxplus-e87fff27
+      FA-lxplus-bb1a62e7 FA-lxplus-df754b65 FA-lxplus-eedb887c FA-lxplus-961e86e0 FA-lxplus-77194f42 FA-lxplus-0bc7969e FA-lxplus-91b58316
+      and the detached timer gate_window_clear2 (07:06) after which the 7 remaining fine-tune reruns of scratchpad args_left.txt
+      are submitted
   findings:
   - at: '2026-11-13T02:46:58+00:00'
     text: '2026-11-13 ~03:50 Joaquin: ''we should start actually doing the work on the draft with what we have ... Let''s
