@@ -32635,7 +32635,8 @@ entries:
   decisions:
   - D365
   - D445
-  next: null
+  next:
+    2: 'Sec. 2: apply Joaquin''s comments on draft_sec2_pages.pdf (draft b5fbf78) when the coordinator passes them on'
   done_when: null
   notes_ref: null
   match: none
@@ -32858,3 +32859,9 @@ entries:
     files: ~/drafts/fm_amplitudes_2026-11/paper.tex (Sec. 2); analysis/data_saving/example_reruns.py; plot_style.py legend_strip(order=);
       scratchpad draft_sec2_pages.pdf
     written: '2026-11-13T08:13:04+00:00'
+  step_why:
+    2:
+      feeds: the draft's Sec. 2 final
+      if:
+      - 'no comments: Sec. 2 done'
+      - 'comments: apply them, redraw beside the old version'
