@@ -32656,6 +32656,9 @@ entries:
       (site pick''s placement), trial dirs copied site to site, parent and pools present there; 22 at 1 h (condor microcentury),
       tp3_scr_ee_bb_nlo_d8 at 2 h; 25 GPU-h at the limits. The 23 CC copies (slurm 63723301..63723345, all PENDING) cancelled
       by id. Same configs, same design otherwise.'
+  - at: '2026-11-13T05:09:52+00:00'
+    text: 'Coordinator 2026-11-13: Sec. 3 is written by optimizations_recap''s owner and Sec. 5 by kit_benchmark''s owner,
+      in parallel; this entry keeps Sec. 2, Sec. 4 and the abstract/outlook. Sec. 4 done (draft 5f4dc23, 22fac9d).'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
