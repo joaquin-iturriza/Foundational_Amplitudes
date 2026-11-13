@@ -52,8 +52,12 @@ if __name__ == "__main__":
     print(json.dumps(out, indent=1))
     fig, ax = ps.figure()
     for (s, v, _), c, lab in ((cos, "k", "cosine"), (wsd, ps.C.blue, "WSD")):
-        ok = v < 5                                    # spikes (listed in the json) left off the plotted range
-        ax.plot(s[ok], v[ok], "-", color=c, label=lab)
+        ax.plot(s, v, "-", color=c, label=lab)
+    # every check is drawn; the y axis tops at the highest non-spike check of the two runs (spikes are the json's
+    # spikes_at, the rule above), so spikes run off the axis, not out of the data
+    top = max(float(max(x for st, x in zip(s_, v_) if int(st) not in out[k]["spikes_at"]))
+              for k, (s_, v_, _) in (("cosine", cos), ("wsd", wsd)))
+    ax.set_ylim(top=top)
     ax.set_xlabel("training step"); ax.set_ylabel(r"val loss (HETEROSC NLL)")
     ps.legend(ax, "upper right")
     ps.save(fig, os.path.join(HERE, "figs", "parent_curves"))
