@@ -33351,6 +33351,17 @@ entries:
       count 1.78M = 1.61M (Tab. 2) + 0.17M diagram encoder (run logs FA-ccin2p3-1a46f3e0, f08e90e8: 1775829 learnable, diagram
       encoder 165760), Muon and star-arms legends balanced and centred (plot_style 59cca7bc). Note: the reference pretrainings
       carry a diagram encoder while Sec. 5 calls the adopted configuration ''no diagram encoder''.'
+  - at: '2026-11-13T17:16:17+00:00'
+    text: '2026-11-13: diagram encoder settled, case (a): both long catalog pretrainings (runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262
+      Muon, v4_het_default25_w8_x16_hp1262_adamw) have use_diagrams: true, diagram_encoder_impl: llm4lhc, use_PIDs: false,
+      particle_encoder_hidden: 0, color_onehot: true; their logs: ''Diagram conditioning (llm4lhc, mode=pooled): 45504 diagrams
+      over 1153 processes ... added to the token embeddings'' and ''Diagram encoder (llm4lhc): 165760 parameters'' (wrappers.setup_diagram_conditioning_llm4lhc
+      adds the per-process vector to every particle token). No catalog_v3_short/v4_short/v4_long run config on CC lacks use_diagrams
+      true (grep -L, 0 files; 272 with it). So the catalog pretrainings are the 448-process comparison''s ''linear embedding''
+      arm (4.86e-4), not its lowest ''no diagram encoder, linear'' arm (3.85e-4). Fixed at draft 031e189 / FA 1d542276: the
+      Sec. 5 inputs text, the Fig. 11 caption and the figure label (adopted -> ''no diagrams, linear''); 1.78M parameter sentence
+      stays. Not checked: whether the Sec. 6 ladder (tp3) runs used the diagram encoder (their configs were not found under
+      sweeps/tp3_*).'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
