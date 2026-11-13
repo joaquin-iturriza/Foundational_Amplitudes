@@ -26585,6 +26585,13 @@ entries:
     text: '2026-11-13 old_setup_examples redrawn with separate exponents (Joaquin: ''Separate exponents''; @3b3c3ab6): S =
       D*_scr/D*_ft [16-84% bootstrap]: Zggg 11.3 [10.4,14.1] (1e-2; alpha 0.87/0.69), d d~ g 5.5 [3.9,7.5] (1e-2; 1.17/0.99),
       u d~ e nu 4.4 [3.4,5.6] (1e-2; 1.76/1.96), b b~ one loop 5.6 [4.6,6.8] (1e-4; 1.76/2.32; D=10 excluded); median 5.55.'
+  - at: '2026-11-13T04:58:52+00:00'
+    text: '2026-11-13 ft_constraint fixed per repo-reviewer (@505ae9af): ratios at each trial''s best checkpoint (lowest val;
+      train at the same check), not the last val; warmup rise as quartiles and share above 1, the unchosen 3x cut removed.
+      Head-start-lost fractions unchanged (search bests'' curves): tree 0.10/0.08/0.16/0.10/0.04/0.08/0.10 at D=10..1e4. Median
+      best val ft/scr, tree: 0.43, 0.53, 2.07, 0.69, 0.55, 1.69, 0.25 (was 1.12, 0.95, 3.24, 0.71, 0.55, 1.03, 0.37 at last
+      val). Warmup rise, tree: quartiles 1.67/3.35/8.46, 96% of 50 trials above 1 (was ''54% above 3''); one loop 1.0/1.0/1.01,
+      27% of 48. The step-6 design''s prior quoted ''54% >3x''; its decision rule (head-start-lost fraction) is unaffected.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
