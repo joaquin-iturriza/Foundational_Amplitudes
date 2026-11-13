@@ -32993,7 +32993,7 @@ entries:
     blocks_steps: &id002 []
   owner:
     agent: aaae6521a1a2098ff
-    state: working
+    state: closed
     since: '2026-11-13T08:53:09+00:00'
     state_at: '2026-11-13T11:07:41.672000+00:00'
     context: 219091
@@ -33190,22 +33190,23 @@ entries:
     start: '2026-11-13T07:19:46+00:00'
     at: '2026-11-13T07:19:46+00:00'
   handoff:
-    state: 'Sec. 2 done, passed a fresh review and sent to Joaquin (draft b5fbf78; pages scratchpad draft_sec2_pages.pdf pp.
-      3-6). Examples from all 24 reruns (analysis/data_saving/example_reruns.py at FA 68f1cb9e): 23 within 2x; e nu fine-tune
-      D=1e4 3x below its record in two reruns, bb one-loop scratch D=1e4 shown from its repeat (1.41x), both in the Fig. 2
-      caption. Per Joaquin 2026-11-13 only his sections change: Sec. 4 at 22fac9d (a8ce7d1), title/abstract/intro/outlook
-      word for word d742281 (1e9b4ba). Sec. 3 belongs to optimizations_recap. Open: Joaquin''s comments on the Sec. 2 pages
-      (step waits on 2026-11-14); reviewer''s optional notes not done (space above Fig. 3 legend strip; ''Fine-tune'' capitalised
-      in Fig. 1 legend).'
-    decisions: 'Sec. 4 and front matter untouched (Joaquin''s words, findings 2026-11-13); reviewer fixes applied: |Delta|>10
-      as over-prediction, e nu exception, bulk claim limited, split sizes and off-record cells in caption, out-of-range |Delta|
-      in end bins, legends per figure in rows, pred/true, natural log stated, 6.7%; figures [!t] after Fig. 1. One-loop bb
-      validation split has no negative |M|^2 (0/5000), so abs() hides nothing.'
-    ruled_out: symlog Delta axis; full-height ratio panel; Sec. 4 relabelling or review; front-matter rewrites
+    state: 'Draft at 46-free state: Sec. 3 v3 and the whole-draft check applied (draft d05d793), heteroscedastic paragraph
+      reverted (3b67267) then the het figure and comparison removed on Joaquin''s word (latest draft commit); full draft scratchpad
+      draft_full.pdf (Fig. 9 is now Muon). Sec. 5 slots held. Open: Joaquin''s comments on the v3 pages and full draft (step
+      waits 2026-11-14); the het-vs-MSE question is parked by his decision (come-back step on this entry): het_eval_check.py
+      (FA 38ac3370) found no evaluation bug, the MSE outliers are a subset of events (up to ~11%) the het network leaves unfitted
+      under sigma ~1 (standardized), median |Delta| better in 118/146, MSE higher in 103/146 on 2->2.'
+    decisions: 'Joaquin 2026-11-13: remove the het figure from the draft and come back to it later. Coordinator: the het claim
+      was rewritten without the evaluation check; text changes only after the check and his seeing the figure. Sec. 4 changes
+      minimal and listed (rung-0 sentence, ladder pools'' rule, 478-entry catalog, real (ladder pools) heading). Front matter
+      and co-author sections untouched; conflicts listed to him.'
+    ruled_out: Changing the het text on a metric change without an evaluation check; scaling the 8.5 in Figs. 14-15 legends
+      to natural size (wider than the page); recolouring Figs. 2-3 (truth is black in Fig. 3)
     running: none
-    files: ~/drafts/fm_amplitudes_2026-11/paper.tex (Sec. 2); analysis/data_saving/example_reruns.py; plot_style.py legend_strip(order=);
-      analysis/data_saving/data/example_cells.json; scratchpad draft_sec2_pages.pdf, draft_uncommitted_before_sec4_revert.diff
-    written: '2026-11-13T08:41:50+00:00'
+    files: ~/drafts/fm_amplitudes_2026-11/paper.tex; analysis/catalog_v4/paper_sec3_figs.py; analysis/transfer/het_delta_summary.py;
+      analysis/transfer/het_eval_check.py; analysis/divergences/plot_genmix_sweep.py; analysis/data_saving/old_setup_examples.py;
+      scratchpad draft_full.pdf, draft_sec3_v3_pages.pdf, hetchk.json; reviewer transcript subagents/agent-a11dfa39787bda2d5.jsonl
+    written: '2026-11-13T11:09:03+00:00'
   step_why:
     2:
       feeds: whether the rewritten draft tells the D365/D354 story clearly enough to send to the co-authors
