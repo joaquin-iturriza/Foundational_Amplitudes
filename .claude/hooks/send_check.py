@@ -111,8 +111,17 @@ def findings(text, terms):
     return out
 
 
+def is_draft(path):
+    """Compiled pages of the paper draft (draft_*.pdf, or under ~/drafts/) are a document: its prose is never linted."""
+    n = os.path.normpath(os.path.expanduser(path))
+    return n.lower().endswith(".pdf") and (os.path.basename(n).startswith("draft_")
+                                           or n.startswith(os.path.expanduser("~/drafts") + os.sep))
+
+
 def check(path, terms):
     """Lines of findings for one file (empty if it passes)."""
+    if is_draft(path):
+        return []
     if "run_plots" in os.path.normpath(path).split(os.sep):   # a run's own plot, copied unchanged: labels are the training code's
         return []
     try:
@@ -157,7 +166,7 @@ def axes_findings(tool_input, cwd):
     cap = cap if isinstance(cap, str) else ""
     out = []
     for p in sent_files(tool_input, FIG_EXT):
-        if is_deck(p):
+        if is_deck(p) or is_draft(p):
             continue
         if axes_missing(cap):
             out.append("%s: its caption must say what the x and y axes are (e.g. \"x axis: ..., y axis: ...\" or "

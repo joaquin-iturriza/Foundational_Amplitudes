@@ -54,3 +54,8 @@ def test_figure_pdf_still_needs_axes(tmp_path):
     d.mkdir(parents=True)
     small_pdf(d / "f.pdf")
     assert run(str(d / "f.pdf"), "loss curves of the arms").returncode == 2
+
+
+def test_draft_pages_are_documents(tmp_path):
+    small_pdf(tmp_path / "draft_sec2_pages4-6.pdf")
+    assert run(str(tmp_path / "draft_sec2_pages4-6.pdf"), "the ratio D1_scr / D1_ft").returncode == 0
