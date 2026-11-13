@@ -26563,6 +26563,10 @@ entries:
       diff its config.yaml against dsave_parent_heldoutbbzz (only scheduler, wsd_cooldown_frac), CPU dry run of one s5wsdparent
       trial on CC, then drive.py over the 6 configs sweep/sweep_config_dsave_s5{wsd,cos}parent_ft_bbx_zz_d{4_t4960,5_t7840,7_t8500}.yaml
       @a3ecbcc3 (8 trials, waves 3,3,2; 12.0 GPU-h); extend ft_constraint.py to the s5 stages; read per the passed outcome.'
+  - at: '2026-11-13T02:07:59+00:00'
+    text: '2026-11-13 ~03:10 main session asked Joaquin (no answer yet): the WSD-parent test (step 6) runs 8 trials per fine-tune
+      search to match the cosine record, against D430 (''8 ... not enough''); offered 16 per search at about twice the 13.5
+      GPU-h. Also open to him: step 7 (shared vs per-curve exponent savings for the draft figure).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
