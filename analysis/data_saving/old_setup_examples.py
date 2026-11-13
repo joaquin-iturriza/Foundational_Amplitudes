@@ -2,8 +2,8 @@
 MSE of log|M|^2 against the fine-tune events D, on the ladder's 8k-step grid (the draft's ladder figures' cells).
 Per panel: scratch and the fine-tune from the pretraining with every structure (rung 9 plus every star arm's
 processes, "finale" in analysis/transfer), with the target precision 1e-4, or 1e-2 where an arm does not reach 1e-4
-(Joaquin 2026-11-13); the saving S = D*_scratch/D*_fine-tune is read from fitted power laws (D438): the joint fit of
-dstar_fit.py, L_arm(D) = A_arm D^-alpha + L_inf,arm with one exponent shared by the arms (D373), D* where each fit
+(Joaquin 2026-11-13); the saving S = D*_scratch/D*_fine-tune is read from fitted power laws (D438): each curve fitted
+alone, L(D) = A D^-alpha + L_inf with its own exponent (dstar_fit.fit_each; Joaquin 2026-11-13 "Separate exponents"), D* where each fit
 meets the line, band the 16-84% bootstrap over cells; the b b~ one-loop D=10 point is left out of both its fits (D438,
 drawn open). Cells are read exactly as
 analysis/transfer/finale_synth.py reads them (cell(): the best of a search's first 5 trials, a fixed run at the
@@ -49,23 +49,23 @@ for ax, p in zip(axs.flat, PROBES):
             ax.plot([q[0] for q in out], [q[1] for q in out], "o", mfc="none", color=c)
     # the line: 1e-4 where both curves reach it, else 1e-2 (Joaquin, 2026-11-13)
     level = 1e-4 if all(min(y for _, y in c) <= 1e-4 for c in curves.values()) else 1e-2
-    r = saving(arms, level)
+    r = saving(arms, level, shared=False)
     f = r["fit"]
     xs = np.geomspace(min(D), max(D), 200)
     for key, c in (("scr", "k"), ("ft", ps.C.blue)):
         A, Li = f[key]
-        ax.plot(xs, A * xs ** -f["alpha"] + Li, "-", color=c)
+        ax.plot(xs, A * xs ** -f["alpha_" + key] + Li, "-", color=c)
     ax.axhline(level, color="0.5", ls="--")
-    ds, df = (dstar(*f[k], f["alpha"], level) for k in ("scr", "ft"))
+    ds, df = (dstar(*f[k], f["alpha_" + k], level) for k in ("scr", "ft"))
     s, (lo, _, hi) = 10 ** r["log10_S"], (10 ** b for b in r["band"])
     S.append(s)
     ax.annotate("", xy=(df, level), xytext=(ds, level), arrowprops=dict(arrowstyle="<|-|>", color=GAP,
                                                                           shrinkA=0, shrinkB=0))
     g = [a / b for a, b in zip(sc, ft) if a and b]
     ALL += g
-    print(f"{p}: level {level:g}  fit alpha {f['alpha']:.2f}  rms {f['rms']:.2f} dec  L_inf scr {f['scr'][1]:.1e} "
+    print(f"{p}: level {level:g}  alpha scr {f['alpha_scr']:.2f} ft {f['alpha_ft']:.2f}  rms {f['rms']:.2f} dec  L_inf scr {f['scr'][1]:.1e} "
           f"ft {f['ft'][1]:.1e}  D*_scratch {ds:.0f}  D*_ft {df:.0f}  S = D*_scr/D*_ft {s:.1f} "
-          f"[16-84%: {lo:.1f}, {hi:.1f}] boot {r['boot']}  S_A {10 ** r['log10_S_A']:.1f}  "
+          f"[16-84%: {lo:.1f}, {hi:.1f}] boot {r['boot']}  "
           f"median L_scratch/L_ft over D {np.median(g):.1f} (range {min(g):.1f}-{max(g):.1f}, {len(g)} cells)")
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlabel(r"training events $D$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")

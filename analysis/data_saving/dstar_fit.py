@@ -46,7 +46,19 @@ def dstar(A, Linf, al, level=LEVEL):
     return (A / (level - Linf)) ** (1 / al) if level > Linf else np.inf
 
 
-def boot(arms, stat, n=500, seed=0):
+def fit_each(arms):
+    """Each arm fitted alone, its own exponent (Joaquin 2026-11-13, "Separate exponents"): {arm: (A, Linf),
+    "alpha_<arm>": alpha, "rms": over all arms' residuals}."""
+    out, sq, n = {}, 0.0, 0
+    for a, dl in arms.items():
+        f = fit({a: dl})
+        out[a], out["alpha_" + a] = f[a], f["alpha"]
+        sq, n = sq + f["rms"] ** 2 * len(dl[0]), n + len(dl[0])
+    out["rms"] = float(np.sqrt(sq / n))
+    return out
+
+
+def boot(arms, stat, n=500, seed=0, fitter=None):
     """16/50/84% of stat over cell resamples. A replicate whose refit floor reaches the level (D* infinite, S unbounded)
     is kept as +-inf in the percentiles, so an unbounded edge shows as inf; counts: kept, of them infinite, and the
     resamples rejected for under 3 distinct D (which cannot fix a power law and a floor)."""
@@ -60,7 +72,7 @@ def boot(arms, stat, n=500, seed=0):
                 break
             b[a] = (D[i], L[i])
         else:
-            out.append(stat(fit(b)))
+            out.append(stat((fitter or fit)(b)))
             continue
         rej += 1
     out = np.array(out, float)
@@ -70,13 +82,18 @@ def boot(arms, stat, n=500, seed=0):
                  "undefined": int(n - rej - len(out))}
 
 
-def saving(arms, level=LEVEL):
-    """{S, S_A, band of log10 S, fit} for arms {'scr': (D, L), 'ft': (D, L)}."""
+def saving(arms, level=LEVEL, shared=True):
+    """{S, S_A, band of log10 S, fit} for arms {'scr': (D, L), 'ft': (D, L)}; shared=False fits each arm with its own
+    exponent (fit_each; S_A then undefined, None)."""
+    al = (lambda f, a: f["alpha"]) if shared else (lambda f, a: f["alpha_" + a])
+
     def logS(f):
-        return np.log10(dstar(*f["scr"], f["alpha"], level) / dstar(*f["ft"], f["alpha"], level))
-    f = fit(arms)
-    band, nb = boot(arms, logS)
-    return {"log10_S": logS(f), "log10_S_A": float(np.log10(f["scr"][0] / f["ft"][0]) / f["alpha"]),
+        return np.log10(dstar(*f["scr"], al(f, "scr"), level) / dstar(*f["ft"], al(f, "ft"), level))
+    fitter = fit if shared else fit_each
+    f = fitter(arms)
+    band, nb = boot(arms, logS, fitter=fitter)
+    return {"log10_S": logS(f),
+            "log10_S_A": float(np.log10(f["scr"][0] / f["ft"][0]) / f["alpha"]) if shared else None,
             "band": list(map(float, band)), "boot": nb, "fit": {k: (list(v) if isinstance(v, tuple) else v)
                                                                    for k, v in f.items()}}
 
