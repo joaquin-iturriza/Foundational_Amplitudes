@@ -32119,6 +32119,33 @@ entries:
       control on >= half the strata of a family and bulk not worse than the band -> pretraining transfers for tt at these
       HPs (A_ft packaged, step 5); none -> 11c''s NO stands on converged runs. Every verdict with the curve form (separation/end_up);
       a blow-up listed with where, the repair lr x0.3 in the same arm.'
+    fix_at: '2026-11-13T10:46:04+00:00'
+    fix: '(1) Matched control (CLAUDE.md: a feature is judged against the best of the HPO sweep, never retrained). The design
+      retrains the uug and tt controls through job_kit.sh, but the chosen trials themselves are complete on the sites: CC
+      runs/kit_hpo_uug_plain/trial_1918 has models/model_run0_best.pt.gz, sigma_stage/, train_steps.npz, config.yaml; tt trial_0131
+      is on lxplus (/eos/.../runs/kit_hpo_ttvirt_thr/trial_0131). Fix: score the two trials with tools/kit_predict.py (job_kit.sh
+      KIT_SCORE_ONLY path or scripts/job_kit_rescore.sh, ~13 min each, no training) and use them as the controls; a job_kit.sh
+      rerun only if the trial cannot be scored, with the reason stated (and then the trial''s val mu-MSE beside it). The step-17
+      scratch softpair arm (no search of its own) stays a new run, as designed. (2) Outcome for no (check 4, A/B protocol):
+      STAYED -> div-form dropped, ReZero closed, and fine-tunes none -> 11c''s NO stands, are all read at HPs searched for
+      the control, not for the arm. ReZero removes LayerNorm and A2 changes target and inputs, so the control''s lr is not
+      expected to be the arm''s; the earlier A_ft lr-axis check already found lr_scale 0.1 helping the soft limit (finding
+      2026-11-11T06:37), and sweep rule 4 defines the fine-tune search (lr_scale in [0.1,10], layer_decay). CLAUDE.md: first
+      at the baseline''s best HPs, done if better; else the same sweep for the feature, best against best. Fix: the no branch
+      of each arm names its follow-up: the same 16-trial search (kit_hpo template, ~10 GPU-h per arm) for the arms that come
+      out STAYED/worse, best against best, with the total cost against D412''s 30 GPU-h (which arms first if over), or a stated
+      reason an arm''s no is final without it. (3) tt control vs A2 (check 1, stated difference): the tt control and the hp0131
+      search run on the emission-scale target (sweep/kit_base/kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr/config.yaml:
+      data.target_physics_factor=true, target_physics_orders=true, dim_ref qperp), while tt A2 and A2+single set target_physics_factor=false
+      target_physics_orders=false and drop the softpairthr inputs. The control field states the bundle only for uug. Fix:
+      state in control that tt A2 differs from hpo_softpairthr in target (emission-scale -> plain, required by the factor''s
+      assert), inputs (log/threshold off) and gamma cap, as the model as designed; and that A2+single vs A2 is the clean one-flag
+      comparison for the Sudakov repair. Passing as designed: measure (step-18 deepest bins 17.7/241/3.55/0.72 log-MSE moved
+      2-4 decades by A2, finding 2026-11-13T10:14), seeds (D315, bands stated), HETEROSC, KIT hard_test/bulk_test events,
+      result.json val_mse_curve written by job_kit.sh (seen in runs/kit/kit_A_ee_tt_virt_finite_n100000_t8000_asym_cont_plainlog/result.json
+      on CC), disk (~75 MB x 15 against 63 GB free on /sps/lpnhe), step rate from the trials themselves (trial_1918: ~23 min
+      training, batch 16384, 1e5, float64). uugg deferred for lack of chosen HPs (uugg T 0/16 good): keep it stated as a difference
+      from step 21''s scope in the submission message.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
