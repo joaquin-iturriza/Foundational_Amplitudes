@@ -26603,6 +26603,11 @@ entries:
       recorded). It must be killed (the classifier refuses the agents and the main session; Joaquin asked to run ''kill 2110766''),
       then the owner cancels the 15 idle 32G lxplus trials, marks them retry and relaunches the driver at 11G (8fbcbdb8),
       once the draft''s reruns run.'
+  - at: '2026-11-13T07:23:44+00:00'
+    text: '2026-11-13 E6927: template-test driver killed while paused (rc=137). 15 idle 32G lxplus trials cancelled and set
+      to retry without penalty in driver_state (lost_runs kept). Relaunch held until the draft''s GPU reruns run (coordinator):
+      sweep/drive.py --config sweep/sweep_config_dsave_{wsd_ft,wsd_scr,wideft_ft}_epem_ttx_d{5,7}_t8500.yaml --item pretrain_data_saving
+      --n-trials 16 --wave-sizes 3,3,2,4,4 --sites ccin2p3 lxplus (configs 11G @8fbcbdb8).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
