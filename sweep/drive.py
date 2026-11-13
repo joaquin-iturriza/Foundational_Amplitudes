@@ -96,10 +96,19 @@ def log(msg):
     print(time.strftime("%H:%M:%S"), msg, flush=True)
 
 
-def site(*args, timeout=600, check=True, quiet=False):
+def site(*args, timeout=600, check=True, quiet=False, timeout_ok=True):
+    """A `site` command's output. A hang past its timeout never kills the driver (E6983: one slow `site pick` ended a
+    search): with check=False and timeout_ok it reads as empty output (no plan, no states: retried next pass),
+    otherwise it raises RuntimeError as a failed command does."""
     cmd = [SITE, "--timeout", str(int(min(timeout, 3600)))] + [str(a) for a in args]
-    p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
-                       timeout=timeout + 60)
+    try:
+        p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
+                           timeout=timeout + 60)
+    except subprocess.TimeoutExpired:
+        if check or not timeout_ok:
+            raise RuntimeError("site %s timed out after %d s" % (" ".join(map(str, args[:3])), timeout + 60))
+        log("site %s timed out after %d s: retried on the next pass" % (" ".join(map(str, args[:3])), timeout + 60))
+        return ""
     if p.returncode and check:
         raise RuntimeError("site %s failed (%d):\n%s" % (" ".join(args[:3]), p.returncode, p.stdout.rstrip()))
     if not quiet and p.returncode:
@@ -390,7 +399,10 @@ class Sweep:
             if stt not in FINAL:
                 t["sched_state"] = stt
                 continue
-            res = self.result_of(t)
+            try:
+                res = self.result_of(t)
+            except RuntimeError as e:                  # its log could not be read: stays in flight, read next pass
+                log("%s: trial %d: %s" % (self.name, t["idx"], e)); continue
             if res and not res.get("failed"):
                 self.sampler.observe(t["hp_idx"], t["t_steps"], float(res["observe_loss"]),
                                      res.get("proc_val_losses"))
@@ -415,7 +427,7 @@ class Sweep:
             self.save()
 
     def result_of(self, t):
-        out = site("logs", t["rid"], "-n", "200", timeout=120, check=False)
+        out = site("logs", t["rid"], "-n", "200", timeout=120, check=False, timeout_ok=False)   # unread is not lost
         hits = [l for l in out.splitlines() if l.strip().startswith("RESULT_JSON ")]
         # the run's own exception, digits blanked, for failure_streak (run_trial's wrapper RuntimeError says nothing)
         errs = [re.sub(r"\d+", "N", l.strip())[:200] for l in out.splitlines()
