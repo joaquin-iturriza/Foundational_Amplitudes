@@ -33341,6 +33341,16 @@ entries:
       Not applied: numbers in Sec. 6 ladder paragraphs (his 0920 ''sec 4 is fine'', coordinator: findings stay), het-vs-MSE
       sentence (Fig. 9 removed by him, MSE result mixed), ''finale'' rename (restored on his order), muon/star_arms legend
       layout (figure files frozen), synthetic generator to appendix (his call).'
+  - at: '2026-11-13T16:57:55+00:00'
+    text: '2026-11-13: the rename of ''finale'' to ''the every-structure pretraining'' stands by Joaquin''s words of 2026-11-13
+      00:03: "And finale probably should be renamed to something more descriptive, finale doesn''t really say anything." His
+      later ''figs 18 and 19 should go back to how they were'' was about the figures'' content only; reverting all of 5f4dc23
+      undid the rename by mistake. Restored at draft 5e52c00: text, captions and the Figs. 18/19 legend strips (redrawn from
+      the e20efefe script with only the label changed; panels untouched). v6 (scratchpad overleaf_update_v6.zip, 5 files)
+      also: e+e- for ee, sqrt(s-hat) for the collision energy, -ize spelling (co-authors'' convention, colour kept), parameter
+      count 1.78M = 1.61M (Tab. 2) + 0.17M diagram encoder (run logs FA-ccin2p3-1a46f3e0, f08e90e8: 1775829 learnable, diagram
+      encoder 165760), Muon and star-arms legends balanced and centred (plot_style 59cca7bc). Note: the reference pretrainings
+      carry a diagram encoder while Sec. 5 calls the adopted configuration ''no diagram encoder''.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
