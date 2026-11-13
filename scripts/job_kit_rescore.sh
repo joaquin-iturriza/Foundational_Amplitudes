@@ -14,7 +14,8 @@ source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 RC=0
 for R in "$@"; do
-    [ -d "$R/kit_benchmark_poolkeyed" ] || cp -a "$R/kit_benchmark" "$R/kit_benchmark_poolkeyed" || { RC=1; continue; }
+    # an unscored run (a kit_hpo trial, scored as a design control) has no earlier scores to keep
+    [ -d "$R/kit_benchmark_poolkeyed" ] || [ ! -d "$R/kit_benchmark" ] || cp -a "$R/kit_benchmark" "$R/kit_benchmark_poolkeyed" || { RC=1; continue; }
     python tools/kit_predict.py "$R" > /dev/null && echo "RESCORED $R" || { echo "RESCORE_FAILED $R"; RC=1; }
 done
 [ "$RC" -eq 0 ] && echo "RUN_DONE"
