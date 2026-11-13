@@ -28208,8 +28208,8 @@ entries:
     '5': 'kit_hpo driver DONE event: the package takes the chosen trials'' models'
     '15': kit_hpo driver DONE event (detach:kit_hpo, log ~/.local/share/ccorch/detached/20261112-224604_kit_hpo.log); live
       trial FA-lxplus-39d3ed3e
-    '14': 'kit_hpo driver DONE event: arms = chosen trial config + ++model.input_div_form=true (D395 smokes 7aff4018 uug,
-      06fc43d3 tt passed every stage: training, sigma_stage, kit_benchmark predictions, plots)'
+    '14': 'kit_hpo driver DONE event: arms = chosen trial config + ++model.input_div_form=true (both D395 div-form smokes
+      passed every stage, 2026-11-13)'
     '16': kit_hpo driver DONE event (uug_T and uugg_T searches in the same driver, D424/D428)
     '17': 'kit_hpo driver DONE event: the chosen t t~ virtual settings'
     '18': kit_hpo driver DONE event (chosen HPs); literature agent's findings for (a)
