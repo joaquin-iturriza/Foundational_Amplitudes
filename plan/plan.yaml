@@ -21594,7 +21594,7 @@ entries:
     - 6
   owner:
     agent: a4ba6827868644ef8
-    state: working
+    state: closed
     since: '2026-11-13T00:05:15+00:00'
     state_at: '2026-11-13T00:58:05.221000+00:00'
     context: 263708
@@ -26609,28 +26609,23 @@ entries:
     start: '2026-11-12T19:10:48+00:00'
     at: '2026-11-12T19:10:48+00:00'
   handoff:
-    state: 'Draft due 2026-11-13 (D413). b b~ > Z Z read done (step 4, finding 23:55): LO S 1.14 [0.81,1.60], V/B S 1.23 [0.88,1.71]:
-      no saving at 1e-4 on either; fine-tune ahead only at D<=32; search bests good LO scr 1/7, ft 0/7, V/B 0/7. Figures figs/stage2_LD_bbx_zz
-      (L(D), open = val leaves train), figs/cell_curves_bbx_zz{,_nlo} (each cell''s best, val solid/train dashed). Template
-      test (step 5, design PASS 16-trial version, D426/D427/D429): 4 WSD-only searches t t~ LO D=316,3162 scr/ft extended
-      8->16, 2 wide fine-tune range searches (lr_scale [0.03,30], layer_decay [0.5,1], batch D/2) at 16; configs @f88017c5;
-      driver detach ttx16_repick (re-picks every 10 min); trials sat IDLE on lxplus at 23:45. When it ends: python analysis/data_saving/lr_centre_readout.py
-      --test tmpl2 (A: 16 vs first 8 by issue order, B: wide vs WSD, C: WSD first 8 vs stage 2; per-cell 5x, pooled 5^(1/sqrt
-      n)), curves figure, apply the design''s outcome rules, report.'
-    decisions: 'D426: batch size never searched beside lr (template-2 batch searches withdrawn, cancelled, not read). D427/D429:
-      8 trials not enough; extend to 16 (as KIT D428). D431: all sites. D421 curve measure; D422 the fix is the HP search;
-      D423 WSD. Wide fine-tune lr_scale opened up to 30 as well as down (reviewer FIX: stage-2 good fine-tune trials sat at
-      the top of [0.1,10]). Trial-count record (trial_count_readout.py @bf88c4d8, JZ, 23 searches N 24-40): best@8/final median
-      1.26, best@16 1.00; no ~50-trial search found.'
-    ruled_out: As before; plus the batch-size search (D426); b b~ > Z Z as the second data-saving example at 1e-4 on the current
-      HPs (no saving, both halves).
-    running: detach ttx16_repick (6 t t~ LO searches to 16 trials, CC/lxplus)
-    files: 'analysis/data_saving/{lr_centre_readout.py,trial_count_readout.py,curve_quality.py,stage2_readout.py,plot_stage2.py},
-      data/{stage2_readout.json,curve_quality_cells_bbx_zz*.json,trial_count_readout_jeanzay.json}, figs/{stage2_LD_bbx_zz,cell_curves_bbx_zz,cell_curves_bbx_zz_nlo,trial_count},
-      sweep/gen_data_saving.py (--no-batch-search), sweep/sweep_config_dsave_{wsd,wideft}_*_epem_ttx_d{5,7}_t8500.yaml. Open
-      defects: Jean Zay copy (relay->jean-zay.idris.fr times out); V/B trials with a target_over_born cache AssertionError
-      listed among divergences (rerun once the Born cache is rebuilt).'
-    written: '2026-11-12T22:59:55+00:00'
+    state: 'Draft figures done 2026-11-13 and sent: old-setup data saving (old_setup_examples.py @1aa91b49, redrawn per Joaquin:
+      savings at the precision line 3.2-12.6x, median gain 11.5x over 28 cells), ladder paper figures (finale_synth_scaling.py
+      --paper @3e4e6146, ''every structure'' for finale; Joaquin: ''Great ladder figures''), zero-shot vs width (width_zero_shot.py
+      @848cf2cc), D414 read (ft_constraint.py @c7c03742: bbZZ tree head start lost in the warmup at 4-16% of the run, rise
+      follows peak lr; Muon WD erases parent at large D; V/B both arms memorise). Template test (step 5) running; when detach
+      ttx16_repick ends: python analysis/data_saving/lr_centre_readout.py --test tmpl2 (A/B/C per the passed design), curves
+      figure, and the warmup-rise measure (ft_constraint.rise) on part B''s low lr_scale trials; report.'
+    decisions: 'D433 old-setup figure (four examples, my fourth pick W pole); D434 ladder redraw; D414 investigation: no test
+      designed (D422 fix is HP tuning; schedule/regularisation tests dropped 2026-11-12; question withdrawn). Precision line
+      rule: 1e-4 if both arms reach it, else 1e-2 (Joaquin 2026-11-13).'
+    ruled_out: As before; the no-rewarmup/low-lr/WD-to-parent fine-tune test not proposed (D422), revisit only if part B shows
+      the start lost at every lr searched.
+    running: 'detach ttx16_repick (drive.py: 4 WSD + 2 wide-range t t~ tree searches to 16 trials, CC/lxplus); E6754 acked
+      (sampled-HP divergence)'
+    files: analysis/data_saving/{old_setup_examples,width_zero_shot,ft_constraint,lr_centre_readout,curve_quality}.py, data/ft_constraint.json,
+      figs/{old_setup_examples,width_zero_shot,ft_constraint}; analysis/transfer/{finale_synth_scaling,rung_grid}.py, figs/finale_synth_paper_*
+    written: '2026-11-13T00:59:30+00:00'
   step_why:
     5:
       feeds: 'the template for the remaining cells: trial count and fine-tune ranges (D422, D427)'
