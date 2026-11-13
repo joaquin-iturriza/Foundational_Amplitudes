@@ -6,8 +6,9 @@ stage-2 searches' logged curves (curve_quality.trials(), trial_overfit.json), va
 Per cell, the search bests of both arms: v_ft(t) / v_scr(t) along the run, the step-0 ratio (the parent's zero-shot
 start against the random init, both standardised with the target's own statistics) and where it first reaches 1.
 Per fine-tune trial: the warmup rise, max of v over the warmup / v at step 0 (the fit the warmup destroys), against
-the peak learning rate training.lr * fine_tune.lr_scale. Per cell over all trials: median end train MSE ft / scr and
-median end val MSE ft / scr.
+the peak learning rate training.lr * fine_tune.lr_scale (its quartiles and the share above 1: any rise above the start).
+Per cell over all trials, each read at its best checkpoint (lowest val): median val MSE ft / scr and median train MSE ft / scr
+at that step.
     python analysis/data_saving/ft_constraint.py   -> data/ft_constraint.json, figs/ft_constraint
 """
 import json, os, sys
@@ -45,14 +46,16 @@ for j, (tg, lab) in enumerate(TG.items()):
         ax.plot(fr, ratio, color=c, label=f"$D={D:.0f}$")
         lost = next((float(fr[i]) for i in range(n) if ratio[i] >= 1), None)
         rr = lambda a, k: [r for r in R if r["target"] == tg and r["D"] == D and r["arm"] == a and r.get("train")]
-        med = lambda a, k: float(np.median([np.log10(r[k][-1]) for r in rr(a, k)]))
+        # each trial at its best checkpoint, the lowest val (CLAUDE.md), train read at the same check
+        at = lambda r, k: r[k][min(int(np.argmin(r["val"])), len(r[k]) - 1)]
+        med = lambda a, k: float(np.median([np.log10(at(r, k)) for r in rr(a, k)]))
         out["cells"][f"{tg}/{D:.0f}"] = {
             "start_ft_over_scr": float(ratio[0]), "head_start_lost_at_frac": lost,
             "ft_warmup_frac": b["ft"][0]["hp"]["warmup_frac"], "ft_best_warmup_rise": rise(b["ft"][0]),
-            "median_end_train_ft_over_scr": 10 ** (med("ft", "train") - med("scr", "train")),
-            "median_end_val_ft_over_scr": 10 ** (med("ft", "val") - med("scr", "val"))}
-        axs[1, 1].scatter(out["cells"][f"{tg}/{D:.0f}"]["median_end_train_ft_over_scr"],
-                          out["cells"][f"{tg}/{D:.0f}"]["median_end_val_ft_over_scr"],
+            "median_best_train_ft_over_scr": 10 ** (med("ft", "train") - med("scr", "train")),
+            "median_best_val_ft_over_scr": 10 ** (med("ft", "val") - med("scr", "val"))}
+        axs[1, 1].scatter(out["cells"][f"{tg}/{D:.0f}"]["median_best_train_ft_over_scr"],
+                          out["cells"][f"{tg}/{D:.0f}"]["median_best_val_ft_over_scr"],
                           color=ps.C.vermillion if tg == "bbx_zz" else ps.C.blue, marker="o" if tg == "bbx_zz" else "s",
                           label=None)
     ax.axhline(1, color="0.5", ls="--", label="equal")
@@ -64,7 +67,8 @@ for j, (tg, lab) in enumerate(TG.items()):
     x, y = [r["peak_lr"] for r in F], [rise(r) for r in F]
     axs[1, 0].scatter(x, y, color=ps.C.vermillion if tg == "bbx_zz" else ps.C.blue,
                       marker="o" if tg == "bbx_zz" else "s", label=lab)
-    out["rise"][tg] = {"n": len(F), "share_above_3": float(np.mean(np.array(y) > 3)),
+    out["rise"][tg] = {"n": len(F), "quartiles": [float(q) for q in np.percentile(y, [25, 50, 75])],
+                       "share_above_1": float(np.mean(np.array(y) > 1)),
                        "spearman_peak_lr": float(spearmanr(x, y)[0]),
                        "spearman_min_val": float(spearmanr(y, [min(r["val"]) for r in F])[0])}
 ax = axs[1, 0]
@@ -76,7 +80,7 @@ ax.scatter([], [], color=ps.C.vermillion, marker="o", label="tree")
 ax.scatter([], [], color=ps.C.blue, marker="s", label="one loop over tree")
 ax.axvline(1, color="0.5", ls="--"); ax.axhline(1, color="0.5", ls="--", label="equal")
 ax.set_xscale("log"); ax.set_yscale("log")
-ax.set_xlabel("end train MSE fine-tune / scratch"); ax.set_ylabel("end val MSE fine-tune / scratch")
+ax.set_xlabel("train MSE fine-tune / scratch"); ax.set_ylabel("best val MSE fine-tune / scratch")
 ps.legend(ax, "upper left")
 for a in axs.flat:
     ps.make_room(a)
