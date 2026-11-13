@@ -32562,3 +32562,34 @@ entries:
       and Gudrun''s threshold scan as next steps) and asked him three things, awaiting answers: (1) do the three co-authors''
       sections (accuracy benchmark, more legs, Feynman-diagram conditioning) stay; (2) show current-setup bbZZ/tt results
       or only the old-setup figure; (3) run the threshold scan and fair NLO protocol before writing the KIT section?'
+  designs:
+  - at: '2026-11-13T03:11:20+00:00'
+    question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
+      D433/D441) for a reader: at a few D, what do the per-event errors and the predicted distributions of the from-scratch
+      and the every-structure fine-tune (tp3_finfte) cells look like (D444: delta histograms, true against predicted distributions
+      with a ratio panel)?'
+    prior: 'Searched docs/results.tex (residual_map, save_predictions, rerun, eval_delta, representative), plan show draft_rewrite,
+      site decisions (D433, D438, D441, D444). The old-setup figure''s cells are read from analysis/transfer/scratch_sweeps.json;
+      their checkpoints are pruned (runs/<sweep>/trial_N/models empty, checked on CC), only configs and the runs'' own plot
+      PDFs remain. Prior per-event work: ee->WW/Za residual maps (results.tex par. residual map, runs rerun with evaluation.save_predictions)
+      and the catalog_v2 residual-vs-target study; no per-event read of these 24 cells exists. Reproduction of a cold rerun
+      from its config: ladder rung 6 hp15 reran to 6% of its record, its rebuilt checkpoint (tools/eval_delta.py) to 0.01%
+      (results.tex, FA-ccin2p3-2ed18ab8). This design reruns the exact cells of the figure, so the examples are the figure''s
+      points.'
+    measure: 'Per cell, the rerun''s per-event validation predictions (preds_val.npz from tools/eval_delta.py at its best
+      checkpoint): Delta = |M|^2_pred/|M|^2_true - 1 histograms and the log|M|^2 distributions true vs predicted with the
+      ratio pred/true per bin; plus the rerun''s validation MSE of log|M|^2 against the cell''s recorded value.'
+    check: 'The figure''s cells already differ by 3-45x in MSE between scratch and fine-tune at equal D (old_setup_examples
+      stdout at 3b3c3ab6: median L_scratch/L_ft 11.5 over 28 cells), so the per-event spread, set by the MSE, moves with the
+      arm; a cold rerun of a ladder trial reproduced its record to 6% (results.tex), well inside those gaps.'
+    fixed: Each cell's own config.yaml (same HPs, horizon T 2816 at D=10^2 and 8000 at 10^3, 10^4, seed 42, data, network,
+      the same finale parent checkpoint tp3_finale/trial_0073 for fine-tunes); rerun cold with scripts/job_rerun_trial.sh,
+      which also writes the per-event predictions.
+    control: The from-scratch cell (the best trial of its search, cells.scratch) at the same probe and D; and each rerun against
+      its own recorded loss.
+    seeds: 'seed 42 as each cell ran, one rerun per cell: 4 probes (u ubar->Zggg, ee->d dbar g, u dbar->e+ nu_e, ee->b bbar
+      one loop) x D in {10^2, 10^3, 10^4} x {scratch, fine-tune} = 24 runs (analysis/data_saving/data/example_cells.json).'
+    outcome: 'Yes (usable as examples): each rerun''s validation MSE within 2x of its cell''s recorded value (the reproduction
+      holds to ~6% in the prior; 2x is far below the arm gaps), then the figure shows them. No: a rerun off by more than 2x
+      is flagged in the caption and redone once from its config on the site that trained it; the figure never mixes an unreproduced
+      cell with the line''s value without saying so.'
