@@ -8,7 +8,7 @@ as ft_constraint.py), the run fraction where it first reaches 1, or NEVER; KEPT 
 >= 2 of 3 D; branches a-d of the design. Per trial the same fraction and the warmup rise (ft_constraint.rise).
 Secondary: best val MSE(ln|M|^2) and test MSE (sigma stage, stage2_readout REMOTE) per arm and D; W/C, C/R, W/R and
 each over scratch, pooled (geometric mean over D) against 5^(1/sqrt 3); zero shot = step-0 val of each arm's trials.
-Diverged trials listed apart (D398). Figure figs/step6_curves_{a,b,c}: per D the val curves of the four bests.
+Diverged trials listed apart (D398). Figures: figs/step6_curves_{a,b,c} (per D the val curves of the four bests), figs/step6_ratio_{a,b,c} (per D each fine-tune best over the scratch best against the run fraction), figs/step6_best (best val per arm against D).
 
     python analysis/data_saving/step6_readout.py [--cached]   -> data/step6_readout.json, data/step6_rows.json
 """
@@ -145,6 +145,28 @@ def main():
         ps.process_label(ax, rf"$b\bar b\to ZZ$, $D={D}$", loc="upper right")
         ps.legend(ax, "lower left")
     ps.save_panels(figs, os.path.join(HERE, "figs", "step6_curves"))
+    # figure: per D each fine-tune best's val over the scratch best's (smoothed) against the run fraction
+    figs = ps.panels(len(CELLS))
+    for (fig, ax), D in zip(figs, CELLS):
+        for a in ("R", "C", "W"):
+            if a in best[D] and "scr" in best[D]:
+                _, fr, ratio = lost_at(best[D][a], best[D]["scr"])
+                ax.plot(fr, ratio, color=sty[a][1], label=sty[a][0])
+        ax.axhline(1, color="0.5", ls="--", label="equal")
+        ax.set_yscale("log"); ax.set_xlabel("fraction of the run"); ax.set_ylabel("val MSE fine-tune / scratch")
+        ps.process_label(ax, rf"$b\bar b\to ZZ$, $D={D}$", loc="upper right")
+        ps.legend(ax, "lower left")
+    ps.save_panels(figs, os.path.join(HERE, "figs", "step6_ratio"))
+    # figure: best val per arm against D
+    fig, ax = ps.figure()
+    for a, (lab, col, _) in sty.items():
+        Ds = [D for D in CELLS if a in out["cells"][D]]
+        ax.plot(Ds, [out["cells"][D][a]["best_val"] for D in Ds], color=col, marker="o", label=lab)
+    ax.set_xscale("log"); ax.set_yscale("log"); ax.set_xlabel(r"$D$ (training events)")
+    ax.set_ylabel(r"best val MSE$(\ln|\mathcal{M}|^2)$")
+    ps.process_label(ax, r"$b\bar b\to ZZ$", loc="upper right")
+    ps.legend(ax, "lower left")
+    ps.save(fig, os.path.join(HERE, "figs", "step6_best"))
 
 
 if __name__ == "__main__":
