@@ -84,7 +84,11 @@ def read():
            "curve": {"steps": s.tolist(), "ratio_adamw_over_muon": (va / vm).round(4).tolist(),
                      "ratio_running_best": (ra / rm).round(4).tolist(),
                      "median_ratio": round(float(np.median(va / vm)), 4), "steps_to_level": to_level,
-                     "plateau": {"adamw": plateau(a), "muon": plateau(mu)}},
+                     "plateau": {"adamw": plateau(a), "muon": plateau(mu)},
+                     "last_ratio": round(float(va[-1] / vm[-1]), 4),
+                     "runs": {k: {"first": c["val_mse_curve"][0], "last": c["val_mse_curve"][-1],
+                                  "max_after_best": max(c["val_mse_curve"][int(np.argmin(c["val_mse_curve"])):]),
+                                  "traintime_hours": round(c["traintime_hours"], 2)} for k, c in cv.items() if k != "paths"}},
            "seed_pair": m.WIDTH["w8"], "reads": {}, "level": {}}
     cls = m.class_of()
     for r in READS:
@@ -108,10 +112,7 @@ def read():
                                   "frac_classes_below_1e-4": round(float(np.mean(np.array(list(pc.values())) < 1e-4)), 4)}
     out["blowups"] = m.blowups([RUNS["adamw"]])
     json.dump(out, open(OUT, "w"), indent=1, default=str)
-    print(json.dumps({"curve": {k: out["curve"][k] for k in ("median_ratio", "steps_to_level", "plateau")},
-                      "R": {r: {n: (v["R"], v["widened"], v["n_classes"], v["frac_classes_muon_lower"])
-                                for n, v in out["reads"][r].items() if isinstance(v, dict)} for r in READS},
-                      "level": out["level"]}, default=str))
+    print(json.dumps(out, default=str))
 
 
 def per_class(x, keys, cls):

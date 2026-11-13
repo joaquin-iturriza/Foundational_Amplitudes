@@ -201,6 +201,21 @@
     "best_over_0p75T": 0.8874,
     "plateaued": false
    }
+  },
+  "last_ratio": 10.6485,
+  "runs": {
+   "adamw": {
+    "first": 0.3622045159423281,
+    "last": 0.09970932722117719,
+    "max_after_best": 0.23391435479992678,
+    "traintime_hours": 17.24
+   },
+   "muon": {
+    "first": 0.32784154539385996,
+    "last": 0.009363706850244239,
+    "max_after_best": 0.009363706850244239,
+    "traintime_hours": 17.58
+   }
   }
  },
  "seed_pair": [
