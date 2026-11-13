@@ -27664,7 +27664,7 @@ entries:
     withdrawn_why: 'Joaquin: use all available clusters'
   owner:
     agent: aac6f423ac4dc32e2
-    state: working
+    state: closed
     since: '2026-11-13T10:31:29+00:00'
     state_at: '2026-11-13T11:03:48.139000+00:00'
     context: 249190
@@ -28683,24 +28683,35 @@ entries:
     '20': '2026-11-14'
     '21': FA-ccin2p3-cee32a46
   handoff:
-    state: '2026-11-13 ~11:35 @1fd675f7. Step 18 read (finding ~11:30): A2 asymptotic factor (plain momenta, gamma<=4) fixes
-      uug/uugg collinear+soft and tt Coulomb (deepest log-MSE 2-4 decades down, exponents on truth), tt Sudakov worse (+1.9
-      overshoot): PARTIAL. Step 21 threshold re-read done (finding ~10:35, kit_threshold_scan_asym.png): A2 within -20% to
-      beta 1e-3, A1 = control, V x beta still best. Curve check: all uug/uugg runs incl. controls fail (late val NLL rise
-      after ~6000 steps), tt not converged at 8000. kit_hpo driver pid 802223 running (log ~/.local/share/ccorch/detached/20261113-095548_kit_hpo.log),
-      16 trials per search. Next on resume: on kit_hpo DRIVE_DONE, kit_curves sweep read and choose HPs; then steps 14, 17,
-      19 and the step-18 follow-up (A2 at chosen HPs + Sudakov repair) with their own designs. Fair protocol (step 20) not
-      before 2026-11-14. Do not touch the draft.'
-    decisions: 'As before (D435 dipoles no MLP branch, D436 factor now, threshold scan do-but-skip-if-poor, KIT results not
-      in today''s draft). E6895: lxplus schedd raises 1 CPU per 3000 MB, so kit_hpo asks 11G (638c42a9); site pick models
-      it (~/.local/bin/site). drive.py survives a hung site command (fbddb0aa). tt factor arms need data.target_physics_factor=false
-      data.target_physics_orders=false (the factor''s assert).'
-    ruled_out: 'As before; plus: the factor on log inputs (A1) does not move the tt Coulomb rise; log^2(s/m^2) alone per heavy
-      leg overshoots Sudakov.'
-    running: kit_hpo driver pid 802223 (4 searches, kit_benchmark); no step-18 jobs left
-    files: tools/kit_figures.py, tools/kit_curves.py, tools/kit_threshold_scan.py, sweep/drive.py, sweep/sweep_config_kit_hpo_*.yaml,
-      analysis/kit_benchmark/data/kit_fig_A_asym.json, kit_threshold_scan_asym.json, kit_curves.json, wrappers.py (_asym_terms/_asym_mu)
-    written: '2026-11-13T10:15:29+00:00'
+    state: '2026-11-13 ~12:30 @ebb031da/deaba164. kit_hpo read (finding ~12:30; kit_hpo.json, figs kit_hpo_lr / kit_hpo_curves):
+      chosen uug plain hp1918 (lr 0.0125, val 2.92e-5), tt softpairthr hp0131 (lr 0.00178, val 7.1e-7; good trials at the
+      lr window''s low edge); uug T only hp1677 good (marginal), uugg T 0/16 good (best at the low lr edge). Design ''steps
+      14/17/19/21 at chosen HPs'' PASSED (10:47 record, after one FIX: controls = the chosen trials scored, not retrained;
+      NO branches -> per-arm 16-trial searches ordered A2, fine-tunes, div-form, ReZero, past 30 GPU-h to Joaquin). Controls
+      scored (dfe44ce0 trial_1918 CC, 66cc5b76 trial_0131 lxplus, kit_benchmark/ in each trial dir). D395 smoke of A2+single
+      cee32a46 passed every stage; the repaired arm hpo_asym_cont_sud1 submitted via site submit auto (check site runs for
+      its id, record it with plan run and add it to step 21''s wait). uugg plain search kit_hpo_uugg_plain driven locally
+      (pid 1218893). Next on resume: when the batch ends, tools/kit_figures.py collect (arms + the two trial dirs as controls;
+      add their tags/labels), kit_extrap_read / kit_readout --vs, kit_curves on the arms, verdicts per the passed outcome,
+      figures; on DRIVE_DONE of uugg: kit_curves sweep kit_hpo_uugg_plain, then uugg A2 at its chosen trial + rescore of that
+      trial. Open question to Joaquin (in the hand-back): extend the uugg T and tt searches below lr 1.667e-3 (~9.6 GPU-h
+      each).'
+    decisions: 'As before (D435, D436, D446-D448). Controls are the searched best trials scored by job_kit_rescore.sh (fixed
+      5cdd9b0c to score runs without earlier scores), per CLAUDE.md best-of-sweep. Fine-tunes at the scratch optimum with
+      lr_scale 1 (sweep rule 4). Sudakov repair = model.input_asym_sudakov_single (ebb031da): exp(c)(L^2 + exp(kappa) L) per
+      heavy coloured leg, kappa learned (kit_asym_bound drift fits L^2 + bL, b~4-7). site sync/submit need --allow-dirty while
+      data_saving data files are uncommitted; submit_guard wants site submit auto or a fresh site pick and --est-gpu-hours.'
+    ruled_out: As before; the old HP point (8000 cosine, lr 0.0118605) is not where the KIT controls train well (uug plain
+      good at 0.0125 with 1831 WSD steps; tt wants ~6.6x lower lr).
+    running: 'Batch (steps 14/17/19/21): FA-ccin2p3-01f55e9b uug divform, 7d7a578c uug rezero, 8a37b9c4 uug A2, af3782ce tt
+      divform, c479cc9b tt rezero, 16720e29 tt A2, 00da227f tt scratch softpair, 0ea05984/7613b88a/bcf0d7e0/7d8335d3/4bd3f9ed
+      fine-tunes (r5, thr, thrbeta, thrloop, thrloopbeta); tt A2+single (hpo_asym_cont_sud1, id in site runs); uugg plain
+      search driver pid 1218893 (log ~/.local/share/ccorch/detached/20261113-115239_kit_hpo_uugg_plain.log).'
+    files: tools/kit_curves.py (sweep, sweepfig), analysis/kit_benchmark/data/kit_hpo.json, analysis/kit_benchmark/figs/kit_hpo_lr.png,
+      kit_hpo_curves.png, wrappers.py (_asym_terms sud_single, input_asym_sudakov_single), tests/test_input_reps.py, scripts/job_kit_rescore.sh,
+      sweep/sweep_config_kit_hpo_uugg_plain.yaml, sweep/kit_base/kit_A_ee_uugg_me2_n100000_t8000_softpair_plain, scratchpad
+      submit list s2.sh
+    written: '2026-11-13T11:07:07+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
