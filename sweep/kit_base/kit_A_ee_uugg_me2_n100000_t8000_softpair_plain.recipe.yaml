@@ -1,0 +1,6 @@
+processes:
+- name: kit_ee_uugg__me2
+  sqrts: [1000, 1000]
+  n_train: 100000
+  n_val: 100000
+  n_test: 200000

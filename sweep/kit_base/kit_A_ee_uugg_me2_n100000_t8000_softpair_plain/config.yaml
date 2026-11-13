@@ -1,0 +1,290 @@
+exp_type: amplitudes
+exp_name: cov_v4_long_hpo8_cc_68224
+data:
+  source: recipes
+  dataset:
+  - kit_ee_uugg__me2
+  data_path: data/
+  seed: 42
+  preprocess_per_dataset: true
+  shared_standardization: true
+  affine_multiplicity_std: false
+  particle_order: none
+  drop_coupling_powers: false
+  signedlog_quantile: 0.01
+  processes: null
+  processes_file: null
+  require_cache: true
+  train_subsample: null
+  eval_subsample: null
+  phase_space_on_pool: false
+  memmap: false
+  memmap_dir: null
+  memmap_prefetch: true
+  subsample: null
+  include_permsym: true
+  train_test_val:
+  - 0.4
+  - 0.5
+  - 0.1
+  no_props: false
+  trafos: {}
+  amp_trafos:
+  - log
+  - standardization
+  incl_fvs: false
+  use_PIDs: false
+  spin_onehot: true
+  color_onehot: true
+  generation_feature: true
+  generation_onehot: true
+  prop_is_massless: true
+  standardize_props: true
+  mass_from_momenta: false
+  coupling_scalars: true
+  internal_mass_scalars: true
+  internal_mass_pdgs:
+  - 23
+  - 6
+  - 25
+  resonance_per_event: false
+  offshell_per_event: true
+  target_propagators: false
+  target_propagator_pdgs:
+  - 23
+  - 24
+  - 6
+  - 25
+  target_propagator_widths:
+    23: 2.4414
+    24: 2.0476
+    6: 1.5083
+    25: 0.006382
+  target_propagator_straddle: 0.005
+  target_propagator_tchannel: false
+  target_propagator_tchannel_max_final: 2
+  target_propagator_tchannel_norm: null
+  offshell_stats: null
+  amp_orders:
+  - - 0
+    - 0
+    - 2
+    - 2
+  target_physics_factor: false
+  target_physics_dim_only: true
+  target_physics_s0: 1.0
+  dimensionless_inputs: true
+  target_physics_orders: false
+  target_physics_dim_ref: qperp
+train: true
+training:
+  iterations: 8000
+  optimizer: MuonAdamW
+  lr: 0.0118605
+  batchsize: 16384
+  validate_every_n_steps: 100
+  validate_frac: 0.02
+  clip_grad_norm: 5
+  scheduler: CosineAnnealingLR
+  train_test_val:
+  - 0.4
+  - 0.5
+  - 0.1
+  subsample: null
+  es_patience: 100000000000000
+  es_load_best_model: true
+  save_intermediate: false
+  load_best_previous: true
+  save_gradients: false
+  save_weights: false
+  save_preds_intermediate: false
+  get_ID: false
+  clip_grad_value: null
+  max_grad_norm: null
+  diverge_patience: 50
+  log_every_n_steps: 1000
+  use_balanced_sampler: false
+  per_process_accumulation: false
+  accumulation_microbatch: null
+  accumulation_steps: 4
+  accumulation_order: interleaved
+  sampler_log_every_n_vals: 10
+  sampler_alpha_ema: 0.7
+  sampler_min_alpha_frac: 0.25
+  sampler_alpha_min: 0.05
+  sampler_sig_k: 2.0
+  sampler_warmup_vals: 10
+  sampler_probe_max: 15
+  sampler_reprobe_every: 20
+  sampler_alpha_window: 30
+  sampler_solo_alpha_path: null
+  sampler_deficit_gamma: 1.5
+  sampler_deficit_cap: 2.0
+  sampler_plateau_floor: 0.3
+  num_workers: 2
+  betas:
+  - 0.9
+  - 0.999
+  eps: 1.0e-08
+  weight_decay: 0
+  scheduler_scale: 1
+  cosanneal_warmup_steps: 0
+  cosanneal_warmup_frac: 0.1800024
+  cosanneal_eta_min: 1.376875e-08
+  reduceplateau_factor: 0.1
+  reduceplateau_patience: 50
+  onecycle_max_lr: 10
+  onecycle_pct_start: 0.3
+  mup_use_optim: true
+  ema_decay: 0.9597525
+  float16: false
+  enable_flash_sdp: false
+  enable_math_sdp: true
+  enable_mem_efficient_sdp: false
+  force_xformers: false
+  allow_tf32: true
+  fused_optimizer: true
+  loss: HETEROSC
+  track_train_eval: true
+  heterosc_select: mu_mse
+  heterosc_beta: 0.0
+  heterosc_sigma_only: false
+  heterosc_mu_only: false
+  heterosc_rank_curve: false
+  rank_curve_max_events: 50000
+  loss_aggregation: mean
+  excess_reference: null
+  excess_beta: 0.0
+  sign_head: false
+  sign_loss_weight: 1.0
+  loss_aggregation_tau: 0.0
+  val_aggregation: geometric_mean
+  dtype: float64
+  regularization: L2
+  regularization_lambda: 9.114591e-08
+  result_path: null
+  is_dyhpo_run: false
+  increment_steps: null
+  muon_weight_decay: 0.04733132
+  heterosc_sigma_stage_steps: 250
+plot: true
+plotting:
+  histograms: true
+  delta: true
+  delta_prepd: true
+  loss: true
+  loss_log_scale: true
+  plot_without_regularization: true
+  plot_mse_het: true
+  per_process_pages: null
+model:
+  _target_: wrappers.AmplitudeLLoCaWrapper
+  token_size: 0
+  d_particle_hidden: 16
+  particle_encoder_hidden: 0
+  use_diagrams: true
+  use_pair_bias: false
+  pair_bias_hidden: 16
+  pair_bias_clamp: 4.0
+  pair_bias_max_props: 48
+  pair_bias_logit_cap: 8.0
+  diagram_scanned_mass: false
+  use_diagram_virtuality: false
+  virt_standardize: true
+  virt_clamp: 4.0
+  virt_log_scale: 0.1
+  virt_mode: edge
+  d_diag: 32
+  diagrams_dir: data/diagrams
+  diagram_encoder:
+    d_model: 64
+    n_heads: 4
+    n_layers: 3
+    k_pe: 8
+    max_diagrams: 512
+  diagram_encoder_impl: llm4lhc
+  diagram_encoder_llm4lhc:
+    mode: pooled
+    hidden_size: 64
+    num_layers: 3
+    num_heads: 4
+    laplacian_pe_dim: 8
+    dropout: 0.0
+    edge_feature_mode: bias_kv
+    max_diagrams: null
+    bsm_labels: true
+  net:
+    _target_: models.lloca.LLOCAMuPTransformer
+    num_scalars: null
+    hidden_channels_mlp: 128
+    num_layers_mlp: 2
+    in_channels: null
+    attn_reps: 8x0n+2x1n
+    out_channels: 1
+    num_blocks: 8
+    num_heads: 8
+    freeze_framesnet: false
+    causal_mask: false
+    causal_frames: prefix
+    causal_frames_min: 4
+    bayesian_last_layer: false
+    bnn_prior_prec: 1.0
+    bnn_logsig2_init: -9.0
+    checkpoint_blocks: false
+    loss: ${training.loss}
+    sigma_after_pool: true
+    detach_sigma_backbone: false
+  input_soft_eps: 1.0e-08
+  input_pair_logs: 6
+run_name: kit_A_ee_uugg_me2_n100000_t8000_softpair
+base_dir: ${oc.env:PROJECT_DIR}
+jobid: null
+seed: 42
+debug: false
+warm_start_idx: 0
+run_dir: null
+save: true
+use_mlflow: false
+save_source: true
+ema: false
+ga_settings:
+  use_fully_connected_subgroup: true
+  use_geometric_product: true
+  mix_mvpseudoscalar_into_scalar: true
+  zero_bivector: false
+evaluate: true
+evaluation:
+  batchsize: 16384
+  train_subsample: 2000
+  save_predictions: false
+find_BS: false
+BS_finding:
+  ema_alpha: 0.9
+  n_batches_big: 20
+  n_batches_small: 10
+count_flops: false
+mlflow:
+  db: ${base_dir}/runs/${exp_name}/mlflow/mlflow.db
+  artifacts: ${base_dir}/runs/${exp_name}/mlflow_artifacts
+fine_tune:
+  pretrained_path: null
+  target_stats: parent
+  offshell_stats: parent
+  parent_offshell_stats: null
+  lr_scale: 0.1
+  layer_decay: 1.0
+  freeze_blocks: []
+  reset_output_head: false
+  lora:
+    enabled: false
+    rank: 8
+    alpha: 16.0
+    target:
+    - qkv
+    - out
+  ewc:
+    enabled: false
+    lambda: 1000.0
+    n_fisher_batches: 64
+    fisher_path: null
+run_idx: 0

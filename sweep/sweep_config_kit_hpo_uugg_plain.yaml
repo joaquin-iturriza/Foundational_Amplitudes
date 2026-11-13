@@ -1,0 +1,56 @@
+# kit_benchmark step 21 (uugg A2 needs HPs; D422, D424, D428): single-fidelity DyHPO as kit_hpo_uug_plain on the uugg from-scratch setup
+# of run fec28926 (plain log|M|^2 target, softpair inputs, sweep/kit_base/kit_A_ee_uugg_me2_n100000_t8000_softpair_plain, 1e5 events).
+# to choose the HPs (lr first) at which validation falls with training (curve_quality's separation/end_up on val_mse_curve / train_eval_mse_curve) and the best validation.
+# Everything else is the run's own config (base_config): inputs, target, HETEROSC + sigma stage, float64.
+# The template's space, WSD with cooldown 0.125 (D423), batch fixed at the template's 16384 (Joaquin 2026-11-12: 'Why
+# would you change batch size?'). Horizon 300 epochs over the 1e5 training events, as Bakar's MLP (Joaquin: 'then we
+# should match the number of epochs'): 300 x 1e5 / 16384 = 1831 steps. 16 trials, 6 start-up then two guided waves of 5
+# (D427: 8 were not enough; D428: 'let's do 16 for now').
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  request_gpus: 1
+  mem: 11G   # peak RSS ~2 GB; <=12000 MB keeps lxplus at 4 CPUs so the V100 nodes (4 CPUs, 16 GB) can take it (E6895)
+  cpus_per_task: 4
+  time: "01:00:00"
+paths: null
+sweep_name: kit_hpo_uugg_plain
+base_config: ${PROJECT_DIR}/sweep/kit_base/kit_A_ee_uugg_me2_n100000_t8000_softpair_plain
+n_trials: 16
+dyhpo:
+  surrogate: gp
+  n_candidates: 2000
+  objective_scale: auto
+  seed: 42
+  n_startup: 6
+  total_budget: 10000
+  waves: [6, 5, 5]
+fidelity_schedule:
+  t_steps: [1831]
+fixed_params:
+  data.source: recipes
+  data.processes_file: ${PROJECT_DIR}/sweep/kit_base/kit_A_ee_uugg_me2_n100000_t8000_softpair_plain.recipe.yaml
+  data.train_subsample: 'null'
+  data.eval_subsample: 'null'
+  data.memmap: 'false'
+  training.dtype: float64
+  training.heterosc_select: mu_mse
+  evaluation.train_subsample: 2000
+  seed: 42
+  plot: 'true'
+  warm_start_idx: 'null'
+  fine_tune.pretrained_path: 'null'
+  training.optimizer: MuonAdamW
+  training.scheduler: WSD
+  training.wsd_cooldown_frac: 0.125
+  training.batchsize: 16384
+range_extension:
+  enabled: false
+search_space:
+- {name: training.lr, type: float_log, low: 1.667e-03, high: 1.5e-02}
+- {name: training.muon_weight_decay, type: float_log, low: 1.0e-03, high: 0.3}
+- {name: training.regularization_lambda, type: float_log, low: 1.0e-10, high: 1.0e-06}
+- {name: training.cosanneal_warmup_frac, type: float_uniform, low: 0.05, high: 0.2}
+- {name: training.cosanneal_eta_min, type: float_log, low: 1.0e-10, high: 1.0e-07}
+- {name: ema, type: categorical, choices: ["false", "true"]}
+- {name: training.ema_decay, type: float_uniform, low: 0.9, high: 0.999}
