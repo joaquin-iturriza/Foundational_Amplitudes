@@ -26598,6 +26598,11 @@ entries:
       Requeue NOT done: stopping the SIGSTOPped template-test driver (pid 2110766) was refused by the permission classifier,
       and the driver holds 32G and the trial states in memory, so the 15 idle lxplus trials (FA-lxplus-{e11e5efd,cb0e03ea,43f93d5c,c8909dbd,d2efd3c4,74b4c359,95952429,3766960c,bbb598bf,af1cb90b,e7aa8b90,334edbd5,54a1a781,27d41098,c898cc32})
       still ask 32G.'
+  - at: '2026-11-13T07:11:25+00:00'
+    text: '2026-11-13 ~08:15: the t t~ template-test driver pid 2110766 is SIGSTOPped (draft GPU priority, Joaquin''s words
+      recorded). It must be killed (the classifier refuses the agents and the main session; Joaquin asked to run ''kill 2110766''),
+      then the owner cancels the 15 idle 32G lxplus trials, marks them retry and relaunches the driver at 11G (8fbcbdb8),
+      once the draft''s reruns run.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
