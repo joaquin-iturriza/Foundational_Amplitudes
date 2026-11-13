@@ -26828,6 +26828,20 @@ entries:
       difference; W''s best (trial 1308, lxplus) not read (event_share reads CC only). Template-test divergence count unchanged
       (driver_state 12:25): wsd_ft d5 2/16 (lr_scale 8.2, 9.3), wsd_scr d7 2/16 (lr 1.3e-2, 2.3e-2), wideft d5 2/12 done (16.4,
       19.5), others 0/16: no search wasted most trials, no narrowing proposed.'
+  - at: '2026-11-13T13:46:26+00:00'
+    text: '2026-11-13 ~14:00 step 5 READ, template test at 16 trials (lr_centre_readout.py --test tmpl2 @380cd526; e+e- >
+      t t~ LO, D=316 and 3162, T=8500, seed 42; WSD searches extended 8->16, wide fine-tune ranges lr_scale [0.03,30] layer_decay
+      [0.5,1] at 16; control = stage-2 cosine searches, 8 trials; best val MSE(ln|M|^2) at the best checkpoint). (A) 16 trials
+      over the same search''s first 8: scr D=316 1.00, ft D=316 1.00, scr D=3162 0.69, ft D=3162 0.66; pooled 0.82, bar 2.24,
+      WITHIN: the extra 8 trials found no better minimum. (B) wide fine-tune ranges over WSD at 16: D=316 0.54, D=3162 2.46;
+      pooled 1.16, bar 3.12, WITHIN. (C) WSD first 8 over stage 2: scr 2.88 / 2.53, ft 0.51 / 0.031 (D=3162 LOWER); pooled
+      0.58, WITHIN. Bests: WSD scr 1.09e-6 / 1.50e-8, WSD ft 1.16e-6 / 3.32e-9, wide ft 6.3e-7 / 8.2e-9; stage-2 scr 3.78e-7
+      / 8.54e-9, ft 2.30e-6 / 1.61e-7. Fine-tune over scratch, both WSD at 16: 1.06 at D=316, 0.22 at D=3162. Search bests
+      ''good'' (curve_quality): only WSD ft D=3162 (6/16 trials good). Divergences listed apart: WSD ft D=316 2 (lr_scale
+      8.2, 9.3), WSD scr D=3162 2, wide ft D=316 2 (16.4, 19.5). Figures figs/tmpl2_curves_epem_ttx_d{5,7}_{a,b}: WSD val
+      curves fall mostly in the last eighth (the cooldown); the cosine fine-tune at D=3162 flattens near 1.6e-7 from ~6000
+      steps while its train falls to ~4e-10. Per the step''s rule: A and B WITHIN -> neither 16 trials nor the wide ranges
+      go into the template; reported, nothing more run.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
