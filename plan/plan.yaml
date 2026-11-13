@@ -32635,7 +32635,8 @@ entries:
   decisions:
   - D365
   - D445
-  next: null
+  next:
+    2: 'Sec. 2: apply Joaquin''s comments on the reviewed pages (draft_sec2_pages.pdf, draft b5fbf78)'
   done_when: null
   notes_ref: null
   match: none
@@ -32872,3 +32873,9 @@ entries:
       analysis/data_saving/data/example_cells.json; scripts/job_rerun_trial.sh; scratchpad sec4_review_1.txt, joaquin_draft_comments_0613.txt,
       refpapers/'
     written: '2026-11-13T07:08:00+00:00'
+  step_why:
+    2:
+      feeds: the draft's Sec. 2 final
+      if:
+      - 'no comments: Sec. 2 done'
+      - 'comments: apply them, show the redraw beside the old version'
