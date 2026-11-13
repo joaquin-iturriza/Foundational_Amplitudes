@@ -152,8 +152,8 @@ FT_PROBES = {"v3_dg_dgwpwm": r"$dg\to dgW^+W^-$", "v3_usx_cxuwpz": r"$u\bar s\to
 
 def ft():
     d = json.load(open(os.path.join(ROOT, "analysis", "catalog_v3", "data", "muon_ft.json")))
-    arms = (("dimensionless", "AdamW", ps.C.vermillion, "AdamW pretraining"),
-            ("dimensionless_muon", "MuonAdamW", ps.C.blue, "Muon pretraining"))
+    arms = (("dimensionless", "AdamW", ps.C.vermillion, "AdamW"),
+            ("dimensionless_muon", "MuonAdamW", ps.C.blue, "Muon"))
     fig, axs = ps.figure(ncols=2, nrows=2)
     for ax, (p, name) in zip(axs.flat, FT_PROBES.items()):
         for parent, opt, c, lab in arms:
