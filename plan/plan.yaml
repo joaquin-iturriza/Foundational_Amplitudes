@@ -32674,12 +32674,10 @@ entries:
     answered_at: '2026-11-13T03:05:03.243000+00:00'
     decision: D445
   owner:
-    agent: a0f7f76dc1ed0520d
-    state: closed
-    since: '2026-11-13T07:12:50+00:00'
-    state_at: '2026-11-13T08:02:05.645000+00:00'
-    context: 141955
-    context_at: '2026-11-13T07:30:54+00:00'
+    agent: aaae6521a1a2098ff
+    state: working
+    since: '2026-11-13T08:53:09+00:00'
+    state_at: '2026-11-13T08:53:09+00:00'
   step_waits:
     '2': '2026-11-14'
   findings:
