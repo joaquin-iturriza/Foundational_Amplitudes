@@ -115,7 +115,7 @@ def plot():
     by = {(c["probe"], c["D"], c["arm"]): c for c in cells if "mse" in c}
     col = {"scratch": ps.C.blue, "fine-tune": ps.C.vermillion}
     lab = {"scratch": "scratch", "fine-tune": "fine-tune"}
-    edges = np.logspace(-6, 1, 57)   # |Delta| from 10^-6 to 10, eight bins a decade
+    edges = np.logspace(-6, 3, 73)   # |Delta| from 10^-6 to 10^3, eight bins a decade: no event beyond either edge
     # |Delta| histograms on a log axis, one panel per probe: colour the arm, line style D
     fd = ps.panels(4)
     for (fig, ax), p in zip(fd, PROBES):
