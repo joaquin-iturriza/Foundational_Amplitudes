@@ -26556,6 +26556,13 @@ entries:
       at 1e-2 (3101/459), u d~ e nu 4.1 [3.3,5.1] at 1e-2 (472/114), b b~ one loop 3.7 [3.1,inf] at 1e-4 (4335/1178; 138/476
       replicates put the scratch floor above 1e-4); median 5.4. Own-alpha check (each arm alone): 11.3, 5.5, 4.4, 5.6. Fit
       rms 0.06, 0.22, 0.30, 0.28 decades.'
+  - at: '2026-11-13T01:56:13+00:00'
+    text: '2026-11-13 step 6 design PASS (re-check after one FIX: paths, input flags, prior, outcome, spread): WSD parent
+      submitted FA-ccin2p3-7453b4ef (scripts/job_datasaving_parent.sh heldoutbbzz ++training.scheduler=WSD ++training.wsd_cooldown_frac=0.125
+      ++model.input_soft_eps=1e-8 ++model.input_pair_logs=6 tag=wsd @597fac1d, --time 02:15:00, target 1.6 h). When it ends:
+      diff its config.yaml against dsave_parent_heldoutbbzz (only scheduler, wsd_cooldown_frac), CPU dry run of one s5wsdparent
+      trial on CC, then drive.py over the 6 configs sweep/sweep_config_dsave_s5{wsd,cos}parent_ft_bbx_zz_d{4_t4960,5_t7840,7_t8500}.yaml
+      @a3ecbcc3 (8 trials, waves 3,3,2; 12.0 GPU-h); extend ft_constraint.py to the s5 stages; read per the passed outcome.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
