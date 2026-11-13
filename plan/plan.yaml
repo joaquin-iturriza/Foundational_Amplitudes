@@ -21619,9 +21619,9 @@ entries:
     decision: D441
   owner:
     agent: a6bd7d6113b9fd0de
-    state: stopped
+    state: working
     since: '2026-11-13T09:11:01+00:00'
-    state_at: '2026-11-13T09:17:10.307000+00:00'
+    state_at: '2026-11-13T09:30:36.486000+00:00'
     context: 126470
     context_at: '2026-11-13T09:29:52+00:00'
   designs:
@@ -27630,9 +27630,9 @@ entries:
     withdrawn_why: 'Joaquin: use all available clusters'
   owner:
     agent: aac7cd28c4a7fa60a
-    state: stopped
+    state: working
     since: '2026-11-13T06:51:11+00:00'
-    state_at: '2026-11-13T08:56:40.983000+00:00'
+    state_at: '2026-11-13T09:30:38.730000+00:00'
     context: 177782
     context_at: '2026-11-13T09:10:44+00:00'
   findings:
