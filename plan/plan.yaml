@@ -27060,6 +27060,12 @@ entries:
     units: null
     start: '2026-11-13T08:56:26+00:00'
     at: '2026-11-13T08:56:26+00:00'
+  - batch: dsave_s6cosparentlongwu
+    wall_h: 0.65
+    jobs: 9
+    units: null
+    start: '2026-11-13T11:25:14+00:00'
+    at: '2026-11-13T11:25:14+00:00'
   handoff:
     state: '2026-11-13 ~13:30. Step 6 READ, branch (d): neither the WSD parent nor the WSD fine-tune keeps the b b~ ZZ tree
       head start (lost-at fraction R 0.16/0.10/0.08, C 0.33/0.14/0.82, W 0.16/0.14/0.18 at D=100/316/3162); W/C best val pooled
