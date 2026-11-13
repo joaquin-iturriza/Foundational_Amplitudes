@@ -67,27 +67,27 @@ print("KITPAPER " + json.dumps(out))
 U, TT = "kit_A_ee_uug_me2_n100000_t8000", "kit_A_ee_tt_virt_finite_n100000_t8000"
 ATTEMPTS = {
     "ee_uug_me2": [
-        ("momenta (parent inputs)", "A_inputs", U),
+        ("parent inputs", "A_inputs", U),
         ("+ soft rescale", "A_inputs", U + "_softrescale"),
         (r"+ $\log s_{ij}$", "A_inputs", U + "_pairlogs"),
-        (r"+ both (reference)", "A_inputs", U + "_softpair"),
-        ("reference, frames cut", "A_route_uug", U + "_softpair_noframes"),
-        ("reference, MLP inputs only", "A_scalars_uug", U + "_softpair_scalars"),
-        (r"reference, $\gamma\leq 4$", "A_gmax4_uug", U + "_softpair_gmax4"),
+        (r"+ both (ref.)", "A_inputs", U + "_softpair"),
+        ("ref., no frames", "A_route_uug", U + "_softpair_noframes"),
+        ("ref., MLP inputs", "A_scalars_uug", U + "_softpair_scalars"),
+        (r"ref., $\gamma\leq 4$", "A_gmax4_uug", U + "_softpair_gmax4"),
         (r"plain target", "A_logpoly_uug", U + "_softpair_plain"),
-        (r"plain + $P_1(L)$", "A_logpolylin_uug", U + "_softpair_plain_logskiplin"),
-        ("pretrained, parent inputs", "A_ft_lr", "kit_A_ft_ee_uug_me2_n100000_t8000_lr0p1")],
+        (r"plain $+P_1(L)$", "A_logpolylin_uug", U + "_softpair_plain_logskiplin"),
+        ("pretrained", "A_ft_lr", "kit_A_ft_ee_uug_me2_n100000_t8000_lr0p1")],
     "ee_tt_virt_finite": [
-        ("momenta (parent inputs)", "A_inputs_carry", TT + "_offon"),
-        (r"+ soft rescale, $\log s_{ij}$", "A_inputs_carry", TT + "_softpair"),
-        (r"+ $\log\beta^2$ (reference)", "A_betainput", TT + "_softpairthr"),
-        ("reference, frames cut", "A_route_tt", TT + "_softpairthr_noframes"),
-        ("reference, MLP inputs only", "A_scalars_tt", TT + "_softpairthr_scalars"),
-        (r"reference + $P_1(L)$", "A_logpolylin_tt", TT + "_softpairthr_logskiplin"),
-        (r"reference + $P_2(L)$", "A_logpoly_tt", TT + "_softpairthr_logskip"),
-        (r"reference, target $V\beta$", "A_vbeta", TT + "_softpairthr_vbeta"),
-        ("pretrained + LO tops", "Aft_thr", "kit_A_ft_ee_tt_virt_finite_n100000_t8000_ftr5thrown"),
-        ("pretrained + 1-loop tops", "Aft_thrloop", "kit_A_ft_ee_tt_virt_finite_n100000_t8000_ftr5thrloopown")]}
+        ("parent inputs", "A_inputs_carry", TT + "_offon"),
+        (r"+ rescale, $\log s_{ij}$", "A_inputs_carry", TT + "_softpair"),
+        (r"+ $\log\beta^2$ (ref.)", "A_betainput", TT + "_softpairthr"),
+        ("ref., no frames", "A_route_tt", TT + "_softpairthr_noframes"),
+        ("ref., MLP inputs", "A_scalars_tt", TT + "_softpairthr_scalars"),
+        (r"ref. $+P_1(L)$", "A_logpolylin_tt", TT + "_softpairthr_logskiplin"),
+        (r"ref. $+P_2(L)$", "A_logpoly_tt", TT + "_softpairthr_logskip"),
+        (r"ref., target $V\beta$", "A_vbeta", TT + "_softpairthr_vbeta"),
+        ("pretr. + LO tops", "Aft_thr", "kit_A_ft_ee_tt_virt_finite_n100000_t8000_ftr5thrown"),
+        ("pretr. + 1-loop tops", "Aft_thrloop", "kit_A_ft_ee_tt_virt_finite_n100000_t8000_ftr5thrloopown")]}
 # (panel, process, stratum, Bakar MLP label in kit_bakar_figs.json, x label)
 THR = r"MLP, log + $\log(s_{t\bar t}-4m_t^2)$"
 LIMITS = [("coll", "ee_uug_me2", "coll_y_1e-07_1e-06", "MLP, log invariants",
