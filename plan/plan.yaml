@@ -32542,8 +32542,16 @@ entries:
   decisions:
   - D365
   - D445
-  next: Fill the draft's slots (~/drafts/fm_amplitudes_2026-11/paper.tex, \slot{...}) as pretrain_data_saving, optimizations_recap,
-    kit_benchmark and virtual_over_born land their results; then the abstract's and outlook's numbers
+  next:
+    1: 'Sec. 2 representative examples: from the 23 reruns (+ the trial_0096 rerun) draw Delta histograms and true vs predicted
+      log|M|^2 with ratio panel, scratch vs fine-tune, 4 probes x D=10^2,10^3,10^4; check each rerun within 2x of its record;
+      fill the slot in Sec. 2'
+    2: 'Sec. 3 optimizations: fill every slot from docs/results.tex, figures regenerated per D444 (ordered, absolute log values,
+      examples); use optimizations_recap''s pID/QN and Muon-to-1e-4 reruns if done'
+    3: 'Sec. 4: swap in the redrawn ladder figures finale_synth_paper_{ee,qcd} (D434: rung before/after, every structure)'
+    4: 'Sec. 5 KIT: write from kit_benchmark''s results so far (Bakar''s plots vs his MLP; bulk better, qg collinear, sqrt(s),
+      beta weaker), open problems plainly'
+    5: Abstract and outlook numbers, after Secs. 2-5
   done_when: null
   notes_ref: null
   match: none
@@ -32577,15 +32585,31 @@ entries:
     context_at: '2026-11-13T03:28:21+00:00'
   step_why:
     1:
-      feeds: the draft's results (D354)
+      feeds: the draft's Sec. 2 (D444, D433)
       if:
-      - 'a sibling entry lands a result: fill its slot, recompile, commit'
-      - 'a sibling result contradicts the story text: rewrite the story text around it and report it'
-  step_waits:
-    '1': 'FA-ccin2p3-d77e2e19 FA-ccin2p3-25f254c8 FA-ccin2p3-b5c155b8 FA-ccin2p3-c6cc7ca4 FA-ccin2p3-5f3a41f4 FA-ccin2p3-85e01366
-      FA-ccin2p3-9a83a25c FA-ccin2p3-de976f69 FA-ccin2p3-515d5a84 FA-ccin2p3-be7e5f6d FA-ccin2p3-5bf54dea FA-ccin2p3-7830006a
-      FA-ccin2p3-867d2d8b FA-ccin2p3-0134adeb FA-ccin2p3-f470a13e FA-ccin2p3-71d1701a FA-ccin2p3-49241829 FA-ccin2p3-5ce6fcd6
-      FA-ccin2p3-5b7c4991 FA-ccin2p3-b22269c6 FA-ccin2p3-391452f0 FA-ccin2p3-89c45c5a FA-ccin2p3-f4813cec '
+      - 'all reruns within 2x: figure in, slot filled, pages to Joaquin'
+      - 'a rerun off by >2x: flag it in the caption, rerun once'
+    2:
+      feeds: the draft's Sec. 3 (D354, D444)
+      if:
+      - 'the reruns are done: their results go in the slots'
+      - 'not done: the slot says what is missing, the text uses results.tex as it stands'
+    3:
+      feeds: the draft's Sec. 4 (D434)
+      if:
+      - 'figures match the text''s numbers: swap, recompile'
+      - 'they contradict the text: rewrite the text around them and report it'
+    4:
+      feeds: the draft's Sec. 5 (D354)
+      if:
+      - 'kit_benchmark results as they stand: write them'
+      - 'Joaquin answers the fair-NLO/threshold-scan question: add or schedule them'
+    5:
+      feeds: the draft's abstract and outlook (D354)
+      if:
+      - 'sections done: fill the factors'
+      - 'a section still open: leave its slot'
+  step_waits: {}
   findings:
   - at: '2026-11-13T02:46:58+00:00'
     text: '2026-11-13 ~03:50 Joaquin: ''we should start actually doing the work on the draft with what we have ... Let''s
