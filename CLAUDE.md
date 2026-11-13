@@ -86,6 +86,7 @@ on the sites (`~/work/CLAUDE.md`).
 - Every scaling fit uses `L(C) = A·C^(−α) + L_∞`; the bare power law is a labelled diagnostic only.
 - A feature is judged against the existing baseline (the best of a short HPO sweep, never retrained): first at the baseline's best HPs, done if better; else the same sweep for the feature, best against best, on `val_loss_no_reg`, re-based when preprocessing differs.
 - Every figure is saved as both `.png` and `.pdf`, and no run is configured with plotting off.
+- A figure comparing many arms, processes or groups orders them so the comparison reads (best to worst, or by a grouping that means something) and shows absolute values on a log scale rather than only ratios to a control; an error level is made concrete by a few representative examples (the delta histogram, true against predicted distributions with a ratio panel).
 
 ## Reference
 
