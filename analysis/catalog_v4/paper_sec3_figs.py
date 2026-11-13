@@ -119,7 +119,7 @@ def examples():
             ek, t, q = np.array(rec["edges"]), np.array(rec["truth"], float), np.array(rec["pred"], float)
             ax.stairs(q, ek, color=col[k], label=lab[k])
             with np.errstate(divide="ignore", invalid="ignore"):
-                r.stairs(np.where(t > 0, q / t, np.nan), ek, color=col[k])
+                r.stairs(np.where(t >= 10, q / t, np.nan), ek, color=col[k])   # bins with >= 10 true events: the rest is counting noise
         r.axhline(1, color="k", lw=0.8)
         r.set_ylim(0.5, 1.5); r.set_yticks([0.5, 1, 1.5]); r.set_yticklabels(["0.5", "1", "1.5"])
         ax.set_xlim(e[0], e[-1])
