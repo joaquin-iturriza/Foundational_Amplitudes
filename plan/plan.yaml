@@ -25586,6 +25586,16 @@ entries:
       the fine-tune warmup is next (reported, a design needed). Beside each: W/C, C/R and over-scratch best-val ratios per
       D and pooled against 5^(1/sqrt 3) = 2.53 (expected within, prior 1), and S read only if a ratio leaves the bar. Diverged
       trials listed apart (D398).'
+    passed_at: '2026-11-13T01:52:22+00:00'
+    reviewer: 'Re-check after FIX: configs @a3ecbcc3 diffed against stage-2 twins at D=100/316/3162 (cosine-parent arm: only
+      name + scheduler WSD/cooldown 0.125; WSD-parent arm also its ${PROJECT_DIR} parent path); WSD parent command now carries
+      input_soft_eps 1e-8 and input_pair_logs 6 as the cosine parent''s config.yaml (lines 5892-5893), with config diff and
+      CC dry run as gates before fine-tunes. Check 2/3: recomputed per-trial head-start-lost fractions from curve_quality.trials:
+      D=100 0.06-0.20 (7), 316 0.04-0.14 (8), 3162 0.06-0.92 (7), never-lost 1/50 over all D (D=10), 2/50 lost after 0.5;
+      KEPT (never or after 0.5 at >=2 of 3 D) sits outside the record''s spread; restart jump 1023->181 (par:v4_warm_start_fixes)
+      shows the parent schedule moves the warmup head start; best-val ratios reported only (expected 1.2-1.3x under the 2.53
+      bar). Outcome has four branches. Disk <=7.5 GB vs 66 GB free; 13.5 GPU-h. Check 5 searched: results.tex WSD, WSD parent,
+      warm start; plan entry WSD, suspect (suspects_readout WSD arm now cited); site decisions D414, D422, D423.'
   step_waits:
     '5': detach ttx16_repick (drive.py, 4 WSD + 2 wide t t~ tree searches to 16 trials, CC/lxplus)
     '6': a reviewer
