@@ -32684,6 +32684,7 @@ entries:
     - analysis/data_saving/figs/example_delta_a.png
     - analysis/data_saving/figs/example_dist_a.png
     - analysis/transfer/het_delta_summary.py
+    - analysis/transfer/het_eval_check.py
     - scripts/job_rerun_trial.sh
   dead_ends: []
   asks:
