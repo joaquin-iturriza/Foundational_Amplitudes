@@ -32660,6 +32660,10 @@ entries:
       1e-4-only framing was replaced); abstract KIT sentence from Sec. 5 as written (4a86295). First 6 example reruns reproduce
       their records within 2x (rerun/recorded MSE of log|M|^2 0.78-1.65; analysis/data_saving/example_reruns.py at 9534d54a).
       job_rerun_trial.sh prints RUN_DONE after a clean eval (FA 830a1ec6).'
+  - at: '2026-11-13T07:21:29+00:00'
+    text: '2026-11-13 Joaquin: ''"Sec. 4 was rewritten after a reviewer pass." Huh???? I said section four was left as it
+      was''. Sec. 4 and its appendix reverted to 22fac9d (draft a8ce7d1, reverts 7801404); redrawn ladder figures kept; no
+      Sec. 4 relabelling, change list or reviewer pass.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
