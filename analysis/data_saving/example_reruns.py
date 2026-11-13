@@ -116,7 +116,7 @@ def plot():
     by = {(c["probe"], c["D"], c["arm"]): c for c in cells if "mse" in c}
     col = {"scratch": ps.C.blue, "fine-tune": ps.C.vermillion}
     lab = {"scratch": "scratch", "fine-tune": "fine-tune"}
-    edges = np.logspace(-6, 3, 73)   # |Delta| from 10^-6 to 10^3, eight bins a decade: no event beyond either edge
+    edges = np.logspace(-6, 3, 73)   # |Delta| from 10^-6 to 10^3, eight bins a decade; events beyond go in the end bins
     # |Delta| histograms on a log axis, one panel per probe: colour the arm, line style D
     fd = ps.panels(4)
     for (fig, ax), p in zip(fd, PROBES):
@@ -124,16 +124,19 @@ def plot():
             for D in D_STYLE:
                 if (p, D, a) in by:
                     c = by[p, D, a]
-                    ax.stairs(np.histogram(np.abs(np.exp(c["pred"] - c["true"]) - 1), edges)[0], edges, color=col[a],
+                    x = np.clip(np.abs(np.exp(c["pred"] - c["true"]) - 1), edges[0], edges[-1] * 0.999)
+                    ax.stairs(np.histogram(x, edges)[0], edges, color=col[a],
                               linestyle=D_STYLE[D], label=f"{lab[a]}, $D=${D_LAB[D]}")
         ax.set_xscale("log"); ax.set_xlim(edges[0], edges[-1])
         ax.set_yscale("log"); ax.set_ylabel("events")
         ax.set_xlabel(r"$|\Delta|$, $\Delta=|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2_{\rm true}-1$")
         ps.process_label(ax, NAME[p])
+    # legends in rows, scratch above fine-tune (entries 0-2 scratch, 3-5 fine-tune; matplotlib fills by column)
+    ps.legend_strip(fd[0][1], os.path.join(figs, "example_delta_legend"), ncol=3, order=[0, 3, 1, 4, 2, 5])
     print("FIGURE", ps.save_panels(fd, os.path.join(figs, "example_delta")))
     # true and predicted log|M|^2 with the ratio below, one panel per probe
     fh = ps.panels(4)
-    for (fig, ax), p in zip(fh, PROBES):
+    for k, ((fig, ax), p) in enumerate(zip(fh, PROBES)):
         r = hist_ratio(ax)
         have = [(a, D) for a in ("scratch", "fine-tune") for D in D_STYLE if (p, D, a) in by]
         if not have:
@@ -152,9 +155,12 @@ def plot():
         r.set_ylim(0.5, 1.5); r.set_yticks([0.5, 1, 1.5]); r.set_yticklabels(["0.5", "1", "1.5"])
         ax.set_xlim(e[0], e[-1])
         ax.set_yscale("log"); ax.set_ylabel("events")
-        r.set_xlabel(r"$\log|\mathcal{M}|^2$"); r.set_ylabel(r"$\frac{\rm model}{\rm truth}$")
+        r.set_xlabel(r"$\log|\mathcal{M}|^2$")
+        if k % 2 == 0:   # right-hand panels: the label would run into the left panel in the paper's pairs
+            r.set_ylabel(r"$\frac{\rm pred}{\rm true}$")
         ps.process_label(ax, NAME[p])
-    ps.legend_strip(fh[0][1], os.path.join(figs, "example_legend"), ncol=4)   # one strip for both figures
+    # scratch row, fine-tune row, truth below (entry 0 truth, 1-3 scratch, 4-6 fine-tune; filled by column)
+    ps.legend_strip(fh[0][1], os.path.join(figs, "example_dist_legend"), ncol=3, order=[1, 4, 0, 2, 5, None, 3, 6, None])
     print("FIGURE", ps.save_panels(fh, os.path.join(figs, "example_dist")))
 
 
