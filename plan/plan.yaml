@@ -28889,7 +28889,7 @@ entries:
     '17': repo-reviewer
     '19': repo-reviewer
     '20': '2026-11-14'
-    '21': FA-ccin2p3-6d7e80ac FA-ccin2p3-e281e8b1
+    '21': repo-reviewer
   handoff:
     state: '2026-11-13 ~12:30 @ebb031da/deaba164. kit_hpo read (finding ~12:30; kit_hpo.json, figs kit_hpo_lr / kit_hpo_curves):
       chosen uug plain hp1918 (lr 0.0125, val 2.92e-5), tt softpairthr hp0131 (lr 0.00178, val 7.1e-7; good trials at the
