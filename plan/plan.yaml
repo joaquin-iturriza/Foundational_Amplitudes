@@ -32846,20 +32846,22 @@ entries:
     start: '2026-11-13T07:19:46+00:00'
     at: '2026-11-13T07:19:46+00:00'
   handoff:
-    state: 'Sec. 2 done and passed a fresh review (draft b5fbf78; figures from analysis/data_saving/example_reruns.py at FA
-      68f1cb9e, all 24 reruns, 23 within 2x, e nu fine-tune D=1e4 3x below its record in two reruns and bb one-loop scratch
-      D=1e4 shown from its repeat, both in the Fig. 2 caption); pages draft_sec2_pages.pdf (pp. 3-6) handed to the main session
-      for Joaquin. Joaquin 2026-11-13: only his sections change: Sec. 4 reverted to 22fac9d (a8ce7d1), title/abstract/intro/outlook
-      restored word for word to d742281 (1e9b4ba). Sec. 3 is optimizations_recap''s. Nothing of this entry left for its owner
-      but Joaquin''s comments on the Sec. 2 pages.'
-    decisions: 'Sec. 4 and front matter left as Joaquin wrote them (his words, findings 2026-11-13); reviewer FIX applied:
-      |Delta|>10 named as over-prediction, legends per figure in rows, out-of-range |Delta| in end bins, ratio pred/true,
-      ln said once, 6.7%.'
-    ruled_out: 'symlog Delta axis; full-height ratio panel; a Sec. 4 relabelling or review (Joaquin: Sec. 4 untouched)'
+    state: 'Sec. 2 done, passed a fresh review and sent to Joaquin (draft b5fbf78; pages scratchpad draft_sec2_pages.pdf pp.
+      3-6). Examples from all 24 reruns (analysis/data_saving/example_reruns.py at FA 68f1cb9e): 23 within 2x; e nu fine-tune
+      D=1e4 3x below its record in two reruns, bb one-loop scratch D=1e4 shown from its repeat (1.41x), both in the Fig. 2
+      caption. Per Joaquin 2026-11-13 only his sections change: Sec. 4 at 22fac9d (a8ce7d1), title/abstract/intro/outlook
+      word for word d742281 (1e9b4ba). Sec. 3 belongs to optimizations_recap. Open: Joaquin''s comments on the Sec. 2 pages
+      (step waits on 2026-11-14); reviewer''s optional notes not done (space above Fig. 3 legend strip; ''Fine-tune'' capitalised
+      in Fig. 1 legend).'
+    decisions: 'Sec. 4 and front matter untouched (Joaquin''s words, findings 2026-11-13); reviewer fixes applied: |Delta|>10
+      as over-prediction, e nu exception, bulk claim limited, split sizes and off-record cells in caption, out-of-range |Delta|
+      in end bins, legends per figure in rows, pred/true, natural log stated, 6.7%; figures [!t] after Fig. 1. One-loop bb
+      validation split has no negative |M|^2 (0/5000), so abs() hides nothing.'
+    ruled_out: symlog Delta axis; full-height ratio panel; Sec. 4 relabelling or review; front-matter rewrites
     running: none
     files: ~/drafts/fm_amplitudes_2026-11/paper.tex (Sec. 2); analysis/data_saving/example_reruns.py; plot_style.py legend_strip(order=);
-      scratchpad draft_sec2_pages.pdf
-    written: '2026-11-13T08:13:04+00:00'
+      analysis/data_saving/data/example_cells.json; scratchpad draft_sec2_pages.pdf, draft_uncommitted_before_sec4_revert.diff
+    written: '2026-11-13T08:41:50+00:00'
   step_why:
     2:
       feeds: the draft's Sec. 2 final
