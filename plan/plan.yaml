@@ -25598,7 +25598,7 @@ entries:
       warm start; plan entry WSD, suspect (suspects_readout WSD arm now cited); site decisions D414, D422, D423.'
   step_waits:
     '5': detach ttx16_repick (drive.py, 4 WSD + 2 wide t t~ tree searches to 16 trials, CC/lxplus)
-    '6': a reviewer
+    '6': FA-ccin2p3-7453b4ef
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
