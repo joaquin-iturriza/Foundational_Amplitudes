@@ -27280,7 +27280,7 @@ entries:
     withdrawn_why: 'Joaquin: use all available clusters'
   owner:
     agent: ad1a12dcf02712802
-    state: working
+    state: closed
     since: '2026-11-12T21:29:09+00:00'
     state_at: '2026-11-13T00:04:46.887000+00:00'
     context: 245352
@@ -28215,31 +28215,36 @@ entries:
     '18': kit_hpo driver DONE event (chosen HPs); literature agent's findings for (a)
     '19': kit_hpo driver DONE event (chosen HPs); literature agent's findings for (a)
   handoff:
-    state: '2026-11-12 ~22:35 @68ccb875. Closed at the context limit. (1) Steps 15+16, kit_hpo driver: one detached sweep/drive.py
-      (detach:kit_hpo, relaunched ~22:25: --sites ccin2p3 lxplus --hours 0.6 --mem 32G --cpus 4) over sweep/sweep_config_kit_hpo_{uug_plain,ttvirt_thr,uug_T,uugg_T}.yaml
-      @68ccb875 (16 trials, waves 6,5,5, 1831 steps, batch 16384, WSD 0.125, base configs from git sweep/kit_base/; design
-      round 5 PASS; ~27 GPU-h, D428). Driver state: 18 first-wave trials submitted on CC (site pick put all there; 1:36 limit),
-      6 in ''retry'' refused by the 30 GPU-h/60-min gate (the 18 at 1.6 h count 28.8); they go when the window clears (~23:20
-      UTC); log ~/.local/share/ccorch/detached/*_kit_hpo.log. On the driver''s DONE: tools/kit_curves.py sweep kit_hpo_uug_plain
-      kit_hpo_ttvirt_thr kit_hpo_uug_T kit_hpo_uugg_T --out analysis/kit_benchmark/data/kit_hpo.json; chosen = lowest best
-      val among good (sep <= 3, end_up <= 2); kit_predict REREAD vs old controls; figure of the chosen trials'' curves. Jean
-      Zay copy blocker (worker a7421d9f on it): JZ lacks /kit_hardps (1.7 GB); site copy CC->JZ times out, copies run on lxplus
-      have no ssh agent (2FA). Once the data is there: restart the driver with --allow-jeanzay and no --sites (D431). Site
-      pick fix (worker a6bfbb55 on it): pick placed every trial on CC despite Slurm''s ~30 h estimate. (2) Step 14: div-form
-      50-step checks FA-ccin2p3-8c1223c0 (uug) and f45f434a (tt) pending; on their end check training, sigma, kit_predict,
-      plots; then arms = chosen trial config + ++model.input_div_form=true via job_kit.sh A at that trial''s HPs and 1831
-      steps, config diff vs the trial''s config.yaml, wall target from the trial''s time. (3) 11c fine-tunes: 2d653209 ->
-      dcf42ad6 and ca5873f3 -> e7dca162 running/pending; step 5 after them.'
-    decisions: 'D424 search uug T and uugg; D425 300 epochs; D426 batch fixed (gen_data_saving.py batch search now opt-in);
-      D427/D428 16 trials; D431 Jean Zay allowed. Step 13 degree-1 log term PARTIAL (finding @6583d0bb): overshoots gone,
-      no limit fixed, Coulomb lost; not adopted. Step 12 dropped (finished).'
-    ruled_out: route cuts (D419); degree-2 and degree-1 log-invariant polynomial terms as general fixes; per-frame gamma bound
-      4; horizon from cosine-run prefixes (not informative)
-    running: kit_hpo driver (18 trials on CC + 6 retry); FA-ccin2p3-8c1223c0, f45f434a (step 14 checks); 2d653209 -> dcf42ad6,
-      ca5873f3 -> e7dca162 (11c)
-    files: sweep/sweep_config_kit_hpo_*.yaml, sweep/kit_base/**, tools/kit_curves.py, analysis/kit_benchmark/data/kit_fig_A_logpolylin_{uug,tt}.json,
-      kit_extrap.json, kit_curves.json, figs kit_extrap_logpolylin_*
-    written: '2026-11-12T21:23:00+00:00'
+    state: '2026-11-13 ~00:10 @0b50d251. Closed near the context limit. (1) Steps 15+16: kit_hpo driver (detach:kit_hpo, pid
+      2142111, code d3a0b8a4, log ~/.local/share/ccorch/detached/20261112-224604_kit_hpo.log; command: .venv-driver/bin/python
+      sweep/drive.py --config sweep/sweep_config_kit_hpo_{uug_plain,ttvirt_thr,uug_T,uugg_T}.yaml --item kit_benchmark --retry-lost
+      --mem 32G --cpus 4 --hours 0.6; no Jean Zay: JZ has no KIT data, add --allow-jeanzay once worker a7421d9f''s copies
+      work). First wave of 24 trials: 23 on CC (00:00: 9 RUNNING, 16 PENDING), 1 idle on lxplus (39d3ed3e). E6711 read: re-pick
+      keeps them on CC correctly (lxplus skipped by pick''s verify timeout; unskipped it fails MOVE_X), but re-pick logs nothing
+      on keep, driver_state.json is not saved on non-final polls, and placement went all-CC while pick printed ''pick: lxplus''
+      (handed to the site-pick worker). On the driver''s DONE: tools/kit_curves.py sweep kit_hpo_uug_plain kit_hpo_ttvirt_thr
+      kit_hpo_uug_T kit_hpo_uugg_T --out analysis/kit_benchmark/data/kit_hpo.json; chosen = lowest best val mu-MSE among good
+      (sep <= 3, end_up <= 2); kit_predict REREAD vs old controls; figures of the chosen trials'' curves (tools/kit_curves.py
+      curves for per-run panels). (2) Step 14: div-form D395 smokes passed (7aff4018 uug, 06fc43d3 tt; the first pair 8c1223c0/f45f434a
+      failed on training.wsd_cooldown_frac without ++, which the parent config lacks: pass ++ for every WSD key in job_kit.sh
+      runs). Arms = chosen trial config + ++model.input_div_form=true via job_kit.sh A at that trial''s HPs and 1831 steps,
+      own design + reviewer. (3) 11c read: NO (finding 23:00) but runs not converged (finding 23:30: NLL still falling 1.1-2.0
+      nats over the last 800 steps, 3/7 fail separation narrowly); step 17 redo at chosen settings. (4) D435 (Joaquin 2026-11-13):
+      new steps dipole ansatz on LLoCa (Maitre-Truong, CS dipoles for uug/uugg, CDST massive where tops) and finish ReZero,
+      both after kit_hpo; NO MLP branch; a separate literature agent''s findings on enforcing Coulomb/Sudakov asymptotics
+      will come to the owner. (5) Step 5 package waits on the chosen models. Figures: KIT figure sets now carry their legend
+      on every panel canvas (strip above when > 4 arms); report median and log-MSE figures together; labels name the parent
+      pretraining and every input (no codes).'
+    decisions: 'D428 16 trials; D431 all sites (Jean Zay held back as a repair: no KIT data there); D435 dipole ansatz + ReZero,
+      no MLP branch. 11c: one-loop top pairs in pretraining give no Coulomb transfer at the old setting (not adopted; KIT
+      parent keeps LO threshold tops), redo at chosen HPs.'
+    ruled_out: route cuts (D419); degree-1/2 log-invariant polynomial terms as general fixes; per-frame gamma bound 4; MLP
+      branch (D435); 11c at the old cosine setting is not a valid read (unconverged)
+    running: 'kit_hpo driver pid 2142111 (24 first-wave trials: 9 running + 15 pending on CC, 1 idle on lxplus)'
+    files: sweep/drive.py (d3a0b8a4 sync-failure drop), tools/kit_figures.py (legend on canvas, labels), tools/kit_curves.py
+      (curves subcommand, curve_panel), analysis/kit_benchmark/data/kit_fig_Aft_thrloop.json, kit_curves.json, figs kit_{mse,median}_Aft_thrloop_ee_tt_virt_finite_{a,b},
+      kit_curves_nll_Aft_thrloop_{a..g}
+    written: '2026-11-13T00:07:08+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
