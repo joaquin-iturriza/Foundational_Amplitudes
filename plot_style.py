@@ -738,9 +738,16 @@ def legend_strip(ax, base: str, ncol: int = 3, order=None, width: float | None =
             if fits:
                 break
         rows = -(-len(handles) // n)
+        n = -(-len(handles) // rows)   # rows as even as the row count allows: no entry alone on the last row
         fig = plt.figure(figsize=(width, 0.22 * rows + 0.05))
-        leg = fig.legend(handles, labels, ncol=n, loc="center", mode="expand", bbox_to_anchor=(0, 0, 1, 1),
-                         borderaxespad=0, **kwargs)
+        leg = fig.legend(handles, labels, ncol=n, loc="center", borderaxespad=0, **kwargs)
+        if n > 1:   # widen the column gaps so the centred block spans the strip ("expand" left short labels left-heavy)
+            fig.canvas.draw()
+            spare = 0.97 * width - leg.get_window_extent(fig.canvas.get_renderer()).width / fig.dpi
+            leg.remove()
+            fs = mpl.font_manager.FontProperties(size=plt.rcParams["legend.fontsize"]).get_size_in_points()
+            cs = kwargs.pop("columnspacing", plt.rcParams["legend.columnspacing"]) + max(spare, 0) * 72 / fs / (n - 1)
+            leg = fig.legend(handles, labels, ncol=n, loc="center", borderaxespad=0, columnspacing=cs, **kwargs)
         for h in leg.legend_handles:   # a key is opaque even where its series is drawn translucent
             if hasattr(h, "set_alpha"):
                 h.set_alpha(1)
