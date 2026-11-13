@@ -27453,11 +27453,6 @@ entries:
       points ok) + at most ~0-10 other one-loop processes bulk only; target 100-1e4 one-loop bulk points, no hard one-loop
       points from any process; whole family held out; standardisation/early stopping/features bulk only; baseline from-scratch
       V/B with exact Born; scored on the hard bins. Not tonight (Joaquin), soon.'
-    21: 'Threshold scan (Gudrun, D-new 2026-11-13 ''I see no reason not to do it, but if we don''t see good results, it''s
-      not a problem if we skip it''): already built and run (tools/kit_threshold_scan.py, kit_threshold_scan.json, findings
-      2026-11-11T21:24, 2026-11-12T09:05, 13:09). Next: REREAD of the step-18 tt virtual arms (asymptotic factor A1, A2) through
-      kit_threshold_scan predict+collect on CC, figure beside the V x beta arm, B, and scratch softpairthr; same passed threshold
-      design (eval only).'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -28618,11 +28613,6 @@ entries:
       if:
       - 'fine-tune beats the V/B baseline on hard bins: strong positive statement'
       - 'it does not: report as inconclusive (tree has no loop functions)'
-    21:
-      feeds: whether a KIT t t~ virtual model reproduces sigma_NLO(sqrt s) near 2 m_t (Fig. 1 of arXiv:1506.06864)
-      if:
-      - 'factor arms within the NLO scale band to beta 1e-3: the factor model is KIT''s threshold model'
-      - 'not: reported plainly; the scan may be skipped for now (Joaquin 2026-11-13)'
   step_waits:
     '5': 'kit_hpo driver DONE event: the package takes the chosen trials'' models'
     '15': kit_hpo driver DONE event (detach:kit_hpo, log ~/.local/share/ccorch/detached/20261112-224604_kit_hpo.log); live
@@ -28634,7 +28624,6 @@ entries:
     '18': FA-ccin2p3-d5fb3d78 FA-ccin2p3-3bbda50a FA-ccin2p3-fec28926 FA-ccin2p3-1ad20d13 FA-ccin2p3-602ce14f FA-ccin2p3-09576b49
       FA-ccin2p3-5ce19348
     '19': kit_hpo driver DONE event (chosen HPs); literature agent's findings for (a)
-    '21': FA-ccin2p3-09576b49 FA-ccin2p3-5ce19348
     '20': '2026-11-14'
   handoff:
     state: '2026-11-13 @3752e145. Draft Sec. 5 was written on the main session''s brief (draft 4a86295) but Joaquin had said
