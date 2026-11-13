@@ -132,11 +132,18 @@ def examples():
                 ax.stairs(t, ek, color="k", label="truth")
             ax.stairs(q, ek, color=col[k], label=lab[k])
             with np.errstate(divide="ignore", invalid="ignore"):
-                r.stairs(np.where(t >= 10, q / t, np.nan), ek, color=col[k])
+                rat = np.where(t > 0, q / t, np.nan)   # defined wherever the truth has events
+            r.stairs(np.minimum(rat, 2.1), ek, color=col[k])
+            up = rat > 2.1                             # off the panel: a marker at its top edge
+            r.plot(0.5 * (ek[:-1] + ek[1:])[up], np.full(up.sum(), 2.0), "^", ms=3, color=col[k], clip_on=False)
+            if k == "muon":                            # bins with no true event: ratio undefined, shaded
+                for i in np.nonzero(t == 0)[0]:
+                    r.axvspan(ek[i], ek[i + 1], color="0.85", lw=0)
             filled = np.nonzero((t > 0) | (q > 0))[0]
             lo, hi = min(lo, ek[filled[0]]), max(hi, ek[filled[-1] + 1])
         r.axhline(1, color="k", lw=0.8)
-        r.set_ylim(0, 2); r.set_yticks([0, 1, 2]); r.set_yticklabels(["0", "1", "2"])
+        r.set_ylim(-0.15, 2.15); r.set_yticks([0, 1, 2]); r.set_yticklabels(["0", "1", "2"])
+        ax.set_ylim(bottom=0.5)              # one-event bins above the frame, not on it
         pad = 0.08 * (hi - lo)               # margin beyond the outermost filled bin
         ax.set_xlim(lo - pad, hi + pad)
         ax.set_yscale("log"); ax.set_ylabel("events")
