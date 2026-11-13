@@ -77,6 +77,9 @@ on the sites (`~/work/CLAUDE.md`).
 - Never create a new `.md`, `.tex` or `.rst` file (exempt: `CLAUDE.md`, `README*`, `.claude/agents|commands/*.md`); a new doc needs my approval.
 
 ## Results and reporting
+- Paper text is written in the style of our published papers (read arXiv:2601.13308, 2405.14806 and 2411.00446 before writing, and plot as they do): for a reader who knows only the paper, with motivation before method, no internal names, no history of how a result was obtained, no statement of the obvious; every result is shown in a figure or worded without its numbers.
+- A draft section reaches me only after a fresh reviewer agent, given these rules, the papers and my earlier comments on the draft, passed it; a section is written only when I named it for that draft, and my words keeping a result of a section out of it keep the whole section waiting unless I name what stays.
+
 
 - Results go in `docs/results.tex`: a finished finding in its results section with its hand-off item deleted; the hand-off holds only open work.
 - Every number reported comes from a committed tool at a named commit, never a throwaway one-liner, and says what it counts and how it was selected; a number in `docs/results.tex` carries `% src:` and `% claim:` lines that reproduce.
