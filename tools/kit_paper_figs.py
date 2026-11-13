@@ -107,11 +107,11 @@ BENCH = [(r"$u\bar ug$ bulk", "ee_uug_me2", "bulk"),
          (r"$u\bar ug$ collinear", "ee_uug_me2", "coll_y_1e-07_1e-06"),
          (r"$u\bar ugg$ bulk", "ee_uugg_me2", "bulk"),
          (r"$u\bar ugg$ soft", "ee_uugg_me2", "soft_x_1e-07_1e-06"),
-         (r"$u\bar ugg$ $qg$ coll.", "ee_uugg_me2", "coll_qg_y_1e-07_1e-06"),
-         (r"$u\bar ugg$ $gg$ coll.", "ee_uugg_me2", "coll_gg_y_1e-07_1e-06"),
-         (r"$t\bar t$ V bulk", "ee_tt_virt_finite", "bulk"),
-         (r"$t\bar t$ V Sudakov", "ee_tt_virt_finite", "sudakov_sqrts_15000_50000"),
-         (r"$t\bar t$ V Coulomb", "ee_tt_virt_finite", "threshold_beta_0.0001_0.001")]
+         (r"$u\bar ugg$ quark-gluon coll.", "ee_uugg_me2", "coll_qg_y_1e-07_1e-06"),
+         (r"$u\bar ugg$ gluon-gluon coll.", "ee_uugg_me2", "coll_gg_y_1e-07_1e-06"),
+         (r"$t\bar t$ virt. bulk", "ee_tt_virt_finite", "bulk"),
+         (r"$t\bar t$ virt. Sudakov", "ee_tt_virt_finite", "sudakov_sqrts_15000_50000"),
+         (r"$t\bar t$ virt. Coulomb", "ee_tt_virt_finite", "threshold_beta_0.0001_0.001")]
 METRICS = [("logmse", "log-MSE"), ("bias", r"$|$bias$|$"), ("p99_abs", r"99th pct. of $|\Delta|$"),
            ("me2_weighted_rel_err", r"$|\mathcal{M}|^2$-weighted rel. error")]
 
@@ -119,14 +119,14 @@ METRICS = [("logmse", "log-MSE"), ("bias", r"$|$bias$|$"), ("p99_abs", r"99th pc
 PROTO_ROWS = [(r"$u\bar ug$ soft", "ee_uug_me2", "soft_x_1e-07_1e-06", ""),
               (r"$u\bar ug$ collinear", "ee_uug_me2", "coll_y_1e-07_1e-06", ""),
               (r"$u\bar ugg$ soft", "ee_uugg_me2", "soft_x_1e-07_1e-06", ""),
-              (r"$u\bar ugg$ $qg$ coll.", "ee_uugg_me2", "coll_qg_y_1e-07_1e-06", ""),
-              (r"$u\bar ugg$ $gg$ coll.", "ee_uugg_me2", "coll_gg_y_1e-07_1e-06", ""),
-              (r"$t\bar t$ V Sudakov", "ee_tt_virt_finite", "sudakov_sqrts_15000_50000", "_offon"),
-              (r"$t\bar t$ V Coulomb", "ee_tt_virt_finite", "threshold_beta_0.0001_0.001", "_offon"),
-              (r"$t\bar t$ B Sudakov", "ee_tt_born", "sudakov_sqrts_15000_50000", "_offon"),
-              (r"$t\bar t$ B threshold", "ee_tt_born", "threshold_beta_0.0001_0.001", "_offon")]
-PROTOS = [("A, from scratch", "kit_A_{p}_n900000_t8000{s}"), ("A, pretrained", "kit_A_ft_{p}_n900000_t8000{s}"),
-          ("bulk continued", "kit_B_bulk_{p}_n900000_t3000{s}"), ("B, hard added", "kit_B_{p}_n900000_t3000{s}")]
+              (r"$u\bar ugg$ quark-gluon coll.", "ee_uugg_me2", "coll_qg_y_1e-07_1e-06", ""),
+              (r"$u\bar ugg$ gluon-gluon coll.", "ee_uugg_me2", "coll_gg_y_1e-07_1e-06", ""),
+              (r"$t\bar t$ virt. Sudakov", "ee_tt_virt_finite", "sudakov_sqrts_15000_50000", "_offon"),
+              (r"$t\bar t$ virt. Coulomb", "ee_tt_virt_finite", "threshold_beta_0.0001_0.001", "_offon"),
+              (r"$t\bar t$ Born Sudakov", "ee_tt_born", "sudakov_sqrts_15000_50000", "_offon"),
+              (r"$t\bar t$ Born threshold", "ee_tt_born", "threshold_beta_0.0001_0.001", "_offon")]
+PROTOS = [("bulk, scratch", "kit_A_{p}_n900000_t8000{s}"), ("bulk, pretrained", "kit_A_ft_{p}_n900000_t8000{s}"),
+          ("bulk continued", "kit_B_bulk_{p}_n900000_t3000{s}"), ("hard added", "kit_B_{p}_n900000_t3000{s}")]
 
 
 def collect(out):
@@ -152,8 +152,8 @@ def fig_runs(name):
 def dotrows(ax, rows, ps):
     """rows (label, {marker label: value}) top to bottom; markers by label"""
     style = {"transformer": ("o", ps.C.vermillion), "MLP (Bakar)": ("s", ps.C.blue), "MLP, raw (Bakar)": ("^", ps.C.green),
-             "A, from scratch": ("o", ps.C.vermillion), "A, pretrained": ("D", ps.C.purple),
-             "bulk continued": ("v", ps.C.grey), "B, hard added": ("s", ps.C.blue)}
+             "bulk, scratch": ("o", ps.C.vermillion), "bulk, pretrained": ("D", ps.C.purple),
+             "bulk continued": ("v", ps.C.grey), "hard added": ("s", ps.C.blue)}
     n = len(rows)
     for i, (lab, vals) in enumerate(rows):
         for k, v in vals.items():
@@ -187,7 +187,7 @@ def plot(figs):
                   f"{np.log10(abs(v['transformer']) / abs(v['MLP (Bakar)'])):+.2f}")
         dotrows(ax, rows, ps)
         ax.set_xlabel(xl)
-        ps.legend(ax, "lower right") if key == "logmse" else None
+        ps.legend_strip(ax, os.path.join(figs, "kit_bench_legend"), ncol=3) if key == "logmse" else None   # a corner box covers the rows
     ps.save_panels(panels, os.path.join(figs, "kit_bench"))
 
     # 2. protocols at 9e5: deepest-bin log-MSE
@@ -201,7 +201,7 @@ def plot(figs):
     fig, ax = ps.figure()
     dotrows(ax, rows, ps)
     ax.set_xlabel(r"log-MSE, deepest bin")
-    ps.legend(ax, "lower right")
+    ps.legend_strip(ax, os.path.join(figs, "kit_protocols_legend"), ncol=2)
     print("FIGURE", ps.save(fig, os.path.join(figs, "kit_protocols")))
 
     # 3. extrapolation attempts: per limit, rows best to worst, Bakar's MLP as the last row
@@ -225,9 +225,9 @@ def plot(figs):
     name = {("ee_uug_me2", "coll_y_1e-07_1e-06"): r"$u\bar ug$, $y\in[10^{-7},10^{-6}]$",
             ("ee_uug_me2", "bulk"): r"$u\bar ug$, bulk",
             ("ee_uugg_me2", "coll_qg_y_1e-07_1e-06"): r"$u\bar ugg$, $y_{qg}\in[10^{-7},10^{-6}]$",
-            ("ee_tt_virt_finite", "sudakov_sqrts_15000_50000"): r"$t\bar t$ V, $\sqrt{s}\in[15,50]$ TeV",
-            ("ee_tt_virt_finite", "threshold_beta_0.0001_0.001"): r"$t\bar t$ V, $\beta\in[10^{-4},10^{-3}]$",
-            ("ee_tt_virt_finite", "bulk"): r"$t\bar t$ V, bulk"}
+            ("ee_tt_virt_finite", "sudakov_sqrts_15000_50000"): r"$t\bar t$ virt., $\sqrt{s}\in[15,50]$ TeV",
+            ("ee_tt_virt_finite", "threshold_beta_0.0001_0.001"): r"$t\bar t$ virt., $\beta\in[10^{-4},10^{-3}]$",
+            ("ee_tt_virt_finite", "bulk"): r"$t\bar t$ virt., bulk"}
     lab = {"transformer": "transformer", "mlp": "MLP (Bakar, rerun)"}
     col = {"transformer": ps.C.vermillion, "mlp": ps.C.blue}
     for e in ex:
@@ -243,10 +243,10 @@ def plot(figs):
             ax.set_yscale("log"); ax.set_xlabel(r"$\Delta=\log_{10}|\mathcal{M}|^2_{\rm pred}-\log_{10}|\mathcal{M}|^2_{\rm true}$")
             ax.set_ylabel("events")
             ps.process_label(ax, name[(e["proc"], e["stratum"])])
-        ps.legend(np.ravel(axs)[0], "upper left")
+        ps.legend_strip(np.ravel(axs)[0], os.path.join(figs, f"kit_delta_{part}_legend"), ncol=2)   # corners hold the labels
         print("FIGURE", ps.save(fig, os.path.join(figs, f"kit_delta_{part}")))
     # distributions with the ratio below: per canvas two strata, top true and predicted, bottom predicted / true
-    for part, sel in (("a", [ex[0], ex[3]]), ("b", [ex[2], ex[4]])):
+    for part, sel in (("a", [ex[0], ex[3]]), ("b", [ex[2], ex[5]])):
         fig, axs = ps.figure(ncols=2, nrows=2)
         for j, e in enumerate(sel):
             c = np.array(e["value_edges"]); t = np.array(e["truth"], float)
@@ -257,11 +257,13 @@ def plot(figs):
                 r = np.where(t > 0, np.array(h) / np.where(t > 0, t, 1), np.nan)
                 bot.stairs(r, c, color=col[k])
             top.set_yscale("log"); top.set_ylabel("events")
-            bot.set_yscale("log"); bot.set_ylabel("pred / truth")
+            rr = np.concatenate([np.array(h) / t[t > 0] for h in (np.array(v)[t > 0] for v in e["pred"].values())])
+            bot.set_yscale("log" if np.nanmax(rr) > 10 * max(np.nanmin(rr[rr > 0]), 1e-12) else "linear")
+            bot.set_ylabel("pred / truth")
             bot.set_xlabel(r"$\log_{10}(|\mathcal{M}|^2)$")
             top.set_xlabel(r"$\log_{10}(|\mathcal{M}|^2)$")
             ps.process_label(top, name[(e["proc"], e["stratum"])])
-        ps.legend(axs[0][0], "upper left")
+        ps.legend_strip(axs[0][0], os.path.join(figs, f"kit_dist_{part}_legend"), ncol=3)
         print("FIGURE", ps.save(fig, os.path.join(figs, f"kit_dist_{part}")))
 
 
