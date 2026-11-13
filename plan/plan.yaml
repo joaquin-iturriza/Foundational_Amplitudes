@@ -25660,6 +25660,27 @@ entries:
       Beside each: per-trial lost_at vs own warmup in L (lost within +-0.05 of the warmup end in most L trials with wf > 0.3
       = the loss is the peak lr''s arrival), the paired start-up trials L vs C, L/scratch per D. Diverged trials listed apart
       (D398).'
+    fix_at: '2026-11-13T11:22:08+00:00'
+    fix: 'Check 5 (prior incomplete): the prior says results.tex has no fine-tune warmup test, but par:v4_warm_start_repairs
+      and par:v4_warm_start_ramp (results.tex lines ~2994-3320, warm_start entry, D303) tested a slower lr ramp at the start
+      of a run restarted from a pretrained parent: Muon groups damped by min(1, step/168) (reads R 1.03/1.05, the jump not
+      shrunk), AdamW damped (1.02/1.01), every group damped (worse, PP4 1.24, EE4 1.62), with the finding ''the ramp postpones
+      the excursion to where the learning rate is high''. That is the hypothesis this design tests, already seen to fail once
+      in another setting; it predicts branch (c)/(b) here. The search for ''warmup'' missed it (its words are damped, ramp,
+      muon_warmup_steps, adamw_warmup_steps, warm25u/warm25e). Fix: name it in the prior with its numbers and say what differs
+      here (single-process held-out fine-tune from a cosine parent, warmup as a searched HP inside DyHPO, head start against
+      scratch rather than a restart''s held-out reads) and why that difference could change the answer; or drop the run if
+      it cannot. Check 4 (outcome partly confirmed by construction): KEPT means the search best loses the head start after
+      0.5 of the run, but the arm opens the warmup to 0.6 and the record puts lost_at at the warmup end (median lag 0.005-0.04);
+      a best trial with warmup >= ~0.45 reads KEPT whatever happens when the peak lr arrives, so KEPT says nothing about whether
+      the head start survives the peak. Fix: state KEPT relative to the trial''s own warmup end (e.g. lost_at - warmup_frac
+      > a margin set from the record''s lag, or the head start held at the best checkpoint / still v_ft < v_scr at the start
+      of the cooldown), so a delayed loss reads LOST. Also say which branch a result like the warm_start ramp (loss moved
+      to the warmup end, val no better) falls into. Checks that hold: 1 (configs @a85a7210 differ from C''s only in sweep_name
+      and warmup high 0.2->0.6; same DyHPO seed 1972870301, uniform warmup so the start-up draws pair), 3 (8 trials per search
+      as C and D439 ''8 trials is fine''; val bar 5^(1/sqrt3)=2.53 from the 5x search-to-search spread, results.tex ~13959),
+      7, 9 (HETEROSC mu_mse from the parent, as C), 10-15 (same recipe and pools as C; 6.0 GPU-h, ~1.1 h; 75 MB per search
+      vs 63 GB free; rate from C''s own trials).'
   step_waits:
     '5': 'detach dsave_step6_and_ttx16 (pid 807668): template-test driver relaunched at 11G'
     '6': the design reviewer (warmup test design 2026-11-13T11:19)
