@@ -26621,6 +26621,11 @@ entries:
       written and checked on the record: arm R reproduces the design''s prior (start ft/scr 0.014/0.037/0.071, lost at 0.16/0.10/0.08,
       best rise 1.27/3.92/6.37; test scr/ft 1.69e-3/3.93e-3, 8.4e-6/1.07e-5, 5.5e-7/6.0e-7). Reads when detach dsave_step6_and_ttx16
       ends: step6_readout.py, lr_centre_readout.py --test tmpl2.'
+  - at: '2026-11-13T10:15:08+00:00'
+    text: '2026-11-13 ~12:05: step 6 divergences so far: W arm (WSD parent + WSD fine-tune) trial hp 430 at D=3162 (also failed
+      in the record, same draw) and trial hp 446 at D=316 (FA-lxplus-f87fe06d, lr_scale 1.81, diverged at step 3883/7840 under
+      the WSD plateau; its record twin under cosine reached 6.96e-5). Listed apart per D398; the step-6 read reports W-arm
+      divergences against R and C.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
