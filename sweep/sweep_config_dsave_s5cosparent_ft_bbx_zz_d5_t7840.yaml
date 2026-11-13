@@ -9,7 +9,7 @@ cluster:
   time: 00:16:00
 paths: null
 sweep_name: dsave_s5cosparent_ft_bbx_zz_d5_t7840
-base_config: /dsave_parent_heldoutbbzz
+base_config: ${PROJECT_DIR}/runs/data_saving/dsave_parent_heldoutbbzz
 n_trials: 8
 dyhpo:
   surrogate: gp
@@ -38,7 +38,7 @@ fixed_params:
   plot: 'true'
   warm_start_idx: 'null'
   training.lr: 0.006968
-  fine_tune.pretrained_path: /dsave_parent_heldoutbbzz/models/model_run0_best.pt
+  fine_tune.pretrained_path: ${PROJECT_DIR}/runs/data_saving/dsave_parent_heldoutbbzz/models/model_run0_best.pt
   fine_tune.target_stats: own
   fine_tune.offshell_stats: parent
   fine_tune.layer_decay: 1.0
