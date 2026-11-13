@@ -32626,7 +32626,7 @@ entries:
     decision: D445
   owner:
     agent: a34e6d2a7f0b1339b
-    state: working
+    state: closed
     since: '2026-11-13T05:16:17+00:00'
     state_at: '2026-11-13T07:01:06.042000+00:00'
     context: 229686
@@ -32789,28 +32789,31 @@ entries:
     start: '2026-11-13T06:49:01+00:00'
     at: '2026-11-13T06:49:01+00:00'
   handoff:
-    state: 'Sec. 2 written and revised to Joaquin''s 2026-11-13 comments (draft 23de6d4): old-setup 4-panel figure, per-curve
-      fits L=A D^-a+L_inf, S at the lowest of 1e-4/1e-3/1e-2 both fits reach in D<=1e4 (Zggg 11.3 @1e-2, ddg 5.5 @1e-2, e
-      nu 5.1 @1e-3, bb one loop 5.6 @1e-4), MSE->relative error (1e-4: 1.0% rms, 0.7% median; 1e-3: 3.2/2.1; 1e-2: 10/6.8),
-      m_b=4.7 GeV; its representative-examples slot waits on 23 reruns now on lxplus. Sec. 4 done: redrawn ladder figures
-      (D434), finale renamed every-structure, caption/lead fixed (draft 5f4dc23, 22fac9d). Co-authors'' held slots removed
-      (sections untouched). KIT slot: threshold scan out (17b03ca). Secs. 3 and 5 belong to optimizations_recap and kit_benchmark
-      owners (coordinator). Draft builds only with /mnt/c/texlive/2025/bin/windows/pdflatex.exe (local pdflatex lacks dsfont);
-      the draft repo has no remote and is shared: before committing paper.tex check every diff hunk is in your sections.'
-    decisions: 'D433/D441/D438 (old-setup figure, per-curve fits, bb D=10 left out); Joaquin 2026-11-13: co-authors'' sections
-      untouched; skip bbZZ/tt in Sec. 2; 1e-3 where possible; legend strip on top; ''own power law'' dropped; fine-tune protocol
-      = short 5-trial searches then fixed configuration, tuned where needed (fixed in draft Secs. 2/4 and results.tex, FA
-      00785a07); threshold scan not in the draft for now. D444: representative examples (design passed 03:21: rerun the 24
-      pruned cells from their configs, 23 runs + the existing tp3_finfte_uubar_Zggg_d8 trial_0096 rerun).'
-    ruled_out: Re-evaluating the cells' checkpoints (pruned); analysis/transfer/delta_data (Delta only, D=1e4 only, no truth/pred);
-      Jean Zay for the reruns (sync push and bundle timed out twice; its checkout is 8fb002e, 2026-10-15).
-    running: '23 reruns on lxplus (scripts/job_rerun_trial.sh, FA-lxplus-9f778f21 + 22, ids in plan run list; step 1 waits
-      on them); per-event preds land in lxplus $SCRATCH/zz_delta/<sweep>__<trial>_rerun/preds_val.npz and the run''s result.json;
-      the Zggg d8 ft one is on CC $SCRATCH/zz_delta/tp3_finfte_uubar_Zggg_d8__trial_0096_rerun. The 23 cancelled CC copies
-      (FA-ccin2p3-*) are still recorded as runs and may raise CANCELLED events: ack them as moved. Repo-reviewer (agent a0235a571b0f6ef08)
-      holds its lock with findings 1-2 for other owners (sweep template scheduler, ft_constraint end-val) routed to the main
-      session.'
-    files: ~/drafts/fm_amplitudes_2026-11/paper.tex; analysis/data_saving/old_setup_examples.py; analysis/data_saving/example_cells.py
-      + data/example_cells.json (cell -> sweep/hp); analysis/data_saving/pool_mass.py; analysis/transfer/finale_synth_scaling.py
-      --paper; scratchpad rerun_args.txt/ids_lx.txt
-    written: '2026-11-13T05:10:23+00:00'
+    state: 'Joaquin''s 06:13 comments (scratchpad joaquin_draft_comments_0613.txt) and CLAUDE.md 5ac00c1e addressed in part.
+      Done: Sec. 5 back to its slots and KIT lines out of the abstract/outlook (draft b215b60); new title, abstract, introduction
+      and outlook in the papers'' style (13459f1); Sec. 2 bootstrap stated plainly, caption shortened, eq labels (13459f1);
+      Sec. 4 rewritten after a fresh review (review text: scratchpad sec4_review_1.txt) with no numbers no figure shows and
+      no history, synthetic generator moved to App. B, training details as facts, W+W- aside dropped (7801404). NOT done:
+      (1) Sec. 2 examples slot: figures from analysis/data_saving/example_reruns.py (FA, plot: example_delta_{a-d} |Delta|
+      histograms log x, example_dist_{a-d} true/pred with quarter-height ratio inset, example_legend strip; colour=arm, line
+      style=D) once the last 5 reruns land: run ''collect'' then ''plot'', copy the pngs/pdfs to draft figs/pretrain/, replace
+      the \slot in Sec. 2 with the two figures (legend strip on top, \widerow pairs of \pnl like Sec. 4) and a short words-only
+      paragraph; flag in the caption any cell outside 2x after its repeat. (2) Sec. 4 figure panel labels still carry codes
+      (r1 vs r0, best r1~r9, (+2), ''rung 0 vs 1'', lr/EMA axes; Figs 15/16 in-panel labels; heatmap narrow): regenerate from
+      analysis/transfer scripts or leave and say so. (3) A fresh reviewer (general-purpose; give it CLAUDE.md, the comments
+      file, scratchpad refpapers/*.pdf) must pass Sec. 2, Sec. 4 (re-check) and the front matter before pages go to Joaquin;
+      then hand back draft_sec2_pages.pdf, draft_sec4_pages.pdf, draft_abstract_outlook_pages.pdf. Reproduction so far: 18
+      of 24 cells read, all within 2x except one-loop bb D=1e4 scratch (4.88x, repeat FA-lxplus-53ebf389 running); e nu D=1e3
+      scratch 1.98x, bb D=1e2 fine-tune 1.82x.'
+    decisions: 'Sec. 5 reverted per Joaquin (''why did you even waste your time making section 5''); 5ac00c1e: a held result
+      holds its section, so the intro no longer lists Sec. 5. Examples drawn as the papers do (2411.00446 Fig. 6: small ratio
+      panel, plain process names); Delta as |Delta| on a log axis so the three D read on one panel (the reviewer may ask for
+      linear Delta). Design''s one repeat of a >2x rerun via job_rerun_trial.sh third argument (FA f0ea79ad).'
+    ruled_out: symlog Delta axis (two-peaked, unreadable); full-height ratio panel (Joaquin).
+    running: FA-lxplus-2a1aa003 (ddg D=1e4 ft), 842454d3, 8c739a3a, 611aa1ec (e nu / bb fine-tunes), 53ebf389 (bb D=1e4 scratch
+      repeat, into trial_0154_rerun2); 4b765eb0, a18ab984, 6b02daa7 done; step 1 waits on them
+    files: '~/drafts/fm_amplitudes_2026-11/paper.tex (commit only your sections: other owners edit it uncommitted; build with
+      -jobname=own_<id> and /mnt/c/texlive/2025/bin/windows/pdflatex.exe + bibtex.exe); analysis/data_saving/example_reruns.py;
+      analysis/data_saving/data/example_cells.json; scripts/job_rerun_trial.sh; scratchpad sec4_review_1.txt, joaquin_draft_comments_0613.txt,
+      refpapers/'
+    written: '2026-11-13T07:08:00+00:00'
