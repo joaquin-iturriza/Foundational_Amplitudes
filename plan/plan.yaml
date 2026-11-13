@@ -26951,12 +26951,10 @@ entries:
     answered_at: '2026-11-13T06:55:37.985000+00:00'
     decision: D451
   owner:
-    agent: a14a677afceccea59
-    state: closed
-    since: '2026-11-13T06:48:36+00:00'
-    state_at: '2026-11-13T07:00:46.764000+00:00'
-    context: 84317
-    context_at: '2026-11-13T06:51:01+00:00'
+    agent: aaecb8d54f4939e0d
+    state: working
+    since: '2026-11-13T07:29:24+00:00'
+    state_at: '2026-11-13T07:29:24+00:00'
   designs:
   - at: '2026-11-10T02:27:57+00:00'
     question: 'Step pidqn (D364: ''I''d like to see the claim that pIDs and quantum numbers behave the same be tested again
