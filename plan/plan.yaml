@@ -33062,6 +33062,14 @@ entries:
       2.14 x standardized residual. The bad events (|ln r|>1: 899, 1142, 234, 57 of 10000/5000) have standardized residual
       ~1.2-1.9 and sigma ~0.9-3.0 against 1e-4 on the rest: the het network leaves them unfitted under a large sigma. Sec.
       3.6 text (draft) states both metrics: median |Delta| better in 118/146, MSE higher in 103/146.'
+  - at: '2026-11-13T11:09:16+00:00'
+    text: '2026-11-13 ~12:10 state for the main session: open questions to Joaquin: (1) Sec. 3.6 text was overtaken by his
+      ''remove this plot from the draft'' (Fig. 9 out; het-vs-MSE kept as a come-back step); (2) step-6 WSD-parent D subset
+      (3 vs 7) is moot now that step 6 answered no (branch d). Promised to Joaquin and not yet done: send the recompiled draft
+      without Fig. 9 (draft owner aaae6521 doing it); send the step-6 figures (pretrain_data_saving owner a6bd7d61 drawing
+      them); resend the three KIT asym figures whose upload failed (kit_mse_A_asym_ee_uug_me2_a, kit_mse_A_asym_ee_uugg_me2_a,
+      kit_curves_nll_A_asym_a) when he asks. Rules added today to CLAUDE.md: d2f6f84a, f5abb4ea, 5ac00c1e, d59291f8, e4d45f77,
+      db1ee05c; claudemd-keeper review blocked with fixes pending (agent a73302b3).'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
