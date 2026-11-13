@@ -31635,6 +31635,25 @@ entries:
       then the reduced-kinematics coefficient (one LLoCa forward per dipole''s mapped event). A blow-up: listed with where,
       the repair lr x0.3 in the same arm (a NO from it is not read). Curve form (kit_curves separation/end_up) reported beside
       every verdict.'
+    passed_at: '2026-11-13T01:18:27+00:00'
+    reviewer: 'Step 18 asymptotic-factor arms. (1) A1 = control + model.input_asym_factor only: uug 203a274f and tt 3fc1016a
+      logs show the same job_kit.sh A args (softpair/softpairthr, plain target on uug, lr 0.0118605, 8000 steps, seed 42);
+      cosine kept despite the WSD default commit 8d120a3d because the parent trial-1262 config.yaml sets scheduler: CosineAnnealingLR;
+      uugg plain control is new and matched. A2 bundles no log inputs + gamma<=4, stated as the continuity conditions and
+      isolated against A1. (2) Same kind of change (analytic log terms added to mu, step 13) moved uug deepest soft signed
+      error -8.40 -> -2.10 and log-MSE 241 -> 4.48, coll +0.81 -> -0.94; test_asym_factor passes locally (gap 3.9e-5, slopes
+      -1.0002 log y, -1.9946 log x). (3) One seed under D315; FIXED/MOVED are absolute against truth or need halving from
+      -8.4/+0.81/-1.87 levels, far above the 0.3 MLP band; caveat: the bulk 0.5-decade band sits inside the transformer rerun
+      spread in results.tex ~13232 (1.1x-30x in loss), so a bulk verdict should quote it. (4) FIXED/MOVED/STAYED and YES/PARTIAL/NO
+      each with consequences. (5) Searched results.tex for dipole, Catani, Maitre, antenna, ansatz, asymptotic, eikonal, Sommerfeld/1/beta,
+      physics factor, factor out, gamma cap, div_form, KIT; plan dead ends (target x eikonal, seeds); site decisions D411-D437:
+      prior covers par:v4_dipole, ~8243, step 13/14, gmax4, eikonal dead end; propagator subtraction (~12995) is a catalog-level
+      target factor, not this question. (6,7) D436 approves log A + g now at current HPs; D435 no MLP branch (MLP only as
+      existing reference); D419: full LLoCa in A1, gamma cap already tested under D419. (8) no labels in inputs; loop gating
+      reads amp_orders L_QCD. (9) HETEROSC. (10) KIT hard_test strata and bulk_test, as every KIT arm. (11) plain target is
+      part of the factor model; tt keeps its control''s. (12) stated. (13) no sweep. (14) ~75 MB/run, memmap off. (15) rates
+      from the controls at same batch/pool/float64; result.json curves set by job_kit.sh; D395 smokes on uugg A2 and tt A1
+      through scoring.)'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
