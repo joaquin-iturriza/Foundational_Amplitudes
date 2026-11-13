@@ -32651,6 +32651,12 @@ entries:
   - at: '2026-11-13T05:09:52+00:00'
     text: 'Coordinator 2026-11-13: Sec. 3 is written by optimizations_recap''s owner and Sec. 5 by kit_benchmark''s owner,
       in parallel; this entry keeps Sec. 2, Sec. 4 and the abstract/outlook. Sec. 4 done (draft 5f4dc23, 22fac9d).'
+  - at: '2026-11-13T05:26:42+00:00'
+    text: '2026-11-13 06:25: abstract, introduction and outlook filled from Sec. 2 (draft 501251a): 5 to 11x fewer target
+      events at tree level at MSE 1e-3 to 1e-2, 5.6x at one loop at 1e-4 (only bb one loop reaches 1e-4 in both fits, so the
+      1e-4-only framing was replaced); abstract KIT sentence from Sec. 5 as written (4a86295). First 6 example reruns reproduce
+      their records within 2x (rerun/recorded MSE of log|M|^2 0.78-1.65; analysis/data_saving/example_reruns.py at 9534d54a).
+      job_rerun_trial.sh prints RUN_DONE after a clean eval (FA 830a1ec6).'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
