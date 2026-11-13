@@ -131,7 +131,8 @@ def write(name, tgt, k, T, arm, rate, parent, lr_factor=1.0, offshell="parent", 
         space = [{"name": "training.batchsize", "type": "int_log", "low": max(4, round(d_of(k) / 64)),
                   "high": int(d_of(k) // 2)}] + space
     hours = T * rate / 3600 + OVERHEAD_H
-    cfg = {"cluster": {"scheduler": "slurm", "auto_submit": False, "request_gpus": 1, "mem": "32G",
+    # 11G: dsave trials peak <= 1.8 GB RSS; 32G became 11 CPUs on lxplus, which its V100 nodes never offer (E6895)
+    cfg = {"cluster": {"scheduler": "slurm", "auto_submit": False, "request_gpus": 1, "mem": "11G",
                        "cpus_per_task": 4,
                        # the estimate itself: sweep/drive.py applies the one margin (1.5x + 6 min)
                        "time": "%02d:%02d:00" % divmod(max(1, int(round(hours * 60))), 60)},
