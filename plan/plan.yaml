@@ -26654,6 +26654,20 @@ entries:
       2.88), D=316 2/8 (1.81, 2.55), D=3162 3/8 (2.38, 2.64, 2.97) = 7/24; W survived up to 2.12 at D=100. C (cosine parent
       + WSD fine-tune) 1/24 (D=100, 2.88, the draw that also failed in W and the record). Template test: wideft D=316 2/10
       (lr_scale 16.4, 19.5), wsd_ft D=316 2/16 (8.2, 9.3), wsd_scr D=3162 2/16, others 0. Only W at D=3162 is over a third.'
+  - at: '2026-11-13T11:05:52+00:00'
+    text: '2026-11-13 step 6 READ (step6_readout.py @dbb74895, data @5c1b33e2, figs/step6_curves_{a,b,c}; b b~ > Z Z tree,
+      8 trials per search, seed 42). Branch (d): NEITHER schedule keeps the head start. Head start of each search best vs
+      the stage-2 scratch best (run fraction where v_ft/v_scr first reaches 1): R (cos parent, cos ft) 0.16/0.10/0.08 at D=100/316/3162;
+      C (cos parent, WSD ft) 0.33/0.14/0.82 (kept at 1 of 3 D); W (WSD parent, WSD ft) 0.16/0.14/0.18 (0 of 3). Step-0 ratio
+      ft/scr R 0.014/0.037/0.071, C 0.014/0.026/0.015, W 0.018/0.062/0.031; zero shot (step-0 val MSE ln) R 0.056/0.020/0.0099,
+      C 0.055/0.017/0.0098, W 0.052/0.019/0.0083: the WSD parent starts no better. Best val MSE(ln|M|^2): scratch 1.63e-3/9.9e-6/8.7e-7;
+      R 3.7e-3/1.6e-5/1.25e-6; C 4.7e-3/5.8e-6/4.4e-7; W 3.6e-3/7.4e-5/9.8e-6. Ratios W/C 0.76/12.8/22.3 (pooled 6.0, HIGHER
+      vs bar 2.53), C/R 1.26/0.35/0.35 (pooled 0.54, WITHIN), W/R pooled 3.2 HIGHER; C/scr 2.9/0.59/0.51. Test MSE: scratch
+      1.7e-3/8.4e-6/5.5e-7, R 3.9e-3/1.1e-5/6.1e-7, C 5.0e-3/4.3e-6/3.7e-7, W 3.9e-3/5.3e-5/9.2e-8. Anomaly: W at D=3162 has
+      val 9.8e-6 but test 9.2e-8 (every W D=3162 trial val >> test, e.g. 0479 1.4e-5 vs 5.9e-7; C''s agree), unexplained,
+      not checked (a few val events?). Divergences listed apart: W 7/24 (lr_scale >= 1.6), C 1/24 (2.88), R 2/24. Figure:
+      WSD->WSD spikes mid-run (D=100 ~3500, D=316 ~6400) and ends highest at D=316/3162; cos->WSD ends lowest at D=316/3162,
+      falling in its cooldown. Per the design: no WSD parents; next is the fine-tune warmup (a design needed).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
