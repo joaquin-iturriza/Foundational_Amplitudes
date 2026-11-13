@@ -21405,11 +21405,6 @@ entries:
   - D420
   - D441
   next:
-    5: 'Template test at 16 trials (design PASS 19:2x, D426/D427/D429): 4 WSD-only searches t t~ LO D=316, 3162 scr/ft extended
-      8->16 (relaunch drive.py --n-trials 16 --wave-sizes 3,3,2,4,4 on the 4 dsave_wsd configs when detach tmpl2_wsd2 ends;
-      the withdrawn batch-searching dsave_tmpl2_* run to 8 in that driver, not read), 2 wide fine-tune searches dsave_wideft_ft
-      (lr_scale [0.03,30], layer_decay [0.5,1]) at 16, detach wideft16; read lr_centre_readout.py --test tmpl2 (A: 16 vs first
-      8; B: wide vs WSD; C: WSD first 8 vs stage 2), curves figure, report'
     7: 'Step 6 warmup test running (design PASS 2026-11-13 ~12:20, configs @a85a7210, reader @20260f1c): arm L dsave_s6cosparentlongwu_ft_bbx_zz_d{4,5,7}
       (cosine parent, WSD fine-tune, warmup [0.05,0.6]) vs C, 8 trials each, detach dsave_s6_longwarmup (drive.py, 6.0 GPU-h,
       target 0.65 h / 9 jobs). Read: step6_readout.py (uncached), branches a-d of the design (lag = lost_at - own warmup >
@@ -25758,7 +25753,6 @@ entries:
       decisions --all. Checks 9-15 as before: HETEROSC mu_mse, same recipe/pools as C, 6.0 GPU-h, ~1.1 h, 75 MB/search vs
       63 GB free, rate from C''s own trials.'
   step_waits:
-    '5': 'detach dsave_step6_and_ttx16 (pid 807668): template-test driver relaunched at 11G'
     '7': detach dsave_s6_longwarmup (drive.py pid 1348472; its DONE event)
   findings:
   - at: '2026-11-10T03:35:22+00:00'
@@ -27103,12 +27097,6 @@ entries:
       step6_best'
     written: '2026-11-13T11:08:52+00:00'
   step_why:
-    5:
-      feeds: 'the template for the remaining cells: trial count and fine-tune ranges (D422, D427)'
-      if:
-      - 'A LOWER or best good at 16: 16 trials into the template, cost to Joaquin'
-      - 'B LOWER: wide ranges into the template'
-      - 'NO/within: reported, nothing more run'
     7:
       feeds: the fine-tune template's warmup range (D414)
       if:
