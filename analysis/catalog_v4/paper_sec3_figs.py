@@ -109,25 +109,30 @@ def examples():
     keys = sorted((p for p in mu if f"PP4:{p}" in h["muon"] and f"PP4:{p}" in h["adamw"]), key=lambda p: mu[p])
     pick = [keys[int(q * (len(keys) - 1))] for q in (0.1, 0.5, 0.9)]
     figs = ps.panels(3, width="half")
+    REB = 4                              # the records' bins merged by four: the ratio is otherwise counting noise
+    def rebin(e, c):
+        n = (len(c) // REB) * REB
+        return e[:n + 1:REB], np.add.reduceat(np.asarray(c[:n], float), np.arange(0, n, REB))
     for (fig, ax), p in zip(figs, pick):
         r = hist_ratio(ax)
-        tr = h["muon"][f"PP4:{p}"]
-        e = np.array(tr["edges"])
-        ax.stairs(np.array(tr["truth"], float), e, color="k", label="truth")
+        lo, hi = np.inf, -np.inf
         for k in ("muon", "adamw"):     # each run's record bins truth and prediction on its own edges
             rec = h[k][f"PP4:{p}"]
-            ek, t, q = np.array(rec["edges"]), np.array(rec["truth"], float), np.array(rec["pred"], float)
+            ek, t = rebin(np.array(rec["edges"]), rec["truth"])
+            _, q = rebin(np.array(rec["edges"]), rec["pred"])
+            if k == "muon":
+                ax.stairs(t, ek, color="k", label="truth")
             ax.stairs(q, ek, color=col[k], label=lab[k])
             with np.errstate(divide="ignore", invalid="ignore"):
-                r.stairs(np.where(t >= 10, q / t, np.nan), ek, color=col[k])   # bins with >= 10 true events: the rest is counting noise
+                r.stairs(np.where(t >= 10, q / t, np.nan), ek, color=col[k])
+            lo, hi = min(lo, ek[0]), max(hi, ek[-1])
         r.axhline(1, color="k", lw=0.8)
         r.set_ylim(0.5, 1.5); r.set_yticks([0.5, 1, 1.5]); r.set_yticklabels(["0.5", "1", "1.5"])
-        ax.set_xlim(e[0], e[-1])
+        ax.set_xlim(lo, hi)
         ax.set_yscale("log"); ax.set_ylabel("events")
-        r.set_xlabel(r"$\log|\mathcal{M}|^2$"); r.set_ylabel(r"$\frac{\rm model}{\rm truth}$")
+        r.set_xlabel(r"$\log|\mathcal{M}|^2$"); r.set_ylabel("ratio")
         ps.process_label(ax, ml.process_tex(p))
         ps.legend(ax, "upper left")
-        print("  example", p, {k: f"{m.read_of(run, 'PP4')[p]:.3g}" for k, run in ml.RUNS.items()})
     ps.save_panels(figs, os.path.join(FIGS, "paper_muon_examples"))
 
 
@@ -151,6 +156,8 @@ def ft():
         sc = sorted((r for r in d if r["kind"] == "scratch" and r["probe"] == p), key=lambda r: r["D"])
         ax.plot([r["D"] for r in sc], [r["mse_log"] for r in sc], "s--", color=ps.C.grey, label="scratch")
         ax.set_xscale("log"); ax.set_yscale("log")
+        ys = [l.get_ydata() for l in ax.lines]
+        ax.set_ylim(0.7 * min(np.min(y) for y in ys), 1.4 * max(np.max(y) for y in ys))
         ax.set_xlabel(r"training events $D$"); ax.set_ylabel(MSE_LAB)
         ps.process_label(ax, name)
     ps.shared_legend(fig, axs.flat[0], ncol=3)
@@ -184,10 +191,10 @@ def target():
     res = json.load(open(os.path.join(ROOT, "analysis", "catalog_v3", "data", "short_reads.json")))
     extra = ("H2p5", "H7E")
     groups = []
-    for grp, lab in ((False, "in range"), (True, r"$2\to5$, $1$-$10$ TeV")):
+    for grp, lab in ((None, "in range"), ("H2p5", r"$2\to5$"), ("H7E", r"$1$-$10$ TeV")):
         xs, ys = [], []
         for a in res["baseline"]:
-            if (a in extra) != grp or a not in res["dimensionless"]:
+            if (a if a in extra else None) != grp or a not in res["dimensionless"]:
                 continue
             px, py = res["baseline"][a].get("probes", {}), res["dimensionless"][a].get("probes", {})
             for p in sorted(set(px) & set(py)):
