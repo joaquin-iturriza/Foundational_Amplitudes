@@ -21617,9 +21617,9 @@ entries:
     decision: D441
   owner:
     agent: a75868725fdec3ff2
-    state: working
+    state: stopped
     since: '2026-11-13T01:20:06+00:00'
-    state_at: '2026-11-13T07:01:11.060000+00:00'
+    state_at: '2026-11-13T07:04:17.477000+00:00'
     context: 237871
     context_at: '2026-11-13T07:11:15+00:00'
   designs:
