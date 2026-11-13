@@ -32642,9 +32642,10 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-4fa87893
-    commit: 723c6550
+    commit: 68f1cb9e
     paths:
     - /home/joaquin/drafts/fm_amplitudes_2026-11/paper.tex
+    - /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_sec2_pages.pdf
     - analysis/data_saving/data/example_cells.json
     - analysis/data_saving/example_reruns.py
     - analysis/data_saving/figs/example_delta_a.png
