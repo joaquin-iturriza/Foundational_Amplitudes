@@ -28664,7 +28664,9 @@ entries:
     '17': FA-ccin2p3-01f55e9b FA-ccin2p3-7d7a578c FA-ccin2p3-8a37b9c4 FA-ccin2p3-af3782ce FA-ccin2p3-c479cc9b FA-ccin2p3-16720e29
       FA-ccin2p3-00da227f FA-ccin2p3-0ea05984 FA-ccin2p3-7613b88a FA-ccin2p3-bcf0d7e0 FA-ccin2p3-7d8335d3 FA-ccin2p3-4bd3f9ed
       FA-ccin2p3-dfe44ce0 FA-lxplus-66cc5b76
-    '19': kit_hpo driver DONE event (chosen HPs); literature agent's findings for (a)
+    '19': FA-ccin2p3-01f55e9b FA-ccin2p3-7d7a578c FA-ccin2p3-8a37b9c4 FA-ccin2p3-af3782ce FA-ccin2p3-c479cc9b FA-ccin2p3-16720e29
+      FA-ccin2p3-00da227f FA-ccin2p3-0ea05984 FA-ccin2p3-7613b88a FA-ccin2p3-bcf0d7e0 FA-ccin2p3-7d8335d3 FA-ccin2p3-4bd3f9ed
+      FA-ccin2p3-dfe44ce0 FA-lxplus-66cc5b76
     '20': '2026-11-14'
     '21': 'kit_hpo searches (driver pid 802223): read with kit_curves sweep when DRIVE_DONE'
   handoff:
