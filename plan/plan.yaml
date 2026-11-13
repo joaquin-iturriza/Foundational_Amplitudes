@@ -26903,11 +26903,12 @@ entries:
     - FA-ccin2p3-65103811
     - FA-ccin2p3-882757e3
     - FA-ccin2p3-f08e90e8
-    commit: b895f6ca
+    commit: 78d79e76
     paths:
     - analysis/catalog_v4/data/muon_long.json
     - analysis/catalog_v4/data/pidqn.json
     - analysis/catalog_v4/muon_long.py
+    - analysis/catalog_v4/paper_sec3_figs.py
     - analysis/catalog_v4/plot_pidqn.py
     - data_mmap.py
     - docs/results.tex
