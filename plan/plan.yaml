@@ -25499,6 +25499,37 @@ entries:
       for the data-saving grid (step feeds), cost to Joaquin; W LOST and C LOST -> the fine-tune warmup is next (reported,
       not run without a design); W LOST but HELPS on (1) -> reported with numbers, nothing more run. Diverged trials listed
       apart (D398).'
+    fix_at: '2026-11-13T01:48:00+00:00'
+    fix: '(A) Configs cannot run (check 15): the six s5 configs @e8af4032 carry base_config ''/dsave_parent_heldoutbbzz''
+      (C) and ''/dsave_parent_heldoutbbzz_wsd'' (W), and fine_tune.pretrained_path ''/dsave_parent_heldoutbbzz[_wsd]/models/model_run0_best.pt'';
+      the record (sweep_config_dsave_s2_ft_bbx_zz_d5_t7840.yaml) has ''${PROJECT_DIR}/runs/data_saving/dsave_parent_heldoutbbzz''.
+      The prefix was lost when --parent-lo was passed; every trial would fail at the base config or raise FileNotFoundError
+      (base_experiment.py:1616). Regenerate with --parent-lo ''${PROJECT_DIR}/runs/data_saving/dsave_parent_heldoutbbzz[_wsd]''
+      (single quotes), diff each against its s2 twin (only sweep_name, parent path, scheduler, wsd_cooldown_frac may differ),
+      and show a CPU dry run on CC of one C trial that loads the parent. (B) The W parent changes a second knob (checks 1,
+      11, 12): the cosine parent FA-ccin2p3-0d698e4b''s config.yaml carries model.input_soft_eps 1e-8 and model.input_pair_logs
+      6 (lines 5892-5893, read on CC), passed as ++ arguments because trial 1262''s base config predates the keys (scripts/job_datasaving_parent.sh
+      header). The design''s W command (heldoutbbzz ++training.scheduler=WSD ++training.wsd_cooldown_frac=0.125 tag=wsd) omits
+      them, so W would train without the input flags. Add ++model.input_soft_eps=1e-8 ++model.input_pair_logs=6 and state
+      that W''s config.yaml will be diffed against the cosine parent''s (only scheduler and wsd_cooldown_frac differ) before
+      the fine-tunes go. (C) Prior work missed (check 5): the 2026-11-12 suspects test (analysis/data_saving/suspects_readout.py,
+      data/suspects_readout.json) ran a WSD fine-tune arm from the cosine parent against the cosine fine-tune on e+e- > t
+      t~ at fixed HPs: R(WSD/control) val 0.73, 5.2, 19.9, 8.7 at D=316, 1e3, 3162, 1e4 (test 0.49, 1.5, 0.35, 45). That is
+      the C/R question on another target; the prior field must cite it with its numbers and say what bbZZ with searched HPs
+      adds. (Searched: results.tex ''WSD'', ''warm start''; plan show entry ''WSD'', ''suspect''; site decisions D414, D422,
+      D423.) (D) Outcome rule incomplete (check 4): no branch for C KEPT with W LOST (the fine-tune schedule alone would then
+      be the fix, from the existing parents) and none for W and C both KEPT with W/C NO PARENT EFFECT (then ''W KEPT -> WSD
+      parents for the grid'' would retrain parents for no parent effect). Make the parent-retraining decision require (1)
+      HELPS, and add the C-only branch. Also state that C''s warmup is identical to R''s (WSD and cosine share warmup and
+      peak; ft_constraint.json: head start lost at 0.16/0.10/0.08 of the run against warmup fractions 0.067/0.144/0.106 at
+      D=100/316/3162), so C''s head-start read is not expected to move and C serves as W''s control and for best val only.
+      (E) Expected effect against the bar (check 3): the only parent-schedule best-val analog, par:v4_warm_start_fixes'' WSD
+      final at the default restart, is PP4 0.759 / EE4 0.832 (about 1.2-1.3x), under the 2.53 pooled bar, so read (1) will
+      most likely say NO PARENT EFFECT whatever happens. State the expected W/C effect and, if the decision rests on the head-start
+      read (3), give its spread across the record''s trials (e.g. from ft_constraint.json''s per-trial warmup rises) so KEPT/LOST
+      is decided above noise. Also state disk per job and CC free disk (66 GB on /sps/lpnhe now) (check 14). Passed as is:
+      HETEROSC (check 9), matched space/DyHPO seed/8 trials 3,3,2 as the record (checks 12, 13), step rates from the cosine
+      twin (1.02 s/iter) and the record''s trials, test events the record''s pools (check 10).'
   step_waits:
     '5': detach ttx16_repick (drive.py, 4 WSD + 2 wide t t~ tree searches to 16 trials, CC/lxplus)
     '6': a reviewer
