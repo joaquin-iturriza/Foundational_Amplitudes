@@ -25743,6 +25743,17 @@ entries:
       lost'' branch). (d) val HIGHER -> the long warmup hurts (as the ramp''s every-group arm): reported, template unchanged.
       Beside each: per-trial lag against warmup in L, the paired start-up trials, L/scratch per D. Diverged trials listed
       apart (D398).'
+    passed_at: '2026-11-13T11:24:09+00:00'
+    reviewer: 'Re-check after FIX. Configs @a85a7210 differ from arm C''s only in sweep_name and warmup high 0.2->0.6, same
+      DyHPO seed, uniform warmup so start-up draws pair. Check 2: step6_readout.json @20260f1c share of trials with head start
+      kept >0.25 past own warmup end R 0.06 (n16), C 0.28 (n18), W 0.08 (n13); C best lag>0.25 at 2 of 3 D, R/W 0; lag is
+      relative to each trial''s warmup so a long warmup cannot read KEPT by construction. Check 3: 8 trials per search as
+      C and D439; HOLDS needs share >= 0.56 (about 3 binomial sd above C''s 0.28 at n~24); val bar 2.53 from the 5x search-to-search
+      spread. Check 4: every result maps to one of (a)-(d), the warm_start-like result explicitly (c). Check 5: prior now
+      cites par:v4_warm_start_repairs/_ramp (every group 1.24/1.62, Muon 1.03/1.05, AdamW 1.02/1.01) and says what differs;
+      searched warmup, damped, ramp, muon_warmup, adamw_warmup, fine-tune warmup, long warmup in results.tex, plan.yaml, site
+      decisions --all. Checks 9-15 as before: HETEROSC mu_mse, same recipe/pools as C, 6.0 GPU-h, ~1.1 h, 75 MB/search vs
+      63 GB free, rate from C''s own trials.'
   step_waits:
     '5': 'detach dsave_step6_and_ttx16 (pid 807668): template-test driver relaunched at 11G'
     '6': the design reviewer (warmup test design 2026-11-13T11:19)
