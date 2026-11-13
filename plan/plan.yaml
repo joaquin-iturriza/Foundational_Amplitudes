@@ -32615,6 +32615,7 @@ entries:
       FA-ccin2p3-867d2d8b FA-ccin2p3-0134adeb FA-ccin2p3-f470a13e FA-ccin2p3-71d1701a FA-ccin2p3-49241829 FA-ccin2p3-5ce6fcd6
       FA-ccin2p3-5b7c4991 FA-ccin2p3-b22269c6 FA-ccin2p3-391452f0 FA-ccin2p3-89c45c5a FA-ccin2p3-f4813cec '
     '5': steps 1-4 (Secs. 2-5 written)
+    '2': 'the main session''s resume: its brief says hand back after Sec. 2 and continue section by section on resume'
   findings:
   - at: '2026-11-13T02:46:58+00:00'
     text: '2026-11-13 ~03:50 Joaquin: ''we should start actually doing the work on the draft with what we have ... Let''s
