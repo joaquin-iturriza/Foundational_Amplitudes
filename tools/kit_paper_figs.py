@@ -164,6 +164,16 @@ def dotrows(ax, rows, ps):
     ax.set_xscale("log")
 
 
+def save_rows(figs, base, ps):
+    """ps.save, then the pdf again with a tight box: the pdf backend sets the long row labels wider than the
+    layout measured and the fixed canvas cut them on the left (seen in the draft); the plot box is unchanged"""
+    figs = figs if isinstance(figs, list) else [(figs, None)]
+    for i, (fig, _) in enumerate(figs):
+        b = base if len(figs) == 1 else f"{base}_{'abcdefgh'[i]}"
+        ps.save(fig, b)
+        fig.savefig(b + ".pdf", bbox_inches="tight", pad_inches=0.02)
+
+
 def plot(figs):
     import plot_style as ps
     ps.use()
@@ -188,7 +198,7 @@ def plot(figs):
         dotrows(ax, rows, ps)
         ax.set_xlabel(xl)
         ps.legend_strip(ax, os.path.join(figs, "kit_bench_legend"), ncol=3) if key == "logmse" else None   # a corner box covers the rows
-    ps.save_panels(panels, os.path.join(figs, "kit_bench"))
+    save_rows(panels, os.path.join(figs, "kit_bench"), ps)
 
     # 2. protocols at 9e5: deepest-bin log-MSE
     fb = fig_runs("B")
@@ -202,7 +212,7 @@ def plot(figs):
     dotrows(ax, rows, ps)
     ax.set_xlabel(r"log-MSE, deepest bin")
     ps.legend_strip(ax, os.path.join(figs, "kit_protocols_legend"), ncol=2)
-    print("FIGURE", ps.save(fig, os.path.join(figs, "kit_protocols")))
+    save_rows(fig, os.path.join(figs, "kit_protocols"), ps)
 
     # 3. extrapolation attempts: per limit, rows best to worst, Bakar's MLP as the last row
     panels = ps.panels(len(LIMITS))
@@ -218,7 +228,7 @@ def plot(figs):
         ax.plot([mv], [-1], "s", color=ps.C.blue, label="MLP (Bakar)")
         ax.set_yticks(range(-1, n), ["MLP (Bakar)"] + [r[0] for r in rows][::-1])
         ax.set_xscale("log"); ax.set_xlabel(xl)
-    ps.save_panels(panels, os.path.join(figs, "kit_attempts"))
+    save_rows(panels, os.path.join(figs, "kit_attempts"), ps)
 
     # 4. representative examples: delta histograms, and true vs predicted distributions with a ratio panel
     ex = json.load(open(os.path.join(DATA, "kit_paper_examples.json")))
