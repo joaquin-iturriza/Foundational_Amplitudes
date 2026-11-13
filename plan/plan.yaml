@@ -28823,6 +28823,23 @@ entries:
       (sep 5.8-101); lowest hp1196 lr 0.00202 val 2.89e-3, train falls to 4e-4 while val stays flat at 3e-3 from step ~800;
       9 of 16 trials and the best at the lr window''s low edge. So: uug plain and tt virtual have chosen HPs; uug T marginal;
       uugg (T, and plain has no search) has none.'
+  - at: '2026-11-13T13:54:41+00:00'
+    text: '2026-11-13 ~15:00 (owner ac14b4077056e4731). Steps 14/17/19/21 batch at the kit_hpo HPs, partial read; tool changes
+      uncommitted (tools/kit_figures.py collect alias + hpo labels, tools/kit_curves.py runs/runsfig, tools/kit_readout.py
+      --verdict): commit blocked by the overdue repo-reviewer backlog, which BLOCKED on three findings in other entries''
+      files (analysis/data_saving/step6_readout.py zero-shot read one interval late; analysis/transfer/het_delta_summary.py
+      msel drops d<=-1; analysis/data_saving/parent_curves.py v<5 cut). Curve check (curve_quality on val/train mu-MSE ->
+      analysis/kit_benchmark/data/kit_curves_hpo_arms.json; figs kit_curves_mse_A_hpo_a..i, _ft_a..f): all 13 arms and both
+      controls good (sep 1.0-2.24, end_up 1.0-1.54); WSD stable phase has 3-30x bumps, 1-2 decades of the drop come in the
+      last ~250 cooldown steps. Arms, deepest-bin log-MSE (KIT bias = mean signed error): uug A2 coll 0.0081, soft 0.0152,
+      exps -1.00/-2.01 (truth -1.00/-2.00), bulk 1.98e-6; uug div-form coll 6.59, soft 65 (exp -0.39/-0.31), bulk 2.7e-5;
+      uug ReZero coll 3.78, soft 0.72 (exp -0.82/-1.83), bulk 1.4e-5. tt A2 Coulomb 0.023 (exp -0.96 vs -1.02, signed -0.15),
+      Sudakov 0.077 (signed +0.16), bulk 1.4e-7; A2+single Coulomb 0.13, Sudakov 0.15 (signed +0.28): STAYED vs A2. tt div-form
+      Coulomb 8.5, Sudakov 0.96; ReZero Sudakov 3.1e6 (blows up there), Coulomb 3.4; scratch softpair Coulomb 7.4, Sudakov
+      0.74; fine-tunes Coulomb 6.8-9.1 (exp ~0), Sudakov 1.6-7.4, ftr5own bulk 4.1e-8 vs scratch 9.1e-8. Controls trial_1918
+      (CC) / trial_0131 (lxplus) not collected yet: need the alias commit. uugg search read (kit_curves sweep -> kit_hpo_uugg_plain.json):
+      4/16 good, chosen hp0798 lr 0.01152, val 2.58e-4, sep 2.72; uugg A2 FA-ccin2p3-6d7e80ac and rescore of trial_0798 FA-ccin2p3-e281e8b1
+      submitted, step 21 waits on them.'
   step_why:
     5:
       feeds: what KIT receives
