@@ -26376,6 +26376,10 @@ entries:
       during warmup; 54% of tree ft trials rise >3x in warmup, Spearman with peak lr +0.50; Muon WD erases the parent at large
       D (E=sum lr*wd 1.9, 4.4 at D=3162, 1e4). V/B: parent starts no better; ft end train lower in 6/7 cells, val 0.25-1.3x;
       both arms val/train ~1e3-1e4 even at D=1e4 (other targets ~1).'
+  - at: '2026-11-13T00:58:11+00:00'
+    text: '2026-11-13 Joaquin: ''this doesn''t answer if wider networks fine tune better, and studying if capacity affects
+      transfer is a bigger task than what we can do tonight, but eventually we want to do this.'' Future study: fine-tune
+      transfer against pretraining width (capacity).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
