@@ -26592,6 +26592,12 @@ entries:
       best val ft/scr, tree: 0.43, 0.53, 2.07, 0.69, 0.55, 1.69, 0.25 (was 1.12, 0.95, 3.24, 0.71, 0.55, 1.03, 0.37 at last
       val). Warmup rise, tree: quartiles 1.67/3.35/8.46, 96% of 50 trials above 1 (was ''54% above 3''); one loop 1.0/1.0/1.01,
       27% of 48. The step-6 design''s prior quoted ''54% >3x''; its decision rule (head-start-lost fraction) is unaffected.'
+  - at: '2026-11-13T07:03:41+00:00'
+    text: '2026-11-13 lxplus idle trials (E6895 cause): dsave configs lowered 32G -> 11G @8fbcbdb8 (6 template-test configs,
+      6 step-6 configs, gen_data_saving.py); dsave trials peak <= 1.8 GB RSS (456 CC trials, sacct since 2026-11-12 12:00).
+      Requeue NOT done: stopping the SIGSTOPped template-test driver (pid 2110766) was refused by the permission classifier,
+      and the driver holds 32G and the trial states in memory, so the 15 idle lxplus trials (FA-lxplus-{e11e5efd,cb0e03ea,43f93d5c,c8909dbd,d2efd3c4,74b4c359,95952429,3766960c,bbb598bf,af1cb90b,e7aa8b90,334edbd5,54a1a781,27d41098,c898cc32})
+      still ask 32G.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
