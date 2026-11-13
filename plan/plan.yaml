@@ -32713,6 +32713,9 @@ entries:
     text: 'Sec. 2 examples filled (draft b55f195) from all 24 reruns (example_reruns.py @723c6550): 23 of 24 within 2x of
       their records (bb one-loop D=1e4 scratch 4.88x then 1.41x on its repeat); u dbar->e nu fine-tune D=1e4 reruns to 1.43e-6
       twice (deterministic) against the recorded 4.65e-6 (0.31x), flagged in the caption. Reviewer on Sec. 2 running.'
+  - at: '2026-11-13T08:11:19+00:00'
+    text: 'Sec. 2 passed a fresh review (draft b5fbf78, FA 68f1cb9e) after 7 fixes; pages draft_sec2_pages.pdf (pp. 3-6) to
+      Joaquin. One-loop bb validation split: 0 of 5000 events negative in truth or prediction, so abs() hides no sign flip.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
