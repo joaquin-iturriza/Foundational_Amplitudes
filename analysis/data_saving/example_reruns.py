@@ -150,16 +150,10 @@ def plot():
             h = np.histogram(by[p, D, a]["pred"], e)[0]
             ax.stairs(h, e, color=col[a], linestyle=D_STYLE[D], label=f"{lab[a]}, $D=${D_LAB[D]}")
             with np.errstate(divide="ignore", invalid="ignore"):
-                rat = np.where(t > 0, h / t, np.nan)   # defined wherever the truth has events
-            r.stairs(np.clip(rat, 0.45, 1.55), e, color=col[a], linestyle=D_STYLE[D])
-            mid = 0.5 * (e[:-1] + e[1:])
-            for off, y, mk in ((rat > 1.55, 1.5, "^"), (rat < 0.45, 0.5, "v")):   # off the panel: a marker at its edge
-                r.plot(mid[off], np.full(off.sum(), y), mk, ms=3, color=col[a], clip_on=False)
-        for i in np.nonzero(t == 0)[0]:   # no true event: ratio undefined, shaded
-            r.axvspan(e[i], e[i + 1], color="0.85", lw=0)
-        ax.set_ylim(bottom=0.5)   # one-event bins above the frame, not on it
+                rat = np.where(t > 0, h / t, np.nan)   # every bin with true events
+            r.stairs(np.clip(rat, 0.5, 1.5), e, color=col[a], linestyle=D_STYLE[D])   # beyond the limits: drawn at the edge
         r.axhline(1, color="k", lw=0.8)   # the truth line, as thin as the papers' ratio reference
-        r.set_ylim(0.5, 1.5); r.set_yticks([0.5, 1, 1.5]); r.set_yticklabels(["0.5", "1", "1.5"])
+        r.set_ylim(0.47, 1.53); r.set_yticks([0.5, 1, 1.5]); r.set_yticklabels(["0.5", "1", "1.5"])
         ax.set_xlim(e[0], e[-1])
         ax.set_yscale("log"); ax.set_ylabel("events")
         r.set_xlabel(r"$\log|\mathcal{M}|^2$")
