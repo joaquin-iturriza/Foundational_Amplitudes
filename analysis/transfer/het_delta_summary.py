@@ -64,17 +64,17 @@ def main():
     hi = max(max(x["mse"] for x in pts if x["mse"]), max(x["het"] for x in pts))
     lim = (lo / 1.5, hi * 1.5)          # the same limits on both axes: "equal" is the plot box's diagonal
     a1.set_xlim(*lim); a1.set_ylim(*lim)
-    a1.plot(lim, lim, "--", color="grey", label="equal")
+    a1.plot(lim, lim, "--", color="grey", label=r"$y=x$")
     from math import erfc
     a2.plot(KS, [erfc(k / np.sqrt(2)) for k in KS], "--", color="k")
     # one legend strip above both panels (a corner legend would make room by growing the left panel's y range and
     # break its equal limits); the right panel's entries are drawn as proxies on the left
     a1.plot([], [], "--", color="k", label=r"$\mathcal{N}(0,1)$ (right)")
-    a1.plot([], [], "-", color="grey", label="median cell (right)")
-    a1.fill_between([], [], [], color="grey", alpha=0.25, lw=0, label=r"$10$ to $90\%$ of cells (right)")
+    a1.plot([], [], "-", color="grey", label="median (right)")
+    a1.fill_between([], [], [], color="grey", alpha=0.25, lw=0, label=r"$10$ to $90\%$ (right)")
     a2.set_yscale("log"); a2.set_ylim(1e-5, 1.5)
     a1.set_xscale("log"); a1.set_yscale("log")
-    a1.set_xlabel(r"median $|\Delta|$, MSE"); a1.set_ylabel(r"median $|\Delta|$, het")
+    a1.set_xlabel(r"median $|\Delta|$, MSE"); a1.set_ylabel(r"median $|\Delta|$, heteroscedastic")
     a2.set_xlabel(r"$k$"); a2.set_ylabel(r"fraction with $|{\rm pull}|>k$")
     ps.shared_legend(fig, a1, ncol=4)
     ps.save(fig, os.path.join(HERE, "figs", "het_delta_summary"))

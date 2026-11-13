@@ -11,6 +11,14 @@ an arm has two) under one setup against another, every set of classes in its own
             zero shot (step 0) and scratch (analysis/catalog_v3/data/muon_ft.json)              -> figs/paper_muon_ft
   pp        catalog_v4 with a 0.25 default-sampled share against the arm that trains its hadronic tree classes on
             13 TeV pp events only (mixture_ab.MIX / BOUND_DEFAULT, MSE runs, two seeds each)    -> figs/paper_pp
+  unseen    zero-shot MSE per process of the pretraining without tau/nu_tau and quartic-gauge pools (catalog_v3 twin,
+            short_reads.json dimensionless_twin): tau processes, quartic-vertex processes, new combinations -> figs/paper_unseen
+  pp_direct per class on the 13 TeV pp test pools, the catalog pretraining (Muon, geometric mean of seeds 42 and 43) against
+            the pretraining whose hadronic classes train on pp events only (AdamW, one seed); classes without b whose label
+            is the same function in both (pp_physics_rescore 'agree'), trained in both and held out in both
+            (compare_pp_trained.rows, par:v4_vs_pp)                                              -> figs/paper_pp_direct
+  pp_bound  the same axes at one optimizer and length: pp-only bound arm against the catalog control on PP4, the classes
+            the bound arm trains and the others (mixture_ab.BOUND, par:v4_pp_bound)              -> figs/paper_pp_bound
   target    zero-shot MSE per held-out probe, dimensionless target against ln|M|^2 in GeV (catalog_v3 short arms,
             analysis/catalog_v3/data/short_reads.json)                                          -> figs/paper_target
 """
@@ -203,6 +211,50 @@ def target():
     scatter(groups, f"{MSE_LAB}, " + r"$\log|\mathcal{M}|^2$ in GeV", f"{MSE_LAB}, " + r"target $T$", "paper_target")
 
 
+def pp_direct():
+    import compare_pp_trained as cp
+    C = json.load(open(os.path.join(HERE, "data", "pp_physics_check.json")))["classes"]
+    R, p, _ = cp.rows()
+    role, b = p["_role"], p["_b"]
+    groups = []
+    for lab, g in (("trained", "train"), ("held out", "heldout")):
+        ns = [n for n in role if not b[n] and C[n]["cls"] == "none" and role[n]["v3"] == g and role[n]["v4"] == g
+              and all(n in R["mse"][r] for r in cp.V4 + ("dimensionless_pp",))]
+        groups.append((lab, np.array([R["mse"]["dimensionless_pp"][n] for n in ns]),
+                       np.array([cp.gm(R, "mse", cp.V4, n) for n in ns])))
+    scatter(groups, f"{MSE_LAB}, pp events only (AdamW)", f"{MSE_LAB}, catalog (Muon)", "paper_pp_direct")
+
+
+def pp_bound():
+    cls = m.class_of()
+    import yaml
+    trained = {cls(q["name"]) for q in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v4_base_train.yaml")))["processes"]}
+    x = m.side([m.read_of(s, "PP4") for s in m.BOUND["arm"]])
+    y = m.side([m.read_of(s, "PP4") for s in m.BOUND["control"]])
+    keys = set(x) & set(y)
+    a, c = by_class({k: x[k] for k in keys}, cls), by_class({k: y[k] for k in keys}, cls)
+    groups = []
+    for lab, keep in (("trained", lambda q: q in trained), ("held out", lambda q: q not in trained)):
+        cs = sorted(q for q in set(a) & set(c) if keep(q))
+        groups.append((lab, np.array([a[q] for q in cs]), np.array([c[q] for q in cs])))
+    scatter(groups, f"{MSE_LAB}, pp events only", f"{MSE_LAB}, catalog", "paper_pp_bound")
+
+
+def unseen():
+    t = json.load(open(os.path.join(ROOT, "analysis", "catalog_v3", "data", "short_reads.json")))["dimensionless_twin"]
+    fig, ax = ps.figure(width="half")
+    vals = {a: np.array([v["mse"] for v in t[a]["probes"].values()]) for a in ("H1", "H4", "H3p")}
+    bins = np.logspace(np.log10(min(v.min() for v in vals.values())) - 0.05,
+                       np.log10(max(v.max() for v in vals.values())) + 0.05, 16)
+    for (a, lab), c in zip((("H1", "new combinations"), ("H4", "quartic vertex unseen"),
+                            ("H3p", r"$\tau$, $\nu_\tau$ unseen")), COLS):
+        ax.hist(vals[a], bins=bins, weights=np.full(len(vals[a]), 1 / len(vals[a])), histtype="step", color=c, label=lab)
+        print(f"  unseen {lab}: {len(vals[a])} processes, median {np.median(vals[a]):.3g}")
+    ax.set_xscale("log"); ax.set_xlabel(f"zero-shot {MSE_LAB}"); ax.set_ylabel("fraction of processes")
+    ps.shared_legend(fig, ax, ncol=2)
+    ps.save(fig, os.path.join(FIGS, "paper_unseen"))
+
+
 # The 448-process pretraining's single-seed arms at the baseline's best HPs, 8601 steps: geometric mean and 90th
 # percentile over processes of the per-process validation loss at the best checkpoint, as docs/results.tex
 # tab:bigrun_arms (analysis/bigrun/arms_best.py, run on the site holding the runs) and the pair-bias table of
@@ -231,6 +283,6 @@ def inputs():
 
 
 if __name__ == "__main__":
-    fns = {"inputs": inputs, "pidqn": pidqn, "muon": muon, "examples": examples, "ft": ft, "pp": pp, "target": target}
+    fns = {"inputs": inputs, "pidqn": pidqn, "muon": muon, "examples": examples, "ft": ft, "pp": pp, "target": target, "unseen": unseen, "pp_direct": pp_direct, "pp_bound": pp_bound}
     for k in (fns if sys.argv[1:] in ([], ["all"]) else sys.argv[1:]):
         fns[k]()
