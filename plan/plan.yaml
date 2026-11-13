@@ -33303,6 +33303,11 @@ entries:
       them); resend the three KIT asym figures whose upload failed (kit_mse_A_asym_ee_uug_me2_a, kit_mse_A_asym_ee_uugg_me2_a,
       kit_curves_nll_A_asym_a) when he asks. Rules added today to CLAUDE.md: d2f6f84a, f5abb4ea, 5ac00c1e, d59291f8, e4d45f77,
       db1ee05c; claudemd-keeper review blocked with fixes pending (agent a73302b3).'
+  - at: '2026-11-13T14:49:04+00:00'
+    text: '2026-11-13 15:50: the first Overleaf zip (overleaf_update.zip) was built from git''s changed-file list; the figure
+      PDFs are gitignored, so every new figure was missing. Replaced by overleaf_update_v2.zip (paper.tex, refs.bib, whole
+      figs/pretrain and figs/transfer, 144 files), tested by unpacking over the 2026-11-10 import and compiling: 62 pages,
+      no missing file. Rule for next time: a bundle for Joaquin is compiled standalone before it is sent.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
