@@ -28422,6 +28422,10 @@ entries:
       the three bins (subleading single logs). Design PASSED (step 18 arms). tt arms take data.target_physics_factor=false
       (a constant for 2->2, 5-95% log F identical in 3fc1016a; the factor''s guard needs the plain log target). D395 smokes
       FA-ccin2p3-5d188180 (uugg A2), FA-ccin2p3-23874954 (tt A1), CC queue ~30 h.'
+  - at: '2026-11-13T03:06:57+00:00'
+    text: '2026-11-13: Joaquin asked to be reminded what the fair NLO protocol and Gudrun''s threshold scan are (''3. Can
+      you remind me what this is?''); main session re-explained both from the 2026-11-10 emails; awaiting whether to run them
+      before the KIT draft section.'
   step_why:
     5:
       feeds: what KIT receives
