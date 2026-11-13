@@ -32950,6 +32950,9 @@ entries:
   - D445
   next:
     2: Apply Joaquin's comments on the Sec. 3 v3 pages and the full draft (draft d05d793)
+    3: 'Het loss vs MSE (Fig. 9, removed from the draft by Joaquin 2026-11-13): come back to it. The het network leaves ~1-11%
+      of 2->2 test events unfitted with large sigma (median |Delta| better 118/146, MSE worse on most 2->2); evaluation checked,
+      no bug; training precision not checked'
   done_when: null
   notes_ref: null
   match: none
@@ -33214,6 +33217,11 @@ entries:
       if:
       - 'he asks for changes: apply them in Secs. 2-3 and minimal ones in Sec. 4, then a fresh review'
       - 'he passes it: hand-off and close the entry'
+    3:
+      feeds: whether and how the paper states the het-vs-MSE comparison
+      if:
+      - 'Joaquin returns to it: design the follow-up he asks for'
+      - 'never: stays out of the paper'
   ask: 'Scope: Sec. 3.6 (heteroscedastic loss): after seeing het_delta_summary.png and the evaluation check (no bug: the het
     network leaves up to ~10% of events on 2->2 unfitted with large sigma), should the text state both measures (median per-event
     error better on 118/146, MSE worse on most 2->2), or stay as it is?'
