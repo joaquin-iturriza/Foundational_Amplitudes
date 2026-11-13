@@ -32624,6 +32624,9 @@ entries:
       and Gudrun''s threshold scan as next steps) and asked him three things, awaiting answers: (1) do the three co-authors''
       sections (accuracy benchmark, more legs, Feynman-diagram conditioning) stay; (2) show current-setup bbZZ/tt results
       or only the old-setup figure; (3) run the threshold scan and fair NLO protocol before writing the KIT section?'
+  - at: '2026-11-13T03:36:24+00:00'
+    text: 'Joaquin 2026-11-13 on the ee->ttbar threshold scan (analysis/kit_benchmark/figs/kit_threshold_scan*): ''But yes,
+      indeed this doesn''t go to the draft for now''. Sec. 5 KIT leaves it out; at most one line among the open items.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
