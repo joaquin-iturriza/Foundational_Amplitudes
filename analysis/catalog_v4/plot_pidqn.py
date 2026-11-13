@@ -47,8 +47,8 @@ def main():
         if d3:
             ax.scatter(x3, y3, color=ps.C.vermillion, alpha=0.6, label="physical top")
         ax.set_xscale("log"); ax.set_yscale("log")
-        ax.set_xlabel(r"MSE$_{\rm qn}(\ln|\mathcal{M}|^2)$")
-        ax.set_ylabel(r"MSE$_{\rm pid}(\ln|\mathcal{M}|^2)$")
+        ax.set_xlabel(r"MSE of $\ln|\mathcal{M}|^2$, quantum numbers")
+        ax.set_ylabel(r"MSE, one-hot token")
         ps.process_label(ax, name)
         if d3:
             ps.legend(ax, "upper left")

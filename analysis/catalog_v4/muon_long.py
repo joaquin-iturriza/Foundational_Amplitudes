@@ -146,33 +146,51 @@ def plot():
     a1.set_yscale("log"); a1.set_xlabel("step"); a1.set_ylabel(r"validation MSE of $\mu$")
     ps.legend(a1, "upper right")
     ps.save(fig, os.path.join(HERE, "figs", "muon_long_curves"))
-    fig, a2 = ps.figure(width="half", figsize=ps.figsize(1, 2, "half"))
-    # (b) per-class MSE of ln|M|^2 per read, reads ordered by Muon's median (best to worst)
-    names = {"PP4": "PP4", "EE4": "EE4"}
-    groups = [("PP4",), ("EE4",), ("HD4",), ("HD5",)] + [("held", ax) for ax in m.HELD]
-    rows = []
-    for g in groups:
-        vals = {}
-        for k, run in RUNS.items():
-            x = m.read_of(run, g[0])
-            if len(g) == 2:
-                x = {kk: v for kk, v in x.items() if kk[0] == g[1]}
-            vals[k] = per_class(x, list(x), cls)
-        rows.append((names.get(g[0], g[-1]), vals))
-    rows.sort(key=lambda r: np.median(list(r[1]["muon"].values())))
-    for i, (_, vals) in enumerate(rows):
-        for j, k in enumerate(("muon", "adamw")):
-            v = np.array(list(vals[k].values()))
-            q = np.percentile(v, [25, 50, 75])
-            y = i + (j - 0.5) * 0.3
-            a2.plot([q[0], q[2]], [y, y], color=col[k], lw=3, alpha=0.5)
-            a2.plot(q[1], y, "o", color=col[k], label=lab[k] if i == 0 else None)
-    a2.axvline(1e-4, color=ps.C.grey, ls="--", label=r"$10^{-4}$")
-    a2.set_yticks(range(len(rows))); a2.set_yticklabels([r[0] for r in rows])
-    a2.set_ylim(len(rows) - 0.5, -4.3); a2.set_xscale("log"); a2.set_xlabel(r"per-class MSE of $\ln|\mathcal{M}|^2$")
-    ps.legend(a2, "upper right")
+    # (b) per-class MSE of ln|M|^2 per read; top: the training classes' test pools and the held-out classes'
+    # default-sampled pools, bottom: the catalog-sampled held-out axes; rows ordered by Muon's median (best on top)
+    names = {"PP4": r"$pp$ test", "EE4": r"$e^+e^-$ test", "HD4": "held-out tree",
+             "HD5": "held-out one loop", "H1": "new combinations", "H2": r"$2\to4$ families",
+             "H2p5": r"$2\to5$", "H3": "physical top", "H5": "one loop",
+             "H6": r"$\alpha_s(M_Z)=0.13$", "H7c": r"harder $p_T$ cut", "H7E": r"$\sqrt{\hat s}$ 6-20 TeV"}
+    fig, axes = ps.figure(nrows=2, sharex=True)
+    for a2, groups in zip(axes, ([("PP4",), ("EE4",), ("HD4",), ("HD5",)], [("held", ax) for ax in m.HELD])):
+        rows = []
+        for g in groups:
+            vals = {}
+            for k, run in RUNS.items():
+                x = m.read_of(run, g[0])
+                if len(g) == 2:
+                    x = {kk: v for kk, v in x.items() if kk[0] == g[1]}
+                vals[k] = per_class(x, list(x), cls)
+            rows.append((names[g[-1]], vals))
+        rows.sort(key=lambda r: np.median(list(r[1]["muon"].values())))
+        for i, (_, vals) in enumerate(rows):
+            for j, k in enumerate(("muon", "adamw")):
+                v = np.array(list(vals[k].values()))
+                q = np.percentile(v, [25, 50, 75])
+                y = i + (j - 0.5) * 0.3
+                a2.plot([q[0], q[2]], [y, y], color=col[k], lw=3, alpha=0.5)
+                a2.plot(q[1], y, "o", color=col[k], label=lab[k] if i == 0 else None)
+        a2.axvline(1e-4, color=ps.C.grey, ls="--", label=r"$10^{-4}$")
+        a2.set_yticks(range(len(rows))); a2.set_yticklabels([r[0] for r in rows])
+        a2.set_ylim(len(rows) - 0.5, -0.5); a2.set_xscale("log")
+    axes[1].set_xlabel(r"per-class MSE of $\ln|\mathcal{M}|^2$")
+    ps.legend(axes[1], "upper right")
     ps.save(fig, os.path.join(HERE, "figs", "muon_long_levels"))
     examples(ps, col, lab)
+
+
+_TEX = {1: "d", 2: "u", 3: "s", 4: "c", 5: "b", 6: "t", 11: "e^-", -11: "e^+", 13: r"\mu^-", -13: r"\mu^+",
+        21: "g", 22: r"\gamma", 23: "Z", 24: "W^+", -24: "W^-", 25: "H"}
+
+
+def process_tex(probe):
+    """The probe's process as $a b \to c d ...$ from its PDG ids (first two incoming)."""
+    sys.path.insert(0, m.ROOT)
+    import mg5_pipeline_final as mg
+    ids = mg.PROCESSES["v4_" + probe.split("_", 1)[1]]["pdg_ids"]
+    one = lambda i: _TEX[i] if i in _TEX else r"\bar " + _TEX[-i]    # negative quark ids: antiquarks
+    return "$" + " ".join(map(one, ids[:2])) + r" \to " + " ".join(map(one, ids[2:])) + "$"
 
 
 def examples(ps, col, lab):
@@ -180,7 +198,7 @@ def examples(ps, col, lab):
     mu = m.read_of(RUNS["muon"], "PP4")
     keys = sorted((p for p in mu if f"PP4:{p}" in h["muon"] and f"PP4:{p}" in h["adamw"]), key=lambda p: mu[p])
     pick = [keys[int(q * (len(keys) - 1))] for q in (0.1, 0.5, 0.9)]
-    fig, axes = ps.figure(ncols=3, nrows=2, sharex="col", gridspec_kw={"height_ratios": [3, 1]})
+    fig, axes = ps.figure(ncols=3, nrows=2, sharex="col", sharey="row", gridspec_kw={"height_ratios": [3, 1]})
     for j, p in enumerate(pick):
         # each run's record bins truth and prediction on its own edges (the range of both): each ratio on its own
         for k in ("muon", "adamw"):
@@ -195,7 +213,7 @@ def examples(ps, col, lab):
         axes[1, j].set_ylim(0, 2)
         axes[0, j].set_yscale("log")
         axes[1, j].set_xlabel(r"$\ln|\mathcal{M}|^2$")
-        ps.process_label(axes[0, j], p.replace("_", " "))
+        ps.process_label(axes[0, j], process_tex(p))
         print("example", p, {k: m.read_of(run, "PP4")[p] for k, run in RUNS.items()})
     axes[0, 0].set_ylabel("events"); axes[1, 0].set_ylabel("pred/true")
     ps.legend(axes[0, 0], "upper left")
