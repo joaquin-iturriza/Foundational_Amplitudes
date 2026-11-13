@@ -27246,7 +27246,8 @@ entries:
     start: '2026-11-12T03:17:01+00:00'
     at: '2026-11-12T03:17:01+00:00'
   step_waits:
-    '2': step 3's AdamW long run (designed after its read, per the hand-off)
+    '2': '2026-11-15: pretrain_data_saving''s fine-tune template (its step 5) and its parent choice (its step 6, WSD parent)
+      must exist before the AdamW-parent arm can be designed on the same grid'
   handoff:
     state: 'pidqn DONE and written up (results.tex sec:optrecap ''Particle encoding'', fig:pidqn, commit 88d7c954; mixture_ab.py
       pidqn, plot_pidqn.py; PP4 R=0.80 [0.74,0.87], EE4 0.86, held pooled 0.92 [0.85,1.01], H3 1.14 [1.01,1.24], no held-out
