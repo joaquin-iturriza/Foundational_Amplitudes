@@ -26626,6 +26626,12 @@ entries:
       in the record, same draw) and trial hp 446 at D=316 (FA-lxplus-f87fe06d, lr_scale 1.81, diverged at step 3883/7840 under
       the WSD plateau; its record twin under cosine reached 6.96e-5). Listed apart per D398; the step-6 read reports W-arm
       divergences against R and C.'
+  - at: '2026-11-13T10:18:07+00:00'
+    text: '2026-11-13 ~12:20: third W-arm divergence (WSD parent + WSD fine-tune): FA-ccin2p3-39842a76, D=3162 guided trial
+      hp 1678, lr_scale 2.64, diverged at step 6241/8500 after jitter through the WSD plateau. W divergences so far all at
+      lr_scale >= 1.8 (430, 446, 1678); the record (cosine) diverged only on hp 430. To test at the step-6 read: does the
+      divergence rate under the held peak lr differ between W, C and R (counts per arm against lr_scale)? E7087: idle lxplus
+      trials are queued for GPU slots, not refused by their requests (12000 MB/4 CPU fits).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
