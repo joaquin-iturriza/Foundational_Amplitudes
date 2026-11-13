@@ -32631,12 +32631,10 @@ entries:
     answered_at: '2026-11-13T03:05:03.243000+00:00'
     decision: D445
   owner:
-    agent: a34e6d2a7f0b1339b
-    state: closed
-    since: '2026-11-13T05:16:17+00:00'
-    state_at: '2026-11-13T07:01:06.042000+00:00'
-    context: 229686
-    context_at: '2026-11-13T07:00:14+00:00'
+    agent: a0f7f76dc1ed0520d
+    state: working
+    since: '2026-11-13T07:12:50+00:00'
+    state_at: '2026-11-13T07:12:50+00:00'
   step_why:
     1:
       feeds: the draft's Sec. 2 (D444, D433)
