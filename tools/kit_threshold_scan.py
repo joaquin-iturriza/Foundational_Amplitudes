@@ -347,6 +347,13 @@ def label(run):
               # D405 fine-tunes: parent pretraining r5, + LO top pairs log-uniform in beta, + the beta input
               "ftr5own": ", parent r5", "ftr5thrown": ", parent r5 + threshold tops",
               "ftr5thrbetaown": r", parent r5 + threshold tops, $\log\beta^2$"}
+    # step 18 (D435): log|M|^2 = log A + g, A the asymptotic factors (1/beta, log^2(s/m^2)); A1 on the log inputs, A2 on
+    # plain momenta with the frames' boost capped at gamma <= 4
+    asym = {"softpairthr_asym_plainlog": r", log inputs + $\log\beta^2$, asymptotic factor",
+            "asym_cont_plainlog": r", asymptotic factor, no log inputs, $\gamma\leq4$"}
+    tag = next((t for t in asym if run.endswith("_" + t)), None)
+    if tag:
+        inputs[run.rsplit("_", 1)[-1]] = asym[tag]
     n = re.search(r"_n(\d+)_", run)
     size = {"100000": r", $10^5$ events", "900000": r", $9\times10^5$ events"}.get(n.group(1), "") if n else ""
     return names[m.group(1)] + size + inputs.get(run.rsplit("_", 1)[-1], "") if m else run
