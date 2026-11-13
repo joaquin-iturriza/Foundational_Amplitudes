@@ -84,7 +84,7 @@ for ax, p in zip(axs.flat, PROBES):
     ps.process_label(ax, {**LAB, **ARMLAB}[p].replace(" (1-loop)", " one loop") + "\n" + rf"$\times{s:.1f}$")
 print(f"median fitted saving over the 4 panels {np.median(S):.1f} (each read at its own panel's level, not one precision); median L_scratch/L_ft over all {len(ALL)} cells "
       f"{np.median(ALL):.1f}")
-H = [Line2D([], [], color="k", marker="o", label="scratch"), Line2D([], [], color=ps.C.blue, marker="o", label="Fine-tune"),
+H = [Line2D([], [], color="k", marker="o", label="scratch"), Line2D([], [], color=ps.C.blue, marker="o", label="fine-tune"),
      Line2D([], [], color="0.5", marker="o", mfc="none", ls="none", label="not fitted"),
      Line2D([], [], color="0.5", ls="--", label="target precision"),
      Line2D([], [], color=GAP, label=r"$D^*_{\rm scr}/D^*_{\rm ft}$")]
