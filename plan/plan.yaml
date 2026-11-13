@@ -28639,6 +28639,7 @@ entries:
     '17': 'kit_hpo driver DONE event: the chosen t t~ virtual settings'
     '19': kit_hpo driver DONE event (chosen HPs); literature agent's findings for (a)
     '20': '2026-11-14'
+    '21': 'kit_hpo searches (driver pid 802223): read with kit_curves sweep when DRIVE_DONE'
   handoff:
     state: '2026-11-13 @3752e145. Draft Sec. 5 was written on the main session''s brief (draft 4a86295) but Joaquin had said
       the KIT results do not go in today''s draft; the draft owner reverts it to its slots, do not touch the draft. Kept for
