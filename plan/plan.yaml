@@ -32639,7 +32639,7 @@ entries:
       - 'all reruns within 2x: figure in, slot filled, pages to Joaquin'
       - 'a rerun off by >2x: flag it in the caption, rerun once'
   step_waits:
-    '1': FA-lxplus-611aa1ec FA-lxplus-53ebf389 FA-lxplus-07859ad1 FA-lxplus-2363ccef
+    '1': FA-lxplus-611aa1ec FA-lxplus-53ebf389 FA-lxplus-07859ad1 FA-lxplus-2363ccef FA-ccin2p3-4fa87893
   findings:
   - at: '2026-11-13T02:46:58+00:00'
     text: '2026-11-13 ~03:50 Joaquin: ''we should start actually doing the work on the draft with what we have ... Let''s
