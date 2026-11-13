@@ -32554,3 +32554,12 @@ entries:
   step_waits:
     '1': results of pretrain_data_saving, optimizations_recap, kit_benchmark, virtual_over_born (none landed yet); 2026-11-17
   checked_until: '2026-11-12T02:24:54+00:00'
+  findings:
+  - at: '2026-11-13T02:46:58+00:00'
+    text: '2026-11-13 ~03:50 Joaquin: ''we should start actually doing the work on the draft with what we have ... Let''s
+      discuss first what we have and what you plan to do''. Main session gave per-section status and a plan (Sec 2 from the
+      old-setup 4-panel figure with separate exponents D441, optimizations slots from results.tex after checking the pID/QN
+      and Muon-to-1e-4 reruns, swap in the new ladder figures D434, KIT section from current results with fair-NLO protocol
+      and Gudrun''s threshold scan as next steps) and asked him three things, awaiting answers: (1) do the three co-authors''
+      sections (accuracy benchmark, more legs, Feynman-diagram conditioning) stay; (2) show current-setup bbZZ/tt results
+      or only the old-setup figure; (3) run the threshold scan and fair NLO protocol before writing the KIT section?'
