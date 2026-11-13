@@ -21619,9 +21619,9 @@ entries:
     decision: D441
   owner:
     agent: a6bd7d6113b9fd0de
-    state: working
+    state: stopped
     since: '2026-11-13T09:11:01+00:00'
-    state_at: '2026-11-13T09:30:36.486000+00:00'
+    state_at: '2026-11-13T09:31:17.567000+00:00'
     context: 126470
     context_at: '2026-11-13T09:29:52+00:00'
   designs:
@@ -32714,7 +32714,7 @@ entries:
     agent: aaae6521a1a2098ff
     state: working
     since: '2026-11-13T08:53:09+00:00'
-    state_at: '2026-11-13T09:29:45.036000+00:00'
+    state_at: '2026-11-13T09:33:04.684000+00:00'
     context: 219091
     context_at: '2026-11-13T09:33:39+00:00'
   step_waits:
