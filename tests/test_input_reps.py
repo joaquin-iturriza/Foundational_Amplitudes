@@ -349,6 +349,14 @@ def test_asym_factor():
     want = sorted([1 / b, np.log(s / m2) ** 2, np.log(s / m2) ** 2])
     assert np.allclose(got, want, rtol=1e-6), (got, want)
     assert int(terms(ev, tok_tt, 0)[1].sum()) == 0
+    # model.input_asym_sudakov_single: one more term per top, exp(kappa) log(s/m^2), on that top's coefficient; none at tree
+    kap = torch.tensor([np.log(3.0)])
+    p1, tp = torch.tensor(ev), torch.tensor([0, len(ev)])
+    ld1, on1, mem1 = _asym_terms(p1, tp, len(ev), Gt[tok_tt, 7], Gt[tok_tt, 2] >= 0, torch.tensor([1.0]), kap)
+    got1 = sorted(float(v) for v in ld1[0, on1[0]].exp())
+    assert np.allclose(got1, sorted(want + [3 * np.log(s / m2)] * 2), rtol=1e-6), got1
+    assert sorted(mem1[on1[0]][-2:, 0].tolist()) == [2, 3] and int(_asym_terms(
+        p1, tp, len(ev), Gt[tok_tt, 7], Gt[tok_tt, 2] >= 0, torch.tensor([0.0]), kap)[1].sum()) == 0
     # a colourless heavy pair (Z Z) at one QCD loop: no Coulomb, no Sudakov
     assert int(terms(_tt(b, m=91.19), torch.tensor(global_encode(np.array([-11, 11, 23, 23]))), 1)[1].sum()) == 0
 
@@ -395,6 +403,10 @@ def test_asym_factor():
         assert float((a[:, 0] - out(wrap(loss, input_pair_logs=6), p)[:, 0]).abs().max()) > 1e-3, "the flag does not move mu"
         if loss == "HETEROSC":
             assert w.net.n_main == 2 and w.net.net.linear_out.out_features == 3 and bool((a[:, 1] > 0).all())
+    # the single-log flag: a learned scalar, no effect on an event without a heavy coloured leg
+    w1 = wrap(input_pair_logs=6, input_asym_factor=True, input_asym_sudakov_single=True)
+    assert w1.asym_kappa is not None and w1.asym_kappa.shape == (1,)
+    assert torch.allclose(out(w1, p), out(wrap(input_pair_logs=6, input_asym_factor=True), p))
     # the coefficients converge only on a net continuous at the limit: plain momenta (no log inputs) and the frames'
     # boosts capped (model.net.frames_gamma_max=4; uncapped, the relative boosts of a soft or collinear leg grow and the
     # readouts with them, ~y^-0.25 and ~x^-0.5 at this init); then mu's slope is the dipoles' -1 in log y, -2 in log x

@@ -181,7 +181,7 @@ def _div_form_inputs(p, ptr, n, cas, heavy):
 _ASYM_BOUND = 10.0
 
 
-def _asym_terms(p, ptr, n, cas, heavy, loops):
+def _asym_terms(p, ptr, n, cas, heavy, loops, sud_single=None):
     """The singular factors D_t of model.input_asym_factor (kit_benchmark step 18, D435), built from each particle's
     colour Casimir `cas` (0, C_F, C_A), `heavy` flag (table mass >= 1 GeV) and the event's QCD loop count `loops`,
     s = (p_0 + p_1)^2, s_ij = 2 p_i.p_j, final legs only (index >= 2):
@@ -191,6 +191,9 @@ def _asym_terms(p, ptr, n, cas, heavy, loops):
                V_qg = C_F (2/(1 - z(1-y)) - (1+z)), V_gg = C_A (1/(1 - z(1-y)) + 1/(1 - (1-z)(1-y)) - 2 + z(1-z))
       Coulomb  per pair i < j of heavy coloured legs of a loop target: D = 1/beta, beta = sqrt(lambda(M^2, m_i^2, m_j^2))/(M^2 - (m_i - m_j)^2)
       Sudakov  per heavy coloured leg of a loop target: D = log^2(s/m_i^2)
+      single   with `sud_single` (a learned scalar kappa, model.input_asym_sudakov_single): per heavy coloured leg of a
+               loop target also D = exp(kappa) log(s/m_i^2), on the leg's coefficient: exp(c)(L^2 + exp(kappa) L), the
+               subleading single log with one global ratio (step 21: log^2 alone overshoots the Sudakov strata)
     (a colourless heavy leg, W, Z, H, tau, has no QCD Coulomb or Sudakov factor: the target's loop count is L_QCD)
     Returns log D (B, T) in float64, on (B, T) (the term exists in that event) and members (T, 3): the legs whose
     coefficients set the term's coefficient, -1 padded. Every D is positive and Lorentz invariant.
@@ -233,7 +236,10 @@ def _asym_terms(p, ptr, n, cas, heavy, loops):
     leg = torch.arange(2, n, device=dev)
     sud = (2 * lg(lg(s[:, None] / m2[:, leg].clamp(min=1e-300))), hq[:, leg] & loop,
            torch.stack([leg, torch.full_like(leg, -1), torch.full_like(leg, -1)], 1))
-    return tuple(torch.cat(x, dim=d) for x, d in zip(zip(dip, cou, sud), (1, 1, 0)))
+    parts = (dip, cou, sud)
+    if sud_single is not None:
+        parts += ((lg(lg(s[:, None] / m2[:, leg].clamp(min=1e-300))) + sud_single.to(P.dtype).reshape(()),) + sud[1:],)
+    return tuple(torch.cat(x, dim=d) for x, d in zip(zip(*parts), (1, 1, 0)))
 
 
 def _asym_mu(mu_raw, alpha, ptr, n, logD, on, members, sd):
@@ -404,7 +410,8 @@ class AmplitudeLLoCaWrapper(nn.Module):
                  input_pair_logs: int = 0, input_soft_eps: float = 0.0, input_local_log_eps: float = 0.0,
                  input_pair_threshold: bool = False, input_scalars_only: bool = False,
                  input_route_off: str = "", input_log_skip: int = 0, input_log_skip_linear: bool = False,
-                 input_div_form: bool = False, input_asym_factor: bool = False):
+                 input_div_form: bool = False, input_asym_factor: bool = False,
+                 input_asym_sudakov_single: bool = False):
         super().__init__()
         self.net = net
         # input representations for singular limits (D374, kit_benchmark input arms; all Lorentz-exact, 0 = off):
@@ -436,6 +443,9 @@ class AmplitudeLLoCaWrapper(nn.Module):
         self.input_asym_factor = bool(input_asym_factor)
         if self.input_asym_factor:
             self.register_buffer("asym_sd", torch.ones((), dtype=torch.float64))
+        # input_asym_sudakov_single: the Sudakov single log beside the double log, kappa = log of their ratio (_asym_terms)
+        assert not input_asym_sudakov_single or self.input_asym_factor, "input_asym_sudakov_single needs input_asym_factor"
+        self.asym_kappa = nn.Parameter(torch.zeros(1)) if input_asym_sudakov_single else None
         if self.input_log_skip:
             assert self.input_pair_logs, "model.input_log_skip needs model.input_pair_logs (the event multiplicity)"
             self.log_skip_head = nn.Linear(d_particle_hidden, 2 * self.input_log_skip + 2)
@@ -1226,7 +1236,7 @@ class AmplitudeLLoCaWrapper(nn.Module):
             cnt = ptr[1:] - ptr[:-1]
             n = int(max(seq_lens)) if seq_lens is not None else int(cnt.max())
             logD, on, mem = _asym_terms(fourmomenta, ptr, n, G[particle_type_indices, 7],
-                                        G[particle_type_indices, 2] >= 0, loops)
+                                        G[particle_type_indices, 2] >= 0, loops, self.asym_kappa)
             mu = _asym_mu(pooled[:, 0], alpha, ptr, n, logD, on, mem, self.asym_sd)
             pooled = torch.cat([mu[:, None].to(pooled.dtype), pooled[:, 1:]], dim=-1)
 
