@@ -26632,6 +26632,13 @@ entries:
       lr_scale >= 1.8 (430, 446, 1678); the record (cosine) diverged only on hp 430. To test at the step-6 read: does the
       divergence rate under the held peak lr differ between W, C and R (counts per arm against lr_scale)? E7087: idle lxplus
       trials are queued for GPU slots, not refused by their requests (12000 MB/4 CPU fits).'
+  - at: '2026-11-13T10:30:47+00:00'
+    text: '2026-11-13 ~12:35: no site cause in the step-6 failures. W arm (WSD parent + WSD fine-tune) failed trials so far,
+      7: hp 430 (D=3162, lr_scale 2.97, lx), 1678 (2.64, cc), 1441 (2.38, cc); 446 (D=316, 1.81, lx), 1942 (2.55, cc); 399
+      (D=100, 1.60, lx), 1395 (2.88, lx). C arm (cosine parent + WSD fine-tune) on the same start-up draws, 0 failed (430,
+      446, 399 observed or running); record R failed on 430 and 1395 only. Every W failure is at lr_scale >= 1.6, on both
+      sites; every C trial at lr_scale >= 1.6 that has finished survived. Template test dsave_wsd_ft t t~ D=316: 2 failed
+      at lr_scale 8.2 (cc) and 9.3 (lx). E7096-E7098 acked, not requeued.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
