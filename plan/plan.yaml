@@ -27100,6 +27100,11 @@ entries:
       log beta^2, and their scratch controls) at the step-15/16 chosen settings for t t~ virtual: the 11c runs (8000 cosine
       steps) are not converged (NLL still falling 1.1-2.0 nats over the last 800 steps; 3 of 7 fail separation narrowly),
       finding 2026-11-12 ~23:30. Own design after kit_hpo''s read.'
+    18: 'D435 (Joaquin 2026-11-13: ''I like the dipole idea, and maybe the layernorm stuff ... we want to be very intentional
+      and reproducible''): (a) dipole ansatz on LLoCa, Maitre-Truong style (arXiv:2107.06625; massive 2301.13562; one-loop
+      2302.04005): the network predicts Catani-Seymour dipole coefficients for uug/uugg, CDST massive dipoles where a top
+      is involved, so the singular limits are exact by construction. No MLP branch. Design at the step-15/16 chosen HPs, with
+      the literature agent''s findings on enforcing Coulomb/Sudakov.'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -28183,6 +28188,12 @@ entries:
       if:
       - 'Coulomb transfer appears on converged runs: one-loop tops go into the KIT parent'
       - 'still none: 11c''s NO stands, now on converged runs'
+    18:
+      feeds: 'whether singular limits can be built in exactly rather than learned (D435: intentional, reproducible asymptotics)'
+      if:
+      - 'the dipole ansatz fixes uug/uugg soft+collinear (and tt Coulomb/Sudakov with CDST massive dipoles) within the MLP
+        bands: it becomes the KIT model and is proposed for catalog runs'
+      - 'no or partial: reported per limit against the input arms; the literature agent''s methods are next'
   step_waits:
     '5': 'kit_hpo driver DONE event: the package takes the chosen trials'' models'
     '15': kit_hpo driver DONE event (detach:kit_hpo, log ~/.local/share/ccorch/detached/20261112-224604_kit_hpo.log); live
