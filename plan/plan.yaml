@@ -28842,6 +28842,13 @@ entries:
       (CC) / trial_0131 (lxplus) not collected yet: need the alias commit. uugg search read (kit_curves sweep -> kit_hpo_uugg_plain.json):
       4/16 good, chosen hp0798 lr 0.01152, val 2.58e-4, sep 2.72; uugg A2 FA-ccin2p3-6d7e80ac and rescore of trial_0798 FA-ccin2p3-e281e8b1
       submitted, step 21 waits on them.'
+  - at: '2026-11-13T14:31:47+00:00'
+    text: '2026-11-13 ~15:30. uugg A2 at hp0798 (FA-ccin2p3-6d7e80ac, collected on CC): deepest-bin log-MSE gg coll 0.042,
+      qg coll 0.156, soft 0.186, azimuth 0.070; exps gg -0.98 (truth -0.99), qg -0.92 (-0.97), soft -1.94 (-2.00); bulk 6.3e-5.
+      Curve check (kit_curves runs -> kit_curves_hpo_uugg.json, figs kit_curves_mse_A_hpo_uugg_a/b): A2 BAD sep 4.1 (val 2e-4
+      vs train 8e-5 at the end, separating only in the last ~150 cooldown steps), control hp0798 good sep 2.72; A2 best val
+      1.55e-4 vs control 2.58e-4. Control trial_0798 rescored (FA-ccin2p3-e281e8b1) but not collected: needs the alias commit
+      (repo-reviewer gate).'
   step_why:
     5:
       feeds: what KIT receives
