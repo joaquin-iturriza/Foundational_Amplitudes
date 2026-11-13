@@ -26837,6 +26837,12 @@ entries:
     units: null
     start: '2026-11-13T01:52:48+00:00'
     at: '2026-11-13T01:52:48+00:00'
+  - batch: step6_ft
+    wall_h: 1.1
+    jobs: 48
+    units: null
+    start: '2026-11-13T08:56:26+00:00'
+    at: '2026-11-13T08:56:26+00:00'
   handoff:
     state: 'Draft figures done 2026-11-13 and sent: old-setup data saving (old_setup_examples.py @1aa91b49, redrawn per Joaquin:
       savings at the precision line 3.2-12.6x, median gain 11.5x over 28 cells), ladder paper figures (finale_synth_scaling.py
