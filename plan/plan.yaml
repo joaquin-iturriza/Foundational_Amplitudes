@@ -27625,9 +27625,9 @@ entries:
     withdrawn_why: 'Joaquin: use all available clusters'
   owner:
     agent: aac7cd28c4a7fa60a
-    state: working
+    state: stopped
     since: '2026-11-13T06:51:11+00:00'
-    state_at: '2026-11-13T09:30:38.730000+00:00'
+    state_at: '2026-11-13T09:34:46.449000+00:00'
     context: 198824
     context_at: '2026-11-13T09:33:21+00:00'
   findings:
@@ -32711,9 +32711,9 @@ entries:
     blocks_steps: &id002 []
   owner:
     agent: aaae6521a1a2098ff
-    state: working
+    state: stopped
     since: '2026-11-13T08:53:09+00:00'
-    state_at: '2026-11-13T09:33:04.684000+00:00'
+    state_at: '2026-11-13T09:34:48.947000+00:00'
     context: 219091
     context_at: '2026-11-13T09:33:39+00:00'
   step_waits:
