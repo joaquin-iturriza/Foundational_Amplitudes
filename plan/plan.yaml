@@ -32635,9 +32635,7 @@ entries:
   decisions:
   - D365
   - D445
-  next:
-    2: 'Fresh reviewer (general-purpose; CLAUDE.md, scratchpad joaquin_draft_comments_0613.txt, refpapers/*.pdf) on Sec. 2
-      only (Joaquin: only his sections change; front matter and Sec. 4 stay as he wrote them) once its examples are final'
+  next: null
   done_when: null
   notes_ref: null
   match: none
@@ -32674,14 +32672,7 @@ entries:
     state_at: '2026-11-13T08:02:05.645000+00:00'
     context: 141955
     context_at: '2026-11-13T07:30:54+00:00'
-  step_why:
-    2:
-      feeds: the draft's Sec. 2 goes to Joaquin
-      if:
-      - 'PASS: hand back draft_sec2_pages.pdf'
-      - 'FIX: revise and continue the same reviewer'
-  step_waits:
-    '2': a reviewer (Sec. 2 review agent, running)
+  step_waits: {}
   findings:
   - at: '2026-11-13T02:46:58+00:00'
     text: '2026-11-13 ~03:50 Joaquin: ''we should start actually doing the work on the draft with what we have ... Let''s
