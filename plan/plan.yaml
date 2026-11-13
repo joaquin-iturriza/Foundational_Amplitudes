@@ -28522,6 +28522,15 @@ entries:
       site pick''s condor slot count models the per-CPU rule. 16 trials cancelled and set to retry without penalty; driver
       relaunched with --mem 11G (pid 3726617), SIGSTOPped by the coordinator until draft_rewrite''s GPU jobs run (resume:
       kill -CONT 3726617).'
+  - at: '2026-11-13T07:53:52+00:00'
+    text: '2026-11-13 ~08:55. Step 18 D395 smokes passed every stage (23874954 tt A1: Coulomb bias -1.12/-1.09 flat over beta
+      1e-4..1e-2, factor live; 5d188180 uugg A2 all strata scored). 7 arms on CC (site pick: all 7 CC, ~0.2 h wait), scripts/job_kit.sh
+      A per the passed design: uug A1 d5fb3d78, uug A2 3bbda50a, uugg plain control fec28926, uugg A1 1ad20d13, uugg A2 602ce14f
+      (@0d576712); tt A1 09576b49 and tt A2 5ce19348 (@fc845d4f, data.target_physics_factor=false data.target_physics_orders=false
+      as their smokes; first tt submissions 18455f84/54c8b71c failed at init without them, resubmits dbf9149d/11fa09d1 hit
+      the existing run dirs, so tags softpairthr_asym_plainlog / asym_cont_plainlog). Wall target 2.75 h, ~12.6 GPU-h. Debris
+      on CC: runs/kit/kit_A_ee_tt_virt_finite_n100000_t8000_{softpairthr_asym,asym_cont} (init-only failed dirs). kit_hpo
+      driver pid 3726617 still SIGSTOPped for draft priority.'
   step_why:
     5:
       feeds: what KIT receives
