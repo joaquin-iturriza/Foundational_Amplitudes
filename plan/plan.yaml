@@ -26857,7 +26857,7 @@ entries:
     1e-4 and transfer better, and how is every adopted and rejected choice (catalog, held-out classes, smart sampling, sigma
     sampling, emission scales + coupling orders preprocessing, adimensionalisation options, input conditionings, off-shellness,
     the meaning of zero-shot error as the fine-tune's starting point) written up with clear formulas (D364)?
-  status: running
+  status: held
   quotes:
   - said_at: '2026-11-10T02:08:07.285000+00:00'
     text: Then we show all the work behind all the optimizations we did along the way, how  pIDs and quantum numbers behave
@@ -26872,8 +26872,15 @@ entries:
     decision: D364
     covers:
     - optimizations_recap
+  - said_at: '2026-11-13T06:55:37.985000+00:00'
+    text: 1. no
+    decision: D451
+    answers_after: '2026-11-13T04:42:32+00:00'
+    covers:
+    - optimizations_recap
   decisions:
   - D364
+  - D451
   next:
     2: 'muon_1e4: the AdamW-parent arm of the pretrain_data_saving grid (same held-out targets, D grid, per-D horizons to
       MSE 1e-4, fine-tune protocol): an AdamW pretraining of the data-saving parent''s setup at AdamW''s own searched HPs,
@@ -26916,7 +26923,9 @@ entries:
       extend the optimizer plots towards 1e-4 ''ideally'', and fine-tunes trained until scratch reaches 1e-4; no pretraining
       horizon or budget past what ran), 2026-11-11T02:09 (asks what moving the optimizer comparison to 2026-11-13 meant; no
       horizon), 2026-11-06T19:52 (the warm start''s learning-rate mismatch; not this horizon)'
-    blocks_steps: &id002 []
+    blocks_steps: []
+    answered_at: '2026-11-13T06:55:37.985000+00:00'
+    decision: D451
   owner:
     agent: a14a677afceccea59
     state: working
@@ -27305,21 +27314,7 @@ entries:
       (fails before, passes after). Also repaired two misfiring tests in tests/test_mmap_key.py (fingerprint re-recorded for
       884d7eb7, memmap content unchanged; prune test stubs the slurm cache guard). Stale cache f3bedd61 (21 GB) deleted; rebuild
       FA-ccin2p3-3b8e8c7d (slurm 63541716); pidqn arms afterok on it.'
-  ask: 'GPU budget: about 140 GPU-h (70 per optimizer) above 30 with no decision covering it. Muon against AdamW on the longest
-    pretraining (width 8, 68224 steps, whole catalog): Muon''s lead holds and grows (final-model per-class error ratio AdamW/Muon
-    5.2 on pp test classes, 3.8 on e+e-, 2.8 on held-out classes), but neither network reaches MSE 1e-4: Muon''s median per-class
-    MSE is 3.4e-2 (pp) and it has not plateaued (the last quarter of the run lowered its validation error by 11%). Its validation
-    error fell by a factor 0.68 from 34k to 68k steps; at that rate (an estimate, assuming it holds) 1e-4 on the whole catalog
-    is about 12 more doublings away. Do you want a 4x longer pair anyway (273k steps, about 70 GPU-h on one V100 per optimizer,
-    reaching roughly 4e-3 at the same rate), or do we take 1e-4 as the fine-tune''s target (step 2) and stop the pretraining
-    comparison at 68k steps?'
-  waiting_since: '2026-11-13T04:42:32+00:00'
-  searched: 'CLAUDE.md GPU budget; site decisions --project FA for 1e-4, muon, horizon, longer: D155, D158, D219, D327-D333,
-    D356, D364: none sets a pretraining horizon beyond 68224 steps or its cost. Joaquin''s messages: 2026-11-10T02:08 (D364/D356:
-    extend the optimizer plots towards 1e-4 ''ideally'', and fine-tunes trained until scratch reaches 1e-4; no pretraining
-    horizon or budget past what ran), 2026-11-11T02:09 (asks what moving the optimizer comparison to 2026-11-13 meant; no
-    horizon), 2026-11-06T19:52 (the warm start''s learning-rate mismatch; not this horizon)'
-  blocks_steps: *id002
+  hold_decision: D451
 - id: kit_benchmark
   title: the KIT hard phase-space benchmark and the fair NLO protocol (Bakar, Gudrun)
   question: 'On the KIT datasets (ee->tt Born and one-loop virtual, ee->uug, ee->uugg; hard bins by distance to the singularity):
