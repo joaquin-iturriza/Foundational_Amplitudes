@@ -26900,10 +26900,17 @@ entries:
     answers_after: '2026-11-13T04:42:32+00:00'
     covers:
     - optimizations_recap
+  - said_at: '2026-11-13T07:45:56.212000+00:00'
+    text: Okay, it's better at held out, that's what matters, so b)
+    decision: D455
+    answers_after: '2026-11-13T07:33:03+00:00'
+    covers:
+    - optimizations_recap
   decisions:
   - D364
   - D451
   - D453
+  - D455
   next:
     2: 'muon_1e4: the AdamW-parent arm of the pretrain_data_saving grid (same held-out targets, D grid, per-D horizons to
       MSE 1e-4, fine-tune protocol): an AdamW pretraining of the data-saving parent''s setup at AdamW''s own searched HPs,
@@ -26959,7 +26966,9 @@ entries:
       shows. His messages: 2026-11-10T02:08 (the draft plan) names no pp comparison; 2026-10-26T02:03 is about encoding the
       AdamW/Muon difference in the data; 2026-11-11T02:09 is about clusters and a message of mine; none chooses'
     blocks: only Sec. 3's pp-coverage paragraph and figure
-    blocks_steps: &id002 []
+    blocks_steps: []
+    answered_at: '2026-11-13T07:45:56.212000+00:00'
+    decision: D455
   owner:
     agent: aaecb8d54f4939e0d
     state: working
@@ -27336,15 +27345,6 @@ entries:
       (fails before, passes after). Also repaired two misfiring tests in tests/test_mmap_key.py (fingerprint re-recorded for
       884d7eb7, memmap content unchanged; prune test stubs the slurm cache guard). Stale cache f3bedd61 (21 GB) deleted; rebuild
       FA-ccin2p3-3b8e8c7d (slurm 63541716); pidqn arms afterok on it.'
-  ask: 'Scope: for Sec. 3''s pp-coverage figure, present (1) the 2026-10-26 result (catalog_v4, no pp events, beats the pp-trained
-    model on pp pools: 0.66 trained, 0.58 held out; Muon vs AdamW confound), (2) the 2026-10-31 clean same-optimizer comparison
-    (pp training reaches 0.39 of the catalog''s error on its classes), or (3) both with the clean one as the answer?'
-  waiting_since: '2026-11-13T07:33:03+00:00'
-  searched: 'results.tex par:v4_vs_pp and par:v4_pp_bound; site decisions --project FA all: none chooses what the paper shows.
-    His messages: 2026-11-10T02:08 (the draft plan) names no pp comparison; 2026-10-26T02:03 is about encoding the AdamW/Muon
-    difference in the data; 2026-11-11T02:09 is about clusters and a message of mine; none chooses'
-  blocks: only Sec. 3's pp-coverage paragraph and figure
-  blocks_steps: *id002
 - id: kit_benchmark
   title: the KIT hard phase-space benchmark and the fair NLO protocol (Bakar, Gudrun)
   question: 'On the KIT datasets (ee->tt Born and one-loop virtual, ee->uug, ee->uugg; hard bins by distance to the singularity):
