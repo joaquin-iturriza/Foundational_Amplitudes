@@ -53,6 +53,12 @@
   "iterations": 4264,
   "log": "log_FA-ccin2p3-f0156d88.txt"
  },
+ "FA-ccin2p3-f08e90e8": {
+  "batches": 6707,
+  "epochs": 10.1721,
+  "iterations": 68224,
+  "log": "f08e90e8.log"
+ },
  "FA-ccin2p3-fd7fc137": {
   "batches": 6707,
   "epochs": 0.6358,

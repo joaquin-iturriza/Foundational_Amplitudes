@@ -1,0 +1,522 @@
+{
+ "design": "plan optimizations_recap step 3, design passed 2026-11-12 00:25",
+ "runs": {
+  "adamw": "FA-ccin2p3-f08e90e8",
+  "muon": "FA-ccin2p3-1a46f3e0"
+ },
+ "curve": {
+  "steps": [
+   1364,
+   2728,
+   4092,
+   5456,
+   6820,
+   8184,
+   9548,
+   10912,
+   12276,
+   13640,
+   15004,
+   16368,
+   17732,
+   19096,
+   20460,
+   21824,
+   23188,
+   24552,
+   25916,
+   27280,
+   28644,
+   30008,
+   31372,
+   32736,
+   34100,
+   35464,
+   36828,
+   38192,
+   39556,
+   40920,
+   42284,
+   43648,
+   45012,
+   46376,
+   47740,
+   49104,
+   50468,
+   51832,
+   53196,
+   54560,
+   55924,
+   57288,
+   58652,
+   60016,
+   61380,
+   62744,
+   64108,
+   65472,
+   66836,
+   68200
+  ],
+  "ratio_adamw_over_muon": [
+   1.1048,
+   2.2254,
+   3.0419,
+   2.0158,
+   3.4296,
+   1.9759,
+   2.2694,
+   4.1654,
+   1.8234,
+   5.0808,
+   2.3332,
+   2.4567,
+   2.3075,
+   1.6311,
+   3.5831,
+   2.5266,
+   3.1736,
+   2.9982,
+   4.2834,
+   5.3313,
+   7.8522,
+   4.9219,
+   4.4977,
+   5.3774,
+   6.8744,
+   5.7413,
+   9.1908,
+   7.1062,
+   7.8167,
+   14.7848,
+   13.9884,
+   7.9268,
+   14.7573,
+   8.9222,
+   12.2156,
+   14.7347,
+   16.0158,
+   11.7026,
+   10.304,
+   13.5753,
+   16.694,
+   19.597,
+   24.2975,
+   17.9367,
+   14.4615,
+   16.9659,
+   9.5066,
+   9.1299,
+   10.7113,
+   10.6485
+  ],
+  "ratio_running_best": [
+   1.1048,
+   2.2254,
+   3.0419,
+   2.0158,
+   2.4024,
+   2.3447,
+   2.2694,
+   2.3975,
+   1.98,
+   1.9888,
+   2.0374,
+   2.0374,
+   2.3075,
+   1.9506,
+   2.0382,
+   2.0382,
+   2.0512,
+   2.0512,
+   2.0512,
+   2.3413,
+   2.5495,
+   2.5532,
+   2.7969,
+   2.7969,
+   2.7969,
+   2.7969,
+   2.8338,
+   2.8338,
+   2.8338,
+   2.9522,
+   2.9522,
+   2.9522,
+   2.9561,
+   2.9561,
+   3.2964,
+   3.4793,
+   3.4957,
+   3.6435,
+   3.6435,
+   3.6435,
+   3.8231,
+   3.8293,
+   3.9934,
+   4.0197,
+   4.0197,
+   4.0384,
+   4.0822,
+   4.0933,
+   4.106,
+   4.106
+  ],
+  "median_ratio": 6.9903,
+  "steps_to_level": {
+   "8528": {
+    "muon_step": 8184,
+    "muon_best_so_far": 0.0311931846145181,
+    "adamw_step": null
+   },
+   "17056": {
+    "muon_step": 17732,
+    "muon_best_so_far": 0.019708976414303258,
+    "adamw_step": null
+   },
+   "34112": {
+    "muon_step": 34100,
+    "muon_best_so_far": 0.013745402272484379,
+    "adamw_step": null
+   },
+   "68224": {
+    "muon_step": 68200,
+    "muon_best_so_far": 0.009363046762185369,
+    "adamw_step": null
+   }
+  },
+  "plateau": {
+   "adamw": {
+    "best": 0.03844457660669075,
+    "best_step": 19096,
+    "at_0p75T": 0.12348163184406152,
+    "step_0p75T": 51832,
+    "best_over_0p75T": 0.3113,
+    "plateaued": true
+   },
+   "muon": {
+    "best": 0.009363046762185369,
+    "best_step": 66836,
+    "at_0p75T": 0.010551623986301608,
+    "step_0p75T": 51832,
+    "best_over_0p75T": 0.8874,
+    "plateaued": false
+   }
+  }
+ },
+ "seed_pair": [
+  "FA-ccin2p3-804a65bc",
+  "FA-ccin2p3-66e8c31f"
+ ],
+ "reads": {
+  "PP4": {
+   "all": {
+    "R": 5.182,
+    "n_classes": 1301,
+    "boot95": [
+     4.9032,
+     5.4768
+    ],
+    "widened": [
+     4.644,
+     5.7825
+    ],
+    "frac_classes_below_1": 0.0707,
+    "n_probes": 1301,
+    "R_seed": 1.0558,
+    "frac_classes_muon_lower": 0.9293
+   },
+   "unmatched": 0
+  },
+  "EE4": {
+   "all": {
+    "R": 3.836,
+    "n_classes": 169,
+    "boot95": [
+     3.4433,
+     4.4086
+    ],
+    "widened": [
+     3.3335,
+     4.5538
+    ],
+    "frac_classes_below_1": 0.0414,
+    "n_probes": 169,
+    "R_seed": 0.9681,
+    "frac_classes_muon_lower": 0.9586
+   },
+   "unmatched": 0
+  },
+  "held": {
+   "all": {
+    "R": 2.7589,
+    "n_classes": 701,
+    "boot95": [
+     2.5214,
+     2.9758
+    ],
+    "widened": [
+     2.3938,
+     3.1345
+    ],
+    "frac_classes_below_1": 0.1327,
+    "n_probes": 701,
+    "R_seed": 1.0533,
+    "frac_classes_muon_lower": 0.8673
+   },
+   "H1": {
+    "R": 3.731,
+    "n_classes": 62,
+    "boot95": [
+     3.3836,
+     4.9356
+    ],
+    "widened": [
+     3.0655,
+     5.4479
+    ],
+    "frac_classes_below_1": 0.0323,
+    "n_probes": 62,
+    "R_seed": 1.1038,
+    "frac_classes_muon_lower": 0.9677
+   },
+   "H2": {
+    "R": 3.919,
+    "n_classes": 218,
+    "boot95": [
+     3.5448,
+     4.3771
+    ],
+    "widened": [
+     3.2643,
+     4.7533
+    ],
+    "frac_classes_below_1": 0.0092,
+    "n_probes": 218,
+    "R_seed": 1.0859,
+    "frac_classes_muon_lower": 0.9908
+   },
+   "H2p5": {
+    "R": 0.6336,
+    "n_classes": 38,
+    "boot95": [
+     0.5135,
+     0.726
+    ],
+    "widened": [
+     0.4465,
+     0.835
+    ],
+    "frac_classes_below_1": 0.8421,
+    "n_probes": 38,
+    "R_seed": 1.1501,
+    "frac_classes_muon_lower": 0.1579
+   },
+   "H3": {
+    "R": 2.3168,
+    "n_classes": 279,
+    "boot95": [
+     2.0748,
+     2.4927
+    ],
+    "widened": [
+     2.0701,
+     2.4985
+    ],
+    "frac_classes_below_1": 0.1362,
+    "n_probes": 279,
+    "R_seed": 0.9977,
+    "frac_classes_muon_lower": 0.8638
+   },
+   "H5": {
+    "R": 0.8512,
+    "n_classes": 28,
+    "boot95": [
+     0.7489,
+     1.2461
+    ],
+    "widened": [
+     0.7169,
+     1.3018
+    ],
+    "frac_classes_below_1": 0.5357,
+    "n_probes": 28,
+    "R_seed": 1.0447,
+    "frac_classes_muon_lower": 0.4643
+   },
+   "H6": {
+    "R": 7.236,
+    "n_classes": 8,
+    "boot95": [
+     2.0184,
+     12.15
+    ],
+    "widened": [
+     1.8906,
+     12.9718
+    ],
+    "frac_classes_below_1": 0.125,
+    "n_probes": 8,
+    "R_seed": 1.0676,
+    "frac_classes_muon_lower": 0.875
+   },
+   "H7E": {
+    "R": 3.1866,
+    "n_classes": 34,
+    "boot95": [
+     2.4823,
+     4.4933
+    ],
+    "widened": [
+     2.4702,
+     4.5153
+    ],
+    "frac_classes_below_1": 0.0588,
+    "n_probes": 34,
+    "R_seed": 1.0049,
+    "frac_classes_muon_lower": 0.9412
+   },
+   "H7c": {
+    "R": 4.114,
+    "n_classes": 34,
+    "boot95": [
+     2.7454,
+     5.2765
+    ],
+    "widened": [
+     2.7216,
+     5.3226
+    ],
+    "frac_classes_below_1": 0.0294,
+    "n_probes": 34,
+    "R_seed": 1.0087,
+    "frac_classes_muon_lower": 0.9706
+   },
+   "unmatched": 0
+  },
+  "HD4": {
+   "all": {
+    "R": 2.7011,
+    "n_classes": 114,
+    "boot95": [
+     1.7232,
+     3.8702
+    ],
+    "widened": [
+     1.6894,
+     3.9477
+    ],
+    "frac_classes_below_1": 0.3158,
+    "n_probes": 114,
+    "R_seed": 1.02,
+    "frac_classes_muon_lower": 0.6842
+   },
+   "unmatched": 0
+  },
+  "HD5": {
+   "all": {
+    "R": 1.0597,
+    "n_classes": 28,
+    "boot95": [
+     0.6574,
+     2.1784
+    ],
+    "widened": [
+     0.5931,
+     2.4144
+    ],
+    "frac_classes_below_1": 0.5,
+    "n_probes": 28,
+    "R_seed": 1.1084,
+    "frac_classes_muon_lower": 0.5
+   },
+   "unmatched": 0
+  }
+ },
+ "level": {
+  "PP4": {
+   "adamw": {
+    "median_class_mse": 0.183574,
+    "frac_classes_below_1e-4": 0.0061
+   },
+   "muon": {
+    "median_class_mse": 0.033547,
+    "frac_classes_below_1e-4": 0.0246
+   }
+  },
+  "EE4": {
+   "adamw": {
+    "median_class_mse": 0.224048,
+    "frac_classes_below_1e-4": 0.0178
+   },
+   "muon": {
+    "median_class_mse": 0.068059,
+    "frac_classes_below_1e-4": 0.0118
+   }
+  },
+  "held": {
+   "adamw": {
+    "median_class_mse": 0.700598,
+    "frac_classes_below_1e-4": 0.0029
+   },
+   "muon": {
+    "median_class_mse": 0.250566,
+    "frac_classes_below_1e-4": 0.0014
+   }
+  },
+  "HD4": {
+   "adamw": {
+    "median_class_mse": 0.484449,
+    "frac_classes_below_1e-4": 0.0175
+   },
+   "muon": {
+    "median_class_mse": 0.239503,
+    "frac_classes_below_1e-4": 0.0088
+   }
+  },
+  "HD5": {
+   "adamw": {
+    "median_class_mse": 15.654212,
+    "frac_classes_below_1e-4": 0.0
+   },
+   "muon": {
+    "median_class_mse": 14.319754,
+    "frac_classes_below_1e-4": 0.0
+   }
+  }
+ },
+ "blowups": {
+  "rule": "non-finite val_loss_no_reg, or after step 500 (a block shorter than that: after its first validation) above 10x the reference validation; het NLL: above the reference + 0.5 ln 10 = 1.151; blown up when the block's best checkpoint is before that validation, spiked and recovered (listed, not flagged) when it is after",
+  "runs": {
+   "FA-ccin2p3-f08e90e8": {
+    "train_run": "FA-ccin2p3-f08e90e8",
+    "loss": "HETEROSC",
+    "blocks": [
+     {
+      "ref_step": 1364,
+      "ref": -0.3870254,
+      "early_max": null,
+      "best_step": 68200,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": -0.3870254
+     },
+     {
+      "ref_step": 10,
+      "ref": -3.322565,
+      "early_max": null,
+      "best_step": 220,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": -3.322403
+     }
+    ],
+    "spiked_recovered": [],
+    "blew_up": null
+   }
+  },
+  "flagged": [],
+  "spiked_recovered": []
+ }
+}
