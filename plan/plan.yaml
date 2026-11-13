@@ -32146,6 +32146,103 @@ entries:
       on CC), disk (~75 MB x 15 against 63 GB free on /sps/lpnhe), step rate from the trials themselves (trial_1918: ~23 min
       training, batch 16384, 1e5, float64). uugg deferred for lack of chosen HPs (uugg T 0/16 good): keep it stated as a difference
       from step 21''s scope in the submission message.'
+  - at: '2026-11-13T10:47:25+00:00'
+    question: 'Steps 14, 17, 19, 21 redone at the kit_hpo chosen HPs (finding 2026-11-13 ~12:30): with validation now falling
+      with training (curve_quality good), do (14) the divergence-form inputs (model.input_div_form), (19) ReZero (model.net.layer_norm=rezero),
+      (21) the asymptotic factor A2 (model.input_asym_factor, plain momenta, gamma<=4) and, on tt, its Sudakov single-log
+      repair (model.input_asym_sudakov_single: exp(c)(L^2 + exp(kappa) L) per heavy leg), and (17) fine-tuning from the held-out-catalog
+      parents (with LO tops / LO and one-loop tops, with/without log beta^2) fix the KIT hard bins (uug soft and collinear;
+      tt virtual Coulomb and Sudakov) against matched from-scratch controls at the same HPs? Feeds: which of these the KIT
+      models take (the step-18 PARTIAL verdict, the 11c NO, the step-14/19 reads were all at the old HP point whose controls
+      fail the curve bars), and whether the factor''s Sudakov term is repaired. Plus the step-21 uugg arm: a uugg plain-target
+      search (kit_hpo template) to give it HPs, then A2 against that search''s chosen trial.'
+    prior: 'Searched docs/results.tex (KIT, div_form, ReZero, asymptotic factor, Sudakov), plan show kit_benchmark, site decisions
+      D405-D449. (1) kit_hpo read (this entry, ~12:30): uug plain hp1918 lr 0.0125 (old 0.0118605) val mu-MSE 2.92e-5 sep
+      1.05; tt softpairthr hp0131 lr 0.00178 val 7.1e-7 sep 1.94; uug T only hp1677 good (sep 1.74), uugg T none good. (2)
+      Step 18 at the old point (8000 cosine): A2 FIXED uug coll (log-MSE 17.7 -> 4.1e-4) and soft (241 -> 0.016), tt Coulomb
+      (3.55 -> 0.010), tt Sudakov WORSE (0.72 -> 4.76, signed +1.88); A1 weaker. (3) kit_asym_bound: Sudakov coefficient c
+      = (log|M|^2 - log sum D - mean)/sd drifts -3.11, -3.35, -3.47 over the three Sudakov bins (y/L^2 falls 0.17 then 0.09
+      nats per bin; L^2 + b L fits it with b ~ 4-7, so a positive single log); bulk c up to -1.46. (4) Step 14 div-form: smokes
+      7aff4018 / 06fc43d3 passed (WSD path through job_kit.sh), no arm run. (5) Step 19 ReZero at the old point: tt Born d322922b
+      nothing to move; uug dc15b6bc / tt 4cab2100 read at the old point. (6) 11c (8000 cosine, lr 0.0118605): fine-tunes not
+      converged (NLL still falling), NO verdict vs scratch. Difference here: every arm and control at the searched HPs, 1831
+      WSD steps (300 epochs, D425), controls rerun through job_kit.sh so they are scored on the hard bins.'
+    measure: 'As every KIT arm: kit_predict scores at the end of each job (hard_test strata + bulk_test); tools/kit_figures.py
+      collect -> analysis/kit_benchmark/data/kit_fig_A_hpo.json; tools/kit_extrap_read.py: per hard bin median signed error
+      (pred - truth, log10|M|^2) and log-MSE, the fitted exponent per family against the truth''s; tools/kit_readout.py --vs:
+      per family the median over strata of log10(arm/control log-MSE); bulk_test log-MSE; tools/kit_curves.py on each run''s
+      val/train mu-MSE curves (separation <= 3, end_up <= 2). Figures: kit_figures error and median panels per setup, legends
+      naming inputs/factor/parent.'
+    check: 'The measure separates failure from target on existing runs: uug plain 203a274f deepest coll y 1e-7..1e-6 log-MSE
+      17.7 / signed +1.83, soft x 1e-7..1e-6 241 / -7.81; tt 3fc1016a Coulomb beta 1e-4..1e-3 3.55 / -1.87, Sudakov 15-50
+      TeV 0.72 / -0.52; the A2 change moved these by 2-4 decades at the old point (step 18), so the measure moves with this
+      kind of change. The controls are the chosen trials themselves, scored on the KIT strata (kit_predict through scripts/job_kit_rescore.sh,
+      fixed at 5cdd9b0c to score a run without earlier scores); their val mu-MSE 2.92e-5 (uug) and 7.1e-7 (tt) are the searched
+      baselines. Code: test_asym_factor (incl. the new single-log term: exp(kappa) log(s/m^2) per top at one loop, none at
+      tree, uug unchanged by the flag) and test_div_form pass in .venv-cpu.'
+    fixed: 'scripts/job_kit.sh, 1e5 KIT bulk_train events, 1831 steps WSD (cooldown 0.125, D423), batch 16384, float64, HETEROSC
+      with mu_mse selection and the sigma stage, seed 42, base config trial 1262 of cov_v4_long_hpo8_cc_68224. HPs per setup
+      = the chosen trial''s (uug hp1918: training.scheduler=WSD ++training.wsd_cooldown_frac=0.125 training.batchsize=16384
+      training.lr=0.01251006 training.muon_weight_decay=0.05224253 training.regularization_lambda=4.881444e-07 training.cosanneal_warmup_frac=0.1902839
+      training.cosanneal_eta_min=1.045745e-08 ema=false training.ema_decay=0.9345431; tt hp0131: training.scheduler=WSD ++training.wsd_cooldown_frac=0.125
+      training.batchsize=16384 training.lr=0.001783506 training.muon_weight_decay=0.00338562 training.regularization_lambda=1.367627e-09
+      training.cosanneal_warmup_frac=0.1987059 training.cosanneal_eta_min=3.446451e-08 ema=true training.ema_decay=0.9179619).
+      Controls, no training: site submit ccin2p3 FA scripts/job_kit_rescore.sh -- runs/kit_hpo_uug_plain/trial_1918 and site
+      submit lxplus FA scripts/job_kit_rescore.sh -- runs/kit_hpo_ttvirt_thr/trial_0131 (~15 min each; if a trial cannot be
+      scored, a job_kit.sh rerun of its setup, reason stated, its val beside). Arms (site submit <pick> FA scripts/job_kit.sh
+      --item kit_benchmark --hdr=--time=01:30:00 -- ...), UC = kit_ee_uug__me2 100000 1831 A ++model.input_soft_eps=1e-8 ++model.input_pair_logs=5
+      data.target_physics_factor=false data.target_physics_orders=false <HU>, TC = kit_ee_tt__virt_finite 100000 1831 A ++model.input_soft_eps=1e-8
+      ++model.input_pair_logs=4 ++model.input_pair_threshold=true <HT>: uug div-form UC ++model.input_div_form=true tag=hpo_softpair_plain_divform;
+      uug ReZero UC ++model.net.layer_norm=rezero tag=hpo_softpair_plain_rezero; uug A2 kit_ee_uug__me2 100000 1831 A data.target_physics_factor=false
+      data.target_physics_orders=false <HU> ++model.input_asym_factor=true ++model.net.frames_gamma_max=4 tag=hpo_asym_cont;
+      tt div-form TC ++model.input_div_form=true tag=hpo_softpairthr_divform; tt ReZero TC ++model.net.layer_norm=rezero tag=hpo_softpairthr_rezero;
+      tt A2 kit_ee_tt__virt_finite 100000 1831 A data.target_physics_factor=false data.target_physics_orders=false <HT> ++model.input_asym_factor=true
+      ++model.net.frames_gamma_max=4 tag=hpo_asym_cont; tt A2+single = tt A2 + ++model.input_asym_sudakov_single=true tag=hpo_asym_cont_sud1
+      (code ebb031da), after its D395 50-step smoke through scoring (same args, 50 steps, tag=smoke_sud1). Step 17: tt scratch
+      softpair (no search of its own: a new run) kit_ee_tt__virt_finite 100000 1831 A ++model.input_soft_eps=1e-8 ++model.input_pair_logs=4
+      <HT> tag=hpo_softpair; five A_ft fine-tunes kit_ee_tt__virt_finite 100000 1831 A_ft fine_tune.offshell_stats=own <HT>
+      with --env KIT_PARENT=runs/data_saving/{dsave_parent_heldout_r5, dsave_parent_heldoutthr_r5, dsave_parent_heldoutthr_r5beta,
+      dsave_parent_heldoutthrloop_r5loop_rerun, dsave_parent_heldoutthrloop_r5loopbeta} (the 11c parents; inputs from each
+      parent''s config), lr_scale 1 (sweep rule 4 centre), tags hpo_ftr5own, hpo_ftr5thrown, hpo_ftr5thrbetaown, hpo_ftr5thrloopown,
+      hpo_ftr5thrloopbetaown. uugg: search sweep/sweep_config_kit_hpo_uugg_plain.yaml (deaba164; the kit_hpo template as kit_hpo_uug_plain,
+      base = fec28926''s setup: plain target, softpair inputs, 16 trials, 1831 steps WSD) via sweep/drive.py --item kit_benchmark
+      --mem 11G; then uugg A2 kit_ee_uugg__me2 100000 1831 A data.target_physics_factor=false data.target_physics_orders=false
+      <chosen trial''s HPs> ++model.input_asym_factor=true ++model.net.frames_gamma_max=4 tag=hpo_asym_cont against the chosen
+      trial scored by job_kit_rescore.sh (if no trial passes the curve check, the uugg arm is reported as having no searched
+      baseline and the search extension is the question). Cost: training ~23 min (trial 1918) + sigma stage and scoring ~13
+      min = ~0.65 h per job: 12 arm jobs 7.8 GPU-h, 2 rescores 0.5, smoke 0.1, uugg search 16 x ~0.6 = 9.6, uugg A2 + its
+      rescore 0.9: ~19 GPU-h, under D412''s 30. Wall target 1.0 h per job, one wave at site pick''s width (14 fit on CC now).
+      Disk ~75 MB/run.'
+    control: 'uug: the chosen trial hp1918 itself (runs/kit_hpo_uug_plain/trial_1918, the searched best; inputs of 203a274f:
+      softpair, plain target); div-form and ReZero differ from it by one flag; A2 differs in inputs (no log inputs) and gamma
+      cap (<=4), on the same plain target: the model as designed (step-18 design). tt: the chosen trial hp0131 (runs/kit_hpo_ttvirt_thr/trial_0131
+      on lxplus; softpairthr inputs, emission-scale target data.target_physics_factor=true target_physics_orders=true, dim_ref
+      qperp); div-form and ReZero differ by one flag; tt A2 differs in target (emission-scale -> plain, required by the factor''s
+      assert), inputs (log and threshold inputs off) and gamma cap: the model as designed, against the searched baseline;
+      A2+single against A2 is the clean one-flag test of the Sudakov repair. Step 17: each fine-tune against the scratch run
+      with its parent''s inputs: hpo_softpair (new, at hp0131) for ftr5own, trial hp0131 for the thr parents (inputs softpairthr),
+      as 11c. uugg: A2 against the uugg plain search''s chosen trial. References: old-point runs (203a274f, 3fc1016a, fec28926,
+      step-18 arms, 11c), Bakar''s MLP seeds.'
+    seeds: 'Seed 42, one run per arm, as every KIT arm (D315, D412). Bands: the MLP seed band 0.3 on the deepest-bin median
+      signed error (kit_extrap.json), family log-MSE medians against the MLP seed band (Sudakov 0.61, bulk 0.23, Coulomb 0.84
+      at 90%); the transformer''s own rerun spread 1.1x-30x in loss (results.tex ~13232) quoted beside any bulk verdict.'
+    outcome: 'Per limit family, arm against its control: FIXED = fitted exponent within 0.1 of the truth''s and deepest-bin
+      median signed error within +-0.3, bulk_test log-MSE no more than 0.5 decades worse; MOVED = deepest |signed error| at
+      least halved and exponent closer to truth; STAYED = within 0.3 of the control; else inconclusive at one seed. YES branches:
+      A2 FIXED on uug soft+coll, tt Coulomb (and uugg) -> the factor goes into the KIT models at searched HPs; A2+single FIXED
+      on Sudakov -> the repaired term is the factor''s; div-form FIXED/MOVED where A2 is not -> kept as inputs beside the
+      factor; ReZero MOVED -> kept; a fine-tune better than its scratch control on >= half the strata of a family, bulk within
+      band -> pretraining transfers for tt (A_ft packaged, step 5). NO branches (STAYED or worse at the baseline''s HPs; CLAUDE.md:
+      then the same sweep for the feature, best against best): each such arm gets its own 16-trial search on the kit_hpo template
+      (~9.6 GPU-h each; the fine-tunes'' search adds fine_tune.lr_scale in [0.1,10] and layer_decay in [0.75,1.0], sweep rule
+      4; the A_ft lr_scale 0.1 soft-limit gain of 2026-11-11T06:37 is the reason it is needed), best against best on val mu-MSE
+      and then the hard strata. Order, as the searches overrun D412''s 30 GPU-h after this batch (~19): (1) A2 (step 21, D436)
+      and A2+single on tt, (2) the fine-tunes (step 17, one search over the best-scoring parent), (3) div-form, (4) ReZero
+      (nothing to move at the old point on tt Born, D435 ''maybe''); each one beyond the remaining budget goes to Joaquin
+      with its cost before submission. A no is final without a search only for an arm that blows up at both the baseline lr
+      and lr x0.3 (listed with where). Sudakov still WORSE with the single log, at its searched HPs -> the per-leg coefficient,
+      not the subleading log, is the defect (next: the coefficient read on the Sudakov strata). Every verdict with the curve
+      form (separation/end_up).'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
