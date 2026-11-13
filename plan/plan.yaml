@@ -28162,6 +28162,15 @@ entries:
       of 8000 steps (factor ~9-55 in MSE if sigma tracks residuals): the cosine anneal ends while the loss is dropping fast,
       so none is converged. The 11c verdict (no Coulomb transfer) is read at a setting where the runs are not trained to convergence;
       to be redone at the step-15/16 chosen settings.'
+  - at: '2026-11-13T00:16:48+00:00'
+    text: '2026-11-13 ~01:10 literature lookup for D435 (Joaquin: ''There has to be a way to do it for the coulomb and sudakov
+      limits, or to enforce any asymptotic behaviour in general''): no ML amplitude paper builds in Coulomb 1/beta or Sudakov
+      log^2. Prior art: Maitre-Truong dipole emulator 2107.06625 (ansatz x learned coefficients), one-loop k-factor with antenna
+      basis 2302.04005, 2301.13562; Badger-Bullock 2002.07516 sector networks; L-GATr 2405.14806/2411.00446 no limits; Xu
+      et al 2009.11848; NALU 1808.00508; rational networks 2004.01902 (power-law tails with controllable exponents); HardNet
+      2410.10807 hard output constraints; 2604.18686 conformal correlators: fixed asymptotic function for log z, log^2 z plus
+      learned correction (naive multiplicative ansatz failed). Most direct for us: log|M|^2 = log A(x) + g(x) with A the known
+      asymptotic factor (Coulomb, Sudakov, dipoles) and g bounded and switched off in the limit.'
   step_why:
     5:
       feeds: what KIT receives
