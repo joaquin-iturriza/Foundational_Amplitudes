@@ -25,4 +25,6 @@ PF=$(grep -m1 "processes_file:" "$T/config.yaml" | sed "s/.*processes_file: *//"
 grep -q "pretrained_path:" "$T/config.yaml" && ! grep -q "map_head:" "$T/config.yaml" && PARENT+=(+fine_tune.map_head=false)
 python run.py --config-path "$T" --config-name config run_dir="${T}_rerun" warm_start_idx=null \
     training.is_dyhpo_run=false plot=true training.result_path="${T}_rerun/result.json" "${PARENT[@]}"
-python tools/eval_delta.py --out-dir "$SCRATCH/zz_delta" "${T}_rerun"
+OUT=$(python tools/eval_delta.py --out-dir "$SCRATCH/zz_delta" "${T}_rerun"); echo "$OUT"
+# the supervisor's end marker: RUN_SUMMARY carries no rc field, so a clean rerun says so here
+grep -q "^EVAL_DELTA_DONE 1/1" <<<"$OUT" && echo RUN_DONE
