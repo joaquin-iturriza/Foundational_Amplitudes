@@ -33308,6 +33308,11 @@ entries:
       PDFs are gitignored, so every new figure was missing. Replaced by overleaf_update_v2.zip (paper.tex, refs.bib, whole
       figs/pretrain and figs/transfer, 144 files), tested by unpacking over the 2026-11-10 import and compiling: 62 pages,
       no missing file. Rule for next time: a bundle for Joaquin is compiled standalone before it is sent.'
+  - at: '2026-11-13T14:53:54+00:00'
+    text: '2026-11-13 Joaquin on the Muon example figure (Fig. 9 in our compile, his Fig. 8) bottom right: ratio stopped and
+      truth vanished. Cause: ratio drawn only in bins with >=10 true events, clipped to [0,2] with 0 on the frame; truth''s
+      1-event bins sat on the y-axis frame. Fixed (FA ab1b1973, draft 2819901): ratio wherever truth >0, >2 marked, empty-truth
+      bins shaded, y from 0.5.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
