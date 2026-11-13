@@ -21617,9 +21617,9 @@ entries:
     decision: D441
   owner:
     agent: a75868725fdec3ff2
-    state: stopped
+    state: working
     since: '2026-11-13T01:20:06+00:00'
-    state_at: '2026-11-13T04:59:52.668000+00:00'
+    state_at: '2026-11-13T07:01:11.060000+00:00'
     context: 206802
     context_at: '2026-11-13T04:57:40+00:00'
   designs:
@@ -26930,7 +26930,7 @@ entries:
     agent: a14a677afceccea59
     state: working
     since: '2026-11-13T06:48:36+00:00'
-    state_at: '2026-11-13T06:48:36+00:00'
+    state_at: '2026-11-13T07:00:46.764000+00:00'
     context: 84317
     context_at: '2026-11-13T06:51:01+00:00'
   designs:
@@ -27569,9 +27569,9 @@ entries:
     withdrawn_why: 'Joaquin: use all available clusters'
   owner:
     agent: aac7cd28c4a7fa60a
-    state: working
+    state: stopped
     since: '2026-11-13T06:51:11+00:00'
-    state_at: '2026-11-13T06:51:11+00:00'
+    state_at: '2026-11-13T07:00:50.127000+00:00'
     context: 126364
     context_at: '2026-11-13T06:59:58+00:00'
   findings:
@@ -32622,7 +32622,7 @@ entries:
     agent: a34e6d2a7f0b1339b
     state: working
     since: '2026-11-13T05:16:17+00:00'
-    state_at: '2026-11-13T06:46:42.197000+00:00'
+    state_at: '2026-11-13T07:01:06.042000+00:00'
     context: 229686
     context_at: '2026-11-13T07:00:14+00:00'
   step_why:
