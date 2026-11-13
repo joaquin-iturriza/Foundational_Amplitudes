@@ -33362,6 +33362,14 @@ entries:
       Sec. 5 inputs text, the Fig. 11 caption and the figure label (adopted -> ''no diagrams, linear''); 1.78M parameter sentence
       stays. Not checked: whether the Sec. 6 ladder (tp3) runs used the diagram encoder (their configs were not found under
       sweeps/tp3_*).'
+  - at: '2026-11-13T17:43:17+00:00'
+    text: '2026-11-13: Sec. 6 ladder runs did not use the diagram encoder. Every runs/tp3_*/trial_*/config.yaml read on CC
+      (3817), Jean Zay (7163) and lxplus (4620), 15600 in all: use_diagrams: true only in the diagram-encoder experiments
+      tp3_levdiag*, tp3_hp58fte* (496 configs); the paper''s families (tp3_ladder_r1-r9, tp3_pre64, tp3_finale, tp3_synth,
+      tp3_star_*, tp3_r1-9fte, tp3_uu64fte, tp3_finfte, tp3_synfte, star-arm fine-tunes, tp3_scr/scrh/scrh10) 7335 configs,
+      0 with use_diagrams: true (e.g. runs/tp3_ladder_r9/trial_0073/config.yaml, tp3_finale/trial_0073, tp3_synth/trial_0073:
+      ''use_diagrams: false''). Sec. 6 setup sentence now says ''without the diagram encoder'' (draft cf688a5), since ''the
+      network of Sec. 5'' would otherwise imply it; zip scratchpad overleaf_update_v7.zip (paper.tex only), tested over overleaf_1113+v5+v6.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
