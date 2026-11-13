@@ -47,7 +47,7 @@ def rows(cached):
         return json.load(open(cache))
     names = [n for n in (name(a, D) for a in NEW for D in CELLS) if os.path.isdir(os.path.join(REPO, "sweeps_local", n))]
     r = {"curves": driven_rows(names),
-         "test": driven_rows(names, stage2_readout.REMOTE, "S2T", "'runs/dsave_s5*parent_ft_bbx_zz_d*/trial_*'")}
+         "test": driven_rows(names, stage2_readout.REMOTE, "S2T", "'runs/dsave_s[56]*parent*_ft_bbx_zz_d*/trial_*'")}
     json.dump(r, open(cache, "w"))
     return r
 
@@ -141,7 +141,7 @@ def main():
         print(f"D={D}: " + "  ".join(
             f"{a} best {c[a]['best_val']:.2e} test {c[a]['best_test'] or float('nan'):.2e}"
             + (f" start {c[a]['start_ft_over_scr']:.3f} lost {c[a]['lost_at']} rise {c[a]['best_rise']:.2f}"
-               if a != "scr" else "") for a in ("scr", "R", "C", "W") if a in c))
+               if a != "scr" else "") for a in ("scr", "R", "C", "W", "L") if a in c))
         print("      " + "  ".join(f"{q} {c[q]:.3g}" for q in c if "/" in q)
               + "  zero shot " + "  ".join(f"{a} {np.median(c[a]['zero_shot_val']):.3g}" for a in ("R", "C", "W") if a in c)
               + "  failed " + str({a: c[a]["failed"] for a in NEW if a in c and c[a]["failed"]}))
