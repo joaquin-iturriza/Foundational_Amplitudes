@@ -24,10 +24,15 @@ GROUPS = ((2, r"$2\to2$"), (3, r"$2\to3$"), (4, r"$2\to4$"))
 BLOWUP = {"tp3_uu64fte_ee_nnbar_d8__trial_0114": "step 1360, best checkpoint step 400"}
 
 
+EXCLUDED = [0]       # events msel could not take (non-finite Delta or a predicted |M|^2 of exactly 0), over all calls
+
+
 def msel(d):
     """MSE of ln|M|^2 from Delta = r - 1, the metric of every other per-cell scatter in the paper."""
-    d = d[np.isfinite(d) & (d > -1)]
-    return float(np.mean(np.log1p(d) ** 2))
+    # ln|1+d| = ln|M_pred|^2 - ln|M_true|^2 for either sign of the prediction, so a flipped-sign event (d <= -1) counts
+    ok = np.isfinite(d) & (d != -1)       # d == -1 is a predicted |M|^2 of exactly 0: ln undefined, the only exclusion
+    EXCLUDED[0] += int((~ok).sum())
+    return float(np.mean(np.log(np.abs(1 + d[ok])) ** 2))
 
 
 def main():
@@ -52,6 +57,7 @@ def main():
                         f1=float(np.mean(np.abs(p) < 1)),
                         tail=np.array([np.mean(np.abs(p) > k) for k in KS])))
     print(f"MSE baselines that are reruns of a pruned trial: {reruns}")
+    print(f"events excluded from the MSE of ln|M|^2 (non-finite Delta or predicted |M|^2 = 0): {EXCLUDED[0]}")
     bad = [x for x in pts if x["blowup"]]
     pts = [x for x in pts if not x["blowup"]]
     fig, (a1, a2) = ps.figure(ncols=2)
