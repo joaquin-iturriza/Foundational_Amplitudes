@@ -10,7 +10,7 @@ cluster:
   scheduler: slurm
   auto_submit: false
   request_gpus: 1
-  mem: 32G
+  mem: 11G   # peak RSS ~2 GB; <=12000 MB keeps lxplus at 4 CPUs so the V100 nodes (4 CPUs, 16 GB) can take it (E6895)
   cpus_per_task: 4
   time: "01:00:00"
 paths: null
