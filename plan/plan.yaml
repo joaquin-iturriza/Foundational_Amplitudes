@@ -27105,6 +27105,9 @@ entries:
       2302.04005): the network predicts Catani-Seymour dipole coefficients for uug/uugg, CDST massive dipoles where a top
       is involved, so the singular limits are exact by construction. No MLP branch. Design at the step-15/16 chosen HPs, with
       the literature agent''s findings on enforcing Coulomb/Sudakov.'
+    19: 'D435: (b) finish the ReZero (model.net.layer_norm=rezero, 9e63d86f) test at the step-15/16 chosen HPs on uug and
+      tt virtual (earlier: tt Born ReZero d322922b read 2026-11-12 ~11:50, nothing to move; uug/tt virtual reads at the old
+      HP point).'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -28194,6 +28197,12 @@ entries:
       - 'the dipole ansatz fixes uug/uugg soft+collinear (and tt Coulomb/Sudakov with CDST massive dipoles) within the MLP
         bands: it becomes the KIT model and is proposed for catalog runs'
       - 'no or partial: reported per limit against the input arms; the literature agent''s methods are next'
+    19:
+      feeds: whether removing LayerNorm (ReZero) is what fixes the input-scale dependence in the limits (D411, D435 'maybe
+        the layernorm stuff')
+      if:
+      - 'ReZero at the chosen HPs closes the limits within bands without bulk loss: adopted for KIT'
+      - 'no effect or worse: ReZero dropped, reported'
   step_waits:
     '5': 'kit_hpo driver DONE event: the package takes the chosen trials'' models'
     '15': kit_hpo driver DONE event (detach:kit_hpo, log ~/.local/share/ccorch/detached/20261112-224604_kit_hpo.log); live
