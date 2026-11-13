@@ -26583,6 +26583,10 @@ entries:
   - at: '2026-11-13T02:29:27+00:00'
     text: '2026-11-13 ~03:30: D441 ''Separate exponents'' -> owner a7586872 redraws old_setup_examples with per-curve exponents
       (muted gap colour #9c86a6 kept, D=10 bb one-loop excluded); main session to send the figure to Joaquin when handed back.'
+  - at: '2026-11-13T02:29:47+00:00'
+    text: '2026-11-13 old_setup_examples redrawn with separate exponents (Joaquin: ''Separate exponents''; @3b3c3ab6): S =
+      D*_scr/D*_ft [16-84% bootstrap]: Zggg 11.3 [10.4,14.1] (1e-2; alpha 0.87/0.69), d d~ g 5.5 [3.9,7.5] (1e-2; 1.17/0.99),
+      u d~ e nu 4.4 [3.4,5.6] (1e-2; 1.76/1.96), b b~ one loop 5.6 [4.6,6.8] (1e-4; 1.76/2.32; D=10 excluded); median 5.55.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
