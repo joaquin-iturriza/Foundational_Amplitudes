@@ -33322,6 +33322,12 @@ entries:
       clipped to [0.5,1.5], on the truth''s 0.1-99.9% quantile range (10 of 5000 true events dropped on ee->bb one loop),
       truth under the predictions. Fixed (FA 6606a08b, draft 1b6a9d0): full range of truth and predictions, truth on top,
       ratio wherever truth>0, off-panel markers, empty truth bins shaded. Muon example fix kept (FA ab1b1973).'
+  - at: '2026-11-13T15:56:03+00:00'
+    text: '2026-11-13 Joaquin''s comments on his Overleaf state (scratchpad overleaf_1113): adopted it (draft 16c1ec9); ''How
+      the study was run'' + Figs. 25-28 removed, a few sentences into Setup; rung_grid figs removed; finale_synth figs/caption
+      back to before 5f4dc23; figures scaled (three ladder panels a row), legends as full-row strips (plot_style.legend_strip
+      width mode, FA 14132f0a); example_dist/Muon extras undone (FA 5e25e978); scatter smaller sets on top. His part 26 pages
+      (snapshot 40, d742281 50). Prose tightening not done; Setup sentences not reviewed. Draft 42c3d80.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
