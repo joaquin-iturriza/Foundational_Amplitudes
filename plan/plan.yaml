@@ -32638,3 +32638,41 @@ entries:
       3, minor: the 2x reproduction threshold is fine once trial_0096 (0.05%) is cited beside the 6% pretraining rerun. Checks
       1, 2, 4, 6, 7, 8, 9, 11, 12 and 13 pass or do not apply: each run reruns its own cell''s config, which is what the figure
       shows (D437: only the every-structure fine-tune; D443: no bb->ZZ or tt).'
+  - at: '2026-11-13T03:20:46+00:00'
+    question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
+      D433/D441) for a reader: at a few D, what do the per-event errors and the predicted distributions of the from-scratch
+      and the every-structure fine-tune (tp3_finfte) cells look like (D444: delta histograms, true against predicted distributions
+      with a ratio panel)?'
+    prior: 'Searched docs/results.tex (residual_map, save_predictions, rerun, eval_delta, representative), plan show draft_rewrite,
+      site decisions (D433, D438, D441, D444), analysis/transfer/delta_data and het_delta_data, site runs for job_rerun_trial.
+      The figure''s cells'' checkpoints are pruned (models/ empty); each run''s own plots_0/delta.pdf and histograms.pdf remain
+      but are single-arm, in the run''s styling, with no ratio panel, so the arrays are needed to overlay scratch and fine-tune
+      in paper style. analysis/transfer/delta_data/*.npz holds test-split Delta only (no truth or prediction, so no distributions)
+      at D=10^4 for 7 of the 8 D=10^4 cells; none at 10^2, 10^3. One of the 24 cells is already rerun cold with predictions:
+      fine-tune Zggg D=10^4 (tp3_finfte_uubar_Zggg_d8 trial_0096_rerun, CC, 2026-10-14; preds_val.npz in $SCRATCH/zz_delta/tp3_finfte_uubar_Zggg_d8__trial_0096_rerun),
+      its rebuilt val loss 1.27292e-4 against the recorded 1.27227e-4 (0.05%): reused, so 23 new runs. Reproduction of a cold
+      rerun: ladder rung 6 hp15, trained on lxplus, reran on CC to 6% of its record (results.tex, FA-ccin2p3-2ed18ab8).'
+    measure: 'Per cell, the rerun''s per-event predictions on the cell''s own validation split (the same events behind the
+      figure''s MSE; preds_val.npz from tools/eval_delta.py at the best checkpoint): Delta = |M|^2_pred/|M|^2_true - 1 histograms
+      and the log|M|^2 distributions true vs predicted with the ratio pred/true per bin; plus the rerun''s validation MSE
+      of log|M|^2 against the cell''s recorded value.'
+    check: 'The figure''s cells differ by 2.3-45x in MSE between scratch and fine-tune at equal D (old_setup_examples stdout
+      at 3b3c3ab6: median L_scratch/L_ft 11.5 over 28 cells), so the per-event spread moves with the arm; cold reruns reproduced
+      their records to 0.05% (Zggg trial_0096) and 6% (rung 6 hp15), far inside those gaps.'
+    fixed: 'Each cell''s own config.yaml (same HPs, horizon T 2816 at D=10^2 and 8000 at 10^3, 10^4, seed 42, data, network;
+      fine-tunes from the same parent tp3_finale/trial_0073, model_run0_best.pt.gz present on CC), rerun cold with scripts/job_rerun_trial.sh
+      (also writes preds_val.npz). Layout: all on CC-IN2P3, where the parent and every probe''s train/val pools are (Jean
+      Zay lacks the udbar_enu train pool); the 6 trial dirs not on CC (lxplus: tp3_finfte_uubar_Zggg_d4/trial_0011, tp3_scr_udbar_enu_d4_002/trial_0015,
+      tp3_scr_udbar_enu_d6_002/trial_0185, tp3_scr_ee_bb_nlo_d4/trial_0116, tp3_scr_ee_bb_nlo_d6/trial_0030; Jean Zay: tp3_finfte_ee_bb_nlo_d6/trial_0026)
+      copied there with site copy, the parent passed as the script''s second argument. Time: records'' training sums to 3.6
+      h over the cells, longest 0.71 h; a rerun job is ~0.36 h for 0.13 h of training; --time=01:30:00 per job, batch wall
+      target 1 h, ~8 GPU-h expected (35 GPU-h ceiling at the limit, never reached). Disk: a few MB per run against 65 GB free
+      on /sps/lpnhe.'
+    control: The from-scratch cell (the best trial of its search, cells.scratch) at the same probe and D; and each rerun against
+      its own recorded loss.
+    seeds: 'seed 42 as each cell ran, one rerun per cell: 4 probes (u ubar->Zggg, ee->d dbar g, u dbar->e+ nu_e, ee->b bbar
+      one loop) x D in {10^2, 10^3, 10^4} x {scratch, fine-tune} = 24 cells (analysis/data_saving/data/example_cells.json),
+      23 runs plus the existing Zggg fine-tune D=10^4 rerun.'
+    outcome: 'Yes (usable as examples): each rerun''s validation MSE within 2x of its cell''s recorded value; the figure shows
+      them. No: a rerun off by more than 2x is flagged in the caption and redone once from its config; the figure never shows
+      an unreproduced cell as the line''s value without saying so.'
