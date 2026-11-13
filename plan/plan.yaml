@@ -26352,6 +26352,17 @@ entries:
       ends better than scratch: ''there is also something in our finetuning process that is constraining the network in some
       way'' (D414 work). Also asked: do larger pretrained networks zero-shot and fine-tune better (''It might be the case
       that we just don''t have enough capacity'').'
+  - at: '2026-11-13T00:16:58+00:00'
+    text: '2026-11-13 ~01:30 CET. Draft figures: (1) old-setup data saving, four examples (old_setup_examples.py @316a22f5,
+      8k grid): L_scr/L_ft u u~ Zggg 4-6.5x from rung 8, 3-13x from every structure; e+e- d d~ g 4-13x from the soft arm;
+      u d~ e nu 5-24x then 190-330x at D>=1e3 from the W-pole arm (2 chosen points per cell); e+e- b b~ one loop (m_b 4.7)
+      4-17x from rung 9, up to 45x from every structure. (2) Ladder paper figures redrawn per D434 (finale_synth_scaling.py
+      --paper @3e4e6146): rung below / first rung with the structure / synthetic / ''every structure'' (the finale renamed)
+      / scratch on top. (3) Zero-shot vs width (width_zero_shot.py @848cf2cc): held-out R 0.66 at 16 heads, 0.53 at 32; test
+      0.56, 0.37. (4) D414 (ft_constraint.py @9aeba3ea): b b~ ZZ tree head start (3-70x at step 0) lost at 4-16% of the run
+      during warmup; 54% of tree ft trials rise >3x in warmup, Spearman with peak lr +0.50; Muon WD erases the parent at large
+      D (E=sum lr*wd 1.9, 4.4 at D=3162, 1e4). V/B: parent starts no better; ft end train lower in 6/7 cells, val 0.25-1.3x;
+      both arms val/train ~1e3-1e4 even at D=1e4 (other targets ~1).'
   targets:
   - batch: calib_trees
     wall_h: 4.0
