@@ -26380,6 +26380,11 @@ entries:
     text: '2026-11-13 Joaquin: ''this doesn''t answer if wider networks fine tune better, and studying if capacity affects
       transfer is a bigger task than what we can do tonight, but eventually we want to do this.'' Future study: fine-tune
       transfer against pretraining width (capacity).'
+  - at: '2026-11-13T00:59:22+00:00'
+    text: '2026-11-13 ~02:00 CET old_setup_examples redrawn per Joaquin (old_setup_examples.py @1aa91b49): scratch vs every-structure
+      fine-tune only, line at 1e-4 (b b~ one loop) or 1e-2 (others, where an arm misses 1e-4); saving D_scr/D_ft at the line
+      (log-log interpolation): Zggg 12.6 (4517/358), d d~ g 3.5 (2475/717), u d~ e nu 3.2 (581/181), b b~ one loop 6.1 (5568/909);
+      median L_scr/L_ft per panel 9.7, 7.4, 25.7, 8.3; over all 28 cells 11.5.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
