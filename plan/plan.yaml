@@ -33173,7 +33173,7 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-4fa87893
-    commit: 28817f4c
+    commit: ab1b1973
     paths:
     - /home/joaquin/drafts/fm_amplitudes_2026-11/paper.tex
     - /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_sec2_pages.pdf
