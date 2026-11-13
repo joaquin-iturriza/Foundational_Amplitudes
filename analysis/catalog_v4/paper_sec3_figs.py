@@ -268,8 +268,9 @@ def unseen():
 # percentile over processes of the per-process validation loss at the best checkpoint, as docs/results.tex
 # tab:bigrun_arms (analysis/bigrun/arms_best.py, run on the site holding the runs) and the pair-bias table of
 # sec:bigrun (whose reference is the 'no diagram encoder, linear embedding' arm, GM 3.85e-4 in both tables)
-# adopted = linear embedding, no diagram encoder; pair bias = added to the adopted configuration
-BIGRUN = {"adopted": (3.85e-4, 0.12),
+# no diagrams, linear = linear embedding and no diagram encoder (the lowest; not what the catalog pretrainings use, which
+# keep the diagram encoder at a linear embedding, the "linear embedding" arm); pair bias = added to it
+BIGRUN = {"no diagrams, linear": (3.85e-4, 0.12),
           "no diagrams": (3.88e-4, 0.10),
           "linear embedding": (4.86e-4, 0.056),
           "pair bias": (5.26e-4, 0.084),
