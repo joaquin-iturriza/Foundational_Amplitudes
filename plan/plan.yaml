@@ -26889,9 +26889,16 @@ entries:
     answers_after: '2026-11-13T04:42:32+00:00'
     covers:
     - optimizations_recap
+  - said_at: '2026-11-13T06:55:37.985000+00:00'
+    text: 1. no
+    decision: D453
+    answers_after: '2026-11-13T04:42:32+00:00'
+    covers:
+    - optimizations_recap
   decisions:
   - D364
   - D451
+  - D453
   next:
     2: 'muon_1e4: the AdamW-parent arm of the pretrain_data_saving grid (same held-out targets, D grid, per-D horizons to
       MSE 1e-4, fine-tune protocol): an AdamW pretraining of the data-saving parent''s setup at AdamW''s own searched HPs,
