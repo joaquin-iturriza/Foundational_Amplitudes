@@ -27456,8 +27456,6 @@ entries:
       these columns behind a new default-off flag + Lorentz-invariance test as tests/test_input_reps.py). One short test:
       uug (plain target and/or T target, controls 203a274f / c15b3337) and tt virtual (control softpairthr 3fc1016a), from
       scratch 1e5, at an lr where validation stays with training (step 15), own design + design-reviewer + D395 smoke.'
-    16: 'HP search for uugg and uug with the T target (same single-fidelity DyHPO template as step 15, WSD, ~16 GPU-h): only
-      on Joaquin''s yes to the 40 GPU-h total (D412)'
     17: 'Redo of 11c (fine-tunes from the held-out-catalog parents, with LO tops / LO and one-loop tops, with and without
       log beta^2, and their scratch controls) at the step-15/16 chosen settings for t t~ virtual: the 11c runs (8000 cosine
       steps) are not converged (NLL still falling 1.1-2.0 nats over the last 800 steps; 3 of 7 fail separation narrowly),
@@ -28631,11 +28629,6 @@ entries:
       - 'fixes uug soft+coll and tt Coulomb/Sudakov within the MLP bands: the features go into the KIT models and are proposed
         for catalog pretraining'
       - 'no or partial: reported per limit against the existing input arms and the log-invariant polynomial term'
-    16:
-      feeds: uugg and uug-T results at an HP point where validation stays with training (D422)
-      if:
-      - 'yes: launch beside step 15''s searches'
-      - 'no: uugg and uug-T stay at the old HP point, said wherever shown'
     17:
       feeds: whether one-loop top pairs in pretraining transfer the Coulomb rise, read on converged runs
       if:
@@ -28666,7 +28659,6 @@ entries:
     '5': 'kit_hpo driver DONE event: the package takes the chosen trials'' models'
     '14': 'kit_hpo driver DONE event: arms = chosen trial config + ++model.input_div_form=true (both D395 div-form smokes
       passed every stage, 2026-11-13)'
-    '16': kit_hpo driver DONE event (uug_T and uugg_T searches in the same driver, D424/D428)
     '17': 'kit_hpo driver DONE event: the chosen t t~ virtual settings'
     '19': kit_hpo driver DONE event (chosen HPs); literature agent's findings for (a)
     '20': '2026-11-14'
