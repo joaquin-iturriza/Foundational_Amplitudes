@@ -27629,7 +27629,7 @@ entries:
     withdrawn_why: 'Joaquin: use all available clusters'
   owner:
     agent: aac7cd28c4a7fa60a
-    state: working
+    state: closed
     since: '2026-11-13T06:51:11+00:00'
     state_at: '2026-11-13T10:09:41.722000+00:00'
     context: 238653
@@ -28646,32 +28646,24 @@ entries:
     '20': '2026-11-14'
     '21': 'kit_hpo searches (driver pid 802223): read with kit_curves sweep when DRIVE_DONE'
   handoff:
-    state: '2026-11-13 @3752e145. Draft Sec. 5 was written on the main session''s brief (draft 4a86295) but Joaquin had said
-      the KIT results do not go in today''s draft; the draft owner reverts it to its slots, do not touch the draft. Kept for
-      later use: tools/kit_paper_figs.py (collect reads CC predictions.h5 -> analysis/kit_benchmark/data/kit_paper_examples.json;
-      plot --figs <dir> prints every number): kit_bench_{a..d} (log-MSE, |bias|, p99 |Delta|, |M|^2-weighted error, transformer
-      vs Bakar log/raw MLP, rows by log10(transformer/MLP)), kit_delta_{a,b} and kit_dist_{a,b} (Delta histograms; true vs
-      predicted with ratio panel; uug coll, uugg qg coll, tt Sudakov, Coulomb, bulks), kit_protocols (A scratch / A_ft / B_bulk
-      / B at 9e5), kit_attempts_{a..f} (every extrapolation attempt per limit, best to worst, plus bulk). Numbers in finding
-      2026-11-13 (tt bulk -1.95 decades vs MLP; uug/uugg bulk +0.71/+1.03; collinear +1.3..+1.7; Sudakov +1.19; soft tied;
-      Coulomb neither). Layout note for a later draft: SciPost text block off-centre (left margin 47 pt), wide rows go into
-      the right margin. Next on resume: (1) D395 smokes FA-ccin2p3-5d188180 (uugg A2) and 23874954 (tt A1), being moved by
-      a mechanical worker under E6880; on their end check KIT_DONE, sigma stage, kit_predict, loop terms on in the tt log;
-      then the 7 step-18 arms per the passed design (plan target first, site pick FA --jobs 7, ~12.6 GPU-h). (2) kit_hpo driver
-      pid 2142111 running (log ~/.local/share/ccorch/detached/20261112-224604_kit_hpo.log); on DONE kit_curves sweep read,
-      then steps 14, 17, 19 and step-18 redo at chosen HPs. (3) Step 21 REREAD after step-18 arms. (4) Step 20 fair protocol
-      not before 2026-11-14. (5) Repo-reviewer backlog blocked by 8d120a3d question.'
-    decisions: 'As before (D436 factor now, D435 dipoles yes no MLP branch, threshold scan do-but-skip-if-poor, fair protocol
-      later). Joaquin 2026-11-13: KIT results not in today''s draft. Cause of the wasted Sec. 5: the brief''s narrowing told
-      me to write it and I did not check it against Joaquin''s own words (site decisions / his messages) before starting;
-      a brief that asks for work Joaquin''s words exclude is to be checked first, not executed.'
-    ruled_out: As before (route cuts D419, log-polynomial as general fix, per-frame gamma bound alone, MLP branch, 11c at
-      the old cosine setting, V x beta as a general fix).
-    running: D395 smokes FA-ccin2p3-5d188180, FA-ccin2p3-23874954 (PENDING CC, E6880 worker may move them); kit_hpo driver
-      pid 2142111.
-    files: tools/kit_paper_figs.py, analysis/kit_benchmark/data/kit_paper_examples.json, tools/kit_bakar_figs.py, analysis/kit_benchmark/data/kit_bakar_figs.json,
-      wrappers.py (_asym_terms/_asym_mu), models/lloca.py, experiment.py, tests/test_input_reps.py::test_asym_factor, tools/kit_threshold_scan.py
-    written: '2026-11-13T06:49:40+00:00'
+    state: '2026-11-13 ~11:35 @1fd675f7. Step 18 read (finding ~11:30): A2 asymptotic factor (plain momenta, gamma<=4) fixes
+      uug/uugg collinear+soft and tt Coulomb (deepest log-MSE 2-4 decades down, exponents on truth), tt Sudakov worse (+1.9
+      overshoot): PARTIAL. Step 21 threshold re-read done (finding ~10:35, kit_threshold_scan_asym.png): A2 within -20% to
+      beta 1e-3, A1 = control, V x beta still best. Curve check: all uug/uugg runs incl. controls fail (late val NLL rise
+      after ~6000 steps), tt not converged at 8000. kit_hpo driver pid 802223 running (log ~/.local/share/ccorch/detached/20261113-095548_kit_hpo.log),
+      16 trials per search. Next on resume: on kit_hpo DRIVE_DONE, kit_curves sweep read and choose HPs; then steps 14, 17,
+      19 and the step-18 follow-up (A2 at chosen HPs + Sudakov repair) with their own designs. Fair protocol (step 20) not
+      before 2026-11-14. Do not touch the draft.'
+    decisions: 'As before (D435 dipoles no MLP branch, D436 factor now, threshold scan do-but-skip-if-poor, KIT results not
+      in today''s draft). E6895: lxplus schedd raises 1 CPU per 3000 MB, so kit_hpo asks 11G (638c42a9); site pick models
+      it (~/.local/bin/site). drive.py survives a hung site command (fbddb0aa). tt factor arms need data.target_physics_factor=false
+      data.target_physics_orders=false (the factor''s assert).'
+    ruled_out: 'As before; plus: the factor on log inputs (A1) does not move the tt Coulomb rise; log^2(s/m^2) alone per heavy
+      leg overshoots Sudakov.'
+    running: kit_hpo driver pid 802223 (4 searches, kit_benchmark); no step-18 jobs left
+    files: tools/kit_figures.py, tools/kit_curves.py, tools/kit_threshold_scan.py, sweep/drive.py, sweep/sweep_config_kit_hpo_*.yaml,
+      analysis/kit_benchmark/data/kit_fig_A_asym.json, kit_threshold_scan_asym.json, kit_curves.json, wrappers.py (_asym_terms/_asym_mu)
+    written: '2026-11-13T10:15:29+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
