@@ -32998,8 +32998,12 @@ entries:
       his messages 2026-11-10T02:08 (the draft brief, predates the hold), 2026-10-14T16:48 (asked for the het Delta comparison,
       predates it), 2026-10-21T23:24 (the dashed diagonal of the median-Delta plot, a drawing fix): none says when to return
       to the parked comparison'
-    blocks_steps: &id002
+    blocks_steps:
     - 3
+    answered_at: '2026-11-13T11:11:39+00:00'
+    decision: D457
+    withdrawn_at: '2026-11-13T11:11:39+00:00'
+    withdrawn_why: Joaquin said he will come back to it; asking when adds nothing. Step 3 waits on his return.
   owner:
     agent: aaae6521a1a2098ff
     state: closed
@@ -33236,13 +33240,3 @@ entries:
       if:
       - 'Joaquin returns to it: design the follow-up he asks for'
       - 'never: stays out of the paper'
-  ask: 'Your hold: ''keep this marked, we will come back to this'' (2026-11-13) covers step 3, the heteroscedastic loss against
-    MSE comparison removed from the draft. When do we come back to it? The evaluation check found no bug: on 2->2 the het
-    network predicts the typical event better (median |Delta| lower in 118 of 146 trainings) but leaves up to ~11% of events
-    unfitted under a large sigma, so its MSE of log|M|^2 is higher in 103 of 146.'
-  waiting_since: '2026-11-13T11:10:45+00:00'
-  searched: 'site decisions --project FA (the 2026-11-13 decision); docs/results.tex het paragraphs; het_eval_check.py output;
-    his messages 2026-11-10T02:08 (the draft brief, predates the hold), 2026-10-14T16:48 (asked for the het Delta comparison,
-    predates it), 2026-10-21T23:24 (the dashed diagonal of the median-Delta plot, a drawing fix): none says when to return
-    to the parked comparison'
-  blocks_steps: *id002
