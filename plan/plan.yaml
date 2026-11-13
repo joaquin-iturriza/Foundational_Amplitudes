@@ -26722,6 +26722,14 @@ entries:
       not checked (a few val events?). Divergences listed apart: W 7/24 (lr_scale >= 1.6), C 1/24 (2.88), R 2/24. Figure:
       WSD->WSD spikes mid-run (D=100 ~3500, D=316 ~6400) and ends highest at D=316/3162; cos->WSD ends lowest at D=316/3162,
       falling in its cooldown. Per the design: no WSD parents; next is the fine-tune warmup (a design needed).'
+  - at: '2026-11-13T11:21:32+00:00'
+    text: '2026-11-13 ~12:30: step-6 W val >> test at D=3162 explained (event_share.py @a85a7210 on CC, final model''s sigma-stage
+      predictions): W trial 0479''s val MSE(ln|M|^2) 1.42e-5 is 95% one validation event (row 1349, ln|M|^2 truth 4.96, pred
+      7.17, quantile 0.93 of the pool), 7.4e-7 without it, against test 5.9e-7 (worst event 3%); C''s best (trial 0295) val
+      4.4e-7, worst event 4%, test 3.7e-7. So W''s D=3162 best val is set by one mispredicted event, not by a val/test split
+      difference; W''s best (trial 1308, lxplus) not read (event_share reads CC only). Template-test divergence count unchanged
+      (driver_state 12:25): wsd_ft d5 2/16 (lr_scale 8.2, 9.3), wsd_scr d7 2/16 (lr 1.3e-2, 2.3e-2), wideft d5 2/12 done (16.4,
+      19.5), others 0/16: no search wasted most trials, no narrowing proposed.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
