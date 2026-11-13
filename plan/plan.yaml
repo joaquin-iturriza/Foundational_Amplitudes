@@ -26872,8 +26872,6 @@ entries:
       MSE 1e-4, fine-tune protocol): an AdamW pretraining of the data-saving parent''s setup at AdamW''s own searched HPs,
       fine-tuned on every cell; its curves beside the Muon parent''s and scratch; design once pretrain_data_saving has its
       design, GPU-h then'
-    3: 'Muon vs AdamW to 1e-4 on its own (Joaquin 2026-11-11: no need to wait for the data-saving grid): the same parent setup
-      trained with each optimizer until MSE 1e-4 or plateau; design after the extrapolation discussion'
   done_when: null
   notes_ref: null
   match: optrec_*
@@ -27219,11 +27217,6 @@ entries:
       - 'the Muon parent''s fine-tunes reach 1e-4 with fewer target events than the AdamW parent''s: the paper states the
         transfer gain at 1e-4'
       - 'the two meet before 1e-4: the paper says Muon''s gain is in the pretraining and small-D start, not at 1e-4'
-    3:
-      feeds: the optimizations section's Muon claim at 1e-4
-      if:
-      - 'designed: review and submit'
-      - 'Joaquin holds it: wait'
   targets:
   - batch: pidqn
     wall_h: 2.8
@@ -27239,7 +27232,6 @@ entries:
     at: '2026-11-12T03:17:01+00:00'
   step_waits:
     '2': step 3's AdamW long run (designed after its read, per the hand-off)
-    '3': FA-ccin2p3-f08e90e8
   handoff:
     state: 'pidqn DONE and written up (results.tex sec:optrecap ''Particle encoding'', fig:pidqn, commit 88d7c954; mixture_ab.py
       pidqn, plot_pidqn.py; PP4 R=0.80 [0.74,0.87], EE4 0.86, held pooled 0.92 [0.85,1.01], H3 1.14 [1.01,1.24], no held-out
