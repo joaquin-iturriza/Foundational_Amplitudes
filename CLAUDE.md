@@ -84,6 +84,7 @@ on the sites (`~/work/CLAUDE.md`).
 - Results go in `docs/results.tex`: a finished finding in its results section with its hand-off item deleted; the hand-off holds only open work.
 - Every number reported comes from a committed tool at a named commit, never a throwaway one-liner, and says what it counts and how it was selected; a number in `docs/results.tex` carries `% src:` and `% claim:` lines that reproduce.
 - A proxy is checked on a few cases before it is reported; an estimate says it is one, with its assumption.
+- A conclusion that changes when a figure is redrawn or re-measured is checked against its data and evaluation before any text or claim changes; the old text stands until then, and the change reaches me as a question with the figure, never as a result.
 - A claim that something is enough (trials, steps, data) or that a case never happens is checked against evidence outside what it judges (a longer search, a longer run, cells where the case can occur), never against itself.
 - Every reported loss is read at the best checkpoint (lowest aggregate `val_loss_no_reg`, each process at that step); a `HETEROSC` run's model is its final one, after the σ fit that ends its training [D276]; a run that blows up is listed apart with where it blew up, never dropped.
 - A claim that runs are fixed or well trained rests on their own curves (validation falling steadily through the run, not only in the anneal, without spikes), never only on a ratio to another arm; the main session looks at the figure before repeating such a claim.
