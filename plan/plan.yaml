@@ -32744,6 +32744,13 @@ entries:
       captions 5-11 shortened; pp held-out ''at least as good''. Fig. 9 on MSE of log|M|^2 (het_delta_summary.py @28817f4c):
       het mean lower in 43/146 2->2 trainings (median |r-1| lower in 118/146 at d7baad30), higher in 31/32 at 2->3, 2->4;
       text matched. Pages scratchpad draft_sec3_v3_pages.pdf.'
+  - at: '2026-11-13T09:08:39+00:00'
+    text: '2026-11-13: whole-draft check (cold reviewer a11dfa39787bda2d5) applied at draft d05d793, FA 825f36f5: one axis
+      label MSE(log|M|^2) across Secs. 2-4 figures (Fig. 6 steering keeps MSE(Delta log|M|^2): its npz is on no site); Sec.
+      2 ordering (pretraining named, cell defined, target not probe); zero-shot defined at first use; Fig. 11 paragraph into
+      3.7; Sec. 4 minimal: rung-0 sentence, ladder pools'' rule, 478-entry catalog. Full draft scratchpad draft_full.pdf.
+      Not changed (front matter, co-authors): empty abstract and outlook, intro lists Sec. 4 before Sec. 2 and calls Sec.
+      2 a catalog pretraining.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
