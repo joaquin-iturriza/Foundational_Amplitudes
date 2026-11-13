@@ -28268,7 +28268,7 @@ entries:
       passed every stage, 2026-11-13)'
     '16': kit_hpo driver DONE event (uug_T and uugg_T searches in the same driver, D424/D428)
     '17': 'kit_hpo driver DONE event: the chosen t t~ virtual settings'
-    '18': kit_hpo driver DONE event (chosen HPs); literature agent's findings for (a)
+    '18': FA-ccin2p3-5d188180 FA-ccin2p3-23874954
     '19': kit_hpo driver DONE event (chosen HPs); literature agent's findings for (a)
   handoff:
     state: '2026-11-13 ~00:10 @0b50d251. Closed near the context limit. (1) Steps 15+16: kit_hpo driver (detach:kit_hpo, pid
