@@ -115,12 +115,12 @@ training:
  muon_weight_decay: 0.1  # decoupled, Muon matrices only (Moonshot's value)
  muon_rms: 0.2           # update RMS at muP's base width (AdamW's typical RMS)
 
- scheduler: CosineAnnealingLR
+ scheduler: WSD
  scheduler_scale: 1
  cosanneal_warmup_steps: 0
  cosanneal_warmup_frac: 0.0   # if > 0, overrides warmup_steps: warmup = frac * increment_steps
  cosanneal_eta_min: 0
- wsd_cooldown_frac: null  # scheduler WSD (required there, no default): (1 - sqrt) cooldown over this last fraction of the steps; warmup and floor as the cosine's
+ wsd_cooldown_frac: 0.125  # scheduler WSD (D423): (1 - sqrt) cooldown over this last fraction of the steps; warmup and floor as the cosine's
  reduceplateau_factor: 0.1
  reduceplateau_patience: 50
  onecycle_max_lr: 10
