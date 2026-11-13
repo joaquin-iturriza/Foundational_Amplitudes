@@ -32654,7 +32654,7 @@ entries:
   - D365
   - D445
   next:
-    2: 'Sec. 2: apply Joaquin''s comments on draft_sec2_pages.pdf (draft b5fbf78) when the coordinator passes them on'
+    2: Apply Joaquin's comments on the Sec. 3 v3 pages and the full draft (draft d05d793)
   done_when: null
   notes_ref: null
   match: none
@@ -32694,8 +32694,7 @@ entries:
     state_at: '2026-11-13T08:53:09+00:00'
     context: 70575
     context_at: '2026-11-13T08:53:58+00:00'
-  step_waits:
-    '2': '2026-11-14'
+  step_waits: {}
   findings:
   - at: '2026-11-13T02:46:58+00:00'
     text: '2026-11-13 ~03:50 Joaquin: ''we should start actually doing the work on the draft with what we have ... Let''s
@@ -32897,7 +32896,7 @@ entries:
     written: '2026-11-13T08:41:50+00:00'
   step_why:
     2:
-      feeds: the draft's Sec. 2 final
+      feeds: whether the rewritten draft tells the D365/D354 story clearly enough to send to the co-authors
       if:
-      - 'no comments: Sec. 2 done'
-      - 'comments: apply them, redraw beside the old version'
+      - 'he asks for changes: apply them in Secs. 2-3 and minimal ones in Sec. 4, then a fresh review'
+      - 'he passes it: hand-off and close the entry'
