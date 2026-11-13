@@ -27113,6 +27113,7 @@ entries:
   match: kit_*
   evidence:
     runs:
+    - FA-ccin2p3-06fc43d3
     - FA-ccin2p3-12a9d54b
     - FA-ccin2p3-1a14c791
     - FA-ccin2p3-2642b17b
@@ -27145,7 +27146,7 @@ entries:
     - FA-ccin2p3-eb0f30db
     - FA-ccin2p3-f45f434a
     - FA-ccin2p3-f6b2ece9
-    commit: e88e79d7
+    commit: 0b50d251
     paths:
     - analysis/kit_benchmark/data/kit_curves_read.json
     - analysis/kit_benchmark/data/kit_fig_A.json
