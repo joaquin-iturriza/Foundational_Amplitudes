@@ -32687,3 +32687,10 @@ entries:
       each cell''s own validation split. Searched: rerun, re-run, eval_delta, 2ed18ab8, residual map, old_setup_examples,
       delta histogram, representative, example_cells, preds_val (results.tex, plan.yaml), site decisions D433-D445, site runs
       job_rerun_trial, CC zz_delta.'
+  targets:
+  - batch: examples_rerun
+    wall_h: 1.0
+    jobs: 23
+    units: null
+    start: '2026-11-13T03:21:42+00:00'
+    at: '2026-11-13T03:21:42+00:00'
