@@ -26920,7 +26920,7 @@ entries:
     - FA-ccin2p3-65103811
     - FA-ccin2p3-882757e3
     - FA-ccin2p3-f08e90e8
-    commit: 78d79e76
+    commit: 8f2d6537
     paths:
     - analysis/catalog_v4/data/muon_long.json
     - analysis/catalog_v4/data/pidqn.json
