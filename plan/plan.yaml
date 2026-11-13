@@ -27856,7 +27856,7 @@ entries:
     agent: ac14b4077056e4731
     state: stopped
     since: '2026-11-13T13:44:51+00:00'
-    state_at: '2026-11-13T14:32:11+00:00'
+    state_at: '2026-11-13T14:32:36.441000+00:00'
     context: 147692
     context_at: '2026-11-13T14:31:07+00:00'
   findings:
