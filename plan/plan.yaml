@@ -32591,7 +32591,6 @@ entries:
       fill the slot in Sec. 2'
     2: 'Sec. 3 optimizations: fill every slot from docs/results.tex, figures regenerated per D444 (ordered, absolute log values,
       examples); use optimizations_recap''s pID/QN and Muon-to-1e-4 reruns if done'
-    3: 'Sec. 4: swap in the redrawn ladder figures finale_synth_paper_{ee,qcd} (D434: rung before/after, every structure)'
     4: 'Sec. 5 KIT: write from kit_benchmark''s results so far (Bakar''s plots vs his MLP; bulk better, qg collinear, sqrt(s),
       beta weaker), open problems plainly'
     5: Abstract and outlook numbers, after Secs. 2-5
@@ -32637,11 +32636,6 @@ entries:
       if:
       - 'the reruns are done: their results go in the slots'
       - 'not done: the slot says what is missing, the text uses results.tex as it stands'
-    3:
-      feeds: the draft's Sec. 4 (D434)
-      if:
-      - 'figures match the text''s numbers: swap, recompile'
-      - 'they contradict the text: rewrite the text around them and report it'
     4:
       feeds: the draft's Sec. 5 (D354)
       if:
@@ -32659,7 +32653,6 @@ entries:
       FA-lxplus-df754b65 FA-lxplus-6cea00bb FA-lxplus-4c27ee38 '
     '5': steps 1-4 (Secs. 2-5 written)
     '2': 'the main session''s resume: its brief says hand back after Sec. 2 and continue section by section on resume'
-    '3': 'the main session''s resume: its brief says hand back after Sec. 2 and continue section by section on resume'
     '4': 'the main session''s resume: its brief says hand back after Sec. 2 and continue section by section on resume'
   findings:
   - at: '2026-11-13T02:46:58+00:00'
