@@ -21596,9 +21596,9 @@ entries:
       (8d120a3d), as the warm-start study found
   owner:
     agent: a75868725fdec3ff2
-    state: working
+    state: stopped
     since: '2026-11-13T01:20:06+00:00'
-    state_at: '2026-11-13T01:20:06+00:00'
+    state_at: '2026-11-13T01:25:56.874000+00:00'
   designs:
   - at: '2026-11-10T02:35:09+00:00'
     question: 'Step 1 (D356 horizons, tree arm): on catalog_v4''s held-out tree targets ee->ttbar (H3, 2->2 massive), ee->ccbar
@@ -27314,9 +27314,9 @@ entries:
     withdrawn_why: 'Joaquin: use all available clusters'
   owner:
     agent: af0d113b078740844
-    state: working
+    state: stopped
     since: '2026-11-13T00:58:46+00:00'
-    state_at: '2026-11-13T00:58:46+00:00'
+    state_at: '2026-11-13T01:27:17.078000+00:00'
     context: 231655
     context_at: '2026-11-13T01:19:53+00:00'
   findings:
