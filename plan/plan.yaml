@@ -32243,6 +32243,20 @@ entries:
       and lr x0.3 (listed with where). Sudakov still WORSE with the single log, at its searched HPs -> the per-leg coefficient,
       not the subleading log, is the defect (next: the coefficient read on the Sudakov strata). Every verdict with the curve
       form (separation/end_up).'
+    passed_at: '2026-11-13T10:48:04+00:00'
+    reviewer: 'Re-check after FIX: controls are now the chosen trials themselves (CC trial_1918 has model_run0_best.pt.gz
+      + sigma_stage; tt trial_0131 on lxplus) scored by job_kit_rescore.sh @5cdd9b0c (skips the copy when no kit_benchmark
+      dir), job_kit.sh rerun as stated fallback; every NO branch now runs the same 16-trial kit_hpo-template search for the
+      arm (fine-tunes add lr_scale/layer_decay, sweep rule 4), ordered, beyond D412''s 30 GPU-h to Joaquin first; tt A2 vs
+      hp0131 now states target emission-scale->plain, inputs off, gamma<=4, A2+single vs A2 the one-flag Sudakov test; uugg
+      plain search deaba164 = kit_hpo_uug_plain template (16 trials, waves 6/5/5, 1831 WSD, batch 16384) on fec28926''s setup,
+      per D424/D428. Check 2: step-18 deepest bins uug coll 17.7, soft 241, tt Coulomb 3.55 log-MSE moved 2-4 decades by A2,
+      Sudakov 0.72->4.76 signed +1.88 (kit_asym_bound drift -3.11/-3.35/-3.47). Check 3: one seed per D315, MLP seed bands
+      0.3 signed / Sudakov 0.61, bulk 0.23, Coulomb 0.84. Disk 63 GB free on /sps/lpnhe vs ~75 MB/run; rate from trial_1918
+      (~23 min training, same batch/pool/float64); val_mse_curve written by job_kit.sh (seen in an asym_cont result.json).
+      Searched results.tex for rezero, div-form, asymptotic factor, single-log, kit_hpo/hp1918/hp0131, r5loop, 11c (no hits;
+      work on the entry), entry findings/dead ends, decisions D400-D449. Note: the prior field still says ''controls rerun
+      through job_kit.sh'' (stale); kit_predict on a trial dir not dry-run, fallback stated.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
