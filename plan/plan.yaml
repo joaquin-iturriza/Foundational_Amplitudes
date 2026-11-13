@@ -27574,7 +27574,7 @@ entries:
     withdrawn_why: 'Joaquin: use all available clusters'
   owner:
     agent: a9e82ab69626a9a4f
-    state: working
+    state: closed
     since: '2026-11-13T04:23:22+00:00'
     state_at: '2026-11-13T06:49:15.370000+00:00'
     context: 263626
@@ -28556,42 +28556,32 @@ entries:
     '21': FA-ccin2p3-5d188180 FA-ccin2p3-23874954
     '20': '2026-11-14'
   handoff:
-    state: '2026-11-13 ~03:30 @536fd78b. (1) Step 18 asymptotic factor (D436): model.input_asym_factor in wrappers._asym_terms/_asym_mu
-      + lloca extra_main + experiment wiring/guards (plain natural-log target, no target_physics_factor/target_over_born),
-      test_asym_factor in tests/test_input_reps.py; bound _ASYM_BOUND=10 from tools/kit_asym_bound.py (kit_asym_bound.json:
-      needed |c| up to 6.84). Design PASSED (step 18 arms, see plan show). D395 smokes queued on CC (~30 h queue at submit):
-      FA-ccin2p3-5d188180 (uugg A2: plain target, factor, frames_gamma_max=4, no log inputs, 50 steps) and FA-ccin2p3-23874954
-      (tt A1: softpairthr inputs + factor + data.target_physics_factor=false, 50 steps). On their end: check KIT_DONE, the
-      sigma stage and kit_predict ran, and that the tt log shows the loop terms on (order_labels[:,0]=1 -> Coulomb/Sudakov
-      terms; the unit test fed loops directly). Then submit the 7 arms per the design (uug A1/A2, uugg plain control + A1/A2,
-      tt A1/A2; tt arms add data.target_physics_factor=false data.target_physics_orders=false; plan target first, site pick
-      FA --jobs 7, ~12.6 GPU-h, --hdr=--time 2:30 uug, 2:45 uugg, 2:00 tt; --allow-dirty if others'' files are dirty). Read
-      with kit_figures collect -> kit_fig_A_asym_*.json, kit_extrap_read, kit_readout --vs, kit_curves; error+median figures.
-      Redo at the kit_hpo chosen HPs afterwards. (2) Step 21: threshold scan REREAD of the tt factor arms (tools/kit_threshold_scan.py
-      predict+collect on CC with site --timeout), figure beside V x beta, B and softpairthr; the scan itself already exists
-      (findings 2026-11-11T21:24, 2026-11-12T09:05, 13:09; all models but V x beta miss ~90-99% of sigma_NLO at beta 1e-3).
-      Joaquin: skipping it is fine if results are poor. (3) Step 20 Bakar''s fair protocol: not before 2026-11-14 (Joaquin:
-      ''not something we will do tonight''). (4) Steps 15/16 kit_hpo driver pid 2142111 still running (log ~/.local/share/ccorch/detached/20261112-224604_kit_hpo.log);
-      on DONE: tools/kit_curves.py sweep kit_hpo_uug_plain kit_hpo_ttvirt_thr kit_hpo_uug_T kit_hpo_uugg_T --out analysis/kit_benchmark/data/kit_hpo.json,
-      chosen = lowest best val mu-MSE among good; then steps 14, 17, 19 and the step-18 redo at the chosen HPs. E6799 acked
-      (pending CC trials are kit_hpo''s). (5) Repo-reviewer backlog still blocked only by 8d120a3d (another agent''s WSD default,
-      D423 covers only data saving and KIT); question relayed to Joaquin via the main session; continue reviewer a2cd45f4d205c20cb
-      once settled.'
-    decisions: 'D436 factor model now, not after the HPOs; D435 dipoles yes, no MLP branch; threshold scan: do it, skip if
-      poor (2026-11-13); fair protocol later. Factor design choices: Catani-Seymour spin-averaged massless final-final dipoles
-      (q->qg, g->gg once per pair) with per-leg coefficients, Coulomb 1/beta and Sudakov log^2(s/m^2) only for heavy coloured
-      legs on L_QCD>=1 targets; coefficients and regular term bounded (tanh, 10 sd); A2 arm uses gamma<=4 and no log inputs
-      because uncapped LLoCa readouts grow ~y^-0.25 / x^-0.5 at the limits (measured at init), capped ones are flat; T-target
-      setups get no factor arm (the T factor already divides out the singularity).'
-    ruled_out: 'As before (route cuts D419, log-polynomial terms as general fixes, per-frame gamma bound alone, MLP branch,
-      11c at the old cosine setting). Not implemented by choice: CDST massive emitter dipole and initial-state coloured legs
-      (no KIT target has them; shortcut comment in wrappers._asym_terms).'
-    running: D395 smokes FA-ccin2p3-5d188180, FA-ccin2p3-23874954 (pending CC, steps 18 and 21 wait on them); kit_hpo driver
-      pid 2142111 (steps 15/16).
-    files: wrappers.py (_ASYM_BOUND, _asym_terms, _asym_mu, wrapper wiring), models/lloca.py (extra_main), experiment.py (extra_main,
-      asym_sd, guards), config/model/lloca.yaml, tests/test_input_reps.py::test_asym_factor, tools/kit_asym_bound.py, analysis/kit_benchmark/data/kit_asym_bound.json,
-      tools/kit_threshold_scan.py, analysis/kit_benchmark/data/kit_threshold_scan.json
-    written: '2026-11-13T03:28:32+00:00'
+    state: '2026-11-13 @3752e145. Draft Sec. 5 was written on the main session''s brief (draft 4a86295) but Joaquin had said
+      the KIT results do not go in today''s draft; the draft owner reverts it to its slots, do not touch the draft. Kept for
+      later use: tools/kit_paper_figs.py (collect reads CC predictions.h5 -> analysis/kit_benchmark/data/kit_paper_examples.json;
+      plot --figs <dir> prints every number): kit_bench_{a..d} (log-MSE, |bias|, p99 |Delta|, |M|^2-weighted error, transformer
+      vs Bakar log/raw MLP, rows by log10(transformer/MLP)), kit_delta_{a,b} and kit_dist_{a,b} (Delta histograms; true vs
+      predicted with ratio panel; uug coll, uugg qg coll, tt Sudakov, Coulomb, bulks), kit_protocols (A scratch / A_ft / B_bulk
+      / B at 9e5), kit_attempts_{a..f} (every extrapolation attempt per limit, best to worst, plus bulk). Numbers in finding
+      2026-11-13 (tt bulk -1.95 decades vs MLP; uug/uugg bulk +0.71/+1.03; collinear +1.3..+1.7; Sudakov +1.19; soft tied;
+      Coulomb neither). Layout note for a later draft: SciPost text block off-centre (left margin 47 pt), wide rows go into
+      the right margin. Next on resume: (1) D395 smokes FA-ccin2p3-5d188180 (uugg A2) and 23874954 (tt A1), being moved by
+      a mechanical worker under E6880; on their end check KIT_DONE, sigma stage, kit_predict, loop terms on in the tt log;
+      then the 7 step-18 arms per the passed design (plan target first, site pick FA --jobs 7, ~12.6 GPU-h). (2) kit_hpo driver
+      pid 2142111 running (log ~/.local/share/ccorch/detached/20261112-224604_kit_hpo.log); on DONE kit_curves sweep read,
+      then steps 14, 17, 19 and step-18 redo at chosen HPs. (3) Step 21 REREAD after step-18 arms. (4) Step 20 fair protocol
+      not before 2026-11-14. (5) Repo-reviewer backlog blocked by 8d120a3d question.'
+    decisions: 'As before (D436 factor now, D435 dipoles yes no MLP branch, threshold scan do-but-skip-if-poor, fair protocol
+      later). Joaquin 2026-11-13: KIT results not in today''s draft. Cause of the wasted Sec. 5: the brief''s narrowing told
+      me to write it and I did not check it against Joaquin''s own words (site decisions / his messages) before starting;
+      a brief that asks for work Joaquin''s words exclude is to be checked first, not executed.'
+    ruled_out: As before (route cuts D419, log-polynomial as general fix, per-frame gamma bound alone, MLP branch, 11c at
+      the old cosine setting, V x beta as a general fix).
+    running: D395 smokes FA-ccin2p3-5d188180, FA-ccin2p3-23874954 (PENDING CC, E6880 worker may move them); kit_hpo driver
+      pid 2142111.
+    files: tools/kit_paper_figs.py, analysis/kit_benchmark/data/kit_paper_examples.json, tools/kit_bakar_figs.py, analysis/kit_benchmark/data/kit_bakar_figs.json,
+      wrappers.py (_asym_terms/_asym_mu), models/lloca.py, experiment.py, tests/test_input_reps.py::test_asym_factor, tools/kit_threshold_scan.py
+    written: '2026-11-13T06:49:40+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
