@@ -33315,6 +33315,13 @@ entries:
       truth vanished. Cause: ratio drawn only in bins with >=10 true events, clipped to [0,2] with 0 on the frame; truth''s
       1-event bins sat on the y-axis frame. Fixed (FA ab1b1973, draft 2819901): ratio wherever truth >0, >2 marked, empty-truth
       bins shaded, y from 0.5.'
+  - at: '2026-11-13T15:17:38+00:00'
+    text: '2026-11-13 Joaquin: ''this is not the figure I''m talking about''. His Overleaf keeps the co-authors'' Accuracy
+      and More-legs sections (5 figures) before his part, so his Fig. N is our compile''s Fig. N-5; I took our compile''s
+      numbering. His Fig. 8 = our Fig. 3 (fig:examples_dist). Its panels drew the ratio only in bins with >=10 true events,
+      clipped to [0.5,1.5], on the truth''s 0.1-99.9% quantile range (10 of 5000 true events dropped on ee->bb one loop),
+      truth under the predictions. Fixed (FA 6606a08b, draft 1b6a9d0): full range of truth and predictions, truth on top,
+      ratio wherever truth>0, off-panel markers, empty truth bins shaded. Muon example fix kept (FA ab1b1973).'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
