@@ -26338,6 +26338,16 @@ entries:
       V/B trials list ''AssertionError: data.target_over_born ... born.npy was computed on another pool'' (CC cache) next
       to their divergence: not a sampled-HP failure, not yet resolved. Figures figs/stage2_LD_bbx_zz, figs/cell_curves_bbx_zz,
       figs/cell_curves_bbx_zz_nlo.'
+  - at: '2026-11-13T00:04:26+00:00'
+    text: '2026-11-13 ~00:30 Joaquin (idea to keep in mind, not a decision): ''It might be the case that by blowing up the
+      catalog to ~1000 datasets we are diluting the transfers from the processes that could be useful to one process or the
+      other, and so not only it might be hard to see very direct transfer, like when adding the looped top processes filling
+      the beta region, but it can also hurt the general performance of the finetuning. This might point to the idea that we
+      need to be more intentional with the datasets that we use in the pretraining''. Also on bbZZ figs: pretrained starts
+      much better but loses the advantage during training even where train/val do not split; in V/B the pretrained train loss
+      ends better than scratch: ''there is also something in our finetuning process that is constraining the network in some
+      way'' (D414 work). Also asked: do larger pretrained networks zero-shot and fine-tune better (''It might be the case
+      that we just don''t have enough capacity'').'
   targets:
   - batch: calib_trees
     wall_h: 4.0
