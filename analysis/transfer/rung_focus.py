@@ -16,13 +16,10 @@ import os, sys
 import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from cells import ROOT, USE_32K, best, scratch  # noqa: E402
-from rung_grid import LAB, P, S, RUNG_ADDS, draw_final, fam  # noqa: E402
+from rung_grid import FOCUS, LAB, P, S, RUNG_ADDS, draw_final, fam  # noqa: E402
 sys.path.insert(0, ROOT)
 import plot_style as ps  # noqa: E402
 
-# probe -> the first rung adding its structure (the rung below is one less; 0 = ee_uu alone)
-FOCUS = {"ee_ddbar": 1, "ee_nnbar": 2, "ee_ttbar": 5, "ee_WW": 6, "ee_dd_nlo": 9, "ee_bb_nlo": 9, "ee_Za": 3,
-         "ud_ud": 4, "uubar_gg": 6, "uubar_Zg": 6, "uubar_Zgg": 7, "uubar_Zggg": 8}
 GREY = dict(color="0.6", alpha=0.35)
 PAPER = "--paper" in sys.argv
 BASE = "rung_focus_paper" if PAPER else "rung_focus"

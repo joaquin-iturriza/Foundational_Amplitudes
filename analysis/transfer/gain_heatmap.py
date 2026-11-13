@@ -2,7 +2,7 @@
 (columns: ee->uu as rung 0, ladder rungs 1-9), the fine-tune's gain over scratch, the mean over the probe's D cells of
 log10(L_scratch / L_fine-tune), each half-decade of D weighted the same (the rule of rung_focus.py). The 8k grid
 (cells.USE_32K off): every pretraining at the same compute in every cell. The first rung that adds the probe's
-structure (rung_focus.FOCUS) is outlined.
+structure (rung_grid.FOCUS) is outlined.
     python analysis/transfer/gain_heatmap.py      -> figs/gain_heatmap
 """
 import io, contextlib, json, os, sys
@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from cells import ROOT, best, scratch  # noqa: E402
 from rung_grid import LAB, P, fam  # noqa: E402
 with contextlib.redirect_stdout(io.StringIO()):
-    from rung_focus import FOCUS  # noqa: E402
+    from rung_grid import FOCUS  # noqa: E402
 sys.path.insert(0, ROOT)
 import plot_style as ps  # noqa: E402
 

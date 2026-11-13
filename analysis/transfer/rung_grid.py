@@ -49,6 +49,11 @@ def draw(ax, f, *a, **kw):
         ax.plot(D, L, *a, **kw)
 
 
+# probe -> the first rung adding its structure (the rung below is one less; 0 = ee_uu alone)
+FOCUS = {"ee_ddbar": 1, "ee_nnbar": 2, "ee_ttbar": 5, "ee_WW": 6, "ee_dd_nlo": 9, "ee_bb_nlo": 9, "ee_Za": 3,
+         "ud_ud": 4, "uubar_gg": 6, "uubar_Zg": 6, "uubar_Zgg": 7, "uubar_Zggg": 8}
+
+
 def fam(r):
     """A pretraining's fine-tune family: rung 0 is the ee->uu pretraining (64k steps, as every rung)."""
     return "tp3_uu64fte" if r == 0 else f"tp3_r{r}fte"

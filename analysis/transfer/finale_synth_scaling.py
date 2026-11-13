@@ -5,13 +5,16 @@ cell is drawn once finished (finale_synth.cell: a search with its 5 trials in, o
   figs/finale_synth_scaling_<ee|qcd|arm>_a..f, _legend
     python analysis/transfer/finale_synth_scaling.py
     python analysis/transfer/finale_synth_scaling.py --paper   -> figs/finale_synth_paper_<ee|qcd>: the paper draft's
-        version (the user's call, 2026-10-09): scratch, rung 9, synthetic and finale only, scratch drawn as in rung_focus
+        version: scratch, the rung below the probe's structure and the first rung with it (rung_grid.FOCUS), synthetic,
+        and the finale named by what it is, "every structure" (D434: before/after kept, no forced rung 9; was rung 9,
+        synthetic and finale, the user's call 2026-10-09)
 """
 import io, contextlib, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from cells import ROOT, scratch  # noqa: E402
 with contextlib.redirect_stdout(io.StringIO()):
     from finale_synth import ARMP, ARMLAB, LAB, P, cell  # noqa: E402
+    from rung_grid import FOCUS, fam  # noqa: E402
 sys.path.insert(0, ROOT)
 import plot_style as ps  # noqa: E402
 
@@ -20,7 +23,7 @@ LADDER = [("tp3_uu64fte", "rung 0", ps.C.sky, "o"), ("tp3_r9fte", "rung 9", ps.C
 FIGS = os.path.join(ROOT, "analysis", "transfer", "figs")
 PAPER = "--paper" in sys.argv
 BASE = "finale_synth_paper" if PAPER else "finale_synth_scaling"
-SCR = dict(color="k", marker="o", label="from scratch") if PAPER else dict(color="k", ls="--", marker="x", label="scratch")
+SCR = dict(color="k", marker="o", label="from scratch", zorder=10) if PAPER else dict(color="k", ls="--", marker="x", label="scratch")
 
 
 def curve(ax, xs, ys, **kw):
@@ -45,7 +48,14 @@ def draw(part, probes, fams, labels):
     ps.save_panels(figs, os.path.join(FIGS, f"{BASE}_{part}"))
 
 
-fams = (lambda p: LADDER[1:]) if PAPER else (lambda p: LADDER)
+if PAPER:
+    def fams(p):
+        r = FOCUS[p]
+        return [(fam(r - 1), "rung below", ps.C.blue, "o"), (fam(r), "first rung with the structure", ps.C.vermillion, "s"),
+                ("tp3_synfte", "synthetic", ps.C.green, "^"), ("tp3_finfte", "every structure", ps.C.orange, "D")]
+    LAB = {p: LAB[p] + f"\nrung {FOCUS[p] - 1} vs {FOCUS[p]}" for p in P}
+else:
+    fams = lambda p: LADDER  # noqa: E731
 draw("ee", P[:6], fams, LAB)
 draw("qcd", P[6:], fams, LAB)
 if not PAPER:
