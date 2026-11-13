@@ -27,6 +27,7 @@ sys.path.insert(0, os.path.join(ROOT, "analysis", "data_saving"))
 from dstar_fit import saving, dstar  # noqa: E402
 
 PROBES = ["uubar_Zggg", "ee_ddbarg", "udbar_enu", "ee_bb_nlo"]
+GAP = "#9c86a6"                    # the gap arrow, muted (Joaquin 2026-11-13: the orange popped too much)
 SKIP = {"ee_bb_nlo": 10}          # D left out of the fits (Joaquin, D438: the first b b~ one-loop point)
 K = range(2, 9)
 D = [10 ** (k / 2) for k in K]
@@ -58,7 +59,7 @@ for ax, p in zip(axs.flat, PROBES):
     ds, df = (dstar(*f[k], f["alpha"], level) for k in ("scr", "ft"))
     s, (lo, _, hi) = 10 ** r["log10_S"], (10 ** b for b in r["band"])
     S.append(s)
-    ax.annotate("", xy=(df, level), xytext=(ds, level), arrowprops=dict(arrowstyle="<|-|>", color=ps.C.vermillion,
+    ax.annotate("", xy=(df, level), xytext=(ds, level), arrowprops=dict(arrowstyle="<|-|>", color=GAP,
                                                                           shrinkA=0, shrinkB=0))
     g = [a / b for a, b in zip(sc, ft) if a and b]
     ALL += g
@@ -75,7 +76,7 @@ print(f"median fitted saving over the 4 panels {np.median(S):.1f}; median L_scra
 H = [Line2D([], [], color="k", marker="o", label="scratch"), Line2D([], [], color=ps.C.blue, marker="o", label="Fine-tune"),
      Line2D([], [], color="0.5", marker="o", mfc="none", ls="none", label="not fitted"),
      Line2D([], [], color="0.5", ls="--", label="target precision"),
-     Line2D([], [], color=ps.C.vermillion, label=r"$D^*_{\rm scr}/D^*_{\rm ft}$")]
+     Line2D([], [], color=GAP, label=r"$D^*_{\rm scr}/D^*_{\rm ft}$")]
 ps.legend(axs.flat[0], "lower left", handles=H)
 for ax in axs.flat:
     ps.make_room(ax)
