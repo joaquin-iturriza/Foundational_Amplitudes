@@ -25604,7 +25604,7 @@ entries:
       bar). Outcome has four branches. Disk <=7.5 GB vs 66 GB free; 13.5 GPU-h. Check 5 searched: results.tex WSD, WSD parent,
       warm start; plan entry WSD, suspect (suspects_readout WSD arm now cited); site decisions D414, D422, D423.'
   step_waits:
-    '5': the coordinator's go to relaunch the template-test driver after the draft reruns
+    '5': 'detach dsave_step6_and_ttx16 (pid 807668): template-test driver relaunched at 11G'
     '6': 'detach dsave_step6_and_ttx16 (pid 807668): step-6 driver, 6 searches dsave_s5{wsdparent,cosparent}_ft_bbx_zz'
   findings:
   - at: '2026-11-10T03:35:22+00:00'
