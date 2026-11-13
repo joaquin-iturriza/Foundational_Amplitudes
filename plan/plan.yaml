@@ -27471,8 +27471,6 @@ entries:
       at the kit_hpo chosen HPs on uug, uugg, tt virtual against the chosen trials, and the tt Sudakov term repaired (log^2(s/m^2)
       per heavy leg overshoots by +1.9 at 15-50 TeV; add the single-log term or let its coefficient span the measured drift,
       kit_asym_bound.json). Own design + design-reviewer after kit_hpo''s read.'
-    22: Resend Joaquin the three KIT asymptotic-factor figures whose upload failed (kit_mse_A_asym_ee_uug_me2_a, kit_mse_A_asym_ee_uugg_me2_a,
-      kit_curves_nll_A_asym_a) when he asks
   done_when: null
   notes_ref: null
   match: kit_*
@@ -28651,11 +28649,6 @@ entries:
       if:
       - 'A2 FIXED at chosen HPs incl. Sudakov: adopt the factor for KIT models, propose for catalog runs'
       - 'Sudakov still off: report factor for massless dipoles and Coulomb only, Sudakov as open'
-    22:
-      feeds: Joaquin seeing the step-18 result
-      if:
-      - 'upload works: sent'
-      - 'still failing: give him the paths'
   step_waits:
     '5': 'kit_hpo driver DONE event: the package takes the chosen trials'' models'
     '14': FA-ccin2p3-01f55e9b FA-ccin2p3-7d7a578c FA-ccin2p3-8a37b9c4 FA-ccin2p3-af3782ce FA-ccin2p3-c479cc9b FA-ccin2p3-16720e29
