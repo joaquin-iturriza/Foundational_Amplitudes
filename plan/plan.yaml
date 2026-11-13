@@ -21410,9 +21410,6 @@ entries:
       the withdrawn batch-searching dsave_tmpl2_* run to 8 in that driver, not read), 2 wide fine-tune searches dsave_wideft_ft
       (lr_scale [0.03,30], layer_decay [0.5,1]) at 16, detach wideft16; read lr_centre_readout.py --test tmpl2 (A: 16 vs first
       8; B: wide vs WSD; C: WSD first 8 vs stage 2), curves figure, report'
-    6: 'Step 6 read branch (d), neither the WSD parent nor the WSD fine-tune keeps the bbZZ head start: design the fine-tune
-      warmup test (head start lost at 8-33% of the run in R/C/W, ft warmup fractions 0.07-0.15; prior: ft_constraint warmup
-      rise, step6_readout.json), design review, then submit within the budget'
     7: 'Step 6 warmup test running (design PASS 2026-11-13 ~12:20, configs @a85a7210, reader @20260f1c): arm L dsave_s6cosparentlongwu_ft_bbx_zz_d{4,5,7}
       (cosine parent, WSD fine-tune, warmup [0.05,0.6]) vs C, 8 trials each, detach dsave_s6_longwarmup (drive.py, 6.0 GPU-h,
       target 0.65 h / 9 jobs). Read: step6_readout.py (uncached), branches a-d of the design (lag = lost_at - own warmup >
@@ -25760,7 +25757,6 @@ entries:
       63 GB free, rate from C''s own trials.'
   step_waits:
     '5': 'detach dsave_step6_and_ttx16 (pid 807668): template-test driver relaunched at 11G'
-    '6': the design reviewer (warmup test design 2026-11-13T11:19)
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
@@ -27096,11 +27092,6 @@ entries:
       - 'A LOWER or best good at 16: 16 trials into the template, cost to Joaquin'
       - 'B LOWER: wide ranges into the template'
       - 'NO/within: reported, nothing more run'
-    6:
-      feeds: fine-tunes that keep the pretrained head start (D414)
-      if:
-      - 'head start kept: warmup into the fine-tune template'
-      - 'still lost: reported, the head-start loss is not the warmup'
     7:
       feeds: the fine-tune template's warmup range (D414)
       if:
