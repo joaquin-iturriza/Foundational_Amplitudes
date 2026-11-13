@@ -32653,10 +32653,10 @@ entries:
       - 'sections done: fill the factors'
       - 'a section still open: leave its slot'
   step_waits:
-    '1': 'FA-ccin2p3-d77e2e19 FA-ccin2p3-25f254c8 FA-ccin2p3-b5c155b8 FA-ccin2p3-c6cc7ca4 FA-ccin2p3-5f3a41f4 FA-ccin2p3-85e01366
-      FA-ccin2p3-9a83a25c FA-ccin2p3-de976f69 FA-ccin2p3-515d5a84 FA-ccin2p3-be7e5f6d FA-ccin2p3-5bf54dea FA-ccin2p3-7830006a
-      FA-ccin2p3-867d2d8b FA-ccin2p3-0134adeb FA-ccin2p3-f470a13e FA-ccin2p3-71d1701a FA-ccin2p3-49241829 FA-ccin2p3-5ce6fcd6
-      FA-ccin2p3-5b7c4991 FA-ccin2p3-b22269c6 FA-ccin2p3-391452f0 FA-ccin2p3-89c45c5a FA-ccin2p3-f4813cec '
+    '1': 'FA-lxplus-9f778f21 FA-lxplus-90226a49 FA-lxplus-5cd714af FA-lxplus-aae72a70 FA-lxplus-f8621c35 FA-lxplus-99843ab7
+      FA-lxplus-11159d5e FA-lxplus-975ee37b FA-lxplus-57edacab FA-lxplus-8342622e FA-lxplus-9f9be8e6 FA-lxplus-944a5949 FA-lxplus-9544b441
+      FA-lxplus-3a031a5b FA-lxplus-a49704a1 FA-lxplus-c15f962f FA-lxplus-e87fff27 FA-lxplus-3203cf3a FA-lxplus-bb1a62e7 FA-lxplus-765ad925
+      FA-lxplus-df754b65 FA-lxplus-6cea00bb FA-lxplus-4c27ee38 '
     '5': steps 1-4 (Secs. 2-5 written)
     '2': 'the main session''s resume: its brief says hand back after Sec. 2 and continue section by section on resume'
     '3': 'the main session''s resume: its brief says hand back after Sec. 2 and continue section by section on resume'
