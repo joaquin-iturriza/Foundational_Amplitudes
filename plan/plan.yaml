@@ -33173,7 +33173,7 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-4fa87893
-    commit: 6606a08b
+    commit: 14132f0a
     paths:
     - /home/joaquin/drafts/fm_amplitudes_2026-11/paper.tex
     - /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_sec2_pages.pdf
@@ -33184,6 +33184,7 @@ entries:
     - analysis/data_saving/figs/example_dist_a.png
     - analysis/transfer/het_delta_summary.py
     - analysis/transfer/het_eval_check.py
+    - plot_style.py
     - scripts/job_rerun_trial.sh
   dead_ends: []
   asks:
