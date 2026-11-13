@@ -28205,6 +28205,19 @@ entries:
       2410.10807 hard output constraints; 2604.18686 conformal correlators: fixed asymptotic function for log z, log^2 z plus
       learned correction (naive multiplicative ansatz failed). Most direct for us: log|M|^2 = log A(x) + g(x) with A the known
       asymptotic factor (Coulomb, Sudakov, dipoles) and g bounded and switched off in the limit.'
+  - at: '2026-11-13T01:26:23+00:00'
+    text: '2026-11-13 ~03:00 @536fd78b. Step 18 code: model.input_asym_factor (wrappers._asym_terms/_asym_mu, lloca extra_main),
+      log|M|^2 = log(sum_t exp(c_t) D_t + exp(r)), CS massless final-final dipoles (q->qg, g->gg), 1/beta per heavy coloured
+      pair and log^2(s/m^2) per heavy coloured leg at one QCD loop; c_t per-leg readout, r pooled, both bounded at 10 target
+      std. test_asym_factor: dipole x s_qg/s -> C_F(1+z^2)/(1-z), dipole sum -> 2 C_F s s_qq/(s_qg s_qg), g -> 0 (gap 6e-5),
+      slopes -1.0003 (log y) / -1.993 (log x) on a gamma-capped net. Diagnosis at init: uncapped LLoCa per-leg readouts grow
+      ~y^-0.25 collinear and ~x^-0.5 soft (relative frame boosts), flat with frames_gamma_max=4 or identity frames; threshold
+      readouts converge either way. Coefficient range needed (tools/kit_asym_bound.py -> kit_asym_bound.json, CC): (log|M|^2
+      - log sum D - mean)/sd is flat across every uug hard stratum (-2.87..-1.24, the reduced Born''s angular span), uugg
+      -6.07..+1.02, tt threshold -0.76 constant over beta 1e-4..1e-2 (1/beta exact), Sudakov -3.1..-3.5 drifting 0.35 sd over
+      the three bins (subleading single logs). Design PASSED (step 18 arms). tt arms take data.target_physics_factor=false
+      (a constant for 2->2, 5-95% log F identical in 3fc1016a; the factor''s guard needs the plain log target). D395 smokes
+      FA-ccin2p3-5d188180 (uugg A2), FA-ccin2p3-23874954 (tt A1), CC queue ~30 h.'
   step_why:
     5:
       feeds: what KIT receives
