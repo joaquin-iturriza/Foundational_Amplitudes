@@ -20,10 +20,11 @@ sys.path.insert(0, os.path.join(ROOT, "analysis"))
 DATA = os.path.join(ROOT, "analysis", "data_saving", "data")
 NPZ = os.path.join(DATA, "example_reruns.npz")
 CELLS = json.load(open(os.path.join(DATA, "example_cells.json")))
-# the one cell rerun earlier, on CC (design: reused, 0.05% of its record)
-ON_CC = {("tp3_finfte_uubar_Zggg_d8", 96)}
+# reruns on CC (the rest on lxplus): the one cell rerun earlier (design: reused, 0.05% of its record), and the
+# repeat of tp3_finfte_udbar_enu_d8 trial_0187 (FA-ccin2p3-4fa87893, lxplus full)
+ON_CC = {"tp3_finfte_uubar_Zggg_d8__trial_0096_rerun", "tp3_finfte_udbar_enu_d8__trial_0187_rerun2"}
 # the design's one repeat of a rerun off its record by more than 2x (job_rerun_trial.sh third argument)
-REPEAT = {("tp3_scr_ee_bb_nlo_d8", 154): "2"}
+REPEAT = {("tp3_scr_ee_bb_nlo_d8", 154): "2", ("tp3_finfte_udbar_enu_d8", 187): "2"}
 NAME = {"uubar_Zggg": r"$u\bar u\to Zggg$", "ee_ddbarg": r"$e^+e^-\to d\bar dg$",
         "udbar_enu": r"$u\bar d\to e^+\nu_e$", "ee_bb_nlo": r"$e^+e^-\to b\bar b$, one loop"}
 PROBES = list(NAME)
@@ -60,7 +61,7 @@ def collect():
     from common.readers import site_python
     have = dict(np.load(NPZ)) if os.path.exists(NPZ) else {}
     for site in ("lxplus", "ccin2p3"):
-        want = [t for c in CELLS if ((c["sweep"], c["hp"]) in ON_CC) == (site == "ccin2p3") for t in tags(c)]
+        want = [t for c in CELLS for t in tags(c) if (t in ON_CC) == (site == "ccin2p3")]
         got = site_python(REMOTE, want, "EXAMPLE_PREDS", site=site)
         for t, s in got.items():
             z = np.load(io.BytesIO(base64.b64decode(s)))
@@ -145,7 +146,8 @@ def plot():
             h = np.histogram(by[p, D, a]["pred"], e)[0]
             ax.stairs(h, e, color=col[a], linestyle=D_STYLE[D], label=f"{lab[a]}, $D=${D_LAB[D]}")
             with np.errstate(divide="ignore", invalid="ignore"):
-                r.stairs(np.where(t > 0, h / t, np.nan), e, color=col[a], linestyle=D_STYLE[D])
+                # ratio only on bins with >= 10 true events, as paper_sec3_figs.examples (e93beb91)
+                r.stairs(np.where(t >= 10, h / t, np.nan), e, color=col[a], linestyle=D_STYLE[D])
         r.axhline(1, color="k", lw=0.8)   # the truth line, as thin as the papers' ratio reference
         r.set_ylim(0.5, 1.5); r.set_yticks([0.5, 1, 1.5]); r.set_yticklabels(["0.5", "1", "1.5"])
         ax.set_xlim(e[0], e[-1])
