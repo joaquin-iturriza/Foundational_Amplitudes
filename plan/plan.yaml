@@ -27346,6 +27346,10 @@ entries:
     19: 'D435: (b) finish the ReZero (model.net.layer_norm=rezero, 9e63d86f) test at the step-15/16 chosen HPs on uug and
       tt virtual (earlier: tt Born ReZero d322922b read 2026-11-12 ~11:50, nothing to move; uug/tt virtual reads at the old
       HP point).'
+    20: 'Bakar''s fair one-loop protocol (2026-11-09 email): pretrain on tree of all processes incl. target''s tree (hard
+      points ok) + at most ~0-10 other one-loop processes bulk only; target 100-1e4 one-loop bulk points, no hard one-loop
+      points from any process; whole family held out; standardisation/early stopping/features bulk only; baseline from-scratch
+      V/B with exact Born; scored on the hard bins. Not tonight (Joaquin), soon.'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -28468,6 +28472,11 @@ entries:
       if:
       - 'ReZero at the chosen HPs closes the limits within bands without bulk loss: adopted for KIT'
       - 'no effect or worse: ReZero dropped, reported'
+    20:
+      feeds: the KIT NLO statement in the draft
+      if:
+      - 'fine-tune beats the V/B baseline on hard bins: strong positive statement'
+      - 'it does not: report as inconclusive (tree has no loop functions)'
   step_waits:
     '5': 'kit_hpo driver DONE event: the package takes the chosen trials'' models'
     '15': kit_hpo driver DONE event (detach:kit_hpo, log ~/.local/share/ccorch/detached/20261112-224604_kit_hpo.log); live
