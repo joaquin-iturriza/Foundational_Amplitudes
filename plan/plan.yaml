@@ -25662,6 +25662,7 @@ entries:
       (D398).'
   step_waits:
     '5': 'detach dsave_step6_and_ttx16 (pid 807668): template-test driver relaunched at 11G'
+    '6': the design reviewer (warmup test design 2026-11-13T11:19)
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
