@@ -21410,8 +21410,6 @@ entries:
       the withdrawn batch-searching dsave_tmpl2_* run to 8 in that driver, not read), 2 wide fine-tune searches dsave_wideft_ft
       (lr_scale [0.03,30], layer_decay [0.5,1]) at 16, detach wideft16; read lr_centre_readout.py --test tmpl2 (A: 16 vs first
       8; B: wide vs WSD; C: WSD first 8 vs stage 2), curves figure, report'
-    6: 'Retrain the held-out data-saving parent with WSD and fine-tune from it (bbZZ head-start loss = cosine parent + cosine
-      fine-tune; par:v4_warm_start_fixes: WSD parent BETTER, restart jump ~1000 -> ~60). Cost shown to Joaquin before submission.'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -25608,7 +25606,6 @@ entries:
       warm start; plan entry WSD, suspect (suspects_readout WSD arm now cited); site decisions D414, D422, D423.'
   step_waits:
     '5': 'detach dsave_step6_and_ttx16 (pid 807668): template-test driver relaunched at 11G'
-    '6': 'detach dsave_step6_and_ttx16 (pid 807668): step-6 driver, 6 searches dsave_s5{wsdparent,cosparent}_ft_bbx_zz'
   findings:
   - at: '2026-11-10T03:35:22+00:00'
     text: 'Stage 2 must leave room for optimizations_recap''s muon_1e4 arm (D364): an AdamW-pretrained parent of this parent''s
@@ -26935,11 +26932,6 @@ entries:
       - 'A LOWER or best good at 16: 16 trials into the template, cost to Joaquin'
       - 'B LOWER: wide ranges into the template'
       - 'NO/within: reported, nothing more run'
-    6:
-      feeds: fine-tunes that keep the pretrained head start (D414)
-      if:
-      - 'head start kept: use WSD parents for the data-saving grid'
-      - 'still lost: look at the fine-tune warmup next'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
