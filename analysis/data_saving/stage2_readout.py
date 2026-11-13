@@ -46,7 +46,7 @@ from tools.nlo_virtual_pipeline import born_path
 out, pools = [], {}
 for d in sorted(glob.glob(sys.argv[1] if len(sys.argv) > 1 else "runs/dsave_s2_*/trial_*")):
     sw = os.path.basename(os.path.dirname(d))
-    m = re.match(r"dsave_(?:s2|diag_[a-z]+)_(scr|ft)_(.+)_d(\d+)_t(\d+)$", sw)
+    m = re.match(r"dsave_(?:s2|s5[a-z]+|diag_[a-z]+)_(scr|ft)_(.+)_d(\d+)_t(\d+)$", sw)
     r = {"sweep": sw, "run": os.path.basename(d), "hp_idx": int(re.match(r"trial_(\d+)", os.path.basename(d)).group(1))}
     f = d + "/sigma_stage/preds_test.npz"
     lg = d + "/out_0.log"

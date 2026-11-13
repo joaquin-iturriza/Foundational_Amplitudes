@@ -23,7 +23,7 @@ from analysis.common.readers import site_python  # noqa: E402
 from curve_quality import quality, together_min  # noqa: E402
 from s4_readout import failed  # noqa: E402
 from suspects_readout import YLAB, ps  # noqa: E402
-from trial_overfit import REMOTE  # noqa: E402
+from trial_overfit import REMOTE, driven_rows  # noqa: E402
 
 # test -> (cells: {cell: {arm: control search prefix}}, variants: {label: sweep tag}); the design of each test is on the
 # plan entry: lr = the lower-lr-centre test, muonly = the one-change mu-only MSE test (training.heterosc_mu_only)
@@ -55,7 +55,10 @@ def rows(cached):
     if cached:
         return json.load(open(cache))
     names = sorted(sweep(c, a, v) for c in CELLS for a in CELLS[c] for v in ["control", *VARIANTS])
-    r = site_python(REMOTE, names, "TOVF", timeout=1800)
+    # driven searches (sweeps_local) are read on every site that ran a trial (lxplus too), the rest on CC
+    drv = [n for n in names if os.path.isdir(os.path.join(REPO, "sweeps_local", n, "results"))]
+    r = driven_rows(drv) + (site_python(REMOTE, sorted(set(names) - set(drv)), "TOVF", timeout=1800)
+                            if set(names) - set(drv) else [])
     json.dump(r, open(cache, "w"))
     return r
 
@@ -182,7 +185,7 @@ def main():
             ax.set_yscale("log"); ax.set_xlabel("step"); ax.set_ylabel(YLAB.get(target, r"val MSE$(\ln|V|)$"))  # u u~ V is trained on V (D375)
             ps.process_label(ax, {"scr": "scratch", "ft": "fine-tune"}[arm] + rf", $D={D}$", loc="upper right")
             ps.legend(ax, "lower left")
-        name = "lr_centre_curves" if TEST == "lr" else f"{TEST}_curves_{cell.split('_t')[0]}"
+        name = "lr_centre_curves" if TEST == "lr" else f"{TEST}_curves_{cell.rsplit('_t', 1)[0]}"  # '_ttx' also holds '_t'
         ps.save_panels(figs, os.path.join(HERE, "figs", name))
 
 

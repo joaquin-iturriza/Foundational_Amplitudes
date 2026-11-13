@@ -8,6 +8,7 @@ Cache data/trial_overfit.json; figure figs/trial_overfit_<a..d> (rise against pe
 
     python analysis/data_saving/trial_overfit.py [--cached]
 """
+import glob
 import json
 import os
 import sys
@@ -45,6 +46,26 @@ for sw in sys.argv[1:]:
         out.append(r)
 print("TOVF " + json.dumps(out))
 '''
+
+
+def driven_rows(names, script=REMOTE, marker="TOVF", pattern=None):
+    """The rows `script` prints for drive.py searches, read on every site that ran one of their observed trials (CC
+    and lxplus), kept only for the run dir each trial's result record names (sweeps_local/<name>/results/*.json; a
+    requeued trial runs in trial_<hp>_r<n> beside its lost first try). `pattern`: the script's one argument (a quoted
+    glob of run dirs) in place of the names."""
+    keep, sites = set(), {}
+    for n in names:
+        st = {t["hp_idx"]: t["site"] for t in
+              json.load(open(os.path.join(REPO, "sweeps_local", n, "driver_state.json")))["trials"].values()}
+        for f in glob.glob(os.path.join(REPO, "sweeps_local", n, "results", "*.json")):
+            j = json.load(open(f))
+            keep.add((n, os.path.basename(j["run_dir"].rstrip("/"))))
+            sites.setdefault(st[j["hp_idx"]], set()).add(n)
+    rows = []
+    for site, ns in sorted(sites.items()):
+        args = [pattern] if pattern else sorted(ns)
+        rows += [dict(r, site=site) for r in site_python(script, args, marker, site=site, timeout=1800)]
+    return [r for r in rows if (r["sweep"], os.path.basename((r.get("run_dir") or r["run"]).rstrip("/"))) in keep]
 
 
 def load(cached=False):
