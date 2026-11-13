@@ -28613,6 +28613,18 @@ entries:
       up after ~6000 steps, end_up 2.4-420 nats; uugg A2 sep 399), tt runs follow training but still fall fast at 8000 (A1
       sep 0.55 good, A2 0.64, control 0.60): none well trained at this HP point; predictions are at the best mu-MSE checkpoint.
       Figures kit_mse_A_asym_*, kit_median_A_asym_*.'
+  - at: '2026-11-13T10:35:19+00:00'
+    text: '2026-11-13 ~12:30 @f19986f9. kit_hpo read (E7091; tools/kit_curves.py sweep -> analysis/kit_benchmark/data/kit_hpo.json,
+      sweepfig -> figs/kit_hpo_lr, kit_hpo_curves). Four single-fidelity DyHPO searches, 16 trials each, 1831 steps WSD (300
+      epochs of 1e5), batch 16384, seed 42; good = curve_quality on val/train mu-MSE (separation <= 3, end_up <= 2). uug plain:
+      10/16 good, chosen = lowest hp1918 lr 0.0125 wd 0.052 reg 4.9e-7 warmup 0.19 eta_min 1.0e-8 no EMA, val 2.92e-5 (sep
+      1.05); good trials cluster at lr 0.0117-0.0137, the old lr 0.0118605 sits inside. tt virtual softpairthr: 12/16 good,
+      chosen = lowest hp0131 lr 0.00178 wd 0.0034 reg 1.4e-9 warmup 0.20 eta_min 3.4e-8 EMA 0.918, val 7.1e-7 (sep 1.94);
+      6.6x below the old lr; the best trials sit at the low edge of the lr window (1.667e-3). uug T: 1/16 good: lowest hp1493
+      val 1.82e-4 fails (sep 19.5, train 2.4e-5 at end); chosen hp1677 lr 0.00655 val 4.04e-4 (sep 1.74). uugg T: 0/16 good
+      (sep 5.8-101); lowest hp1196 lr 0.00202 val 2.89e-3, train falls to 4e-4 while val stays flat at 3e-3 from step ~800;
+      9 of 16 trials and the best at the lr window''s low edge. So: uug plain and tt virtual have chosen HPs; uug T marginal;
+      uugg (T, and plain has no search) has none.'
   step_why:
     5:
       feeds: what KIT receives
