@@ -25530,6 +25530,62 @@ entries:
       is decided above noise. Also state disk per job and CC free disk (66 GB on /sps/lpnhe now) (check 14). Passed as is:
       HETEROSC (check 9), matched space/DyHPO seed/8 trials 3,3,2 as the record (checks 12, 13), step rates from the cosine
       twin (1.02 s/iter) and the record''s trials, test events the record''s pools (check 10).'
+  - at: '2026-11-13T01:51:27+00:00'
+    question: 'Step 6, revised once on the reviewer''s FIX (paths, input flags, prior, outcome, expected effect, disk). On
+      b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class), does a parent trained with WSD (cooldown 1/8)
+      keep the pretrained head start through a WSD fine-tune, where the cosine parent''s fine-tunes lose it? Arms per D in
+      {100, 316, 3162}: (R) the stage-2 record, cosine parent + cosine fine-tune (dsave_s2_ft_bbx_zz_d{4,5,7}); (C) cosine
+      parent + WSD fine-tune (dsave_s5cosparent); (W) WSD parent + WSD fine-tune (dsave_s5wsdparent). W/C isolates the parent''s
+      schedule, C/R the fine-tune''s. Feeds: WSD parents for the data-saving grid, or the fine-tune warmup next.'
+    prior: '(1) results.tex par:v4_warm_start_fixes (catalog warm start, seed 42): WSD parent val at best -2.909 vs cosine
+      -2.858; its final model at the default restart 0.759 (PP4) / 0.832 (EE4) of the cosine control (a 1.2-1.3x parent effect
+      on best val); restart jump G 181 (branch 61) vs 1023. (2) Suspects test 2026-11-12 (data/suspects_readout.json): WSD
+      fine-tune from the cosine parent vs the cosine fine-tune on e+e- > t t~ LO at fixed (cosine-tuned) HPs: val ratio 0.73
+      / 5.2 / 19.9 / 8.7 at D=316 / 1e3 / 3162 / 1e4, test 0.49 / 1.5 / 0.35 / 45: WSD at untuned HPs worse at D>=1e3; this
+      design adds a searched WSD fine-tune (D423, schedule tuned in the search), a second target (b b~ ZZ, where the head
+      start was measured) and the parent''s schedule, which no record varies for a data-saving target. (3) D414 read (ft_constraint.py
+      @9aeba3ea): bbZZ tree stage-2 bests start at ft/scr 0.014 / 0.037 / 0.071 (D=100/316/3162), lose the head start at 16
+      / 10 / 8% of the run against warmup fractions 0.067 / 0.144 / 0.106; best trial warmup rise 1.27 / 3.9 / 6.4; 54% of
+      50 tree ft trials rise >3x in warmup (Spearman with peak lr +0.50). (4) Stage-2 best test MSE scr/ft: D=100 1.7e-3/3.9e-3,
+      316 8.4e-6/1.1e-5, 3162 5.5e-7/6.1e-7; S at 1e-4 1.14 [0.81,1.60]. Searched: results.tex WSD, WSD parent, warm start;
+      plan show (WSD, suspect); site decisions D414, D422, D423.'
+    measure: 'Primary (the decision): head start of each search''s best fine-tune trial, v_ft(t)/v_scr(t) against the scratch
+      search best on record at that D (3-check running median, as ft_constraint.py), the run fraction where it first reaches
+      1, or NEVER; per trial the same fraction and the warmup rise max_warmup v / v(0). Secondary: per D and arm the best
+      val MSE(ln|M|^2) (mu, best checkpoint) and test MSE; ratios W/C, C/R, W/R and each over the scratch best. Curves figure
+      of R, C, W bests and the scratch best per D. Reader: ft_constraint.py extended to the s5 stages.'
+    check: 'Spread of the primary on the record (curve_quality.trials, stage-2 bbZZ tree, every ft trial against its D''s
+      scratch best): D=100 lost at 0.06-0.20 (7 trials), 316 0.04-0.14 (8), 3162 0.06-0.92 (7); NEVER in 0 of 22 at these
+      D (1 of 50 over all D, at D=10); median ~0.10. So a search best that NEVER loses it is outside every record trial. Across
+      schedules the restart jump moved 1023 -> 181 -> 61 (par:v4_warm_start_fixes). Expected: the parent effect on best val
+      ~1.2-1.3x (prior 1), below the 2.53 pooled bar, so the best-val ratios are reported, not decided on; the head-start
+      reading decides. C''s warmup and peak lr are the record''s (WSD and cosine share both), so C''s head start is not expected
+      to move from R unless the rise comes from the cosine decay; W is the arm expected to move.'
+    fixed: 'Configs @a3ecbcc3 (sweep/gen_data_saving.py --targets bbx_zz --arms ft --ks 4 5 7 --wsd, --stage s5wsdparent /
+      s5cosparent): against the stage-2 twin only the name, the scheduler (WSD, cooldown 0.125) and, for W, the parent path
+      differ (diffed); stage-2 tree fine-tune space (lr_scale [1/3,3], layer_decay 1, template ranges), lr centre c(T) as
+      the record, T 4960/7840/8500, batch D/2, recipe catalog_v4_datasaving_bbx_zz, HETEROSC mu_mse + sigma stage, seed 42,
+      DyHPO seed = the record''s (same start-up draws), 8 trials in waves 3,3,2. Parent W: scripts/job_datasaving_parent.sh
+      heldoutbbzz ++training.scheduler=WSD ++training.wsd_cooldown_frac=0.125 ++model.input_soft_eps=1e-8 ++model.input_pair_logs=6
+      tag=wsd -> runs/data_saving/dsave_parent_heldoutbbzz_wsd: the cosine parent''s (FA-ccin2p3-0d698e4b) pools, T=3458,
+      lr 9.248e-3, warmup, batch 16384, input flags, seed 42. Before any fine-tune: diff its config.yaml against the cosine
+      parent''s (only scheduler and wsd_cooldown_frac may differ) and one CPU dry run on CC of a trial loading it.'
+    control: C (cosine parent, same WSD fine-tune search, same seed) for the parent; R (stage-2 record, same space and DyHPO
+      seed) for the fine-tune schedule; the stage-2 scratch search bests per D as the head-start reference.
+    seeds: 'Run seed 42, one 8-trial search per arm and D (as the record and its sibling cells, D315). Cost: parent from its
+      cosine twin''s own run, 62.5 min training (1.02 s/iter, V100) + ~20 min load/eval + 7.8 min sigma stage = 1.51 GPU-h;
+      fine-tunes at the generator''s per-trial estimates 0.20/0.26/0.29 GPU-h x 8 x 2 arms = 12.0 GPU-h; total 13.5 GPU-h,
+      under 30. Disk: the cosine parent 152 MB; a fine-tune trial at most that (D<=3162 train events), 48 trials + parent
+      <= 7.5 GB against CC /sps/lpnhe 66 GB free (read 2026-11-13). Wall: parent ~1.6 h, then 3 waves x ~0.35 h. C goes with
+      W after the parent, one drive.py batch of 6 searches, CC and lxplus.'
+    outcome: 'Head start per arm, at each D its search best KEPT if NEVER lost (v_ft/v_scr < 1 through the run) or lost after
+      0.5 of the run (beyond every record trial but one at 0.92), else LOST. Arm KEPT at >= 2 of 3 D, else LOST. Branches:
+      (a) W KEPT, C LOST -> the parent''s schedule keeps it: WSD parents for the data-saving grid (cost to Joaquin). (b) W
+      KEPT, C KEPT -> the fine-tune schedule keeps it: no parent retraining; the WSD fine-tune template (D423) suffices, reported.
+      (c) W LOST, C KEPT -> the WSD parent hurts: reported, cosine parents kept. (d) both LOST -> neither schedule keeps it:
+      the fine-tune warmup is next (reported, a design needed). Beside each: W/C, C/R and over-scratch best-val ratios per
+      D and pooled against 5^(1/sqrt 3) = 2.53 (expected within, prior 1), and S read only if a ratio leaves the bar. Diverged
+      trials listed apart (D398).'
   step_waits:
     '5': detach ttx16_repick (drive.py, 4 WSD + 2 wide t t~ tree searches to 16 trials, CC/lxplus)
     '6': a reviewer
