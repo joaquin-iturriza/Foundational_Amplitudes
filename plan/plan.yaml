@@ -32617,6 +32617,7 @@ entries:
     '5': steps 1-4 (Secs. 2-5 written)
     '2': 'the main session''s resume: its brief says hand back after Sec. 2 and continue section by section on resume'
     '3': 'the main session''s resume: its brief says hand back after Sec. 2 and continue section by section on resume'
+    '4': 'the main session''s resume: its brief says hand back after Sec. 2 and continue section by section on resume'
   findings:
   - at: '2026-11-13T02:46:58+00:00'
     text: '2026-11-13 ~03:50 Joaquin: ''we should start actually doing the work on the draft with what we have ... Let''s
