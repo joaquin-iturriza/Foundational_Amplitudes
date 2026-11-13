@@ -70,7 +70,15 @@ NAMED = {"c15b3337": "kit_A_ee_uug_me2_n100000_t8000_softpair",
          "95be8db2": "kit_A_ee_uug_me2_n100000_t8000_softpair_gmax4",
          "88b9334a": "kit_A_ee_uugg_me2_n100000_t8000_softpair_gmax4",
          "c4fc1d6f": "kit_A_ee_uug_me2_n100000_t8000_softpair_plain_logskiplin",
-         "6bc05a40": "kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr_logskiplin"}
+         "6bc05a40": "kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr_logskiplin",
+         # step 18: asymptotic-factor arms (A1 on the control's inputs, A2 no log inputs + gamma <= 4) and the uugg control
+         "d5fb3d78": "kit_A_ee_uug_me2_n100000_t8000_softpair_asym",
+         "3bbda50a": "kit_A_ee_uug_me2_n100000_t8000_asym_cont",
+         "fec28926": "kit_A_ee_uugg_me2_n100000_t8000_softpair_plain",
+         "1ad20d13": "kit_A_ee_uugg_me2_n100000_t8000_softpair_plain_asym",
+         "602ce14f": "kit_A_ee_uugg_me2_n100000_t8000_asym_cont",
+         "09576b49": "kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr_asym_plainlog",
+         "5ce19348": "kit_A_ee_tt_virt_finite_n100000_t8000_asym_cont_plainlog"}
 
 
 def smooth(x):

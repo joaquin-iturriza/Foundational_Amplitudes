@@ -154,6 +154,12 @@ INPUT_ARMS = {"pairlogs": r"+ $\log(s_{ij}/s)$ inputs", "softrescale": "+ soft l
               "softpair_plain": "plain target",
               "softpair_plain_logskip": r"plain target + $P_2(L)$", "softpair_plain_logskiplin": r"plain target + $P_1(L)$",
               "softpairthr_logskip": r"+ $\log\beta^2$ + $P_2(L)$", "softpairthr_logskiplin": r"+ $\log\beta^2$ + $P_1(L)$",
+              # step 18 (D435): log|M|^2 = log A + g, A the asymptotic factors (dipoles, 1/beta, log^2), on the plain target
+              "softpair_asym": r"+ soft rescale + $\log(s_{ij}/s)$" + "\n" + "+ asymptotic factor",
+              "softpair_plain_asym": r"+ soft rescale + $\log(s_{ij}/s)$" + "\n" + "+ asymptotic factor",
+              "softpairthr_asym_plainlog": r"+ $\log(s_{ij}/s)$ + $\log\beta^2$" + "\n" + "+ asymptotic factor",
+              "asym_cont": "asymptotic factor,\n" + r"no log inputs, $\gamma\leq4$",
+              "asym_cont_plainlog": "asymptotic factor,\n" + r"no log inputs, $\gamma\leq4$",
               # A_ft: the parent's pretraining (catalog_v4 with the KIT families held out, + LO / one-loop top pairs near
               # threshold), then the inputs every such arm has (input_soft_eps, input_pair_logs=6; beta where tagged)
               "ftr5own": "held-out catalog\n" + r"+ soft rescale + $\log(s_{ij}/s)$",
