@@ -32549,9 +32549,10 @@ entries:
   match: none
   evidence:
     runs: []
-    commit: null
+    commit: bc3e68e2
     paths:
     - /home/joaquin/drafts/fm_amplitudes_2026-11/paper.tex
+    - analysis/data_saving/data/example_cells.json
   dead_ends: []
   asks:
   - ask: 'Scope: three sections of the draft are not in your new story: Sec. 2 ''Accuracy and precision benchmark'' (a placeholder
