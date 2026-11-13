@@ -199,9 +199,9 @@ def ledger_sync(d):
         it, s = items.get(e.get("id")), e.get("status")
         if it == "held" and s in ("running", "waiting_user") and e["id"] in held_by:
             e["status"], e["hold_decision"] = "held", held_by[e["id"]]
-        elif it == "active" and s == "held" and kinds.get(e.get("hold_decision")) == "hold" and e["id"] not in held_by:
-            # only a hold that is no longer in force releases it; a forbid (plan answer --kind forbid) leaves the item
-            # active in the ledger and the entry held
+        elif it == "active" and s == "held" and kinds.get(e.get("hold_decision")) in ("hold", "forbid") \
+                and e["id"] not in held_by:
+            # a hold or forbid no longer in force (superseded) releases it; one in force keeps it held (held_by)
             e["status"] = "running"
             e.pop("hold_decision", None)
 
