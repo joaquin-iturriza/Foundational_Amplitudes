@@ -33327,6 +33327,17 @@ entries:
       back to before 5f4dc23; figures scaled (three ladder panels a row), legends as full-row strips (plot_style.legend_strip
       width mode, FA 14132f0a); example_dist/Muon extras undone (FA 5e25e978); scatter smaller sets on top. His part 26 pages
       (snapshot 40, d742281 50). Prose tightening not done; Setup sentences not reviewed. Draft 42c3d80.'
+  - at: '2026-11-13T16:39:11+00:00'
+    text: '2026-11-13: Sec. 6 tightened (draft 37dc1bc: synthetic subsection without syn_00008/00010, ''Version 1'', unrecorded
+      reasons, 478-entry catalog, 432 compiles); fresh cold reviewer on Secs. 4-6 (FIX, 32 items) applied in part at draft
+      3e7c9a3 (Sec. 4 setup/history/unshown numbers, retraining note to Fig. 7 caption; Sec. 5 lead, test-set sentence, zero-shot
+      paragraph; Sec. 6 EW-Sudakov internal names, single-run counts, Fig. 22 caption, synthetic subsection numbered so sec:synthetic
+      resolves, repeats, s_ij note, checks, sigma stats; example figures 0.6->0.52 and the clearpage before Sec. 6 removed,
+      so no lone float pages). His part pp. 8-31 (24 pages; snapshot 40). Zip scratchpad overleaf_update_v5.zip (paper.tex
+      + 37 figure PDFs of v4, unchanged), compiled standalone over overleaf_1113: same text, only citation numbers differ.
+      Not applied: numbers in Sec. 6 ladder paragraphs (his 0920 ''sec 4 is fine'', coordinator: findings stay), het-vs-MSE
+      sentence (Fig. 9 removed by him, MSE result mixed), ''finale'' rename (restored on his order), muon/star_arms legend
+      layout (figure files frozen), synthetic generator to appendix (his call).'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
