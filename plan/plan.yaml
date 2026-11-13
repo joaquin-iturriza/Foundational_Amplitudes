@@ -28585,7 +28585,7 @@ entries:
     '18': FA-ccin2p3-d5fb3d78 FA-ccin2p3-3bbda50a FA-ccin2p3-fec28926 FA-ccin2p3-1ad20d13 FA-ccin2p3-602ce14f FA-ccin2p3-dbf9149d
       FA-ccin2p3-11fa09d1
     '19': kit_hpo driver DONE event (chosen HPs); literature agent's findings for (a)
-    '21': FA-ccin2p3-5d188180 FA-ccin2p3-23874954
+    '21': FA-ccin2p3-dbf9149d FA-ccin2p3-11fa09d1
     '20': '2026-11-14'
   handoff:
     state: '2026-11-13 @3752e145. Draft Sec. 5 was written on the main session''s brief (draft 4a86295) but Joaquin had said
