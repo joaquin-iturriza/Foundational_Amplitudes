@@ -21420,7 +21420,7 @@ entries:
     - FA-ccin2p3-57dfe7bf
     - FA-ccin2p3-938b05ab
     - FA-ccin2p3-e8425579
-    commit: 9aeba3ea
+    commit: dbb74895
     paths:
     - analysis/data_saving/data/ft_hpo_diag.json
     - analysis/data_saving/data/hmap_readout.json
@@ -21434,10 +21434,12 @@ entries:
     - analysis/data_saving/ft_hpo_diag.py
     - analysis/data_saving/hmap_readout.py
     - analysis/data_saving/horizons.py
+    - analysis/data_saving/lr_centre_readout.py
     - analysis/data_saving/nullparent_readout.py
     - analysis/data_saving/old_setup_examples.py
     - analysis/data_saving/plot_vb_test.py
     - analysis/data_saving/stage2_readout.py
+    - analysis/data_saving/step6_readout.py
     - analysis/data_saving/trial_overfit.py
     - analysis/data_saving/width_zero_shot.py
     - analysis/transfer/finale_synth_scaling.py
