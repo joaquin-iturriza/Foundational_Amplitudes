@@ -30,7 +30,8 @@ fixed_params:
   training.get_ID: 'false'
   training.regularization: L2
   training.save_intermediate: 'false'
-  training.scheduler: CosineAnnealingLR
+  training.scheduler: WSD
+  training.wsd_cooldown_frac: 0.125
 
 # HP search space — same format as before.
 # DyHPOSampler pre-samples n_candidates configs from this space at init.

@@ -36,7 +36,8 @@ fixed_params:
   training.get_ID: 'false'
   training.regularization: L2
   training.save_intermediate: 'false'
-  training.scheduler: CosineAnnealingLR
+  training.scheduler: WSD
+  training.wsd_cooldown_frac: 0.125
   # MuonAdamW (optim/muon.py) for pretraining and fine-tuning, the user's switch to Muon (2026-10-26, "seems obvious
   # that we should switch to muon", D155; docs/results.tex par:v3_muon). config/default.yaml keeps AdamW so sweeps
   # and reruns written before the switch keep the optimizer they ran with; a new sweep sets it here. A fine-tune whose
