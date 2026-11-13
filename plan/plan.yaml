@@ -32616,7 +32616,7 @@ entries:
     decision: D445
   owner:
     agent: a2a4ed3ec50041307
-    state: working
+    state: closed
     since: '2026-11-13T03:06:53+00:00'
     state_at: '2026-11-13T04:59:05.885000+00:00'
     context: 274100
@@ -32774,3 +32774,29 @@ entries:
     units: null
     start: '2026-11-13T05:05:29+00:00'
     at: '2026-11-13T05:05:29+00:00'
+  handoff:
+    state: 'Sec. 2 written and revised to Joaquin''s 2026-11-13 comments (draft 23de6d4): old-setup 4-panel figure, per-curve
+      fits L=A D^-a+L_inf, S at the lowest of 1e-4/1e-3/1e-2 both fits reach in D<=1e4 (Zggg 11.3 @1e-2, ddg 5.5 @1e-2, e
+      nu 5.1 @1e-3, bb one loop 5.6 @1e-4), MSE->relative error (1e-4: 1.0% rms, 0.7% median; 1e-3: 3.2/2.1; 1e-2: 10/6.8),
+      m_b=4.7 GeV; its representative-examples slot waits on 23 reruns now on lxplus. Sec. 4 done: redrawn ladder figures
+      (D434), finale renamed every-structure, caption/lead fixed (draft 5f4dc23, 22fac9d). Co-authors'' held slots removed
+      (sections untouched). KIT slot: threshold scan out (17b03ca). Secs. 3 and 5 belong to optimizations_recap and kit_benchmark
+      owners (coordinator). Draft builds only with /mnt/c/texlive/2025/bin/windows/pdflatex.exe (local pdflatex lacks dsfont);
+      the draft repo has no remote and is shared: before committing paper.tex check every diff hunk is in your sections.'
+    decisions: 'D433/D441/D438 (old-setup figure, per-curve fits, bb D=10 left out); Joaquin 2026-11-13: co-authors'' sections
+      untouched; skip bbZZ/tt in Sec. 2; 1e-3 where possible; legend strip on top; ''own power law'' dropped; fine-tune protocol
+      = short 5-trial searches then fixed configuration, tuned where needed (fixed in draft Secs. 2/4 and results.tex, FA
+      00785a07); threshold scan not in the draft for now. D444: representative examples (design passed 03:21: rerun the 24
+      pruned cells from their configs, 23 runs + the existing tp3_finfte_uubar_Zggg_d8 trial_0096 rerun).'
+    ruled_out: Re-evaluating the cells' checkpoints (pruned); analysis/transfer/delta_data (Delta only, D=1e4 only, no truth/pred);
+      Jean Zay for the reruns (sync push and bundle timed out twice; its checkout is 8fb002e, 2026-10-15).
+    running: '23 reruns on lxplus (scripts/job_rerun_trial.sh, FA-lxplus-9f778f21 + 22, ids in plan run list; step 1 waits
+      on them); per-event preds land in lxplus $SCRATCH/zz_delta/<sweep>__<trial>_rerun/preds_val.npz and the run''s result.json;
+      the Zggg d8 ft one is on CC $SCRATCH/zz_delta/tp3_finfte_uubar_Zggg_d8__trial_0096_rerun. The 23 cancelled CC copies
+      (FA-ccin2p3-*) are still recorded as runs and may raise CANCELLED events: ack them as moved. Repo-reviewer (agent a0235a571b0f6ef08)
+      holds its lock with findings 1-2 for other owners (sweep template scheduler, ft_constraint end-val) routed to the main
+      session.'
+    files: ~/drafts/fm_amplitudes_2026-11/paper.tex; analysis/data_saving/old_setup_examples.py; analysis/data_saving/example_cells.py
+      + data/example_cells.json (cell -> sweep/hp); analysis/data_saving/pool_mass.py; analysis/transfer/finale_synth_scaling.py
+      --paper; scratchpad rerun_args.txt/ids_lx.txt
+    written: '2026-11-13T05:10:23+00:00'
