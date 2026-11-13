@@ -175,6 +175,89 @@ def _div_form_inputs(p, ptr, n, cas, heavy):
     return torch.cat([eik, spl, coul, sud], dim=1).repeat_interleave(cnt, dim=0)
 
 
+# model.input_asym_factor: every learned coefficient within +-10 target std of the bulk mean. Needed (tools/kit_asym_bound.py,
+# kit_asym_bound.json): the common coefficient (log|M|^2 - log sum D_t - mean)/sd over bulk_train and every hard_test
+# stratum reaches |c| 3.05 (uug), 6.07 (uugg soft), 6.84 (tt Sudakov), the regular readout |z| 5.24; 10 leaves 3 std
+_ASYM_BOUND = 10.0
+
+
+def _asym_terms(p, ptr, n, cas, heavy, loops):
+    """The singular factors D_t of model.input_asym_factor (kit_benchmark step 18, D435), built from each particle's
+    colour Casimir `cas` (0, C_F, C_A), `heavy` flag (table mass >= 1 GeV) and the event's QCD loop count `loops`,
+    s = (p_0 + p_1)^2, s_ij = 2 p_i.p_j, final legs only (index >= 2):
+      dipole   per ordered (i, j, k) of light coloured final legs, j a gluon, i a quark (q -> q g) or a gluon with i < j
+               (g -> g g, once per pair), k the spectator: Catani-Seymour's spin-averaged massless final-final dipole
+               D = (s/s_ij) V, y = s_ij/(s_ij + s_ik + s_jk), z = s_ik/(s_ik + s_jk),
+               V_qg = C_F (2/(1 - z(1-y)) - (1+z)), V_gg = C_A (1/(1 - z(1-y)) + 1/(1 - (1-z)(1-y)) - 2 + z(1-z))
+      Coulomb  per pair i < j of heavy coloured legs of a loop target: D = 1/beta, beta = sqrt(lambda(M^2, m_i^2, m_j^2))/(M^2 - (m_i - m_j)^2)
+      Sudakov  per heavy coloured leg of a loop target: D = log^2(s/m_i^2)
+    (a colourless heavy leg, W, Z, H, tau, has no QCD Coulomb or Sudakov factor: the target's loop count is L_QCD)
+    Returns log D (B, T) in float64, on (B, T) (the term exists in that event) and members (T, 3): the legs whose
+    coefficients set the term's coefficient, -1 padded. Every D is positive and Lorentz invariant.
+    shortcut: no heavy emitter (CDST's massive Q -> Q g dipole) and no initial-state coloured leg; no KIT target has
+    either (uug, uugg, tt virtual), add them when a t t~ g or a pp target is fit with the factor."""
+    cnt = ptr[1:] - ptr[:-1]
+    ar = torch.arange(n, device=p.device)
+    valid = ar[None, :] < cnt[:, None]
+    idx = (ptr[:-1, None] + ar[None, :]).clamp(max=p.shape[0] - 1)
+    P = p[idx].to(torch.float64)
+    c, hv = cas[idx].to(torch.float64) * valid, heavy[idx] & valid
+    dots = torch.einsum("bic,bjc,c->bij", P, P, torch.tensor(_ETA, device=p.device, dtype=P.dtype))
+    s = (dots[:, 0, 0] + dots[:, 1, 1] + 2 * dots[:, 0, 1]).abs().clamp(min=1e-300)
+    sij = (2 * dots).abs().clamp(min=1e-300)
+    light = (c > 0) & ~hv
+    glu, qrk = light & ((c - _CA).abs() < 1e-3), light & ((c - _CF).abs() < 1e-3)
+    loop = (loops > 0.5)[:, None] if loops is not None else torch.zeros_like(s, dtype=torch.bool)[:, None]
+    lg = lambda x: torch.log(x.clamp(min=1e-300))
+    dev, L = p.device, torch.long
+    tri = torch.tensor([(i, j, k) for i in range(2, n) for j in range(2, n) for k in range(2, n) if len({i, j, k}) == 3],
+                       device=dev, dtype=L).reshape(-1, 3)
+    i, j, k = tri[:, 0], tri[:, 1], tri[:, 2]
+    a, b, d = sij[:, i, j], sij[:, i, k], sij[:, j, k]
+    y, z = a / (a + b + d), b / (b + d)
+    wi, wj = d / (b + d) + z * y, b / (b + d) + (1 - z) * y          # 1 - z(1-y), 1 - (1-z)(1-y), stable at z -> 1
+    qg, gg = qrk[:, i] & glu[:, j], glu[:, i] & glu[:, j] & (i < j)
+    V = torch.where(qg, _CF * (2 / wi - (1 + z)), _CA * (1 / wi + 1 / wj - 2 + z * (1 - z)))
+    dip = (lg(V) + lg(s[:, None] / a), (qg | gg) & light[:, k], tri)
+    pr = torch.triu_indices(n, n, 1, device=dev)
+    pr = pr[:, pr[0] >= 2]
+    a, b = pr[0], pr[1]
+    m2 = dots.diagonal(dim1=1, dim2=2).abs()
+    m = m2.sqrt()
+    M2 = m2[:, a] + m2[:, b] + 2 * dots[:, a, b]
+    beta = (((M2 - (m[:, a] + m[:, b]) ** 2) * (M2 - (m[:, a] - m[:, b]) ** 2)).abs().sqrt()
+            / (M2 - (m[:, a] - m[:, b]) ** 2).abs().clamp(min=1e-300))
+    neg = torch.full_like(a, -1)
+    hq = hv & (c > 0)                                                  # heavy and coloured
+    cou = (-lg(beta), hq[:, a] & hq[:, b] & loop, torch.stack([a, b, neg], 1))
+    leg = torch.arange(2, n, device=dev)
+    sud = (2 * lg(lg(s[:, None] / m2[:, leg].clamp(min=1e-300))), hq[:, leg] & loop,
+           torch.stack([leg, torch.full_like(leg, -1), torch.full_like(leg, -1)], 1))
+    return tuple(torch.cat(x, dim=d) for x, d in zip(zip(dip, cou, sud), (1, 1, 0)))
+
+
+def _asym_mu(mu_raw, alpha, ptr, n, logD, on, members, sd):
+    """(B,) the standardized mu of model.input_asym_factor: log|M|^2 = log A(x) + g(x) with
+    A = sum_t exp(c_t) D_t, c_t = sd * mean over the term's legs of alpha_i (per-particle readout), and
+    g = log(1 + exp(r)/A), r = sd * mu_raw (the pooled readout), both readouts bounded by +-_ASYM_BOUND (tanh), so g is
+    bounded and goes to 0 wherever a D_t diverges: there log|M|^2 - log(exp(c_t) D_t) -> 0, the limit's form is exact
+    and only the coefficient (the reduced matrix element's role, smooth in the limit) is learned (Maitre-Truong,
+    arXiv:2107.06625). In target units: mu = (log|M|^2 - mean)/sd; the bulk level `mean` cancels into the readouts.
+    mu_raw (B,), alpha (N_total,) the raw readouts; logD, on, members from _asym_terms; sd the target's std (nats)."""
+    B_ = _ASYM_BOUND
+    cnt = ptr[1:] - ptr[:-1]
+    ar = torch.arange(n, device=ptr.device)
+    valid = (ar[None, :] < cnt[:, None]).to(torch.float64)
+    al = (B_ * torch.tanh(alpha.to(torch.float64) / B_))[(ptr[:-1, None] + ar[None, :]).clamp(max=alpha.shape[0] - 1)]
+    al = torch.cat([al * valid, torch.zeros_like(al[:, :1])], 1)               # column n: the -1 padding
+    mem = torch.where(members < 0, torch.full_like(members, n), members)
+    cbar = al[:, mem].sum(-1) / (members >= 0).sum(-1).to(torch.float64)        # (B, T)
+    sd = sd.to(torch.float64)
+    terms = torch.where(on, sd * cbar + logD, torch.full_like(logD, -torch.inf))
+    reg = sd * B_ * torch.tanh(mu_raw.to(torch.float64) / B_)
+    return torch.logsumexp(torch.cat([reg[:, None], terms], 1), 1) / sd
+
+
 def _soft_rescale(p, ptr, eps):
     """p_i -> p_i log1p(x_i/eps) / (x_i log1p(1/eps)), x_i = 2 p_i.Q/s, Q = p_0 + p_1, s = Q^2: an invariant factor per
     momentum (equivariant), 1 at x_i = 1, so a soft momentum's scale reads logarithmically (model.input_soft_eps)."""
@@ -321,7 +404,7 @@ class AmplitudeLLoCaWrapper(nn.Module):
                  input_pair_logs: int = 0, input_soft_eps: float = 0.0, input_local_log_eps: float = 0.0,
                  input_pair_threshold: bool = False, input_scalars_only: bool = False,
                  input_route_off: str = "", input_log_skip: int = 0, input_log_skip_linear: bool = False,
-                 input_div_form: bool = False):
+                 input_div_form: bool = False, input_asym_factor: bool = False):
         super().__init__()
         self.net = net
         # input representations for singular limits (D374, kit_benchmark input arms; all Lorentz-exact, 0 = off):
@@ -347,6 +430,12 @@ class AmplitudeLLoCaWrapper(nn.Module):
         # input_pair_logs (its multiplicity) and the property encoding (colour Casimir and table mass of each particle)
         self.input_div_form = bool(input_div_form)
         assert not self.input_div_form or self.input_pair_logs, "model.input_div_form needs model.input_pair_logs"
+        # input_asym_factor: log|M|^2 = log A + g, A the universal singular factors with learned per-leg coefficients,
+        # g bounded and vanishing in every limit (_asym_terms, _asym_mu; step 18); the net carries one more per-particle
+        # row (models/lloca.py extra_main) and asym_sd, the target's std, is set by the experiment from its data stats
+        self.input_asym_factor = bool(input_asym_factor)
+        if self.input_asym_factor:
+            self.register_buffer("asym_sd", torch.ones((), dtype=torch.float64))
         if self.input_log_skip:
             assert self.input_pair_logs, "model.input_log_skip needs model.input_pair_logs (the event multiplicity)"
             self.log_skip_head = nn.Linear(d_particle_hidden, 2 * self.input_log_skip + 2)
@@ -1023,6 +1112,8 @@ class AmplitudeLLoCaWrapper(nn.Module):
         """
         ev_lrs = None
         assert not (self.input_log_skip and self.use_pids), "model.input_log_skip reads the property encoding"
+        assert not (self.input_asym_factor and self.use_pids), "model.input_asym_factor reads the property table"
+        loops = order_labels[:, 0] if order_labels is not None else None     # L_QCD of the target (experiment._order_row)
         if self.use_pids:
             particle_type = torch.nn.functional.one_hot(
                 particle_type_indices, num_classes=self.token_size
@@ -1112,6 +1203,9 @@ class AmplitudeLLoCaWrapper(nn.Module):
         outputs = self.net(fm_net, particle_type, mean, std, ptr=ptr,
                            seq_lens=seq_lens, pair_ctx=pair_ctx, **net_kwargs)
 
+        if self.input_asym_factor:   # rows [mu, alpha, sigma]: the per-particle coefficient leaves before the pool
+            k0 = self.net.out_shape
+            alpha, outputs = outputs[:, k0], torch.cat([outputs[:, :k0], outputs[:, k0 + 1:]], dim=-1)
         pair_feats = None
         if self.sign_pair_dim > 0:
             pair_feats, outputs = outputs[:, -self.sign_pair_dim:], outputs[:, :-self.sign_pair_dim]
@@ -1126,6 +1220,15 @@ class AmplitudeLLoCaWrapper(nn.Module):
             skip = _log_skip(fourmomenta, ptr, skip_types, self.input_pair_logs, self.log_skip_head,
                              self.input_pair_threshold, not self.input_log_skip_linear).to(pooled.dtype)
             pooled = torch.cat([pooled[:, :1] + skip[:, None], pooled[:, 1:]], dim=-1)   # mu is column 0
+        if self.input_asym_factor:
+            from particle_ids import GLOBAL_PROPERTY_MATRIX as _G
+            G = torch.as_tensor(_G, device=fourmomenta.device)
+            cnt = ptr[1:] - ptr[:-1]
+            n = int(max(seq_lens)) if seq_lens is not None else int(cnt.max())
+            logD, on, mem = _asym_terms(fourmomenta, ptr, n, G[particle_type_indices, 7],
+                                        G[particle_type_indices, 2] >= 0, loops)
+            mu = _asym_mu(pooled[:, 0], alpha, ptr, n, logD, on, mem, self.asym_sd)
+            pooled = torch.cat([mu[:, None].to(pooled.dtype), pooled[:, 1:]], dim=-1)
 
         # HETEROSC + sigma_after_pool: the net handed us a RAW per-particle sigma logit, so the
         # positivity nonlinearity is applied here — ONCE, to the pooled per-event value:

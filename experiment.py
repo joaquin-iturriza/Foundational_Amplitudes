@@ -842,6 +842,9 @@ class AmplitudeExperiment(BaseExperiment):
             if self.cfg.model.get("input_div_form", False):   # wrappers._div_form_inputs columns
                 from wrappers import _div_form_width
                 n_scalars += _div_form_width(_npl)
+            if self.cfg.model.get("input_asym_factor", False):   # wrappers._asym_mu: one more per-particle readout row
+                with open_dict(self.cfg):
+                    self.cfg.model.net.extra_main = 1
 
             with open_dict(self.cfg):
                 if self.modelname in ("MuPLGATr", "MuPLGATrSlim"):
@@ -1266,6 +1269,14 @@ class AmplitudeExperiment(BaseExperiment):
         standard-parametrization (SP) parameter by lloca.mup.finalize (in init_model)."""
         if self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer", "MuPLGATr", "MuPLGATrSlim"):
             use_pids = self.cfg.data.get("use_PIDs", False)
+            if getattr(model, "input_asym_factor", False):   # the target's std in nats (wrappers._asym_mu)
+                sds = np.atleast_1d(np.asarray(self.prepd_std, dtype=np.float64)).ravel()
+                assert np.allclose(sds, sds[0]), f"model.input_asym_factor needs one target std, got {sds}"
+                trafos = [list(self.cfg.data.amp_trafos)] + [list(t) for t in (getattr(self, "_amp_trafos_pp", None) or [])]
+                assert all(t[0] == "log" for t in trafos) and not self.cfg.data.get("target_physics_factor", False) \
+                    and not self.cfg.data.get("target_over_born", False), \
+                    f"model.input_asym_factor models log|M|^2 (natural log, no divided-out factor), got trafos {trafos}"
+                model.asym_sd.fill_(float(sds[0]))
             model.setup_particle_features(
                 use_pids=use_pids,
                 property_matrix=getattr(self, "property_matrix", None),

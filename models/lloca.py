@@ -113,6 +113,7 @@ class LLOCAMuPTransformer(nn.Module):
         sign_channel: bool = False,
         sign_branch: bool = False,
         sign_branch_blocks: int = 1,
+        extra_main: int = 0,
         # token_size: int = 0,
     ):
         super().__init__()
@@ -142,6 +143,10 @@ class LLOCAMuPTransformer(nn.Module):
         self.loss = loss
         self.out_shape = out_channels
         net_out_channels = 2 * out_channels if loss == "HETEROSC" else out_channels
+        # extra_main k: k more per-particle rows after mu, read by the wrapper before pooling (model.input_asym_factor's
+        # coefficient channel): rows [mu, extra, sigma], so sigma stays the last out_shape rows for the sigma stage
+        self.extra_main = int(extra_main or 0)
+        net_out_channels += self.extra_main
         # sign_channel (HETEROSC with training.sign_head; set by experiment.init_data): one more readout row, the sign
         # logit, between mu and sigma: rows [mu (out_shape), sign (1), sigma (out_shape)], so the experiment's splits
         # (sigma = the last out_shape channels, then the sign = the last remaining one) and the sigma stage (only the
@@ -150,7 +155,8 @@ class LLOCAMuPTransformer(nn.Module):
         self.sign_channel = bool(sign_channel)
         assert not self.sign_channel or loss == "HETEROSC", "sign_channel is the HETEROSC readout's sign row"
         # rows read from the live (non-detached) features: mu, and the sign logit when present
-        self.n_main = out_channels + (1 if self.sign_channel else 0)
+        self.n_main = out_channels + (1 if self.sign_channel else 0) + self.extra_main
+        assert not (self.extra_main and self.sign_channel), "extra_main is not combined with the sign row"
         # sign_branch: the sign logit (readout row out_channels) is computed by a copy of the last transformer block on
         # detached features and frames (models/transformer_lloca_mup.py MuPTransformer.sign_block), so the sign loss
         # never reaches the shared trunk nor its clipped update (plan catalog_coverage step 73); sign_branch_blocks k:

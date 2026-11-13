@@ -45,6 +45,9 @@ input_log_skip_linear: false
 # input_div_form: the singular limits' functional forms as scalars (wrappers._div_form_inputs: eikonal per triple,
 # log P(z) per final coloured pair, log 1/beta per heavy pair, log^2(s/m^2) per heavy leg; needs input_pair_logs)
 input_div_form: false
+# input_asym_factor: log|M|^2 = log A + g, A = sum of the universal singular factors (Catani-Seymour dipoles, 1/beta,
+# log^2(s/m^2) at one loop) with learned bounded per-leg coefficients, g bounded and vanishing in every limit (wrappers._asym_mu)
+input_asym_factor: false
 context_dim: 0
 context_dropout: 0.5
 context_names_file: null
