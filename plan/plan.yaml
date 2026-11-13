@@ -32609,7 +32609,11 @@ entries:
       if:
       - 'sections done: fill the factors'
       - 'a section still open: leave its slot'
-  step_waits: {}
+  step_waits:
+    '1': 'FA-ccin2p3-d77e2e19 FA-ccin2p3-25f254c8 FA-ccin2p3-b5c155b8 FA-ccin2p3-c6cc7ca4 FA-ccin2p3-5f3a41f4 FA-ccin2p3-85e01366
+      FA-ccin2p3-9a83a25c FA-ccin2p3-de976f69 FA-ccin2p3-515d5a84 FA-ccin2p3-be7e5f6d FA-ccin2p3-5bf54dea FA-ccin2p3-7830006a
+      FA-ccin2p3-867d2d8b FA-ccin2p3-0134adeb FA-ccin2p3-f470a13e FA-ccin2p3-71d1701a FA-ccin2p3-49241829 FA-ccin2p3-5ce6fcd6
+      FA-ccin2p3-5b7c4991 FA-ccin2p3-b22269c6 FA-ccin2p3-391452f0 FA-ccin2p3-89c45c5a FA-ccin2p3-f4813cec '
   findings:
   - at: '2026-11-13T02:46:58+00:00'
     text: '2026-11-13 ~03:50 Joaquin: ''we should start actually doing the work on the draft with what we have ... Let''s
