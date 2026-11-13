@@ -26639,6 +26639,16 @@ entries:
       446, 399 observed or running); record R failed on 430 and 1395 only. Every W failure is at lr_scale >= 1.6, on both
       sites; every C trial at lr_scale >= 1.6 that has finished survived. Template test dsave_wsd_ft t t~ D=316: 2 failed
       at lr_scale 8.2 (cc) and 9.3 (lx). E7096-E7098 acked, not requeued.'
+  - at: '2026-11-13T10:33:12+00:00'
+    text: '2026-11-13 ~12:45, divergences per search (driver_state, finished trials; scratch/divcount): W arm (WSD parent
+      + WSD fine-tune, lr_scale window [1/3,3]): D=100 2 of 3 failed (lr_scale 1.60, 2.88; survived 1.17), D=316 2 of 4 (1.81,
+      2.55; survived 0.33, 1.06), D=3162 3 of 8 (2.38, 2.64, 2.97; survived 0.55..1.35): 7 of 15, every failure at lr_scale
+      >= 1.6, every survivor <= 1.35. C arm (cosine parent + WSD fine-tune, same window and start-up draws): 0 of 11, survivors
+      up to 1.60 / 1.81 / 2.97. So the failures belong to the WSD parent, not to the WSD fine-tune schedule. Template test:
+      dsave_wsd_ft t t~ D=316 2 of 9 (lr_scale 8.2, 9.3; survived up to 3.95), D=3162 0 of 16; dsave_wsd_scr D=3162 2 of 16
+      (lr 1.3e-2, 2.3e-2), D=316 0 of 8; dsave_wideft_ft 0 of 22. No search wastes most of its trials; the W arm loses about
+      half. Not narrowed: the design fixes one lr_scale window for R, C and W (W/C isolates the parent), and the divergence
+      rate is itself part of the step-6 answer; DyHPO keeps searching [1/3,1.35] for W.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
