@@ -21392,11 +21392,18 @@ entries:
     answers_after: '2026-11-12T15:42:33+00:00'
     covers:
     - pretrain_data_saving
+  - said_at: '2026-11-13T02:28:01.336000+00:00'
+    text: Separate exponents
+    decision: D441
+    answers_after: '2026-11-13T01:39:27+00:00'
+    covers:
+    - pretrain_data_saving
   decisions:
   - D360
   - D377
   - D407
   - D420
+  - D441
   next:
     5: 'Template test at 16 trials (design PASS 19:2x, D426/D427/D429): 4 WSD-only searches t t~ LO D=316, 3162 scr/ft extended
       8->16 (relaunch drive.py --n-trials 16 --wave-sizes 3,3,2,4,4 on the 4 dsave_wsd configs when detach tmpl2_wsd2 ends;
@@ -21606,8 +21613,10 @@ entries:
       diagonal line in another plot; 2026-11-10T02:08 is the KIT kickoff with the draft zip; 2026-11-13T00:57 asks for the
       1e-4/1e-2 lines and the median gain; none chooses the fit'
     blocks: only which numbers the draft states (step 7)
-    blocks_steps: &id002
+    blocks_steps:
     - 7
+    answered_at: '2026-11-13T02:28:01.336000+00:00'
+    decision: D441
   owner:
     agent: a75868725fdec3ff2
     state: working
@@ -26835,15 +26844,6 @@ entries:
       if:
       - 'shared: keep the figure as drawn'
       - 'per-curve: redraw with each curve''s own exponent'
-  ask: 'Scope: for the draft''s four-panel data-saving figure, use the savings from one shared exponent per panel (15.9, 6.8,
-    4.1, 3.7; median 5.4) or from each curve''s own exponent (11.3, 5.5, 4.4, 5.6)?'
-  waiting_since: '2026-11-13T01:39:27+00:00'
-  searched: 'site decisions --project FA all: D373 says the exponents are similar (why the tool shares one) but does not choose
-    for the draft; D438 asks for fitted power laws, not which fit. His messages: 2026-10-21T23:24 is about a dashed diagonal
-    line in another plot; 2026-11-10T02:08 is the KIT kickoff with the draft zip; 2026-11-13T00:57 asks for the 1e-4/1e-2
-    lines and the median gain; none chooses the fit'
-  blocks: only which numbers the draft states (step 7)
-  blocks_steps: *id002
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
@@ -32526,7 +32526,7 @@ entries:
       about cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID,
       says nothing about the draft's sections)
     blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-    blocks_steps: &id003 []
+    blocks_steps: &id002 []
   owner:
     agent: afb073b8fc9460ec5
     state: stopped
@@ -32544,7 +32544,7 @@ entries:
     cutting it from the draft); 2026-10-22T12:12 (Suprio's update that diagram conditioning brings no gain over pID, says
     nothing about the draft's sections)
   blocks: the cut or placement of those three sections; the rest of the rewrite goes on
-  blocks_steps: *id003
+  blocks_steps: *id002
   step_why:
     1:
       feeds: the draft's results (D354)
