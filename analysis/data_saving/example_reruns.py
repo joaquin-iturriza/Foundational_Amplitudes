@@ -131,9 +131,9 @@ def plot():
         ax.set_yscale("log"); ax.set_ylabel("events")
         ax.set_xlabel(r"$|\Delta|$, $\Delta=|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2_{\rm true}-1$")
         ps.process_label(ax, NAME[p])
-    # legends in rows, scratch above fine-tune (entries 0-2 scratch, 3-5 fine-tune; matplotlib fills by column)
-    ps.legend_strip(fd[0][1], os.path.join(figs, "example_delta_legend"), ncol=3, order=[0, 3, 1, 4, 2, 5])
     print("FIGURE", ps.save_panels(fd, os.path.join(figs, "example_delta")))
+    ps.legend_strip(fd[0][1], os.path.join(figs, "example_delta_legend"),
+                    width=2 * fd[0][0].get_size_inches()[0])   # after save_panels: the laid-out width; two panels a row
     # true and predicted log|M|^2 with the ratio below, one panel per probe
     fh = ps.panels(4)
     for k, ((fig, ax), p) in enumerate(zip(fh, PROBES)):
@@ -160,9 +160,9 @@ def plot():
         if k % 2 == 0:   # right-hand panels: the label would run into the left panel in the paper's pairs
             r.set_ylabel(r"$\frac{\rm pred}{\rm true}$")
         ps.process_label(ax, NAME[p])
-    # scratch row, fine-tune row, truth below (entry 0 truth, 1-3 scratch, 4-6 fine-tune; filled by column)
-    ps.legend_strip(fh[0][1], os.path.join(figs, "example_dist_legend"), ncol=3, order=[1, 4, 0, 2, 5, None, 3, 6, None])
     print("FIGURE", ps.save_panels(fh, os.path.join(figs, "example_dist")))
+    ps.legend_strip(fh[0][1], os.path.join(figs, "example_dist_legend"),
+                    width=2 * fh[0][0].get_size_inches()[0])
 
 
 if __name__ == "__main__":

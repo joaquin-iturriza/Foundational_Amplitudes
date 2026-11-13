@@ -66,24 +66,29 @@ def pair_sets(run_a, run_b, sets, cls):
 COLS = (ps.C.blue, ps.C.vermillion, ps.C.green, ps.C.purple, ps.C.orange)
 
 
-def scatter(groups, xlab, ylab, base):
+def strip(row, base, span=1, **kwargs):
+    """The legend of a row of the paper's panels, `(fig, ax)` each saved, as one strip across the row's width
+    (`span` times it where the row's other panel, without a legend, is not in `row`)."""
+    ps.legend_strip([ax for _, ax in row], base, width=span * sum(f.get_size_inches()[0] for f, _ in row), **kwargs)
+
+
+def scatter(groups, xlab, ylab, base, row=(), span=1):
+    """One point per class and set; its legend a strip across the row, with the entries of `row`'s other panels."""
     fig, ax = ps.figure(width="half")
     lo = min(min(g[1].min(), g[2].min()) for g in groups)
     hi = max(max(g[1].max(), g[2].max()) for g in groups)
     ax.plot([lo, hi], [lo, hi], color=ps.C.grey, ls="--", label=r"$y=x$")
     for (lab, x, y), c in zip(groups, COLS):
-        ax.scatter(x, y, color=c, alpha=0.45, s=6, linewidths=0, label=lab, rasterized=True)
+        ax.scatter(x, y, color=c, alpha=0.45, s=6, linewidths=0, label=lab, rasterized=True,
+                   zorder=2 + 1 / len(x))   # smaller sets on top: a large set drawn later would cover them
         print(f"  {os.path.basename(base)} {lab}: {len(x)} classes, median y/x {np.median(y / x):.3g}, "
               f"medians x {np.median(x):.3g} y {np.median(y):.3g}")
     ax.set_xscale("log"); ax.set_yscale("log")
     pad = (hi / lo) ** 0.04
     ax.set_xlim(lo / pad, hi * pad); ax.set_ylim(lo / pad, hi * pad)
     ax.set_xlabel(xlab); ax.set_ylabel(ylab)
-    leg = ps.shared_legend(fig, ax, ncol=2, markerscale=2.5)   # five entries fit in no corner of a 1.9 in box
-    for h in leg.legend_handles:
-        if hasattr(h, "set_alpha"):
-            h.set_alpha(1)
     ps.save(fig, os.path.join(FIGS, base))
+    strip([(fig, ax)] + list(row), os.path.join(FIGS, base + "_legend"), span=span, markerscale=2.5)
 
 
 SETS = (("pp test", ("PP4",)), (r"$e^+e^-$ test", ("EE4",)), ("held out", ("held",)),
@@ -92,13 +97,13 @@ SETS = (("pp test", ("PP4",)), (r"$e^+e^-$ test", ("EE4",)), ("held out", ("held
 
 def pidqn():
     g = pair_sets(m.PIDQN["qn"], m.PIDQN["pid"], SETS, m.class_of())
-    scatter(g, f"{MSE_LAB}, quantum numbers", f"{MSE_LAB}, one-hot", "paper_pidqn")
+    scatter(g, f"{MSE_LAB}, quantum numbers", f"{MSE_LAB}, one-hot", "paper_pidqn", row=[unseen()])
 
 
 def muon():
     import muon_long as ml
     g = pair_sets(ml.RUNS["muon"], ml.RUNS["adamw"], SETS, m.class_of())
-    scatter(g, f"{MSE_LAB}, Muon", f"{MSE_LAB}, AdamW", "paper_muon")
+    scatter(g, f"{MSE_LAB}, Muon", f"{MSE_LAB}, AdamW", "paper_muon", span=2)   # beside an example panel
 
 
 def hist_ratio(ax):
@@ -172,8 +177,8 @@ def ft():
         ax.set_ylim(0.7 * min(np.min(y) for y in ys), 4 * max(np.max(y) for y in ys))   # headroom: the process label sits above the zero-shot lines
         ax.set_xlabel(r"training events $D$"); ax.set_ylabel(MSE_LAB)
         ps.process_label(ax, name)
-    ps.shared_legend(fig, axs.flat[0], ncol=3)
     ps.save(fig, os.path.join(FIGS, "paper_muon_ft"))
+    strip([(fig, axs.flat[0])], os.path.join(FIGS, "paper_muon_ft_legend"))
 
 
 def pp():
@@ -212,7 +217,7 @@ def target():
             for p in sorted(set(px) & set(py)):
                 xs.append(px[p]["mse"]); ys.append(py[p]["mse"])
         groups.append((lab, np.array(xs), np.array(ys)))
-    scatter(groups, f"{MSE_LAB}, " + r"$\log|\mathcal{M}|^2$ in GeV", f"{MSE_LAB}, " + r"target $T$", "paper_target")
+    scatter(groups, f"{MSE_LAB}, " + r"$\log|\mathcal{M}|^2$ in GeV", f"{MSE_LAB}, " + r"target $T$", "paper_target", span=2)   # beside paper_inputs
 
 
 def pp_direct():
@@ -255,8 +260,8 @@ def unseen():
         ax.hist(vals[a], bins=bins, weights=np.full(len(vals[a]), 1 / len(vals[a])), histtype="step", color=c, label=lab)
         print(f"  unseen {lab}: {len(vals[a])} processes, median {np.median(vals[a]):.3g}")
     ax.set_xscale("log"); ax.set_xlabel(f"zero-shot {MSE_LAB}"); ax.set_ylabel("fraction of processes")
-    ps.shared_legend(fig, ax, ncol=2)
-    ps.save(fig, os.path.join(FIGS, "paper_unseen"))
+    ps.save(fig, os.path.join(FIGS, "paper_unseen"))   # its legend joins the pidqn row's strip
+    return fig, ax
 
 
 # The 448-process pretraining's single-seed arms at the baseline's best HPs, 8601 steps: geometric mean and 90th

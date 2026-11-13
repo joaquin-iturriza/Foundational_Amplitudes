@@ -716,11 +716,39 @@ def shared_legend(fig, ax, ncol: int = 3, **kwargs):
     return leg
 
 
-def legend_strip(ax, base: str, ncol: int = 3, order=None, **kwargs):
+def legend_strip(ax, base: str, ncol: int = 3, order=None, width: float | None = None, **kwargs):
     """The legend of a multi-panel set as a file of its own, `<base>.png/.pdf`, to be included centred above the
     panels' rows in LaTeX. For `save_panels` sets, where a `shared_legend` on panel (a) widens that panel's canvas
-    and sits off-centre over the two columns. Takes the handles from `ax`; nothing is drawn on the panels."""
-    handles, labels = ax.get_legend_handles_labels()
+    and sits off-centre over the two columns. Takes the handles from `ax` (or a list of axes, their entries
+    joined); nothing is drawn on the panels. `width` (inches, the row's natural width): the strip spans it, entries
+    spread across, in as few rows as fit (`ncol` and `order` are then ignored)."""
+    if isinstance(ax, (list, tuple)):
+        hl = [a.get_legend_handles_labels() for a in ax]
+        handles, labels = [h for h, _ in hl for h in h], [l for _, l in hl for l in l]
+    else:
+        handles, labels = ax.get_legend_handles_labels()
+    if width is not None:
+        kwargs.setdefault("frameon", False)
+        for n in range(len(handles), 0, -1):   # the most columns whose natural width fits the row
+            fig = plt.figure(figsize=(width, 1))
+            leg = fig.legend(handles, labels, ncol=n, loc="center", **kwargs)
+            fig.canvas.draw()
+            fits = leg.get_window_extent(fig.canvas.get_renderer()).width / fig.dpi <= width
+            plt.close(fig)
+            if fits:
+                break
+        rows = -(-len(handles) // n)
+        fig = plt.figure(figsize=(width, 0.22 * rows + 0.05))
+        leg = fig.legend(handles, labels, ncol=n, loc="center", mode="expand", bbox_to_anchor=(0, 0, 1, 1),
+                         borderaxespad=0, **kwargs)
+        for h in leg.legend_handles:   # a key is opaque even where its series is drawn translucent
+            if hasattr(h, "set_alpha"):
+                h.set_alpha(1)
+        for ext in (".png", ".pdf"):
+            fig.savefig(base + ext)   # the full width, not cropped: the strip spans the row
+        plt.close(fig)
+        print(f"saved {base}.png / .pdf (legend strip, {n} columns, {width:.2f} in)")
+        return
     if order is not None:   # matplotlib fills a legend column by column: `order` lays the entries out in rows;
         # an index None is an empty cell
         blank = plt.Line2D([], [], alpha=0)
