@@ -32602,3 +32602,25 @@ entries:
       holds to ~6% in the prior; 2x is far below the arm gaps), then the figure shows them. No: a rerun off by more than 2x
       is flagged in the caption and redone once from its config on the site that trained it; the figure never mixes an unreproduced
       cell with the line''s value without saying so.'
+    fix_at: '2026-11-13T03:16:07+00:00'
+    fix: 'Prior work (check 5): one of the 24 cells has already been rerun cold with these per-event outputs, and the prior
+      field says none exists. The cell is the fine-tune, u ubar->Zggg, D=10^4, tp3_finfte_uubar_Zggg_d8 trial_0096. It was
+      rerun on 2026-10-14 with scripts/job_rerun_trial.sh (runs/tp3_finfte_uubar_Zggg_d8/trial_0096_rerun on CC-IN2P3). Its
+      preds_val.npz is in $SCRATCH/zz_delta/tp3_finfte_uubar_Zggg_d8__trial_0096_rerun/, and its eval_delta.json gives val_loss_rebuilt
+      1.27292e-4 against the recorded 1.27227e-4 (standardized), which is 0.05%. Fix: reuse this run (23 new runs, not 24)
+      and cite it as evidence that a fine-tune cell of this exact figure reproduces. Also, every cell''s plots_0 still holds
+      the run''s own delta.pdf and histograms.pdf. Say in one line why the per-event arrays are needed anyway (for example:
+      the paper figure''s style, scratch and fine-tune overlaid, the ratio panel). Checks 14 and 15 (placement, time, disk):
+      the design does not say where the runs go, and 6 cells'' configs are not on CC-IN2P3, where the parent and the other
+      18 are. Five are only on lxplus: tp3_finfte_uubar_Zggg_d4/trial_0011, tp3_scr_udbar_enu_d4_002/trial_0015, tp3_scr_udbar_enu_d6_002/trial_0185,
+      tp3_scr_ee_bb_nlo_d4/trial_0116 and tp3_scr_ee_bb_nlo_d6/trial_0030. One is only on Jean Zay: tp3_finfte_ee_bb_nlo_d6/trial_0026.
+      job_rerun_trial.sh is a SLURM script. The fine-tunes need the parent tp3_finale/trial_0073 (its model_run0_best.pt.gz
+      is on CC). Fix: state the layout. One option is to site copy those 6 trial dirs to CC, as was done for runs_from_lxplus,
+      and pass the parent as the script''s second argument; the 2026-10-25 lxplus-trained rung-6 trial reran on CC to 6% of
+      its record. Also state the wall-time target and GPU-h, and the disk. Wall time: the records'' traintime_hours sum to
+      3.6 h over the 24 cells (max 0.71 h, tp3_scr_ee_bb_nlo_d8), under the script''s 2 h limit; the trial_0096 rerun took
+      0.36 h per job against its 0.13 h training. Disk: 65 GB free on /sps/lpnhe now (88% used); each rerun writes a few MB.
+      Check 10: state that every read is on each cell''s own validation split, the same events behind the figure''s MSE. Check
+      3, minor: the 2x reproduction threshold is fine once trial_0096 (0.05%) is cited beside the 6% pretraining rerun. Checks
+      1, 2, 4, 6, 7, 8, 9, 11, 12 and 13 pass or do not apply: each run reruns its own cell''s config, which is what the figure
+      shows (D437: only the every-structure fine-tune; D443: no bb->ZZ or tt).'
