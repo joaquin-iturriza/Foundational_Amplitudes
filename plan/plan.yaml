@@ -32668,7 +32668,7 @@ entries:
     decision: D445
   owner:
     agent: a0f7f76dc1ed0520d
-    state: working
+    state: closed
     since: '2026-11-13T07:12:50+00:00'
     state_at: '2026-11-13T08:02:05.645000+00:00'
     context: 141955
@@ -32844,31 +32844,17 @@ entries:
     start: '2026-11-13T07:19:46+00:00'
     at: '2026-11-13T07:19:46+00:00'
   handoff:
-    state: 'Joaquin''s 06:13 comments (scratchpad joaquin_draft_comments_0613.txt) and CLAUDE.md 5ac00c1e addressed in part.
-      Done: Sec. 5 back to its slots and KIT lines out of the abstract/outlook (draft b215b60); new title, abstract, introduction
-      and outlook in the papers'' style (13459f1); Sec. 2 bootstrap stated plainly, caption shortened, eq labels (13459f1);
-      Sec. 4 rewritten after a fresh review (review text: scratchpad sec4_review_1.txt) with no numbers no figure shows and
-      no history, synthetic generator moved to App. B, training details as facts, W+W- aside dropped (7801404). NOT done:
-      (1) Sec. 2 examples slot: figures from analysis/data_saving/example_reruns.py (FA, plot: example_delta_{a-d} |Delta|
-      histograms log x, example_dist_{a-d} true/pred with quarter-height ratio inset, example_legend strip; colour=arm, line
-      style=D) once the last 5 reruns land: run ''collect'' then ''plot'', copy the pngs/pdfs to draft figs/pretrain/, replace
-      the \slot in Sec. 2 with the two figures (legend strip on top, \widerow pairs of \pnl like Sec. 4) and a short words-only
-      paragraph; flag in the caption any cell outside 2x after its repeat. (2) Sec. 4 figure panel labels still carry codes
-      (r1 vs r0, best r1~r9, (+2), ''rung 0 vs 1'', lr/EMA axes; Figs 15/16 in-panel labels; heatmap narrow): regenerate from
-      analysis/transfer scripts or leave and say so. (3) A fresh reviewer (general-purpose; give it CLAUDE.md, the comments
-      file, scratchpad refpapers/*.pdf) must pass Sec. 2, Sec. 4 (re-check) and the front matter before pages go to Joaquin;
-      then hand back draft_sec2_pages.pdf, draft_sec4_pages.pdf, draft_abstract_outlook_pages.pdf. Reproduction so far: 18
-      of 24 cells read, all within 2x except one-loop bb D=1e4 scratch (4.88x, repeat FA-lxplus-53ebf389 running); e nu D=1e3
-      scratch 1.98x, bb D=1e2 fine-tune 1.82x.'
-    decisions: 'Sec. 5 reverted per Joaquin (''why did you even waste your time making section 5''); 5ac00c1e: a held result
-      holds its section, so the intro no longer lists Sec. 5. Examples drawn as the papers do (2411.00446 Fig. 6: small ratio
-      panel, plain process names); Delta as |Delta| on a log axis so the three D read on one panel (the reviewer may ask for
-      linear Delta). Design''s one repeat of a >2x rerun via job_rerun_trial.sh third argument (FA f0ea79ad).'
-    ruled_out: symlog Delta axis (two-peaked, unreadable); full-height ratio panel (Joaquin).
-    running: FA-lxplus-2a1aa003 (ddg D=1e4 ft), 842454d3, 8c739a3a, 611aa1ec (e nu / bb fine-tunes), 53ebf389 (bb D=1e4 scratch
-      repeat, into trial_0154_rerun2); 4b765eb0, a18ab984, 6b02daa7 done; step 1 waits on them
-    files: '~/drafts/fm_amplitudes_2026-11/paper.tex (commit only your sections: other owners edit it uncommitted; build with
-      -jobname=own_<id> and /mnt/c/texlive/2025/bin/windows/pdflatex.exe + bibtex.exe); analysis/data_saving/example_reruns.py;
-      analysis/data_saving/data/example_cells.json; scripts/job_rerun_trial.sh; scratchpad sec4_review_1.txt, joaquin_draft_comments_0613.txt,
-      refpapers/'
-    written: '2026-11-13T07:08:00+00:00'
+    state: 'Sec. 2 done and passed a fresh review (draft b5fbf78; figures from analysis/data_saving/example_reruns.py at FA
+      68f1cb9e, all 24 reruns, 23 within 2x, e nu fine-tune D=1e4 3x below its record in two reruns and bb one-loop scratch
+      D=1e4 shown from its repeat, both in the Fig. 2 caption); pages draft_sec2_pages.pdf (pp. 3-6) handed to the main session
+      for Joaquin. Joaquin 2026-11-13: only his sections change: Sec. 4 reverted to 22fac9d (a8ce7d1), title/abstract/intro/outlook
+      restored word for word to d742281 (1e9b4ba). Sec. 3 is optimizations_recap''s. Nothing of this entry left for its owner
+      but Joaquin''s comments on the Sec. 2 pages.'
+    decisions: 'Sec. 4 and front matter left as Joaquin wrote them (his words, findings 2026-11-13); reviewer FIX applied:
+      |Delta|>10 named as over-prediction, legends per figure in rows, out-of-range |Delta| in end bins, ratio pred/true,
+      ln said once, 6.7%.'
+    ruled_out: 'symlog Delta axis; full-height ratio panel; a Sec. 4 relabelling or review (Joaquin: Sec. 4 untouched)'
+    running: none
+    files: ~/drafts/fm_amplitudes_2026-11/paper.tex (Sec. 2); analysis/data_saving/example_reruns.py; plot_style.py legend_strip(order=);
+      scratchpad draft_sec2_pages.pdf
+    written: '2026-11-13T08:13:04+00:00'
