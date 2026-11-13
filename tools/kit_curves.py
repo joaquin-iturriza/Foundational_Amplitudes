@@ -18,6 +18,7 @@ without the mu-MSE, so a failing NLL curve can still hide a sound mu-MSE curve (
     python tools/kit_curves.py sweep kit_hpo_uug_plain kit_hpo_ttvirt_thr --out analysis/kit_benchmark/data/kit_hpo.json
         (step 15's searches, driven by sweep/drive.py: the trials in sweeps_local/<name>/results, their curves read on CC: per trial its HPs, best val mu-MSE and curve_quality on the mu-MSE curves
          val_mse_curve / train_eval_mse_curve; chosen = the lowest best val among the good trials)
+    python tools/kit_curves.py sweepfig analysis/kit_benchmark/data/kit_hpo.json --out analysis/kit_benchmark/figs/kit_hpo
 """
 import argparse
 import json
@@ -224,12 +225,59 @@ def sweep_read(names, out):
     json.dump(d, open(out, "w"), indent=1)
 
 
+SWEEP_LAB = {"kit_hpo_uug_plain": r"$u\bar u g$, $|\mathcal{M}|^2$", "kit_hpo_uug_T": r"$u\bar u g$, $T$",
+             "kit_hpo_uugg_T": r"$u\bar u gg$, $T$", "kit_hpo_ttvirt_thr": r"$t\bar t$, $V$"}
+OLD_LR = 0.0118605  # the KIT controls' lr (8000 cosine steps)
+
+
+def sweep_fig(data, base):
+    """<base>_lr: per search (2x2) each trial's best validation mu-MSE against its lr, good/bad by curve_quality, the
+    lowest marked; <base>_curves: per search the validation and training mu-MSE curves of the lowest trial and of the
+    chosen one (lowest among the good) when it differs."""
+    import plot_style as ps
+    import matplotlib.pyplot as plt
+    d = json.load(open(data))
+    names = [n for n in SWEEP_LAB if n in d]
+    fig, axs = ps.figure(ncols=2, nrows=2)
+    for ax, n in zip(axs.ravel(), names):
+        rows = [r for r in d[n]["trials"] if r["val_loss"] is not None]
+        best = min(rows, key=lambda r: r["val_loss"])
+        for well, c, lab in ((True, ps.C.blue, "good"), (False, ps.C.vermillion, "bad")):
+            g = [r for r in rows if bool(r.get("well")) == well]
+            ax.scatter([r["hp"]["training.lr"] for r in g], [r["val_loss"] for r in g], color=c, label=lab)
+        ax.scatter([best["hp"]["training.lr"]], [best["val_loss"]], marker="*", s=160, facecolor="none",
+                   edgecolor="k", label="lowest")  # s: the star must enclose the trial's dot
+        ax.axvline(OLD_LR, color=ps.C.grey, linestyle=":", label="old lr")
+        ax.set_xscale("log"); ax.set_yscale("log")
+        ax.xaxis.set_minor_formatter(plt.NullFormatter())  # minor labels collide across the 1-decade window
+        ax.set_xlabel(r"lr"); ax.set_ylabel(r"best val MSE$(\mu)$")
+        ps.process_label(ax, SWEEP_LAB[n])
+    ps.legend(axs[0, 0], "upper left")
+    ps.save(fig, base + "_lr")
+    fig, axs = ps.figure(ncols=2, nrows=2)
+    for ax, n in zip(axs.ravel(), names):
+        rows = [r for r in d[n]["trials"] if r["val_loss"] is not None and r["val"]]
+        best = min(rows, key=lambda r: r["val_loss"])
+        ch = next((r for r in rows if r["file"] == d[n]["chosen"]), None)
+        for r, c, tag in ((best, ps.C.vermillion, "lowest"), (ch, ps.C.blue, "chosen")):
+            if r is None or (tag == "lowest" and r is ch):
+                continue
+            x = np.arange(1, len(r["val"]) + 1) * 1831 / len(r["val"])  # evaluations spread evenly over 1831 steps
+            ax.plot(x, smooth(r["val"]), color=c, label=f"{tag} val")
+            ax.plot(x, smooth(r["train"]), color=c, linestyle="--", label=f"{tag} train")
+        ax.set_yscale("log"); ax.set_xlabel("training step"); ax.set_ylabel(r"MSE$(\mu)$")
+        ps.process_label(ax, SWEEP_LAB[n])
+    ps.legend(axs[0, 1], "lower left")
+    ps.save(fig, base + "_curves")
+
+
 def main():  # dup-ok: argparse boilerplate (collect/read), no shared logic
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
     c = sub.add_parser("collect"); c.add_argument("--out", required=True)
     r = sub.add_parser("read"); r.add_argument("data"); r.add_argument("--figs")
     w = sub.add_parser("sweep"); w.add_argument("names", nargs="+"); w.add_argument("--out", required=True)
+    f = sub.add_parser("sweepfig"); f.add_argument("data"); f.add_argument("--out", required=True)
     p = sub.add_parser("curves"); p.add_argument("data"); p.add_argument("runs", nargs="+"); p.add_argument("--out", required=True)
     a = ap.parse_args()
     if a.cmd == "collect":
@@ -238,6 +286,8 @@ def main():  # dup-ok: argparse boilerplate (collect/read), no shared logic
         print(f"-> {a.out}")
     elif a.cmd == "curves":
         plot_runs(json.load(open(a.data)), a.runs, a.out)
+    elif a.cmd == "sweepfig":
+        sweep_fig(a.data, a.out)
     elif a.cmd == "sweep":
         sweep_read(a.names, a.out)
     else:
