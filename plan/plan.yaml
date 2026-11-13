@@ -26971,7 +26971,7 @@ entries:
     decision: D455
   owner:
     agent: aaecb8d54f4939e0d
-    state: stopped
+    state: closed
     since: '2026-11-13T07:29:24+00:00'
     state_at: '2026-11-13T07:58:24.683000+00:00'
     context: 275184
@@ -27308,33 +27308,39 @@ entries:
     '2': '2026-11-15: pretrain_data_saving''s fine-tune template (its step 5) and its parent choice (its step 6, WSD parent)
       must exist before the AdamW-parent arm can be designed on the same grid'
   handoff:
-    state: 'Sec. 3 of ~/drafts/fm_amplitudes_2026-11/paper.tex rewritten from scratch as ''Building the pretraining'' (draft
-      commits 509d67c text, then figures), 11 figures from analysis/catalog_v4/paper_sec3_figs.py (FA 78d79e76, e93beb91,
-      latest), pages at scratchpad draft_sec3_v2_pages.pdf. A fresh cold-read reviewer returned FIX with 38 points (its report
-      is in the session transcript, agent a6bbd8868ba6b4f85). Only the figure points are applied (examples rebinned with a
-      ratio label, ft y-range, target 2->5 vs TeV split). Still to do in the TEXT: new title and opening without the ''every
-      choice'' promise; mixture equation replaced by shares in words, rho_fwd in one plain sentence; delete the VBF/VBS sentence;
-      D_j and P in a display, no \linebreak, drop ''order-free''; genmix ''best averaged over sqrt s''; steering ''bulk pays
-      at every gamma, growing'', infrared = log10 ymin<-3, caption: ratio = steered/uniform, parity = ratio 1, log-flat =
-      equal weight per decade; pidqn drop ''variation between runs''; off-shellness worded on the geometric mean, single seed,
-      no resonance claim; Muon examples text ''on the hardest class both fail, AdamW further''; Muon transfer says the fine-tunes
-      are a shorter pretraining (different compute); ft one-loop qualified; het caption: cross = a training that blew up,
-      ''cell'' -> ''training'', ''equal'' = y=x; inputs caption: loss = validation loss without regularization, define rows;
-      rename coupling powers q,e -> n_s,n_e, ''schematically'', alpha_s at mu=sqrt(s_hat); catalog: 2->4 = 2->3 plus g/gamma,
-      physical top held out (top QN trained at 50/300/600), alpha_s copies at 0.09/0.15, pT cut value; add tau and quartic
-      rows (separate pretraining) to tab:heldout; one setup paragraph (short ~4k-step and long 68k-step pretrainings, 448-process
-      set); cite L-GATr in tab:arch, ''best validation loss''; numbered \subsection, floats [tbp]; Muon scatter + 3 examples
-      as one 2x2 figure; tone list (points 33-35). Then re-check by continuing the same reviewer (SendMessage a6bbd8868ba6b4f85)
-      and hand back the pages.'
-    decisions: Joaquin 'no' to the 140 GPU-h Muon/AdamW extension (entry on hold; Muon claim rests on the 68k pair). Sec.
-      3 needs no GPU job (every figure from local reads); any GPU job for the draft goes under item draft_rewrite. Joaquin's
-      het-better-than-MSE and pp-coverage framings do not match the data found (open questions in the hand-back).
-    ruled_out: A Sec. 3 figure from the 448-process run's per-process losses (run dirs not recorded; the inputs figure uses
-      tab:bigrun_arms aggregates).
+    state: 'Sec. 3 of ~/drafts/fm_amplitudes_2026-11/paper.tex rewritten as ''Pretraining data, representation and training''
+      (numbered subsections 3.1-3.7, reference-pretrainings paragraph). Cold-read reviewer a6bbd8868ba6b4f85 returned PASS
+      at draft df0b55a after 4 rounds. b15c997 then dropped the FloatBarrier before 3.6 and shortened the fine-tune legend;
+      the reviewer has not re-read b15c997. Joaquin: ''this is much much better''. Figure (b) paper_pp_bound (same optimizer:
+      pp-only wins on its trained classes, catalog wins on classes neither trains; worded without numbers) replaced the old
+      paper_pp figure and figure (a) in the draft (D455, draft 7455731 onward). Open for Joaquin: (1) a figure for the conditionings
+      tested on their own setups (scalar log M, c_p, propagator division, D_j/P, affine) or the formula list as is; (2) the
+      number of training classes (not stated; could not reconcile from recipes/catalog_v4_base_train.yaml, 1153 entries incl.
+      92 one-loop and copies). Unverified: the 1.8M-parameter network size (width-8 N_PARAMS of analysis/catalog_v4/size_figs.py)
+      is confirmed for the long Muon/AdamW pair and the pidqn cells; for the pp bound/control runs (mixture_ab.BOUND) it rests
+      on the LLoCa default of 8 heads, their config.yaml not read. Steering legend keeps ''parity'' (caption defines it);
+      its per-event npz (analysis/divergences/heldout_eval_*_s*.npz) is on no site (CC, Jean Zay, lxplus searched), so it
+      cannot be redrawn without new runs. Draft pages: scratchpad draft_sec3_v2_pages.pdf; build with the Windows TeX Live
+      (/mnt/c/texlive/2025/bin/windows/pdflatex.exe -jobname=own_opt3; the local pdflatex lacks dsfont and deletes paper.pdf
+      on failure). Commit only Sec. 3: stage HEAD with Sec. 3 swapped from the working tree (git hash-object + update-index),
+      since other owners leave uncommitted edits in Sec. 2.'
+    decisions: 'Joaquin 2026-11-13: pp coverage shown as figure (b), the same-optimizer comparison (''it''s better at held
+      out, that''s what matters, so b)'', D455). Joaquin ''no'' to the 140 GPU-h Muon/AdamW extension (D451): the Muon claim
+      rests on the 68k pair. Sec. 3 needs no GPU job. The heteroscedastic-loss text states only what the figure shows (wins
+      on 2->2 only).'
+    ruled_out: Absolute per-decade errors for gamma>1 in the steering figure (per-event data on no site). Figure (a), catalog
+      Muon against pp-only AdamW (optimizer confound; replaced by (b)). A Sec. 3 figure from the 448-process run's per-process
+      losses (run dirs not recorded).
     running: none
-    files: analysis/catalog_v4/paper_sec3_figs.py, analysis/catalog_v4/figs/paper_*.png/pdf, ~/drafts/fm_amplitudes_2026-11/paper.tex
-      Sec. 3, refs.bib Jordan:2024muon, scratchpad draft_sec3_v2_pages.pdf, joaquin_draft_comments_0613.txt
-    written: '2026-11-13T07:13:28+00:00'
+    files: 'Producing tools: analysis/catalog_v4/paper_sec3_figs.py (FA 64e57309 and the ft legend commit after it), with
+      subcommands pidqn -> paper_pidqn, unseen -> paper_unseen, muon -> paper_muon, examples -> paper_muon_examples_{a,b,c},
+      ft -> paper_muon_ft, pp_bound -> paper_pp_bound (Fig. 5, in the draft), pp_direct -> paper_pp_direct (not in the draft),
+      pp -> paper_pp (old, removed from the draft), target -> paper_target, inputs -> paper_inputs; analysis/divergences/plot_genmix_sweep.py
+      -> eeuu_genmix_fraction_sweep; analysis/divergences/plot_l2_uugg.py -> l2_uugg_perdecade and analysis/divergences/plot_l2_uugg_gamma.py
+      -> l2_uugg_gamma (both need the missing npz); analysis/transfer/het_delta_summary.py -> het_delta_summary. Figures are
+      copied into ~/drafts/fm_amplitudes_2026-11/figs/pretrain/. Draft commits c378859, 7455731, aaa1081, df0b55a (PASS),
+      b15c997. Reviewer transcript: subagents/agent-a6bbd8868ba6b4f85.jsonl. Joaquin''s comments: scratchpad joaquin_draft_comments_0613.txt.'
+    written: '2026-11-13T08:41:57+00:00'
   findings:
   - at: '2026-11-12T03:17:43+00:00'
     text: 'Cache key mismatch cause (2026-11-12): the composed pools'' rows hash identically on htc and GPU nodes (2736/2736
