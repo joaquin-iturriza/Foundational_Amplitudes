@@ -32779,6 +32779,12 @@ entries:
     units: null
     start: '2026-11-13T06:49:01+00:00'
     at: '2026-11-13T06:49:01+00:00'
+  - batch: enu_d8_ft_repeat
+    wall_h: 1.0
+    jobs: 1
+    units: null
+    start: '2026-11-13T07:19:46+00:00'
+    at: '2026-11-13T07:19:46+00:00'
   handoff:
     state: 'Joaquin''s 06:13 comments (scratchpad joaquin_draft_comments_0613.txt) and CLAUDE.md 5ac00c1e addressed in part.
       Done: Sec. 5 back to its slots and KIT lines out of the abstract/outlook (draft b215b60); new title, abstract, introduction
