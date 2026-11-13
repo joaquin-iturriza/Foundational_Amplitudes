@@ -21413,6 +21413,10 @@ entries:
     6: 'Step 6 read branch (d), neither the WSD parent nor the WSD fine-tune keeps the bbZZ head start: design the fine-tune
       warmup test (head start lost at 8-33% of the run in R/C/W, ft warmup fractions 0.07-0.15; prior: ft_constraint warmup
       rise, step6_readout.json), design review, then submit within the budget'
+    7: 'Step 6 warmup test running (design PASS 2026-11-13 ~12:20, configs @a85a7210, reader @20260f1c): arm L dsave_s6cosparentlongwu_ft_bbx_zz_d{4,5,7}
+      (cosine parent, WSD fine-tune, warmup [0.05,0.6]) vs C, 8 trials each, detach dsave_s6_longwarmup (drive.py, 6.0 GPU-h,
+      target 0.65 h / 9 jobs). Read: step6_readout.py (uncached), branches a-d of the design (lag = lost_at - own warmup >
+      0.25; L/C pooled vs 2.53), figures step6_lost_vs_warmup, step6_curves, step6_ratio, step6_best; report'
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -27097,6 +27101,11 @@ entries:
       if:
       - 'head start kept: warmup into the fine-tune template'
       - 'still lost: reported, the head-start loss is not the warmup'
+    7:
+      feeds: the fine-tune template's warmup range (D414)
+      if:
+      - 'val LOWER: wide warmup into the fine-tune template'
+      - 'WITHIN: reported, nothing more run'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
