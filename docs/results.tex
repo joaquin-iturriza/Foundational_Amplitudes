@@ -17054,8 +17054,7 @@ $1/\nh$.
 % ==========================================================================
 The user (D364): ``Then we show all the work behind all the optimizations we did along the way, \dots\ everything well
 explained in formulas that are clear''. One paragraph per choice, adopted or rejected, with its formula and where its
-measurement lives in these notes; the numbers are read in the paragraphs referenced (their provenance is there). One item waits on a run of plan entry \code{optimizations\_recap}: the optimizer comparison on the longest
-pretraining, towards MSE $10^{-4}$.
+measurement lives in these notes; the numbers are read in the paragraphs referenced (their provenance is there).
 % allow: 10^{-4} because it is the precision the comparison is set to (D356), a setting
 
 \paragraph{Notation and the error we quote.} An event has $N$ external particles ($2\to N-2$), momenta $p_i$, partonic
@@ -17209,9 +17208,95 @@ limit's normalization and colour weight (par.~\ref{par:v4_mult_cand}).
 $W\leftarrow W-\eta\,(c\,\mathrm{NS}_5(M_t)+\lambda W)$, $M_t=\beta M_{t-1}+\nabla_W\mathcal L$, with $\mathrm{NS}_5$
 five Newton-Schulz iterations towards $UV^\top$ of $M_t=U\Sigma V^\top$, $\lambda$ a decoupled weight decay and $c$
 matching AdamW's update RMS. Ahead of AdamW best against best in pretraining, zero-shot on every held-out axis, and after
-small-$D$ fine-tunes, part of it the better start (par.~\ref{par:v3_muon}); the extension to MSE $10^{-4}$ is step
-muon\_1e4.
+small-$D$ fine-tunes, part of it the better start (par.~\ref{par:v3_muon}).
 % allow: 5 because it is the Newton-Schulz iteration count, a setting
+
+\paragraph{Muon against AdamW on the longest pretraining (2026-11-13).}\label{par:muon_long} The question (D364, plan
+\code{optimizations\_recap} step 3, design passed 2026-11-12 00:25): does Muon's lead of par.~\ref{par:v3_muon}, measured
+at $4264$ steps, hold at the lower errors of the longest catalog\_v4 pretraining, towards MSE $10^{-4}$, and does its
+zero-shot (transfer) lead hold? Design: the width-8 $16\times$ cell ($68224$ steps, the whole training set, $10.2$
+epochs, trial 1262's HPs, lr $3.65\times10^{-3}$, seed 42) trained with AdamW in place of Muon (\code{FA-ccin2p3-f08e90e8},
+\code{scripts/job\_catalog\_v3\_short.sh v4\_het\_default25 LONG\_OPT=adamw LONG\_HEADS=8 LONG\_FACTOR=16 LONG\_HP=1262
+LONG\_MEMMAP=true} @fbadd4b5, V100, the existing memmap cache opened, $17.2$ h of training against the $20.3$ h target)
+against trial 1262 itself (Muon, reads \code{FA-ccin2p3-1a46f3e0}, par.~\ref{par:v4_length}); only
+\code{training.optimizer} differs. AdamW runs at Muon's lr (its own search at this horizon not run). The validation
+$\mu$-MSE (Fig.~\ref{fig:muon_long}a): Muon falls steadily from $0.328$ to $9.36\times10^{-3}$, best at its last
+validation; AdamW is best at step $19096$ ($3.84\times10^{-2}$), rises to $0.23$ and ends at $0.100$ after the anneal,
+while its het NLL keeps falling (no blow-up by the blow-up rule: the NLL's best is at the last validation). AdamW's running
+best never reaches Muon's at $8528$ steps ($3.12\times10^{-2}$); the median over the $50$ validations of AdamW over Muon
+is $6.99$. At the final models (best checkpoint, then the $\sigma$ fit), with $R$ the median over classes of the class
+gmean $\mathrm{MSE}_{\rm AdamW}/\mathrm{MSE}_{\rm Muon}$ of $\ln|\mathcal M|^2$, interval widened by the width-8 seed
+pair: PP4 $5.18$ $[4.64,5.78]$ over 1301 classes (Muon lower on a share $0.929$ of them), EE4 $3.84$ $[3.33,4.55]$ over 169 (share $0.959$),
+held out pooled $2.76$ $[2.39,3.13]$ over 701, every catalog-sampled axis but two between $2.32$ (H3) and $7.24$ (H6,
+8 classes), HD4 $2.70$ $[1.69,3.95]$; AdamW better at $2\to5$ (H2p5 $0.634$ $[0.447,0.835]$), level on one loop (H5
+$0.851$ $[0.717,1.30]$, HD5 $1.06$ $[0.593,2.41]$). The level: median per-class MSE of $\ln|\mathcal M|^2$ $0.0335$ (PP4)
+and $0.0681$ (EE4) for Muon against $0.184$ and $0.224$ for AdamW; a share $0.025$ of Muon's PP4 classes is below $10^{-4}$.
+Plateau rule: Muon's best is $0.887$ of its value at $0.75T$ and at its last validation, so it has not plateaued;
+AdamW's best is before $0.9T$, a rise, not a plateau. Outcome by the design: YES, Muon's lead holds and grows with the
+horizon ($8.03\times$ per pool at $4264$ steps on catalog\_v3, $5.18$ here on PP4 at the final model, $10.6\times$ on the
+validation curve's last point), and carries to the held-out classes zero-shot except $2\to5$ and one loop; neither run
+reaches $10^{-4}$ and Muon is not plateaued, so the longer horizon is a question to Joaquin. The fine-tune transfer at
+$10^{-4}$ stays step 2. Examples of the levels: Fig.~\ref{fig:muon_long}c.
+% src: python3 analysis/catalog_v4/muon_long.py read @0d6c9d5b
+% claim: reads.PP4.all.R=5.18
+% claim: reads.PP4.all.widened.0=4.64
+% claim: reads.PP4.all.widened.1=5.78
+% claim: reads.PP4.all.n_classes=1301
+% claim: reads.EE4.all.R=3.84
+% claim: reads.EE4.all.n_classes=169
+% claim: reads.held.all.R=2.76
+% claim: reads.held.all.n_classes=701
+% claim: reads.held.H2p5.R=0.634
+% claim: reads.held.H5.R=0.851
+% claim: reads.HD4.all.R=2.70
+% claim: reads.HD5.all.R=1.06
+% claim: level.PP4.muon.median_class_mse=0.0335
+% claim: level.EE4.muon.median_class_mse=0.0681
+% claim: level.PP4.adamw.median_class_mse=0.184
+% claim: level.EE4.adamw.median_class_mse=0.224
+% claim: curve.median_ratio=6.99
+% claim: curve.plateau.muon.best_over_0p75T=0.887
+% claim: curve.plateau.adamw.best_step=19096
+% claim: curve.plateau.adamw.best=3.84e-2
+% claim: curve.plateau.muon.best=9.36e-3
+% claim: curve.runs.muon.first=0.328
+% claim: curve.runs.adamw.max_after_best=0.23
+% claim: curve.runs.adamw.last=0.100
+% claim: curve.runs.adamw.traintime_hours=17.2
+% claim: curve.last_ratio=10.6
+% claim: curve.steps_to_level.8528.muon_best_so_far=3.12e-2
+% claim: reads.PP4.all.frac_classes_muon_lower=0.929
+% claim: reads.EE4.all.widened.0=3.33
+% claim: reads.EE4.all.widened.1=4.55
+% claim: reads.EE4.all.frac_classes_muon_lower=0.959
+% claim: reads.held.all.widened.0=2.39
+% claim: reads.held.all.widened.1=3.13
+% claim: reads.held.H3.R=2.32
+% claim: reads.held.H6.R=7.24
+% claim: reads.HD4.all.widened.0=1.69
+% claim: reads.HD4.all.widened.1=3.95
+% claim: reads.held.H2p5.widened.0=0.447
+% claim: reads.held.H2p5.widened.1=0.835
+% claim: reads.held.H5.widened.0=0.717
+% claim: reads.held.H5.widened.1=1.30
+% claim: reads.HD5.all.widened.0=0.593
+% claim: reads.HD5.all.widened.1=2.41
+% claim: level.PP4.muon.frac_classes_below_1e-4=0.025
+% allow: 3.65 20.3 1364 because they are the run's lr, its wall target and the validation interval, settings
+% allow: 10^{-4} 0.75 0.9 10 90 because they are the precision the comparison is set to (D356), the plateau rule's fractions and the examples' percentiles, settings
+% allow: 8.03 3 because they are par:v3_muon's per-pool ratio (its provenance there) and a panel count, quoted
+% allow: 8 16 68224 10.2 42 1262 4264 50 8528 because they are the cell's width, length factor, steps, epochs, seed, trial, the earlier horizon, the validation count and a level step, settings
+% allow: 2 because it is the exponent of a squared quantity, a constant
+\begin{figure}[htbp]\centering
+\includegraphics{../analysis/catalog_v4/figs/muon_long_curves.pdf}\hfill
+\includegraphics{../analysis/catalog_v4/figs/muon_long_levels.pdf}\\
+\includegraphics{../analysis/catalog_v4/figs/muon_long_examples.pdf}
+\caption{Muon against AdamW on the width-8 $16\times$ catalog\_v4 cell ($68224$ steps, seed 42, only the optimizer
+differs). (a) Validation $\mu$-MSE every $1364$ steps. (b) Per-class MSE of $\ln|\mathcal M|^2$ at the final models:
+dot the median over classes, bar the interquartile range; rows ordered by Muon's median; dashed $10^{-4}$. (c) True
+and predicted $\ln|\mathcal M|^2$ on the PP4 probes at Muon's $10$th, $50$th and $90$th percentile of MSE
+($ug\to\gamma dW^+$, $dg\to\gamma b\bar bd$, $b\bar b\to\gamma t\bar t$), predicted over true below.}\label{fig:muon_long}
+\end{figure}
 
 \paragraph{What a zero-shot error means.} The user: most zero-shot errors are not usable in practice (an MSE near one, values off by a factor of about
 $2.7$), but the point is to reduce them as much as possible, since the zero-shot error is the starting point, the
