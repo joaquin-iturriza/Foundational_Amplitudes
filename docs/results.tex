@@ -14879,8 +14879,9 @@ better than scratch at any $D$, as expected of a structure no pretraining had.
 the finale also on the six star-arm probes, $7$ values of $D$ each (\code{analysis/transfer/finale\_synth.py},
 \code{finale\_synth\_scaling.py}; per cell MSE of $\log|\mathcal M|^2$ at the best checkpoint, the probe's
 \code{val\_loss\_no\_reg} times its $\sigma_p^2$; Figs.~\ref{fig:finale_synth} and \ref{fig:finale_synth_scaling}).
-A cell is the best of its $5$-trial search where that finished ($122$ cells), else one run at the reference cell's best
-point ($88$ cells, rung $9$'s or the star arm's; the user's call, 2026-10-07), so the two kinds of cell are measured
+Short $5$-trial searches came first; their best hyperparameters were similar in most cells, so the remaining cells
+were run once at a fixed configuration, the reference cell's best point (rung $9$'s or the star arm's; the user's call,
+2026-10-07), and tuned only where needed: $122$ cells are a search's best, $88$ are single runs, so the two kinds of cell are measured
 differently; a search that ran twice counts its first $5$ trials. The tests are paired, cell against the reference cell
 of the same probe and $D$; since the $7$ cells of a probe are not independent, the test that counts is the one over
 probes (each probe's median difference, Wilcoxon), with the per-cell figure alongside as descriptive.
