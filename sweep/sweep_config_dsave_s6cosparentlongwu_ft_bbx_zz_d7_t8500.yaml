@@ -1,0 +1,78 @@
+# pretrain_data_saving stage 2: bbx_zz D=3162 ft T=8500; est 0.29 GPU-h per trial.
+# Written by sweep/gen_data_saving.py.
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  request_gpus: 1
+  mem: 11G
+  cpus_per_task: 4
+  time: 00:17:00
+paths: null
+sweep_name: dsave_s6cosparentlongwu_ft_bbx_zz_d7_t8500
+base_config: ${PROJECT_DIR}/runs/data_saving/dsave_parent_heldoutbbzz
+n_trials: 8
+dyhpo:
+  surrogate: gp
+  n_candidates: 2000
+  objective_scale: auto
+  seed: 1972870301
+  n_startup: 3
+  total_budget: 10000
+  waves:
+  - 3
+  - 3
+  - 2
+fidelity_schedule:
+  t_steps:
+  - 8500
+fixed_params:
+  data.source: recipes
+  data.processes_file: ${PROJECT_DIR}/recipes/catalog_v4_datasaving_bbx_zz.yaml
+  data.train_subsample: 3162
+  data.eval_subsample: 'null'
+  data.phase_space_on_pool: 'true'
+  data.memmap: 'false'
+  training.heterosc_select: mu_mse
+  evaluation.train_subsample: 2000
+  seed: 42
+  plot: 'true'
+  warm_start_idx: 'null'
+  training.lr: 0.007817
+  fine_tune.pretrained_path: ${PROJECT_DIR}/runs/data_saving/dsave_parent_heldoutbbzz/models/model_run0_best.pt
+  fine_tune.target_stats: own
+  fine_tune.offshell_stats: parent
+  fine_tune.layer_decay: 1.0
+  training.scheduler: WSD
+  training.wsd_cooldown_frac: 0.125
+range_extension:
+  enabled: false
+search_space:
+- name: fine_tune.lr_scale
+  type: float_log
+  low: 0.333
+  high: 3.0
+- name: training.muon_weight_decay
+  type: float_log
+  low: 0.001
+  high: 0.3
+- name: training.regularization_lambda
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-06
+- name: training.cosanneal_warmup_frac
+  type: float_uniform
+  low: 0.05
+  high: 0.6
+- name: training.cosanneal_eta_min
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-07
+- name: ema
+  type: categorical
+  choices:
+  - 'false'
+  - 'true'
+- name: training.ema_decay
+  type: float_uniform
+  low: 0.9
+  high: 0.999

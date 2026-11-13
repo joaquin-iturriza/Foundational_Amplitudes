@@ -89,9 +89,12 @@ def halved():
 
 
 def write(name, tgt, k, T, arm, rate, parent, lr_factor=1.0, offshell="parent", ft_space="llrd", tmpl2=False,
-          wsd=False, batch_search=False):
+          wsd=False, batch_search=False, warmup_high=None):
     c = lr_centre(T, k) * lr_factor
     space = template_space()
+    if warmup_high:
+        # step 6 warmup test: the warmup range opened upward, the peak lr reached later in the run
+        space = [dict(s, high=warmup_high) if s["name"] == "training.cosanneal_warmup_frac" else s for s in space]
     fixed = {"data.source": "recipes", "data.processes_file": f"${{PROJECT_DIR}}/recipes/catalog_v4_datasaving_{tgt}.yaml",
              "data.train_subsample": d_of(k), "data.eval_subsample": "null", "data.phase_space_on_pool": "true",
              "data.memmap": "false", "training.heterosc_select": "mu_mse", "evaluation.train_subsample": 2000,
@@ -176,6 +179,8 @@ def main():
                     help="--tmpl2 with the batch size searched in [D/64, D/2]: forbidden by D426 (searching batch beside lr "
                          "confounds the two); kept only to reproduce the 4 tmpl2 configs made before it")
     ap.add_argument("--no-batch-search", action="store_true", help="the default since D426; kept so old commands run")
+    ap.add_argument("--warmup-high", type=float, help="upper edge of the searched training.cosanneal_warmup_frac "
+                    "(template 0.2): the step-6 fine-tune warmup test")
     ap.add_argument("--ks", type=int, nargs="*", help="only these D exponents k (D = 10^(k/2))")
     a = ap.parse_args()
     R, hz = rates(), horizons()
@@ -196,7 +201,8 @@ def main():
     for name, t, k, T, arm in jobs:
         p, h = write(name, t, k, T, arm, R[(t, k)], a.parent_nlo if t.endswith("_nlo") else a.parent_lo,
                      (0.5 if (t, k) in half else 1.0) * a.lr_factor, a.offshell_nlo if t.endswith("_nlo") else "parent",
-                     a.ft_space or ("llrd" if t.endswith("_nlo") else "scratch"), a.tmpl2, a.wsd, a.batch_search)
+                     a.ft_space or ("llrd" if t.endswith("_nlo") else "scratch"), a.tmpl2, a.wsd, a.batch_search,
+                     a.warmup_high)
         total += h
         print(f"{os.path.relpath(p, ROOT)}  {h:.1f} GPU-h")
     print(f"{len(jobs)} sweeps, {total:.1f} GPU-h estimated (8 trials each)")

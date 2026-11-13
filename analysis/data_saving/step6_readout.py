@@ -17,6 +17,7 @@ import os
 import sys
 
 import numpy as np
+from scipy.stats import spearmanr
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, "..", ".."))
@@ -30,7 +31,7 @@ import plot_style as ps  # noqa: E402
 
 DATA = os.path.join(HERE, "data")
 CELLS = {100: (4, 4960), 316: (5, 7840), 3162: (7, 8500)}          # D: (k, T) of the stage-2 twins
-NEW = {"C": "s5cosparent", "W": "s5wsdparent"}
+NEW = {"C": "s5cosparent", "W": "s5wsdparent", "L": "s6cosparentlongwu"}   # L: the warmup test, C with warmup [0.05, 0.6]
 BAR = 5 ** (1 / np.sqrt(3))
 
 
@@ -43,7 +44,7 @@ def rows(cached):
     cache = os.path.join(DATA, "step6_rows.json")
     if cached:
         return json.load(open(cache))
-    names = [name(a, D) for a in NEW for D in CELLS]
+    names = [n for n in (name(a, D) for a in NEW for D in CELLS) if os.path.isdir(os.path.join(REPO, "sweeps_local", n))]
     r = {"curves": driven_rows(names),
          "test": driven_rows(names, stage2_readout.REMOTE, "S2T", "'runs/dsave_s5*parent_ft_bbx_zz_d*/trial_*'")}
     json.dump(r, open(cache, "w"))
@@ -99,22 +100,32 @@ def main():
                 c.update(start_ft_over_scr=float(ratio[0]), lost_at=lost,
                          kept=lost is None or lost > 0.5, best_rise=rise(b),
                          trials=[{"run": os.path.basename(r["run_dir"].rstrip("/")), "lost_at": lost_at(r, sc)[0],
-                                  "rise": rise(r), "val": r["val_min"],
+                                  "rise": rise(r), "val": r["val_min"], "warmup_frac": r["hp"]["warmup_frac"],
                                   "peak_lr": r["hp"]["lr"] * (r["hp"]["lr_scale"] or 1)} for r in v],
                          failed=failed(b["sweep"]) if a in NEW else None)
             cell[a] = c
-        for x, y in (("W", "C"), ("C", "R"), ("W", "R"), ("R", "scr"), ("C", "scr"), ("W", "scr")):
+        for x, y in (("W", "C"), ("C", "R"), ("W", "R"), ("L", "C"), ("R", "scr"), ("C", "scr"), ("W", "scr"), ("L", "scr")):
             if x in cell and y in cell:
                 cell[f"{x}/{y}"] = cell[x]["best_val"] / cell[y]["best_val"]
         out["cells"][D] = cell
-    for a in ("R", "C", "W"):
+    for a in ("R", "C", "W", "L"):
         ks = [c[a]["kept"] for c in out["cells"].values() if a in c]
         out["arms"][a] = {"kept_at": sum(ks), "of": len(ks), "kept": len(ks) == 3 and sum(ks) >= 2}
-    for q in ("W/C", "C/R", "W/R"):
+    for q in ("W/C", "C/R", "W/R", "L/C"):
         v = [c[q] for c in out["cells"].values() if q in c]
         if v:
             G = gm(v)
             out["pooled_" + q] = {"G": G, "read": "LOWER" if G < 1 / BAR else "HIGHER" if G > BAR else "WITHIN"}
+    # the warmup test's check: does a trial lose the head start where its own warmup ends (the peak lr arrives)?
+    # per arm over its trials that did not blow up in the warmup (rise < 10), lost_at (1 if never) against warmup_frac
+    for a in ("R", "C", "W", "L"):
+        T_ = [t for c in out["cells"].values() if a in c for t in c[a]["trials"] if t["rise"] < 10]
+        if len(T_) > 2:
+            lo = np.array([t["lost_at"] if t["lost_at"] is not None else 1.0 for t in T_])
+            wf = np.array([t["warmup_frac"] for t in T_])
+            out["arms"][a]["lost_vs_warmup"] = {
+                "n": len(T_), "spearman": float(spearmanr(wf, lo)[0]), "median_lost_minus_wf": float(np.median(lo - wf)),
+                "share_within_0.05": float(np.mean(np.abs(lo - wf) <= 0.05))}
     A = out["arms"]
     if all(A.get(a, {}).get("of") == 3 for a in "CW"):
         out["branch"] = {(True, False): "a: WSD parent keeps it", (True, True): "b: WSD fine-tune keeps it",
@@ -132,7 +143,8 @@ def main():
     json.dump(out, open(os.path.join(DATA, "step6_readout.json"), "w"), indent=1)
     # figure: per D the val curves of the scratch best and the R, C, W bests (legend: parent schedule -> fine-tune schedule)
     sty = {"scr": ("scratch", "black", "-"), "R": (r"cos$\to$cos", ps.C.grey, "-"),
-           "C": (r"cos$\to$WSD", ps.C.blue, "-"), "W": (r"WSD$\to$WSD", ps.C.vermillion, "-")}
+           "C": (r"cos$\to$WSD", ps.C.blue, "-"), "W": (r"WSD$\to$WSD", ps.C.vermillion, "-"),
+           "L": (r"cos$\to$WSD, long warmup", ps.C.green, "-")}
     figs = ps.panels(len(CELLS))
     for (fig, ax), D in zip(figs, CELLS):
         for a, (lab, col, ls) in sty.items():
@@ -148,7 +160,7 @@ def main():
     # figure: per D each fine-tune best's val over the scratch best's (smoothed) against the run fraction
     figs = ps.panels(len(CELLS))
     for (fig, ax), D in zip(figs, CELLS):
-        for a in ("R", "C", "W"):
+        for a in ("R", "C", "W", "L"):
             if a in best[D] and "scr" in best[D]:
                 _, fr, ratio = lost_at(best[D][a], best[D]["scr"])
                 ax.plot(fr, ratio, color=sty[a][1], label=sty[a][0])
@@ -167,6 +179,20 @@ def main():
     ps.process_label(ax, r"$b\bar b\to ZZ$", loc="upper right")
     ps.legend(ax, "lower left")
     ps.save(fig, os.path.join(HERE, "figs", "step6_best"))
+    # figure: per trial (no warmup blow-up, rise < 10) the run fraction where the head start is lost against its own
+    # warmup fraction, D = 100, 316, 3162 pooled; never lost drawn at 1
+    fig, ax = ps.figure()
+    for a in ("R", "C", "W", "L"):
+        for D, c in out["cells"].items():
+            T_ = [t for t in c.get(a, {}).get("trials", []) if t["rise"] < 10]
+            ax.scatter([t["warmup_frac"] for t in T_], [t["lost_at"] if t["lost_at"] is not None else 1.0 for t in T_],
+                       color=sty[a][1], label=sty[a][0] if D == 100 else None)
+    ax.plot([0, 1], [0, 1], color="0.5", ls="--", label="lost at warmup end")
+    ax.set_xlim(0, 0.65); ax.set_ylim(0, 1.02)
+    ax.set_xlabel("fine-tune warmup fraction"); ax.set_ylabel("run fraction where the head start is lost")
+    ps.process_label(ax, r"$b\bar b\to ZZ$", loc="lower right")
+    ps.legend(ax, "upper right")
+    ps.save(fig, os.path.join(HERE, "figs", "step6_lost_vs_warmup"))
 
 
 if __name__ == "__main__":
