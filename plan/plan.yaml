@@ -32738,6 +32738,12 @@ entries:
   - at: '2026-11-13T08:11:19+00:00'
     text: 'Sec. 2 passed a fresh review (draft b5fbf78, FA 68f1cb9e) after 7 fixes; pages draft_sec2_pages.pdf (pp. 3-6) to
       Joaquin. One-loop bb validation split: 0 of 5000 events negative in truth or prediction, so abs() hides no sign flip.'
+  - at: '2026-11-13T09:01:44+00:00'
+    text: '2026-11-13: Sec. 3 v3 (draft 93d900a, FA 28817f4c): emission scales explained (factorization Eq. 7, three-step
+      computation); Figs. 7, 8, 10 aligned at plot-box tops (pnld, measured offsets); Fig. 8 right without 90th percentile;
+      captions 5-11 shortened; pp held-out ''at least as good''. Fig. 9 on MSE of log|M|^2 (het_delta_summary.py @28817f4c):
+      het mean lower in 43/146 2->2 trainings (median |r-1| lower in 118/146 at d7baad30), higher in 31/32 at 2->3, 2->4;
+      text matched. Pages scratchpad draft_sec3_v3_pages.pdf.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
