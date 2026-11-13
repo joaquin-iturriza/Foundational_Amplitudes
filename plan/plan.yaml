@@ -21617,7 +21617,7 @@ entries:
     decision: D441
   owner:
     agent: a75868725fdec3ff2
-    state: working
+    state: closed
     since: '2026-11-13T01:20:06+00:00'
     state_at: '2026-11-13T08:53:49.241000+00:00'
     context: 248944
@@ -26844,23 +26844,29 @@ entries:
     start: '2026-11-13T08:56:26+00:00'
     at: '2026-11-13T08:56:26+00:00'
   handoff:
-    state: 'Draft figures done 2026-11-13 and sent: old-setup data saving (old_setup_examples.py @1aa91b49, redrawn per Joaquin:
-      savings at the precision line 3.2-12.6x, median gain 11.5x over 28 cells), ladder paper figures (finale_synth_scaling.py
-      --paper @3e4e6146, ''every structure'' for finale; Joaquin: ''Great ladder figures''), zero-shot vs width (width_zero_shot.py
-      @848cf2cc), D414 read (ft_constraint.py @c7c03742: bbZZ tree head start lost in the warmup at 4-16% of the run, rise
-      follows peak lr; Muon WD erases parent at large D; V/B both arms memorise). Template test (step 5) running; when detach
-      ttx16_repick ends: python analysis/data_saving/lr_centre_readout.py --test tmpl2 (A/B/C per the passed design), curves
-      figure, and the warmup-rise measure (ft_constraint.rise) on part B''s low lr_scale trials; report.'
-    decisions: 'D433 old-setup figure (four examples, my fourth pick W pole); D434 ladder redraw; D414 investigation: no test
-      designed (D422 fix is HP tuning; schedule/regularisation tests dropped 2026-11-12; question withdrawn). Precision line
-      rule: 1e-4 if both arms reach it, else 1e-2 (Joaquin 2026-11-13).'
-    ruled_out: As before; the no-rewarmup/low-lr/WD-to-parent fine-tune test not proposed (D422), revisit only if part B shows
-      the start lost at every lr searched.
-    running: 'detach ttx16_repick (drive.py: 4 WSD + 2 wide-range t t~ tree searches to 16 trials, CC/lxplus); E6754 acked
-      (sampled-HP divergence)'
-    files: analysis/data_saving/{old_setup_examples,width_zero_shot,ft_constraint,lr_centre_readout,curve_quality}.py, data/ft_constraint.json,
-      figs/{old_setup_examples,width_zero_shot,ft_constraint}; analysis/transfer/{finale_synth_scaling,rung_grid}.py, figs/finale_synth_paper_*
-    written: '2026-11-13T00:59:30+00:00'
+    state: '2026-11-13 ~10:00. Draft figure old_setup_examples final per Joaquin: separate exponents (dstar_fit.fit_each,
+      @3b3c3ab6), muted gap colour (@3208aa79): S 11.3 [10.4,14.1], 5.5 [3.9,7.5], 4.4 [3.4,5.6], 5.6 [4.6,6.8], median 5.55.
+      ft_constraint fixed (best checkpoint, no 3x cut, @505ae9af); head-start-lost fractions unchanged. Step 6 (design PASS
+      after one FIX): WSD bbZZ parent FA-ccin2p3-7453b4ef done (best val -2.723 vs cosine -2.749, both at the last step; WSD
+      flat ~-1.7 until its cooldown; per process WSD-cosine median -0.03, WSD lower in 59% of 1132; parent_curves.py @27b07e60,
+      figs/parent_curves; config diff and checkpoint gate pass); its 6 fine-tune searches running (D=100,316,3162, 8 trials
+      each). Step 5 template-test driver relaunched at 11G (15 lxplus trials requeued, no penalty). Next: when detach dsave_step6_and_ttx16
+      ends, extend ft_constraint.py to read stages s5wsdparent/s5cosparent (curve_quality.trials only reads s2/s4) and read
+      step 6 by its outcome rule (head-start-lost fraction per search best vs stage-2 scratch best; kept = never or after
+      0.5 at >=2 of 3 D; branches a-d); zero shot of each parent on bbZZ = step-0 val of its fine-tune trials; and lr_centre_readout.py
+      --test tmpl2 for step 5 (A/B/C).'
+    decisions: 'D438 fitted gap; Joaquin ''Separate exponents'' (step 7 closed); muted gap colour; ''8 trials is fine'' for
+      step 6. The D subset of step 6 (3 of the 7 D, full grid +16.8 GPU-h = 30.3 total) was put to Joaquin by the coordinator,
+      unanswered (''I have no idea what you are asking'', re-asked): do not extend until he answers. Draft GPU jobs take priority
+      over everything (Joaquin).'
+    ruled_out: As before; WSD fine-tune at cosine-tuned HPs (suspects test) worse at D>=1e3 on t t~; not rerun.
+    running: 'detach dsave_step6_and_ttx16 (pid 807668): driver 1 = 6 searches sweep/sweep_config_dsave_s5{wsdparent,cosparent}_ft_bbx_zz_d{4_t4960,5_t7840,7_t8500}.yaml
+      (@a3ecbcc3, 11G @8fbcbdb8), CC+lxplus (WSD parent copied to lxplus); driver 2 = template test, 6 dsave_{wsd,wideft}
+      t t~ configs to 16 trials, waves 3,3,2,4,4. Jean Zay not used: the parents and pools are not there (copy failed earlier).'
+    files: analysis/data_saving/{old_setup_examples,dstar_fit,ft_constraint,parent_curves,check_parent_ckpt,lr_centre_readout,curve_quality}.py;
+      data/{ft_constraint,parent_curves}.json; figs/{old_setup_examples,parent_curves,ft_constraint}; sweep/gen_data_saving.py;
+      scripts/job_datasaving_parent.sh
+    written: '2026-11-13T08:57:45+00:00'
   step_why:
     5:
       feeds: 'the template for the remaining cells: trial count and fine-tune ranges (D422, D427)'
