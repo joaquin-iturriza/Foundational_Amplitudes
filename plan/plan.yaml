@@ -26608,6 +26608,17 @@ entries:
       to retry without penalty in driver_state (lost_runs kept). Relaunch held until the draft''s GPU reruns run (coordinator):
       sweep/drive.py --config sweep/sweep_config_dsave_{wsd_ft,wsd_scr,wideft_ft}_epem_ttx_d{5,7}_t8500.yaml --item pretrain_data_saving
       --n-trials 16 --wave-sizes 3,3,2,4,4 --sites ccin2p3 lxplus (configs 11G @8fbcbdb8).'
+  - at: '2026-11-13T09:16:37+00:00'
+    text: '2026-11-13 ~11:30 (owner a6bd7d61): E6987 acked: FA-ccin2p3-f61e6b16 = template-test WSD scratch t t~ LO D=3162
+      trial 7 (lr 1.32e-2) diverged at step 2420/8500 (inf grads from ~2370), recorded failed with penalty by the driver,
+      not resubmitted, listed apart. Reader gap fixed @dbb74895: lr_centre_readout and the stage-2 readers read trial curves
+      on CC only, while drive.py places trials on lxplus too (all 18 first step-6 trials and some template-test trials are
+      on lxplus): trial_overfit.driven_rows now reads each driven search on every site that ran an observed trial, kept to
+      the run dir its result names. tmpl2 figures were saved under one name per target (d5 overwritten by d7; the same collision
+      hit the earlier lrx3/muonly epem_ttx and ee_ttbar_nlo figures), now per cell. Step-6 reader analysis/data_saving/step6_readout.py
+      written and checked on the record: arm R reproduces the design''s prior (start ft/scr 0.014/0.037/0.071, lost at 0.16/0.10/0.08,
+      best rise 1.27/3.92/6.37; test scr/ft 1.69e-3/3.93e-3, 8.4e-6/1.07e-5, 5.5e-7/6.0e-7). Reads when detach dsave_step6_and_ttx16
+      ends: step6_readout.py, lr_centre_readout.py --test tmpl2.'
   targets:
   - batch: calib_trees
     wall_h: 4.0
