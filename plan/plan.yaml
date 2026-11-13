@@ -26940,7 +26940,7 @@ entries:
     decision: D451
   owner:
     agent: a14a677afceccea59
-    state: working
+    state: closed
     since: '2026-11-13T06:48:36+00:00'
     state_at: '2026-11-13T07:00:46.764000+00:00'
     context: 84317
@@ -27277,45 +27277,33 @@ entries:
     '2': '2026-11-15: pretrain_data_saving''s fine-tune template (its step 5) and its parent choice (its step 6, WSD parent)
       must exist before the AdamW-parent arm can be designed on the same grid'
   handoff:
-    state: 'Step 1 (pidqn) DONE, written in results.tex sec:optrecap ''Particle encoding'' (fig:pidqn). Step 3 (Muon vs AdamW
-      on the 16x width-8 catalog_v4 pretraining) DONE and read 2026-11-13, written in results.tex par:muon_long + fig:muon_long
-      (b895f6ca): outcome YES, AdamW/Muon R = 5.18 [4.64,5.78] PP4 (1301 classes), 3.84 EE4, held pooled 2.76, AdamW better
-      on 2->5 (0.634), level on one loop (H5 0.851, HD5 1.06); median per-class MSE Muon 0.0335 pp / AdamW 0.184; neither
-      reaches 1e-4, Muon not plateaued (best/0.75T 0.887); AdamW val mu-MSE best at 19096 then rises (run at Muon''s lr).
-      Open question to Joaquin (plan ask, GPU budget ~140 GPU-h): a 4x longer pair, or take 1e-4 as the fine-tune target and
-      stop at 68k. Step 2 (AdamW-parent fine-tunes on the data-saving grid) waits on pretrain_data_saving''s template (its
-      step 5) and WSD parent choice (its step 6), plan wait until 2026-11-15. Paper Sec. 3 (~/drafts/fm_amplitudes_2026-11/paper.tex,
-      commits 53cc9e7, 67d44d4) was written from these results and REJECTED by Joaquin as written; a fresh owner rewrites
-      it. Ask the main session for his words on why before rewriting; the section text is not a basis.'
-    decisions: D364 scope (every adopted and rejected choice, with formulas); D315 one seed per arm; step 3 read under the
-      design passed 2026-11-12 00:25 (R per read, widened by the width-8 seed pair FA-ccin2p3-804a65bc/66e8c31f; plateau rule
-      best within 10% of the 0.75T value or best before 0.9T); figure labels name things by what they are, no axis codes (plot_style
-      refuses coded labels); draft figures with absolute values on log scale, rows ordered by Muon's median; the 1e-4 horizon
-      is Joaquin's call (budget).
-    ruled_out: 'A longer pretraining reaching 1e-4 on the whole catalog: at Muon''s measured 0.68x per doubling (34k->68k)
-      that is ~12 more doublings, an estimate. Re-ablating off-shellness on catalog_v4: not done; the at-scale evidence is
-      the 448-process big run (tab:bigrun_arms) and catalog_v2 (tab:catv2_offshell). The sigma-steering gamma sweep in absolute
-      values cannot be redrawn locally (analysis/divergences/heldout_eval_*_s*.npz not on this machine; plot_l2_uugg_abs.py
-      needs them).'
+    state: 'Sec. 3 of ~/drafts/fm_amplitudes_2026-11/paper.tex rewritten from scratch as ''Building the pretraining'' (draft
+      commits 509d67c text, then figures), 11 figures from analysis/catalog_v4/paper_sec3_figs.py (FA 78d79e76, e93beb91,
+      latest), pages at scratchpad draft_sec3_v2_pages.pdf. A fresh cold-read reviewer returned FIX with 38 points (its report
+      is in the session transcript, agent a6bbd8868ba6b4f85). Only the figure points are applied (examples rebinned with a
+      ratio label, ft y-range, target 2->5 vs TeV split). Still to do in the TEXT: new title and opening without the ''every
+      choice'' promise; mixture equation replaced by shares in words, rho_fwd in one plain sentence; delete the VBF/VBS sentence;
+      D_j and P in a display, no \linebreak, drop ''order-free''; genmix ''best averaged over sqrt s''; steering ''bulk pays
+      at every gamma, growing'', infrared = log10 ymin<-3, caption: ratio = steered/uniform, parity = ratio 1, log-flat =
+      equal weight per decade; pidqn drop ''variation between runs''; off-shellness worded on the geometric mean, single seed,
+      no resonance claim; Muon examples text ''on the hardest class both fail, AdamW further''; Muon transfer says the fine-tunes
+      are a shorter pretraining (different compute); ft one-loop qualified; het caption: cross = a training that blew up,
+      ''cell'' -> ''training'', ''equal'' = y=x; inputs caption: loss = validation loss without regularization, define rows;
+      rename coupling powers q,e -> n_s,n_e, ''schematically'', alpha_s at mu=sqrt(s_hat); catalog: 2->4 = 2->3 plus g/gamma,
+      physical top held out (top QN trained at 50/300/600), alpha_s copies at 0.09/0.15, pT cut value; add tau and quartic
+      rows (separate pretraining) to tab:heldout; one setup paragraph (short ~4k-step and long 68k-step pretrainings, 448-process
+      set); cite L-GATr in tab:arch, ''best validation loss''; numbered \subsection, floats [tbp]; Muon scatter + 3 examples
+      as one 2x2 figure; tone list (points 33-35). Then re-check by continuing the same reviewer (SendMessage a6bbd8868ba6b4f85)
+      and hand back the pages.'
+    decisions: Joaquin 'no' to the 140 GPU-h Muon/AdamW extension (entry on hold; Muon claim rests on the 68k pair). Sec.
+      3 needs no GPU job (every figure from local reads); any GPU job for the draft goes under item draft_rewrite. Joaquin's
+      het-better-than-MSE and pp-coverage framings do not match the data found (open questions in the hand-back).
+    ruled_out: A Sec. 3 figure from the 448-process run's per-process losses (run dirs not recorded; the inputs figure uses
+      tab:bigrun_arms aggregates).
     running: none
-    files: 'Muon: analysis/catalog_v4/muon_long.py (curves|read|hists|plot), data/muon_long.json, data/muon_long_curves.json,
-      data/reads/FA-ccin2p3-f08e90e8_*.json and FA-ccin2p3-1a46f3e0_*.json (+ _hists.json), figs/muon_long_{curves,levels,examples}.png/pdf;
-      results.tex par:muon_long, par:v3_muon (analysis/catalog_v3/muon_compare.py, muon_hp_ft.py; zero shot as fine-tune start:
-      par:v3_muon fine-tune paragraph, data/muon_ft.json). pidqn: analysis/catalog_v4/mixture_ab.py pidqn, data/pidqn.json,
-      plot_pidqn.py -> figs/pidqn_classes.png/pdf. het vs MSE: mixture_ab.py mixture --het / het_over_mse -> analysis/catalog_v4/data/mixture_ab_het.json.
-      pp coverage: results.tex par:v4_vs_pp (analysis/catalog_v4/compare_pp_trained.py), par:v4_density (density_check.py,
-      data/density_check.json, density_hists.json.gz), par:v4_pp_bound and par:v4_mixture (mixture_ab.py bound/bound_default
-      -> data/pp_bound.json, bound_default.json), pp_support.py, analysis/catalog_v3/coverage_check.py, coverage_fig.py, pp_compare.py.
-      Target: analysis/catalog_v3/short_reads.py -> data/short_reads.json, figs/short_reads.png/pdf; results.tex tab:v3_short,
-      par:dimless_orders, par:dimless_qperp, sec:optrecap. Sampling: analysis/divergences/plot_genmix_sweep.py, eeuu_resonance_numbers.py
-      (fig:eeuu_genmix_fraction_sweep), plot_l2_uugg.py, steering_numbers.py (fig:l2_uugg_perdecade, fig:l2_uugg_gamma), results.tex
-      sec:div-sampling. Off-shellness at scale: compare_models/plot_levers_ab.py (fig levers_offshell_ab), results.tex sec:levers
-      tab:levers, tab:bigrun_arms, tab:catv2_offshell. Rejected conditionings: results.tex par:v4_dipole, par:v4_prop, par:v4_lco,
-      par:v4_lco_not (analysis/catalog_v4/lco_map.py), par:v4_kshot_spread (kshot_spread.py), par:v4_mult_cand (loop_levels.py
-      --mult-candidates), context vector par (analysis/catalog_v3/kshot_context.py), sec:bigrun (pair attention bias, diagram
-      encoder). LR law: results.tex sec:lrlaw prin:invU. Catalog: results.tex sec:catalog (census par, par:v4_validation,
-      par:v4_vs_v3). Run logs read: site logs FA-ccin2p3-f08e90e8 / FA-ccin2p3-1a46f3e0 -n 3000000.'
-    written: '2026-11-13T06:46:43+00:00'
+    files: analysis/catalog_v4/paper_sec3_figs.py, analysis/catalog_v4/figs/paper_*.png/pdf, ~/drafts/fm_amplitudes_2026-11/paper.tex
+      Sec. 3, refs.bib Jordan:2024muon, scratchpad draft_sec3_v2_pages.pdf, joaquin_draft_comments_0613.txt
+    written: '2026-11-13T07:13:28+00:00'
   findings:
   - at: '2026-11-12T03:17:43+00:00'
     text: 'Cache key mismatch cause (2026-11-12): the composed pools'' rows hash identically on htc and GPU nodes (2736/2736
