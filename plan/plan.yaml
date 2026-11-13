@@ -32785,6 +32785,12 @@ entries:
     units: null
     start: '2026-11-13T05:05:29+00:00'
     at: '2026-11-13T05:05:29+00:00'
+  - batch: rerun_ft7
+    wall_h: 1.0
+    jobs: 7
+    units: null
+    start: '2026-11-13T06:49:01+00:00'
+    at: '2026-11-13T06:49:01+00:00'
   handoff:
     state: 'Sec. 2 written and revised to Joaquin''s 2026-11-13 comments (draft 23de6d4): old-setup 4-panel figure, per-curve
       fits L=A D^-a+L_inf, S at the lowest of 1e-4/1e-3/1e-2 both fits reach in D<=1e4 (Zggg 11.3 @1e-2, ddg 5.5 @1e-2, e
