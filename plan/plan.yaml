@@ -32726,6 +32726,10 @@ entries:
     text: '2026-11-13 Joaquin: ''I never asked for a title, abstract, outlook, introduction, or anything else. You task was
       to only modify my part of the draft, and leave everything else untouched.'' Title, abstract, introduction and outlook
       restored word for word to d742281 (draft 1e9b4ba). Only Sec. 2 (this entry) and Sec. 3 (optimizations_recap) change.'
+  - at: '2026-11-13T08:04:38+00:00'
+    text: 'Sec. 2 examples filled (draft b55f195) from all 24 reruns (example_reruns.py @723c6550): 23 of 24 within 2x of
+      their records (bb one-loop D=1e4 scratch 4.88x then 1.41x on its repeat); u dbar->e nu fine-tune D=1e4 reruns to 1.43e-6
+      twice (deterministic) against the recorded 4.65e-6 (0.31x), flagged in the caption. Reviewer on Sec. 2 running.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
