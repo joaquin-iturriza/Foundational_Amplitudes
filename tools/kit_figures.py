@@ -185,7 +185,7 @@ SHORT = {"softpair_plain": "scratch", "softpair": "scratch", "softpairthr": r"sc
          "asym_cont": "factor", "asym_cont_sud1": "factor+log",
          "softpair_plain_divform": "div-form", "softpairthr_divform": "div-form",
          "softpair_plain_rezero": "ReZero", "softpairthr_rezero": "ReZero",
-         "ftr5own": "FT", "ftr5thrown": "FT+LO", "ftr5thrbetaown": r"FT+LO+$\beta$",
+         "ftr5own": "FT", "ftr5own_search": "FT searched", "ftr5thrown": "FT+LO", "ftr5thrbetaown": r"FT+LO+$\beta$",
          "ftr5thrloopown": "FT+1L", "ftr5thrloopbetaown": r"FT+1L+$\beta$"}
 
 
@@ -307,10 +307,10 @@ FAMS = {("ee_uug", "me2"): [("coll_y", "coll"), ("soft_x", "soft")],
         ("ee_tt", "virt_finite"): [("threshold_beta", "Coulomb"), ("sudakov_sqrts", "Sudakov")]}
 
 
-def summary(path, out):
-    """the deepest-bin log-MSE of every arm and control of a kit_readout --verdict json, per family"""
+def summary(paths, out):
+    """the deepest-bin log-MSE of every arm and control of kit_readout --verdict jsons, per family"""
     import plot_style as ps
-    d = json.load(open(path))
+    d = {k: v for path in paths for k, v in json.load(open(path)).items()}
     vals = {}   # (file, target) -> {tag: {family: logmse}}
     for pair, v in d.items():
         for name, key in zip(pair.split(" vs "), ("logmse", "logmse_ref")):
@@ -322,7 +322,7 @@ def summary(path, out):
     C = ps.C
     sty = {"scratch": (C.vermillion, "s"), r"scratch+$\beta$": (C.orange, "s"), "factor": (C.blue, "o"),
            "factor+log": (C.sky, "o"), "div-form": (C.green, "D"), "ReZero": (C.purple, "^"),
-           "FT": ("k", "v"), "FT+LO": ("k", "<"), r"FT+LO+$\beta$": ("k", ">"), "FT+1L": ("k", "p"),
+           "FT": ("k", "v"), "FT searched": ("k", "*"), "FT+LO": ("k", "<"), r"FT+LO+$\beta$": ("k", ">"), "FT+1L": ("k", "p"),
            r"FT+1L+$\beta$": ("k", "h")}
     figs = ps.panels(len(procs))
     for (fig, ax), p in zip(figs, procs):
@@ -332,7 +332,7 @@ def summary(path, out):
         for j, t in enumerate(arms):
             xs = [(i - 0.35 + w * (j + 0.5), vals[p][t][f]) for i, (f, _) in enumerate(fams) if f in vals[p][t]]
             c, mk = sty[SHORT[t]]
-            ax.plot(*zip(*xs), mk, ls="", color=c, mfc="none" if t.startswith("ft") else c, label=SHORT[t])
+            ax.plot(*zip(*xs), mk, ls="", color=c, mfc="none" if t.startswith("ft") and not t.endswith("_search") else c, label=SHORT[t])
         ref = [(i, MLP[(*p, f)][2]) for i, (f, _) in enumerate(fams) if (*p, f) in MLP]
         ax.hlines([y for _, y in ref], [i - 0.4 for i, _ in ref], [i + 0.4 for i, _ in ref], color="k", label="MLP log")
         ax.set_xticks(range(len(fams)), [lab for _, lab in fams])
@@ -363,7 +363,7 @@ def main():
                    help="the off-shellness-off runs in their own figures (<base>_nooffshell), not beside the on ones")
     p.add_argument("--short", action="store_true", help="legend symbols of SHORT (the caption defines them)")
     s = sub.add_parser("summary")
-    s.add_argument("verdict", help="a tools/kit_readout.py --verdict json")
+    s.add_argument("verdict", nargs="+", help="tools/kit_readout.py --verdict jsons")
     s.add_argument("--out", default=os.path.join(ROOT, "analysis", "kit_benchmark", "figs", "kit_deepest_A_hpo"))
     a = ap.parse_args()
     if a.cmd == "collect":

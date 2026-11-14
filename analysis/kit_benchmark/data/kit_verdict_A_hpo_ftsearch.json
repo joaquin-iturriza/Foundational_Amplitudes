@@ -1,0 +1,83 @@
+{
+ "kit_A_ft_ee_tt_virt_finite_n100000_t1831_hpo_ftr5own_search vs kit_A_ee_tt_virt_finite_n100000_t1831_hpo_softpair": {
+  "bulk_decades": -0.5194350901054942,
+  "families": {
+   "sudakov_sqrts": {
+    "stratum": "sudakov_sqrts_15000_50000",
+    "logmse": 2.7780811265192837,
+    "logmse_ref": 0.741215727371677,
+    "bias": -1.6162250400352915,
+    "bias_ref": -0.7594358970999388,
+    "exp": null,
+    "exp_ref": null,
+    "exp_truth": null,
+    "verdict": "inconclusive"
+   },
+   "threshold_beta": {
+    "stratum": "threshold_beta_0.0001_0.001",
+    "logmse": 7.67962085847194,
+    "logmse_ref": 7.421291404117661,
+    "bias": -2.7559557302645645,
+    "bias_ref": -2.708686601294027,
+    "exp": -0.0009211937740448866,
+    "exp_ref": -0.014963900373310409,
+    "exp_truth": -1.0157556001743897,
+    "verdict": "STAYED"
+   }
+  }
+ },
+ "kit_A_ft_ee_tt_virt_finite_n100000_t1831_hpo_ftr5own_search vs kit_A_ee_tt_virt_finite_n100000_t1831_hpo_softpairthr": {
+  "bulk_decades": -0.3425834861736036,
+  "families": {
+   "sudakov_sqrts": {
+    "stratum": "sudakov_sqrts_15000_50000",
+    "logmse": 2.7780811265192837,
+    "logmse_ref": 0.8191791270149045,
+    "bias": -1.6162250400352915,
+    "bias_ref": -0.8287655959542812,
+    "exp": null,
+    "exp_ref": null,
+    "exp_truth": null,
+    "verdict": "inconclusive"
+   },
+   "threshold_beta": {
+    "stratum": "threshold_beta_0.0001_0.001",
+    "logmse": 7.67962085847194,
+    "logmse_ref": 7.4796685323596295,
+    "bias": -2.7559557302645645,
+    "bias_ref": -2.718712848950035,
+    "exp": -0.0009211937740448866,
+    "exp_ref": -1.7136301381258284e-05,
+    "exp_truth": -1.0157556001743897,
+    "verdict": "STAYED"
+   }
+  }
+ },
+ "kit_A_ft_ee_tt_virt_finite_n100000_t1831_hpo_ftr5own_search vs kit_A_ft_ee_tt_virt_finite_n100000_t1831_hpo_ftr5own": {
+  "bulk_decades": -0.16715164595783116,
+  "families": {
+   "sudakov_sqrts": {
+    "stratum": "sudakov_sqrts_15000_50000",
+    "logmse": 2.7780811265192837,
+    "logmse_ref": 7.440069861242302,
+    "bias": -1.6162250400352915,
+    "bias_ref": -2.663825704870466,
+    "exp": null,
+    "exp_ref": null,
+    "exp_truth": null,
+    "verdict": "inconclusive"
+   },
+   "threshold_beta": {
+    "stratum": "threshold_beta_0.0001_0.001",
+    "logmse": 7.67962085847194,
+    "logmse_ref": 7.452551656179824,
+    "bias": -2.7559557302645645,
+    "bias_ref": -2.714447308851705,
+    "exp": -0.0009211937740448866,
+    "exp_ref": -0.014565216495389707,
+    "exp_truth": -1.0157556001743897,
+    "verdict": "STAYED"
+   }
+  }
+ }
+}
