@@ -27677,10 +27677,6 @@ entries:
       points ok) + at most ~0-10 other one-loop processes bulk only; target 100-1e4 one-loop bulk points, no hard one-loop
       points from any process; whole family held out; standardisation/early stopping/features bulk only; baseline from-scratch
       V/B with exact Born; scored on the hard bins. Not tonight (Joaquin), soon.'
-    21: 'Step 18 follow-up (finding 2026-11-13 ~11:30): the asymptotic factor in its A2 form (plain momenta, gamma<=4) redone
-      at the kit_hpo chosen HPs on uug, uugg, tt virtual against the chosen trials, and the tt Sudakov term repaired (log^2(s/m^2)
-      per heavy leg overshoots by +1.9 at 15-50 TeV; add the single-log term or let its coefficient span the measured drift,
-      kit_asym_bound.json). Own design + design-reviewer after kit_hpo''s read.'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -28894,18 +28890,12 @@ entries:
       if:
       - 'fine-tune beats the V/B baseline on hard bins: strong positive statement'
       - 'it does not: report as inconclusive (tree has no loop functions)'
-    21:
-      feeds: whether the KIT models (and catalog runs) take the asymptotic factor (D435)
-      if:
-      - 'A2 FIXED at chosen HPs incl. Sudakov: adopt the factor for KIT models, propose for catalog runs'
-      - 'Sudakov still off: report factor for massless dipoles and Coulomb only, Sudakov as open'
   step_waits:
     '5': 'kit_hpo driver DONE event: the package takes the chosen trials'' models'
     '14': repo-reviewer
     '17': repo-reviewer
     '19': repo-reviewer
     '20': '2026-11-14'
-    '21': repo-reviewer
   handoff:
     state: '2026-11-13 ~12:30 @ebb031da/deaba164. kit_hpo read (finding ~12:30; kit_hpo.json, figs kit_hpo_lr / kit_hpo_curves):
       chosen uug plain hp1918 (lr 0.0125, val 2.92e-5), tt softpairthr hp0131 (lr 0.00178, val 7.1e-7; good trials at the
