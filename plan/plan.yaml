@@ -32801,6 +32801,12 @@ entries:
     units: null
     start: '2026-11-13T13:49:27+00:00'
     at: '2026-11-13T13:49:27+00:00'
+  - batch: kit_hpo_tt_ft_r5
+    wall_h: 2.0
+    jobs: 16
+    units: null
+    start: '2026-11-14T00:56:23+00:00'
+    at: '2026-11-14T00:56:23+00:00'
   ask: 'GPU budget: ~95 GPU-h above 30 with no decision covering it, now that the asymptotic factor fixes the KIT hard bins
     from scratch at the searched HPs (D402''s ''we clearly haven''t converged on something that does what we want'' no longer
     holds). (a) Step 20, Bakar''s fair one-loop protocol on ee->tt one-loop virtual with the factor: a fair_nlo parent with
