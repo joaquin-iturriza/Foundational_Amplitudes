@@ -28899,7 +28899,7 @@ entries:
       - 'Joaquin approves: run the searches, best against best'
       - 'Joaquin drops them: A2 alone is the KIT model; record the dead ends'
   step_waits:
-    '5': 'kit_hpo driver DONE event: the package takes the chosen trials'' models'
+    '5': step 21's fine-tune search kit_hpo_tt_ft_r5 (the A_ft package takes its best trial if it transfers)
     '20': '2026-11-14'
     '21': kit_hpo_tt_ft_r5 search (drive.py, detached pid 2760776; its DONE event), config sweep/sweep_config_kit_hpo_tt_ft_r5.yaml
       @9b1d32e6
