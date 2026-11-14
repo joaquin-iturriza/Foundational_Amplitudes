@@ -1,0 +1,60 @@
+# kit_benchmark step 17 NO branch (passed design 2026-11-13 10:47, order (2)): the fine-tune search over the
+# best-scoring held-out-catalog parent, dsave_parent_heldout_r5 (A_ft at the kit_hpo HPs: bulk log-MSE 4.1e-8 against
+# its scratch control's 9.1e-8; kit_verdict_A_hpo.json). The kit_hpo template (sweep_config_kit_hpo_ttvirt_thr.yaml:
+# 16 trials, waves 6/5/5, 1831 WSD steps = 300 epochs of 1e5, batch 16384) on the A_ft setup of scripts/job_kit.sh
+# (the parent's config as base, its best weights as start, target stats and off-shellness stats fitted on the target,
+# as hpo_ftr5own); training.lr fixed at the tt search's chosen hp0131 and fine_tune.lr_scale searched in [0.1, 10]
+# with layer_decay in [0.75, 1.0] (HPO rule 4), the rest of the template's space as it is.
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  request_gpus: 1
+  mem: 11G   # peak RSS ~2 GB; <=12000 MB keeps lxplus at 4 CPUs (E6895)
+  cpus_per_task: 4
+  time: "01:00:00"
+paths: null
+sweep_name: kit_hpo_tt_ft_r5
+base_config: ${PROJECT_DIR}/runs/data_saving/dsave_parent_heldout_r5
+n_trials: 16
+dyhpo:
+  surrogate: gp
+  n_candidates: 2000
+  objective_scale: auto
+  seed: 42
+  n_startup: 6
+  total_budget: 10000
+  waves: [6, 5, 5]
+fidelity_schedule:
+  t_steps: [1831]
+fixed_params:
+  data.source: recipes
+  data.processes_file: ${PROJECT_DIR}/sweep/kit_base/kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr.recipe.yaml
+  data.train_subsample: 'null'
+  data.eval_subsample: 'null'
+  data.memmap: 'false'
+  training.dtype: float64
+  training.heterosc_select: mu_mse
+  training.increment_steps: 'null'
+  evaluation.train_subsample: 2000
+  seed: 42
+  plot: 'true'
+  warm_start_idx: 'null'
+  fine_tune.pretrained_path: ${PROJECT_DIR}/runs/data_saving/dsave_parent_heldout_r5/models/model_run0_best.pt.gz
+  fine_tune.target_stats: own
+  fine_tune.offshell_stats: own
+  training.lr: 0.001783506
+  training.optimizer: MuonAdamW
+  training.scheduler: WSD
+  training.wsd_cooldown_frac: 0.125
+  training.batchsize: 16384
+range_extension:
+  enabled: false
+search_space:
+- {name: fine_tune.lr_scale, type: float_log, low: 0.1, high: 10.0}
+- {name: fine_tune.layer_decay, type: float_uniform, low: 0.75, high: 1.0}
+- {name: training.muon_weight_decay, type: float_log, low: 1.0e-03, high: 0.3}
+- {name: training.regularization_lambda, type: float_log, low: 1.0e-10, high: 1.0e-06}
+- {name: training.cosanneal_warmup_frac, type: float_uniform, low: 0.05, high: 0.2}
+- {name: training.cosanneal_eta_min, type: float_log, low: 1.0e-10, high: 1.0e-07}
+- {name: ema, type: categorical, choices: ["false", "true"]}
+- {name: training.ema_decay, type: float_uniform, low: 0.9, high: 0.999}
