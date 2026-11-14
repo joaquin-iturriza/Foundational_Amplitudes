@@ -32838,6 +32838,12 @@ entries:
     units: null
     start: '2026-11-14T02:59:00+00:00'
     at: '2026-11-14T02:59:00+00:00'
+  - batch: kit_package_v6
+    wall_h: 0.5
+    jobs: 1
+    units: null
+    start: '2026-11-14T05:10:01+00:00'
+    at: '2026-11-14T05:10:01+00:00'
   ask: 'GPU budget: ~95 GPU-h above 30 with no decision covering it, now that the asymptotic factor fixes the KIT hard bins
     from scratch at the searched HPs (D402''s ''we clearly haven''t converged on something that does what we want'' no longer
     holds). (a) Step 20, Bakar''s fair one-loop protocol on ee->tt one-loop virtual with the factor: a fair_nlo parent with
