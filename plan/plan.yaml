@@ -28902,6 +28902,15 @@ entries:
       the factor). uugg''s check pass collected 1e6 predictions (35 min) for 200-event strata: a full-file read inside check,
       cost only. Next: kit_package.py check --repo on the three runs (repo code, original runs, CPU) to split package vs CPU/rebuild,
       then read the asym factor''s statistics.'
+  - at: '2026-11-14T04:34:58+00:00'
+    text: '2026-11-14 ~06:00. Step 5 package v5 check failure diagnosed: repo code on the original runs at 4 CPU threads (FA-ccin2p3-83880457)
+      reproduces v5''s deltas exactly (uug 2.6e-5, tt Sudakov 5.5e-3, threshold 4.85e-4): no package defect; the package at
+      1 thread (FA-ccin2p3-d56c5264) matches the runs'' GPU-made predictions to 0.00 on every uug and tt stratum. Cause: the
+      factor models'' predictions move with the CPU thread count, and kit_predict pinned 4. Fix (uncommitted, repo-reviewer
+      passed it): kit_predict default KIT_THREADS=1, README updated; kit_package._subset groups by phi only in azimuth (group)
+      strata (collinear strata have a per-event phi: the uugg 35-min whole-file read). Commit blocked by the repo-reviewer
+      backlog''s blocking finding in another entry (analysis/transfer/het_delta_summary.py metric change vs docs/results.tex
+      caption); rebuild v6 waits on that commit.'
   step_why:
     5:
       feeds: what KIT receives
