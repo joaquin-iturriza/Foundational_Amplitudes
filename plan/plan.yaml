@@ -27864,9 +27864,9 @@ entries:
     - 22
   owner:
     agent: a73c69a740b3e5d89
-    state: working
+    state: stopped
     since: '2026-11-14T00:45:04+00:00'
-    state_at: '2026-11-14T02:58:12+00:00'
+    state_at: '2026-11-14T02:59:41+00:00'
     context: 220624
     context_at: '2026-11-14T02:58:04+00:00'
   findings:
