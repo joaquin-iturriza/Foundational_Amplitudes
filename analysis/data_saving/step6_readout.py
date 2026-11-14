@@ -7,7 +7,7 @@ Primary: each search best's v_ft(t) / v_scr(t) (val mu-MSE in ln units, 3-check 
 as ft_constraint.py), the run fraction where it first reaches 1, or NEVER; KEPT if NEVER or after 0.5, arm KEPT at
 >= 2 of 3 D; branches a-d of the design. Per trial the same fraction and the warmup rise (ft_constraint.rise).
 Secondary: best val MSE(ln|M|^2) and test MSE (sigma stage, stage2_readout REMOTE) per arm and D; W/C, C/R, W/R and
-each over scratch, pooled (geometric mean over D) against 5^(1/sqrt 3); zero shot = step-0 val of each arm's trials.
+each over scratch, pooled (geometric mean over D) against 5^(1/sqrt 3); first val = the validation one interval in (the files hold no step-0 mu-MSE, the step-0 entry is the HETEROSC NLL).
 Diverged trials listed apart (D398). Figures: figs/step6_curves_{a,b,c} (per D the val curves of the four bests), figs/step6_ratio_{a,b,c} (per D each fine-tune best over the scratch best against the run fraction), figs/step6_best (best val per arm against D).
 
     python analysis/data_saving/step6_readout.py [--cached]   -> data/step6_readout.json, data/step6_rows.json
@@ -61,13 +61,13 @@ def lost_at(f, s):
     """The run fraction where v_f / v_s (smoothed) first reaches 1, None if never; the ratio curve."""
     a, b = smooth(f["val_ln"]), smooth(s["val_ln"])
     n = min(len(a), len(b))
-    fr, ratio = np.arange(n) / (n - 1), 10 ** (a[:n] - b[:n])
+    fr, ratio = (np.arange(n) + 1) / n, 10 ** (a[:n] - b[:n])   # val[i] is at step (i+1)*every; no step-0 entry
     return next((float(fr[i]) for i in range(n) if ratio[i] >= 1), None), fr, ratio
 
 
 def rise(r):
     v = smooth(r["val_ln"])
-    iw = max(1, int(round(r["hp"]["warmup_frac"] * (len(v) - 1))))
+    iw = max(1, int(round(r["hp"]["warmup_frac"] * len(v))) - 1)   # index of the check at the warmup end
     return float(10 ** (v[:iw + 1].max() - v[0]))
 
 
@@ -95,10 +95,10 @@ def main():
             b = best[D][a]
             te = test.get((b["sweep"], os.path.basename(b["run_dir"].rstrip("/"))), {})
             c = {"n": len(v), "best_val": b["val_min"], "best_test": te.get("mse_ln"), "best_run": b["run_dir"],
-                 "zero_shot_val": [float(r["val_ln"][0]) for r in v]}
+                 "first_val": [float(r["val_ln"][0]) for r in v]}   # first validation, one interval in (no step-0 mu-MSE in the files)
             if a != "scr":
                 lost, _, ratio = lost_at(b, sc)
-                c.update(start_ft_over_scr=float(ratio[0]), lost_at=lost,
+                c.update(first_ft_over_scr=float(ratio[0]), lost_at=lost,
                          kept=lost is None or lost > 0.5, best_rise=rise(b), best_warmup_frac=b["hp"]["warmup_frac"],
                          # the warmup test's rule: kept past the trial's own warmup end by more than LAG of the run
                          kept_after_warmup=lost is None or lost - b["hp"]["warmup_frac"] > LAG,
@@ -140,10 +140,10 @@ def main():
     for D, c in out["cells"].items():
         print(f"D={D}: " + "  ".join(
             f"{a} best {c[a]['best_val']:.2e} test {c[a]['best_test'] or float('nan'):.2e}"
-            + (f" start {c[a]['start_ft_over_scr']:.3f} lost {c[a]['lost_at']} rise {c[a]['best_rise']:.2f}"
+            + (f" first-val {c[a]['first_ft_over_scr']:.3f} lost {c[a]['lost_at']} rise {c[a]['best_rise']:.2f}"
                if a != "scr" else "") for a in ("scr", "R", "C", "W", "L") if a in c))
         print("      " + "  ".join(f"{q} {c[q]:.3g}" for q in c if "/" in q)
-              + "  zero shot " + "  ".join(f"{a} {np.median(c[a]['zero_shot_val']):.3g}" for a in ("R", "C", "W") if a in c)
+              + "  first val (1 interval in) " + "  ".join(f"{a} {np.median(c[a]['first_val']):.3g}" for a in ("R", "C", "W") if a in c)
               + "  failed " + str({a: c[a]["failed"] for a in NEW if a in c and c[a]["failed"]}))
     print(json.dumps({k: v for k, v in out.items() if k != "cells"}))
     json.dump(out, open(os.path.join(DATA, "step6_readout.json"), "w"), indent=1)
@@ -157,7 +157,7 @@ def main():
             r = best[D].get(a)
             if r is None:
                 continue
-            st = np.arange(len(r["val_ln"])) * (r.get("every") or 1)
+            st = (np.arange(len(r["val_ln"])) + 1) * (r.get("every") or 1)
             ax.plot(st, r["val_ln"], color=col, linestyle=ls, label=lab)
         ax.set_yscale("log"); ax.set_xlabel("step"); ax.set_ylabel(r"val MSE$(\ln|\mathcal{M}|^2)$")
         ps.process_label(ax, rf"$b\bar b\to ZZ$, $D={D}$", loc="upper right")
