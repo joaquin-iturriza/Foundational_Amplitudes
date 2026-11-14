@@ -69,9 +69,51 @@ def versus(path, ref):
                   f"better: {(x < 0).sum()} worse: {(x > 0).sum()}")
 
 
+def verdict(path, arm, ref):
+    """The passed design's outcome (kit_benchmark, 2026-11-13 10:47) per hard family, arm against control `ref`:
+    FIXED  |exponent - truth's| <= 0.1, |deepest-bin median signed error| <= 0.3, bulk log-MSE <= 0.5 decades worse;
+    MOVED  deepest |signed error| at least halved and the exponent closer to the truth's;
+    STAYED deepest signed error within 0.3 of the control's; else inconclusive.
+    Signed error = median of prediction - truth (log10|M|^2) in the deepest stratum (kit_figures collect's `med`).
+    A family KIT fits no exponent for (sudakov) can only be STAYED or inconclusive: its signed errors are printed."""
+    import numpy as np
+    d = json.load(open(path))
+    a, c = d["runs"][arm], d["runs"][ref]
+    bulk = lambda r: next(v["logmse"] for k, v in r["strata"].items() if k.startswith("bulk_test/"))
+    dbulk = float(np.log10(bulk(a) / bulk(c)))
+    out = {"bulk_decades": dbulk, "families": {}}
+    print(f"== {arm} vs {ref}: bulk log-MSE {bulk(a):.3g} vs {bulk(c):.3g} ({dbulk:+.2f} decades)")
+    for fam, (st, _, lm) in sorted(deepest(a["strata"]).items()):
+        k = next(k for k in a["strata"] if k.startswith(f"hard_test/{st}/"))
+        ba, bc, lc = a["strata"][k]["med"], c["strata"][k]["med"], c["strata"][k]["logmse"]
+        sk = next((k2 for k2 in a.get("slopes", {}) if k2.startswith(fam + "/")), None)
+        ea, ec, et = (a["slopes"][sk]["pred"], c["slopes"][sk]["pred"], a["slopes"][sk]["truth"]) if sk else (None,) * 3
+        if sk and abs(ea - et) <= 0.1 and abs(ba) <= 0.3 and dbulk <= 0.5:
+            v = "FIXED"
+        elif sk and abs(ba) <= 0.5 * abs(bc) and abs(ea - et) < abs(ec - et):
+            v = "MOVED"
+        elif abs(ba - bc) <= 0.3:
+            v = "STAYED"
+        else:
+            v = "inconclusive"
+        out["families"][fam] = dict(stratum=st, logmse=lm, logmse_ref=lc, bias=ba, bias_ref=bc, exp=ea, exp_ref=ec,
+                                    exp_truth=et, verdict=v)
+        e = f"exp {ea:+.2f} vs {ec:+.2f} (truth {et:+.2f})" if sk else "no exponent"
+        print(f"  {fam:14s} {st}: log-MSE {lm:.3g} vs {lc:.3g}, signed {ba:+.2f} vs {bc:+.2f}, {e}: {v}")
+    return out
+
+
 if __name__ == "__main__":
-    # python tools/kit_readout.py <json> [--vs <run name>]
-    if "--vs" in sys.argv:
+    # python tools/kit_readout.py <json> [--vs <run name>] [--verdict <arm> <control> ...pairs]
+    if "--verdict" in sys.argv:
+        av = sys.argv[:]
+        out = av.pop(av.index("--out") + 1) if "--out" in av else None
+        av = [x for x in av if x != "--out"]
+        pairs = av[av.index("--verdict") + 1:]
+        res = {f"{a} vs {r}": verdict(av[1], a, r) for a, r in zip(pairs[::2], pairs[1::2])}
+        if out:
+            json.dump(res, open(out, "w"), indent=1)
+    elif "--vs" in sys.argv:
         versus(sys.argv[1], sys.argv[sys.argv.index("--vs") + 1])
     else:
         main(sys.argv[1])

@@ -18,6 +18,8 @@ without the mu-MSE, so a failing NLL curve can still hide a sound mu-MSE curve (
     python tools/kit_curves.py sweep kit_hpo_uug_plain kit_hpo_ttvirt_thr --out analysis/kit_benchmark/data/kit_hpo.json
         (step 15's searches, driven by sweep/drive.py: the trials in sweeps_local/<name>/results, their curves read on CC: per trial its HPs, best val mu-MSE and curve_quality on the mu-MSE curves
          val_mse_curve / train_eval_mse_curve; chosen = the lowest best val among the good trials)
+    python tools/kit_curves.py runs <run dir> ... [--control NAME=<sweep json>#<search>#<trial file>] --out <json>
+        (curve_quality on KIT runs' mu-MSE curves, result.json on CC; controls from a `sweep` output); runsfig <json> <names> --out <base>
     python tools/kit_curves.py sweepfig analysis/kit_benchmark/data/kit_hpo.json --out analysis/kit_benchmark/figs/kit_hpo
 """
 import argparse
@@ -271,6 +273,56 @@ def sweep_fig(data, base):
     ps.save(fig, base + "_curves")
 
 
+def runs_read(dirs, controls, out):
+    """curve_quality on the val/train mu-MSE curves of KIT runs (their result.json, written by job_kit.sh, read on CC)
+    and of the searched trials used as their controls (rows of a `sweep` output: NAME=<json>#<search>#<trial file>)."""
+    sys.path.insert(0, os.path.join(ROOT, "analysis", "data_saving"))
+    from curve_quality import quality as q_mse
+    from analysis.common.readers import site_python
+    import base64
+    rows = [["arms", os.path.basename(d.rstrip("/")), d.rstrip("/") + "/result.json", d] for d in dirs]
+    d = {r["file"]: r for r in site_python(SWEEP_SITE, [base64.b64encode(json.dumps(rows).encode()).decode()],
+                                           "KITHPO").get("arms", [])}
+    for c in controls:
+        name, _, src = c.partition("=")
+        f, search, trial = src.split("#")
+        d[name] = next(t for t in json.load(open(f))[search]["trials"] if t["file"] == trial)
+    for name, r in d.items():
+        r.update(q_mse(r["val"], r["train"]))
+        print(f"{name:66s} best val {r['val_loss']:.3g}  sep {r['separation']:.3g}  end_up {r['end_up']:.3g}  "
+              + ("good" if r["well"] else "BAD"))
+    json.dump(d, open(out, "w"), indent=1)
+
+
+# panel labels of the runs read by `runs` (tags hpo_<arm> of the steps 14/17/19/21 batch)
+RUN_LAB = {"softpair_plain": "control", "softpairthr": "control", "softpair": "scratch, no $\\log\\beta^2$",
+           "softpair_plain_divform": "div-form inputs", "softpairthr_divform": "div-form inputs",
+           "softpair_plain_rezero": "ReZero", "softpairthr_rezero": "ReZero", "asym_cont": "asymptotic factor",
+           "asym_cont_sud1": "factor + single log", "ftr5own": "pretrained", "ftr5thrown": "pretrained + LO tops",
+           "ftr5thrbetaown": "pretrained + LO tops, $\\log\\beta^2$",
+           "ftr5thrloopown": "pretrained + LO, 1-loop tops",
+           "ftr5thrloopbetaown": "pretrained + LO, 1-loop tops,\n$\\log\\beta^2$"}
+
+
+def runs_fig(data, runs, base):
+    """one panel per run (<base>_a, _b, ... in the order given): its validation and training mu-MSE against step"""
+    import plot_style as ps
+    d = json.load(open(data))
+    figs = ps.panels(len(runs))
+    for (fig, ax), run in zip(figs, runs):
+        r = d[run]
+        x = np.arange(1, len(r["val"]) + 1) * 1831 / len(r["val"])  # evaluations spread evenly over 1831 steps
+        ax.plot(x, smooth(r["val"]), color=ps.C.vermillion, label="validation")
+        ax.plot(x, smooth(r["train"]), color=ps.C.blue, linestyle="--", label="training")
+        ax.set_yscale("log"); ax.set_xlabel("training step"); ax.set_ylabel(r"MSE$(\mu)$")
+        proc = SWEEP_LAB["kit_hpo_uug_plain" if "_uug_" in run else "kit_hpo_uugg_T" if "_uugg_" in run
+                         else "kit_hpo_ttvirt_thr"].split(",")[0]
+        ps.process_label(ax, proc + ", " + RUN_LAB[run.split("_hpo_")[1]], loc="lower left")
+        ps.legend(ax, "upper right")
+    for w in ps.save_panels(figs, base):
+        print(w)
+
+
 def main():  # dup-ok: argparse boilerplate (collect/read), no shared logic
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -279,6 +331,9 @@ def main():  # dup-ok: argparse boilerplate (collect/read), no shared logic
     w = sub.add_parser("sweep"); w.add_argument("names", nargs="+"); w.add_argument("--out", required=True)
     f = sub.add_parser("sweepfig"); f.add_argument("data"); f.add_argument("--out", required=True)
     p = sub.add_parser("curves"); p.add_argument("data"); p.add_argument("runs", nargs="+"); p.add_argument("--out", required=True)
+    u = sub.add_parser("runs"); u.add_argument("dirs", nargs="+"); u.add_argument("--control", action="append", default=[])
+    u.add_argument("--out", required=True)
+    v = sub.add_parser("runsfig"); v.add_argument("data"); v.add_argument("runs", nargs="+"); v.add_argument("--out", required=True)
     a = ap.parse_args()
     if a.cmd == "collect":
         from analysis.common.readers import site_python
@@ -286,6 +341,10 @@ def main():  # dup-ok: argparse boilerplate (collect/read), no shared logic
         print(f"-> {a.out}")
     elif a.cmd == "curves":
         plot_runs(json.load(open(a.data)), a.runs, a.out)
+    elif a.cmd == "runs":
+        runs_read(a.dirs, a.control, a.out)
+    elif a.cmd == "runsfig":
+        runs_fig(a.data, a.runs, a.out)
     elif a.cmd == "sweepfig":
         sweep_fig(a.data, a.out)
     elif a.cmd == "sweep":

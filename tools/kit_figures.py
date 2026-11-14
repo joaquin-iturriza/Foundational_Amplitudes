@@ -2,7 +2,7 @@
 """Figures of the KIT hard phase-space benchmark: per process, each arm's KIT log10-MSE per hard_test stratum and its
 median predicted log10|M|^2 against the truth's, along the stratum family's singular variable.
 
-    python tools/kit_figures.py collect <run dir> ... > out.txt     (on the site: reads the runs and the KIT files)
+    python tools/kit_figures.py collect <run dir>[=<KIT run name>] ... > out.txt     (on the site: reads the runs and the KIT files)
     python tools/kit_figures.py plot <collected.json> [--out analysis/kit_benchmark/figs]
 
 collect, per run dir (runs/kit/kit_<mode>_<file>_<target>_n<N>_t<T>[_tag]): its kit_benchmark/kit_result.json
@@ -78,7 +78,10 @@ def collect(run_dirs):
     from tools import kit_hardps as kh
     out = {"runs": {}, "truth": {}}
     for rd in run_dirs:
-        m = RUN_RE.match(os.path.basename(rd.rstrip("/")))
+        # <dir>=<name>: a run dir not named as a KIT run (a kit_hpo trial scored as a control) under a KIT run name
+        rd, _, alias = rd.partition("=")
+        alias = alias or os.path.basename(rd.rstrip("/"))
+        m = RUN_RE.match(alias)
         if not m:
             raise SystemExit(f"not a KIT run dir: {rd}")
         stem, target = m["file"], m["target"]
@@ -99,7 +102,9 @@ def collect(run_dirs):
                 y = np.asarray(p[f"hard_test/{st}/{ds}"][:], np.float64)
                 sv = (np.asarray(g["singular_var"][:], np.float64) if "singular_var" in g
                       else np.full(len(t), np.sqrt(np.prod(edges(st)))))
-                strata[name] = dict(r, x=float(np.median(sv)), lo=edges(st)[0], hi=edges(st)[1])
+                # med: median signed error (prediction - truth, log10|M|^2), the kit_benchmark design's outcome measure
+                strata[name] = dict(r, x=float(np.median(sv)), lo=edges(st)[0], hi=edges(st)[1],
+                                    med=float(np.median(y - t)))
                 assert len(t) == len(y), (name, len(t), len(y))
                 fams.setdefault(family(st), []).append((sv, t, y, st))
             if key not in out["truth"]:
@@ -127,7 +132,7 @@ def collect(run_dirs):
                                  int(s.sum())])
             meds[fam] = rows
             out["truth"][key]["median"].setdefault(fam, [[r[0], r[1]] for r in rows])
-        out["runs"][os.path.basename(rd.rstrip("/"))] = {
+        out["runs"][alias] = {
             "mode": m["mode"], "file": stem, "target": target, "n": int(m["n"]), "steps": int(m["t"]),
             "tag": m["tag"] or "", "strata": strata, "slopes": res.get("slopes", {}), "medians": meds}
     print("KITFIG " + json.dumps(out))
@@ -160,6 +165,12 @@ INPUT_ARMS = {"pairlogs": r"+ $\log(s_{ij}/s)$ inputs", "softrescale": "+ soft l
               "softpairthr_asym_plainlog": r"+ $\log(s_{ij}/s)$ + $\log\beta^2$" + "\n" + "+ asymptotic factor",
               "asym_cont": "asymptotic factor,\n" + r"no log inputs, $\gamma\leq4$",
               "asym_cont_plainlog": "asymptotic factor,\n" + r"no log inputs, $\gamma\leq4$",
+              # steps 14/19/21 at the kit_hpo chosen HPs (tags hpo_<arm>; the hpo_ prefix is dropped for the legend)
+              "asym_cont_sud1": "asymptotic factor + single log,\n" + r"no log inputs, $\gamma\leq4$",
+              "softpair_plain_divform": "plain target\n+ divergence-form inputs",
+              "softpair_plain_rezero": "plain target, ReZero",
+              "softpairthr_divform": r"+ soft rescale + $\log(s_{ij}/s)$ + $\log\beta^2$" + "\n" + "+ divergence-form inputs",
+              "softpairthr_rezero": r"+ soft rescale + $\log(s_{ij}/s)$ + $\log\beta^2$" + "\n" + "ReZero",
               # A_ft: the parent's pretraining (catalog_v4 with the KIT families held out, + LO / one-loop top pairs near
               # threshold), then the inputs every such arm has (input_soft_eps, input_pair_logs=6; beta where tagged)
               "ftr5own": "held-out catalog\n" + r"+ soft rescale + $\log(s_{ij}/s)$",
@@ -176,7 +187,7 @@ def arm_label(r, with_n=True):
     how = {"A": "scratch", "A_ft": "pretrained", "B": "scratch + hard events",
            "B_bulk": "scratch + 3000 steps\non bulk only"}[r["mode"]]
     lab = f"{how}, {n} bulk" if with_n else how
-    tag = r["tag"]
+    tag = r["tag"].removeprefix("hpo_")
     if tag.endswith("lr0p1"):   # the A_ft design's lr-axis check (KIT_LR_SCALE=0.1)
         lab += r", lr $\times0.1$"
         tag = tag[:-len("lr0p1")].rstrip("_")
