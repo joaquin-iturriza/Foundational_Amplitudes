@@ -33236,7 +33236,7 @@ entries:
     context_at: '2026-11-13T17:27:04+00:00'
   step_waits:
     '2': '2026-11-15: review of the sent v6/v7 draft bundles'
-    '3': '2026-11-14'
+    '3': '2026-11-20: next draft round'
   findings:
   - at: '2026-11-13T02:46:58+00:00'
     text: '2026-11-13 ~03:50 Joaquin: ''we should start actually doing the work on the draft with what we have ... Let''s
