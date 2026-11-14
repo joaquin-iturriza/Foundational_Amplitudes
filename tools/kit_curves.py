@@ -273,6 +273,50 @@ def sweep_fig(data, base):
     ps.save(fig, base + "_curves")
 
 
+def ft_fig(search, arms, base):
+    """a fine-tune search against its scratch controls (kit_benchmark step 21): (a) each trial's best validation
+    mu-MSE against its fine_tune.lr_scale, good/bad by curve_quality, the controls' best as lines and the unsearched
+    fine-tune (lr_scale 1) as a star; (b) validation and training mu-MSE curves of the chosen trial and the controls.
+    search: a `sweep` output; arms: a `runs` output holding the controls (scratch, scratch+beta) and the lr_scale-1 FT"""
+    import plot_style as ps
+    import matplotlib.pyplot as plt
+    (name, d), = json.load(open(search)).items()
+    a = json.load(open(arms))
+    ref = {"scratch": a["kit_A_ee_tt_virt_finite_n100000_t1831_hpo_softpair"],
+           r"scratch+$\beta$": json.load(open(os.path.join(os.path.dirname(arms), "kit_hpo.json")))["kit_hpo_ttvirt_thr"]}
+    ref[r"scratch+$\beta$"] = next(r for r in ref[r"scratch+$\beta$"]["trials"] if r["file"] == "hp0131_t1831.json")
+    ft1 = a["kit_A_ft_ee_tt_virt_finite_n100000_t1831_hpo_ftr5own"]
+    rows = [r for r in d["trials"] if r["val_loss"] is not None]
+    ch = next(r for r in rows if r["file"] == d["chosen"])
+    # the sweep read keeps the training.* HPs only; lr_scale from the driver's trial records
+    st = json.load(open(os.path.join(ROOT, "sweeps_local", name, "driver_state.json")))["trials"]
+    scale = {f"hp{t['hp_idx']:04d}_t{t['t_steps']}.json": t["hp"]["fine_tune.lr_scale"]
+             for t in (st if isinstance(st, list) else st.values())}
+    fig, (ax, bx) = ps.figure(ncols=2)
+    for well, c, lab in ((True, ps.C.blue, "FT good"), (False, ps.C.vermillion, "FT bad")):
+        g = [r for r in rows if bool(r.get("well")) == well]
+        if g:
+            ax.scatter([scale[r["file"]] for r in g], [r["val_loss"] for r in g], color=c, label=lab)
+    ax.scatter([1.0], [ft1["val_loss"]], marker="*", color="k", label="FT, no search")
+    for (lab, r), c in zip(ref.items(), (ps.C.orange, ps.C.green)):
+        ax.axhline(r["val_loss"], color=c, linestyle="--", label=lab)
+    ax.set_xscale("log"); ax.set_yscale("log")
+    ax.xaxis.set_minor_formatter(plt.NullFormatter())
+    ax.set_xlabel(r"fine-tune lr scale"); ax.set_ylabel(r"best val MSE$(\mu)$")
+    ps.process_label(ax, r"$t\bar t$ virtual")
+    ps.legend(ax, "upper left"); ps.make_room(ax)
+    for r, c, lab in ((ch, ps.C.blue, "FT"), (ref["scratch"], ps.C.orange, "scratch"),
+                      (ref[r"scratch+$\beta$"], ps.C.green, r"scratch+$\beta$")):
+        x = np.arange(1, len(r["val"]) + 1) * 1831 / len(r["val"])  # evaluations spread evenly over 1831 steps
+        bx.plot(x, smooth(r["val"]), color=c, label=lab)
+        bx.plot(x, smooth(r["train"]), color=c, linestyle="--")
+    bx.plot([], [], color=ps.C.grey, linestyle="--", label="train")   # line style key: solid val, dashed train
+    bx.set_yscale("log"); bx.set_xlabel("training step"); bx.set_ylabel(r"MSE$(\mu)$")
+    ps.process_label(bx, r"$t\bar t$ virtual")
+    ps.legend(bx, "lower left"); ps.make_room(bx)
+    ps.save(fig, base)
+
+
 def runs_read(dirs, controls, out):
     """curve_quality on the val/train mu-MSE curves of KIT runs (their result.json, written by job_kit.sh, read on CC)
     and of the searched trials used as their controls (rows of a `sweep` output: NAME=<json>#<search>#<trial file>)."""
@@ -334,8 +378,11 @@ def main():  # dup-ok: argparse boilerplate (collect/read), no shared logic
     u = sub.add_parser("runs"); u.add_argument("dirs", nargs="+"); u.add_argument("--control", action="append", default=[])
     u.add_argument("--out", required=True)
     v = sub.add_parser("runsfig"); v.add_argument("data"); v.add_argument("runs", nargs="+"); v.add_argument("--out", required=True)
+    g = sub.add_parser("ftfig"); g.add_argument("search"); g.add_argument("arms"); g.add_argument("--out", required=True)
     a = ap.parse_args()
-    if a.cmd == "collect":
+    if a.cmd == "ftfig":
+        ft_fig(a.search, a.arms, a.out)
+    elif a.cmd == "collect":
         from analysis.common.readers import site_python
         json.dump(site_python(SITE, [], "KITCURVES"), open(a.out, "w"))
         print(f"-> {a.out}")
