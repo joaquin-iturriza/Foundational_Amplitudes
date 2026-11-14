@@ -21404,7 +21404,10 @@ entries:
   - D407
   - D420
   - D441
-  next: null
+  next:
+    2: True step-0 zero shot for the step-6 readout (its first value is the validation one interval in, ~2% of the run; 37dd99de
+      renamed it first_val; no step-0 mu-MSE is stored). Read the parent's mu-MSE on each target before any fine-tune step
+      via tools/zero_shot_parent.py; grep the other readers that take val[0] as a zero shot.
   done_when: null
   notes_ref: null
   match: dsave_*
@@ -27130,6 +27133,12 @@ entries:
     the network''; old-setup examples for the draft) and 2026-11-13T00:57 (draft figure edits; ''Didn''t we already find ...
     the different scheduler'') set the head-start investigation and the draft figure, not whether the grid now runs'
   holds_all: the entry's next work is Joaquin's call under D420
+  step_why:
+    2:
+      feeds: how large the fine-tune's head start is at step 0, against the first validation the step-6 read uses
+      if:
+      - 'step-0 head start within 10% of first_val''s: keep the read, relabel only'
+      - 'step-0 head start larger: redo the lost_at figures from the true step 0'
 - id: optimizations_recap
   title: 'the optimizations section: pID against quantum numbers rerun, Muon to 1e-4, and the write-up of every choice'
   question: Do pIDs and quantum numbers still behave the same on the latest setup, does the Muon advantage hold down to MSE
