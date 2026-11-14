@@ -180,9 +180,20 @@ INPUT_ARMS = {"pairlogs": r"+ $\log(s_{ij}/s)$ inputs", "softrescale": "+ soft l
               "ftr5thrloopbetaown": "held-out catalog\n+ LO and one-loop tops\n" + r"+ soft rescale + $\log(s_{ij}/s)$" + "\n" + r"+ $\log\beta^2$"}
 
 
-def arm_label(r, with_n=True):
+# short legend symbols (--short; the caption defines them): steps 14/17/19/21 at the kit_hpo chosen HPs
+SHORT = {"softpair_plain": "scratch", "softpair": "scratch", "softpairthr": r"scratch+$\beta$",
+         "asym_cont": "factor", "asym_cont_sud1": "factor+log",
+         "softpair_plain_divform": "div-form", "softpairthr_divform": "div-form",
+         "softpair_plain_rezero": "ReZero", "softpairthr_rezero": "ReZero",
+         "ftr5own": "FT", "ftr5thrown": "FT+LO", "ftr5thrbetaown": r"FT+LO+$\beta$",
+         "ftr5thrloopown": "FT+1L", "ftr5thrloopbetaown": r"FT+1L+$\beta$"}
+
+
+def arm_label(r, with_n=True, short=False):
     """legend text saying what the curve is (D368, D369): how the network was trained, then the bulk size (left out
-    when every curve of the figure has the same one; the caption gives it)"""
+    when every curve of the figure has the same one; the caption gives it); short: the SHORT symbol"""
+    if short:
+        return SHORT[r["tag"].removeprefix("hpo_")]
     n = r"$10^5$" if r["n"] == 100000 else r"$9\times10^5$"
     how = {"A": "scratch", "A_ft": "pretrained", "B": "scratch + hard events",
            "B_bulk": "scratch + 3000 steps\non bulk only"}[r["mode"]]
@@ -200,7 +211,7 @@ def arm_label(r, with_n=True):
     return lab
 
 
-def plot(path, outdir, prefix="", split_offshell=False):
+def plot(path, outdir, prefix="", split_offshell=False, short=False):
     import plot_style as ps
     from matplotlib.ticker import NullFormatter
     d = json.load(open(path))
@@ -217,7 +228,7 @@ def plot(path, outdir, prefix="", split_offshell=False):
         if off:     # every curve of this figure has the off-shellness input off: the caption says so, not the legend
             runs = [(nm, dict(r, tag="")) for nm, r in runs]
         with_n = len({r["n"] for _, r in runs}) > 1
-        arms = [(arm_label(r, with_n), colors[i % len(colors)], r) for i, (_, r) in enumerate(runs)]
+        arms = [(arm_label(r, with_n, short), colors[i % len(colors)], r) for i, (_, r) in enumerate(runs)]
         ls = {}
         if len(runs) > len(colors):   # colours would repeat: a fine-tune takes its scratch twin's colour, dashed (lr x0.1 dotted)
             twin = {(r["n"], r["tag"]): c for _, c, r in arms if r["mode"] == "A"}
@@ -241,12 +252,12 @@ def plot(path, outdir, prefix="", split_offshell=False):
                 ax.plot(*zip(*pts), "o", ls=ls.get(id(r), "-"), color=c, label=lab)
             fl = sorted((v["x"], v["mse"]) for st, v in tr["floor"].items() if family(st) == fam)
             if any(m > 0 for _, m in fl):   # zero in every bin (truth inside the training range): not drawn, no entry
-                ax.plot(*zip(*fl), "--", color=ps.C.grey, label="truth clipped to\ntraining range")
+                ax.plot(*zip(*fl), "--", color=ps.C.grey, label="clip" if short else "truth clipped to\ntraining range")
             ref = MLP.get((stem, target, fam))
             if ref:
                 x = np.sqrt(ref[0] * ref[1])
-                ax.plot([x], [ref[2]], "*", color="k", label="KIT MLP (log inputs)")
-                ax.plot([x], [ref[3]], "x", color="k", label="KIT MLP (raw inputs)")
+                ax.plot([x], [ref[2]], "*", color="k", label="MLP log" if short else "KIT MLP (log inputs)")
+                ax.plot([x], [ref[3]], "x", color="k", label="MLP raw" if short else "KIT MLP (raw inputs)")
             ax.set_xscale("log")
             ax.xaxis.set_minor_formatter(NullFormatter())
             ax.set_yscale("log")
@@ -290,6 +301,55 @@ def plot(path, outdir, prefix="", split_offshell=False):
         print(w)
 
 
+# summary: deepest-bin log-MSE per family, one panel per process (families grouped by process)
+FAMS = {("ee_uug", "me2"): [("coll_y", "coll"), ("soft_x", "soft")],
+        ("ee_uugg", "me2"): [("coll_gg_y", "gg coll"), ("coll_qg_y", "qg coll"), ("soft_x", "soft")],
+        ("ee_tt", "virt_finite"): [("threshold_beta", "Coulomb"), ("sudakov_sqrts", "Sudakov")]}
+
+
+def summary(path, out):
+    """the deepest-bin log-MSE of every arm and control of a kit_readout --verdict json, per family"""
+    import plot_style as ps
+    d = json.load(open(path))
+    vals = {}   # (file, target) -> {tag: {family: logmse}}
+    for pair, v in d.items():
+        for name, key in zip(pair.split(" vs "), ("logmse", "logmse_ref")):
+            m = RUN_RE.match(name)
+            for fam, x in v["families"].items():
+                vals.setdefault((m["file"], m["target"]), {}).setdefault(m["tag"].removeprefix("hpo_"), {})[fam] = x[key]
+    procs = [p for p in FAMS if p in vals]
+    # one style per legend symbol across the panels; the fine-tunes share hollow black markers, one shape per parent
+    C = ps.C
+    sty = {"scratch": (C.vermillion, "s"), r"scratch+$\beta$": (C.orange, "s"), "factor": (C.blue, "o"),
+           "factor+log": (C.sky, "o"), "div-form": (C.green, "D"), "ReZero": (C.purple, "^"),
+           "FT": ("k", "v"), "FT+LO": ("k", "<"), r"FT+LO+$\beta$": ("k", ">"), "FT+1L": ("k", "p"),
+           r"FT+1L+$\beta$": ("k", "h")}
+    figs = ps.panels(len(procs))
+    for (fig, ax), p in zip(figs, procs):
+        order = list(sty)
+        fams, arms = FAMS[p], sorted(vals[p], key=lambda t: order.index(SHORT[t]))
+        w = 0.7 / len(arms)
+        for j, t in enumerate(arms):
+            xs = [(i - 0.35 + w * (j + 0.5), vals[p][t][f]) for i, (f, _) in enumerate(fams) if f in vals[p][t]]
+            c, mk = sty[SHORT[t]]
+            ax.plot(*zip(*xs), mk, ls="", color=c, mfc="none" if t.startswith("ft") else c, label=SHORT[t])
+        ref = [(i, MLP[(*p, f)][2]) for i, (f, _) in enumerate(fams) if (*p, f) in MLP]
+        ax.hlines([y for _, y in ref], [i - 0.4 for i, _ in ref], [i + 0.4 for i, _ in ref], color="k", label="MLP log")
+        ax.set_xticks(range(len(fams)), [lab for _, lab in fams])
+        ax.set_xlim(-0.6, len(fams) - 0.4)
+        ax.set_yscale("log")
+        ax.set_ylabel(r"deepest-bin log-MSE of $\log_{10}|\mathcal{M}|^2$")
+        ps.process_label(ax, PROC[p])
+        ps.shared_legend(fig, ax, ncol=3)   # a strip above every panel: in-axes legends sat on markers
+        # a quarter of the span clear above the highest marker (make_room tests marker centres only: the tt ReZero
+        # Sudakov point at 3e6 sat under the process label)
+        ys = [y for t in arms for y in vals[p][t].values()] + [y for _, y in ref]
+        lo, hi = np.log10(min(ys)), np.log10(max(ys))
+        ax.set_ylim(10 ** (lo - 0.1 * (hi - lo)), 10 ** (hi + 0.25 * (hi - lo)))
+    for w in ps.save_panels(figs, out):
+        print(w)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -301,11 +361,17 @@ def main():
     p.add_argument("--prefix", default="", help="file name prefix after kit_mse_ / kit_median_ (e.g. B_)")
     p.add_argument("--split-offshell", action="store_true",
                    help="the off-shellness-off runs in their own figures (<base>_nooffshell), not beside the on ones")
+    p.add_argument("--short", action="store_true", help="legend symbols of SHORT (the caption defines them)")
+    s = sub.add_parser("summary")
+    s.add_argument("verdict", help="a tools/kit_readout.py --verdict json")
+    s.add_argument("--out", default=os.path.join(ROOT, "analysis", "kit_benchmark", "figs", "kit_deepest_A_hpo"))
     a = ap.parse_args()
     if a.cmd == "collect":
         collect(a.run_dirs)
+    elif a.cmd == "summary":
+        summary(a.verdict, a.out)
     else:
-        plot(a.data, a.out, a.prefix, a.split_offshell)
+        plot(a.data, a.out, a.prefix, a.split_offshell, a.short)
 
 
 if __name__ == "__main__":
