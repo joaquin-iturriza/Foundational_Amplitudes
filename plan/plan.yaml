@@ -27663,8 +27663,6 @@ entries:
   - D424
   - D428
   next:
-    5: 'Checkpoint + inference package for KIT (Joaquin sends it): best A_ft/B checkpoints, a float64 predict script, log10|M|^2
-      out; after the A_ft batch'
     20: 'Bakar''s fair one-loop protocol (2026-11-09 email): pretrain on tree of all processes incl. target''s tree (hard
       points ok) + at most ~0-10 other one-loop processes bulk only; target 100-1e4 one-loop bulk points, no hard one-loop
       points from any process; whole family held out; standardisation/early stopping/features bulk only; baseline from-scratch
@@ -28919,11 +28917,6 @@ entries:
       strata (first 200 events each, azimuth 192); check took ~1 min (v5 35 min). Ready for Joaquin to send to KIT. Caveat:
       at 4 CPU threads predictions move up to 5.5e-3 log10 (tt Sudakov), stated in README.'
   step_why:
-    5:
-      feeds: what KIT receives
-      if:
-      - 'A_ft best: package A_ft'
-      - 'B best: package B'
     20:
       feeds: the KIT NLO statement in the draft
       if:
@@ -28936,7 +28929,6 @@ entries:
       - 'Joaquin drops them: A2 alone is the KIT model; record the dead ends'
   step_waits:
     '20': '2026-11-14'
-    '5': FA-ccin2p3-0d3b978a
   handoff:
     state: '2026-11-14 ~04:45 @11222e57. Steps 14/17/19/21 read at the kit_hpo HPs (findings 2026-11-14T00:28, ~04:00): the
       asymptotic factor (A2) is the only arm that fixes the KIT hard families (uug coll+soft, uugg gg/qg coll+soft, tt Coulomb;
