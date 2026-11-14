@@ -28911,6 +28911,13 @@ entries:
       strata (collinear strata have a per-event phi: the uugg 35-min whole-file read). Commit blocked by the repo-reviewer
       backlog''s blocking finding in another entry (analysis/transfer/het_delta_summary.py metric change vs docs/results.tex
       caption); rebuild v6 waits on that commit.'
+  - at: '2026-11-14T05:22:07+00:00'
+    text: '2026-11-14 ~06:15. Step 5 done: KIT package v6 (FA-ccin2p3-0d3b978a, code @a1603add incl. 817d0d0c: kit_predict
+      at 1 CPU thread, subset by phi groups only in azimuth strata) = the three asymptotic-factor models at the searched HPs
+      (labels uug/uugg/tt_virtual_asymptotic_factor), runs/kit/kit_package_v6.tar.gz on CC, 47.5 MB; check PACKAGE_OK: max
+      |delta log10| package (CPU, 1 thread) vs the runs'' own GPU predictions 0.00e+00 on all 11 uug, 19 uugg, 8 tt virtual
+      strata (first 200 events each, azimuth 192); check took ~1 min (v5 35 min). Ready for Joaquin to send to KIT. Caveat:
+      at 4 CPU threads predictions move up to 5.5e-3 log10 (tt Sudakov), stated in README.'
   step_why:
     5:
       feeds: what KIT receives
