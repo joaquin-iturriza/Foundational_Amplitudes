@@ -27666,10 +27666,6 @@ entries:
       these columns behind a new default-off flag + Lorentz-invariance test as tests/test_input_reps.py). One short test:
       uug (plain target and/or T target, controls 203a274f / c15b3337) and tt virtual (control softpairthr 3fc1016a), from
       scratch 1e5, at an lr where validation stays with training (step 15), own design + design-reviewer + D395 smoke.'
-    17: 'Redo of 11c (fine-tunes from the held-out-catalog parents, with LO tops / LO and one-loop tops, with and without
-      log beta^2, and their scratch controls) at the step-15/16 chosen settings for t t~ virtual: the 11c runs (8000 cosine
-      steps) are not converged (NLL still falling 1.1-2.0 nats over the last 800 steps; 3 of 7 fail separation narrowly),
-      finding 2026-11-12 ~23:30. Own design after kit_hpo''s read.'
     20: 'Bakar''s fair one-loop protocol (2026-11-09 email): pretrain on tree of all processes incl. target''s tree (hard
       points ok) + at most ~0-10 other one-loop processes bulk only; target 100-1e4 one-loop bulk points, no hard one-loop
       points from any process; whole family held out; standardisation/early stopping/features bulk only; baseline from-scratch
@@ -28871,11 +28867,6 @@ entries:
       - 'fixes uug soft+coll and tt Coulomb/Sudakov within the MLP bands: the features go into the KIT models and are proposed
         for catalog pretraining'
       - 'no or partial: reported per limit against the existing input arms and the log-invariant polynomial term'
-    17:
-      feeds: whether one-loop top pairs in pretraining transfer the Coulomb rise, read on converged runs
-      if:
-      - 'Coulomb transfer appears on converged runs: one-loop tops go into the KIT parent'
-      - 'still none: 11c''s NO stands, now on converged runs'
     20:
       feeds: the KIT NLO statement in the draft
       if:
@@ -28884,7 +28875,6 @@ entries:
   step_waits:
     '5': 'kit_hpo driver DONE event: the package takes the chosen trials'' models'
     '14': repo-reviewer
-    '17': repo-reviewer
     '20': '2026-11-14'
   handoff:
     state: '2026-11-13 ~12:30 @ebb031da/deaba164. kit_hpo read (finding ~12:30; kit_hpo.json, figs kit_hpo_lr / kit_hpo_curves):
