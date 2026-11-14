@@ -28849,6 +28849,22 @@ entries:
       vs train 8e-5 at the end, separating only in the last ~150 cooldown steps), control hp0798 good sep 2.72; A2 best val
       1.55e-4 vs control 2.58e-4. Control trial_0798 rescored (FA-ccin2p3-e281e8b1) but not collected: needs the alias commit
       (repo-reviewer gate).'
+  - at: '2026-11-14T00:28:31+00:00'
+    text: '2026-11-14 @eff10e77. Steps 14/17/19/21 at the kit_hpo chosen HPs, read under the passed design (kit_figures collect
+      -> kit_fig_A_hpo.json, controls = the chosen trials scored: uug hp1918, uugg hp0798, tt hp0131; kit_readout --verdict
+      -> kit_verdict_A_hpo.json; signed = median(pred - truth) log10 in the deepest stratum; figs kit_mse/median_A_hpo_*,
+      _A_hpo_ft_*, curves kit_curves_mse_A_hpo_*). Curves: all good (sep <= 2.24) except uugg A2 sep 4.1 (separates in the
+      last ~150 cooldown steps). Step 21 A2: uug coll 7.62 -> 0.0081 (signed -1.60 -> -0.01, exp -0.50 -> -1.00, truth -1.00)
+      FIXED; soft 75.5 -> 0.015 (-8.69 -> +0.02, exp -0.18 -> -2.01) FIXED; bulk 1.75e-5 -> 1.98e-6. uugg gg coll 9.88 ->
+      0.042, qg 16.5 -> 0.156, soft 87.4 -> 0.186 all FIXED (exps -0.98/-0.92/-1.94 vs -0.99/-0.97/-2.00), azimuth 24.8 ->
+      0.070, bulk 1.07e-4 -> 6.3e-5. tt Coulomb 7.48 -> 0.023 (signed -2.72 -> -0.15, exp 0.00 -> -0.96, truth -1.02) FIXED;
+      Sudakov 0.82 -> 0.077 (signed -0.83 -> +0.12; no KIT exponent so the design rule gives inconclusive); bulk 6.1e-8 ->
+      1.4e-7 (+0.35 decades, within 0.5). A2+single vs A2: STAYED (Coulomb 0.13, Sudakov 0.15, signed +0.21): the single log
+      is not needed at the searched HPs; the old-point Sudakov overshoot (+1.88) is gone. Step 14 div-form: uug inconclusive
+      (coll 6.59, soft 65, no movement), tt STAYED both. Step 19 ReZero: uug soft MOVED (75.5 -> 0.72, exp -1.83), coll inconclusive
+      (3.78); tt Coulomb 3.42 (exp -0.34) inconclusive, Sudakov blows up (log-MSE 3.1e6 in 15-50 TeV), bulk +1.04 decades.
+      Step 17 fine-tunes vs scratch: Coulomb STAYED (6.9-9.1, flat), Sudakov worse (1.6-7.4 vs 0.74-0.82), bulk ftr5own 4.1e-8
+      vs 9.1e-8, ftr5thrbeta 5.0e-8 vs 6.1e-8, others worse: NO.'
   step_why:
     5:
       feeds: what KIT receives
