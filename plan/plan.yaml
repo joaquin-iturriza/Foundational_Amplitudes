@@ -28901,6 +28901,8 @@ entries:
   step_waits:
     '5': 'kit_hpo driver DONE event: the package takes the chosen trials'' models'
     '20': '2026-11-14'
+    '21': kit_hpo_tt_ft_r5 search (drive.py, detached pid 2760776; its DONE event), config sweep/sweep_config_kit_hpo_tt_ft_r5.yaml
+      @9b1d32e6
   handoff:
     state: '2026-11-14 @eff10e77. Steps 14/17/19/21 batch at the kit_hpo chosen HPs read under the passed 10:47 design (finding
       2026-11-14; kit_fig_A_hpo.json, kit_verdict_A_hpo.json; figs kit_mse/median_A_hpo_*, _A_hpo_ft_*, kit_curves_mse_A_hpo_*):
