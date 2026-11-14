@@ -27856,7 +27856,7 @@ entries:
     - 22
   owner:
     agent: ac14b4077056e4731
-    state: working
+    state: closed
     since: '2026-11-13T13:44:51+00:00'
     state_at: '2026-11-14T00:24:01+00:00'
     context: 147692
@@ -28893,35 +28893,30 @@ entries:
     '5': 'kit_hpo driver DONE event: the package takes the chosen trials'' models'
     '20': '2026-11-14'
   handoff:
-    state: '2026-11-13 ~12:30 @ebb031da/deaba164. kit_hpo read (finding ~12:30; kit_hpo.json, figs kit_hpo_lr / kit_hpo_curves):
-      chosen uug plain hp1918 (lr 0.0125, val 2.92e-5), tt softpairthr hp0131 (lr 0.00178, val 7.1e-7; good trials at the
-      lr window''s low edge); uug T only hp1677 good (marginal), uugg T 0/16 good (best at the low lr edge). Design ''steps
-      14/17/19/21 at chosen HPs'' PASSED (10:47 record, after one FIX: controls = the chosen trials scored, not retrained;
-      NO branches -> per-arm 16-trial searches ordered A2, fine-tunes, div-form, ReZero, past 30 GPU-h to Joaquin). Controls
-      scored (dfe44ce0 trial_1918 CC, 66cc5b76 trial_0131 lxplus, kit_benchmark/ in each trial dir). D395 smoke of A2+single
-      cee32a46 passed every stage; the repaired arm hpo_asym_cont_sud1 submitted via site submit auto (check site runs for
-      its id, record it with plan run and add it to step 21''s wait). uugg plain search kit_hpo_uugg_plain driven locally
-      (pid 1218893). Next on resume: when the batch ends, tools/kit_figures.py collect (arms + the two trial dirs as controls;
-      add their tags/labels), kit_extrap_read / kit_readout --vs, kit_curves on the arms, verdicts per the passed outcome,
-      figures; on DRIVE_DONE of uugg: kit_curves sweep kit_hpo_uugg_plain, then uugg A2 at its chosen trial + rescore of that
-      trial. Open question to Joaquin (in the hand-back): extend the uugg T and tt searches below lr 1.667e-3 (~9.6 GPU-h
-      each).'
-    decisions: 'As before (D435, D436, D446-D448). Controls are the searched best trials scored by job_kit_rescore.sh (fixed
-      5cdd9b0c to score runs without earlier scores), per CLAUDE.md best-of-sweep. Fine-tunes at the scratch optimum with
-      lr_scale 1 (sweep rule 4). Sudakov repair = model.input_asym_sudakov_single (ebb031da): exp(c)(L^2 + exp(kappa) L) per
-      heavy coloured leg, kappa learned (kit_asym_bound drift fits L^2 + bL, b~4-7). site sync/submit need --allow-dirty while
-      data_saving data files are uncommitted; submit_guard wants site submit auto or a fresh site pick and --est-gpu-hours.'
-    ruled_out: As before; the old HP point (8000 cosine, lr 0.0118605) is not where the KIT controls train well (uug plain
-      good at 0.0125 with 1831 WSD steps; tt wants ~6.6x lower lr).
-    running: 'Batch (steps 14/17/19/21): FA-ccin2p3-01f55e9b uug divform, 7d7a578c uug rezero, 8a37b9c4 uug A2, af3782ce tt
-      divform, c479cc9b tt rezero, 16720e29 tt A2, 00da227f tt scratch softpair, 0ea05984/7613b88a/bcf0d7e0/7d8335d3/4bd3f9ed
-      fine-tunes (r5, thr, thrbeta, thrloop, thrloopbeta); tt A2+single (hpo_asym_cont_sud1, id in site runs); uugg plain
-      search driver pid 1218893 (log ~/.local/share/ccorch/detached/20261113-115239_kit_hpo_uugg_plain.log).'
-    files: tools/kit_curves.py (sweep, sweepfig), analysis/kit_benchmark/data/kit_hpo.json, analysis/kit_benchmark/figs/kit_hpo_lr.png,
-      kit_hpo_curves.png, wrappers.py (_asym_terms sud_single, input_asym_sudakov_single), tests/test_input_reps.py, scripts/job_kit_rescore.sh,
-      sweep/sweep_config_kit_hpo_uugg_plain.yaml, sweep/kit_base/kit_A_ee_uugg_me2_n100000_t8000_softpair_plain, scratchpad
-      submit list s2.sh
-    written: '2026-11-13T11:07:07+00:00'
+    state: '2026-11-14 @eff10e77. Steps 14/17/19/21 batch at the kit_hpo chosen HPs read under the passed 10:47 design (finding
+      2026-11-14; kit_fig_A_hpo.json, kit_verdict_A_hpo.json; figs kit_mse/median_A_hpo_*, _A_hpo_ft_*, kit_curves_mse_A_hpo_*):
+      A2 (asymptotic factor, no log inputs, gamma<=4) FIXED uug coll+soft, uugg gg/qg coll+soft, tt Coulomb; tt Sudakov 0.82->0.077
+      (no KIT exponent: rule gives inconclusive); A2+single STAYED vs A2; div-form no movement; ReZero uug soft MOVED, tt
+      Sudakov blows up; fine-tunes no transfer (Coulomb flat, Sudakov worse). Curves all good except uugg A2 sep 4.1 (cooldown
+      only). uugg search chosen hp0798. Step 20 designed (~76 GPU-h full, ~52 with 3 D values) and asked with step 22 (div-form/ReZero
+      searches, ~19 GPU-h) in one GPU-budget ask (open). Step 21 (fine-tune search, NO branch, ~9.6 GPU-h, inside the design''s
+      budget) is ready and not started: needs a 16-trial A_ft sweep config on the kit_hpo template (sweep/sweep_config_kit_hpo_*.yaml,
+      sweep/kit_base) with fine_tune.lr_scale [0.1,10] and layer_decay [0.75,1.0] over parent dsave_parent_heldout_r5 (ftr5own:
+      bulk -0.35 decades vs scratch hpo_softpair) driven by sweep/drive.py --item kit_benchmark --mem 11G; its control is
+      the scratch hpo_softpair run (no search of its own: the design compares best against best, so the scratch softpair side
+      may need its own search too, check the design text). Repo-reviewer backlog: kit files passed; it still blocks on analysis/data_saving/step6_readout.py
+      (zero shot = val_ln[0], other entry''s file), lock held by reviewer a48db8faa36789a99.'
+    decisions: Verdict rule = the passed design's, coded in tools/kit_readout.py --verdict on the median signed error (kit_figures
+      collect 'med'), FIXED/MOVED need a KIT exponent (reviewer finding 4). Controls are the chosen search trials scored by
+      job_kit_rescore.sh, collected via the '<dir>=<KIT run name>' alias (trial_0131 on lxplus). Step 20's budget ask was
+      refused by plan ask as answered by D401/D402; re-asked jointly with step 22 since the reason of D402 (no converged model)
+      changed.
+    ruled_out: As before; div-form inputs and the fine-tunes at the searched HPs do not fix any hard family; the tt Sudakov
+      single-log term is not needed at the searched HPs.
+    running: none
+    files: tools/kit_figures.py, tools/kit_curves.py (runs, runsfig), tools/kit_readout.py (--verdict), analysis/kit_benchmark/data/kit_fig_A_hpo*.json,
+      kit_verdict_A_hpo.json, kit_curves_hpo_arms.json, kit_curves_hpo_uugg.json, kit_hpo_uugg_plain.json
+    written: '2026-11-14T00:32:55+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
