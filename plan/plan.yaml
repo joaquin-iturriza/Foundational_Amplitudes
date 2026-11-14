@@ -28877,6 +28877,17 @@ entries:
       (3.78); tt Coulomb 3.42 (exp -0.34) inconclusive, Sudakov blows up (log-MSE 3.1e6 in 15-50 TeV), bulk +1.04 decades.
       Step 17 fine-tunes vs scratch: Coulomb STAYED (6.9-9.1, flat), Sudakov worse (1.6-7.4 vs 0.74-0.82), bulk ftr5own 4.1e-8
       vs 9.1e-8, ftr5thrbeta 5.0e-8 vs 6.1e-8, others worse: NO.'
+  - at: '2026-11-14T02:45:11+00:00'
+    text: '2026-11-14 ~04:00 @11222e57. Step 21 (step 17 NO branch, passed design 2026-11-13 10:47): fine-tune search kit_hpo_tt_ft_r5
+      (sweep/sweep_config_kit_hpo_tt_ft_r5.yaml @9b1d32e6; parent dsave_parent_heldout_r5, lr fixed 0.001783506, lr_scale
+      [0.1,10], layer_decay [0.75,1], 16 trials, 1831 WSD) done, 16/16 good (kit_curves sweep -> kit_hpo_tt_ft_r5.json, sep
+      1.06-2.65). Chosen hp1986 (lr_scale 2.49, layer_decay 0.97) val mu-MSE 2.89e-7 vs searched scratch+beta hp0131 7.1e-7
+      and scratch softpair 1.08e-6 (same emission-scale target). Scored by FA-ccin2p3-fcad1510, kit_readout --verdict -> kit_verdict_A_hpo_ftsearch.json:
+      bulk -0.52 decades vs scratch, -0.34 vs scratch+beta (inside the transformer''s rerun spread 1.1x-30x); Coulomb STAYED
+      (7.7 vs 7.4-7.5, exponent 0.00 vs truth -1.02); Sudakov 2.8 vs 0.74/0.82 (worse, signed -1.62; better than the unsearched
+      FT 7.4). By the passed outcome: NO, pretraining does not fix any t t-bar hard family after its search; the factor arm
+      stays the only fix. Figs kit_hpo_tt_ft_r5 (search, curves), kit_mse/median_A_hpo_ftsearch_ee_tt_virt_finite_{a,b}, kit_deepest_A_hpo_c
+      (FT searched added).'
   step_why:
     5:
       feeds: what KIT receives
