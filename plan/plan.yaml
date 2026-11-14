@@ -27660,6 +27660,10 @@ entries:
       points ok) + at most ~0-10 other one-loop processes bulk only; target 100-1e4 one-loop bulk points, no hard one-loop
       points from any process; whole family held out; standardisation/early stopping/features bulk only; baseline from-scratch
       V/B with exact Born; scored on the hard bins. Not tonight (Joaquin), soon.'
+    21: 'Step 17 NO branch of the passed 10:47 design: the fine-tune search (16 trials, kit_hpo template + fine_tune.lr_scale
+      [0.1,10], layer_decay [0.75,1.0]) over the best-scoring parent (kit_verdict_A_hpo.json: ftr5own bulk -0.35 decades vs
+      scratch, ftr5thrbetaown -0.09; no parent fixes Coulomb or Sudakov), ~9.6 GPU-h, inside the design''s remaining budget
+      (~11 of 30)'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -28855,6 +28859,12 @@ entries:
       if:
       - 'fine-tune beats the V/B baseline on hard bins: strong positive statement'
       - 'it does not: report as inconclusive (tree has no loop functions)'
+    21:
+      feeds: whether pretraining transfers for tt virtual (A_ft packaged, step 5)
+      if:
+      - 'the searched fine-tune beats the searched scratch on >= half the strata of a family, bulk within band: pretraining
+        transfers, package A_ft'
+      - 'it does not: no transfer at searched HPs; step 20''s fair protocol is the remaining transfer test'
   step_waits:
     '5': 'kit_hpo driver DONE event: the package takes the chosen trials'' models'
     '20': '2026-11-14'
