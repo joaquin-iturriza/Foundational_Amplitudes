@@ -27838,6 +27838,22 @@ entries:
     decision: D431
     withdrawn_at: '2026-11-12T20:56:52+00:00'
     withdrawn_why: 'Joaquin: use all available clusters'
+  - ask: 'GPU budget: ~95 GPU-h above 30 with no decision covering it, now that the asymptotic factor fixes the KIT hard bins
+      from scratch at the searched HPs (D402''s ''we clearly haven''t converged on something that does what we want'' no longer
+      holds). (a) Step 20, Bakar''s fair one-loop protocol on ee->tt one-loop virtual with the factor: a fair_nlo parent with
+      the factor (~16 GPU-h) and, per D = 1e2, 3e2, 1e3, 3e3, 1e4 one-loop bulk points, three arms (fine-tuned; scratch with
+      the factor; Bakar''s scratch V/B times exact Born), 16-trial searches each (~60 GPU-h, estimate); ~52 GPU-h in all with
+      D = 1e2, 1e3, 1e4. (b) The divergence-form-input and ReZero searches the passed design orders after a NO (~19 GPU-h);
+      both lost to the factor. Go for (a) in full, and (b) or drop it?'
+    at: '2026-11-14T00:32:27+00:00'
+    searched: 'site decisions --project FA: D353, D363 approve KIT work at no stated cost; D401/D402 answered the 2026-11-11
+      D-scan ask ''no'' because no model converged; D412 caps a test at 30 GPU-h; D428 16 trials; D447 says soon. Joaquin''s
+      messages 2026-11-10T02:08 (KIT request, no cost), 2026-11-12T01:19 (data-saving results, unrelated), 2026-10-04T10:57
+      (unrelated), 2026-11-12T13:59 (keep working on the tt scaling problem and the draft; asks for the divergence-form idea,
+      names no cost).'
+    blocks_steps: &id002
+    - 20
+    - 22
   owner:
     agent: ac14b4077056e4731
     state: working
@@ -32781,6 +32797,20 @@ entries:
     units: null
     start: '2026-11-13T13:49:27+00:00'
     at: '2026-11-13T13:49:27+00:00'
+  ask: 'GPU budget: ~95 GPU-h above 30 with no decision covering it, now that the asymptotic factor fixes the KIT hard bins
+    from scratch at the searched HPs (D402''s ''we clearly haven''t converged on something that does what we want'' no longer
+    holds). (a) Step 20, Bakar''s fair one-loop protocol on ee->tt one-loop virtual with the factor: a fair_nlo parent with
+    the factor (~16 GPU-h) and, per D = 1e2, 3e2, 1e3, 3e3, 1e4 one-loop bulk points, three arms (fine-tuned; scratch with
+    the factor; Bakar''s scratch V/B times exact Born), 16-trial searches each (~60 GPU-h, estimate); ~52 GPU-h in all with
+    D = 1e2, 1e3, 1e4. (b) The divergence-form-input and ReZero searches the passed design orders after a NO (~19 GPU-h);
+    both lost to the factor. Go for (a) in full, and (b) or drop it?'
+  waiting_since: '2026-11-14T00:32:27+00:00'
+  searched: 'site decisions --project FA: D353, D363 approve KIT work at no stated cost; D401/D402 answered the 2026-11-11
+    D-scan ask ''no'' because no model converged; D412 caps a test at 30 GPU-h; D428 16 trials; D447 says soon. Joaquin''s
+    messages 2026-11-10T02:08 (KIT request, no cost), 2026-11-12T01:19 (data-saving results, unrelated), 2026-10-04T10:57
+    (unrelated), 2026-11-12T13:59 (keep working on the tt scaling problem and the draft; asks for the divergence-form idea,
+    names no cost).'
+  blocks_steps: *id002
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
