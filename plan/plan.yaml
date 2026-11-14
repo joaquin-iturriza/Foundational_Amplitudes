@@ -28904,6 +28904,7 @@ entries:
       - 'Joaquin drops them: A2 alone is the KIT model; record the dead ends'
   step_waits:
     '20': '2026-11-14'
+    '5': FA-ccin2p3-4ce445e2
   handoff:
     state: '2026-11-14 @eff10e77. Steps 14/17/19/21 batch at the kit_hpo chosen HPs read under the passed 10:47 design (finding
       2026-11-14; kit_fig_A_hpo.json, kit_verdict_A_hpo.json; figs kit_mse/median_A_hpo_*, _A_hpo_ft_*, kit_curves_mse_A_hpo_*):
