@@ -27656,16 +27656,6 @@ entries:
   next:
     5: 'Checkpoint + inference package for KIT (Joaquin sends it): best A_ft/B checkpoints, a float64 predict script, log10|M|^2
       out; after the A_ft batch'
-    14: 'Joaquin 2026-11-12 (~19:30, via coordinator): ''I know that log invariants go as inputs, this is not necessarily
-      the same as passing the functional form of the divergence as an input''. Design one arm of divergence-form input features,
-      general for any process and built from the universal limits, fed per particle or per pair into the transformer (full
-      LLoCa, D419), through the whole network: per coloured triple (i,j,k) the eikonal factor s_ik/(s_ij s_jk) (or its log,
-      standardized); per coloured pair the collinear splitting variables (1/s_ij and the splitting function P(z), z the momentum
-      fraction w.r.t. a reference direction, flavour-dependent q->qg, g->gg); per massive pair 1/beta (Coulomb); per massive
-      leg the Sudakov double log log^2(s/m^2). Implementation point: wrappers._pair_log_inputs (pair scalars; extend with
-      these columns behind a new default-off flag + Lorentz-invariance test as tests/test_input_reps.py). One short test:
-      uug (plain target and/or T target, controls 203a274f / c15b3337) and tt virtual (control softpairthr 3fc1016a), from
-      scratch 1e5, at an lr where validation stays with training (step 15), own design + design-reviewer + D395 smoke.'
     20: 'Bakar''s fair one-loop protocol (2026-11-09 email): pretrain on tree of all processes incl. target''s tree (hard
       points ok) + at most ~0-10 other one-loop processes bulk only; target 100-1e4 one-loop bulk points, no hard one-loop
       points from any process; whole family held out; standardisation/early stopping/features bulk only; baseline from-scratch
@@ -28860,13 +28850,6 @@ entries:
       if:
       - 'A_ft best: package A_ft'
       - 'B best: package B'
-    14:
-      feeds: whether feeding the divergences' functional form as inputs through the whole network (not added at the output)
-        fixes the KIT limits with full LLoCa (D419)
-      if:
-      - 'fixes uug soft+coll and tt Coulomb/Sudakov within the MLP bands: the features go into the KIT models and are proposed
-        for catalog pretraining'
-      - 'no or partial: reported per limit against the existing input arms and the log-invariant polynomial term'
     20:
       feeds: the KIT NLO statement in the draft
       if:
@@ -28874,7 +28857,6 @@ entries:
       - 'it does not: report as inconclusive (tree has no loop functions)'
   step_waits:
     '5': 'kit_hpo driver DONE event: the package takes the chosen trials'' models'
-    '14': repo-reviewer
     '20': '2026-11-14'
   handoff:
     state: '2026-11-13 ~12:30 @ebb031da/deaba164. kit_hpo read (finding ~12:30; kit_hpo.json, figs kit_hpo_lr / kit_hpo_curves):
