@@ -27864,9 +27864,9 @@ entries:
     - 22
   owner:
     agent: a21d23a7af7d2b76b
-    state: working
+    state: stopped
     since: '2026-11-14T03:52:27+00:00'
-    state_at: '2026-11-14T03:52:27+00:00'
+    state_at: '2026-11-14T04:01:06.560000+00:00'
   findings:
   - at: '2026-11-10T03:33:04+00:00'
     text: 'Data: KIT package (888 MB tar, 2.7 GB with the tar) on CC at $DATA_DIR/kit_hardps/hardps_benchmark (fetched by
