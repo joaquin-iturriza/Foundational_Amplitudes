@@ -45,9 +45,10 @@ def predict(run_dir, splits, out, h5=None):
     import h5py
     import torch
     from tools.rebuild_run import rebuild
-    # CPU predictions of the tt virtual models moved by up to 3.8e-4 in log10 at 32 threads, not at 1 or 4 or on GPU
-    # (kit package v2 check, FA-ccin2p3-2d0c78fe): the thread count is pinned (README)
-    torch.set_num_threads(int(os.environ.get("KIT_THREADS", 4)))
+    # CPU predictions move with the thread count: tt virtual softpair by 3.8e-4 in log10 at 32 threads (package v2,
+    # FA-ccin2p3-2d0c78fe), the asymptotic-factor models by up to 5.5e-3 at 4 threads and not at all at 1 (package v5,
+    # FA-ccin2p3-d56c5264 vs FA-ccin2p3-83880457): pinned to 1 (README)
+    torch.set_num_threads(int(os.environ.get("KIT_THREADS", 1)))
     name = run_target(run_dir)
     stem, target, _ = kh.parse(name)
     src = h5 or kh.h5_path(stem)

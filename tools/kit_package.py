@@ -56,10 +56,11 @@ is scored. Each run is rebuilt on its own statistics from the benchmark's bulk_t
 recipe), which needs KIT_HARDPS_DIR.
 Reproducibility: a prediction depends on the event alone (read in its own frame, no augmentation; the frames'
 degeneracy regularization uses noise that is a function of the particle, not of a random generator). CPU threads are
-pinned to 4 (KIT_THREADS): at 32 threads some predictions moved by up to 3.8e-4 in log10, at 1 or 4 not at all.
-CPU and GPU predictions agree to {tol:.0e} in log10 (rounding; the largest seen 1.5e-6, ee_uugg's deepest collinear bin).
+pinned to 1 (KIT_THREADS), at which the package on CPU reproduces our predictions (made on GPU) exactly: the
+asymptotic-factor models move with the thread count (at 4 threads by up to 5.5e-3 in log10 on ee_tt's Sudakov bins,
+4.9e-4 at threshold, 2.6e-5 on ee_uug), a rounding sensitivity well below their errors there.
 """
-TOL = 2e-6   # CPU vs GPU rounding limit of the check (README)
+TOL = 2e-6   # rounding limit of the check (README; at the pinned thread count it reproduces exactly)
 
 
 def public_paths():
@@ -155,8 +156,9 @@ def _subset(src, small, n_ev):
         for sp in ("hard_test", "bulk_test"):
             for st in f[sp]:
                 grp = f[f"{sp}/{st}"]
-                # an azimuthal-scan stratum is scored in whole groups of its phi values (evaluate.py)
-                nphi = len(np.unique(grp["phi"][:])) if "phi" in grp else 1
+                # an azimuthal-scan stratum (its `group` column) is scored in whole groups of its phi values (evaluate.py);
+                # a collinear stratum's phi is a continuous per-event angle (its unique count read the whole stratum)
+                nphi = len(np.unique(grp["phi"][:])) if "group" in grp else 1
                 n = max(n_ev // nphi, 1) * nphi
                 for k, v in grp.items():
                     g[f"{sp}/{st}/{k}"] = v[:n]
