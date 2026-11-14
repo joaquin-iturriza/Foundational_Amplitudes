@@ -27714,7 +27714,7 @@ entries:
     - FA-ccin2p3-eb0f30db
     - FA-ccin2p3-f45f434a
     - FA-ccin2p3-f6b2ece9
-    commit: f19986f9
+    commit: f801b73f
     paths:
     - analysis/kit_benchmark/data/kit_curves_read.json
     - analysis/kit_benchmark/data/kit_fig_A.json
@@ -27727,6 +27727,7 @@ entries:
     - scripts/job_kit_rescore.sh
     - scripts/job_kit_threshold.sh
     - sweep/drive.py
+    - sweep/sweep_config_kit_hpo_tt_ft_r5.yaml
     - sweep/sweep_config_kit_hpo_ttvirt_thr.yaml
     - sweep/sweep_config_kit_hpo_uug_T.yaml
     - sweep/sweep_config_kit_hpo_uug_plain.yaml
