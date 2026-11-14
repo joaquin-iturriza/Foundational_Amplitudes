@@ -27864,7 +27864,7 @@ entries:
     - 22
   owner:
     agent: a73c69a740b3e5d89
-    state: working
+    state: closed
     since: '2026-11-14T00:45:04+00:00'
     state_at: '2026-11-14T03:40:14+00:00'
     context: 220624
@@ -28922,30 +28922,26 @@ entries:
     '20': '2026-11-14'
     '5': FA-ccin2p3-4ce445e2
   handoff:
-    state: '2026-11-14 @eff10e77. Steps 14/17/19/21 batch at the kit_hpo chosen HPs read under the passed 10:47 design (finding
-      2026-11-14; kit_fig_A_hpo.json, kit_verdict_A_hpo.json; figs kit_mse/median_A_hpo_*, _A_hpo_ft_*, kit_curves_mse_A_hpo_*):
-      A2 (asymptotic factor, no log inputs, gamma<=4) FIXED uug coll+soft, uugg gg/qg coll+soft, tt Coulomb; tt Sudakov 0.82->0.077
-      (no KIT exponent: rule gives inconclusive); A2+single STAYED vs A2; div-form no movement; ReZero uug soft MOVED, tt
-      Sudakov blows up; fine-tunes no transfer (Coulomb flat, Sudakov worse). Curves all good except uugg A2 sep 4.1 (cooldown
-      only). uugg search chosen hp0798. Step 20 designed (~76 GPU-h full, ~52 with 3 D values) and asked with step 22 (div-form/ReZero
-      searches, ~19 GPU-h) in one GPU-budget ask (open). Step 21 (fine-tune search, NO branch, ~9.6 GPU-h, inside the design''s
-      budget) is ready and not started: needs a 16-trial A_ft sweep config on the kit_hpo template (sweep/sweep_config_kit_hpo_*.yaml,
-      sweep/kit_base) with fine_tune.lr_scale [0.1,10] and layer_decay [0.75,1.0] over parent dsave_parent_heldout_r5 (ftr5own:
-      bulk -0.35 decades vs scratch hpo_softpair) driven by sweep/drive.py --item kit_benchmark --mem 11G; its control is
-      the scratch hpo_softpair run (no search of its own: the design compares best against best, so the scratch softpair side
-      may need its own search too, check the design text). Repo-reviewer backlog: kit files passed; it still blocks on analysis/data_saving/step6_readout.py
-      (zero shot = val_ln[0], other entry''s file), lock held by reviewer a48db8faa36789a99.'
-    decisions: Verdict rule = the passed design's, coded in tools/kit_readout.py --verdict on the median signed error (kit_figures
-      collect 'med'), FIXED/MOVED need a KIT exponent (reviewer finding 4). Controls are the chosen search trials scored by
-      job_kit_rescore.sh, collected via the '<dir>=<KIT run name>' alias (trial_0131 on lxplus). Step 20's budget ask was
-      refused by plan ask as answered by D401/D402; re-asked jointly with step 22 since the reason of D402 (no converged model)
-      changed.
-    ruled_out: As before; div-form inputs and the fine-tunes at the searched HPs do not fix any hard family; the tt Sudakov
-      single-log term is not needed at the searched HPs.
+    state: '2026-11-14 ~04:45 @11222e57. Steps 14/17/19/21 read at the kit_hpo HPs (findings 2026-11-14T00:28, ~04:00): the
+      asymptotic factor (A2) is the only arm that fixes the KIT hard families (uug coll+soft, uugg gg/qg coll+soft, tt Coulomb;
+      tt Sudakov 0.82->0.077, no exponent); the fine-tune search kit_hpo_tt_ft_r5 (16/16 good, chosen hp1986) is a NO (bulk
+      -0.5 decades, Coulomb STAYED, Sudakov worse). Step 5 (coordinator: package the factor models, the best ones): package
+      v5 built but its reproduction check failed (finding ~04:45, E7274 acked); next is the diagnosis probe (check --repo),
+      fix, rebuild with scripts/job_kit_package.sh -- runs/kit/kit_package_v5 <3 runs>=<labels> (CPU, ~0.85 h; the uugg check
+      reads a full file, 35 min). Steps 20 and 22 wait on Joaquin''s open GPU-budget question (~95 GPU-h); do not start them.'
+    decisions: 'Short legend symbols (scratch, scratch+beta, factor, factor+log, div-form, ReZero, FT, FT+LO, FT+LO+beta,
+      FT+1L, FT+1L+beta, FT searched) via kit_figures plot --short; captions define them. Deepest-bin summary figure kit_figures
+      summary <verdict jsons>. The KIT package carries the factor models only (coordinator, 2026-11-14: the step-5 rule packages
+      the best model; the package format takes a plain run list, so no B checkpoint). Fine-tune search compared against the
+      searched scratch+beta (hp0131) and the unsearched scratch softpair; no search for the scratch softpair side (would be
+      ~9.6 GPU-h beyond the budget).'
+    ruled_out: As before; fine-tuning from the held-out catalog parent does not fix any tt hard family even after its own
+      16-trial search.
     running: none
-    files: tools/kit_figures.py, tools/kit_curves.py (runs, runsfig), tools/kit_readout.py (--verdict), analysis/kit_benchmark/data/kit_fig_A_hpo*.json,
-      kit_verdict_A_hpo.json, kit_curves_hpo_arms.json, kit_curves_hpo_uugg.json, kit_hpo_uugg_plain.json
-    written: '2026-11-14T00:32:55+00:00'
+    files: tools/kit_figures.py (--short, summary), tools/kit_curves.py (ftfig), sweep/sweep_config_kit_hpo_tt_ft_r5.yaml,
+      analysis/kit_benchmark/data/kit_hpo_tt_ft_r5.json, kit_fig_A_hpo_ftsearch.json, kit_verdict_A_hpo_ftsearch.json, figs
+      kit_deepest_A_hpo_{a,b,c}, kit_hpo_tt_ft_r5, kit_*_A_hpo_ftsearch_*, tools/kit_package.py, scripts/job_kit_package.sh
+    written: '2026-11-14T03:41:31+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
