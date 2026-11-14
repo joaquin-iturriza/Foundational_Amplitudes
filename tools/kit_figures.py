@@ -257,7 +257,7 @@ def plot(path, outdir, prefix="", split_offshell=False):
         # legend'), listing what that panel draws (the reference line is absent where it is zero); inside the axes up
         # to 4 arms, else a strip above the panel on the same canvas (more entries fit in no 2.4 x 1.92 in box)
         for fig, ax in figs:
-            if len(arms) > 4:
+            if len(ax.get_legend_handles_labels()[0]) > 3:     # entries, not arms: truth and the KIT markers count
                 ps.shared_legend(fig, ax, ncol=2)
             else:
                 ps.legend(ax, "upper left")
@@ -280,7 +280,7 @@ def plot(path, outdir, prefix="", split_offshell=False):
             ps.process_label(ax, PROC.get((stem, target), stem))
         h0 = figs[0][1].get_legend_handles_labels()[0]
         for fig, ax in figs:
-            if len(arms) > 4:
+            if len(h0) > 3:
                 ps.shared_legend(fig, figs[0][1], ncol=2)
             else:
                 ps.legend(ax, "upper left", handles=h0)
