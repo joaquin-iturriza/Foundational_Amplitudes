@@ -1,9 +1,10 @@
 """The het retrains of the Delta cells (D47) against the MSE cells they retrain, one point per cell of delta_audit.json's
-paper_8k grid that has both. Left: the MSE of ln|M|^2 (from Delta) of the het model's mu against the MSE model's (test split, raw
+paper_8k grid that has both. Left: the median |Delta| (with --mse, the MSE of ln|M|^2 from Delta) of the het model's mu against the MSE model's (test split, raw
 |M|^2). Right: the pull std against the fraction of events with |pull| < 1 (the sigma stage's sigma, D70); a unit
 Gaussian sits at (1, 0.683). Colour: 2->2, 2->3 or 2->4 (uubar_Zggg). Inputs: analysis/transfer/delta_data/*.npz (the MSE cells),
 het_delta_data/*.npz (collect_het_delta.py).
-    python analysis/transfer/het_delta_summary.py   -> figs/het_delta_summary
+    python analysis/transfer/het_delta_summary.py        -> figs/het_delta_summary (median |Delta|, the paper's figure)
+    python analysis/transfer/het_delta_summary.py --mse  -> figs/het_delta_summary_mse (MSE of ln|M|^2 from Delta)
 """
 import glob, json, os, sys
 
@@ -24,10 +25,14 @@ GROUPS = ((2, r"$2\to2$"), (3, r"$2\to3$"), (4, r"$2\to4$"))
 BLOWUP = {"tp3_uu64fte_ee_nnbar_d8__trial_0114": "step 1360, best checkpoint step 400"}
 
 
+MSE = "--mse" in sys.argv     # the left-panel metric: MSE of ln|M|^2, else the median |Delta|
+METRIC = "MSE of ln|M|^2" if MSE else "median |Delta|"
 EXCLUDED = [0]       # events msel could not take (non-finite Delta or a predicted |M|^2 of exactly 0), over all calls
 
 
 def msel(d):
+    if not MSE:
+        return float(np.median(np.abs(d[np.isfinite(d)])))
     """MSE of ln|M|^2 from Delta = r - 1, the metric of every other per-cell scatter in the paper."""
     # ln|1+d| = ln|M_pred|^2 - ln|M_true|^2 for either sign of the prediction, so a flipped-sign event (d <= -1) counts
     ok = np.isfinite(d) & (d != -1)       # d == -1 is a predicted |M|^2 of exactly 0: ln undefined, the only exclusion
@@ -85,17 +90,20 @@ def main():
     a1.fill_between([], [], [], color="grey", alpha=0.25, lw=0, label=r"$10$ to $90\%$ (right)")
     a2.set_yscale("log"); a2.set_ylim(1e-5, 1.5)
     a1.set_xscale("log"); a1.set_yscale("log")
-    a1.set_xlabel(r"MSE$(\log|\mathcal{M}|^2)$, MSE loss"); a1.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$, heteroscedastic")
+    if MSE:
+        a1.set_xlabel(r"MSE$(\log|\mathcal{M}|^2)$, MSE loss"); a1.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$, heteroscedastic")
+    else:
+        a1.set_xlabel(r"median $|r-1|$, MSE"); a1.set_ylabel(r"median $|r-1|$, heteroscedastic")
     a2.set_xlabel(r"$k$"); a2.set_ylabel(r"fraction with $|{\rm pull}|>k$")
     ps.shared_legend(fig, a1, ncol=4)
-    ps.save(fig, os.path.join(HERE, "figs", "het_delta_summary"))
+    ps.save(fig, os.path.join(HERE, "figs", "het_delta_summary" + ("_mse" if MSE else "")))
     r = np.array([x["het"] / x["mse"] for x in pts if x["mse"]])
-    print(f"{len(pts)} cells, {len(r)} with an MSE counterpart; het/MSE MSE of ln|M|^2: median {np.median(r):.2f}, "
+    print(f"{len(pts)} cells, {len(r)} with an MSE counterpart; het/MSE {METRIC}: median {np.median(r):.2f}, "
           f"range {r.min():.2f} to {r.max():.2f}, het lower in {int((r < 1).sum())}")
     for nf, _ in GROUPS:
         q = [x for x in pts if x["nf"] == nf]
         rr = np.array([x["het"] / x["mse"] for x in q if x["mse"]])
-        print(f"2->{nf}: het/MSE MSE of ln|M|^2 median {np.median(rr):.2f} ({rr.min():.2f} to "
+        print(f"2->{nf}: het/MSE {METRIC} median {np.median(rr):.2f} ({rr.min():.2f} to "
               f"{rr.max():.2f}, het lower in {int((rr < 1).sum())}/{len(rr)})")
         print(f"2->{nf}: {len(q)} cells, pull std {min(x['std'] for x in q):.2f} to "
               f"{max(x['std'] for x in q):.2f}, |pull|<1 {min(x['f1'] for x in q):.2f} to {max(x['f1'] for x in q):.2f}")
@@ -111,7 +119,7 @@ def main():
     for x in bad:
         print(f"blew up: {x['tag']} ({BLOWUP[x['tag']]}): het/MSE {(x['het'] / x['mse']) if x['mse'] else float('nan'):.2f}, "
               f"pull std {x['std']:.2f}, |pull|<1 {x['f1']:.2f}")
-    out = dict(cells=len(pts) + len(bad), reruns=reruns,     # the one blown-up cell: het/MSE MSE of ln|M|^2, pull std
+    out = dict(cells=len(pts) + len(bad), reruns=reruns,     # the one blown-up cell: het/MSE of the left metric, pull std
                blowup_ratio=[x["het"] / x["mse"] for x in bad if x["mse"]], blowup_pull_std=[x["std"] for x in bad])
     for nf, _ in GROUPS:
         q = [x for x in pts if x["nf"] == nf]

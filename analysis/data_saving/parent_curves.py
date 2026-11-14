@@ -1,7 +1,7 @@
 """pretrain_data_saving step 6: the WSD-trained b b~ > Z Z held-out parent against its cosine twin (same pools, steps,
 lr, batch, inputs, seed 42; only the schedule differs). Per parent, from its job log (`site logs <run> -n 100000`):
 the combined val_loss_no_reg (HETEROSC) at every validation, the best (lowest) and its step, the last, and spikes
-(a validation above 10x the running best are listed apart, not dropped). Per process at each parent's best
+(a validation more than 1.0 above the running best, a factor e in sigma-weighted error, is listed apart, not dropped). Per process at each parent's best
 validation: the paired difference WSD - cosine of the per-process val loss (HETEROSC NLL, log units).
     python analysis/data_saving/parent_curves.py <cosine log> <wsd log>  -> data/parent_curves.json, figs/parent_curves
 """
