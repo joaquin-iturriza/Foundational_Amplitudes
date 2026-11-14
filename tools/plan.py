@@ -418,6 +418,8 @@ def ask_parts(ask):
     """The parts of a multi-part question: the texts after its `(1)`, `(2)` ... markers (a lead-in such as "Two calls:"
     is dropped); [] when it holds fewer than two."""
     parts = re.split(r"\(\d+\)", ask or "")[1:]
+    if len(parts) < 2:      # lettered parts "(a) ... (b) ...", only when no numbered ones (2026-11-14: kit_benchmark ask)
+        parts = re.split(r"\([a-d]\)", ask or "")[1:]
     return [p for p in parts if ask_terms(p)] if len(parts) >= 2 else []
 
 

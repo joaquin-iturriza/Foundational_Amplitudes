@@ -185,3 +185,20 @@ def test_ask_quoted_verbatim_with_semicolon():
     assert plan.ask_matches(e, 'Joaquin, the open question in the plan\'s exact wording:\n\n"%s"' % ask)
     assert plan.ask_matches_set(e, ["Joaquin, nothing new.", 'Joaquin: "%s"' % ask])
     assert not plan.ask_matches(e, "Joaquin, the grid stops at D=1e4; nothing needs you.")
+
+
+KIT_ASK = ("GPU budget: ~95 GPU-h above 30 with no decision covering it. (a) Step 20, Bakar's fair one-loop protocol on "
+           "ee->tt one-loop virtual with the factor: a fair_nlo parent (~16 GPU-h) and three arms per D, 16-trial searches "
+           "(~52 GPU-h in all). (b) The divergence-form-input and ReZero searches (~19 GPU-h); both lost to the factor. "
+           "Go for (a) in full, and (b) or drop it?")
+KIT_MSG = ("Joaquin, about the KIT GPU budget: do I go ahead with (a) in full and (b), or drop (b)?\n"
+           "- (a) Bakar's fair one-loop protocol on e+e- -> t t~ one-loop virtual, with the asymptotic factor: a parent "
+           "with the factor (~16 GPU-h); three arms at each target size D, each with a 16-trial search.\n"
+           "- (b) The divergence-form and ReZero searches, ~19 GPU-h. Both lost to the factor.")
+
+
+def test_lettered_parts_asked_in_other_words_passes_unrelated_refuses():
+    e = {"id": "kit_benchmark", "ask": KIT_ASK}
+    assert plan.ask_matches_set(e, [KIT_MSG])
+    assert not plan.ask_matches_set(e, ["Joaquin, the data-saving read is fixed; the zero-shot label changed."])
+    assert not plan.ask_matches_set(e, ["Joaquin, (a) is fine and (b) is fine, do you agree?"])
