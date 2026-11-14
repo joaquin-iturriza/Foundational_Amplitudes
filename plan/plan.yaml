@@ -28929,7 +28929,7 @@ entries:
       - 'Joaquin drops them: A2 alone is the KIT model; record the dead ends'
   step_waits:
     '20': '2026-11-14'
-    '5': repo-reviewer
+    '5': FA-ccin2p3-0d3b978a
   handoff:
     state: '2026-11-14 ~04:45 @11222e57. Steps 14/17/19/21 read at the kit_hpo HPs (findings 2026-11-14T00:28, ~04:00): the
       asymptotic factor (A2) is the only arm that fixes the KIT hard families (uug coll+soft, uugg gg/qg coll+soft, tt Coulomb;
