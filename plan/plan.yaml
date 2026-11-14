@@ -27664,6 +27664,9 @@ entries:
       [0.1,10], layer_decay [0.75,1.0]) over the best-scoring parent (kit_verdict_A_hpo.json: ftr5own bulk -0.35 decades vs
       scratch, ftr5thrbetaown -0.09; no parent fixes Coulomb or Sudakov), ~9.6 GPU-h, inside the design''s remaining budget
       (~11 of 30)'
+    22: 'Steps 14/19 NO branches of the passed 10:47 design: div-form (uug inconclusive, tt STAYED) and ReZero (uug soft MOVED,
+      tt Sudakov blows up) each a 16-trial kit_hpo-template search, ~9.6 GPU-h each, beyond the design''s remaining budget:
+      to Joaquin with the cost, beside A2 (FIXED on every family with an exponent)'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -28865,6 +28868,11 @@ entries:
       - 'the searched fine-tune beats the searched scratch on >= half the strata of a family, bulk within band: pretraining
         transfers, package A_ft'
       - 'it does not: no transfer at searched HPs; step 20''s fair protocol is the remaining transfer test'
+    22:
+      feeds: whether div-form inputs or ReZero are kept in the KIT models beside the factor
+      if:
+      - 'Joaquin approves: run the searches, best against best'
+      - 'Joaquin drops them: A2 alone is the KIT model; record the dead ends'
   step_waits:
     '5': 'kit_hpo driver DONE event: the package takes the chosen trials'' models'
     '20': '2026-11-14'
