@@ -28892,6 +28892,16 @@ entries:
       searched fine-tune nor B beats them), built and checked by scripts/job_kit_package.sh (FA-ccin2p3-4ce445e2, code @c3b1d2a81f)
       -> runs/kit/kit_package_v5.tar.gz on CC. models.json is a list of runs, so no B checkpoint is expected by the format;
       none added. Caveat: the uugg factor run''s curve separates in the last ~150 cooldown steps (sep 4.1).'
+  - at: '2026-11-14T03:41:23+00:00'
+    text: '2026-11-14 ~04:45. Step 5 package v5 (FA-ccin2p3-4ce445e2, @c3b1d2a8): build OK (runs/kit/kit_package_v5.tar.gz
+      on CC, 47.5 MB, 3 asymptotic-factor runs), check FAILED the 2e-6 gate (E7274): max |delta log10| package vs each run''s
+      job predictions, first 200 events per stratum, CPU: uug 2.6e-5 (soft strata 2.5e-5), uugg 2.3e-4 (qg coll), tt virtual
+      5.5e-3 (Sudakov 1.5e-3..5.5e-3; threshold a flat 4.85e-4 in all four beta strata; bulk 3.2e-4). The earlier models (v4)
+      passed this gate, so it is the factor path: deltas grow with the factor''s dynamic range, and a strata-independent offset
+      on threshold suggests a statistic or constant the package rebuilds differently from the job (or float32 somewhere in
+      the factor). uugg''s check pass collected 1e6 predictions (35 min) for 200-event strata: a full-file read inside check,
+      cost only. Next: kit_package.py check --repo on the three runs (repo code, original runs, CPU) to split package vs CPU/rebuild,
+      then read the asym factor''s statistics.'
   step_why:
     5:
       feeds: what KIT receives
