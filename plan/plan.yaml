@@ -28903,7 +28903,6 @@ entries:
       - 'Joaquin approves: run the searches, best against best'
       - 'Joaquin drops them: A2 alone is the KIT model; record the dead ends'
   step_waits:
-    '5': step 21's fine-tune search kit_hpo_tt_ft_r5 (the A_ft package takes its best trial if it transfers)
     '20': '2026-11-14'
   handoff:
     state: '2026-11-14 @eff10e77. Steps 14/17/19/21 batch at the kit_hpo chosen HPs read under the passed 10:47 design (finding
