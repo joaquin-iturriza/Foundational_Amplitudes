@@ -33447,6 +33447,10 @@ entries:
       0 with use_diagrams: true (e.g. runs/tp3_ladder_r9/trial_0073/config.yaml, tp3_finale/trial_0073, tp3_synth/trial_0073:
       ''use_diagrams: false''). Sec. 6 setup sentence now says ''without the diagram encoder'' (draft cf688a5), since ''the
       network of Sec. 5'' would otherwise imply it; zip scratchpad overleaf_update_v7.zip (paper.tex only), tested over overleaf_1113+v5+v6.'
+  - at: '2026-11-15T17:26:08+00:00'
+    text: '2026-11-15: step 2 (apply Joaquin''s comments on the draft) finished: all his comments through 2026-11-14 are in
+      the final Overleaf zip (draft cf688a5, draft_final_overleaf.zip); his answer D458 keeps the synthetic subsection where
+      it is. Step 3 (het loss vs MSE) stays held by his ''we will come back to this'' (D457).'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
