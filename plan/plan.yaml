@@ -33231,7 +33231,6 @@ entries:
   - D445
   - D458
   next:
-    2: Apply Joaquin's comments on the Sec. 3 v3 pages and the full draft (draft d05d793)
     3: 'Het loss vs MSE (Fig. 9, removed from the draft by Joaquin 2026-11-13): come back to it. The het network leaves ~1-11%
       of 2->2 test events unfitted with large sigma (median |Delta| better 118/146, MSE worse on most 2->2); evaluation checked,
       no bug; training precision not checked'
@@ -33314,7 +33313,6 @@ entries:
     context: 295766
     context_at: '2026-11-14T00:23:56+00:00'
   step_waits:
-    '2': '2026-11-15: review of the sent v6/v7 draft bundles'
     '3': '2026-11-20: next draft round'
   findings:
   - at: '2026-11-13T02:46:58+00:00'
@@ -33602,11 +33600,6 @@ entries:
       analysis/data_saving/example_reruns.py
     written: '2026-11-13T16:11:55+00:00'
   step_why:
-    2:
-      feeds: whether the rewritten draft tells the D365/D354 story clearly enough to send to the co-authors
-      if:
-      - 'he asks for changes: apply them in Secs. 2-3 and minimal ones in Sec. 4, then a fresh review'
-      - 'he passes it: hand-off and close the entry'
     3:
       feeds: whether and how the paper states the het-vs-MSE comparison
       if:
