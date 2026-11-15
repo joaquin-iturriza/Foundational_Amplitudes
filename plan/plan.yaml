@@ -33220,9 +33220,16 @@ entries:
     answers_after: '2026-11-10T02:22:50+00:00'
     covers:
     - draft_rewrite
+  - said_at: '2026-11-15T17:24:22.178000+00:00'
+    text: 1. stays as it is right now.
+    decision: D458
+    answers_after: '2026-11-15T00:25:20+00:00'
+    covers:
+    - draft_rewrite
   decisions:
   - D365
   - D445
+  - D458
   next:
     2: Apply Joaquin's comments on the Sec. 3 v3 pages and the full draft (draft d05d793)
     3: 'Het loss vs MSE (Fig. 9, removed from the draft by Joaquin 2026-11-13): come back to it. The het network leaves ~1-11%
@@ -33295,8 +33302,10 @@ entries:
       paper.tex, a question about broken images, says nothing on placement); 2026-10-06T00:17 (transfer study plan, not the
       draft layout); 2026-10-05T04:33 (an older notes comment); 2026-11-13 messages (cut 'How the study was run', nothing
       on the synthetic part)
-    blocks_steps: &id003
+    blocks_steps:
     - 2
+    answered_at: '2026-11-15T17:24:22.178000+00:00'
+    decision: D458
   owner:
     agent: aae7320a57d6658f4
     state: stopped
@@ -33603,11 +33612,3 @@ entries:
       if:
       - 'Joaquin returns to it: design the follow-up he asks for'
       - 'never: stays out of the paper'
-  ask: 'Scope: the synthetic-generator definition, checks and cost table (about 5 pages of the ladder section) moved to an
-    appendix with one paragraph left in the ladder section, or kept where they are?'
-  waiting_since: '2026-11-15T00:25:20+00:00'
-  searched: site decisions --project FA (none on the synthetic section's placement); Joaquin 2026-11-14T04:31 (his pasted
-    paper.tex, a question about broken images, says nothing on placement); 2026-10-06T00:17 (transfer study plan, not the
-    draft layout); 2026-10-05T04:33 (an older notes comment); 2026-11-13 messages (cut 'How the study was run', nothing on
-    the synthetic part)
-  blocks_steps: *id003
