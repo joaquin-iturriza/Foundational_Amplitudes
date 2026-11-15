@@ -27577,8 +27577,7 @@ entries:
     start: '2026-11-12T03:17:01+00:00'
     at: '2026-11-12T03:17:01+00:00'
   step_waits:
-    '2': '2026-11-15: pretrain_data_saving''s fine-tune template (its step 5) and its parent choice (its step 6, WSD parent)
-      must exist before the AdamW-parent arm can be designed on the same grid'
+    '2': the pretrain_data_saving entry's grid design, which its step 2 needs first
   handoff:
     state: 'Sec. 3 of ~/drafts/fm_amplitudes_2026-11/paper.tex rewritten as ''Pretraining data, representation and training''
       (numbered subsections 3.1-3.7, reference-pretrainings paragraph). Cold-read reviewer a6bbd8868ba6b4f85 returned PASS
