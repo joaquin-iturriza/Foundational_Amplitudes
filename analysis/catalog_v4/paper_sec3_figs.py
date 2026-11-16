@@ -227,6 +227,10 @@ def pp_bound():
     for lab, keep in (("trained", lambda q: q in trained), ("held out", lambda q: q not in trained)):
         cs = sorted(q for q in set(a) & set(c) if keep(q))
         groups.append((lab, np.array([a[q] for q in cs]), np.array([c[q] for q in cs])))
+    from analysis.common import ratio_stats
+    for lab, xs, ys in groups:   # catalog over pp-only per class: n_num_lower = classes where the catalog is lower
+        r = ys / xs
+        print(f"  pp_bound {lab}: catalog/pp-only {ratio_stats(ys, xs)}, min {r.min():.3g} at pp-only MSE {xs[r.argmin()]:.3g}")
     scatter(groups, f"{MSE_LAB}, pp events only", f"{MSE_LAB}, catalog", "paper_pp_bound")
 
 
