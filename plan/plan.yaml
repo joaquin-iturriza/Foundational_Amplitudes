@@ -33344,6 +33344,15 @@ entries:
     - 2
     answered_at: '2026-11-15T17:24:22.178000+00:00'
     decision: D458
+  - ask: 'Scope: Fig. 8 of the draft redrawn by the shared true-vs-predicted function (x range = the truth''s own range; panel
+      d about -1.5..7 instead of -2.5..7.5), or kept as it is.'
+    at: '2026-11-16T20:10:47+00:00'
+    searched: site decisions --project FA (none on Fig. 8's range); Joaquin 2026-11-13T15:39 (asked why the truth and ratio
+      vanished and to undo the extras, not for a range rule); 2026-11-16T20:00 (the writing skill, not figures); 2026-11-14T04:31
+      (his pasted paper.tex, about broken images from the widerow macro); other 2026-11-16 messages (complaints about how
+      figures were sent, no choice on the range)
+    blocks_steps: &id003
+    - 3
   owner:
     agent: aceb4110a4694e016
     state: working
@@ -33648,3 +33657,11 @@ entries:
       if:
       - 'Joaquin returns to it: design the follow-up he asks for'
       - 'never: stays out of the paper'
+  ask: 'Scope: Fig. 8 of the draft redrawn by the shared true-vs-predicted function (x range = the truth''s own range; panel
+    d about -1.5..7 instead of -2.5..7.5), or kept as it is.'
+  waiting_since: '2026-11-16T20:10:47+00:00'
+  searched: site decisions --project FA (none on Fig. 8's range); Joaquin 2026-11-13T15:39 (asked why the truth and ratio
+    vanished and to undo the extras, not for a range rule); 2026-11-16T20:00 (the writing skill, not figures); 2026-11-14T04:31
+    (his pasted paper.tex, about broken images from the widerow macro); other 2026-11-16 messages (complaints about how figures
+    were sent, no choice on the range)
+  blocks_steps: *id003
