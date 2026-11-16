@@ -33430,7 +33430,7 @@ entries:
     decision: D464
   owner:
     agent: aceb4110a4694e016
-    state: stopped
+    state: closed
     since: '2026-11-16T20:03:20+00:00'
     state_at: '2026-11-16T22:38:44.823000+00:00'
     context: 249304
@@ -33721,30 +33721,36 @@ entries:
     start: '2026-11-13T07:19:46+00:00'
     at: '2026-11-13T07:19:46+00:00'
   handoff:
-    state: 'Draft 93c54e4 (from Joaquin''s Overleaf snapshot scratchpad overleaf_1113, adopted 16c1ec9): How-the-study-was-run
-      + Figs 25-28 removed (setup sentences added in Sec. 6 ''Target, model and metric''), rung_grid figs removed, finale_synth
-      figs/caption reverted to pre-5f4dc23, figures scaled (\widerow[scale]), legends as row strips (plot_style.legend_strip
-      width mode, FA 14132f0a), example_dist/Muon extras undone (FA 5e25e978), scatter smaller sets on top. Secs. 4-5 prose
-      tightened (93c54e4, findings kept). His part now pp. 8-32 (25 pages; snapshot 40, d742281 50). Zip of figures vs snapshot:
-      scratchpad overleaf_update_v4.zip (figures final; paper.tex there is stale, rebuild with current paper.tex). REMAINING
-      (coordinator''s order): tighten Sec. 6 prose (ladder findings/figures kept; synthetic section: drop internal names syn_00008,
-      ''Version 1'', ''no reason recorded'', ''478-entry catalog'', compile counts; keep the generator definition and equations),
-      then a fresh reviewer on Secs. 4-6 with the CLAUDE.md paper rules, arXiv 2601.13308/2405.14806/2411.00446, scratchpad
-      joaquin_draft_comments_0613.txt and _0920.txt and the coordinator''s message of today; fix, recompile with /mnt/c/texlive/2025/bin/windows/pdflatex.exe,
-      rebuild zip (paper.tex + figure files differing from overleaf_1113, excluding figs/kit), hand back PDF, page counts,
-      zip with paths, change list vs snapshot.'
-    decisions: 'Joaquin 2026-11-13: his Overleaf edits win; cut ''How the study was run'' and Figs 25-28; Figs 20/21 out;
-      Figs 18/19 back as before; figures smaller, no single-figure pages; legends centred strips; Fig 8/14 only show truth
-      tail and ratio everywhere (no markers/shading); check all figures for hidden data (only scatter draw order found, fixed).
-      rung_focus/star_arms panels NOT regenerated (current data at TP_USE_32K=1 changes points); only their legend strips,
-      made at TP_USE_32K=0.'
-    ruled_out: Regenerating rung_focus/star_arms panels from current data; triangles/shading in ratio panels; local /usr/bin/pdflatex
-      (TL2023, lacks dsfont)
+    state: 'Draft ~/drafts/fm_amplitudes_2026-11 at ded8a89 (current). Since cf688a5 (the Overleaf zip /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_final_overleaf.zip):
+      style pass 83a87eb (no \emph, full captions, \text, Fig./Tab., result lists as prose), item-1 pass 73c4b87, ladder redo
+      66c49d5 (heatmap dropped, ppcover from pp_bound @37af3f9a), plain ladder rewrite 009acff (one claim per paragraph, at
+      most one anchor number; cold reviewer PASS), metaphors replaced ded8a89. Build: copy paper.tex into /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/final_draft
+      (identical tree: cls, bst, incl_*.tex, bibs, figs), compile there with /mnt/c/texlive/2025/bin/windows/pdflatex.exe
+      + bibtex.exe (pdflatex x2 after bibtex), zip with: cd final_draft; zip -qr <out>.zip $(unzip -Z1 /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_final_overleaf.zip
+      | grep -v ''/$''). Latest zip /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_final_overleaf_plain2.zip,
+      PDF /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_final_plain2.pdf (45
+      pp). Joaquin''s latest upload /home/joaquin/.claude/uploads/71602535-0955-42ad-a58f-23dc320798dc/b183957a-fm_amplitudes.zip
+      was edited from the pre-style-pass version (cf688a5); its six co-author edits are listed in /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/their_edits.txt;
+      merging them into ded8a89 waits on Joaquin. Next step recorded by the coordinator (sigma-driven generation results into
+      the sampling subsection) not started.'
+    decisions: 'Joaquin 2026-11-16 on the writing skill: 9 conflicts answered (plot or nothing; no \emph; full captions; surrogate
+      network; Eq.~\eqref; non-adversarial comparisons; \text; Fig.~/prose; no hedging in final text); a value read off a
+      plotted figure counts as shown; one claim per paragraph with at most one anchor number, no per-case factor lists (reference
+      papers do this); comparisons stated plainly, no metaphors; gain heatmap dropped (''adds nothing new''); the 2.5x/3.7-4.2x
+      D split stays out (coincides with the horizon change). Skill .claude/skills/paper-writing-style/SKILL.md (FA c6d29f4d,
+      de06d721, 73a0db0d, 8beeb4bf, 19cfb273); CLAUDE.md paper bullet points to it (claudemd-keeper PASS). Seed-noise sentence
+      kept: ''lower at every D'' and the star arms ''at every D'' rest on single cells. Dead-cone b-mass explanation dropped
+      (whether the arm''s pools have a massive b not checked).'
+    ruled_out: Lists of per-probe gain factors in the ladder text; unplotted aggregates (geometric means over cells, per-rung
+      means, 698/840 count); the gain heatmap; the four further input conditionings of Sec. 5 (no figure, dropped); the synthetic
+      within-process spread 2.75 vs 1.32 (no figure)
     running: none
-    files: ~/drafts/fm_amplitudes_2026-11/paper.tex; scratchpad overleaf_1113/ (his snapshot); scratchpad overleaf_update_v4.zip;
-      scratchpad tight/lib.py (span-replace helper), s4.py, s5.py; plot_style.py legend_strip; analysis/catalog_v4/paper_sec3_figs.py;
-      analysis/data_saving/example_reruns.py
-    written: '2026-11-13T16:11:55+00:00'
+    files: ~/drafts/fm_amplitudes_2026-11/paper.tex; /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/final_draft/;
+      /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_final_overleaf_plain2.zip;
+      /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/their_edits.txt; .claude/skills/paper-writing-style/SKILL.md;
+      analysis/catalog_v4/paper_sec3_figs.py (pp_bound prints catalog/pp-only ratio_stats); /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/joaquin_draft_comments_0613.txt,
+      _0920.txt
+    written: '2026-11-16T22:59:59+00:00'
   step_why:
     3:
       feeds: whether and how the paper states the het-vs-MSE comparison
