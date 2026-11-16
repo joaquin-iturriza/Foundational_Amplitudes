@@ -33279,10 +33279,18 @@ entries:
     answers_after: '2026-11-15T00:25:20+00:00'
     covers:
     - draft_rewrite
+  - said_at: '2026-11-16T20:31:26.926000+00:00'
+    text: I believe the answer to this should be obvious, the range should be set to the largest of the two, why would you
+      pick one over the other?
+    decision: D462
+    answers_after: '2026-11-16T20:10:47+00:00'
+    covers:
+    - draft_rewrite
   decisions:
   - D365
   - D445
   - D458
+  - D462
   next:
     3: 'Het loss vs MSE (Fig. 9, removed from the draft by Joaquin 2026-11-13): come back to it. The het network leaves ~1-11%
       of 2->2 test events unfitted with large sigma (median |Delta| better 118/146, MSE worse on most 2->2); evaluation checked,
@@ -33369,8 +33377,10 @@ entries:
       vanished and to undo the extras, not for a range rule); 2026-11-16T20:00 (the writing skill, not figures); 2026-11-14T04:31
       (his pasted paper.tex, about broken images from the widerow macro); other 2026-11-16 messages (complaints about how
       figures were sent, no choice on the range)
-    blocks_steps: &id003
+    blocks_steps:
     - 3
+    answered_at: '2026-11-16T20:31:26.926000+00:00'
+    decision: D462
   owner:
     agent: aceb4110a4694e016
     state: stopped
@@ -33680,11 +33690,3 @@ entries:
       if:
       - 'applied: send the zip and the change list'
       - 'a change alters a claim: ask Joaquin with the figure'
-  ask: 'Scope: Fig. 8 of the draft redrawn by the shared true-vs-predicted function (x range = the truth''s own range; panel
-    d about -1.5..7 instead of -2.5..7.5), or kept as it is.'
-  waiting_since: '2026-11-16T20:10:47+00:00'
-  searched: site decisions --project FA (none on Fig. 8's range); Joaquin 2026-11-13T15:39 (asked why the truth and ratio
-    vanished and to undo the extras, not for a range rule); 2026-11-16T20:00 (the writing skill, not figures); 2026-11-14T04:31
-    (his pasted paper.tex, about broken images from the widerow macro); other 2026-11-16 messages (complaints about how figures
-    were sent, no choice on the range)
-  blocks_steps: *id003
