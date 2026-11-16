@@ -33412,6 +33412,7 @@ entries:
     context_at: '2026-11-16T20:38:18+00:00'
   step_waits:
     '3': '2026-11-20: next draft round'
+    '5': fresh cold reviewer of the item-1 pass (draft paper.tex uncommitted)
   findings:
   - at: '2026-11-13T02:46:58+00:00'
     text: '2026-11-13 ~03:50 Joaquin: ''we should start actually doing the work on the draft with what we have ... Let''s
