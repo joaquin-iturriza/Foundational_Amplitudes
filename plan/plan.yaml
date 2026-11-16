@@ -33402,6 +33402,17 @@ entries:
     - 3
     answered_at: '2026-11-16T20:31:26.926000+00:00'
     decision: D462
+  - ask: 'Scope: new figures beyond the item-1 pass (the coordinator''s order was to propose, not draw). Draw the synthetic,
+      every-structure and star-arm columns on the gain heatmap, a gain-against-D figure per rung group with the horizon change
+      marked, and seed bands on the per-probe curves, so the ladder numbers can come back beside them? Also: Fig. ppcover
+      shows the pp-only pretraining better on the classes it trains and level on held-out ones, not coverage helping as your
+      0613 comment expected; the text now keeps the catalog for its energy reach. Agreed?'
+    at: '2026-11-16T21:04:11+00:00'
+    searched: draft 73c4b87 Secs. 4-6, analysis/transfer/gain_heatmap.py, scratchpad joaquin_draft_comments_0613/0920, site
+      decisions D457 D458; his messages 2026-11-14T04:31 (his Overleaf paper.tex, no word on these figures), 2026-11-10T02:08
+      (the rewrite request, no figure list), 2026-11-16T20:00 (the writing skill, not these figures)
+    blocks_steps: &id003
+    - 4
   owner:
     agent: aceb4110a4694e016
     state: working
@@ -33711,3 +33722,13 @@ entries:
       if:
       - 'Joaquin says yes: draw them with the figure-style skill and put the numbers back beside them'
       - 'no: the text stays worded from the existing figures'
+  ask: 'Scope: new figures beyond the item-1 pass (the coordinator''s order was to propose, not draw). Draw the synthetic,
+    every-structure and star-arm columns on the gain heatmap, a gain-against-D figure per rung group with the horizon change
+    marked, and seed bands on the per-probe curves, so the ladder numbers can come back beside them? Also: Fig. ppcover shows
+    the pp-only pretraining better on the classes it trains and level on held-out ones, not coverage helping as your 0613
+    comment expected; the text now keeps the catalog for its energy reach. Agreed?'
+  waiting_since: '2026-11-16T21:04:11+00:00'
+  searched: draft 73c4b87 Secs. 4-6, analysis/transfer/gain_heatmap.py, scratchpad joaquin_draft_comments_0613/0920, site
+    decisions D457 D458; his messages 2026-11-14T04:31 (his Overleaf paper.tex, no word on these figures), 2026-11-10T02:08
+    (the rewrite request, no figure list), 2026-11-16T20:00 (the writing skill, not these figures)
+  blocks_steps: *id003
