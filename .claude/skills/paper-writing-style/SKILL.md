@@ -33,11 +33,12 @@ change); this skill holds how the text reads.
    counts, no account of how a result was obtained or what was tried first. A thing is named by what it is (a
    process by its reaction, a pretraining by what it trained on). The same rule for figures is enforced by
    `.claude/hooks/send_check.py`, with accepted terms in `docs/glossary.txt`.
-9. **A result is shown in a plot or not at all.** A result that can only be given qualitatively, or whose numbers
-   cannot be plotted (at most put in a table), is probably wrong or not important enough: rethink why it cannot be
-   quantified or plotted, or drop it and state what the problem is. In the paper, the text words a plotted result
-   without repeating its numbers. `docs/results.tex` is a record: there every claim carries its number
-   (notes-editor).
+9. **A result is shown in a plot or not at all.** A value read off a plotted figure counts as shown and is stated
+   where it makes a point: a gain read from two plotted curves (fine-tune against scratch), a count of plotted
+   points, a position on an axis, with the figure cited. What no figure shows (a number from a run, an aggregate
+   over several figures, a spread never drawn) is not stated: plot it, or drop it and state the problem. A result
+   that can only be given qualitatively is probably wrong or not important enough: rethink why it cannot be
+   quantified. `docs/results.tex` is a record: there every claim carries its number (notes-editor).
 10. **No hedging in the final text.** A claim that cannot be defended is not made. Hedging stays only where it is by
    design, in work in progress, which does not go into the final paper.
 
