@@ -33322,7 +33322,7 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-4fa87893
-    commit: c6d29f4d
+    commit: de06d721
     paths:
     - .claude/skills/paper-writing-style/SKILL.md
     - /home/joaquin/drafts/fm_amplitudes_2026-11/paper.tex
