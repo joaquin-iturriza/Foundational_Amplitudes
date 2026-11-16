@@ -33596,6 +33596,15 @@ entries:
       skill had no rule against it. Fixed: skill vocabulary row ''a metaphor for a comparison -> the comparison itself'' (FA,
       this commit). Draft ded8a89: every-structure vs rung 9 stated per probe (about 3x lower on u ubar->Zggg, from 8.0 vs
       2.4 read off Fig. finale_synth_qcd), star-arm ''dilutes/undo'' and ''costs/carries'' replaced.'
+  - at: '2026-11-16T23:07:06+00:00'
+    text: '2026-11-17: sec:div-sampling sigma-steering figures redrawn for Joaquin (''show me the results ... we saw the sigma
+      driven generation working''): l2_eeuu_online a-c by l2_eeuu_online.py (unchanged, @7fe85ad blob), l2_uugg_perdecade,
+      l2_uugg_gamma, l2_gamma_response_extended, l2_uug_multiscale, l2_uuggg_perdecade, l2_bbbarg by the new analysis/divergences/plot_steering.py
+      (FA c3f0548d) from steering_eval_summary.json (the npz inputs of the older scripts are only on Jean Zay); ratio axes
+      MSE_steered/MSE_uniform; bbbarg now three seeds (mean, std); all nine pass send_check --scan. Numbers: uug gamma 3 over
+      uniform Z peak 0.40, peak&IR 0.25, continuum 1.005; bbbarg gamma 3 three-seed peak 0.54, shoulder 0.52, continuum 0.83;
+      uuggg overall 5.68e-2 -> 5.65e-2; uugg deepest decade 0.90 (gamma 1) -> 0.55 (gamma 10), 3 seeds; eeuu starved base
+      sigma^0.5+IS 5.25x below static, IS-only within 1.11x of it.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
