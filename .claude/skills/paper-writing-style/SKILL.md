@@ -38,7 +38,9 @@ change); this skill holds how the text reads.
    points, a position on an axis, with the figure cited. What no figure shows (a number from a run, an aggregate
    over several figures, a spread never drawn) is not stated: plot it, or drop it and state the problem. A result
    that can only be given qualitatively is probably wrong or not important enough: rethink why it cannot be
-   quantified. `docs/results.tex` is a record: there every claim carries its number (notes-editor).
+   quantified. A paragraph makes one claim its figure shows, as a trend or a ranking, with at most one number
+   as an anchor; never a list of per-case factors read off the curves (the reference papers state figure
+   results this way, with zero or one number per figure). `docs/results.tex` is a record: there every claim carries its number (notes-editor).
 10. **No hedging in the final text.** A claim that cannot be defended is not made. Hedging stays only where it is by
    design, in work in progress, which does not go into the final paper.
 
