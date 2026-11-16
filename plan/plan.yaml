@@ -33432,7 +33432,7 @@ entries:
     agent: aaaf7a20d9dbeed54
     state: working
     since: '2026-11-16T23:01:27+00:00'
-    state_at: '2026-11-16T23:01:27+00:00'
+    state_at: '2026-11-16T23:03:02.314000+00:00'
     context: 102143
     context_at: '2026-11-16T23:03:12+00:00'
   step_waits:
