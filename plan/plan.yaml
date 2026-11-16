@@ -33323,9 +33323,6 @@ entries:
     3: 'Het loss vs MSE (Fig. 9, removed from the draft by Joaquin 2026-11-13): come back to it. The het network leaves ~1-11%
       of 2->2 test events unfitted with large sigma (median |Delta| better 118/146, MSE worse on most 2->2); evaluation checked,
       no bug; training precision not checked'
-    4: 'Figures proposed by the item-1 pass for results now worded without numbers: synthetic, every-structure and star-arm
-      columns on the gain heatmap; gain against D per rung group with the horizon change marked; seed bands on the per-probe
-      curves'
     5: 'Redo of the item-1 pass per Joaquin 2026-11-16: gains read off plotted curves stated again; heatmap and its text removed;
       D-split numbers out; seed-noise sentence out unless needed; Fig. ppcover reworded (catalog lower on held-out classes,
       pp-only lower on trained); skill rule 9 clarified; owner aceb4110a4694e016; relay change list, PDF, full zip.'
@@ -33729,11 +33726,6 @@ entries:
       if:
       - 'Joaquin returns to it: design the follow-up he asks for'
       - 'never: stays out of the paper'
-    4:
-      feeds: whether the ladder section's numbers come back, carried by figures
-      if:
-      - 'Joaquin says yes: draw them with the figure-style skill and put the numbers back beside them'
-      - 'no: the text stays worded from the existing figures'
     5:
       feeds: the draft's ladder and sampling text
       if:
