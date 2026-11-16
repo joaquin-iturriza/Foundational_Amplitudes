@@ -198,6 +198,23 @@ An outside legend is a last resort for when the entries fit in no panel at all â
 labels, say. Then it is **one strip above the plot** via `ps.shared_legend`, never below, never
 to the side, and it grows the canvas rather than the panel.
 
+## True against predicted distributions: the one layout
+
+Any figure of a predicted distribution against the truth (log|M|^2, a ratio, a kinematic
+variable) is drawn by `ps.true_pred_hist` (built on `ps.hist_ratio`, 617c4bb6), never by hand.
+The reference is the paper's Fig. 8, `analysis/data_saving/example_reruns.py` (figs
+`example_dist_*`).
+
+| element | rule |
+|---|---|
+| ratio panel | **directly under its histogram, sharing its x axis** (`ps.hist_ratio`). The histogram has no x tick labels; the x label goes on the ratio axes. Never a ratio panel on its own x range, never a ratio in a separate figure. |
+| x range | **the truth's**: its first to last filled bin, the same edges for truth and every model. Never set by a model's tail, never a percentile clip of the pooled values. |
+| a model mostly off the truth's range | not drawn (under 1% of its events inside, `min_inside`); `true_pred_hist` returns its label and the **caption names it**. Never widen the range to fit it. |
+| ratio limits | fixed per figure (default 0.5 to 1.5, `log_ratio` for spreads of a decade); values beyond are drawn at the edge. A ratio is drawn in every bin with true events: no minimum-count mask. |
+| truth | black line, first in the legend, on top. |
+| in-panel text | **the process label only.** A stratum, cut, energy or event count goes in the caption, never in the panel. |
+| several panels | `ps.panels(n)` + `ps.save_panels`, one legend strip (`ps.legend_strip`); right-hand panels drop the ratio y label. |
+
 ## Include at natural size in LaTeX
 
 ```latex
