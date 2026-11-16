@@ -26,6 +26,7 @@ OUT = os.path.join(HERE, "figs")
 LBL = [r"$<\!-6$", r"$-6$", r"$-5$", r"$-4$", r"$-3$", r"$-2$", r"$-1$"]   # lower edge of each y_min decade
 X = np.arange(len(LBL))
 YL = r"MSE$(\Delta\log|\mathcal{M}|^2)$"
+YR = r"MSE$_\mathrm{steered}$ / MSE$_\mathrm{uniform}$"   # sigma-steered arm over uniform keep
 REG = [("peak", r"$<3$"), ("shoulder", r"$3\!-\!15$"), ("continuum", r"$>15$"), ("peak_ir", r"$<3$, IR")]
 printed = {}
 
@@ -48,13 +49,13 @@ def decade_axes(ax, ylabel=YL):
 b, g = seeds("base"), seeds("sigma")
 fig, (axL, axR) = ps.figure(ncols=2)
 axL.errorbar(X, b.mean(0), yerr=b.std(0), fmt="o-", color=ps.C.grey, mfc="white", label="uniform")
-axL.errorbar(X, g.mean(0), yerr=g.std(0), fmt="s-", color=ps.C.vermillion, label=r"$\sigma^{\gamma}$, $\gamma=1$")
+axL.errorbar(X, g.mean(0), yerr=g.std(0), fmt="s-", color=ps.C.vermillion, label="steered")
 axL.set_yscale("log"); decade_axes(axL)
 ps.legend(axL, "lower left")
 ps.process_label(axL, r"$e^+e^-\to u\bar u gg$")
 axR.axhline(1.0, color=ps.C.grey, ls=":", label="parity")
-axR.errorbar(X, g.mean(0) / b.mean(0), yerr=(g / b).std(0), fmt="D-", color=ps.C.vermillion, label=r"$\sigma^{\gamma}$ / uniform")
-decade_axes(axR, "MSE ratio")
+axR.errorbar(X, g.mean(0) / b.mean(0), yerr=(g / b).std(0), fmt="D-", color=ps.C.vermillion, label=r"$\gamma=1$")
+decade_axes(axR, YR)
 ps.legend(axR, "upper left")
 ps.save(fig, os.path.join(OUT, "l2_uugg_perdecade"))
 printed["uugg_g1_ratio_per_decade"] = (g.mean(0) / b.mean(0)).round(3).tolist()
@@ -66,7 +67,7 @@ fig, (axL, axR) = ps.figure(ncols=2)
 axL.axhline(1.0, color=ps.C.grey, ls=":", zorder=1, label="parity")
 for (k, a), c in zip(arms.items(), ps.sequence(len(arms))):
     axL.errorbar(X, (a / b).mean(0), yerr=(a / b).std(0), fmt="o-", color=c, label=rf"$\gamma={k}$")
-decade_axes(axL, "MSE ratio")
+decade_axes(axL, YR)
 ps.legend(axL, "upper left", ncol=2)
 ps.process_label(axL, r"$e^+e^-\to u\bar u gg$", loc="lower right")
 gg = np.array(list(arms))
@@ -77,7 +78,7 @@ axR.axhline(1.0, color=ps.C.grey, ls=":", label="parity")
 axR.plot(gg, deep, "o-", color=ps.C.blue, label=r"$\log_{10} y_{\min}<-6$")
 axR.plot(gg, logf, "s-", color=ps.C.vermillion, label="log-flat")
 axR.plot(gg, shal, "^-", color=ps.C.green, label=r"$\log_{10} y_{\min}>-1$")
-axR.set_xlabel(r"$\gamma$"); axR.set_ylabel("MSE ratio"); axR.set_xticks(gg)
+axR.set_xlabel(r"$\gamma$"); axR.set_ylabel(YR); axR.set_xticks(gg)
 ps.legend(axR, "upper left")
 ps.save(fig, os.path.join(OUT, "l2_uugg_gamma"))
 printed["uugg_gamma"] = dict(gamma=gg.tolist(), deepest=deep.round(3).tolist(), logflat=logf.round(3).tolist(),
@@ -104,7 +105,7 @@ for ax, (proc, bt, rows) in zip(axes, PROCS):
     ax.set_xscale("log"); ax.set_xticks(gx); ax.set_xticklabels([str(k) for k in gx]); ax.minorticks_off()
     ax.set_xlabel(r"$\gamma$")
     ps.process_label(ax, proc, loc="upper left")
-axes[0].set_ylabel("MSE ratio")
+axes[0].set_ylabel(YR)
 ps.legend(axes[1], "lower left", handles=axes[0].get_legend_handles_labels()[0])
 ps.save(fig, os.path.join(OUT, "l2_gamma_response_extended"))
 
