@@ -17425,6 +17425,16 @@ entries:
       V-beta send: refused (caption leaves ''parent r5'' etc. undefined; and the old figure has no legend file). Not stoppable:
       the min-count ratio mask of example_dist (a choice after looking, unless true_pred_hist is used), a caption naming a
       curve the legend lacks (V-beta''s ''trained on V·beta''). tests/test_figure_setup.py; repo-reviewer pending.'
+  - at: '2026-11-16T20:39:28+00:00'
+    text: '2026-11-16 figure setup committed cfe97bf5 (repo-reviewer a2168a01 PASS, backlog advanced to 2e100669), incl. D462
+      union range: true_pred_hist x range = union of truth and every model, every model drawn, no truth-range option; example_reruns,
+      paper_sec3_figs, kit_vs_mlp, kit_paper_figs, muon_long updated; kit_paper_figs collect re-binned on min..max (was a
+      0.1/99.9% value clip and 99.5% delta clip that lost up to 0.6% of events) and recollected from CC: every event in the
+      histograms. Regenerated: analysis/kit_benchmark/figs/paper/kit_dist_*, kit_delta_*, figs/vs_mlp/kitvm_*, analysis/catalog_v4/figs/muon_long_examples_{a,b,c}
+      + _legend; no !! line. The union range shows what the truth range hid: the transformer''s u ubar g collinear prediction
+      has tails from about -17 to +10 in log10|M|^2 against a truth within about -2..2 (kit_dist_a_a), scratch tails over
+      -13..+13 and the MLP on raw inputs about 4 decades low in kitvm_dist_ee_uug_me2_a (read off the figures). Fig. 8 not
+      regenerated.'
   handoff:
     state: '2026-11-12 ~15:10 local. Restore of CC pools deleted 2026-11-11: held-out H1..H7c all prebuilt (check_site_data
       0 missing); dsh_eea 115/115 train rebuilt, val/test sha256 230/230 unchanged, its parts gc''d (5.45 GB); PP4: 1 pool
