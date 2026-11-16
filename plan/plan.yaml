@@ -33323,9 +33323,6 @@ entries:
     3: 'Het loss vs MSE (Fig. 9, removed from the draft by Joaquin 2026-11-13): come back to it. The het network leaves ~1-11%
       of 2->2 test events unfitted with large sigma (median |Delta| better 118/146, MSE worse on most 2->2); evaluation checked,
       no bug; training precision not checked'
-    5: 'Redo of the item-1 pass per Joaquin 2026-11-16: gains read off plotted curves stated again; heatmap and its text removed;
-      D-split numbers out; seed-noise sentence out unless needed; Fig. ppcover reworded (catalog lower on held-out classes,
-      pp-only lower on trained); skill rule 9 clarified; owner aceb4110a4694e016; relay change list, PDF, full zip.'
   done_when: null
   notes_ref: null
   match: none
@@ -33431,7 +33428,6 @@ entries:
     context_at: '2026-11-16T21:19:16+00:00'
   step_waits:
     '3': '2026-11-20: next draft round'
-    '5': fresh cold reviewer of the ladder redo (draft paper.tex uncommitted)
   findings:
   - at: '2026-11-13T02:46:58+00:00'
     text: '2026-11-13 ~03:50 Joaquin: ''we should start actually doing the work on the draft with what we have ... Let''s
@@ -33727,8 +33723,3 @@ entries:
       if:
       - 'Joaquin returns to it: design the follow-up he asks for'
       - 'never: stays out of the paper'
-    5:
-      feeds: the draft's ladder and sampling text
-      if:
-      - 'reviewer passes: send zip and change list'
-      - 'a claim changes: ask Joaquin with the figure'
