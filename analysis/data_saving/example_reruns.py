@@ -90,12 +90,6 @@ D_STYLE = {100: ":", 1000: "--", 10000: "-"}
 D_LAB = {100: r"$10^2$", 1000: r"$10^3$", 10000: r"$10^4$"}
 
 
-def hist_ratio(ax):
-    """The ratio panel under a histogram, a quarter of the plot box's height, sharing its x axis (as
-    analysis/catalog_v4/paper_sec3_figs.hist_ratio, the papers' layout)."""
-    r = ax.inset_axes([0, -0.31, 1, 0.25], sharex=ax)
-    ax.tick_params(labelbottom=False)
-    return r
 
 
 def plot():
@@ -137,7 +131,7 @@ def plot():
     # true and predicted log|M|^2 with the ratio below, one panel per probe
     fh = ps.panels(4)
     for k, ((fig, ax), p) in enumerate(zip(fh, PROBES)):
-        r = hist_ratio(ax)
+        r = ps.hist_ratio(ax)
         have = [(a, D) for a in ("scratch", "fine-tune") for D in D_STYLE if (p, D, a) in by]
         if not have:
             continue

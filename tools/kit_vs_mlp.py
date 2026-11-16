@@ -20,8 +20,11 @@ Figures (each panel its own file, its own legend):
   kitvm_median_<p>_*   median predicted log10|M|^2 per bin and the truth's
   kitvm_dev_<p>_*      median prediction minus the truth's median per bin (symlog)
   kitvm_bulk           bulk_test log-MSE per process
-  kitvm_dist_*         one stratum per family (the deepest) and each process's bulk: truth and predicted log10|M|^2
-                       histograms, predicted over true below, over the range any of them occupies
+  kitvm_dist_<p>_*     one stratum per family (the deepest) and the bulk: truth and predicted log10|M|^2 histograms
+                       over the truth's range, predicted over true directly below (ps.hist_ratio, shared x); a model
+                       with under 1% of its events in that range is not drawn
+  kitvm_ratio_beta_*   t t~ virtual threshold family: |M|^2_pred/|M|^2_true per bin of beta, median and 16-84% band
+                       (a histogram of a beta bin is a box: log10|M|^2 is near flat there)
 """
 import argparse
 import json
@@ -47,13 +50,16 @@ HIST_RUNS = {p: {"factor": ("ccin2p3", "runs/kit/" + FACTOR.format(p=p)),
 HIST_RUNS["ee_uug_me2"]["scratch"] = ("ccin2p3", "runs/kit_hpo_uug_plain/trial_1918")
 HIST_RUNS["ee_uugg_me2"]["scratch"] = ("ccin2p3", "runs/kit_hpo_uugg_plain/trial_0798")
 HIST_RUNS["ee_tt_virt_finite"]["scratch"] = ("lxplus", "runs/kit_hpo_ttvirt_thr/trial_0131")
-# one stratum per family (the deepest bin) and the bulk; canvases of two, grouped by process
-CANVASES = [[("ee_uug_me2", "hard_test", "coll_y_1e-07_1e-06"), ("ee_uug_me2", "hard_test", "soft_x_1e-07_1e-06")],
-            [("ee_uugg_me2", "hard_test", "coll_qg_y_1e-07_1e-06"), ("ee_uugg_me2", "hard_test", "coll_gg_y_1e-07_1e-06")],
-            [("ee_uugg_me2", "hard_test", "soft_x_1e-07_1e-06"), ("ee_uugg_me2", "hard_test", "azimuth_gg_y_1e-07")],
-            [("ee_tt_virt_finite", "hard_test", "threshold_beta_0.0001_0.001"),
-             ("ee_tt_virt_finite", "hard_test", "sudakov_sqrts_15000_50000")],
-            [("ee_uug_me2", "bulk_test", "bulk"), ("ee_tt_virt_finite", "bulk_test", "bulk")]]
+# one stratum per family (the deepest bin) and each process's bulk, a true-against-predicted histogram each; the t t~
+# threshold family is read against beta instead (EX_X): in a bin of beta log10|M|^2 is close to flat (|M|^2 ~ 1/beta,
+# beta log-uniform), so its histogram is a box whatever the model does
+EXAMPLES = [("ee_uug_me2", "hard_test", "coll_y_1e-07_1e-06"), ("ee_uug_me2", "hard_test", "soft_x_1e-07_1e-06"),
+            ("ee_uug_me2", "bulk_test", "bulk"),
+            ("ee_uugg_me2", "hard_test", "coll_qg_y_1e-07_1e-06"), ("ee_uugg_me2", "hard_test", "coll_gg_y_1e-07_1e-06"),
+            ("ee_uugg_me2", "hard_test", "soft_x_1e-07_1e-06"), ("ee_uugg_me2", "hard_test", "azimuth_gg_y_1e-07"),
+            ("ee_uugg_me2", "bulk_test", "bulk"),
+            ("ee_tt_virt_finite", "hard_test", "sudakov_sqrts_15000_50000"), ("ee_tt_virt_finite", "bulk_test", "bulk")]
+EX_X = [("ee_tt_virt_finite", "hard_test", "threshold_beta*")]
 THR = r"MLP, log + $\log(s_{t\bar t}-4m_t^2)$"
 # legend symbol -> (Bakar's label in kit_bakar_figs.json base, our rerun tag), per process
 MLPS = {"ee_uug_me2": [("MLP log", "MLP, log invariants", "mlpmlp"), ("MLP raw", "MLP, raw invariants", "mlpraw")],
@@ -70,6 +76,23 @@ EX, RUNS = json.loads(sys.argv[1]), json.loads(sys.argv[2])
 out = []
 for proc, split, st in EX:
     stem, tk = (proc[:-4], "log10_me2") if proc.endswith("_me2") else ("ee_tt", "log10_abs_" + proc[len("ee_tt_"):])
+    if st.endswith("*"):    # a whole family against its singular variable: 10^(pred - truth) per bin of 4 a decade
+        with h5py.File(kh.h5_path(stem), "r") as T:
+            sts = [x for x in T[split] if x.startswith(st[:-1])]
+            x = np.concatenate([T[split][x]["singular_var"][:] for x in sts])
+            t = np.concatenate([T[split][x][tk][:] for x in sts])
+        lx = np.log10(x)
+        e = np.arange(np.floor(lx.min() * 4) / 4, lx.max() + 0.25, 0.25)
+        i = np.digitize(lx, e) - 1
+        keep = [b for b in range(len(e) - 1) if (i == b).sum() >= 50]
+        r = {"proc": proc, "split": split, "stratum": st, "n": int(len(t)), "x": [float(10 ** (e[b] + 0.125)) for b in keep],
+             "ratio": {}}
+        for lab, d in RUNS.get(proc, {}).items():
+            with h5py.File(d + "/kit_benchmark/predictions.h5", "r") as P:
+                q = 10 ** (np.concatenate([P[split][x][tk][:] for x in sts]) - t)
+            r["ratio"][lab] = [np.quantile(q[i == b], [0.16, 0.5, 0.84]).tolist() for b in keep]
+        out.append(r)
+        continue
     with h5py.File(kh.h5_path(stem), "r") as T:
         t = T[split][st][tk][:]
     # edges from the truth alone (both sites draw the same): 40 bins over its 0.1-99.9% range, the same width out to
@@ -93,19 +116,34 @@ print("KITVM " + json.dumps(out))
 def collect():
     from analysis.common.readers import site_python
     import shlex
-    ex = [x for c in CANVASES for x in c]
+    ex = EXAMPLES + EX_X
+    out = os.path.join(DATA, "kit_vs_mlp_hist.json")
+    prev = {(e["proc"], e["stratum"]): e for e in json.load(open(out))} if os.path.exists(out) else {}
     merged = None
     for site in ("ccin2p3", "lxplus"):
         runs = {p: {lab: d for lab, (s, d) in m.items() if s == site} for p, m in HIST_RUNS.items()}
-        part = site_python(SITE, [shlex.quote(json.dumps(ex)), shlex.quote(json.dumps(runs))], "KITVM", site=site,
-                           timeout=3000)
+        try:
+            part = site_python(SITE, [shlex.quote(json.dumps(ex)), shlex.quote(json.dumps(runs))], "KITVM", site=site,
+                               timeout=3000)
+        except SystemExit as err:   # a site down: its models keep the previous collection's histograms where they match
+            print(f"{site} not read ({str(err)[-200:]}); its models from the previous collection where the bins match")
+            for a in merged:
+                o = prev.get((a["proc"], a["stratum"]))
+                if o and "edges" in a and o.get("edges") == a["edges"] and o["truth"] == a["truth"]:
+                    for lab in runs.get(a["proc"], {}):
+                        if lab in o["pred"]:
+                            a["pred"][lab] = o["pred"][lab]; a["outside"][lab] = o["outside"][lab]
+            continue
         if merged is None:
             merged = part
             continue
         for a, b in zip(merged, part):
+            if "ratio" in a:
+                assert a["x"] == b["x"], f"{a['stratum']}: the sites' KIT files differ"
+                a["ratio"].update(b["ratio"])
+                continue
             assert a["edges"] == b["edges"] and a["truth"] == b["truth"], f"{a['stratum']}: the sites' KIT files differ"
             a["pred"].update(b["pred"]); a.setdefault("outside", {}).update(b.get("outside", {}))
-    out = os.path.join(DATA, "kit_vs_mlp_hist.json")
     json.dump(merged, open(out, "w"))
     print(f"-> {out}")
 
@@ -166,20 +204,28 @@ def plot(figs):
                 tm = dict((round(x, 12), y) for x, y in tr["median"][fam])
                 if kind == "median":
                     ax.plot(*zip(*tr["median"][fam]), "-", color="k", label="truth")
-                for sym, m in med.items():
-                    rows = m[fam]
-                    c, mk, ls = sty[sym]
-                    y = [q[2] if kind == "median" else q[2] - tm[round(q[0], 12)] for q in rows]
-                    ax.plot([q[0] for q in rows], y, marker=mk, ls=ls, color=c, label=sym)
-                    if kind == "dev":
-                        print(f"DEV {p} {fam} {sym}: deepest {y[0]:+.3g}, max |dev| {max(map(abs, y)):.3g}")
-                ax.set_xscale("log"); ax.xaxis.set_minor_formatter(NullFormatter())
-                if kind == "median":    # the truth's span and half of it again each side: a series beyond it leaves the axes
+                ys = {sym: [q[2] if kind == "median" else q[2] - tm[round(q[0], 12)] for q in m[fam]] for sym, m in med.items()}
+                if kind == "median":    # the truth's span and half of it again each side
                     ty = [y for _, y in tr["median"][fam]]
                     pad = max(1.0, 0.5 * (max(ty) - min(ty)))
-                    ax.set_ylim(min(ty) - pad, max(ty) + pad)
+                    lo, hi = min(ty) - pad, max(ty) + pad
+                else:                   # the models on the truth (factor, MLP with log inputs) and half again
+                    lim = max(0.1, 1.5 * max(abs(v) for s_, y in ys.items() if s_ in ("factor", "MLP log", r"MLP log+$\beta$")
+                                             for v in y))
+                    lo, hi = -lim, lim
+                for sym, m in med.items():
+                    y = ys[sym]
+                    if kind == "dev":
+                        print(f"DEV {p} {fam} {sym}: deepest {y[0]:+.3g}, max |dev| {max(map(abs, y)):.3g}")
+                    if not any(lo <= v <= hi for v in y):     # wholly off the axes: not drawn (caption)
+                        print(f"OFF {kind} {p} {fam} {sym}: not drawn")
+                        continue
+                    c, mk, ls = sty[sym]
+                    ax.plot([q[0] for q in m[fam]], y, marker=mk, ls=ls, color=c, label=sym)
+                ax.set_xscale("log"); ax.xaxis.set_minor_formatter(NullFormatter())
                 if kind == "dev":
                     ax.set_yscale("symlog", linthresh=0.01); ax.axhline(0, color="k", lw=0.8)
+                ax.set_ylim(lo, hi)
                 ax.set_xlabel(XLAB.get(fam, fam))
                 ax.set_ylabel(r"median $\log_{10}|\mathcal{M}|^2$" if kind == "median"
                               else r"median$_{\rm pred}-$median$_{\rm true}$")
@@ -198,48 +244,64 @@ def plot(figs):
     ax.set_yscale("log"); ax.set_ylabel(r"bulk log-MSE of $\log_{10}|\mathcal{M}|^2$")
     ps.shared_legend(fig, ax, ncol=3)
     written.append(ps.save(fig, os.path.join(figs, "kitvm_bulk")))
-    # (5) distributions of one stratum per family, predicted over true below
+    # (5) true against predicted log10|M|^2 of one stratum per family, predicted over true in the panel below (shared x,
+    # ps.hist_ratio); the range is the truth's, a model with under 1% of its events in it is not drawn there
     hp = os.path.join(DATA, "kit_vs_mlp_hist.json")
     if os.path.exists(hp):
-        H = {(e["proc"], e["stratum"]): e for e in json.load(open(hp))}
-        for i, canvas in enumerate(CANVASES):
-            fig, axs = ps.figure(ncols=2, nrows=2)
-            for j, (p, _, st) in enumerate(canvas):
-                e = H[(p, st)]
-                c = np.array(e["edges"]); t = np.array(e["truth"], float)
-                hs = {k: np.array(v, float) for k, v in e["pred"].items()}
-                occ = np.flatnonzero(t + sum(hs.values()))
-                a, b = occ[0], occ[-1] + 1                       # crop to the occupied bins, merge to <= 300
-                m = int(np.ceil((b - a) / 300))
-                b = a + m * int(np.ceil((b - a) / m))
-                b = min(b, len(t))
-                a = b - m * ((b - a) // m)
-                c = c[a:b + 1:m]
-                t = t[a:b].reshape(-1, m).sum(1)
-                e = dict(e, pred={k: v[a:b].reshape(-1, m).sum(1) for k, v in hs.items()})
-                top, bot = axs[0][j], axs[1][j]
-                top.stairs(t, c, color="k", label="truth")
-                for sym in ("factor", "scratch", "MLP log", "MLP raw"):
-                    if sym not in e["pred"]:
+        H = json.load(open(hp))
+        mlp_sym = lambda p, k: r"MLP log+$\beta$" if k == "MLP log" and p.startswith("ee_tt") else k
+        for p in PROCS:
+            ex = [e for e in H if e["proc"] == p and "edges" in e]
+            panels = ps.panels(len(ex))
+            for (fig, ax), e in zip(panels, ex):
+                c, t = np.array(e["edges"]), np.array(e["truth"], float)
+                occ = np.flatnonzero(t)
+                a_, b_ = occ[0], occ[-1] + 1                      # the truth's range, at the collection's bin width
+                c, t = c[a_:b_ + 1], t[a_:b_]
+                r = ps.hist_ratio(ax)
+                for k in ("factor", "MLP log", "scratch", "MLP raw"):
+                    if k not in e["pred"]:
                         continue
-                    h = np.array(e["pred"][sym], float)
+                    h = np.array(e["pred"][k], float)[a_:b_]
+                    inside = h.sum() / e["n"]
+                    sym = mlp_sym(p, k)
+                    print(f"DIST {p} {e['stratum']} {sym}: {100 * inside:.1f}% of its events in the truth's range")
+                    if inside < 0.01:
+                        continue
                     col, _, ls = sty[sym]
-                    lab = r"MLP log+$\beta$" if sym == "MLP log" and p.startswith("ee_tt") else sym
-                    col, _, ls = sty[lab]
-                    top.stairs(h, c, color=col, ls=ls, label=lab)
-                    bot.stairs(np.where(t > 0, h / np.where(t > 0, t, 1), np.nan), c, color=col, ls=ls)
-                    print(f"DIST {p} {st} {lab}: outside the edges {100 * e['outside'][sym]:.1f}%")
-                top.set_yscale("log"); top.set_ylabel("events"); top.set_ylim(0.5, None)
-                occ = np.flatnonzero(t)                   # the ratio exists where the truth has events
-                bot.set_xlim(c[occ[0]], c[occ[-1] + 1])
-                bot.set_yscale("log"); bot.set_ylabel("pred / true")
-                for ax in (top, bot):
-                    ax.set_xlabel(r"$\log_{10}(|\mathcal{M}|^2)$")
-                fam = family(st)
-                lo_hi = st[len(fam) + 1:].replace("_", ",")
-                ps.process_label(top, PROC[PROCS[p]] + ("" if st == "bulk" else rf", {fam.split('_')[0]} [{lo_hi}]"))
-            ps.shared_legend(fig, axs[0][0], ncol=3)
-            written.append(ps.save(fig, os.path.join(figs, f"kitvm_dist_{'abcde'[i]}")))
+                    ax.stairs(h, c, color=col, ls=ls, label=sym)
+                    with np.errstate(divide="ignore", invalid="ignore"):
+                        rat = np.where(t > 0, h / t, np.nan)
+                    r.stairs(np.clip(rat, 0.105, 9.5), c, color=col, ls=ls)   # beyond the limits: drawn at the edge
+                ax.stairs(t, c, color="k", label="truth", zorder=5)
+                r.axhline(1, color="k", lw=0.8)
+                r.set_yscale("log"); r.set_ylim(0.1, 10); r.set_yticks([0.1, 1, 10], ["0.1", "1", "10"])
+                ax.set_xlim(c[0], c[-1]); ax.set_yscale("log"); ax.set_ylabel("events")
+                r.set_xlabel(r"$\log_{10}(|\mathcal{M}|^2/\mathrm{GeV}^{-2})$")
+                r.set_ylabel(r"$\frac{\rm pred}{\rm true}$")
+                ps.process_label(ax, PROC[PROCS[p]])
+                ps.shared_legend(fig, ax, ncol=3)
+            written += ps.save_panels(panels, os.path.join(figs, f"kitvm_dist_{p}"))
+        # (6) the t t~ threshold family: 10^(pred - truth) per bin of beta, median and 16-84% band
+        for e in [e for e in H if "ratio" in e]:
+            p = e["proc"]
+            fig, ax = ps.figure()
+            x = np.array(e["x"])
+            for k in ("factor", "MLP log", "scratch", "MLP raw"):
+                if k not in e["ratio"]:
+                    continue
+                q = np.array(e["ratio"][k])
+                sym = mlp_sym(p, k)
+                col, mk, ls = sty[sym]
+                ax.plot(x, q[:, 1], marker=mk, ls=ls, color=col, label=sym)
+                ax.fill_between(x, q[:, 0], q[:, 2], color=col, alpha=0.2, lw=0)
+                print(f"BETA {sym}: median pred/true at beta {x[0]:.2g} {q[0, 1]:.3g}, at {x[-1]:.2g} {q[-1, 1]:.3g}")
+            ax.axhline(1, color="k", lw=0.8)
+            ax.set_xscale("log"); ax.set_yscale("log"); ax.xaxis.set_minor_formatter(NullFormatter())
+            ax.set_xlabel(XLAB["threshold_beta"]); ax.set_ylabel(r"$|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2_{\rm true}$")
+            ps.process_label(ax, PROC[PROCS[p]])
+            ps.shared_legend(fig, ax, ncol=3)
+            written.append(ps.save(fig, os.path.join(figs, f"kitvm_ratio_beta_{p}")))
     for w in written:
         print("FIGURE", w)
 

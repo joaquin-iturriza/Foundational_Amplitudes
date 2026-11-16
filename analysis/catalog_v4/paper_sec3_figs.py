@@ -106,11 +106,6 @@ def muon():
     scatter(g, f"{MSE_LAB}, Muon", f"{MSE_LAB}, AdamW", "paper_muon", span=2)   # beside an example panel
 
 
-def hist_ratio(ax):
-    """The ratio panel under a histogram, a quarter of the plot box's height, sharing its x axis (the papers' layout)."""
-    r = ax.inset_axes([0, -0.31, 1, 0.25], sharex=ax)
-    ax.tick_params(labelbottom=False)
-    return r
 
 
 def examples():
@@ -127,7 +122,7 @@ def examples():
         n = (len(c) // REB) * REB
         return e[:n + 1:REB], np.add.reduceat(np.asarray(c[:n], float), np.arange(0, n, REB))
     for (fig, ax), p in zip(figs, pick):
-        r = hist_ratio(ax)
+        r = ps.hist_ratio(ax)
         lo, hi = np.inf, -np.inf
         for k in ("muon", "adamw"):     # each run's record bins truth and prediction on its own edges
             rec = h[k][f"PP4:{p}"]

@@ -609,6 +609,15 @@ def process_label(ax, text: str, loc: str = "upper right", **kwargs):
     return lbl
 
 
+def hist_ratio(ax):
+    """The ratio panel under a histogram, a quarter of the plot box's height, sharing its x axis (the papers' layout:
+    analysis/catalog_v4/paper_sec3_figs, analysis/data_saving/example_reruns, tools/kit_vs_mlp). The histogram keeps
+    no x tick labels; set the x label on the returned ratio axes."""
+    r = ax.inset_axes([0, -0.31, 1, 0.25], sharex=ax)
+    ax.tick_params(labelbottom=False)
+    return r
+
+
 #: The only legend positions allowed. A legend at `center left` / `center right` / `center`
 #: floats in the middle of the plot with data on both sides of it, and it reads as a mistake
 #: even when it happens not to overlap anything -- two of them ("weirdly placed") were spotted
