@@ -33579,6 +33579,11 @@ entries:
       Fixed: skill rule 9 now says one claim per paragraph as a trend or ranking, at most one anchor number, no lists of per-case
       factors (FA 8beeb4bf). Draft 009acff: ladder results rewritten that way, 13 TeV comparison one sentence (median 2.6
       and 1.1, pp_bound @37af3f9a); cold reviewer PASS.'
+  - at: '2026-11-16T22:38:06+00:00'
+    text: '2026-11-16: Joaquin asked what ''moves gain between probes'' means. Cause: comparison worded as a metaphor; the
+      skill had no rule against it. Fixed: skill vocabulary row ''a metaphor for a comparison -> the comparison itself'' (FA,
+      this commit). Draft ded8a89: every-structure vs rung 9 stated per probe (about 3x lower on u ubar->Zggg, from 8.0 vs
+      2.4 read off Fig. finale_synth_qcd), star-arm ''dilutes/undo'' and ''costs/carries'' replaced.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
