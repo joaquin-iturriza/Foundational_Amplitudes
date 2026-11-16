@@ -33611,6 +33611,13 @@ entries:
       the quarter-flat base; uugg deep IR, half at gamma 10; uug/bbg Z peak, 2.5x at gamma 3; uuggg nothing, 8% worse at gamma
       20 and ''Finally'' sentence), six figures (fig:steer_eeuu, steer, steer_uug, steer_bbg, steer_uuggg, steer_gamma) from
       FA plot_steering.py @c3f0548d and l2_eeuu_online.py; 48 pp; cold reviewer running.'
+  - at: '2026-11-16T23:26:22+00:00'
+    text: '2026-11-17: step 4 done. Draft 47bbb35 (from ded8a89): sampling subsection''s sigma-driven generation on ee->uu
+      (Fig. steer_eeuu, 3 panels), uugg (steer, redrawn), uug (steer_uug), bbg (steer_bbg), uuggg (steer_uuggg), gamma response
+      (steer_gamma); cold reviewer FIX (12 items: controls per panel, target density, unplotted seed spread, uuggg premise,
+      Finally scoped to uniform keep, windows, y_ij) applied, re-check PASS. Zip scratchpad draft_final_overleaf_steer.zip
+      (200 files, compiled standalone, 48 pp), PDF draft_final_steer.pdf. Co-authors'' six edits still not merged (waits on
+      Joaquin).'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
