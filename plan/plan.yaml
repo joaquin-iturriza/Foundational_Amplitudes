@@ -33318,6 +33318,10 @@ entries:
       no bug; training precision not checked'
     4: 'Item 1 of Joaquin''s 2026-11-16 answers: rethink the results his sections state without a plot (list handed back 2026-11-16);
       separate pass'
+    5: 'Item-1 pass on Joaquin''s sections: the results stated without a plot (inputs'' four conditionings; ladder opening
+      summary; per-probe D-averaged gains; ''gains follow the structures''; star-arm cost on ee->dd) each get a plot, a showable
+      number, or are dropped with the reason; and confirm with him the section split (his: data saving, pretraining data/representation/training,
+      ladder+synthetic; co-authors'': accuracy benchmark, more legs, Feynman-diagram conditioning).'
   done_when: null
   notes_ref: null
   match: none
@@ -33711,3 +33715,8 @@ entries:
       if:
       - 'a result can be plotted: draw it and reword the text around the figure'
       - 'it cannot be plotted or quantified: drop it and state the problem'
+    5:
+      feeds: the draft's results meeting the paper-writing-style rule 9
+      if:
+      - 'he confirms the split: run the pass on his sections'
+      - 'a section is his too: include it'
