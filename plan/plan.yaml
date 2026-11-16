@@ -33608,6 +33608,14 @@ entries:
       Finally scoped to uniform keep, windows, y_ij) applied, re-check PASS. Zip scratchpad draft_final_overleaf_steer.zip
       (200 files, compiled standalone, 48 pp), PDF draft_final_steer.pdf. Co-authors'' six edits still not merged (waits on
       Joaquin).'
+  - at: '2026-11-16T23:52:31+00:00'
+    text: '2026-11-17: Joaquin: ''we show only the figure with the two panels you sent for uug and that''s it, and we remove
+      the phrase saying that the gain is modest''. Draft 8b55c58: steering text cut to method + uug Z peak (2.5x at gamma
+      3, continuum unchanged), one figure (fig:steer = l2_uug_multiscale); co-authors'' edits merged (ab margin note moved
+      from the caption, where \marginpar cannot compile, to the text sentence citing the figure; Tab. sentence with empty
+      ref kept in the caption; genmix caption opening; rung_focus caption adapted to its colours; clearpage before Sec. cond
+      removed); ''modest'' sentence and stray preamble line left out. 45 pp; zip scratchpad draft_final_overleaf_steer_uug.zip
+      compiled standalone.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
