@@ -33323,15 +33323,6 @@ entries:
     3: 'Het loss vs MSE (Fig. 9, removed from the draft by Joaquin 2026-11-13): come back to it. The het network leaves ~1-11%
       of 2->2 test events unfitted with large sigma (median |Delta| better 118/146, MSE worse on most 2->2); evaluation checked,
       no bug; training precision not checked'
-    4: 'Sigma-driven generation in the draft''s sampling subsection beyond ee->uugg (Joaquin 2026-11-16: ''I also asked for
-      the other results we have for the sigma driven generation, not only the uugg ones, why aren''t they there?''; his 2026-11-13
-      words: ''out of all the figures about the sigma driven generation, I don''t understand why you chose one that shows
-      basically no effect'' and ''provide the figures that exist that show these numbers ... show all that we did in a concise
-      way''): add the existing results of docs/results.tex sec:div-sampling, each with its figure from committed tools: ee->uu
-      online (fig:l2_eeuu_online, sigma does not beat a fresh static draw on a 2->2 resonance), ee->uug multi-scale (fig:l2_uug_multiscale,
-      the Z peak error falls 2.5x at gamma 3, continuum untouched), ee->uuggg (fig:l2_uuggg_perdecade, no gain: diffuse divergence;
-      gamma 10, 20 reverse it, fig:l2_gamma_response_extended), ee->bbg massive (fig:l2_bbbarg); concise, one claim per paragraph
-      per the skill; on the version with the co-authors'' six edits merged if Joaquin says so; fresh reviewer; zip and PDF.'
   done_when: null
   notes_ref: null
   match: none
@@ -33439,7 +33430,6 @@ entries:
     context_at: '2026-11-16T23:11:55+00:00'
   step_waits:
     '3': '2026-11-20: next draft round'
-    '4': the next owner of draft_rewrite (hand-off written 2026-11-17; previous owner closed near the context limit)
   findings:
   - at: '2026-11-13T02:46:58+00:00'
     text: '2026-11-13 ~03:50 Joaquin: ''we should start actually doing the work on the draft with what we have ... Let''s
@@ -33782,8 +33772,3 @@ entries:
       if:
       - 'Joaquin returns to it: design the follow-up he asks for'
       - 'never: stays out of the paper'
-    4:
-      feeds: the draft's sigma-driven generation results
-      if:
-      - 'reviewer passes: send the figure(s) and the zip'
-      - 'a figure needs redrawing to the current style: redraw from its committed tool'
