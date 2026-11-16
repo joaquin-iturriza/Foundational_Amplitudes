@@ -33313,6 +33313,8 @@ entries:
     3: 'Het loss vs MSE (Fig. 9, removed from the draft by Joaquin 2026-11-13): come back to it. The het network leaves ~1-11%
       of 2->2 test events unfitted with large sigma (median |Delta| better 118/146, MSE worse on most 2->2); evaluation checked,
       no bug; training precision not checked'
+    4: 'Item 1 of Joaquin''s 2026-11-16 answers: rethink the results his sections state without a plot (list handed back 2026-11-16);
+      separate pass'
   done_when: null
   notes_ref: null
   match: none
@@ -33700,3 +33702,8 @@ entries:
       if:
       - 'Joaquin returns to it: design the follow-up he asks for'
       - 'never: stays out of the paper'
+    4:
+      feeds: which results the draft keeps under 'a result is shown in a plot or not at all'
+      if:
+      - 'a result can be plotted: draw it and reword the text around the figure'
+      - 'it cannot be plotted or quantified: drop it and state the problem'
