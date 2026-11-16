@@ -15793,6 +15793,13 @@ entries:
     23: Show Joaquin the CLAUDE.md diff of the reviewer's three dedupe findings (fixed by agent aceb4110a4694e016 without
       his yes, per his 2026-11-16 'I don't understand why this would need me'), and the figure-setup result with the union-range
       correction (agent a0636264613b51f22).
+    24: 'send_check fix (Joaquin 2026-11-16 ''Send me the figure, why do you keep sending me pages of the draft???''): a figure
+      of the paper draft must be sendable as the figure itself, not as draft pages. Add a committed tools/draft_figure.py
+      <label> that extracts the \includegraphics/\pnl block of that figure environment from the draft''s paper.tex and compiles
+      it standalone (legend strip plus panels, no caption) to <scratchpad>/draft_fig_<label>.{pdf,png} with a <base>.legend.txt
+      recording the tool and its blob; make send_check accept a file that tool made and point its draft-figure refusal at
+      the tool instead of ''compiled draft pages''; test on fig:finale_synth and fig:finale_synth_qcd; run the hook tests
+      in .venv-cpu; commit named paths.'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16317,6 +16324,11 @@ entries:
       if:
       - 'reviewer passes: send the diff'
       - 'reviewer blocks: fix and re-check'
+    24:
+      feeds: sending draft figures to Joaquin
+      if:
+      - 'tests pass: main session uses the tool'
+      - 'it needs judgment: report'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
