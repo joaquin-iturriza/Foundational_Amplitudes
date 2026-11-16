@@ -33287,6 +33287,9 @@ entries:
     3: 'Het loss vs MSE (Fig. 9, removed from the draft by Joaquin 2026-11-13): come back to it. The het network leaves ~1-11%
       of 2->2 test events unfitted with large sigma (median |Delta| better 118/146, MSE worse on most 2->2); evaluation checked,
       no bug; training precision not checked'
+    4: 'Joaquin''s writing-skill answers (2026-11-16): apply items 2,3,7,8 to his sections (no emph, full captions, text not
+      mathrm, prose not lists), skill updated, list places where a result is written without a plot (item 1) for a later pass;
+      agent aceb4110a4694e016 doing it; relay the diff and the new zip.'
   done_when: null
   notes_ref: null
   match: none
@@ -33672,6 +33675,11 @@ entries:
       if:
       - 'Joaquin returns to it: design the follow-up he asks for'
       - 'never: stays out of the paper'
+    4:
+      feeds: the draft's text conventions
+      if:
+      - 'applied: send the zip and the change list'
+      - 'a change alters a claim: ask Joaquin with the figure'
   ask: 'Scope: Fig. 8 of the draft redrawn by the shared true-vs-predicted function (x range = the truth''s own range; panel
     d about -1.5..7 instead of -2.5..7.5), or kept as it is.'
   waiting_since: '2026-11-16T20:10:47+00:00'
