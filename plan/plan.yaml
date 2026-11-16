@@ -15802,7 +15802,7 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-046cc7d3
-    commit: 866e644d
+    commit: cfe97bf5
     paths:
     - .claude/hooks/notification_absorb.py
     - .claude/hooks/owner_handoff.py
@@ -15939,6 +15939,7 @@ entries:
     - analysis/agent_redesign/wake_batching.json
     - analysis/agent_redesign/wake_batching_all.json
     - analysis/agent_redesign/wake_batching_baseline.json
+    - analysis/kit_benchmark/figs/paper
     - 'double wake (next 15, D279), 2026-11-04: main-session record since 2026-10-31T04:22Z: 32 agent task-notifications started
       a turn of their own (the rest were folded mid-turn); the harness called the model on 4 (10-31 15:15, 19:31, 22:27 delivered-by-hand-back;
       23:06 waiting on its own work), none since 10-31T23:06; the other 28 were held without a call. Hand-back to notification
@@ -16022,6 +16023,7 @@ entries:
     - switch-overs A, B, D applied and committed (merge 2c7741c0, settings 84a15232); reply check fixed (d2c15a58); worktree
       removal script (d39af33d, 978b7179); supervisor summary-check fixes in ~/.local/bin/site, supervisor restarted 12:55
     - tests/test_context_push.py
+    - tests/test_figure_setup.py
     - tests/test_handback_batch.py
     - tests/test_owner_handoff.py
     - tests/test_plan_ledger_sync.py
