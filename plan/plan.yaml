@@ -16319,7 +16319,7 @@ entries:
     agent: a0636264613b51f22
     state: working
     since: '2026-11-16T20:07:48+00:00'
-    state_at: '2026-11-16T20:07:48+00:00'
+    state_at: '2026-11-16T20:31:50.268000+00:00'
     context: 192626
     context_at: '2026-11-16T20:32:00+00:00'
   designs:
@@ -33383,9 +33383,9 @@ entries:
     decision: D462
   owner:
     agent: aceb4110a4694e016
-    state: stopped
+    state: working
     since: '2026-11-16T20:03:20+00:00'
-    state_at: '2026-11-16T20:08:59.262000+00:00'
+    state_at: '2026-11-16T20:32:14.242000+00:00'
     context: 81135
     context_at: '2026-11-16T20:07:32+00:00'
   step_waits:
