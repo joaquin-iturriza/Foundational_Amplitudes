@@ -95,6 +95,7 @@ Prose paragraphs, not bullet lists, for results.
 | "not just X, but Y"; rule-of-three padding; "studies show" with nothing behind it | a plain declarative; the one item that matters; a citation |
 | an em-dash (`---`), above all in a header | a comma, colon or full stop |
 | "surrogate model" | "surrogate network" |
+| a metaphor for a comparison ("moves gain between probes", "dilutes", "lifts", "carries", "costs") | the comparison itself: which arm is lower than which, on which probe, in which figure |
 | "scaled" (loss) | "heteroscedastic" |
 
 **Also cut:** sentences that restate an equation; what the figure under discussion already shows; negative results
