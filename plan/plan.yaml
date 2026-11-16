@@ -16338,6 +16338,7 @@ entries:
     '21': the date 2026-11-17 (a week after the 2026-11-09 23:54 restart on the batching code)
     '22': owner a0636264613b51f22 hand-back (figure setup fix, repo-reviewer a2168a01c708db057 running)
     '23': main session relay; owner a0636264613b51f22 hand-back after step 24
+    '24': mechanical-worker a3d68fa11233894ec is building tools/draft_figure.py and the send_check change
   owner:
     agent: a0636264613b51f22
     state: stopped
