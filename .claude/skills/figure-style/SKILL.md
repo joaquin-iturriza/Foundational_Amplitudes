@@ -231,7 +231,7 @@ exactly 1.000, so figure text matches body text. `ps.save` guarantees nothing ex
 The figures in the reference paper (arXiv:2601.13308) are very plain. Match them.
 
 **No titles.** No `set_title`, no `suptitle`, no panel titles. Explanation lives in the LaTeX
-caption and body text.
+caption and body text, worded by the paper-writing-style skill.
 
 **No reading instructions.** Delete `(higher = better)`, `(lower = better)`, `(IR <-> bulk)`,
 `(<1 = sigma wins)` from labels, ticks, legends and annotations.

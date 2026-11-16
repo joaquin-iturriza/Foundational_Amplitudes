@@ -30,24 +30,13 @@ reviewer cannot see any of that, and those are the findings that matter most.
 
 ## The author's voice
 
-The reference is the author's own paper, **arXiv:2601.13308, _Scaling laws for amplitude
-surrogates_** (Bahl, Bresó-Pla, Butter, Iturriza Ramirez). Match that register; do not
-invent a new one.
+The voice is the paper-writing-style skill's (`.claude/skills/paper-writing-style/SKILL.md`): read it first and
+enforce it, including its vocabulary and cut lists. Two notebook-specific additions:
 
-- **Formal, technical, declarative.** Direct assertions for established results ("we show",
-  "this demonstrates"); measured hedging only where warranted ("can", "appears to", "we
-  speculate") for genuinely novel claims. No hype adjectives.
-- **First-person plural for methods and results** ("we residualize", "we find"); impersonal
-  for background. **Present tense** for findings.
-- **Punctuation: commas and colons carry the load.** Em-dashes are rare in the reference
-  paper. In LaTeX the em-dash is `---`; this document has historically overused it badly, so
-  treat a high `---` density as the primary thing to fix. Keep one only where a true
-  parenthetical break earns it.
-- **Sentence rhythm varies:** a short topic sentence, then a longer qualified one. Not a
-  string of uniform clauses, not fragmented bullet-speak.
+- **Em-dash density** (`---`) is the primary thing to fix: this document has historically overused it badly.
 - **Quantitative claims carry their number and its uncertainty**, and say how it was
-  measured. A comparative claim ("X beats Y") without the metric and the conditions is
-  incomplete: the comparison metric here is the best non-regularized validation loss on
+  measured (the notebook is a record, unlike the paper). A comparative claim ("X beats Y") without the metric and the
+  conditions is incomplete: the comparison metric here is the best non-regularized validation loss on
   log-amplitudes (`val_loss_no_reg`), and a claim that silently uses another metric, or
   compares across differing preprocessing, is a blocking finding.
 
@@ -95,19 +84,6 @@ Before asserting which processes ANY run trained on, open its `config.yaml` and 
 Reading `data.dataset` on a recipe run silently inverts what was held out, and therefore
 what "zero-shot", "held-out", "never seen" and "in-distribution" mean. Treat a claim about
 training-set membership that was not checked this way as unverified, and say so.
-
-## Kill on sight (LLM tells)
-
-- **"not just X, but Y" / "it's not just … it's …"** antithesis scaffolding. Rewrite as a
-  plain declarative.
-- **Em-dash (`---`) overuse.** Replace with a comma, colon, or full stop.
-- **Empty intensifiers and hype:** "crucial(ly)", "powerful", "seamless", "it is worth
-  noting that", "importantly", "notably", "rich".
-- **Rule-of-three padding** ("robust, reliable, and reproducible"), hedging pileups
-  ("might potentially perhaps"), and listicle prose where sentences belong.
-- **Vague attribution:** "studies show", "it is well known", with nothing behind it.
-- **Self-congratulatory framing** of a result ("a striking finding", "remarkably"). State
-  the number; let it be striking on its own.
 
 ## Structure the repo requires
 

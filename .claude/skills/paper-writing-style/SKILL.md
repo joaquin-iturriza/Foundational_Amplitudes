@@ -1,0 +1,128 @@
+---
+name: paper-writing-style
+description: >-
+  How to write paper text for Foundational_Amplitudes: forward argumentation, sharp physics-first arguments,
+  sentence and paragraph patterns, vocabulary, and the equation, figure, caption and reference conventions. Use it
+  whenever writing, rewriting, editing or reviewing LaTeX paper text (sections, results paragraphs, captions,
+  abstracts, conclusions, outlooks) for the amplitude papers, and for the prose of docs/results.tex.
+---
+
+# Paper writing style
+
+The group's writing rules, merged with our own. The voice to match is that of our papers, arXiv:2601.13308
+(scaling laws for amplitude surrogates), 2405.14806 and 2411.00446: read them before writing, and plot as they do
+(figure-style skill). The text is for a reader who knows only the paper. Never put people's names into text about
+these rules. CLAUDE.md "Results and reporting" holds the process rules (reviewer before Joaquin, which sections may
+change); this skill holds how the text reads.
+
+## The core rules
+
+1. **Forward argumentation.** "We want Y, so we do X", never "we do X, because that way we can Y". Check the
+   direction of every sentence that explains why something is done, and flip it if it runs backwards. Motivation
+   comes before method.
+2. **Sharp arguments only.** Every sentence earns its place. Cut hedging, throat-clearing, the obvious, and anything
+   the equation or figure already says.
+3. **Formulas work without the text.** If extra notation seems needed, simplify the argument, not the words. No
+   proofs.
+4. **A symbol is defined inline at its first use, and only if it is used afterwards.** No notation tables.
+5. **Physics first, method second.** The readers are physicists and master's students.
+6. **Fewer words.** Each piece of information once, tersely.
+7. **Active voice, present tense:** "we train", "we find". Passive only for objective, universal statements; past
+   tense only in the outlook or conclusions.
+8. **No internal names and no history.** No run, sweep, arm or recipe names, no "Version 1", no compile or trial
+   counts, no account of how a result was obtained or what was tried first. A thing is named by what it is (a
+   process by its reaction, a pretraining by what it trained on). The same rule for figures is enforced by
+   `.claude/hooks/send_check.py`, with accepted terms in `docs/glossary.txt`.
+9. **Numbers:** in the paper, every result is shown in a figure or worded without its numbers (CLAUDE.md); see the
+   open conflict below. `docs/results.tex` is a record: there every claim carries its number (notes-editor).
+
+## Flow, not templates
+
+The patterns below are tendencies, not slots. If every sentence runs "For X, verdict. The reason is ...", the text
+is monotonic. Connect paragraphs as an argument:
+- **A question:** "the question is if ...", "Once we are convinced that ..., the question is ...".
+- **The figure as the answer:** "In the left panel of Fig.~\ref{...} we show ...", "In the right panel ... and
+  confirm that ...".
+- **Consequences:** "This means that ...".
+- **Comparisons:** "As for ...", "While ...", "However, compared to ...", "Again, ...", "Consequently, ...".
+
+Prose paragraphs, not bullet lists, for results.
+
+## Sentence patterns
+
+- **"For [context], [verdict]."** The context (process, pretraining, data size, phase-space region) first, the
+  verdict after, without "we observe that". Example: "For $e^+e^-\to b\bar b$ at one loop, the pretrained network
+  reaches the scratch network's loss with a tenth of the data."
+- **"Again, ..."** opens a sentence when a pattern repeats, instead of explaining it again.
+- **"... provides us with ..."** carries the payoff sentence of a case block.
+- **Limitations are appended, never foregrounded:** a subordinate clause after a positive claim ("..., until the
+  loss is dominated by the numerical precision of the amplitudes."). Never "Although X is limited by ..., it ...".
+- **"The reason is that ..."** gives a real cause its own sentence, at most once per section and never in two
+  neighbouring paragraphs. Usually the forward order (setup first, then result) needs no connective.
+- **A colon for elaboration** instead of "namely", "specifically", "in particular".
+- **"familiar"** tells the reader a pattern is one they know, without explaining it.
+- **Rhythm:** a short declarative sentence (under ~15 words) carries the claim, a longer one carries the mechanism,
+  chaining at most two clauses, then reset. A reader who skims only the short sentences still gets the argument.
+- **"Finally, ..."** only for the closing sentence of a results paragraph, carrying the full-range claim.
+
+## Paragraph and section structure
+
+- **Sections** open with a declarative problem statement or physics goal, never with a definition.
+- **Results paragraphs:** what the figure shows or what is tested; the methods in order of increasing
+  sophistication; the "Finally, ..." sentence.
+- **"We find that ..."** introduces empirical findings. No conclusions announced in the methods part.
+- **Conclusions:** the physics problem, with no "in this work we ..."; one sentence on the approach ("In this paper,
+  we have targeted this problem with ..."); a two-sentence result per case; an outlook that follows from the
+  results, limitations appended to positive claims.
+
+## Vocabulary
+
+| Avoid | Write |
+|---|---|
+| "neural-network" (as a noun) | "neural network" |
+| "performs well", "shows good results", "is able to" | maintains, recovers, achieves, provides us with, follows (results); fails, inherits, collapses, drops (failures); find, observe, confirm, show (observations) |
+| "In this work we consider/explore/apply X" | cut, and state the approach directly |
+| vague hedges ("shows good performance, but typically reaches limitations when ...") | cut, and give the per-case result |
+| "crucial(ly)", "powerful", "seamless", "notably", "importantly", "it is worth noting", "remarkably", "striking" | cut |
+| "not just X, but Y"; rule-of-three padding; "studies show" with nothing behind it | a plain declarative; the one item that matters; a citation |
+| an em-dash (`---`), above all in a header | a comma, colon or full stop |
+| "scaled" (loss) | "heteroscedastic" |
+
+**Also cut:** sentences that restate an equation; what the figure under discussion already shows; negative results
+implied by the main result.
+
+## Equations, references, figures
+
+- **Around an equation:** before it, 0-2 sentences with the goal; after it, the symbol definitions inline, one
+  sentence with the implication, then stop.
+- **References:** figures `Fig.~\ref{fig:..}`, sections `Sec.~\ref{sec:..}`, tables `Tab.~\ref{tab:..}`; never
+  `\cref` for equations.
+- **`\text{}`, not `\mathrm{}`, for words inside math:** `A_\text{NN}`, `\tau_\text{lo}`.
+- **No subfigures.** A plain grid of `\includegraphics` (`\widerow` in the draft), each panel's position described
+  in the one caption. No panel titles (figure-style skill).
+- **Every caption stands alone:** the process, the setting and every legend symbol defined, the methods ordered as
+  in the text or its reverse. What the figure shows goes in the caption, never inside the plot (figure-style).
+
+## Open conflicts (Joaquin's call; until he decides, CLAUDE.md and the draft's current convention hold)
+
+- Group: "Specific numbers over qualitative claims: percentages, GeV values, error margins." Ours (CLAUDE.md): "every
+  result is shown in a figure or worded without its numbers".
+- Group: "No `\emph{}` anywhere." The draft uses `\emph` (17 times).
+- Group: "Never write 'As Fig.~\ref{...}, for ...': write the full caption, even if it repeats another one." The
+  draft has three such captions (rung_focus, finale_synth and star_arms companions).
+- Group: "surrogate network", never "surrogate model". Our 2601.13308 is titled with "amplitude surrogates"; the
+  draft says "surrogate amplitudes" once.
+- Group: `Eq.\eqref{eq:..}` (no tie). The draft writes `Eq.~\eqref` (13 of 14).
+- Group: no "Unlike Ref. X, we ..." or "in contrast to ..." comparison with other work. The draft's KIT NLO
+  benchmark and its L-GATr comparison ("should be compared with ... Ref.") compare with other work by design.
+- Group: `\text{}`, not `\mathrm{}`, for text in math. The draft has `\mathrm{MSE}`, `\mathrm{NS}_5`, `\mathrm{Bin}`.
+- Group: `Fig.~\ref` and prose over bullet lists. The co-authors' sections (kept untouched) write `Figure~\ref` 13
+  times; the synthetic-generator subsection lists its limits as `\textbf`-headed bullets.
+- Group: no hedging at all. notes-editor (before this merge): "measured hedging only where warranted ('can',
+  'appears to', 'we speculate') for genuinely novel claims"; it now defers to this skill.
+
+## Before you hand back text
+
+Check every sentence, also of a one-line fix: it argues forward; it chains at most two clauses; it says something
+new; it has no hedging, meta-commentary or internal name; every symbol in it is defined and used; it uses no
+`\mathrm` for words and no `\cref` for equations; every caption stands alone.
