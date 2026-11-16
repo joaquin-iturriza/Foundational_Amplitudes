@@ -33323,6 +33323,9 @@ entries:
     3: 'Het loss vs MSE (Fig. 9, removed from the draft by Joaquin 2026-11-13): come back to it. The het network leaves ~1-11%
       of 2->2 test events unfitted with large sigma (median |Delta| better 118/146, MSE worse on most 2->2); evaluation checked,
       no bug; training precision not checked'
+    4: 'Ladder section rewrite per Joaquin 2026-11-16 (''why ... state these gains like this? It''s really confusing''): each
+      results paragraph one claim its figure shows with at most one number, no per-probe factor lists, after reading 2601.13308
+      and 2405.14806; owner aceb4110a4694e016; relay PDF, zip and a before/after paragraph.'
   done_when: null
   notes_ref: null
   match: none
@@ -33730,3 +33733,8 @@ entries:
       if:
       - 'Joaquin returns to it: design the follow-up he asks for'
       - 'never: stays out of the paper'
+    4:
+      feeds: the ladder section's text
+      if:
+      - 'reviewer passes: send'
+      - 'a claim changes: ask Joaquin with the figure'
