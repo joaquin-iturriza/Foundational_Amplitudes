@@ -128,7 +128,7 @@ def test_draft_figure_goes_as_pages(tmp_path):
     _sidecar(str(tmp_path / "example_dist_a"), [])
     bad, _ = sc.legend_findings({"files": [str(tmp_path / "example_dist_a.png")], "caption": ""}, "/",
                                 drafts=str(tmp_path))
-    assert bad and "compiled draft pages" in bad[0]
+    assert bad and "tools/draft_figure.py" in bad[0]
     assert sc.legend_findings({"files": [str(tmp_path / "draft_v2.pdf")], "caption": ""}, "/",
                               drafts=str(tmp_path)) == ([], [])
 
@@ -136,3 +136,16 @@ def test_draft_figure_goes_as_pages(tmp_path):
 if __name__ == "__main__":
     import pytest
     sys.exit(pytest.main([__file__, "-q"]))
+
+
+def test_draft_figure_tool_output_accepted(tmp_path):
+    """tools/draft_figure.py's file carries a legend file naming the tool; same stem as a draft figure, still sendable"""
+    (tmp_path / "paper.tex").write_text("\\includegraphics{figs/draft_fig_x.pdf}\n")
+    tool = os.path.join(ROOT, "tools", "draft_figure.py")
+    blob = subprocess.run(["git", "-C", ROOT, "hash-object", tool], capture_output=True, text=True).stdout.strip()
+    base = str(tmp_path / "draft_fig_x")
+    open(base + ".png", "wb").close()
+    open(base + ".legend.txt", "w").write(f"# producer: {tool} {blob}\nfrom scratch\n")
+    bad, _ = sc.legend_findings({"files": [base + ".png"], "caption": "from scratch: the baseline"}, "/",
+                                drafts=str(tmp_path))
+    assert not any("paper draft" in b for b in bad)

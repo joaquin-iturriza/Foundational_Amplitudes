@@ -31,7 +31,8 @@ is not committed at the content that drew it (git blob), when the save recorded 
 legend entry, a ratio panel that is not a hist_ratio inset), or when the caption leaves a legend entry undefined (the
 entry, reduced to its letters and digits, TeX symbols as their Unicode letters, must appear in the caption reduced the
 same way). The legend entries are shown at every send. A figure the paper draft includes (an includegraphics stem of a
-.tex under ~/drafts) is never sent loose: a comparison of draft figures goes as compiled draft pages.
+.tex under ~/drafts) is never sent loose: the figure itself goes as made by tools/draft_figure.py <label>
+(its .legend.txt names that tool), never as draft pages.
 
 A term listed in docs/glossary.txt (term<TAB>plain definition) is allowed, in its underscore or its spaced form.
 
@@ -257,9 +258,11 @@ def legend_findings(tool_input, cwd, drafts=None):
         if is_deck(p) or is_draft(p) or "run_plots" in os.path.normpath(p).split(os.sep):
             continue
         stems = draft_stems(drafts) if stems is None else stems
-        if re.sub(r"\.(png|pdf)$", "", os.path.basename(p), flags=re.I) in stems:
-            bad.append("%s: a figure of the paper draft: send the compiled draft pages (draft_*.pdf), never the loose "
-                       "figure" % p)
+        lg0 = read_legend(p)
+        made_by_tool = lg0 is not None and os.path.basename(lg0[0]) == "draft_figure.py"   # the figure itself
+        if not made_by_tool and re.sub(r"\.(png|pdf)$", "", os.path.basename(p), flags=re.I) in stems:
+            bad.append("%s: a figure of the paper draft: make it standalone with tools/draft_figure.py <label> "
+                       "(legend strip plus panels, no caption) and send that file, never the loose panel" % p)
             continue
         lg = read_legend(p)
         if lg is None:
