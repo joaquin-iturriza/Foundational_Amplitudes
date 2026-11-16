@@ -17399,6 +17399,18 @@ entries:
       docstring; skill never loaded; fa-figures push came 2 h later, l.637: tools/kit_*.py not in its paths). Caption V.beta
       (main l.204932 caption from the owner''s table; legend only as a png the main session does not open; no legend text
       file). Proposal to Joaquin in the hand-back.'
+  - at: '2026-11-16T20:25:36+00:00'
+    text: '2026-11-16 figure setup fix (Joaquin''s go 2026-11-16, five points + main-session send rule): ps.save/legend_strip
+      write <base>.legend.txt (producer script + git blob, style warnings, legend entries) and warn on legend entries >30
+      chars or multi-line and on ratio axes not made by hist_ratio; send_check refuses a figure without legend file (montage),
+      drawn by uncommitted code, with a recorded warning, a caption not containing every legend entry (alnum after NFKC +
+      TeX greek), or a figure the draft includes (send compiled pages), and shows the legend at every send; skill and fa-figures
+      push carry the binding lines (paths + tools/kit_*.py, tools/*fig*.py, plot_style.py); kit_paper_figs and muon_long examples
+      on ps.true_pred_hist, kit_figures INPUT_ARMS/arm_label short symbols. Replays of the old code: kitvm_dist @a87aeec4,
+      kit_paper_figs and muon_long @2f2cd689 flagged (ratio panel of its own), kit_figures @2f2cd689 flagged (INPUT_ARMS sentences);
+      V-beta send: refused (caption leaves ''parent r5'' etc. undefined; and the old figure has no legend file). Not stoppable:
+      the min-count ratio mask of example_dist (a choice after looking, unless true_pred_hist is used), a caption naming a
+      curve the legend lacks (V-beta''s ''trained on V·beta''). tests/test_figure_setup.py; repo-reviewer pending.'
   handoff:
     state: '2026-11-12 ~15:10 local. Restore of CC pools deleted 2026-11-11: held-out H1..H7c all prebuilt (check_site_data
       0 missing); dsh_eea 115/115 train rebuilt, val/test sha256 230/230 unchanged, its parts gc''d (5.45 GB); PP4: 1 pool
