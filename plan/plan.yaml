@@ -33338,7 +33338,7 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-4fa87893
-    commit: 37af3f9a
+    commit: c3f0548d
     paths:
     - .claude/skills/paper-writing-style/SKILL.md
     - /home/joaquin/drafts/fm_amplitudes_2026-11/paper.tex
@@ -33349,6 +33349,8 @@ entries:
     - analysis/data_saving/example_reruns.py
     - analysis/data_saving/figs/example_delta_a.png
     - analysis/data_saving/figs/example_dist_a.png
+    - analysis/divergences/l2_eeuu_online.py
+    - analysis/divergences/plot_steering.py
     - analysis/transfer/het_delta_summary.py
     - analysis/transfer/het_eval_check.py
     - plot_style.py
