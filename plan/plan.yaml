@@ -27862,7 +27862,7 @@ entries:
     - 22
   owner:
     agent: a21d23a7af7d2b76b
-    state: stopped
+    state: closed
     since: '2026-11-14T03:52:27+00:00'
     state_at: '2026-11-16T19:42:50.003000+00:00'
     context: 290843
@@ -28940,26 +28940,29 @@ entries:
   step_waits:
     '20': '2026-11-14'
   handoff:
-    state: '2026-11-14 ~04:45 @11222e57. Steps 14/17/19/21 read at the kit_hpo HPs (findings 2026-11-14T00:28, ~04:00): the
-      asymptotic factor (A2) is the only arm that fixes the KIT hard families (uug coll+soft, uugg gg/qg coll+soft, tt Coulomb;
-      tt Sudakov 0.82->0.077, no exponent); the fine-tune search kit_hpo_tt_ft_r5 (16/16 good, chosen hp1986) is a NO (bulk
-      -0.5 decades, Coulomb STAYED, Sudakov worse). Step 5 (coordinator: package the factor models, the best ones): package
-      v5 built but its reproduction check failed (finding ~04:45, E7274 acked); next is the diagnosis probe (check --repo),
-      fix, rebuild with scripts/job_kit_package.sh -- runs/kit/kit_package_v5 <3 runs>=<labels> (CPU, ~0.85 h; the uugg check
-      reads a full file, 35 min). Steps 20 and 22 wait on Joaquin''s open GPU-budget question (~95 GPU-h); do not start them.'
-    decisions: 'Short legend symbols (scratch, scratch+beta, factor, factor+log, div-form, ReZero, FT, FT+LO, FT+LO+beta,
-      FT+1L, FT+1L+beta, FT searched) via kit_figures plot --short; captions define them. Deepest-bin summary figure kit_figures
-      summary <verdict jsons>. The KIT package carries the factor models only (coordinator, 2026-11-14: the step-5 rule packages
-      the best model; the package format takes a plain run list, so no B checkpoint). Fine-tune search compared against the
-      searched scratch+beta (hp0131) and the unsearched scratch softpair; no search for the scratch softpair side (would be
-      ~9.6 GPU-h beyond the budget).'
-    ruled_out: As before; fine-tuning from the held-out catalog parent does not fix any tt hard family even after its own
-      16-trial search.
+    state: '2026-11-16. Step 5 done (package v6 PACKAGE_OK, runs/kit/kit_package_v6.tar.gz on CC, 47.5 MB, max |dlog10| 0
+      on all strata; kit_predict pinned to 1 CPU thread @817d0d0c). Factor vs Bakar MLP figures (tools/kit_vs_mlp.py @617c4bb6,
+      figs analysis/kit_benchmark/figs/vs_mlp/kitvm_*; findings 2026-11-15). Joaquin rejected the first kitvm_dist_d (ratio
+      not under histogram on same x, x range set by worst model, off models as edge spikes, stratum text in panel, threshold
+      bin degenerate). 617c4bb6 already redraws dist through ps.hist_ratio (shared x), truth range, <1% models dropped, threshold
+      as pred/true vs beta (kitvm_ratio_beta_ee_tt_virt_finite; no scratch: lxplus down, 2FA). IN PROGRESS, uncommitted in
+      plot_style.py: ps.true_pred_hist(ax, models, truth=, ratio=, log_ratio=, xlabel=, ratio_label=, min_inside=) returning
+      (ratio ax, dropped labels), plus ''import numpy as np''. Remaining per coordinator (latest message): move example_reruns.example_dist,
+      paper_sec3_figs.examples and kit_vs_mlp dist onto true_pred_hist; regenerate paper figs only if they change and say
+      whether (their old ranges covered all true and predicted events, so they likely change); add a small test in tests/
+      (e.g. tests/test_plot_style_hist.py: truth range, dropped model, ratio axis shares x) and run in .venv-cpu; redraw all
+      kitvm_dist_*, check each: truth fills x, every drawn model on it, ratio lines cover truth bins, no degenerate panel;
+      check kitvm_median/dev; repo-reviewer before commit; hand back files, per-figure changes vs the version Joaquin saw,
+      captions naming both axes and every symbol. Steps 20/22 wait on Joaquin''s GPU budget.'
+    decisions: Package carries the 3 factor models only; kit_predict 1 thread (exact reproduction; 4 threads moves up to 5.5e-3).
+      MLP log-MSE from Bakar's evaluate.py files; MLP medians/histograms from our reruns (seed median / seed 0). Scratch =
+      searched chosen trials (uug 1918, uugg 0798, tt 0131 on lxplus).
+    ruled_out: 'As before; histogram of the tt threshold beta bin (log|M|^2 near flat: box).'
     running: none
-    files: tools/kit_figures.py (--short, summary), tools/kit_curves.py (ftfig), sweep/sweep_config_kit_hpo_tt_ft_r5.yaml,
-      analysis/kit_benchmark/data/kit_hpo_tt_ft_r5.json, kit_fig_A_hpo_ftsearch.json, kit_verdict_A_hpo_ftsearch.json, figs
-      kit_deepest_A_hpo_{a,b,c}, kit_hpo_tt_ft_r5, kit_*_A_hpo_ftsearch_*, tools/kit_package.py, scripts/job_kit_package.sh
-    written: '2026-11-14T03:41:31+00:00'
+    files: plot_style.py (uncommitted true_pred_hist), tools/kit_vs_mlp.py, analysis/kit_benchmark/data/kit_vs_mlp_hist.json,
+      kit_fig_mlp_reruns.json, analysis/data_saving/example_reruns.py, analysis/catalog_v4/paper_sec3_figs.py, tools/kit_package.py,
+      tools/kit_predict.py
+    written: '2026-11-16T19:43:55+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
