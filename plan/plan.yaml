@@ -33572,6 +33572,13 @@ entries:
       (FA 73a0db0d). Draft redo 66c49d5: gains read off rung_focus/finale_synth/star_arms back, heatmap dropped, ppcover from
       pp_bound @37af3f9a (trained: pp-only lower on 742/797, median 2.6x; held out: catalog lower on 290/504, median 1.1x,
       up to 10x); cold reviewer PASS.'
+  - at: '2026-11-16T22:21:56+00:00'
+    text: '2026-11-16: Joaquin on the ladder redo: ''why ... state these gains like this? It''s really confusing. Do you see
+      any of the reference papers doing something like this?'' Cause: the redo read the relay ''put back the gains wherever
+      a gain makes a point'' as lists of per-probe factors; the skill had no rule on how many numbers a figure paragraph carries.
+      Fixed: skill rule 9 now says one claim per paragraph as a trend or ranking, at most one anchor number, no lists of per-case
+      factors (FA 8beeb4bf). Draft 009acff: ladder results rewritten that way, 13 TeV comparison one sentence (median 2.6
+      and 1.1, pp_bound @37af3f9a); cold reviewer PASS.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
