@@ -33605,6 +33605,12 @@ entries:
       uniform Z peak 0.40, peak&IR 0.25, continuum 1.005; bbbarg gamma 3 three-seed peak 0.54, shoulder 0.52, continuum 0.83;
       uuggg overall 5.68e-2 -> 5.65e-2; uugg deepest decade 0.90 (gamma 1) -> 0.55 (gamma 10), 3 seeds; eeuu starved base
       sigma^0.5+IS 5.25x below static, IS-only within 1.11x of it.'
+  - at: '2026-11-16T23:18:36+00:00'
+    text: '2026-11-17: step 4 text written on draft ded8a89 -> 1ec32b9: sampling subsection''s sigma-steering part rewritten
+      as five paragraphs (method; ee->uu: gain over uniform base is pole emphasis, IS-only within seed spread, no gain against
+      the quarter-flat base; uugg deep IR, half at gamma 10; uug/bbg Z peak, 2.5x at gamma 3; uuggg nothing, 8% worse at gamma
+      20 and ''Finally'' sentence), six figures (fig:steer_eeuu, steer, steer_uug, steer_bbg, steer_uuggg, steer_gamma) from
+      FA plot_steering.py @c3f0548d and l2_eeuu_online.py; 48 pp; cold reviewer running.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
