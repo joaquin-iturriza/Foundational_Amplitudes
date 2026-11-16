@@ -33329,6 +33329,8 @@ entries:
     5: 'Redo of the item-1 pass per Joaquin 2026-11-16: gains read off plotted curves stated again; heatmap and its text removed;
       D-split numbers out; seed-noise sentence out unless needed; Fig. ppcover reworded (catalog lower on held-out classes,
       pp-only lower on trained); skill rule 9 clarified; owner aceb4110a4694e016; relay change list, PDF, full zip.'
+    6: Ladder section redo on Joaquin's rule-9 reading (values read off plotted curves count as shown; heatmap dropped; ppcover
+      reworded from pp_bound @37af3f9a)
   done_when: null
   notes_ref: null
   match: none
@@ -33739,3 +33741,8 @@ entries:
       if:
       - 'reviewer passes: send zip and change list'
       - 'a claim changes: ask Joaquin with the figure'
+    6:
+      feeds: the ladder section's final text
+      if:
+      - 'reviewer PASS: hand back PDF and zip'
+      - 'FIX: apply and re-check with the same reviewer'
