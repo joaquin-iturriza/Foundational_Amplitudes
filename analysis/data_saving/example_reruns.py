@@ -131,28 +131,21 @@ def plot():
     # true and predicted log|M|^2 with the ratio below, one panel per probe
     fh = ps.panels(4)
     for k, ((fig, ax), p) in enumerate(zip(fh, PROBES)):
-        r = ps.hist_ratio(ax)
         have = [(a, D) for a in ("scratch", "fine-tune") for D in D_STYLE if (p, D, a) in by]
         if not have:
             continue
         tr = by[p, have[0][1], have[0][0]]["true"]   # every cell of a probe scores the same validation split
-        every = np.concatenate([tr] + [by[p, D, a]["pred"] for a, D in have])
-        e = np.linspace(every.min(), every.max(), 41)   # the full range: no true or predicted event outside it
-        t = np.histogram(tr, e)[0].astype(float)
-        ax.stairs(t, e, color="k", label="truth", zorder=5)   # on top: the best fine-tune otherwise hides it
-        for a, D in have:
-            h = np.histogram(by[p, D, a]["pred"], e)[0]
-            ax.stairs(h, e, color=col[a], linestyle=D_STYLE[D], label=f"{lab[a]}, $D=${D_LAB[D]}")
-            with np.errstate(divide="ignore", invalid="ignore"):
-                rat = np.where(t > 0, h / t, np.nan)   # every bin with true events
-            r.stairs(np.clip(rat, 0.5, 1.5), e, color=col[a], linestyle=D_STYLE[D])   # beyond the limits: drawn at the edge
-        r.axhline(1, color="k", lw=0.8)   # the truth line, as thin as the papers' ratio reference
-        r.set_ylim(0.47, 1.53); r.set_yticks([0.5, 1, 1.5]); r.set_yticklabels(["0.5", "1", "1.5"])
-        ax.set_xlim(e[0], e[-1])
-        ax.set_yscale("log"); ax.set_ylabel("events")
-        r.set_xlabel(r"$\log|\mathcal{M}|^2$")
-        if k % 2 == 0:   # right-hand panels: the label would run into the left panel in the paper's pairs
-            r.set_ylabel(r"$\frac{\rm pred}{\rm true}$")
+        e = np.linspace(tr.min(), tr.max(), 41)      # the truth's range; predictions outside it are not drawn
+        t = np.histogram(tr, e)[0]
+        models = [dict(label=f"{lab[a]}, $D=${D_LAB[D]}", edges=e, truth=t, n=by[p, D, a]["pred"].size,
+                       pred=np.histogram(by[p, D, a]["pred"], e)[0], style=dict(color=col[a], linestyle=D_STYLE[D]))
+                  for a, D in have]
+        _, dropped = ps.true_pred_hist(ax, models, xlabel=r"$\log|\mathcal{M}|^2$",
+                                       ratio_label=r"$\frac{\rm pred}{\rm true}$" if k % 2 == 0 else None)
+        # right-hand panels carry no ratio label: it would run into the left panel in the paper's pairs
+        for m in models:
+            print(f"DIST {p} {m['label']}: {100 * m['pred'].sum() / m['n']:.1f}% of its events in the truth's range"
+                  + (" (not drawn)" if m["label"] in dropped else ""))
         ps.process_label(ax, NAME[p])
     print("FIGURE", ps.save_panels(fh, os.path.join(figs, "example_dist")))
     ps.legend_strip(fh[0][1], os.path.join(figs, "example_dist_legend"),

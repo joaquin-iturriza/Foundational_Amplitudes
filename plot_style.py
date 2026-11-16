@@ -54,6 +54,7 @@ from types import SimpleNamespace
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import numpy as np
 
 # --- geometry ---------------------------------------------------------------
 
@@ -616,6 +617,54 @@ def hist_ratio(ax):
     r = ax.inset_axes([0, -0.31, 1, 0.25], sharex=ax)
     ax.tick_params(labelbottom=False)
     return r
+
+
+def true_pred_hist(ax, models, truth=None, ratio=(0.5, 1.5), log_ratio=False, xlabel=None, ratio_label="pred/true",
+                   min_inside=0.01):
+    """True against predicted histograms with the pred/true ratio directly under them on the same x axis
+    (hist_ratio): the one layout of the papers' true-vs-predicted figures (analysis/data_saving/example_reruns,
+    analysis/catalog_v4/paper_sec3_figs, tools/kit_vs_mlp). `models`: dicts {label, edges, pred, truth, style, n}: one
+    model's predicted and true counts on its own edges (the true counts of the same events; the ratio is pred/truth
+    per bin, drawn in every bin with true events); `n` its event count, default sum(pred). `truth` = (edges, counts)
+    of the truth line, default the first model's. The x range is the truth's (its first to last filled bin): a model
+    with under `min_inside` of its events in it is not drawn. Ratios beyond `ratio` are drawn at its edge.
+    Returns (ratio axes, [labels not drawn]) -- the caption names them."""
+    te, tc = truth if truth is not None else (models[0]["edges"], models[0]["truth"])
+    te, tc = np.asarray(te, float), np.asarray(tc, float)
+    filled = np.flatnonzero(tc)
+    lo, hi = te[filled[0]], te[filled[-1] + 1]
+    r = hist_ratio(ax)
+    ax.stairs(tc, te, color="k", label="truth", zorder=5)   # first in the legend, on top of the predictions
+    dropped = []
+    for m in models:
+        e, q, t = np.asarray(m["edges"], float), np.asarray(m["pred"], float), np.asarray(m["truth"], float)
+        mid = 0.5 * (e[1:] + e[:-1])
+        inside = q[(mid > lo) & (mid < hi)].sum() / max(m.get("n", q.sum()), 1)
+        if inside < min_inside:
+            dropped.append(m["label"])
+            continue
+        st = m.get("style", {})
+        ax.stairs(q, e, label=m["label"], **st)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            rat = np.where(t > 0, q / t, np.nan)        # every bin with true events
+        r.stairs(np.clip(rat, *ratio), e, **st)         # beyond the limits: drawn at the edge
+    r.axhline(1, color="k", lw=0.8)                     # the truth line, as thin as the papers' ratio reference
+    if log_ratio:
+        r.set_yscale("log")
+        pad = (ratio[1] / ratio[0]) ** 0.03
+        r.set_ylim(ratio[0] / pad, ratio[1] * pad)
+    else:
+        pad = 0.03 * (ratio[1] - ratio[0])
+        r.set_ylim(ratio[0] - pad, ratio[1] + pad)      # edge-clipped lines inside the frame, not on it
+    r.set_yticks([ratio[0], 1, ratio[1]], [f"{v:g}" for v in (ratio[0], 1, ratio[1])])
+    r.yaxis.set_minor_locator(mpl.ticker.NullLocator())
+    ax.set_xlim(lo, hi)
+    ax.set_yscale("log"); ax.set_ylim(bottom=0.5); ax.set_ylabel("events")   # one-event bins above the frame
+    if xlabel:
+        r.set_xlabel(xlabel)
+    if ratio_label:
+        r.set_ylabel(ratio_label)
+    return r, dropped
 
 
 #: The only legend positions allowed. A legend at `center left` / `center right` / `center`

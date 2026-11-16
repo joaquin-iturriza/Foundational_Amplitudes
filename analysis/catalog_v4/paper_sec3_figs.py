@@ -122,27 +122,15 @@ def examples():
         n = (len(c) // REB) * REB
         return e[:n + 1:REB], np.add.reduceat(np.asarray(c[:n], float), np.arange(0, n, REB))
     for (fig, ax), p in zip(figs, pick):
-        r = ps.hist_ratio(ax)
-        lo, hi = np.inf, -np.inf
+        models = []
         for k in ("muon", "adamw"):     # each run's record bins truth and prediction on its own edges
             rec = h[k][f"PP4:{p}"]
             ek, t = rebin(np.array(rec["edges"]), rec["truth"])
             _, q = rebin(np.array(rec["edges"]), rec["pred"])
-            if k == "muon":
-                ax.stairs(t, ek, color="k", label="truth", zorder=5)   # on top of the predictions
-            ax.stairs(q, ek, color=col[k], label=lab[k])
-            with np.errstate(divide="ignore", invalid="ignore"):
-                rat = np.where(t > 0, q / t, np.nan)   # every bin with true events
-            r.stairs(np.clip(rat, 0, 2), ek, color=col[k])   # beyond the limits: drawn at the edge
-            filled = np.nonzero((t > 0) | (q > 0))[0]
-            lo, hi = min(lo, ek[filled[0]]), max(hi, ek[filled[-1] + 1])
-        r.axhline(1, color="k", lw=0.8)
-        r.set_ylim(-0.06, 2.06); r.set_yticks([0, 1, 2]); r.set_yticklabels(["0", "1", "2"])
-        ax.set_ylim(bottom=0.5)              # one-event bins above the frame, not on it
-        pad = 0.08 * (hi - lo)               # margin beyond the outermost filled bin
-        ax.set_xlim(lo - pad, hi + pad)
-        ax.set_yscale("log"); ax.set_ylabel("events")
-        r.set_xlabel(r"$\log|\mathcal{M}|^2$"); r.set_ylabel("pred/true")
+            models.append(dict(label=lab[k], edges=ek, truth=t, pred=q, style=dict(color=col[k])))
+        _, dropped = ps.true_pred_hist(ax, models, ratio=(0, 2), xlabel=r"$\log|\mathcal{M}|^2$")
+        if dropped:
+            print(f"EXAMPLE {p}: not drawn (under 1% of events in the truth's range): {', '.join(dropped)}")
         ps.process_label(ax, ml.process_tex(p))
         ps.legend(ax, "upper left")
     ps.save_panels(figs, os.path.join(FIGS, "paper_muon_examples"))

@@ -21,7 +21,7 @@ Figures (each panel its own file, its own legend):
   kitvm_dev_<p>_*      median prediction minus the truth's median per bin (symlog)
   kitvm_bulk           bulk_test log-MSE per process
   kitvm_dist_<p>_*     one stratum per family (the deepest) and the bulk: truth and predicted log10|M|^2 histograms
-                       over the truth's range, predicted over true directly below (ps.hist_ratio, shared x); a model
+                       over the truth's range, predicted over true directly below (ps.true_pred_hist, shared x); a model
                        with under 1% of its events in that range is not drawn
   kitvm_ratio_beta_*   t t~ virtual threshold family: |M|^2_pred/|M|^2_true per bin of beta, median and 16-84% band
                        (a histogram of a beta bin is a box: log10|M|^2 is near flat there)
@@ -244,8 +244,8 @@ def plot(figs):
     ax.set_yscale("log"); ax.set_ylabel(r"bulk log-MSE of $\log_{10}|\mathcal{M}|^2$")
     ps.shared_legend(fig, ax, ncol=3)
     written.append(ps.save(fig, os.path.join(figs, "kitvm_bulk")))
-    # (5) true against predicted log10|M|^2 of one stratum per family, predicted over true in the panel below (shared x,
-    # ps.hist_ratio); the range is the truth's, a model with under 1% of its events in it is not drawn there
+    # (5) true against predicted log10|M|^2 of one stratum per family, predicted over true in the panel below
+    # (ps.true_pred_hist: the truth's range, a model with under 1% of its events in it not drawn)
     hp = os.path.join(DATA, "kit_vs_mlp_hist.json")
     if os.path.exists(hp):
         H = json.load(open(hp))
@@ -254,31 +254,18 @@ def plot(figs):
             ex = [e for e in H if e["proc"] == p and "edges" in e]
             panels = ps.panels(len(ex))
             for (fig, ax), e in zip(panels, ex):
-                c, t = np.array(e["edges"]), np.array(e["truth"], float)
-                occ = np.flatnonzero(t)
-                a_, b_ = occ[0], occ[-1] + 1                      # the truth's range, at the collection's bin width
-                c, t = c[a_:b_ + 1], t[a_:b_]
-                r = ps.hist_ratio(ax)
-                for k in ("factor", "MLP log", "scratch", "MLP raw"):
-                    if k not in e["pred"]:
-                        continue
-                    h = np.array(e["pred"][k], float)[a_:b_]
-                    inside = h.sum() / e["n"]
-                    sym = mlp_sym(p, k)
-                    print(f"DIST {p} {e['stratum']} {sym}: {100 * inside:.1f}% of its events in the truth's range")
-                    if inside < 0.01:
-                        continue
-                    col, _, ls = sty[sym]
-                    ax.stairs(h, c, color=col, ls=ls, label=sym)
-                    with np.errstate(divide="ignore", invalid="ignore"):
-                        rat = np.where(t > 0, h / t, np.nan)
-                    r.stairs(np.clip(rat, 0.105, 9.5), c, color=col, ls=ls)   # beyond the limits: drawn at the edge
-                ax.stairs(t, c, color="k", label="truth", zorder=5)
-                r.axhline(1, color="k", lw=0.8)
-                r.set_yscale("log"); r.set_ylim(0.1, 10); r.set_yticks([0.1, 1, 10], ["0.1", "1", "10"])
-                ax.set_xlim(c[0], c[-1]); ax.set_yscale("log"); ax.set_ylabel("events")
-                r.set_xlabel(r"$\log_{10}(|\mathcal{M}|^2/\mathrm{GeV}^{-2})$")
-                r.set_ylabel(r"$\frac{\rm pred}{\rm true}$")
+                models = [dict(label=mlp_sym(p, k), edges=e["edges"], truth=e["truth"], pred=e["pred"][k], n=e["n"],
+                               style=dict(color=sty[mlp_sym(p, k)][0], ls=sty[mlp_sym(p, k)][2]))
+                          for k in ("factor", "MLP log", "scratch", "MLP raw") if k in e["pred"]]
+                _, dropped = ps.true_pred_hist(ax, models, ratio=(0.1, 10), log_ratio=True,
+                                               xlabel=r"$\log_{10}(|\mathcal{M}|^2/\mathrm{GeV}^{-2})$",
+                                               ratio_label=r"$\frac{\rm pred}{\rm true}$")
+                lo, hi = ax.get_xlim()
+                for m in models:
+                    c, h = np.array(m["edges"]), np.array(m["pred"], float)
+                    mid = 0.5 * (c[1:] + c[:-1])
+                    print(f"DIST {p} {e['stratum']} {m['label']}: {100 * h[(mid > lo) & (mid < hi)].sum() / e['n']:.1f}%"
+                          " of its events in the truth's range" + (" (not drawn)" if m["label"] in dropped else ""))
                 ps.process_label(ax, PROC[PROCS[p]])
                 ps.shared_legend(fig, ax, ncol=3)
             written += ps.save_panels(panels, os.path.join(figs, f"kitvm_dist_{p}"))
