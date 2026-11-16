@@ -33326,6 +33326,9 @@ entries:
     4: 'Figures proposed by the item-1 pass for results now worded without numbers: synthetic, every-structure and star-arm
       columns on the gain heatmap; gain against D per rung group with the horizon change marked; seed bands on the per-probe
       curves'
+    5: 'Redo of the item-1 pass per Joaquin 2026-11-16: gains read off plotted curves stated again; heatmap and its text removed;
+      D-split numbers out; seed-noise sentence out unless needed; Fig. ppcover reworded (catalog lower on held-out classes,
+      pp-only lower on trained); skill rule 9 clarified; owner aceb4110a4694e016; relay change list, PDF, full zip.'
   done_when: null
   notes_ref: null
   match: none
@@ -33731,3 +33734,8 @@ entries:
       if:
       - 'Joaquin says yes: draw them with the figure-style skill and put the numbers back beside them'
       - 'no: the text stays worded from the existing figures'
+    5:
+      feeds: the draft's ladder and sampling text
+      if:
+      - 'reviewer passes: send zip and change list'
+      - 'a claim changes: ask Joaquin with the figure'
