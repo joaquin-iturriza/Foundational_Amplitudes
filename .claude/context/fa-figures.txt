@@ -1,10 +1,17 @@
 on: write
-paths: analysis/**/*.py, tools/plot_*.py, **/plot*.py, **/make_fig*.py, talks/**
+paths: analysis/**/*.py, tools/plot_*.py, tools/kit_*.py, tools/*fig*.py, plot_style.py, **/plot*.py, **/make_fig*.py, talks/**
 cmds: \bsavefig\b, \bplot\w*\.py\b, \bmake_fig\w*\.py\b
 tools: SendUserFile
 ---
-- Save both in the same call (`fig.savefig(base+'.png'); fig.savefig(base+'.pdf')`), same basename and dir;
-  plotting scripts emit both by default. Both are gitignored (on disk, not committed). Single-format exceptions go in
-  `.claude/figure_pair_ignore.txt`.
-- Style: the figure-style skill.
-- A figure carries short labels; its explanation goes in the caption or the talk, never inside the plot.
+- Save through `ps.save(fig, base)` (`ps.save_panels`, `ps.legend_strip`): it writes `.png` and `.pdf` with the same
+  basename and `<base>.legend.txt`; never `fig.savefig`. Figures are gitignored (on disk, not committed). Single-format
+  exceptions go in `.claude/figure_pair_ignore.txt`.
+- Load the figure-style skill before drawing. Binding, whatever a sibling script does:
+  - a legend entry is a short symbol or formula on one line (at most 30 characters), defined in the caption;
+  - the process label names the process only; strata, cuts, energies and counts go in the caption; no other text in
+    a panel;
+  - true against predicted distributions are drawn by `ps.true_pred_hist`: the ratio directly under its histogram on
+    the same x axis, every event on the frame, the ratio in every bin with true events;
+  - data is never clipped, masked or dropped for appearance.
+- `ps.save` prints `!!` for each breach it sees; `send_check` refuses a figure with one, one without its legend file
+  or drawn by uncommitted code, and a caption that leaves a legend entry undefined.

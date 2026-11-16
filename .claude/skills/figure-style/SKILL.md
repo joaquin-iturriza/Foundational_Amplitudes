@@ -64,7 +64,7 @@ cannot hold standard plot boxes at that column count. Fix it structurally:
 | a row over 8.2 in | shorten the longest tick or legend label; only then fewer columns |
 | 3 or more columns | 2 columns and more rows (never 3 across) |
 | legend outside the axes | put it inside; use `ps.make_room` to open space |
-| a panel spanning two cells | split the figure; every panel is one cell |
+| a panel spanning two cells | split the figure; every panel is one cell (the ratio inset `ps.hist_ratio` puts under its histogram is part of that cell, never a cell of its own) |
 
 ## Grids: one canvas holds 1, 2 or 4 panels. Anything else is separate files.
 
@@ -113,7 +113,8 @@ Unrelated plots that happen to be discussed together go in separate figures.
 others. Sharing is how panels stop looking like each other: with `sharey` in a 2x2 only
 column 0 carries tick labels, so panels (a) and (c) have numbers and (b) does not. Every panel
 labels its own axes. `sharey` is fine in a 1x2 when both panels really are the same quantity —
-there it is symmetric — but never as a width workaround.
+there it is symmetric — but never as a width workaround. The ratio inset of `ps.hist_ratio` shares its histogram's x axis by
+design: it is part of that panel, not a second one.
 
 ## Always use the shared module
 
@@ -145,7 +146,10 @@ ps.save(fig, "analysis/divergences/figs/my_figure")   # writes .png AND .pdf
   the document. The only legitimate exception is when line weight *encodes* something (a thick
   translucent "truth" band under a thin dashed "model"), and then it needs a comment saying so.
 - `ps.save(fig, base)` — lays out, checks the invariant, writes **both** `.png` and `.pdf`. A
-  `Stop` hook blocks the turn if one is missing.
+  `Stop` hook blocks the turn if one is missing. It also writes `<base>.legend.txt` (the drawing script and its git
+  blob, the style warnings, the legend entries): `send_check` sends only a figure with one, drawn by a committed
+  script, without warnings, whose caption defines every entry. A figure saved any other way (`fig.savefig`, a
+  montage) cannot be sent.
 
 ## Standard placements — do not vary these per figure
 
@@ -156,9 +160,10 @@ precisely what the reader notices.
 | element | rule |
 |---|---|
 | legend | **`ps.legend(ax, "upper left")` — inside the axes, in a CORNER.** `ps.legend` rejects anything else. `ps.make_room` then grows the y-range until it is clear of the data. |
-| legend that will not fit | let `ps.legend` drop the font (it goes to `LEGEND_MIN_PT`, 8.5pt). Do **not** rewrite the labels to save width if that costs the reader a distinction. |
+| legend entry | **a short symbol or formula on one line, at most 30 characters, defined in the caption** (`scratch`, `FT+LO`, `$\log\beta^2$`), never a sentence. `ps.save` warns `!!` on a longer or multi-line entry and `send_check` refuses the figure. |
+| legend that will not fit | let `ps.legend` drop the font (it goes to `LEGEND_MIN_PT`, 8.5pt), then shorten the symbols. |
 | legend, which panel | **one legend per canvas**: a figure on one canvas (ps.figure 1x2, 2x2) carries one legend in whichever panel has room; panels saved as separate files (ps.panels / save_panels) each carry their own legend, since any file may be shown alone. |
-| process label | `ps.process_label(ax, ...)`, default **upper right**. Do not pick a corner per figure. |
+| process label | `ps.process_label(ax, ...)`, default **upper right**. Do not pick a corner per figure. It **names the process only**: a stratum, cut, energy, event count or model goes in the caption. |
 | colourbar | **`ps.colorbar(ax, mappable, label)` — vertical, immediately right of its own panel.** Always, and one per panel that needs a scale. Not below, not on top, not in an inset. |
 | headroom | `ps.headroom` gives every plot the same clear band above and below the data. Do not hand-tune `ylim` for appearance. |
 | tick labels | horizontal. **Never rotate them** — rotated labels are tall, and tall labels used to shrink the plot. If they collide, use fewer ticks or shorter text ($\log_{10}$ exponents, not `1e-6`). |
@@ -208,8 +213,8 @@ The reference is the paper's Fig. 8, `analysis/data_saving/example_reruns.py` (f
 | element | rule |
 |---|---|
 | ratio panel | **directly under its histogram, sharing its x axis** (`ps.hist_ratio`). The histogram has no x tick labels; the x label goes on the ratio axes. Never a ratio panel on its own x range, never a ratio in a separate figure. |
-| x range | **the truth's**: its first to last filled bin, the same edges for truth and every model. Never set by a model's tail, never a percentile clip of the pooled values. |
-| a model mostly off the truth's range | not drawn (under 1% of its events inside, `min_inside`); `true_pred_hist` returns its label and the **caption names it**. Never widen the range to fit it. |
+| x range | **the union of the truth's and every prediction's filled bins** (`true_pred_hist` sets it): no event off the frame. Never the truth's range alone and never a percentile clip: picking one range would hide a problem in the data or the prediction (Joaquin 2026-11-16). Bin on the union too (edges from the min and max of truth and predictions). |
+| a model far off the truth | **drawn**, never dropped: a model wildly off is a finding to show. |
 | ratio limits | fixed per figure (default 0.5 to 1.5, `log_ratio` for spreads of a decade); values beyond are drawn at the edge. A ratio is drawn in every bin with true events: no minimum-count mask. |
 | truth | black line, first in the legend, on top. |
 | in-panel text | **the process label only.** A stratum, cut, energy or event count goes in the caption, never in the panel. |
@@ -248,6 +253,10 @@ grey background scatter.
 go in the legend is a rare second exception. A third piece of in-plot text means you are
 breaking the rule.
 
+**Data is never clipped, masked or dropped for appearance.** No minimum-count mask on a ratio, no percentile cut of
+the x range, no noisy bins hidden after a look: a bin with data is drawn, a value beyond the axis limits is drawn at
+the edge. Ranges are set by rule, never after a look; what a figure leaves out the caption names.
+
 **Per-point value labels are clutter.** The axis carries the number; exact values go in a table.
 
 **One font size everywhere.** 11 pt. Fix collisions with fewer ticks, never a smaller font.
@@ -266,7 +275,8 @@ A missing glyph is silent: no warning, just a box. Look at the PNG after any lab
 1. **Run the script and read its output.** `!!` lines are the invariant being violated. A
    `canvas exceeds \textwidth` line means restructure, not shrink; an `empty cell(s)` line means
    `ps.panels`; a `legend is wider than its plot box` line means factorise the labels.
-2. **Look at the PNG.** Colliding tick labels, a legend on the data, a missing glyph and a
+2. **Look at each PNG on its own** (never a downscaled montage of several), against this skill's lists, not only at
+   what the data say. Colliding tick labels, a legend on the data, a missing glyph and a
    colourbar in the wrong place are only visible in the render.
 3. **Run `python scripts/check_tex_figure_rows.py`.** Panels included two per line have
    to *add up* to under `\textwidth`; if they do not, LaTeX silently drops the last one

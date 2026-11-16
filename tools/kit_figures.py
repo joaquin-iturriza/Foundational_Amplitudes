@@ -146,38 +146,28 @@ XLAB = {"threshold_beta": r"top velocity $\beta$", "sudakov_sqrts": r"$\sqrt{s}$
         "azimuth_gg_y": r"$g\to gg$ collinear $y=s_{gg}/s$"}
 
 
-# input-representation arms (D374, model.input_*): tag -> legend text
-INPUT_ARMS = {"pairlogs": r"+ $\log(s_{ij}/s)$ inputs", "softrescale": "+ soft log rescale",
-              "locallogs": "+ local-frame logs",
-              "softpair": r"+ soft rescale + $\log(s_{ij}/s)$",
-              "softpairthr": r"+ soft rescale + $\log(s_{ij}/s)$" + "\n" + r"+ $\log\beta^2$ of massive pairs",
-              "softpairthr_vbeta": r"+ soft rescale + $\log(s_{ij}/s)$" + "\n" + r"+ $\log\beta^2$, target $V\beta$",
-              "softpair_rezero": r"+ soft rescale + $\log(s_{ij}/s)$" + "\n" + "ReZero",
-              "softpair_scalars": "MLP inputs only",
-              "softpairthr_scalars": "MLP inputs only",
-              # + the learned log-invariant polynomial term on the output (degree 2, or 1 for _logskiplin)
-              "softpair_plain": "plain target",
-              "softpair_plain_logskip": r"plain target + $P_2(L)$", "softpair_plain_logskiplin": r"plain target + $P_1(L)$",
-              "softpairthr_logskip": r"+ $\log\beta^2$ + $P_2(L)$", "softpairthr_logskiplin": r"+ $\log\beta^2$ + $P_1(L)$",
-              # step 18 (D435): log|M|^2 = log A + g, A the asymptotic factors (dipoles, 1/beta, log^2), on the plain target
-              "softpair_asym": r"+ soft rescale + $\log(s_{ij}/s)$" + "\n" + "+ asymptotic factor",
-              "softpair_plain_asym": r"+ soft rescale + $\log(s_{ij}/s)$" + "\n" + "+ asymptotic factor",
-              "softpairthr_asym_plainlog": r"+ $\log(s_{ij}/s)$ + $\log\beta^2$" + "\n" + "+ asymptotic factor",
-              "asym_cont": "asymptotic factor,\n" + r"no log inputs, $\gamma\leq4$",
-              "asym_cont_plainlog": "asymptotic factor,\n" + r"no log inputs, $\gamma\leq4$",
+# input-representation arms (D374, model.input_*): tag -> legend symbol, one line, defined in the caption
+# (soft: soft log rescale; log s_ij: log(s_ij/s) pair inputs; log beta^2: of massive pairs; factor: the asymptotic
+# factor A of log|M|^2 = log A + g; plain: plain target; P_k(L): the learned log-invariant polynomial on the output;
+# FT: fine-tuned from the held-out catalog parent, +LO / +1L: with LO / one-loop tops near threshold)
+INPUT_ARMS = {"pairlogs": r"$\log s_{ij}$", "softrescale": "soft", "locallogs": "local logs",
+              "softpair": r"soft, $\log s_{ij}$",
+              "softpairthr": r"soft, $\log s_{ij}$, $\log\beta^2$",
+              "softpairthr_vbeta": r"$\log\beta^2$, target $V\beta$",
+              "softpair_rezero": "ReZero",
+              "softpair_scalars": "MLP inputs", "softpairthr_scalars": "MLP inputs",
+              "softpair_plain": "plain",
+              "softpair_plain_logskip": r"plain, $P_2(L)$", "softpair_plain_logskiplin": r"plain, $P_1(L)$",
+              "softpairthr_logskip": r"$\log\beta^2$, $P_2(L)$", "softpairthr_logskiplin": r"$\log\beta^2$, $P_1(L)$",
+              "softpair_asym": "factor", "softpair_plain_asym": "factor",
+              "softpairthr_asym_plainlog": r"factor, $\log\beta^2$",
+              "asym_cont": r"factor, $\gamma\leq4$", "asym_cont_plainlog": r"factor, $\gamma\leq4$",
               # steps 14/19/21 at the kit_hpo chosen HPs (tags hpo_<arm>; the hpo_ prefix is dropped for the legend)
-              "asym_cont_sud1": "asymptotic factor + single log,\n" + r"no log inputs, $\gamma\leq4$",
-              "softpair_plain_divform": "plain target\n+ divergence-form inputs",
-              "softpair_plain_rezero": "plain target, ReZero",
-              "softpairthr_divform": r"+ soft rescale + $\log(s_{ij}/s)$ + $\log\beta^2$" + "\n" + "+ divergence-form inputs",
-              "softpairthr_rezero": r"+ soft rescale + $\log(s_{ij}/s)$ + $\log\beta^2$" + "\n" + "ReZero",
-              # A_ft: the parent's pretraining (catalog_v4 with the KIT families held out, + LO / one-loop top pairs near
-              # threshold), then the inputs every such arm has (input_soft_eps, input_pair_logs=6; beta where tagged)
-              "ftr5own": "held-out catalog\n" + r"+ soft rescale + $\log(s_{ij}/s)$",
-              "ftr5thrown": "held-out catalog + LO tops\n" + r"+ soft rescale + $\log(s_{ij}/s)$",
-              "ftr5thrbetaown": "held-out catalog + LO tops\n" + r"+ soft rescale + $\log(s_{ij}/s)$" + "\n" + r"+ $\log\beta^2$",
-              "ftr5thrloopown": "held-out catalog\n+ LO and one-loop tops\n" + r"+ soft rescale + $\log(s_{ij}/s)$",
-              "ftr5thrloopbetaown": "held-out catalog\n+ LO and one-loop tops\n" + r"+ soft rescale + $\log(s_{ij}/s)$" + "\n" + r"+ $\log\beta^2$"}
+              "asym_cont_sud1": r"factor+log, $\gamma\leq4$",
+              "softpair_plain_divform": "div-form", "softpair_plain_rezero": "plain, ReZero",
+              "softpairthr_divform": r"div-form, $\log\beta^2$", "softpairthr_rezero": r"ReZero, $\log\beta^2$",
+              "ftr5own": "FT", "ftr5thrown": "FT+LO", "ftr5thrbetaown": r"FT+LO+$\beta$",
+              "ftr5thrloopown": "FT+1L", "ftr5thrloopbetaown": r"FT+1L+$\beta$"}
 
 
 # short legend symbols (--short; the caption defines them): steps 14/17/19/21 at the kit_hpo chosen HPs
@@ -190,25 +180,18 @@ SHORT = {"softpair_plain": "scratch", "softpair": "scratch", "softpairthr": r"sc
 
 
 def arm_label(r, with_n=True, short=False):
-    """legend text saying what the curve is (D368, D369): how the network was trained, then the bulk size (left out
-    when every curve of the figure has the same one; the caption gives it); short: the SHORT symbol"""
+    """the legend symbol of a run, one line, defined in the caption: how it was trained, the bulk size (left out when
+    every curve of the figure has the same one), its inputs; short: the SHORT symbol"""
     if short:
         return SHORT[r["tag"].removeprefix("hpo_")]
-    n = r"$10^5$" if r["n"] == 100000 else r"$9\times10^5$"
-    how = {"A": "scratch", "A_ft": "pretrained", "B": "scratch + hard events",
-           "B_bulk": "scratch + 3000 steps\non bulk only"}[r["mode"]]
-    lab = f"{how}, {n} bulk" if with_n else how
     tag = r["tag"].removeprefix("hpo_")
-    if tag.endswith("lr0p1"):   # the A_ft design's lr-axis check (KIT_LR_SCALE=0.1)
-        lab += r", lr $\times0.1$"
-        tag = tag[:-len("lr0p1")].rstrip("_")
-    if tag in ("offoff", "nooffshell"):
-        lab += ",\nno off-shell input"
-    elif tag == "plain":
-        lab += ",\nplain target"
-    elif tag in INPUT_ARMS:
-        lab += ",\n" + INPUT_ARMS[tag]
-    return lab
+    lr = tag.endswith("lr0p1")      # the A_ft design's lr-axis check (KIT_LR_SCALE=0.1)
+    tag = tag[:-len("lr0p1")].rstrip("_") if lr else tag
+    how = {"A": "", "A_ft": "FT", "B": "+hard", "B_bulk": "+bulk"}[r["mode"]]     # from scratch: no prefix
+    inputs = {"offoff": "no off-shell", "nooffshell": "no off-shell", "plain": "plain"}.get(tag, INPUT_ARMS.get(tag, ""))
+    n = (r"$10^5$" if r["n"] == 100000 else r"$9\times10^5$") if with_n else ""
+    parts = [how if not inputs.startswith("FT") else "", n, inputs or ("scratch" if not how else ""), r"lr$\times0.1$" if lr else ""]
+    return ", ".join(p for p in parts if p)
 
 
 def plot(path, outdir, prefix="", split_offshell=False, short=False):
@@ -252,12 +235,12 @@ def plot(path, outdir, prefix="", split_offshell=False, short=False):
                 ax.plot(*zip(*pts), "o", ls=ls.get(id(r), "-"), color=c, label=lab)
             fl = sorted((v["x"], v["mse"]) for st, v in tr["floor"].items() if family(st) == fam)
             if any(m > 0 for _, m in fl):   # zero in every bin (truth inside the training range): not drawn, no entry
-                ax.plot(*zip(*fl), "--", color=ps.C.grey, label="clip" if short else "truth clipped to\ntraining range")
+                ax.plot(*zip(*fl), "--", color=ps.C.grey, label="clip")
             ref = MLP.get((stem, target, fam))
             if ref:
                 x = np.sqrt(ref[0] * ref[1])
-                ax.plot([x], [ref[2]], "*", color="k", label="MLP log" if short else "KIT MLP (log inputs)")
-                ax.plot([x], [ref[3]], "x", color="k", label="MLP raw" if short else "KIT MLP (raw inputs)")
+                ax.plot([x], [ref[2]], "*", color="k", label="MLP log")
+                ax.plot([x], [ref[3]], "x", color="k", label="MLP raw")
             ax.set_xscale("log")
             ax.xaxis.set_minor_formatter(NullFormatter())
             ax.set_yscale("log")

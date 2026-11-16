@@ -128,9 +128,7 @@ def examples():
             ek, t = rebin(np.array(rec["edges"]), rec["truth"])
             _, q = rebin(np.array(rec["edges"]), rec["pred"])
             models.append(dict(label=lab[k], edges=ek, truth=t, pred=q, style=dict(color=col[k])))
-        _, dropped = ps.true_pred_hist(ax, models, ratio=(0, 2), xlabel=r"$\log|\mathcal{M}|^2$")
-        if dropped:
-            print(f"EXAMPLE {p}: not drawn (under 1% of events in the truth's range): {', '.join(dropped)}")
+        ps.true_pred_hist(ax, models, ratio=(0, 2), xlabel=r"$\log|\mathcal{M}|^2$")
         ps.process_label(ax, ml.process_tex(p))
         ps.legend(ax, "upper left")
     ps.save_panels(figs, os.path.join(FIGS, "paper_muon_examples"))

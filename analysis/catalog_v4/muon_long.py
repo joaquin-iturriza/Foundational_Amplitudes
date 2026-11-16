@@ -16,8 +16,8 @@ differs).
            ln|M|^2 on the probe's test pool) -> data/reads/<run>_hists.json
   plot     -> figs/muon_long_curves.{png,pdf} (the two validation curves), figs/muon_long_levels.{png,pdf} (each run's
            per-class MSE per read: median and quartiles over classes, reads ordered by Muon's median),
-           figs/muon_long_examples.{png,pdf} (true and predicted ln|M|^2 of the PP4 probes at Muon's 10th, 50th and
-           90th percentile of MSE, ratio predicted/true below)
+           figs/muon_long_examples_{a,b,c}.{png,pdf} + _legend (true and predicted ln|M|^2 of the PP4 probes at Muon's 10th,
+           50th and 90th percentile of MSE, ps.true_pred_hist: ratio predicted/true below on the same x axis)
 """
 import argparse, json, os, sys
 
@@ -198,26 +198,22 @@ def examples(ps, col, lab):
     mu = m.read_of(RUNS["muon"], "PP4")
     keys = sorted((p for p in mu if f"PP4:{p}" in h["muon"] and f"PP4:{p}" in h["adamw"]), key=lambda p: mu[p])
     pick = [keys[int(q * (len(keys) - 1))] for q in (0.1, 0.5, 0.9)]
-    fig, axes = ps.figure(ncols=3, nrows=2, sharex="col", sharey="row", gridspec_kw={"height_ratios": [3, 1]})
-    for j, p in enumerate(pick):
-        # each run's record bins truth and prediction on its own edges (the range of both): each ratio on its own
+    panels = ps.panels(len(pick))
+    for (fig, ax), p in zip(panels, pick):
+        # each run's record bins truth and prediction on its own edges; the truth line and x range are Muon's record's
+        models = []
         for k in ("muon", "adamw"):
             r = h[k][f"PP4:{p}"]
-            e, t, q = np.array(r["edges"]), np.array(r["truth"], float), np.array(r["pred"], float)
-            if k == "muon":
-                axes[0, j].stairs(t, e, color="k", label="true")
-            axes[0, j].stairs(q, e, color=col[k], label=lab[k])
-            with np.errstate(divide="ignore", invalid="ignore"):
-                axes[1, j].stairs(np.where(t > 0, q / t, np.nan), e, color=col[k])
-        axes[1, j].axhline(1, color=ps.C.grey, ls="--")
-        axes[1, j].set_ylim(0, 2)
-        axes[0, j].set_yscale("log")
-        axes[1, j].set_xlabel(r"$\ln|\mathcal{M}|^2$")
-        ps.process_label(axes[0, j], process_tex(p))
+            models.append({"label": lab[k], "edges": r["edges"], "pred": r["pred"], "truth": r["truth"],
+                           "style": {"color": col[k]}})
+        ps.true_pred_hist(ax, models, xlabel=r"$\ln|\mathcal{M}|^2$")
+        ps.process_label(ax, process_tex(p))
         print("example", p, {k: m.read_of(run, "PP4")[p] for k, run in RUNS.items()})
-    axes[0, 0].set_ylabel("events"); axes[1, 0].set_ylabel("pred/true")
-    ps.legend(axes[0, 0], "upper left")
-    ps.save(fig, os.path.join(HERE, "figs", "muon_long_examples"))
+    for fig, ax in panels[1::2]:            # right-hand panels (two per row) drop the y labels (figure-style)
+        ax.set_ylabel("")
+        ax.child_axes[0].set_ylabel("")
+    ps.legend_strip(panels[0][1], os.path.join(HERE, "figs", "muon_long_examples_legend"), ncol=3)
+    ps.save_panels(panels, os.path.join(HERE, "figs", "muon_long_examples"))
 
 
 if __name__ == "__main__":

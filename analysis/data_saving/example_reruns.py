@@ -135,17 +135,15 @@ def plot():
         if not have:
             continue
         tr = by[p, have[0][1], have[0][0]]["true"]   # every cell of a probe scores the same validation split
-        e = np.linspace(tr.min(), tr.max(), 41)      # the truth's range; predictions outside it are not drawn
+        allv = np.concatenate([tr] + [by[p, D, a]["pred"] for a, D in have])
+        e = np.linspace(allv.min(), allv.max(), 41)  # the union of truth and predictions: every event on the frame
         t = np.histogram(tr, e)[0]
         models = [dict(label=f"{lab[a]}, $D=${D_LAB[D]}", edges=e, truth=t, n=by[p, D, a]["pred"].size,
                        pred=np.histogram(by[p, D, a]["pred"], e)[0], style=dict(color=col[a], linestyle=D_STYLE[D]))
                   for a, D in have]
-        _, dropped = ps.true_pred_hist(ax, models, xlabel=r"$\log|\mathcal{M}|^2$",
+        ps.true_pred_hist(ax, models, xlabel=r"$\log|\mathcal{M}|^2$",
                                        ratio_label=r"$\frac{\rm pred}{\rm true}$" if k % 2 == 0 else None)
         # right-hand panels carry no ratio label: it would run into the left panel in the paper's pairs
-        for m in models:
-            print(f"DIST {p} {m['label']}: {100 * m['pred'].sum() / m['n']:.1f}% of its events in the truth's range"
-                  + (" (not drawn)" if m["label"] in dropped else ""))
         ps.process_label(ax, NAME[p])
     print("FIGURE", ps.save_panels(fh, os.path.join(figs, "example_dist")))
     ps.legend_strip(fh[0][1], os.path.join(figs, "example_dist_legend"),

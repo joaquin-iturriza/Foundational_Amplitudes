@@ -49,6 +49,7 @@ labels. If a metric needs explaining, put its formula on the axis instead of pro
 from __future__ import annotations
 
 import os
+import sys
 import re
 from types import SimpleNamespace
 
@@ -615,34 +616,33 @@ def hist_ratio(ax):
     analysis/catalog_v4/paper_sec3_figs, analysis/data_saving/example_reruns, tools/kit_vs_mlp). The histogram keeps
     no x tick labels; set the x label on the returned ratio axes."""
     r = ax.inset_axes([0, -0.31, 1, 0.25], sharex=ax)
+    r._ps_ratio = True          # save() warns on any other axes labelled as a ratio to the truth
     ax.tick_params(labelbottom=False)
     return r
 
 
-def true_pred_hist(ax, models, truth=None, ratio=(0.5, 1.5), log_ratio=False, xlabel=None, ratio_label="pred/true",
-                   min_inside=0.01):
+def true_pred_hist(ax, models, truth=None, ratio=(0.5, 1.5), log_ratio=False, xlabel=None, ratio_label="pred/true"):
     """True against predicted histograms with the pred/true ratio directly under them on the same x axis
     (hist_ratio): the one layout of the papers' true-vs-predicted figures (analysis/data_saving/example_reruns,
     analysis/catalog_v4/paper_sec3_figs, tools/kit_vs_mlp). `models`: dicts {label, edges, pred, truth, style, n}: one
     model's predicted and true counts on its own edges (the true counts of the same events; the ratio is pred/truth
     per bin, drawn in every bin with true events); `n` its event count, default sum(pred). `truth` = (edges, counts)
-    of the truth line, default the first model's. The x range is the truth's (its first to last filled bin): a model
-    with under `min_inside` of its events in it is not drawn. Ratios beyond `ratio` are drawn at its edge.
-    Returns (ratio axes, [labels not drawn]) -- the caption names them."""
+    of the truth line, default the first model's. The x range is the union of every filled bin of the truth and of
+    every model, and every model is drawn (Joaquin 2026-11-16: "the range should be set to the largest of the two
+    ... picking one would hide a problem in the data or prediction"). Ratios beyond `ratio` are drawn at its edge.
+    Returns the ratio axes."""
     te, tc = truth if truth is not None else (models[0]["edges"], models[0]["truth"])
     te, tc = np.asarray(te, float), np.asarray(tc, float)
     filled = np.flatnonzero(tc)
     lo, hi = te[filled[0]], te[filled[-1] + 1]
+    for m in models:
+        e, q = np.asarray(m["edges"], float), np.flatnonzero(np.asarray(m["pred"], float))
+        if q.size:
+            lo, hi = min(lo, e[q[0]]), max(hi, e[q[-1] + 1])
     r = hist_ratio(ax)
     ax.stairs(tc, te, color="k", label="truth", zorder=5)   # first in the legend, on top of the predictions
-    dropped = []
     for m in models:
         e, q, t = np.asarray(m["edges"], float), np.asarray(m["pred"], float), np.asarray(m["truth"], float)
-        mid = 0.5 * (e[1:] + e[:-1])
-        inside = q[(mid > lo) & (mid < hi)].sum() / max(m.get("n", q.sum()), 1)
-        if inside < min_inside:
-            dropped.append(m["label"])
-            continue
         st = m.get("style", {})
         ax.stairs(q, e, label=m["label"], **st)
         with np.errstate(divide="ignore", invalid="ignore"):
@@ -664,7 +664,7 @@ def true_pred_hist(ax, models, truth=None, ratio=(0.5, 1.5), log_ratio=False, xl
         r.set_xlabel(xlabel)
     if ratio_label:
         r.set_ylabel(ratio_label)
-    return r, dropped
+    return r
 
 
 #: The only legend positions allowed. A legend at `center left` / `center right` / `center`
@@ -811,6 +811,7 @@ def legend_strip(ax, base: str, ncol: int = 3, order=None, width: float | None =
                 h.set_alpha(1)
         for ext in (".png", ".pdf"):
             fig.savefig(base + ext)   # the full width, not cropped: the strip spans the row
+        write_legend_txt(base, labels, [w for w in style_warnings(fig) if w.startswith('legend')])
         plt.close(fig)
         print(f"saved {base}.png / .pdf (legend strip, {n} columns, {width:.2f} in)")
         return
@@ -823,6 +824,7 @@ def legend_strip(ax, base: str, ncol: int = 3, order=None, width: float | None =
     fig.legend(handles, labels, ncol=ncol, loc="center", **kwargs)
     for ext in (".png", ".pdf"):
         fig.savefig(base + ext, bbox_inches="tight", pad_inches=0.03)
+    write_legend_txt(base, [l for l in labels if l], [w for w in style_warnings(fig) if w.startswith('legend')])
     plt.close(fig)
     print(f"saved {base}.png / .pdf (legend strip)")
 
@@ -1207,10 +1209,76 @@ def save(fig, base: str, repo: str | None = None) -> str:
         print(f"  !! {os.path.basename(base)}: layout failed: "
               f"{type(exc).__name__}: {exc}")
     _warn_if_squeezed(fig, base)
+    warns = style_warnings(fig)
+    for w in warns:
+        print(f"  !! {os.path.basename(base)}: {w}")
     fig.savefig(base + ".png")
     fig.savefig(base + ".pdf")
+    write_legend_txt(base, legend_labels(fig), warns)
     print(f"saved {base}.png / .pdf")
     return base
+
+
+#: A legend entry is a short symbol or formula on one line, defined in the caption (figure-style skill).
+LEGEND_MAX_CHARS = 30
+#: A y label that says "prediction over truth" (pred/true, \frac{pred}{true}): such an axes must be the hist_ratio inset
+#: under its histogram. A stand-alone ratio figure ("MSE ratio") is not one.
+_RATIO_YLABEL = re.compile(r"pred\w*\s*/?\s*(?:true|truth)\b|/\s*(?:true|truth)\b", re.I)
+
+
+def plain_text(label: str) -> str:
+    """What a reader sees of a label, roughly: a TeX command counts as one character, markup dropped."""
+    t = re.sub(r"\\(?:rm|mathrm|mathcal|mathbf|bar|hat|tilde)\b|\\[,;!]", "", str(label))
+    t = re.sub(r"\\[A-Za-z]+", "x", t)
+    return re.sub(r"[${}^_]", "", t)
+
+
+def legend_labels(fig) -> list:
+    """Every legend entry of `fig`, axes legends and figure legends, in order, each once."""
+    out = []
+    legs = list(fig.legends) + [ax.get_legend() for ax in fig.axes]
+    for leg in legs:
+        for t in (leg.get_texts() if leg is not None else []):
+            if t.get_text() and t.get_text() not in out:
+                out.append(t.get_text())
+    return out
+
+
+def style_warnings(fig) -> list:
+    """The figure-style breaches a script can see: a legend entry that is not a short one-line symbol, and a ratio
+    axes drawn as a panel of its own instead of the hist_ratio inset under its histogram."""
+    out = []
+    for lab in legend_labels(fig):
+        if "\n" in lab or len(plain_text(lab)) > LEGEND_MAX_CHARS:
+            out.append(f"legend entry {lab!r} is not a short one-line symbol (at most {LEGEND_MAX_CHARS} characters): "
+                       "write a symbol or formula and define it in the caption")
+    for ax in fig.axes:
+        if _RATIO_YLABEL.search(plain_text(ax.get_ylabel().replace("\\frac", ""))) and not getattr(ax, "_ps_ratio", False):
+            out.append(f"axes {ax.get_ylabel()!r} is a ratio panel of its own: draw it with ps.true_pred_hist or "
+                       "ps.hist_ratio, under its histogram on the same x axis")
+    return out
+
+
+def _producer():
+    """(script path, git blob id of its content now) of the running script; ('<interactive>', '') without one."""
+    import subprocess
+    p = os.path.abspath(sys.argv[0]) if sys.argv and sys.argv[0] and os.path.isfile(sys.argv[0]) else ""
+    if not p:
+        return "<interactive>", ""
+    r = subprocess.run(["git", "hash-object", p], capture_output=True, text=True)
+    return p, r.stdout.strip() if r.returncode == 0 else ""
+
+
+def write_legend_txt(base: str, labels: list, warns=()) -> None:
+    """`<base>.legend.txt`: the producing script and its blob (send_check refuses a figure no committed tool drew),
+    the style warnings of the save (send_check refuses those too), then one legend entry per line, as written."""
+    script, blob = _producer()
+    with open(base + ".legend.txt", "w", encoding="utf-8") as f:
+        f.write(f"# producer: {script} {blob}\n")
+        for w in warns:
+            f.write(f"# warn: {w}\n")
+        for lab in labels:
+            f.write(lab.replace("\n", "\\n") + "\n")
 
 
 def check_panels(fig, name: str) -> None:

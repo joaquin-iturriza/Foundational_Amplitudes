@@ -68,6 +68,7 @@ data/*.dat
 
 # Generated figures (all formats; already-tracked figures stay tracked)
 *.pdf
+*.legend.txt
 
 # Profiling / smoke scratch outputs
 compare_models/_probe_*

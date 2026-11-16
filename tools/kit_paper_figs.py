@@ -49,10 +49,10 @@ for proc, split, st in EX:
         with h5py.File(d + "/kit_benchmark/predictions.h5", "r") as P:
             p[lab] = P[split][st][tk][:]
     dl = {k: v - t for k, v in p.items()}
-    m = max(np.quantile(np.abs(v), 0.995) for v in dl.values())
+    m = max(np.abs(v).max() for v in dl.values())     # every event on the frame: no clip
     de = np.linspace(-m, m, 61)
     allv = np.concatenate([t] + list(p.values()))
-    ve = np.linspace(np.quantile(allv, 0.001), np.quantile(allv, 0.999), 41)
+    ve = np.linspace(allv.min(), allv.max(), 41)
     out.append({"proc": proc, "split": split, "stratum": st, "n": int(len(t)), "delta_edges": de.tolist(),
                 "value_edges": ve.tolist(), "truth": np.histogram(t, ve)[0].tolist(),
                 "pred": {k: np.histogram(v, ve)[0].tolist() for k, v in p.items()},
@@ -232,13 +232,9 @@ def plot(figs):
 
     # 4. representative examples: delta histograms, and true vs predicted distributions with a ratio panel
     ex = json.load(open(os.path.join(DATA, "kit_paper_examples.json")))
-    name = {("ee_uug_me2", "coll_y_1e-07_1e-06"): r"$u\bar ug$, $y\in[10^{-7},10^{-6}]$",
-            ("ee_uug_me2", "bulk"): r"$u\bar ug$, bulk",
-            ("ee_uugg_me2", "coll_qg_y_1e-07_1e-06"): r"$u\bar ugg$, $y_{qg}\in[10^{-7},10^{-6}]$",
-            ("ee_tt_virt_finite", "sudakov_sqrts_15000_50000"): r"$t\bar t$ virt., $\sqrt{s}\in[15,50]$ TeV",
-            ("ee_tt_virt_finite", "threshold_beta_0.0001_0.001"): r"$t\bar t$ virt., $\beta\in[10^{-4},10^{-3}]$",
-            ("ee_tt_virt_finite", "bulk"): r"$t\bar t$ virt., bulk"}
-    lab = {"transformer": "transformer", "mlp": "MLP (Bakar, rerun)"}
+    # the panel names the process only; the stratum goes in the caption (printed as PANEL lines)
+    proc = {"ee_uug_me2": r"$u\bar ug$", "ee_uugg_me2": r"$u\bar ugg$", "ee_tt_virt_finite": r"$t\bar t$ virtual"}
+    lab = {"transformer": "transformer", "mlp": "MLP"}
     col = {"transformer": ps.C.vermillion, "mlp": ps.C.blue}
     for e in ex:
         print(f"EXAMPLE {e['proc']} {e['stratum']} n={e['n']}: " + "; ".join(
@@ -246,35 +242,31 @@ def plot(figs):
     # delta histograms, two canvases of four
     for part, sel in (("a", ex[:3] + ex[5:6]), ("b", ex[3:5])):
         fig, axs = ps.figure(ncols=2, nrows=2) if len(sel) == 4 else ps.figure(ncols=2)
-        for ax, e in zip(np.ravel(axs), sel):
+        for i, (ax, e) in enumerate(zip(np.ravel(axs), sel)):
             c = np.array(e["delta_edges"])
             for k, h in e["delta"].items():
                 ax.stairs(h, c, color=col[k], label=lab[k])
             ax.set_yscale("log"); ax.set_xlabel(r"$\Delta=\log_{10}|\mathcal{M}|^2_{\rm pred}-\log_{10}|\mathcal{M}|^2_{\rm true}$")
             ax.set_ylabel("events")
-            ps.process_label(ax, name[(e["proc"], e["stratum"])])
+            ps.process_label(ax, proc[e["proc"]])
+            print(f"PANEL kit_delta_{part} {i + 1}: {e['proc']} {e['split']} {e['stratum']}")
         ps.legend_strip(np.ravel(axs)[0], os.path.join(figs, f"kit_delta_{part}_legend"), ncol=2)   # corners hold the labels
         print("FIGURE", ps.save(fig, os.path.join(figs, f"kit_delta_{part}")))
-    # distributions with the ratio below: per canvas two strata, top true and predicted, bottom predicted / true
+    # true against predicted distributions, the ratio under each (ps.true_pred_hist), one file per stratum
     for part, sel in (("a", [ex[0], ex[3]]), ("b", [ex[2], ex[5]])):
-        fig, axs = ps.figure(ncols=2, nrows=2)
-        for j, e in enumerate(sel):
-            c = np.array(e["value_edges"]); t = np.array(e["truth"], float)
-            top, bot = axs[0][j], axs[1][j]
-            top.stairs(t, c, color="k", label="truth")
-            for k, h in e["pred"].items():
-                top.stairs(h, c, color=col[k], label=lab[k])
-                r = np.where(t > 0, np.array(h) / np.where(t > 0, t, 1), np.nan)
-                bot.stairs(r, c, color=col[k])
-            top.set_yscale("log"); top.set_ylabel("events")
-            rr = np.concatenate([np.array(h) / t[t > 0] for h in (np.array(v)[t > 0] for v in e["pred"].values())])
-            bot.set_yscale("log" if np.nanmax(rr) > 10 * max(np.nanmin(rr[rr > 0]), 1e-12) else "linear")
-            bot.set_ylabel("pred / truth")
-            bot.set_xlabel(r"$\log_{10}(|\mathcal{M}|^2)$")
-            top.set_xlabel(r"$\log_{10}(|\mathcal{M}|^2)$")
-            ps.process_label(top, name[(e["proc"], e["stratum"])])
-        ps.legend_strip(axs[0][0], os.path.join(figs, f"kit_dist_{part}_legend"), ncol=3)
-        print("FIGURE", ps.save(fig, os.path.join(figs, f"kit_dist_{part}")))
+        panels = ps.panels(len(sel))
+        for i, ((fig, ax), e) in enumerate(zip(panels, sel)):
+            c, t = e["value_edges"], np.array(e["truth"], float)
+            models = [{"label": lab[k], "edges": c, "pred": h, "truth": t, "style": {"color": col[k]}}
+                      for k, h in e["pred"].items()]
+            rr = np.concatenate([np.array(h, float)[t > 0] / t[t > 0] for h in e["pred"].values()])
+            wide = np.nanmax(rr) > 10 * max(np.nanmin(rr[rr > 0]), 1e-12)   # spread over a decade: log ratio axis
+            ps.true_pred_hist(ax, models, ratio=(0.1, 10) if wide else (0.5, 1.5), log_ratio=wide,
+                                           xlabel=r"$\log_{10}|\mathcal{M}|^2$")
+            ps.process_label(ax, proc[e["proc"]])
+            print(f"PANEL kit_dist_{part}_{ps.PANEL_SUFFIXES[i]}: {e['proc']} {e['split']} {e['stratum']}")
+        ps.legend_strip(panels[0][1], os.path.join(figs, f"kit_dist_{part}_legend"), ncol=3)
+        print("FIGURE", ps.save_panels(panels, os.path.join(figs, f"kit_dist_{part}")))
 
 
 def main():   # dup-ok: argparse collect/plot boilerplate, every kit tool has it

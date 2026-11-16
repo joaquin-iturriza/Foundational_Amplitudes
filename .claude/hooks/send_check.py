@@ -23,6 +23,16 @@ pattern "<y quantity> against <x quantity>" gives both. When the caption names p
 panel's text must do so (a text before the first letter counts for all panels, so a shared "x axis ..." sentence
 there is enough).
 
+Legend rule (2026-11-16, Joaquin: "why do you not do something about it instead of fixing each individual occurrence
+of the mistake?"): every figure (.png, .pdf) other than a deck, a draft or a run's own plot is read through
+<base>.legend.txt, which plot_style.save and legend_strip write beside it. The send is refused when that file is
+missing (the figure was not drawn through ps.save: an ad hoc montage or a hand-saved image), when the script it names
+is not committed at the content that drew it (git blob), when the save recorded a style warning (a long or multi-line
+legend entry, a ratio panel that is not a hist_ratio inset), or when the caption leaves a legend entry undefined (the
+entry, reduced to its letters and digits, TeX symbols as their Unicode letters, must appear in the caption reduced the
+same way). The legend entries are shown at every send. A figure the paper draft includes (an includegraphics stem of a
+.tex under ~/drafts) is never sent loose: a comparison of draft figures goes as compiled draft pages.
+
 A term listed in docs/glossary.txt (term<TAB>plain definition) is allowed, in its underscore or its spaced form.
 
 Read-only use: python3 .claude/hooks/send_check.py --scan FILE... prints the findings (a .txt file is read as one
@@ -174,6 +184,101 @@ def axes_findings(tool_input, cwd):
     return out
 
 
+GREEK = dict(zip("alpha beta gamma delta epsilon zeta eta theta iota kappa lambda mu nu xi pi rho sigma tau upsilon phi "
+                 "chi psi omega".split(), "αβγδεζηθικλμνξπρστυφχψω"))
+GREEK.update({"varepsilon": "ε", "varphi": "φ", "vartheta": "θ", "ell": "l"})
+WORDS = ("log", "ln", "exp", "sin", "cos", "tan", "min", "max", "lim")
+
+
+def norm(text):
+    """Letters and digits only, lowercase, TeX greek as its letter, Unicode super/subscripts as plain digits (NFKC):
+    a legend entry and a caption reduced this way compare as substrings."""
+    import unicodedata
+    t = re.sub(r"\\([A-Za-z]+)", lambda m: GREEK.get(m.group(1).lower(), "") if m.group(1).lower() in GREEK
+               else (m.group(1) if m.group(1) in WORDS else ""), text)
+    t = unicodedata.normalize("NFKC", t)
+    return "".join(c for c in t.lower() if c.isalnum())
+
+
+def legend_file(path):
+    return re.sub(r"\.(png|pdf|svg)$", "", path, flags=re.I) + ".legend.txt"
+
+
+def read_legend(path):
+    """(producer script, blob, [warnings], [entries]) of a figure's legend file, None when it has none."""
+    p = legend_file(path)
+    if not os.path.exists(p):
+        return None
+    script, blob, warns, labels = "", "", [], []
+    for line in open(p, encoding="utf-8").read().splitlines():
+        if line.startswith("# producer: "):
+            script, _, blob = line[len("# producer: "):].rpartition(" ")
+        elif line.startswith("# warn: "):
+            warns.append(line[len("# warn: "):])
+        elif line.strip():
+            labels.append(line)
+    return script, blob, warns, labels
+
+
+def committed(script, blob):
+    """True when `script` is in git and some commit holds it at exactly `blob` (the content that drew the figure).
+    shortcut: only the top-level script is checked, not the repo modules it imports (plot_style, helpers); hash
+    those too if an uncommitted helper ever draws a sent figure."""
+    if not blob or not os.path.isfile(script):
+        return False
+    d = os.path.dirname(script)
+    r = subprocess.run(["git", "-C", d, "log", "--all", "-1", "--format=%h", "--find-object=" + blob, "--",
+                        os.path.basename(script)], capture_output=True, text=True, timeout=30)
+    return r.returncode == 0 and bool(r.stdout.strip())
+
+
+def draft_stems(drafts=None):
+    """Stems of every figure an \\includegraphics of a .tex under ~/drafts names."""
+    import glob
+    drafts = drafts or os.path.expanduser("~/drafts")
+    out = set()
+    for tex in glob.glob(os.path.join(drafts, "**", "*.tex"), recursive=True):
+        try:
+            body = open(tex, encoding="utf-8", errors="replace").read()
+        except OSError:
+            continue
+        for m in re.finditer(r"\\includegraphics(?:\[[^\]]*\])?\{([^}]+)\}", body):
+            out.add(re.sub(r"\.(pdf|png)$", "", os.path.basename(m.group(1).strip())))
+    return out
+
+
+def legend_findings(tool_input, cwd, drafts=None):
+    """([refusal lines], [legend lines shown]) for the figures of a SendUserFile call (see the legend rule)."""
+    cap = tool_input.get("caption") if isinstance(tool_input, dict) else None
+    ncap = norm(cap if isinstance(cap, str) else "")
+    bad, shown, stems = [], [], None
+    for p in sent_files(tool_input, (".png", ".pdf")):
+        p = p if os.path.isabs(p) else os.path.join(cwd, p)
+        if is_deck(p) or is_draft(p) or "run_plots" in os.path.normpath(p).split(os.sep):
+            continue
+        stems = draft_stems(drafts) if stems is None else stems
+        if re.sub(r"\.(png|pdf)$", "", os.path.basename(p), flags=re.I) in stems:
+            bad.append("%s: a figure of the paper draft: send the compiled draft pages (draft_*.pdf), never the loose "
+                       "figure" % p)
+            continue
+        lg = read_legend(p)
+        if lg is None:
+            bad.append("%s: no %s: not drawn through ps.save by a committed tool (an ad hoc montage or a hand-saved "
+                       "image); draw it with a committed script" % (p, os.path.basename(legend_file(p))))
+            continue
+        script, blob, warns, labels = lg
+        if not committed(script, blob):
+            bad.append("%s: drawn by %s, not committed at the content that drew it: commit the script and redraw"
+                       % (p, script or "no script"))
+        bad += ["%s: %s" % (p, w) for w in warns]
+        shown.append("%s: %s" % (os.path.basename(p), " | ".join(labels) if labels else "(no legend)"))
+        miss = [l for l in labels if norm(l) and norm(l) not in ncap]
+        if miss:
+            bad.append("%s: the caption does not define these legend entries: %s (the legend holds: %s)"
+                       % (p, " | ".join(miss), " | ".join(labels)))
+    return bad, shown
+
+
 def sent_files(tool_input, exts=(".png", ".pdf")):
     """Every .png/.pdf path (or exts) in the tool input, whatever its field is called."""
     out = []
@@ -208,9 +313,17 @@ def main(argv):
     for p in sent_files(ev.get("tool_input") or {}):
         bad += check(p if os.path.isabs(p) else os.path.join(cwd, p), terms)
     ax = axes_findings(ev.get("tool_input") or {}, cwd)
+    lg, shown = legend_findings(ev.get("tool_input") or {}, cwd)
+    if lg:
+        sys.stderr.write("send_check: a figure must be drawn by a committed tool through ps.save, its legend entries "
+                         "short and each defined in the caption:\n  " + "\n  ".join(lg) + "\n")
+        return 2
     if ax:
         sys.stderr.write("send_check: a figure needs its axes named in the caption:\n  " + "\n  ".join(ax) + "\n")
     if not bad:
+        if not ax and shown:
+            print(json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse", "additionalContext":
+                                                     "send_check: legend entries sent:\n" + "\n".join(shown)}}))
         return 2 if ax else 0
     sys.stderr.write(
         "send_check: this file does not read on its own (CLAUDE.md 0e: plain names, no internal codes). Redraw it with "
