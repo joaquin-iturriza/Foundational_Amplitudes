@@ -33433,6 +33433,8 @@ entries:
     state: working
     since: '2026-11-16T23:01:27+00:00'
     state_at: '2026-11-16T23:01:27+00:00'
+    context: 102143
+    context_at: '2026-11-16T23:03:12+00:00'
   step_waits:
     '3': '2026-11-20: next draft round'
     '4': the next owner of draft_rewrite (hand-off written 2026-11-17; previous owner closed near the context limit)
