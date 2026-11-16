@@ -27706,7 +27706,7 @@ entries:
     - FA-ccin2p3-f45f434a
     - FA-ccin2p3-f6b2ece9
     - FA-ccin2p3-fcad1510
-    commit: 617c4bb6
+    commit: ddc99fba
     paths:
     - analysis/kit_benchmark/data/kit_curves_read.json
     - analysis/kit_benchmark/data/kit_fig_A.json
@@ -27716,6 +27716,7 @@ entries:
     - analysis/kit_benchmark/data/kit_threshold_scan.json
     - analysis/kit_benchmark/data/kit_verdict_A_hpo_ftsearch.json
     - models/lloca.py
+    - plot_style.py
     - scripts/job_kit_package.sh
     - scripts/job_kit_rescore.sh
     - scripts/job_kit_threshold.sh
