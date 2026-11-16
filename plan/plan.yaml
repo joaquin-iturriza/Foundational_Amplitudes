@@ -15793,9 +15793,6 @@ entries:
     23: Show Joaquin the CLAUDE.md diff of the reviewer's three dedupe findings (fixed by agent aceb4110a4694e016 without
       his yes, per his 2026-11-16 'I don't understand why this would need me'), and the figure-setup result with the union-range
       correction (agent a0636264613b51f22).
-    24: 'Figure setup fix cfe97bf5: when detach figsetup_regen ends (kit_paper_examples recollected from CC on the full range,
-      kit_paper_figs -> analysis/kit_benchmark/figs/paper, kit_vs_mlp, muon_long regenerated under D462''s union range), read
-      its log, look at the KIT dist panels once, then hand back (step 22)'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16320,11 +16317,6 @@ entries:
       if:
       - 'reviewer passes: send the diff'
       - 'reviewer blocks: fix and re-check'
-    24:
-      feeds: whether the figure setup fix holds on the recorded cases
-      if:
-      - 'all three regenerate with no !! line: hand back with the figures'
-      - 'a part fails or warns: read its log, fix, rerun once'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
@@ -16333,7 +16325,6 @@ entries:
       idle: event (or its absence after 45 min) is the trigger'
     '21': the date 2026-11-17 (a week after the 2026-11-09 23:54 restart on the batching code)
     '22': owner a0636264613b51f22 hand-back (figure setup fix, repo-reviewer a2168a01c708db057 running)
-    '24': detach figsetup_regen (pid 3762914)
     '23': main session relay; owner a0636264613b51f22 hand-back after step 24
   owner:
     agent: a0636264613b51f22
