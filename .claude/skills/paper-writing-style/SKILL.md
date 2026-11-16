@@ -33,8 +33,13 @@ change); this skill holds how the text reads.
    counts, no account of how a result was obtained or what was tried first. A thing is named by what it is (a
    process by its reaction, a pretraining by what it trained on). The same rule for figures is enforced by
    `.claude/hooks/send_check.py`, with accepted terms in `docs/glossary.txt`.
-9. **Numbers:** in the paper, every result is shown in a figure or worded without its numbers (CLAUDE.md); see the
-   open conflict below. `docs/results.tex` is a record: there every claim carries its number (notes-editor).
+9. **A result is shown in a plot or not at all.** A result that can only be given qualitatively, or whose numbers
+   cannot be plotted (at most put in a table), is probably wrong or not important enough: rethink why it cannot be
+   quantified or plotted, or drop it and state what the problem is. In the paper, the text words a plotted result
+   without repeating its numbers. `docs/results.tex` is a record: there every claim carries its number
+   (notes-editor).
+10. **No hedging in the final text.** A claim that cannot be defended is not made. Hedging stays only where it is by
+   design, in work in progress, which does not go into the final paper.
 
 ## Flow, not templates
 
@@ -86,6 +91,7 @@ Prose paragraphs, not bullet lists, for results.
 | "crucial(ly)", "powerful", "seamless", "notably", "importantly", "it is worth noting", "remarkably", "striking" | cut |
 | "not just X, but Y"; rule-of-three padding; "studies show" with nothing behind it | a plain declarative; the one item that matters; a citation |
 | an em-dash (`---`), above all in a header | a comma, colon or full stop |
+| "surrogate model" | "surrogate network" |
 | "scaled" (loss) | "heteroscedastic" |
 
 **Also cut:** sentences that restate an equation; what the figure under discussion already shows; negative results
@@ -95,34 +101,19 @@ implied by the main result.
 
 - **Around an equation:** before it, 0-2 sentences with the goal; after it, the symbol definitions inline, one
   sentence with the implication, then stop.
-- **References:** figures `Fig.~\ref{fig:..}`, sections `Sec.~\ref{sec:..}`, tables `Tab.~\ref{tab:..}`; never
-  `\cref` for equations.
+- **References:** equations `Eq.~\eqref{eq:..}` (`Eqs.~\eqref{eq:a} and \eqref{eq:b}`), never `\cref`; figures
+  `Fig.~\ref{fig:..}`, sections `Sec.~\ref{sec:..}`, tables `Tab.~\ref{tab:..}`, also at the start of a sentence.
+- **Comparisons with other work** are made, and framed without an adversarial tone: what we do and what it gives
+  beside the reference result, never "Unlike Ref. X, we ..." set up as a contest.
+- **No `\emph{}`** anywhere: the term in plain text.
 - **`\text{}`, not `\mathrm{}`, for words inside math:** `A_\text{NN}`, `\tau_\text{lo}`.
 - **No subfigures.** A plain grid of `\includegraphics` (`\widerow` in the draft), each panel's position described
   in the one caption. No panel titles (figure-style skill).
 - **Every caption stands alone:** the process, the setting and every legend symbol defined, the methods ordered as
-  in the text or its reverse. What the figure shows goes in the caption, never inside the plot (figure-style).
-
-## Open conflicts (Joaquin's call; until he decides, CLAUDE.md and the draft's current convention hold)
-
-- Group: "Specific numbers over qualitative claims: percentages, GeV values, error margins." Ours (CLAUDE.md): "every
-  result is shown in a figure or worded without its numbers".
-- Group: "No `\emph{}` anywhere." The draft uses `\emph` (17 times).
-- Group: "Never write 'As Fig.~\ref{...}, for ...': write the full caption, even if it repeats another one." The
-  draft has three such captions (rung_focus, finale_synth and star_arms companions).
-- Group: "surrogate network", never "surrogate model". Our 2601.13308 is titled with "amplitude surrogates"; the
-  draft says "surrogate amplitudes" once.
-- Group: `Eq.\eqref{eq:..}` (no tie). The draft writes `Eq.~\eqref` (13 of 14).
-- Group: no "Unlike Ref. X, we ..." or "in contrast to ..." comparison with other work. The draft's KIT NLO
-  benchmark and its L-GATr comparison ("should be compared with ... Ref.") compare with other work by design.
-- Group: `\text{}`, not `\mathrm{}`, for text in math. The draft has `\mathrm{MSE}`, `\mathrm{NS}_5`, `\mathrm{Bin}`.
-- Group: `Fig.~\ref` and prose over bullet lists. The co-authors' sections (kept untouched) write `Figure~\ref` 13
-  times; the synthetic-generator subsection lists its limits as `\textbf`-headed bullets.
-- Group: no hedging at all. notes-editor (before this merge): "measured hedging only where warranted ('can',
-  'appears to', 'we speculate') for genuinely novel claims"; it now defers to this skill.
+  in the text or its reverse. Never "As Fig.~\ref{...}, for ...": write the full caption, even if it repeats another. What the figure shows goes in the caption, never inside the plot (figure-style).
 
 ## Before you hand back text
 
 Check every sentence, also of a one-line fix: it argues forward; it chains at most two clauses; it says something
-new; it has no hedging, meta-commentary or internal name; every symbol in it is defined and used; it uses no
-`\mathrm` for words and no `\cref` for equations; every caption stands alone.
+new; it has no hedging, meta-commentary, adversarial comparison or internal name; every result in it is plotted; every symbol in it is defined and used; it uses no
+`\emph`, no `\mathrm` for words and no `\cref` for equations; every caption stands alone.
