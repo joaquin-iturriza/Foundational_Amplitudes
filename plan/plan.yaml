@@ -17383,6 +17383,17 @@ entries:
       pools prebuilt, sidecars present. Held-out H1..H7c and dsh_eea were already complete (hand-off 2026-11-12T14:05). lhe_parts
       gc --queue zz_redesign_pp4_parts --parts: 0 files left (the worker deleted its part, 0.11 GB), 6 held by other queues
       kept.'
+  - at: '2026-11-16T20:03:29+00:00'
+    text: '2026-11-16 figure rules not binding (Joaquin 2026-11-16): skill gained the true-vs-predicted layout section (7863b1c2).
+      Causes from transcripts: kitvm_dist (agent a21d23a7 l.324 loaded the skill, which had no ratio-panel rule and says every
+      panel is one cell; l.330-339 copied tools/kit_paper_figs.py, still a 2x2 with the ratio as its own cell at HEAD; range
+      0.1-99.9% widened then ''12 decades beyond the truth''; stratum put inside process_label; l.399 looked at a 5-canvas
+      montage, reported data not form). example_dist (a14a677a l.476-480 masked ratio bins <10 after looking, for appearance;
+      a0f7f76d copied it, 723c6550; [0.5,1.5] and truth quantile range from 0c46798e; fixes 6606a08b/5e25e978 local to the
+      script). KIT legends (a6c696e8 l.457 INPUT_ARMS under D369 ''legends say what each curve is'', baked into arm_label
+      docstring; skill never loaded; fa-figures push came 2 h later, l.637: tools/kit_*.py not in its paths). Caption V.beta
+      (main l.204932 caption from the owner''s table; legend only as a png the main session does not open; no legend text
+      file). Proposal to Joaquin in the hand-back.'
   handoff:
     state: '2026-11-12 ~15:10 local. Restore of CC pools deleted 2026-11-11: held-out H1..H7c all prebuilt (check_site_data
       0 missing); dsh_eea 115/115 train rebuilt, val/test sha256 230/230 unchanged, its parts gc''d (5.45 GB); PP4: 1 pool
