@@ -33332,13 +33332,6 @@ entries:
     3: 'Het loss vs MSE (Fig. 9, removed from the draft by Joaquin 2026-11-13): come back to it. The het network leaves ~1-11%
       of 2->2 test events unfitted with large sigma (median |Delta| better 118/146, MSE worse on most 2->2); evaluation checked,
       no bug; training precision not checked'
-    4: 'Fig. 15 redo (Joaquin 2026-11-17: ''just get some processes with relatively good performance, but with also good separation
-      between muon and adam''): the 4 low-loss probes chosen by muon_compare.py low-probes (one per held-out axis at the 10th
-      percentile of the two parents'' geometric-mean zero-shot MSE) gave three 2->4 processes and a one-loop one, errors 0.03-0.4
-      that barely move with D_train. Choose instead, across all held-out processes and with no per-axis constraint, processes
-      whose fine-tuned errors are low and whose Muon/AdamW zero-shot separation is large (state the rule and the candidates''
-      numbers before running); rerun the same protocol (~3 GPU-h); redraw; check on the plotted curves that the errors fall
-      with D_train before reporting.'
   done_when: null
   notes_ref: null
   match: none
@@ -33466,7 +33459,6 @@ entries:
     context_at: '2026-11-17T05:51:40+00:00'
   step_waits:
     '3': '2026-11-20: next draft round'
-    '4': FA-ccin2p3-9f53a445 FA-ccin2p3-25941ebf FA-ccin2p3-264b3f81
   findings:
   - at: '2026-11-13T02:46:58+00:00'
     text: '2026-11-13 ~03:50 Joaquin: ''we should start actually doing the work on the draft with what we have ... Let''s
@@ -34039,8 +34031,3 @@ entries:
       if:
       - 'Joaquin returns to it: design the follow-up he asks for'
       - 'never: stays out of the paper'
-    4:
-      feeds: Fig. 15 on representative processes
-      if:
-      - 'runs finish: redraw, check the curves fall with D_train, send'
-      - 'no process has both low error and separation: say so with the numbers'
