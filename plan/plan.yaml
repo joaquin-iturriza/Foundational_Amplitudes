@@ -33708,6 +33708,14 @@ entries:
       D=32 and 100 and end within 25% (inside the 1.4x seed spread of the zero-shot read). Several D=32 fine-tunes end above
       their zero-shot start. Draft 314e151, Sec. 4 paragraph and caption rewritten; build 48 pp draft_final_fig15.pdf/.zip
       in scratchpad.'
+  - at: '2026-11-17T04:29:59+00:00'
+    text: '2026-11-17 step 4 (Fig. 15 redo) probe rule, muon_compare.py sep-probes @d0ae01a7: over the 529 held-out processes
+      of short_reads.json (axes H1, H2, H2p5, H3, H5; the alpha_s/energy/cut variants H6, H7E, H7c of trained processes left
+      out), keep those whose geometric mean of the two parents'' zero-shot MSE(log|M|^2) is at or below the 25th percentile
+      (0.287; median 0.596), 133 of them, rank by |log(AdamW/Muon)|, take the first 4: g g->t tbar (AdamW 0.0841, Muon 0.000431,
+      195x), d dbar->t ubar (0.196, 0.00302, 65x), b bbar->HHHZ (0.301, 0.0092, 33x), u ubar->W+W- (0.618, 0.0205, 30x). Next
+      in line: d dbar->HHW+W- 27x, d d->a d d 26x, u dbar->b tbar 24x, d dbar->a g 22x. The old low-probes rule (one per axis
+      at the 10th percentile) never selected for separation (5.9-7.4x).'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
