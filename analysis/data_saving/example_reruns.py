@@ -108,13 +108,18 @@ def plot():
               + f"; Delta rms {np.sqrt(np.mean(d ** 2)):.3g}, median |Delta| {np.median(np.abs(d)):.3g}, "
               f"|Delta| > 10: {np.mean(np.abs(d) > 10):.2%}, < 1e-6: {np.mean(np.abs(d) < 1e-6):.2%}")
     by = {(c["probe"], c["D"], c["arm"]): c for c in cells if "mse" in c}
-    col = {"scratch": ps.C.blue, "fine-tune": ps.C.vermillion}
+    # each (arm, D_train) curve its own colour, line style and a heavier line (Joaquin 2026-11-17: the four curves of
+    # Figs. 7-8 were hard to tell apart with colour for the arm and dashes for D_train only)
+    col = {("scratch", 100): ps.C.sky, ("scratch", 10000): ps.C.blue,
+           ("fine-tune", 100): ps.C.purple, ("fine-tune", 10000): ps.C.vermillion}
+    LW = 1.8
     lab = {"scratch": "from scratch", "fine-tune": "fine-tuned"}   # short: the legend shares its row with the process label
     from matplotlib.lines import Line2D
     # one file per figure, legends inside in words (Joaquin 2026-11-17): the arm's colour in panel (a), the number of
     # training events' line style in panel (b)
-    arm_h = [Line2D([], [], color=col[a], label=lab[a]) for a in ("scratch", "fine-tune")]
-    d_h = [Line2D([], [], color="0.4", linestyle=D_STYLE[D], label=D_LAB[D]) for D in D_STYLE]
+    def arm_h(a):
+        return [Line2D([], [], color=col[a, D], linestyle=D_STYLE[D], lw=LW, label=D_LAB[D])
+                for D in D_STYLE]   # the arm is the legend's title: narrow enough to leave the process label clear
     edges = np.logspace(-6, 3, 73)   # |Delta| from 10^-6 to 10^3, eight bins a decade; events beyond go in the end bins
     # |Delta| histograms on a log axis, one panel per probe: colour the arm, line style D
     fig, axs = ps.figure(ncols=2, nrows=2)
@@ -124,14 +129,14 @@ def plot():
                 if (p, D, a) in by:
                     c = by[p, D, a]
                     x = np.clip(np.abs(np.exp(c["pred"] - c["true"]) - 1), edges[0], edges[-1] * 0.999)
-                    ax.stairs(np.histogram(x, edges)[0], edges, color=col[a],
-                              linestyle=D_STYLE[D])
+                    ax.stairs(np.histogram(x, edges)[0], edges, color=col[a, D],
+                              linestyle=D_STYLE[D], lw=LW)
         ax.set_xscale("log"); ax.set_xlim(edges[0], edges[-1])
         ax.set_yscale("log"); ax.set_ylabel("events")
         ax.set_xlabel(r"$|\Delta|$, $\Delta=|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2_{\rm true}-1$")
         ps.process_label(ax, NAME[p])
-    ps.legend(axs.flat[0], "upper left", handles=arm_h)
-    ps.legend(axs.flat[2], "upper left", handles=d_h)
+    ps.legend(axs.flat[0], "upper left", handles=arm_h("scratch"), title=lab["scratch"])
+    ps.legend(axs.flat[2], "upper left", handles=arm_h("fine-tune"), title=lab["fine-tune"])
     print("FIGURE", ps.save(fig, os.path.join(figs, "example_delta")))
     # true and predicted log|M|^2 with the ratio below, one panel per probe
     fig, axs = ps.figure(ncols=2, nrows=2)
@@ -144,14 +149,15 @@ def plot():
         e = np.linspace(allv.min(), allv.max(), 41)  # the union of truth and predictions: every event on the frame
         t = np.histogram(tr, e)[0]
         models = [dict(label=f"{lab[a]}, {D_LAB[D]}", edges=e, truth=t, n=by[p, D, a]["pred"].size,
-                       pred=np.histogram(by[p, D, a]["pred"], e)[0], style=dict(color=col[a], linestyle=D_STYLE[D]))
+                       pred=np.histogram(by[p, D, a]["pred"], e)[0], style=dict(color=col[a, D], linestyle=D_STYLE[D], lw=LW))
                   for a, D in have]
         ps.true_pred_hist(ax, models, xlabel=r"$\log|\mathcal{M}|^2$",
                                        ratio_label=r"$\frac{\rm pred}{\rm true}$" if k % 2 == 0 else None)
         # right-hand panels carry no ratio label: it would run into the left panel in the paper's pairs
         ps.process_label(ax, NAME[p])
-    ps.legend(axs.flat[0], "upper left", handles=[Line2D([], [], color="k", label="truth")] + arm_h)
-    ps.legend(axs.flat[2], "upper left", handles=d_h)
+    ps.legend(axs.flat[0], "upper left", handles=arm_h("scratch"), title=lab["scratch"])
+    ps.legend(axs.flat[1], "upper left", handles=[Line2D([], [], color="k", label="truth")])
+    ps.legend(axs.flat[2], "upper left", handles=arm_h("fine-tune"), title=lab["fine-tune"])
     print("FIGURE", ps.save(fig, os.path.join(figs, "example_dist")))
 
 
