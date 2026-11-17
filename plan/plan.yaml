@@ -29018,6 +29018,7 @@ entries:
       - 'the runs are mislabelled in the data: say which'
   step_waits:
     '20': '2026-11-14'
+    '23': the repo-reviewer ae24955df7b1a36a7 re-check of 224c7920
   handoff:
     state: '2026-11-17 @092b4128. Step 23 done again (Joaquin 2026-11-17: fewer figures, readable ranges, short deck): 12
       figures in analysis/kit_benchmark/figs/deck (tools/kit_vs_mlp.py plot --figs analysis/kit_benchmark/figs/deck; tools/kit_figures.py
