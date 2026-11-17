@@ -33499,7 +33499,7 @@ entries:
     agent: a4b2e4f58e3b9081f
     state: stopped
     since: '2026-11-17T11:26:56+00:00'
-    state_at: '2026-11-17T12:10:37+00:00'
+    state_at: '2026-11-17T12:11:35.983000+00:00'
     context: 248803
     context_at: '2026-11-17T12:12:22+00:00'
   step_waits:
@@ -34235,9 +34235,9 @@ entries:
     - 2
   owner:
     agent: ad838d9b0df85e41f
-    state: stopped
+    state: working
     since: '2026-11-17T11:36:14+00:00'
-    state_at: '2026-11-17T12:09:21.422000+00:00'
+    state_at: '2026-11-17T12:13:10.342000+00:00'
     context: 268000
     context_at: '2026-11-17T12:13:19+00:00'
   designs:
