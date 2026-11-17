@@ -34213,6 +34213,15 @@ entries:
     - 3
     answered_at: '2026-11-17T11:33:55.256000+00:00'
     decision: D478
+  - ask: 'GPU budget: up to 96 GPU-h above 30 with no decision covering it. Train their networks with their own code: all
+      4 networks x 4 multiplicities (at most 96 GPU-h, their 24 h limit per multiplicity job), or LLoCa-Transformer + LGATr-slim
+      only (about 50-65 GPU-h, estimate)?'
+    at: '2026-11-17T12:05:49+00:00'
+    searched: 'CLAUDE.md GPU budget rule (30 GPU-h); site decisions --project FA: D477 approves the entry at no stated cost;
+      D478, D479 settle HPs and epochs only. Joaquin''s messages 2026-11-14T04:31 (a paper LaTeX template), 2026-11-12T15:33
+      (KIT transformer results), 2026-11-15T17:28 (conference abstract): none names a cost for this work'
+    blocks_steps: &id003
+    - 2
   owner:
     agent: ad838d9b0df85e41f
     state: working
@@ -34611,3 +34620,11 @@ entries:
       no KIT scorer for uq_); mg5_pipeline_final.py (ddbar_Zg..Zgggg); analysis/zng_uq/paper_mse.py + data/paper_mse.json;
       their repo supriodubey/lloca-experiments-uq branch uq (experiments/amplitudes/experiment_uq.py init_data, experiments/uq/metrics.py)
     written: '2026-11-17T11:27:17+00:00'
+  ask: 'GPU budget: up to 96 GPU-h above 30 with no decision covering it. Train their networks with their own code: all 4
+    networks x 4 multiplicities (at most 96 GPU-h, their 24 h limit per multiplicity job), or LLoCa-Transformer + LGATr-slim
+    only (about 50-65 GPU-h, estimate)?'
+  waiting_since: '2026-11-17T12:05:49+00:00'
+  searched: 'CLAUDE.md GPU budget rule (30 GPU-h); site decisions --project FA: D477 approves the entry at no stated cost;
+    D478, D479 settle HPs and epochs only. Joaquin''s messages 2026-11-14T04:31 (a paper LaTeX template), 2026-11-12T15:33
+    (KIT transformer results), 2026-11-15T17:28 (conference abstract): none names a cost for this work'
+  blocks_steps: *id003
