@@ -35326,10 +35326,13 @@ entries:
     - dan_zeroshot_v4
   decisions:
   - D488
-  next: 'Read trial_1262 (cov_v4_long_hpo8_cc_68224, sigma stage) on Daniel''s 139 held-out pools (axis DAN, one eval job,
-    ~0.1 h), bring the predictions home (collect_heldout_preds.py -> data/v4_trial1262_dan.npz) and draw analysis/catalog_daniel/dan_per_process.py:
-    96 relabels and the 9 extrapolation processes with no relabel in catalog_v4''s training (v4_heldout_overlap.py: 34 of
-    43 have one)'
+  next:
+    1: 'Read trial_1262 (cov_v4_long_hpo8_cc_68224, sigma stage) on Daniel''s 139 held-out pools (axis DAN, one eval job,
+      ~0.1 h), bring the predictions home (collect_heldout_preds.py -> data/v4_trial1262_dan.npz) and draw analysis/catalog_daniel/dan_per_process.py:
+      96 relabels and the 9 extrapolation processes with no relabel in catalog_v4''s training (v4_heldout_overlap.py: 34 of
+      43 have one)'
+    2: Ask Joaquin where the dimensionless + coupling orders model goes for Suprio (checkpoint, code and config, or both;
+      where); main was the wrong guess and was not touched
   done_when: null
   notes_ref: null
   match: dan_zs_v4*
@@ -35433,3 +35436,8 @@ entries:
         figure'
       - 'above, or probes refused/non-finite: report with the failing probes listed and what the physics mismatch (massive
         b, Daniel''s run card) may cost'
+    2:
+      feeds: how Suprio gets the dimensionless + coupling orders model (D489)
+      if:
+      - 'Joaquin names a place for the checkpoint: a worker copies it there'
+      - 'Joaquin wants code and config: a worker puts them where he says'
