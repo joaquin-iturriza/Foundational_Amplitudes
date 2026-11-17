@@ -34083,3 +34083,31 @@ entries:
     claim'
   blocks: nothing
   blocks_steps: *id003
+- id: zng_uq_benchmark
+  title: Our model on the Z + n gluon UQ datasets (Zenodo 16793011)
+  question: 'How does our latest setup (emission-scale target, HETEROSC, mu-P LLoCa), from scratch and fine-tuned from a pretraining,
+    compare with the networks of lloca-experiments-uq (branch uq) on q qbar -> Z + 1..4 g: median |Delta| against multiplicity,
+    the |Delta| distribution on Z+4g, and the pulls?'
+  status: running
+  quotes:
+  - said_at: '2026-11-17T10:54:59.965000+00:00'
+    text: We for sure want some trainings from scratch on them with our latest setup, emission scales and so on, but also
+      a fine tuned case
+    decision: D477
+    covers:
+    - zng_uq_benchmark
+  decisions:
+  - D477
+  next: 'Setup: the four datasets on a site (20 GB compressed; check free disk), a committed converter (PDG ids, partonic
+    frame, alpha_s handling, cuts/support check), our |M|^2 cross-checked on ~100 of their events; their splits and |Delta|
+    and pull definitions reproduced. Then a design (scratch per multiplicity + a fine-tune from our best pretraining, HETEROSC
+    with sigma stage), GPU-h estimate, design review, runs, the three figures.'
+  done_when: null
+  notes_ref: null
+  match: zng_uq_*,tp*_zng_*
+  evidence:
+    runs: []
+    commit: null
+    paths: []
+  dead_ends: []
+  asks: []
