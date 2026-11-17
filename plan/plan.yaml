@@ -35116,7 +35116,7 @@ entries:
       - 'parent converges within 10x of the old finale''s 4.9e-6 geometric mean: stage 2 design'
       - 'it fails: report where, fix'
   step_waits:
-    '5': the notes-editor pillar reviewer (blocked on par:muon_long, another entry)
+    '5': the results of batches 1, B1, B2
     '4': '2026-11-18'
     '6': detached zng_gate_windows (submits Suprio's RUN_N=1..4 production at 19:35 UTC); smoke FA-ccin2p3-7f7f0b53 passed
     '7': detached zng_gate_windows (submits B2's 8 runs at 18:12 UTC, after the site gate's 60-min window)
