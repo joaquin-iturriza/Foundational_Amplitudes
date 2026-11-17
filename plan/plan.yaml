@@ -33738,6 +33738,17 @@ entries:
       195x), d dbar->t ubar (0.196, 0.00302, 65x), b bbar->HHHZ (0.301, 0.0092, 33x), u ubar->W+W- (0.618, 0.0205, 30x). Next
       in line: d dbar->HHW+W- 27x, d d->a d d 26x, u dbar->b tbar 24x, d dbar->a g 22x. The old low-probes rule (one per axis
       at the 10th percentile) never selected for separation (5.9-7.4x).'
+  - at: '2026-11-17T04:43:29+00:00'
+    text: '2026-11-17 Joaquin''s third figure round applied (FA 84948781, draft a1fae6e, 46 pp; scratchpad draft_final_figs3.pdf,
+      draft_final_overleaf_figs3.zip compiled standalone): Figs. 16-17 -> one 3x4 grid (rung_focus.pdf, new Fig. 17) and Figs.
+      18-19 -> one 3x4 grid (finale_synth_paper.pdf, new Fig. 18), included at 0.62 (7.8 in): curves common to every panel
+      in one strip on top, each panel''s own ladder steps in a legend in its free corner, no y stretch (rung_grid.grid, ps.legend_free).
+      y = x scatters (Figs. 10, 12, 14 left, 15 top left) on the data''s range: a corner legend clears the diagonal only if
+      w/W + h/H < 1, so the entries split between the two off-diagonal corners when one legend does not clear (limits now
+      within ~1.1x of the data: e.g. pidqn 5.6e-6..1.3e3 for data 1.2e-5..650, was 1e-7..1e9). Fig. 12 split into paper_pidqn
+      (scatter) and paper_unseen (new Fig. 13): two quantities, two figures. Fig. 14 right rows as input lists (o, R_c, G,
+      MLP or Wx_i, b_ij, |b_ij|<=8), x MSE(log|M|^2)/sigma^2 with sigma^2 and the geometric mean over 448 processes in the
+      caption, points black. Rerun of that comparison on catalog_v4 stays a question to Joaquin (asked 04:29).'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
