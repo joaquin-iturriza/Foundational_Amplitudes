@@ -33344,13 +33344,18 @@ entries:
   match: none
   evidence:
     runs:
+    - FA-ccin2p3-25941ebf
+    - FA-ccin2p3-264b3f81
     - FA-ccin2p3-4fa87893
-    commit: '84948781'
+    - FA-ccin2p3-9f53a445
+    commit: adab94db
     paths:
     - .claude/skills/paper-writing-style/SKILL.md
     - /home/joaquin/drafts/fm_amplitudes_2026-11/paper.tex
     - /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_sec2_pages.pdf
     - /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/overleaf_update_v5.zip
+    - analysis/catalog_v3/data/muon_ft_sep.json
+    - analysis/catalog_v4/figs/paper_muon_ft.png
     - analysis/catalog_v4/figs/paper_unseen.png
     - analysis/catalog_v4/paper_sec3_figs.py
     - analysis/data_saving/data/example_cells.json
