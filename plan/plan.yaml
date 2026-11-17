@@ -33475,7 +33475,7 @@ entries:
     blocks_steps: &id003 []
   owner:
     agent: ab19284b896bafec4
-    state: working
+    state: closed
     since: '2026-11-17T10:36:49+00:00'
     state_at: '2026-11-17T10:45:13.141000+00:00'
     context: 289412
@@ -34050,28 +34050,34 @@ entries:
     start: '2026-11-17T04:33:08+00:00'
     at: '2026-11-17T04:33:08+00:00'
   handoff:
-    state: 'Draft ~/drafts/fm_amplitudes_2026-11 at 2ec4471, 46 pp (scratchpad draft_final_fig15sep.pdf, draft_final_overleaf_fig15sep.zip,
-      compiled standalone). Joaquin''s third figure round applied (FA 84948781, draft a1fae6e): Figs. 16-17 and 18-19 each
-      one 3x4 grid at scale 0.62 (rung_focus.pdf, finale_synth_paper.pdf; rung_grid.grid, ps.legend_free), y = x scatters
-      on the data''s range with legends split between the off-diagonal corners, Fig. 12 split (paper_pidqn, paper_unseen),
-      Fig. 14 right input rows as symbols, x MSE/sigma^2, black. Fig. 15 redone on the separation probes (muon_compare.py
-      sep-probes; runs FA-ccin2p3-9f53a445/25941ebf/264b3f81, muon_ft_sep.json @adab94db): every curve falls with D_train
-      except Muon on b bbar->HHHZ (2.3x over 10->316); Muon lower at D=10 (10-50x), within 1.5x at D=316 on 3 of 4; Sec. 4
-      text rewritten. Step 3 (het vs MSE) waits on Joaquin as before. fa-figures context and figure-style skill lack today''s
-      rules (free-corner legends, split scatter legends, scaled 3x4 grids); plot_style changes (covered, legend_free, shared_legend
-      handles, _ps_scaled, add_artist legends counted) not yet seen by the repo-reviewer.'
-    decisions: 'Joaquin 2026-11-17: Figs. 18-19 (and any like them) one 3x4 grid scaled to the page; scatters compacted (no
-      range stretch for the legend); Fig. 12 split since its panels are two quantities; Fig. 13 (now 14) right symbolic rows;
-      Fig. 15 probes with low error and large Muon/AdamW separation (rule: 25th percentile of geometric-mean zero-shot MSE
-      over all held-out processes but alpha_s/energy/cut variants, top 4 by |log AdamW/Muon|). Input-comparison rerun deferred
-      (D472); Fig. 20 keeps its single step-1 curve.'
-    ruled_out: 'One corner legend on a 4-set y = x scatter (w/W + h/H = 1.04 > 1: crosses the diagonal at any range); low-probes''
-      one-per-axis rule (no separation, three 2->4 and a one-loop probe).'
-    running: none
-    files: analysis/catalog_v4/paper_sec3_figs.py; analysis/transfer/rung_grid.py (grid); analysis/transfer/rung_focus.py;
-      analysis/transfer/finale_synth_scaling.py; plot_style.py (covered, legend_free); analysis/catalog_v3/muon_compare.py
-      (sep-probes); analysis/catalog_v3/data/muon_ft_sep.json; recipes/catalog_v3_sep_probes.yaml; ~/drafts/fm_amplitudes_2026-11/paper.tex
-    written: '2026-11-17T05:55:22+00:00'
+    state: 'Step 4 general pass done in text: draft ~/drafts/fm_amplitudes_2026-11 at 6c5dfc7 (48 pp; scratchpad draft_pass4.pdf,
+      draft_pass4.zip compiled standalone). Fine-tune figure and its subsection out (D473); ''ab: insert here'' resolved per
+      Joaquin (figure before its paragraph; Sec. 4 says the network is pretrained on ladder steps 1-9 plus every star arm,
+      the 28 processes of Tabs. ladder and arms; tables rewritten with the figures'' names, step 0 to k convention, duplicates
+      noted); captions message-first with colours; figures [H] after their first paragraph; catalog/pool/Muon naming fixed;
+      Fig. 14 right rows in words (FA 6a53212c); ladder grids at widerow 0.56 (0.62 ran off the page). Cold reader (figures
+      alone + text vs figures) applied: claims softened to what the figures show (nearly every pretraining helps; nine of
+      twelve with its criterion and exceptions; threshold arm; W pole from 1e3; step budgets 8k at 1e3, 32k at 1e3.5/1e4).
+      Left from the cold read, both need code blocked by the repo-reviewer backlog: split Fig. 14 into two figures (two quantities,
+      Joaquin''s own rule for Fig. 12) and redraw Fig. 19 (star_arms2: y range 1e-12..1 from make_room for its 8-entry legend
+      squashes the curves). Repo-reviewer holds the lock, verdict FIX: blocking tools/kit_figures.py:330 (kit_benchmark entry''s
+      file: one legend ''pretrained with the top family held out (6 runs)'' over parents that had tops added); non-blocking
+      for this entry: ''+ capped pair bias'' reads cumulative (caption must say both pair-bias rows add to ''no diagrams,
+      linear embedding'', capped one with identity term), write_own_alphas.py:92 shared tmp name (add pid), catft_curves.json
+      grew 26x (collector must store lr peak/warm-up end as scalars, not per-step lists; the json was restored to the committed
+      version), analysis/data_saving/data/example_reruns.npz not gitignored. Step 5: cause read (finding 2026-11-17, Muon
+      fine-tune at the parent''s lr rises above zero shot within the first validations); figure script drafted but not written
+      to disk (Write blocked by the backlog).,'
+    decisions: 'Joaquin 2026-11-17 (D473): fine-tune figure out until the zero-shot loss in fine-tuning is understood; his
+      ''ab: insert here'' clarification: the figure goes there, no new table, say how the network was pretrained and point
+      to the ladder/star-arm tables, made clear. Fig. 14 right labels his examples verbatim; rows in reading order.,'
+    ruled_out: 'A new pretraining-process table (Joaquin: point to the ladder/arms tables); widerow 0.62 for the 3x4 grids
+      (clips the left column on A4).,'
+    running: none,
+    files: '~/drafts/fm_amplitudes_2026-11/paper.tex; analysis/catalog_v4/paper_sec3_figs.py; analysis/catalog_v3/collect_catft_curves.py
+      (uncommitted: prepd_std + step logs, site --timeout 900); analysis/transfer/star_arms.py; scratchpad draft_pass4.pdf/.zip,
+      fig14_paper_target.png, d7/sec456.txt'
+    written: '2026-11-17T11:03:22+00:00'
   step_why:
     3:
       feeds: whether and how the paper states the het-vs-MSE comparison
