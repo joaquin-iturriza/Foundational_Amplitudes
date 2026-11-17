@@ -110,18 +110,24 @@ ps.legend(axes[1], "lower left", handles=axes[0].get_legend_handles_labels()[0])
 ps.save(fig, os.path.join(OUT, "l2_gamma_response_extended"))
 
 # ---- ee -> u ubar g, seed 0: per decade and per sqrt(s) region (|sqrt s - M_Z| in GeV; IR = y_min < 1e-3)
-UUG = [("uniform", "uug_base_s0", ps.C.grey, "o"), (r"$\gamma=1$", "uug_sigma_s0", ps.C.sky, "s"),
-       (r"$\gamma=3$", "uug_g3_s0", ps.C.vermillion, "D")]
+# labels in words (Joaquin 2026-11-17): the arms say they are heteroscedastic steering against a uniform keep, y_min is
+# defined on its axis, the regions read in order (the peak's IR subset next to the peak)
+STEER = "heteroscedastic steering,\n" + r"kept $\propto\sigma^\gamma$, "
+UUG = [("proposals kept uniformly", "uug_base_s0", ps.C.grey, "o"), (STEER + r"$\gamma=1$", "uug_sigma_s0", ps.C.sky, "s"),
+       (STEER + r"$\gamma=3$", "uug_g3_s0", ps.C.vermillion, "D")]
+REG_UUG = [("peak", r"$<3$"), ("peak_ir", r"$<3$," + "\n" + r"$y_{\min}<10^{-3}$"), ("shoulder", r"$3\!-\!15$"),
+           ("continuum", r"$>15$")]
 fig, (axL, axR) = ps.figure(ncols=2)
-xr = np.arange(len(REG))
+xr = np.arange(len(REG_UUG))
 for j, (lab, t, c, m) in enumerate(UUG):
     axL.plot(X, dec(t), m + "-", color=c, label=lab)
-    axR.plot(xr + (j - 1) * 0.15, [F[t]["reg"][k][1] for k, _ in REG], m, color=c, label=lab)
-axL.set_yscale("log"); decade_axes(axL)
-ps.legend(axL, "upper left")
+    axR.plot(xr + (j - 1) * 0.15, [F[t]["reg"][k][1] for k, _ in REG_UUG], m, color=c, label=lab)
+axL.set_yscale("log"); decade_axes(axL, r"MSE$(\log|\mathcal{M}|^2)$ in the decade")
+axL.set_xlabel(r"$\log_{10} y_{\min}$,  $y_{\min}=\min_{i<j} s_{ij}/\hat s$")
+ps.legend(axR, "lower left")
 ps.process_label(axL, r"$e^+e^-\to u\bar u g$")
-axR.set_yscale("log"); axR.set_xticks(xr); axR.set_xticklabels([l for _, l in REG])
-axR.set_xlabel(r"$|\sqrt{s}-M_Z|$ [GeV]"); axR.set_ylabel(YL)
+axR.set_yscale("log"); axR.set_xticks(xr); axR.set_xticklabels([l for _, l in REG_UUG])
+axR.set_xlabel(r"$|\sqrt{\hat s}-M_Z|$ [GeV]", labelpad=6); axR.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$ in the window")
 ps.save(fig, os.path.join(OUT, "l2_uug_multiscale"))
 printed["uug_region_over_base_g3"] = {k: round(F["uug_g3_s0"]["reg"][k][1] / F["uug_base_s0"]["reg"][k][1], 3) for k, _ in REG}
 printed["uug_overall"] = [F[t]["mse"] for _, t, _, _ in UUG]
