@@ -34185,7 +34185,7 @@ entries:
     - 3
   owner:
     agent: a7b24b3d46311d66f
-    state: working
+    state: closed
     since: '2026-11-17T10:59:14+00:00'
     state_at: '2026-11-17T11:05:23.633000+00:00'
     context: 300084
@@ -34300,3 +34300,24 @@ entries:
     this. He asked (2026-11-17, via the main session) to see the parent and the HP route before anything runs.'
   blocks: step 3 (all trainings on their data); setup and eval-only go on
   blocks_steps: *id004
+  handoff:
+    state: 'Setup job FA-ccin2p3-32145d4b (CPU, scripts/job_zng_fetch.sh @43a6d86c, design PASSED) running: zg, zgg, zggg
+      archives downloaded and md5-verified (~34 MB/s); next zgggg_part1 (8.4 GB), then convert -> $DATA_DIR/zng_uq/uq_<proc>.h5
+      (their split), d d~ sidecars, crosscheck.json (ours/theirs |M|^2, d d~ and u u~, 100 test events each; YES = max/min-1
+      < 1e-6). Training design is an open plan ask to Joaquin (parent 1262, DyHPO ~370 GPU-h vs template ~23 GPU-h, horizon
+      12,500 vs 9,155 steps, matched-input scratch control); step 3 held on it. Step 2 (eval-only of existing models: 1262
+      zero-shot, u-flavour highmult Z+4g MSE, het Zg/Zgg/Zggg cells; caption ''our existing models, not trained on their data'')
+      waits on the setup job; it needs its own design + review and a way to rebuild the multi-process 1262 on a pool (tools/rebuild_run.rebuild
+      handles single-process runs only).'
+    decisions: 'Data read as KIT layout (dataset names kit_uq_z<g..>__me2, scripts/job_kit.sh works unchanged; set KIT_NTEST=1000000);
+      split = their randperm seed 1, train then val in bulk_train; alpha_s 0.13 in metadata (target_physics_orders strips
+      it exactly); momenta kept as stored; flavour d (their target_norm.zng_process). Parent proposed: trial 1262 (production
+      catalog_v4 pretraining). Their numbers: paper MSE via analysis/zng_uq/paper_mse.py; median |Delta| of Joaquin''s meeting
+      figure not public, asked him for the pdf or preds npz.'
+    ruled_out: Downloading zgggg_part2 unless part1 lacks zgggg_0..2; keeping archives (deleted after extraction, CC disk
+      ~58 GB free); data-saving r5 parents as fine-tune parent (short, held-out families).
+    running: FA-ccin2p3-32145d4b (setup, CPU, target 3 h, limit 8 h)
+    files: tools/zng_uq.py; scripts/job_zng_fetch.sh; tools/kit_hardps.py (uq_ stems, DIAGRAMS_OF); tools/kit_predict.py (sigma_ln.npy,
+      no KIT scorer for uq_); mg5_pipeline_final.py (ddbar_Zg..Zgggg); analysis/zng_uq/paper_mse.py + data/paper_mse.json;
+      their repo supriodubey/lloca-experiments-uq branch uq (experiments/amplitudes/experiment_uq.py init_data, experiments/uq/metrics.py)
+    written: '2026-11-17T11:27:17+00:00'
