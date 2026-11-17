@@ -35617,6 +35617,7 @@ entries:
     at: '2026-11-17T19:45:30+00:00'
   step_waits:
     '1': FA-ccin2p3-488df7d6
+    '2': 'the next owner: this owner closed at the context limit with the hand-off written'
   findings:
   - at: '2026-11-17T19:03:19+00:00'
     text: 'The dimensionless + coupling orders network''s zero-shot predictions depend on the eval-time Lorentz augmentation
