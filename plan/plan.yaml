@@ -33621,6 +33621,16 @@ entries:
       cell failed at once, require_cache: the probes'' train pools are not prebuilt in /sps/lpnhe/.../tmp/amp_data_cache (the
       zero-shot reads used val pools only; even the October probes'' train caches are gone). Fix: prebuild the four probes''
       train pools (prebuild_recipes.sh on a spec of the four, CPU), then resubmit the same three jobs unchanged.'
+  - at: '2026-11-17T01:46:28+00:00'
+    text: '2026-11-17 step 4 progress: rules changed first (FA c0f64b99: plot_style legend entries in plain words up to 2x40
+      chars, legend font floor 7.5pt, ps.legend_cell for a 3-panel 2x2, save_panels/legend_strip leave a warning send_check
+      refuses; send_check asks caption definitions only for symbol entries and lets a one-file draft figure go as itself;
+      figure-style skill section ''A figure reads on its own'' and .claude/context/fa-figures.txt updated; tests/test_figure_setup.py
+      13 pass). Redrawn, one file each, send_check --scan clean, looked at once: Fig. 6 old_setup_examples (56f00427), Figs.
+      7-8 example_delta/example_dist (ce7a6b49), Fig. 9 eeuu_genmix_fraction_sweep (d0fe498e), Figs. 10, 12-15 paper_pp_bound,
+      paper_pidqn, paper_target, paper_muon, paper_muon_ft (8e6e5b22), Fig. 11 l2_uug_multiscale (d30ce875, 1476aba3). Numbers
+      unchanged. Not done: Sec. 5 Figs. 16-21 (rung_focus.py, finale_synth_scaling.py, star_arms.py); paper.tex captions and
+      includes, build, fresh reviewer reading figures alone, zip/PDF, sending each figure.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
