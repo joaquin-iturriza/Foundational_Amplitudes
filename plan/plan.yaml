@@ -34775,8 +34775,7 @@ entries:
       - 'written and committed: plan evidence with the commit'
       - 'the zero-shot read fails: write up the trained runs alone'
   step_waits:
-    '5': notes-editor pillar (blocked on par:muon_long, another entry's paragraph); the zero-shot read of step 3 joins the
-      write-up
+    '5': the notes-editor pillar reviewer (blocked on par:muon_long, another entry)
   findings:
   - at: '2026-11-17T11:18:43+00:00'
     text: 'Their numbers: the UQ repo (branch uq, 311 files) holds no figures, preds or result files. arXiv:2505.20280''s
