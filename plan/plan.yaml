@@ -34140,8 +34140,10 @@ entries:
   match: zng_uq_*,tp*_zng_*
   evidence:
     runs: []
-    commit: null
-    paths: []
+    commit: e8062214
+    paths:
+    - analysis/zng_uq/data/paper_mse.json
+    - tools/zng_uq.py
   dead_ends: []
   asks: []
   owner:
