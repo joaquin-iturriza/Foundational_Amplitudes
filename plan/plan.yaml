@@ -34372,9 +34372,9 @@ entries:
     - 10
   owner:
     agent: af420daee93095631
-    state: working
+    state: stopped
     since: '2026-11-17T17:01:50.121000+00:00'
-    state_at: '2026-11-17T20:46:41.814000+00:00'
+    state_at: '2026-11-17T20:47:26.477000+00:00'
     context: 165816
     context_at: '2026-11-17T20:36:16+00:00'
   designs:
@@ -35371,9 +35371,9 @@ entries:
     decision: D488
   owner:
     agent: acd7131834d93c97d
-    state: working
+    state: stopped
     since: '2026-11-17T19:59:30+00:00'
-    state_at: '2026-11-17T20:36:07.371000+00:00'
+    state_at: '2026-11-17T20:58:58.681000+00:00'
     context: 208226
     context_at: '2026-11-17T20:46:50+00:00'
   designs:
