@@ -979,6 +979,9 @@ PY
     # every axis on log max(|M|^2, floor) for a sign-changing pool (the one-loop pools of H5, and the twin's tau
     # one-loop pools of H3p); a positive pool's target is log|M|^2 either way
     SM=(--signed-magnitude)
+    # DAN: Daniel's pools differ from catalog_v4's physics by design (massive b, his alpha_s rule, coupling kind, MT);
+    # that cross-catalog difference is what the read measures, with DANID as its calibration
+    [ "$A" = DAN ] && SM+=(--allow-physics-mismatch "DAN: cross-catalog read of arXiv:2606.23791's held-out pools (plan dan_zeroshot_v4)")
     python tools/zero_shot_parent.py --parent "$READ_PARENT" --save-dir "$PRED/$A" --split "$SPLIT" "${SM[@]}" "${P[@]}" | sed -u "s/^/$A /"
     [ "${PIPESTATUS[0]}" = 0 ] || exit 1
     # H5's sign-changing pools: the sign head's own scoring too (magnitude and wrong-sign share, the signed A/B's metrics)
