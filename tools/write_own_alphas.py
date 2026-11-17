@@ -89,7 +89,8 @@ def main():
             except ValueError as e:                # no alpha_s rule: listed, no file (a run with the factor refuses it)
                 print(f"[ALPHAS] refused: {e}")
                 continue
-            np.save(out, a_s)
+            np.save(out + ".tmp.npy", a_s)
+            os.replace(out + ".tmp.npy", out)   # a killed job leaves no truncated sidecar that later runs skip
             done += 1
             print(f"[ALPHAS] {os.path.basename(out)}: {a_s.size} events, {a_s.min():.4f} to {a_s.max():.4f}")
     print(f"WRITE_OWN_ALPHAS_DONE {done} written")

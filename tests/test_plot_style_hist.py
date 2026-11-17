@@ -26,5 +26,12 @@ def test_true_pred_hist():
     assert lo < 0.5 and hi > 1.5
 
 
+def test_ratio_range():
+    """the range the bulk of the bins sets: one bin at 10x does not widen it (Joaquin 2026-11-17)"""
+    rats = [np.r_[np.full(19, 1.08), 10.0, np.nan]]
+    assert ps.ratio_range(rats) == (0.9, 1.1)
+    assert ps.ratio_range([np.full(10, 3.0)]) == (0.0, 3.0)
+
+
 if __name__ == "__main__":
-    test_true_pred_hist(); print("ok")
+    test_true_pred_hist(); test_ratio_range(); print("ok")

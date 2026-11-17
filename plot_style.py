@@ -622,7 +622,18 @@ def hist_ratio(ax):
     return r
 
 
-def true_pred_hist(ax, models, truth=None, ratio=(0.5, 1.5), log_ratio=False, xlabel=None, ratio_label="pred/true"):
+def ratio_range(rats, q=90):
+    """The pred/true range 1 -+ w that the bulk of the bins sets (Joaquin 2026-11-17: one large bin must not flatten
+    the rest): w = the q-th percentile over every bin of |pred/true - 1|, rounded up to 0.1, 0.2, 0.3, 0.5, 1, 2, 5;
+    the bins beyond are drawn at the edge."""
+    d = np.abs(np.concatenate([np.asarray(r, float).ravel() for r in rats]) - 1)
+    d = d[np.isfinite(d)]
+    w = np.percentile(d, q) if d.size else 0.5
+    w = next((v for v in (0.1, 0.2, 0.3, 0.5, 1, 2, 5) if v >= w), 5)
+    return (max(0.0, 1 - w), 1 + w)
+
+
+def true_pred_hist(ax, models, truth=None, ratio="auto", log_ratio=False, xlabel=None, ratio_label="pred/true"):
     """True against predicted histograms with the pred/true ratio directly under them on the same x axis
     (hist_ratio): the one layout of the papers' true-vs-predicted figures (analysis/data_saving/example_reruns,
     analysis/catalog_v4/paper_sec3_figs, tools/kit_vs_mlp). `models`: dicts {label, edges, pred, truth, style, n}: one
@@ -642,13 +653,17 @@ def true_pred_hist(ax, models, truth=None, ratio=(0.5, 1.5), log_ratio=False, xl
             lo, hi = min(lo, e[q[0]]), max(hi, e[q[-1] + 1])
     r = hist_ratio(ax)
     ax.stairs(tc, te, color="k", label="truth", zorder=5)   # first in the legend, on top of the predictions
+    rats = []
     for m in models:
         e, q, t = np.asarray(m["edges"], float), np.asarray(m["pred"], float), np.asarray(m["truth"], float)
-        st = m.get("style", {})
-        ax.stairs(q, e, label=m["label"], **st)
         with np.errstate(divide="ignore", invalid="ignore"):
-            rat = np.where(t > 0, q / t, np.nan)        # every bin with true events
-        r.stairs(np.clip(rat, *ratio), e, **st)         # beyond the limits: drawn at the edge
+            rats.append(np.where(t > 0, q / t, np.nan))   # every bin with true events
+    if ratio == "auto":
+        ratio = ratio_range(rats)
+    for m, rat in zip(models, rats):
+        st = m.get("style", {})
+        ax.stairs(np.asarray(m["pred"], float), np.asarray(m["edges"], float), label=m["label"], **st)
+        r.stairs(np.clip(rat, *ratio), np.asarray(m["edges"], float), **st)   # beyond the limits: drawn at the edge
     r.axhline(1, color="k", lw=0.8)                     # the truth line, as thin as the papers' ratio reference
     if log_ratio:
         r.set_yscale("log")
@@ -1017,6 +1032,8 @@ def make_room(ax, max_iter: int = 12, step: float = 0.10, max_growth: float = 1.
     # of blank axes. Those panels need a smaller legend, not a bigger axis.
     if ax.get_label() == "<colorbar>" or getattr(ax, "_colorbar", None) is not None:
         return
+    if getattr(ax, "_ps_equal_limits", False):
+        return      # a y = x scatter: equal x and y limits keep the diagonal corner to corner; its corner is left free
     if ax.images:
         return
     from matplotlib.collections import QuadMesh

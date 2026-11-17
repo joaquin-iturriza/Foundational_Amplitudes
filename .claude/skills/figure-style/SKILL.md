@@ -24,6 +24,19 @@ without the text and with at most a glance at a short caption.
 - **Every axis defines its quantity**: `$\log_{10} y_{\min}$, $y_{\min}=\min_{i<j} s_{ij}/\hat s$`, not a symbol
   defined two figures later. Bins and categories are ordered as they read (left to right, low to high).
 - **A scanned parameter is a colour bar with its name**, not a legend with one entry per value.
+- **One name per dataset across figures** (Joaquin 2026-11-17): a set of processes keeps the same legend name in every
+  figure that shows it ("$pp$, in pretraining, sampled from PDFs", "$pp$, held out, sampled from PDFs"); a held-out
+  set says how it differs from pretraining ("held out, $2\to5$, only up to $2\to4$ in pretraining").
+- **A y = x scatter has equal x and y limits** (`scatter_ax` in `analysis/catalog_v4/paper_sec3_figs.py`; set
+  `ax._ps_equal_limits = True` so `ps.make_room` leaves them): the diagonal runs corner to corner; the legend's room is
+  made by opening both limits the same factor.
+- **The pred/true ratio range is set by the bulk of the bins** (`ps.true_pred_hist` default `ratio="auto"`,
+  `ps.ratio_range`): one large bin does not flatten the others; the bins beyond are drawn at the edge, and the caption
+  says so.
+- **A comparison of variants is labelled as one baseline plus or minus one change** ("baseline", "$-$ colour", "lin.
+  emb., $-$ diagrams"), the baseline defined once on the figure; one abbreviation used everywhere or nowhere.
+- **One legend names every curve in full** where a figure's curves cross two attributes (arm and $D_{\rm train}$),
+  placed where it covers no data; never legend titles split across panels.
 - **One file per figure** (the group's no-subfigure rule): all panels and the legend in one `ps.save`; never
   `ps.save_panels`, never `ps.legend_strip` (both now leave a warning that `send_check` refuses). To change a layout,
   redraw the figure.

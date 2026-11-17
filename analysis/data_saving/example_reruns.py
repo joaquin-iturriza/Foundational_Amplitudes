@@ -118,8 +118,10 @@ def plot():
     # one file per figure, legends inside in words (Joaquin 2026-11-17): the arm's colour in panel (a), the number of
     # training events' line style in panel (b)
     def arm_h(a):
-        return [Line2D([], [], color=col[a, D], linestyle=D_STYLE[D], lw=LW, label=D_LAB[D])
-                for D in D_STYLE]   # the arm is the legend's title: narrow enough to leave the process label clear
+        return [Line2D([], [], color=col[a, D], linestyle=D_STYLE[D], lw=LW, label=f"{lab[a]}, {D_LAB[D]}")
+                for D in D_STYLE]
+    # one legend naming each of the four curves in full (Joaquin 2026-11-17: titles split across panels did not read)
+    all_h = arm_h("scratch") + arm_h("fine-tune")
     edges = np.logspace(-6, 3, 73)   # |Delta| from 10^-6 to 10^3, eight bins a decade; events beyond go in the end bins
     # |Delta| histograms on a log axis, one panel per probe: colour the arm, line style D
     fig, axs = ps.figure(ncols=2, nrows=2)
@@ -135,8 +137,7 @@ def plot():
         ax.set_yscale("log"); ax.set_ylabel("events")
         ax.set_xlabel(r"$|\Delta|$, $\Delta=|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2_{\rm true}-1$")
         ps.process_label(ax, NAME[p])
-    ps.legend(axs.flat[0], "upper left", handles=arm_h("scratch"), title=lab["scratch"])
-    ps.legend(axs.flat[2], "upper left", handles=arm_h("fine-tune"), title=lab["fine-tune"])
+    ps.legend(axs.flat[0], "upper left", handles=all_h, fontsize=ps.LEGEND_MIN_PT)
     print("FIGURE", ps.save(fig, os.path.join(figs, "example_delta")))
     # true and predicted log|M|^2 with the ratio below, one panel per probe
     fig, axs = ps.figure(ncols=2, nrows=2)
@@ -155,9 +156,8 @@ def plot():
                                        ratio_label=r"$\frac{\rm pred}{\rm true}$" if k % 2 == 0 else None)
         # right-hand panels carry no ratio label: it would run into the left panel in the paper's pairs
         ps.process_label(ax, NAME[p])
-    ps.legend(axs.flat[0], "upper left", handles=arm_h("scratch"), title=lab["scratch"])
-    ps.legend(axs.flat[1], "upper left", handles=[Line2D([], [], color="k", label="truth")])
-    ps.legend(axs.flat[2], "upper left", handles=arm_h("fine-tune"), title=lab["fine-tune"])
+    ps.legend(axs.flat[0], "upper left", handles=[Line2D([], [], color="k", label="truth")] + all_h,
+              fontsize=ps.LEGEND_MIN_PT)
     print("FIGURE", ps.save(fig, os.path.join(figs, "example_dist")))
 
 

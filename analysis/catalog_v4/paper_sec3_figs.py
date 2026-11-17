@@ -92,15 +92,15 @@ def scatter_ax(ax, groups, xlab, ylab, name, legend="lower right"):
         print(f"  {name} {lab!r}: {len(x)} classes, median y/x {np.median(y / x):.3g}, "
               f"medians x {np.median(x):.3g} y {np.median(y):.3g}")
     ax.set_xscale("log"); ax.set_yscale("log")
-    # the legend goes in the corner on the side of y = x the points leave emptier, and both axes open the same
-    # factor toward it, so the scatter keeps its aspect; left to make_room, the y range alone grew to 1e6-1e10 and
-    # squeezed the points into a band (main session 2026-11-17)
-    pad, room = (hi / lo) ** 0.04, (hi / lo) ** 0.3
+    # equal x and y limits, so y = x runs corner to corner (Joaquin 2026-11-17); both limits open the same
+    # factor so the legend sits in the corner on the side of y = x the points leave emptier
+    pad, room = (hi / lo) ** 0.04, (hi / lo) ** (0.25 + 0.08 * len(groups))   # a longer legend, a larger free corner
     above = np.mean(np.concatenate([g[2] > g[1] for g in groups])) if legend else 0.5
-    if above > 0.5:     # lower right: more x on the right, more y below
-        ax.set_xlim(lo / pad, hi * pad * room); ax.set_ylim(lo / pad / room, hi * pad)
-    else:               # upper left: more x on the left, more y above
-        ax.set_xlim(lo / pad / room, hi * pad); ax.set_ylim(lo / pad, hi * pad * room)
+    # the free corner's side opens more: upper left (points below y = x) more on top, lower right more at the bottom
+    L, H = (lo / pad / room ** 0.5, hi * pad * room ** 1.5) if above <= 0.5 else (lo / pad / room ** 1.5, hi * pad * room ** 0.5)
+    ax.set_xlim(L, H); ax.set_ylim(L, H)   # the house plot box (2.40x1.92in) stays: y = x is its diagonal
+    ax.lines[0].set_data([L, H], [L, H])
+    ax._ps_equal_limits = True     # ps.make_room leaves these limits alone
     ax.set_xlabel(xlab); ax.set_ylabel(ylab)
     if legend:
         ps.legend(ax, "lower right" if above > 0.5 else "upper left", markerscale=2.5, fontsize=ps.LEGEND_MIN_PT)
@@ -108,8 +108,8 @@ def scatter_ax(ax, groups, xlab, ylab, name, legend="lower right"):
 
 SETS = (("$pp$, in pretraining, sampled from PDFs", ("PP4",)),
         ("$e^+e^-$, in pretraining", ("EE4",)),
-        ("held out, our sampling", ("held",)),
-        ("held out, MadEvent's default sampling", ("HD4", "HD5")))
+        ("held out, sampled by our mixture", ("held",)),
+        ("held out, sampled by MadEvent", ("HD4", "HD5")))
 
 
 def pidqn():
@@ -144,8 +144,10 @@ def examples(axes):
     mu = m.read_of(ml.RUNS["muon"], "PP4")
     keys = sorted((p for p in mu if f"PP4:{p}" in h["muon"] and f"PP4:{p}" in h["adamw"]), key=lambda p: mu[p])
     pick = [keys[int(q * (len(keys) - 1))] for q in (0.1, 0.5, 0.9)]
-    REB = 4                              # the records' bins merged by four: the ratio is otherwise counting noise
     def rebin(e, c):
+        # the records' bins merged to ~40, as the other true-against-predicted figures (Joaquin 2026-11-17: Fig. 14
+        # had fewer bins than the others; merged by a fixed four it kept 25)
+        REB = max(1, len(c) // 40)
         n = (len(c) // REB) * REB
         return e[:n + 1:REB], np.add.reduceat(np.asarray(c[:n], float), np.arange(0, n, REB))
     for i, (ax, p) in enumerate(zip(axes, pick)):
@@ -155,7 +157,7 @@ def examples(axes):
             ek, t = rebin(np.array(rec["edges"]), rec["truth"])
             _, q = rebin(np.array(rec["edges"]), rec["pred"])
             models.append(dict(label=lab[k], edges=ek, truth=t, pred=q, style=dict(color=col[k])))
-        ps.true_pred_hist(ax, models, ratio=(0, 2), xlabel=r"$\log|\mathcal{M}|^2$")
+        ps.true_pred_hist(ax, models, xlabel=r"$\log|\mathcal{M}|^2$")
         ps.process_label(ax, ml.process_tex(p))
         if i == 0:
             ps.legend(ax, "upper left")
@@ -225,8 +227,8 @@ def target():
     res = json.load(open(os.path.join(ROOT, "analysis", "catalog_v3", "data", "short_reads.json")))
     extra = ("H2p5", "H7E")
     groups = []
-    for grp, lab in ((None, "held out, particle number\nand energies as in pretraining"), ("H2p5", "held out, one particle more\nthan in pretraining"),
-                     ("H7E", "held out, energies above\npretraining (1 to 10 TeV)")):
+    for grp, lab in ((None, "held out, multiplicity and\nenergies as in pretraining"), ("H2p5", "held out, $2\\to5$, only up to\n$2\\to4$ in pretraining"),
+                     ("H7E", "held out, 1 to 10 TeV, only\nup to 1 TeV in pretraining")):
         xs, ys = [], []
         for a in res["baseline"]:
             if (a if a in extra else None) != grp or a not in res["dimensionless"]:
@@ -268,8 +270,8 @@ def pp_bound():
     keys = set(x) & set(y)
     a, c = by_class({k: x[k] for k in keys}, cls), by_class({k: y[k] for k in keys}, cls)
     groups = []
-    for lab, keep in (("$pp$ processes in both pretrainings", lambda q: q in trained),
-                      ("$pp$ processes held out of both", lambda q: q not in trained)):
+    for lab, keep in (("$pp$, in pretraining, sampled from PDFs", lambda q: q in trained),
+                      ("$pp$, held out, sampled from PDFs", lambda q: q not in trained)):
         cs = sorted(q for q in set(a) & set(c) if keep(q))
         groups.append((lab, np.array([a[q] for q in cs]), np.array([c[q] for q in cs])))
     from analysis.common import ratio_stats
@@ -283,17 +285,22 @@ def pp_bound():
 
 
 def unseen(ax):
+    """Zero-shot MSE per held-out process of the pretraining without tau, nu_tau and quartic vertices, one column per
+    kind of held-out process, every process a point, the median a bar (Joaquin 2026-11-17: the histogram did not show
+    which held-out processes do worse)."""
     t = json.load(open(os.path.join(ROOT, "analysis", "catalog_v3", "data", "short_reads.json")))["dimensionless_twin"]
-    vals = {a: np.array([v["mse"] for v in t[a]["probes"].values()]) for a in ("H1", "H4", "H3p")}
-    bins = np.logspace(np.log10(min(v.min() for v in vals.values())) - 0.05,
-                       np.log10(max(v.max() for v in vals.values())) + 0.05, 16)
-    for (a, lab), c in zip((("H1", "only seen particles and vertices"), ("H4", "with a quartic vertex never seen"),
-                            ("H3p", r"with $\tau$ or $\nu_\tau$, never seen")), COLS):
-        ax.hist(vals[a], bins=bins, weights=np.full(len(vals[a]), 1 / len(vals[a])), histtype="step", color=c, label=lab)
-        print(f"  unseen {lab}: {len(vals[a])} processes, median {np.median(vals[a]):.3g}")
-    ax.set_xscale("log"); ax.set_xlabel(f"zero-shot {MSE_LAB},\n" + r"pretrained without $\tau$, $\nu_\tau$, quartic vertices")
-    ax.set_ylabel("fraction of held-out processes")
-    ps.legend(ax, "upper right")
+    groups = (("H1", "only seen\nparticles,\nvertices"), ("H4", "unseen\nquartic\nvertex"), ("H3p", "unseen\n" r"$\tau$ or $\nu_\tau$"))
+    rng = np.random.default_rng(0)
+    for i, ((a, lab), c) in enumerate(zip(groups, COLS)):
+        v = np.array([x["mse"] for x in t[a]["probes"].values()])
+        ax.scatter(i + rng.uniform(-0.25, 0.25, v.size), v, color=c, alpha=0.5, s=8, linewidths=0, rasterized=True)
+        ax.plot([i - 0.35, i + 0.35], [np.median(v)] * 2, color="k", lw=1.5)
+        print(f"  unseen {lab!r}: {v.size} processes, median {np.median(v):.3g}")
+    ax.set_xticks(range(len(groups)), [lab for _, lab in groups]); ax.set_xlim(-0.6, len(groups) - 0.4)
+    ax.set_yscale("log")
+    ax.set_ylabel(f"zero-shot {MSE_LAB}, pretrained\n" + r"without $\tau$, $\nu_\tau$, quartic vertices")
+    ax.plot([], [], color="k", lw=1.5, label="median")
+    ps.legend(ax, "upper left")
 
 
 # The 448-process pretraining's single-seed arms at the baseline's best HPs, 8601 steps: geometric mean and 90th
@@ -303,14 +310,17 @@ def unseen(ax):
 # no diagrams, linear = linear embedding and no diagram encoder (the lowest; not what the catalog pretrainings use, which
 # keep the diagram encoder at a linear embedding, the "linear embedding" arm); pair bias = added to it
 # row names in plain words (Joaquin 2026-11-17): "all inputs" = off-shellness, colour, diagram encoder, MLP embedding
-BIGRUN = {"linear embedding, no diagrams": (3.85e-4, 0.12),
-          "all inputs but diagrams": (3.88e-4, 0.10),
-          "all inputs, linear embedding": (4.86e-4, 0.056),
-          "no diagrams, attention pair bias": (5.26e-4, 0.084),
-          "no diagrams, capped pair bias": (5.74e-4, 0.077),
-          "all inputs": (5.79e-4, 0.085),
-          "all inputs but colour": (6.81e-4, 0.094),
-          "all inputs but off-shellness": (8.63e-4, 0.067)}
+# rows as changes to one baseline (Joaquin 2026-11-17: plain words did not say which inputs): baseline = off-shellness,
+# colour, diagram encoder and an MLP embedding; '-' removes one, 'lin. emb.' replaces the MLP by a linear embedding,
+# '+' adds a pair bias (capped or not) to the attention
+BIGRUN = {"lin. emb., $-$ diagrams": (3.85e-4, 0.12),
+          "$-$ diagrams": (3.88e-4, 0.10),
+          "lin. emb.": (4.86e-4, 0.056),
+          "lin. emb., $-$ diagrams, + bias": (5.26e-4, 0.084),
+          "lin. emb., $-$ diagrams, + capped bias": (5.74e-4, 0.077),
+          "baseline": (5.79e-4, 0.085),
+          "$-$ colour": (6.81e-4, 0.094),
+          "$-$ off-shellness": (8.63e-4, 0.067)}
 
 
 def inputs(ax):
@@ -318,6 +328,9 @@ def inputs(ax):
     y = np.arange(len(rows))
     ax.plot([v[0] for _, v in rows], y, "o", color=ps.C.blue)
     ax.set_yticks(y); ax.set_yticklabels([k for k, _ in rows])
+    ax.tick_params(axis="y", labelsize=0.9 * ps.BASE_PT)   # the longest row fits the printable width
+    ax.text(0.97, 0.97, "baseline: off-shellness, colour,\ndiagram encoder, MLP embedding;\nbias: pair bias on the attention", transform=ax.transAxes,
+            ha="right", va="top", fontsize=ps.LEGEND_MIN_PT)   # in the empty upper right, beside the lowest rows
     ax.set_ylim(len(rows) - 0.5, -0.5); ax.set_xscale("log")
     ax.set_xticks([4e-4, 6e-4, 8e-4], [r"$4\cdot10^{-4}$", r"$6\cdot10^{-4}$", r"$8\cdot10^{-4}$"]); ax.minorticks_off()
     ax.set_xlabel("geometric mean over 448 processes\n" + r"of MSE of the standardized $\log|\mathcal{M}|^2$")
