@@ -583,6 +583,8 @@ axis_recipe() { case "$1" in
     # HD5: H5's 28 one-loop held-out classes on their default-sampled test pools (MadEvent Born events labelled by the
     # class's MadLoop, lhe label rule virt; catalog_coverage step 19)
     HD5) echo recipes/catalog_v4_heldout_default_H5_test.yaml ;;
+    # DAN: Daniel's 139 held-out processes (arXiv:2606.23791's test split; dan_zeroshot_v4), their 13 TeV pp pools
+    DAN) echo recipes/catalog_daniel_heldout.yaml ;;
     TR) echo "$TRAIN" ;; *) echo "recipes/catalog_${CAT}_heldout_$1.yaml" ;; esac; }
 # TR (mode eval only, V3_AXES=TR): the arm's own training pools read by the same zero-shot scorer on their test
 # split, the in-distribution reference of the held-out reads (v3_prep_explore, the shape gap, par:v4_tree_shape)
@@ -960,7 +962,7 @@ print(' '.join(([f for f in fs if neg(f)][:1] + [f for f in fs if not neg(f)][:1
     python - "$CAT" "$A" "$AR" "$MODE" "${P[@]}" <<'PY' || exit 1
 import os, sys, yaml
 cat, axis, ar, mode, files = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5:]
-pfx = {"XV3": "v3_", "XV4": "v4_", "PP": "pp13_", "PP4": ("pp13v4_", "pp13_"), "EE4": "ee4_", "HD4": "hd_", "HD5": "hd_"}.get(axis, f"{cat}_")
+pfx = {"XV3": "v3_", "XV4": "v4_", "PP": "pp13_", "PP4": ("pp13v4_", "pp13_"), "EE4": "ee4_", "HD4": "hd_", "HD5": "hd_", "DAN": "dc_"}.get(axis, f"{cat}_")
 names = {p["name"] for p in yaml.safe_load(open(ar))["processes"]}
 got = [os.path.basename(f)[:-len(".yaml")] for f in files]
 bad = sorted(n for n in got if n not in names or not n.startswith(pfx))

@@ -43,7 +43,7 @@ import pool_physics  # noqa: E402  (standard library only at import)
 SITE = shlex.split(os.environ.get("PLAN_SITE", "site"))
 PLAN = [sys.executable, os.path.join(HERE, "tools", "plan.py")]
 CROSS_PREFIX = {"XV3": "v3_", "XV4": "v4_", "PP": "pp13_", "PP4": ("pp13v4_", "pp13_"), "EE4": "ee4_",
-                "HD4": "hd_", "HD5": "hd_"}  # the job's rule
+                "HD4": "hd_", "HD5": "hd_", "DAN": "dc_"}  # the job's rule
 # EE4 entries excluded by decision (pool_physics.DROPPED: ee4_epem_cgsxwm, its 3 TeV block dropped, D193); the job
 # leaves them out and lists (V3_AXIS_PARTIAL) every other entry without a pool, so any other one missing is still
 # reported here
@@ -75,6 +75,8 @@ def axis_recipe(axis, cat):
         return "recipes/catalog_v4_heldout_default_test.yaml"
     if axis == "HD5":
         return "recipes/catalog_v4_heldout_default_H5_test.yaml"
+    if axis == "DAN":
+        return "recipes/catalog_daniel_heldout.yaml"
     if axis == "TR":   # the in-distribution read of the job's axis TR: the controls' training recipe (other arms' differ)
         return "recipes/catalog_%s_train.yaml" % cat
     return "recipes/catalog_%s_heldout_%s.yaml" % (cat, axis)

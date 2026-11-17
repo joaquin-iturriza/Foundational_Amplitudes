@@ -1,0 +1,1368 @@
+{
+ "training_entries": 1069,
+ "seen_with_classes": 1682,
+ "class_members_without_pdg": [],
+ "processes": {
+  "dc_bbx_ahh": {
+   "group": "extrap",
+   "process": "b b~ > a h h",
+   "identical": [],
+   "relabel": []
+  },
+  "dc_bbx_amummup": {
+   "group": "interp",
+   "process": "b b~ > a mu- mu+",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_aepem",
+    "v4_bbx_aepem_nlo",
+    "v4_bbx_ataptam",
+    "v4_bbx_ataptam_nlo",
+    "v4_ddx_aepem",
+    "v4_ddx_amupmum",
+    "v4_ddx_ataptam"
+   ]
+  },
+  "dc_bbx_avmvmx": {
+   "group": "interp",
+   "process": "b b~ > a vm vm~",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_avevex",
+    "v4_bbx_avtvtx",
+    "v4_ddx_avevex",
+    "v4_ddx_avmvmx",
+    "v4_ddx_avtvtx"
+   ]
+  },
+  "dc_bbx_ghh": {
+   "group": "extrap",
+   "process": "b b~ > g h h",
+   "identical": [],
+   "relabel": []
+  },
+  "dc_bbx_gmummup": {
+   "group": "interp",
+   "process": "b b~ > g mu- mu+",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_epemg",
+    "v4_bbx_gtaptam",
+    "v4_ddx_epemg",
+    "v4_ddx_gmupmum",
+    "v4_ddx_gtaptam"
+   ]
+  },
+  "dc_bbx_gvmvmx": {
+   "group": "interp",
+   "process": "b b~ > g vm vm~",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_gvevex",
+    "v4_bbx_gvevex_nlo",
+    "v4_bbx_gvtvtx",
+    "v4_ddx_gvevex",
+    "v4_ddx_gvmvmx",
+    "v4_ddx_gvtvtx"
+   ]
+  },
+  "dc_bbx_hh": {
+   "group": "extrap",
+   "process": "b b~ > h h",
+   "identical": [],
+   "relabel": [
+    "v4_ddx_hh_loop"
+   ]
+  },
+  "dc_bbx_hhh": {
+   "group": "extrap",
+   "process": "b b~ > h h h",
+   "identical": [],
+   "relabel": [
+    "v4_ddx_hhh_loop"
+   ]
+  },
+  "dc_bbx_hmummup": {
+   "group": "interp",
+   "process": "b b~ > h mu- mu+",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_epemh",
+    "v4_bbx_epemh_nlo",
+    "v4_bbx_htaptam",
+    "v4_bbx_htaptam_nlo",
+    "v4_ddx_epemh",
+    "v4_ddx_hmupmum",
+    "v4_ddx_htaptam"
+   ]
+  },
+  "dc_bbx_htamtap": {
+   "group": "extrap",
+   "process": "b b~ > h ta- ta+",
+   "identical": [
+    "v4_bbx_htaptam",
+    "v4_bbx_htaptam_nlo"
+   ],
+   "relabel": [
+    "v4_bbx_epemh",
+    "v4_bbx_epemh_nlo",
+    "v4_bbx_htaptam",
+    "v4_bbx_htaptam_nlo",
+    "v4_ddx_epemh",
+    "v4_ddx_hmupmum",
+    "v4_ddx_htaptam"
+   ]
+  },
+  "dc_bbx_hvmvmx": {
+   "group": "interp",
+   "process": "b b~ > h vm vm~",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_hvevex",
+    "v4_bbx_hvevex_nlo",
+    "v4_bbx_hvtvtx",
+    "v4_ddx_hvevex",
+    "v4_ddx_hvmvmx",
+    "v4_ddx_hvtvtx"
+   ]
+  },
+  "dc_bbx_mummup": {
+   "group": "interp",
+   "process": "b b~ > mu- mu+",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_epem",
+    "v4_bbx_taptam",
+    "v4_bbx_taptam_nlo",
+    "v4_ddx_epem",
+    "v4_ddx_mupmum",
+    "v4_ddx_taptam"
+   ]
+  },
+  "dc_bbx_vmvmx": {
+   "group": "interp",
+   "process": "b b~ > vm vm~",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_vevex",
+    "v4_bbx_vevex_nlo",
+    "v4_bbx_vtvtx",
+    "v4_ddx_vevex",
+    "v4_ddx_vmvmx",
+    "v4_ddx_vtvtx"
+   ]
+  },
+  "dc_bbx_wmmupvm": {
+   "group": "interp",
+   "process": "b b~ > w- mu+ vm",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_epvewm",
+    "v4_bbx_tapvtwm",
+    "v4_bbx_tapvtwm_nlo",
+    "v4_ddx_tapvtwm",
+    "v4_ddx_tapvtwm_nlo"
+   ]
+  },
+  "dc_bbx_wpmumvmx": {
+   "group": "interp",
+   "process": "b b~ > w+ mu- vm~",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_epvewm",
+    "v4_bbx_tapvtwm",
+    "v4_bbx_tapvtwm_nlo",
+    "v4_ddx_tapvtwm",
+    "v4_ddx_tapvtwm_nlo"
+   ]
+  },
+  "dc_bbx_zhh": {
+   "group": "extrap",
+   "process": "b b~ > z h h",
+   "identical": [
+    "v4_bbx_hhz",
+    "v4_bbx_hhz_nlo"
+   ],
+   "relabel": [
+    "v4_bbx_hhz",
+    "v4_bbx_hhz_nlo",
+    "v4_ddx_hhz"
+   ]
+  },
+  "dc_bbx_zmummup": {
+   "group": "interp",
+   "process": "b b~ > z mu- mu+",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_epemz",
+    "v4_bbx_epemz_nlo",
+    "v4_bbx_taptamz",
+    "v4_ddx_epemz",
+    "v4_ddx_mupmumz",
+    "v4_ddx_taptamz"
+   ]
+  },
+  "dc_bbx_zvmvmx": {
+   "group": "interp",
+   "process": "b b~ > z vm vm~",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_vevexz",
+    "v4_bbx_vtvtxz",
+    "v4_ddx_vevexz",
+    "v4_ddx_vmvmxz",
+    "v4_ddx_vtvtxz"
+   ]
+  },
+  "dc_bbx_zzz": {
+   "group": "extrap",
+   "process": "b b~ > z z z",
+   "identical": [
+    "v4_bbx_zzz",
+    "v4_bbx_zzz_nlo"
+   ],
+   "relabel": [
+    "v4_bbx_zzz",
+    "v4_bbx_zzz_nlo",
+    "v4_ddx_zzz"
+   ]
+  },
+  "dc_bsx_bsx": {
+   "group": "interp",
+   "process": "b s~ > b s~",
+   "identical": [],
+   "relabel": [
+    "v4_dbx_bxd",
+    "v4_dsx_dsx"
+   ]
+  },
+  "dc_bsx_bsxa": {
+   "group": "interp",
+   "process": "b s~ > b s~ a",
+   "identical": [],
+   "relabel": [
+    "v4_dbx_abxd",
+    "v4_dsx_adsx"
+   ]
+  },
+  "dc_bsx_bsxh": {
+   "group": "interp",
+   "process": "b s~ > b s~ h",
+   "identical": [],
+   "relabel": [
+    "v4_dbx_bxdh",
+    "v4_dsx_dhsx"
+   ]
+  },
+  "dc_bsx_bsxz": {
+   "group": "interp",
+   "process": "b s~ > b s~ z",
+   "identical": [],
+   "relabel": [
+    "v4_dbx_bxdz",
+    "v4_dsx_dsxz",
+    "v4_dsx_dsxz_nlo"
+   ]
+  },
+  "dc_bsx_gbsx": {
+   "group": "interp",
+   "process": "b s~ > g b s~",
+   "identical": [],
+   "relabel": [
+    "v4_dbx_bxdg",
+    "v4_dsx_dgsx"
+   ]
+  },
+  "dc_bsx_tsxwm": {
+   "group": "interp",
+   "process": "b s~ > t s~ w-",
+   "identical": [],
+   "relabel": []
+  },
+  "dc_cb_cb": {
+   "group": "interp",
+   "process": "c b > c b",
+   "identical": [],
+   "relabel": [
+    "v4_ub_bu",
+    "v4_ud_du",
+    "v4_us_su"
+   ]
+  },
+  "dc_cb_cba": {
+   "group": "interp",
+   "process": "c b > c b a",
+   "identical": [],
+   "relabel": [
+    "v4_ub_abu",
+    "v4_ud_adu",
+    "v4_ud_adu_nlo",
+    "v4_us_asu"
+   ]
+  },
+  "dc_cb_cbh": {
+   "group": "interp",
+   "process": "c b > c b h",
+   "identical": [],
+   "relabel": [
+    "v4_ub_bhu",
+    "v4_ud_dhu",
+    "v4_us_hsu"
+   ]
+  },
+  "dc_cb_cbz": {
+   "group": "interp",
+   "process": "c b > c b z",
+   "identical": [],
+   "relabel": [
+    "v4_ub_buz",
+    "v4_ub_buz_nlo",
+    "v4_ud_duz",
+    "v4_us_suz"
+   ]
+  },
+  "dc_cb_ctwm": {
+   "group": "interp",
+   "process": "c b > c t w-",
+   "identical": [],
+   "relabel": []
+  },
+  "dc_cb_gcb": {
+   "group": "interp",
+   "process": "c b > g c b",
+   "identical": [],
+   "relabel": [
+    "v4_ub_bgu",
+    "v4_ud_dgu",
+    "v4_us_gsu"
+   ]
+  },
+  "dc_cb_gst": {
+   "group": "interp",
+   "process": "c b > g s t",
+   "identical": [],
+   "relabel": []
+  },
+  "dc_cb_sbwp": {
+   "group": "interp",
+   "process": "c b > s b w+",
+   "identical": [],
+   "relabel": [
+    "v4_ub_bdwp",
+    "v4_us_dswp"
+   ]
+  },
+  "dc_cb_st": {
+   "group": "interp",
+   "process": "c b > s t",
+   "identical": [],
+   "relabel": [
+    "v4_ub_dt"
+   ]
+  },
+  "dc_cb_sta": {
+   "group": "interp",
+   "process": "c b > s t a",
+   "identical": [],
+   "relabel": []
+  },
+  "dc_cb_sth": {
+   "group": "interp",
+   "process": "c b > s t h",
+   "identical": [],
+   "relabel": []
+  },
+  "dc_cb_stz": {
+   "group": "interp",
+   "process": "c b > s t z",
+   "identical": [],
+   "relabel": [
+    "v4_ub_dtz"
+   ]
+  },
+  "dc_ccx_htamtap": {
+   "group": "extrap",
+   "process": "c c~ > h ta- ta+",
+   "identical": [],
+   "relabel": [
+    "v4_uux_epemh",
+    "v4_uux_hmupmum",
+    "v4_uux_htaptam"
+   ]
+  },
+  "dc_ccx_zhh": {
+   "group": "extrap",
+   "process": "c c~ > z h h",
+   "identical": [],
+   "relabel": [
+    "v4_uux_hhz"
+   ]
+  },
+  "dc_ccx_zzz": {
+   "group": "extrap",
+   "process": "c c~ > z z z",
+   "identical": [],
+   "relabel": [
+    "v4_uux_zzz"
+   ]
+  },
+  "dc_csx_htapvt": {
+   "group": "extrap",
+   "process": "c s~ > h ta+ vt",
+   "identical": [],
+   "relabel": [
+    "v4_udx_ephve",
+    "v4_udx_hmupvm",
+    "v4_udx_htapvt"
+   ]
+  },
+  "dc_csx_wphh": {
+   "group": "extrap",
+   "process": "c s~ > w+ h h",
+   "identical": [],
+   "relabel": [
+    "v4_udx_hhwp"
+   ]
+  },
+  "dc_csx_wpwpwm": {
+   "group": "extrap",
+   "process": "c s~ > w+ w+ w-",
+   "identical": [],
+   "relabel": [
+    "v4_udx_wpwpwm",
+    "v4_udx_wpwpwm_nlo"
+   ]
+  },
+  "dc_cux_cux": {
+   "group": "interp",
+   "process": "c u~ > c u~",
+   "identical": [],
+   "relabel": [
+    "v4_ucx_cxu"
+   ]
+  },
+  "dc_cux_cuxa": {
+   "group": "interp",
+   "process": "c u~ > c u~ a",
+   "identical": [],
+   "relabel": [
+    "v4_ucx_acxu"
+   ]
+  },
+  "dc_cux_cuxh": {
+   "group": "interp",
+   "process": "c u~ > c u~ h",
+   "identical": [],
+   "relabel": [
+    "v4_ucx_cxhu"
+   ]
+  },
+  "dc_cux_cuxz": {
+   "group": "interp",
+   "process": "c u~ > c u~ z",
+   "identical": [],
+   "relabel": [
+    "v4_ucx_cxuz",
+    "v4_ucx_cxuz_nlo"
+   ]
+  },
+  "dc_cux_gcux": {
+   "group": "interp",
+   "process": "c u~ > g c u~",
+   "identical": [],
+   "relabel": [
+    "v4_ucx_cxgu"
+   ]
+  },
+  "dc_cxbx_cxbx": {
+   "group": "interp",
+   "process": "c~ b~ > c~ b~",
+   "identical": [],
+   "relabel": [
+    "v4_ub_bu",
+    "v4_ud_du",
+    "v4_us_su"
+   ]
+  },
+  "dc_cxbx_cxbxa": {
+   "group": "interp",
+   "process": "c~ b~ > c~ b~ a",
+   "identical": [],
+   "relabel": [
+    "v4_ub_abu",
+    "v4_ud_adu",
+    "v4_ud_adu_nlo",
+    "v4_us_asu"
+   ]
+  },
+  "dc_cxbx_cxbxh": {
+   "group": "interp",
+   "process": "c~ b~ > c~ b~ h",
+   "identical": [],
+   "relabel": [
+    "v4_ub_bhu",
+    "v4_ud_dhu",
+    "v4_us_hsu"
+   ]
+  },
+  "dc_cxbx_cxbxz": {
+   "group": "interp",
+   "process": "c~ b~ > c~ b~ z",
+   "identical": [],
+   "relabel": [
+    "v4_ub_buz",
+    "v4_ub_buz_nlo",
+    "v4_ud_duz",
+    "v4_us_suz"
+   ]
+  },
+  "dc_cxbx_cxtxwp": {
+   "group": "interp",
+   "process": "c~ b~ > c~ t~ w+",
+   "identical": [],
+   "relabel": []
+  },
+  "dc_cxbx_gcxbx": {
+   "group": "interp",
+   "process": "c~ b~ > g c~ b~",
+   "identical": [],
+   "relabel": [
+    "v4_ub_bgu",
+    "v4_ud_dgu",
+    "v4_us_gsu"
+   ]
+  },
+  "dc_cxbx_gsxtx": {
+   "group": "interp",
+   "process": "c~ b~ > g s~ t~",
+   "identical": [],
+   "relabel": []
+  },
+  "dc_cxbx_sxbxwm": {
+   "group": "interp",
+   "process": "c~ b~ > s~ b~ w-",
+   "identical": [],
+   "relabel": [
+    "v4_ub_bdwp",
+    "v4_us_dswp"
+   ]
+  },
+  "dc_cxbx_sxtx": {
+   "group": "interp",
+   "process": "c~ b~ > s~ t~",
+   "identical": [],
+   "relabel": [
+    "v4_ub_dt"
+   ]
+  },
+  "dc_cxbx_sxtxa": {
+   "group": "interp",
+   "process": "c~ b~ > s~ t~ a",
+   "identical": [],
+   "relabel": []
+  },
+  "dc_cxbx_sxtxh": {
+   "group": "interp",
+   "process": "c~ b~ > s~ t~ h",
+   "identical": [],
+   "relabel": []
+  },
+  "dc_cxbx_sxtxz": {
+   "group": "interp",
+   "process": "c~ b~ > s~ t~ z",
+   "identical": [],
+   "relabel": [
+    "v4_ub_dtz"
+   ]
+  },
+  "dc_ddx_htamtap": {
+   "group": "extrap",
+   "process": "d d~ > h ta- ta+",
+   "identical": [
+    "v4_ddx_htaptam"
+   ],
+   "relabel": [
+    "v4_bbx_epemh",
+    "v4_bbx_epemh_nlo",
+    "v4_bbx_htaptam",
+    "v4_bbx_htaptam_nlo",
+    "v4_ddx_epemh",
+    "v4_ddx_hmupmum",
+    "v4_ddx_htaptam"
+   ]
+  },
+  "dc_ddx_zhh": {
+   "group": "extrap",
+   "process": "d d~ > z h h",
+   "identical": [
+    "v4_ddx_hhz"
+   ],
+   "relabel": [
+    "v4_bbx_hhz",
+    "v4_bbx_hhz_nlo",
+    "v4_ddx_hhz"
+   ]
+  },
+  "dc_ddx_zzz": {
+   "group": "extrap",
+   "process": "d d~ > z z z",
+   "identical": [
+    "v4_ddx_zzz"
+   ],
+   "relabel": [
+    "v4_bbx_zzz",
+    "v4_bbx_zzz_nlo",
+    "v4_ddx_zzz"
+   ]
+  },
+  "dc_ds_ds": {
+   "group": "interp",
+   "process": "d s > d s",
+   "identical": [
+    "v4_ds_ds"
+   ],
+   "relabel": [
+    "v4_db_bd",
+    "v4_db_bd_nlo",
+    "v4_ds_ds"
+   ]
+  },
+  "dc_ds_dsa": {
+   "group": "interp",
+   "process": "d s > d s a",
+   "identical": [
+    "v4_ds_ads"
+   ],
+   "relabel": [
+    "v4_db_abd",
+    "v4_db_abd_nlo",
+    "v4_ds_ads"
+   ]
+  },
+  "dc_ds_dsh": {
+   "group": "interp",
+   "process": "d s > d s h",
+   "identical": [
+    "v4_ds_dhs"
+   ],
+   "relabel": [
+    "v4_db_bdh",
+    "v4_ds_dhs"
+   ]
+  },
+  "dc_ds_dsz": {
+   "group": "interp",
+   "process": "d s > d s z",
+   "identical": [
+    "v4_ds_dsz"
+   ],
+   "relabel": [
+    "v4_db_bdz",
+    "v4_ds_dsz"
+   ]
+  },
+  "dc_ds_gds": {
+   "group": "interp",
+   "process": "d s > g d s",
+   "identical": [
+    "v4_ds_dgs"
+   ],
+   "relabel": [
+    "v4_db_bdg",
+    "v4_ds_dgs"
+   ]
+  },
+  "dc_dux_htamvtx": {
+   "group": "extrap",
+   "process": "d u~ > h ta- vt~",
+   "identical": [],
+   "relabel": [
+    "v4_udx_ephve",
+    "v4_udx_hmupvm",
+    "v4_udx_htapvt"
+   ]
+  },
+  "dc_dux_wmhh": {
+   "group": "extrap",
+   "process": "d u~ > w- h h",
+   "identical": [],
+   "relabel": [
+    "v4_udx_hhwp"
+   ]
+  },
+  "dc_dux_wpwmwm": {
+   "group": "extrap",
+   "process": "d u~ > w+ w- w-",
+   "identical": [],
+   "relabel": [
+    "v4_udx_wpwpwm",
+    "v4_udx_wpwpwm_nlo"
+   ]
+  },
+  "dc_gb_bhh": {
+   "group": "extrap",
+   "process": "g b > b h h",
+   "identical": [],
+   "relabel": []
+  },
+  "dc_gbx_bxhh": {
+   "group": "extrap",
+   "process": "g b~ > b~ h h",
+   "identical": [],
+   "relabel": []
+  },
+  "dc_gg_btxwp": {
+   "group": "extrap",
+   "process": "g g > b t~ w+",
+   "identical": [],
+   "relabel": []
+  },
+  "dc_gg_csxwm": {
+   "group": "extrap",
+   "process": "g g > c s~ w-",
+   "identical": [
+    "v4_gg_csxwm"
+   ],
+   "relabel": [
+    "v4_gg_csxwm"
+   ]
+  },
+  "dc_gg_duxwp": {
+   "group": "extrap",
+   "process": "g g > d u~ w+",
+   "identical": [],
+   "relabel": [
+    "v4_gg_csxwm"
+   ]
+  },
+  "dc_gg_gttx": {
+   "group": "extrap",
+   "process": "g g > g t t~",
+   "identical": [],
+   "relabel": []
+  },
+  "dc_gg_scxwp": {
+   "group": "extrap",
+   "process": "g g > s c~ w+",
+   "identical": [],
+   "relabel": [
+    "v4_gg_csxwm"
+   ]
+  },
+  "dc_gg_tbxwm": {
+   "group": "extrap",
+   "process": "g g > t b~ w-",
+   "identical": [],
+   "relabel": []
+  },
+  "dc_gg_ttxa": {
+   "group": "extrap",
+   "process": "g g > t t~ a",
+   "identical": [],
+   "relabel": []
+  },
+  "dc_gg_ttxh": {
+   "group": "extrap",
+   "process": "g g > t t~ h",
+   "identical": [],
+   "relabel": []
+  },
+  "dc_gg_ttxz": {
+   "group": "extrap",
+   "process": "g g > t t~ z",
+   "identical": [
+    "v4_gg_ttxz"
+   ],
+   "relabel": [
+    "v4_gg_ttxz"
+   ]
+  },
+  "dc_gg_udxwm": {
+   "group": "extrap",
+   "process": "g g > u d~ w-",
+   "identical": [],
+   "relabel": [
+    "v4_gg_csxwm"
+   ]
+  },
+  "dc_gs_ggs": {
+   "group": "interp",
+   "process": "g s > g g s",
+   "identical": [],
+   "relabel": [
+    "v4_bg_bgg",
+    "v4_dg_dgg"
+   ]
+  },
+  "dc_gs_gs": {
+   "group": "interp",
+   "process": "g s > g s",
+   "identical": [],
+   "relabel": [
+    "v4_bg_bg",
+    "v4_bg_bg_nlo",
+    "v4_dg_dg"
+   ]
+  },
+  "dc_gs_gsa": {
+   "group": "interp",
+   "process": "g s > g s a",
+   "identical": [],
+   "relabel": [
+    "v4_bg_abg",
+    "v4_bg_abg_nlo",
+    "v4_dg_adg"
+   ]
+  },
+  "dc_gs_gsz": {
+   "group": "interp",
+   "process": "g s > g s z",
+   "identical": [],
+   "relabel": []
+  },
+  "dc_gs_sa": {
+   "group": "interp",
+   "process": "g s > s a",
+   "identical": [],
+   "relabel": [
+    "v4_bg_ab",
+    "v4_dg_ad"
+   ]
+  },
+  "dc_gs_saa": {
+   "group": "interp",
+   "process": "g s > s a a",
+   "identical": [],
+   "relabel": [
+    "v4_bg_aab",
+    "v4_dg_aad"
+   ]
+  },
+  "dc_gs_saz": {
+   "group": "interp",
+   "process": "g s > s a z",
+   "identical": [],
+   "relabel": [
+    "v4_bg_abz",
+    "v4_bg_abz_nlo",
+    "v4_dg_adz"
+   ]
+  },
+  "dc_gs_sbbx": {
+   "group": "interp",
+   "process": "g s > s b b~",
+   "identical": [],
+   "relabel": [
+    "v4_bg_bddx",
+    "v4_dg_bbxd",
+    "v4_dg_dssx"
+   ]
+  },
+  "dc_gs_sccx": {
+   "group": "interp",
+   "process": "g s > s c c~",
+   "identical": [],
+   "relabel": [
+    "v4_bg_bccx",
+    "v4_bg_bccx_nlo",
+    "v4_dg_ccxd",
+    "v4_dg_duux"
+   ]
+  },
+  "dc_gs_stamtap": {
+   "group": "interp",
+   "process": "g s > s ta- ta+",
+   "identical": [],
+   "relabel": [
+    "v4_bg_bepem",
+    "v4_bg_btaptam",
+    "v4_bg_btaptam_nlo",
+    "v4_dg_depem",
+    "v4_dg_dmupmum",
+    "v4_dg_dtaptam"
+   ]
+  },
+  "dc_gs_sttx": {
+   "group": "interp",
+   "process": "g s > s t t~",
+   "identical": [],
+   "relabel": []
+  },
+  "dc_gs_svtvtx": {
+   "group": "interp",
+   "process": "g s > s vt vt~",
+   "identical": [],
+   "relabel": [
+    "v4_bg_bvevex",
+    "v4_bg_bvtvtx",
+    "v4_dg_dvevex",
+    "v4_dg_dvmvmx",
+    "v4_dg_dvtvtx"
+   ]
+  },
+  "dc_gs_swpwm": {
+   "group": "interp",
+   "process": "g s > s w+ w-",
+   "identical": [],
+   "relabel": [
+    "v4_bg_bwpwm",
+    "v4_bg_bwpwm_nlo",
+    "v4_dg_dwpwm"
+   ]
+  },
+  "dc_gs_sz": {
+   "group": "interp",
+   "process": "g s > s z",
+   "identical": [],
+   "relabel": [
+    "v4_bg_bz",
+    "v4_bg_bz_nlo",
+    "v4_dg_dz"
+   ]
+  },
+  "dc_gs_szh": {
+   "group": "interp",
+   "process": "g s > s z h",
+   "identical": [],
+   "relabel": [
+    "v4_bg_bhz",
+    "v4_bg_bhz_nlo",
+    "v4_dg_dhz"
+   ]
+  },
+  "dc_gs_szz": {
+   "group": "interp",
+   "process": "g s > s z z",
+   "identical": [],
+   "relabel": [
+    "v4_bg_bzz",
+    "v4_dg_dzz"
+   ]
+  },
+  "dc_sb_gsb": {
+   "group": "interp",
+   "process": "s b > g s b",
+   "identical": [],
+   "relabel": [
+    "v4_db_bdg",
+    "v4_ds_dgs"
+   ]
+  },
+  "dc_sb_sb": {
+   "group": "interp",
+   "process": "s b > s b",
+   "identical": [],
+   "relabel": [
+    "v4_db_bd",
+    "v4_db_bd_nlo",
+    "v4_ds_ds"
+   ]
+  },
+  "dc_sb_sba": {
+   "group": "interp",
+   "process": "s b > s b a",
+   "identical": [],
+   "relabel": [
+    "v4_db_abd",
+    "v4_db_abd_nlo",
+    "v4_ds_ads"
+   ]
+  },
+  "dc_sb_sbh": {
+   "group": "interp",
+   "process": "s b > s b h",
+   "identical": [],
+   "relabel": [
+    "v4_db_bdh",
+    "v4_ds_dhs"
+   ]
+  },
+  "dc_scx_htamvtx": {
+   "group": "extrap",
+   "process": "s c~ > h ta- vt~",
+   "identical": [],
+   "relabel": [
+    "v4_udx_ephve",
+    "v4_udx_hmupvm",
+    "v4_udx_htapvt"
+   ]
+  },
+  "dc_scx_wmhh": {
+   "group": "extrap",
+   "process": "s c~ > w- h h",
+   "identical": [],
+   "relabel": [
+    "v4_udx_hhwp"
+   ]
+  },
+  "dc_scx_wpwmwm": {
+   "group": "extrap",
+   "process": "s c~ > w+ w- w-",
+   "identical": [],
+   "relabel": [
+    "v4_udx_wpwpwm",
+    "v4_udx_wpwpwm_nlo"
+   ]
+  },
+  "dc_ssx_aemep": {
+   "group": "interp",
+   "process": "s s~ > a e- e+",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_aepem",
+    "v4_bbx_aepem_nlo",
+    "v4_bbx_ataptam",
+    "v4_bbx_ataptam_nlo",
+    "v4_ddx_aepem",
+    "v4_ddx_amupmum",
+    "v4_ddx_ataptam"
+   ]
+  },
+  "dc_ssx_avevex": {
+   "group": "interp",
+   "process": "s s~ > a ve ve~",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_avevex",
+    "v4_bbx_avtvtx",
+    "v4_ddx_avevex",
+    "v4_ddx_avmvmx",
+    "v4_ddx_avtvtx"
+   ]
+  },
+  "dc_ssx_ddx": {
+   "group": "interp",
+   "process": "s s~ > d d~",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_ddx",
+    "v4_ddx_bbx",
+    "v4_ddx_ssx"
+   ]
+  },
+  "dc_ssx_ddxa": {
+   "group": "interp",
+   "process": "s s~ > d d~ a",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_addx",
+    "v4_bbx_addx_nlo",
+    "v4_ddx_abbx",
+    "v4_ddx_assx"
+   ]
+  },
+  "dc_ssx_ddxh": {
+   "group": "interp",
+   "process": "s s~ > d d~ h",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_ddxh",
+    "v4_ddx_bbxh",
+    "v4_ddx_bbxh_nlo",
+    "v4_ddx_hssx"
+   ]
+  },
+  "dc_ssx_ddxz": {
+   "group": "interp",
+   "process": "s s~ > d d~ z",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_ddxz",
+    "v4_ddx_bbxz",
+    "v4_ddx_ssxz"
+   ]
+  },
+  "dc_ssx_duxwp": {
+   "group": "interp",
+   "process": "s s~ > d u~ w+",
+   "identical": [],
+   "relabel": []
+  },
+  "dc_ssx_emep": {
+   "group": "interp",
+   "process": "s s~ > e- e+",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_epem",
+    "v4_bbx_taptam",
+    "v4_bbx_taptam_nlo",
+    "v4_ddx_epem",
+    "v4_ddx_mupmum",
+    "v4_ddx_taptam"
+   ]
+  },
+  "dc_ssx_gddx": {
+   "group": "interp",
+   "process": "s s~ > g d d~",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_ddxg",
+    "v4_ddx_bbxg",
+    "v4_ddx_gssx"
+   ]
+  },
+  "dc_ssx_gemep": {
+   "group": "interp",
+   "process": "s s~ > g e- e+",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_epemg",
+    "v4_bbx_gtaptam",
+    "v4_ddx_epemg",
+    "v4_ddx_gmupmum",
+    "v4_ddx_gtaptam"
+   ]
+  },
+  "dc_ssx_gvevex": {
+   "group": "interp",
+   "process": "s s~ > g ve ve~",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_gvevex",
+    "v4_bbx_gvevex_nlo",
+    "v4_bbx_gvtvtx",
+    "v4_ddx_gvevex",
+    "v4_ddx_gvmvmx",
+    "v4_ddx_gvtvtx"
+   ]
+  },
+  "dc_ssx_hemep": {
+   "group": "interp",
+   "process": "s s~ > h e- e+",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_epemh",
+    "v4_bbx_epemh_nlo",
+    "v4_bbx_htaptam",
+    "v4_bbx_htaptam_nlo",
+    "v4_ddx_epemh",
+    "v4_ddx_hmupmum",
+    "v4_ddx_htaptam"
+   ]
+  },
+  "dc_ssx_htamtap": {
+   "group": "extrap",
+   "process": "s s~ > h ta- ta+",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_epemh",
+    "v4_bbx_epemh_nlo",
+    "v4_bbx_htaptam",
+    "v4_bbx_htaptam_nlo",
+    "v4_ddx_epemh",
+    "v4_ddx_hmupmum",
+    "v4_ddx_htaptam"
+   ]
+  },
+  "dc_ssx_hvevex": {
+   "group": "interp",
+   "process": "s s~ > h ve ve~",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_hvevex",
+    "v4_bbx_hvevex_nlo",
+    "v4_bbx_hvtvtx",
+    "v4_ddx_hvevex",
+    "v4_ddx_hvmvmx",
+    "v4_ddx_hvtvtx"
+   ]
+  },
+  "dc_ssx_udxwm": {
+   "group": "interp",
+   "process": "s s~ > u d~ w-",
+   "identical": [],
+   "relabel": []
+  },
+  "dc_ssx_vevex": {
+   "group": "interp",
+   "process": "s s~ > ve ve~",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_vevex",
+    "v4_bbx_vevex_nlo",
+    "v4_bbx_vtvtx",
+    "v4_ddx_vevex",
+    "v4_ddx_vmvmx",
+    "v4_ddx_vtvtx"
+   ]
+  },
+  "dc_ssx_wmepve": {
+   "group": "interp",
+   "process": "s s~ > w- e+ ve",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_epvewm",
+    "v4_bbx_tapvtwm",
+    "v4_bbx_tapvtwm_nlo",
+    "v4_ddx_tapvtwm",
+    "v4_ddx_tapvtwm_nlo"
+   ]
+  },
+  "dc_ssx_wpemvex": {
+   "group": "interp",
+   "process": "s s~ > w+ e- ve~",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_epvewm",
+    "v4_bbx_tapvtwm",
+    "v4_bbx_tapvtwm_nlo",
+    "v4_ddx_tapvtwm",
+    "v4_ddx_tapvtwm_nlo"
+   ]
+  },
+  "dc_ssx_zemep": {
+   "group": "interp",
+   "process": "s s~ > z e- e+",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_epemz",
+    "v4_bbx_epemz_nlo",
+    "v4_bbx_taptamz",
+    "v4_ddx_epemz",
+    "v4_ddx_mupmumz",
+    "v4_ddx_taptamz"
+   ]
+  },
+  "dc_ssx_zhh": {
+   "group": "extrap",
+   "process": "s s~ > z h h",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_hhz",
+    "v4_bbx_hhz_nlo",
+    "v4_ddx_hhz"
+   ]
+  },
+  "dc_ssx_zvevex": {
+   "group": "interp",
+   "process": "s s~ > z ve ve~",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_vevexz",
+    "v4_bbx_vtvtxz",
+    "v4_ddx_vevexz",
+    "v4_ddx_vmvmxz",
+    "v4_ddx_vtvtxz"
+   ]
+  },
+  "dc_ssx_zzz": {
+   "group": "extrap",
+   "process": "s s~ > z z z",
+   "identical": [],
+   "relabel": [
+    "v4_bbx_zzz",
+    "v4_bbx_zzz_nlo",
+    "v4_ddx_zzz"
+   ]
+  },
+  "dc_sxsx_gsxsx": {
+   "group": "interp",
+   "process": "s~ s~ > g s~ s~",
+   "identical": [],
+   "relabel": [
+    "v4_bb_bbg",
+    "v4_dd_ddg"
+   ]
+  },
+  "dc_sxsx_sxsx": {
+   "group": "interp",
+   "process": "s~ s~ > s~ s~",
+   "identical": [],
+   "relabel": [
+    "v4_bb_bb",
+    "v4_dd_dd"
+   ]
+  },
+  "dc_sxsx_sxsxa": {
+   "group": "interp",
+   "process": "s~ s~ > s~ s~ a",
+   "identical": [],
+   "relabel": []
+  },
+  "dc_sxsx_sxsxh": {
+   "group": "interp",
+   "process": "s~ s~ > s~ s~ h",
+   "identical": [],
+   "relabel": [
+    "v4_bb_bbh",
+    "v4_dd_ddh"
+   ]
+  },
+  "dc_sxsx_sxsxz": {
+   "group": "interp",
+   "process": "s~ s~ > s~ s~ z",
+   "identical": [],
+   "relabel": [
+    "v4_bb_bbz",
+    "v4_bb_bbz_nlo",
+    "v4_dd_ddz"
+   ]
+  },
+  "dc_udx_htapvt": {
+   "group": "extrap",
+   "process": "u d~ > h ta+ vt",
+   "identical": [
+    "v4_udx_htapvt"
+   ],
+   "relabel": [
+    "v4_udx_ephve",
+    "v4_udx_hmupvm",
+    "v4_udx_htapvt"
+   ]
+  },
+  "dc_udx_wphh": {
+   "group": "extrap",
+   "process": "u d~ > w+ h h",
+   "identical": [
+    "v4_udx_hhwp"
+   ],
+   "relabel": [
+    "v4_udx_hhwp"
+   ]
+  },
+  "dc_udx_wpwpwm": {
+   "group": "extrap",
+   "process": "u d~ > w+ w+ w-",
+   "identical": [
+    "v4_udx_wpwpwm",
+    "v4_udx_wpwpwm_nlo"
+   ],
+   "relabel": [
+    "v4_udx_wpwpwm",
+    "v4_udx_wpwpwm_nlo"
+   ]
+  },
+  "dc_uux_htamtap": {
+   "group": "extrap",
+   "process": "u u~ > h ta- ta+",
+   "identical": [
+    "v4_uux_htaptam"
+   ],
+   "relabel": [
+    "v4_uux_epemh",
+    "v4_uux_hmupmum",
+    "v4_uux_htaptam"
+   ]
+  },
+  "dc_uux_zhh": {
+   "group": "extrap",
+   "process": "u u~ > z h h",
+   "identical": [
+    "v4_uux_hhz"
+   ],
+   "relabel": [
+    "v4_uux_hhz"
+   ]
+  },
+  "dc_uux_zzz": {
+   "group": "extrap",
+   "process": "u u~ > z z z",
+   "identical": [
+    "v4_uux_zzz"
+   ],
+   "relabel": [
+    "v4_uux_zzz"
+   ]
+  }
+ }
+}
