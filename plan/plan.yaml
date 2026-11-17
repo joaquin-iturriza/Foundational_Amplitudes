@@ -32939,6 +32939,7 @@ entries:
     (unrelated), 2026-11-12T13:59 (keep working on the tt scaling problem and the draft; asks for the divergence-form idea,
     names no cost).'
   blocks_steps: *id002
+  checked_until: '2026-11-17T14:35:24+00:00'
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
