@@ -35335,6 +35335,8 @@ entries:
       locally (.venv-cpu, CPU) with parent evaluate_daniels_catalog/model on the full dc_bbx_hh val pool brought home (scratch
       fullpool/: pool + .recipe.json + .alphas.npy, same file identity as the stored read) and compare per event with data/catalog_short_DlessInOrd_sigstage.npz
       dc_bbx_hh__q; then hand back the commit, command and result'
+    3: Asked Joaquin the file format of Daniel's/Suprio's catalog data so evaluate.py can read it directly; it takes plain
+      arrays (momenta, pdg, alphas) until then
   done_when: null
   notes_ref: null
   match: dan_zs_v4*
@@ -35508,6 +35510,11 @@ entries:
       if:
       - 'stored predictions reproduced to float precision: hand the dir over'
       - 'not reproduced: find which input differs (code since 2026-10-23, own-stats role) before handing over'
+    3:
+      feeds: how evaluate_daniels_catalog reads Suprio's data (D490)
+      if:
+      - 'Joaquin gives the file format: the evaluator reads it directly'
+      - 'no format given: plain arrays (momenta, pdg, alphas) as now'
   targets:
   - batch: dan_zs_v4_reads
     wall_h: 0.1
