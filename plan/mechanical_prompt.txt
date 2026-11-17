@@ -14,5 +14,7 @@ The step:
 - Commit only your own files, named (`git commit -m "..." -- <paths>`).
 === END MECHANICAL RULES ===
 
+When a part of your step unblocks other work (a checkout ready, a fix in place), hand that part back at once as a short
+separate report, then go on with the rest.
 Final message: one or two lines, what you did with its run ids or commits; start it with "ROUTINE:" when nothing
 needs Joaquin; never when the step hands back a file or result for Joaquin (a draft, a figure, a fix he asked for).
