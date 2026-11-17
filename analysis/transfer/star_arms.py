@@ -71,7 +71,7 @@ ax.plot(*curve(lambda k: scratch(p, k, steered=False)[0]), "o-", color="k", labe
 ax.plot(*curve(lambda k: best(f"tp3_r1fte_{p}_d{k}")[0]), "o-", color=ps.C.blue, label="ladder step 1")
 # the W-pole and EW-Sudakov arms ran two chosen points here too: step 1 at the same two points, their reference
 ax.plot(*curve(lambda k: r1(p, k, "wpole")), "o--", color=ps.C.blue,
-        label="ladder step 1 at the hyperparameter\npoints of the W-pole and Sudakov arms")
+        label="ladder step 1 at the hyperparameter\npoints of the $W$-pole and Sudakov arms")
 for arm, (_, what) in ARMS.items():
     ax.plot(*curve(lambda k: best(f"tp3_s{arm}fte_{p}_d{k}")[0]), "o-", color=ARM_C[arm], label=f"step 1 + {what}")
 ps.process_label(ax, LAB[p])
