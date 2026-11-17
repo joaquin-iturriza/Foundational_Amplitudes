@@ -33847,6 +33847,16 @@ entries:
       warm-up''s end (peak lr). Reading: the gain is lost to the fine-tune learning rate, the Muon parent''s full lr on 32-316
       events, not to the pretraining; the best checkpoint at D=32 is the first validation, and step 0 is never a candidate.
       Prior: muon_hp_ft (results.tex) searched lr_scale 0.1-10 on the median probes, best lr_scale 0.343, gain 1.19x.'
+  - at: '2026-11-17T11:56:12+00:00'
+    text: 'Fig. 14 right (input comparison) label versions Joaquin REJECTED, never to be shown again: (1) long plain words
+      ''all inputs'', ''same, pair bias capped'' (''plain words don''t work at all to represent these''); (2) short names
+      plus an explaining key box (''the little legend just to explain the names indicates that something is not working'');
+      (3) symbols o, R_c, G, Wx_i, b_ij, MLP (''why would R_c refer to color, what would MLP even mean here? nothing indicates
+      at all that diagrams were attempted''); (4) the words version ''all inputs / no off-shellness / no colour / no diagrams
+      / linear embedding / + pair bias'' unordered, then ordered (''the points are not ordered at all''; 2026-11-17 ''It''s
+      like going in circles with figure 14 ... If I already told you something doesn''t work or it''s not understandable,
+      don''t show it to me again''). Also asked: short x label, no reused colours, formulas/symbols/shorter names that explain
+      themselves. Any new version must differ from all four and be checked against this list before it reaches him.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
