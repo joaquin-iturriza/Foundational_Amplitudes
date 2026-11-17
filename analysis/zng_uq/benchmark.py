@@ -54,7 +54,7 @@ def collect(theirs, out):
         with h5py.File(os.path.join(os.environ["DATA_DIR"], "zng_uq", f"uq_{p}.h5"), "r") as f:
             truth = np.log(10.0) * f["bulk_test/bulk/log10_me2"][:]
             test_idx = f["split_idx/test"][:]
-            # their paper standardises log|M|^2 with the training set's mean/std (first 5e5 = our n_train)
+            # the UQ repo standardises log|M|^2 with the training events' mean/std (README_uq; first 5e5 = our n_train)
             std_train = float(np.std(np.log(10.0) * f["bulk_train/bulk/log10_me2"][:500000]))
         for mode, label in OURS.items():
             for d in sorted(glob.glob(os.path.join(root, f"kit_{mode}_uq_{p}_me2_n500000_t12500*"))):
@@ -98,33 +98,25 @@ def collect(theirs, out):
 PROC_LAB = {1: r"$q\bar q\to Zg$", 2: r"$q\bar q\to Zgg$", 3: r"$q\bar q\to Zggg$", 4: r"$q\bar q\to Zgggg$"}
 
 
-def plot(path, curves=None, paper=os.path.join(HERE, "data", "paper_mse.json")):
-    """(a) median |Delta| and standardised-log MSE against n, the latter beside their paper's six networks (their own
-    test set); (b) |Delta| on Z+4g; (c) pulls per n against N(0,1); (d) val/train mu-MSE curves per n (curve test)."""
+def plot(path, curves=None):
+    """(a) median |Delta| against n; (b) |Delta| on Z+4g; (c) pulls per n against N(0,1); (d) val/train mu-MSE curves per n (curve test)."""
     import sys
     sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
     import plot_style as ps
     ps.use()
     d = json.load(open(path))
-    col = {"from scratch": ps.C.blue, "fine-tuned": ps.C.vermillion, ZS: "k"}  # the paper networks take the other six palette colours
+    col = {"from scratch": ps.C.blue, "fine-tuned": ps.C.vermillion, ZS: "k"}
     arms = [a for a in list(OURS.values()) + [ZS] if any(v["arm"] == a for v in d["runs"].values())]
     figs = os.path.join(HERE, "figs")
     os.makedirs(figs, exist_ok=True)
     ours = lambda a, key: sorted((v["n_gluons"], v[key]) for v in d["runs"].values() if v["arm"] == a)
     # (a)
-    fig, (axl, axr) = ps.figure(2)
+    fig, axl = ps.figure()
     for a in arms:
         axl.plot(*zip(*ours(a, "median_abs_delta")), "o-", color=col[a], label=a)
-        axr.plot(*zip(*ours(a, "mse_std")), "o-", color=col[a])
-    pm = json.load(open(paper))["mse"]
-    for net, c in zip(sorted(pm, key=lambda k: pm[k]["Z+4g"]), [ps.C.green, ps.C.orange, ps.C.purple, ps.C.sky,
-                                                                  ps.C.grey, ps.C.yellow]):
-        axr.plot([1, 2, 3, 4], [pm[net][f"Z+{n}g"] for n in (1, 2, 3, 4)], "s--", color=c, label=net.replace("MLP-I", "MLP on invariants") + ", paper")
     axl.set_ylabel(r"median $|\Delta|$, $\Delta=|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2-1$")
-    axr.set_ylabel(r"MSE of standardised $\log|\mathcal{M}|^2$")
-    for ax in (axl, axr):
-        ax.set_yscale("log"); ax.set_xlabel("number of gluons $n$"); ax.set_xticks([1, 2, 3, 4])
-    ps.legend(axl, "upper left"); ps.legend_free(axr)
+    axl.set_yscale("log"); axl.set_xlabel("number of gluons $n$"); axl.set_xticks([1, 2, 3, 4])
+    ps.legend(axl, "upper left")
     ps.save(fig, os.path.join(figs, "zng_median_delta"))
     # (b)
     fig, ax = ps.figure()
@@ -186,9 +178,9 @@ def parent(out):
     print(json.dumps(d))
 
 
-def summary(path, curves, paper=os.path.join(HERE, "data", "paper_mse.json")):
+def summary(path, curves):
     """The numbers docs/results.tex quotes, one JSON line (verify_claims): per arm (scr, ft, zs) and n the median |Delta|,
-    MSE of standardised ln|M|^2, pull std, 68% coverage; per trained run the curve test; their paper's best network."""
+    MSE of standardised ln|M|^2, pull std, 68% coverage; per trained run the curve test."""
     d = json.load(open(path))
     short = {"from scratch": "scr", "fine-tuned": "ft", ZS: "zs"}
     out = {}
@@ -205,7 +197,6 @@ def summary(path, curves, paper=os.path.join(HERE, "data", "paper_mse.json")):
                 if r:
                     out[a][str(n)].update(separation=r["separation"], well=r["well"], best_step=r["best_step"])
         out["n_well"] = sum(r["well"] for r in c.values())
-    out["paper_lloca"] = {str(n): json.load(open(paper))["mse"]["LLoCa-Transformer"][f"Z+{n}g"] for n in PROCS}
     print(json.dumps(out))
 
 
