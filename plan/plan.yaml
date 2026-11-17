@@ -33438,7 +33438,7 @@ entries:
   step_waits:
     '3': '2026-11-20: next draft round'
     '5': FA-ccin2p3-167dc1db FA-ccin2p3-0d4d4506 FA-ccin2p3-c81ba5db
-    '4': next owner (context limit reached; Sec. 5 figures and paper.tex left, see hand-off)
+    '4': FA-ccin2p3-167dc1db FA-ccin2p3-0d4d4506 FA-ccin2p3-c81ba5db
   findings:
   - at: '2026-11-13T02:46:58+00:00'
     text: '2026-11-13 ~03:50 Joaquin: ''we should start actually doing the work on the draft with what we have ... Let''s
