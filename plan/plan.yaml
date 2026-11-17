@@ -34358,9 +34358,9 @@ entries:
     decision: D481
   owner:
     agent: af420daee93095631
-    state: working
+    state: stopped
     since: '2026-11-17T17:01:50.121000+00:00'
-    state_at: '2026-11-17T17:24:25.845000+00:00'
+    state_at: '2026-11-17T17:28:42.273000+00:00'
     context: 121624
     context_at: '2026-11-17T17:38:58+00:00'
   designs:
