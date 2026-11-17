@@ -15790,9 +15790,6 @@ entries:
       event and RUN_DONE with no manual poll (next 19 fix).'
     22: 'Relay to Joaquin the merged paper-writing skill (agent aceb4110a4694e016''s hand-back: diff and conflict list) and
       the figure-setup fix (agent a0636264613b51f22) when it hands back.'
-    23: Show Joaquin the CLAUDE.md diff of the reviewer's three dedupe findings (fixed by agent aceb4110a4694e016 without
-      his yes, per his 2026-11-16 'I don't understand why this would need me'), and the figure-setup result with the union-range
-      correction (agent a0636264613b51f22).
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16312,11 +16309,6 @@ entries:
       if:
       - 'conflicts listed: ask him each'
       - 'none: report the diff'
-    23:
-      feeds: the rules files and the figure setup
-      if:
-      - 'reviewer passes: send the diff'
-      - 'reviewer blocks: fix and re-check'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
@@ -16325,7 +16317,6 @@ entries:
       idle: event (or its absence after 45 min) is the trigger'
     '21': the date 2026-11-17 (a week after the 2026-11-09 23:54 restart on the batching code)
     '22': owner a0636264613b51f22 hand-back (figure setup fix, repo-reviewer a2168a01c708db057 running)
-    '23': main session relay; owner a0636264613b51f22 hand-back after step 24
   owner:
     agent: a0636264613b51f22
     state: stopped
