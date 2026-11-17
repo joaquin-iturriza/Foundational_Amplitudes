@@ -34207,6 +34207,10 @@ entries:
   next:
     3: Eval-only of existing models (trial 1262 zero-shot, u-flavour Z+ng models shifted by 0.779805) on their 1e6 test events
       per multiplicity; needs its own design and a rebuild path for the multi-process 1262
+    4: 'HPs for the Z+ng runs: the 8 runs at kit_hpo_uug_T hp1677 (lr 6.55e-3) fail the curve test in 7 of 8; a single-fidelity
+      DyHPO search (template coupled space, Muon, WSD, emission-scale target, HETEROSC, 12,500 steps, 5e5 events, 8 trials)
+      from scratch, then the 8 runs again at its choice. Cost above 30 GPU-h: Joaquin''s call (per multiplicity ~61 GPU-h;
+      Z+4g only and its HPs for all n ~33 GPU-h)'
   done_when: null
   notes_ref: null
   match: zng_uq_*,tp*_zng_*
@@ -34625,6 +34629,11 @@ entries:
       if:
       - 'a model within 3x of their median |Delta|: report as is'
       - 'every model far above: report the in-support subset beside the whole set'
+    4:
+      feeds: whether our setup, trained well, comes within 3x of their networks on Z+ng
+      if:
+      - 'search finds a trial passing the curve test: the 8 runs at its HPs, the benchmark read again'
+      - 'no trial passes: report the setup''s floor on Z+ng, flagged'
   step_waits:
     '3': the fresh owner launched from the 2026-11-17 hand-off (this owner closed at the context limit)
   findings:
