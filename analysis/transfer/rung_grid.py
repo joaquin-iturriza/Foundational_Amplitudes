@@ -93,11 +93,40 @@ def grid(base, probes, panel, own):
     hl = {l: h for ax in cells for h, l in zip(*ax.get_legend_handles_labels())}
     mine = {p: own(p) for p in probes}
     common = [l for l in hl if not any(l in m for m in mine.values())]
-    ps.shared_legend(fig, cells[0], ncol=len(common), handles=[hl[l] for l in common], labels=common)
     ps.layout(fig); ps.apply_headroom(fig)
+    rend = fig.canvas.get_renderer()
+    own = {}
     for ax, p in zip(cells, probes):
         h, l = ax.get_legend_handles_labels()
-        ps.legend_free(ax, handles=[h[l.index(x)] for x in mine[p]], labels=mine[p], fontsize=ps.LEGEND_MIN_PT)
+        own[ax] = ps.legend_free(ax, handles=[h[l.index(x)] for x in mine[p]], labels=mine[p], fontsize=ps.LEGEND_MIN_PT)
+        ax.add_artist(own[ax]); ax.legend_ = None
+    # no legend outside the axes (Joaquin 2026-11-17: 'I already told you we don't do that'): the curves every panel has
+    # get one legend inside the panel and corner that covers the fewest points, clear of that panel's own legend and label
+    best = None
+    for ax in cells:
+        for loc in ps.LEGEND_LOCS:
+            leg = ps.legend(ax, loc, handles=[hl[l] for l in common], labels=common, fontsize=ps.LEGEND_MIN_PT)
+            bb = leg.get_window_extent(rend)
+            clash = bb.overlaps(own[ax].get_window_extent(rend)) or bb.overlaps(ax._ps_label.get_window_extent(rend))
+            n = ps.covered(ax, leg)
+            leg.remove(); ax.legend_ = None
+            if not clash and (best is None or n < best[0]):
+                best = (n, ax, loc)
+    merged = best is None   # no corner clears a panel's own legend: one panel's own legend takes the common entries too
+    if merged:
+        for ax, p in zip(cells, probes):
+            names = common + mine[p]
+            for loc in ps.LEGEND_LOCS:
+                leg = ps.legend(ax, loc, handles=[hl[l] for l in names], labels=names, fontsize=ps.LEGEND_MIN_PT)
+                clash = leg.get_window_extent(rend).overlaps(ax._ps_label.get_window_extent(rend))
+                n = ps.covered(ax, leg)
+                leg.remove(); ax.legend_ = None
+                if not clash and (best is None or n < best[0]):
+                    best = (n, ax, loc)
+        own[best[1]].remove()
+    names = common + (mine[probes[cells.index(best[1])]] if merged else [])
+    ps.legend(best[1], best[2], handles=[hl[l] for l in names], labels=names, fontsize=ps.LEGEND_MIN_PT)
+    print(f"{os.path.basename(base)}: common legend in panel {cells.index(best[1])} {best[2]}, covers {best[0]} points")
     ps.save(fig, base)
 
 
