@@ -34433,6 +34433,23 @@ entries:
       not resolved (expected, highmult grid), seeds asked of Joaquin. Timing check: GPU-h of their production = 4 jobs x min(2e5
       x s/step shared, 24 h); <= 30 GPU-h -> submit; above -> to Joaquin with the number, beside asking the authors for their
       prod_het_v1 preds_test_0.npz (same split, the cheaper route).'
+    fix_at: '2026-11-17T11:51:08+00:00'
+    fix: 'Re-check of the 11:50 design. My four earlier items are addressed: seed spread cited with a 3x median |Delta| resolution
+      and a ''not resolved'' outcome for each comparison, with seeds as a question to Joaquin; HP sources named; reason for
+      mu_mse selection stated; disk 104 MB/run against 54 GB free; ~18 GPU-h; pull sign now theirs. One new failure, in the
+      HP source (checks 5 and 7, D478 ''take the HPs from'' similar optimized runs). The design takes kit_hpo_uugg_T hp1196
+      ''as is'' as ''best'', but analysis/kit_benchmark/data/kit_hpo.json shows that search chose no trial: chosen = None,
+      and all 16 trials fail the project''s curve test (tools/kit_curves.py, curve_quality on the val/train mu-MSE curves).
+      hp1196 itself has well=False, separation 7.5, and the runner-up hp0556 is tied with it (val mu-MSE 2.889e-3 vs 2.900e-3).
+      kit_benchmark''s own design records this as ''uugg T none good''. The design omits this verdict and reuses as optimized
+      a point the source entry rejected, whose validation did not fall with training (D421''s criterion), at 7x the searched
+      horizon (1831 -> 12,500 steps) with lr not rescaled. Fix: take a trial that passed (kit_hpo_uug_T chosen hp1677, or
+      kit_hpo_uug_plain hp1918, both chosen by kit_benchmark), saying how its target/inputs relate to ours; or, if hp1196
+      is kept, state its failed curve test and the evidence that it does not matter here, and make the smoke and batch outcome
+      read the curve test on our runs (a BAD curve is a NO for that run). State the horizon/lr choice for the picked point
+      the same way. Everything else holds: the matched scratch/fine-tune pair; ~410 epochs both sides (D479); HETEROSC + sigma
+      stage; emission-scale target (D477); test events = their split, checked event by event; the dtype override checked with
+      --cfg job; their production gated on time_check and Joaquin above 30 GPU-h.'
   step_why:
     1:
       feeds: whether any run or evaluation on their events compares like with like
