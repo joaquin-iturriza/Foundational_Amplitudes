@@ -6,7 +6,7 @@ ee -> nu_e nu_e), external photons r3, QCD exchange r4, masses r5, the first ext
 and uu -> Zg cross it), 2->3 r7, 2->4 r8, one loop r9. Same cells and values as rung_grid.py: the 8k grid while
 cells.USE_32K is off (now), the 32k cells at D = 10^3.5, 10^4 once it is on (cells.final; a cell still at 8k drawn open). The best pretraining overall is
 ranked on the 8k grid, where every pretraining has every cell at the same compute.
-  <base>_ee_a..f, <base>_qcd_a..f
+  <base>_ee, <base>_qcd (one file each, six panels)
     python analysis/transfer/rung_focus.py      -> figs/rung_focus
     python analysis/transfer/rung_focus.py --paper   -> figs/rung_focus_paper: the paper's version (the user's call,
         2026-10-09): scratch, the rung below, the first rung with the structure, the best rung overall, the synthetic
@@ -75,42 +75,45 @@ def series():
     return [f for f in (fam(r) for r in range(0, 10)) if any(n.startswith(f + "_") for n in S)]
 
 
+ADDS = {1: r"$s$-channel $\gamma/Z$", 2: r"EW $t$-channel", 3: "photons", 4: "QCD, colour", 5: "masses",
+        6: r"$W$+jet", 7: r"$2\to3$", 8: r"$2\to4$", 9: "one loop"}    # RUNG_ADDS in a legend's few words
+
+
+def upto(r):
+    """A ladder pretraining in plain words: the steps are cumulative, step 0 is ee->uu alone."""
+    return r"$e^+e^-\to u\bar u$ only" if r == 0 else ("ladder step 1" if r == 1 else f"ladder steps 1-{r}")
+
+
+# One file per figure, six panels in three rows of two; each panel carries its own legend because its steps differ
+# (Joaquin 2026-11-17: legend inside, 'step' of the ladder, no 'ties within 1.2x' he could not read). The green curve
+# is the largest gain over scratch, mean over D (overall()'s first), stated as that: no tie or winner claim rests on TIE.
 for part, order in (("ee", P[:6]), ("qcd", P[6:])):
-    figs = ps.panels(len(order))
-    for (fig, ax), p in zip(figs, order):
+    fig, axs = ps.figure(ncols=2, nrows=3)
+    for ax, p in zip(axs.flat, order):
         hi, lo = fam(FOCUS[p]), fam(FOCUS[p] - 1)
-        lead, unranked = overall(p, [f for f in series() if f.endswith("fte")])
-        first = True
+        lead, _ = overall(p, [f for f in series() if f.endswith("fte")])
+        first, opened = True, []
         for f in ([] if PAPER else series()):
             if f in (hi, lo) or (lead and f == lead[0]):
                 continue
-            if draw_final(ax, f, p, "o-", label="other pretrainings" if first else None, **GREY) is not None:
-                first = False
-        draw_final(ax, "scr", p, "o-", color="k", label="from scratch")
-        draw_final(ax, lo, p, "o-", color=ps.C.blue, label="the rung below")
-        draw_final(ax, hi, p, "o-", color=ps.C.vermillion, label="first rung with the structure")
+            op = draw_final(ax, f, p, "o-", label="other ladder steps" if first else None, **GREY)
+            if op is not None:
+                first, opened = False, opened + op
+        opened += draw_final(ax, "scr", p, "o-", color="k", label="from scratch") or []
+        opened += draw_final(ax, lo, p, "o-", color=ps.C.blue, label=upto(FOCUS[p] - 1)) or []
+        opened += draw_final(ax, hi, p, "o-", color=ps.C.vermillion,
+                             label=upto(FOCUS[p]) + ": adds " + ADDS[FOCUS[p]]) or []
         if lead and lead[0] not in (hi, lo):
-            draw_final(ax, lead[0], p, "o-", color=ps.C.green, label="best overall")
+            k = 0 if lead[0] == "tp3_uu64fte" else int(short(lead[0])[1:])
+            opened += draw_final(ax, lead[0], p, "o-", color=ps.C.green,
+                                 label="largest gain over scratch: " + upto(k).removeprefix("ladder ")) or []
         if PAPER:
             draw_arm(ax, "tp3_synfte", p, "s--", color=ps.C.purple, label="synthetic amplitudes")
-            draw_arm(ax, "tp3_finfte", p, "D-", color=ps.C.orange, label="finale (rung 9 + every star arm)")
-        below = f"r{FOCUS[p] - 1}"
-        ps.process_label(ax, LAB[p] + "\n" + f"r{FOCUS[p]} vs " + below
-                         # the leader and its first tie by name, any further ties as a count (the full list ran
-                         # off the panel once every grid was ranked)
-                         + (", best " + r"$\approx$".join(short(f) for f in lead[:2])
-                            + (f" (+{len(lead) - 2})" if len(lead) > 2 else "") if lead else "")
-                         + ("\n" + "unranked " + ", ".join(short(f) for f in unranked) if unranked else ""))
+            draw_arm(ax, "tp3_finfte", p, "D-", color=ps.C.orange, label="every structure")
+        if opened:
+            ax.plot([], [], "o", color="k", mfc="white", label="open: 8k of 32k steps")
+        ps.process_label(ax, LAB[p])
         ax.set_xscale("log"); ax.set_yscale("log")
-        ax.set_xlabel(r"training events $D$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
-        ps.make_room(ax)
-    a0 = figs[0][1]
-    if "best overall" not in a0.get_legend_handles_labels()[1]:     # the legend is read off panel (a)
-        a0.plot([], [], "o-", color=ps.C.green, label="best overall")
-    if USE_32K:
-        a0.plot([], [], "o", color="k", mfc="white", label="open: 8k steps where the study runs 32k (for now)")
-    # the key to the panels' "r6 vs r5" labels is the ladder's table (rung -> structure) in the text, not the legend: nine
-    # extra legend rows pushed the six-panel figure past a page
-    ps.save_panels(figs, os.path.join(ROOT, "analysis", "transfer", "figs", f"{BASE}_{part}"))
-    ps.legend_strip(a0, os.path.join(ROOT, "analysis", "transfer", "figs", f"{BASE}_{part}_legend"),
-                    width=3 * figs[0][0].get_size_inches()[0])   # after save_panels: the laid-out width; the paper sets three panels a row
+        ax.set_xlabel(r"fine-tuning events $D$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
+        ps.legend(ax, "lower left", ncol=2, fontsize=ps.LEGEND_MIN_PT)
+    ps.save(fig, os.path.join(ROOT, "analysis", "transfer", "figs", f"{BASE}_{part}"))

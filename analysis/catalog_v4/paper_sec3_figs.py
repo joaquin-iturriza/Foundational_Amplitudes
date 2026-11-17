@@ -92,17 +92,24 @@ def scatter_ax(ax, groups, xlab, ylab, name, legend="lower right"):
         print(f"  {name} {lab!r}: {len(x)} classes, median y/x {np.median(y / x):.3g}, "
               f"medians x {np.median(x):.3g} y {np.median(y):.3g}")
     ax.set_xscale("log"); ax.set_yscale("log")
-    pad = (hi / lo) ** 0.04
-    ax.set_xlim(lo / pad, hi * pad); ax.set_ylim(lo / pad, hi * pad)
+    # the legend goes in the corner on the side of y = x the points leave emptier, and both axes open the same
+    # factor toward it, so the scatter keeps its aspect; left to make_room, the y range alone grew to 1e6-1e10 and
+    # squeezed the points into a band (main session 2026-11-17)
+    pad, room = (hi / lo) ** 0.04, (hi / lo) ** 0.3
+    above = np.mean(np.concatenate([g[2] > g[1] for g in groups])) if legend else 0.5
+    if above > 0.5:     # lower right: more x on the right, more y below
+        ax.set_xlim(lo / pad, hi * pad * room); ax.set_ylim(lo / pad / room, hi * pad)
+    else:               # upper left: more x on the left, more y above
+        ax.set_xlim(lo / pad / room, hi * pad); ax.set_ylim(lo / pad, hi * pad * room)
     ax.set_xlabel(xlab); ax.set_ylabel(ylab)
     if legend:
-        ps.legend(ax, legend, markerscale=2.5)
+        ps.legend(ax, "lower right" if above > 0.5 else "upper left", markerscale=2.5, fontsize=ps.LEGEND_MIN_PT)
 
 
-SETS = (("$pp$ processes in the pretraining,\nsampled from PDFs", ("PP4",)),
-        ("$e^+e^-$ processes in the pretraining", ("EE4",)),
-        ("held-out processes, our sampling", ("held",)),
-        ("held-out processes,\nMadEvent's default sampling", ("HD4", "HD5")))
+SETS = (("$pp$, in pretraining, sampled from PDFs", ("PP4",)),
+        ("$e^+e^-$, in pretraining", ("EE4",)),
+        ("held out, our sampling", ("held",)),
+        ("held out, MadEvent's default sampling", ("HD4", "HD5")))
 
 
 def pidqn():
