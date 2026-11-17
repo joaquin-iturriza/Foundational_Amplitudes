@@ -80,13 +80,18 @@ def predict(run_dir, splits, out, h5=None):
     assert all(t == ["log", "standardization"] for t in trafos), (
         f"the residual is ln-exact only under [log, standardization]; the run resolved {trafos}")
     with torch.no_grad():
-        pred, truth, _ = exp._collect_predictions(loader)
+        pred, truth, sig = exp._collect_predictions(loader)
     res_ln = (np.asarray(pred, np.float64).reshape(-1) - np.asarray(truth, np.float64).reshape(-1)) \
         * float(exp.prepd_std[0])
     perm = np.asarray(exp._role_perm["test"])[:len(res_ln)]
     res = np.full(len(rows), np.nan)
     res[perm] = res_ln
     assert np.isfinite(res).all(), "an event without a prediction"
+    if sig is not None:
+        # HETEROSC: each event's sigma in ln|M|^2 units (the network's standardized sigma times prepd_std), file order
+        sg = np.full(len(rows), np.nan)
+        sg[perm] = np.asarray(sig, np.float64).reshape(-1)[:len(res_ln)] * float(exp.prepd_std[0])
+        np.save(os.path.join(out, "sigma_ln.npy"), sg)
     path = os.path.join(out, "predictions.h5")
     i = 0
     with h5py.File(src, "r") as t, h5py.File(path, "w") as f:
@@ -104,7 +109,7 @@ def predict(run_dir, splits, out, h5=None):
 
 def evaluate(stem, pred_path, out, h5=None):
     ev = os.path.join(os.path.dirname(os.path.dirname(kh.kit_dir())), "src", "evaluate.py")
-    if not os.path.exists(ev):
+    if not os.path.exists(ev) or stem.startswith("uq_"):    # the KIT scorer reads KIT files only
         print(f"no benchmark scorer at {ev}: predictions only")
         return None
     res = os.path.join(out, "kit_result.json")

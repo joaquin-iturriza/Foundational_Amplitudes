@@ -35,7 +35,10 @@ SPLITS = ("bulk_train", "bulk_test", "hard_train", "hard_test")
 # file not listed has none (a run of it sets model.use_diagrams=false and data.offshell_per_event=false, or a sidecar
 # is dumped with tools/dump_diagrams.py and listed here).
 DIAGRAMS_OF = {("ee_tt", "born"): "ee_ttbar", ("ee_tt", "virt_finite"): "ee_ttbar_nlo",
-               ("ee_uug", "me2"): "ee_uug", ("ee_uugg", "me2"): "ee_uugg"}
+               ("ee_uug", "me2"): "ee_uug", ("ee_uugg", "me2"): "ee_uugg",
+               # zng_uq_benchmark's d d~ > Z + n g files (tools/zng_uq.py), read through this layout
+               ("uq_zg", "me2"): "ddbar_Zg", ("uq_zgg", "me2"): "ddbar_Zgg", ("uq_zggg", "me2"): "ddbar_Zggg",
+               ("uq_zgggg", "me2"): "ddbar_Zgggg"}
 
 
 def kit_dir():
@@ -60,6 +63,8 @@ def parse(name):
 
 
 def h5_path(stem):
+    if stem.startswith("uq_"):       # zng_uq_benchmark's converted Zenodo 16793011 files (tools/zng_uq.py)
+        return os.path.join(os.environ["DATA_DIR"], "zng_uq", f"{stem}.h5")
     return os.path.join(kit_dir(), f"{stem}.h5")
 
 
