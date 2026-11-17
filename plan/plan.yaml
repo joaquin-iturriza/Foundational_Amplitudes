@@ -27701,10 +27701,6 @@ entries:
     22: 'Steps 14/19 NO branches of the passed 10:47 design: div-form (uug inconclusive, tt STAYED) and ReZero (uug soft MOVED,
       tt Sudakov blows up) each a 16-trial kit_hpo-template search, ~9.6 GPU-h each, beyond the design''s remaining budget:
       to Joaquin with the cost, beside A2 (FIXED on every family with an exponent)'
-    23: 'Deck slide 3 rewritten in plain sentences (Joaquin 2026-11-17: ''I don''t really know what you mean by right where...,
-      wrong when it''s not... But I don''t even like the construction of those phrases''): the soft/collinear slopes continue
-      a power law visible in the training data, the tt threshold slope does not; checked against the bulk''s own slopes first;
-      rebuild and send the deck.'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -29012,11 +29008,6 @@ entries:
       if:
       - 'Joaquin approves: run the searches, best against best'
       - 'Joaquin drops them: A2 alone is the KIT model; record the dead ends'
-    23:
-      feeds: how the group meeting explains why the log-invariant MLP extrapolates and the factor is needed
-      if:
-      - 'deck rebuilt: send it'
-      - 'the bulk does not show the slope: say so and reword'
   step_waits:
     '20': '2026-11-14'
   handoff:
