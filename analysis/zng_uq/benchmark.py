@@ -106,13 +106,14 @@ def plot(path, curves=None, paper=os.path.join(HERE, "data", "paper_mse.json")):
     import plot_style as ps
     ps.use()
     d = json.load(open(path))
-    col = {"from scratch": ps.C.blue, "fine-tuned": ps.C.vermillion}
+    col = {"from scratch": ps.C.blue, "fine-tuned": ps.C.vermillion, ZS: "k"}  # the paper networks take the other six palette colours
+    arms = [a for a in list(OURS.values()) + [ZS] if any(v["arm"] == a for v in d["runs"].values())]
     figs = os.path.join(HERE, "figs")
     os.makedirs(figs, exist_ok=True)
     ours = lambda a, key: sorted((v["n_gluons"], v[key]) for v in d["runs"].values() if v["arm"] == a)
     # (a)
     fig, (axl, axr) = ps.figure(2)
-    for a in OURS.values():
+    for a in arms:
         axl.plot(*zip(*ours(a, "median_abs_delta")), "o-", color=col[a], label=a)
         axr.plot(*zip(*ours(a, "mse_std")), "o-", color=col[a])
     pm = json.load(open(paper))["mse"]
@@ -127,7 +128,7 @@ def plot(path, curves=None, paper=os.path.join(HERE, "data", "paper_mse.json")):
     ps.save(fig, os.path.join(figs, "zng_median_delta"))
     # (b)
     fig, ax = ps.figure()
-    for a in OURS.values():
+    for a in arms:
         h = np.asarray(d["runs"][f"{a}|4"]["hist_abs_delta"], float)
         ax.stairs(h / h.sum(), d["bins_abs_delta"], color=col[a], label=a)
     ax.set_xscale("log"); ax.set_xlabel(r"$|\Delta|$, $\Delta=|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2-1$")
@@ -137,7 +138,7 @@ def plot(path, curves=None, paper=os.path.join(HERE, "data", "paper_mse.json")):
     b = np.asarray(d["bins_pull"]); x = np.linspace(b[0], b[-1], 481)
     fig, axs = ps.figure(2, 2)
     for n, ax in zip((1, 2, 3, 4), axs.flat):
-        for a in OURS.values():
+        for a in arms:
             h = np.asarray(d["runs"][f"{a}|{n}"]["hist_pull"], float)
             ax.stairs(h / h.sum(), b, color=col[a], label=a)
         ax.plot(x, np.exp(-x ** 2 / 2) / np.sqrt(2 * np.pi) * (b[1] - b[0]), "k:", label=r"$\mathcal{N}(0,1)$")
