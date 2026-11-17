@@ -35326,10 +35326,15 @@ entries:
     - dan_zeroshot_v4
   decisions:
   - D488
-  next: 'Read trial_1262 (cov_v4_long_hpo8_cc_68224, sigma stage) on Daniel''s 139 held-out pools (axis DAN, one eval job,
-    ~0.1 h), bring the predictions home (collect_heldout_preds.py -> data/v4_trial1262_dan.npz) and draw analysis/catalog_daniel/dan_per_process.py:
-    96 relabels and the 9 extrapolation processes with no relabel in catalog_v4''s training (v4_heldout_overlap.py: 34 of
-    43 have one)'
+  next:
+    1: 'Read trial_1262 (cov_v4_long_hpo8_cc_68224, sigma stage) on Daniel''s 139 held-out pools (axis DAN, one eval job,
+      ~0.1 h), bring the predictions home (collect_heldout_preds.py -> data/v4_trial1262_dan.npz) and draw analysis/catalog_daniel/dan_per_process.py:
+      96 relabels and the 9 extrapolation processes with no relabel in catalog_v4''s training (v4_heldout_overlap.py: 34 of
+      43 have one)'
+    2: 'Finish evaluate_daniels_catalog (D489, de68fbd7): README with the exact command; the reproduction test: run tools/zero_shot_parent.py
+      locally (.venv-cpu, CPU) with parent evaluate_daniels_catalog/model on the full dc_bbx_hh val pool brought home (scratch
+      fullpool/: pool + .recipe.json + .alphas.npy, same file identity as the stored read) and compare per event with data/catalog_short_DlessInOrd_sigstage.npz
+      dc_bbx_hh__q; then hand back the commit, command and result'
   done_when: null
   notes_ref: null
   match: dan_zs_v4*
@@ -35500,6 +35505,11 @@ entries:
         figure'
       - 'above, or probes refused/non-finite: report with the failing probes listed and what the physics mismatch (massive
         b, Daniel''s run card) may cost'
+    2:
+      feeds: whether Suprio can run the dimensionless + coupling orders network on Daniel's data himself (D489)
+      if:
+      - 'stored predictions reproduced to float precision: hand the dir over'
+      - 'not reproduced: find which input differs (code since 2026-10-23, own-stats role) before handing over'
   targets:
   - batch: dan_zs_v4_reads
     wall_h: 0.1
