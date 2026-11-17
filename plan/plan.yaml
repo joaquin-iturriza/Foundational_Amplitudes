@@ -34172,9 +34172,11 @@ entries:
   match: zng_uq_*,tp*_zng_*
   evidence:
     runs: []
-    commit: e8062214
+    commit: ad28cb6b
     paths:
+    - analysis/zng_uq/benchmark.py
     - analysis/zng_uq/data/paper_mse.json
+    - scripts/job_uq_ext.sh
     - tools/zng_uq.py
   dead_ends: []
   asks:
