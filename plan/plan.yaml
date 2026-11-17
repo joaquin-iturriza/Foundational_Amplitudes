@@ -35534,6 +35534,15 @@ entries:
       the input order reversed, differ by rms 0.13 (max 0.63) in log|M|^2; the read''s MSE is 0.36-0.37. The evaluator matches
       the stored read per event only to that level: rms 0.132 over 300 matched events (evaluate_daniels_catalog/evaluate.py
       @de68fbd7, CPU).'
+  - at: '2026-11-17T19:32:59+00:00'
+    text: 'The rms 0.13 ''augmentation dependence'' of CPU reads was a bug: without xformers LLoCa''s non-causal attention
+      had no mask and attended across every event of a batch (models/attention_lloca_mup.py build_block_diagonal_bias returned
+      None). Fixed at 1ce53bcd (dense block mask, test_no_cross_event_cpu). After the fix the network is invariant (8 augmentation
+      seeds: per-event sd <= 1.7e-4) and forward vs reversed files agree exactly. Every earlier local CPU read of a LLoCa
+      model on multi-event batches is affected. Against the stored GPU read (catalog_short_DlessInOrd_sigstage, 2000 dc_bbx_hh
+      val events): same shape per event (corr 0.994, sd of difference 0.0094) but the stored read is 0.194 higher in log|M|^2
+      (MSE 0.279 stored vs 0.417 evaluator); not code drift (Oct-23 code + fix: same 0.194), not the sidecar, augmentation
+      or own target stats; open: a GPU read of the same model on CC.'
   handoff:
     state: 'Zero-shot read in flight: FA-ccin2p3-d95c89ad (trial_1262 of cov_v4_long_hpo8_cc_68224, eval-only, axes DAN =
       139 Daniel held-out val pools and DANID = 9 identical catalog_v4 training trees on their own test pools; design passed
