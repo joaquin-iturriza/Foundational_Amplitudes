@@ -33420,7 +33420,7 @@ entries:
     decision: D464
   owner:
     agent: ae24c212cd46ebda9
-    state: working
+    state: closed
     since: '2026-11-17T02:46:37+00:00'
     state_at: '2026-11-17T04:05:06.350000+00:00'
     context: 276624
@@ -33893,41 +33893,27 @@ entries:
     start: '2026-11-17T02:49:38+00:00'
     at: '2026-11-17T02:49:38+00:00'
   handoff:
-    state: 'Draft ~/drafts/fm_amplitudes_2026-11 at f405886: every figure of Joaquin''s sections is one file, legend inside,
-      short caption; rung -> step of the ladder; D -> D_train in Secs. 3-5. Figures done, committed, send_check --scan clean,
-      each looked at once: Fig. 6 old_setup_examples (92891bcd: per-panel legend entry ''data saved xS'' on the arrow), Figs.
-      7-8 example_delta/example_dist (19fd0166: no D=10^3, D_train), Fig. 9 eeuu_genmix_fraction_sweep (19fd0166: one name
-      ''fraction sampled flat in log|M|^2'' on colour bar and axis), Fig. 11 l2_uug_multiscale (92891bcd: arms distinct by
-      fill/line style, points spread), Figs. 10, 12-14 paper_pp_bound/pidqn/target/muon (3d1c64be: scatter legend on the emptier
-      side of y=x, both axes opened), Figs. 16-17 rung_focus_ee/qcd and 18-19 finale_synth_paper_ee/qcd (3x2, per-panel legends
-      ''ladder steps 1-k'', ''largest gain over scratch''; c329f319), Figs. 20-21 star_arms/star_arms2 (a6c72579). All PDFs
-      copied into the draft''s figs/pretrain and figs/transfer. Figure-style rules ''readable but short'' in skill + fa-figures
-      (30b1b541). REMAINING step 4 (does not need Fig. 15): build in scratchpad final_draft (rsync the draft minus .git/own_*,
-      then /mnt/c/texlive/2025/bin/windows/pdflatex.exe + bibtex.exe; the WSL TeX lacks dsfont), a fresh cold reviewer told
-      to read the figures alone (10-minute scroll test) on Figs. 6-21, apply its fixes, zip + PDF, send each figure as its
-      own file; swap Fig. 15 in when its runs end. Step 5 (Fig. 15 on low-loss probes): running FA-ccin2p3-167dc1db (AdamW
-      parent, keep-parent-stats), -0d4d4506 (Muon parent), -c81ba5db (scratch), scripts/job_catalog_ft.sh @c7b2a389 args ''<parent>
-      <opt> <mode> zz_catft_lowloss2 v3_dbx_bxdgg,v3_udx_gwpzz,v3_epem_mupmumttx,v3_uux_wpwm_nlo'', ~3 GPU-h, step 5 waits
-      on them. When they end: site logs <each> -n 200000 | python3 analysis/catalog_v3/muon_compare.py collect-ft > analysis/catalog_v3/data/muon_ft_lowloss.json;
-      python analysis/catalog_v4/paper_sec3_figs.py ft (draws the low-loss probes, @ fe of ''ft'' commit after 92891bcd);
-      compare step-0 zero-shot to the design''s check (AdamW 0.261/0.375/0.38/0.484, Muon 0.0353/0.0469/0.0647/0.0796: the
-      val/test pools were rebuilt in the prebuild, not checked equal); copy to draft figs/pretrain/paper_muon_ft.pdf; rewrite
-      the Sec. 4 fine-tune sentence (fig:ft) to what it shows; report with the figure.'
-    decisions: 'Joaquin 2026-11-17 (scratchpad joaquin_figs_2026-11-17.txt + his notes relayed later): figures readable alone
-      but short; one short arm name everywhere (''from scratch'', ''fine-tuned''); D_train; one name for a scanned parameter
-      on bar and axis; plain MSE(log|M|^2) y label; data-saved factor as ''data saved xS'' off the lines; steering arms easy
-      to tell apart. Repo-reviewer FIX on rung_focus: no ''best''/tie claim (TIE=1.2 unsourced), the green curve is ''largest
-      gain over scratch'' (mean over D of log10 scratch/fine-tune). Fig. 9: per-bin and <100 GeV means lowest at f=0.5, all-events
-      mean at f=0.25; no text repeated the wrong claim.'
-    ruled_out: 'Deleting the failed batch''s run dirs on CC (fresh out dir zz_catft_lowloss2 instead). 3-across or 4x2 grids
-      (height past a page): 3x2 with per-panel legends. Legend in a corner left to make_room on scatters (squeezed the points).'
-    running: FA-ccin2p3-167dc1db, FA-ccin2p3-0d4d4506, FA-ccin2p3-c81ba5db (Fig. 15 low-loss fine-tunes)
-    files: analysis/transfer/rung_focus.py; analysis/transfer/finale_synth_scaling.py; analysis/transfer/star_arms.py; analysis/catalog_v4/paper_sec3_figs.py;
-      analysis/data_saving/old_setup_examples.py; analysis/data_saving/example_reruns.py; analysis/divergences/plot_genmix_sweep.py;
-      analysis/divergences/plot_steering.py; recipes/catalog_v3_lowloss_probes.yaml; .claude/hooks/submit_guard.py (9192f890);
-      .claude/skills/figure-style/SKILL.md; .claude/context/fa-figures.txt; ~/drafts/fm_amplitudes_2026-11/paper.tex; scratchpad
-      final_draft/
-    written: '2026-11-17T02:43:20+00:00'
+    state: 'Draft ~/drafts/fm_amplitudes_2026-11 at 314e151, 48 pp (scratchpad draft_final_fig15.pdf, draft_final_overleaf_fig15.zip).
+      Step 5 done: Fig. 15 on the low-loss probes (muon_ft_lowloss.json @4979f72f): Muon lower on the 3 trees at every D_train
+      (4-5x at 316), one loop crosses between D=32 and 100 and ends within 25%; Sec. 4 paragraph and caption rewritten. Step
+      4: both rounds of Joaquin''s figure notes applied (FA 80849a90 and after; skill updated); open: his answer on Fig. 21''s
+      step-1 curve and on a scaled 3x4 grid (plan ask). Not applied and reported: square scatter boxes (house 2.40x1.92 box;
+      equal limits instead), Figs. 18-19 shorter y (legend needs it), Figs. 20-21 as one figure (7 panels do not fit). .claude/context/fa-figures.txt
+      lacks the new figure rules (claudemd-keeper backlog overdue blocked commits while it was edited): add them after that
+      review. Step 3 (het vs MSE) waits as before.'
+    decisions: 'Joaquin 2026-11-17: figures readable alone; one name per dataset (''pp, in pretraining / held out, sampled
+      from PDFs''); y = x scatters on equal limits; ratio range from the bulk of the bins (ps.ratio_range, rest at the edge);
+      input rows baseline +- one change with ''lin. emb.''; Figs. 7-8 one legend naming the four curves; calm star-arm colours;
+      no hyperparameter points named in Fig. 21. Fig. 21 step-1 curve = step 1''s search (repo-reviewer: the two-point curve
+      overstates the four searched arms'' gain; Joaquin asked).'
+    ruled_out: 3 columns of house panels (10.7 in, past the printable width); 4 rows (10.2 in, past the page); fixed-aspect
+      square scatter axes (layout() does not support them, content overhangs); legend upper right on finale_synth (no shorter
+      y range).
+    running: none
+    files: analysis/catalog_v4/paper_sec3_figs.py; analysis/transfer/star_arms.py; analysis/data_saving/example_reruns.py;
+      plot_style.py (ratio_range, _ps_equal_limits); analysis/catalog_v3/data/muon_ft_lowloss.json; scripts/prebuild_recipes.sh;
+      tools/write_own_alphas.py; .claude/skills/figure-style/SKILL.md; ~/drafts/fm_amplitudes_2026-11/paper.tex
+    written: '2026-11-17T04:08:30+00:00'
   step_why:
     3:
       feeds: whether and how the paper states the het-vs-MSE comparison
