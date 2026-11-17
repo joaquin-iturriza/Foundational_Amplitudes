@@ -33341,6 +33341,11 @@ entries:
       ''rung'', internal names; the same names as the figures); (e) Fig. 14 right: row names short but readable alone (e.g.
       ''all inputs'', ''no off-shellness'', ''no colour'', ''no diagrams'', ''linear embedding'', ''+ pair bias''), nothing
       cryptic like R_c or MLP; fresh reviewer; zip and PDF.'
+    5: 'Why the zero-shot gain is lost in fine-tuning (Joaquin 2026-11-17: ''we don''t show fig 15 until we understand why
+      we can''t keep the gain from the zero shot through the fine tuning''): on the Fig. 15 runs (zz_catft_sep, zz_catft_lowloss3)
+      read the fine-tunes'' training and validation curves: does the error rise above the zero-shot start early in fine-tuning
+      (learning rate, warmup, the head or standardization reset), and does it then recover; compare Muon and AdamW parents.
+      Analysis on existing runs first; a design for any new run.'
   done_when: null
   notes_ref: null
   match: none
@@ -34053,6 +34058,11 @@ entries:
       if:
       - 'reviewer passes: send zip, PDF and changed figures'
       - 'a correction needs a result not on disk: say which'
+    5:
+      feeds: whether Fig. 15 returns to the draft and what the fine-tune protocol should be
+      if:
+      - 'a cause is found on existing runs: report with the curves and propose the fix'
+      - 'existing runs cannot tell: propose a small design'
   ask: 'Scope: Fig. 15 on the new probes changes the Sec. 4 claim: Muon''s head start in fine-tuning holds at D_train = 10
     (10-50x) but closes by 316 (within 1.5x on three probes, 4.5x on b b̄ → HHHZ, whose Muon curve barely falls). The draft
     text was reworded to that; keep the new wording, or revert to the old until you''ve looked?'
