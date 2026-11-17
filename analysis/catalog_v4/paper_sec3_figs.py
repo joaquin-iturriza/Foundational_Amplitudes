@@ -344,31 +344,27 @@ def unseen(ax):
 
 # The 448-process pretraining's single-seed arms at the baseline's best HPs, 8601 steps: geometric mean over processes
 # of the per-process validation loss (MSE of the standardized log|M|^2) at the best checkpoint, as docs/results.tex
-# tab:bigrun_arms (analysis/bigrun/arms_best.py, run on the site holding the runs) and the pair-bias table of
-# sec:bigrun. Rows name the inputs each network has (Joaquin 2026-11-17, third round: symbols, not words that need a
-# legend): rows say in words what each network has against the one with all inputs (Joaquin 2026-11-17, fourth
-# round: 'all inputs', 'no off-shellness', 'no colour', 'no diagrams', 'linear embedding', '+ pair bias'). All inputs
-# = propagator off-shellness, colour one-hot, diagram encoder, MLP particle embedding; the pair-bias rows add the
-# attention pair bias (capped at |b_ij| <= 8 in one) to 'no diagrams, linear embedding' (Joaquin's name, the caption says so).
-# Rows ordered by value, lowest error on top (Joaquin 2026-11-17, fifth round).
-BIGRUN = {"all inputs": (5.79e-4, 0.085),
-          "no off-shellness": (8.63e-4, 0.067),
-          "no colour": (6.81e-4, 0.094),
-          "no diagrams": (3.88e-4, 0.10),
-          "linear embedding": (4.86e-4, 0.056),
-          "no diagrams, linear embedding": (3.85e-4, 0.12),
-          "+ pair bias": (5.26e-4, 0.084),
-          "+ capped pair bias": (5.74e-4, 0.077)}
+# tab:bigrun_arms (analysis/bigrun/arms_best.py) and the pair-bias table of sec:bigrun. Each row names what changed
+# against the setup the paper's pretrainings use (off-shellness, colour, diagram encoder, linear embedding; Joaquin's
+# text), rows by value (Joaquin 2026-11-17: the four earlier label versions, a finding on draft_rewrite, are rejected).
+BIGRUN = {"setup used": 4.86e-4,
+          r"$-$ diagrams": 3.85e-4,
+          r"$-$ diagrams, $+$ nonlinear emb.": 3.88e-4,
+          r"$-$ diagrams, $+$ pair bias": 5.26e-4,
+          r"$-$ diagrams, $+$ capped pair bias": 5.74e-4,
+          r"$+$ nonlinear emb.": 5.79e-4,
+          r"$+$ nonlinear emb., $-$ colour": 6.81e-4,
+          r"$+$ nonlinear emb., $-$ off-shellness": 8.63e-4}
 
 
 def inputs(ax):
-    rows = sorted(BIGRUN.items(), key=lambda kv: kv[1][0])
+    rows = sorted(BIGRUN.items(), key=lambda kv: kv[1])
     y = np.arange(len(rows))
-    ax.plot([v[0] for _, v in rows], y, "o", color="k")   # black: the left panel's colours name its sets
+    ax.plot([v for _, v in rows], y, "o", color="k")   # black: the left panel's colours name its sets
     ax.set_yticks(y); ax.set_yticklabels([k for k, _ in rows])
     ax.set_ylim(len(rows) - 0.5, -0.5); ax.set_xscale("log")
     ax.set_xticks([4e-4, 6e-4, 8e-4], [r"$4\cdot10^{-4}$", r"$6\cdot10^{-4}$", r"$8\cdot10^{-4}$"]); ax.minorticks_off()
-    ax.set_xlabel(r"MSE$(\log|\mathcal{M}|^2)/\sigma^2$")
+    ax.set_xlabel("standardized MSE")
 
 
 if __name__ == "__main__":
