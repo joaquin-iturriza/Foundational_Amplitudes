@@ -29000,6 +29000,16 @@ entries:
       slope: uug -1.98/-0.95 vs truth -2.00/-1.00, tt threshold -0.56 vs bulk edge -0.59 vs truth -1.00. So the MLP''s extrapolation
       is right where the limit''s power law is already reached in the bulk and wrong at threshold, where it is not. Deck slide
       3 rewritten with these (c.f. talks/kit_nov2026).'
+  - at: '2026-11-17T11:12:56+00:00'
+    text: '2026-11-17 @224c7920. Step 23 (repo-reviewer blocking item tools/kit_figures.py:330) fixed: the attempts figure''s
+      six tt fine-tunes split by parent: ''fine-tuned, tops held out of pretraining (2 runs)'' (hollow down-triangles: ftr5own,
+      ftr5own_search; parent dsave_parent_heldout_r5) and ''fine-tuned, tops added to pretraining (4 runs)'' (hollow diamonds:
+      thr/thrbeta/thrloop/thrloopbeta parents). Redrawn analysis/kit_benchmark/figs/deck/kit_deepest_attempts.{png,pdf}; caption
+      in scratchpad caps/caps_deck.{py,json}, send_check passes on all 13; deck talks/kit_nov2026/main.pdf rebuilt. Numbers
+      unchanged: tt deepest threshold log-MSE held-out 7.45/7.68, tops added 6.76-9.06; high energy held-out 7.44/2.78, tops
+      added 1.58-6.23 (scratch 7.48/0.82, factor 0.023/0.077). Repo-reviewer ae24955df7b1a36a7 re-check: item cleared; backlog
+      not advanced only because of other entries'' unreviewed changes (157b5d08 zng_uq_benchmark; uncommitted mg5_pipeline_final.py,
+      tools/kit_hardps.py, tools/kit_predict.py, collect_catft_curves.py), lock still held.'
   step_why:
     20:
       feeds: the KIT NLO statement in the draft
