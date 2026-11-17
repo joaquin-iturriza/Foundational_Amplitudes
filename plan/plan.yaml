@@ -33418,12 +33418,10 @@ entries:
     answered_at: '2026-11-16T21:18:36.220000+00:00'
     decision: D464
   owner:
-    agent: af12ee6aa9c5a58f7
-    state: closed
-    since: '2026-11-17T01:21:13+00:00'
-    state_at: '2026-11-17T01:47:09+00:00'
-    context: 186619
-    context_at: '2026-11-17T01:30:26+00:00'
+    agent: ae2faa477da4f03df
+    state: working
+    since: '2026-11-17T01:48:40+00:00'
+    state_at: '2026-11-17T01:48:40+00:00'
   step_waits:
     '3': '2026-11-20: next draft round'
     '5': prebuild of recipes/catalog_v3_lowloss_probes.yaml (next owner submits it)
