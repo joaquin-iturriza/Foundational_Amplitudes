@@ -35126,7 +35126,7 @@ entries:
       go to Jean Zay A100; data and trial 1262 already copied there
     '8': the four B1 DyHPO sweeps ccin2p3:tp_zng_hpo_{zg,zgg,zggg,zgggg} (31 of 32 trials queued; zgggg trial_0007 resubmitted
       by detached zng_gate_windows)
-    '9': 'detached zng_gate_windows2 (parent smoke at 18:12 UTC; pool rebuild FA-ccin2p3-910dd6e1 done: 3 built, 81 cached)'
+    '9': 'detached zng_gate_windows2 (parent smoke at 18:12 UTC; pool rebuild done: 3 built, 81 cached)'
   findings:
   - at: '2026-11-17T11:18:43+00:00'
     text: 'Their numbers: the UQ repo (branch uq, 311 files) holds no figures, preds or result files. arXiv:2505.20280''s
