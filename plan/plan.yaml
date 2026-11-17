@@ -35427,6 +35427,56 @@ entries:
       per-process score file the figure script reads. Checks that hold: loss HETEROSC with sigma stage (trial_1262); test
       events are Daniel''s pools, the same split and 2000 events as the earlier arms; no sweep; only the model differs, which
       is the question.'
+  - at: '2026-11-17T18:43:53+00:00'
+    question: 'How does our best catalog_v4 pretraining, trial_1262 of cov_v4_long_hpo8_cc_68224 (16x, its final model: best-checkpoint
+      mean + sigma fit, runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262/sigma_stage; eval run FA-ccin2p3-1a46f3e0),
+      do zero-shot on Daniel''s held-out split (recipes/catalog_daniel_heldout.yaml, 139 processes), against Suprio''s particle-ID
+      embedding and our earlier arms trained on Daniel''s catalog (hp58 per-process standardization with g, shared standardization,
+      dimensionless + coupling orders)? D488: interpolation relabels scored (91; the 5 dc_ds_* identical to a catalog_v4 training
+      entry listed apart); extrapolation only on the 9 with no relabel in catalog_v4''s training. Eval-only. REREAD=FA-ccin2p3-1a46f3e0.
+      One job, axes DAN (139 dc_ val pools) and DANID (the 9 catalog_v4 training trees identical to one of Daniel''s processes,
+      on their own test pools: the calibration).'
+    prior: 'Searched docs/results.tex, plan, site decisions (Daniel, dc_, dan_per_process, heldout_zero_shot, hp58, dancat_het_pre,
+      PHYSICS_MISMATCH, held out in both catalogs, DlessInOrd, catalog_norm_B, 1262; D45 D59 D74 D77 D81 D83 D87 D88 D113
+      D114 D131). (1) hp58 (dancat_het_pre best, D59) read on the same 139 with the same scorer, raw and after the best affine
+      map (D74; heldout_zero_shot.py, fig heldout_mse; with g''s statistics D81): now an arm of the figure; recomputed raw
+      median on the 91 relabels 0.114, after the affine map 0.0057; on the 9: 1.12 raw, 0.37 affine. (2) the October deck''s
+      dan_per_process (Suprio, shared standardization catalog_norm_B, dimensionless+coupling orders catalog_short_DlessInOrd_sigstage):
+      medians on 91 relabels 0.080/0.066/0.046, on the 9 truly held out 2.24/1.72/1.05. (3) cross-catalog precedent (results.tex
+      ~1292-1300, 4490-4495): processes held out in both catalogs read on v3 and v4 pools, b processes set apart (4.7 GeV
+      vs massless are different functions); catalog_v4 seed spreads of a median 0.08-0.12 at level ~0.45, per-class |log10|
+      0.10-0.14. (4) par:v4_length: trial_1262 never read on Daniel''s pools. D113/D114 hold Daniel''s-catalog preprocessing
+      studies, not this; D488 authorises this. Differs: a catalog_v4-trained model read across catalogs on Daniel''s pools.'
+    measure: 'Per process MSE of log|M|^2 over the first 2000 val events, prediction q in log|M|^2, no map (zero_shot_parent.py,
+      the earlier arms'' scorer, split and count), and the same after the best affine map (q_aff, as hp58''s read). Per set
+      (91 relabels; 9 truly held out, split no-b 3 [gg>gtt~, gg>tt~a, gg>tt~h] and b 6, 4 of which need the b Yukawa that
+      catalog_v4''s massless-b model sets to zero): median per arm and the median per-process log10(new/arm) with its process-bootstrap
+      68% interval (analysis/catalog_daniel/dan_per_process.py @26cab1f7). Calibration: for the 9 identical pairs, MSE on
+      Daniel''s pool against MSE on catalog_v4''s own test pool of the same tree: the floor the convention and physics mismatch
+      adds.'
+    check: 'The raw measure separates the existing arms on these pools (9 truly held out: 2.24/1.12/1.72/1.05; relabels 0.080/0.114/0.066/0.046)
+      and the affine map moves it by up to 20x (hp58 0.114 -> 0.0057), so level against shape is visible; the bootstrap, dry-run
+      with a stand-in arm, gives 68% intervals of +-0.05 to 0.1 in log10 on the 91 and +-0.1 to 0.5 on the 9 and 3. Whether
+      the cross-catalog read measures generalisation and not convention offsets is what the DANID calibration measures in
+      the same job: if the 9 identical processes score near their own-pool MSE, the offset is small; if far, every cross-catalog
+      number carries that floor and is reported with it. Pools present on CC (checked 2026-11-17: 4463 dc_ val and test pools,
+      dc_bbx_hh_13000-13000GeV_val present, 1491 dc_ diagram sidecars; D131 deleted only the training caches); per-probe npz
+      written by zero_shot_parent --save-dir to $SCRATCH/zz_v4_long_best_..._trial_1262/<axis>/, packed by collect_heldout_preds.py,
+      the format the figure script reads.'
+    fixed: 'The parent''s checkpoint and sigma stage (no training); scorer and --signed-magnitude as every axis read; Daniel''s
+      pools as generated (13 TeV pp, his run card, massive b): their physics differs from catalog_v4''s (sm vs sm-no_b_mass,
+      b mass, coupling orders), so the physics check is overridden (ZS_ALLOW_PHYSICS_MISMATCH, reason recorded per probe);
+      the question is zero-shot on exactly the pools the other arms read.'
+    control: The four arms already read on the same 139 pools, same split and count (Suprio from the draft figure); the DANID
+      own-pool read as the floor of the cross-catalog read.
+    seeds: 'One (trial_1262, seed 42; the earlier arms are single seeds). Resolution: a gap counts only when the bootstrap
+      interval of the median log10 ratio excludes 0 and exceeds catalog_v4''s seed spread (0.10-0.14 in per-class |log10|,
+      ~0.1 relative on a median); on the 3 no-b processes no gap below ~0.5 in log10 is resolved, which is said with the number.'
+    outcome: 'If catalog_v4''s model is lower than the arms trained on Daniel''s catalog on the 9 (or the 3 no-b) beyond the
+      resolution and above the calibration floor: the new catalog''s pretraining generalises to Daniel''s unseen processes
+      at least as well as his own training, reported to Joaquin as evidence for using it as the foundation; if higher or within
+      resolution: it is not better on his held-out set, with the calibration saying how much is the cross-catalog mismatch
+      (b Yukawa, conventions) rather than the model, and the b split saying where; refused or non-finite probes listed apart.'
   step_why:
     1:
       feeds: whether catalog_v4's best pretraining zero-shots Daniel's held-out processes better than the arms trained on
