@@ -35542,6 +35542,38 @@ entries:
       (stored q MSE 0.2791 and truth mean -11.0198 recomputed from the stored npz, which matches the first 2000 rows of the
       local val pool to 7e-7; the 0.194 offset is 20x the 0.0094 per-event sd); one seed is enough (8 seeds agree to 1.7e-4);
       test events are the stored read''s own; about 0.1 GPU-h, disk trivial.'
+  - at: '2026-11-17T19:44:35+00:00'
+    question: 'Where does the constant 0.194 offset in log|M|^2 come from between evaluate_daniels_catalog (CPU, attention
+      mask fixed at 1ce53bcd; MSE 0.4173, mean prediction -11.459) and the stored read catalog_short_DlessInOrd_sigstage (FA-ccin2p3-f6f9251c
+      @c2f90d83, GPU, parent runs/catalog_norm_short/DlessInOrd/sigma_stage, tools/zero_shot_parent.py --parent <sigma_stage>
+      --save-dir, default flags; MSE 0.279, mean -11.265) on the same 2000 dc_bbx_hh val events: the evaluator''s wrapper,
+      CPU vs GPU, or code/weights since 2026-10-23? Eval-only check of the D489 deliverable. REREAD of FA-ccin2p3-f6f9251c.'
+    prior: 'Searched plan (dan_zeroshot_v4 findings), docs/results.tex, analysis scripts and decisions D489 D490 (DlessInOrd_sigstage,
+      evaluate_daniels, sigma_stage, bbx_hh): no earlier GPU re-read. Local CPU checks today: after the fix, 8 augmentation
+      seeds agree to 1.7e-4; forward/reversed files agree exactly; per event the CPU read and the stored one agree in shape
+      (corr 0.994, sd of the difference 0.0094) with a constant 0.194. Two CPU entry points give the same 0.4173: evaluate.py
+      on a fresh pool file, and evaluate.score on the original pool file. The Oct-23 code at 25f16063 + the mask fix, run
+      on CPU through zero_shot_parent.py directly (the stored read''s entry point, its default flags, train stand-in from
+      the val pool), gives the same 0.194. logF of the evaluator equals the stored 4.7112 (t matches the stored t to 1e-6
+      in log(|M|^2 F)). The CC checkpoint is the sigma stage''s (step 149, the main run''s EMA weights, mean frozen).'
+    measure: 'On a CC GPU with xformers, over the first 2000 val events of dc_bbx_hh: MSE of log|M|^2, mean predicted log|M|^2
+      and logF for three reads in one job (scripts/job_evaluate_daniels.sh): (a) evaluate.py with the committed model copy,
+      (b) evaluate.py with runs/catalog_norm_short/DlessInOrd/sigma_stage, (c) the stored read''s own path, tools/zero_shot_parent.py
+      --parent runs/catalog_norm_short/DlessInOrd/sigma_stage at today''s code.'
+    check: 'The two candidate values differ by 0.194 in the mean and 0.14 in MSE, 20x the per-event sd of the difference (0.0094):
+      any read lands clearly on 0.417/-11.46, on 0.279/-11.27, or neither. CPU: (a)-type reads give 0.4173/-11.459 by both
+      entry points.'
+    fixed: Weights and config (DlessInOrd sigma stage), the 2000 events, the code at the job's commit, seed 42 (outputs seed-independent
+      to 1.7e-4).
+    control: The same reads on CPU (0.4173 / -11.459, both entry points) and the stored GPU read (0.279 / -11.265); within
+      the job, (c) is the control for the evaluator's wrapper (a, b).
+    seeds: 'One: the output does not depend on the augmentation seed (8 seeds, 1.7e-4).'
+    outcome: '(a)=(b)=(c)=0.417: GPU and CPU agree at today''s code; the offset is code or weights changed since 2026-10-23
+      (the CPU Oct-23-code read rules out code on CPU, so weights or a GPU-only path then); Suprio''s evaluator matches what
+      our scorer gives now, reported so. (c)=0.279 while (a,b)=0.417: the evaluator''s wrapper differs from the scorer on
+      GPU; find which input before handing over. (a)=(b)=(c)=0.279: a CPU-vs-GPU difference to find before Suprio uses the
+      CPU. (a) != (b): the committed copy is not the run''s model. A read on neither value (off by more than 0.02 in mean
+      from both): reported as such with its logF, and the inputs of that read compared one by one with the CPU read''s.'
   step_why:
     1:
       feeds: whether catalog_v4's best pretraining zero-shots Daniel's held-out processes better than the arms trained on
