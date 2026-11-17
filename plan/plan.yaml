@@ -34217,12 +34217,25 @@ entries:
   notes_ref: null
   match: zng_uq_*,tp*_zng_*
   evidence:
-    runs: []
-    commit: ad28cb6b
+    runs:
+    - FA-ccin2p3-02a0c484
+    - FA-ccin2p3-213da086
+    - FA-ccin2p3-28d56f33
+    - FA-ccin2p3-2d4d3709
+    - FA-ccin2p3-394f20ac
+    - FA-ccin2p3-82eb9944
+    - FA-ccin2p3-966a6561
+    - FA-ccin2p3-b4ebd88e
+    - FA-ccin2p3-ba9df01f
+    commit: 34077f8a
     paths:
     - analysis/zng_uq/benchmark.py
+    - analysis/zng_uq/data/benchmark.json
     - analysis/zng_uq/data/paper_mse.json
+    - analysis/zng_uq/data/parent_bbx.json
+    - analysis/zng_uq/data/zng_curves.json
     - scripts/job_uq_ext.sh
+    - scripts/job_zng_zeroshot.sh
     - tools/zng_uq.py
   dead_ends:
   - tried: 'Their networks (LGATr-slim, LLoCa-Transformer, Transformer, MLP, het) by their own code (scripts/job_uq_ext.sh):
