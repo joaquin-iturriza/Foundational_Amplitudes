@@ -35315,9 +35315,17 @@ entries:
   question: How does our best catalog_v4 pretraining (trial 1262) do zero-shot on the held-out processes of Daniel's catalog
     split (dan_per_process figure), against Suprio's particle-ID embedding and our earlier arms, on the processes catalog_v4
     never trained on?
-  status: waiting_user
-  quotes: []
-  decisions: []
+  status: running
+  quotes:
+  - said_at: '2026-11-17T18:26:00.208000+00:00'
+    text: Okay, but remember that in their case "Interpolation" is what we call a relabeling, so it's fine if there are relabelings,
+      the held outs should truly be held outs
+    decision: D488
+    answers_after: '2026-11-17T18:22:22+00:00'
+    covers:
+    - dan_zeroshot_v4
+  decisions:
+  - D488
   next: Check which of Daniel's 139 held-out processes (and their relabel classes) are in catalog_v4's training; score trial
     1262 eval-only on the rest; redraw dan_per_process with a committed script and the new arm
   done_when: null
@@ -35335,9 +35343,5 @@ entries:
     searched: 'site decisions --project FA and plan entries: dancat_ext (held, a sweep) is the only Daniel-catalog entry;
       none covers a catalog_v4 zero-shot on Daniel''s split. Matched messages: 2026-10-06T00:17 (the transfer study''s plan
       to finish), 2026-11-14T04:31 (a SciPost template paste): neither is about this'
-  ask: 'Scope: new eval-only work, about 1-2 GPU-h. Score trial 1262 zero-shot on Daniel''s held-out processes not in catalog_v4''s
-    training, and redraw the per-process figure with it beside Suprio''s arm. Go?'
-  waiting_since: '2026-11-17T18:22:22+00:00'
-  searched: 'site decisions --project FA and plan entries: dancat_ext (held, a sweep) is the only Daniel-catalog entry; none
-    covers a catalog_v4 zero-shot on Daniel''s split. Matched messages: 2026-10-06T00:17 (the transfer study''s plan to finish),
-    2026-11-14T04:31 (a SciPost template paste): neither is about this'
+    answered_at: '2026-11-17T18:26:00.208000+00:00'
+    decision: D488
