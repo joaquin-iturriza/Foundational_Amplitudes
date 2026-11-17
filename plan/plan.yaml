@@ -33501,12 +33501,10 @@ entries:
     withdrawn_why: 'Joaquin 2026-11-17: ''We already know there is a problem with the finetune start, why are you showing
       me this exactly?''; Fig. 15 stays out under his hold, no rerun asked'
   owner:
-    agent: a4b2e4f58e3b9081f
-    state: closed
-    since: '2026-11-17T11:26:56+00:00'
-    state_at: '2026-11-17T12:35:42+00:00'
-    context: 248803
-    context_at: '2026-11-17T12:12:22+00:00'
+    agent: ab329af4e168e0143
+    state: working
+    since: '2026-11-17T12:43:50.818000+00:00'
+    state_at: '2026-11-17T12:43:50.818000+00:00'
   step_waits:
     '3': '2026-11-20: next draft round'
     '4': the next owner (previous closed at its context limit, hand-off written)
