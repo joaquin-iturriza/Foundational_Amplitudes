@@ -33868,6 +33868,24 @@ entries:
       ((1)/(4) again, too long). Ladder grids: the strip legend above the panels removed (Joaquin: no legend outside); the
       common curves'' legend goes in the panel corner covering fewest points, or merged into one panel''s own legend when
       no corner clears it (rung_grid.grid).'
+  - at: '2026-11-17T12:38:39+00:00'
+    text: '2026-11-17 cause check over Joaquin''s four note files (scratchpad joaquin_figs_, joaquin_figs2_, joaquin_figs3_,
+      joaquin_draft4_2026-11-17.txt) against draft 14fea89. Done now: target T -> A^* (draft 801c504, eq:target and lines
+      635/643/654; Fig. 14 y axis ''trained on A^*'', FA 7a1fdabc); Fig. 14 left legend in his words ''held out, 2->5, only
+      up to 2->4 in pretraining'' / ''1-10 TeV, only up to 1 TeV in pretraining'' (FA 73d5145c; it had regressed to ''(pretrained
+      <=2->4)''; its equal limits opened from 6e-4..2.6e3 to 2e-4..7e3 for the longer entries). Already carried at 14fea89
+      (checked in code/draft): Muon/AdamW ''optimizer'' labels, no ''rung'', no ''ties within 1.2x'', no subfigures/strips,
+      legends inside (grids fixed a0d7fd1f), Fig. 10/12 dataset names, Fig. 12 split, scatter equal limits and compact range,
+      pred/true bin count and ratio range, ladder/star 3x4 grids, Figs. 20-21 merged with YlOrBr, Fig. 15 out. SKIPPED, with
+      reason: (a) figs3 ''why state here that it''s the standardized logM^2? ... then why show it like this?'': Fig. 14 right
+      still on standardized MSE; converting to MSE(log|M|^2) needs the 448-process runs'' standardization (prepd_std per dataset,
+      GM of std^2 over processes) read on the site holding them (analysis/bigrun/arms_best.py) - next owner: read it and replot
+      on MSE(log|M|^2), a clear ask; (b) figs3 ''Why 448 processes? didn''t we rerun this comparison with the new catalog?'':
+      a question already put to him (asked 04:29), no rerun exists, his call; (c) figs3 weekly-presentation order (asymptotic
+      factors): a slide deck, not this draft; (d) figs1 Fig. 9 colour bar for f and Fig. 11 y_min definition / bin order:
+      redrawn in round two (FA 80849a90) and not commented on after (''much better''), not re-verified today on the rendered
+      figures; (e) figs2 ''ladder step 1 at the hyperparameters...'' label: gone from Figs. 18-19 (one step-1 curve), not
+      re-verified on star_arms.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
