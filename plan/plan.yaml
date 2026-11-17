@@ -34358,7 +34358,7 @@ entries:
     decision: D481
   owner:
     agent: a2e3b2c2d3ff318a9
-    state: working
+    state: closed
     since: '2026-11-17T15:36:05+00:00'
     state_at: '2026-11-17T16:45:14.610000+00:00'
     context: 291247
@@ -35219,25 +35219,29 @@ entries:
     start: '2026-11-17T15:13:36+00:00'
     at: '2026-11-17T15:13:36+00:00'
   handoff:
-    state: '2026-11-17 ~18:00. Done: the 8 trainings read (7 of 8 fail the curve test; numbers flagged) and the zero-shot
-      read of 1262 on their 1e6 test events (FA-ccin2p3-7a112608): both in analysis/zng_uq/data/benchmark.json @8f291240,
-      four figures analysis/zng_uq/figs/zng_{median_delta,delta_z4g,pulls,curves} (zero-shot arm in black; drawn @8f291240+legend
-      fix). Write-up: the paragraph ''Against the q qbar -> Z+ng uncertainty benchmark'' and fig:zng in docs/results.tex,
-      UNCOMMITTED (verify_claims --worktree passes; notes-editor items 2-5 applied); commit blocked by the notes-editor pillar,
-      which blocks on par:muon_long (another entry; the main session asks Joaquin). Still to add to it: the zero-shot read
-      (numbers in the 2026-11-17 zero-shot finding; claims from benchmark.py summary, keys zs.<n>.*), then commit, then plan
-      done only after step 4 is settled. Open question to Joaquin (step 4, held): HP search (a) per n ~61 GPU-h, (b) Z+4g
-      only ~33 GPU-h, (c) none. The main session also put to Joaquin: their networks at our 5e5, ladder+star pretraining vs
-      scratch at D 1e2-1e4, or a generation probe for their data size (their paper: 1e7 events per n at Z+1..3g, 1e8 at Z+4g);
-      do nothing on these until he answers.'
-    decisions: 'HPs kit_hpo_uug_T hp1677 as found (Joaquin: take HPs from similar optimised runs); they fail the curve test
-      here, so a search is proposed, asked for the GPU budget. The u-flavour Z+ng models could not be read: their sweeps on
-      CC kept no checkpoints; their recorded u u~ MSEs are the prior. The zero-shot read is split: n=1..3 label transfer against
-      1262''s own b b~ -> Z+1..3g level (parent_bbx.json), n=4 extrapolation (design passed after a FIX).'
-    ruled_out: Training their networks (Joaquin); u-flavour model eval (no checkpoints on CC; Jean Zay/lxplus not checked);
-      kit_hpo_uugg_T hp1196; the matched-input scratch control (Joaquin).
-    running: none
-    files: analysis/zng_uq/benchmark.py (collect on CC with --out $SCRATCH/..., plot, summary for claims, parent); analysis/zng_uq/data/{benchmark,zng_curves,parent_bbx,paper_mse}.json;
-      scripts/job_zng_zeroshot.sh; scripts/job_kit.sh; tools/kit_curves.py; tools/zero_shot_parent.py; docs/results.tex (uncommitted
-      paragraph).
-    written: '2026-11-17T15:32:36+00:00'
+    state: '2026-11-17 ~17:30. Design (four batches, D481/D484/D487) PASSED 15:58; code reviewed and in trunk (job_uq_ext.sh,
+      job_datasaving_parent.sh finale case, sweep_config_tp_zng_hpo_<p>.yaml; e75bcabb). Submitted: (1) smoke of Suprio''s
+      LLoCa-Transformer FA-ccin2p3-7f7f0b53 (job_uq_ext.sh train_shared.sh zng_uq_smoke_z1g UQ_BUILD=1 RUN_N=1 RUN_NETS=lloca,
+      50 steps; builds his env and runs his tests/uq) and the B2 smoke FA-ccin2p3-3e8178a0 (job_kit.sh A on kit_uq_zgggg__me2,
+      T=50, Suprio''s protocol args, KIT_NTEST=2e4), both @12c0ad15. NOT yet submitted: B1 (site run ccin2p3 FA -- python
+      sweep/generate_sweep.py --config sweep/sweep_config_tp_zng_hpo_<p>.yaml for the 4 n, then sweep_manager submit; site
+      pick --jobs 32 --groups 4 first), and the parent''s pool rebuild (scripts/prebuild_recipes.sh recipes/transfer_finale.yaml
+      on CC: 5 train pools missing, uubar_ttbar_nlo, udbar_taunu, ee_mumu_ew_nlo, ee_uu_ew_nlo, uubar_ZZ_nlo smix), then the
+      parent smoke (job_datasaving_parent.sh finale iters=50 tag=zng_uq_smoke) and the parent (tag=zng_uq, --hdr=--time from
+      the smoke''s s/step x 64000 x 1.3 + 1 h). On the smokes: read the logs, take s/step, then (1) RUN_N=1..4 production
+      (RUN_EXP=zng_uq_lloca/z<n>g, no UQ_BUILD) and B2''s 8 runs (A, A_ft x 4 n, T=200000, validate_every 1000, KIT_NTEST=1e6,
+      tag=suprio_protocol) at limits s/step x 2e5 x 1.3 + 1 h; record each batch''s target (plan target). Item est set to
+      125 GPU-h. Write-up paragraph in results.tex uncommitted (paper numbers removed), blocked by notes-editor pillar. Every
+      submission needs --allow-dirty (other agents'' files) and a site pick call of its own before it.'
+    decisions: 'Route to Suprio''s code: clone over ssh with CC''s read key (Joaquin; 9ea31ae3 is gone from trunk). arXiv:2505.20280
+      comparison removed (never Joaquin''s). Item (2): old finale and old-setup grid dropped (D487); new parent in the current
+      setup on the 28 finale processes (1262 config, WSD 1/8, input flags with pair_logs 7, 64000 steps, lr 3.78e-3); stage
+      2 (fine-tunes vs scratch D 1e2..5e5) needs its own design after the parent (horizon calibration). Yes/no at 10x (one-seed
+      spread); 3-10x unresolved, second seed is Joaquin''s call. Step 4 superseded in practice by B1 (D484); held under a
+      date wait.'
+    ruled_out: Their networks other than LLoCa (D481); the old finale parent (D487); using 9ea31ae3 (history rewritten).
+    running: FA-ccin2p3-7f7f0b53 (smoke 1), FA-ccin2p3-3e8178a0 (smoke B2)
+    files: 'scripts/job_uq_ext.sh; scripts/job_kit.sh; scripts/job_datasaving_parent.sh; sweep/sweep_config_tp_zng_hpo_{zg,zgg,zggg,zgggg}.yaml;
+      analysis/zng_uq/benchmark.py (collect needs the new arms: theirs at $WORK/ext/uq_runs/runs/zng_uq_lloca, the suprio_protocol
+      runs, post-search reruns); analysis/zng_uq/figs/zng_median_delta.png; docs/results.tex (uncommitted paragraph)'
+    written: '2026-11-17T16:49:14+00:00'
