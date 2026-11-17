@@ -34848,6 +34848,89 @@ entries:
       our setup''s floor on Z+ng, flagged. (2) gain > +0.3 dex at small D falling to |gain| < 0.2 dex at D >= 10^4 -> the
       u u~ -> Z+4g picture holds on their data; gain > +0.3 dex persisting at D >= 10^4.5 -> the pretraining still saves data
       at their scale; gain < -0.3 dex -> it costs, stated with D.'
+  - at: '2026-11-17T15:55:28+00:00'
+    question: 'Four batches on q qbar -> Z+1..4g, Zenodo 16793011 in Suprio''s split (train 5e5, val 1e5, test 1e6; same events
+      for every arm). (1) D481/D482: Suprio''s LLoCa-Transformer (lloca-experiments-uq, branch uq @1074f6a) trained and scored
+      by his own production (uq_ops/jobs/train_shared.sh, RUN_NETS=lloca, uq=het, seed 0, data_seed 0, config/amplitudes_uq.yaml
+      + amp_default: Adam lr 1e-3 betas (0.99,0.999), batch 1024, <=2e5 steps, ReduceLROnPlateau 0.3/patience 10, early stopping
+      20 validations, validation every 1000 steps, clip 5): his median |Delta|, |Delta| distribution and pulls, the comparison
+      Joaquin asked for. (B2) D484: our latest setup (muP LLoCa, emission-scale target, HETEROSC + sigma stage, float64),
+      scratch and fine-tuned from trial 1262, trained under Suprio''s protocol (the same optimizer/schedule/batch/stopping
+      list, checkpoint on validation NLL): does his training protocol close our gap to his network? (B1) D484: one single-fidelity
+      DyHPO search per multiplicity over the template''s coupled space (Muon, WSD, 12,500 steps, scratch), then scratch (the
+      best trial) and the fine-tune from 1262 at its choice: does our own protocol at searched HPs pass the curve test and
+      where does it land? (2) D482/D483/D487, stage 1 of 2: a new parent, the ladder + star-arm pretraining''s 28 processes
+      (recipes/transfer_finale.yaml: ladder steps 1-9 plus every star arm, the finale''s pools) retrained in our current setup
+      (trial 1262''s config: muP LLoCa, MuonAdamW, emission-scale target with coupling orders, dimensionless inputs + the
+      D392 input flags, HETEROSC + sigma stage) under WSD, at the finale''s 64000 steps: does it train to a converged pretraining
+      on those processes (its per-process val MSE of ln|M|^2 at least as low as the old finale''s, the curve test passing)?
+      Stage 2, its fine-tunes against scratch on Z+ng at D 1e2..5e5 in the same setup, gets its own design once this parent
+      exists (the data-saving protocol''s horizons T(D) need a calibration on these targets first). The old finale''s fine-tunes
+      are dropped (D487: kept only if free; they are not).'
+    prior: 'This entry: our 8 runs at kit_hpo_uug_T hp1677 (Muon lr 6.55e-3, WSD, 12,500 steps x 16384): median |Delta| scratch/ft
+      Z+1g 1.0e-4/4.8e-5 .. Z+4g 2.1e-2/1.6e-2, 7 of 8 fail the curve test (val plateau ~1e-3 then train falls 10-300x below
+      val in the cooldown), pull std up to 28 on Z+4g (benchmark.json @8f291240); zero-shot of 1262 0.098-0.23. Suprio''s
+      network results: none readable (no checkpoints or preds public; his runs are on nemo/ITP). results.tex high-multiplicity
+      full grid (highmult 254/254): on u u~ -> Z+4g the finale gains +0.96..+0.48 dex over scratch at D<=10^3, +0.21 at 10^3.5,
+      -0.11/-0.21/-0.06 at 10^4/10^4.5/10^5 (one seed); the 128k-step horizon test at 10^4.5 moved neither arm >10%. The finale
+      vs rung 9 on u u~ -> Zg/Zgg/Zggg (8k grid, D 10^1..10^4): better on 6/7, 7/7, 7/7 cells. Searched: zng, Z+4g, highmult,
+      finale, hmscr, finfte, ReduceLROnPlateau, Adam lr 1e-3, batch 1024 in results.tex; plan entry; D476-D484. No earlier
+      run of our network under Suprio''s protocol; no earlier Z+ng search on this data (the u u~ Z+ng searches tp_scr_*/tp3_scr32k_*
+      are on our own pools, MSE loss). (2): the old finale (hp73, 28 processes, 64000 steps, older setup: per-dataset standardisation,
+      MSE loss, cosine) is the reference parent; no current-setup pretraining on these 28 exists; the data-saving parents
+      (dsave_parent_heldout*, current setup, 1e4 events per pool, ~4300 steps) are the protocol''s precedent, dsave_parent_heldoutbbzz_wsd
+      the WSD one.'
+    measure: 'Per run on the same 1e6 test events: Suprio''s metrics (his experiments/uq/metrics.py, the same functions as
+      analysis/zng_uq/benchmark.py collect): median, q90, q99 |Delta| with Delta = expm1(mu - truth) in ln|M|^2, |Delta| histogram
+      on Z+4g, pulls (truth-mu)/sigma with std, mean and 68% coverage; MSE of standardised ln|M|^2; the curve test (tools/kit_curves.py)
+      for our runs. (1) is read by benchmark.py collect --theirs (his preds_test_0.npz; asserts his test indices and truth
+      equal ours event by event) and his own plots/fallback. (2) the parent''s per-process val MSE of ln|M|^2 at its best
+      checkpoint (per_process_metrics.json, analysis/common run_metrics/best_checkpoint), its val/train curves (tools/kit_curves.py
+      curve test).'
+    check: 'The measure moves with these changes on existing data: across our 8 runs median |Delta| spans 4.8e-5..2.1e-2 and
+      pull std 0.99..28 (benchmark.json @8f291240), and the scratch vs fine-tune difference (1.3-2.1x) is read by it; the
+      zero-shot arm moves it by 10-1000x. For (2): the old finale''s per-process val MSEs on these pools exist (its out_0.log,
+      metrics on CC) and the current setup''s pretraining moved the catalog_v4 val MSE by orders against older setups (results.tex
+      par:v4 WSD and catalog_v4 sections), so a setup difference shows in this measure.'
+    fixed: 'Data: uq_<p>.h5 (tools/zng_uq.py) = his data_seed-0 split; the same 1e6 test events for (1), (B1), (B2) and the
+      earlier 8 runs; (2) val 1e5 = his val, n_test 1e5. (1) scripts/job_uq_ext.sh: his repo cloned over ssh with the CC account''s
+      read key into $WORK/ext at 1074f6a (nothing of his in our repo), his pinned env (torch 2.9.1 cu126, flash_attn/xformers
+      left out), train_shared.sh unchanged, RUN_N=1..4, RUN_NETS=lloca, RUN_EXP=zng_uq_lloca/z<n>g. (B2) scripts/job_kit.sh
+      A and A_ft (parent 1262, fine_tune.lr_scale 1, target_stats own), T=200000, extra: training.batchsize=1024 training.optimizer=Adam
+      training.lr=1e-3 training.betas=[0.99,0.999] training.weight_decay=0 training.regularization_lambda=0 ema=false training.scheduler=ReduceLROnPlateau
+      training.reduceplateau_factor=0.3 training.reduceplateau_patience=10 training.validate_frac=0 training.validate_every_n_steps=1000
+      training.es_patience=20000 training.clip_grad_norm=5 training.heterosc_select=nll tag=suprio_protocol, KIT_NTEST=1e6;
+      everything else the 8 runs'' (MuAdam under muP). (B1) sweep/sweep_config_tp_zng_hpo_<p>.yaml: base = the earlier scratch
+      run''s config, kit_hpo_uug_T''s space and objective (val mu-MSE), 8 trials, waves 3,3,2, seed 42; then A_ft from 1262
+      at the best trial''s HPs (later submission). (2) scripts/job_datasaving_parent.sh finale: base trial 1262''s config.yaml,
+      recipe recipes/transfer_finale.yaml, every train event (no subsample), training.iterations=64000 (the finale''s), lr
+      3.78e-3 (1262''s 3.649e-3 at 68224 steps on its law 7.82114e-3 (T/17056)^-0.55), args training.scheduler=WSD training.wsd_cooldown_frac=0.125
+      ++model.input_soft_eps=1e-8 ++model.input_pair_logs=6 tag=zng_uq; run dir runs/data_saving/dsave_parent_finale_zng_uq;
+      smoke (D395) iters=50 tag=zng_uq_smoke through the sigma stage and plots. Smokes of (1): UQ_BUILD=1, RUN_N=1, RUN_EXTRA=''training.iterations=50
+      training.validate_every_n_steps=25 data.n_calib=10000 data.n_test=10000'' (builds his env under a lock, his tests/uq
+      must pass, else exit 4; production jobs refuse without the tested env); (B2) Z+4g A, T=50, validate every 25, KIT_NTEST
+      2e4. B1 runs the path of kit_hpo_uug_T and the 8 runs: no smoke. Wall targets and limits: (1) ~3-6 h per n (his paper
+      2.1 h on H100 at Z+4g), limit 12 h; (B2) ~0.07 s/step x 2e5 ~4 h at Z+4g, limit 12 h; (B1) trial ~2.2 h at Z+4g (0.59
+      s/step measured on the 8 runs), limit 4 h; (2) parent: the old finale''s 64000 steps took 6.67 h on lxplus at the old
+      setup; the current setup at batch 16384 is estimated 0.3-0.5 s/step -> 5-9 h, limit 24 h, read from its first log lines.
+      GPU-h expected: (1) ~20, (B2) ~35, (B1) ~61 with the A_ft reruns, (2) parent ~9 (+0.2 smoke); total ~125.'
+    control: '(1) against (B1)/(B2)/the earlier 8: same events, same metrics; (1) vs (B2) differ in the network and its input/target
+      pipeline only (the training protocol matched), which is the comparison Joaquin asked for. (B2) vs the earlier 8 runs:
+      same network, data, target, scoring; the training protocol is the change. (B1) scratch best vs the earlier scratch:
+      the HPs searched vs taken. (2) the parent against the old finale (tp3_finale hp73) on the same 28 processes: per-process
+      val MSE of ln|M|^2 at its best checkpoint (its sigma stage''s final model, D276); the setup is the change.'
+    seeds: 'One per run as every earlier arm of this entry and the high-multiplicity grid: (1) seed 0, data_seed 0 (his production);
+      (B2), (B1) seed 42; (2) the parent seed 42 (1262 config); the 3x/0.3 dex resolution of one seed is what the outcomes
+      use.'
+    outcome: 'Smokes YES: each stage writes its file ((1) preds_test_0.npz, fallback_0.json, plots; (B2) kit_benchmark/predictions.h5
+      and sigma_ln.npy; (2) a result per trial with val_loss and prepd_std) -> the batch goes; NO -> fix the launch path,
+      smoke again. (1) his LLoCa median |Delta| per n and pulls are the reference; our best arm within 3x of his median |Delta|
+      at an n -> comparable there; above 10x -> our setup is behind, stated per n. (B2) our run passes the curve test and
+      its median |Delta| falls below the earlier 8 runs'' by >3x -> his protocol fixes our training; within 3x -> the protocol
+      is not the gap. (B1) a trial passes the curve test -> the A_ft rerun at its HPs, read as (B2); none passes -> report
+      our setup''s floor on Z+ng, flagged. (2) parent: completes 64000 steps without blowing up, curve test passes and its
+      geometric-mean val MSE over the 28 is within 3x of or below the old finale''s -> it is the parent of stage 2; else the
+      failure (where, which processes) is reported and stage 2 waits on a fix.'
   step_why:
     4:
       feeds: whether our setup, trained well, comes within 3x of their networks on Z+ng
