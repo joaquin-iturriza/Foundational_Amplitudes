@@ -1,0 +1,7042 @@
+exp_type: amplitudes
+exp_name: dancat_het_pre
+data:
+  source: recipes
+  dataset:
+  - dc_bb_bb
+  - dc_bb_bba
+  - dc_bb_bbh
+  - dc_bb_bbz
+  - dc_bb_btwm
+  - dc_bb_gbb
+  - dc_bbx_aa
+  - dc_bbx_aaa
+  - dc_bbx_aah
+  - dc_bbx_aaz
+  - dc_bbx_aemep
+  - dc_bbx_ah
+  - dc_bbx_atamtap
+  - dc_bbx_avevex
+  - dc_bbx_avtvtx
+  - dc_bbx_az
+  - dc_bbx_azh
+  - dc_bbx_azz
+  - dc_bbx_bbx
+  - dc_bbx_bbxa
+  - dc_bbx_bbxh
+  - dc_bbx_bbxz
+  - dc_bbx_btxwp
+  - dc_bbx_ccx
+  - dc_bbx_ccxa
+  - dc_bbx_ccxh
+  - dc_bbx_ccxz
+  - dc_bbx_csxwm
+  - dc_bbx_ddx
+  - dc_bbx_ddxa
+  - dc_bbx_ddxh
+  - dc_bbx_ddxz
+  - dc_bbx_duxwp
+  - dc_bbx_emep
+  - dc_bbx_ga
+  - dc_bbx_gaa
+  - dc_bbx_gah
+  - dc_bbx_gaz
+  - dc_bbx_gbbx
+  - dc_bbx_gccx
+  - dc_bbx_gddx
+  - dc_bbx_gemep
+  - dc_bbx_gg
+  - dc_bbx_gga
+  - dc_bbx_ggg
+  - dc_bbx_ggh
+  - dc_bbx_ggz
+  - dc_bbx_gh
+  - dc_bbx_gssx
+  - dc_bbx_gtamtap
+  - dc_bbx_gttx
+  - dc_bbx_guux
+  - dc_bbx_gvevex
+  - dc_bbx_gvtvtx
+  - dc_bbx_gwpwm
+  - dc_bbx_gz
+  - dc_bbx_gzh
+  - dc_bbx_gzz
+  - dc_bbx_hemep
+  - dc_bbx_hvevex
+  - dc_bbx_hvtvtx
+  - dc_bbx_scxwp
+  - dc_bbx_ssx
+  - dc_bbx_ssxa
+  - dc_bbx_ssxh
+  - dc_bbx_ssxz
+  - dc_bbx_tamtap
+  - dc_bbx_tbxwm
+  - dc_bbx_ttx
+  - dc_bbx_ttxa
+  - dc_bbx_ttxh
+  - dc_bbx_ttxz
+  - dc_bbx_udxwm
+  - dc_bbx_uux
+  - dc_bbx_uuxa
+  - dc_bbx_uuxh
+  - dc_bbx_uuxz
+  - dc_bbx_vevex
+  - dc_bbx_vtvtx
+  - dc_bbx_wmepve
+  - dc_bbx_wmtapvt
+  - dc_bbx_wpemvex
+  - dc_bbx_wptamvtx
+  - dc_bbx_wpwm
+  - dc_bbx_wpwma
+  - dc_bbx_wpwmh
+  - dc_bbx_wpwmz
+  - dc_bbx_zemep
+  - dc_bbx_zh
+  - dc_bbx_ztamtap
+  - dc_bbx_zvevex
+  - dc_bbx_zvtvtx
+  - dc_bbx_zz
+  - dc_bbx_zzh
+  - dc_bcx_bcx
+  - dc_bcx_bcxa
+  - dc_bcx_bcxh
+  - dc_bcx_bcxz
+  - dc_bcx_bsxwm
+  - dc_bcx_gbcx
+  - dc_bcx_tcxwm
+  - dc_bdx_bdx
+  - dc_bdx_bdxa
+  - dc_bdx_bdxh
+  - dc_bdx_bdxz
+  - dc_bdx_buxwp
+  - dc_bdx_gbdx
+  - dc_bdx_gtux
+  - dc_bdx_tdxwm
+  - dc_bdx_tuxa
+  - dc_bdx_tuxh
+  - dc_bdx_tuxz
+  - dc_bsx_bcxwp
+  - dc_bsx_gtcx
+  - dc_bsx_tcxa
+  - dc_bsx_tcxh
+  - dc_bsx_tcxz
+  - dc_bux_bdxwm
+  - dc_bux_bux
+  - dc_bux_buxa
+  - dc_bux_buxh
+  - dc_bux_buxz
+  - dc_bux_gbux
+  - dc_bux_tuxwm
+  - dc_bxbx_bxbx
+  - dc_bxbx_bxbxa
+  - dc_bxbx_bxbxh
+  - dc_bxbx_bxbxz
+  - dc_bxbx_bxtxwp
+  - dc_bxbx_gbxbx
+  - dc_cbx_cbx
+  - dc_cbx_cbxa
+  - dc_cbx_cbxh
+  - dc_cbx_cbxz
+  - dc_cbx_ctxwp
+  - dc_cbx_gcbx
+  - dc_cbx_sbxwp
+  - dc_cc_cc
+  - dc_cc_cca
+  - dc_cc_cch
+  - dc_cc_ccz
+  - dc_cc_gcc
+  - dc_cc_scwp
+  - dc_ccx_aa
+  - dc_ccx_aaa
+  - dc_ccx_aaz
+  - dc_ccx_aemep
+  - dc_ccx_amummup
+  - dc_ccx_atamtap
+  - dc_ccx_avevex
+  - dc_ccx_avmvmx
+  - dc_ccx_avtvtx
+  - dc_ccx_az
+  - dc_ccx_azh
+  - dc_ccx_azz
+  - dc_ccx_bbx
+  - dc_ccx_bbxa
+  - dc_ccx_bbxh
+  - dc_ccx_bbxz
+  - dc_ccx_btxwp
+  - dc_ccx_ccx
+  - dc_ccx_ccxa
+  - dc_ccx_ccxh
+  - dc_ccx_ccxz
+  - dc_ccx_csxwm
+  - dc_ccx_ddx
+  - dc_ccx_ddxa
+  - dc_ccx_ddxh
+  - dc_ccx_ddxz
+  - dc_ccx_duxwp
+  - dc_ccx_emep
+  - dc_ccx_ga
+  - dc_ccx_gaa
+  - dc_ccx_gaz
+  - dc_ccx_gbbx
+  - dc_ccx_gccx
+  - dc_ccx_gddx
+  - dc_ccx_gemep
+  - dc_ccx_gg
+  - dc_ccx_gga
+  - dc_ccx_ggg
+  - dc_ccx_ggz
+  - dc_ccx_gmummup
+  - dc_ccx_gssx
+  - dc_ccx_gtamtap
+  - dc_ccx_gttx
+  - dc_ccx_guux
+  - dc_ccx_gvevex
+  - dc_ccx_gvmvmx
+  - dc_ccx_gvtvtx
+  - dc_ccx_gwpwm
+  - dc_ccx_gz
+  - dc_ccx_gzh
+  - dc_ccx_gzz
+  - dc_ccx_hemep
+  - dc_ccx_hmummup
+  - dc_ccx_hvevex
+  - dc_ccx_hvmvmx
+  - dc_ccx_hvtvtx
+  - dc_ccx_mummup
+  - dc_ccx_scxwp
+  - dc_ccx_ssx
+  - dc_ccx_ssxa
+  - dc_ccx_ssxh
+  - dc_ccx_ssxz
+  - dc_ccx_tamtap
+  - dc_ccx_tbxwm
+  - dc_ccx_ttx
+  - dc_ccx_ttxa
+  - dc_ccx_ttxh
+  - dc_ccx_ttxz
+  - dc_ccx_udxwm
+  - dc_ccx_uux
+  - dc_ccx_uuxa
+  - dc_ccx_uuxh
+  - dc_ccx_uuxz
+  - dc_ccx_vevex
+  - dc_ccx_vmvmx
+  - dc_ccx_vtvtx
+  - dc_ccx_wmepve
+  - dc_ccx_wmmupvm
+  - dc_ccx_wmtapvt
+  - dc_ccx_wpemvex
+  - dc_ccx_wpmumvmx
+  - dc_ccx_wptamvtx
+  - dc_ccx_wpwm
+  - dc_ccx_wpwma
+  - dc_ccx_wpwmh
+  - dc_ccx_wpwmz
+  - dc_ccx_zemep
+  - dc_ccx_zh
+  - dc_ccx_zmummup
+  - dc_ccx_ztamtap
+  - dc_ccx_zvevex
+  - dc_ccx_zvmvmx
+  - dc_ccx_zvtvtx
+  - dc_ccx_zz
+  - dc_ccx_zzh
+  - dc_cd_su
+  - dc_cdx_cdx
+  - dc_cdx_cdxa
+  - dc_cdx_cdxh
+  - dc_cdx_cdxz
+  - dc_cdx_cuxwp
+  - dc_cdx_gcdx
+  - dc_cdx_sdxwp
+  - dc_csx_aepve
+  - dc_csx_amupvm
+  - dc_csx_atapvt
+  - dc_csx_bbxwp
+  - dc_csx_ccxwp
+  - dc_csx_csx
+  - dc_csx_csxa
+  - dc_csx_csxh
+  - dc_csx_csxz
+  - dc_csx_ddxwp
+  - dc_csx_epve
+  - dc_csx_gcsx
+  - dc_csx_gepve
+  - dc_csx_ggwp
+  - dc_csx_gmupvm
+  - dc_csx_gtapvt
+  - dc_csx_gtbx
+  - dc_csx_gudx
+  - dc_csx_gwp
+  - dc_csx_gwpa
+  - dc_csx_gwph
+  - dc_csx_gwpz
+  - dc_csx_hepve
+  - dc_csx_hmupvm
+  - dc_csx_mupvm
+  - dc_csx_ssxwp
+  - dc_csx_tapvt
+  - dc_csx_tbx
+  - dc_csx_tbxa
+  - dc_csx_tbxh
+  - dc_csx_tbxz
+  - dc_csx_ttxwp
+  - dc_csx_udx
+  - dc_csx_udxa
+  - dc_csx_udxh
+  - dc_csx_udxz
+  - dc_csx_uuxwp
+  - dc_csx_wpa
+  - dc_csx_wpaa
+  - dc_csx_wpah
+  - dc_csx_wpaz
+  - dc_csx_wpemep
+  - dc_csx_wph
+  - dc_csx_wpmummup
+  - dc_csx_wptamtap
+  - dc_csx_wpvevex
+  - dc_csx_wpvmvmx
+  - dc_csx_wpvtvtx
+  - dc_csx_wpz
+  - dc_csx_wpzh
+  - dc_csx_wpzz
+  - dc_csx_zepve
+  - dc_csx_zmupvm
+  - dc_csx_ztapvt
+  - dc_cux_cdxwm
+  - dc_cux_gsdx
+  - dc_cux_sdx
+  - dc_cux_sdxa
+  - dc_cux_sdxh
+  - dc_cux_sdxz
+  - dc_cux_suxwp
+  - dc_cxcx_cxcx
+  - dc_cxcx_cxcxa
+  - dc_cxcx_cxcxh
+  - dc_cxcx_cxcxz
+  - dc_cxcx_gcxcx
+  - dc_cxcx_sxcxwm
+  - dc_cxdx_sxux
+  - dc_db_db
+  - dc_db_dba
+  - dc_db_dbh
+  - dc_db_dbz
+  - dc_db_dtwm
+  - dc_db_gdb
+  - dc_db_ubwm
+  - dc_dbx_dbx
+  - dc_dbx_dbxa
+  - dc_dbx_dbxh
+  - dc_dbx_dbxz
+  - dc_dbx_dtxwp
+  - dc_dbx_gdbx
+  - dc_dbx_gutx
+  - dc_dbx_ubxwm
+  - dc_dbx_utx
+  - dc_dbx_utxa
+  - dc_dbx_utxh
+  - dc_dbx_utxz
+  - dc_dc_dc
+  - dc_dc_dca
+  - dc_dc_dch
+  - dc_dc_dcz
+  - dc_dc_dswp
+  - dc_dc_gdc
+  - dc_dc_gus
+  - dc_dc_ucwm
+  - dc_dc_usa
+  - dc_dc_ush
+  - dc_dc_usz
+  - dc_dcx_dcx
+  - dc_dcx_dcxa
+  - dc_dcx_dcxh
+  - dc_dcx_dcxz
+  - dc_dcx_dsxwm
+  - dc_dcx_gdcx
+  - dc_dcx_ucxwm
+  - dc_dd_dd
+  - dc_dd_dda
+  - dc_dd_ddh
+  - dc_dd_ddz
+  - dc_dd_gdd
+  - dc_dd_udwm
+  - dc_ddx_aa
+  - dc_ddx_aaa
+  - dc_ddx_aaz
+  - dc_ddx_aemep
+  - dc_ddx_amummup
+  - dc_ddx_atamtap
+  - dc_ddx_avevex
+  - dc_ddx_avmvmx
+  - dc_ddx_avtvtx
+  - dc_ddx_az
+  - dc_ddx_azh
+  - dc_ddx_azz
+  - dc_ddx_bbx
+  - dc_ddx_bbxa
+  - dc_ddx_bbxh
+  - dc_ddx_bbxz
+  - dc_ddx_btxwp
+  - dc_ddx_ccx
+  - dc_ddx_ccxa
+  - dc_ddx_ccxh
+  - dc_ddx_ccxz
+  - dc_ddx_csxwm
+  - dc_ddx_ddx
+  - dc_ddx_ddxa
+  - dc_ddx_ddxh
+  - dc_ddx_ddxz
+  - dc_ddx_duxwp
+  - dc_ddx_emep
+  - dc_ddx_ga
+  - dc_ddx_gaa
+  - dc_ddx_gaz
+  - dc_ddx_gbbx
+  - dc_ddx_gccx
+  - dc_ddx_gddx
+  - dc_ddx_gemep
+  - dc_ddx_gg
+  - dc_ddx_gga
+  - dc_ddx_ggg
+  - dc_ddx_ggz
+  - dc_ddx_gmummup
+  - dc_ddx_gssx
+  - dc_ddx_gtamtap
+  - dc_ddx_gttx
+  - dc_ddx_guux
+  - dc_ddx_gvevex
+  - dc_ddx_gvmvmx
+  - dc_ddx_gvtvtx
+  - dc_ddx_gwpwm
+  - dc_ddx_gz
+  - dc_ddx_gzh
+  - dc_ddx_gzz
+  - dc_ddx_hemep
+  - dc_ddx_hmummup
+  - dc_ddx_hvevex
+  - dc_ddx_hvmvmx
+  - dc_ddx_hvtvtx
+  - dc_ddx_mummup
+  - dc_ddx_scxwp
+  - dc_ddx_ssx
+  - dc_ddx_ssxa
+  - dc_ddx_ssxh
+  - dc_ddx_ssxz
+  - dc_ddx_tamtap
+  - dc_ddx_tbxwm
+  - dc_ddx_ttx
+  - dc_ddx_ttxa
+  - dc_ddx_ttxh
+  - dc_ddx_ttxz
+  - dc_ddx_udxwm
+  - dc_ddx_uux
+  - dc_ddx_uuxa
+  - dc_ddx_uuxh
+  - dc_ddx_uuxz
+  - dc_ddx_vevex
+  - dc_ddx_vmvmx
+  - dc_ddx_vtvtx
+  - dc_ddx_wmepve
+  - dc_ddx_wmmupvm
+  - dc_ddx_wmtapvt
+  - dc_ddx_wpemvex
+  - dc_ddx_wpmumvmx
+  - dc_ddx_wptamvtx
+  - dc_ddx_wpwm
+  - dc_ddx_wpwma
+  - dc_ddx_wpwmh
+  - dc_ddx_wpwmz
+  - dc_ddx_zemep
+  - dc_ddx_zh
+  - dc_ddx_zmummup
+  - dc_ddx_ztamtap
+  - dc_ddx_zvevex
+  - dc_ddx_zvmvmx
+  - dc_ddx_zvtvtx
+  - dc_ddx_zz
+  - dc_ddx_zzh
+  - dc_ds_dcwm
+  - dc_ds_uswm
+  - dc_dsx_dcxwp
+  - dc_dsx_dsx
+  - dc_dsx_dsxa
+  - dc_dsx_dsxh
+  - dc_dsx_dsxz
+  - dc_dsx_gdsx
+  - dc_dsx_gucx
+  - dc_dsx_ucx
+  - dc_dsx_ucxa
+  - dc_dsx_ucxh
+  - dc_dsx_ucxz
+  - dc_dsx_usxwm
+  - dc_dux_aemvex
+  - dc_dux_amumvmx
+  - dc_dux_atamvtx
+  - dc_dux_bbxwm
+  - dc_dux_btxa
+  - dc_dux_btxh
+  - dc_dux_btxz
+  - dc_dux_ccxwm
+  - dc_dux_ddxwm
+  - dc_dux_dux
+  - dc_dux_duxa
+  - dc_dux_duxh
+  - dc_dux_duxz
+  - dc_dux_emvex
+  - dc_dux_gbtx
+  - dc_dux_gdux
+  - dc_dux_gemvex
+  - dc_dux_ggwm
+  - dc_dux_gmumvmx
+  - dc_dux_gscx
+  - dc_dux_gtamvtx
+  - dc_dux_gwm
+  - dc_dux_gwma
+  - dc_dux_gwmh
+  - dc_dux_gwmz
+  - dc_dux_hemvex
+  - dc_dux_hmumvmx
+  - dc_dux_mumvmx
+  - dc_dux_scx
+  - dc_dux_scxa
+  - dc_dux_scxh
+  - dc_dux_scxz
+  - dc_dux_ssxwm
+  - dc_dux_tamvtx
+  - dc_dux_ttxwm
+  - dc_dux_txb
+  - dc_dux_uuxwm
+  - dc_dux_wma
+  - dc_dux_wmaa
+  - dc_dux_wmah
+  - dc_dux_wmaz
+  - dc_dux_wmemep
+  - dc_dux_wmh
+  - dc_dux_wmmummup
+  - dc_dux_wmtamtap
+  - dc_dux_wmvevex
+  - dc_dux_wmvmvmx
+  - dc_dux_wmvtvtx
+  - dc_dux_wmz
+  - dc_dux_wmzh
+  - dc_dux_wmzz
+  - dc_dux_zemvex
+  - dc_dux_zmumvmx
+  - dc_dux_ztamvtx
+  - dc_dxb_uxt
+  - dc_dxbx_dxbx
+  - dc_dxbx_dxbxa
+  - dc_dxbx_dxbxh
+  - dc_dxbx_dxbxz
+  - dc_dxbx_dxtxwp
+  - dc_dxbx_gdxbx
+  - dc_dxbx_uxbxwp
+  - dc_dxcx_dxcx
+  - dc_dxcx_dxcxa
+  - dc_dxcx_dxcxh
+  - dc_dxcx_dxcxz
+  - dc_dxcx_dxsxwm
+  - dc_dxcx_gdxcx
+  - dc_dxcx_guxsx
+  - dc_dxcx_uxcxwp
+  - dc_dxcx_uxsxa
+  - dc_dxcx_uxsxh
+  - dc_dxcx_uxsxz
+  - dc_dxdx_dxdx
+  - dc_dxdx_dxdxa
+  - dc_dxdx_dxdxh
+  - dc_dxdx_dxdxz
+  - dc_dxdx_gdxdx
+  - dc_dxdx_uxdxwp
+  - dc_dxsx_dxcxwp
+  - dc_dxsx_dxsx
+  - dc_dxsx_dxsxa
+  - dc_dxsx_dxsxh
+  - dc_dxsx_dxsxz
+  - dc_dxsx_gdxsx
+  - dc_dxsx_uxsxwp
+  - dc_gb_ba
+  - dc_gb_baa
+  - dc_gb_bah
+  - dc_gb_baz
+  - dc_gb_bbbx
+  - dc_gb_bemep
+  - dc_gb_bh
+  - dc_gb_bmummup
+  - dc_gb_btamtap
+  - dc_gb_bttx
+  - dc_gb_bvevex
+  - dc_gb_bvmvmx
+  - dc_gb_bvtvtx
+  - dc_gb_bwpwm
+  - dc_gb_bz
+  - dc_gb_bzh
+  - dc_gb_bzz
+  - dc_gb_cbcx
+  - dc_gb_dbdx
+  - dc_gb_dtux
+  - dc_gb_gb
+  - dc_gb_gba
+  - dc_gb_gbh
+  - dc_gb_gbz
+  - dc_gb_ggb
+  - dc_gb_gtwm
+  - dc_gb_sbsx
+  - dc_gb_stcx
+  - dc_gb_temvex
+  - dc_gb_tmumvmx
+  - dc_gb_ttamvtx
+  - dc_gb_twm
+  - dc_gb_twma
+  - dc_gb_twmh
+  - dc_gb_twmz
+  - dc_gb_ubux
+  - dc_gbx_bbxbx
+  - dc_gbx_bxa
+  - dc_gbx_bxaa
+  - dc_gbx_bxah
+  - dc_gbx_bxaz
+  - dc_gbx_bxemep
+  - dc_gbx_bxh
+  - dc_gbx_bxmummup
+  - dc_gbx_bxtamtap
+  - dc_gbx_bxvevex
+  - dc_gbx_bxvmvmx
+  - dc_gbx_bxvtvtx
+  - dc_gbx_bxwpwm
+  - dc_gbx_bxz
+  - dc_gbx_bxzh
+  - dc_gbx_bxzz
+  - dc_gbx_ccxbx
+  - dc_gbx_csxtx
+  - dc_gbx_ddxbx
+  - dc_gbx_gbx
+  - dc_gbx_gbxa
+  - dc_gbx_gbxh
+  - dc_gbx_gbxz
+  - dc_gbx_ggbx
+  - dc_gbx_gtxwp
+  - dc_gbx_ssxbx
+  - dc_gbx_tbxtx
+  - dc_gbx_txepve
+  - dc_gbx_txmupvm
+  - dc_gbx_txtapvt
+  - dc_gbx_txwp
+  - dc_gbx_txwpa
+  - dc_gbx_txwph
+  - dc_gbx_txwpz
+  - dc_gbx_udxtx
+  - dc_gbx_uuxbx
+  - dc_gc_ca
+  - dc_gc_caa
+  - dc_gc_caz
+  - dc_gc_cbbx
+  - dc_gc_cccx
+  - dc_gc_cemep
+  - dc_gc_cmummup
+  - dc_gc_ctamtap
+  - dc_gc_cttx
+  - dc_gc_cvevex
+  - dc_gc_cvmvmx
+  - dc_gc_cvtvtx
+  - dc_gc_cwpwm
+  - dc_gc_cz
+  - dc_gc_czh
+  - dc_gc_czz
+  - dc_gc_dcdx
+  - dc_gc_gc
+  - dc_gc_gca
+  - dc_gc_gcz
+  - dc_gc_ggc
+  - dc_gc_gswp
+  - dc_gc_scsx
+  - dc_gc_sepve
+  - dc_gc_smupvm
+  - dc_gc_stapvt
+  - dc_gc_stbx
+  - dc_gc_swp
+  - dc_gc_swpa
+  - dc_gc_swph
+  - dc_gc_swpz
+  - dc_gc_ucux
+  - dc_gc_usdx
+  - dc_gcx_bcxbx
+  - dc_gcx_bsxtx
+  - dc_gcx_ccxcx
+  - dc_gcx_cxa
+  - dc_gcx_cxaa
+  - dc_gcx_cxaz
+  - dc_gcx_cxemep
+  - dc_gcx_cxmummup
+  - dc_gcx_cxtamtap
+  - dc_gcx_cxvevex
+  - dc_gcx_cxvmvmx
+  - dc_gcx_cxvtvtx
+  - dc_gcx_cxwpwm
+  - dc_gcx_cxz
+  - dc_gcx_cxzh
+  - dc_gcx_cxzz
+  - dc_gcx_ddxcx
+  - dc_gcx_duxsx
+  - dc_gcx_gcx
+  - dc_gcx_gcxa
+  - dc_gcx_gcxz
+  - dc_gcx_ggcx
+  - dc_gcx_gsxwm
+  - dc_gcx_ssxcx
+  - dc_gcx_sxemvex
+  - dc_gcx_sxmumvmx
+  - dc_gcx_sxtamvtx
+  - dc_gcx_sxwm
+  - dc_gcx_sxwma
+  - dc_gcx_sxwmh
+  - dc_gcx_sxwmz
+  - dc_gcx_tcxtx
+  - dc_gcx_uuxcx
+  - dc_gd_da
+  - dc_gd_daa
+  - dc_gd_daz
+  - dc_gd_dbbx
+  - dc_gd_dccx
+  - dc_gd_dddx
+  - dc_gd_demep
+  - dc_gd_dmummup
+  - dc_gd_dssx
+  - dc_gd_dtamtap
+  - dc_gd_dttx
+  - dc_gd_dvevex
+  - dc_gd_dvmvmx
+  - dc_gd_dvtvtx
+  - dc_gd_dwpwm
+  - dc_gd_dz
+  - dc_gd_dzh
+  - dc_gd_dzz
+  - dc_gd_gd
+  - dc_gd_gda
+  - dc_gd_gdz
+  - dc_gd_ggd
+  - dc_gd_guwm
+  - dc_gd_ubtx
+  - dc_gd_udux
+  - dc_gd_uemvex
+  - dc_gd_umumvmx
+  - dc_gd_uscx
+  - dc_gd_utamvtx
+  - dc_gd_uwm
+  - dc_gd_uwma
+  - dc_gd_uwmh
+  - dc_gd_uwmz
+  - dc_gdx_bdxbx
+  - dc_gdx_cdxcx
+  - dc_gdx_cuxsx
+  - dc_gdx_ddxdx
+  - dc_gdx_dxa
+  - dc_gdx_dxaa
+  - dc_gdx_dxaz
+  - dc_gdx_dxemep
+  - dc_gdx_dxmummup
+  - dc_gdx_dxtamtap
+  - dc_gdx_dxvevex
+  - dc_gdx_dxvmvmx
+  - dc_gdx_dxvtvtx
+  - dc_gdx_dxwpwm
+  - dc_gdx_dxz
+  - dc_gdx_dxzh
+  - dc_gdx_dxzz
+  - dc_gdx_gdx
+  - dc_gdx_gdxa
+  - dc_gdx_gdxz
+  - dc_gdx_ggdx
+  - dc_gdx_guxwp
+  - dc_gdx_sdxsx
+  - dc_gdx_tdxtx
+  - dc_gdx_tuxbx
+  - dc_gdx_uuxdx
+  - dc_gdx_uxepve
+  - dc_gdx_uxmupvm
+  - dc_gdx_uxtapvt
+  - dc_gdx_uxwp
+  - dc_gdx_uxwpa
+  - dc_gdx_uxwph
+  - dc_gdx_uxwpz
+  - dc_gg_bbx
+  - dc_gg_bbxa
+  - dc_gg_bbxh
+  - dc_gg_bbxz
+  - dc_gg_ccx
+  - dc_gg_ccxa
+  - dc_gg_ccxz
+  - dc_gg_ddx
+  - dc_gg_ddxa
+  - dc_gg_ddxz
+  - dc_gg_gbbx
+  - dc_gg_gccx
+  - dc_gg_gddx
+  - dc_gg_gg
+  - dc_gg_ggg
+  - dc_gg_gssx
+  - dc_gg_guux
+  - dc_gg_ssx
+  - dc_gg_ssxa
+  - dc_gg_ssxz
+  - dc_gg_ttx
+  - dc_gg_uux
+  - dc_gg_uuxa
+  - dc_gg_uuxz
+  - dc_gs_cbtx
+  - dc_gs_cemvex
+  - dc_gs_cmumvmx
+  - dc_gs_ctamvtx
+  - dc_gs_cwm
+  - dc_gs_cwma
+  - dc_gs_cwmh
+  - dc_gs_cwmz
+  - dc_gs_dcux
+  - dc_gs_dsdx
+  - dc_gs_gcwm
+  - dc_gs_semep
+  - dc_gs_smummup
+  - dc_gs_sssx
+  - dc_gs_svevex
+  - dc_gs_svmvmx
+  - dc_gs_usux
+  - dc_gsx_bsxbx
+  - dc_gsx_csxcx
+  - dc_gsx_cxepve
+  - dc_gsx_cxmupvm
+  - dc_gsx_cxtapvt
+  - dc_gsx_cxwp
+  - dc_gsx_cxwpa
+  - dc_gsx_cxwph
+  - dc_gsx_cxwpz
+  - dc_gsx_ddxsx
+  - dc_gsx_gcxwp
+  - dc_gsx_ggsx
+  - dc_gsx_gsx
+  - dc_gsx_gsxa
+  - dc_gsx_gsxz
+  - dc_gsx_ssxsx
+  - dc_gsx_sxa
+  - dc_gsx_sxaa
+  - dc_gsx_sxaz
+  - dc_gsx_sxemep
+  - dc_gsx_sxmummup
+  - dc_gsx_sxtamtap
+  - dc_gsx_sxvevex
+  - dc_gsx_sxvmvmx
+  - dc_gsx_sxvtvtx
+  - dc_gsx_sxwpwm
+  - dc_gsx_sxz
+  - dc_gsx_sxzh
+  - dc_gsx_sxzz
+  - dc_gsx_tcxbx
+  - dc_gsx_tsxtx
+  - dc_gsx_udxcx
+  - dc_gsx_uuxsx
+  - dc_gu_dcsx
+  - dc_gu_depve
+  - dc_gu_dmupvm
+  - dc_gu_dtapvt
+  - dc_gu_dtbx
+  - dc_gu_dwp
+  - dc_gu_dwpa
+  - dc_gu_dwph
+  - dc_gu_dwpz
+  - dc_gu_gdwp
+  - dc_gu_ggu
+  - dc_gu_gu
+  - dc_gu_gua
+  - dc_gu_guz
+  - dc_gu_ua
+  - dc_gu_uaa
+  - dc_gu_uaz
+  - dc_gu_ubbx
+  - dc_gu_uccx
+  - dc_gu_uddx
+  - dc_gu_uemep
+  - dc_gu_umummup
+  - dc_gu_ussx
+  - dc_gu_utamtap
+  - dc_gu_uttx
+  - dc_gu_uuux
+  - dc_gu_uvevex
+  - dc_gu_uvmvmx
+  - dc_gu_uvtvtx
+  - dc_gu_uwpwm
+  - dc_gu_uz
+  - dc_gu_uzh
+  - dc_gu_uzz
+  - dc_gux_bdxtx
+  - dc_gux_buxbx
+  - dc_gux_cuxcx
+  - dc_gux_duxdx
+  - dc_gux_dxemvex
+  - dc_gux_dxmumvmx
+  - dc_gux_dxtamvtx
+  - dc_gux_dxwm
+  - dc_gux_dxwma
+  - dc_gux_dxwmh
+  - dc_gux_dxwmz
+  - dc_gux_gdxwm
+  - dc_gux_ggux
+  - dc_gux_gux
+  - dc_gux_guxa
+  - dc_gux_guxz
+  - dc_gux_sdxcx
+  - dc_gux_suxsx
+  - dc_gux_tuxtx
+  - dc_gux_uuxux
+  - dc_gux_uxa
+  - dc_gux_uxaa
+  - dc_gux_uxaz
+  - dc_gux_uxemep
+  - dc_gux_uxmummup
+  - dc_gux_uxtamtap
+  - dc_gux_uxvevex
+  - dc_gux_uxvmvmx
+  - dc_gux_uxvtvtx
+  - dc_gux_uxwpwm
+  - dc_gux_uxz
+  - dc_gux_uxzh
+  - dc_gux_uxzz
+  - dc_sb_cbwm
+  - dc_sb_sbz
+  - dc_sb_stwm
+  - dc_sbx_cbxwm
+  - dc_sbx_ctx
+  - dc_sbx_ctxa
+  - dc_sbx_ctxh
+  - dc_sbx_ctxz
+  - dc_sbx_gctx
+  - dc_sbx_gsbx
+  - dc_sbx_sbx
+  - dc_sbx_sbxa
+  - dc_sbx_sbxh
+  - dc_sbx_sbxz
+  - dc_sbx_stxwp
+  - dc_sc_ccwm
+  - dc_sc_gsc
+  - dc_sc_sc
+  - dc_sc_sca
+  - dc_sc_sch
+  - dc_sc_scz
+  - dc_sc_sswp
+  - dc_scx_aemvex
+  - dc_scx_amumvmx
+  - dc_scx_atamvtx
+  - dc_scx_bbxwm
+  - dc_scx_btxa
+  - dc_scx_btxh
+  - dc_scx_btxz
+  - dc_scx_ccxwm
+  - dc_scx_ddxwm
+  - dc_scx_dux
+  - dc_scx_duxa
+  - dc_scx_duxh
+  - dc_scx_duxz
+  - dc_scx_emvex
+  - dc_scx_gbtx
+  - dc_scx_gdux
+  - dc_scx_gemvex
+  - dc_scx_ggwm
+  - dc_scx_gmumvmx
+  - dc_scx_gscx
+  - dc_scx_gtamvtx
+  - dc_scx_gwm
+  - dc_scx_gwma
+  - dc_scx_gwmh
+  - dc_scx_gwmz
+  - dc_scx_hemvex
+  - dc_scx_hmumvmx
+  - dc_scx_mumvmx
+  - dc_scx_scx
+  - dc_scx_scxa
+  - dc_scx_scxh
+  - dc_scx_scxz
+  - dc_scx_ssxwm
+  - dc_scx_tamvtx
+  - dc_scx_ttxwm
+  - dc_scx_txb
+  - dc_scx_uuxwm
+  - dc_scx_wma
+  - dc_scx_wmaa
+  - dc_scx_wmah
+  - dc_scx_wmaz
+  - dc_scx_wmemep
+  - dc_scx_wmh
+  - dc_scx_wmmummup
+  - dc_scx_wmtamtap
+  - dc_scx_wmvevex
+  - dc_scx_wmvmvmx
+  - dc_scx_wmvtvtx
+  - dc_scx_wmz
+  - dc_scx_wmzh
+  - dc_scx_wmzz
+  - dc_scx_zemvex
+  - dc_scx_zmumvmx
+  - dc_scx_ztamvtx
+  - dc_sdx_cdxwm
+  - dc_sdx_cux
+  - dc_sdx_cuxa
+  - dc_sdx_cuxh
+  - dc_sdx_cuxz
+  - dc_sdx_gcux
+  - dc_sdx_gsdx
+  - dc_sdx_sdx
+  - dc_sdx_sdxa
+  - dc_sdx_sdxh
+  - dc_sdx_sdxz
+  - dc_sdx_suxwp
+  - dc_ss_gss
+  - dc_ss_scwm
+  - dc_ss_ss
+  - dc_ss_ssa
+  - dc_ss_ssh
+  - dc_ss_ssz
+  - dc_ssx_aa
+  - dc_ssx_aaa
+  - dc_ssx_aaz
+  - dc_ssx_amummup
+  - dc_ssx_atamtap
+  - dc_ssx_avmvmx
+  - dc_ssx_avtvtx
+  - dc_ssx_az
+  - dc_ssx_azh
+  - dc_ssx_azz
+  - dc_ssx_bbx
+  - dc_ssx_bbxa
+  - dc_ssx_bbxh
+  - dc_ssx_bbxz
+  - dc_ssx_btxwp
+  - dc_ssx_ccx
+  - dc_ssx_ccxa
+  - dc_ssx_ccxh
+  - dc_ssx_ccxz
+  - dc_ssx_csxwm
+  - dc_ssx_ga
+  - dc_ssx_gaa
+  - dc_ssx_gaz
+  - dc_ssx_gbbx
+  - dc_ssx_gccx
+  - dc_ssx_gg
+  - dc_ssx_gga
+  - dc_ssx_ggg
+  - dc_ssx_ggz
+  - dc_ssx_gmummup
+  - dc_ssx_gssx
+  - dc_ssx_gtamtap
+  - dc_ssx_gttx
+  - dc_ssx_guux
+  - dc_ssx_gvmvmx
+  - dc_ssx_gvtvtx
+  - dc_ssx_gwpwm
+  - dc_ssx_gz
+  - dc_ssx_gzh
+  - dc_ssx_gzz
+  - dc_ssx_hmummup
+  - dc_ssx_hvmvmx
+  - dc_ssx_hvtvtx
+  - dc_ssx_mummup
+  - dc_ssx_scxwp
+  - dc_ssx_ssx
+  - dc_ssx_ssxa
+  - dc_ssx_ssxh
+  - dc_ssx_ssxz
+  - dc_ssx_tamtap
+  - dc_ssx_tbxwm
+  - dc_ssx_ttx
+  - dc_ssx_ttxa
+  - dc_ssx_ttxh
+  - dc_ssx_ttxz
+  - dc_ssx_uux
+  - dc_ssx_uuxa
+  - dc_ssx_uuxh
+  - dc_ssx_uuxz
+  - dc_ssx_vmvmx
+  - dc_ssx_vtvtx
+  - dc_ssx_wmmupvm
+  - dc_ssx_wmtapvt
+  - dc_ssx_wpmumvmx
+  - dc_ssx_wptamvtx
+  - dc_ssx_wpwm
+  - dc_ssx_wpwma
+  - dc_ssx_wpwmh
+  - dc_ssx_wpwmz
+  - dc_ssx_zh
+  - dc_ssx_zmummup
+  - dc_ssx_ztamtap
+  - dc_ssx_zvmvmx
+  - dc_ssx_zvtvtx
+  - dc_ssx_zz
+  - dc_ssx_zzh
+  - dc_sux_cuxwm
+  - dc_sux_gsux
+  - dc_sux_sdxwm
+  - dc_sux_sux
+  - dc_sux_suxa
+  - dc_sux_suxh
+  - dc_sux_suxz
+  - dc_sxb_cxt
+  - dc_sxbx_cxbxwp
+  - dc_sxbx_gsxbx
+  - dc_sxbx_sxbx
+  - dc_sxbx_sxbxa
+  - dc_sxbx_sxbxh
+  - dc_sxbx_sxbxz
+  - dc_sxbx_sxtxwp
+  - dc_sxcx_cxcxwp
+  - dc_sxcx_gsxcx
+  - dc_sxcx_sxcx
+  - dc_sxcx_sxcxa
+  - dc_sxcx_sxcxh
+  - dc_sxcx_sxcxz
+  - dc_sxcx_sxsxwm
+  - dc_sxsx_sxcxwp
+  - dc_ub_dbwp
+  - dc_ub_dt
+  - dc_ub_dta
+  - dc_ub_dth
+  - dc_ub_dtz
+  - dc_ub_gdt
+  - dc_ub_gub
+  - dc_ub_ub
+  - dc_ub_uba
+  - dc_ub_ubh
+  - dc_ub_ubz
+  - dc_ub_utwm
+  - dc_ubx_dbxwp
+  - dc_ubx_gubx
+  - dc_ubx_ubx
+  - dc_ubx_ubxa
+  - dc_ubx_ubxh
+  - dc_ubx_ubxz
+  - dc_ubx_utxwp
+  - dc_uc_dcwp
+  - dc_uc_guc
+  - dc_uc_uc
+  - dc_uc_uca
+  - dc_uc_uch
+  - dc_uc_ucz
+  - dc_uc_uswp
+  - dc_ucx_dcxwp
+  - dc_ucx_dsx
+  - dc_ucx_dsxa
+  - dc_ucx_dsxh
+  - dc_ucx_dsxz
+  - dc_ucx_gdsx
+  - dc_ucx_gucx
+  - dc_ucx_ucx
+  - dc_ucx_ucxa
+  - dc_ucx_ucxh
+  - dc_ucx_ucxz
+  - dc_ucx_usxwm
+  - dc_ud_ddwp
+  - dc_ud_gud
+  - dc_ud_ud
+  - dc_ud_uda
+  - dc_ud_udh
+  - dc_ud_udz
+  - dc_ud_uuwm
+  - dc_udx_aepve
+  - dc_udx_amupvm
+  - dc_udx_atapvt
+  - dc_udx_bbxwp
+  - dc_udx_ccxwp
+  - dc_udx_csx
+  - dc_udx_csxa
+  - dc_udx_csxh
+  - dc_udx_csxz
+  - dc_udx_ddxwp
+  - dc_udx_epve
+  - dc_udx_gcsx
+  - dc_udx_gepve
+  - dc_udx_ggwp
+  - dc_udx_gmupvm
+  - dc_udx_gtapvt
+  - dc_udx_gtbx
+  - dc_udx_gudx
+  - dc_udx_gwp
+  - dc_udx_gwpa
+  - dc_udx_gwph
+  - dc_udx_gwpz
+  - dc_udx_hepve
+  - dc_udx_hmupvm
+  - dc_udx_mupvm
+  - dc_udx_ssxwp
+  - dc_udx_tapvt
+  - dc_udx_tbx
+  - dc_udx_tbxa
+  - dc_udx_tbxh
+  - dc_udx_tbxz
+  - dc_udx_ttxwp
+  - dc_udx_udx
+  - dc_udx_udxa
+  - dc_udx_udxh
+  - dc_udx_udxz
+  - dc_udx_uuxwp
+  - dc_udx_wpa
+  - dc_udx_wpaa
+  - dc_udx_wpah
+  - dc_udx_wpaz
+  - dc_udx_wpemep
+  - dc_udx_wph
+  - dc_udx_wpmummup
+  - dc_udx_wptamtap
+  - dc_udx_wpvevex
+  - dc_udx_wpvmvmx
+  - dc_udx_wpvtvtx
+  - dc_udx_wpz
+  - dc_udx_wpzh
+  - dc_udx_wpzz
+  - dc_udx_zepve
+  - dc_udx_zmupvm
+  - dc_udx_ztapvt
+  - dc_us_dc
+  - dc_us_dca
+  - dc_us_dch
+  - dc_us_dcz
+  - dc_us_dswp
+  - dc_us_gdc
+  - dc_us_gus
+  - dc_us_ucwm
+  - dc_us_us
+  - dc_us_usa
+  - dc_us_ush
+  - dc_us_usz
+  - dc_usx_dsxwp
+  - dc_usx_gusx
+  - dc_usx_ucxwp
+  - dc_usx_usx
+  - dc_usx_usxa
+  - dc_usx_usxh
+  - dc_usx_usxz
+  - dc_uu_guu
+  - dc_uu_udwp
+  - dc_uu_uu
+  - dc_uu_uua
+  - dc_uu_uuh
+  - dc_uu_uuz
+  - dc_uux_aa
+  - dc_uux_aaa
+  - dc_uux_aaz
+  - dc_uux_aemep
+  - dc_uux_amummup
+  - dc_uux_atamtap
+  - dc_uux_avevex
+  - dc_uux_avmvmx
+  - dc_uux_avtvtx
+  - dc_uux_az
+  - dc_uux_azh
+  - dc_uux_azz
+  - dc_uux_bbx
+  - dc_uux_bbxa
+  - dc_uux_bbxh
+  - dc_uux_bbxz
+  - dc_uux_btxwp
+  - dc_uux_ccx
+  - dc_uux_ccxa
+  - dc_uux_ccxh
+  - dc_uux_ccxz
+  - dc_uux_csxwm
+  - dc_uux_ddx
+  - dc_uux_ddxa
+  - dc_uux_ddxh
+  - dc_uux_ddxz
+  - dc_uux_duxwp
+  - dc_uux_emep
+  - dc_uux_ga
+  - dc_uux_gaa
+  - dc_uux_gaz
+  - dc_uux_gbbx
+  - dc_uux_gccx
+  - dc_uux_gddx
+  - dc_uux_gemep
+  - dc_uux_gg
+  - dc_uux_gga
+  - dc_uux_ggg
+  - dc_uux_ggz
+  - dc_uux_gmummup
+  - dc_uux_gssx
+  - dc_uux_gtamtap
+  - dc_uux_gttx
+  - dc_uux_guux
+  - dc_uux_gvevex
+  - dc_uux_gvmvmx
+  - dc_uux_gvtvtx
+  - dc_uux_gwpwm
+  - dc_uux_gz
+  - dc_uux_gzh
+  - dc_uux_gzz
+  - dc_uux_hemep
+  - dc_uux_hmummup
+  - dc_uux_hvevex
+  - dc_uux_hvmvmx
+  - dc_uux_hvtvtx
+  - dc_uux_mummup
+  - dc_uux_scxwp
+  - dc_uux_ssx
+  - dc_uux_ssxa
+  - dc_uux_ssxh
+  - dc_uux_ssxz
+  - dc_uux_tamtap
+  - dc_uux_tbxwm
+  - dc_uux_ttx
+  - dc_uux_ttxa
+  - dc_uux_ttxh
+  - dc_uux_ttxz
+  - dc_uux_udxwm
+  - dc_uux_uux
+  - dc_uux_uuxa
+  - dc_uux_uuxh
+  - dc_uux_uuxz
+  - dc_uux_vevex
+  - dc_uux_vmvmx
+  - dc_uux_vtvtx
+  - dc_uux_wmepve
+  - dc_uux_wmmupvm
+  - dc_uux_wmtapvt
+  - dc_uux_wpemvex
+  - dc_uux_wpmumvmx
+  - dc_uux_wptamvtx
+  - dc_uux_wpwm
+  - dc_uux_wpwma
+  - dc_uux_wpwmh
+  - dc_uux_wpwmz
+  - dc_uux_zemep
+  - dc_uux_zh
+  - dc_uux_zmummup
+  - dc_uux_ztamtap
+  - dc_uux_zvevex
+  - dc_uux_zvmvmx
+  - dc_uux_zvtvtx
+  - dc_uux_zz
+  - dc_uux_zzh
+  - dc_uxbx_dxbxwm
+  - dc_uxbx_dxtx
+  - dc_uxbx_dxtxa
+  - dc_uxbx_dxtxh
+  - dc_uxbx_dxtxz
+  - dc_uxbx_gdxtx
+  - dc_uxbx_guxbx
+  - dc_uxbx_uxbx
+  - dc_uxbx_uxbxa
+  - dc_uxbx_uxbxh
+  - dc_uxbx_uxbxz
+  - dc_uxbx_uxtxwp
+  - dc_uxcx_dxcxwm
+  - dc_uxcx_guxcx
+  - dc_uxcx_uxcx
+  - dc_uxcx_uxcxa
+  - dc_uxcx_uxcxh
+  - dc_uxcx_uxcxz
+  - dc_uxcx_uxsxwm
+  - dc_uxdx_dxdxwm
+  - dc_uxdx_guxdx
+  - dc_uxdx_uxdx
+  - dc_uxdx_uxdxa
+  - dc_uxdx_uxdxh
+  - dc_uxdx_uxdxz
+  - dc_uxdx_uxuxwp
+  - dc_uxsx_dxcx
+  - dc_uxsx_dxcxa
+  - dc_uxsx_dxcxh
+  - dc_uxsx_dxcxz
+  - dc_uxsx_dxsxwm
+  - dc_uxsx_gdxcx
+  - dc_uxsx_guxsx
+  - dc_uxsx_uxcxwp
+  - dc_uxsx_uxsx
+  - dc_uxsx_uxsxa
+  - dc_uxsx_uxsxh
+  - dc_uxsx_uxsxz
+  - dc_uxux_guxux
+  - dc_uxux_uxdxwm
+  - dc_uxux_uxux
+  - dc_uxux_uxuxa
+  - dc_uxux_uxuxh
+  - dc_uxux_uxuxz
+  data_path: data/
+  seed: 42
+  preprocess_per_dataset: true
+  shared_standardization: true
+  affine_multiplicity_std: false
+  particle_order: none
+  drop_coupling_powers: false
+  signedlog_quantile: 0.01
+  processes: null
+  processes_file: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/recipes/catalog_daniel_train.yaml
+  require_cache: true
+  train_subsample: 10000
+  eval_subsample: 200
+  phase_space_on_pool: false
+  memmap: false
+  memmap_dir: /tmp/fa_mmap_62323388
+  memmap_prefetch: true
+  subsample: 13520000
+  include_permsym: true
+  train_test_val:
+  - 0.4
+  - 0.5
+  - 0.1
+  no_props: false
+  trafos: {}
+  amp_trafos:
+  - log
+  - standardization
+  incl_fvs: false
+  use_PIDs: false
+  spin_onehot: true
+  color_onehot: true
+  generation_feature: true
+  generation_onehot: true
+  prop_is_massless: true
+  standardize_props: true
+  mass_from_momenta: false
+  coupling_scalars: true
+  internal_mass_scalars: true
+  internal_mass_pdgs:
+  - 23
+  - 6
+  - 25
+  resonance_per_event: false
+  offshell_per_event: true
+  target_propagators: false
+  target_propagator_pdgs:
+  - 23
+  - 24
+  - 6
+  - 25
+  target_propagator_widths:
+    23: 2.4414
+    24: 2.0476
+    6: 1.5083
+    25: 0.006382
+  target_propagator_straddle: 0.005
+  target_propagator_tchannel: false
+  target_propagator_tchannel_max_final: 2
+  target_propagator_tchannel_norm: null
+  offshell_stats: null
+  amp_orders:
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 2
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 1
+    - 2
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 3
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 2
+    - 0
+  - - 0
+    - 0
+    - 2
+    - 1
+  - - 0
+    - 0
+    - 0
+    - 3
+  - - 0
+    - 0
+    - 2
+    - 1
+  target_physics_factor: true
+  target_physics_dim_only: true
+  target_physics_s0: 1.0
+  dimensionless_inputs: true
+  target_physics_orders: true
+train: true
+training:
+  iterations: 150
+  optimizer: AdamW
+  lr: 0.01
+  batchsize: 16384
+  validate_every_n_steps: 82
+  validate_frac: 0.2
+  clip_grad_norm: 5
+  scheduler: CosineAnnealingLR
+  train_test_val:
+  - 0.4
+  - 0.5
+  - 0.1
+  subsample: null
+  es_patience: 100000000000000
+  es_load_best_model: true
+  save_intermediate: false
+  load_best_previous: true
+  save_gradients: false
+  save_weights: false
+  save_preds_intermediate: false
+  get_ID: false
+  clip_grad_value: null
+  max_grad_norm: null
+  diverge_patience: 50
+  log_every_n_steps: 1000
+  use_balanced_sampler: false
+  per_process_accumulation: false
+  accumulation_microbatch: null
+  accumulation_steps: 4
+  accumulation_order: interleaved
+  sampler_log_every_n_vals: 10
+  sampler_alpha_ema: 0.7
+  sampler_min_alpha_frac: 0.25
+  sampler_alpha_min: 0.05
+  sampler_sig_k: 2.0
+  sampler_warmup_vals: 10
+  sampler_probe_max: 15
+  sampler_reprobe_every: 20
+  sampler_alpha_window: 30
+  sampler_solo_alpha_path: null
+  sampler_deficit_gamma: 1.5
+  sampler_deficit_cap: 2.0
+  sampler_plateau_floor: 0.3
+  num_workers: 2
+  betas:
+  - 0.9
+  - 0.999
+  eps: 1.0e-08
+  weight_decay: 0
+  scheduler_scale: 1
+  cosanneal_warmup_steps: 0
+  cosanneal_warmup_frac: 0.0
+  cosanneal_eta_min: 1.820878e-10
+  reduceplateau_factor: 0.1
+  reduceplateau_patience: 50
+  onecycle_max_lr: 10
+  onecycle_pct_start: 0.3
+  mup_use_optim: true
+  ema_decay: 0.9412073
+  float16: false
+  enable_flash_sdp: false
+  enable_math_sdp: true
+  enable_mem_efficient_sdp: false
+  force_xformers: false
+  allow_tf32: true
+  fused_optimizer: true
+  loss: HETEROSC
+  track_train_eval: true
+  heterosc_select: nll
+  heterosc_beta: 0.0
+  heterosc_sigma_only: true
+  heterosc_mu_only: false
+  heterosc_rank_curve: false
+  rank_curve_max_events: 50000
+  loss_aggregation: mean
+  excess_reference: null
+  excess_beta: 0.0
+  sign_head: false
+  sign_loss_weight: 1.0
+  loss_aggregation_tau: 0.0
+  val_aggregation: geometric_mean
+  dtype: float32
+  regularization: L2
+  regularization_lambda: 0.0
+  result_path: null
+  is_dyhpo_run: false
+  increment_steps: 150
+  heterosc_sigma_stage_steps: 150
+  heterosc_sigma_stage_validations: 5
+plot: true
+plotting:
+  histograms: true
+  delta: true
+  delta_prepd: true
+  loss: true
+  loss_log_scale: true
+  plot_without_regularization: true
+  plot_mse_het: true
+  per_process_pages: null
+  sigma_only: true
+model:
+  _target_: wrappers.AmplitudeLLoCaWrapper
+  token_size: 31
+  d_particle_hidden: 16
+  particle_encoder_hidden: 0
+  use_diagrams: true
+  use_pair_bias: false
+  pair_bias_hidden: 16
+  pair_bias_clamp: 4.0
+  pair_bias_max_props: 48
+  pair_bias_logit_cap: 8.0
+  diagram_scanned_mass: false
+  use_diagram_virtuality: false
+  virt_standardize: true
+  virt_clamp: 4.0
+  virt_log_scale: 0.1
+  virt_mode: edge
+  d_diag: 32
+  diagrams_dir: data/diagrams
+  diagram_encoder:
+    d_model: 64
+    n_heads: 4
+    n_layers: 3
+    k_pe: 8
+    max_diagrams: 512
+  diagram_encoder_impl: llm4lhc
+  diagram_encoder_llm4lhc:
+    mode: pooled
+    hidden_size: 64
+    num_layers: 3
+    num_heads: 4
+    laplacian_pe_dim: 8
+    dropout: 0.0
+    edge_feature_mode: bias_kv
+    max_diagrams: null
+  net:
+    _target_: models.lloca.LLOCAMuPTransformer
+    num_scalars: 25
+    hidden_channels_mlp: 128
+    num_layers_mlp: 2
+    in_channels: 29
+    attn_reps: 8x0n+2x1n
+    out_channels: 1
+    num_blocks: 8
+    num_heads: 8
+    freeze_framesnet: false
+    causal_mask: false
+    causal_frames: prefix
+    causal_frames_min: 4
+    bayesian_last_layer: false
+    bnn_prior_prec: 1.0
+    bnn_logsig2_init: -9.0
+    checkpoint_blocks: false
+    loss: HETEROSC
+    sigma_after_pool: true
+    detach_sigma_backbone: false
+run_name: sigma_stage
+base_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+jobid: null
+seed: 42
+debug: false
+warm_start_idx: 0
+run_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/catalog_norm_short/DlessInOrd/sigma_stage
+save: true
+use_mlflow: false
+save_source: true
+ema: false
+ga_settings:
+  use_fully_connected_subgroup: true
+  use_geometric_product: true
+  mix_mvpseudoscalar_into_scalar: true
+  zero_bivector: false
+evaluate: true
+evaluation:
+  batchsize: 16384
+  train_subsample: 2000
+  save_predictions: true
+find_BS: false
+BS_finding:
+  ema_alpha: 0.9
+  n_batches_big: 20
+  n_batches_small: 10
+count_flops: false
+mlflow:
+  db: ${base_dir}/runs/${exp_name}/mlflow/mlflow.db
+  artifacts: ${base_dir}/runs/${exp_name}/mlflow_artifacts
+fine_tune:
+  pretrained_path: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/catalog_norm_short/DlessInOrd/models/model_run0_best.pt
+  target_stats: parent
+  offshell_stats: parent
+  parent_offshell_stats: null
+  lr_scale: 1.0
+  layer_decay: 1.0
+  freeze_blocks: []
+  reset_output_head: false
+  lora:
+    enabled: false
+    rank: 8
+    alpha: 16.0
+    target:
+    - qkv
+    - out
+  ewc:
+    enabled: false
+    lambda: 1000.0
+    n_fisher_batches: 64
+    fisher_path: null
+run_idx: 0
