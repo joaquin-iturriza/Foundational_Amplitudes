@@ -33781,6 +33781,14 @@ entries:
       -> 0.0040). Muon lower at D=10 on all four (10-50x); at D=316 4.5x lower on HHHZ, within 1.5x on the other three (scratch
       lowest on g g->t tbar). Muon''s D=32 fine-tune ends above its zero shot on 3 of 4. Sec. 4 paragraph and caption rewritten
       to this (draft 2ec4471).'
+  - at: '2026-11-17T10:49:11+00:00'
+    text: '2026-11-17 step 4 (general pass) in progress: FA 6a53212c paper_target rows in words (''all inputs'', ''no off-shellness'',
+      ''no colour'', ''no diagrams'', ''linear embedding'', ''no diagrams, linear embedding'', ''+ pair bias'', ''+ capped
+      pair bias''); draft 92579e7: fine-tune figure and its subsection out (Joaquin''s hold), ''ab: insert here'' resolved
+      per Joaquin (figure before its paragraph, pretraining stated as the 28 processes of Tabs. ladder+arms, tables named
+      as in the figures), every figure [H] after its first paragraph, captions message-first with colours, catalog->pretraining
+      set, Muon->Muon optimizer, finale text matched to the figure (each probe''s two ladder steps, not step 9). Cold reader
+      running.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
