@@ -35355,7 +35355,7 @@ entries:
     decision: D488
   owner:
     agent: a78702a7c3fd231ea
-    state: working
+    state: closed
     since: '2026-11-17T19:14:02.913000+00:00'
     state_at: '2026-11-17T19:54:35.675000+00:00'
     context: 266288
@@ -35630,26 +35630,19 @@ entries:
       in our model code (after the attention-mask fix 1ce53bcd), not the wrapper or weights; not found yet (not fp16, not
       augmentation, not frame noise). README d3208a9e: use a GPU.'
   handoff:
-    state: 'Zero-shot read in flight: FA-ccin2p3-d95c89ad (trial_1262 of cov_v4_long_hpo8_cc_68224, eval-only, axes DAN =
-      139 Daniel held-out val pools and DANID = 9 identical catalog_v4 training trees on their own test pools; design passed
-      2026-11-17; queued ~33 h behind 30 of our jobs). When it ends: bring home $SCRATCH/zz_v4_long_best_cov_v4_long_hpo8_cc_68224_trial_1262/{DAN,DANID}
-      with collect_heldout_preds.py as data/v4_trial1262_dan.npz and data/v4_trial1262_danid.npz, run analysis/catalog_daniel/dan_per_process.py
-      (it reads both and draws the figure), look at it and report. Overlap (v4_heldout_overlap.py): 34 of 43 extrapolation
-      processes have a relabel in catalog_v4 training, 9 are truly held out (6 with a b). Step 2: evaluate_daniels_catalog
-      (D489, Joaquin''s words via the main session) is committed at de68fbd7: the model (DlessInOrd sigma_stage), the diagrams
-      archive and evaluate.py, tested on CPU on 300 events of b b~ > h h in both input formats (MSE 0.371). Still missing:
-      the README and the to-precision reproduction (the full val pool is in the scratchpad fullpool/; the scorer cannot run
-      on CC''s CPU because xformers has no CPU kernel).'
-    decisions: 'Relabel defined broadly (charge conjugation, down-type and up-type permutations, lepton generations, plus
-      catalog_v4''s equality classes) so that a kept extrapolation process is held out under any reading (D488). Interpolation:
-      91 scored, the 5 dc_ds_* identical to a training entry listed apart. hp58 added as an arm, per the design review. Physics
-      check overridden for Daniel''s pools, since every arm reads those same pools. Trial 1262 is the 16x (68224-step) best,
-      the lowest of the two lengths. Model brought home by site run base64: site fetch takes only tier-0 names. The evaluator
-      recovers the input order through distinct stand-in |M|^2 tags and subtracts logF.'
-    ruled_out: 'site fetch for model files: only tier-0 names. Running the scorer on CC''s login CPU: xformers has no CPU
-      operator. dc_ train pools: deleted (D131); use n_train 0, the val stand-in.'
-    running: FA-ccin2p3-d95c89ad
-    files: analysis/catalog_daniel/v4_heldout_overlap.py, analysis/catalog_daniel/data/v4_heldout_overlap.json, analysis/catalog_daniel/dan_per_process.py,
-      recipes/catalog_v4_dan_identical.yaml, scripts/job_catalog_v3_short.sh (axes DAN, DANID), tools/short_wall.py, tools/collect_run.py,
-      evaluate_daniels_catalog/{evaluate.py,model/,diagrams.tar.gz}
-    written: '2026-11-17T19:03:33+00:00'
+    state: 'Evaluator (evaluate_daniels_catalog, README d3208a9e) reproduces the stored DlessInOrd read on GPU exactly (MSE
+      0.2791, FA-ccin2p3-c3e63032) and is file/order independent (per-event keyed augmentation; CPU cross-event attention
+      fixed 1ce53bcd). On CPU it is still 0.194 low in log|M|^2 (open step: find the CPU path difference). Zero-shot read
+      of trial_1262 on Daniel''s 139 DAN pools resubmitted as FA-ccin2p3-488df7d6 (first job d95c89ad failed every DAN probe
+      on deleted train pools; fixed 8aadaa18 with n_train 0); DANID (9 calibration probes) done in d95c89ad. When 488df7d6
+      ends: collect DAN and DANID with analysis/catalog_daniel/collect_heldout_preds.py into data/v4_trial1262_dan.npz and
+      _danid.npz, run analysis/catalog_daniel/dan_per_process.py, look, report.'
+    decisions: Augmentation kept, keyed per event on (seed, momenta), not turned off (COM-frame reads are out of distribution);
+      the dependence on file/order was the CPU attention bug, not augmentation. Format question to Joaquin dropped (plan ask
+      refuses it; plain arrays until Suprio sends a file). GPU check design passed after FIX (third read = original scorer).
+    ruled_out: 'Offset causes ruled out: code since 2026-10-23, pool sidecar, own target stats, augmentation, frame noise,
+      fp16, logF (4.7112 both), weights/wrapper (GPU reproduces). Turning augmentation off at evaluation.'
+    running: FA-ccin2p3-488df7d6
+    files: evaluate_daniels_catalog/{evaluate.py,check_reproduction.py,README}, models/attention_lloca_mup.py, tests/test_causal_mask.py,
+      scripts/job_evaluate_daniels.sh, scripts/job_catalog_v3_short.sh
+    written: '2026-11-17T19:55:58+00:00'
