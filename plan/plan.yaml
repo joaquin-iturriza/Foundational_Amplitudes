@@ -27905,9 +27905,9 @@ entries:
     - 22
   owner:
     agent: a5c2257d0023b136b
-    state: stopped
+    state: working
     since: '2026-11-16T19:48:30+00:00'
-    state_at: '2026-11-17T02:35:49.265000+00:00'
+    state_at: '2026-11-17T03:24:31.458000+00:00'
     context: 213667
     context_at: '2026-11-17T02:43:03+00:00'
   findings:
