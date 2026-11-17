@@ -34201,3 +34201,13 @@ entries:
   step_waits:
     '1': a design reviewer
     '3': a design reviewer
+  findings:
+  - at: '2026-11-17T11:18:43+00:00'
+    text: 'Their numbers: the UQ repo (branch uq, 311 files) holds no figures, preds or result files. arXiv:2505.20280''s
+      source has the per-multiplicity figure as vector data (figs/amplitudes/scaled_multiplicity_scan_prep_big.pdf), read
+      by analysis/zng_uq/paper_mse.py @157b5d08 -> analysis/zng_uq/data/paper_mse.json; its Z+4g values reproduce the paper''s
+      table. Quantity: test MSE of the standardised log|M|^2 on the paper''s own 500k test set (not the UQ repo''s Zenodo
+      split). Z+1g/2g/3g/4g: LLoCa-Transformer 6.8e-10/3.1e-7/4.6e-6/1.16e-5; L-GATr 4.7e-9/8.9e-7/6.6e-6/1.78e-5; Transformer
+      2.6e-7/6.5e-6/3.3e-5/8.3e-5; LLoCa-GNN 1.4e-9/1.15e-6/2.6e-5/5.0e-5; GNN 3.1e-9/5.7e-6/2.5e-5/1.05e-4; MLP-I 2.0e-8/1.0e-5/1.3e-4/1.37e-3.
+      The median |Delta| of Joaquin''s meeting figure is in neither (only its legend, read off his screenshot). torch 2.1.2
+      and 2.9.1 give the same randperm(3e6, seed 1).'
