@@ -33791,6 +33791,19 @@ entries:
       as in the figures), every figure [H] after its first paragraph, captions message-first with colours, catalog->pretraining
       set, Muon->Muon optimizer, finale text matched to the figure (each probe''s two ladder steps, not step 9). Cold reader
       running.'
+  - at: '2026-11-17T11:02:58+00:00'
+    text: '2026-11-17 step 5 first read (NOT from a committed tool yet; collector change uncommitted, repo-reviewer backlog
+      blocks commits): validation curves of zz_catft_sep and zz_catft_lowloss3 fine-tunes (val_curve, val_loss_step0, prepd_std,
+      per-step lr read on CC). Muon-parent fine-tunes peak at lr 8.9e-3 (the parent''s, lr_scale 1; AdamW parent''s 2.2e-3),
+      warm-up over the first 1/6 of steps; their validation error rises above the zero-shot within the first validations (step
+      7 at D=32) and stays there: share of validations above zero shot 0.97-1.00 on 3 of 4 sep probes at D=10/32 and on every
+      lowloss3 tree probe at every D; last validation 10-100x the zero shot (e.g. b bbar->HHHZ D=316: zero shot 0.0092, best
+      0.0040 at step 45, last 0.036). The reported best is the first validation (step 0 is never a checkpoint candidate).
+      AdamW parent (zero shot 30-200x higher) falls below its zero shot. Reading: the gain is lost to the fine-tune learning
+      rate (the parent''s full Muon lr on 10-316 events), not to the pretraining. Prior: muon_hp_ft (results.tex) searched
+      lr_scale in [0.1,10] on the median probes, best 0.343, gain 1.19x. Next: commit analysis/catalog_v3/ft_curves_fig.py
+      (drafted, in the hand-off) and draw the curves; propose a DyHPO fine-tune search of lr_scale and layer_decay reaching
+      below 0.1 on the sep probes, both parents.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
