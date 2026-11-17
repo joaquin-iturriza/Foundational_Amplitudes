@@ -278,7 +278,7 @@ def target():
         groups.append((lab, np.array(xs), np.array(ys)))
     fig, (a, b) = ps.figure(ncols=2)
     scatter_ax(a, groups, "zero-shot " + MSE_LAB + ",\n" + r"trained on $\log|\mathcal{M}|^2$ in GeV",
-               "zero-shot " + MSE_LAB + ",\n" + r"trained on dimensionless $\log|\mathcal{M}|^2$", "paper_target",
+               "zero-shot " + MSE_LAB + ",\n" + r"trained on $A^*$", "paper_target",
                legend="upper left")
     inputs(b)
     ps.save(fig, os.path.join(FIGS, "paper_target"))
