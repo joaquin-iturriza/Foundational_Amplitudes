@@ -33892,6 +33892,11 @@ entries:
       redrawn in round two (FA 80849a90) and not commented on after (''much better''), not re-verified today on the rendered
       figures; (e) figs2 ''ladder step 1 at the hyperparameters...'' label: gone from Figs. 18-19 (one step-1 curve), not
       re-verified on star_arms.'
+  - at: '2026-11-17T12:50:04+00:00'
+    text: '2026-11-17 Fig. 14 restored (Joaquin: ''I didn''t ask you to change fig 14, only the text''): paper_sec3_figs.py
+      back to its state before 7a1fdabc/73d5145c (FA 3496f60b; git diff 7a1fdabc~1 on the file is empty), right panel the
+      fifth version (71119c82); draft efba937 (figure only, text rename T -> A^* of 801c504 kept), 48 pp, scratchpad draft_pass8.pdf/.zip
+      (only figs/pretrain/paper_target.pdf differs from pass7).'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
