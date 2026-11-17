@@ -33320,11 +33320,6 @@ entries:
       rule), captions short; apply his figure-by-figure notes on Figs. 9-13, 15, 16 and the same to every other figure of
       his sections; change the figure-style skill and ps/send_check to the new legend and one-file rules; fresh reviewer told
       to read the figures alone; zip and PDF; send each figure as its own file.'
-    5: 'Fig. 15 rerun (Joaquin 2026-11-17: ''Would it be possible to get plot 15 but with processes that have good losses
-      instead of ones with MSElog ~1? since we are looking at such small dataset sizes, the runs can be very quick.''): Muon
-      against AdamW fine-tunes on probe processes whose losses are low (pick from existing results, say how), same D values
-      and protocol as the current figure; design, design review, GPU-h estimate (budget rule), runs, redraw in the new figure
-      style.'
   done_when: null
   notes_ref: null
   match: none
@@ -33432,7 +33427,6 @@ entries:
     context_at: '2026-11-17T04:05:13+00:00'
   step_waits:
     '3': '2026-11-20: next draft round'
-    '5': FA-ccin2p3-d622e8cc FA-ccin2p3-e408d1a1 FA-ccin2p3-25992f44
     '4': FA-ccin2p3-d622e8cc FA-ccin2p3-e408d1a1 FA-ccin2p3-25992f44
   findings:
   - at: '2026-11-13T02:46:58+00:00'
@@ -33945,8 +33939,3 @@ entries:
       if:
       - 'reviewer passes: send figures, zip, PDF'
       - 'a figure needs data not on disk: say which and why'
-    5:
-      feeds: Fig. 15 on representative processes
-      if:
-      - 'runs finish: redraw and send'
-      - 'GPU-h above 30: ask Joaquin'
