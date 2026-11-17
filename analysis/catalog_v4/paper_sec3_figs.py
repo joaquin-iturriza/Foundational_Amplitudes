@@ -306,8 +306,8 @@ def unseen(ax):
 BIGRUN = {"linear embedding, no diagrams": (3.85e-4, 0.12),
           "all inputs but diagrams": (3.88e-4, 0.10),
           "all inputs, linear embedding": (4.86e-4, 0.056),
-          "linear embedding, no diagrams, pair bias": (5.26e-4, 0.084),
-          "linear embedding, no diagrams, capped pair bias": (5.74e-4, 0.077),
+          "no diagrams, attention pair bias": (5.26e-4, 0.084),
+          "no diagrams, capped pair bias": (5.74e-4, 0.077),
           "all inputs": (5.79e-4, 0.085),
           "all inputs but colour": (6.81e-4, 0.094),
           "all inputs but off-shellness": (8.63e-4, 0.067)}
