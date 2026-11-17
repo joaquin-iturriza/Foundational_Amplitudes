@@ -33808,6 +33808,12 @@ entries:
     units: null
     start: '2026-11-17T01:33:04+00:00'
     at: '2026-11-17T01:33:04+00:00'
+  - batch: lowloss_prebuild
+    wall_h: 2.0
+    jobs: 1
+    units: null
+    start: '2026-11-17T01:54:02+00:00'
+    at: '2026-11-17T01:54:02+00:00'
   handoff:
     state: 'Draft ~/drafts/fm_amplitudes_2026-11 still at 8b55c58 (paper.tex not touched this round). Step 4 (figures readable
       alone): rules changed first (FA c0f64b99: plot_style, send_check, tests/test_figure_setup.py, figure-style skill, .claude/context/fa-figures.txt);
