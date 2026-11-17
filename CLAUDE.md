@@ -38,6 +38,7 @@ on the sites (`~/work/CLAUDE.md`).
 ## What you may do
 
 - Never change the scope I asked for: "run X" means every probe, parent, arm, D, seed and horizon of its design; a subset, more or fewer trials or seeds than the sibling cells, or another horizon or pool is my call, asked before the configs are made, with what the change costs the comparison.
+- A change I ask for is made as asked and nothing else with it (no other figure, label or text); a pass over my earlier notes lists what is missing for me, never changes it.
 - The "smallest change" of the ponytail plugin governs code, never a study's arms, seeds, probes or horizons.
 - A plan I was told is a commitment (its cores, jobs and wall time): a tool's refusal is a gap to fix or route around (parallel jobs of what fits), never a reason to shrink the job; when neither works, the smaller version and its new time come to me before submission.
 - Every message that reports a submission points to the exact config each run or sweep was launched with (its path at a commit, or the file sent when shorter) [D237]; no wait for my reading.
