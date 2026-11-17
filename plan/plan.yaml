@@ -35139,8 +35139,7 @@ entries:
   step_waits:
     '5': the results of batches 1, B1, B2
     '4': '2026-11-18'
-    '6': detached zng_gate_windows (submits Suprio's RUN_N=1..4 production at 19:35 UTC; its smoke passed, 50 tests, 0.21
-      s/step on V100)
+    '6': FA-ccin2p3-745b9c75 FA-ccin2p3-ba3b8896 FA-ccin2p3-8790c95a FA-ccin2p3-d4ce62b8
     '7': FA-ccin2p3-cc575309 FA-ccin2p3-135dbf69 FA-ccin2p3-2d84ce6c FA-ccin2p3-a6730d61 FA-ccin2p3-cd7c6513 FA-ccin2p3-dacbf632
       FA-ccin2p3-b988a809 FA-ccin2p3-57003e68
     '8': the four B1 DyHPO sweeps ccin2p3:tp_zng_hpo_{zg,zgg,zggg,zgggg} (31 of 32 trials queued; zgggg trial_0007 resubmitted
