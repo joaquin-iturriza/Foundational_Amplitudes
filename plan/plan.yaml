@@ -35122,7 +35122,7 @@ entries:
     '7': detached zng_gate_windows (submits B2's 8 runs at 18:12 UTC, after the site gate's 60-min window)
     '8': the four B1 DyHPO sweeps ccin2p3:tp_zng_hpo_{zg,zgg,zggg,zgggg} (31 of 32 trials queued; zgggg trial_0007 resubmitted
       by detached zng_gate_windows)
-    '9': the next owner's submission (pool rebuild not yet submitted at the close)
+    '9': FA-ccin2p3-910dd6e1 (pool rebuild); the parent smoke goes afterok on it from zng_gate_windows
   findings:
   - at: '2026-11-17T11:18:43+00:00'
     text: 'Their numbers: the UQ repo (branch uq, 311 files) holds no figures, preds or result files. arXiv:2505.20280''s
