@@ -34168,14 +34168,19 @@ entries:
     answers_after: '2026-11-17T11:24:55+00:00'
     covers:
     - zng_uq_benchmark
+  - said_at: '2026-11-17T12:19:05.926000+00:00'
+    text: No, we don't train their networks, it's fine. Just please send the runs now we need this quick
+    decision: D480
+    answers_after: '2026-11-17T12:05:49+00:00'
+    covers:
+    - zng_uq_benchmark
   decisions:
   - D477
   - D478
+  - D480
   next:
     1: 'Our trainings on their data: smoke (2 jobs, Z+4g, 50 steps, scratch and fine-tune from trial 1262), then 8 jobs scratch
       and fine-tune x Z+1..4g, 12,500 steps, HPs of kit_hpo_uugg_T hp1196, job_kit.sh, float32, scored on their 1e6 test events'
-    2: 'Their networks (LGATr-slim, LLoCa-Transformer, Transformer, MLP, het) by their own code (scripts/job_uq_ext.sh): timing
-      check, then their production per multiplicity (no public checkpoints exist)'
     3: Eval-only of existing models (trial 1262 zero-shot, u-flavour Z+ng models shifted by 0.779805) on their 1e6 test events
       per multiplicity; needs its own design and a rebuild path for the multi-process 1262
   done_when: null
@@ -34189,7 +34194,11 @@ entries:
     - analysis/zng_uq/data/paper_mse.json
     - scripts/job_uq_ext.sh
     - tools/zng_uq.py
-  dead_ends: []
+  dead_ends:
+  - tried: 'Their networks (LGATr-slim, LLoCa-Transformer, Transformer, MLP, het) by their own code (scripts/job_uq_ext.sh):
+      timing check, then their production per multiplicity (no public checkpoints exist)'
+    why: 'step 2 dropped by D480: the user answered no to the question that blocked it'
+    at: '2026-11-17T12:20:17+00:00'
   asks:
   - ask: 'GPU budget: ~370 GPU-h above 30 with no decision covering it (DyHPO route; ~23 GPU-h with template defaults). Design
       for the Z+ng trainings, for your call (nothing submitted). (1) Parent for the fine-tune: trial 1262 of cov_v4_long_hpo8_cc_68224
@@ -34231,8 +34240,10 @@ entries:
     searched: 'CLAUDE.md GPU budget rule (30 GPU-h); site decisions --project FA: D477 approves the entry at no stated cost;
       D478, D479 settle HPs and epochs only. Joaquin''s messages 2026-11-14T04:31 (a paper LaTeX template), 2026-11-12T15:33
       (KIT transformer results), 2026-11-15T17:28 (conference abstract): none names a cost for this work'
-    blocks_steps: &id003
+    blocks_steps:
     - 2
+    answered_at: '2026-11-17T12:19:05.926000+00:00'
+    decision: D480
   owner:
     agent: ad838d9b0df85e41f
     state: stopped
@@ -34557,11 +34568,6 @@ entries:
       if:
       - 'smoke ends all stages: batch of 8 at the smoke''s s/step'
       - 'smoke fails: fix the path, rerun the smoke'
-    2:
-      feeds: the reference numbers on the same test events
-      if:
-      - 'production <= 30 GPU-h: submit 4 jobs'
-      - 'above 30 GPU-h: to Joaquin with the cost, beside asking the authors for their prod_het_v1 preds_test_0.npz'
     3:
       feeds: what our current models give on their benchmark before any training on it
       if:
@@ -34570,7 +34576,6 @@ entries:
   step_waits:
     '1': FA-ccin2p3-394f20ac FA-ccin2p3-b4ebd88e FA-ccin2p3-ba9df01f FA-ccin2p3-02a0c484 FA-ccin2p3-213da086 FA-ccin2p3-82eb9944
       FA-ccin2p3-966a6561 FA-ccin2p3-2d4d3709
-    '2': FA-ccin2p3-3a43722f
     '3': FA-ccin2p3-394f20ac FA-ccin2p3-b4ebd88e FA-ccin2p3-ba9df01f FA-ccin2p3-02a0c484 FA-ccin2p3-213da086 FA-ccin2p3-82eb9944
       FA-ccin2p3-966a6561 FA-ccin2p3-2d4d3709
   findings:
@@ -34650,11 +34655,3 @@ entries:
       no KIT scorer for uq_); mg5_pipeline_final.py (ddbar_Zg..Zgggg); analysis/zng_uq/paper_mse.py + data/paper_mse.json;
       their repo supriodubey/lloca-experiments-uq branch uq (experiments/amplitudes/experiment_uq.py init_data, experiments/uq/metrics.py)
     written: '2026-11-17T11:27:17+00:00'
-  ask: 'GPU budget: up to 96 GPU-h above 30 with no decision covering it. Train their networks with their own code: all 4
-    networks x 4 multiplicities (at most 96 GPU-h, their 24 h limit per multiplicity job), or LLoCa-Transformer + LGATr-slim
-    only (about 50-65 GPU-h, estimate)?'
-  waiting_since: '2026-11-17T12:05:49+00:00'
-  searched: 'CLAUDE.md GPU budget rule (30 GPU-h); site decisions --project FA: D477 approves the entry at no stated cost;
-    D478, D479 settle HPs and epochs only. Joaquin''s messages 2026-11-14T04:31 (a paper LaTeX template), 2026-11-12T15:33
-    (KIT transformer results), 2026-11-15T17:28 (conference abstract): none names a cost for this work'
-  blocks_steps: *id003
