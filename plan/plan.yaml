@@ -34205,8 +34205,6 @@ entries:
   - D478
   - D480
   next:
-    3: Eval-only of existing models (trial 1262 zero-shot, u-flavour Z+ng models shifted by 0.779805) on their 1e6 test events
-      per multiplicity; needs its own design and a rebuild path for the multi-process 1262
     4: 'HPs for the Z+ng runs: the 8 runs at kit_hpo_uug_T hp1677 (lr 6.55e-3) fail the curve test in 7 of 8; a single-fidelity
       DyHPO search (template coupled space, Muon, WSD, emission-scale target, HETEROSC, 12,500 steps, 5e5 events, 8 trials)
       from scratch, then the 8 runs again at its choice. Cost above 30 GPU-h: Joaquin''s call (per multiplicity ~61 GPU-h;
@@ -34757,11 +34755,6 @@ entries:
       1262, multiplicity, bbx_g*z, ddx/uux names, highmult in results.tex, 1262''s training recipe, the plan entry, decisions
       D20-D480.'
   step_why:
-    3:
-      feeds: what our current models give on their benchmark before any training on it
-      if:
-      - 'a model within 3x of their median |Delta|: report as is'
-      - 'every model far above: report the in-support subset beside the whole set'
     4:
       feeds: whether our setup, trained well, comes within 3x of their networks on Z+ng
       if:
@@ -34773,7 +34766,6 @@ entries:
       - 'written and committed: plan evidence with the commit'
       - 'the zero-shot read fails: write up the trained runs alone'
   step_waits:
-    '3': FA-ccin2p3-7a112608
     '5': notes-editor pillar (blocked on par:muon_long, another entry's paragraph); the zero-shot read of step 3 joins the
       write-up
   findings:
