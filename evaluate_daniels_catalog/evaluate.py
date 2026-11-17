@@ -58,6 +58,79 @@ def rows_from(events, alphas):
         amp is not None
 
 
+def event_keyed_chunks(com, seed, uid, rs=None, mom_div=None, chunk=1 << 16, dtype=np.float32):
+    """keyed_aug.model_momenta_chunks with each event's Lorentz augmentation keyed on the event itself (the sha256 of
+    its centre-of-mass momenta) instead of on its pool file and its place there: the same draw distribution as in
+    training, so a prediction is a function of (event, seed) alone. `uid` is ignored."""
+    import hashlib
+    import keyed_aug
+    com = np.asarray(com)
+    for i in range(0, len(com), chunk):
+        c = com[i:i + chunk]
+        uids = np.array([int.from_bytes(hashlib.sha256(np.ascontiguousarray(r, np.float32).tobytes()).digest()[:8],
+                                        "little") for r in c], dtype=np.uint64)
+        x = keyed_aug.apply_components(keyed_aug.trafo_components(seed, uids, np.zeros(len(c), np.int64)), c).astype(dtype)
+        if rs is not None:
+            x = (x.astype(np.float64) / np.asarray(rs[i:i + chunk])[:, None, None]).astype(dtype)
+        yield x if mom_div is None else x / mom_div
+
+
+def score(name, pool, n_val, n_score, model, seed=42):
+    """tools/zero_shot_parent.py's read of the first n_score events of the val pool `pool` (n_val rows) of process
+    `name` by the network in `model`: the scorer's .npz (t, q, s, logF, ... in the scorer's shuffled order). The
+    Lorentz augmentation the network was trained with is drawn per event from (seed, the event's momenta)
+    (event_keyed_chunks), and the frames' degeneracy noise is a hash of each vector (rebuild_run.deterministic_frame_noise),
+    so a prediction depends on the event and the seed alone, never on the file it came in or its place there."""
+    tmp = tempfile.mkdtemp(prefix="evaluate_daniels_catalog_")
+    # the network's own files, its config pointed at this checkout (training catalog, diagram sidecars)
+    from omegaconf import OmegaConf, open_dict
+    parent = os.path.join(tmp, "model")
+    os.makedirs(parent)
+    for f in ("data_stats.json", "particle_tokenizer.json", "models"):
+        os.symlink(os.path.join(os.path.abspath(model), f), os.path.join(parent, f))
+    diagrams = os.path.join(tmp, "diagrams")
+    with tarfile.open(os.path.join(HERE, "diagrams.tar.gz")) as t:
+        t.extractall(diagrams, filter="data")
+    cfg = OmegaConf.load(os.path.join(model, "config.yaml"))
+    with open_dict(cfg):
+        cfg.data.processes_file = os.path.join(ROOT, "recipes", "catalog_daniel_train.yaml")
+        cfg.model.diagrams_dir = diagrams
+        cfg.run_dir = parent
+        cfg.seed = int(seed)
+        cfg.data.unaugmented_roles = ["train", "val"]    # uid None reaches model_momenta_chunks: keyed per event below
+    OmegaConf.save(cfg, os.path.join(parent, "config.yaml"))
+    recipe = os.path.join(tmp, name + ".yaml")
+    yaml.safe_dump({"processes": [{"name": name, "sqrts": [13000, 13000], "n_train": 0, "n_val": n_val, "n_test": 0}]},
+                   open(recipe, "w"))
+    # every read of this pool comes from the file above, never from the generator or a site's data directory
+    import datagen
+    real = datagen.ensure_split_set
+
+    def split(specs, role, seed, dest_dir=None, require_cache=False):
+        mine = [s for s in specs if s["process"] == name]
+        out = {name: pool} if mine else {}
+        rest = [s for s in specs if s["process"] != name]
+        if rest:
+            out.update(real(rest, role=role, seed=seed, dest_dir=dest_dir, require_cache=require_cache))
+        return out
+    datagen.ensure_split_set = split
+    import keyed_aug
+    from rebuild_run import deterministic_frame_noise
+    keyed_aug.model_momenta_chunks = event_keyed_chunks
+    deterministic_frame_noise()
+    os.environ.setdefault("SCRATCH", tmp)
+    save = os.path.join(tmp, "preds")
+    os.makedirs(save)
+    sys.argv = ["zero_shot_parent.py", "--parent", parent, "--save-dir", save, "--split", "val", "--signed-magnitude",
+                "--eval-subsample", str(n_score), "--train-subsample", str(n_score),
+                "--allow-physics-mismatch", "evaluate_daniels_catalog: events given by the user, no pool sidecar", recipe]
+    try:
+        runpy.run_path(os.path.join(ROOT, "tools", "zero_shot_parent.py"), run_name="__main__")
+    finally:
+        datagen.ensure_split_set = real
+    return np.load(os.path.join(save, name + ".npz"))
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--process", required=True)
@@ -66,6 +139,7 @@ def main():
     ap.add_argument("--out", required=True)
     ap.add_argument("--n", type=int, default=None, help="the first n events only (default all)")
     ap.add_argument("--model", default=os.path.join(HERE, "model"))
+    ap.add_argument("--seed", type=int, default=42, help="the seed of the per-event Lorentz augmentation draws")
     a = ap.parse_args()
 
     name = "dc_" + folder_of(a.process)
@@ -84,44 +158,7 @@ def main():
     np.save(pool, rows)
     if a_s is not None:
         np.save(pool[:-len(".npy")] + ".alphas.npy", np.asarray(a_s, np.float64)[:n])
-    # the network's own files, its config pointed at this checkout (training catalog, diagram sidecars)
-    from omegaconf import OmegaConf, open_dict
-    parent = os.path.join(tmp, "model")
-    os.makedirs(parent)
-    for f in ("data_stats.json", "particle_tokenizer.json", "models"):
-        os.symlink(os.path.join(os.path.abspath(a.model), f), os.path.join(parent, f))
-    diagrams = os.path.join(tmp, "diagrams")
-    with tarfile.open(os.path.join(HERE, "diagrams.tar.gz")) as t:
-        t.extractall(diagrams, filter="data")
-    cfg = OmegaConf.load(os.path.join(a.model, "config.yaml"))
-    with open_dict(cfg):
-        cfg.data.processes_file = os.path.join(ROOT, "recipes", "catalog_daniel_train.yaml")
-        cfg.model.diagrams_dir = diagrams
-        cfg.run_dir = parent
-    OmegaConf.save(cfg, os.path.join(parent, "config.yaml"))
-    recipe = os.path.join(tmp, name + ".yaml")
-    yaml.safe_dump({"processes": [{"name": name, "sqrts": [13000, 13000], "n_train": 0, "n_val": n, "n_test": 0}]},
-                   open(recipe, "w"))
-    # every read of this pool comes from the file above, never from the generator or a site's data directory
-    import datagen
-    real = datagen.ensure_split_set
-
-    def split(specs, role, seed, dest_dir=None, require_cache=False):
-        mine = [s for s in specs if s["process"] == name]
-        out = {name: pool} if mine else {}
-        rest = [s for s in specs if s["process"] != name]
-        if rest:
-            out.update(real(rest, role=role, seed=seed, dest_dir=dest_dir, require_cache=require_cache))
-        return out
-    datagen.ensure_split_set = split
-    os.environ.setdefault("SCRATCH", tmp)
-    save = os.path.join(tmp, "preds")
-    os.makedirs(save)
-    sys.argv = ["zero_shot_parent.py", "--parent", parent, "--save-dir", save, "--split", "val", "--signed-magnitude",
-                "--eval-subsample", str(n), "--train-subsample", str(n),
-                "--allow-physics-mismatch", "evaluate_daniels_catalog: events given by the user, no pool sidecar", recipe]
-    runpy.run_path(os.path.join(ROOT, "tools", "zero_shot_parent.py"), run_name="__main__")
-    z = np.load(os.path.join(save, name + ".npz"))
+    z = score(name, pool, n, n, a.model, seed=a.seed)
     # q and t are log(|M|^2 F), F the per-event physics factor of the target (logF): log|M|^2 = q - logF
     logF = z["logF"].astype(np.float64) if z["logF"].size else 0.0
     t = z["t"].astype(np.float64) - logF

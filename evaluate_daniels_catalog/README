@@ -1,0 +1,41 @@
+evaluate_daniels_catalog: predict |M|^2 on events of the arXiv:2606.23791 catalog with our
+"dimensionless + coupling orders" network trained on that catalog.
+
+Setup (once, from the repository root): the repository's CPU environment, Python 3.11, torch 2.1.2, numpy 1.26.4
+    bash scripts/cpu_env.sh            # builds .venv-cpu; on a GPU machine the full requirements.txt (adds xformers)
+
+Command:
+    .venv-cpu/bin/python evaluate_daniels_catalog/evaluate.py --process "b b~ > h h" --events events.npz --out preds.npz
+
+Inputs
+  --process  the process string of the catalog's process_catalog_sm.json ("b b~ > h h") or its folder (bbx_hh).
+  --events   .npz with
+               momenta (N, n, 4) in GeV, (E, px, py, pz); the two incoming partons first, then the outgoing ones
+                       in the catalog's order
+               pdg     (n,) or (N, n) PDG ids
+               alphas  (N,) each event's alpha_s (MadEvent's AQCDUP); needed unless the process has no alpha_s
+               amp     (N,) optional, the true |M|^2 (then the MSE of log|M|^2 is printed)
+             or one of our pools (.npy rows [momenta flat, pdg, |M|^2]) with --alphas <file.npy>.
+  --n        only the first n events (default all).
+  --seed     seed of the per-event Lorentz augmentation draw (default 42; the output does not depend on it, below).
+Output (--out .npz, one row per input event, in the input's order)
+  logM2_pred, M2_pred, sigma_logM2 (the network's sigma of log|M|^2), and logM2_true, M2_true when amp was given.
+
+Model: model/ is runs/catalog_norm_short/DlessInOrd/sigma_stage on CC-IN2P3 (5 epochs of 1e4 events per process on
+the catalog's 1352 training processes, EMA weights at the best checkpoint, then a sigma fit with the mean frozen).
+diagrams.tar.gz holds the catalog's diagram files the network reads. CPU handles a few thousand events in seconds
+to a minute; a GPU is used when there is one.
+
+What a prediction depends on: the event alone. Each event's Lorentz augmentation is drawn from (seed, its momenta),
+the frames' degeneracy noise is a hash, and the attention never crosses events (models/attention_lloca_mup.py: the
+CPU path without xformers used to attend over the whole batch, which made every prediction depend on the other
+events of the file and their order). Tests at the commit of this README, b b~ > h h, CPU:
+  - the same 300 events in forward and reversed order, written as two files: identical predictions (max diff 0).
+  - 8 augmentation seeds on 2000 events: per-event sd of log|M|^2 at most 1.7e-4 (the network is invariant).
+  - against our stored zero-shot read of the same 2000 val events (catalog_short_DlessInOrd_sigstage, GPU, 2026-10-23):
+    per event the two agree in shape (corr 0.994, sd of the difference 0.0094) up to a constant: the stored read is
+    0.194 higher in log|M|^2. MSE of log|M|^2: this evaluator 0.417, the stored read 0.279. The constant is not
+    explained yet (not the code since then: the 2026-10-23 code with the attention fix gives the same 0.194; not the
+    pool sidecar, the augmentation or the target statistics); a read of the same model on a GPU at CC is the next check.
+check_reproduction.py runs that comparison:
+    .venv-cpu/bin/python evaluate_daniels_catalog/check_reproduction.py --pool <dc_bbx_hh val pool .npy> --stored <read.npz>

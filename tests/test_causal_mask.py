@@ -332,6 +332,21 @@ def test_leakage_cpu_dense():
         _leakage_suite("cpu", tol=1e-4)
 
 
+def test_no_cross_event_cpu():
+    """Without xformers (CPU) the non-causal model never attends across events: an event's output is the same alone
+    as in a batch (the old fallback had no mask, dc_bbx_hh read on CPU: corr(q, t) -0.39 batched, +0.61 alone)."""
+    import torch
+    torch.set_default_dtype(torch.float32)
+    net = _model(False).eval()
+    mom, sca = _batch(3, (4, 5, 6))
+    with _dense_attention():
+        full, ptr = _run(net, mom, sca, "cpu")
+        for e in range(3):
+            alone, _ = _run(net, [mom[e]], [sca[e]], "cpu")
+            assert torch.allclose(full[int(ptr[e]):int(ptr[e + 1])], alone, atol=1e-5), f"event {e} depends on its batch"
+    print("no attention across events on the CPU path: ok")
+
+
 def test_leakage_cuda_xformers():
     import torch
     import models.attention_lloca_mup as A
@@ -353,5 +368,6 @@ if __name__ == "__main__":
         test_off_is_unchanged()
         test_frames_leak_fp64()
         test_leakage_cpu_dense()
+        test_no_cross_event_cpu()
         test_leakage_cuda_xformers()
     print("all passed")

@@ -1326,10 +1326,10 @@ class _AmplitudeGATrMuPBase(nn.Module):
         # batchsize 1024. μP's 1/d query pre-scaling is unaffected: it wraps the
         # `scaled_dot_product_attention` dispatcher *above* backend selection, and
         # xformers defaults to the same 1/sqrt(d) scale as native SDPA.
-        # `build_block_diagonal_bias` returns None when xformers is unavailable
-        # (e.g. login-node CPU) -> fall back to the dense mask + native attention.
+        # Without xformers (e.g. login-node CPU) `build_block_diagonal_bias` returns a dense boolean mask, which
+        # lgatr's dispatcher does not take as attn_bias -> the dense mask + native attention.
         attn_bias = build_block_diagonal_bias(ptr, seq_lens)
-        if attn_bias is not None:
+        if attn_bias is not None and not isinstance(attn_bias, torch.Tensor):
             amp_per_particle = self._run_net(fm, scalars, attn_bias=attn_bias)
         else:
             attn_mask = _block_diagonal_attn_mask(ptr, fourmomenta.device)

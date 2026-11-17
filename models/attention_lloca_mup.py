@@ -36,21 +36,29 @@ def _cached_block_diagonal_causal_mask(seq_lens):
     return BlockDiagonalCausalMask.from_seqlens(list(seq_lens))
 
 
-def dense_block_causal_mask(ptr, device=None):
-    """Boolean (N_total, N_total) mask, True where key j is visible to query i: same event and j <= i. The
-    xformers-free equivalent of BlockDiagonalCausalMask (CPU, tests)."""
+def dense_block_mask(ptr, device=None, causal=False):
+    """Boolean (N_total, N_total) mask, True where key j is visible to query i: same event (and j <= i when causal).
+    The xformers-free equivalent of BlockDiagonalMask / BlockDiagonalCausalMask (CPU, tests)."""
     ptr = torch.as_tensor(ptr)
     counts = (ptr[1:] - ptr[:-1]).long()
     ev = torch.repeat_interleave(torch.arange(len(counts)), counts.cpu())
-    idx = torch.arange(int(counts.sum()))
-    m = (ev[:, None] == ev[None, :]) & (idx[None, :] <= idx[:, None])
+    m = ev[:, None] == ev[None, :]
+    if causal:
+        idx = torch.arange(int(counts.sum()))
+        m = m & (idx[None, :] <= idx[:, None])
     return m if device is None else m.to(device)
+
+
+def dense_block_causal_mask(ptr, device=None):
+    return dense_block_mask(ptr, device=device, causal=True)
 
 
 def build_block_diagonal_bias(ptr, seq_lens=None, causal=False):
     """Build (or fetch from cache) the xformers BlockDiagonalMask for `ptr`.
 
-    Returns None if xformers is unavailable (caller falls back to dense attention).
+    Without xformers (CPU) it is the dense boolean mask (dense_block_mask), so particles never attend across events:
+    the old None made LLoCa's fallback attend over the whole batch, every prediction then depending on the other
+    events of its batch (a CPU read of dc_bbx_hh: corr(q, t) -0.39 batched against +0.61 one event per batch).
 
     `seq_lens` (a CPU tuple of per-event particle counts) may be supplied to skip
     the GPU→CPU sync entirely. `ptr` is born on the CPU in the collate fn, so the
@@ -65,9 +73,7 @@ def build_block_diagonal_bias(ptr, seq_lens=None, causal=False):
     `num_blocks` serializing syncs per step for the identical mask.
     """
     if not _XFORMERS_AVAILABLE:
-        # causal: the dense boolean mask (the fallback below would otherwise attend across events and to later
-        # particles); non-causal keeps the old behaviour
-        return dense_block_causal_mask(ptr, device=ptr.device) if causal else None
+        return dense_block_mask(ptr, device=ptr.device, causal=causal)
     if seq_lens is None:
         seq_lens = tuple((ptr[1:] - ptr[:-1]).tolist())   # GPU→CPU sync
     else:
@@ -410,7 +416,7 @@ def scaled_dot_product_attention(
         attn_bias = build_block_diagonal_bias(ptr)
 
     if isinstance(attn_bias, torch.Tensor):
-        # dense boolean mask (dense_block_causal_mask: the causal path without xformers)
+        # dense boolean mask (dense_block_mask: the path without xformers)
         attn_scores = torch.matmul(query, key.transpose(-2, -1)) * scale
         attn_scores = attn_scores.masked_fill(~attn_bias, float("-inf"))
         return torch.matmul(F.softmax(attn_scores, dim=-1), value)
