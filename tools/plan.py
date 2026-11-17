@@ -501,6 +501,11 @@ def ask_matches(e, text):
     allsents = [x for x in re.split(r"(?<=[.?!;])\s+|\n+", text or "")]
     if parts and all(any(part_asked(p, x) for x in (sents if "?" in p else allsents)) for p in parts):
         return True
+    # lettered options of one question (no "?" in any part) are alternatives: a message listing most of them asks it
+    # (2026-11-17: zng_uq_benchmark (a)/(b)/(c), option (c) reworded, refused 3 messages)
+    if parts and not re.search(r"\(\d+\)", e.get("ask") or "") and not any("?" in p for p in parts):
+        if 2 * sum(any(part_asked(p, x) for x in allsents) for p in parts) >= len(parts):
+            return True
     # a single-question ask is asked by its question sentence too: the background before it (numbers, estimates, a
     # withdrawn question) makes the whole ask long, and a message asking it in its own words shares under half of it
     # (2026-11-06: "Do you want 4 seeds, 2, or none ..." asked as "4 more from-scratch seeds ..., 2, or none ...")

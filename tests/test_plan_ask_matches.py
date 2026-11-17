@@ -202,3 +202,17 @@ def test_lettered_parts_asked_in_other_words_passes_unrelated_refuses():
     assert plan.ask_matches_set(e, [KIT_MSG])
     assert not plan.ask_matches_set(e, ["Joaquin, the data-saving read is fixed; the zero-shot label changed."])
     assert not plan.ask_matches_set(e, ["Joaquin, (a) is fine and (b) is fine, do you agree?"])
+
+
+ZNG_ASK = ("GPU budget: 33 to 61 GPU-h above 30 with no decision covering it. Our runs are not well trained. A DyHPO search "
+           "is the fix; which one: (a) one search per multiplicity, then the fine-tunes at each choice, ~61 GPU-h, ~8 h wall; "
+           "(b) one search on Z+4g only and its HPs for all 8 runs again, ~33 GPU-h, ~10 h wall; (c) neither, report the "
+           "current runs flagged.")
+
+
+def test_lettered_options_one_question_third_reworded_passes():
+    e = {"id": "zng_uq_benchmark", "ask": ZNG_ASK}
+    msg = ("Joaquin, which do you want?\n- (a) One search per multiplicity, then the fine-tunes at each one's best: ~61 GPU-h.\n"
+           "- (b) One search on Z+4g only, then all 8 runs again at its HPs: ~33 GPU-h.\n- (c) No search; runs reported untrained.")
+    assert plan.ask_matches(e, msg)
+    assert not plan.ask_matches(e, "Joaquin, do you like the plot colours?")
