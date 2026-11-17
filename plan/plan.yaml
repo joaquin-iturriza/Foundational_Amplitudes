@@ -33353,9 +33353,6 @@ entries:
       read the fine-tunes'' training and validation curves: does the error rise above the zero-shot start early in fine-tuning
       (learning rate, warmup, the head or standardization reset), and does it then recover; compare Muon and AdamW parents.
       Analysis on existing runs first; a design for any new run.'
-    6: 'Joaquin''s 2026-11-17 corrections, verbatim with the list in scratchpad pending_draft_corrections.txt: caption headlines
-      undone, no seed counts in paper captions (figure-style skill line changed), Fig. 14 right rows ordered by value with
-      short names, Fig. 19 legend split, ladder grids 3 across x 4 down.'
   done_when: null
   notes_ref: null
   match: none
@@ -34114,11 +34111,6 @@ entries:
       if:
       - 'a cause is found on existing runs: report with the curves and propose the fix'
       - 'existing runs cannot tell: propose a small design'
-    6:
-      feeds: a draft whose captions and figures follow what Joaquin asked, not what was invented
-      if:
-      - 'done: send figures, zip, PDF'
-      - 'a layout does not fit: say why with the measured size'
   ask: 'Scope: Fig. 15 on the new probes changes the Sec. 4 claim: Muon''s head start in fine-tuning holds at D_train = 10
     (10-50x) but closes by 316 (within 1.5x on three probes, 4.5x on b b̄ → HHHZ, whose Muon curve barely falls). The draft
     text was reworded to that; keep the new wording, or revert to the old until you''ve looked?'
