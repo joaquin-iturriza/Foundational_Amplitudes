@@ -35574,6 +35574,13 @@ entries:
       GPU; find which input before handing over. (a)=(b)=(c)=0.279: a CPU-vs-GPU difference to find before Suprio uses the
       CPU. (a) != (b): the committed copy is not the run''s model. A read on neither value (off by more than 0.02 in mean
       from both): reported as such with its logF, and the inputs of that read compared one by one with the CPU read''s.'
+    passed_at: '2026-11-17T19:45:07+00:00'
+    reviewer: 'Re-check after FIX: job at b4d92a24 now adds read (c), the stored read''s own scorer (zero_shot_parent.py --parent
+      sigma_stage, default --eval-subsample 2000 = the stored read''s first 2000 val rows, mean_t printed to confirm -11.0198),
+      so wrapper vs CPU/GPU vs code/weights separate; outcome covers all three plus (a)!=(b) and neither. Check 2: stored
+      npz q MSE 0.2791 recomputed, truth matches local pool to 7e-7; offset 0.194 vs per-event sd 0.0094 (20x). Check 3: one
+      seed, 8 seeds agree to 1.7e-4. Check 5 searched: DlessInOrd_sigstage, evaluate_daniels, sigma_stage, bbx_hh in docs/results.tex,
+      plan, analysis scripts, site decisions (D489 D490 D395 D276): no earlier GPU re-read. Eval-only, ~0.1 GPU-h, disk trivial.'
   step_why:
     1:
       feeds: whether catalog_v4's best pretraining zero-shots Daniel's held-out processes better than the arms trained on
