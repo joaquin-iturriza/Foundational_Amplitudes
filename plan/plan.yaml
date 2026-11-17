@@ -34372,9 +34372,9 @@ entries:
     - 10
   owner:
     agent: af420daee93095631
-    state: working
+    state: stopped
     since: '2026-11-17T17:01:50.121000+00:00'
-    state_at: '2026-11-17T21:21:32.164000+00:00'
+    state_at: '2026-11-17T21:25:05.282000+00:00'
     context: 165816
     context_at: '2026-11-17T20:36:16+00:00'
   designs:
@@ -35369,7 +35369,7 @@ entries:
     agent: acd7131834d93c97d
     state: working
     since: '2026-11-17T19:59:30+00:00'
-    state_at: '2026-11-17T21:21:32.520000+00:00'
+    state_at: '2026-11-17T21:35:04.456000+00:00'
     context: 232335
     context_at: '2026-11-17T21:21:41+00:00'
   designs:
