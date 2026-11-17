@@ -35505,3 +35505,10 @@ entries:
       if:
       - 'Joaquin names a place for the checkpoint: a worker copies it there'
       - 'Joaquin wants code and config: a worker puts them where he says'
+  targets:
+  - batch: dan_zs_v4_reads
+    wall_h: 0.1
+    jobs: 1
+    units: null
+    start: '2026-11-17T18:48:20+00:00'
+    at: '2026-11-17T18:48:20+00:00'
