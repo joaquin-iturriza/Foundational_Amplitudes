@@ -34223,11 +34223,12 @@ entries:
     - FA-ccin2p3-28d56f33
     - FA-ccin2p3-2d4d3709
     - FA-ccin2p3-394f20ac
+    - FA-ccin2p3-7a112608
     - FA-ccin2p3-82eb9944
     - FA-ccin2p3-966a6561
     - FA-ccin2p3-b4ebd88e
     - FA-ccin2p3-ba9df01f
-    commit: 34077f8a
+    commit: 8f291240
     paths:
     - analysis/zng_uq/benchmark.py
     - analysis/zng_uq/data/benchmark.json
