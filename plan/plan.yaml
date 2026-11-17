@@ -33863,6 +33863,36 @@ entries:
       plan.yaml, site decisions for the four probe names, ''low-loss'', ''good loss'', ''low loss'', ''Fine-tunes at small'',
       muon_ft, catft, muon_hp_ft: no fine-tune on these probes; the 2x2/refit cells and the Muon fine-tune HP search are on
       the old probes only.'
+  - at: '2026-11-17T04:30:22+00:00'
+    question: 'Fig. 15 (fig:ft, Muon against AdamW pretraining fine-tuned at small D_train) on held-out probes with low error
+      and a large Muon/AdamW zero-shot separation (Joaquin 2026-11-17: ''just get some processes with relatively good performance,
+      but with also good separation between muon and adam''): does the Muon pretraining''s fine-tune stay below the AdamW
+      one''s at every D_train, and do both fall with D_train? Feeds the figure and the Sec. 4 optimizer sentence.'
+    prior: 'Same protocol, passed 2026-11-17T01:32, run on low-loss probes chosen one per held-out axis (FA-ccin2p3-d622e8cc/-e408d1a1/-25992f44,
+      muon_ft_lowloss.json @4979f72f): Muon lower on the 3 tree probes at every D (4-5x at 316), one-loop crosses; errors
+      0.03-0.4 that barely fell with D (Joaquin rejected the probes). 2026-10-26 runs on the four median probes (muon_ft.json):
+      Muon lower on the trees at every D. Searched results.tex, plan show draft_rewrite, site decisions for gg_ttx, dbx_txu,
+      bbx_hhhz, uux_wpwm, catft, sep-probes: no fine-tune on these probes.'
+    measure: 'Per probe and D_train: best-checkpoint validation MSE of log|M|^2 on the probe''s first 2000 validation events
+      (tools/catalog_ft.py CATFT mse_log) and each pretraining''s zero-shot error (mse_log_step0).'
+    check: 'On the chosen probes the parents'' zero-shot errors differ by 30-195x (AdamW/Muon: g g->t tbar 0.0841/0.000431,
+      d dbar->t ubar 0.196/0.00302, b bbar->HHHZ 0.301/0.0092, u ubar->W+W- 0.618/0.0205; short_reads.json via muon_compare.py
+      sep-probes @d0ae01a7), far above the ~1.4x pretraining-seed spread of the zero-shot read, so step 0 moves with the optimizer
+      arm; whether the gap survives fine-tuning is the question.'
+    fixed: 'Protocol of the passed design unchanged: tools/catalog_ft.py via scripts/job_catalog_ft.sh at the submitted commit;
+      parents runs/catalog_v3_short/dimensionless (AdamW) and dimensionless_muon (Muon), best checkpoints, CC-IN2P3; fine-tune
+      optimizer = the parent''s, --keep-parent-stats; D = 10, 32, 100, 316 at 176, 704, 2816, 4576 steps; parent''s lr and
+      HPs; scratch with the dimensionless config and AdamW. Only the probes change: v3_gg_ttx, v3_dbx_txu, v3_bbx_hhhz, v3_uux_wpwm
+      (rule: muon_compare.py sep-probes, all held-out processes but the alpha_s/energy/cut variants, geometric-mean zero-shot
+      MSE at or below the 25th percentile, top 4 by |log AdamW/Muon|). Pools by scripts/prebuild_recipes.sh recipes/catalog_v3_sep_probes.yaml
+      (with alpha_s sidecars), the 3 jobs afterok on it, out dir zz_catft_sep. 3 jobs x ~1 h = ~3 GPU-h (time from the 3 runs
+      of the same setup today, 0.77-0.99 h per job), --time=02:00:00.'
+    control: From scratch on the same probe, D_train and events, and each arm's zero-shot line.
+    seeds: One seed per cell, as the figure; zero-shot pretraining-seed spread ~1.4x quoted, ratios inside it reported unresolved.
+    outcome: 'Yes: Muon''s fine-tune at or below AdamW''s at most D_train on most probes and the curves fall with D_train:
+      the figure replaces Fig. 15. No: AdamW at or below Muon, or curves flat in D_train: the figure shows it, the Sec. 4
+      sentence says so and the flat probes are reported to Joaquin before the figure is called done; a failed cell is listed
+      and rerun once.'
   targets:
   - batch: examples_rerun
     wall_h: 1.0
