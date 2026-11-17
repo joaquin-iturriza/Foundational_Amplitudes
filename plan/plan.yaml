@@ -33349,12 +33349,13 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-4fa87893
-    commit: c3f0548d
+    commit: '84948781'
     paths:
     - .claude/skills/paper-writing-style/SKILL.md
     - /home/joaquin/drafts/fm_amplitudes_2026-11/paper.tex
     - /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_sec2_pages.pdf
     - /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/overleaf_update_v5.zip
+    - analysis/catalog_v4/figs/paper_unseen.png
     - analysis/catalog_v4/paper_sec3_figs.py
     - analysis/data_saving/data/example_cells.json
     - analysis/data_saving/example_reruns.py
@@ -33362,9 +33363,12 @@ entries:
     - analysis/data_saving/figs/example_dist_a.png
     - analysis/divergences/l2_eeuu_online.py
     - analysis/divergences/plot_steering.py
+    - analysis/transfer/figs/finale_synth_paper.png
+    - analysis/transfer/figs/rung_focus.png
     - analysis/transfer/het_delta_summary.py
     - analysis/transfer/het_eval_check.py
     - plot_style.py
+    - recipes/catalog_v3_sep_probes.yaml
     - scripts/job_rerun_trial.sh
   dead_ends: []
   asks:
