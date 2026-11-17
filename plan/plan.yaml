@@ -33424,7 +33424,7 @@ entries:
     state_at: '2026-11-17T01:48:40+00:00'
   step_waits:
     '3': '2026-11-20: next draft round'
-    '5': prebuild of recipes/catalog_v3_lowloss_probes.yaml (next owner submits it)
+    '5': FA-ccin2p3-49d18c32 FA-ccin2p3-abaec8ae FA-ccin2p3-b551c3a9
     '4': next owner (context limit reached; Sec. 5 figures and paper.tex left, see hand-off)
   findings:
   - at: '2026-11-13T02:46:58+00:00'
