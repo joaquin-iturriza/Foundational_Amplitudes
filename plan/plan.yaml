@@ -27701,9 +27701,6 @@ entries:
     22: 'Steps 14/19 NO branches of the passed 10:47 design: div-form (uug inconclusive, tt STAYED) and ReZero (uug soft MOVED,
       tt Sudakov blows up) each a 16-trial kit_hpo-template search, ~9.6 GPU-h each, beyond the design''s remaining budget:
       to Joaquin with the cost, beside A2 (FIXED on every family with an exponent)'
-    23: 'Repo-reviewer blocking item (draft_rewrite owner''s hand-off 2026-11-17): tools/kit_figures.py:330, the KIT deck''s
-      attempts figure puts six fine-tunes under one legend entry ''pretrained with the top family held out (6 runs)'', but
-      four of those parents had tops added; split or relabel, redraw, rebuild the deck, re-run the reviewer.'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -29021,14 +29018,8 @@ entries:
       if:
       - 'Joaquin approves: run the searches, best against best'
       - 'Joaquin drops them: A2 alone is the KIT model; record the dead ends'
-    23:
-      feeds: a correct KIT deck figure and a clear reviewer backlog
-      if:
-      - 'fixed: send the redrawn figure and the deck'
-      - 'the runs are mislabelled in the data: say which'
   step_waits:
     '20': '2026-11-14'
-    '23': the repo-reviewer ae24955df7b1a36a7 re-check of 224c7920
   handoff:
     state: '2026-11-17 @092b4128. Step 23 done again (Joaquin 2026-11-17: fewer figures, readable ranges, short deck): 12
       figures in analysis/kit_benchmark/figs/deck (tools/kit_vs_mlp.py plot --figs analysis/kit_benchmark/figs/deck; tools/kit_figures.py
