@@ -119,9 +119,12 @@ REG_UUG = [("peak", r"$<3$"), ("peak_ir", r"$<3$, IR"), ("shoulder", r"$3\!-\!15
            ("continuum", r"$>15$")]
 fig, (axL, axR) = ps.figure(ncols=2)
 xr = np.arange(len(REG_UUG))
+# each arm its own marker, fill and line style as well as colour, the points of a window spread apart (Joaquin
+# 2026-11-17: the three were hard to tell apart)
+LS, FILL = ("-", "--", "-."), ("white", None, None)
 for j, (lab, t, c, m) in enumerate(UUG):
-    axL.plot(X, dec(t), m + "-", color=c, label=lab)
-    axR.plot(xr + (j - 1) * 0.15, [F[t]["reg"][k][1] for k, _ in REG_UUG], m, color=c, label=lab)
+    axL.plot(X, dec(t), marker=m, ls=LS[j], color=c, mfc=FILL[j] or c, label=lab)
+    axR.plot(xr + (j - 1) * 0.25, [F[t]["reg"][k][1] for k, _ in REG_UUG], m, color=c, mfc=FILL[j] or c, label=lab)
 axL.set_yscale("log"); decade_axes(axL)
 axL.set_xlabel(r"$\log_{10} y_{\min}$,  $y_{\min}=\min_{i<j} s_{ij}/\hat s$")
 ps.legend(axR, "lower left")

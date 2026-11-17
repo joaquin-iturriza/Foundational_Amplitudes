@@ -81,16 +81,20 @@ for ax, p in zip(axs.flat, PROBES):
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlabel(r"training events $D_{\rm train}$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
     # the saving's factor on its arrow (Joaquin 2026-11-17: under the process name it read as unexplained)
-    ax.annotate(rf"$\times{s:.1f}$", xy=(np.sqrt(ds * df), level), xytext=(0, -4), textcoords="offset points",
-                ha="center", va="top", bbox=dict(fc="white", ec="none", pad=0.5), zorder=6)
+    ax._saved = s   # the factor goes in the panel's legend, on the arrow's own entry (Joaquin 2026-11-17: not on the lines)
     ps.process_label(ax, {**LAB, **ARMLAB}[p].replace(" (1-loop)", " one loop"))
 print(f"median fitted saving over the 4 panels {np.median(S):.1f} (each read at its own panel's level, not one precision); median L_scratch/L_ft over all {len(ALL)} cells "
       f"{np.median(ALL):.1f}")
 # the legend inside the first panel, in words (Joaquin 2026-11-17: one file, legend inside, readable without the text)
-H = [Line2D([], [], color="k", marker="o", label="from scratch"),
-     Line2D([], [], color=ps.C.blue, marker="o", label="fine-tuned"),
-     Line2D([], [], color="0.5", marker="o", mfc="none", ls="none", label="left out of the fit"),
-     Line2D([], [], color="0.5", ls="--", label="target precision"),
-     Line2D([], [], color=GAP, label="data saved at the target precision")]
-ps.legend(axs.flat[0], "lower left", handles=H)
+# per panel a legend in its free lower-left corner: the arrow's entry carries that panel's factor; the first panel adds
+# the shared entries, the one-loop panel its open point (Joaquin 2026-11-17: one legend line "data saved x5.5")
+for ax, p in zip(axs.flat, PROBES):
+    H = [Line2D([], [], color=GAP, label=rf"data saved $\times{ax._saved:.1f}$")]
+    if ax is axs.flat[0]:
+        H = [Line2D([], [], color="k", marker="o", label="from scratch"),
+             Line2D([], [], color=ps.C.blue, marker="o", label="fine-tuned"),
+             Line2D([], [], color="0.5", ls="--", label="target precision")] + H
+    if p in SKIP:
+        H.append(Line2D([], [], color="0.5", marker="o", mfc="none", ls="none", label="left out of the fit"))
+    ps.legend(ax, "lower left", handles=H)
 ps.save(fig, os.path.join(ROOT, "analysis", "data_saving", "figs", "old_setup_examples"))
