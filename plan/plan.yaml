@@ -34663,6 +34663,46 @@ entries:
       HETEROSC, as decided (D71). The parent''s own preprocessing is used (shared_standardization true, emission-scale target),
       right for an eval-only read of an existing model. Deterministic, so one read is enough. The smoke at 20000 events writes
       the npz that benchmark.py reads before the full job goes. Disk is small.'
+  - at: '2026-11-17T14:54:47+00:00'
+    question: 'Step 3, eval-only: what median |Delta|, |Delta| distribution on Z+4g and pulls does the catalog_v4 pretraining
+      (trial 1262, its sigma stage) give zero-shot on the UQ repo''s q qbar -> Z+1..4g test events (Zenodo 16793011, their
+      split, 1e6 per n), beside our 8 trained runs? Two different questions by n: n=1..3 is a known function under a new quark
+      label (1262 trains on b b~ -> Z+1..3g, v4_bbx_gz/ggz/gggz, massless b), n=4 (2->5) is extrapolation in multiplicity
+      (catalog_v4 stops at 2->4). Caption: our pretraining, not trained on their events. The u-flavour Z+ng models of the
+      step''s text cannot be read: every u u~ > Z+ng search on CC (tp_scr_*, tp3_scr32k_*, tp3_hmscr32k_*, *_het) holds only
+      results/ and dyhpo_surrogate/, no checkpoint (listed 2026-11-17); their recorded test MSE of ln|M|^2 on u u~ is the
+      prior instead: scratch, D=1e5, 32k steps, MSE loss, lr ~1.4e-3: Zg 5.8e-8, Zgg 2.1e-5, Zggg 3.4e-4, Zgggg 3.9e-4 (analysis/transfer/scratch_sweeps.json;
+      own event pools).'
+    prior: '1262 on its own b b~ -> Z+ng training processes, 200 validation events each at its best (sigma_stage/preds_val.npz,
+      mu frozen; benchmark.py parent @34077f8a -> analysis/zng_uq/data/parent_bbx.json): median |Delta| Z+1g 5.2e-4, Z+2g
+      3.9e-3, Z+3g 2.0e-2; MSE of ln|M|^2 1.1e-6, 2.3e-4, 2.7e-3 (catalog sampling, not their phase space). Zero-shot multiplicity
+      extrapolation of catalog_v4 (results.tex par:v4_mult_bias, ~l.3985): the 2->4 multiplicity pools carry a signed level
+      bias, median offset 0.12 with 0.642 of 218 pools positive (the level placed too high one particle up). Our 8 runs (benchmark.json
+      @4a2a9f3d): median |Delta| scratch/ft Z+1g 1.0e-4/4.8e-5 .. Z+4g 2.1e-2/1.6e-2, 7 of 8 fail the curve test. Same |M|^2,
+      b b~ vs d d~: argued, not computed: massless b and d carry the same QCD and Z couplings in the SM UFO (sm-no_b_mass),
+      no CKM or Yukawa enters q q~ -> Z + gluons at tree level, so |M|^2 is equal event by event; the read carries this caveat.
+      Searched: zng, Z+4g, zero-shot, 1262, multiplicity, bbx_g*z, highmult, het23 in results.tex; 1262''s recipe; the plan
+      entry; D477-D480.'
+    measure: 'benchmark.py collect on zero_shot_parent''s per-probe npz (t, q, s in the target''s ln units; q - t is the ln
+      residual of |M|^2, a target factor divides both): median, q90, q99 |Delta|, MSE of ln|M|^2 and standardised, |Delta|
+      histogram, pulls (t - q)/s, pull std, 68% coverage; the same functions as for our runs.'
+    check: 'The quantity moves: median |Delta| spans 1e-4 to 2e-2 across n and arms in benchmark.json; 1262''s own b b~ level
+      (5.2e-4 .. 2.0e-2) sits between scratch and 10x above it, so the read can resolve ''label transfer works'' from ''it
+      does not'' at n=1..3. Same events: the event count asserted equal to our truth''s 1e6 per n.'
+    fixed: 'Parent runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262/sigma_stage (mu = 1262''s best, its sigma
+      stage), its own config, shared standardization (pooled mu, sigma; no fit). Probes kit_uq_<zg|zgg|zggg|zgggg>__me2, n_train
+      5e5, n_val 1e5, n_test 1e6 (as job_kit.sh with KIT_NTEST=1e6), --split test --eval-subsample N. --allow-physics-mismatch
+      with the reason: the events'' |M|^2 equals our MadGraph d d~ > Z+ng to 1.4e-14 (FA-ccin2p3-32145d4b). scripts/job_zng_zeroshot.sh
+      @34077f8a, one GPU job, output runs/kit/zng_zeroshot_1262_n<N>/preds. Smoke (D395): N=20000 through every stage, then
+      N=1e6. Wall target 1 h, limit 2 h; ~1.5 GPU-h with the smoke. Disk ~50 MB.'
+    control: 'n=1..3: 1262''s own level on b b~ -> Z+1..3g (parent_bbx.json) is the in-training reference; our fine-tuned
+      and scratch runs on the same events. n=4: our trained runs; par:v4_mult_bias for the expected sign of the error.'
+    seeds: 'None: eval-only of one existing model, deterministic.'
+    outcome: 'Smoke YES: four ZERO_SHOT lines without error, four npz with t, q, s of 20000 events -> the full job. NO ->
+      fix, smoke again. n=1..3 (label transfer): zero-shot median |Delta| within 3x of 1262''s own b b~ level -> the d label
+      reads as b, the pretraining holds Z+ng; above 10x -> the label breaks it; between: stated. n=4 (extrapolation): within
+      3x of the fine-tuned run -> extrapolates; above 10x -> it does not, with the sign of the mean residual q - t against
+      par:v4_mult_bias (positive expected). Pull std per n against 1.'
   step_why:
     3:
       feeds: what our current models give on their benchmark before any training on it
