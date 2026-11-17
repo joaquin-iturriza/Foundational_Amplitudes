@@ -33613,6 +33613,14 @@ entries:
       ref kept in the caption; genmix caption opening; rung_focus caption adapted to its colours; clearpage before Sec. cond
       removed); ''modest'' sentence and stray preamble line left out. 45 pp; zip scratchpad draft_final_overleaf_steer_uug.zip
       compiled standalone.'
+  - at: '2026-11-17T01:46:22+00:00'
+    text: '2026-11-17 step 5 (Fig. 15 on low-loss probes): design passed (design-reviewer PASS); probes by analysis/catalog_v3/muon_compare.py
+      low-probes @de3e6c17 (10th percentile per held-out axis of the two parents'' geometric-mean zero-shot MSE): d dbar->b
+      bbar g g, u dbar->g W+ Z Z, e+e- -> mu+mu- t tbar, u ubar -> W+W- one loop. Batch FA-ccin2p3-1ab1158d (AdamW parent),
+      -e7ab0fd5 (Muon parent), -fc9f98dc (scratch), scripts/job_catalog_ft.sh @2bec150a, 3 GPU x 2 h limit, target 1 h: every
+      cell failed at once, require_cache: the probes'' train pools are not prebuilt in /sps/lpnhe/.../tmp/amp_data_cache (the
+      zero-shot reads used val pools only; even the October probes'' train caches are gone). Fix: prebuild the four probes''
+      train pools (prebuild_recipes.sh on a spec of the four, CPU), then resubmit the same three jobs unchanged.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
