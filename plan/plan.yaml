@@ -35711,7 +35711,8 @@ entries:
     units: null
     start: '2026-11-17T20:54:56+00:00'
     at: '2026-11-17T20:54:56+00:00'
-  step_waits: {}
+  step_waits:
+    '2': 'the notes-editor review (docs/*.tex pillar DUE and locked: edits to docs/results.tex refused until it passes)'
   findings:
   - at: '2026-11-17T19:03:19+00:00'
     text: 'The dimensionless + coupling orders network''s zero-shot predictions depend on the eval-time Lorentz augmentation
