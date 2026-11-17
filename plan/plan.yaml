@@ -33332,6 +33332,15 @@ entries:
     3: 'Het loss vs MSE (Fig. 9, removed from the draft by Joaquin 2026-11-13): come back to it. The het network leaves ~1-11%
       of 2->2 test events unfitted with large sigma (median |Delta| better 118/146, MSE worse on most 2->2); evaluation checked,
       no bug; training precision not checked'
+    4: 'General draft pass (Joaquin 2026-11-17, verbatim in scratchpad joaquin_draft4_2026-11-17.txt): (a) Fig. 15 and its
+      Sec. 4 sentence out of the draft for now (his hold); (b) act on the co-authors'' corrections instead of merging them:
+      fill the ''ab: insert here'' (the table of the pretraining processes, Tab. ref filled), and apply what their edits show
+      to every caption and paragraph of his sections (captions open with the message in plain words and name colours, results
+      say what the network was trained on, effect sizes placed against something the reader knows); (c) every figure placed
+      next to the text that first discusses it; (d) the text made consistent with the redrawn figures (no ''the catalog'',
+      ''rung'', internal names; the same names as the figures); (e) Fig. 14 right: row names short but readable alone (e.g.
+      ''all inputs'', ''no off-shellness'', ''no colour'', ''no diagrams'', ''linear embedding'', ''+ pair bias''), nothing
+      cryptic like R_c or MLP; fresh reviewer; zip and PDF.'
   done_when: null
   notes_ref: null
   match: none
@@ -34041,6 +34050,11 @@ entries:
       if:
       - 'Joaquin returns to it: design the follow-up he asks for'
       - 'never: stays out of the paper'
+    4:
+      feeds: a draft whose text and figures match and read alone
+      if:
+      - 'reviewer passes: send zip, PDF and changed figures'
+      - 'a correction needs a result not on disk: say which'
   ask: 'Scope: Fig. 15 on the new probes changes the Sec. 4 claim: Muon''s head start in fine-tuning holds at D_train = 10
     (10-50x) but closes by 316 (within 1.5x on three probes, 4.5x on b b̄ → HHHZ, whose Muon curve barely falls). The draft
     text was reworded to that; keep the new wording, or revert to the old until you''ve looked?'
