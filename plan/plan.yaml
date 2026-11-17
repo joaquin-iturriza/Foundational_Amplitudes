@@ -35331,7 +35331,9 @@ entries:
     - dan_zeroshot_v4
   decisions:
   - D488
-  next: null
+  next:
+    2: 'Write up in docs/results.tex: trial 1262 zero-shot on Daniel''s held-out split (dan_per_process, 9e02875a), the b-mass
+      calibration, and the CPU evaluator''s Laplacian-PE fix (425f10d2), with src/claim lines; then plan done'
   done_when: null
   notes_ref: null
   match: dan_zs_v4*
@@ -35781,3 +35783,10 @@ entries:
     files: evaluate_daniels_catalog/{evaluate.py,check_reproduction.py,README}, models/attention_lloca_mup.py, tests/test_causal_mask.py,
       scripts/job_evaluate_daniels.sh, scripts/job_catalog_v3_short.sh
     written: '2026-11-17T19:55:58+00:00'
+  step_why:
+    2:
+      feeds: 'whether catalog_v4''s best pretraining zero-shots Daniel''s held-out processes better than the arms trained
+        on his catalog (answer: no, 1-2 decades worse, the b mass mismatch dominating)'
+      if:
+      - 'write-up passes the claims check: plan done with the write-up commit'
+      - 'a claim does not reproduce: fix the number at its source tool and redo the paragraph'
