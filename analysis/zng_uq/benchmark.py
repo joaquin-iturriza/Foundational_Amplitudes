@@ -15,6 +15,7 @@ Every metric is their experiments/uq/metrics.py definition, in ln|M|^2: Delta = 
 """
 import argparse
 import glob
+import sys
 import json
 import os
 
@@ -24,6 +25,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 PROCS = {1: "zg", 2: "zgg", 3: "zggg", 4: "zgggg"}
 NETS = {"slim": "LGATr-slim", "lloca": "LLoCa-Transformer", "transformer": "Transformer", "mlp": "MLP"}
 OURS = {"A": "from scratch", "A_ft": "fine-tuned"}
+ZS = "pretraining only, zero-shot"
 DBINS = np.logspace(-8, 1, 91)          # |Delta| bins
 PBINS = np.linspace(-6, 6, 121)         # pull bins
 
@@ -69,6 +71,16 @@ def collect(theirs, out):
                 data["runs"][f"{label}|{n}"] = dict(metrics(truth, mu, sigma), run=d, arm=label, n_gluons=n,
                                                        std_train_ln=std_train)
                 data["runs"][f"{label}|{n}"]["mse_std"] = data["runs"][f"{label}|{n}"]["mse_log"] / std_train ** 2
+        # the catalog_v4 pretraining zero-shot (scripts/job_zng_zeroshot.sh, tools/zero_shot_parent.py): t, q, s in the
+        # scored target's ln units (a target factor divides both, so q - t is the ln residual of |M|^2)
+        zf = os.path.join(root, "zng_zeroshot_1262_n1000000", "preds", f"kit_uq_{p}__me2.npz")
+        if os.path.exists(zf):
+            z = np.load(zf)
+            assert len(z["t"]) == len(truth), f"zero-shot {p}: {len(z['t'])} events, not the {len(truth)} test events"
+            data["runs"][f"{ZS}|{n}"] = dict(metrics(z["t"].astype(np.float64), z["q"].astype(np.float64),
+                                                     z["s"].astype(np.float64) if len(z["s"]) else None),
+                                             run=zf, arm=ZS, n_gluons=n, std_train_ln=std_train)
+            data["runs"][f"{ZS}|{n}"]["mse_std"] = data["runs"][f"{ZS}|{n}"]["mse_log"] / std_train ** 2
         for net, label in NETS.items():
             f = os.path.join(theirs, f"z{n}g", net, "preds_test_0.npz") if theirs else ""
             if not os.path.exists(f):
@@ -149,15 +161,69 @@ def plot(path, curves=None, paper=os.path.join(HERE, "data", "paper_mse.json")):
         ps.save(fig, os.path.join(figs, "zng_curves"))
 
 
+PARENT = "runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262/sigma_stage"
+PARENT_SITE = r'''
+import json, sys
+import numpy as np
+z = np.load(sys.argv[1] + "/preds_val.npz")
+names = list(z["names"]); out = {}
+for p in ("v4_bbx_gz", "v4_bbx_ggz", "v4_bbx_gggz"):
+    m = z["process_id"] == names.index(p)
+    r = np.log(z["raw_pred"][m, 0]) - np.log(z["raw_truth"][m, 0])
+    out[p] = {"n": int(m.sum()), "median_abs_delta": float(np.median(np.abs(np.expm1(r)))), "mse_ln": float(np.mean(r ** 2))}
+print("PARENTBBX " + json.dumps(out))
+'''
+
+
+def parent(out):
+    """1262's own level on its b b~ -> Z+1..3g training processes (massless b: the same tree |M|^2 as d d~ -> Z+ng):
+    median |Delta| and MSE of ln|M|^2 on its validation events (sigma_stage/preds_val.npz, mu frozen = the best)."""
+    sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
+    from analysis.common.readers import site_python
+    d = site_python(PARENT_SITE, [PARENT], "PARENTBBX")
+    json.dump(d, open(out, "w"), indent=1)
+    print(json.dumps(d))
+
+
+def summary(path, curves, paper=os.path.join(HERE, "data", "paper_mse.json")):
+    """The numbers docs/results.tex quotes, one JSON line (verify_claims): per arm (scr, ft, zs) and n the median |Delta|,
+    MSE of standardised ln|M|^2, pull std, 68% coverage; per trained run the curve test; their paper's best network."""
+    d = json.load(open(path))
+    short = {"from scratch": "scr", "fine-tuned": "ft", ZS: "zs"}
+    out = {}
+    for v in d["runs"].values():
+        if v["arm"] in short:
+            o = out.setdefault(short[v["arm"]], {}).setdefault(str(v["n_gluons"]), {})
+            o.update(median=v["median_abs_delta"], mse_std=v["mse_std"], mse_ln=v["mse_log"],
+                     pull_std=v.get("pull_std"), cov68=v.get("cov_0.68"), sigma_median=v.get("sigma_median"))
+    if curves and os.path.exists(curves):
+        c = json.load(open(curves))
+        for m, a in (("A", "scr"), ("A_ft", "ft")):
+            for n, p in PROCS.items():
+                r = c.get(f"kit_{m}_uq_{p}_me2_n500000_t12500")
+                if r:
+                    out[a][str(n)].update(separation=r["separation"], well=r["well"], best_step=r["best_step"])
+        out["n_well"] = sum(r["well"] for r in c.values())
+    out["paper_lloca"] = {str(n): json.load(open(paper))["mse"]["LLoCa-Transformer"][f"Z+{n}g"] for n in PROCS}
+    print(json.dumps(out))
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("cmd", choices=["collect", "plot"])
+    ap.add_argument("cmd", choices=["collect", "plot", "summary", "parent"])
     ap.add_argument("--theirs", default=os.path.join(os.environ.get("WORK", ""), "ext", "uq_runs", "runs", "prod_het"))
     ap.add_argument("--out", default=os.path.join(HERE, "data", "benchmark.json"))
     ap.add_argument("--data", default=os.path.join(HERE, "data", "benchmark.json"))
     ap.add_argument("--curves", default=os.path.join(HERE, "data", "zng_curves.json"))
     a = ap.parse_args()
-    collect(a.theirs, a.out) if a.cmd == "collect" else plot(a.data, a.curves)
+    if a.cmd == "collect":
+        collect(a.theirs, a.out)
+    elif a.cmd == "parent":
+        parent(os.path.join(HERE, "data", "parent_bbx.json"))
+    elif a.cmd == "plot":
+        plot(a.data, a.curves)
+    else:
+        summary(a.data, a.curves)
 
 
 if __name__ == "__main__":
