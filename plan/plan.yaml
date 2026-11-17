@@ -33483,6 +33483,7 @@ entries:
   step_waits:
     '3': '2026-11-20: next draft round'
     '4': a reviewer (cold reader of the draft 92579e7)
+    '5': repo-reviewer (backlog blocks the curve script)
   findings:
   - at: '2026-11-13T02:46:58+00:00'
     text: '2026-11-13 ~03:50 Joaquin: ''we should start actually doing the work on the draft with what we have ... Let''s
