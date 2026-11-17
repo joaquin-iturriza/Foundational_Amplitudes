@@ -78,5 +78,28 @@ for arm, (_, what) in ARMS.items():
             label=f"step 1 + {what}")
 ps.process_label(ax, LAB[p])
 axes_style(ax)
-ps.legend(ax, "lower left", fontsize=ps.LEGEND_MIN_PT)   # the curves fall from upper left: lower left is empty
+# the curves fall from upper left to lower right: the 8 entries split between the two free corners, as the scatters'
+# (Joaquin 2026-11-17: one 8-entry legend stretched the y range and squashed the curves)
+ps.layout(fig)
+hs, ls = ax.get_legend_handles_labels()
+order = sorted(range(len(ls)), key=lambda i: len(ls[i]))   # the short names fit the lower left, under the curves
+hs, ls = [hs[i] for i in order], [ls[i] for i in order]
+kw = dict(fontsize=ps.LEGEND_MIN_PT, handlelength=1.5, handletextpad=0.4, labelspacing=0.2, borderpad=0.2,
+          borderaxespad=0.2)
+legs = [ps.legend(ax, "lower left", handles=hs[:4], labels=ls[:4], **kw)]
+ax.add_artist(legs[0])
+fig.canvas.draw()   # the upper-right entries sit under the process label, which holds that corner
+y_lab = ax.transAxes.inverted().transform(ax._ps_label.get_window_extent(fig.canvas.get_renderer()))[0, 1]
+legs.append(ps.legend(ax, "upper right", handles=hs[4:], labels=ls[4:], bbox_to_anchor=(1, y_lab - 0.01), **kw))
+# open the y range only as far as each legend needs, the lower one downwards, the upper one upwards (make_room sees
+# one legend only, so it is told to leave these limits alone)
+lo, hi = ax.get_ylim()
+lo0, hi0, f = lo, hi, (hi / lo) ** 0.03
+while ps.covered(ax, legs[0]) and lo > lo0 / 1e4:
+    lo /= f; ax.set_ylim(lo, hi)
+while ps.covered(ax, legs[1]) and hi < hi0 * 1e4:
+    hi *= f; ax.set_ylim(lo, hi)
+ax._ps_equal_limits = True
+print(f"star_arms2: y {lo:.2g} to {hi:.2g} (data range {lo0:.2g} to {hi0:.2g}), points covered",
+      [ps.covered(ax, g) for g in legs])
 ps.save(fig, os.path.join(FIGDIR, "star_arms2"))

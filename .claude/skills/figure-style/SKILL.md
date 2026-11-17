@@ -42,8 +42,8 @@ without the text and with at most a glance at a short caption.
   redraw the figure.
 - **The legend is inside the figure**: in a panel corner (`ps.legend`), or in the spare cell of a 2x2 holding three
   panels (`ps.legend_cell`). Its font may drop to `LEGEND_MIN_PT` (7.5pt) for now.
-- **Captions are short**: what the figure shows and the setting (process, data size, seeds); nothing the figure
-  already says, no list of definitions.
+- **Captions are short**: what the figure shows and the setting (process, data size); no seed counts in a
+  paper caption (Joaquin 2026-11-17); nothing the figure already says, no list of definitions.
 - **Readable, but short** (Joaquin 2026-11-17, "before we swing completely in the other direction"):
   - one short name per arm, the same in every legend and figure: `from scratch`, `fine-tuned`, never
     `trained from scratch` in one place and `from scratch` in another;

@@ -76,13 +76,15 @@ def draw_final(ax, f, p, *a, **kw):
 
 def grid(base, probes, panel, own):
     """Joaquin 2026-11-17 ('combined into a big 3x4 grid', 'why not merge 18 and 19 as I asked?'): the twelve probes
-    in one file, the e+e- probes in the left two columns and the others in the right two, included scaled to the page.
+    in one file, the e+e- probes in the top two rows and the others in the bottom two, included scaled to the page.
     `panel(ax, p)` draws a probe; the curves every panel has share one legend strip on top, each panel's own curves
     (labels in `own(p)`) a legend in the corner that covers the fewest points, inside the range the data already
     has (Joaquin: 'there is enough space for the legends')."""
-    fig, axs = ps.figure(ncols=4, nrows=3)
+    # three across and four down (Joaquin 2026-11-17, fifth round: 'I said 3x4, not 4x3'): the e+e- probes in the top
+    # two rows, the others in the bottom two
+    fig, axs = ps.figure(ncols=3, nrows=4)
     fig._ps_scaled = True
-    cells = [axs[i // 2][i % 2] for i in range(6)] + [axs[i // 2][2 + i % 2] for i in range(6)]
+    cells = list(axs.flat)
     for ax, p in zip(cells, probes):
         panel(ax, p)
         ax.set_xscale("log"); ax.set_yscale("log")

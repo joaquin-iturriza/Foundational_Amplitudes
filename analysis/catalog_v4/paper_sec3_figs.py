@@ -348,8 +348,9 @@ def unseen(ax):
 # sec:bigrun. Rows name the inputs each network has (Joaquin 2026-11-17, third round: symbols, not words that need a
 # legend): rows say in words what each network has against the one with all inputs (Joaquin 2026-11-17, fourth
 # round: 'all inputs', 'no off-shellness', 'no colour', 'no diagrams', 'linear embedding', '+ pair bias'). All inputs
-# = propagator off-shellness, colour one-hot, diagram encoder, MLP particle embedding; '+ pair bias' rows add the
-# attention pair bias (capped at |b_ij| <= 8 in one) to the row above them. Rows in that reading order, not by value.
+# = propagator off-shellness, colour one-hot, diagram encoder, MLP particle embedding; the pair-bias rows add the
+# attention pair bias (capped at |b_ij| <= 8 in one) to 'no diagrams, linear embedding' (Joaquin's name, the caption says so).
+# Rows ordered by value, lowest error on top (Joaquin 2026-11-17, fifth round).
 BIGRUN = {"all inputs": (5.79e-4, 0.085),
           "no off-shellness": (8.63e-4, 0.067),
           "no colour": (6.81e-4, 0.094),
@@ -361,7 +362,7 @@ BIGRUN = {"all inputs": (5.79e-4, 0.085),
 
 
 def inputs(ax):
-    rows = list(BIGRUN.items())
+    rows = sorted(BIGRUN.items(), key=lambda kv: kv[1][0])
     y = np.arange(len(rows))
     ax.plot([v[0] for _, v in rows], y, "o", color="k")   # black: the left panel's colours name its sets
     ax.set_yticks(y); ax.set_yticklabels([k for k, _ in rows])
