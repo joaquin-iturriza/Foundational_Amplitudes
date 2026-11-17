@@ -33454,9 +33454,9 @@ entries:
     decision: D471
   owner:
     agent: a4fffe14e30441828
-    state: working
+    state: stopped
     since: '2026-11-17T04:18:38+00:00'
-    state_at: '2026-11-17T04:27:42.038000+00:00'
+    state_at: '2026-11-17T04:44:32+00:00'
     context: 155688
     context_at: '2026-11-17T04:28:06+00:00'
   step_waits:
