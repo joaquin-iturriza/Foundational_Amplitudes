@@ -34274,6 +34274,61 @@ entries:
       trains on this same Zenodo dataset, draft paper.tex l.110) and D86 ''(c) Jonas''s matched Z+ng: dropped'' are not named
       in prior and must be cited by the training design; our own u u~ > Z+ng pools (results.tex l.13514, l.14937) are the
       reference for the u u~ shift.'
+  - at: '2026-11-17T11:45:36+00:00'
+    question: 'Steps 3 and the reference arm: on the UQ repo''s own split of Zenodo 16793011 (q qbar -> Z+ng, n=1..4; 5e5
+      train, 1e5 val, 1e6 test, data_seed 0), what median |Delta| (Delta = prediction/truth - 1 of |M|^2), |Delta| distribution
+      on Z+4g and pulls ((log|M|^2_pred - log|M|^2_true)/sigma) does our latest setup give, from scratch per multiplicity
+      and fine-tuned from the catalog_v4 pretraining trial 1262, against the four networks of lloca-experiments-uq (LGATr-slim,
+      LLoCa-Transformer, Transformer, MLP; het loss) trained by their own code on the same events? Jobs: (a) FA smoke, 2 jobs
+      (scratch, fine-tune) on Z+4g, 50 steps through training, sigma stage and scoring of the 1e6 test events (D395, new data
+      path); (b) FA batch, 8 jobs: scratch and fine-tune x Z+1g..Z+4g, 12,500 steps; (c) their timing check (their uq_ops/jobs/time_check.sh,
+      unchanged, 1 GPU, ~1 h) to price their production (their train_shared.sh, 4 GPU jobs up to 2e5 steps) before it is submitted;
+      that production goes to Joaquin first if above 30 GPU-h. No public checkpoints of their networks exist (repo, releases,
+      Zenodo checked).'
+    prior: 'Setup step (FA-ccin2p3-32145d4b, finding 2026-11-17): our d d~ |M|^2 equals theirs to 1.4e-14, u u~ is 0.779805
+      x theirs. Their paper numbers (analysis/zng_uq/data/paper_mse.json, finding 11:18): test MSE of standardised log|M|^2,
+      LLoCa-Transformer 6.8e-10/3.1e-7/4.6e-6/1.16e-5 for Z+1..4g (paper''s own 500k test set, MSE loss, not het). results.tex
+      het23 (l.10795-10845): HETEROSC with its own DyHPO on u u~ > Zgg/Zggg, D=1e4, 8k steps: median |Delta| het/MSE 1.07,
+      1.59 (scratch, rung 1 Zgg), 1.23, 1.57 (Zggg); pull std 1.6 to 3.0 (sigma too small). results.tex highmult grid (l.14945):
+      u u~ > Z+4g fine-tune gains over scratch +0.48 dex at D=1e3 down to -0.11 at 1e4 (older setup, MSE). results.tex l.15501:
+      the collaboration draft''s ''Extrapolating to more legs'' (Jonas) trains on this same Zenodo dataset (10M events per
+      n, MSE ~7e-4 zero-shot at n=5), a different question (extrapolation, not per-n accuracy); D86 dropped ''Jonas''s matched
+      Z+ng'' as a zero-shot fix item (old preprocessing), not this benchmark. D477 approves the entry; Joaquin 11:33 ''take
+      the HPs from'' similar optimized runs; ''Matching the epochs is fine''.'
+    measure: 'Per run, from tools/kit_predict.py on the 1e6 test events (bulk_test of uq_<proc>.h5, saved preds and sigma_ln.npy):
+      median |Delta| with Delta = exp(mu - log|M|^2) - 1, the |Delta| histogram on Z+4g, pulls (mu - log|M|^2)/sigma (their
+      metrics.py definitions, in log|M|^2 units); their networks: the same quantities from their preds_test_0.npz / metrics_test_0.json
+      (their experiments/uq/metrics.py) on the same 1e6 test events (their split_indices_<run>.npz compared with our split_idx/test).
+      For (c): seconds per step of each network alone and of the four sharing one GPU (their time_check.sh output), giving
+      the production''s GPU-h at 2e5 steps per multiplicity as an upper bound.'
+    check: 'The measure moves with the tested change on existing data: on het23 (results.tex l.10795) median |Delta| moved
+      by 1.07 to 1.59x between losses/HPs at fixed data, and fine-tune vs scratch moved u u~ > Z+4g MSE by -0.11 to +0.96
+      dex (highmult grid); their paper''s MSE moves 17x between LLoCa-Transformer and MLP on Z+1g. The data are like with
+      like: our |M|^2 equals theirs to 1.4e-14 on 100 test events per multiplicity (setup job), the split is their randperm(3e6,
+      seed 1) (converter checked on their mini file; torch 2.1.2 and 2.9.1 agree), and their run writes its split indices,
+      which are compared with ours before any number is read.'
+    fixed: 'Our arms: scripts/job_kit.sh (mode A scratch, A_ft fine-tune), base config = trial 1262''s saved config (runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262:
+      mu-P LLoCa 8 blocks, 8 heads, emission-scale target with coupling orders, dimensionless inputs, off-shellness levers,
+      HETEROSC + sigma stage, MuonAdamW, cosine, batch 16384), training.dtype=float32 (the parent''s; job_kit''s float64 overridden),
+      12,500 steps (their 2e5 steps x batch 1024 = 400 epochs of 5e5 at batch 16384, ''matching the epochs''), seed 42, checkpoint
+      on val mu-MSE, KIT_NTEST=1000000, data kit_uq_z<g..>__me2. HPs taken from trial 1262, the DyHPO best of cov_v4_long_hpo8_cc_17056
+      (catalog_v4 pretraining sweep): same model, inputs, target and loss as these runs, and its training data hold b b~ >
+      Z+1..3g, the same equality class as d d~ > Z+ng; warmup 0.180, eta_min 1.38e-8, lambda 9.11e-8, EMA off, Muon weight
+      decay 0.047; lr from that sweep''s lr law 7.82114e-3 (t/17056)^-0.55 at t=12,500 = 9.28e-3, D factor 1 (5e5 per process
+      is past the measured high-D row, 7e4) (job_kit.sh''s rule, the KIT protocol A runs''); fine-tune at the same lr (lr_scale
+      1, HPO rule 4), layer_decay 1.0 (parent''s), target stats own, off-shellness stats parent. Their arms: their code at
+      1074f6a, unchanged job scripts, het, seed 0, data_seed 0, their defaults (Adam lr 1e-3, ReduceLROnPlateau, early stopping,
+      up to 2e5 steps, batch 1024).'
+    control: Scratch vs fine-tune is the matched pair (same data, steps, lr, seed; only the start differs). Their four networks
+      on the same split and test events are the reference. Joaquin dropped the matched-input scratch control (2026-11-17b).
+    seeds: One seed per arm (ours 42, theirs 0), as their production; seed spread not measured in this step.
+    outcome: 'Smoke YES: all stages end (training, sigma stage, kit_predict writes preds and sigma for 1e6 test events, log
+      shows n_train 500000 and offshell masks N=P), its s/step sets the batch''s wall target -> batch (b) goes. NO -> fix
+      the path and rerun the smoke. Batch: per multiplicity our median |Delta| and pull std against theirs; YES (ours at or
+      below their best network on median |Delta|) -> reported as such; NO -> reported with the gap per multiplicity, and fine-tune
+      vs scratch read either way. Timing check: GPU-h of their production = 4 jobs x min(2e5 x s/step shared, 24 h); <= 30
+      GPU-h -> submit; above -> to Joaquin with the number, beside the alternative of asking the authors for their prod_het_v1
+      preds_test_0.npz (same split).'
   step_why:
     1:
       feeds: whether any run or evaluation on their events compares like with like
