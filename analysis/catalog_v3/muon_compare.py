@@ -557,5 +557,24 @@ def plot(pre, reads):
     ps.save(fig, os.path.join(HERE, "figs", "muon_compare"))
 
 
+def low_probes(axes=("H1", "H2", "H3", "H5"), q=0.10):
+    """The low-loss probes of the Fig. 15 rerun (Joaquin 2026-11-17: 'processes that have good losses'): per held-out
+    axis of FT_PROBES, the probe at the q quantile (rank round(q (n-1)) from the lowest) of the geometric mean of the
+    two parents' zero-shot MSE of log|M|^2 (short_reads.json, dimensionless and dimensionless_muon)."""
+    r = json.load(open(os.path.join(HERE, "data", "short_reads.json")))
+    out = {}
+    for ax in axes:
+        A, M = r["dimensionless"][ax]["probes"], r["dimensionless_muon"][ax]["probes"]
+        g = {p: float(np.sqrt(A[p]["mse"] * M[p]["mse"])) for p in sorted(set(A) & set(M))}
+        s = sorted(g, key=g.get)
+        p = s[int(round(q * (len(s) - 1)))]
+        out[ax] = p
+        print(f"{ax}: {p} (rank {s.index(p) + 1} of {len(s)}), zero-shot AdamW {A[p]['mse']:.3g}, Muon {M[p]['mse']:.3g}, "
+              f"geometric mean {g[p]:.3g}; axis median {np.median(list(g.values())):.3g}")
+    print(",".join(out.values()))
+    return out
+
+
 if __name__ == "__main__":
-    {"collect": collect, "collect-ft": collect_ft, "collect-search": collect_search}.get(sys.argv[1] if sys.argv[1:] else "", main)()
+    {"collect": collect, "collect-ft": collect_ft, "collect-search": collect_search,
+     "low-probes": low_probes}.get(sys.argv[1] if sys.argv[1:] else "", main)()
