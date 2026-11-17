@@ -35635,6 +35635,11 @@ entries:
       val events): same shape per event (corr 0.994, sd of difference 0.0094) but the stored read is 0.194 higher in log|M|^2
       (MSE 0.279 stored vs 0.417 evaluator); not code drift (Oct-23 code + fix: same 0.194), not the sidecar, augmentation
       or own target stats; open: a GPU read of the same model on CC.'
+  - at: '2026-11-17T19:55:29+00:00'
+    text: 'GPU check FA-ccin2p3-c3e63032: evaluate.py (committed model and run dir) and the original zero_shot_parent all
+      give MSE 0.2791, mean -11.265 on the 2000 dc_bbx_hh events = the stored read. The 0.194 offset is a CPU-only path difference
+      in our model code (after the attention-mask fix 1ce53bcd), not the wrapper or weights; not found yet (not fp16, not
+      augmentation, not frame noise). README d3208a9e: use a GPU.'
   handoff:
     state: 'Zero-shot read in flight: FA-ccin2p3-d95c89ad (trial_1262 of cov_v4_long_hpo8_cc_68224, eval-only, axes DAN =
       139 Daniel held-out val pools and DANID = 9 identical catalog_v4 training trees on their own test pools; design passed
