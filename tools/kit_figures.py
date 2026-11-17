@@ -284,14 +284,26 @@ def plot(path, outdir, prefix="", split_offshell=False, short=False):
         print(w)
 
 
-# summary: deepest-bin log-MSE per family, one panel per process (families grouped by process)
-FAMS = {("ee_uug", "me2"): [("coll_y", "coll"), ("soft_x", "soft")],
-        ("ee_uugg", "me2"): [("coll_gg_y", "gg coll"), ("coll_qg_y", "qg coll"), ("soft_x", "soft")],
-        ("ee_tt", "virt_finite"): [("threshold_beta", "Coulomb"), ("sudakov_sqrts", "Sudakov")]}
+# summary: deepest-bin MSE per family, one panel per process (families grouped by process), one file
+FAMS = {("ee_uug", "me2"): [("coll_y", "collinear"), ("soft_x", "soft")],
+        ("ee_uugg", "me2"): [("coll_gg_y", "gg coll."), ("coll_qg_y", "qg coll."), ("soft_x", "soft")],
+        ("ee_tt", "virt_finite"): [("threshold_beta", "threshold"), ("sudakov_sqrts", "high energy")]}
+SUMMARY_PROC = {("ee_uug", "me2"): r"$e^+e^-\to u\bar u g$", ("ee_uugg", "me2"): r"$e^+e^-\to u\bar u gg$",
+                ("ee_tt", "virt_finite"): r"$e^+e^-\to t\bar t$, one loop"}
+# each arm in plain words, the same name as in tools/kit_vs_mlp.py (Joaquin 2026-11-17: a figure reads on its own)
+WORDS = {"scratch": "transformer", r"scratch+$\beta$": "transformer",
+         "scratch-nobeta": r"transformer without $\log\beta^2$ input",
+         "factor": "transformer + asymptotic factor", "factor+log": "asymptotic factor + single log",
+         "div-form": "divergence-form inputs", "ReZero": "ReZero layers",
+         "FT": "fine-tuned", "FT searched": "fine-tuned, searched",
+         "FT+LO": "fine-tuned, LO tops in pretraining", r"FT+LO+$\beta$": r"fine-tuned, LO tops, $\log\beta^2$",
+         "FT+1L": "fine-tuned, LO and one-loop tops", r"FT+1L+$\beta$": "fine-tuned, LO and one-loop tops,\n"
+                                                                         r"$\log\beta^2$"}
 
 
 def summary(paths, out):
-    """the deepest-bin log-MSE of every arm and control of kit_readout --verdict jsons, per family"""
+    """the deepest-bin MSE of every arm and control of kit_readout --verdict jsons, per family: one canvas, a panel per
+    process and the legend in the spare cell"""
     import plot_style as ps
     d = {k: v for path in paths for k, v in json.load(open(path)).items()}
     vals = {}   # (file, target) -> {tag: {family: logmse}}
@@ -301,36 +313,41 @@ def summary(paths, out):
             for fam, x in v["families"].items():
                 vals.setdefault((m["file"], m["target"]), {}).setdefault(m["tag"].removeprefix("hpo_"), {})[fam] = x[key]
     procs = [p for p in FAMS if p in vals]
-    # one style per legend symbol across the panels; the fine-tunes share hollow black markers, one shape per parent
+    # one style per arm across the panels; the fine-tunes share hollow black markers, one shape per parent
     C = ps.C
-    sty = {"scratch": (C.vermillion, "s"), r"scratch+$\beta$": (C.orange, "s"), "factor": (C.blue, "o"),
-           "factor+log": (C.sky, "o"), "div-form": (C.green, "D"), "ReZero": (C.purple, "^"),
+    sty = {"scratch": (C.vermillion, "s"), r"scratch+$\beta$": (C.vermillion, "s"), "scratch-nobeta": (C.orange, "s"),
+           "factor": (C.blue, "o"), "factor+log": (C.sky, "o"), "div-form": (C.green, "D"), "ReZero": (C.purple, "^"),
            "FT": ("k", "v"), "FT searched": ("k", "*"), "FT+LO": ("k", "<"), r"FT+LO+$\beta$": ("k", ">"), "FT+1L": ("k", "p"),
            r"FT+1L+$\beta$": ("k", "h")}
-    figs = ps.panels(len(procs))
-    for (fig, ax), p in zip(figs, procs):
+    sym = lambda p, t: "scratch-nobeta" if p[0] == "ee_tt" and t == "softpair" else SHORT[t]
+    fig, axs = ps.figure(ncols=2, nrows=2)
+    axs = list(np.ravel(axs))
+    for ax, p in zip(axs, procs):
         order = list(sty)
-        fams, arms = FAMS[p], sorted(vals[p], key=lambda t: order.index(SHORT[t]))
+        fams, arms = FAMS[p], sorted(vals[p], key=lambda t: order.index(sym(p, t)))
         w = 0.7 / len(arms)
         for j, t in enumerate(arms):
             xs = [(i - 0.35 + w * (j + 0.5), vals[p][t][f]) for i, (f, _) in enumerate(fams) if f in vals[p][t]]
-            c, mk = sty[SHORT[t]]
-            ax.plot(*zip(*xs), mk, ls="", color=c, mfc="none" if t.startswith("ft") and not t.endswith("_search") else c, label=SHORT[t])
+            c, mk = sty[sym(p, t)]
+            ax.plot(*zip(*xs), mk, ls="", color=c, mfc="none" if t.startswith("ft") and not t.endswith("_search") else c,
+                    label=WORDS[sym(p, t)])
+            print(f"DEEPEST {p[0]} {WORDS[sym(p, t)]!r}: " + ", ".join(f"{f} {vals[p][t][f]:.3g}" for f, _ in fams
+                                                                       if f in vals[p][t]))
         ref = [(i, MLP[(*p, f)][2]) for i, (f, _) in enumerate(fams) if (*p, f) in MLP]
-        ax.hlines([y for _, y in ref], [i - 0.4 for i, _ in ref], [i + 0.4 for i, _ in ref], color="k", label="MLP log")
+        ax.hlines([y for _, y in ref], [i - 0.4 for i, _ in ref], [i + 0.4 for i, _ in ref], color="k",
+                  label="MLP, log invariants")
         ax.set_xticks(range(len(fams)), [lab for _, lab in fams])
         ax.set_xlim(-0.6, len(fams) - 0.4)
         ax.set_yscale("log")
-        ax.set_ylabel(r"deepest-bin log-MSE of $\log_{10}|\mathcal{M}|^2$")
-        ps.process_label(ax, PROC[p])
-        ps.shared_legend(fig, ax, ncol=3)   # a strip above every panel: in-axes legends sat on markers
+        ax.set_ylabel(r"MSE$(\log_{10}|\mathcal{M}|^2)$")
+        ps.process_label(ax, SUMMARY_PROC[p])
         # a quarter of the span clear above the highest marker (make_room tests marker centres only: the tt ReZero
         # Sudakov point at 3e6 sat under the process label)
         ys = [y for t in arms for y in vals[p][t].values()] + [y for _, y in ref]
         lo, hi = np.log10(min(ys)), np.log10(max(ys))
         ax.set_ylim(10 ** (lo - 0.1 * (hi - lo)), 10 ** (hi + 0.25 * (hi - lo)))
-    for w in ps.save_panels(figs, out):
-        print(w)
+    ps.legend_cell(axs[3], axs[:3], fontsize=ps.LEGEND_MIN_PT)
+    print(ps.save(fig, out))
 
 
 def main():

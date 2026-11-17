@@ -152,6 +152,48 @@ def _st(k):
     return k.split("/")[1]
 
 
+# one plain-words name per model, the same in every figure (Joaquin 2026-11-17: a figure reads on its own)
+NAME = {"factor": "transformer + asymptotic factor", "scratch": "transformer",
+        "MLP log": "MLP, log invariants", "MLP raw": "MLP, raw invariants",
+        r"MLP log+$\beta$": "MLP, log invariants\n" + r"and $\log(s_{t\bar t}-4m_t^2)$"}
+PROCESS = {"ee_uug_me2": r"$e^+e^-\to u\bar u g$", "ee_uugg_me2": r"$e^+e^-\to u\bar u gg$",
+           "ee_tt_virt_finite": r"$e^+e^-\to t\bar t$, one loop"}
+# panels in reading order; the azimuth strata are a scan in the gluons' azimuth at three fixed y (not a y scan of
+# their own): their x is that fixed y
+FAM_ORDER = ["coll_y", "coll_gg_y", "coll_qg_y", "soft_x", "azimuth_gg_y", "sudakov_sqrts", "threshold_beta"]
+XLAB = dict(XLAB, azimuth_gg_y=r"azimuthal scan at fixed $y=s_{gg}/s$")
+MSE_LAB = r"MSE$(\log_{10}|\mathcal{M}|^2)$"
+LEG_PT = 9   # the two-line MLP entry at 11pt fits the plot box before layout, not after
+LOGM = r"$\log_{10}(|\mathcal{M}|^2/\mathrm{GeV}^{-2})$"
+
+
+def _grid(n):
+    """one canvas for n panels (1x1, 1x2, 2x2): (fig, axes in reading order, spare cell or None)"""
+    import plot_style as ps
+    fig, axs = ps.figure(ncols=1 if n == 1 else 2, nrows=2 if n > 2 else 1)
+    axs = list(np.ravel(axs))
+    return fig, axs[:n], (axs[n] if len(axs) > n else None)
+
+
+def _legend(axs, spare, process=None):
+    """the one legend of the canvas: the spare cell of a 3-panel 2x2, else the first panel's corner; there, with
+    `process`, the legend's title names the process in place of the panel's process label (they collided)"""
+    import plot_style as ps
+    if spare is not None:
+        ps.legend_cell(spare, axs, fontsize=ps.LEGEND_MIN_PT)
+        return
+    hl = {}
+    for a in axs:
+        for h, l in zip(*a.get_legend_handles_labels()):
+            hl.setdefault(l, h)
+    if process and getattr(axs[0], "_ps_label", None) is not None:
+        axs[0]._ps_label.remove()
+        del axs[0]._ps_label
+    ps.legend(axs[0], "upper left", handles=list(hl.values()), labels=list(hl), fontsize=LEG_PT, title=process,
+              title_fontsize=LEG_PT, alignment="left")
+    ps.make_room(axs[0])
+
+
 def plot(figs):
     import plot_style as ps
     from matplotlib.ticker import NullFormatter
@@ -174,21 +216,21 @@ def plot(figs):
         for sym, his, _ in MLPS[p]:
             series[sym] = metrics(B[p]["base"][his])[0]
         bulk[p] = {s: v["bulk"] for s, v in series.items()}
-        fams = sorted({family(s) for s in x_of})
-        # (1) log-MSE per stratum, every family (the azimuth scan at its three fixed y)
-        panels = ps.panels(len(fams))
-        for (fig, ax), fam in zip(panels, fams):
+        fams = sorted({family(s) for s in x_of}, key=FAM_ORDER.index)
+        # (1) MSE per hard bin, every family of the process on one canvas (the azimuth scan at its three fixed y)
+        fig, axs, spare = _grid(len(fams))
+        for ax, fam in zip(axs, fams):
             for sym, v in series.items():
                 pts = sorted((x_of[s], m) for s, m in v.items() if s in x_of and family(s) == fam)
                 c, mk, ls = sty[sym]
-                ax.plot(*zip(*pts), marker=mk, ls=ls, color=c, label=sym)
-                print(f"MSE {p} {fam} {sym}: " + " ".join(f"{m:.3g}" for _, m in pts))
+                ax.plot(*zip(*pts), marker=mk, ls=ls, color=c, label=NAME[sym])
+                print(f"MSE {p} {fam} {sym}: " + " ".join(f"{x:.3g}:{m:.3g}" for x, m in pts))
             ax.set_xscale("log"); ax.set_yscale("log"); ax.xaxis.set_minor_formatter(NullFormatter())
-            ax.set_xlabel(XLAB.get(fam, fam)); ax.set_ylabel(r"log-MSE of $\log_{10}|\mathcal{M}|^2$")
-            ps.process_label(ax, PROC[(stem, target)])
-            ps.shared_legend(fig, ax, ncol=3)
-        written += ps.save_panels(panels, os.path.join(figs, f"kitvm_mse_{p}"))
-        # (2) median per bin and (3) its deviation from the truth's median; the azimuth scan has no singular-variable bins
+            ax.set_xlabel(XLAB.get(fam, fam)); ax.set_ylabel(MSE_LAB)
+            ps.process_label(ax, PROCESS[p], loc="upper right")
+        _legend(axs, spare, PROCESS[p])
+        written.append(ps.save(fig, os.path.join(figs, f"kitvm_mse_{p}")))
+        # (2) median per bin and (3) its shift from the truth's median; the azimuth scan has no singular-variable bins
         mf = [f for f in fams if f in fac["medians"]]
         med = {"factor": fac["medians"], "scratch": scr["medians"]}
         for sym, _, tag in MLPS[p]:
@@ -199,70 +241,66 @@ def plot(figs):
                             for i, row in enumerate(seeds[0][f])] for f in mf}
             assert all([q[0] for q in s[f]] == [q[0] for q in seeds[0][f]] for s in seeds for f in mf)
         for kind in ("median", "dev"):
-            panels = ps.panels(len(mf))
-            for (fig, ax), fam in zip(panels, mf):
+            fig, axs, spare = _grid(len(mf))
+            for ax, fam in zip(axs, mf):
                 tm = dict((round(x, 12), y) for x, y in tr["median"][fam])
                 if kind == "median":
                     ax.plot(*zip(*tr["median"][fam]), "-", color="k", label="truth")
-                ys = {sym: [q[2] if kind == "median" else q[2] - tm[round(q[0], 12)] for q in m[fam]] for sym, m in med.items()}
-                if kind == "median":    # the truth's span and half of it again each side
-                    ty = [y for _, y in tr["median"][fam]]
-                    pad = max(1.0, 0.5 * (max(ty) - min(ty)))
-                    lo, hi = min(ty) - pad, max(ty) + pad
-                else:                   # the models on the truth (factor, MLP with log inputs) and half again
-                    lim = max(0.1, 1.5 * max(abs(v) for s_, y in ys.items() if s_ in ("factor", "MLP log", r"MLP log+$\beta$")
-                                             for v in y))
-                    lo, hi = -lim, lim
                 for sym, m in med.items():
-                    y = ys[sym]
+                    y = [q[2] if kind == "median" else q[2] - tm[round(q[0], 12)] for q in m[fam]]
                     if kind == "dev":
-                        print(f"DEV {p} {fam} {sym}: deepest {y[0]:+.3g}, max |dev| {max(map(abs, y)):.3g}")
-                    if not any(lo <= v <= hi for v in y):     # wholly off the axes: not drawn (caption)
-                        print(f"OFF {kind} {p} {fam} {sym}: not drawn")
-                        continue
+                        print(f"DEV {p} {fam} {sym}: " + " ".join(f"{q[0]:.3g}:{v:+.3g}" for q, v in zip(m[fam], y)))
                     c, mk, ls = sty[sym]
-                    ax.plot([q[0] for q in m[fam]], y, marker=mk, ls=ls, color=c, label=sym)
+                    ax.plot([q[0] for q in m[fam]], y, marker=mk, ls=ls, color=c, label=NAME[sym])
                 ax.set_xscale("log"); ax.xaxis.set_minor_formatter(NullFormatter())
-                if kind == "dev":
+                if kind == "dev":   # every model drawn: symlog keeps the 0.01-decade shifts and the 10-decade ones
                     ax.set_yscale("symlog", linthresh=0.01); ax.axhline(0, color="k", lw=0.8)
-                ax.set_ylim(lo, hi)
                 ax.set_xlabel(XLAB.get(fam, fam))
                 ax.set_ylabel(r"median $\log_{10}|\mathcal{M}|^2$" if kind == "median"
-                              else r"median$_{\rm pred}-$median$_{\rm true}$")
-                ps.process_label(ax, PROC[(stem, target)])
-                ps.shared_legend(fig, ax, ncol=3)
-            written += ps.save_panels(panels, os.path.join(figs, f"kitvm_{kind}_{p}"))
-    # (4) bulk log-MSE per process
+                              else r"median shift of $\log_{10}|\mathcal{M}|^2$")
+                ps.process_label(ax, PROCESS[p], loc="upper right")
+            _legend(axs, spare, PROCESS[p])
+            written.append(ps.save(fig, os.path.join(figs, f"kitvm_{kind}_{p}")))
+    # (4) bulk MSE per process
     fig, ax = ps.figure()
-    syms = list(sty)
-    for j, sym in enumerate(syms):
+    for j, sym in enumerate(sty):
         pts = [(i - 0.3 + 0.15 * j, bulk[p][sym]) for i, p in enumerate(PROCS) if sym in bulk[p]]
         c, mk, _ = sty[sym]
-        ax.plot(*zip(*pts), mk, ls="", color=c, label=sym)
+        ax.plot(*zip(*pts), mk, ls="", color=c, label=NAME[sym])
         print(f"BULK {sym}: " + " ".join(f"{v:.3g}" for _, v in pts))
-    ax.set_xticks(range(3), [PROC[PROCS[p]] for p in PROCS]); ax.set_xlim(-0.6, 2.6)
-    ax.set_yscale("log"); ax.set_ylabel(r"bulk log-MSE of $\log_{10}|\mathcal{M}|^2$")
-    ps.shared_legend(fig, ax, ncol=3)
+    ax.set_xticks(range(3), [r"$u\bar ug$", r"$u\bar ugg$", r"$t\bar t$, one loop"]); ax.set_xlim(-0.6, 2.6)
+    ax.set_yscale("log"); ax.set_ylabel(MSE_LAB)
+    ps.legend(ax, "upper left", fontsize=LEG_PT); ps.make_room(ax)
     written.append(ps.save(fig, os.path.join(figs, "kitvm_bulk")))
-    # (5) true against predicted log10|M|^2 of one stratum per family, predicted over true in the panel below
-    # (ps.true_pred_hist: the union of the truth's and the predictions' ranges, every model drawn)
+    # (5) true against predicted log10|M|^2: the deepest bin of each hard family, one canvas per process, and the
+    # three bulks on one canvas (ps.true_pred_hist: the union of the truth's and the predictions' ranges, every model)
     hp = os.path.join(DATA, "kit_vs_mlp_hist.json")
     if os.path.exists(hp):
         H = json.load(open(hp))
-        mlp_sym = lambda p, k: r"MLP log+$\beta$" if k == "MLP log" and p.startswith("ee_tt") else k
+        sym_of = lambda p, k: r"MLP log+$\beta$" if k == "MLP log" and p.startswith("ee_tt") else k
+        def draw(ax, p, e):
+            models = [dict(label=NAME[sym_of(p, k)], edges=e["edges"], truth=e["truth"], pred=e["pred"][k], n=e["n"],
+                           style=dict(color=sty[sym_of(p, k)][0], ls=sty[sym_of(p, k)][2]))
+                      for k in ("factor", "MLP log", "scratch", "MLP raw") if k in e["pred"]]
+            ps.true_pred_hist(ax, models, ratio=(0.1, 10), log_ratio=True, xlabel=LOGM,
+                              ratio_label=r"$\frac{\rm pred}{\rm true}$")
+            ps.process_label(ax, PROCESS[p], loc="upper right")
+            print(f"DIST {p} {e['stratum']}: x {ax.get_xlim()[0]:.3g}..{ax.get_xlim()[1]:.3g}, outside the bins "
+                  + ", ".join(f"{k} {v:.2%}" for k, v in e.get("outside", {}).items()))
         for p in PROCS:
-            ex = [e for e in H if e["proc"] == p and "edges" in e]
-            panels = ps.panels(len(ex))
-            for (fig, ax), e in zip(panels, ex):
-                models = [dict(label=mlp_sym(p, k), edges=e["edges"], truth=e["truth"], pred=e["pred"][k], n=e["n"],
-                               style=dict(color=sty[mlp_sym(p, k)][0], ls=sty[mlp_sym(p, k)][2]))
-                          for k in ("factor", "MLP log", "scratch", "MLP raw") if k in e["pred"]]
-                ps.true_pred_hist(ax, models, ratio=(0.1, 10), log_ratio=True,
-                                               xlabel=r"$\log_{10}(|\mathcal{M}|^2/\mathrm{GeV}^{-2})$",
-                                               ratio_label=r"$\frac{\rm pred}{\rm true}$")
-                ps.process_label(ax, PROC[PROCS[p]])
-                ps.shared_legend(fig, ax, ncol=3)
-            written += ps.save_panels(panels, os.path.join(figs, f"kitvm_dist_{p}"))
+            ex = sorted((e for e in H if e["proc"] == p and "edges" in e and e["split"] == "hard_test"),
+                        key=lambda e: FAM_ORDER.index(family(e["stratum"])))
+            fig, axs, spare = _grid(len(ex))
+            for ax, e in zip(axs, ex):
+                draw(ax, p, e)
+            _legend(axs, spare, PROCESS[p])
+            written.append(ps.save(fig, os.path.join(figs, f"kitvm_dist_{p}")))
+        ex = [e for e in H if "edges" in e and e["split"] == "bulk_test"]
+        fig, axs, spare = _grid(len(ex))
+        for ax, e in zip(axs, ex):
+            draw(ax, e["proc"], e)
+        _legend(axs, spare)
+        written.append(ps.save(fig, os.path.join(figs, "kitvm_dist_bulk")))
         # (6) the t t~ threshold family: 10^(pred - truth) per bin of beta, median and 16-84% band
         for e in [e for e in H if "ratio" in e]:
             p = e["proc"]
@@ -272,16 +310,16 @@ def plot(figs):
                 if k not in e["ratio"]:
                     continue
                 q = np.array(e["ratio"][k])
-                sym = mlp_sym(p, k)
+                sym = sym_of(p, k)
                 col, mk, ls = sty[sym]
-                ax.plot(x, q[:, 1], marker=mk, ls=ls, color=col, label=sym)
+                ax.plot(x, q[:, 1], marker=mk, ls=ls, color=col, label=NAME[sym])
                 ax.fill_between(x, q[:, 0], q[:, 2], color=col, alpha=0.2, lw=0)
-                print(f"BETA {sym}: median pred/true at beta {x[0]:.2g} {q[0, 1]:.3g}, at {x[-1]:.2g} {q[-1, 1]:.3g}")
+                print(f"BETA {sym}: median pred/true " + " ".join(f"{a:.2g}:{b:.3g}" for a, b in zip(x, q[:, 1])))
             ax.axhline(1, color="k", lw=0.8)
             ax.set_xscale("log"); ax.set_yscale("log"); ax.xaxis.set_minor_formatter(NullFormatter())
             ax.set_xlabel(XLAB["threshold_beta"]); ax.set_ylabel(r"$|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2_{\rm true}$")
-            ps.process_label(ax, PROC[PROCS[p]])
-            ps.shared_legend(fig, ax, ncol=3)
+            ps.process_label(ax, PROCESS[p], loc="upper right")
+            _legend([ax], None, PROCESS[p])
             written.append(ps.save(fig, os.path.join(figs, f"kitvm_ratio_beta_{p}")))
     for w in written:
         print("FIGURE", w)
