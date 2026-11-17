@@ -34249,15 +34249,17 @@ entries:
     - FA-ccin2p3-966a6561
     - FA-ccin2p3-b4ebd88e
     - FA-ccin2p3-ba9df01f
-    commit: 8f291240
+    commit: e75bcabb
     paths:
     - analysis/zng_uq/benchmark.py
     - analysis/zng_uq/data/benchmark.json
     - analysis/zng_uq/data/paper_mse.json
     - analysis/zng_uq/data/parent_bbx.json
     - analysis/zng_uq/data/zng_curves.json
+    - scripts/job_datasaving_parent.sh
     - scripts/job_uq_ext.sh
     - scripts/job_zng_zeroshot.sh
+    - sweep/sweep_config_tp_zng_hpo_zgggg.yaml
     - tools/zng_uq.py
   dead_ends:
   - tried: 'Their networks (LGATr-slim, LLoCa-Transformer, Transformer, MLP, het) by their own code (scripts/job_uq_ext.sh):
