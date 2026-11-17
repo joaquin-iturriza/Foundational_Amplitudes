@@ -114,6 +114,13 @@ def score(name, pool, n_val, n_score, model, seed=42):
             out.update(real(rest, role=role, seed=seed, dest_dir=dest_dir, require_cache=require_cache))
         return out
     datagen.ensure_split_set = split
+    # the diagram encoder's Laplacian PEs as computed where the network was trained (lap_pe_table.py): a degenerate
+    # eigenspace's basis is the machine's LAPACK kernel's, and another basis moved the read by 0.194 in log|M|^2
+    import models.diagram_encoder_llm4lhc as dge
+    table = os.environ.get("EVALUATE_LAP_PE", os.path.join(HERE, "model", "lap_pe.json"))
+    if not os.path.exists(table):
+        sys.exit(f"evaluate: {table} missing (evaluate_daniels_catalog/lap_pe_table.py on a CC-IN2P3 GPU node)")
+    dge.LAP_PE_TABLE.update({k: np.asarray(v, np.float32) for k, v in json.load(open(table)).items()})
     import keyed_aug
     from rebuild_run import deterministic_frame_noise
     keyed_aug.model_momenta_chunks = event_keyed_chunks

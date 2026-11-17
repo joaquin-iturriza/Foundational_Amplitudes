@@ -133,6 +133,17 @@ def _label(pdg, vocab):
     return vocab[pdg]
 
 
+# {lap_pe_key(adj): (n, k) float32}: Laplacian PEs as computed where a model was trained. Within a degenerate
+# eigenspace (b b~ > h h: eigenvalue 1 twice) eigh's basis is whatever the machine's LAPACK kernel returns, and a
+# model learned that basis: read on another CPU kernel the same model gave MSE 0.4173 against 0.2791 (dan_zeroshot_v4).
+LAP_PE_TABLE = {}
+
+
+def lap_pe_key(adj):
+    a = np.asarray(adj, dtype=bool)
+    return f"{a.shape[0]}:" + np.packbits(a).tobytes().hex()
+
+
 def laplacian_pe(adj, k):
     """Top-``k`` non-trivial eigenvectors of ``L = I - D^-1/2 A D^-1/2`` (their
     ``_compute_laplacian_pe``): drop the smallest, zero-pad below ``k``, flip each so its
@@ -140,6 +151,9 @@ def laplacian_pe(adj, k):
     n = adj.shape[0]
     if n == 0:
         return np.zeros((0, k), dtype=np.float32)
+    hit = LAP_PE_TABLE.get(lap_pe_key(adj))
+    if hit is not None and hit.shape == (n, k):
+        return hit.copy()
     a = adj.astype(np.float32)
     deg = a.sum(axis=1)
     with np.errstate(divide="ignore"):
