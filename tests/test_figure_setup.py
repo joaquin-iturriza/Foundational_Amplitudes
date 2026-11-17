@@ -49,12 +49,12 @@ def test_true_pred_hist_not_warned():
 
 def test_input_arms_sentences_warned_and_new_labels_short():
     old = ["scratch,\n+ soft rescale + $\\log(s_{ij}/s)$\n+ $\\log\\beta^2$ of massive pairs",   # INPUT_ARMS @2f2cd689
-           "truth clipped to\ntraining range", "fine-tuned, $10^5$ events, parent r5 + threshold tops"]
+           "fine-tuned, $10^5$ events, parent r5 + threshold tops"]
     for lab in old:
         fig, ax = ps.figure()
         ax.plot([0, 1], [0, 1], label=lab)
         ps.legend(ax)
-        assert any("not a short one-line symbol" in x for x in ps.style_warnings(fig)), lab
+        assert any("too long" in x for x in ps.style_warnings(fig)), lab
     sys.path.insert(0, os.path.join(ROOT, "tools"))
     import kit_figures as K
     for tag in list(K.INPUT_ARMS) + ["offoff", "plain", ""]:
@@ -95,11 +95,34 @@ VBETA_CAPTION = ("e⁺e⁻→tt̄ threshold scan from 11 November. KIT data, m_t
 
 
 def test_vbeta_caption_refused(tmp_path):
-    base = str(tmp_path / "kit_threshold_scan_d405_legend")
-    _sidecar(base, VBETA_LEGEND)
+    """since 2026-11-17 an entry in plain words names itself; a symbol entry still needs the caption"""
+    base = str(tmp_path / "kit_threshold_scan_d405")
+    _sidecar(base, VBETA_LEGEND + [r"FT+$V\beta$"])
     bad, shown = sc.legend_findings({"files": [base + ".png"], "caption": VBETA_CAPTION}, "/", drafts=str(tmp_path))
-    assert any("does not define" in b and "parent r5" in b for b in bad)
+    assert any("does not define" in b and "FT+" in b for b in bad)
+    assert not any("parent r5" in b.split("the legend holds")[0] for b in bad)   # plain words: no caption needed
     assert shown and "NLO scale band" in shown[0]          # the legend is shown at the send
+
+
+def test_panel_files_and_strips_refused(tmp_path):
+    """Joaquin 2026-11-17: one file per figure, legend inside; save_panels and legend_strip leave a warning"""
+    figs = ps.panels(2)
+    for fig, ax in figs:
+        ax.plot([0, 1], [0, 1], label="AdamW optimizer")
+    ps.save_panels(figs, str(tmp_path / "p"))
+    ps.legend_strip(figs[0][1], str(tmp_path / "p_legend"))
+    for b in ("p_a", "p_legend"):
+        assert any("one file holding all its panels" in w for w in sc.read_legend(str(tmp_path / (b + ".png")))[2]), b
+
+
+def test_legend_cell_fills_the_grid(tmp_path, capsys):
+    fig, axs = ps.figure(ncols=2, nrows=2)
+    for ax in (axs[0][0], axs[0][1], axs[1][0]):
+        ax.plot([0, 1], [0, 1], label="Muon optimizer")
+    ps.legend_cell(axs[1][1], axs[0][0])
+    ps.save(fig, str(tmp_path / "g"))
+    assert "empty" not in capsys.readouterr().out
+    assert sc.read_legend(str(tmp_path / "g.png"))[3] == ["Muon optimizer"]
 
 
 def test_caption_defining_every_entry_passes(tmp_path):
@@ -131,6 +154,10 @@ def test_draft_figure_goes_as_pages(tmp_path):
     assert bad and "tools/draft_figure.py" in bad[0]
     assert sc.legend_findings({"files": [str(tmp_path / "draft_v2.pdf")], "caption": ""}, "/",
                               drafts=str(tmp_path)) == ([], [])
+    (tmp_path / "paper.tex").write_text("\\includegraphics{figs/muon_ft.pdf}\n")   # a one-file figure goes as itself
+    _sidecar(str(tmp_path / "muon_ft"), ["AdamW optimizer"])
+    bad, _ = sc.legend_findings({"files": [str(tmp_path / "muon_ft.png")], "caption": ""}, "/", drafts=str(tmp_path))
+    assert not any("draft_figure" in b for b in bad)
 
 
 if __name__ == "__main__":

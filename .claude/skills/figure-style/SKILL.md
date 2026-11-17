@@ -12,6 +12,26 @@ description: >-
 Every figure goes into `docs/results.tex` and must look like it belongs to the same document
 as the prose and as every other figure.
 
+## A figure reads on its own (Joaquin 2026-11-17)
+
+A reader scrolls through the figures only, in under ten minutes, and gets what was compared and what it shows,
+without the text and with at most a glance at a short caption.
+
+- **What is compared is named on the figure in plain words**: the legend says what each curve is ("pretrained only
+  on events sampled from PDFs", "AdamW optimizer", "Muon optimizer", "particle IDs"), never an internal name (catalog,
+  uniform keep, $P_{\rm keep}$, target $T$, in range, one-hot, rung: a ladder has steps) and never a bare symbol that
+  only the caption defines. An entry is at most two lines of 40 characters.
+- **Every axis defines its quantity**: `$\log_{10} y_{\min}$, $y_{\min}=\min_{i<j} s_{ij}/\hat s$`, not a symbol
+  defined two figures later. Bins and categories are ordered as they read (left to right, low to high).
+- **A scanned parameter is a colour bar with its name**, not a legend with one entry per value.
+- **One file per figure** (the group's no-subfigure rule): all panels and the legend in one `ps.save`; never
+  `ps.save_panels`, never `ps.legend_strip` (both now leave a warning that `send_check` refuses). To change a layout,
+  redraw the figure.
+- **The legend is inside the figure**: in a panel corner (`ps.legend`), or in the spare cell of a 2x2 holding three
+  panels (`ps.legend_cell`). Its font may drop to `LEGEND_MIN_PT` (7.5pt) for now.
+- **Captions are short**: what the figure shows and the setting (process, data size, seeds); nothing the figure
+  already says, no list of definitions.
+
 ## THE INVARIANT — read this before anything else
 
 **The plot box is a constant: `PLOT_W_IN` x `PLOT_H_IN` (2.40 x 1.92 in). The canvas is
@@ -59,46 +79,19 @@ cannot hold standard plot boxes at that column count. Fix it structurally:
 
 | symptom | fix |
 |---|---|
-| 3 panels, or any count that does not fill a rectangle | `ps.panels(n)` + `ps.save_panels`, two per row |
+| 3 panels | one `ps.figure(2, 2)`, the legend in the fourth cell (`ps.legend_cell`), or one column |
 | a row between 6.5 and 8.2 in | nothing — wrap it in `\widerow` and let it overhang the margins |
 | a row over 8.2 in | shorten the longest tick or legend label; only then fewer columns |
 | 3 or more columns | 2 columns and more rows (never 3 across) |
-| legend outside the axes | put it inside; use `ps.make_room` to open space |
+| legend outside the axes | put it inside; use `ps.make_room` to open space, or the spare cell |
 | a panel spanning two cells | split the figure; every panel is one cell (the ratio inset `ps.hist_ratio` puts under its histogram is part of that cell, never a cell of its own) |
 
-## Grids: one canvas holds 1, 2 or 4 panels. Anything else is separate files.
+## Grids: one file per figure
 
-**`ps.figure` is only for 1x1, 1x2 and 2x2.** Never 3 across, never 4 across, never a panel
-spanning two cells, and never a grid with an empty cell.
-
-**For any other panel count — in practice any 3 — use `ps.panels(n)` and `ps.save_panels`.**
-Each panel is written as its own file (`<base>_a.pdf`, `_b`, `_c`) and `results.tex` includes
-them two per line, so LaTeX puts two on the first line and the third centred underneath:
-
-```python
-figs = ps.panels(3)
-for (fig, ax), d in zip(figs, datasets):
-    ax.plot(...)
-ps.save_panels(figs, "analysis/divergences/figs/my_set")   # prints the LaTeX to paste
-```
-
-```latex
-\widerow{\pnl{my_set_a.pdf}\hfill\pnl{my_set_b.pdf}} \\[1ex]
-\pnl{my_set_c.pdf}
-```
-
-Two macros, both defined in `results.tex`, and rows need **both**:
-
-- `\pnl{f.pdf}` — `\raisebox{-\height}{\includegraphics{f.pdf}}`. Panels line up by their
-  **tops**, not their baselines. Two canvases holding the same plot box can differ in height,
-  because one carries an x-label and its neighbour only tick labels; on the baseline the
-  shorter one's *plot area* then sits lower than its neighbour's even though the boxes are
-  identical. Always wrap a panel that shares a row.
-- `\widerow{...}` — centres a row wider than `\textwidth` so it overhangs both margins evenly.
-  Only needed above 6.5 in; harmless below.
-
-Three panels forced into a 2x2 leave a hole where the fourth would go, and that hole is the
-first thing anyone notices about the figure. `ps.save()` warns when a grid has an empty cell.
+**`ps.figure` is for 1x1, 1x2, 2x2 and, for three panels, 2x2 with the legend in the fourth cell
+(`ps.legend_cell(axs[1][1], axs[0][0])`) or 3x1.** Never 3 across, never 4 across, never a panel spanning two
+cells, never a hole: `ps.save` warns on an empty cell that holds no legend. Panels as files of their own
+(`ps.panels`, `ps.save_panels`) and a legend strip (`ps.legend_strip`) are retired (Joaquin 2026-11-17).
 
 Two panels share a line whenever their canvases add to under **8.2 in** — the text block
 plus both margins. A panel carrying a colourbar is ~3.9 in, so a pair of maps is ~7.9 in and
@@ -160,9 +153,9 @@ precisely what the reader notices.
 | element | rule |
 |---|---|
 | legend | **`ps.legend(ax, "upper left")` — inside the axes, in a CORNER.** `ps.legend` rejects anything else. `ps.make_room` then grows the y-range until it is clear of the data. |
-| legend entry | **a short symbol or formula on one line, at most 30 characters, defined in the caption** (`scratch`, `FT+LO`, `$\log\beta^2$`), never a sentence. `ps.save` warns `!!` on a longer or multi-line entry and `send_check` refuses the figure. |
-| legend that will not fit | let `ps.legend` drop the font (it goes to `LEGEND_MIN_PT`, 8.5pt), then shorten the symbols. |
-| legend, which panel | **one legend per canvas**: a figure on one canvas (ps.figure 1x2, 2x2) carries one legend in whichever panel has room; panels saved as separate files (ps.panels / save_panels) each carry their own legend, since any file may be shown alone. |
+| legend entry | **plain words naming the curve, at most two lines of 40 characters** (`from scratch`, `AdamW optimizer`, `pretrained on processes\nsampled from PDFs`). A symbol entry is allowed only where the axis or another entry defines it. `ps.save` warns `!!` on a longer entry and `send_check` refuses the figure. |
+| legend that will not fit | let `ps.legend` drop the font (it goes to `LEGEND_MIN_PT`, 7.5pt), then shorten the words, then the spare cell. |
+| legend, which panel | **one legend per figure**, in whichever panel has room or in the spare cell; a panel whose curves differ from the others' carries its own. |
 | process label | `ps.process_label(ax, ...)`, default **upper right**. Do not pick a corner per figure. It **names the process only**: a stratum, cut, energy, event count or model goes in the caption. |
 | colourbar | **`ps.colorbar(ax, mappable, label)` — vertical, immediately right of its own panel.** Always, and one per panel that needs a scale. Not below, not on top, not in an inset. |
 | headroom | `ps.headroom` gives every plot the same clear band above and below the data. Do not hand-tune `ylim` for appearance. |
@@ -199,8 +192,8 @@ figure and made the reader assemble each curve's identity themselves. Prefer the
 reach for factorising only when the two factors are genuinely independent and the reader
 already thinks in them.
 
-An outside legend is a last resort for when the entries fit in no panel at all — eight process
-labels, say. Then it is **one strip above the plot** via `ps.shared_legend`, never below, never
+An outside legend is a last resort for when the entries fit in no panel and no spare cell — eight process
+labels, say. Then it is **one strip above the plot, in the same file** via `ps.shared_legend`, never below, never
 to the side, and it grows the canvas rather than the panel.
 
 ## True against predicted distributions: the one layout
@@ -218,7 +211,7 @@ The reference is the paper's Fig. 8, `analysis/data_saving/example_reruns.py` (f
 | ratio limits | fixed per figure (default 0.5 to 1.5, `log_ratio` for spreads of a decade); values beyond are drawn at the edge. A ratio is drawn in every bin with true events: no minimum-count mask. |
 | truth | black line, first in the legend, on top. |
 | in-panel text | **the process label only.** A stratum, cut, energy or event count goes in the caption, never in the panel. |
-| several panels | `ps.panels(n)` + `ps.save_panels`, one legend strip (`ps.legend_strip`); right-hand panels drop the ratio y label. |
+| several panels | one `ps.figure`, the legend in a panel or the spare cell; right-hand panels drop the ratio y label. |
 
 ## Include at natural size in LaTeX
 
@@ -259,7 +252,7 @@ the edge. Ranges are set by rule, never after a look; what a figure leaves out t
 
 **Per-point value labels are clutter.** The axis carries the number; exact values go in a table.
 
-**One font size everywhere.** 11 pt. Fix collisions with fewer ticks, never a smaller font.
+**One font size everywhere.** 11 pt, the legend alone down to 7.5 pt. Fix collisions with fewer ticks, never a smaller font.
 
 ## cmr10 glyph traps
 

@@ -568,6 +568,7 @@ def save_panels(figs, base: str, repo: str | None = None) -> list:
     out = []
     for i, item in enumerate(figs):
         fig = item[0] if isinstance(item, tuple) else item
+        fig._ps_extra_warns = [ONE_FILE_WARN]   # recorded in the legend file: send_check refuses a panel file
         out.append(save(fig, f"{base}_{PANEL_SUFFIXES[i]}", repo=repo))
     stem = os.path.basename(base)
     rows = [PANEL_SUFFIXES[i:min(i + 2, len(figs))] for i in range(0, len(figs), 2)]
@@ -697,9 +698,9 @@ def legend(ax, loc: str = "upper left", **kwargs):
 
 
 #: How far the legend font may drop below BASE_PT to fit a legend inside its plot box.
-#: Only the legend, only as a last resort, and never below this -- a legend at 7pt beside 11pt
-#: body text reads as a different document.
-LEGEND_MIN_PT = 8.5
+#: Only the legend, only as a last resort. 7.5pt since the legends moved inside every figure in plain words
+#: (Joaquin 2026-11-17: "we can slightly go against the rules and make the fontsize of the legend slightly smaller").
+LEGEND_MIN_PT = 7.5
 
 
 def _legend_fits(ax, leg):
@@ -737,6 +738,19 @@ def _shrink_wide_legend(ax, leg, kwargs):
         kwargs["ncol"] = ncol
         leg = ax.legend(**kwargs)
     return leg
+
+
+def legend_cell(cell, axes, **kwargs):
+    """The figure's legend in its spare grid cell `cell` (a 2x2 holding three panels): the cell's axes turned off and
+    the entries of `axes` (one axes or a list, each label once) centred in it. One file per figure, the legend inside
+    it (Joaquin 2026-11-17)."""
+    hl = {}
+    for a in (axes if isinstance(axes, (list, tuple)) else [axes]):
+        for h, l in zip(*a.get_legend_handles_labels()):
+            hl.setdefault(l, h)
+    cell.set_axis_off()
+    kwargs.setdefault("frameon", False)
+    return cell.legend(list(hl.values()), list(hl), loc="center", **kwargs)
 
 
 def shared_legend(fig, ax, ncol: int = 3, **kwargs):
@@ -811,7 +825,7 @@ def legend_strip(ax, base: str, ncol: int = 3, order=None, width: float | None =
                 h.set_alpha(1)
         for ext in (".png", ".pdf"):
             fig.savefig(base + ext)   # the full width, not cropped: the strip spans the row
-        write_legend_txt(base, labels, [w for w in style_warnings(fig) if w.startswith('legend')])
+        write_legend_txt(base, labels, [w for w in style_warnings(fig) if w.startswith('legend')] + [ONE_FILE_WARN])
         plt.close(fig)
         print(f"saved {base}.png / .pdf (legend strip, {n} columns, {width:.2f} in)")
         return
@@ -824,7 +838,8 @@ def legend_strip(ax, base: str, ncol: int = 3, order=None, width: float | None =
     fig.legend(handles, labels, ncol=ncol, loc="center", **kwargs)
     for ext in (".png", ".pdf"):
         fig.savefig(base + ext, bbox_inches="tight", pad_inches=0.03)
-    write_legend_txt(base, [l for l in labels if l], [w for w in style_warnings(fig) if w.startswith('legend')])
+    write_legend_txt(base, [l for l in labels if l], [w for w in style_warnings(fig) if w.startswith('legend')]
+                     + [ONE_FILE_WARN])
     plt.close(fig)
     print(f"saved {base}.png / .pdf (legend strip)")
 
@@ -1219,8 +1234,14 @@ def save(fig, base: str, repo: str | None = None) -> str:
     return base
 
 
-#: A legend entry is a short symbol or formula on one line, defined in the caption (figure-style skill).
-LEGEND_MAX_CHARS = 30
+#: A legend entry names its curve in plain words, on at most LEGEND_MAX_LINES lines of at most LEGEND_MAX_CHARS
+#: characters each (Joaquin 2026-11-17: the figures must read without the text; was one line of 30, a symbol
+#: defined in the caption).
+LEGEND_MAX_CHARS = 40
+LEGEND_MAX_LINES = 2
+#: Joaquin 2026-11-17 (the group's no-subfigure rule): one file per figure, all its panels and its legend inside it.
+ONE_FILE_WARN = ("a panel file or a legend strip of its own: a figure is one file holding all its panels and its "
+                 "legend inside (ps.figure, the legend in a panel or a spare cell)")
 #: A y label that says "prediction over truth" (pred/true, \frac{pred}{true}): such an axes must be the hist_ratio inset
 #: under its histogram. A stand-alone ratio figure ("MSE ratio") is not one.
 _RATIO_YLABEL = re.compile(r"pred\w*\s*/?\s*(?:true|truth)\b|/\s*(?:true|truth)\b", re.I)
@@ -1247,11 +1268,12 @@ def legend_labels(fig) -> list:
 def style_warnings(fig) -> list:
     """The figure-style breaches a script can see: a legend entry that is not a short one-line symbol, and a ratio
     axes drawn as a panel of its own instead of the hist_ratio inset under its histogram."""
-    out = []
+    out = list(getattr(fig, "_ps_extra_warns", []))
     for lab in legend_labels(fig):
-        if "\n" in lab or len(plain_text(lab)) > LEGEND_MAX_CHARS:
-            out.append(f"legend entry {lab!r} is not a short one-line symbol (at most {LEGEND_MAX_CHARS} characters): "
-                       "write a symbol or formula and define it in the caption")
+        lines = lab.split("\n")
+        if len(lines) > LEGEND_MAX_LINES or any(len(plain_text(x)) > LEGEND_MAX_CHARS for x in lines):
+            out.append(f"legend entry {lab!r} is too long (at most {LEGEND_MAX_LINES} lines of {LEGEND_MAX_CHARS} "
+                       "characters): name the curve in fewer plain words")
     for ax in fig.axes:
         if _RATIO_YLABEL.search(plain_text(ax.get_ylabel().replace("\\frac", ""))) and not getattr(ax, "_ps_ratio", False):
             out.append(f"axes {ax.get_ylabel()!r} is a ratio panel of its own: draw it with ps.true_pred_hist or "
@@ -1343,7 +1365,8 @@ def _warn_if_squeezed(fig, base: str) -> None:
                  if ax not in [b[0] for b in boxes] and ax.get_legend() is not None)
         if nr * nc > n:
             print(f"  !! {name}: {n} panels in a {nr}x{nc} grid leaves {nr * nc - n} empty "
-                  f"cell(s) -- use ps.panels({n}) + ps.save_panels() instead")
+                  f"cell(s) -- put the legend in the spare cell (an axes with only a legend), or use one row "
+                  f"or one column")
         # A legend wider than its plot box hangs out over the neighbouring panel or off the
         # canvas. ps.legend drops ncol for you; a raw ax.legend(ncol=...) does not.
         for ax, box in boxes:
