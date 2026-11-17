@@ -33745,6 +33745,20 @@ entries:
     outcome: 'Yes: Muon''s fine-tune at or below AdamW''s at most D on the tree probes, as on the median probes; the figure
       replaces Fig. 15 with these probes. No: AdamW lower or the curves cross on the trees: the figure shows it and the Sec.
       4 sentence changes to what it shows; a cell that fails is listed and rerun once.'
+    passed_at: '2026-11-17T01:32:22+00:00'
+    reviewer: 'One change: same stage-1 parents (dimensionless AdamW, dimensionless_muon, same lr/HPs, optimizer the only
+      difference), each fine-tuned with its own optimizer keeping the parent''s standardization, scratch with AdamW, same
+      D=10/32/100/316 cells and 2000 validation events as draft Fig. 15 (paper.tex fig:ft); only the probes change, per Joaquin''s
+      2026-11-17 words (D468). Check 2: muon_compare.py low-probes @de3e6c17 rerun locally gives v3_dbx_bxdgg, v3_udx_gwpzz,
+      v3_epem_mupmumttx, v3_uux_wpwm_nlo with zero-shot AdamW 0.261/0.375/0.38/0.484 vs Muon 0.0353/0.0469/0.0647/0.0796 (5.9-7.4x);
+      on the old probes (muon_ft.json) the kept-stats fine-tune gap stayed ~2-5x (e.g. gg->gamma ttbar D=316 0.0537 vs 0.0169).
+      Check 3: one seed per cell as the sibling figure; pretraining-seed spread 0.124-0.148 decades (~1.4x, results.tex zs.all.spread)
+      against an expected gap of order 3x; fine-tune seed spread itself unmeasured, so ratios inside 1.4x should be reported
+      as unresolved. Time from muon_ft.json seconds: 0.77-0.99 h per job, 3 jobs ~3 GPU-h; CC /sps/lpnhe 66G free (df read
+      now). Loss and preprocessing inherited from the figure''s parents, as the redo of that figure asks. Searched results.tex,
+      plan.yaml, site decisions for the four probe names, ''low-loss'', ''good loss'', ''low loss'', ''Fine-tunes at small'',
+      muon_ft, catft, muon_hp_ft: no fine-tune on these probes; the 2x2/refit cells and the Muon fine-tune HP search are on
+      the old probes only.'
   targets:
   - batch: examples_rerun
     wall_h: 1.0
