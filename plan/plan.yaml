@@ -17418,6 +17418,12 @@ entries:
       has tails from about -17 to +10 in log10|M|^2 against a truth within about -2..2 (kit_dist_a_a), scratch tails over
       -13..+13 and the MLP on raw inputs about 4 decades low in kitvm_dist_ee_uug_me2_a (read off the figures). Fig. 8 not
       regenerated.'
+  - at: '2026-11-17T00:02:29+00:00'
+    text: '2026-11-17 step 21 (after-period of the 10-min batch, D324): the live batching start is 2026-11-11T19:55:43Z (first
+      line of ~/.local/share/ccorch/absorb.log, the hand-back spool live with the new waiter; first spooled hand-back 20:03:20Z);
+      7 days end 2026-11-18T19:55Z, so the run is not due yet: waits on 2026-11-19, then wake_batching.py --since 2026-11-11T19:55:43Z
+      --until +7 days. Later restarts (supervisor 2026-11-16 12:59 local, waiter 2026-11-17 00:37 local) are re-execs of the
+      same batching code, not new code for this measure.'
   handoff:
     state: '2026-11-12 ~15:10 local. Restore of CC pools deleted 2026-11-11: held-out H1..H7c all prebuilt (check_site_data
       0 missing); dsh_eea 115/115 train rebuilt, val/test sha256 230/230 unchanged, its parts gc''d (5.45 GB); PP4: 1 pool
