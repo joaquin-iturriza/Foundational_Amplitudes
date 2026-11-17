@@ -34802,6 +34802,12 @@ entries:
     units: null
     start: '2026-11-17T12:16:25+00:00'
     at: '2026-11-17T12:16:25+00:00'
+  - batch: zng_zeroshot_smoke
+    wall_h: 0.5
+    jobs: 1
+    units: null
+    start: '2026-11-17T14:57:57+00:00'
+    at: '2026-11-17T14:57:57+00:00'
   handoff:
     state: '2026-11-17 ~16:00. All 8 trainings finished cleanly (E7399, not acked by me; the next owner acks it with what
       the read found). Batch: scripts/job_kit.sh, base config trial 1262''s saved config, HPs of kit_hpo_uug_T hp1677 (design
