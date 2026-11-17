@@ -34821,6 +34821,13 @@ entries:
       n=3 4.9x above (2.0e-2) -> between; n=4 14x above the fine-tuned run -> does not extrapolate, its residual negative
       (prediction low), opposite to par:v4_mult_bias''s positive sign. At n=1,2 the error is near a constant: prediction/truth
       ~1.2-1.25 (|Delta| q90 0.24 at Z+1g), close to 1/0.7798 = 1.28, the u/d ratio (observation, not checked).'
+  - at: '2026-11-17T15:40:12+00:00'
+    text: '2026-11-17: the comparison with arXiv:2505.20280 (the LLoCa paper''s test MSE, six ''..., paper'' points in zng_median_delta''s
+      right panel and two numbers in the uncommitted results.tex paragraph) was never Joaquin''s: he asked for his own performance
+      on Zenodo 16793011 against Suprio''s repo (lloca-experiments-uq, branch uq), median |Delta| against n, the |Delta| plot
+      and the pulls. The previous owner took the paper as a stand-in when the repo held no results. Removed: the right panel
+      (figure now median |Delta| alone, benchmark.py @8b3069d7), the paper numbers and their claims from the paragraph. The
+      comparison is Suprio''s LLoCa-Transformer (trained by us with his code, or his own preds_test_0.npz).'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
