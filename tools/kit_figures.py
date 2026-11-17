@@ -327,7 +327,9 @@ FAMS = {("ee_uug", "me2"): [("coll_y", "collinear"), ("soft_x", "soft")],
         ("ee_tt", "virt_finite"): [("threshold_beta", "threshold"), ("sudakov_sqrts", "high energy")]}
 SUMMARY_PROC = {("ee_uug", "me2"): r"$e^+e^-\to u\bar u g$", ("ee_uugg", "me2"): r"$e^+e^-\to u\bar u gg$",
                 ("ee_tt", "virt_finite"): r"$e^+e^-\to t\bar t$, one loop"}
-FT_ALL = "fine-tuned, pretrained with the\ntop family held out (6 runs)"   # every fine-tune one marker: none fixes a limit
+# the fine-tunes in two markers by parent (none fixes a limit): tops held out of pretraining, or LO / one-loop tops added
+FT_HELD = "fine-tuned, tops held out\nof pretraining (2 runs)"
+FT_TOPS = "fine-tuned, tops added\nto pretraining (4 runs)"
 # each arm in plain words, the same name as in tools/kit_vs_mlp.py (Joaquin 2026-11-17: a figure reads on its own)
 WORDS = {"scratch": "transformer", r"scratch+$\beta$": "transformer",
          "scratch-nobeta": r"transformer without $\log\beta^2$ input",
@@ -355,8 +357,8 @@ def summary(paths, out):
     C = ps.C
     sty = {"scratch": (C.vermillion, "s"), r"scratch+$\beta$": (C.vermillion, "s"), "scratch-nobeta": (C.orange, "s"),
            "factor": (C.blue, "o"), "factor+log": (C.sky, "o"), "div-form": (C.green, "D"), "ReZero": (C.purple, "^"),
-           "FT": ("k", "v"), "FT searched": ("k", "v"), "FT+LO": ("k", "v"), r"FT+LO+$\beta$": ("k", "v"), "FT+1L": ("k", "v"),
-           r"FT+1L+$\beta$": ("k", "v")}
+           "FT": ("k", "v"), "FT searched": ("k", "v"), "FT+LO": ("k", "d"), r"FT+LO+$\beta$": ("k", "d"), "FT+1L": ("k", "d"),
+           r"FT+1L+$\beta$": ("k", "d")}
     sym = lambda p, t: "scratch-nobeta" if p[0] == "ee_tt" and t == "softpair" else SHORT[t]
     fig, axs = ps.figure(ncols=2, nrows=2)
     axs = list(np.ravel(axs))
@@ -369,7 +371,7 @@ def summary(paths, out):
             xs = [(i - 0.35 + w * (j + 0.5), vals[p][t][f]) for i, (f, _) in enumerate(fams) if f in vals[p][t]]
             c, mk = sty[sym(p, t)]
             ft = sym(p, t).startswith("FT")
-            lab = FT_ALL if ft else WORDS[sym(p, t)]
+            lab = (FT_HELD if sym(p, t) in ("FT", "FT searched") else FT_TOPS) if ft else WORDS[sym(p, t)]
             clipped |= clip_plot(ax, *zip(*xs), 0, YCAP, sci, ls="", marker=mk, color=c, mfc="none" if ft else c,
                                  label=lab if lab not in labs else None)
             labs.add(lab)
