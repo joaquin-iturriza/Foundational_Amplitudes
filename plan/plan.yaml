@@ -35343,10 +35343,12 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-d95c89ad
-    commit: 26cab1f7
+    commit: 1ce53bcd
     paths:
     - analysis/catalog_daniel/dan_per_process.py
     - analysis/catalog_daniel/data/v4_heldout_overlap.json
+    - evaluate_daniels_catalog/README
+    - evaluate_daniels_catalog/check_reproduction.py
   dead_ends: []
   asks:
   - ask: 'Scope: new eval-only work, about 1-2 GPU-h. Score trial 1262 zero-shot on Daniel''s held-out processes not in catalog_v4''s
