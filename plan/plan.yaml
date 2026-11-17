@@ -33652,6 +33652,14 @@ entries:
       refused the prebuild job itself (data check); fixed 9192f890. Fig. 9: per-bin and <100 GeV means lowest at f=0.5 (1.53e-5,
       1.97e-5), mean over all test events lowest at f=0.25 (4.73e-6 vs 7.48e-6 at 0.5); no text repeated the f=0.5-in-all-three
       claim.'
+  - at: '2026-11-17T02:24:20+00:00'
+    text: '2026-11-17 step 4: Sec. 5 figures one file each (rung_focus_ee/qcd, finale_synth_paper_ee/qcd 3x2 with per-panel
+      legends ''ladder steps 1-k'', ''largest gain over scratch'' replacing ''best (ties within 1.2x)'' after repo-reviewer
+      FIX, reviewer passed and advanced; star_arms 2x2, star_arms2 2x2 with legend cell); Sec. 4 scatters'' legends on the
+      emptier side of y=x, both axes opened (main session: y range had grown to 1e6-1e10); Joaquin''s notes on Figs. 6-9,
+      11 applied and made skill rules (30b1b541). Draft cd6dee5: one include per figure, short captions, rung -> step of the
+      ladder, D -> D_train in Secs. 3-5; builds 48 pp with TeX Live 2025 at /mnt/c/texlive/2025/bin/windows (the WSL TeX lacks
+      dsfont). Left: Fig. 15 from the new runs, cold figures-only reviewer, zip + PDF, send each figure.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
