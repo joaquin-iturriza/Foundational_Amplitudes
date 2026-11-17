@@ -34211,6 +34211,8 @@ entries:
       DyHPO search (template coupled space, Muon, WSD, emission-scale target, HETEROSC, 12,500 steps, 5e5 events, 8 trials)
       from scratch, then the 8 runs again at its choice. Cost above 30 GPU-h: Joaquin''s call (per multiplicity ~61 GPU-h;
       Z+4g only and its HPs for all n ~33 GPU-h)'
+    5: 'Write-up in docs/results.tex: the 8 runs flagged by the curve test, the zero-shot read, the figures zng_median_delta,
+      zng_delta_z4g, zng_pulls, zng_curves, % src / % claim lines'
   done_when: null
   notes_ref: null
   match: zng_uq_*,tp*_zng_*
@@ -34634,6 +34636,11 @@ entries:
       if:
       - 'search finds a trial passing the curve test: the 8 runs at its HPs, the benchmark read again'
       - 'no trial passes: report the setup''s floor on Z+ng, flagged'
+    5:
+      feeds: the record of the comparison so far
+      if:
+      - 'written and committed: plan evidence with the commit'
+      - 'the zero-shot read fails: write up the trained runs alone'
   step_waits:
     '3': the fresh owner launched from the 2026-11-17 hand-off (this owner closed at the context limit)
   findings:
