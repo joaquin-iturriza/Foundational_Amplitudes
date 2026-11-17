@@ -30,6 +30,43 @@ import numpy as np
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
+# Off-scale rule of the KIT figures (Joaquin 2026-11-17: a bad model far off must not squash the good ones): an
+# MSE(log10|M|^2) axis stops at YCAP (an error of 10 decades); a value beyond an axis limit is drawn on the edge as a
+# hollow triangle pointing the way the value lies, the most extreme of each curve printed beside it, and the legend gets an "off the scale" entry
+YCAP = 1e2
+OFF = "off the scale, value printed"
+
+
+def clip_plot(ax, x, y, lo, hi, fmt, **kw):
+    """ax.plot(x, y, **kw) with y clipped to [lo, hi]; clipped points hollow, the most extreme one labelled fmt(value).
+    True when a point was clipped."""
+    x, y = np.asarray(x, float), np.asarray(y, float)
+    yc = np.clip(y, lo, hi)
+    line, = ax.plot(x, yc, **kw)
+    out = np.flatnonzero(y != yc)
+    if not out.size:
+        return False
+    for side, mk in ((y > hi, "^"), (y < lo, "v")):   # the arrow's way: where the value lies
+        if side.any():
+            ax.plot(x[side], yc[side], ls="", marker=mk, color=line.get_color(), mfc="white", zorder=line.get_zorder() + 1)
+    i = out[np.argmax(np.abs(np.log10(y[out] / yc[out]) if ax.get_yscale() == "log" else y[out] - yc[out]))]
+    top = y[i] > hi
+    ax.annotate(fmt(y[i]), (x[i], yc[i]), textcoords="offset points", xytext=(-4, -12 if top else 4), ha="right",
+                color=line.get_color())
+    return True
+
+
+def off_entry(ax):
+    """the legend entry of clip_plot's hollow markers (an empty line: no data)"""
+    ax.plot([], [], ls="", marker="^", color="0.4", mfc="white", label=OFF)
+
+
+def sci(v):
+    """a value as a power of ten in mathtext, e.g. 3x10^4"""
+    e = int(np.floor(np.log10(v)))
+    return rf"${v / 10 ** e:.0f}\times10^{{{e}}}$"
+
+
 RUN_RE = re.compile(r"kit_(?P<mode>A_ft|A|B_bulk|B)_(?P<file>ee_[a-z]+)_(?P<target>[a-z0-9_]+?)_n(?P<n>\d+)_t(?P<t>\d+)"
                     r"(?:_(?P<tag>.+))?$")
 
@@ -290,6 +327,7 @@ FAMS = {("ee_uug", "me2"): [("coll_y", "collinear"), ("soft_x", "soft")],
         ("ee_tt", "virt_finite"): [("threshold_beta", "threshold"), ("sudakov_sqrts", "high energy")]}
 SUMMARY_PROC = {("ee_uug", "me2"): r"$e^+e^-\to u\bar u g$", ("ee_uugg", "me2"): r"$e^+e^-\to u\bar u gg$",
                 ("ee_tt", "virt_finite"): r"$e^+e^-\to t\bar t$, one loop"}
+FT_ALL = "fine-tuned, pretrained with the\ntop family held out (6 runs)"   # every fine-tune one marker: none fixes a limit
 # each arm in plain words, the same name as in tools/kit_vs_mlp.py (Joaquin 2026-11-17: a figure reads on its own)
 WORDS = {"scratch": "transformer", r"scratch+$\beta$": "transformer",
          "scratch-nobeta": r"transformer without $\log\beta^2$ input",
@@ -317,11 +355,12 @@ def summary(paths, out):
     C = ps.C
     sty = {"scratch": (C.vermillion, "s"), r"scratch+$\beta$": (C.vermillion, "s"), "scratch-nobeta": (C.orange, "s"),
            "factor": (C.blue, "o"), "factor+log": (C.sky, "o"), "div-form": (C.green, "D"), "ReZero": (C.purple, "^"),
-           "FT": ("k", "v"), "FT searched": ("k", "*"), "FT+LO": ("k", "<"), r"FT+LO+$\beta$": ("k", ">"), "FT+1L": ("k", "p"),
-           r"FT+1L+$\beta$": ("k", "h")}
+           "FT": ("k", "v"), "FT searched": ("k", "v"), "FT+LO": ("k", "v"), r"FT+LO+$\beta$": ("k", "v"), "FT+1L": ("k", "v"),
+           r"FT+1L+$\beta$": ("k", "v")}
     sym = lambda p, t: "scratch-nobeta" if p[0] == "ee_tt" and t == "softpair" else SHORT[t]
     fig, axs = ps.figure(ncols=2, nrows=2)
     axs = list(np.ravel(axs))
+    clipped, labs = False, set()
     for ax, p in zip(axs, procs):
         order = list(sty)
         fams, arms = FAMS[p], sorted(vals[p], key=lambda t: order.index(sym(p, t)))
@@ -329,8 +368,11 @@ def summary(paths, out):
         for j, t in enumerate(arms):
             xs = [(i - 0.35 + w * (j + 0.5), vals[p][t][f]) for i, (f, _) in enumerate(fams) if f in vals[p][t]]
             c, mk = sty[sym(p, t)]
-            ax.plot(*zip(*xs), mk, ls="", color=c, mfc="none" if t.startswith("ft") and not t.endswith("_search") else c,
-                    label=WORDS[sym(p, t)])
+            ft = sym(p, t).startswith("FT")
+            lab = FT_ALL if ft else WORDS[sym(p, t)]
+            clipped |= clip_plot(ax, *zip(*xs), 0, YCAP, sci, ls="", marker=mk, color=c, mfc="none" if ft else c,
+                                 label=lab if lab not in labs else None)
+            labs.add(lab)
             print(f"DEEPEST {p[0]} {WORDS[sym(p, t)]!r}: " + ", ".join(f"{f} {vals[p][t][f]:.3g}" for f, _ in fams
                                                                        if f in vals[p][t]))
         ref = [(i, MLP[(*p, f)][2]) for i, (f, _) in enumerate(fams) if (*p, f) in MLP]
@@ -341,11 +383,12 @@ def summary(paths, out):
         ax.set_yscale("log")
         ax.set_ylabel(r"MSE$(\log_{10}|\mathcal{M}|^2)$")
         ps.process_label(ax, SUMMARY_PROC[p])
-        # a quarter of the span clear above the highest marker (make_room tests marker centres only: the tt ReZero
-        # Sudakov point at 3e6 sat under the process label)
-        ys = [y for t in arms for y in vals[p][t].values()] + [y for _, y in ref]
+        # a quarter of the span clear above the highest marker (make_room tests marker centres only)
+        ys = [min(y, YCAP) for t in arms for y in vals[p][t].values()] + [y for _, y in ref]
         lo, hi = np.log10(min(ys)), np.log10(max(ys))
         ax.set_ylim(10 ** (lo - 0.1 * (hi - lo)), 10 ** (hi + 0.25 * (hi - lo)))
+    if clipped:
+        off_entry(axs[len(procs) - 1])   # last in the legend
     ps.legend_cell(axs[3], axs[:3], fontsize=ps.LEGEND_MIN_PT)
     print(ps.save(fig, out))
 

@@ -1,0 +1,72 @@
+%=========================================================================
+%  Foundational Amplitudes, informal weekly update, KIT hard phase space (November 2026)
+%  Joaquin Iturriza Ramirez
+%  Compile (twice):  pdflatex -interaction=nonstopmode main.tex
+%=========================================================================
+\documentclass[aspectratio=169,10pt]{beamer}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usefonttheme{professionalfonts}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+
+\graphicspath{{figs/}}
+
+\definecolor{navy}{RGB}{38,38,110}
+
+\setbeamercolor{frametitle}{fg=navy}
+\setbeamercolor{structure}{fg=navy}
+\setbeamertemplate{navigation symbols}{}
+
+\setbeamertemplate{frametitle}{%
+  \vskip0.6em\hbox{\hspace{0.2em}\usebeamerfont{frametitle}\insertframetitle}%
+  \vskip0.12em\hbox{\hspace{0.2em}\textcolor{navy}{\rule{0.965\paperwidth}{0.8pt}}}\vskip0.2em}
+
+\setbeamertemplate{footline}{%
+  \hfill\usebeamerfont{normal text}\color{gray}\scriptsize\insertframenumber\hspace{1em}\vspace{0.6em}}
+
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+
+% full slide size (weekly-deck skill); two side by side at 0.49\textwidth each
+\newcommand{\fig}[1]{\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{#1}}
+\newcommand{\figtop}[1]{\raisebox{-\height}{\includegraphics[width=0.49\textwidth,height=0.78\textheight,keepaspectratio]{#1}}}
+
+\begin{document}
+
+\begin{frame}{Asymptotic factor fixes the singular limits}
+  \centering\fig{kitvm_mse_ee_uug_me2.pdf}
+\end{frame}
+
+\begin{frame}{Asymptotic factor fixes the singular limits}
+  \centering\fig{kitvm_mse_ee_uugg_me2.pdf}
+\end{frame}
+
+\begin{frame}{Top pairs at one loop}
+  \centering\fig{kitvm_mse_ee_tt_virt_finite.pdf}
+\end{frame}
+
+\begin{frame}{Extrapolation into the limits}
+  \centering\fig{kitvm_median_ee_uug_me2.pdf}
+\end{frame}
+
+\begin{frame}{Extrapolation into the limits}
+  \centering\fig{kitvm_median_ee_tt_virt_finite.pdf}
+\end{frame}
+
+\begin{frame}{Deepest bins}
+  \centering\fig{kitvm_dist_ee_uug_me2.pdf}
+\end{frame}
+
+\begin{frame}{Bulk is not worse}
+  \centering\fig{kitvm_bulk.pdf}
+\end{frame}
+
+\begin{frame}{Other attempts}
+  \centering\fig{kit_deepest_attempts.pdf}
+\end{frame}
+
+\end{document}
