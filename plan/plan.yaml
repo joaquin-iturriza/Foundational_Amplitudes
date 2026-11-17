@@ -33425,12 +33425,10 @@ entries:
     answered_at: '2026-11-16T21:18:36.220000+00:00'
     decision: D464
   owner:
-    agent: ae2faa477da4f03df
-    state: closed
-    since: '2026-11-17T01:48:40+00:00'
-    state_at: '2026-11-17T02:43:32+00:00'
-    context: 261852
-    context_at: '2026-11-17T02:43:10+00:00'
+    agent: ae24c212cd46ebda9
+    state: working
+    since: '2026-11-17T02:46:37+00:00'
+    state_at: '2026-11-17T02:46:37+00:00'
   step_waits:
     '3': '2026-11-20: next draft round'
     '5': FA-ccin2p3-167dc1db FA-ccin2p3-0d4d4506 FA-ccin2p3-c81ba5db
