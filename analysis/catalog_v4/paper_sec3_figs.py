@@ -346,21 +346,22 @@ def unseen(ax):
 # of the per-process validation loss (MSE of the standardized log|M|^2) at the best checkpoint, as docs/results.tex
 # tab:bigrun_arms (analysis/bigrun/arms_best.py, run on the site holding the runs) and the pair-bias table of
 # sec:bigrun. Rows name the inputs each network has (Joaquin 2026-11-17, third round: symbols, not words that need a
-# legend): o the propagator off-shellness, R_c the colour one-hot, G the diagram encoder, MLP or W x_i the particle
-# embedding (an MLP or a linear map), b_ij the pair bias on the attention (|b_ij| <= 8 its capped version, v2);
-# the symbols are defined in the caption and the text.
-BIGRUN = {r"$o,\,R_c,\,Wx_i$": (3.85e-4, 0.12),
-          r"$o,\,R_c$, MLP": (3.88e-4, 0.10),
-          r"$o,\,R_c,\,G,\,Wx_i$": (4.86e-4, 0.056),
-          r"$o,\,R_c,\,Wx_i,\,b_{ij}$": (5.26e-4, 0.084),
-          r"$o,\,R_c,\,Wx_i,\,|b_{ij}|\leq8$": (5.74e-4, 0.077),
-          r"$o,\,R_c,\,G$, MLP": (5.79e-4, 0.085),
-          r"$o,\,G$, MLP": (6.81e-4, 0.094),
-          r"$R_c,\,G$, MLP": (8.63e-4, 0.067)}
+# legend): rows say in words what each network has against the one with all inputs (Joaquin 2026-11-17, fourth
+# round: 'all inputs', 'no off-shellness', 'no colour', 'no diagrams', 'linear embedding', '+ pair bias'). All inputs
+# = propagator off-shellness, colour one-hot, diagram encoder, MLP particle embedding; '+ pair bias' rows add the
+# attention pair bias (capped at |b_ij| <= 8 in one) to the row above them. Rows in that reading order, not by value.
+BIGRUN = {"all inputs": (5.79e-4, 0.085),
+          "no off-shellness": (8.63e-4, 0.067),
+          "no colour": (6.81e-4, 0.094),
+          "no diagrams": (3.88e-4, 0.10),
+          "linear embedding": (4.86e-4, 0.056),
+          "no diagrams, linear embedding": (3.85e-4, 0.12),
+          "+ pair bias": (5.26e-4, 0.084),
+          "+ capped pair bias": (5.74e-4, 0.077)}
 
 
 def inputs(ax):
-    rows = sorted(BIGRUN.items(), key=lambda kv: kv[1][0])
+    rows = list(BIGRUN.items())
     y = np.arange(len(rows))
     ax.plot([v[0] for _, v in rows], y, "o", color="k")   # black: the left panel's colours name its sets
     ax.set_yticks(y); ax.set_yticklabels([k for k, _ in rows])
