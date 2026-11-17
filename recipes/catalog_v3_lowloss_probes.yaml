@@ -1,0 +1,33 @@
+# the four low-loss fine-tune probes of the Fig. 15 rerun (draft_rewrite step 5, muon_compare.py low-probes),
+# entries copied from recipes/catalog_v3_heldout_H1/H2/H3/H5.yaml, for prebuild_recipes.sh
+sampling:
+  mode: mixture
+processes:
+- name: v3_dbx_bxdgg
+  sqrts:
+  - 25
+  - 1000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: v3_udx_gwpzz
+  sqrts:
+  - 276
+  - 1000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: v3_epem_mupmumttx
+  sqrts:
+  - 362
+  - 1000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: v3_uux_wpwm_nlo
+  sqrts:
+  - 169
+  - 1000
+  n_train: 50000
+  n_val: 5000
+  n_test: 5000
