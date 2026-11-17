@@ -34206,11 +34206,18 @@ entries:
     answers_after: '2026-11-17T15:31:39+00:00'
     covers:
     - zng_uq_benchmark
+  - said_at: '2026-11-17T15:46:14.307000+00:00'
+    text: I want runs with both, HP search of ours, and his batchsize, lr, etc
+    decision: D485
+    answers_after: '2026-11-17T15:31:39+00:00'
+    covers:
+    - zng_uq_benchmark
   decisions:
   - D477
   - D478
   - D480
   - D481
+  - D485
   next:
     4: 'HPs for the Z+ng runs: the 8 runs at kit_hpo_uug_T hp1677 (lr 6.55e-3) fail the curve test in 7 of 8; a single-fidelity
       DyHPO search (template coupled space, Muon, WSD, emission-scale target, HETEROSC, 12,500 steps, 5e5 events, 8 trials)
@@ -34320,6 +34327,8 @@ entries:
       figures), 2026-11-14T04:31 (a SciPost LaTeX template paste): none is about Z+ng follow-ups'
     blocks: nothing
     blocks_steps: []
+    answered_at: '2026-11-17T15:46:14.307000+00:00'
+    decision: D485
   - ask: 'GPU budget: 33 to 61 GPU-h above 30 with no decision covering it, plus scope. (A) The Z+ng HP search, which one:
       (a) one DyHPO search per multiplicity then the fine-tunes, ~61 GPU-h; (b) one on Z+4g only and all 8 runs again at its
       HPs, ~33 GPU-h; (c) none, report the runs flagged? (B) Which follow-ups: (1) the UQ paper''s models at our 5e5-event
