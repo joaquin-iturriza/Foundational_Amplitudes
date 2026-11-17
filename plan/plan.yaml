@@ -35628,6 +35628,34 @@ entries:
       reads are not the model''s reads). Checks 3, 6-15: one deterministic eval, eval-only, ~0.1 GPU-h, no training loss or
       HPO, test events are the stored read''s 2000 dc_bbx_hh val events: fine. Local dump (scratchpad cpuoff/dump_cpu.npz)
       reproduces the CPU read as stated.'
+  - at: '2026-11-17T20:13:00+00:00'
+    question: 'Where does the CPU read of the DlessInOrd sigma-stage model part from the GPU read (CPU log|M|^2 0.194 low,
+      MSE 0.4173 vs 0.2791 on the first 2000 dc_bbx_hh val events): TF32 matmuls on the GPU (the model config has training.allow_tf32
+      true), the attention kernel, or another module''s CPU path? Eval-only diagnostic of the D489/D490 evaluator. REREAD=FA-ccin2p3-c3e63032.'
+    prior: 'GPU check FA-ccin2p3-c3e63032 (this entry, design passed 2026-11-17T19:45): evaluate.py (model copy and run dir)
+      and zero_shot_parent all give 0.2791 on GPU (GPU type not recorded); CPU gives 0.4173 locally and today on the CC login
+      node with CC''s own packages (torch 2.1.2+cu118, lloca 111caa04, xformers hidden): package versions out. Local CPU variants
+      LLOCA_FRAMES=repeat and training.dtype=float64 give 0.4173; the frames'' degeneracy regularizers fire on 0 of 4000 vectors
+      on CPU. docs/results.tex sec:tf32-eval (2026-10-15): reading a model at another precision than its training one moved
+      its loss up to 133x (''a model''s precision is part of what it learned''); this design tests that on this model. No
+      earlier per-layer CPU/GPU comparison (searched tf32, layer dump, CPU vs GPU, xformers, 0.194).'
+    measure: 'One GPU job (scripts/job_layer_dump.sh at the submit commit), four reads by evaluate_daniels_catalog/layer_dump.py,
+      each printing the GPU name, both TF32 flags, MSE of log|M|^2 and mean q-t, and dumping the 181 module outputs (first
+      20000 entries, mean, rms): (1) GPU xformers TF32 as configured, (2) GPU xformers TF32 off, (3) GPU dense masked attention
+      TF32 off, (4) CPU same node. Compared call by call (max|diff|/max|value|, mean): 2 vs 4, 3 vs 4, 1 vs 2, 1 vs 4.'
+    check: 'Locally the dump reproduces the CPU read (MSE 0.4173, mean q-t -0.4394, 181 calls; --no-tf32 also 0.4173, flags
+      False) and a dump against itself compares at 0. The threshold is calibrated in the job: 3 vs 4 (both exact fp32) sets
+      the floor (~1e-6), 1 vs 2 the TF32 noise; the per-layer trend and the mean column are read, not only the first crossing.'
+    fixed: Weights (evaluate_daniels_catalog/model = DlessInOrd sigma stage), the 2000 events, code at the submit commit,
+      seed 42 (output seed-independent to 1.7e-4), one eval batch.
+    control: (1) must give 0.2791 (= c3e63032) if on the same GPU type, (4) 0.4173; (2) isolates TF32, (3) the attention kernel.
+    seeds: One (deterministic eval; seeds agree to 1.7e-4).
+    outcome: '(2)=(3)=(4)=0.4173 and (1)=0.2791: TF32 is the offset; the CPU path has no bug and the model''s reads are its
+      TF32 reads: emulate TF32 rounding of matmul inputs on CPU (round to 10-bit mantissa) in the evaluator and check locally
+      it reaches 0.2791 (corr per event), else report that CPU reads are not the model''s reads and Suprio needs an Ampere+
+      GPU. (2)=0.2791, (3)=(4)=0.4173: the attention kernel; fix the dense path at the first differing LLoCaAttention call.
+      (2)=(3)=0.2791, (4)=0.4173: another CPU path, the first module above the 3-vs-4 floor named and fixed, re-checked locally
+      to 0.2791. (1) on a V100 (no TF32) with (1)=(2): the TF32 branch is untested, rerun pinned to H100. Cost ~0.15 GPU-h.'
   step_why:
     1:
       feeds: whether catalog_v4's best pretraining zero-shots Daniel's held-out processes better than the arms trained on
