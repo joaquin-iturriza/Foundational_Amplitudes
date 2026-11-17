@@ -27895,7 +27895,7 @@ entries:
     - 22
   owner:
     agent: a83f3969d5f6975f8
-    state: working
+    state: closed
     since: '2026-11-17T03:26:01+00:00'
     state_at: '2026-11-17T03:26:01+00:00'
   findings:
@@ -28995,44 +28995,20 @@ entries:
   step_waits:
     '20': '2026-11-14'
   handoff:
-    state: '2026-11-17 @eb6c697d. Step 23 done and handed back: 16 asymptotic-factor figures, one file each, legend inside
-      in plain words, all pass send_check with captions in /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/caps/caps.json
-      (key = figure stem; caps.py there reruns send_check on each). Drawn by: tools/kit_vs_mlp.py plot --figs analysis/kit_benchmark/figs/factor
-      (kitvm_mse_<p>, kitvm_median_<p>, kitvm_dev_<p> for p in ee_uug_me2, ee_uugg_me2, ee_tt_virt_finite; kitvm_bulk; kitvm_dist_<p>
-      and kitvm_dist_bulk; kitvm_ratio_beta_ee_tt_virt_finite) and tools/kit_figures.py summary analysis/kit_benchmark/data/kit_verdict_A_hpo.json
-      analysis/kit_benchmark/data/kit_verdict_A_hpo_ftsearch.json --out analysis/kit_benchmark/figs/factor/kit_deepest_attempts.
-      Data: per-bin log-MSE and medians of factor and transformer from analysis/kit_benchmark/data/kit_fig_A_hpo.json; MLP
-      log-MSE from kit_bakar_figs.json (Bakar''s evaluate.py); MLP medians from kit_fig_mlp_reruns.json (median of 3 seeds);
-      histograms and beta ratios from kit_vs_mlp_hist.json (tools/kit_vs_mlp.py collect, reads CC and lxplus); attempts from
-      the two kit_verdict jsons. lxplus-only: the tt from-scratch transformer (runs/kit_hpo_ttvirt_thr/trial_0131) predictions,
-      so the beta-ratio figure lacks it (lxplus down at collection, 2FA); its tt dist histogram comes from an earlier collection.
-      What each shows: mse_<p> = MSE(log10|M|^2) per hard bin vs distance to the limit (factor deepest uug coll 0.0081/soft
-      0.015 vs MLP log 0.108/0.33, transformer 7.6/75; uugg gg 0.042 vs 0.054, qg 0.156 vs 0.080 (MLP wins x2), soft 0.19
-      vs 0.41, azimuth 0.070 vs 0.066; tt Sudakov 15-50 TeV 0.077 vs 0.046 (MLP+threshold input wins x1.7), threshold beta
-      1e-4..1e-3 0.023 vs 2.4); bulk = bulk_test MSE per process (factor 2.0e-6/6.3e-5/1.4e-7, transformer 1.75e-5/1.07e-4/6.1e-8:
-      on tt the transformer is 2.2x better); median_<p> = median log10|M|^2 per quarter-decade bin vs truth (factor and MLP
-      log follow, transformer and MLP raw flatten; MLP raw +200 on tt Sudakov stretches that panel); dev_<p> = median pred
-      - median true, symlog (deepest: factor -0.03..-0.24 on uug/uugg, tt threshold -0.15, tt 40 TeV +0.17; transformer -9.5
-      uug soft, -3.1 tt threshold); dist_<p> = true vs predicted histograms of the deepest bins with pred/true below on the
-      union range (factor on the truth; transformer spread ~25 decades or 9 decades low; MLP raw on tt Sudakov >12 decades
-      off, all in the end bins); dist_bulk = the three bulk sets (all models on the truth); ratio_beta = |M|^2 pred/true median
-      and 16-84% band vs beta (factor flat 0.70 to beta 3e-3 then 1.0 at 0.13; MLP+threshold 0.14 at 1e-4; MLP raw 6e-4);
-      kit_deepest_attempts = deepest-bin MSE of every attempt (div-form, ReZero, factor+single log, six fine-tunes) beside
-      factor, transformer and MLP line: only the factor fixes the limits. Earlier figures (pre-rules) in analysis/kit_benchmark/figs/vs_mlp.
-      Paper-figure helper ps.true_pred_hist (ddc99fba; since changed by others to the union range, D462). Steps 20/22 wait
-      on Joaquin''s GPU budget answer (2026-11-14 question).'
-    decisions: 'Factor = the KIT model (best on every hard family, kit_verdict_A_hpo.json). Arm names fixed across figures:
-      transformer, transformer + asymptotic factor, MLP log invariants, MLP raw invariants, MLP log invariants and log(s_tt-4m_t^2);
-      fine-tunes ''fine-tuned, <parent>''. In multi-panel figures the legend title names the process (process label removed
-      in that panel: they collided). Legend font 9pt (LEG_PT in kit_vs_mlp.py) so the two-line MLP entry fits after layout.
-      No data clipped or models dropped (D462).'
-    ruled_out: As before; dev-only view not dropped (kept beside median). Training curves and per-bin figures of each individual
-      attempt not redrawn under the new rules (only the deepest-bin summary).
+    state: '2026-11-17 @092b4128. Step 23 done again (Joaquin 2026-11-17: fewer figures, readable ranges, short deck): 12
+      figures in analysis/kit_benchmark/figs/deck (tools/kit_vs_mlp.py plot --figs analysis/kit_benchmark/figs/deck; tools/kit_figures.py
+      summary kit_verdict_A_hpo.json kit_verdict_A_hpo_ftsearch.json --out .../deck/kit_deepest_attempts), captions in scratchpad
+      caps/caps_deck.json (caps_deck.py reruns send_check, all pass). Deck talks/kit_nov2026/main.tex (main.pdf built, 8 slides,
+      figs copied into talks/kit_nov2026/figs). Steps 20/22 wait on Joaquin''s GPU budget answer (2026-11-14 question).'
+    decisions: 'Factor = the KIT model. Off-scale rule (kit_figures.clip_plot, YCAP=100): values beyond an axis drawn on its
+      edge as hollow triangles, the most extreme printed, legend entry ''off the scale, value printed''; median y range =
+      truth''s range widened by its span (min 1 decade). Histograms: a model with <90% of its events inside the truth''s filled
+      range goes in a right-hand panel of its own (kit_vs_mlp._far). Legend corner per canvas in LEG_AT, font 7.5pt. dev and
+      beta-ratio figures dropped as duplicates of median and MSE; the six fine-tunes share one marker on the attempts figure.'
+    ruled_out: As before.
     running: none
-    files: tools/kit_vs_mlp.py, tools/kit_figures.py (summary), plot_style.py (true_pred_hist), analysis/kit_benchmark/figs/factor/*,
-      analysis/kit_benchmark/data/{kit_fig_A_hpo,kit_bakar_figs,kit_fig_mlp_reruns,kit_vs_mlp_hist,kit_verdict_A_hpo,kit_verdict_A_hpo_ftsearch}.json,
-      /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/caps/caps.json
-    written: '2026-11-17T03:25:00+00:00'
+    files: tools/kit_vs_mlp.py, tools/kit_figures.py, talks/kit_nov2026/main.tex, analysis/kit_benchmark/figs/deck/*, analysis/kit_benchmark/data/{kit_fig_A_hpo,kit_bakar_figs,kit_fig_mlp_reruns,kit_vs_mlp_hist,kit_verdict_A_hpo,kit_verdict_A_hpo_ftsearch}.json
+    written: '2026-11-17T03:40:44+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
