@@ -34524,6 +34524,18 @@ entries:
       within -> not resolved (expected, highmult grid), seeds asked of Joaquin. Timing check: GPU-h of their production =
       4 jobs x min(2e5 x s/step shared, 24 h); <= 30 GPU-h -> submit; above -> to Joaquin with the number, beside asking the
       authors for their prod_het_v1 preds_test_0.npz (same split, the cheaper route).'
+    passed_at: '2026-11-17T11:52:53+00:00'
+    reviewer: 'Third check. HPs are kit_hpo_uug_T''s chosen hp1677, read in kit_hpo.json: well=True, separation 1.74, lr 6.55e-3,
+      Muon wd 0.0171, lambda 1.91e-7, warmup 0.132, eta_min 4.33e-10, EMA off, WSD; the design''s values match. uugg_T ''none
+      good'' is stated and that search is not used. Missing softpair inputs and the unrescaled lr at 12,500 steps are stated,
+      and the curve test on every run (job_kit.sh writes the val/train mu-MSE curves via training.result_path) flags a run
+      that is not well. Check 2: their paper''s MSE moves 17x (Z+1g) to 120x (Z+4g) between networks, against a one-seed spread
+      of ~1 dex (V/B seeds 3.3e-7/3.1e-6/1.1e-6). Check 3: 3x resolution on median |Delta|, with ''not resolved'' outcomes;
+      fine-tune vs scratch is expected within one seed''s spread (highmult -0.39..+0.19 dex past D~1e4), and seeds are a question
+      to Joaquin. Searched: zenodo, lloca-experiments, zgggg, Z+ng, Z+4g, zng, uq_, het23, KIT, kit_hpo, seed spread in results.tex;
+      plan show zng_uq_benchmark and kit_benchmark; site decisions D62, D86, D226, D395, D477-D479. Disk ~1 GB of 54 GB free;
+      ~18 GPU-h; matched scratch/fine-tune pair; ~410 epochs on both sides; HETEROSC; emission-scale target; test events their
+      split, checked event by event.'
   step_why:
     1:
       feeds: 'the entry''s question: our latest setup against their networks on median |Delta|, the Z+4g |Delta| distribution
