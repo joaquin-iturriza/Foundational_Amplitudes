@@ -33849,6 +33849,12 @@ entries:
     units: null
     start: '2026-11-17T01:54:49+00:00'
     at: '2026-11-17T01:54:49+00:00'
+  - batch: fig15_lowloss3
+    wall_h: 1.0
+    jobs: 3
+    units: null
+    start: '2026-11-17T02:49:38+00:00'
+    at: '2026-11-17T02:49:38+00:00'
   handoff:
     state: 'Draft ~/drafts/fm_amplitudes_2026-11 at f405886: every figure of Joaquin''s sections is one file, legend inside,
       short caption; rung -> step of the ladder; D -> D_train in Secs. 3-5. Figures done, committed, send_check --scan clean,
