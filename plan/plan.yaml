@@ -33667,6 +33667,18 @@ entries:
       @ac163ae3 into zz_catft_lowloss3, same passed design, ~3 GPU-h. Figs. 7-8 four distinct colours + arm as legend title,
       Fig. 11 back to pre-92891bcd style (Joaquin''s note was about Figs. 7-8), rung_focus ''lowest mean error: steps 1-k''
       (fe542936, 05cfaf52); draft 7a1360e builds 47 pp; cold figures-only reviewer running.'
+  - at: '2026-11-17T03:05:04+00:00'
+    text: '2026-11-17 step 4: cold figures-only reader (Figs. 6-21, 10-minute scroll test) said FIX on every figure, mostly
+      captions without outcome and undefined jargon. Applied (draft 99028df, FA 5ced9ccf, paper_target fix after): each caption
+      of Figs. 6-14, 16-21 gets one outcome clause taken from the body text and defines its jargon (S, L*, sigma, gamma, ladder
+      step k, star arm, five-trial hyperparameter search, open points = stopped at 8k of 32k steps, pair-bias rows linear
+      embedding); Fig. 7''s provenance sentence cut; star arms: own marker and dashed line per arm, threshold arm purple (was
+      sky next to step 1''s blue), ''thr.'' -> ''threshold''; paper_target rows spelled out (''no diagrams, attention pair
+      bias'', ''no diagrams, capped pair bias'', x ''MSE of the standardized log|M|^2''). Not applied: trimming scatter axes
+      (Figs. 10, 12, 14: the main session asked both axes opened for the legend), scatter legend font (at the 7.5 pt floor),
+      Fig. 9 crowding at the Z pole, Fig. 8 truth legend in panel 2, Fig. 11 legend wording (Joaquin asked it back to its
+      earlier version), Fig. 6 ''Tab. ??'' (co-author''s empty ref, kept). Fig. 15 ticks/clip at its redraw. Build 48 pp:
+      scratchpad draft_final_figs_alone.pdf, draft_final_overleaf_figs_alone.zip.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
