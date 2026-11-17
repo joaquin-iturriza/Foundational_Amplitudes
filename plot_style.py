@@ -712,6 +712,45 @@ def legend(ax, loc: str = "upper left", **kwargs):
     return _shrink_wide_legend(ax, leg, kwargs)
 
 
+def covered(ax, artist, per_segment: int = 20, lines: bool = True) -> int:
+    """How many drawn points `artist` (a legend) covers: every marker, and each line sampled `per_segment` times
+    between its vertices (a line crossing a legend between two markers covers it too; `lines=False`: markers only)."""
+    import numpy as np
+    ax.figure.canvas.draw()
+    bb = artist.get_window_extent(ax.figure.canvas.get_renderer())
+    pts = [] if (P := _data_points(ax)) is None else [P]
+    t = np.linspace(0, 1, per_segment)[:, None]
+    for ln in (ax.get_lines() if lines else []):
+        if ln.get_transform() is not ax.transData or ln.get_linestyle() in ("None", "", " "):
+            continue
+        xy = ax.transData.transform(ln.get_xydata())
+        xy = xy[np.isfinite(xy).all(axis=1)]
+        if len(xy) > 1:
+            pts.append((xy[:-1, None, :] * (1 - t) + xy[1:, None, :] * t).reshape(-1, 2))
+    if not pts:
+        return 0
+    P = np.vstack(pts)
+    return int(np.sum((P[:, 0] >= bb.x0) & (P[:, 0] <= bb.x1) & (P[:, 1] >= bb.y0) & (P[:, 1] <= bb.y1)))
+
+
+def legend_free(ax, locs=LEGEND_LOCS, **kwargs):
+    """`legend` in the corner of `locs` that covers the fewest drawn points (Joaquin 2026-11-17: use the free space
+    a panel already has before its range is stretched). Call after the figure's layout and headroom
+    (`layout(fig)`, `apply_headroom(fig)`): the plot box must have its final size for the test to mean anything."""
+    best, lab = None, getattr(ax, "_ps_label", None)
+    for loc in locs:
+        leg = legend(ax, loc, **kwargs)
+        rend = ax.figure.canvas.get_renderer()
+        n = covered(ax, leg)
+        if lab is not None and leg.get_window_extent(rend).overlaps(lab.get_window_extent(rend)):
+            continue    # never on the process label
+        if best is None or n < best[0]:
+            best = (n, loc)
+        if n == 0:
+            break
+    return legend(ax, best[1], **kwargs)
+
+
 #: How far the legend font may drop below BASE_PT to fit a legend inside its plot box.
 #: Only the legend, only as a last resort. 7.5pt since the legends moved inside every figure in plain words
 #: (Joaquin 2026-11-17: "we can slightly go against the rules and make the fontsize of the legend slightly smaller").
@@ -775,7 +814,9 @@ def shared_legend(fig, ax, ncol: int = 3, **kwargs):
     panel plots the same series, take the handles from one axes and put a single legend
     across the top instead. Call BEFORE `save`.
     """
-    handles, labels = ax.get_legend_handles_labels()
+    handles, labels = kwargs.pop("handles", None), kwargs.pop("labels", None)
+    if handles is None:
+        handles, labels = ax.get_legend_handles_labels()
     # `loc="lower center"` puts the strip BELOW the panels. Producers that want that used to
     # hand-roll `fig.legend(...)` + `tight_layout(rect=[0, 0.30, 1, 1])`, which reserves a
     # fraction rather than inches and is invisible to the geometry solve. Supporting it here
@@ -1274,7 +1315,9 @@ def plain_text(label: str) -> str:
 def legend_labels(fig) -> list:
     """Every legend entry of `fig`, axes legends and figure legends, in order, each once."""
     out = []
-    legs = list(fig.legends) + [ax.get_legend() for ax in fig.axes]
+    from matplotlib.legend import Legend
+    legs = list(fig.legends) + [ax.get_legend() for ax in fig.axes] + [
+        a for ax in fig.axes for a in ax.artists if isinstance(a, Legend)]   # a second legend kept by add_artist
     for leg in legs:
         for t in (leg.get_texts() if leg is not None else []):
             if t.get_text() and t.get_text() not in out:
@@ -1364,7 +1407,8 @@ def _warn_if_squeezed(fig, base: str) -> None:
                       f"not the {PLOT_W_IN:.2f}x{PLOT_H_IN:.2f}in standard -- layout() did not "
                       f"run or was overridden (tight_layout/constrained_layout after save?)")
         fw, fh = fig.get_size_inches()
-        if fw > MAX_FIG_IN + 0.01:
+        if fw > MAX_FIG_IN + 0.01 and not getattr(fig, "_ps_scaled", False):   # _ps_scaled: included scaled down
+            # (Joaquin 2026-11-17: Figs. 16-19 as one 3x4 grid each, scaled to the page)
             print(f"  !! {name}: canvas {fw:.2f}in exceeds the printable width "
                   f"({MAX_FIG_IN}in incl. the margins) -- it will run off the PAPER and be "
                   f"clipped. Fewer columns; do not shrink the plot box")

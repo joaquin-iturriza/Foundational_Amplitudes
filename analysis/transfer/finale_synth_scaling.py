@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from cells import ROOT, scratch  # noqa: E402
 with contextlib.redirect_stdout(io.StringIO()):
     from finale_synth import ARMP, ARMLAB, LAB, P, cell  # noqa: E402
-    from rung_grid import FOCUS, fam  # noqa: E402
+    from rung_grid import FOCUS, fam, grid  # noqa: E402
 sys.path.insert(0, ROOT)
 import plot_style as ps  # noqa: E402
 
@@ -59,10 +59,18 @@ if PAPER:
         return [(fam(r - 1), upto(r - 1), ps.C.blue, "o"), (fam(r), upto(r), ps.C.vermillion, "s"),
                 ("tp3_synfte", "synthetic amplitudes", ps.C.green, "^"),
                 ("tp3_finfte", "ladder steps 1-9 + every star arm", ps.C.orange, "D")]
+
+    def panel(ax, p):
+        K = list(range(2, 9))
+        D = [10 ** (k / 2) for k in K]
+        curve(ax, D, [scratch(p, k, steered=False)[0] for k in K], **SCR)
+        for f, lab, c, m in fams(p):
+            curve(ax, D, [cell(f, p, k) for k in K], color=c, marker=m, label=lab)
+
+    grid(os.path.join(FIGS, BASE), P, panel, lambda p: [upto(FOCUS[p] - 1), upto(FOCUS[p])])
 else:
     fams = lambda p: LADDER  # noqa: E731
-draw("ee", P[:6], fams, LAB)
-draw("qcd", P[6:], fams, LAB)
-if not PAPER:
+    draw("ee", P[:6], fams, LAB)
+    draw("qcd", P[6:], fams, LAB)
     draw("arm", list(ARMP), lambda p: [(ARMP[p][0], "the probe's star arm", ps.C.orange, "o"),
                                      ("tp3_finfte", "finale", ps.C.vermillion, "D")], ARMLAB)

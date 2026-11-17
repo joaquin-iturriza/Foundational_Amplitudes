@@ -74,6 +74,31 @@ def draw_final(ax, f, p, *a, **kw):
     return op
 
 
+def grid(base, probes, panel, own):
+    """Joaquin 2026-11-17 ('combined into a big 3x4 grid', 'why not merge 18 and 19 as I asked?'): the twelve probes
+    in one file, the e+e- probes in the left two columns and the others in the right two, included scaled to the page.
+    `panel(ax, p)` draws a probe; the curves every panel has share one legend strip on top, each panel's own curves
+    (labels in `own(p)`) a legend in the corner that covers the fewest points, inside the range the data already
+    has (Joaquin: 'there is enough space for the legends')."""
+    fig, axs = ps.figure(ncols=4, nrows=3)
+    fig._ps_scaled = True
+    cells = [axs[i // 2][i % 2] for i in range(6)] + [axs[i // 2][2 + i % 2] for i in range(6)]
+    for ax, p in zip(cells, probes):
+        panel(ax, p)
+        ax.set_xscale("log"); ax.set_yscale("log")
+        ax.set_xlabel(r"training events $D_{\rm train}$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
+        ps.process_label(ax, LAB[p])
+    hl = {l: h for ax in cells for h, l in zip(*ax.get_legend_handles_labels())}
+    mine = {p: own(p) for p in probes}
+    common = [l for l in hl if not any(l in m for m in mine.values())]
+    ps.shared_legend(fig, cells[0], ncol=len(common), handles=[hl[l] for l in common], labels=common)
+    ps.layout(fig); ps.apply_headroom(fig)
+    for ax, p in zip(cells, probes):
+        h, l = ax.get_legend_handles_labels()
+        ps.legend_free(ax, handles=[h[l.index(x)] for x in mine[p]], labels=mine[p], fontsize=ps.LEGEND_MIN_PT)
+    ps.save(fig, base)
+
+
 if __name__ == "__main__":
     for part, order in (("ee", P[:6]), ("qcd", P[6:])):
         figs = ps.panels(len(order))

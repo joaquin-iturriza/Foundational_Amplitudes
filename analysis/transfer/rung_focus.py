@@ -16,7 +16,7 @@ import os, sys
 import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from cells import ROOT, USE_32K, best, scratch  # noqa: E402
-from rung_grid import FOCUS, LAB, P, S, RUNG_ADDS, draw_final, fam  # noqa: E402
+from rung_grid import FOCUS, LAB, P, S, RUNG_ADDS, draw_final, fam, grid  # noqa: E402
 sys.path.insert(0, ROOT)
 import plot_style as ps  # noqa: E402
 
@@ -84,37 +84,38 @@ def upto(r):
     return r"$e^+e^-\to u\bar u$ only" if r == 0 else ("ladder step 1" if r == 1 else f"ladder steps 1-{r}")
 
 
-# One file per figure, six panels in three rows of two; each panel carries its own legend because its steps differ
-# (Joaquin 2026-11-17: legend inside, 'step' of the ladder, no 'ties within 1.2x' he could not read). The green curve
-# has the largest mean over D of log10(scratch/fine-tune) (overall()'s first), i.e. the lowest mean log error (scratch is
-# common to every arm); labelled in words "lowest mean error" (send_check: no "gain" in words); no tie claim rests on TIE.
-for part, order in (("ee", P[:6]), ("qcd", P[6:])):
-    fig, axs = ps.figure(ncols=2, nrows=3)
-    for ax, p in zip(axs.flat, order):
-        hi, lo = fam(FOCUS[p]), fam(FOCUS[p] - 1)
-        lead, _ = overall(p, [f for f in series() if f.endswith("fte")])
-        first, opened = True, []
-        for f in ([] if PAPER else series()):
-            if f in (hi, lo) or (lead and f == lead[0]):
-                continue
-            op = draw_final(ax, f, p, "o-", label="other ladder steps" if first else None, **GREY)
-            if op is not None:
-                first, opened = False, opened + op
-        opened += draw_final(ax, "scr", p, "o-", color="k", label="from scratch") or []
-        opened += draw_final(ax, lo, p, "o-", color=ps.C.blue, label=upto(FOCUS[p] - 1)) or []
-        opened += draw_final(ax, hi, p, "o-", color=ps.C.vermillion,
-                             label=upto(FOCUS[p]) + ": adds " + ADDS[FOCUS[p]]) or []
-        if lead and lead[0] not in (hi, lo):
-            k = 0 if lead[0] == "tp3_uu64fte" else int(short(lead[0])[1:])
-            opened += draw_final(ax, lead[0], p, "o-", color=ps.C.green,
-                                 label="lowest mean error: " + upto(k).removeprefix("ladder ")) or []
-        if PAPER:
-            draw_arm(ax, "tp3_synfte", p, "s--", color=ps.C.purple, label="synthetic amplitudes")
-            draw_arm(ax, "tp3_finfte", p, "D-", color=ps.C.orange, label="every structure")
-        if opened:
-            ax.plot([], [], "o", color="k", mfc="white", label="stopped at 8k of 32k steps")
-        ps.process_label(ax, LAB[p])
-        ax.set_xscale("log"); ax.set_yscale("log")
-        ax.set_xlabel(r"training events $D_{\rm train}$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
-        ps.legend(ax, "lower left", ncol=2, fontsize=ps.LEGEND_MIN_PT)
-    ps.save(fig, os.path.join(ROOT, "analysis", "transfer", "figs", f"{BASE}_{part}"))
+# One file for the twelve probes (Joaquin 2026-11-17: Figs. 16-17 and 18-19 'combined into a big 3x4 grid'): the curves
+# every panel has (scratch, the other steps, open points) in one strip on top, each panel's own steps in its own legend
+# in its free corner (rung_grid.grid). The green curve has the largest mean over D of log10(scratch/fine-tune)
+# (overall()'s first), i.e. the lowest mean log error (scratch is common to every arm); labelled in words "lowest mean
+# error" (send_check: no "gain" in words); no tie claim rests on TIE.
+OWN = {}
+
+
+def panel(ax, p):
+    hi, lo = fam(FOCUS[p]), fam(FOCUS[p] - 1)
+    lead, _ = overall(p, [f for f in series() if f.endswith("fte")])
+    first, opened = True, []
+    for f in ([] if PAPER else series()):
+        if f in (hi, lo) or (lead and f == lead[0]):
+            continue
+        op = draw_final(ax, f, p, "o-", label="other ladder steps" if first else None, **GREY)
+        if op is not None:
+            first, opened = False, opened + op
+    opened += draw_final(ax, "scr", p, "o-", color="k", label="from scratch") or []
+    own = [upto(FOCUS[p] - 1), upto(FOCUS[p]) + ": adds " + ADDS[FOCUS[p]]]
+    opened += draw_final(ax, lo, p, "o-", color=ps.C.blue, label=own[0]) or []
+    opened += draw_final(ax, hi, p, "o-", color=ps.C.vermillion, label=own[1]) or []
+    if lead and lead[0] not in (hi, lo):
+        k = 0 if lead[0] == "tp3_uu64fte" else int(short(lead[0])[1:])
+        own.append("lowest mean error: " + upto(k).removeprefix("ladder "))
+        opened += draw_final(ax, lead[0], p, "o-", color=ps.C.green, label=own[-1]) or []
+    if PAPER:
+        draw_arm(ax, "tp3_synfte", p, "s--", color=ps.C.purple, label="synthetic amplitudes")
+        draw_arm(ax, "tp3_finfte", p, "D-", color=ps.C.orange, label="every structure")
+    if opened:
+        ax.plot([], [], "o", color="k", mfc="white", label="stopped at 8k of 32k steps")
+    OWN[p] = own
+
+
+grid(os.path.join(ROOT, "analysis", "transfer", "figs", BASE), P, panel, lambda p: OWN[p])
