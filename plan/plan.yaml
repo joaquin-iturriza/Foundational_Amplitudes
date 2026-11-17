@@ -33484,12 +33484,10 @@ entries:
     blocks: nothing
     blocks_steps: &id003 []
   owner:
-    agent: ab19284b896bafec4
-    state: closed
-    since: '2026-11-17T10:36:49+00:00'
-    state_at: '2026-11-17T10:45:13.141000+00:00'
-    context: 289412
-    context_at: '2026-11-17T10:58:49+00:00'
+    agent: a4b2e4f58e3b9081f
+    state: working
+    since: '2026-11-17T11:26:56+00:00'
+    state_at: '2026-11-17T11:26:56+00:00'
   step_waits:
     '3': '2026-11-20: next draft round'
     '4': repo-reviewer (backlog blocks the Fig. 14 split and Fig. 19 redraw)
