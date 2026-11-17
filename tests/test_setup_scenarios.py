@@ -495,7 +495,10 @@ def questions():
     scenario("an ask with no checkable words is refused", rc != 0, out)
     done = [{"ask": ask, "at": ago(200), "answered_at": ago(100), "decision": "D5"}]
     w = World([E("lowd", asks=done), E("other")])
-    rc, out = w.plan_cmd("ask", "other", "--ask", "Should the small study run the frozen lower blocks at every rung?",
+    rc, out = w.plan_cmd("ask", "other", "--ask", "Scope: should the small study run the frozen lower blocks at every rung?",
+                         "--searched", SEARCHED)
+    scenario("plan ask accepts a question overlapping one answered on another entry", rc == 0, out)
+    rc, out = w.plan_cmd("ask", "lowd", "--ask", "Scope: should the small study run the frozen lower blocks at every rung?",
                          "--searched", SEARCHED)
     scenario("plan ask refuses a question already answered", rc != 0 and "already answered" in out, out)
     w = World([E("lowd", asks=done)], state={"lowd": step(1)},

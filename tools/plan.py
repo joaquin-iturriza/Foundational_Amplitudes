@@ -2795,7 +2795,7 @@ def cmd_ask(a):
         held_entry = e.get("status") == "held"     # a held entry stays held; the question is recorded on it
         if held_entry and a.holds_all is not None:
             sys.exit("plan: %s is held; a question on it names what it blocks (--blocks), not --holds-all" % a.id)
-        again = [(o, x) for o, x in answered_asks(d) if overlap(x["ask"], a.ask) or overlap(a.ask, x["ask"])]
+        again = [(o, x) for o, x in answered_asks(d) if o["id"] == a.id and (overlap(x["ask"], a.ask) or overlap(a.ask, x["ask"]))]
         if again:
             o, x = again[0]
             sys.exit("plan: already answered: %r on %s, %s (%s); act on that answer" % (
