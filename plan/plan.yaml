@@ -33423,9 +33423,9 @@ entries:
     decision: D464
   owner:
     agent: aaaf7a20d9dbeed54
-    state: working
+    state: stopped
     since: '2026-11-16T23:01:27+00:00'
-    state_at: '2026-11-16T23:46:19.890000+00:00'
+    state_at: '2026-11-16T23:53:11.392000+00:00'
     context: 189779
     context_at: '2026-11-16T23:46:30+00:00'
   step_waits:
