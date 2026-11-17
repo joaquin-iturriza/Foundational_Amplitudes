@@ -35698,6 +35698,12 @@ entries:
     units: null
     start: '2026-11-17T19:45:30+00:00'
     at: '2026-11-17T19:45:30+00:00'
+  - batch: layer_dump
+    wall_h: 0.3
+    jobs: 1
+    units: null
+    start: '2026-11-17T20:16:47+00:00'
+    at: '2026-11-17T20:16:47+00:00'
   step_waits:
     '1': FA-ccin2p3-488df7d6
     '2': 'the next owner: this owner closed at the context limit with the hand-off written'
