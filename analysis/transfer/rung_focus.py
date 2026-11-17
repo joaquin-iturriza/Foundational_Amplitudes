@@ -86,7 +86,8 @@ def upto(r):
 
 # One file per figure, six panels in three rows of two; each panel carries its own legend because its steps differ
 # (Joaquin 2026-11-17: legend inside, 'step' of the ladder, no 'ties within 1.2x' he could not read). The green curve
-# is the largest gain over scratch, mean over D (overall()'s first), stated as that: no tie or winner claim rests on TIE.
+# has the largest mean over D of log10(scratch/fine-tune) (overall()'s first), i.e. the lowest mean log error (scratch is
+# common to every arm); labelled in words "lowest mean error" (send_check: no "gain" in words); no tie claim rests on TIE.
 for part, order in (("ee", P[:6]), ("qcd", P[6:])):
     fig, axs = ps.figure(ncols=2, nrows=3)
     for ax, p in zip(axs.flat, order):
@@ -106,7 +107,7 @@ for part, order in (("ee", P[:6]), ("qcd", P[6:])):
         if lead and lead[0] not in (hi, lo):
             k = 0 if lead[0] == "tp3_uu64fte" else int(short(lead[0])[1:])
             opened += draw_final(ax, lead[0], p, "o-", color=ps.C.green,
-                                 label="largest gain over scratch: " + upto(k).removeprefix("ladder ")) or []
+                                 label="lowest mean error: " + upto(k).removeprefix("ladder ")) or []
         if PAPER:
             draw_arm(ax, "tp3_synfte", p, "s--", color=ps.C.purple, label="synthetic amplitudes")
             draw_arm(ax, "tp3_finfte", p, "D-", color=ps.C.orange, label="every structure")
