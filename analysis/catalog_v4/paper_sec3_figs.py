@@ -266,8 +266,8 @@ def target():
     res = json.load(open(os.path.join(ROOT, "analysis", "catalog_v3", "data", "short_reads.json")))
     extra = ("H2p5", "H7E")
     groups = []
-    for grp, lab in ((None, "held out, multiplicity\nand energy as pretrained"), ("H2p5", "held out, $2\\to5$\n(pretrained $\\leq2\\to4$)"),
-                     ("H7E", "held out, $1\\!-\\!10$ TeV\n(pretrained $\\leq1$ TeV)")):
+    for grp, lab in ((None, "held out, multiplicity\nand energy as pretrained"), ("H2p5", "held out, $2\\to5$,\nonly up to $2\\to4$ in pretraining"),
+                     ("H7E", "held out, $1\\!-\\!10$ TeV,\nonly up to $1$ TeV in pretraining")):
         xs, ys = [], []
         for a in res["baseline"]:
             if (a if a in extra else None) != grp or a not in res["dimensionless"]:
