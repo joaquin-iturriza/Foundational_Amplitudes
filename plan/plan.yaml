@@ -34226,7 +34226,7 @@ entries:
     agent: ad838d9b0df85e41f
     state: stopped
     since: '2026-11-17T11:36:14+00:00'
-    state_at: '2026-11-17T12:06:56.210000+00:00'
+    state_at: '2026-11-17T12:09:21.422000+00:00'
     context: 256071
     context_at: '2026-11-17T12:08:23+00:00'
   designs:
