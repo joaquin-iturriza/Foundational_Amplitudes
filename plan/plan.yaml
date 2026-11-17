@@ -35500,6 +35500,33 @@ entries:
       on CC; the axis code is committed (fc43b7c2, 26cab1f7). Searched: Daniel, dc_, dan_per_process, heldout_zero_shot, hp58,
       dancat_het_pre, PHYSICS_MISMATCH, held out in both catalogs, and decisions D45 D59 D74 D77 D83 D87 D88 D113 D114 D131
       D488.'
+  - at: '2026-11-17T19:41:26+00:00'
+    question: Is the constant 0.194 offset in log|M|^2 between evaluate_daniels_catalog (CPU, fixed attention mask, 1ce53bcd;
+      MSE 0.417, mean prediction -11.459) and the stored zero-shot read catalog_short_DlessInOrd_sigstage (GPU, 2026-10-23;
+      MSE 0.279, mean -11.265) on the same 2000 dc_bbx_hh val events a CPU-vs-GPU difference, or does the stored read come
+      from other weights? Eval-only check of the D489 deliverable (repair inside its approval). REREAD of the DlessInOrd sigma_stage
+      model.
+    prior: 'Searched plan (dan_zeroshot_v4 findings), docs/results.tex (DlessInOrd, catalog_short_DlessInOrd_sigstage), decisions
+      D489 D490. Found: previous owner''s 300-event CPU test (MSE 0.371, rms 0.13 vs stored) was made with the cross-event
+      attention bug, fixed at 1ce53bcd. Local checks today: after the fix, 8 augmentation seeds agree to 1.7e-4, forward and
+      reversed files agree exactly, per event the CPU read and the stored read agree in shape (corr 0.994, sd of the difference
+      0.0094) with a constant 0.194; the Oct-23 code (worktree at 25f16063 + the mask fix) gives the same 0.194; not the pool
+      sidecar, own target statistics (2k vs 10k) or the augmentation. CC: the committed checkpoint is the sigma stage''s (step
+      149, EMA weights of the main run, mean frozen).'
+    measure: MSE of log|M|^2 and mean predicted log|M|^2 over the first 2000 val events of dc_bbx_hh, evaluate.py on a V100/H100
+      with xformers, for (a) the committed model copy and (b) runs/catalog_norm_short/DlessInOrd/sigma_stage on CC; printed
+      as EVAL_GPU lines.
+    check: 'The CPU run of the same command on the same 2000 events gives MSE 0.4173, mean -11.459; the stored read 0.279,
+      mean -11.265: the two candidate answers differ by 0.194 in the mean and 0.14 in MSE, 20x the per-event sd of the difference
+      (0.0094), so the GPU read lands clearly on one or neither.'
+    fixed: Model weights and config (sigma stage of DlessInOrd), the 2000 events, the evaluator at its commit, seed 42 (outputs
+      seed-independent to 1.7e-4).
+    control: The same command on CPU (local, 0.4173 / -11.459) and the stored GPU read (0.279 / -11.265).
+    seeds: 'One: the output does not depend on the augmentation seed (8 seeds, 1.7e-4).'
+    outcome: 'If the GPU gives 0.417 / -11.46 for both models: CPU and GPU agree, the evaluator is right for the checkpoint
+      on disk and the stored read came from other weights (reported to Joaquin; Suprio gets the evaluator as is). If the GPU
+      gives 0.279 / -11.27: a CPU-vs-GPU numerical difference to find before Suprio uses it on CPU. If (a) and (b) differ:
+      the committed copy is not the run''s model.'
   step_why:
     1:
       feeds: whether catalog_v4's best pretraining zero-shots Daniel's held-out processes better than the arms trained on
