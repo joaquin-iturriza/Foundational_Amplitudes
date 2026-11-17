@@ -34125,10 +34125,16 @@ entries:
     - zng_uq_benchmark
   decisions:
   - D477
-  next: 'Setup: the four datasets on a site (20 GB compressed; check free disk), a committed converter (PDG ids, partonic
-    frame, alpha_s handling, cuts/support check), our |M|^2 cross-checked on ~100 of their events; their splits and |Delta|
-    and pull definitions reproduced. Then a design (scratch per multiplicity + a fine-tune from our best pretraining, HETEROSC
-    with sigma stage), GPU-h estimate, design review, runs, the three figures.'
+  next:
+    1: 'Setup: scripts/job_zng_fetch.sh on CC (Zenodo archives, tools/zng_uq.py convert with the UQ repo''s split, d d~ >
+      Z+ng sidecars, |M|^2 cross-check d d~ and u u~ on 100 test events each)'
+    2: 'Eval-only on what we have: trial 1262 zero-shot (catalog_v4, trained on b b~ > Z+1..3g, same class as d d~) and the
+      u-flavour Z+ng models (highmult Z+4g MSE scratch/fine-tunes, het Zg/Zgg/Zggg cells) on their 1e6 test events per multiplicity
+      (u models shifted by the cross-check''s constant); median |Delta|, |Delta| on Z+4g, pulls where sigma exists; caption
+      ''our existing models, not trained on their data'''
+    3: 'Trainings on their data (scratch per multiplicity with the latest setup, fine-tune from trial 1262), HETEROSC + sigma
+      stage, on 5e5 train events: the design and its HP route wait on Joaquin''s answer (pretraining choice, DyHPO vs template
+      defaults, GPU-h)'
   done_when: null
   notes_ref: null
   match: zng_uq_*,tp*_zng_*
@@ -34175,3 +34181,20 @@ entries:
       value reported and, if not 1, the convention named, e.g. electroweak scheme). Then trainings and evaluations go ahead
       on uq_<proc>.h5. NO: a spread above 1e-6 on any process -> stop, find the mismatch (leg order, momenta frame, flavour,
       helicity sum) before any job reads these files; a split mismatch -> stop and fix the converter.'
+  step_why:
+    1:
+      feeds: whether any run or evaluation on their events compares like with like
+      if:
+      - 'YES (one constant per process, split exact): steps 2 and 3 read uq_<proc>.h5'
+      - 'NO (spread or split mismatch): fix the converter or find the convention before anything reads the files'
+    2:
+      feeds: what our current models give on their benchmark before any training on it (Joaquin 2026-11-17)
+      if:
+      - 'a model within 3x of their median |Delta|: report as is'
+      - 'every model far above (out of support, sqrt(s) to 5.7 TeV): report the in-support subset beside the whole set'
+    3:
+      feeds: 'the entry''s question: our latest setup against their networks on median |Delta|, the Z+4g |Delta| distribution
+        and pulls'
+      if:
+      - 'Joaquin picks an option: record the design, review, submit at site pick''s width'
+      - 'he changes the parent or horizon: redo the cost before the configs'
