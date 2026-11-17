@@ -23,8 +23,7 @@ Output (--out .npz, one row per input event, in the input's order)
 
 Model: model/ is runs/catalog_norm_short/DlessInOrd/sigma_stage on CC-IN2P3 (5 epochs of 1e4 events per process on
 the catalog's 1352 training processes, EMA weights at the best checkpoint, then a sigma fit with the mean frozen).
-diagrams.tar.gz holds the catalog's diagram files the network reads. CPU handles a few thousand events in seconds
-to a minute; a GPU is used when there is one.
+diagrams.tar.gz holds the catalog's diagram files the network reads. Run it on a GPU (see the tests below).
 
 What a prediction depends on: the event alone. Each event's Lorentz augmentation is drawn from (seed, its momenta),
 the frames' degeneracy noise is a hash, and the attention never crosses events (models/attention_lloca_mup.py: the
@@ -32,10 +31,10 @@ CPU path without xformers used to attend over the whole batch, which made every 
 events of the file and their order). Tests at the commit of this README, b b~ > h h, CPU:
   - the same 300 events in forward and reversed order, written as two files: identical predictions (max diff 0).
   - 8 augmentation seeds on 2000 events: per-event sd of log|M|^2 at most 1.7e-4 (the network is invariant).
-  - against our stored zero-shot read of the same 2000 val events (catalog_short_DlessInOrd_sigstage, GPU, 2026-10-23):
-    per event the two agree in shape (corr 0.994, sd of the difference 0.0094) up to a constant: the stored read is
-    0.194 higher in log|M|^2. MSE of log|M|^2: this evaluator 0.417, the stored read 0.279. The constant is not
-    explained yet (not the code since then: the 2026-10-23 code with the attention fix gives the same 0.194; not the
-    pool sidecar, the augmentation or the target statistics); a read of the same model on a GPU at CC is the next check.
+  - against our stored zero-shot read of the same 2000 val events (catalog_short_DlessInOrd_sigstage, GPU, 2026-10-23,
+    MSE of log|M|^2 0.279, mean prediction -11.265): on a GPU (CC-IN2P3, FA-ccin2p3-c3e63032) this evaluator, with the
+    committed model and with the run directory, and the original scorer all give MSE 0.2791, mean -11.265: reproduced.
+    On a CPU it gives the same shape per event (corr 0.994) but 0.194 lower in log|M|^2 (MSE 0.417): a CPU-only
+    difference in the model's code path, not found yet. USE A GPU (with xformers, requirements.txt) until it is fixed.
 check_reproduction.py runs that comparison:
     .venv-cpu/bin/python evaluate_daniels_catalog/check_reproduction.py --pool <dc_bbx_hh val pool .npy> --stored <read.npz>
