@@ -35656,6 +35656,15 @@ entries:
       GPU. (2)=0.2791, (3)=(4)=0.4173: the attention kernel; fix the dense path at the first differing LLoCaAttention call.
       (2)=(3)=0.2791, (4)=0.4173: another CPU path, the first module above the 3-vs-4 floor named and fixed, re-checked locally
       to 0.2791. (1) on a V100 (no TF32) with (1)=(2): the TF32 branch is untested, rerun pinned to H100. Cost ~0.15 GPU-h.'
+    passed_at: '2026-11-17T20:13:25+00:00'
+    reviewer: 'Revised layer dump: four reads (GPU xformers TF32 as configured, GPU xformers TF32 off, GPU dense TF32 off,
+      CPU) separate TF32, attention kernel and the CPU path one change at a time; --no-tf32 patches _init_backend after it
+      sets the flags, GPU name and both flags printed. Check 2: local CPU dump reproduces 0.4173 (mean q-t -0.4394, 181 calls),
+      GPU reads 0.2791 (c3e63032), so the 0.194 offset must surface in the last calls; threshold calibrated in the job by
+      the exact-fp32 3-vs-4 floor and the 1-vs-2 TF32 noise, trend and means read. Check 3: deterministic eval, augmentation
+      seeds agree to 1.7e-4, far below 0.194. Outcomes cover TF32 / attention / other CPU path / V100 (rerun pinned to H100).
+      Check 5 searched tf32, layer dump, CPU vs GPU, xformers, 0.194 in docs/results.tex and decisions: sec:tf32-eval now
+      cited. Eval only, ~0.15 GPU-h; checks 9-15 not applicable.'
   step_why:
     1:
       feeds: whether catalog_v4's best pretraining zero-shots Daniel's held-out processes better than the arms trained on
