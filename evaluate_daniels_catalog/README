@@ -23,7 +23,10 @@ Output (--out .npz, one row per input event, in the input's order)
 
 Model: model/ is runs/catalog_norm_short/DlessInOrd/sigma_stage on CC-IN2P3 (5 epochs of 1e4 events per process on
 the catalog's 1352 training processes, EMA weights at the best checkpoint, then a sigma fit with the mean frozen).
-diagrams.tar.gz holds the catalog's diagram files the network reads. Run it on a GPU (see the tests below).
+diagrams.tar.gz holds the catalog's diagram files the network reads; model/lap_pe.json the diagram encoder's Laplacian
+positional encodings as computed on the GPU nodes where the network reads as stored (lap_pe_table.py, FA-lxplus-86b24e3b):
+every catalog diagram graph has a degenerate Laplacian eigenspace, whose eigh basis depends on the machine's
+OpenBLAS kernel, and the network learned that basis. CPU and GPU both fine.
 
 What a prediction depends on: the event alone. Each event's Lorentz augmentation is drawn from (seed, its momenta),
 the frames' degeneracy noise is a hash, and the attention never crosses events (models/attention_lloca_mup.py: the
@@ -34,7 +37,8 @@ events of the file and their order). Tests at the commit of this README, b b~ > 
   - against our stored zero-shot read of the same 2000 val events (catalog_short_DlessInOrd_sigstage, GPU, 2026-10-23,
     MSE of log|M|^2 0.279, mean prediction -11.265): on a GPU (CC-IN2P3, FA-ccin2p3-c3e63032) this evaluator, with the
     committed model and with the run directory, and the original scorer all give MSE 0.2791, mean -11.265: reproduced.
-    On a CPU it gives the same shape per event (corr 0.994) but 0.194 lower in log|M|^2 (MSE 0.417): a CPU-only
-    difference in the model's code path, not found yet. USE A GPU (with xformers, requirements.txt) until it is fixed.
+    On this CPU (Intel i5-10400F, .venv-cpu) with model/lap_pe.json: MSE 0.2791, per event equal to the stored read
+    (rms of the difference 0.0000). Without the table, computing the encodings on this machine's OpenBLAS kernel, it
+    was 0.194 lower in log|M|^2 (MSE 0.4173).
 check_reproduction.py runs that comparison:
     .venv-cpu/bin/python evaluate_daniels_catalog/check_reproduction.py --pool <dc_bbx_hh val pool .npy> --stored <read.npz>
