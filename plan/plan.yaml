@@ -34748,7 +34748,7 @@ entries:
       - 'written and committed: plan evidence with the commit'
       - 'the zero-shot read fails: write up the trained runs alone'
   step_waits:
-    '3': FA-ccin2p3-28d56f33
+    '3': FA-ccin2p3-7a112608
     '5': notes-editor pillar (blocked on par:muon_long, another entry's paragraph); the zero-shot read of step 3 joins the
       write-up
   findings:
