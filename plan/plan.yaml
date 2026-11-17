@@ -34585,6 +34585,42 @@ entries:
       plan show zng_uq_benchmark and kit_benchmark; site decisions D62, D86, D226, D395, D477-D479. Disk ~1 GB of 54 GB free;
       ~18 GPU-h; matched scratch/fine-tune pair; ~410 epochs on both sides; HETEROSC; emission-scale target; test events their
       split, checked event by event.'
+  - at: '2026-11-17T14:50:17+00:00'
+    question: 'Step 3, eval-only: what median |Delta|, |Delta| distribution on Z+4g and pulls does the catalog_v4 pretraining
+      (trial 1262, its sigma stage; no Z+ng in its catalog recipe catalog_v4_default25_train.yaml) give zero-shot on the UQ
+      repo''s q qbar -> Z+1..4g test events (Zenodo 16793011, their split, 1e6 per n), beside our 8 trained runs? Caption:
+      our existing models, not trained on their data. The u-flavour Z+ng models of the step''s text cannot be read: every
+      u u~ > Z+ng search on CC (tp_scr_*, tp3_scr32k_*, tp3_hmscr32k_*, *_het) holds only results/ and dyhpo_surrogate/, no
+      checkpoint (listed 2026-11-17); their recorded test MSE of ln|M|^2 on u u~ (identical to d d~ up to the constant 0.779805)
+      is used instead as the prior: scratch at D=1e5, 32k steps, MSE loss, lr ~1.4e-3: Zg 5.8e-8, Zgg 2.1e-5, Zggg 3.4e-4,
+      Zgggg 3.9e-4 (analysis/transfer/scratch_sweeps.json; own event pools, cuts not checked to match).'
+    prior: 'Our 8 runs (FA-ccin2p3-394f20ac..2d4d3709, benchmark.json @4a2a9f3d): median |Delta| scratch/ft Z+1g 1.0e-4/4.8e-5
+      .. Z+4g 2.1e-2/1.6e-2; 7 of 8 fail the curve test. 1262 zero-shot on held-out catalog processes: tools/zero_shot_parent.py,
+      scripts/job_catalog_heldout_preds.sh (the 139 held-out, D: the Delta plots). results.tex l.16279: a pretraining whose
+      eight processes include q qbar -> Z+4g, Z+5g (another run). Searched: zng, Z+4g, zero-shot, 1262, highmult, het23 in
+      results.tex, the plan entry, site decisions D477-D480.'
+    measure: 'benchmark.py collect on zero_shot_parent''s per-probe npz (t, q, s in the target''s ln units; q - t is the ln
+      residual of |M|^2, a target factor divides both): median, q90, q99 |Delta|, MSE of ln|M|^2 and standardised, |Delta|
+      histogram, pulls (t - q)/s, pull std, 68% coverage; the same functions as for our runs.'
+    check: 'The quantity moves: our runs'' median |Delta| spans 1e-4 to 2e-2 across n and arms; a zero-shot model on unseen
+      multiplicity-n processes is expected far off (1262 has no Z+ng), so the read separates ''pretraining knows Z+ng'' (within
+      3x of fine-tuned) from ''does not'' (>10x). Data like with like: the same 1e6 test events per n (n_test 1e6 of the KIT
+      recipe, their bulk_test), event count asserted equal to our truth''s.'
+    fixed: 'Parent runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262/sigma_stage (mu = 1262''s best, sigma of
+      its sigma stage), its own config, shared standardization (data.shared_standardization true: the parent''s pooled mu,
+      sigma give the prediction, no fit). Probes kit_uq_<zg|zgg|zggg|zgggg>__me2, n_train 5e5, n_val 1e5, n_test 1e6, --split
+      test --eval-subsample 1e6. --allow-physics-mismatch with the reason: the events'' |M|^2 equals our MadGraph d d~ > Z+ng
+      to 1.4e-14 (FA-ccin2p3-32145d4b). scripts/job_zng_zeroshot.sh, one GPU job, output runs/kit/zng_zeroshot_1262_n<N>/preds.
+      Smoke (D395, new launch path): the same script with N=20000 through every stage (pool build, physics check, forward,
+      save), then the full N=1e6. Wall: forward-only, ~0.3 h for 4x1e6 at batch 16384 plus pool builds; target 1 h, limit
+      2 h; ~1.5 GPU-h with the smoke. Disk ~50 MB.'
+    control: Our fine-tuned and from-scratch runs on the same events (the trained arms); the earlier u u~ scratch searches'
+      recorded MSE as prior.
+    seeds: 'None: eval-only of one existing model, deterministic.'
+    outcome: 'Smoke YES: four ZERO_SHOT lines without error and four npz with t, q, s of 20000 events -> the full job goes.
+      NO -> fix the path, smoke again. Full: zero-shot median |Delta| within 3x of the fine-tuned run''s per n -> the pretraining
+      already holds Z+ng; above 10x -> it does not, the fine-tune carries it; between -> stated. Pull std reported against
+      1.'
   step_why:
     1:
       feeds: 'the entry''s question: our latest setup against their networks on median |Delta|, the Z+4g |Delta| distribution
