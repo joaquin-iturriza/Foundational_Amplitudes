@@ -585,6 +585,8 @@ axis_recipe() { case "$1" in
     HD5) echo recipes/catalog_v4_heldout_default_H5_test.yaml ;;
     # DAN: Daniel's 139 held-out processes (arXiv:2606.23791's test split; dan_zeroshot_v4), their 13 TeV pp pools
     DAN) echo recipes/catalog_daniel_heldout.yaml ;;
+    # DANID: the catalog_v4 training entries identical to one of DAN's processes, on their own test pools (calibration)
+    DANID) echo recipes/catalog_v4_dan_identical.yaml ;;
     TR) echo "$TRAIN" ;; *) echo "recipes/catalog_${CAT}_heldout_$1.yaml" ;; esac; }
 # TR (mode eval only, V3_AXES=TR): the arm's own training pools read by the same zero-shot scorer on their test
 # split, the in-distribution reference of the held-out reads (v3_prep_explore, the shape gap, par:v4_tree_shape)
@@ -941,7 +943,7 @@ PY
     # the role scored: the test pool on PP4 (the pp-trained arm's training classes selected their checkpoint on
     # their pp13v4 val pools; catalog_coverage's design reads test) and on TR (the arm's own training pools, whose val
     # split selected its checkpoint), val on every other axis (every read so far); tools/collect_run.py AXIS_SPLIT
-    SPLIT=val; { [ "$A" = PP4 ] || [ "$A" = TR ] || [ "$A" = EE4 ] || [ "$A" = HD4 ] || [ "$A" = HD5 ]; } && SPLIT=test
+    SPLIT=val; { [ "$A" = PP4 ] || [ "$A" = TR ] || [ "$A" = EE4 ] || [ "$A" = HD4 ] || [ "$A" = HD5 ] || [ "$A" = DANID ]; } && SPLIT=test
     miss=$(python -c "
 import glob, os, sys, yaml
 print(sum(not glob.glob(os.path.join(os.environ['DATA_DIR'], f\"{p['name']}_*_{sys.argv[2]}_*amplitudes.npy\"))
@@ -962,7 +964,7 @@ print(' '.join(([f for f in fs if neg(f)][:1] + [f for f in fs if not neg(f)][:1
     python - "$CAT" "$A" "$AR" "$MODE" "${P[@]}" <<'PY' || exit 1
 import os, sys, yaml
 cat, axis, ar, mode, files = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5:]
-pfx = {"XV3": "v3_", "XV4": "v4_", "PP": "pp13_", "PP4": ("pp13v4_", "pp13_"), "EE4": "ee4_", "HD4": "hd_", "HD5": "hd_", "DAN": "dc_"}.get(axis, f"{cat}_")
+pfx = {"XV3": "v3_", "XV4": "v4_", "PP": "pp13_", "PP4": ("pp13v4_", "pp13_"), "EE4": "ee4_", "HD4": "hd_", "HD5": "hd_", "DAN": "dc_", "DANID": "v4_"}.get(axis, f"{cat}_")
 names = {p["name"] for p in yaml.safe_load(open(ar))["processes"]}
 got = [os.path.basename(f)[:-len(".yaml")] for f in files]
 bad = sorted(n for n in got if n not in names or not n.startswith(pfx))
