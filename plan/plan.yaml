@@ -33897,6 +33897,13 @@ entries:
       back to its state before 7a1fdabc/73d5145c (FA 3496f60b; git diff 7a1fdabc~1 on the file is empty), right panel the
       fifth version (71119c82); draft efba937 (figure only, text rename T -> A^* of 801c504 kept), 48 pp, scratchpad draft_pass8.pdf/.zip
       (only figs/pretrain/paper_target.pdf differs from pass7).'
+  - at: '2026-11-17T12:50:13+00:00'
+    text: 'Listed for Joaquin, not done unasked: (i) next step 4, Fig. 14 right on MSE(log|M|^2) instead of standardized MSE
+      (read so far, nothing changed: the bigrun arms on Jean Zay compare_models/_bigrun_arm_*, all with the same data_stats.json
+      md5 66bef774, 448 per-dataset prepd_std, so GM MSE(log|M|^2) = GM loss x GM std^2 would hold for those arms; baseline
+      trial hp0226 not checked); (ii) Fig. 9 colour bar for f; (iii) Fig. 11 y_min definition and bin order; (iv) the ''ladder
+      step 1 at the hyperparameters...'' label gone from the star-arm figures. None checked on the rendered figures, none
+      changed.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
