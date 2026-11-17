@@ -643,7 +643,7 @@ def data(segs):
         script, args, hdr = _submit_parts(toks)
         pos = [t for t in cmdparse.strip_redirs(rest[:rest.index("--")] if "--" in rest else rest)
                if not t.startswith("-")]
-        if not script or len(pos) < 2 or pos[1] != "FA":
+        if not script or len(pos) < 2 or pos[1] != "FA" or PREBUILD_JOB.search(script):  # a prebuild job is what builds the pools
             continue
         site = pos[0]
         recipes = [a for a in args if re.match(r"^(?:\$PROJECT_DIR/)?recipes/[\w./-]+\.ya?ml$", a)]

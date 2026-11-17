@@ -48,6 +48,13 @@ def test_chained_on_prebuild_passes_without_read():
                                     "v4_dimensionless_muon")) == [] and not calls
 
 
+def test_prebuild_job_itself_not_refused():
+    g._site_data_ok = lambda site, r: (False, "missing")
+    cmd = ("site submit ccin2p3 FA scripts/prebuild_recipes.sh --item draft_rewrite -- "
+           "recipes/catalog_v3_lowloss_probes.yaml")
+    assert g.data(cmdparse.commands(cmd)) == []
+
+
 def test_refused_command_keeps_its_pick_unit():
     """a submission refused by another check (here data) does not spend the unit of `site pick` it was allotted."""
     import json, time
