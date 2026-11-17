@@ -35175,6 +35175,15 @@ entries:
       and the pulls. The previous owner took the paper as a stand-in when the repo held no results. Removed: the right panel
       (figure now median |Delta| alone, benchmark.py @8b3069d7), the paper numbers and their claims from the paragraph. The
       comparison is Suprio''s LLoCa-Transformer (trained by us with his code, or his own preds_test_0.npz).'
+  - at: '2026-11-17T17:12:49+00:00'
+    text: '2026-11-17 17:15 UTC: smokes passed. B2 smoke FA-ccin2p3-3e8178a0 (job_kit.sh A, Z+4g, Suprio protocol, T=50, V100):
+      every stage ran (training, sigma stage, scoring), 0.10 s/step pure training at batch 1024 float64 (0.169 s/step averaged
+      with validation every 25 steps) -> production 2e5 steps ~5.6 h, limit 12 h. Suprio smoke FA-ccin2p3-7f7f0b53 (his train_shared.sh,
+      RUN_N=1, V100): his tests 50 passed, 49 steps in 0.17 min (0.21 s/step with 2 validations), preds/metrics/plots written
+      -> limit 16 h (0.21 x 2e5 x 1.3 + 1 h). B1 31 of 32 trials queued; the site gate (60-min window, 125 GPU-h item estimate,
+      counted at wall limits) refused zgggg trial_0007 and the parent smoke; the rest (trial_0007, parent smoke afterok on
+      prebuild 64201860, B2 x8, Suprio x4) goes from the detached zng_gate_windows at 18:12 and 19:35 UTC. Sum of limits submitted
+      ~290 GPU-h against expected use ~125.'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
