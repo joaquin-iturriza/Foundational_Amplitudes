@@ -35310,3 +35310,34 @@ entries:
     (zip and slides upload), 2026-11-14T04:31 (a SciPost LaTeX template paste): none is about par:muon_long'
   blocks: step 10 and the commit of the Z+ng write-up
   blocks_steps: *id003
+- id: dan_zeroshot_v4
+  title: Catalog_v4 pretraining zero-shot on Daniel's held-out split
+  question: How does our best catalog_v4 pretraining (trial 1262) do zero-shot on the held-out processes of Daniel's catalog
+    split (dan_per_process figure), against Suprio's particle-ID embedding and our earlier arms, on the processes catalog_v4
+    never trained on?
+  status: waiting_user
+  quotes: []
+  decisions: []
+  next: Check which of Daniel's 139 held-out processes (and their relabel classes) are in catalog_v4's training; score trial
+    1262 eval-only on the rest; redraw dan_per_process with a committed script and the new arm
+  done_when: null
+  notes_ref: null
+  match: dan_zs_v4*
+  evidence:
+    runs: []
+    commit: null
+    paths: []
+  dead_ends: []
+  asks:
+  - ask: 'Scope: new eval-only work, about 1-2 GPU-h. Score trial 1262 zero-shot on Daniel''s held-out processes not in catalog_v4''s
+      training, and redraw the per-process figure with it beside Suprio''s arm. Go?'
+    at: '2026-11-17T18:22:22+00:00'
+    searched: 'site decisions --project FA and plan entries: dancat_ext (held, a sweep) is the only Daniel-catalog entry;
+      none covers a catalog_v4 zero-shot on Daniel''s split. Matched messages: 2026-10-06T00:17 (the transfer study''s plan
+      to finish), 2026-11-14T04:31 (a SciPost template paste): neither is about this'
+  ask: 'Scope: new eval-only work, about 1-2 GPU-h. Score trial 1262 zero-shot on Daniel''s held-out processes not in catalog_v4''s
+    training, and redraw the per-process figure with it beside Suprio''s arm. Go?'
+  waiting_since: '2026-11-17T18:22:22+00:00'
+  searched: 'site decisions --project FA and plan entries: dancat_ext (held, a sweep) is the only Daniel-catalog entry; none
+    covers a catalog_v4 zero-shot on Daniel''s split. Matched messages: 2026-10-06T00:17 (the transfer study''s plan to finish),
+    2026-11-14T04:31 (a SciPost template paste): neither is about this'
