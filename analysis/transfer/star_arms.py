@@ -34,7 +34,10 @@ def r1(p, k, arm):
 ARMS = {"soft": ("ee_ddbarg", "soft/collinear emission"), "isr": ("uubar_Zg", "initial-state collinear"),
         "deadcone": ("ee_ttbarg", "dead cone (massive collinear)"), "threshold": ("ee_ttbar_nlo_thr", r"$t\bar t$ threshold"),
         "wpole": ("udbar_enu", r"$W$ pole"), "sudakovew": ("ee_dd_ew_nlo", "EW Sudakov logarithms")}
-ARM_C = dict(zip(ARMS, (ps.C.vermillion, ps.C.orange, ps.C.green, ps.C.sky, ps.C.purple, ps.C.yellow)))
+ARM_C = dict(zip(ARMS, (ps.C.vermillion, ps.C.orange, ps.C.green, ps.C.purple, ps.C.sky, ps.C.yellow)))
+# each arm its own marker and a dashed line besides its colour: step 1 (blue circles, solid) and the arms are told apart
+# in every panel, and the six arms on ee -> dd~ (cold figure reader 2026-11-17: close colours bunched at large D)
+ARM_M = dict(zip(ARMS, ("s", "^", "v", "D", "P", "X")))
 
 # One file per figure (Joaquin 2026-11-17): the four searched arms in a 2x2 (star_arms), the two chosen-point arms and
 # ee -> dd~ from every arm in a 2x2 whose fourth cell holds the legend of (g) (star_arms2); 'ladder step 1', not rung 1.
@@ -51,7 +54,7 @@ def own_probe(ax, arm):
     ax.plot(*curve(lambda k: scratch(p, k, steered=False)[0]), "o-", color="k", label="from scratch")
     ax.plot(*curve(lambda k: r1(p, k, arm)), "o-", color=ps.C.blue,
             label="ladder step 1" + (", same two\nhyperparameter points" if arm in CHOSEN_ONLY else ""))
-    ax.plot(*curve(lambda k: best(f"tp3_s{arm}fte_{p}_d{k}")[0]), "o-", color=ARM_C[arm], label=f"step 1 + {what}")
+    ax.plot(*curve(lambda k: best(f"tp3_s{arm}fte_{p}_d{k}")[0]), ARM_M[arm] + "--", color=ARM_C[arm], label=f"step 1 + {what}")
     ps.process_label(ax, LAB[p])
     axes_style(ax)
     ps.legend(ax, "lower left", fontsize=ps.LEGEND_MIN_PT)
@@ -73,7 +76,7 @@ ax.plot(*curve(lambda k: best(f"tp3_r1fte_{p}_d{k}")[0]), "o-", color=ps.C.blue,
 ax.plot(*curve(lambda k: r1(p, k, "wpole")), "o--", color=ps.C.blue,
         label="ladder step 1 at the hyperparameter\npoints of the $W$-pole and Sudakov arms")
 for arm, (_, what) in ARMS.items():
-    ax.plot(*curve(lambda k: best(f"tp3_s{arm}fte_{p}_d{k}")[0]), "o-", color=ARM_C[arm], label=f"step 1 + {what}")
+    ax.plot(*curve(lambda k: best(f"tp3_s{arm}fte_{p}_d{k}")[0]), ARM_M[arm] + "--", color=ARM_C[arm], label=f"step 1 + {what}")
 ps.process_label(ax, LAB[p])
 axes_style(ax)
 ps.legend_cell(axs[1][1], ax, fontsize=ps.LEGEND_MIN_PT)

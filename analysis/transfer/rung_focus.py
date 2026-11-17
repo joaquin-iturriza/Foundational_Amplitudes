@@ -112,7 +112,7 @@ for part, order in (("ee", P[:6]), ("qcd", P[6:])):
             draw_arm(ax, "tp3_synfte", p, "s--", color=ps.C.purple, label="synthetic amplitudes")
             draw_arm(ax, "tp3_finfte", p, "D-", color=ps.C.orange, label="every structure")
         if opened:
-            ax.plot([], [], "o", color="k", mfc="white", label="open: 8k of 32k steps")
+            ax.plot([], [], "o", color="k", mfc="white", label="stopped at 8k of 32k steps")
         ps.process_label(ax, LAB[p])
         ax.set_xscale("log"); ax.set_yscale("log")
         ax.set_xlabel(r"training events $D_{\rm train}$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")

@@ -20,7 +20,7 @@ ARMP = {"ee_ddbarg": ("tp3_ssoftfte", "soft"), "ee_ttbarg": ("tp3_sdeadconefte",
         "ee_ttbar_nlo_thr": ("tp3_sthresholdfte", "threshold"), "ee_dd_nlo_hi": ("tp3_ssudakovfte", "Sudakov"),
         "udbar_enu": ("tp3_swpolefte", "W pole"), "ee_dd_ew_nlo": ("tp3_ssudakovewfte", "Sudakov EW")}
 ARMLAB = {"ee_ddbarg": r"$e^+e^-\to d\bar dg$", "ee_ttbarg": r"$e^+e^-\to t\bar tg$",
-          "ee_ttbar_nlo_thr": r"$e^+e^-\to t\bar t$ (thr.)", "ee_dd_nlo_hi": r"$e^+e^-\to d\bar d$ (1-loop, hi)",
+          "ee_ttbar_nlo_thr": r"$e^+e^-\to t\bar t$ (1-loop, threshold)", "ee_dd_nlo_hi": r"$e^+e^-\to d\bar d$ (1-loop, hi)",
           "udbar_enu": r"$u\bar d\to e^+\nu_e$", "ee_dd_ew_nlo": r"$e^+e^-\to d\bar d$ (EW 1-loop)"}
 
 

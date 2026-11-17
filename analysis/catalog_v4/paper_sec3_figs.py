@@ -306,8 +306,8 @@ def unseen(ax):
 BIGRUN = {"linear embedding, no diagrams": (3.85e-4, 0.12),
           "all inputs but diagrams": (3.88e-4, 0.10),
           "all inputs, linear embedding": (4.86e-4, 0.056),
-          "lin. emb., no diagrams, pair bias": (5.26e-4, 0.084),
-          "same, pair bias capped": (5.74e-4, 0.077),
+          "linear embedding, no diagrams, pair bias": (5.26e-4, 0.084),
+          "linear embedding, no diagrams, capped pair bias": (5.74e-4, 0.077),
           "all inputs": (5.79e-4, 0.085),
           "all inputs but colour": (6.81e-4, 0.094),
           "all inputs but off-shellness": (8.63e-4, 0.067)}
@@ -320,7 +320,7 @@ def inputs(ax):
     ax.set_yticks(y); ax.set_yticklabels([k for k, _ in rows])
     ax.set_ylim(len(rows) - 0.5, -0.5); ax.set_xscale("log")
     ax.set_xticks([4e-4, 6e-4, 8e-4], [r"$4\cdot10^{-4}$", r"$6\cdot10^{-4}$", r"$8\cdot10^{-4}$"]); ax.minorticks_off()
-    ax.set_xlabel("geometric mean over 448 processes\n" + r"of MSE$(\log|\mathcal{M}|^2)$, standardized")
+    ax.set_xlabel("geometric mean over 448 processes\n" + r"of MSE of the standardized $\log|\mathcal{M}|^2$")
 
 
 if __name__ == "__main__":
