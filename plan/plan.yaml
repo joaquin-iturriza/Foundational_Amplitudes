@@ -34772,6 +34772,82 @@ entries:
       target), HETEROSC. Smoke at 20000 events writes the npz benchmark.py collect reads. Terms searched: zng, Z+4g, zero-shot,
       1262, multiplicity, bbx_g*z, ddx/uux names, highmult in results.tex, 1262''s training recipe, the plan entry, decisions
       D20-D480.'
+  - at: '2026-11-17T15:51:00+00:00'
+    question: 'Four batches on q qbar -> Z+1..4g, Zenodo 16793011 in Suprio''s split (train 5e5, val 1e5, test 1e6; same events
+      for every arm). (1) D481/D482: Suprio''s LLoCa-Transformer (lloca-experiments-uq, branch uq @1074f6a) trained and scored
+      by his own production (uq_ops/jobs/train_shared.sh, RUN_NETS=lloca, uq=het, seed 0, data_seed 0, config/amplitudes_uq.yaml
+      + amp_default: Adam lr 1e-3 betas (0.99,0.999), batch 1024, <=2e5 steps, ReduceLROnPlateau 0.3/patience 10, early stopping
+      20 validations, validation every 1000 steps, clip 5): his median |Delta|, |Delta| distribution and pulls, the comparison
+      Joaquin asked for. (B2) D484: our latest setup (muP LLoCa, emission-scale target, HETEROSC + sigma stage, float64),
+      scratch and fine-tuned from trial 1262, trained under Suprio''s protocol (the same optimizer/schedule/batch/stopping
+      list, checkpoint on validation NLL): does his training protocol close our gap to his network? (B1) D484: one single-fidelity
+      DyHPO search per multiplicity over the template''s coupled space (Muon, WSD, 12,500 steps, scratch), then scratch (the
+      best trial) and the fine-tune from 1262 at its choice: does our own protocol at searched HPs pass the curve test and
+      where does it land? (2) D482/D483: the ladder + star-arm pretraining (the finale, tp3_finale hp73, 28 processes, 64k
+      steps, older setup) fine-tuned against the same network from scratch at D_train = 10^2, 10^2.5, ..., 10^5.5 and 5e5:
+      how many target events does that pretraining save on Z+ng, and does the gain vanish at large D as on u u~ -> Z+4g?'
+    prior: 'This entry: our 8 runs at kit_hpo_uug_T hp1677 (Muon lr 6.55e-3, WSD, 12,500 steps x 16384): median |Delta| scratch/ft
+      Z+1g 1.0e-4/4.8e-5 .. Z+4g 2.1e-2/1.6e-2, 7 of 8 fail the curve test (val plateau ~1e-3 then train falls 10-300x below
+      val in the cooldown), pull std up to 28 on Z+4g (benchmark.json @8f291240); zero-shot of 1262 0.098-0.23. Suprio''s
+      network results: none readable (no checkpoints or preds public; his runs are on nemo/ITP). results.tex high-multiplicity
+      full grid (highmult 254/254): on u u~ -> Z+4g the finale gains +0.96..+0.48 dex over scratch at D<=10^3, +0.21 at 10^3.5,
+      -0.11/-0.21/-0.06 at 10^4/10^4.5/10^5 (one seed); the 128k-step horizon test at 10^4.5 moved neither arm >10%. The finale
+      vs rung 9 on u u~ -> Zg/Zgg/Zggg (8k grid, D 10^1..10^4): better on 6/7, 7/7, 7/7 cells. Searched: zng, Z+4g, highmult,
+      finale, hmscr, finfte, ReduceLROnPlateau, Adam lr 1e-3, batch 1024 in results.tex; plan entry; D476-D484. No earlier
+      run of our network under Suprio''s protocol; no earlier Z+ng search on this data (the u u~ Z+ng searches tp_scr_*/tp3_scr32k_*
+      are on our own pools, MSE loss).'
+    measure: 'Per run on the same 1e6 test events: Suprio''s metrics (his experiments/uq/metrics.py, the same functions as
+      analysis/zng_uq/benchmark.py collect): median, q90, q99 |Delta| with Delta = expm1(mu - truth) in ln|M|^2, |Delta| histogram
+      on Z+4g, pulls (truth-mu)/sigma with std, mean and 68% coverage; MSE of standardised ln|M|^2; the curve test (tools/kit_curves.py)
+      for our runs. (1) is read by benchmark.py collect --theirs (his preds_test_0.npz; asserts his test indices and truth
+      equal ours event by event) and his own plots/fallback. (2) per cell (n, D, arm): MSE of ln|M|^2 on their validation
+      split at the best checkpoint of the cell''s best trial (val_loss_no_reg x sigma_p^2, analysis/common trial_mse, the
+      high-multiplicity study''s measure); gain = log10(scratch/finale) per cell; D* at a fixed MSE per n as dstar_fit.'
+    check: 'The measure moves with these changes on existing data: across our 8 runs median |Delta| spans 4.8e-5..2.1e-2 and
+      pull std 0.99..28 (benchmark.json @8f291240), and the scratch vs fine-tune difference (1.3-2.1x) is read by it; the
+      zero-shot arm moves it by 10-1000x. For (2), the same per-cell val MSE separated the finale from scratch by +0.96 to
+      -0.21 dex on u u~ -> Z+4g (scratch_sweeps.json, highmult) with one-seed scatter ~0.2 dex, so gains above ~0.3 dex resolve
+      and the large-D ''no gain'' reads as such. Their |M|^2 equals our MadGraph d d~ -> Z+ng to 1.4e-14 (FA-ccin2p3-32145d4b),
+      so scores are on one target.'
+    fixed: 'Data: uq_<p>.h5 (tools/zng_uq.py) = his data_seed-0 split; the same 1e6 test events for (1), (B1), (B2) and the
+      earlier 8 runs; (2) val 1e5 = his val, n_test 1e5. (1) scripts/job_uq_ext.sh: his repo cloned over ssh with the CC account''s
+      read key into $WORK/ext at 1074f6a (nothing of his in our repo), his pinned env (torch 2.9.1 cu126, flash_attn/xformers
+      left out), train_shared.sh unchanged, RUN_N=1..4, RUN_NETS=lloca, RUN_EXP=zng_uq_lloca/z<n>g. (B2) scripts/job_kit.sh
+      A and A_ft (parent 1262, fine_tune.lr_scale 1, target_stats own), T=200000, extra: training.batchsize=1024 training.optimizer=Adam
+      training.lr=1e-3 training.betas=[0.99,0.999] training.weight_decay=0 training.regularization_lambda=0 ema=false training.scheduler=ReduceLROnPlateau
+      training.reduceplateau_factor=0.3 training.reduceplateau_patience=10 training.validate_frac=0 training.validate_every_n_steps=1000
+      training.es_patience=20000 training.clip_grad_norm=5 training.heterosc_select=nll tag=suprio_protocol, KIT_NTEST=1e6;
+      everything else the 8 runs'' (MuAdam under muP). (B1) sweep/sweep_config_tp_zng_hpo_<p>.yaml: base = the earlier scratch
+      run''s config, kit_hpo_uug_T''s space and objective (val mu-MSE), 8 trials, waves 3,3,2, seed 42; then A_ft from 1262
+      at the best trial''s HPs (later submission). (2) sweep/gen_zng_ladder.py: each cell the u u~ -> Z+4g high-multiplicity
+      cell of the same D (configs as gen_highmult wrote them: older setup features, MSE loss, CosineAnnealing, batch 16384,
+      steps 2816/4576/8000 at D 10^2/10^2.5/10^3, 32000 from 10^3.5; k=11 and 5e5 the d10 cell), recipe recipes/zng_uq_<p>.yaml,
+      train prefixes of D, parent runs/tp3_finale/trial_0073 (model_run0_best.pt.gz on CC); scratch 8-trial DyHPO per cell,
+      finale the two fixed points (lr 1.3e-3, 2.2e-3, lambda 3e-10; sweep/fixed_points.py). Smoke (D395): (1) one job Z+1g
+      with RUN_EXTRA training.iterations=50 validate_every 25 n_calib/n_test 1e4 through env build, his tests, train, eval,
+      fallback, plots; (B2) Z+4g A, T=50, validate every 25, KIT_NTEST 2e4; (2) tp3_zng_smoke_{scr,fin}_zgggg (50 steps, D=1e5,
+      one trial each). B1 runs the path of kit_hpo_uug_T and the 8 runs (same script, data and base configs): no smoke. Wall
+      targets: (1) ~3-6 h per n (his paper 2.1 h on H100 at Z+4g), limit 12 h; (B2) ~0.07 s/step x 2e5 ~4 h at Z+4g, limit
+      12 h; (B1) trial ~2.2 h at Z+4g (0.59 s/step measured), limit 4 h; (2) Z+4g trial times from scratch_sweeps.json (0.06/0.08/0.15
+      h at 8k, 0.63/1.5/4.3/4.8 h at 32k), limits as the template''s (16 h at k>=10). GPU-h expected: (1) ~20, (B2) ~35, (B1)
+      ~61 with the A_ft reruns, (2) ~650-850 (scratch 8 x 9 cells x 4 n, finale 2 x 9 x 4); total ~770-970.'
+    control: '(1) against (B1)/(B2)/the earlier 8: same events, same metrics; (1) vs (B2) differ in the network and its input/target
+      pipeline only (the training protocol matched), which is the comparison Joaquin asked for. (B2) vs the earlier 8 runs:
+      same network, data, target, scoring; the training protocol is the change. (B1) scratch best vs the earlier scratch:
+      the HPs searched vs taken. (2) finale vs scratch per cell: same network, data, D, steps, recipe; the start is the change;
+      scratch searched (8 trials), the finale at its two fixed points, as the high-multiplicity protocol (stated asymmetry,
+      D25).'
+    seeds: 'One per run as every earlier arm of this entry and the high-multiplicity grid: (1) seed 0, data_seed 0 (his production);
+      (B2), (B1) seed 42; (2) seed 42 per trial; the 3x/0.3 dex resolution of one seed is what the outcomes use.'
+    outcome: 'Smokes YES: each stage writes its file ((1) preds_test_0.npz, fallback_0.json, plots; (B2) kit_benchmark/predictions.h5
+      and sigma_ln.npy; (2) a result per trial with val_loss and prepd_std) -> the batch goes; NO -> fix the launch path,
+      smoke again. (1) his LLoCa median |Delta| per n and pulls are the reference; our best arm within 3x of his median |Delta|
+      at an n -> comparable there; above 10x -> our setup is behind, stated per n. (B2) our run passes the curve test and
+      its median |Delta| falls below the earlier 8 runs'' by >3x -> his protocol fixes our training; within 3x -> the protocol
+      is not the gap. (B1) a trial passes the curve test -> the A_ft rerun at its HPs, read as (B2); none passes -> report
+      our setup''s floor on Z+ng, flagged. (2) gain > +0.3 dex at small D falling to |gain| < 0.2 dex at D >= 10^4 -> the
+      u u~ -> Z+4g picture holds on their data; gain > +0.3 dex persisting at D >= 10^4.5 -> the pretraining still saves data
+      at their scale; gain < -0.3 dex -> it costs, stated with D.'
   step_why:
     4:
       feeds: whether our setup, trained well, comes within 3x of their networks on Z+ng
