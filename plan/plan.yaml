@@ -33475,7 +33475,11 @@ entries:
       older), 2026-11-10T02:08 (draft restructure, D364/D365), 2026-11-14T04:31 (pasted paper.tex, no decision): none settles
       the changed claim'
     blocks: nothing
-    blocks_steps: &id003 []
+    blocks_steps: []
+    answered_at: '2026-11-17T11:44:20+00:00'
+    decision: D473
+    withdrawn_at: '2026-11-17T11:44:20+00:00'
+    withdrawn_why: Fig. 15 and its Sec. 4 paragraph are out of the draft under D473, so the wording question is moot
   owner:
     agent: a4b2e4f58e3b9081f
     state: working
@@ -34114,15 +34118,6 @@ entries:
       - 'Muon fine-tune stays at or below its zero shot at D=32 and below AdamW''s at every D: Fig. 15 returns with that protocol,
         Sec. 4 says so'
       - 'still above its zero shot: the lr is not the whole cause; read the head/standardization reset next'
-  ask: 'Scope: Fig. 15 on the new probes changes the Sec. 4 claim: Muon''s head start in fine-tuning holds at D_train = 10
-    (10-50x) but closes by 316 (within 1.5x on three probes, 4.5x on b b̄ → HHHZ, whose Muon curve barely falls). The draft
-    text was reworded to that; keep the new wording, or revert to the old until you''ve looked?'
-  waiting_since: '2026-11-17T06:06:54+00:00'
-  searched: 'site decisions --project FA; Joaquin''s messages 2026-11-17 on Fig. 15, 2026-10-26T02:03 (qcd-only probes, older),
-    2026-11-10T02:08 (draft restructure, D364/D365), 2026-11-14T04:31 (pasted paper.tex, no decision): none settles the changed
-    claim'
-  blocks: nothing
-  blocks_steps: *id003
 - id: zng_uq_benchmark
   title: Our model on the Z + n gluon UQ datasets (Zenodo 16793011)
   question: 'How does our latest setup (emission-scale target, HETEROSC, mu-P LLoCa), from scratch and fine-tuned from a pretraining,
