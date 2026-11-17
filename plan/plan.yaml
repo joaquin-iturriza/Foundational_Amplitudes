@@ -33422,6 +33422,15 @@ entries:
     - 4
     answered_at: '2026-11-16T21:18:36.220000+00:00'
     decision: D464
+  - ask: 'Scope: (1) rerun Fig. 13''s input comparison (448-process big run) on catalog_v4, one pretraining per row, GPU-h
+      given before it runs? (2) Fig. 21: keep only step 1 at its searched hyperparameters, or add an unlabelled step-1 curve
+      at the W-pole and Sudakov arms'' two points?'
+    at: '2026-11-17T04:29:14+00:00'
+    searched: 'site decisions --project FA; Joaquin''s messages 2026-11-17T03:17, 2026-11-17T04:16 (asks whether it was rerun,
+      not to rerun), 2026-11-14T04:31 (pasted paper.tex, no request), 2026-10-04T10:57 (arms'' test design, not the curve),
+      2026-11-10T02:08 (D364: rerun pIDs vs quantum numbers only): none asks the input rerun or picks the curve'
+    blocks: nothing
+    blocks_steps: &id003 []
   owner:
     agent: a4fffe14e30441828
     state: working
@@ -33928,3 +33937,12 @@ entries:
       if:
       - 'runs finish: redraw, check the curves fall with D_train, send'
       - 'no process has both low error and separation: say so with the numbers'
+  ask: 'Scope: (1) rerun Fig. 13''s input comparison (448-process big run) on catalog_v4, one pretraining per row, GPU-h given
+    before it runs? (2) Fig. 21: keep only step 1 at its searched hyperparameters, or add an unlabelled step-1 curve at the
+    W-pole and Sudakov arms'' two points?'
+  waiting_since: '2026-11-17T04:29:14+00:00'
+  searched: 'site decisions --project FA; Joaquin''s messages 2026-11-17T03:17, 2026-11-17T04:16 (asks whether it was rerun,
+    not to rerun), 2026-11-14T04:31 (pasted paper.tex, no request), 2026-10-04T10:57 (arms'' test design, not the curve),
+    2026-11-10T02:08 (D364: rerun pIDs vs quantum numbers only): none asks the input rerun or picks the curve'
+  blocks: nothing
+  blocks_steps: *id003
