@@ -35123,8 +35123,7 @@ entries:
     '6': FA-ccin2p3-7f7f0b53
     '7': FA-ccin2p3-3e8178a0
     '8': the next owner's submission (B1 sweeps not yet submitted at the close)
-    '9': the CC checkout reset to the rewritten trunk (site sync cannot fast-forward after the history rewrite that dropped
-      9ea31ae3)
+    '9': the next owner's submission (pool rebuild not yet submitted at the close)
   findings:
   - at: '2026-11-17T11:18:43+00:00'
     text: 'Their numbers: the UQ repo (branch uq, 311 files) holds no figures, preds or result files. arXiv:2505.20280''s
