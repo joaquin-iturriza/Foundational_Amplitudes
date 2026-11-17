@@ -33893,6 +33893,19 @@ entries:
       the figure replaces Fig. 15. No: AdamW at or below Muon, or curves flat in D_train: the figure shows it, the Sec. 4
       sentence says so and the flat probes are reported to Joaquin before the figure is called done; a failed cell is listed
       and rerun once.'
+    passed_at: '2026-11-17T04:31:43+00:00'
+    reviewer: 'Only the probes change from the protocol passed 2026-11-17T01:32 (same parents, fine-tune optimizer, D_train
+      10/32/100/316 at 176-4576 steps, untuned parent HPs, scratch control, one seed per cell as the sibling cells). Reran
+      muon_compare.py sep-probes @d0ae01a7: 529 held-out, q25 0.287, 133 kept; top 4 g g->t tbar 0.0841/0.000431 (195x), d
+      dbar->t ubar 0.196/0.00302 (65x), b bbar->HHHZ 0.301/0.0092 (33x), u ubar->W+W- 0.618/0.0205 (30x), as the check says;
+      recipe catalog_v3_sep_probes.yaml names the same four. Check 2: zero-shot gap 30-195x, and the fine-tune read moved
+      with the arm in muon_ft_lowloss.json (4-5x at D=316 on trees). Check 3: seed spread ~1.4x (results.tex par:v3_muon,
+      0.124-0.148 decades), far below the zero-shot gap; one seed matches sibling cells. Time from the same script today (0.77-0.99
+      h per job, 2->4 probes; these are 2->2/2->3/2->4, so not slower), CATFT readout shown written. Searched results.tex,
+      plan, site decisions for gg_ttx, dbx_txu, bbx_hhhz, uux_wpwm, ''g g.*t.*bar'', muon_ft, catft, fine-tun.*Muon, seed
+      spread: only the 2026-10-26 median-probe and today''s low-loss runs, both named in prior. Risk noted: probes with a
+      near-zero Muon zero-shot (g g->t tbar 4e-4) may give flat Muon curves; the outcome reports flat probes to Joaquin before
+      the figure is called done.'
   targets:
   - batch: examples_rerun
     wall_h: 1.0
