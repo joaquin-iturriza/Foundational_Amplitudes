@@ -53,8 +53,8 @@
   \begin{itemize}
     \item The MLP reads $\log s_{ij}$ through leaky ReLUs. A ReLU MLP trained by gradient descent becomes linear in its inputs far from the data (Xu et al., ICLR 2021, arXiv:2009.11848), and linear in $\log s_{ij}$ is a power law in $s_{ij}$
     \item Our transformer's LayerNorm, softmax and GELU saturate instead, so it goes flat
-    \item Right when the limit's slope is already set in the bulk: $-0.95$ against $-1.00$ (collinear), $-1.98$ against $-2.00$ (soft)
-    \item Wrong when it is not: $t\bar t$ threshold $-0.56$ against $-1.00$, even with $\log(s_{t\bar t}-4m_t^2)$ as input
+    \item In the $u\bar u g$ soft and collinear limits the power law already shows in the training data (slope $-1.99$ and $-1.10$ at its edge), so the MLP continues it with the right slope: $-1.98$ (truth $-2$) and $-0.95$ (truth $-1$)
+    \item At the $t\bar t$ threshold the training data reach only $\beta>0.2$, where the slope is $-0.59$; the MLP continues that slope, $-0.56$, short of the $1/\beta$ rise ($-1$), even with $\log(s_{t\bar t}-4m_t^2)$ as an input
   \end{itemize}
   \vfill
 \end{frame}
