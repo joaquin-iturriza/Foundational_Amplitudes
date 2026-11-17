@@ -33754,6 +33754,18 @@ entries:
       (scatter) and paper_unseen (new Fig. 13): two quantities, two figures. Fig. 14 right rows as input lists (o, R_c, G,
       MLP or Wx_i, b_ij, |b_ij|<=8), x MSE(log|M|^2)/sigma^2 with sigma^2 and the geometric mean over 448 processes in the
       caption, points black. Rerun of that comparison on catalog_v4 stays a question to Joaquin (asked 04:29).'
+  - at: '2026-11-17T05:54:46+00:00'
+    text: '2026-11-17 step 4 done: Fig. 15 on the separation probes (FA-ccin2p3-9f53a445 AdamW parent, -25941ebf Muon parent,
+      -264b3f81 scratch, job_catalog_ft.sh @17ae0ba4; 48 cells, no error; muon_ft_sep.json, paper_sec3_figs.py ft @adab94db).
+      MSE(log|M|^2) at D_train=10/32/100/316, AdamW | Muon | scratch (zero shot AdamW, Muon): g g->t tbar 0.0214 0.00305 5.79e-5
+      1.01e-5 | 0.000431 0.00114 3.51e-5 6.87e-6 | 0.0055 0.00213 3.12e-5 5.52e-6 (0.0841, 0.000431); d dbar->t ubar 0.051
+      0.00114 1.82e-4 4.32e-5 | 0.00302 0.00409 3.55e-4 2.96e-5 | 0.115 0.0138 4.55e-4 4.07e-5 (0.196, 0.00302); b bbar->HHHZ
+      0.144 0.0785 0.0308 0.0181 | 0.00831 0.0100 0.00671 0.00402 | 0.246 0.136 0.0828 0.0251 (0.301, 0.0092); u ubar->W+W-
+      0.147 0.00433 0.00348 9.08e-4 | 0.0142 0.00613 0.00248 8.63e-4 | 0.127 0.0215 0.0114 0.00163 (0.618, 0.0205). Every
+      curve falls with D_train over 10->316 (by 1.5-3.5 decades), except Muon on b bbar->HHHZ, only 2.3x (0.0092 zero shot
+      -> 0.0040). Muon lower at D=10 on all four (10-50x); at D=316 4.5x lower on HHHZ, within 1.5x on the other three (scratch
+      lowest on g g->t tbar). Muon''s D=32 fine-tune ends above its zero shot on 3 of 4. Sec. 4 paragraph and caption rewritten
+      to this (draft 2ec4471).'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
