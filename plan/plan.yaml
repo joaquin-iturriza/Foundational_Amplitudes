@@ -33450,6 +33450,15 @@ entries:
     blocks_steps: []
     answered_at: '2026-11-17T04:35:30.672000+00:00'
     decision: D471
+  - ask: 'Scope: Fig. 15 on the new probes changes the Sec. 4 claim: Muon''s head start in fine-tuning holds at D_train =
+      10 (10-50x) but closes by 316 (within 1.5x on three probes, 4.5x on b b̄ → HHHZ, whose Muon curve barely falls). The
+      draft text was reworded to that; keep the new wording, or revert to the old until you''ve looked?'
+    at: '2026-11-17T06:06:54+00:00'
+    searched: 'site decisions --project FA; Joaquin''s messages 2026-11-17 on Fig. 15, 2026-10-26T02:03 (qcd-only probes,
+      older), 2026-11-10T02:08 (draft restructure, D364/D365), 2026-11-14T04:31 (pasted paper.tex, no decision): none settles
+      the changed claim'
+    blocks: nothing
+    blocks_steps: &id003 []
   owner:
     agent: a4fffe14e30441828
     state: closed
@@ -34032,3 +34041,12 @@ entries:
       if:
       - 'Joaquin returns to it: design the follow-up he asks for'
       - 'never: stays out of the paper'
+  ask: 'Scope: Fig. 15 on the new probes changes the Sec. 4 claim: Muon''s head start in fine-tuning holds at D_train = 10
+    (10-50x) but closes by 316 (within 1.5x on three probes, 4.5x on b b̄ → HHHZ, whose Muon curve barely falls). The draft
+    text was reworded to that; keep the new wording, or revert to the old until you''ve looked?'
+  waiting_since: '2026-11-17T06:06:54+00:00'
+  searched: 'site decisions --project FA; Joaquin''s messages 2026-11-17 on Fig. 15, 2026-10-26T02:03 (qcd-only probes, older),
+    2026-11-10T02:08 (draft restructure, D364/D365), 2026-11-14T04:31 (pasted paper.tex, no decision): none settles the changed
+    claim'
+  blocks: nothing
+  blocks_steps: *id003
