@@ -34225,6 +34225,8 @@ entries:
       Z+4g only and its HPs for all n ~33 GPU-h)'
     5: 'Write-up in docs/results.tex: the 8 runs flagged by the curve test, the zero-shot read, the figures zng_median_delta,
       zng_delta_z4g, zng_pulls, zng_curves, % src / % claim lines'
+    6: 'Batch (1): Suprio''s LLoCa-Transformer by his train_shared.sh (RUN_NETS=lloca, het, seed 0), scripts/job_uq_ext.sh
+      @e75bcabb: smoke UQ_BUILD=1 RUN_N=1 50 steps, then RUN_N=1..4 at limits from the smoke''s s/step'
   done_when: null
   notes_ref: null
   match: zng_uq_*,tp*_zng_*
@@ -35086,6 +35088,11 @@ entries:
       if:
       - 'written and committed: plan evidence with the commit'
       - 'the zero-shot read fails: write up the trained runs alone'
+    6:
+      feeds: Suprio's median |Delta|, |Delta| on Z+4g and pulls beside ours
+      if:
+      - 'smoke writes preds_test_0.npz, fallback, plots: the four production jobs'
+      - 'smoke fails: fix the launch path, smoke again'
   step_waits:
     '5': the notes-editor pillar reviewer (blocked on par:muon_long, another entry)
     '4': '2026-11-18'
