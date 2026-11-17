@@ -34145,3 +34145,33 @@ entries:
     state_at: '2026-11-17T11:05:23.633000+00:00'
     context: 225369
     context_at: '2026-11-17T11:09:26+00:00'
+  designs:
+  - at: '2026-11-17T11:14:59+00:00'
+    question: 'Setup step (CPU job scripts/job_zng_fetch.sh, no GPU): are the Zenodo 16793011 Z+1..4g files, converted by
+      tools/zng_uq.py into the KIT layout (uq_<proc>.h5), the exact events of the UQ repo''s (lloca-experiments-uq, branch
+      uq) train/val/test split, and does our MadGraph (d d~ > Z+ng, sm card, alpha_s 0.13) give their |M|^2 up to one constant
+      per process, so that any run or evaluation on them compares like with like? Also: is u u~ > Z+ng at the same momenta
+      one constant times theirs (what an existing u-flavour model of ours is shifted by)?'
+    prior: 'none found in docs/results.tex for Zenodo/16793011/lloca-experiments/2505.20280 (searched those terms); plan entry
+      zng_uq_benchmark has no evidence yet; decisions: D477 approves the entry. Related: kit_benchmark read external HDF5
+      files the same way (tools/kit_hardps.py), its alpha_s and leg-order assumptions were checked against the files'' metadata
+      (finding 2026-11-10T03:33).'
+    measure: '(1) the split: the converted rows equal the source rows at torch.randperm(3e6, seed data_seed+1=1) positions
+      [0,5e5) train, [5e5,6e5) val, [1.6e6,2.6e6) test; (2) per process the ratio ours/theirs of |M|^2 on the first 100 test
+      events (tools/zng_uq.py crosscheck -> $DATA_DIR/zng_uq/crosscheck.json): median, min, max, max/min - 1, for d d~ and
+      for u u~.'
+    check: 'Split: checked locally on their committed 5e4-event data/zgggg_mini.npy (copied as files 0,1,2, reduced counts):
+      kit_hardps.role_rows train/val/test equal the source rows at the permutation''s positions (assert passed, tools/zng_uq.py
+      @ this commit); torch 2.1.2 (ours) and 2.9.1 (theirs) give the same randperm(3e6, seed 1) (sha1 e0167507 both). The
+      ratio moves with a convention change by construction: alpha_s 0.13 vs 0.118 alone moves it by (0.118/0.13)^n, the u
+      vs d couplings by a constant; a phase-space mismatch (leg order, frame) gives event-to-event spread.'
+    fixed: Their files zg/zgg/zggg/zgggg _0,_1,_2 (the repo's data.files), data_seed 0, counts 5e5/1e5/1e6/1e6, alpha_s 0.13
+      (their data.alpha_s), leg order d, d~, Z, g... (their target_norm.zng_process), our MadGraph sm param card as in every
+      catalog pool.
+    control: Their stored |M|^2 (the standalone MadGraph values on Zenodo) is the reference each of our values is divided
+      by.
+    seeds: 'none (deterministic: data_seed 0 as theirs; 100 events per process)'
+    outcome: 'YES: the split assertion holds on the full files and for every process max/min - 1 < 1e-6 (one constant; its
+      value reported and, if not 1, the convention named, e.g. electroweak scheme). Then trainings and evaluations go ahead
+      on uq_<proc>.h5. NO: a spread above 1e-6 on any process -> stop, find the mismatch (leg order, momenta frame, flavour,
+      helicity sum) before any job reads these files; a split mismatch -> stop and fix the converter.'
