@@ -34642,6 +34642,27 @@ entries:
       NO -> fix the path, smoke again. Full: zero-shot median |Delta| within 3x of the fine-tuned run''s per n -> the pretraining
       already holds Z+ng; above 10x -> it does not, the fine-tune carries it; between -> stated. Pull std reported against
       1.'
+    fix_at: '2026-11-17T14:52:45+00:00'
+    fix: 'Check 5 (prior) and check 4 (outcome) fail. The design says 1262 has ''no Z+ng in its catalog''. It does: recipes/catalog_v4_default25_train.yaml,
+      the recipe in 1262''s sigma_stage/config.yaml data.processes_file, trains v4_bbx_gz, v4_bbx_ggz and v4_bbx_gggz, i.e.
+      b b~ > Z+1g, 2g, 3g with a massless b (catalog_v4''s sm-no_b_mass). At tree level with only gluons emitted, that |M|^2
+      is the same function as d d~ > Z+ng (same Z coupling, no Yukawa). The only difference is the b''s particle label (the
+      b gets its own species row, +-5000000). So for n = 1..3 this read is a known function under a new quark label, not an
+      unseen process. Z+4g (2->5, 7 particles) is outside catalog_v4''s 2->4 range, so for n = 4 it is a multiplicity extrapolation.
+      The outcome ''within 3x of fine-tuned -> the pretraining already holds Z+ng; above 10x -> it does not'' therefore reads
+      two different things as one, and the caption ''not trained on their data'' is incomplete. What to change: (a) prior:
+      name the three b b~ > Z+ng training processes and their numbers from 1262 itself, the per-process validation MSE of
+      ln|M|^2 at its best checkpoint. That is what ''knows Z+ng'' looks like at n = 1..3. Also name the zero-shot multiplicity
+      extrapolation results in results.tex (par:v4_mult_bias, l.3985: a signed level bias on the 2->4 multiplicity pools).
+      (b) Show that b b~ and d d~ > Z+ng give the same |M|^2 on a few of their events (the MadGraph comparison the setup job
+      already ran for d d~ and u u~), or cite where it was shown. (c) State the outcome per n: n = 1..3 as a label-transfer
+      read against 1262''s own b b~ validation level, and n = 4 as a multiplicity extrapolation. If you can relabel the beams
+      to b b~ in the probe (a PDG swap at pool read, no other change), consider adding the same events read with b b~ labels
+      as the in-training reference. It is cheap, the same job. The rest passes: same 1e6 bulk_test events and recipe counts
+      (n_train 5e5, n_val 1e5, n_test 1e6) as the eight trained runs, so the test events match their split. Training loss
+      HETEROSC, as decided (D71). The parent''s own preprocessing is used (shared_standardization true, emission-scale target),
+      right for an eval-only read of an existing model. Deterministic, so one read is enough. The smoke at 20000 events writes
+      the npz that benchmark.py reads before the full job goes. Disk is small.'
   step_why:
     3:
       feeds: what our current models give on their benchmark before any training on it
