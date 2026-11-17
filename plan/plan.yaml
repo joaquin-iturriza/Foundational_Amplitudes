@@ -33784,6 +33784,12 @@ entries:
     units: null
     start: '2026-11-13T07:19:46+00:00'
     at: '2026-11-13T07:19:46+00:00'
+  - batch: fig15_lowloss
+    wall_h: 1.0
+    jobs: 3
+    units: null
+    start: '2026-11-17T01:33:04+00:00'
+    at: '2026-11-17T01:33:04+00:00'
   handoff:
     state: 'Draft ~/drafts/fm_amplitudes_2026-11 at 8b55c58 (current, 45 pp). Since ded8a89: step 4 written on all five sigma-steering
       processes (1ec32b9..47bbb35, cold reviewer FIX then PASS), then cut on Joaquin''s 2026-11-17 words (''only the figure
