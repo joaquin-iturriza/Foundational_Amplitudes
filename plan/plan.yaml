@@ -35331,10 +35331,7 @@ entries:
     - dan_zeroshot_v4
   decisions:
   - D488
-  next: 'Read trial_1262 (cov_v4_long_hpo8_cc_68224, sigma stage) on Daniel''s 139 held-out pools (axis DAN, one eval job,
-    ~0.1 h), bring the predictions home (collect_heldout_preds.py -> data/v4_trial1262_dan.npz) and draw analysis/catalog_daniel/dan_per_process.py:
-    96 relabels and the 9 extrapolation processes with no relabel in catalog_v4''s training (v4_heldout_overlap.py: 34 of
-    43 have one)'
+  next: null
   done_when: null
   notes_ref: null
   match: dan_zs_v4*
@@ -35675,15 +35672,6 @@ entries:
       seeds agree to 1.7e-4, far below 0.194. Outcomes cover TF32 / attention / other CPU path / V100 (rerun pinned to H100).
       Check 5 searched tf32, layer dump, CPU vs GPU, xformers, 0.194 in docs/results.tex and decisions: sec:tf32-eval now
       cited. Eval only, ~0.15 GPU-h; checks 9-15 not applicable.'
-  step_why:
-    1:
-      feeds: whether catalog_v4's best pretraining zero-shots Daniel's held-out processes better than the arms trained on
-        Daniel's catalog (Suprio's pID embedding, shared standardization, dimensionless + coupling orders)
-      if:
-      - 'median MSE on the 9 truly held out below the earlier arms'': report it and the relabel medians to Joaquin with the
-        figure'
-      - 'above, or probes refused/non-finite: report with the failing probes listed and what the physics mismatch (massive
-        b, Daniel''s run card) may cost'
   targets:
   - batch: dan_zs_v4_reads
     wall_h: 0.1
@@ -35721,8 +35709,7 @@ entries:
     units: null
     start: '2026-11-17T20:54:56+00:00'
     at: '2026-11-17T20:54:56+00:00'
-  step_waits:
-    '1': FA-lxplus-50f4fc6b
+  step_waits: {}
   findings:
   - at: '2026-11-17T19:03:19+00:00'
     text: 'The dimensionless + coupling orders network''s zero-shot predictions depend on the eval-time Lorentz augmentation
