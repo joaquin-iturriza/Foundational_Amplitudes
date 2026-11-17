@@ -27746,7 +27746,7 @@ entries:
     - FA-ccin2p3-f45f434a
     - FA-ccin2p3-f6b2ece9
     - FA-ccin2p3-fcad1510
-    commit: ddc99fba
+    commit: eb6c697d
     paths:
     - analysis/kit_benchmark/data/kit_curves_read.json
     - analysis/kit_benchmark/data/kit_fig_A.json
