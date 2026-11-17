@@ -28989,6 +28989,14 @@ entries:
       uugg soft -2.00/-2.16/-1.89; tt threshold beta -1.00 / -0.56 (MLP log+beta) / -1.00; Sudakov sqrt(s) +0.35/+0.53/+0.54;
       transformer flat (-0.71, -0.14, +0.04 ...). The leaky-ReLU MLP on log invariants continues a straight line, right where
       the power law''s slope is set in the bulk (collinear, soft), wrong at threshold.'
+  - at: '2026-11-17T04:37:51+00:00'
+    text: '2026-11-17 @b7d1df5a tools/kit_bulk_slope.py (CC login, first 2e5 bulk_train events, median log10|M|^2 in quarter-decade
+      bins, slope over the lowest decade the bulk reaches): uug soft x -1.99 (bulk x 0.5% quantile 0.087), uug collinear y
+      = min s_qg/s -1.10 (0.011); uugg soft -1.86, collinear (min over qg pairs) -0.84; tt virtual beta -0.59 over beta 0.18..1
+      (0.5% quantile 0.27). Against the hard-bin slopes (kit_vs_mlp SLOPE): the log-invariant MLP continues the bulk''s edge
+      slope: uug -1.98/-0.95 vs truth -2.00/-1.00, tt threshold -0.56 vs bulk edge -0.59 vs truth -1.00. So the MLP''s extrapolation
+      is right where the limit''s power law is already reached in the bulk and wrong at threshold, where it is not. Deck slide
+      3 rewritten with these (c.f. talks/kit_nov2026).'
   step_why:
     20:
       feeds: the KIT NLO statement in the draft
