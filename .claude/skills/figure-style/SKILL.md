@@ -31,6 +31,15 @@ without the text and with at most a glance at a short caption.
   panels (`ps.legend_cell`). Its font may drop to `LEGEND_MIN_PT` (7.5pt) for now.
 - **Captions are short**: what the figure shows and the setting (process, data size, seeds); nothing the figure
   already says, no list of definitions.
+- **Readable, but short** (Joaquin 2026-11-17, "before we swing completely in the other direction"):
+  - one short name per arm, the same in every legend and figure: `from scratch`, `fine-tuned`, never
+    `trained from scratch` in one place and `from scratch` in another;
+  - the training-set size is $D_{\rm train}$ (axis `training events $D_{\rm train}$`, legend `$D_{\rm train}=10^2$`),
+    never a bare $D$;
+  - a scanned parameter has one short name, the same on its colour bar and on any axis that carries it;
+  - the y label of an error is `MSE$(\log|\mathcal{M}|^2)$` alone, never "in the bin / decade / window";
+  - a number drawn in a panel sits on the mark it belongs to (a factor on its arrow), never under the process label;
+  - a tick label is one line.
 
 ## THE INVARIANT — read this before anything else
 

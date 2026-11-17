@@ -11,6 +11,9 @@ tools: SendUserFile
   - a figure reads without the text: what is compared is named on it in plain words (a legend entry, at most two
     lines of 40 characters), each axis defines its quantity, a scanned parameter is a named colour bar, no internal
     names; captions short;
+  - readable but short: one short name per arm everywhere (`from scratch`, `fine-tuned`), $D_{\rm train}$ for the
+    training-set size, one short name for a scanned parameter on its colour bar and axis, y label
+    `MSE$(\log|\mathcal{M}|^2)$` alone, one-line tick labels;
   - the process label names the process only; strata, cuts, energies and counts go in the caption; no other text in
     a panel;
   - true against predicted distributions are drawn by `ps.true_pred_hist`: the ratio directly under its histogram on
