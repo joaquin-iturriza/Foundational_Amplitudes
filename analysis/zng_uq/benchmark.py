@@ -23,7 +23,7 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 PROCS = {1: "zg", 2: "zgg", 3: "zggg", 4: "zgggg"}
 NETS = {"slim": "LGATr-slim", "lloca": "LLoCa-Transformer", "transformer": "Transformer", "mlp": "MLP"}
-OURS = {"A": "ours, scratch", "A_ft": "ours, fine-tuned"}
+OURS = {"A": "from scratch", "A_ft": "fine-tuned"}
 DBINS = np.logspace(-8, 1, 91)          # |Delta| bins
 PBINS = np.linspace(-6, 6, 121)         # pull bins
 
@@ -52,6 +52,8 @@ def collect(theirs, out):
         with h5py.File(os.path.join(os.environ["DATA_DIR"], "zng_uq", f"uq_{p}.h5"), "r") as f:
             truth = np.log(10.0) * f["bulk_test/bulk/log10_me2"][:]
             test_idx = f["split_idx/test"][:]
+            # their paper standardises log|M|^2 with the training set's mean/std (first 5e5 = our n_train)
+            std_train = float(np.std(np.log(10.0) * f["bulk_train/bulk/log10_me2"][:500000]))
         for mode, label in OURS.items():
             for d in sorted(glob.glob(os.path.join(root, f"kit_{mode}_uq_{p}_me2_n500000_t12500*"))):
                 if "smoke" in d:
@@ -63,7 +65,10 @@ def collect(theirs, out):
                     mu = np.log(10.0) * f["bulk_test/bulk/log10_me2"][:]
                 sg = os.path.join(kb, "sigma_ln.npy")
                 sigma = np.load(sg)[-len(mu):] if os.path.exists(sg) else None    # bulk_test is the last block
-                data["runs"][f"{label}|{n}"] = dict(metrics(truth, mu, sigma), run=d, arm=label, n_gluons=n)
+                assert f"{label}|{n}" not in data["runs"], f"{d}: a second run of {label}, n={n}; name the one to read"
+                data["runs"][f"{label}|{n}"] = dict(metrics(truth, mu, sigma), run=d, arm=label, n_gluons=n,
+                                                       std_train_ln=std_train)
+                data["runs"][f"{label}|{n}"]["mse_std"] = data["runs"][f"{label}|{n}"]["mse_log"] / std_train ** 2
         for net, label in NETS.items():
             f = os.path.join(theirs, f"z{n}g", net, "preds_test_0.npz") if theirs else ""
             if not os.path.exists(f):
@@ -78,39 +83,70 @@ def collect(theirs, out):
         print(k, {a: v[a] for a in ("median_abs_delta", "pull_std") if a in v})
 
 
-def plot(path):
+PROC_LAB = {1: r"$q\bar q\to Zg$", 2: r"$q\bar q\to Zgg$", 3: r"$q\bar q\to Zggg$", 4: r"$q\bar q\to Zgggg$"}
+
+
+def plot(path, curves=None, paper=os.path.join(HERE, "data", "paper_mse.json")):
+    """(a) median |Delta| and standardised-log MSE against n, the latter beside their paper's six networks (their own
+    test set); (b) |Delta| on Z+4g; (c) pulls per n against N(0,1); (d) val/train mu-MSE curves per n (curve test)."""
     import sys
     sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
     import plot_style as ps
     ps.use()
     d = json.load(open(path))
-    arms = sorted({v["arm"] for v in d["runs"].values()}, key=lambda a: (a.startswith("ours"), a))
+    col = {"from scratch": ps.C.blue, "fine-tuned": ps.C.vermillion}
     figs = os.path.join(HERE, "figs")
     os.makedirs(figs, exist_ok=True)
-    # (a) median |Delta| against the number of gluons
-    fig, ax = ps.figure()
-    for a in arms:
-        pts = sorted((v["n_gluons"], v["median_abs_delta"]) for v in d["runs"].values() if v["arm"] == a)
-        ax.plot(*zip(*pts), "o-" if a.startswith("ours") else "s--", label=a)
-    ax.set_yscale("log"); ax.set_xlabel("$n$ gluons"); ax.set_ylabel(r"median $|\Delta|$")
-    ax.set_xticks([1, 2, 3, 4]); ax.legend()
+    ours = lambda a, key: sorted((v["n_gluons"], v[key]) for v in d["runs"].values() if v["arm"] == a)
+    # (a)
+    fig, (axl, axr) = ps.figure(2)
+    for a in OURS.values():
+        axl.plot(*zip(*ours(a, "median_abs_delta")), "o-", color=col[a], label=a)
+        axr.plot(*zip(*ours(a, "mse_std")), "o-", color=col[a])
+    pm = json.load(open(paper))["mse"]
+    for net, c in zip(sorted(pm, key=lambda k: pm[k]["Z+4g"]), [ps.C.green, ps.C.orange, ps.C.purple, ps.C.sky,
+                                                                  ps.C.grey, ps.C.yellow]):
+        axr.plot([1, 2, 3, 4], [pm[net][f"Z+{n}g"] for n in (1, 2, 3, 4)], "s--", color=c, label=net.replace("MLP-I", "MLP on invariants") + ", paper")
+    axl.set_ylabel(r"median $|\Delta|$, $\Delta=|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2-1$")
+    axr.set_ylabel(r"MSE of standardised $\log|\mathcal{M}|^2$")
+    for ax in (axl, axr):
+        ax.set_yscale("log"); ax.set_xlabel("number of gluons $n$"); ax.set_xticks([1, 2, 3, 4])
+    ps.legend(axl, "upper left"); ps.legend(axr, "upper left")
     ps.save(fig, os.path.join(figs, "zng_median_delta"))
-    # (b) |Delta| on Z+4g, (c) pulls on Z+4g
-    for key, bins, xl, name, logx in (("hist_abs_delta", d["bins_abs_delta"], r"$|\Delta|$", "zng_delta_z4g", True),
-                                      ("hist_pull", d["bins_pull"], "pull", "zng_pull_z4g", False)):
-        fig, ax = ps.figure()
-        for a in arms:
-            v = d["runs"].get(f"{a}|4")
-            if v and key in v:
-                h = np.asarray(v[key], float)
-                ax.stairs(h / h.sum(), bins, label=a)
-        if logx:
-            ax.set_xscale("log")
-        else:
-            x = np.linspace(-6, 6, 241)
-            ax.plot(x, np.exp(-x**2 / 2) / np.sqrt(2 * np.pi) * (bins[1] - bins[0]), "k:", label=r"$\mathcal{N}(0,1)$")
-        ax.set_xlabel(xl); ax.set_ylabel("fraction of events"); ax.legend()
-        ps.save(fig, os.path.join(figs, name))
+    # (b)
+    fig, ax = ps.figure()
+    for a in OURS.values():
+        h = np.asarray(d["runs"][f"{a}|4"]["hist_abs_delta"], float)
+        ax.stairs(h / h.sum(), d["bins_abs_delta"], color=col[a], label=a)
+    ax.set_xscale("log"); ax.set_xlabel(r"$|\Delta|$, $\Delta=|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2-1$")
+    ax.set_ylabel("fraction of test events"); ps.legend(ax, "upper left"); ps.process_label(ax, PROC_LAB[4])
+    ps.save(fig, os.path.join(figs, "zng_delta_z4g"))
+    # (c)
+    b = np.asarray(d["bins_pull"]); x = np.linspace(b[0], b[-1], 481)
+    fig, axs = ps.figure(2, 2)
+    for n, ax in zip((1, 2, 3, 4), axs.flat):
+        for a in OURS.values():
+            h = np.asarray(d["runs"][f"{a}|{n}"]["hist_pull"], float)
+            ax.stairs(h / h.sum(), b, color=col[a], label=a)
+        ax.plot(x, np.exp(-x ** 2 / 2) / np.sqrt(2 * np.pi) * (b[1] - b[0]), "k:", label=r"$\mathcal{N}(0,1)$")
+        ax.set_xlabel(r"pull $(\ln|\mathcal{M}|^2-\mu)/\sigma$"); ax.set_ylabel("fraction of test events")
+        ps.process_label(ax, PROC_LAB[n])
+    ps.legend(axs[0][0], "upper left")
+    ps.save(fig, os.path.join(figs, "zng_pulls"))
+    # (d)
+    if curves:
+        c = json.load(open(curves))
+        fig, axs = ps.figure(2, 2)
+        for n, ax in zip((1, 2, 3, 4), axs.flat):
+            for m, a in OURS.items():
+                r = c[f"kit_{m}_uq_{PROCS[n]}_me2_n500000_t12500"]
+                st = np.arange(1, len(r["val"]) + 1) * 12500 / len(r["val"])   # evaluations evenly over 12,500 steps
+                ax.plot(st, r["val"], color=col[a], label=a + ", validation")
+                ax.plot(st, r["train"], color=col[a], linestyle="--", label=a + ", training")
+            ax.set_yscale("log"); ax.set_xlabel("training step"); ax.set_ylabel(r"MSE$(\mu)$")
+            ps.process_label(ax, PROC_LAB[n])
+        ps.legend(axs[0][0], "lower left")
+        ps.save(fig, os.path.join(figs, "zng_curves"))
 
 
 def main():
@@ -119,8 +155,9 @@ def main():
     ap.add_argument("--theirs", default=os.path.join(os.environ.get("WORK", ""), "ext", "uq_runs", "runs", "prod_het"))
     ap.add_argument("--out", default=os.path.join(HERE, "data", "benchmark.json"))
     ap.add_argument("--data", default=os.path.join(HERE, "data", "benchmark.json"))
+    ap.add_argument("--curves", default=os.path.join(HERE, "data", "zng_curves.json"))
     a = ap.parse_args()
-    collect(a.theirs, a.out) if a.cmd == "collect" else plot(a.data)
+    collect(a.theirs, a.out) if a.cmd == "collect" else plot(a.data, a.curves)
 
 
 if __name__ == "__main__":
