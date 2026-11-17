@@ -34169,18 +34169,12 @@ entries:
   - D477
   - D478
   next:
-    1: 'Setup: scripts/job_zng_fetch.sh on CC (Zenodo archives, tools/zng_uq.py convert with the UQ repo''s split, d d~ >
-      Z+ng sidecars, |M|^2 cross-check d d~ and u u~ on 100 test events each)'
-    2: 'Eval-only on what we have: trial 1262 zero-shot (catalog_v4, trained on b b~ > Z+1..3g, same class as d d~) and the
-      u-flavour Z+ng models (highmult Z+4g MSE scratch/fine-tunes, het Zg/Zgg/Zggg cells) on their 1e6 test events per multiplicity
-      (u models shifted by the cross-check''s constant); median |Delta|, |Delta| on Z+4g, pulls where sigma exists; caption
-      ''our existing models, not trained on their data'''
-    3: 'Trainings on their data (scratch per multiplicity with the latest setup, fine-tune from trial 1262), HETEROSC + sigma
-      stage, on 5e5 train events: the design and its HP route wait on Joaquin''s answer (pretraining choice, DyHPO vs template
-      defaults, GPU-h)'
-    4: 'Their networks'' numbers by running their repo (lloca-experiments-uq, branch uq) on the same test events: median |Delta|
-      per multiplicity and pulls for LGATr-slim, LLoCa-Transformer, Transformer, MLP, instead of asking Joaquin for files;
-      GPU-h first if above 30.'
+    1: 'Our trainings on their data: smoke (2 jobs, Z+4g, 50 steps, scratch and fine-tune from trial 1262), then 8 jobs scratch
+      and fine-tune x Z+1..4g, 12,500 steps, HPs of kit_hpo_uugg_T hp1196, job_kit.sh, float32, scored on their 1e6 test events'
+    2: 'Their networks (LGATr-slim, LLoCa-Transformer, Transformer, MLP, het) by their own code (scripts/job_uq_ext.sh): timing
+      check, then their production per multiplicity (no public checkpoints exist)'
+    3: Eval-only of existing models (trial 1262 zero-shot, u-flavour Z+ng models shifted by 0.779805) on their 1e6 test events
+      per multiplicity; needs its own design and a rebuild path for the multi-process 1262
   done_when: null
   notes_ref: null
   match: zng_uq_*,tp*_zng_*
@@ -34452,30 +34446,22 @@ entries:
       --cfg job; their production gated on time_check and Joaquin above 30 GPU-h.'
   step_why:
     1:
-      feeds: whether any run or evaluation on their events compares like with like
-      if:
-      - 'YES (one constant per process, split exact): steps 2 and 3 read uq_<proc>.h5'
-      - 'NO (spread or split mismatch): fix the converter or find the convention before anything reads the files'
-    2:
-      feeds: what our current models give on their benchmark before any training on it (Joaquin 2026-11-17)
-      if:
-      - 'a model within 3x of their median |Delta|: report as is'
-      - 'every model far above (out of support, sqrt(s) to 5.7 TeV): report the in-support subset beside the whole set'
-    3:
       feeds: 'the entry''s question: our latest setup against their networks on median |Delta|, the Z+4g |Delta| distribution
         and pulls'
       if:
-      - 'Joaquin picks an option: record the design, review, submit at site pick''s width'
-      - 'he changes the parent or horizon: redo the cost before the configs'
-    4:
-      feeds: the comparison curves of the Z+ng UQ figures
+      - 'smoke ends all stages: batch of 8 at the smoke''s s/step'
+      - 'smoke fails: fix the path, rerun the smoke'
+    2:
+      feeds: the reference numbers on the same test events
       if:
-      - 'their numbers produced: put them on our axes'
-      - 'their training costs above 30 GPU-h: give Joaquin the estimate'
-  step_waits:
-    '1': FA-ccin2p3-32145d4b
-    '3': a design reviewer
-    '2': FA-ccin2p3-32145d4b
+      - 'production <= 30 GPU-h: submit 4 jobs'
+      - 'above 30 GPU-h: to Joaquin with the cost, beside asking the authors for their prod_het_v1 preds_test_0.npz'
+    3:
+      feeds: what our current models give on their benchmark before any training on it
+      if:
+      - 'a model within 3x of their median |Delta|: report as is'
+      - 'every model far above: report the in-support subset beside the whole set'
+  step_waits: {}
   findings:
   - at: '2026-11-17T11:18:43+00:00'
     text: 'Their numbers: the UQ repo (branch uq, 311 files) holds no figures, preds or result files. arXiv:2505.20280''s
