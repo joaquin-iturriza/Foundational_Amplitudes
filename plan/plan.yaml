@@ -34151,6 +34151,9 @@ entries:
     3: 'Trainings on their data (scratch per multiplicity with the latest setup, fine-tune from trial 1262), HETEROSC + sigma
       stage, on 5e5 train events: the design and its HP route wait on Joaquin''s answer (pretraining choice, DyHPO vs template
       defaults, GPU-h)'
+    4: 'Their networks'' numbers by running their repo (lloca-experiments-uq, branch uq) on the same test events: median |Delta|
+      per multiplicity and pulls for LGATr-slim, LLoCa-Transformer, Transformer, MLP, instead of asking Joaquin for files;
+      GPU-h first if above 30.'
   done_when: null
   notes_ref: null
   match: zng_uq_*,tp*_zng_*
@@ -34259,6 +34262,11 @@ entries:
       if:
       - 'Joaquin picks an option: record the design, review, submit at site pick''s width'
       - 'he changes the parent or horizon: redo the cost before the configs'
+    4:
+      feeds: the comparison curves of the Z+ng UQ figures
+      if:
+      - 'their numbers produced: put them on our axes'
+      - 'their training costs above 30 GPU-h: give Joaquin the estimate'
   step_waits:
     '1': FA-ccin2p3-32145d4b
     '3': a design reviewer
