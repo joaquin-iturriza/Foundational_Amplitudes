@@ -37,6 +37,46 @@
 
 \begin{document}
 
+\begin{frame}{Extrapolation into the limits}
+  \centering\fig{kitvm_median_nofactor_ee_uug_me2.pdf}
+\end{frame}
+
+\begin{frame}{Extrapolation into the limits}
+  \centering\fig{kitvm_median_nofactor_ee_tt_virt_finite.pdf}
+\end{frame}
+
+\begin{frame}{Log invariants extrapolate almost by chance}
+  \vfill
+  \[ |\mathcal{M}|^2 \propto y^{-1}\ \ (\text{collinear}),\qquad |\mathcal{M}|^2 \propto x^{-2}\ \ (\text{soft})
+     \quad\Longrightarrow\quad \log|\mathcal{M}|^2 \ \text{linear in}\ \log y,\ \log x \]
+  \vspace{1em}
+  \begin{itemize}
+    \item The MLP reads $\log s_{ij}$ through leaky ReLUs: piecewise linear, so past the training range it continues its last straight line
+    \item Right when the limit's slope is already set in the bulk: $-0.95$ against $-1.00$ (collinear), $-1.98$ against $-2.00$ (soft)
+    \item Wrong when it is not: $t\bar t$ threshold $-0.56$ against $-1.00$, even with $\log(s_{t\bar t}-4m_t^2)$ as input
+  \end{itemize}
+  \vfill
+\end{frame}
+
+\begin{frame}{Asymptotic factor}
+  \vfill
+  \[ \log|\mathcal{M}|^2 = \log\Big(\sum_t e^{\,c_t(x)}\,D_t(x) + e^{\,r(x)}\Big) \]
+  \vspace{1em}
+  \begin{itemize}
+    \item $D_t$ the known singular structures: Catani Seymour dipoles $\frac{s}{s_{ij}}V_{ij,k}$, Coulomb $1/\beta$, Sudakov $\log^2(s/m_t^2)$
+    \item The transformer learns the coefficients $c_t$ and a bounded remainder $r$, not the divergence: in a limit one $D_t$ dominates and its form is exact
+  \end{itemize}
+  \vfill
+\end{frame}
+
+\begin{frame}{Extrapolation into the limits}
+  \centering\fig{kitvm_median_ee_uug_me2.pdf}
+\end{frame}
+
+\begin{frame}{Extrapolation into the limits}
+  \centering\fig{kitvm_median_ee_tt_virt_finite.pdf}
+\end{frame}
+
 \begin{frame}{Asymptotic factor fixes the singular limits}
   \centering\fig{kitvm_mse_ee_uug_me2.pdf}
 \end{frame}
@@ -47,14 +87,6 @@
 
 \begin{frame}{Top pairs at one loop}
   \centering\fig{kitvm_mse_ee_tt_virt_finite.pdf}
-\end{frame}
-
-\begin{frame}{Extrapolation into the limits}
-  \centering\fig{kitvm_median_ee_uug_me2.pdf}
-\end{frame}
-
-\begin{frame}{Extrapolation into the limits}
-  \centering\fig{kitvm_median_ee_tt_virt_finite.pdf}
 \end{frame}
 
 \begin{frame}{Deepest bins}

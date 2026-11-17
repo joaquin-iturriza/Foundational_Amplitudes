@@ -265,24 +265,36 @@ def plot(figs):
             med[sym] = {f: [[row[0], row[1], float(np.median([s[f][i][2] for s in seeds])), row[3]]
                             for i, row in enumerate(seeds[0][f])] for f in mf}
             assert all([q[0] for q in s[f]] == [q[0] for q in seeds[0][f]] for s in seeds for f in mf)
-        # the y range is the truth's, widened by its own span (at least a decade) each side; beyond it, off the scale
-        fig, axs, spare = _grid(len(mf))
-        for ax, fam in zip(axs, mf):
-            ty = [y for _, y in tr["median"][fam]]
-            pad = max(1.0, max(ty) - min(ty))
-            lo, hi = min(ty) - pad, max(ty) + pad
-            ax.plot(*zip(*tr["median"][fam]), "-", color="k", label="truth")
-            for sym, m in med.items():
-                c, mk, ls = sty[sym]
-                if clip_plot(ax, [q[0] for q in m[fam]], [q[2] for q in m[fam]], lo, hi, lambda v: f"{v:+.0f}",
-                             marker=mk, ls=ls, color=c, label=NAME[sym]):
-                    off_entry(ax)
-            ax.set_xscale("log"); ax.xaxis.set_minor_formatter(NullFormatter())
-            ax.set_xlabel(XLAB.get(fam, fam))
-            ax.set_ylabel(r"median $\log_{10}|\mathcal{M}|^2$")
-            ps.process_label(ax, PROCESS[p], loc="upper right")
-        _legend(axs, spare, PROCESS[p], LEG_AT["median"][p])
-        written.append(ps.save(fig, os.path.join(figs, f"kitvm_median_{p}")))
+        # the y range is the truth's, widened by its own span (at least a decade) each side; beyond it, off the scale;
+        # drawn with every model and, for the deck's opening (Joaquin 2026-11-17), without the factor
+        for fname, drop in ((f"kitvm_median_{p}", ()), (f"kitvm_median_nofactor_{p}", ("factor",))):
+            fig, axs, spare = _grid(len(mf))
+            for ax, fam in zip(axs, mf):
+                ty = [y for _, y in tr["median"][fam]]
+                pad = max(1.0, max(ty) - min(ty))
+                lo, hi = min(ty) - pad, max(ty) + pad
+                ax.plot(*zip(*tr["median"][fam]), "-", color="k", label="truth")
+                for sym, m in med.items():
+                    if sym in drop:
+                        continue
+                    c, mk, ls = sty[sym]
+                    if clip_plot(ax, [q[0] for q in m[fam]], [q[2] for q in m[fam]], lo, hi, lambda v: f"{v:+.0f}",
+                                 marker=mk, ls=ls, color=c, label=NAME[sym]):
+                        off_entry(ax)
+                ax.set_xscale("log"); ax.xaxis.set_minor_formatter(NullFormatter())
+                ax.set_xlabel(XLAB.get(fam, fam))
+                ax.set_ylabel(r"median $\log_{10}|\mathcal{M}|^2$")
+                ps.process_label(ax, PROCESS[p], loc="upper right")
+            _legend(axs, spare, PROCESS[p], LEG_AT["median"][p])
+            written.append(ps.save(fig, os.path.join(figs, fname)))
+        # the slope d median log10|M|^2 / d log10 x over the deeper half of the bins (sqrt(s): the higher half), a
+        # least-squares line, truth and each model: does a model continue the truth's power law into the limit
+        for fam in mf:
+            deep = lambda rows: sorted(rows, key=lambda r: -r[0] if fam == "sudakov_sqrts" else r[0])[:len(rows) // 2]
+            fit = lambda rows: np.polyfit(np.log10([r[0] for r in rows]), [r[1] for r in rows], 1)[0]
+            print(f"SLOPE {p} {fam} deeper half: truth {fit(deep(tr['median'][fam])):+.3f} " + " ".join(
+                f"{NAME[sym].replace(chr(10), ' ')} {fit(deep([(q[0], q[2]) for q in m[fam]])):+.3f};"
+                for sym, m in med.items()))
     # (4) bulk MSE per process
     fig, ax = ps.figure()
     for j, sym in enumerate(sty):
