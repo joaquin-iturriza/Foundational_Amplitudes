@@ -35580,6 +35580,31 @@ entries:
       npz q MSE 0.2791 recomputed, truth matches local pool to 7e-7; offset 0.194 vs per-event sd 0.0094 (20x). Check 3: one
       seed, 8 seeds agree to 1.7e-4. Check 5 searched: DlessInOrd_sigstage, evaluate_daniels, sigma_stage, bbx_hh in docs/results.tex,
       plan, analysis scripts, site decisions (D489 D490 D395 D276): no earlier GPU re-read. Eval-only, ~0.1 GPU-h, disk trivial.'
+  - at: '2026-11-17T20:09:51+00:00'
+    question: Where in the forward pass does the CPU read of the DlessInOrd sigma-stage model part from the GPU read (CPU
+      log|M|^2 0.194 low, MSE 0.4173 vs 0.2791 on the first 2000 dc_bbx_hh val events)? Eval-only diagnostic of the D489/D490
+      evaluator. REREAD=FA-ccin2p3-c3e63032.
+    prior: 'GPU check FA-ccin2p3-c3e63032 (this entry, design passed 2026-11-17T19:45): evaluate.py (model copy and run dir)
+      and zero_shot_parent all give 0.2791 on GPU, so weights, wrapper and code drift are out; CPU gives 0.4173 locally and
+      today on the CC login node with CC''s own packages (torch 2.1.2+cu118, lloca 111caa04, xformers hidden): package versions
+      are out. Local CPU variants LLOCA_FRAMES=repeat and training.dtype=float64 both give 0.4173. Searched docs/results.tex,
+      plan, decisions (D489 D490 D395) for layer dump, CPU vs GPU, xformers: no earlier per-layer comparison.'
+    measure: 'One GPU job (scripts/job_layer_dump.sh at the submit commit): evaluate_daniels_catalog/layer_dump.py dumps each
+      of the 181 module outputs of the forward pass (first 20000 entries, mean, rms) for (1) GPU with xformers, (2) GPU with
+      xformers hidden (dense masked attention), (3) CPU on the same node; plus each read''s MSE of log|M|^2 and mean q-t.
+      Compared call by call: max|diff|/max|value|, first call above 1e-3.'
+    check: Locally the dump reproduces the CPU read (MSE 0.4173, mean q-t -0.4394, 181 calls) and a CPU dump against itself
+      compares at 0 everywhere; reads (1) and (3) differ by 0.194 in mean output, so some call must pass 1e-3.
+    fixed: Weights (evaluate_daniels_catalog/model = DlessInOrd sigma stage), the 2000 events, code at the submit commit,
+      seed 42 (output seed-independent to 1.7e-4), one eval batch.
+    control: (1) vs (3) on the same node is the CPU/GPU contrast; (2) separates the attention kernel from everything else
+      device-dependent; (1)'s MSE must be 0.2791 (= c3e63032) and (3)'s 0.4173.
+    seeds: One (deterministic eval; seeds agree to 1.7e-4).
+    outcome: '(2)=(1)=0.2791 and the first difference to (3) is a named module: that module''s CPU path is the bug, fixed
+      and re-checked locally to 0.2791. (2)=(3)=0.4173: the attention kernel (xformers vs dense mask) is the difference; compare
+      the first LLoCaAttention call and fix the dense path. First difference at call 0: the inputs differ by device, traced
+      in the data path. No call above 1e-3 yet MSE differs: the difference is in the scorer after the model, traced there.
+      Cost ~0.1 GPU-h.'
   step_why:
     1:
       feeds: whether catalog_v4's best pretraining zero-shots Daniel's held-out processes better than the arms trained on
