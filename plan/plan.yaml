@@ -34580,6 +34580,11 @@ entries:
       arXiv:2505.20280) and a Zenodo search for lloca hold none; their production runs (runs/prod_het_v1, preds_test_0.npz
       per network on the same data_seed-0 split) live on their clusters nemo (/work/classic/hd_md186-amp_uq) and ITP (/remote/gpu03/dubey/amp_uq)
       per uq_ops/jobs/site.sh.'
+  - at: '2026-11-17T12:06:28+00:00'
+    text: '2026-11-17 main session: their trained networks are not public (repo branch uq: no checkpoints, no releases, only
+      data/toptagging_mini.npz; Zenodo 16793011: only the five data archives, related arXiv:2505.20280). Their numbers need
+      their networks trained with their code; the owner gives the GPU-h (all 4 networks x 4 multiplicities, and a cheaper
+      LLoCa-Transformer + LGATr-slim version) to Joaquin before anything runs.'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
