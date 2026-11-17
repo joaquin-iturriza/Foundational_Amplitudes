@@ -2,7 +2,7 @@
 log|M|^2 at the best checkpoint) against the fine-tune events D, 8k grid, for scratch, rung 0 (ee->uu), rung 9,
 synthetic and finale on the twelve ladder probes; scratch, the star arm and the finale on the six star-arm probes. A
 cell is drawn once finished (finale_synth.cell: a search with its 5 trials in, or its fixed run at the reference point).
-  figs/finale_synth_scaling_<ee|qcd|arm>_a..f, _legend
+  figs/finale_synth_scaling_<ee|qcd|arm> (one file each)
     python analysis/transfer/finale_synth_scaling.py
     python analysis/transfer/finale_synth_scaling.py --paper   -> figs/finale_synth_paper_<ee|qcd>: the paper draft's
         version: scratch, the rung below the probe's structure and the first rung with it (rung_grid.FOCUS), synthetic,
@@ -33,27 +33,32 @@ def curve(ax, xs, ys, **kw):
 
 
 def draw(part, probes, fams, labels):
-    figs = ps.panels(len(probes))
-    for (fig, ax), p in zip(figs, probes):
+    """One file per figure (Joaquin 2026-11-17), six panels in three rows of two, each with its own legend where its
+    curves differ from the others' (the paper's steps), else one legend on the first panel."""
+    fig, axs = ps.figure(ncols=2, nrows=3)
+    for i, (ax, p) in enumerate(zip(axs.flat, probes)):
         K = list(range(2, 9))
         D = [10 ** (k / 2) for k in K]
         curve(ax, D, [scratch(p, k, steered=False)[0] for k in K], **SCR)
         for f, lab, c, m in fams(p):
             curve(ax, D, [cell(f, p, k) for k in K], color=c, marker=m, label=lab)
         ax.set_xscale("log"); ax.set_yscale("log")
-        ax.set_xlabel(r"training events $D$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
+        ax.set_xlabel(r"fine-tuning events $D$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
         ps.process_label(ax, labels[p])
-    a0 = max((ax for _, ax in figs), key=lambda ax: len(ax.get_legend_handles_labels()[1]))   # the fullest panel
-    ps.legend_strip(a0, os.path.join(FIGS, f"{BASE}_{part}_legend"), ncol=5)
-    ps.save_panels(figs, os.path.join(FIGS, f"{BASE}_{part}"))
+        if PAPER or i == 0:
+            ps.legend(ax, "lower left", fontsize=ps.LEGEND_MIN_PT)
+    ps.save(fig, os.path.join(FIGS, f"{BASE}_{part}"))
 
 
 if PAPER:
+    def upto(r):    # as rung_focus.upto (importing rung_focus draws its figures)
+        return r"$e^+e^-\to u\bar u$ only" if r == 0 else ("ladder step 1" if r == 1 else f"ladder steps 1-{r}")
+
     def fams(p):
         r = FOCUS[p]
-        return [(fam(r - 1), "rung below", ps.C.blue, "o"), (fam(r), "first rung with the structure", ps.C.vermillion, "s"),
-                ("tp3_synfte", "synthetic", ps.C.green, "^"), ("tp3_finfte", "every structure", ps.C.orange, "D")]
-    LAB = {p: LAB[p] + f"\nrung {FOCUS[p] - 1} vs {FOCUS[p]}" for p in P}
+        return [(fam(r - 1), upto(r - 1), ps.C.blue, "o"), (fam(r), upto(r), ps.C.vermillion, "s"),
+                ("tp3_synfte", "synthetic amplitudes", ps.C.green, "^"),
+                ("tp3_finfte", "ladder steps 1-9 + every star arm", ps.C.orange, "D")]
 else:
     fams = lambda p: LADDER  # noqa: E731
 draw("ee", P[:6], fams, LAB)
