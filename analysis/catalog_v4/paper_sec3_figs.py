@@ -73,55 +73,75 @@ def strip(row, base, span=1, **kwargs):
 
 
 def scatter(groups, xlab, ylab, base, row=(), span=1):
-    """One point per class and set; its legend a strip across the row, with the entries of `row`'s other panels."""
+    """One point per class and set, saved alone with its legend strip (the figures outside the draft)."""
     fig, ax = ps.figure(width="half")
+    scatter_ax(ax, groups, xlab, ylab, base)
+    ps.save(fig, os.path.join(FIGS, base))
+    strip([(fig, ax)] + list(row), os.path.join(FIGS, base + "_legend"), span=span, markerscale=2.5)
+
+
+def scatter_ax(ax, groups, xlab, ylab, name, legend="lower right"):
+    """One point per class and set on `ax`, the y = x line, the legend inside (Joaquin 2026-11-17: one file per
+    figure, legend inside, entries in plain words)."""
     lo = min(min(g[1].min(), g[2].min()) for g in groups)
     hi = max(max(g[1].max(), g[2].max()) for g in groups)
     ax.plot([lo, hi], [lo, hi], color=ps.C.grey, ls="--", label=r"$y=x$")
     for (lab, x, y), c in zip(groups, COLS):
         ax.scatter(x, y, color=c, alpha=0.45, s=6, linewidths=0, label=lab, rasterized=True,
                    zorder=2 + 1 / len(x))   # smaller sets on top: a large set drawn later would cover them
-        print(f"  {os.path.basename(base)} {lab}: {len(x)} classes, median y/x {np.median(y / x):.3g}, "
+        print(f"  {name} {lab!r}: {len(x)} classes, median y/x {np.median(y / x):.3g}, "
               f"medians x {np.median(x):.3g} y {np.median(y):.3g}")
     ax.set_xscale("log"); ax.set_yscale("log")
     pad = (hi / lo) ** 0.04
     ax.set_xlim(lo / pad, hi * pad); ax.set_ylim(lo / pad, hi * pad)
     ax.set_xlabel(xlab); ax.set_ylabel(ylab)
-    ps.save(fig, os.path.join(FIGS, base))
-    strip([(fig, ax)] + list(row), os.path.join(FIGS, base + "_legend"), span=span, markerscale=2.5)
+    if legend:
+        ps.legend(ax, legend, markerscale=2.5)
 
 
-SETS = (("pp test", ("PP4",)), (r"$e^+e^-$ test", ("EE4",)), ("held out", ("held",)),
-        ("held out, MadEvent", ("HD4", "HD5")))
+SETS = (("$pp$ processes in the pretraining,\nsampled from PDFs", ("PP4",)),
+        ("$e^+e^-$ processes in the pretraining", ("EE4",)),
+        ("held-out processes, our sampling", ("held",)),
+        ("held-out processes,\nMadEvent's default sampling", ("HD4", "HD5")))
 
 
 def pidqn():
+    """Particle encoding: one file, the per-class scatter (left) and the zero-shot histogram of the pretraining
+    without tau, nu_tau and quartic vertices (right)."""
     g = pair_sets(m.PIDQN["qn"], m.PIDQN["pid"], SETS, m.class_of())
-    scatter(g, f"{MSE_LAB}, quantum numbers", f"{MSE_LAB}, one-hot", "paper_pidqn", row=[unseen()])
+    fig, (a, b) = ps.figure(ncols=2)
+    scatter_ax(a, g, f"{MSE_LAB}, particles encoded\nby their quantum numbers",
+               f"{MSE_LAB}, particles encoded\nby particle IDs", "paper_pidqn", legend="upper left")
+    unseen(b)
+    ps.save(fig, os.path.join(FIGS, "paper_pidqn"))
 
 
 def muon():
+    """Optimizer: one file, the per-class scatter and the three true-against-predicted examples (2x2)."""
     import muon_long as ml
     g = pair_sets(ml.RUNS["muon"], ml.RUNS["adamw"], SETS, m.class_of())
-    scatter(g, f"{MSE_LAB}, Muon", f"{MSE_LAB}, AdamW", "paper_muon", span=2)   # beside an example panel
+    fig, axs = ps.figure(ncols=2, nrows=2)
+    scatter_ax(axs[0][0], g, f"{MSE_LAB}, Muon optimizer", f"{MSE_LAB}, AdamW optimizer", "paper_muon",
+               legend="upper left")
+    examples([axs[0][1], axs[1][0], axs[1][1]])
+    ps.save(fig, os.path.join(FIGS, "paper_muon"))
 
 
 
 
-def examples():
+def examples(axes):
     import muon_long as ml
     col = {"muon": ps.C.blue, "adamw": ps.C.vermillion}
-    lab = {"muon": "Muon", "adamw": "AdamW"}
+    lab = {"muon": "Muon optimizer", "adamw": "AdamW optimizer"}
     h = {k: json.load(open(os.path.join(m.READS, f"{run}_hists.json"))) for k, run in ml.RUNS.items()}
     mu = m.read_of(ml.RUNS["muon"], "PP4")
     keys = sorted((p for p in mu if f"PP4:{p}" in h["muon"] and f"PP4:{p}" in h["adamw"]), key=lambda p: mu[p])
     pick = [keys[int(q * (len(keys) - 1))] for q in (0.1, 0.5, 0.9)]
-    figs = ps.panels(3, width="half")
     REB = 4                              # the records' bins merged by four: the ratio is otherwise counting noise
     def rebin(e, c):
         n = (len(c) // REB) * REB
         return e[:n + 1:REB], np.add.reduceat(np.asarray(c[:n], float), np.arange(0, n, REB))
-    for (fig, ax), p in zip(figs, pick):
+    for i, (ax, p) in enumerate(zip(axes, pick)):
         models = []
         for k in ("muon", "adamw"):     # each run's record bins truth and prediction on its own edges
             rec = h[k][f"PP4:{p}"]
@@ -130,8 +150,8 @@ def examples():
             models.append(dict(label=lab[k], edges=ek, truth=t, pred=q, style=dict(color=col[k])))
         ps.true_pred_hist(ax, models, ratio=(0, 2), xlabel=r"$\log|\mathcal{M}|^2$")
         ps.process_label(ax, ml.process_tex(p))
-        ps.legend(ax, "upper left")
-    ps.save_panels(figs, os.path.join(FIGS, "paper_muon_examples"))
+        if i == 0:
+            ps.legend(ax, "upper left")
 
 
 FT_PROBES = {"v3_dg_dgwpwm": r"$dg\to dgW^+W^-$", "v3_usx_cxuwpz": r"$u\bar s\to \bar c uW^+Z$",
@@ -140,26 +160,26 @@ FT_PROBES = {"v3_dg_dgwpwm": r"$dg\to dgW^+W^-$", "v3_usx_cxuwpz": r"$u\bar s\to
 
 def ft():
     d = json.load(open(os.path.join(ROOT, "analysis", "catalog_v3", "data", "muon_ft.json")))
-    arms = (("dimensionless", "AdamW", ps.C.vermillion, "AdamW"),
-            ("dimensionless_muon", "MuonAdamW", ps.C.blue, "Muon"))
+    arms = (("dimensionless", "AdamW", ps.C.vermillion, "AdamW optimizer"),
+            ("dimensionless_muon", "MuonAdamW", ps.C.blue, "Muon optimizer"))
     fig, axs = ps.figure(ncols=2, nrows=2)
     for ax, (p, name) in zip(axs.flat, FT_PROBES.items()):
         for parent, opt, c, lab in arms:
             rs = sorted((r for r in d if r["kind"] == "catft_parentstats" and r["parent"] == parent
                          and r["optimizer"] == opt and r["probe"] == p), key=lambda r: r["D"])
             ax.plot([r["D"] for r in rs], [r["mse_log"] for r in rs], "o-", color=c, label=f"{lab}, fine-tuned")
-            ax.axhline(rs[0]["mse_log_step0"], color=c, ls=":", label=f"{lab}, zero shot")
+            ax.axhline(rs[0]["mse_log_step0"], color=c, ls=":", label=f"{lab}, before fine-tuning")
             print(f"  ft {p} {lab}: zero shot {rs[0]['mse_log_step0']:.3g}, D=10 {rs[0]['mse_log']:.3g}, "
                   f"D=316 {rs[-1]['mse_log']:.3g}")
         sc = sorted((r for r in d if r["kind"] == "scratch" and r["probe"] == p), key=lambda r: r["D"])
-        ax.plot([r["D"] for r in sc], [r["mse_log"] for r in sc], "s--", color=ps.C.grey, label="scratch")
+        ax.plot([r["D"] for r in sc], [r["mse_log"] for r in sc], "s--", color=ps.C.grey, label="trained from scratch")
         ax.set_xscale("log"); ax.set_yscale("log")
         ys = [l.get_ydata() for l in ax.lines]
         ax.set_ylim(0.7 * min(np.min(y) for y in ys), 4 * max(np.max(y) for y in ys))   # headroom: the process label sits above the zero-shot lines
-        ax.set_xlabel(r"training events $D$"); ax.set_ylabel(MSE_LAB)
+        ax.set_xlabel(r"target training events $D$"); ax.set_ylabel(MSE_LAB)
         ps.process_label(ax, name)
+    ps.legend(axs.flat[0], "lower left")
     ps.save(fig, os.path.join(FIGS, "paper_muon_ft"))
-    strip([(fig, axs.flat[0])], os.path.join(FIGS, "paper_muon_ft_legend"))
 
 
 def pp():
@@ -189,7 +209,8 @@ def target():
     res = json.load(open(os.path.join(ROOT, "analysis", "catalog_v3", "data", "short_reads.json")))
     extra = ("H2p5", "H7E")
     groups = []
-    for grp, lab in ((None, "in range"), ("H2p5", r"$2\to5$"), ("H7E", r"$1$-$10$ TeV")):
+    for grp, lab in ((None, "held out, particle number\nand energies as in pretraining"), ("H2p5", "held out, one particle more\nthan in pretraining"),
+                     ("H7E", "held out, energies above\npretraining (1 to 10 TeV)")):
         xs, ys = [], []
         for a in res["baseline"]:
             if (a if a in extra else None) != grp or a not in res["dimensionless"]:
@@ -198,7 +219,12 @@ def target():
             for p in sorted(set(px) & set(py)):
                 xs.append(px[p]["mse"]); ys.append(py[p]["mse"])
         groups.append((lab, np.array(xs), np.array(ys)))
-    scatter(groups, f"{MSE_LAB}, " + r"$\log|\mathcal{M}|^2$ in GeV", f"{MSE_LAB}, " + r"target $T$", "paper_target", span=2)   # beside paper_inputs
+    fig, (a, b) = ps.figure(ncols=2)
+    scatter_ax(a, groups, "zero-shot " + MSE_LAB + ",\n" + r"trained on $\log|\mathcal{M}|^2$ in GeV",
+               "zero-shot " + MSE_LAB + ",\n" + r"trained on dimensionless $\log|\mathcal{M}|^2$", "paper_target",
+               legend="upper left")
+    inputs(b)
+    ps.save(fig, os.path.join(FIGS, "paper_target"))
 
 
 def pp_direct():
@@ -216,6 +242,8 @@ def pp_direct():
 
 
 def pp_bound():
+    """Sampling: per class on the 13 TeV pp test sets, the pretraining with our sampling against the one whose pp
+    classes train only on PDF-sampled MadEvent events; one file, legend inside."""
     cls = m.class_of()
     import yaml
     trained = {cls(q["name"]) for q in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v4_base_train.yaml")))["processes"]}
@@ -224,29 +252,32 @@ def pp_bound():
     keys = set(x) & set(y)
     a, c = by_class({k: x[k] for k in keys}, cls), by_class({k: y[k] for k in keys}, cls)
     groups = []
-    for lab, keep in (("trained", lambda q: q in trained), ("held out", lambda q: q not in trained)):
+    for lab, keep in (("$pp$ processes in both pretrainings", lambda q: q in trained),
+                      ("$pp$ processes held out of both", lambda q: q not in trained)):
         cs = sorted(q for q in set(a) & set(c) if keep(q))
         groups.append((lab, np.array([a[q] for q in cs]), np.array([c[q] for q in cs])))
     from analysis.common import ratio_stats
     for lab, xs, ys in groups:   # catalog over pp-only per class: n_num_lower = classes where the catalog is lower
         r = ys / xs
         print(f"  pp_bound {lab}: catalog/pp-only {ratio_stats(ys, xs)}, min {r.min():.3g} at pp-only MSE {xs[r.argmin()]:.3g}")
-    scatter(groups, f"{MSE_LAB}, pp events only", f"{MSE_LAB}, catalog", "paper_pp_bound")
-
-
-def unseen():
-    t = json.load(open(os.path.join(ROOT, "analysis", "catalog_v3", "data", "short_reads.json")))["dimensionless_twin"]
     fig, ax = ps.figure(width="half")
+    scatter_ax(ax, groups, f"{MSE_LAB}, pretrained on $pp$\nevents sampled from PDFs only",
+               f"{MSE_LAB}, pretrained on\nour mixture of sampling techniques", "paper_pp_bound", legend="upper left")
+    ps.save(fig, os.path.join(FIGS, "paper_pp_bound"))
+
+
+def unseen(ax):
+    t = json.load(open(os.path.join(ROOT, "analysis", "catalog_v3", "data", "short_reads.json")))["dimensionless_twin"]
     vals = {a: np.array([v["mse"] for v in t[a]["probes"].values()]) for a in ("H1", "H4", "H3p")}
     bins = np.logspace(np.log10(min(v.min() for v in vals.values())) - 0.05,
                        np.log10(max(v.max() for v in vals.values())) + 0.05, 16)
-    for (a, lab), c in zip((("H1", "new combinations"), ("H4", "quartic vertex unseen"),
-                            ("H3p", r"$\tau$, $\nu_\tau$ unseen")), COLS):
+    for (a, lab), c in zip((("H1", "only seen particles and vertices"), ("H4", "with a quartic vertex never seen"),
+                            ("H3p", r"with $\tau$ or $\nu_\tau$, never seen")), COLS):
         ax.hist(vals[a], bins=bins, weights=np.full(len(vals[a]), 1 / len(vals[a])), histtype="step", color=c, label=lab)
         print(f"  unseen {lab}: {len(vals[a])} processes, median {np.median(vals[a]):.3g}")
-    ax.set_xscale("log"); ax.set_xlabel(f"zero-shot {MSE_LAB}"); ax.set_ylabel("fraction of processes")
-    ps.save(fig, os.path.join(FIGS, "paper_unseen"))   # its legend joins the pidqn row's strip
-    return fig, ax
+    ax.set_xscale("log"); ax.set_xlabel(f"zero-shot {MSE_LAB},\n" + r"pretrained without $\tau$, $\nu_\tau$, quartic vertices")
+    ax.set_ylabel("fraction of held-out processes")
+    ps.legend(ax, "upper right")
 
 
 # The 448-process pretraining's single-seed arms at the baseline's best HPs, 8601 steps: geometric mean and 90th
@@ -255,29 +286,28 @@ def unseen():
 # sec:bigrun (whose reference is the 'no diagram encoder, linear embedding' arm, GM 3.85e-4 in both tables)
 # no diagrams, linear = linear embedding and no diagram encoder (the lowest; not what the catalog pretrainings use, which
 # keep the diagram encoder at a linear embedding, the "linear embedding" arm); pair bias = added to it
-BIGRUN = {"no diagrams, linear": (3.85e-4, 0.12),
-          "no diagrams": (3.88e-4, 0.10),
-          "linear embedding": (4.86e-4, 0.056),
-          "pair bias": (5.26e-4, 0.084),
-          "pair bias, capped": (5.74e-4, 0.077),
+# row names in plain words (Joaquin 2026-11-17): "all inputs" = off-shellness, colour, diagram encoder, MLP embedding
+BIGRUN = {"linear embedding, no diagrams": (3.85e-4, 0.12),
+          "all inputs but diagrams": (3.88e-4, 0.10),
+          "all inputs, linear embedding": (4.86e-4, 0.056),
+          "lin. emb., no diagrams, pair bias": (5.26e-4, 0.084),
+          "same, pair bias capped": (5.74e-4, 0.077),
           "all inputs": (5.79e-4, 0.085),
-          "no colour one-hot": (6.81e-4, 0.094),
-          "no off-shellness": (8.63e-4, 0.067)}
+          "all inputs but colour": (6.81e-4, 0.094),
+          "all inputs but off-shellness": (8.63e-4, 0.067)}
 
 
-def inputs():
+def inputs(ax):
     rows = sorted(BIGRUN.items(), key=lambda kv: kv[1][0])
-    fig, ax = ps.figure(width="half")
     y = np.arange(len(rows))
     ax.plot([v[0] for _, v in rows], y, "o", color=ps.C.blue)
     ax.set_yticks(y); ax.set_yticklabels([k for k, _ in rows])
     ax.set_ylim(len(rows) - 0.5, -0.5); ax.set_xscale("log")
     ax.set_xticks([4e-4, 6e-4, 8e-4], [r"$4\cdot10^{-4}$", r"$6\cdot10^{-4}$", r"$8\cdot10^{-4}$"]); ax.minorticks_off()
-    ax.set_xlabel(r"MSE$(\log|\mathcal{M}|^2)$, standardized")
-    ps.save(fig, os.path.join(FIGS, "paper_inputs"))
+    ax.set_xlabel("geometric mean over 448 processes\n" + r"of MSE$(\log|\mathcal{M}|^2)$, standardized")
 
 
 if __name__ == "__main__":
-    fns = {"inputs": inputs, "pidqn": pidqn, "muon": muon, "examples": examples, "ft": ft, "pp": pp, "target": target, "unseen": unseen, "pp_direct": pp_direct, "pp_bound": pp_bound}
+    fns = {"pidqn": pidqn, "muon": muon, "ft": ft, "pp": pp, "target": target, "pp_direct": pp_direct, "pp_bound": pp_bound}
     for k in (fns if sys.argv[1:] in ([], ["all"]) else sys.argv[1:]):
         fns[k]()
