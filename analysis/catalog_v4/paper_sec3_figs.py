@@ -206,7 +206,13 @@ FT_LOW = {"v3_dbx_bxdgg": r"$d\bar d\to b\bar bgg$", "v3_udx_gwpzz": r"$u\bar d\
           "v3_epem_mupmumttx": r"$e^+e^-\to\mu^+\mu^-t\bar t$", "v3_uux_wpwm_nlo": r"$u\bar u\to W^+W^-$, one loop"}
 
 
-def ft(src="muon_ft_lowloss.json", probes=FT_LOW, base="paper_muon_ft"):
+# the Fig. 15 probes after Joaquin 2026-11-17 ('relatively good performance, but with also good separation between
+# muon and adam'): muon_compare.py sep-probes, same cells and protocol
+FT_SEP = {"v3_gg_ttx": r"$gg\to t\bar t$", "v3_dbx_txu": r"$d\bar d\to t\bar u$",
+          "v3_bbx_hhhz": r"$b\bar b\to HHHZ$", "v3_uux_wpwm": r"$u\bar u\to W^+W^-$"}
+
+
+def ft(src="muon_ft_sep.json", probes=FT_SEP, base="paper_muon_ft"):
     """Fine-tunes at small D_train of the Muon and AdamW pretrainings: the low-loss probes (the draft's figure);
     `ft_median` draws the first version, on the median-error probes (muon_ft.json)."""
     d = json.load(open(os.path.join(ROOT, "analysis", "catalog_v3", "data", src)))
@@ -364,6 +370,6 @@ def inputs(ax):
 
 
 if __name__ == "__main__":
-    fns = {"pidqn": pidqn, "muon": muon, "ft": ft, "ft_median": lambda: ft("muon_ft.json", FT_MEDIAN, "paper_muon_ft_median"), "pp": pp, "target": target, "pp_direct": pp_direct, "pp_bound": pp_bound}
+    fns = {"pidqn": pidqn, "muon": muon, "ft": ft, "ft_median": lambda: ft("muon_ft.json", FT_MEDIAN, "paper_muon_ft_median"), "ft_low": lambda: ft("muon_ft_lowloss.json", FT_LOW, "paper_muon_ft_lowloss"), "pp": pp, "target": target, "pp_direct": pp_direct, "pp_bound": pp_bound}
     for k in (fns if sys.argv[1:] in ([], ["all"]) else sys.argv[1:]):
         fns[k]()
