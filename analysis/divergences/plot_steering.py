@@ -112,7 +112,7 @@ ps.save(fig, os.path.join(OUT, "l2_gamma_response_extended"))
 # ---- ee -> u ubar g, seed 0: per decade and per sqrt(s) region (|sqrt s - M_Z| in GeV; IR = y_min < 1e-3)
 # labels in words (Joaquin 2026-11-17): the arms say they are heteroscedastic steering against a uniform keep, y_min is
 # defined on its axis, the regions read in order (the peak's IR subset next to the peak)
-STEER = "heteroscedastic steering,\n" + r"kept $\propto\sigma^\gamma$, "
+STEER = "heteroscedastic steering, kept\n" + r"in proportion to $\sigma^\gamma$, "
 UUG = [("proposals kept uniformly", "uug_base_s0", ps.C.grey, "o"), (STEER + r"$\gamma=1$", "uug_sigma_s0", ps.C.sky, "s"),
        (STEER + r"$\gamma=3$", "uug_g3_s0", ps.C.vermillion, "D")]
 REG_UUG = [("peak", r"$<3$"), ("peak_ir", r"$<3$," + "\n" + r"$y_{\min}<10^{-3}$"), ("shoulder", r"$3\!-\!15$"),
