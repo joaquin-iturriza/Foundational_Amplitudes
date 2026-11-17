@@ -34359,6 +34359,17 @@ entries:
     - 4
     answered_at: '2026-11-17T15:32:59.984000+00:00'
     decision: D481
+  - ask: 'Scope: a results.tex conclusion changes. par:muon_long says Muon''s lead holds and grows with the horizon, but 5.18
+      (PP4, final model) is below the 8.03 at 4264 steps and measures something else; replace it with the notes-editor''s
+      wording ''YES, Muon''s lead holds (5.18 on PP4 at the final model, 10.6x at the validation curve''s last point), with
+      AdamW at Muon''s lr; whether it grows is not measured'', or leave it?'
+    at: '2026-11-17T17:58:16+00:00'
+    searched: 'site decisions --project FA: none on par:muon_long''s wording; CLAUDE.md: a conclusion change reaches Joaquin
+      as a question with the figure. Matched messages: 2026-10-05T02:23 (a complaint about a transfer summary''s wording),
+      2026-11-10T02:08 (zip and slides upload), 2026-11-14T04:31 (a SciPost LaTeX template paste): none is about par:muon_long'
+    blocks: step 10 and the commit of the Z+ng write-up
+    blocks_steps: &id003
+    - 10
   owner:
     agent: af420daee93095631
     state: stopped
@@ -35289,3 +35300,13 @@ entries:
       analysis/zng_uq/benchmark.py (collect needs the new arms: theirs at $WORK/ext/uq_runs/runs/zng_uq_lloca, the suprio_protocol
       runs, post-search reruns); analysis/zng_uq/figs/zng_median_delta.png; docs/results.tex (uncommitted paragraph)'
     written: '2026-11-17T16:49:14+00:00'
+  ask: 'Scope: a results.tex conclusion changes. par:muon_long says Muon''s lead holds and grows with the horizon, but 5.18
+    (PP4, final model) is below the 8.03 at 4264 steps and measures something else; replace it with the notes-editor''s wording
+    ''YES, Muon''s lead holds (5.18 on PP4 at the final model, 10.6x at the validation curve''s last point), with AdamW at
+    Muon''s lr; whether it grows is not measured'', or leave it?'
+  waiting_since: '2026-11-17T17:58:16+00:00'
+  searched: 'site decisions --project FA: none on par:muon_long''s wording; CLAUDE.md: a conclusion change reaches Joaquin
+    as a question with the figure. Matched messages: 2026-10-05T02:23 (a complaint about a transfer summary''s wording), 2026-11-10T02:08
+    (zip and slides upload), 2026-11-14T04:31 (a SciPost LaTeX template paste): none is about par:muon_long'
+  blocks: step 10 and the commit of the Z+ng write-up
+  blocks_steps: *id003
