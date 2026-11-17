@@ -34288,6 +34288,16 @@ entries:
       2.6e-7/6.5e-6/3.3e-5/8.3e-5; LLoCa-GNN 1.4e-9/1.15e-6/2.6e-5/5.0e-5; GNN 3.1e-9/5.7e-6/2.5e-5/1.05e-4; MLP-I 2.0e-8/1.0e-5/1.3e-4/1.37e-3.
       The median |Delta| of Joaquin''s meeting figure is in neither (only its legend, read off his screenshot). torch 2.1.2
       and 2.9.1 give the same randperm(3e6, seed 1).'
+  - at: '2026-11-17T11:43:54+00:00'
+    text: 'Setup done (FA-ccin2p3-32145d4b, scripts/job_zng_fetch.sh @43a6d86c, 16 min wall: downloads ~6 min, the rest extraction/convert/crosscheck;
+      only zgggg_part1 was needed). YES: our MadGraph d d~ > Z+ng over their stored |M|^2 on 100 test events per multiplicity,
+      median 1.000000 for Z+1..4g, max/min-1 1.3e-15, 7.5e-15, 6.2e-15, 1.4e-14 (threshold 1e-6); u u~ > Z+ng over theirs
+      one constant 0.779805 at every multiplicity (spread <= 2.2e-14). Converted uq_<proc>.h5 in $DATA_DIR/zng_uq (4.0 GB
+      with raw npy). Checkpoints of their networks: none public. Their repo (branches main e901fae, uq 1074f6a; no tags, no
+      releases, no .pt/.ckpt files), the Zenodo record 16793011 (data only: zg, zgg, zggg, zgggg_part1/2 tar.xz; related only
+      arXiv:2505.20280) and a Zenodo search for lloca hold none; their production runs (runs/prod_het_v1, preds_test_0.npz
+      per network on the same data_seed-0 split) live on their clusters nemo (/work/classic/hd_md186-amp_uq) and ITP (/remote/gpu03/dubey/amp_uq)
+      per uq_ops/jobs/site.sh.'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
