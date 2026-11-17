@@ -33331,6 +33331,10 @@ entries:
       whose fine-tuned errors are low and whose Muon/AdamW zero-shot separation is large (state the rule and the candidates''
       numbers before running); rerun the same protocol (~3 GPU-h); redraw; check on the plotted curves that the errors fall
       with D_train before reporting.'
+    5: 'Third round of Joaquin''s draft-figure notes (2026-11-17, verbatim in scratchpad joaquin_figs3_2026-11-17.txt): Figs.
+      18-19 merged (D-scope ''why not merge 18 and 19 as I asked?''), scatters compacted (smaller, squarer legends), Fig.
+      12 panels linked or split, Fig. 13 right short symbolic rows and plain x label, distinct colours; send each figure,
+      PDF, zip.'
   done_when: null
   notes_ref: null
   match: none
@@ -34004,3 +34008,8 @@ entries:
       if:
       - 'runs finish: redraw, check the curves fall with D_train, send'
       - 'no process has both low error and separation: say so with the numbers'
+    5:
+      feeds: draft figures readable alone
+      if:
+      - 'done: send figures, zip, PDF'
+      - 'a layout does not fit: say why with the measured size'
