@@ -33643,6 +33643,15 @@ entries:
       paper_pidqn, paper_target, paper_muon, paper_muon_ft (8e6e5b22), Fig. 11 l2_uug_multiscale (d30ce875, 1476aba3). Numbers
       unchanged. Not done: Sec. 5 Figs. 16-21 (rung_focus.py, finale_synth_scaling.py, star_arms.py); paper.tex captions and
       includes, build, fresh reviewer reading figures alone, zip/PDF, sending each figure.'
+  - at: '2026-11-17T02:24:10+00:00'
+    text: '2026-11-17 Fig. 15 rerun: first resubmission (FA-ccin2p3-49d18c32/abaec8ae/b551c3a9, chained on prebuild FA-ccin2p3-2b93952c
+      which built the four train pools in 33 s from reused chunks) failed every cell on ''experiment directory already exists''
+      left by the require_cache-failed batch; resubmitted unchanged into zz_catft_lowloss2: FA-ccin2p3-167dc1db (AdamW parent),
+      -0d4d4506 (Muon parent), -c81ba5db (scratch), job_catalog_ft.sh @c7b2a389, ~3 GPU-h. Next: collect CATFT lines into
+      analysis/catalog_v3/data/muon_ft_lowloss.json (muon_compare.py collect-ft), draw paper_sec3_figs.py ft. submit_guard
+      refused the prebuild job itself (data check); fixed 9192f890. Fig. 9: per-bin and <100 GeV means lowest at f=0.5 (1.53e-5,
+      1.97e-5), mean over all test events lowest at f=0.25 (4.73e-6 vs 7.48e-6 at 0.5); no text repeated the f=0.5-in-all-three
+      claim.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
