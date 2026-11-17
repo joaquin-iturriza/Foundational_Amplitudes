@@ -33707,6 +33707,19 @@ entries:
       Fig. 9 crowding at the Z pole, Fig. 8 truth legend in panel 2, Fig. 11 legend wording (Joaquin asked it back to its
       earlier version), Fig. 6 ''Tab. ??'' (co-author''s empty ref, kept). Fig. 15 ticks/clip at its redraw. Build 48 pp:
       scratchpad draft_final_figs_alone.pdf, draft_final_overleaf_figs_alone.zip.'
+  - at: '2026-11-17T03:33:20+00:00'
+    text: '2026-11-17 Joaquin''s second figure round (scratchpad joaquin_figs2_2026-11-17.txt) applied, FA 80849a90 + star_arms2
+      legend commit, draft 5cc973a, build 48 pp (draft_final_figs2.pdf, draft_final_overleaf_figs2.zip): y = x scatters on
+      equal limits (Figs. 10, 12, 13, 14; the house 2.40x1.92 box kept, so not square), one dataset name (''pp, in pretraining
+      / held out, sampled from PDFs'', ''held out, sampled by our mixture / by MadEvent''), Fig. 12 right a strip plot per
+      kind of held-out process (medians 0.93 seen, 0.68 unseen quartic vertex, 4.75 unseen tau/nu_tau), Fig. 13 sets ''2->5,
+      only up to 2->4 in pretraining'', ''1 to 10 TeV, only up to 1 TeV'', rows baseline +- one change; Fig. 14 ~40 bins;
+      pred/true range from the bulk of the bins (ps.ratio_range, 90th percentile of |pred/true-1|, rest at the edge, tested);
+      Figs. 7-8 one legend naming the four curves; Figs. 20-21: six arms 3x2 + ee->dd~ single panel (seven panels do not fit
+      one figure: 3 across past the printable width, 4 rows 10.2 in), YlOrBr shades + markers, one step-1 curve (step 1''s
+      search; repo-reviewer: the two-point curve overstates the four searched arms'' gain); Figs. 18-19 y extension left (legend
+      upper right gave no shorter range); 3x4 grid not done (4 rows = 10.2 in). Repo-reviewer passed (watermark 535c5e06).
+      Fixed from its review: prebuild --seed to write_own_alphas, atomic sidecar write.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
