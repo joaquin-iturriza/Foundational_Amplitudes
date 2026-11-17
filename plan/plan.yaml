@@ -28981,6 +28981,14 @@ entries:
       each panel titled with process and bin. dev and beta-ratio figures dropped (duplicate median and MSE). Attempts: six
       fine-tunes one marker. Deck talks/kit_nov2026/main.pdf, 8 slides (MSE uug/uugg/tt, median uug/tt, deepest uug histograms,
       bulk, attempts). Captions in scratchpad caps/caps_deck.json, all 12 pass send_check.'
+  - at: '2026-11-17T04:22:49+00:00'
+    text: '2026-11-17 @d4984d67. Deck kit_nov2026 reordered (Joaquin 2026-11-17): medians without the factor (kitvm_median_nofactor_<p>),
+      why log invariants extrapolate, the factor''s equation, medians with it, then the rest; 12 slides. Slope of median log10|M|^2
+      against log10 of the limit variable over the deeper half of the bins (tools/kit_vs_mlp.py plot, SLOPE lines): truth
+      / MLP log / factor: uug coll -1.00/-0.95/-0.99, uug soft -2.00/-1.98/-2.00, uugg gg -1.00/-0.97/-0.93, qg -1.00/-0.93/-0.92,
+      uugg soft -2.00/-2.16/-1.89; tt threshold beta -1.00 / -0.56 (MLP log+beta) / -1.00; Sudakov sqrt(s) +0.35/+0.53/+0.54;
+      transformer flat (-0.71, -0.14, +0.04 ...). The leaky-ReLU MLP on log invariants continues a straight line, right where
+      the power law''s slope is set in the bulk (collinear, soft), wrong at threshold.'
   step_why:
     20:
       feeds: the KIT NLO statement in the draft
