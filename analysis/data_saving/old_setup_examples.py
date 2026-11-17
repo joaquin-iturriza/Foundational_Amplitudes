@@ -79,19 +79,16 @@ for ax, p in zip(axs.flat, PROBES):
           f"[16-84%: {lo:.1f}, {hi:.1f}] boot {r['boot']}  "
           f"median L_scratch/L_ft over D {np.median(g):.1f} (range {min(g):.1f}-{max(g):.1f}, {len(g)} cells)")
     ax.set_xscale("log"); ax.set_yscale("log")
-    ax.set_xlabel(r"training events $D$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
+    ax.set_xlabel(r"target training events $D$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
     # the saving's value under the process label, where make_room keeps the data clear of it
     ps.process_label(ax, {**LAB, **ARMLAB}[p].replace(" (1-loop)", " one loop") + "\n" + rf"$\times{s:.1f}$")
 print(f"median fitted saving over the 4 panels {np.median(S):.1f} (each read at its own panel's level, not one precision); median L_scratch/L_ft over all {len(ALL)} cells "
       f"{np.median(ALL):.1f}")
-H = [Line2D([], [], color="k", marker="o", label="scratch"), Line2D([], [], color=ps.C.blue, marker="o", label="fine-tune"),
-     Line2D([], [], color="0.5", marker="o", mfc="none", ls="none", label="not fitted"),
+# the legend inside the first panel, in words (Joaquin 2026-11-17: one file, legend inside, readable without the text)
+H = [Line2D([], [], color="k", marker="o", label="trained from scratch"),
+     Line2D([], [], color=ps.C.blue, marker="o", label="fine-tuned from the pretraining"),
+     Line2D([], [], color="0.5", marker="o", mfc="none", ls="none", label="left out of the fit"),
      Line2D([], [], color="0.5", ls="--", label="target precision"),
-     Line2D([], [], color=GAP, label=r"$D^*_{\rm scr}/D^*_{\rm ft}$")]
-for ax in axs.flat:
-    ps.make_room(ax)
-for h in H:                          # the strip on top takes its handles from the first panel (Joaquin 2026-11-13)
-    axs.flat[0].plot([], [], color=h.get_color(), marker=h.get_marker(), mfc=h.get_markerfacecolor(),
-                     ls=h.get_linestyle(), label=h.get_label())
-ps.shared_legend(fig, axs.flat[0], ncol=5)
+     Line2D([], [], color=GAP, label="data saved, " + r"$\times D_{\rm scratch}/D_{\rm fine\!-\!tuned}$" + "\nat the target precision")]
+ps.legend(axs.flat[0], "lower left", handles=H)
 ps.save(fig, os.path.join(ROOT, "analysis", "data_saving", "figs", "old_setup_examples"))
