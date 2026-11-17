@@ -33419,7 +33419,7 @@ entries:
     decision: D464
   owner:
     agent: af12ee6aa9c5a58f7
-    state: working
+    state: closed
     since: '2026-11-17T01:21:13+00:00'
     state_at: '2026-11-17T01:32:27.947000+00:00'
     context: 186619
@@ -33810,42 +33810,47 @@ entries:
     start: '2026-11-17T01:33:04+00:00'
     at: '2026-11-17T01:33:04+00:00'
   handoff:
-    state: 'Draft ~/drafts/fm_amplitudes_2026-11 at 8b55c58 (current, 45 pp). Since ded8a89: step 4 written on all five sigma-steering
-      processes (1ec32b9..47bbb35, cold reviewer FIX then PASS), then cut on Joaquin''s 2026-11-17 words (''only the figure
-      with the two panels you sent for uug and that''s it, and we remove the phrase saying that the gain is modest'') to the
-      method paragraph + one paragraph on e+e- -> u ubar g (Z peak error 2.5x lower at gamma 3, continuum unchanged), one
-      figure fig:steer = figs/pretrain/l2_uug_multiscale.pdf; co-authors'' six edits merged (8b55c58) except the ''effect
-      is modest'' sentence and the stray preamble line. Build: copy paper.tex (and any new figure PDFs, same relative path)
-      into /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/final_draft (identical tree:
-      cls, bst, incl_*.tex, bibs, figs), compile there with /mnt/c/texlive/2025/bin/windows/pdflatex.exe, bibtex.exe, pdflatex
-      x2; zip with: cd final_draft; zip -qr <out>.zip $(unzip -Z1 /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_final_overleaf.zip
-      | grep -v ''/$'') plus any figure not in that list (check: every figs/*.pdf grep''d from paper.tex present in the zip);
-      then unzip into an empty dir and compile there before sending. Latest: zip /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_final_overleaf_steer_uug.zip
-      (197 files, compiled standalone), PDF /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_final_steer_uug.pdf.
-      Only warning: the co-authors'' empty \ref{tab:} (kept as written).'
-    decisions: 'Joaquin 2026-11-17: sigma-driven subsection shows only the uug two-panel figure, ''modest'' sentence removed.
-      Co-authors'' edits: their \mpar{ab: insert here} cannot compile inside a caption (marginpar in a float), so it sits
-      in the text sentence ''Fig. data_saving shows the four targets''; their Tab. sentence with empty ref stays in the caption;
-      genmix caption opening word for word; rung_focus (e+e- probes) caption takes their wording adapted to rung_focus.py
-      colours (scratch black, first rung with structure vermillion=''orange'', rung below blue, best overall green, others
-      grey), rung_focus_qcd caption unchanged; clearpage before Sec. cond removed. Figures: the sigma-steering figures of
-      results.tex sec:div-sampling are drawn locally by analysis/divergences/plot_steering.py (FA c3f0548d) from steering_eval_summary.json,
-      because the heldout_eval_*.npz inputs of the older plot_l2_*.py scripts exist only on Jean Zay; l2_eeuu_online a-c by
-      l2_eeuu_online.py --plot (local summaries). Ratio axes are MSE_steered/MSE_uniform (send_check refuses ''MSE ratio''
-      and a sigma glyph on one side of ''/''); all nine pass send_check --scan. bbbarg drawn as 3-seed mean/std (notes'' version
-      seed 0).'
-    ruled_out: 'In the draft: the e+e- -> uu online, uugg, bbg, uuggg and gamma-response steering figures and their text (Joaquin
-      2026-11-17, only uug); the co-authors'' ''effect is modest'' sentence; the stray preamble line {\noindent\makebox[\textwidth][c]{#1}}
-      (breaks the compile). Earlier: per-probe gain-factor lists, unplotted aggregates, the gain heatmap, Sec. 5 extra input
-      conditionings, synthetic spread 2.75 vs 1.32.'
-    running: none
-    files: ~/drafts/fm_amplitudes_2026-11/paper.tex; /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/final_draft/;
-      /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_final_overleaf_steer_uug.zip;
-      /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_final_steer_uug.pdf; /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_final_overleaf.zip
-      (file list for zips); analysis/divergences/plot_steering.py; analysis/divergences/l2_eeuu_online.py; analysis/divergences/steering_eval_summary.json;
-      analysis/divergences/figs/l2_*.{png,pdf,legend.txt} (redrawn 2026-11-17; the draft's figs/pretrain holds copies, the
-      unused steering PDFs stay there); .claude/skills/paper-writing-style/SKILL.md; tools/draft_figure.py
-    written: '2026-11-17T01:21:21+00:00'
+    state: 'Draft ~/drafts/fm_amplitudes_2026-11 still at 8b55c58 (paper.tex not touched this round). Step 4 (figures readable
+      alone): rules changed first (FA c0f64b99: plot_style, send_check, tests/test_figure_setup.py, figure-style skill, .claude/context/fa-figures.txt);
+      redrawn as one file each with legends inside in plain words, send_check --scan clean, each looked at once: Fig. 6 analysis/data_saving/figs/old_setup_examples
+      (56f00427), Figs. 7-8 analysis/data_saving/figs/example_delta, example_dist (ce7a6b49; replace the _a.._d + _legend
+      includes), Fig. 9 analysis/divergences/eeuu_genmix_fraction_sweep (d0fe498e; bins panel first with the fraction as a
+      named colour bar), Fig. 10 analysis/catalog_v4/figs/paper_pp_bound, Fig. 12 paper_pidqn (scatter + zero-shot histogram
+      in one file), Fig. 13 paper_target (scatter + inputs rows in words in one file; paper_inputs is gone), Fig. 14 paper_muon
+      (scatter + 3 true/pred examples, 2x2), Fig. 15 paper_muon_ft (all 8e6e5b22), Fig. 11 analysis/divergences/figs/l2_uug_multiscale
+      (d30ce875, 1476aba3). Left: Sec. 5 Figs. 16-21 from analysis/transfer/rung_focus.py, finale_synth_scaling.py, star_arms.py
+      (each figure one file, 6-7 panels in 2 columns with the legend in a spare cell; ''step k of the ladder'' never ''rung'';
+      best pretraining named in words, no ''ties within 1.2x'' wording; synthetic/every-structure/star arms named by what
+      they contain); then paper.tex: one include per figure (drop \pnl rows and legend strips; copy the new PDFs into figs/pretrain
+      or figs/transfer under the stems the draft uses or new ones), short captions (what is shown + setting), text references
+      to colours/panels checked; build in the scratchpad final_draft tree as in the previous hand-off; a fresh cold reviewer
+      told to read the figures alone (10-minute scroll test); zip + PDF; send each figure as its own file. Step 5 (Fig. 15
+      on low-loss probes): design passed; batch FA-ccin2p3-1ab1158d (AdamW parent, keep-parent-stats), FA-ccin2p3-e7ab0fd5
+      (Muon parent), FA-ccin2p3-fc9f98dc (scratch), scripts/job_catalog_ft.sh @2bec150a with args ''<parent> <opt> <mode>
+      zz_catft_lowloss v3_dbx_bxdgg,v3_udx_gwpzz,v3_epem_mupmumttx,v3_uux_wpwm_nlo'', is failing every cell: the four probes''
+      train pools are not prebuilt in the CC cache (require_cache; val pools exist, the October probes'' train caches are
+      gone too). Next: ack its events with that cause, prebuild the four train pools (prebuild_recipes.sh on a spec of the
+      four probes from recipes/catalog_v3_heldout_H1/H2/H3/H5.yaml, CPU), resubmit the same three jobs unchanged (site pick
+      first, --hdr=--time=02:00:00, --allow-dirty because of others'' files), then fill muon_ft rows (muon_compare.py collect-ft)
+      and point paper_sec3_figs.ft at them.'
+    decisions: 'Joaquin 2026-11-17 (his message in the scratchpad joaquin_figs_2026-11-17.txt): figures readable in a 10-minute
+      scroll without the text; plain words on the figure; one file per figure, legend inside, legend font may be smaller;
+      ''AdamW optimizer''/''Muon optimizer''; ''step'' of the ladder; Fig. 15 on processes with good losses. Implemented as
+      rules: legend entries up to 2 lines x 40 chars; LEGEND_MIN_PT 7.5; save_panels/legend_strip warn (send_check refuses);
+      caption must define only symbol entries. Low-loss probes = 10th percentile per held-out axis of the geometric mean of
+      both parents'' zero-shot MSE (muon_compare.py low-probes @de3e6c17); same D cells, parent standardization, parent''s
+      optimizer, scratch AdamW, one seed. I did not split the redraw across helper agents (brief_guard: an owner is never
+      split).'
+    ruled_out: 'Helper agents per figure group (one owner per entry). Steering legend with the proportional sign (pdftotext
+      reads it as ''/'', send_check refuses): worded ''kept in proportion to sigma^gamma''.'
+    running: FA-ccin2p3-1ab1158d, FA-ccin2p3-e7ab0fd5, FA-ccin2p3-fc9f98dc (running, every cell failing on missing train caches;
+      will end with exit 1)
+    files: plot_style.py; .claude/hooks/send_check.py; .claude/skills/figure-style/SKILL.md; .claude/context/fa-figures.txt;
+      tests/test_figure_setup.py; analysis/catalog_v4/paper_sec3_figs.py; analysis/divergences/plot_genmix_sweep.py; analysis/divergences/plot_steering.py;
+      analysis/data_saving/old_setup_examples.py; analysis/data_saving/example_reruns.py; analysis/catalog_v3/muon_compare.py
+      (low-probes); scripts/job_catalog_ft.sh; tools/catalog_ft.py; ~/drafts/fm_amplitudes_2026-11/paper.tex; scratchpad final_draft/,
+      draft_final_overleaf_steer_uug.zip, draft_final_steer_uug.pdf, joaquin_figs_2026-11-17.txt
+    written: '2026-11-17T01:46:59+00:00'
   step_why:
     3:
       feeds: whether and how the paper states the het-vs-MSE comparison
