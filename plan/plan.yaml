@@ -33814,6 +33814,16 @@ entries:
       lr_scale in [0.1,10] on the median probes, best 0.343, gain 1.19x. Next: commit analysis/catalog_v3/ft_curves_fig.py
       (drafted, in the hand-off) and draw the curves; propose a DyHPO fine-tune search of lr_scale and layer_decay reaching
       below 0.1 on the sep probes, both parents.'
+  - at: '2026-11-17T11:42:17+00:00'
+    text: '2026-11-17 step 6 done (Joaquin''s corrections): draft 09d9e38+ed7f923, FA b48af71b. Caption headline openings
+      removed from 14 captions (the co-authors'' genmix ''Illustration of different sampling techniques f.'' and rung_focus
+      ''Improvement of accuracy as a function of training data and pretraining on selected processes:'' restored); seed counts
+      out of every caption of Secs. 2-6 (the co-authors'' Sec. cond appendix captions untouched); figure-style skill line
+      no longer asks for seeds; Fig. 14 right rows sorted by value, lowest on top (no diagrams+linear embedding 3.85e-4 ...
+      no off-shellness 8.63e-4), Joaquin''s short names, caption says the + pair-bias rows add to ''no diagrams, linear embedding'';
+      Fig. 19 legend split, the four short names lower left, four long upper right under the process label, y range 1e-7..2e4
+      (was 1e-12..1; data 1e-7..1.7), no point covered; ladder grids (Figs. 16, 17) 3 across x 4 down, included at 0.62 (420
+      pt wide of 425). Build 49 pp, overfulls unchanged (7, none from figures). Scratchpad draft_pass5.pdf/.zip.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
