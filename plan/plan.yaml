@@ -34272,7 +34272,7 @@ entries:
     decision: D480
   owner:
     agent: ad838d9b0df85e41f
-    state: stopped
+    state: closed
     since: '2026-11-17T11:36:14+00:00'
     state_at: '2026-11-17T12:53:18.169000+00:00'
     context: 281444
@@ -34661,23 +34661,45 @@ entries:
     start: '2026-11-17T12:16:25+00:00'
     at: '2026-11-17T12:16:25+00:00'
   handoff:
-    state: 'Setup job FA-ccin2p3-32145d4b (CPU, scripts/job_zng_fetch.sh @43a6d86c, design PASSED) running: zg, zgg, zggg
-      archives downloaded and md5-verified (~34 MB/s); next zgggg_part1 (8.4 GB), then convert -> $DATA_DIR/zng_uq/uq_<proc>.h5
-      (their split), d d~ sidecars, crosscheck.json (ours/theirs |M|^2, d d~ and u u~, 100 test events each; YES = max/min-1
-      < 1e-6). Training design is an open plan ask to Joaquin (parent 1262, DyHPO ~370 GPU-h vs template ~23 GPU-h, horizon
-      12,500 vs 9,155 steps, matched-input scratch control); step 3 held on it. Step 2 (eval-only of existing models: 1262
-      zero-shot, u-flavour highmult Z+4g MSE, het Zg/Zgg/Zggg cells; caption ''our existing models, not trained on their data'')
-      waits on the setup job; it needs its own design + review and a way to rebuild the multi-process 1262 on a pool (tools/rebuild_run.rebuild
-      handles single-process runs only).'
-    decisions: 'Data read as KIT layout (dataset names kit_uq_z<g..>__me2, scripts/job_kit.sh works unchanged; set KIT_NTEST=1000000);
-      split = their randperm seed 1, train then val in bulk_train; alpha_s 0.13 in metadata (target_physics_orders strips
-      it exactly); momenta kept as stored; flavour d (their target_norm.zng_process). Parent proposed: trial 1262 (production
-      catalog_v4 pretraining). Their numbers: paper MSE via analysis/zng_uq/paper_mse.py; median |Delta| of Joaquin''s meeting
-      figure not public, asked him for the pdf or preds npz.'
-    ruled_out: Downloading zgggg_part2 unless part1 lacks zgggg_0..2; keeping archives (deleted after extraction, CC disk
-      ~58 GB free); data-saving r5 parents as fine-tune parent (short, held-out families).
-    running: FA-ccin2p3-32145d4b (setup, CPU, target 3 h, limit 8 h)
-    files: tools/zng_uq.py; scripts/job_zng_fetch.sh; tools/kit_hardps.py (uq_ stems, DIAGRAMS_OF); tools/kit_predict.py (sigma_ln.npy,
-      no KIT scorer for uq_); mg5_pipeline_final.py (ddbar_Zg..Zgggg); analysis/zng_uq/paper_mse.py + data/paper_mse.json;
-      their repo supriodubey/lloca-experiments-uq branch uq (experiments/amplitudes/experiment_uq.py init_data, experiments/uq/metrics.py)
-    written: '2026-11-17T11:27:17+00:00'
+    state: '2026-11-17 ~16:00. All 8 trainings finished cleanly (E7399, not acked by me; the next owner acks it with what
+      the read found). Batch: scripts/job_kit.sh, base config trial 1262''s saved config, HPs of kit_hpo_uug_T hp1677 (design
+      passed 11:52). Command: job_kit.sh -- kit_uq_<proc>__me2 500000 12500 <A|A_ft> training.lr=6.550106e-3 training.scheduler=WSD
+      ++training.wsd_cooldown_frac=0.125 training.muon_weight_decay=0.01708213 training.regularization_lambda=1.909007e-07
+      training.cosanneal_warmup_frac=0.1320452 training.cosanneal_eta_min=4.333021e-10 ema=false training.dtype=float32, env
+      KIT_NTEST=1000000. Runs (scratch / fine-tune): Z+1g FA-ccin2p3-394f20ac / 82eb9944; Z+2g b4ebd88e / 213da086; Z+3g ba9df01f
+      / 966a6561; Z+4g 02a0c484 / 2d4d3709. 966a6561 and 2d4d3709 ran at 9ea31ae3, the rest at 5897801f; job_kit.sh is identical
+      in both. Run dirs on CC: runs/kit/kit_<A|A_ft>_uq_<zg|zgg|zggg|zgggg>_me2_n500000_t12500/ (no tag). Test predictions:
+      <run dir>/kit_benchmark/predictions.h5 (bulk_test/bulk/log10_me2 = predicted log10|M|^2, in the order of uq_<proc>.h5
+      bulk_test) and <run dir>/kit_benchmark/sigma_ln.npy (sigma in ln|M|^2; bulk_test is its last block). Truth and split:
+      $DATA_DIR/zng_uq/uq_<proc>.h5 (bulk_test/bulk/log10_me2, split_idx/test). Learning curves: <run dir>/result.json (val_mse_curve,
+      train_eval_mse_curve). Their paper''s test MSE of standardised log|M|^2, per multiplicity Z+1g/2g/3g/4g, from analysis/zng_uq/data/paper_mse.json
+      (made by analysis/zng_uq/paper_mse.py @157b5d08 from arXiv:2505.20280''s source figure figs/amplitudes/scaled_multiplicity_scan_prep_big.pdf;
+      the paper''s own 500k test set and MSE loss, not their UQ split): LLoCa-Transformer 6.8e-10/3.1e-7/4.6e-6/1.16e-5; L-GATr
+      4.7e-9/8.9e-7/6.6e-6/1.78e-5; Transformer 2.6e-7/6.5e-6/3.3e-5/8.3e-5; LLoCa-GNN 1.4e-9/1.15e-6/2.6e-5/5.0e-5; GNN 3.1e-9/5.7e-6/2.5e-5/1.05e-4;
+      MLP-I 2.0e-8/1.0e-5/1.3e-4/1.37e-3. Their median |Delta| and pulls do not exist anywhere public (no checkpoints, no
+      preds), and Joaquin decided not to train their networks.'
+    decisions: 'Data: Zenodo 16793011 read through the KIT layout with their split (setup YES: our d d~ |M|^2 / theirs = 1
+      to 1.4e-14; u u~ / their d d~ = 0.779805, one constant). HPs: kit_hpo_uug_T hp1677 as found, per Joaquin''s ''take the
+      HPs from'' similar optimised runs; uugg_T was rejected because that search passed no trial. 12,500 steps matches their
+      epochs (D479). Float32 as the parent. The checkpoint is chosen on val mu-MSE. One seed; at one seed only a factor above
+      3x in median |Delta| is resolved. Joaquin 2026-11-17: ''we don''t train their networks''; the timing job was cancelled
+      and the vendored code removed (bcfdce22; still in history at 9ea31ae3).'
+    ruled_out: Training their networks (Joaquin); the vendored copy of their repo; kit_hpo_uugg_T hp1196 as the HP source;
+      the matched-input scratch control (Joaquin); zgggg_part2.
+    running: none
+    files: 'analysis/zng_uq/benchmark.py (collect on CC: ours from predictions.h5 + sigma_ln.npy with their metrics definitions;
+      theirs needs preds_test_0.npz, which does not exist, so that branch stays empty; plot -> analysis/zng_uq/figs/zng_median_delta,
+      zng_delta_z4g, zng_pull_z4g via ps.save); analysis/zng_uq/data/paper_mse.json and paper_mse.py; tools/zng_uq.py; tools/kit_predict.py;
+      tools/kit_curves.py (runs <dirs> for the curve test the design requires on every run); scripts/job_kit.sh. NEXT, in
+      order: (1) run benchmark.py collect on CC (site run ccin2p3 FA -- python analysis/zng_uq/benchmark.py collect, or site_python),
+      fetch the JSON and commit it. (2) tools/kit_curves.py runs on the 8 run dirs: the curve test per run; a run that fails
+      it is flagged (design outcome). (3) Three plots. (a) Median |Delta| against n, ours scratch and fine-tune; their paper
+      numbers are MSE, not median |Delta|, so draw a second panel of our test MSE of standardised log|M|^2 (standardise with
+      the train mean/std of log|M|^2 over uq_<proc>.h5 bulk_train''s first 5e5, as their paper does) beside their six networks
+      from paper_mse.json, labelled as their paper''s test set. (b) The |Delta| distribution on Z+4g, scratch and fine-tune.
+      (c) Pull distributions per multiplicity against N(0,1), with pull std. Look at each figure once and give the caption.
+      (4) Step 3, the eval-only read of our existing models (trial 1262 zero-shot on d d~ data; the u-flavour Z+ng highmult/het
+      models, their predictions shifted by ln 0.779805): it needs its own design and review, and a rebuild path for the multi-process
+      1262 (tools/rebuild_run.rebuild handles single-process runs only); its caption is ''our existing models, not trained
+      on their data''. (5) Write-up in docs/results.tex with % src / % claim lines.'
+    written: '2026-11-17T14:35:34+00:00'
