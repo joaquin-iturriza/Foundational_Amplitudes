@@ -35122,7 +35122,8 @@ entries:
     '4': '2026-11-18'
     '6': detached zng_gate_windows (submits Suprio's RUN_N=1..4 production at 19:35 UTC; its smoke passed, 50 tests, 0.21
       s/step on V100)
-    '7': detached zng_gate_windows (submits B2's 8 runs at 18:12 UTC, after the site gate's 60-min window)
+    '7': Jean Zay checkout reset to the rewritten trunk (a worker is on it; JZ at 8fb002e lacks e75bcabb); then B2's 8 runs
+      go to Jean Zay A100; data and trial 1262 already copied there
     '8': the four B1 DyHPO sweeps ccin2p3:tp_zng_hpo_{zg,zgg,zggg,zgggg} (31 of 32 trials queued; zgggg trial_0007 resubmitted
       by detached zng_gate_windows)
     '9': FA-ccin2p3-910dd6e1 (pool rebuild); the parent smoke goes afterok on it from zng_gate_windows
