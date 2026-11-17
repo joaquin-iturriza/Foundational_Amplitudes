@@ -114,6 +114,6 @@ for part, order in (("ee", P[:6]), ("qcd", P[6:])):
             ax.plot([], [], "o", color="k", mfc="white", label="open: 8k of 32k steps")
         ps.process_label(ax, LAB[p])
         ax.set_xscale("log"); ax.set_yscale("log")
-        ax.set_xlabel(r"fine-tuning events $D$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
+        ax.set_xlabel(r"training events $D_{\rm train}$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
         ps.legend(ax, "lower left", ncol=2, fontsize=ps.LEGEND_MIN_PT)
     ps.save(fig, os.path.join(ROOT, "analysis", "transfer", "figs", f"{BASE}_{part}"))

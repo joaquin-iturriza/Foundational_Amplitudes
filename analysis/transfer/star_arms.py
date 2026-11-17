@@ -43,7 +43,7 @@ FIGDIR = os.path.join(ROOT, "analysis", "transfer", "figs")
 
 def axes_style(ax):
     ax.set_xscale("log"); ax.set_yscale("log")
-    ax.set_xlabel(r"fine-tuning events $D$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
+    ax.set_xlabel(r"training events $D_{\rm train}$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
 
 
 def own_probe(ax, arm):

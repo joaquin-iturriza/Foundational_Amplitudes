@@ -179,11 +179,11 @@ def ft():
             print(f"  ft {p} {lab}: zero shot {rs[0]['mse_log_step0']:.3g}, D=10 {rs[0]['mse_log']:.3g}, "
                   f"D=316 {rs[-1]['mse_log']:.3g}")
         sc = sorted((r for r in d if r["kind"] == "scratch" and r["probe"] == p), key=lambda r: r["D"])
-        ax.plot([r["D"] for r in sc], [r["mse_log"] for r in sc], "s--", color=ps.C.grey, label="trained from scratch")
+        ax.plot([r["D"] for r in sc], [r["mse_log"] for r in sc], "s--", color=ps.C.grey, label="from scratch")
         ax.set_xscale("log"); ax.set_yscale("log")
         ys = [l.get_ydata() for l in ax.lines]
         ax.set_ylim(0.7 * min(np.min(y) for y in ys), 4 * max(np.max(y) for y in ys))   # headroom: the process label sits above the zero-shot lines
-        ax.set_xlabel(r"target training events $D$"); ax.set_ylabel(MSE_LAB)
+        ax.set_xlabel(r"training events $D_{\rm train}$"); ax.set_ylabel(MSE_LAB)
         ps.process_label(ax, name)
     ps.legend(axs.flat[0], "lower left")
     ps.save(fig, os.path.join(FIGS, "paper_muon_ft"))

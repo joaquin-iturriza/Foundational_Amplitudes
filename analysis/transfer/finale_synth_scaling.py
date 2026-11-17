@@ -43,7 +43,7 @@ def draw(part, probes, fams, labels):
         for f, lab, c, m in fams(p):
             curve(ax, D, [cell(f, p, k) for k in K], color=c, marker=m, label=lab)
         ax.set_xscale("log"); ax.set_yscale("log")
-        ax.set_xlabel(r"fine-tuning events $D$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
+        ax.set_xlabel(r"training events $D_{\rm train}$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
         ps.process_label(ax, labels[p])
         if PAPER or i == 0:
             ps.legend(ax, "lower left", fontsize=ps.LEGEND_MIN_PT)
