@@ -33452,7 +33452,7 @@ entries:
     decision: D471
   owner:
     agent: a4fffe14e30441828
-    state: working
+    state: closed
     since: '2026-11-17T04:18:38+00:00'
     state_at: '2026-11-17T05:51:47+00:00'
     context: 237494
@@ -34004,27 +34004,28 @@ entries:
     start: '2026-11-17T04:33:08+00:00'
     at: '2026-11-17T04:33:08+00:00'
   handoff:
-    state: 'Draft ~/drafts/fm_amplitudes_2026-11 at 314e151, 48 pp (scratchpad draft_final_fig15.pdf, draft_final_overleaf_fig15.zip).
-      Step 5 done: Fig. 15 on the low-loss probes (muon_ft_lowloss.json @4979f72f): Muon lower on the 3 trees at every D_train
-      (4-5x at 316), one loop crosses between D=32 and 100 and ends within 25%; Sec. 4 paragraph and caption rewritten. Step
-      4: both rounds of Joaquin''s figure notes applied (FA 80849a90 and after; skill updated); open: his answer on Fig. 21''s
-      step-1 curve and on a scaled 3x4 grid (plan ask). Not applied and reported: square scatter boxes (house 2.40x1.92 box;
-      equal limits instead), Figs. 18-19 shorter y (legend needs it), Figs. 20-21 as one figure (7 panels do not fit). .claude/context/fa-figures.txt
-      lacks the new figure rules (claudemd-keeper backlog overdue blocked commits while it was edited): add them after that
-      review. Step 3 (het vs MSE) waits as before.'
-    decisions: 'Joaquin 2026-11-17: figures readable alone; one name per dataset (''pp, in pretraining / held out, sampled
-      from PDFs''); y = x scatters on equal limits; ratio range from the bulk of the bins (ps.ratio_range, rest at the edge);
-      input rows baseline +- one change with ''lin. emb.''; Figs. 7-8 one legend naming the four curves; calm star-arm colours;
-      no hyperparameter points named in Fig. 21. Fig. 21 step-1 curve = step 1''s search (repo-reviewer: the two-point curve
-      overstates the four searched arms'' gain; Joaquin asked).'
-    ruled_out: 3 columns of house panels (10.7 in, past the printable width); 4 rows (10.2 in, past the page); fixed-aspect
-      square scatter axes (layout() does not support them, content overhangs); legend upper right on finale_synth (no shorter
-      y range).
+    state: 'Draft ~/drafts/fm_amplitudes_2026-11 at 2ec4471, 46 pp (scratchpad draft_final_fig15sep.pdf, draft_final_overleaf_fig15sep.zip,
+      compiled standalone). Joaquin''s third figure round applied (FA 84948781, draft a1fae6e): Figs. 16-17 and 18-19 each
+      one 3x4 grid at scale 0.62 (rung_focus.pdf, finale_synth_paper.pdf; rung_grid.grid, ps.legend_free), y = x scatters
+      on the data''s range with legends split between the off-diagonal corners, Fig. 12 split (paper_pidqn, paper_unseen),
+      Fig. 14 right input rows as symbols, x MSE/sigma^2, black. Fig. 15 redone on the separation probes (muon_compare.py
+      sep-probes; runs FA-ccin2p3-9f53a445/25941ebf/264b3f81, muon_ft_sep.json @adab94db): every curve falls with D_train
+      except Muon on b bbar->HHHZ (2.3x over 10->316); Muon lower at D=10 (10-50x), within 1.5x at D=316 on 3 of 4; Sec. 4
+      text rewritten. Step 3 (het vs MSE) waits on Joaquin as before. fa-figures context and figure-style skill lack today''s
+      rules (free-corner legends, split scatter legends, scaled 3x4 grids); plot_style changes (covered, legend_free, shared_legend
+      handles, _ps_scaled, add_artist legends counted) not yet seen by the repo-reviewer.'
+    decisions: 'Joaquin 2026-11-17: Figs. 18-19 (and any like them) one 3x4 grid scaled to the page; scatters compacted (no
+      range stretch for the legend); Fig. 12 split since its panels are two quantities; Fig. 13 (now 14) right symbolic rows;
+      Fig. 15 probes with low error and large Muon/AdamW separation (rule: 25th percentile of geometric-mean zero-shot MSE
+      over all held-out processes but alpha_s/energy/cut variants, top 4 by |log AdamW/Muon|). Input-comparison rerun deferred
+      (D472); Fig. 20 keeps its single step-1 curve.'
+    ruled_out: 'One corner legend on a 4-set y = x scatter (w/W + h/H = 1.04 > 1: crosses the diagonal at any range); low-probes''
+      one-per-axis rule (no separation, three 2->4 and a one-loop probe).'
     running: none
-    files: analysis/catalog_v4/paper_sec3_figs.py; analysis/transfer/star_arms.py; analysis/data_saving/example_reruns.py;
-      plot_style.py (ratio_range, _ps_equal_limits); analysis/catalog_v3/data/muon_ft_lowloss.json; scripts/prebuild_recipes.sh;
-      tools/write_own_alphas.py; .claude/skills/figure-style/SKILL.md; ~/drafts/fm_amplitudes_2026-11/paper.tex
-    written: '2026-11-17T04:08:30+00:00'
+    files: analysis/catalog_v4/paper_sec3_figs.py; analysis/transfer/rung_grid.py (grid); analysis/transfer/rung_focus.py;
+      analysis/transfer/finale_synth_scaling.py; plot_style.py (covered, legend_free); analysis/catalog_v3/muon_compare.py
+      (sep-probes); analysis/catalog_v3/data/muon_ft_sep.json; recipes/catalog_v3_sep_probes.yaml; ~/drafts/fm_amplitudes_2026-11/paper.tex
+    written: '2026-11-17T05:55:22+00:00'
   step_why:
     3:
       feeds: whether and how the paper states the het-vs-MSE comparison
