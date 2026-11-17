@@ -28971,6 +28971,16 @@ entries:
       kitvm_mse/median/dev per process, kitvm_bulk, kitvm_dist per process + bulk, kitvm_ratio_beta, kit_deepest_attempts;
       16 files, each passes send_check with its caption (captions in scratchpad caps/caps.json). Transformer from scratch
       missing on the beta-ratio figure (lxplus down).'
+  - at: '2026-11-17T03:40:17+00:00'
+    text: '2026-11-17 @092b4128. Step 23 redone (Joaquin 2026-11-17: fewer figures, ranges readable when a bad model is far
+      off, short deck): tools/kit_vs_mlp.py plot --figs analysis/kit_benchmark/figs/deck and kit_figures.py summary --out
+      .../deck/kit_deepest_attempts. Off-scale rule (kit_figures.clip_plot): MSE axes capped at 100 (10 decades), median axes
+      at the truth''s range widened by its span; values beyond drawn on the edge as hollow triangles, the extreme printed
+      (tt Sudakov raw MLP MSE 4e4, median +206; tt ReZero 3e6). Histograms: models with <90% of events inside the truth''s
+      range in their own right-hand panel (transformer and raw MLP on every hard bin, plus the log+beta MLP on tt Sudakov);
+      each panel titled with process and bin. dev and beta-ratio figures dropped (duplicate median and MSE). Attempts: six
+      fine-tunes one marker. Deck talks/kit_nov2026/main.pdf, 8 slides (MSE uug/uugg/tt, median uug/tt, deepest uug histograms,
+      bulk, attempts). Captions in scratchpad caps/caps_deck.json, all 12 pass send_check.'
   step_why:
     20:
       feeds: the KIT NLO statement in the draft
