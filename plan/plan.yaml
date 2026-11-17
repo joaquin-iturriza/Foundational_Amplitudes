@@ -35739,6 +35739,13 @@ entries:
       give MSE 0.2791, mean -11.265 on the 2000 dc_bbx_hh events = the stored read. The 0.194 offset is a CPU-only path difference
       in our model code (after the attention-mask fix 1ce53bcd), not the wrapper or weights; not found yet (not fp16, not
       augmentation, not frame noise). README d3208a9e: use a GPU.'
+  - at: '2026-11-17T20:22:45+00:00'
+    text: 'CPU offset (0.194 low in log|M|^2, MSE 0.4173 vs GPU 0.2791, 2000 dc_bbx_hh val events) is not package versions:
+      the CC login node''s own env (torch 2.1.2+cu118, lloca 111caa04) on CPU with xformers hidden gives 0.4173. Not training.dtype
+      float64 (0.4173), not LLOCA_FRAMES=repeat (0.4173), not frame degeneracy noise (regularizers fire on 0 of 4000 vectors
+      on CPU), and not TF32 rounding: emulating TF32 on CPU (matmul/linear/bmm/einsum inputs rounded to a 10-bit mantissa)
+      gives 0.4175, mean q-t -0.4395 (vs -0.4394). Layer-by-layer GPU/CPU dump submitted (FA-lxplus-fee0d906, evaluate_daniels_catalog/layer_dump.py
+      @bac629cf).'
   handoff:
     state: 'Evaluator (evaluate_daniels_catalog, README d3208a9e) reproduces the stored DlessInOrd read on GPU exactly (MSE
       0.2791, FA-ccin2p3-c3e63032) and is file/order independent (per-event keyed augmentation; CPU cross-event attention
