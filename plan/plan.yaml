@@ -33821,6 +33821,19 @@ entries:
       Fig. 19 legend split, the four short names lower left, four long upper right under the process label, y range 1e-7..2e4
       (was 1e-12..1; data 1e-7..1.7), no point covered; ladder grids (Figs. 16, 17) 3 across x 4 down, included at 0.62 (420
       pt wide of 425). Build 49 pp, overfulls unchanged (7, none from figures). Scratchpad draft_pass5.pdf/.zip.'
+  - at: '2026-11-17T11:42:58+00:00'
+    text: '2026-11-17 step 5 (why the zero-shot gain is lost in fine-tuning), from committed tools: collect_catft_curves.py
+      @85ee6178, ft_curves_fig.py @3eb26532 (figs/ft_curves_sep.png), validation MSE(log|M|^2) of the separation-probe fine-tunes
+      (zz_catft_sep). Muon pretraining''s fine-tunes run at its own peak lr 8.9e-3 (AdamW''s 2.2e-3), warm-up to step 111
+      (D=32) / 724 (D=316). At D_train=32 the Muon fine-tune is above its zero shot at the first validation (step 7) and stays
+      there on 3 of 4 probes (share of validations above: 1.00 on g g->t tbar, d dbar->t ubar, b bbar->HHHZ; 0.17 on u ubar->W+W-);
+      e.g. g g->t tbar zero shot 4.31e-4, first 1.14e-3, last 1.51e-3. At D=316 the first validation (step 45) is already
+      below the zero shot on 3 probes and ends 15-100x below it; b bbar->HHHZ is the exception: 0.0040 at step 45 then rises
+      to 0.036 as the lr warms up (share above 0.97). AdamW pretraining''s fine-tunes start 30-200x higher and fall below
+      their zero shot by the first validation on every probe (share above 0.00-0.03); both parents show loss spikes near the
+      warm-up''s end (peak lr). Reading: the gain is lost to the fine-tune learning rate, the Muon parent''s full lr on 32-316
+      events, not to the pretraining; the best checkpoint at D=32 is the first validation, and step 0 is never a candidate.
+      Prior: muon_hp_ft (results.tex) searched lr_scale 0.1-10 on the median probes, best lr_scale 0.343, gain 1.19x.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
