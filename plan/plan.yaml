@@ -33502,7 +33502,7 @@ entries:
       me this exactly?''; Fig. 15 stays out under his hold, no rerun asked'
   owner:
     agent: a4b2e4f58e3b9081f
-    state: working
+    state: closed
     since: '2026-11-17T11:26:56+00:00'
     state_at: '2026-11-17T12:35:42+00:00'
     context: 248803
@@ -34137,34 +34137,24 @@ entries:
     start: '2026-11-17T04:33:08+00:00'
     at: '2026-11-17T04:33:08+00:00'
   handoff:
-    state: 'Step 4 general pass done in text: draft ~/drafts/fm_amplitudes_2026-11 at 6c5dfc7 (48 pp; scratchpad draft_pass4.pdf,
-      draft_pass4.zip compiled standalone). Fine-tune figure and its subsection out (D473); ''ab: insert here'' resolved per
-      Joaquin (figure before its paragraph; Sec. 4 says the network is pretrained on ladder steps 1-9 plus every star arm,
-      the 28 processes of Tabs. ladder and arms; tables rewritten with the figures'' names, step 0 to k convention, duplicates
-      noted); captions message-first with colours; figures [H] after their first paragraph; catalog/pool/Muon naming fixed;
-      Fig. 14 right rows in words (FA 6a53212c); ladder grids at widerow 0.56 (0.62 ran off the page). Cold reader (figures
-      alone + text vs figures) applied: claims softened to what the figures show (nearly every pretraining helps; nine of
-      twelve with its criterion and exceptions; threshold arm; W pole from 1e3; step budgets 8k at 1e3, 32k at 1e3.5/1e4).
-      Left from the cold read, both need code blocked by the repo-reviewer backlog: split Fig. 14 into two figures (two quantities,
-      Joaquin''s own rule for Fig. 12) and redraw Fig. 19 (star_arms2: y range 1e-12..1 from make_room for its 8-entry legend
-      squashes the curves). Repo-reviewer holds the lock, verdict FIX: blocking tools/kit_figures.py:330 (kit_benchmark entry''s
-      file: one legend ''pretrained with the top family held out (6 runs)'' over parents that had tops added); non-blocking
-      for this entry: ''+ capped pair bias'' reads cumulative (caption must say both pair-bias rows add to ''no diagrams,
-      linear embedding'', capped one with identity term), write_own_alphas.py:92 shared tmp name (add pid), catft_curves.json
-      grew 26x (collector must store lr peak/warm-up end as scalars, not per-step lists; the json was restored to the committed
-      version), analysis/data_saving/data/example_reruns.npz not gitignored. Step 5: cause read (finding 2026-11-17, Muon
-      fine-tune at the parent''s lr rises above zero shot within the first validations); figure script drafted but not written
-      to disk (Write blocked by the backlog).,'
-    decisions: 'Joaquin 2026-11-17 (D473): fine-tune figure out until the zero-shot loss in fine-tuning is understood; his
-      ''ab: insert here'' clarification: the figure goes there, no new table, say how the network was pretrained and point
-      to the ladder/star-arm tables, made clear. Fig. 14 right labels his examples verbatim; rows in reading order.,'
-    ruled_out: 'A new pretraining-process table (Joaquin: point to the ladder/arms tables); widerow 0.62 for the 3x4 grids
-      (clips the left column on A4).,'
-    running: none,
-    files: '~/drafts/fm_amplitudes_2026-11/paper.tex; analysis/catalog_v4/paper_sec3_figs.py; analysis/catalog_v3/collect_catft_curves.py
-      (uncommitted: prepd_std + step logs, site --timeout 900); analysis/transfer/star_arms.py; scratchpad draft_pass4.pdf/.zip,
-      fig14_paper_target.png, d7/sec456.txt'
-    written: '2026-11-17T11:03:22+00:00'
+    state: 'Joaquin''s corrections done through 2026-11-17 ~13:30: captions without headlines or seed counts; ladder grids
+      3 across x 4 down with every legend inside (common curves in one panel); Fig. 19 legend split; Fig. 14 right fifth version
+      (rows as +/- changes against the setup used, by value, reviewed against the four rejected versions, finding 11:56 lists
+      them: never show them again); target T renamed A^* in text and Fig. 14 axis; Fig. 14 left legend in his words. Draft
+      ~/drafts/fm_amplitudes_2026-11 at 801c504, 48 pp, scratchpad draft_pass7.pdf/.zip. Step 5 cause found (fine-tune lr;
+      ft_curves_sep figure) and asked to Joaquin under D473 (rerun at lr_scale 0.343 or leave Fig. 15 out). Next ready: the
+      new step (Fig. 14 right on MSE(log|M|^2)).'
+    decisions: 'Fig. 14 right reference = the setup the pretrainings use (Joaquin''s own text: diagram encoder kept, linear
+      embedding); labels ''- diagrams'', ''+ nonlinear emb.'', ''+/- pair bias'' etc. Common legend of the grids inside a
+      panel or merged into one panel''s legend (no strips). A^* for the dimensionless target (Joaquin). No seed counts in
+      paper captions (figure-style skill changed).'
+    ruled_out: 'Fig. 14 right label versions 1-4 (finding 11:56); words-only fallback of version 5 (reviewer: versions 1/4
+      again, too long); ''trained on A^*, the dimensionless target'' y label (clipped); two-line tick labels (overlap).'
+    running: none
+    files: ~/drafts/fm_amplitudes_2026-11/paper.tex; analysis/catalog_v4/paper_sec3_figs.py (target, inputs); analysis/transfer/rung_grid.py
+      (grid); analysis/transfer/star_arms.py; analysis/catalog_v3/ft_curves_fig.py, collect_catft_curves.py; scratchpad draft_pass7.pdf/.zip,
+      joaquin_figs*_2026-11-17.txt
+    written: '2026-11-17T12:39:08+00:00'
   step_why:
     3:
       feeds: whether and how the paper states the het-vs-MSE comparison
