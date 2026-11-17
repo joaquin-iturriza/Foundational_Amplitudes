@@ -35120,8 +35120,7 @@ entries:
   step_waits:
     '5': the notes-editor pillar reviewer (blocked on par:muon_long, another entry)
     '4': '2026-11-18'
-    '6': the CC checkout reset to the rewritten trunk (site sync cannot fast-forward after the history rewrite that dropped
-      9ea31ae3)
+    '6': FA-ccin2p3-7f7f0b53
     '7': the CC checkout reset to the rewritten trunk (site sync cannot fast-forward after the history rewrite that dropped
       9ea31ae3)
     '8': the CC checkout reset to the rewritten trunk (site sync cannot fast-forward after the history rewrite that dropped
