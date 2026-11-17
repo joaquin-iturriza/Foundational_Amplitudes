@@ -42,7 +42,7 @@ cd "$PROJECT_DIR"
 WHICH="$1"; shift
 SUB=10000; FIX=()
 case "$WHICH" in finale) T=64000; LR=3.78e-3; SUB=null
-    FIX=(training.scheduler=WSD training.wsd_cooldown_frac=0.125 ++model.input_soft_eps=1e-8 ++model.input_pair_logs=7) ;; heldoutbbzz) T=3458; LR=9.248e-3 ;; heldout|heldoutthr|heldoutthrloop) T=4307; LR=8.196e-3 ;; treesin) T=4313; LR=8.190e-3 ;; *) echo "finale, heldout, heldoutbbzz, heldoutthr, heldoutthrloop or treesin"; exit 2 ;; esac
+    FIX=(training.scheduler=WSD ++training.wsd_cooldown_frac=0.125 ++model.input_soft_eps=1e-8 ++model.input_pair_logs=7) ;; heldoutbbzz) T=3458; LR=9.248e-3 ;; heldout|heldoutthr|heldoutthrloop) T=4307; LR=8.196e-3 ;; treesin) T=4313; LR=8.190e-3 ;; *) echo "finale, heldout, heldoutbbzz, heldoutthr, heldoutthrloop or treesin"; exit 2 ;; esac
 PARENT="runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262"
 RECIPE="$PROJECT_DIR/recipes/catalog_v4_datasaving_parent_${WHICH}.yaml"
 [ "$WHICH" = finale ] && RECIPE="$PROJECT_DIR/recipes/transfer_finale.yaml"
