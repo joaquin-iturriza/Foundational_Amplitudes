@@ -35062,6 +35062,19 @@ entries:
       our setup''s floor on Z+ng, flagged. (2) parent: completes 64000 steps without blowing up, curve test passes and its
       geometric-mean val MSE over the 28 is within 10x of or below the old finale''s -> it is the parent of stage 2; else
       the failure (where, which processes) is reported and stage 2 waits on a fix.'
+    passed_at: '2026-11-17T15:59:12+00:00'
+    reviewer: 'Re-check of the 15:58 design after FIX. Check 1: one change per comparison (B2 vs earlier 8 = protocol; Suprio
+      LLoCa vs B2 = network/pipeline at matched protocol; new parent vs old finale = setup, D487). Check 2: median |Delta|
+      spans 4.8e-5..2.1e-2 and pull std 0.99..28 across the 8 runs (benchmark.json @8f291240); old finale geometric-mean val
+      MSE 4.9e-6 confirmed at results.tex l.15024, converted per process by sigma_p on the same val pools. Check 3: one seed
+      against the measured spread (ladder seeds median 1.5x, >3x in 10/49 cells, l.13696; one-loop seeds 9x on u u~), yes/no
+      at 10x, 3-10x unresolved with the second-seed question to Joaquin. Check 13: B1 = template coupled space, 8 trials,
+      3 start-up, waves 3,3,2; finish times stated. Check 14: ~11 GB of 45 GB free on CC (runs/kit dirs ~80 MB measured).
+      Check 15: step rates and limits from each batch''s own smoke; the B2 overrides exist in base_experiment.py. Checks 9/11:
+      HETEROSC and emission-scale target per D71/D487. Check 10: Suprio''s data_seed-0 test split. Check 7: D481, D484, D487
+      answered; stage 2 (D483) deferred with its reason. Check 5 searched: zng, Z+ng, Suprio, highmult, finale, transfer_finale,
+      dsave_parent_finale, finale with het/HETEROSC/current setup, D91/D94 (het fine-tunes from the finale only, no retrained
+      parent).'
   step_why:
     4:
       feeds: whether our setup, trained well, comes within 3x of their networks on Z+ng
