@@ -34145,7 +34145,38 @@ entries:
     - analysis/zng_uq/data/paper_mse.json
     - tools/zng_uq.py
   dead_ends: []
-  asks: []
+  asks:
+  - ask: 'GPU budget: ~370 GPU-h above 30 with no decision covering it (DyHPO route; ~23 GPU-h with template defaults). Design
+      for the Z+ng trainings, for your call (nothing submitted). (1) Parent for the fine-tune: trial 1262 of cov_v4_long_hpo8_cc_68224
+      (runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262), our production catalog_v4 pretraining: 1153 pools
+      of catalog_v4 at default share 0.25, 68,224 steps at batch 16384, MuonAdamW, HETEROSC + sigma stage, emission-scale
+      target, float32, width 8, diagrams + off-shellness; the length that won par:v4_length (16x over 4x steps: test MSE ratio
+      0.67 on PP4 and EE4). Final val_loss_no_reg (het NLL over all pools) -4.201. It trained on b b~ > Z + 1,2,3 g with massless
+      b, the same |M|^2 as d d~ up to the Z couplings, so Z+1..3g are not held out for it; Z+4g (2->5) it never saw. Its test
+      MSE of the standardized target on those pools (200 events each): Z+g 3.6e-8, Z+2g 7.2e-6, Z+3g 7.5e-5 (mean |rel err|
+      0.07%, 0.72%, 3.0%). It lacks the newer softpair inputs (soft rescale + pair logs), so a fine-tune runs on its inputs,
+      not the scratch runs''. The alternative, the data-saving r5 parents (softpair, but 3,458 steps and families held out),
+      is weaker. (2) Scratch runs, the latest setup as in kit_benchmark: emission-scale target, HETEROSC + sigma stage, MuonAdamW,
+      WSD (cooldown 1/8), batch 16384, softpair inputs, float64, their 5e5 train / 1e5 val / 1e6 test events, checkpoint on
+      val mu-MSE. Horizon: their 200k iterations at batch 1024 are 410 epochs of 5e5, 12,500 steps at our batch (300 epochs,
+      the KIT precedent D425, would be 9,155). (3) HPs: (a) a 16-trial DyHPO over the template''s space per arm and multiplicity
+      (scratch: lr, Muon weight decay, L2, warmup, eta_min, EMA; fine-tune adds lr_scale and layer_decay), 8 searches = 128
+      trials; (b) the template''s defaults, lr from the lr law at (T, D), one run per arm and multiplicity = 8 runs. Cost,
+      estimated from the KIT float64 step rates (uug 0.69, uugg 0.79 s/step on V100, ~+0.1 s per extra particle, so Z+1g..Z+4g
+      ~0.6..0.9 s/step; not measured on these data) plus ~0.3 h of sigma stage and scoring 1e6 test events: ~2.9 GPU-h per
+      run at 12,500 steps. (a) ~370 GPU-h (~280 at 300 epochs), (b) ~23 GPU-h (~18). A scratch run at the parent''s inputs,
+      so the fine-tune has a matched control: +4 runs (b) or +4 searches (a). Which parent, which HP route, which horizon,
+      and the matched-input control or not?'
+    at: '2026-11-17T11:24:55+00:00'
+    searched: 'CLAUDE.md (HPO rule: a hyperparameter question goes through a DyHPO sweep over the template''s space; GPU budget
+      30 GPU-h), site decisions --project FA: D477 approves scratch + fine-tune with no cost; D424/D428/D430 (properly optimize,
+      16 trials) and D425 (match their epochs) were said for kit_benchmark; D153/D242/D244 budget; D86 dropped ''Jonas''s
+      matched Z+ng'' (another question). Joaquin''s messages 2026-11-14T04:31 (the paper draft''s LaTeX source, no cost or
+      parent for this entry), 2026-11-10T02:08 (the KIT benchmark request), 2026-10-09T00:15 (synthetic data conventions):
+      none settles this. He asked (2026-11-17, via the main session) to see the parent and the HP route before anything runs.'
+    blocks: step 3 (all trainings on their data); setup and eval-only go on
+    blocks_steps: &id004
+    - 3
   owner:
     agent: a7b24b3d46311d66f
     state: working
@@ -34233,3 +34264,33 @@ entries:
     units: null
     start: '2026-11-17T11:23:55+00:00'
     at: '2026-11-17T11:23:55+00:00'
+  ask: 'GPU budget: ~370 GPU-h above 30 with no decision covering it (DyHPO route; ~23 GPU-h with template defaults). Design
+    for the Z+ng trainings, for your call (nothing submitted). (1) Parent for the fine-tune: trial 1262 of cov_v4_long_hpo8_cc_68224
+    (runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262), our production catalog_v4 pretraining: 1153 pools of
+    catalog_v4 at default share 0.25, 68,224 steps at batch 16384, MuonAdamW, HETEROSC + sigma stage, emission-scale target,
+    float32, width 8, diagrams + off-shellness; the length that won par:v4_length (16x over 4x steps: test MSE ratio 0.67
+    on PP4 and EE4). Final val_loss_no_reg (het NLL over all pools) -4.201. It trained on b b~ > Z + 1,2,3 g with massless
+    b, the same |M|^2 as d d~ up to the Z couplings, so Z+1..3g are not held out for it; Z+4g (2->5) it never saw. Its test
+    MSE of the standardized target on those pools (200 events each): Z+g 3.6e-8, Z+2g 7.2e-6, Z+3g 7.5e-5 (mean |rel err|
+    0.07%, 0.72%, 3.0%). It lacks the newer softpair inputs (soft rescale + pair logs), so a fine-tune runs on its inputs,
+    not the scratch runs''. The alternative, the data-saving r5 parents (softpair, but 3,458 steps and families held out),
+    is weaker. (2) Scratch runs, the latest setup as in kit_benchmark: emission-scale target, HETEROSC + sigma stage, MuonAdamW,
+    WSD (cooldown 1/8), batch 16384, softpair inputs, float64, their 5e5 train / 1e5 val / 1e6 test events, checkpoint on
+    val mu-MSE. Horizon: their 200k iterations at batch 1024 are 410 epochs of 5e5, 12,500 steps at our batch (300 epochs,
+    the KIT precedent D425, would be 9,155). (3) HPs: (a) a 16-trial DyHPO over the template''s space per arm and multiplicity
+    (scratch: lr, Muon weight decay, L2, warmup, eta_min, EMA; fine-tune adds lr_scale and layer_decay), 8 searches = 128
+    trials; (b) the template''s defaults, lr from the lr law at (T, D), one run per arm and multiplicity = 8 runs. Cost, estimated
+    from the KIT float64 step rates (uug 0.69, uugg 0.79 s/step on V100, ~+0.1 s per extra particle, so Z+1g..Z+4g ~0.6..0.9
+    s/step; not measured on these data) plus ~0.3 h of sigma stage and scoring 1e6 test events: ~2.9 GPU-h per run at 12,500
+    steps. (a) ~370 GPU-h (~280 at 300 epochs), (b) ~23 GPU-h (~18). A scratch run at the parent''s inputs, so the fine-tune
+    has a matched control: +4 runs (b) or +4 searches (a). Which parent, which HP route, which horizon, and the matched-input
+    control or not?'
+  waiting_since: '2026-11-17T11:24:55+00:00'
+  searched: 'CLAUDE.md (HPO rule: a hyperparameter question goes through a DyHPO sweep over the template''s space; GPU budget
+    30 GPU-h), site decisions --project FA: D477 approves scratch + fine-tune with no cost; D424/D428/D430 (properly optimize,
+    16 trials) and D425 (match their epochs) were said for kit_benchmark; D153/D242/D244 budget; D86 dropped ''Jonas''s matched
+    Z+ng'' (another question). Joaquin''s messages 2026-11-14T04:31 (the paper draft''s LaTeX source, no cost or parent for
+    this entry), 2026-11-10T02:08 (the KIT benchmark request), 2026-10-09T00:15 (synthetic data conventions): none settles
+    this. He asked (2026-11-17, via the main session) to see the parent and the HP route before anything runs.'
+  blocks: step 3 (all trainings on their data); setup and eval-only go on
+  blocks_steps: *id004
