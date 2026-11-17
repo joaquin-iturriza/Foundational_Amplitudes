@@ -35120,7 +35120,8 @@ entries:
     '4': '2026-11-18'
     '6': FA-ccin2p3-7f7f0b53
     '7': FA-ccin2p3-3e8178a0
-    '8': the next owner's submission (B1 sweeps not yet submitted at the close)
+    '8': the four B1 DyHPO sweeps ccin2p3:tp_zng_hpo_{zg,zgg,zggg,zgggg} (31 of 32 trials queued; zgggg trial_0007 resubmitted
+      by detached zng_gate_windows)
     '9': the next owner's submission (pool rebuild not yet submitted at the close)
   findings:
   - at: '2026-11-17T11:18:43+00:00'
