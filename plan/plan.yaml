@@ -34812,6 +34812,13 @@ entries:
       2-3e-3 against median |Delta| 1.6-2.1e-2, i.e. sigma follows the memorised training residuals (hypothesis, not checked:
       where the sigma stage fits). Design outcome ''not well'': numbers flagged; next step the HP choice per multiplicity,
       a DyHPO search, to Joaquin (cost above 30 GPU-h).'
+  - at: '2026-11-17T15:31:49+00:00'
+    text: '2026-11-17 zero-shot read of 1262 (sigma stage) on their 1e6 test events per n (FA-ccin2p3-7a112608, benchmark.json
+      @8f291240): median |Delta| Z+1g 0.19, Z+2g 0.12, Z+3g 0.098, Z+4g 0.23; pull std 68/8.1/1.9/8.0, pull mean -168/-21/-2.8/+3.8.
+      Design outcome: n=1,2 more than 10x above 1262''s own b b~ level (5.2e-4, 3.9e-3: 370x, 30x) -> the d label breaks it;
+      n=3 4.9x above (2.0e-2) -> between; n=4 14x above the fine-tuned run -> does not extrapolate, its residual negative
+      (prediction low), opposite to par:v4_mult_bias''s positive sign. At n=1,2 the error is near a constant: prediction/truth
+      ~1.2-1.25 (|Delta| q90 0.24 at Z+1g), close to 1/0.7798 = 1.28, the u/d ratio (observation, not checked).'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
