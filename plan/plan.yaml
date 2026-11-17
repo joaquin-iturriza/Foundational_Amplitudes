@@ -35772,6 +35772,11 @@ entries:
       in training and in reading. Fix 4522c3ba: models/diagram_encoder_llm4lhc.LAP_PE_TABLE, filled by evaluate.py from evaluate_daniels_catalog/model/lap_pe.json,
       generated on a GPU node (lap_pe_table.py, job_lap_pe_table.sh); the table overriding the machine''s basis checked locally
       (Prescott table on a Haswell kernel: 0.2898).'
+  - at: '2026-11-17T21:23:11+00:00'
+    text: 'CPU evaluator fixed at 425f10d2: with the Laplacian PE table from an lxplus GPU node (FA-lxplus-86b24e3b), evaluate.py
+      on the local CPU gives MSE 0.2791 on the 2000 dc_bbx_hh val events, per event equal to the stored GPU read (rms difference
+      0.0000, check_reproduction.py). Open: on a CPU-only machine with xformers installed the evaluator crashes (xformers
+      has no CPU kernel); .venv-cpu has no xformers.'
   handoff:
     state: 'Evaluator (evaluate_daniels_catalog, README d3208a9e) reproduces the stored DlessInOrd read on GPU exactly (MSE
       0.2791, FA-ccin2p3-c3e63032) and is file/order independent (per-event keyed augmentation; CPU cross-event attention
