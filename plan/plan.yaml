@@ -35477,6 +35477,20 @@ entries:
       at least as well as his own training, reported to Joaquin as evidence for using it as the foundation; if higher or within
       resolution: it is not better on his held-out set, with the calibration saying how much is the cross-catalog mismatch
       (b Yukawa, conventions) rather than the model, and the b split saying where; refused or non-finite probes listed apart.'
+    passed_at: '2026-11-17T18:44:34+00:00'
+    reviewer: 'Re-check after FIX: hp58 (with g) is now an arm alongside Suprio, shared standardization and DlessInOrd; the
+      prior names the hp58 read (D74) and the cross-catalog precedent with its b split and seed spreads. Check 2: the raw
+      measure separates the existing arms on the 9 truly held out (2.24/1.12/1.72/1.05) and the affine map moves hp58 by 20x
+      (0.114 to 0.0057 on the 91). The DANID axis at 26cab1f7 (recipes/catalog_v4_dan_identical.yaml, 9 catalog_v4 tree entries
+      identical to a Daniel process, test split, v4_ prefix in the job and collect_run) measures in the same job the floor
+      that the cross-catalog mismatch adds. Check 3: process-bootstrap 68% intervals of +-0.05 to 0.1 in log10 on the 91 and
+      +-0.1 to 0.5 on the 9 and 3, against catalog_v4''s seed spread of 0.10 to 0.14; the design states that the 3 no-b processes
+      resolve nothing below about 0.5. The b processes are split apart (6 of the 9, 4 needing the b Yukawa). D488 is followed:
+      91 relabels scored, the 5 dc_ds_* identical to training entries listed apart, extrapolation only on the 9. The outcome
+      is stated for yes and no. Loss is HETEROSC with the sigma stage; eval-only, no sweep, under 10 MB of disk; pools seen
+      on CC; the axis code is committed (fc43b7c2, 26cab1f7). Searched: Daniel, dc_, dan_per_process, heldout_zero_shot, hp58,
+      dancat_het_pre, PHYSICS_MISMATCH, held out in both catalogs, and decisions D45 D59 D74 D77 D83 D87 D88 D113 D114 D131
+      D488.'
   step_why:
     1:
       feeds: whether catalog_v4's best pretraining zero-shots Daniel's held-out processes better than the arms trained on
