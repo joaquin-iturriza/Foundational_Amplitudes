@@ -109,28 +109,33 @@ def plot():
               f"|Delta| > 10: {np.mean(np.abs(d) > 10):.2%}, < 1e-6: {np.mean(np.abs(d) < 1e-6):.2%}")
     by = {(c["probe"], c["D"], c["arm"]): c for c in cells if "mse" in c}
     col = {"scratch": ps.C.blue, "fine-tune": ps.C.vermillion}
-    lab = {"scratch": "scratch", "fine-tune": "fine-tune"}
+    lab = {"scratch": "from scratch", "fine-tune": "fine-tuned"}   # short: the legend shares its row with the process label
+    from matplotlib.lines import Line2D
+    # one file per figure, legends inside in words (Joaquin 2026-11-17): the arm's colour in panel (a), the number of
+    # training events' line style in panel (b)
+    arm_h = [Line2D([], [], color=col[a], label=lab[a]) for a in ("scratch", "fine-tune")]
+    d_h = [Line2D([], [], color="0.4", linestyle=D_STYLE[D], label=f"{D_LAB[D]} events") for D in D_STYLE]
     edges = np.logspace(-6, 3, 73)   # |Delta| from 10^-6 to 10^3, eight bins a decade; events beyond go in the end bins
     # |Delta| histograms on a log axis, one panel per probe: colour the arm, line style D
-    fd = ps.panels(4)
-    for (fig, ax), p in zip(fd, PROBES):
+    fig, axs = ps.figure(ncols=2, nrows=2)
+    for ax, p in zip(axs.flat, PROBES):
         for a in ("scratch", "fine-tune"):
             for D in D_STYLE:
                 if (p, D, a) in by:
                     c = by[p, D, a]
                     x = np.clip(np.abs(np.exp(c["pred"] - c["true"]) - 1), edges[0], edges[-1] * 0.999)
                     ax.stairs(np.histogram(x, edges)[0], edges, color=col[a],
-                              linestyle=D_STYLE[D], label=f"{lab[a]}, $D=${D_LAB[D]}")
+                              linestyle=D_STYLE[D])
         ax.set_xscale("log"); ax.set_xlim(edges[0], edges[-1])
         ax.set_yscale("log"); ax.set_ylabel("events")
         ax.set_xlabel(r"$|\Delta|$, $\Delta=|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2_{\rm true}-1$")
         ps.process_label(ax, NAME[p])
-    print("FIGURE", ps.save_panels(fd, os.path.join(figs, "example_delta")))
-    ps.legend_strip(fd[0][1], os.path.join(figs, "example_delta_legend"),
-                    width=2 * fd[0][0].get_size_inches()[0])   # after save_panels: the laid-out width; two panels a row
+    ps.legend(axs.flat[0], "upper left", handles=arm_h)
+    ps.legend(axs.flat[2], "upper left", handles=d_h)
+    print("FIGURE", ps.save(fig, os.path.join(figs, "example_delta")))
     # true and predicted log|M|^2 with the ratio below, one panel per probe
-    fh = ps.panels(4)
-    for k, ((fig, ax), p) in enumerate(zip(fh, PROBES)):
+    fig, axs = ps.figure(ncols=2, nrows=2)
+    for k, (ax, p) in enumerate(zip(axs.flat, PROBES)):
         have = [(a, D) for a in ("scratch", "fine-tune") for D in D_STYLE if (p, D, a) in by]
         if not have:
             continue
@@ -145,9 +150,9 @@ def plot():
                                        ratio_label=r"$\frac{\rm pred}{\rm true}$" if k % 2 == 0 else None)
         # right-hand panels carry no ratio label: it would run into the left panel in the paper's pairs
         ps.process_label(ax, NAME[p])
-    print("FIGURE", ps.save_panels(fh, os.path.join(figs, "example_dist")))
-    ps.legend_strip(fh[0][1], os.path.join(figs, "example_dist_legend"),
-                    width=2 * fh[0][0].get_size_inches()[0])
+    ps.legend(axs.flat[0], "upper left", handles=[Line2D([], [], color="k", label="truth")] + arm_h)
+    ps.legend(axs.flat[2], "upper left", handles=d_h)
+    print("FIGURE", ps.save(fig, os.path.join(figs, "example_dist")))
 
 
 if __name__ == "__main__":
