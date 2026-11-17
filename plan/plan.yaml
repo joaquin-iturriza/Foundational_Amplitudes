@@ -35393,6 +35393,37 @@ entries:
     outcome: 'Descriptive comparison, no yes/no rule on the decision: the figure and per-group medians say whether catalog_v4''s
       pretraining zero-shots Daniel''s held-out processes better (median below the earlier arms'' on the 9 truly held out
       and on the 96 relabels) or worse; a probe the read refuses or that blows up (non-finite) is listed apart, never dropped.'
+    fix_at: '2026-11-17T18:40:55+00:00'
+    fix: '(1) Not a repeat / prior incomplete: the prior omits hp58, the best trial of the HETEROSC pretraining sweep on Daniel''s
+      catalog (dancat_het_pre, D59), already read on the same 139 held-out processes with tools/zero_shot_parent.py, per process
+      MSE(log|M|^2) raw and after the best affine map (D74; results.tex par. ''Its held-out split: zero-shot on 43, in-class
+      on 96'', fig. heldout_mse, analysis/catalog_daniel/heldout_zero_shot.py). It also omits the cross-catalog read precedent
+      (results.tex ~l.1294-1300 and ~4490-4495): processes read on both catalogs'' pools, where processes with a b are set
+      apart because the 4.7 GeV and massless-b pools ''are different functions'', with the seed spreads of those medians.
+      Fix: add hp58 as a control or say why it is not one; name both precedents. Searched: Daniel, dc_, dan_per_process, heldout_zero_shot,
+      hp58, dancat_het_pre, PHYSICS_MISMATCH, held out in both catalogs, and the FA decisions (D45, D59, D74, D77, D83, D87,
+      D88, D113, D114, D131). (2) The measure is not shown to respond to the tested change: the check shows that MSE(log|M|^2)
+      separates three arms trained on Daniel''s own catalog. It does not show that a raw read across catalogs, with no map,
+      measures generalization rather than convention and physics offsets (sm against sm-no_b_mass, b mass, alpha_s and scale
+      choice). Fix: use as calibration the 19 held-out processes identical to a catalog_v4 training entry (the 5 interpolation
+      dc_ds_ds, dc_ds_dsa, dc_ds_dsh, dc_ds_dsz, dc_ds_gds and the 14 extrapolation ones). Compare trial_1262''s MSE on Daniel''s
+      pools with its MSE on its own catalog_v4 pools of the same processes, report these 19 apart as the floor of the mismatch,
+      and also report the result after the best affine map, as hp58''s read did. Split processes with a b apart, as the precedent
+      does. 6 of the 9 truly held out contain a b (bb~>ahh, bb~>ghh, gb>bhh, gb~>b~hh, gg>bt~w+, gg>tb~w-); the 4 b-b-Higgs
+      ones depend on the b Yukawa coupling, which is zero in catalog_v4''s massless-b model, so this pretraining never saw
+      that coupling. Only 3 truly held-out processes have no b (gg>gtt~, gg>tt~a, gg>tt~h); the design must state that, and
+      what a median over 3 or 9 can say. (3) Seeds against spread: no spread is cited. A seed spread exists for catalog_v4
+      zero-shot medians: about 0.08 to 0.12 at a level of about 0.45 (results.tex ~l.1298-1299), and 0.10 to 0.14 in per-class
+      |log10| (~l.4495). State this spread and the scatter across processes of a median over 9 (or 3) processes against the
+      gaps between arms (for example 1.05 against 1.72 on the 9) and say which gap one seed resolves. (4) Outcome: ''better
+      or worse'' is stated, but not what each result changes for the entry or for the next work. Add it. (5) D488 coverage:
+      scoring the relabels whole follows D488, but the 5 interpolation processes identical to catalog_v4 training entries
+      (dc_ds_*) are not relabels; list them apart. (6) Launch and readout: DAN is a new read axis, with the physics override,
+      and its code is uncommitted. Before the batch is sized, show from a first job, or a CPU dry run on the site, that Daniel''s
+      held-out pools are present on CC (D131 deleted Daniel''s catalog''s cached pools there) and that the read writes the
+      per-process score file the figure script reads. Checks that hold: loss HETEROSC with sigma stage (trial_1262); test
+      events are Daniel''s pools, the same split and 2000 events as the earlier arms; no sweep; only the model differs, which
+      is the question.'
   step_why:
     1:
       feeds: whether catalog_v4's best pretraining zero-shots Daniel's held-out processes better than the arms trained on
