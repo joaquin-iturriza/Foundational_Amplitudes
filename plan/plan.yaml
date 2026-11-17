@@ -34224,9 +34224,9 @@ entries:
     - 2
   owner:
     agent: ad838d9b0df85e41f
-    state: working
+    state: stopped
     since: '2026-11-17T11:36:14+00:00'
-    state_at: '2026-11-17T12:03:46.355000+00:00'
+    state_at: '2026-11-17T12:06:56.210000+00:00'
     context: 236820
     context_at: '2026-11-17T11:56:56+00:00'
   designs:
