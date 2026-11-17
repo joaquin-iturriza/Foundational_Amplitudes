@@ -34205,8 +34205,6 @@ entries:
   - D478
   - D480
   next:
-    1: 'Our trainings on their data: smoke (2 jobs, Z+4g, 50 steps, scratch and fine-tune from trial 1262), then 8 jobs scratch
-      and fine-tune x Z+1..4g, 12,500 steps, HPs of kit_hpo_uugg_T hp1196, job_kit.sh, float32, scored on their 1e6 test events'
     3: Eval-only of existing models (trial 1262 zero-shot, u-flavour Z+ng models shifted by 0.779805) on their 1e6 test events
       per multiplicity; needs its own design and a rebuild path for the multi-process 1262
   done_when: null
@@ -34622,19 +34620,12 @@ entries:
       already holds Z+ng; above 10x -> it does not, the fine-tune carries it; between -> stated. Pull std reported against
       1.'
   step_why:
-    1:
-      feeds: 'the entry''s question: our latest setup against their networks on median |Delta|, the Z+4g |Delta| distribution
-        and pulls'
-      if:
-      - 'smoke ends all stages: batch of 8 at the smoke''s s/step'
-      - 'smoke fails: fix the path, rerun the smoke'
     3:
       feeds: what our current models give on their benchmark before any training on it
       if:
       - 'a model within 3x of their median |Delta|: report as is'
       - 'every model far above: report the in-support subset beside the whole set'
   step_waits:
-    '1': the fresh owner launched from the 2026-11-17 hand-off (this owner closed at the context limit)
     '3': the fresh owner launched from the 2026-11-17 hand-off (this owner closed at the context limit)
   findings:
   - at: '2026-11-17T11:18:43+00:00'
