@@ -33712,6 +33712,37 @@ entries:
       each cell''s own validation split. Searched: rerun, re-run, eval_delta, 2ed18ab8, residual map, old_setup_examples,
       delta histogram, representative, example_cells, preds_val (results.tex, plan.yaml), site decisions D433-D445, site runs
       job_rerun_trial, CC zz_delta.'
+  - at: '2026-11-17T01:29:51+00:00'
+    question: 'Fig. 15 of the draft (fig:ft, Muon against AdamW pretraining fine-tuned at small D) on held-out probes whose
+      losses are low (Joaquin 2026-11-17: ''processes that have good losses instead of ones with MSElog ~1''): does the Muon
+      pretraining''s fine-tune still start and end lower than the AdamW one''s, at every D, on such probes? Feeds the figure
+      and the sentence of Sec. 4 (optimizer) built on it.'
+    prior: 'Searched docs/results.tex (Fine-tunes at small D, fig:v3_muon_ft, muon_ft.json, catft), plan show draft_rewrite,
+      site runs for job_catalog_ft.sh. Prior: 2026-10-26 runs FA-ccin2p3-70adfc03, -13e57de7 (parent standardization), -00d080ba
+      (scratch) on the four median-error probes dg->dgW+W-, us->cuW+Z, gg->gamma ttbar, ud->gamma g W+ one loop; Muon''s fine-tune
+      ends lower on the three trees at every D, on the one-loop probe AdamW starts lower and the curves cross; their zero-shot
+      errors are ~1 (AdamW 0.84-1.7 axis medians). No run on low-loss probes.'
+    measure: 'Per probe and D: best-checkpoint validation MSE of log|M|^2 on the probe''s first 2000 validation events (tools/catalog_ft.py
+      CATFT mse_log), and each pretraining''s zero-shot error (step-0 validation, mse_log_step0).'
+    check: On the chosen probes the two parents' zero-shot errors already differ by 5.9-7.4x (AdamW 0.261/0.375/0.38/0.484
+      against Muon 0.0353/0.0469/0.0647/0.0796, short_reads.json, muon_compare.py low-probes @de3e6c17), far above the pretraining-seed
+      spread of the zero-shot read (0.124-0.148 decades, a factor ~1.4, results.tex), so the step-0 measure moves with the
+      optimizer arm on these probes; on the old probes the fine-tunes kept a gap at every D on the trees.
+    fixed: 'Protocol of the current figure: tools/catalog_ft.py via scripts/job_catalog_ft.sh @de3e6c17; parents runs/catalog_v3_short/dimensionless
+      (AdamW) and dimensionless_muon (Muon), best checkpoints on CC-IN2P3; fine-tune optimizer = the parent''s (AdamW, MuonAdamW),
+      --keep-parent-stats (step 0 = the parent''s zero shot); cells D = 10, 32, 100, 316 at 176, 704, 2816, 4576 steps; parent''s
+      lr and HPs, no layer decay; scratch with the dimensionless parent''s config and AdamW. Probes (muon_compare.py low-probes
+      @de3e6c17): per held-out axis of the current figure (new combinations, 2->4 families, the top, one loop) the probe at
+      the 10th percentile of the two parents'' geometric-mean zero-shot MSE: d dbar->b bbar g g (v3_dbx_bxdgg), u dbar->g
+      W+ Z Z (v3_udx_gwpzz), e+e- -> mu+mu- t tbar (v3_epem_mupmumttx), u ubar -> W+W- one loop (v3_uux_wpwm_nlo). Layout:
+      CC-IN2P3, where the parents and the zero-shot reads are; 3 jobs (one per arm, 16 cells each); time from the 2026-10-26
+      runs of the same setup: 0.77-0.99 h of cells per job; --time=02:00:00, wall target 1 h, ~3 GPU-h; disk a few MB per
+      cell against 66 GB free on /sps/lpnhe.'
+    control: From scratch on the same probe, D and events (the figure's third curve), and each arm's own zero-shot line.
+    seeds: One seed per cell, as the current figure (seed spread of the zero-shot read quoted, ~1.4x).
+    outcome: 'Yes: Muon''s fine-tune at or below AdamW''s at most D on the tree probes, as on the median probes; the figure
+      replaces Fig. 15 with these probes. No: AdamW lower or the curves cross on the trees: the figure shows it and the Sec.
+      4 sentence changes to what it shows; a cell that fails is listed and rerun once.'
   targets:
   - batch: examples_rerun
     wall_h: 1.0
