@@ -932,11 +932,13 @@ PY
     # job's reads only, so a probe this job fails cannot be answered by a stale prediction
     if [ -d "$PRED/$A" ] && [ -n "$(ls -A "$PRED/$A")" ]; then mv "$PRED/$A" "$PRED/$A.prev_${SLURM_JOB_ID:-$$}" || exit 1; fi
     mkdir -p "$PRED/$A"
-    python - "$R/$A" "$AR" <<'PY'
+    python - "$R/$A" "$AR" "$A" <<'PY'
 import sys, yaml
 r = yaml.safe_load(open(sys.argv[2]))
 top = {k: v for k, v in r.items() if k != "processes"}
 for p in r["processes"]:
+    if sys.argv[3] == "DAN":   # Daniel's train pools were deleted (D131): the probe's own statistics from its val pool
+        p = {**p, "n_train": 0}
     yaml.safe_dump({**top, "processes": [p]}, open(f"{sys.argv[1]}/{p['name']}.yaml", "w"))
 PY
     # an axis whose pools are not generated yet (H7, stage 4) is skipped and listed, its read left for mode eval
