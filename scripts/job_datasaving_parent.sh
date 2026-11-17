@@ -17,6 +17,11 @@
 #            beta log-uniform on [1e-5, 0.6], D405/D406): r5's T = 4307 and lr 8.196e-3 kept, so only the pools differ
 #   heldoutbbzz  1132 pools, the r4 held-out recipe (1133 pools, no physical-mass tops) minus the f f~ > Z Z class: the
 #            parent of b b~ > Z Z LO's fine-tunes (D413, D417); r4's T = 3458 and lr 9.248e-3 kept, so only the pools differ
+#   finale  zng_uq_benchmark (D487): the ladder + star-arm pretraining's 28 processes (recipes/transfer_finale.yaml, the
+#            finale's pools, every train event: no subsample) retrained in the current setup; the finale's 64000 steps,
+#            lr 3.78e-3 = trial 1262's 3.649e-3 at its 68224 steps moved along its law 7.82114e-3 (T/17056)^-0.55;
+#            WSD (cooldown 1/8, D423) and the D392 input flags set here. Its limit is not this header's 3 h: submit with
+#            --hdr=--time=<the smoke's measured s/step x 64000 x 1.3 + 1 h>
 # Base config:
 # trial 1262 of cov_v4_long_hpo8_cc_68224 (model, HPs, HETEROSC + sigma stage); in memory (data.memmap=false: the
 # 1e4-per-pool train split is ~1.41e7 events, 10 GB host memory at 1.13e7 in r4, and no memmap cache exists for this recipe).
@@ -30,20 +35,24 @@
 # runs/data_saving/dsave_parent_<which>[_<tag>]. lr=<value> replaces the default lr, HPO rule 2's centre 1e-2 (T/3000)^-0.55
 # (at the law 7.82114e-3 (T/17056)^-0.55, 1.88e-2, both r3 parents diverged near step 900-1000, 2026-11-11). iters=<n>
 # replaces T (a smoke run, D395).
+# (the finale case sets 7: its parent is fine-tuned on q qbar -> Z+4g, 2->5; pairs past an event's multiplicity are zero)
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 WHICH="$1"; shift
-case "$WHICH" in heldoutbbzz) T=3458; LR=9.248e-3 ;; heldout|heldoutthr|heldoutthrloop) T=4307; LR=8.196e-3 ;; treesin) T=4313; LR=8.190e-3 ;; *) echo "heldout, heldoutbbzz, heldoutthr, heldoutthrloop or treesin"; exit 2 ;; esac
+SUB=10000; FIX=()
+case "$WHICH" in finale) T=64000; LR=3.78e-3; SUB=null
+    FIX=(training.scheduler=WSD training.wsd_cooldown_frac=0.125 ++model.input_soft_eps=1e-8 ++model.input_pair_logs=7) ;; heldoutbbzz) T=3458; LR=9.248e-3 ;; heldout|heldoutthr|heldoutthrloop) T=4307; LR=8.196e-3 ;; treesin) T=4313; LR=8.190e-3 ;; *) echo "finale, heldout, heldoutbbzz, heldoutthr, heldoutthrloop or treesin"; exit 2 ;; esac
 PARENT="runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262"
 RECIPE="$PROJECT_DIR/recipes/catalog_v4_datasaving_parent_${WHICH}.yaml"
+[ "$WHICH" = finale ] && RECIPE="$PROJECT_DIR/recipes/transfer_finale.yaml"
 [ -e "$RECIPE" ] && [ -e "$PROJECT_DIR/$PARENT/config.yaml" ] || { echo "no $RECIPE or $PARENT/config.yaml"; exit 2; }
 TAG=; ARGS=(); for x in "$@"; do case "$x" in tag=*) TAG="_${x#tag=}";; lr=*) LR="${x#lr=}";; iters=*) T="${x#iters=}";; *) ARGS+=("$x");; esac; done
 OUT="$PROJECT_DIR/runs/data_saving/dsave_parent_${WHICH}${TAG}"
 echo "DATASAVING_PARENT recipe=$RECIPE base=$PARENT args: ${ARGS[*]}"
 python run.py --config-path "$PROJECT_DIR/$PARENT" --config-name config run_dir="$OUT" run_name=null \
-    data.processes_file="$RECIPE" data.train_subsample=10000 data.memmap=false fine_tune.pretrained_path=null \
-    warm_start_idx=null training.iterations="$T" training.lr="$LR" training.is_dyhpo_run=false "${ARGS[@]}"
+    data.processes_file="$RECIPE" data.train_subsample="$SUB" data.memmap=false fine_tune.pretrained_path=null \
+    warm_start_idx=null training.iterations="$T" training.lr="$LR" training.is_dyhpo_run=false "${FIX[@]}" "${ARGS[@]}"
 RC=$?
 echo "DATASAVING_PARENT_DONE rc=$RC $OUT"
 [ "$RC" -eq 0 ] && echo "RUN_DONE $OUT"

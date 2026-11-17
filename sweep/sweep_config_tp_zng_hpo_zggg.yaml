@@ -1,0 +1,51 @@
+# zng_uq_benchmark B1 (D484: 'I want runs with both, HP search of ours, and his batchsize, lr, etc'): single-fidelity DyHPO
+# over the template's coupled space on kit_A_uq_zggg_me2_n500000_t12500 (scratch, emission-scale target, HETEROSC + sigma stage, float64, Muon, WSD,
+# 12,500 steps, 5e5 training events of their split), as kit_hpo_uug_T; 8 trials, waves 3, 3, 2; selection on val mu-MSE.
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  request_gpus: 1
+  mem: 32G   # 3e6-event recipe pools in memory, float64 (the 8 runs at job_kit.sh's 32G)
+  cpus_per_task: 4
+  time: "04:00:00"
+paths: null
+sweep_name: tp_zng_hpo_zggg
+base_config: ${PROJECT_DIR}/runs/kit/kit_A_uq_zggg_me2_n500000_t12500
+n_trials: 8
+dyhpo:
+  surrogate: gp
+  n_candidates: 2000
+  objective_scale: auto
+  seed: 42
+  n_startup: 3
+  total_budget: 10000
+  waves: [3, 3, 2]
+fidelity_schedule:
+  t_steps: [12500]
+fixed_params:
+  data.source: recipes
+  data.processes_file: ${PROJECT_DIR}/runs/kit/recipes/kit_A_uq_zggg_me2_n500000_t12500.yaml
+  data.train_subsample: 'null'
+  data.eval_subsample: 'null'
+  data.memmap: 'false'
+  training.dtype: float64
+  training.heterosc_select: mu_mse
+  evaluation.train_subsample: 2000
+  seed: 42
+  plot: 'true'
+  warm_start_idx: 'null'
+  fine_tune.pretrained_path: 'null'
+  training.optimizer: MuonAdamW
+  training.scheduler: WSD
+  training.wsd_cooldown_frac: 0.125
+  training.batchsize: 16384
+range_extension:
+  enabled: false
+search_space:
+- {name: training.lr, type: float_log, low: 1.667e-03, high: 1.5e-02}
+- {name: training.muon_weight_decay, type: float_log, low: 1.0e-03, high: 0.3}
+- {name: training.regularization_lambda, type: float_log, low: 1.0e-10, high: 1.0e-06}
+- {name: training.cosanneal_warmup_frac, type: float_uniform, low: 0.05, high: 0.2}
+- {name: training.cosanneal_eta_min, type: float_log, low: 1.0e-10, high: 1.0e-07}
+- {name: ema, type: categorical, choices: ["false", "true"]}
+- {name: training.ema_decay, type: float_uniform, low: 0.9, high: 0.999}
