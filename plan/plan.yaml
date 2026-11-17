@@ -33303,6 +33303,17 @@ entries:
     3: 'Het loss vs MSE (Fig. 9, removed from the draft by Joaquin 2026-11-13): come back to it. The het network leaves ~1-11%
       of 2->2 test events unfitted with large sigma (median |Delta| better 118/146, MSE worse on most 2->2); evaluation checked,
       no bug; training precision not checked'
+    4: 'Figures readable on their own (Joaquin 2026-11-17, his whole message in /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/joaquin_figs_2026-11-17.txt,
+      numbers as in draft_final_steer_uug.pdf at draft 8b55c58): every figure of his three sections redrawn from its committed
+      tool so that a reader scrolling only the figures, in under 10 minutes, gets what was compared and what it shows: what
+      is compared named on the figure in plain words (sampling techniques, optimizers ''AdamW optimizer''/''Muon optimizer'',
+      ''particle IDs'' not one-hot, ''step'' of the ladder not ''rung'', no internal names like catalog, uniform keep, P_keep,
+      target T, in range), axis quantities defined on the axis (y_min after log y_min), colour bar with a named quantity instead
+      of a big legend where a parameter is scanned, bins ordered as they read, legend inside each figure (font may be slightly
+      smaller for now), one file per figure with all its panels (no separate legend or panel files, the group''s no-subfigure
+      rule), captions short; apply his figure-by-figure notes on Figs. 9-13, 15, 16 and the same to every other figure of
+      his sections; change the figure-style skill and ps/send_check to the new legend and one-file rules; fresh reviewer told
+      to read the figures alone; zip and PDF; send each figure as its own file.'
   done_when: null
   notes_ref: null
   match: none
@@ -33760,3 +33771,8 @@ entries:
       if:
       - 'Joaquin returns to it: design the follow-up he asks for'
       - 'never: stays out of the paper'
+    4:
+      feeds: a paper whose figures can be read without the text
+      if:
+      - 'reviewer passes: send figures, zip, PDF'
+      - 'a figure needs data not on disk: say which and why'
