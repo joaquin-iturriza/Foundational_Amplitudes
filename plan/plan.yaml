@@ -33502,7 +33502,7 @@ entries:
       me this exactly?''; Fig. 15 stays out under his hold, no rerun asked'
   owner:
     agent: ab329af4e168e0143
-    state: working
+    state: closed
     since: '2026-11-17T12:43:50.818000+00:00'
     state_at: '2026-11-17T12:47:56.614000+00:00'
     context: 78055
@@ -34150,24 +34150,18 @@ entries:
     start: '2026-11-17T04:33:08+00:00'
     at: '2026-11-17T04:33:08+00:00'
   handoff:
-    state: 'Joaquin''s corrections done through 2026-11-17 ~13:30: captions without headlines or seed counts; ladder grids
-      3 across x 4 down with every legend inside (common curves in one panel); Fig. 19 legend split; Fig. 14 right fifth version
-      (rows as +/- changes against the setup used, by value, reviewed against the four rejected versions, finding 11:56 lists
-      them: never show them again); target T renamed A^* in text and Fig. 14 axis; Fig. 14 left legend in his words. Draft
-      ~/drafts/fm_amplitudes_2026-11 at 801c504, 48 pp, scratchpad draft_pass7.pdf/.zip. Step 5 cause found (fine-tune lr;
-      ft_curves_sep figure) and asked to Joaquin under D473 (rerun at lr_scale 0.343 or leave Fig. 15 out). Next ready: the
-      new step (Fig. 14 right on MSE(log|M|^2)).'
-    decisions: 'Fig. 14 right reference = the setup the pretrainings use (Joaquin''s own text: diagram encoder kept, linear
-      embedding); labels ''- diagrams'', ''+ nonlinear emb.'', ''+/- pair bias'' etc. Common legend of the grids inside a
-      panel or merged into one panel''s legend (no strips). A^* for the dimensionless target (Joaquin). No seed counts in
-      paper captions (figure-style skill changed).'
-    ruled_out: 'Fig. 14 right label versions 1-4 (finding 11:56); words-only fallback of version 5 (reviewer: versions 1/4
-      again, too long); ''trained on A^*, the dimensionless target'' y label (clipped); two-line tick labels (overlap).'
+    state: Fig. 14 restored to its version before 7a1fdabc/73d5145c (FA 3496f60b; y axis 'trained on dimensionless log|M|^2',
+      legend '(pretrained <=2->4)'/'(pretrained <=1 TeV)'), right panel fifth version; draft efba937 (only that figure; text
+      T -> A^* of 801c504 kept), 48 pp, scratchpad draft_pass8.pdf/.zip. Step 4 and the three figure checks (Fig. 9 colour
+      bar, Fig. 11 y_min/bin order, star-arm step-1 label) listed for Joaquin, not done unasked (finding 2026-11-17).
+    decisions: 'Joaquin 2026-11-17: ''I didn''t ask you to change fig 14, only the text, and you keep making changes that
+      I didn''t ask for'': change only what he asks; figures untouched unless he names the change.'
+    ruled_out: Fig. 14 right label versions 1-4 (finding 11:56); Fig. 14 left A^* axis and reworded legend (reverted on his
+      word).
     running: none
-    files: ~/drafts/fm_amplitudes_2026-11/paper.tex; analysis/catalog_v4/paper_sec3_figs.py (target, inputs); analysis/transfer/rung_grid.py
-      (grid); analysis/transfer/star_arms.py; analysis/catalog_v3/ft_curves_fig.py, collect_catft_curves.py; scratchpad draft_pass7.pdf/.zip,
-      joaquin_figs*_2026-11-17.txt
-    written: '2026-11-17T12:39:08+00:00'
+    files: ~/drafts/fm_amplitudes_2026-11/paper.tex, figs/pretrain/paper_target.pdf; analysis/catalog_v4/paper_sec3_figs.py;
+      scratchpad draft_pass8.pdf/.zip
+    written: '2026-11-17T12:50:34+00:00'
   step_why:
     3:
       feeds: whether and how the paper states the het-vs-MSE comparison
