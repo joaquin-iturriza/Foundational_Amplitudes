@@ -35722,6 +35722,12 @@ entries:
     units: null
     start: '2026-11-17T20:49:49+00:00'
     at: '2026-11-17T20:49:49+00:00'
+  - batch: lap_pe_table
+    wall_h: 0.2
+    jobs: 1
+    units: null
+    start: '2026-11-17T20:54:56+00:00'
+    at: '2026-11-17T20:54:56+00:00'
   step_waits:
     '1': FA-lxplus-50f4fc6b
     '2': FA-lxplus-fee0d906
