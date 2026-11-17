@@ -33691,6 +33691,17 @@ entries:
       search; repo-reviewer: the two-point curve overstates the four searched arms'' gain); Figs. 18-19 y extension left (legend
       upper right gave no shorter range); 3x4 grid not done (4 rows = 10.2 in). Repo-reviewer passed (watermark 535c5e06).
       Fixed from its review: prebuild --seed to write_own_alphas, atomic sidecar write.'
+  - at: '2026-11-17T04:07:46+00:00'
+    text: '2026-11-17 step 5 done: Fig. 15 on the low-loss probes (FA-ccin2p3-d622e8cc AdamW parent, -e408d1a1 Muon parent,
+      -25992f44 scratch; 48 cells, no error; analysis/catalog_v3/data/muon_ft_lowloss.json @4979f72f; paper_sec3_figs.py ft).
+      Zero-shot starts equal the design check exactly. MSE(log|M|^2) at D_train=10/32/100/316, AdamW | Muon | scratch: d dbar->b
+      bbar g g 0.261 0.274 0.207 0.151 | 0.0353 0.0402 0.0416 0.0318 | 2.8 1.28 0.759 0.44; u dbar->g W+ZZ 0.375 0.424 0.161
+      0.110 | 0.0469 0.086 0.032 0.027 | 1.29 0.67 0.374 0.176; e+e- -> mu+mu- t tbar 0.38 0.448 0.327 0.188 | 0.0647 0.0989
+      0.0622 0.0465 | 3.11 3.49 2.16 1.22; u ubar->W+W- one loop 0.414 0.0917 0.00161 0.000386 | 0.0485 0.0262 0.00292 0.000481
+      | 0.631 0.102 0.0119 0.00432. Muon lower on the trees at every D (4-5x at 316), at one loop the curves cross between
+      D=32 and 100 and end within 25% (inside the 1.4x seed spread of the zero-shot read). Several D=32 fine-tunes end above
+      their zero-shot start. Draft 314e151, Sec. 4 paragraph and caption rewritten; build 48 pp draft_final_fig15.pdf/.zip
+      in scratchpad.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
