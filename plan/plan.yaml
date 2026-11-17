@@ -33426,7 +33426,7 @@ entries:
     context_at: '2026-11-17T02:12:50+00:00'
   step_waits:
     '3': '2026-11-20: next draft round'
-    '5': FA-ccin2p3-49d18c32 FA-ccin2p3-abaec8ae FA-ccin2p3-b551c3a9
+    '5': FA-ccin2p3-167dc1db FA-ccin2p3-0d4d4506 FA-ccin2p3-c81ba5db
     '4': next owner (context limit reached; Sec. 5 figures and paper.tex left, see hand-off)
   findings:
   - at: '2026-11-13T02:46:58+00:00'
