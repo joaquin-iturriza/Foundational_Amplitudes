@@ -35767,6 +35767,16 @@ entries:
       on the local CPU gives MSE 0.2791 on the 2000 dc_bbx_hh val events, per event equal to the stored GPU read (rms difference
       0.0000, check_reproduction.py). Open: on a CPU-only machine with xformers installed the evaluator crashes (xformers
       has no CPU kernel); .venv-cpu has no xformers.'
+  - at: '2026-11-17T21:36:24+00:00'
+    text: 'Trial 1262 (catalog_v4 pretraining, sigma stage) zero-shot on Daniel''s held-out pools (FA-lxplus-50f4fc6b, physics
+      allowance 009a4551; dan_per_process.py, data/dan_per_process.json @9e02875a): median MSE of log|M|^2 on the 91 relabels
+      3.03 vs Suprio''s particle-ID embedding 0.080 and our dimensionless + coupling orders 0.046; on the 9 truly held out
+      15.9 vs 2.24 and 1.05. Ratio over Suprio (log10, median, process bootstrap 68%): relabels without a b +0.38 [-0.11,+0.67]
+      (n=44), with a b +1.96 [+1.91,+2.01] (n=47); truly held out without a b +0.04 (n=3), with a b +0.75 (n=6). Calibration
+      (catalog_v4 training trees identical to Daniel''s processes): the 6 without a b read as well on Daniel''s pools as on
+      catalog_v4''s own (2.5e-5 to 1.2e-1 vs 9.5e-5 to 6.6e-2); the 3 with b b~ go from 6.5e-5..9e-4 on own pools to 0.018..0.197
+      on Daniel''s: the massive b in Daniel''s pools (massless in catalog_v4) costs up to ~3 decades. After the best affine
+      map the relabel median is 0.386 vs 0.041.'
   handoff:
     state: 'Evaluator (evaluate_daniels_catalog, README d3208a9e) reproduces the stored DlessInOrd read on GPU exactly (MSE
       0.2791, FA-ccin2p3-c3e63032) and is file/order independent (per-event keyed augmentation; CPU cross-event attention
