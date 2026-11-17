@@ -33428,7 +33428,7 @@ entries:
     agent: ae24c212cd46ebda9
     state: stopped
     since: '2026-11-17T02:46:37+00:00'
-    state_at: '2026-11-17T03:05:29+00:00'
+    state_at: '2026-11-17T03:06:10.410000+00:00'
     context: 72388
     context_at: '2026-11-17T02:47:29+00:00'
   step_waits:
