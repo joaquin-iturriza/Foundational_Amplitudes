@@ -34313,7 +34313,21 @@ entries:
       epochs; none covers these three. Matched messages: 2026-11-10T02:08 (zip and slides upload), 2026-11-13T00:03 (two transfer
       figures), 2026-11-14T04:31 (a SciPost LaTeX template paste): none is about Z+ng follow-ups'
     blocks: nothing
-    blocks_steps: &id003 []
+    blocks_steps: []
+  - ask: 'GPU budget: 33 to 61 GPU-h above 30 with no decision covering it, plus scope. (A) The Z+ng HP search, which one:
+      (a) one DyHPO search per multiplicity then the fine-tunes, ~61 GPU-h; (b) one on Z+4g only and all 8 runs again at its
+      HPs, ~33 GPU-h; (c) none, report the runs flagged? (B) Which follow-ups: (1) the UQ paper''s models at our 5e5-event
+      conditions, reversing this morning''s no; (2) the ladder steps 1-9 + star-arm pretraining fine-tuned against scratch
+      at D_train 1e2..1e4 on the Zenodo data; (3) a generation probe to price the paper''s data size (10M per multiplicity,
+      100M at Z+4g)?'
+    at: '2026-11-17T15:31:39+00:00'
+    searched: 'site decisions --project FA: D480 is the no of this morning; D477-D479 approve the entry and matched epochs;
+      D241 says an HP question goes through DyHPO; none prices a search or covers these follow-ups. Matched messages: 2026-10-06T00:17
+      (the transfer study''s plan to finish, not Z+ng), 2026-11-10T02:08 (zip and slides upload), 2026-11-13T00:03 (two transfer
+      figures), 2026-11-14T04:31 (a SciPost LaTeX template paste): none is about Z+ng'
+    blocks: step 4 (the HP search) and the three follow-ups
+    blocks_steps: &id003
+    - 4
   owner:
     agent: a0923cdbb41f6dbf2
     state: stopped
@@ -34884,13 +34898,15 @@ entries:
       1262 (tools/rebuild_run.rebuild handles single-process runs only); its caption is ''our existing models, not trained
       on their data''. (5) Write-up in docs/results.tex with % src / % claim lines.'
     written: '2026-11-17T14:35:34+00:00'
-  ask: 'Scope: three follow-ups to the Z+ng comparison, which do you want? (1) Their networks trained at our 5e5-event conditions
-    (LLoCa-Transformer alone ~15-20 GPU-h, all four ~100-150 GPU-h; D480 forbids it today). (2) The ladder steps 1-9 + star-arm
-    pretraining fine-tuned against scratch at D_train 1e2..1e4 on their data. (3) A generation probe to price their full data
-    size (10M per multiplicity, 100M at Z+4g).'
-  waiting_since: '2026-11-17T15:30:43+00:00'
-  searched: 'site decisions --project FA: D480 forbids training their networks; D477-D479 approve the entry and matched epochs;
-    none covers these three. Matched messages: 2026-11-10T02:08 (zip and slides upload), 2026-11-13T00:03 (two transfer figures),
-    2026-11-14T04:31 (a SciPost LaTeX template paste): none is about Z+ng follow-ups'
-  blocks: nothing
+  ask: 'GPU budget: 33 to 61 GPU-h above 30 with no decision covering it, plus scope. (A) The Z+ng HP search, which one: (a)
+    one DyHPO search per multiplicity then the fine-tunes, ~61 GPU-h; (b) one on Z+4g only and all 8 runs again at its HPs,
+    ~33 GPU-h; (c) none, report the runs flagged? (B) Which follow-ups: (1) the UQ paper''s models at our 5e5-event conditions,
+    reversing this morning''s no; (2) the ladder steps 1-9 + star-arm pretraining fine-tuned against scratch at D_train 1e2..1e4
+    on the Zenodo data; (3) a generation probe to price the paper''s data size (10M per multiplicity, 100M at Z+4g)?'
+  waiting_since: '2026-11-17T15:31:39+00:00'
+  searched: 'site decisions --project FA: D480 is the no of this morning; D477-D479 approve the entry and matched epochs;
+    D241 says an HP question goes through DyHPO; none prices a search or covers these follow-ups. Matched messages: 2026-10-06T00:17
+    (the transfer study''s plan to finish, not Z+ng), 2026-11-10T02:08 (zip and slides upload), 2026-11-13T00:03 (two transfer
+    figures), 2026-11-14T04:31 (a SciPost LaTeX template paste): none is about Z+ng'
+  blocks: step 4 (the HP search) and the three follow-ups
   blocks_steps: *id003
