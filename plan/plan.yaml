@@ -35348,8 +35348,10 @@ entries:
     - FA-ccin2p3-488df7d6
     - FA-ccin2p3-c3e63032
     - FA-ccin2p3-d95c89ad
+    - FA-lxplus-50f4fc6b
+    - FA-lxplus-86b24e3b
     - FA-lxplus-fee0d906
-    commit: bac629cf
+    commit: 4522c3ba
     paths:
     - analysis/catalog_daniel/dan_per_process.py
     - analysis/catalog_daniel/data/v4_heldout_overlap.json
