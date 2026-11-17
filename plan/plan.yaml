@@ -34931,6 +34931,36 @@ entries:
       our setup''s floor on Z+ng, flagged. (2) parent: completes 64000 steps without blowing up, curve test passes and its
       geometric-mean val MSE over the 28 is within 3x of or below the old finale''s -> it is the parent of stage 2; else the
       failure (where, which processes) is reported and stage 2 waits on a fix.'
+    fix_at: '2026-11-17T15:56:47+00:00'
+    fix: 'Check 3 (seeds against spread): the outcomes use a ''3x / 0.3 dex resolution of one seed'' with no source. The spreads
+      measured at fixed HPs in our setup are larger: the one-loop virtual from scratch at the template setup (HETEROSC, batch
+      16384, 50k events, seeds 42/43/44) spans 3.3e-7..3.1e-6 on u u~ (9x) and 3.9e-10..2.1e-7 on t t~ (one spike), and the
+      ladder seeds give the search best a median 1.5x below fresh seeds, more than 3x in 10 of 49 cells (results.tex, par.
+      ''One seed is not a measurement at a cell''). Fix: cite a seed spread measured on comparable runs for median |Delta|
+      (or MSE of ln|M|^2) and set the B2-vs-earlier-8 threshold (the ''>3x'' yes) and the (1)-vs-ours 3x/10x bands above it;
+      if no such spread exists, put to Joaquin the question whether to add a second seed to the B2 and B1 reruns (what it
+      costs, what it buys), do not add seeds yourself. Check 2 (measure shown to move), item (2): the check says the current
+      setup ''moved the catalog_v4 val MSE by orders'' with no number and the old finale''s per-process MSEs ''exist'' without
+      reading them. The old finale''s val_loss_no_reg is an MSE on per-dataset standardised targets, the new parent''s is
+      a HETEROSC NLL. Fix: give the old finale''s per-process MSE of ln|M|^2 on the 28 pools as a number (val_loss_no_reg
+      x sigma_p^2, the tool that reads it), show that the new parent''s run writes the per-process mu-MSE in the same units
+      on the same val events (same recipe, same data.seed), and quote one existing number where a setup change moved this
+      measure. Check 14 (disk): no disk line. CC /sps/lpnhe has 45 GB free (92% used, read 2026-11-17). Fix: give disk per
+      job from the earlier runs (runs/kit/kit_A_uq_* are ~80 MB each), the B1 sweep dirs, the parent''s run dir, Suprio''s
+      cloned repo plus his pinned torch 2.9.1 env in WORK/ext and his outputs (preds on 1e6 calib and 1e6 test per n), and
+      their sum against the free disk, on the site the batches go to. Check 15 (step rate from the same setup): the B2 wall
+      target of 0.07 s/step at batch 1024 float64 comes from no run at that batch (the only measured rate is 0.59 s/step at
+      batch 16384). Fix: state that the B2 Z+4g smoke''s measured step rate sets the target and the limit of the other seven
+      before they go; likewise (1)''s from its smoke on the GPU type it lands on (his 2.1 h is on H100, CC also gives V100).
+      The (2) smoke outcome still reads ''a result per trial with val_loss and prepd_std'', left from the dropped sweep design:
+      name what the parent smoke must write (per_process_metrics.json, the sigma-stage model, the plots). Check 13 (finish
+      time): the design does not state when the B1 searches (8 trials, waves 3,3,2, ~2.2 h per Z+4g trial, so ~7-8 h) and
+      the B2 runs finish against Joaquin''s ''we need this quick''; add it. Passing as written: one change per comparison
+      (B2 vs the earlier 8 = the protocol; (1) vs B2 = network and pipeline; parent vs the old finale = the setup, D487);
+      B1 is the template''s coupled space, 8 trials, 3 start-up, waves 3,3,2 (sweep/sweep_config_tp_zng_hpo_zgggg.yaml against
+      sweep_config_jeanzay_template.yaml); HETEROSC and the emission-scale target match D71 and D487; the B2 overrides all
+      exist in base_experiment.py (ReduceLROnPlateau on each validation, es_patience counted in steps, heterosc_select=nll);
+      test events are Suprio''s data_seed-0 split; D481, D484, D487 are each answered; stage 2 deferred with its reason.'
   step_why:
     4:
       feeds: whether our setup, trained well, comes within 3x of their networks on Z+ng
