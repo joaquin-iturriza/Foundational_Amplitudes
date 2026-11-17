@@ -34231,6 +34231,9 @@ entries:
       ES 20 val, val/1000, 2e5 steps, clip 5, select NLL): Z+4g smoke T=50 then 8 runs'
     8: 'Batch B1: DyHPO per n (sweep/sweep_config_tp_zng_hpo_<p>.yaml @e75bcabb, 8 trials, waves 3,3,2), then A_ft from 1262
       at each best'
+    9: 'Batch (2) stage 1: rebuild the 5 missing finale train pools on CC (prebuild_recipes.sh recipes/transfer_finale.yaml),
+      parent smoke (job_datasaving_parent.sh finale iters=50 tag=zng_uq_smoke), then the parent (64000 steps, limit from the
+      smoke)'
   done_when: null
   notes_ref: null
   match: zng_uq_*,tp*_zng_*
@@ -35107,6 +35110,11 @@ entries:
       if:
       - 'a trial passes the curve test: A_ft at its HPs, read as B2'
       - 'none passes: report the floor, flagged'
+    9:
+      feeds: the current-setup ladder + star-arm parent for stage 2's fine-tunes
+      if:
+      - 'parent converges within 10x of the old finale''s 4.9e-6 geometric mean: stage 2 design'
+      - 'it fails: report where, fix'
   step_waits:
     '5': the notes-editor pillar reviewer (blocked on par:muon_long, another entry)
     '4': '2026-11-18'
