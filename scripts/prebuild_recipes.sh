@@ -37,3 +37,6 @@ cd "$PROJECT_DIR"
 WORKERS="${SLURM_CPUS_PER_TASK:-16}"
 
 python prebuild_recipes.py "$SPEC" --workers "$WORKERS" --auto-workers "$@"
+# each built pool's per-event alpha_s (data.target_physics_orders reads it; submit_guard waives the data check for a
+# job chained on this prebuild, so the prebuild must leave what that check asks); skips what exists
+python tools/write_own_alphas.py "$SPEC"
