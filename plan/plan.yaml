@@ -33339,11 +33339,10 @@ entries:
     3: 'Het loss vs MSE (Fig. 9, removed from the draft by Joaquin 2026-11-13): come back to it. The het network leaves ~1-11%
       of 2->2 test events unfitted with large sigma (median |Delta| better 118/146, MSE worse on most 2->2); evaluation checked,
       no bug; training precision not checked'
-    5: 'Why the zero-shot gain is lost in fine-tuning (Joaquin 2026-11-17: ''we don''t show fig 15 until we understand why
-      we can''t keep the gain from the zero shot through the fine tuning''): on the Fig. 15 runs (zz_catft_sep, zz_catft_lowloss3)
-      read the fine-tunes'' training and validation curves: does the error rise above the zero-shot start early in fine-tuning
-      (learning rate, warmup, the head or standardization reset), and does it then recover; compare Muon and AdamW parents.
-      Analysis on existing runs first; a design for any new run.'
+    5: 'Fine-tune lr on the Muon pretraining (follow-up to the step-5 cause, Fig. 15 held by D473): if Joaquin says go, add
+      a fine_tune.lr_scale option to tools/catalog_ft.py and rerun the Muon-parent fine-tunes on the four separation probes
+      at all four D_train at lr_scale 0.343 (muon_hp_ft''s best), one job ~1 GPU-h, design reviewed first; compare against
+      the lr_scale 1 runs and the zero shot.'
   done_when: null
   notes_ref: null
   match: none
@@ -33486,7 +33485,6 @@ entries:
     context_at: '2026-11-17T11:41:18+00:00'
   step_waits:
     '3': '2026-11-20: next draft round'
-    '5': repo-reviewer (backlog blocks the curve script)
   findings:
   - at: '2026-11-13T02:46:58+00:00'
     text: '2026-11-13 ~03:50 Joaquin: ''we should start actually doing the work on the draft with what we have ... Let''s
@@ -34111,10 +34109,11 @@ entries:
       - 'Joaquin returns to it: design the follow-up he asks for'
       - 'never: stays out of the paper'
     5:
-      feeds: whether Fig. 15 returns to the draft and what the fine-tune protocol should be
+      feeds: whether Fig. 15 returns to the draft and with which fine-tune protocol
       if:
-      - 'a cause is found on existing runs: report with the curves and propose the fix'
-      - 'existing runs cannot tell: propose a small design'
+      - 'Muon fine-tune stays at or below its zero shot at D=32 and below AdamW''s at every D: Fig. 15 returns with that protocol,
+        Sec. 4 says so'
+      - 'still above its zero shot: the lr is not the whole cause; read the head/standardization reset next'
   ask: 'Scope: Fig. 15 on the new probes changes the Sec. 4 claim: Muon''s head start in fine-tuning holds at D_train = 10
     (10-50x) but closes by 316 (within 1.5x on three probes, 4.5x on b b̄ → HHHZ, whose Muon curve barely falls). The draft
     text was reworded to that; keep the new wording, or revert to the old until you''ve looked?'
