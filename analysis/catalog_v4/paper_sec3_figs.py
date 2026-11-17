@@ -266,8 +266,8 @@ def target():
     res = json.load(open(os.path.join(ROOT, "analysis", "catalog_v3", "data", "short_reads.json")))
     extra = ("H2p5", "H7E")
     groups = []
-    for grp, lab in ((None, "held out, multiplicity\nand energy as pretrained"), ("H2p5", "held out, $2\\to5$,\nonly up to $2\\to4$ in pretraining"),
-                     ("H7E", "held out, $1\\!-\\!10$ TeV,\nonly up to $1$ TeV in pretraining")):
+    for grp, lab in ((None, "held out, multiplicity\nand energy as pretrained"), ("H2p5", "held out, $2\\to5$\n(pretrained $\\leq2\\to4$)"),
+                     ("H7E", "held out, $1\\!-\\!10$ TeV\n(pretrained $\\leq1$ TeV)")):
         xs, ys = [], []
         for a in res["baseline"]:
             if (a if a in extra else None) != grp or a not in res["dimensionless"]:
@@ -278,7 +278,7 @@ def target():
         groups.append((lab, np.array(xs), np.array(ys)))
     fig, (a, b) = ps.figure(ncols=2)
     scatter_ax(a, groups, "zero-shot " + MSE_LAB + ",\n" + r"trained on $\log|\mathcal{M}|^2$ in GeV",
-               "zero-shot " + MSE_LAB + ",\n" + r"trained on $A^*$", "paper_target",
+               "zero-shot " + MSE_LAB + ",\n" + r"trained on dimensionless $\log|\mathcal{M}|^2$", "paper_target",
                legend="upper left")
     inputs(b)
     ps.save(fig, os.path.join(FIGS, "paper_target"))
