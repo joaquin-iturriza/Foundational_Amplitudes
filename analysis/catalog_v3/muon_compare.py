@@ -575,6 +575,30 @@ def low_probes(axes=("H1", "H2", "H3", "H5"), q=0.10):
     return out
 
 
+def sep_probes(n=4, q=0.25, variants=("H6", "H7E", "H7c")):
+    """The Fig. 15 probes after Joaquin 2026-11-17 ('just get some processes with relatively good performance, but with
+    also good separation between muon and adam'; low_probes' one-per-axis rule forced three 2->4 and a one-loop probe):
+    over every held-out process of short_reads.json (all axes but the variants of trained processes at other alpha_s,
+    energies or cuts), those whose geometric mean of the two parents' zero-shot MSE of log|M|^2 is at or below the q
+    quantile of all of them, ranked by |log(AdamW / Muon)|; the n first."""
+    r = json.load(open(os.path.join(HERE, "data", "short_reads.json")))
+    rows = []
+    for ax in r["dimensionless"]:
+        if ax in variants or ax not in r["dimensionless_muon"]:
+            continue
+        A, M = r["dimensionless"][ax]["probes"], r["dimensionless_muon"][ax]["probes"]
+        rows += [(ax, p, A[p]["mse"], M[p]["mse"]) for p in sorted(set(A) & set(M))]
+    g = np.array([np.sqrt(a * m) for *_, a, m in rows])
+    cut = np.quantile(g, q)
+    low = sorted((x for x, gi in zip(rows, g) if gi <= cut), key=lambda x: -abs(np.log(x[2] / x[3])))
+    print(f"{len(rows)} held-out processes, geometric-mean zero-shot MSE median {np.median(g):.3g}, q{q:g} {cut:.3g}; "
+          f"{len(low)} at or below it, by |log AdamW/Muon|:")
+    for i, (ax, p, a, m) in enumerate(low[:12]):
+        print(f"  {'*' if i < n else ' '} {ax} {p}: AdamW {a:.3g}, Muon {m:.3g}, AdamW/Muon {a / m:.3g}")
+    print(",".join(p for _, p, _, _ in low[:n]))
+    return [p for _, p, _, _ in low[:n]]
+
+
 if __name__ == "__main__":
     {"collect": collect, "collect-ft": collect_ft, "collect-search": collect_search,
-     "low-probes": low_probes}.get(sys.argv[1] if sys.argv[1:] else "", main)()
+     "low-probes": low_probes, "sep-probes": sep_probes}.get(sys.argv[1] if sys.argv[1:] else "", main)()

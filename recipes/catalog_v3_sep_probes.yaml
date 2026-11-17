@@ -1,0 +1,33 @@
+# the four Fig. 15 probes after Joaquin 2026-11-17 (low error and large Muon/AdamW separation; muon_compare.py
+# sep-probes), entries copied from recipes/catalog_v3_heldout_H1/H2/H3.yaml, for prebuild_recipes.sh
+sampling:
+  mode: mixture
+processes:
+- name: v3_gg_ttx
+  sqrts:
+  - 362
+  - 1000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: v3_dbx_txu
+  sqrts:
+  - 181
+  - 1000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: v3_bbx_hhhz
+  sqrts:
+  - 489
+  - 1000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
+- name: v3_uux_wpwm
+  sqrts:
+  - 169
+  - 1000
+  n_train: 100000
+  n_val: 10000
+  n_test: 10000
