@@ -33505,6 +33505,8 @@ entries:
     state: working
     since: '2026-11-17T12:43:50.818000+00:00'
     state_at: '2026-11-17T12:43:50.818000+00:00'
+    context: 78055
+    context_at: '2026-11-17T12:48:04+00:00'
   step_waits:
     '3': '2026-11-20: next draft round'
     '4': the next owner (previous closed at its context limit, hand-off written)
