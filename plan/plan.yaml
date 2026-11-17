@@ -35366,9 +35366,9 @@ entries:
     decision: D488
   owner:
     agent: acd7131834d93c97d
-    state: working
+    state: stopped
     since: '2026-11-17T19:59:30+00:00'
-    state_at: '2026-11-17T21:35:04.456000+00:00'
+    state_at: '2026-11-17T21:38:45.299000+00:00'
     context: 232335
     context_at: '2026-11-17T21:21:41+00:00'
   designs:
