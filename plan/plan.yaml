@@ -35352,3 +35352,42 @@ entries:
     state_at: '2026-11-17T18:27:26+00:00'
     context: 150508
     context_at: '2026-11-17T18:38:26+00:00'
+  designs:
+  - at: '2026-11-17T18:38:53+00:00'
+    question: 'How does our best catalog_v4 pretraining, trial_1262 of cov_v4_long_hpo8_cc_68224 (16x, 68224 steps, its final
+      model = best-checkpoint mean + sigma fit, run dir runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262/sigma_stage,
+      eval run FA-ccin2p3-1a46f3e0), do zero-shot on the 139 held-out processes of Daniel''s catalog split (recipes/catalog_daniel_heldout.yaml:
+      96 interpolation relabels, 43 extrapolation), against Suprio''s particle-ID embedding and the two earlier arms of the
+      October dan_per_process figure? D488: interpolation (relabels) is scored whole; extrapolation only on processes neither
+      present nor relabelled in catalog_v4''s training. Eval-only, no training. REREAD=FA-ccin2p3-1a46f3e0'
+    prior: 'Searched docs/results.tex, plan, site decisions for dan_per_process, Daniel, Suprio, particle-ID, catalog_daniel_heldout,
+      DlessInOrd, catalog_norm_B, 1262. Found: (1) the October deck figure talks/progress_oct2026b/figs/dan_per_process (script
+      uncommitted): per-process MSE(log|M|^2) of Suprio''s pID embedding (draft numbers, seed 0, 20 epochs), shared standardization
+      (catalog_norm_B, diverged after 1.1 epochs, read at best ckpt) and dimensionless+coupling orders (catalog_short_DlessInOrd_sigstage,
+      5 epochs of 1e4 events), all trained on Daniel''s catalog; medians recomputed now from analysis/catalog_daniel/data:
+      interpolation 96: Suprio 0.079, B 0.067, DlessInOrd 0.051; extrapolation 43: 0.649, 0.604, 0.478; on the 9 truly-held-out
+      extrapolations: 2.24, 1.72, 1.05. (2) par:v4_length: trial_1262 at 16x vs 4x, held-out catalog_v4 classes R=0.92 (default-sampled),
+      never read on Daniel''s pools. (3) D113/D114 hold Daniel''s-catalog preprocessing studies (catalog_norm, dimless_kt,
+      ...), not this entry; D488 authorises this one. Differs: a model trained on catalog_v4 (not Daniel''s catalog) read
+      on Daniel''s pools; overlap computed by analysis/catalog_daniel/v4_heldout_overlap.py (data/v4_heldout_overlap.json):
+      of 43 extrapolation processes 34 have a relabel (or the process itself, 14) in catalog_v4''s training, 9 are truly held
+      out (bb~>ahh, bb~>ghh, gb>bhh, gb~>b~hh, gg>bt~w+, gg>tb~w-, gg>gtt~, gg>tt~a, gg>tt~h); of 96 interpolation 82 have
+      a relabel and 5 the identical process in it.'
+    measure: Per process MSE of log|M|^2 = mean over the first 2000 events of the val pool of (q - t)^2, q the parent's prediction
+      in log|M|^2 (tools/zero_shot_parent.py, no map fitted), the same split, event count and scorer as the earlier arms'
+      reads; plotted per process in the dan_per_process layout with the new arm beside the three; per group the median over
+      processes (interpolation 96; extrapolation truly held out 9).
+    check: 'The measure already separates the three existing arms on these pools: extrapolation medians 0.649 / 0.604 / 0.478
+      (all 43) and 2.24 / 1.72 / 1.05 (the 9), interpolation 0.079 / 0.067 / 0.051; per-process spreads span 1e-3 to 30, so
+      a new model''s level shows. The scorer (job_catalog_v3_short.sh mode eval, axis reads) has read trial_1262 on PP4/EE4/HD4/HD5
+      (FA-ccin2p3-1a46f3e0).'
+    fixed: 'The parent''s checkpoint and sigma stage as they are (no retraining); scorer tools/zero_shot_parent.py with --signed-magnitude
+      as every axis read; Daniel''s pools as generated (13 TeV pp, his run card, massive b): their physics differs from catalog_v4''s
+      (sm vs sm-no_b_mass, b mass, coupling orders), so the physics check is overridden with ZS_ALLOW_PHYSICS_MISMATCH and
+      the reason recorded per probe: the question is zero-shot on exactly the pools the other arms were read on.'
+    control: The three arms already read on the same 139 pools, same split and event count (Suprio from the draft figure's
+      vector paths).
+    seeds: 'One: trial_1262 (seed 42), the single best trial; the earlier arms are single seeds too.'
+    outcome: 'Descriptive comparison, no yes/no rule on the decision: the figure and per-group medians say whether catalog_v4''s
+      pretraining zero-shots Daniel''s held-out processes better (median below the earlier arms'' on the 9 truly held out
+      and on the 96 relabels) or worse; a probe the read refuses or that blows up (non-finite) is listed apart, never dropped.'
