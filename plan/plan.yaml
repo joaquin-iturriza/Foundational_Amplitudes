@@ -27895,7 +27895,7 @@ entries:
     - 22
   owner:
     agent: a6d4e5fe8016e5052
-    state: working
+    state: closed
     since: '2026-11-17T11:10:00+00:00'
     state_at: '2026-11-17T11:10:00+00:00'
   findings:
@@ -29021,20 +29021,17 @@ entries:
   step_waits:
     '20': '2026-11-14'
   handoff:
-    state: '2026-11-17 @092b4128. Step 23 done again (Joaquin 2026-11-17: fewer figures, readable ranges, short deck): 12
-      figures in analysis/kit_benchmark/figs/deck (tools/kit_vs_mlp.py plot --figs analysis/kit_benchmark/figs/deck; tools/kit_figures.py
-      summary kit_verdict_A_hpo.json kit_verdict_A_hpo_ftsearch.json --out .../deck/kit_deepest_attempts), captions in scratchpad
-      caps/caps_deck.json (caps_deck.py reruns send_check, all pass). Deck talks/kit_nov2026/main.tex (main.pdf built, 8 slides,
-      figs copied into talks/kit_nov2026/figs). Steps 20/22 wait on Joaquin''s GPU budget answer (2026-11-14 question).'
-    decisions: 'Factor = the KIT model. Off-scale rule (kit_figures.clip_plot, YCAP=100): values beyond an axis drawn on its
-      edge as hollow triangles, the most extreme printed, legend entry ''off the scale, value printed''; median y range =
-      truth''s range widened by its span (min 1 decade). Histograms: a model with <90% of its events inside the truth''s filled
-      range goes in a right-hand panel of its own (kit_vs_mlp._far). Legend corner per canvas in LEG_AT, font 7.5pt. dev and
-      beta-ratio figures dropped as duplicates of median and MSE; the six fine-tunes share one marker on the attempts figure.'
+    state: '2026-11-17 @224c7920. Step 23 done: attempts figure fine-tunes split by parent (2 tops held out, triangles; 4
+      tops added, diamonds), redrawn, deck talks/kit_nov2026/main.pdf rebuilt, repo-reviewer cleared the item. Steps 20/22
+      held by Joaquin''s 2026-11-14 GPU-budget question.'
+    decisions: 'Factor = the KIT model. Off-scale rule (kit_figures.clip_plot, YCAP=100), hollow up-triangles on the edge.
+      Attempts figure: fine-tunes in two markers by parent (FT_HELD down-triangles, FT_TOPS hollow diamonds, not up-triangles
+      which mean off-scale).'
     ruled_out: As before.
     running: none
-    files: tools/kit_vs_mlp.py, tools/kit_figures.py, talks/kit_nov2026/main.tex, analysis/kit_benchmark/figs/deck/*, analysis/kit_benchmark/data/{kit_fig_A_hpo,kit_bakar_figs,kit_fig_mlp_reruns,kit_vs_mlp_hist,kit_verdict_A_hpo,kit_verdict_A_hpo_ftsearch}.json
-    written: '2026-11-17T03:40:44+00:00'
+    files: tools/kit_figures.py, tools/kit_vs_mlp.py, talks/kit_nov2026/main.tex, analysis/kit_benchmark/figs/deck/*, scratchpad
+      caps/caps_deck.py
+    written: '2026-11-17T11:13:24+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
