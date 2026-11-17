@@ -33480,6 +33480,20 @@ entries:
     decision: D473
     withdrawn_at: '2026-11-17T11:44:20+00:00'
     withdrawn_why: Fig. 15 and its Sec. 4 paragraph are out of the draft under D473, so the wording question is moot
+  - ask: 'Your hold: D473 holds Fig. 15 (the Muon-against-AdamW fine-tune figure and its Sec. 4 sentence) until we understand
+      why the zero-shot gain is lost in fine-tuning. It is the fine-tune learning rate: the Muon pretraining''s fine-tunes
+      run at its own peak lr (8.9e-3, 4x AdamW''s) and at D_train=32 sit above the zero shot from the first validation on
+      3 of 4 probes; at D_train=316 they end 15-100x below it except b bbar->HHHZ, which rises from 0.004 to 0.036 as the
+      lr warms up (figure ft_curves_sep). Shall I rerun the Muon fine-tunes on the four probes at a lower lr (lr_scale 0.343,
+      the best of the earlier fine-tune search; ~1 GPU-h, a small option in tools/catalog_ft.py) to bring Fig. 15 back, or
+      leave the figure out?'
+    at: '2026-11-17T11:45:06+00:00'
+    searched: 'CLAUDE.md, site decisions --project FA (D473 holds the fine-tune figure; nothing settles a new fine-tune protocol),
+      results.tex muon_hp_ft; Joaquin''s messages 2026-11-14T04:31 (a pasted paper.tex, no decision), 2026-11-16T20:00 (the
+      writing-style skill), 2026-11-12T01:19 (KIT stage-2 results): none is about the fine-tune lr'
+    blocks: step 5 only
+    blocks_steps: &id003
+    - 5
   owner:
     agent: a4b2e4f58e3b9081f
     state: working
@@ -34118,6 +34132,19 @@ entries:
       - 'Muon fine-tune stays at or below its zero shot at D=32 and below AdamW''s at every D: Fig. 15 returns with that protocol,
         Sec. 4 says so'
       - 'still above its zero shot: the lr is not the whole cause; read the head/standardization reset next'
+  ask: 'Your hold: D473 holds Fig. 15 (the Muon-against-AdamW fine-tune figure and its Sec. 4 sentence) until we understand
+    why the zero-shot gain is lost in fine-tuning. It is the fine-tune learning rate: the Muon pretraining''s fine-tunes run
+    at its own peak lr (8.9e-3, 4x AdamW''s) and at D_train=32 sit above the zero shot from the first validation on 3 of 4
+    probes; at D_train=316 they end 15-100x below it except b bbar->HHHZ, which rises from 0.004 to 0.036 as the lr warms
+    up (figure ft_curves_sep). Shall I rerun the Muon fine-tunes on the four probes at a lower lr (lr_scale 0.343, the best
+    of the earlier fine-tune search; ~1 GPU-h, a small option in tools/catalog_ft.py) to bring Fig. 15 back, or leave the
+    figure out?'
+  waiting_since: '2026-11-17T11:45:06+00:00'
+  searched: 'CLAUDE.md, site decisions --project FA (D473 holds the fine-tune figure; nothing settles a new fine-tune protocol),
+    results.tex muon_hp_ft; Joaquin''s messages 2026-11-14T04:31 (a pasted paper.tex, no decision), 2026-11-16T20:00 (the
+    writing-style skill), 2026-11-12T01:19 (KIT stage-2 results): none is about the fine-tune lr'
+  blocks: step 5 only
+  blocks_steps: *id003
 - id: zng_uq_benchmark
   title: Our model on the Z + n gluon UQ datasets (Zenodo 16793011)
   question: 'How does our latest setup (emission-scale target, HETEROSC, mu-P LLoCa), from scratch and fine-tuned from a pretraining,
