@@ -16311,7 +16311,7 @@ entries:
     '21': '2026-11-19'
   owner:
     agent: a0636264613b51f22
-    state: working
+    state: closed
     since: '2026-11-16T20:07:48+00:00'
     state_at: '2026-11-17T00:01:15.483000+00:00'
     context: 221080
@@ -17425,28 +17425,19 @@ entries:
       --until +7 days. Later restarts (supervisor 2026-11-16 12:59 local, waiter 2026-11-17 00:37 local) are re-execs of the
       same batching code, not new code for this measure.'
   handoff:
-    state: '2026-11-12 ~15:10 local. Restore of CC pools deleted 2026-11-11: held-out H1..H7c all prebuilt (check_site_data
-      0 missing); dsh_eea 115/115 train rebuilt, val/test sha256 230/230 unchanged, its parts gc''d (5.45 GB); PP4: 1 pool
-      left, pp13v4_udx_uuxwpz/train, single one-core MadEvent run of 558880 events (est 2.74 h from the 4-final median, real
-      >4.9 h: bb6707de timed out at 05:00) rerunning as FA-ccin2p3-046cc7d3 (1 core for byte identity with the original build,
-      24:00 limit, target 12 h); when it ends: check_site_data --list recipes/catalog_v4_pp_test.yaml, then lhe_parts gc --queue
-      zz_redesign_pp4_parts --parts. optimizations_recap was told its held-out reads can be redone. Cache census done (cache_census.py
-      @68fe3591, figs cache_census_a/b.png, data/cache_census_*.json): data cache 96.75 GB of train pools read by open entries;
-      smixq 1301 pools (30.89 GB) deleted under D410; chunk dirs of built pools (3.12 GB) removed; duplicates by recipe id
-      0. Step 24 measured (data/waiter_live_20261112.json @9edb252f, figs/waiter_live_20261112.png): replay new = old = 56
-      returns at 600 s (41/37/34 at 20/30/60 min, 103 unbatched), actual 32 waiter wakes; window question to Joaquin (plan
-      ask, holds step 24). Step 22 (CLAUDE.md figure rule): plan bound D412 (''no stopping for useless questions'') as the
-      answer to its question; CLAUDE.md allows a guidance change after a mistake shown as a diff: next owner decides whether
-      to make it.'
-    decisions: Last PP4 run stays on one core (MadEvent deterministic at fixed iseed on one core; the val/test blocks come
-      from the same run); D410 smixq deletion stands on 'read only by held catalog_coverage'; census duplicates are same recipe
-      id only (repo-review)
-    ruled_out: Splitting or multi-core for pp13v4_udx_uuxwpz (changes the run's events, so the train block would no longer
-      match the original run); smix vs smixq as duplicates
-    running: FA-ccin2p3-046cc7d3 (PP4 last run, step 25)
-    files: analysis/agent_redesign/cache_census.py analysis/agent_redesign/plot_cache_census.py analysis/agent_redesign/plot_waiter_live.py
-      tools/check_site_data.py tests/test_check_site_data_paths.py tests/test_cache_census.py analysis/agent_redesign/data/
-    written: '2026-11-12T14:05:50+00:00'
+    state: '2026-11-17. Figure setup fix done and committed cfe97bf5 (repo-reviewer PASS, backlog at 2e100669), incl. D462
+      union range for ps.true_pred_hist; KIT panels and muon_long examples regenerated; steps 22/23 relayed and dropped by
+      the main session. Step 21 (after-period of the 10-min batch) waits on 2026-11-19: run python3 tools/wake_batching.py
+      --since 2026-11-11T19:55:43Z --until +7 days --out analysis/agent_redesign/wake_batching_after.json --fig analysis/agent_redesign/figs/wake_batching_after
+      and compare per day with the baseline wake_batching_baseline.json @b65c92a9. Steps 11, 12, 14, 17 unchanged.'
+    decisions: Batching start for step 21 = absorb.log start 2026-11-11T19:55:43Z (later restarts re-exec the same code);
+      send_check refuses draft figures loose (every draft-figure redraw is a comparison under CLAUDE.md); true_pred_hist has
+      no truth-only range (Joaquin 2026-11-16, D462)
+    ruled_out: truth-range opt-in for kit_vs_mlp (D462 says never the truth alone)
+    running: none
+    files: plot_style.py .claude/hooks/send_check.py .claude/skills/figure-style/SKILL.md .claude/context/fa-figures.txt tools/kit_paper_figs.py
+      tools/kit_figures.py tools/kit_vs_mlp.py analysis/catalog_v4/muon_long.py tests/test_figure_setup.py tests/test_plot_style_hist.py
+    written: '2026-11-17T00:02:52+00:00'
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
   question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
