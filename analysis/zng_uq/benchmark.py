@@ -92,7 +92,7 @@ def plot(path):
     for a in arms:
         pts = sorted((v["n_gluons"], v["median_abs_delta"]) for v in d["runs"].values() if v["arm"] == a)
         ax.plot(*zip(*pts), "o-" if a.startswith("ours") else "s--", label=a)
-    ax.set_yscale("log"); ax.set_xlabel("$n$ gluons"); ax.set_ylabel(r"median $|\Delta|$, $\Delta = |\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2 - 1$")
+    ax.set_yscale("log"); ax.set_xlabel("$n$ gluons"); ax.set_ylabel(r"median $|\Delta|$")
     ax.set_xticks([1, 2, 3, 4]); ax.legend()
     ps.save(fig, os.path.join(figs, "zng_median_delta"))
     # (b) |Delta| on Z+4g, (c) pulls on Z+4g
