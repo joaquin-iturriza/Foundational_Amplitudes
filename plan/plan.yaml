@@ -35326,8 +35326,10 @@ entries:
     - dan_zeroshot_v4
   decisions:
   - D488
-  next: Check which of Daniel's 139 held-out processes (and their relabel classes) are in catalog_v4's training; score trial
-    1262 eval-only on the rest; redraw dan_per_process with a committed script and the new arm
+  next: 'Read trial_1262 (cov_v4_long_hpo8_cc_68224, sigma stage) on Daniel''s 139 held-out pools (axis DAN, one eval job,
+    ~0.1 h), bring the predictions home (collect_heldout_preds.py -> data/v4_trial1262_dan.npz) and draw analysis/catalog_daniel/dan_per_process.py:
+    96 relabels and the 9 extrapolation processes with no relabel in catalog_v4''s training (v4_heldout_overlap.py: 34 of
+    43 have one)'
   done_when: null
   notes_ref: null
   match: dan_zs_v4*
@@ -35391,3 +35393,12 @@ entries:
     outcome: 'Descriptive comparison, no yes/no rule on the decision: the figure and per-group medians say whether catalog_v4''s
       pretraining zero-shots Daniel''s held-out processes better (median below the earlier arms'' on the 9 truly held out
       and on the 96 relabels) or worse; a probe the read refuses or that blows up (non-finite) is listed apart, never dropped.'
+  step_why:
+    1:
+      feeds: whether catalog_v4's best pretraining zero-shots Daniel's held-out processes better than the arms trained on
+        Daniel's catalog (Suprio's pID embedding, shared standardization, dimensionless + coupling orders)
+      if:
+      - 'median MSE on the 9 truly held out below the earlier arms'': report it and the relabel medians to Joaquin with the
+        figure'
+      - 'above, or probes refused/non-finite: report with the failing probes listed and what the physics mismatch (massive
+        b, Daniel''s run card) may cost'
