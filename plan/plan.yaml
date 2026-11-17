@@ -34196,12 +34196,10 @@ entries:
     answered_at: '2026-11-17T11:33:55.256000+00:00'
     decision: D478
   owner:
-    agent: a7b24b3d46311d66f
-    state: closed
-    since: '2026-11-17T10:59:14+00:00'
-    state_at: '2026-11-17T11:05:23.633000+00:00'
-    context: 300084
-    context_at: '2026-11-17T11:26:35+00:00'
+    agent: ad838d9b0df85e41f
+    state: working
+    since: '2026-11-17T11:36:14+00:00'
+    state_at: '2026-11-17T11:36:14+00:00'
   designs:
   - at: '2026-11-17T11:14:59+00:00'
     question: 'Setup step (CPU job scripts/job_zng_fetch.sh, no GPU): are the Zenodo 16793011 Z+1..4g files, converted by
