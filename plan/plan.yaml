@@ -33419,7 +33419,7 @@ entries:
     decision: D464
   owner:
     agent: af12ee6aa9c5a58f7
-    state: working
+    state: closed
     since: '2026-11-17T01:21:13+00:00'
     state_at: '2026-11-17T01:21:13+00:00'
   step_waits:
@@ -33738,36 +33738,42 @@ entries:
     start: '2026-11-13T07:19:46+00:00'
     at: '2026-11-13T07:19:46+00:00'
   handoff:
-    state: 'Draft ~/drafts/fm_amplitudes_2026-11 at ded8a89 (current). Since cf688a5 (the Overleaf zip /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_final_overleaf.zip):
-      style pass 83a87eb (no \emph, full captions, \text, Fig./Tab., result lists as prose), item-1 pass 73c4b87, ladder redo
-      66c49d5 (heatmap dropped, ppcover from pp_bound @37af3f9a), plain ladder rewrite 009acff (one claim per paragraph, at
-      most one anchor number; cold reviewer PASS), metaphors replaced ded8a89. Build: copy paper.tex into /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/final_draft
-      (identical tree: cls, bst, incl_*.tex, bibs, figs), compile there with /mnt/c/texlive/2025/bin/windows/pdflatex.exe
-      + bibtex.exe (pdflatex x2 after bibtex), zip with: cd final_draft; zip -qr <out>.zip $(unzip -Z1 /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_final_overleaf.zip
-      | grep -v ''/$''). Latest zip /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_final_overleaf_plain2.zip,
-      PDF /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_final_plain2.pdf (45
-      pp). Joaquin''s latest upload /home/joaquin/.claude/uploads/71602535-0955-42ad-a58f-23dc320798dc/b183957a-fm_amplitudes.zip
-      was edited from the pre-style-pass version (cf688a5); its six co-author edits are listed in /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/their_edits.txt;
-      merging them into ded8a89 waits on Joaquin. Next step recorded by the coordinator (sigma-driven generation results into
-      the sampling subsection) not started.'
-    decisions: 'Joaquin 2026-11-16 on the writing skill: 9 conflicts answered (plot or nothing; no \emph; full captions; surrogate
-      network; Eq.~\eqref; non-adversarial comparisons; \text; Fig.~/prose; no hedging in final text); a value read off a
-      plotted figure counts as shown; one claim per paragraph with at most one anchor number, no per-case factor lists (reference
-      papers do this); comparisons stated plainly, no metaphors; gain heatmap dropped (''adds nothing new''); the 2.5x/3.7-4.2x
-      D split stays out (coincides with the horizon change). Skill .claude/skills/paper-writing-style/SKILL.md (FA c6d29f4d,
-      de06d721, 73a0db0d, 8beeb4bf, 19cfb273); CLAUDE.md paper bullet points to it (claudemd-keeper PASS). Seed-noise sentence
-      kept: ''lower at every D'' and the star arms ''at every D'' rest on single cells. Dead-cone b-mass explanation dropped
-      (whether the arm''s pools have a massive b not checked).'
-    ruled_out: Lists of per-probe gain factors in the ladder text; unplotted aggregates (geometric means over cells, per-rung
-      means, 698/840 count); the gain heatmap; the four further input conditionings of Sec. 5 (no figure, dropped); the synthetic
-      within-process spread 2.75 vs 1.32 (no figure)
+    state: 'Draft ~/drafts/fm_amplitudes_2026-11 at 8b55c58 (current, 45 pp). Since ded8a89: step 4 written on all five sigma-steering
+      processes (1ec32b9..47bbb35, cold reviewer FIX then PASS), then cut on Joaquin''s 2026-11-17 words (''only the figure
+      with the two panels you sent for uug and that''s it, and we remove the phrase saying that the gain is modest'') to the
+      method paragraph + one paragraph on e+e- -> u ubar g (Z peak error 2.5x lower at gamma 3, continuum unchanged), one
+      figure fig:steer = figs/pretrain/l2_uug_multiscale.pdf; co-authors'' six edits merged (8b55c58) except the ''effect
+      is modest'' sentence and the stray preamble line. Build: copy paper.tex (and any new figure PDFs, same relative path)
+      into /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/final_draft (identical tree:
+      cls, bst, incl_*.tex, bibs, figs), compile there with /mnt/c/texlive/2025/bin/windows/pdflatex.exe, bibtex.exe, pdflatex
+      x2; zip with: cd final_draft; zip -qr <out>.zip $(unzip -Z1 /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_final_overleaf.zip
+      | grep -v ''/$'') plus any figure not in that list (check: every figs/*.pdf grep''d from paper.tex present in the zip);
+      then unzip into an empty dir and compile there before sending. Latest: zip /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_final_overleaf_steer_uug.zip
+      (197 files, compiled standalone), PDF /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_final_steer_uug.pdf.
+      Only warning: the co-authors'' empty \ref{tab:} (kept as written).'
+    decisions: 'Joaquin 2026-11-17: sigma-driven subsection shows only the uug two-panel figure, ''modest'' sentence removed.
+      Co-authors'' edits: their \mpar{ab: insert here} cannot compile inside a caption (marginpar in a float), so it sits
+      in the text sentence ''Fig. data_saving shows the four targets''; their Tab. sentence with empty ref stays in the caption;
+      genmix caption opening word for word; rung_focus (e+e- probes) caption takes their wording adapted to rung_focus.py
+      colours (scratch black, first rung with structure vermillion=''orange'', rung below blue, best overall green, others
+      grey), rung_focus_qcd caption unchanged; clearpage before Sec. cond removed. Figures: the sigma-steering figures of
+      results.tex sec:div-sampling are drawn locally by analysis/divergences/plot_steering.py (FA c3f0548d) from steering_eval_summary.json,
+      because the heldout_eval_*.npz inputs of the older plot_l2_*.py scripts exist only on Jean Zay; l2_eeuu_online a-c by
+      l2_eeuu_online.py --plot (local summaries). Ratio axes are MSE_steered/MSE_uniform (send_check refuses ''MSE ratio''
+      and a sigma glyph on one side of ''/''); all nine pass send_check --scan. bbbarg drawn as 3-seed mean/std (notes'' version
+      seed 0).'
+    ruled_out: 'In the draft: the e+e- -> uu online, uugg, bbg, uuggg and gamma-response steering figures and their text (Joaquin
+      2026-11-17, only uug); the co-authors'' ''effect is modest'' sentence; the stray preamble line {\noindent\makebox[\textwidth][c]{#1}}
+      (breaks the compile). Earlier: per-probe gain-factor lists, unplotted aggregates, the gain heatmap, Sec. 5 extra input
+      conditionings, synthetic spread 2.75 vs 1.32.'
     running: none
     files: ~/drafts/fm_amplitudes_2026-11/paper.tex; /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/final_draft/;
-      /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_final_overleaf_plain2.zip;
-      /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/their_edits.txt; .claude/skills/paper-writing-style/SKILL.md;
-      analysis/catalog_v4/paper_sec3_figs.py (pp_bound prints catalog/pp-only ratio_stats); /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/joaquin_draft_comments_0613.txt,
-      _0920.txt
-    written: '2026-11-16T22:59:59+00:00'
+      /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_final_overleaf_steer_uug.zip;
+      /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_final_steer_uug.pdf; /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_final_overleaf.zip
+      (file list for zips); analysis/divergences/plot_steering.py; analysis/divergences/l2_eeuu_online.py; analysis/divergences/steering_eval_summary.json;
+      analysis/divergences/figs/l2_*.{png,pdf,legend.txt} (redrawn 2026-11-17; the draft's figs/pretrain holds copies, the
+      unused steering PDFs stay there); .claude/skills/paper-writing-style/SKILL.md; tools/draft_figure.py
+    written: '2026-11-17T01:21:21+00:00'
   step_why:
     3:
       feeds: whether and how the paper states the het-vs-MSE comparison
