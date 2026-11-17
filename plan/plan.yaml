@@ -34329,6 +34329,37 @@ entries:
       vs scratch read either way. Timing check: GPU-h of their production = 4 jobs x min(2e5 x s/step shared, 24 h); <= 30
       GPU-h -> submit; above -> to Joaquin with the number, beside the alternative of asking the authors for their prod_het_v1
       preds_test_0.npz (same split).'
+    fix_at: '2026-11-17T11:48:26+00:00'
+    fix: '(1) Seeds against spread, and outcome (checks 3, 4): the design says ''seed spread not measured in this step'' but
+      spreads exist and decide the reading. results.tex highmult grid (l.14949-14967): past D~1e4 fine-tune vs scratch on
+      u u~ > Z+4g/Z+5g is -0.39 to +0.19 dex, ''within the spread of one seed''; at 5e5 events per multiplicity the expected
+      fine-tune vs scratch effect is inside one-seed noise, and the check field''s -0.11..+0.96 dex comes from D=1e4 down
+      to D=10, not this regime. Single-process seed spread at the latest setup (results.tex ~l.4400, V/B study, template setup,
+      HETEROSC, batch 16384): u u~ virtual MSE 3.3e-7, 3.1e-6, 1.1e-6 over seeds 42-44 (~1 dex); tt 3.9e-10, 8.8e-10, 2.1e-7.
+      Fix: cite the measured spread for this kind of run, state the smallest ours-vs-theirs and fine-tune-vs-scratch difference
+      that stands above it at one seed, and add a third outcome ''within the spread: not resolved'' for both comparisons,
+      with what each outcome changes for the entry (fine-tune vs scratch is now ''read either way'', which any result confirms).
+      If resolving fine-tune vs scratch needs more seeds, that is Joaquin''s call: word it as a question to him (one seed
+      is also their production''s), not as added seeds. (2) Prior incomplete (checks 5, 7, D478 ''take the HPs from'' similar
+      optimized runs): the prior omits kit_benchmark''s DyHPO searches on single-process from-scratch runs built on the same
+      base config (trial 1262, HETEROSC, batch 16384, mu_mse selection): analysis/kit_benchmark/data/kit_hpo.json (kit_hpo_uug_plain,
+      kit_hpo_uug_T, kit_hpo_uugg_T, kit_hpo_ttvirt_thr; chosen ee->uug hp1918: WSD, lr 0.0125, Muon wd 0.052, lambda 4.9e-7,
+      warmup 0.19, per the kit_benchmark design), and the het23 scratch sweeps on u u~ > Zgg/Zggg that ''chose the same point
+      but for lr'' (results.tex l.10851-10853) are cited only for their |Delta|, not weighed as an HP source. These are the
+      closest optimized runs (single process, scratch, latest setup) to step 3, and they differ from trial 1262''s pretraining
+      HPs (scheduler WSD vs cosine, lambda 4.9e-7 vs 9.1e-8). Fix: name them and say which source the HPs come from and why
+      (or take them), per D478. (3) Checkpoint selection (check 9, decisions in force): the design selects on val mu-MSE (job_kit.sh
+      training.heterosc_select=mu_mse) while D62 sets training.heterosc_select''s default to nll; state the reason (e.g. the
+      measure is median |Delta| of mu, as in kit_benchmark) or follow D62. (4) Disk and cost (check 14, GPU budget rule):
+      no disk per job, no CC free disk now, no GPU-h estimate for the 8-job batch. Fix: disk per job from a finished job_kit.sh
+      run (data.memmap=false, so no shared cache; plus the 1e6-event preds/sigma), times 8 plus their production''s run folder
+      under WORK/ext, against site run ccin2p3 FA -- df -h; GPU-h of the batch from a KIT run''s s/step at batch 16384 (stated
+      as an estimate, the smoke confirms it), with the 30 GPU-h line. Minor, not blocking alone: their pull is (truth - mu)/sigma
+      (experiments/uq/metrics.py l.35), the design''s is (mu - truth)/sigma; use one sign. Checks that hold: matched scratch/fine-tune
+      pair (same data, 12,500 steps, lr 9.28e-3, seed; only start differs); 400 epochs both sides (D479); HETEROSC + sigma
+      stage (D226); emission-scale target as Joaquin asked (D477); test events = their own split, compared via split_indices;
+      smoke per D395; their production gated on time_check and Joaquin above 30 GPU-h; Delta definition matches their point_metrics
+      (expm1 of log residual).'
   step_why:
     1:
       feeds: whether any run or evaluation on their events compares like with like
