@@ -35524,6 +35524,24 @@ entries:
       on disk and the stored read came from other weights (reported to Joaquin; Suprio gets the evaluator as is). If the GPU
       gives 0.279 / -11.27: a CPU-vs-GPU numerical difference to find before Suprio uses it on CPU. If (a) and (b) differ:
       the committed copy is not the run''s model.'
+    fix_at: '2026-11-17T19:43:32+00:00'
+    fix: 'Checks 1 and 4 (matched control, outcome): the job runs only the new evaluator (evaluate_daniels_catalog/evaluate.py)
+      on GPU, on the committed copy and on the run directory. Its ''no'' outcome (GPU gives 0.417 / -11.46 for both, so ''the
+      stored read came from other weights'') does not follow: the evaluator differs from the 2026-10-23 read in more than
+      device and weights (its own wrapper: stand-in |M|^2 tags and the scorer''s own-target standardization, logF subtracted
+      from its own recompute, processes_file swapped to recipes/catalog_daniel_train.yaml, unaugmented_roles plus per-event
+      keyed augmentation, --allow-physics-mismatch without the pool sidecar), and the code has moved since 2026-10-23. The
+      ''Oct-23 code + mask fix gives the same 0.194'' check was on CPU and the design does not say through which entry point.
+      Fix: name the job that produced catalog_short_DlessInOrd_sigstage.npz (run id, commit, parent path) and add to the same
+      GPU job a third read, its own command (tools/zero_shot_parent.py --parent runs/catalog_norm_short/DlessInOrd/sigma_stage
+      --split val --save-dir ... on the dc_bbx_hh recipe, as that job ran it), on the same 2000 events. Then the outcomes
+      separate: original command on GPU 0.279 while the evaluator on GPU gives 0.417 means the evaluator''s wrapper differs
+      (find which input); original command 0.417 too means code drift or other weights since 2026-10-23 (then compare against
+      the run''s checkpoint files and the stored job''s commit); evaluator on GPU 0.279 means a CPU-vs-GPU difference. Also
+      state the outcome for a read that lands on neither value. Everything else holds: the measure separates the candidates
+      (stored q MSE 0.2791 and truth mean -11.0198 recomputed from the stored npz, which matches the first 2000 rows of the
+      local val pool to 7e-7; the 0.194 offset is 20x the 0.0094 per-event sd); one seed is enough (8 seeds agree to 1.7e-4);
+      test events are the stored read''s own; about 0.1 GPU-h, disk trivial.'
   step_why:
     1:
       feeds: whether catalog_v4's best pretraining zero-shots Daniel's held-out processes better than the arms trained on
