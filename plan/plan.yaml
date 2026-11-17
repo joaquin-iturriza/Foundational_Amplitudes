@@ -28972,6 +28972,13 @@ entries:
       on truth''s range, no 8% pad): new versions in scratchpad paperfigs/new, repo copies restored to the old ones for Joaquin''s
       call. kitvm_dist redrawn: 10 panels, truth 42-53 filled bins each, dropped: MLP raw on every hard stratum, scratch on
       uug/uugg soft and tt Sudakov (0.0-0.2% inside).'
+  - at: '2026-11-17T02:34:31+00:00'
+    text: '2026-11-17 @eb6c697d. Step 23 (Joaquin: bring back the factor results, all plots, explained): every factor figure
+      redrawn as one file with its legend inside in plain words (tools/kit_vs_mlp.py plot --figs analysis/kit_benchmark/figs/factor;
+      tools/kit_figures.py summary kit_verdict_A_hpo.json kit_verdict_A_hpo_ftsearch.json --out .../factor/kit_deepest_attempts):
+      kitvm_mse/median/dev per process, kitvm_bulk, kitvm_dist per process + bulk, kitvm_ratio_beta, kit_deepest_attempts;
+      16 files, each passes send_check with its caption (captions in scratchpad caps/caps.json). Transformer from scratch
+      missing on the beta-ratio figure (lxplus down).'
   step_why:
     20:
       feeds: the KIT NLO statement in the draft
