@@ -34181,6 +34181,18 @@ entries:
       value reported and, if not 1, the convention named, e.g. electroweak scheme). Then trainings and evaluations go ahead
       on uq_<proc>.h5. NO: a spread above 1e-6 on any process -> stop, find the mismatch (leg order, momenta frame, flavour,
       helicity sum) before any job reads these files; a split mismatch -> stop and fix the converter.'
+    passed_at: '2026-11-17T11:19:09+00:00'
+    reviewer: 'CPU setup job, no GPU, no training: checks on loss/preprocessing/HPO/seeds/sampling not applicable. Split measure
+      shown on their zgggg_mini.npy (float64, 5e4x29; momentum conservation 2e-12 to 8e-12 relative), randperm(3e6, seed 1)
+      identical across torch 2.1.2/2.9.1; the |M|^2 ratio is a deterministic conformance read whose 1e-6 spread threshold
+      sits far above the source precision (float64), u u~ constant-ratio claim holds at tree level without widths (P-odd epsilon
+      terms vanish), and the run measures it. Outcome yes/no stated. Disk: archives 0.70+1.12+1.40+8.37+8.37 GB (Zenodo API),
+      fetched one at a time and deleted; /sps/lpnhe 57 GB free. Searched results.tex, plan and decisions for zenodo, 16793011,
+      Z+, zng, z+ng, lloca-experiments, 2505.20280, uq, gluon, Jonas, matched Z, zgggg, published dataset: no earlier conversion
+      or |M|^2 cross-check of this dataset; results.tex l.15501 (the collaboration draft''s ''Extrapolating to more legs''
+      trains on this same Zenodo dataset, draft paper.tex l.110) and D86 ''(c) Jonas''s matched Z+ng: dropped'' are not named
+      in prior and must be cited by the training design; our own u u~ > Z+ng pools (results.tex l.13514, l.14937) are the
+      reference for the u u~ shift.'
   step_why:
     1:
       feeds: whether any run or evaluation on their events compares like with like
