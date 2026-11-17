@@ -35145,7 +35145,7 @@ entries:
       FA-ccin2p3-b988a809 FA-ccin2p3-57003e68
     '8': the four B1 DyHPO sweeps ccin2p3:tp_zng_hpo_{zg,zgg,zggg,zgggg} (31 of 32 trials queued; zgggg trial_0007 resubmitted
       by detached zng_gate_windows)
-    '9': FA-ccin2p3-30fc5363 (parent smoke; the parent goes from its s/step)
+    '9': FA-ccin2p3-7aff114e (parent smoke after the fix; the parent goes from its s/step)
   findings:
   - at: '2026-11-17T11:18:43+00:00'
     text: 'Their numbers: the UQ repo (branch uq, 311 files) holds no figures, preds or result files. arXiv:2505.20280''s
