@@ -44,7 +44,7 @@ def main():
     # Joaquin 2026-11-17: the reader meets the sqrt(s) bins first (left), the fraction is a named colour bar, and the
     # f axis says it is a sampling technique (flat in log|M|^2 against flat phase space)
     fig, (axL, axR) = ps.figure(ncols=2)
-    FLAB = "fraction of training events\n" + r"sampled flat in $\log|\mathcal{M}|^2$"
+    FLAB = r"fraction sampled flat in $\log|\mathcal{M}|^2$"   # one short name on bar and axis (Joaquin 2026-11-17)
     cmap, norm = matplotlib.colormaps[ps.CMAP], matplotlib.colors.Normalize(0, 1)
     for t in tags:
         b = np.array(by[t]["binmse"], float)
@@ -53,9 +53,9 @@ def main():
     axL.set_xscale("log"); axL.set_yscale("log")
     axL.set_xticks(XTICKS); axL.set_xticklabels([str(t) for t in XTICKS]); axL.minorticks_off()
     axL.set_xlabel(r"$\sqrt{\hat s}$ of the test events [GeV]")
-    axL.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$ in the $\sqrt{\hat s}$ bin")
+    axL.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
     ps.process_label(axL, r"$e^+e^-\to u\bar u$")
-    ps.colorbar(axL, matplotlib.cm.ScalarMappable(norm=norm, cmap=cmap), FLAB + ",\nthe rest flat in phase space")
+    ps.colorbar(axL, matplotlib.cm.ScalarMappable(norm=norm, cmap=cmap), FLAB)
 
     axR.plot(f, logflat, "o-", color=ps.C.blue, label=r"mean over $\sqrt{\hat s}$ bins," + "\nequal weight per bin")
     axR.plot(f, reson, "s-", color=ps.C.vermillion, label=r"mean over bins with $\sqrt{\hat s}<100$ GeV")

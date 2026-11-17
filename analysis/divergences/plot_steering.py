@@ -25,7 +25,7 @@ F = json.load(open(os.path.join(HERE, "steering_eval_summary.json")))["files"]
 OUT = os.path.join(HERE, "figs")
 LBL = [r"$<\!-6$", r"$-6$", r"$-5$", r"$-4$", r"$-3$", r"$-2$", r"$-1$"]   # lower edge of each y_min decade
 X = np.arange(len(LBL))
-YL = r"MSE$(\Delta\log|\mathcal{M}|^2)$"
+YL = r"MSE$(\log|\mathcal{M}|^2)$"
 YR = r"MSE$_\mathrm{steered}$ / MSE$_\mathrm{uniform}$"   # sigma-steered arm over uniform keep
 REG = [("peak", r"$<3$"), ("shoulder", r"$3\!-\!15$"), ("continuum", r"$>15$"), ("peak_ir", r"$<3$, IR")]
 printed = {}
@@ -115,19 +115,19 @@ ps.save(fig, os.path.join(OUT, "l2_gamma_response_extended"))
 STEER = "heteroscedastic steering, kept\n" + r"in proportion to $\sigma^\gamma$, "
 UUG = [("proposals kept uniformly", "uug_base_s0", ps.C.grey, "o"), (STEER + r"$\gamma=1$", "uug_sigma_s0", ps.C.sky, "s"),
        (STEER + r"$\gamma=3$", "uug_g3_s0", ps.C.vermillion, "D")]
-REG_UUG = [("peak", r"$<3$"), ("peak_ir", r"$<3$," + "\n" + r"$y_{\min}<10^{-3}$"), ("shoulder", r"$3\!-\!15$"),
+REG_UUG = [("peak", r"$<3$"), ("peak_ir", r"$<3$, IR"), ("shoulder", r"$3\!-\!15$"),
            ("continuum", r"$>15$")]
 fig, (axL, axR) = ps.figure(ncols=2)
 xr = np.arange(len(REG_UUG))
 for j, (lab, t, c, m) in enumerate(UUG):
     axL.plot(X, dec(t), m + "-", color=c, label=lab)
     axR.plot(xr + (j - 1) * 0.15, [F[t]["reg"][k][1] for k, _ in REG_UUG], m, color=c, label=lab)
-axL.set_yscale("log"); decade_axes(axL, r"MSE$(\log|\mathcal{M}|^2)$ in the decade")
+axL.set_yscale("log"); decade_axes(axL)
 axL.set_xlabel(r"$\log_{10} y_{\min}$,  $y_{\min}=\min_{i<j} s_{ij}/\hat s$")
 ps.legend(axR, "lower left")
 ps.process_label(axL, r"$e^+e^-\to u\bar u g$")
 axR.set_yscale("log"); axR.set_xticks(xr); axR.set_xticklabels([l for _, l in REG_UUG])
-axR.set_xlabel(r"$|\sqrt{\hat s}-M_Z|$ [GeV]", labelpad=6); axR.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$ in the window")
+axR.set_xlabel(r"$|\sqrt{\hat s}-M_Z|$ [GeV];  IR: $y_{\min}<10^{-3}$"); axR.set_ylabel(YL)   # one-line ticks (Joaquin 2026-11-17)
 ps.save(fig, os.path.join(OUT, "l2_uug_multiscale"))
 printed["uug_region_over_base_g3"] = {k: round(F["uug_g3_s0"]["reg"][k][1] / F["uug_base_s0"]["reg"][k][1], 3) for k, _ in REG}
 printed["uug_overall"] = [F[t]["mse"] for _, t, _, _ in UUG]

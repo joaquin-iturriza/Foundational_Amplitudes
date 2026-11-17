@@ -79,16 +79,18 @@ for ax, p in zip(axs.flat, PROBES):
           f"[16-84%: {lo:.1f}, {hi:.1f}] boot {r['boot']}  "
           f"median L_scratch/L_ft over D {np.median(g):.1f} (range {min(g):.1f}-{max(g):.1f}, {len(g)} cells)")
     ax.set_xscale("log"); ax.set_yscale("log")
-    ax.set_xlabel(r"target training events $D$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
-    # the saving's value under the process label, where make_room keeps the data clear of it
-    ps.process_label(ax, {**LAB, **ARMLAB}[p].replace(" (1-loop)", " one loop") + "\n" + rf"$\times{s:.1f}$")
+    ax.set_xlabel(r"training events $D_{\rm train}$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
+    # the saving's factor on its arrow (Joaquin 2026-11-17: under the process name it read as unexplained)
+    ax.annotate(rf"$\times{s:.1f}$", xy=(np.sqrt(ds * df), level), xytext=(0, -4), textcoords="offset points",
+                ha="center", va="top", bbox=dict(fc="white", ec="none", pad=0.5), zorder=6)
+    ps.process_label(ax, {**LAB, **ARMLAB}[p].replace(" (1-loop)", " one loop"))
 print(f"median fitted saving over the 4 panels {np.median(S):.1f} (each read at its own panel's level, not one precision); median L_scratch/L_ft over all {len(ALL)} cells "
       f"{np.median(ALL):.1f}")
 # the legend inside the first panel, in words (Joaquin 2026-11-17: one file, legend inside, readable without the text)
-H = [Line2D([], [], color="k", marker="o", label="trained from scratch"),
-     Line2D([], [], color=ps.C.blue, marker="o", label="fine-tuned from the pretraining"),
+H = [Line2D([], [], color="k", marker="o", label="from scratch"),
+     Line2D([], [], color=ps.C.blue, marker="o", label="fine-tuned"),
      Line2D([], [], color="0.5", marker="o", mfc="none", ls="none", label="left out of the fit"),
      Line2D([], [], color="0.5", ls="--", label="target precision"),
-     Line2D([], [], color=GAP, label="data saved, " + r"$\times D_{\rm scratch}/D_{\rm fine\!-\!tuned}$" + "\nat the target precision")]
+     Line2D([], [], color=GAP, label="data saved at the target precision")]
 ps.legend(axs.flat[0], "lower left", handles=H)
 ps.save(fig, os.path.join(ROOT, "analysis", "data_saving", "figs", "old_setup_examples"))

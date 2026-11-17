@@ -86,8 +86,8 @@ def cells_with_preds():
     return out
 
 
-D_STYLE = {100: ":", 1000: "--", 10000: "-"}
-D_LAB = {100: r"$10^2$", 1000: r"$10^3$", 10000: r"$10^4$"}
+D_STYLE = {100: "--", 10000: "-"}   # D = 10^3 left out of the figures (Joaquin 2026-11-17)
+D_LAB = {100: r"$D_{\rm train}=10^2$", 10000: r"$D_{\rm train}=10^4$"}
 
 
 
@@ -114,7 +114,7 @@ def plot():
     # one file per figure, legends inside in words (Joaquin 2026-11-17): the arm's colour in panel (a), the number of
     # training events' line style in panel (b)
     arm_h = [Line2D([], [], color=col[a], label=lab[a]) for a in ("scratch", "fine-tune")]
-    d_h = [Line2D([], [], color="0.4", linestyle=D_STYLE[D], label=f"{D_LAB[D]} events") for D in D_STYLE]
+    d_h = [Line2D([], [], color="0.4", linestyle=D_STYLE[D], label=D_LAB[D]) for D in D_STYLE]
     edges = np.logspace(-6, 3, 73)   # |Delta| from 10^-6 to 10^3, eight bins a decade; events beyond go in the end bins
     # |Delta| histograms on a log axis, one panel per probe: colour the arm, line style D
     fig, axs = ps.figure(ncols=2, nrows=2)
@@ -143,7 +143,7 @@ def plot():
         allv = np.concatenate([tr] + [by[p, D, a]["pred"] for a, D in have])
         e = np.linspace(allv.min(), allv.max(), 41)  # the union of truth and predictions: every event on the frame
         t = np.histogram(tr, e)[0]
-        models = [dict(label=f"{lab[a]}, $D=${D_LAB[D]}", edges=e, truth=t, n=by[p, D, a]["pred"].size,
+        models = [dict(label=f"{lab[a]}, {D_LAB[D]}", edges=e, truth=t, n=by[p, D, a]["pred"].size,
                        pred=np.histogram(by[p, D, a]["pred"], e)[0], style=dict(color=col[a], linestyle=D_STYLE[D]))
                   for a, D in have]
         ps.true_pred_hist(ax, models, xlabel=r"$\log|\mathcal{M}|^2$",
