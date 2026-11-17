@@ -35119,7 +35119,7 @@ entries:
     '5': the notes-editor pillar reviewer (blocked on par:muon_long, another entry)
     '4': '2026-11-18'
     '6': FA-ccin2p3-7f7f0b53
-    '7': FA-ccin2p3-3e8178a0
+    '7': detached zng_gate_windows (submits B2's 8 runs at 18:12 UTC, after the site gate's 60-min window)
     '8': the four B1 DyHPO sweeps ccin2p3:tp_zng_hpo_{zg,zgg,zggg,zgggg} (31 of 32 trials queued; zgggg trial_0007 resubmitted
       by detached zng_gate_windows)
     '9': the next owner's submission (pool rebuild not yet submitted at the close)
