@@ -34274,6 +34274,23 @@ entries:
     - 2
     answered_at: '2026-11-17T12:19:05.926000+00:00'
     decision: D480
+  - ask: 'GPU budget: 33 to 61 GPU-h above 30 with no decision covering it. Joaquin, our 8 Z+ng runs are not well trained:
+      7 of 8 fail the curve test (the mu-MSE sits on a ~1e-3 plateau at lr 6.55e-3 for 10k steps, then training drops 10-300x
+      below validation in the WSD cooldown), and on Z+4g they are 4-6x worse in MSE of ln|M|^2 (2.4e-3 scratch, 1.5e-3 fine-tuned,
+      at 5e5 events) than our earlier searched u u~ > Z+4g scratch run at 1e5 events (3.9e-4; older setup, MSE loss, lr 1.5e-3).
+      The HP source (kit_hpo_uug_T, ee->uug at 1e5 events and 1,831 steps) does not carry to Z+ng. A DyHPO search for this
+      setup (template coupled space, 12,500 steps, 5e5 events, 8 trials) is the fix; which one: (a) one search per multiplicity,
+      then the fine-tunes at each choice, ~61 GPU-h, ~8 h wall; (b) one search on Z+4g only and its HPs for all 8 runs again,
+      ~33 GPU-h, ~10 h wall; (c) neither, report the current runs flagged.'
+    at: '2026-11-17T14:52:32+00:00'
+    searched: 'CLAUDE.md GPU budget (30 GPU-h), D241 (an HP question goes through DyHPO), D477-D480 (entry approved, matched
+      epochs, not their networks; none prices a search). Joaquin''s messages flagged by the tool: 2026-11-14T04:31 (a SciPost
+      LaTeX template), 2026-11-10T02:08 (uploads of the KIT slides and amplitudes zip), 2026-11-16T20:00 (a writing-style
+      skill): none is about HPs or GPU budget for this entry. His 2026-11-17T11:33 ''take the HPs from'' similar optimised
+      runs was followed; those HPs fail here.'
+    blocks: step 4 (the HP search and the rerun)
+    blocks_steps: &id003
+    - 4
   owner:
     agent: a0923cdbb41f6dbf2
     state: working
@@ -34754,3 +34771,19 @@ entries:
       1262 (tools/rebuild_run.rebuild handles single-process runs only); its caption is ''our existing models, not trained
       on their data''. (5) Write-up in docs/results.tex with % src / % claim lines.'
     written: '2026-11-17T14:35:34+00:00'
+  ask: 'GPU budget: 33 to 61 GPU-h above 30 with no decision covering it. Joaquin, our 8 Z+ng runs are not well trained: 7
+    of 8 fail the curve test (the mu-MSE sits on a ~1e-3 plateau at lr 6.55e-3 for 10k steps, then training drops 10-300x
+    below validation in the WSD cooldown), and on Z+4g they are 4-6x worse in MSE of ln|M|^2 (2.4e-3 scratch, 1.5e-3 fine-tuned,
+    at 5e5 events) than our earlier searched u u~ > Z+4g scratch run at 1e5 events (3.9e-4; older setup, MSE loss, lr 1.5e-3).
+    The HP source (kit_hpo_uug_T, ee->uug at 1e5 events and 1,831 steps) does not carry to Z+ng. A DyHPO search for this setup
+    (template coupled space, 12,500 steps, 5e5 events, 8 trials) is the fix; which one: (a) one search per multiplicity, then
+    the fine-tunes at each choice, ~61 GPU-h, ~8 h wall; (b) one search on Z+4g only and its HPs for all 8 runs again, ~33
+    GPU-h, ~10 h wall; (c) neither, report the current runs flagged.'
+  waiting_since: '2026-11-17T14:52:32+00:00'
+  searched: 'CLAUDE.md GPU budget (30 GPU-h), D241 (an HP question goes through DyHPO), D477-D480 (entry approved, matched
+    epochs, not their networks; none prices a search). Joaquin''s messages flagged by the tool: 2026-11-14T04:31 (a SciPost
+    LaTeX template), 2026-11-10T02:08 (uploads of the KIT slides and amplitudes zip), 2026-11-16T20:00 (a writing-style skill):
+    none is about HPs or GPU budget for this entry. His 2026-11-17T11:33 ''take the HPs from'' similar optimised runs was
+    followed; those HPs fail here.'
+  blocks: step 4 (the HP search and the rerun)
+  blocks_steps: *id003
