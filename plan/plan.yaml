@@ -34573,6 +34573,12 @@ entries:
     units: null
     start: '2026-11-17T11:23:55+00:00'
     at: '2026-11-17T11:23:55+00:00'
+  - batch: zng_smoke
+    wall_h: 0.5
+    jobs: 2
+    units: null
+    start: '2026-11-17T11:54:17+00:00'
+    at: '2026-11-17T11:54:17+00:00'
   handoff:
     state: 'Setup job FA-ccin2p3-32145d4b (CPU, scripts/job_zng_fetch.sh @43a6d86c, design PASSED) running: zg, zgg, zggg
       archives downloaded and md5-verified (~34 MB/s); next zgggg_part1 (8.4 GB), then convert -> $DATA_DIR/zng_uq/uq_<proc>.h5
