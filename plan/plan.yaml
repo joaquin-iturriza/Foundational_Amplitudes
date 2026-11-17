@@ -33339,6 +33339,11 @@ entries:
     3: 'Het loss vs MSE (Fig. 9, removed from the draft by Joaquin 2026-11-13): come back to it. The het network leaves ~1-11%
       of 2->2 test events unfitted with large sigma (median |Delta| better 118/146, MSE worse on most 2->2); evaluation checked,
       no bug; training precision not checked'
+    4: 'Fig. 14 right on MSE(log|M|^2) (Joaquin figs3: ''why state that it''s the standardized logM^2? is it different from
+      everything else we are showing?''): read the 448-process arms'' per-process standardization (data_stats.json prepd_std,
+      the site holding the bigrun runs, analysis/bigrun/arms_best.py) and plot GM over processes of MSE(log|M|^2) (= GM loss
+      x GM std^2 if every arm shares the standardization; check it does); x label MSE(log|M|^2); caption without the standardization
+      sentence. Labels stay the fifth version (reviewed).'
   done_when: null
   notes_ref: null
   match: none
@@ -34166,6 +34171,11 @@ entries:
       if:
       - 'Joaquin returns to it: design the follow-up he asks for'
       - 'never: stays out of the paper'
+    4:
+      feeds: a Fig. 14 right on the same quantity as every other figure
+      if:
+      - 'every arm shares one standardization: replot, rebuild, send'
+      - 'arms differ in standardization: recompute per-process MSE from each run''s metrics and say so'
 - id: zng_uq_benchmark
   title: Our model on the Z + n gluon UQ datasets (Zenodo 16793011)
   question: 'How does our latest setup (emission-scale target, HETEROSC, mu-P LLoCa), from scratch and fine-tuned from a pretraining,
