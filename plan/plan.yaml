@@ -33955,6 +33955,12 @@ entries:
     units: null
     start: '2026-11-17T02:49:38+00:00'
     at: '2026-11-17T02:49:38+00:00'
+  - batch: fig15_sep
+    wall_h: 1.0
+    jobs: 3
+    units: null
+    start: '2026-11-17T04:33:08+00:00'
+    at: '2026-11-17T04:33:08+00:00'
   handoff:
     state: 'Draft ~/drafts/fm_amplitudes_2026-11 at 314e151, 48 pp (scratchpad draft_final_fig15.pdf, draft_final_overleaf_fig15.zip).
       Step 5 done: Fig. 15 on the low-loss probes (muon_ft_lowloss.json @4979f72f): Muon lower on the 3 trees at every D_train
