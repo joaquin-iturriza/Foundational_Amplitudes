@@ -78,5 +78,5 @@ for arm, (_, what) in ARMS.items():
             label=f"step 1 + {what}")
 ps.process_label(ax, LAB[p])
 axes_style(ax)
-ps.legend(ax, "upper right", fontsize=ps.LEGEND_MIN_PT)
+ps.legend(ax, "lower left", fontsize=ps.LEGEND_MIN_PT)   # the curves fall from upper left: lower left is empty
 ps.save(fig, os.path.join(FIGDIR, "star_arms2"))
