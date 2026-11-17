@@ -34224,3 +34224,10 @@ entries:
       2.6e-7/6.5e-6/3.3e-5/8.3e-5; LLoCa-GNN 1.4e-9/1.15e-6/2.6e-5/5.0e-5; GNN 3.1e-9/5.7e-6/2.5e-5/1.05e-4; MLP-I 2.0e-8/1.0e-5/1.3e-4/1.37e-3.
       The median |Delta| of Joaquin''s meeting figure is in neither (only its legend, read off his screenshot). torch 2.1.2
       and 2.9.1 give the same randperm(3e6, seed 1).'
+  targets:
+  - batch: zng_fetch
+    wall_h: 3.0
+    jobs: 1
+    units: null
+    start: '2026-11-17T11:23:55+00:00'
+    at: '2026-11-17T11:23:55+00:00'
