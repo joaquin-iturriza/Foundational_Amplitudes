@@ -33660,6 +33660,9 @@ entries:
       11 applied and made skill rules (30b1b541). Draft cd6dee5: one include per figure, short captions, rung -> step of the
       ladder, D -> D_train in Secs. 3-5; builds 48 pp with TeX Live 2025 at /mnt/c/texlive/2025/bin/windows (the WSL TeX lacks
       dsfont). Left: Fig. 15 from the new runs, cold figures-only reviewer, zip + PDF, send each figure.'
+  - at: '2026-11-17T02:31:01+00:00'
+    text: '2026-11-17 Joaquin on Figs. 6, 11: factor off the lines -> per-panel legend entry on the arrow ''data saved xS'';
+      uug steering arms distinct fill/line style, window points spread (92891bcd, draft f405886).'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
