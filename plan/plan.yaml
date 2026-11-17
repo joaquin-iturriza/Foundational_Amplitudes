@@ -33440,6 +33440,7 @@ entries:
     context_at: '2026-11-17T04:28:06+00:00'
   step_waits:
     '3': '2026-11-20: next draft round'
+    '4': FA-ccin2p3-9f53a445 FA-ccin2p3-25941ebf FA-ccin2p3-264b3f81
   findings:
   - at: '2026-11-13T02:46:58+00:00'
     text: '2026-11-13 ~03:50 Joaquin: ''we should start actually doing the work on the draft with what we have ... Let''s
