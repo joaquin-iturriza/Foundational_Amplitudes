@@ -15,4 +15,4 @@ The step:
 === END MECHANICAL RULES ===
 
 Final message: one or two lines, what you did with its run ids or commits; start it with "ROUTINE:" when nothing
-needs Joaquin.
+needs Joaquin; never when the step hands back a file or result for Joaquin (a draft, a figure, a fix he asked for).
