@@ -176,3 +176,13 @@ def test_draft_figure_tool_output_accepted(tmp_path):
     bad, _ = sc.legend_findings({"files": [base + ".png"], "caption": "from scratch: the baseline"}, "/",
                                 drafts=str(tmp_path))
     assert not any("paper draft" in b for b in bad)
+
+
+def test_outside_legend_refused(tmp_path):
+    """Joaquin 2026-11-17: ps.shared_legend and a raw fig.legend leave a warning, so send_check refuses the figure"""
+    for i, draw in enumerate((lambda f, a: ps.shared_legend(f, a), lambda f, a: f.legend(loc="upper center"))):
+        (fig, ax), = ps.panels(1)
+        ax.plot([0, 1], [0, 1], label="AdamW optimizer")
+        draw(fig, ax)
+        ps.save(fig, str(tmp_path / f"o{i}"))
+        assert any("outside legend" in w for w in sc.read_legend(str(tmp_path / f"o{i}.png"))[2]), i

@@ -1329,6 +1329,9 @@ def style_warnings(fig) -> list:
     """The figure-style breaches a script can see: a legend entry that is not a short one-line symbol, and a ratio
     axes drawn as a panel of its own instead of the hist_ratio inset under its histogram."""
     out = list(getattr(fig, "_ps_extra_warns", []))
+    if fig.legends:   # ps.shared_legend or a raw fig.legend: drawn outside the axes (Joaquin 2026-11-17)
+        out.append("outside legend: a legend is never outside the axes; put it inside a panel (ps.legend, "
+                   "ps.legend_free) or in a spare grid cell (ps.legend_cell)")
     for lab in legend_labels(fig):
         lines = lab.split("\n")
         if len(lines) > LEGEND_MAX_LINES or any(len(plain_text(x)) > LEGEND_MAX_CHARS for x in lines):

@@ -214,9 +214,9 @@ figure and made the reader assemble each curve's identity themselves. Prefer the
 reach for factorising only when the two factors are genuinely independent and the reader
 already thinks in them.
 
-An outside legend is a last resort for when the entries fit in no panel and no spare cell — eight process
-labels, say. Then it is **one strip above the plot, in the same file** via `ps.shared_legend`, never below, never
-to the side, and it grows the canvas rather than the panel.
+An outside legend is not allowed (Joaquin 2026-11-17): `ps.shared_legend` and any `fig.legend` record a `!!` warning
+and `send_check` refuses the figure. Put the legend inside a panel (`ps.legend_free`) or in a spare grid cell
+(`ps.legend_cell`).
 
 ## True against predicted distributions: the one layout
 
