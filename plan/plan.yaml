@@ -35364,8 +35364,8 @@ entries:
     state: working
     since: '2026-11-17T19:14:02.913000+00:00'
     state_at: '2026-11-17T19:14:02.913000+00:00'
-    context: 154763
-    context_at: '2026-11-17T19:23:59+00:00'
+    context: 235624
+    context_at: '2026-11-17T19:40:01+00:00'
   designs:
   - at: '2026-11-17T18:38:53+00:00'
     question: 'How does our best catalog_v4 pretraining, trial_1262 of cov_v4_long_hpo8_cc_68224 (16x, 68224 steps, its final
