@@ -35605,6 +35605,29 @@ entries:
       the first LLoCaAttention call and fix the dense path. First difference at call 0: the inputs differ by device, traced
       in the data path. No call above 1e-3 yet MSE differs: the difference is in the scorer after the model, traced there.
       Cost ~0.1 GPU-h.'
+    fix_at: '2026-11-17T20:11:23+00:00'
+    fix: 'Check 5 (not a repeat / prior): docs/results.tex par. ''TF32 at evaluation (2026-10-15)'' (sec:tf32-eval, ~line
+      16495) already found that reading a model at another matmul precision than it was trained at moves its loss by up to
+      133x (107 Jean Zay runs rebuilt with tools/eval_delta.py --tf32 on|off; H100 rebuilds FA-ccin2p3-6030a6a3 / c2518adc),
+      ''a model''s precision is part of what it learned''. The prior field omits it (searched: tf32, layer dump, CPU vs GPU,
+      0.194). The DlessInOrd model''s config has training.allow_tf32: true (evaluate_daniels_catalog/model/config.yaml line
+      6899), base_experiment._init_backend turns TF32 on for every GPU read, and CC''s partition is gpu_v100,gpu_h100 (sites.yaml):
+      on H100 the GPU reads are TF32, the CPU reads (fp32 and fp64, both 0.4173) are exact. TF32 is the leading candidate
+      for the whole offset and the design does not name it. Check 1 (one change at a time): arms (1) and (2) differ from (3)
+      in device AND in matmul precision (TF32 on H100, none on V100, GPU type not recorded or pinned); add a GPU read with
+      TF32 off (training.allow_tf32=false, or torch.backends.cuda.matmul.allow_tf32 = cudnn.allow_tf32 = False before the
+      read) next to the TF32-on read, print torch.cuda.get_device_name() and the two backend flags in the LAYER_DUMP line,
+      and state which GPU c3e63032 ran on (it reproduced 0.2791 with TF32 on if H100). Check 2 / 4 (measure and outcome):
+      the comparison threshold max|diff|/max|value| > 1e-3 sits exactly at TF32''s per-matmul rounding (~1e-3), so with TF32
+      on the first Linear will pass it and ''first difference = the buggy CPU module'' or ''call 0: data path'' is read off
+      noise; calibrate it (GPU TF32-off vs CPU should be ~1e-6, TF32-on vs off gives the TF32 floor) or report the per-call
+      ratio trend and the mean/rms columns rather than a first crossing. Add the outcome branch the current list cannot reach:
+      GPU with TF32 off = 0.4173 = CPU -> the offset is TF32, the CPU path is not buggy, the model must be read at its training
+      precision (the stored 0.2791 is the TF32 read); what that means for evaluate_daniels_catalog on CPU (D490: Suprio on
+      CPU) goes in the outcome (e.g. emulate TF32 rounding of matmul inputs on CPU, checked to 0.2791, or report that CPU
+      reads are not the model''s reads). Checks 3, 6-15: one deterministic eval, eval-only, ~0.1 GPU-h, no training loss or
+      HPO, test events are the stored read''s 2000 dc_bbx_hh val events: fine. Local dump (scratchpad cpuoff/dump_cpu.npz)
+      reproduces the CPU read as stated.'
   step_why:
     1:
       feeds: whether catalog_v4's best pretraining zero-shots Daniel's held-out processes better than the arms trained on
