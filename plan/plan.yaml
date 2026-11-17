@@ -35272,6 +35272,12 @@ entries:
     units: null
     start: '2026-11-17T17:11:16+00:00'
     at: '2026-11-17T17:11:16+00:00'
+  - batch: parent
+    wall_h: 8.2
+    jobs: 1
+    units: null
+    start: '2026-11-17T20:20:02+00:00'
+    at: '2026-11-17T20:20:02+00:00'
   handoff:
     state: '2026-11-17 ~17:30. Design (four batches, D481/D484/D487) PASSED 15:58; code reviewed and in trunk (job_uq_ext.sh,
       job_datasaving_parent.sh finale case, sweep_config_tp_zng_hpo_<p>.yaml; e75bcabb). Submitted: (1) smoke of Suprio''s
