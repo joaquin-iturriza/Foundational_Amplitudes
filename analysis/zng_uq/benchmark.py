@@ -124,7 +124,7 @@ def plot(path, curves=None, paper=os.path.join(HERE, "data", "paper_mse.json")):
     axr.set_ylabel(r"MSE of standardised $\log|\mathcal{M}|^2$")
     for ax in (axl, axr):
         ax.set_yscale("log"); ax.set_xlabel("number of gluons $n$"); ax.set_xticks([1, 2, 3, 4])
-    ps.legend(axl, "upper left"); ps.legend(axr, "upper left")
+    ps.legend(axl, "upper left"); ps.legend_free(axr)
     ps.save(fig, os.path.join(figs, "zng_median_delta"))
     # (b)
     fig, ax = ps.figure()
