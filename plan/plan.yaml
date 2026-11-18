@@ -35205,7 +35205,7 @@ entries:
         the curve test on mu-MSE, and still repair e+ nu g in the retrain before stage 2'
   step_waits:
     '5': the results of batches 1, B1, B2
-    '8': ccin2p3:tp_zng_hpo_zgggg (2 trials left, checked on the next wake of this entry)
+    '8': FA-ccin2p3-824ef059 FA-ccin2p3-6aa590e7 FA-ccin2p3-c5eefd77 FA-ccin2p3-6539ffc6
     '14': FA-lxplus-7539d95a FA-lxplus-44ab7dd7
   findings:
   - at: '2026-11-17T11:18:43+00:00'
