@@ -35308,6 +35308,15 @@ entries:
       -> e+e-: median residual^2 ~1e-6 as the clean processes, the mean 5e-4 set by a few events (bhabha at sqrt s 68-71 GeV,
       u ubar -> d dbar at 750-980 GeV). The clean 2->2 processes (e+e- -> gamma gamma, ZH, u ubar -> t tbar) are uniformly
       10-90x above the old finale (median ~ mean): a level gap, not outliers. Figure analysis/zng_uq/figs/zng_parent_curves.png.'
+  - at: '2026-11-18T06:06:01+00:00'
+    text: '2026-11-18 E7505: the CC re-read of parent FA-lxplus-00347f0a failed because each site composes its own train (and
+      some val) pools from its own generated chunks: prebuild FA-lxplus-d6326fc1 built 9 train pools on lxplus, FA-ccin2p3-910dd6e1
+      3 on CC; md5 of the 45 val files: 42 equal, u d~ -> W+ g / W+ gg / W+ ggg val differ. Fix: tools/eval_best_val.py EVAL_FROZEN=1
+      (ec232554) reads on the run''s own data_stats.json; job_eval_best.sh exited 1 on every clean read (trailing [ ] &&,
+      fixed eb949f53). CC frozen read FA-ccin2p3-76be39e7 done (analysis/zng_uq/data/parent_fullval_cc.json; W+jets rows on
+      CC''s pools); authoritative lxplus read FA-lxplus-44ab7dd7 running. Parent retrain design (W 24 in internal_mass_pdgs
+      + full-pool validation, lxplus) PASSED; smoke FA-lxplus-7539d95a. B1 reader: tools/kit_curves.py sweep <site>:<name>
+      (2896074c).'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
