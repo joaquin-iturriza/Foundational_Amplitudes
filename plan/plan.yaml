@@ -35162,6 +35162,21 @@ entries:
       2 waits on Joaquin whether a parent with one memorised NLO pool is acceptable; geometric mean still >10x -> the setup
       (emission-scale/HETEROSC/dimensionless) is behind the old finale at 64000 steps, reported with the per-process gap,
       the horizon is Joaquin''s call.'
+    passed_at: '2026-11-18T06:04:11+00:00'
+    reviewer: 'Parent (2) stage 1 repair retrain checked against job_datasaving_parent.sh finale @7409c64a (eval_subsample=10000
+      present, ++ args pass through, memmap off so no shared cache, ~0.2 GB run dir) and parent_vs_finale.json: geometric
+      mean 9.99e-5 vs finale 1.02e-5 (9.81x), 6 of 28 lower, 5 above 90x, u d~ -> e+ nu g 4.83 (2.5e3x); curve separation
+      2.26 / end_up 0.77. Check 2: W coordinate moved u d~ -> e nu g 0.13-0.16 -> 0.03-0.04 and u d~ -> e nu 0.052 -> 0.011
+      (results.tex l.12829-12833). Check 3: the cited spread is wrong: l.13696 gives 45-75x over three seeds at one cell,
+      not ~10x; the deciding effect (e+ nu g at 2.5e3x above the finale) clears it, but per-process changes under ~75x must
+      not be read as effects in the write-up, and the 10x geometric-mean bar is the passed design''s acceptance line, not
+      a resolved effect. eval_subsample changes only the read (final model after sigma stage, D276), so the model differs
+      from the first parent in the W column alone. Adding 24 deviates from the canonical table''s [23,6,25] and from D487''s
+      ''current setup'' literally; results.tex concludes ''The coordinate belongs in the list'', a defect fix, but the submission
+      message must open with it. Smoke must also confirm preds_val holds the whole val pools (10000/5000 per process), the
+      quantity parent_read.py reads. Searched: internal_mass_pdgs, offshW, W in the propagator list, 23,6,25, finale, dsave_parent_finale,
+      zng_uq_w, eval_subsample, udbar enug / e nu g in results.tex; the entry''s evidence, findings and dead end; site decisions
+      D477-D489.'
   step_why:
     5:
       feeds: the record of the comparison so far
