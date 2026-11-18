@@ -35300,6 +35300,12 @@ entries:
     units: null
     start: '2026-11-17T20:20:02+00:00'
     at: '2026-11-17T20:20:02+00:00'
+  - batch: parent_fullval_reread
+    wall_h: 0.3
+    jobs: 1
+    units: null
+    start: '2026-11-18T05:22:58+00:00'
+    at: '2026-11-18T05:22:58+00:00'
   handoff:
     state: '2026-11-18. B2 (our setup under Suprio''s protocol, 8 runs) and Suprio''s LLoCa-Transformer (4 runs, his code
       @1074f6a) read and committed (analysis/zng_uq/benchmark.py fd1a3a6c; benchmark.json, zng_curves.json): our best B2 arm
