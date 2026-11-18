@@ -34241,15 +34241,18 @@ entries:
     runs:
     - FA-ccin2p3-02a0c484
     - FA-ccin2p3-213da086
+    - FA-ccin2p3-26dd7aba
     - FA-ccin2p3-28d56f33
     - FA-ccin2p3-2d4d3709
     - FA-ccin2p3-394f20ac
+    - FA-ccin2p3-76be39e7
     - FA-ccin2p3-7a112608
     - FA-ccin2p3-82eb9944
     - FA-ccin2p3-966a6561
     - FA-ccin2p3-b4ebd88e
     - FA-ccin2p3-ba9df01f
-    commit: fd1a3a6c
+    - FA-lxplus-44ab7dd7
+    commit: 2896074c
     paths:
     - analysis/zng_uq/benchmark.py
     - analysis/zng_uq/data/benchmark.json
