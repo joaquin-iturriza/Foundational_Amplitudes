@@ -34229,6 +34229,15 @@ entries:
       nats), gmean val MSE 9.8x the old finale''s; udbar_enug (MSE 4.8), uubar_ttbar_nlo, uubar_ddbar, ee_bhabha far worse.
       Read the full val pools (not 200 events per process) and per-process curves, find the cause, fix, retrain; then stage
       2 (fine-tunes vs scratch on Z+ng at D 1e2..5e5, same setup) gets its own design after a horizon calibration T(D)'
+    14: 'Parent (2) stage 1 repair: read the full-val re-read FA-ccin2p3-d2d34dd7 (tools/eval_best_val.py EVAL_FULL=1 @7409c64a;
+      per-process mu-MSE x prepd_std^2 = 6.25 against the old finale in parent_vs_finale.json) and redraw zng_parent_vs_finale
+      on it. Cause found (parent_read.py diag @9c8ece50, figure zng_parent_curves): validation on 200 events per process (eval_subsample
+      inherited from 1262; fixed @7409c64a); u d~ -> e+ nu g never learns: dimensionless inputs drop the absolute scale and
+      its internal W (all external legs massless) is not in internal_mass_pdgs [23,6,25], so the W pole position is invisible
+      (the old finale had dimensional inputs; u d~ -> tau nu learns through the tau mass); u u~ -> t t~ V memorised (train/val
+      mu-MSE 55x) with a sigma collapse at the last validation, which fails the curve test; the clean 2->2 sit 10-90x above
+      the old finale, curves still falling at the end. Not checked: how many catalog_v4 classes share the massless internal-W
+      case.'
   done_when: null
   notes_ref: null
   match: zng_uq_*,tp*_zng_*
@@ -35122,6 +35131,14 @@ entries:
         the parent, design stage 2'
       - 'the failures hold on the full pools: fix the setup on those pools (target, signed/NLO handling), retrain the parent,
         read again'
+    14:
+      feeds: whether the retrained ladder+star parent can be stage 2's parent, and what the retrain changes
+      if:
+      - 'full read keeps e+ nu g broken and the gmean ratio near or above 10x: design the retrain (job_datasaving_parent.sh
+        finale with eval_subsample 10000 and internal_mass_pdgs [23,6,25,24], else the passed design''s setup, ~9 GPU-h),
+        design reviewer, submit'
+      - 'full read puts the gmean ratio well under 10x with only the curve test failing on t t~ V''s sigma: report it, read
+        the curve test on mu-MSE, and still repair e+ nu g in the retrain before stage 2'
   step_waits:
     '5': the results of batches 1, B1, B2
     '8': the four B1 DyHPO sweeps ccin2p3:tp_zng_hpo_{zg,zgg,zggg,zgggg} (31 of 32 trials queued; zgggg trial_0007 resubmitted
