@@ -35135,6 +35135,7 @@ entries:
     '8': the four B1 DyHPO sweeps ccin2p3:tp_zng_hpo_{zg,zgg,zggg,zgggg} (31 of 32 trials queued; zgggg trial_0007 resubmitted
       by detached zng_gate_windows)
     '9': FA-lxplus-00347f0a (the 64000-step parent)
+    '11': '2026-11-19'
   findings:
   - at: '2026-11-17T11:18:43+00:00'
     text: 'Their numbers: the UQ repo (branch uq, 311 files) holds no figures, preds or result files. arXiv:2505.20280''s
