@@ -34225,10 +34225,6 @@ entries:
       at each best'
     12: Asked Joaquin (2026-11-18 ~02:20) whether to add a second seed at Z+1g (ours 3.2x his median |Delta|, in the 3-10x
       band)
-    13: 'Parent (2) stage 1 fix: the new ladder+star parent FA-lxplus-00347f0a fails the curve test (sep 2.26, end_up 0.77
-      nats), gmean val MSE 9.8x the old finale''s; udbar_enug (MSE 4.8), uubar_ttbar_nlo, uubar_ddbar, ee_bhabha far worse.
-      Read the full val pools (not 200 events per process) and per-process curves, find the cause, fix, retrain; then stage
-      2 (fine-tunes vs scratch on Z+ng at D 1e2..5e5, same setup) gets its own design after a horizon calibration T(D)'
     14: 'Parent (2) stage 1 repair: read the full-val re-read FA-ccin2p3-d2d34dd7 (tools/eval_best_val.py EVAL_FULL=1 @7409c64a;
       per-process mu-MSE x prepd_std^2 = 6.25 against the old finale in parent_vs_finale.json) and redraw zng_parent_vs_finale
       on it. Cause found (parent_read.py diag @9c8ece50, figure zng_parent_curves): validation on 200 events per process (eval_subsample
@@ -35124,13 +35120,6 @@ entries:
       if:
       - 'Joaquin says yes: a second seed of his and our Z+1g run, ~1 GPU-h each'
       - 'no: reported unresolved by one seed'
-    13:
-      feeds: 'D482/D483/D487: does a current-setup ladder+star pretraining help fine-tunes on Z+ng against scratch'
-      if:
-      - 'the full-pool read clears the failing processes and the curve failure is the sigma stage or the 200-event read: accept
-        the parent, design stage 2'
-      - 'the failures hold on the full pools: fix the setup on those pools (target, signed/NLO handling), retrain the parent,
-        read again'
     14:
       feeds: whether the retrained ladder+star parent can be stage 2's parent, and what the retrain changes
       if:
@@ -35143,7 +35132,6 @@ entries:
     '5': the results of batches 1, B1, B2
     '8': the four B1 DyHPO sweeps ccin2p3:tp_zng_hpo_{zg,zgg,zggg,zgggg} (31 of 32 trials queued; zgggg trial_0007 resubmitted
       by detached zng_gate_windows)
-    '13': FA-ccin2p3-d2d34dd7
   findings:
   - at: '2026-11-17T11:18:43+00:00'
     text: 'Their numbers: the UQ repo (branch uq, 311 files) holds no figures, preds or result files. arXiv:2505.20280''s
