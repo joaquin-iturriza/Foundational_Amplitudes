@@ -4798,6 +4798,7 @@ class AmplitudeExperiment(BaseExperiment):
             #if self.cfg.use_mlflow:
             #    log_mlflow("val.loss", val_loss, step=step)
 
+        self.proc_val_mse = proc_mse_vals   # this validation's per-process mu-MSE (HETEROSC; None otherwise), for re-reads
         # Record per-process losses for plotting
         for name, loss in proc_losses.items():
             if name not in self.proc_val_losses:

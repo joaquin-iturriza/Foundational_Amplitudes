@@ -9,6 +9,8 @@ Needs a GPU.
     python tools/eval_best_val.py <run_dir> [<run_dir> ...]
 EVAL_LIVE=1 scores the checkpoint's "model" entry alone, as this tool did before D63's EMA readers (2026-10-15): in an
 older checkpoint with EMA on that is the live weights, not the EMA weights validation used.
+EVAL_FULL=1 reads the whole validation pools (data.eval_subsample=null) instead of the run's cap; proc_val_mse is each
+process's mu-MSE of the standardised target (HETEROSC runs).
 """
 import json, os, sys, tempfile
 
@@ -31,6 +33,8 @@ for run_dir in sys.argv[1:]:
         cfg.training.validate_frac = 0; cfg.training.validate_every_n_steps = 1   # _validate records every call
         if cfg.get("fine_tune") is not None:
             cfg.fine_tune.pretrained_path = None
+        if os.environ.get("EVAL_FULL") == "1":
+            cfg.data.eval_subsample = None   # the whole val pools, whatever cap the run trained with
         cfg.run_dir = tempfile.mkdtemp(prefix="evalbest_", dir=os.environ["SCRATCH"])
         # a run copied from another site keeps that site's absolute paths (its recipe): re-root them here
         if cfg.data.get("processes_file"):
@@ -59,4 +63,5 @@ for run_dir in sys.argv[1:]:
         "run_dir": run_dir, "val_loss": exp.val_loss_no_reg[-1], "ema_applied": ema_applied,
         "live_only": os.environ.get("EVAL_LIVE") == "1",
         "proc_val_losses_no_reg": {n: v[-1] for n, v in exp.proc_val_losses_no_reg.items()},
+        "proc_val_mse": getattr(exp, "proc_val_mse", {}),
         "prepd_std": saved["prepd_std"]}), flush=True)

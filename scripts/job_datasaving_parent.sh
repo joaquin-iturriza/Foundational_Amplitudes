@@ -19,6 +19,7 @@
 #            parent of b b~ > Z Z LO's fine-tunes (D413, D417); r4's T = 3458 and lr 9.248e-3 kept, so only the pools differ
 #   finale  zng_uq_benchmark (D487): the ladder + star-arm pretraining's 28 processes (recipes/transfer_finale.yaml, the
 #            finale's pools, every train event: no subsample) retrained in the current setup; the finale's 64000 steps,
+#            validation on the whole val pools as the old finale (data.eval_subsample=10000; 1262 caps it at 200);
 #            lr 3.78e-3 = trial 1262's 3.649e-3 at its 68224 steps moved along its law 7.82114e-3 (T/17056)^-0.55;
 #            WSD (cooldown 1/8, D423) and the D392 input flags set here. Its limit is not this header's 3 h: submit with
 #            --hdr=--time=<the smoke's measured s/step x 64000 x 1.3 + 1 h>
@@ -42,7 +43,7 @@ cd "$PROJECT_DIR"
 WHICH="$1"; shift
 SUB=10000; FIX=()
 case "$WHICH" in finale) T=64000; LR=3.78e-3; SUB=null
-    FIX=(training.scheduler=WSD ++training.wsd_cooldown_frac=0.125 ++model.input_soft_eps=1e-8 ++model.input_pair_logs=7) ;; heldoutbbzz) T=3458; LR=9.248e-3 ;; heldout|heldoutthr|heldoutthrloop) T=4307; LR=8.196e-3 ;; treesin) T=4313; LR=8.190e-3 ;; *) echo "finale, heldout, heldoutbbzz, heldoutthr, heldoutthrloop or treesin"; exit 2 ;; esac
+    FIX=(training.scheduler=WSD ++training.wsd_cooldown_frac=0.125 ++model.input_soft_eps=1e-8 ++model.input_pair_logs=7 data.eval_subsample=10000) ;; heldoutbbzz) T=3458; LR=9.248e-3 ;; heldout|heldoutthr|heldoutthrloop) T=4307; LR=8.196e-3 ;; treesin) T=4313; LR=8.190e-3 ;; *) echo "finale, heldout, heldoutbbzz, heldoutthr, heldoutthrloop or treesin"; exit 2 ;; esac
 PARENT="runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262"
 RECIPE="$PROJECT_DIR/recipes/catalog_v4_datasaving_parent_${WHICH}.yaml"
 [ "$WHICH" = finale ] && RECIPE="$PROJECT_DIR/recipes/transfer_finale.yaml"
