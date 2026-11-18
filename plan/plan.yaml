@@ -34219,10 +34219,6 @@ entries:
   - D481
   - D485
   next:
-    4: 'HPs for the Z+ng runs: the 8 runs at kit_hpo_uug_T hp1677 (lr 6.55e-3) fail the curve test in 7 of 8; a single-fidelity
-      DyHPO search (template coupled space, Muon, WSD, emission-scale target, HETEROSC, 12,500 steps, 5e5 events, 8 trials)
-      from scratch, then the 8 runs again at its choice. Cost above 30 GPU-h: Joaquin''s call (per multiplicity ~61 GPU-h;
-      Z+4g only and its HPs for all n ~33 GPU-h)'
     5: 'Write-up in docs/results.tex: the 8 runs flagged by the curve test, the zero-shot read, the figures zng_median_delta,
       zng_delta_z4g, zng_pulls, zng_curves, % src / % claim lines'
     6: 'Batch (1): Suprio''s LLoCa-Transformer by his train_shared.sh (RUN_NETS=lloca, het, seed 0), scripts/job_uq_ext.sh
@@ -35101,11 +35097,6 @@ entries:
       dsave_parent_finale, finale with het/HETEROSC/current setup, D91/D94 (het fine-tunes from the finale only, no retrained
       parent).'
   step_why:
-    4:
-      feeds: whether our setup, trained well, comes within 3x of their networks on Z+ng
-      if:
-      - 'search finds a trial passing the curve test: the 8 runs at its HPs, the benchmark read again'
-      - 'no trial passes: report the setup''s floor on Z+ng, flagged'
     5:
       feeds: the record of the comparison so far
       if:
@@ -35138,7 +35129,6 @@ entries:
       - 'Joaquin takes the notes-editor wording: a worker applies it, then the Z+ng paragraph commits'
   step_waits:
     '5': the results of batches 1, B1, B2
-    '4': '2026-11-18'
     '6': FA-ccin2p3-745b9c75 FA-ccin2p3-ba3b8896 FA-ccin2p3-8790c95a FA-ccin2p3-d4ce62b8
     '7': the notes-editor reviewer a86a7077b7c67f5b4 (re-check after other agents' pidqn/muon_long fixes) before the commit
       of benchmark.py's B2 arms; the 8 runs are read (finding 2026-11-18)
