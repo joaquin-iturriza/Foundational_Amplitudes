@@ -34377,10 +34377,10 @@ entries:
     blocks_steps: &id003
     - 12
   owner:
-    agent: a9b46f5b49be7a76e
-    state: closed
-    since: '2026-11-18T05:18:47+00:00'
-    state_at: '2026-11-18T05:18:47+00:00'
+    agent: a9e3e52e7c46a5c22
+    state: working
+    since: '2026-11-18T05:43:36+00:00'
+    state_at: '2026-11-18T05:43:36+00:00'
   designs:
   - at: '2026-11-17T11:14:59+00:00'
     question: 'Setup step (CPU job scripts/job_zng_fetch.sh, no GPU): are the Zenodo 16793011 Z+1..4g files, converted by
