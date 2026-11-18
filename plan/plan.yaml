@@ -34212,12 +34212,19 @@ entries:
     answers_after: '2026-11-17T15:31:39+00:00'
     covers:
     - zng_uq_benchmark
+  - said_at: '2026-11-18T23:35:53.600000+00:00'
+    text: I don't see a reason to do more seeds now.
+    decision: D492
+    answers_after: '2026-11-18T02:50:09+00:00'
+    covers:
+    - zng_uq_benchmark
   decisions:
   - D477
   - D478
   - D480
   - D481
   - D485
+  - D492
   next:
     5: 'Write-up in docs/results.tex: the 8 runs flagged by the curve test, the zero-shot read, the figures zng_median_delta,
       zng_delta_z4g, zng_pulls, zng_curves, % src / % claim lines'
@@ -34377,8 +34384,10 @@ entries:
     searched: CLAUDE.md scope rule; site decisions D481-D487 (no word on seeds); the design's seeds clause (second seed is
       Joaquin's call); Joaquin's messages 2026-11-14T04:31 (a paper LaTeX template, no seeds call), 2026-10-14T16:48 (an upload
       about the amplitudes paper, no seeds call), 2026-11-17T10:50 (the request for this comparison, no word on seeds)
-    blocks_steps: &id003
+    blocks_steps:
     - 12
+    answered_at: '2026-11-18T23:35:53.600000+00:00'
+    decision: D492
   owner:
     agent: a9e3e52e7c46a5c22
     state: working
@@ -35460,14 +35469,6 @@ entries:
       analysis/zng_uq/figs/zng_parent_{vs_finale,curves}.png; tools/eval_best_val.py (EVAL_FULL, proc_val_mse); experiment.py
       (self.proc_val_mse); scripts/job_datasaving_parent.sh
     written: '2026-11-18T05:37:23+00:00'
-  ask: 'Scope: a second seed at Z+1g beyond the design''s one seed per run, for our fine-tuned arm under Suprio''s protocol
-    and his LLoCa-Transformer. Ours is 3.2x his median |Delta| (2.2e-5 vs 6.9e-6), in the 3-10x band one seed does not resolve;
-    cost ~1 GPU-h each.'
-  waiting_since: '2026-11-18T02:50:09+00:00'
-  searched: CLAUDE.md scope rule; site decisions D481-D487 (no word on seeds); the design's seeds clause (second seed is Joaquin's
-    call); Joaquin's messages 2026-11-14T04:31 (a paper LaTeX template, no seeds call), 2026-10-14T16:48 (an upload about
-    the amplitudes paper, no seeds call), 2026-11-17T10:50 (the request for this comparison, no word on seeds)
-  blocks_steps: *id003
 - id: dan_zeroshot_v4
   title: Catalog_v4 pretraining zero-shot on Daniel's held-out split
   question: How does our best catalog_v4 pretraining (trial 1262) do zero-shot on the held-out processes of Daniel's catalog
