@@ -35206,6 +35206,15 @@ entries:
       10.6/4.3), Z+4g 1.37/1.50 (was 28/14), 68% coverage Z+4g 0.59/0.54 (was 0.06/0.11); fine-tuned Z+1g pulls off (mean
       0.82, std 12, coverage 0.59). Early stopping ended Z+3g ~1.4e5 steps, Z+4g scratch ~1.0e5, fine-tuned ~0.7e5; Z+1g,
       Z+2g ran the full 2e5.'
+  - at: '2026-11-18T01:12:50+00:00'
+    text: '2026-11-18 Suprio''s LLoCa-Transformer (his train_shared.sh, RUN_NETS=lloca, het, seed 0; FA-ccin2p3-745b9c75/ba3b8896/8790c95a/d4ce62b8)
+      collected by benchmark.py collect --theirs (his test indices and truth equal ours event by event, asserted; benchmark.py
+      still uncommitted, commit hook blocked by the notes-editor pillar). His median |Delta| Z+1..4g 6.9e-6, 2.3e-4, 1.5e-3,
+      4.4e-3; pull std 1.00/1.35/1.17/1.15, 68% coverage 0.73/0.70/0.64/0.63. Our best arm (B2) over his: Z+1g 3.2x (ft B2
+      2.2e-5), Z+2g 0.77x (ft B2 1.8e-4), Z+3g 1.06x (ft B2 1.6e-3), Z+4g 2.0x (scratch B2 8.7e-3); the earlier 12,500-step
+      runs 6.9x/1.8x/2.2x/3.7x (best of scratch/ft). Design outcome: within 10x at every n -> not resolved apart by one seed;
+      Z+1g at 3.2x in the 3-10x band (second seed is Joaquin''s call). His Z+1g MSE of ln|M|^2 9.5e-4 is set by outliers (median
+      6.9e-6).'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
