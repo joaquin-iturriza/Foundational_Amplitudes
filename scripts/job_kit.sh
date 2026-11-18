@@ -78,7 +78,9 @@ print(f'{7.82114e-3 * (t / 17056) ** -0.55 * f:.6g}')") || exit 2
 fi
 echo "KIT dataset=$NAME n_train=$N steps=$T mode=$MODE base=$BASE args: ${ARGS[*]}"
 if [ -n "$KIT_SCORE_ONLY" ]; then
-    # re-score a run that trained but whose scoring failed (same arguments name the same run dir); no training
+    # re-score a run that trained but whose scoring failed (same arguments name the same run dir); no training.
+    # KIT_SCORE_DIR=<run dir> scores a run trained elsewhere (a sweep trial, runs/<sweep>/trial_<k>) instead
+    OUT="${KIT_SCORE_DIR:+$PROJECT_DIR/$KIT_SCORE_DIR}"; OUT="${OUT:-$PROJECT_DIR/runs/kit/kit_${MODE}_${FILE}_${TGT}_n${N}_t${T}${TAG}}"
     [ -e "$OUT/config.yaml" ] || { echo "KIT_SCORE_ONLY: no trained run at $OUT"; exit 2; }
     python tools/kit_predict.py "$OUT"; RC=$?
     echo "KIT_DONE rc=$RC $OUT"; [ "$RC" -eq 0 ] && echo "RUN_DONE $OUT"; exit $RC
