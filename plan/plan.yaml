@@ -35416,6 +35416,12 @@ entries:
     units: null
     start: '2026-11-18T14:04:47+00:00'
     at: '2026-11-18T14:04:47+00:00'
+  - batch: parent_w
+    wall_h: 8.0
+    jobs: 1
+    units: null
+    start: '2026-11-18T23:27:13+00:00'
+    at: '2026-11-18T23:27:13+00:00'
   handoff:
     state: '2026-11-18 07:00. parent_read.py and its data committed (41746393, 8053338e, 9c8ece50). Parent FA-lxplus-00347f0a
       read per process: it validated on 200 events per process (data.eval_subsample=200 inherited from trial 1262; the old
