@@ -34220,8 +34220,6 @@ entries:
   next:
     5: 'Write-up in docs/results.tex: the 8 runs flagged by the curve test, the zero-shot read, the figures zng_median_delta,
       zng_delta_z4g, zng_pulls, zng_curves, % src / % claim lines'
-    12: Asked Joaquin (2026-11-18 ~02:20) whether to add a second seed at Z+1g (ours 3.2x his median |Delta|, in the 3-10x
-      band)
     14: 'Parent (2) stage 1 repair: read the full-val re-read FA-ccin2p3-d2d34dd7 (tools/eval_best_val.py EVAL_FULL=1 @7409c64a;
       per-process mu-MSE x prepd_std^2 = 6.25 against the old finale in parent_vs_finale.json) and redraw zng_parent_vs_finale
       on it. Cause found (parent_read.py diag @9c8ece50, figure zng_parent_curves): validation on 200 events per process (eval_subsample
@@ -35186,11 +35184,6 @@ entries:
       if:
       - 'written and committed: plan evidence with the commit'
       - 'the zero-shot read fails: write up the trained runs alone'
-    12:
-      feeds: whether Z+1g's 3.2x gap to Suprio is resolved
-      if:
-      - 'Joaquin says yes: a second seed of his and our Z+1g run, ~1 GPU-h each'
-      - 'no: reported unresolved by one seed'
     14:
       feeds: whether the retrained ladder+star parent can be stage 2's parent, and what the retrain changes
       if:
