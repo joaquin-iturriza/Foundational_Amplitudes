@@ -35199,7 +35199,7 @@ entries:
       - 'full read puts the gmean ratio well under 10x with only the curve test failing on t t~ V''s sigma: report it, read
         the curve test on mu-MSE, and still repair e+ nu g in the retrain before stage 2'
   step_waits:
-    '5': the results of batches 1, B1, B2
+    '5': FA-lxplus-57f6d2cb
     '14': FA-lxplus-57f6d2cb
   findings:
   - at: '2026-11-17T11:18:43+00:00'
