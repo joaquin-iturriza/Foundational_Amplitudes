@@ -34251,7 +34251,7 @@ entries:
     - FA-ccin2p3-966a6561
     - FA-ccin2p3-b4ebd88e
     - FA-ccin2p3-ba9df01f
-    commit: e75bcabb
+    commit: fd1a3a6c
     paths:
     - analysis/zng_uq/benchmark.py
     - analysis/zng_uq/data/benchmark.json
