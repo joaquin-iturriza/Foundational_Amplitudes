@@ -4,6 +4,7 @@
 
     python analysis/zng_uq/parent_read.py read   (reads lxplus) -> analysis/zng_uq/data/parent_vs_finale.json
     python analysis/zng_uq/parent_read.py plot   -> analysis/zng_uq/figs/zng_parent_vs_finale.{png,pdf}
+    python analysis/zng_uq/parent_read.py curves -> analysis/zng_uq/figs/zng_parent_curves.{png,pdf}
 
 Per process, the validation MSE of ln|M|^2 at each run's best checkpoint:
   old finale (tp3_finale trial_0073, MSE loss, per-dataset standardisation): proc_val_losses_no_reg at the lowest
@@ -38,7 +39,8 @@ q = json.load(open(new + "/plots_0/per_process_metrics.json"))
 t = np.load(new + "/train_steps.npz")["loss"]; v = q["val_loss_no_reg"]; e = len(t) // len(v)
 tr = [float(np.median(t[i * e:(i + 1) * e])) for i in range(len(v))]
 print("PARENTREAD " + json.dumps({"old": o, "old_best_index": b, "old_n_vals": len(m["val_loss_no_reg"]), "new": n,
-      "new_events": cnt, "new_val": v, "new_train": tr, "new_steps": len(t)}))
+      "new_events": cnt, "new_val": v, "new_train": tr, "new_steps": len(t),
+      "new_proc_val": q["proc_val_losses_no_reg"], "new_every": q["validate_every_n_steps"]}))
 '''
 
 
@@ -74,6 +76,40 @@ def plot(path):
     ps.save(fig, os.path.join(HERE, "figs", "zng_parent_vs_finale"))
 
 
+TEX = {"ee_uu": r"e^+e^-\to u\bar u", "ee_mumu": r"e^+e^-\to\mu^+\mu^-", "ee_numu": r"e^+e^-\to\nu_\mu\bar\nu_\mu",
+       "ee_bhabha": r"e^+e^-\to e^+e^-", "ee_aa": r"e^+e^-\to\gamma\gamma", "uubar_ddbar": r"u\bar u\to d\bar d",
+       "uu_uu": r"uu\to uu", "uubar_uubar": r"u\bar u\to u\bar u", "dd_dd": r"dd\to dd", "ee_bbbar": r"e^+e^-\to b\bar b",
+       "uubar_ttbar": r"u\bar u\to t\bar t", "ee_ZZ": r"e^+e^-\to ZZ", "ee_ZH": r"e^+e^-\to ZH", "udbar_Wg": r"u\bar d\to Wg",
+       "udbar_Wgg": r"u\bar d\to Wgg", "udbar_Wggg": r"u\bar d\to Wggg", "ee_uu_nlo": r"e^+e^-\to u\bar u,\ V",
+       "uubar_ddbar_nlo": r"u\bar u\to d\bar d,\ V", "uubar_ZZ_nlo": r"u\bar u\to ZZ,\ V", "ee_uug": r"e^+e^-\to u\bar ug",
+       "ee_uugg": r"e^+e^-\to u\bar ugg", "ee_bbbarg": r"e^+e^-\to b\bar bg", "ee_bbbargg": r"e^+e^-\to b\bar bgg",
+       "uubar_ttbar_nlo": r"u\bar u\to t\bar t,\ V", "udbar_enug": r"u\bar d\to e^+\nu_e g", "udbar_taunu": r"u\bar d\to\tau^+\nu_\tau",
+       "ee_mumu_ew_nlo": r"e^+e^-\to\mu^+\mu^-,\ V_{\rm EW}", "ee_uu_ew_nlo": r"e^+e^-\to u\bar u,\ V_{\rm EW}"}
+
+
+def plot_curves(path):
+    """The new parent's validation NLL per process against step (its per_process_metrics.json, the events it validated on)."""
+    sys.path.insert(0, ROOT)
+    import plot_style as ps
+    ps.use()
+    d = json.load(open(path))
+    procs = sorted(d["new_proc_val"], key=lambda p: d["old"][p])
+    fig, axs = ps.figure(ncols=2, nrows=14, sharex=True)
+    for ax, p in zip(axs.flat, procs):
+        v = np.array(d["new_proc_val"][p])
+        ax.plot((np.arange(len(v)) + 1) * d["new_every"], v, color=ps.C.blue)
+        ps.process_label(ax, "$" + TEX[p] + "$", fontsize=6)
+        ax.tick_params(labelsize=6)
+    for ax in axs.flat[len(procs):]:
+        ax.set_visible(False)
+    for ax in axs.flat[len(procs) - 2:len(procs)]:
+        ax.set_xlabel("step", fontsize=7)
+        ax.xaxis.set_tick_params(labelbottom=True)
+    for ax in axs[:, 0]:
+        ax.set_ylabel("val NLL", fontsize=7)
+    ps.save(fig, os.path.join(HERE, "figs", "zng_parent_curves"))
+
+
 if __name__ == "__main__":
     data = os.path.join(HERE, "data", "parent_vs_finale.json")
-    read(data) if sys.argv[1] == "read" else plot(data)
+    {"read": read, "plot": plot, "curves": plot_curves}[sys.argv[1]](data)
