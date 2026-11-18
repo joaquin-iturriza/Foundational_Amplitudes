@@ -34223,9 +34223,6 @@ entries:
       zng_delta_z4g, zng_pulls, zng_curves, % src / % claim lines'
     8: 'Batch B1: DyHPO per n (sweep/sweep_config_tp_zng_hpo_<p>.yaml @e75bcabb, 8 trials, waves 3,3,2), then A_ft from 1262
       at each best'
-    11: Asked Joaquin (2026-11-18 ~02:00) whether to apply the notes-editor's pidqn wording (token 14-20% lower within trained
-      classes; HD4 [0.69,0.89] excludes 1) and its muon_long wording; both block every commit (reviewer agent a86a7077b7c67f5b4
-      holds the lock)
     12: Asked Joaquin (2026-11-18 ~02:20) whether to add a second seed at Z+1g (ours 3.2x his median |Delta|, in the 3-10x
       band)
     13: 'Parent (2) stage 1 fix: the new ladder+star parent FA-lxplus-00347f0a fails the curve test (sep 2.26, end_up 0.77
@@ -35113,11 +35110,6 @@ entries:
       if:
       - 'a trial passes the curve test: A_ft at its HPs, read as B2'
       - 'none passes: report the floor, flagged'
-    11:
-      feeds: whether the notes-editor passes so the Z+ng tool and figures commit
-      if:
-      - 'Joaquin takes the reviewer''s pidqn wording: a worker applies it'
-      - 'Joaquin keeps it: the reviewer is told his word'
     12:
       feeds: whether Z+1g's 3.2x gap to Suprio is resolved
       if:
@@ -35134,7 +35126,6 @@ entries:
     '5': the results of batches 1, B1, B2
     '8': the four B1 DyHPO sweeps ccin2p3:tp_zng_hpo_{zg,zgg,zggg,zgggg} (31 of 32 trials queued; zgggg trial_0007 resubmitted
       by detached zng_gate_windows)
-    '11': '2026-11-19'
     '13': FA-ccin2p3-d2d34dd7
   findings:
   - at: '2026-11-17T11:18:43+00:00'
