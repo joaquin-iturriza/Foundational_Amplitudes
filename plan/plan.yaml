@@ -35205,6 +35205,17 @@ entries:
       counted at wall limits) refused zgggg trial_0007 and the parent smoke; the rest (trial_0007, parent smoke afterok on
       prebuild 64201860, B2 x8, Suprio x4) goes from the detached zng_gate_windows at 18:12 and 19:35 UTC. Sum of limits submitted
       ~290 GPU-h against expected use ~125.'
+  - at: '2026-11-18T00:33:33+00:00'
+    text: '2026-11-18 B2 read (8 runs, our setup under Suprio''s protocol; analysis/zng_uq/benchmark.py with the B2 arms,
+      UNCOMMITTED: the commit hook blocks every commit until the notes-editor pillar passes, reviewer running; data analysis/zng_uq/data/{benchmark,zng_curves}.json).
+      Curve test (tools/kit_curves.py runs): 4 of 8 pass (scratch Z+3g, Z+4g; fine-tuned Z+1g, Z+3g) against 1 of 8 for the
+      12,500-step runs; scratch Z+1g fails by a late val rise (end_up 2.91), scratch Z+2g and fine-tuned Z+2g, Z+4g by train/val
+      separation. Median |Delta| scratch/fine-tuned: Z+1g 2.6e-5/2.2e-5, Z+2g 3.4e-4/1.8e-4, Z+3g 3.4e-3/1.6e-3, Z+4g 8.7e-3/9.6e-3;
+      earlier over B2 1.6-2.4x everywhere but scratch Z+1g 3.9x -> design outcome: the protocol is not the gap in median |Delta|
+      (within 3x), scratch Z+1g unresolved (3-10x, its curve test fails). Pulls fixed: std scratch/ft Z+3g 1.31/1.55 (was
+      10.6/4.3), Z+4g 1.37/1.50 (was 28/14), 68% coverage Z+4g 0.59/0.54 (was 0.06/0.11); fine-tuned Z+1g pulls off (mean
+      0.82, std 12, coverage 0.59). Early stopping ended Z+3g ~1.4e5 steps, Z+4g scratch ~1.0e5, fine-tuned ~0.7e5; Z+1g,
+      Z+2g ran the full 2e5.'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
