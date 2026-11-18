@@ -88,12 +88,14 @@ def proc_label(name):
     return pl(META[name]["process"])
 
 
-def fig_per_process():
+def fig_per_process(name="dan_per_process", drop_shared=False):
     """The draft's mse_per_process_two_rows form: one point per held-out process, the draft's order and groups."""
     arms = [("particle-ID embedding (Suprio, seed 0, 20 epochs)", None, "*", "k", 6),
             ("shared standardization (diverged after 1.1 epochs)", parts(ARMS_FULL[1][1]()), "o", ps.C.blue, 3.5),
             (r"dimensionless + coupling orders (5 epochs of $10^4$ events)", parts(ARMS_FULL[3][1]()), "D",
              ps.C.vermillion, 3.2)]
+    if drop_shared:
+        arms = [a for a in arms if not a[0].startswith("shared standardization")]
     fig, axes = plt.subplots(2, 1, figsize=(8.4, 5.2))
     fig.subplots_adjust(left=0.085, right=0.995, top=0.82, bottom=0.10, hspace=1.0)
     for ax, sp in zip(axes, ("interp", "extrap")):
@@ -133,7 +135,11 @@ def fig_per_process():
     h.append(plt.Rectangle((0, 0), 1, 1, color="0.88")); l.append(r"$2\to2$")
     fig.legend(h, l, loc="upper center", ncol=2, fontsize=8, bbox_to_anchor=(0.5, 1.0), handletextpad=0.3,
                columnspacing=1.5)
-    save(fig, "dan_per_process")
+    if drop_shared:
+        ps.save(fig, os.path.join(FIG, name))   # png + pdf + legend.txt
+        plt.close(fig)
+    else:
+        save(fig, name)
 
 
 def fig_grid():
@@ -575,6 +581,7 @@ def fig_kshot():
 if __name__ == "__main__":
     res = {}
     fig_per_process()
+    fig_per_process("dan_per_process_pid_dimless", drop_shared=True)
     res["grid"] = fig_grid()
     res["moves"] = fig_moves()
     fig_why()
