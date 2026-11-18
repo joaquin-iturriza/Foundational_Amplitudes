@@ -34226,9 +34226,6 @@ entries:
     9: 'Batch (2) stage 1: rebuild the 5 missing finale train pools on CC (prebuild_recipes.sh recipes/transfer_finale.yaml),
       parent smoke (job_datasaving_parent.sh finale iters=50 tag=zng_uq_smoke), then the parent (64000 steps, limit from the
       smoke)'
-    10: 'Bring Joaquin the par:muon_long paragraph (docs/results.tex, commit b895f6ca) with its figure: it says Muon''s lead
-      grows with the horizon while its numbers (5.18 at the final model, 10.6x at the curve''s last point) do not show growth;
-      the notes-editor''s proposed wording; it blocks the commit of the Z+ng write-up'
     11: Asked Joaquin (2026-11-18 ~02:00) whether to apply the notes-editor's pidqn wording (token 14-20% lower within trained
       classes; HD4 [0.69,0.89] excludes 1) and its muon_long wording; both block every commit (reviewer agent a86a7077b7c67f5b4
       holds the lock)
@@ -35122,11 +35119,6 @@ entries:
       if:
       - 'parent converges within 10x of the old finale''s 4.9e-6 geometric mean: stage 2 design'
       - 'it fails: report where, fix'
-    10:
-      feeds: whether the Z+ng write-up can be committed (notes-editor pillar)
-      if:
-      - 'Joaquin keeps par:muon_long as is: the notes-editor advances on his word'
-      - 'Joaquin takes the notes-editor wording: a worker applies it, then the Z+ng paragraph commits'
     11:
       feeds: whether the notes-editor passes so the Z+ng tool and figures commit
       if:
