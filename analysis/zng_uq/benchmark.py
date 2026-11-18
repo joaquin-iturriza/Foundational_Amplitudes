@@ -139,16 +139,17 @@ def plot(path, curves=None):
     ps.legend_cell(cell, axl)
     ps.save(fig, os.path.join(figs, "zng_median_delta"))
     # (b)
-    fig, ax = ps.figure()
+    fig, (ax, cell) = ps.figure(2)
     for a in [a for a in arms if f"{a}|4" in d["runs"]]:
         h = np.asarray(d["runs"][f"{a}|4"]["hist_abs_delta"], float)
         ax.stairs(h / h.sum(), d["bins_abs_delta"], color=col[a], linestyle=ls(a), label=lab(a))
     ax.set_xscale("log"); ax.set_xlabel(r"$|\Delta|$, $\Delta=|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2-1$")
-    ax.set_ylabel("fraction of test events"); ps.legend(ax, "upper left"); ps.process_label(ax, PROC_LAB[4])
+    # the legend in a cell of its own: in the panel it covered Suprio's peak
+    ax.set_ylabel("fraction of test events"); ps.legend_cell(cell, ax); ps.process_label(ax, PROC_LAB[4])
     ps.save(fig, os.path.join(figs, "zng_delta_z4g"))
     # (c)
     b = np.asarray(d["bins_pull"]); x = np.linspace(b[0], b[-1], 481)
-    fig, axs = ps.figure(2, 2)
+    fig, axs = ps.figure(2, 3)
     for n, ax in zip((1, 2, 3, 4), axs.flat):
         for a in [a for a in arms if f"{a}|{n}" in d["runs"]]:
             h = np.asarray(d["runs"][f"{a}|{n}"]["hist_pull"], float)
@@ -156,7 +157,11 @@ def plot(path, curves=None):
         ax.plot(x, np.exp(-x ** 2 / 2) / np.sqrt(2 * np.pi) * (b[1] - b[0]), "k:", label=r"$\mathcal{N}(0,1)$")
         ax.set_xlabel(r"pull $(\ln|\mathcal{M}|^2-\mu)/\sigma$"); ax.set_ylabel("fraction of test events")
         ps.process_label(ax, PROC_LAB[n])
-    ps.legend(axs[0][0], "upper left")
+    # the legend in the two spare cells of a 2x3 (in the n=1 panel it covered the data), split across them
+    h, l = axs[0][0].get_legend_handles_labels()
+    k = (len(l) + 1) // 2
+    for cell, sl in ((axs[2][0], slice(0, k)), (axs[2][1], slice(k, None))):
+        cell.set_axis_off(); cell.legend(h[sl], l[sl], loc="center", frameon=False)
     ps.save(fig, os.path.join(figs, "zng_pulls"))
     # (d)
     if curves:
