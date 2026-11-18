@@ -35104,6 +35104,61 @@ entries:
       answered; stage 2 (D483) deferred with its reason. Check 5 searched: zng, Z+ng, Suprio, highmult, finale, transfer_finale,
       dsave_parent_finale, finale with het/HETEROSC/current setup, D91/D94 (het fine-tunes from the finale only, no retrained
       parent).'
+  - at: '2026-11-18T06:02:26+00:00'
+    question: 'Parent (2) stage 1 repair (D487, fix of approved work): does the ladder+star parent retrained in the current
+      setup with the two defects found in FA-lxplus-00347f0a fixed, (a) validation and checkpoint selection on the whole val
+      pools (data.eval_subsample=10000, the old finale''s; the first parent inherited 200 from trial 1262) and (b) the W (PDG
+      24) added to data.internal_mass_pdgs [23,6,25] -> [23,6,25,24] (u d~ -> e+ nu g has an s-channel W between massless
+      legs, so under dimensionless inputs its pole is invisible without the off-shellness column), train to a converged pretraining
+      on the 28 processes: per-process val MSE of ln|M|^2 at its best checkpoint within 10x of or below the old finale''s
+      (tp3_finale hp73), u d~ -> e+ nu g learned, and the curve test passing? The 15:58 design''s other batches ((1), B1,
+      B2) are unchanged by this one.'
+    prior: 'This entry: first parent FA-lxplus-00347f0a (same recipe, config, lr 3.78e-3, 64000 steps WSD): geometric-mean
+      val MSE over the 28 9.99e-5 vs the old finale 1.02e-5 (9.8x, on 200 val events per process), curve test fails (separation
+      2.26, end_up 0.77), u d~ -> e+ nu g never learns (standardised mu-MSE 0.78 val / 0.70 train), u u~ -> t t~ V memorised
+      (train/val 55x, NLL jump at the last validation), clean 2->2 10-90x above the finale (parent_read.py @9c8ece50, parent_diag.json);
+      its full-val re-read FA-lxplus-44ab7dd7 (+ CC twin FA-ccin2p3-76be39e7) in flight. results.tex ''The W in the propagator
+      list'' (l.12826): the catalog short arithmetic arm rerun with [23,6,25,24] (runs/catalog_short_offshW2_mean, masks 478/478,
+      1000 steps, one seed): u d~ -> e nu 0.052 -> 0.011, u d~ -> e nu g and its alpha_s variants 0.13-0.16 -> 0.03-0.04;
+      geometric mean over 478 processes 1.13x (not established as a cost: spread unmeasured), over the 117 with a W 1.04x;
+      ''The coordinate belongs in the list for the same reason the Z''s does.'' Canonical setup table still lists [23,6,25].
+      Searched: internal_mass_pdgs, offshW, W in the propagator list, finale, dsave_parent_finale, eval_subsample in results.tex;
+      plan entry; D480-D487.'
+    measure: 'As the passed design''s (2): per-process val MSE of ln|M|^2 at the best checkpoint (sigma stage''s final model,
+      D276) on the whole val pools (10000 / 5000 per process), geometric mean over the 28 against the old finale''s 1.02e-5
+      (parent_read.py read on the new run); u d~ -> e+ nu g''s MSE against the first parent''s (4.8) and the finale''s; the
+      curve test (tools/kit_curves.py, NLL: separation <= 0.55, end_up <= 0.35 nats) on its per-validation curves; whether
+      the offshell mask line reads 28/28 processes.'
+    check: 'The measure moves with both changes on existing data: the first parent''s per-process MSEs span 1e-7..4.8 with
+      6 of 28 below the finale and 5 above 90x (parent_vs_finale.json @8053338e), so a factor-10 shift of the geometric mean
+      or of single processes is read; the W coordinate moved u d~ -> e nu g 4x and u d~ -> e nu 5x in the catalog short arm
+      (results.tex l.12829); the 200-event selection put the first parent''s best at validation 48 of 50 with an NLL jump
+      at the last one (zng_parent_curves), which full-pool validation changes.'
+    fixed: 'Everything of the first parent (scripts/job_datasaving_parent.sh finale @7409c64a: base trial 1262''s config.yaml,
+      recipes/transfer_finale.yaml, every train event, 64000 steps, lr 3.78e-3, WSD cooldown 1/8, ++model.input_soft_eps=1e-8
+      ++model.input_pair_logs=7, HETEROSC + sigma stage, MuonAdamW, batch 16384, seed 42, data.eval_subsample=10000 already
+      in the finale case) plus one argument ++data.internal_mass_pdgs=[23,6,25,24] (a job argument, not --export: the comma
+      list was once truncated by sbatch --export, l.12828), tag=zng_uq_w. Site: lxplus, where the first parent and the finale
+      trained: its train and val pools are the first parent''s; CC''s val pools of u d~ -> W+ g, W+ gg, W+ ggg differ by md5
+      from lxplus''s (each site generated its own), so the comparison is on lxplus''s. Smoke first (D395, a config the launch
+      path has not run): iters=50 tag=zng_uq_w_smoke through the sigma stage and plots, checking the offshell mask line 28/28
+      and the log''s internal mass pdgs; then the full run. Wall: first parent 0.4087 s/step x 64000 = 7.3 h on lxplus at
+      200-event validation; the full-pool validation (50 x ~2.7e5 events forward) read from the smoke''s validation time;
+      limit 12 h; GPU-h ~8 + smoke ~0.3. Disk: ~0.2 GB run dir on EOS.'
+    control: 'The first parent FA-lxplus-00347f0a (same everything but the two changes; its full-val re-read gives the per-process
+      values on the same pools) and the old finale tp3_finale hp73 (the passed design''s reference). Two changes at once:
+      both are defect repairs, not arms; the u d~ -> e+ nu g change is attributed to the W column (the only process-specific
+      change; the 200-event cap acts on selection for all), the rest of the shift to both together.'
+    seeds: One seed (42), as the first parent and the finale; one-seed resolution ~10x on a cell (ladder seed study l.13696),
+      so yes/no at 10x on the geometric mean, a single process's change below 3x is not read.
+    outcome: 'Smoke YES: sigma stage, per_process_metrics.json and plots written, offshell masks 28/28 -> full run goes; NO
+      -> fix and smoke again. Full: completes 64000 steps without blowing up, curve test passes, geometric-mean val MSE within
+      10x of or below the finale''s and u d~ -> e+ nu g''s MSE below 10x the finale''s -> it is the parent of stage 2 (D483''s
+      fine-tunes get their own design); u d~ -> e+ nu g still unlearned -> the W column does not reach it (offshell masks
+      checked), reported; curve test fails on u u~ -> t t~ V memorisation alone -> reported with its per-process curve, stage
+      2 waits on Joaquin whether a parent with one memorised NLO pool is acceptable; geometric mean still >10x -> the setup
+      (emission-scale/HETEROSC/dimensionless) is behind the old finale at 64000 steps, reported with the per-process gap,
+      the horizon is Joaquin''s call.'
   step_why:
     5:
       feeds: the record of the comparison so far
