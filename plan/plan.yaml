@@ -34252,7 +34252,9 @@ entries:
     - FA-ccin2p3-b4ebd88e
     - FA-ccin2p3-ba9df01f
     - FA-lxplus-44ab7dd7
-    commit: 2896074c
+    - FA-lxplus-57f6d2cb
+    - FA-lxplus-7539d95a
+    commit: 02713979
     paths:
     - analysis/zng_uq/benchmark.py
     - analysis/zng_uq/data/benchmark.json
