@@ -96,6 +96,10 @@ def fig_per_process(name="dan_per_process", drop_shared=False):
              ps.C.vermillion, 3.2)]
     if drop_shared:
         arms = [a for a in arms if not a[0].startswith("shared standardization")]
+        arms[0] = ("particle-ID embedding (Suprio)",) + arms[0][1:]
+        arms[1] = ("dimensionless + coupling orders",) + arms[1][1:]
+        w0, h0 = ps.PLOT_W_IN, ps.PLOT_H_IN
+        ps.PLOT_W_IN, ps.PLOT_H_IN = 7.6, 1.9   # ps.layout fixes the plot box: wide enough for the family names
     fig, axes = plt.subplots(2, 1, figsize=(8.4, 5.2))
     fig.subplots_adjust(left=0.085, right=0.995, top=0.82, bottom=0.10, hspace=1.0)
     for ax, sp in zip(axes, ("interp", "extrap")):
@@ -133,13 +137,17 @@ def fig_per_process(name="dan_per_process", drop_shared=False):
         ax.text(0.0, 1.16, PANEL_TITLE[sp], transform=ax.transAxes, ha="left", va="bottom", fontsize=9.5)
     h, l = axes[0].get_legend_handles_labels()
     h.append(plt.Rectangle((0, 0), 1, 1, color="0.88")); l.append(r"$2\to2$")
+    if drop_shared:
+        axes[0].legend(h, l, loc="upper left", ncol=3, fontsize=8, frameon=True, framealpha=1)
+        for a in axes:
+            a._ps_equal_limits = True   # keep October's fixed y range: no make_room stretch (legend sits in the free 10-300 band)
+        ps.save(fig, os.path.join(FIG, name))   # png + pdf + legend.txt
+        ps.PLOT_W_IN, ps.PLOT_H_IN = w0, h0
+        plt.close(fig)
+        return
     fig.legend(h, l, loc="upper center", ncol=2, fontsize=8, bbox_to_anchor=(0.5, 1.0), handletextpad=0.3,
                columnspacing=1.5)
-    if drop_shared:
-        ps.save(fig, os.path.join(FIG, name))   # png + pdf + legend.txt
-        plt.close(fig)
-    else:
-        save(fig, name)
+    save(fig, name)
 
 
 def fig_grid():
@@ -579,6 +587,9 @@ def fig_kshot():
 
 
 if __name__ == "__main__":
+    if sys.argv[1:] == ["pid_dimless"]:   # only the particle-ID + dimensionless per-process figure
+        fig_per_process("dan_per_process_pid_dimless", drop_shared=True)
+        sys.exit()
     res = {}
     fig_per_process()
     fig_per_process("dan_per_process_pid_dimless", drop_shared=True)
