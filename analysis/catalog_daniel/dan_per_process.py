@@ -70,7 +70,16 @@ def boot_median_log_ratio(a, b, n=2000, seed=0):
     return [float(np.median(r)), float(np.quantile(bs, 0.16)), float(np.quantile(bs, 0.84)), len(r)]
 
 
+KEYS = ["pid", "perproc", "shared", "dimless", "new"]   # --arms names, in the order of the arms list
+
+
 def main():
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--arms", default=",".join(KEYS), help="comma list of " + ",".join(KEYS) + " drawn (all computed)")
+    shown = ap.parse_args().arms.split(",")
+    assert set(shown) <= set(KEYS), shown
+    full = shown == KEYS
     draft = json.load(open(os.path.join(ROOT, "talks", "progress_oct2026b", "data", "draft_pid_by_process.json")))
     ov = json.load(open(os.path.join(D, "v4_heldout_overlap.json")))["processes"]
     packs = {"per-process standardization": hp58(), "shared standardization": pack("catalog_norm_B"),
@@ -92,7 +101,7 @@ def main():
         x = np.arange(1, len(names) + 1)
         rec = {"processes": names, "with_b": [n for n in names if has_b(n)], "mse": {}, "median": {},
                "median_affine": {}, "unscored": {}, "new_over_arm_log10": {}}
-        for a, m, mk, c in arms:
+        for k, (a, m, mk, c) in zip(KEYS, arms):
             y = np.array([m.get(n, np.nan) for n in names])
             rec["mse"][a] = [None if not np.isfinite(v) else v for v in y]
             rec["unscored"][a] = [n for n, v in zip(names, y) if not np.isfinite(v)]
@@ -105,7 +114,8 @@ def main():
                     ns = [n for n in names if sel(n) and n in m and n in new]
                     rec["new_over_arm_log10"].setdefault(a, {})[sub] = boot_median_log_ratio(
                         [new[n] for n in ns], [m[n] for n in ns])
-            ax.plot(x, y, mk, color=c, ls="none", label=a, alpha=0.85)
+            if k in shown:
+                ax.plot(x, y, mk, color=c, ls="none", label=a, alpha=0.85)
         ax.set_yscale("log")
         ax.set_xlabel("held-out process")
         ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
@@ -133,8 +143,9 @@ def main():
               f"on its own pool {c['v4_entry']} {c['on_own']:.3g}")
     ps.legend(axs[0], "upper left")
     ps.make_room(axs[0])
-    json.dump(out, open(os.path.join(D, "dan_per_process.json"), "w"), indent=1)
-    ps.save(fig, os.path.join(HERE, "figs", "dan_per_process"))
+    if full:
+        json.dump(out, open(os.path.join(D, "dan_per_process.json"), "w"), indent=1)
+    ps.save(fig, os.path.join(HERE, "figs", "dan_per_process" if full else "dan_per_process_" + "_vs_".join(shown)))
 
 
 if __name__ == "__main__":
