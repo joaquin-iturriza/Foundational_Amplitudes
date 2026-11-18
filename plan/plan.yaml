@@ -35319,6 +35319,14 @@ entries:
       CC''s pools); authoritative lxplus read FA-lxplus-44ab7dd7 running. Parent retrain design (W 24 in internal_mass_pdgs
       + full-pool validation, lxplus) PASSED; smoke FA-lxplus-7539d95a. B1 reader: tools/kit_curves.py sweep <site>:<name>
       (2896074c).'
+  - at: '2026-11-18T23:31:48+00:00'
+    text: '2026-11-19 B1 read (benchmark.py @65031a0b, data @02713979; figure zng_median_delta with B1 arms). Curve test (b1_search.json):
+      Z+1g 3/8 trials pass, Z+2g/3g/4g 0/8 (separation 13-543). Best trial per n scored on the 1e6 test events: median |Delta|
+      scratch, searched HPs 4.3e-5 / 3.9e-4 / 4.4e-3 / 1.6e-2 (Suprio''s LLoCa 6.2x / 1.7x / 3.0x / 3.7x), pull std 1.02 /
+      1.44 / 4.2 / 7.7; fine-tuned at Z+1g''s passing HPs 5.1e-5 (7.3x Suprio, 2.3x B2 fine-tuned). Design outcome: searched
+      HPs pass the curve test only at n=1; there they beat the 12,500-step hp1677 scratch run 2.3x and the fine-tune not (1.06x);
+      at n=2-4 the floor of our protocol (flagged, curve test fails) is within 1.1-1.9x of B2 and B2 stays our best arm everywhere
+      but scratch Z+1g. Every gap to Suprio''s network within 10x (one seed).'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
