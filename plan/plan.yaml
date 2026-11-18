@@ -34378,7 +34378,7 @@ entries:
     - 12
   owner:
     agent: a9b46f5b49be7a76e
-    state: working
+    state: closed
     since: '2026-11-18T05:18:47+00:00'
     state_at: '2026-11-18T05:18:47+00:00'
   designs:
@@ -35315,28 +35315,33 @@ entries:
     start: '2026-11-18T05:22:58+00:00'
     at: '2026-11-18T05:22:58+00:00'
   handoff:
-    state: '2026-11-18. B2 (our setup under Suprio''s protocol, 8 runs) and Suprio''s LLoCa-Transformer (4 runs, his code
-      @1074f6a) read and committed (analysis/zng_uq/benchmark.py fd1a3a6c; benchmark.json, zng_curves.json): our best B2 arm
-      0.77-3.2x his median |Delta| (Z+1g 3.2x, Z+2g 0.77x, Z+3g 1.06x, Z+4g 2.0x), pulls near N(0,1) for both on Z+2..4g;
-      B2 curve test 4/8. Figures analysis/zng_uq/figs/zng_{median_delta,delta_z4g,pulls,curves,curves_suprio}.png. B1 (four
-      DyHPO searches tp_zng_hpo_{zg,zgg,zggg,zgggg} on CC, 32 trials) still running; when done, A_ft from 1262 at each best
-      (step 8). Parent (2) stage 1 FA-lxplus-00347f0a done and read by analysis/zng_uq/parent_read.py (UNCOMMITTED: the commit
-      hook blocks while the notes-editor pillar is overdue; commit it with its data/figure when it passes): curve test fails,
-      gmean val MSE 9.8x the old finale''s, 6/28 lower; step 13 holds the fix and stage 2. Write-up (step 5) not started:
-      the uncommitted Z+ng paragraph in results.tex holds the old numbers; it must be rewritten with B2, Suprio and B1, and
-      trial 1262''s recipe checked for b b~ > Z+1..3g (and no Z+4g) before ''extrapolates one gluon'' stands (notes-editor
-      note).'
-    decisions: 'Sites: B2 went to CC when Jean Zay could not sync and lxplus failed site pick''s probe; the parent went to
-      lxplus (pools prebuilt there, FA-lxplus-d6326fc1). Suprio''s Z+3g/Z+4g stayed on CC (lxplus would need a key-path change,
-      his raw npy and a new env smoke). job_datasaving_parent.sh finale uses ++training.wsd_cooldown_frac (80e4bb5b). Second
-      seed at Z+1g asked of Joaquin (step 12, Scope).'
-    ruled_out: Their other networks (D481); the old finale's fine-tunes (D487); 9ea31ae3; moving running B1 sweeps (state
-      on CC).
-    running: B1 sweeps ccin2p3:tp_zng_hpo_{zg,zgg,zggg,zgggg}
-    files: analysis/zng_uq/benchmark.py; analysis/zng_uq/parent_read.py (uncommitted); analysis/zng_uq/data/{benchmark,zng_curves,parent_vs_finale}.json;
-      analysis/zng_uq/figs/*.png; scripts/job_kit.sh; scripts/job_uq_ext.sh; scripts/job_datasaving_parent.sh; sweep/sweep_config_tp_zng_hpo_*.yaml;
-      docs/results.tex (uncommitted Z+ng paragraph)
-    written: '2026-11-18T05:05:49+00:00'
+    state: '2026-11-18 07:00. parent_read.py and its data committed (41746393, 8053338e, 9c8ece50). Parent FA-lxplus-00347f0a
+      read per process: it validated on 200 events per process (data.eval_subsample=200 inherited from trial 1262; the old
+      finale used 10000/5000); finale case of job_datasaving_parent.sh now sets data.eval_subsample=10000 (7409c64a). Full-val
+      eval-only re-read FA-ccin2p3-d2d34dd7 queued on CC (run dir copied lxplus->CC; tools/eval_best_val.py EVAL_FULL=1 prints
+      proc_val_mse = per-process mu-MSE of the standardised target; x prepd_std^2 = 6.25 (shared std) for ln|M|^2). Figure
+      analysis/zng_uq/figs/zng_parent_curves.png (per-process val NLL, sent to main). Cause read (parent_read.py diag, parent_diag.json):
+      u d~ -> e+ nu g never learns (std mu-MSE 0.78 val/0.70 train, corr 0.83; worst residuals at m(e nu) 3-6 GeV and at the
+      W pole): dimensionless inputs + internal W not in internal_mass_pdgs [23,6,25] (old finale: dimensional inputs, same
+      pdgs); u u~ -> t t~ V memorised (train/val 55x) and its NLL jumps to 100 at the last validation (drives the curve test''s
+      end_up); bhabha and u u~ -> d d~ set by a few events (sqrt s 68-71 GeV; 750-980 GeV); clean 2->2 10-90x above the old
+      finale, curves still falling. Step 14 holds the repair branches; step 8: B1 zg and zgg searches ended (8/8 each), zggg/zgggg
+      running; tools/kit_curves.py sweep reads only drive.py''s sweeps_local/<name>/driver_state.json, so B1 (sweep_manager
+      on CC) needs a reader (analysis.common sweep_trials) before the curve test and the A_ft reruns. notes-editor backlog
+      passed and advanced (a86a7077) after the pidqn and muon_long factual fixes; results.tex still uncommitted (shared, holds
+      those fixes, the editor''s, and the old Z+ng draft).'
+    decisions: 'Fix-and-retrain branch, not accept: the parent fails the curve test and has a broken process. The full-val
+      re-read is an eval-only REREAD under the passed design (measure: per-process val MSE on the finale''s own val pools).
+      Proposed repair in the retrain: eval_subsample 10000 and W (24) added to internal_mass_pdgs; the rest of the passed
+      design''s setup kept (D487). notes-editor wording applied as corrections of claims contradicted by their own intervals
+      (one correct answer), step 11 dropped.'
+    ruled_out: Resonance as the cause of the bhabha / u u~ -> d d~ outliers (worst events off the Z pole); overfitting on
+      most processes (train ~ val except t t~ V and the 4-5 leg trees 2-4x).
+    running: FA-ccin2p3-d2d34dd7 (full-val re-read, CC, 45 min limit); B1 sweeps ccin2p3:tp_zng_hpo_zggg, tp_zng_hpo_zgggg
+    files: analysis/zng_uq/parent_read.py (read, plot, curves, diag); analysis/zng_uq/data/{parent_vs_finale,parent_diag}.json;
+      analysis/zng_uq/figs/zng_parent_{vs_finale,curves}.png; tools/eval_best_val.py (EVAL_FULL, proc_val_mse); experiment.py
+      (self.proc_val_mse); scripts/job_datasaving_parent.sh
+    written: '2026-11-18T05:37:23+00:00'
   ask: 'Scope: a second seed at Z+1g beyond the design''s one seed per run, for our fine-tuned arm under Suprio''s protocol
     and his LLoCa-Transformer. Ours is 3.2x his median |Delta| (2.2e-5 vs 6.9e-6), in the 3-10x band one seed does not resolve;
     cost ~1 GPU-h each.'
