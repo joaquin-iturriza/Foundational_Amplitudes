@@ -35130,8 +35130,7 @@ entries:
         the curve test on mu-MSE, and still repair e+ nu g in the retrain before stage 2'
   step_waits:
     '5': the results of batches 1, B1, B2
-    '8': the four B1 DyHPO sweeps ccin2p3:tp_zng_hpo_{zg,zgg,zggg,zgggg} (31 of 32 trials queued; zgggg trial_0007 resubmitted
-      by detached zng_gate_windows)
+    '8': ccin2p3:tp_zng_hpo_zggg ccin2p3:tp_zng_hpo_zgggg
     '14': FA-ccin2p3-d2d34dd7
   findings:
   - at: '2026-11-17T11:18:43+00:00'
