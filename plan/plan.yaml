@@ -34376,7 +34376,7 @@ entries:
     - 12
   owner:
     agent: af420daee93095631
-    state: working
+    state: closed
     since: '2026-11-17T17:01:50.121000+00:00'
     state_at: '2026-11-18T05:00:58.717000+00:00'
     context: 231915
@@ -35303,32 +35303,28 @@ entries:
     start: '2026-11-17T20:20:02+00:00'
     at: '2026-11-17T20:20:02+00:00'
   handoff:
-    state: '2026-11-17 ~17:30. Design (four batches, D481/D484/D487) PASSED 15:58; code reviewed and in trunk (job_uq_ext.sh,
-      job_datasaving_parent.sh finale case, sweep_config_tp_zng_hpo_<p>.yaml; e75bcabb). Submitted: (1) smoke of Suprio''s
-      LLoCa-Transformer FA-ccin2p3-7f7f0b53 (job_uq_ext.sh train_shared.sh zng_uq_smoke_z1g UQ_BUILD=1 RUN_N=1 RUN_NETS=lloca,
-      50 steps; builds his env and runs his tests/uq) and the B2 smoke FA-ccin2p3-3e8178a0 (job_kit.sh A on kit_uq_zgggg__me2,
-      T=50, Suprio''s protocol args, KIT_NTEST=2e4), both @12c0ad15. NOT yet submitted: B1 (site run ccin2p3 FA -- python
-      sweep/generate_sweep.py --config sweep/sweep_config_tp_zng_hpo_<p>.yaml for the 4 n, then sweep_manager submit; site
-      pick --jobs 32 --groups 4 first), and the parent''s pool rebuild (scripts/prebuild_recipes.sh recipes/transfer_finale.yaml
-      on CC: 5 train pools missing, uubar_ttbar_nlo, udbar_taunu, ee_mumu_ew_nlo, ee_uu_ew_nlo, uubar_ZZ_nlo smix), then the
-      parent smoke (job_datasaving_parent.sh finale iters=50 tag=zng_uq_smoke) and the parent (tag=zng_uq, --hdr=--time from
-      the smoke''s s/step x 64000 x 1.3 + 1 h). On the smokes: read the logs, take s/step, then (1) RUN_N=1..4 production
-      (RUN_EXP=zng_uq_lloca/z<n>g, no UQ_BUILD) and B2''s 8 runs (A, A_ft x 4 n, T=200000, validate_every 1000, KIT_NTEST=1e6,
-      tag=suprio_protocol) at limits s/step x 2e5 x 1.3 + 1 h; record each batch''s target (plan target). Item est set to
-      125 GPU-h. Write-up paragraph in results.tex uncommitted (paper numbers removed), blocked by notes-editor pillar. Every
-      submission needs --allow-dirty (other agents'' files) and a site pick call of its own before it.'
-    decisions: 'Route to Suprio''s code: clone over ssh with CC''s read key (Joaquin; 9ea31ae3 is gone from trunk). arXiv:2505.20280
-      comparison removed (never Joaquin''s). Item (2): old finale and old-setup grid dropped (D487); new parent in the current
-      setup on the 28 finale processes (1262 config, WSD 1/8, input flags with pair_logs 7, 64000 steps, lr 3.78e-3); stage
-      2 (fine-tunes vs scratch D 1e2..5e5) needs its own design after the parent (horizon calibration). Yes/no at 10x (one-seed
-      spread); 3-10x unresolved, second seed is Joaquin''s call. Step 4 superseded in practice by B1 (D484); held under a
-      date wait.'
-    ruled_out: Their networks other than LLoCa (D481); the old finale parent (D487); using 9ea31ae3 (history rewritten).
-    running: FA-ccin2p3-7f7f0b53 (smoke 1), FA-ccin2p3-3e8178a0 (smoke B2)
-    files: 'scripts/job_uq_ext.sh; scripts/job_kit.sh; scripts/job_datasaving_parent.sh; sweep/sweep_config_tp_zng_hpo_{zg,zgg,zggg,zgggg}.yaml;
-      analysis/zng_uq/benchmark.py (collect needs the new arms: theirs at $WORK/ext/uq_runs/runs/zng_uq_lloca, the suprio_protocol
-      runs, post-search reruns); analysis/zng_uq/figs/zng_median_delta.png; docs/results.tex (uncommitted paragraph)'
-    written: '2026-11-17T16:49:14+00:00'
+    state: '2026-11-18. B2 (our setup under Suprio''s protocol, 8 runs) and Suprio''s LLoCa-Transformer (4 runs, his code
+      @1074f6a) read and committed (analysis/zng_uq/benchmark.py fd1a3a6c; benchmark.json, zng_curves.json): our best B2 arm
+      0.77-3.2x his median |Delta| (Z+1g 3.2x, Z+2g 0.77x, Z+3g 1.06x, Z+4g 2.0x), pulls near N(0,1) for both on Z+2..4g;
+      B2 curve test 4/8. Figures analysis/zng_uq/figs/zng_{median_delta,delta_z4g,pulls,curves,curves_suprio}.png. B1 (four
+      DyHPO searches tp_zng_hpo_{zg,zgg,zggg,zgggg} on CC, 32 trials) still running; when done, A_ft from 1262 at each best
+      (step 8). Parent (2) stage 1 FA-lxplus-00347f0a done and read by analysis/zng_uq/parent_read.py (UNCOMMITTED: the commit
+      hook blocks while the notes-editor pillar is overdue; commit it with its data/figure when it passes): curve test fails,
+      gmean val MSE 9.8x the old finale''s, 6/28 lower; step 13 holds the fix and stage 2. Write-up (step 5) not started:
+      the uncommitted Z+ng paragraph in results.tex holds the old numbers; it must be rewritten with B2, Suprio and B1, and
+      trial 1262''s recipe checked for b b~ > Z+1..3g (and no Z+4g) before ''extrapolates one gluon'' stands (notes-editor
+      note).'
+    decisions: 'Sites: B2 went to CC when Jean Zay could not sync and lxplus failed site pick''s probe; the parent went to
+      lxplus (pools prebuilt there, FA-lxplus-d6326fc1). Suprio''s Z+3g/Z+4g stayed on CC (lxplus would need a key-path change,
+      his raw npy and a new env smoke). job_datasaving_parent.sh finale uses ++training.wsd_cooldown_frac (80e4bb5b). Second
+      seed at Z+1g asked of Joaquin (step 12, Scope).'
+    ruled_out: Their other networks (D481); the old finale's fine-tunes (D487); 9ea31ae3; moving running B1 sweeps (state
+      on CC).
+    running: B1 sweeps ccin2p3:tp_zng_hpo_{zg,zgg,zggg,zgggg}
+    files: analysis/zng_uq/benchmark.py; analysis/zng_uq/parent_read.py (uncommitted); analysis/zng_uq/data/{benchmark,zng_curves,parent_vs_finale}.json;
+      analysis/zng_uq/figs/*.png; scripts/job_kit.sh; scripts/job_uq_ext.sh; scripts/job_datasaving_parent.sh; sweep/sweep_config_tp_zng_hpo_*.yaml;
+      docs/results.tex (uncommitted Z+ng paragraph)
+    written: '2026-11-18T05:05:49+00:00'
   ask: 'Scope: a second seed at Z+1g beyond the design''s one seed per run, for our fine-tuned arm under Suprio''s protocol
     and his LLoCa-Transformer. Ours is 3.2x his median |Delta| (2.2e-5 vs 6.9e-6), in the 3-10x band one seed does not resolve;
     cost ~1 GPU-h each.'
