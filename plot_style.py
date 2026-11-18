@@ -155,7 +155,7 @@ def _data_axes(fig):
     for ax in fig.axes:
         if _is_cbar(ax) or not ax.get_visible():
             continue
-        if not (ax.lines or ax.collections or ax.images or ax.patches):
+        if not (ax.lines or ax.collections or ax.images or ax.patches or ax.get_legend()):   # a legend cell is a cell
             continue
         out.append(ax)
     return out

@@ -130,12 +130,13 @@ def plot(path, curves=None):
     os.makedirs(figs, exist_ok=True)
     ours = lambda a, key: sorted((v["n_gluons"], v[key]) for v in d["runs"].values() if v["arm"] == a)
     # (a)
-    fig, axl = ps.figure()
+    fig, (axl, cell) = ps.figure(2)
     for a in arms:
         axl.plot(*zip(*ours(a, "median_abs_delta")), "o", linestyle=ls(a), color=col[a], label=lab(a))
     axl.set_ylabel(r"median $|\Delta|$, $\Delta=|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2-1$")
     axl.set_yscale("log"); axl.set_xlabel("number of gluons $n$"); axl.set_xticks([1, 2, 3, 4])
-    ps.legend(axl, "upper left")
+    # the legend in a cell of its own: eight entries in the panel covered the zero-shot curve
+    ps.legend_cell(cell, axl)
     ps.save(fig, os.path.join(figs, "zng_median_delta"))
     # (b)
     fig, ax = ps.figure()
