@@ -34223,9 +34223,6 @@ entries:
       zng_delta_z4g, zng_pulls, zng_curves, % src / % claim lines'
     8: 'Batch B1: DyHPO per n (sweep/sweep_config_tp_zng_hpo_<p>.yaml @e75bcabb, 8 trials, waves 3,3,2), then A_ft from 1262
       at each best'
-    9: 'Batch (2) stage 1: rebuild the 5 missing finale train pools on CC (prebuild_recipes.sh recipes/transfer_finale.yaml),
-      parent smoke (job_datasaving_parent.sh finale iters=50 tag=zng_uq_smoke), then the parent (64000 steps, limit from the
-      smoke)'
     11: Asked Joaquin (2026-11-18 ~02:00) whether to apply the notes-editor's pidqn wording (token 14-20% lower within trained
       classes; HD4 [0.69,0.89] excludes 1) and its muon_long wording; both block every commit (reviewer agent a86a7077b7c67f5b4
       holds the lock)
@@ -35114,11 +35111,6 @@ entries:
       if:
       - 'a trial passes the curve test: A_ft at its HPs, read as B2'
       - 'none passes: report the floor, flagged'
-    9:
-      feeds: the current-setup ladder + star-arm parent for stage 2's fine-tunes
-      if:
-      - 'parent converges within 10x of the old finale''s 4.9e-6 geometric mean: stage 2 design'
-      - 'it fails: report where, fix'
     11:
       feeds: whether the notes-editor passes so the Z+ng tool and figures commit
       if:
@@ -35133,7 +35125,6 @@ entries:
     '5': the results of batches 1, B1, B2
     '8': the four B1 DyHPO sweeps ccin2p3:tp_zng_hpo_{zg,zgg,zggg,zgggg} (31 of 32 trials queued; zgggg trial_0007 resubmitted
       by detached zng_gate_windows)
-    '9': FA-lxplus-00347f0a (the 64000-step parent)
     '11': '2026-11-19'
   findings:
   - at: '2026-11-17T11:18:43+00:00'
