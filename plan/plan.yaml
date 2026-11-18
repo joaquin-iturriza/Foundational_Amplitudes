@@ -35215,6 +35215,17 @@ entries:
       runs 6.9x/1.8x/2.2x/3.7x (best of scratch/ft). Design outcome: within 10x at every n -> not resolved apart by one seed;
       Z+1g at 3.2x in the 3-10x band (second seed is Joaquin''s call). His Z+1g MSE of ln|M|^2 9.5e-4 is set by outliers (median
       6.9e-6).'
+  - at: '2026-11-18T05:04:22+00:00'
+    text: '2026-11-18 new ladder+star parent FA-lxplus-00347f0a (64000 steps, current setup, WSD) read by analysis/zng_uq/parent_read.py
+      (UNCOMMITTED: commit hook blocked by the notes-editor pillar) -> analysis/zng_uq/data/parent_vs_finale.json, figure
+      analysis/zng_uq/figs/zng_parent_vs_finale.png. Val MSE of ln|M|^2 per process, old finale (trial_0073, full val pools,
+      proc_val_losses_no_reg x prepd_std^2 at best) vs new parent (sigma-stage preds_val, 200 events per process): geometric
+      mean over the 28 1.02e-5 -> 9.99e-5, new/old 9.8x (just inside the design''s 10x), new lower on 6 of 28 (the Z/W+gluons
+      processes: ee_bbbarg 0.07x, udbar_Wgg 0.13x, ee_uug 0.25x); far worse on uubar_ttbar_nlo (2.5e4x, 1.1e-4), udbar_enug
+      (2.5e3x, MSE 4.8: broken), uubar_ddbar (2.4e3x), ee_bhabha (650x), uubar_ttbar (93x). Curve test (NLL, nats) FAILS:
+      separation 2.26 (bar 0.55), end_up 0.77 (bar 0.35); val NLL best at validation 48 of 50. Design outcome: the curve test
+      fails -> not yet the parent of stage 2; the failures sit on the 2->2 and signed/NLO pools, where the emission-scale/HETEROSC
+      setup or the 200-event read may be at fault (not checked).'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
