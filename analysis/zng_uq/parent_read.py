@@ -3,6 +3,9 @@
 28 processes (recipes/transfer_finale.yaml).
 
     python analysis/zng_uq/parent_read.py read   (reads lxplus) -> analysis/zng_uq/data/parent_vs_finale.json
+    python analysis/zng_uq/parent_read.py fullval (after read) adds "fullval": the new parent on its whole val pools, from
+        tools/eval_best_val.py EVAL_FULL=1 on lxplus (FA-lxplus-44ab7dd7, data/parent_fullval_lxplus.json): proc_val_mse x
+        prepd_std^2, same best weights; plot then draws it beside the 200-event read
     python analysis/zng_uq/parent_read.py plot   -> analysis/zng_uq/figs/zng_parent_vs_finale.{png,pdf}
     python analysis/zng_uq/parent_read.py curves -> analysis/zng_uq/figs/zng_parent_curves.{png,pdf}
     python analysis/zng_uq/parent_read.py diag   (reads lxplus) -> analysis/zng_uq/data/parent_diag.json
@@ -61,6 +64,21 @@ def read(out):
     print(json.dumps({"summary": d["summary"], "curve": d["curve"]}))
 
 
+def fullval(path):
+    d = json.load(open(path))
+    e = json.load(open(os.path.join(HERE, "data", "parent_fullval_lxplus.json")))
+    d["fullval"] = {p: v * e["prepd_std"][0] ** 2 for p, v in e["proc_val_mse"].items()}
+    assert len(set(e["prepd_std"])) == 1, "one shared target std expected"
+    common = sorted(set(d["old"]) & set(d["fullval"]))
+    lr = np.log10([d["fullval"][p] / d["old"][p] for p in common])
+    gm = lambda x: float(np.exp(np.mean(np.log(x))))
+    d["summary_fullval"] = {"n_common": len(common), "gmean_fullval": gm([d["fullval"][p] for p in common]),
+                            "gmean_ratio_fullval_over_old": float(10 ** lr.mean()), "n_lower": int((lr < 0).sum()),
+                            "ratio_min": float(10 ** lr.min()), "ratio_max": float(10 ** lr.max())}
+    json.dump(d, open(path, "w"), indent=1)
+    print(json.dumps(d["summary_fullval"]))
+
+
 def plot(path):
     sys.path.insert(0, ROOT)
     import plot_style as ps
@@ -70,7 +88,9 @@ def plot(path):
     fig, ax = ps.figure()
     x = np.arange(len(procs))
     ax.plot(x, [d["old"][p] for p in procs], "o", color=ps.C.grey, label="old finale")
-    ax.plot(x, [d["new"][p] for p in procs], "s", color=ps.C.blue, label="new parent")
+    ax.plot(x, [d["new"][p] for p in procs], "s", color=ps.C.blue, label="new parent, 200 val events")
+    if "fullval" in d:
+        ax.plot(x, [d["fullval"][p] for p in procs], "^", color=ps.C.vermillion, label="new parent, whole val pools")
     ax.set_yscale("log"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
     ax.set_xlabel("process, ordered by the old finale's MSE"); ax.set_xticks(x[::3])
     ps.legend(ax, "upper left")
@@ -157,4 +177,4 @@ if __name__ == "__main__":
     if sys.argv[1] == "diag":
         diag(os.path.join(HERE, "data", "parent_diag.json"))
     else:
-        {"read": read, "plot": plot, "curves": plot_curves}[sys.argv[1]](data)
+        {"read": read, "fullval": fullval, "plot": plot, "curves": plot_curves}[sys.argv[1]](data)
