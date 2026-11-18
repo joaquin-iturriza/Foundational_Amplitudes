@@ -17,7 +17,8 @@ without the mu-MSE, so a failing NLL curve can still hide a sound mu-MSE curve (
     python tools/kit_curves.py read analysis/kit_benchmark/data/kit_curves.json [--figs analysis/kit_benchmark/figs]
     python tools/kit_curves.py sweep kit_hpo_uug_plain kit_hpo_ttvirt_thr --out analysis/kit_benchmark/data/kit_hpo.json
         (step 15's searches, driven by sweep/drive.py: the trials in sweeps_local/<name>/results, their curves read on CC: per trial its HPs, best val mu-MSE and curve_quality on the mu-MSE curves
-         val_mse_curve / train_eval_mse_curve; chosen = the lowest best val among the good trials)
+         val_mse_curve / train_eval_mse_curve; chosen = the lowest best val among the good trials;
+         a name <site>:<name> is a sweep_manager search, its results and checkpoint_index.json read on that site)
     python tools/kit_curves.py runs <run dir> ... [--control NAME=<sweep json>#<search>#<trial file>] --out <json>
         (curve_quality on KIT runs' mu-MSE curves, result.json on CC; controls from a `sweep` output); runsfig <json> <names> --out <base>
     python tools/kit_curves.py sweepfig analysis/kit_benchmark/data/kit_hpo.json --out analysis/kit_benchmark/figs/kit_hpo
@@ -190,6 +191,25 @@ print("KITHPO " + json.dumps(out))
 '''
 
 
+SWEEP_LIST = r'''
+import glob, json, os, sys, yaml
+sys.path.insert(0, os.getcwd()); sys.path.insert(0, os.path.join(os.getcwd(), "sweep"))
+import siteconf
+from run_trial import _sweep_dirs
+# a sweep_manager search: results/hp<idx>_t<T>_<ts>.json in its sweep dir, the run dir from checkpoint_index.json
+name = sys.argv[1]
+cfg = siteconf.resolve(yaml.safe_load(open(f"sweep/sweep_config_{name}.yaml")))
+afs, eos = _sweep_dirs(cfg, name)
+idx = json.load(open(os.path.join(afs, "checkpoint_index.json")))
+rows = []
+for f in sorted(glob.glob(os.path.join(eos, "results", "*.json"))):
+    h = str(int(os.path.basename(f)[2:6]))
+    if h in idx:   # a result without its index entry is a trial that did not finish its observe
+        rows.append([name, os.path.basename(f), f, idx[h]["run_dir"]])
+print("SWEEPLIST " + json.dumps(rows))
+'''
+
+
 def sweep_read(names, out):
     """Per search: each trial's curve_quality (separation, end_up on the mu-MSE curves) and best val; the chosen trial."""
     sys.path.insert(0, os.path.join(ROOT, "analysis", "data_saving"))
@@ -199,14 +219,19 @@ def sweep_read(names, out):
     # drive.py keeps each observed trial's RESULT_JSON locally; its result_path (the curves) and run_dir are on the
     # site that ran it (driver_state.json's trial "site")
     todo = {}
-    for n in names:
+    for n in [n for n in names if ":" in n]:   # <site>:<name>, a sweep_manager search: its state and results on that site
+        site, sw = n.split(":", 1)
+        todo.setdefault(site, []).extend(site_python(SWEEP_LIST, [sw], "SWEEPLIST", site=site))
+    for n in [n.split(":", 1)[1] if ":" in n else n for n in names]:
+        if not os.path.exists(os.path.join(ROOT, "sweeps_local", n, "driver_state.json")):
+            continue
         st = json.load(open(os.path.join(ROOT, "sweeps_local", n, "driver_state.json")))["trials"].values()
         where = {(t["hp_idx"], t["t_steps"]): t["site"] for t in st if t["status"] == "observed"}
         for f in sorted(glob.glob(os.path.join(ROOT, "sweeps_local", n, "results", "*.json"))):
             j = json.load(open(f))
             todo.setdefault(where[(j["hp_idx"], j["t_steps"])], []).append(
                 [n, os.path.basename(f), j["result_path"], j["run_dir"]])
-    d = {n: [] for n in names}
+    d = {n.split(":", 1)[-1]: [] for n in names}
     for site, rows in todo.items():
         for n, r in site_python(SWEEP_SITE, [base64.b64encode(json.dumps(rows).encode()).decode()], "KITHPO",
                                 site=site).items():
