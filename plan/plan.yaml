@@ -35227,6 +35227,18 @@ entries:
       separation 2.26 (bar 0.55), end_up 0.77 (bar 0.35); val NLL best at validation 48 of 50. Design outcome: the curve test
       fails -> not yet the parent of stage 2; the failures sit on the 2->2 and signed/NLO pools, where the emission-scale/HETEROSC
       setup or the 200-event read may be at fault (not checked).'
+  - at: '2026-11-18T05:32:55+00:00'
+    text: '2026-11-18 parent FA-lxplus-00347f0a, per-process read (parent_read.py @8053338e; sigma_stage preds on 200 val
+      events per process): the run validated on 200 events per process, not the old finale''s 10000/5000: data.eval_subsample=200
+      inherited from trial 1262''s config (job_datasaving_parent.sh finale now sets 10000, @7409c64a); full-val eval-only
+      re-read FA-ccin2p3-d2d34dd7 (tools/eval_best_val.py EVAL_FULL=1). Per-process val NLL falls through the run on 26 of
+      28, noisy in the stable phase and steepest in the WSD cooldown, best at the last validation (not converged). Two broken:
+      u dbar -> e+ nu g never learns (val NLL ~0 throughout; standardised mu-MSE 0.78 val, 0.70 train, corr 0.83: underfit,
+      not overfit; largest residuals at m(e nu) 3-6 GeV and at the W pole); u ubar -> t tbar V''s NLL jumps to 100 at the
+      last validation (mu-MSE train 3.1e-7 vs val 1.7e-5 standardised: memorised, sigma collapses). u ubar -> d dbar and e+e-
+      -> e+e-: median residual^2 ~1e-6 as the clean processes, the mean 5e-4 set by a few events (bhabha at sqrt s 68-71 GeV,
+      u ubar -> d dbar at 750-980 GeV). The clean 2->2 processes (e+e- -> gamma gamma, ZH, u ubar -> t tbar) are uniformly
+      10-90x above the old finale (median ~ mean): a level gap, not outliers. Figure analysis/zng_uq/figs/zng_parent_curves.png.'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
