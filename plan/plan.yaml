@@ -35137,8 +35137,7 @@ entries:
       - 'no: reported unresolved by one seed'
   step_waits:
     '5': the results of batches 1, B1, B2
-    '7': the notes-editor reviewer a86a7077b7c67f5b4 (re-check after other agents' pidqn/muon_long fixes) before the commit
-      of benchmark.py's B2 arms; the 8 runs are read (finding 2026-11-18)
+    '7': nothing left but the write-up (step 5); B2 read and committed at fd1a3a6c
     '8': the four B1 DyHPO sweeps ccin2p3:tp_zng_hpo_{zg,zgg,zggg,zgggg} (31 of 32 trials queued; zgggg trial_0007 resubmitted
       by detached zng_gate_windows)
     '9': FA-lxplus-00347f0a (the 64000-step parent)
