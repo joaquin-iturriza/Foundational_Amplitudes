@@ -34221,8 +34221,6 @@ entries:
   next:
     5: 'Write-up in docs/results.tex: the 8 runs flagged by the curve test, the zero-shot read, the figures zng_median_delta,
       zng_delta_z4g, zng_pulls, zng_curves, % src / % claim lines'
-    8: 'Batch B1: DyHPO per n (sweep/sweep_config_tp_zng_hpo_<p>.yaml @e75bcabb, 8 trials, waves 3,3,2), then A_ft from 1262
-      at each best'
     12: Asked Joaquin (2026-11-18 ~02:20) whether to add a second seed at Z+1g (ours 3.2x his median |Delta|, in the 3-10x
       band)
     14: 'Parent (2) stage 1 repair: read the full-val re-read FA-ccin2p3-d2d34dd7 (tools/eval_best_val.py EVAL_FULL=1 @7409c64a;
@@ -35187,11 +35185,6 @@ entries:
       if:
       - 'written and committed: plan evidence with the commit'
       - 'the zero-shot read fails: write up the trained runs alone'
-    8:
-      feeds: our protocol at searched HPs on Z+ng
-      if:
-      - 'a trial passes the curve test: A_ft at its HPs, read as B2'
-      - 'none passes: report the floor, flagged'
     12:
       feeds: whether Z+1g's 3.2x gap to Suprio is resolved
       if:
@@ -35207,7 +35200,6 @@ entries:
         the curve test on mu-MSE, and still repair e+ nu g in the retrain before stage 2'
   step_waits:
     '5': the results of batches 1, B1, B2
-    '8': FA-ccin2p3-824ef059 FA-ccin2p3-6aa590e7 FA-ccin2p3-c5eefd77 FA-ccin2p3-6539ffc6
     '14': FA-lxplus-57f6d2cb
   findings:
   - at: '2026-11-17T11:18:43+00:00'
