@@ -12,5 +12,6 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-python tools/eval_best_val.py "$@"
-[ "${LIVE_TOO:-0}" = 1 ] && EVAL_LIVE=1 python tools/eval_best_val.py "$@"
+python tools/eval_best_val.py "$@" || exit $?
+# an if, not `[ ] &&`: as the last line that returned 1 without LIVE_TOO and SLURM marked every clean read FAILED
+if [ "${LIVE_TOO:-0}" = 1 ]; then EVAL_LIVE=1 python tools/eval_best_val.py "$@"; fi
