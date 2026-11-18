@@ -35321,6 +35321,14 @@ entries:
       HPs pass the curve test only at n=1; there they beat the 12,500-step hp1677 scratch run 2.3x and the fine-tune not (1.06x);
       at n=2-4 the floor of our protocol (flagged, curve test fails) is within 1.1-1.9x of B2 and B2 stays our best arm everywhere
       but scratch Z+1g. Every gap to Suprio''s network within 10x (one seed).'
+  - at: '2026-11-18T23:33:20+00:00'
+    text: '2026-11-19 first parent FA-lxplus-00347f0a on its whole val pools (lxplus re-read FA-lxplus-44ab7dd7, parent_read.py
+      fullval @4499a3aa, figure zng_parent_vs_finale v2): geometric-mean MSE(ln|M|^2) over the 28 1.11e-4 vs the old finale
+      1.02e-5 = 10.9x (200-event read 9.8x), lower on 6 of 28; u d~ -> e+ nu g 4.18 (2153x), u u~ -> t t~ V 1.08e-4 (25279x),
+      u u~ -> d d~ 2.6e-3 (2060x), bhabha 2.6e-3 (466x). The 200-event read held per process (squares and triangles overlap).
+      CC frozen-stats read FA-ccin2p3-76be39e7 agrees with lxplus to 0.22% on the 25 processes whose val pools match (EVAL_FROZEN
+      validated). Design outcome: fails (curve test, and >10x) -> retrain FA-lxplus-57f6d2cb (W column + whole-pool validation)
+      running.'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
