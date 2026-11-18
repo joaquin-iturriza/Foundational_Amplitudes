@@ -34234,6 +34234,8 @@ entries:
     11: Asked Joaquin (2026-11-18 ~02:00) whether to apply the notes-editor's pidqn wording (token 14-20% lower within trained
       classes; HD4 [0.69,0.89] excludes 1) and its muon_long wording; both block every commit (reviewer agent a86a7077b7c67f5b4
       holds the lock)
+    12: Asked Joaquin (2026-11-18 ~02:20) whether to add a second seed at Z+1g (ours 3.2x his median |Delta|, in the 3-10x
+      band)
   done_when: null
   notes_ref: null
   match: zng_uq_*,tp*_zng_*
@@ -35128,6 +35130,11 @@ entries:
       if:
       - 'Joaquin takes the reviewer''s pidqn wording: a worker applies it'
       - 'Joaquin keeps it: the reviewer is told his word'
+    12:
+      feeds: whether Z+1g's 3.2x gap to Suprio is resolved
+      if:
+      - 'Joaquin says yes: a second seed of his and our Z+1g run, ~1 GPU-h each'
+      - 'no: reported unresolved by one seed'
   step_waits:
     '5': the results of batches 1, B1, B2
     '7': the notes-editor reviewer a86a7077b7c67f5b4 (re-check after other agents' pidqn/muon_long fixes) before the commit
