@@ -34221,8 +34221,6 @@ entries:
   next:
     5: 'Write-up in docs/results.tex: the 8 runs flagged by the curve test, the zero-shot read, the figures zng_median_delta,
       zng_delta_z4g, zng_pulls, zng_curves, % src / % claim lines'
-    6: 'Batch (1): Suprio''s LLoCa-Transformer by his train_shared.sh (RUN_NETS=lloca, het, seed 0), scripts/job_uq_ext.sh
-      @e75bcabb: smoke UQ_BUILD=1 RUN_N=1 50 steps, then RUN_N=1..4 at limits from the smoke''s s/step'
     7: 'Batch B2: our setup under Suprio''s protocol, job_kit.sh A and A_ft x Z+1..4g (batch 1024, Adam 1e-3, RLROP 0.3/10,
       ES 20 val, val/1000, 2e5 steps, clip 5, select NLL): Z+4g smoke T=50 then 8 runs'
     8: 'Batch B1: DyHPO per n (sweep/sweep_config_tp_zng_hpo_<p>.yaml @e75bcabb, 8 trials, waves 3,3,2), then A_ft from 1262
@@ -35102,11 +35100,6 @@ entries:
       if:
       - 'written and committed: plan evidence with the commit'
       - 'the zero-shot read fails: write up the trained runs alone'
-    6:
-      feeds: Suprio's median |Delta|, |Delta| on Z+4g and pulls beside ours
-      if:
-      - 'smoke writes preds_test_0.npz, fallback, plots: the four production jobs'
-      - 'smoke fails: fix the launch path, smoke again'
     7:
       feeds: whether his training protocol closes our gap
       if:
@@ -35129,7 +35122,6 @@ entries:
       - 'Joaquin takes the notes-editor wording: a worker applies it, then the Z+ng paragraph commits'
   step_waits:
     '5': the results of batches 1, B1, B2
-    '6': FA-ccin2p3-745b9c75 FA-ccin2p3-ba3b8896 FA-ccin2p3-8790c95a FA-ccin2p3-d4ce62b8
     '7': the notes-editor reviewer a86a7077b7c67f5b4 (re-check after other agents' pidqn/muon_long fixes) before the commit
       of benchmark.py's B2 arms; the 8 runs are read (finding 2026-11-18)
     '8': the four B1 DyHPO sweeps ccin2p3:tp_zng_hpo_{zg,zgg,zggg,zgggg} (31 of 32 trials queued; zgggg trial_0007 resubmitted
