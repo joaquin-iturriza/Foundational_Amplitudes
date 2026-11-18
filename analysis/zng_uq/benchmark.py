@@ -25,6 +25,11 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 PROCS = {1: "zg", 2: "zgg", 3: "zggg", 4: "zgggg"}
 NETS = {"slim": "LGATr-slim", "lloca": "LLoCa-Transformer", "transformer": "Transformer", "mlp": "MLP"}
 OURS = {"A": "from scratch", "A_ft": "fine-tuned"}
+SP = ", Suprio's protocol"
+# (mode, run-dir suffix, label, val every n steps): the 12,500-step runs at kit_hpo_uug_T hp1677, then B2 (D484): the
+# same network under Suprio's protocol (Adam 1e-3, batch 1024, RLROP, early stopping, <= 2e5 steps, validation every 1000)
+ARMS = [(m, "t12500", lab, None) for m, lab in OURS.items()] + \
+       [(m, "t200000_suprio_protocol", lab + SP, 1000) for m, lab in OURS.items()]
 ZS = "pretraining only, zero-shot"
 DBINS = np.logspace(-8, 1, 91)          # |Delta| bins
 PBINS = np.linspace(-6, 6, 121)         # pull bins
@@ -56,8 +61,8 @@ def collect(theirs, out):
             test_idx = f["split_idx/test"][:]
             # the UQ repo standardises log|M|^2 with the training events' mean/std (README_uq; first 5e5 = our n_train)
             std_train = float(np.std(np.log(10.0) * f["bulk_train/bulk/log10_me2"][:500000]))
-        for mode, label in OURS.items():
-            for d in sorted(glob.glob(os.path.join(root, f"kit_{mode}_uq_{p}_me2_n500000_t12500*"))):
+        for mode, suffix, label, _ in ARMS:
+            for d in sorted(glob.glob(os.path.join(root, f"kit_{mode}_uq_{p}_me2_n500000_{suffix}"))):
                 if "smoke" in d:
                     continue
                 kb = os.path.join(d, "kit_benchmark")
@@ -106,14 +111,19 @@ def plot(path, curves=None):
     ps.use()
     d = json.load(open(path))
     col = {"from scratch": ps.C.blue, "fine-tuned": ps.C.vermillion, ZS: "k"}
-    arms = [a for a in list(OURS.values()) + [ZS] if any(v["arm"] == a for v in d["runs"].values())]
+    col.update({a + SP: col[a] for a in OURS.values()})
+    ls = lambda a: "--" if a.endswith(SP) else "-"
+    # legend labels: ", Suprio" = trained under Suprio's protocol
+    lab = lambda a: {ZS: "zero-shot", NETS["lloca"]: "Suprio's network"}.get(a, a.replace("from scratch", "scratch").replace(SP, ", Suprio"))
+    col.update({NETS["lloca"]: ps.C.green})
+    arms = [a for a in [x[2] for x in ARMS] + [ZS] + list(NETS.values()) if any(v["arm"] == a for v in d["runs"].values())]
     figs = os.path.join(HERE, "figs")
     os.makedirs(figs, exist_ok=True)
     ours = lambda a, key: sorted((v["n_gluons"], v[key]) for v in d["runs"].values() if v["arm"] == a)
     # (a)
     fig, axl = ps.figure()
     for a in arms:
-        axl.plot(*zip(*ours(a, "median_abs_delta")), "o-", color=col[a], label=a)
+        axl.plot(*zip(*ours(a, "median_abs_delta")), "o", linestyle=ls(a), color=col[a], label=lab(a))
     axl.set_ylabel(r"median $|\Delta|$, $\Delta=|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2-1$")
     axl.set_yscale("log"); axl.set_xlabel("number of gluons $n$"); axl.set_xticks([1, 2, 3, 4])
     ps.legend(axl, "upper left")
@@ -122,7 +132,7 @@ def plot(path, curves=None):
     fig, ax = ps.figure()
     for a in arms:
         h = np.asarray(d["runs"][f"{a}|4"]["hist_abs_delta"], float)
-        ax.stairs(h / h.sum(), d["bins_abs_delta"], color=col[a], label=a)
+        ax.stairs(h / h.sum(), d["bins_abs_delta"], color=col[a], linestyle=ls(a), label=lab(a))
     ax.set_xscale("log"); ax.set_xlabel(r"$|\Delta|$, $\Delta=|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2-1$")
     ax.set_ylabel("fraction of test events"); ps.legend(ax, "upper left"); ps.process_label(ax, PROC_LAB[4])
     ps.save(fig, os.path.join(figs, "zng_delta_z4g"))
@@ -132,7 +142,7 @@ def plot(path, curves=None):
     for n, ax in zip((1, 2, 3, 4), axs.flat):
         for a in arms:
             h = np.asarray(d["runs"][f"{a}|{n}"]["hist_pull"], float)
-            ax.stairs(h / h.sum(), b, color=col[a], label=a)
+            ax.stairs(h / h.sum(), b, color=col[a], linestyle=ls(a), label=lab(a))
         ax.plot(x, np.exp(-x ** 2 / 2) / np.sqrt(2 * np.pi) * (b[1] - b[0]), "k:", label=r"$\mathcal{N}(0,1)$")
         ax.set_xlabel(r"pull $(\ln|\mathcal{M}|^2-\mu)/\sigma$"); ax.set_ylabel("fraction of test events")
         ps.process_label(ax, PROC_LAB[n])
@@ -141,17 +151,23 @@ def plot(path, curves=None):
     # (d)
     if curves:
         c = json.load(open(curves))
-        fig, axs = ps.figure(2, 2)
-        for n, ax in zip((1, 2, 3, 4), axs.flat):
-            for m, a in OURS.items():
-                r = c[f"kit_{m}_uq_{PROCS[n]}_me2_n500000_t12500"]
-                st = np.arange(1, len(r["val"]) + 1) * 12500 / len(r["val"])   # evaluations evenly over 12,500 steps
-                ax.plot(st, r["val"], color=col[a], label=a + ", validation")
-                ax.plot(st, r["train"], color=col[a], linestyle="--", label=a + ", training")
-            ax.set_yscale("log"); ax.set_xlabel("training step"); ax.set_ylabel(r"MSE$(\mu)$")
-            ps.process_label(ax, PROC_LAB[n])
-        ps.legend(axs[0][0], "lower left")
-        ps.save(fig, os.path.join(figs, "zng_curves"))
+        for suffix, name in (("t12500", "zng_curves"), ("t200000_suprio_protocol", "zng_curves_suprio")):
+            fig, axs = ps.figure(2, 2)
+            for n, ax in zip((1, 2, 3, 4), axs.flat):
+                for m, _, a, every in [x for x in ARMS if x[1] == suffix]:
+                    r = c.get(f"kit_{m}_uq_{PROCS[n]}_me2_n500000_{suffix}")
+                    if not r:
+                        continue
+                    # the 12,500-step runs: evaluations evenly over 12,500 steps; B2: one every `every` steps
+                    st = np.arange(1, len(r["val"]) + 1) * (every or 12500 / len(r["val"]))
+                    a0 = lab(a)
+                    ax.plot(st, r["val"], color=col[a], label=a0 + ", validation")
+                    ax.plot(st, [np.nan if x is None else x for x in r["train"]], color=col[a], linestyle=":",
+                            label=a0 + ", training")
+                ax.set_yscale("log"); ax.set_xlabel("training step"); ax.set_ylabel(r"MSE$(\mu)$")
+                ps.process_label(ax, PROC_LAB[n])
+            ps.legend(axs[0][0], "lower left")
+            ps.save(fig, os.path.join(figs, name))
 
 
 PARENT = "runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262/sigma_stage"
@@ -182,7 +198,7 @@ def summary(path, curves):
     """The numbers docs/results.tex quotes, one JSON line (verify_claims): per arm (scr, ft, zs) and n the median |Delta|,
     MSE of standardised ln|M|^2, pull std, 68% coverage; per trained run the curve test."""
     d = json.load(open(path))
-    short = {"from scratch": "scr", "fine-tuned": "ft", ZS: "zs"}
+    short = {"from scratch": "scr", "fine-tuned": "ft", ZS: "zs", "from scratch" + SP: "scr_sp", "fine-tuned" + SP: "ft_sp"}
     out = {}
     for v in d["runs"].values():
         if v["arm"] in short:
@@ -191,12 +207,14 @@ def summary(path, curves):
                      pull_std=v.get("pull_std"), cov68=v.get("cov_0.68"), sigma_median=v.get("sigma_median"))
     if curves and os.path.exists(curves):
         c = json.load(open(curves))
-        for m, a in (("A", "scr"), ("A_ft", "ft")):
+        for m, sfx, a in (("A", "t12500", "scr"), ("A_ft", "t12500", "ft"), ("A", "t200000_suprio_protocol", "scr_sp"),
+                          ("A_ft", "t200000_suprio_protocol", "ft_sp")):
             for n, p in PROCS.items():
-                r = c.get(f"kit_{m}_uq_{p}_me2_n500000_t12500")
+                r = c.get(f"kit_{m}_uq_{p}_me2_n500000_{sfx}")
                 if r:
                     out[a][str(n)].update(separation=r["separation"], well=r["well"], best_step=r["best_step"])
-        out["n_well"] = sum(r["well"] for r in c.values())
+        out["n_well"] = sum(r["well"] for k, r in c.items() if k.endswith("t12500"))
+        out["n_well_sp"] = sum(r["well"] for k, r in c.items() if k.endswith("suprio_protocol"))
     print(json.dumps(out))
 
 
