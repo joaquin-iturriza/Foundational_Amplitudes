@@ -30,6 +30,13 @@ SP = ", Suprio's protocol"
 # same network under Suprio's protocol (Adam 1e-3, batch 1024, RLROP, early stopping, <= 2e5 steps, validation every 1000)
 ARMS = [(m, "t12500", lab, None) for m, lab in OURS.items()] + \
        [(m, "t200000_suprio_protocol", lab + SP, 1000) for m, lab in OURS.items()]
+# B1 (D484): our protocol at HPs searched per multiplicity (sweep/sweep_config_tp_zng_hpo_<p>.yaml, DyHPO, 8 trials):
+# scratch = each search's lowest-val trial (curve test passes only at n=1: analysis/zng_uq/data/b1_search.json), scored
+# on the test events by job_kit.sh KIT_SCORE_DIR; fine-tuned from 1262 at the passing trial's HPs (n=1 only)
+SH = ", searched HPs"
+ARMS += [("A_ft", "t12500_b1_hp1612", OURS["A_ft"] + SH, None)]
+B1_SCR = {1: "runs/tp_zng_hpo_zg/trial_1612", 2: "runs/tp_zng_hpo_zgg/trial_0353", 3: "runs/tp_zng_hpo_zggg/trial_0494",
+          4: "runs/tp_zng_hpo_zgggg/trial_0238"}
 ZS = "pretraining only, zero-shot"
 DBINS = np.logspace(-8, 1, 91)          # |Delta| bins
 PBINS = np.linspace(-6, 6, 121)         # pull bins
@@ -61,8 +68,9 @@ def collect(theirs, out):
             test_idx = f["split_idx/test"][:]
             # the UQ repo standardises log|M|^2 with the training events' mean/std (README_uq; first 5e5 = our n_train)
             std_train = float(np.std(np.log(10.0) * f["bulk_train/bulk/log10_me2"][:500000]))
-        for mode, suffix, label, _ in ARMS:
-            for d in sorted(glob.glob(os.path.join(root, f"kit_{mode}_uq_{p}_me2_n500000_{suffix}"))):
+        b1 = [(os.path.join(os.environ.get("PROJECT_DIR", "."), B1_SCR[n]), OURS["A"] + SH)]
+        for d, label in [(d, label) for mode, suffix, label, _ in ARMS
+                         for d in sorted(glob.glob(os.path.join(root, f"kit_{mode}_uq_{p}_me2_n500000_{suffix}")))] + b1:
                 if "smoke" in d:
                     continue
                 kb = os.path.join(d, "kit_benchmark")
@@ -112,11 +120,12 @@ def plot(path, curves=None):
     d = json.load(open(path))
     col = {"from scratch": ps.C.blue, "fine-tuned": ps.C.vermillion, ZS: "k"}
     col.update({a + SP: col[a] for a in OURS.values()})
-    ls = lambda a: "--" if a.endswith(SP) else "-"
+    col.update({a + SH: col[a] for a in OURS.values()})
+    ls = lambda a: "--" if a.endswith(SP) else (":" if a.endswith(SH) else "-")
     # legend labels: ", Suprio" = trained under Suprio's protocol
-    lab = lambda a: {ZS: "zero-shot", NETS["lloca"]: "Suprio's network"}.get(a, a.replace("from scratch", "scratch").replace(SP, ", Suprio"))
+    lab = lambda a: {ZS: "zero-shot", NETS["lloca"]: "Suprio's network"}.get(a, a.replace("from scratch", "scratch").replace(SP, ", Suprio").replace(SH, ", searched"))
     col.update({NETS["lloca"]: ps.C.green})
-    arms = [a for a in [x[2] for x in ARMS] + [ZS] + list(NETS.values()) if any(v["arm"] == a for v in d["runs"].values())]
+    arms = [a for a in [x[2] for x in ARMS] + [OURS["A"] + SH, ZS] + list(NETS.values()) if any(v["arm"] == a for v in d["runs"].values())]
     figs = os.path.join(HERE, "figs")
     os.makedirs(figs, exist_ok=True)
     ours = lambda a, key: sorted((v["n_gluons"], v[key]) for v in d["runs"].values() if v["arm"] == a)
@@ -130,7 +139,7 @@ def plot(path, curves=None):
     ps.save(fig, os.path.join(figs, "zng_median_delta"))
     # (b)
     fig, ax = ps.figure()
-    for a in arms:
+    for a in [a for a in arms if f"{a}|4" in d["runs"]]:
         h = np.asarray(d["runs"][f"{a}|4"]["hist_abs_delta"], float)
         ax.stairs(h / h.sum(), d["bins_abs_delta"], color=col[a], linestyle=ls(a), label=lab(a))
     ax.set_xscale("log"); ax.set_xlabel(r"$|\Delta|$, $\Delta=|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2-1$")
@@ -140,7 +149,7 @@ def plot(path, curves=None):
     b = np.asarray(d["bins_pull"]); x = np.linspace(b[0], b[-1], 481)
     fig, axs = ps.figure(2, 2)
     for n, ax in zip((1, 2, 3, 4), axs.flat):
-        for a in arms:
+        for a in [a for a in arms if f"{a}|{n}" in d["runs"]]:
             h = np.asarray(d["runs"][f"{a}|{n}"]["hist_pull"], float)
             ax.stairs(h / h.sum(), b, color=col[a], linestyle=ls(a), label=lab(a))
         ax.plot(x, np.exp(-x ** 2 / 2) / np.sqrt(2 * np.pi) * (b[1] - b[0]), "k:", label=r"$\mathcal{N}(0,1)$")
