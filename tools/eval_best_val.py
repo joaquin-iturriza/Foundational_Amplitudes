@@ -11,6 +11,9 @@ EVAL_LIVE=1 scores the checkpoint's "model" entry alone, as this tool did before
 older checkpoint with EMA on that is the live weights, not the EMA weights validation used.
 EVAL_FULL=1 reads the whole validation pools (data.eval_subsample=null) instead of the run's cap; proc_val_mse is each
 process's mu-MSE of the standardised target (HETEROSC runs).
+EVAL_FROZEN=1 builds on the run's own data_stats.json (as a fine-tune reads its parent's, rebuild_run's route) instead of
+refitting them on this site's train pools: for a run read on a site whose train pools are not the ones it trained on
+(each site generates its own; the finale parent trained on lxplus, read on CC). The val pools must still be the run's.
 """
 import json, os, sys, tempfile
 
@@ -33,6 +36,11 @@ for run_dir in sys.argv[1:]:
         cfg.training.validate_frac = 0; cfg.training.validate_every_n_steps = 1   # _validate records every call
         if cfg.get("fine_tune") is not None:
             cfg.fine_tune.pretrained_path = None
+        if os.environ.get("EVAL_FROZEN") == "1":
+            # stats from <pretrained_path>/../../data_stats.json = the run's own; the weights are replaced below
+            own = os.path.join(run_dir, "models", "model_run0_best.pt")
+            cfg.fine_tune.pretrained_path = own if os.path.exists(own) else own + ".gz"
+            cfg.fine_tune.target_stats = "parent"; cfg.fine_tune.offshell_stats = "parent"
         if os.environ.get("EVAL_FULL") == "1":
             cfg.data.eval_subsample = None   # the whole val pools, whatever cap the run trained with
         cfg.run_dir = tempfile.mkdtemp(prefix="evalbest_", dir=os.environ["SCRATCH"])
