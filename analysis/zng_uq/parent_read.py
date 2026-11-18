@@ -5,6 +5,7 @@
     python analysis/zng_uq/parent_read.py read   (reads lxplus) -> analysis/zng_uq/data/parent_vs_finale.json
     python analysis/zng_uq/parent_read.py plot   -> analysis/zng_uq/figs/zng_parent_vs_finale.{png,pdf}
     python analysis/zng_uq/parent_read.py curves -> analysis/zng_uq/figs/zng_parent_curves.{png,pdf}
+    python analysis/zng_uq/parent_read.py diag   (reads lxplus) -> analysis/zng_uq/data/parent_diag.json
 
 Per process, the validation MSE of ln|M|^2 at each run's best checkpoint:
   old finale (tp3_finale trial_0073, MSE loss, per-dataset standardisation): proc_val_losses_no_reg at the lowest
@@ -87,6 +88,47 @@ TEX = {"ee_uu": r"e^+e^-\to u\bar u", "ee_mumu": r"e^+e^-\to\mu^+\mu^-", "ee_num
        "ee_mumu_ew_nlo": r"e^+e^-\to\mu^+\mu^-,\ V_{\rm EW}", "ee_uu_ew_nlo": r"e^+e^-\to u\bar u,\ V_{\rm EW}"}
 
 
+DIAG = r"""
+import json, os, sys
+import numpy as np
+d = sys.argv[1]
+POOL = {"udbar_enug": ("udbar_enug_25-1000GeV", 5), "ee_bhabha": ("ee_bhabha_25-1000GeV", 4),
+        "uubar_ddbar": ("uubar_ddbar_25-1000GeV", 4), "ee_mumu": ("ee_mumu_25-1000GeV", 4), "udbar_taunu": ("udbar_taunu_25-1000GeV", 4)}
+def mass(v): return np.sqrt(np.maximum(v[..., 0] ** 2 - np.sum(v[..., 1:] ** 2, -1), 0))
+out = {}
+for sp in ("val", "train"):
+    z = np.load(d + "/sigma_stage/preds_%s.npz" % sp); names = [str(x) for x in z["names"]]
+    for i, p in enumerate(names):
+        k = z["process_id"] == i; r = (z["pred"][k, 0] - z["truth"][k, 0]) ** 2
+        out.setdefault(p, {})[sp] = dict(mse=float(r.mean()), median=float(np.median(r)), top1_share=float(r.max() / r.sum()),
+                                         corr=float(np.corrcoef(z["pred"][k, 0], z["truth"][k, 0])[0, 1]), n=int(k.sum()))
+        if sp == "val" and p in POOL:
+            # the validated events are the pool's first rows (eval_subsample), matched to the predictions by |M|^2
+            f, n = POOL[p]; a = np.array(np.load(os.path.join(os.environ["DATA_DIR"], f + "_val_smix_amplitudes.npy"), mmap_mode="r")[:k.sum()])
+            mom, amp, rt = a[:, :4 * n].reshape(-1, n, 4), a[:, -1], z["raw_truth"][k, 0]
+            j = np.array([int(np.argmin(np.abs(amp - t) / abs(t))) for t in rt])
+            assert np.max(np.abs(amp[j] - rt) / np.abs(rt)) < 1e-4, p
+            sq, pair = mass(mom[j, 0] + mom[j, 1]), mass(mom[j, 2] + mom[j, 3])
+            o = np.argsort(-r)[:8]
+            out[p]["val_top8"] = [dict(r2=float(r[q]), sqrt_s=float(sq[q]), m_finals12=float(pair[q])) for q in o]
+print("PARENTDIAG " + json.dumps(out))
+"""
+
+
+def diag(out):
+    """Per process, the sigma stage's residuals on its validated and train events (standardised units): MSE, median,
+    the largest event's share, corr(pred, truth); for five processes the 8 largest validation residuals with sqrt(s)
+    and the first two finals' pair mass."""
+    sys.path.insert(0, ROOT)
+    from analysis.common.readers import site_python
+    d = site_python(DIAG, [NEW], "PARENTDIAG", site="lxplus")
+    json.dump(d, open(out, "w"), indent=1)
+    for p, v in sorted(d.items()):
+        print(p, {sp: {k: round(x, 8) for k, x in v[sp].items()} for sp in ("val", "train")})
+        for t in v.get("val_top8", []):
+            print("   ", {k: round(x, 6) for k, x in t.items()})
+
+
 def plot_curves(path):
     """The new parent's validation NLL per process against step (its per_process_metrics.json, the events it validated on)."""
     sys.path.insert(0, ROOT)
@@ -112,4 +154,7 @@ def plot_curves(path):
 
 if __name__ == "__main__":
     data = os.path.join(HERE, "data", "parent_vs_finale.json")
-    {"read": read, "plot": plot, "curves": plot_curves}[sys.argv[1]](data)
+    if sys.argv[1] == "diag":
+        diag(os.path.join(HERE, "data", "parent_diag.json"))
+    else:
+        {"read": read, "plot": plot, "curves": plot_curves}[sys.argv[1]](data)
