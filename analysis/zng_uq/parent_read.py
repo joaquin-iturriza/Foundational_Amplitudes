@@ -432,6 +432,7 @@ def relabel(out):
 REBUILT = r"""
 import glob, hashlib, json, os, re, sys
 import numpy as np
+sys.path.insert(0, os.getcwd())
 import datagen
 site, run = sys.argv[1], sys.argv[2]
 d = os.path.join(datagen.frozen_dir())
