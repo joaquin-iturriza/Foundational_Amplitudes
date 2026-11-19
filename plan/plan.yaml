@@ -17461,6 +17461,17 @@ entries:
       to 37.4M tokens/day (was 56.6 to 37.5); every other number of the 2026-11-19 finding unchanged. Commit of tools/wake_batching.py
       and the two JSONs waits on the repo-reviewer backlog (blocked also by findings 1-2 on analysis/zng_uq/benchmark.py,
       zng_uq_benchmark''s).'
+  - at: '2026-11-19T09:45:25+00:00'
+    text: '2026-11-19 wake audit 23:37-09:21 UTC (main transcript records + runs.db events 7527-7613): waiter 26 wakes = ROUTINE
+      hand-back only 6 (open events before 08998527, live from E7611 09:22Z), CC disk ALERT unchanged 4 (976783b0 was not
+      on CC: CC disk_watch at 70c1fe66 until site sync to d4575fd6 at ~10:50 local), hook-incident ALERT 2, OVERRUN 2 (E7554
+      8 jobs pending 1.2 h, acted on; E7582 1 job pending 1.1 h, kept), RUN broke 3, owner detach DONE 1, RUN_DONE 1, hand-backs
+      with news 7. Agent-finished notices 19, 18 made no model call (absorbed); the one that did (02:09:50, ''waiting on its
+      own background work'', answered ''nothing new'') is now absorbed (a34b19d3, test_notification_absorb unit + replay since
+      11-18 PASS). Stop-hook continuations 23: resume owner 8 (6 in a row 02:38-02:41: main gave E7564-70 to a worker, not
+      the owner, and tried to end 4 times with ''nothing new''), figures not sent 6 (3 at 23:44-23:46: text named the figures
+      without basenames, refusal now says to name basenames, a34b19d3; 1 uncommitted producer, fixed 65acb054; 2 png not yet
+      on disk, fixed 2a0fd2f8), open HANDBACK events spooled mid-turn 5, no live owner 3, OVERRUN acked by main 1.'
   handoff:
     state: '2026-11-17. Figure setup fix done and committed cfe97bf5 (repo-reviewer PASS, backlog at 2e100669), incl. D462
       union range for ps.true_pred_hist; KIT panels and muon_long examples regenerated; steps 22/23 relayed and dropped by
