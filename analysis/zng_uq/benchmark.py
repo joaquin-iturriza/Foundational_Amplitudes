@@ -31,7 +31,8 @@ SP = ", Suprio's protocol"
 ARMS = [(m, "t12500", lab, None) for m, lab in OURS.items()] + \
        [(m, "t200000_suprio_protocol", lab + SP, 1000) for m, lab in OURS.items()]
 # B1 (D484): our protocol at HPs searched per multiplicity (sweep/sweep_config_tp_zng_hpo_<p>.yaml, DyHPO, 8 trials):
-# scratch = each search's lowest-val trial (curve test passes only at n=1: analysis/zng_uq/data/b1_search.json), scored
+# scratch = at n=1 the lowest-val passing trial (tools/kit_curves.py sweep's choice, trial_1612); at n=2..4 no trial
+# passes the curve test (0/8 each, b1_search.json), so each search's lowest-val trial, flagged in every figure, scored
 # on the test events by job_kit.sh KIT_SCORE_DIR; fine-tuned from 1262 at the passing trial's HPs (n=1 only)
 SH = ", searched HPs"
 ARMS += [("A_ft", "t12500_b1_hp1612", OURS["A_ft"] + SH, None)]
@@ -123,7 +124,14 @@ def plot(path, curves=None):
     col.update({a + SH: col[a] for a in OURS.values()})
     ls = lambda a: "--" if a.endswith(SP) else (":" if a.endswith(SH) else "-")
     # legend labels: ", Suprio" = trained under Suprio's protocol
-    lab = lambda a: {ZS: "zero-shot", NETS["lloca"]: "Suprio's network"}.get(a, a.replace("from scratch", "scratch").replace(SP, ", Suprio").replace(SH, ", searched"))
+    # B1 scratch at n where no trial of the search passes the curve test (b1_search.json chosen None: n = 2, 3, 4): the
+    # search's lowest-validation trial, flagged (passed design 2026-11-17: "none passes -> report our setup's floor,
+    # flagged"); drawn as open markers in (a) and named in every legend
+    b1 = json.load(open(os.path.join(HERE, "data", "b1_search.json")))
+    fails = sorted(n for n, p in PROCS.items() if b1[f"tp_zng_hpo_{p}"]["chosen"] is None)
+    flag = ",\nfails curve test, $n=" + ",".join(map(str, fails)) + "$" if fails else ""
+    lab = lambda a: {ZS: "zero-shot", NETS["lloca"]: "Suprio's network", OURS["A"] + SH: "scratch, searched" + flag}.get(
+        a, a.replace("from scratch", "scratch").replace(SP, ", Suprio").replace(SH, ", searched"))
     col.update({NETS["lloca"]: ps.C.green})
     arms = [a for a in [x[2] for x in ARMS] + [OURS["A"] + SH, ZS] + list(NETS.values()) if any(v["arm"] == a for v in d["runs"].values())]
     figs = os.path.join(HERE, "figs")
@@ -132,7 +140,12 @@ def plot(path, curves=None):
     # (a)
     fig, (axl, cell) = ps.figure(2)
     for a in arms:
-        axl.plot(*zip(*ours(a, "median_abs_delta")), "o", linestyle=ls(a), color=col[a], label=lab(a))
+        pts = ours(a, "median_abs_delta")
+        axl.plot(*zip(*pts), "o", linestyle=ls(a), color=col[a], label=lab(a))
+        if a == OURS["A"] + SH:   # the flagged points (no trial passes the curve test) open
+            q = [v for v in pts if v[0] in fails]
+            if q:
+                axl.plot(*zip(*q), "o", linestyle="none", color=col[a], markerfacecolor="white")
     axl.set_ylabel(r"median $|\Delta|$, $\Delta=|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2-1$")
     axl.set_yscale("log"); axl.set_xlabel("number of gluons $n$"); axl.set_xticks([1, 2, 3, 4])
     # the legend in a cell of its own: eight entries in the panel covered the zero-shot curve
@@ -233,9 +246,50 @@ def summary(path, curves):
     print(json.dumps(out))
 
 
+# the target's standardisation std per n, equal in B1's best trials and the B2 runs (their data_stats.json prepd_std,
+# read on CC 2026-11-19): standardised MSE x std^2 = MSE(ln|M|^2)
+STD = {1: 0.7400866884821334, 2: 0.916236411330228, 3: 1.0440505621505058, 4: 1.1233685031095888}
+
+
+def b1b2(curves, search):
+    """zng_b1_vs_b2 (2x2, one panel per n): validation and training MSE(ln|M|^2) of the mean against training events
+    seen (step x batch) for B1's best trial (our protocol at searched HPs: MuonAdamW, WSD, batch 16384, 12,500 steps,
+    validation every 250 steps) and B2 (our network under Suprio's protocol: Adam 1e-3, batch 1024, plateau decay,
+    early stopping, validation every 1000 steps), both from scratch on the same 5e5 training events per n; the
+    training curve is the mean's MSE on 2000 fixed training events (evaluation.train_subsample)."""
+    import sys
+    sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
+    import plot_style as ps
+    ps.use()
+    c, b = json.load(open(curves)), json.load(open(search))
+    fig, axs = ps.figure(ncols=2, nrows=2)
+    for n, ax in zip(PROCS, axs.flat):
+        p = PROCS[n]
+        t1 = next(t for t in b[f"tp_zng_hpo_{p}"]["trials"] if t["file"].startswith(B1_SCR[n].rsplit("trial_", 1)[1].join(["hp", "_"])))
+        t2 = c[f"kit_A_uq_{p}_me2_n500000_t200000_suprio_protocol"]
+        rows = []
+        for t, every, bs, col, lab in ((t1, 12500 / len(t1["val"]), 16384, ps.C.blue, "our protocol, searched HPs"),
+                                       (t2, 1000, 1024, ps.C.vermillion, "Suprio's protocol")):
+            x = (np.arange(len(t["val"])) + 1) * every * bs
+            v, tr = np.array(t["val"]) * STD[n] ** 2, np.array(t["train"]) * STD[n] ** 2
+            ax.plot(x, v, color=col, label=lab + ", validation")
+            ax.plot(x, tr, color=col, linestyle="--", label=lab + ", training")
+            i = int(np.argmin(v))
+            rows.append((lab, x[i], v[i], v[-1], tr[-1], x[-1], v[-1] / tr[-1], v[i] / tr[i]))
+        ax.set_xscale("log"); ax.set_yscale("log")
+        ax.set_xlabel("training events seen"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
+        ps.process_label(ax, rf"$q\bar q\to Z+{n}g$")
+        for r in rows:
+            print(f"n={n} {r[0]:28s} best val {r[2]:.3g} at {r[1]:.3g} events; end val {r[3]:.3g} train {r[4]:.3g} at {r[5]:.3g}; "
+                  f"val/train end {r[6]:.3g}, at best {r[7]:.3g}")
+        print(f"n={n} best val B1/B2 {rows[0][2] / rows[1][2]:.3g}")
+    ps.legend(axs[0][0], "lower left")
+    ps.save(fig, os.path.join(HERE, "figs", "zng_b1_vs_b2"))
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("cmd", choices=["collect", "plot", "summary", "parent"])
+    ap.add_argument("cmd", choices=["collect", "plot", "summary", "parent", "b1b2"])
     ap.add_argument("--theirs", default=os.path.join(os.environ.get("WORK", ""), "ext", "uq_runs", "runs", "prod_het"))
     ap.add_argument("--out", default=os.path.join(HERE, "data", "benchmark.json"))
     ap.add_argument("--data", default=os.path.join(HERE, "data", "benchmark.json"))
@@ -245,6 +299,8 @@ def main():
         collect(a.theirs, a.out)
     elif a.cmd == "parent":
         parent(os.path.join(HERE, "data", "parent_bbx.json"))
+    elif a.cmd == "b1b2":
+        b1b2(a.curves, os.path.join(HERE, "data", "b1_search.json"))
     elif a.cmd == "plot":
         plot(a.data, a.curves)
     else:
