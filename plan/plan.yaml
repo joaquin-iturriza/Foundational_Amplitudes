@@ -35511,6 +35511,14 @@ entries:
       B1''s train MSE falls 40-140x at n=2-4 against 3-13x on val (val/train 21-68 at the end, the curve-test failure); B2''s
       val/train ends at 1.6-5.4. Best val MSE B1/B2: 0.66, 0.14, 1.29, 1.72 (n=1..4), while test median |Delta| has B1 1.2-1.8x
       worse at every n.'
+  - at: '2026-11-19T00:54:50+00:00'
+    text: '2026-11-19 trial 1262 (catalog_v4 long pretraining, dimensionless inputs, internal_mass_pdgs [23,6,25]) per-class
+      val MSE(ln|M|^2), sigma-stage best mu on its 200 scored val events per class (parent_read.py w1262 @53a1fcc5, data/w1262.json,
+      fig zng_w1262): the 12 charged-current classes with e/mu + neutrino and all outside legs massless sit at median 6.3
+      (0.62-8.3; 99th percentile of the 1153 classes, run median 0.016); the 11 tau + neutrino classes at median 0.13 (u d~
+      -> tau nu 2.1e-4), the 60 Z lepton-pair classes at 0.195 (2->2 1e-5 to 1e-4; 2->3 with gluon 8e-4 to 6e-3). So 1262
+      has the same W failure as the new parent; at 12 of 1153 classes (1%) it does not move a median over the catalog, which
+      is why the dimensionless-input test on medians did not show it.'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
