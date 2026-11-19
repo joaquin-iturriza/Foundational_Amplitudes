@@ -15799,7 +15799,7 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-046cc7d3
-    commit: cfe97bf5
+    commit: 6d067301
     paths:
     - .claude/hooks/notification_absorb.py
     - .claude/hooks/owner_handoff.py
@@ -15934,6 +15934,7 @@ entries:
     - analysis/agent_redesign/usage_report_v2.json
     - analysis/agent_redesign/usage_windows.json
     - analysis/agent_redesign/wake_batching.json
+    - analysis/agent_redesign/wake_batching_after.json
     - analysis/agent_redesign/wake_batching_all.json
     - analysis/agent_redesign/wake_batching_baseline.json
     - analysis/kit_benchmark/figs/paper
