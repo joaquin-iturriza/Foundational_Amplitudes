@@ -17456,6 +17456,14 @@ entries:
       the owner, and tried to end 4 times with ''nothing new''), figures not sent 6 (3 at 23:44-23:46: text named the figures
       without basenames, refusal now says to name basenames, a34b19d3; 1 uncommitted producer, fixed 65acb054; 2 png not yet
       on disk, fixed 2a0fd2f8), open HANDBACK events spooled mid-turn 5, no live owner 3, OVERRUN acked by main 1.'
+  - at: '2026-11-19T09:46:48+00:00'
+    text: '2026-11-19 step 23 fixes: a34b19d3 (absorb ''waiting on its own background work'' notices; figures refusal asks
+      for basenames), b-next commit: notification_absorb mid_turn(): a hand-back arriving while the main session''s last assistant
+      message called a tool is not spooled (folds into the running turn); replay on the transcript: E7531, E7534, E7541, E7609
+      mid-turn (would fold, 4 Stop-hook continuations saved), E7527 and controls E7535, E7586 idle (still spooled). CC synced
+      to d4575fd6 so disk_watch 976783b0 is live there. Open proposals: OVERRUN on a pending job only beyond site pick''s
+      predicted wait (E7582 fired at 1.1 h pending); the main session''s ''nothing new'' texts and the E7564-70 routing are
+      conduct under existing CLAUDE.md rules.'
   handoff:
     state: '2026-11-17. Figure setup fix done and committed cfe97bf5 (repo-reviewer PASS, backlog at 2e100669), incl. D462
       union range for ps.true_pred_hist; KIT panels and muon_long examples regenerated; steps 22/23 relayed and dropped by
