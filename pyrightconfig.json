@@ -1,0 +1,5 @@
+{
+  "exclude": ["worktrees", ".venv*", "**/__pycache__", ".git"],
+  "venvPath": ".",
+  "venv": ".venv-cpu"
+}
