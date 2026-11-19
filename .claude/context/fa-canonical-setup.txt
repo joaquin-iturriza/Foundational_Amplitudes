@@ -29,5 +29,4 @@ run config disagrees with this table, the table wins.
 | EMA (`ema` top-level flag) | swept `{false,true}` × `ema_decay∈[0.9,0.999]`; not settled (the big-run DyHPO and the catalog quick sweeps chose it on, the catalog wave's best had it off) | open |
 | fine-tune | full retrain + layer-decay; `lr_scale∈[0.1,10]@1`, `layer_decay∈[0.75,1.0]` | fixed |
 
-Sweep search ranges: HPO rule 3 (section fa-sweeps-and-hpo). Quick tests pass `evaluation.train_subsample=2000` (the
-post-training train-split pass otherwise runs the whole pool).
+Sweep search ranges: HPO rule 3 (section fa-sweeps-and-hpo). Quick tests pass `evaluation.train_subsample=2000` (default 10000 per process).
