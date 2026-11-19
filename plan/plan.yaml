@@ -16337,9 +16337,9 @@ entries:
     '24': '2026-11-22'
   owner:
     agent: ab33cfe08e8f1ac89
-    state: stopped
+    state: working
     since: '2026-11-19T00:02:30+00:00'
-    state_at: '2026-11-19T09:47:42.564000+00:00'
+    state_at: '2026-11-19T11:49:39.972000+00:00'
     context: 193004
     context_at: '2026-11-19T10:05:21+00:00'
   designs:
