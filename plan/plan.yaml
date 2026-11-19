@@ -34688,8 +34688,25 @@ entries:
       parent and transfer sections; plan findings 2026-11-18/19. Joaquin''s messages 2026-11-14T04:31 (a pasted SciPost LaTeX
       template, no instruction), 2026-10-06T00:17 (the October transfer-study plan, not this parent) and 2026-11-10T02:08
       (file uploads for the KIT slides) do not touch this run''s lr or the W column.'
-    blocks_steps: &id001
+    blocks_steps:
     - 17
+  - ask: 'Scope: seeds (your D492, ''I don''t see a reason to do more seeds now'') or a different measure for the protocol
+      follow-up. The protocol test held each arm''s learning rate fixed across a 16x batch change, so it is no comparison.
+      The best-against-best fix (each arm''s own 8-trial DyHPO search per n, ~261 GPU-h) cannot resolve it at one seed: our
+      network under Suprio''s protocol beats our searched setup by only 1.1-1.9x in test median |Delta| (and is worse on best
+      validation MSE at n=1,2), inside the 3x that one seed resolves. Options: (1) two more seeds of B1 and B2 at every n
+      first (16 runs; B2 runs took 2.9-4.2 h each, so roughly 30-50 GPU-h, an estimate) to see whether the gap is real before
+      decomposing it; (2) decompose on what the two protocols clearly differ on, the end validation/training ratio (B1 21-68
+      against B2 1.6-5.4 at n=2-4), with the same searches (~261 GPU-h); (3) drop the decomposition. Which?'
+    at: '2026-11-19T18:18:33+00:00'
+    searched: 'CLAUDE.md feature rule and GPU budget; site decisions D241, D484-D498 (D492: no more seeds now; D498 covered
+      single protocol-test runs only); docs/results.tex zng paragraphs; design reviewer FIX 2026-11-19. Joaquin''s messages
+      2026-11-14T04:31 (a pasted SciPost LaTeX template, no instruction), 2026-11-10T02:08 (file uploads for the KIT slides)
+      and 2026-11-06T04:28 (worktrees, pp sampling, het loss, sign head; before this entry existed) do not touch seeds or
+      this decomposition.'
+    blocks: the protocol follow-up step
+    blocks_steps: &id001
+    - 18
   owner:
     agent: a4d03f2a6af185e35
     state: working
@@ -36396,21 +36413,22 @@ entries:
       protocol_test_{lxplus,cc}.json; figs zng_ttv_relabel, zng_parent_vs_finale, zng_parent_w_curves, zng_parent_stab, zng_b1_vs_b2.
       Commits since repo-review watermark 48cce8ed: c0851757, 79c87112, 3c908baf, eba6ddb9, kit_curves --site, b1b2 arms.'
     written: '2026-11-19T13:53:09+00:00'
-  ask: 'Scope: a one-HP change (the peak learning rate) of the W retrain, which D241 keeps for your yes. The retrained ladder+star
-    parent (with the W boson added to its propagator list, a change you did not ask for) trains unstably at peak lr 3.8e-3:
-    its training het. loss climbs from about -5 to above 0 between steps 25000 and 55000, its median grad norm reaches about
-    1e6 against the first parent''s 1e2-1e3, with 24 skipped non-finite steps (zng_parent_stab); it ends 27x above the old
-    finale on the 28-process geometric-mean val MSE, against the first parent''s 6.6x. Proposal: rerun it once with the peak
-    lr halved to 1.9e-3, everything else equal (~8 GPU-h on lxplus), read against the first parent and the old finale on the
-    same pools. Yes, or would you rather drop the W (back to the first parent, u d~ -> e+ nu g unlearned), or run a DyHPO
-    sweep of the parent setup with the W?'
-  waiting_since: '2026-11-19T09:27:16+00:00'
-  searched: 'site decisions --project FA (D241, D483-D498; parent, stage 2, lr: nothing on this run''s lr); docs/results.tex
-    parent and transfer sections; plan findings 2026-11-18/19. Joaquin''s messages 2026-11-14T04:31 (a pasted SciPost LaTeX
-    template, no instruction), 2026-10-06T00:17 (the October transfer-study plan, not this parent) and 2026-11-10T02:08 (file
-    uploads for the KIT slides) do not touch this run''s lr or the W column.'
+  ask: 'Scope: seeds (your D492, ''I don''t see a reason to do more seeds now'') or a different measure for the protocol follow-up.
+    The protocol test held each arm''s learning rate fixed across a 16x batch change, so it is no comparison. The best-against-best
+    fix (each arm''s own 8-trial DyHPO search per n, ~261 GPU-h) cannot resolve it at one seed: our network under Suprio''s
+    protocol beats our searched setup by only 1.1-1.9x in test median |Delta| (and is worse on best validation MSE at n=1,2),
+    inside the 3x that one seed resolves. Options: (1) two more seeds of B1 and B2 at every n first (16 runs; B2 runs took
+    2.9-4.2 h each, so roughly 30-50 GPU-h, an estimate) to see whether the gap is real before decomposing it; (2) decompose
+    on what the two protocols clearly differ on, the end validation/training ratio (B1 21-68 against B2 1.6-5.4 at n=2-4),
+    with the same searches (~261 GPU-h); (3) drop the decomposition. Which?'
+  waiting_since: '2026-11-19T18:18:33+00:00'
+  searched: 'CLAUDE.md feature rule and GPU budget; site decisions D241, D484-D498 (D492: no more seeds now; D498 covered
+    single protocol-test runs only); docs/results.tex zng paragraphs; design reviewer FIX 2026-11-19. Joaquin''s messages
+    2026-11-14T04:31 (a pasted SciPost LaTeX template, no instruction), 2026-11-10T02:08 (file uploads for the KIT slides)
+    and 2026-11-06T04:28 (worktrees, pp sampling, het loss, sign head; before this entry existed) do not touch seeds or this
+    decomposition.'
+  blocks: the protocol follow-up step
   blocks_steps: *id001
-  checked_until: '2026-11-19T14:21:06+00:00'
 - id: dan_zeroshot_v4
   title: Catalog_v4 pretraining zero-shot on Daniel's held-out split
   question: How does our best catalog_v4 pretraining (trial 1262) do zero-shot on the held-out processes of Daniel's catalog
