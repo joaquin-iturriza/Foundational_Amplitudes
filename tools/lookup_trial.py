@@ -3,13 +3,15 @@
 each answered by a low-effort Explore agent per arm, the arms differing only in the tool the brief tells it to use.
 
     python3 tools/lookup_trial.py brief TASK ARM        the brief given to the agent (question identical across arms)
-    python3 tools/lookup_trial.py record TASK ARM AGENT_ID   score the agent's answer, count its tokens and tool calls
-    python3 tools/lookup_trial.py report [--fig BASE]   per arm: correct, tokens and tool calls per task; the figure
+    python3 tools/lookup_trial.py record TASK ARM AGENT_ID [--hand ok|wrong]   score the agent's answer, count its tokens and tool calls
+    python3 tools/lookup_trial.py report [--arms A,B] [--fig BASE]   per arm: correct, tokens and tool calls per task; the figure
 
 Arms: grep (as now), lsp (pyright LSP tool), graph (graphify CLI queries via Bash), batch (tools/batch.py).
 Tokens of an agent = sum over its API calls (deduplicated by message id) of input + cache read + cache write + output,
-as tools/wake_batching.py counts them. Correct = every expected file:function named, and for a who-calls task no
-non-test .py file outside the expected set. Records: analysis/agent_redesign/lookup_trial.json.
+as tools/wake_batching.py counts them. Correct (code) = each expected (file, function) named on
+one answer line, files matched by whole path components and functions exactly, and for a who-calls task no file
+outside the expected set; tool calls = distinct tool_use ids on assistant lines. Recall answers: a blind hand read
+decides (record --hand ok|wrong); the substring check is an aid. Records: analysis/agent_redesign/lookup_trial.json.
 """
 import glob, json, os, re, sys
 
@@ -33,11 +35,11 @@ RECALL = {
                     "(Muon's lead no longer 'grows with the horizon'; the particle-ID token '14-20% lower') and he "
                     "replied 'I don't remember saying yes to this'. Did he ever say yes to that change? Name the "
                     "record that asked him (entry and date) and quote any words of his on it.",
-                    ["zng_uq_benchmark", "2026-11-17"], None),
+                    ["zng_uq_benchmark", "2026-11-17", "never"], None),
     "b1_n1_scope": ("For the Z+ng protocol test of 2026-11-19, what did Joaquin approve for arm (a)'s "
                     "hyperparameters? Quote his words and the decision's recorded scope, with date and time, and say "
                     "whether the design that ran used the same hyperparameters.",
-                    ["those runs can go", "n=1 searched", "own"], None),
+                    ["those runs can go", "n=1 searched", "each n"], None),
 }
 
 # id: (question, expected "file:function" strings, who-calls: the allowed file set for precision, else None)
@@ -46,7 +48,7 @@ _CACHED = ["mix_compose.py", "datagen.py", "prebuild_recipes.py", "mg5_pipeline_
 TASKS = {
     "assemble_callers": ("Which non-test code calls mg5_pipeline_final.lhe_assemble? Give each caller's file and "
                          "enclosing function.", ["tools/lhe_parts.py:_run_task"],
-                         ["tools/lhe_parts.py", "mg5_pipeline_final.py"]),
+                         ["tools/lhe_parts.py"]),
     "is_cached_callers": ("List every non-test Python file that calls datagen._is_cached (datagen.py itself "
                           "included if it calls it).", _CACHED, _CACHED),
     "val_combine": ("Where, during validation, is the combined val_loss_no_reg computed from the per-process "
@@ -103,7 +105,7 @@ def brief(task, arm):
 
 def usage(agent):
     """(tokens, tool calls, final answer text) of one agent's transcript."""
-    seen, tok, calls, last = set(), 0, 0, ""
+    seen, seen_tools, tok, calls, last = set(), set(), 0, 0, ""
     for f in glob.glob(SUB % agent):
         for line in open(f, errors="replace"):
             try:
@@ -111,10 +113,11 @@ def usage(agent):
             except ValueError:
                 continue
             m = d.get("message")
-            if not (isinstance(m, dict) and m.get("role") == "assistant"):
-                continue
+            if d.get("type") != "assistant" or not isinstance(m, dict):
+                continue   # api-request-blob lines repeat each call
             for c in m.get("content") or []:
-                if c.get("type") == "tool_use":
+                if c.get("type") == "tool_use" and c.get("id") not in seen_tools:
+                    seen_tools.add(c.get("id"))
                     calls += 1
                     if c.get("name") == "SubagentHandback":
                         calls -= 1
@@ -129,37 +132,55 @@ def usage(agent):
     return tok, calls, last
 
 
+def _pairs(answer):
+    """(path, function) per answer line: path relative to the checkout, function the last dotted name or ''."""
+    out = []
+    for line in answer.replace("`", "").splitlines():
+        m = re.search(r"([\w./-]+\.py)(?::(?:\d+:?)?\s*([\w.<>]+))?", line)
+        if m:
+            path = m.group(1).replace("/home/joaquin/work/FA/", "").lstrip("./") if not m.group(1).startswith(
+                ".claude") else m.group(1)
+            out.append((path, (m.group(2) or "").split(".")[-1]))
+    return out
+
+
+def _same(path, want):
+    return re.sub(r"^worktrees/[^/]+/", "", path) == want   # relative to the checkout (or a worktree of it)
+
+
 def correct(task, answer):
     _, want, allowed = TASKS[task]
-    a = answer.replace("`", "")
-    if task in RECALL:
-        low = a.lower().replace("\u2019", "'")
+    if task in RECALL:   # aid only: a blind hand read of every recall answer decides (record --hand)
+        low = answer.lower().replace("\u2019", "'")
         return all(w.lower() in low for w in want)
-    ok = all(w.split(":")[0] in a and w.split(":")[-1].split("/")[-1].replace(".py", "") in a for w in want)
-    if allowed is not None:
-        named = {p.lstrip("./") for p in re.findall(r"[\w./-]+\.py", a)}
-        named = {p.replace("/home/joaquin/work/FA/", "") for p in named}
-        ok = ok and all(any(p == x or p.endswith("/" + x) for x in allowed) for p in named)
-    return ok
+    pairs = _pairs(answer)
+    for w in want:
+        f, _, fn = w.partition(":")
+        if not any(_same(p, f) and (not fn or q == fn) for p, q in pairs):
+            return False
+    if allowed is not None:   # who-calls: no caller outside the expected files (tests excluded by the question)
+        return all(any(_same(p, x) for x in allowed) for p, _ in pairs)
+    return True
 
 
 def load():
     return json.load(open(REC)) if os.path.exists(REC) else {}
 
 
-def record(task, arm, agent):
+def record(task, arm, agent, hand=None):
     tok, calls, ans = usage(agent)
     r = load()
+    ok = correct(task, ans) if hand is None else hand == "ok"
     r.setdefault(task, {})[arm] = {"agent": agent, "tokens": tok, "tool_calls": calls, "answer": ans,
-                                   "correct": correct(task, ans)}
+                                   "correct": ok, "auto": correct(task, ans), "hand": hand}
     os.makedirs(os.path.dirname(REC), exist_ok=True)
     json.dump(r, open(REC, "w"), indent=1)
     print(task, arm, r[task][arm]["correct"], tok, calls)
 
 
-def report(fig=None):
+def report(fig=None, arms=None):
     r = load()
-    arms = [a for a in ARMS if any(a in v for v in r.values())]
+    arms = arms or [a for a in ARMS if any(a in v for v in r.values())]
     tasks = [t for t in TASKS if all(a in r.get(t, {}) for a in arms)]   # paired tasks only
     out = {}
     for a in arms:
@@ -206,6 +227,9 @@ if __name__ == "__main__":
     if cmd == "brief":
         print(brief(sys.argv[2], sys.argv[3]))
     elif cmd == "record":
-        record(*sys.argv[2:5])
+        a = sys.argv
+        record(*a[2:5], hand=a[a.index("--hand") + 1] if "--hand" in a else None)
     elif cmd == "report":
-        report(sys.argv[sys.argv.index("--fig") + 1] if "--fig" in sys.argv else None)
+        a = sys.argv
+        report(a[a.index("--fig") + 1] if "--fig" in a else None,
+               a[a.index("--arms") + 1].split(",") if "--arms" in a else None)
