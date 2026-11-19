@@ -16,6 +16,7 @@ cd "$PROJECT_DIR"
 C=${VL_CLASSES:-$(python -c "import yaml; print(' '.join(p['name'] for p in yaml.safe_load(open('recipes/catalog_v4_heldout_H5.yaml'))['processes']))")}
 echo "VIRT_LABEL_CHECK_START code=$(git rev-parse --short HEAD) classes=$(echo $C | wc -w) n=${VL_N:-200}"
 # VL_FROM_RUN=<run dir> [VL_SAVE=<dir>]: the train and val pools that run loaded, all CPUs on one class at a time
+VL_SAVE=${VL_SAVE//'$SCRATCH'/$SCRATCH}   # site submit --env passes it unexpanded
 if [ -n "${VL_FROM_RUN:-}" ]; then
   for c in $C; do python tools/virt_label_check.py --n "${VL_N:-200}" --workers "${SLURM_CPUS_PER_TASK:-1}" \
     --from-run "$VL_FROM_RUN" ${VL_SAVE:+--save "$VL_SAVE"} "$c"; done

@@ -397,8 +397,10 @@ RELABEL = r"""
 import json, os, sys
 import numpy as np
 o = {}
+# FA-lxplus-e3eecae0 got VL_SAVE unexpanded and wrote into the checkout's literal "$SCRATCH" dir (job script fixed since)
+d = next(x for x in (os.path.join(os.environ["SCRATCH"], "zz_vl_ttv"), os.path.join("$SCRATCH", "zz_vl_ttv")) if os.path.isdir(x))
 for role in ("train", "val"):
-    z = np.load(os.path.join(os.environ["SCRATCH"], "zz_vl_ttv", "uubar_ttbar_nlo_%s.npz" % role))
+    z = np.load(os.path.join(d, "uubar_ttbar_nlo_%s.npz" % role))
     o[role] = dict(pool=str(z["pool"]), sqrts=z["sqrts"].tolist(), ok=z["ok"].tolist(),
                    log_ratio=np.log(np.abs(z["relabelled"]) / np.abs(z["stored"])).tolist())
 print("RELABEL " + json.dumps(o))
