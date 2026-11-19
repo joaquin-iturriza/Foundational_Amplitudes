@@ -237,6 +237,32 @@
    "tools": {
     "Bash": 3
    }
+  },
+  "batch2": {
+   "agent": "a39d4028178690785",
+   "tokens": 38749,
+   "tool_calls": 2,
+   "answer": "tools/lhe_parts.py:_run_task\n\nNot checked: dynamic calls such as getattr or string dispatch. The mg5_pipeline_final.py hit is in a docstring, so I did not count it as a caller.",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "Bash": 2
+   }
+  },
+  "lsp2": {
+   "agent": "aa11ab69e37535598",
+   "tokens": 110245,
+   "tool_calls": 7,
+   "answer": "tools/lhe_parts.py:_run_task\n\nI didn't get this from the LSP. workspaceSymbol rejected the folder path, and incomingCalls timed out after 60s. So I grepped for it instead: there's one call, mg.lhe_assemble(...) at line 716. The other hits are comments inside mg5_pipeline_final.py.",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 2,
+    "Bash": 4
+   }
   }
  },
  "is_cached_callers": {
@@ -286,6 +312,32 @@
    "hand": null,
    "tools": {
     "Bash": 4
+   }
+  },
+  "batch2": {
+   "agent": "a812dd369232241b4",
+   "tokens": 37778,
+   "tool_calls": 2,
+   "answer": "datagen.py:ensure_dataset\ndatagen.py:lhe_pp_items\ndatagen.py:_needs_compose\nmix_compose.py:ensure_composed\nprebuild_recipes.py:skip_group\nmg5_pipeline_final.py:lhe_set_aside\nsweep/sweep_manager.py:_spec_fully_cached\ntools/pool_physics.py:stored_block\ntools/check_site_data.py:<module>\ntools/lhe_parts.py:_items\ntools/lhe_parts.py:_run_task\ntools/lhe_parts.py:built\ntools/prune_mixture_pools.py:plan\n\nNot checked: these were matched by name only, so aliased or dynamic calls would be missed. Left out: scripts/job_loop_probes_prep.sh:30, an inline Python call inside a shell script.",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "Bash": 2
+   }
+  },
+  "lsp2": {
+   "agent": "a2d2108fb6c3b97e3",
+   "tokens": 154455,
+   "tool_calls": 8,
+   "answer": "datagen.py:ensure_dataset\ndatagen.py:lhe_pp_items\ndatagen.py:_needs_compose\nmix_compose.py:ensure_composed\nprebuild_recipes.py:skip_group\nmg5_pipeline_final.py:lhe_set_aside\nsweep/sweep_manager.py:_spec_fully_cached\ntools/check_site_data.py:<module>\ntools/lhe_parts.py:_items\ntools/lhe_parts.py:_run_task\ntools/lhe_parts.py:built\ntools/pool_physics.py:stored_block\ntools/prune_mixture_pools.py:plan\n\nNot checked: the LSP incomingCalls call timed out after 60 s, so I used grep and found each enclosing def with awk. If a call sits inside a lambda or a nested function, the name may be off. The check_site_data.py calls run at module level.",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 2,
+    "Bash": 5
    }
   }
  },
@@ -337,6 +389,32 @@
    "tools": {
     "Bash": 2
    }
+  },
+  "lsp2": {
+   "agent": "a2c6b7e69a3bef597",
+   "tokens": 100045,
+   "tool_calls": 6,
+   "answer": "experiment.py:AmplitudeExperiment._validate\n(The combining step is the nested helper _combine in that method, about line 4770, called as val_loss_no_reg = _combine(lnr). base_experiment.py:BaseExperiment._validate is the generic fallback, using np.mean(losses_no_reg).)\nFound with grep. LSP workspaceSymbol was rejected because I gave it a directory path, and I did not try again with a file path.",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 1,
+    "Bash": 4
+   }
+  },
+  "batch2": {
+   "agent": "a50f1fc75e058ea1c",
+   "tokens": 109017,
+   "tool_calls": 5,
+   "answer": "experiment.py:_validate\n\nI found this with batch.py grep. I located the enclosing method with a plain grep of the `def` lines, because batch.py has no lookup for that. Inside `AmplitudeExperiment._validate` (line 4625), the nested helper `_combine` (line 4770) combines the per-process losses. Line 4785 runs `val_loss_no_reg = _combine(lnr)`, and line 4795 appends the result. I did not read what `_combine` does inside. The `np.mean(losses_no_reg)` at `base_experiment.py:2017` is the generic base path, which `_validate` overrides.",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "Bash": 5
+   }
   }
  },
  "ckpt_select": {
@@ -386,6 +464,32 @@
    "hand": null,
    "tools": {
     "Bash": 2
+   }
+  },
+  "lsp2": {
+   "agent": "a122379761d358420",
+   "tokens": 64641,
+   "tool_calls": 4,
+   "answer": "base_experiment.py:BaseExperiment.train",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 1,
+    "Bash": 2
+   }
+  },
+  "batch2": {
+   "agent": "a109eebd65a088120",
+   "tokens": 127978,
+   "tool_calls": 6,
+   "answer": "base_experiment.py:train\n\nNot checked: whether experiment.py overrides train(). The pushed reference names experiment._result_extra, but the code shows that method only reads values at the index train() already chose.",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "Bash": 6
    }
   }
  },
@@ -437,6 +541,32 @@
    "tools": {
     "Bash": 1
    }
+  },
+  "lsp2": {
+   "agent": "a53b0b70ffc454a5d",
+   "tokens": 48328,
+   "tool_calls": 3,
+   "answer": "/home/joaquin/work/FA/losses.py:heteroscedastic_loss",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 1,
+    "Bash": 1
+   }
+  },
+  "batch2": {
+   "agent": "a7b0a300a345d9ae3",
+   "tokens": 89636,
+   "tool_calls": 5,
+   "answer": "losses.py:HeteroscedasticLoss\n\nNot checked: whether the trainer has its own inline NLL (run.py, `_per_event_loss`). batch.py's `def` op crashed on the class lookup, so I used plain grep for that step.",
+   "correct": false,
+   "auto": false,
+   "hand": null,
+   "tools": {
+    "Bash": 5
+   }
   }
  },
  "fold_spool": {
@@ -487,6 +617,32 @@
    "tools": {
     "Bash": 1
    }
+  },
+  "lsp2": {
+   "agent": "aa693234fb141195d",
+   "tokens": 62617,
+   "tool_calls": 4,
+   "answer": ".claude/hooks/notification_absorb.py:mid_turn",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 1,
+    "Bash": 2
+   }
+  },
+  "batch2": {
+   "agent": "a6f90ccebb216cb57",
+   "tokens": 68696,
+   "tool_calls": 4,
+   "answer": ".claude/hooks/notification_absorb.py:mid_turn",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "Bash": 4
+   }
   }
  },
  "freeze_callers": {
@@ -535,6 +691,32 @@
    "auto": true,
    "hand": null,
    "tools": {
+    "Bash": 2
+   }
+  },
+  "batch2": {
+   "agent": "a5f1c5bb8929fee69",
+   "tokens": 35056,
+   "tool_calls": 2,
+   "answer": "experiment.py:init_model\n\nI took this from batch.py's `calls` lookup. Its only other hits were in tests, which you said to skip. I did not check for indirect calls, like ones made through getattr or a string name.",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "Bash": 2
+   }
+  },
+  "lsp2": {
+   "agent": "a9a1693db68eeb459",
+   "tokens": 78312,
+   "tool_calls": 6,
+   "answer": "experiment.py:init_model\n\n(pyright timed out on references/incomingCalls, so I found the call site with grep and checked its enclosing method.)",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 3,
     "Bash": 2
    }
   }
@@ -587,6 +769,32 @@
    "tools": {
     "Bash": 2
    }
+  },
+  "lsp2": {
+   "agent": "a5912206e08f0f0d0",
+   "tokens": 64711,
+   "tool_calls": 4,
+   "answer": "mix_compose.py:compose",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 1,
+    "Bash": 2
+   }
+  },
+  "batch2": {
+   "agent": "ade1c9f76404ed56e",
+   "tokens": 70418,
+   "tool_calls": 4,
+   "answer": "mix_compose.py:compose",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "Bash": 4
+   }
   }
  },
  "lhe_order": {
@@ -631,6 +839,32 @@
    "tokens": 92463,
    "tool_calls": 5,
    "answer": "/home/joaquin/work/FA/mg5_pipeline_final.py:lhe_layout\nNot checked: other places that also hardcode this order (e.g. experiment.py, tools/lhe_parts.py) may re-derive it, but lhe_layout is the one that defines it.",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "Bash": 5
+   }
+  },
+  "lsp2": {
+   "agent": "a066d686120b33d87",
+   "tokens": 144429,
+   "tool_calls": 8,
+   "answer": "mg5_pipeline_final.py:lhe_layout\n\n(LSP was not used: the first call failed because it was given a directory, not a file, and I answered with grep instead. The function returns val [0, nv), then test, then train in the shuffled MadEvent run.)",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 1,
+    "Bash": 6
+   }
+  },
+  "batch2": {
+   "agent": "af5ed38ac87df0ca7",
+   "tokens": 84374,
+   "tool_calls": 5,
+   "answer": "mg5_pipeline_final.py:lhe_layout",
    "correct": true,
    "auto": true,
    "hand": null,
@@ -686,6 +920,32 @@
    "hand": null,
    "tools": {
     "Bash": 3
+   }
+  },
+  "batch2": {
+   "agent": "a79bc33c9763174a7",
+   "tokens": 34931,
+   "tool_calls": 2,
+   "answer": "run.py:main\ntools/sigma_stage.py:<module>",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "Bash": 2
+   }
+  },
+  "lsp2": {
+   "agent": "a76a342a6fb5e1937",
+   "tokens": 106296,
+   "tool_calls": 7,
+   "answer": "run.py:main\ntools/sigma_stage.py:<module> (module-level loop, no enclosing function)\n\nNot checked: the LSP incomingCalls request timed out, so I found the callers with grep.",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 2,
+    "Bash": 4
    }
   }
  }
