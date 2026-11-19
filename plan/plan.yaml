@@ -17285,19 +17285,16 @@ entries:
       has fewer total tool calls and tokens than both grep runs at equal correctness -> brief line and hook change as a diff;
       else dead end. 27: yes if recall reaches 4 of 5 sources (hand read) with fewer tool calls than both now runs -> offer
       recall.py for briefs and hand-offs; else dead end.'
-    fix_at: '2026-11-19T13:14:03+00:00'
-    fix: 'Re-check of the 13:13 design (lookup_trial.py @bfddb0c0). Fixed and confirmed: the (path, function) scoring refuses
-      base_experiment.py:_validate, _validate_start with ''train'', an extra base_experiment caller, an mg5_pipeline_final
-      caller and a missing _is_cached file, and accepts the right answers in plain, dotted-class, line-number and ''- '' list
-      forms (17 of 18 cases I ran); tool calls are distinct tool_use ids on assistant lines; control repeats grep2/now2 and
-      the beat-both rule; hand read decides recall; the prior names the ponytail A/B, sd 0.073, D501, D502, D206. One scorer
-      bug left (check 2/4): _pairs() strips the /home/joaquin/work/FA/ prefix and then lstrip(''./''), so an absolute path
-      to a hook, ''/home/joaquin/work/FA/.claude/hooks/notification_absorb.py:mid_turn'', becomes ''claude/hooks/...'' and
-      fold_spool scores False on a right answer. The startswith(''.claude'') test runs on the unstripped path, so it only
-      protects relative paths. Absolute paths are likely from Explore agents and most likely from the lsp arm (the LSP tool
-      returns absolute file URIs), so this biases correctness against the tested arm in the ''equal correctness'' condition.
-      Fix: strip the checkout prefix (and any worktrees/<x>/) first, then remove only a leading ''./'' (not lstrip of characters);
-      add the absolute .claude path and a file:///home/... URI form to the self-check. Nothing else needs to change.'
+    passed_at: '2026-11-19T13:15:00+00:00'
+    reviewer: 'Three local trials (lookup_trial.py @3531dc6e, batch.py @7830e0aa, recall.py @a0671a53). Arms differ only in
+      the brief''s tool sentence. Ten code answers checked against trunk 9d011b9f by grep and enclosing def; the five recall
+      sources are in the ledger, transcript and plan (D277, D324, D380 at 2026-11-11T03:21:50, D498, zng ask 3d91030c). Check
+      2: the scorer accepts all 21 right and wrong forms I tested as expected, including absolute, file:// and worktree paths,
+      and refuses base_experiment.py:_validate; tool calls are distinct tool_use ids (the api-request-blob doubling is gone).
+      Check 3: the controls run twice (grep and grep2, now and now2), and a tested arm must beat both runs and be 30% below
+      their mean; the model trial''s paired sd is 0.073. Recall is decided by a blind hand read. Check 5 searched: graphify,
+      LSP, pyright, recall, batch, lookup, code mode, Explore in results.tex, plus the ledger (D501, D502, D206) and the entry''s
+      dead ends; the prior now names the ponytail A/B. Checks 8-15 do not apply (no training, no site jobs).'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
