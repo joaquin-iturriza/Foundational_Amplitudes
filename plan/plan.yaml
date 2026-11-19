@@ -34519,17 +34519,27 @@ entries:
     - FA-ccin2p3-7a112608
     - FA-ccin2p3-82eb9944
     - FA-ccin2p3-966a6561
+    - FA-ccin2p3-a652edfc
     - FA-ccin2p3-b4ebd88e
     - FA-ccin2p3-ba9df01f
+    - FA-lxplus-3ea39a5e
     - FA-lxplus-44ab7dd7
+    - FA-lxplus-4e0a55ab
+    - FA-lxplus-547c198d
     - FA-lxplus-57f6d2cb
+    - FA-lxplus-6394cbfc
     - FA-lxplus-7539d95a
-    commit: 02713979
+    - FA-lxplus-8b928927
+    - FA-lxplus-9a0f77c5
+    - FA-lxplus-f3901ad0
+    commit: 7a90efc3
     paths:
     - analysis/zng_uq/benchmark.py
     - analysis/zng_uq/data/benchmark.json
     - analysis/zng_uq/data/paper_mse.json
     - analysis/zng_uq/data/parent_bbx.json
+    - analysis/zng_uq/data/protocol_test_delta_cc.json
+    - analysis/zng_uq/data/protocol_test_delta_lxplus.json
     - analysis/zng_uq/data/zng_curves.json
     - scripts/job_datasaving_parent.sh
     - scripts/job_uq_ext.sh
