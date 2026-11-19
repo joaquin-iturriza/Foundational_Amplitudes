@@ -15794,8 +15794,6 @@ entries:
     24: 'Wake measure after RUN/OVERRUN joined the 10-min debounce (2026-11-19): on or after 2026-11-22 re-run tools/wake_batching.py
       over the 3 days since, against the after-period of step 21; report to Joaquin with its figure, then he decides on owners
       as separate sessions'
-    25: 'Evaluate Joaquin''s three ideas (2026-11-19): graphify, Code Mode, an age-tiered reversible memory; overlap with
-      existing tools, conflicts with rules (no memory files, no new .md, hooks), and a small trial design for each'
     26: 'Trial graphify as a CLI only, in a worktree with its own venv (no hook, no CLAUDE.md block, graphify-out/ outside
       git): build the AST graph of FA''s code only (no docs semantic pass), then 10 past lookup tasks from this session''s
       transcripts (where is X computed / who calls Y), three arms at low effort: grep as now, graph queries via Bash, pyright
@@ -16334,11 +16332,6 @@ entries:
       if:
       - 'wakes not by Joaquin fall well below 28/day: report, sessions likely not needed'
       - 'they stay near 28/day: report with the sessions design question'
-    25:
-      feeds: which of the three FA adopts
-      if:
-      - 'an idea overlaps fully with what exists: say so, no trial'
-      - 'an idea adds something: trial design to Joaquin'
     26:
       feeds: whether a code graph or the LSP cuts lookup cost
       if:
