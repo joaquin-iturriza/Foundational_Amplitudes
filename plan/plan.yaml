@@ -15788,6 +15788,9 @@ entries:
       notifications after a hand-back were already absorbed; owner resumes by peer hand-backs cannot be held (Claude Code
       offers no delivery delay, an owner has no waiter). Also confirm the first run of a held item that ends gets its RUN
       event and RUN_DONE with no manual poll (next 19 fix).'
+    22: 'Open to Joaquin (asked 2026-11-19): (1) the lxplus GPU-h costing fix in site/site_gate.py, refused by the permission
+      classifier; (2) the CLAUDE.md line-24 rewording (drop ''objective''; ''a repair that keeps the setup I asked for''),
+      which blocks the claudemd-keeper pass. Then continue the claudemd-keeper on f49a6b45 and e4e655fa.'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16302,6 +16305,11 @@ entries:
       if:
       - 'saving within or above 11-30% on main per day: keep 10 min'
       - 'below: report to Joaquin with numbers and causes'
+    22:
+      feeds: whether the setup's gates and rules match what Joaquin decided
+      if:
+      - 'he says yes to a change: a mechanical-worker or he applies it, then the reviewer re-checks'
+      - 'he says leave it: record his words, the reviewer re-checks with line 24 as is'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
