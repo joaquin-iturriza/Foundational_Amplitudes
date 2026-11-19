@@ -229,6 +229,9 @@ def report(fig=None, arms=None):
                 if bad:
                     ax.plot(*zip(*bad), "kx", ms=6, label="wrong answer" if i == 0 else None)
         axs[0].set_yscale("log")
+        top = {k: max(r[t][a][k] for t in tasks for a in arms) for k in ("tokens", "tool_calls")}
+        axs[0].set_ylim(10, top["tokens"] * 1e-3 * 1.5)   # explicit: ps.save's layout otherwise crops the bars
+        axs[1].set_ylim(0, top["tool_calls"] + 1)
         axs[0].set_ylabel("tokens to answer [k]")
         axs[1].set_ylabel("tool calls to answer")
         for ax in axs:
