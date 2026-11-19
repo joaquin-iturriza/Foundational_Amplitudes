@@ -34243,6 +34243,10 @@ entries:
       by ~1% (train-minus-val median ln|M|^2 0.008-0.013 per sqrt(s) bin, parent_ttv_pools.json). Read the one-loop labelling
       code history (mg5_pipeline_final.py, tools/nlo_conventions.py) and relabel 50 val events with the current pipeline;
       then make train and val agree, for the retrain''s read and for stage 2'
+    16: 'D498 protocol test read: 8 runs (arm a ''ours at batch 1024'': FA-ccin2p3-5c14c2aa zgggg, 9958966c zggg, 2f8ac2e5
+      zgg, ac047fb1 zg; arm b ''Adam plateau at batch 16384'': d77906e1 zgggg, 9e1b1276 zggg, d57071d3 zgg, d5f02694 zg).
+      Read R = last val/train MSE, best val MSE(ln|M|^2) against B1''s best trial (a) and B2 (b), test median |Delta| (benchmark.py
+      collect); figure zng_b1_vs_b2 extended with both arms; verdict per the passed design''s bands.'
   done_when: null
   notes_ref: null
   match: zng_uq_*,tp*_zng_*
@@ -35502,6 +35506,13 @@ entries:
         retrain on them'
       - 'the current pipeline reproduces the old val: the regenerated train pool is wrong, rebuild it from the old pipeline
         and report'
+    16:
+      feeds: which protocol the Z+ng runs and the parent's fine-tunes use (why B1 ends 21-68x val/train while B2 stays within
+        1.6-5.4x)
+      if:
+      - 'a yes, b no: batch/updates are the cause -> our protocol at small batch for the Z+ng runs'
+      - 'a no, b yes: Muon/WSD cooldown opens the split -> plateau/early-stopping schedule for 5e5-event single-process runs'
+      - 'both or neither / unresolved: both matter -> reported per n, protocol choice to Joaquin'
   step_waits:
     '5': FA-lxplus-57f6d2cb
     '14': FA-lxplus-57f6d2cb
