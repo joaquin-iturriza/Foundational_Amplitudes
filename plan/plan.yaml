@@ -35808,6 +35808,19 @@ entries:
       val: median 0.0084, max 0.016). datagen.mixed_generation on the retrain''s 28 processes flags none (t t~ V now same
       pipeline sha as its train; max |z| of the rest 2.7). md5 lxplus != CC; event by event: same events, momenta differ by
       <= 2.9e-11, labels |ln ratio| <= 4.4e-11, 0 rows above 1e-6 (val and test): floating-point rounding across sites.'
+  - at: '2026-11-19T09:21:27+00:00'
+    text: '2026-11-19 step 14 (parent_read.py reread @3c908baf, job FA-ccin2p3-a3e1e1dc, data/parent_reread.json, figs zng_parent_vs_finale
+      v3, zng_parent_w_curves): old finale, first parent and retrained parent (W 24 added to internal_mass_pdgs, whole-pool
+      validation; the W was not asked by Joaquin) at best weights on the same whole CC val pools after the t t~ V rebuild.
+      Geometric-mean MSE(ln|M|^2) over 28: old finale 1.44e-5 (implied), first parent 9.6e-5 (6.6x old, 7/28 below), retrain
+      3.9e-4 (27x old, 2/28 below). u d~ -> e+ nu g: 4.18 -> 0.45 (old 1.95e-3, 232x). t t~ V on rebuilt pools: retrain 2.3e-6,
+      first parent 1.95e-6, old finale 8.2e-5 (the old finale was trained on the old labels: 19257x its old-pool value 4.3e-9...
+      see json). Retrain worse than first parent on 21/28, worst ee_numu 0.208 (2.45e4x old), uubar_ddbar_nlo 0.317, udbar_taunu
+      0.054. Curves: every process''s val het. loss rises mid-run above its 1/8-run value and falls in the WSD cooldown; spikes
+      at step 21760 (u d~ -> e+ nu g, 4.6e12) and 14080 (u d~ -> tau nu, 1.0e9); curve test fails (separation 2.5). Cross-check:
+      CC re-read equals the run''s own lxplus sigma-stage MSE on processes whose pools match (ee_numu 0.208 vs 0.218, ee_aa
+      1.96e-7 vs 1.89e-7, uubar_ddbar_nlo 0.317 both). Design outcome: gmean >10x and curve test fails -> not stage 2''s parent;
+      the horizon/setup is Joaquin''s call.'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
