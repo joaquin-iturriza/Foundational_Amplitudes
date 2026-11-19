@@ -1572,6 +1572,13 @@ class AmplitudeExperiment(BaseExperiment):
             paths[role] = datagen.ensure_split_set(
                 role_specs, role=role, seed=seed, require_cache=require_cache)
         self._pool_paths = paths     # {role: {name: npy}}: what a probe read checks the physics of (tools/pool_physics.py)
+        mixed = datagen.mixed_generation(paths)
+        if mixed:
+            msg = (f"{len(mixed)} process(es) have train/val/test pools from different generator versions "
+                   f"and labels shifted between them (median ln|M|^2 train - other, combined z): {mixed}")
+            assert bool(self.cfg.data.get("allow_mixed_generation", False)), \
+                msg + "; regenerate the odd pool, or pass ++data.allow_mixed_generation=true to train on them anyway"
+            LOGGER.warning(msg + " (data.allow_mixed_generation=true)")
         # a pool composed at load (mix_compose.py) carries its stored pool's recipe id, its sidecar sits in the job's
         # $TMPDIR: which pools were composed, from which control pool, is written into the run's own record
         composed = datagen.composed_record(paths)

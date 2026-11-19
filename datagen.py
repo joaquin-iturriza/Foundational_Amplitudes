@@ -624,6 +624,55 @@ def composed_record(paths):
     return out
 
 
+def _sqrts_and_logm2(pth):
+    """sqrt(s_hat) (the two incoming legs) and ln|M|^2 of every row of a pool."""
+    a = np.load(pth, mmap_mode="r"); n = (a.shape[1] - 1) // 5
+    p = np.asarray(a[:, :8]).reshape(-1, 2, 4).sum(1)
+    return np.sqrt(np.maximum(p[:, 0] ** 2 - (p[:, 1:] ** 2).sum(1), 0)), np.log(np.abs(np.asarray(a[:, -1])))
+
+
+def mixed_generation(paths, z_max=5.0, n_bins=10):
+    """{process: {role: {train, other, z, shift}}} for the processes in `paths` ({role: {process: npy}}) whose train
+    and val/test pools come from different generator versions (provenance.pipeline_sha256 of the .recipe.json
+    sidecars) AND whose labels disagree: per sqrt(s_hat) decile of the val/test pool, z_i = (median ln|M|^2 of train -
+    that of val/test) / its standard error (1.2533 std / sqrt(n) per pool); flagged when |sum z_i| / sqrt(n_bins) >
+    z_max (a shift of one sign across the energy range). The version alone does not decide: the generator file changes
+    far more often than its labels (26 of 28 processes of the zng parent, 74 of 1153 of trial 1262 differ in
+    version). On the zng parent's pools u u~ -> t t~ (one loop), its train pool regenerated with a ~1% label shift,
+    reads z = 8.3 (val) and 6.1 (test); the other 25 processes of the parent and the 74 of trial 1262 at most 2.7
+    (zng_uq_benchmark, analysis/zng_uq/data/mixed_generation_z.json)."""
+    by = {}
+    for role, d in paths.items():
+        for name, pth in d.items():
+            try:
+                sha = (json.load(open(pth + ".recipe.json")).get("provenance") or {}).get("pipeline_sha256")
+            except (OSError, ValueError):
+                continue
+            if sha:
+                by.setdefault(name, {})[role] = (sha, pth)
+    out = {}
+    for name, r in by.items():
+        if "train" not in r or len({v[0] for v in r.values()}) < 2:
+            continue
+        s_tr, l_tr = _sqrts_and_logm2(r["train"][1])
+        for role in ("val", "test"):
+            if role not in r or r[role][0] == r["train"][0]:
+                continue
+            s_e, l_e = _sqrts_and_logm2(r[role][1])
+            edges = np.quantile(s_e, np.linspace(0, 1, n_bins + 1)); edges[-1] += 1e-9
+            zs, ds = [], []
+            for lo, hi in zip(edges[:-1], edges[1:]):
+                a, b = l_tr[(s_tr >= lo) & (s_tr < hi)], l_e[(s_e >= lo) & (s_e < hi)]
+                if len(a) < 20 or len(b) < 20:
+                    continue
+                se = 1.2533 * np.hypot(a.std() / np.sqrt(len(a)), b.std() / np.sqrt(len(b)))
+                ds.append(float(np.median(a) - np.median(b))); zs.append(ds[-1] / se if se > 0 else 0.0)
+            z = float(np.sum(zs) / np.sqrt(len(zs))) if zs else 0.0
+            if abs(z) > z_max:
+                out.setdefault(name, {})[role] = dict(train=r["train"][0][:8], other=r[role][0][:8], z=round(z, 2),
+                                                      shift=float(np.median(ds)))
+    return out
+
 def _needs_compose(s, role, seed, dest_dir):
     recipe = mg.variable_energy_recipe(s["process"], s["sqrts_min"], s["sqrts_max"], s["n_events"], role=role, seed=seed)
     if float((recipe.get("sampling") or {}).get("f_default", 0)) <= 0:
