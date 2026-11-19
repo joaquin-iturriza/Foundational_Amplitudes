@@ -34238,6 +34238,11 @@ entries:
       mu-MSE 55x) with a sigma collapse at the last validation, which fails the curve test; the clean 2->2 sit 10-90x above
       the old finale, curves still falling at the end. Not checked: how many catalog_v4 classes share the massless internal-W
       case.'
+    15: 'u u~ -> t t~ (one loop) pool mismatch: find what changed between the val pool''s generation (2026-10-02, @ced1f7af,
+      pipeline 99b70db5) and the train pool lxplus regenerated 2026-11-17 (@7ce215f8, pipeline 2daabe91) that shifts |M|^2
+      by ~1% (train-minus-val median ln|M|^2 0.008-0.013 per sqrt(s) bin, parent_ttv_pools.json). Read the one-loop labelling
+      code history (mg5_pipeline_final.py, tools/nlo_conventions.py) and relabel 50 val events with the current pipeline;
+      then make train and val agree, for the retrain''s read and for stage 2'
   done_when: null
   notes_ref: null
   match: zng_uq_*,tp*_zng_*
@@ -35201,6 +35206,13 @@ entries:
         design reviewer, submit'
       - 'full read puts the gmean ratio well under 10x with only the curve test failing on t t~ V''s sigma: report it, read
         the curve test on mu-MSE, and still repair e+ nu g in the retrain before stage 2'
+    15:
+      feeds: whether the parent's t t~ V failure is a data defect and not the setup
+      if:
+      - 'current pipeline reproduces the train pool on val events: regenerate the val/test pools with it (CPU), re-read the
+        retrain on them'
+      - 'the current pipeline reproduces the old val: the regenerated train pool is wrong, rebuild it from the old pipeline
+        and report'
   step_waits:
     '5': FA-lxplus-57f6d2cb
     '14': FA-lxplus-57f6d2cb
