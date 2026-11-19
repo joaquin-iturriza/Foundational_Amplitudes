@@ -152,7 +152,7 @@ FIG_EXT = (".png", ".pdf", ".svg")
 X_AXIS = re.compile(r"\bx[\s-]*axis|\bx\s*:|horizontal|\bx\b.*\bagainst\b", re.I | re.S)
 Y_AXIS = re.compile(r"\by[\s-]*axis|\by\s*:|vertical", re.I)
 AGAINST = re.compile(r"\S.*\bagainst\b\s*\S", re.I | re.S)
-PANEL = re.compile(r"\(([a-h])\)")
+PANEL = re.compile(r"(?:^|(?<=\. ))\(([a-h])\)", re.M)   # only a letter opening a line or sentence
 
 
 def has_axes(text):

@@ -34,7 +34,7 @@ def test_neither_refused(tmp_path):
 
 
 def test_panels_each_checked(tmp_path):
-    assert run(str(tmp_path / "f.svg"), "(a) loss against step (b) the arms").returncode == 2
+    assert run(str(tmp_path / "f.svg"), "(a) loss against step. (b) the arms").returncode == 2
     assert run(str(tmp_path / "f.svg"), "(a) loss against step (b) error against energy").returncode == 0
 
 
