@@ -173,6 +173,7 @@ plan/.claims_cache.json
 # scripts/disk_watch.py: its du cache and the disk-full flag sweep/feed_capped.py reads
 /.disk_watch_cache.json
 /.disk_watch_cache.json.tmp
+/.disk_watch_alerted.json
 /.disk_full
 talks/progress_oct2026b/data/
 # hook dispatcher and incident record (per checkout, live state)

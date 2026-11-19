@@ -230,12 +230,16 @@ def summary(path, curves):
     """The numbers docs/results.tex quotes, one JSON line (verify_claims): per arm (scr, ft, zs) and n the median |Delta|,
     MSE of standardised ln|M|^2, pull std, 68% coverage; per trained run the curve test."""
     d = json.load(open(path))
-    short = {"from scratch": "scr", "fine-tuned": "ft", ZS: "zs", "from scratch" + SP: "scr_sp", "fine-tuned" + SP: "ft_sp"}
+    short = {"from scratch": "scr", "fine-tuned": "ft", ZS: "zs", "from scratch" + SP: "scr_sp", "fine-tuned" + SP: "ft_sp",
+             OURS["A"] + SH: "scr_sh", OURS["A_ft"] + SH: "ft_sh", NETS["lloca"]: "suprio",
+             PT[0][2]: "pt_a", PT[1][2]: "pt_b"}
     out = {}
-    for v in d["runs"].values():
+    pts = [os.path.join(HERE, "data", f"protocol_test_delta_{s}.json") for s in ("lxplus", "cc")]
+    # Suprio's network has no mse_std (collect computes it only for our runs): None there
+    for v in list(d["runs"].values()) + [v for f in pts if os.path.exists(f) for v in json.load(open(f))["runs"].values()]:
         if v["arm"] in short:
             o = out.setdefault(short[v["arm"]], {}).setdefault(str(v["n_gluons"]), {})
-            o.update(median=v["median_abs_delta"], mse_std=v["mse_std"], mse_ln=v["mse_log"],
+            o.update(median=v["median_abs_delta"], mse_std=v.get("mse_std"), mse_ln=v["mse_log"],
                      pull_std=v.get("pull_std"), cov68=v.get("cov_0.68"), sigma_median=v.get("sigma_median"))
     if curves and os.path.exists(curves):
         c = json.load(open(curves))
@@ -247,6 +251,13 @@ def summary(path, curves):
                     out[a][str(n)].update(separation=r["separation"], well=r["well"], best_step=r["best_step"])
         out["n_well"] = sum(r["well"] for k, r in c.items() if k.endswith("t12500"))
         out["n_well_sp"] = sum(r["well"] for k, r in c.items() if k.endswith("suprio_protocol"))
+    # test median |Delta| ratios the text quotes: protocol-test arms over their controls, B2 over Suprio's network
+    for n in map(str, PROCS):
+        out.setdefault("ratio", {})[n] = {k: out[a][n]["median"] / out[b][n]["median"] for k, a, b in
+                                          (("a_b1", "pt_a", "scr_sh"), ("b_b2", "pt_b", "scr_sp"), ("b2_suprio", "scr_sp", "suprio"))
+                                          if a in out and b in out}
+    b1 = json.load(open(os.path.join(HERE, "data", "b1_search.json")))
+    out["b1_pass"] = {str(n): sum(bool(t.get("well")) for t in b1[f"tp_zng_hpo_{p}"]["trials"]) for n, p in PROCS.items()}
     print(json.dumps(out))
 
 
@@ -281,6 +292,7 @@ def b1b2(curves, search):
     c, b = json.load(open(curves)), json.load(open(search))
     STD = {int(k): v for k, v in json.load(open(os.path.join(HERE, "data", "zng_std.json"))).items()}
     fig, axs = ps.figure(ncols=2, nrows=2)
+    res = {}
     for n, ax in zip(PROCS, axs.flat):
         p = PROCS[n]
         t1 = next(t for t in b[f"tp_zng_hpo_{p}"]["trials"] if t["file"].startswith(B1_SCR[n].rsplit("trial_", 1)[1].join(["hp", "_"])))
@@ -310,6 +322,7 @@ def b1b2(curves, search):
             ax.plot(x, v, color=col, label=lab + ", validation")
             ax.plot(x, tr, color=col, linestyle="--", label=lab + ", training")
             R, Rc = v[-1] / tr[-1], rows[ctl][6]
+            res.setdefault(str(n), {})["ab"[ctl]] = {"val_ratio": float(v.min() / rows[ctl][2]), "R": float(R), "R_control": float(Rc)}
             print(f"n={n} {lab:28s} best val {v.min():.3g} (control {rows[ctl][2]:.3g}, ratio {v.min() / rows[ctl][2]:.3g}); "
                   f"end R val/train {R:.3g} (control {Rc:.3g}); {len(v)} validations to {x[-1]:.3g} events")
         ax.set_xscale("log"); ax.set_yscale("log")
@@ -329,6 +342,7 @@ def b1b2(curves, search):
               f"first B1 validation ({e0:.3g} events) val {t1['val'][0] * STD[n] ** 2:.3g}, B2 at {(k0 + 1) * 1000 * b2s:.3g} val {t2['val'][k0] * STD[n] ** 2:.3g}")
     ps.legend(axs[0][0], "lower left", fontsize=5)
     ps.save(fig, os.path.join(HERE, "figs", "zng_b1_vs_b2"))
+    print(json.dumps(res))
 
 
 PT_SITE = r"""
@@ -343,6 +357,7 @@ for a in sys.argv[1:]:
     label += "|" + n
     with h5py.File(os.path.join(os.environ["DATA_DIR"], "zng_uq", f"uq_{p}.h5"), "r") as f:
         truth = np.log(10.0) * f["bulk_test/bulk/log10_me2"][:]
+        std_train = float(np.std(np.log(10.0) * f["bulk_train/bulk/log10_me2"][:500000]))   # as in collect
     for d in sorted(glob.glob(pat)):
         kb = d + "/kit_benchmark"
         if not os.path.exists(kb + "/predictions.h5"):
@@ -351,7 +366,8 @@ for a in sys.argv[1:]:
             mu = np.log(10.0) * f["bulk_test/bulk/log10_me2"][:]
         sigma = np.load(kb + "/sigma_ln.npy")[-len(mu):]    # bulk_test is the last block
         assert label not in out, f"{d}: a second run of {label}"
-        out[label] = dict(metrics(truth, mu, sigma), run=os.path.abspath(d))
+        out[label] = dict(metrics(truth, mu, sigma), run=os.path.abspath(d), std_train_ln=std_train)
+        out[label]["mse_std"] = out[label]["mse_log"] / std_train ** 2
 print("ZNGPT " + json.dumps(out))
 """
 
@@ -372,7 +388,7 @@ def ptcollect(site, out):
 def ptdelta(data, pts):
     """zng_protocol_test_delta: test median |Delta| against n for the D498 protocol test's two arms beside their controls
     B1 (scratch, searched HPs) and B2 (scratch, Suprio's protocol) and Suprio's network (benchmark.json); the arms' numbers
-    from `collect --out` on each site (protocol_test_delta_{lxplus,cc}.json, only the PT arms taken)."""
+    from `ptcollect --site lxplus|ccin2p3` (protocol_test_delta_{lxplus,cc}.json)."""
     sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
     import plot_style as ps
     ps.use()
