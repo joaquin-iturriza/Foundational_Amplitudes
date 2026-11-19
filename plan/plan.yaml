@@ -35216,6 +35216,9 @@ entries:
   step_waits:
     '5': FA-lxplus-57f6d2cb
     '14': FA-lxplus-57f6d2cb
+    '15': 'the main session''s go for one CPU job (this turn''s narrowing allows no new jobs): no uubar_ttbar_nlo standalone
+      exists on lxplus or CC (relabel_check.py refused: no compiled backend), so the relabel of 200 train and 200 val events
+      (tools/relabel_check.py) needs a CPU job that rebuilds the standalone, under its own design and design review'
   findings:
   - at: '2026-11-17T11:18:43+00:00'
     text: 'Their numbers: the UQ repo (branch uq, 311 files) holds no figures, preds or result files. arXiv:2505.20280''s
