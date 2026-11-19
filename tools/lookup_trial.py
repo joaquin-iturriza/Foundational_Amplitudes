@@ -99,6 +99,16 @@ TOOL["batch2"] = ("You must use python3 /home/joaquin/work/FA/worktrees/wt-batch
                   "first tool call is that command with --help, and every later lookup is one batch.py call holding "
                   "several operations (def, calls, grep, read). Use plain grep or sed only for what batch.py cannot do.")
 TOOL["grep2"], TOOL["now2"] = TOOL["grep"], TOOL["now"]
+# figure names in plain words
+ARM_LABEL = {"grep": "grep, run 1", "grep2": "grep, run 2", "lsp": "LSP asked", "lsp2": "LSP required",
+             "graph": "code graph", "batch": "batch asked", "batch2": "batch required", "now": "as now, run 1",
+             "now2": "as now, run 2", "recall": "recall tool"}
+TASK_LABEL = {"assemble_callers": "callers of LHE assemble", "is_cached_callers": "callers of cache check",
+              "val_combine": "combined val loss", "ckpt_select": "best checkpoint", "het_loss": "het. loss",
+              "fold_spool": "hand-back fold", "freeze_callers": "callers of sigma freeze",
+              "f_default": "default-source share", "lhe_order": "LHE block order", "sigma_cfg_callers":
+              "callers of sigma config", "context_500k": "500k context", "batch_10min": "10-min batching",
+              "no_agent": "no agent", "wording_yes": "wording yes", "b1_n1_scope": "B1 HP scope"}
 
 
 def brief(task, arm):
@@ -207,32 +217,25 @@ def report(fig=None, arms=None):
         import matplotlib
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
-        try:
-            import plot_style  # noqa: F401
-        except ImportError:
-            pass
+        import plot_style as ps
         fig_, axs = plt.subplots(1, 2, figsize=(9, 3.6))
         x = range(len(tasks))
         w = 0.8 / len(arms)
         for i, a in enumerate(arms):
             xs = [k + (i - (len(arms) - 1) / 2) * w for k in x]
             for ax, key, sc in ((axs[0], "tokens", 1e-3), (axs[1], "tool_calls", 1)):
-                ax.bar(xs, [r[t][a][key] * sc for t in tasks], w, label=a)
+                ax.bar(xs, [r[t][a][key] * sc for t in tasks], w, label=ARM_LABEL[a])
                 bad = [(xx, r[t][a][key] * sc) for xx, t in zip(xs, tasks) if not r[t][a]["correct"]]
                 if bad:
-                    ax.plot(*zip(*bad), "kx", ms=6, label="wrong" if i == 0 else None)
+                    ax.plot(*zip(*bad), "kx", ms=6, label="wrong answer" if i == 0 else None)
         axs[0].set_yscale("log")
         axs[0].set_ylabel("tokens to answer [k]")
         axs[1].set_ylabel("tool calls to answer")
         for ax in axs:
             ax.set_xticks(list(x))
-            ax.set_xticklabels(tasks, rotation=60, ha="right", fontsize=7)
+            ax.set_xticklabels([TASK_LABEL[t] for t in tasks], rotation=60, ha="right", fontsize=7)
         axs[1].legend(fontsize=7)
-        fig_.tight_layout()
-        for ext in ("png", "pdf"):
-            fig_.savefig(fig + "." + ext, dpi=150)
-        h, l = axs[1].get_legend_handles_labels()
-        open(fig + ".legend.txt", "w").write("\n".join(l) + "\n")
+        ps.save(fig_, os.path.abspath(fig))
     return out
 
 
