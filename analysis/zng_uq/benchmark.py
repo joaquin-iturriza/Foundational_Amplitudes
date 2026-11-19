@@ -40,8 +40,7 @@ B1_SCR = {1: "runs/tp_zng_hpo_zg/trial_1612", 2: "runs/tp_zng_hpo_zgg/trial_0353
           4: "runs/tp_zng_hpo_zgggg/trial_0238"}
 ZS = "pretraining only, zero-shot"
 # D498 protocol test (step 16), from scratch: (a) B1's HPs at batch 1024 for 2e5 steps, (b) B2's Adam/plateau at batch
-# 16384 for 12,500 steps; lxplus run dirs carry a "_lxplus" suffix, hence the glob; kept out of ARMS so the earlier
-# figures stay as they were
+# 16384 for 12,500 steps; lxplus run dirs carry a "_lxplus" suffix, hence the glob; read by ptcollect on each site
 PT = [("A", "t200000_protocol_test_ours_bs1024*", "ours at batch 1024", None),
       ("A", "t12500_protocol_test_adam_plateau_bs16384*", "Adam plateau at batch 16384", None)]
 DBINS = np.logspace(-8, 1, 91)          # |Delta| bins
@@ -332,6 +331,44 @@ def b1b2(curves, search):
     ps.save(fig, os.path.join(HERE, "figs", "zng_b1_vs_b2"))
 
 
+PT_SITE = r"""
+import glob, json, os, sys
+import h5py
+import numpy as np
+sys.path.insert(0, "analysis/zng_uq")
+from benchmark import metrics   # the site's copy: metrics() as in this file
+out = {}
+for a in sys.argv[1:]:
+    label, n, p, pat = a.split("|")
+    label += "|" + n
+    with h5py.File(os.path.join(os.environ["DATA_DIR"], "zng_uq", f"uq_{p}.h5"), "r") as f:
+        truth = np.log(10.0) * f["bulk_test/bulk/log10_me2"][:]
+    for d in sorted(glob.glob(pat)):
+        kb = d + "/kit_benchmark"
+        if not os.path.exists(kb + "/predictions.h5"):
+            continue
+        with h5py.File(kb + "/predictions.h5", "r") as f:
+            mu = np.log(10.0) * f["bulk_test/bulk/log10_me2"][:]
+        sigma = np.load(kb + "/sigma_ln.npy")[-len(mu):]    # bulk_test is the last block
+        assert label not in out, f"{d}: a second run of {label}"
+        out[label] = dict(metrics(truth, mu, sigma), run=os.path.abspath(d))
+print("ZNGPT " + json.dumps(out))
+"""
+
+
+def ptcollect(site, out):
+    """The D498 protocol-test runs scored on the test events of one site (read-only, site_python): the same metrics as
+    collect, keyed "<arm>|<n>" -> protocol_test_delta_<site>.json (lxplus: 7 runs, CC: arm (a) at n=4)."""
+    sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
+    from analysis.common.readers import site_python
+    args = [f"'{lab}|{n}|{p}|runs/kit/kit_{m}_uq_{p}_me2_n500000_{sfx}'" for m, sfx, lab, _ in PT for n, p in PROCS.items()]
+    r = site_python(PT_SITE, args, "ZNGPT", site=site)
+    for k, v in r.items():
+        v.update(arm=k.split("|")[0], n_gluons=int(k.split("|")[1]))
+    json.dump({"runs": r}, open(out, "w"), indent=1)
+    print({k: (round(v["median_abs_delta"], 7), round(v["pull_std"], 3)) for k, v in r.items()})
+
+
 def ptdelta(data, pts):
     """zng_protocol_test_delta: test median |Delta| against n for the D498 protocol test's two arms beside their controls
     B1 (scratch, searched HPs) and B2 (scratch, Suprio's protocol) and Suprio's network (benchmark.json); the arms' numbers
@@ -346,10 +383,10 @@ def ptdelta(data, pts):
             if v["arm"] in [x[2] for x in PT]:
                 assert k not in runs, f"{k} in two files"
                 runs[k] = v
-    arms = [(OURS["A"] + SH, "B1: ours, searched HPs", ps.C.blue, "-"),
-            (OURS["A"] + SP, "B2: ours, Suprio's protocol", ps.C.vermillion, "--"),
-            ("ours at batch 1024", "(a) B1's HPs at batch 1024", ps.C.sky, "-"),
-            ("Adam plateau at batch 16384", "(b) B2's optimiser at batch 16384", ps.C.orange, "--"),
+    arms = [(OURS["A"] + SH, "ours, searched HPs", ps.C.blue, "-"),
+            (OURS["A"] + SP, "ours, Suprio's protocol", ps.C.vermillion, "--"),
+            ("ours at batch 1024", "searched HPs, batch 1024", ps.C.sky, "-"),
+            ("Adam plateau at batch 16384", "Adam plateau, batch 16384", ps.C.orange, "--"),
             (NETS["lloca"], "Suprio's network", ps.C.green, ":")]
     fig, (ax, cell) = ps.figure(2)
     out = {}
@@ -371,7 +408,8 @@ def ptdelta(data, pts):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("cmd", choices=["collect", "plot", "summary", "parent", "b1b2", "stds", "ptdelta"])
+    ap.add_argument("cmd", choices=["collect", "plot", "summary", "parent", "b1b2", "stds", "ptdelta", "ptcollect"])
+    ap.add_argument("--site", default="ccin2p3")
     ap.add_argument("--theirs", default=os.path.join(os.environ.get("WORK", ""), "ext", "uq_runs", "runs", "prod_het"))
     ap.add_argument("--out", default=os.path.join(HERE, "data", "benchmark.json"))
     ap.add_argument("--data", default=os.path.join(HERE, "data", "benchmark.json"))
@@ -386,6 +424,8 @@ def main():
         stds(os.path.join(HERE, "data", "zng_std.json"))
     elif a.cmd == "b1b2":
         b1b2(a.curves, os.path.join(HERE, "data", "b1_search.json"))
+    elif a.cmd == "ptcollect":
+        ptcollect(a.site, os.path.join(HERE, "data", f"protocol_test_delta_{'cc' if a.site == 'ccin2p3' else a.site}.json"))
     elif a.cmd == "ptdelta":
         ptdelta(a.data, [os.path.join(HERE, "data", f"protocol_test_delta_{s}.json") for s in ("lxplus", "cc")])
     elif a.cmd == "plot":
