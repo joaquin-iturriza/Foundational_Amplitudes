@@ -34502,10 +34502,6 @@ entries:
   next:
     5: 'Write-up in docs/results.tex: the 8 runs flagged by the curve test, the zero-shot read, the figures zng_median_delta,
       zng_delta_z4g, zng_pulls, zng_curves, % src / % claim lines'
-    16: 'D498 protocol test read: 8 runs (arm a ''ours at batch 1024'': FA-ccin2p3-5c14c2aa zgggg, 9958966c zggg, 2f8ac2e5
-      zgg, ac047fb1 zg; arm b ''Adam plateau at batch 16384'': d77906e1 zgggg, 9e1b1276 zggg, d57071d3 zgg, d5f02694 zg).
-      Read R = last val/train MSE, best val MSE(ln|M|^2) against B1''s best trial (a) and B2 (b), test median |Delta| (benchmark.py
-      collect); figure zng_b1_vs_b2 extended with both arms; verdict per the passed design''s bands.'
     17: 'Parent (2) repair of the W retrain''s training instability (zng_parent_stab): proposal to Joaquin, a one-HP change
       (peak lr), needs his yes per D241'
   done_when: null
@@ -35867,13 +35863,6 @@ entries:
       if:
       - 'written and committed: plan evidence with the commit'
       - 'the zero-shot read fails: write up the trained runs alone'
-    16:
-      feeds: which protocol the Z+ng runs and the parent's fine-tunes use (why B1 ends 21-68x val/train while B2 stays within
-        1.6-5.4x)
-      if:
-      - 'a yes, b no: batch/updates are the cause -> our protocol at small batch for the Z+ng runs'
-      - 'a no, b yes: Muon/WSD cooldown opens the split -> plateau/early-stopping schedule for 5e5-event single-process runs'
-      - 'both or neither / unresolved: both matter -> reported per n, protocol choice to Joaquin'
     17:
       feeds: whether a ladder+star parent with the W column can be stage 2's parent
       if:
@@ -35882,8 +35871,6 @@ entries:
       - 'Joaquin prefers a DyHPO sweep of the parent setup with the W, or dropping the W: design that instead'
   step_waits:
     '5': FA-lxplus-d2cae475 FA-lxplus-48d41cb6 FA-lxplus-643c1b5e FA-ccin2p3-a652edfc
-    '16': FA-lxplus-045ef0ad FA-lxplus-d2cae475 FA-lxplus-658ba6ac FA-lxplus-48d41cb6 FA-lxplus-162b272b FA-lxplus-643c1b5e
-      FA-lxplus-632957c1 FA-ccin2p3-a652edfc
   findings:
   - at: '2026-11-17T11:18:43+00:00'
     text: 'Their numbers: the UQ repo (branch uq, 311 files) holds no figures, preds or result files. arXiv:2505.20280''s
