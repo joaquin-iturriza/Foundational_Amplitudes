@@ -34242,9 +34242,6 @@ entries:
       zgg, ac047fb1 zg; arm b ''Adam plateau at batch 16384'': d77906e1 zgggg, 9e1b1276 zggg, d57071d3 zgg, d5f02694 zg).
       Read R = last val/train MSE, best val MSE(ln|M|^2) against B1''s best trial (a) and B2 (b), test median |Delta| (benchmark.py
       collect); figure zng_b1_vs_b2 extended with both arms; verdict per the passed design''s bands.'
-    17: Rebuild u u~ -> t t~ (one loop) frozen val/test pools on lxplus with today's labeller (prebuild_recipes.sh recipes/zng_ttv_rebuild.yaml
-      --rebuild uubar_ttbar_nlo, design of 2026-11-19), then the virt_label_check re-read of the new val (expect <1e-6) and
-      datagen.mixed_generation clear; then re-read FA-lxplus-57f6d2cb on them (step 14).
   done_when: null
   notes_ref: null
   match: zng_uq_*,tp*_zng_*
@@ -35604,17 +35601,11 @@ entries:
       - 'a yes, b no: batch/updates are the cause -> our protocol at small batch for the Z+ng runs'
       - 'a no, b yes: Muon/WSD cooldown opens the split -> plateau/early-stopping schedule for 5e5-event single-process runs'
       - 'both or neither / unresolved: both matter -> reported per n, protocol choice to Joaquin'
-    17:
-      feeds: whether stage 2's parent and its t t~ V read rest on pools labelled alike
-      if:
-      - 'new val reproduces today''s labels: re-read the retrain on them, stage 2 uses them'
-      - 'new val still off: the build did not use the fixed labeller; read the log and report'
   step_waits:
     '5': FA-lxplus-2ee4002c
     '14': FA-lxplus-2ee4002c
     '16': FA-lxplus-045ef0ad FA-lxplus-d2cae475 FA-lxplus-658ba6ac FA-lxplus-48d41cb6 FA-lxplus-162b272b FA-lxplus-643c1b5e
       FA-lxplus-632957c1 FA-ccin2p3-a652edfc
-    '17': FA-lxplus-2ee4002c
   findings:
   - at: '2026-11-17T11:18:43+00:00'
     text: 'Their numbers: the UQ repo (branch uq, 311 files) holds no figures, preds or result files. arXiv:2505.20280''s
