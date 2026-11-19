@@ -49,6 +49,7 @@ on the sites (`~/work/CLAUDE.md`).
 - GPU budget: estimate wall time × GPUs over everything about to be submitted, sized to what I asked; above 30 GPU-h confirm with me unless a decision in force approves that work at that cost, or I asked for it by name at the project's usual size for it (its template, its sibling runs) [D153, D242, D244]; otherwise run it and show me what ran.
 - Reading state, git and file edits are never confirm-first.
 - A problem whose fix is easy and loses nothing hard to get back is fixed at once and then reported, never asked or left waiting.
+- A defect found is fixed where every later run picks it up (a `config/` default, the canonical setup, a load or submit check), at once or as a plan step that blocks its entry; a sentence in `docs/results.tex` saying it "is being fixed" is never the fix.
 - A repair never changes the setup I asked for (inputs, target, loss, schedule, data, the propagator list): such a change is my call, asked before its run; a reviewer's rewording of a claim in `docs/results.tex` waits for my yes, and the commit it blocks waits with it.
 - Work exists only as a plan entry, changed only through `tools/plan.py`; every submission names its entry's item (`--item`).
 - Before proposing or designing a run, analysis or tool fix, or launching a lookup, search `docs/results.tex`, the plan and `site decisions` for prior work on the same question and name what was found with its result, or that none was found.
