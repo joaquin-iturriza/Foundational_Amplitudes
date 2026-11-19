@@ -16312,9 +16312,9 @@ entries:
       analysis/zng_uq/benchmark.py) before the step-21 commit
   owner:
     agent: ab33cfe08e8f1ac89
-    state: working
+    state: stopped
     since: '2026-11-19T00:02:30+00:00'
-    state_at: '2026-11-19T00:02:30+00:00'
+    state_at: '2026-11-19T00:12:03.626000+00:00'
     context: 102691
     context_at: '2026-11-19T00:10:19+00:00'
   designs:
@@ -34391,7 +34391,7 @@ entries:
     agent: a168bea4a254f5c1d
     state: working
     since: '2026-11-19T00:01:06+00:00'
-    state_at: '2026-11-19T00:01:06+00:00'
+    state_at: '2026-11-19T00:12:19.070000+00:00'
     context: 198775
     context_at: '2026-11-19T00:12:27+00:00'
   designs:
