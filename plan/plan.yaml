@@ -35802,6 +35802,13 @@ entries:
       falling to ~0.7% at 450 GeV), the train-minus-val offset of parent_ttv_pools.json. Design outcome branch 1: the val/test
       pools carry the older labelling (top width handling before 7b00eb21/7f879cd7); today''s labelling is the train pool''s.
       Not checked: which other frozen one-loop or top pools predate 7b00eb21 and carry the same old width.'
+  - at: '2026-11-19T02:16:53+00:00'
+    text: '2026-11-19 E7554: the 8 protocol-test jobs pended 1.2 h on CC (Resources, slurm wait 10.9 h); cancelled and resubmitted
+      with the same arguments (code @367caa64; uq_*.h5 sha256 equal on CC and lxplus) per site pick --hours 6 (lxplus 7, CC
+      1, done ~12 h vs CC-only ~45 h). Arm (a) ''ours at batch 1024'': Z+1g FA-lxplus-4e0a55ab, Z+2g FA-lxplus-8b928927, Z+3g
+      FA-lxplus-f3901ad0, Z+4g FA-ccin2p3-a652edfc. Arm (b) ''Adam plateau at batch 16384'': Z+1g FA-lxplus-9a0f77c5, Z+2g
+      FA-lxplus-3ea39a5e, Z+3g FA-lxplus-547c198d, Z+4g FA-lxplus-6394cbfc. Cancelled: FA-ccin2p3-5c14c2aa d77906e1 9958966c
+      9e1b1276 2f8ac2e5 d57071d3 ac047fb1 d5f02694.'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
