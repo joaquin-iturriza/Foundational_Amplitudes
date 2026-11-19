@@ -16360,7 +16360,7 @@ entries:
       be started by hand)
   owner:
     agent: ab33cfe08e8f1ac89
-    state: working
+    state: closed
     since: '2026-11-19T00:02:30+00:00'
     state_at: '2026-11-19T11:49:39.972000+00:00'
     context: 225192
@@ -17528,19 +17528,27 @@ entries:
       (Lossless Context Management, arXiv 2605.04050; lossless-claw, hermes-lcm, pi-lcm): hierarchical summary DAG over a
       verbatim store, lcm_expand; not for Claude Code. Trials proposed to Joaquin.'
   handoff:
-    state: '2026-11-17. Figure setup fix done and committed cfe97bf5 (repo-reviewer PASS, backlog at 2e100669), incl. D462
-      union range for ps.true_pred_hist; KIT panels and muon_long examples regenerated; steps 22/23 relayed and dropped by
-      the main session. Step 21 (after-period of the 10-min batch) waits on 2026-11-19: run python3 tools/wake_batching.py
-      --since 2026-11-11T19:55:43Z --until +7 days --out analysis/agent_redesign/wake_batching_after.json --fig analysis/agent_redesign/figs/wake_batching_after
-      and compare per day with the baseline wake_batching_baseline.json @b65c92a9. Steps 11, 12, 14, 17 unchanged.'
-    decisions: Batching start for step 21 = absorb.log start 2026-11-11T19:55:43Z (later restarts re-exec the same code);
-      send_check refuses draft figures loose (every draft-figure redraw is a comparison under CLAUDE.md); true_pred_hist has
-      no truth-only range (Joaquin 2026-11-16, D462)
-    ruled_out: truth-range opt-in for kit_vs_mlp (D462 says never the truth alone)
+    state: '2026-11-19. Step 21 done (after-period of the 10-min batch, 6d067301; figure analysis/agent_redesign/figs/wake_batching_after_per_day.png,
+      finding of 2026-11-19). Wake audit done (step 23 finding; fixes a34b19d3 absorb ''waiting on its own background work''
+      notices + figures refusal names basenames, 7bb939b6 mid-turn hand-backs fold into the turn, CC synced to d4575fd6 so
+      disk_watch 976783b0 is live). Step 25 (three ideas) reported; steps 26 and 27 are READY under Joaquin''s go (''worth
+      looking into implementing them''), to run in worktrees with no hook, settings or CLAUDE.md change, each handed back
+      with its figure: 26 graphify CLI trial (Graphify-Labs/graphify Apache-2.0; pip install graphifyy into a venv inside
+      the worktree, code-only AST graph, graphify-out outside git; 10 past lookup tasks from session 71602535 transcripts
+      with known answers, three arms at low effort: grep, graph queries via Bash, pyright LSP told to use; tokens to answer
+      + correctness; yes = >=30% fewer tokens at equal correctness). 27 tools/recall.py (search over plan findings/hand-offs
+      via tools/plan.py loaders, site decisions --all, compaction summaries in transcripts; expand = raw transcript lines
+      of the record''s agent and time window; 5 past lost-context cases, e.g. Joaquin 2026-11-18T23:35Z ''I don''t remember
+      saying yes'', the zng B1 n=1 scope question; yes = 4/5 sources reached with fewer reads). Step 28 (Code Mode checklist)
+      waits on Joaquin starting a terminal session with CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1 (not over Remote Control).'
+    decisions: 'Wake counts: only wakes that made an API call (no-call wakes are absorbed notices); replay bounds over the
+      same called wakes (repo-reviewer finding 3). Mid-turn hand-backs are not spooled: folding is free, spooling forced a
+      Stop-hook continuation. ''waiting on its own background work'' notices absorbed: nothing to act on.'
+    ruled_out: Asking Joaquin for trials 26/27 (inside his go; plan ask refuses non-call questions)
     running: none
-    files: plot_style.py .claude/hooks/send_check.py .claude/skills/figure-style/SKILL.md .claude/context/fa-figures.txt tools/kit_paper_figs.py
-      tools/kit_figures.py tools/kit_vs_mlp.py analysis/catalog_v4/muon_long.py tests/test_figure_setup.py tests/test_plot_style_hist.py
-    written: '2026-11-17T00:02:52+00:00'
+    files: tools/wake_batching.py analysis/agent_redesign/wake_batching_baseline.json analysis/agent_redesign/wake_batching_after.json
+      .claude/hooks/notification_absorb.py .claude/hooks/stop_conditions.py tests/test_notification_absorb.py tests/test_routine_handback.py
+    written: '2026-11-19T12:06:33+00:00'
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
   question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
