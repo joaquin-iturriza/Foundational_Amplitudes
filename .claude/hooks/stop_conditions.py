@@ -192,7 +192,7 @@ def figures_handed_back(inp, records=None, spool=SPOOL):
             try:
                 mt = os.path.getmtime(f)    # a send older than the file is of an earlier version
             except OSError:
-                mt = 0                      # file not here: any send counts
+                continue                    # file not here (a figure the owner will draw): nothing to send yet
             if f not in missing and not any(b == os.path.basename(f) and st >= mt for st, b in sent) \
                     and not any(st >= t and os.path.basename(f) in tx for st, tx in said):
                 missing.append(f)

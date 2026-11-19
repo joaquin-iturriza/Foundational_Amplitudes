@@ -57,11 +57,12 @@ def test_figure_sent_earlier_in_session_counts():
     send = {"type": "assistant", "timestamp": "2026-11-12T09:00:00Z", "message": {"content": [
         {"type": "tool_use", "name": "SendUserFile", "input": {"files": ["/w/analysis/e/figs/a.png"]}}]}}
     assert sc.figures_handed_back({}, [send, user], d)[0] == []          # sent before the hand-back: counts
-    assert sc.figures_handed_back({}, [user], d)[0] != []                # never sent: still refused
+    assert sc.figures_handed_back({}, [user], d)[0] == []                # file not on disk (to be drawn): nothing to send
     fig = os.path.join(d, "analysis", "e", "figs", "a.png")                               # redraw under the same name after the send
     os.makedirs(os.path.dirname(fig))
     open(fig, "w").write("v2")
     open(os.path.join(d, "9999999999_x"), "w").write("Joaquin, see " + fig)
+    assert sc.figures_handed_back({}, [user], d)[0] != []                # existing, never sent: still refused
     send["message"]["content"][0]["input"]["files"] = [fig]
     assert sc.figures_handed_back({}, [send, user], d)[0] != []          # file newer than the send: refused
     os.utime(fig, (1, 1))
