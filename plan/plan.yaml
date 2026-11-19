@@ -35915,6 +35915,55 @@ entries:
       h per trial -> 8 x 24.9 = 199 GPU-h; arm (b) 1.2/1.4/1.7/3.4 h -> 8 x 7.7 = 61.6 GPU-h; total ~261 GPU-h plus scoring
       of the 8 chosen trials (~1 h each). Above 30 GPU-h and D498 covered single runs: needs Joaquin''s go before submission;
       not submitted.'
+    fix_at: '2026-11-19T18:15:14+00:00'
+    fix: 'Searched (check 5): results.tex ''protocol'', ''Suprio'', ''batch 1024'', ''16384'', ''seed''; plan show findings
+      11-17..19 and dead ends; site decisions D480-D504. No earlier batch-matched search on Z+ng: prior is complete. Failed
+      checks:
+
+      (2,3,4) The effect the study decomposes is below the design''s own resolution. The check says ''B1 vs B2 differ 1.5-3.7x
+      in test median |Delta|'': those are B2 over Suprio''s network. B1 (searched, scratch) over B2 (scratch) is 1.66/1.14/1.29/1.88x
+      at n=1..4 (benchmark.json runs). On the primary measure, best val MSE B1/B2 = 0.66/0.14/1.29/1.72 (b1_search.json val_loss
+      over protocol_steps.json B2 min val_mse), so B1 is lower at n=1,2. Every gap is inside the 3x one-seed band the design
+      uses. So the outcome bands cannot separate: arm (a) near B1 is also within 3x of B2, which meets neither the yes nor
+      the no band, and both ''arm (b) within 3x of B2'' and ''within 3x of B1'' hold at once. The check also says the best
+      val of the 8 B1 trials ''spans more than 10x''. That holds only at n=1. At n=2,3,4 it spans 3.9x/2.8x/3.3x (b1_search.json),
+      about the size of the band. Fix: either (i) choose a measure on which B1 and B2 differ well beyond one seed, for example
+      the end train/val ratio (B1 21-68 vs B2 1.6-5.4 at n=2-4) or the curve-test pass, and state yes/no bands on it; or (ii)
+      ask Joaquin whether the 1.1-1.9x B2-over-B1 gap is worth seeds (D492 holds seeds at one), worded as that question.
+
+      (2/4) The measure reads ''the lowest-validation trial that passes the curve test'', but B1 has 0 of 8 passing trials
+      at n=2,3,4. The control''s value is undefined at 3 of 4 n. State what is read when no trial passes, the same rule for
+      arm and control (for example the lowest-val trial, flagged, as results.tex does for B1).
+
+      (1, feature rule) Best against best needs a converged control. B1''s best lr at n=3,4 sits at its window''s top edge
+      (1.49e-2, 1.48e-2 vs 1.5e-2). The design declares those reads unresolved in advance but still spends ~114 GPU-h on arm
+      (a) at n=3,4. Either re-search B1 higher at n=3,4 first, as was done for the 31 top-edge cells (results.tex lr-surface
+      paragraph), with its cost added, or say that arm (a) at n=3,4 is read against B2 only.
+
+      (1) The B2 comparisons pit a searched arm against an unsearched reference: B2 runs at Suprio''s settings, reg 0, ema
+      off, no search. Arm (b) searches lr, regularization_lambda, ema and ema_decay, and takes the shared ''heterosc mu_mse
+      selection''. B2''s checkpoint selection is not stated, and the protocol-test arm (b) that copied B2 used heterosc_select=nll
+      (proto_submit_lx_v3.sh). State B2''s selection, match it or name the difference, and state that a ''within 3x of B2''
+      yes for a tuned arm against a fixed reference is biased toward yes. Arm (b) against B1 is the clean pair (same batch
+      and steps, both searched): say so.
+
+      (7) D481 ''by 1 I meant lloca alone'' names Suprio''s LLoCa-Transformer as the entry''s reference. Reuse its existing
+      numbers (benchmark.json) in the read, or say why not.
+
+      (13) State when the sweeps finish (arm (a) waves 3,3,2 at 5-7.5 h per trial, plus queue) and how they are laid out on
+      sites. The template''s cluster.time 04:00:00 must rise above the 7.5 h trials.
+
+      (14) There is no disk per trial (read a protocol-test run directory) times concurrent trials against the sites'' free
+      disk.
+
+      (15, D395) The sweep path with Adam/ReduceLROnPlateau, es_patience and batch 1024 at 2e5 steps through run_trial has
+      not run end to end. Add a ~50-step smoke through every stage (sigma fit, scoring) or a CPU dry run of the generated
+      trial command, showing the result line the measure reads.
+
+      Passing: training loss HETEROSC (9); target and preprocessing are B1/B2''s base_config (11); test events are their 1e6
+      split, as asked (10); no labels in inputs (8); one seed per D492 (3, seeds); cost from the same setup''s measured wall
+      times (protocol_steps.json traintime_hours 5.1/5.6/7.5/6.7 h and 1.2/1.4/1.7/3.4 h); 8 trials, 3 start-up, waves 3,3,2
+      over the template''s space, lr centred by the steps law (13, space).'
   step_why:
     17:
       feeds: whether a ladder+star parent with the W column can be stage 2's parent
