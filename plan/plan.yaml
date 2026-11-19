@@ -16399,9 +16399,9 @@ entries:
       be started by hand)
   owner:
     agent: af2bc6219bb4a56b5
-    state: working
+    state: stopped
     since: '2026-11-19T17:53:29+00:00'
-    state_at: '2026-11-19T17:53:29+00:00'
+    state_at: '2026-11-19T18:10:44.629000+00:00'
     context: 164191
     context_at: '2026-11-19T18:09:09+00:00'
   designs:
