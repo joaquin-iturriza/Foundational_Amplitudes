@@ -206,6 +206,7 @@ m = json.load(open(old + "/plots_0/per_process_metrics.json")); st = json.load(o
 for p in PROCS:
     out["old_curves"][p] = [float(v * st["prepd_std"][order.index(p)] ** 2) for v in m["proc_val_losses_no_reg"][p]]
 out["old_every"] = m["validate_every_n_steps"]
+out["prepd_std"] = dict(zip([str(x) for x in np.load(new + "/sigma_stage/preds_val.npz")["names"]], sn))
 print("PARENTEXPLAIN " + json.dumps(out))
 """
 
@@ -235,20 +236,22 @@ def plot_learning(path):
     import plot_style as ps
     ps.use()
     d = json.load(open(path)); x = json.load(open(os.path.join(HERE, "data", "parent_explain.json")))
-    g = json.load(open(os.path.join(HERE, "data", "parent_diag.json"))); sd2 = 2.497118239233265 ** 2  # shared target std
+    g = json.load(open(os.path.join(HERE, "data", "parent_diag.json")))
+    assert len(set(x["prepd_std"].values())) == 1, "one shared target std expected"
+    sd2 = next(iter(x["prepd_std"].values())) ** 2   # parent_diag's MSEs are standardised
     fig, axs = ps.figure(ncols=2, nrows=2)
     a, b, c, leg = axs[0][0], axs[0][1], axs[1][0], axs[1][1]
     st = (np.arange(len(d["new_val"])) + 1) * d["new_every"]
     for p, col in SHOW:
-        # NLL above 2 nats (t t~ V's last validations, up to 100) drawn at the top edge, the axis set by the rest
-        a.plot(st, np.minimum(d["new_proc_val"][p], 2.0), color=getattr(ps.C, col), label="$" + TEX[p] + "$")
+        a.plot(st, d["new_proc_val"][p], color=getattr(ps.C, col), label="$" + TEX[p] + "$")
         o = x["old_curves"][p]
         b.plot((np.arange(len(o)) + 1) * x["old_every"], o, color=getattr(ps.C, col))
     a.plot(st, d["new_train"], color="k", linestyle="--", label="training, all 28 processes")
-    a.set_xlabel("step"); a.set_ylabel("NLL (nats)"); a.set_ylim(-9.5, 2.3)
+    # symlog: t t~ V's last validations reach 100 nats, the rest sit between -9 and 0; every point drawn
+    a.set_xlabel("step"); a.set_ylabel("NLL (nats)"); a.set_yscale("symlog", linthresh=1.0)
     b.set_yscale("log"); b.set_xlabel("step"); b.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
     ps.process_label(b, "old finale")
-    ps.process_label(a, "new parent", loc="lower left")   # the clipped t t~ V curve runs along the top edge
+    ps.process_label(a, "new parent", loc="lower left")   # t t~ V's blow-up runs into the upper right
     others = [p for p in g if p not in dict(SHOW)]
     c.plot([g[p]["train"]["mse"] * sd2 for p in others], [g[p]["val"]["mse"] * sd2 for p in others], "o",
            color=ps.C.grey, label="the other 25 processes")
@@ -328,16 +331,17 @@ def plot_wpole(path):
 TTV = r"""
 import json, os, sys
 import numpy as np
-# the new parent's t t~ V pools, as its out_0.log names them: train composed on lxplus 2026-11-17, val from datasets
-tr = "/eos/user/j/joiturri/tmp/amp_data_cache/uubar_ttbar_nlo_363-450GeV_train_amplitudes.npy"
-va = os.environ["DATA_DIR"] + "/uubar_ttbar_nlo_363-450GeV_val_amplitudes.npy"
+import re
+# the new parent's t t~ V pools, the files its out_0.log says it loaded (no path written here)
+log = open(sys.argv[1] + "/out_0.log").read()
+tr, va = (re.search(r"\[%s\] uubar_ttbar_nlo: \d+ events.*? from (\S+\.npy)" % r, log).group(1) for r in ("train", "val"))
 def mass(v): return np.sqrt(np.maximum(v[..., 0] ** 2 - np.sum(v[..., 1:] ** 2, -1), 0))
 o = {}
 for k, f in (("train", tr), ("val", va)):
     a = np.array(np.load(f, mmap_mode="r")); s = mass(a[:, :16].reshape(-1, 4, 4)[:, :2].sum(1)); lm = np.log(np.abs(a[:, -1]))
     rec = json.load(open(f + ".recipe.json"))
     idx = np.digitize(s, [363, 370, 380, 400, 450]) - 1
-    o[k] = dict(n=int(len(a)), created=rec["created"], commit=rec["provenance"]["git_commit"],
+    o[k] = dict(file=f, n=int(len(a)), created=rec["created"], commit=rec["provenance"]["git_commit"],
                 pipeline=rec["provenance"]["pipeline_sha256"], seed=rec["effective_seed"],
                 alphas=np.unique(np.load(f.replace(".npy", ".alphas.npy"))).tolist(),
                 median_lnM2_by_sqrts=[float(np.median(lm[idx == i])) for i in range(4)], n_by_sqrts=[int((idx == i).sum()) for i in range(4)])
@@ -350,7 +354,7 @@ def ttv_pools(out):
     and the median ln|M|^2 in four sqrt(s) bins [363,370,380,400,450] GeV -> analysis/zng_uq/data/parent_ttv_pools.json"""
     sys.path.insert(0, ROOT)
     from analysis.common.readers import site_python
-    d = site_python(TTV, [], "TTVPOOLS", site="lxplus")
+    d = site_python(TTV, [NEW], "TTVPOOLS", site="lxplus")
     json.dump(d, open(out, "w"), indent=1)
     for k, v in d.items():
         print(k, v)
@@ -358,10 +362,43 @@ def ttv_pools(out):
           [round(a - b, 4) for a, b in zip(d["train"]["median_lnM2_by_sqrts"], d["val"]["median_lnM2_by_sqrts"])])
 
 
+POOLGEN = r"""
+import json, os, re, sys
+log = open(sys.argv[1] + "/out_0.log").read()
+o = {}
+for role, p, f in re.findall(r"\[(train|val)\] (\S+): \d+ events.*? from (\S+\.npy)", log):
+    r = json.load(open(f + ".recipe.json")) if os.path.exists(f + ".recipe.json") else {}
+    o.setdefault(p, {})[role] = dict(file=f, created=r.get("created"), pipeline=(r.get("provenance") or {}).get("pipeline_sha256"),
+                                     commit=(r.get("provenance") or {}).get("git_commit"))
+print("POOLGEN " + json.dumps(o))
+"""
+
+
+def pool_gen(out):
+    """Per process of a parent run (its out_0.log's [train] and [val] lines): each pool's file, generation date, commit
+    and pipeline hash (its .recipe.json) -> analysis/zng_uq/data/parent_pool_gen.json; prints the processes whose train
+    pool was generated more than a week after its val pool (the hash differs for nearly every pool: separate jobs)."""
+    sys.path.insert(0, ROOT)
+    from analysis.common.readers import site_python
+    d = {}
+    for run in (NEW, NEW + "_w"):
+        d[run] = site_python(POOLGEN, [run], "POOLGEN", site="lxplus")
+    json.dump(d, open(out, "w"), indent=1)
+    for run, v in d.items():
+        from datetime import datetime
+        age = lambda r: (datetime.fromisoformat(r["train"]["created"]) - datetime.fromisoformat(r["val"]["created"])).days
+        diff = {p: (r["train"]["created"], r["val"]["created"]) for p, r in v.items() if "train" in r and "val" in r and age(r) > 7}
+        print(run, len(v), "processes;", len(diff), "whose train pool was generated more than a week after its val pool:")
+        for p, c in sorted(diff.items()):
+            print("   ", p, "train", c[0], "val", c[1])
+
+
 if __name__ == "__main__":
     data = os.path.join(HERE, "data", "parent_vs_finale.json")
     if sys.argv[1] == "diag":
         diag(os.path.join(HERE, "data", "parent_diag.json"))
+    elif sys.argv[1] == "poolgen":
+        pool_gen(os.path.join(HERE, "data", "parent_pool_gen.json"))
     elif sys.argv[1] == "ttvpools":
         ttv_pools(os.path.join(HERE, "data", "parent_ttv_pools.json"))
     elif sys.argv[1] == "explain":

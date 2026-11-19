@@ -1,5 +1,6 @@
 {
  "train": {
+  "file": "/eos/user/j/joiturri/tmp/amp_data_cache/uubar_ttbar_nlo_363-450GeV_train_amplitudes.npy",
   "n": 50000,
   "created": "2026-11-17T22:09:32+0100",
   "commit": "7ce215f8afbc90d2c20f2e34264f2e3006412780",
@@ -22,6 +23,7 @@
   ]
  },
  "val": {
+  "file": "/eos/user/j/joiturri/datasets/uubar_ttbar_nlo_363-450GeV_val_amplitudes.npy",
   "n": 5000,
   "created": "2026-10-02T05:00:05+0200",
   "commit": "ced1f7af6a6859f5998f5fdcc76cfe2bc72c808b",

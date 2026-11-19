@@ -246,9 +246,22 @@ def summary(path, curves):
     print(json.dumps(out))
 
 
-# the target's standardisation std per n, equal in B1's best trials and the B2 runs (their data_stats.json prepd_std,
-# read on CC 2026-11-19): standardised MSE x std^2 = MSE(ln|M|^2)
-STD = {1: 0.7400866884821334, 2: 0.916236411330228, 3: 1.0440505621505058, 4: 1.1233685031095888}
+STDREAD = r"""
+import json, sys
+print("ZNGSTD " + json.dumps({d: json.load(open(d + "/data_stats.json"))["prepd_std"][0] for d in sys.argv[1:]}))
+"""
+
+
+def stds(out):
+    """The target's standardisation std of B1's best trials and the B2 scratch runs per n (data_stats.json prepd_std, read
+    on CC), asserted equal per n -> analysis/zng_uq/data/zng_std.json {n: std}: standardised MSE x std^2 = MSE(ln|M|^2)"""
+    from analysis.common.readers import site_python
+    b2 = {n: f"runs/kit/kit_A_uq_{p}_me2_n500000_t200000_suprio_protocol" for n, p in PROCS.items()}
+    r = site_python(STDREAD, list(B1_SCR.values()) + list(b2.values()), "ZNGSTD")
+    for n in PROCS:
+        assert abs(r[B1_SCR[n]] / r[b2[n]] - 1) < 1e-12, (n, r[B1_SCR[n]], r[b2[n]])
+    json.dump({str(n): r[B1_SCR[n]] for n in PROCS}, open(out, "w"), indent=1)
+    print(open(out).read())
 
 
 def b1b2(curves, search):
@@ -262,14 +275,16 @@ def b1b2(curves, search):
     import plot_style as ps
     ps.use()
     c, b = json.load(open(curves)), json.load(open(search))
+    STD = {int(k): v for k, v in json.load(open(os.path.join(HERE, "data", "zng_std.json"))).items()}
     fig, axs = ps.figure(ncols=2, nrows=2)
     for n, ax in zip(PROCS, axs.flat):
         p = PROCS[n]
         t1 = next(t for t in b[f"tp_zng_hpo_{p}"]["trials"] if t["file"].startswith(B1_SCR[n].rsplit("trial_", 1)[1].join(["hp", "_"])))
         t2 = c[f"kit_A_uq_{p}_me2_n500000_t200000_suprio_protocol"]
         rows = []
-        for t, every, bs, col, lab in ((t1, 12500 / len(t1["val"]), 16384, ps.C.blue, "our protocol, searched HPs"),
-                                       (t2, 1000, 1024, ps.C.vermillion, "Suprio's protocol")):
+        for t, every, col, lab in ((t1, 12500 / len(t1["val"]), ps.C.blue, "our protocol, searched HPs"),
+                                   (t2, 1000, ps.C.vermillion, "Suprio's protocol")):
+            bs = t["hp"]["training.batchsize"]   # each run's own (16384 fixed in the B1 searches, 1024 in B2)
             x = (np.arange(len(t["val"])) + 1) * every * bs
             v, tr = np.array(t["val"]) * STD[n] ** 2, np.array(t["train"]) * STD[n] ** 2
             ax.plot(x, v, color=col, label=lab + ", validation")
@@ -283,13 +298,21 @@ def b1b2(curves, search):
             print(f"n={n} {r[0]:28s} best val {r[2]:.3g} at {r[1]:.3g} events; end val {r[3]:.3g} train {r[4]:.3g} at {r[5]:.3g}; "
                   f"val/train end {r[6]:.3g}, at best {r[7]:.3g}")
         print(f"n={n} best val B1/B2 {rows[0][2] / rows[1][2]:.3g}")
+        # before and after the WSD cooldown (its last 1/8 of the steps): B1 at 7/8 of its run, B2 at the same events seen
+        b1s, b2s = t1["hp"]["training.batchsize"], t2["hp"]["training.batchsize"]
+        k1 = int(round(len(t1["val"]) * 7 / 8)) - 1; e1 = (k1 + 1) * 12500 / len(t1["val"]) * b1s
+        k2 = min(int(round(e1 / b2s / 1000)) - 1, len(t2["val"]) - 1)
+        e0 = 12500 / len(t1["val"]) * b1s; k0 = int(round(e0 / b2s / 1000)) - 1
+        print(f"n={n} B1 at {e1:.3g} events (7/8): val {t1['val'][k1] * STD[n] ** 2:.3g} train {t1['train'][k1] * STD[n] ** 2:.3g}; "
+              f"B2 at {(k2 + 1) * 1000 * b2s:.3g}: val {t2['val'][k2] * STD[n] ** 2:.3g} train {t2['train'][k2] * STD[n] ** 2:.3g}; "
+              f"first B1 validation ({e0:.3g} events) val {t1['val'][0] * STD[n] ** 2:.3g}, B2 at {(k0 + 1) * 1000 * b2s:.3g} val {t2['val'][k0] * STD[n] ** 2:.3g}")
     ps.legend(axs[0][0], "lower left")
     ps.save(fig, os.path.join(HERE, "figs", "zng_b1_vs_b2"))
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("cmd", choices=["collect", "plot", "summary", "parent", "b1b2"])
+    ap.add_argument("cmd", choices=["collect", "plot", "summary", "parent", "b1b2", "stds"])
     ap.add_argument("--theirs", default=os.path.join(os.environ.get("WORK", ""), "ext", "uq_runs", "runs", "prod_het"))
     ap.add_argument("--out", default=os.path.join(HERE, "data", "benchmark.json"))
     ap.add_argument("--data", default=os.path.join(HERE, "data", "benchmark.json"))
@@ -299,6 +322,9 @@ def main():
         collect(a.theirs, a.out)
     elif a.cmd == "parent":
         parent(os.path.join(HERE, "data", "parent_bbx.json"))
+    elif a.cmd == "stds":
+        sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
+        stds(os.path.join(HERE, "data", "zng_std.json"))
     elif a.cmd == "b1b2":
         b1b2(a.curves, os.path.join(HERE, "data", "b1_search.json"))
     elif a.cmd == "plot":
