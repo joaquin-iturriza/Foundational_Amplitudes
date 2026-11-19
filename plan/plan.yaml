@@ -35780,6 +35780,12 @@ entries:
     units: null
     start: '2026-11-19T00:56:59+00:00'
     at: '2026-11-19T00:56:59+00:00'
+  - batch: protocol_test_adam_plateau_bs16384
+    wall_h: 3.5
+    jobs: 4
+    units: null
+    start: '2026-11-19T00:57:06+00:00'
+    at: '2026-11-19T00:57:06+00:00'
   handoff:
     state: '2026-11-19 ~01:30 UTC. Joaquin''s four questions answered with figures (finding of 2026-11-19; figs zng_parent_learning,
       zng_parent_true_pred, zng_parent_wpole, zng_b1_vs_b2; zng_median_delta flags B1 n=2..4 as failing the curve test). u
