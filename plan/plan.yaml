@@ -35809,6 +35809,14 @@ entries:
       FA-lxplus-f3901ad0, Z+4g FA-ccin2p3-a652edfc. Arm (b) ''Adam plateau at batch 16384'': Z+1g FA-lxplus-9a0f77c5, Z+2g
       FA-lxplus-3ea39a5e, Z+3g FA-lxplus-547c198d, Z+4g FA-lxplus-6394cbfc. Cancelled: FA-ccin2p3-5c14c2aa d77906e1 9958966c
       9e1b1276 2f8ac2e5 d57071d3 ac047fb1 d5f02694.'
+  - at: '2026-11-19T08:57:08+00:00'
+    text: '2026-11-19 step 17 done (parent_read.py rebuilt/sitediff @0191bb4f, data/parent_ttv_rebuilt.json, parent_ttv_sitediff.json,
+      fig zng_ttv_relabel v2): u u~ -> t t~ one-loop val/test rebuilt with today''s labeller on lxplus (FA-lxplus-2ee4002c)
+      and CC (FA-ccin2p3-33afc1ca); old pools, alphas and sidecars moved to datasets/quarantine (.20261119-0936xx lxplus,
+      -0950xx CC), never deleted. Today''s labeller on the rebuilt val: 200/200, max |ln ratio| 4.8e-15, 0 above 1e-6 (old
+      val: median 0.0084, max 0.016). datagen.mixed_generation on the retrain''s 28 processes flags none (t t~ V now same
+      pipeline sha as its train; max |z| of the rest 2.7). md5 lxplus != CC; event by event: same events, momenta differ by
+      <= 2.9e-11, labels |ln ratio| <= 4.4e-11, 0 rows above 1e-6 (val and test): floating-point rounding across sites.'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
