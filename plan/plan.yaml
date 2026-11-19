@@ -15798,10 +15798,6 @@ entries:
       git): build the AST graph of FA''s code only (no docs semantic pass), then 10 past lookup tasks from this session''s
       transcripts (where is X computed / who calls Y), three arms at low effort: grep as now, graph queries via Bash, pyright
       LSP told to use; measure tokens to answer and correctness against the known answer'
-    27: 'Trial tools/recall.py over our own stores (plan hand-offs and findings, ledger decisions, compaction summaries in
-      the transcripts): search returns the summary records, expand returns the raw transcript lines behind one (by agent id
-      and time window); no memory file. Test on 5 past cases of lost context (e.g. 2026-11-18 ''I don''t remember saying yes'',
-      the B1 n=1 scope question): does expand reach the source words'
     28: 'Trial Code Mode in a terminal session Joaquin starts in a worktree with CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1 in that
       shell only (not available over Remote Control): checklist that submit_guard, git_verify_guard (compound ''cd X && git
       commit''), review_guard, plan_files_guard, send_check, brief_guard still refuse from inside code; whether PostToolUse
@@ -16367,11 +16363,6 @@ entries:
       if:
       - 'graph or LSP arm >=30% fewer tokens at equal correctness: propose the integration to Joaquin as a diff'
       - 'no gain: dead end, LSP plugin kept or removed on the same numbers'
-    27:
-      feeds: whether reversible age-tiered recall adds over what we keep
-      if:
-      - '4 of 5 found with fewer reads than now: offer it to Joaquin for briefs and hand-offs'
-      - 'fewer: dead end'
     28:
       feeds: whether Code Mode can be used under our hooks
       if:
