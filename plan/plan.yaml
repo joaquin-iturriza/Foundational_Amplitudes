@@ -35572,6 +35572,17 @@ entries:
       finale re-read eval-only there, REREAD=tp3_finale trial_0073), and the old finale''s shift between the two pools (expected
       MSE ~1e-4 from the 0.008-0.013 label offset) is reported beside it; no number mixes the two pools. If the CC and lxplus
       md5 differ, the labels are compared event by event before either is used.'
+    passed_at: '2026-11-19T01:11:01+00:00'
+    reviewer: 'Re-check of the 01:10 rebuild design (u u~ -> t t~ one-loop val/test pools, no GPU). Rebuilding shared pools
+      is a bug fix (top-width handling 7b00eb21/7f879cd7) with the old files quarantined, not Joaquin''s call. Check 2: parent_ttv_relabel.json,
+      train log ratio <=3.3e-16 on 200/200, val 0.0036-0.016 (median ~0.008) on 200/200; mixed_generation z 8.3 val / 6.1
+      test, others <=2.7. Fixes verified: lxplus build only after FA-lxplus-57f6d2cb ends (no running reader); same --rebuild
+      on CC with md5 compared across sites, event-by-event read if they differ; CC''s train pool guarded at every load by
+      datagen.mixed_generation (experiment.py l.1575, asserts unless data.allow_mixed_generation, default off); 24 recipes
+      name uubar_ttbar_nlo, only transfer_finale by an open entry per the owner''s plan search; old finale re-read on the
+      rebuilt pool with its pool-to-pool shift beside it, no number mixing pools. Searched: rebuild, regenerat, quarantine,
+      frozen val, width_regen (D145). Note: the eval-only re-read of the old finale may trip the same load guard (old train
+      sha vs new val) and need allow_mixed_generation stated.'
   step_why:
     5:
       feeds: the record of the comparison so far
