@@ -661,10 +661,18 @@ def stop_conditions():
     c6, n6 = sc.context({"transcript_path": tr2}, d, ask=found(miss), steps="")
     open(tr2, "a").write(json.dumps(rec(6, "assistant", "Joaquin, may I widen the pools?")) + "\n")
     more = dict(miss, questions=miss["questions"] + [{"quote": "may I widen the pools?", "why": "w"}])
-    c7, _ = sc.context({"transcript_path": tr2}, d, ask=found(more), steps="")
-    scenario("B1: context_guard's Stop branch refuses once per omission: the same omissions at a new transcript "
-             "state pass with a note; a new omission refuses again",
-             not c6 and n6 and "no `plan ask`" in n6[0] and len(c7) == 1 and "widen the pools" in c7[0], (c6, n6, c7))
+    c7, n7 = sc.context({"transcript_path": tr2}, d, ask=found(more), steps="")
+    reworded = dict(miss)
+    reworded["questions"] = [{"quote": "the held-out pools be generated closer to the families?", "why": "w"}]
+    os.unlink(os.path.join(d, ".claude", ".compact_checked"))
+    open(tr2, "a").write(json.dumps(rec(7, "assistant", "x")) + "\n")
+    c8, _ = sc.context({"transcript_path": tr2}, d, ask=found(miss), steps="")
+    open(tr2, "a").write(json.dumps(rec(8, "assistant", "y")) + "\n")
+    c9, n9 = sc.context({"transcript_path": tr2}, d, ask=found(reworded), steps="")
+    scenario("B1: context_guard's Stop branch refuses at most once per wanted period: later Stops, even with a new "
+             "omission or reworded quotes, pass with a note; after the markers are cleared it refuses again",
+             not c6 and n6 and "no `plan ask`" in n6[0] and not c7 and n7 and len(c8) == 1 and not c9 and n9,
+             (c6, n6, c7, n7, c8, c9, n9))
     sys.path.insert(0, os.path.join(ROOT, ".claude", "hooks"))
     import context_guard as cg
     u, says, recs = cg.window(tr)
