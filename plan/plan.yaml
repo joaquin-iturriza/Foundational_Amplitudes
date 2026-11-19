@@ -34731,7 +34731,7 @@ entries:
     - 18
   owner:
     agent: a4d03f2a6af185e35
-    state: working
+    state: closed
     since: '2026-11-19T13:56:30+00:00'
     state_at: '2026-11-19T18:08:07.408000+00:00'
     context: 272512
@@ -36429,26 +36429,31 @@ entries:
     start: '2026-11-19T09:05:19+00:00'
     at: '2026-11-19T09:05:19+00:00'
   handoff:
-    state: '2026-11-19 ~12:30 UTC. Done this owner: step 17 (t t~ V val/test rebuilt on lxplus+CC, label check 4.8e-15, sites
-      agree to 4e-11, zng_ttv_relabel v2); step 14 (old finale, first parent, W retrain on the same CC pools, FA-ccin2p3-a3e1e1dc:
-      gmean 1.44e-5 / 9.6e-5 (6.6x) / 3.9e-4 (27x); figs zng_parent_vs_finale v3, zng_parent_w_curves); retrain instability
-      diagnosed (zng_parent_stab: training het. loss and grad norm blow up in the stable phase with the W column at lr 3.8e-3;
-      24 non-finite steps); step 16 protocol test read (zng_b1_vs_b2 v2; arm a NO at n=1, unresolved n=2-4 and unstable; arm
-      b NO at every n). Open: step 17 held by the plan ask (lr halving of the W retrain, D241). Step 5 write-up ready: include
-      the protocol-test read and its test median |Delta| (measure 3: benchmark.py collect on lxplus and CC for the 8 runs,
-      not read yet).'
-    decisions: 'Rebuild of t t~ V val/test as bug fix (passed design); CC''s t t~ V TRAIN pool still old labelling (guard
-      refuses CC training on it; eval_best_val EVAL_FROZEN now passes allow_mixed_generation, 79c87112). W column in the retrain
-      is a change Joaquin did not ask for: say so whenever it is reported. Protocol-test verdicts by the passed design''s
-      bands, D492 one seed.'
-    ruled_out: 'The rebuilt pools as a source of the retrain''s regression (cross-check: CC re-read = lxplus sigma-stage MSE
-      on matching pools). W''s off-shell column scale (standardised, std 5.2) as a raw blow-up.'
+    state: '2026-11-19 ~18:30 UTC. Done this owner: step 5 (protocol-test test median |Delta| via benchmark.py ptcollect/ptdelta
+      @77ef8fae, fig zng_protocol_test_delta; write-up results.tex 7a90efc3 incl. the 11-17 paragraph the earlier owner left
+      uncommitted); Joaquin''s curve questions answered (stepread/protocol_figs @d16ba280, figs zng_protocol_lr, zng_protocol_gradnorm,
+      zng_wsd_cooldown, captions in scratchpad cap_lr/cap_gn/cap_cd.txt, check_caption OK). Joaquin found the protocol test
+      held lr fixed across the 16x batch change (no comparison). Best-against-best design (8-trial DyHPO per arm per n, ~261
+      GPU-h) got design-reviewer FIX: B1/B2 gap 1.1-1.9x test median (B1 better on best val at n=1,2) is inside one seed''s
+      3x; recorded as dead end. Open question (asked 18:19, holds steps 17,18): (A) W retrain: halve peak lr to 1.9e-3 (~8
+      GPU-h), drop the W, or DyHPO with W; (B) protocol follow-up: 2 more seeds of B1/B2 (~30-50 GPU-h est., against D492),
+      decompose on end val/train ratio (~261 GPU-h), or drop. Waiting on Joaquin''s yes: the withdrawal wording for the 7a90efc3
+      protocol-test paragraphs in /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/wording.txt
+      (three sentences: unresolved since lr not retuned; ''neither carries'' withdrawn; ''beats at every n'' -> 1.1-1.9x inside
+      one seed); not committed. Not checked: B2''s heterosc_select (protocol-test arm b used nll, arm a mu_mse).'
+    decisions: 'Scored the protocol-test runs with a read-only site_python script (site sync refused: --allow-dirty denied
+      by the permission classifier; sites lag trunk). Committed only the zng hunk of results.tex (other agents'' uncommitted
+      edits untouched); old src @34077f8a moved to @77ef8fae (commit gone). Repo-reviewer PASS after fixes (.gitignore disk_watch_alerted,
+      docstring, mse_std in PT_SITE). Combined both open questions into one ask (the plan keeps one).'
+    ruled_out: 'Train/val gap as a measurement artifact: the training curve is mu-MSE on the first 2000 training events, eval
+      mode, validation''s weights, no reg term, same in every arm. Start-point differences as data: they are logging cadence
+      (validate_frac 0.02 vs every 1000/62 steps) and updates per event (at 1000 updates arm b is below B2). Best-against-best
+      at one seed (dead end).'
     running: none
-    files: 'analysis/zng_uq/parent_read.py (rebuilt, sitediff, reread, stab), analysis/zng_uq/benchmark.py b1b2, tools/kit_curves.py
-      runs --site, tools/eval_best_val.py; data parent_reread.json, parent_stab.json, parent_ttv_rebuilt.json, parent_ttv_sitediff.json,
-      protocol_test_{lxplus,cc}.json; figs zng_ttv_relabel, zng_parent_vs_finale, zng_parent_w_curves, zng_parent_stab, zng_b1_vs_b2.
-      Commits since repo-review watermark 48cce8ed: c0851757, 79c87112, 3c908baf, eba6ddb9, kit_curves --site, b1b2 arms.'
-    written: '2026-11-19T13:53:09+00:00'
+    files: analysis/zng_uq/benchmark.py (ptcollect, ptdelta, summary, b1b2 JSON, stepread, protocol_figs); data protocol_test_delta_{lxplus,cc}.json,
+      protocol_test_{lxplus,cc}.json, protocol_steps.json; figs zng_protocol_test_delta, zng_protocol_lr, zng_protocol_gradnorm,
+      zng_wsd_cooldown, zng_b1_vs_b2; docs/results.tex 7a90efc3; scratchpad wording.txt, cap_*.txt, ptd_caption.txt, proto_submit_lx_v3.sh
+    written: '2026-11-19T18:21:17+00:00'
   ask: 'Scope: two calls of yours, D241 (one-HP changes) and D492 (no more seeds now). (A, asked 2026-11-19 09:27, still open)
     The retrained ladder+star parent with the W added to its propagator list (a change you did not ask for) trains unstably
     at peak lr 3.8e-3 and ends 27x above the old finale on the 28-process geometric-mean val MSE (first parent 6.6x): rerun
