@@ -198,7 +198,7 @@ def figures_handed_back(inp, records=None, spool=SPOOL):
                 missing.append(f)
     if not missing:
         return [], []
-    return ["figures handed back for Joaquin not sent: %s; send them (SendUserFile) or say why not"
+    return ["figures handed back for Joaquin not sent: %s; send them (SendUserFile) or say why not, naming each file (its basename) in the text"
             % ", ".join(missing)], []
 
 

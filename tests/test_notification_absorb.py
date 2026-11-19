@@ -60,7 +60,8 @@ def unit():
                  ("delivered, harness preamble first", PREAMBLE + DELIVERED, hb, True),
                  ("delivered, no hand-back in the transcript", DELIVERED, nohb, False),
                  ("delivered, no transcript path", DELIVERED, None, False),
-                 ("waiting on its own background work", WAITING, hb, False),
+                 ("waiting on its own background work", WAITING, hb, True),
+                 ("waiting, no hand-back in the transcript", WAITING, nohb, True),
                  ("report inline in the notification", INLINE, hb, False),
                  ("agent killed", KILLED, hb, False),
                  ("background command", BASH, hb, False),
@@ -164,7 +165,7 @@ def replay(since=None):
                 m = na.AGENT.search(prompt[:2000])
                 deliv = bool(na.DELIVERED.search(prompt)) and "<status>completed</status>" in prompt
                 counts[(where, kind, "delivered" if kind == "agent_done" and deliv else "-", block)] += 1
-                if block and not (kind == "agent_done" and deliv):
+                if block and not (kind == "agent_done" and (deliv or na.WAITING.search(prompt))):
                     fails.append(("blocked a %s that is not a hand-back delivery" % kind, p, t))
                 if kind == "agent_done" and deliv and m and m.group(1) in handed and not block:
                     fails.append(("passed a delivered notification after its hand-back", p, t, why))

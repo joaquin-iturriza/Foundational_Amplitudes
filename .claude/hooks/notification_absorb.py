@@ -12,7 +12,9 @@ This hook blocks that prompt, so no model call is made on it, only when all hold
   - its result says the report was delivered through SubagentHandback (nothing in it is new);
   - the prompt is that one notification and nothing else (no second notification, no reminder after it);
   - the transcript holds a hand-back message from that same agent (the report did reach this session).
-Anything else (a notification with the report inline, an agent waiting on its own work, a failed or killed agent,
+It also blocks a completed agent notification whose result says the agent "has not reported yet: it is waiting on its
+own background work" (nothing new; its report comes later through SubagentHandback).
+Anything else (a notification with the report inline, a failed or killed agent,
 a background command, typed text) passes untouched. A crash exits 1 (non-blocking: the prompt goes through).
 
 Hand-back batching (D324, Joaquin 2026-11-07: "10 minutes seems reasonable"): a prompt that is one agent's hand-back
@@ -28,6 +30,7 @@ prompt holding anything else (typed text, a second message): the prompt goes thr
 import hashlib, json, os, re, subprocess, sys, time
 
 AGENT = re.compile(r"<task-id>(a[0-9a-f]{16})</task-id>")
+WAITING = re.compile(r"<result>This agent has not reported yet: it is waiting on its own background work")
 DELIVERED = re.compile(r"report was delivered to you as a message from \"?(a[0-9a-f]{16})\"? \(its SubagentHandback call\)")
 
 
@@ -74,6 +77,10 @@ def verdict(prompt, transcript):
     agent = m.group(1)
     if "<status>completed</status>" not in s:
         return False, "status is not completed"
+    if WAITING.search(s):
+        # nothing to act on: the agent resumes on its own work and hands back later (2026-11-19 02:09 UTC: a model
+        # call at full context that said "nothing new")
+        return True, agent
     d = DELIVERED.search(s)
     if not d or d.group(1) != agent:
         return False, "the result is not a SubagentHandback delivery"
@@ -205,7 +212,8 @@ def main():
     block, why = verdict(prompt, d.get("transcript_path"))
     if block:
         print(json.dumps({"decision": "block",
-                          "reason": "agent %s finished; its report was already delivered by its hand-back" % why}))
+                          "reason": ("agent %s is waiting on its own work; its report comes later" if WAITING.search(prompt)
+                                     else "agent %s finished; its report was already delivered by its hand-back") % why}))
     return 0
 
 
