@@ -17684,6 +17684,22 @@ entries:
       now runs 47%). Scorer repair after the run (inside the passed design): answer items are lines starting with a path;
       two right assemble_callers answers had been scored wrong for a prose note naming mg5_pipeline_final.py. Figure not drawn
       yet.'
+  - at: '2026-11-19T13:35:09+00:00'
+    text: '2026-11-19 steps 26/29 rerun with the tool required (lookup_trial.py @69503278 in worktrees/wt-graphify, arms lsp2
+      and batch2, 20 Explore agents at low effort, same ten code lookups; figure analysis/agent_redesign/figs/lookup_trial.png
+      there). The first run''s lsp and batch arms were invalid: 0 LSP calls and 0 batch.py calls in all 20 agents (tools field
+      + transcript grep). Rerun, total over ten tasks, correct / tokens / tool calls: grep run 1 9/469k/24, grep run 2 10/468k/24,
+      LSP required 10/934k/57, batch required 9/697k/37. LSP: every agent called LSP but no request answered (workspaceSymbol
+      given the checkout dir: ''Path is not a file''; incomingCalls/findReferences: pyright no response after 60 s; reproduced
+      by the owner on losses.py). Cause: pyright indexes 33k .py files (16.6k .venv-cpu, 8.7k .venv-driver, 6.9k worktrees)
+      against 995 of FA''s own; fix pyrightconfig.json excluding them (50222fd6 on trunk), live only after the LSP server
+      restarts (next session). So LSP is still untested. batch.py: used by all ten agents (2-5 calls each, plus the required
+      --help); on the design''s rule (fewer calls and tokens than both grep runs) a No: +49% tokens, +54% calls. Post hoc,
+      not the design''s rule: on the four who-calls tasks batch took 147k/8 calls against 257k/13 (grep, both runs), all correct;
+      on the six where-is tasks 550k/29 against 211k/11. The one batch miss (het loss: answered the class HeteroscedasticLoss,
+      not heteroscedastic_loss) followed a batch.py crash on a one-file def lookup, fixed 4e7f3858 (grep -H). Step 27 recall:
+      dead end recorded (figure recall_trial.png). graphify install refused again by the auto-mode classifier after Joaquin''s
+      approval (''Unauthorized Access''; the first attempt, chained with a commit, ''Undermining Oversight'').'
   handoff:
     state: '2026-11-19. Steps 26, 27, 29 trial ran (design passed by the design-reviewer after two FIXes; scorer 3531dc6e,
       item-line repair 61005cc0 in worktrees/wt-graphify). Results in the finding of 2026-11-19 (lookup_trial.json). Left:
