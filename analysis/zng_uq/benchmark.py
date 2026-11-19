@@ -385,6 +385,138 @@ def ptcollect(site, out):
     print({k: (round(v["median_abs_delta"], 7), round(v["pull_std"], 3)) for k, v in r.items()})
 
 
+STEPS_SITE = r"""
+import json, os, sys
+import numpy as np
+import yaml
+out = {}
+for d in sys.argv[1:]:
+    if not os.path.exists(d + "/config.yaml"):
+        continue
+    c = yaml.safe_load(open(d + "/config.yaml")); t = c["training"]
+    cfg = {k: t.get(k) for k in ("optimizer", "lr", "batchsize", "iterations", "scheduler", "cosanneal_warmup_frac",
+                                 "wsd_cooldown_frac", "cosanneal_eta_min", "validate_every_n_steps", "clip_grad_norm",
+                                 "es_patience", "reduceplateau_factor", "reduceplateau_patience", "ema_decay",
+                                 "muon_weight_decay", "regularization_lambda", "track_train_eval")}
+    cfg.update(ema=c.get("ema"), train_eval_events=c.get("evaluation", {}).get("train_subsample"))
+    r = json.load(open(d + "/result.json")) if os.path.exists(d + "/result.json") else {}
+    z = np.load(d + "/train_steps.npz")
+    # validate_frac > 0 overrides validate_every_n_steps at run time (base_experiment: frac x iterations)
+    ve = max(1, int(t["validate_frac"] * t["iterations"])) if t.get("validate_frac") else int(t["validate_every_n_steps"])
+    cfg["validate_every"] = ve
+    st = z["step"]; g = z["grad_norm"]; lr = z["lr"]; ls = z["loss"]
+    k = (st // ve).astype(int)                      # validation interval of each step
+    rows = []
+    for i in np.unique(k):
+        m = k == i; gi = g[m]; fin = np.isfinite(gi)
+        rows.append([int(st[m][-1]) + 1, float(lr[m][-1]), float(np.median(gi[fin])) if fin.any() else None,
+                     float(np.max(gi[fin])) if fin.any() else None, int((~fin).sum()),
+                     float(np.median(ls[m][np.isfinite(ls[m])])) if np.isfinite(ls[m]).any() else None])
+    out[d] = {"cfg": cfg, "val_mse": r.get("val_mse_curve"), "train_mse": r.get("train_eval_mse_curve"),
+              "val_nll": r.get("val_curve"), "best_step": r.get("best_step"), "n_steps": int(len(st)),
+              "first_step": int(st[0]), "intervals": rows,
+              "cols": ["end_step", "lr_end", "grad_norm_median", "grad_norm_max", "n_nonfinite", "train_nll_median"]}
+print("ZNGSTEPS " + json.dumps(out))
+"""
+# the 16 runs of zng_b1_vs_b2: B1, B2 (CC), protocol-test arm (a) (lxplus n=1..3, CC n=4) and (b) (lxplus)
+STEP_RUNS = {"ccin2p3": list(B1_SCR.values()) + [f"runs/kit/kit_A_uq_{p}_me2_n500000_t200000_suprio_protocol" for p in PROCS.values()]
+             + ["runs/kit/kit_A_uq_zgggg_me2_n500000_t200000_protocol_test_ours_bs1024"],
+             "lxplus": [f"runs/kit/kit_A_uq_{p}_me2_n500000_t200000_protocol_test_ours_bs1024_lxplus" for p in ("zg", "zgg", "zggg")]
+             + [f"runs/kit/kit_A_uq_{p}_me2_n500000_t12500_protocol_test_adam_plateau_bs16384_lxplus" for p in PROCS.values()]}
+
+
+def stepread(out):
+    """Per run of zng_b1_vs_b2: its config (optimizer, schedule, EMA, train-eval events) and its train_steps.npz reduced
+    per validation interval (lr at its end, median and max pre-clip grad norm, non-finite steps, median per-batch
+    training NLL on live weights), with result.json's val and train-eval mu-MSE curves -> protocol_steps.json"""
+    sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
+    from analysis.common.readers import site_python
+    d = {}
+    for site, runs in STEP_RUNS.items():
+        for k, v in site_python(STEPS_SITE, runs, "ZNGSTEPS", site=site).items():
+            d[k] = dict(v, site=site)
+    assert len(d) == 16, sorted(d)
+    json.dump(d, open(out, "w"))
+    for k, v in d.items():
+        print(k, v["cfg"]["optimizer"], v["cfg"]["scheduler"], v["n_steps"], "ema", v["cfg"]["ema"])
+
+
+def protocol_figs(steps):
+    """The schedule and stability of the four arms of zng_b1_vs_b2, one panel per n, from protocol_steps.json (stepread):
+    zng_protocol_lr (learning rate over its own peak against training events seen, per validation interval),
+    zng_protocol_gradnorm (largest pre-clip gradient norm per validation interval), and zng_wsd_cooldown (validation
+    and training MSE(log|M|^2) of the two WSD arms against step / total steps). Prints the read as one JSON line."""
+    sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
+    import plot_style as ps
+    ps.use()
+    d = json.load(open(steps))
+    b1 = json.load(open(os.path.join(HERE, "data", "b1_search.json")))
+    STD = {int(k): v for k, v in json.load(open(os.path.join(HERE, "data", "zng_std.json"))).items()}
+    ARM = [("tp_zng_hpo_", "our protocol, searched HPs", ps.C.blue),
+           ("suprio_protocol", "Suprio's protocol", ps.C.vermillion),
+           ("ours_bs1024", "ours at batch 1024", ps.C.sky),
+           ("adam_plateau", "Adam plateau at batch 16384", ps.C.orange)]
+
+    def run(n, tag):
+        p = PROCS[n]
+        k = next(k for k in d if tag in k and (f"hpo_{p}/" in k or f"_uq_{p}_" in k))
+        v = d[k]
+        if tag == "tp_zng_hpo_":    # sweep trials keep their curves in the sweep's results (b1_search.json)
+            t = next(t for t in b1[f"tp_zng_hpo_{p}"]["trials"] if t["run_dir"].endswith(k))
+            v = dict(v, val_mse=t["val"], train_mse=t["train"])
+        I = np.array([[np.nan if x is None else x for x in r] for r in v["intervals"]], float)
+        va = np.array(v["val_mse"], float) * STD[n] ** 2
+        tr = np.array([np.nan if x is None else x for x in v["train_mse"]], float) * STD[n] ** 2
+        return v["cfg"], I, va, tr
+
+    out = {}
+    figs = {name: ps.figure(ncols=2, nrows=2) for name in ("zng_protocol_lr", "zng_protocol_gradnorm", "zng_wsd_cooldown")}
+    for i, n in enumerate(PROCS):
+        for tag, lab, col in ARM:
+            c, I, va, tr = run(n, tag)
+            ev = I[:, 0] * c["batchsize"]
+            ve = c["validate_every"]
+            figs["zng_protocol_lr"][1].flat[i].plot(ev, I[:, 1] / np.nanmax(I[:, 1]), color=col, label=lab)
+            figs["zng_protocol_gradnorm"][1].flat[i].plot(ev, I[:, 3], color=col, label=lab)
+            o = out.setdefault(str(n), {}).setdefault(tag, {})
+            gm = I[:, 3]
+            o.update(first_val_step=ve, first_val_events=ve * c["batchsize"], first_val=float(va[0]), first_train=float(tr[0]),
+                     first_lr_over_peak=float(I[0, 1] / np.nanmax(I[:, 1])), warmup_steps=int((c["cosanneal_warmup_frac"] or 0) * c["iterations"]) if c["scheduler"] == "WSD" else 0,
+                     grad_norm_median=float(np.nanmedian(I[:, 2])), grad_norm_max=float(np.nanmax(gm)),
+                     n_spike_intervals=int(np.sum(gm > 100 * np.nanmedian(I[:, 2]))), n_intervals=int(len(gm)),
+                     end_val=float(va[-1]), end_train=float(tr[-1]), min_val=float(np.nanmin(va)))
+            if tag == "adam_plateau":   # the Adam arm at the update count of Suprio's first validation (1000 steps)
+                j = int(np.argmin(np.abs((np.arange(len(va)) + 1) * ve - 1000)))
+                o.update(val_at_1000_steps=float(va[j]), step_near_1000=int((j + 1) * ve))
+            if c["scheduler"] == "WSD":
+                T = c["iterations"]; f = (np.arange(len(va)) + 1) * ve / T
+                ax = figs["zng_wsd_cooldown"][1].flat[i]
+                ax.plot(f, va, color=col, label=lab + ", validation")
+                ax.plot(f, tr, color=col, linestyle="--", label=lab + ", training")
+                k0 = int(np.searchsorted(f, 1 - c["wsd_cooldown_frac"], side="right")) - 1   # last validation before it
+                k8 = int(round(len(va) / 8)) - 1
+                o.update(cooldown_frac=c["wsd_cooldown_frac"], cooldown_steps=int(round(c["wsd_cooldown_frac"] * T)),
+                         val_eighth=float(va[k8]), val_cool_start=float(va[k0]), train_cool_start=float(tr[k0]),
+                         min_val_stable=float(np.nanmin(va[:k0 + 1])),
+                         cool_val_drop=float(va[k0] / va[-1]), cool_train_drop=float(tr[k0] / tr[-1]),
+                         stable_val_drop=float(va[k8] / va[k0]), R_cool_start=float(va[k0] / tr[k0]), R_end=float(va[-1] / tr[-1]),
+                         epochs=float(T * c["batchsize"] / 500000), cool_epochs=float(c["wsd_cooldown_frac"] * T * c["batchsize"] / 500000))
+        for name, (fig, axs) in figs.items():
+            ax = axs.flat[i]
+            ps.process_label(ax, rf"$q\bar q\to Z+{n}g$")
+            if name == "zng_wsd_cooldown":
+                ax.axvline(1 - c["wsd_cooldown_frac"], color="0.5", linestyle=":", label="start of the cooldown")
+                ax.set_xlabel("step / total steps"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$"); ax.set_yscale("log")
+            else:
+                ax.set_xscale("log"); ax.set_xlabel("training events seen")
+                ax.set_yscale("log")
+                ax.set_ylabel("learning rate / its peak" if name == "zng_protocol_lr" else "largest pre-clip gradient norm")
+    for name, (fig, axs) in figs.items():
+        ps.legend(axs[0][0], "lower left")
+        ps.save(fig, os.path.join(HERE, "figs", name))
+    print(json.dumps(out))
+
+
 def ptdelta(data, pts):
     """zng_protocol_test_delta: test median |Delta| against n for the D498 protocol test's two arms beside their controls
     B1 (scratch, searched HPs) and B2 (scratch, Suprio's protocol) and Suprio's network (benchmark.json); the arms' numbers
@@ -424,7 +556,7 @@ def ptdelta(data, pts):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("cmd", choices=["collect", "plot", "summary", "parent", "b1b2", "stds", "ptdelta", "ptcollect"])
+    ap.add_argument("cmd", choices=["collect", "plot", "summary", "parent", "b1b2", "stds", "ptdelta", "ptcollect", "stepread", "protocol_figs"])
     ap.add_argument("--site", default="ccin2p3")
     ap.add_argument("--theirs", default=os.path.join(os.environ.get("WORK", ""), "ext", "uq_runs", "runs", "prod_het"))
     ap.add_argument("--out", default=os.path.join(HERE, "data", "benchmark.json"))
@@ -440,6 +572,10 @@ def main():
         stds(os.path.join(HERE, "data", "zng_std.json"))
     elif a.cmd == "b1b2":
         b1b2(a.curves, os.path.join(HERE, "data", "b1_search.json"))
+    elif a.cmd == "protocol_figs":
+        protocol_figs(os.path.join(HERE, "data", "protocol_steps.json"))
+    elif a.cmd == "stepread":
+        stepread(os.path.join(HERE, "data", "protocol_steps.json"))
     elif a.cmd == "ptcollect":
         ptcollect(a.site, os.path.join(HERE, "data", f"protocol_test_delta_{'cc' if a.site == 'ccin2p3' else a.site}.json"))
     elif a.cmd == "ptdelta":
