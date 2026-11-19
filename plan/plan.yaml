@@ -17573,6 +17573,11 @@ entries:
       in terminal with Code Mode on. Memory: best fit to ''older compacted more, expandable to the exact original'' is LCM
       (Lossless Context Management, arXiv 2605.04050; lossless-claw, hermes-lcm, pi-lcm): hierarchical summary DAG over a
       verbatim store, lcm_expand; not for Claude Code. Trials proposed to Joaquin.'
+  - at: '2026-11-19T13:07:51+00:00'
+    text: '2026-11-19 steps 26/27/29 set up in worktrees wt-graphify (lookup_trial.py e6f0ef58), wt-batch (batch.py 7830e0aa),
+      wt-recall (recall.py a0671a53). pip install graphifyy into worktrees/wt-graphify/.venv-graphify was refused twice by
+      the auto-mode classifier (''Unauthorized Access'', then ''Undermining Oversight''): the graph arm of step 26 waits on
+      Joaquin allowing that install; grep, lsp, batch, now and recall arms go ahead under the trial design.'
   handoff:
     state: '2026-11-19. Step 21 done (after-period of the 10-min batch, 6d067301; figure analysis/agent_redesign/figs/wake_batching_after_per_day.png,
       finding of 2026-11-19). Wake audit done (step 23 finding; fixes a34b19d3 absorb ''waiting on its own background work''
