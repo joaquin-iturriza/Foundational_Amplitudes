@@ -35236,6 +35236,22 @@ entries:
       card), reported with the per-point spread before anything is regenerated. Both pools reproduced: the shift is not in
       the labels (the phase space or the stored row order differs), and the event-by-event comparison of the two pools'' momenta
       is next.'
+    passed_at: '2026-11-19T00:32:11+00:00'
+    reviewer: 'Step 15 relabel (CPU, no training): each pool is relabelled on its own stored momenta by one labeller, so only
+      the labelling generation differs (1). Check 2: parent_ttv_pools.json confirms train (eos tmp/amp_data_cache, 2026-11-17,
+      7ce215f8, pipeline 2daabe91) minus val (eos datasets, 2026-10-02, ced1f7af, pipeline 99b70db5) median ln|M|^2 = 0.013/0.011/0.008/0.010
+      per sqrt(s) bin, alpha_s 0.118 both; the measure is the per-event label ratio itself, so a ~1e-2 label shift is read
+      directly. The 1e-6 reproduction floor is asserted (virt_label_check has no earlier recorded run: none in site runs or
+      artifacts), but the outcome rests on ~1e-2 against agreement and the ''off both'' branch reports a nonzero floor before
+      anything is regenerated, so a floor up to ~1e-3 cannot flip the verdict. Check 3: deterministic MadLoop on stored points,
+      a systematic O(Gamma_t/m_t) shift per event, 200 per pool ample. Check 15: --from-run uses the same out_0.log regex
+      that parent_read.py ttvpools already ran on this run (l.337) to produce parent_ttv_pools.json''s two paths. Disk ~0.3
+      GB standalone on lxplus, 1 h CPU. Note: the job script''s header asks 16 CPUs, the design says 4; either fits. 7b00eb21/7f879cd7
+      (2026-10-26) fall between the two generations; the mixed-born change of u u~ -> t t~ one-loop (results.tex l.250, be01f2db
+      2026-09-13) predates both and is not a candidate. Outcome: four branches stated with actions. Searched: virt_label_check,
+      relabel, ttbar_nlo, DECAY, top width, Gamma_t, zero width, card_width, width_regen, stored label, label check in docs/results.tex;
+      plan.yaml (virt_label_check, lhe_label_virt, H5 step 19 design); site decisions --project FA (ttbar, top width, relabel,
+      val pool, regenerat): no earlier relabel of these pools.'
   step_why:
     5:
       feeds: the record of the comparison so far
