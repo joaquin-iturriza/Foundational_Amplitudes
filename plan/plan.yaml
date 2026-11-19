@@ -16356,7 +16356,6 @@ entries:
     '22': '2026-11-20'
     '23': '2026-11-20'
     '24': '2026-11-22'
-    '27': 'the main session''s go after this owner''s 2026-11-19 report (its narrowing: one report first)'
     '28': the main session's go after this owner's 2026-11-19 report (an interactive terminal session with Code Mode on must
       be started by hand)
   owner:
