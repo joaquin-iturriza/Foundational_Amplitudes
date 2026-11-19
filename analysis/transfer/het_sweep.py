@@ -48,7 +48,7 @@ def main():
     fig, (a1, a2) = ps.figure(ncols=2)
     a1.plot(b["steps"], b["val_curve"], color=ps.C.vermillion, label="validation")
     a1.plot(b["steps"], b["train_eval_loss_no_reg_curve"], color=ps.C.blue, label="training split")
-    a1.set_xlabel("step"); a1.set_ylabel("NLL")
+    a1.set_xlabel("step"); a1.set_ylabel("het. loss")
     a2.plot(b["steps"], b["val_mse_curve"], color=ps.C.vermillion, label="validation")
     a2.plot(b["steps"], b["train_eval_mse_curve"], color=ps.C.blue, label="training split")
     a2.set_yscale("log"); a2.set_xlabel("step"); a2.set_ylabel(r"MSE of $\mu$")
@@ -64,7 +64,7 @@ def main():
         ax.plot(d["steps"], d["val_curve"], color=cmap(norm(np.log10(lr[d["hp"]]))))
     # loss spikes early in training reach +20; the axis stops at 0 so the endpoints that rank the trials can be read
     ax.set_ylim(min(min(d["val_curve"]) for d in rs) - 0.5, 0)
-    ax.set_xlabel("step"); ax.set_ylabel("validation NLL")
+    ax.set_xlabel("step"); ax.set_ylabel("validation het. loss")
     ps.process_label(ax, LAB)
     ps.colorbar(ax, mpl.cm.ScalarMappable(norm=norm, cmap=cmap), r"$\log_{10}$ lr")
     ps.save(fig, os.path.join(OUT, "het_sweep_trials"))

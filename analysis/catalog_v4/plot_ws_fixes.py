@@ -100,10 +100,10 @@ def main():   # dup-ok: one run per arm (seed 42 only), per-arm main-stage lengt
     aR.set_xticks(range(1, len(ticks) + 1)); aR.set_xticklabels(ticks, fontsize=6, rotation=35, ha="right")
     aR.set_ylabel("MSE(arm) / MSE(default restart)")
     aG.set_yscale("log"); aG.set_xlabel("step of the restart"); aG.set_ylabel("gradient norm")
-    aL.set_xlabel("step of the restart"); aL.set_ylabel("training loss (het NLL)")
+    aL.set_xlabel("step of the restart"); aL.set_ylabel("training loss (het. loss)")
     vmin = min(float(curve(RUN[k])[1].min()) for _, k, _, _, _ in ARMS if RUN[k] and RUN[k] in g)
     aV.set_ylim(vmin - 0.1, 0.5)
-    aV.set_xlabel("step of the restart"); aV.set_ylabel("validation loss (het NLL)")
+    aV.set_xlabel("step of the restart"); aV.set_ylabel("validation loss (het. loss)")
     for a, w in ((aP, "pp"), (aE, r"$e^+e^-$")):
         a.set_xscale("log"); a.set_xlabel(w + r" classes: MSE of $\log|M|^2$"); a.set_ylabel("fraction of classes")
         a.set_ylim(0, 1)
@@ -154,7 +154,7 @@ def main_s15():
     aR.set_xticks(range(1, len(ticks) + 1)); aR.set_xticklabels(ticks, fontsize=6, rotation=35, ha="right")
     aR.set_ylabel("MSE(warm start) / MSE(WSD from scratch)")
     for a, n in ((aS, "step of the pretraining"), (aW, "step of the warm start")):
-        a.set_xlabel(n); a.set_ylabel("validation loss (het NLL)"); a.set_ylim(-3.0, -1.5)
+        a.set_xlabel(n); a.set_ylabel("validation loss (het. loss)"); a.set_ylim(-3.0, -1.5)
     for a, w in ((aP, "pp"), (aE, r"$e^+e^-$")):
         a.set_xscale("log"); a.set_xlabel(w + r" classes: MSE of $\log|M|^2$"); a.set_ylabel("fraction of classes")
         a.set_ylim(0, 1)

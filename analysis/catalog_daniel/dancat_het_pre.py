@@ -38,7 +38,7 @@ def main():
         a2.plot(s, mse, color=cols[k])
         print(f"{k} best {r['val_loss']:.3f} at step {r['best_step']}, mu-MSE at the best step {r["val_mse_curve"][r["best_step"] // r["validate_every"] - 1]:.3g}, test {r['test_loss']:.3g}, "
               f"{r['traintime_hours']:.1f} h")
-    a1.set_xlabel("step"); a1.set_ylabel("validation NLL")
+    a1.set_xlabel("step"); a1.set_ylabel("validation het. loss")
     a2.set_yscale("log"); a2.set_xlabel("step"); a2.set_ylabel(r"validation MSE of $\mu$")
     ps.shared_legend(fig, a1, ncol=3)
     ps.save(fig, os.path.join(HERE, "figs", "dancat_het_pre"))

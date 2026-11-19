@@ -93,10 +93,10 @@ def main():
     aR.set_ylabel("MSE(restart arm) / MSE(default restart)")
     aG.plot([], [], "k-", label="seed 42"); aG.plot([], [], "k--", label="seed 43")
     aG.set_yscale("log"); aG.set_xlabel("step of the restart"); aG.set_ylabel("gradient norm")
-    aL.set_xlabel("step of the restart"); aL.set_ylabel("training loss (het NLL)")
+    aL.set_xlabel("step of the restart"); aL.set_ylabel("training loss (het. loss)")
     lo = min(float(curve(r)[1].min()) for _, _, c, _ in ARMS for r in WARM[c]["W"][533])
     aV.set_ylim(lo - 0.1, 0.5)
-    aV.set_xlabel("step of the restart"); aV.set_ylabel("validation loss (het NLL)")
+    aV.set_xlabel("step of the restart"); aV.set_ylabel("validation loss (het. loss)")
     for a, w in ((aP, "pp"), (aE, r"$e^+e^-$")):
         a.set_xscale("log"); a.set_xlabel(w + r" classes: MSE of $\log|M|^2$"); a.set_ylabel("fraction of classes")
         a.set_ylim(0, 1)

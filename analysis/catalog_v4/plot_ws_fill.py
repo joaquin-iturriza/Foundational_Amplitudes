@@ -88,7 +88,7 @@ def main():
     # off scale and is listed in the printed out instead of flattening the rest)
     lo = min(min(v[v < 0]) for _, v in (curve(r) for _, rs, _ in ARMS for r in rs))
     aV.set_ylim(lo - 0.1, 0.5)
-    aV.set_xlabel("step of the restart"); aV.set_ylabel("validation loss (het NLL)")
+    aV.set_xlabel("step of the restart"); aV.set_ylabel("validation loss (het. loss)")
     for a, w in ((aP, "pp"), (aE, r"$e^+e^-$")):
         a.set_xscale("log"); a.set_xlabel(w + r" classes: MSE of $\log|M|^2$"); a.set_ylabel("fraction of classes")
         a.set_ylim(0, 1)

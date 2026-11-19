@@ -75,7 +75,7 @@ def main():
     for nf, col, lab in ((3, ps.C.vermillion, r"$2\to3$"), (4, ps.C.green, r"$2\to4$")):
         q = [p for p in pts if NFIN[p["probe"]] == nf]
         ax.plot([p["mse"] for p in q], [p["het_mumse"] for p in q], "o", color=col, label=lab + r", $\mu$-MSE selected")
-        ax.plot([p["mse"] for p in q], [p["het_nll"] for p in q], "o", color=col, mfc="none", label=lab + ", NLL selected")
+        ax.plot([p["mse"] for p in q], [p["het_nll"] for p in q], "o", color=col, mfc="none", label=lab + ", het. loss selected")
     v = [p[k] for p in pts for k in ("mse", "het_nll", "het_mumse")]
     lim = (min(v) / 1.5, max(v) * 1.5)
     ax.set_xscale("log"); ax.set_yscale("log"); ax.set_xlim(*lim); ax.set_ylim(*lim)

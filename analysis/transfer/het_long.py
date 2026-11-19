@@ -51,7 +51,7 @@ def main():
         print(f"{lab}: best val NLL {d['val_loss']:.3f} at step {d['best_step']}, val MSE(mu) there {d['val_mse_curve'][i]:.3g},"
               f" train-split MSE(mu) there {d['train_eval_mse_curve'][i]:.3g}")
     a1.set_ylim(-9.5, 0)
-    a1.set_xlabel("step"); a1.set_ylabel("validation NLL")
+    a1.set_xlabel("step"); a1.set_ylabel("validation het. loss")
     a2.set_yscale("log"); a2.set_xlabel("step"); a2.set_ylabel(r"validation MSE of $\mu$")
     ps.legend(a1, "upper right"); ps.process_label(a2, r"$e^+e^-\to t\bar t$")
     ps.save(fig, os.path.join(HERE, "figs", "het_long"))

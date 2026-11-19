@@ -29,7 +29,7 @@ from plot_warm_start_compare import class_mse, curve, pair  # noqa: E402
 FIGS = {"ws_c1m": ([("pretrained start", WARM["C1"]["A"], False),
                     ("scratch with change", WARM["C1"]["B"], False),
                     ("warm, default lr", WARM["C1m"]["ref"]["untuned"], True),
-                    ("warm, NLL-tuned", WARM["C1m"]["ref"]["nll_tuned"], True),
+                    ("warm, het. loss-tuned", WARM["C1m"]["ref"]["nll_tuned"], True),
                     ("warm, MSE-tuned", WARM["C1m"]["W"][533], True)], -1.5),
         "ws_c10wm": ([("width 8, scratch", WARM["C10wm"]["A"], False),
                       ("width 16, scratch", WARM["C10wm"]["B"], False),
@@ -63,7 +63,7 @@ def main():
             m, _ = class_mse(pair(runs, axis), axis, cls)
             a.step(m, np.arange(1, len(m) + 1) / len(m), where="post", color=col, label=lab)
             print(lab, axis, "median class MSE", round(float(np.median(m)), 4))
-    aV.set_ylim(min(lo) - 0.1, ytop); aV.set_xlabel("step of the restart"); aV.set_ylabel("validation loss (het NLL)")
+    aV.set_ylim(min(lo) - 0.1, ytop); aV.set_xlabel("step of the restart"); aV.set_ylabel("validation loss (het. loss)")
     for a, w in ((aP, "pp"), (aE, r"$e^+e^-$")):
         a.set_xscale("log"); a.set_xlabel(w + r" classes: MSE of $\log|M|^2$"); a.set_ylabel("fraction of classes")
         a.set_ylim(0, 1)

@@ -125,7 +125,7 @@ def spearman(x, y):
     return float(np.corrcoef(rx, ry)[0, 1])
 
 
-LABELS = {"parent": "pretrained start", "untuned_k533": "warm start, default lr", "trial_1860": "warm start, NLL-tuned lr"}
+LABELS = {"parent": "pretrained start", "untuned_k533": "warm start, default lr", "trial_1860": "warm start, het. loss-tuned lr"}
 
 
 def _few_figure(rows):
@@ -244,7 +244,7 @@ def summary(a):
     import plot_style  # noqa: F401  (the project's figure style)
     o = np.argsort(lr)
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(9, 3.6))
-    a1.plot(lr[o], dn[o], "o-", label="NLL (trial minus trial mean)")
+    a1.plot(lr[o], dn[o], "o-", label="het. loss (trial minus trial mean)")
     a1.plot(lr[o], dw[o], "s--", label=r"$W=\langle r^2/2\sigma^2\rangle$")
     a1.plot(lr[o], ds[o], "^--", label=r"$S=\langle\log\sigma\rangle$")
     a1.set_xscale("log"); a1.set_xlabel("fine_tune.lr_scale"); a1.set_ylabel("deviation from the 8-trial mean")

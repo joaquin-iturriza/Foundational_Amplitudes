@@ -111,7 +111,7 @@ def figs():
             ax.set_xscale("log"); ax.xaxis.set_minor_formatter(NullFormatter())
         if name == "ema":
             ax.set_xticks([0, 1]); ax.set_xticklabels(["off", "on"]); ax.set_xlim(-0.5, 1.5)
-        ax.set_xlabel(lab); ax.set_ylabel("best val. loss (het. NLL)")
+        ax.set_xlabel(lab); ax.set_ylabel("best val. loss (het. loss)")
     ax0 = figs[0][1]
     ax0.plot([], [], color=ps.C.grey, lw=0.6, ls=":", label="search range")
     base = os.path.join(FIGS, "long_hpo_landscape_hps")
@@ -137,7 +137,7 @@ def figs():
         ax.set_ylim(None, YCAP + 0.3)
         ax.set_xlabel("step")
         ps.legend(ax, "upper right")
-    axes[0].set_ylabel(r"val. loss (het. NLL)")
+    axes[0].set_ylabel(r"val. loss (het. loss)")
     ps.save(fig, os.path.join(FIGS, "long_hpo_landscape_curves"))
     print("validations off the scale (step, value) per sweep and trial:", json.dumps(spikes))
     for steps in SWEEPS:

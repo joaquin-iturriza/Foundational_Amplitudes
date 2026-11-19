@@ -43,7 +43,7 @@ def main():
         if key == "training.lr":
             ax.set_xticks([1e-3, 3e-3, 9e-3], [r"$10^{-3}$", r"$3\times10^{-3}$", r"$9\times10^{-3}$"])
             ax.set_xticks([], minor=True)
-        ax.set_xlabel(lab); ax.set_ylabel("validation NLL")
+        ax.set_xlabel(lab); ax.set_ylabel("validation het. loss")
     ax = figs[0][1]
     for i, c in enumerate(cols):
         ax.plot([], [], "o", color=c, label=f"wave {i + 1}")

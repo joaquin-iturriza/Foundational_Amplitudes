@@ -18,7 +18,7 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 FIGS = os.path.join(HERE, "figs")
 SRC = {"mse_wsd": os.path.join(HERE, "data", "ws_mse_hpo8", "trial_curves.json"),
        "nll_cosine": os.path.join(HERE, "data", "ws_hpo8", "trial_curves.json")}
-LABEL = {"mse_wsd": "MSE objective, WSD", "nll_cosine": "NLL objective, cosine"}
+LABEL = {"mse_wsd": "MSE objective, WSD", "nll_cosine": "het. loss objective, cosine"}
 
 
 def rows(path):

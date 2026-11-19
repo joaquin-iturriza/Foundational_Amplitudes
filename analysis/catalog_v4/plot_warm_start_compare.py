@@ -41,7 +41,7 @@ GROUPS = {
     "tuned": [("pretrained start", WARM["C1"]["A"], False),
               ("scratch with change", WARM["C1"]["B"], False),
               ("warm start, default lr", WARM["C1"]["W"][533], True),
-              ("warm start, NLL-tuned lr", WARM["C1t"]["W"][533], True)],
+              ("warm start, het. loss-tuned lr", WARM["C1t"]["W"][533], True)],
     "ckpt": [("pretrained start", WARM["C1"]["A"], False),
              ("scratch with change", WARM["C1"]["B"], False),
              ("warm start from step 2132", WARM["C1ck2132"]["W"][533], True),
@@ -105,7 +105,7 @@ def main():
                                  q10=float(np.quantile(m, 0.1)), q90=float(np.quantile(m, 0.9)))
             out[g][lab] = rec
         axs[i, 0].set_ylim(min(lo) - 0.1, -1.5)
-        axs[i, 0].set_xscale("log"); axs[i, 0].set_xlabel("step"); axs[i, 0].set_ylabel("validation loss (het NLL)")
+        axs[i, 0].set_xscale("log"); axs[i, 0].set_xlabel("step"); axs[i, 0].set_ylabel("validation loss (het. loss)")
         for k in range(3):
             ps.legend(axs[i, k])
         for k, axis in enumerate(("PP4", "EE4")):

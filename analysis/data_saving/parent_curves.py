@@ -58,6 +58,6 @@ if __name__ == "__main__":
     top = max(float(max(x for st, x in zip(s_, v_) if int(st) not in out[k]["spikes_at"]))
               for k, (s_, v_, _) in (("cosine", cos), ("wsd", wsd)))
     ax.set_ylim(top=top)
-    ax.set_xlabel("training step"); ax.set_ylabel(r"val loss (HETEROSC NLL)")
+    ax.set_xlabel("training step"); ax.set_ylabel(r"val loss (HETEROSC het. loss)")
     ps.legend(ax, "upper right")
     ps.save(fig, os.path.join(HERE, "figs", "parent_curves"))

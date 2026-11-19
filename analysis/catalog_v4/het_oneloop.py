@@ -817,7 +817,7 @@ def step61_fig():
         e.plot([v[0] for v in cur[0][:n]], np.median([[v[1] for v in x[:n]] for x in cur], axis=0), color=col[arm])
     e.set_yscale("symlog", linthresh=1)
     e.set_xlabel("training step")
-    e.set_ylabel("validation het NLL")
+    e.set_ylabel("validation het. loss")
     h = a.get_legend_handles_labels()[0] + c.get_legend_handles_labels()[0]
     ps.legend(c, "upper left", handles=h)
     ps.save(fig, os.path.join(FIGS, "het_signhead61"))
