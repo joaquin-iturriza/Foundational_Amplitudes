@@ -41,6 +41,8 @@ for run_dir in sys.argv[1:]:
             own = os.path.join(run_dir, "models", "model_run0_best.pt")
             cfg.fine_tune.pretrained_path = own if os.path.exists(own) else own + ".gz"
             cfg.fine_tune.target_stats = "parent"; cfg.fine_tune.offshell_stats = "parent"
+            # the stats are the run's own, so this site's train pools are only loaded, never read for a number
+            cfg.data.allow_mixed_generation = True
         if os.environ.get("EVAL_FULL") == "1":
             cfg.data.eval_subsample = None   # the whole val pools, whatever cap the run trained with
         cfg.run_dir = tempfile.mkdtemp(prefix="evalbest_", dir=os.environ["SCRATCH"])
