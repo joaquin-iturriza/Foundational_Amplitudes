@@ -36290,6 +36290,7 @@ entries:
     template, no instruction), 2026-10-06T00:17 (the October transfer-study plan, not this parent) and 2026-11-10T02:08 (file
     uploads for the KIT slides) do not touch this run''s lr or the W column.'
   blocks_steps: *id002
+  checked_until: '2026-11-19T14:21:06+00:00'
 - id: dan_zeroshot_v4
   title: Catalog_v4 pretraining zero-shot on Daniel's held-out split
   question: How does our best catalog_v4 pretraining (trial 1262) do zero-shot on the held-out processes of Daniel's catalog
