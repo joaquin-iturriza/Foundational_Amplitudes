@@ -138,16 +138,17 @@ def _pairs(answer):
     """(path, function) per answer line: path relative to the checkout, function the last dotted name or ''."""
     out = []
     for line in answer.replace("`", "").splitlines():
-        m = re.search(r"([\w./-]+\.py)(?::(?:\d+:?)?\s*([\w.<>]+))?", line)
+        m = re.search(r"((?:file://)?[\w./-]+\.py)(?::(?:\d+:?)?\s*([\w.<>]+))?", line)
         if m:
-            path = m.group(1).replace("/home/joaquin/work/FA/", "").lstrip("./") if not m.group(1).startswith(
-                ".claude") else m.group(1)
+            path = re.sub(r"^(?:file://)?/home/joaquin/work/FA/", "", m.group(1))
+            path = re.sub(r"^worktrees/[^/]+/", "", path)
+            path = path[2:] if path.startswith("./") else path
             out.append((path, (m.group(2) or "").split(".")[-1]))
     return out
 
 
 def _same(path, want):
-    return re.sub(r"^worktrees/[^/]+/", "", path) == want   # relative to the checkout (or a worktree of it)
+    return path == want   # relative to the checkout (_pairs strips the checkout and worktree prefixes)
 
 
 def correct(task, answer):
