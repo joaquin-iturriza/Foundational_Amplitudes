@@ -414,6 +414,7 @@ for d in sys.argv[1:]:
                      float(np.median(ls[m][np.isfinite(ls[m])])) if np.isfinite(ls[m]).any() else None])
     out[d] = {"cfg": cfg, "val_mse": r.get("val_mse_curve"), "train_mse": r.get("train_eval_mse_curve"),
               "val_nll": r.get("val_curve"), "best_step": r.get("best_step"), "n_steps": int(len(st)),
+              "traintime_hours": r.get("traintime_hours"),
               "first_step": int(st[0]), "intervals": rows,
               "cols": ["end_step", "lr_end", "grad_norm_median", "grad_norm_max", "n_nonfinite", "train_nll_median"]}
 print("ZNGSTEPS " + json.dumps(out))
