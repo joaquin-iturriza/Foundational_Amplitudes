@@ -35468,6 +35468,19 @@ entries:
       Muon/WSD with its cooldown is what opens the split, the plateau schedule keeps B2 together; both yes or both no -> both
       matter; reported per n with the figure (val and train MSE against events seen, each arm beside its control), naming
       the unresolved cells.'
+    passed_at: '2026-11-19T00:56:27+00:00'
+    reviewer: 'Re-check of the 00:55 design after FIX. Per-n B1 best-trial HPs for arm (a) are within D498 (one-change against
+      B1 at each n; no batch-16384 run at n=1 HPs exists at n=2-4); the submission message must open with that difference
+      from D498''s covers line. Check 1: cfgdiff.json keys all set per arm; es/plateau patience kept in events (base_experiment.py
+      l.1223). Check 2: R = last val/train MSE, b1_search.json 47.9/20.7/68.4 (B1 n=2-4), 2.0 at n=1, B2 1.6-5.4; val-MSE
+      B1/B2 0.14-1.72. Check 3: one seed (D492); bands now outside the measured spread (results.tex l.13711-13720: best-of-8
+      bias median 1.5x, Z gg/Z ggg 0.9-1.9x): arm (a) yes needs R<5 and val ratio to B1 <=0.5, no R>20 and >=1; arm (b) yes
+      R<10 and <=2 of B2, no R>20 or >=3; n=3 (control R 20.7) reads only yes/unresolved. Check 4: no outcome confirmed by
+      the control itself. Check 5 searched: batch 1024, batchsize, ReduceLROnPlateau, early stopping, plateau, suprio, protocol,
+      seed spread, one-seed resolution, solo seeds, Muon AdamW; prior now cites seeds_scratch and par:muon_long. Checks 9-15:
+      HETEROSC, same Zenodo 1e6 test split, emission-scale target as B1/B2, no HPO, 40 GB free on /sps/lpnhe vs ~1.6 GB, job_kit.sh
+      writes result.json val/train mu-MSE curves as for B2, 12 h limit covers Muon overhead to ~0.22 s/step (read from first
+      jobs).'
   step_why:
     5:
       feeds: the record of the comparison so far
