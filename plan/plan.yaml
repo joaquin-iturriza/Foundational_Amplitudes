@@ -35870,7 +35870,7 @@ entries:
         reviewer, smoke, run'
       - 'Joaquin prefers a DyHPO sweep of the parent setup with the W, or dropping the W: design that instead'
   step_waits:
-    '5': FA-lxplus-d2cae475 FA-lxplus-48d41cb6 FA-lxplus-643c1b5e FA-ccin2p3-a652edfc
+    '5': 'the next owner: owner closed near the context limit with a hand-off, step 5 ready'
   findings:
   - at: '2026-11-17T11:18:43+00:00'
     text: 'Their numbers: the UQ repo (branch uq, 311 files) holds no figures, preds or result files. arXiv:2505.20280''s
