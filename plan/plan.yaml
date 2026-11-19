@@ -35192,6 +35192,50 @@ entries:
       quantity parent_read.py reads. Searched: internal_mass_pdgs, offshW, W in the propagator list, 23,6,25, finale, dsave_parent_finale,
       zng_uq_w, eval_subsample, udbar enug / e nu g in results.tex; the entry''s evidence, findings and dead end; site decisions
       D477-D489.'
+  - at: '2026-11-19T00:30:09+00:00'
+    question: 'Step 15, repair inside the approved parent work (D487): is the ~1% |M|^2 shift between the u u~ -> t t~ one-loop
+      train pool the parent loaded (lxplus cache, generated 2026-11-17 by pipeline 2daabe91 at 7ce215f8) and its val pool
+      (datasets, 2026-10-02, pipeline 99b70db5 at ced1f7af) a labelling difference on the same momenta, and which pool does
+      today''s labeller reproduce? The answer tells which pool to regenerate so that the retrain FA-lxplus-57f6d2cb and stage
+      2 read t t~ V on train and val pools labelled alike.'
+    prior: 'This entry (parent_read.py ttvpools @eb18f692, parent_ttv_pools.json): train-minus-val median ln|M|^2 is 0.013/0.011/0.008/0.010
+      in sqrt(s) bins [363,370,380,400,450] GeV, alpha_s 0.118 in both. The parent''s residual is +0.001 on train and +0.007..+0.016
+      on val (zng_parent_true_pred), with val MSE/train MSE 55x. results.tex l.262-268: MadLoop keeps the card Gamma_t in
+      the tree-like top propagators of the loop diagrams, which moves the result at O(Gamma_t/m_t) ~ 0.9%. Commits between
+      the two generations change how the top width reaches MadLoop: 7b00eb21 (2026-10-26, DECAY lines written from column
+      1; before, MadGraph skipped an indented DECAY line and used the compiled default width) and 7f879cd7 (the certifier''s
+      zero-width patch now also hits patched cards). The one-loop labeller code (nlo_virtual_pipeline.py, nlo_madloop, the
+      lhe label rule) is unchanged from 7ce215f8 to HEAD (git diff empty), so today''s labeller is the train pool''s. tools/virt_label_check.py
+      (the lhe ''virt'' rule against stored labels) was used on the H5 held-out one-loop classes; its result is not in results.tex.
+      tools/relabel_check.py does not apply: tree path, and no t t~ V standalone exists on lxplus or CC (it refused). Searched:
+      relabel, DECAY, label check, ttbar_nlo, one-loop top in results.tex; plan show zng_uq_benchmark; site decisions D477-D492.'
+    measure: 'Per pool (train and val, the first 200 rows each), the relative difference between today''s relabel and the
+      stored label: median and max of |relabelled/stored - 1|, the count above 1e-6, the median ln(relabelled/stored) in sqrt(s)
+      quartiles, MadLoop-unusable points. Written by tools/virt_label_check.py --from-run (@65560c1f) as one VIRT_LABEL_CHECK
+      line per pool, plus a per-event npz for the figure: ln(relabelled/stored) against sqrt(s), train and val.'
+    check: 'The quantity moves on existing data. The stored pools differ by 0.008-0.013 in median ln|M|^2 per sqrt(s) bin
+      (parent_ttv_pools.json), and the network''s per-event residual separates the two pools by the same amount at every |M|^2.
+      The labeller reproduces a pool''s own labels to 1e-6 when nothing changed (virt_label_check''s design: same evaluator,
+      same momenta, exact up to MadLoop''s stability rescue). So a shift of 1e-2 on one pool and <1e-6 on the other is resolved
+      by 200 events each.'
+    fixed: 'Momenta: the pools'' own stored rows (no new phase space). Labeller: today''s trunk (one-loop code equal to 7ce215f8''s).
+      alpha_s(M_Z) 0.118, the catalog''s stripped-virtual convention. The standalone is built and pole-certified by datagen.ensure_virt_backend
+      (certifier at zero width, card width restored). Site: lxplus, where both pools the parent read are. Job: scripts/job_virt_label_check.sh
+      with VL_CLASSES=uubar_ttbar_nlo VL_N=200 VL_FROM_RUN=runs/data_saving/dsave_parent_finale_zng_uq VL_SAVE=$SCRATCH/zz_vl_ttv,
+      CPU only, 4 cores, wall limit 1 h (one MadLoop 2->2 build plus certify ~10-20 min, 400 points at <0.5 s/point/core).
+      Disk: one standalone (~0.3 GB) in the MadGraph work dir and a ~20 kB npz. No GPU.'
+    control: 'Each pool is its own control: the same momenta relabelled by one fixed labeller, so the two pools'' ratios are
+      compared under one labeller. Their difference is the labelling change between the generations; the kinematics cannot
+      enter.'
+    seeds: 'None: deterministic MadLoop evaluation of stored points.'
+    outcome: 'Relabel equals train (<1e-6 median) and is off val by ~1e-2 with the same sqrt(s) trend: the val/test pools
+      carry the older labelling (top width handling before 7b00eb21/7f879cd7). Regenerate the u u~ -> t t~ one-loop val and
+      test pools with today''s labeller (CPU, its own design), then re-read the parent and the retrain on them. Relabel equals
+      val and is off train: the 2026-11-17 regeneration on lxplus is wrong; rebuild the train pool from today''s code after
+      finding the setting it differed in, and report. Relabel off both: the labeller drifts on this process (stability or
+      card), reported with the per-point spread before anything is regenerated. Both pools reproduced: the shift is not in
+      the labels (the phase space or the stored row order differs), and the event-by-event comparison of the two pools'' momenta
+      is next.'
   step_why:
     5:
       feeds: the record of the comparison so far
