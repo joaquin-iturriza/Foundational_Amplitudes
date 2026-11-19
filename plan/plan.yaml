@@ -34504,6 +34504,9 @@ entries:
   next:
     17: 'Parent (2) repair of the W retrain''s training instability (zng_parent_stab): proposal to Joaquin, a one-HP change
       (peak lr), needs his yes per D241'
+    18: 'Protocol follow-up: whether the batch or the optimiser carries Suprio''s protocol''s edge, after the D498 protocol
+      test held lr fixed across batch (no comparison); waits on Joaquin: seeds of B1/B2 first, decompose on the end val/train
+      ratio, or drop'
   done_when: null
   notes_ref: null
   match: zng_uq_*,tp*_zng_*
@@ -35980,6 +35983,13 @@ entries:
       - 'Joaquin yes to a lower peak lr for the W retrain: design it (lr halved, everything else as FA-lxplus-57f6d2cb), design
         reviewer, smoke, run'
       - 'Joaquin prefers a DyHPO sweep of the parent setup with the W, or dropping the W: design that instead'
+    18:
+      feeds: whether our setup's gap to Suprio's protocol comes from the batch or the optimiser
+      if:
+      - 'Joaquin picks seeds: design 2 more seeds of B1 and B2 per n, design reviewer, submit'
+      - 'Joaquin picks the val/train-ratio decomposition: revise the best-against-best design on that measure, reviewer, his
+        go on ~261 GPU-h'
+      - 'Joaquin drops it: record the protocol test as unresolved in results.tex'
   step_waits: {}
   findings:
   - at: '2026-11-17T11:18:43+00:00'
