@@ -34238,11 +34238,6 @@ entries:
       mu-MSE 55x) with a sigma collapse at the last validation, which fails the curve test; the clean 2->2 sit 10-90x above
       the old finale, curves still falling at the end. Not checked: how many catalog_v4 classes share the massless internal-W
       case.'
-    15: 'u u~ -> t t~ (one loop) pool mismatch: find what changed between the val pool''s generation (2026-10-02, @ced1f7af,
-      pipeline 99b70db5) and the train pool lxplus regenerated 2026-11-17 (@7ce215f8, pipeline 2daabe91) that shifts |M|^2
-      by ~1% (train-minus-val median ln|M|^2 0.008-0.013 per sqrt(s) bin, parent_ttv_pools.json). Read the one-loop labelling
-      code history (mg5_pipeline_final.py, tools/nlo_conventions.py) and relabel 50 val events with the current pipeline;
-      then make train and val agree, for the retrain''s read and for stage 2'
     16: 'D498 protocol test read: 8 runs (arm a ''ours at batch 1024'': FA-ccin2p3-5c14c2aa zgggg, 9958966c zggg, 2f8ac2e5
       zgg, ac047fb1 zg; arm b ''Adam plateau at batch 16384'': d77906e1 zgggg, 9e1b1276 zggg, d57071d3 zgg, d5f02694 zg).
       Read R = last val/train MSE, best val MSE(ln|M|^2) against B1''s best trial (a) and B2 (b), test median |Delta| (benchmark.py
@@ -35499,13 +35494,6 @@ entries:
         design reviewer, submit'
       - 'full read puts the gmean ratio well under 10x with only the curve test failing on t t~ V''s sigma: report it, read
         the curve test on mu-MSE, and still repair e+ nu g in the retrain before stage 2'
-    15:
-      feeds: whether the parent's t t~ V failure is a data defect and not the setup
-      if:
-      - 'current pipeline reproduces the train pool on val events: regenerate the val/test pools with it (CPU), re-read the
-        retrain on them'
-      - 'the current pipeline reproduces the old val: the regenerated train pool is wrong, rebuild it from the old pipeline
-        and report'
     16:
       feeds: which protocol the Z+ng runs and the parent's fine-tunes use (why B1 ends 21-68x val/train while B2 stays within
         1.6-5.4x)
@@ -35516,7 +35504,6 @@ entries:
   step_waits:
     '5': FA-lxplus-57f6d2cb
     '14': FA-lxplus-57f6d2cb
-    '15': FA-lxplus-e3eecae0
     '16': FA-ccin2p3-5c14c2aa FA-ccin2p3-d77906e1 FA-ccin2p3-9958966c FA-ccin2p3-9e1b1276 FA-ccin2p3-2f8ac2e5 FA-ccin2p3-d57071d3
       FA-ccin2p3-ac047fb1 FA-ccin2p3-d5f02694
   findings:
