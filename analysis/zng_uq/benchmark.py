@@ -476,7 +476,10 @@ def protocol_figs(steps):
             c, I, va, tr = run(n, tag)
             ev = I[:, 0] * c["batchsize"]
             ve = c["validate_every"]
-            figs["zng_protocol_lr"][1].flat[i].plot(ev, I[:, 1] / np.nanmax(I[:, 1]), color=col, label=lab)
+            # dashed for the batch-1024 arm: its schedule in events coincides with the searched-HP run's (same warmup
+            # fraction, same steps x batch) and would hide it
+            figs["zng_protocol_lr"][1].flat[i].plot(ev, I[:, 1] / np.nanmax(I[:, 1]), color=col, label=lab,
+                                                    linestyle="--" if tag == "ours_bs1024" else "-")
             figs["zng_protocol_gradnorm"][1].flat[i].plot(ev, I[:, 3], color=col, label=lab)
             o = out.setdefault(str(n), {}).setdefault(tag, {})
             gm = I[:, 3]
