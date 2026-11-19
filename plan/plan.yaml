@@ -17285,6 +17285,19 @@ entries:
       has fewer total tool calls and tokens than both grep runs at equal correctness -> brief line and hook change as a diff;
       else dead end. 27: yes if recall reaches 4 of 5 sources (hand read) with fewer tool calls than both now runs -> offer
       recall.py for briefs and hand-offs; else dead end.'
+    fix_at: '2026-11-19T13:14:03+00:00'
+    fix: 'Re-check of the 13:13 design (lookup_trial.py @bfddb0c0). Fixed and confirmed: the (path, function) scoring refuses
+      base_experiment.py:_validate, _validate_start with ''train'', an extra base_experiment caller, an mg5_pipeline_final
+      caller and a missing _is_cached file, and accepts the right answers in plain, dotted-class, line-number and ''- '' list
+      forms (17 of 18 cases I ran); tool calls are distinct tool_use ids on assistant lines; control repeats grep2/now2 and
+      the beat-both rule; hand read decides recall; the prior names the ponytail A/B, sd 0.073, D501, D502, D206. One scorer
+      bug left (check 2/4): _pairs() strips the /home/joaquin/work/FA/ prefix and then lstrip(''./''), so an absolute path
+      to a hook, ''/home/joaquin/work/FA/.claude/hooks/notification_absorb.py:mid_turn'', becomes ''claude/hooks/...'' and
+      fold_spool scores False on a right answer. The startswith(''.claude'') test runs on the unstripped path, so it only
+      protects relative paths. Absolute paths are likely from Explore agents and most likely from the lsp arm (the LSP tool
+      returns absolute file URIs), so this biases correctness against the tested arm in the ''equal correctness'' condition.
+      Fix: strip the checkout prefix (and any worktrees/<x>/) first, then remove only a leading ''./'' (not lstrip of characters);
+      add the absolute .claude path and a file:///home/... URI form to the self-check. Nothing else needs to change.'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
