@@ -34396,9 +34396,9 @@ entries:
     decision: D492
   owner:
     agent: ac941999d5d09e98c
-    state: working
+    state: stopped
     since: '2026-11-19T02:28:14+00:00'
-    state_at: '2026-11-19T03:54:37.825000+00:00'
+    state_at: '2026-11-19T03:56:35.979000+00:00'
     context: 90249
     context_at: '2026-11-19T03:23:44+00:00'
   designs:
