@@ -191,7 +191,7 @@ def reread(run_id):
     d = {"eval_run": run_id}
     for e in ev:
         k = tag[e["run_dir"].rstrip("/")]
-        if e["proc_val_mse"]:
+        if k != "old":                                 # HETEROSC: mu-MSE of one shared standardised target
             assert len(set(e["prepd_std"])) == 1, "one shared target std expected"
             d[k] = {p: v * e["prepd_std"][0] ** 2 for p, v in e["proc_val_mse"].items()}
         else:
