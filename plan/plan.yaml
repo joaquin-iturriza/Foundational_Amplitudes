@@ -16113,6 +16113,14 @@ entries:
       vs 257k, 13) and much dearer on the six where-is tasks (550k, 29 vs 211k, 11); a who-calls-only use would need its own
       design. batch.py stays unmerged in worktrees/wt-batch.'
     at: '2026-11-19T13:34:49+00:00'
+  - tried: 'Step 29: tools/batch.py (several read-only lookups in one Bash call: read, grep, def, calls, ls, plan, site) for
+      code lookups, brief requiring it (arm batch required, lookup_trial.py @69503278, batch.py @7830e0aa), ten past code
+      lookups against grep run twice'
+    why: 'Design rule (fewer tool calls and tokens than both grep runs at equal correctness) not met: 37 calls / 697k tokens
+      / 9 of 10 correct against 24/469k/9 and 24/468k/10. Post hoc it was cheaper on the four who-calls tasks (147k, 8 calls
+      vs 257k, 13) and much dearer on the six where-is tasks (550k, 29 vs 211k, 11); a who-calls-only use would need its own
+      design. batch.py stays unmerged in worktrees/wt-batch.'
+    at: '2026-11-19T13:35:16+00:00'
   asks:
   - ask: 'Run the matched small-model trial: 10 small tool-fix or analysis tasks, each on Sonnet 5.5 and on Opus 5.5 at low
       effort, same briefs, scored by tools/agent_tasks.py plus a hand read, about $30 at list price?'
