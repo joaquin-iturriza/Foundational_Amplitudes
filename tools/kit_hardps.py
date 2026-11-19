@@ -23,6 +23,7 @@ preprocessing takes the signed log).
 import json
 import os
 import sys
+import uuid
 
 import numpy as np
 
@@ -242,7 +243,7 @@ def pool_path(rec, out_dir):
 def build_pool(rec, out):
     """Write the pool of recipe `rec` at `out` (atomically: concurrent trials of one size build identical bytes)."""
     rows = role_rows(rec["process"], rec["role"], rec["n_events"])
-    tmp = f"{out}.tmp{os.getpid()}.npy"
+    tmp = f"{out}.tmp{os.getpid()}_{uuid.uuid4().hex[:8]}.npy"   # pids collide across nodes
     os.makedirs(os.path.dirname(out) or ".", exist_ok=True)   # a fresh SCRATCH has no cache dir yet
     np.save(tmp, rows)
     os.replace(tmp, out)
