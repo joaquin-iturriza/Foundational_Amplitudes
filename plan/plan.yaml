@@ -15794,10 +15794,11 @@ entries:
     24: 'Wake measure after RUN/OVERRUN joined the 10-min debounce (2026-11-19): on or after 2026-11-22 re-run tools/wake_batching.py
       over the 3 days since, against the after-period of step 21; report to Joaquin with its figure, then he decides on owners
       as separate sessions'
-    26: 'Trial graphify as a CLI only, in a worktree with its own venv (no hook, no CLAUDE.md block, graphify-out/ outside
-      git): build the AST graph of FA''s code only (no docs semantic pass), then 10 past lookup tasks from this session''s
-      transcripts (where is X computed / who calls Y), three arms at low effort: grep as now, graph queries via Bash, pyright
-      LSP told to use; measure tokens to answer and correctness against the known answer'
+    26: 'Step 26 rest, two arms on the same ten lookups and grep controls (lookup_trial.py @69503278): (a) LSP required, rerun
+      in the next session, once one LSP request on trunk answers within 60 s with pyrightconfig.json (50222fd6) live (the
+      2026-11-19 LSP arm got no answer from pyright on any request); (b) code graph (graphify CLI), once the venv install
+      worktrees/wt-graphify/.venv-graphify + pip install graphifyy gets past the auto-mode classifier (refused 2026-11-19
+      after Joaquin''s approval: ''Unauthorized Access''), which needs a Bash permission rule in his settings'
     28: 'Trial Code Mode in a terminal session Joaquin starts in a worktree with CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1 in that
       shell only (not available over Remote Control): checklist that submit_guard, git_verify_guard (compound ''cd X && git
       commit''), review_guard, plan_files_guard, send_check, brief_guard still refuse from inside code; whether PostToolUse
@@ -16354,10 +16355,12 @@ entries:
       - 'wakes not by Joaquin fall well below 28/day: report, sessions likely not needed'
       - 'they stay near 28/day: report with the sessions design question'
     26:
-      feeds: whether a code graph or the LSP cuts lookup cost
+      feeds: whether an LSP or code-graph tool answers code lookups with fewer tokens than grep (step 26 of the passed trial
+        design)
       if:
-      - 'graph or LSP arm >=30% fewer tokens at equal correctness: propose the integration to Joaquin as a diff'
-      - 'no gain: dead end, LSP plugin kept or removed on the same numbers'
+      - 'LSP or graph >=30% fewer tokens than the mean of the two grep runs and below both, equal or more correct: propose
+        integration as a diff to Joaquin'
+      - 'otherwise: dead end; LSP plugin kept or removed on the same numbers'
     28:
       feeds: whether Code Mode can be used under our hooks
       if:
