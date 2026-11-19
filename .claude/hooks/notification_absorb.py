@@ -158,6 +158,28 @@ def handback_of(prompt):
     return m.group(1)
 
 
+def mid_turn(transcript):
+    """True when the session's last assistant message called a tool (its turn is running): a hand-back then folds into
+    that turn at no extra call, while a spooled one forced a Stop-hook continuation on its open HANDBACK event
+    (2026-11-19: E7527, E7531, E7534, E7541, E7609)."""
+    try:
+        with open(transcript, "rb") as f:
+            f.seek(0, 2)
+            f.seek(max(0, f.tell() - 400000))
+            lines = f.read().decode(errors="replace").splitlines()
+    except (OSError, TypeError):
+        return False
+    for line in reversed(lines):
+        if '"type":"assistant"' not in line.replace(" ", ""):
+            continue
+        try:
+            m = json.loads(line).get("message") or {}
+        except ValueError:
+            continue
+        return m.get("stop_reason") == "tool_use"
+    return False
+
+
 def spool(prompt, agent, site=("site",)):
     """(ok, event line): the report written to the spool and opened as a HANDBACK event."""
     d = os.path.join(CCORCH, "spool", PROJECT)
@@ -203,7 +225,7 @@ def main():
                 f.write("%s not-one-handback %r\n" % (time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), prompt[:120]))
         except OSError:
             pass
-    if agent and waiter_alive():
+    if agent and waiter_alive() and not mid_turn(d.get("transcript_path")):
         ok, line = spool(prompt, agent)
         if ok:
             print(json.dumps({"decision": "block", "reason": "hand-back of %s spooled for the 10-minute batch (%s); "

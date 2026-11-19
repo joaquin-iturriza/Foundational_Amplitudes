@@ -38,3 +38,16 @@ def test_add_event_acked_note():
     assert s.add_event(c, "FA", None, "HANDBACK", "k1", "m", "routine hand-back, auto-acked")
     assert s.add_event(c, "FA", None, "HANDBACK", "k2", "m")
     assert c.execute("SELECT key, acked IS NULL FROM events ORDER BY id").fetchall() == [("k1", 0), ("k2", 1)]
+
+
+def test_mid_turn(tmp_path):
+    import json
+    p = tmp_path / "t.jsonl"
+    run = {"type": "assistant", "message": {"stop_reason": "tool_use", "content": []}}
+    done = {"type": "assistant", "message": {"stop_reason": "end_turn", "content": []}}
+    res = {"type": "user", "message": {"content": [{"type": "tool_result", "content": "x"}]}}
+    p.write_text("\n".join(json.dumps(r) for r in (done, run, res)) + "\n")
+    assert na.mid_turn(str(p))                      # a tool call is running: the hand-back folds into the turn
+    p.write_text("\n".join(json.dumps(r) for r in (run, res, done)) + "\n")
+    assert not na.mid_turn(str(p))                  # the turn ended: spool for the batch
+    assert not na.mid_turn(str(tmp_path / "none.jsonl"))
