@@ -16358,6 +16358,8 @@ entries:
     '24': '2026-11-22'
     '26': 'the main session''s go after this owner''s 2026-11-19 report (its narrowing: one report first)'
     '27': 'the main session''s go after this owner''s 2026-11-19 report (its narrowing: one report first)'
+    '28': the main session's go after this owner's 2026-11-19 report (an interactive terminal session with Code Mode on must
+      be started by hand)
   owner:
     agent: ab33cfe08e8f1ac89
     state: working
