@@ -16357,6 +16357,7 @@ entries:
     '23': '2026-11-20'
     '24': '2026-11-22'
     '26': 'the main session''s go after this owner''s 2026-11-19 report (its narrowing: one report first)'
+    '27': 'the main session''s go after this owner''s 2026-11-19 report (its narrowing: one report first)'
   owner:
     agent: ab33cfe08e8f1ac89
     state: working
