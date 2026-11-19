@@ -16369,6 +16369,7 @@ entries:
     '28': the main session's go after this owner's 2026-11-19 report (an interactive terminal session with Code Mode on must
       be started by hand)
     '26': design-reviewer a8dbb3eb628fac151
+    '27': design-reviewer a8dbb3eb628fac151
   owner:
     agent: a595c4013ad39e6ca
     state: working
