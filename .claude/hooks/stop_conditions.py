@@ -136,6 +136,17 @@ def _epoch(ts):
     return datetime.datetime.fromisoformat((ts or "").replace("Z", "+00:00")).timestamp()
 
 
+def _uncommitted(fig):
+    """True when the figure's legend file names a producer not at a committed blob (send_check refuses its send)."""
+    sys.path.insert(0, HOOKS)
+    try:
+        import send_check
+        lg = send_check.read_legend(fig)
+        return bool(lg) and not send_check.committed(lg[0], lg[1])
+    except Exception:
+        return False
+
+
 def figures_handed_back(inp, records=None, spool=SPOOL):
     """a hand-back in the spool newer than Joaquin's last message names a figure (analysis/**/figs/*.png) for him
     and the main session has not SendUserFile'd it (at any time in the session); "ROUTINE:" reports are exempt. Passes when the turn's
@@ -176,6 +187,8 @@ def figures_handed_back(inp, records=None, spool=SPOOL):
         if body.startswith("ROUTINE:") or "Joaquin" not in body:
             continue
         for f in _FIG.findall(body):
+            if _uncommitted(f):
+                continue                    # send_check would refuse it anyway: nothing the turn can clear
             try:
                 mt = os.path.getmtime(f)    # a send older than the file is of an earlier version
             except OSError:
