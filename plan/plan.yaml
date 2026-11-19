@@ -35332,6 +35332,29 @@ entries:
       CC frozen-stats read FA-ccin2p3-76be39e7 agrees with lxplus to 0.22% on the 25 processes whose val pools match (EVAL_FROZEN
       validated). Design outcome: fails (curve test, and >10x) -> retrain FA-lxplus-57f6d2cb (W column + whole-pool validation)
       running.'
+  - at: '2026-11-19T00:17:00+00:00'
+    text: '2026-11-19 Joaquin''s four questions answered with figures (parent_read.py @eb18f692, benchmark.py @eb18f692).
+      (1) u d~ -> e+ nu g never learns = its val NLL stays at ~0 nats over all 50 validations, and the final model''s MSE(ln|M|^2)
+      is 4.4 on train and 4.8 on val: underfit, not memorised. Predictions span -17..-5 against a true -19.5..-1. u u~ ->
+      t t~ V is NOT memorisation: its val residual sits +0.007..+0.016 above the train residual (~+0.001) at every |M|^2 (MSE
+      train 1.95e-6, val 1.08e-4). Its train pool was regenerated on lxplus 2026-11-17 (pipeline 2daabe91 @7ce215f8), its
+      val pool is from 2026-10-02 (99b70db5 @ced1f7af), and the train-minus-val median ln|M|^2 in four sqrt(s) bins is 0.013/0.011/0.008/0.010,
+      the residual offset. The val NLL blows up (to 100 nats) when sigma shrinks to the train residual. The other 8 regenerated
+      train pools (ee_ZZ, ee_mumu_ew_nlo, ee_uu_ew_nlo, udbar_Wg/Wgg/Wggg, udbar_taunu, uubar_ZZ_nlo) show train/val MSE 0.9-3.7,
+      no such gap (parent_diag). (2) 200 val events: Joaquin 2026-10-22 ''Reduce the validation pool proportionally too''
+      for the short runs at 1e4 train/process (job_catalog_norm.sh l.130, 164a8fe9); 200 then carried to the catalog_v3 short
+      runs, to the long runs (''validate on 200 per process like the short arms'', 1f848f4a, sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml
+      l.56) although they train on the full 1e5 per process (D236), and from trial 1262''s config.yaml into the parent. (3)
+      W: internal_mass_pdgs gives each listed PDG a per-process log-mass scalar and, with offshell_per_event, a per-event
+      (s_prop - M^2)/s_hat column; under dimensionless_inputs the momenta are divided by sqrt(s_hat), the mass column is log10(m/sqrt
+      s_hat) and the sqrt(s_hat) column is removed (wrappers.py setup_dimless_mass), so with all legs massless nothing fixes
+      m_W/sqrt(s_hat). Residual against m(e nu) on the 200 val events: rms 3.9 at 70-90 GeV (mean -3.45), 7.1 below 40 GeV
+      (mean +6.3), 0.6 above 150 GeV. u d~ -> tau nu (tau mass gives the scale) has rms 0.022 at the pole and 0.0025 above.
+      (4) B1 vs B2 (both ~2e8 events, ~410 passes over 5e5): at B1''s first validation (4.1e6 events) B1 val is 13-20x above
+      B2. Before the WSD cooldown (7/8 of the run) B1 val/train is 1.3-2 and val sits above B2. In the 1562-step cooldown
+      B1''s train MSE falls 40-140x at n=2-4 against 3-13x on val (val/train 21-68 at the end, the curve-test failure); B2''s
+      val/train ends at 1.6-5.4. Best val MSE B1/B2: 0.66, 0.14, 1.29, 1.72 (n=1..4), while test median |Delta| has B1 1.2-1.8x
+      worse at every n.'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
