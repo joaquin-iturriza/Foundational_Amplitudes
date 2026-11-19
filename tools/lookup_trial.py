@@ -18,7 +18,8 @@ import glob, json, os, re, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REC = os.path.join(ROOT, "analysis", "agent_redesign", "lookup_trial.json")
 SUB = os.path.expanduser("~/.claude/projects/-home-joaquin-work-FA/*/subagents/agent-%s.jsonl")
-ARMS = ("grep", "grep2", "lsp", "graph", "batch", "now", "now2", "recall")   # grep2, now2: control repeats
+ARMS = ("grep", "grep2", "lsp", "lsp2", "graph", "batch", "batch2", "now", "now2", "recall")   # grep2, now2: control repeats
+# lsp2, batch2: reruns with the tool required (the lsp and batch agents of the first run never called it)
 
 # step 27: past cases where Joaquin's earlier words were lost; id: (question, substrings the answer must hold, None)
 RECALL = {
@@ -91,6 +92,12 @@ TOOL = {
                "only for what it cannot answer."),
 }
 
+TOOL["lsp2"] = ("You must use the LSP tool (pyright): your first tool call is ToolSearch with query 'select:LSP', "
+                "and your next calls are LSP operations (workspaceSymbol to find a symbol, then goToDefinition, "
+                "findReferences or incomingCalls). Use grep only for what LSP could not answer after you tried it.")
+TOOL["batch2"] = ("You must use python3 /home/joaquin/work/FA/worktrees/wt-batch/tools/batch.py for every lookup: your "
+                  "first tool call is that command with --help, and every later lookup is one batch.py call holding "
+                  "several operations (def, calls, grep, read). Use plain grep or sed only for what batch.py cannot do.")
 TOOL["grep2"], TOOL["now2"] = TOOL["grep"], TOOL["now"]
 
 
