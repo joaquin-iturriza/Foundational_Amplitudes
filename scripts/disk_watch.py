@@ -7,7 +7,8 @@ the six largest directories of the user's own area there (WORK when it is on tha
 those paths on it), measured with `du -s` under a time budget and cached in .disk_watch_cache.json in the checkout
 for 6 h (a timed-out measurement is cached as partial, so a slow filesystem is not re-walked every pass).
 
-Exit status: 0 below --warn (90%) and above --min-free-gb (60); otherwise 1, last line "DISK <fs> at N% (X GB free)" (the supervisor turns a failing maintain
+Exit status (alarm only on a change: first crossing, or free space down >= 5 GB since the last alarm, state in
+.disk_watch_alerted.json, cleared when the disk is back above the thresholds): 0 below --warn (90%) and above --min-free-gb (60); otherwise 1, last line "DISK <fs> at N% (X GB free)" (the supervisor turns a failing maintain
 command into an ALERT). At --full (97%) or above it also writes .disk_full in the checkout: sweep/feed_capped.py
 submits nothing while that flag is under 30 min old. The flag is refreshed every pass while the disk is full and
 removed by this script once every filesystem is back below --full.
@@ -19,6 +20,8 @@ import argparse, json, os, subprocess, sys, time
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FLAG = os.path.join(REPO, ".disk_full")
 CACHE = os.path.join(REPO, ".disk_watch_cache.json")
+STATE = os.path.join(REPO, ".disk_watch_alerted.json")   # {mount: free GB at its last alert}
+DROP_GB = 5
 TOP = 6
 
 
@@ -147,6 +150,11 @@ def main():
     a = ap.parse_args()
     site = os.environ.get("CCORCH_SITE", "?")
     cache, dirty, alerts, full = load_cache(), False, [], []
+    try:
+        last = json.load(open(STATE))
+    except (OSError, ValueError):
+        last = {}
+    now_alerted = {}
     for dev, e in sorted(filesystems().items(), key=lambda kv: kv[1]["mount"]):
         used, total, pct = usage(e["paths"][0])
         print("%s %s (%s): %s of %s used, %d%%" % (site, e["mount"], ", ".join(e["names"]), gb(used), gb(total), pct))
@@ -162,9 +170,21 @@ def main():
             print("    %10s  %s" % (gb(b), d))
         free = free_gb(e["paths"][0])
         if pct >= a.warn or free < a.min_free_gb:
-            alerts.append("DISK %s at %d%% (%.0f GB free)" % (e["mount"], pct, free))
+            # alert on the first crossing or a further drop of DROP_GB; an unchanged low disk is only printed
+            prev = last.get(e["mount"])
+            if prev is None or free <= prev - DROP_GB:
+                alerts.append("DISK %s at %d%% (%.0f GB free)" % (e["mount"], pct, free))
+                now_alerted[e["mount"]] = free
+            else:
+                now_alerted[e["mount"]] = prev
+                print("  still low, no change since the last alert (%.0f GB free, was %.0f): not alerting" % (free, prev))
         if pct >= a.full:
             full.append("DISK %s at %d%%" % (e["mount"], pct))
+    if now_alerted != last:
+        try:
+            json.dump(now_alerted, open(STATE, "w"))
+        except OSError:
+            pass
     if dirty:
         save_cache(cache)
     if full:
