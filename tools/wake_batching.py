@@ -219,6 +219,10 @@ def summary(streams, wins):
         c["wakes"] += 1
         c["raw"] += w["raw"]
         c["wt"] += w["wt"]
+    ctx = [w["first"]["raw"] for w in allw if w["first"]]
+    rec["calls"] = sum(w["calls"] for w in allw)
+    rec["no_call_wakes"] = sum(1 for w in allw if not w["calls"])
+    rec["ctx_median"] = statistics.median(ctx) if ctx else 0      # first call of a wake: the context it reads
     rec["windows"] = {}
     for win in wins:
         agg = {"wakes": 0, "raw_first_call_saved": 0, "raw_max_member": 0, "wt_first_call_saved": 0.0,
@@ -243,6 +247,7 @@ def main():
     ap.add_argument("--until", help="ISO time: wakes at or after it are left out")
     ap.add_argument("--out", default="analysis/agent_redesign/wake_batching.json")
     ap.add_argument("--fig", default="analysis/agent_redesign/figs/wake_batching")
+    ap.add_argument("--baseline", help="a JSON of an earlier period: also draw <fig>_per_day, both periods per day")
     ap.add_argument("--list", help="also write every wake (time, stream, cause, tokens) to this JSON file")
     a = ap.parse_args()
     lo = ts(a.since) if a.since else float("-inf")
@@ -271,6 +276,8 @@ def main():
                  for ag, ws in agents.items() for w in ws]
         json.dump(sorted(rows, key=lambda r: r["iso"]), open(a.list, "w"), indent=0)
     figure(rep, wins, os.path.join(ROOT, a.fig))
+    if a.baseline:
+        per_day(json.load(open(os.path.join(ROOT, a.baseline))), rep, os.path.join(ROOT, a.fig + "_per_day"))
     for who in ("main", "owners"):
         r = rep[who]
         print(f"{who}: {r['wakes']} wakes, {r['raw'] / 1e6:.1f}M tokens, by cause " +
@@ -313,6 +320,48 @@ def figure(rep, wins, base):
     ps.legend(axN, "lower left")
     os.makedirs(os.path.dirname(base), exist_ok=True)
     ps.save(fig, base)
+
+
+def per_day_rows(rep, who, win="10"):
+    """{group: (wakes/day, M tokens/day)} of one period; 'not by Joaquin' replayed at `win` min as two token bounds."""
+    r, d = rep[who], rep["days"]
+    u = r["by_cause"].get("user", {"wakes": 0, "raw": 0})
+    rows = {"by Joaquin": (u["wakes"] / d, u["raw"] / 1e6 / d),
+            "not by Joaquin": ((r["wakes"] - u["wakes"]) / d, (r["raw"] - u["raw"]) / 1e6 / d)}
+    w = r["windows"][win]
+    rows["replay"] = ((w["wakes"] - u["wakes"]) / d, (w["raw_first_call_saved"] - u["raw"]) / 1e6 / d,
+                      (w["raw_max_member"] - u["raw"]) / 1e6 / d)
+    return rows
+
+
+def per_day(base, rep, out):
+    """Wakes per day and tokens per day (rows: main session, owners), split by who started the wake, before (base)
+    and after (rep); the before period's 10-min replay drawn as the prediction for the wakes not started by Joaquin."""
+    sys.path.insert(0, ROOT)
+    import plot_style as ps
+    ps.use()
+    fig, axs = ps.figure(ncols=2, nrows=2)
+    groups = ("by Joaquin", "not by Joaquin")
+    x = range(len(groups))
+    for i, who in enumerate(("main", "owners")):
+        b, a = per_day_rows(base, who), per_day_rows(rep, who)
+        for j, (ax, lab) in enumerate(zip(axs[i], ("wakes per day", "tokens per day [millions]"))):
+            ax.bar([k - .2 for k in x], [b[g][j] for g in groups], .4, color=ps.C.blue, label="before the batch")
+            ax.bar([k + .2 for k in x], [a[g][j] for g in groups], .4, color=ps.C.vermillion,
+                   label="after the 10-min batch")
+            pred = b["replay"][1:] if j else b["replay"][:1]
+            ax.plot([1.2] * len(pred), pred, "kD", label="before, replayed with\na 10-min batch")
+            ax.set_xticks(list(x), ["by Joaquin", "other"])
+            ax.set_ylabel(lab)
+            ax.set_ylim(bottom=0)
+            ps.process_label(ax, "main session" if who == "main" else "owners")
+            print(f"{who} {lab}: before " + ", ".join(f"{g} {b[g][j]:.1f}" for g in groups) +
+                  f"; replay {' to '.join(f'{v:.1f}' for v in pred)}; after " +
+                  ", ".join(f"{g} {a[g][j]:.1f}" for g in groups))
+        print(f"{who}: median context at a wake's first call before {base[who].get('ctx_median', 0) / 1e3:.0f}k, "
+              f"after {rep[who]['ctx_median'] / 1e3:.0f}k; wakes without a call after {rep[who]['no_call_wakes']}")
+    ps.legend(axs[0][0], "upper left")
+    ps.save(fig, out)
 
 
 if __name__ == "__main__":

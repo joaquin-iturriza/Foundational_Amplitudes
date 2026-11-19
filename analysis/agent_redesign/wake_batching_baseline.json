@@ -9,7 +9,7 @@
  "main": {
   "wakes": 823,
   "raw": 819787386,
-  "wt": 102210727.20000003,
+  "wt": 102210727.2,
   "by_cause": {
    "task_notification": {
     "wakes": 111,
@@ -32,6 +32,9 @@
     "wt": 33961905.949999996
    }
   },
+  "calls": 3055,
+  "no_call_wakes": 97,
+  "ctx_median": 265965.0,
   "windows": {
    "0": {
     "wakes": 823,
@@ -104,7 +107,7 @@
  "owners": {
   "wakes": 247,
   "raw": 618161381,
-  "wt": 86825652.75000001,
+  "wt": 86825652.75,
   "by_cause": {
    "handback": {
     "wakes": 169,
@@ -132,6 +135,9 @@
     "wt": 6716344.25
    }
   },
+  "calls": 3105,
+  "no_call_wakes": 0,
+  "ctx_median": 198029,
   "windows": {
    "0": {
     "wakes": 247,
