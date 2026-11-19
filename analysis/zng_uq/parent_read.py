@@ -485,6 +485,38 @@ def rebuilt(out):
     print(json.dumps({s: {k: v for k, v in d[s].items() if k not in ("train", "val")} for s in ("lxplus", "ccin2p3")}),
           "md5_equal", d["md5_equal"])
 
+SITEPOOL = r"""
+import json, os, sys
+sys.path.insert(0, os.getcwd())
+import numpy as np
+import datagen
+o = {}
+for r in ("val", "test"):
+    a = np.load(os.path.join(datagen.frozen_dir(), "uubar_ttbar_nlo_363-450GeV_%s_amplitudes.npy" % r))
+    o[r] = dict(shape=list(a.shape), rows=a.tolist())
+print("SITEPOOL " + json.dumps(o))
+"""
+
+
+def sitediff(out):
+    """Step 17: the rebuilt u u~ -> t t~ one-loop val and test pools on lxplus and CC differ in md5
+    (parent_ttv_rebuilt.json): compared event by event -> data/parent_ttv_sitediff.json (per role: max |delta| of the
+    momenta columns, max and median |ln ratio| of the labels, rows whose label differs above 1e-6)."""
+    sys.path.insert(0, ROOT)
+    from analysis.common.readers import site_python
+    a = {s: site_python(SITEPOOL, [], "SITEPOOL", site=s) for s in ("lxplus", "ccin2p3")}
+    o = {}
+    for r in ("val", "test"):
+        x, y = np.array(a["lxplus"][r]["rows"]), np.array(a["ccin2p3"][r]["rows"])
+        assert x.shape == y.shape, (x.shape, y.shape)
+        lr = np.abs(np.log(np.abs(x[:, -1]) / np.abs(y[:, -1])))
+        o[r] = dict(shape=list(x.shape), max_abs_momenta=float(np.abs(x[:, :-1] - y[:, :-1]).max()),
+                    rows_momenta_differ=int((np.abs(x[:, :-1] - y[:, :-1]).max(1) > 0).sum()),
+                    max_abs_ln_label=float(lr.max()), median_abs_ln_label=float(np.median(lr)),
+                    rows_label_above_1e_6=int((lr > 1e-6).sum()), rows_label_differ=int((lr > 0).sum()))
+    json.dump(o, open(out, "w"), indent=1)
+    print(json.dumps(o))
+
 
 W1262 = r"""
 import json, sys
@@ -589,6 +621,8 @@ if __name__ == "__main__":
         pool_gen(os.path.join(HERE, "data", "parent_pool_gen.json"))
     elif sys.argv[1] == "relabel":
         relabel(os.path.join(HERE, "data", "parent_ttv_relabel.json"))
+    elif sys.argv[1] == "sitediff":
+        sitediff(os.path.join(HERE, "data", "parent_ttv_sitediff.json"))
     elif sys.argv[1] == "rebuilt":
         rebuilt(os.path.join(HERE, "data", "parent_ttv_rebuilt.json"))
     elif sys.argv[1] == "ttvpools":
