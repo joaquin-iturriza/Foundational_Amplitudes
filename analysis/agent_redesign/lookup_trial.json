@@ -263,6 +263,45 @@
     "LSP": 2,
     "Bash": 4
    }
+  },
+  "lsp3": {
+   "agent": "a95b7afa2855e3a79",
+   "tokens": 85561,
+   "tool_calls": 5,
+   "answer": "tools/lhe_parts.py:_run_task\n\nI didn't use LSP for this. Pyright's workspaceSymbol search timed out, so I used grep instead. That found only one non-test call, at tools/lhe_parts.py:716. The other matches were comments in mg5_pipeline_final.py and calls in tests/.",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 1,
+    "Bash": 3
+   }
+  },
+  "lsp4": {
+   "agent": "ac8ed2a2cced0fcfb",
+   "tokens": 48776,
+   "tool_calls": 3,
+   "answer": "tools/lhe_parts.py:_run_task\n\nNot checked: dynamic calls such as getattr or string dispatch, which pyright incomingCalls cannot see. I did not run a grep fallback.",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 2
+   }
+  },
+  "graph": {
+   "agent": "a6ea66e1b19d41262",
+   "tokens": 45594,
+   "tool_calls": 2,
+   "answer": "tools/lhe_parts.py:_run_task\n\n(I only checked the graph's direct `calls` edges and did not grep for dynamic or indirect calls.)",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "Bash": 2
+   }
   }
  },
  "is_cached_callers": {
@@ -338,6 +377,45 @@
     "ToolSearch": 1,
     "LSP": 2,
     "Bash": 5
+   }
+  },
+  "lsp3": {
+   "agent": "a080d3d333f93bb9f",
+   "tokens": 116530,
+   "tool_calls": 6,
+   "answer": "datagen.py:ensure_dataset\ndatagen.py:lhe_pp_items\ndatagen.py:_needs_compose\nmix_compose.py:ensure_composed\nmg5_pipeline_final.py:lhe_set_aside\nprebuild_recipes.py:skip_group\ntools/pool_physics.py:stored_block\ntools/check_site_data.py:<module>\ntools/prune_mixture_pools.py:plan\ntools/lhe_parts.py:_items\ntools/lhe_parts.py:_run_task\ntools/lhe_parts.py:built\nsweep/sweep_manager.py:_spec_fully_cached\n\nNot checked: pyright's workspaceSymbol timed out after 60 s, so I found these with grep and took the nearest def above each call as its function. Nested defs (prebuild_recipes.py:skip_group, tools/lhe_parts.py:built) may be wrong if the call actually sits in the outer function. tools/check_site_data.py has no def above its calls, so I listed it as <module> (top-level code).",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 1,
+    "Bash": 4
+   }
+  },
+  "lsp4": {
+   "agent": "adfe5fabd8648a85c",
+   "tokens": 49491,
+   "tool_calls": 3,
+   "answer": "datagen.py:ensure_dataset\ndatagen.py:lhe_pp_items\ndatagen.py:_needs_compose\nmg5_pipeline_final.py:lhe_set_aside\nmix_compose.py:ensure_composed\nprebuild_recipes.py:main\nsweep/sweep_manager.py:_spec_fully_cached\ntools/check_site_data.py:<module>\ntools/lhe_parts.py:_items\ntools/lhe_parts.py:_run_task\ntools/lhe_parts.py:built\ntools/pool_physics.py:stored_block\ntools/prune_mixture_pools.py:plan\n\nThis list comes from pyright incomingCalls only. I did not grep for calls it might miss, such as getattr or string-based calls.",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 2
+   }
+  },
+  "graph": {
+   "agent": "aa2c7f61278e6ecf0",
+   "tokens": 38146,
+   "tool_calls": 2,
+   "answer": "datagen.py:ensure_dataset\ndatagen.py:lhe_pp_items\ndatagen.py:_needs_compose\nprebuild_recipes.py:main\ntools/lhe_parts.py:_items\ntools/lhe_parts.py:_run_task\ntools/lhe_parts.py:built\n\nI took these direct callers from the graph and did not check them with grep, so callers the graph missed (for example dynamic or aliased calls) would not be listed.",
+   "correct": false,
+   "auto": false,
+   "hand": null,
+   "tools": {
+    "Bash": 2
    }
   }
  },
@@ -415,6 +493,46 @@
    "tools": {
     "Bash": 5
    }
+  },
+  "lsp3": {
+   "agent": "aa8eeca6e0d68ab2c",
+   "tokens": 81384,
+   "tool_calls": 5,
+   "answer": "experiment.py:AmplitudeExperiment._validate\n(base_experiment.py:BaseExperiment._validate has a generic version that takes np.mean(losses_no_reg). AmplitudeExperiment overrides it.)\nNot checked: the LSP workspaceSymbol call timed out, so I found this with grep.",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 1,
+    "Bash": 3
+   }
+  },
+  "lsp4": {
+   "agent": "a24c6aec5c6268184",
+   "tokens": 53607,
+   "tool_calls": 3,
+   "answer": "experiment.py:AmplitudeExperiment._validate\n\nIt's computed in `_validate` as `val_loss_no_reg = _combine(lnr)` at line 4785, where `lnr` is the per-process no-reg losses with monitor processes left out. I didn't check the body of `_combine` itself.",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 1,
+    "Bash": 1
+   }
+  },
+  "graph": {
+   "agent": "a25529ca4bffc742e",
+   "tokens": 43178,
+   "tool_calls": 2,
+   "answer": "experiment.py:AmplitudeExperiment._validate (line ~4785: `val_loss_no_reg = _combine(lnr)`)\nNot checked: the body of the `_combine` helper itself. The graph query found `_validate`, and grep gave the exact line.",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "Bash": 2
+   }
   }
  },
  "ckpt_select": {
@@ -490,6 +608,46 @@
    "hand": null,
    "tools": {
     "Bash": 6
+   }
+  },
+  "lsp3": {
+   "agent": "afe1531bbb36288a8",
+   "tokens": 69815,
+   "tool_calls": 3,
+   "answer": "base_experiment.py:BaseExperiment.train",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 1,
+    "Bash": 1
+   }
+  },
+  "lsp4": {
+   "agent": "a4ae935dcb71f1733",
+   "tokens": 52844,
+   "tool_calls": 3,
+   "answer": "base_experiment.py:BaseExperiment.train\n\nNot checked: I didn't read the comparison step itself. I only confirmed that `train` sets up `smallest_val_loss_no_reg`, with the comment \"checkpoint selection uses this when available\", plus `_best_val_idx`. The project notes also mention `experiment._result_extra` for best-checkpoint selection, but that function reports values at the chosen index; it doesn't make the choice.",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 1,
+    "Bash": 1
+   }
+  },
+  "graph": {
+   "agent": "abee57c400536a4f8",
+   "tokens": 91271,
+   "tool_calls": 4,
+   "answer": "base_experiment.py:BaseExperiment.train\n\nNot checked: base_experiment.py:1218 sets smallest_val_loss_no_reg = selection_loss. For some setups, selection_loss may be a different metric (for example, val_mse for HETEROSC). experiment.py:_result_extra reads values back at that index, but it does not choose the checkpoint.",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "Bash": 4
    }
   }
  },
@@ -567,6 +725,46 @@
    "tools": {
     "Bash": 5
    }
+  },
+  "lsp3": {
+   "agent": "a0bc2d9cc76293d65",
+   "tokens": 48667,
+   "tool_calls": 3,
+   "answer": "losses.py:heteroscedastic_loss\n(Found with grep: the LSP workspaceSymbol call timed out after 60s. I did not check analysis/transfer/het_long.py's local nll helper.)",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 1,
+    "Bash": 1
+   }
+  },
+  "lsp4": {
+   "agent": "abef8f9c2dc23d2a7",
+   "tokens": 48978,
+   "tool_calls": 3,
+   "answer": "losses.py:heteroscedastic_loss\nlosses.py:HeteroscedasticLoss.forward",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 1,
+    "Bash": 1
+   }
+  },
+  "graph": {
+   "agent": "a3510bcd1770defac",
+   "tokens": 37116,
+   "tool_calls": 2,
+   "answer": "losses.py:heteroscedastic_loss\nlosses.py:HeteroscedasticLoss",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "Bash": 2
+   }
   }
  },
  "fold_spool": {
@@ -643,6 +841,46 @@
    "tools": {
     "Bash": 4
    }
+  },
+  "lsp3": {
+   "agent": "ad480246df322daae",
+   "tokens": 62913,
+   "tool_calls": 4,
+   "answer": ".claude/hooks/notification_absorb.py:mid_turn",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 1,
+    "Bash": 2
+   }
+  },
+  "lsp4": {
+   "agent": "a0c801fdca0e8ff6e",
+   "tokens": 66859,
+   "tool_calls": 4,
+   "answer": ".claude/hooks/notification_absorb.py:mid_turn",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 1,
+    "Bash": 2
+   }
+  },
+  "graph": {
+   "agent": "a517ec2d10a4b2a84",
+   "tokens": 25412,
+   "tool_calls": 1,
+   "answer": ".claude/hooks/notification_absorb.py:mid_turn",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "Bash": 1
+   }
   }
  },
  "freeze_callers": {
@@ -717,6 +955,45 @@
    "tools": {
     "ToolSearch": 1,
     "LSP": 3,
+    "Bash": 2
+   }
+  },
+  "lsp3": {
+   "agent": "accc18c1e5e0f4af7",
+   "tokens": 65262,
+   "tool_calls": 4,
+   "answer": "experiment.py:init_model\n\n(LSP workspaceSymbol timed out, so I used grep. It found one call site, at line 1487.)",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 1,
+    "Bash": 2
+   }
+  },
+  "lsp4": {
+   "agent": "ab072b0ccd2585e85",
+   "tokens": 48686,
+   "tool_calls": 3,
+   "answer": "experiment.py:init_model",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 2
+   }
+  },
+  "graph": {
+   "agent": "afde19afde7324762",
+   "tokens": 37363,
+   "tool_calls": 2,
+   "answer": "experiment.py:init_model",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
     "Bash": 2
    }
   }
@@ -795,6 +1072,46 @@
    "tools": {
     "Bash": 4
    }
+  },
+  "lsp3": {
+   "agent": "a53844f84e652dd2c",
+   "tokens": 64857,
+   "tool_calls": 4,
+   "answer": "mix_compose.py:compose\n\n(pyright's workspaceSymbol timed out after 60s, so I found this with grep instead. compose takes sampling.f_default at line 181. ensure_composed is the load-time entry point that leads to it, though I didn't trace that call.)",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 1,
+    "Bash": 2
+   }
+  },
+  "lsp4": {
+   "agent": "a5a7dbce85f7a0789",
+   "tokens": 65389,
+   "tool_calls": 4,
+   "answer": "mix_compose.py:compose",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 1,
+    "Bash": 2
+   }
+  },
+  "graph": {
+   "agent": "a2f2d43ceb7d0f1f1",
+   "tokens": 39167,
+   "tool_calls": 2,
+   "answer": "mix_compose.py:compose",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "Bash": 2
+   }
   }
  },
  "lhe_order": {
@@ -871,6 +1188,46 @@
    "tools": {
     "Bash": 5
    }
+  },
+  "lsp3": {
+   "agent": "a85141419fe486d4c",
+   "tokens": 117557,
+   "tool_calls": 7,
+   "answer": "mg5_pipeline_final.py:lhe_layout\n\nSkipped: pyright workspaceSymbol timed out after 60 s, so I found this with grep.",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 1,
+    "Bash": 5
+   }
+  },
+  "lsp4": {
+   "agent": "a91a486abe7791cbe",
+   "tokens": 195597,
+   "tool_calls": 7,
+   "answer": "mg5_pipeline_final.py:lhe_layout\n\nSkipped: I did not check that every caller uses this layout. I used grep after LSP symbol search did not find it.",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 2,
+    "Bash": 4
+   }
+  },
+  "graph": {
+   "agent": "a70b856a9d210d2ec",
+   "tokens": 62940,
+   "tool_calls": 3,
+   "answer": "mg5_pipeline_final.py:lhe_layout\n\nI found this through graphify query, then checked the function body with sed. I did not look for other places that rebuild the same val/test/train offsets.",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "Bash": 3
+   }
   }
  },
  "sigma_cfg_callers": {
@@ -946,6 +1303,45 @@
     "ToolSearch": 1,
     "LSP": 2,
     "Bash": 4
+   }
+  },
+  "lsp3": {
+   "agent": "a450001945acc1691",
+   "tokens": 83530,
+   "tool_calls": 5,
+   "answer": "run.py:main\ntools/sigma_stage.py:<module> (top-level script loop, no enclosing function)\n\nNot checked: pyright workspaceSymbol timed out after 60s, so I found these callers with grep instead.",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 1,
+    "Bash": 3
+   }
+  },
+  "lsp4": {
+   "agent": "a31cdc0d6eadbc5c8",
+   "tokens": 48707,
+   "tool_calls": 3,
+   "answer": "run.py:main\ntools/sigma_stage.py:<module> (module-level code, line 28, not inside a function)\n\nFound with pyright incomingCalls. I left out the two test callers.",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "ToolSearch": 1,
+    "LSP": 2
+   }
+  },
+  "graph": {
+   "agent": "ac92847f8bd887aaf",
+   "tokens": 55265,
+   "tool_calls": 3,
+   "answer": "run.py:main\ntools/sigma_stage.py:<module> (top-level script code at line 28, not inside a function)\n\nThe graph found only run.py:main as a non-test caller, and listed tools/sigma_stage.py only as an import. I used grep to confirm the call at line 28 and that the file has no functions.",
+   "correct": true,
+   "auto": true,
+   "hand": null,
+   "tools": {
+    "Bash": 3
    }
   }
  }

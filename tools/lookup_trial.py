@@ -18,7 +18,7 @@ import glob, json, os, re, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REC = os.path.join(ROOT, "analysis", "agent_redesign", "lookup_trial.json")
 SUB = os.path.expanduser("~/.claude/projects/-home-joaquin-work-FA/*/subagents/agent-%s.jsonl")
-ARMS = ("grep", "grep2", "lsp", "lsp2", "graph", "batch", "batch2", "now", "now2", "recall")   # grep2, now2: control repeats
+ARMS = ("grep", "grep2", "lsp", "lsp2", "lsp3", "lsp4", "graph", "batch", "batch2", "now", "now2", "recall")   # grep2, now2: control repeats
 # lsp2, batch2: reruns with the tool required (the lsp and batch agents of the first run never called it)
 
 # step 27: past cases where Joaquin's earlier words were lost; id: (question, substrings the answer must hold, None)
@@ -77,9 +77,11 @@ TOOL = {
     "grep": "Use Grep, Glob and Read (or grep via Bash) as you normally would.",
     "lsp": ("Use the LSP tool (pyright) for definitions, references and call hierarchy: load it first with ToolSearch "
             "query 'select:LSP'. Fall back to grep only for what LSP cannot answer."),
-    "graph": ("Use the graphify CLI via Bash on the prebuilt code graph: "
-              "cd /home/joaquin/work/FA/worktrees/wt-graphify && .venv-graphify/bin/graphify --help shows the query "
-              "commands (graph in ../../../graphify-out-FA). Fall back to grep only for what the graph cannot answer."),
+    "graph": ("You must use the graphify CLI on the prebuilt code graph of this checkout: your first tool call is "
+              "/home/joaquin/work/FA/worktrees/wt-graphify/.venv-graphify/bin/graphify --help, and your next calls are "
+              "its query, explain, path or affected commands, each with --graph "
+              "/home/joaquin/work/graphify-out-FA/graphify-out/graph.json (its file paths are relative to /home/joaquin/work/FA). Use grep only for what the graph could not "
+              "answer after you tried it."),
     "batch": ("Batch your read-only lookups: python3 /home/joaquin/work/FA/worktrees/wt-batch/tools/batch.py takes "
               "several operations in one Bash call (run it with --help first). Prefer one batch call over several "
               "single calls."),
@@ -95,12 +97,18 @@ TOOL = {
 TOOL["lsp2"] = ("You must use the LSP tool (pyright): your first tool call is ToolSearch with query 'select:LSP', "
                 "and your next calls are LSP operations (workspaceSymbol to find a symbol, then goToDefinition, "
                 "findReferences or incomingCalls). Use grep only for what LSP could not answer after you tried it.")
+# lsp3: lsp2 rerun once pyright answers (pyrightconfig.json 50222fd6); workspaceSymbol needs a file path
+TOOL["lsp3"] = TOOL["lsp2"] + (" workspaceSymbol takes filePath /home/joaquin/work/FA/run.py (any .py file of the "
+                               "checkout) with line 1, character 1 and your query.")
+# lsp4: lsp3 rerun after the pyright server (up since 2026-11-12, so without 50222fd6) was restarted: lsp3's requests hung
+TOOL["lsp4"] = TOOL["lsp3"]
 TOOL["batch2"] = ("You must use python3 /home/joaquin/work/FA/worktrees/wt-batch/tools/batch.py for every lookup: your "
                   "first tool call is that command with --help, and every later lookup is one batch.py call holding "
                   "several operations (def, calls, grep, read). Use plain grep or sed only for what batch.py cannot do.")
 TOOL["grep2"], TOOL["now2"] = TOOL["grep"], TOOL["now"]
 # figure names in plain words
 ARM_LABEL = {"grep": "grep, run 1", "grep2": "grep, run 2", "lsp": "LSP asked", "lsp2": "LSP required",
+             "lsp3": "LSP, old server", "lsp4": "LSP answering",
              "graph": "code graph", "batch": "batch asked", "batch2": "batch required", "now": "as now, run 1",
              "now2": "as now, run 2", "recall": "recall tool"}
 TASK_LABEL = {"assemble_callers": "callers of LHE assemble", "is_cached_callers": "callers of cache check",
