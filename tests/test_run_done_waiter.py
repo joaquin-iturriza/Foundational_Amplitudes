@@ -145,9 +145,9 @@ def test_batch_window():
 
 def test_batch_holds_non_urgent():
     """2026-11-12: a HANDBACK is held for the whole window even when a non-urgent event (STALLED) arrives in it; a RUN
-    (urgent: RUN, GAP, OVERRUN, ALERT) ends the window at once."""
+    (urgent: GAP, ALERT; 2026-11-19 RUN and OVERRUN are held too) ends the window at once."""
     os.environ["SITE_WAIT_POLL_S"] = "1"
-    for late, held in (("STALLED", True), ("RUN", False)):
+    for late, held in (("STALLED", True), ("RUN", True), ("OVERRUN", True), ("ALERT", False)):
         with tempfile.TemporaryDirectory() as tmp:
             m = load_site(tmp)
             m._rx().read_owners = lambda mm, pr, rules=None: world("stopped")[1]
