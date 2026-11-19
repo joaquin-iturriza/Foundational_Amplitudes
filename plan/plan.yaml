@@ -15782,8 +15782,6 @@ entries:
     22: 'Open to Joaquin (asked 2026-11-19): (1) the lxplus GPU-h costing fix in site/site_gate.py, refused by the permission
       classifier; (2) the CLAUDE.md line-24 rewording (drop ''objective''; ''a repair that keeps the setup I asked for''),
       which blocks the claudemd-keeper pass. Then continue the claudemd-keeper on f49a6b45 and e4e655fa.'
-    23: 'Why the wake fixes did not hold on 2026-11-19 (48 main-session wakes 00:37-10:20: 21 waiter, 13 agent-finished notifications
-      not absorbed, 14 Stop-hook refusals): causes with counts and fixes, to Joaquin (owner ab33cfe08e8f1ac89 working on it)'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16299,11 +16297,6 @@ entries:
       if:
       - 'he says yes to a change: a mechanical-worker or he applies it, then the reviewer re-checks'
       - 'he says leave it: record his words, the reviewer re-checks with line 24 as is'
-    23:
-      feeds: whether the wake-reduction setup works as Joaquin was told
-      if:
-      - 'a cause is mechanical: fixed and tested, then reported'
-      - 'a cause needs a setting he holds: proposed to him as a diff'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
