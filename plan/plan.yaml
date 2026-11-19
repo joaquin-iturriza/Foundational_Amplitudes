@@ -35515,6 +35515,23 @@ entries:
       val still differs from today''s relabel (>1e-6) the build did not run the fixed labeller (stale chunks or backend):
       read the log, report before anything else. If the build changes the phase-space points (event-by-event momenta differ
       from the quarantined pool), that is reported, not a failure: only labels were meant to change.'
+    fix_at: '2026-11-19T01:09:31+00:00'
+    fix: 'Rebuilding the shared u u~ -> t t~ one-loop val/test pools is a bug fix (top-width handling, 7b00eb21/7f879cd7)
+      with the old files quarantined, not deleted: not Joaquin''s call, and the measure is sound (parent_ttv_relabel.json:
+      train log ratio |.|<=3.3e-16 on 200/200, val 0.0036-0.016, median ~0.008). FAILS: (1, one pool per spec on every site)
+      The design rebuilds lxplus only and leaves CC''s copies ''untouched'', so the same spec (recipe id 64cfbc33/db20bba3
+      val/test) would carry two label sets across sites: the E7505 failure this entry already hit (CC and lxplus val pools
+      differing for u d~ -> W+ g..ggg). Fix: after the lxplus build and its relabel check, put the same pools on CC (site
+      copy lxplus->CC, CC''s old ones quarantined the same way), or rebuild there and show the md5 equal; and state whether
+      CC''s and lxplus''s train pools for this spec carry the old or new labels (lxplus train was regenerated 2026-11-17 with
+      the new labeller; CC''s train is not checked). (2, running reader) FA-lxplus-57f6d2cb (the parent retrain, RUNNING)
+      reads this val pool. Show from the code/config that it reads the files only at init (and that its memmap/cache key does
+      not see the move), or schedule the move after it ends; otherwise its sigma stage or final read can mix the two label
+      sets. (3, other readers and the old comparison) The pool is read by every recipe naming uubar_ttbar_nlo (transfer_finale*,
+      transfer_star_*, transfer_wng_*, catalog_loop_probes, catalog_v2*): list the open entries among them and say what the
+      swap does to their reads. In particular the old finale (trial_0073) trained on old labels; re-read on the rebuilt val
+      it gains a label offset (ln shift ~0.008-0.013, MSE ~1e-4, the size of the parent''s 1.08e-4 failure), so the planned
+      parent-vs-finale comparison on this process must read both on one pool and say which; state it in the outcome.'
   step_why:
     5:
       feeds: the record of the comparison so far
