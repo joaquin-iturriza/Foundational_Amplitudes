@@ -427,6 +427,101 @@ def relabel(out):
     ps.save(fig, os.path.join(HERE, "figs", "zng_ttv_relabel"))
 
 
+W1262 = r"""
+import json, sys
+import numpy as np
+# trial 1262's sigma stage (its best checkpoint's mu): per process the MSE of ln|M|^2 on the val events it scored
+d = sys.argv[1] + "/sigma_stage"
+z = np.load(d + "/preds_val.npz"); names = [str(x) for x in z["names"]]; sd = json.load(open(d + "/data_stats.json"))["prepd_std"]
+o = {}
+for i, p in enumerate(names):
+    k = z["process_id"] == i
+    r = (z["pred"][k, 0] - z["truth"][k, 0]) * sd[i]
+    o[p] = dict(mse=float(np.mean(r ** 2)), med_abs=float(np.median(np.abs(r))), n=int(k.sum()))
+print("W1262 " + json.dumps(o))
+"""
+TOK = sorted("tap tam ta mup mum ep em vex ve vmx vm vtx vt wp wm z h a g tx t bx b cx c sx s ux u dx d".split(), key=len, reverse=True)
+LIGHT = set("g a u ux d dx s sx c cx b bx".split())
+
+
+def legs(name):
+    """A catalog_v4 tree's legs from its name (v4_<initial>_<finals>): the two tokenised strings, None if unparsed."""
+    out = []
+    for part in name.split("_")[1:3]:
+        t = []
+        while part:
+            m = next((x for x in TOK if part.startswith(x)), None)
+            if m is None:
+                return None
+            t.append(m); part = part[len(m):]
+        out.append(t)
+    return out
+
+
+def w_group(name):
+    """The class of a catalog_v4 tree with a hadronic initial state and one lepton pair besides light partons and
+    photons (b massless in v4): 'W, e or mu' (charged lepton e/mu + neutrino: the W internal, every outside leg
+    massless), 'W, tau' (tau + neutrino: the tau mass fixes a scale), 'Z, massless' (a same-flavour e/mu or neutrino
+    pair: the Z internal and in internal_mass_pdgs); None for anything else (nlo, variants, other legs)."""
+    if name.count("_") != 2:
+        return None
+    lg = legs(name)
+    if lg is None or not all(x in LIGHT for x in lg[0]):
+        return None
+    lep = [x for x in lg[1] if x not in LIGHT]
+    if len(lep) != 2:
+        return None
+    nu = [x for x in lep if x.startswith("v")]; ch = [x for x in lep if not x.startswith("v")]
+    if len(nu) == 1 and ch[0] in ("ep", "em", "mup", "mum") and nu[0][:2] == {"e": "ve", "m": "vm"}[ch[0][0]]:
+        return "W, e or mu"
+    if len(nu) == 1 and ch[0] in ("tap", "tam") and nu[0][:2] == "vt":
+        return "W, tau"
+    if sorted(lep) in (["em", "ep"], ["mum", "mup"], ["ve", "vex"], ["vm", "vmx"]):
+        return "Z, massless"
+    return None
+
+
+def w1262(out):
+    """Trial 1262 (catalog_v4 long run, dimensionless inputs, internal_mass_pdgs [23, 6, 25]): per-class val MSE of
+    ln|M|^2 on its 200 scored val events per class, grouped by w_group."""
+    sys.path.insert(0, ROOT)
+    from analysis.common.readers import site_python
+    d = site_python(W1262, ["runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262"], "W1262")
+    for p in d:
+        d[p]["group"] = w_group(p); lg = legs(p) if d[p]["group"] else None
+        d[p]["n_final"] = len(lg[1]) if lg else None
+    json.dump(d, open(out, "w"), indent=1)
+    allm = np.array([v["mse"] for v in d.values()])
+    print("all %d classes: median MSE %.3g" % (len(allm), np.median(allm)))
+    for g in ("W, e or mu", "W, tau", "Z, massless"):
+        r = sorted((v["n_final"], p, v["mse"]) for p, v in d.items() if v["group"] == g)
+        print(g, len(r), "median MSE %.3g" % np.median([x[2] for x in r]), "rank-percentile median %.2f"
+              % np.median([(allm < x[2]).mean() for x in r]))
+        for x in r:
+            print("   %d %-22s %.3g" % x)
+
+
+def plot_w1262(path):
+    """zng_w1262 (1x1): trial 1262's val MSE(ln|M|^2) per class against the number of final legs, the three groups of
+    w_group, beside the median over all its classes."""
+    sys.path.insert(0, ROOT)
+    import plot_style as ps
+    ps.use()
+    d = json.load(open(path))
+    fig, ax = ps.figure()
+    off = {"W, e or mu": 0.12, "W, tau": 0.0, "Z, massless": -0.12}
+    lab = {"W, e or mu": r"$W$, $e/\mu$ + $\nu$ (all massless)", "W, tau": r"$W$, $\tau$ + $\nu$",
+           "Z, massless": r"$Z$, $\ell^+\ell^-$ or $\nu\bar\nu$"}
+    col = {"W, e or mu": ps.C.vermillion, "W, tau": ps.C.blue, "Z, massless": ps.C.green}
+    for g in off:
+        r = [(v["n_final"], v["mse"]) for v in d.values() if v["group"] == g]
+        ax.plot([x[0] + off[g] for x in r], [x[1] for x in r], "o", color=col[g], label=lab[g])
+    ax.axhline(np.median([v["mse"] for v in d.values()]), color="k", linestyle=":", label="median, all classes")
+    ax.set_xticks([2, 3, 4]); ax.set_yscale("log"); ax.set_xlabel("final-state legs"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
+    ps.legend(ax, "upper left")
+    ps.save(fig, os.path.join(HERE, "figs", "zng_w1262"))
+
+
 if __name__ == "__main__":
     data = os.path.join(HERE, "data", "parent_vs_finale.json")
     if sys.argv[1] == "diag":
@@ -437,6 +532,10 @@ if __name__ == "__main__":
         relabel(os.path.join(HERE, "data", "parent_ttv_relabel.json"))
     elif sys.argv[1] == "ttvpools":
         ttv_pools(os.path.join(HERE, "data", "parent_ttv_pools.json"))
+    elif sys.argv[1] == "w1262":
+        w1262(os.path.join(HERE, "data", "w1262.json"))
+    elif sys.argv[1] == "w1262plot":
+        plot_w1262(os.path.join(HERE, "data", "w1262.json"))
     elif sys.argv[1] == "explain":
         explain(os.path.join(HERE, "data", "parent_explain.json"))
     else:
