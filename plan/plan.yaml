@@ -15800,6 +15800,10 @@ entries:
       git): build the AST graph of FA''s code only (no docs semantic pass), then 10 past lookup tasks from this session''s
       transcripts (where is X computed / who calls Y), three arms at low effort: grep as now, graph queries via Bash, pyright
       LSP told to use; measure tokens to answer and correctness against the known answer'
+    27: 'Trial tools/recall.py over our own stores (plan hand-offs and findings, ledger decisions, compaction summaries in
+      the transcripts): search returns the summary records, expand returns the raw transcript lines behind one (by agent id
+      and time window); no memory file. Test on 5 past cases of lost context (e.g. 2026-11-18 ''I don''t remember saying yes'',
+      the B1 n=1 scope question): does expand reach the source words'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16335,6 +16339,11 @@ entries:
       if:
       - 'graph or LSP arm >=30% fewer tokens at equal correctness: propose the integration to Joaquin as a diff'
       - 'no gain: dead end, LSP plugin kept or removed on the same numbers'
+    27:
+      feeds: whether reversible age-tiered recall adds over what we keep
+      if:
+      - '4 of 5 found with fewer reads than now: offer it to Joaquin for briefs and hand-offs'
+      - 'fewer: dead end'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
