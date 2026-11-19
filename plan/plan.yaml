@@ -35818,6 +35818,16 @@ entries:
       21). Old finale geometric mean 1.44e-5. t t~ V: the old finale read 4.3e-9 on the old val pool (its own labels, trained
       on the old train pool) and 8.2e-5 on the rebuilt one: the ~0.8% label offset squared (~6e-5), as the design expected
       (~1e-4); so on t t~ V the old finale is no longer a reference.'
+  - at: '2026-11-19T09:25:01+00:00'
+    text: '2026-11-19 retrain instability (parent_read.py stab @2398515d, data/parent_stab.json, fig zng_parent_stab): same
+      lr schedule in both parents (WSD, peak 3.8e-3 from step ~13000 to ~56000). The retrained parent (W in internal_mass_pdgs)
+      is unstable in the stable phase in TRAINING too: its training het. loss climbs from ~-5 to above 0 between ~25000 and
+      ~55000 steps and recovers only in the cooldown (end -5.08 vs first parent -5.97); median grad norm per 1280-step interval
+      up to ~1e6 (first parent ~1e2-1e3); 24 non-finite grad norms (skipped steps; first parent 0); validation spikes to 1.65e11.
+      The first parent shows none of this. So the W column, the only training-side change, destabilises training at this lr;
+      the W''s off-shell column is standardised (mean -0.43, std 5.19 in data_stats offshell_stats), so not a raw scale blow-up.
+      Repair options: lower peak lr (a one-HP change: Joaquin''s yes needed, D241) or an HPO sweep of the parent setup with
+      the W column; dropping the W returns to the first parent (u d~ -> e+ nu g unlearned, 4.18).'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
