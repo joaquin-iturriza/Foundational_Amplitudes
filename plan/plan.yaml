@@ -34403,7 +34403,7 @@ entries:
     agent: ac941999d5d09e98c
     state: stopped
     since: '2026-11-19T02:28:14+00:00'
-    state_at: '2026-11-19T09:27:37+00:00'
+    state_at: '2026-11-19T09:28:08.308000+00:00'
     context: 214331
     context_at: '2026-11-19T09:21:22+00:00'
   designs:
