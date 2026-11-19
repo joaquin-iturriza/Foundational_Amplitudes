@@ -17218,6 +17218,35 @@ entries:
       has fewer tool calls and tokens than grep at equal correctness -> brief line and hook change to Joaquin as a diff; else
       dead end. 27: yes if recall reaches 4 of 5 sources with fewer tool calls than now -> offer recall.py to Joaquin for
       briefs and hand-offs; else dead end.'
+    fix_at: '2026-11-19T13:11:32+00:00'
+    fix: '(1) Scorer accepts wrong code answers (check 2/4): correct() matches file and function as substrings of the whole
+      answer, so for val_combine ''base_experiment.py:_validate'' scores True (experiment.py is a substring of base_experiment.py,
+      and AmplitudeExperiment._validate at experiment.py:4625 overrides the base one, so that answer is the likeliest wrong
+      one), and for ckpt_select ''base_experiment.py:_validate_start'' plus any word containing ''train'' scores True; assemble_callers
+      allows mg5_pipeline_final.py, which has no call of lhe_assemble (only comments and the def), so a wrong caller there
+      passes. Fix: parse each answer line into (path, function), match the path by whole path components and the function
+      by exact name, and drop mg5_pipeline_final.py from the assemble_callers allowed set; rerun the self-check on these wrong
+      answers and commit it. (2) Tool-call count is about doubled (check 2): usage() counts tool_use blocks in every line
+      whose message role is assistant, and the transcripts also carry ''api-request-blob'' lines repeating each call (993
+      subagent transcripts of this session have them); on agent a8dbb3eb628fac151 it counts 61 calls for 34 distinct tool_use
+      ids. The 29 and 27 outcomes are read on tool calls. Fix: count only lines of type ''assistant'' or dedupe by tool_use
+      id, and test on one transcript. (3) Recall scoring too loose (check 4): b1_n1_scope requires the substring ''own'',
+      which ''shown'', ''known'' or ''down'' satisfy, so an answer saying the design used the same HPs can pass; wording_yes
+      requires only ''zng_uq_benchmark'' and ''2026-11-17'', so ''yes, he approved it'' passes while the right answer is that
+      he never said yes. Fix: require the distinguishing words (e.g. each n''s own / not the n=1 searched HPs; never answered
+      / no yes) or add a blind hand read of every recall answer as in the D203 trial, and state which decides. (4) No spread
+      for one agent on one prompt (check 3): one agent per task and arm; the ponytail A/B in results.tex (sec:ponytail-ab)
+      says run-to-run spread of one agent on one prompt is measured by no cell, and the design cites none. Fix: measure it
+      (e.g. the grep arm run a second time on all ten tasks, or three tasks three times, and the now arm twice on the five
+      cases) and show the 30% token threshold stands above it, or cite a measured spread (D203''s paired cost-ratio sd 0.073,
+      analysis/agent_redesign/model_trial_size.json) with why it transfers to low-effort lookups. (5) Prior incomplete (check
+      5): the ponytail A/B (results.tex sec:ponytail-ab, analysis/ponytail_ab/ponytail_ab.py @cf3af8f5) is prior work measuring
+      agent tool calls and tokens across arms with the same token sum, including a how-to lookups task; name it and what it
+      settled. Checked and fine: the ten code answers hold at trunk 9d011b9f (9 files call datagen._is_cached; lhe_parts._run_task;
+      experiment.init_model; run.main and tools/sigma_stage.py; experiment._validate, base_experiment.train, losses.heteroscedastic_loss,
+      notification_absorb.mid_turn, mix_compose.compose, mg5_pipeline_final.lhe_layout exist); recall sources D277, D324,
+      D380 (2026-11-11T03:21:50), D498 and the zng ask of 2026-11-17 18:58 CET exist; arms differ only in the brief''s tool
+      sentence; checks 8-15 do not apply (no training, no site jobs).'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
