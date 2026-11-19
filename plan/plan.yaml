@@ -34682,8 +34682,8 @@ entries:
     state: stopped
     since: '2026-11-19T13:56:30+00:00'
     state_at: '2026-11-19T14:07:46.371000+00:00'
-    context: 142098
-    context_at: '2026-11-19T17:53:18+00:00'
+    context: 156282
+    context_at: '2026-11-19T18:02:45+00:00'
   designs:
   - at: '2026-11-17T11:14:59+00:00'
     question: 'Setup step (CPU job scripts/job_zng_fetch.sh, no GPU): are the Zenodo 16793011 Z+1..4g files, converted by
