@@ -393,12 +393,48 @@ def pool_gen(out):
             print("   ", p, "train", c[0], "val", c[1])
 
 
+RELABEL = r"""
+import json, os, sys
+import numpy as np
+o = {}
+for role in ("train", "val"):
+    z = np.load(os.path.join(os.environ["SCRATCH"], "zz_vl_ttv", "uubar_ttbar_nlo_%s.npz" % role))
+    o[role] = dict(pool=str(z["pool"]), sqrts=z["sqrts"].tolist(), ok=z["ok"].tolist(),
+                   log_ratio=np.log(np.abs(z["relabelled"]) / np.abs(z["stored"])).tolist())
+print("RELABEL " + json.dumps(o))
+"""
+
+
+def relabel(out):
+    """Step 15: today's one-loop labeller on the first 200 rows of the u u~ -> t t~ one-loop train and val pools the
+    parent loaded (scripts/job_virt_label_check.sh VL_FROM_RUN, npz in $SCRATCH/zz_vl_ttv on lxplus) ->
+    analysis/zng_uq/data/parent_ttv_relabel.json and figure zng_ttv_relabel: ln(relabelled/stored) against sqrt(s)."""
+    sys.path.insert(0, ROOT)
+    from analysis.common.readers import site_python
+    import plot_style as ps
+    ps.use()
+    d = site_python(RELABEL, [], "RELABEL", site="lxplus")
+    json.dump(d, open(out, "w"))
+    fig, ax = ps.figure()
+    for role, col, lab in (("train", ps.C.blue, "training pool"), ("val", ps.C.vermillion, "validation pool")):
+        r = d[role]; k = np.array(r["ok"]); x, y = np.array(r["sqrts"])[k], np.array(r["log_ratio"])[k]
+        ax.plot(x, y, ".", color=col, label=lab)
+        print(role, r["pool"], "n %d unusable %d  median ln ratio %.3g  max |ln ratio| %.3g" % (k.sum(), (~k).sum(), np.median(y), np.abs(y).max()))
+    ax.axhline(0, color="k", linestyle=":", label="relabel = stored")
+    ax.set_xlabel(r"$\sqrt{\hat s}$ (GeV)"); ax.set_ylabel(r"$\ln(|\mathcal{M}|^2_{\rm today}/|\mathcal{M}|^2_{\rm stored})$")
+    ps.process_label(ax, r"$u\bar u\to t\bar t,\ V$")
+    ps.legend(ax, "upper left")
+    ps.save(fig, os.path.join(HERE, "figs", "zng_ttv_relabel"))
+
+
 if __name__ == "__main__":
     data = os.path.join(HERE, "data", "parent_vs_finale.json")
     if sys.argv[1] == "diag":
         diag(os.path.join(HERE, "data", "parent_diag.json"))
     elif sys.argv[1] == "poolgen":
         pool_gen(os.path.join(HERE, "data", "parent_pool_gen.json"))
+    elif sys.argv[1] == "relabel":
+        relabel(os.path.join(HERE, "data", "parent_ttv_relabel.json"))
     elif sys.argv[1] == "ttvpools":
         ttv_pools(os.path.join(HERE, "data", "parent_ttv_pools.json"))
     elif sys.argv[1] == "explain":
