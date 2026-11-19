@@ -16381,7 +16381,7 @@ entries:
     agent: ab76a6886e2c96d3b
     state: working
     since: '2026-11-19T13:26:59+00:00'
-    state_at: '2026-11-19T13:26:59+00:00'
+    state_at: '2026-11-19T13:31:39.815000+00:00'
     context: 121361
     context_at: '2026-11-19T13:31:57+00:00'
   designs:
