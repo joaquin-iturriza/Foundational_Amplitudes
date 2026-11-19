@@ -35935,6 +35935,12 @@ entries:
     units: null
     start: '2026-11-19T08:33:09+00:00'
     at: '2026-11-19T08:33:09+00:00'
+  - batch: parent_reread_rebuilt_pools
+    wall_h: 0.5
+    jobs: 1
+    units: null
+    start: '2026-11-19T09:05:19+00:00'
+    at: '2026-11-19T09:05:19+00:00'
   handoff:
     state: '2026-11-19 ~03:00 UTC. (1) D498 protocol test (design passed after one FIX; arm (a) uses each n''s own B1 best-trial
       HPs, not D498''s ''n=1 searched HPs'': reviewer judged it within D498, a message reporting it opens with that). Moved
