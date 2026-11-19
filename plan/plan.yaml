@@ -16318,6 +16318,16 @@ entries:
     - 24
     answered_at: '2026-11-12T14:37:19.796000+00:00'
     decision: D416
+  - ask: 'Permission classifier refusal: `cd /home/joaquin/work/FA/worktrees/wt-graphify && python3 -m venv .venv-graphify
+      && .venv-graphify/bin/pip install -q graphifyy` was refused (''Unauthorized Access'') after your approval of that install
+      (D503). Will you add a Bash permission rule for exactly that command, or run it yourself in ~/work/FA? The code-graph
+      arm of the lookup trial waits on it.'
+    at: '2026-11-19T13:37:50+00:00'
+    searched: 'site decisions --project FA (D501, D503); the entry''s findings 2026-11-19; Joaquin''s messages 2026-11-11T02:02
+      (WSL boot and user session, not this install), 2026-11-14T04:31 (SciPost LaTeX template), 2026-10-26T17:18 (removing
+      wildcard rules from settings.json, not a rule for this command): none settles it'
+    blocks_steps: &id001
+    - 26
   step_why:
     11:
       feeds: whether the redesign is finished
@@ -17712,6 +17722,15 @@ entries:
     files: worktrees/wt-graphify/tools/lookup_trial.py worktrees/wt-graphify/analysis/agent_redesign/lookup_trial.json worktrees/wt-graphify/analysis/agent_redesign/lookup_trial_agents.txt
       worktrees/wt-batch/tools/batch.py worktrees/wt-recall/tools/recall.py
     written: '2026-11-19T13:20:29+00:00'
+  ask: 'Permission classifier refusal: `cd /home/joaquin/work/FA/worktrees/wt-graphify && python3 -m venv .venv-graphify &&
+    .venv-graphify/bin/pip install -q graphifyy` was refused (''Unauthorized Access'') after your approval of that install
+    (D503). Will you add a Bash permission rule for exactly that command, or run it yourself in ~/work/FA? The code-graph
+    arm of the lookup trial waits on it.'
+  waiting_since: '2026-11-19T13:37:50+00:00'
+  searched: 'site decisions --project FA (D501, D503); the entry''s findings 2026-11-19; Joaquin''s messages 2026-11-11T02:02
+    (WSL boot and user session, not this install), 2026-11-14T04:31 (SciPost LaTeX template), 2026-10-26T17:18 (removing wildcard
+    rules from settings.json, not a rule for this command): none settles it'
+  blocks_steps: *id001
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
   question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
@@ -34651,7 +34670,7 @@ entries:
       parent and transfer sections; plan findings 2026-11-18/19. Joaquin''s messages 2026-11-14T04:31 (a pasted SciPost LaTeX
       template, no instruction), 2026-10-06T00:17 (the October transfer-study plan, not this parent) and 2026-11-10T02:08
       (file uploads for the KIT slides) do not touch this run''s lr or the W column.'
-    blocks_steps: &id001
+    blocks_steps: &id002
     - 17
   owner:
     agent: ac941999d5d09e98c
@@ -36266,7 +36285,7 @@ entries:
     parent and transfer sections; plan findings 2026-11-18/19. Joaquin''s messages 2026-11-14T04:31 (a pasted SciPost LaTeX
     template, no instruction), 2026-10-06T00:17 (the October transfer-study plan, not this parent) and 2026-11-10T02:08 (file
     uploads for the KIT slides) do not touch this run''s lr or the W column.'
-  blocks_steps: *id001
+  blocks_steps: *id002
 - id: dan_zeroshot_v4
   title: Catalog_v4 pretraining zero-shot on Daniel's held-out split
   question: How does our best catalog_v4 pretraining (trial 1262) do zero-shot on the held-out processes of Daniel's catalog
