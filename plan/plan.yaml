@@ -17179,6 +17179,42 @@ entries:
       and gc --parts only after the sha256 comparison of val/test and check_site_data pass. Searched: heldout, held-out, regen,
       restore, delete, amp_data_cache, dsh_eea in results.tex, the plan and the decisions; the prior names the earlier pass
       and both FIXes.'
+  - at: '2026-11-19T13:07:28+00:00'
+    question: 'Steps 26, 27, 29 (three trials, no jobs, no GPU): do (26) a pyright LSP arm or a graphify code-graph arm, (29)
+      FA''s own batch tool tools/batch.py, answer past code lookups with fewer tokens than grep at equal correctness; (27)
+      does tools/recall.py (search our summary records: decisions, plan findings/asks/hand-offs, compaction summaries; expand
+      to the raw transcript lines) reach Joaquin''s source words in past lost-context cases with fewer tool calls than searching
+      as now?'
+    prior: 'Step 25 (2026-11-19 finding): graphify, Code Mode and LCM evaluated, no install; LSP plugin installed but 0 LSP
+      calls in 1471 transcripts of session 71602535. D203 model trial (tools/model_trial.py) is the pattern: matched tasks,
+      arms differing in one thing, cost from the agent transcripts. No prior recall or batch tool in results.tex, the plan
+      or the decisions (searched recall, batch, graphify, LSP).'
+    measure: 'Per agent from its transcript (tools/lookup_trial.py @e6f0ef58 in worktrees/wt-graphify): tokens = sum over
+      API calls (dedup by message id) of input + cache read + cache write + output (as wake_batching.py), tool calls, and
+      correct (code: every expected file:function named and, for who-calls, no non-test file outside the expected set; recall:
+      the source words and their date in the answer). Checked on existing data: the scorer passes and refuses hand-written
+      answers (self-check in the session); the task answers were read from the code by grep and enclosing-def lookup, the
+      recall answers from Joaquin''s own messages in the main transcript and the ledger.'
+    check: 'Ten code tasks (lhe_assemble callers, datagen._is_cached callers [9 files], combined val_loss_no_reg in experiment._validate,
+      best checkpoint in base_experiment.train, losses.heteroscedastic_loss, notification_absorb.mid_turn, _freeze_all_but_sigma_head
+      caller experiment.init_model, mix_compose.compose f_default, mg5_pipeline_final.lhe_layout, sigma_stage_cfg callers
+      run.main + tools/sigma_stage.py); every symbol appears in 20-225 past transcripts of the session. Five recall cases:
+      500k context (D277, 2026-10-31T15:39), 10-min batch (2026-11-07T16:59), ''no agent'' (2026-11-11T03:21:50), the results.tex
+      wording yes (zng_uq_benchmark ask of 2026-11-17T17:58, never answered yes), B1 n=1 scope (D498 2026-11-19T00:37, covers
+      ''n=1 searched HPs'', design used each n''s own).'
+    fixed: 'Agent type Explore, effort low, model inherited (Opus 5.5), same question text per task across arms (lookup_trial.py
+      brief), one attempt per task and arm, cwd the FA checkout at trunk 3aef8063 (worktrees at the same commit); only the
+      tool sentence of the brief differs. Arms of 26/29: grep (as now), lsp (pyright via the LSP tool), graph (graphify CLI;
+      waits on Joaquin allowing pip install graphifyy into the worktree venv, refused twice by the auto-mode classifier),
+      batch (tools/batch.py @7830e0aa). Arms of 27: now (transcript grep, plan show, site decisions) vs recall (tools/recall.py
+      @a0671a53).'
+    control: grep arm for 26 and 29 (the same ten tasks); now arm for 27 (the same five cases).
+    seeds: one agent per task and arm (10 x 3 now, graph arm later on the same tasks; 5 x 2); indicative, as D203's 10 pairs
+    outcome: '26: yes if lsp or graph arm uses >=30% fewer total tokens than grep at equal or better correct count -> propose
+      integration to Joaquin as a diff; else dead end and the LSP plugin kept or removed on the same numbers. 29: yes if batch
+      has fewer tool calls and tokens than grep at equal correctness -> brief line and hook change to Joaquin as a diff; else
+      dead end. 27: yes if recall reaches 4 of 5 sources with fewer tool calls than now -> offer recall.py to Joaquin for
+      briefs and hand-offs; else dead end.'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
