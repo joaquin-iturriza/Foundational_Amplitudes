@@ -35276,11 +35276,7 @@ entries:
   step_waits:
     '5': FA-lxplus-57f6d2cb
     '14': FA-lxplus-57f6d2cb
-    '15': 'lxplus passing site pick''s probe (it timed out 3 times at 01:1x UTC while ssh answers): the relabel job is designed
-      and passed (design-pass 2026-11-19), committed (65560c1f, c18b755d), lxplus synced to c18b755d; submit: site submit
-      lxplus FA scripts/job_virt_label_check.sh --item zng_uq_benchmark --hdr=--time=01:00:00 --hdr=--cpus-per-task=4 --env
-      VL_CLASSES=uubar_ttbar_nlo --env VL_N=200 --env VL_FROM_RUN=runs/data_saving/dsave_parent_finale_zng_uq --env VL_SAVE=$SCRATCH/zz_vl_ttv,
-      then parent_read.py relabel'
+    '15': FA-lxplus-e3eecae0
   findings:
   - at: '2026-11-17T11:18:43+00:00'
     text: 'Their numbers: the UQ repo (branch uq, 311 files) holds no figures, preds or result files. arXiv:2505.20280''s
