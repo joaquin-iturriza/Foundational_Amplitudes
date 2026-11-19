@@ -16308,6 +16308,8 @@ entries:
     '14': 'Joaquin bringing back the deck cold-read agent (D261: ''we will do it later'')'
     '17': 'the first real idle moment: plan next listing RESUME/LAUNCH with no FA job live; the supervisor''s own STALLED
       idle: event (or its absence after 45 min) is the trigger'
+    '21': the repo-reviewer a6335284b8bd81379 (backlog review before the step-21 commit of tools/wake_batching.py and its
+      JSONs)
   owner:
     agent: ab33cfe08e8f1ac89
     state: working
