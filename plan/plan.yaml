@@ -34384,6 +34384,21 @@ entries:
     - 12
     answered_at: '2026-11-18T23:35:53.600000+00:00'
     decision: D492
+  - ask: 'Scope: a one-HP change (the peak learning rate) of the W retrain, which D241 keeps for your yes. The retrained ladder+star
+      parent (with the W boson added to its propagator list, a change you did not ask for) trains unstably at peak lr 3.8e-3:
+      its training het. loss climbs from about -5 to above 0 between steps 25000 and 55000, its median grad norm reaches about
+      1e6 against the first parent''s 1e2-1e3, with 24 skipped non-finite steps (zng_parent_stab); it ends 27x above the old
+      finale on the 28-process geometric-mean val MSE, against the first parent''s 6.6x. Proposal: rerun it once with the
+      peak lr halved to 1.9e-3, everything else equal (~8 GPU-h on lxplus), read against the first parent and the old finale
+      on the same pools. Yes, or would you rather drop the W (back to the first parent, u d~ -> e+ nu g unlearned), or run
+      a DyHPO sweep of the parent setup with the W?'
+    at: '2026-11-19T09:27:16+00:00'
+    searched: 'site decisions --project FA (D241, D483-D498; parent, stage 2, lr: nothing on this run''s lr); docs/results.tex
+      parent and transfer sections; plan findings 2026-11-18/19. Joaquin''s messages 2026-11-14T04:31 (a pasted SciPost LaTeX
+      template, no instruction), 2026-10-06T00:17 (the October transfer-study plan, not this parent) and 2026-11-10T02:08
+      (file uploads for the KIT slides) do not touch this run''s lr or the W column.'
+    blocks_steps: &id001
+    - 17
   owner:
     agent: ac941999d5d09e98c
     state: working
@@ -35984,6 +35999,20 @@ entries:
       scripts/job_virt_label_check.sh; tests/test_mixed_generation.py. Unreviewed commits: 65560c1f, c18b755d, 53a1fcc5, 712bc7a4,
       b94bb67e, f02c3d67, 676b5698'
     written: '2026-11-19T02:26:20+00:00'
+  ask: 'Scope: a one-HP change (the peak learning rate) of the W retrain, which D241 keeps for your yes. The retrained ladder+star
+    parent (with the W boson added to its propagator list, a change you did not ask for) trains unstably at peak lr 3.8e-3:
+    its training het. loss climbs from about -5 to above 0 between steps 25000 and 55000, its median grad norm reaches about
+    1e6 against the first parent''s 1e2-1e3, with 24 skipped non-finite steps (zng_parent_stab); it ends 27x above the old
+    finale on the 28-process geometric-mean val MSE, against the first parent''s 6.6x. Proposal: rerun it once with the peak
+    lr halved to 1.9e-3, everything else equal (~8 GPU-h on lxplus), read against the first parent and the old finale on the
+    same pools. Yes, or would you rather drop the W (back to the first parent, u d~ -> e+ nu g unlearned), or run a DyHPO
+    sweep of the parent setup with the W?'
+  waiting_since: '2026-11-19T09:27:16+00:00'
+  searched: 'site decisions --project FA (D241, D483-D498; parent, stage 2, lr: nothing on this run''s lr); docs/results.tex
+    parent and transfer sections; plan findings 2026-11-18/19. Joaquin''s messages 2026-11-14T04:31 (a pasted SciPost LaTeX
+    template, no instruction), 2026-10-06T00:17 (the October transfer-study plan, not this parent) and 2026-11-10T02:08 (file
+    uploads for the KIT slides) do not touch this run''s lr or the W column.'
+  blocks_steps: *id001
 - id: dan_zeroshot_v4
   title: Catalog_v4 pretraining zero-shot on Daniel's held-out split
   question: How does our best catalog_v4 pretraining (trial 1262) do zero-shot on the held-out processes of Daniel's catalog
