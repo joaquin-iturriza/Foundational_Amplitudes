@@ -385,9 +385,9 @@ def pool_gen(out):
         d[run] = site_python(POOLGEN, [run], "POOLGEN", site="lxplus")
     json.dump(d, open(out, "w"), indent=1)
     for run, v in d.items():
-        from datetime import datetime
+        from datetime import datetime   # the 7-day line: a shortcut that only separates the 2026-11-17 regenerations from the September/October pools
         age = lambda r: (datetime.fromisoformat(r["train"]["created"]) - datetime.fromisoformat(r["val"]["created"])).days
-        diff = {p: (r["train"]["created"], r["val"]["created"]) for p, r in v.items() if "train" in r and "val" in r and age(r) > 7}
+        diff = {p: (r["train"]["created"], r["val"]["created"]) for p, r in v.items() if r.get("train", {}).get("created") and r.get("val", {}).get("created") and age(r) > 7}
         print(run, len(v), "processes;", len(diff), "whose train pool was generated more than a week after its val pool:")
         for p, c in sorted(diff.items()):
             print("   ", p, "train", c[0], "val", c[1])
