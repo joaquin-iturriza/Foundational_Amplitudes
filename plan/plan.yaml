@@ -35688,6 +35688,15 @@ entries:
       Consequence: any re-read or retrain on the zng parent''s pools (FA-lxplus-57f6d2cb''s re-reads, steps 5/14) now refuses
       until the t t~ V pools agree or the override is passed. Not tested: a shift below ~0.5% (z scales with pool size), pools
       without provenance (skipped).'
+  - at: '2026-11-19T01:04:01+00:00'
+    text: '2026-11-19 D498 protocol test submitted on ccin2p3 (design passed 2026-11-19 by the design reviewer after one FIX).
+      Deviation from D498''s covers line (''n=1 searched HPs''): arm (a) uses each n''s own B1 best-trial HPs (trial_1612/0353/0494/0238)
+      so it differs from its control only in batch and steps; reviewer: within D498. Arm (a) ''ours at batch 1024'', 2e5 steps,
+      MuonAdamW/WSD: FA-ccin2p3-ac047fb1 zg, 2f8ac2e5 zgg, 9958966c zggg, 5c14c2aa zgggg (configs runs/kit/kit_A_uq_<p>_me2_n500000_t200000_protocol_test_ours_bs1024/config.yaml
+      on CC, code @aad2fe7a, args in scratchpad proto_submit.sh, job_kit.sh A); arm (b) ''Adam plateau at batch 16384'', 12,500
+      steps, validation every 62 steps, es_patience 1240: d5f02694 zg, d57071d3 zgg, 9e1b1276 zggg, d77906e1 zgggg (runs/kit/kit_A_uq_<p>_me2_n500000_t12500_protocol_test_adam_plateau_bs16384/config.yaml).
+      Targets 6 h (a, limit 12 h) and 3.5 h (b, limit 6 h); ~32-36 GPU-h estimated (Muon step time at batch 1024 unmeasured).
+      site pick gave ccin2p3 for all 8, ''done in ~17.2 h'' (not one wave: CC had 0 free GPUs fitting 32G/4cpu).'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
