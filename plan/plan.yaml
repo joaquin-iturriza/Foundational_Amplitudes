@@ -16365,8 +16365,8 @@ entries:
     state: working
     since: '2026-11-19T00:02:30+00:00'
     state_at: '2026-11-19T11:49:39.972000+00:00'
-    context: 193004
-    context_at: '2026-11-19T10:05:21+00:00'
+    context: 225192
+    context_at: '2026-11-19T12:06:03+00:00'
   designs:
   - at: '2026-10-30T19:52:22+00:00'
     question: 'Can lxplus''s HTCondor GPU nodes run FA jobs: does the env activate, the GPU show, the xformers attention kernel
