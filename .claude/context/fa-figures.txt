@@ -10,7 +10,7 @@ tools: SendUserFile
 - Load the figure-style skill before drawing. Binding, whatever a sibling script does:
   - a figure reads without the text: what is compared is named on it in plain words (a legend entry, at most two
     lines of 40 characters), each axis defines its quantity, a scanned parameter is a named colour bar, no internal
-    names; captions short;
+    names; paper captions short (figure-style skill), captions sent to Joaquin full (CLAUDE.md);
   - readable but short: one short name per arm everywhere (`from scratch`, `fine-tuned`), $D_{\rm train}$ for the
     training-set size, one short name for a scanned parameter on its colour bar and axis, y label
     `MSE$(\log|\mathcal{M}|^2)$` alone, one-line tick labels;
