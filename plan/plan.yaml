@@ -16096,6 +16096,15 @@ entries:
       since 2026-10-31T04:22Z, of 362 main-session wakes (07.69, main_turns.py --split 2026-10-31T04:22:16Z), separate task-notification
       (agent_done) wakes are 4 (/bin/bash.48, 0.45%); 138 more were absorbed mid-turn at no extra wake'
     at: '2026-11-04T19:17:19+00:00'
+  - tried: 'Step 27: tools/recall.py (search our summary records: decisions, plan findings/asks/hand-offs, compaction summaries;
+      expand to raw transcript lines) against searching as now, 5 past lost-context cases, Explore at low effort, controls
+      run twice (lookup_trial.py @3531dc6e, recall.py @a0671a53 in worktrees/wt-recall; figure analysis/agent_redesign/figs/recall_trial.png
+      in worktrees/wt-graphify)'
+    why: 'Design rule (recall reaches >=4/5 sources with fewer tool calls than both now runs) not met: all three arms 5/5
+      correct by hand read, but recall took 17 tool calls against 14 and 18 for the two now runs; tokens 321k against 342k
+      and 501k (the two now runs differ by 47%, so the token gap is inside the control''s own spread). recall.py stays unmerged
+      in its worktree.'
+    at: '2026-11-19T13:30:04+00:00'
   asks:
   - ask: 'Run the matched small-model trial: 10 small tool-fix or analysis tasks, each on Sonnet 5.5 and on Opus 5.5 at low
       effort, same briefs, scored by tools/agent_tasks.py plus a hand read, about $30 at list price?'
