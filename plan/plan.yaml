@@ -16120,6 +16120,19 @@ entries:
       vs 257k, 13) and much dearer on the six where-is tasks (550k, 29 vs 211k, 11); a who-calls-only use would need its own
       design. batch.py stays unmerged in worktrees/wt-batch.'
     at: '2026-11-19T13:35:16+00:00'
+  - tried: 'Step 26: pyright LSP and a graphify code graph for code lookups (lookup_trial.py @687cb40f in worktrees/wt-graphify,
+      design 3531dc6e; ten past code lookups, Explore at low effort, tool required by the brief, against grep run twice; figure
+      analysis/agent_redesign/figs/lookup_trial_v2.png there)'
+    why: 'Design rule (>=30% fewer tokens than the grep mean 468.7k and below both runs, at equal or higher correctness) not
+      met by either. LSP answering (pyright restarted, pyrightconfig.json 50222fd6 live): 10/10 correct, 679k tokens (+45%),
+      36 calls against 24 and 24; every agent made 1-2 LSP calls; cheaper only on two who-calls lookups (cache check 49k vs
+      111k, LHE assemble 49k vs 57k), dearer on where-is lookups (LHE block order 196k vs 30k). Code graph (graphify 0.9.112
+      extract --code-only on the 995 tracked .py at fefdd953, graph outside git at ~/work/graphify-out-FA): 9/10 correct,
+      475k tokens (+1.4%), 23 calls; its miss: cache-check callers, 4 of 9 files. An earlier LSP rerun (lsp3, 10 agents) is
+      void: the pyright server had run since 2026-11-12 (before 50222fd6) and hung; killed, Claude Code restarted it, then
+      it answered within seconds. A first graph over all files (yaml, json) was 269 MB at 35 s per query; rebuilt on .py only
+      (11.6 MB, 1.3 s).'
+    at: '2026-11-19T18:09:32+00:00'
   asks:
   - ask: 'Run the matched small-model trial: 10 small tool-fix or analysis tasks, each on Sonnet 5.5 and on Opus 5.5 at low
       effort, same briefs, scored by tools/agent_tasks.py plus a hand read, about $30 at list price?'
