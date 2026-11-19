@@ -492,7 +492,7 @@ def protocol_figs(steps):
                 j = int(np.argmin(np.abs((np.arange(len(va)) + 1) * ve - 1000)))
                 o.update(val_at_1000_steps=float(va[j]), step_near_1000=int((j + 1) * ve))
             if c["scheduler"] == "WSD":
-                T = c["iterations"]; f = (np.arange(len(va)) + 1) * ve / T
+                T = c["iterations"]; f = (np.arange(len(va)) + 1) * ve / T; cool = c["wsd_cooldown_frac"]
                 ax = figs["zng_wsd_cooldown"][1].flat[i]
                 ax.plot(f, va, color=col, label=lab + ", validation")
                 ax.plot(f, tr, color=col, linestyle="--", label=lab + ", training")
@@ -508,7 +508,7 @@ def protocol_figs(steps):
             ax = axs.flat[i]
             ps.process_label(ax, rf"$q\bar q\to Z+{n}g$")
             if name == "zng_wsd_cooldown":
-                ax.axvline(1 - c["wsd_cooldown_frac"], color="0.5", linestyle=":", label="start of the cooldown")
+                ax.axvline(1 - cool, color="0.5", linestyle=":", label="start of the cooldown")
                 ax.set_xlabel("step / total steps"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$"); ax.set_yscale("log")
             else:
                 ax.set_xscale("log"); ax.set_xlabel("training events seen")
