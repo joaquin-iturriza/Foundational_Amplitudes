@@ -15512,6 +15512,171 @@ and negative on the other nine probes. On our good probes our zero-shot is at th
 others have no counterpart there, and Jonas's extrapolation is one more gluon within a family seen at every lower $n$. No two
 of the three share a test set.
 
+\paragraph{Against the $q\bar q\to Z+ng$ uncertainty benchmark (2026-11-17, D477--D480).} The question: how does
+our latest setup (emission-scale target, HETEROSC, $\mu$P LLoCa), from scratch and fine-tuned from the catalog
+pretraining (trial 1262, which trains on $b\bar b\to Z+1,2,3g$ with a massless $b$, the same tree $|\mathcal M|^2$ as $d\bar d$, so the fine-tune starts near its data at $n\le3$ and extrapolates one gluon at $n=4$), compare with the networks of lloca-experiments-uq on $q\bar q\to Z+ng$, $n=1,\dots,4$
+(Zenodo 16793011, their split: $5\times10^5$ training and $10^6$ test events per $n$)? Their trained networks and
+predictions are not public, so this paragraph holds our side only; their LLoCa-Transformer, trained with their code on
+the same split, is in the next paragraph. Our eight runs
+(\code{scripts/job\_kit.sh}, modes A and A\_ft, $12{,}500$ steps, the HPs of the passed \code{kit\_hpo\_uug\_T}
+search, one seed) fail the curve test (validation and training falling together, \code{tools/kit\_curves.py}) in all but one (from scratch, $Z+g$; passing runs: $1$): the $\mu$-MSE sits on a plateau for most
+of the run and the training error falls far below the validation error in the WSD cooldown, the best checkpoint
+being the last step ($12{,}500$) in all eight (Fig.~\ref{fig:zng}, bottom right). The design's branch is ``not well'': the
+numbers stand flagged, and the HP choice for this setup on $Z+ng$ is the next step. Median $|\Delta|$ from scratch
+and fine-tuned: $1.0\times10^{-4}$ and $4.8\times10^{-5}$ on $Z+g$, $2.1\times10^{-2}$ and $1.6\times10^{-2}$ on
+$Z+4g$; the fine-tune's median is below scratch at every $n$ (its MSE is not, on $Z+g$) but within $3\times$, the factor the design takes as what one seed resolves. The MSE of
+the standardised $\log|\mathcal M|^2$ (standardised with the variance of $\ln|\mathcal M|^2$ over the first
+$5\times10^5$ training events) is $3.4\times10^{-4}$ and $2.1\times10^{-4}$ on $Z+4g$; on $Z+g$
+($1.1\times10^{-4}$, $9.1\times10^{-4}$) it is set by a few events with $|\Delta|\sim1$. The pulls are calibrated on $Z+g$
+(std $1.00$ and $0.99$) and $\sigma$ far too small on $Z+4g$ (std $28$ and $14$, $68\%$ coverage $0.06$ and $0.11$).
+% src: python3 analysis/zng_uq/benchmark.py summary @77ef8fae
+% claim: n_well=1
+% claim: scr.1.median=1.0e-4
+% claim: ft.1.median=4.8e-5
+% claim: scr.4.median=2.1e-2
+% claim: ft.4.median=1.6e-2
+% claim: scr.4.mse_std=3.4e-4
+% claim: ft.4.mse_std=2.1e-4
+% claim: scr.1.mse_std=1.1e-4
+% claim: ft.1.mse_std=9.1e-4
+% claim: scr.1.pull_std=1.00
+% claim: ft.1.pull_std=0.99
+% claim: scr.4.pull_std=28
+% claim: ft.4.pull_std=14
+% claim: scr.4.cov68=0.06
+% claim: ft.4.cov68=0.11
+% allow: 16793011 5 10 6 12{,}500 1262 3 68 4g 4 2 1 because they are the record id, the largest n, the split's event counts, the steps, the trial, the seed resolution and the coverage level
+
+\paragraph{Searched HPs, Suprio's protocol and his network (2026-11-18, D484, D498).} Three arms answer the
+``not well'' branch above, all from scratch on the same split and one seed. Our setup at HPs searched per $n$ (an
+eight-trial DyHPO search per multiplicity, \code{sweep/sweep\_config\_tp\_zng\_hpo\_<p>.yaml}): trials passing the
+curve test $3$, $0$, $0$, $0$ of eight at $n=1,\dots,4$, so at $n\ge2$ the lowest-validation trial stands, flagged. The
+same network under Suprio's protocol (Adam at $10^{-3}$, batch $1024$, plateau decay, early stopping, up to $2\times10^5$
+steps). Suprio's LLoCa-Transformer trained by his code on the split. Median $|\Delta|$ at $n=1,\dots,4$
+(Fig.~\ref{fig:zng}, top; Fig.~\ref{fig:zng_protocol}, bottom): searched HPs $4.3\times10^{-5}$, $3.9\times10^{-4}$,
+$4.4\times10^{-3}$, $1.6\times10^{-2}$; Suprio's protocol $2.6\times10^{-5}$, $3.4\times10^{-4}$, $3.4\times10^{-3}$,
+$8.7\times10^{-3}$; his network $6.9\times10^{-6}$, $2.3\times10^{-4}$, $1.5\times10^{-3}$, $4.4\times10^{-3}$. Our
+network under his protocol stays $3.7$, $1.5$, $2.3$, $2.0$ times above his network. Its pulls are close to calibrated
+(std $1.00$, $1.05$, $1.31$, $1.37$; his $1.00$, $1.35$, $1.17$, $1.15$), while at the searched HPs $\sigma$ is too
+small from $n=3$ (std $4.2$, $7.7$).
+% src: python3 analysis/zng_uq/benchmark.py summary @77ef8fae
+% claim: b1_pass.1=3
+% claim: b1_pass.2=0
+% claim: b1_pass.3=0
+% claim: b1_pass.4=0
+% claim: scr_sh.1.median=4.3e-5
+% claim: scr_sh.2.median=3.9e-4
+% claim: scr_sh.3.median=4.4e-3
+% claim: scr_sh.4.median=1.6e-2
+% claim: scr_sp.1.median=2.6e-5
+% claim: scr_sp.2.median=3.4e-4
+% claim: scr_sp.3.median=3.4e-3
+% claim: scr_sp.4.median=8.7e-3
+% claim: suprio.1.median=6.9e-6
+% claim: suprio.2.median=2.3e-4
+% claim: suprio.3.median=1.5e-3
+% claim: suprio.4.median=4.4e-3
+% claim: ratio.1.b2_suprio=3.7
+% claim: ratio.2.b2_suprio=1.5
+% claim: ratio.3.b2_suprio=2.3
+% claim: ratio.4.b2_suprio=2.0
+% claim: scr_sp.1.pull_std=1.00
+% claim: scr_sp.2.pull_std=1.05
+% claim: scr_sp.3.pull_std=1.31
+% claim: scr_sp.4.pull_std=1.37
+% claim: suprio.1.pull_std=1.00
+% claim: suprio.2.pull_std=1.35
+% claim: suprio.3.pull_std=1.17
+% claim: suprio.4.pull_std=1.15
+% claim: scr_sh.3.pull_std=4.2
+% claim: scr_sh.4.pull_std=7.7
+% allow: 10^{-3} 2\times10^5 1024 1 2 3 4 because they are the learning rate, the step limit, the batch size and the multiplicities
+
+\paragraph{Batch or optimiser? The protocol test (2026-11-19, D498).} Suprio's protocol beats ours at every $n$, and its
+runs separate validation from training less. The test swaps one ingredient each way, from scratch at each $n$: arm (a)
+keeps our optimiser and schedule (MuonAdamW, WSD) at the searched HPs but takes his batch of $1024$ for $2\times10^5$
+steps, read against the searched-HP run; arm (b) keeps his optimiser and schedule (Adam at $10^{-3}$, plateau decay,
+early stopping) at our batch of $16384$ for $12{,}500$ steps, read against our network under his protocol. On best
+validation MSE of $\log|\mathcal M|^2$ (Fig.~\ref{fig:zng_protocol}, top) arm (a) sits $112$, $4.5$, $3.7$ and $1.2$ times
+above its control; it narrows the split (validation over training at the end $2.5\times10^3$, $5.5$, $3.8$, $1.7$
+against $2.0$, $48$, $21$, $68$) but trains unstably, validation and training spiking by orders of magnitude at
+$n=2$ and $n=4$: the searched learning rate, found at batch $16384$, is too high for sixteen times more updates, so arm
+(a) does not isolate the batch cleanly. Arm (b) sits $1.4\times10^4$, $5.5$, $8.1$ and $5.1$ times above its control,
+with no split (end ratio $0.49$, $0.84$, $0.90$, $1.1$) and validation still falling at the last step. By the design's
+bands: arm (a) no at $n=1$, unresolved at $n=2,3,4$; arm (b) no at every $n$.
+% src: python3 analysis/zng_uq/benchmark.py b1b2 @77ef8fae
+% claim: 1.a.val_ratio=112
+% claim: 2.a.val_ratio=4.5
+% claim: 3.a.val_ratio=3.7
+% claim: 4.a.val_ratio=1.2
+% claim: 1.a.R=2.5e3
+% claim: 2.a.R=5.5
+% claim: 3.a.R=3.8
+% claim: 4.a.R=1.7
+% claim: 1.a.R_control=2.0
+% claim: 2.a.R_control=48
+% claim: 3.a.R_control=21
+% claim: 4.a.R_control=68
+% claim: 1.b.val_ratio=1.4e4
+% claim: 2.b.val_ratio=5.5
+% claim: 3.b.val_ratio=8.1
+% claim: 4.b.val_ratio=5.1
+% claim: 1.b.R=0.49
+% claim: 2.b.R=0.84
+% claim: 3.b.R=0.90
+% claim: 4.b.R=1.1
+% allow: 10^{-3} 2\times10^5 1024 16384 12{,}500 1 2 3 4 because they are the learning rate, the steps, the batch sizes and the multiplicities
+
+On the test events (Fig.~\ref{fig:zng_protocol}, bottom) arm (a)'s median $|\Delta|$ is $2.9\times10^{-4}$,
+$1.6\times10^{-3}$, $3.9\times10^{-3}$, $1.2\times10^{-2}$, that is $6.9$, $4.2$, $0.87$ and $0.75$ times the searched-HP
+run: worse at $n=1,2$, slightly better at $n=3,4$, where the searched-HP run itself fails the curve test. Arm (b)'s is
+$1.7\times10^{-4}$, $3.3\times10^{-3}$, $1.7\times10^{-2}$, $2.9\times10^{-2}$, $6.6$, $9.5$, $4.8$ and $3.4$ times our
+network under his protocol. So neither ingredient alone carries his protocol's advantage: at batch $16384$ his optimiser
+falls short in $12{,}500$ updates, and our optimiser at his batch would need a learning rate searched at that batch.
+Suprio's protocol at batch $1024$ remains our best arm, $1.5$--$3.7$ times above his network.
+% src: python3 analysis/zng_uq/benchmark.py summary @77ef8fae
+% claim: pt_a.1.median=2.9e-4
+% claim: pt_a.2.median=1.6e-3
+% claim: pt_a.3.median=3.9e-3
+% claim: pt_a.4.median=1.2e-2
+% claim: ratio.1.a_b1=6.9
+% claim: ratio.2.a_b1=4.2
+% claim: ratio.3.a_b1=0.87
+% claim: ratio.4.a_b1=0.75
+% claim: pt_b.1.median=1.7e-4
+% claim: pt_b.2.median=3.3e-3
+% claim: pt_b.3.median=1.7e-2
+% claim: pt_b.4.median=2.9e-2
+% claim: ratio.1.b_b2=6.6
+% claim: ratio.2.b_b2=9.5
+% claim: ratio.3.b_b2=4.8
+% claim: ratio.4.b_b2=3.4
+% claim: ratio.2.b2_suprio=1.5
+% claim: ratio.1.b2_suprio=3.7
+% allow: 16384 12{,}500 1024 1 2 3 4 because they are the batch sizes, the steps and the multiplicities
+
+\begin{figure}[t]
+\centering
+\includegraphics{../analysis/zng_uq/figs/zng_b1_vs_b2.pdf}\\[1ex]
+\includegraphics{../analysis/zng_uq/figs/zng_protocol_test_delta.pdf}
+\caption{$q\bar q\to Z+ng$, from scratch, one seed. Top: validation (solid) and training (dashed) MSE of
+$\log|\mathcal M|^2$ against training events seen, one panel per $n$, for our protocol at searched HPs, Suprio's
+protocol, and the protocol test's two arms. Bottom: median $|\Delta|$ on the $10^6$ test events against $n$.}
+\label{fig:zng_protocol}
+% allow: 10^6 2 because they are the test event count and the square of |M|
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics{../analysis/zng_uq/figs/zng_median_delta.pdf}\\[1ex]
+\includegraphics{../analysis/zng_uq/figs/zng_delta_z4g.pdf}\\[1ex]
+\widerow{\includegraphics{../analysis/zng_uq/figs/zng_pulls.pdf}\hfill\includegraphics{../analysis/zng_uq/figs/zng_curves.pdf}}
+\caption{$q\bar q\to Z+ng$ on the uncertainty benchmark's split, one seed. Top: median $|\Delta|$ against $n$. Middle: distribution of $|\Delta|$ on $Z+4g$. Bottom: pulls against $\mathcal N(0,1)$, pulls beyond $\pm6$ in the edge bins
+(left); validation and training $\mu$-MSE against step (right).}
+\label{fig:zng}
+% allow: 4g 0 1 6 2 because they are the process, the normal's parameters and the pull edge
+\end{figure}
+
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
   \item \textbf{The new catalog, catalog\_v3 (D98; the user, 2026-10-23: ``design a new similarly sized catalog with true
