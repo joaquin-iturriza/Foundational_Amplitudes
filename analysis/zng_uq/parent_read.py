@@ -236,6 +236,53 @@ def reread(run_id):
         ax.set_ylabel("val. het. loss", fontsize=7)
     ps.save(fig, os.path.join(HERE, "figs", "zng_parent_w_curves"))
 
+STAB = r"""
+import json, sys
+import numpy as np
+o = {}
+for r in sys.argv[1:]:
+    z = np.load(r + "/train_steps.npz"); q = json.load(open(r + "/plots_0/per_process_metrics.json"))
+    b = len(z["loss"]) // len(q["val_loss_no_reg"])
+    blk = lambda x: np.asarray(x[:b * (len(x) // b)]).reshape(-1, b)
+    o[r] = dict(every=b, train=np.median(blk(z["loss"]), 1).tolist(), gn_med=np.median(blk(z["grad_norm"]), 1).tolist(),
+                gn_max=blk(z["grad_norm"]).max(1).tolist(), lr=blk(z["lr"])[:, 0].tolist(), val=q["val_loss_no_reg"],
+                n_gn_nonfinite=int((~np.isfinite(z["grad_norm"])).sum()))
+print("STAB " + json.dumps(o))
+"""
+
+
+def stab(out):
+    """Next attempt on parent (2): is the retrain's mid-run rise of the validation het. loss an optimisation instability?
+    Both parents' training het. loss (median per validation interval), grad norm (median and max per interval; clipped
+    at 5 after the norm is read), lr and aggregate validation het. loss against step, from train_steps.npz and
+    per_process_metrics.json on lxplus -> data/parent_stab.json, figure zng_parent_stab."""
+    sys.path.insert(0, ROOT)
+    from analysis.common.readers import site_python
+    import plot_style as ps
+    ps.use()
+    d = site_python(STAB, [NEW, NEW + "_w"], "STAB", site="lxplus")
+    json.dump(d, open(out, "w"))
+    fig, axs = ps.figure(ncols=1, nrows=3, sharex=True)
+    for r, col, lab in ((NEW, ps.C.blue, "first parent"), (NEW + "_w", ps.C.vermillion, "retrained parent")):
+        e = d[r]; x = (np.arange(len(e["val"])) + 1) * e["every"]
+        axs[0].plot(x, e["train"][:len(x)], color=col, linestyle="--")
+        axs[0].plot(x, e["val"], color=col, label=lab)
+        axs[1].plot(x, e["gn_med"][:len(x)], color=col)
+        axs[1].plot(x, e["gn_max"][:len(x)], color=col, linestyle=":")
+        axs[2].plot(x, e["lr"][:len(x)], color=col)
+        v = np.array(e["val"])
+        print(lab, "val min %.3g at step %d, end %.3g, max after 1/8 %.3g; train end %.3g; grad norm median %.3g -> %.3g, max %.3g; nonfinite %d" % (
+            v.min(), x[v.argmin()], v[-1], v[len(v) // 8:].max(), e["train"][-1], e["gn_med"][0], e["gn_med"][-1], max(e["gn_max"]), e["n_gn_nonfinite"]))
+    axs[0].set_ylabel("het. loss"); axs[0].set_yscale("symlog", linthresh=1.0)
+    axs[1].set_ylabel("grad norm"); axs[1].set_yscale("log")
+    axs[2].set_ylabel("learning rate"); axs[2].set_xlabel("step")
+    axs[0].plot([], [], color="k", linestyle="--", label="training")
+    axs[0].plot([], [], color="k", label="validation")
+    axs[1].plot([], [], color="k", label="median per interval")
+    axs[1].plot([], [], color="k", linestyle=":", label="max per interval")
+    ps.legend(axs[0], "upper right"); ps.legend(axs[1], "upper right")
+    ps.save(fig, os.path.join(HERE, "figs", "zng_parent_stab"))
+
 
 EXPLAIN = r"""
 import json, os, sys
@@ -686,6 +733,8 @@ if __name__ == "__main__":
         pool_gen(os.path.join(HERE, "data", "parent_pool_gen.json"))
     elif sys.argv[1] == "relabel":
         relabel(os.path.join(HERE, "data", "parent_ttv_relabel.json"))
+    elif sys.argv[1] == "stab":
+        stab(os.path.join(HERE, "data", "parent_stab.json"))
     elif sys.argv[1] == "reread":
         reread(sys.argv[2])
     elif sys.argv[1] == "sitediff":
