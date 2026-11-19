@@ -342,7 +342,7 @@ def ft_fig(search, arms, base):
     ps.save(fig, base)
 
 
-def runs_read(dirs, controls, out):
+def runs_read(dirs, controls, out, site="ccin2p3"):
     """curve_quality on the val/train mu-MSE curves of KIT runs (their result.json, written by job_kit.sh, read on CC)
     and of the searched trials used as their controls (rows of a `sweep` output: NAME=<json>#<search>#<trial file>)."""
     sys.path.insert(0, os.path.join(ROOT, "analysis", "data_saving"))
@@ -351,7 +351,7 @@ def runs_read(dirs, controls, out):
     import base64
     rows = [["arms", os.path.basename(d.rstrip("/")), d.rstrip("/") + "/result.json", d] for d in dirs]
     d = {r["file"]: r for r in site_python(SWEEP_SITE, [base64.b64encode(json.dumps(rows).encode()).decode()],
-                                           "KITHPO").get("arms", [])}
+                                           "KITHPO", site=site).get("arms", [])}
     for c in controls:
         name, _, src = c.partition("=")
         f, search, trial = src.split("#")
@@ -401,7 +401,7 @@ def main():  # dup-ok: argparse boilerplate (collect/read), no shared logic
     f = sub.add_parser("sweepfig"); f.add_argument("data"); f.add_argument("--out", required=True)
     p = sub.add_parser("curves"); p.add_argument("data"); p.add_argument("runs", nargs="+"); p.add_argument("--out", required=True)
     u = sub.add_parser("runs"); u.add_argument("dirs", nargs="+"); u.add_argument("--control", action="append", default=[])
-    u.add_argument("--out", required=True)
+    u.add_argument("--out", required=True); u.add_argument("--site", default="ccin2p3")
     v = sub.add_parser("runsfig"); v.add_argument("data"); v.add_argument("runs", nargs="+"); v.add_argument("--out", required=True)
     g = sub.add_parser("ftfig"); g.add_argument("search"); g.add_argument("arms"); g.add_argument("--out", required=True)
     a = ap.parse_args()
@@ -414,7 +414,7 @@ def main():  # dup-ok: argparse boilerplate (collect/read), no shared logic
     elif a.cmd == "curves":
         plot_runs(json.load(open(a.data)), a.runs, a.out)
     elif a.cmd == "runs":
-        runs_read(a.dirs, a.control, a.out)
+        runs_read(a.dirs, a.control, a.out, a.site)
     elif a.cmd == "runsfig":
         runs_fig(a.data, a.runs, a.out)
     elif a.cmd == "sweepfig":
