@@ -161,9 +161,11 @@ def spool(prompt, agent, site=("site",)):
         f.write(prompt)
     body = re.sub(r"\A[^>]*<agent-message[^>]*>", "", prompt.split("The report follows:", 1)[-1].strip()).strip().splitlines()
     first = " ".join((body[0] if body else "").split())[:160]
+    # a ROUTINE: hand-back never reaches the user: opened already acked, so it neither wakes the waiter nor needs an ack
+    routine = ["--acked-note", "routine hand-back, auto-acked"] if first.startswith("ROUTINE:") else []
     r = subprocess.run(list(site) + ["event", "--project", PROJECT, "--kind", "HANDBACK", "--key",
                                      "handback:%s:%s" % (agent, h), "--msg",
-                                     "hand-back from %s: %s | report: %s" % (agent, first, path)],
+                                     "hand-back from %s: %s | report: %s" % (agent, first, path)] + routine,
                        capture_output=True, text=True, timeout=60)
     ok = r.returncode == 0 and re.search(r"\bE\d+\b", r.stdout or "")
     return bool(ok), (r.stdout or r.stderr or "").strip()[-200:]
