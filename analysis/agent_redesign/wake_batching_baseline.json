@@ -14,22 +14,26 @@
    "task_notification": {
     "wakes": 111,
     "raw": 10477917,
-    "wt": 1125853.4500000002
+    "wt": 1125853.4500000002,
+    "called": 22
    },
    "site_event": {
     "wakes": 128,
     "raw": 145330319,
-    "wt": 20343764.750000007
+    "wt": 20343764.750000007,
+    "called": 128
    },
    "handback": {
     "wakes": 398,
     "raw": 401742478,
-    "wt": 46779203.05
+    "wt": 46779203.05,
+    "called": 393
    },
    "user": {
     "wakes": 186,
     "raw": 262236672,
-    "wt": 33961905.949999996
+    "wt": 33961905.949999996,
+    "called": 183
    }
   },
   "calls": 3055,
@@ -102,6 +106,38 @@
     "delay_max_min": 60.0,
     "batched_members": 637
    }
+  },
+  "windows_called": {
+   "0": {
+    "wakes": 726,
+    "raw_first_call_saved": 819787386,
+    "raw_max_member": 819787386
+   },
+   "5": {
+    "wakes": 462,
+    "raw_first_call_saved": 750502587,
+    "raw_max_member": 645358768
+   },
+   "10": {
+    "wakes": 378,
+    "raw_first_call_saved": 728443641,
+    "raw_max_member": 569616596
+   },
+   "20": {
+    "wakes": 313,
+    "raw_first_call_saved": 709123588,
+    "raw_max_member": 505468480
+   },
+   "30": {
+    "wakes": 285,
+    "raw_first_call_saved": 701530724,
+    "raw_max_member": 470242182
+   },
+   "60": {
+    "wakes": 243,
+    "raw_first_call_saved": 689192792,
+    "raw_max_member": 415011148
+   }
   }
  },
  "owners": {
@@ -112,27 +148,32 @@
    "handback": {
     "wakes": 169,
     "raw": 459048975,
-    "wt": 62748011.90000001
+    "wt": 62748011.90000001,
+    "called": 169
    },
    "task_notification": {
     "wakes": 49,
     "raw": 47199994,
-    "wt": 7607057.900000003
+    "wt": 7607057.900000003,
+    "called": 49
    },
    "user": {
     "wakes": 10,
     "raw": 36868650,
-    "wt": 5987172.200000001
+    "wt": 5987172.200000001,
+    "called": 10
    },
    "main_message": {
     "wakes": 9,
     "raw": 27838936,
-    "wt": 3767066.5000000005
+    "wt": 3767066.5000000005,
+    "called": 9
    },
    "site_event": {
     "wakes": 10,
     "raw": 47204826,
-    "wt": 6716344.25
+    "wt": 6716344.25,
+    "called": 10
    }
   },
   "calls": 3105,
@@ -204,6 +245,38 @@
     "delay_mean_min": 50.95,
     "delay_max_min": 60.0,
     "batched_members": 237
+   }
+  },
+  "windows_called": {
+   "0": {
+    "wakes": 247,
+    "raw_first_call_saved": 618161381,
+    "raw_max_member": 618161381
+   },
+   "5": {
+    "wakes": 137,
+    "raw_first_call_saved": 596802953,
+    "raw_max_member": 528223001
+   },
+   "10": {
+    "wakes": 110,
+    "raw_first_call_saved": 591486109,
+    "raw_max_member": 481083031
+   },
+   "20": {
+    "wakes": 100,
+    "raw_first_call_saved": 589831837,
+    "raw_max_member": 458901741
+   },
+   "30": {
+    "wakes": 94,
+    "raw_first_call_saved": 588659067,
+    "raw_max_member": 449401735
+   },
+   "60": {
+    "wakes": 89,
+    "raw_first_call_saved": 587845622,
+    "raw_max_member": 433256030
    }
   }
  },

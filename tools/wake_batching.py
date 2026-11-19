@@ -215,16 +215,20 @@ def summary(streams, wins):
     rec = {"wakes": len(allw), "raw": sum(w["raw"] for w in allw), "wt": sum(w["wt"] for w in allw),
            "by_cause": {}}
     for w in allw:
-        c = rec["by_cause"].setdefault(w["cause"], {"wakes": 0, "raw": 0, "wt": 0.0})
+        c = rec["by_cause"].setdefault(w["cause"], {"wakes": 0, "raw": 0, "wt": 0.0, "called": 0})
         c["wakes"] += 1
+        c["called"] += bool(w["calls"])
         c["raw"] += w["raw"]
         c["wt"] += w["wt"]
     ctx = [w["first"]["raw"] for w in allw if w["first"]]
     rec["calls"] = sum(w["calls"] for w in allw)
     rec["no_call_wakes"] = sum(1 for w in allw if not w["calls"])
     rec["ctx_median"] = statistics.median(ctx) if ctx else 0      # first call of a wake: the context it reads
-    rec["windows"] = {}
+    rec["windows"], rec["windows_called"] = {}, {}
     for win in wins:
+        rc = [replay([w for w in s if w["calls"]], win) for s in streams]   # the wakes that made an API call
+        rec["windows_called"][str(win)] = {k: sum(r[k] for r in rc) for k in
+                                           ("wakes", "raw_first_call_saved", "raw_max_member")}
         agg = {"wakes": 0, "raw_first_call_saved": 0, "raw_max_member": 0, "wt_first_call_saved": 0.0,
                "wt_max_member": 0.0, "delays": [], "n_cold": 0}
         for s in streams:
@@ -325,17 +329,18 @@ def figure(rep, wins, base):
 def per_day_rows(rep, who, win="10"):
     """{group: (wakes/day, M tokens/day)} of one period; 'not by Joaquin' replayed at `win` min as two token bounds."""
     r, d = rep[who], rep["days"]
-    u = r["by_cause"].get("user", {"wakes": 0, "raw": 0})
-    rows = {"by Joaquin": (u["wakes"] / d, u["raw"] / 1e6 / d),
-            "not by Joaquin": ((r["wakes"] - u["wakes"]) / d, (r["raw"] - u["raw"]) / 1e6 / d)}
-    w = r["windows"][win]
-    rows["replay"] = ((w["wakes"] - u["wakes"]) / d, (w["raw_first_call_saved"] - u["raw"]) / 1e6 / d,
+    u = r["by_cause"].get("user", {"called": 0, "raw": 0})
+    n = r["wakes"] - r["no_call_wakes"]                      # a wake that made no API call costs nothing: not counted
+    rows = {"by Joaquin": (u["called"] / d, u["raw"] / 1e6 / d),
+            "not by Joaquin": ((n - u["called"]) / d, (r["raw"] - u["raw"]) / 1e6 / d)}
+    w = r["windows_called"][win]
+    rows["replay"] = ((w["wakes"] - u["called"]) / d, (w["raw_first_call_saved"] - u["raw"]) / 1e6 / d,
                       (w["raw_max_member"] - u["raw"]) / 1e6 / d)
     return rows
 
 
 def per_day(base, rep, out):
-    """Wakes per day and tokens per day (rows: main session, owners), split by who started the wake, before (base)
+    """Wakes that made an API call per day and tokens per day (rows: main session, owners), split by who started the wake, before (base)
     and after (rep); the before period's 10-min replay drawn as the prediction for the wakes not started by Joaquin."""
     sys.path.insert(0, ROOT)
     import plot_style as ps
@@ -346,12 +351,12 @@ def per_day(base, rep, out):
     for i, who in enumerate(("main", "owners")):
         b, a = per_day_rows(base, who), per_day_rows(rep, who)
         for j, (ax, lab) in enumerate(zip(axs[i], ("wakes per day", "tokens per day [millions]"))):
-            ax.bar([k - .2 for k in x], [b[g][j] for g in groups], .4, color=ps.C.blue, label="before the batch")
+            ax.bar([k - .2 for k in x], [b[g][j] for g in groups], .4, color=ps.C.blue, label="before")
             ax.bar([k + .2 for k in x], [a[g][j] for g in groups], .4, color=ps.C.vermillion,
-                   label="after the 10-min batch")
+                   label="after the\n10-min batch")
             pred = b["replay"][1:] if j else b["replay"][:1]
-            ax.plot([1.2] * len(pred), pred, "kD", label="before, replayed with\na 10-min batch")
-            ax.set_xticks(list(x), ["by Joaquin", "other"])
+            ax.plot([1.2] * len(pred), pred, "kD", label="before, replayed\nat 10 min")
+            ax.set_xticks(list(x), ["by Joaquin", "not by Joaquin"])
             ax.set_ylabel(lab)
             ax.set_ylim(bottom=0)
             ps.process_label(ax, "main session" if who == "main" else "owners")
@@ -360,7 +365,7 @@ def per_day(base, rep, out):
                   ", ".join(f"{g} {a[g][j]:.1f}" for g in groups))
         print(f"{who}: median context at a wake's first call before {base[who].get('ctx_median', 0) / 1e3:.0f}k, "
               f"after {rep[who]['ctx_median'] / 1e3:.0f}k; wakes without a call after {rep[who]['no_call_wakes']}")
-    ps.legend(axs[0][0], "upper left")
+    ps.legend(axs[1][0], "upper left")
     ps.save(fig, out)
 
 
