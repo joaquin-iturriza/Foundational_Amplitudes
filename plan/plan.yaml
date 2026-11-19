@@ -35697,6 +35697,15 @@ entries:
       steps, validation every 62 steps, es_patience 1240: d5f02694 zg, d57071d3 zgg, 9e1b1276 zggg, d77906e1 zgggg (runs/kit/kit_A_uq_<p>_me2_n500000_t12500_protocol_test_adam_plateau_bs16384/config.yaml).
       Targets 6 h (a, limit 12 h) and 3.5 h (b, limit 6 h); ~32-36 GPU-h estimated (Muon step time at batch 1024 unmeasured).
       site pick gave ccin2p3 for all 8, ''done in ~17.2 h'' (not one wave: CC had 0 free GPUs fitting 32G/4cpu).'
+  - at: '2026-11-19T01:06:19+00:00'
+    text: '2026-11-19 step 15 relabel (FA-lxplus-e3eecae0, tools/virt_label_check.py @2a0fd2f8, parent_read.py relabel @b94bb67e,
+      data/parent_ttv_relabel.json, fig zng_ttv_relabel): today''s one-loop labeller on the first 200 rows of each u u~ ->
+      t t~ (one loop) pool the parent loaded reproduces the train pool (lxplus cache, 2026-11-17, pipeline 2daabe91) exactly
+      (max |ln ratio| 3.3e-16, 0 unusable) and sits above the stored val labels (datasets, 2026-10-02, pipeline 99b70db5)
+      on all 200 events: median ln ratio 0.0084, max 0.016, by sqrt(s) quartile 0.011/0.009/0.008/0.007 (1.6% near threshold
+      falling to ~0.7% at 450 GeV), the train-minus-val offset of parent_ttv_pools.json. Design outcome branch 1: the val/test
+      pools carry the older labelling (top width handling before 7b00eb21/7f879cd7); today''s labelling is the train pool''s.
+      Not checked: which other frozen one-loop or top pools predate 7b00eb21 and carry the same old width.'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
