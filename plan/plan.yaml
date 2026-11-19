@@ -34670,7 +34670,7 @@ entries:
     - 17
   owner:
     agent: ac941999d5d09e98c
-    state: working
+    state: closed
     since: '2026-11-19T02:28:14+00:00'
     state_at: '2026-11-19T13:49:40.515000+00:00'
     context: 233693
@@ -36248,30 +36248,26 @@ entries:
     start: '2026-11-19T09:05:19+00:00'
     at: '2026-11-19T09:05:19+00:00'
   handoff:
-    state: '2026-11-19 ~03:00 UTC. (1) D498 protocol test (design passed after one FIX; arm (a) uses each n''s own B1 best-trial
-      HPs, not D498''s ''n=1 searched HPs'': reviewer judged it within D498, a message reporting it opens with that). Moved
-      off CC (E7554, 10.9 h wait) to: arm (a) ''ours at batch 1024'' Z+1g FA-lxplus-4e0a55ab, Z+2g FA-lxplus-8b928927, Z+3g
-      FA-lxplus-f3901ad0, Z+4g FA-ccin2p3-a652edfc; arm (b) ''Adam plateau at batch 16384'' Z+1g FA-lxplus-9a0f77c5, Z+2g
-      FA-lxplus-3ea39a5e, Z+3g FA-lxplus-547c198d, Z+4g FA-lxplus-6394cbfc (args: scratchpad proto_submit_v2.sh; code 367caa64;
-      configs runs/kit/kit_A_uq_<p>_me2_n500000_t{200000_protocol_test_ours_bs1024,12500_protocol_test_adam_plateau_bs16384}/config.yaml).
-      Events E7566-E7570: lxplus runs ended on a traceback, a mechanical worker reads them; step 16 (read: R = last val/train,
-      val MSE vs control, bands in the passed design) waits on the 8. (2) Step 15 done: today''s labeller reproduces the t
-      t~ V train pool (3e-16), val 0.7-1.6% off (zng_ttv_relabel). Step 17 (rebuild val/test, prebuild_recipes.sh recipes/zng_ttv_rebuild.yaml
-      --rebuild uubar_ttbar_nlo on lxplus, then same on CC + md5 compare; design PASSED 2026-11-19 ~01:12, pass valid 24 h)
-      waits on the retrain FA-lxplus-57f6d2cb ending. (3) Trial 1262 W read done (zng_w1262). (4) datagen.mixed_generation
-      load check done: refuses t t~ V parent pools until the rebuild (override ++data.allow_mixed_generation=true, needed
-      also for the old-finale re-read). Steps 5 and 14 wait on FA-lxplus-57f6d2cb.'
-    decisions: 'D498 approves the protocol test (~31 GPU-h; estimate 32-36). Rebuild of the t t~ V frozen val/test is a bug
-      fix (plan ask refused the question as cheap-to-rebuild; reviewer agreed); old files quarantined, never deleted. D492:
-      no more seeds.'
-    ruled_out: 'Pipeline-version alone as a pool check (26/28 parent and 74/1153 trial-1262 processes differ in version).
-      The val pool as correct: today''s labels equal the train pool''s.'
-    running: FA-lxplus-57f6d2cb (parent retrain); the 8 protocol-test runs above (some ended on a traceback, E7566-E7570)
-    files: 'analysis/zng_uq/parent_read.py (w1262, relabel); analysis/zng_uq/data/{w1262,parent_ttv_relabel,mixed_generation_z}.json;
-      figs zng_w1262, zng_ttv_relabel; datagen.py mixed_generation; experiment.py l.1575; prebuild_recipes.py --rebuild; recipes/zng_ttv_rebuild.yaml;
-      scripts/job_virt_label_check.sh; tests/test_mixed_generation.py. Unreviewed commits: 65560c1f, c18b755d, 53a1fcc5, 712bc7a4,
-      b94bb67e, f02c3d67, 676b5698'
-    written: '2026-11-19T02:26:20+00:00'
+    state: '2026-11-19 ~12:30 UTC. Done this owner: step 17 (t t~ V val/test rebuilt on lxplus+CC, label check 4.8e-15, sites
+      agree to 4e-11, zng_ttv_relabel v2); step 14 (old finale, first parent, W retrain on the same CC pools, FA-ccin2p3-a3e1e1dc:
+      gmean 1.44e-5 / 9.6e-5 (6.6x) / 3.9e-4 (27x); figs zng_parent_vs_finale v3, zng_parent_w_curves); retrain instability
+      diagnosed (zng_parent_stab: training het. loss and grad norm blow up in the stable phase with the W column at lr 3.8e-3;
+      24 non-finite steps); step 16 protocol test read (zng_b1_vs_b2 v2; arm a NO at n=1, unresolved n=2-4 and unstable; arm
+      b NO at every n). Open: step 17 held by the plan ask (lr halving of the W retrain, D241). Step 5 write-up ready: include
+      the protocol-test read and its test median |Delta| (measure 3: benchmark.py collect on lxplus and CC for the 8 runs,
+      not read yet).'
+    decisions: 'Rebuild of t t~ V val/test as bug fix (passed design); CC''s t t~ V TRAIN pool still old labelling (guard
+      refuses CC training on it; eval_best_val EVAL_FROZEN now passes allow_mixed_generation, 79c87112). W column in the retrain
+      is a change Joaquin did not ask for: say so whenever it is reported. Protocol-test verdicts by the passed design''s
+      bands, D492 one seed.'
+    ruled_out: 'The rebuilt pools as a source of the retrain''s regression (cross-check: CC re-read = lxplus sigma-stage MSE
+      on matching pools). W''s off-shell column scale (standardised, std 5.2) as a raw blow-up.'
+    running: none
+    files: 'analysis/zng_uq/parent_read.py (rebuilt, sitediff, reread, stab), analysis/zng_uq/benchmark.py b1b2, tools/kit_curves.py
+      runs --site, tools/eval_best_val.py; data parent_reread.json, parent_stab.json, parent_ttv_rebuilt.json, parent_ttv_sitediff.json,
+      protocol_test_{lxplus,cc}.json; figs zng_ttv_relabel, zng_parent_vs_finale, zng_parent_w_curves, zng_parent_stab, zng_b1_vs_b2.
+      Commits since repo-review watermark 48cce8ed: c0851757, 79c87112, 3c908baf, eba6ddb9, kit_curves --site, b1b2 arms.'
+    written: '2026-11-19T13:53:09+00:00'
   ask: 'Scope: a one-HP change (the peak learning rate) of the W retrain, which D241 keeps for your yes. The retrained ladder+star
     parent (with the W boson added to its propagator list, a change you did not ask for) trains unstably at peak lr 3.8e-3:
     its training het. loss climbs from about -5 to above 0 between steps 25000 and 55000, its median grad norm reaches about
