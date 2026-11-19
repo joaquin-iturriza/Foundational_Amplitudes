@@ -34242,6 +34242,10 @@ entries:
       zgg, ac047fb1 zg; arm b ''Adam plateau at batch 16384'': d77906e1 zgggg, 9e1b1276 zggg, d57071d3 zgg, d5f02694 zg).
       Read R = last val/train MSE, best val MSE(ln|M|^2) against B1''s best trial (a) and B2 (b), test median |Delta| (benchmark.py
       collect); figure zng_b1_vs_b2 extended with both arms; verdict per the passed design''s bands.'
+    17: 'Make u u~ -> t t~ (one loop) train and val/test agree: regenerate its frozen val and test pools (5000 + 5000 one-loop
+      points, ~0.035 s/point/core, CPU) with today''s labeller, the old ones moved aside (not deleted), then re-read the parent
+      retrain FA-lxplus-57f6d2cb on them; its own design and review. Waits on Joaquin: the frozen val/test pool is the catalog''s
+      one file per spec, read by every run with this process (the old finale''s numbers were read on it).'
   done_when: null
   notes_ref: null
   match: zng_uq_*,tp*_zng_*
@@ -35501,6 +35505,12 @@ entries:
       - 'a yes, b no: batch/updates are the cause -> our protocol at small batch for the Z+ng runs'
       - 'a no, b yes: Muon/WSD cooldown opens the split -> plateau/early-stopping schedule for 5e5-event single-process runs'
       - 'both or neither / unresolved: both matter -> reported per n, protocol choice to Joaquin'
+    17:
+      feeds: whether stage 2's parent and its t t~ V read rest on pools labelled alike
+      if:
+      - 'Joaquin yes: design, review, regenerate on lxplus, re-read with ++data.allow_mixed_generation no longer needed'
+      - 'Joaquin no (keep the old val pool): rebuild the train pool at the old labelling instead, or train with the override
+        and report the 1% offset'
   step_waits:
     '5': FA-lxplus-57f6d2cb
     '14': FA-lxplus-57f6d2cb
