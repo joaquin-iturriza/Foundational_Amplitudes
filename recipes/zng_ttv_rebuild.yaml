@@ -1,0 +1,6 @@
+# zng_uq_benchmark: u u~ -> t t~ (one loop), the parent's entry of recipes/transfer_finale.yaml, its frozen val and test
+# pools rebuilt with today's labeller (prebuild_recipes.py --rebuild uubar_ttbar_nlo; zng_ttv_relabel: the 2026-10-02
+# val pool sits 0.7-1.6% below today's labels, the 2026-11-17 train pool equals them)
+sampling: {mode: mixture}
+processes:
+  - {name: uubar_ttbar_nlo, sqrts: [363, 450], n_train: 50000, n_val: 5000, n_test: 5000}

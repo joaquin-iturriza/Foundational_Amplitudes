@@ -23,7 +23,7 @@ with AMP_FROZEN_DIR / AMP_TRAIN_CACHE_DIR). Idempotent.
 Usage:
     python prebuild_recipes.py recipes/pretrain8_D1e5.yaml --workers 24 [--seed 42]
 """
-import argparse, os, shutil, sys, time
+import argparse, glob, os, shutil, sys, time
 from collections import defaultdict
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import yaml
@@ -152,6 +152,10 @@ def main():
     ap.add_argument("--quarantine-dir", default=None,
                     help="where a group skipped by the pole guard mid-generation has its pools and chunk dirs moved, "
                          "with their sidecars (default: quarantine/ next to LIST_FILE); listed in LIST_FILE")
+    ap.add_argument("--rebuild", action="append", default=[], metavar="NAME",
+                    help="regenerate this entry's frozen val and test pools: the stored ones, their sidecars and chunk "
+                         "dir are moved to --quarantine-dir (default $WORK/datasets/quarantine; never deleted) first, "
+                         "so the build makes them with today's code (a labelling fixed since they were made)")
     ap.add_argument("--auto-workers", action="store_true",
                     help="raise --workers up to ncpu when the cost estimate shows "
                          "more cores would shorten the prebuild (free on prepost)")
@@ -255,6 +259,15 @@ def main():
                                                role=role, seed=args.seed)
             out, rid = mg.recipe_output_path(recipe, dest), mg.recipe_id(recipe)
             pools[(name, role)] = out
+            if name in args.rebuild and role in ("val", "test"):
+                qdir = args.quarantine_dir or os.path.join(datagen.frozen_dir(), "quarantine")
+                stamp = time.strftime(".%Y%m%d-%H%M%S")
+                for src in [out] + glob.glob(out[:-len(".npy")] + ".*") + [os.path.join(dest, f".chunks_{rid}")]:
+                    if os.path.exists(src):
+                        os.makedirs(qdir, exist_ok=True)
+                        dst = os.path.join(qdir, os.path.basename(src) + stamp)
+                        shutil.move(src, dst)
+                        print(f"REBUILD {src} -> {dst}", flush=True)
             if datagen._is_cached(out, rid):
                 n_cached += 1
                 print(f"  [cached] [{role:5s}] {name}")
