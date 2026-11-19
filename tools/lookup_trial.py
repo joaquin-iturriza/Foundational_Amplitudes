@@ -107,7 +107,7 @@ def brief(task, arm):
 
 def usage(agent):
     """(tokens, tool calls, final answer text) of one agent's transcript."""
-    seen, seen_tools, tok, calls, last = set(), set(), 0, 0, ""
+    seen, seen_tools, tok, calls, last, names = set(), set(), 0, 0, "", {}
     for f in glob.glob(SUB % agent):
         for line in open(f, errors="replace"):
             try:
@@ -121,6 +121,7 @@ def usage(agent):
                 if c.get("type") == "tool_use" and c.get("id") not in seen_tools:
                     seen_tools.add(c.get("id"))
                     calls += 1
+                    names[c.get("name")] = names.get(c.get("name"), 0) + 1
                     if c.get("name") == "SubagentHandback":
                         calls -= 1
                         last = c["input"].get("message", last)
@@ -131,14 +132,17 @@ def usage(agent):
                 u = m["usage"]
                 tok += (u.get("input_tokens", 0) + u.get("output_tokens", 0) + u.get("cache_read_input_tokens", 0)
                         + u.get("cache_creation_input_tokens", 0))
-    return tok, calls, last
+    names.pop("SubagentHandback", None)
+    return tok, calls, last, names
 
 
 def _pairs(answer):
-    """(path, function) per answer line: path relative to the checkout, function the last dotted name or ''."""
+    """(path, function) per answer item: a line that starts with a path (after an optional '- '); prose lines, such as
+    a note naming a file the agent left out, are not items. Path relative to the checkout, function the last dotted
+    name or ''."""
     out = []
     for line in answer.replace("`", "").splitlines():
-        m = re.search(r"((?:file://)?[\w./-]+\.py)(?::(?:\d+:?)?\s*([\w.<>]+))?", line)
+        m = re.match(r"\s*(?:[-*]\s*)?((?:file://)?[\w./-]+\.py)(?::(?:\d+:?)?\s*([\w.<>]+))?", line)
         if m:
             path = re.sub(r"^(?:file://)?/home/joaquin/work/FA/", "", m.group(1))
             path = re.sub(r"^worktrees/[^/]+/", "", path)
@@ -171,11 +175,11 @@ def load():
 
 
 def record(task, arm, agent, hand=None):
-    tok, calls, ans = usage(agent)
+    tok, calls, ans, names = usage(agent)
     r = load()
     ok = correct(task, ans) if hand is None else hand == "ok"
     r.setdefault(task, {})[arm] = {"agent": agent, "tokens": tok, "tool_calls": calls, "answer": ans,
-                                   "correct": ok, "auto": correct(task, ans), "hand": hand}
+                                   "correct": ok, "auto": correct(task, ans), "hand": hand, "tools": names}
     os.makedirs(os.path.dirname(REC), exist_ok=True)
     json.dump(r, open(REC, "w"), indent=1)
     print(task, arm, r[task][arm]["correct"], tok, calls)
