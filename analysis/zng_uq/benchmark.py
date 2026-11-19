@@ -39,6 +39,11 @@ ARMS += [("A_ft", "t12500_b1_hp1612", OURS["A_ft"] + SH, None)]
 B1_SCR = {1: "runs/tp_zng_hpo_zg/trial_1612", 2: "runs/tp_zng_hpo_zgg/trial_0353", 3: "runs/tp_zng_hpo_zggg/trial_0494",
           4: "runs/tp_zng_hpo_zgggg/trial_0238"}
 ZS = "pretraining only, zero-shot"
+# D498 protocol test (step 16), from scratch: (a) B1's HPs at batch 1024 for 2e5 steps, (b) B2's Adam/plateau at batch
+# 16384 for 12,500 steps; lxplus run dirs carry a "_lxplus" suffix, hence the glob; kept out of ARMS so the earlier
+# figures stay as they were
+PT = [("A", "t200000_protocol_test_ours_bs1024*", "ours at batch 1024", None),
+      ("A", "t12500_protocol_test_adam_plateau_bs16384*", "Adam plateau at batch 16384", None)]
 DBINS = np.logspace(-8, 1, 91)          # |Delta| bins
 PBINS = np.linspace(-6, 6, 121)         # pull bins
 
@@ -327,9 +332,46 @@ def b1b2(curves, search):
     ps.save(fig, os.path.join(HERE, "figs", "zng_b1_vs_b2"))
 
 
+def ptdelta(data, pts):
+    """zng_protocol_test_delta: test median |Delta| against n for the D498 protocol test's two arms beside their controls
+    B1 (scratch, searched HPs) and B2 (scratch, Suprio's protocol) and Suprio's network (benchmark.json); the arms' numbers
+    from `collect --out` on each site (protocol_test_delta_{lxplus,cc}.json, only the PT arms taken)."""
+    sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
+    import plot_style as ps
+    ps.use()
+    runs = {k: v for k, v in json.load(open(data))["runs"].items()
+            if v["arm"] in (OURS["A"] + SH, OURS["A"] + SP, NETS["lloca"])}
+    for f in pts:
+        for k, v in json.load(open(f))["runs"].items():
+            if v["arm"] in [x[2] for x in PT]:
+                assert k not in runs, f"{k} in two files"
+                runs[k] = v
+    arms = [(OURS["A"] + SH, "B1: ours, searched HPs", ps.C.blue, "-"),
+            (OURS["A"] + SP, "B2: ours, Suprio's protocol", ps.C.vermillion, "--"),
+            ("ours at batch 1024", "(a) B1's HPs at batch 1024", ps.C.sky, "-"),
+            ("Adam plateau at batch 16384", "(b) B2's optimiser at batch 16384", ps.C.orange, "--"),
+            (NETS["lloca"], "Suprio's network", ps.C.green, ":")]
+    fig, (ax, cell) = ps.figure(2)
+    out = {}
+    for a, lab, c, ls in arms:
+        pts_ = sorted((v["n_gluons"], v["median_abs_delta"]) for v in runs.values() if v["arm"] == a)
+        assert [n for n, _ in pts_] == [1, 2, 3, 4], (a, pts_)
+        ax.plot(*zip(*pts_), "o", linestyle=ls, color=c, label=lab)
+        out[a] = {n: m for n, m in pts_}
+        print(f"{lab:36s} " + "  ".join(f"n={n} {m:.3g}" for n, m in pts_))
+    for n in PROCS:
+        print(f"n={n} (a)/B1 {out['ours at batch 1024'][n] / out[OURS['A'] + SH][n]:.3g}  "
+              f"(b)/B2 {out['Adam plateau at batch 16384'][n] / out[OURS['A'] + SP][n]:.3g}  "
+              f"B2/Suprio {out[OURS['A'] + SP][n] / out[NETS['lloca']][n]:.3g}")
+    ax.set_ylabel(r"median $|\Delta|$, $\Delta=|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2-1$")
+    ax.set_yscale("log"); ax.set_xlabel("number of gluons $n$"); ax.set_xticks([1, 2, 3, 4])
+    ps.legend_cell(cell, ax)
+    ps.save(fig, os.path.join(HERE, "figs", "zng_protocol_test_delta"))
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("cmd", choices=["collect", "plot", "summary", "parent", "b1b2", "stds"])
+    ap.add_argument("cmd", choices=["collect", "plot", "summary", "parent", "b1b2", "stds", "ptdelta"])
     ap.add_argument("--theirs", default=os.path.join(os.environ.get("WORK", ""), "ext", "uq_runs", "runs", "prod_het"))
     ap.add_argument("--out", default=os.path.join(HERE, "data", "benchmark.json"))
     ap.add_argument("--data", default=os.path.join(HERE, "data", "benchmark.json"))
@@ -344,6 +386,8 @@ def main():
         stds(os.path.join(HERE, "data", "zng_std.json"))
     elif a.cmd == "b1b2":
         b1b2(a.curves, os.path.join(HERE, "data", "b1_search.json"))
+    elif a.cmd == "ptdelta":
+        ptdelta(a.data, [os.path.join(HERE, "data", f"protocol_test_delta_{s}.json") for s in ("lxplus", "cc")])
     elif a.cmd == "plot":
         plot(a.data, a.curves)
     else:
