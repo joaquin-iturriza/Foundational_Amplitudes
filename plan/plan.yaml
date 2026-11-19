@@ -16319,6 +16319,7 @@ entries:
       idle: event (or its absence after 45 min) is the trigger'
     '22': '2026-11-20'
     '23': '2026-11-20'
+    '24': '2026-11-20'
   owner:
     agent: ab33cfe08e8f1ac89
     state: stopped
