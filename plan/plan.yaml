@@ -36281,6 +36281,20 @@ entries:
       Neither ingredient alone carries Suprio''s protocol''s advantage; at n=3,4 arm (a)''s median is slightly below B1''s
       although its best val MSE is 3.7x/1.2x above. Write-up committed 7a90efc3 (fig:zng_protocol; also commits the 11-17
       paragraph the earlier owner left uncommitted, src moved to @77ef8fae since 34077f8a no longer exists).'
+  - at: '2026-11-19T18:19:48+00:00'
+    text: '2026-11-19 protocol curves read (benchmark.py stepread/protocol_figs @d16ba280, data/protocol_steps.json, figs
+      zng_protocol_lr, zng_protocol_gradnorm, zng_wsd_cooldown). Start points: x = steps x batch; 50 validations per run under
+      our protocol (validate_frac 0.02: every 250 steps for B1, 4000 for arm a, both first at 4.1e6 events), every 1000 steps
+      for B2 and 62 for arm b (first at 1.0e6). At 1000 updates arm b''s val (8.3e-4/0.019/0.046/0.105) is below B2''s first
+      point (0.035/0.034/0.060/0.19): the start gap is updates, not events. Training curve = mu-MSE on the first 2000 training
+      events, eval mode, validation''s weights, no reg term, same in every arm. B1''s val/train ratio is ~1 at the cooldown
+      start (0.94/1.83/0.99/1.40) and 2.0/48/21/68 at the end: the 1562-step cooldown (51 epochs) cuts training MSE 565/261/209/169x
+      and validation 261/10/10/3.4x; stable-phase validation from 1/8 of the run to the cooldown start falls 21/8.6/2.0/2.3x.
+      Arm a: largest pre-clip grad norm 1e9-2e20, spikes (>100x median) in 9/43/38/33 of 50 intervals; validation at the cooldown
+      start 0.52/0.44/0.16/0.25 of its value at 1/8 (it rises in the stable phase). Lr: arm a ran B1''s lr (2.2e-3/1.2e-2/1.5e-2/1.5e-2,
+      searched at batch 16384) at batch 1024; arm b Adam 1e-3 (Suprio''s, set for batch 1024) at batch 16384: neither retuned,
+      so the protocol test is no comparison (Joaquin). Best-against-best design: reviewer FIX (B1/B2 gap 1.1-1.9x inside one
+      seed); dead end recorded, question to Joaquin.'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
