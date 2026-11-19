@@ -36114,6 +36114,14 @@ entries:
       B2; still falling at the end (12,500 updates). Plain reading: no train/validation split opens without Muon/WSD (arm
       b R ~1, smooth), and Muon/WSD at batch 1024 shrinks the split but trains unstably; B2''s lower validation MSE needs
       its many small updates. Test median |Delta| (measure 3) not read yet (benchmark.py collect on the sites).'
+  - at: '2026-11-19T14:07:01+00:00'
+    text: '2026-11-19 step 5: D498 protocol-test test median |Delta| (benchmark.py ptcollect/ptdelta/summary @77ef8fae, data/protocol_test_delta_{lxplus,cc}.json,
+      fig zng_protocol_test_delta) on the 1e6 test events per n. Arm (a) ours at batch 1024 (searched HPs, 2e5 steps): 2.9e-4/1.6e-3/3.9e-3/1.2e-2
+      at n=1..4 = 6.9/4.2/0.87/0.75x B1 (searched HPs, batch 16384). Arm (b) Adam plateau at batch 16384 (12,500 steps): 1.7e-4/3.3e-3/1.7e-2/2.9e-2
+      = 6.6/9.5/4.8/3.4x B2 (our network, Suprio''s protocol). B2 stays 3.7/1.5/2.3/2.0x above Suprio''s network (6.9e-6/2.3e-4/1.5e-3/4.4e-3).
+      Neither ingredient alone carries Suprio''s protocol''s advantage; at n=3,4 arm (a)''s median is slightly below B1''s
+      although its best val MSE is 3.7x/1.2x above. Write-up committed 7a90efc3 (fig:zng_protocol; also commits the 11-17
+      paragraph the earlier owner left uncommitted, src moved to @77ef8fae since 34077f8a no longer exists).'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
