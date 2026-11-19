@@ -35533,6 +35533,12 @@ entries:
     units: null
     start: '2026-11-18T23:27:13+00:00'
     at: '2026-11-18T23:27:13+00:00'
+  - batch: ttv_relabel
+    wall_h: 1.0
+    jobs: 1
+    units: null
+    start: '2026-11-19T00:38:48+00:00'
+    at: '2026-11-19T00:38:48+00:00'
   handoff:
     state: '2026-11-19. B1 read and drawn: curve test passes only at Z+1g (3/8); best trial per n scored on 1e6 test events,
       median |Delta| 4.3e-5/3.9e-4/4.4e-3/1.6e-2 = 6.2/1.7/3.0/3.7x Suprio''s LLoCa; fine-tuned at Z+1g''s HPs 5.1e-5; B2
