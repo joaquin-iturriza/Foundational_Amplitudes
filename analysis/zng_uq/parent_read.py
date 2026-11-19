@@ -168,8 +168,73 @@ def plot_curves(path):
         ax.set_xlabel("step", fontsize=7)
         ax.xaxis.set_tick_params(labelbottom=True)
     for ax in axs[:, 0]:
-        ax.set_ylabel("val NLL", fontsize=7)
+        ax.set_ylabel("val. het. loss", fontsize=7)
     ps.save(fig, os.path.join(HERE, "figs", "zng_parent_curves"))
+
+def reread(run_id):
+    """Step 14: the old finale, the first parent (no W column, 200-event validation) and the retrain (W column in
+    internal_mass_pdgs, whole val pools; FA-lxplus-57f6d2cb) scored at their best weights on the same whole val pools
+    (CC, after the t t~ V rebuild): tools/eval_best_val.py EVAL_FROZEN=1 EVAL_FULL=1 in one job `run_id`, its EVAL_BEST
+    lines read from `site logs`. Per process MSE(ln|M|^2): HETEROSC runs proc_val_mse x prepd_std^2 (one shared std),
+    the MSE-loss old finale proc_val_losses_no_reg x its dataset's prepd_std^2. Curve test of the retrain from its own
+    logs on lxplus (SITE, tools/kit_curves.quality). -> data/parent_reread.json, figures zng_parent_vs_finale (v3) and
+    zng_parent_w_curves."""
+    import subprocess
+    sys.path.insert(0, ROOT)
+    from analysis.common.readers import site_python
+    from tools.kit_curves import quality
+    import plot_style as ps
+    ps.use()
+    log = subprocess.run(["site", "logs", run_id, "-n", "100000"], capture_output=True, text=True).stdout
+    ev = [json.loads(l.split("EVAL_BEST ", 1)[1]) for l in log.splitlines() if l.startswith("EVAL_BEST ")]
+    tag = {OLD: "old", NEW: "parent", NEW + "_w": "retrain"}
+    d = {"eval_run": run_id}
+    for e in ev:
+        k = tag[e["run_dir"].rstrip("/")]
+        if e["proc_val_mse"]:
+            assert len(set(e["prepd_std"])) == 1, "one shared target std expected"
+            d[k] = {p: v * e["prepd_std"][0] ** 2 for p, v in e["proc_val_mse"].items()}
+        else:
+            # positional std: every process must be present (experiment._validate drops one without a val loader)
+            assert len(e["proc_val_losses_no_reg"]) == len(e["prepd_std"]), (k, len(e["proc_val_losses_no_reg"]))
+            d[k] = {p: v * e["prepd_std"][i] ** 2 for i, (p, v) in enumerate(e["proc_val_losses_no_reg"].items())}
+    assert set(d) >= {"old", "parent", "retrain"}, sorted(d)
+    s = site_python(SITE, [OLD, NEW + "_w"], "PARENTREAD", site="lxplus")
+    d["retrain_curve"] = quality(s["new_val"], s["new_train"])
+    d["retrain_proc_val"], d["retrain_every"] = s["new_proc_val"], s["new_every"]
+    prev = json.load(open(os.path.join(HERE, "data", "parent_vs_finale.json")))
+    d["old_on_old_pools"] = prev["old"]          # the old finale's own validation, before the rebuild
+    gm = lambda x: float(np.exp(np.mean(np.log(x))))
+    procs = sorted(d["old"], key=lambda p: d["old"][p])
+    d["summary"] = {k: {"gmean": gm([d[k][p] for p in procs]),
+                        "gmean_over_old": gm([d[k][p] / d["old"][p] for p in procs]),
+                        "n_below_old": int(sum(d[k][p] < d["old"][p] for p in procs))} for k in ("parent", "retrain")}
+    d["summary"]["ttv_old_finale_new_over_old_pool"] = d["old"]["uubar_ttbar_nlo"] / d["old_on_old_pools"]["uubar_ttbar_nlo"]
+    json.dump(d, open(os.path.join(HERE, "data", "parent_reread.json"), "w"), indent=1)
+    print(json.dumps({"summary": d["summary"], "curve": d["retrain_curve"]}))
+    for p in procs:
+        print("%-18s old %.3g  parent %.3g  retrain %.3g  retrain/old %.3g" % (p, d["old"][p], d["parent"][p], d["retrain"][p], d["retrain"][p] / d["old"][p]))
+    fig, ax = ps.figure()
+    x = np.arange(len(procs))
+    for k, mk, col, lab in (("old", "o", ps.C.grey, "old finale"), ("parent", "s", ps.C.blue, "first parent"),
+                            ("retrain", "^", ps.C.vermillion, "retrained parent")):
+        ax.plot(x, [d[k][p] for p in procs], mk, color=col, label=lab)
+    ax.set_yscale("log"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
+    ax.set_xlabel("process, ordered by the old finale's MSE"); ax.set_xticks(x[::3])
+    ps.legend(ax, "upper left")
+    ps.save(fig, os.path.join(HERE, "figs", "zng_parent_vs_finale"))
+    fig, axs = ps.figure(ncols=2, nrows=14, sharex=True)
+    for ax, p in zip(axs.flat, procs):
+        v = np.array(d["retrain_proc_val"][p])
+        ax.plot((np.arange(len(v)) + 1) * d["retrain_every"], v, color=ps.C.vermillion)
+        ps.process_label(ax, "$" + TEX[p] + "$", fontsize=6)
+        ax.tick_params(labelsize=6)
+    for ax in axs.flat[len(procs) - 2:len(procs)]:
+        ax.set_xlabel("step", fontsize=7)
+        ax.xaxis.set_tick_params(labelbottom=True)
+    for ax in axs[:, 0]:
+        ax.set_ylabel("val. het. loss", fontsize=7)
+    ps.save(fig, os.path.join(HERE, "figs", "zng_parent_w_curves"))
 
 
 EXPLAIN = r"""
@@ -248,7 +313,7 @@ def plot_learning(path):
         b.plot((np.arange(len(o)) + 1) * x["old_every"], o, color=getattr(ps.C, col))
     a.plot(st, d["new_train"], color="k", linestyle="--", label="training, all 28 processes")
     # symlog: t t~ V's last validations reach 100 nats, the rest sit between -9 and 0; every point drawn
-    a.set_xlabel("step"); a.set_ylabel("NLL (nats)"); a.set_yscale("symlog", linthresh=1.0)
+    a.set_xlabel("step"); a.set_ylabel("het. loss (nats)"); a.set_yscale("symlog", linthresh=1.0)
     b.set_yscale("log"); b.set_xlabel("step"); b.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
     ps.process_label(b, "old finale")
     ps.process_label(a, "new parent", loc="lower left")   # t t~ V's blow-up runs into the upper right
@@ -621,6 +686,8 @@ if __name__ == "__main__":
         pool_gen(os.path.join(HERE, "data", "parent_pool_gen.json"))
     elif sys.argv[1] == "relabel":
         relabel(os.path.join(HERE, "data", "parent_ttv_relabel.json"))
+    elif sys.argv[1] == "reread":
+        reread(sys.argv[2])
     elif sys.argv[1] == "sitediff":
         sitediff(os.path.join(HERE, "data", "parent_ttv_sitediff.json"))
     elif sys.argv[1] == "rebuilt":

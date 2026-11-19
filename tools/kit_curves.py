@@ -135,7 +135,7 @@ def curve_panel(ax, e):
     ax.plot(st, tr, color=ps.C.blue, linestyle="--", label="training")
     lo = np.nanmin(np.r_[va, tr])
     ax.set_ylim(lo - 0.5, lo + 6)
-    ax.set_xlabel("training step"); ax.set_ylabel("NLL")
+    ax.set_xlabel("training step"); ax.set_ylabel("het. loss")
 
 
 def plot(d, figs):
