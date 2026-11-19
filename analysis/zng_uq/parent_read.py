@@ -172,9 +172,200 @@ def plot_curves(path):
     ps.save(fig, os.path.join(HERE, "figs", "zng_parent_curves"))
 
 
+EXPLAIN = r"""
+import json, os, sys
+import numpy as np
+old, new = sys.argv[1], sys.argv[2]
+PROCS = ("udbar_enug", "uubar_ttbar_nlo", "uubar_ttbar", "udbar_taunu")
+POOL = {"udbar_enug": ("udbar_enug_25-1000GeV_val_smix", 5), "udbar_taunu": ("udbar_taunu_25-1000GeV_val_smix", 4),
+        "uubar_ttbar_nlo": ("uubar_ttbar_nlo_363-450GeV_val", 4)}
+def mass(v): return np.sqrt(np.maximum(v[..., 0] ** 2 - np.sum(v[..., 1:] ** 2, -1), 0))
+sn = json.load(open(new + "/data_stats.json"))["prepd_std"]
+out = {"new": {}, "old_curves": {}}
+for sp in ("val", "train"):
+    z = np.load(new + "/sigma_stage/preds_%s.npz" % sp); names = [str(x) for x in z["names"]]
+    for p in PROCS:
+        i = names.index(p); k = z["process_id"] == i; rt = z["raw_truth"][k, 0]; rp = z["raw_pred"][k, 0]
+        e = dict(log_truth=np.log(np.abs(rt)).tolist(), log_pred=np.log(np.abs(rp)).tolist(),
+                 # the residual of the trained target in ln units: (standardised pred - truth) x its std
+                 resid=((z["pred"][k, 0] - z["truth"][k, 0]) * sn[i]).tolist(), sigma=(z["sigma"][k, 0] * sn[i]).tolist(),
+                 n_neg_truth=int((rt < 0).sum()), n_neg_pred=int((rp < 0).sum()))
+        if sp == "val" and p in POOL:
+            # the validated events are the pool's first rows (eval_subsample), matched to the predictions by |M|^2
+            f, n = POOL[p]; f = os.path.join(os.environ["DATA_DIR"], f + "_amplitudes")
+            a = np.array(np.load(f + ".npy", mmap_mode="r")[:2 * k.sum()])
+            mom, amp = a[:, :4 * n].reshape(-1, n, 4), a[:, -1]
+            j = np.array([int(np.argmin(np.abs(amp - t) / abs(t))) for t in rt])
+            assert np.max(np.abs(amp[j] - rt) / np.abs(rt)) < 1e-4, p
+            e["sqrt_s"] = mass(mom[j, 0] + mom[j, 1]).tolist(); e["m_lnu"] = mass(mom[j, 2] + mom[j, 3]).tolist()
+            e["m3"] = mass(mom[j, 2]).tolist()
+            if os.path.exists(f + ".alphas.npy"):
+                e["alphas"] = np.load(f + ".alphas.npy")[:2 * k.sum()][j].tolist()
+        out["new"].setdefault(p, {})[sp] = e
+m = json.load(open(old + "/plots_0/per_process_metrics.json")); st = json.load(open(old + "/data_stats.json")); order = m["dataset_order"]
+for p in PROCS:
+    out["old_curves"][p] = [float(v * st["prepd_std"][order.index(p)] ** 2) for v in m["proc_val_losses_no_reg"][p]]
+out["old_every"] = m["validate_every_n_steps"]
+print("PARENTEXPLAIN " + json.dumps(out))
+"""
+
+
+def explain(out):
+    """For u d~ -> e+ nu g, u u~ -> t t~ (one loop), u u~ -> t t~ and u d~ -> tau+ nu: the new parent's sigma-stage
+    predictions on its validated and train events (ln|M|^2 true and predicted, residual of the trained target in ln
+    units, sigma), m(l nu) and sqrt(s) of the validated e nu g and tau nu events, and the old finale's per-process
+    validation MSE(ln|M|^2) curves -> analysis/zng_uq/data/parent_explain.json"""
+    sys.path.insert(0, ROOT)
+    from analysis.common.readers import site_python
+    d = site_python(EXPLAIN, [OLD, NEW], "PARENTEXPLAIN", site="lxplus")
+    json.dump(d, open(out, "w"))
+    for p, v in d["new"].items():
+        print(p, {sp: (len(e["resid"]), e["n_neg_truth"], e["n_neg_pred"]) for sp, e in v.items()})
+
+
+SHOW = (("udbar_enug", "vermillion"), ("uubar_ttbar_nlo", "green"), ("uubar_ttbar", "blue"))
+
+
+def plot_learning(path):
+    """zng_parent_learning (2x2): (a) the new parent's validation NLL per process for u d~ -> e+ nu g, u u~ -> t t~ one
+    loop and u u~ -> t t~ against step, with its training NLL over all 28 (the only training curve it logs); (b) the old
+    finale's validation MSE(ln|M|^2) of the same three against step; (c) the new parent's final model, MSE(ln|M|^2) on
+    train events against validation events per process (y = x); (d) the legend."""
+    sys.path.insert(0, ROOT)
+    import plot_style as ps
+    ps.use()
+    d = json.load(open(path)); x = json.load(open(os.path.join(HERE, "data", "parent_explain.json")))
+    g = json.load(open(os.path.join(HERE, "data", "parent_diag.json"))); sd2 = 2.497118239233265 ** 2  # shared target std
+    fig, axs = ps.figure(ncols=2, nrows=2)
+    a, b, c, leg = axs[0][0], axs[0][1], axs[1][0], axs[1][1]
+    st = (np.arange(len(d["new_val"])) + 1) * d["new_every"]
+    for p, col in SHOW:
+        # NLL above 2 nats (t t~ V's last validations, up to 100) drawn at the top edge, the axis set by the rest
+        a.plot(st, np.minimum(d["new_proc_val"][p], 2.0), color=getattr(ps.C, col), label="$" + TEX[p] + "$")
+        o = x["old_curves"][p]
+        b.plot((np.arange(len(o)) + 1) * x["old_every"], o, color=getattr(ps.C, col))
+    a.plot(st, d["new_train"], color="k", linestyle="--", label="training, all 28 processes")
+    a.set_xlabel("step"); a.set_ylabel("NLL (nats)"); a.set_ylim(-9.5, 2.3)
+    b.set_yscale("log"); b.set_xlabel("step"); b.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
+    ps.process_label(b, "old finale")
+    ps.process_label(a, "new parent", loc="lower left")   # the clipped t t~ V curve runs along the top edge
+    others = [p for p in g if p not in dict(SHOW)]
+    c.plot([g[p]["train"]["mse"] * sd2 for p in others], [g[p]["val"]["mse"] * sd2 for p in others], "o",
+           color=ps.C.grey, label="the other 25 processes")
+    for p, col in SHOW:
+        c.plot(g[p]["train"]["mse"] * sd2, g[p]["val"]["mse"] * sd2, "o", color=getattr(ps.C, col))
+    lim = (1e-7, 1e2)
+    c.plot(lim, lim, color="k", linestyle=":", label="validation = training")
+    c.set_xscale("log"); c.set_yscale("log"); c.set_xlim(lim); c.set_ylim(lim); c._ps_equal_limits = True
+    c.set_xlabel(r"MSE$(\log|\mathcal{M}|^2)$, training"); c.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$, validation")
+    ps.legend_cell(leg, [a, c])
+    ps.save(fig, os.path.join(HERE, "figs", "zng_parent_learning"))
+    for p, _ in SHOW:
+        v = np.array(d["new_proc_val"][p]); o = np.array(x["old_curves"][p])
+        print(p, "new val NLL first %.2f min %.2f (val %d) last %.2f" % (v[0], v.min(), v.argmin() + 1, v[-1]),
+              "| old MSE first %.2e min %.2e last %.2e" % (o[0], o.min(), o[-1]),
+              "| final train %.2e val %.2e" % (g[p]["train"]["mse"] * sd2, g[p]["val"]["mse"] * sd2))
+
+
+def plot_true_pred(path):
+    """zng_parent_true_pred (3x2): per process (rows: u d~ -> e+ nu g, u u~ -> t t~ one loop, u u~ -> t t~), the new
+    parent's predicted against true ln|M|^2 on its 2000 train and 200 validation events (left, y = x) and the
+    residual ln|M|^2_pred - ln|M|^2_true against the true value (right)."""
+    sys.path.insert(0, ROOT)
+    import plot_style as ps
+    ps.use()
+    x = json.load(open(os.path.join(HERE, "data", "parent_explain.json")))["new"]
+    fig, axs = ps.figure(ncols=2, nrows=3)
+    for (p, _), (l, r) in zip(SHOW, axs):
+        for sp, col, lab in (("train", ps.C.blue, "training events"), ("val", ps.C.vermillion, "validation events")):
+            t, q, e = (np.array(x[p][sp][k]) for k in ("log_truth", "log_pred", "resid"))
+            l.plot(t, q, ".", color=col, label=lab); r.plot(t, e, ".", color=col)
+        lo = min(min(x[p][sp]["log_truth"] + x[p][sp]["log_pred"]) for sp in ("train", "val"))
+        hi = max(max(x[p][sp]["log_truth"] + x[p][sp]["log_pred"]) for sp in ("train", "val"))
+        l.plot((lo, hi), (lo, hi), color="k", linestyle=":", label="prediction = truth")
+        l.set_xlim(lo, hi); l.set_ylim(lo, hi); l._ps_equal_limits = True
+        r.axhline(0, color="k", linestyle=":")
+        l.set_xlabel(r"true $\log|\mathcal{M}|^2$"); l.set_ylabel(r"predicted $\log|\mathcal{M}|^2$")
+        r.set_xlabel(r"true $\log|\mathcal{M}|^2$"); r.set_ylabel(r"predicted $-$ true")
+        ps.process_label(l, "$" + TEX[p] + "$", loc="lower right")
+    ps.legend(axs[2][0], "upper left")   # the clean process's diagonal leaves that corner empty
+    ps.save(fig, os.path.join(HERE, "figs", "zng_parent_true_pred"))
+    for p, _ in SHOW:
+        for sp in ("train", "val"):
+            t, q, e = (np.array(x[p][sp][k]) for k in ("log_truth", "log_pred", "resid"))
+            print(p, sp, "n %d  MSE %.2e  corr %.3f  true range %.2f..%.2f  pred range %.2f..%.2f" %
+                  (len(t), (e ** 2).mean(), np.corrcoef(t, q)[0, 1], t.min(), t.max(), q.min(), q.max()))
+
+
+def plot_wpole(path):
+    """zng_parent_wpole (1x2): the new parent's residual ln|M|^2_pred - ln|M|^2_true on its 200 validated events against
+    the lepton pair's mass m(l nu), for u d~ -> e+ nu g (massless legs, W internal) and u d~ -> tau+ nu (tau mass
+    fed per sqrt(s_hat)), with m_W."""
+    sys.path.insert(0, ROOT)
+    import plot_style as ps
+    ps.use()
+    x = json.load(open(os.path.join(HERE, "data", "parent_explain.json")))["new"]
+    fig, axs = ps.figure(ncols=2, nrows=1)
+    for ax, p, lab in ((axs[0], "udbar_enug", r"$m(e^+\nu_e)$ (GeV)"), (axs[1], "udbar_taunu", r"$m(\tau^+\nu_\tau)$ (GeV)")):
+        v = x[p]["val"]; m, e = np.array(v["m_lnu"]), np.array(v["resid"])
+        ax.plot(m, e, ".", color=ps.C.vermillion, label="validation events")
+        ax.axvline(80.419, color="k", linestyle=":", label="$m_W$")
+        ax.axhline(0, color="k", linestyle="-", alpha=0.3, label="prediction = truth")
+        ax.set_xscale("log"); ax.set_xlabel(lab); ax.set_ylabel(r"predicted $-$ true $\log|\mathcal{M}|^2$")
+        ps.process_label(ax, "$" + TEX[p] + "$", loc="lower right")
+        near = np.abs(m - 80.419) < 10
+        print(p, "n %d  |resid| median %.3g; |m-mW|<10 GeV: n %d median |resid| %.3g; elsewhere %.3g; max |resid| %.3g at m %.1f"
+              % (len(m), np.median(np.abs(e)), near.sum(), np.median(np.abs(e[near])) if near.any() else np.nan,
+                 np.median(np.abs(e[~near])), np.abs(e).max(), m[np.abs(e).argmax()]))
+        for lo, hi in ((0, 40), (40, 70), (70, 90), (90, 150), (150, 400), (400, 1000)):
+            k = (m >= lo) & (m < hi)
+            if k.any():
+                print("   m in [%d,%d): n %d  rms resid %.3g  mean resid %+.3g" % (lo, hi, k.sum(), np.sqrt((e[k] ** 2).mean()), e[k].mean()))
+    ps.legend(axs[0], "upper left")
+    ps.save(fig, os.path.join(HERE, "figs", "zng_parent_wpole"))
+
+
+TTV = r"""
+import json, os, sys
+import numpy as np
+# the new parent's t t~ V pools, as its out_0.log names them: train composed on lxplus 2026-11-17, val from datasets
+tr = "/eos/user/j/joiturri/tmp/amp_data_cache/uubar_ttbar_nlo_363-450GeV_train_amplitudes.npy"
+va = os.environ["DATA_DIR"] + "/uubar_ttbar_nlo_363-450GeV_val_amplitudes.npy"
+def mass(v): return np.sqrt(np.maximum(v[..., 0] ** 2 - np.sum(v[..., 1:] ** 2, -1), 0))
+o = {}
+for k, f in (("train", tr), ("val", va)):
+    a = np.array(np.load(f, mmap_mode="r")); s = mass(a[:, :16].reshape(-1, 4, 4)[:, :2].sum(1)); lm = np.log(np.abs(a[:, -1]))
+    rec = json.load(open(f + ".recipe.json"))
+    idx = np.digitize(s, [363, 370, 380, 400, 450]) - 1
+    o[k] = dict(n=int(len(a)), created=rec["created"], commit=rec["provenance"]["git_commit"],
+                pipeline=rec["provenance"]["pipeline_sha256"], seed=rec["effective_seed"],
+                alphas=np.unique(np.load(f.replace(".npy", ".alphas.npy"))).tolist(),
+                median_lnM2_by_sqrts=[float(np.median(lm[idx == i])) for i in range(4)], n_by_sqrts=[int((idx == i).sum()) for i in range(4)])
+print("TTVPOOLS " + json.dumps(o))
+"""
+
+
+def ttv_pools(out):
+    """The new parent's u u~ -> t t~ (one loop) train and val pools: generation date, commit, pipeline hash, alpha_s,
+    and the median ln|M|^2 in four sqrt(s) bins [363,370,380,400,450] GeV -> analysis/zng_uq/data/parent_ttv_pools.json"""
+    sys.path.insert(0, ROOT)
+    from analysis.common.readers import site_python
+    d = site_python(TTV, [], "TTVPOOLS", site="lxplus")
+    json.dump(d, open(out, "w"), indent=1)
+    for k, v in d.items():
+        print(k, v)
+    print("train - val median ln|M|^2 per sqrt(s) bin:",
+          [round(a - b, 4) for a, b in zip(d["train"]["median_lnM2_by_sqrts"], d["val"]["median_lnM2_by_sqrts"])])
+
+
 if __name__ == "__main__":
     data = os.path.join(HERE, "data", "parent_vs_finale.json")
     if sys.argv[1] == "diag":
         diag(os.path.join(HERE, "data", "parent_diag.json"))
+    elif sys.argv[1] == "ttvpools":
+        ttv_pools(os.path.join(HERE, "data", "parent_ttv_pools.json"))
+    elif sys.argv[1] == "explain":
+        explain(os.path.join(HERE, "data", "parent_explain.json"))
     else:
-        {"read": read, "fullval": fullval, "plot": plot, "curves": plot_curves}[sys.argv[1]](data)
+        {"read": read, "fullval": fullval, "plot": plot, "curves": plot_curves, "learning": plot_learning,
+         "truepred": plot_true_pred, "wpole": plot_wpole}[sys.argv[1]](data)
