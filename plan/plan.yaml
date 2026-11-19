@@ -16396,12 +16396,10 @@ entries:
     '28': the main session's go after this owner's 2026-11-19 report (an interactive terminal session with Code Mode on must
       be started by hand)
   owner:
-    agent: ab76a6886e2c96d3b
-    state: stopped
-    since: '2026-11-19T13:26:59+00:00'
-    state_at: '2026-11-19T13:38:36.900000+00:00'
-    context: 160492
-    context_at: '2026-11-19T13:49:52+00:00'
+    agent: af2bc6219bb4a56b5
+    state: working
+    since: '2026-11-19T17:53:29+00:00'
+    state_at: '2026-11-19T17:53:29+00:00'
   designs:
   - at: '2026-10-30T19:52:22+00:00'
     question: 'Can lxplus''s HTCondor GPU nodes run FA jobs: does the env activate, the GPU show, the xformers attention kernel
