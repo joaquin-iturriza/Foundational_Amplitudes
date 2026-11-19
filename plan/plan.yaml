@@ -17658,6 +17658,18 @@ entries:
       wt-recall (recall.py a0671a53). pip install graphifyy into worktrees/wt-graphify/.venv-graphify was refused twice by
       the auto-mode classifier (''Unauthorized Access'', then ''Undermining Oversight''): the graph arm of step 26 waits on
       Joaquin allowing that install; grep, lsp, batch, now and recall arms go ahead under the trial design.'
+  - at: '2026-11-19T13:19:46+00:00'
+    text: '2026-11-19 steps 26/27/29 trial ran under the design passed by the design-reviewer (3531dc6e); 55 Explore agents
+      at low effort; records analysis/agent_redesign/lookup_trial.json in worktrees/wt-graphify (commit after 3531dc6e, tools/lookup_trial.py
+      report --arms ...). Code lookups, 10 tasks, total tokens / tool calls / correct: grep 469.4k/24/9, grep2 467.9k/24/10
+      (spread 0.3%), lsp 536.8k/28/10, batch 489.4k/25/9; both misses are base_experiment.py:_validate for val_combine. INVALID
+      ARM: the lsp agents made 0 LSP calls on all 10 tasks (tools recorded per agent; several said ''found with grep, not
+      LSP''), so step 26 has not tested LSP; batch arm''s use of batch.py not yet checked from the tools field. Recall, 5
+      cases, hand read all 15 correct: now 342.0k/14, now2 501.2k/18, recall 321.5k/17 calls: recall not fewer calls than
+      both now runs -> on the design''s rule step 27 is a No (tokens 6% below now, 36% below now2; spread between the two
+      now runs 47%). Scorer repair after the run (inside the passed design): answer items are lines starting with a path;
+      two right assemble_callers answers had been scored wrong for a prose note naming mg5_pipeline_final.py. Figure not drawn
+      yet.'
   handoff:
     state: '2026-11-19. Step 21 done (after-period of the 10-min batch, 6d067301; figure analysis/agent_redesign/figs/wake_batching_after_per_day.png,
       finding of 2026-11-19). Wake audit done (step 23 finding; fixes a34b19d3 absorb ''waiting on its own background work''
