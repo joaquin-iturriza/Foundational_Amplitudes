@@ -35678,6 +35678,16 @@ entries:
       -> tau nu 2.1e-4), the 60 Z lepton-pair classes at 0.195 (2->2 1e-5 to 1e-4; 2->3 with gluon 8e-4 to 6e-3). So 1262
       has the same W failure as the new parent; at 12 of 1153 classes (1%) it does not move a median over the catalog, which
       is why the dimensionless-input test on medians did not show it.'
+  - at: '2026-11-19T01:03:55+00:00'
+    text: '2026-11-19 pool check (@712bc7a4, datagen.mixed_generation, called at data load in experiment.py; refuses unless
+      ++data.allow_mixed_generation=true; tests/test_mixed_generation.py). By generator version alone it would refuse 26 of
+      28 processes of the zng parent and 74 of 1153 of trial 1262 (pipeline_sha256 differs between train and val/test far
+      more often than labels), so it also asks for a label shift: per sqrt(s) decile, z of the train-minus-val median ln|M|^2,
+      combined |sum z|/sqrt(10) > 5. Tested on real pools (analysis/zng_uq/data/mixed_generation_z.json): u u~ -> t t~ one
+      loop z = 8.3 (val), 6.1 (test); the other 25 parent processes and the 74 version-mismatched 1262 classes at most 2.7.
+      Consequence: any re-read or retrain on the zng parent''s pools (FA-lxplus-57f6d2cb''s re-reads, steps 5/14) now refuses
+      until the t t~ V pools agree or the override is passed. Not tested: a shift below ~0.5% (z scales with pool size), pools
+      without provenance (skipped).'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
