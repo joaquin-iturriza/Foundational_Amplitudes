@@ -35252,6 +35252,63 @@ entries:
       relabel, ttbar_nlo, DECAY, top width, Gamma_t, zero width, card_width, width_regen, stored label, label check in docs/results.tex;
       plan.yaml (virt_label_check, lhe_label_virt, H5 step 19 design); site decisions --project FA (ttbar, top width, relabel,
       val pool, regenerat): no earlier relabel of these pools.'
+  - at: '2026-11-19T00:50:55+00:00'
+    question: 'D498 protocol test, Z+1g..Z+4g from scratch (q qbar -> Z + n g, Zenodo 16793011, 5e5 train events): why does
+      our protocol (B1: MuonAdamW, WSD, searched HPs, batch 16384, 12,500 steps) end with validation 21-68x above training
+      at n=2-4 and a worse val MSE than Suprio''s protocol (B2: Adam 1e-3, plateau decay, early stopping, batch 1024, <=2e5
+      steps), when both see ~2e8 events? Two arms, each changing one group of settings of one protocol: (a) ''ours, batch
+      1024'': B1''s best trial at each n with only batch 1024 and 2e5 steps (same events, same events per validation), against
+      B1 itself; (b) ''Adam plateau, batch 16384'': B2''s settings with only batch 16384 and 12,500 steps (validation, early-stopping
+      patience and plateau patience kept in events), against B2 itself. Feeds: whether the gap is the number and size of updates
+      (batch, steps) or the optimizer and schedule, which decides the protocol for the Z+ng runs and the parent''s fine-tunes.'
+    prior: 'This entry: B1 (findings 2026-11-18T23:31, 2026-11-19T00:17; zng_b1_vs_b2, b1_search.json, benchmark.py @eb18f692):
+      curve test passes 3/8 trials at n=1, 0/8 at n=2-4; best val MSE B1/B2 0.66, 0.14, 1.29, 1.72 (n=1..4); B1 val/train
+      1.3-2 before the WSD cooldown, 21-68 at its end (train falls 40-140x in the cooldown, val 3-13x); B2 val/train ends
+      1.6-5.4; at 4.1e6 events B1 val is 13-20x above B2; test median |Delta| B1 1.2-1.8x worse than B2 at every n; B1''s
+      best checkpoint is always its last step (early stopping is not the gap). B2 (finding 2026-11-18T00:33): curve test 4/8
+      pass; median |Delta| scratch 2.6e-5, 3.4e-4, 3.4e-3, 8.7e-3. Config diff read today on CC (trial_1612, trial_0238 vs
+      the B2 runs): besides batch/steps/optimizer/scheduler the two differ in betas (0.9 vs 0.99), plateau factor/patience,
+      es_patience (off vs 20000 steps), checkpoint selection (mu_mse vs nll), L2 lambda (searched vs 0), EMA (searched vs
+      off), validation (every 250 steps on 2% fraction vs every 1000 on all); each arm keeps all of these at its own protocol''s
+      values. No earlier run varies batch at fixed optimizer on these data. Searched docs/results.tex (batch 1024, suprio,
+      protocol, WSD cooldown, plateau), plan show zng_uq_benchmark, site decisions --project FA (D480-D498): none else.'
+    measure: 'Per run (8): (1) best validation MSE(ln|M|^2) of the mean, val_loss_no_reg at the best checkpoint x prepd_std^2
+      (benchmark.py b1b2 reading); (2) end separation, last-validation val MSE / train MSE (tools/kit_curves.py runs, the
+      curve test: separation and end_up); (3) test median |Delta| on the 1e6 test events (benchmark.py collect, KIT_NTEST=1000000).
+      Each read against its control at the same n; figure: val and train MSE against training events seen per n, the new arm
+      beside its control (zng_b1_vs_b2 extended).'
+    check: 'The measure moves on existing data with a protocol change: B1 vs B2 best val MSE ratios 0.14-1.72 and end separation
+      21-68 vs 1.6-5.4 at n=2-4 (b1_search.json, zng_curves.json); across B1''s 8 trials per n separation 13-543 (HP changes
+      alone move it 40x). Times: B2 measured 0.067/0.073/0.082/0.099 s/step at batch 1024 Adam (out_0.log ''Finished training'',
+      n=1..4), B1 0.59/0.71/0.83/0.93 s/step at 16384 Muon.'
+    fixed: 'Data: kit_uq_<p>__me2 recipes, 5e5 train, validation 1e5, test 1e6 (KIT_NTEST=1000000), the B1/B2 split; model,
+      inputs, target, loss HETEROSC, dtype float64, seed 42, clip 5, weight_decay 0: as B1 and B2 (equal in the config diff).
+      Launch: scripts/job_kit.sh <ds> 500000 <T> A (the path of B2 and the B1 fine-tune). Arm (a) per n: T=200000, training.batchsize=1024,
+      everything else B1''s best trial at that n (n=1 trial_1612, n=2 trial_0353, n=3 trial_0494, n=4 trial_0238: lr, muon_weight_decay,
+      regularization_lambda, warmup_frac, eta_min, ema, ema_decay), MuonAdamW, WSD cooldown 1/8, betas [0.9,0.999], plateau
+      0.1/50 (unused), es_patience 1e14 (off), heterosc_select mu_mse, validate_frac 0.02 (50 validations, 4.1e6 events apart
+      as in B1), tag protocol_test_ours_bs1024. Arm (b) per n: T=12500, training.batchsize=16384, B2''s settings (Adam lr
+      1e-3, betas [0.99,0.999], L2 0, ema off, ReduceLROnPlateau factor 0.3 patience 10 validations, heterosc_select nll,
+      validate_frac 0) with validation every 62 steps and es_patience 1240 steps (B2''s 1000 and 20000 steps x 1024/16384:
+      the same events between validations and before stopping), tag protocol_test_adam_plateau_bs16384. Site ccin2p3 (site
+      pick, 8 jobs; data there). Wall: (a) training at B2''s Adam step rate x 2e5 = 3.7/4.0/4.5/5.5 h plus Muon''s per-step
+      cost (not measured at batch 1024: read from the first jobs'' logs), target 6 h, limit 12 h; (b) B1''s step rate x 12500
+      = 2.1/2.5/2.9/3.3 h, target 3.5 h, limit 6 h. GPU-h ~20-24 (a) + ~12 (b) = ~32-36, D498''s ~31. Disk ~0.2 GB per run
+      (as B2).'
+    control: Arm (a) against B1's best trial at the same n (same HPs, optimizer, schedule, checkpoint rule; only batch 16384->1024
+      and steps 12,500->2e5 differ). Arm (b) against the B2 scratch run at the same n (same optimizer, schedule, stopping
+      and checkpoint rule in events; only batch 1024->16384 and steps 2e5->12,500 differ). Both controls already exist (no
+      rerun).
+    seeds: 'One, seed 42, as both controls; D492 (''I don''t see a reason to do more seeds now''). A single-seed read: differences
+      within 1.5x in val MSE are not called.'
+    outcome: 'Arm (a), batch 1024 under our protocol: YES, the batch/step count is the cause, if its end separation drops
+      to B2''s range (<10 at n=2-4, against B1''s 21-68) and its best val MSE comes within 1.5x of B2 or below; NO, batch
+      is not the cause, if it separates like B1 (>20) with val MSE no better than B1''s. Arm (b), Adam+plateau at batch 16384:
+      YES, the optimizer and schedule are the cause, if it stays together like B2 (separation <10) with val MSE within 1.5x
+      of B2; NO if it separates like B1 (>20) or its val MSE is >3x B2''s. Read together: (a) yes and (b) no -> small batches
+      (16x more updates) are what our protocol lacks; (a) no and (b) yes -> Muon/WSD with its cooldown overfits, and the plateau/early-stopping
+      schedule is what keeps B2 together; both yes or both no -> both matter, reported per n with the figure. Separation 10-20
+      is unresolved at one seed and reported as such.'
   step_why:
     5:
       feeds: the record of the comparison so far
