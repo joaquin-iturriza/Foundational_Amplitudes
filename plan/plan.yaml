@@ -16318,6 +16318,7 @@ entries:
       idle: event (or its absence after 45 min) is the trigger'
     '21': the repo-reviewer a6335284b8bd81379 re-check (finding 3 fixed in tools/wake_batching.py; findings 1-2 on zng_uq_benchmark's
       analysis/zng_uq/benchmark.py) before the step-21 commit
+    '22': '2026-11-20'
   owner:
     agent: ab33cfe08e8f1ac89
     state: stopped
