@@ -15779,15 +15779,6 @@ entries:
     17: 'Live check of the idle wake (site idle_pass, fix of 2026-11-06 site.bak-20261106-idlelive): at the first real moment
       plan next lists RESUME/LAUNCH with nothing running, confirm a STALLED idle: event is opened by the running supervisor
       within 45 min; report to Joaquin either way.'
-    21: 'After-period of the 10-minute batch (D324), on or after 2026-11-17: python3 tools/wake_batching.py --since <the time
-      the main session''s waiter and supervisor were restarted on the new site code> --until +7 days --out analysis/agent_redesign/wake_batching_after.json
-      --fig analysis/agent_redesign/figs/wake_batching_after; compare per day with the baseline (analysis/agent_redesign/wake_batching_baseline.json
-      @b65c92a9: main 823 wakes / 819.8M tokens in 8.22 days, owners 247 / 618.2M; predicted at 10 min: main 385 wakes, 727.7M
-      (work kept) to 570.7M (largest only), i.e. 11-30% fewer tokens; owners not batchable live, only measured). Live batching
-      covers main-session hand-backs (spooled HANDBACK events) and routine site events (fixed 600 s window); agent-finished
-      notifications after a hand-back were already absorbed; owner resumes by peer hand-backs cannot be held (Claude Code
-      offers no delivery delay, an owner has no waiter). Also confirm the first run of a held item that ends gets its RUN
-      event and RUN_DONE with no manual poll (next 19 fix).'
     22: 'Open to Joaquin (asked 2026-11-19): (1) the lxplus GPU-h costing fix in site/site_gate.py, refused by the permission
       classifier; (2) the CLAUDE.md line-24 rewording (drop ''objective''; ''a repair that keeps the setup I asked for''),
       which blocks the claudemd-keeper pass. Then continue the claudemd-keeper on f49a6b45 and e4e655fa.'
@@ -16303,11 +16294,6 @@ entries:
       if:
       - 'fired: report and drop'
       - 'did not fire: trace and fix, replay again'
-    21:
-      feeds: whether 10-minute batching cuts token usage as the replay predicts
-      if:
-      - 'saving within or above 11-30% on main per day: keep 10 min'
-      - 'below: report to Joaquin with numbers and causes'
     22:
       feeds: whether the setup's gates and rules match what Joaquin decided
       if:
@@ -16324,8 +16310,6 @@ entries:
     '14': 'Joaquin bringing back the deck cold-read agent (D261: ''we will do it later'')'
     '17': 'the first real idle moment: plan next listing RESUME/LAUNCH with no FA job live; the supervisor''s own STALLED
       idle: event (or its absence after 45 min) is the trigger'
-    '21': the repo-reviewer a6335284b8bd81379 re-check (finding 3 fixed in tools/wake_batching.py; findings 1-2 on zng_uq_benchmark's
-      analysis/zng_uq/benchmark.py) before the step-21 commit
     '22': '2026-11-20'
   owner:
     agent: ab33cfe08e8f1ac89
