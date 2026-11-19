@@ -36114,6 +36114,19 @@ entries:
       the W''s off-shell column is standardised (mean -0.43, std 5.19 in data_stats offshell_stats), so not a raw scale blow-up.
       Repair options: lower peak lr (a one-HP change: Joaquin''s yes needed, D241) or an HPO sweep of the parent setup with
       the W column; dropping the W returns to the first parent (u d~ -> e+ nu g unlearned, 4.18).'
+  - at: '2026-11-19T13:52:12+00:00'
+    text: '2026-11-19 step 16 D498 protocol test read (benchmark.py b1b2 @47a39166, tools/kit_curves.py runs --site; data/protocol_test_lxplus.json,
+      protocol_test_cc.json; fig zng_b1_vs_b2 v2). Arm (a) ours at batch 1024 (B1''s HPs, 2e5 steps) vs B1: best val MSE(ln|M|^2)
+      3.63e-6/2.41e-4/1.54e-3/1.88e-3 at n=1..4 = 112x/4.5x/3.7x/1.2x B1''s; end R = val/train 2550/5.5/3.8/1.75 (B1 2.0/47.9/20.7/68.4).
+      Verdict per the passed bands: NO at n=1 (val >= 1x B1), unresolved at n=2,3,4 (R below 5 or near it but val 1.2-4.5x
+      worse, not <= 0.5x). The curves of arm (a) are unstable: validation and training spike to ~1e2 (n=2) and ~1e4 (n=4)
+      and are noisy at n=1 after 4e6 events: B1''s lr, searched at batch 16384, is too high for 16x more updates at batch
+      1024, so arm (a) does not isolate batch cleanly. Arm (b) Adam plateau at batch 16384 (B2''s settings, 12,500 steps,
+      full length) vs B2: best val 7.09e-4/2.08e-3/2.61e-3/4.63e-3 = 1.4e4x/5.5x/8.1x/5.1x B2''s; R 0.49/0.85/0.90/1.12 (B2
+      17.5/5.4/1.6/1.9). Verdict: NO at every n (val >= 3x B2): B2''s optimizer and schedule at batch 16384 do not reproduce
+      B2; still falling at the end (12,500 updates). Plain reading: no train/validation split opens without Muon/WSD (arm
+      b R ~1, smooth), and Muon/WSD at batch 1024 shrinks the split but trains unstably; B2''s lower validation MSE needs
+      its many small updates. Test median |Delta| (measure 3) not read yet (benchmark.py collect on the sites).'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
