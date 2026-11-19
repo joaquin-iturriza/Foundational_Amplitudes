@@ -35309,6 +35309,32 @@ entries:
       (16x more updates) are what our protocol lacks; (a) no and (b) yes -> Muon/WSD with its cooldown overfits, and the plateau/early-stopping
       schedule is what keeps B2 together; both yes or both no -> both matter, reported per n with the figure. Separation 10-20
       is unresolved at one seed and reported as such.'
+    fix_at: '2026-11-19T00:54:17+00:00'
+    fix: 'Within D498: arm (a) at each n''s own B1 best-trial HPs (not n=1''s) is a method choice with one right answer for
+      a one-change test (n=1''s HPs at n=2-4 would change HPs and batch together against every B1 control, and no batch-16384
+      run at n=1''s HPs exists at n=2-4); cost and run count unchanged. Keep it, but the submission message must open with
+      this difference from D498''s covers line (''n=1 searched HPs''). Checks 1, 5-15 hold (config diff fully overridden per
+      arm; HETEROSC; same test split; 40 GB free on /sps/lpnhe against ~1.6 GB; result.json val/train mu-MSE curves written
+      by job_kit.sh as for B2; 12 h limit covers Muon overhead up to ~0.12 s/step at batch 1024, read it from the first jobs).
+      FAILS: (3, seeds against spread) The 1.5x val-MSE bar has no measured spread behind it, and one exists: docs/results.tex
+      l.13711-13720 (seeds_scratch.py, fig ladder_seeds): fresh seeds at a search best''s HPs sit above the best-of-8 trial
+      by a median 1.5x (up to 11x for u u~ -> Z g), and u u~ -> Z gg / Z ggg spread 0.9-1.9x across seeds; this entry''s own
+      earlier designs took 3x as what one seed resolves (results.tex l.15527). Arm (a)''s control is a best-of-8 selected
+      trial, the arm a fresh run, so arm (a) starts ~1.5x behind B1 by selection alone. Fix: cite that spread, set the val-MSE
+      bands outside it (>=2x, or the entry''s 3x), and state the selection bias of B1 best against a fresh run. No seed spread
+      is measured for the separation ratio: say so and widen its bands accordingly; more seeds stay Joaquin''s call (D492),
+      do not add them. (4, outcome discriminates) (i) ''separation'' is two different numbers in the design: the 21-68 quoted
+      are last val / last train (b1_search.json: 47.9, 20.7, 68.4 for trial_0353, 0494, 0238), while the measure names kit_curves.py''s
+      curve-test separation, which for the same controls is 40.0, 13.4, 37.5. Name one. (ii) At n=3 the control itself sits
+      at the boundary (20.7 raw, 13.4 curve-test, inside the 10-20 ''unresolved'' band), so arm (a)''s NO cannot be read at
+      n=3: say n=3 reads only YES-or-unresolved, or set bands per n from the control''s value. (iii) Arm (a)''s YES half ''val
+      MSE within 1.5x of B2 or below'' is already met by the control at n=2 (B1/B2 0.14) and n=3 (1.29), and its NO half ''no
+      better than B1'' is expected from selection bias alone; restate the val-MSE criterion as a change against the control
+      (arm over B1 best, with the bias stated) so a run identical to B1 does not read as YES. (5, prior) Add to prior the
+      seed-noise result above and par:muon_long (results.tex l.17260: Muon vs AdamW at fixed protocol on catalog_v4, AdamW''s
+      val mu-MSE rises after step 19096 while Muon falls, 5.18x per class), the nearest earlier optimizer-at-fixed-protocol
+      read, relevant to arm (b)''s optimizer/schedule question; terms I searched: batch 1024, batchsize, ReduceLROnPlateau,
+      early stopping, plateau, suprio, protocol, seed spread, one-seed resolution, solo seeds, Muon AdamW.'
   step_why:
     5:
       feeds: the record of the comparison so far
