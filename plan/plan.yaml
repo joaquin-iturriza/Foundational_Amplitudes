@@ -15784,8 +15784,6 @@ entries:
       which blocks the claudemd-keeper pass. Then continue the claudemd-keeper on f49a6b45 and e4e655fa.'
     23: 'Asked Joaquin 2026-11-19: (a) debounce RUN and OVERRUN events in the 10-min batch (changes D324''s kinds); (b) raise
       OVERRUN only after a job waits longer than site pick predicted'
-    25: 'Asked Joaquin 2026-11-19: (1) debounce crash/overrun events in the 10-min window; (2) check and design owners as
-      separate Claude sessions a script can resume (claude -p --resume) instead of subagents'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16306,11 +16304,6 @@ entries:
       if:
       - 'yes: a mechanical-worker changes site events --debounce kinds and the overrun check, tested'
       - 'no: kept as is, recorded'
-    25:
-      feeds: how events reach owners without waking the main session
-      if:
-      - 'yes to 1: mechanical-worker changes the waiter''s debounced kinds, tested'
-      - 'yes to 2: a lookup of the CLI resume path, then a design to Joaquin'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
@@ -16319,7 +16312,6 @@ entries:
       idle: event (or its absence after 45 min) is the trigger'
     '22': '2026-11-20'
     '23': '2026-11-20'
-    '25': '2026-11-20'
   owner:
     agent: ab33cfe08e8f1ac89
     state: stopped
