@@ -34551,6 +34551,15 @@ entries:
       timing check, then their production per multiplicity (no public checkpoints exist)'
     why: 'step 2 dropped by D480: the user answered no to the question that blocked it'
     at: '2026-11-17T12:20:17+00:00'
+  - tried: 'Best-against-best DyHPO searches for the two protocol-test arms (arm a: our optimiser at batch 1024, 2e5 steps;
+      arm b: Adam/plateau at batch 16384, 12,500 steps), 8 trials x 4 n each, ~261 GPU-h (design 2026-11-19, design reviewer
+      FIX)'
+    why: 'The gap it would split is inside one seed: B2 over B1 in test median |Delta| is 1/1.66, 1/1.14, 1/1.29, 1/1.88 at
+      n=1..4 (benchmark.json), and on best val MSE(log|M|^2) B1/B2 is 0.66, 0.14, 1.29, 1.72 (B1 lower at n=1,2), all within
+      the 3x band the zng reads take as one seed''s resolution (D492: one seed); yes/no bands overlap. Also B1''s best lr
+      sits at its window''s upper edge at n=3,4, and B1 has no passing trial at n=2-4. Needs Joaquin''s call (seeds, or a
+      measure B1 and B2 separate on, such as the end val/train ratio 21-68 vs 1.6-5.4 at n=2-4).'
+    at: '2026-11-19T18:16:06+00:00'
   asks:
   - ask: 'GPU budget: ~370 GPU-h above 30 with no decision covering it (DyHPO route; ~23 GPU-h with template defaults). Design
       for the Z+ng trainings, for your call (nothing submitted). (1) Parent for the fine-tune: trial 1262 of cov_v4_long_hpo8_cc_68224
