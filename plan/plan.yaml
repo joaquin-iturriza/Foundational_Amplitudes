@@ -35867,6 +35867,54 @@ entries:
       rebuilt pool with its pool-to-pool shift beside it, no number mixing pools. Searched: rebuild, regenerat, quarantine,
       frozen val, width_regen (D145). Note: the eval-only re-read of the old finale may trip the same load guard (old train
       sha vs new val) and need allow_mixed_generation stated.'
+  - at: '2026-11-19T18:11:07+00:00'
+    question: 'Best against best for the two protocol-test arms (Joaquin 2026-11-19: the protocol test kept each arm''s learning
+      rate across a 16x batch change, so it is no comparison). Arm (a) ''ours at batch 1024'' and arm (b) ''Adam plateau at
+      batch 16384'' each get their own single-fidelity DyHPO search per n = 1..4, 8 trials (waves 3,3,2) as B1, at their own
+      batch and steps; the best passing trial of each is read against its control''s best (B1 for a, B2 for b). Does batch
+      1024 with our optimiser, at its own searched HPs, reach B2''s level (then the batch carries Suprio''s advantage), and
+      does Adam/plateau at batch 16384, at its own searched HPs, reach B1''s or B2''s (then the optimiser does)?'
+    prior: 'This entry: protocol test D498 (runs FA-lxplus-4e0a55ab 8b928927 f3901ad0, FA-ccin2p3-a652edfc; FA-lxplus-9a0f77c5
+      3ea39a5e 547c198d 6394cbfc; results.tex 7a90efc3, fig zng_b1_vs_b2 v2, zng_protocol_test_delta): arm (a) ran B1''s lr
+      (2.2e-3, 1.2e-2, 1.5e-2, 1.5e-2, searched at batch 16384) at batch 1024: best val MSE(log|M|^2) 112/4.5/3.7/1.2x B1,
+      grad-norm spikes (largest pre-clip norm 1e9-2e20) in 9/43/38/33 of 50 intervals, validation at the cooldown start 0.52/0.44/0.16/0.25
+      of its value at 1/8 of the run (zng_protocol_gradnorm, zng_wsd_cooldown, protocol_steps.json @e2f6b687+). Arm (b) ran
+      Adam 1e-3 (Suprio''s at batch 1024) at batch 16384: 1.4e4/5.5/8.1/5.1x B2, still falling at the last step. B1 searches
+      (sweep/sweep_config_tp_zng_hpo_<p>.yaml, b1_search.json): passing trials 3/0/0/0 of 8; best lr at n=3,4 (1.49e-2, 1.48e-2)
+      at the window''s upper edge 1.5e-2. CLAUDE.md feature rule: a NO at the baseline''s HPs is no verdict; the same sweep
+      for the feature, best against best. Searched: results.tex (zng paragraphs, batch, protocol), plan findings 11-17..19,
+      site decisions D484-D498 (D498 covered single runs only); no earlier batch-matched search on Z+ng.'
+    measure: Per n, best validation MSE(log|M|^2) of the mean (val_mse, lowest over the run, x std^2 of zng_std.json) of each
+      search's lowest-validation trial that passes the curve test (tools/kit_curves.py sweep), and its test median |Delta|
+      on the 1e6 test events (benchmark.py ptcollect after KIT_SCORE_DIR scoring), against B1 and B2 on the same quantities
+      (benchmark.json, b1_search.json).
+    check: 'The quantity moves with the tested change on existing data: changing batch at fixed lr moved best val MSE 1.2-112x
+      (arm a) and 5-1.4e4x (arm b) against the controls, and B1 vs B2 differ 1.5-3.7x in test median |Delta| at every n (zng_protocol_test_delta);
+      between the 8 trials of a B1 search best val spans more than 10x (b1_search.json), so the search resolves differences
+      of the size at stake.'
+    fixed: 'Data: kit_uq_<p>__me2 recipes, 5e5 training events, the uq_<p>.h5 split, test 1e6 events, float64, heterosc mu_mse
+      selection, evaluation.train_subsample 2000, seed 42, LLoCa muP network of B1/B2 (base_config runs/kit/kit_A_uq_<p>_me2_n500000_t12500).
+      Arm (a) search: MuonAdamW, WSD, wsd_cooldown_frac 0.125, batch 1024, 2e5 steps, validate_frac 0.02, clip 5; space =
+      the B1 template''s (lr, muon_weight_decay [1e-3,0.3], regularization_lambda [1e-10,1e-6], cosanneal_warmup_frac [0.05,0.2],
+      cosanneal_eta_min [1e-10,1e-7], ema, ema_decay [0.9,0.999]) with the lr window centred by the HPO rule at t=2e5 steps
+      (lr_c = 1e-2 (t/3000)^-0.55 = 1.0e-3, +-1/2 decade: [3.3e-4, 3.0e-3]). Arm (b) search: Adam, betas (0.99,0.999), ReduceLROnPlateau
+      factor 0.3 patience 10 validations, validation every 62 steps, es_patience 1240, batch 16384, 12,500 steps; space =
+      lr centred at t=12,500 (4.6e-3, +-1/2 decade: [1.5e-3, 1.4e-2]), regularization_lambda, ema, ema_decay as the template
+      (warmup, eta_min and muon_weight_decay have no role under Adam/plateau). 8 trials per search, DyHPO gp, n_startup 3,
+      waves 3,3,2, seed 42: 8 searches (2 arms x 4 n), 64 trials.'
+    control: 'B1 (our protocol at batch 16384, 12,500 steps, its own 8-trial DyHPO search per n: trials 1612/0353/0494/0238)
+      for arm (a); B2 (our network under Suprio''s protocol at batch 1024, Adam 1e-3, the protocol''s own settings) for arm
+      (b). Both on the same data, network, split and selection.'
+    seeds: 'One seed (42) per trial, as B1 and B2 (D492: no more seeds now); differences under 3x read as unresolved, the
+      factor the earlier zng reads take as what one seed resolves.'
+    outcome: 'Arm (a) best <= 1/3 of B1 at n where B1 is beaten and within 3x of B2: batch 1024 carries Suprio''s advantage
+      with our optimiser; arm (a) best >= B1/3 and B2 still 3x lower: the batch alone does not. Arm (b) best within 3x of
+      B2: Suprio''s optimiser carries it at any batch; arm (b) >= 3x above both B1 and B2: Adam/plateau needs the small batch.
+      A search whose best trial sits at an lr window edge is reported as such (as B1 at n=3,4) and the read at that n stays
+      unresolved. Cost: measured wall time of the protocol-test runs (protocol_steps.json traintime_hours): arm (a) 5.1/5.6/7.5/6.7
+      h per trial -> 8 x 24.9 = 199 GPU-h; arm (b) 1.2/1.4/1.7/3.4 h -> 8 x 7.7 = 61.6 GPU-h; total ~261 GPU-h plus scoring
+      of the 8 chosen trials (~1 h each). Above 30 GPU-h and D498 covered single runs: needs Joaquin''s go before submission;
+      not submitted.'
   step_why:
     17:
       feeds: whether a ladder+star parent with the W column can be stage 2's parent
