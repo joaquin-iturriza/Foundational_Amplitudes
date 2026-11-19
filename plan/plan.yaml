@@ -34396,7 +34396,7 @@ entries:
     decision: D492
   owner:
     agent: ad5adf3912f1ae3ea
-    state: stopped
+    state: closed
     since: '2026-11-19T00:42:18+00:00'
     state_at: '2026-11-19T02:09:50.414000+00:00'
     context: 288852
@@ -35931,43 +35931,30 @@ entries:
     start: '2026-11-19T00:57:06+00:00'
     at: '2026-11-19T00:57:06+00:00'
   handoff:
-    state: '2026-11-19 ~01:30 UTC. Joaquin''s four questions answered with figures (finding of 2026-11-19; figs zng_parent_learning,
-      zng_parent_true_pred, zng_parent_wpole, zng_b1_vs_b2; zng_median_delta flags B1 n=2..4 as failing the curve test). u
-      u~ -> t t~ V is not memorised: its train pool (lxplus cache, regenerated 2026-11-17 at 7ce215f8) and its val pool (2026-10-02
-      at ced1f7af) differ by ~1% in |M|^2 (parent_ttv_pools.json). OPEN WORK, in order: (A) Joaquin''s go D498 ''Okay, those
-      runs can go, but still you are not really explaining why the different behaviour, just proposing tests that I''m not
-      sure what they are supposed to check'': design, design-review and submit the ~31 GPU-h protocol test, 8 runs, each arm
-      changing one thing with plain-word yes/no: (a) B1''s best-trial HPs per n (MuonAdamW, WSD) at batch 1024 for 2e5 steps
-      (same ~2e8 events), which isolates updates per event and batch at our optimizer and schedule; (b) B2''s optimizer and
-      schedule (Adam 1e-3, ReduceLROnPlateau, early stopping) at batch 16384 for 12,500 steps, which isolates optimizer and
-      schedule at our batch and steps. Read B2''s exact protocol settings from its config (runs/kit/kit_A_uq_<p>_me2_n500000_t200000_suprio_protocol/config.yaml
-      on CC, diffed against runs/tp_zng_hpo_<p>/trial_<best>/config.yaml; the diff attempt did not finish). Then plan target
-      and name the configs. The explanation Joaquin wants: the B1 curves show the train/val split opening in the WSD cooldown
-      (train falls 40-140x, val 3-13x at n=2-4) while B2 keeps them within 1.6-5.4x; and B2 is 13-20x ahead per event early.
-      (B) Step 15: the relabel job''s design PASSED (2026-11-19) and the code is committed (65560c1f, c18b755d), lxplus synced.
-      Blocked because lxplus fails site pick''s probe (timed out 3x while ssh answers). Submit when a pick lists lxplus: site
-      submit lxplus FA scripts/job_virt_label_check.sh --item zng_uq_benchmark --hdr=--time=01:00:00 --hdr=--cpus-per-task=4
-      --env VL_CLASSES=uubar_ttbar_nlo --env VL_N=200 --env VL_FROM_RUN=runs/data_saving/dsave_parent_finale_zng_uq --env
-      ''VL_SAVE=$SCRATCH/zz_vl_ttv''; then python analysis/zng_uq/parent_read.py relabel (figure zng_ttv_relabel). (C) Read
-      trial 1262''s per-class validation error on the catalog_v4 classes with an s-channel W and all-massless outside legs
-      (u d~ -> e+ nu (g)) against comparable classes with a Z or a massive lepton, with its figure: does 1262 show the same
-      W failure? This answers Joaquin''s question why the gap was not seen when dimensionless inputs were tested on medians
-      over ~1000 classes. (D) A check that refuses training on a process whose train and val pools come from different generator
-      commits (the provenance is in each pool''s .recipe.json: provenance.git_commit / pipeline_sha256; analysis/zng_uq/parent_read.py
-      poolgen reads it), made in the data load or the prebuild, tested on uubar_ttbar_nlo. (E) Steps 5 and 14 wait on the
-      retrain FA-lxplus-57f6d2cb, which uses the same mismatched t t~ V pools.'
-    decisions: D498 approves the protocol test (~31 GPU-h). Step 15 is a repair inside D487; its design passed. The repo-reviewer
-      passed the zng code through eb18f692 (B1 fine-tune only at Z+1g per the passed design 2026-11-17 15:59, 'none passes
-      -> floor, flagged'; a message reporting B1 must open with that). Commits 65560c1f and c18b755d (virt_label_check --from-run/--save,
-      the relabel reader) are not reviewed yet.
-    ruled_out: Memorisation as the cause of the t t~ V failure (a ~1% train/val pool offset instead). alpha_s differences
-      (0.118 in both pools). The other 8 lxplus-regenerated train pools (train/val MSE 0.9-3.7). Early stopping as the B1/B2
-      gap (B1's best checkpoint is always its last step).
-    running: FA-lxplus-57f6d2cb (parent retrain, lxplus, RUNNING, no validation line in its log at 01:00 UTC)
-    files: analysis/zng_uq/{parent_read.py,benchmark.py}; analysis/zng_uq/data/{parent_explain,parent_ttv_pools,parent_pool_gen,zng_std,b1_search,zng_curves,benchmark}.json;
-      analysis/zng_uq/figs/zng_{parent_learning,parent_true_pred,parent_wpole,b1_vs_b2,median_delta}.png; tools/virt_label_check.py;
-      scripts/job_virt_label_check.sh
-    written: '2026-11-19T00:40:23+00:00'
+    state: '2026-11-19 ~03:00 UTC. (1) D498 protocol test (design passed after one FIX; arm (a) uses each n''s own B1 best-trial
+      HPs, not D498''s ''n=1 searched HPs'': reviewer judged it within D498, a message reporting it opens with that). Moved
+      off CC (E7554, 10.9 h wait) to: arm (a) ''ours at batch 1024'' Z+1g FA-lxplus-4e0a55ab, Z+2g FA-lxplus-8b928927, Z+3g
+      FA-lxplus-f3901ad0, Z+4g FA-ccin2p3-a652edfc; arm (b) ''Adam plateau at batch 16384'' Z+1g FA-lxplus-9a0f77c5, Z+2g
+      FA-lxplus-3ea39a5e, Z+3g FA-lxplus-547c198d, Z+4g FA-lxplus-6394cbfc (args: scratchpad proto_submit_v2.sh; code 367caa64;
+      configs runs/kit/kit_A_uq_<p>_me2_n500000_t{200000_protocol_test_ours_bs1024,12500_protocol_test_adam_plateau_bs16384}/config.yaml).
+      Events E7566-E7570: lxplus runs ended on a traceback, a mechanical worker reads them; step 16 (read: R = last val/train,
+      val MSE vs control, bands in the passed design) waits on the 8. (2) Step 15 done: today''s labeller reproduces the t
+      t~ V train pool (3e-16), val 0.7-1.6% off (zng_ttv_relabel). Step 17 (rebuild val/test, prebuild_recipes.sh recipes/zng_ttv_rebuild.yaml
+      --rebuild uubar_ttbar_nlo on lxplus, then same on CC + md5 compare; design PASSED 2026-11-19 ~01:12, pass valid 24 h)
+      waits on the retrain FA-lxplus-57f6d2cb ending. (3) Trial 1262 W read done (zng_w1262). (4) datagen.mixed_generation
+      load check done: refuses t t~ V parent pools until the rebuild (override ++data.allow_mixed_generation=true, needed
+      also for the old-finale re-read). Steps 5 and 14 wait on FA-lxplus-57f6d2cb.'
+    decisions: 'D498 approves the protocol test (~31 GPU-h; estimate 32-36). Rebuild of the t t~ V frozen val/test is a bug
+      fix (plan ask refused the question as cheap-to-rebuild; reviewer agreed); old files quarantined, never deleted. D492:
+      no more seeds.'
+    ruled_out: 'Pipeline-version alone as a pool check (26/28 parent and 74/1153 trial-1262 processes differ in version).
+      The val pool as correct: today''s labels equal the train pool''s.'
+    running: FA-lxplus-57f6d2cb (parent retrain); the 8 protocol-test runs above (some ended on a traceback, E7566-E7570)
+    files: 'analysis/zng_uq/parent_read.py (w1262, relabel); analysis/zng_uq/data/{w1262,parent_ttv_relabel,mixed_generation_z}.json;
+      figs zng_w1262, zng_ttv_relabel; datagen.py mixed_generation; experiment.py l.1575; prebuild_recipes.py --rebuild; recipes/zng_ttv_rebuild.yaml;
+      scripts/job_virt_label_check.sh; tests/test_mixed_generation.py. Unreviewed commits: 65560c1f, c18b755d, 53a1fcc5, 712bc7a4,
+      b94bb67e, f02c3d67, 676b5698'
+    written: '2026-11-19T02:26:20+00:00'
 - id: dan_zeroshot_v4
   title: Catalog_v4 pretraining zero-shot on Daniel's held-out split
   question: How does our best catalog_v4 pretraining (trial 1262) do zero-shot on the held-out processes of Daniel's catalog
