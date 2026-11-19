@@ -34233,9 +34233,6 @@ entries:
       zgg, ac047fb1 zg; arm b ''Adam plateau at batch 16384'': d77906e1 zgggg, 9e1b1276 zggg, d57071d3 zgg, d5f02694 zg).
       Read R = last val/train MSE, best val MSE(ln|M|^2) against B1''s best trial (a) and B2 (b), test median |Delta| (benchmark.py
       collect); figure zng_b1_vs_b2 extended with both arms; verdict per the passed design''s bands.'
-    17: 'Parent (2) next attempt: diagnose the retrain''s mid-run rise (every process''s val het. loss climbs above its 1/8-run
-      value in the stable phase and falls only in the WSD cooldown; spikes at steps 14080 and 21760 on u d~ -> tau nu and
-      u d~ -> e+ nu g) against the first parent''s curves, from train_steps.npz (train het. loss, grad norm, sigma)'
   done_when: null
   notes_ref: null
   match: zng_uq_*,tp*_zng_*
@@ -35587,13 +35584,6 @@ entries:
       - 'a yes, b no: batch/updates are the cause -> our protocol at small batch for the Z+ng runs'
       - 'a no, b yes: Muon/WSD cooldown opens the split -> plateau/early-stopping schedule for 5e5-event single-process runs'
       - 'both or neither / unresolved: both matter -> reported per n, protocol choice to Joaquin'
-    17:
-      feeds: whether a ladder+star parent can be stage 2's parent
-      if:
-      - 'the rise and spikes come with grad-norm or sigma blow-ups in the stable phase (an optimisation instability): design
-        an lr repair of the retrain, through the design reviewer'
-      - 'no instability in train het. loss/grad norm (the rise is val-only, an over-fit or input-scale effect of the W column):
-        design a retrain without the W column but with whole-pool validation, isolating the W'
   step_waits:
     '5': FA-lxplus-d2cae475 FA-lxplus-48d41cb6 FA-lxplus-643c1b5e FA-ccin2p3-a652edfc
     '16': FA-lxplus-045ef0ad FA-lxplus-d2cae475 FA-lxplus-658ba6ac FA-lxplus-48d41cb6 FA-lxplus-162b272b FA-lxplus-643c1b5e
