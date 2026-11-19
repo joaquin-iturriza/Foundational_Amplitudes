@@ -291,6 +291,23 @@ def b1b2(curves, search):
             ax.plot(x, tr, color=col, linestyle="--", label=lab + ", training")
             i = int(np.argmin(v))
             rows.append((lab, x[i], v[i], v[-1], tr[-1], x[-1], v[-1] / tr[-1], v[i] / tr[i]))
+        # D498 protocol test (zng_uq_benchmark step 16): (a) B1's HPs at batch 1024 for 2e5 steps, (b) B2's Adam/plateau at
+        # batch 16384, validation every 62 steps; curves from tools/kit_curves.py runs (protocol_test_{lxplus,cc}.json)
+        pt = {}
+        for f in ("protocol_test_lxplus.json", "protocol_test_cc.json"):
+            pt.update(json.load(open(os.path.join(HERE, "data", f))))
+        for tag, T, col, lab, ctl in (("t200000_protocol_test_ours_bs1024", 200000, ps.C.sky, "ours at batch 1024", 0),
+                                      ("t12500_protocol_test_adam_plateau_bs16384", None, ps.C.orange, "Adam plateau at batch 16384", 1)):
+            t = next(r for k, r in pt.items() if k.startswith(f"kit_A_uq_{p}_me2_n500000_{tag}"))
+            every = T / len(t["val"]) if T else 62
+            x = (np.arange(len(t["val"])) + 1) * every * t["hp"]["training.batchsize"]
+            v = np.array(t["val"]) * STD[n] ** 2
+            tr = np.array([np.nan if y is None else y for y in t["train"]], float) * STD[n] ** 2
+            ax.plot(x, v, color=col, label=lab + ", validation")
+            ax.plot(x, tr, color=col, linestyle="--", label=lab + ", training")
+            R, Rc = v[-1] / tr[-1], rows[ctl][6]
+            print(f"n={n} {lab:28s} best val {v.min():.3g} (control {rows[ctl][2]:.3g}, ratio {v.min() / rows[ctl][2]:.3g}); "
+                  f"end R val/train {R:.3g} (control {Rc:.3g}); {len(v)} validations to {x[-1]:.3g} events")
         ax.set_xscale("log"); ax.set_yscale("log")
         ax.set_xlabel("training events seen"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
         ps.process_label(ax, rf"$q\bar q\to Z+{n}g$")
@@ -306,7 +323,7 @@ def b1b2(curves, search):
         print(f"n={n} B1 at {e1:.3g} events (7/8): val {t1['val'][k1] * STD[n] ** 2:.3g} train {t1['train'][k1] * STD[n] ** 2:.3g}; "
               f"B2 at {(k2 + 1) * 1000 * b2s:.3g}: val {t2['val'][k2] * STD[n] ** 2:.3g} train {t2['train'][k2] * STD[n] ** 2:.3g}; "
               f"first B1 validation ({e0:.3g} events) val {t1['val'][0] * STD[n] ** 2:.3g}, B2 at {(k0 + 1) * 1000 * b2s:.3g} val {t2['val'][k0] * STD[n] ** 2:.3g}")
-    ps.legend(axs[0][0], "lower left")
+    ps.legend(axs[0][0], "lower left", fontsize=5)
     ps.save(fig, os.path.join(HERE, "figs", "zng_b1_vs_b2"))
 
 
