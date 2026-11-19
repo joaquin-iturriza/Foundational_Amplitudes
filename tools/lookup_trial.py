@@ -18,7 +18,7 @@ import glob, json, os, re, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REC = os.path.join(ROOT, "analysis", "agent_redesign", "lookup_trial.json")
 SUB = os.path.expanduser("~/.claude/projects/-home-joaquin-work-FA/*/subagents/agent-%s.jsonl")
-ARMS = ("grep", "lsp", "graph", "batch", "now", "recall")
+ARMS = ("grep", "grep2", "lsp", "graph", "batch", "now", "now2", "recall")   # grep2, now2: control repeats
 
 # step 27: past cases where Joaquin's earlier words were lost; id: (question, substrings the answer must hold, None)
 RECALL = {
@@ -90,6 +90,8 @@ TOOL = {
                "finds summary records, expand shows the raw transcript lines behind one. Fall back to other searches "
                "only for what it cannot answer."),
 }
+
+TOOL["grep2"], TOOL["now2"] = TOOL["grep"], TOOL["now"]
 
 
 def brief(task, arm):
