@@ -429,6 +429,62 @@ def relabel(out):
     ps.save(fig, os.path.join(HERE, "figs", "zng_ttv_relabel"))
 
 
+REBUILT = r"""
+import glob, hashlib, json, os, re, sys
+import numpy as np
+import datagen
+site, run = sys.argv[1], sys.argv[2]
+d = os.path.join(datagen.frozen_dir())
+o = {"md5": {r: hashlib.md5(open(os.path.join(d, "uubar_ttbar_nlo_363-450GeV_%s_amplitudes.npy" % r), "rb").read()).hexdigest()
+             for r in ("val", "test")}}
+if site == "lxplus":
+    paths = {}
+    for l in open(os.path.join(run, "out_0.log")):
+        m = re.search(r"\[(train|val|test)\] (\S+): \d+ events.*? from (\S+\.npy)", l)
+        if m:
+            paths.setdefault(m.group(1), {})[m.group(2)] = m.group(3)
+    o["n_processes"] = len(paths.get("train", {}))
+    o["flagged"] = datagen.mixed_generation(paths)               # the load check as it runs (|z| > 5)
+    o["all_z"] = datagen.mixed_generation(paths, z_max=0)        # every version-mismatched pool's z, for the record
+    s = os.path.join(os.environ["SCRATCH"], "zz_vl_ttv_rebuilt")
+    for role in ("train", "val"):
+        z = np.load(os.path.join(s, "uubar_ttbar_nlo_%s.npz" % role))
+        o[role] = dict(pool=str(z["pool"]), sqrts=z["sqrts"].tolist(), ok=z["ok"].tolist(),
+                       log_ratio=np.log(np.abs(z["relabelled"]) / np.abs(z["stored"])).tolist())
+print("REBUILT " + json.dumps(o))
+"""
+
+
+def rebuilt(out):
+    """Step 17 checks after the u u~ -> t t~ one-loop val/test rebuild (prebuild_recipes.py --rebuild, lxplus
+    FA-lxplus-2ee4002c, CC FA-ccin2p3-33afc1ca): md5 of the new val and test pools on both sites, datagen.mixed_generation
+    on the pools the retrain (NEW + "_w") loaded, and today's labeller against the rebuilt val (virt_label_check --save
+    $SCRATCH/zz_vl_ttv_rebuilt) -> data/parent_ttv_rebuilt.json; figure zng_ttv_relabel v2: the step-15 points (training
+    pool, old validation pool) with the rebuilt validation pool beside them."""
+    sys.path.insert(0, ROOT)
+    from analysis.common.readers import site_python
+    import plot_style as ps
+    ps.use()
+    d = {"lxplus": site_python(REBUILT, ["lxplus", NEW + "_w"], "REBUILT", site="lxplus"),
+         "ccin2p3": site_python(REBUILT, ["ccin2p3", NEW + "_w"], "REBUILT", site="ccin2p3")}
+    d["md5_equal"] = d["lxplus"]["md5"] == d["ccin2p3"]["md5"]
+    json.dump(d, open(out, "w"))
+    old = json.load(open(os.path.join(HERE, "data", "parent_ttv_relabel.json")))
+    fig, ax = ps.figure()
+    for r, col, lab, mk in ((old["train"], ps.C.blue, "training pool", "."), (old["val"], ps.C.vermillion, "old validation pool", "."),
+                            (d["lxplus"]["val"], ps.C.green, "rebuilt validation pool", "x")):
+        k = np.array(r["ok"]); x, y = np.array(r["sqrts"])[k], np.array(r["log_ratio"])[k]
+        ax.plot(x, y, mk, color=col, label=lab)
+        print(lab, r["pool"], "n %d unusable %d  median ln ratio %.3g  max |ln ratio| %.3g" % (k.sum(), (~k).sum(), np.median(y), np.abs(y).max()))
+    ax.axhline(0, color="k", linestyle=":", label="relabel = stored")
+    ax.set_xlabel(r"$\sqrt{\hat s}$ (GeV)"); ax.set_ylabel(r"$\ln(|\mathcal{M}|^2_{\rm today}/|\mathcal{M}|^2_{\rm stored})$")
+    ps.process_label(ax, r"$u\bar u\to t\bar t,\ V$")
+    ps.legend(ax, "upper left")
+    ps.save(fig, os.path.join(HERE, "figs", "zng_ttv_relabel"))
+    print(json.dumps({s: {k: v for k, v in d[s].items() if k not in ("train", "val")} for s in ("lxplus", "ccin2p3")}),
+          "md5_equal", d["md5_equal"])
+
+
 W1262 = r"""
 import json, sys
 import numpy as np
@@ -532,6 +588,8 @@ if __name__ == "__main__":
         pool_gen(os.path.join(HERE, "data", "parent_pool_gen.json"))
     elif sys.argv[1] == "relabel":
         relabel(os.path.join(HERE, "data", "parent_ttv_relabel.json"))
+    elif sys.argv[1] == "rebuilt":
+        rebuilt(os.path.join(HERE, "data", "parent_ttv_rebuilt.json"))
     elif sys.argv[1] == "ttvpools":
         ttv_pools(os.path.join(HERE, "data", "parent_ttv_pools.json"))
     elif sys.argv[1] == "w1262":
