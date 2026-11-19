@@ -66,7 +66,7 @@ def op(text):
         name = args[0]
         pat = r"^\s*(async\s+)?(def|class)\s+%s\b" % name if v == "def" else r"\b%s\s*\(" % name
         out = []
-        for hit in sh(["grep", "-rnE", "--include=*.py", *SKIP, "--", pat, *(args[1:] or ["."])]).splitlines():
+        for hit in sh(["grep", "-rnHE", "--include=*.py", *SKIP, "--", pat, *(args[1:] or ["."])]).splitlines():
             path, ln, src = hit.split(":", 2)
             path = os.path.relpath(path, ".") if not path.startswith("./") else path[2:]
             if v == "def":
