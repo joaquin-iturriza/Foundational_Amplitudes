@@ -34398,7 +34398,7 @@ entries:
     agent: ac941999d5d09e98c
     state: stopped
     since: '2026-11-19T02:28:14+00:00'
-    state_at: '2026-11-19T02:29:17+00:00'
+    state_at: '2026-11-19T02:29:48.058000+00:00'
     context: 61149
     context_at: '2026-11-19T02:37:48+00:00'
   designs:
