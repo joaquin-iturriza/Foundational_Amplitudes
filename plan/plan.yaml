@@ -35803,6 +35803,11 @@ entries:
       CC re-read equals the run''s own lxplus sigma-stage MSE on processes whose pools match (ee_numu 0.208 vs 0.218, ee_aa
       1.96e-7 vs 1.89e-7, uubar_ddbar_nlo 0.317 both). Design outcome: gmean >10x and curve test fails -> not stage 2''s parent;
       the horizon/setup is Joaquin''s call.'
+  - at: '2026-11-19T09:22:20+00:00'
+    text: '2026-11-19 correction to the step 14 finding: the retrain is worse than the first parent on 18/28 processes (not
+      21). Old finale geometric mean 1.44e-5. t t~ V: the old finale read 4.3e-9 on the old val pool (its own labels, trained
+      on the old train pool) and 8.2e-5 on the rebuilt one: the ~0.8% label offset squared (~6e-5), as the design expected
+      (~1e-4); so on t t~ V the old finale is no longer a reference.'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
