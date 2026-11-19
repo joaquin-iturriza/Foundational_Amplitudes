@@ -17492,6 +17492,18 @@ entries:
     text: 'site events --wait: RUN and OVERRUN removed from URGENT_KINDS (now GAP, ALERT) so they join the 10-min debounce
       (D324); --help updated; backup ~/.local/bin/site.bak-20261119-runjoinsdebounce. Tested: tests/test_run_done_waiter.py
       updated (RUN and OVERRUN mid-window are held to the window end, ALERT ends it at once), 6 passed.'
+  - at: '2026-11-19T11:51:26+00:00'
+    text: '2026-11-19 step 25 (three ideas) evaluated, no install: graphify (Graphify-Labs/graphify, Apache-2.0) = tree-sitter
+      AST graph + CLI/MCP queries; its Claude install adds a CLAUDE.md block, PreToolUse hooks on Bash|Grep and Read|Glob
+      (advisory nudge, --strict blocks Read/Grep once per session, 10 s timeout) and a SessionStart:compact hook. Overlap:
+      ponytail map (regex, 2000 chars), pyright LSP plugin (0 LSP calls in 1471 transcripts of session 71602535, grep ''"name":"LSP"''),
+      tools/readers_index.py. Code Mode (docs code-mode.md, CC 2.1.328 here >= 2.1.323): PreToolUse hooks and deny/ask rules
+      fire per inner call under the tool name (Bash may arrive as ''cd X && cmd''); auto-mode classifier reviews the code,
+      not each call, blind to runtime values; PostToolUse not stated; UserPromptSubmit hooks also run on background code output
+      (source poll_event); not available with Remote Control (this session is a bridge session) or -p/SDK; resumable only
+      in terminal with Code Mode on. Memory: best fit to ''older compacted more, expandable to the exact original'' is LCM
+      (Lossless Context Management, arXiv 2605.04050; lossless-claw, hermes-lcm, pi-lcm): hierarchical summary DAG over a
+      verbatim store, lcm_expand; not for Claude Code. Trials proposed to Joaquin.'
   handoff:
     state: '2026-11-17. Figure setup fix done and committed cfe97bf5 (repo-reviewer PASS, backlog at 2e100669), incl. D462
       union range for ps.true_pred_hist; KIT panels and muon_long examples regenerated; steps 22/23 relayed and dropped by
