@@ -15786,6 +15786,8 @@ entries:
       OVERRUN only after a job waits longer than site pick predicted'
     24: Tell Joaquin whether a script can resume a stopped subagent without the main session (claude-code-guide lookup running,
       2026-11-19), and what that means for batching owner wakes directly
+    25: 'Asked Joaquin 2026-11-19: (1) debounce crash/overrun events in the 10-min window; (2) check and design owners as
+      separate Claude sessions a script can resume (claude -p --resume) instead of subagents'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16311,6 +16313,11 @@ entries:
       if:
       - 'yes: design direct delivery to owners with the 10-min batch, to Joaquin'
       - 'no: say so plainly; only debouncing crash/overrun kinds remains'
+    25:
+      feeds: how events reach owners without waking the main session
+      if:
+      - 'yes to 1: mechanical-worker changes the waiter''s debounced kinds, tested'
+      - 'yes to 2: a lookup of the CLI resume path, then a design to Joaquin'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
