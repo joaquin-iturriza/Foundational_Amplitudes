@@ -17423,6 +17423,19 @@ entries:
       7 days end 2026-11-18T19:55Z, so the run is not due yet: waits on 2026-11-19, then wake_batching.py --since 2026-11-11T19:55:43Z
       --until +7 days. Later restarts (supervisor 2026-11-16 12:59 local, waiter 2026-11-17 00:37 local) are re-execs of the
       same batching code, not new code for this measure.'
+  - at: '2026-11-19T00:08:09+00:00'
+    text: '2026-11-19 step 21 done (D324 after-period, tools/wake_batching.py --since 2026-11-11T19:55:43Z --until 2026-11-18T19:55:43Z
+      --baseline analysis/agent_redesign/wake_batching_baseline.json; per day over the span first..last wake, 8.22 d before,
+      6.79 d after; only wakes that made an API call counted: 97 before and 220 after made none, absorbed notices). Main session,
+      wakes not started by Joaquin: 66.1/day before, 23.7/day predicted by the 10-min replay of the before period, 28.4/day
+      after (-57% against -64% predicted). Their tokens: 67.8M/day before, predicted 56.6M (work kept) to 37.5M (largest only),
+      54.7M after (-19%, at the work-kept end of the band). Confound: the median context at a wake''s first call rose 266k
+      -> 326k (x1.23); at the before context the after tokens would be about 44.6M/day (estimate, assuming tokens scale with
+      context). Wakes started by Joaquin 22.3 -> 26.5/day, their tokens 31.9 -> 61.5M/day, so the main session''s total rose
+      99.7 -> 116.2M/day. Owners (not batched live): not by Joaquin 28.8 -> 20.9 wakes/day, 70.7 -> 75.8M/day; median context
+      198k -> 216k. Verdict: the live 10-min batch delivers the predicted wake cut and the work-kept token cut on the wakes
+      it acts on; the total did not fall because Joaquin-started turns doubled in tokens. Figure analysis/agent_redesign/figs/wake_batching_after_per_day.png;
+      JSONs wake_batching_baseline.json (re-run, reproduces b65c92a9 exactly) and wake_batching_after.json.'
   handoff:
     state: '2026-11-17. Figure setup fix done and committed cfe97bf5 (repo-reviewer PASS, backlog at 2e100669), incl. D462
       union range for ps.true_pred_hist; KIT panels and muon_long examples regenerated; steps 22/23 relayed and dropped by
