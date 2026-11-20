@@ -37457,6 +37457,29 @@ entries:
       sigma/function on the new target, step 1) or plain scratch catch-up is next, a design needed. (d) HIGHER -> that restart
       hurts: reported. Beside: step-0 NLL and gradient norm per arm (O/B expected to keep the 1e3-scale NLL at step 0 if the
       shock is the parent''s function), S vs stage-2 cosine scratch. Diverged trials listed apart (D398).'
+    fix_at: '2026-11-20T03:09:46+00:00'
+    fix: '(1) One change at a time: O differs from C'' in three things, not one: live weights instead of the EMA weights validation
+      scored, the main-stage model from before the parent''s sigma stage instead of the final post-sigma model, and the optimizer
+      state. B differs from W'' in those three plus the branch point and no warmup. Step 1 places the step-0 shock in the
+      parent''s function, its sigma under the head map, meeting the new target. The snapshot change (pre-sigma head) touches
+      exactly that, so a HOLDS cannot be credited to avoiding the lr jump or to the optimizer state, and the entry asks why.
+      Fix: add the matched controls from the same step checkpoints, live weights, fresh optimizer, today''s search: one from
+      cosine step 3458 for O, one from WSD step 3026 for B. That is +2 x 6 GPU-h, about 45 GPU-h in all, under D511''s 100.
+      Or state why a bundle verdict is enough and drop the mechanism reading. (2) The scratch control has no W, against D506
+      and against the arms: sweep_config_dsave_s7wsd_scr_bbx_zz_d*.yaml take base_config runs/data_saving/dsave_parent_heldoutbbzz,
+      the original parent, so internal_mass_pdgs is [23,6,25]. Every fine-tune from the rerun parents carries [23,6,25,24]
+      (job_datasaving_parent.sh line 58, the owner''s amendment). So S, the head-start reference for O, B, C'' and W'', differs
+      from them in an input, and as a new run it breaks D506 (''W ... added ... before we run anything else''). Fix: S carries
+      [23,6,25,24], by override or the rerun parent''s config; the stage-2 cosine scratch shown beside it is labelled as without
+      W. Record the amendment in fixed: the rerun parents differ from the originals in save_model_at_steps and internal_mass_pdgs,
+      so C'' is no replicate of step 6''s C and L vs C stays on the original parents. (3) The spread of the measure is not
+      stated: step6_readout.json gives share_lag_above 1/17 = 0.06 for R and 5/19 = 0.26 for C (the design writes 0.28). That
+      difference is about 1.5 binomial SE apart (Fisher p about 0.2), so the record that the measure moves is within noise,
+      and no search-to-search spread of share_lag_above exists. Fix: give the HOLDS threshold as trial counts against the
+      binomial spread at about 20 non-blow-up trials per arm (SE about 0.1, so a difference has to reach about 0.3 to stand
+      out), name what spread is expected for a no, and demote ''best lag > 0.25 at more D'' to a side read: it rests on one
+      trial per D with no spread. The val bar of 2.53 and the step-0 NLL and gradient-norm numbers check out (restart_summary.json:
+      3558/408 and 3.1e5/3.4e4; catalog 631 -> 79).'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
