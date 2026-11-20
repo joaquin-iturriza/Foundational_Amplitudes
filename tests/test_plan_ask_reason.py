@@ -21,7 +21,7 @@ MARGIN = ("Scope: the wall-time margin of the sign-output jobs is above 2x at bu
 def test_sign_jobs_pass_only_with_the_classifier_refusal():
     assert plan.ask_reason(SIGN_PLAIN) is None
     assert plan.ask_reason(SIGN_CLASSIFIER) == "classifier"
-    assert plan.ask_reason("Permission classifier refusal: it refused.") is None      # the call is not quoted
+    assert plan.ask_reason("Permission classifier refusal: it refused.") is None      # no plain words after it
 
 
 def test_cache_deletion_refused_even_with_a_classifier_quote():
@@ -43,3 +43,16 @@ def test_gpu_and_hold_reasons():
     assert plan.ask_reason("GPU budget: 45 GPU-h with no decision covering it; go?") == "gpu"
     assert plan.ask_reason("GPU budget: a big run; go?") is None
     assert plan.ask_reason("Your hold: warm_start held at its design (items warm_start); release?") == "hold"
+
+
+def test_raw_command_in_an_ask_is_refused():
+    for ask in ("Permission classifier refusal: `python3 - <<'X' ... X` was refused, will you allow it?",
+                "Permission classifier refusal: it ran EOF and was refused, will you allow it?",
+                "Permission classifier refusal: an edit\nwas refused, will you allow it?"):
+        try:
+            plan._ask_ok(ask)
+        except SystemExit as e:
+            assert "plain words" in str(e)
+        else:
+            raise AssertionError(ask)
+    plan._ask_ok("Permission classifier refusal: an edit of the gate was refused, will you make it yourself?")
