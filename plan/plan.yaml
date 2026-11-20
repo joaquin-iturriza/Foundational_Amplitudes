@@ -34529,9 +34529,9 @@ entries:
     17: 'W parent repair under D506: rerun FA-lxplus-57f6d2cb with the peak lr halved (1.89e-3), everything else equal (job_datasaving_parent.sh
       finale @72cba9e8, which now sets the W), ~8 GPU-h on lxplus; design recorded 2026-11-20, design reviewer; submit when
       a site answers'
-    18: 'Protocol follow-up: whether the batch or the optimiser carries Suprio''s protocol''s edge, after the D498 protocol
-      test held lr fixed across batch (no comparison); waits on Joaquin: seeds of B1/B2 first, decompose on the end val/train
-      ratio, or drop'
+    18: 'D507 protocol follow-up at 1e4 training events, Z+4g, 400 epochs: 2x2 {MuonAdamW+WSD, Adam+plateau} x {batch 2048,
+      batch 128}, an 8-trial DyHPO per cell (<= 19 GPU-h); design (scratchpad d507_design.sh) recorded after the W design''s
+      review, design reviewer, sweep configs, D395 smoke of the Adam/plateau sweep path, submit when a site answers'
   done_when: null
   notes_ref: null
   match: zng_uq_*,tp*_zng_*
@@ -36117,12 +36117,10 @@ entries:
       - 'stable and gmean <= 1.5x the first parent: re-read on CC, it is stage 2''s parent candidate'
       - 'still unstable or worse: dead end, design a DyHPO of the parent setup with the W and put its cost to Joaquin'
     18:
-      feeds: whether our setup's gap to Suprio's protocol comes from the batch or the optimiser
+      feeds: whether the batch or the optimiser carries Suprio's protocol's edge
       if:
-      - 'Joaquin picks seeds: design 2 more seeds of B1 and B2 per n, design reviewer, submit'
-      - 'Joaquin picks the val/train-ratio decomposition: revise the best-against-best design on that measure, reviewer, his
-        go on ~261 GPU-h'
-      - 'Joaquin drops it: record the protocol test as unresolved in results.tex'
+      - 'G >= 3: decompose by the batch and optimiser ratios, write up'
+      - 'G < 3: no edge at 1e4 events, write it up, nothing more run'
   step_waits: {}
   findings:
   - at: '2026-11-17T11:18:43+00:00'
