@@ -62,3 +62,14 @@ def test_sweep_no_wait_names_gives_no_event():
 
 def test_owner_working_no_event():
     assert run([dict(ROW, owner_state="working")])[0] == 0
+
+
+def test_step_one_event_when_all_sweeps_ended():
+    ss = {"3": [["ccin2p3", "a"], ["jeanzay", "b"]]}
+    ra, rb = dict(ROW, name="a", step_sweeps=ss), dict(ROW, name="b", site="jeanzay", step_sweeps=ss)
+    n, c = run([ra, rb])
+    assert n == 1
+    msg = c.execute("SELECT msg FROM events").fetchone()[0]
+    assert "sweep a" in msg and "sweep b" in msg
+    assert run([ra, rb], c)[0] == 0
+    assert run([])[0] == 0          # one of two ended: plan sweepends lists neither
