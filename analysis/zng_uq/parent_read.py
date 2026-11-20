@@ -725,6 +725,92 @@ def plot_w1262(path):
     ps.save(fig, os.path.join(HERE, "figs", "zng_w1262"))
 
 
+WLR = "runs/data_saving/dsave_parent_finale_zng_uq_w_lr1p89e-3_cc"
+
+
+def wlr(out):
+    """Step 17 (W parent, peak lr halved, FA-ccin2p3-47e14eae, trained on CC with whole-pool validation) under its passed
+    design. Stability: STAB on its train_steps.npz beside the two parents in parent_stab.json. Accuracy: per-process
+    MSE(ln|M|^2) of the sigma stage's best-checkpoint mu over its own whole CC val pools (SITE's "new"), beside the old
+    finale, first parent and W retrain of parent_reread.json (eval_best_val EVAL_FULL on the same CC pools). Check of
+    that equivalence: the W retrain's own sigma-stage read on lxplus against its CC eval (25 of 28 pools match across
+    sites). Curve test reported. -> data/parent_wlr.json, figure zng_parent_wlr."""
+    sys.path.insert(0, ROOT)
+    from analysis.common.readers import site_python
+    from tools.kit_curves import quality
+    import plot_style as ps
+    ps.use()
+    rr = json.load(open(os.path.join(HERE, "data", "parent_reread.json")))
+    st = json.load(open(os.path.join(HERE, "data", "parent_stab.json")))
+    s = site_python(SITE, [OLD, WLR], "PARENTREAD", site="ccin2p3")
+    st[WLR] = site_python(STAB, [WLR], "STAB", site="ccin2p3")[WLR]
+    chk = site_python(SITE, [OLD, NEW + "_w"], "PARENTREAD", site="lxplus")["new"]
+    procs = sorted(rr["old"], key=lambda p: rr["old"][p])
+    gm = lambda x: float(np.exp(np.mean(np.log(x))))
+    d = {"wlr": s["new"], "wlr_events": s["new_events"], "curve": quality(s["new_val"], s["new_train"])}
+    d["check_retrain_sigma_over_eval"] = {p: chk[p] / rr["retrain"][p] for p in procs}
+    for k in ("old", "parent", "retrain"):
+        d[k] = rr[k]
+    d["summary"] = {k: {"gmean": gm([d[k][p] for p in procs]), "n_below_parent": int(sum(d[k][p] < d["parent"][p] for p in procs))}
+                    for k in ("old", "parent", "retrain", "wlr")}
+    d["stab"] = {r.rsplit("/", 1)[1]: {"max_gn_med": max(st[r]["gn_med"]), "n_nonfinite": st[r]["n_gn_nonfinite"],
+                                       "train_rise": max(st[r]["train"][len(st[r]["train"]) // 8:]) - st[r]["train"][len(st[r]["train"]) // 8]}
+                 for r in st}
+    json.dump(d, open(out, "w"), indent=1)
+    print(json.dumps({k: d[k] for k in ("summary", "stab", "curve")}, indent=1))
+    print("check sigma/eval (retrain):", {p: round(v, 3) for p, v in d["check_retrain_sigma_over_eval"].items()})
+    for p in procs:
+        print("%-18s n %6d  old %.3g  parent %.3g  retrain %.3g  wlr %.3g  wlr/parent %.3g" % (
+            p, d["wlr_events"][p], d["old"][p], d["parent"][p], d["retrain"][p], d["wlr"][p], d["wlr"][p] / d["parent"][p]))
+    runs = ((NEW, ps.C.blue, "s", r"no $W$, peak lr $3.8\cdot10^{-3}$"),
+            (NEW + "_w", ps.C.vermillion, "^", r"with $W$, peak lr $3.8\cdot10^{-3}$"),
+            (WLR, ps.C.green, "v", r"with $W$, peak lr $1.9\cdot10^{-3}$"))
+    fig, axs = ps.figure(ncols=1, nrows=3)
+    x = np.arange(len(procs))
+    axs[0].plot(x, [d["old"][p] for p in procs], "o", color=ps.C.grey, label="old finale")
+    for (r, col, mk, lab), k in zip(runs, ("parent", "retrain", "wlr")):
+        axs[0].plot(x, [d[k][p] for p in procs], mk, color=col, label=lab)
+    axs[0].set_yscale("log"); axs[0].set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
+    axs[0].set_xlabel("process, ordered by the old finale's MSE"); axs[0].set_xticks(x[::3])
+    for r, col, _, lab in runs:
+        e = st[r]; xs = (np.arange(len(e["train"])) + 1) * e["every"]
+        axs[1].plot(xs, e["train"], color=col)
+        axs[2].plot(xs, e["gn_med"], color=col)
+    axs[1].set_ylabel("training het. loss"); axs[1].set_yscale("symlog", linthresh=1.0); axs[1].set_xlabel("step")
+    axs[2].set_ylabel("median grad norm"); axs[2].set_yscale("log"); axs[2].set_xlabel("step")
+    ps.legend(axs[0], "upper left")
+    ps.save(fig, os.path.join(HERE, "figs", "zng_parent_wlr"))
+
+
+LEAK = r"""
+import json, re, sys
+import numpy as np
+pools = {}
+for l in open(sys.argv[1] + "/out_0.log"):
+    m = re.search(r"\[(train|val)\] (\w+): \d+ events.* from (\S+\.npy)", l)
+    if m:
+        pools.setdefault(m.group(2), {})[m.group(1)] = m.group(3)
+o = {}
+for p, d in pools.items():
+    key = lambda a: {r.tobytes() for r in np.round(a[:, :-1], 9)}   # momenta + PDG ids, the label dropped
+    tr, va = key(np.load(d["train"], mmap_mode="r")), np.load(d["val"], mmap_mode="r")
+    o[p] = {"n_val": len(va), "n_val_in_train": int(sum(r.tobytes() in tr for r in np.round(va[:, :-1], 9))),
+            "train": d["train"], "val": d["val"], "dtypes": [str(np.load(d[k], mmap_mode="r").dtype) for k in ("train", "val")]}
+print("LEAK " + json.dumps(o))
+"""
+
+
+def wleak(out):
+    """Check behind the W lr-halved parent's read: the fraction of each of its val pools' events (momenta and PDG ids,
+    rounded to 1e-9) found in the train pool it loaded, from the pool paths in its own out_0.log on CC -> data/parent_wlr_leak.json"""
+    sys.path.insert(0, ROOT)
+    from analysis.common.readers import site_python
+    d = site_python(LEAK, [WLR], "LEAK", site="ccin2p3", timeout=1800)
+    json.dump(d, open(out, "w"), indent=1)
+    for p, v in d.items():
+        print("%-18s val in train %d / %d  %s" % (p, v["n_val_in_train"], v["n_val"], v["dtypes"]))
+
+
 if __name__ == "__main__":
     data = os.path.join(HERE, "data", "parent_vs_finale.json")
     if sys.argv[1] == "diag":
@@ -747,6 +833,10 @@ if __name__ == "__main__":
         w1262(os.path.join(HERE, "data", "w1262.json"))
     elif sys.argv[1] == "w1262plot":
         plot_w1262(os.path.join(HERE, "data", "w1262.json"))
+    elif sys.argv[1] == "wlr":
+        wlr(os.path.join(HERE, "data", "parent_wlr.json"))
+    elif sys.argv[1] == "wleak":
+        wleak(os.path.join(HERE, "data", "parent_wlr_leak.json"))
     elif sys.argv[1] == "explain":
         explain(os.path.join(HERE, "data", "parent_explain.json"))
     else:
