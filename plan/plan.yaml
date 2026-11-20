@@ -34785,9 +34785,9 @@ entries:
     decision: D508
   owner:
     agent: a581d911afb36cd15
-    state: working
+    state: stopped
     since: '2026-11-20T03:42:58+00:00'
-    state_at: '2026-11-20T07:22:21.772000+00:00'
+    state_at: '2026-11-20T07:23:08.149000+00:00'
     context: 146398
     context_at: '2026-11-20T04:24:10+00:00'
   designs:
@@ -37406,7 +37406,7 @@ entries:
     agent: a6350226f3a8054a2
     state: stopped
     since: '2026-11-20T05:09:01+00:00'
-    state_at: '2026-11-20T07:31:29+00:00'
+    state_at: '2026-11-20T07:39:56.451000+00:00'
     context: 147252
     context_at: '2026-11-20T07:39:37+00:00'
   findings:
