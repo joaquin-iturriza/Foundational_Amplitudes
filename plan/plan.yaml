@@ -37611,6 +37611,12 @@ entries:
     units: null
     start: '2026-11-20T05:20:35+00:00'
     at: '2026-11-20T05:20:35+00:00'
+  - batch: ftm_s7_searches
+    wall_h: 1.1
+    jobs: 168
+    units: null
+    start: '2026-11-20T10:13:21+00:00'
+    at: '2026-11-20T10:13:21+00:00'
   step_why:
     1:
       feeds: D414 (fine-tunes that keep the head start), D423 fine-tune template restart
