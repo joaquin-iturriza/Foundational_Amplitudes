@@ -34826,9 +34826,9 @@ entries:
       up to 5e5; the 650-850 GPU-h stage-2 design was an agent's expansion, withdrawn
   owner:
     agent: adaaac120a3656f82
-    state: working
+    state: stopped
     since: '2026-11-20T11:37:33+00:00'
-    state_at: '2026-11-20T14:48:29.475000+00:00'
+    state_at: '2026-11-20T15:11:21.594000+00:00'
     context: 240900
     context_at: '2026-11-20T15:12:54+00:00'
   designs:
@@ -37675,9 +37675,9 @@ entries:
     - 1
   owner:
     agent: acb3827e706c70d22
-    state: stopped
+    state: working
     since: '2026-11-20T11:37:38+00:00'
-    state_at: '2026-11-20T14:09:45.915000+00:00'
+    state_at: '2026-11-20T15:12:41.386000+00:00'
     context: 198201
     context_at: '2026-11-20T14:48:41+00:00'
   findings:
