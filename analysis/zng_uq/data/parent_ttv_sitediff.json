@@ -1,0 +1,26 @@
+{
+ "val": {
+  "shape": [
+   5000,
+   21
+  ],
+  "max_abs_momenta": 2.8908431204399676e-11,
+  "rows_momenta_differ": 1857,
+  "max_abs_ln_label": 4.3774095460483686e-11,
+  "median_abs_ln_label": 0.0,
+  "rows_label_above_1e_6": 0,
+  "rows_label_differ": 1989
+ },
+ "test": {
+  "shape": [
+   5000,
+   21
+  ],
+  "max_abs_momenta": 1.6123991031236073e-11,
+  "rows_momenta_differ": 1865,
+  "max_abs_ln_label": 3.0319746712843534e-11,
+  "median_abs_ln_label": 0.0,
+  "rows_label_above_1e_6": 0,
+  "rows_label_differ": 1998
+ }
+}
