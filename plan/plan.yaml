@@ -36465,6 +36465,24 @@ entries:
       + 0.25 + 0.2) = 16.4 GPU-h; seeds of changed chosen trials <= 8 runs ~4 GPU-h; scoring <= 4 x 0.2 h: <= 21.2 GPU-h.
       Wall: three waves per search, longest Muon b128 3 x 0.9 h = 2.7 h, target 4 h, limit per trial 2 h as the configs. Disk
       ~0.2 GB per trial, read at submission.'
+    fix_at: '2026-11-20T14:58:05+00:00'
+    fix: 'Check 15 (time per unit from the same setup) fails: the step rates behind the cost, the 4 h wall target and the
+      2 h per-trial limit are CC''s (D509 seed logs: Muon b128 0.0886 s/step, Adam b128 0.0706 s/step), but all 32 new trials
+      go to lxplus, whose GPUs are not uniform. The lxplus Adam b128 trials of this same search (runs/tp_zng_d1e4_adam_b128_zgggg/trial_*/out_0.log
+      on lxplus) trained at 0.036 to 0.074 s/step on most nodes and 0.2254 to 0.2269 s/step on two; the chosen trial_0833
+      itself ran 16068 steps in 93.85 min at 0.2254 s/step, and its whole job took 1 h 55 min (08:57 to 10:52) against the
+      2 h limit. A Muon b128 trial (31250 steps, about 1.25x Adam''s step time on CC) on such a node needs about 0.28 s/step
+      x 31250 = 2.4 h of training alone, past the 2 h limit, so it would be cut, and a full-length Adam b128 trial on one
+      (31250 x 0.225 s = 1.95 h plus a 9 min sigma stage) is cut too. Fix: size the per-trial limit from the slowest lxplus
+      rate measured on this setup (for example 3.5 to 4 h for the b128 cells), or restrict the lxplus GPU type to the fast
+      nodes and show it; then recompute the GPU-h (worst case about 45 GPU-h if the b128 trials land on slow nodes, above
+      30: state it against the GPU budget, with Joaquin''s 2026-11-20 words and the D429 precedent, 8 to 16 trials, as the
+      cover if that is the claim) and the wall target (up to about 3 x 2.6 h for Muon b128). Everything else holds: a measure
+      that moves with lr inside a search (Muon b128 val mu-MSE 0.0144 to 0.0401, 2.8x; Adam b128 0.0313 to 0.0587, 1.9x, d507_search.json),
+      the D509 seed spread 1.15 to 1.74x as the replacement bar with three-seed means after, outcomes for yes and no, D429-style
+      8-to-16 extension in waves 3,3,2, disk (46 MB per trial, EOS 2.2 PB free), and no earlier extension of these searches
+      found (searched results.tex for tp_zng_d1e4, extend_sweep, d507, 1e4 training events; site decisions for batch, extend,
+      zng).'
   step_waits: {}
   findings:
   - at: '2026-11-17T11:18:43+00:00'
