@@ -36531,6 +36531,15 @@ entries:
       43/44 of changed chosen trials <= 8 runs = 5.3 GPU-h; test scoring <= 4 x 0.2 = 0.8: <= 27.3 GPU-h, under 30. Wall:
       three waves, longest Muon b128 3 x 1.06 = 3.2 h plus queue, target 4.5 h; limits 3 h (b128), 1 h (b2048). Disk 46 MB
       per trial (trial_0833), EOS free read by the reviewer 2.2 PB.'
+    passed_at: '2026-11-20T15:00:40+00:00'
+    reviewer: 'Re-check after FIX on timing: lxplus Adam b128 sweep logs show TRIAL_GPU Tesla T4 on the two 0.225 s/step trials
+      and A100/H100 on the six at 0.036-0.074 s/step; all four configs carry requirements A100|H100 and not MIG (@abc47ad9),
+      wired into the HTCondor submit file by generate_sweep.py:204-255; b128 limit 3 h against <=1.06 h per Muon b128 trial
+      (0.093 s/step x 31250 + sigma), cost <=27.3 GPU-h under 30, wall target 4.5 h. Check 2: val mu-MSE moves with lr inside
+      a search, Muon b128 0.0144-0.0401 (2.8x), Adam b128 0.0313-0.0587 (1.9x), d507_search.json. Check 3: D509 seed spread
+      1.15-1.74x as the replacement bar, three-seed means after. Check 5 searched: results.tex tp_zng_d1e4, extend_sweep,
+      d507, 1e4 training events; site decisions batch, extend, zng (D429 is the same 8-to-16 extension on another entry; no
+      earlier extension of these searches).'
   step_waits: {}
   findings:
   - at: '2026-11-17T11:18:43+00:00'
