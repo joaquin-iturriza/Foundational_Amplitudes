@@ -36689,6 +36689,22 @@ entries:
       Val MSE(log|M|^2) at B2''s chosen checkpoint over its lowest: 2.91/1.03/1.09/1.05 at n=1..4; protocol-test arms <= 1.01.
       The mismatch matters only at Z+1g (B2''s val MSE rises slowly after step ~103000 while its NLL keeps falling); at n=2-4
       it is <= 9%, inside one seed.'
+  - at: '2026-11-20T04:01:16+00:00'
+    text: '2026-11-20 E7654: the W parent rerun FA-ccin2p3-94c78e94 failed at init_data (not training): datagen.mixed_generation
+      refused u u~ -> t t~ (one loop) on CC, whose train cache pool was still the 2026-10-02 one (pipeline 99b70db5, labels
+      ~0.8% low; z -8.6 val, -10.8 test) while CC''s val/test were rebuilt 2026-11-19 (2daabe91). Fix: lxplus''s 2026-11-17
+      train pool (+ .recipe.json, .born.npy, .born.npy.json) copied to CC $SCRATCH/amp_data_cache with site copy --overwrite
+      (CC''s old cache pool replaced; no running job read it; .alphas.npy left, unused without target_physics_orders); md5
+      now equal on both sites (npy 108f214b, born 8544e636). A resubmit with the design''s tag (FA-ccin2p3-9f188a73) refused
+      because the failed init left runs/data_saving/dsave_parent_finale_zng_uq_w_lr1p89e-3 (config.yaml + out_0.log, 73K;
+      removal was refused by the permission check); resubmitted as FA-ccin2p3-47e14eae, same arguments with tag=zng_uq_w_lr1p89e-3_cc
+      (run dir dsave_parent_finale_zng_uq_w_lr1p89e-3_cc), limit 14 h, code @f31118aa. D507: smoke tp_zng_d1e4_adam_smoke50_zgggg
+      ran end to end (Adam + ReduceLROnPlateau, 78 batches of 128 = 1e4 events, 50 steps, sigma stage 250 steps, preds val
+      1e5 / test 1e6 / train 2000, plots png+pdf, RESULT val_loss_no_reg 0.474 with val_mse_curve and train_eval_mse_curve;
+      0 tracebacks; trial dir 58 MB). The four searches submitted per site pick (CC 3, lxplus 1): lxplus tp_zng_d1e4_adam_b128_zgggg
+      (HTCondor DAG; base config.yaml and recipe copied CC->lxplus first, they were missing there), CC tp_zng_d1e4_muon_b128_zgggg,
+      _muon_b2048_, _adam_b2048_ (waves 3,3,2), configs sweep/sweep_config_tp_zng_d1e4_{muon_b2048,muon_b128,adam_b2048,adam_b128}_zgggg.yaml
+      @63809f71, code @c0dddfad.'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
