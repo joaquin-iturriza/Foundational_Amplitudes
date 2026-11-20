@@ -33805,6 +33805,8 @@ entries:
     state: working
     since: '2026-11-20T01:50:53+00:00'
     state_at: '2026-11-20T01:50:53+00:00'
+    context: 62966
+    context_at: '2026-11-20T01:57:48+00:00'
   step_waits:
     '3': '2026-12-15: deferred, marked for later on 2026-11-17; no run'
     '4': '2026-11-21: all three sites unreachable 2026-11-20 (ssh to the gateway refused, retried once); the bigrun arms''
