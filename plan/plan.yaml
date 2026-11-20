@@ -36818,6 +36818,12 @@ entries:
     units: null
     start: '2026-11-19T09:05:19+00:00'
     at: '2026-11-19T09:05:19+00:00'
+  - batch: w_parent_lr1p89e-3
+    wall_h: 9.0
+    jobs: 1
+    units: null
+    start: '2026-11-20T02:38:24+00:00'
+    at: '2026-11-20T02:38:24+00:00'
   handoff:
     state: '2026-11-19 ~18:30 UTC. Done this owner: step 5 (protocol-test test median |Delta| via benchmark.py ptcollect/ptdelta
       @77ef8fae, fig zng_protocol_test_delta; write-up results.tex 7a90efc3 incl. the 11-17 paragraph the earlier owner left
