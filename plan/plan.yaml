@@ -36381,6 +36381,16 @@ entries:
       train_steps.npz, models/model_run0_best.pt, per_process_metrics.json, data_stats.json, kit_benchmark/predictions.h5
       and sigma_ln.npy, the plots as png and pdf) and the RESULT line run_trial reads. Disk per trial read from a protocol-test
       run dir at submission against the site''s free disk.'
+    passed_at: '2026-11-20T02:08:31+00:00'
+    reviewer: 'Re-check after FIX. Cells differ only in batch (with steps) or the optimiser bundle (4 configs vs B1''s); each
+      searched, 8 trials 3,3,2 like the siblings. Check 2: the only tuned-lr evidence is B1/B2 at n=4, 1.72x val and 1.88x
+      test (benchmark.json), below 3x; the design says so and reads 1/3<G<3 as unresolved, with a G<=1/3 branch. Check 3:
+      one seed per D492, 3x called a convention not a measured spread, seed question (~4.5 GPU-h) asked. Prior verified: tp3_hmscr32k_uubar_Zgggg_d8
+      best lr 1.92e-3, val 1.80e-4, 8 trials span 2.45x (analysis/transfer/scratch_sweeps.json); its lr moved to 2.5e-3 (Adam
+      2048) and 2.2e-4 (Adam 128), recomputed. Windows now cover their anchors (Adam 2048 [1.4e-3,1.8e-2], Adam 128 [1.5e-4,1.8e-3],
+      Muon 2048 [3.1e-3,4.1e-2], Muon 128 [2.7e-4,3.6e-3]). Step rates re-read from wave 1; smoke lists outputs. HETEROSC,
+      B1 target, their split; mu_mse selection departs from D62, stated. Searched: protocol, Suprio, plateau, ReduceLROnPlateau,
+      batch 128/2048, 1e4, D=10^4, train_subsample 10000, highmult, hmscr, seed spread, one seed, dead ends, D484-D507.'
   step_why:
     17:
       feeds: whether a ladder+star parent with the W column trains stably and can be stage 2's parent
