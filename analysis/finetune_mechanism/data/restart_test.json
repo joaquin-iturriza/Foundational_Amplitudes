@@ -1,0 +1,369 @@
+{
+ "cells": {
+  "100": {
+   "C'": {
+    "n": 5,
+    "best_val": 0.0023238268588105194,
+    "best_run": "runs/dsave_s7cosrerun_ft_bbx_zz_d4_t4960/trial_0582",
+    "best_lag": 0.366084
+   },
+   "Oc": {
+    "n": 7,
+    "best_val": 0.0015948986178199692,
+    "best_run": "runs/dsave_s7cosstep_ft_bbx_zz_d4_t4960/trial_0231",
+    "best_lag": 0.8227554
+   },
+   "O": {
+    "n": 6,
+    "best_val": 0.004072466330583279,
+    "best_run": "runs/dsave_s7optstate_ft_bbx_zz_d4_t4960/trial_1586",
+    "best_lag": -0.037928500000000004
+   },
+   "W'": {
+    "n": 7,
+    "best_val": 0.0040526946087887,
+    "best_run": "runs/dsave_s7wsdrerun_ft_bbx_zz_d4_t4960/trial_1690",
+    "best_lag": -0.0499102
+   },
+   "Bc": {
+    "n": 7,
+    "best_val": 0.0025970173747007896,
+    "best_run": "runs/dsave_s7wsdstep_ft_bbx_zz_d4_t4960/trial_0823",
+    "best_lag": 0.01699581
+   },
+   "B": {
+    "n": 7,
+    "best_val": 0.0007360617448176471,
+    "best_run": "runs/dsave_s7wsdbranch_ft_bbx_zz_d4_t4960/trial_0551",
+    "best_lag": 0.08
+   },
+   "S": {
+    "n": 7,
+    "best_val": 0.0020432333057514534,
+    "best_run": "runs/dsave_s7wsd_scr_bbx_zz_d4_t4960/trial_0349"
+   },
+   "O/Oc": 2.5534327292538763,
+   "Oc/C'": 0.6863242034461804,
+   "B/Bc": 0.2834258068459981,
+   "Bc/W'": 0.6408125026417931
+  },
+  "316": {
+   "C'": {
+    "n": 8,
+    "best_val": 3.483232571820354e-05,
+    "best_run": "runs/dsave_s7cosrerun_ft_bbx_zz_d5_t7840/trial_0237",
+    "best_lag": 0.12472177999999999
+   },
+   "Oc": {
+    "n": 7,
+    "best_val": 3.9395404481417996e-05,
+    "best_run": "runs/dsave_s7cosstep_ft_bbx_zz_d5_t7840/trial_0563",
+    "best_lag": 0.2563256
+   },
+   "O": {
+    "n": 8,
+    "best_val": 2.9214899553446816e-05,
+    "best_run": "runs/dsave_s7optstate_ft_bbx_zz_d5_t7840/trial_1444",
+    "best_lag": 0.17333454999999998
+   },
+   "W'": {
+    "n": 8,
+    "best_val": 2.1889823495296137e-05,
+    "best_run": "runs/dsave_s7wsdrerun_ft_bbx_zz_d5_t7840/trial_1655",
+    "best_lag": 0.55734008
+   },
+   "Bc": {
+    "n": 8,
+    "best_val": 1.2321869249934283e-05,
+    "best_run": "runs/dsave_s7wsdstep_ft_bbx_zz_d5_t7840/trial_1268",
+    "best_lag": 0.15525766
+   },
+   "B": {
+    "n": 8,
+    "best_val": 2.564414750573533e-05,
+    "best_run": "runs/dsave_s7wsdbranch_ft_bbx_zz_d5_t7840/trial_0340",
+    "best_lag": 0.92
+   },
+   "S": {
+    "n": 8,
+    "best_val": 1.066128349101673e-05,
+    "best_run": "runs/dsave_s7wsd_scr_bbx_zz_d5_t7840/trial_1471"
+   },
+   "O/Oc": 0.7415814087459588,
+   "Oc/C'": 1.1310012658968036,
+   "B/Bc": 2.0811897112016586,
+   "Bc/W'": 0.5629040020620589
+  },
+  "3162": {
+   "C'": {
+    "n": 5,
+    "best_val": 6.170894041025562e-06,
+    "best_run": "runs/dsave_s7cosrerun_ft_bbx_zz_d7_t8500/trial_1308",
+    "best_lag": 0.9339494
+   },
+   "Oc": {
+    "n": 6,
+    "best_val": 4.7587229617915917e-07,
+    "best_run": "runs/dsave_s7cosstep_ft_bbx_zz_d7_t8500/trial_0451",
+    "best_lag": 0.90095623
+   },
+   "O": {
+    "n": 6,
+    "best_val": 1.8590504606888565e-06,
+    "best_run": "runs/dsave_s7optstate_ft_bbx_zz_d7_t8500/trial_1308",
+    "best_lag": 0.9339494
+   },
+   "W'": {
+    "n": 8,
+    "best_val": 1.5825138615298842e-07,
+    "best_run": "runs/dsave_s7wsdrerun_ft_bbx_zz_d7_t8500/trial_1723",
+    "best_lag": 0.9128994
+   },
+   "Bc": {
+    "n": 6,
+    "best_val": 1.1397006420359532e-06,
+    "best_run": "runs/dsave_s7wsdstep_ft_bbx_zz_d7_t8500/trial_1308",
+    "best_lag": 0.9339494
+   },
+   "B": {
+    "n": 8,
+    "best_val": 2.026911887960915e-06,
+    "best_run": "runs/dsave_s7wsdbranch_ft_bbx_zz_d7_t8500/trial_1475",
+    "best_lag": 0.9
+   },
+   "S": {
+    "n": 7,
+    "best_val": 1.6396217511367092e-06,
+    "best_run": "runs/dsave_s7wsd_scr_bbx_zz_d7_t8500/trial_0017"
+   },
+   "O/Oc": 3.9066162825939132,
+   "Oc/C'": 0.07711561615147622,
+   "B/Bc": 1.7784598983291382,
+   "Bc/W'": 7.201836708931924
+  }
+ },
+ "pairs": {
+  "O/Oc": {
+   "kept": [
+    4,
+    17
+   ],
+   "pair_kept": [
+    7,
+    15
+   ],
+   "share_diff": -0.23137254901960785,
+   "fisher_p": 0.9604036691331753,
+   "head_start": "UNRESOLVED",
+   "median_lag": 0.12472177999999999,
+   "pair_median_lag": 0.18472178,
+   "val_pooled": 1.9484742469341405,
+   "val": "WITHIN"
+  },
+  "Oc/C'": {
+   "kept": [
+    7,
+    15
+   ],
+   "pair_kept": [
+    5,
+    16
+   ],
+   "share_diff": 0.15416666666666667,
+   "fisher_p": 0.30474117779819776,
+   "head_start": "NO",
+   "median_lag": 0.18472178,
+   "pair_median_lag": 0.08303682999999999,
+   "val_pooled": 0.3911814446432905,
+   "val": "LOWER"
+  },
+  "B/Bc": {
+   "kept": [
+    9,
+    23
+   ],
+   "pair_kept": [
+    4,
+    18
+   ],
+   "share_diff": 0.16908212560386476,
+   "fisher_p": 0.20808699037896794,
+   "head_start": "NO",
+   "median_lag": 0.22,
+   "pair_median_lag": 0.024137155000000007,
+   "val_pooled": 1.016088913738113,
+   "val": "WITHIN"
+  },
+  "Bc/W'": {
+   "kept": [
+    4,
+    18
+   ],
+   "pair_kept": [
+    9,
+    19
+   ],
+   "share_diff": -0.25146198830409355,
+   "fisher_p": 0.9753320935745853,
+   "head_start": "UNRESOLVED",
+   "median_lag": 0.024137155000000007,
+   "pair_median_lag": 0.12472177999999999,
+   "val_pooled": 1.3746839464486291,
+   "val": "WITHIN"
+  }
+ },
+ "diverged": {
+  "dsave_s7cosrerun_ft_bbx_zz_d4_t4960": [
+   {
+    "run": "FA-lxplus-82cc2626",
+    "hp_idx": 399,
+    "status": "failed",
+    "cause": "RuntimeError: Training diverged: N consecutive non-finite-gradient steps (patience N) at step N. Aborting before a NaN feature can feed a downstream gather/scatter and crash on a CUDA index-OOB."
+   },
+   {
+    "run": "FA-lxplus-1575600c",
+    "hp_idx": 1395,
+    "status": "failed",
+    "cause": "RuntimeError: Training diverged: N consecutive non-finite-gradient steps (patience N) at step N. Aborting before a NaN feature can feed a downstream gather/scatter and crash on a CUDA index-OOB."
+   },
+   {
+    "run": "FA-lxplus-ba7449f6",
+    "hp_idx": 1275,
+    "status": "failed",
+    "cause": "RuntimeError: Training diverged: N consecutive non-finite-gradient steps (patience N) at step N. Aborting before a NaN feature can feed a downstream gather/scatter and crash on a CUDA index-OOB."
+   }
+  ],
+  "dsave_s7cosrerun_ft_bbx_zz_d7_t8500": [
+   {
+    "run": "FA-lxplus-dc0c0f8b",
+    "hp_idx": 430,
+    "status": "failed",
+    "cause": "RuntimeError: Training diverged: N consecutive non-finite-gradient steps (patience N) at step N. Aborting before a NaN feature can feed a downstream gather/scatter and crash on a CUDA index-OOB."
+   },
+   {
+    "run": "FA-lxplus-86dbd33f",
+    "hp_idx": 1146,
+    "status": "failed",
+    "cause": "RuntimeError: Training diverged: N consecutive non-finite-gradient steps (patience N) at step N. Aborting before a NaN feature can feed a downstream gather/scatter and crash on a CUDA index-OOB."
+   },
+   {
+    "run": "FA-lxplus-494ed419",
+    "hp_idx": 1950,
+    "status": "failed",
+    "cause": "RuntimeError: Training diverged: N consecutive non-finite-gradient steps (patience N) at step N. Aborting before a NaN feature can feed a downstream gather/scatter and crash on a CUDA index-OOB."
+   }
+  ],
+  "dsave_s7cosstep_ft_bbx_zz_d4_t4960": [
+   {
+    "run": "FA-lxplus-97300cbf",
+    "hp_idx": 1395,
+    "status": "failed",
+    "cause": "RuntimeError: Training diverged: N consecutive non-finite-gradient steps (patience N) at step N. Aborting before a NaN feature can feed a downstream gather/scatter and crash on a CUDA index-OOB."
+   }
+  ],
+  "dsave_s7cosstep_ft_bbx_zz_d5_t7840": [
+   {
+    "run": "FA-lxplus-607feef4",
+    "hp_idx": 446,
+    "status": "failed",
+    "cause": "RuntimeError: Training diverged: N consecutive non-finite-gradient steps (patience N) at step N. Aborting before a NaN feature can feed a downstream gather/scatter and crash on a CUDA index-OOB."
+   }
+  ],
+  "dsave_s7cosstep_ft_bbx_zz_d7_t8500": [
+   {
+    "run": "FA-lxplus-7b666bcc",
+    "hp_idx": 1977,
+    "status": "failed",
+    "cause": "RuntimeError: Training diverged: N consecutive non-finite-gradient steps (patience N) at step N. Aborting before a NaN feature can feed a downstream gather/scatter and crash on a CUDA index-OOB."
+   },
+   {
+    "run": "FA-lxplus-e6252d7d",
+    "hp_idx": 62,
+    "status": "failed",
+    "cause": "RuntimeError: Training diverged: N consecutive non-finite-gradient steps (patience N) at step N. Aborting before a NaN feature can feed a downstream gather/scatter and crash on a CUDA index-OOB."
+   }
+  ],
+  "dsave_s7optstate_ft_bbx_zz_d4_t4960": [
+   {
+    "run": "FA-lxplus-5f8cbd55",
+    "hp_idx": 399,
+    "status": "failed",
+    "cause": "RuntimeError: Training diverged: N consecutive non-finite-gradient steps (patience N) at step N. Aborting before a NaN feature can feed a downstream gather/scatter and crash on a CUDA index-OOB."
+   },
+   {
+    "run": "FA-lxplus-79ebcc17",
+    "hp_idx": 1395,
+    "status": "failed",
+    "cause": "RuntimeError: Training diverged: N consecutive non-finite-gradient steps (patience N) at step N. Aborting before a NaN feature can feed a downstream gather/scatter and crash on a CUDA index-OOB."
+   }
+  ],
+  "dsave_s7optstate_ft_bbx_zz_d7_t8500": [
+   {
+    "run": "FA-lxplus-7dd3223f",
+    "hp_idx": 430,
+    "status": "failed",
+    "cause": "RuntimeError: Training diverged: N consecutive non-finite-gradient steps (patience N) at step N. Aborting before a NaN feature can feed a downstream gather/scatter and crash on a CUDA index-OOB."
+   },
+   {
+    "run": "FA-lxplus-fad6ff57",
+    "hp_idx": 1678,
+    "status": "failed",
+    "cause": "RuntimeError: Training diverged: N consecutive non-finite-gradient steps (patience N) at step N. Aborting before a NaN feature can feed a downstream gather/scatter and crash on a CUDA index-OOB."
+   }
+  ],
+  "dsave_s7wsdrerun_ft_bbx_zz_d4_t4960": [
+   {
+    "run": "FA-lxplus-9de63994",
+    "hp_idx": 399,
+    "status": "failed",
+    "cause": "RuntimeError: Training diverged: N consecutive non-finite-gradient steps (patience N) at step N. Aborting before a NaN feature can feed a downstream gather/scatter and crash on a CUDA index-OOB."
+   }
+  ],
+  "dsave_s7wsdstep_ft_bbx_zz_d4_t4960": [
+   {
+    "run": "FA-lxplus-d60e86e1",
+    "hp_idx": 551,
+    "status": "failed",
+    "cause": "RuntimeError: Training diverged: N consecutive non-finite-gradient steps (patience N) at step N. Aborting before a NaN feature can feed a downstream gather/scatter and crash on a CUDA index-OOB."
+   }
+  ],
+  "dsave_s7wsdstep_ft_bbx_zz_d7_t8500": [
+   {
+    "run": "FA-lxplus-a34721ce",
+    "hp_idx": 430,
+    "status": "failed",
+    "cause": "RuntimeError: Training diverged: N consecutive non-finite-gradient steps (patience N) at step N. Aborting before a NaN feature can feed a downstream gather/scatter and crash on a CUDA index-OOB."
+   },
+   {
+    "run": "FA-lxplus-16ec484f",
+    "hp_idx": 1678,
+    "status": "failed",
+    "cause": "RuntimeError: Training diverged: N consecutive non-finite-gradient steps (patience N) at step N. Aborting before a NaN feature can feed a downstream gather/scatter and crash on a CUDA index-OOB."
+   }
+  ],
+  "dsave_s7wsdbranch_ft_bbx_zz_d4_t4960": [
+   {
+    "run": "FA-lxplus-6954ff42",
+    "hp_idx": 1395,
+    "status": "failed",
+    "cause": "RuntimeError: Training diverged: N consecutive non-finite-gradient steps (patience N) at step N. Aborting before a NaN feature can feed a downstream gather/scatter and crash on a CUDA index-OOB."
+   }
+  ],
+  "dsave_s7wsd_scr_bbx_zz_d4_t4960": [
+   {
+    "run": "FA-lxplus-fbdf6bc6",
+    "hp_idx": 299,
+    "status": "failed",
+    "cause": "RuntimeError: Training diverged: N consecutive non-finite-gradient steps (patience N) at step N. Aborting before a NaN feature can feed a downstream gather/scatter and crash on a CUDA index-OOB."
+   }
+  ],
+  "dsave_s7wsd_scr_bbx_zz_d7_t8500": [
+   {
+    "run": "FA-lxplus-91ff617e",
+    "hp_idx": 311,
+    "status": "failed",
+    "cause": "RuntimeError: Training diverged: N consecutive non-finite-gradient steps (patience N) at step N. Aborting before a NaN feature can feed a downstream gather/scatter and crash on a CUDA index-OOB."
+   }
+  ]
+ }
+}

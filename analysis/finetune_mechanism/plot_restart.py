@@ -13,6 +13,7 @@ Reads data/restart_steps.json (restart_steps.py), ../data_saving/data/step6_rows
 ../catalog_v4/data/ws_{restart_study,fixes}_steps.json.
 
     python analysis/finetune_mechanism/plot_restart.py   -> figs/restart_steps, figs/restart_headstart, data/restart_summary.json
+    python analysis/finetune_mechanism/plot_restart.py --s7   -> the restart test's figs/restart_{headstart,steps}_s7
 """
 import json
 import os
@@ -124,5 +125,71 @@ def main():
     print(json.dumps(summ, indent=1))
 
 
+S7 = {"C'": ("cosine parent, final model,\nfresh optimizer", ps.C.vermillion, "-"),
+      "Oc": ("cosine parent, end of main stage,\nfresh optimizer", ps.C.vermillion, "--"),
+      "O": ("cosine parent, end of main stage,\nits optimizer state", ps.C.vermillion, ":"),
+      "W'": ("WSD parent, final model,\nfresh optimizer", ps.C.green, "-"),
+      "Bc": ("WSD parent, before cooldown,\nfresh optimizer", ps.C.green, "--"),
+      "B": ("WSD parent, before cooldown, its\noptimizer state, no warmup", ps.C.green, ":"),
+      "S": ("from scratch", ps.C.grey, "-")}
+S7_STEPS = {"C'": "C'", "Oc": "Oc", "O": "O", "W'": "W'", "Bc": "Bc", "B": "B", "S": "Sw"}
+
+
+def main_s7():
+    """The restart test (restart_test_readout.py): figs/restart_headstart_s7, validation of each arm's search best and
+    the WSD scratch best against step per D; figs/restart_steps_s7, pre-clip gradient norm and training loss over the
+    first 400 steps of each search best at D=3162 and D=100. Writes data/restart_s7_summary.json (step-0 NLL and max
+    gradient norm over steps 0-40 per observed trial, median per arm and D)."""
+    res = json.load(open(os.path.join(HERE, "data", "restart_test.json")))
+    rows = {r["run_dir"]: ln(r) for r in json.load(open(os.path.join(HERE, "data", "restart_test_rows.json")))
+            if r.get("val") and len(r["val"]) > 3}
+    st = json.load(open(os.path.join(HERE, "data", "restart_steps.json")))
+    steps = {r["run_dir"]: r for r in st["search"] if "step" in r}
+    fig, axs = ps.figure(2, 2)
+    for ax, D in zip([axs[0][0], axs[0][1], axs[1][0]], CELLS):
+        for arm, (lab, col, ls) in S7.items():
+            r = rows[res["cells"][str(D)][arm]["best_run"]]
+            x = (np.arange(len(r["val_ln"])) + 1) * r["every"]
+            ax.plot(x, r["val_ln"], color=col, ls=ls, label=lab)
+        ax.set_yscale("log")
+        ax.set_xlabel("step")
+        ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
+        ps.process_label(ax, rf"$D_{{\rm train}}={D}$")
+    ps.legend_cell(axs[1][1], axs[0][0], fontsize=ps.LEGEND_MIN_PT)
+    ps.save(fig, os.path.join(HERE, "figs", "restart_headstart_s7"))
+
+    fig, axs = ps.figure(2, 2)
+    (a, b), (c, d) = axs
+    for arm, (lab, col, ls) in S7.items():
+        for ax, D, key in ((a, 3162, "grad_norm"), (b, 3162, "loss"), (c, 100, "grad_norm")):
+            s = steps[res["cells"][str(D)][arm]["best_run"]]
+            ax.plot(s["step"], s[key], color=col, ls=ls, label=lab)
+    for ax, D in ((a, 3162), (b, 3162), (c, 100)):
+        ax.set_xlabel("step after the restart")
+        ps.process_label(ax, rf"$D_{{\rm train}}={D}$")
+    for ax in (a, c):
+        ax.set_yscale("log")
+        ax.set_ylabel("gradient norm before clipping")
+    b.set_yscale("symlog", linthresh=1.0)
+    b.set_ylabel("training loss (het. NLL)")
+    ps.legend_cell(d, a, fontsize=ps.LEGEND_MIN_PT)
+    ps.save(fig, os.path.join(HERE, "figs", "restart_steps_s7"))
+
+    summ = {}
+    for arm, sw in S7_STEPS.items():
+        for D in CELLS:
+            k, T = CELLS[D]
+            tr = [s for s in steps.values() if s["sweep"] == f"dsave_{ARMS_S7[sw]}_bbx_zz_d{k}_t{T}"]
+            if tr:
+                summ[f"{arm} D={D}"] = {"n": len(tr), "nll_step0_median": float(np.median([s["loss"][0] for s in tr])),
+                                        "gn_max_0_40_median": float(np.median([max(s["grad_norm"][:41]) for s in tr]))}
+    json.dump(summ, open(os.path.join(HERE, "data", "restart_s7_summary.json"), "w"), indent=1)
+    print(json.dumps(summ, indent=1))
+
+
+ARMS_S7 = {"C'": "s7cosrerun_ft", "Oc": "s7cosstep_ft", "O": "s7optstate_ft", "W'": "s7wsdrerun_ft",
+           "Bc": "s7wsdstep_ft", "B": "s7wsdbranch_ft", "Sw": "s7wsd_scr"}
+
+
 if __name__ == "__main__":
-    main()
+    main_s7() if "--s7" in sys.argv else main()

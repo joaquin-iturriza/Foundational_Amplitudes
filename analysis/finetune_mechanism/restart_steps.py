@@ -6,6 +6,7 @@ warmup, for
     fine-tune dsave_s2_ft, C cosine parent + WSD fine-tune dsave_s5cosparent, W WSD parent + WSD fine-tune
     dsave_s5wsdparent, L C with warmup searched in [0.05, 0.6] dsave_s6cosparentlongwu) and the scratch searches
     (dsave_s2_scr, a run's own warmup from random weights as the reference), every observed trial;
+  - the restart test's searches (C', Oc, O, W', Bc, B and their WSD scratch, restart_test_readout.py);
   - the Z+ng fine-tunes (runs/kit/kit_A_ft_*: lr_scale 1, fresh optimizer, WSD, from trial 1262's best checkpoint).
 The catalog warm-start restarts are read from analysis/catalog_v4/data/ws_{restart_study,fixes}_steps.json (steps 0-40).
 lowd_ft (2026-10-25) predates train_steps.npz (0a616ed4, 2026-10-26): no per-step record.
@@ -26,7 +27,10 @@ from trial_overfit import driven_rows  # noqa: E402
 
 FIRST = 400
 CELLS = {100: (4, 4960), 316: (5, 7840), 3162: (7, 8500)}
-ARMS = {"R": "s2_ft", "C": "s5cosparent_ft", "W": "s5wsdparent_ft", "L": "s6cosparentlongwu_ft", "S": "s2_scr"}
+ARMS = {"R": "s2_ft", "C": "s5cosparent_ft", "W": "s5wsdparent_ft", "L": "s6cosparentlongwu_ft", "S": "s2_scr",
+        # the restart test's arms (restart_test_readout.py; Sw its WSD scratch)
+        "C'": "s7cosrerun_ft", "Oc": "s7cosstep_ft", "O": "s7optstate_ft", "W'": "s7wsdrerun_ft", "Bc": "s7wsdstep_ft",
+        "B": "s7wsdbranch_ft", "Sw": "s7wsd_scr"}
 
 REMOTE = r'''
 import glob, json, os, sys
