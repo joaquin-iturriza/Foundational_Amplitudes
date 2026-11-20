@@ -51,6 +51,11 @@ def test_start_weights():
             assert "model_live" in str(e)
         else:
             raise AssertionError("a checkpoint without model_live was not refused")
+        noema = os.path.join(tmp, "noema.pt")      # EMA off: "model" is the live weights, no model_live written
+        torch.save({"model": {k: torch.full_like(v, 3.0) for k, v in torch.nn.Linear(3, 2).state_dict().items()},
+                    "ema": None}, noema)
+        s = _Stub("live"); s._load_pretrained_weights(noema)
+        assert all(torch.all(v == 3.0) for v in s.model.state_dict().values()), "EMA-off live weights not loaded"
 
 
 if __name__ == "__main__":

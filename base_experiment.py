@@ -1526,11 +1526,12 @@ class BaseExperiment:
             if _ft0 is not None and str(_ft0.get("start_weights", "scored")) == "live":
                 # fine_tune.start_weights=live (plan warm_start step 14): the checkpoint's live training weights, the
                 # ones its saved optimizer state belongs to, so a branch with fine_tune.load_optimizer_state continues
-                # the parent's run itself; a checkpoint without them is refused
-                if "model_live" not in ck:
+                # the parent's run itself; an EMA checkpoint without them is refused (with EMA off "model" is live)
+                if "model_live" not in ck and (ck.get("model_is_ema") or ck.get("ema")):
                     raise RuntimeError(f"fine_tune.start_weights=live: {pretrained_path} holds no model_live")
                 state_dict, source = _ckpt_live_state(ck), "model_live"
-                LOGGER.info("Fine-tuning: the parent's live weights (model_live, fine_tune.start_weights=live)")
+                LOGGER.info("Fine-tuning: the parent's live weights (fine_tune.start_weights=live; "
+                            f"{'model_live' if 'model_live' in ck else 'model, EMA off'})")
             else:
                 state_dict, source = _ckpt_scored_state(ck, [n for n, _ in self.model.named_parameters()])
             if source == "shadow":
