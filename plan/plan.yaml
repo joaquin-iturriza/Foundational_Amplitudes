@@ -37716,9 +37716,9 @@ entries:
     - 2
   owner:
     agent: a57c4c5a332c9e185
-    state: working
+    state: stopped
     since: '2026-11-20T15:57:56+00:00'
-    state_at: '2026-11-20T15:57:56+00:00'
+    state_at: '2026-11-20T16:17:14.075000+00:00'
   findings:
   - at: '2026-11-20T03:05:23+00:00'
     text: '2026-11-20 step 1 read (restart_steps.py, plot_restart.py @a5f6c7b3; figs restart_steps, restart_steps_zng, restart_headstart):
