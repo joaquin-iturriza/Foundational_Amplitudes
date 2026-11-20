@@ -558,9 +558,46 @@ def ptdelta(data, pts):
     ps.save(fig, os.path.join(HERE, "figs", "zng_protocol_test_delta"))
 
 
+def selection(steps, out):
+    """Which validation curve picked each protocol run's checkpoint (best_step against the step of the lowest val NLL
+    and of the lowest val mu-MSE, validation k at step (k+1) x validate_every) and what it cost on val
+    MSE(log|M|^2): the MSE at the chosen checkpoint over the lowest MSE of the run -> selection.json; figure
+    zng_selection: B2's validation MSE against step per n, its chosen and its lowest-MSE checkpoints marked."""
+    sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
+    import plot_style as ps
+    ps.use()
+    d = json.load(open(steps))
+    STD = {int(k): v for k, v in json.load(open(os.path.join(HERE, "data", "zng_std.json"))).items()}
+    res = {}
+    fig, axs = ps.figure(ncols=2, nrows=2)
+    for k, v in d.items():
+        if not v["val_mse"]:
+            continue    # sweep trials (B1): heterosc_select mu_mse in sweep/sweep_config_tp_zng_hpo_<p>.yaml
+        n = next(n for n, p in PROCS.items() if f"_uq_{p}_" in k)
+        vm, vn = np.array(v["val_mse"], float) * STD[n] ** 2, np.array(v["val_nll"], float)
+        st = (np.arange(len(vm)) + 1) * v["cfg"]["validate_every"]
+        i = int(np.where(st == v["best_step"])[0][0])
+        im, inl = int(np.nanargmin(vm)), int(np.nanargmin(vn))
+        res[k] = dict(n=n, best_step=v["best_step"], step_min_nll=int(st[inl]), step_min_mse=int(st[im]),
+                      selected_by="nll" if i == inl else "mu_mse" if i == im else "neither",
+                      mse_chosen=float(vm[i]), mse_min=float(vm[im]), chosen_over_min=float(vm[i] / vm[im]))
+        if "suprio_protocol" in k:
+            ax = axs.flat[n - 1]
+            ax.plot(st, vm, color=ps.C.vermillion, label="validation")
+            ax.plot(st[i], vm[i], "o", color=ps.C.blue, label="chosen checkpoint")
+            ax.plot(st[im], vm[im], "s", color=ps.C.green, label="lowest MSE")
+            ax.set_yscale("log"); ax.set_xlabel("step"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
+            ps.process_label(ax, rf"$q\bar q\to Z+{n}g$")
+    ps.legend(axs[0][0], "lower left")
+    ps.save(fig, os.path.join(HERE, "figs", "zng_selection"))
+    json.dump(res, open(out, "w"), indent=1)
+    for k, r in res.items():
+        print(k.split("/")[-1], r["selected_by"], f"{r['chosen_over_min']:.2f}")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("cmd", choices=["collect", "plot", "summary", "parent", "b1b2", "stds", "ptdelta", "ptcollect", "stepread", "protocol_figs"])
+    ap.add_argument("cmd", choices=["collect", "plot", "summary", "parent", "b1b2", "stds", "ptdelta", "ptcollect", "stepread", "protocol_figs", "selection"])
     ap.add_argument("--site", default="ccin2p3")
     ap.add_argument("--theirs", default=os.path.join(os.environ.get("WORK", ""), "ext", "uq_runs", "runs", "prod_het"))
     ap.add_argument("--out", default=os.path.join(HERE, "data", "benchmark.json"))
@@ -578,6 +615,8 @@ def main():
         b1b2(a.curves, os.path.join(HERE, "data", "b1_search.json"))
     elif a.cmd == "protocol_figs":
         protocol_figs(os.path.join(HERE, "data", "protocol_steps.json"))
+    elif a.cmd == "selection":
+        selection(os.path.join(HERE, "data", "protocol_steps.json"), os.path.join(HERE, "data", "selection.json"))
     elif a.cmd == "stepread":
         stepread(os.path.join(HERE, "data", "protocol_steps.json"))
     elif a.cmd == "ptcollect":
