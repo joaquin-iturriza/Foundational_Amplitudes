@@ -37899,6 +37899,78 @@ entries:
       Disk under 3 GB against 40 GB free. Check 5 terms: optimizer state, load_optimizer, branched, sigma head, step-0, head
       start in results.tex (par:v4_warm_start_optstate/_fixes cited); pretrain_data_saving step 6/7; D308, D414, D423, D506,
       D511.'
+  - at: '2026-11-20T15:20:35+00:00'
+    question: 'D513 (Joaquin: ''Yes, of course I want those open points explored.''), within D511''s 100 GPU-h (~56 spent).
+      On b b~ > Z Z tree level from the held-out cosine rerun parent (dsave_parent_heldoutbbzz_cosrerun2): (1) step 2: does
+      today''s template fine-tune (D423: parent''s final post-sigma model, fresh optimizer, WSD, the s7cosrerun space) reach
+      a higher end point than WSD from scratch when both run 4x the horizon at D=316 (T=31360), i.e. do the parent''s weights
+      hold it above scratch (a/b), or do both reach the same end point (c: pretraining buys speed only)? (2) the sigma-start
+      arm (Sg): the same restart with the parent''s sigma rows of linear_out replaced by the fresh init (fine_tune.reset_sigma_head,
+      new switch @049026d4; trunk and mu row the parent''s), against today''s restart C'' (s7cosrerun) at D=100, 316, 3162:
+      does removing the parent''s sigma (the step-0 shock of the post-sigma head) keep the head start or lower the best val?
+      (3) top-up of Oc (s7cosstep) and C'' (s7cosrerun) by 4 trials per D (8->12), so the restart test''s pairs O/Oc and Oc/C''
+      reach the design''s ~20 non-blow-up trials (they fell to 15 and 16). Feeds D414/D423 (the fine-tune template restart)
+      and step 2''s question how the template keeps the pretraining''s edge.'
+    prior: '(1) par:ftm_restart_test (results.tex, @bc3b3bda; restart_test.json): no restart keeps the head start; optimizer
+      state O/Oc 4/17 vs 7/15 UNRESOLVED, B/Bc 9/23 vs 4/18 NO; snapshot Oc/C'' val 0.391 LOWER at the 0.395 bar on D=3162
+      alone; shock-free Bc (step-0 NLL 12.7, gradient norm 627, scratch 14.3) still loses it: branch (c), head start lost
+      to scratch catch-up. Best val at T(D) (restart_test.json cells): C'' 2.32e-3/3.48e-5/6.17e-6, S (WSD scratch) 2.04e-3/1.07e-5/1.64e-6
+      at D=100/316/3162, C''/S 1.14/3.27/3.76, pooled 2.42 (WITHIN 2.53): the fine-tune''s end point sits above scratch''s
+      at every D but within the search-to-search spread (two searches'' bests differ by up to 5x between seeds, results.tex
+      l.14082). (2) data saving step 6 (step6_readout.py @f073f912): head start lost at 0.16/0.10/0.08 (R), 0.33/0.14/0.82
+      (C), 0.16/0.14/0.18 (W) of the run. (3) this entry''s step 1 (finding 2026-11-20T03:05): step-0 het NLL 3558, gradient
+      norm 3.1e5 from the cosine parent vs scratch 38.6/1.4e4: the shock is the parent''s function (its sigma) on the new
+      target, present at lr 0; the sigma-start arm was the design''s branch (c) follow-up. (4) Horizon: no fine-tune vs scratch
+      comparison past T(D) on record (searched results.tex for long horizon, longer horizon, end point, speed only, 4x; plan
+      entries finetune_mechanism, pretrain_data_saving); results.tex l.13703-13743 calibrates T(D) per D at a long horizon
+      for scratch only. Decisions read: D414, D423, D511, D513, D395, D398, D372.'
+    measure: '(1) Long horizon, D=316, T=31360: best val MSE(ln|M|^2) at the best checkpoint (mu, as restart_test_readout),
+      fine-tune search best over scratch search best (F/S), against the per-cell spread bar 5 (HIGHER > 5, LOWER < 1/5, else
+      WITHIN), beside the T=7840 ratio C''/S = 3.27; secondary: the 8 trials'' non-blow-up best vals compared by one-sided
+      Mann-Whitney U (F above S at p<0.05); the head-start reads (lag of each trial against the S best curve, as restart_test_readout,
+      with share_lag_above) and the best-so-far val curves of both bests against step fraction, plotted on one log axis. (2)
+      Sigma start: the restart test''s measure for the pair Sg/C'': per non-blow-up trial lag = lost_at - warmup_frac against
+      the s7 S best, share_lag_above (lag > 0.25) against C''''s, one-sided Fisher; best val per D and pooled over 3 D against
+      2.53; step-0 het NLL and max pre-clip gradient norm over steps 0-40 (restart_steps.py) against C'' (2260/2.0e5) and
+      S (14.3). (3) Top-up: the restart test''s pairs O/Oc and Oc/C'' re-read with all trials (restart_test_readout.py, rows
+      re-read, not --cached). Figures: restart_headstart_s7 and restart_steps_s7 redrawn with Sg; a new long-horizon figure
+      (val against step fraction, both bests, both horizons).'
+    check: 'Horizon moves the end point: at T=7840, D=316, the S best''s val curve (restart_test_rows.json) falls 4.9e-6 ->
+      2.3e-6 over the last 6% of the run with its minimum at the last check, and C''''s 2.6e-5 -> 7.4e-6, minimum at the last
+      check: neither has reached its end point at T(D), so 4x T moves the measured end point of both. Sigma start moves step
+      0: the s7 step-0 reads separate by the start (C'' NLL 2260, Oc 1346, Bc 12.7, S 14.3; restart_s7_summary.json), and
+      the reset replaces exactly the row that carries the parent''s sigma (test_reset_sigma_head.py). Top-up: SE of a share
+      at 15 trials ~0.12, at 20 ~0.10 (design of the restart test).'
+    fixed: 'Configs @ the commit holding sweep/sweep_config_dsave_s8*.yaml (written by sweep/gen_data_saving.py --targets
+      bbx_zz --wsd --parent-lo ${PROJECT_DIR}/runs/data_saving/dsave_parent_heldoutbbzz_cosrerun2 --fix training.save_model_at_steps=[],
+      with --stage s8long --arms ft scr --ks 5 --horizon-factor 4, and --stage s8sigstart --arms ft --ks 4 5 7 --fix fine_tune.reset_sigma_head=true).
+      s8long_ft against s7cosrerun_ft d5: only T 7840->31360, training.lr centre 6.968e-3 -> 3.251e-3 (lr_centre(T,k), the
+      rule-2 t-axis), the DyHPO seed (name-derived) and time; s8long_scr against s7wsd_scr d5: T, lr window [2.32e-3,2.09e-2]
+      -> [1.08e-3,9.75e-3], seed, time. s8sigstart against s7cosrerun per D: only fine_tune.reset_sigma_head=true (same DyHPO
+      seed, T, lr, space). Same: parent cosrerun2 final model (model_run0_best.pt, post-sigma), recipe catalog_v4_datasaving_bbx_zz,
+      D=train_subsample, batch D/2, WSD cooldown 1/8, HETEROSC mu_mse + sigma stage, seed 42, ft space lr_scale [1/3,3] layer_decay
+      1, template ranges, 8 trials waves 3,3,2. Top-up: the committed s7cosstep/s7cosrerun configs @f3b0156d unchanged, drive.py
+      --n-trials 12 --wave-sizes 3,3,2,2,2 on their sweeps_local state (the 4 new trials guided by all 8 observed). Gate:
+      D395 smoke of s8sigstart d5 (50 steps + sigma stage, 1 GPU, scripts/job_config_smoke.sh): the log shows the sigma-row
+      reset line, step-0 het NLL far below C''''s 2260, the sigma stage and plots run.'
+    control: '(1) S at the same 4x horizon (WSD scratch, W in, same recipe, D, seed, waves); the T=7840 pair C''/S beside.
+      (2) C'' (s7cosrerun, same parent, DyHPO seed, T, space; one change: the sigma rows); S (s7wsd_scr) as the head-start
+      reference. (3) the pairs'' own arms as in the restart test.'
+    seeds: 'Run seed 42; one 8-trial DyHPO search per arm and cell as the s7 searches (D315, D439): 2 long-horizon searches
+      (16 trials) + 3 sigma-start searches (24 trials) + 6 top-up searches x 4 trials (24 trials) = 64 trials. Cost (generator
+      estimates incl. overhead): long 2 x 8 x 0.81 = 13.0 GPU-h; sigma start 6.0; top-up 4 x (0.20+0.26+0.29) x 2 = 6.0; smoke
+      0.3; total ~25.3 GPU-h, ~81 of D511''s 100 with the ~56 spent. Disk < 2 GB. Wall: long trials ~0.8 h x 3 waves ~2.6
+      h; the rest inside it; one drive.py batch per wave layout, --sites ccin2p3 lxplus jeanzay --allow-jeanzay.'
+    outcome: '(1) F/S > 5 (HIGHER) or Mann-Whitney F above S at p<0.05 with F/S above the T=7840 3.27: the parent''s weights
+      hold the fine-tune above scratch''s end point -> next (Joaquin''s step-2 branch): test (a) parent weights vs (b) the
+      fine-tune''s lr range and length (a wider lr_scale range / longer fine-tune at the same T). F/S WITHIN and Mann-Whitney
+      not significant: both reach the same end point within the spread -> (c) pretraining buys speed only; reported. F/S <
+      1/5: the fine-tune ends below scratch at long horizon: reported (the edge reappears late). (2) Sg/C'': HOLDS if share_lag_above
+      exceeds C''''s by >= 0.3 at one-sided Fisher p<0.05 -> the parent''s sigma causes the lost head start, the reset goes
+      to the template question (D423) with its val; NO within 0.2; UNRESOLVED between. Val pooled Sg/C'' LOWER < 1/2.53 ->
+      the reset helps at the best checkpoint; HIGHER > 2.53 hurts; else WITHIN. Expected from Bc (shock-free, still lost):
+      NO and WITHIN. (3) The top-up pairs re-read with the same criteria, the verdicts replaced in par:ftm_restart_test only
+      through Joaquin''s yes if one changes. Diverged trials listed apart (D398), never retried.'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
