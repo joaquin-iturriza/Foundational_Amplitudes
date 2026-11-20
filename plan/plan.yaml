@@ -37374,7 +37374,7 @@ entries:
   asks: []
   owner:
     agent: a407e0588f15adc8c
-    state: working
+    state: closed
     since: '2026-11-20T02:52:25+00:00'
     state_at: '2026-11-20T02:52:25+00:00'
     context: 268198
@@ -37583,3 +37583,43 @@ entries:
         catch-up'
   step_waits:
     '1': FA-ccin2p3-d19829fc FA-ccin2p3-48d3ee8d
+  handoff:
+    state: '2026-11-20. Step 1 done (finding 2026-11-20; plot_restart.py @a5f6c7b3, figs analysis/finetune_mechanism/figs/restart_steps,
+      restart_steps_zng, restart_headstart; captions passed check_caption): the fine-tunes'' shock is at step 0 with lr 0
+      (b b~ ZZ D=3162 het NLL 3558 / grad norm 3.1e5 from the cosine parent, 408 / 3.4e4 from the WSD parent, scratch 38.6
+      / 1.4e4; catalog restarts 4.7-23 rising to 61-631; Z+ng alike), not the restart''s lr jump. Step 2 restart test: design
+      PASSED 2026-11-20 (revised once on FIX). Two rerun parents RUNNING on CC; no search sent yet. When the parents end:
+      (1) diff each rerun config.yaml against its original (runs/data_saving/dsave_parent_heldoutbbzz[_wsd]): only training.save_model_at_steps
+      and data.internal_mass_pdgs ([23,6,25,24], D506) may differ; (2) check models/model_run0_step3458.pt (cosrerun) and
+      model_run0_step3026.pt (wsdrerun) exist and hold optimizer + model_live; (3) D395 smoke of O and B, ~50 steps + sigma
+      stage, 1 GPU; (4) one drive.py batch of the 24 s7 searches (8 trials, waves 3,3,2, --item finetune_mechanism, --sites
+      ccin2p3 lxplus jeanzay --allow-jeanzay), plan target recorded before, plan wait on them; then read with analysis/finetune_mechanism/restart_test_readout.py
+      and redraw the figures with the new arms. Arms (each 8-trial search at D=100/316/3162, seed 42): C'' s7cosrerun today''s
+      restart from the cosine rerun; Oc s7cosstep cosine rerun step 3458 live weights (pre-sigma), fresh optimizer, today''s
+      search (vs C'': the snapshot); O s7optstate = Oc + parent''s optimizer state (vs Oc: optimizer state only); W'' s7wsdrerun
+      today''s restart from the WSD rerun; Bc s7wsdstep WSD rerun step 3026 (cooldown start, lr at peak) live, fresh optimizer,
+      today''s search (vs W'': snapshot + branch point); B s7wsdbranch = Bc + optimizer state + warmup fixed 0 (vs Bc: the
+      branch continuation); S s7wsd_scr WSD scratch on the cosrerun config (W in), head-start reference; L (dsave_s6cosparentlongwu)
+      reused vs C on the original parents. Outcome: per pair HOLDS if share_lag_above (non-blow-up trials with lost_at - warmup
+      > 0.25 vs S best) exceeds the pair''s by >= 0.3 with one-sided Fisher p < 0.05; NO within +-0.2; else UNRESOLVED; best
+      lag per D a side read. Val pooled arm/pair vs 2.53: LOWER/WITHIN/HIGHER. Branches: (a) O or B LOWER -> into the fine-tune
+      template; (b) HOLDS + WITHIN -> reported, template unchanged; (c) nothing moves -> lr jump/empty optimizer ruled out;
+      Oc/C'' moving credits the step-0 sigma shock (sigma-start design next), else scratch catch-up; (d) HIGHER -> reported.
+      Diverged trials apart (D398). Cost ~51 GPU-h under D511''s 100.'
+    decisions: 'D511 go up to 100 GPU-h, owner-sized. Reviewer FIX: Oc and Bc controls added (one change per pair); S on the
+      rerun config with W (D506); HOLDS threshold set against the binomial spread (record R 1/17 vs C 5/19, ~1.5 SE). Reruns
+      follow D506 (W added), so C'' is not a replicate of step 6''s C. No sigma-reset arm added now (W''s 9x smaller shock
+      lost the head start at the same 0.14-0.18 of the run); it is branch (c)''s next design. Work item globs widened to the
+      s7 names and rerun parents.'
+    ruled_out: 'lowd_ft per-step read: runs predate train_steps.npz (0a616ed4); new long-warmup run: L exists and read branch
+      (c).'
+    running: FA-ccin2p3-d19829fc (cosine rerun parent, job_datasaving_parent.sh @f86a89b8 heldoutbbzz ++model.input_soft_eps=1e-8
+      ++model.input_pair_logs=6 ++training.save_model_at_steps=[3458] tag=cosrerun) and FA-ccin2p3-48d3ee8d (same + ++training.scheduler=WSD
+      ++training.wsd_cooldown_frac=0.125, save [3026], tag=wsdrerun), RUNNING on CC, target 1.6 h (batch ftm_parents), step
+      1 waits on both.
+    files: 'sweep configs @9e9d7d9b: sweep/sweep_config_dsave_s7{cosrerun,cosstep,optstate,wsdrerun,wsdstep,wsdbranch}_ft_bbx_zz_d{4,5,7}_*.yaml,
+      sweep_config_dsave_s7wsd_scr_bbx_zz_d{4,5,7}_*.yaml (gen_data_saving.py --ckpt/--fix @a5f6c7b3); readout analysis/finetune_mechanism/restart_test_readout.py
+      @f86a89b8 (untested on data); analysis/finetune_mechanism/restart_steps.py, plot_restart.py @a5f6c7b3, data/restart_steps.json,
+      data/restart_summary.json. Not checked: the step-0 split between sigma and mean error is inferred (the files hold no
+      step-0 mu-MSE); the parents'' step checkpoints are not yet confirmed to exist.'
+    written: '2026-11-20T03:25:14+00:00'
