@@ -37675,7 +37675,7 @@ entries:
     - 1
   owner:
     agent: acb3827e706c70d22
-    state: working
+    state: closed
     since: '2026-11-20T11:37:38+00:00'
     state_at: '2026-11-20T15:12:41.386000+00:00'
     context: 198201
@@ -37909,31 +37909,33 @@ entries:
       - 'both reach the same end point: (c), pretraining buys speed only; report'
   step_waits: {}
   handoff:
-    state: '2026-11-20 11:50. Restart test (design passed 2026-11-20): the 21 s7 searches are out as one drive.py batch (detached
-      ftm_s7_searches, pid 729952, log ~/.local/share/ccorch/detached/20261120-114841_ftm_s7_searches.log, local state sweeps_local/dsave_s7*;
-      8 trials, waves 3,3,2, --sites ccin2p3 lxplus jeanzay --allow-jeanzay; target 1.1 h for 168 trials). At launch the driver
-      was still initialising (4 of 21 sweeps_local dirs, output buffered) and site pick''s probes were timing out although
-      site list showed CC and lxplus up: the next owner first checks the log shows trials issued. Parents: cosine FA-lxplus-0ab69a57
-      (runs/data_saving/dsave_parent_heldoutbbzz_cosrerun2) and WSD FA-lxplus-c9cb19d1 (dsave_parent_heldoutbbzz_wsdrerun3),
-      both on lxplus and copied to ccin2p3; config diffs against the originals clean (internal_mass_pdgs +24, save_model_at_steps,
-      site paths); step snapshots model_run0_step3458.pt.gz / _step3026.pt.gz hold model (EMA off = live) + optimizer (32
-      states). D395 smokes clean through every stage: O FA-lxplus-8f5f5ff4, B FA-lxplus-63dabbeb (WSD, warmup 0). When the
-      batch ends: read with analysis/finetune_mechanism/restart_test_readout.py (untested on data), outcome per pair as in
-      the design, redraw restart_steps and restart_headstart with the new arms, write-up in docs/results.tex.'
-    decisions: 'D511 (go up to 100 GPU-h, owner-sized); cost so far ~51 GPU-h planned + ~5 GPU-h of parent reruns and smokes.
-      Parents rerun under new tags rather than overwriting (cosrerun2, wsdrerun3); configs repointed (f3b0156d, 10564601)
-      with nothing else changed. WSD rerun divergence (FA-lxplus-d9e44add, 50 non-finite steps at 2346) resubmitted unchanged
-      as a repair: the setup ran clean 3 of 4 times.'
-    ruled_out: 'First reruns FA-ccin2p3-d19829fc / -48d3ee8d: step checkpoints deleted by run.py promote_final_model (fixed
-      91cc8e5e). FA-lxplus-a74362e3: refused at start (existing wsdrerun2 dir); submit_guard rundir check now refuses that
-      before queueing (28055b3c, 532ff51f). tests/test_hooks_real.py 144/153 both before and after the rundir check: 9 pre-existing
-      failures (A3 dispatcher x2, B2 budget x2, B2 placement/design, B3, (b) site-gate x3), not fixed here.'
-    running: drive.py batch ftm_s7_searches (21 searches, 168 trials) on ccin2p3/lxplus(/jeanzay)
-    files: 'sweep/sweep_config_dsave_s7*_bbx_zz_d{4,5,7}_*.yaml @10564601; analysis/finetune_mechanism/restart_test_readout.py;
-      plot_restart.py, restart_steps.py; fixes: run.py promote_final_model (91cc8e5e), base_experiment.py start_weights=live
-      with EMA off (86d1fc96), scripts/job_config_smoke.sh base_config + RUN_DONE (05d09525, 10564601), .claude/hooks/submit_guard.py
-      rundir (28055b3c, 532ff51f); tests test_promote_final_model.py, test_start_weights_live.py, test_submit_rundir_check.py'
-    written: '2026-11-20T10:50:29+00:00'
+    state: '2026-11-20 15:30. Restart test done and written: par:ftm_restart_test @bc3b3bda (figs analysis/finetune_mechanism/figs/restart_headstart_s7,
+      restart_steps_s7; readout restart_test_readout.py --cached @291c08a1, plot_restart.py --s7). Branch (c): optimizer state
+      not adopted, template restart stays; cosine snapshot pair LOWER at the bar (0.391 vs 0.395, D=3162 only), WSD twin opposite;
+      WSD before-cooldown arm starts shock-free (NLL 12.7) and still loses the head start. 21/168 trials diverged (listed
+      apart, no site effect: 17% lxplus = step 6 on CC). Joaquin answered the open question ''Yes, of course I want those
+      open points explored.'' (so step 1 = run the sigma-start design and the top-up; the plan ask may still show open: mark
+      it answered) and opened step 2 (why the fine-tune does not improve below scratch''s end point). NOT yet designed (closed
+      for context): the next owner records ONE design covering (i) step 2''s first test: long-horizon fine-tune vs WSD scratch
+      at D=316 (dsave cell d5), same horizon for both, today''s template restart from the cosine rerun parent (cosrerun2)
+      and the WSD scratch base config, 8-trial DyHPO each as the s7 searches; horizon proposal 4x T=7840 = 31360 steps (scratch''s
+      s7 best at D=316 still falls through its cooldown to 1.07e-5, so T=7840 is not its end point; check it on its curve),
+      cost ~1.0 GPU-h/trial x 16 = ~17 GPU-h; (ii) the sigma-start arm: the cosine parent''s final model with its sigma head
+      re-initialised (or sigma output zeroed) so step 0 matches scratch, today''s search, D in {100,316,3162}, against C''
+      (s7cosrerun) - check that the code has a switch for it before designing; ~6 GPU-h; (iii) top-up of Oc (s7cosstep) and
+      C'' (s7cosrerun) by 4 trials per D (drive.py --n-trials 12 on the same sweeps_local state), ~5 GPU-h. Spent so far ~56
+      GPU-h of D511''s 100: (i)+(ii)+(iii) ~28 GPU-h fits. Then design-reviewer, site pick, plan target, submit with drive.py
+      --sites ccin2p3 lxplus jeanzay --allow-jeanzay.'
+    decisions: D511 (owner-sized, under 100 GPU-h total); diverged trials listed apart (D398), never retried; no pinning to
+      CC (no site effect measured); the long-warmup arm cited as WITHIN without its number (0.88 in plan finding 2026-11-13)
+      - add its src if the write-up is extended
+    ruled_out: lxplus launch/env error for the 22 failed trials (all training divergence, same torch 2.1.2+cu118 both sites);
+      the step-0 shock as the cause of the lost head start (shock-free Bc loses it too); optimizer state as a template change
+    running: none
+    files: analysis/finetune_mechanism/restart_test_readout.py, plot_restart.py, restart_steps.py, data/restart_test.json,
+      data/restart_s7_summary.json, data/restart_test_rows.json (cache), data/restart_steps.json (cache); sweep/sweep_config_dsave_s7*_bbx_zz_d{4,5,7}_*.yaml
+      @10564601; sweeps_local/dsave_s7*; docs/results.tex par:ftm_restart_test
+    written: '2026-11-20T15:13:15+00:00'
   ask: 'Scope: dropping the design''s pre-registered next step (a sigma-start design) and the top-up of two arms below the
     design''s trial count. The restart test reads branch (c): the parent''s optimizer state does not keep the head start or
     lower validation, so the fine-tune template''s restart stays. The branch says a sigma-start design comes next if the snapshot
