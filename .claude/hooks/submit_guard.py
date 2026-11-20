@@ -693,7 +693,7 @@ def _site_path_exists(site, path):
                             % shlex.quote(path)], capture_output=True, text=True, timeout=100)
     except (OSError, subprocess.TimeoutExpired):
         return None
-    out = p.stdout + p.stderr
+    out = {l.strip() for l in (p.stdout + p.stderr).splitlines()}    # whole lines: `site run` echoes the command
     return True if "RUNDIR_EXISTS" in out else False if "RUNDIR_FREE" in out else None
 
 
