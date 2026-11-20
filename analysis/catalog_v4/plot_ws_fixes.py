@@ -12,7 +12,7 @@ its cooldown on share 0.25 or 0.50, the WSD parent's final model at the default 
 Usage: python3 analysis/catalog_v4/plot_ws_fixes.py [--cached]
     -> figs/ws_fixes.{png,pdf}, data/ws_fixes_steps.json (per-step grad norm, loss and lr from CC)
        python3 analysis/catalog_v4/plot_ws_fixes.py --s15
-    -> figs/ws_wsd_match_{a..e}.{png,pdf}: step 15 (mixture_ab.S15, data/warm_start_S15.json): (a) validation loss of the
+    -> figs/ws_wsd_match.{png,pdf}: step 15 (mixture_ab.S15, data/warm_start_S15.json): (a) validation loss of the
     from-scratch runs (B cosine, B under WSD) over their 4264 steps; (b) validation loss of the WSD warm starts over
     their 533 steps; (c) R(arm/B_wsd) on PP4 and EE4 with the widened intervals and the 1.35 bar; (d, e) per-class MSE
     CDFs on PP4 and EE4, every model after its sigma stage (D276)."""
@@ -29,13 +29,13 @@ from mixture_ab import S14, S15, class_of  # noqa: E402
 from plot_warm_start_compare import class_mse, curve  # noqa: E402
 
 # (label, S14 key, run dir under runs/catalog_v4_short, colour, steps of the main stage)
-ARMS = [("default restart (control)", "control", "v4_het_wsx_default_rerun", ps.C.blue, 533),
+ARMS = [("restart (control)", "control", "v4_het_wsx_default_rerun", ps.C.blue, 533),
         ("shrink and perturb", "shrinkperturb", "v4_het_wsx_shrinkperturb_tagfix1", ps.C.vermillion, 533),
         ("share 0.50, 267 steps", "share50_k267", "v4_het_wsx_share50_k267", ps.C.sky, 267),
         ("share 0.50, 533 steps", "share50_k533", "v4_het_warm50_k533", ps.C.green, 533),
-        ("branch, 0.25", "wsdbranch25", "v4_het_wsx_wsdbranch25", ps.C.orange, 533),
-        ("branch, 0.50", "wsdbranch50", "v4_het_wsx_wsdbranch50", ps.C.purple, 533),
-        ("WSD final, default restart", "wsdfinal_default", "v4_het_wsx_wsdfinal_default", ps.C.grey, 533)]
+        ("WSD parent, branch, share 0.25", "wsdbranch25", "v4_het_wsx_wsdbranch25", ps.C.orange, 533),
+        ("WSD parent, branch, share 0.50", "wsdbranch50", "v4_het_wsx_wsdbranch50", ps.C.purple, 533),
+        ("WSD parent, restart", "wsdfinal_default", "v4_het_wsx_wsdfinal_default", ps.C.grey, 533)]
 RUN = {k: (S14["control"] if k == "control" else S14["arms"][k]) for _, k, _, _, _ in ARMS}
 DIRS = {RUN[k]: f"runs/catalog_v4_short/{d}" for _, k, d, _, _ in ARMS if RUN[k]}
 SCRIPT = r'''
@@ -71,7 +71,7 @@ def main():   # dup-ok: one run per arm (seed 42 only), per-arm main-stage lengt
         aG.plot(np.arange(len(gn)), gn, color=col, label=lab)
         aL.plot(np.arange(SMOOTH - 1, n_main), lm, color=col)
         s, v = curve(r)
-        aV.plot(s, v, color=col)
+        aV.plot(s, np.minimum(v, 0.5), color=col)   # excursions above 0.5 drawn at the edge
         short[k] = {"run": r, "grad_max_0_19": float(gn[:20].max()), "loss_0": float(lo[0]),
                     "loss_max_0_39": float(lo[:40].max()), "loss_rise_0_39": float(lo[:40].max() - lo[0]),
                     "loss_median_last50": float(np.median(lo[n_main - 50:n_main])),
@@ -85,7 +85,7 @@ def main():   # dup-ok: one run per arm (seed 42 only), per-arm main-stage lengt
         row = s14["arms"].get(k)
         if k != "control" and row and row.get("PP4"):
             j = len(ticks) + 1
-            ticks.append(lab.replace("default restart", "restart"))
+            ticks.append(lab)
             for dx, axis, mk in ((-0.12, "PP4", "o"), (0.12, "EE4", "s")):
                 rv, (l, h) = row[axis]["R"], row[axis]["widened"]
                 aR.errorbar([j + dx], [rv], yerr=[[rv - l], [h - rv]], color=col, marker=mk, ls="none", capsize=2)
@@ -93,42 +93,45 @@ def main():   # dup-ok: one run per arm (seed 42 only), per-arm main-stage lengt
         m, _ = class_mse((S14["B"][axis],), axis, cls)
         a.step(m, np.arange(1, len(m) + 1) / len(m), where="post", color="k", ls=":")
         out[f"B {axis} median class MSE"] = float(np.median(m))
-    aG.plot([], [], "k:", label="share 0.25 from scratch")
+    aG.plot([], [], "k:", label="from scratch, share 0.25")
     aR.plot([], [], "ko", ls="none", label="pp")
     aR.plot([], [], "ks", ls="none", label=r"$e^+e^-$")
-    aR.axhline(1, color=ps.C.grey, lw=0.8)
-    aR.set_xticks(range(1, len(ticks) + 1)); aR.set_xticklabels(ticks, fontsize=6, rotation=35, ha="right")
-    aR.set_ylabel("MSE(arm) / MSE(default restart)")
+    aR.axhline(1, color=ps.C.blue, ls=":", label="equal to restart (control)")
+    aR.set_xticks([]); aR.set_xlabel("warm start (colour)")   # arms named by colour in the legend: no rotated ticks
+    aR.set_ylabel("MSE(arm) / MSE(restart)")
     aG.set_yscale("log"); aG.set_xlabel("step of the restart"); aG.set_ylabel("gradient norm")
     aL.set_xlabel("step of the restart"); aL.set_ylabel("training loss (het. loss)")
     vmin = min(float(curve(RUN[k])[1].min()) for _, k, _, _, _ in ARMS if RUN[k] and RUN[k] in g)
     aV.set_ylim(vmin - 0.1, 0.5)
     aV.set_xlabel("step of the restart"); aV.set_ylabel("validation loss (het. loss)")
     for a, w in ((aP, "pp"), (aE, r"$e^+e^-$")):
-        a.set_xscale("log"); a.set_xlabel(w + r" classes: MSE of $\log|M|^2$"); a.set_ylabel("fraction of classes")
-        a.set_ylim(0, 1)
-    ps.shared_legend(fig, aG, ncol=3)
+        a.set_xscale("log"); a.set_xlabel(w + r" classes: MSE$(\log|\mathcal{M}|^2)$")
+        a.set_ylabel("fraction of classes"); a.set_ylim(0, 1)
+    ps.legend(aG, "upper right", ncol=2)
     ps.legend(aR, "upper left")
     ps.save(fig, os.path.join(HERE, "figs", "ws_fixes"))
     print(json.dumps(out, indent=0))
     print(json.dumps(short))
 
 
-S15_ARMS = [("restart, 0.50", "wsdfinal_default50", ps.C.green),
-            ("branch, 0.50", "wsdbranch50", ps.C.purple),
-            ("restart, 0.25", "wsdfinal_default", ps.C.grey),
-            ("branch, 0.25", "wsdbranch25", ps.C.orange)]
+S15_ARMS = [("WSD parent, restart, share 0.50", "wsdfinal_default50", ps.C.green),
+            ("WSD parent, branch, share 0.50", "wsdbranch50", ps.C.purple),
+            ("WSD parent, restart, share 0.25", "wsdfinal_default", ps.C.grey),
+            ("WSD parent, branch, share 0.25", "wsdbranch25", ps.C.orange)]
+
+
+VTOP = -1.5   # top of the validation-loss panels: the early pretraining (and B's spike near step 100) sits above it
 
 
 def main_s15():
     cls = class_of()
     s15 = json.load(open(os.path.join(HERE, "data", "warm_start_S15.json")))
-    (fS, aS), (fW, aW), (fR, aR), (fP, aP), (fE, aE) = ps.panels(5)
+    fig, ((aS, aW), (aR, aX), (aP, aE)) = ps.figure(ncols=2, nrows=3)
     out = {}
-    for key, lab, run, col, ls in (("B_cosine", "scratch, cosine", S14["B"]["PP4"], "k", ":"),
-                                   ("B_wsd", "scratch, WSD", S15["B_wsd"], ps.C.blue, "-")):
+    for key, lab, run, col, ls in (("B_cosine", "from scratch, cosine", S14["B"]["PP4"], "k", ":"),
+                                   ("B_wsd", "from scratch, WSD", S15["B_wsd"], ps.C.blue, "-")):
         st, v = curve(run)
-        aS.plot(st, v, color=col, ls=ls, label=lab)
+        aS.plot(st, np.minimum(v, VTOP), color=col, ls=ls, label=lab)   # values above VTOP drawn at the edge
         out[key] = {"val_best": round(float(v.min()), 4)}
         for a, axis in ((aP, "PP4"), (aE, "EE4")):
             m, _ = class_mse((S14["B"][axis] if key == "B_cosine" else run,), axis, cls)
@@ -149,21 +152,18 @@ def main_s15():
             rv, (l, h) = row[axis]["R"], row[axis]["widened"]
             aR.errorbar([j + dx], [rv], yerr=[[rv - l], [h - rv]], color=col, marker=mk, ls="none", capsize=2)
         ticks.append(lab)
-    aR.axhline(1, color=ps.C.grey, lw=0.8); aR.axhline(1.35, color=ps.C.vermillion, lw=0.8, ls="--")
+    aR.axhline(1, color=ps.C.blue, ls=":", label="equal to from scratch, WSD"); aR.axhline(1.35, color=ps.C.vermillion, ls="--")
     aR.plot([], [], "ko", ls="none", label="pp"); aR.plot([], [], "ks", ls="none", label=r"$e^+e^-$")
-    aR.set_xticks(range(1, len(ticks) + 1)); aR.set_xticklabels(ticks, fontsize=6, rotation=35, ha="right")
-    aR.set_ylabel("MSE(warm start) / MSE(WSD from scratch)")
+    aR.plot([], [], color=ps.C.vermillion, ls="--", label="MATCH bar 1.35")
+    aR.set_xticks([]); aR.set_xlabel("warm start (colour)")   # arms named by colour in the legend: no rotated ticks
+    aR.set_ylabel("MSE(warm start) / MSE(from scratch, WSD)")
     for a, n in ((aS, "step of the pretraining"), (aW, "step of the warm start")):
-        a.set_xlabel(n); a.set_ylabel("validation loss (het. loss)"); a.set_ylim(-3.0, -1.5)
+        a.set_xlabel(n); a.set_ylabel("validation loss (het. loss)"); a.set_ylim(-3.0, VTOP)
     for a, w in ((aP, "pp"), (aE, r"$e^+e^-$")):
-        a.set_xscale("log"); a.set_xlabel(w + r" classes: MSE of $\log|M|^2$"); a.set_ylabel("fraction of classes")
-        a.set_ylim(0, 1)
-    for a in (aS, aW):
-        ps.legend(a, "upper right")
-    ps.legend(aR, "upper left")
-    for a in (aP, aE):   # the classes' curves leave the upper left empty; the legend must not move the axis
-        ps.legend(a, "upper left"); a.set_ylim(0, 1)
-    ps.save_panels([fS, fW, fR, fP, fE], os.path.join(HERE, "figs", "ws_wsd_match"))
+        a.set_xscale("log"); a.set_xlabel(w + r" classes: MSE$(\log|\mathcal{M}|^2)$")
+        a.set_ylabel("fraction of classes"); a.set_ylim(0, 1)
+    ps.legend_cell(aX, [aS, aW, aR], fontsize=ps.LEGEND_MIN_PT)   # nine entries in one cell
+    ps.save(fig, os.path.join(HERE, "figs", "ws_wsd_match"))
     print(json.dumps(out))
 
 
