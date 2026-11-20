@@ -37339,3 +37339,31 @@ entries:
       if:
       - 'write-up passes the claims check: plan done with the write-up commit'
       - 'a claim does not reproduce: fix the number at its source tool and redo the paragraph'
+- id: finetune_mechanism
+  title: Why fine-tuning loses its head start
+  question: Does the restart of a converged parent (full lr, fresh optimizer) destroy a fine-tune's head start, and does a
+    restart that avoids the jump (WSD parent branched before its cooldown with its optimizer state; restart with the parent's
+    optimizer state; low peak lr with a long warmup) keep it?
+  status: running
+  quotes:
+  - said_at: '2026-11-20T02:50:59.573000+00:00'
+    text: Open it, size it reasonably and send the jobs right away, don't ask me for permission, I'm giving it ahead of time,
+      unless you propose something over 100h, but that would be stupid so you wont do that.
+    decision: D511
+    covers:
+    - finetune_mechanism
+  decisions:
+  - D511
+  next: 'Evidence from existing runs (no jobs): first steps of each fine-tune''s loss and gradient norm against the warm-start
+    restarts (data saving step 6, lowd_ft, Z+ng fine-tunes), and fine-tuned against from-scratch per D; then one test on b
+    b~ -> ZZ at D=100,316,3162: today''s restart against the three jump-free restarts, matched from-scratch control; design
+    review; submit within the go (up to 100 GPU-h)'
+  done_when: null
+  notes_ref: null
+  match: dsave_ftmech_*,ftmech_*
+  evidence:
+    runs: []
+    commit: null
+    paths: []
+  dead_ends: []
+  asks: []
