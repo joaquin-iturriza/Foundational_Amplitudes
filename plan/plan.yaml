@@ -36877,6 +36877,15 @@ entries:
       1/3). Test median |Delta| (seed 42): 0.141, 0.072, 0.136, 0.114; test G 1.23. Design read: G unresolved; no single ingredient
       of Suprio''s protocol carries an edge at 1e4; the best cell is ours (MuonAdamW+WSD) at batch 128, 2.9x below Adam at
       128 on val, 1.6x on test. All chosen trials flagged (0/32 pass the curve test). B1/B2 at 5e5 sit 30-60x lower.'
+  - at: '2026-11-20T15:15:52+00:00'
+    text: '2026-11-20 step 4 sized (estimate, upper bound): ladder+star fine-tunes from the W parent at half lr (FA-ccin2p3-47e14eae),
+      one run per cell at the parent''s HPs (job_kit.sh A_ft path), 9 D (10^2, 10^2.5, ..., 10^5.5, 5e5) x 4 n = 36 runs,
+      steps per D as the high-multiplicity grid (2816, 4576, 8000 at D <= 1e3; 32000 above). Rate: 0.59 s/step, B1''s measured
+      Z+4g rate at batch 16384 under the current setup (the only measured rate of this setup on their data; lower n and full
+      batches below 16384 are cheaper, not measured). Per n <= 2.5 h (3 small D) + 6 x 5.24 h = 34 GPU-h; Z+4g only <= 34
+      GPU-h, all four n <= 136 GPU-h. Comparison gap: the existing from-scratch results on their data are at D = 5e5 only
+      (the earlier 8 runs, B1, B2) and at D = 1e4 for Z+4g only (D507, 1953/31250 steps), so at the other 7 D values the fine-tunes
+      have no scratch reference.'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
