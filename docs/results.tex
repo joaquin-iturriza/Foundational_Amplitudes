@@ -3692,8 +3692,8 @@ matches the change from scratch under the same schedule is not yet read.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.8\linewidth]{../analysis/catalog_v4/figs/ws_fixes.pdf}
-% src: python3 analysis/catalog_v4/plot_ws_fixes.py --cached @1e7042dd
+\includegraphics{../analysis/catalog_v4/figs/ws_fixes.pdf}
+% src: python3 analysis/catalog_v4/plot_ws_fixes.py --cached @c6e489b4
 \caption{Warm-start mechanisms toward the C1 change at $k=533$, seed $42$, colour per arm. Top left: gradient norm
 before clipping against the restart's step, steps $0$ to $40$. Top right: training loss (het NLL per batch), a running
 median over $25$ steps. Middle left: validation loss of the main stage (het NLL);
@@ -3805,12 +3805,8 @@ only. Testing the other changes with this recipe waits on lifting D307.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.49\linewidth]{../analysis/catalog_v4/figs/ws_wsd_match_a.pdf}\hfill
-\includegraphics[width=0.49\linewidth]{../analysis/catalog_v4/figs/ws_wsd_match_b.pdf}\\[1ex]
-\includegraphics[width=0.49\linewidth]{../analysis/catalog_v4/figs/ws_wsd_match_c.pdf}\hfill
-\includegraphics[width=0.49\linewidth]{../analysis/catalog_v4/figs/ws_wsd_match_d.pdf}\\[1ex]
-\includegraphics[width=0.49\linewidth]{../analysis/catalog_v4/figs/ws_wsd_match_e.pdf}
-% src: python3 analysis/catalog_v4/plot_ws_fixes.py --s15 @265f3bbf
+\includegraphics{../analysis/catalog_v4/figs/ws_wsd_match.pdf}
+% src: python3 analysis/catalog_v4/plot_ws_fixes.py --s15 @c6e489b4
 \caption{The WSD warm starts against the C1 change pretrained from scratch under the same WSD schedule, seed $42$.
 (a) Validation loss (het NLL) of the change from scratch over its pretraining, cosine (B, dotted) and WSD
 (B\textsubscript{WSD}). (b) Validation loss of the four WSD warm starts over their $533$ steps: the WSD parent's final
