@@ -15796,8 +15796,6 @@ entries:
     22: 'Open to Joaquin (asked 2026-11-19): (1) the lxplus GPU-h costing fix in site/site_gate.py, refused by the permission
       classifier; (2) the CLAUDE.md line-24 rewording (drop ''objective''; ''a repair that keeps the setup I asked for''),
       which blocks the claudemd-keeper pass. Then continue the claudemd-keeper on f49a6b45 and e4e655fa.'
-    23: 'Asked Joaquin 2026-11-19: (a) debounce RUN and OVERRUN events in the 10-min batch (changes D324''s kinds); (b) raise
-      OVERRUN only after a job waits longer than site pick predicted'
     24: 'Wake measure after RUN/OVERRUN joined the 10-min debounce (2026-11-19): on or after 2026-11-22 re-run tools/wake_batching.py
       over the 3 days since, against the after-period of step 21; report to Joaquin with its figure, then he decides on owners
       as separate sessions'
@@ -16371,11 +16369,6 @@ entries:
       if:
       - 'he says yes to a change: a mechanical-worker or he applies it, then the reviewer re-checks'
       - 'he says leave it: record his words, the reviewer re-checks with line 24 as is'
-    23:
-      feeds: which event kinds wake the main session at once
-      if:
-      - 'yes: a mechanical-worker changes site events --debounce kinds and the overrun check, tested'
-      - 'no: kept as is, recorded'
     24:
       feeds: 'whether owners move to separate sessions (Joaquin: decide after measuring)'
       if:
@@ -16393,7 +16386,6 @@ entries:
     '17': 'the first real idle moment: plan next listing RESUME/LAUNCH with no FA job live; the supervisor''s own STALLED
       idle: event (or its absence after 45 min) is the trigger'
     '22': '2026-11-20'
-    '23': '2026-11-20'
     '24': '2026-11-22'
     '28': the main session's go after this owner's 2026-11-19 report (an interactive terminal session with Code Mode on must
       be started by hand)
