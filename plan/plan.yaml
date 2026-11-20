@@ -36083,6 +36083,33 @@ entries:
       validation (the retrain''s own run; limit 12 h), one GPU on lxplus: ~8 GPU-h, plus the CC re-read (~0.5 GPU-h). Disk
       ~0.2 GB run dir on EOS. The launch path ran end to end in FA-lxplus-57f6d2cb (no smoke, D395). Not submitted while every
       site is unreachable (2026-11-20).'
+    fix_at: '2026-11-20T02:00:08+00:00'
+    fix: 'Outcome (check 4): the branches do not cover the likeliest result. YES needs stability AND the curve test passing
+      AND gmean <= 1.5x the first parent AND u d~ -> e+ nu g <= 0.45; STABLE BUT WORSE needs gmean > 1.5x; NO needs instability.
+      The stable control itself, the first parent FA-lxplus-00347f0a, FAILED the curve test (separation 2.26, end_up 0.77),
+      so ''stable, gmean <= 1.5x, curve test fails'' (or u d~ -> e+ nu g > 0.45) has no branch and no stated consequence.
+      Fix: make the branches a partition (stability first; then accuracy with and without the curve test; then the e+ nu g
+      level) and say what each changes for the entry, in particular whether a stable run that fails the curve test like the
+      first parent can still be stage 2''s parent. Also state the stable-phase loss criterion''s tolerance: the first parent
+      only just meets ''no rise above its 1/8-run value'' (-3.10 at step ~6400, stable-phase values up to -3.11/-3.12, parent_stab.json),
+      so the bar as written sits at its noise. Seeds (check 3): the 1.5x unresolved band on the geometric-mean val MSE cites
+      no measured spread. Cite one (e.g. the catalog_v4 per-class seed spread 0.10-0.14 decades, results.tex near line 4491,
+      or another measured for this kind of read) and set the band against it; the stability read (median grad norm 1e2-5e3
+      vs up to 2e6, 0 vs 24 non-finite steps) is far above any spread and is fine. Time (check 15): the 0.4087 s/step rate
+      is the first parent''s (no W, 200-event validation); the exact setup, the W retrain FA-lxplus-57f6d2cb, ran 30928 s
+      = 8.6 h on lxplus (registry submitted/finished; smoke 0.535 s/step). Take the wall-time target and the GPU-h from that
+      run. Run directory: job_datasaving_parent.sh writes runs/data_saving/dsave_parent_finale${TAG}; the first parent used
+      tag zng_uq and the W retrain zng_uq_w. The design must name a new descriptive tag (e.g. tag=zng_uq_w_lr1p89e-3) so neither
+      costly run directory is overwritten, and the exact submit line (lr=1.89e-3 tag=...). Disk (check 14): read lxplus free
+      disk at submission (run dir ~0.2 GB, in memory, no cache: fine otherwise). Passed: one change (lr 3.78e-3 -> 1.89e-3;
+      script diff 8596c289..72cba9e8 only adds the W list the retrain passed as an argument plus the mixed-generation guard;
+      the t t~ V val rebuild is stated), measure moves (parent_stab.json: median grad norm max 5.4e3 vs 2.1e6, non-finite
+      0 vs 24; parent_reread.json gmean 9.6e-5 vs 3.9e-4), loss HETEROSC and target per D487, whole val pools as both controls,
+      controls reused, not a repeat (searched results.tex: internal_mass_pdgs, W column, offshW, peak lr, non-finite, unstable,
+      dsave_parent; plan dead ends; decisions D241, D487, D492, D506: only the 1000-step offshW2 catalog run with W, no instability
+      reported, no W parent at another lr). D241: one run at one changed lr as a stability repair is not an HP search; the
+      main session''s relay is not Joaquin''s yes, but CLAUDE.md lets a repair within scope be tried; question (A) to Joaquin
+      stays open and should be updated when this runs.'
   step_why:
     17:
       feeds: whether a ladder+star parent with the W column trains stably and can be stage 2's parent
