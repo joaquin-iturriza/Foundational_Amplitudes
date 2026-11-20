@@ -36403,8 +36403,7 @@ entries:
       - 'G >= 3: decompose by the batch and optimiser ratios, write up'
       - 'G < 3: no edge at 1e4 events, write it up, nothing more run'
   step_waits:
-    '17': '2026-11-20T12:00 the sites: lxplus (2FA ssh master, Joaquin''s) and CC unreachable at 2026-11-20; design passed,
-      submit when one answers'
+    '17': FA-ccin2p3-94c78e94
     '18': 2026-11-20T12:00 the sites, all unreachable 2026-11-20; design passed 2026-11-20, configs @4ec4caf1; then the D395
       smoke of the Adam sweep path and the four sweeps
   findings:
