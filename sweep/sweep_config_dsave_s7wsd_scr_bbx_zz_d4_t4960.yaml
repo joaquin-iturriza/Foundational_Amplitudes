@@ -9,7 +9,7 @@ cluster:
   time: 00:12:00
 paths: null
 sweep_name: dsave_s7wsd_scr_bbx_zz_d4_t4960
-base_config: ${PROJECT_DIR}/runs/data_saving/dsave_parent_heldoutbbzz
+base_config: ${PROJECT_DIR}/runs/data_saving/dsave_parent_heldoutbbzz_cosrerun
 n_trials: 8
 dyhpo:
   surrogate: gp
@@ -40,6 +40,7 @@ fixed_params:
   fine_tune.pretrained_path: 'null'
   training.scheduler: WSD
   training.wsd_cooldown_frac: 0.125
+  training.save_model_at_steps: []
 range_extension:
   enabled: false
 search_space:
