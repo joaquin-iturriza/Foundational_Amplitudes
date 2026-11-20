@@ -443,6 +443,7 @@ class Popen(_popen):
         super().__init__(_wrap(args), *a, **k)
 subprocess.run, subprocess.Popen = run, Popen
 sys.argv = [%(scen)r]
+sys.path.insert(0, os.path.dirname(%(scen)r))
 runpy.run_path(%(scen)r, run_name="__main__")
 '''
 
@@ -850,12 +851,12 @@ def submit_budget():
     open(cpu, "w").write("#!/bin/bash\n#SBATCH --cpus-per-task=16\npython tools/lhe_parts.py work\n")
     db = os.path.join(d, "runs.db")
     c = sqlite3.connect(db)
-    c.execute("CREATE TABLE runs (id TEXT, project TEXT, site TEXT, item TEXT, est_gpu_hours REAL, submitted INTEGER)")
+    c.execute("CREATE TABLE runs (id TEXT, project TEXT, site TEXT, item TEXT, est_gpu_hours REAL, submitted INTEGER, state TEXT, running_seen INTEGER)")
     c.execute("CREATE TABLE items (project TEXT, id TEXT, est_gpu_hours REAL)")
     import time as _t
     c.executemany("INSERT INTO items VALUES ('FA', ?, ?)", [("small", 20), ("approved", 35), ("split", None),
                                                            ("jz", None), ("cpu", None)])
-    c.execute("INSERT INTO runs VALUES ('FA-ccin2p3-00000001', 'FA', 'ccin2p3', 'split', 20, ?)", (int(_t.time()) - 1800,))
+    c.execute("INSERT INTO runs VALUES ('FA-ccin2p3-00000001', 'FA', 'ccin2p3', 'split', 20, ?, 'RUNNING', 1)", (int(_t.time()) - 1800,))
     c.commit()
     env = dict(_guard_env(d), SUBMIT_ONLY="budget", SUBMIT_RUNS_DB=db)
     sub = lambda cmd: _rc([sys.executable, os.path.join(HOOKS, "submit_guard.py")],
@@ -936,6 +937,7 @@ class Popen(_popen):
         super().__init__(_wrap(args, k), *a, **k)
 subprocess.run, subprocess.Popen = run, Popen
 sys.argv = [%(scen)r]
+sys.path.insert(0, os.path.dirname(%(scen)r))
 import importlib.util
 spec = importlib.util.spec_from_file_location("scen", %(scen)r)
 t = importlib.util.module_from_spec(spec); spec.loader.exec_module(t)
@@ -970,12 +972,7 @@ def submit_scenarios():
 
 
 def review_merged():
-    """B3: lock_guard's and reviewer_resume's scenarios against review_guard.py; one reviewer per backlog."""
-    diff, n, same_n = scenarios_mapped({"lock_guard.py": ["review_guard.py", ""],
-                                        "reviewer_resume.py": ["review_guard.py", ""]},
-                                       ["command_reading", "reviewer_resume"])
-    scenario("B3: %d scenarios of lock_guard and reviewer_resume: the same results against review_guard.py" % n,
-             n > 10 and same_n and not diff, diff[:5])
+    """B3: one reviewer per backlog (lock_guard.py and reviewer_resume.py were merged into review_guard.py and removed in 4550ed8c)."""
     d = tempfile.mkdtemp(prefix="rg_")
     st = os.path.join(d, ".claude", ".review_state")
     os.makedirs(st)
