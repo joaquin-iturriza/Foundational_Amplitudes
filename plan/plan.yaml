@@ -36540,7 +36540,9 @@ entries:
       1.15-1.74x as the replacement bar, three-seed means after. Check 5 searched: results.tex tp_zng_d1e4, extend_sweep,
       d507, 1e4 training events; site decisions batch, extend, zng (D429 is the same 8-to-16 extension on another entry; no
       earlier extension of these searches).'
-  step_waits: {}
+  step_waits:
+    '3': sweeps lxplus:tp_zng_d1e4_muon_b2048_zgggg, tp_zng_d1e4_muon_b128_zgggg, tp_zng_d1e4_adam_b2048_zgggg, tp_zng_d1e4_adam_b128_zgggg
+      (8 new trials each)
   findings:
   - at: '2026-11-17T11:18:43+00:00'
     text: 'Their numbers: the UQ repo (branch uq, 311 files) holds no figures, preds or result files. arXiv:2505.20280''s
