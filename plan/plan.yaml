@@ -37553,6 +37553,16 @@ entries:
       scratch catch-up: reported. (d) HIGHER -> that restart hurts: reported. Beside: step-0 NLL and gradient norm per arm
       (Oc/O/Bc/B expected to differ from C''/W'' if the post-sigma head makes the shock), S vs stage-2 cosine scratch. Diverged
       trials listed apart (D398).'
+    passed_at: '2026-11-20T03:11:40+00:00'
+    reviewer: 'Re-check after FIX at 9e9d7d9b. Pairs diffed at each D: Oc vs O differ only in load_optimizer_state. Bc vs
+      B differ in optimizer state and warmup fixed at 0 (stated as the branch continuation). Bc vs W'' differ in the step-3026
+      live checkpoint (snapshot and branch point, stated). S is based on the cosine rerun config (W in, D506), WSD, save [].
+      Check 2: restart_summary.json step-0 NLL 3558/408, gradient norm 3.1e5/3.4e4; catalog jump 631->79. Check 3: step6_readout.json
+      R 1/17 against C 5/19 (about 1.5 SE), now stated. HOLDS needs a gap of 0.3 or more with one-sided Fisher p<0.05 (8/20
+      vs 2/20 gives p about 0.03), no within 0.2, UNRESOLVED between. Val bar 2.53. Cost about 51 GPU-h under D511''s 100.
+      Disk under 3 GB against 40 GB free. Check 5 terms: optimizer state, load_optimizer, branched, sigma head, step-0, head
+      start in results.tex (par:v4_warm_start_optstate/_fixes cited); pretrain_data_saving step 6/7; D308, D414, D423, D506,
+      D511.'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
