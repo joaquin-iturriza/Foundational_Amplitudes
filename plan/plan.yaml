@@ -34548,7 +34548,11 @@ entries:
   - D485
   - D492
   - D508
-  next: null
+  next:
+    2: 'Stage 2 (D482 part 2, D483 up to 5e5, D487 retrained parent): the ladder+star parent with the W at half the peak lr
+      (FA-ccin2p3-47e14eae) fine-tuned against the same network from scratch (searched) on Z+1..4g at D_train 10^2..10^5.5
+      and 5e5, under the canonical setup; design, reviewer, generator, smoke, submit; earlier design''s estimate ~650-850
+      GPU-h'
   done_when: null
   notes_ref: null
   match: zng_uq_*,tp*_zng_*
@@ -36921,6 +36925,14 @@ entries:
       tools/zero_shot_eval.py, tools/sigma_stage.py and others; kit_predict.py:74 reads only target_over_born, harmless):
       a run copied between sites fails there on /eos or /sps paths.'
     written: '2026-11-20T11:06:05+00:00'
+  step_why:
+    2:
+      feeds: how many target events the retrained ladder+star pretraining saves on Z+ng, and whether the gain vanishes at
+        large D as on u u~ -> Z+4g
+      if:
+      - 'gain > +0.3 dex at small D falling below 0.2 dex at D >= 1e4: the u u~ -> Z+4g picture holds on their data'
+      - 'gain > +0.3 dex persisting at D >= 10^4.5: the pretraining still saves data at their scale'
+      - 'gain < -0.3 dex: it costs, stated with D'
 - id: dan_zeroshot_v4
   title: Catalog_v4 pretraining zero-shot on Daniel's held-out split
   question: How does our best catalog_v4 pretraining (trial 1262) do zero-shot on the held-out processes of Daniel's catalog
