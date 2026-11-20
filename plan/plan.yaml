@@ -33782,7 +33782,7 @@ entries:
     since: '2026-11-20T01:50:53+00:00'
     state_at: '2026-11-20T01:50:53+00:00'
   step_waits:
-    '3': '2026-11-20: next draft round'
+    '3': '2026-12-15: deferred, marked for later on 2026-11-17; no run'
     '4': the next owner (previous closed at its context limit, hand-off written)
   findings:
   - at: '2026-11-13T02:46:58+00:00'
