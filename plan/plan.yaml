@@ -36823,12 +36823,6 @@ entries:
     units: null
     start: '2026-11-19T09:05:19+00:00'
     at: '2026-11-19T09:05:19+00:00'
-  - batch: w_parent_lr1p89e-3
-    wall_h: 9.0
-    jobs: 1
-    units: null
-    start: '2026-11-20T02:38:24+00:00'
-    at: '2026-11-20T02:38:24+00:00'
   - batch: d507_smoke50
     wall_h: 0.5
     jobs: 1
@@ -36841,6 +36835,12 @@ entries:
     units: null
     start: '2026-11-20T03:58:01+00:00'
     at: '2026-11-20T03:58:01+00:00'
+  - batch: w_parent_lr1p89e-3
+    wall_h: 9.0
+    jobs: 1
+    units: null
+    start: '2026-11-20T03:58:07+00:00'
+    at: '2026-11-20T03:58:07+00:00'
   handoff:
     state: '2026-11-20 ~03:45 UTC. D506 done in code @72cba9e8 (internal_mass_pdgs default [23,6,25,24], init_data load check,
       generators and job_datasaving_parent.sh). W parent rerun at peak lr 1.89e-3 submitted on CC (FA-ccin2p3-94c78e94, design
