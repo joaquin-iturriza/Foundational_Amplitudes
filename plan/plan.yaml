@@ -36730,6 +36730,16 @@ entries:
       pool it loaded (momenta+PDG, float64, rounded 1e-9); sigma-stage val read vs eval_best_val on the W retrain agree to
       0.66-1.09x on 25/28 pools (not on tau nu, t t~ V, whose pools differ by site). Not separated: lr from site (this run
       trained on CC''s train pools, the controls on lxplus''s; same recipe).'
+  - at: '2026-11-20T12:31:30+00:00'
+    text: '2026-11-20 D507 read with the D509 seeds (benchmark.py d507collect/d507fig @3d45fee3, data/d507.json, d507_read.json,
+      fig zng_d507 @0d2064b7). Best val MSE(ln|M|^2), seeds 42/43/44: Muon b2048 0.058/0.067/0.064, Muon b128 0.018/0.021/0.020,
+      Adam b2048 0.054/0.076/0.085, Adam b128 0.039/0.068/0.061; seed spread max/min 1.15, 1.19, 1.58, 1.74. Ratios of three-seed
+      means [range over seed pairings]: G (Muon 2048 / Adam 128) 1.12 [0.85, 1.70]: unresolved, the two protocols equal within
+      seeds at 1e4 events; batch 2048/128 Muon 3.20 [2.71, 3.72] (separated, mean at the 3x bar), Adam 1.28 [0.79, 2.17] (none);
+      optimiser Muon/Adam b2048 0.88 [0.68, 1.24] (none), b128 0.35 [0.26, 0.54] (Muon better, separated, mean just above
+      1/3). Test median |Delta| (seed 42): 0.141, 0.072, 0.136, 0.114; test G 1.23. Design read: G unresolved; no single ingredient
+      of Suprio''s protocol carries an edge at 1e4; the best cell is ours (MuonAdamW+WSD) at batch 128, 2.9x below Adam at
+      128 on val, 1.6x on test. All chosen trials flagged (0/32 pass the curve test). B1/B2 at 5e5 sit 30-60x lower.'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
