@@ -17769,6 +17769,7 @@ entries:
     gate'
   blocks: the lxplus costing fix in the site gate only
   blocks_steps: *id001
+  checked_until: '2026-11-20T11:06:45+00:00'
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
   question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
