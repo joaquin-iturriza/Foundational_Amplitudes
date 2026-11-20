@@ -9568,6 +9568,133 @@ measurably. A validation read on this target is therefore given beside its value
 % allow: 5000 42 2 because they are the pool size, the seed and the stage's name
 \end{figure}
 
+\paragraph{Does a restart without the jump keep the head start? (2026-11-20)}\label{par:ftm_restart_test} The question
+(D414, D423; plan \code{finetune\_mechanism}, design passed 2026-11-20): a fine-tune from a converged parent loses its
+head start over scratch early in the run; does a restart that avoids today's restart jump keep it, and does it lower the
+search best's validation? Design: $b\bar b\to ZZ$ at tree level, held out of the parent, $D\in\{100,316,3162\}$, one
+8-trial DyHPO search per arm and $D$ (seed 42, \code{sweep/sweep\_config\_dsave\_s7*\_bbx\_zz\_d\{4,5,7\}\_*.yaml}
+@10564601), all from two reruns of the held-out parent, one cosine-scheduled and one WSD-scheduled. Arms, each paired
+with the arm it differs from by one change: today's restart (the final post-$\sigma$ EMA model, fresh optimizer, warmup
+from lr 0) from each parent; the cosine parent's live weights at the end of its main stage (step 3458, before the
+$\sigma$ stage) with a fresh optimizer, and the same with the parent's optimizer state; the WSD parent's live weights
+before its cooldown (step 3026) with a fresh optimizer, and the same with its optimizer state and no warmup (the
+parent's run continued); a WSD scratch search as the head-start reference. Per trial the lag is the run fraction past
+its own warmup at which its smoothed validation first reaches the scratch best's; the head start is kept when the lag
+exceeds 0.25. HOLDS needs a share of kept trials 0.3 above the pair's with one-sided Fisher $p<0.05$, NO a difference
+within 0.2, UNRESOLVED between; on validation, the geometric mean over $D$ of arm over pair is LOWER below
+$1/2.53$, HIGHER above 2.53. Twenty-one of the 168 trials diverged (non-finite gradients after warmup) and are listed apart: 6 of today's cosine restart, 4 in each cosine end-of-main-stage arm, 3 in the WSD
+before-cooldown arm with a fresh optimizer, 2 of scratch, 1 in each of the other two. The lag count also leaves out
+trials whose validation rises tenfold or more over their warmup (the blow-up rule): 2 of 18 observed in today's cosine
+restart, 5 of 20 and 3 of 20 in the cosine main-stage-end arms, 4 of 23 in today's WSD restart, 3 of 21 and 0 of 23 in
+the WSD before-cooldown arms. The two cosine arms then hold 15 and 16 counted trials against the design's assumed
+20, which widens their share's error to about 0.12.
+% allow: 8 42 168 1 0 because they are the trials per search, the seed, the trial count and the warmup start, settings
+% allow: 10564601 3458 3026 because they are a commit and the snapshot steps
+% allow: 0.12 because it is the binomial error at a share of 0.4 over 16 trials, an estimate
+% allow: 0.25 0.3 0.05 0.2 2.53 because they are the design's thresholds and warmup range
+No restart keeps the head start (Fig.~\ref{fig:ftm_headstart}). The parent's optimizer state: 4 of 17 trials keep it
+against 7 of 15 with a fresh optimizer at the cosine parent's main-stage end (UNRESOLVED, the difference $-0.23$ in the
+wrong direction, $p=0.96$), 9 of 23 against 4 of 18 at the WSD parent's cooldown start (NO, $p=0.21$). The
+validation measure is the search best's MSE$(\ln|\mathcal M|^2)$ of the $\mu$ head at its best checkpoint, taken
+as arm over pair per $D$ and pooled as the geometric mean over the three $D$: WITHIN in both (1.95 and 1.02). The snapshot: the cosine main-stage end against today's restart keeps 7 of 15 against
+5 of 16 (NO), and the WSD cooldown start against today's restart 4 of 18 against 9 of 19 (UNRESOLVED, $-0.25$, wrong
+direction). On the same validation measure the cosine snapshot reads LOWER at 0.391 against the bar of 0.395, carried by $D=3162$
+alone (0.077; 0.69 and 1.13 at $D=100$ and $316$); the WSD snapshot reads WITHIN at 1.37 with the opposite sign at
+$D=3162$ (7.2). So the optimizer state neither keeps the head start nor lowers the validation, and the template's restart stays.
+By the design's branch (c) the cosine snapshot pair moves, which points to a sigma-start design next; the read sits at
+the bar, rests on $D=3162$ alone and its WSD twin reads the other way, so whether to run it is put to the user. The
+long-warmup arm (plan \code{pretrain\_data\_saving} step 7) read WITHIN.
+% src: python3 analysis/finetune_mechanism/restart_test_readout.py --cached @291c08a1
+% claim: n_diverged.C'=6
+% claim: n_observed.C'=18
+% claim: n_observed.Oc=20
+% claim: n_observed.W'=23
+% claim: n_observed.Bc=21
+% claim: n_blowup.C'=2
+% claim: n_blowup.Oc=5
+% claim: n_blowup.O=3
+% claim: n_blowup.W'=4
+% claim: n_blowup.Bc=3
+% claim: n_blowup.B=0
+% claim: n_diverged.Oc=4
+% claim: n_diverged.O=4
+% claim: n_diverged.Bc=3
+% claim: n_diverged.S=2
+% claim: n_diverged.B=1
+% claim: n_diverged.W'=1
+% claim: pairs.O/Oc.kept.0=4
+% claim: pairs.O/Oc.kept.1=17
+% claim: pairs.O/Oc.pair_kept.0=7
+% claim: pairs.O/Oc.pair_kept.1=15
+% claim: pairs.O/Oc.share_diff=-0.23
+% claim: pairs.O/Oc.fisher_p=0.96
+% claim: pairs.B/Bc.kept.0=9
+% claim: pairs.B/Bc.kept.1=23
+% claim: pairs.B/Bc.pair_kept.0=4
+% claim: pairs.B/Bc.pair_kept.1=18
+% claim: pairs.B/Bc.fisher_p=0.21
+% claim: pairs.O/Oc.val_pooled=1.95
+% claim: pairs.B/Bc.val_pooled=1.02
+% claim: pairs.Bc/W'.kept.0=4
+% claim: pairs.Bc/W'.kept.1=18
+% claim: pairs.Bc/W'.pair_kept.0=9
+% claim: pairs.Bc/W'.pair_kept.1=19
+% claim: pairs.Bc/W'.share_diff=-0.25
+% claim: pairs.Oc/C'.val_pooled=0.391
+% claim: cells.3162.Oc/C'=0.077
+% claim: cells.100.Oc/C'=0.69
+% claim: cells.316.Oc/C'=1.13
+% claim: pairs.Bc/W'.val_pooled=1.37
+% claim: pairs.Oc/C'.kept.0=7
+% claim: pairs.Oc/C'.kept.1=15
+% claim: pairs.Oc/C'.pair_kept.0=5
+% claim: pairs.Oc/C'.pair_kept.1=16
+% claim: cells.3162.Bc/W'=7.2
+% allow: 100 316 3162 because they are the grid's D, settings
+% allow: 8 42 168 because they are the trials per search, the seed and the trial count, settings
+% allow: 3458 3026 because they are the snapshot steps, settings
+% allow: 0.25 0.3 0.2 0.05 2.53 0.395 because they are the design's thresholds
+% allow: 10564601 because it is a commit
+
+The step-0 shock is not what loses the head start (Fig.~\ref{fig:ftm_steps}). At step 0, before any update, the median
+trial starts at het.\ NLL 2260 and a largest pre-clip gradient norm over steps 0--40 of $2.0\times10^{5}$ from today's
+cosine restart ($D=3162$), 1346 and $1.2\times10^{5}$ from the cosine main-stage end, 869 and $5.1\times10^{4}$ from
+today's WSD restart; from the WSD parent before its cooldown at 12.7 and 627, the level of scratch's random start
+(14.3). Both main-stage snapshots are taken before the parent's $\sigma$ stage, yet only the WSD one is free of the
+shock. That arm starts with no shock and still keeps the head start in fewer trials than today's WSD restart (4 of 18
+against 9 of 19): removing the shock does not keep the head start.
+% src: python3 analysis/finetune_mechanism/plot_restart.py --s7 @3e532716
+% claim: C'_D3162.nll_step0_median=2260
+% claim: C'_D3162.gn_max_0_40_median=2.0e5
+% claim: Oc_D3162.nll_step0_median=1346
+% claim: Oc_D3162.gn_max_0_40_median=1.2e5
+% claim: W'_D3162.nll_step0_median=869
+% claim: W'_D3162.gn_max_0_40_median=5.1e4
+% claim: Bc_D3162.nll_step0_median=12.7
+% claim: Bc_D3162.gn_max_0_40_median=627
+% claim: S_D3162.nll_step0_median=14.3
+% allow: 3162 0 40 because they are the cell and the step window, settings
+% allow: 4 18 9 19 because they are the counts claimed in the paragraph above
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{../analysis/finetune_mechanism/figs/restart_headstart_s7.pdf}
+  \caption{\textbf{No restart keeps the head start.} Validation MSE$(\log|\mathcal M|^2)$ against step of each arm's
+  search best, $b\bar b\to ZZ$ at tree level, per $D_{\rm train}$. Final model: the parent's post-$\sigma$ EMA model;
+  end of main stage, before cooldown: the parent's live weights before its $\sigma$ stage.}
+% allow: 2 because it is the square in the axis quantity
+  \label{fig:ftm_headstart}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{../analysis/finetune_mechanism/figs/restart_steps_s7.pdf}
+  \caption{\textbf{The step-0 shock is absent only from the WSD parent before its cooldown.} Gradient norm before clipping and training loss over
+  the first 400 steps after the restart, each arm's search best, $b\bar b\to ZZ$ at tree level.}
+  \label{fig:ftm_steps}
+% allow: 400 0 because they are the plotted window and the step named
+\end{figure}
+
 % ==========================================================================
 \section{Architecture and encoding ablations}\label{sec:arch}
 % ==========================================================================
