@@ -37404,9 +37404,9 @@ entries:
   asks: []
   owner:
     agent: a6350226f3a8054a2
-    state: stopped
+    state: working
     since: '2026-11-20T05:09:01+00:00'
-    state_at: '2026-11-20T07:39:56.451000+00:00'
+    state_at: '2026-11-20T08:06:41+00:00'
     context: 147252
     context_at: '2026-11-20T07:39:37+00:00'
   findings:
