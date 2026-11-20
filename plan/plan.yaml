@@ -37375,14 +37375,13 @@ entries:
     - finetune_mechanism
   decisions:
   - D511
-  next: 'Restart test, last gate before the 21 searches (configs @10564601: 9e9d7d9b with parents cosrerun2 / wsdrerun3):
-    both parents done (FA-lxplus-0ab69a57 cosrerun2, FA-lxplus-c9cb19d1 wsdrerun3), config diffs clean, step snapshots 3458
-    / 3026 with optimizer state, both copied to ccin2p3 (same sizes); smoke of O FA-lxplus-8f5f5ff4 clean. When the smoke
-    of B FA-lxplus-63dabbeb (sweep_config_dsave_s7wsdbranch_ft_bbx_zz_d7_t8500.yaml, 50 steps + sigma stage) is clean through
-    every stage: send the 21 s7 searches as one detached drive.py batch (tools/detach.py --entry finetune_mechanism -- .venv-driver/bin/python
-    sweep/drive.py --config <each of the 21> --item finetune_mechanism --n-trials 8 --wave-sizes 3,3,2 --sites ccin2p3 lxplus
-    jeanzay --allow-jeanzay), target 1.1 h for 168 trials recorded (ftm_s7_searches); then read with analysis/finetune_mechanism/restart_test_readout.py
-    and redraw the figures'
+  next: 'Restart test running: the 21 s7 searches (configs @10564601: sweep/sweep_config_dsave_s7{cosrerun,cosstep,optstate,wsdrerun,wsdstep,wsdbranch}_ft_bbx_zz_d{4,5,7}_*.yaml
+    and sweep_config_dsave_s7wsd_scr_bbx_zz_d{4,5,7}_*.yaml; parents cosrerun2 / wsdrerun3) as one drive.py batch, detached
+    ftm_s7_searches (pid 729952, log ~/.local/share/ccorch/detached/20261120-114841_ftm_s7_searches.log, state sweeps_local/dsave_s7*),
+    8 trials, waves 3,3,2, --sites ccin2p3 lxplus jeanzay --allow-jeanzay; target 1.1 h for 168 trials (ftm_s7_searches).
+    When it ends: read with analysis/finetune_mechanism/restart_test_readout.py (untested on data: check it on the first finished
+    searches), outcome per pair (share_lag_above vs pair, Fisher, val pooled vs 2.53), redraw restart_steps and restart_headstart
+    with the new arms, write-up in docs/results.tex'
   done_when: null
   notes_ref: null
   match: dsave_ftmech_*,ftmech_*
@@ -37624,8 +37623,7 @@ entries:
       - 'HOLDS and WITHIN: reported, template unchanged'
       - 'nothing moves: lr jump ruled out; Oc/C'' moving credits the step-0 sigma shock (sigma-start design next), else scratch
         catch-up'
-  step_waits:
-    '1': FA-lxplus-63dabbeb
+  step_waits: {}
   handoff:
     state: '2026-11-20. Step 1 done (finding 2026-11-20; plot_restart.py @a5f6c7b3, figs analysis/finetune_mechanism/figs/restart_steps,
       restart_steps_zng, restart_headstart; captions passed check_caption): the fine-tunes'' shock is at step 0 with lr 0
