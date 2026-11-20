@@ -37457,3 +37457,10 @@ entries:
       sigma/function on the new target, step 1) or plain scratch catch-up is next, a design needed. (d) HIGHER -> that restart
       hurts: reported. Beside: step-0 NLL and gradient norm per arm (O/B expected to keep the 1e3-scale NLL at step 0 if the
       shock is the parent''s function), S vs stage-2 cosine scratch. Diverged trials listed apart (D398).'
+  targets:
+  - batch: ftm_parents
+    wall_h: 1.6
+    jobs: 2
+    units: null
+    start: '2026-11-20T03:08:52+00:00'
+    at: '2026-11-20T03:08:52+00:00'
