@@ -34556,17 +34556,27 @@ entries:
     runs:
     - FA-ccin2p3-02a0c484
     - FA-ccin2p3-213da086
+    - FA-ccin2p3-21cf4ce9
+    - FA-ccin2p3-24c4a980
     - FA-ccin2p3-26dd7aba
     - FA-ccin2p3-28d56f33
     - FA-ccin2p3-2d4d3709
     - FA-ccin2p3-394f20ac
+    - FA-ccin2p3-47e14eae
+    - FA-ccin2p3-67fb62ef
+    - FA-ccin2p3-6b5c5372
+    - FA-ccin2p3-7390e5a4
     - FA-ccin2p3-76be39e7
     - FA-ccin2p3-7a112608
     - FA-ccin2p3-82eb9944
+    - FA-ccin2p3-852e8de6
     - FA-ccin2p3-966a6561
     - FA-ccin2p3-a652edfc
     - FA-ccin2p3-b4ebd88e
     - FA-ccin2p3-ba9df01f
+    - FA-ccin2p3-d8ab6a8d
+    - FA-ccin2p3-d95314b4
+    - FA-ccin2p3-f9748b00
     - FA-lxplus-3ea39a5e
     - FA-lxplus-44ab7dd7
     - FA-lxplus-4e0a55ab
@@ -34577,12 +34587,16 @@ entries:
     - FA-lxplus-8b928927
     - FA-lxplus-9a0f77c5
     - FA-lxplus-f3901ad0
-    commit: afe18d8c
+    commit: e4696fd4
     paths:
     - analysis/zng_uq/benchmark.py
     - analysis/zng_uq/data/benchmark.json
+    - analysis/zng_uq/data/d507.json
+    - analysis/zng_uq/data/d507_read.json
     - analysis/zng_uq/data/paper_mse.json
     - analysis/zng_uq/data/parent_bbx.json
+    - analysis/zng_uq/data/parent_wlr.json
+    - analysis/zng_uq/data/parent_wlr_leak.json
     - analysis/zng_uq/data/protocol_test_delta_cc.json
     - analysis/zng_uq/data/protocol_test_delta_lxplus.json
     - analysis/zng_uq/data/selection.json
