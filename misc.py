@@ -80,12 +80,16 @@ def cosine_warmup_scheduler(optimizer, warmup_steps, T_max, eta_min=0):
     return LambdaLR(optimizer, lr_lambda)
 
 
+def wsd_cooldown_start(T_max, cooldown_frac, warmup_steps=0):
+    """Step at which wsd_scheduler's cooldown begins: the model after this many steps is the pre-cooldown one."""
+    return max(warmup_steps, T_max - max(1, int(round(cooldown_frac * T_max))))
+
+
 def wsd_scheduler(optimizer, warmup_steps, T_max, cooldown_frac, eta_min=0):
     """Warmup-stable-decay (Hu et al. 2024 arXiv:2404.06395; Haegele et al. 2024 arXiv:2405.18392): linear warmup
     0 -> 1 over warmup_steps, constant 1, then a (1 - sqrt) cooldown to eta_min over the last cooldown_frac of T_max
     (the cooldown shape that beat linear in Haegele et al.)."""
-    cool = max(1, int(round(cooldown_frac * T_max)))
-    start = max(warmup_steps, T_max - cool)
+    start = wsd_cooldown_start(T_max, cooldown_frac, warmup_steps)
     floor = eta_min / optimizer.defaults['lr']
 
     def lr_lambda(step):

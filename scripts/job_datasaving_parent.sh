@@ -51,6 +51,12 @@ RECIPE="$PROJECT_DIR/recipes/catalog_v4_datasaving_parent_${WHICH}.yaml"
 [ -e "$RECIPE" ] && [ -e "$PROJECT_DIR/$PARENT/config.yaml" ] || { echo "no $RECIPE or $PARENT/config.yaml"; exit 2; }
 TAG=; ARGS=(); for x in "$@"; do case "$x" in tag=*) TAG="_${x#tag=}";; lr=*) LR="${x#lr=}";; iters=*) T="${x#iters=}";; *) ARGS+=("$x");; esac; done
 OUT="$PROJECT_DIR/runs/data_saving/dsave_parent_${WHICH}${TAG}"
+# WSD: also save the pre-cooldown model (with its optimizer state) at T x (1 - wsd_cooldown_frac), for snapshot restarts
+if [[ " ${FIX[*]} ${ARGS[*]} " == *" training.scheduler=WSD "* ]]; then
+    FRAC=0.125; for x in "${FIX[@]}" "${ARGS[@]}"; do case "$x" in *training.wsd_cooldown_frac=*) FRAC="${x##*=}";; esac; done
+    SNAP=$(python -c "from misc import wsd_cooldown_start as w; print(w($T, $FRAC))") || exit 2
+    ARGS+=("training.save_model_at_steps=[$SNAP]")
+fi
 echo "DATASAVING_PARENT recipe=$RECIPE base=$PARENT args: ${ARGS[*]}"
 python run.py --config-path "$PROJECT_DIR/$PARENT" --config-name config run_dir="$OUT" run_name=null \
     data.processes_file="$RECIPE" data.train_subsample="$SUB" data.memmap=false fine_tune.pretrained_path=null \
