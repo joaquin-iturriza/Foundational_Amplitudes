@@ -37589,8 +37589,15 @@ entries:
     decision: D511
     covers:
     - finetune_mechanism
+  - said_at: '2026-11-20T15:11:45.765000+00:00'
+    text: Yes, of course I want those open points explored.
+    decision: D513
+    answers_after: '2026-11-20T14:08:55+00:00'
+    covers:
+    - finetune_mechanism
   decisions:
   - D511
+  - D513
   next:
     1: Restart test written (par:ftm_restart_test @bc3b3bda). Close the entry (plan done --writeup bc3b3bda) unless Joaquin
       asks for the sigma-start run or a top-up of the two cosine arms
@@ -37671,8 +37678,10 @@ entries:
       and 2026-11-10T02:08 (uploaded slides and zip) share words but are about the paper and figures, not this test's next
       step; none settles it
     blocks: closing the entry (plan done)
-    blocks_steps: &id002
+    blocks_steps:
     - 1
+    answered_at: '2026-11-20T15:11:45.765000+00:00'
+    decision: D513
   owner:
     agent: acb3827e706c70d22
     state: closed
@@ -37937,19 +37946,3 @@ entries:
       data/restart_s7_summary.json, data/restart_test_rows.json (cache), data/restart_steps.json (cache); sweep/sweep_config_dsave_s7*_bbx_zz_d{4,5,7}_*.yaml
       @10564601; sweeps_local/dsave_s7*; docs/results.tex par:ftm_restart_test
     written: '2026-11-20T15:13:15+00:00'
-  ask: 'Scope: dropping the design''s pre-registered next step (a sigma-start design) and the top-up of two arms below the
-    design''s trial count. The restart test reads branch (c): the parent''s optimizer state does not keep the head start or
-    lower validation, so the fine-tune template''s restart stays. The branch says a sigma-start design comes next if the snapshot
-    pair (cosine main-stage end against today''s restart) moves; it reads LOWER on validation at 0.391 against the 0.395 bar,
-    carried by D=3162 alone, while its WSD twin reads WITHIN with the opposite sign, and the WSD before-cooldown arm already
-    starts with no sigma shock (step-0 NLL 12.7, the scratch level) and still loses the head start. I propose to close the
-    entry without the sigma-start run and without topping up the two cosine arms whose usable trials fell to 15 and 16 (the
-    design assumed about 20; 4 more trials per D in both arms is about 5 GPU-h and cannot turn the wrong-sign optimizer-state
-    result into a HOLDS). Close it, or run the sigma-start design and/or the top-up?'
-  waiting_since: '2026-11-20T14:08:55+00:00'
-  searched: CLAUDE.md (a dropped step of a design is the user's call), site decisions D414, D423, D511; Joaquin's messages
-    2026-11-14T04:31 (a SciPost LaTeX template paste), 2026-11-17T01:19 (figures self-contained, the reviewers' corrections)
-    and 2026-11-10T02:08 (uploaded slides and zip) share words but are about the paper and figures, not this test's next step;
-    none settles it
-  blocks: closing the entry (plan done)
-  blocks_steps: *id002
