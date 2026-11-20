@@ -2177,15 +2177,20 @@ def cmd_sweepends(a):
         ended, _, _ = sweep_status(e["id"], st, sw)
         names = {sweep_label(x["name"], x["site"], (sw.get(x["site"]) or {"sweeps": {}})["sweeps"].get(x["name"]) or {}): x
                  for x in sweeps_of(st, e["id"])}
+        done = {x["name"] for lab, _, _ in ended for x in names.values() if lab.startswith(x["name"] + " (")}
+        named = lambda x, w: re.search(r"(?<![\w-])(%s:)?%s(?![\w-])" % (re.escape(x["site"]), re.escape(x["name"])), str(w))
+        # a step is reported once all the recorded sweeps its wait names have ended (the caller merges them into one RUN_DONE)
+        ready = {str(k): [x for x in sweeps_of(st, e["id"]) if named(x, w)] for k, w in waits.items()}
+        ready = {k: v for k, v in ready.items() if v and all(x["name"] in done for x in v)}
         for lab, _, _ in ended:
             x = next((v for k, v in names.items() if lab.startswith(v["name"] + " (")), None)
             if not x:
                 continue
-            steps = sorted(str(k) for k, w in waits.items()
-                           if re.search(r"(?<![\w-])(%s:)?%s(?![\w-])" % (re.escape(x["site"]), re.escape(x["name"])), str(w)))
+            steps = sorted(k for k, v in ready.items() if x in v)
             o = owner_of(e)
             rows.append({"entry": e["id"], "owner": o and o["agent"], "owner_state": owner_state(e), "site": x["site"],
-                         "name": x["name"], "label": lab, "steps": steps})
+                         "name": x["name"], "label": lab, "steps": steps,
+                         "step_sweeps": {k: [[y["site"], y["name"]] for y in ready[k]] for k in steps}})
     print(json.dumps(rows))
 
 
