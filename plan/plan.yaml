@@ -36110,6 +36110,55 @@ entries:
       reported, no W parent at another lr). D241: one run at one changed lr as a stability repair is not an HP search; the
       main session''s relay is not Joaquin''s yes, but CLAUDE.md lets a repair within scope be tried; question (A) to Joaquin
       stays open and should be updated when this runs.'
+  - at: '2026-11-20T02:01:06+00:00'
+    question: 'W parent repair (D506: ''The W offshellness should be added as it was supposed to before we run anything else.'';
+      the main session: the repair is the owner''s within budget). Does the ladder+star parent with the W (PDG 24) in internal_mass_pdgs
+      [23,6,25,24] train stably when its WSD peak lr is halved from 3.78e-3 to 1.89e-3, everything else as the unstable W
+      retrain FA-lxplus-57f6d2cb, and where does it land against the first parent (no W) and the old finale on the whole val
+      pools?'
+    prior: 'This entry: first parent FA-lxplus-00347f0a (no W, peak 3.78e-3): stable (largest median grad norm per 1280-step
+      interval 5.4e3, 0 non-finite), curve test failed (separation 2.26, end_up 0.77), geometric-mean val MSE(ln|M|^2) over
+      the 28 processes 9.6e-5 on the rebuilt CC val pools, u d~ -> e+ nu g 4.18 (unlearned). W retrain FA-lxplus-57f6d2cb
+      (W added, peak 3.78e-3): largest median grad norm 2.1e6, 24 non-finite grad norms, training het. loss climbs from ~-5
+      to above 0 between steps ~25000 and ~55000, validation spikes to 1.65e11, gmean 3.9e-4 (27x the old finale''s 1.44e-5),
+      u d~ -> e+ nu g 0.45 (findings 2026-11-19 09:21, 09:25; parent_read.py reread @3c908baf, stab @2398515d; parent_reread.json,
+      parent_stab.json committed @HEAD). The only training-side change between the two is the W column (signed-log standardised).
+      Searched: results.tex (internal_mass_pdgs, PDG 24, W column, offshell, offshW, peak lr, grad norm, non-finite, unstable,
+      dsave_parent, W retrain), plan findings 11-18..20, site decisions D241, D487, D492, D506: the only earlier W run is
+      the 1000-step catalog_short_offshW2_mean (no instability); no W parent at another lr.'
+    measure: '(1) Stability from the run''s train_steps.npz (parent_read.py stab): per 1280-step interval median and max pre-clip
+      grad norm, count of non-finite grad-norm steps, training het. loss over the stable phase. (2) Accuracy at best weights
+      on the whole CC val pools of the 28 processes (parent_read.py reread, EVAL_FROZEN): geometric mean over the 28 of val
+      MSE(ln|M|^2), per process, and u d~ -> e+ nu g, against the first parent, the W retrain and the old finale on the same
+      pools (parent_reread.json). (3) The curve test (reported, not a gate: the first parent fails it too).'
+    check: Measure 1 separates the two existing parents by ~400x in the largest median grad norm (5.4e3 vs 2.1e6) and 0 vs
+      24 non-finite steps (parent_stab.json); measure 2 moved 9.6e-5 -> 3.9e-4 (gmean) and 4.18 -> 0.45 (u d~ -> e+ nu g)
+      between them (parent_reread.json).
+    fixed: 'Everything of FA-lxplus-57f6d2cb: scripts/job_datasaving_parent.sh finale (@72cba9e8 it sets data.internal_mass_pdgs=[23,6,25,24]
+      itself, the list the retrain passed as an argument; it also carries the mixed-generation guard, which flags none of
+      the 28 since the t t~ V rebuild), base trial 1262, recipes/transfer_finale.yaml (28 processes, every train event), 64000
+      steps, WSD cooldown 1/8, every other HP of 1262, data.eval_subsample=10000 (whole-pool validation), input flags (input_soft_eps
+      1e-8, input_pair_logs 7), seed, batch 16384, HETEROSC + sigma stage. One change: lr=1.89e-3. Pools: the u u~ -> t t~
+      V val/test rebuilt 2026-11-19 (same pipeline as its train). Submission: site submit lxplus FA scripts/job_datasaving_parent.sh
+      --item zng_uq_benchmark --hdr=--time=12:00:00 -- finale lr=1.89e-3 tag=zng_uq_w_lr1p89e-3 (run dir runs/data_saving/dsave_parent_finale_zng_uq_w_lr1p89e-3,
+      new; the first parent is _zng_uq, the W retrain _zng_uq_w).'
+    control: The first parent FA-lxplus-00347f0a (no W, 3.78e-3) and the W retrain FA-lxplus-57f6d2cb (W, 3.78e-3), both already
+      read on the same rebuilt val pools (parent_reread.json); the old finale as the reference level.
+    seeds: 'One seed (42), as both controls (D492: no more seeds now). Accuracy band: the catalog_v4 per-class seed spread
+      is 0.10-0.14 decades (docs/results.tex, seeds paragraph near line 4491), so gmean ratios within 10^0.14 = 1.38x of the
+      first parent read as equal. The stability read needs no seeds (its gap is orders of magnitude).'
+    outcome: 'UNSTABLE: any non-finite grad-norm step, or a median grad norm per interval above 1e4 (first parent''s largest
+      5.4e3, W retrain''s 2.1e6), or the stable-phase training het. loss rising more than 1 unit above its value at 1/8 of
+      the run (W retrain rose ~5, first parent''s noise ~0.02) -> the instability is not the peak lr alone; dead end, next
+      a DyHPO of the parent setup with the W, its cost to Joaquin. STABLE, then by accuracy: (a) gmean <= 1.38 x 9.6e-5 =
+      1.3e-4: the W parent matches the first parent and is stage 2''s parent candidate, the curve test result reported beside
+      it (the first parent fails it as well, so the curve test does not decide between them); (b) gmean > 1.3e-4: halving
+      the peak lr costs accuracy at 64000 steps; next the DyHPO as above. In each stable case u d~ -> e+ nu g is read: <=
+      0.45 the W column learns it (as the retrain did); between 0.45 and 4.18/1.38 partly; >= 3.0 not learned, so the W column
+      gains nothing on its own process, reported. Cost: the W retrain''s own measured wall time, 30928 s = 8.6 h on one lxplus
+      GPU (run registry; smoke 0.535 s/step), target 9 h, limit 12 h: ~8.6 GPU-h, plus the CC re-read (~0.5 GPU-h): ~9.1 GPU-h.
+      Disk ~0.2 GB in the run dir on EOS (in memory, no cache), lxplus free disk read at submission. The launch path ran end
+      to end in FA-lxplus-57f6d2cb (no smoke, D395). Not submitted while every site is unreachable (2026-11-20).'
   step_why:
     17:
       feeds: whether a ladder+star parent with the W column trains stably and can be stage 2's parent
