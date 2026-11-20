@@ -16350,6 +16350,19 @@ entries:
     - 26
     answered_at: '2026-11-19T17:51:47.511000+00:00'
     decision: D504
+  - ask: 'Permission classifier refusal: `cd ~/.local/bin; cp site site.bak-20261119-maxruntime; cp site_gate.py site_gate.py.bak-20261119-maxruntime;
+      python3 - <<''EOF'' ... (the gate costs an lxplus job by its own --time limit, not its flavour''s) EOF` (2026-11-19,
+      ''Undermining Oversight''). The GPU-budget gate charges an lxplus job the wall time of its HTCondor flavour rather than
+      the job''s own time limit, so lxplus jobs are over-counted against the 30 GPU-h budget. May the fix be applied (by you,
+      or with a permission rule allowing that edit of ~/.local/bin/site and site_gate.py)?'
+    at: '2026-11-20T01:53:56+00:00'
+    searched: 'both CLAUDE.md files and site decisions --project FA --all: D197 is an earlier site_gate fix (cancelled-while-pending
+      jobs), nothing covers this edit. Joaquin''s messages flagged by the check: 2026-11-14T04:31 is a pasted SciPost LaTeX
+      template; 2026-11-19T17:51 is his pasted graphify venv install; 2026-11-16T20:00 is about merging a writing-style skill;
+      none concerns the site gate'
+    blocks: the lxplus costing fix in the site gate only
+    blocks_steps: &id001
+    - 29
   step_why:
     11:
       feeds: whether the redesign is finished
@@ -17731,6 +17744,18 @@ entries:
     files: worktrees/wt-graphify/tools/lookup_trial.py worktrees/wt-graphify/analysis/agent_redesign/lookup_trial.json worktrees/wt-graphify/analysis/agent_redesign/lookup_trial_agents.txt
       worktrees/wt-batch/tools/batch.py worktrees/wt-recall/tools/recall.py
     written: '2026-11-19T13:20:29+00:00'
+  ask: 'Permission classifier refusal: `cd ~/.local/bin; cp site site.bak-20261119-maxruntime; cp site_gate.py site_gate.py.bak-20261119-maxruntime;
+    python3 - <<''EOF'' ... (the gate costs an lxplus job by its own --time limit, not its flavour''s) EOF` (2026-11-19, ''Undermining
+    Oversight''). The GPU-budget gate charges an lxplus job the wall time of its HTCondor flavour rather than the job''s own
+    time limit, so lxplus jobs are over-counted against the 30 GPU-h budget. May the fix be applied (by you, or with a permission
+    rule allowing that edit of ~/.local/bin/site and site_gate.py)?'
+  waiting_since: '2026-11-20T01:53:56+00:00'
+  searched: 'both CLAUDE.md files and site decisions --project FA --all: D197 is an earlier site_gate fix (cancelled-while-pending
+    jobs), nothing covers this edit. Joaquin''s messages flagged by the check: 2026-11-14T04:31 is a pasted SciPost LaTeX
+    template; 2026-11-19T17:51 is his pasted graphify venv install; 2026-11-16T20:00 is about merging a writing-style skill;
+    none concerns the site gate'
+  blocks: the lxplus costing fix in the site gate only
+  blocks_steps: *id001
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
   question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
@@ -34723,7 +34748,7 @@ entries:
       (file uploads for the KIT slides), 2026-11-06T04:28 (worktrees, pp sampling, het loss, sign head; before this entry
       existed) and 2026-10-06T00:17 (the October transfer-study plan) touch neither.'
     blocks: the W retrain repair (step 17) and the protocol follow-up (step 18)
-    blocks_steps: &id001
+    blocks_steps: &id002
     - 17
     - 18
   owner:
@@ -36469,7 +36494,7 @@ entries:
     (file uploads for the KIT slides), 2026-11-06T04:28 (worktrees, pp sampling, het loss, sign head; before this entry existed)
     and 2026-10-06T00:17 (the October transfer-study plan) touch neither.'
   blocks: the W retrain repair (step 17) and the protocol follow-up (step 18)
-  blocks_steps: *id001
+  blocks_steps: *id002
 - id: dan_zeroshot_v4
   title: Catalog_v4 pretraining zero-shot on Daniel's held-out split
   question: How does our best catalog_v4 pretraining (trial 1262) do zero-shot on the held-out processes of Daniel's catalog
