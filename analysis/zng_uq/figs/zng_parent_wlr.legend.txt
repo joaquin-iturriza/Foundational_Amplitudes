@@ -1,0 +1,5 @@
+# producer: /home/joaquin/work/FA/analysis/zng_uq/parent_read.py 51582328c5c43d86d5d676c88e98adb1cfc6628d
+old finale
+no $W$, peak lr $3.8\cdot10^{-3}$
+with $W$, peak lr $3.8\cdot10^{-3}$
+with $W$, peak lr $1.9\cdot10^{-3}$
