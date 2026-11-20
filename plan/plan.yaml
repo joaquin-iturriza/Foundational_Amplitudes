@@ -36483,6 +36483,54 @@ entries:
       8-to-16 extension in waves 3,3,2, disk (46 MB per trial, EOS 2.2 PB free), and no earlier extension of these searches
       found (searched results.tex for tp_zng_d1e4, extend_sweep, d507, 1e4 training events; site decisions for batch, extend,
       zng).'
+  - at: '2026-11-20T15:00:08+00:00'
+    question: 'Joaquin 2026-11-20 on the D507 read: ''Okay, so it seems like batchsize is incredibly important contrary to
+      my own assumptions, but then still as you say, these runs are clearly still not optimal, so maybe extending a bit the
+      HPO would be smart''. Do the D507 ratios (G, batch per optimiser, optimiser per batch) hold when each of the four searches
+      gets 8 more guided trials (16 per cell) and the two batch-128 cells, whose chosen lr sits in the top fifth of its window,
+      get a window whose top is tripled?'
+    prior: 'This entry: D507 searches tp_zng_d1e4_{muon,adam}_b{2048,128}_zgggg, 8 trials each (3,3,2), 0/32 pass the curve
+      test; chosen lr / window: Muon b2048 2.03e-2 in [3.1e-3,4.1e-2] (log position 0.73), Muon b128 2.28e-3 in [2.7e-4,3.6e-3]
+      (0.82; best_step 31250 = last step in 6/8 trials), Adam b2048 4.18e-3 in [1.4e-3,1.8e-2] (0.43), Adam b128 1.24e-3 in
+      [1.5e-4,1.8e-3] (0.85) (data/d507_search.json). D509 three-seed read (finding 2026-11-20, data/d507_read.json @0d2064b7):
+      G 1.12 [0.85,1.70], batch Muon 3.20 [2.71,3.72], Adam 1.28, optimiser b2048 0.88, b128 0.35 [0.26,0.54]; seed spread
+      1.15-1.74x. B1 at 5e5 sat at its window''s top edge too. Searched: results.tex (protocol, D507, batch 128, extend_sweep,
+      fold), plan findings 11-17..20, decisions D484-D511: no earlier extension of these searches.'
+    measure: 'As D507: per cell the lowest-val trial of the 16 (curve test flagged): best val MSE(log|M|^2) = min val mu-MSE
+      x std^2 (1.1198), test median |Delta| on the 1e6 test events for a newly chosen trial; ratios G, batch, optimiser of
+      three-seed means with the range over seed pairings (benchmark.py d507fig). Plus each b128 cell''s chosen lr against
+      its new window.'
+    check: 'The searches'' trials span 2.8x (Muon b128: 0.0144-0.0401), 1.9x (Adam b128), 1.7x (Muon b2048), 1.8x (Adam b2048)
+      in val with lr (d507_search.json): the measure moves with lr inside a search, and the b128 bests sit at lrs where the
+      val still falls with lr (Muon b128 best at 2.28e-3 of trials up to 2.83e-3; trials below 1e-3 at 0.026-0.040), so a
+      higher lr can move the best.'
+    fixed: 'Everything of the four D507 sweep configs (sweep/sweep_config_tp_zng_d1e4_*_zgggg.yaml: data, 1e4 events, steps
+      1953/31250, base config, HETEROSC, mu_mse selection, seed 42, the rest of each space); changes: n_trials 16, dyhpo.waves
+      [3,3,2,3,3,2], training.lr high 1.1e-2 (Muon b128) and 5.4e-3 (Adam b128) via sweep/extend_sweep.py --param training.lr
+      --high (candidates drawn in the added zone, observations kept). HTCondor requirements regexp("A100|H100", GPUs_DeviceName)
+      && !regexp("MIG") in all four configs (@abc47ad9): the two slow trials of the lxplus Adam b128 search (0.225-0.227 s/step)
+      ran on a Tesla T4 (float64), the six others on A100/H100 at 0.036-0.074 s/step; per-trial limit 3 h for b128 (was 2
+      h), 1 h for b2048. Placement: site pick FA --jobs 32 --groups 4 gives all four searches to lxplus (CC: 0 GPUs fit 32G/4cpu);
+      Adam b128 already lives there; each CC search is continued on lxplus as the same sweep name with its 8 CC observations
+      folded in (extend_sweep --dump-points on CC, --fold-points on lxplus), so the surrogate keeps them and the 8 new trials
+      are guided. Seeds 43, 44 of a changed chosen trial via sweep/run_fixed_hp.py (job_seed_batch.sh) as D509; scoring via
+      job_kit.sh KIT_SCORE_DIR.'
+    control: Each cell's D507 8-trial best (and its D509 seeds) is the control for its 16-trial best; across cells, the 2x2
+      neighbours as in D507.
+    seeds: Trials seed 42; the chosen trial of each cell at seeds 42, 43, 44 (existing D509 seeds reused where the chosen
+      trial is unchanged).
+    outcome: 'Per cell: new best below the old best by more than that cell''s seed spread (1.15-1.74x) -> the 8-trial search
+      had not converged there, its chosen trial replaced, seeds 43/44 run; within it -> the D507 choice stands. A b128 cell
+      whose new best lr is above the old top -> the old window was the limit; one at the new top edge again -> reported, unresolved.
+      Then the D507 bands on three-seed means: G >= 3 or <= 1/3 -> a protocol leads; 1/3 < G < 3 -> unresolved; batch ratios
+      >= 3 (both optimisers) -> batch carries it; the Muon batch ratio (3.20 now) re-read against its seed range. Cost, from
+      this search''s own lxplus A100/H100 rates (Adam b128 0.036-0.074 s/step, out_0.log of its 6 trials there) and the CC
+      Muon/Adam step ratio 1.25 (D509 seed logs 0.0886/0.0706): Muon b128 <= 0.093 s/step x 31250 = 0.81 h + 0.25 h sigma
+      stage and evaluation = 1.06 h; Adam b128 0.64 + 0.25 = 0.9 h (early stopping shortens it); Muon b2048 1953 x 0.188 s
+      (CC V100, an upper bound) = 0.10 + 0.25 = 0.35 h; Adam b2048 0.34 h. 8 x (1.06 + 0.9 + 0.35 + 0.34) = 21.2 GPU-h; seeds
+      43/44 of changed chosen trials <= 8 runs = 5.3 GPU-h; test scoring <= 4 x 0.2 = 0.8: <= 27.3 GPU-h, under 30. Wall:
+      three waves, longest Muon b128 3 x 1.06 = 3.2 h plus queue, target 4.5 h; limits 3 h (b128), 1 h (b2048). Disk 46 MB
+      per trial (trial_0833), EOS free read by the reviewer 2.2 PB.'
   step_waits: {}
   findings:
   - at: '2026-11-17T11:18:43+00:00'
