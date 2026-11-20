@@ -9,7 +9,7 @@ cluster:
   time: 00:16:00
 paths: null
 sweep_name: dsave_s7wsd_scr_bbx_zz_d5_t7840
-base_config: ${PROJECT_DIR}/runs/data_saving/dsave_parent_heldoutbbzz_cosrerun
+base_config: ${PROJECT_DIR}/runs/data_saving/dsave_parent_heldoutbbzz_cosrerun2
 n_trials: 8
 dyhpo:
   surrogate: gp
