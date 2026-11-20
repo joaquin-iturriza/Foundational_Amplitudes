@@ -34815,7 +34815,12 @@ entries:
       messages 2026-11-14T04:31 (a pasted SciPost LaTeX template), 2026-11-10T02:08 (file uploads), 2026-11-11T02:09 (clusters
       back, the optimizer comparison's date) share words but say nothing on stage 2 or its cost
     blocks: stage 2's design and submission; nothing else of the entry is open
-    blocks_steps: &id002 []
+    blocks_steps: []
+    answered_at: '2026-11-20T15:12:06+00:00'
+    decision: D483
+    withdrawn_at: '2026-11-20T15:12:06+00:00'
+    withdrawn_why: Joaquin never asked for from-scratch searches at 9 D x 4 n; D483 asks only to add the ladder+star fine-tunes
+      up to 5e5; the 650-850 GPU-h stage-2 design was an agent's expansion, withdrawn
   owner:
     agent: adaaac120a3656f82
     state: working
@@ -37087,18 +37092,6 @@ entries:
       if:
       - 'a b128 cell''s best moves into the widened lr zone: its window was the limit; re-read the ratios'
       - 'the chosen trials stay or move < seed spread: the D507 read stands at 16 trials per cell'
-  ask: 'GPU budget: ~650-850 GPU-h above 30 with no decision covering it. The W parent at half the peak lr is stable and better
-    than both earlier parents, so stage 2 (your part 2 with D483: the ladder+star parent fine-tuned against the same network
-    from scratch, searched, on Z+1..4g at D_train 10^2 to 10^5.5 and 5e5) can now be designed on it; its cost by the 2026-11-17
-    design is ~650-850 GPU-h (8 scratch trials x 9 D x 4 multiplicities, plus 2 fine-tune points per cell). Go at that size,
-    or a cut (e.g. Z+4g only, about a third of it, or fewer D points), knowing a cut loses the gain against multiplicity?'
-  waiting_since: '2026-11-20T12:34:50+00:00'
-  searched: CLAUDE.md GPU budget; site decisions D482 ('1 and 2'), D483 ('add the ladder + star up to 5x10^5'), D487, D506;
-    D482 predates the 650-850 GPU-h estimate of the design recorded 2026-11-17T15:55, so no decision covers that cost. Joaquin's
-    messages 2026-11-14T04:31 (a pasted SciPost LaTeX template), 2026-11-10T02:08 (file uploads), 2026-11-11T02:09 (clusters
-    back, the optimizer comparison's date) share words but say nothing on stage 2 or its cost
-  blocks: stage 2's design and submission; nothing else of the entry is open
-  blocks_steps: *id002
 - id: dan_zeroshot_v4
   title: Catalog_v4 pretraining zero-shot on Daniel's held-out split
   question: How does our best catalog_v4 pretraining (trial 1262) do zero-shot on the held-out processes of Daniel's catalog
@@ -37665,7 +37658,7 @@ entries:
       and 2026-11-10T02:08 (uploaded slides and zip) share words but are about the paper and figures, not this test's next
       step; none settles it
     blocks: closing the entry (plan done)
-    blocks_steps: &id003
+    blocks_steps: &id002
     - 1
   owner:
     agent: acb3827e706c70d22
@@ -37938,4 +37931,4 @@ entries:
     and 2026-11-10T02:08 (uploaded slides and zip) share words but are about the paper and figures, not this test's next step;
     none settles it
   blocks: closing the entry (plan done)
-  blocks_steps: *id003
+  blocks_steps: *id002
