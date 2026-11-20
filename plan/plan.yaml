@@ -16361,6 +16361,19 @@ entries:
       template; 2026-11-19T17:51 is his pasted graphify venv install; 2026-11-16T20:00 is about merging a writing-style skill;
       none concerns the site gate'
     blocks: the lxplus costing fix in the site gate only
+    blocks_steps:
+    - 29
+  - ask: 'Permission classifier refusal: an edit of ~/.local/bin/site and site_gate.py so that the GPU-budget gate charges
+      an lxplus job its own time limit (refused 2026-11-19 as ''Undermining Oversight''). Today the gate charges an lxplus
+      job the full wall time of its HTCondor flavour, so lxplus jobs count for more than they use against the 30 GPU-h budget.
+      Will you make that edit yourself, or add a permission rule that lets it through?'
+    at: '2026-11-20T02:06:51+00:00'
+    searched: 'both CLAUDE.md files and site decisions --project FA --all: D197 is an earlier site_gate fix (cancelled-while-pending
+      jobs), nothing covers this edit; the earlier ask of the same refusal quoted a raw heredoc and is replaced by this one.
+      Joaquin''s messages flagged by the check, read: 2026-11-14T04:31 is a pasted SciPost LaTeX template, 2026-11-16T20:00
+      is about merging a writing-style skill, 2026-11-11T02:09 is about the optimizer comparison date; none concerns the site
+      gate'
+    blocks: the lxplus costing fix in the site gate only
     blocks_steps: &id001
     - 29
   step_why:
@@ -17744,16 +17757,16 @@ entries:
     files: worktrees/wt-graphify/tools/lookup_trial.py worktrees/wt-graphify/analysis/agent_redesign/lookup_trial.json worktrees/wt-graphify/analysis/agent_redesign/lookup_trial_agents.txt
       worktrees/wt-batch/tools/batch.py worktrees/wt-recall/tools/recall.py
     written: '2026-11-19T13:20:29+00:00'
-  ask: 'Permission classifier refusal: `cd ~/.local/bin; cp site site.bak-20261119-maxruntime; cp site_gate.py site_gate.py.bak-20261119-maxruntime;
-    python3 - <<''EOF'' ... (the gate costs an lxplus job by its own --time limit, not its flavour''s) EOF` (2026-11-19, ''Undermining
-    Oversight''). The GPU-budget gate charges an lxplus job the wall time of its HTCondor flavour rather than the job''s own
-    time limit, so lxplus jobs are over-counted against the 30 GPU-h budget. May the fix be applied (by you, or with a permission
-    rule allowing that edit of ~/.local/bin/site and site_gate.py)?'
-  waiting_since: '2026-11-20T01:53:56+00:00'
+  ask: 'Permission classifier refusal: an edit of ~/.local/bin/site and site_gate.py so that the GPU-budget gate charges an
+    lxplus job its own time limit (refused 2026-11-19 as ''Undermining Oversight''). Today the gate charges an lxplus job
+    the full wall time of its HTCondor flavour, so lxplus jobs count for more than they use against the 30 GPU-h budget. Will
+    you make that edit yourself, or add a permission rule that lets it through?'
+  waiting_since: '2026-11-20T02:06:51+00:00'
   searched: 'both CLAUDE.md files and site decisions --project FA --all: D197 is an earlier site_gate fix (cancelled-while-pending
-    jobs), nothing covers this edit. Joaquin''s messages flagged by the check: 2026-11-14T04:31 is a pasted SciPost LaTeX
-    template; 2026-11-19T17:51 is his pasted graphify venv install; 2026-11-16T20:00 is about merging a writing-style skill;
-    none concerns the site gate'
+    jobs), nothing covers this edit; the earlier ask of the same refusal quoted a raw heredoc and is replaced by this one.
+    Joaquin''s messages flagged by the check, read: 2026-11-14T04:31 is a pasted SciPost LaTeX template, 2026-11-16T20:00
+    is about merging a writing-style skill, 2026-11-11T02:09 is about the optimizer comparison date; none concerns the site
+    gate'
   blocks: the lxplus costing fix in the site gate only
   blocks_steps: *id001
 - id: error_correlates
