@@ -18,10 +18,12 @@ cmds: \bhook_incident\.py\b, \bswitch_settings\.py\b
   wall-time target), `git_verify_guard.py` (claims check bypasses, attribution in a commit message), `review_guard.py`
   (reviewer locks, one reviewer per backlog), `brief_guard.py` (briefs), `plan_files_guard.py`, `md_guard.sh`,
   `plot_guard.sh` (config writes), `worktree_guard.sh` (advisory), `worktree_fold_guard.sh`, `review_backlog.sh
-  gate|bashpre`, `hook_syntax_guard.py`, `no_blocking_question.sh`, `send_check.py`, and the user-level
+  gate|bashpre`, `hook_syntax_guard.py`, `no_blocking_question.sh`, `send_check.py`, `wait_guard.py` (no waiting on jobs), and the user-level
   `sleep_guard.sh`. PostToolUse: `review_guard.py` (records reviewer ids), `owner_context.py` (context after a
   hand-back), `delegation_note.py` (a note, never a refusal, when the main session edits code, runs an analysis or
-  tests, or submits; counted in `site digest`), `context_push.py`, `context_guard.py`, `hook_syntax_guard.py`. SessionStart and PreCompact:
+  tests, or submits; counted in `site digest`), `context_push.py`, `context_guard.py`, `hook_syntax_guard.py`, `owner_handoff.py` (an owner's context at the close
+  threshold). UserPromptSubmit: `notification_absorb.py` (the second wake of an agent end). PostToolUseFailure:
+  `submit_guard.py refund`. SessionStart and PreCompact:
   `context_guard.py`, `context_push.py`, the user-level `ledger_guard.sh session-start`. `.githooks/commit-msg` refuses
   attribution lines in every commit.
 - Python hooks exit 1 on a crash (non-blocking); shell hooks are parsed before a write and restored from the last good

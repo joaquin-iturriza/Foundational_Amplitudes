@@ -10,7 +10,7 @@ cmds: \bLLOCA_[A-Z_]+=, \bbench_workers_ab\.sh\b
   `LLOCA_POOL`); per-particle frames broadcast over heads instead of replicated
   (`models/attention_lloca_mup.py`, `LLOCA_FRAMES`, default `broadcast`; set
   `repeat` for the original — broadcast only applies for `attn_reps` with max
-  order ≤ 1, else auto-falls-back to repeat). Equivalence guards: `test_amp.py`
+  order ≤ 1, else auto-falls-back to repeat). Equivalence guards: `tests/test_amp.py`
   Section 0. Read the code for details.
 - **Per-step host↔device syncs** — `LLOCA_SYNC` env toggle (default `deferred`,
   `blocking` = original for A/B). `deferred` fuses the per-step syncs into one and
