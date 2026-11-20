@@ -1,0 +1,98 @@
+{
+ "bbzz_d3162": {
+  "scr": {
+   "run": "runs/dsave_s2_scr_bbx_zz_d7_t8500/trial_1937",
+   "gn_step0": 14074.1181640625,
+   "gn_max_0_40": 18675188.0,
+   "gn_median_100_400": 159.05500030517578,
+   "loss_step0": 38.641502380371094,
+   "loss_step50": -0.9983330368995667,
+   "warmup": 0.1467426,
+   "lr_step100": 0.00045585477145148354
+  },
+  "R": {
+   "run": "runs/dsave_s2_ft_bbx_zz_d7_t8500/trial_1678",
+   "gn_step0": 314505.78125,
+   "gn_max_0_40": 317277.03125,
+   "gn_median_100_400": 87.73654556274414,
+   "loss_step0": 3557.783447265625,
+   "loss_step50": -2.473858118057251,
+   "warmup": 0.1057209,
+   "lr_step100": 0.0022969566812917593
+  },
+  "C": {
+   "run": "runs/dsave_s5cosparent_ft_bbx_zz_d7_t8500/trial_0295",
+   "gn_step0": 314505.78125,
+   "gn_max_0_40": 317277.03125,
+   "gn_median_100_400": 332.6329040527344,
+   "loss_step0": 3557.791748046875,
+   "loss_step50": -1.5788995027542114,
+   "warmup": 0.1917704,
+   "lr_step100": 0.00030579643612269937
+  },
+  "W": {
+   "run": "runs/dsave_s5wsdparent_ft_bbx_zz_d7_t8500/trial_1308",
+   "gn_step0": 33716.44921875,
+   "gn_max_0_40": 33716.44921875,
+   "gn_median_100_400": 211.82715606689453,
+   "loss_step0": 408.0426330566406,
+   "loss_step50": -3.1058030128479004,
+   "warmup": 0.0660506,
+   "lr_step100": 0.0007633828600356505
+  },
+  "L": {
+   "run": "runs/dsave_s6cosparentlongwu_ft_bbx_zz_d7_t8500/trial_0267",
+   "gn_step0": 314505.78125,
+   "gn_max_0_40": 320106.03125,
+   "gn_median_100_400": 1392.548095703125,
+   "loss_step0": 3557.784912109375,
+   "loss_step50": 88.3734359741211,
+   "warmup": 0.5553932,
+   "lr_step100": 7.158391251694915e-05
+  }
+ },
+ "catalog": {
+  "FA-ccin2p3-0de6be56": {
+   "label": "catalog, cosine parent, restart",
+   "gn_step0": 9.325844764709473,
+   "gn_max_0_40": 631.28369140625
+  },
+  "FA-ccin2p3-9079718e": {
+   "label": "catalog, WSD parent, restart",
+   "gn_step0": 5.6683244705200195,
+   "gn_max_0_40": 182.28150939941406
+  },
+  "FA-ccin2p3-1354daee": {
+   "label": "catalog, WSD parent branched\nwith optimizer state",
+   "gn_step0": 23.342626571655273,
+   "gn_max_0_40": 61.232666015625
+  },
+  "FA-ccin2p3-1c90ae73": {
+   "label": "catalog, cosine parent continued\nwith optimizer state",
+   "gn_step0": 4.659816741943359,
+   "gn_max_0_40": 78.99139404296875
+  }
+ },
+ "kit": {
+  "zg": {
+   "gn_step0": 3332128.0,
+   "loss_step0": 16539.076171875,
+   "gn_median_100_400": 184.76211547851562
+  },
+  "zgg": {
+   "gn_step0": 60722.859375,
+   "loss_step0": 252.02078247070312,
+   "gn_median_100_400": 203.36284637451172
+  },
+  "zggg": {
+   "gn_step0": 1945.0655517578125,
+   "loss_step0": 2.5095162391662598,
+   "gn_median_100_400": 167.83849334716797
+  },
+  "zgggg": {
+   "gn_step0": 3658.9716796875,
+   "loss_step0": 37.64922332763672,
+   "gn_median_100_400": 105.86104583740234
+  }
+ }
+}
