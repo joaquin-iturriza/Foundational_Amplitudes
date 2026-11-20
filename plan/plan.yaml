@@ -36718,6 +36718,18 @@ entries:
       42): Muon 2048 0.141, Muon 128 0.072, Adam 2048 0.136, Adam 128 pending (scoring FA-ccin2p3-f5720c93 failed: the trial
       copied lxplus->CC kept its /eos recipe path; fix tools/rebuild_run.load_cfg). B1/B2 at 5e5 (n=4): val 1.57e-3/9.2e-4,
       test 0.0164/0.0087. D509 seeds running on CC.'
+  - at: '2026-11-20T12:31:25+00:00'
+    text: '2026-11-20 step 17, W parent at half the peak lr FA-ccin2p3-47e14eae (parent_read.py wlr/wleak @b70ad9fd, data/parent_wlr.json,
+      parent_wlr_leak.json, fig zng_parent_wlr @e4696fd4), under its passed design. Stability: largest median grad norm per
+      1280-step interval 5.0e3 (bar 1e4; first parent 5.4e3, W at 3.78e-3 2.1e6), 0 non-finite steps (24), stable-phase training
+      het. loss rise 0.0 (4.4): STABLE. Accuracy on the same whole CC val pools: geometric-mean MSE(ln|M|^2) over 28 = 7.1e-6
+      against first parent 9.6e-5 (13.6x lower, below it on 28/28), W at 3.78e-3 3.9e-4, old finale 1.44e-5 (2.0x lower, below
+      it on 21/28): outcome (a), stage 2''s parent candidate. u d~ -> e+ nu g 0.074 (<= 0.45: the W column learns it; old
+      finale 1.95e-3, first parent 4.18). Worst against the old finale: bhabha 2.0e-3 (361x), u u~ -> d d~ one loop 0.016
+      (60x). Curve test passes (separation 0.33, end_up 0). Checks: 0 of the val events of any of the 28 pools in the train
+      pool it loaded (momenta+PDG, float64, rounded 1e-9); sigma-stage val read vs eval_best_val on the W retrain agree to
+      0.66-1.09x on 25/28 pools (not on tau nu, t t~ V, whose pools differ by site). Not separated: lr from site (this run
+      trained on CC''s train pools, the controls on lxplus''s; same recipe).'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
