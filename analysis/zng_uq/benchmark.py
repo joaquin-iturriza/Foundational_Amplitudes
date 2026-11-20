@@ -717,6 +717,13 @@ def d507fig(data, search):
     res["ratios"] = {"G": b["muon_b2048"] / b["adam_b128"], "batch_muon": b["muon_b2048"] / b["muon_b128"],
                      "batch_adam": b["adam_b2048"] / b["adam_b128"], "opt_b2048": b["muon_b2048"] / b["adam_b2048"],
                      "opt_b128": b["muon_b128"] / b["adam_b128"]}
+    # D509 seed spread: each ratio over the three-seed means, and its range over every seed pairing (min, max)
+    sd = {c: list(res[c]["seeds"].values()) for c in D507}
+    pairs = {"G": ("muon_b2048", "adam_b128"), "batch_muon": ("muon_b2048", "muon_b128"), "batch_adam": ("adam_b2048", "adam_b128"),
+             "opt_b2048": ("muon_b2048", "adam_b2048"), "opt_b128": ("muon_b128", "adam_b128")}
+    res["ratios_seeds"] = {k: {"mean": float(np.mean(sd[a]) / np.mean(sd[b])), "min": min(sd[a]) / max(sd[b]),
+                               "max": max(sd[a]) / min(sd[b])} for k, (a, b) in pairs.items()}
+    res["seed_spread"] = {c: max(v) / min(v) for c, v in sd.items()}
     t = {c: res[c]["test_median_abs_delta"] for c in D507}
     if all(v is not None for v in t.values()):
         res["ratios_test"] = {"G": t["muon_b2048"] / t["adam_b128"], "batch_muon": t["muon_b2048"] / t["muon_b128"],
