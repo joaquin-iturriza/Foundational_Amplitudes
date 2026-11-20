@@ -36412,8 +36412,7 @@ entries:
     '17': FA-ccin2p3-47e14eae
     '18': FA-ccin2p3-6a7b4e06 FA-ccin2p3-48eae325 FA-ccin2p3-5bbb5f00 FA-ccin2p3-7390e5a4 FA-ccin2p3-f9748b00 FA-ccin2p3-21cf4ce9
       FA-ccin2p3-852e8de6 FA-ccin2p3-d8ab6a8d FA-ccin2p3-d95314b4 FA-ccin2p3-24c4a980 FA-ccin2p3-6b5c5372 FA-ccin2p3-67fb62ef
-    '19': FA-ccin2p3-6a7b4e06 FA-ccin2p3-48eae325 FA-ccin2p3-5bbb5f00 FA-ccin2p3-7390e5a4 FA-ccin2p3-f9748b00 FA-ccin2p3-21cf4ce9
-      FA-ccin2p3-852e8de6 FA-ccin2p3-d8ab6a8d FA-ccin2p3-d95314b4 FA-ccin2p3-24c4a980 FA-ccin2p3-6b5c5372 FA-ccin2p3-67fb62ef
+    '19': FA-ccin2p3-f9748b00 FA-ccin2p3-21cf4ce9
   findings:
   - at: '2026-11-17T11:18:43+00:00'
     text: 'Their numbers: the UQ repo (branch uq, 311 files) holds no figures, preds or result files. arXiv:2505.20280''s
