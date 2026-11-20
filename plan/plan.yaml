@@ -34549,10 +34549,6 @@ entries:
   - D492
   - D508
   next:
-    2: 'Stage 2 (D482 part 2, D483 up to 5e5, D487 retrained parent): the ladder+star parent with the W at half the peak lr
-      (FA-ccin2p3-47e14eae) fine-tuned against the same network from scratch (searched) on Z+1..4g at D_train 10^2..10^5.5
-      and 5e5, under the canonical setup; design, reviewer, generator, smoke, submit; earlier design''s estimate ~650-850
-      GPU-h'
     3: 'D507 search extension (Joaquin 2026-11-20: ''maybe extending a bit the HPO would be smart''): 8 more guided trials
       in each of the four D507 searches (waves 3,3,2), lr window top tripled in the two batch-128 cells (Muon 3.6e-3 -> 1.1e-2,
       Adam 1.8e-3 -> 5.4e-3), all four on lxplus per site pick (the three CC searches folded there with their 8 observations
@@ -37082,13 +37078,6 @@ entries:
       a run copied between sites fails there on /eos or /sps paths.'
     written: '2026-11-20T11:06:05+00:00'
   step_why:
-    2:
-      feeds: how many target events the retrained ladder+star pretraining saves on Z+ng, and whether the gain vanishes at
-        large D as on u u~ -> Z+4g
-      if:
-      - 'gain > +0.3 dex at small D falling below 0.2 dex at D >= 1e4: the u u~ -> Z+4g picture holds on their data'
-      - 'gain > +0.3 dex persisting at D >= 10^4.5: the pretraining still saves data at their scale'
-      - 'gain < -0.3 dex: it costs, stated with D'
     3:
       feeds: whether the batch-size and optimiser effects of D507 hold once each cell's search is longer and its lr window
         covers its best
