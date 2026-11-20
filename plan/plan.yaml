@@ -34820,6 +34820,21 @@ entries:
     withdrawn_at: '2026-11-20T15:12:06+00:00'
     withdrawn_why: Joaquin never asked for from-scratch searches at 9 D x 4 n; D483 asks only to add the ladder+star fine-tunes
       up to 5e5; the 650-850 GPU-h stage-2 design was an agent's expansion, withdrawn
+  - ask: 'GPU budget: up to ~136 GPU-h above 30 with no decision covering it. Stage 2 per your D483 (''And add the ladder
+      + star up to 5x10^5''): fine-tunes from the new W parent (stable, 13.6x below the first parent) on Z+1..4g at D_train
+      = 10^2, 10^2.5, ..., 10^5.5 and 5e5, one run per cell at the parent''s HPs, 36 runs. Estimate from the only measured
+      rate of this setup on their data (Z+4g, 0.59 s/step, an upper bound for lower n): ~34 GPU-h per multiplicity, so ~34
+      GPU-h for Z+4g alone and up to ~136 for all four. Also: the from-scratch results we have on their data exist only at
+      D = 5e5 (all n) and at 1e4 (Z+4g), so at the other 7 D the fine-tunes would have no scratch to compare against. Go with
+      all four n, Z+4g only, or another cut?'
+    at: '2026-11-20T15:16:43+00:00'
+    searched: 'CLAUDE.md GPU budget; site decisions D482, D483, D487, D506: none sets a cost for the fine-tune ladder; the
+      earlier 650-850 GPU-h design (with scratch searches) withdrawn as never asked. Joaquin''s messages 2026-11-13T06:45
+      (section 2 resampling and a caption), 2026-11-12T01:19 (tt LO / uu V points, what ''stage 2'' meant in another entry)
+      and 2026-11-14T04:31 (a pasted SciPost LaTeX template) share words but set no cost for this ladder'
+    blocks: step 4 (stage 2 submission); step 3 keeps running
+    blocks_steps: &id002
+    - 4
   owner:
     agent: adaaac120a3656f82
     state: working
@@ -37098,6 +37113,20 @@ entries:
       if:
       - 'under 30 GPU-h: design review, submit'
       - 'above 30 GPU-h: cost to Joaquin first'
+  ask: 'GPU budget: up to ~136 GPU-h above 30 with no decision covering it. Stage 2 per your D483 (''And add the ladder +
+    star up to 5x10^5''): fine-tunes from the new W parent (stable, 13.6x below the first parent) on Z+1..4g at D_train =
+    10^2, 10^2.5, ..., 10^5.5 and 5e5, one run per cell at the parent''s HPs, 36 runs. Estimate from the only measured rate
+    of this setup on their data (Z+4g, 0.59 s/step, an upper bound for lower n): ~34 GPU-h per multiplicity, so ~34 GPU-h
+    for Z+4g alone and up to ~136 for all four. Also: the from-scratch results we have on their data exist only at D = 5e5
+    (all n) and at 1e4 (Z+4g), so at the other 7 D the fine-tunes would have no scratch to compare against. Go with all four
+    n, Z+4g only, or another cut?'
+  waiting_since: '2026-11-20T15:16:43+00:00'
+  searched: 'CLAUDE.md GPU budget; site decisions D482, D483, D487, D506: none sets a cost for the fine-tune ladder; the earlier
+    650-850 GPU-h design (with scratch searches) withdrawn as never asked. Joaquin''s messages 2026-11-13T06:45 (section 2
+    resampling and a caption), 2026-11-12T01:19 (tt LO / uu V points, what ''stage 2'' meant in another entry) and 2026-11-14T04:31
+    (a pasted SciPost LaTeX template) share words but set no cost for this ladder'
+  blocks: step 4 (stage 2 submission); step 3 keeps running
+  blocks_steps: *id002
 - id: dan_zeroshot_v4
   title: Catalog_v4 pretraining zero-shot on Daniel's held-out split
   question: How does our best catalog_v4 pretraining (trial 1262) do zero-shot on the held-out processes of Daniel's catalog
