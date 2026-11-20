@@ -37480,6 +37480,79 @@ entries:
       out), name what spread is expected for a no, and demote ''best lag > 0.25 at more D'' to a side read: it rests on one
       trial per D with no spread. The val bar of 2.53 and the step-0 NLL and gradient-norm numbers check out (restart_summary.json:
       3558/408 and 3.1e5/3.4e4; catalog 631 -> 79).'
+  - at: '2026-11-20T03:10:55+00:00'
+    question: 'Revised once on the reviewer''s FIX (controls per change, W in the scratch, spread). On b b~ > Z Z tree level
+      (held-out parent without the f f~ > Z Z class), does a restart that avoids today''s restart jump keep the pretrained
+      head start over scratch and lower the search best''s val? Today''s restart (D423 template): the parent''s final post-sigma
+      model (EMA weights), fresh optimizer, WSD fine-tune, warmup searched in [0.05,0.2] from lr 0. Arms per D in {100,316,3162},
+      8-trial DyHPO searches, all from two rerun parents (cosrerun, wsdrerun): C'' today''s restart from the cosine rerun;
+      Oc the cosine rerun''s main-stage end (step 3458, live weights, pre-sigma), fresh optimizer, today''s search; O = Oc
+      + the parent''s optimizer state; W'' today''s restart from the WSD rerun; Bc the WSD rerun at the start of its cooldown
+      (step 3026, lr at peak, live weights), fresh optimizer, today''s search; B = Bc + the parent''s optimizer state + no
+      warmup (the branch continued); S WSD scratch (the matched from-scratch control). L (low peak lr, long warmup) is the
+      existing step-7 arm dsave_s6cosparentlongwu vs its control C on the original parent (no new run). Pairs, one change
+      each: O/Oc optimizer state; Oc/C'' the snapshot (live pre-sigma end vs scored post-sigma); B/Bc optimizer state with
+      no warmup (the jump-free continuation); Bc/W'' snapshot and branch point. Feeds D414 and the fine-tune template''s restart
+      (D423); D511 (owner-sized, under 100 GPU-h).'
+    prior: '(1) results.tex par:v4_warm_start_optstate/_valley/_fixes (catalog warm start, k=533): the parent''s optimizer
+      state removed the restart jump (G 79 vs 631-1016) and read WORSE/no better (R 1.148/1.240 vs control); the WSD branch
+      with optimizer state G 61 vs 181 (WSD final restart) vs 1023, NOT BETTER than the WSD final restart (PP4 1.016, EE4
+      1.035); the moment fill at lr 0 did not remove the jump (par:v4_warm_start_repairs). (2) data saving step 6 (pretrain_data_saving,
+      step6_readout.py @f073f912): head start lost at R 0.16/0.10/0.08, C 0.33/0.14/0.82, W 0.16/0.14/0.18 at D=100/316/3162;
+      W/C best val pooled 6.0, C/R 0.54. (3) step-7 warmup test L (finding 2026-11-13T13:50): lead lost at 0.14-0.16 of the
+      run with warmup up to 0.6, 11/12 long-warmup trials before their own warmup end; L/C pooled 0.88 WITHIN. (4) This entry''s
+      step 1 (finding 2026-11-20, plot_restart.py @a5f6c7b3): at step 0, lr 0, het NLL 3558 and gradient norm 3.1e5 from the
+      cosine parent (408, 3.4e4 from the WSD parent) against catalog restarts'' 5-23 rising to 61-631; Z+ng fine-tunes alike
+      (3.3e6 Zg): the shock is the parent''s function (its sigma) on the new target, which the snapshot change (pre-sigma
+      head) touches, hence the Oc and Bc controls. Prediction from (1),(3),(4): O/Oc and B/Bc read no change. lowd_ft: first
+      validation above start in 78/102 linear-probe runs (par:lowd_ft). Searched: results.tex optimizer state, branch, restart,
+      warm start, warmup, sigma head, step-0; plan entries pretrain_data_saving, warm_start; site decisions D303, D307, D308,
+      D414, D423, D506, D511.'
+    measure: 'Primary per pair, read by a readout extending step6_readout.py to the s7 searches: per non-blow-up trial (warmup
+      rise < 10) the lag = lost_at - warmup_frac (lost_at where the smoothed v_ft/v_scr against the S search best first reaches
+      1, 1 if never; B''s warmup 0), and the count of an arm''s trials with lag > 0.25 out of its non-blow-up trials (share_lag_above),
+      against its pair''s. Side reads: per D whether the search best''s lag > 0.25 (one trial per D, no spread); the same
+      against the stage-2 cosine scratch best (labelled without W). Secondary: best val MSE(ln|M|^2) (mu, best checkpoint)
+      per D, pair ratios per D and pooled (geometric mean over 3 D) against 5^(1/sqrt 3)=2.53; test MSE beside; each over
+      S. Mechanism: step-0 het NLL and max pre-clip gradient norm over steps 0-40 per trial (restart_steps.py). Figures: restart_steps
+      and restart_headstart redrawn with the new arms.'
+    check: 'Step-0 shock moves with the parent and start: NLL 3558 (cosine) vs 408 (WSD), gradient norm 3.1e5 vs 3.4e4 (restart_summary.json);
+      the optimizer state moved the catalog jump 631 -> 79. Head-start share on the record: R 1/17 = 0.06, C 5/19 = 0.26 (step6_readout.json),
+      about 1.5 binomial SE apart (Fisher p ~0.2): the measure''s resolution at ~20 trials per arm is SE ~0.1 per share, ~0.14
+      on a difference, so only a difference of ~0.3 stands out; no search-to-search spread of it exists. Val bar 2.53 = the
+      5x search-to-search spread (results.tex ladder); checks every 2% of the run, 0.25 lag = 12 checks.'
+    fixed: 'Configs @a5f6c7b3 and this FIX''s commit (sweep/gen_data_saving.py --targets bbx_zz --ks 4 5 7 --wsd; stages s7cosrerun,
+      s7cosstep, s7optstate, s7wsdrerun, s7wsdstep, s7wsdbranch ft; s7wsd scr): against their step-6 twins only name, parent
+      path (reruns), training.save_model_at_steps=[], and per arm: Oc/Bc ckpt model_run0_step3458/3026 with fine_tune.start_weights=live;
+      O/B those plus fine_tune.load_optimizer_state=true; B also cosanneal_warmup_frac fixed 0 (out of the space). S: scratch
+      space as stage 2 under WSD, base config the cosine rerun (W in). Same: stage-2 tree ft space (lr_scale [1/3,3] about
+      c(T), layer_decay 1, template ranges), T 4960/7840/8500, batch D/2, recipe catalog_v4_datasaving_bbx_zz, HETEROSC mu_mse
+      + sigma stage, seed 42, DyHPO seed = the s2 twin''s, 8 trials waves 3,3,2. Parents: scripts/job_datasaving_parent.sh
+      heldoutbbzz ++model.input_soft_eps=1e-8 ++model.input_pair_logs=6 ++training.save_model_at_steps=[3458] tag=cosrerun,
+      and the same with ++training.scheduler=WSD ++training.wsd_cooldown_frac=0.125 ++training.save_model_at_steps=[3026]
+      tag=wsdrerun (cooldown round(0.125*3458)=432 steps from 3026). The reruns differ from the step-6 originals in the save
+      key and in data.internal_mass_pdgs [23,6,25,24] (D506, the script''s current canonical setup): C'' is not a replicate
+      of step 6''s C, and L vs C stays on the original parents. Gate before the searches: each rerun config.yaml diffed against
+      its original (only those two keys), and a D395 smoke of O and B (~50 steps + sigma stage, 1 GPU).'
+    control: Each arm against its one-change pair (O/Oc, Oc/C', B/Bc, Bc/W', same rerun parent, search and DyHPO seed); C
+      (step 6) for L; S (WSD scratch, W in, same seed and waves) as the head-start reference, the stage-2 cosine scratch (without
+      W) beside.
+    seeds: 'Run seed 42, one 8-trial search per arm and D (D315, D439, as step 6): 7 fine-tune arms + S = 24 searches, 192
+      trials. Cost: parents 2 x 1.51 GPU-h (V100); 8 arms x (0.20+0.26+0.29) x 8 = 48.0 GPU-h at the generator''s per-trial
+      estimates; smoke ~0.3; total ~51 GPU-h, under D511''s 100. Disk: < 3 GB on CC (40 GB free on /sps/lpnhe read 2026-11-20).
+      Wall: parents ~1.6 h on CC (site pick: 7 fit), smoke ~0.3 h, then one drive.py batch of 24 searches, 3 waves x ~0.35
+      h, --sites ccin2p3 lxplus jeanzay --allow-jeanzay.'
+    outcome: 'Per pair: HOLDS if the arm''s share_lag_above exceeds its pair''s by >= 0.3 with one-sided Fisher p < 0.05 on
+      the trial counts (e.g. 8/20 vs 2/20); a no is shares within about +-0.2 (the binomial spread at ~20 trials); between:
+      UNRESOLVED, reported as such. Val: pooled arm/pair LOWER < 1/2.53, HIGHER > 2.53, else WITHIN. Branches: (a) O or B
+      val LOWER than its pair -> that restart (optimizer state, branch) goes to the fine-tune template (D423/D414), reported
+      with its cost (parents saved with optimizer state). (b) HOLDS and WITHIN -> the jump-free restart keeps the head start
+      but it does not pay at the best checkpoint: reported, template unchanged. (c) O/Oc and B/Bc both no and WITHIN (with
+      L''s branch (c)) -> the head start is not lost to the restart''s lr jump or empty optimizer; if Oc/C'' or Bc/W'' moves,
+      the snapshot (pre-sigma head, the step-0 shock) is credited and a sigma-start design is next; if nothing moves, plain
+      scratch catch-up: reported. (d) HIGHER -> that restart hurts: reported. Beside: step-0 NLL and gradient norm per arm
+      (Oc/O/Bc/B expected to differ from C''/W'' if the post-sigma head makes the shock), S vs stage-2 cosine scratch. Diverged
+      trials listed apart (D398).'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
