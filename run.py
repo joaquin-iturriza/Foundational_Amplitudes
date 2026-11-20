@@ -110,7 +110,7 @@ def promote_final_model(run_dir, stage_dir):
         return
     os.makedirs(dst, exist_ok=True)
     for f in os.listdir(dst):
-        if f.startswith("model_run"):
+        if f.startswith("model_run") and "_step" not in f:   # training.save_model_at_steps snapshots are kept
             os.remove(os.path.join(dst, f))
     for f in os.listdir(src):
         shutil.move(os.path.join(src, f), os.path.join(dst, f))

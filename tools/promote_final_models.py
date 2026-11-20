@@ -30,7 +30,7 @@ def main():
                 continue
             run = os.path.dirname(os.path.dirname(sm))
             pre = [os.path.join(run, "models", f) for f in sorted(os.listdir(os.path.join(run, "models")))
-                   if f.startswith("model_run")] if os.path.isdir(os.path.join(run, "models")) else []
+                   if f.startswith("model_run") and "_step" not in f] if os.path.isdir(os.path.join(run, "models")) else []
             todo.append((run, os.path.dirname(sm), pre))
     freed = sum(os.path.getsize(f) for _, _, pre in todo for f in pre)
     print(f"{len(todo)} runs, {freed / 1e9:.2f} GB of pre-fit checkpoints")
