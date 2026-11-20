@@ -37583,8 +37583,13 @@ entries:
     - finetune_mechanism
   decisions:
   - D511
-  next: Restart test written (par:ftm_restart_test @bc3b3bda). Close the entry (plan done --writeup bc3b3bda) unless Joaquin
-    asks for the sigma-start run or a top-up of the two cosine arms
+  next:
+    1: Restart test written (par:ftm_restart_test @bc3b3bda). Close the entry (plan done --writeup bc3b3bda) unless Joaquin
+      asks for the sigma-start run or a top-up of the two cosine arms
+    2: 'Joaquin 2026-11-20 ''Yes, of course I want those open points explored.'': why the fine-tune does not improve below
+      from-scratch''s end point: (a) parent weights hold it at a worse end point, (b) fine-tune lr range or length wrong,
+      (c) end point set by D so pretraining buys only speed; first a long-horizon fine-tune vs from-scratch at D=316; within
+      D511'
   done_when: null
   notes_ref: null
   match: dsave_ftmech_*,ftmech_*
@@ -37889,6 +37894,11 @@ entries:
       if:
       - 'Joaquin says close: plan done --writeup bc3b3bda'
       - 'Joaquin asks for the sigma-start run or a top-up: design it, review, submit'
+    2:
+      feeds: how the fine-tune template should keep the pretraining's edge (D414, D423)
+      if:
+      - 'fine-tune end point above scratch at long horizon: test (a) vs (b)'
+      - 'both reach the same end point: (c), pretraining buys speed only; report'
   step_waits: {}
   handoff:
     state: '2026-11-20 11:50. Restart test (design passed 2026-11-20): the 21 s7 searches are out as one drive.py batch (detached
