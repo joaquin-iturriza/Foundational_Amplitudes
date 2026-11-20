@@ -2,16 +2,16 @@
  "epem_ttx_d7_t8500/scr": {
   "control": {
    "n": 9,
-   "n_tracks": 6,
+   "n_good": 1,
    "best_min": 8.539538591395683e-09,
+   "together_min": 1.2669658392257522e-08,
    "best": {
     "run_dir": "runs/dsave_s2_scr_epem_ttx_d7_t8500/trial_0640",
     "peak_lr": 0.005622732,
-    "end_over_best": 1.001929752747487,
-    "late_val": 0.0017389428733691514,
-    "late_train": 0.00020276620838120783,
-    "well": true,
-    "stalls": false
+    "separation": 8.659716500928443,
+    "end_up": 1.0,
+    "well": false,
+    "batchsize": null
    },
    "failed": [
     [
@@ -23,50 +23,50 @@
   },
   "c/3": {
    "n": 8,
-   "n_tracks": 4,
+   "n_good": 0,
    "best_min": 1.2962519427013385e-07,
+   "together_min": 2.64071044009558e-07,
    "best": {
     "run_dir": "runs/dsave_lrthird_scr_epem_ttx_d7_t8500/trial_0153",
     "peak_lr": 0.00387384,
-    "end_over_best": 1.0,
-    "late_val": 0.030351971720014498,
-    "late_train": 0.0010452696234813004,
-    "well": true,
-    "stalls": false
+    "separation": 35.14759233461262,
+    "end_up": 1.0,
+    "well": false,
+    "batchsize": null
    },
    "failed": [],
-   "verdict": "HIGHER (15x), best tracks"
+   "verdict": "HIGHER (15x), best bad"
   },
   "c/10": {
    "n": 8,
-   "n_tracks": 6,
+   "n_good": 0,
    "best_min": 6.216535076303449e-08,
+   "together_min": 6.216535076303449e-08,
    "best": {
     "run_dir": "runs/dsave_lrtenth_scr_epem_ttx_d7_t8500/trial_1073",
     "peak_lr": 0.002340865,
-    "end_over_best": 5.502414139689231,
-    "late_val": 1.9548293923623714,
-    "late_train": 0.020698881956128467,
+    "separation": 714.8666533583931,
+    "end_up": 2.5661976842833374,
     "well": false,
-    "stalls": false
+    "batchsize": null
    },
    "failed": [],
-   "verdict": "HIGHER (7.3x), best turns up"
+   "verdict": "HIGHER (7.3x), best bad"
   }
  },
  "epem_ttx_d7_t8500/ft": {
   "control": {
    "n": 7,
-   "n_tracks": 5,
+   "n_good": 0,
    "best_min": 8.219863874168195e-09,
+   "together_min": 2.2371457531859355e-08,
    "best": {
     "run_dir": "runs/dsave_s4_ft_epem_ttx_d7_t8500/trial_1545",
     "peak_lr": 0.0031777316634999993,
-    "end_over_best": 1.0,
-    "late_val": 0.09910262524148719,
-    "late_train": 0.004796759094599548,
-    "well": true,
-    "stalls": false
+    "separation": 25.493135175424843,
+    "end_up": 1.0,
+    "well": false,
+    "batchsize": null
    },
    "failed": [
     [
@@ -78,35 +78,35 @@
   },
   "c/3": {
    "n": 8,
-   "n_tracks": 8,
+   "n_good": 0,
    "best_min": 1.877244518904492e-09,
+   "together_min": 5.8838704983564815e-09,
    "best": {
     "run_dir": "runs/dsave_lrthird_ft_epem_ttx_d7_t8500/trial_1033",
     "peak_lr": 0.004196043809,
-    "end_over_best": 1.0,
-    "late_val": 0.0007257574519484019,
-    "late_train": 0.00022799325007665465,
-    "well": true,
-    "stalls": false
+    "separation": 3.756472852664535,
+    "end_up": 1.0,
+    "well": false,
+    "batchsize": null
    },
    "failed": [],
-   "verdict": "LOWER (0.23x), best tracks"
+   "verdict": "LOWER (0.23x), best bad"
   },
   "c/10": {
    "n": 8,
-   "n_tracks": 8,
+   "n_good": 0,
    "best_min": 7.153871439128104e-09,
+   "together_min": 1.6888460171418527e-08,
    "best": {
     "run_dir": "runs/dsave_lrtenth_ft_epem_ttx_d7_t8500/trial_1024",
     "peak_lr": 0.0011505349829,
-    "end_over_best": 1.0,
-    "late_val": 0.01554768153913097,
-    "late_train": 0.001248414750683601,
-    "well": true,
-    "stalls": false
+    "separation": 12.84034169955252,
+    "end_up": 1.0,
+    "well": false,
+    "batchsize": null
    },
    "failed": [],
-   "verdict": "SAME (0.87x), best tracks"
+   "verdict": "SAME (0.87x), best bad"
   }
  }
 }
