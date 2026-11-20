@@ -34548,9 +34548,7 @@ entries:
   - D485
   - D492
   - D508
-  next:
-    19: 'D509 one-seed spread: 2 more seeds of each D507 cell''s best trial (4 cells x 2 = 8 runs, ~4.5 GPU-h), same HPs and
-      config, seeds 43 and 44, after the four searches pick their bests'
+  next: null
   done_when: null
   notes_ref: null
   match: zng_uq_*,tp*_zng_*
@@ -36388,14 +36386,7 @@ entries:
       Muon 2048 [3.1e-3,4.1e-2], Muon 128 [2.7e-4,3.6e-3]). Step rates re-read from wave 1; smoke lists outputs. HETEROSC,
       B1 target, their split; mu_mse selection departs from D62, stated. Searched: protocol, Suprio, plateau, ReduceLROnPlateau,
       batch 128/2048, 1e4, D=10^4, train_subsample 10000, highmult, hmscr, seed spread, one seed, dead ends, D484-D507.'
-  step_why:
-    19:
-      feeds: how far apart one seed puts a cell's best, the band the D507 ratios are read against
-      if:
-      - 'seed spread well under 3x: read G and the ratios against the measured spread'
-      - 'seed spread near or above 3x: the D507 ratios read as unresolved at that spread, said so'
-  step_waits:
-    '19': FA-ccin2p3-f9748b00 FA-ccin2p3-21cf4ce9
+  step_waits: {}
   findings:
   - at: '2026-11-17T11:18:43+00:00'
     text: 'Their numbers: the UQ repo (branch uq, 311 files) holds no figures, preds or result files. arXiv:2505.20280''s
