@@ -95,7 +95,8 @@ def main(cached):
                                     "val_pooled": G, "val": None if G is None else
                                     "LOWER" if G < 1 / BAR else "HIGHER" if G > BAR else "WITHIN"}
     json.dump(out, open(os.path.join(HERE, "data", "restart_test.json"), "w"), indent=1)
-    print(json.dumps({k: out[k] for k in ("pairs", "diverged")}, indent=1))
+    out["n_diverged"] = {a: sum(len(v) for n, v in out["diverged"].items() if f"_{STAGE[a]}_" in n) for a in STAGE}
+    print(json.dumps({k: out[k] for k in ("pairs", "cells", "n_diverged")}))
 
 
 if __name__ == "__main__":

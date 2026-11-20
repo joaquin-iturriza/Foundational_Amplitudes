@@ -181,10 +181,10 @@ def main_s7():
             k, T = CELLS[D]
             tr = [s for s in steps.values() if s["sweep"] == f"dsave_{ARMS_S7[sw]}_bbx_zz_d{k}_t{T}"]
             if tr:
-                summ[f"{arm} D={D}"] = {"n": len(tr), "nll_step0_median": float(np.median([s["loss"][0] for s in tr])),
+                summ[f"{arm}_D{D}"] = {"n": len(tr), "nll_step0_median": float(np.median([s["loss"][0] for s in tr])),
                                         "gn_max_0_40_median": float(np.median([max(s["grad_norm"][:41]) for s in tr]))}
     json.dump(summ, open(os.path.join(HERE, "data", "restart_s7_summary.json"), "w"), indent=1)
-    print(json.dumps(summ, indent=1))
+    print(json.dumps(summ))
 
 
 ARMS_S7 = {"C'": "s7cosrerun_ft", "Oc": "s7cosstep_ft", "O": "s7optstate_ft", "W'": "s7wsdrerun_ft",
