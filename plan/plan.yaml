@@ -36159,6 +36159,18 @@ entries:
       GPU (run registry; smoke 0.535 s/step), target 9 h, limit 12 h: ~8.6 GPU-h, plus the CC re-read (~0.5 GPU-h): ~9.1 GPU-h.
       Disk ~0.2 GB in the run dir on EOS (in memory, no cache), lxplus free disk read at submission. The launch path ran end
       to end in FA-lxplus-57f6d2cb (no smoke, D395). Not submitted while every site is unreachable (2026-11-20).'
+    passed_at: '2026-11-20T02:01:31+00:00'
+    reviewer: 'Re-check after FIX: only lr changes vs the W retrain (script diff 8596c289..72cba9e8 adds only the W list the
+      retrain passed and the mixed-generation guard; t t~ V val rebuild stated); measure moves in parent_stab.json (largest
+      median grad norm 5.4e3 vs 2.1e6, non-finite 0 vs 24, train het. loss rise ~5 in the W retrain) and parent_reread.json
+      (gmean 9.6e-5 vs 3.9e-4, e+ nu g 4.18 vs 0.45), committed fea30e4d; outcome now covers every result (unstable / stable
+      a,b, with u d~ -> e+ nu g read in each, curve test reported since the first parent fails it too); 1.38x band from the
+      catalog_v4 seed spread 0.10-0.14 decades, stability gap orders of magnitude above any spread; cost from the W retrain''s
+      own 8.6 h (30928 s), limit 12 h, ~9.1 GPU-h; new tag zng_uq_w_lr1p89e-3 so no run dir is overwritten; disk ~0.2 GB,
+      in memory, free disk read at submission. Searched results.tex: internal_mass_pdgs, PDG 24, W column, offshell, offshW,
+      peak lr, grad norm, non-finite, unstable, dsave_parent, W retrain; plan dead ends; decisions D241, D487, D492, D506:
+      only the 1000-step offshW2 run with W, no W parent at another lr. Note: the first parent''s stable-phase loss noise
+      is ~0.1-0.4, not ~0.02 as written; the 1-unit bar still separates it from the retrain''s ~5.'
   step_why:
     17:
       feeds: whether a ladder+star parent with the W column trains stably and can be stage 2's parent
