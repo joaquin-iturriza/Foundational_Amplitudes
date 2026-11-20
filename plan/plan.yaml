@@ -37412,7 +37412,7 @@ entries:
     agent: a6350226f3a8054a2
     state: closed
     since: '2026-11-20T05:09:01+00:00'
-    state_at: '2026-11-20T10:44:34+00:00'
+    state_at: '2026-11-20T10:50:35+00:00'
     context: 190128
     context_at: '2026-11-20T10:28:14+00:00'
   findings:
