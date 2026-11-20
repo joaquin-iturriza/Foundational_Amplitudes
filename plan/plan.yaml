@@ -34518,6 +34518,14 @@ entries:
     answers_after: '2026-11-18T02:50:09+00:00'
     covers:
     - zng_uq_benchmark
+  - said_at: '2026-11-20T01:46:01.978000+00:00'
+    text: To understand what we are doing, I'd like to continue with these tests, but let's be smarter about it. If you believe
+      that the ~400 epochs regime is what's making a difference, then in order to make tests cheap, go with less data, say
+      1e4 points.
+    decision: D508
+    answers_after: '2026-11-19T18:19:17+00:00'
+    covers:
+    - zng_uq_benchmark
   decisions:
   - D477
   - D478
@@ -34525,6 +34533,7 @@ entries:
   - D481
   - D485
   - D492
+  - D508
   next:
     17: 'W parent repair under D506: rerun FA-lxplus-57f6d2cb with the peak lr halved (1.89e-3), everything else equal (job_datasaving_parent.sh
       finale @72cba9e8, which now sets the W), ~8 GPU-h on lxplus; design recorded 2026-11-20, design reviewer; submit when
@@ -34754,9 +34763,11 @@ entries:
       (file uploads for the KIT slides), 2026-11-06T04:28 (worktrees, pp sampling, het loss, sign head; before this entry
       existed) and 2026-10-06T00:17 (the October transfer-study plan) touch neither.'
     blocks: the W retrain repair (step 17) and the protocol follow-up (step 18)
-    blocks_steps: &id002
+    blocks_steps:
     - 17
     - 18
+    answered_at: '2026-11-20T01:46:01.978000+00:00'
+    decision: D508
   owner:
     agent: a391643ac109c6adb
     state: stopped
@@ -36696,25 +36707,6 @@ entries:
       protocol_test_{lxplus,cc}.json, protocol_steps.json; figs zng_protocol_test_delta, zng_protocol_lr, zng_protocol_gradnorm,
       zng_wsd_cooldown, zng_b1_vs_b2; docs/results.tex 7a90efc3; scratchpad wording.txt, cap_*.txt, ptd_caption.txt, proto_submit_lx_v3.sh
     written: '2026-11-19T18:21:17+00:00'
-  ask: 'Scope: two calls of yours, D241 (one-HP changes) and D492 (no more seeds now). (A, asked 2026-11-19 09:27, still open)
-    The retrained ladder+star parent with the W added to its propagator list (a change you did not ask for) trains unstably
-    at peak lr 3.8e-3 and ends 27x above the old finale on the 28-process geometric-mean val MSE (first parent 6.6x): rerun
-    it once with the peak lr halved to 1.9e-3, everything else equal (~8 GPU-h on lxplus), or drop the W, or a DyHPO sweep
-    of the parent setup with the W? (B) The protocol test held each arm''s learning rate fixed across a 16x batch change,
-    so it is no comparison. The best-against-best fix (each arm''s own 8-trial DyHPO search per n, ~261 GPU-h) cannot resolve
-    it at one seed: our network under Suprio''s protocol beats our searched setup by only 1.1-1.9x in test median |Delta|
-    (and is worse on best validation MSE at n=1,2), inside the 3x that one seed resolves. Options: (1) two more seeds of B1
-    and B2 at every n first (16 runs; B2 runs took 2.9-4.2 h each, so roughly 30-50 GPU-h, an estimate) to see whether the
-    gap is real before decomposing it; (2) decompose on what the two protocols clearly differ on, the end validation/training
-    ratio (B1 21-68 against B2 1.6-5.4 at n=2-4), with the same searches (~261 GPU-h); (3) drop the decomposition. Which?'
-  waiting_since: '2026-11-19T18:19:17+00:00'
-  searched: 'CLAUDE.md feature rule and GPU budget; site decisions D241, D484-D498 (D492: no more seeds now; D498 covered
-    single protocol-test runs only; nothing on the W retrain''s lr); docs/results.tex zng and parent paragraphs; design reviewer
-    FIX 2026-11-19. Joaquin''s messages 2026-11-14T04:31 (a pasted SciPost LaTeX template, no instruction), 2026-11-10T02:08
-    (file uploads for the KIT slides), 2026-11-06T04:28 (worktrees, pp sampling, het loss, sign head; before this entry existed)
-    and 2026-10-06T00:17 (the October transfer-study plan) touch neither.'
-  blocks: the W retrain repair (step 17) and the protocol follow-up (step 18)
-  blocks_steps: *id002
 - id: dan_zeroshot_v4
   title: Catalog_v4 pretraining zero-shot on Daniel's held-out split
   question: How does our best catalog_v4 pretraining (trial 1262) do zero-shot on the held-out processes of Daniel's catalog
