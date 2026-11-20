@@ -1,0 +1,1 @@
+sweep/sweep_config_tp_zng_d1e4_adam_b128_zgggg.yaml tp_zng_d1e4_adam_b128_zgggg_best_s43 31250 training.lr=0.001240051 training.regularization_lambda=3.264703e-10 ema=false training.ema_decay=0.9770664 seed=43
