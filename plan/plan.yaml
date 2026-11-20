@@ -37625,7 +37625,7 @@ entries:
       - 'nothing moves: lr jump ruled out; Oc/C'' moving credits the step-0 sigma shock (sigma-start design next), else scratch
         catch-up'
   step_waits:
-    '1': FA-lxplus-c9cb19d1
+    '1': FA-lxplus-63dabbeb
   handoff:
     state: '2026-11-20. Step 1 done (finding 2026-11-20; plot_restart.py @a5f6c7b3, figs analysis/finetune_mechanism/figs/restart_steps,
       restart_steps_zng, restart_headstart; captions passed check_caption): the fine-tunes'' shock is at step 0 with lr 0
