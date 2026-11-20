@@ -37907,7 +37907,8 @@ entries:
       if:
       - 'fine-tune end point above scratch at long horizon: test (a) vs (b)'
       - 'both reach the same end point: (c), pretraining buys speed only; report'
-  step_waits: {}
+  step_waits:
+    '2': 'a fresh owner: design per the hand-off of 2026-11-20 15:30 (closed for context)'
   handoff:
     state: '2026-11-20 15:30. Restart test done and written: par:ftm_restart_test @bc3b3bda (figs analysis/finetune_mechanism/figs/restart_headstart_s7,
       restart_steps_s7; readout restart_test_readout.py --cached @291c08a1, plot_restart.py --s7). Branch (c): optimizer state
