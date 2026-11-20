@@ -36302,6 +36302,85 @@ entries:
       B1''s emission-scale target (9, 11); their split''s 1e5 val and 1e6 test (10); one multiplicity as D507 says (6, 7);
       no label in inputs (8); disk read at submission, fine since sites are down (14). Note for Joaquin, not a failure: heterosc_select
       mu_mse in every cell departs from D62''s nll default; it is uniform across cells, but the reason should reach him.'
+  - at: '2026-11-20T02:07:46+00:00'
+    question: 'D507 protocol follow-up, made cheap (''To understand what we are doing, I''d like to continue with these tests,
+      but let''s be smarter about it. If you believe that the ~400 epochs regime is what''s making a difference, then in order
+      to make tests cheap, go with less data, say 1e4 points.''). At 1e4 training events of q qbar -> Z+4g and ~400 epochs
+      (as B1 and B2 at 5e5: 4.1e6 events seen here, 2.05e8 there), which carries the edge of Suprio''s protocol: the batch
+      (many small updates) or the optimiser bundle (Adam + ReduceLROnPlateau + its validation cadence and early stopping,
+      against MuonAdamW + WSD)? A 2x2 of {MuonAdamW+WSD, Adam+plateau} x {batch 2048, batch 128}, each cell its own 8-trial
+      single-fidelity DyHPO (best against best). Batch re-posed at this size: 16384 exceeds 1e4 events; the design keeps the
+      protocols'' 16x ratio in batch and in updates and the 400 epochs; B1''s 3.3% and B2''s 0.2% of the data per batch would
+      be 328 and 20 here and put the small-batch cell at 2e5 steps (~90 GPU-h), so 2048 (1953 steps, 5 updates per epoch)
+      and 128 (31250 steps, 78 per epoch). One multiplicity, n=4: with n=3 the only n where B2 beats B1 on both val MSE and
+      test median |Delta|, and by the most (1.72/1.88 against 1.29/1.29; at n=1,2 the measures disagree in sign: val 0.66/0.14,
+      test 1.66/1.14); the entry''s headline multiplicity; no dearer per step than n=3. Expected effect: at 5e5 events B1/B2
+      is 1.7-1.9x, below the 3x read band. Why 1e4 may widen it (the hypothesis D507 tests): the two protocols differ most
+      in their generalisation gap (end val/train MSE ratio B1 68 against B2 1.9 at n=4, protocol_steps.json), and with 50x
+      fewer events per epoch the gap carries more of the validation error.'
+    prior: 'This entry: B1 (our protocol, MuonAdamW/WSD, batch 16384, 12,500 steps, 5e5 events, searched per n: tp_zng_hpo_zgggg
+      trial_0238, best lr 1.48e-2 at its window''s top edge) and B2 (Adam 1e-3, betas (0.99,0.999), batch 1024, plateau 0.3/10,
+      early stop 20 validations, <= 2e5 steps, FA-ccin2p3-cc575309; launch line plan/plan.yaml:35229, :35312); at n=4 B1/B2
+      1.72 (val), 1.88 (test). D498 protocol test (lr not retuned, no comparison). Best-against-best at 5e5, ~261 GPU-h: FIX,
+      dead end. Checkpoint selection (selection.json): B2 chose by NLL, 1.05x its lowest val MSE at n=4. Earlier work at 1e4
+      events on Z+4g: the high-multiplicity transfer grid''s scratch search tp3_hmscr32k_uubar_Zgggg_d8 (u u~ -> Z+4g, D=1e4,
+      32k steps at batch 16384, i.e. full batch, AdamW + cosine, MSE, float32; results.tex ''High multiplicity, first cells''
+      and ''the full grid'', scratch 7.0e-3 in the first cells): best trial lr 1.92e-3 (val_loss 1.80e-4), then 9.6e-4, 2.3e-4,
+      2.1e-4; the trial at 4.4e-3 peaked at step 8320 (analysis/transfer/scratch_sweeps.json); and the horizon test (trendtests,
+      D38) on the same process. Older setup, so a learning-rate anchor here, not a control. Searched: results.tex (protocol,
+      Suprio, plateau, ReduceLROnPlateau, batch 128/2048, 1e4, D=10^4, train_subsample 10000, highmult, hmscr, seed spread,
+      one seed), plan findings 11-17..20, dead ends, site decisions D484-D508.'
+    measure: 'Per cell, the search''s lowest-validation trial (curve test of tools/kit_curves.py sweep flagged, the same rule
+      in every cell; when no trial passes, the lowest-val trial, flagged, as B1): (1) best validation MSE(log|M|^2) of the
+      mean (val_mse lowest over the run x std^2 of the run''s own target standardisation) on the 1e5 validation events of
+      their split; (2) its test median |Delta| on the 1e6 test events (job_kit.sh KIT_SCORE_DIR scoring, benchmark.py ptcollect).
+      Ratios: G = best(Muon/WSD, 2048) / best(Adam/plateau, 128) (B1 over B2 at 1e4); batch ratios best(2048)/best(128) per
+      optimiser; optimiser ratios best(Muon/WSD)/best(Adam/plateau) per batch.'
+    check: 'With tuned lrs the only evidence is B1 over B2 at 5e5: 1.72x (val) and 1.88x (test) at n=4 (benchmark.json, b1_search.json):
+      the measure moves with the whole protocol change, below the 3x band; whether it widens at 1e4 is the question. The protocol-test
+      ratios (1.2-112x, 5-1.4e4x) moved with batch at an lr that was not retuned and are not cited as evidence of a tuned
+      effect. Within a search at 1e4 events on Z+4g the 8 trials span 2.5x in val loss (tp3_hmscr32k_uubar_Zgggg_d8) and B1''s
+      8 at 5e5 span 3.3x: spread from the HPs, not seeds.'
+    fixed: 'Data: kit_A_uq_zgggg_me2 recipe (runs/kit/recipes/kit_A_uq_zgggg_me2_n500000_t12500.yaml), data.train_subsample
+      10000 (the first 1e4 of their 5e5), validation 1e5 and test 1e6 of their split; float64; base_config runs/kit/kit_A_uq_zgggg_me2_n500000_t12500
+      (B1/B2''s network, emission-scale target, HETEROSC + sigma stage); data.internal_mass_pdgs [23,6,25,24] (D506; constant
+      column on Z+4g); heterosc_select mu_mse in all four cells (a departure from D62''s nll default, the same in every cell,
+      to compare means as B1 did); evaluation.train_subsample 2000; clip 5; seed 42. Muon cells: wsd_cooldown_frac 0.125,
+      validate_frac 0.02, the B1 template''s space. Adam cells: betas (0.99,0.999), weight_decay 0 (B2''s launch line), plateau
+      0.3/10, es_patience 20 validations, validation every 10 (2048) and 156 (128) steps (~200 per run, B2''s cadence); space
+      lr, regularization_lambda, ema, ema_decay. Lr windows (configs sweep/sweep_config_tp_zng_d1e4_*_zgggg.yaml): batch scaling
+      by sqrt(batch), the square-root rule for adaptive optimisers (Malladi et al. 2022, SDEs and scaling rules for adaptive
+      gradient algorithms), also used for Muon for want of a rule, supported here by arm a (B1''s lr at 16x smaller batch
+      trained unstably); steps by HPO rule 2; the data-size side (lr* ~ D^0.17, saturating above D~2k) would lower 5e5 anchors
+      by at most 0.51x, and B1''s n=4 best sits at its top edge (a lower bound), so the two are taken as cancelling and the
+      windows widened instead. Muon 2048: 1.48e-2 moved to 1953 steps and batch 2048 = 9.2e-3, window [3.1e-3, 4.1e-2] (top
+      raised for B1''s edge). Muon 128: 8.0e-4, [2.7e-4, 3.6e-3]. Adam 2048: anchors B2''s 1e-3 at batch 1024 x sqrt(2) =
+      1.4e-3, the same with the steps law to 1953 steps 1.8e-2, and the 1e4-event search''s 1.92e-3 at 32k full-batch steps
+      moved to 1953 steps and batch 2048: 2.5e-3; window [1.4e-3, 1.8e-2] covers all three. Adam 128: B2 x sqrt(1/8) = 3.5e-4,
+      with the steps law 9.8e-4, the 1e4-event search''s 1.92e-3 x sqrt(128/1e4) = 2.1e-4; window [1.5e-4, 1.8e-3]. 8 trials
+      per search, DyHPO gp, n_startup 3, waves 3,3,2: 4 searches, 32 trials.'
+    control: Within the 2x2, each cell against its neighbour at the same batch (optimiser) or the same optimiser (batch);
+      Muon/2048 is the B1 analogue, Adam/128 the B2 analogue, both searched here. B1 and B2 at 5e5 are reference levels only
+      (other data size).
+    seeds: 'One seed (42) per trial (D492: ''I don''t see a reason to do more seeds now.''). The 3x band is the zng reads''
+      convention, not a measured seed spread; ratios under 3x read as unresolved, never as no effect. Joaquin is asked whether
+      to add two more seeds of each cell''s chosen trial (8 runs, ~4.5 GPU-h) to measure the spread; the batch goes without
+      them under D492 meanwhile.'
+    outcome: 'G >= 3: Suprio''s protocol leads at 1e4 events; decompose: BATCH carries it when both batch ratios are >= 3
+      and both optimiser ratios < 3, OPTIMISER the reverse, BOTH when both hold, an interaction when only G clears 3. G <=
+      1/3: our protocol leads at 1e4 (the reverse of 5e5); the same ratios say which ingredient. 1/3 < G < 3: unresolved at
+      one seed (as at 5e5, 1.7-1.9x); reported as such, the seeds question decides whether to resolve it. A search whose best
+      trial sits at an lr window edge is reported and its read is unresolved. Cost from measured step rates (protocol_steps.json):
+      Muon batch 1024 n=4 0.121 s/step, Adam batch 1024 n=4 0.102, Adam batch 16384 n=4 0.982 (~5.6e-5 s per extra event per
+      step); batch 128 at the batch-1024 rates (an upper bound): 1.05 h (Muon) and 0.89 h (Adam) per trial; batch 2048 interpolated:
+      0.10 h (Muon), 0.20 h (Adam incl. 200 validations). 8 trials each: 8.4 + 7.1 + 0.8 + 1.6 = 17.9 GPU-h, scoring the 4
+      chosen ~1, smoke ~0.1: <= 19 GPU-h. Wall: waves 3,3,2, the four searches in parallel (12 GPUs): ~3.2 h plus queue, target
+      5 h. The step rates at 128 and 2048 are re-read from wave 1''s traintime before waves 2 and 3 start; a rate over 2x
+      the estimate raises their time limits first. D395 smoke of the Adam/plateau sweep path: one trial at 50 steps through
+      the sigma stage and scoring, listing what it writes (config.yaml, result.json with val_mse_curve and train_eval_mse_curve,
+      train_steps.npz, models/model_run0_best.pt, per_process_metrics.json, data_stats.json, kit_benchmark/predictions.h5
+      and sigma_ln.npy, the plots as png and pdf) and the RESULT line run_trial reads. Disk per trial read from a protocol-test
+      run dir at submission against the site''s free disk.'
   step_why:
     17:
       feeds: whether a ladder+star parent with the W column trains stably and can be stage 2's parent
