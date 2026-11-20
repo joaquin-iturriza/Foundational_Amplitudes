@@ -37971,6 +37971,69 @@ entries:
       the reset helps at the best checkpoint; HIGHER > 2.53 hurts; else WITHIN. Expected from Bc (shock-free, still lost):
       NO and WITHIN. (3) The top-up pairs re-read with the same criteria, the verdicts replaced in par:ftm_restart_test only
       through Joaquin''s yes if one changes. Diverged trials listed apart (D398), never retried.'
+  - at: '2026-11-20T16:06:13+00:00'
+    question: 'D515 (Joaquin: ''Yes, I don''t think we didn''t answer anything with what already ran, we just continue but
+      on Z+4g, with the open points and the other things you said were worth trying''), D513 open points, D511 budget (~44
+      of 100 GPU-h left). On q q~ -> Z+4g (Zenodo 16793011 split) at the D507 setting (1e4 training events, ~400 epochs: batch
+      2048 x 1953 steps and batch 128 x 31250 steps, float64, HETEROSC, mu_mse selection): (1) does today''s template fine-tune
+      restart (D423: the W parent FA-ccin2p3-47e14eae''s final post-sigma model, fresh optimizer, MuonAdamW + WSD, lr searched
+      as scratch) end at the from-scratch Muon/WSD cell''s level (pretraining buys speed only) or above it, best against best,
+      at both batches? (2c) does re-initialising the parent''s sigma head (fine_tune.reset_sigma_head) change the fine-tune''s
+      best val or its head start? Arms (2a) pre-cooldown snapshot with a fresh optimizer and (2b) snapshot with its optimizer
+      state and no warmup need a parent rerun with save_model_at_steps=[56000] (~9 GPU-h) and are held on the budget (asked).
+      (3) designed only on (1)''s result.'
+    prior: 'results.tex highmult grid (l.15072-15095, catalog u u~ -> Z+4g, 32k steps): pretraining gain over scratch at D=1e4
+      -0.11 (finale), +0.11 (+W), -0.04 dex (syn.), within one seed; one decade at D<=10^1.5. results.tex l.15640-15652 (zng,
+      Zenodo split, 5e5 events, 12500 steps, one seed, curve test failed): A_ft vs A on Z+4g MSE 2.1e-4 vs 3.4e-4, median
+      |Delta| 1.6e-2 vs 2.1e-2, within 3x. zng_uq_benchmark D507/D509 (d507_read.json @0d2064b7): scratch Muon b2048 best
+      val MSE(log|M|^2)/std^2 0.0580/0.0669/0.0641 (seeds 42-44), Muon b128 0.0180/0.0214/0.0196; seed spread 1.15 and 1.19;
+      their search extension to 16 trials running (lxplus). This entry on b b~ > Z Z (par:ftm_restart_test @bc3b3bda): fine-tune
+      best val above scratch at every D (C''/S 1.14-3.76, pooled 2.42 within the 2.53 spread); no restart variant (optimizer
+      state, snapshot, shock-free WSD branch) kept the head start; step-0 shock from the first parent on Z+4g: het NLL 37.6,
+      grad norm 3.7e3 (finding 2026-11-20T03:05). No fine-tune search on Z+4g at 1e4 events, nor from the W parent, on record
+      (searched results.tex: Z+4g, zgggg, A_ft, fine-tun; plan entries finetune_mechanism, zng_uq_benchmark; decisions D483,
+      D507, D509, D511, D513, D515).'
+    measure: 'Per cell (batch 2048, 128): best val MSE(log|M|^2) = min val mu-MSE x std^2 (as D507, benchmark.py) of the search''s
+      lowest-val trial, curve test flagged. (1) F/S = three-seed mean of the ft search''s chosen trial (seeds 42 trial, 43,
+      44 fixed-HP reruns) over the three-seed mean of the scratch cell''s chosen trial (D509; replaced by the zng owner''s
+      16-trial choice if it changes), with the range over the 9 seed pairings; also F over the input-flag control (scratch
+      + the parent''s two input flags at scratch''s chosen HPs, seeds 42-44). Head start: best-so-far val of each three-seed
+      curve against step fraction; the fraction at which each first reaches 1.2 x S''s mean best. (2c) Sg/F8: the sigma-reset
+      search''s best over the ft search''s first-8-trials best (its first three waves, same budget, same DyHPO seed), one
+      seed each; step-0 het NLL and max pre-clip grad norm over steps 0-40 (restart_steps.py) for Sg, F and S. Figure: best-so-far
+      val against step fraction for S, S+flags, F, Sg per batch (log y), and the per-seed best vals per arm.'
+    check: 'The start moves the measure on this family: catalog Z+4g gains of ~1 dex at D<=10^1.5 falling to 0+-0.1 dex at
+      1e4 (highmult); zng 5e5 A_ft/A MSE ratio 0.62. The searched lr moves val 1.7-2.8x inside each D507 Muon cell (d507_search.json),
+      so best-against-best is needed. The sigma reset moves step 0: on b b~ > Z Z the parent''s sigma gave step-0 NLL 2260
+      vs scratch 14.3 (restart_s7_summary.json), and the switch replaces exactly the sigma rows (tests/test_reset_sigma_head.py).
+      The flags are part of the parent''s architecture (input_soft_eps 1e-8, input_pair_logs 7; the only model difference
+      between the parent''s and the scratch base''s config.yaml, read on CC 2026-11-20), so their own effect needs the control.'
+    fixed: 'Configs sweep/sweep_config_ftmech_zng4g_{ft,sigreset,scrflags}_{b2048,b128}.yaml, each a copy of sweep_config_tp_zng_d1e4_muon_<batch>_zgggg.yaml
+      @c57dd900 (base kit_A_uq_zgggg config, recipe, 1e4 train events, eval on the whole val split, float64, mu_mse, seed
+      42, MuonAdamW, WSD cooldown 1/8, validate_frac 0.02, steps 1953/31250, the same 7-HP space incl. the widened b128 lr
+      window [2.7e-4,1.1e-2], dyhpo.seed 42 so the 3 start-up trials draw the same HPs as scratch) with only: fine_tune.pretrained_path
+      = the W parent''s models/model_run0_best.pt.gz (copied CC->lxplus by site copy), target_stats own, offshell_stats parent
+      (job_kit A_ft), lr_scale 1, layer_decay 1, ++model.input_soft_eps 1e-8, ++model.input_pair_logs 7; sigreset adds fine_tune.reset_sigma_head=true
+      and runs 8 trials (waves 3,3,2); ft runs 16 (3,3,2,3,3,2) as the extended scratch cells. Gate: D395 smoke, one job,
+      50 steps + sigma stage + plots of ft, sigreset and scrflags at b2048 (scratch trial 1333''s HPs): the log shows the
+      parent loaded, the sigma-row reset line, the sigma stage and plots.'
+    control: 'S: the D507 Muon/WSD scratch cell at the same batch (same data, steps, space, seed, DyHPO seed), its three-seed
+      mean (D509); S+flags (same HPs, seeds 42-44) for the flags alone. For Sg: F''s first 8 trials (same budget and start-up
+      HPs).'
+    seeds: 'Trials seed 42. ft: 16-trial DyHPO per batch, then seeds 43, 44 of each chosen trial (sweep/run_fixed_hp.py).
+      sigreset: 8 trials per batch, one seed. scrflags: seeds 42, 43, 44 per batch at scratch''s chosen HPs. Cost (upper bounds,
+      zng owner''s A100/H100 rates: b128 Muon <=1.06 h, b2048 0.35 h per trial incl. sigma stage): smoke 0.75; ft 16x(1.06+0.35)=22.6;
+      ft seeds 2x1.41=2.8; sigreset 8x1.41=11.3; scrflags 3x1.41=4.2: 41.7 GPU-h, ~98 of D511''s 100 with ~56 spent. Held
+      (asked): parent rerun with save_model_at_steps=[56000] (8.2 h V100 measured, ~9 GPU-h) + snapshot fresh and snapshot+optimizer-state
+      no-warmup searches, 8 trials x 2 batches each: 22.6; total 31.6 GPU-h beyond D511.'
+    outcome: '(1) per batch: HIGHER if every seed pairing gives F/S > 1 (F''s three seeds all above S''s), SAME if the pairing
+      range contains 1, LOWER if all < 1. Both HIGHER (and F above S+flags too) -> the fine-tune ends above scratch: step
+      (3) separates parent weights from the fine-tune''s lr range/length (designed then). SAME -> the fine-tune ends at scratch''s
+      level: pretraining buys speed only at 1e4 (read with the head-start fractions: F reaching 1.2 S earlier = speed). LOWER
+      -> pretraining still gives an edge at 1e4. If S+flags differs from S (range excludes 1), F is read against S+flags as
+      the matched control and the flags'' effect is reported apart. (2c) Sg/F8 beyond 1.41 (= 1.19^2, two single seeds each
+      within the Muon seed spread) either way -> the sigma reset changes the end point (reported which way); within -> no
+      effect; step-0 NLL/grad norm say whether the reset removes the shock. Diverged trials listed apart (D398), never retried.'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
