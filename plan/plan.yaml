@@ -36037,6 +36037,46 @@ entries:
       split, as asked (10); no labels in inputs (8); one seed per D492 (3, seeds); cost from the same setup''s measured wall
       times (protocol_steps.json traintime_hours 5.1/5.6/7.5/6.7 h and 1.2/1.4/1.7/3.4 h); 8 trials, 3 start-up, waves 3,3,2
       over the template''s space, lr centred by the steps law (13, space).'
+  - at: '2026-11-20T01:57:28+00:00'
+    question: 'W parent repair (D506: ''The W offshellness should be added as it was supposed to before we run anything else.'';
+      the main session: the repair is the owner''s within budget). Does the ladder+star parent with the W (PDG 24) in internal_mass_pdgs
+      [23,6,25,24] train stably when its WSD peak lr is halved from 3.78e-3 to 1.89e-3, everything else as the unstable W
+      retrain FA-lxplus-57f6d2cb, and where does it land against the first parent (no W) and the old finale on the whole val
+      pools?'
+    prior: 'This entry: first parent FA-lxplus-00347f0a (no W, peak 3.78e-3): stable (median grad norm per 1280-step interval
+      1e2-1e3, 0 non-finite), geometric-mean val MSE(ln|M|^2) over the 28 processes 9.6e-5 on the rebuilt CC val pools, u
+      d~ -> e+ nu g 4.18 (unlearned). W retrain FA-lxplus-57f6d2cb (W added, peak 3.78e-3): median grad norm up to ~1e6, 24
+      non-finite grad norms, training het. loss climbs from ~-5 to above 0 between steps ~25000 and ~55000, validation spikes
+      to 1.65e11, gmean 3.9e-4 (27x the old finale''s 1.44e-5), u d~ -> e+ nu g 0.45 (findings 2026-11-19 09:21, 09:25; parent_read.py
+      reread @3c908baf, stab @2398515d; parent_reread.json, parent_stab.json). The W''s off-shell column is signed-log standardised
+      (std 5.19 before), so not a raw-scale blow-up; the only training-side change between the two parents is the W column.
+      Searched: results.tex (parent, finale, W, internal_mass_pdgs, offshW), plan findings 11-18..19, site decisions D241,
+      D487, D506: no earlier W-parent run at another lr.'
+    measure: '(1) Stability from the run''s train_steps.npz (parent_read.py stab): per 1280-step interval median and max pre-clip
+      grad norm, count of non-finite grad-norm steps, training het. loss over the stable phase. (2) Accuracy at best weights
+      on the whole CC val pools of the 28 processes (parent_read.py reread, EVAL_FROZEN): geometric mean over the 28 of val
+      MSE(ln|M|^2), per process, and u d~ -> e+ nu g, against the first parent, the unstable W retrain and the old finale
+      on the same pools (parent_reread.json).'
+    check: Measure 1 separates the two existing parents by >100x in median grad norm (1e2-1e3 vs up to 1e6) and 0 vs 24 non-finite
+      steps (parent_stab.json); measure 2 moved 9.6e-5 -> 3.9e-4 (gmean) and 4.18 -> 0.45 (u d~ -> e+ nu g) between them (parent_reread.json).
+    fixed: 'Everything of FA-lxplus-57f6d2cb: scripts/job_datasaving_parent.sh finale (@72cba9e8 it now sets data.internal_mass_pdgs=[23,6,25,24]
+      itself, same list the retrain passed as an argument), base trial 1262 (runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262),
+      recipes/transfer_finale.yaml (28 processes, every train event), 64000 steps, WSD cooldown 1/8, warmup and every other
+      HP of 1262, data.eval_subsample=10000 (whole-pool validation), input flags (input_soft_eps 1e-8, input_pair_logs 7),
+      seed, batch 16384, HETEROSC + sigma stage. One change: lr=1.89e-3 (half). Pools: the u u~ -> t t~ V val/test rebuilt
+      2026-11-19 (same pipeline as its train); train pools unchanged.'
+    control: The first parent FA-lxplus-00347f0a (no W, 3.78e-3) and the W retrain FA-lxplus-57f6d2cb (W, 3.78e-3), both already
+      read on the same rebuilt val pools (parent_reread.json); the old finale as the reference level.
+    seeds: 'One seed (42), as both controls (D492: no more seeds now). Differences under 1.5x on the gmean read as unresolved.'
+    outcome: 'YES (repaired): 0 non-finite steps, median grad norm per interval <= 1e4 at every interval, no rise of the training
+      het. loss in the stable phase above its 1/8-run value, curve test passes; then accuracy: gmean <= 1.5x the first parent''s
+      9.6e-5 and u d~ -> e+ nu g <= 0.45 -> the W parent is stage 2''s parent candidate. STABLE BUT WORSE: stability yes,
+      gmean > 1.5x the first parent -> halving the peak lr costs accuracy at 64000 steps; next is a DyHPO of the parent setup
+      with the W (its cost to Joaquin). NO: non-finite steps or median grad norm > 1e4 again -> the instability is not the
+      peak lr alone; dead end recorded, next the DyHPO. Cost: the first parent''s 0.4087 s/step x 64000 = 7.3 h plus the whole-pool
+      validation (the retrain''s own run; limit 12 h), one GPU on lxplus: ~8 GPU-h, plus the CC re-read (~0.5 GPU-h). Disk
+      ~0.2 GB run dir on EOS. The launch path ran end to end in FA-lxplus-57f6d2cb (no smoke, D395). Not submitted while every
+      site is unreachable (2026-11-20).'
   step_why:
     17:
       feeds: whether a ladder+star parent with the W column can be stage 2's parent
