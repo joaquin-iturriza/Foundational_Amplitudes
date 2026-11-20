@@ -11,7 +11,7 @@ cluster:
 paths: null
 sweep_name: tp_zng_d1e4_adam_b2048_zgggg
 base_config: ${PROJECT_DIR}/runs/kit/kit_A_uq_zgggg_me2_n500000_t12500
-n_trials: 8
+n_trials: 16  # 8 + 8 guided (Joaquin 2026-11-20: extend the D507 searches)
 dyhpo:
   surrogate: gp
   n_candidates: 2000
@@ -19,7 +19,7 @@ dyhpo:
   seed: 42
   n_startup: 3
   total_budget: 10000
-  waves: [3, 3, 2]
+  waves: [3, 3, 2, 3, 3, 2]
 fidelity_schedule:
   t_steps: [1953]
 fixed_params:
