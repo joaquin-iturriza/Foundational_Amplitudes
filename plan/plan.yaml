@@ -34809,9 +34809,9 @@ entries:
     blocks_steps: &id002 []
   owner:
     agent: adaaac120a3656f82
-    state: working
+    state: stopped
     since: '2026-11-20T11:37:33+00:00'
-    state_at: '2026-11-20T12:24:00.411000+00:00'
+    state_at: '2026-11-20T12:35:49.013000+00:00'
     context: 66421
     context_at: '2026-11-20T12:24:26+00:00'
   designs:
@@ -37495,9 +37495,9 @@ entries:
   asks: []
   owner:
     agent: acb3827e706c70d22
-    state: working
+    state: stopped
     since: '2026-11-20T11:37:38+00:00'
-    state_at: '2026-11-20T12:24:04.116000+00:00'
+    state_at: '2026-11-20T12:25:48.596000+00:00'
     context: 93403
     context_at: '2026-11-20T12:24:18+00:00'
   findings:
