@@ -37384,13 +37384,17 @@ entries:
   notes_ref: null
   match: dsave_ftmech_*,ftmech_*
   evidence:
-    runs: []
-    commit: a5f6c7b3
+    runs:
+    - FA-lxplus-0ab69a57
+    - FA-lxplus-d9e44add
+    commit: f3b0156d
     paths:
     - analysis/finetune_mechanism/data/restart_steps.json
     - analysis/finetune_mechanism/data/restart_summary.json
     - analysis/finetune_mechanism/plot_restart.py
     - analysis/finetune_mechanism/restart_steps.py
+    - run.py
+    - tests/test_promote_final_model.py
   dead_ends: []
   asks: []
   owner:
