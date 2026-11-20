@@ -41,4 +41,7 @@ echo "SMOKE $CFG steps=$STEPS run=$RUN"
 python run.py $OVR training.iterations=$STEPS training.validate_frac=0 training.validate_every_n_steps=100 \
   evaluation.train_subsample=2000 use_mlflow=false run_name=$RUN exp_name=zz_smoke \
   run_dir="$PROJECT_DIR/runs/zz_smoke/$RUN" "$@"   # explicit: a base_config's run_dir is the parent run's own
-echo "SMOKE_EXIT $?"
+RC=$?
+echo "SMOKE_EXIT $RC"
+[ "$RC" = 0 ] && echo "RUN_DONE $PROJECT_DIR/runs/zz_smoke/$RUN"   # the supervisor's end marker
+exit $RC
