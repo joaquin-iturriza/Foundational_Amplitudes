@@ -34553,6 +34553,11 @@ entries:
       (FA-ccin2p3-47e14eae) fine-tuned against the same network from scratch (searched) on Z+1..4g at D_train 10^2..10^5.5
       and 5e5, under the canonical setup; design, reviewer, generator, smoke, submit; earlier design''s estimate ~650-850
       GPU-h'
+    3: 'D507 search extension (Joaquin 2026-11-20: ''maybe extending a bit the HPO would be smart''): 8 more guided trials
+      in each of the four D507 searches (waves 3,3,2), lr window top tripled in the two batch-128 cells (Muon 3.6e-3 -> 1.1e-2,
+      Adam 1.8e-3 -> 5.4e-3), all four on lxplus per site pick (the three CC searches folded there with their 8 observations
+      each); then seeds 43, 44 of any cell whose chosen trial changes, test scoring of new chosen trials, d507collect/d507fig
+      v2; <= 22 GPU-h'
   done_when: null
   notes_ref: null
   match: zng_uq_*,tp*_zng_*
@@ -36946,6 +36951,12 @@ entries:
       - 'gain > +0.3 dex at small D falling below 0.2 dex at D >= 1e4: the u u~ -> Z+4g picture holds on their data'
       - 'gain > +0.3 dex persisting at D >= 10^4.5: the pretraining still saves data at their scale'
       - 'gain < -0.3 dex: it costs, stated with D'
+    3:
+      feeds: whether the batch-size and optimiser effects of D507 hold once each cell's search is longer and its lr window
+        covers its best
+      if:
+      - 'a b128 cell''s best moves into the widened lr zone: its window was the limit; re-read the ratios'
+      - 'the chosen trials stay or move < seed spread: the D507 read stands at 16 trials per cell'
   ask: 'GPU budget: ~650-850 GPU-h above 30 with no decision covering it. The W parent at half the peak lr is stable and better
     than both earlier parents, so stage 2 (your part 2 with D483: the ladder+star parent fine-tuned against the same network
     from scratch, searched, on Z+1..4g at D_train 10^2 to 10^5.5 and 5e5) can now be designed on it; its cost by the 2026-11-17
