@@ -36254,6 +36254,41 @@ entries:
       at 50 steps through the sigma stage and scoring) ~0.1 GPU-h. Total <= 19 GPU-h, under 30 (D507 scope). Wall: waves 3,
       3, 2 per search, the four searches in parallel (12 GPUs at a time): 3 x 1.05 h = ~3.2 h plus queue, target 5 h. Disk
       per trial read from a protocol-test run directory at submission against the site''s free disk.'
+    fix_at: '2026-11-20T02:06:02+00:00'
+    fix: '(1) Seeds against spread (check 3): the 3x ''one seed resolves'' factor is asserted, never measured (results.tex
+      l.15523 calls it ''the factor the design takes''); no seed-to-seed spread of best val MSE(log|M|^2) or test median |Delta|
+      exists for these runs, and none at 1e4 events, where it is likely larger. The 8 B1 trials'' 3.3x span (b1_search.json)
+      is HP spread, not seed spread. Under D492 (''I don''t see a reason to do more seeds now'', said of the 5e5 runs) this
+      is Joaquin''s call: ask him, with the cost, whether the chosen trial of each cell gets two more seeds at 1e4 (about
+      0.2 h per run at batch 2048, about 1 h at batch 128, about 4.5 GPU-h in all) so G and the four ratios can be read against
+      a measured spread, or whether he accepts 3x unmeasured. (2) Measure responds (check 2): the check cites the protocol
+      test (arm a against B1 1.2-112x, arm b against B2 5-1.4e4x), which ran each arm at an lr that was not retuned, and Joaquin
+      called that no comparison. That shows the measure moves with lr mistuning, not with batch or optimiser at their own
+      lr. The only tuned-ish evidence is B1 against B2 at n=4: 1.72x best val, 1.88x test median |Delta| (benchmark.json),
+      below the design''s 3x bar. State this as the expected size, and say why 1e4 events at 400 epochs should open a larger
+      gap (or lower the bar using the measured spread from item 1). Otherwise the design expects an unresolved read from the
+      start. (3) Outcome (check 4): ''G < 3 -> no edge at 1e4 events'' turns an unresolved one-seed read into a no. At one
+      seed it reads ''unresolved'', as the 5e5 gap of 1.7-1.9x was; say what that changes for the entry. Add the branch G
+      <= 1/3 (our protocol ahead at 1e4) and what it means. Fix ''which carries 4.1e6 events seen, as B1 and B2'': B1 saw
+      12,500 x 16384 = 2.05e8 events; only the epoch count (about 400) is matched. (4) Prior work, searched independently
+      (check 5): the prior says ''no earlier run at 1e4 events on Z+ng'', and that is false. The high-multiplicity transfer
+      grid ran 8-trial scratch searches on u u~ -> Z+4g at D=1e4, 32k steps, batch 16384, so in effect full batch (sweep/sweep_config_tp3_hmscr32k_uubar_Zgggg_d8.yaml;
+      results.tex l.14932-14975: scratch 7.0e-3 at the first read, hp 18 diverged), plus the D=1e3 and 1e4.5 horizon tests
+      (trendtests, l.14980-14992: at 1e4.5 events the cell is data-limited, best steps 35-50k). Older setup (AdamW cosine,
+      MSE, float32, u not d), but it is the measured lr optimum at (t about 32k, D=1e4) for Z+4g that HPO rule 2 asks to centre
+      on, and the level a 1e4 search reached. Name it with its result, and check the Muon/128 and Adam/128 windows against
+      its best lr. (5) lr windows (checks 13 and 16): the Adam/2048 window [1.6e-3, 1.6e-2] excludes both of its own anchors,
+      1.4e-3 (B2''s lr with sqrt batch scaling) and 1.8e-2 (with the steps law). Widen it to cover both, or give the source
+      of the geometric-mean rule. Say which lr scaling (sqrt batch) is used and where it comes from, and apply rule 2''s D-axis
+      (1e4 against 5e5 events) or say why it is negligible. B1''s n=4 anchor 1.48e-2 sat at its window''s top edge, so the
+      Muon centres inherit a lower bound: say so. (6) Step rate (check 15): the batch-128 and batch-2048 rates are taken from
+      batch-1024 and batch-16384 siblings. The upper-bound argument is plausible, but the design must say the per-step rate
+      is re-read from the first wave''s jobs before the later waves'' limits are confirmed, and that the first-wave Adam smoke
+      lists the validation curve, the mu-MSE result line and the score file it writes. Checks that hold: one change per neighbour
+      pair, each cell searched with its own lr (1, 16); 8 trials, 3 start-up, waves 3,3,2 as the siblings (13); HETEROSC and
+      B1''s emission-scale target (9, 11); their split''s 1e5 val and 1e6 test (10); one multiplicity as D507 says (6, 7);
+      no label in inputs (8); disk read at submission, fine since sites are down (14). Note for Joaquin, not a failure: heterosc_select
+      mu_mse in every cell departs from D62''s nll default; it is uniform across cells, but the reason should reach him.'
   step_why:
     17:
       feeds: whether a ladder+star parent with the W column trains stably and can be stage 2's parent
