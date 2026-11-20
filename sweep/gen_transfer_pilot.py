@@ -139,7 +139,7 @@ FIXED = {
     "data.mass_from_momenta": "false", "data.coupling_scalars": "true",
     "data.internal_mass_scalars": "true", "data.offshell_per_event": "true",
     "data.target_propagators": "true", "data.target_propagator_tchannel": "false",
-    "data.target_propagator_tchannel_max_final": 2, "data.internal_mass_pdgs": "[23,6,25]",
+    "data.target_propagator_tchannel_max_final": 2, "data.internal_mass_pdgs": "[23,6,25,24]",
     "model": "lloca", "model.use_diagrams": "false", "model.particle_encoder_hidden": 0,
     "model.net.num_heads": 8, "model.net.num_blocks": 8, "seed": 42,
     "training.batchsize": 16384, "evaluation.batchsize": 16384, "evaluation.train_subsample": 2000,

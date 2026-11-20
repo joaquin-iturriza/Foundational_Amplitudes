@@ -507,6 +507,12 @@ class AmplitudeExperiment(BaseExperiment):
         self._internal_mass_pdgs = [int(p) for p in (self.cfg.data.get("internal_mass_pdgs", []) or [])]
         self._resonance_per_event = bool(self.cfg.data.get("resonance_per_event", False))
         self._offshell_per_event = bool(self.cfg.data.get("offshell_per_event", False))
+        # D506: a new training run with off-shellness carries the W; a fine-tune or warm start keeps its parent's columns
+        ft = self.cfg.get("fine_tune", None) or {}
+        assert not (self._offshell_per_event and self._use_internal_mass_scalars and self.cfg.get("train", True)
+                    and not ft.get("pretrained_path", None) and self.cfg.get("warm_start_idx", None) is None
+                    and 24 not in self._internal_mass_pdgs), \
+            f"data.internal_mass_pdgs {self._internal_mass_pdgs} lacks the W (24): D506, the default is [23, 6, 25, 24]"
         if bool(self.cfg.data.get("dimensionless_inputs", False)):
             # the settings that would still feed GeV, or rebuild GeV from the momenta, under dimensionless_inputs
             assert self.cfg.data.get("source", "files") == "recipes", "data.dimensionless_inputs: the recipe path only"

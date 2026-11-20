@@ -106,7 +106,7 @@ data:
  # internal-mass analog of coupling_scalars. Values come from each dataset's recipe
  # physics.masses block (table mass as fallback).
  internal_mass_scalars: false
- internal_mass_pdgs: []          # e.g. [23] to feed the scanned Z-propagator mass
+ internal_mass_pdgs: [23, 6, 25, 24]   # D506: Z, top, Higgs and W; read only with internal_mass_scalars
  # Diagnostic: when true, the internal_mass slot is filled PER-EVENT with the
  # resonance argument (√s − m) instead of the per-dataset log-mass — i.e. do the
  # kinematic×mass interaction for the model, to test whether that interaction (not
@@ -123,7 +123,7 @@ data:
  # internal-mass regress-to-mean U-shape that the no-feature baseline cannot — s-channel
  # Z ~1.6 → ~1e-6..1e-4, top 0.42 → 5.4e-2, Z-in-4ℓ 0.17 → 5.9e-2, Higgs(H→ττ) 0.10 →
  # 7.7e-2 (weak: Z→ττ swamps the τ-Yukawa). Production setting for the big-run pretrain:
- # internal_mass_scalars=true, offshell_per_event=true, internal_mass_pdgs=[23,6,25].
+ # internal_mass_scalars=true, offshell_per_event=true, internal_mass_pdgs=[23,6,25,24] (W added, D506).
  # Off by default (opt-in) since it needs the recipe path + diagram sidecars.
  offshell_per_event: false
  # Target-side propagator subtraction: every event's |M|² is multiplied by

@@ -233,12 +233,12 @@ def main():
               f"#   • s-channel M_Z on {len(ZSCAN_PROCS)} neutral-current procs × {N_MZ} "
               f"(~[68,114] GeV), resonance-dense √s;\n"
               f"#   • EXOTIC resonant intermediates: top MT & Higgs MH in ee_wwbb, Z MZ in ee→4μ\n"
-              f"#     (pole is a sub-invariant, phase-space sampled). pdgs [23,6,25].\n"
+              f"#     (pole is a sub-invariant, phase-space sampled). pdgs [23,6,25,24].\n"
               f"# External-mass scan DROPPED (per-dataset offset, removed by standardization). All\n"
               f"# LO share one √s range [{int(LO_SQRTS_MIN)},{int(LO_SQRTS_MAX)}] (clamped up by threshold).\n"
               f"# Run with: data.mass_from_momenta=true data.coupling_scalars=true\n"
               f"#           data.offshell_per_event=true data.internal_mass_scalars=true\n"
-              f"#           data.internal_mass_pdgs=[23,6,25]  (offshell arm)\n"
+              f"#           data.internal_mass_pdgs=[23,6,25,24]  (offshell arm)\n"
               f"#           model.use_diagrams=true (A/B toggles these).\n")
     with open(args.out, "w") as f:
         f.write(header)

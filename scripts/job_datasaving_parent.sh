@@ -23,6 +23,7 @@
 #            lr 3.78e-3 = trial 1262's 3.649e-3 at its 68224 steps moved along its law 7.82114e-3 (T/17056)^-0.55;
 #            WSD (cooldown 1/8, D423) and the D392 input flags set here. Its limit is not this header's 3 h: submit with
 #            --hdr=--time=<the smoke's measured s/step x 64000 x 1.3 + 1 h>
+# D506: every case adds the W (24) to trial 1262's internal_mass_pdgs [23,6,25].
 # Base config:
 # trial 1262 of cov_v4_long_hpo8_cc_68224 (model, HPs, HETEROSC + sigma stage); in memory (data.memmap=false: the
 # 1e4-per-pool train split is ~1.41e7 events, 10 GB host memory at 1.13e7 in r4, and no memmap cache exists for this recipe).
@@ -53,7 +54,8 @@ OUT="$PROJECT_DIR/runs/data_saving/dsave_parent_${WHICH}${TAG}"
 echo "DATASAVING_PARENT recipe=$RECIPE base=$PARENT args: ${ARGS[*]}"
 python run.py --config-path "$PROJECT_DIR/$PARENT" --config-name config run_dir="$OUT" run_name=null \
     data.processes_file="$RECIPE" data.train_subsample="$SUB" data.memmap=false fine_tune.pretrained_path=null \
-    warm_start_idx=null training.iterations="$T" training.lr="$LR" training.is_dyhpo_run=false "${FIX[@]}" "${ARGS[@]}"
+    warm_start_idx=null training.iterations="$T" training.lr="$LR" training.is_dyhpo_run=false \
+    'data.internal_mass_pdgs=[23,6,25,24]' "${FIX[@]}" "${ARGS[@]}"
 RC=$?
 echo "DATASAVING_PARENT_DONE rc=$RC $OUT"
 [ "$RC" -eq 0 ] && echo "RUN_DONE $OUT"

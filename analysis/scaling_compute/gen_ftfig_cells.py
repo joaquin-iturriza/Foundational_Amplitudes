@@ -42,7 +42,7 @@ RAW_FLAGS = ("data.spin_onehot=false data.color_onehot=false data.prop_is_massle
 BEST_FLAGS = ("data.spin_onehot=true data.color_onehot=true data.prop_is_massless=true "
               "data.standardize_props=true data.mass_from_momenta=true "
               "data.coupling_scalars=true data.internal_mass_scalars=true "
-              "data.offshell_per_event=true data.internal_mass_pdgs=[23,6,25] "
+              "data.offshell_per_event=true data.internal_mass_pdgs=[23,6,25,24] "
               "data.amp_orders=[[1,0]]")
 FAMS = {"ft416raw":  ("raw416",  RAW_FLAGS),
         "ft416best": ("best416", BEST_FLAGS),
