@@ -16398,9 +16398,9 @@ entries:
       be started by hand)
   owner:
     agent: af2bc6219bb4a56b5
-    state: stopped
+    state: working
     since: '2026-11-19T17:53:29+00:00'
-    state_at: '2026-11-19T18:10:44.629000+00:00'
+    state_at: '2026-11-20T01:49:34.702000+00:00'
     context: 179003
     context_at: '2026-11-20T01:50:47+00:00'
   designs:
@@ -18204,9 +18204,9 @@ entries:
     decision: D332
   owner:
     agent: ae9049fb82fff3856
-    state: stopped
+    state: working
     since: '2026-11-07T06:12:26+00:00'
-    state_at: '2026-11-07T06:18:40+00:00'
+    state_at: '2026-11-20T01:49:41.018000+00:00'
     context: 115917
     context_at: '2026-11-07T06:33:26+00:00'
   designs:
