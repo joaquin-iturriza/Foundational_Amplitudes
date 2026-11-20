@@ -36709,6 +36709,16 @@ entries:
       (HTCondor DAG; base config.yaml and recipe copied CC->lxplus first, they were missing there), CC tp_zng_d1e4_muon_b128_zgggg,
       _muon_b2048_, _adam_b2048_ (waves 3,3,2), configs sweep/sweep_config_tp_zng_d1e4_{muon_b2048,muon_b128,adam_b2048,adam_b128}_zgggg.yaml
       @63809f71, code @c0dddfad.'
+  - at: '2026-11-20T10:57:32+00:00'
+    text: '2026-11-20 D507 interim read (benchmark.py d507collect/d507fig, uncommitted until the repo-reviewer passes): no
+      trial of the four searches passes the curve test (0/8 each, d507_search.json); chosen = each search''s lowest-val trial,
+      flagged: Muon b2048 trial_1333 (lr 2.03e-2, window 3.1e-3..4.1e-2), Muon b128 trial_0950 (lr 2.28e-3, window top 3.6e-3),
+      Adam b2048 trial_1152 (lr 4.18e-3, window 1.4e-3..1.8e-2), Adam b128 trial_0833 (lr 1.24e-3, window top 1.8e-3). Best
+      val MSE(log|M|^2) (std 1.1198): Muon 2048 0.0580, Muon 128 0.0180, Adam 2048 0.0540, Adam 128 0.0393; G = 1.48; batch
+      ratios (2048/128) Muon 3.22, Adam 1.38; optimiser ratios (Muon/Adam) b2048 1.07, b128 0.46. Test median |Delta| (seed
+      42): Muon 2048 0.141, Muon 128 0.072, Adam 2048 0.136, Adam 128 pending (scoring FA-ccin2p3-f5720c93 failed: the trial
+      copied lxplus->CC kept its /eos recipe path; fix tools/rebuild_run.load_cfg). B1/B2 at 5e5 (n=4): val 1.57e-3/9.2e-4,
+      test 0.0164/0.0087. D509 seeds running on CC.'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
