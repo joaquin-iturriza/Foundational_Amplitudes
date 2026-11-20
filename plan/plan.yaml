@@ -36254,7 +36254,9 @@ entries:
       if:
       - 'G >= 3: decompose by the batch and optimiser ratios, write up'
       - 'G < 3: no edge at 1e4 events, write it up, nothing more run'
-  step_waits: {}
+  step_waits:
+    '17': '2026-11-20T12:00 the sites: lxplus (2FA ssh master, Joaquin''s) and CC unreachable at 2026-11-20; design passed,
+      submit when one answers'
   findings:
   - at: '2026-11-17T11:18:43+00:00'
     text: 'Their numbers: the UQ repo (branch uq, 311 files) holds no figures, preds or result files. arXiv:2505.20280''s
