@@ -37449,13 +37449,9 @@ entries:
     - finetune_mechanism
   decisions:
   - D511
-  next: 'Restart test running: the 21 s7 searches (configs @10564601: sweep/sweep_config_dsave_s7{cosrerun,cosstep,optstate,wsdrerun,wsdstep,wsdbranch}_ft_bbx_zz_d{4,5,7}_*.yaml
-    and sweep_config_dsave_s7wsd_scr_bbx_zz_d{4,5,7}_*.yaml; parents cosrerun2 / wsdrerun3) as one drive.py batch, detached
-    ftm_s7_searches (pid 729952, log ~/.local/share/ccorch/detached/20261120-114841_ftm_s7_searches.log, state sweeps_local/dsave_s7*),
-    8 trials, waves 3,3,2, --sites ccin2p3 lxplus jeanzay --allow-jeanzay; target 1.1 h for 168 trials (ftm_s7_searches).
-    When it ends: read with analysis/finetune_mechanism/restart_test_readout.py (untested on data: check it on the first finished
-    searches), outcome per pair (share_lag_above vs pair, Fisher, val pooled vs 2.53), redraw restart_steps and restart_headstart
-    with the new arms, write-up in docs/results.tex'
+  next: 'Restart test read and written (par:ftm_restart_test, staged; commit after the notes-editor pass): branch (c), optimizer
+    state not adopted, template restart stays. Then close the entry (plan done --writeup <commit>) unless Joaquin asks for
+    the sigma-start run or a top-up of the cosine arms'
   done_when: null
   notes_ref: null
   match: dsave_ftmech_*,ftmech_*
@@ -37723,14 +37719,11 @@ entries:
     at: '2026-11-20T10:13:21+00:00'
   step_why:
     1:
-      feeds: D414 (fine-tunes that keep the head start), D423 fine-tune template restart
+      feeds: D414, D423 fine-tune template restart
       if:
-      - 'O or B val LOWER: that restart into the template'
-      - 'HOLDS and WITHIN: reported, template unchanged'
-      - 'nothing moves: lr jump ruled out; Oc/C'' moving credits the step-0 sigma shock (sigma-start design next), else scratch
-        catch-up'
-  step_waits:
-    '1': ftm_s7_searches
+      - 'Joaquin says close: plan done with the write-up commit'
+      - 'Joaquin asks for the sigma-start run or a top-up: design it, review, submit'
+  step_waits: {}
   handoff:
     state: '2026-11-20 11:50. Restart test (design passed 2026-11-20): the 21 s7 searches are out as one drive.py batch (detached
       ftm_s7_searches, pid 729952, log ~/.local/share/ccorch/detached/20261120-114841_ftm_s7_searches.log, local state sweeps_local/dsave_s7*;
