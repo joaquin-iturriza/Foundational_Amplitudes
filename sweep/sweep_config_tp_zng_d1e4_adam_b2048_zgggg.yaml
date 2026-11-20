@@ -7,6 +7,7 @@ cluster:
   request_gpus: 1
   mem: 32G   # 3e6-event recipe pools in memory, float64 (the 8 runs at job_kit.sh's 32G)
   cpus_per_task: 4
+  requirements: 'regexp("A100|H100", TARGET.GPUs_DeviceName) && !regexp("MIG", TARGET.GPUs_DeviceName)'   # HTCondor only: float64 trials on a Tesla T4 ran 3-6x slower (trial_0833 0.225 s/step against 0.036-0.074 on A100/H100)
   time: "01:00:00"
 paths: null
 sweep_name: tp_zng_d1e4_adam_b2048_zgggg
