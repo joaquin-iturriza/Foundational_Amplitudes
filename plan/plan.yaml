@@ -37375,11 +37375,14 @@ entries:
     - finetune_mechanism
   decisions:
   - D511
-  next: 'Restart test (design passed 2026-11-20, configs @9e9d7d9b): when the rerun parents FA-ccin2p3-d19829fc (cosrerun)
-    and FA-ccin2p3-48d3ee8d (wsdrerun) end, diff their config.yaml against the originals (only save_model_at_steps and internal_mass_pdgs),
-    check models/model_run0_step3458.pt and _step3026.pt exist, run the D395 smoke of O and B (~50 steps + sigma stage, 1
-    GPU), then one drive.py batch of the 24 s7 searches (8 trials, waves 3,3,2; --sites ccin2p3 lxplus jeanzay --allow-jeanzay);
-    read with analysis/finetune_mechanism/restart_test_readout.py and redraw the figures'
+  next: 'Restart test (design passed 2026-11-20, configs @f3b0156d = 9e9d7d9b with parents repointed to the second reruns):
+    the first reruns (FA-ccin2p3-d19829fc, FA-ccin2p3-48d3ee8d) ended clean but run.py promote_final_model deleted their step
+    checkpoints (fixed 91cc8e5e); second reruns FA-lxplus-0ab69a57 (dsave_parent_heldoutbbzz_cosrerun2, save [3458]) and FA-lxplus-d9e44add
+    (wsdrerun2, WSD, save [3026]) on lxplus. When they end: diff their config.yaml against the originals (only save_model_at_steps,
+    internal_mass_pdgs, run_dir/name), check models/model_run0_step3458.pt(.gz) / _step3026.pt(.gz) hold optimizer + model_live,
+    site copy both run dirs lxplus -> ccin2p3, run the D395 smoke of O and B (~50 steps + sigma stage, 1 GPU), then one drive.py
+    batch of the 21 s7 searches (8 trials, waves 3,3,2; --sites ccin2p3 lxplus jeanzay --allow-jeanzay); read with analysis/finetune_mechanism/restart_test_readout.py
+    and redraw the figures'
   done_when: null
   notes_ref: null
   match: dsave_ftmech_*,ftmech_*
