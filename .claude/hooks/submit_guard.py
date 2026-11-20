@@ -26,6 +26,8 @@ A command is refused (exit 2, every reason found) when
              by the job at start) needs for the arm, the --env values (LONG_*, GROW_K, ...) and the mode (see wall_need).
   cache      a `site run <site> FA -- ... rm ... amp_mmap_cache/<key>` while a RUNNING or queued FA job on that site names
              the key in its log or config (tools/cache_guard.py); a deletion of the whole root counts every such job.
+  rundir     a job of RUNDIR_OF (scripts/job_datasaving_parent.sh) whose run dir (its which + tag=) already exists on
+             the named site: its run would abort at start (BaseExperiment._init_directory).
   data       a FA training job whose recipe's pools are not prebuilt on the named site (tools/check_site_data.py run
              there), unless it is chained afterok on that site's prebuild run of the recipe (see data()).
 Each check's verdict is the old guard's on the same command (tests/test_hooks_real.py replays the night's submissions
@@ -671,6 +673,62 @@ def data(segs):
     return out
 
 
+# ------------------------------------------------------------------ rundir (2026-11-20)
+def _parent_out(args):
+    """scripts/job_datasaving_parent.sh <which> [... tag=<name>]: its run dir runs/data_saving/dsave_parent_<which>[_<tag>]."""
+    if not args:
+        return None
+    tag = [a[4:] for a in args if a.startswith("tag=")]
+    return "runs/data_saving/dsave_parent_%s%s" % (args[0], "_" + tag[-1] if tag else "")
+
+
+RUNDIR_OF = {"job_datasaving_parent.sh": _parent_out}    # scripts whose run refuses an existing run dir at start
+
+
+def _site_path_exists(site, path):
+    """True / False from `test -e` on the site, None when the read did not finish."""
+    import subprocess
+    try:
+        p = subprocess.run(["site", "run", site, "FA", "--", "test -e %s && echo RUNDIR_EXISTS || echo RUNDIR_FREE"
+                            % shlex.quote(path)], capture_output=True, text=True, timeout=100)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    out = p.stdout + p.stderr
+    return True if "RUNDIR_EXISTS" in out else False if "RUNDIR_FREE" in out else None
+
+
+def rundir(segs):
+    """A job whose run refuses an existing run dir (BaseExperiment._init_directory), submitted with a tag whose dir
+    is already on the site: refused before it is queued (FA-lxplus-a74362e3 died at start on 2026-11-20)."""
+    if os.environ.get("SUBMIT_TEST") == "1" and "rundir" not in (os.environ.get("SUBMIT_ONLY") or "").split(","):
+        return []
+    out = []
+    for toks in segs or []:
+        if not toks or os.path.basename(toks[0]) != "site" or toks[1:2] != ["submit"]:
+            continue
+        rest = toks[2:]
+        if "--check" in rest or "--help" in rest or "-h" in rest:
+            continue
+        script, args, _ = _submit_parts(toks)
+        pos = [t for t in cmdparse.strip_redirs(rest[:rest.index("--")] if "--" in rest else rest)
+               if not t.startswith("-")]
+        f = RUNDIR_OF.get(os.path.basename(script or ""))
+        if not f or len(pos) < 2 or pos[1] != "FA" or not f(args):
+            continue
+        site, d = pos[0], f(args)
+        if site == "auto":
+            out.append("rundir: `site submit auto` of %s: name the site `site pick` gave, so %s can be checked "
+                       "there" % (script, d))
+            continue
+        ex = _site_path_exists(site, d)
+        if ex:
+            out.append("rundir: %s already exists on %s and the run would abort at start (_init_directory): "
+                       "give the job a new tag=<name>" % (d, site))
+        elif ex is None:
+            out.append("rundir: could not read whether %s exists on %s; retry" % (d, site))
+    return out
+
+
 # ------------------------------------------------------------------ epoch (2026-11-06)
 def _submit_env(toks):
     """{K: V} of the `--env K=V` options of one `site submit` segment."""
@@ -966,7 +1024,7 @@ def problems(inp):
         return design(cmd, inp, subs)
 
     checks = (("placement", lambda: placement(cmd, scan)), ("hpo", lambda: hpo(cmd)), ("plot", lambda: plot(cmd, segs)),
-              ("design", design_check), ("budget", lambda: budget(cmd, segs)), ("data", lambda: data(segs)),
+              ("design", design_check), ("budget", lambda: budget(cmd, segs)), ("data", lambda: data(segs)), ("rundir", lambda: rundir(segs)),
               ("expect", lambda: expect(segs)), ("epoch", lambda: epoch(segs)), ("wall", lambda: wall(segs)), ("cache", lambda: cache_delete(segs)))
     out = []
     for name, f in checks:
