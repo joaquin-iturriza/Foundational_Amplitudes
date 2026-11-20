@@ -89,7 +89,7 @@ def halved():
 
 
 def write(name, tgt, k, T, arm, rate, parent, lr_factor=1.0, offshell="parent", ft_space="llrd", tmpl2=False,
-          wsd=False, batch_search=False, warmup_high=None):
+          wsd=False, batch_search=False, warmup_high=None, ckpt="model_run0_best", fix=None):
     c = lr_centre(T, k) * lr_factor
     space = template_space()
     if warmup_high:
@@ -108,7 +108,7 @@ def write(name, tgt, k, T, arm, rate, parent, lr_factor=1.0, offshell="parent", 
         space = [{"name": "training.lr", "type": "float_log", "low": float(f"{c / 3:.3g}"),
                   "high": float(f"{3 * c:.3g}")}] + space
     else:
-        fixed.update({"training.lr": float(f"{c:.4g}"), "fine_tune.pretrained_path": f"{parent}/models/model_run0_best.pt",
+        fixed.update({"training.lr": float(f"{c:.4g}"), "fine_tune.pretrained_path": f"{parent}/models/{ckpt}.pt",
                       "fine_tune.target_stats": "own", "fine_tune.offshell_stats": offshell})
         if ft_space == "scratch":
             # step 3 (2026-11-12): the scratch arm's space, the parent's weights the only difference: one param group
@@ -133,6 +133,12 @@ def write(name, tgt, k, T, arm, rate, parent, lr_factor=1.0, offshell="parent", 
         # range (|rho| <= 0.10 but lr's -0.30), while it is set by D, and batch size and horizon are what follow D
         space = [{"name": "training.batchsize", "type": "int_log", "low": max(4, round(d_of(k) / 64)),
                   "high": int(d_of(k) // 2)}] + space
+    if fix:
+        # --fix KEY=VALUE (finetune_mechanism): a fixed key added or overridden, and dropped from the search space
+        for kv in fix:
+            key, v = kv.split("=", 1)
+            fixed[key] = yaml.safe_load(v)
+            space = [s for s in space if s["name"] != key]
     hours = T * rate / 3600 + OVERHEAD_H
     # 11G: dsave trials peak <= 1.8 GB RSS; 32G became 11 CPUs on lxplus, which its V100 nodes never offer (E6895)
     cfg = {"cluster": {"scheduler": "slurm", "auto_submit": False, "request_gpus": 1, "mem": "11G",
@@ -182,6 +188,9 @@ def main():
     ap.add_argument("--warmup-high", type=float, help="upper edge of the searched training.cosanneal_warmup_frac "
                     "(template 0.2): the step-6 fine-tune warmup test")
     ap.add_argument("--ks", type=int, nargs="*", help="only these D exponents k (D = 10^(k/2))")
+    ap.add_argument("--ckpt", default="model_run0_best", help="the parent checkpoint a fine-tune starts from, "
+                    "models/<ckpt>.pt (finetune_mechanism: model_run0_step<N> from training.save_model_at_steps)")
+    ap.add_argument("--fix", action="append", help="KEY=VALUE fixed in every config, removed from the search space")
     a = ap.parse_args()
     R, hz = rates(), horizons()
     jobs = []
@@ -202,7 +211,7 @@ def main():
         p, h = write(name, t, k, T, arm, R[(t, k)], a.parent_nlo if t.endswith("_nlo") else a.parent_lo,
                      (0.5 if (t, k) in half else 1.0) * a.lr_factor, a.offshell_nlo if t.endswith("_nlo") else "parent",
                      a.ft_space or ("llrd" if t.endswith("_nlo") else "scratch"), a.tmpl2, a.wsd, a.batch_search,
-                     a.warmup_high)
+                     a.warmup_high, a.ckpt, a.fix)
         total += h
         print(f"{os.path.relpath(p, ROOT)}  {h:.1f} GPU-h")
     print(f"{len(jobs)} sweeps, {total:.1f} GPU-h estimated (8 trials each)")
