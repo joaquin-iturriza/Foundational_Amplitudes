@@ -38156,6 +38156,18 @@ entries:
       beyond 1.41 (= 1.19^2, two single seeds each within the Muon seed spread) either way -> the sigma reset changes the
       end point (reported which way); within -> no effect; step-0 NLL/grad norm say whether the reset removes the shock. Diverged
       trials listed apart (D398), never retried.'
+    passed_at: '2026-11-20T16:10:56+00:00'
+    reviewer: 'Re-check after FIX, all three points addressed. (1) The flags arm is used as the control only if its three-seed
+      mean is no worse than scratch''s; otherwise F is read against scratch, so F is never compared with a worse, untuned
+      arm. (2) Plateau criterion recomputed from d507_search.json: best-so-far val drops 4.5% between 1/2 and 7/8 of the run
+      for b128 hp0950 (0.01651 to 0.01576) and 1.3% for b2048 hp1333 (0.04714 to 0.04652). b2048 ends 3.2x above b128 (d507_read.json,
+      2.71-3.72), so it is compute-limited, and its SAME/LOWER/HIGHER branches are restated. (3) Path is drive.py --sites
+      ccin2p3 lxplus, the two sites holding the parent; Jean Zay is excluded unless the parent is copied there first. Disk:
+      D507 trials are 2 MB (b128 trial_0353) and the whole b2048 sweep dir is 84 MB on CC, against 38 GB free on CC and 2.2
+      PB on EOS. Checks 2-3 (unchanged): scratch seeds 0.0580/0.0669/0.0641 (b2048) and 0.0180/0.0214/0.0196 (b128), seed
+      spread 1.15/1.19; step-0 NLL 2260; zng 5e5 MSE 2.1e-4 vs 3.4e-4. Configs differ from the D507 twins only in the start.
+      Searched zgggg, Z+4g, Z+ng, reset_sigma, sigma head, sigma-start, input_pair_logs, soft_eps, head start, speed only;
+      found no prior Z+4g 1e4-event fine-tune search.'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
