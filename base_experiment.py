@@ -80,14 +80,15 @@ MIN_STEP_SKIP = 1000
 def clear_start_only(ft):
     """Clear, in a config that loads a finished run as its parent (the HETEROSC sigma stage, the zero-shot and k-shot
     readers), the fine_tune keys that shaped only how that run started from its own parent (plan warm_start steps 13
-    and 14): fine_tune.shrink_perturb, fine_tune.start_weights=live, fine_tune.load_optimizer_state and
-    fine_tune.moment_fill_steps. Inherited, they were applied again to the run's own model: the sigma stage of
+    and 14): fine_tune.shrink_perturb, fine_tune.start_weights=live, fine_tune.load_optimizer_state,
+    fine_tune.moment_fill_steps and fine_tune.reset_sigma_head. Inherited, they were applied again to the run's own model: the sigma stage of
     v4_het_wsx_shrinkperturb (FA-ccin2p3-71852916) shrank its trained model and every probe read shrank it once more.
     The caller holds open_dict."""
     ft.shrink_perturb = None
     ft.start_weights = "scored"
     ft.load_optimizer_state = False
     ft.moment_fill_steps = 0
+    ft.reset_sigma_head = False
 
 
 def _ckpt_live_state(ck):
@@ -1612,6 +1613,19 @@ class BaseExperiment:
                                     f"(rows {p_roles}) into rows {own_roles}: rows by role, missing ones zeroed")
                 if ft is not None and str(ft.get("target_stats", "parent")) == "own" and ft.get("map_head", True):
                     self._map_head_to_own_stats(state_dict, pretrained_path)
+                if ft is not None and bool(ft.get("reset_sigma_head", False)):
+                    # plan finetune_mechanism: the parent's sigma rows replaced by this model's fresh init (scratch's
+                    # sigma at the same seed); trunk and mu row stay the parent's
+                    if str(self.cfg.training.get("loss")) != "HETEROSC":
+                        raise RuntimeError("fine_tune.reset_sigma_head needs training.loss=HETEROSC (no sigma row)")
+                    n_sig, fresh = int(self.cfg.model.net.out_channels), self.model.state_dict()
+                    keys = [k for k in state_dict if k.endswith("linear_out.weight") or k.endswith("linear_out.bias")]
+                    if not keys:
+                        raise RuntimeError("fine_tune.reset_sigma_head: the checkpoint has no linear_out")
+                    for k in keys:
+                        state_dict[k] = state_dict[k].clone()
+                        state_dict[k][-n_sig:] = fresh[k][-n_sig:]
+                    LOGGER.info(f"Fine-tuning: sigma rows of linear_out reset to the fresh init (last {n_sig} rows)")
                 self.model.load_state_dict(state_dict)
         except FileNotFoundError:
             raise FileNotFoundError(f"Pretrained checkpoint not found: {pretrained_path}")
