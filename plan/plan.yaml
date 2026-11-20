@@ -37376,3 +37376,14 @@ entries:
     state: working
     since: '2026-11-20T02:52:25+00:00'
     state_at: '2026-11-20T02:52:25+00:00'
+  findings:
+  - at: '2026-11-20T03:05:23+00:00'
+    text: '2026-11-20 step 1 read (restart_steps.py, plot_restart.py @a5f6c7b3; figs restart_steps, restart_steps_zng, restart_headstart):
+      the fine-tunes'' restart shock is not the catalog restart''s lr jump. On b b~ > Z Z D=3162 every fine-tune from the
+      cosine parent starts, at step 0 with lr 0 (before any update), at het. NLL 3558 and pre-clip gradient norm 3.1e5; from
+      the WSD parent 408 and 3.4e4; scratch at random init 38.6 and 1.4e4. The catalog warm-start restarts start at gradient
+      norm 4.7-23 and peak 61-631 over steps 0-40. The NLL falls below 0 in 20-80 steps whatever the warmup (L, warmup 0.56,
+      at ~90). Z+ng fine-tunes (kit A_ft, t12500) the same: step-0 gradient norm 3.3e6 / 6.1e4 / 1.9e3 / 3.7e3 and NLL 16539
+      / 252 / 2.5 / 37.6 for Zg/Zgg/Zggg/Zgggg. So the shock is the parent''s function (its sigma, under the head map) meeting
+      the new target, present at lr 0; the WSD parent''s 9x smaller shock (W) lost the head start at the same 0.14-0.18 of
+      the run as C (step 6). lowd_ft (2026-10-25) predates train_steps.npz (0a616ed4): no per-step record.'
