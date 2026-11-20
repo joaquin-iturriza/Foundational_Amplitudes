@@ -37449,9 +37449,8 @@ entries:
     - finetune_mechanism
   decisions:
   - D511
-  next: 'Restart test read and written (par:ftm_restart_test, staged; commit after the notes-editor pass): branch (c), optimizer
-    state not adopted, template restart stays. Then close the entry (plan done --writeup <commit>) unless Joaquin asks for
-    the sigma-start run or a top-up of the cosine arms'
+  next: Restart test written (par:ftm_restart_test @bc3b3bda). Close the entry (plan done --writeup bc3b3bda) unless Joaquin
+    asks for the sigma-start run or a top-up of the two cosine arms
   done_when: null
   notes_ref: null
   match: dsave_ftmech_*,ftmech_*
@@ -37737,7 +37736,7 @@ entries:
     1:
       feeds: D414, D423 fine-tune template restart
       if:
-      - 'Joaquin says close: plan done with the write-up commit'
+      - 'Joaquin says close: plan done --writeup bc3b3bda'
       - 'Joaquin asks for the sigma-start run or a top-up: design it, review, submit'
   step_waits: {}
   handoff:
