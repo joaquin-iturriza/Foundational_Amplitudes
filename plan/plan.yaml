@@ -37592,6 +37592,12 @@ entries:
     units: null
     start: '2026-11-20T03:08:52+00:00'
     at: '2026-11-20T03:08:52+00:00'
+  - batch: ftm_parents2
+    wall_h: 1.6
+    jobs: 2
+    units: null
+    start: '2026-11-20T05:20:35+00:00'
+    at: '2026-11-20T05:20:35+00:00'
   step_why:
     1:
       feeds: D414 (fine-tunes that keep the head start), D423 fine-tune template restart
