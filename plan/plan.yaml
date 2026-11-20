@@ -36835,6 +36835,12 @@ entries:
     units: null
     start: '2026-11-20T02:42:06+00:00'
     at: '2026-11-20T02:42:06+00:00'
+  - batch: d507_searches_d1e4_zgggg
+    wall_h: 5.0
+    jobs: 32
+    units: null
+    start: '2026-11-20T03:58:01+00:00'
+    at: '2026-11-20T03:58:01+00:00'
   handoff:
     state: '2026-11-20 ~03:45 UTC. D506 done in code @72cba9e8 (internal_mass_pdgs default [23,6,25,24], init_data load check,
       generators and job_datasaving_parent.sh). W parent rerun at peak lr 1.89e-3 submitted on CC (FA-ccin2p3-94c78e94, design
