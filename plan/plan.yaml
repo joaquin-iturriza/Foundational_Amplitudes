@@ -36405,8 +36405,8 @@ entries:
   step_waits:
     '17': '2026-11-20T12:00 the sites: lxplus (2FA ssh master, Joaquin''s) and CC unreachable at 2026-11-20; design passed,
       submit when one answers'
-    '18': the design reviewer (D507 design recorded 2026-11-20T02:02) and the repo-reviewer (the four tp_zng_d1e4 sweep configs,
-      uncommitted); then the sites (all unreachable 2026-11-20)
+    '18': 2026-11-20T12:00 the sites, all unreachable 2026-11-20; design passed 2026-11-20, configs @4ec4caf1; then the D395
+      smoke of the Adam sweep path and the four sweeps
   findings:
   - at: '2026-11-17T11:18:43+00:00'
     text: 'Their numbers: the UQ repo (branch uq, 311 files) holds no figures, preds or result files. arXiv:2505.20280''s
