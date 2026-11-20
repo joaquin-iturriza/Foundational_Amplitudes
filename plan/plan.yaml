@@ -37614,12 +37614,15 @@ entries:
   - D511
   - D513
   next:
-    1: Restart test written (par:ftm_restart_test @bc3b3bda). Close the entry (plan done --writeup bc3b3bda) unless Joaquin
-      asks for the sigma-start run or a top-up of the two cosine arms
-    2: 'Joaquin 2026-11-20 ''Yes, of course I want those open points explored.'': why the fine-tune does not improve below
-      from-scratch''s end point: (a) parent weights hold it at a worse end point, (b) fine-tune lr range or length wrong,
-      (c) end point set by D so pretraining buys only speed; first a long-horizon fine-tune vs from-scratch at D=316; within
-      D511'
+    1: D515 Z+4g arms (1) template fine-tune from the W parent at batch 2048 and 128 (16-trial searches + seeds 43/44 of each
+      chosen trial), (2c) sigma-head reset (8 trials per batch), input-flag scratch control (seeds 42-44 per batch), configs
+      sweep/sweep_config_ftmech_zng4g_*.yaml @71ff1ef9; design 2026-11-20T16:06; smoke first (D395), then the batch, ~41.7
+      GPU-h
+    2: Arms (2a) pre-cooldown snapshot of the W parent with a fresh optimizer and (2b) the snapshot with its optimizer state
+      and no warmup, 8-trial searches at both batches, after a parent rerun with training.save_model_at_steps=[56000] (~9
+      GPU-h); 31.6 GPU-h beyond D511's 100, held on Joaquin's go
+    3: 'Step (3), only on arm (1)''s HIGHER result: separate the parent''s weights from the fine-tune''s lr range or length
+      (design then)'
   done_when: null
   notes_ref: null
   match: dsave_ftmech_*,ftmech_*
@@ -38055,17 +38058,24 @@ entries:
     at: '2026-11-20T10:13:21+00:00'
   step_why:
     1:
-      feeds: D414, D423 fine-tune template restart
+      feeds: 'D513/D515: does the fine-tune end at scratch''s level (pretraining buys speed only) or above it on Z+4g at 1e4
+        events'
       if:
-      - 'Joaquin says close: plan done --writeup bc3b3bda'
-      - 'Joaquin asks for the sigma-start run or a top-up: design it, review, submit'
+      - 'F/S HIGHER at both batches: design step (3), parent weights vs the fine-tune''s lr range/length'
+      - 'F/S SAME: pretraining buys speed only at 1e4; report with the head-start fractions'
+      - 'F/S LOWER: the pretraining keeps an edge at 1e4; report'
     2:
-      feeds: how the fine-tune template should keep the pretraining's edge (D414, D423)
+      feeds: 'D513/D515: does a restart that avoids the cooldown''s end or keeps the optimizer state keep the head start on
+        Z+4g'
       if:
-      - 'fine-tune end point above scratch at long horizon: test (a) vs (b)'
-      - 'both reach the same end point: (c), pretraining buys speed only; report'
-  step_waits:
-    '2': 'a fresh owner: design per the hand-off of 2026-11-20 15:30 (closed for context)'
+      - 'Joaquin approves the cost: parent rerun, smoke, the 4 searches'
+      - 'Joaquin declines: drop the step, report (2c) alone'
+    3:
+      feeds: 'D513 open point: why the fine-tune ends above scratch'
+      if:
+      - 'arm (1) HIGHER: design, review, submit within budget or ask'
+      - 'arm (1) SAME or LOWER: drop'
+  step_waits: {}
   handoff:
     state: '2026-11-20 15:30. Restart test done and written: par:ftm_restart_test @bc3b3bda (figs analysis/finetune_mechanism/figs/restart_headstart_s7,
       restart_steps_s7; readout restart_test_readout.py --cached @291c08a1, plot_restart.py --s7). Branch (c): optimizer state
