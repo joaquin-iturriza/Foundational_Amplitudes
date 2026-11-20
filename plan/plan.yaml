@@ -36408,7 +36408,7 @@ entries:
       - 'seed spread well under 3x: read G and the ratios against the measured spread'
       - 'seed spread near or above 3x: the D507 ratios read as unresolved at that spread, said so'
   step_waits:
-    '17': FA-ccin2p3-94c78e94
+    '17': FA-ccin2p3-47e14eae
     '18': ccin2p3:tp_zng_d1e4_adam_smoke50_zgggg
     '19': the four D507 searches (ccin2p3/lxplus tp_zng_d1e4_{muon,adam}_b{2048,128}_zgggg), submitted after the smoke ccin2p3:tp_zng_d1e4_adam_smoke50_zgggg
       passes
