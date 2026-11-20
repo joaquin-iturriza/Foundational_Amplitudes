@@ -37516,6 +37516,16 @@ entries:
       / 252 / 2.5 / 37.6 for Zg/Zgg/Zggg/Zgggg. So the shock is the parent''s function (its sigma, under the head map) meeting
       the new target, present at lr 0; the WSD parent''s 9x smaller shock (W) lost the head start at the same 0.14-0.18 of
       the run as C (step 6). lowd_ft (2026-10-25) predates train_steps.npz (0a616ed4): no per-step record.'
+  - at: '2026-11-20T14:05:34+00:00'
+    text: '2026-11-20 restart test read (restart_test_readout.py, plot_restart.py --s7 @3e532716; figs restart_headstart_s7,
+      restart_steps_s7): no restart keeps the head start. Optimizer state: O/Oc 4/17 vs 7/15 kept (UNRESOLVED, -0.23 wrong
+      side, p 0.96), B/Bc 9/23 vs 4/18 (NO, p 0.21); val WITHIN (1.95, 1.02). Snapshot: Oc/C'' 7/15 vs 5/16 NO, val 0.391
+      LOWER at the 0.395 bar, carried by D=3162 alone (0.077; 0.69, 1.13); Bc/W'' 4/18 vs 9/19 UNRESOLVED (-0.25 wrong side),
+      val 1.37 WITHIN (7.2 at D=3162). Step 0: Bc/B (WSD live, pre-sigma) start at NLL 12.7 and max gradient norm 627 = scratch
+      level (14.3), against 869/5.1e4 (W''), 1346/1.2e5 (Oc), 2260/2.0e5 (C''): removing the shock does not keep the head
+      start. Branch (c): optimizer state not adopted, template restart stays; head start lost to scratch catch-up. 21/168
+      trials diverged (C'' 6, Oc 4, O 4, Bc 3, S 2, B 1, W'' 1), listed apart; non-blow-up trials below the design''s ~20
+      in Oc (15) and C'' (16).'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
