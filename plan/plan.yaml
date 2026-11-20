@@ -37508,7 +37508,24 @@ entries:
       and 2026-11-10T02:08 (uploaded slides and zip) share words but are about the paper and figures, not this test's next
       step; none settles it
     blocks: closing the entry (plan done); the write-up commit goes ahead
-    blocks_steps: &id003 []
+    blocks_steps: []
+  - ask: 'Scope: dropping the design''s pre-registered next step (a sigma-start design) and the top-up of two arms below the
+      design''s trial count. The restart test reads branch (c): the parent''s optimizer state does not keep the head start
+      or lower validation, so the fine-tune template''s restart stays. The branch says a sigma-start design comes next if
+      the snapshot pair (cosine main-stage end against today''s restart) moves; it reads LOWER on validation at 0.391 against
+      the 0.395 bar, carried by D=3162 alone, while its WSD twin reads WITHIN with the opposite sign, and the WSD before-cooldown
+      arm already starts with no sigma shock (step-0 NLL 12.7, the scratch level) and still loses the head start. I propose
+      to close the entry without the sigma-start run and without topping up the two cosine arms whose usable trials fell to
+      15 and 16 (the design assumed about 20; 4 more trials per D in both arms is about 5 GPU-h and cannot turn the wrong-sign
+      optimizer-state result into a HOLDS). Close it, or run the sigma-start design and/or the top-up?'
+    at: '2026-11-20T14:08:55+00:00'
+    searched: CLAUDE.md (a dropped step of a design is the user's call), site decisions D414, D423, D511; Joaquin's messages
+      2026-11-14T04:31 (a SciPost LaTeX template paste), 2026-11-17T01:19 (figures self-contained, the reviewers' corrections)
+      and 2026-11-10T02:08 (uploaded slides and zip) share words but are about the paper and figures, not this test's next
+      step; none settles it
+    blocks: closing the entry (plan done)
+    blocks_steps: &id003
+    - 1
   owner:
     agent: acb3827e706c70d22
     state: working
@@ -37774,10 +37791,10 @@ entries:
     entry without the sigma-start run and without topping up the two cosine arms whose usable trials fell to 15 and 16 (the
     design assumed about 20; 4 more trials per D in both arms is about 5 GPU-h and cannot turn the wrong-sign optimizer-state
     result into a HOLDS). Close it, or run the sigma-start design and/or the top-up?'
-  waiting_since: '2026-11-20T14:07:40+00:00'
+  waiting_since: '2026-11-20T14:08:55+00:00'
   searched: CLAUDE.md (a dropped step of a design is the user's call), site decisions D414, D423, D511; Joaquin's messages
     2026-11-14T04:31 (a SciPost LaTeX template paste), 2026-11-17T01:19 (figures self-contained, the reviewers' corrections)
     and 2026-11-10T02:08 (uploaded slides and zip) share words but are about the paper and figures, not this test's next step;
     none settles it
-  blocks: closing the entry (plan done); the write-up commit goes ahead
+  blocks: closing the entry (plan done)
   blocks_steps: *id003
