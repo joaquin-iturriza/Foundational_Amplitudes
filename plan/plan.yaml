@@ -34549,9 +34549,6 @@ entries:
   - D492
   - D508
   next:
-    17: 'W parent repair under D506: rerun FA-lxplus-57f6d2cb with the peak lr halved (1.89e-3), everything else equal (job_datasaving_parent.sh
-      finale @72cba9e8, which now sets the W), ~8 GPU-h on lxplus; design recorded 2026-11-20, design reviewer; submit when
-      a site answers'
     18: 'D507 protocol follow-up at 1e4 training events, Z+4g, 400 epochs: 2x2 {MuonAdamW+WSD, Adam+plateau} x {batch 2048,
       batch 128}, an 8-trial DyHPO per cell (<= 19 GPU-h); design (scratchpad d507_design.sh) recorded after the W design''s
       review, design reviewer, sweep configs, D395 smoke of the Adam/plateau sweep path, submit when a site answers'
@@ -36395,11 +36392,6 @@ entries:
       B1 target, their split; mu_mse selection departs from D62, stated. Searched: protocol, Suprio, plateau, ReduceLROnPlateau,
       batch 128/2048, 1e4, D=10^4, train_subsample 10000, highmult, hmscr, seed spread, one seed, dead ends, D484-D507.'
   step_why:
-    17:
-      feeds: whether a ladder+star parent with the W column trains stably and can be stage 2's parent
-      if:
-      - 'stable and gmean <= 1.5x the first parent: re-read on CC, it is stage 2''s parent candidate'
-      - 'still unstable or worse: dead end, design a DyHPO of the parent setup with the W and put its cost to Joaquin'
     18:
       feeds: whether the batch or the optimiser carries Suprio's protocol's edge
       if:
@@ -36411,7 +36403,6 @@ entries:
       - 'seed spread well under 3x: read G and the ratios against the measured spread'
       - 'seed spread near or above 3x: the D507 ratios read as unresolved at that spread, said so'
   step_waits:
-    '17': FA-ccin2p3-47e14eae
     '18': FA-ccin2p3-f9748b00 FA-ccin2p3-21cf4ce9
     '19': FA-ccin2p3-f9748b00 FA-ccin2p3-21cf4ce9
   findings:
