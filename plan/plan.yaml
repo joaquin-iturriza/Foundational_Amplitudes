@@ -36359,6 +36359,19 @@ entries:
       searched at batch 16384) at batch 1024; arm b Adam 1e-3 (Suprio''s, set for batch 1024) at batch 16384: neither retuned,
       so the protocol test is no comparison (Joaquin). Best-against-best design: reviewer FIX (B1/B2 gap 1.1-1.9x inside one
       seed); dead end recorded, question to Joaquin.'
+  - at: '2026-11-20T01:58:03+00:00'
+    text: '2026-11-20 D506 done in code @72cba9e8: config/amplitudes.yaml internal_mass_pdgs default [23,6,25,24]; experiment.py
+      init_data asserts that a new training run with offshell_per_event + internal_mass_scalars carries 24 (fine-tunes, warm
+      starts and eval-only runs keep their parent''s columns); scripts/job_datasaving_parent.sh sets [23,6,25,24] in every
+      case; generators sweep/gen_transfer_pilot.py, sweep/compute_scan/gen_ftfig_sweeps.py, analysis/scaling_compute/gen_ftfig_cells.py,
+      recipes/gen_scan_bigrun.py, scripts/job_needle_probe.sh, job_collision_ab.sh moved to [23,6,25,24]; fa-canonical-setup
+      row updated (claudemd-keeper PASS); tests/test_w_offshell_default.py 6 pass. Not changed: existing sweep configs carrying
+      [23,6,25] (a re-generation of a from-scratch one now refuses). Checkpoint selection (benchmark.py selection @afe18d8c,
+      data/selection.json, fig zng_selection): B2 (our network under Suprio''s protocol) chose its checkpoint by val NLL at
+      every n (best_step = the val-NLL argmin, not the val-MSE argmin, n=1..4); B1''s searches select on mu_mse; arm b nll.
+      Val MSE(log|M|^2) at B2''s chosen checkpoint over its lowest: 2.91/1.03/1.09/1.05 at n=1..4; protocol-test arms <= 1.01.
+      The mismatch matters only at Z+1g (B2''s val MSE rises slowly after step ~103000 while its NLL keeps falling); at n=2-4
+      it is <= 9%, inside one seed.'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
