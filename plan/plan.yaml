@@ -37024,6 +37024,12 @@ entries:
     units: null
     start: '2026-11-20T10:49:44+00:00'
     at: '2026-11-20T10:49:44+00:00'
+  - batch: d507_extension
+    wall_h: 4.5
+    jobs: 32
+    units: null
+    start: '2026-11-20T15:01:28+00:00'
+    at: '2026-11-20T15:01:28+00:00'
   handoff:
     state: '2026-11-20 ~12:00 UTC. D507: all four searches ended (8/8 each); no trial passes the curve test (0/8 each, data/d507_search.json
       @f897ad1d), so each cell''s chosen trial is its lowest-val trial, flagged: Muon b2048 runs/tp_zng_d1e4_muon_b2048_zgggg/trial_1333
