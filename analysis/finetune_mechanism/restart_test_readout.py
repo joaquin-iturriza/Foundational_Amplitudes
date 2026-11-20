@@ -56,6 +56,7 @@ def main(cached):
                 if bad:
                     out["diverged"][name(a, D)] = bad
     trials = {a: [] for a in STAGE}
+    n_obs = {}
     for D in CELLS:
         g = {a: [r for r in rows if r["sweep"] == name(a, D)] for a in STAGE}
         best = {a: min(v, key=lambda r: r["val_min"]) for a, v in g.items() if v}
@@ -71,6 +72,7 @@ def main(cached):
                 wf = lambda r: r["hp"].get("warmup_frac") or 0.0   # B: warmup fixed 0
                 lost = lost_at(b, best["S"])[0]
                 c["best_lag"] = (1.0 if lost is None else lost) - wf(b)
+                n_obs[a] = n_obs.get(a, 0) + len(v)
                 for r in v:
                     if rise(dict(r, hp=dict(r["hp"], warmup_frac=wf(r)))) < 10:
                         lo = lost_at(r, best["S"])[0]
@@ -95,8 +97,10 @@ def main(cached):
                                     "val_pooled": G, "val": None if G is None else
                                     "LOWER" if G < 1 / BAR else "HIGHER" if G > BAR else "WITHIN"}
     json.dump(out, open(os.path.join(HERE, "data", "restart_test.json"), "w"), indent=1)
+    out["n_observed"] = n_obs
+    out["n_blowup"] = {a: n_obs[a] - len(trials[a]) for a in n_obs}   # warmup rise >= 10, out of the lag count
     out["n_diverged"] = {a: sum(len(v) for n, v in out["diverged"].items() if f"_{STAGE[a]}_" in n) for a in STAGE}
-    print(json.dumps({k: out[k] for k in ("pairs", "cells", "n_diverged")}))
+    print(json.dumps({k: out[k] for k in ("pairs", "cells", "n_diverged", "n_observed", "n_blowup")}))
 
 
 if __name__ == "__main__":
