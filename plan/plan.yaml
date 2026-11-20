@@ -34785,7 +34785,7 @@ entries:
     decision: D508
   owner:
     agent: a391643ac109c6adb
-    state: stopped
+    state: closed
     since: '2026-11-20T01:48:26+00:00'
     state_at: '2026-11-20T02:42:49+00:00'
     context: 260958
@@ -36838,31 +36838,31 @@ entries:
     start: '2026-11-20T02:42:06+00:00'
     at: '2026-11-20T02:42:06+00:00'
   handoff:
-    state: '2026-11-19 ~18:30 UTC. Done this owner: step 5 (protocol-test test median |Delta| via benchmark.py ptcollect/ptdelta
-      @77ef8fae, fig zng_protocol_test_delta; write-up results.tex 7a90efc3 incl. the 11-17 paragraph the earlier owner left
-      uncommitted); Joaquin''s curve questions answered (stepread/protocol_figs @d16ba280, figs zng_protocol_lr, zng_protocol_gradnorm,
-      zng_wsd_cooldown, captions in scratchpad cap_lr/cap_gn/cap_cd.txt, check_caption OK). Joaquin found the protocol test
-      held lr fixed across the 16x batch change (no comparison). Best-against-best design (8-trial DyHPO per arm per n, ~261
-      GPU-h) got design-reviewer FIX: B1/B2 gap 1.1-1.9x test median (B1 better on best val at n=1,2) is inside one seed''s
-      3x; recorded as dead end. Open question (asked 18:19, holds steps 17,18): (A) W retrain: halve peak lr to 1.9e-3 (~8
-      GPU-h), drop the W, or DyHPO with W; (B) protocol follow-up: 2 more seeds of B1/B2 (~30-50 GPU-h est., against D492),
-      decompose on end val/train ratio (~261 GPU-h), or drop. Waiting on Joaquin''s yes: the withdrawal wording for the 7a90efc3
-      protocol-test paragraphs in /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/wording.txt
-      (three sentences: unresolved since lr not retuned; ''neither carries'' withdrawn; ''beats at every n'' -> 1.1-1.9x inside
-      one seed); not committed. Not checked: B2''s heterosc_select (protocol-test arm b used nll, arm a mu_mse).'
-    decisions: 'Scored the protocol-test runs with a read-only site_python script (site sync refused: --allow-dirty denied
-      by the permission classifier; sites lag trunk). Committed only the zng hunk of results.tex (other agents'' uncommitted
-      edits untouched); old src @34077f8a moved to @77ef8fae (commit gone). Repo-reviewer PASS after fixes (.gitignore disk_watch_alerted,
-      docstring, mse_std in PT_SITE). Combined both open questions into one ask (the plan keeps one).'
-    ruled_out: 'Train/val gap as a measurement artifact: the training curve is mu-MSE on the first 2000 training events, eval
-      mode, validation''s weights, no reg term, same in every arm. Start-point differences as data: they are logging cadence
-      (validate_frac 0.02 vs every 1000/62 steps) and updates per event (at 1000 updates arm b is below B2). Best-against-best
-      at one seed (dead end).'
-    running: none
-    files: analysis/zng_uq/benchmark.py (ptcollect, ptdelta, summary, b1b2 JSON, stepread, protocol_figs); data protocol_test_delta_{lxplus,cc}.json,
-      protocol_test_{lxplus,cc}.json, protocol_steps.json; figs zng_protocol_test_delta, zng_protocol_lr, zng_protocol_gradnorm,
-      zng_wsd_cooldown, zng_b1_vs_b2; docs/results.tex 7a90efc3; scratchpad wording.txt, cap_*.txt, ptd_caption.txt, proto_submit_lx_v3.sh
-    written: '2026-11-19T18:21:17+00:00'
+    state: '2026-11-20 ~03:45 UTC. D506 done in code @72cba9e8 (internal_mass_pdgs default [23,6,25,24], init_data load check,
+      generators and job_datasaving_parent.sh). W parent rerun at peak lr 1.89e-3 submitted on CC (FA-ccin2p3-94c78e94, design
+      passed 2026-11-20). D507: design passed after one FIX; configs @4ec4caf1; D395 smoke of the Adam/plateau sweep path
+      submitted on CC (sweep ccin2p3:tp_zng_d1e4_adam_smoke50_zgggg, 50 steps, config @63809f71). NEXT on the smoke''s clean
+      end: read its trial log (sigma stage, RESULT line, files listed in the design), then site pick FA --jobs 32 --groups
+      4 --mem 32 and generate+submit the four sweeps sweep/sweep_config_tp_zng_d1e4_{muon_b2048,muon_b128,adam_b2048,adam_b128}_zgggg.yaml
+      where it allots (site run <site> FA --item zng_uq_benchmark -- python sweep/generate_sweep.py --config <cfg> --submit;
+      generate_sweep has --submit, not --auto-submit), record each with plan run --sweep, plan target (5 h, 32 jobs), re-read
+      wave-1 step rates before waves 2-3 (design). Then step 19 (D509: 2 more seeds, 43 and 44, of each cell''s best trial).
+      B2 checkpoint selection check done (selection.json, fig zng_selection): NLL-selected, matters only at n=1 (2.91x).'
+    decisions: 'D506: W in the default + a load check refusing new from-scratch off-shell runs without 24 (fine-tunes, warm
+      starts, train=false exempt). W repair = one rerun at half the peak lr (coordinator: a repair, not a D241 search); placed
+      on CC by site pick (design named lxplus; lxplus rate 0.535 s/step, CC rate unmeasured, limit 14 h). D507: n=4 (B2 beats
+      B1 on both measures and by the most there), batch re-posed as 2048 vs 128 (16x ratio and 400 epochs kept; fraction-preserving
+      328/20 would cost ~90 GPU-h), 2x2 each searched, mu_mse selection everywhere, lr windows from B1, B2 and tp3_hmscr32k_uubar_Zgggg_d8
+      (sqrt-batch rule), <= 19 GPU-h. G between 1/3 and 3 = unresolved. D509: seeds of each cell''s best trial. site sync
+      needs --allow-dirty (other agents'' uncommitted files).'
+    ruled_out: Fraction-preserving batches 328/20 at 1e4 (~90 GPU-h). Reading G<3 as no edge. Protocol-test ratios as a tuned
+      effect.
+    running: FA-ccin2p3-94c78e94 (W parent rerun, target 9 h, limit 14 h); sweep ccin2p3:tp_zng_d1e4_adam_smoke50_zgggg (1
+      trial, slurm 64448780)
+    files: config/amplitudes.yaml, experiment.py (D506 check), tests/test_w_offshell_default.py, scripts/job_datasaving_parent.sh,
+      sweep/sweep_config_tp_zng_d1e4_*_zgggg.yaml, analysis/zng_uq/benchmark.py (selection), analysis/zng_uq/data/selection.json,
+      figs/zng_selection.png, data/parent_stab.json, parent_reread.json
+    written: '2026-11-20T02:43:14+00:00'
 - id: dan_zeroshot_v4
   title: Catalog_v4 pretraining zero-shot on Daniel's held-out split
   question: How does our best catalog_v4 pretraining (trial 1262) do zero-shot on the held-out processes of Daniel's catalog
