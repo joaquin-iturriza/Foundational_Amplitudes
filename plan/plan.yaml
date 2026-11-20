@@ -38051,6 +38051,34 @@ entries:
       the matched control and the flags'' effect is reported apart. (2c) Sg/F8 beyond 1.41 (= 1.19^2, two single seeds each
       within the Muon seed spread) either way -> the sigma reset changes the end point (reported which way); within -> no
       effect; step-0 NLL/grad norm say whether the reset removes the shock. Diverged trials listed apart (D398), never retried.'
+    fix_at: '2026-11-20T16:09:22+00:00'
+    fix: 'Checked: the six configs differ from their D507 scratch twins only in the start (parent path, target_stats own,
+      offshell_stats parent, lr_scale 1, layer_decay 1 as every sibling fine-tune sweep, the two input flags) plus reset_sigma_head
+      / 8 trials (3,3,2) for the sigma arm and the flags alone for scrflags; d507_read.json confirms scratch seeds 0.0580/0.0669/0.0641
+      (b2048) and 0.0180/0.0214/0.0196 (b128), seed spread 1.15/1.19; restart_s7_summary.json step-0 NLL 2260; results.tex
+      l.15640-52 MSE 3.4e-4 vs 2.1e-4. Searched results.tex for zgggg, Z+4g, Z+ng, reset_sigma, sigma head, sigma-start, input_pair_logs,
+      soft_eps, head start, speed only; plan finetune_mechanism, zng_uq_benchmark; decisions D414, D423, D507-D515: no Z+4g
+      fine-tune search at 1e4 found, prior is complete. Three things to fix. (1) One change against a matched control, the
+      flags fallback: the outcome says that if S+flags differs from S, F is read against S+flags. S+flags is run at S''s HPs
+      and is not searched, so if the flags make it worse, F (searched over 16 trials) would be compared with an arm nobody
+      tuned, which is the tuned-against-untuned failure (CLAUDE.md feature rule). Fix: if S+flags is better than or equal
+      to S, read F against S+flags. If it is worse, read F against S and report the flags'' effect separately as an upper
+      bound. Never compare F with a worse, untuned S+flags. (2) The outcome must say what each result means, and the b2048
+      cell is not at its end point. At the same 1e4 events and 400 epochs, Muon b128 ends 3.2x below b2048 (d507_read.json
+      batch_muon 3.20 [2.71, 3.72]), so b2048 at 1953 steps is limited by compute, not by D. ''SAME -> pretraining buys speed
+      only'' cannot hold there: a speed gain would show as LOWER at a compute-limited horizon, so SAME at b2048 means no gain
+      at that compute. Fix: tie branch (c), end point set by D, to the cell whose S curve has flattened before the cooldown
+      (state the curve criterion and read it on the D507 b128 curves). State that b2048 SAME means ''no gain at this compute''
+      and LOWER means ''speed''. (3) Where the jobs run and the disk. The design names no submission path or sites. The parent
+      model_run0_best.pt.gz is present on CC and lxplus (checked now). drive.py does not copy a fine-tune parent (only rebalance.py
+      does). Jean Zay does not answer now (ssh refused), so whether the parent is there is not checked. CC /sps/lpnhe is at
+      93% with 38 GB free. Fix: state the path (classic sweep_manager on lxplus like the D507 extension, or drive.py on sites
+      holding the parent, with the parent copied by site copy to any other site used), and state the disk per trial read from
+      a D507 trial dir against free disk at submission. The rest holds: HETEROSC with mu_mse selection as in D507; test reads
+      on the Zenodo val split as D507; lr searched in the same 7-HP space at the same batch and steps; 16 trials with waves
+      3,3,2,3,3,2 match the extended scratch cells; the step rate comes from the same float64 batch-1953/31250 setup on A100/H100;
+      the D395 smoke gate covers the new launch path; ~41.7 GPU-h fits D511; the held snapshot arms are rightly asked, since
+      they push the total past D511''s 100 GPU-h.'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
