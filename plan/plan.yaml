@@ -34558,6 +34558,9 @@ entries:
       Adam 1.8e-3 -> 5.4e-3), all four on lxplus per site pick (the three CC searches folded there with their 8 observations
       each); then seeds 43, 44 of any cell whose chosen trial changes, test scoring of new chosen trials, d507collect/d507fig
       v2; <= 22 GPU-h'
+    4: 'Stage 2 per D483 only (''And add the ladder + star up to 5x10^5''): ladder+star fine-tunes from the new W parent FA-ccin2p3-47e14eae
+      up to D=5e5, read against the existing from-scratch results; size it and bring the cost before submission (the 9 D x
+      4 n scratch-search design is withdrawn)'
   done_when: null
   notes_ref: null
   match: zng_uq_*,tp*_zng_*
@@ -37092,6 +37095,11 @@ entries:
       if:
       - 'a b128 cell''s best moves into the widened lr zone: its window was the limit; re-read the ratios'
       - 'the chosen trials stay or move < seed spread: the D507 read stands at 16 trials per cell'
+    4:
+      feeds: 'D483: the ladder+star fine-tune curve up to 5e5'
+      if:
+      - 'under 30 GPU-h: design review, submit'
+      - 'above 30 GPU-h: cost to Joaquin first'
 - id: dan_zeroshot_v4
   title: Catalog_v4 pretraining zero-shot on Daniel's held-out split
   question: How does our best catalog_v4 pretraining (trial 1262) do zero-shot on the held-out processes of Daniel's catalog
