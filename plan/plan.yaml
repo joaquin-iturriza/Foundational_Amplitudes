@@ -37354,10 +37354,11 @@ entries:
     - finetune_mechanism
   decisions:
   - D511
-  next: 'Evidence from existing runs (no jobs): first steps of each fine-tune''s loss and gradient norm against the warm-start
-    restarts (data saving step 6, lowd_ft, Z+ng fine-tunes), and fine-tuned against from-scratch per D; then one test on b
-    b~ -> ZZ at D=100,316,3162: today''s restart against the three jump-free restarts, matched from-scratch control; design
-    review; submit within the go (up to 100 GPU-h)'
+  next: 'Restart test (design passed 2026-11-20, configs @9e9d7d9b): when the rerun parents FA-ccin2p3-d19829fc (cosrerun)
+    and FA-ccin2p3-48d3ee8d (wsdrerun) end, diff their config.yaml against the originals (only save_model_at_steps and internal_mass_pdgs),
+    check models/model_run0_step3458.pt and _step3026.pt exist, run the D395 smoke of O and B (~50 steps + sigma stage, 1
+    GPU), then one drive.py batch of the 24 s7 searches (8 trials, waves 3,3,2; --sites ccin2p3 lxplus jeanzay --allow-jeanzay);
+    read with analysis/finetune_mechanism/restart_test_readout.py and redraw the figures'
   done_when: null
   notes_ref: null
   match: dsave_ftmech_*,ftmech_*
@@ -37570,3 +37571,11 @@ entries:
     units: null
     start: '2026-11-20T03:08:52+00:00'
     at: '2026-11-20T03:08:52+00:00'
+  step_why:
+    1:
+      feeds: D414 (fine-tunes that keep the head start), D423 fine-tune template restart
+      if:
+      - 'O or B val LOWER: that restart into the template'
+      - 'HOLDS and WITHIN: reported, template unchanged'
+      - 'nothing moves: lr jump ruled out; Oc/C'' moving credits the step-0 sigma shock (sigma-start design next), else scratch
+        catch-up'
