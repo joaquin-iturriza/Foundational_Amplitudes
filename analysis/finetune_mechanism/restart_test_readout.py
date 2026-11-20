@@ -45,7 +45,16 @@ def main(cached):
         rows = driven_rows(names)
         json.dump(rows, open(cache, "w"))
     rows = [ln(r) for r in rows if r.get("val") and len(r["val"]) > 3]
-    out = {"cells": {}, "pairs": {}}
+    out = {"cells": {}, "pairs": {}, "diverged": {}}
+    # D398: trials that reported a failure (diverged) have no result record; listed apart with their cause
+    for a in STAGE:
+        for D in CELLS:
+            f = os.path.join(REPO, "sweeps_local", name(a, D), "driver_state.json")
+            if os.path.exists(f):
+                bad = [{"run": t["rid"], "hp_idx": t["hp_idx"], "status": t["status"], "cause": t.get("cause")}
+                       for t in json.load(open(f))["trials"].values() if t["status"] in ("failed", "lost")]
+                if bad:
+                    out["diverged"][name(a, D)] = bad
     trials = {a: [] for a in STAGE}
     for D in CELLS:
         g = {a: [r for r in rows if r["sweep"] == name(a, D)] for a in STAGE}
@@ -86,7 +95,7 @@ def main(cached):
                                     "val_pooled": G, "val": None if G is None else
                                     "LOWER" if G < 1 / BAR else "HIGHER" if G > BAR else "WITHIN"}
     json.dump(out, open(os.path.join(HERE, "data", "restart_test.json"), "w"), indent=1)
-    print(json.dumps(out["pairs"], indent=1))
+    print(json.dumps({k: out[k] for k in ("pairs", "diverged")}, indent=1))
 
 
 if __name__ == "__main__":
