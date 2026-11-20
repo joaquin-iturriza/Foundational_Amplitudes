@@ -34559,7 +34559,7 @@ entries:
     - FA-lxplus-8b928927
     - FA-lxplus-9a0f77c5
     - FA-lxplus-f3901ad0
-    commit: 7a90efc3
+    commit: afe18d8c
     paths:
     - analysis/zng_uq/benchmark.py
     - analysis/zng_uq/data/benchmark.json
@@ -34567,11 +34567,14 @@ entries:
     - analysis/zng_uq/data/parent_bbx.json
     - analysis/zng_uq/data/protocol_test_delta_cc.json
     - analysis/zng_uq/data/protocol_test_delta_lxplus.json
+    - analysis/zng_uq/data/selection.json
     - analysis/zng_uq/data/zng_curves.json
+    - config/amplitudes.yaml
     - scripts/job_datasaving_parent.sh
     - scripts/job_uq_ext.sh
     - scripts/job_zng_zeroshot.sh
     - sweep/sweep_config_tp_zng_hpo_zgggg.yaml
+    - tests/test_w_offshell_default.py
     - tools/zng_uq.py
   dead_ends:
   - tried: 'Their networks (LGATr-slim, LLoCa-Transformer, Transformer, MLP, het) by their own code (scripts/job_uq_ext.sh):
