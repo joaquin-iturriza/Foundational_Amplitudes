@@ -21,6 +21,14 @@ sys.path.insert(0, ROOT)
 import datagen  # noqa: E402
 
 
+def load_cfg(run_dir):
+    """The run's config.yaml with another site's project paths re-rooted on this checkout (siteconf._expand): a run
+    copied site to site (site copy) keeps the paths of the site that trained it (FA-ccin2p3-f5720c93, 2026-11-20)."""
+    import siteconf
+    raw = OmegaConf.to_container(OmegaConf.load(os.path.join(run_dir, "config.yaml")), resolve=False)
+    return OmegaConf.create(siteconf._expand(raw))
+
+
 def _load_best_ckpt(run_dir):
     p = os.path.join(run_dir, "models", "model_run0_best.pt")
     if os.path.exists(p):
@@ -171,7 +179,7 @@ def _build(cfg, swap, path, name):
 def own_offshell_stats(run_dir):
     """The off-shellness column stats [mean, std] the run trained with, from a build on its own pools (for runs
     older than their record in data_stats.json); checked against the run's frozen amplitude stats."""
-    cfg = OmegaConf.load(os.path.join(run_dir, "config.yaml"))
+    cfg = load_cfg(run_dir)
     assert cfg.data.get("offshell_per_event", False), f"{run_dir} has no off-shellness input"
     name = yaml.safe_load(open(os.path.expandvars(str(cfg.data.processes_file))))["processes"][0]["name"]
     with open_dict(cfg):
@@ -240,7 +248,7 @@ def rebuild(run_dir, role, path, n_events, event_frame=False):
     event_frame: that role unaugmented (data.unaugmented_roles), each event read in its own centre-of-mass frame, so
     its prediction depends on the event alone, not on the pool (the augmentation is keyed on the pool's identity), and
     the frames' degeneracy noise a function of each particle (deterministic_frame_noise)."""
-    cfg = OmegaConf.load(os.path.join(run_dir, "config.yaml"))
+    cfg = load_cfg(run_dir)
     own_recipe = os.path.expandvars(str(cfg.data.processes_file))
     rec = yaml.safe_load(open(own_recipe))
     (spec,) = rec["processes"]
@@ -259,7 +267,7 @@ def rebuild(run_dir, role, path, n_events, event_frame=False):
             cfg.data.unaugmented_roles = [role]
             deterministic_frame_noise()
         cfg.run_dir = tempfile.mkdtemp(prefix="rebuild_", dir=os.environ["SCRATCH"])
-    if OmegaConf.select(OmegaConf.load(os.path.join(run_dir, "config.yaml")), "fine_tune.pretrained_path"):
+    if OmegaConf.select(load_cfg(run_dir), "fine_tune.pretrained_path"):
         # a fine-tuned run trained on frozen stats (its parent's, kept in its own data_stats.json), not on stats of
         # its own train split (protocol B adds hard events, which moves mom_div): the experiment reads frozen stats
         # from <pretrained_path>/../../data_stats.json, so point it at this run's own best model

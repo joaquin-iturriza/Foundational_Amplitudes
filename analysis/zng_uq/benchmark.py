@@ -595,9 +595,140 @@ def selection(steps, out):
         print(k.split("/")[-1], r["selected_by"], f"{r['chosen_over_min']:.2f}")
 
 
+# D507 (zng_uq_benchmark step 18): the 2x2 {MuonAdamW+WSD, Adam+plateau} x {batch 2048, 128} at 1e4 training events of
+# Z+4g, each an 8-trial DyHPO search; no trial passes the curve test (d507_search.json, tools/kit_curves.py sweep), so
+# each search's lowest-val trial (flagged) is the cell's choice, scored on the 1e6 test events (job_kit.sh
+# KIT_SCORE_DIR); D509: seeds 43 and 44 of each choice (sweep/run_fixed_hp.py via job_seed_batch.sh, runs/<name>)
+D507 = {"muon_b2048": ("Muon, batch 2048", "trial_1333", 2048, "blue", "-"),
+        "muon_b128": ("Muon, batch 128", "trial_0950", 128, "blue", "--"),
+        "adam_b2048": ("Adam, batch 2048", "trial_1152", 2048, "vermillion", "-"),
+        "adam_b128": ("Adam, batch 128", "trial_0833", 128, "vermillion", "--")}
+D507_SITE = r"""
+import glob, json, os, sys
+import numpy as np
+sys.path.insert(0, "analysis/zng_uq")
+from benchmark import metrics
+import h5py
+with h5py.File(os.path.join(os.environ["DATA_DIR"], "zng_uq", "uq_zgggg.h5"), "r") as f:
+    truth = np.log(10.0) * f["bulk_test/bulk/log10_me2"][:]
+out = {}
+for a in sys.argv[1:]:
+    c, s, d, res = a.split("|")
+    label = c + "|" + s
+    r = {"run": d, "std": json.load(open(d + "/data_stats.json"))["prepd_std"][0] if os.path.exists(d + "/data_stats.json") else None}
+    if res and os.path.exists(res):
+        j = json.load(open(res)); r.update(val_mse=j.get("val_mse_curve"), train_mse=j.get("train_eval_mse_curve"),
+                                           best_step=j.get("best_step"), validate_every=j.get("validate_every"))
+    kb = d + "/kit_benchmark"
+    if os.path.exists(kb + "/predictions.h5"):
+        with h5py.File(kb + "/predictions.h5", "r") as f:
+            mu = np.log(10.0) * f["bulk_test/bulk/log10_me2"][:]
+        r["test"] = metrics(truth, mu, np.load(kb + "/sigma_ln.npy")[-len(mu):])
+    out[label] = r
+print("ZNGD507 " + json.dumps(out))
+"""
+
+
+def d507collect(out):
+    """Per D507 cell: its chosen trial (seed 42) and the D509 seeds 43, 44 on CC: target std (data_stats prepd_std),
+    val and train mu-MSE curves (standardised), and for the scored trials the test metrics -> d507.json"""
+    sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
+    from analysis.common.readers import site_python
+    args = []
+    for c, (_, tr, _, _, _) in D507.items():
+        sw = f"tp_zng_d1e4_{c}_zgggg"
+        args.append(f"'{c}|42|runs/{sw}/{tr}|'")
+        for s in (43, 44):
+            args.append(f"'{c}|{s}|runs/{sw}_best_s{s}|sweeps/{sw}_best_s{s}/results/fixed.json'")
+    r = site_python(D507_SITE, args, "ZNGD507", site="ccin2p3")
+    json.dump(r, open(out, "w"), indent=1)
+    print({k: (v.get("std"), v.get("test", {}).get("median_abs_delta")) for k, v in r.items()})
+
+
+def d507fig(data, search):
+    """zng_d507: (a) validation MSE(ln|M|^2) of the mean against training events seen for each D507 cell's chosen trial
+    (1e4 training events of Z+4g), beside B1 and B2 at 5e5 (n=4); (b) each cell's best validation MSE(ln|M|^2), seeds 42,
+    43, 44; (c) each cell's test median |Delta| (seed 42) beside B1 and B2 at 5e5."""
+    sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
+    import plot_style as ps
+    ps.use()
+    d, sr = json.load(open(data)), json.load(open(search))
+    STD4 = json.load(open(os.path.join(HERE, "data", "zng_std.json")))["4"]
+    bench = json.load(open(os.path.join(HERE, "data", "benchmark.json")))["runs"]
+    b1 = next(t for t in json.load(open(os.path.join(HERE, "data", "b1_search.json")))["tp_zng_hpo_zgggg"]["trials"]
+              if t["file"].startswith(B1_SCR[4].rsplit("trial_", 1)[1].join(["hp", "_"])))
+    b2 = json.load(open(os.path.join(HERE, "data", "zng_curves.json")))["kit_A_uq_zgggg_me2_n500000_t200000_suprio_protocol"]
+    ref = {"B1": (r"our protocol, $D_{\rm train}=5\cdot10^5$", ps.C.grey, "-", b1, 12500 / len(b1["val"]), b1["hp"]["training.batchsize"],
+                  bench["from scratch, searched HPs|4"]["median_abs_delta"]),
+           "B2": (r"Suprio's protocol, $D_{\rm train}=5\cdot10^5$", ps.C.grey, ":", b2, 1000, b2["hp"]["training.batchsize"],
+                  bench["from scratch, Suprio's protocol|4"]["median_abs_delta"])}
+    fig, axs = ps.figure(ncols=2, nrows=2)
+    ax, axv, axt, cell = axs[0][0], axs[0][1], axs[1][0], axs[1][1]
+    res = {}
+    for k, (lab, col, ls, t, every, bs, _) in ref.items():
+        x = (np.arange(len(t["val"])) + 1) * every * bs
+        v = np.array(t["val"]) * STD4 ** 2
+        ax.plot(x, v, color=col, linestyle=ls, label=lab)
+        res[k] = {"best_val": float(v.min())}
+    for c, (lab, tr, bs, col, ls) in D507.items():
+        col = getattr(ps.C, col)
+        s42 = d[f"{c}|42"]
+        t = next(t for t in sr[f"tp_zng_d1e4_{c}_zgggg"]["trials"] if t["run_dir"].endswith(tr))
+        every = t["best_step"] / (int(np.argmin(t["val"])) + 1)    # validation cadence from the best step's index
+        x = (np.arange(len(t["val"])) + 1) * every * bs
+        ax.plot(x, np.array(t["val"]) * s42["std"] ** 2, color=col, linestyle=ls, label=lab)
+        res[c] = {"seeds": {}, "std": s42["std"]}
+        res[c]["seeds"]["42"] = float(min(t["val"]) * s42["std"] ** 2)
+        for s in ("43", "44"):
+            r = d.get(f"{c}|{s}") or {}
+            if r.get("val_mse"):
+                res[c]["seeds"][s] = float(min(r["val_mse"]) * r["std"] ** 2)
+        res[c]["test_median_abs_delta"] = s42.get("test", {}).get("median_abs_delta")
+    # (b), (c): x = batch size, colour = optimiser (as in (a)); seed 42 the searched trial, seeds 43, 44 its D509 repeats
+    for c, (lab, _, bs, col, _) in D507.items():
+        col = getattr(ps.C, col)
+        sv = res[c]["seeds"]
+        bs = bs * (0.93 if c.startswith("muon") else 1.07)   # Muon a little left, Adam right: the two never overlap
+        axv.plot([bs], [sv["42"]], "o", color=col)
+        others = [sv[s] for s in ("43", "44") if s in sv]
+        if others:
+            axv.plot([bs] * len(others), others, "x", color=col)
+        if res[c]["test_median_abs_delta"] is not None:
+            axt.plot([bs], [res[c]["test_median_abs_delta"]], "o", color=col)
+    xr = [90, 2900]                         # the reference levels drawn across both batch sizes (and in the y range)
+    for k, (lab, col, ls, _, _, _, med) in ref.items():
+        axv.plot(xr, [res[k]["best_val"]] * 2, color=col, linestyle=ls)
+        axt.plot(xr, [med] * 2, color=col, linestyle=ls)
+        res[k]["test_median_abs_delta"] = med
+    axv.plot([], [], "o", color=ps.C.grey, label="searched trial, seed 42")
+    axv.plot([], [], "x", color=ps.C.grey, label="seeds 43, 44")
+    for a in (axv, axt):
+        a.set_xscale("log"); a.set_yscale("log"); a.set_xlim(*xr)
+        a.set_xticks([128, 2048]); a.set_xticklabels(["128", "2048"]); a.minorticks_off()
+        a.set_xlabel("batch size")
+    ax.set_xscale("log"); ax.set_yscale("log")
+    ax.set_xlabel("training events seen"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
+    axv.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
+    axt.set_ylabel(r"test median $|\Delta|$")
+    ps.process_label(ax, r"$q\bar q\to Z+4g$")
+    ps.legend_cell(cell, [ax, axv], fontsize=ps.LEGEND_MIN_PT)
+    ps.save(fig, os.path.join(HERE, "figs", "zng_d507"))
+    b = {c: res[c]["seeds"]["42"] for c in D507}
+    res["ratios"] = {"G": b["muon_b2048"] / b["adam_b128"], "batch_muon": b["muon_b2048"] / b["muon_b128"],
+                     "batch_adam": b["adam_b2048"] / b["adam_b128"], "opt_b2048": b["muon_b2048"] / b["adam_b2048"],
+                     "opt_b128": b["muon_b128"] / b["adam_b128"]}
+    t = {c: res[c]["test_median_abs_delta"] for c in D507}
+    if all(v is not None for v in t.values()):
+        res["ratios_test"] = {"G": t["muon_b2048"] / t["adam_b128"], "batch_muon": t["muon_b2048"] / t["muon_b128"],
+                              "batch_adam": t["adam_b2048"] / t["adam_b128"], "opt_b2048": t["muon_b2048"] / t["adam_b2048"],
+                              "opt_b128": t["muon_b128"] / t["adam_b128"]}
+    json.dump(res, open(os.path.join(HERE, "data", "d507_read.json"), "w"), indent=1)
+    print(json.dumps(res, indent=1))
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("cmd", choices=["collect", "plot", "summary", "parent", "b1b2", "stds", "ptdelta", "ptcollect", "stepread", "protocol_figs", "selection"])
+    ap.add_argument("cmd", choices=["collect", "plot", "summary", "parent", "b1b2", "stds", "ptdelta", "ptcollect", "stepread", "protocol_figs", "selection", "d507collect", "d507fig"])
     ap.add_argument("--site", default="ccin2p3")
     ap.add_argument("--theirs", default=os.path.join(os.environ.get("WORK", ""), "ext", "uq_runs", "runs", "prod_het"))
     ap.add_argument("--out", default=os.path.join(HERE, "data", "benchmark.json"))
@@ -617,6 +748,10 @@ def main():
         protocol_figs(os.path.join(HERE, "data", "protocol_steps.json"))
     elif a.cmd == "selection":
         selection(os.path.join(HERE, "data", "protocol_steps.json"), os.path.join(HERE, "data", "selection.json"))
+    elif a.cmd == "d507collect":
+        d507collect(os.path.join(HERE, "data", "d507.json"))
+    elif a.cmd == "d507fig":
+        d507fig(os.path.join(HERE, "data", "d507.json"), os.path.join(HERE, "data", "d507_search.json"))
     elif a.cmd == "stepread":
         stepread(os.path.join(HERE, "data", "protocol_steps.json"))
     elif a.cmd == "ptcollect":

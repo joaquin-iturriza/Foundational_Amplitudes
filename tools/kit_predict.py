@@ -33,7 +33,8 @@ from tools import kit_hardps as kh  # noqa: E402
 def run_target(run_dir):
     import yaml
     from omegaconf import OmegaConf
-    cfg = OmegaConf.load(os.path.join(run_dir, "config.yaml"))
+    from tools.rebuild_run import load_cfg
+    cfg = load_cfg(run_dir)
     rec = yaml.safe_load(open(os.path.expandvars(str(cfg.data.processes_file))))
     (spec,) = rec["processes"]
     return spec["name"]
