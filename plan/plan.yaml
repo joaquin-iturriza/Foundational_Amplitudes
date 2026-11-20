@@ -36823,6 +36823,12 @@ entries:
     units: null
     start: '2026-11-20T02:38:24+00:00'
     at: '2026-11-20T02:38:24+00:00'
+  - batch: d507_smoke50
+    wall_h: 0.5
+    jobs: 1
+    units: null
+    start: '2026-11-20T02:42:06+00:00'
+    at: '2026-11-20T02:42:06+00:00'
   handoff:
     state: '2026-11-19 ~18:30 UTC. Done this owner: step 5 (protocol-test test median |Delta| via benchmark.py ptcollect/ptdelta
       @77ef8fae, fig zng_protocol_test_delta; write-up results.tex 7a90efc3 incl. the 11-17 paragraph the earlier owner left
