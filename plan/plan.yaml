@@ -38230,9 +38230,7 @@ entries:
       - 'arm (1) HIGHER: design, review, submit within budget or ask'
       - 'arm (1) SAME or LOWER: drop'
   step_waits:
-    '1': 'main session: smoke submission blocked; site submit/sync refuse the shared checkout''s other agents'' uncommitted
-      files (docs/results.tex, sweep/gen_data_saving.py, analysis/*/data, ...) and --allow-dirty was denied by the permission
-      classifier'
+    '1': FA-ccin2p3-5f896107
     '3': step 1's arm (1) result (not yet submitted)
     '2': 'main session: submission blocked, site sync refuses the shared checkout while docs/results.tex is modified (not
       mine; no stash present at 16:48 UTC); then parent rerun tag=zng_uq_w_lr1p89e-3_snap, smoke, snap/snapopt searches (configs
