@@ -37869,9 +37869,9 @@ entries:
     - 4
   owner:
     agent: a56696c4cc0b20792
-    state: working
+    state: stopped
     since: '2026-11-21T16:47:43+00:00'
-    state_at: '2026-11-21T22:45:28.810000+00:00'
+    state_at: '2026-11-21T22:53:14.350000+00:00'
     context: 180476
     context_at: '2026-11-21T22:45:36+00:00'
   findings:
