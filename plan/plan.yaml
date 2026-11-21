@@ -37869,6 +37869,12 @@ entries:
       steps 0-40 scratch 124/226, fine-tune 8.6e7/5.1e8, reset 3.8e3/5.6e4: the reset removes the NLL shock but leaves gradient
       spikes 30-250x scratch''s, and does not move the end point (Sg/F8 1.004, 0.769). Target std 1.11978 in data_stats.json
       of every run (32 at b2048, 29 at b128), equal to D507''s: shared.'
+  - at: '2026-11-21T16:53:16+00:00'
+    text: '2026-11-21 step 1 readout, batch 128 (zng4g_readout.py @6547b7c1, data rerun with seeds 43/44 FA-ccin2p3-3dc6dacc/-06fbca06;
+      figs zng4g_ft_vs_scratch, zng4g_step0 redrawn): F/S = 1.54 (three-seed means 0.0300 vs 0.0197; 9-pairing range 1.21-1.92)
+      -> HIGHER, as at b2048 (1.56). F seeds 0.0258/0.0306/0.0346 all above S''s 0.0180-0.0214; F never reaches 1.2 x S''s
+      best (S at 0.42 of the run). Both batches HIGHER: step 3 opens. The ft searches'' bests sit at the lr window edge (b128
+      top 1.1e-2, b2048 bottom 3.1e-3; scratch''s interior), so step 3 stage 1 extends both windows (design 2026-11-21).'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
