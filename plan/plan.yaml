@@ -38219,6 +38219,12 @@ entries:
     units: null
     start: '2026-11-21T01:41:46+00:00'
     at: '2026-11-21T01:41:46+00:00'
+  - batch: zng4g_scrflags
+    wall_h: 1.06
+    jobs: 6
+    units: null
+    start: '2026-11-21T01:41:51+00:00'
+    at: '2026-11-21T01:41:51+00:00'
   step_why:
     1:
       feeds: 'D513/D515: does the fine-tune end at scratch''s level (pretraining buys speed only) or above it on Z+4g at 1e4
