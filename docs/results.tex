@@ -12362,6 +12362,68 @@ generating and grow the model or the horizon.
 % claim: sat.budget_factor=8
 \end{figure}
 
+\subsection{The singular-limit benchmark: what reaches the deepest bins (2026-11-21)}\label{sec:kit-deepest}
+The question: which change to the $\mu$P LLoCa transformer trained from scratch reaches the deepest hard bin of each
+singular limit of the benchmark of the draft's Sec.~7 (D517; networks trained on $10^5$ bulk events, one seed each,
+MSE of $\log_{10}|\mathcal M|^2$ scored by the benchmark's code)? It fed the draft's Sec.~7, which since 2026-11-21
+shows only the medians and the bulk (Joaquin: the attempts figure out of the draft); the record is here, in
+Fig.~\ref{fig:kit-deepest}. The asymptotic factor of the draft's Eq.~(asym) lowers the deepest-bin error in every
+limit: on $e^+e^-\to u\bar ug$ from $75.5$ to $0.0152$ (soft) and from $7.62$ to $0.00812$ (collinear), on the
+one-loop $e^+e^-\to t\bar t$ from $7.48$ to $0.0230$ (threshold) and from $0.819$ to $0.0766$ (high energy). It is
+below the reference MLP everywhere but the quark-gluon collinear limit of $e^+e^-\to u\bar ugg$ ($0.156$ against
+$0.08$) and the $t\bar t$ high-energy bin ($0.0766$ against $0.05$). A single Sudakov logarithm beside the double one
+does not lower the high-energy bin ($0.147$). The divergence-form inputs stay near the plain transformer ($65.0$ in
+the soft limit of $u\bar ug$, $8.52$ at threshold). ReZero layers lower the soft limit of $u\bar ug$ to $0.718$, the
+collinear one only to $3.78$, and blow up at high energy ($3.14\times10^{6}$). Every fine-tune ends where the
+transformer from scratch does at threshold ($6.76$ to $9.06$) and above it at high energy ($1.58$ to $7.44$ against
+$0.819$), also with threshold tops in the pretraining.
+% src: python3 tools/kit_figures.py summary analysis/kit_benchmark/data/kit_verdict_A_hpo.json analysis/kit_benchmark/data/kit_verdict_A_hpo_ftsearch.json --out analysis/kit_benchmark/figs/deck/kit_deepest_attempts @ccbffbc5
+% claim: deepest.ee_uug_me2.softpair_plain.soft_x=75.5
+% claim: deepest.ee_uug_me2.asym_cont.soft_x=0.0152
+% claim: deepest.ee_uug_me2.softpair_plain.coll_y=7.62
+% claim: deepest.ee_uug_me2.asym_cont.coll_y=0.00812
+% claim: deepest.ee_tt_virt_finite.softpairthr.threshold_beta=7.48
+% claim: deepest.ee_tt_virt_finite.asym_cont.threshold_beta=0.0230
+% claim: deepest.ee_tt_virt_finite.softpairthr.sudakov_sqrts=0.819
+% claim: deepest.ee_tt_virt_finite.asym_cont.sudakov_sqrts=0.0766
+% claim: deepest.ee_uugg_me2.asym_cont.coll_qg_y=0.156
+% claim: mlp.ee_uugg_me2.coll_qg_y=0.08
+% claim: mlp.ee_tt_virt_finite.sudakov_sqrts=0.05
+% claim: deepest.ee_tt_virt_finite.asym_cont_sud1.sudakov_sqrts=0.147
+% claim: deepest.ee_uug_me2.softpair_plain_divform.soft_x=65.0
+% claim: deepest.ee_tt_virt_finite.softpairthr_divform.threshold_beta=8.52
+% claim: deepest.ee_uug_me2.softpair_plain_rezero.soft_x=0.718
+% claim: deepest.ee_uug_me2.softpair_plain_rezero.coll_y=3.78
+% claim: deepest.ee_tt_virt_finite.softpairthr_rezero.sudakov_sqrts=3.14e6
+% claim: deepest.ee_tt_virt_finite.ftr5thrloopbetaown.threshold_beta=6.76
+% claim: deepest.ee_tt_virt_finite.ftr5thrown.threshold_beta=9.06
+% claim: deepest.ee_tt_virt_finite.ftr5thrloopbetaown.sudakov_sqrts=1.58
+% claim: deepest.ee_tt_virt_finite.ftr5own.sudakov_sqrts=7.44
+% allow: 10^5
+% allow: 7 2 because they are a section number and the square of |M|
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/kit_benchmark/figs/deck/kit_deepest_attempts.pdf}
+\caption{MSE of $\log_{10}|\mathcal M|^2$ in the deepest hard bin against the limit, networks trained on $10^5$ bulk
+events. Upper left: $e^+e^-\to u\bar ug$, collinear $y\in[10^{-7},10^{-6}]$ and soft $x\in[10^{-7},10^{-6}]$. Upper
+right: $e^+e^-\to u\bar ugg$, gluon-gluon and quark-gluon collinear and soft, same ranges. Lower left: the finite
+one-loop virtual correction to $e^+e^-\to t\bar t$, threshold $\beta\in[10^{-4},10^{-3}]$ and high energy
+$\sqrt s\in[15,50]$\,TeV. Transformer: the $\mu$P LLoCa network from scratch; transformer + asymptotic factor: the
+same with the draft's Eq.~(asym); divergence-form inputs: the logarithms of the factor's singular functions as extra
+inputs; ReZero layers: layer normalizations replaced by learned residual weights starting at zero; MLP, log
+invariants: the benchmark's reference MLP (black lines); transformer without $\log\beta^2$ input; asymptotic factor +
+single log: the Sudakov factor $\log^2(s/m_t^2)+\kappa\log(s/m_t^2)$, $\kappa$ learned; fine-tuned, $e^+e^-\to t\bar
+t$ not in pretraining: pretrained on the draft's catalog with every tree-level process with a physical top added but
+$e^+e^-\to t\bar t$, at the pretraining's and at searched fine-tune hyperparameters; fine-tuned, threshold tops
+added to pretraining: the same with $gg$, $d\bar d$, $b\bar b\to t\bar t$ down to $\beta=10^{-5}$ added, alone or with
+one-loop $gg$, $d\bar d\to t\bar t$ down to $\beta=10^{-5}$ and up to $\sqrt s=50$\,TeV, each with and without the
+$\log\beta^2$ input. Off the scale, value printed: a value beyond the axis, drawn on its edge.}
+% allow: 10^5 10^{-7} 10^{-6} 10^{-4} 10^{-3} 10^{-5}
+% allow: 2 15 50 because they are bin edges, energies and the square of a logarithm
+\label{fig:kit-deepest}
+\end{figure}
+
 \subsection{Hand-off: open items}\label{sec:div-open}
 Genuinely-unfinished / future work for this line (the completed findings are the subsection above):
 \begin{itemize}
