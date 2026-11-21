@@ -128,6 +128,15 @@ def hours_of(t):
     return parts[0] + parts[1] / 60.0 + parts[2] / 3600.0
 
 
+def condor_floor(req):
+    """The GPU-memory floor standing in for a config's HTCondor `requirements`, which site submit does not pass (E8056):
+    24G when the requirement names the allowed devices (a positive regexp on GPUs_DeviceName) and T4 is not among them,
+    else None (a MIG-only exclusion is already in the site's default)."""
+    # shortcut: the regexp becomes a 24G floor (keeps T4 off; V100 nodes take no job above 12000 MB); pass it if site gains it
+    m = re.search(r'(?<!!)regexp\(\s*"([^"]*)"\s*,\s*TARGET\.GPUs_DeviceName', str(req or ""))
+    return "24G" if m and "T4" not in m.group(1).split("|") else None
+
+
 class Sweep:
     def __init__(self, config_path, a):
         self.config_rel = os.path.relpath(os.path.abspath(config_path), ROOT)
@@ -168,6 +177,10 @@ class Sweep:
         self.mem = a.mem or cl.get("mem") or cl.get("request_memory") or "8G"
         self.cpus = int(a.cpus or cl.get("cpus_per_task") or 4)
         self.gpu_min_mem = cl.get("gpu_min_mem")          # e.g. 24G: HTCondor keeps the trial off smaller GPUs
+        if not self.gpu_min_mem and condor_floor(cl.get("requirements")):
+            self.gpu_min_mem = condor_floor(cl["requirements"])
+            log("%s: cluster.requirements %r -> gpu_min_mem %s (site submit passes no requirements)"
+                % (self.name, cl["requirements"], self.gpu_min_mem))
         self.hours = float(a.hours) if a.hours else hours_of(cl.get("time", "01:00:00"))
         self.time = hhmmss(self.hours * 1.5 + 0.1)           # wall limit: margin over the estimate
         fp = self.cfg.get("fixed_params", {})
