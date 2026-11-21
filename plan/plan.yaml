@@ -33819,7 +33819,7 @@ entries:
       me this exactly?''; Fig. 15 stays out under his hold, no rerun asked'
   owner:
     agent: a09a17fa36ad25dbd
-    state: stopped
+    state: closed
     since: '2026-11-20T01:50:53+00:00'
     state_at: '2026-11-21T04:52:16.839000+00:00'
     context: 264381
@@ -34487,18 +34487,42 @@ entries:
     start: '2026-11-17T04:33:08+00:00'
     at: '2026-11-17T04:33:08+00:00'
   handoff:
-    state: Fig. 14 restored to its version before 7a1fdabc/73d5145c (FA 3496f60b; y axis 'trained on dimensionless log|M|^2',
-      legend '(pretrained <=2->4)'/'(pretrained <=1 TeV)'), right panel fifth version; draft efba937 (only that figure; text
-      T -> A^* of 801c504 kept), 48 pp, scratchpad draft_pass8.pdf/.zip. Step 4 and the three figure checks (Fig. 9 colour
-      bar, Fig. 11 y_min/bin order, star-arm step-1 label) listed for Joaquin, not done unasked (finding 2026-11-17).
-    decisions: 'Joaquin 2026-11-17: ''I didn''t ask you to change fig 14, only the text, and you keep making changes that
-      I didn''t ask for'': change only what he asks; figures untouched unless he names the change.'
-    ruled_out: Fig. 14 right label versions 1-4 (finding 11:56); Fig. 14 left A^* axis and reworded legend (reverted on his
-      word).
+    state: '2026-11-21. KIT section (step 5, D517) written as Sec. 7 ''Extrapolation into singular limits'' in draft ~/drafts/fm_amplitudes_2026-11
+      commit 4e7626e (text ac96ae5 + caption axes 4e7626e), pp. 32-38 of 54; fresh section reviewer FIX then PASS; step 5
+      dropped as done. Joaquin then asked for a rework, his words: ''First, make sure the figures respect the rules we set
+      for the rest of the figures in the rest of the draft. Then, of course there is no need to cite any benchmark, it''s
+      just what they sent in an email... There is absolutely no reason to do fig 20 and then fig 21, that was for the presentation,
+      what is the point of putting it like this in a draft?? I also don''t see why fig 22 is even there''. So: (1) bring the
+      KIT figures to the draft''s figure rules (compare with the other draft figures: legends, sizes, style, captions); (2)
+      remove the \slot{KIT benchmark reference} and the citation of a benchmark (describe it as the data sent to us, no reference);
+      (3) one median figure, not the deck''s no-factor then with-factor pair (Fig. 20 kit_median + Fig. 21 kit_median_factor
+      -> one figure with the factor curves, text order adapted); (4) Fig. 22 (deepest-bin attempts, kit_deepest_attempts)
+      out of the section, its text (attempts, fine-tunes vs scratch) reworked without it. Not yet added as a plan step: the
+      next owner adds it (it is Joaquin''s ask, covered by D517). Steps 3 (date wait 2026-12-15, het vs MSE, deferred by Joaquin)
+      and 4 (date wait 2026-11-22, Fig. 14 right on MSE(log|M|^2), Jean Zay unreachable 2026-11-20/21, the 448-process runs''
+      data_stats.json only there) stand.'
+    decisions: 'D517 (write the KIT extrapolation section, few illustrative figures, explain what we do and why the MLP extrapolates
+      by chance); D435 (no accidental extrapolation: the factor, not an MLP); D448 (threshold scan out of the draft); D363
+      (KIT replaces the divergence section). By-chance argument rests only on the plotted medians (ReLU MLP linear in log
+      inputs far from data, arXiv:2009.11848 -> power law with an exponent set by the fit: right in uug, a decade low at tt
+      threshold beta=1e-4, overshoot at high energy); reviewer accepted. Joaquin 2026-11-17: change only what he asks; figures
+      untouched unless he names the change (here he names figs 20-22 and the figure rules).'
+    ruled_out: 'Bulk-edge slopes in the text or a bulk-side median figure: tools/kit_bulk_slope.py rerun on CC 2026-11-21
+      (uug soft -1.991, coll -1.098; tt beta -0.586) but tt bulk medians sit ~1.5 decades above the hard-bin truth at the
+      bulk edge, unexplained, so the deck''s slide-3 premise is not a clean read (finding 2026-11-21). Legend ''tops held
+      out of pretraining'' (wrong: the held-out parent keeps every tree top class but the e+e- > t t~ family; fixed FA 7f0b6b29).
+      Citing the benchmark (Joaquin: no citation, it came by email).'
     running: none
-    files: ~/drafts/fm_amplitudes_2026-11/paper.tex, figs/pretrain/paper_target.pdf; analysis/catalog_v4/paper_sec3_figs.py;
-      scratchpad draft_pass8.pdf/.zip
-    written: '2026-11-17T12:50:34+00:00'
+    files: 'Draft: ~/drafts/fm_amplitudes_2026-11/paper.tex Sec. 7 (label sec:kit, figs fig:kit_median, fig:kit_median_factor,
+      fig:kit_deepest, fig:kit_bulk), refs.bib (Catani:1996vz, Xu:2020how, Bachlechner:2020rezero added), figs/kit/{kitvm_median_nofactor_ee_uug_me2,kitvm_median_nofactor_ee_tt_virt_finite,kitvm_median_ee_uug_me2,kitvm_median_ee_tt_virt_finite,kit_deepest_attempts,kitvm_bulk}.pdf,
+      copies of FA analysis/kit_benchmark/figs/deck/*.{png,pdf,legend.txt} (gitignored). Tools: tools/kit_vs_mlp.py plot @d4984d67
+      (medians, MSE, bulk; SLOPE/MSE/BULK lines; data analysis/kit_benchmark/data/kit_fig_A_hpo.json, kit_fig_mlp_reruns.json,
+      kit_bakar_figs.json), tools/kit_figures.py summary @7f0b6b29 (deepest-bin attempts; kit_verdict_A_hpo.json, kit_verdict_A_hpo_ftsearch.json),
+      tools/kit_bulk_slope.py (CC, truth only), wrappers.py _asym_terms/_asym_mu (the factor). Build: rsync draft to scratchpad
+      final_draft, Windows TeX /mnt/c/texlive/2025/bin/*/pdflatex.exe + bibtex.exe. Scratchpad: kit_section_pages.pdf, draft_kit3.pdf/.zip,
+      kit_captions.txt, joaquin_draft_comments.txt (his messages since 2026-11-10). Sources: plan show kit_benchmark (findings
+      2026-11-14 @eff10e77, 2026-11-15 @a87aeec4, 2026-11-17), talks/kit_nov2026/main.tex.'
+    written: '2026-11-21T16:50:16+00:00'
   step_why:
     3:
       feeds: whether and how the paper states the het-vs-MSE comparison
