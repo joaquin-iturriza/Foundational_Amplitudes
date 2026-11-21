@@ -38280,6 +38280,12 @@ entries:
     units: null
     start: '2026-11-21T01:56:46+00:00'
     at: '2026-11-21T01:56:46+00:00'
+  - batch: parent_rerun_fp32
+    wall_h: 8.0
+    jobs: 1
+    units: null
+    start: '2026-11-21T11:01:39+00:00'
+    at: '2026-11-21T11:01:39+00:00'
   step_why:
     1:
       feeds: 'D513/D515: does the fine-tune end at scratch''s level (pretraining buys speed only) or above it on Z+4g at 1e4
