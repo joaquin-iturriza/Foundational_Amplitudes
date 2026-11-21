@@ -38343,6 +38343,27 @@ entries:
       the parent''s weights or length cost the end point: stage 2 (a longer fine-tune against a longer scratch at b128, or
       a shrink of the parent''s weights) designed on this; HIGHER with the best again at the new edge -> reported as unresolved,
       the window question goes to Joaquin. b2048 the same reading, compute-limited (step-1 outcome).'
+    fix_at: '2026-11-21T16:54:21+00:00'
+    fix: '(1) Seeds/trials against the sibling cells: the extended fine-tune searches end at 24 trials while the scratch control
+      they are read against (D507 cells tp_zng_d1e4_muon_b128/b2048_zgggg) has 16 (Joaquin 2026-11-20: ''extend the D507 searches'',
+      8+8). No user quote or decision on this entry names the unequal count (D97 is for the hp58 cells; results.tex l.14073-14076
+      documents the edge rule, 8-24 trials per cell, but as a past study''s protocol, not a decision here). This is Joaquin''s
+      call: record it as a question to him, e.g. ''The two fine-tune searches have their best trials at the lr window''s edge
+      (b128: 6 best at 8.8e-3..1.10e-2 of a 1.1e-2 top; b2048: 7 best at 3.1e-3..3.8e-3 of a 3.1e-3 bottom). Extending them
+      in place adds 8 trials each (24 against scratch''s 16, ~11.3 GPU-h). Do you accept the unequal count, as in the transfer
+      study where cells held 8-24 trials, or should the scratch searches also be continued 8 trials (about another 11 GPU-h)
+      so both arms have 24?'' (2) Outcome: a SAME after the extension is read as ''the HIGHER was the lr window'', but with
+      8 extra trials for the fine-tune only, a SAME from a new trial whose lr lies inside the old window would be the extra
+      trials, not the window. State it: SAME counts as the window only if the new chosen trial''s lr is outside the old window
+      (b128 > 1.1e-2, b2048 < 3.1e-3); a SAME from a trial inside the old window is reported as search budget, with the arm-matched
+      scratch question above. (3) Check wording: ''falling monotonically over the top decade'' quotes 0.0379/0.0249/0.0206
+      and leaves out idx 8 (0.0379 at 8.9e-3) and idx 15 (0.0252 at 1.07e-2); inside 8.8e-3..1.1e-2 val varies 0.0206-0.0379
+      with the other HPs (weight decay). Write the edge evidence as it is (the 6 best of 16 all at lr >= 8.8e-3; b2048 7 best
+      at lr <= 3.8e-3, with only a 4% rise from 3.1e-3 to 4.9e-3), and say at b2048 that a slope that shallow makes closing
+      a 1.56x gap unlikely, so the b2048 extension is a confirmation. All other checks hold: one change (lr bound + trials,
+      configs diffed), measure = the step-1 readout (zng4g_readout.json, F/S 1.54 [1.21,1.92] b128, 1.56 [1.45,1.72] b2048;
+      F seed spread b128 0.0258-0.0346, S 0.0180-0.0214), coupled space kept with 3,3,2 waves, rates from the same sweeps,
+      disk ~1 GB, same batch/optimizer per arm, HETEROSC and own target stats as step 1.'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
