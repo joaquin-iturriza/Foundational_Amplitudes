@@ -33822,6 +33822,8 @@ entries:
     state: working
     since: '2026-11-21T17:02:36+00:00'
     state_at: '2026-11-21T17:02:36+00:00'
+    context: 53473
+    context_at: '2026-11-21T17:02:53+00:00'
   step_waits:
     '3': '2026-12-15: deferred, marked for later on 2026-11-17; no run'
     '4': '2026-11-22: Jean Zay still unreachable 2026-11-21 (ssh to lpnclaude03 refused, retried once); the bigrun arms''
