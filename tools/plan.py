@@ -2177,13 +2177,16 @@ def cmd_sweepends(a):
         ended, _, _ = sweep_status(e["id"], st, sw)
         names = {sweep_label(x["name"], x["site"], (sw.get(x["site"]) or {"sweeps": {}})["sweeps"].get(x["name"]) or {}): x
                  for x in sweeps_of(st, e["id"])}
-        done = {x["name"] for lab, _, _ in ended for x in names.values() if lab.startswith(x["name"] + " (")}
+        # a label is "<name> (<site>, ..." or "<name> (<site>: ...": match the site too, since one name can live on two
+        # sites (a search continued elsewhere; 2026-11-21 the ended CC copies closed the live lxplus ones' wait)
+        of = lambda lab, x: re.match(r"%s \(%s[,:]" % (re.escape(x["name"]), re.escape(x["site"])), lab)
+        done = {(x["site"], x["name"]) for lab, _, _ in ended for x in names.values() if of(lab, x)}
         named = lambda x, w: re.search(r"(?<![\w-])(%s:)?%s(?![\w-])" % (re.escape(x["site"]), re.escape(x["name"])), str(w))
         # a step is reported once all the recorded sweeps its wait names have ended (the caller merges them into one RUN_DONE)
         ready = {str(k): [x for x in sweeps_of(st, e["id"]) if named(x, w)] for k, w in waits.items()}
-        ready = {k: v for k, v in ready.items() if v and all(x["name"] in done for x in v)}
+        ready = {k: v for k, v in ready.items() if v and all((x["site"], x["name"]) in done for x in v)}
         for lab, _, _ in ended:
-            x = next((v for k, v in names.items() if lab.startswith(v["name"] + " (")), None)
+            x = next((v for k, v in names.items() if of(lab, v)), None)
             if not x:
                 continue
             steps = sorted(k for k, v in ready.items() if x in v)
