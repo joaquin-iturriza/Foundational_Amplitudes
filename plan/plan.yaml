@@ -37692,7 +37692,10 @@ entries:
   match: dsave_ftmech_*,ftmech_*
   evidence:
     runs:
+    - FA-ccin2p3-676bd3d0
+    - FA-ccin2p3-74805752
     - FA-lxplus-0ab69a57
+    - FA-lxplus-1407949d
     - FA-lxplus-1575600c
     - FA-lxplus-16ec484f
     - FA-lxplus-494ed419
@@ -37716,15 +37719,19 @@ entries:
     - FA-lxplus-d9e44add
     - FA-lxplus-dc0c0f8b
     - FA-lxplus-e6252d7d
+    - FA-lxplus-e8d15505
     - FA-lxplus-fad6ff57
     - FA-lxplus-fbdf6bc6
-    commit: 0103dd12
+    commit: 44d5c2ce
     paths:
     - analysis/finetune_mechanism/data/restart_steps.json
     - analysis/finetune_mechanism/data/restart_summary.json
+    - analysis/finetune_mechanism/parent_rerun_check.py
+    - analysis/finetune_mechanism/plot_parent_rerun.py
     - analysis/finetune_mechanism/plot_restart.py
     - analysis/finetune_mechanism/restart_steps.py
     - analysis/finetune_mechanism/restart_test_readout.py
+    - analysis/finetune_mechanism/zng4g_sigreset_read.py
     - run.py
     - tests/test_promote_final_model.py
   dead_ends: []
