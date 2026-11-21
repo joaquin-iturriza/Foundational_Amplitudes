@@ -295,6 +295,8 @@ class DyHPOSampler:
         (`DyHPOAlgorithmND._obj`: -log10 for a positive loss, the raw value for a signed one), then are
         standardised; a diverged trial without an observation counts as the worst value seen."""
         alg = self.algorithm
+        if len(alg._real_obs()) >= len(alg.init_conf_indices):   # folded observations cover the random start
+            alg.initial_random_index = len(alg.init_conf_indices)
         while alg.initial_random_index < len(alg.init_conf_indices):
             h = int(alg.init_conf_indices[alg.initial_random_index])
             alg.initial_random_index += 1

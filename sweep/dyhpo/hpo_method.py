@@ -623,7 +623,11 @@ class DyHPOAlgorithmND:
 
         idx, combo = None, None
 
-        # Startup: consume init_conf_indices, skipping excluded/diverged ones.
+        # Startup: consume init_conf_indices, skipping excluded/diverged ones. Observations folded in from another
+        # search (extend_sweep --fold-points) that already cover the random start end it: without this a folded
+        # search re-ran its blind start-up wave (zng D507 extension, 2026-11-21: 3 of 8 trials repeated CC's points).
+        if len(self._real_obs()) >= len(self.init_conf_indices):
+            self.initial_random_index = len(self.init_conf_indices)
         while self.initial_random_index < len(self.init_conf_indices):
             candidate = int(self.init_conf_indices[self.initial_random_index])
             self.initial_random_index += 1
