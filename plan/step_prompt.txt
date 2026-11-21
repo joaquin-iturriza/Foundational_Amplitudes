@@ -51,6 +51,7 @@ How you work
    acked by the supervisor; a broken one comes back to you as an event: read its log (`site logs <run> -n 100000`)
    before anything is resubmitted, then `site ack E<n> --note "<run>: <what the log showed>"`.
    Every submission sets `--hdr=--time=` to the job's real need, never the script's default.
+   When `site sync` or `site submit` refuses for uncommitted changes, clear it yourself in that turn: commit your own files; for others' files, back up the diff to your scratchpad, `git stash push -- <their paths>`, sync, then `git stash pop` and check the diff matches the backup; never end a turn with a step waiting on a blocker that no event will clear.
 3. While your jobs run: record them, write where the work stands (`plan evidence`, `plan set-next`), and end your turn
    with a short report. Before you end it, `plan leave-check {id}` must pass: every next step you leave is in flight,
    under `plan wait {id} <step> --on "<run ids | a reviewer | a date YYYY-MM-DD>"` (a date wait wakes nothing until
