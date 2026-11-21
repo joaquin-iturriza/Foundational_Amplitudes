@@ -397,6 +397,10 @@ def summary(paths, out):
         off_entry(axs[len(procs) - 1])   # last in the legend
     ps.legend_cell(axs[3], axs[:3], fontsize=ps.LEGEND_MIN_PT)
     print(ps.save(fig, out))
+    # the numbers for % claim: lines (tools/verify_claims.py reads the last JSON line): MSE(log10|M|^2) in the deepest
+    # bin, by process, run tag and family
+    print(json.dumps({"deepest": {f"{p[0]}_{p[1]}": vals[p] for p in procs},
+                      "mlp": {f"{p[0]}_{p[1]}": {f: MLP[(*p, f)][2] for f, _ in FAMS[p] if (*p, f) in MLP} for p in procs}}))
 
 
 def main():
