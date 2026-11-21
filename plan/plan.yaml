@@ -34248,6 +34248,17 @@ entries:
       kit_deepest_attempts (legend fixed FA 7f0b6b29), kitvm_bulk (analysis/kit_benchmark/figs/deck). Open: the benchmark
       citation is a red \slot (unpublished; the authors'' names for a private-communication or in-preparation entry come from
       Joaquin). Scratchpad kit_section_pages.pdf, draft_kit3.pdf/.zip.'
+  - at: '2026-11-21T17:13:30+00:00'
+    text: '2026-11-21 step 5 rework (Joaquin''s figure-rules / no citation / one median figure / no Fig. 22): draft 4c57c9f
+      (51 pp, Sec. 7 pp. 32-35, overfulls 7 unchanged). Figures from tools/kit_vs_mlp.py paper_figs @a7d5cf93: kitvm_paper_median
+      (2x2: u u~ g collinear and soft, t t~ one loop high energy and threshold; truth, transformer, transformer + asymptotic
+      factor, MLP log invariants, MLP log invariants and log(s_tt-4m_t^2), MLP raw invariants, together), kitvm_paper_bulk;
+      both on natural log like the rest of the draft (log10 x ln10, MSE x ln10^2), process label upper right in every panel,
+      one legend per process row in a free corner, off-scale values on the axis edge without printed value (MLP raw at high
+      energy reaches median log|M|^2 475, in the caption), thresholded MLP purple (was black, the truth''s colour); check_caption
+      OK on both. Text: citation slot removed, the factor''s method moved before the one median figure, deepest-bin attempts
+      paragraphs and figure out, ReZero bib entry dropped. Fig. 22''s content was not in docs/results.tex: written there as
+      sec:kit-deepest (FA bb35ba1a, claims verified from tools/kit_figures.py summary @ccbffbc5). Fresh section reviewer launched.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
