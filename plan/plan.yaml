@@ -37833,6 +37833,18 @@ entries:
       for Sg, F, S still to read with the step-1 readout. FA-lxplus-506eaef9 (scrflags b128 s42) landed on a Tesla T4 and
       was removed by HTCondor''s wall limit after ~6 h (float64); resubmitted on CC FA-ccin2p3-676bd3d0 with --gpu-min-mem=24G;
       seed-batch submissions to lxplus carry --hdr=--gpu-min-mem=24G from now on (sweep configs already restrict to A100/H100).'
+  - at: '2026-11-21T12:47:25+00:00'
+    text: '2026-11-21 step 1 readout, batch 2048 (zng4g_readout.py @6547b7c1; figs zng4g_ft_vs_scratch, zng4g_step0): F/S
+      = 1.56 (three-seed means 0.0980 vs 0.0630; range over the 9 seed pairings 1.45-1.72) -> HIGHER: at this compute the
+      template restart costs more than the start gives. S+flags is worse than S (0.155 vs 0.063, 2.5x; b128 0.050 vs 0.020),
+      so F is read against S and the flags'' effect is reported apart as an upper bound. Head start: F''s mean best-so-far
+      is below S''s only at 4-10% of the run, then flat at 0.0980 from 10% to the end (fixed-HP seeds'' best_step 195 of 1953)
+      while S falls 0.112 -> 0.063; no arm but S reaches 1.2 x S''s best. Batch 128 not read: search at 15/16 (trial 14 hp1230
+      on lxplus FA-lxplus-8b59a788), F seed 42 so far 0.0258 vs S 0.0197, ahead of S only at the first validation. Step 0
+      (2c): het. NLL median scratch 1.18/1.11 (b2048/b128), fine-tune 9051/70.8, sigma reset 1.84/0.69; max grad norm over
+      steps 0-40 scratch 124/226, fine-tune 8.6e7/5.1e8, reset 3.8e3/5.6e4: the reset removes the NLL shock but leaves gradient
+      spikes 30-250x scratch''s, and does not move the end point (Sg/F8 1.004, 0.769). Target std 1.11978 in data_stats.json
+      of every run (32 at b2048, 29 at b128), equal to D507''s: shared.'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
