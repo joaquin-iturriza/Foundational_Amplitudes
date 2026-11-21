@@ -37728,7 +37728,7 @@ entries:
     decision: D516
   owner:
     agent: a57c4c5a332c9e185
-    state: working
+    state: closed
     since: '2026-11-20T15:57:56+00:00'
     state_at: '2026-11-21T01:33:43.047000+00:00'
     context: 206649
@@ -38257,30 +38257,23 @@ entries:
       parent rerun tag=zng_uq_w_lr1p89e-3_snap'
     '4': step 2's parent rerun
   handoff:
-    state: '2026-11-20 15:30. Restart test done and written: par:ftm_restart_test @bc3b3bda (figs analysis/finetune_mechanism/figs/restart_headstart_s7,
-      restart_steps_s7; readout restart_test_readout.py --cached @291c08a1, plot_restart.py --s7). Branch (c): optimizer state
-      not adopted, template restart stays; cosine snapshot pair LOWER at the bar (0.391 vs 0.395, D=3162 only), WSD twin opposite;
-      WSD before-cooldown arm starts shock-free (NLL 12.7) and still loses the head start. 21/168 trials diverged (listed
-      apart, no site effect: 17% lxplus = step 6 on CC). Joaquin answered the open question ''Yes, of course I want those
-      open points explored.'' (so step 1 = run the sigma-start design and the top-up; the plan ask may still show open: mark
-      it answered) and opened step 2 (why the fine-tune does not improve below scratch''s end point). NOT yet designed (closed
-      for context): the next owner records ONE design covering (i) step 2''s first test: long-horizon fine-tune vs WSD scratch
-      at D=316 (dsave cell d5), same horizon for both, today''s template restart from the cosine rerun parent (cosrerun2)
-      and the WSD scratch base config, 8-trial DyHPO each as the s7 searches; horizon proposal 4x T=7840 = 31360 steps (scratch''s
-      s7 best at D=316 still falls through its cooldown to 1.07e-5, so T=7840 is not its end point; check it on its curve),
-      cost ~1.0 GPU-h/trial x 16 = ~17 GPU-h; (ii) the sigma-start arm: the cosine parent''s final model with its sigma head
-      re-initialised (or sigma output zeroed) so step 0 matches scratch, today''s search, D in {100,316,3162}, against C''
-      (s7cosrerun) - check that the code has a switch for it before designing; ~6 GPU-h; (iii) top-up of Oc (s7cosstep) and
-      C'' (s7cosrerun) by 4 trials per D (drive.py --n-trials 12 on the same sweeps_local state), ~5 GPU-h. Spent so far ~56
-      GPU-h of D511''s 100: (i)+(ii)+(iii) ~28 GPU-h fits. Then design-reviewer, site pick, plan target, submit with drive.py
-      --sites ccin2p3 lxplus jeanzay --allow-jeanzay.'
-    decisions: D511 (owner-sized, under 100 GPU-h total); diverged trials listed apart (D398), never retried; no pinning to
-      CC (no site effect measured); the long-warmup arm cited as WITHIN without its number (0.88 in plan finding 2026-11-13)
-      - add its src if the write-up is extended
-    ruled_out: lxplus launch/env error for the 22 failed trials (all training divergence, same torch 2.1.2+cu118 both sites);
-      the step-0 shock as the cause of the lost head start (shock-free Bc loses it too); optimizer state as a template change
-    running: none
-    files: analysis/finetune_mechanism/restart_test_readout.py, plot_restart.py, restart_steps.py, data/restart_test.json,
-      data/restart_s7_summary.json, data/restart_test_rows.json (cache), data/restart_steps.json (cache); sweep/sweep_config_dsave_s7*_bbx_zz_d{4,5,7}_*.yaml
-      @10564601; sweeps_local/dsave_s7*; docs/results.tex par:ftm_restart_test
-    written: '2026-11-20T15:13:15+00:00'
+    state: '2026-11-21 ~03:00 UTC. Z+4g work under D515/D516; the design passed review after one fix (plan design). Smoke
+      FA-ccin2p3-5f896107 ended clean: all stages ran; step-0 val 4.2e8 for the template restart against 5.1 with the sigma
+      reset. Batch out: sweep/drive.py (detached, pid 1518409, log ~/.local/share/ccorch/detached/20261121-023759_zng4g_ft_sigreset_drive.log)
+      runs ftmech_zng4g_ft_b128/b2048 (16 trials each) and sigreset_b128/b2048 (8 each), state in sweeps_local; target 6.4
+      h. The 6 scrflags control jobs (FA-lxplus-506eaef9, FA-ccin2p3-3d10df9d, -df24160a, -fc7a50c6, -43973899, -f7790500)
+      have target 1.06 h. Parent rerun FA-ccin2p3-d860d784 FAILED at launch (save_model_at_steps needed ++); fixed @550e359a
+      and passed by the repo-reviewer; it made no run dir. NEXT: once the tree is clean, site sync ccin2p3 FA, then site pick
+      and site submit <site> FA scripts/job_datasaving_parent.sh --item finetune_mechanism --est-gpu-hours 11.5 --hdr=--time=11:30:00
+      --hdr=--mem=32G -- finale lr=1.89e-3 tag=zng_uq_w_lr1p89e-3_snap (target 8.24 h). After it: step 4 equivalence check
+      (_snap final vs _cc), a 50-step smoke of snapopt (float32 optimizer state loaded into a float64 run), then the snap/snapopt
+      searches. After the searches: seeds 43/44 of the arm-(1) chosen trials (~2.8 GPU-h), then the readout per the design
+      (F/S over seed pairings; Sg/F8 against 1.41; plateau criterion, end point at b128 only).'
+    decisions: 'D515 scope Z+4g; D511 100 GPU-h cap, raised by D516 ''Yes, do the rerun then'' to ~129 for the snapshot arms;
+      ft lr searched directly (lr_scale 1), same 7-HP space and DyHPO seed as the D507 scratch cells; flags control read per
+      the reviewer: F against S+flags only if S+flags <= S; b2048 compute-limited (SAME = no gain at this compute)'
+    ruled_out: 'b b~ > Z Z s8 long-horizon, sigma-start and top-up (D515: off his question, left as recorded)'
+    running: drive.py 4 searches (ftmech_zng4g_{ft,sigreset}_{b128,b2048}); 6 scrflags jobs; the parent rerun not yet resubmitted
+    files: sweep/sweep_config_ftmech_zng4g_*.yaml @71ff1ef9 and @f970a3c7 (snap, snapopt); analysis/finetune_mechanism/seed_chunks/zng4g_*.txt
+      @61ee6c44; scripts/job_datasaving_parent.sh @550e359a
+    written: '2026-11-21T01:43:15+00:00'
