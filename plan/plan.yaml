@@ -38346,6 +38346,12 @@ entries:
     units: null
     start: '2026-11-21T11:11:50+00:00'
     at: '2026-11-21T11:11:50+00:00'
+  - batch: ft_b128_seeds
+    wall_h: 0.9
+    jobs: 2
+    units: null
+    start: '2026-11-21T14:47:15+00:00'
+    at: '2026-11-21T14:47:15+00:00'
   step_why:
     1:
       feeds: 'D513/D515: does the fine-tune end at scratch''s level (pretraining buys speed only) or above it on Z+4g at 1e4
