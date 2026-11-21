@@ -353,6 +353,8 @@ def plot(figs):
 
 
 PAPER_OFF = "off the scale, on the axis edge"
+# one legend order in both paper figures
+PAPER_ORDER = ["factor", "scratch", "MLP log", r"MLP log+$\beta$", "MLP raw"]
 
 
 def paper_figs(figs, paper_med, bulk, sty):
@@ -366,22 +368,33 @@ def paper_figs(figs, paper_med, bulk, sty):
               ("ee_tt_virt_finite", "threshold_beta")]
     fig, axs = ps.figure(ncols=2, nrows=2)
     axs = list(np.ravel(axs))
+    clip = {}
     for ax, (p, fam) in zip(axs, panels):
         tr, med = paper_med[p]
+        sx = 1e-3 if fam == "sudakov_sqrts" else 1.0   # sqrt(s) in TeV, as the text
         tx, ty = zip(*tr[fam])
-        ty = LN * np.asarray(ty)
+        tx, ty = sx * np.asarray(tx), LN * np.asarray(ty)
         pad = max(LN, ty.max() - ty.min())   # the truth's range widened by its own span (at least a decade) each side
+        clip[id(ax)] = ty.max() + pad
         ax.plot(tx, ty, "-", color="k", label="truth")
-        for sym, m in med.items():
+        for sym in PAPER_ORDER:
+            if sym not in med:
+                continue
+            m = med[sym]
             c, mk, ls = sty[sym]
             y = LN * np.array([q[2] for q in m[fam]])
-            if clip_plot(ax, [q[0] for q in m[fam]], y, ty.min() - pad, ty.max() + pad, None, marker=mk, ls=ls,
+            if clip_plot(ax, [sx * q[0] for q in m[fam]], y, ty.min() - pad, ty.max() + pad, None, marker=mk, ls=ls,
                          color=c, label=NAME[sym]):
                 off_entry(ax, PAPER_OFF)
                 print(f"PAPER OFF {p} {fam} {NAME[sym]!r}: max median log|M|^2 {y.max():.4g}")
         ax.set_xscale("log"); ax.xaxis.set_minor_formatter(NullFormatter())
-        ax.set_xlabel(XLAB[fam]); ax.set_ylabel(r"median $\log|\mathcal{M}|^2$")
-        ps.process_label(ax, PROCESS[p], loc="upper right")
+        if fam == "sudakov_sqrts":
+            ax.set_xticks([2, 5, 10, 20, 50], ["2", "5", "10", "20", "50"])
+        ax.set_xlabel(r"$\sqrt{s}$ [TeV]" if fam == "sudakov_sqrts" else XLAB[fam])
+        ax.set_ylabel(r"median $\log|\mathcal{M}|^2$")
+        # the off-scale medians run along the top of the high-energy panel and the raw-invariant MLP's line climbs to
+        # them on the left: the one corner free there is lower right
+        ps.process_label(ax, PROCESS[p], loc="lower right" if fam == "sudakov_sqrts" else "upper right")
     # one legend per process row: the t t~ row has its own MLP
     for i, at in ((1, "lower left"), (3, "lower left")):
         hl = {}
@@ -391,17 +404,27 @@ def paper_figs(figs, paper_med, bulk, sty):
         if PAPER_OFF in hl:
             hl[PAPER_OFF] = hl.pop(PAPER_OFF)
         ps.legend(axs[i], at, handles=list(hl.values()), labels=list(hl), fontsize=LEG_PT)
-        ps.make_room(axs[i])
+    # off-scale medians on the final axis edge: limits settled (headroom, room for legend and label) and frozen, then
+    # the clipped points moved up to them (ps.save leaves frozen limits: autoscale off, _ps_equal_limits skips
+    # make_room)
+    for ax in axs:
+        ps.headroom(ax); ps.make_room(ax)
+        lo, top = ax.get_ylim()
+        ax.set_ylim(lo, top); ax._ps_equal_limits = True
+        for ln in ax.get_lines():
+            y = np.asarray(ln.get_ydata(), float)
+            if y.size and (y == clip[id(ax)]).any():
+                ln.set_ydata(np.where(y == clip[id(ax)], top, y))
     out.append(ps.save(fig, os.path.join(figs, "kitvm_paper_median")))
     fig, ax = ps.figure()
-    for j, sym in enumerate(sty):
+    for j, sym in enumerate(PAPER_ORDER):
         pts = [(i - 0.3 + 0.15 * j, LN ** 2 * bulk[p][sym]) for i, p in enumerate(PROCS) if sym in bulk[p]]
         c, mk, _ = sty[sym]
         ax.plot(*zip(*pts), mk, ls="", color=c, label=NAME[sym])
         print(f"PAPER BULK {NAME[sym]!r}: " + " ".join(f"{v:.3g}" for _, v in pts))
     ax.set_xticks(range(3), [r"$u\bar ug$", r"$u\bar ugg$", r"$t\bar t$, one loop"]); ax.set_xlim(-0.6, 2.6)
     ax.set_yscale("log"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
-    ps.legend(ax, "upper left", fontsize=LEG_PT); ps.make_room(ax)
+    ps.legend(ax, "upper left", fontsize=LEG_PT); ps.make_room(ax)   # LEG_PT: at the default floor it overflows
     out.append(ps.save(fig, os.path.join(figs, "kitvm_paper_bulk")))
     return out
 
