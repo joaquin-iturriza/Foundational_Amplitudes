@@ -37630,6 +37630,9 @@ entries:
       GPU-h); 31.6 GPU-h beyond D511's 100, held on Joaquin's go
     3: 'Step (3), only on arm (1)''s HIGHER result: separate the parent''s weights from the fine-tune''s lr range or length
       (design then)'
+    4: 'Before the snapshot arms (2a, 2b) are read: show that the rerun dsave_parent_finale_zng_uq_w_lr1p89e-3_snap reproduces
+      the _cc parent (per-process best-checkpoint val_loss_no_reg of the two final models, ratio against the seed spread),
+      since 2a/2b start from the rerun and arm (1)/(2c) from _cc (repo-reviewer finding 2026-11-21)'
   done_when: null
   notes_ref: null
   match: dsave_ftmech_*,ftmech_*
@@ -38229,6 +38232,11 @@ entries:
       if:
       - 'arm (1) HIGHER: design, review, submit within budget or ask'
       - 'arm (1) SAME or LOWER: drop'
+    4:
+      feeds: whether 2a/2b vs arm (1) isolates the branch point from parent run-to-run noise
+      if:
+      - 'within the spread: read 2a/2b against arm (1) as designed'
+      - 'outside it: ask Joaquin for the matched control (fresh restart from the _snap final, both batches, ~11.3 GPU-h)'
   step_waits:
     '1': FA-ccin2p3-5f896107
     '3': step 1's arm (1) result (not yet submitted)
