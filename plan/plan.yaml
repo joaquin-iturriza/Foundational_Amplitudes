@@ -37676,9 +37676,11 @@ entries:
       chosen trial), (2c) sigma-head reset (8 trials per batch), input-flag scratch control (seeds 42-44 per batch), configs
       sweep/sweep_config_ftmech_zng4g_*.yaml @71ff1ef9; design 2026-11-20T16:06; smoke first (D395), then the batch, ~41.7
       GPU-h
-    2: Arms (2a) pre-cooldown snapshot of the W parent with a fresh optimizer and (2b) the snapshot with its optimizer state
-      and no warmup, 8-trial searches at both batches, after a parent rerun with training.save_model_at_steps=[56000] (~9
-      GPU-h); 31.6 GPU-h beyond D511's 100, held on Joaquin's go
+    2: 'Arms (2a) pre-cooldown snapshot of the W parent with a fresh optimizer and (2b) the snapshot with its optimizer state
+      and no warmup, 8-trial searches at both batches (sweep_config_ftmech_zng4g_snap*_b*.yaml, D516 go), from the step-56000
+      model of the fp32 parent rerun dsave_parent_finale_zng_uq_w_lr1p89e-3_snapfp32 (FA-ccin2p3-74805752) once step 4 shows
+      it reproduces _cc: repoint fine_tune.pretrained_path from _snap to _snapfp32, check the D395 smoke FA-lxplus-1407949d''s
+      log, then drive.py --sites ccin2p3 lxplus (parent copied to lxplus by site copy) at site pick''s width, ~22.6 GPU-h'
     3: 'Step (3), only on arm (1)''s HIGHER result: separate the parent''s weights from the fine-tune''s lr range or length
       (design then)'
     4: 'Before the snapshot arms (2a, 2b) are read: show that the rerun dsave_parent_finale_zng_uq_w_lr1p89e-3_snap reproduces
@@ -38328,8 +38330,9 @@ entries:
       feeds: 'D513/D515: does a restart that avoids the cooldown''s end or keeps the optimizer state keep the head start on
         Z+4g'
       if:
-      - 'Joaquin approves the cost: parent rerun, smoke, the 4 searches'
-      - 'Joaquin declines: drop the step, report (2c) alone'
+      - 'fp32 rerun reproduces _cc and smoke clean: submit the 4 searches'
+      - 'fp32 rerun still outside: ask Joaquin for the matched control (fresh restart from the rerun''s final, both batches,
+        ~11.3 GPU-h)'
     3:
       feeds: 'D513 open point: why the fine-tune ends above scratch'
       if:
