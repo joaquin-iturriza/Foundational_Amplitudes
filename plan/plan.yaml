@@ -37789,7 +37789,7 @@ entries:
     decision: D516
   owner:
     agent: acd2ab0221b67834c
-    state: working
+    state: closed
     since: '2026-11-21T10:49:53+00:00'
     state_at: '2026-11-21T14:46:59.031000+00:00'
     context: 245890
@@ -38385,23 +38385,27 @@ entries:
     '2': FA-ccin2p3-74805752 FA-lxplus-1407949d
     '4': FA-ccin2p3-74805752
   handoff:
-    state: '2026-11-21 ~03:00 UTC. Z+4g work under D515/D516; the design passed review after one fix (plan design). Smoke
-      FA-ccin2p3-5f896107 ended clean: all stages ran; step-0 val 4.2e8 for the template restart against 5.1 with the sigma
-      reset. Batch out: sweep/drive.py (detached, pid 1518409, log ~/.local/share/ccorch/detached/20261121-023759_zng4g_ft_sigreset_drive.log)
-      runs ftmech_zng4g_ft_b128/b2048 (16 trials each) and sigreset_b128/b2048 (8 each), state in sweeps_local; target 6.4
-      h. The 6 scrflags control jobs (FA-lxplus-506eaef9, FA-ccin2p3-3d10df9d, -df24160a, -fc7a50c6, -43973899, -f7790500)
-      have target 1.06 h. Parent rerun FA-ccin2p3-d860d784 FAILED at launch (save_model_at_steps needed ++); fixed @550e359a
-      and passed by the repo-reviewer; it made no run dir. NEXT: once the tree is clean, site sync ccin2p3 FA, then site pick
-      and site submit <site> FA scripts/job_datasaving_parent.sh --item finetune_mechanism --est-gpu-hours 11.5 --hdr=--time=11:30:00
-      --hdr=--mem=32G -- finale lr=1.89e-3 tag=zng_uq_w_lr1p89e-3_snap (target 8.24 h). After it: step 4 equivalence check
-      (_snap final vs _cc), a 50-step smoke of snapopt (float32 optimizer state loaded into a float64 run), then the snap/snapopt
-      searches. After the searches: seeds 43/44 of the arm-(1) chosen trials (~2.8 GPU-h), then the readout per the design
-      (F/S over seed pairings; Sg/F8 against 1.41; plateau criterion, end point at b128 only).'
-    decisions: 'D515 scope Z+4g; D511 100 GPU-h cap, raised by D516 ''Yes, do the rerun then'' to ~129 for the snapshot arms;
-      ft lr searched directly (lr_scale 1), same 7-HP space and DyHPO seed as the D507 scratch cells; flags control read per
-      the reviewer: F against S+flags only if S+flags <= S; b2048 compute-limited (SAME = no gain at this compute)'
-    ruled_out: 'b b~ > Z Z s8 long-horizon, sigma-start and top-up (D515: off his question, left as recorded)'
-    running: drive.py 4 searches (ftmech_zng4g_{ft,sigreset}_{b128,b2048}); 6 scrflags jobs; the parent rerun not yet resubmitted
-    files: sweep/sweep_config_ftmech_zng4g_*.yaml @71ff1ef9 and @f970a3c7 (snap, snapopt); analysis/finetune_mechanism/seed_chunks/zng4g_*.txt
-      @61ee6c44; scripts/job_datasaving_parent.sh @550e359a
-    written: '2026-11-21T01:43:15+00:00'
+    state: '2026-11-21 ~14:30 UTC. Step 1 (Z+4g, D515): b2048 read: F/S 1.56 [1.45,1.72] HIGHER (zng4g_readout.py @6547b7c1);
+      S+flags 2.5x worse than S so F is read against S; reset removes step-0 NLL shock (1.8 vs 9051) not grad spikes; Sg/F8
+      1.004/0.769 within 1.41; std 1.11978 shared. b128 search ended (16 trials), chosen hp1966 trial 11 val 0.020566; its
+      seeds 43/44 FA-ccin2p3-3dc6dacc, -06fbca06 (chunks @23034887) out on CC, step 1 waits on them. NEXT on their end: rerun
+      python3 analysis/finetune_mechanism/zng4g_readout.py (it reads F|128|s43/s44 from CC runs/ftmech_zng4g_ft_b128_s4X)
+      for the b128 verdict and redraw figs zng4g_ft_vs_scratch/zng4g_step0 (captions in the last report; at b128 the fine-tune
+      then has 3 seeds: update the caption); if b128 HIGHER too: design step 3 (parent weights vs the fine-tune''s lr range/length),
+      review, submit within budget. Step 2/4: the TF32 rerun FA-lxplus-e8d15505 failed to reproduce _cc (gmean MSE ratio 5.0,
+      parent_rerun_check.py @6215a796); strict-fp32 rerun FA-ccin2p3-74805752 (tag _snapfp32, ++training.allow_tf32=false)
+      running; on its end: parent_rerun_check.py with PARENTS[''snap''] pointed at ccin2p3 runs/data_saving/dsave_parent_finale_zng_uq_w_lr1p89e-3_snapfp32
+      (edit the dict), then if within 0.43-2.5x: repoint the 4 snap configs'' pretrained_path to _snapfp32/models/model_run0_step56000.pt,
+      read the smoke FA-lxplus-1407949d log (snap + snapopt, OPT_STATE line, all stages), site copy the _snapfp32 dir to lxplus,
+      drive.py --config the 4 snap configs --item finetune_mechanism --mem 32G --cpus 4 --sites ccin2p3 lxplus (detached via
+      tools/detach.py), target ~6.4 h. If outside: ask Joaquin for the matched control.'
+    decisions: 'D515 Z+4g scope; D516 ''Yes, do the rerun then'' raised the budget to ~129 GPU-h; the fp32 parent rerun is
+      a repair inside D516 (rerun on H100 with TF32 did not reproduce the V100 parent); flags control read per reviewer: S+flags
+      worse than S, so F vs S and the flags'' 2.5x as an upper bound; b2048 compute-limited, D end point read at b128 only'
+    ruled_out: b b~ > Z Z s8 long-horizon, sigma-start, top-up (D515, left as recorded)
+    running: FA-ccin2p3-3dc6dacc, FA-ccin2p3-06fbca06 (b128 ft seeds 43/44); FA-ccin2p3-74805752 (fp32 W parent rerun, ~8
+      h); FA-lxplus-1407949d (snap/snapopt smoke)
+    files: analysis/finetune_mechanism/zng4g_readout.py @6547b7c1, zng4g_sigreset_read.py @44d5c2ce, parent_rerun_check.py
+      @6215a796, plot_parent_rerun.py @12c25225, zng4g_seed_chunks.py @d69b9372; seed_chunks/zng4g_*; sweep/sweep_config_ftmech_zng4g_*.yaml;
+      figs zng4g_ft_vs_scratch, zng4g_step0, zng4g_sigreset, parent_rerun_check
+    written: '2026-11-21T14:52:30+00:00'
