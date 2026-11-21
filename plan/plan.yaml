@@ -34608,7 +34608,7 @@ entries:
     - FA-lxplus-8b928927
     - FA-lxplus-9a0f77c5
     - FA-lxplus-f3901ad0
-    commit: c57dd900
+    commit: 170183dd
     paths:
     - analysis/zng_uq/benchmark.py
     - analysis/zng_uq/data/benchmark.json
@@ -34626,12 +34626,17 @@ entries:
     - scripts/job_datasaving_parent.sh
     - scripts/job_uq_ext.sh
     - scripts/job_zng_zeroshot.sh
+    - sweep/dyhpo/hpo_method.py
+    - sweep/dyhpo_sampler.py
     - sweep/sweep_config_tp_zng_d1e4_adam_b128_zgggg.yaml
     - sweep/sweep_config_tp_zng_d1e4_adam_b2048_zgggg.yaml
     - sweep/sweep_config_tp_zng_d1e4_muon_b128_zgggg.yaml
     - sweep/sweep_config_tp_zng_d1e4_muon_b2048_zgggg.yaml
     - sweep/sweep_config_tp_zng_hpo_zgggg.yaml
+    - tests/test_fold_startup.py
+    - tests/test_sweepends_step.py
     - tests/test_w_offshell_default.py
+    - tools/plan.py
     - tools/zng_uq.py
   dead_ends:
   - tried: 'Their networks (LGATr-slim, LLoCa-Transformer, Transformer, MLP, het) by their own code (scripts/job_uq_ext.sh):
