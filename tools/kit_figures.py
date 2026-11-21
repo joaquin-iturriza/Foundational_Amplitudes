@@ -327,9 +327,10 @@ FAMS = {("ee_uug", "me2"): [("coll_y", "collinear"), ("soft_x", "soft")],
         ("ee_tt", "virt_finite"): [("threshold_beta", "threshold"), ("sudakov_sqrts", "high energy")]}
 SUMMARY_PROC = {("ee_uug", "me2"): r"$e^+e^-\to u\bar u g$", ("ee_uugg", "me2"): r"$e^+e^-\to u\bar u gg$",
                 ("ee_tt", "virt_finite"): r"$e^+e^-\to t\bar t$, one loop"}
-# the fine-tunes in two markers by parent (none fixes a limit): tops held out of pretraining, or LO / one-loop tops added
-FT_HELD = "fine-tuned, tops held out\nof pretraining (2 runs)"
-FT_TOPS = "fine-tuned, tops added\nto pretraining (4 runs)"
+# the fine-tunes in two markers by parent (none fixes a limit): the held-out parent keeps every other top class
+# (recipes/gen_datasaving_parent.py), so only e+e- > t t~ is out; the other four add threshold-sampled tops
+FT_HELD = "fine-tuned, $e^+e^-\\to t\\bar t$\nnot in pretraining (2 runs)"
+FT_TOPS = "fine-tuned, threshold tops\nadded to pretraining (4 runs)"
 # each arm in plain words, the same name as in tools/kit_vs_mlp.py (Joaquin 2026-11-17: a figure reads on its own)
 WORDS = {"scratch": "transformer", r"scratch+$\beta$": "transformer",
          "scratch-nobeta": r"transformer without $\log\beta^2$ input",
