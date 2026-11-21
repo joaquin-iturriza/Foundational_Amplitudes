@@ -33816,9 +33816,9 @@ entries:
       me this exactly?''; Fig. 15 stays out under his hold, no rerun asked'
   owner:
     agent: a09a17fa36ad25dbd
-    state: working
+    state: stopped
     since: '2026-11-20T01:50:53+00:00'
-    state_at: '2026-11-21T00:41:08.265000+00:00'
+    state_at: '2026-11-21T00:43:32.157000+00:00'
     context: 62966
     context_at: '2026-11-20T01:57:48+00:00'
   step_waits:
@@ -37725,9 +37725,9 @@ entries:
     decision: D516
   owner:
     agent: a57c4c5a332c9e185
-    state: working
+    state: stopped
     since: '2026-11-20T15:57:56+00:00'
-    state_at: '2026-11-21T00:41:06.408000+00:00'
+    state_at: '2026-11-21T00:46:49.342000+00:00'
     context: 206649
     context_at: '2026-11-21T00:41:29+00:00'
   findings:
