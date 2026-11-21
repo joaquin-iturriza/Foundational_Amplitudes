@@ -34238,6 +34238,13 @@ entries:
       ''bulk-edge slope -0.59, MLP continues it'' premise (talks/kit_nov2026 slide 3) is not a clean read; the section''s
       by-chance argument rests on the plotted medians only. Reviewer (fresh Plan agent) FIX round 1: 15 items, all applied
       except the bulk-side figure (reason above) and the benchmark citation (slot, Joaquin''s).'
+  - at: '2026-11-21T04:51:18+00:00'
+    text: '2026-11-21 step 5 done: Sec. 7 ''Extrapolation into singular limits'' in draft 4e7626e (text ac96ae5 + caption
+      axes 4e7626e), 54 pp, section pp. 32-38, overfulls unchanged (7). Fresh section reviewer: FIX (15 items) then PASS on
+      ac96ae5; captions pass check_caption on all 6 pngs. Figures: kitvm_median_nofactor_{ee_uug_me2,ee_tt_virt_finite}, kitvm_median_{ee_uug_me2,ee_tt_virt_finite},
+      kit_deepest_attempts (legend fixed FA 7f0b6b29), kitvm_bulk (analysis/kit_benchmark/figs/deck). Open: the benchmark
+      citation is a red \slot (unpublished; the authors'' names for a private-communication or in-preparation entry come from
+      Joaquin). Scratchpad kit_section_pages.pdf, draft_kit3.pdf/.zip.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
