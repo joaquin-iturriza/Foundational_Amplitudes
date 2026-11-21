@@ -38344,7 +38344,7 @@ entries:
     '1': local:ftmech_zng4g_ft_b128 FA-ccin2p3-676bd3d0
     '3': step 1's arm (1) result (not yet submitted)
     '2': FA-ccin2p3-74805752 FA-lxplus-1407949d
-    '4': step 2's parent rerun
+    '4': FA-ccin2p3-74805752
   handoff:
     state: '2026-11-21 ~03:00 UTC. Z+4g work under D515/D516; the design passed review after one fix (plan design). Smoke
       FA-ccin2p3-5f896107 ended clean: all stages ran; step-0 val 4.2e8 for the template restart against 5.1 with the sigma
