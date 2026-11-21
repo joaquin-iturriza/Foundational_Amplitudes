@@ -38297,6 +38297,50 @@ entries:
       spread 1.15/1.19; step-0 NLL 2260; zng 5e5 MSE 2.1e-4 vs 3.4e-4. Configs differ from the D507 twins only in the start.
       Searched zgggg, Z+4g, Z+ng, reset_sigma, sigma head, sigma-start, input_pair_logs, soft_eps, head start, speed only;
       found no prior Z+4g 1e4-event fine-tune search.'
+  - at: '2026-11-21T16:52:27+00:00'
+    question: 'Step 3, stage 1 (D515/D516; Joaquin: ''Yes, of course I want those open points explored.''). Arm (1) ended
+      HIGHER at both batches (zng4g_readout.py @6547b7c1 code, data rerun 2026-11-21: F/S b2048 1.56 [1.45,1.72], b128 1.54
+      [1.21,1.92]). Is that the parent''s weights or the fine-tune search''s lr window? The ft searches'' best trials sit
+      at the window edge on opposite sides: b128 the 6 best (val mu-MSE 0.0206-0.0252) at lr 8.8e-3..1.10e-2 against a top
+      of 1.1e-2, val falling with lr; b2048 the 7 best (0.0771-0.0801) at lr 3.1e-3..3.8e-3 against a bottom of 3.1e-3. Scratch''s
+      chosen lrs are interior (b128 2.3e-3 in [2.7e-4,1.1e-2], b2048 2.0e-2 in [3.1e-3,4.1e-2]). Extending each ft search
+      past its edge (b128 top to 3.3e-2, b2048 bottom to 1.0e-3, half a decade) and continuing it 8 trials: does F''s best
+      then reach S (the HIGHER was the window), or does it stay above S with an interior optimum (the parent''s weights, or
+      the run''s length, cost the end point; stage 2 then separates those two, designed on this result)?'
+    prior: 'D97 (hp58 fine-tunes, best at the top lr: extend_sweep in place, 5 more trials) and results.tex l.14074-14094
+      (tp cells extended in place where the best sat at the window''s top, 31 scratch and 46 fine-tune cells): the window
+      edge was repaired by extension before any best-against-best read. This entry: arm (1) HIGHER at both batches (above);
+      Sg/F8 1.004/0.769 (sigma reset no effect); b b~ > Z Z: no restart variant kept the head start (par:ftm_restart_test).
+      No search of the Z+4g fine-tune beyond these windows on record (searched results.tex: lr window, edge, extended; plan
+      finetune_mechanism; decisions D76, D94, D97, D515, D516).'
+    measure: 'As step 1: best val MSE(log|M|^2) = min val mu-MSE x std^2 (std 1.11978, shared). Per batch the extended search''s
+      (24 trials) lowest-val trial; if it is a new trial, its seeds 43, 44 by run_fixed_hp.py (job_seed_batch.sh) and F/S
+      recomputed with three-seed means and the 9-pairing range (zng4g_readout.py, which picks the chosen trial from driver_state).
+      Also the ft search''s best val against lr (one point per trial, 24 per batch) beside scratch''s 16, to show where the
+      optimum sits.'
+    check: 'lr moves val inside the ft searches by more than the gap to S: b128 val mu-MSE 0.0206 at lr 1.02e-2 vs 0.050 at
+      4.3e-4 (2.4x) and falling monotonically over the top decade (0.0379 at 4.0e-3, 0.0249 at 9.3e-3, 0.0206 at 1.02e-2),
+      while F/S is 1.54; b2048 0.0771 at 3.1e-3 vs 0.113 at 3.6e-2 (1.5x), rising with lr from the bottom. The extension moves
+      the cell where the best sits at the edge (D97: hp58 cells moved after extension; results.tex l.14083: extending moved
+      ee->nu_e nu_e~ most).'
+    fixed: 'The two ft searches ftmech_zng4g_ft_b128 and _b2048 (state sweeps_local, 16 trials each) continued in place: sweep/extend_sweep.py
+      sweeps_local/<name> --param training.lr --high 3.3e-2 (b128) / --low 1.0e-3 (b2048), observations and surrogate kept;
+      configs sweep/sweep_config_ftmech_zng4g_ft_b{128,2048}.yaml change only the lr bound and n_trials 16->24, waves 3,3,2,3,3,2,3,3,2.
+      Everything else as step 1 (parent W final model, data 1e4 events, float64, steps 1953/31250, MuonAdamW+WSD, the other
+      6 HPs, dyhpo seed 42). drive.py --sites ccin2p3 lxplus (the parent on both), --mem 32G --cpus 4. Disk 46 MB per trial
+      x 20 = ~1 GB.'
+    control: 'S: the D507 scratch cell''s chosen trial at the same batch, three-seed mean (as step 1; its lr interior). F''s
+      16-trial best as the before.'
+    seeds: 'Trials seed 42; seeds 43, 44 of the extended search''s chosen trial if it is a new trial (else the step-1 seeds
+      stand). Cost (design rates, b128 1.06 h, b2048 0.35 h per trial incl. sigma stage): 8x1.06 + 8x0.35 = 11.3 GPU-h, seeds
+      up to 2x(1.06+0.35) = 2.8: <=14.1 GPU-h, inside D516''s ~129 GPU-h (spent/committed ~83: step 1 41.7, parent reruns
+      ~18, step 2 searches 22.6). Wall ~3.5 h (3 waves of b128 trials) + seeds ~1.1 h.'
+    outcome: 'Per batch, F/S read as in step 1 (HIGHER/SAME/LOWER on the 9 pairings). b128 SAME or LOWER -> the step-1 HIGHER
+      was the lr window: the fine-tune needs a higher lr than scratch (reported with the lr optimum against scratch''s), arm
+      (1) re-read; HIGHER with the best now interior (not within the top 2 trials'' lr of 3.3e-2) -> the window is ruled out,
+      the parent''s weights or length cost the end point: stage 2 (a longer fine-tune against a longer scratch at b128, or
+      a shrink of the parent''s weights) designed on this; HIGHER with the best again at the new edge -> reported as unresolved,
+      the window question goes to Joaquin. b2048 the same reading, compute-limited (step-1 outcome).'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
