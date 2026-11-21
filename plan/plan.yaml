@@ -33658,13 +33658,6 @@ entries:
       the site holding the bigrun runs, analysis/bigrun/arms_best.py) and plot GM over processes of MSE(log|M|^2) (= GM loss
       x GM std^2 if every arm shares the standardization; check it does); x label MSE(log|M|^2); caption without the standardization
       sentence. Labels stay the fifth version (reviewed).'
-    5: 'KIT section rework (D517, Joaquin 2026-11-21: ''First, make sure the figures respect the rules we set for the rest
-      of the figures in the rest of the draft. Then, of course there is no need to cite any benchmark, it''s just what they
-      sent in an email... There is absolutely no reason to do fig 20 and then fig 21, that was for the presentation, what
-      is the point of putting it like this in a draft?? I also don''t see why fig 22 is even there''): (1) KIT figures to
-      the draft''s figure rules; (2) benchmark citation slot removed, data described as sent to us; (3) Figs 20+21 merged
-      into one median figure with and without the factor; (4) Fig. 22 (deepest-bin attempts) out, its text reworked, content
-      kept in docs/results.tex; then fresh section reviewer.'
   done_when: null
   notes_ref: null
   match: none
@@ -33835,7 +33828,6 @@ entries:
     '3': '2026-12-15: deferred, marked for later on 2026-11-17; no run'
     '4': '2026-11-22: Jean Zay still unreachable 2026-11-21 (ssh to lpnclaude03 refused, retried once); the bigrun arms''
       data_stats.json are on Jean Zay only (none on CC-IN2P3 compare_models/ or runs/, none in the local mirror)'
-    '5': a reviewer
   findings:
   - at: '2026-11-13T02:46:58+00:00'
     text: '2026-11-13 ~03:50 Joaquin: ''we should start actually doing the work on the draft with what we have ... Let''s
@@ -34561,11 +34553,6 @@ entries:
       if:
       - 'every arm shares one standardization: replot, rebuild, send'
       - 'arms differ in standardization: recompute per-process MSE from each run''s metrics and say so'
-    5:
-      feeds: 'D517: the KIT extrapolation section of the draft'
-      if:
-      - 'reviewer PASS: draft handed to Joaquin'
-      - 'reviewer FIX: revise once and re-check'
 - id: zng_uq_benchmark
   title: Our model on the Z + n gluon UQ datasets (Zenodo 16793011)
   question: 'How does our latest setup (emission-scale target, HETEROSC, mu-P LLoCa), from scratch and fine-tuned from a pretraining,
