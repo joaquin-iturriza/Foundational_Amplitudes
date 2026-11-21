@@ -37909,6 +37909,15 @@ entries:
       -> HIGHER, as at b2048 (1.56). F seeds 0.0258/0.0306/0.0346 all above S''s 0.0180-0.0214; F never reaches 1.2 x S''s
       best (S at 0.42 of the run). Both batches HIGHER: step 3 opens. The ft searches'' bests sit at the lr window edge (b128
       top 1.1e-2, b2048 bottom 3.1e-3; scratch''s interior), so step 3 stage 1 extends both windows (design 2026-11-21).'
+  - at: '2026-11-21T18:51:52+00:00'
+    text: '2026-11-21 step 4 read (parent_rerun_check.py snapfp32 @af51c8ea, plot_parent_rerun.py @5bd7f1e1^; fig parent_rerun_check_snapfp32):
+      the strict-fp32 rerun FA-ccin2p3-74805752 (V100, allow_tf32 false, same command/seed/steps/lr) is much closer to the
+      original FA-ccin2p3-47e14eae than the TF32 rerun but outside the pre-registered 0.43-2.5x per-process reference (results.tex
+      l.14243): per-process final-model val MSE ratio gmean 1.39 (TF32 rerun 5.0), 23 of 28 inside, 5 outside: ee_bbbar 1159x
+      (1.3e-7 -> 1.5e-4), uubar_ZZ_nlo 22.7x, ee_mumu_ew_nlo 3.05x, ee_aa 0.165x, uubar_ddbar 0.070x; combined sigma-stage
+      NLL -7.329 vs -7.271. So TF32 explains most of the _snap gap; the rest is run-to-run spread on the same GPU type, large
+      on a few processes. Smoke FA-lxplus-1407949d clean (snap and snapopt load step 56000, OPT_STATE 32 entries, warmup 0
+      for snapopt, sigma stage and plots). Snap configs repointed to _snapfp32 (5bd7f1e1), parent copied to lxplus.'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
