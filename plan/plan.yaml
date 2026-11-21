@@ -33671,7 +33671,7 @@ entries:
     - FA-ccin2p3-264b3f81
     - FA-ccin2p3-4fa87893
     - FA-ccin2p3-9f53a445
-    commit: 3eb26532
+    commit: 7f0b6b29
     paths:
     - .claude/skills/figure-style/SKILL.md
     - .claude/skills/paper-writing-style/SKILL.md
@@ -33700,6 +33700,9 @@ entries:
     - plot_style.py
     - recipes/catalog_v3_sep_probes.yaml
     - scripts/job_rerun_trial.sh
+    - tools/kit_bulk_slope.py
+    - tools/kit_figures.py
+    - tools/kit_vs_mlp.py
   dead_ends: []
   asks:
   - ask: 'Scope: three sections of the draft are not in your new story: Sec. 2 ''Accuracy and precision benchmark'' (a placeholder
