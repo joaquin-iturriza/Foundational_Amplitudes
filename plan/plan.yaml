@@ -38374,7 +38374,7 @@ entries:
         default for float32 catalog parents goes to Joaquin as a question'
       - 'outside it: ask Joaquin for the matched control (fresh restart from the rerun''s final, both batches, ~11.3 GPU-h)'
   step_waits:
-    '1': local:ftmech_zng4g_ft_b128
+    '1': local:ftmech_zng4g_ft_b128 FA-lxplus-8b59a788
     '3': step 1's arm (1) result (not yet submitted)
     '2': FA-ccin2p3-74805752 FA-lxplus-1407949d
     '4': FA-ccin2p3-74805752
