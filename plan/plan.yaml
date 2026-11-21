@@ -38259,8 +38259,7 @@ entries:
     '1': FA-lxplus-506eaef9 FA-ccin2p3-3d10df9d FA-ccin2p3-df24160a FA-ccin2p3-fc7a50c6 FA-ccin2p3-43973899 FA-ccin2p3-f7790500
       local:ftmech_zng4g_ft_b128 local:ftmech_zng4g_ft_b2048 local:ftmech_zng4g_sigreset_b128 local:ftmech_zng4g_sigreset_b2048
     '3': step 1's arm (1) result (not yet submitted)
-    '2': 'main session: site sync of 550e359a (blocked by another agent''s uncommitted docs/results.tex), then resubmit the
-      parent rerun tag=zng_uq_w_lr1p89e-3_snap'
+    '2': FA-lxplus-e8d15505
     '4': step 2's parent rerun
   handoff:
     state: '2026-11-21 ~03:00 UTC. Z+4g work under D515/D516; the design passed review after one fix (plan design). Smoke
