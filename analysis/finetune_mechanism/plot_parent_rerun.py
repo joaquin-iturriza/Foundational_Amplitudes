@@ -14,7 +14,7 @@ import numpy as np  # noqa: E402
 import plot_style as ps  # noqa: E402
 
 
-RERUN_LABEL = {"snap": "rerun, H100,\nreduced-precision matmuls", "snapfp32": "rerun, V100, full fp32"}
+RERUN_LABEL = {"snap": "rerun, H100,\nreduced-precision matmuls", "snapfp32": "rerun, V100,\nfull 32-bit precision"}
 
 
 def main():
