@@ -37789,9 +37789,9 @@ entries:
     decision: D516
   owner:
     agent: acd2ab0221b67834c
-    state: working
+    state: stopped
     since: '2026-11-21T10:49:53+00:00'
-    state_at: '2026-11-21T12:42:05.711000+00:00'
+    state_at: '2026-11-21T12:48:37.467000+00:00'
     context: 209271
     context_at: '2026-11-21T12:42:16+00:00'
   findings:
