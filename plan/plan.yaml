@@ -36918,6 +36918,24 @@ entries:
       GPU-h, all four n <= 136 GPU-h. Comparison gap: the existing from-scratch results on their data are at D = 5e5 only
       (the earlier 8 runs, B1, B2) and at D = 1e4 for Z+4g only (D507, 1953/31250 steps), so at the other 7 D values the fine-tunes
       have no scratch reference.'
+  - at: '2026-11-21T04:44:10+00:00'
+    text: '2026-11-21 E7940/E7941 (step 3, D507 extension). E7940 RUN_DONE was false: plan sweepends keyed ended sweeps by
+      name only, so the ended CC copies of muon_b2048/muon_b128/adam_b2048 closed the wait on their live lxplus copies; fixed
+      tools/plan.py @170183dd (site+name; tests/test_sweepends_step.py two-site case fails before, passes after). Second defect:
+      the three searches recreated on lxplus with their 8 CC observations folded (extend_sweep --fold-points) re-ran their
+      random start-up wave (hp1860, hp1333, hp0353; exact CC HPs in the two b2048 cells), because add_observed left init_conf_indices
+      unconsumed; fixed in both suggest paths (sweep/dyhpo/hpo_method.py, sweep/dyhpo_sampler.py _suggest_gp, the one these
+      gp configs use) @ab6215d5, tests/test_fold_startup.py (gp and dyhpo; fails before). So each folded search gets 5 guided
+      trials of its 8; repair inside the approved design: 3 more guided trials in muon_b128 and adam_b2048 on lxplus once
+      their DAGs end. Pace: lxplus ran these jobs one at a time (first start 6.4 h after submission, b2048 wave 2 idle 5 h),
+      against the 4.5 h target; per site pick (lxplus 1 sweep, CC 1 sweep) muon_b2048 moved to CC: the CC search (8 obs, start-up
+      done) extended by 8 guided trials (jobs 64570999-64571006, waves 3,3,2, sweep_config_tp_zng_d1e4_muon_b2048_zgggg.yaml
+      @abc47ad9, code @7f0b6b29, target 2.8 h, <=2.8 GPU-h), lxplus DAG 13207190 removed (idle nodes only). Same-HP seed-42
+      repeats across sites (b2048, CC vs lxplus, standardised val mu-MSE): muon 0.0785/0.0577, 0.0462/0.0534, 0.0526/0.0518;
+      adam 0.0791/0.0574, 0.0581/0.0606, 0.0737/0.0595: ratios 1.02-1.38, the size of the D509 seed spread. Interim, not a
+      result: adam_b128 complete at 16: best hp1141 lr 8.2e-4, 0.0256 vs D507 choice trial_0833 0.0313 (1.22x, inside its
+      1.74 seed spread: choice stands); muon_b128 4 of 8: hp0078 lr 9.24e-3 0.00708 vs trial_0950 0.0144 (2.0x, beyond 1.19),
+      at log position 0.95 of the new window [2.7e-4, 1.1e-2].'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
