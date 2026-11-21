@@ -55,7 +55,7 @@ OUT="$PROJECT_DIR/runs/data_saving/dsave_parent_${WHICH}${TAG}"
 if [[ " ${FIX[*]} ${ARGS[*]} " == *" training.scheduler=WSD "* ]]; then
     FRAC=0.125; for x in "${FIX[@]}" "${ARGS[@]}"; do case "$x" in *training.wsd_cooldown_frac=*) FRAC="${x##*=}";; esac; done
     SNAP=$(python -c "from misc import wsd_cooldown_start as w; print(w($T, $FRAC))") || exit 2
-    ARGS+=("training.save_model_at_steps=[$SNAP]")
+    ARGS+=("++training.save_model_at_steps=[$SNAP]")   # ++: trial 1262's config predates the key
 fi
 echo "DATASAVING_PARENT recipe=$RECIPE base=$PARENT args: ${ARGS[*]}"
 python run.py --config-path "$PROJECT_DIR/$PARENT" --config-name config run_dir="$OUT" run_name=null \

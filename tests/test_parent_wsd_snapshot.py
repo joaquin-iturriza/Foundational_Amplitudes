@@ -23,7 +23,7 @@ def main():
         assert lr_after(T, frac, n) == 1.0 and lr_after(T, frac, n + 1) < 1.0, (T, frac)
     assert wsd_cooldown_start(64000, 0.125) == 56000
     sh = open(os.path.join(ROOT, "scripts", "job_datasaving_parent.sh")).read()
-    assert 'training.scheduler=WSD' in sh and 'training.save_model_at_steps=[$SNAP]' in sh
+    assert 'training.scheduler=WSD' in sh and '"++training.save_model_at_steps=[$SNAP]"' in sh
     print("ok")
 
 

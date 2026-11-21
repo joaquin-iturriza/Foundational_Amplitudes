@@ -45,7 +45,7 @@ def main(cached):
         rows = driven_rows(names)
         json.dump(rows, open(cache, "w"))
     rows = [ln(r) for r in rows if r.get("val") and len(r["val"]) > 3]
-    out = {"cells": {}, "pairs": {}, "diverged": {}}
+    out = {"cells": {}, "pairs": {}, "diverged": {}, "failed_other": {}}
     # D398: trials that reported a failure (diverged) have no result record; listed apart with their cause
     for a in STAGE:
         for D in CELLS:
@@ -53,8 +53,11 @@ def main(cached):
             if os.path.exists(f):
                 bad = [{"run": t["rid"], "hp_idx": t["hp_idx"], "status": t["status"], "cause": t.get("cause")}
                        for t in json.load(open(f))["trials"].values() if t["status"] in ("failed", "lost")]
-                if bad:
-                    out["diverged"][name(a, D)] = bad
+                div = [t for t in bad if "diverged" in (t["cause"] or "")]   # an OOM, timeout or lost job is no divergence
+                if div:
+                    out["diverged"][name(a, D)] = div
+                if len(div) < len(bad):
+                    out["failed_other"][name(a, D)] = [t for t in bad if t not in div]
     trials = {a: [] for a in STAGE}
     n_obs = {}
     for D in CELLS:
