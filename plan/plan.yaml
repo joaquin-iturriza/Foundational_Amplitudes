@@ -38542,6 +38542,12 @@ entries:
     units: null
     start: '2026-11-21T14:47:15+00:00'
     at: '2026-11-21T14:47:15+00:00'
+  - batch: ftmech_zng4g_snapshot_searches
+    wall_h: 6.4
+    jobs: 32
+    units: null
+    start: '2026-11-21T18:52:15+00:00'
+    at: '2026-11-21T18:52:15+00:00'
   step_why:
     2:
       feeds: 'D513/D515: does a restart that avoids the cooldown''s end or keeps the optimizer state keep the head start on
