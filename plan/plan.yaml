@@ -37803,6 +37803,16 @@ entries:
       start. Branch (c): optimizer state not adopted, template restart stays; head start lost to scratch catch-up. 21/168
       trials diverged (C'' 6, Oc 4, O 4, Bc 3, S 2, B 1, W'' 1), listed apart; non-blow-up trials below the design''s ~20
       in Oc (15) and C'' (16).'
+  - at: '2026-11-21T11:08:55+00:00'
+    text: '2026-11-21 step 4 read (parent_rerun_check.py @6215a796, plot_parent_rerun.py @12c25225; fig parent_rerun_check):
+      the W parent rerun FA-lxplus-e8d15505 (H100, TF32 active) does NOT reproduce the original FA-ccin2p3-47e14eae (V100,
+      full fp32), same command, seed, steps, lr. Final-model sigma-stage combined val NLL -6.612 vs -7.271; per-process val
+      MSE(std. log|M|^2) ratio rerun/original over 28 processes gmean 5.0, 26 of 28 above 1: the 14 lowest-MSE processes (1.7e-9..1.9e-7)
+      1.7-51x, the next 12 0.82-2.1x, ee_numu 875x, udbar_taunu 1.4e4x, ee_ZZ 0.037x; outside the 0.43-2.5x GPU-rerun reference
+      (results.tex l.14183). Consistent with TF32''s ~1e-3 relative matmul error flooring processes fit to 1e-9 (sec:tf32-eval;
+      the TF32 training A/B covered only 1e-5-level errors). Repair inside D516: parent rerun with ++training.allow_tf32=false
+      (FA-ccin2p3-74805752, tag _snapfp32), which also tests the cause; the snapshot arms start from its step-56000 model
+      once it reproduces _cc.'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
