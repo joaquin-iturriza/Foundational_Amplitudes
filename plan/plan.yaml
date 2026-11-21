@@ -34260,6 +34260,14 @@ entries:
       OK on both. Text: citation slot removed, the factor''s method moved before the one median figure, deepest-bin attempts
       paragraphs and figure out, ReZero bib entry dropped. Fig. 22''s content was not in docs/results.tex: written there as
       sec:kit-deepest (FA bb35ba1a, claims verified from tools/kit_figures.py summary @ccbffbc5). Fresh section reviewer launched.'
+  - at: '2026-11-21T17:25:50+00:00'
+    text: '2026-11-21 step 5 rework done: fresh section reviewer FIX (13 items: hard regions not ''bins per decade'', compared
+      quantities as plotted, u u~ g g limits not named, D_a/c_a without x, m defined, factor motivated forward, collinear
+      transformer as plotted, comma splice, captions define truth and open triangles in the text''s order, off-scale markers
+      on the final axis edge, sqrt(s) in TeV, one legend order) then PASS on draft 6af3acf, figures tools/kit_vs_mlp.py @c5bf6790
+      (kitvm_paper_median, kitvm_paper_bulk). Deviations accepted by the reviewer: legend fontsize 7.5 pt kept (ps.legend
+      overflows the bulk figure without it); the high-energy panel''s process label lower right (off-scale points on the top
+      edge and the raw MLP''s line leave no upper corner). Draft 51 pp, Sec. 7 pp. 32-35, overfulls 7. Scratchpad draft_kit5.pdf.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
