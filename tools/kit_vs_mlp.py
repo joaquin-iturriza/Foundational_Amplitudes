@@ -19,6 +19,10 @@ Figures (one file each, legends inside; off-scale values on the edge, kit_figure
   kitvm_mse_<p>_*      log-MSE per stratum against the stratum's median singular variable, one panel per family
   kitvm_median_<p>_*   median predicted log10|M|^2 per bin and the truth's
   kitvm_bulk           bulk_test log-MSE per process
+  kitvm_paper_median, kitvm_paper_bulk   the draft's figures (Sec. 7, Joaquin 2026-11-21: the rules of the draft's
+                     other figures, every arm with and without the factor in one figure): the medians of u u~ g
+                     (collinear, soft) and t t~ one loop (high energy, threshold) in one 2x2, and the bulk MSE, in the
+                     draft's natural log (log10 values times ln 10), off-scale values on the edge without printed value
   kitvm_dist_<p>_*     one stratum per family (the deepest) and the bulk: truth and predicted log10|M|^2 histograms
                        over the union of the truth's and the predictions' ranges, predicted over true directly below
                        (ps.true_pred_hist, shared x); every model drawn, those near the truth (90% of their events
@@ -227,10 +231,11 @@ def plot(figs):
     M = json.load(open(os.path.join(DATA, "kit_fig_mlp_reruns.json")))
     B = json.load(open(os.path.join(DATA, "kit_bakar_figs.json")))
     C = ps.C
-    sty = {"factor": (C.blue, "o", "-"), "scratch": (C.vermillion, "s", "-"), r"MLP log+$\beta$": ("k", "^", "--"),
+    sty = {"factor": (C.blue, "o", "-"), "scratch": (C.vermillion, "s", "-"), r"MLP log+$\beta$": (C.purple, "^", "--"),   # not black: the truth's
            "MLP log": (C.green, "^", "--"), "MLP raw": (C.grey, "x", ":")}
     written = []
     bulk = {}
+    paper_med = {}
     for p, (stem, target) in PROCS.items():
         fac, scr = A["runs"][FACTOR.format(p=p)], A["runs"][SCRATCH[p]]
         tr = A["truth"][f"{stem}/{target}"]
@@ -265,6 +270,7 @@ def plot(figs):
             med[sym] = {f: [[row[0], row[1], float(np.median([s[f][i][2] for s in seeds])), row[3]]
                             for i, row in enumerate(seeds[0][f])] for f in mf}
             assert all([q[0] for q in s[f]] == [q[0] for q in seeds[0][f]] for s in seeds for f in mf)
+        paper_med[p] = (tr["median"], med)
         # the y range is the truth's, widened by its own span (at least a decade) each side; beyond it, off the scale;
         # drawn with every model and, for the deck's opening (Joaquin 2026-11-17), without the factor
         for fname, drop in ((f"kitvm_median_{p}", ()), (f"kitvm_median_nofactor_{p}", ("factor",))):
@@ -341,8 +347,63 @@ def plot(figs):
             draw(ax, e["proc"], e, [k for k in order if k in e["pred"]], PROCESS[e["proc"]])
         _legend(axs, spare)
         written.append(ps.save(fig, os.path.join(figs, "kitvm_dist_bulk")))
+    written += paper_figs(figs, paper_med, bulk, sty)
     for w in written:
         print("FIGURE", w)
+
+
+PAPER_OFF = "off the scale, on the axis edge"
+
+
+def paper_figs(figs, paper_med, bulk, sty):
+    """the draft's two KIT figures from the same data as the deck's: the medians of every arm (factor, no factor, the
+    MLPs) for u u~ g and t t~ one loop on one 2x2 canvas, and the bulk MSE; natural log as in the rest of the draft"""
+    import plot_style as ps
+    from matplotlib.ticker import NullFormatter
+    LN = np.log(10)
+    out = []
+    panels = [("ee_uug_me2", "coll_y"), ("ee_uug_me2", "soft_x"), ("ee_tt_virt_finite", "sudakov_sqrts"),
+              ("ee_tt_virt_finite", "threshold_beta")]
+    fig, axs = ps.figure(ncols=2, nrows=2)
+    axs = list(np.ravel(axs))
+    for ax, (p, fam) in zip(axs, panels):
+        tr, med = paper_med[p]
+        tx, ty = zip(*tr[fam])
+        ty = LN * np.asarray(ty)
+        pad = max(LN, ty.max() - ty.min())   # the truth's range widened by its own span (at least a decade) each side
+        ax.plot(tx, ty, "-", color="k", label="truth")
+        for sym, m in med.items():
+            c, mk, ls = sty[sym]
+            y = LN * np.array([q[2] for q in m[fam]])
+            if clip_plot(ax, [q[0] for q in m[fam]], y, ty.min() - pad, ty.max() + pad, None, marker=mk, ls=ls,
+                         color=c, label=NAME[sym]):
+                off_entry(ax, PAPER_OFF)
+                print(f"PAPER OFF {p} {fam} {NAME[sym]!r}: max median log|M|^2 {y.max():.4g}")
+        ax.set_xscale("log"); ax.xaxis.set_minor_formatter(NullFormatter())
+        ax.set_xlabel(XLAB[fam]); ax.set_ylabel(r"median $\log|\mathcal{M}|^2$")
+        ps.process_label(ax, PROCESS[p], loc="upper right")
+    # one legend per process row: the t t~ row has its own MLP
+    for i, at in ((1, "lower left"), (3, "lower left")):
+        hl = {}
+        for a in axs[i - 1:i + 1]:
+            for h, l in zip(*a.get_legend_handles_labels()):
+                hl.setdefault(l, h)
+        if PAPER_OFF in hl:
+            hl[PAPER_OFF] = hl.pop(PAPER_OFF)
+        ps.legend(axs[i], at, handles=list(hl.values()), labels=list(hl), fontsize=LEG_PT)
+        ps.make_room(axs[i])
+    out.append(ps.save(fig, os.path.join(figs, "kitvm_paper_median")))
+    fig, ax = ps.figure()
+    for j, sym in enumerate(sty):
+        pts = [(i - 0.3 + 0.15 * j, LN ** 2 * bulk[p][sym]) for i, p in enumerate(PROCS) if sym in bulk[p]]
+        c, mk, _ = sty[sym]
+        ax.plot(*zip(*pts), mk, ls="", color=c, label=NAME[sym])
+        print(f"PAPER BULK {NAME[sym]!r}: " + " ".join(f"{v:.3g}" for _, v in pts))
+    ax.set_xticks(range(3), [r"$u\bar ug$", r"$u\bar ugg$", r"$t\bar t$, one loop"]); ax.set_xlim(-0.6, 2.6)
+    ax.set_yscale("log"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
+    ps.legend(ax, "upper left", fontsize=LEG_PT); ps.make_room(ax)
+    out.append(ps.save(fig, os.path.join(figs, "kitvm_paper_bulk")))
+    return out
 
 
 def main():   # dup-ok: argparse collect/plot boilerplate, every kit tool has it

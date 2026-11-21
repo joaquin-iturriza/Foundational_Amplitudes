@@ -38,8 +38,9 @@ OFF = "off the scale, value printed"
 
 
 def clip_plot(ax, x, y, lo, hi, fmt, **kw):
-    """ax.plot(x, y, **kw) with y clipped to [lo, hi]; clipped points hollow, the most extreme one labelled fmt(value).
-    True when a point was clipped."""
+    """ax.plot(x, y, **kw) with y clipped to [lo, hi]; clipped points hollow, the most extreme one labelled fmt(value)
+    (fmt None: no label, the paper's figures carry no in-panel text and the caption gives the value). True when a point
+    was clipped."""
     x, y = np.asarray(x, float), np.asarray(y, float)
     yc = np.clip(y, lo, hi)
     line, = ax.plot(x, yc, **kw)
@@ -49,6 +50,8 @@ def clip_plot(ax, x, y, lo, hi, fmt, **kw):
     for side, mk in ((y > hi, "^"), (y < lo, "v")):   # the arrow's way: where the value lies
         if side.any():
             ax.plot(x[side], yc[side], ls="", marker=mk, color=line.get_color(), mfc="white", zorder=line.get_zorder() + 1)
+    if fmt is None:
+        return True
     i = out[np.argmax(np.abs(np.log10(y[out] / yc[out]) if ax.get_yscale() == "log" else y[out] - yc[out]))]
     top = y[i] > hi
     ax.annotate(fmt(y[i]), (x[i], yc[i]), textcoords="offset points", xytext=(-4, -12 if top else 4), ha="right",
@@ -56,9 +59,9 @@ def clip_plot(ax, x, y, lo, hi, fmt, **kw):
     return True
 
 
-def off_entry(ax):
+def off_entry(ax, label=OFF):
     """the legend entry of clip_plot's hollow markers (an empty line: no data)"""
-    ax.plot([], [], ls="", marker="^", color="0.4", mfc="white", label=OFF)
+    ax.plot([], [], ls="", marker="^", color="0.4", mfc="white", label=label)
 
 
 def sci(v):
