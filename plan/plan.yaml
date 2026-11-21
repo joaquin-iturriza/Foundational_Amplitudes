@@ -38341,8 +38341,7 @@ entries:
       - 'within the spread: read 2a/2b against arm (1) as designed'
       - 'outside it: ask Joaquin for the matched control (fresh restart from the _snap final, both batches, ~11.3 GPU-h)'
   step_waits:
-    '1': FA-lxplus-506eaef9 FA-ccin2p3-3d10df9d FA-ccin2p3-df24160a FA-ccin2p3-fc7a50c6 FA-ccin2p3-43973899 FA-ccin2p3-f7790500
-      local:ftmech_zng4g_ft_b128 local:ftmech_zng4g_ft_b2048 local:ftmech_zng4g_sigreset_b128 local:ftmech_zng4g_sigreset_b2048
+    '1': local:ftmech_zng4g_ft_b128 FA-ccin2p3-676bd3d0
     '3': step 1's arm (1) result (not yet submitted)
     '2': FA-lxplus-e8d15505
     '4': step 2's parent rerun
