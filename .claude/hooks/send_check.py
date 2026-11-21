@@ -275,7 +275,9 @@ def legend_findings(tool_input, cwd, drafts=None):
         lg = read_legend(p)
         if lg is None:
             bad.append("%s: no %s: not drawn through ps.save by a committed tool (an ad hoc montage or a hand-saved "
-                       "image); draw it with a committed script" % (p, os.path.basename(legend_file(p))))
+                       "image); draw it with a committed script. If this is compiled pages of the paper draft (a document, "
+                       "not a figure), name it draft_<something>.pdf and send it again; draft_*.pdf is never linted "
+                       "as a figure." % (p, os.path.basename(legend_file(p))))
             continue
         script, blob, warns, labels = lg
         if not committed(script, blob):

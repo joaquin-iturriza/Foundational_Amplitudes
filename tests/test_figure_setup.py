@@ -186,3 +186,8 @@ def test_outside_legend_refused(tmp_path):
         draw(fig, ax)
         ps.save(fig, str(tmp_path / f"o{i}"))
         assert any("outside legend" in w for w in sc.read_legend(str(tmp_path / f"o{i}.png"))[2]), i
+
+
+def test_legendless_pdf_refusal_names_draft_route(tmp_path):
+    bad, _ = sc.legend_findings({"files": [str(tmp_path / "kit_section_pages.pdf")], "caption": ""}, "/", drafts=str(tmp_path))
+    assert bad and "draft_" in bad[0]
