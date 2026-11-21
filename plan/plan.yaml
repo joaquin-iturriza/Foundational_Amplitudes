@@ -37728,8 +37728,8 @@ entries:
     state: stopped
     since: '2026-11-20T15:57:56+00:00'
     state_at: '2026-11-20T16:48:50.917000+00:00'
-    context: 195584
-    context_at: '2026-11-20T16:35:16+00:00'
+    context: 206649
+    context_at: '2026-11-21T00:41:29+00:00'
   findings:
   - at: '2026-11-20T03:05:23+00:00'
     text: '2026-11-20 step 1 read (restart_steps.py, plot_restart.py @a5f6c7b3; figs restart_steps, restart_steps_zng, restart_headstart):
