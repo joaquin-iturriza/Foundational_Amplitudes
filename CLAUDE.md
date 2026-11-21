@@ -87,6 +87,7 @@ on the sites (`~/work/CLAUDE.md`).
 
 - Paper text follows the paper-writing-style skill; in it a result is shown in a plot or not at all.
 - A draft section reaches me only after a fresh reviewer agent, given these rules, the paper-writing-style skill, the papers and my earlier comments on the draft, passed it; a section I called done or left as it was is never changed or reviewed again unless I ask; only the sections I named for that draft are written or changed, and everything else in it (title, abstract, introduction, outlook, other sections, appendices) stays as I wrote it, and my words keeping a result of a section out of it keep the whole section waiting unless I name what stays.
+- A draft section is written for the paper, never transcribed from a talk: its figures follow the figure rules (fa-figures), one per result with all its arms, never a talk's build-up; alternatives tried and dropped stay in `docs/results.tex`; nothing received by email is cited.
 - Results go in `docs/results.tex`: a finished finding in its results section with its hand-off item deleted; the hand-off holds only open work.
 - Every number reported comes from a committed tool at a named commit, never a throwaway one-liner, and says what it counts and how it was selected; a number in `docs/results.tex` carries `% src:` and `% claim:` lines that reproduce.
 - A proxy is checked on a few cases before it is reported; an estimate says it is one, with its assumption.
