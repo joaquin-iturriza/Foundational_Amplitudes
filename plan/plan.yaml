@@ -33658,6 +33658,10 @@ entries:
       the site holding the bigrun runs, analysis/bigrun/arms_best.py) and plot GM over processes of MSE(log|M|^2) (= GM loss
       x GM std^2 if every arm shares the standardization; check it does); x label MSE(log|M|^2); caption without the standardization
       sentence. Labels stay the fifth version (reviewed).'
+    5: 'Write the KIT hard phase-space (extrapolation) section of the draft [D517], replacing the divergence section (D363):
+      protocol, data and hard bins, factor model, inputs, fine-tune vs scratch, why the MLP extrapolates by chance (D435);
+      a few illustrative figures; tt threshold scan out (D448); only this section changes; fresh reviewer passes it before
+      Joaquin'
   done_when: null
   notes_ref: null
   match: none
@@ -34488,6 +34492,12 @@ entries:
       if:
       - 'every arm shares one standardization: replot, rebuild, send'
       - 'arms differ in standardization: recompute per-process MSE from each run''s metrics and say so'
+    5:
+      feeds: the draft's KIT benchmark section (D363, D517)
+      if:
+      - 'reviewer PASS: hand back compiled pages, figures used and why, verdict'
+      - 'reviewer FIX: revise once and re-check with the same reviewer; a claim the data cannot back is cut from the section
+        and listed'
 - id: zng_uq_benchmark
   title: Our model on the Z + n gluon UQ datasets (Zenodo 16793011)
   question: 'How does our latest setup (emission-scale target, HETEROSC, mu-P LLoCa), from scratch and fine-tuned from a pretraining,
