@@ -33823,6 +33823,8 @@ entries:
     context_at: '2026-11-20T01:57:48+00:00'
   step_waits:
     '3': '2026-12-15: deferred, marked for later on 2026-11-17; no run'
+    '4': '2026-11-22: Jean Zay still unreachable 2026-11-21 (ssh to lpnclaude03 refused, retried once); the bigrun arms''
+      data_stats.json are on Jean Zay only (none on CC-IN2P3 compare_models/ or runs/, none in the local mirror)'
   findings:
   - at: '2026-11-13T02:46:58+00:00'
     text: '2026-11-13 ~03:50 Joaquin: ''we should start actually doing the work on the draft with what we have ... Let''s
