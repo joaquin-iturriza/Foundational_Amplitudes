@@ -38255,6 +38255,7 @@ entries:
     '3': step 1's arm (1) result (not yet submitted)
     '2': 'main session: site sync of 550e359a (blocked by another agent''s uncommitted docs/results.tex), then resubmit the
       parent rerun tag=zng_uq_w_lr1p89e-3_snap'
+    '4': step 2's parent rerun
   handoff:
     state: '2026-11-20 15:30. Restart test done and written: par:ftm_restart_test @bc3b3bda (figs analysis/finetune_mechanism/figs/restart_headstart_s7,
       restart_steps_s7; readout restart_test_readout.py --cached @291c08a1, plot_restart.py --s7). Branch (c): optimizer state
