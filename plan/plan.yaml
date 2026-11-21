@@ -38440,6 +38440,20 @@ entries:
       interior to the new window -> the window is ruled out: the parent''s weights or the run''s length cost the end point,
       stage 2 designed on this. HIGHER with the best again at the new edge -> unresolved, reported to Joaquin. b2048 read
       the same way, compute-limited.'
+    passed_at: '2026-11-21T17:39:40+00:00'
+    reviewer: 'Re-check after FIX: all three points addressed. (1) Trial count 24 ft vs scratch 16 is recorded as a question
+      to Joaquin (asked 2026-11-21T16:56, plan ask blocks the submission), both branches costed (14.1 / ~25.4 GPU-h, inside
+      D516); submission waits on his answer. (2) Outcome now counts SAME/LOWER as the window only if the new chosen trial''s
+      lr is outside the old window (b128 >1.1e-2, b2048 <3.1e-3), otherwise search budget, not read against S. (3) Check rewritten
+      as the data: driver_state b128 6 best 0.0206-0.0252 at lr 8.82e-3..1.10e-2, idx 8 0.0379 at 8.9e-3 named; b2048 7 best
+      0.0771-0.0801 at 3.12e-3..3.82e-3, 4.9e-3 gives 0.0807, b2048 called a confirmation. Confirmed numbers in sweeps_local/ftmech_zng4g_ft_b*/driver_state.json.
+      Check 2: results.tex l.14096-14110, the far probe''s fine-tune loss (5-8x) became gains once its lr_scale window was
+      lifted above the cap, so this measure moved with an lr-edge extension before. Check 3: F seeds b128 0.0258-0.0346, S
+      0.0180-0.0214 against F/S 1.54 [1.21,1.92]; seeds 43/44 added for a new chosen trial. Ft and scratch configs share the
+      lr window (b2048 3.1e-3..4.1e-2, b128 2.7e-4..1.1e-2) and differ only in the start; extension keeps the coupled space,
+      waves 3,3,2, same batch/optimizer, HETEROSC, own target stats; disk ~1 GB; rates from the same sweeps. Searched results.tex
+      for ftmech, zng4g, window''s top, window edge, extend_sweep; decisions for extend, window, edge, trials (D97, D244,
+      D245, D429, D430, D514): no prior Z+4g fine-tune search beyond these windows.'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
