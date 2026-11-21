@@ -34227,6 +34227,18 @@ entries:
       trial hp0226 not checked); (ii) Fig. 9 colour bar for f; (iii) Fig. 11 y_min definition and bin order; (iv) the ''ladder
       step 1 at the hyperparameters...'' label gone from the star-arm figures. None checked on the rendered figures, none
       changed.'
+  - at: '2026-11-21T04:49:30+00:00'
+    text: '2026-11-21 step 5 (KIT section, D517): draft cd086c1 then ac96ae5 (Sec. 7 ''Extrapolation into singular limits'',
+      4 floats: medians without factor uug+tt, medians with factor, deepest-bin attempts, bulk; figures from tools/kit_vs_mlp.py
+      @d4984d67, reproduced bit-identical today, and tools/kit_figures.py @7f0b6b29). Defect fixed: the attempts figure''s
+      legend ''tops held out of pretraining'' was wrong (recipes/gen_datasaving_parent.py: the held-out parent keeps every
+      tree class with a physical top except the e+e- > t t~ family); now ''fine-tuned, e+e- > t t~ not in pretraining'' /
+      ''fine-tuned, threshold tops added to pretraining'' (FA 7f0b6b29). Not used in text: tools/kit_bulk_slope.py rerun on
+      CC today (uug soft -1.991, coll -1.098, uugg soft -1.860, coll -0.844, tt beta -0.586): the tt bulk medians (+0.06 at
+      beta~0.24) sit ~1.5 decades above the hard-bin truth near the bulk edge (~-1.5 at beta 0.14), unexplained, so the deck''s
+      ''bulk-edge slope -0.59, MLP continues it'' premise (talks/kit_nov2026 slide 3) is not a clean read; the section''s
+      by-chance argument rests on the plotted medians only. Reviewer (fresh Plan agent) FIX round 1: 15 items, all applied
+      except the bulk-side figure (reason above) and the benchmark citation (slot, Joaquin''s).'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
