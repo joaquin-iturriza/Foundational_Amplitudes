@@ -37843,8 +37843,30 @@ entries:
       counts; 2026-10-06T00:17 approves the transfer study''s plan-to-finish items (sec:ladder-open), not this entry''s searches.
       None settles it. The design reviewer returned FIX on it (2026-11-21).'
     blocks: 'step 3 stage 1 (extend the two ft searches): the design re-review and the submission'
-    blocks_steps: &id003
+    blocks_steps:
     - 3
+  - ask: 'Scope: adding a matched-control arm to the snapshot test. The snapshot arms (restart from the pretrained W parent
+      before its cooldown, with a fresh optimizer or with its optimizer state) need the parent retrained, since the original
+      kept no pre-cooldown snapshot. The retrain in full 32-bit precision, the same command, seed and GPU type, reproduces
+      the original on 23 of its 28 processes within the 0.43-2.5x spread we measured before between reruns of a catalog run.
+      Five fall outside: e+e- -> b b~ is 1159x worse, u u~ -> ZZ at NLO 23x, e+e- -> mu mu EW NLO 3x, while e+e- -> gamma
+      gamma and u u~ -> d d~ are 6x and 14x better; geometric mean 1.39 (figure parent_rerun_check_snapfp32; the earlier rerun
+      with reduced-precision matmuls gave 5.0). So the snapshot arms branch from a parent that is not the one arm (1)''s fine-tune
+      started from. The four snapshot searches are running (they are needed in every case). Do you want the matched control,
+      the template fine-tune restarted from the retrained parent''s final model at both batches (8-trial searches, about 11.3
+      GPU-h), so the snapshot arms are read against a fine-tune from the same parent run? Or should they be read against arm
+      (1) as designed, with this parent difference stated? Without the control, a snapshot effect smaller than the parent''s
+      run-to-run spread cannot be told apart from it.'
+    at: '2026-11-21T18:52:50+00:00'
+    searched: 'CLAUDE.md (a new arm is the user''s call, ''a comparison is made only against the reference I gave''); site
+      decisions --project FA: D516 (''Yes, do the rerun then'') approved the parent rerun and snapshot arms, not a second
+      control; the plan''s pre-registered step-4 branch ''if outside it: ask Joaquin for the matched control''. Joaquin''s
+      messages flagged by the tool: 2026-11-14T04:31 is a pasted SciPost LaTeX paper draft; 2026-11-17T01:19 is about making
+      figures self-contained after referee comments; 2026-10-14T16:48 is a forwarded benchmark discussion with a paper zip;
+      none is about this parent or a control. None settles it.'
+    blocks: reading the snapshot arms (2a, 2b) against a control; the matched-control searches if chosen
+    blocks_steps: &id003
+    - 4
   owner:
     agent: a56696c4cc0b20792
     state: working
@@ -38597,21 +38619,24 @@ entries:
       @6215a796, plot_parent_rerun.py @12c25225, zng4g_seed_chunks.py @d69b9372; seed_chunks/zng4g_*; sweep/sweep_config_ftmech_zng4g_*.yaml;
       figs zng4g_ft_vs_scratch, zng4g_step0, zng4g_sigreset, parent_rerun_check
     written: '2026-11-21T14:52:30+00:00'
-  ask: 'Scope: 24 fine-tune trials against scratch''s 16. On q q~ -> Z+4g at 1e4 events, the fine-tune from the pretrained
-    W parent ends above from-scratch training at both batch sizes, by 1.54x at batch 128 and 1.56x at batch 2048 (figure zng4g_ft_vs_scratch).
-    The fine-tune''s 16-trial lr search has its best trials at the edge of its lr window: at the top (1.1e-2) at batch 128
-    and at the bottom (3.1e-3) at batch 2048. Scratch''s best sits inside its window. To check whether the window, rather
-    than the pretrained weights, causes the gap, I would extend both fine-tune searches in place past that edge (to 3.3e-2
-    and 1.0e-3) and run 8 more trials each, about 11.3 GPU-h. Is the unequal count acceptable, as in the transfer study whose
-    cells held 8-24 trials after extension? Or should the two scratch searches also continue 8 trials each (about 11.3 GPU-h
-    more, ~25 in total) so both arms have 24? With 24 against 16, a gain from a trial inside the old window would be read
-    as search budget, not as an effect of pretraining.'
-  waiting_since: '2026-11-21T16:56:33+00:00'
-  searched: 'CLAUDE.md: ''more or fewer trials or seeds than the sibling cells ... is my call, asked before the configs are
-    made''; site decisions --project FA: D97 extended the hp58 fine-tune searches in place but names only those cells; D515/D516
-    cover this entry''s step 3 at budget but not the trial count. Joaquin''s messages flagged by the tool: 2026-11-14T04:31
-    is a pasted SciPost LaTeX paper draft, 2026-11-10T02:08 is a file upload of slides and a paper zip, neither about trial
-    counts; 2026-10-06T00:17 approves the transfer study''s plan-to-finish items (sec:ladder-open), not this entry''s searches.
-    None settles it. The design reviewer returned FIX on it (2026-11-21).'
-  blocks: 'step 3 stage 1 (extend the two ft searches): the design re-review and the submission'
+  ask: 'Scope: adding a matched-control arm to the snapshot test. The snapshot arms (restart from the pretrained W parent
+    before its cooldown, with a fresh optimizer or with its optimizer state) need the parent retrained, since the original
+    kept no pre-cooldown snapshot. The retrain in full 32-bit precision, the same command, seed and GPU type, reproduces the
+    original on 23 of its 28 processes within the 0.43-2.5x spread we measured before between reruns of a catalog run. Five
+    fall outside: e+e- -> b b~ is 1159x worse, u u~ -> ZZ at NLO 23x, e+e- -> mu mu EW NLO 3x, while e+e- -> gamma gamma and
+    u u~ -> d d~ are 6x and 14x better; geometric mean 1.39 (figure parent_rerun_check_snapfp32; the earlier rerun with reduced-precision
+    matmuls gave 5.0). So the snapshot arms branch from a parent that is not the one arm (1)''s fine-tune started from. The
+    four snapshot searches are running (they are needed in every case). Do you want the matched control, the template fine-tune
+    restarted from the retrained parent''s final model at both batches (8-trial searches, about 11.3 GPU-h), so the snapshot
+    arms are read against a fine-tune from the same parent run? Or should they be read against arm (1) as designed, with this
+    parent difference stated? Without the control, a snapshot effect smaller than the parent''s run-to-run spread cannot be
+    told apart from it.'
+  waiting_since: '2026-11-21T18:52:50+00:00'
+  searched: 'CLAUDE.md (a new arm is the user''s call, ''a comparison is made only against the reference I gave''); site decisions
+    --project FA: D516 (''Yes, do the rerun then'') approved the parent rerun and snapshot arms, not a second control; the
+    plan''s pre-registered step-4 branch ''if outside it: ask Joaquin for the matched control''. Joaquin''s messages flagged
+    by the tool: 2026-11-14T04:31 is a pasted SciPost LaTeX paper draft; 2026-11-17T01:19 is about making figures self-contained
+    after referee comments; 2026-10-14T16:48 is a forwarded benchmark discussion with a paper zip; none is about this parent
+    or a control. None settles it.'
+  blocks: reading the snapshot arms (2a, 2b) against a control; the matched-control searches if chosen
   blocks_steps: *id003
