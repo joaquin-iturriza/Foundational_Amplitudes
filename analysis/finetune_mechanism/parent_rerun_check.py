@@ -6,7 +6,8 @@ main stage and of the sigma stage (best_checkpoint), and the MSE of the standard
 sigma stage's saved val predictions (preds_val.npz, the final model). Read on each parent's own site (site_python).
 Writes analysis/finetune_mechanism/data/parent_rerun_check.json.
 
-    python3 analysis/finetune_mechanism/parent_rerun_check.py
+    python3 analysis/finetune_mechanism/parent_rerun_check.py [snap|snapfp32]   (the rerun read against cc; default snap,
+    the TF32 rerun; snapfp32 = the strict-fp32 rerun, written to parent_rerun_check_snapfp32.json)
 """
 import json
 import os
@@ -16,7 +17,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from analysis.common.readers import site_python  # noqa: E402
 
 PARENTS = {"cc": ("ccin2p3", "runs/data_saving/dsave_parent_finale_zng_uq_w_lr1p89e-3_cc", "FA-ccin2p3-47e14eae"),
-           "snap": ("lxplus", "runs/data_saving/dsave_parent_finale_zng_uq_w_lr1p89e-3_snap", "FA-lxplus-e8d15505")}
+           "snap": ("lxplus", "runs/data_saving/dsave_parent_finale_zng_uq_w_lr1p89e-3_snap", "FA-lxplus-e8d15505"),
+           "snapfp32": ("ccin2p3", "runs/data_saving/dsave_parent_finale_zng_uq_w_lr1p89e-3_snapfp32", "FA-ccin2p3-74805752")}
 
 REMOTE = r'''
 import json, os, sys
@@ -39,10 +41,12 @@ print("PRC " + json.dumps(out))
 
 def main():
     res = {}
-    for k, (site, d, run) in PARENTS.items():
+    key = sys.argv[1] if len(sys.argv) > 1 else "snap"
+    for k in ("cc", key):
+        site, d, run = PARENTS[k]
         res[k] = site_python(REMOTE, [d], "PRC", site=site)
         res[k].update(site=site, run_dir=d, run=run)
-    a, b = res["cc"], res["snap"]
+    a, b = res["cc"], res[key]
     procs = sorted(a["mse"], key=lambda n: a["mse"][n])
     assert set(procs) == set(b["mse"]), "the two parents hold different processes"
     assert a["n_val"] == b["n_val"], "the two parents' val pools differ in size"
@@ -53,16 +57,16 @@ def main():
     res["summary"] = {"procs": procs, "mse_ratio_snap_over_cc": ratio, "sigma_nll_snap_minus_cc": dnll,
                       "ratio_min": float(r.min()), "ratio_max": float(r.max()),
                       "ratio_gmean": float(np.exp(np.log(r).mean())),
-                      "combined_nll": {"cc": a["sigma"]["combined"], "snap": b["sigma"]["combined"]}}
-    out = os.path.join(os.path.dirname(__file__), "data", "parent_rerun_check.json")
+                      "combined_nll": {"cc": a["sigma"]["combined"], key: b["sigma"]["combined"]}, "rerun": key}
+    out = os.path.join(os.path.dirname(__file__), "data", "parent_rerun_check%s.json" % ("" if key == "snap" else "_" + key))
     with open(out, "w") as f:
         json.dump(res, f, indent=1)
     s = res["summary"]
-    print(f"combined sigma-stage NLL: cc {s['combined_nll']['cc']:.4f} snap {s['combined_nll']['snap']:.4f}")
-    print(f"MSE ratio snap/cc over {len(procs)} processes: gmean {s['ratio_gmean']:.3f}, "
+    print(f"combined sigma-stage NLL: cc {s['combined_nll']['cc']:.4f} {key} {s['combined_nll'][key]:.4f}")
+    print(f"MSE ratio {key}/cc over {len(procs)} processes: gmean {s['ratio_gmean']:.3f}, "
           f"range [{s['ratio_min']:.3f}, {s['ratio_max']:.3f}]")
     for n in procs:
-        print(f"  {n:18s} cc {a['mse'][n]:.3e} snap {b['mse'][n]:.3e} ratio {ratio[n]:.3f} dNLL {dnll[n]:+.3f}")
+        print(f"  {n:18s} cc {a['mse'][n]:.3e} {key} {b['mse'][n]:.3e} ratio {ratio[n]:.3f} dNLL {dnll[n]:+.3f}")
     print("wrote", out)
 
 

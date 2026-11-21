@@ -2,7 +2,7 @@
 the standardised log|M|^2 for the original (CC, V100) and its rerun (lxplus, H100, TF32 on), ordered by the original's,
 and their ratio rerun / original beside it.
 
-    python3 analysis/finetune_mechanism/plot_parent_rerun.py
+    python3 analysis/finetune_mechanism/plot_parent_rerun.py [snap|snapfp32]   (snapfp32: the strict-fp32 rerun, TF32 off)
 """
 import json
 import os
@@ -14,15 +14,20 @@ import numpy as np  # noqa: E402
 import plot_style as ps  # noqa: E402
 
 
+RERUN_LABEL = {"snap": "rerun, H100,\nreduced-precision matmuls", "snapfp32": "rerun, V100, full fp32"}
+
+
 def main():
-    r = json.load(open(os.path.join(HERE, "data", "parent_rerun_check.json")))
+    key = sys.argv[1] if len(sys.argv) > 1 else "snap"
+    sfx = "" if key == "snap" else "_" + key
+    r = json.load(open(os.path.join(HERE, "data", "parent_rerun_check%s.json" % sfx)))
     procs = r["summary"]["procs"]          # ordered by the original's MSE
     a = np.array([r["cc"]["mse"][n] for n in procs])
-    b = np.array([r["snap"]["mse"][n] for n in procs])
+    b = np.array([r[key]["mse"][n] for n in procs])
     x = np.arange(1, len(procs) + 1)
     fig, (l, rt) = ps.figure(ncols=2)
     l.plot(x, a, "o", color=ps.C.blue, label="original, V100")
-    l.plot(x, b, "s", color=ps.C.vermillion, label="rerun, H100,\nreduced-precision matmuls")
+    l.plot(x, b, "s", color=ps.C.vermillion, label=RERUN_LABEL[key])
     l.set_yscale("log")
     l.set_xlabel("process, by the original's MSE")
     l.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)/\sigma^2$")
@@ -33,7 +38,7 @@ def main():
     rt.set_xlabel("process, by the original's MSE")
     rt.set_ylabel("MSE ratio, rerun / original")
     ps.legend(rt, "upper left")
-    ps.save(fig, os.path.join(HERE, "figs", "parent_rerun_check"))
+    ps.save(fig, os.path.join(HERE, "figs", "parent_rerun_check" + sfx))
 
 
 if __name__ == "__main__":
