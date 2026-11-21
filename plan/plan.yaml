@@ -37813,6 +37813,14 @@ entries:
       the TF32 training A/B covered only 1e-5-level errors). Repair inside D516: parent rerun with ++training.allow_tf32=false
       (FA-ccin2p3-74805752, tag _snapfp32), which also tests the cause; the snapshot arms start from its step-56000 model
       once it reproduces _cc.'
+  - at: '2026-11-21T11:08:59+00:00'
+    text: '2026-11-21 (2c) read (zng4g_sigreset_read.py @44d5c2ce; fig zng4g_sigreset): Sg/F8 = 1.004 at b2048 (best 0.0971
+      vs 0.0967) and 0.769 at b128 (0.0289 vs 0.0375), both within the 1.41 bar: the sigma-head reset does not change the
+      fine-tune''s end point. Every fine-tune and reset trial sits above all three scratch seeds (b2048 scratch 0.058-0.067
+      vs ft 0.097-0.20; b128 scratch 0.018-0.021 vs ft first-8 0.038-0.066, ft 11-trial best 0.031). Step-0 NLL/grad norm
+      for Sg, F, S still to read with the step-1 readout. FA-lxplus-506eaef9 (scrflags b128 s42) landed on a Tesla T4 and
+      was removed by HTCondor''s wall limit after ~6 h (float64); resubmitted on CC FA-ccin2p3-676bd3d0 with --gpu-min-mem=24G;
+      seed-batch submissions to lxplus carry --hdr=--gpu-min-mem=24G from now on (sweep configs already restrict to A100/H100).'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
