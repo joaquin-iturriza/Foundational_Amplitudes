@@ -37696,10 +37696,6 @@ entries:
   - D513
   - D516
   next:
-    1: D515 Z+4g arms (1) template fine-tune from the W parent at batch 2048 and 128 (16-trial searches + seeds 43/44 of each
-      chosen trial), (2c) sigma-head reset (8 trials per batch), input-flag scratch control (seeds 42-44 per batch), configs
-      sweep/sweep_config_ftmech_zng4g_*.yaml @71ff1ef9; design 2026-11-20T16:06; smoke first (D395), then the batch, ~41.7
-      GPU-h
     2: 'Arms (2a) pre-cooldown snapshot of the W parent with a fresh optimizer and (2b) the snapshot with its optimizer state
       and no warmup, 8-trial searches at both batches (sweep_config_ftmech_zng4g_snap*_b*.yaml, D516 go), from the step-56000
       model of the fp32 parent rerun dsave_parent_finale_zng_uq_w_lr1p89e-3_snapfp32 (FA-ccin2p3-74805752) once step 4 shows
@@ -38427,13 +38423,6 @@ entries:
     start: '2026-11-21T14:47:15+00:00'
     at: '2026-11-21T14:47:15+00:00'
   step_why:
-    1:
-      feeds: 'D513/D515: does the fine-tune end at scratch''s level (pretraining buys speed only) or above it on Z+4g at 1e4
-        events'
-      if:
-      - 'F/S HIGHER at both batches: design step (3), parent weights vs the fine-tune''s lr range/length'
-      - 'F/S SAME: pretraining buys speed only at 1e4; report with the head-start fractions'
-      - 'F/S LOWER: the pretraining keeps an edge at 1e4; report'
     2:
       feeds: 'D513/D515: does a restart that avoids the cooldown''s end or keeps the optimizer state keep the head start on
         Z+4g'
@@ -38454,7 +38443,6 @@ entries:
         default for float32 catalog parents goes to Joaquin as a question'
       - 'outside it: ask Joaquin for the matched control (fresh restart from the rerun''s final, both batches, ~11.3 GPU-h)'
   step_waits:
-    '1': FA-ccin2p3-3dc6dacc FA-ccin2p3-06fbca06
     '3': step 1's arm (1) result (not yet submitted)
     '2': FA-ccin2p3-74805752 FA-lxplus-1407949d
     '4': FA-ccin2p3-74805752
