@@ -33674,7 +33674,7 @@ entries:
     - FA-ccin2p3-264b3f81
     - FA-ccin2p3-4fa87893
     - FA-ccin2p3-9f53a445
-    commit: 7f0b6b29
+    commit: bb35ba1a
     paths:
     - .claude/skills/figure-style/SKILL.md
     - .claude/skills/paper-writing-style/SKILL.md
