@@ -53,6 +53,15 @@ def recover(name):
         again = mom[lo:hi].reshape(hi - lo, npart * 4)
         if stored.shape != again.shape or not np.allclose(stored, again, rtol=1e-9, atol=1e-9):
             bad.append(p)
+            if stored.shape == again.shape:     # how it differs: last digits, a reordering, or other events
+                st = np.asarray(stored)
+                rows = np.all(np.isclose(st, again, rtol=1e-9, atol=1e-9), axis=1)
+                rel = np.abs(st - again) / np.maximum(np.abs(st), 1e-12)
+                pos = {tuple(np.round(r, 6)) for r in mom.reshape(len(mom), npart * 4)}
+                found = np.mean([tuple(np.round(r, 6)) in pos for r in st[:200]])
+                print(f"[ALPHAS] {name} {os.path.basename(p)}: rows equal {rows.mean():.4f}, max rel diff {rel.max():.3g}, "
+                      f"median rel diff {np.median(rel):.3g}, first 200 stored rows found anywhere in the rerun {found:.2f}",
+                      flush=True)
             continue
         np.save(p[:-len(".npy")] + ".alphas.npy", np.asarray(aqcd[lo:hi], dtype=np.float64))
         out.append(p)
