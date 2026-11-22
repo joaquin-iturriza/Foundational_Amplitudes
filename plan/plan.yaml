@@ -39388,6 +39388,18 @@ entries:
       key dirs, 14.3 GB vs 36 GB free on CC /sps/lpnhe; the 1491 train .recipe.json + .identity.json, --overwrite). Question
       to Joaquin recorded 14:33 UTC combining the costed search (~40-90 GPU-h, estimate), the seed-43 pair and the still-open
       smoke question.'
+  - at: '2026-11-22T14:55:14+00:00'
+    text: '2026-11-22 ~15:55 (D528, Joaquin: ''just get it done''; no smoke): part (a) search launched on lxplus: sweep/drive.py
+      --config sweep/sweep_config_llmcmp_a_adamw_const.yaml @ f71cde629 (deployed 58a7f5bead) --sites lxplus --mem 32G --cpus
+      4 --hours 14.6 (job limit 22.0 h), detached llmcmp_a_drive2, waves 3+3+2, state sweeps_local/llmcmp_a_adamw_const; matched
+      control FA-lxplus-cb9273f1 (sweep/trial_job.sh --detached --hp-idx 9000 --t-steps 60840, lr 1e-3, warmup 0, L2 lambda
+      0, EMA off; 22 h). Deviation: job limit 22 h, not lxplus''s longest (1 week): the site gate counts each job''s limit
+      as its GPU-h (1 job x 168 h refused against the 90 GPU-h item estimate from D528), so 22 h (counted 24 h, 2.1x the 10.5
+      h V100 estimate) is the longest that fits 4 jobs in 90; the first trial''s logged s/step re-sets the target. gpu_min_mem
+      32G added to the config (design: whole GPUs >= 32 GB, no model pinned). Gaps fixed: site pick''s 120 s probe timed out
+      on lxplus (probe takes ~177 s): per-site probe_timeout (sites.toml lxplus 360 s; ~/.local/bin/site rank_sites, backup
+      site.bak.pre-probe-timeout). CC key check: heldout FA-ccin2p3-dd63b9fb opened b39fc80c8b10edbe4b07f6a0 through the stubs
+      (''is ready'', RUN_DONE), train FA-ccin2p3-8d817d54 running.'
   step_waits:
     '1': the pool gate (detach pool_gate2) and the two lxplus memmap prebuilds that follow it
     '2': 'step 1''s first finished GPU run (the smoke or the first trial): the scoring check runs on its checkpoint'
