@@ -39537,3 +39537,16 @@ entries:
       an eos quota read showing >= 48 GB + 10 GB margin free. Batch: 2982 pairs, every |z| < 5 and every pool complete ->
       memmap prebuilds and part (a)''s chain resubmitted. A process with |z| >= 5 is listed with z and shift and its pool
       unused until the cause is found and fixed; a short or failed process is rebuilt by resubmitting its shard (idempotent).'
+    passed_at: '2026-11-22T05:50:37+00:00'
+    reviewer: 'Generation of the 1491 catalog_daniel train pools on lxplus with MG5 3.7.0 (code 2964c0bc). Checked: the measure
+      responds, analysis/zng_uq/data/mixed_generation_z.json has |z| 8.28 for a ~1% label shift (uubar_ttbar_nlo) against
+      at most 2.7 on 99 clean processes, threshold 5; check_pp_pools --labels runs (tests/test_check_pp_pools.py and test_mixed_generation.py
+      pass in .venv-cpu) and requires 2 pairs per process (4 smoke, 2982 batch); control = the stored val/test pools, whose
+      sidecars carry pipeline_sha256 (read on lxplus); no seed axis; workers and cores set explicitly (DANIEL_WORKERS first,
+      --hdr cpus/mem/time); MadEvent and standalone dirs node-local (DANIEL_LOCAL_MG=1, MG5_WORK_DIR is used only for _events/_standalone
+      in mg5_pipeline_final, datagen and prebuild_recipes), sizes logged by the smoke and gated before the batch; EOS: ~30
+      GB of pools + ~18 GB memmap cache against ~77 GB free, eos quota >= 58 GB re-read before the batch (prebuild''s disk
+      floor reads EOS''s 2.2 PB filesystem and is blind to the quota, so this read is the only guard); wall targets 0.5 h
+      / 1.5 h from 185 core-h over 128 cores, rescaled from the smoke. Searched: docs/results.tex catalog_daniel, dc_ train,
+      regeneration; decisions D51, D54, D131, D134, D113/D114 (hold scoped to the preprocessing study), D209, D527; the entry''s
+      findings and hand-off.'
