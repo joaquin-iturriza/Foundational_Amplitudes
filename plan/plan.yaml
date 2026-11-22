@@ -37892,8 +37892,19 @@ entries:
       unnecessary; D519/D520 ('Don't do unnecessary testing') is the only basis and does not name these cuts. Joaquin's messages
       2026-11-14T04:31 (a pasted draft) and 2026-10-06T00:17 (the transfer study's plan to finish) do not address these runs
     blocks: whether the three cut runs are restored
-    blocks_steps: &id003
+    blocks_steps:
     - 3
+  - ask: 'Scope: fine-tuning loses on Z+4g because the W parent carries two input flags (momentum log-rescale, pair logs)
+      that make the model 2.3x worse from scratch on this process. Run (a) the one-flag-at-a-time test (about 2 GPU-h at fixed
+      HPs, up to about 15 GPU-h with searches), (b) a parent retrained without the flags, or (c) leave the parent as it is?
+      Also: restore the batch-128 scratch-with-flags search (about 14 GPU-h)?'
+    at: '2026-11-22T13:17:43+00:00'
+    searched: CLAUDE.md whole; site decisions --project FA whole (D519, D520 mandate the diagnosis, not a change of the parent's
+      inputs; a repair never changes the setup's inputs without Joaquin). Joaquin's messages 2026-11-14T04:31 (a pasted LaTeX
+      draft, no decision on the parent), 2026-10-14T16:48 (a pasted email on benchmarks, not this parent), 2026-11-18T23:35
+      (about the ladder + star arm parent and seeds, not the W parent's input flags)
+    blocks: any work on the parent; the batch-128 flags share
+    blocks_steps: &id003 []
   owner:
     agent: a134b21ae2a8a78ce
     state: working
@@ -39053,14 +39064,16 @@ entries:
       data/zng4g_readout.json; figs zng4g_snap_vs_ft, zng4g_snap_step0 (captions OK); sweep/sweep_config_ftmech_zng4g_scrflagsrch_b{128,2048}.yaml
       @ff8297fa, sweep_config_ftmech_zng4g_ft_b{128,2048}.yaml @ab57ac74; sweeps_local/ftmech_zng4g_{scrflagsrch,ft}_b*
     written: '2026-11-22T08:25:17+00:00'
-  ask: 'Scope: restore any of the three cuts of the passed R1/R3 design (R1 at batch 128 stopped at 3 of 16 trials, ~14 GPU-h;
-    seeds 43/44 of R3''s batch-2048 extended fine-tune, ~0.7 GPU-h; R4 one flag at a time), made under the main session''s
-    ''only what answers the question'' instruction without asking.'
-  waiting_since: '2026-11-22T11:00:44+00:00'
-  searched: CLAUDE.md (a cut of a passed design is Joaquin's call) and every decision grepped for scope, seeds, trials, unnecessary;
-    D519/D520 ('Don't do unnecessary testing') is the only basis and does not name these cuts. Joaquin's messages 2026-11-14T04:31
-    (a pasted draft) and 2026-10-06T00:17 (the transfer study's plan to finish) do not address these runs
-  blocks: whether the three cut runs are restored
+  ask: 'Scope: fine-tuning loses on Z+4g because the W parent carries two input flags (momentum log-rescale, pair logs) that
+    make the model 2.3x worse from scratch on this process. Run (a) the one-flag-at-a-time test (about 2 GPU-h at fixed HPs,
+    up to about 15 GPU-h with searches), (b) a parent retrained without the flags, or (c) leave the parent as it is? Also:
+    restore the batch-128 scratch-with-flags search (about 14 GPU-h)?'
+  waiting_since: '2026-11-22T13:17:43+00:00'
+  searched: CLAUDE.md whole; site decisions --project FA whole (D519, D520 mandate the diagnosis, not a change of the parent's
+    inputs; a repair never changes the setup's inputs without Joaquin). Joaquin's messages 2026-11-14T04:31 (a pasted LaTeX
+    draft, no decision on the parent), 2026-10-14T16:48 (a pasted email on benchmarks, not this parent), 2026-11-18T23:35
+    (about the ladder + star arm parent and seeds, not the W parent's input flags)
+  blocks: any work on the parent; the batch-128 flags share
   blocks_steps: *id003
 - id: llm_compare
   title: LLoCa against Suprio's LLM on the LLM amplitude catalogue
