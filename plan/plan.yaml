@@ -39047,7 +39047,7 @@ entries:
       the round_robin line of the earlier mapping finding. Cost of one run: measured from our own smoke run in this layout,
       not his 7.2 H100-h.'
   step_waits:
-    '1': 'the next owner: hand-off written 2026-11-22, previous owner closed at its context limit'
+    '1': FA-ccin2p3-57ba0c9d FA-ccin2p3-c3333b41
     '2': 'the next owner: hand-off written 2026-11-22, previous owner closed at its context limit'
   handoff:
     state: 'Data settled by D51/D527: our catalog_daniel pools (1352 train / 139 held-out recipes, 1e5/1e4/1e4 per process,
