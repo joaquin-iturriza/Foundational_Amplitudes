@@ -3,7 +3,7 @@ training processes of the validation MSE of log|M|^2 at the best checkpoint, sum
 evaluation's 'MSE (prepd) val_<p>' lines (each process's own standardized units) and data_stats.json's prepd_std.
 A shared z divides this by one constant, so it ranks the trials as a shared-target plain-mean MSE does.
 Reads on CC (analysis.common.site_python); prints one line per trial, ordered by lr.
-    python analysis/catalog_daniel/dancat_plain_mse.py
+    python analysis/catalog_daniel/dancat_plain_mse.py [sweeps_local/dancat_het_pre/summary.txt]
 """
 import json, os, re, sys
 
@@ -27,7 +27,7 @@ for d in sorted(glob.glob("runs/dancat_het_pre/trial_*")):
 print("MARK " + json.dumps(out))
 '''
 
-summary = os.path.join(ROOT, "sweeps_local", "dancat_het_pre", "summary.txt")
+summary = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, "sweeps_local", "dancat_het_pre", "summary.txt")
 lr = {int(l.split()[0][3:]): float(re.search(r"lr=(\S+)", l).group(1))
       for l in open(summary) if l.strip().startswith("hp_")}
 for k, v in sorted(site_python(REMOTE, [], "MARK").items(), key=lambda kv: lr[int(kv[0])]):
