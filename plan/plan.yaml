@@ -39019,10 +39019,10 @@ entries:
     answered_at: '2026-11-22T03:51:47.016000+00:00'
     decision: D527
   owner:
-    agent: a07b29701ce6d7a7c
-    state: closed
-    since: '2026-11-22T07:34:02+00:00'
-    state_at: '2026-11-22T07:34:55+00:00'
+    agent: aa5836ca091e40268
+    state: working
+    since: '2026-11-22T07:35:07+00:00'
+    state_at: '2026-11-22T07:35:07+00:00'
   step_why:
     1:
       feeds: the cost of one run and so whether the DyHPO search fits 30 GPU-h at full length
