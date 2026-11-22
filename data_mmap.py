@@ -190,6 +190,7 @@ class MmapSource:
         self.osh_mu, self.osh_sd = ((np.asarray(osh_stats[0], np.float64), np.asarray(osh_stats[1], np.float64))
                                     if osh_stats is not None else (None, None))
         self.osh_eps, self.F = osh_eps, int(F)
+        self.alp = None     # data.alphas_input: the per-event alpha_s map, set by init_data_recipes_mmap
 
     def osh_transformed(self, base_rows):
         """sign(o) log1p|o| of the raw off-shellness of `base_rows` (o / eps under dimensionless_inputs), float64"""
@@ -220,6 +221,10 @@ class MmapSource:
         if self.osh is not None:
             n_pdg = self.osh.shape[1]
             order[:, self.F - n_pdg:self.F] = ((self.osh_transformed(r) - self.osh_mu) / self.osh_sd).astype(np.float32)
+        if self.alp is not None:
+            a = np.asarray(self.alp[r], dtype=np.float64)
+            col = ((np.log(a) + self.alp_shift) / self.alp_scale).astype(np.float32)
+            order = np.concatenate([order, col[:, None]], axis=1)
         if self.dimless:
             lrs = np.log10(np.asarray(self.rs[r])).astype(np.float32)
             order = np.concatenate([order, lrs[:, None]], axis=1)
@@ -1119,6 +1124,20 @@ def _open_run(exp, c, d, meta, fdir, need, want_offshell):
         src.osh_mu, src.osh_sd = np.asarray(mu, np.float64), np.asarray(sdv, np.float64)
         LOGGER.info(f"offshell_per_event ON (memmap): internal-mass slot ({n_pdg} col) filled per batch with "
                     f"signed-log-standardized (s-M^2) for pdgs {exp._internal_mass_pdgs}")
+    if bool(cfg.data.get("alphas_input", False)):
+        # one more per-event input column, (ln alpha_s + shift) / scale, after the order row (the off-shellness slot keeps
+        # its place) and before dimensionless_inputs' sqrt(s_hat) column
+        assert meta["has_alphas"], "data.alphas_input: no pool of the run has a per-event alpha_s (<pool>.alphas.npy)"
+        src.alp = _open(d, "alphas")
+        src.alp_shift = float(cfg.data.get("alphas_input_shift", 1.994))
+        src.alp_scale = float(cfg.data.get("alphas_input_scale", 0.169))
+        # every event the run reads needs its own alpha_s (the input the LLM run saw), refused here, not at a later step
+        for sg in meta["segs"]:
+            k = need.get((sg["role"], sg["name"]), 0) if sg["name"] in pidx else 0
+            assert not np.isnan(src.alp[sg["ev0"]:sg["ev0"] + k]).any(), \
+                f"data.alphas_input: events without a per-event alpha_s in {sg['role']}/{sg['name']}"
+        F += 1
+        LOGGER.info(f"alphas_input ON (memmap): (ln alpha_s + {src.alp_shift}) / {src.alp_scale} as order column {F - 1}")
     exp._mmap_src = src
     exp.n_order_features = int(F)
     exp.N_events = int(len(ev_rows))

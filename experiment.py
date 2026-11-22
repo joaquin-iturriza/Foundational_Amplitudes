@@ -507,6 +507,8 @@ class AmplitudeExperiment(BaseExperiment):
         self._internal_mass_pdgs = [int(p) for p in (self.cfg.data.get("internal_mass_pdgs", []) or [])]
         self._resonance_per_event = bool(self.cfg.data.get("resonance_per_event", False))
         self._offshell_per_event = bool(self.cfg.data.get("offshell_per_event", False))
+        assert not (bool(self.cfg.data.get("alphas_input", False)) and not bool(self.cfg.data.get("memmap", False))), \
+            "data.alphas_input is built on the memmap path (data.memmap=true)"
         # D506: a new training run with off-shellness carries the W; a fine-tune or warm start keeps its parent's columns
         ft = self.cfg.get("fine_tune", None) or {}
         assert not (self._offshell_per_event and self._use_internal_mass_scalars and self.cfg.get("train", True)

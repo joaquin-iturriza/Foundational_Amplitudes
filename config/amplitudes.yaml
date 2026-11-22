@@ -25,6 +25,9 @@ data:
  preprocess_per_dataset: true
  shared_standardization: false  # one pooled (mu, sigma), per-process transforms kept: zero-shot scoring (results.tex)
  affine_multiplicity_std: false  # with shared_standardization: mu_N = a + b N over the particle count, one sigma (draft Sec. 5, multiplicity_extrap.py)
+ alphas_input: false   # each event's alpha_s (<pool>.alphas.npy) as one more input column, (ln alpha_s + shift) / scale; memmap path (plan llm_compare)
+ alphas_input_shift: 1.994
+ alphas_input_scale: 0.169
  particle_order: none   # none | pdotP | shuffle: identical outgoing particles ordered by p.P descending / at random, for model.net.causal_mask
  drop_coupling_powers: false  # zero the alpha_s/alpha_ew powers of amp_orders (they carry the multiplicity to every particle; causal_mask, D55)
  signedlog_quantile: 0.01   # signed pools (one-loop finite parts that change sign) use
