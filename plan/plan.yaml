@@ -39271,6 +39271,18 @@ entries:
       with the jobs pinned to that gpu type''????"); trial time limits set with room on one measured rate. Generation layouts
       from now on: one job per process (or few light ones), as many at once as site pick offers, wall = slowest process (D51,
       D208; "how many times do I have to ask for the generation to be done fast").'
+  - at: '2026-11-22T10:30:49+00:00'
+    text: '2026-11-22 ~11:30: regeneration ended: shards FA-lxplus-1f8de50d and -af3b62d2 (the last of the 16) logged ''Done:
+      1491 ok, 0 failed''; E8158''s reruns FA-lxplus-4ad73b1a/-d67dc714 belong to the mechanical worker. Gate (check_pp_pools
+      --labels on lxplus) first died on site run''s default 120 s ssh timeout (E8164; no pool read failed), relaunched with
+      site run --timeout 3600 (detach pool_gate2). EOS quota (eos root://eosuser.cern.ch quota /eos/user/j/joiturri/; plain
+      ''eos quota'' prints only the group node): 954.46 GB of 1.00 TB logical, ~45 GB free for ~18 GB of caches. Step 4 code:
+      identity stubs (branch llmcmp_stubs 9e1bcd9b: keyed_aug.pool_stub read by pool_identity, data_mmap._alphas_identity/_need/_check_canary,
+      datagen.mixed_generation; written by check_pp_pools --labels --write-stubs via data_mmap.write_pool_stub); tests/test_memmap_data.py
+      --synthetic OK (a memmap run on stubs = the same cache dir, events, batches, statistics as on the pools; refuses with
+      neither; mixed_generation on stubs = on pools for two generator versions, refuses against another val pool); repo review
+      running. Design re-recorded without per-GPU smokes or pinning, CC through stubs; design review running. site pick 2026-11-22
+      ~11:20 for 9 GPU runs: CC 1 at once, first start ~8 h; lxplus probe timed out; Jean Zay down.'
   step_waits:
     '1': FA-lxplus-0c92a3ed,FA-lxplus-e0fd42d4,FA-lxplus-047ec23e,FA-lxplus-09fa2d64,FA-lxplus-cc565c49,FA-lxplus-0ea9e16f,FA-lxplus-e931d117,FA-lxplus-2ebfd93d,FA-lxplus-323dc77f,FA-lxplus-cd2552fb,FA-lxplus-7d1cb6a6,FA-lxplus-3c7af077,FA-lxplus-af3b62d2,FA-lxplus-ad4fdc2d,FA-lxplus-1f8de50d,FA-lxplus-64dc6699
     '2': FA-lxplus-0c92a3ed,FA-lxplus-e0fd42d4,FA-lxplus-047ec23e,FA-lxplus-09fa2d64,FA-lxplus-cc565c49,FA-lxplus-0ea9e16f,FA-lxplus-e931d117,FA-lxplus-2ebfd93d,FA-lxplus-323dc77f,FA-lxplus-cd2552fb,FA-lxplus-7d1cb6a6,FA-lxplus-3c7af077,FA-lxplus-af3b62d2,FA-lxplus-ad4fdc2d,FA-lxplus-1f8de50d,FA-lxplus-64dc6699
