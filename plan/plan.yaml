@@ -39100,6 +39100,19 @@ entries:
       (setup.sh''s 3.7.0 URL 404''d and fell back to 3.6.7 silently: fixed bbd507fa). site pick planned lxplus CPU jobs on
       the GPU probe (2 at once, first start ~28 h): ~/.local/bin/site now probes GPU-less slots for --gpus 0 on HTCondor (backup
       ~/.local/share/ccorch/site.bak.pre-condor-cpu; 425 slots fit 16G/8cpu).'
+  - at: '2026-11-22T07:51:39+00:00'
+    text: '2026-11-22 generation batch: smoke FA-lxplus-a0cc1bc6 passed (MG5 3.7.0; check_pp_pools --labels 4 pairs, max |z|
+      0.97 dc_gb_bbbx test, 0 problems; LHE_WORK_PEAK_MB 604, STANDALONES_MB 2; EOS quota 923.18 GB of 1.00 TB). Rate: lxplus
+      1061/4503 s against CC''s 870.5/3268 s for dc_gb_bbbx/dc_gg_ggg (CC times from the stored test-pool sidecars'' lhe_run.seconds;
+      lxplus 1.34x slower); CC sum 167.2 core-h over 1491, worst 16-shard x 8-worker LPT 1.69 h at CC''s rate -> target 2.3
+      h. Batch 16 shards submitted @1f1de3d0 (FA-lxplus-0c92a3ed FA-lxplus-e0fd42d4 FA-lxplus-047ec23e FA-lxplus-09fa2d64
+      FA-lxplus-cc565c49 FA-lxplus-c4702306 FA-lxplus-0ea9e16f FA-lxplus-e931d117 FA-lxplus-2ebfd93d FA-lxplus-323dc77f FA-lxplus-cd2552fb
+      FA-lxplus-7d1cb6a6 FA-lxplus-3c7af077 FA-lxplus-af3b62d2 FA-lxplus-ad4fdc2d FA-lxplus-1f8de50d ) with --hdr=--tmp=8G
+      (new ~/.local/bin/site mapping to request_disk, backup site.bak.pre-request-disk): lxplus advertises ~3.8 MB Disk per
+      slot and does not enforce it, and 8G cut matching slots 9020 -> 679 (4 free at submission), so the start may be slow;
+      site has no cancel verb, so the idle jobs were left rather than condor_rm by hand. Design review of the part (a) chain
+      FIX: a cache copied to CC cannot open without its pools (experiment.py ensure_split_set require_cache; data_mmap.base_key_doc
+      pool_identity reads each pool), so every GPU job goes to lxplus; CC needs a code change.'
   step_waits:
     '1': FA-lxplus-a0cc1bc6
     '2': FA-lxplus-a0cc1bc6
