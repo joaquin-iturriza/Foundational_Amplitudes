@@ -39080,6 +39080,21 @@ entries:
       -maxdepth 5 -name ''dc_bb_bb_13000-13000GeV_train*'', via site_python) timed out after 600 s: inconclusive, not ''none
       found''. The next owner checks narrower places first (siteconf.DATA_DIR, $WORK/datasets, $SCRATCH/amp_data_cache, any
       storage_*/archive dirs) before regenerating.'
+  - at: '2026-11-22T05:40:06+00:00'
+    text: '2026-11-22, what deleted the catalog_daniel train pools: Joaquin''s D131/D134 (2026-10-25T20:06, ''Yes, delete
+      daniel''s catalog'', covers: the dc_* training caches in SCRATCH/amp_data_cache on CC, 31 GB, ''they rebuild on demand'');
+      the CC census of 2026-10-26 (analysis/storage/cache_manifest_2026-10-26.tsv, 18,160 paths) already holds none. They
+      do not rebuild on demand: a memmap prebuild stops at require_cache. No copy anywhere: CC amp_data_cache 16,177 entries
+      with no dc_/d4 name, CC DATA_DIR/checkout/sps root, lxplus amp_data_cache/datasets/checkout (searched 2026-11-22). Second
+      hazard found and fixed: sweep/prune.py --caches (supervisor, every 6 h, CC and lxplus) deleted any amp_data_cache file
+      unread for 30 days unless it began v4_/pp13v4_/pp13_/dsh_/ee4_, so rebuilt dc_ pools and lxplus''s d4_ probes (last
+      read 22 days ago) were next; now a pool of any process a recipe in recipes/** names is kept (2db2f626, repo review PASS).
+      Also seen: an agent''s hand-run find -delete of dsh_*/pp13*/d4* and pre-Nov v4_* in CC''s amp_data_cache (transcript
+      search), which is why d4_ is gone on CC. Placement: CC 36 GB free with the generator''s 15.4 GB floor cannot take ~30
+      GB of pools; lxplus EOS has ~77 GB of its 1 TB quota but MG5 3.6.7, so MG5 3.7.0 (CC''s) is installed at lxplus WORK/mg5amcnlo_370
+      (setup.sh''s 3.7.0 URL 404''d and fell back to 3.6.7 silently: fixed bbd507fa). site pick planned lxplus CPU jobs on
+      the GPU probe (2 at once, first start ~28 h): ~/.local/bin/site now probes GPU-less slots for --gpus 0 on HTCondor (backup
+      ~/.local/share/ccorch/site.bak.pre-condor-cpu; 425 slots fit 16G/8cpu).'
   step_waits:
     '1': llm_compare step 3 (train pools)
     '2': step 3 (train pools regenerated), then the smoke run's checkpoint
