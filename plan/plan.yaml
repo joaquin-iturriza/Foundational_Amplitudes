@@ -39392,8 +39392,8 @@ entries:
       depend on it (base_key_doc: pools and layout only). Driver relaunched as llmcmp_a_drive4 with --retry-failed 6cdb4904
       (penalty removed).'
   step_waits:
-    '1': detached llmcmp_a_drive3 (the 8-trial DyHPO search on lxplus + ccin2p3; wave 1 FA-lxplus-51201734 FA-lxplus-4857eed5
-      FA-ccin2p3-6cdb4904, later waves by the driver) and the control FA-lxplus-cb9273f1
+    '1': detached llmcmp_a_drive4 (the 8-trial DyHPO search on lxplus + ccin2p3; wave 1 FA-lxplus-51201734 FA-lxplus-4857eed5
+      FA-ccin2p3-bd3e4211, waves 2-3 submitted by the driver) and the control FA-lxplus-cb9273f1
     '2': 'FA-lxplus-cb9273f1 (the control: first finished run; the scoring check runs on its checkpoint, or on the first trial
       to end before it)'
   handoff:
