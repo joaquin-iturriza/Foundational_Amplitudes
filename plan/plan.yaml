@@ -39050,6 +39050,7 @@ entries:
       not his 7.2 H100-h.'
   step_waits:
     '1': 'the next owner: hand-off written 2026-11-22, previous owner closed at its context limit'
+    '2': 'the next owner: hand-off written 2026-11-22, previous owner closed at its context limit'
   handoff:
     state: 'Data settled by D51/D527: our catalog_daniel pools (1352 train / 139 held-out recipes, 1e5/1e4/1e4 per process,
       per-event alpha_s sidecars on CC). Input data.alphas_input merged (7d3a6ee9, repo review PASS at 67dad1aa). Part (a)''s
