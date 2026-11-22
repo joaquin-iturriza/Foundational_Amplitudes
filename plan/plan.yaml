@@ -39111,13 +39111,6 @@ entries:
       on seen (1352) and held-out (139) processes, 16,384 test events per process = the 1e4 test pool + train-pool rows 55,296..61,679
       (never trained on), held-out processes predicted with the shared multiplicity-affine statistics (no per-process affine
       map, unlike zero_shot_parent.py), per-process MSEs for the figure in his panels'
-    3: 'Regenerate the catalog_daniel TRAIN pools (1491 processes, n_train 1e5, D51; scripts/job_gen_daniel_catalog.sh / prebuild_recipes):
-      on 2026-11-22 amp_data_cache held 0 dc_*_train pools on CC and lxplus (val/test pools and alpha_s sidecars present),
-      so both memmap prebuilds failed at require_cache. First find what deleted them and fix it where every later run picks
-      it up (a cache an open entry''s recipe reads is never deleted). Disk: ~29 GB of pools (1491 x 1e5 x ~196 B, an estimate)
-      + ~18 GB memmap cache vs 38 GB free on CC /sps/lpnhe: does not fit; place where it fits (lxplus EOS or space made by
-      the pruning tool). Generation design + review (fa-generation), then resubmit the chain as recorded in the 2026-11-22
-      handoff.'
     4: 'CC for part (a) trials: let a run open a memmap cache copied from another site without its pools (pool identities
       read from the cache''s key_doc.json when the pool file is absent, require_cache satisfied by the cache), in a worktree
       with a test and repo review; then site copy the lxplus caches to CC (df re-read, ~18 GB vs 36 GB free) and show one
@@ -39241,11 +39234,6 @@ entries:
       if:
       - 'tool reproduces a run''s own test MSE on seen processes: use it for every arm'
       - 'it does not: find the difference before any number goes out'
-    3:
-      feeds: 'whether part (a) can run: its training data'
-      if:
-      - 'pools regenerated and the memmap prebuilds pass: resubmit smokes and scoring (steps 1, 2)'
-      - 'no site has room for pools + cache: bring the disk call to Joaquin with the sizes'
     4:
       feeds: where part (a)'s 8-trial search and control run (lxplus only, or lxplus and CC), so the search finishes in one
         wave at site pick's width
@@ -39392,7 +39380,6 @@ entries:
   step_waits:
     '1': the pool gate (detach pool_gate2) and the two lxplus memmap prebuilds that follow it
     '2': FA-lxplus-0c92a3ed,FA-lxplus-e0fd42d4,FA-lxplus-047ec23e,FA-lxplus-09fa2d64,FA-lxplus-cc565c49,FA-lxplus-0ea9e16f,FA-lxplus-e931d117,FA-lxplus-2ebfd93d,FA-lxplus-323dc77f,FA-lxplus-cd2552fb,FA-lxplus-7d1cb6a6,FA-lxplus-3c7af077,FA-lxplus-af3b62d2,FA-lxplus-ad4fdc2d,FA-lxplus-1f8de50d,FA-lxplus-64dc6699
-    '3': FA-lxplus-71f15edb FA-lxplus-1e697b5c
     '4': FA-lxplus-71f15edb FA-lxplus-1e697b5c (the lxplus caches to copy to CC)
   handoff:
     state: 'Step 3 (pools), nearly done. The full pool check (check_pp_pools --labels, recipes/catalog_daniel_all.yaml, lxplus)
