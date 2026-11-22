@@ -40446,6 +40446,12 @@ entries:
     units: null
     start: '2026-11-22T11:02:30+00:00'
     at: '2026-11-22T11:02:30+00:00'
+  - batch: recover_alphas_valtest5
+    wall_h: 0.2
+    jobs: 5
+    units: null
+    start: '2026-11-22T11:32:25+00:00'
+    at: '2026-11-22T11:32:25+00:00'
   ask: 'Scope: skip the one 50-step D395 smoke run before part (a)''s search (new launch path: regenerated catalog_daniel
     pools, the new alpha_s input, the new scoring), and send the search directly once the data caches are built.'
   waiting_since: '2026-11-22T09:56:59+00:00'
