@@ -37981,6 +37981,22 @@ entries:
       PATH BUG: loading works (first-val head start, parent loaded, OPT_STATE 32 entries in the smoke); a bug costing the
       end point would also show as F above Sf*. Discriminating runs: R1 scratch+flags searched (b128, 16 trials, the D507
       twin + flags): separates H1 from H3/H4/H5/H7; R3 ft lr window extension (b128): tests H3.'
+  - at: '2026-11-22T09:36:00+00:00'
+    text: '2026-11-22 R1/R3 batch 2048 first read (zng4g_r1_read.py @6a7715e0; figs zng4g_r1_b2048, zng4g_r1_trainval_b2048,
+      captions OK). Best val MSE(log|M|^2): searched scratch+flags Sf* (16 trials, chosen hp1377, lr 0.0306, 0.13 decade below
+      the window top: not edge-limited) seed 42 = 0.122 vs S 3-seed mean 0.0630 and F 0.0980: Sf*/S 1.93, F/Sf* 0.80, share
+      log(Sf*/S)/log(F/S) = 1.49 (10-90% over 9 triples 1.42-1.60; seeds 43/44 of Sf* running FA-ccin2p3-e754cd17/-024a7d8b)
+      -> branch (a) H1 on one seed: the inherited flags cost more than the whole gap; on the same architecture pretraining
+      helps 1.25x. Every Sf* trial (0.122-0.196) sits above every S trial (0.057-0.100) over the same lr range 3e-3..4e-2:
+      no lr recovers it. R3 b2048: extended ft search''s chosen hp1532 lr 3.23e-3 INSIDE the old window [3.1e-3, 4.1e-2],
+      val 0.0949 vs F16 0.0967 (1.02x, below the 1.19 bar) -> H3 ruled out at b2048; the 8 added trials at lr 1.0e-3..1.9e-3
+      give 0.095-0.103, flat. Seeds 43/44 of hp1532 running (FA-ccin2p3-2b0a8ebc/-9485314c, named ftx24). Train vs val (train_eval_mse:
+      2000 training events, same weights and units as val, base_experiment._track_train_eval): every arm memorises (train
+      MSE ~2e-6 at the end, val/train 2e4-5e4); F has the lowest train error throughout (2-3x below S mid-run) but its val
+      is best at 10% of the run (validation 5 of 50, all 3 seeds and the sigma-reset arm) and ends 1.27x above its best, while
+      S''s and Sf*''s val keep falling (best at 56-100%, end/best 1.00-1.07). Tool fix: zng4g_seed_chunks.py rebuilt an extended
+      search''s HPs from the edited config (hp1532 gave lr 1.06e-3 instead of 3.23e-3); it now reads the drive''s dyhpo_state.pkl
+      (@90918fa5).'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
