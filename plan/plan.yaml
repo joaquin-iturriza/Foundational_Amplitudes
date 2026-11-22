@@ -39024,9 +39024,9 @@ entries:
     decision: D527
   owner:
     agent: aa5836ca091e40268
-    state: working
+    state: stopped
     since: '2026-11-22T07:35:07+00:00'
-    state_at: '2026-11-22T07:35:07+00:00'
+    state_at: '2026-11-22T07:57:11+00:00'
   step_why:
     1:
       feeds: the cost of one run and so whether the DyHPO search fits 30 GPU-h at full length
