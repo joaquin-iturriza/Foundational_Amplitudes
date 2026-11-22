@@ -37716,9 +37716,9 @@ entries:
   - D513
   - D516
   next:
-    3: 'R1/R3 close-out: three-seed b2048 flags share from Sf* seeds 43/44 (FA-ccin2p3-e754cd17, -024a7d8b; zng4g_r1_read.py
-      2048); R3 b128 H3 read when the ft_b128 extension ends (ftmech_ftb128_drive3, 22/24 observed, 2 in flight): its chosen
-      trial''s lr against the old top 1.1e-2 and val against F16 by 1.19, no seeds'
+    3: 'R3 batch 128 H3 read when the fine-tune lr-window extension ends (ftmech_ftb128_drive3, 22/24 observed, trials 22/23
+      FA-lxplus-c08b3944/-f8120264): chosen trial''s lr against the old top 1.1e-2 and val against the 16-trial best by 1.19
+      (zng4g_r1_read.py needs a b128 mode without the dropped R1 b128 search)'
   done_when: null
   notes_ref: null
   match: dsave_ftmech_*,ftmech_*
@@ -39014,13 +39014,11 @@ entries:
     at: '2026-11-22T09:29:10+00:00'
   step_why:
     3:
-      feeds: 'D519: the flags'' share of the Z+4g fine-tune gap (H1) and the lr window (H3)'
+      feeds: 'D519: whether the lr window adds to the gap at batch 128 (H3)'
       if:
-      - 'share >= 0.7: H1 confirmed; the parent change is Joaquin''s call (one-flag test offered, not run)'
-      - 'share <= 0.3: the start; path-bug vs plasticity design'
-      - 'b128 H3 yes: lr window part of the gap at b128'
-  step_waits:
-    '3': FA-ccin2p3-e754cd17 FA-ccin2p3-024a7d8b ftmech_ftb128_drive3
+      - 'H3 yes: lr window part of the gap at b128, reported with the matched-count question'
+      - 'H3 no: the flags explanation stands alone'
+  step_waits: {}
   handoff:
     state: '2026-11-22 08:25 UTC. D519/D520 widened the entry: find why the Z+4g fine-tune ends ~1.55x above scratch. HYPOTHESES
       recorded (finding ''2026-11-22 HYPOTHESES''): lead H1 = the parent''s inherited input flags (input_soft_eps 1e-8, input_pair_logs
