@@ -38962,6 +38962,7 @@ entries:
       - 'both share it: stage 2 searches the ambiguous arm'
   step_waits:
     '4': a reviewer
+    '3': FA-ccin2p3-e754cd17 FA-ccin2p3-024a7d8b FA-ccin2p3-2b0a8ebc FA-ccin2p3-9485314c
   handoff:
     state: '2026-11-22 08:25 UTC. D519/D520 widened the entry: find why the Z+4g fine-tune ends ~1.55x above scratch. HYPOTHESES
       recorded (finding ''2026-11-22 HYPOTHESES''): lead H1 = the parent''s inherited input flags (input_soft_eps 1e-8, input_pair_logs
