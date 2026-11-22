@@ -39335,6 +39335,13 @@ entries:
       20 pairs, max |z| 2.49 (dc_ssx_wpwmh test), 0 problems; rows shared by each new val/test pool with its lxplus train
       pool: 0 of 10000 for all 6, val-test shared 0 (byte-equal rows, scratchpad subcheck2.py). Full gate check_pp_pools --labels
       --write-stubs on lxplus launched detached (pool_gate_stubs, log ~/.local/share/ccorch/detached/20261122-132650_pool_gate_stubs.log).'
+  - at: '2026-11-22T13:23:30+00:00'
+    text: '2026-11-22 ~13:55 (E8204): gate passed on lxplus: check_pp_pools --spec recipes/catalog_daniel_all.yaml --labels
+      --write-stubs: 2982 process-role pairs, largest |z| 4.08 (dc_bbx_ga test), 1491 processes, 0 problems, 1491 train-pool
+      .identity.json stubs written (counted 1491 stubs beside 1491 train pools in lxplus SCRATCH/amp_data_cache). Prebuilds
+      submitted on lxplus (pools only there; site pick probe of lxplus timed out twice, CC offered but holds no pools): FA-lxplus-71f15edb
+      (catalog_daniel_train) and FA-lxplus-1e697b5c (catalog_daniel_heldout), scripts/job_mmap_prebuild.sh at b25f9e6ffb with
+      the 04:24 overrides (O string of the CC prebuilds FA-ccin2p3-5920ce08/-099e0ce5), 4 cpu, 16G, limit 3 h, target 1 h.'
   step_waits:
     '1': the pool gate (detach pool_gate2) and the two lxplus memmap prebuilds that follow it
     '2': FA-lxplus-0c92a3ed,FA-lxplus-e0fd42d4,FA-lxplus-047ec23e,FA-lxplus-09fa2d64,FA-lxplus-cc565c49,FA-lxplus-0ea9e16f,FA-lxplus-e931d117,FA-lxplus-2ebfd93d,FA-lxplus-323dc77f,FA-lxplus-cd2552fb,FA-lxplus-7d1cb6a6,FA-lxplus-3c7af077,FA-lxplus-af3b62d2,FA-lxplus-ad4fdc2d,FA-lxplus-1f8de50d,FA-lxplus-64dc6699
