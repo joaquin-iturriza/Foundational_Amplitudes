@@ -39197,6 +39197,26 @@ entries:
       cost or seeds'
     blocks: only the submission of the search and control (and the seed-43 pair); the caches, the CC key check and the scoring
       check go on
+    blocks_steps:
+    - 1
+  - ask: 'GPU budget: about 40 (A100/H100) to 90 (V100) GPU-h above 30 with no decision covering it, for part (a)''s search:
+      8 DyHPO trials plus the matched control at your LLM run''s conditions (60,840 steps at batch 24,576 each, D525/D526)
+      (estimate: 0.412 s/step measured for the catalog without diagrams at batch 16,384 on a V100, scaled linearly to 24,576
+      = 0.62 s/step, x 60,840 steps = 10.5 h per run, x 9 runs; H100/A100 assumed ~2.3x faster). Go for the 9 runs? With it,
+      two scope calls: the second seed (43) of the control and of the best trial (2 runs more, about 20 GPU-h on V100), the
+      seed spread the tuned-against-control gain is read against (without it the gain has no spread); and, still open from
+      09:56, skipping the one 50-step D395 smoke run (new launch path: regenerated pools, alpha_s input, new scoring) and
+      sending the search directly, the scoring check then on the first finished trial; the smoke, if kept, also measures the
+      step rate this estimate assumes.'
+    at: '2026-11-22T14:33:25+00:00'
+    searched: 'CLAUDE.md (D395, GPU budget rule); site decisions --project FA grepped for smoke, test run, D395, GPU-h, budget,
+      HPO, llm_compare: D522-D527 approve the work but name no cost; no decision approves ~40-90 GPU-h for it; the passed
+      design says a search above 30 GPU-h goes to Joaquin with the seed-43 pair. Joaquin''s messages 2026-11-14T04:31 (a pasted
+      SciPost draft), 2026-10-02T11:24 (tf32 and budget priorities on another study), 2026-11-03T03:22 (seed error bars on
+      a plot), 2026-10-06T00:17 (the transfer study''s plan, approved there only), 2026-11-13T03:05 (draft section answers)
+      and 2026-11-01T15:56 (deleting caches) do not address this smoke, this search''s cost or its seeds'
+    blocks: only the smoke and the submission of the search and control (and the seed-43 pair); the caches and the CC key
+      check go on
     blocks_steps: &id004
     - 1
   owner:
@@ -40525,18 +40545,21 @@ entries:
     units: null
     start: '2026-11-22T13:22:23+00:00'
     at: '2026-11-22T13:22:23+00:00'
-  ask: 'GPU budget (30 GPU-h rule): the part (a) search, 8 DyHPO trials plus the matched control at your LLM run''s conditions
-    (60,840 steps at batch 24,576 each, D525/D526), costs an estimated 90 GPU-h on V100 or about 40 on A100/H100 (estimate:
+  ask: 'GPU budget: about 40 (A100/H100) to 90 (V100) GPU-h above 30 with no decision covering it, for part (a)''s search:
+    8 DyHPO trials plus the matched control at your LLM run''s conditions (60,840 steps at batch 24,576 each, D525/D526) (estimate:
     0.412 s/step measured for the catalog without diagrams at batch 16,384 on a V100, scaled linearly to 24,576 = 0.62 s/step,
-    x 60,840 steps = 10.5 h per run, x 9 runs; H100/A100 assumed ~2.3x faster). Go for the 9 runs? And do you want the second
-    seed (43) of the control and of the best trial (2 runs more, ~+22%: about 20 GPU-h on V100), which gives the seed spread
-    the tuned-against-control gain is read against? Without it that gain is reported with no spread.'
-  waiting_since: '2026-11-22T14:32:36+00:00'
-  searched: 'CLAUDE.md GPU budget rule; site decisions --project FA grepped for GPU-h, budget, HPO, llm_compare: D522-D527
-    approve the work but name no cost; no decision approves ~40-90 GPU-h for it; the passed design says a search above 30
-    GPU-h goes to Joaquin with the seed-43 pair. Joaquin''s messages 2026-11-14T04:31 (a pasted SciPost draft), 2026-10-02T11:24
-    (tf32 and budget priorities on another study) and 2026-11-03T03:22 (seed error bars on a plot) do not address this search''s
-    cost or seeds'
-  blocks: only the submission of the search and control (and the seed-43 pair); the caches, the CC key check and the scoring
-    check go on
+    x 60,840 steps = 10.5 h per run, x 9 runs; H100/A100 assumed ~2.3x faster). Go for the 9 runs? With it, two scope calls:
+    the second seed (43) of the control and of the best trial (2 runs more, about 20 GPU-h on V100), the seed spread the tuned-against-control
+    gain is read against (without it the gain has no spread); and, still open from 09:56, skipping the one 50-step D395 smoke
+    run (new launch path: regenerated pools, alpha_s input, new scoring) and sending the search directly, the scoring check
+    then on the first finished trial; the smoke, if kept, also measures the step rate this estimate assumes.'
+  waiting_since: '2026-11-22T14:33:25+00:00'
+  searched: 'CLAUDE.md (D395, GPU budget rule); site decisions --project FA grepped for smoke, test run, D395, GPU-h, budget,
+    HPO, llm_compare: D522-D527 approve the work but name no cost; no decision approves ~40-90 GPU-h for it; the passed design
+    says a search above 30 GPU-h goes to Joaquin with the seed-43 pair. Joaquin''s messages 2026-11-14T04:31 (a pasted SciPost
+    draft), 2026-10-02T11:24 (tf32 and budget priorities on another study), 2026-11-03T03:22 (seed error bars on a plot),
+    2026-10-06T00:17 (the transfer study''s plan, approved there only), 2026-11-13T03:05 (draft section answers) and 2026-11-01T15:56
+    (deleting caches) do not address this smoke, this search''s cost or its seeds'
+  blocks: only the smoke and the submission of the search and control (and the seed-43 pair); the caches and the CC key check
+    go on
   blocks_steps: *id004
