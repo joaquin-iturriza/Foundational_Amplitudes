@@ -1716,8 +1716,8 @@ class AmplitudeExperiment(BaseExperiment):
                 amp_trafos = amp_trafos_pp = None
                 prepd_means = prepd_stds = None
                 per_dataset = bool(self.cfg.data.get("preprocess_per_dataset", False))
-                assert not bool(self.cfg.data.get("memmap", False)), \
-                    "fine_tune.target_stats=parent_shared is built on the in-memory path (the memmap cache key does not carry it)"
+                # the memmap path too: its cache holds no target statistic (data_mmap.base_key_doc), and it standardizes
+                # at open through _resolve_amp_preprocessing, which applies these (llm_compare's held-out read)
                 self._ft_parent_target_stats = stats
                 LOGGER.info("Fine-tuning: the parent's target standardization kept on the probe "
                             "(fine_tune.target_stats=parent_shared), transform resolved on its own train split")
