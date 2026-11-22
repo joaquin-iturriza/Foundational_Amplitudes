@@ -655,6 +655,21 @@ def mixed_generation(paths, z_max=5.0, n_bins=10, any_version=False):
     for name, r in by.items():
         if "train" not in r or (not any_version and len({v[0] for v in r.values()}) < 2):
             continue
+        from keyed_aug import pool_identity, pool_stub
+        stub = pool_stub(r["train"][1])
+        if stub is not None:
+            # the train pool is absent here: its stub carries this check as run beside it, against the val/test
+            # pools it names (tools/pool_stubs.py); valid only for those same pools
+            rec = stub["mixed_generation"]      # every role's z (any_version=True, z_max=0) and the pools it read
+            for role in ("val", "test"):
+                if role not in r or (not any_version and r[role][0] == r["train"][0]):
+                    continue
+                assert rec["against"].get(role) == pool_identity(r[role][1]), \
+                    f"{r['train'][1]}: its stub's label check was made against another {role} pool; rewrite the stub"
+                z = rec["z"].get(role)
+                if z is not None and abs(z["z"]) > z_max:
+                    out.setdefault(name, {})[role] = z
+            continue
         s_tr, l_tr = _sqrts_and_logm2(r["train"][1])
         for role in ("val", "test"):
             if role not in r or (not any_version and r[role][0] == r["train"][0]):

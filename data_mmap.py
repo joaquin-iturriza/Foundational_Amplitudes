@@ -51,7 +51,7 @@ import logging.handlers  # noqa: F401  (logger.py uses logging.handlers without 
 from logger import LOGGER
 from dirlock import dir_lock
 import keyed_aug
-from keyed_aug import pool_identity
+from keyed_aug import pool_identity, pool_stub
 
 # The format of the cached arrays. Bump it with any change to what _build_base or _build_features write (the
 # fingerprint in tests/test_mmap_key.py fails until it is bumped and re-recorded).
@@ -383,11 +383,27 @@ def _alphas_identity(pool):
     """The identity of a pool's per-event alpha_s file, None when it has none. A pool composed at load gets its alpha_s
     from its rows (mix_compose.alphas_of_rows), whose bytes differ by an ulp between nodes (numpy's SIMD log: CC's htc
     and GPU nodes, 2026-11-12, so a CPU prebuild never matched its GPU run): it is keyed by the rows it is made from."""
+    stub = pool_stub(pool)
+    if stub is not None:
+        return stub["alphas"]
     a = _alphas_path(pool)
     if not os.path.exists(a):
         return None
     pid = pool_identity(pool)
     return ["alphas_of_rows", pid] if str(pid[2]).startswith("rows:") else pool_identity(a)
+
+
+def write_pool_stub(train, others, z):
+    """<train>.identity.json (keyed_aug.pool_stub) for the train pool `train`, beside it: its identity, its alpha_s
+    identity, its shape, and datagen.mixed_generation's z (any_version=True, z_max=0: {role: {...}}) against the
+    pools `others` ({role: path}) whose identities it records."""
+    from keyed_aug import STUB_SUFFIX
+    doc = {"identity": pool_identity(train), "alphas": _alphas_identity(train),
+           "shape": list(np.load(train, mmap_mode="r").shape),
+           "mixed_generation": {"against": {r: pool_identity(p) for r, p in others.items()}, "z": z}}
+    with open(train + STUB_SUFFIX + ".tmp", "w") as f:
+        json.dump(doc, f)
+    os.replace(train + STUB_SUFFIX + ".tmp", train + STUB_SUFFIX)
 
 
 def base_key_doc(cfg, names, roles, paths):
@@ -479,7 +495,8 @@ def _need(cap_for, names, roles, paths):
     for r in roles:
         cap = _cap(cap_for[r])
         for n in names:
-            N0 = np.load(paths[r][n], mmap_mode="r").shape[0]
+            stub = pool_stub(paths[r][n])
+            N0 = stub["shape"][0] if stub is not None else np.load(paths[r][n], mmap_mode="r").shape[0]
             out[(r, n)] = N0 if cap is None else min(N0, cap)
     return out
 
@@ -526,8 +543,8 @@ def _check_canary(d, meta, paths):
     assert not bad, f"memmap cache {d}: {bad} differ from what the build wrote (truncated or overwritten); rebuild it"
     amp = _open(d, "amp")
     for s in meta["segs"]:
-        if s["n"] == 0:
-            continue
+        if s["n"] == 0 or pool_stub(paths[s["role"]][s["name"]]) is not None:
+            continue        # a stubbed pool is bound to the cache by its identity in the key (base_key_doc)
         pool = np.load(paths[s["role"]][s["name"]], mmap_mode="r")
         first, last = float(pool[0, -1]), float(pool[s["n"] - 1, -1])
         assert first == float(amp[s["ev0"]]) and last == float(amp[s["ev0"] + s["n"] - 1]), \
