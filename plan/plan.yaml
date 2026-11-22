@@ -38785,6 +38785,50 @@ entries:
       unresolved each have a next step. Check 5 terms searched: input_soft_eps, input_pair_logs, softpair, soft rescale, pair
       log, scrflags, flags, plasticity, Z+4g in results.tex, plus decisions D513-D525. The prior names the flags'' KIT origin,
       the high-multiplicity grid and the plasticity test par:v4_warm_start_fixes.'
+  - at: '2026-11-22T09:37:23+00:00'
+    question: 'D519/D520 (Joaquin: get to the bottom of why the Z+4g fine-tune ends worse than scratch, with minimal discriminating
+      tests). R1 at batch 2048 (zng4g_r1_read.py @6a7715e0) puts the gap on the parent''s two inherited input flags: searched
+      scratch+flags Sf* 0.122 vs scratch S 0.063 and fine-tune F 0.098, share 1.49 (9-triple range 1.42-1.60; branch (a),
+      outcome (a)''s next step: which flag). R4: which of the two flags, input_soft_eps 1e-8 (every momentum log-rescaled,
+      p_i -> p_i log1p(x_i/eps)/(x_i log1p(1/eps))) or input_pair_logs 7 (log(2p_i.p_j/s)/5 of every pair as extra scalars),
+      makes the model worse on Z+4g, or only their combination? The answer says which change the parent needs for Z+ng (Joaquin''s
+      call) and whether a fine-tune can drop the flag (soft_eps keeps the weights'' shapes; pair_logs changes the input width).'
+    prior: 'This entry: S (D507 Muon/WSD scratch, chosen hp1333, seeds 42-44) 0.0580/0.0669/0.0641 and Sf (both flags at S''s
+      HPs, seeds 42-44) 0.150/0.162/0.155 (zng4g_readout.json @6547b7c1); Sf* searched 0.122 (seed 42): the search recovers
+      only 2.5x -> 1.93x; every Sf* trial above every S trial over lr 3e-3..4e-2 (zng4g_r1_b2048.json). The flags come from
+      the KIT singular-limit benchmark (results.tex l.12365-12397, softpair arms, D374); searched results.tex, plan.yaml and
+      decisions for input_soft_eps, input_pair_logs, softpair, one-flag: no on/off A/B of either flag alone on record, on
+      any process (the 2026-11-22T03:09 design''s search found the same).'
+    measure: 'Best val MSE(log|M|^2) = min val mu-MSE x std^2 (std 1.11978 shared, checked per run) of each fixed-HP run,
+      three seeds per arm. Per flag x: its cost share c_x = log(mean Sx / mean S) / log(mean Sf / mean S) (denominator log(0.1556/0.0630)
+      = 0.904), with its 10-90% range over the 27 seed triples (one seed each of Sx, S, Sf). Figure: each arm''s per-seed
+      best (S, S+soft rescale, S+pair logs, S+both) and the train-vs-val curves (as zng4g_r1_trainval).'
+    check: 'The two flags together move the measure 2.47x at these fixed HPs (log 0.90; seeds 0.150-0.162 vs 0.058-0.067),
+      so a flag carrying it moves it by up to that much; S''s seed spread is log 0.14 (max-min), so c_x is resolved to about
+      +-0.15, which supports the 0.3/0.7 edges. All four arms share HPs, data (1e4 events of the D507 pools), steps 1953,
+      float64, seeds: the factorial changes one flag per cell.'
+    fixed: 'sweep/sweep_config_ftmech_zng4g_scrsoft_b2048.yaml and sweep_config_ftmech_zng4g_scrpair_b2048.yaml @30b23c29:
+      copies of sweep_config_ftmech_zng4g_scrflags_b2048.yaml (the passed Sf control) with one flag line removed (back to
+      the code default, off; S''s saved config has neither key, Sf''s both, checked on CC). Run at S''s chosen HPs (hp1333:
+      lr 0.02029637, muon wd 0.01451547, reg 8.40e-7, warmup 0.0897, eta_min 1.13e-8, EMA 0.968), 1953 steps, by run_fixed_hp.py
+      via scripts/job_seed_batch.sh, chunks analysis/finetune_mechanism/seed_chunks/zng4g_scr{soft,pair}_b2048_s{42,43,44}.txt,
+      evaluation.train_subsample 2000 as every seed run. 6 jobs at site pick''s site, --time 01:00:00, mem 32G, 4 CPUs. No
+      parent, any site. Stage 2 (only on outcome (d)): the ambiguous single-flag arm searched as Sf* (16 trials, same space,
+      waves 3,3,2,3,3,2, DyHPO seed 42) + its seeds 43/44.'
+    control: 'S (no flag) and Sf (both flags) at the same HPs and seeds: the 2x2 factorial''s other two cells, already run
+      (no rerun).'
+    seeds: '42, 43, 44 per arm, as S and Sf. Cost: 6 x 0.35 GPU-h = 2.1 GPU-h (b2048 seed runs measured 0.35 h); stage 2 if
+      needed 16 x 0.35 + 2 x 0.35 = 6.3 GPU-h per arm. Total <= 14.7 GPU-h, inside D520. Wall ~0.4 h (one wave of 6). Goes
+      now: the R1 b2048 branch is decided on one seed of Sf* (share 1.42-1.60 over 9 triples); falling below 0.7 needs Sf*
+      seeds 43/44 to average 0.068, a 1.8x seed swing against S''s 1.15x and Sf''s 1.08x.'
+    outcome: '(a) c_soft >= 0.7 and c_pair <= 0.3 (ranges on their side of 0.5): the momentum log-rescale carries the cost.
+      Next: a fine-tune of the W parent with input_soft_eps set to 0 (same weight shapes) against F, its own design, and Joaquin''s
+      call on the parent for Z+ng. (b) c_pair >= 0.7 and c_soft <= 0.3: the pair logs carry it; a fine-tune cannot drop them
+      (input width changes), so the next step is Joaquin''s call on a parent without them; no further run proposed. (c) both
+      <= 0.3: only the combination costs (interaction); reported, next Joaquin''s call on the parent. (d) either in (0.3,
+      0.7), or ranges spanning both edges: both share it; stage 2 searches the arm(s) in (0.3, 0.7) as Sf* was, then read
+      c_x from searched arms. Any arm whose best sits at a val spike >10x best-so-far, or diverged, listed apart (D398), never
+      retried.'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
