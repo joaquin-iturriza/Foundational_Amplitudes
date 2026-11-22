@@ -39311,7 +39311,7 @@ entries:
   step_waits:
     '1': the pool gate (detach pool_gate2) and the two lxplus memmap prebuilds that follow it
     '2': FA-lxplus-0c92a3ed,FA-lxplus-e0fd42d4,FA-lxplus-047ec23e,FA-lxplus-09fa2d64,FA-lxplus-cc565c49,FA-lxplus-0ea9e16f,FA-lxplus-e931d117,FA-lxplus-2ebfd93d,FA-lxplus-323dc77f,FA-lxplus-cd2552fb,FA-lxplus-7d1cb6a6,FA-lxplus-3c7af077,FA-lxplus-af3b62d2,FA-lxplus-ad4fdc2d,FA-lxplus-1f8de50d,FA-lxplus-64dc6699
-    '3': FA-ccin2p3-46d58dc0,FA-ccin2p3-75172cb3,FA-ccin2p3-8556d1a5
+    '3': detached pool_gate_stubs (check_pp_pools --labels --write-stubs on lxplus), then the two lxplus prebuilds
     '4': the pool gate (detach pool_gate2), then check_pp_pools --labels --write-stubs on lxplus (stub code merged 0bb3af13,
       repo review PASS), then the design re-review
   handoff:
