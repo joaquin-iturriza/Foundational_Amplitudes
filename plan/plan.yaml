@@ -38955,10 +38955,16 @@ entries:
   decisions:
   - D525
   - D527
-  next: 'Get Suprio''s LLM-run data onto CC: processes/*/data_running_alpha.npy for the 1501 processes, the rows his run used
-    (55,296 train per process, val, the 16,384 test per process), test_split.json as he ran it, and his metric code; then
-    a reader for it, the 50-step smoke run through every stage [D395], cost one full run, design the DyHPO search, design
-    review, submit'
+  next:
+    1: 'Smoke run then cost: muP LLoCa on catalog_daniel (recipes/catalog_daniel_train.yaml, 1352 processes; D51/D527) in
+      the LLM run''s conditions: train_subsample=55296 (the first 55,296 rows, the same rows every epoch), val pool 1e4, 60,840
+      updates of 24,576 mixed-process events (D526), validation every 3042 steps, best-val checkpoint, shared_standardization
+      + affine_multiplicity_std as target z, alphas_input, loss/val aggregation mean; one GPU ~50 steps through every stage
+      [D395], then the step rate gives the cost of one full run'
+    2: 'Scoring tool: pooled RMSE of log|M|^2 (his table''s metric: sqrt of the mean squared error over all test events pooled)
+      on seen (1352) and held-out (139) processes, 16,384 test events per process = the 1e4 test pool + train-pool rows 55,296..61,679
+      (never trained on), held-out processes predicted with the shared multiplicity-affine statistics (no per-process affine
+      map, unlike zero_shot_parent.py), per-process MSEs for the figure in his panels'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -39005,11 +39011,17 @@ entries:
     context_at: '2026-11-22T03:16:24+00:00'
   step_why:
     1:
-      feeds: whether (a)-(c) can be compared with the LLM's 0.321/0.721 on his own test events
+      feeds: the cost of one run and so whether the DyHPO search fits 30 GPU-h at full length
       if:
-      - 'his files reach a site: write the reader, smoke run, design and cost the search'
-      - 'he cannot share them: Joaquin''s call whether our regeneration of his catalogue (catalog_daniel: same 1491 processes
-        and MadEvent cards, our |M|^2 labels, 1e5/1e4/1e4 events) replaces them, reported as different test events'
+      - 'full-length search above 30 GPU-h: show on existing data whether a shorter horizon ranks HPs, else bring the costed
+        search to Joaquin under the GPU budget rule'
+      - 'within budget: design, review, submit the search'
+    2:
+      feeds: the numbers and figure of (a)-(c) against the LLM's 0.321/0.721 (measured on his events; ours on our regeneration
+        of the same catalogue)
+      if:
+      - 'tool reproduces a run''s own test MSE on seen processes: use it for every arm'
+      - 'it does not: find the difference before any number goes out'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
