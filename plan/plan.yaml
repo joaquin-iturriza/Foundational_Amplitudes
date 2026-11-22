@@ -39400,6 +39400,13 @@ entries:
       on lxplus (probe takes ~177 s): per-site probe_timeout (sites.toml lxplus 360 s; ~/.local/bin/site rank_sites, backup
       site.bak.pre-probe-timeout). CC key check: heldout FA-ccin2p3-dd63b9fb opened b39fc80c8b10edbe4b07f6a0 through the stubs
       (''is ready'', RUN_DONE), train FA-ccin2p3-8d817d54 running.'
+  - at: '2026-11-22T15:10:06+00:00'
+    text: '2026-11-22 ~16:10: item estimate raised to 216 GPU-h (coordinator, D528 approves the search at its cost): the site
+      gate charges each job its time limit (24 h counted for a 22 h limit, 9 x 24 = 216), while the expected use stays ~40-90
+      GPU-h (estimate). CC key check passed: FA-ccin2p3-8d817d54 and -dd63b9fb logged ''the cache ... is ready'' under the
+      lxplus key dirs 99c164da4365de9d7c017b75 (train) and b39fc80c8b10edbe4b07f6a0 (heldout) on CC, nothing built. Driver
+      stopped (state: trials 0, 1 submitted) and relaunched as llmcmp_a_drive3 with --sites lxplus ccin2p3 (same config f71cde629,
+      --mem 32G --cpus 4 --hours 14.6).'
   step_waits:
     '1': detached llmcmp_a_drive2 (the 8-trial DyHPO search, trials FA-lxplus-51201734 FA-lxplus-4857eed5 + the rest the driver
       submits) and the control FA-lxplus-cb9273f1
