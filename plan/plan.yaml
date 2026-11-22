@@ -39187,3 +39187,36 @@ entries:
       spread of the top-3, i.e. HPO does not move this setup, and the comparison rests on (b)/(c). The smoke run passes when
       it completes train, test evaluation and plots, logs s/step and peak memory, and the fitted constants a, b, c are within
       10% of 14.017 / 6.713 / 5.303 in one log base (else the target or metric differs from his and is fixed before any search).'
+    fix_at: '2026-11-22T04:15:59+00:00'
+    fix: '(5) prior incomplete: docs/results.tex has shared-standardization pretrainings on these same 1352 catalog_daniel
+      processes, scored on the same 139 held-out with no per-process map, which the prior omits: ''The shared and the s-hat+coupling
+      pretrainings (D83)'', where the shared-target run at hp58''s lr 8.9e-3 BLEW UP (50 non-finite-gradient steps at step
+      8734), which matters directly for a window topping at 9e-3 at constant lr with no anneal; its held-out medians, MSE
+      of log|M|^2 0.60 on the 43 new and 0.067 on the 96 relabels, are the in-house reference for the held-out read; ''Short
+      design runs (D87)'': 1e4 events and 4126 steps reproduce the full-length held-out reads (0.603 vs 0.604), which is the
+      evidence the fallback ''shorter horizon ranks HPs'' should start from; ''Extrapolation in multiplicity: the units of
+      the target (D88)'' on the shared target''s units, against his affine-in-n_out z. Also relevant to the No outcome: the
+      catalog_v3 Muon search, where tuning moved AdamW by nothing (1.03x stage 1, seed spread 0.148 decades). Name these with
+      their results and say what the design takes from each (the lr top and the blow-up, how a blown-up trial is read and
+      what the control''s held-out number is expected to be). (3) seeds against spread: no measured seed spread is named,
+      and the No outcome uses ''the trial-to-trial spread of the top-3'', which is a spread over different HPs, not noise.
+      Cite a measured seed-to-seed spread of a comparable aggregate (e.g. catalog_v3 stage 1''s 0.148 decades, or another
+      in results.tex) and state the yes, partial and no thresholds against it. If no spread fits this aggregate, the design
+      measures it, and a second seed of the control and of the best trial is Joaquin''s call: ask him whether he wants it,
+      with its cost, instead of adding seeds. (4) follows from (3): restate No as best below the control by less than the
+      measured seed spread. (2) the check shows dancat_het_pre''s HETEROSC validation NLL moving with lr on a per-process-standardized
+      target; the design ranks on the plain-mean MSE of a shared multiplicity-affine z, dominated by the processes with the
+      largest error. Show this kind of measure moving with HPs: read the 8 trials'' validation MSE of mu (their run_dirs under
+      runs/dancat_het_pre on CC) and the D83 shared run''s validation MSE, and give by how much it moved. (15) the reported
+      measure is not written by the job config: the test role reads the train recipe''s 1e4 test pool only (eval_subsample
+      10000), the 16,384-per-process test (train rows 55,296..61,679 added) and the 139 held-out scoring need the scoring
+      tool of next 2, which does not exist yet. Write it and run it on the smoke run''s checkpoint, showing the pooled seen
+      and held-out RMSE file, before the search goes out. (14) disk: no disk per job, cache size or free disk given. Estimate
+      the caches from dancat_het_pre''s 40 GB memmap at 1e5 events (train depth 61,680 + 1e4 + 1e4 for 1352, plus the held-out
+      139), read CC /sps free disk (site run ccin2p3 FA -- df -h), and say which sites the trials may land on: require_cache=true
+      fails anywhere the prebuild was not run, and drive.py places trials on any site. (13) state when the 3+3+2 waves finish
+      at the smoke run''s rate (and the cost against the 30 GPU-h rule, which is already in the design). Checks that hold:
+      1 (trials and control differ only in the searched HPs; the control is the untuned point the question is about), 6, 7
+      (LLM and his LLoCa included; parts b and c are later designs), 8, 9 (MSE, reason stated: his loss under D524), 10 (MadGraph-default
+      catalogue pools as his), 11 (his z under D524; our emission-scale target is part c), 12, 16 (same batch, steps, optimizer
+      across cells).'
