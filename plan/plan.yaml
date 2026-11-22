@@ -37769,7 +37769,12 @@ entries:
     - sweep/sweep_config_ftmech_zng4g_scrflagsrch_b128.yaml
     - sweep/sweep_config_ftmech_zng4g_scrflagsrch_b2048.yaml
     - tests/test_promote_final_model.py
-  dead_ends: []
+  dead_ends:
+  - tried: R4 one-flag-at-a-time at b2048 (scratch + input_soft_eps only / + input_pair_logs only at S's HPs, configs @30b23c29);
+      reviewer FIX (kit uug one-flag A/B prior missing; searched stage required)
+    why: 'withdrawn under check 0: it answers which parent change to make (Joaquin''s call), not why the fine-tune is worse;
+      offered, not run. Prior uug A/B at 1e5 events: each flag alone ~0.2 dex better than control, both 0.88 dex (interaction)'
+    at: '2026-11-22T09:42:16+00:00'
   asks:
   - ask: 'Scope: dropping the design''s pre-registered next step (a sigma-start design) and the top-up of two arms below the
       design''s trial count. The restart test reads branch (c): the parent''s optimizer state does not keep the head start
