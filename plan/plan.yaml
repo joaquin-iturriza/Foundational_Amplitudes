@@ -39165,7 +39165,7 @@ entries:
     agent: a54fe33a1743eb2d3
     state: working
     since: '2026-11-22T12:19:32+00:00'
-    state_at: '2026-11-22T12:19:32+00:00'
+    state_at: '2026-11-22T12:37:14.288000+00:00'
     context: 103447
     context_at: '2026-11-22T12:37:21+00:00'
   step_why:
