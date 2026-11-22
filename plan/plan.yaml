@@ -39405,8 +39405,8 @@ entries:
       submits) and the control FA-lxplus-cb9273f1
     '2': 'FA-lxplus-cb9273f1 (the control: first finished run; the scoring check runs on its checkpoint, or on the first trial
       to end before it)'
-    '4': detached daniel_caches_to_cc (lxplus->CC copy of the two key dirs and 1491 stubs), then the CC prebuild-command key
-      check
+    '4': FA-ccin2p3-8d817d54 (CC key check of catalog_daniel_train; heldout passed in FA-ccin2p3-dd63b9fb), then restart the
+      driver with --sites lxplus ccin2p3 and re-set the wave target from the first trial's s/step
   handoff:
     state: 'Step 3 (pools), nearly done. The full pool check (check_pp_pools --labels, recipes/catalog_daniel_all.yaml, lxplus)
       found no label shift (2978 pairs, max |z| 4.08) and 23 problems. (a) The dc_bbx_gzh and dc_gsx_ggsx train pools were
