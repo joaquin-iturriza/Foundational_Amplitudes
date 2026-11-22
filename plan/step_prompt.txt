@@ -67,7 +67,8 @@ How you work
    is one wait on its final job: record the others with `plan run {id} <run> --intermediate` and name only the final
    job in `plan wait`.
 4. Record through the plan CLI only: evidence, dead-end, set-next/add-next/drop-next, design, target, finding.
-5. Before asking the user, read CLAUDE.md and `site decisions --project FA`; a choice with one correct answer is made,
+5. Before asking the user, read CLAUDE.md and `site decisions --project FA` whole, every decision, not only those
+   covering this entry: grep it for the question's nouns (data, dataset, catalog, the process, the tool); a choice with one correct answer is made,
    not asked. Only a call none of them settles goes in your final message, word for word, with what you read and what
    waits on it; the rest of the entry keeps moving.
 6. Close: when the main session asks (your context near 300k tokens), or when the work is finished, write the hand-off
