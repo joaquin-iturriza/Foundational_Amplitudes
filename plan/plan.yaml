@@ -38965,6 +38965,13 @@ entries:
       on seen (1352) and held-out (139) processes, 16,384 test events per process = the 1e4 test pool + train-pool rows 55,296..61,679
       (never trained on), held-out processes predicted with the shared multiplicity-affine statistics (no per-process affine
       map, unlike zero_shot_parent.py), per-process MSEs for the figure in his panels'
+    3: 'Regenerate the catalog_daniel TRAIN pools (1491 processes, n_train 1e5, D51; scripts/job_gen_daniel_catalog.sh / prebuild_recipes):
+      on 2026-11-22 amp_data_cache held 0 dc_*_train pools on CC and lxplus (val/test pools and alpha_s sidecars present),
+      so both memmap prebuilds failed at require_cache. First find what deleted them and fix it where every later run picks
+      it up (a cache an open entry''s recipe reads is never deleted). Disk: ~29 GB of pools (1491 x 1e5 x ~196 B, an estimate)
+      + ~18 GB memmap cache vs 38 GB free on CC /sps/lpnhe: does not fit; place where it fits (lxplus EOS or space made by
+      the pruning tool). Generation design + review (fa-generation), then resubmit the chain as recorded in the 2026-11-22
+      handoff.'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -39026,6 +39033,11 @@ entries:
       if:
       - 'tool reproduces a run''s own test MSE on seen processes: use it for every arm'
       - 'it does not: find the difference before any number goes out'
+    3:
+      feeds: 'whether part (a) can run: its training data'
+      if:
+      - 'pools regenerated and the memmap prebuilds pass: resubmit smokes and scoring (steps 1, 2)'
+      - 'no site has room for pools + cache: bring the disk call to Joaquin with the sizes'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
