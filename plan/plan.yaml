@@ -38678,6 +38678,21 @@ entries:
       lr than scratch; the matched-count question (24 against 16) then goes to Joaquin before any ratio is built; chosen trial
       inside the old window or not lower -> H3 ruled out; best at the new edge -> unresolved. Diverged and spiking trials
       listed apart (D398), never retried.'
+    fix_at: '2026-11-22T03:09:25+00:00'
+    fix: 'Re-check of the revision: fixes 1, 2 and 4 hold, and the numbers reproduce from zng4g_readout.json. log(F/S) is
+      0.433 at batch 128 and 0.442 at batch 2048. Scratch seed log spreads are 0.17 and 0.14. Pairing ranges are 0.19-0.66
+      and 0.37-0.55. A three-seed share resolves to about +-0.3 (log sigma of a three-seed mean about 0.05-0.07, over 0.43),
+      which supports the 0.3/0.7 edges. The branches cover every result and each has its next step. R3 is now read only for
+      H3, with no ratio built from 24 trials. One point remains, the same scope rule as R3 (check 3). The new edge rule lets
+      Sf* grow to 24 trials, +8 past the window edge, while S and F stay at 16, and the share is then read from that 24-trial
+      Sf*. A trial count different from the sibling cells is Joaquin''s call, and no decision of his names it: the 2026-11-20
+      extension of S''s window happened inside S''s 16 trials. The design''s ''it biases against H1'' does not make the count
+      his. Fix: on an edge extension, treat it as R3 is treated. Report the 16-trial share and flag it as edge-limited; read
+      no share from the 24-trial Sf* until Joaquin answers the matched-count question, which is already open as plan question
+      (a). Ask it then as: ''Sf*''s best sits at the lr window edge; read the flags'' share from a 24-trial Sf* against 16-trial
+      S and F, or extend S and F by 8 trials too (about 11 GPU-h per batch)?'' Everything else passes: the configs at ff8297fa
+      change one thing per step (S -> Sf* -> F), the loss is HETEROSC, the trial counts are 16 and the waves match the sibling
+      searches, the disk is 1.5 GB, and the prior now names par:v4_warm_start_fixes.'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
