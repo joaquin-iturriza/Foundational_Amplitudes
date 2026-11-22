@@ -38878,6 +38878,12 @@ entries:
     units: null
     start: '2026-11-22T03:13:00+00:00'
     at: '2026-11-22T03:13:00+00:00'
+  - batch: r1r3_b2048_seeds
+    wall_h: 0.8
+    jobs: 4
+    units: null
+    start: '2026-11-22T09:29:10+00:00'
+    at: '2026-11-22T09:29:10+00:00'
   step_why:
     3:
       feeds: 'D519: how much of the fine-tune''s gap to scratch on Z+4g is the inherited input flags (H1) against the pretrained
