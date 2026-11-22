@@ -40597,3 +40597,9 @@ entries:
     units: null
     start: '2026-11-22T17:02:35+00:00'
     at: '2026-11-22T17:02:35+00:00'
+  - batch: score_control
+    wall_h: 0.5
+    jobs: 1
+    units: null
+    start: '2026-11-22T23:48:07+00:00'
+    at: '2026-11-22T23:48:07+00:00'
