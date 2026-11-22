@@ -39398,3 +39398,27 @@ entries:
       resubmitted (step 3 done; pools on lxplus, copied by site copy where the chain runs). A process with |z| >= 5 is listed
       with its z and shift and its pool is not used until the cause is found (cards, MG version, labeller) and fixed; a short
       or failed process is rebuilt by resubmitting its shard (idempotent).'
+    fix_at: '2026-11-22T05:41:52+00:00'
+    fix: '(1) Check 15, the readout is not written by the job''s command: tools/check_pp_pools.py --labels crashes before
+      any z is computed. main() binds a = ap.parse_args() and then reuses a for every np.load in the pool loop, so ''if a.labels:''
+      reads a memmap: AttributeError: ''memmap'' object has no attribute ''labels'' (reproduced 2026-11-22 in .venv-cpu on
+      a one-process fake spec with DATA_DIR/SCRATCH set). Fix: rename the loop variable, add a test that runs main() with
+      --labels on a tiny spec, then run tools/check_pp_pools.py --spec <a 2-entry spec> --labels on an lxplus login node (site
+      run) against the stored val/test pools before the smoke, so the line it prints is shown. (2) Check 4, the outcome can
+      pass while nothing was compared: datagen.mixed_generation silently skips any pool whose .recipe.json has no pipeline_sha256,
+      and check_pp_pools does not fail when fewer pairs are compared than expected. State, and make the tool enforce, that
+      the LABELS line must report 2 x N process-role pairs (4 for the smoke, 2982 for the batch); fewer = fail. (3) Check
+      15/13, the job layout is not what the design says: scripts/job_gen_daniel_catalog.sh has #SBATCH --cpus-per-task=48
+      (site turns it into request_cpus) and W=${SLURM_CPUS_PER_TASK:-${DANIEL_WORKERS:-48}}; HTCondor sets no SLURM_CPUS_PER_TASK,
+      so an ''8-core'' shard as written requests 48 CPUs and runs 48 MadEvent workers. Name the exact submit line: --hdr=--cpus-per-task=8,
+      --env DANIEL_WORKERS=8 (and AMP_LHE_CORES), MG5_WORK_DIR/MG5_BIN, and the time limit. (4) Check 14, disk: the MadEvent
+      work dirs (AMP_LHE_WORK_DIR=$SCRATCH/lhe_work, on EOS on lxplus) are not counted: 16 shards x 8 concurrent process dirs;
+      give their size per process (from the 2026-10-15 CC generation or the smoke) and the EOS quota free read at submission
+      (eos quota, not df, which shows the 2.2 PB pool), against ~30 GB of pools plus the ~18 GB memmap cache if the chain
+      runs there; consider a node-local work dir. (5) Wall-time target not stated: from the first generation, 185 core-h for
+      the full layout of 1491 processes, so ~185/128 = ~1.5 h per shard if lxplus cores match CC''s; state it, record it on
+      the entry, and check it on the smoke''s per-process time. Checks that hold: measure responds (analysis/zng_uq/data/mixed_generation_z.json:
+      1% label shift on uubar_ttbar_nlo reads |z| 8.28, the other 25 + 74 processes at most 2.7, threshold 5 between); control
+      = each process''s stored val/test pools (lxplus sidecars carry pipeline_sha256, read 2026-11-22); prior searched (results.tex
+      catalog_daniel, decisions D51/D54/D131/D134/D113/D114/D527, the entry''s findings); within the entry''s step 3 and D51/D527;
+      training-only checks (loss, lr, seeds against spread) not applicable to a generation batch.'
