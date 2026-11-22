@@ -31,6 +31,12 @@ def test_mixed_generation():
         assert datagen.mixed_generation({"train": {"p": tr}, "val": {"p": clean}}) == {}
         r = datagen.mixed_generation({"train": {"p": tr}, "val": {"p": bad}})
         assert set(r) == {"p"} and r["p"]["val"]["z"] < -5, r
+        # any_version (a train pool rebuilt on another site's MadGraph): the same-version shift is caught, the clean
+        # pool passes, and z_max=0 returns its z too
+        r = datagen.mixed_generation({"train": {"p": tr}, "val": {"p": same}}, any_version=True)
+        assert set(r) == {"p"} and r["p"]["val"]["z"] < -5, r
+        r = datagen.mixed_generation({"train": {"p": tr}, "val": {"p": clean}}, z_max=0, any_version=True)
+        assert abs(r["p"]["val"]["z"]) < 5, r
 
 
 if __name__ == "__main__":

@@ -631,7 +631,7 @@ def _sqrts_and_logm2(pth):
     return np.sqrt(np.maximum(p[:, 0] ** 2 - (p[:, 1:] ** 2).sum(1), 0)), np.log(np.abs(np.asarray(a[:, -1])))
 
 
-def mixed_generation(paths, z_max=5.0, n_bins=10):
+def mixed_generation(paths, z_max=5.0, n_bins=10, any_version=False):
     """{process: {role: {train, other, z, shift}}} for the processes in `paths` ({role: {process: npy}}) whose train
     and val/test pools come from different generator versions (provenance.pipeline_sha256 of the .recipe.json
     sidecars) AND whose labels disagree: per sqrt(s_hat) decile of the val/test pool, z_i = (median ln|M|^2 of train -
@@ -640,7 +640,8 @@ def mixed_generation(paths, z_max=5.0, n_bins=10):
     far more often than its labels (26 of 28 processes of the zng parent, 74 of 1153 of trial 1262 differ in
     version). On the zng parent's pools u u~ -> t t~ (one loop), its train pool regenerated with a ~1% label shift,
     reads z = 8.3 (val) and 6.1 (test); the other 25 processes of the parent and the 74 of trial 1262 at most 2.7
-    (zng_uq_benchmark, analysis/zng_uq/data/mixed_generation_z.json)."""
+    (zng_uq_benchmark, analysis/zng_uq/data/mixed_generation_z.json). any_version: compare whatever the versions (a
+    train pool rebuilt on another site's MadGraph: the version is not in the sha); z_max=0 returns every process's z."""
     by = {}
     for role, d in paths.items():
         for name, pth in d.items():
@@ -652,11 +653,11 @@ def mixed_generation(paths, z_max=5.0, n_bins=10):
                 by.setdefault(name, {})[role] = (sha, pth)
     out = {}
     for name, r in by.items():
-        if "train" not in r or len({v[0] for v in r.values()}) < 2:
+        if "train" not in r or (not any_version and len({v[0] for v in r.values()}) < 2):
             continue
         s_tr, l_tr = _sqrts_and_logm2(r["train"][1])
         for role in ("val", "test"):
-            if role not in r or r[role][0] == r["train"][0]:
+            if role not in r or (not any_version and r[role][0] == r["train"][0]):
                 continue
             s_e, l_e = _sqrts_and_logm2(r[role][1])
             edges = np.quantile(s_e, np.linspace(0, 1, n_bins + 1)); edges[-1] += 1e-9

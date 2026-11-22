@@ -3,7 +3,9 @@ recipes/catalog_v3_pp_test.yaml, the val and test pools in $DATA_DIR and the tra
 load, hold the recipe's row counts, carry their alpha_s sidecar (<pool>.alphas.npy, one value per row), and the
 process has its diagram sidecar (data/diagrams/<name>.diagrams.json, parses). Prints one line per problem and a
 summary; exit 1 if any.
-    python tools/check_pp_pools.py
+    python tools/check_pp_pools.py [--spec recipes/<spec>.yaml] [--labels]
+--labels: also each train pool's labels against its val and test pools (datagen.mixed_generation, any generator
+version): BADZ above |z| = 5; prints the largest |z|.
 """
 import json, os, sys
 
@@ -15,12 +17,18 @@ DATA, CACHE = os.environ["DATA_DIR"], os.path.join(os.environ["SCRATCH"], "amp_d
 
 
 def main():
-    procs = yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v3_pp_test.yaml")))["processes"]
-    bad = []
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--spec", default=os.path.join(ROOT, "recipes", "catalog_v3_pp_test.yaml"))
+    ap.add_argument("--labels", action="store_true")
+    a = ap.parse_args()
+    procs = yaml.safe_load(open(a.spec))["processes"]
+    bad, paths = [], {"train": {}, "val": {}, "test": {}}
     for e in procs:
         n = e["name"]
         for role, d, want in (("val", DATA, e["n_val"]), ("test", DATA, e["n_test"]), ("train", CACHE, e["n_train"])):
             p = os.path.join(d, f"{n}_13000-13000GeV_{role}_lhe_amplitudes.npy")
+            paths[role][n] = p
             try:
                 a = np.load(p, mmap_mode="r")
                 if a.shape[0] < want:
@@ -35,6 +43,13 @@ def main():
             json.load(open(dg))
         except Exception as ex:                         # noqa: BLE001
             bad.append(f"{n} diagrams: {type(ex).__name__}")
+    if a.labels:
+        sys.path.insert(0, ROOT)
+        import datagen
+        zs = datagen.mixed_generation(paths, z_max=0, any_version=True)
+        allz = [(abs(v["z"]), n, r) for n, d in zs.items() for r, v in d.items()]
+        bad += [f"{n} {r}: train labels against {r} z={z:.1f}" for z, n, r in allz if z > 5]
+        print("LABELS %d process-role pairs compared, largest |z| %s" % (len(allz), max(allz)[:3] if allz else None))
     for b in bad:
         print("BAD", b)
     print(f"checked {len(procs)} processes, {len(bad)} problems")
