@@ -39097,7 +39097,7 @@ entries:
       ~/.local/share/ccorch/site.bak.pre-condor-cpu; 425 slots fit 16G/8cpu).'
   step_waits:
     '1': FA-lxplus-a0cc1bc6
-    '2': step 3 (train pools regenerated), then the smoke run's checkpoint
+    '2': FA-lxplus-a0cc1bc6
     '3': FA-lxplus-a0cc1bc6
   handoff:
     state: 'Part (a) design PASSED 2026-11-22T04:21 (design-reviewer; covers prebuilds, 60-step smokes H100+V100, scoring
