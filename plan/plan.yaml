@@ -39391,6 +39391,18 @@ entries:
       while trials 0, 1 and the control were still IDLE (run_trial.py reads the config at start). The memmap key does not
       depend on it (base_key_doc: pools and layout only). Driver relaunched as llmcmp_a_drive4 with --retry-failed 6cdb4904
       (penalty removed).'
+  - at: '2026-11-22T17:02:49+00:00'
+    text: '2026-11-22 ~18:00 CET: all 4 part (a) jobs are training at config 2a597c478 (lxplus jobs started 16:45-16:46 CET,
+      after the 16:33 CET sync of the preprocess_per_dataset fix; none hit the assert). Step rates (run.py''s ''Finished iteration''
+      lines): control FA-lxplus-cb9273f1 A100-PCIE-40GB 0.383 s/step (iter 1000 at 383 s, estimate 6.48 h); trial 0 FA-lxplus-51201734
+      (hp1860, lr 1.03e-3, EMA on) A100-40GB 0.401 s/step (6.77 h); trial 1 FA-lxplus-4857eed5 (hp0353, lr 3.20e-3) A100-40GB
+      0.392 s/step (6.62 h); trial 2 retry FA-ccin2p3-bd3e4211 (hp1333, lr 8.92e-3, EMA on) H100 NVL 0.231 s/step (iter 20281
+      at 4677 s, estimate 3.90 h). Peak VRAM 13.0 GB at batch 24,576 (fits every allowed >= 32 GB GPU). lxplus start-up before
+      training ~33-37 min (memmap open 261-522 s incl. page-cache prefetch 190-428 s from EOS). Wall target of wave 1 + control
+      re-set to 7.3 h (A100 6.8 h + start-up); the 22 h limits cover a V100 at up to ~2.9x the A100 step. The measured cost:
+      ~0.39 s/step on A100 = 6.6 GPU-h per run, ~0.23 on H100 = 3.9: 9 runs ~35-60 GPU-h, under the 40-90 estimate. Reading
+      a running lxplus job''s training log: site logs shows only the condor event log (stdout/stderr are transferred at job
+      end); condor_tail -stderr <cluster>.0 via site run in the AFS submit dir shows it.'
   step_waits:
     '1': detached llmcmp_a_drive4 (the 8-trial DyHPO search on lxplus + ccin2p3; wave 1 FA-lxplus-51201734 FA-lxplus-4857eed5
       FA-ccin2p3-bd3e4211, waves 2-3 submitted by the driver) and the control FA-lxplus-cb9273f1
