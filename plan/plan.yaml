@@ -39299,3 +39299,18 @@ entries:
       and said so), i.e. HPO does not move this setup, and the comparison rests on (b)/(c). The smoke run passes when it completes
       train, test evaluation and plots, logs s/step and peak memory, and the fitted constants a, b, c are within 10% of 14.017
       / 6.713 / 5.303 in one log base (else the target or metric differs from his and is fixed before any search).'
+    passed_at: '2026-11-22T04:22:21+00:00'
+    reviewer: 'Design of 04:21 re-checked on every earlier FIX point. Check 2: reran analysis/catalog_daniel/dancat_plain_mse.py
+      @a93ba8fa on CC; plain-mean val MSE of log|M|^2 over the 1352 processes goes from 0.156 (lr 1.73e-3) to 0.0167 (8.94e-3)
+      across dancat_het_pre''s 8 trials, a 9.4x range, with the blown-up hp1466 at 0.0576, so the ranking measure resolves
+      the searched HPs on this catalog. Check 3: no measured seed spread exists for this aggregate (searched results.tex;
+      the catalog_v3/v4 spreads of 0.09-0.23 decades are per-probe zero-shot ratios). The seed-43 pair of control and best
+      trial goes to Joaquin as a question with the costed search, and No is read against that pair or reported with no spread.
+      Check 1: one change (tuned vs untuned) on the same fixed setup. Checks 14/15: train cache ~16 GB plus held-out 1.6 GB
+      against 36 GB free on CC /sps; cache keyed by content (data_mmap); trials only on sites with a completed prebuild; tools/llm_score.py
+      run on the smoke checkpoint and must reproduce the run''s own test stage. Check 13: template space minus the Muon-only
+      knobs, 8 trials in waves 3+3+2, timing recorded from the smoke rate. Checks 9/11: MSE and his z under D524. Check 5
+      terms: catalog_daniel, dancat, Suprio, LLM, llm_compare, 2606.23791, shared target, shared standardi, affine multiplicity,
+      alphas input, catalog_norm, seed spread (results.tex); suprio, llm, qwen, catalog_daniel, dancat (plan.yaml); site decisions
+      (D45, D59, D83, D87, D93). The prior now names D83 (the shared run blew up at 8.9e-3), D87, D88 and the catalog_v3 AdamW
+      tuning result.'
