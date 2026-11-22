@@ -39135,6 +39135,15 @@ entries:
     - 1
     answered_at: '2026-11-22T03:51:47.016000+00:00'
     decision: D527
+  - ask: 'Scope: skip the one 50-step D395 smoke run before part (a)''s search (new launch path: regenerated catalog_daniel
+      pools, the new alpha_s input, the new scoring), and send the search directly once the data caches are built.'
+    at: '2026-11-22T09:56:59+00:00'
+    searched: 'CLAUDE.md (D395: a new launch path first runs once ~50 steps through every stage) and every decision grepped
+      for smoke, test run, D395. Joaquin''s messages 2026-11-14T04:31 (a pasted draft), 2026-11-13T03:05 (draft section answers)
+      and 2026-11-01T15:56 (deleting caches) do not address a smoke before this search'
+    blocks: only whether the single smoke precedes the search
+    blocks_steps: &id004
+    - 2
   owner:
     agent: aa5836ca091e40268
     state: closed
@@ -40153,3 +40162,11 @@ entries:
     units: null
     start: '2026-11-22T09:15:03+00:00'
     at: '2026-11-22T09:15:03+00:00'
+  ask: 'Scope: skip the one 50-step D395 smoke run before part (a)''s search (new launch path: regenerated catalog_daniel
+    pools, the new alpha_s input, the new scoring), and send the search directly once the data caches are built.'
+  waiting_since: '2026-11-22T09:56:59+00:00'
+  searched: 'CLAUDE.md (D395: a new launch path first runs once ~50 steps through every stage) and every decision grepped
+    for smoke, test run, D395. Joaquin''s messages 2026-11-14T04:31 (a pasted draft), 2026-11-13T03:05 (draft section answers)
+    and 2026-11-01T15:56 (deleting caches) do not address a smoke before this search'
+  blocks: only whether the single smoke precedes the search
+  blocks_steps: *id004
