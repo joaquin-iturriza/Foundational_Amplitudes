@@ -38743,9 +38743,15 @@ entries:
     - LLoCa transformer in Suprio's LLM-comparison setup (1501-process LLM catalogue) with a DyHPO search
   decisions:
   - D525
-  next: Get Suprio's setup and data on a site (catalogue, data_running_alpha.npy, his splits, his metric code), map the LLM
-    run's conditions onto run.py, cost one full LLoCa run, design the DyHPO search (fewer steps or a subset only if it still
-    ranks HPs), design review, submit
+  next:
+    1: 'Get Suprio''s LLM-run data onto CC: processes/*/data_running_alpha.npy for the 1501 processes, the rows his run used
+      (55,296 train per process, val, the 16,384 test per process), test_split.json as he ran it, and his metric code; then
+      a reader for it, the 50-step smoke run through every stage [D395], cost one full run, design the DyHPO search, design
+      review, submit'
+    2: 'Build the LLM run''s conditions into run.py in a worktree: alpha_s as a per-particle input column (ln alpha_s + 1.994)/0.169,
+      the target z = (log|M|^2 - 14.017 + 6.713 n_out)/5.303 as an amp_trafos option, validation once per epoch (3042 steps)
+      with the best-val checkpoint, and the pooled test RMSE of log|M|^2 seen/held out; CPU tests on catalog_daniel-shaped
+      pools'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -38760,3 +38766,15 @@ entries:
     state: working
     since: '2026-11-22T02:58:44+00:00'
     state_at: '2026-11-22T02:58:44+00:00'
+  step_why:
+    1:
+      feeds: whether (a)-(c) can be compared with the LLM's 0.321/0.721 on his own test events
+      if:
+      - 'his files reach a site: write the reader, smoke run, design and cost the search'
+      - 'he cannot share them: Joaquin''s call whether our regeneration of his catalogue (catalog_daniel: same 1491 processes
+        and MadEvent cards, our |M|^2 labels, 1e5/1e4/1e4 events) replaces them, reported as different test events'
+    2:
+      feeds: the launch path of (a), (b) and (c)
+      if:
+      - 'tests pass: ready for the smoke run as soon as the data is on a site'
+      - 'a condition cannot be matched in our pipeline: say which and what it costs the comparison, to Joaquin'
