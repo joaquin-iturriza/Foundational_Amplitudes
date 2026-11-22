@@ -39550,3 +39550,10 @@ entries:
       / 1.5 h from 185 core-h over 128 cores, rescaled from the smoke. Searched: docs/results.tex catalog_daniel, dc_ train,
       regeneration; decisions D51, D54, D131, D134, D113/D114 (hold scoped to the preprocessing study), D209, D527; the entry''s
       findings and hand-off.'
+  targets:
+  - batch: gen_smoke
+    wall_h: 0.5
+    jobs: 1
+    units: null
+    start: '2026-11-22T05:51:11+00:00'
+    at: '2026-11-22T05:51:11+00:00'
