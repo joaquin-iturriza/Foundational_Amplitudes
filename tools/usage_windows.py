@@ -92,10 +92,11 @@ def files():
     return sorted(glob.glob(PROJ + "/*/*.jsonl")) + sorted(glob.glob(PROJ + "/*/*/subagents/agent-*.jsonl"))
 
 
-def extract(out=CACHE):
+def extract(out=CACHE, limits=LIMITS, min_mtime=0):
     os.makedirs(os.path.dirname(out), exist_ok=True)
     seen, n, hits = {}, 0, {}
-    for f in files():
+    fs = [f for f in files() if os.path.getmtime(f) >= min_mtime]
+    for f in fs:
         folder = f[len(PROJ) + 1:].split("/")[0]
         agent = os.path.basename(f)[6:-6] if "/subagents/" in f else None
         session = f.split("/")[-3] if agent else os.path.basename(f)[:-6]
@@ -137,10 +138,10 @@ def extract(out=CACHE):
                 continue
             fh.write(json.dumps(r) + "\n")
             n += 1
-    with open(LIMITS, "w") as fh:
+    with open(limits, "w") as fh:
         for h in sorted(hits.values(), key=lambda h: h["ts"]):
             fh.write(json.dumps(h) + "\n")
-    print("%d calls from %d files -> %s; %d limit messages -> %s" % (n, len(files()), out, len(hits), LIMITS))
+    print("%d calls from %d files -> %s; %d limit messages -> %s" % (n, len(fs), out, len(hits), limits))
 
 
 def load(path=CACHE):

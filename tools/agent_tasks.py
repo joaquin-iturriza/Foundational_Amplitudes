@@ -232,9 +232,12 @@ def main():
     if a.mechanical:
         a.since, a.scored_before = max(a.since, MECH_SINCE), "9999"
         a.out = a.out if a.out != ap.get_default("out") else "analysis/agent_redesign/mechanical_watch.json"
-        subprocess.run([sys.executable, os.path.join(ROOT, "tools", "usage_windows.py"), "extract"],
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    calls = [c for c in uw.load() if c["agent"]]
+        # bounded: only transcripts touched since the switch, into their own cache (a full extract of all
+        # ~/.claude/projects took over 2400 s); the full cache of `usage_windows.py extract` is left alone
+        mech_cache = os.path.expanduser("~/.cache/fa_usage/calls_mechanical.jsonl")
+        uw.extract(mech_cache, os.devnull, datetime.fromisoformat(MECH_SINCE).replace(
+            tzinfo=__import__("datetime").timezone.utc).timestamp())
+    calls = [c for c in uw.load(mech_cache if a.mechanical else uw.CACHE) if c["agent"]]
     by_agent = defaultdict(list)
     for c in calls:
         by_agent[c["agent"]].append(c)
