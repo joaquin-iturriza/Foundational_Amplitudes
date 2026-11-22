@@ -38036,6 +38036,16 @@ entries:
       is worse; offered to him, not run. KEPT: Sf* b2048 seeds 43/44 (Joaquin asked; one seed -> three-seed share) and the
       last 2 trials of the b128 ft lr-window extension (H3 was the live lead at b128, 22/24 done); drive restarted on ft_b128
       alone (ftmech_ftb128_drive3).'
+  - at: '2026-11-22T13:05:44+00:00'
+    text: '2026-11-22 R1 batch 2048 three-seed read (zng4g_r1_read.py @f52eb72b and per-seed train/val commit after it; figs
+      zng4g_r1_b2048 v2 (per-seed raw val curves), zng4g_r1_trainval_b2048 v2 (per seed); captions OK). Searched scratch+flags
+      chosen trial hp1377 (lr 0.031) seeds 42/43/44 best 0.122/0.140/0.165 (mean 0.142) vs scratch 0.058/0.067/0.064 (0.063)
+      and fine-tuned 0.097/0.100/0.097 (0.098): flags/scratch 2.26, fine-tuned/flags 0.69, fine-tuned/scratch 1.56; flags''
+      share of the gap log(2.26)/log(1.56) = 1.84, 10-90% over 27 triples 1.45-2.27 -> branch (a) H1 confirmed at b2048. BLOW-UPS
+      listed apart (D398): seeds 43 and 44 of scratch+flags blow up (val > 10x best-so-far first at step 702 and 429 of 1953;
+      val up to 4e3-6e3; recover only in the WSD cooldown, end/best 18x and 30x); their best checkpoints come before, so they
+      are read there; on seed 42 alone the share is 1.49 (1.42-1.60), still (a). The flags'' chosen lr 0.031 is unstable at
+      2 of 3 seeds.'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
