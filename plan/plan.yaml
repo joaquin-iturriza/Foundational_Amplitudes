@@ -39120,10 +39120,6 @@ entries:
       on seen (1352) and held-out (139) processes, 16,384 test events per process = the 1e4 test pool + train-pool rows 55,296..61,679
       (never trained on), held-out processes predicted with the shared multiplicity-affine statistics (no per-process affine
       map, unlike zero_shot_parent.py), per-process MSEs for the figure in his panels'
-    4: 'CC for part (a) trials: let a run open a memmap cache copied from another site without its pools (pool identities
-      read from the cache''s key_doc.json when the pool file is absent, require_cache satisfied by the cache), in a worktree
-      with a test and repo review; then site copy the lxplus caches to CC (df re-read, ~18 GB vs 36 GB free) and show one
-      CC job opening it under the same key before trials are placed there'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -39245,13 +39241,6 @@ entries:
       if:
       - 'tool reproduces a run''s own test MSE on seen processes: use it for every arm'
       - 'it does not: find the difference before any number goes out'
-    4:
-      feeds: where part (a)'s 8-trial search and control run (lxplus only, or lxplus and CC), so the search finishes in one
-        wave at site pick's width
-      if:
-      - 'a CC job opens the copied cache under the lxplus key: CC joins drive.py --sites for the search'
-      - 'it cannot (key differs or the load still needs pools): the search runs on lxplus alone, its timing from lxplus''s
-        GPU start'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
@@ -39412,8 +39401,6 @@ entries:
       submits) and the control FA-lxplus-cb9273f1
     '2': 'FA-lxplus-cb9273f1 (the control: first finished run; the scoring check runs on its checkpoint, or on the first trial
       to end before it)'
-    '4': FA-ccin2p3-8d817d54 (CC key check of catalog_daniel_train; heldout passed in FA-ccin2p3-dd63b9fb), then restart the
-      driver with --sites lxplus ccin2p3 and re-set the wave target from the first trial's s/step
   handoff:
     state: 'Step 3 (pools), nearly done. The full pool check (check_pp_pools --labels, recipes/catalog_daniel_all.yaml, lxplus)
       found no label shift (2978 pairs, max |z| 4.08) and 23 problems. (a) The dc_bbx_gzh and dc_gsx_ggsx train pools were
