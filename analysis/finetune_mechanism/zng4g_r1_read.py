@@ -111,14 +111,14 @@ def h3(b):
     import plot_style as ps
     fig, ax = ps.figure()
     old = [t for t in r["trials"] if t[2] < 16]; new = [t for t in r["trials"] if t[2] >= 16]
-    ax.plot([t[0] for t in old], [t[1] for t in old], "s", color=ps.C.vermillion, label="fine-tuned, first 16 trials")
-    ax.plot([t[0] for t in new], [t[1] for t in new], "s", color=ps.C.vermillion, mfc="none", label="fine-tuned, 8 added trials")
+    ax.plot([t[0] for t in old], [t[1] for t in old], "s", color=ps.C.vermillion, label="first 16 trials")
+    ax.plot([t[0] for t in new], [t[1] for t in new], "s", color=ps.C.vermillion, mfc="none", label="8 added trials")
     for e in ow:
         ax.axvline(e, color=ps.C.vermillion, linestyle=":")
     for e in nw:
         ax.axvline(e, color=ps.C.grey, linestyle="--")
-    ax.plot([], [], color=ps.C.vermillion, linestyle=":", label="lr window, first 16")
-    ax.plot([], [], color=ps.C.grey, linestyle="--", label="lr window, extended")
+    ax.plot([], [], color=ps.C.vermillion, linestyle=":", label="window, first 16")
+    ax.plot([], [], color=ps.C.grey, linestyle="--", label="window, extended")
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlabel(f"learning rate, batch {b}"); ax.set_ylabel(r"best MSE$(\log|\mathcal{M}|^2)$")
     ps.process_label(ax, r"$q\bar q\to Z+4g$")
