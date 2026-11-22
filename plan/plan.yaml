@@ -39879,6 +39879,22 @@ entries:
       and said so), i.e. HPO does not move this setup, and the comparison rests on (b)/(c). The smoke run passes when it completes
       train, test evaluation and plots, logs s/step and peak memory, and the fitted constants a, b, c are within 10% of 14.017
       / 6.713 / 5.303 in one log base (else the target or metric differs from his and is fixed before any search).'
+    fix_at: '2026-11-22T07:52:01+00:00'
+    fix: 'Time per unit from the same setup (check 15): the 07:51 design fixes my last finding (every GPU job on lxplus, where
+      pools and caches are; the smoke log must show the prebuild''s cache key directory; the ~28 h queue start is in the timing).
+      But it cuts the two smokes, one per GPU type, to one smoke on ''one lxplus GPU with at least 32 GB''. lxplus slots with
+      >= 32 GB are a mix of whole V100, A100, H100 and H200 GPUs (site''s CONDOR_GPU_REQ and gpus_minimum_memory, ~/.local/bin/site
+      lines 445-455), and the smoke reports whichever model it got. Trials are then sized with ''the smoke run''s s/step on
+      its GPU type'', a rate that exists for that type only. A trial that lands on a slower model (V100 against A100/H100
+      is about 2-3x) gets a job limit sized from a faster GPU and is cut. That is the 2026-11-10 failure (V/B sweeps sized
+      from a sibling''s rate ran 3x slower and every trial was cut). The 04:21 design avoided it with an H100 and a V100 smoke.
+      Fix, one of: (a) pin the smoke, scoring and trials to one GPU model with a Condor requirement on the model name (GPUs_DeviceName),
+      and say which model and how many such slots site pick sees; (b) set every trial''s job limit from the slowest model
+      allowed: a smoke on that model (V100 32 GB if allowed), or one 60-step smoke per allowed model; (c) restrict --gpu-min-mem
+      so only models with a measured rate are allowed. Smaller point: fix the stale line ''the smokes and score 3 x <= 1 GPU-h''
+      to the jobs actually planned. Unchanged from the 04:21 pass: matched lr-1e-3 control; the measure moves 9.4x across
+      lr (dancat_plain_mse.py, 0.156 down to 0.0167); the seed-43 pair is Joaquin''s call; outcome stated; MSE loss per D524-D527;
+      8-trial search over the template''s coupled space; disk on lxplus EOS (~77 GB free, ~48 GB planned, re-read before prebuilds).'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
