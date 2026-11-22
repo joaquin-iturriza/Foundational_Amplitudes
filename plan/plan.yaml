@@ -37867,9 +37867,9 @@ entries:
     - 4
   owner:
     agent: aea3b3e66649163d1
-    state: stopped
+    state: working
     since: '2026-11-22T02:15:37+00:00'
-    state_at: '2026-11-22T02:22:17.733000+00:00'
+    state_at: '2026-11-22T02:57:38.845000+00:00'
     context: 145201
     context_at: '2026-11-22T02:58:34+00:00'
   findings:
