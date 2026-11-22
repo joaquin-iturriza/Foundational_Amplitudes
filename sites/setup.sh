@@ -36,7 +36,9 @@ if [ ! -x "$BIN" ]; then
   echo "installing MadGraph $MG5_VER into $ROOT"
   tmp=$(mktemp -d)
   ok=0
+  # 3.7.0 is published under launchpad's 3.6.x series (3.7.x: 404, 2026-11-22)
   for url in "https://launchpad.net/mg5amcnlo/3.0/${MG5_VER%.*}.x/+download/MG5_aMC_v${MG5_VER}.tar.gz" \
+             "https://launchpad.net/mg5amcnlo/3.0/3.6.x/+download/MG5_aMC_v${MG5_VER}.tar.gz" \
              "https://launchpad.net/mg5amcnlo/3.0/3.6.x/+download/MG5_aMC_v3.6.7.tar.gz"; do
     echo "  $url"
     if curl -fsSL -m 900 -o "$tmp/mg5.tgz" "$url"; then ok=1; break; fi
@@ -45,6 +47,8 @@ if [ ! -x "$BIN" ]; then
   mkdir -p "$(dirname "$ROOT")"
   tar xzf "$tmp/mg5.tgz" -C "$tmp" && mv "$tmp"/MG5_aMC_v* "$ROOT"
   rm -rf "$tmp"
+  got=$(sed -n 's/^version = //p' "$ROOT/VERSION" 2>/dev/null)
+  [ "$got" = "$MG5_VER" ] || echo "warning: asked MadGraph $MG5_VER, installed $got (download fell back)"
 fi
 # non-interactive smoke: MG5 starts and quits (writes its configuration on first run)
 echo quit | timeout 600 "$BIN" >/dev/null 2>&1 || { echo "mg5_aMC does not start"; exit 1; }
