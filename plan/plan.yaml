@@ -37719,8 +37719,6 @@ entries:
       -024a7d8b) and of the extended ft chosen trial (FA-ccin2p3-2b0a8ebc, -9485314c) running -> three-seed b2048 share by
       zng4g_r1_read.py 2048; b128 when ftmech_r1r3_drive2 ends (scrflagsrch_b128 3/16, ft_b128 22/24): seeds 43/44 of each
       chosen trial, zng4g_r1_read.py 128'
-    4: 'R4 one-flag-at-a-time at b2048 (design 2026-11-22, configs @30b23c29): scratch + input_soft_eps only and scratch +
-      input_pair_logs only at S''s HPs, seeds 42-44 (6 jobs, 2.1 GPU-h), against S and Sf; cost share per flag'
   done_when: null
   notes_ref: null
   match: dsave_ftmech_*,ftmech_*
@@ -38975,14 +38973,7 @@ entries:
       - 'share >= 0.7: H1, R4 one-flag test'
       - 'share <= 0.3: the start; path-bug vs plasticity design'
       - 'between: both'
-    4:
-      feeds: 'D519: which inherited flag makes the model worse on Z+4g, so which parent change Joaquin decides'
-      if:
-      - 'soft_eps carries it: design a fine-tune with input_soft_eps 0'
-      - 'pair_logs carries it or only the pair: Joaquin''s call on the parent'
-      - 'both share it: stage 2 searches the ambiguous arm'
   step_waits:
-    '4': a reviewer
     '3': FA-ccin2p3-e754cd17 FA-ccin2p3-024a7d8b FA-ccin2p3-2b0a8ebc FA-ccin2p3-9485314c
   handoff:
     state: '2026-11-22 08:25 UTC. D519/D520 widened the entry: find why the Z+4g fine-tune ends ~1.55x above scratch. HYPOTHESES
