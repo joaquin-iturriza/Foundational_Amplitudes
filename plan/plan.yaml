@@ -39015,7 +39015,7 @@ entries:
     decision: D527
   owner:
     agent: a765e8d955c16a241
-    state: working
+    state: closed
     since: '2026-11-22T04:07:09+00:00'
     state_at: '2026-11-22T04:52:32.537000+00:00'
     context: 233350
@@ -39081,37 +39081,29 @@ entries:
     '1': llm_compare step 3 (train pools)
     '2': FA-ccin2p3-c3333b41
   handoff:
-    state: 'Data settled by D51/D527: our catalog_daniel pools (1352 train / 139 held-out recipes, 1e5/1e4/1e4 per process,
-      per-event alpha_s sidecars on CC). Input data.alphas_input merged (7d3a6ee9, repo review PASS at 67dad1aa). Part (a)''s
-      sweep config drafted, committed 9315c74f (sweep/sweep_config_llmcmp_a_adamw_const.yaml), NOT smoke-run, NOT design-reviewed.
-      Next: (1) memmap prebuild of catalog_daniel_train at train_subsample 55296 / eval_subsample 10000 (scripts/job_mmap_prebuild.sh
-      with the config''s data overrides; check CC /sps free disk first; dancat_het_pre''s cache was eval 2000 so it does not
-      serve); (2) 50-step smoke run of that config through every stage [D395] on one H100 (sweep/drive.py with a one-trial
-      copy at t_steps 50, or run.py with the fixed params), read: the fitted affine target constants against his 14.017 /
-      6.713 / 5.303 (settles ln vs log10 only together with his table''s metric), whether batch 24,576 fits (H100 80GB; else
-      accumulation), s/step -> cost of one 60,840-step run and of the 8-trial search; (3) scoring tool: pooled RMSE of log|M|^2
-      (sqrt of the mean over all test events), seen 1352 and held-out 139, test = 1e4 test pool + train rows 55,296..61,679
-      (16,384 per process, disjoint), held-out predicted with the shared affine stats (no per-process map, unlike tools/zero_shot_parent.py);
-      (4) plan design + design-reviewer; search above 30 GPU-h needs Joaquin''s yes under the GPU budget rule (estimate: dancat_het_pre''s
-      0.412 s/step on V100 at 16,384 scaled to 24,576 is ~0.62 s/step, ~10.5 V100-h per run, so 8 full trials ~60-85 GPU-h
-      before H100 speedup) unless a shorter horizon is shown on existing data to rank HPs; (5) parts (b) width scale-up toward
-      359.6M at (a)''s best HPs (muP: lr transfers), (c) our latest setup (emission-scale target, inputs, MuonAdamW, WSD,
-      template space). Every comparison with the LLM''s 0.321/0.721 carries: his events, ours a regeneration of the same catalogue.'
-    decisions: 'D525 (HPO in his setup), D522 (width scale-up), D523 (our latest setup), D524 (match the LLM run''s conditions,
-      not his LLoCa implementation), D526 (his batch construction need not be replicated: kept 55,296 events/process/epoch,
-      60,840 updates of 24,576, dropped one-process micro-batches), D527 (Daniel''s catalog, i.e. our catalog_daniel pools).
-      Part (a) choices: AdamW at constant lr after warmup (WSD, cooldown 0) because the LLM ran constant lr and optimizer/scheduler
-      are listed by Joaquin as part of our latest setup (c); inputs momenta + species + alpha_s only (coupling powers zeroed,
-      no levers, no diagrams); MSE plain mean; target as shared multiplicity-affine standardization (his z''s form); clip
-      5 (ours); validation every 3042 steps; test 16,384 per process as stated.'
-    ruled_out: 'Fetching Suprio''s data_running_alpha.npy (D51/D527: we generate it; asking was a missed search of D51). A
-      per-pool alpha_s = 1 fallback for sidecar-less electroweak pools (repo review: an outlier input the LLM never saw).
-      The in-memory data path for alphas_input (cannot hold the catalogue).'
-    running: none
-    files: sweep/sweep_config_llmcmp_a_adamw_const.yaml (9315c74f), data_mmap.py + tests/test_alphas_input.py (alphas_input,
-      7d3a6ee9), recipes/catalog_daniel_train.yaml, recipes/catalog_daniel_heldout.yaml, scripts/job_mmap_prebuild.sh, docs/results.tex
-      par. 'Pretraining on it (2026-10-16, D59)' and 'Its held-out split', tools/zero_shot_parent.py, Suprio's table /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/suprio_setup_table.pdf
-    written: '2026-11-22T03:55:30+00:00'
+    state: 'Part (a) design PASSED 2026-11-22T04:21 (design-reviewer; covers prebuilds, 60-step smokes H100+V100, scoring
+      on the smoke, then the 8-trial search + matched control costed from the smoke; >30 GPU-h and a seed-43 pair go to Joaquin
+      via plan ask). lr window [1e-3, 9e-3] (f53e1da5). Scoring tool tools/llm_score.py + scripts/job_llm_score.sh merged
+      at 24a677db (repo review PASS a93ba8fa, nits fixed 089c1830); parent_shared now allowed on memmap. BLOCKER: both CC
+      memmap prebuilds (FA-ccin2p3-5920ce08, -099e0ce5) failed at require_cache: the 1491 catalog_daniel 100k TRAIN pools
+      are absent from amp_data_cache on CC and lxplus (val/test pools and alpha_s sidecars are present, 2982/2962 on each
+      site). Dependents cancelled; events E8092-E8096 acked. Next = step 3: find what deleted the pools and fix it at the
+      source, generation design + review, regenerate (D51) where pools (~29 GB est) + memmap cache (~18 GB est) fit (CC /sps/lpnhe
+      had 38 GB free 2026-11-22, does not fit both), then resubmit the chain. A find over /sps/lpnhe/jiturrizaramirez01 (maxdepth
+      5) for a surviving copy of dc_bb_bb_13000-13000GeV_train* was still running at close (local background task); not read.'
+    decisions: 'D525/D522/D523/D524/D526/D527 as before. Test = each process''s 1e4 test pool (same estimand as his 16,384;
+      no train rows). Matched control added: our LLoCa at his LLoCa''s lr 1e-3 constant, no warmup/L2/EMA. Measure check:
+      analysis/catalog_daniel/dancat_plain_mse.py, plain-mean val MSE of log|M|^2 over 1352 moves 0.156 (lr 1.73e-3) -> 0.0167
+      (8.94e-3) on dancat_het_pre. No measured seed spread for this aggregate: seed-43 pair is Joaquin''s call with the costed
+      search.'
+    ruled_out: 16,384-event test with train rows 55,296..61,679 (needs new pool files and a third cache, same estimand). The
+      drafted lr window [4.3e-4, 3.9e-3] (below the measured best on this catalog). zero_shot_parent.py for the held-out read
+      (in-memory path; alphas_input is memmap-only).
+    running: none (prebuilds failed; smokes FA-ccin2p3-6f47ac71/-57ba0c9d and score FA-ccin2p3-c3333b41 cancelled)
+    files: sweep/sweep_config_llmcmp_a_adamw_const.yaml (f53e1da5), tools/llm_score.py, scripts/job_llm_score.sh, analysis/catalog_daniel/dancat_plain_mse.py
+      (24a677db), scripts/job_mmap_prebuild.sh (args after --), scripts/job_config_smoke.sh, the 2026-11-22 findings on this
+      entry (exact overrides and chain)
+    written: '2026-11-22T04:57:45+00:00'
   designs:
   - at: '2026-11-22T04:13:14+00:00'
     question: 'Part (a), D525: in the conditions of Suprio''s LLM pID run (D524, D526, D527: our catalog_daniel regeneration
