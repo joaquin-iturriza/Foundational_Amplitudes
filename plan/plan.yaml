@@ -38972,7 +38972,8 @@ entries:
       - 'share >= 0.7: H1 confirmed; the parent change is Joaquin''s call (one-flag test offered, not run)'
       - 'share <= 0.3: the start; path-bug vs plasticity design'
       - 'b128 H3 yes: lr window part of the gap at b128'
-  step_waits: {}
+  step_waits:
+    '3': FA-ccin2p3-e754cd17 FA-ccin2p3-024a7d8b ftmech_ftb128_drive3
   handoff:
     state: '2026-11-22 08:25 UTC. D519/D520 widened the entry: find why the Z+4g fine-tune ends ~1.55x above scratch. HYPOTHESES
       recorded (finding ''2026-11-22 HYPOTHESES''): lead H1 = the parent''s inherited input flags (input_soft_eps 1e-8, input_pair_logs
