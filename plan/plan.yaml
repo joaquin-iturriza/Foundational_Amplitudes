@@ -39042,5 +39042,10 @@ entries:
       ~1352 x 8e4 events). Pooled test RMSE seen/held-out: sqrt of the event-weighted mean of per-process test MSEs from per_process_metrics.json,
       tool to write once his metric code fixes the definition. Particle encoding, momentum scaling, precision stay ours (D524:
       match the LLM run''s conditions, not his LLoCa implementation).'
+  - at: '2026-11-22T03:16:19+00:00'
+    text: 'Repo review of alphas_input (2026-11-22): tools that build order rows from experiment._order_row without MmapSource
+      (tools/attribution_inputs.py, tools/linear_readout.py, tools/kshot_context.py, analysis/divergences/*) have no alpha_s
+      column and fail with a shape mismatch on an alphas_input model, as does a fine-tune whose alphas_input differs from
+      its parent''s; llm_compare''s held-out scoring must go through the run''s own test role on the memmap path.'
   step_waits:
     '2': 'a reviewer: repo-reviewer of branch alphas_input @2786116d'
