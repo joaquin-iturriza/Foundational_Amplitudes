@@ -16418,8 +16418,8 @@ entries:
     '14': 'Joaquin bringing back the deck cold-read agent (D261: ''we will do it later'')'
     '17': 'the first real idle moment: plan next listing RESUME/LAUNCH with no FA job live; the supervisor''s own STALLED
       idle: event (or its absence after 45 min) is the trigger'
-    '24': 2026-11-22T10:20 (3 days after the debounce change went live, site edited 2026-11-19T10:19:30Z); then wake_batching.py
-      --since 2026-11-19T10:19:30Z --until 2026-11-22T10:19:30Z --baseline analysis/agent_redesign/wake_batching_after.json
+    '24': the repo-reviewer a109ce0a65d92c425 (backlog due blocks the commit of tools/wake_batching.py --labels); measure
+      done, figure figs/wake_batching_after2_per_day.png drawn, commit + redraw + check_caption after its pass
     '28': the main session's go after this owner's 2026-11-19 report (an interactive terminal session with Code Mode on must
       be started by hand)
   owner:
