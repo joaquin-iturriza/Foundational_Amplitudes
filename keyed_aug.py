@@ -37,12 +37,18 @@ STUB_SUFFIX = ".identity.json"
 
 
 def pool_stub(path):
-    """The identity stub standing for a pool whose file is absent (tools/pool_stubs.py: a run on a site holding its
-    memmap cache but not its train pools), None when the pool file exists or no stub does."""
+    """The identity stub standing for a pool whose file is absent (tools/check_pp_pools.py --write-stubs: a run on a
+    site holding its memmap cache but not its train pools), None when the pool file exists or no stub does. It holds
+    only beside the .recipe.json it was written with (the sidecar's sha256): a regenerated pool's sidecar refuses it."""
     import os
     if os.path.exists(path) or not os.path.exists(path + STUB_SUFFIX):
         return None
-    return json.load(open(path + STUB_SUFFIX))
+    stub = json.load(open(path + STUB_SUFFIX))
+    side = path + ".recipe.json"
+    got = hashlib.sha256(open(side, "rb").read()).hexdigest() if os.path.exists(side) else None
+    assert got == stub["recipe_sha256"], \
+        f"{path + STUB_SUFFIX}: written beside another .recipe.json than the one here; rewrite it beside the pool"
+    return stub
 
 
 def pool_identity(path):

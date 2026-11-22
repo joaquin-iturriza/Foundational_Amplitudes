@@ -659,7 +659,7 @@ def mixed_generation(paths, z_max=5.0, n_bins=10, any_version=False):
         stub = pool_stub(r["train"][1])
         if stub is not None:
             # the train pool is absent here: its stub carries this check as run beside it, against the val/test
-            # pools it names (tools/pool_stubs.py); valid only for those same pools
+            # pools it names (tools/check_pp_pools.py --write-stubs); valid only for those same pools
             rec = stub["mixed_generation"]      # every role's z (any_version=True, z_max=0) and the pools it read
             for role in ("val", "test"):
                 if role not in r or (not any_version and r[role][0] == r["train"][0]):

@@ -398,7 +398,8 @@ def write_pool_stub(train, others, z):
     identity, its shape, and datagen.mixed_generation's z (any_version=True, z_max=0: {role: {...}}) against the
     pools `others` ({role: path}) whose identities it records."""
     from keyed_aug import STUB_SUFFIX
-    doc = {"identity": pool_identity(train), "alphas": _alphas_identity(train),
+    doc = {"recipe_sha256": hashlib.sha256(open(train + ".recipe.json", "rb").read()).hexdigest(),
+           "identity": pool_identity(train), "alphas": _alphas_identity(train),
            "shape": list(np.load(train, mmap_mode="r").shape),
            "mixed_generation": {"against": {r: pool_identity(p) for r, p in others.items()}, "z": z}}
     with open(train + STUB_SUFFIX + ".tmp", "w") as f:

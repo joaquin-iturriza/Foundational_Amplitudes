@@ -275,6 +275,15 @@ def section1_stub_labels():
         os.rename(paths["train"]["proc"], paths["train"]["proc"] + ".away")
         assert datagen.mixed_generation(paths, **kw) == want, (kw, datagen.mixed_generation(paths, **kw), want)
         os.rename(paths["train"]["proc"] + ".away", paths["train"]["proc"])
+    tr = paths["train"]["proc"]                     # a regenerated pool's new sidecar under the old stub refuses
+    os.rename(tr, tr + ".away"); side = open(tr + ".recipe.json").read()
+    open(tr + ".recipe.json", "w").write(side.replace('"train"', '"train2"'))
+    try:
+        datagen.mixed_generation(paths)
+        raise AssertionError("a stub beside another .recipe.json must refuse")
+    except AssertionError as e:
+        assert "another .recipe.json" in str(e), e
+    open(tr + ".recipe.json", "w").write(side); os.rename(tr + ".away", tr)
     np.save(paths["val"]["proc"], np.load(paths["val"]["proc"])[:-1])      # another val pool than the stub read
     os.rename(paths["train"]["proc"], paths["train"]["proc"] + ".away")
     try:
