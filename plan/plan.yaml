@@ -39057,5 +39057,4 @@ entries:
       micro-batch, 4 per step); we use our own memmap data path and sampler (mixed-process batches of 24,576). Supersedes
       the round_robin line of the earlier mapping finding. Cost of one run: measured from our own smoke run in this layout,
       not his 7.2 H100-h.'
-  step_waits:
-    '2': 'a reviewer: repo-reviewer of branch alphas_input @2786116d'
+  step_waits: {}
