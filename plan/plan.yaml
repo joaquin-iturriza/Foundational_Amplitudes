@@ -40393,6 +40393,20 @@ entries:
       and said so), i.e. HPO does not move this setup, and the comparison rests on (b)/(c). The smoke run passes when it completes
       train, test evaluation and plots, logs s/step and peak memory, and the fitted constants a, b, c are within 10% of 14.017
       / 6.713 / 5.303 in one log base (else the target or metric differs from his and is fixed before any search).'
+    passed_at: '2026-11-22T10:34:43+00:00'
+    reviewer: 'Fourth review, after my FIX at ~11:35. The three points are fixed. The prior now names dan_zeroshot_v4''s per-process
+      read against the same LLM run (dan_per_process.py @9e02875a: 0.046 against 0.080 on the relabels, 1.05 against 2.24
+      on the truly held out) and how it differs; the held-out read reports the truly held-out subset and the relabels separately
+      (Joaquin 2026-11-17T18:26); the per-process figure reuses dan_per_process.py. The prior names the Z+ng protocol work
+      (D484, D498: ours 1.5-3.7x above his LLoCa under his protocol), so only tuned against our control is read as tuning.
+      Shared cache: checked in data_mmap.py lines 881-897. A run with memmap_prebuild off raises when no key dir matches,
+      so a trial never builds a second cache. The key match is read from the first trial''s log on lxplus and from the CC
+      check job. The stub code is merged (0bb3af13). Check 2: dancat_plain_mse.py re-run today, plain-mean val MSE of log|M|^2
+      from 0.156 at lr 1.73e-3 to 0.0167 at 8.94e-3 (9.4x). Check 3: one seed; the seed-43 pair goes to Joaquin as a question.
+      Check 5 searched: suprio, LLM, pID, catalog_daniel, DlessInOrd, dan_per_process, his LLoCa, pooled RMSE, affine_multiplicity,
+      alphas_input, identity stub; plan dan_zeroshot_v4; decisions D484-D527. Search space is the template''s coupled space,
+      8 trials in waves 3+3+2; MSE and the shared affine target follow D524; no GPU pinning and no per-model smokes (Joaquin
+      09:28/09:33).'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
