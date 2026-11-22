@@ -38761,6 +38761,18 @@ entries:
       lr than scratch; the matched-count question (24 against 16) then goes to Joaquin before any ratio is built; chosen trial
       inside the old window or not lower -> H3 ruled out; best at the new edge -> unresolved. Diverged and spiking trials
       listed apart (D398), never retried.'
+    passed_at: '2026-11-22T03:10:20+00:00'
+    reviewer: 'Third round. R1 configs at ff8297fa change one thing per step: scratch -> scratch with flags differ only by
+      input_soft_eps 1e-8 and input_pair_logs 7 (against the D507 scratch configs at c57dd900), scratch with flags -> fine-tune
+      only by the start. HETEROSC with mu_mse selection, float64, the same pools, 16 trials, waves 3,3,2,3,3,2, disk about
+      1.5 GB. Check 2: the flags move the measure 2.5x at scratch''s HPs (0.0499 vs 0.0197 at batch 128, 0.156 vs 0.063 at
+      batch 2048; zng4g_readout.json), log 0.93 against a gap of log 0.433/0.442. Check 3: scratch seed log spread 0.17/0.14
+      and gap pairing range 0.19-0.66 / 0.37-0.55, so a three-seed share resolves to about +-0.3, which supports the 0.3/0.7
+      branch edges. Trial counts match the sibling cells. Every 24-trial read (R3, and the scratch-with-flags edge case) waits
+      on Joaquin''s matched-count question before any ratio or share is read. Outcomes (a), (b), (c) and R3''s yes, no and
+      unresolved each have a next step. Check 5 terms searched: input_soft_eps, input_pair_logs, softpair, soft rescale, pair
+      log, scrflags, flags, plasticity, Z+4g in results.tex, plus decisions D513-D525. The prior names the flags'' KIT origin,
+      the high-multiplicity grid and the plasticity test par:v4_warm_start_fixes.'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
