@@ -37753,7 +37753,7 @@ entries:
     - FA-lxplus-e8d15505
     - FA-lxplus-fad6ff57
     - FA-lxplus-fbdf6bc6
-    commit: ef9a3301
+    commit: ab57ac74
     paths:
     - analysis/finetune_mechanism/data/restart_steps.json
     - analysis/finetune_mechanism/data/restart_summary.json
@@ -37766,6 +37766,8 @@ entries:
     - analysis/finetune_mechanism/zng4g_sigreset_read.py
     - analysis/finetune_mechanism/zng4g_snap_read.py
     - run.py
+    - sweep/sweep_config_ftmech_zng4g_scrflagsrch_b128.yaml
+    - sweep/sweep_config_ftmech_zng4g_scrflagsrch_b2048.yaml
     - tests/test_promote_final_model.py
   dead_ends: []
   asks:
