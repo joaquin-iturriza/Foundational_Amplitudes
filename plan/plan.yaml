@@ -39011,3 +39011,16 @@ entries:
   blocks: step 1 (data, smoke run, cost, search design and submission); step 2 (the LLM run's conditions in run.py) keeps
     moving
   blocks_steps: *id003
+  findings:
+  - at: '2026-11-22T03:12:02+00:00'
+    text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
+      accumulation_microbatch=6144, accumulation_steps=4, accumulation_order=random (dataset.RoundRobinMicroBatchSampler:
+      K = 55,296/6144 = 9 slots per process per epoch, 1352*9/4 = 3042 steps, as his); 20 epochs = 60,840 steps with validate_frac=0,
+      validate_every_n_steps=3042 and the best-val checkpoint; his plain MSE = loss_aggregation=mean and val_aggregation=mean
+      (equal val counts per process); target z = (log|M|^2 - 14.017 + 6.713 n_out)/5.303 has the form of shared_standardization
+      + affine_multiplicity_std (mu linear in the particle count, one sigma), fitted on the train split: to compare with his
+      constants once his data is here (log base not checked until his metric code is read); alpha_s input: new data.alphas_input
+      (branch alphas_input @2786116d, memmap path only; the in-memory path keeps a Python array per event and cannot hold
+      ~1352 x 8e4 events). Pooled test RMSE seen/held-out: sqrt of the event-weighted mean of per-process test MSEs from per_process_metrics.json,
+      tool to write once his metric code fixes the definition. Particle encoding, momentum scaling, precision stay ours (D524:
+      match the LLM run''s conditions, not his LLoCa implementation).'
