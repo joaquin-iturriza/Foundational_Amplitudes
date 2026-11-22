@@ -23,7 +23,7 @@ global best is kept wherever it ran.
      bookkeeping (DAG manager output and logs, node logs, *.bak copies of the DyHPO state) is removed and trial
      stdout/stderr (*.out, *.err) gzipped in place
   5. --caches: pip's cache under $SCRATCH emptied; amp_data_cache entries untouched for --cache-days removed (both
-     rebuilt on demand)
+     rebuilt on demand), except the pools of any process a recipe in the checkout names (recipes/**) and POOL_PREFIXES
 
     python sweep/prune.py [PREFIX ...] [--apply] [--caches] [--submit-logs] [--cache-days 30] [--every HOURS]
 --every: skip this run if the last applied one on this site was less than HOURS ago (for the supervisor's upkeep).
@@ -283,6 +283,26 @@ def submit_logs(sweep, apply):
 
 # generated catalog pools (hours of MadEvent each): never pruned
 POOL_PREFIXES = ("v4_", "pp13v4_", "pp13_", "dsh_", "ee4_")
+RECIPE_NAME_RE = re.compile(r"""["']?\bname["']?\s*:\s*["']?([A-Za-z0-9][\w.+-]*)""")
+
+
+def recipe_names():
+    """Every process name a recipe in the checkout lists: their pools are never pruned (2026-11-22: the 1491
+    catalog_daniel dc_*_train pools, MadEvent, were deleted here at 30 days while llm_compare's recipe read them)."""
+    names = set()
+    for f in glob.glob(os.path.join(REPO, "recipes", "**", "*.y*ml"), recursive=True) + \
+            glob.glob(os.path.join(REPO, "recipes", "**", "*.json"), recursive=True):
+        try:
+            names |= set(RECIPE_NAME_RE.findall(open(f, errors="replace").read()))
+        except OSError:
+            continue
+    return names
+
+
+def _named(base, names):
+    """True when the basename starts with a recipe process name followed by '_' (pool files are <name>_<...>)."""
+    parts = base.split("_")
+    return any("_".join(parts[:k]) in names for k in range(1, len(parts)))
 
 
 def caches(days, apply):
@@ -294,8 +314,12 @@ def caches(days, apply):
         if apply:
             shutil.rmtree(pip, ignore_errors=True)
     cut = time.time() - 86400 * days
+    names = recipe_names()
+    if not names:                    # recipes unreadable: never prune blind
+        raise RuntimeError("prune --caches: no recipe process names read under %s/recipes" % REPO)
     for f in glob.glob(os.path.join(siteconf.SCRATCH, "amp_data_cache", "**", "*"), recursive=True):
-        if os.path.isfile(f) and not os.path.basename(f).startswith(POOL_PREFIXES) and max(os.path.getmtime(f), os.path.getatime(f)) < cut:
+        base = os.path.basename(f)
+        if os.path.isfile(f) and not base.startswith(POOL_PREFIXES) and not _named(base, names) and max(os.path.getmtime(f), os.path.getatime(f)) < cut:
             freed += _size(f)
             if apply:
                 os.remove(f)
