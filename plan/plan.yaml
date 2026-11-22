@@ -38898,7 +38898,7 @@ entries:
       - 'share <= 0.3: the start; next the path-bug vs plasticity design'
       - 'between: both, each reported'
   step_waits:
-    '3': ftmech_r1r3_drive (detached drive.py of the 4 searches; its DONE event)
+    '3': ftmech_r1r3_drive2 (detached drive.py of the 4 searches; its DONE event)
   handoff:
     state: '2026-11-22 ~01:45 UTC. STEP 1 DONE: F/S HIGHER at both batches (b2048 1.56 [1.45,1.72], b128 1.54 [1.21,1.92];
       zng4g_readout.py @6547b7c1, data eff894f8; figs zng4g_ft_vs_scratch, zng4g_step0 redrawn and handed back with v1 beside,
