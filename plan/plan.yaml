@@ -39079,7 +39079,7 @@ entries:
       then plan ask Joaquin (costed search above 30 GPU-h and the seed-43 pair).'
   step_waits:
     '1': llm_compare step 3 (train pools)
-    '2': FA-ccin2p3-c3333b41
+    '2': step 3 (train pools regenerated), then the smoke run's checkpoint
   handoff:
     state: 'Part (a) design PASSED 2026-11-22T04:21 (design-reviewer; covers prebuilds, 60-step smokes H100+V100, scoring
       on the smoke, then the 8-trial search + matched control costed from the smoke; >30 GPU-h and a seed-43 pair go to Joaquin
