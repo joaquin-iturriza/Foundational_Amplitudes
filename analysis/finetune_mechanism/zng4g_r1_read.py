@@ -25,6 +25,7 @@ from zng4g_readout import analyse, driven, CC, S_TRIAL  # noqa: E402
 
 OLD_FT_WINDOW = {"2048": (3.1e-3, 4.1e-2), "128": (2.7e-4, 1.1e-2)}   # sweep_config_ftmech_zng4g_ft_b<B>.yaml @ab57ac74^
 SF_WINDOW = {"2048": (3.1e-3, 4.1e-2), "128": (2.7e-4, 1.1e-2)}      # sweep_config_ftmech_zng4g_scrflagsrch_b<B>.yaml
+NEW_FT_WINDOW = {"2048": (1.0e-3, 4.1e-2), "128": (2.7e-4, 3.3e-2)}   # same configs @ab57ac74
 SEED_BAR = 1.19   # R3's seed spread bar (design outcome)
 
 REMOTE = r'''
@@ -86,8 +87,49 @@ def triples_share(sf, s, f):
     return [float(x) for x in np.quantile(sh, [0.1, 0.5, 0.9])], len(sh)
 
 
+def h3(b):
+    """R3 alone (the lr-window extension of the fine-tune search): its chosen trial's lr and val against the 16-trial
+    best; for a batch whose scratch+flags search was dropped (b128, check 0, 2026-11-22)."""
+    cache = os.path.join(HERE, "data", f"zng4g_r3_raw_b{b}.json")
+    raw = json.load(open(cache)) if "--cached" in sys.argv else collect(b)
+    json.dump(raw, open(cache, "w"))
+    k2 = analyse(json.load(open(os.path.join(HERE, "data", "zng4g_readout_raw.json"))))[b]["std"] ** 2
+    ts = [(int(k.split("|")[2][1:]), v) for k, v in raw.items() if k.startswith(f"Fx|{b}|t")]
+    assert len(ts) == 24 and all(isinstance(v["lr"], float) and v["val_loss"] is not None for _, v in ts), len(ts)
+    ti, fx = min(ts, key=lambda x: x[1]["val_loss"])
+    f16 = min(v["val_loss"] for i, v in ts if i < 16)
+    ow, nw = OLD_FT_WINDOW[b], NEW_FT_WINDOW[b]
+    inside = ow[0] <= fx["lr"] <= ow[1]
+    edge = min(np.log10(fx["lr"] / nw[0]), np.log10(nw[1] / fx["lr"])) < 0.1
+    r = {"batch": b, "chosen_trial": ti, "chosen_lr": fx["lr"], "chosen_val": fx["val_loss"] * k2, "f16_best": f16 * k2,
+         "f16_over_new": f16 / fx["val_loss"], "inside_old_window": inside, "at_new_edge": bool(edge),
+         "H3": "unresolved (new edge)" if (edge and not inside) else
+               ("yes" if (not inside and f16 / fx["val_loss"] > SEED_BAR) else "ruled out"),
+         "trials": sorted((v["lr"], v["val_loss"] * k2, i) for i, v in ts)}
+    json.dump(r, open(os.path.join(HERE, "data", f"zng4g_r3_b{b}.json"), "w"), indent=1)
+    print(json.dumps({k: v for k, v in r.items() if k != "trials"}, indent=1))
+    import plot_style as ps
+    fig, ax = ps.figure()
+    old = [t for t in r["trials"] if t[2] < 16]; new = [t for t in r["trials"] if t[2] >= 16]
+    ax.plot([t[0] for t in old], [t[1] for t in old], "s", color=ps.C.vermillion, label="fine-tuned, first 16 trials")
+    ax.plot([t[0] for t in new], [t[1] for t in new], "s", color=ps.C.vermillion, mfc="none", label="fine-tuned, 8 added trials")
+    for e in ow:
+        ax.axvline(e, color=ps.C.vermillion, linestyle=":")
+    for e in nw:
+        ax.axvline(e, color=ps.C.grey, linestyle="--")
+    ax.plot([], [], color=ps.C.vermillion, linestyle=":", label="lr window, first 16")
+    ax.plot([], [], color=ps.C.grey, linestyle="--", label="lr window, extended")
+    ax.set_xscale("log"); ax.set_yscale("log")
+    ax.set_xlabel(f"learning rate, batch {b}"); ax.set_ylabel(r"best MSE$(\log|\mathcal{M}|^2)$")
+    ps.process_label(ax, r"$q\bar q\to Z+4g$")
+    ps.legend(ax, "lower left")
+    ps.save(fig, os.path.join(HERE, "figs", f"zng4g_r3_b{b}"))
+
+
 def main():
     b = sys.argv[1]
+    if "--h3" in sys.argv:
+        return h3(b)
     cache = os.path.join(HERE, "data", f"zng4g_r1_raw_b{b}.json")
     raw = json.load(open(cache)) if "--cached" in sys.argv else collect(b)
     json.dump(raw, open(cache, "w"))
