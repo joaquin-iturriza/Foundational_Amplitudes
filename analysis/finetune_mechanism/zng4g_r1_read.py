@@ -161,8 +161,8 @@ def plot(res, curves, sf_curves, ow):
         v = res["best"][k]
         a.plot(np.full(len(v), i) + np.linspace(-0.12, 0.12, len(v)), v, m, color=col, label=lab)
         cs = curves[k] if k != "Sf" else sf_curves
-        mc = np.mean([np.minimum.accumulate(np.array(cv)) for cv in cs], axis=0)
-        c.plot((np.arange(len(mc)) + 1) / len(mc), mc, color=col)
+        for cv in cs:   # each seed's raw validation curve: a blow-up shows (a best-so-far mean hides it)
+            c.plot((np.arange(len(cv)) + 1) / len(cv), cv, color=col)
     a.set_xticks(range(3)); a.set_xticklabels(["scratch", "+flags", "fine-tuned"]); a.set_xlim(-0.5, 2.5)
     a.set_yscale("log"); a.set_xlabel(f"arm, batch {b}"); a.set_ylabel(r"best MSE$(\log|\mathcal{M}|^2)$")
     tr = res["trials"]
@@ -180,7 +180,7 @@ def plot(res, curves, sf_curves, ow):
     l.set_xscale("log"); l.set_yscale("log")
     l.set_xlabel("learning rate"); l.set_ylabel(r"best MSE$(\log|\mathcal{M}|^2)$")
     c.set_yscale("log"); c.set_xlabel(f"fraction of the run, batch {b}")
-    c.set_ylabel(r"best-so-far MSE$(\log|\mathcal{M}|^2)$")
+    c.set_ylabel(r"validation MSE$(\log|\mathcal{M}|^2)$")
     ps.process_label(a, r"$q\bar q\to Z+4g$")
     ps.legend_cell(leg, [a, l])
     ps.save(fig, os.path.join(HERE, "figs", f"zng4g_r1_b{b}"))
