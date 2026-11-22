@@ -4,7 +4,7 @@ load, hold the recipe's row counts, carry their alpha_s sidecar (<pool>.alphas.n
 process has its diagram sidecar (data/diagrams/<name>.diagrams.json, parses). Prints one line per problem and a
 summary; exit 1 if any.
     python tools/check_pp_pools.py [--spec recipes/<spec>.yaml] [--labels]
---labels: also each train pool's labels against its val and test pools (datagen.mixed_generation, any generator
+--labels: also each train pool's labels (2 pairs per process required, else BAD) against its val and test pools (datagen.mixed_generation, any generator
 version): BADZ above |z| = 5; prints the largest |z|.
 """
 import json, os, sys
@@ -30,12 +30,12 @@ def main():
             p = os.path.join(d, f"{n}_13000-13000GeV_{role}_lhe_amplitudes.npy")
             paths[role][n] = p
             try:
-                a = np.load(p, mmap_mode="r")
-                if a.shape[0] < want:
-                    bad.append(f"{n} {role}: {a.shape[0]} rows < {want}")
+                pool = np.load(p, mmap_mode="r")
+                if pool.shape[0] < want:
+                    bad.append(f"{n} {role}: {pool.shape[0]} rows < {want}")
                 s = np.load(p[:-4] + ".alphas.npy", mmap_mode="r")
-                if s.shape[0] != a.shape[0]:
-                    bad.append(f"{n} {role}: alphas sidecar {s.shape[0]} rows != {a.shape[0]}")
+                if s.shape[0] != pool.shape[0]:
+                    bad.append(f"{n} {role}: alphas sidecar {s.shape[0]} rows != {pool.shape[0]}")
             except Exception as ex:                     # noqa: BLE001
                 bad.append(f"{n} {role}: {type(ex).__name__}: {ex}")
         dg = os.path.join(ROOT, "data", "diagrams", f"{n}.diagrams.json")
@@ -49,6 +49,8 @@ def main():
         zs = datagen.mixed_generation(paths, z_max=0, any_version=True)
         allz = [(abs(v["z"]), n, r) for n, d in zs.items() for r, v in d.items()]
         bad += [f"{n} {r}: train labels against {r} z={z:.1f}" for z, n, r in allz if z > 5]
+        if len(allz) != 2 * len(procs):      # a pool without a generator sha is skipped by mixed_generation: never a pass
+            bad.append(f"labels: {len(allz)} process-role pairs compared, {2 * len(procs)} expected")
         print("LABELS %d process-role pairs compared, largest |z| %s" % (len(allz), max(allz)[:3] if allz else None))
     for b in bad:
         print("BAD", b)

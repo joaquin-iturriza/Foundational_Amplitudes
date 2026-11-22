@@ -21,7 +21,7 @@ source "$_CCORCH_ROOT/sites/activate.sh"
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 cd "$PROJECT_DIR"
 SPEC="${DANIEL_SPEC:-recipes/catalog_daniel_all.yaml}"
-W="${SLURM_CPUS_PER_TASK:-${DANIEL_WORKERS:-48}}"
+W="${DANIEL_WORKERS:-${SLURM_CPUS_PER_TASK:-48}}"   # HTCondor sets no SLURM_CPUS_PER_TASK: pass DANIEL_WORKERS
 # parallel parts: shard DANIEL_SHARD_K of DANIEL_SHARD_N (tools/shard_recipes.py: backend groups kept together, cost-
 # balanced), or DANIEL_ONLY=a,b for a few entries; MG5_WORK_DIR/MG5_BIN pick the MadGraph (lxplus: 3.7.0 = CC's)
 if [ -n "${DANIEL_SHARD_N:-}${DANIEL_ONLY:-}" ]; then
@@ -32,11 +32,18 @@ if [ -n "${DANIEL_SHARD_N:-}${DANIEL_ONLY:-}" ]; then
     SPEC="$OUT"
 fi
 echo "MG5 $(sed -n 's/^version = //p' "${MG5_WORK_DIR:-$WORK/mg5amcnlo}/VERSION" 2>/dev/null)"
-export AMP_LHE_WORK_DIR="${AMP_LHE_WORK_DIR:-$SCRATCH/lhe_work}"   # MadEvent dirs, deleted per process
+# MadEvent dirs, deleted per process: node-local under HTCondor (lxplus: SCRATCH is EOS, quota-bound), else SCRATCH
+export AMP_LHE_WORK_DIR="${AMP_LHE_WORK_DIR:-${_CONDOR_SCRATCH_DIR:+$_CONDOR_SCRATCH_DIR/lhe_work}}"
+export AMP_LHE_WORK_DIR="${AMP_LHE_WORK_DIR:-$SCRATCH/lhe_work}"
+mkdir -p "$AMP_LHE_WORK_DIR"
+# the work area's peak size (the batch's disk per job), sampled once a minute
+( peak=0; while sleep 60; do m=$(du -sm "$AMP_LHE_WORK_DIR" 2>/dev/null | cut -f1); [ "${m:-0}" -gt "$peak" ] && peak=$m && echo "LHE_WORK_PEAK_MB $peak"; done ) &
+SAMPLER=$!
 echo "host $(hostname)  spec $SPEC  workers $W  lhe cores ${AMP_LHE_CORES:-1}  work $AMP_LHE_WORK_DIR"
 python prebuild_recipes.py "$SPEC" --workers "$W" --lhe-cores "${AMP_LHE_CORES:-1}"
 rc=$?
 python tools/dump_diagrams.py --prefix "${DANIEL_PREFIX:-dc_}" --skip-existing --workers "$W"   # d4_: the 2->4 probes
 rc2=$?
+kill $SAMPLER 2>/dev/null
 echo "prebuild exit $rc, sidecars exit $rc2"
 exit $(( rc != 0 || rc2 != 0 ))
