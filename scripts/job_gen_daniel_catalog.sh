@@ -21,7 +21,17 @@ source "$_CCORCH_ROOT/sites/activate.sh"
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 cd "$PROJECT_DIR"
 SPEC="${DANIEL_SPEC:-recipes/catalog_daniel_all.yaml}"
-W="${SLURM_CPUS_PER_TASK:-48}"
+W="${SLURM_CPUS_PER_TASK:-${DANIEL_WORKERS:-48}}"
+# parallel parts: shard DANIEL_SHARD_K of DANIEL_SHARD_N (tools/shard_recipes.py: backend groups kept together, cost-
+# balanced), or DANIEL_ONLY=a,b for a few entries; MG5_WORK_DIR/MG5_BIN pick the MadGraph (lxplus: 3.7.0 = CC's)
+if [ -n "${DANIEL_SHARD_N:-}${DANIEL_ONLY:-}" ]; then
+    N="${DANIEL_SHARD_N:-1}"; K="${DANIEL_SHARD_K:-0}"
+    OUT="$SCRATCH/zz_gen_daniel/shard${K}_of_${N}_$(echo "${DANIEL_ONLY:-}" | md5sum | cut -c1-8).yaml"
+    mkdir -p "$(dirname "$OUT")"
+    python tools/shard_recipes.py "$SPEC" --n "$N" --k "$K" --only "${DANIEL_ONLY:-}" --out "$OUT" || exit 1
+    SPEC="$OUT"
+fi
+echo "MG5 $(sed -n 's/^version = //p' "${MG5_WORK_DIR:-$WORK/mg5amcnlo}/VERSION" 2>/dev/null)"
 export AMP_LHE_WORK_DIR="${AMP_LHE_WORK_DIR:-$SCRATCH/lhe_work}"   # MadEvent dirs, deleted per process
 echo "host $(hostname)  spec $SPEC  workers $W  lhe cores ${AMP_LHE_CORES:-1}  work $AMP_LHE_WORK_DIR"
 python prebuild_recipes.py "$SPEC" --workers "$W" --lhe-cores "${AMP_LHE_CORES:-1}"
