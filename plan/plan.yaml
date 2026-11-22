@@ -39401,7 +39401,8 @@ entries:
       site.bak.pre-probe-timeout). CC key check: heldout FA-ccin2p3-dd63b9fb opened b39fc80c8b10edbe4b07f6a0 through the stubs
       (''is ready'', RUN_DONE), train FA-ccin2p3-8d817d54 running.'
   step_waits:
-    '1': the pool gate (detach pool_gate2) and the two lxplus memmap prebuilds that follow it
+    '1': detached llmcmp_a_drive2 (the 8-trial DyHPO search, trials FA-lxplus-51201734 FA-lxplus-4857eed5 + the rest the driver
+      submits) and the control FA-lxplus-cb9273f1
     '2': 'step 1''s first finished GPU run (the smoke or the first trial): the scoring check runs on its checkpoint'
     '4': detached daniel_caches_to_cc (lxplus->CC copy of the two key dirs and 1491 stubs), then the CC prebuild-command key
       check
