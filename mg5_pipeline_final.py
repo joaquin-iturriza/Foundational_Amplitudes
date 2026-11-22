@@ -5512,7 +5512,15 @@ def lhe_run_madevent(process, ev, nevents, iseed, log_path, mg_cores=1, run_name
     lhe = f"{ev}/Events/{run_name}/unweighted_events.lhe.gz"
     gridpack = str((patches or {}).get("gridpack", "")).lower() in ("true", ".true.", "t")
     if r.returncode != 0 or not (gridpack or os.path.exists(lhe)):
-        raise RuntimeError(f"{process}: generate_events exited {r.returncode}, no {lhe}; log {log_path}")
+        # the run dir and log may be node-local and gone with the job (2026-11-22, FA-lxplus-c4702306): carry their tails
+        tails = []
+        for p in [log_path] + sorted(glob.glob(f"{ev}/*debug*.log") + glob.glob(f"{ev}/Events/{run_name}/*debug*.log")):
+            try:
+                tails.append(f"--- {p} (last 40 lines)\n" + "".join(open(p, errors="replace").readlines()[-40:]))
+            except OSError:
+                pass
+        raise RuntimeError(f"{process}: generate_events exited {r.returncode}, no {lhe}; log {log_path}\n"
+                           + "\n".join(tails))
     if gridpack:                # a gridpack run writes the packed grids, not events (lhe_make_gridpack)
         lhe = None
     banners = sorted(glob.glob(f"{ev}/Events/{run_name}/*_banner.txt"))
