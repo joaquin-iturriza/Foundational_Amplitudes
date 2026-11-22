@@ -39396,6 +39396,14 @@ entries:
       lxplus key dirs 99c164da4365de9d7c017b75 (train) and b39fc80c8b10edbe4b07f6a0 (heldout) on CC, nothing built. Driver
       stopped (state: trials 0, 1 submitted) and relaunched as llmcmp_a_drive3 with --sites lxplus ccin2p3 (same config f71cde629,
       --mem 32G --cpus 4 --hours 14.6).'
+  - at: '2026-11-22T15:34:05+00:00'
+    text: '2026-11-22 ~16:33 (E8220): trial 2 FA-ccin2p3-6cdb4904 failed at init_data: the assert in experiment.py _resolve_amp_preprocessing
+      requires data.preprocess_per_dataset=true with affine_multiplicity_std (per-dataset transforms, one shared affine sigma);
+      the config had false (copied from the prebuild overrides). The CC cache opened before the assert (stubs path works).
+      Fix: sweep/sweep_config_llmcmp_a_adamw_const.yaml preprocess_per_dataset ''true'' at 2a597c478, synced to both sites
+      while trials 0, 1 and the control were still IDLE (run_trial.py reads the config at start). The memmap key does not
+      depend on it (base_key_doc: pools and layout only). Driver relaunched as llmcmp_a_drive4 with --retry-failed 6cdb4904
+      (penalty removed).'
   step_waits:
     '1': detached llmcmp_a_drive3 (the 8-trial DyHPO search on lxplus + ccin2p3; wave 1 FA-lxplus-51201734 FA-lxplus-4857eed5
       FA-ccin2p3-6cdb4904, later waves by the driver) and the control FA-lxplus-cb9273f1
