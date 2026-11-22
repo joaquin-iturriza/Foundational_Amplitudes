@@ -39991,6 +39991,16 @@ entries:
       and said so), i.e. HPO does not move this setup, and the comparison rests on (b)/(c). The smoke run passes when it completes
       train, test evaluation and plots, logs s/step and peak memory, and the fitted constants a, b, c are within 10% of 14.017
       / 6.713 / 5.303 in one log base (else the target or metric differs from his and is fixed before any search).'
+    passed_at: '2026-11-22T07:53:46+00:00'
+    reviewer: 'Third review of the part (a) launch path. Checks 14/15: every GPU job on lxplus, where pools and caches are
+      (a copied cache cannot open without its pools, confirmed in experiment.py:1571-1581 and data_mmap.base_key_doc/pool_identity);
+      smoke logs must show the prebuild''s cache key; disk on lxplus EOS ~77 GB free against ~48 GB planned, re-read before
+      the prebuilds; one 60-step smoke per allowed whole-GPU model >=32 GB (V100 89 / A100 84 / H100 NVL 49 / H200 5 slots),
+      pinned by the new --hdr=--gpu-model (site lines 449-451, 466), and job limits from the slowest measured model. Check
+      2: plain-mean val MSE of log|M|^2 moves 9.4x across the lr window on dancat_het_pre (dancat_plain_mse.py, 0.156 to 0.0167).
+      Check 3: no spread of this aggregate exists; the seed-43 pair goes to Joaquin with the costed search. Searched for check
+      5: catalog_daniel, dancat_het_pre, D83 shared, D87, D88, Suprio LLoCa, train pools deleted (prior unchanged from the
+      04:21 pass).'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
