@@ -37999,6 +37999,18 @@ entries:
       S''s and Sf*''s val keep falling (best at 56-100%, end/best 1.00-1.07). Tool fix: zng4g_seed_chunks.py rebuilt an extended
       search''s HPs from the edited config (hp1532 gave lr 1.06e-3 instead of 3.23e-3); it now reads the drive''s dyhpo_state.pkl
       (@90918fa5).'
+  - at: '2026-11-22T09:41:55+00:00'
+    text: '2026-11-22 ~09:45 UTC check 0 (coordinator, e1faa4fc: every run must be the fastest, smallest way to find why the
+      Z+4g fine-tune ends worse than scratch). DROPPED: (1) R1 b128 searched scratch+flags at 3/16 (in-flight FA-lxplus-3e33a952
+      running, -d1c72a79, -4f2836ac queued, removed; ~14 GPU-h, ~6 h saved): fixed-HP b128 already shows the b2048 pattern
+      (Sf/S 2.5x vs 2.47x, F/Sf 0.61 vs 0.63) and at b2048 the search moved the flag cost only 2.47x -> 1.93x, so it would
+      replicate. (2) seeds 43/44 of R3''s b2048 extended ft chosen trial (FA-ccin2p3-2b0a8ebc, -9485314c, cancelled while
+      pending): H3 is ruled out at b2048 from the chosen trial alone (inside the old window, 1.02x), and no ratio is built
+      from the 24-trial search. (3) R4 one-flag-at-a-time (design FIXed by the reviewer: prior kit uug one-flag A/B FA-ccin2p3-f6b2ece9/1a14c791/3fa9854a/c15b3337
+      omitted, and the searched stage required): which flag answers the parent remedy, Joaquin''s call, not why the fine-tune
+      is worse; offered to him, not run. KEPT: Sf* b2048 seeds 43/44 (Joaquin asked; one seed -> three-seed share) and the
+      last 2 trials of the b128 ft lr-window extension (H3 was the live lead at b128, 22/24 done); drive restarted on ft_b128
+      alone (ftmech_ftb128_drive3).'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
