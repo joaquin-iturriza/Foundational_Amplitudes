@@ -39379,7 +39379,7 @@ entries:
       smoke question.'
   step_waits:
     '1': the pool gate (detach pool_gate2) and the two lxplus memmap prebuilds that follow it
-    '2': FA-lxplus-0c92a3ed,FA-lxplus-e0fd42d4,FA-lxplus-047ec23e,FA-lxplus-09fa2d64,FA-lxplus-cc565c49,FA-lxplus-0ea9e16f,FA-lxplus-e931d117,FA-lxplus-2ebfd93d,FA-lxplus-323dc77f,FA-lxplus-cd2552fb,FA-lxplus-7d1cb6a6,FA-lxplus-3c7af077,FA-lxplus-af3b62d2,FA-lxplus-ad4fdc2d,FA-lxplus-1f8de50d,FA-lxplus-64dc6699
+    '2': 'step 1''s first finished GPU run (the smoke or the first trial): the scoring check runs on its checkpoint'
     '4': detached daniel_caches_to_cc (lxplus->CC copy of the two key dirs and 1491 stubs), then the CC prebuild-command key
       check
   handoff:
