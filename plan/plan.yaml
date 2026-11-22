@@ -38989,9 +38989,9 @@ entries:
     - 1
   owner:
     agent: a8a038810c46db8aa
-    state: working
+    state: stopped
     since: '2026-11-22T02:58:44+00:00'
-    state_at: '2026-11-22T03:16:03.915000+00:00'
+    state_at: '2026-11-22T03:18:21.829000+00:00'
     context: 180218
     context_at: '2026-11-22T03:16:24+00:00'
   step_why:
