@@ -39124,6 +39124,21 @@ entries:
       site has no cancel verb, so the idle jobs were left rather than condor_rm by hand. Design review of the part (a) chain
       FIX: a cache copied to CC cannot open without its pools (experiment.py ensure_split_set require_cache; data_mmap.base_key_doc
       pool_identity reads each pool), so every GPU job goes to lxplus; CC needs a code change.'
+  - at: '2026-11-22T07:56:30+00:00'
+    text: '2026-11-22 part (a) chain design PASSED (third review, 07:53): every GPU job on lxplus; 4 x 60-step smokes pinned
+      per GPU model >= 32 GB (V100/V100S 89 slots, A100-40GB 84, H100 NVL 49, H200 5; condor_status 2026-11-22) with new site
+      flag --hdr=--gpu-model=<regexp on GPUs_DeviceName> (~/.local/bin/site condor_sub; pin ''H100'' not ''H100 NVL'' if hdr
+      splits on spaces); trial job limits from the slowest model''s s/step; score on the H100 smoke. Exact launch after the
+      gate: prebuilds = the 04:24 CC command (O=... seed=42, catalog_daniel_train/_heldout) on lxplus with --hdr=--cpus-per-task=4
+      --hdr=--mem=16G --hdr=--time=03:00:00 --est-gpu-hours 0; smokes = site submit lxplus FA scripts/job_config_smoke.sh
+      -- sweep/sweep_config_llmcmp_a_adamw_const.yaml 60 training.lr=0.003 training.validate_every_n_steps=30 with --hdr=--gres=gpu:1
+      --hdr=--gpu-min-mem=32G --hdr=--gpu-model=M --hdr=--time=02:00:00. site pick 2026-11-22 for 9 lxplus GPU runs: 2 at
+      once, first start ~13 h, so CC (step 4) matters for the search width. Step 4 surface (a run on a site with the caches
+      but not the train pools): datagen._is_cached (train .recipe.json), keyed_aug.pool_identity (size + head/tail sha of
+      the pool), data_mmap._alphas_identity (alphas.npy), data_mmap._need (np.load shape of every pool, line 482), datagen.mixed_generation
+      (reads train labels when pipeline_sha256 differs); rest of the memmap init not mapped. Plan: an opt-in identity stub
+      per pool (<pool>.identity.json: identity, alphas identity, shape) written on lxplus and copied with the train sidecars;
+      ruled out: sparse look-alike pools (any other reader silently gets zeros).'
   step_waits:
     '1': FA-lxplus-a0cc1bc6
     '2': FA-lxplus-a0cc1bc6
