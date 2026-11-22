@@ -39133,6 +39133,11 @@ entries:
       (reads train labels when pipeline_sha256 differs); rest of the memmap init not mapped. Plan: an opt-in identity stub
       per pool (<pool>.identity.json: identity, alphas identity, shape) written on lxplus and copied with the train sidecars;
       ruled out: sparse look-alike pools (any other reader silently gets zeros).'
+  - at: '2026-11-22T09:28:00+00:00'
+    text: 'Joaquin 2026-11-22 ~10:30: ''Why would I want a test run on each gpu type???'' The four per-GPU-model smokes of
+      part (a)''s chain are dropped: one 60-step smoke on the GPU type the trials are pinned to (the drive''s A100|H100 requirement
+      already limits them), its rate sets the trial time limits; no smoke per model. The data-cache build and scoring check
+      stay.'
   step_waits:
     '1': FA-lxplus-0c92a3ed,FA-lxplus-e0fd42d4,FA-lxplus-047ec23e,FA-lxplus-09fa2d64,FA-lxplus-cc565c49,FA-lxplus-0ea9e16f,FA-lxplus-e931d117,FA-lxplus-2ebfd93d,FA-lxplus-323dc77f,FA-lxplus-cd2552fb,FA-lxplus-7d1cb6a6,FA-lxplus-3c7af077,FA-lxplus-af3b62d2,FA-lxplus-ad4fdc2d,FA-lxplus-1f8de50d,FA-lxplus-64dc6699
     '2': FA-lxplus-0c92a3ed,FA-lxplus-e0fd42d4,FA-lxplus-047ec23e,FA-lxplus-09fa2d64,FA-lxplus-cc565c49,FA-lxplus-0ea9e16f,FA-lxplus-e931d117,FA-lxplus-2ebfd93d,FA-lxplus-323dc77f,FA-lxplus-cd2552fb,FA-lxplus-7d1cb6a6,FA-lxplus-3c7af077,FA-lxplus-af3b62d2,FA-lxplus-ad4fdc2d,FA-lxplus-1f8de50d,FA-lxplus-64dc6699
