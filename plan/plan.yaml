@@ -39160,9 +39160,9 @@ entries:
     - 2
   owner:
     agent: a5644f3943a4f9a4f
-    state: working
+    state: stopped
     since: '2026-11-22T10:14:28+00:00'
-    state_at: '2026-11-22T11:00:05.787000+00:00'
+    state_at: '2026-11-22T11:07:23.267000+00:00'
     context: 219260
     context_at: '2026-11-22T11:17:34+00:00'
   step_why:
