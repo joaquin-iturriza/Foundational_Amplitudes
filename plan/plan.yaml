@@ -37715,9 +37715,10 @@ entries:
   - D513
   - D516
   next:
-    3: 'R1+R3 (design passed 2026-11-22): searched scratch+flags ftmech_zng4g_scrflagsrch_b{128,2048} (16 trials) for H1,
-      and the ft lr-window extension ftmech_zng4g_ft_b{128,2048} (+8 trials) for H3, driven together (ftmech_r1r3_drive);
-      then seeds 43, 44 of each new chosen trial and the share readout (zng4g_readout.py extended)'
+    3: 'R1+R3 readout: b2048 first look done (share 1.49 on Sf* seed 42; H3 ruled out at b2048); seeds 43/44 of Sf* (FA-ccin2p3-e754cd17,
+      -024a7d8b) and of the extended ft chosen trial (FA-ccin2p3-2b0a8ebc, -9485314c) running -> three-seed b2048 share by
+      zng4g_r1_read.py 2048; b128 when ftmech_r1r3_drive2 ends (scrflagsrch_b128 3/16, ft_b128 22/24): seeds 43/44 of each
+      chosen trial, zng4g_r1_read.py 128'
   done_when: null
   notes_ref: null
   match: dsave_ftmech_*,ftmech_*
@@ -38946,14 +38947,12 @@ entries:
     at: '2026-11-22T09:29:10+00:00'
   step_why:
     3:
-      feeds: 'D519: how much of the fine-tune''s gap to scratch on Z+4g is the inherited input flags (H1) against the pretrained
-        start (H4/H5/H7), and whether the lr window (H3) is the cause'
+      feeds: 'D519: the flags'' share of the Z+4g fine-tune gap (H1) and the lr window (H3)'
       if:
-      - 'share >= 0.7: H1, next single-flag searches and Joaquin''s call on the parent architecture'
-      - 'share <= 0.3: the start; next the path-bug vs plasticity design'
-      - 'between: both, each reported'
-  step_waits:
-    '3': ftmech_r1r3_drive2 (detached drive.py of the 4 searches; its DONE event)
+      - 'share >= 0.7: H1, R4 one-flag test'
+      - 'share <= 0.3: the start; path-bug vs plasticity design'
+      - 'between: both'
+  step_waits: {}
   handoff:
     state: '2026-11-22 08:25 UTC. D519/D520 widened the entry: find why the Z+4g fine-tune ends ~1.55x above scratch. HYPOTHESES
       recorded (finding ''2026-11-22 HYPOTHESES''): lead H1 = the parent''s inherited input flags (input_soft_eps 1e-8, input_pair_logs
