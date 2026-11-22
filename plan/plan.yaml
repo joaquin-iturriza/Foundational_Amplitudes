@@ -39658,6 +39658,94 @@ entries:
       and said so), i.e. HPO does not move this setup, and the comparison rests on (b)/(c). The smoke run passes when it completes
       train, test evaluation and plots, logs s/step and peak memory, and the fitted constants a, b, c are within 10% of 14.017
       / 6.713 / 5.303 in one log base (else the target or metric differs from his and is fixed before any search).'
+  - at: '2026-11-22T07:48:56+00:00'
+    question: 'Part (a), D525: in the conditions of Suprio''s LLM pID run (D524, D526, D527: our catalog_daniel regeneration
+      of the arXiv:2606.23791 catalogue, his 1352 training / 139 evaluated held-out processes; 55,296 train events per process,
+      the first rows, the same every epoch; 60,840 updates of 24,576 mixed-process events = his 20 epochs; his target form
+      z = (log|M|^2 - a + b n_out)/c fitted on the train split; MSE plain mean; best-val checkpoint read once per epoch),
+      how far does a DyHPO-tuned muP LLoCa get in pooled test RMSE of log|M|^2 against the LLM (0.321 seen / 0.721 held out)
+      and his untuned LLoCa (0.506 / 0.953)? Launch path, all under this design (re-recorded 2026-11-22 after the train pools
+      were found deleted; changes against the design passed 04:21 are only where the jobs run): (0) gate: the 1491 catalog_daniel
+      train pools regenerated on lxplus under the generation design passed 05:50 (16 shards FA-lxplus-0c92a3ed..1f8de50d,
+      MG5 3.7.0) pass python tools/check_pp_pools.py --spec recipes/catalog_daniel_all.yaml --labels on the lxplus login node
+      (2982 pairs, every |z| < 5, 0 problems); a process failing it is listed with its z and the chain waits until its cause
+      is found and fixed (no process is dropped from the 1352/139). (1) two CPU memmap prebuilds on lxplus, where the train
+      pools are (catalog_daniel_train and _heldout, train depth 55,296 / eval 10,000, the same overrides as the 04:24 CC submissions:
+      data.source=recipes memmap shared_standardization affine_multiplicity_std alphas_input drop_coupling_powers, no levers/diagrams,
+      seed 42; scripts/job_mmap_prebuild.sh, --hdr=--cpus-per-task=4 --hdr=--mem=16G --hdr=--time=03:00:00); no target statistic
+      or path enters a cache (content-keyed), so (1b) site copy FA lxplus ccin2p3 of the two cache directories under SCRATCH/amp_mmap_cache
+      serves CC''s GPUs (lxplus''s GPU queue started its first job ~28 h after submission on 2026-11-22); (2) one 60-step
+      smoke run of sweep/sweep_config_llmcmp_a_adamw_const.yaml on one CC H100 (scripts/job_config_smoke.sh, lr 3e-3, validate
+      every 30) through train, evaluation and plots [D395], plus the same 60 steps on one CC V100 (whether batch 24,576 fits
+      32 GB, and its step rate for placement), giving s/step, peak memory and the fitted target constants; (2b) the scoring
+      tool (tools/llm_score.py via scripts/job_llm_score.sh @24a677db) on the H100 smoke run''s checkpoint, seen and held-out,
+      one GPU: its seen read must reproduce the run''s own test stage per process, its held-out read is the first use of fine_tune.target_stats=parent_shared
+      on memmap; (3) the 8-trial search (waves 3+3+2) and the matched control run, costed from the smoke run''s own rate:
+      above 30 GPU-h the costed search goes to Joaquin (plan ask) before submission. Disk: lxplus EOS quota 76.8 GB logical
+      free (eos quota read 2026-11-22 before the generation batch) before ~30 GB of train pools and ~18 GB of caches (train
+      cache estimated 16 GB from dancat_het_pre''s 21.8 GB for 140.6M events scaled to 101.8M, held-out 1.6 GB; estimates,
+      the builds'' own sizes recorded): ~29 GB left; eos quota re-read before the prebuilds. CC /sps/lpnhe 36 GB free (df
+      2026-11-22) against the ~18 GB copy, re-read before the copy. GPU budget: the smokes and score 3 x <= 1 GPU-h. Trials
+      run only on sites holding a complete cache (drive.py --sites). Timing: one trial''s wall = 60,840 x the smoke run''s
+      s/step on its GPU type plus 20 validations and the test stage; recorded with plan target before submission.'
+    prior: 'docs/results.tex ''Pretraining on it (2026-10-16, D59)'': dancat_het_pre, the same 1352 catalog_daniel processes
+      (1e5 events each, all rows), HETEROSC loss, per-process standardization, diagram embedding, 32k steps at batch 16,384,
+      AdamW + cosine, 8 DyHPO trials, 37 GPU-h on CC V100: ranking followed lr, best hp58 lr 8.9e-3 at the window top [1e-3,
+      9e-3] (val NLL -4.10, val MSE of mu on standardized log|M|^2 3.96e-3), lr 1.7e-3 worst converged (-3.35), hp1466 at
+      8.8e-3 blew up after step 15.4k; nothing converged. D76 approved widening to 2.7e-2 with 4 more trials; sweeps_local/dancat_het_pre
+      shows only the 8 evaluated (the extension never ran). ''Its held-out split'': hp58 zero-shot on the 139 held-out up
+      to a per-process affine map (median 1-rho^2 1.2e-3 in-class, 0.098 zero-shot). This design differs: shared multiplicity-affine
+      target (no per-process map, so held-out RMSE is absolute as his), MSE not HETEROSC, no diagrams, inputs momenta + species
+      + alpha_s only, 55,296 events per process, 60,840 steps at 24,576, constant lr. Suprio''s table (scratchpad suprio_setup_table.pdf):
+      his LLoCa 1.1M params, Adam betas (0.99,0.999), lr 1e-3 constant, clip 5, 7.2 H100-h; LLM 0.321/0.721. Decisions: D51,
+      D522-D527. plan show llm_compare: no earlier design or run. Also on these same 1352/139 processes: ''The shared and
+      the s-hat+coupling pretrainings'' (D83): hp58''s config and HPs with one shared standardization, the shared run blew
+      up at step 8734 (50 consecutive non-finite gradients) at lr 8.9e-3 with the cosine, read at its best checkpoint; held-out
+      MSE of log|M|^2 median 0.60 on the 43 new and 0.067 on the 96 relabels, our own absolute held-out reference (that run
+      had diagrams and levers on, no alpha_s input, HETEROSC); this design''s window top 9e-3 at constant lr can blow up too:
+      such a trial is listed apart at its best checkpoint, and DyHPO observes it. ''Short design runs'' (D87): 1e4 events,
+      4126 steps gave the full-length held-out read for fixed HPs (0.603 vs 0.604); a shorter-horizon search is not used here
+      (lr optimum moves with t, HPO rule 2; horizon is Joaquin''s call). ''The units of the target'' (D88): a target with
+      one shared standardization differs only in the reference scale Lambda; his z''s mean linear in n_out is our affine_multiplicity_std
+      (a fitted Lambda). catalog_v3 Muon search: tuning AdamW gained 1.03x at stage 1, inside a seed spread of 0.148 decades
+      (a zero-shot per-probe ratio spread, not this aggregate).'
+    measure: 'Ranking (DyHPO objective, checkpoint): val_loss_no_reg, the plain mean over the 1352 processes of the MSE of
+      z on the 1e4 validation pool, at the best checkpoint (once per 3042 steps). Reported: pooled test RMSE of log|M|^2 =
+      sqrt(mean over all test events of (pred - true)^2) in log|M|^2 units (z times the fitted c), seen = 1352 processes x
+      their 1e4 test pool, held out = 139 x their 1e4 test pool (his test is 16,384 per process from the same distribution:
+      the same estimand, each process weighted equally in both; train-pool rows are not added), held out with the shared affine
+      statistics (no per-process map); per-process MSEs drawn as in his held-out figure.'
+    check: 'analysis/catalog_daniel/dancat_plain_mse.py (worktree llmcmp_score @a93ba8fa; dancat_het_pre''s final-evaluation
+      per-process val MSE times each process''s prepd_std^2, plain mean over the 1352, i.e. this design''s ranking measure
+      up to the one constant sigma^2 of a shared z): lr 1.73e-3 0.156, 4.04e-3 0.0397, 4.42e-3 0.0347, 6.92e-3 0.0224, 7.22e-3
+      0.0181, 8.91e-3 0.0171, 8.94e-3 0.0167; hp1466 (8.83e-3, blew up after 15.4k) 0.0576 at its best checkpoint. The plain-mean
+      val MSE of log|M|^2 moves 9.4x across the searched lr range on this catalog. Test against val on this catalog: hp58
+      val 3.96e-3, test 3.97e-3 (per-process z).'
+    fixed: 'Data (catalog_daniel_train 1352 recipes, train_subsample 55,296 first rows, val 1e4, seed 42), target form shared_standardization
+      + affine_multiplicity_std, alphas_input, coupling powers dropped, no levers/diagrams, model muP LLoCa 8 blocks 8 heads
+      (default width), particle_encoder_hidden 0, MSE plain mean (loss and val), batch 24,576, 60,840 steps, validate every
+      3042, AdamW, WSD with cooldown 0 (constant after warmup), clip 5, float32 + tf32, best-val checkpoint; all in sweep/sweep_config_llmcmp_a_adamw_const.yaml
+      fixed_params. Searched: lr [1e-3, 9e-3] log, L2 lambda [1e-10, 1e-6], warmup frac [0.05, 0.2], EMA {off,on} x decay
+      [0.9, 0.999]. Sites: caches built on lxplus (the only site with the train pools), copied to CC; GPU placement by site
+      pick over the sites holding the cache; Jean Zay down. Train pools: the lxplus regeneration (MG5 3.7.0, seed 42, train
+      block [2e4,1.2e5) of each process''s MadEvent layout), val/test pools the 2026-10-15 CC ones.'
+    control: 'External: the LLM pID (0.321 / 0.721) and his LLoCa (0.506 / 0.953), on his events; ours on our regeneration
+      of the same catalogue, said with every comparison. Matched internal control: one run of the same fixed setup at his
+      LLoCa''s optimizer settings that D524 lets us keep in our implementation (lr 1e-3 constant, no warmup, no L2, EMA off),
+      so the tuned-vs-untuned gain is measured on our data and code, apart from the data and implementation difference to
+      his 0.506.'
+    seeds: 'One seed (42) per trial and for the control, as his seed 0. No measured seed spread of a catalog-wide plain-mean
+      val MSE exists (searched docs/results.tex for seed spreads: catalog_v4/v3 short pretrainings report per-probe zero-shot
+      ratio spreads 0.09-0.23 decades and het NLL, not this aggregate). A second seed (43) of the control and of the best
+      trial measures it: that is a seed count beyond the design and is Joaquin''s call, asked together with the costed search
+      (2 runs more).'
+    outcome: 'Yes (HPO closes the gap to the LLM): the best trial''s pooled seen RMSE at or below 0.321 and held-out at or
+      below 0.721. Partial: below the matched control and his 0.506/0.953 but above the LLM; the size of the remaining gap
+      feeds part (b) (width toward 359.6M, D522). No: the best trial below the matched control by less than the measured seed
+      spread (the seed-43 pair, if Joaquin approves it; without it the best-over-control ratio is reported with no spread
+      and said so), i.e. HPO does not move this setup, and the comparison rests on (b)/(c). The smoke run passes when it completes
+      train, test evaluation and plots, logs s/step and peak memory, and the fitted constants a, b, c are within 10% of 14.017
+      / 6.713 / 5.303 in one log base (else the target or metric differs from his and is fixed before any search).'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
