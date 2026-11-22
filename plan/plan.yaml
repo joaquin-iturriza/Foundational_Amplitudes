@@ -39077,6 +39077,11 @@ entries:
       free before the caches (~18 GB after), under the 60 GB alarm floor. Next, on the smoke: s/step -> cost of 8 trials +
       control (+ the seed-43 pair), fitted a,b,sigma against 14.017/6.713/5.303 (log base), whether 24,576 fits the V100;
       then plan ask Joaquin (costed search above 30 GPU-h and the seed-43 pair).'
+  - at: '2026-11-22T05:03:56+00:00'
+    text: '2026-11-22: the search of CC for a surviving copy of a catalog_daniel train pool (find /sps/lpnhe/jiturrizaramirez01
+      -maxdepth 5 -name ''dc_bb_bb_13000-13000GeV_train*'', via site_python) timed out after 600 s: inconclusive, not ''none
+      found''. The next owner checks narrower places first (siteconf.DATA_DIR, $WORK/datasets, $SCRATCH/amp_data_cache, any
+      storage_*/archive dirs) before regenerating.'
   step_waits:
     '1': llm_compare step 3 (train pools)
     '2': step 3 (train pools regenerated), then the smoke run's checkpoint
