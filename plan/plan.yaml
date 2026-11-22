@@ -39289,7 +39289,8 @@ entries:
     '1': the pool gate (detach pool_gate2) and the two lxplus memmap prebuilds that follow it
     '2': FA-lxplus-0c92a3ed,FA-lxplus-e0fd42d4,FA-lxplus-047ec23e,FA-lxplus-09fa2d64,FA-lxplus-cc565c49,FA-lxplus-0ea9e16f,FA-lxplus-e931d117,FA-lxplus-2ebfd93d,FA-lxplus-323dc77f,FA-lxplus-cd2552fb,FA-lxplus-7d1cb6a6,FA-lxplus-3c7af077,FA-lxplus-af3b62d2,FA-lxplus-ad4fdc2d,FA-lxplus-1f8de50d,FA-lxplus-64dc6699
     '3': 'the full pool check on lxplus (detach pool_gate2: check_pp_pools --labels, 2982 pairs)'
-    '4': the repo reviewer's re-check of llmcmp_stubs b293fbe4 and the synthetic test rerun (detach stub_test4)
+    '4': the pool gate (detach pool_gate2), then check_pp_pools --labels --write-stubs on lxplus (stub code merged 0bb3af13,
+      repo review PASS), then the design re-review
   handoff:
     state: 'Step 3: catalog_daniel train regeneration batch on lxplus (16 shards; shard 5 rerun FA-lxplus-64dc6699 after 3
       MadEvent failures, E8138 acked; others finished so far 90/90 in 42-47 min, target 2.3 h). When all end: (0) gate on
