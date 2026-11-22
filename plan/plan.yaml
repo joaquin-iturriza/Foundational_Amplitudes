@@ -37938,6 +37938,21 @@ entries:
       NLL -7.329 vs -7.271. So TF32 explains most of the _snap gap; the rest is run-to-run spread on the same GPU type, large
       on a few processes. Smoke FA-lxplus-1407949d clean (snap and snapopt load step 56000, OPT_STATE 32 entries, warmup 0
       for snapopt, sigma stage and plots). Snap configs repointed to _snapfp32 (5bd7f1e1), parent copied to lxplus.'
+  - at: '2026-11-22T02:20:35+00:00'
+    text: '2026-11-22 step 2 read (zng4g_snap_read.py @ef9a3301, plotting zng4g_readout.plot; figs zng4g_snap_vs_ft, zng4g_snap_step0,
+      captions OK): the snapshot arms (W parent''s pre-cooldown step-56000 model from the fp32 rerun FA-ccin2p3-74805752;
+      8-trial searches, seed 42) end where arm (1) ends, above scratch, against arm (1) with the parent difference stated
+      (rerun matches the original parent on 23/28 processes; matched control asked). Best val MSE(log|M|^2) (mu-MSE x 1.11978^2):
+      b2048 snapshot fresh-opt 0.0845, snapshot+opt-state 0.113, F 0.0967 (first 8 = 16-trial best), scratch 3-seed mean 0.0630:
+      P/F8 0.874, Po/F8 1.17, both within the 1.41 bar; P/S 1.34, Po/S 1.79. b128 P 0.0298, Po 0.0298, F8 0.0375, F16 0.0258,
+      S 0.0197: P/F8 = Po/F8 0.793 within, P/F16 1.15, P/S 1.51. No arm reaches 1.2 x S''s mean best; every restart is below
+      S''s mean best-so-far only at 2-12% of the run (b2048) or the first validation (b128), as F. Step 0: the snapshot (pre-sigma)
+      starts at het. NLL 4.3/2.7 (b2048/b128) vs F 9051/70.8 and scratch 1.18/1.11; max grad norm steps 0-40 snapshot fresh
+      5.4e5/4.2e3, with opt state 9.8e13/923, F 5.8e7/5.5e8, scratch 124/226: removing the NLL shock (and keeping the optimizer
+      state) does not keep the head start, as on b b~ > Z Z. Both b128 snapshot bests sit at the lr window top 1.1e-2 (hp1518
+      1.098e-2, hp570 1.096e-2), as F''s. Val spikes > 10x the best-so-far, read at the best checkpoint and listed apart:
+      snap b2048 hp353, hp1470, b128 hp529; snapopt b2048 hp1333, hp1373, hp450 (lr 0.025-0.030, grad norm 1e14-1e15), b128
+      hp570 (the chosen trial; recovered, end/best 1.02), hp1413; F b2048 hp353, b128 hp110, hp49. No trial without val.'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
