@@ -40251,6 +40251,34 @@ entries:
       and said so), i.e. HPO does not move this setup, and the comparison rests on (b)/(c). The smoke run passes when it completes
       train, test evaluation and plots, logs s/step and peak memory, and the fitted constants a, b, c are within 10% of 14.017
       / 6.713 / 5.303 in one log base (else the target or metric differs from his and is fixed before any search).'
+    fix_at: '2026-11-22T10:32:54+00:00'
+    fix: 'Check 5 (prior incomplete; searched docs/results.tex for suprio, LLM, pID, catalog_daniel, DlessInOrd, dan_per_process,
+      his LLoCa, pooled RMSE, affine_multiplicity, alphas_input, identity stub; plan show dan_zeroshot_v4; site decisions
+      D484-D527): (i) the prior leaves out the existing comparison against the same reference. plan dan_zeroshot_v4 (D488-D491,
+      analysis/catalog_daniel/dan_per_process.py, data/dan_per_process.json @9e02875a) already sets our LLoCa arms trained
+      on catalog_daniel against Suprio''s particle-ID embedding run (draft_pid_by_process.json: seed 0, 20 epochs, which is
+      this design''s LLM pID run), per held-out process, on the first 2000 val events of the held-out pools. Median MSE of
+      log|M|^2: our dimensionless + coupling orders arm (catalog_short_DlessInOrd, 5 epochs of 1e4) 0.046 against his 0.080
+      on the 91 relabels, and 1.05 against 2.24 on the 9 truly held out; hp58 and the shared-standardization run (catalog_norm_B)
+      are in the same figure. The design must name this with its numbers and say how it fits this design''s pooled RMSE (median
+      per process against pooled over events; 2000 val events against the 1e4 test pool; that arm''s inputs and target against
+      part (a)''s), and reuse dan_per_process for the per-process figure it plans instead of a new one. Joaquin''s words on
+      that comparison (2026-11-17T18:26: ''in their case Interpolation is what we call a relabeling, so it''s fine if there
+      are relabelings, the held outs should truly be held outs'') mean the held-out read also reports the truly held-out subset
+      on its own, next to the 139 of his split that is matched against 0.721. This costs no extra job, it is the same scoring.
+      (ii) The prior also leaves out docs/results.tex ''Searched HPs, Suprio''s protocol and his network'' and ''The protocol
+      test'' (2026-11-18/19, D484, D498, Z+ng). There, our network at searched HPs lost to Suprio''s untuned protocol, and
+      our network under his protocol stayed 1.5-3.7x above his LLoCa trained by his code. That is a measured implementation
+      gap to his LLoCa: it bears on the ''his LLoCa 0.506 / 0.953'' reference and on what the matched control isolates, and
+      it should be named. Check 14 (shared cache, small): require_cache only guards the pools. On lxplus, where the pools
+      exist, a trial whose memmap key differed from the prebuild''s would build its own ~18 GB cache, and three such trials
+      would not fit in ~45 GB of EOS. The design shows the key match only in the optional smoke. If Joaquin skips the smoke,
+      say what shows the key match before wave 1''s three trials start together: the stub test building the key the way two
+      jobs would, or the scoring job''s log against the prebuild''s key dir. Everything else holds and need not change: one
+      change against a matched control; the measure check reproduced today (dancat_plain_mse.py: 0.156 at lr 1.73e-3 to 0.0167
+      at 8.94e-3, 9.4x); seeds put to Joaquin as the seed-43 question; outcome bands; the template''s coupled space with 8
+      trials in waves 3+3+2; MSE and shared affine target from D524; one measured rate with 1.5x room and no pins, per his
+      09:28/09:33 words; the CC stub gate.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
