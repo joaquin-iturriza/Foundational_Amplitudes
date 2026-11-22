@@ -39096,7 +39096,7 @@ entries:
       the GPU probe (2 at once, first start ~28 h): ~/.local/bin/site now probes GPU-less slots for --gpus 0 on HTCondor (backup
       ~/.local/share/ccorch/site.bak.pre-condor-cpu; 425 slots fit 16G/8cpu).'
   step_waits:
-    '1': llm_compare step 3 (train pools)
+    '1': FA-lxplus-a0cc1bc6
     '2': step 3 (train pools regenerated), then the smoke run's checkpoint
     '3': FA-lxplus-a0cc1bc6
   handoff:
