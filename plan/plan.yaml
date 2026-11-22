@@ -38957,8 +38957,9 @@ entries:
   match: llmcmp_*,tp_llmcmp_*
   evidence:
     runs: []
-    commit: 2786116d
+    commit: 7d3a6ee9
     paths:
+    - config/amplitudes.yaml
     - data_mmap.py
     - tests/test_alphas_input.py
   dead_ends: []
