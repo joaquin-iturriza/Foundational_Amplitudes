@@ -1,5 +1,5 @@
 # llm_compare part (a): muP LLoCa in the conditions of Suprio's LLM pID run (D525, D524, D526, D527), DyHPO.
-# DRAFT, not yet smoke-run or design-reviewed: nothing is submitted from it before both (plan llm_compare).
+# Not yet smoke-run or design-reviewed: nothing is submitted from it before both (plan llm_compare).
 # Data: our regeneration of the arXiv:2606.23791 catalogue (catalog_daniel, D51/D527), his split's 1352 training
 #   processes; 55,296 train events per process (the first rows, the same every epoch), validation pool 1e4.
 # Updates: 60,840 steps of 24,576 events = his 20 epochs; batches mixed across processes (D526: his one-process
@@ -10,7 +10,10 @@
 #   powers zeroed and no physics levers or diagrams (the LLM saw species, momenta and alpha_s only; those are part (c)).
 # Optimizer: AdamW at a constant lr after warmup (WSD with no cooldown), as the LLM run (constant lr); MuonAdamW and
 #   WSD's cooldown belong to our latest setup, part (c). Space: the template's coupled space, Muon's decay and eta_min
-#   (inert at constant lr) dropped, lr centred by HPO rule 2 at t = 60,840, large D (~1.3e-3), +/- 1/2 decade.
+#   (inert at constant lr) dropped; lr +/- 1/2 decade around 3e-3, [1e-3, 9e-3]: HPO rule 2's high-D extrapolation to
+#   t = 60,840 gives 1.3e-3 (the window's bottom), but on this same catalog dancat_het_pre (32k steps, AdamW) ranked
+#   its 8 trials by lr with the best, 8.9e-3, at the top of [1e-3, 9e-3] (docs/results.tex 'Pretraining on it'), so
+#   the window reaches it; constant lr (no anneal) favours a lower lr than that cosine run, hence not centred above.
 # Batch 24,576 is above what fits a 32 GB V100 at 16,384 (fa-canonical-setup): H100, or accumulation; smoke run decides.
 cluster:
   scheduler: slurm
@@ -85,8 +88,8 @@ fixed_params:
 search_space:
 - name: training.lr
   type: float_log
-  low: 4.3e-04      # [c/3, 3c] around c = 1.3e-3, HPO rule 2's high-D decay extrapolated to t = 60,840
-  high: 3.9e-03
+  low: 1.0e-03      # [c/3, 3c] around c = 3e-3 (header)
+  high: 9.0e-03
 - name: training.regularization_lambda
   type: float_log
   low: 1.0e-10
