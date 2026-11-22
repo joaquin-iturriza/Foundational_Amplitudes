@@ -39429,6 +39429,7 @@ entries:
       end); condor_tail -stderr <cluster>.0 via site run in the AFS submit dir shows it.'
   step_waits:
     '1': FA-lxplus-4bfd2286
+    '2': llmcmp_a_drive4
   handoff:
     state: 'Part (a) running: the 8-trial single-fidelity DyHPO search (waves 3+3+2) and the matched control, at the LLM run''s
       conditions, config sweep/sweep_config_llmcmp_a_adamw_const.yaml @ 2a597c478. Driven from the local machine by .venv-driver/bin/python
