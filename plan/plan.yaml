@@ -39403,7 +39403,8 @@ entries:
   step_waits:
     '1': detached llmcmp_a_drive2 (the 8-trial DyHPO search, trials FA-lxplus-51201734 FA-lxplus-4857eed5 + the rest the driver
       submits) and the control FA-lxplus-cb9273f1
-    '2': 'step 1''s first finished GPU run (the smoke or the first trial): the scoring check runs on its checkpoint'
+    '2': 'FA-lxplus-cb9273f1 (the control: first finished run; the scoring check runs on its checkpoint, or on the first trial
+      to end before it)'
     '4': detached daniel_caches_to_cc (lxplus->CC copy of the two key dirs and 1491 stubs), then the CC prebuild-command key
       check
   handoff:
