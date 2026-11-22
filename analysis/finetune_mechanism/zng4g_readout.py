@@ -158,14 +158,21 @@ def analyse(raw):
     return res
 
 
-def plot(res):
+TICK = {"S": "scratch", "Sf": "+flags", "F": "fine-tuned", "Sg": "reset", "P": "snap.", "Po": "snap.+opt."}
+
+
+def plot(res, arms=("S", "Sf", "F", "Sg"), tag=""):
+    """res[b]: curves[a] (best-so-far averaged over the list), best[a] (points), step0[a]; figs zng4g{tag}_*."""
     import plot_style as ps
     names = {"S": ("from scratch", ps.C.blue, "-", "o"), "Sf": ("from scratch + input flags", ps.C.grey, ":", "D"),
-             "F": ("fine-tuned", ps.C.vermillion, "-", "s"), "Sg": ("fine-tuned, sigma head reset", ps.C.green, "--", "^")}
+             "F": ("fine-tuned", ps.C.vermillion, "-", "s"), "Sg": ("fine-tuned, sigma head reset", ps.C.green, "--", "^"),
+             "P": ("snapshot, fresh optimizer", ps.C.green, "--", "^"),
+             "Po": ("snapshot, its optimizer state", ps.C.purple, ":", "D")}
+    ticks, n = [TICK[a] for a in arms], len(arms)
     fig, axs = ps.figure(ncols=2, nrows=2)
     for j, b in enumerate(("2048", "128")):
         r, ax, bx = res[b], axs[0][j], axs[1][j]
-        for i, a in enumerate(("S", "Sf", "F", "Sg")):
+        for i, a in enumerate(arms):
             lab, col, ls, m = names[a]
             cs = r["curves"][a]
             mcur = np.mean([np.minimum.accumulate(cv) for cv in cs], axis=0)
@@ -176,31 +183,31 @@ def plot(res):
         ax.set_yscale("log"); bx.set_yscale("log")
         ax.set_xlabel(f"fraction of the run, batch {b}")
         ax.set_ylabel(r"best-so-far MSE$(\log|\mathcal{M}|^2)$")
-        bx.set_xticks([0, 1, 2, 3]); bx.set_xticklabels(["scratch", "+flags", "fine-tuned", "reset"]); bx.set_xlim(-0.5, 3.5)
+        bx.set_xticks(range(n)); bx.set_xticklabels(ticks); bx.set_xlim(-0.5, n - 0.5)
         bx.set_xlabel(f"arm, batch {b}")
         bx.set_ylabel(r"best MSE$(\log|\mathcal{M}|^2)$")
     ps.process_label(axs[0][0], r"$q\bar q\to Z+4g$")
     ps.legend(axs[0][1], "upper right")
-    ps.save(fig, os.path.join(HERE, "figs", "zng4g_ft_vs_scratch"))
+    ps.save(fig, os.path.join(HERE, "figs", "zng4g_ft_vs_scratch" if not tag else f"zng4g_{tag}_vs_ft"))
 
     fig, (l, rr) = ps.figure(ncols=2)
     for k, (b, m) in enumerate((("2048", "o"), ("128", "s"))):
-        for i, a in enumerate(("S", "Sf", "F", "Sg")):
+        for i, a in enumerate(arms):
             s = res[b]["step0"][a]
             col = names[a][1]
             l.plot([i + 0.1 * (2 * k - 1)], [s["nll0"]], m, color=col)
             rr.plot([i + 0.1 * (2 * k - 1)], [s["gmax"]], m, color=col)
         l.plot([], [], m, color="black", label=f"batch {b}")
     for ax in (l, rr):
-        ax.set_xticks([0, 1, 2, 3]); ax.set_xticklabels(["scratch", "+flags", "fine-tuned", "reset"]); ax.set_xlim(-0.5, 3.5)
+        ax.set_xticks(range(n)); ax.set_xticklabels(ticks); ax.set_xlim(-0.5, n - 0.5)
         ax.set_xlabel("arm")
-    l.set_yscale("log")   # every step-0 NLL here is positive (smallest 0.69)
+    l.set_yscale("log")   # every step-0 NLL here is positive (smallest 0.69; snapshot arms 2.7)
     rr.set_yscale("log")
     ps.headroom(l); ps.headroom(rr)
     l.set_ylabel("training NLL at step 0")
     rr.set_ylabel("max gradient norm, steps 0-40")
     ps.legend(l, "upper left")
-    ps.save(fig, os.path.join(HERE, "figs", "zng4g_step0"))
+    ps.save(fig, os.path.join(HERE, "figs", f"zng4g{tag and '_' + tag}_step0"))
 
 
 def main():
