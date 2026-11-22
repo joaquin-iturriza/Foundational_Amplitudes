@@ -37871,7 +37871,7 @@ entries:
       already give independently at the end point; it tests no open hypothesis
   owner:
     agent: aea3b3e66649163d1
-    state: working
+    state: closed
     since: '2026-11-22T02:15:37+00:00'
     state_at: '2026-11-22T08:24:30.860000+00:00'
     context: 212418
@@ -38891,44 +38891,38 @@ entries:
   step_waits:
     '3': ftmech_r1r3_drive2 (detached drive.py of the 4 searches; its DONE event)
   handoff:
-    state: '2026-11-22 ~01:45 UTC. STEP 1 DONE: F/S HIGHER at both batches (b2048 1.56 [1.45,1.72], b128 1.54 [1.21,1.92];
-      zng4g_readout.py @6547b7c1, data eff894f8; figs zng4g_ft_vs_scratch, zng4g_step0 redrawn and handed back with v1 beside,
-      captions OK). STEP 4 READ: strict-fp32 W parent rerun FA-ccin2p3-74805752 (V100, TF32 off) vs original FA-ccin2p3-47e14eae:
-      per-process MSE ratio gmean 1.39 (TF32 rerun 5.0), 23/28 inside the pre-registered 0.43-2.5x, 5 outside (ee_bbbar 1159x,
-      uubar_ZZ_nlo 22.7x, ee_mumu_ew_nlo 3.05x, ee_aa 0.165x, uubar_ddbar 0.070x); NOT reproduced by the bar (parent_rerun_check.py
-      snapfp32 @af51c8ea, fig parent_rerun_check_snapfp32, caption OK). STEP 2 SEARCHES ENDED (E8069/E8072, not acked: the
-      next owner''s): the 4 snapshot searches ftmech_zng4g_{snap,snapopt}_b{128,2048} (8 trials each, all 32 observed, sweeps_local;
-      configs @5bd7f1e1 from _snapfp32 step 56000) were launched before Joaquin''s answer because every branch of his question
-      uses them (disclosed to the main session; reviewer noted it). Raw search bests, val mu-MSE (NOT x std^2, NOT read):
-      snap b128 0.02373, snapopt b128 0.02374, snap b2048 0.0674, snapopt b2048 0.0900; ft arm (1) search bests for comparison
-      0.02057 (b128), 0.0771 (b2048). NEXT (readout, the fresh owner): per the passed design, the snapshot arms'' best val
-      MSE(log|M|^2) (min val mu-MSE x std^2, std 1.11978 checked equal) against arm (1)''s F at each batch, best against best
-      (8-trial snapshot searches vs F''s first-8-trials best, as Sg/F8, plus vs F''s 16-trial best), with the head-start curves
-      and step-0 NLL/grad norm (restart_steps-style, from train_steps.npz) for 2a/2b; every number stated with the caveat
-      that 2a/2b branch from the fp32 rerun parent, not the _cc parent of arm (1) (5/28 processes outside the rerun spread),
-      until Joaquin answers the matched-control question; figure with check_caption; extend zng4g_readout.py or a sibling
-      (committed) for it. Diverged trials listed apart.'
-    decisions: 'D515 Z+4g scope; D516 (''Yes, do the rerun then'') budget ~129 GPU-h (committed ~82: step 1 41.7, parent reruns
-      ~18, snapshot searches 22.6); the fp32 rerun is a repair inside D516. Snapshot searches launched despite the step-4
-      bar miss because both answers to the matched-control question need them (only the control arm and the reading wait).
-      Step 3 stage 1 design (extend both ft searches'' lr window past the edge their bests sit at: b128 top 1.1e-2->3.3e-2,
-      b2048 bottom 3.1e-3->1.0e-3, +8 DyHPO trials each, waves 3,3,2) reviewed FIX then revised; coordinator reports it passed
-      (E8019); waits only on Joaquin''s trial-count answer. OPEN QUESTIONS TO JOAQUIN (plan asks): (a) ''Scope: 24 fine-tune
-      trials against scratch''s 16'' (step 3; or extend the two D507 scratch searches 8 trials too, ~11.3 GPU-h more); (b)
-      ''Scope: adding a matched-control arm to the snapshot test'' (template fine-tune from the fp32 rerun''s final model,
-      both batches, 8-trial searches, ~11.3 GPU-h, or read 2a/2b against arm (1) with the parent difference stated). Infra:
-      drive.py now maps a config''s positive A100|H100 GPU regexp to the 24G HTCondor floor (c5d7cf85, test tests/test_drive_condor_floor.py,
-      repo-reviewer passed); E8056 lxplus trials moved to CC, E8061 moved back by the driver''s re-pick.'
-    ruled_out: b b~ > Z Z s8 long-horizon, sigma-start, top-up (D515, as recorded); sigma-head reset changes nothing at the
-      end point (Sg/F8 1.004/0.769); TF32 as the whole parent-rerun gap (fp32 rerun closes most, not all).
-    running: none (ftmech_snap_drive3 exited rc=0; all 32 snapshot trials observed). Events E8069, E8072 left unacked for
-      the next owner.
-    files: 'analysis/finetune_mechanism/zng4g_readout.py @6547b7c1 (data eff894f8), zng4g_sigreset_read.py, parent_rerun_check.py
-      + plot_parent_rerun.py (arg snap|snapfp32, af51c8ea), data/parent_rerun_check_snapfp32.json, figs zng4g_ft_vs_scratch,
-      zng4g_step0, parent_rerun_check(_snapfp32); sweep/sweep_config_ftmech_zng4g_{ft,sigreset,scrflags,snap,snapopt}_b{128,2048}.yaml;
-      sweeps_local/ftmech_zng4g_*; step-3 config diff (lr window + n_trials 24 + waves) /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/step3_window_configs.diff
-      (scratchpad: re-create from the design if cleared); sweep/drive.py condor_floor (c5d7cf85)'
-    written: '2026-11-22T02:14:29+00:00'
+    state: '2026-11-22 08:25 UTC. D519/D520 widened the entry: find why the Z+4g fine-tune ends ~1.55x above scratch. HYPOTHESES
+      recorded (finding ''2026-11-22 HYPOTHESES''): lead H1 = the parent''s inherited input flags (input_soft_eps 1e-8, input_pair_logs
+      7): scratch+flags at scratch''s HPs is 2.5x scratch, and F/Sf = 0.61 (b128) / 0.63 (b2048), so pretraining helps 1.6x
+      on the same architecture; H2 dilution held (no gain at 1e4 to dilute; testable at D<=10^3); H3 lr window (F and both
+      snapshot bests at the b128 top 1.1e-2); H4/H5 start shock ruled out at the end point (Sg, P, Po all within 1.41 of F8);
+      H6 precision not a lead; H7 path bug shares R1''s signature with plasticity. STEP 2 READ (zng4g_snap_read.py @ef9a3301):
+      P/F8 0.874/0.793, Po/F8 1.17/0.793 (b2048/b128), all above scratch (P/S 1.34/1.51). RUNNING: design passed 2026-11-22T03:09
+      (R1+R3, after two FIX rounds): R1 = searched scratch+flags ftmech_zng4g_scrflagsrch_b{128,2048} (16 trials, configs
+      @ff8297fa) and R3 = ft lr-window extension ftmech_zng4g_ft_b{128,2048} (+8 trials, @ab57ac74), all driven by ftmech_r1r3_drive2
+      (pid 2903650, log ~/.local/share/ccorch/detached/20261122-041442_ftmech_r1r3_drive2.log; FA_NEW_SWEEP_REASON D519 because
+      cell_guard matched the fixed-HP scrflags runs). NEXT (readout, the fresh owner, on the drive''s DONE event): seeds 43,
+      44 of each new chosen trial (run_fixed_hp.py via job_seed_batch.sh); extend zng4g_readout.py with arm Sf* and compute
+      share = log(mean Sf*/mean S)/log(mean F/mean S) (denominators 0.433 b128, 0.442 b2048) with its 10-90% range over the
+      27 seed triples; branches >=0.7 H1 (next single-flag searches + Joaquin''s call on the parent architecture), <=0.3 the
+      start (next path-bug vs plasticity: parent architecture at random init via the fine-tune path, then shrink-and-perturb,
+      par:v4_warm_start_fixes l.3557), between both; edge rule: Sf* chosen lr within 0.1 decade of an edge -> read the 16-trial
+      share flagged edge-limited and ask Joaquin the matched-count question (reviewer''s wording in the design). R3 read for
+      H3 only (chosen lr outside the old window and val below F16 by > 1.19 -> H3; no ratio from 24 trials). Figures per the
+      design''s measure, check_caption.'
+    decisions: 'D519/D520: understand the deficit with minimal discriminating runs, GPU over 30 h allowed if reasonable (R1+R3
+      <= 39.5 GPU-h). Matched-control question withdrawn under D519 (only sharpened the H4 null). Step-3 trial-count question
+      moot: R3 read by lr position only. Steps 2 and 4 dropped (done). E8069, E8072, E8074, E8097, E8133 acked; pending trials
+      left to the driver''s re-pick.'
+    ruled_out: sigma-head reset and pre-cooldown snapshot (fresh or with optimizer state) do not change the end point (all
+      within 1.41 of F8); start shock (H4) at the end point; parent precision (H6).
+    running: 'ftmech_r1r3_drive2 (drive.py, 4 searches on ccin2p3+lxplus): scrflagsrch_b128 trials in flight on lxplus (3e33a952,
+      4f2836ac, d1c72a79 queued), scrflagsrch_b2048 and ft_b2048 extension largely observed, ft_b128 extension in flight;
+      step 3 waits on its DONE event.'
+    files: analysis/finetune_mechanism/zng4g_readout.py (plot takes arms/tag, @ef9a3301), zng4g_snap_read.py + data/zng4g_snap_read.json,
+      data/zng4g_readout.json; figs zng4g_snap_vs_ft, zng4g_snap_step0 (captions OK); sweep/sweep_config_ftmech_zng4g_scrflagsrch_b{128,2048}.yaml
+      @ff8297fa, sweep_config_ftmech_zng4g_ft_b{128,2048}.yaml @ab57ac74; sweeps_local/ftmech_zng4g_{scrflagsrch,ft}_b*
+    written: '2026-11-22T08:25:17+00:00'
 - id: llm_compare
   title: LLoCa against Suprio's LLM on the LLM amplitude catalogue
   question: In the conditions of Suprio's LLM pID run (1501 MadGraph-default processes, 1352 trained, 149 held out; 55,296
