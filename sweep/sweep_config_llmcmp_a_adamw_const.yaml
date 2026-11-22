@@ -49,7 +49,7 @@ fixed_params:
   data.eval_subsample: 10000
   data.phase_space_on_pool: 'false'
   data.seed: 42
-  data.preprocess_per_dataset: 'false'
+  data.preprocess_per_dataset: 'true'    # affine_multiplicity_std refines shared_standardization of per-dataset transforms (experiment.py assert)
   data.shared_standardization: 'true'
   data.affine_multiplicity_std: 'true'
   data.alphas_input: 'true'
