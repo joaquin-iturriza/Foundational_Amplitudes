@@ -38693,6 +38693,74 @@ entries:
       S and F, or extend S and F by 8 trials too (about 11 GPU-h per batch)?'' Everything else passes: the configs at ff8297fa
       change one thing per step (S -> Sf* -> F), the loss is HETEROSC, the trial counts are 16 and the waves match the sibling
       searches, the disk is 1.5 GB, and the prior now names par:v4_warm_start_fixes.'
+  - at: '2026-11-22T03:09:56+00:00'
+    question: 'Revised on the reviewer''s FIX and re-check (edge rule reads the 16-trial share; share-of-gap reading, R3 read
+      limited to H3, edge rule for Sf*, start-up claim corrected). D519/D520 (Joaquin: ''I want you to get to the bottom of
+      what''s happening, how is it possible that fine tuning with our current setup is so much worse?''). On q q~ -> Z+4g
+      at 1e4 events the template fine-tune from the 28-process W parent ends above Muon/WSD scratch (F/S b128 1.54 [1.21,1.92],
+      b2048 1.56 [1.45,1.72]). R1: how much of that gap is the architecture the fine-tune inherits (H1: the parent''s input
+      flags input_soft_eps 1e-8 and input_pair_logs 7) and how much the pretrained start (H4 plasticity, H5 preprocessing/head
+      scale, H7 a fine-tune path bug)? Measured by a SEARCHED from-scratch model with the flags, Sf*. R3: is the fine-tune''s
+      lr window the cause (H3)? Step 3 stage 1 as passed 2026-11-21T17:39, read for H3 only. Hypotheses and existing data:
+      finding 2026-11-22 HYPOTHESES.'
+    prior: 'This entry: Sf (scratch + flags at S''s chosen HPs, seeds 42-44, not searched) b128 0.047-0.052 vs S 0.018-0.021
+      (2.5x), b2048 0.150-0.162 vs 0.058-0.067; F/Sf 0.61 [0.50,0.74] (b128), 0.63 [0.60,0.66] (b2048) (zng4g_readout.json
+      @6547b7c1). Start-shock removal moves nothing at the end point (Sg/F8 1.004/0.769, snapshot P/F8 0.874/0.793, Po/F8
+      1.17/0.793; zng4g_snap_read.py @ef9a3301). results.tex highmult grid l.15134-15160: Z+4g pretraining gain ~1 dex at
+      D<=10^1.5, ~0 at 10^4 for every parent. The flags come from the KIT singular-limit benchmark (results.tex l.12365-12397,
+      softpair arms; commit 06b9353a, D374); no on/off A/B of the two flags alone on record, none on Z+ng. Plasticity: the
+      catalog_v4 warm-start shrink-and-perturb test (par:v4_warm_start_fixes, results.tex l.3557) is the prior for H4''s follow-up
+      in branch (b). Searched results.tex: input_soft_eps, input_pair_logs, softpair, soft rescale, pair logs, plasticity,
+      Z+4g; plan finetune_mechanism, zng_uq_benchmark, kit_benchmark; decisions D374, D392, D507, D515, D516, D519, D520.'
+    measure: 'Best val MSE(log|M|^2) = min val mu-MSE x std^2 (std 1.11978 shared, checked per run) of a search''s lowest-val
+      trial; three seeds (42 trial, 43, 44) per chosen trial. R1 per batch: the flags'' share of the gap, share = log(mean
+      Sf* / mean S) / log(mean F / mean S) (three-seed means; denominator 0.433 b128, 0.442 b2048), with its 10-90% range
+      over the 27 seed triples (one seed each of Sf*, S, F). R3: the extended ft search''s chosen trial''s lr and val (H3
+      yes/no only; no F/S or F/Sf* ratio is built from the 24-trial search). Figure: each arm''s per-seed best val per batch
+      (S, Sf*, F) with the share; per-trial best val against lr for S, Sf* and F (F''s 24) with the old window edges marked;
+      best-so-far curves of the chosen trials.'
+    check: 'The flags move the measure on existing data: Sf/S 2.5x at fixed HPs (log 0.93, twice the 0.43 gap; seeds b128
+      0.0466/0.0512/0.0519 vs 0.0180/0.0214/0.0196; b2048 0.150/0.162/0.155 vs 0.058/0.067/0.064); whether a search recovers
+      it is unknown (the searched lr moves val 1.7-2.8x inside each D507 Muon cell, d507_search.json), so R1 searches. Resolution:
+      a scratch seed varies 0.17 (b128) / 0.14 (b2048) in log (max-min over 3 seeds); the gap''s 9-pairing range is 0.19-0.66
+      (b128), 0.37-0.55 (b2048); a three-seed share is resolved to ~+-0.3, which sets the branch edges 0.3 and 0.7. R3''s
+      check as passed: b128 ft driver_state 6 best at lr 8.8e-3..1.10e-2, both snapshot searches'' b128 bests also at the
+      top (1.098e-2, 1.096e-2; zng4g_snap_read.json); b2048 a confirmation (val ~4% flat 3.1e-3..4.9e-3).'
+    fixed: 'R1: sweep/sweep_config_ftmech_zng4g_scrflagsrch_b{128,2048}.yaml @ff8297fa, each differing from the D507 scratch
+      twin sweep_config_tp_zng_d1e4_muon_b<B>_zgggg.yaml (@c57dd900) only by model.input_soft_eps 1e-8 and model.input_pair_logs
+      7 (data, 1e4 events, float64, MuonAdamW/WSD, steps 31250/1953, the same 7-HP space and lr windows, 16 trials, waves
+      3,3,2,3,3,2, DyHPO seed 42). Start-up draws: at b2048 they equal S''s; at b128 they differ in lr, since S''s first 8
+      trials were drawn with lr top 3.6e-3 (tripled to 1.1e-2 after them) and Sf* draws with 1.1e-2 from the start. Edge rule,
+      fixed before the run: if Sf*''s chosen lr is within 0.1 decade of a window edge, the share is read from the 16-trial
+      search and reported as limited by the window edge, and Joaquin is asked: ''Scratch-with-flags'' best sits at the lr
+      window edge. Do we read the flags'' share from a 24-trial search against the 16-trial scratch and fine-tune searches,
+      or extend those two by 8 trials as well (about 11 GPU-h per batch)?''; no share is read from a 24-trial search before
+      his answer. No parent, so any site: sweep/drive.py --sites ccin2p3 lxplus (+ jeanzay --allow-jeanzay if it answers),
+      --mem 32G --cpus 4. Seeds 43, 44 of each chosen trial by run_fixed_hp.py via scripts/job_seed_batch.sh at site pick''s
+      site. R3: as passed (extend_sweep.py on sweeps_local/ftmech_zng4g_ft_b128 --high 3.3e-2 and _b2048 --low 1.0e-3, n_trials
+      24, waves +3,3,2, drive.py --sites ccin2p3 lxplus, the parent''s sites). Disk ~1.5 GB (46 MB per trial) against CC/EOS
+      free.'
+    control: 'R1: S (the D507 scratch cell, same data, space, seed, DyHPO seed, 16 trials, three seeds) for the flags'' cost;
+      F (arm 1, the 16-trial ft search, three seeds) for the start''s cost on the same architecture; the ladder S -> Sf* ->
+      F changes one thing per step (the flags, then the start). R3 as passed: F''s 16-trial best and its lr as the before.'
+    seeds: 'Trials seed 42; seeds 43, 44 of each new chosen trial. Cost: R1 16 x 1.06 (b128) + 16 x 0.35 (b2048) = 22.6 GPU-h
+      + seeds 2 x 1.41 = 2.8; R3 11.3 + seeds <= 2.8. Total <= 39.5 GPU-h, over 30: D520 (''I don''t care about gpu hours
+      for this in particular as long as the design is reasonable ... send it anyway''); fewer steps or events would change
+      the cells where the deficit was measured, so the cells stay. Wall: R1 b128 ~6.4 h (6 waves x 1.06 h), b2048 ~2.1 h;
+      R3 ~3.2 h; seeds ~1.1 h after.'
+    outcome: 'R1 per batch, from the three-seed share (single-seed searches only as a first look): (a) share >= 0.7 with its
+      10-90% range above 0.3 -> H1: the inherited flags carry the gap (share > 1: the start helps on the same architecture,
+      F < Sf*); next: which flag (single-flag searched scratch at b128) and Joaquin''s call on the parent''s architecture
+      for Z+ng; dilution (H2) then tested where a gain exists (D <= 10^3). (b) share <= 0.3 with its range below 0.7 -> H1
+      ruled out: the flags cost nothing once searched; the gap is the pretrained start (H3 read from R3; else H4/H5/H7): next
+      design separates a fine-tune path bug from plasticity (the parent''s architecture at random init loaded through the
+      fine-tune path, against Sf*; then a shrink-and-perturb start after par:v4_warm_start_fixes). (c) share in (0.3, 0.7),
+      or its range spanning both edges -> both: the flags cost Sf*/S and the start F/Sf*, each reported with its range; next
+      both follow-ups, the larger first. R3 (H3 only): new chosen trial with lr outside the old window (b128 > 1.1e-2, b2048
+      < 3.1e-3) and val below F''s 16-trial best by more than the 1.19 seed spread -> H3: the fine-tune needs a different
+      lr than scratch; the matched-count question (24 against 16) then goes to Joaquin before any ratio is built; chosen trial
+      inside the old window or not lower -> H3 ruled out; best at the new edge -> unresolved. Diverged and spiking trials
+      listed apart (D398), never retried.'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
