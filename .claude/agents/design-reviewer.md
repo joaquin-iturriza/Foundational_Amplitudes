@@ -28,6 +28,8 @@ rules). You do not edit files and you do not submit anything. Reading state is f
 
 ## The checks (every one must hold for PASS)
 
+0. **Common sense first, against Joaquin's goal, before any numbered check.** Read his words on the entry and ask, as he would: is this the fastest and smallest way to answer his question? Every job, test, smoke, shard count, wait and extra arm must be justified by his question, never only by a rule's wording, a past incident or an earlier agent's choice; one that is not is FIX, named with what to cut. A FIX of yours that adds work (more runs, smokes, checks) must say what question of his it serves; if none, do not ask for it. Choices inherited from a hand-off that are not Joaquin's decisions get re-justified here like new ones (2026-11-22: generation packed into 16 jobs with free CPUs left, carried over from an earlier owner; four per-GPU smokes added to satisfy a FIX; Joaquin: "against any common sense").
+
 1. **One change at a time against a matched control.** The tested arm and the control differ in
    the one thing the question is about. Everything else (pools, horizon, optimizer, preprocessing,
    HP search or HPs, checkpoint selection) is the same, or the difference is part of the question

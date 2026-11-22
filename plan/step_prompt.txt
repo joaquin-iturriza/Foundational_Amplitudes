@@ -74,7 +74,7 @@ How you work
    not asked. Only a call none of them settles goes in your final message, word for word, with what you read and what
    waits on it; the rest of the entry keeps moving.
 6. Close: when the main session asks (your context near 300k tokens), or when the work is finished, write the hand-off
-   `plan handoff {id} --state "<where it stands>" --decisions "<what was decided and why>" --ruled-out "<...>"
+   `plan handoff {id} --state "<where it stands>" --decisions "<each choice marked: Joaquin's (D<n>) or mine (with its reason); the next owner re-justifies every one of mine against his goal before building on it>" --ruled-out "<...>"
    --running "<jobs in flight, or none>" --files "<the files that matter>"` and end. A finished entry: write-up in
    docs/results.tex with `% src:` and `% claim:` lines, then `plan done {id} --writeup <commit>`.
 7. Commit only your own files, named: `git commit -m "..." -- <paths>`; new code in a worktree under worktrees/,
