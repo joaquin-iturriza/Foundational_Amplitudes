@@ -39049,5 +39049,13 @@ entries:
       (tools/attribution_inputs.py, tools/linear_readout.py, tools/kshot_context.py, analysis/divergences/*) have no alpha_s
       column and fail with a shape mismatch on an alphas_input model, as does a fine-tune whose alphas_input differs from
       its parent''s; llm_compare''s held-out scoring must go through the run''s own test role on the memmap path.'
+  - at: '2026-11-22T03:16:36+00:00'
+    text: 'Batching (Joaquin 2026-11-22: ''I believe that training time might be mostly because of how weirdly he implements
+      batches and so on, so keep that in mind as one of the things that we don''t necessarily need to replicate''): kept what
+      fairness to the LLM rests on, the data and the updates: 55,296 events per process per epoch, 20 epochs, 60,840 optimizer
+      updates, so 24,576 events per update, the same target and test. Dropped: his batch construction (one process per 6144-event
+      micro-batch, 4 per step); we use our own memmap data path and sampler (mixed-process batches of 24,576). Supersedes
+      the round_robin line of the earlier mapping finding. Cost of one run: measured from our own smoke run in this layout,
+      not his 7.2 H100-h.'
   step_waits:
     '2': 'a reviewer: repo-reviewer of branch alphas_input @2786116d'
