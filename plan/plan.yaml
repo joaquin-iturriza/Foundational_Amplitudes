@@ -39096,17 +39096,20 @@ entries:
   evidence:
     runs:
     - FA-lxplus-a0cc1bc6
-    commit: 29e6c9f6
+    commit: 0bb3af13
     paths:
     - analysis/catalog_daniel/dancat_plain_mse.py
     - config/amplitudes.yaml
     - data_mmap.py
+    - datagen.py
+    - keyed_aug.py
     - scripts/job_gen_daniel_catalog.sh
     - scripts/job_llm_score.sh
     - sites/setup.sh
     - sweep/prune.py
     - sweep/sweep_config_llmcmp_a_adamw_const.yaml
     - tests/test_alphas_input.py
+    - tests/test_memmap_data.py
     - tools/check_pp_pools.py
     - tools/llm_score.py
   dead_ends: []
