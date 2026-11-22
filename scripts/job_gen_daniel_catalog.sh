@@ -31,13 +31,18 @@ if [ -n "${DANIEL_SHARD_N:-}${DANIEL_ONLY:-}" ]; then
     python tools/shard_recipes.py "$SPEC" --n "$N" --k "$K" --only "${DANIEL_ONLY:-}" --out "$OUT" || exit 1
     SPEC="$OUT"
 fi
-echo "MG5 $(sed -n 's/^version = //p' "${MG5_WORK_DIR:-$WORK/mg5amcnlo}/VERSION" 2>/dev/null)"
+echo "MG5 $(sed -n 's/^version = //p' "$(dirname "$(dirname "${MG5_BIN:-$WORK/mg5amcnlo/bin/mg5_aMC}")")/VERSION" 2>/dev/null)"
 # MadEvent dirs, deleted per process: node-local under HTCondor (lxplus: SCRATCH is EOS, quota-bound), else SCRATCH
 export AMP_LHE_WORK_DIR="${AMP_LHE_WORK_DIR:-${_CONDOR_SCRATCH_DIR:+$_CONDOR_SCRATCH_DIR/lhe_work}}"
 export AMP_LHE_WORK_DIR="${AMP_LHE_WORK_DIR:-$SCRATCH/lhe_work}"
 mkdir -p "$AMP_LHE_WORK_DIR"
+# DANIEL_LOCAL_MG=1: the compiled <process>_standalone/_events outputs node-local too (MG5_WORK_DIR holds only those;
+# MG5_BIN stays the install), gone with the job: the pools' physics sidecar replaces the standalone [D209]
+if [ "${DANIEL_LOCAL_MG:-0}" = 1 ] && [ -n "${_CONDOR_SCRATCH_DIR:-${TMPDIR:-}}" ]; then
+    export MG5_WORK_DIR="${_CONDOR_SCRATCH_DIR:-$TMPDIR}/mg5work"; mkdir -p "$MG5_WORK_DIR"
+fi
 # the work area's peak size (the batch's disk per job), sampled once a minute
-( peak=0; while sleep 60; do m=$(du -sm "$AMP_LHE_WORK_DIR" 2>/dev/null | cut -f1); [ "${m:-0}" -gt "$peak" ] && peak=$m && echo "LHE_WORK_PEAK_MB $peak"; done ) &
+( peak=0; while sleep 60; do m=$(du -smc "$AMP_LHE_WORK_DIR" ${DANIEL_LOCAL_MG:+"$MG5_WORK_DIR"} 2>/dev/null | tail -1 | cut -f1); [ "${m:-0}" -gt "$peak" ] && peak=$m && echo "LHE_WORK_PEAK_MB $peak"; done ) &
 SAMPLER=$!
 echo "host $(hostname)  spec $SPEC  workers $W  lhe cores ${AMP_LHE_CORES:-1}  work $AMP_LHE_WORK_DIR"
 python prebuild_recipes.py "$SPEC" --workers "$W" --lhe-cores "${AMP_LHE_CORES:-1}"
@@ -45,5 +50,6 @@ rc=$?
 python tools/dump_diagrams.py --prefix "${DANIEL_PREFIX:-dc_}" --skip-existing --workers "$W"   # d4_: the 2->4 probes
 rc2=$?
 kill $SAMPLER 2>/dev/null
+[ "${DANIEL_LOCAL_MG:-0}" = 1 ] && echo "STANDALONES_MB $(du -smc "$MG5_WORK_DIR"/*_standalone 2>/dev/null | tail -1 | cut -f1) for $(ls -d "$MG5_WORK_DIR"/*_standalone 2>/dev/null | wc -l) processes"
 echo "prebuild exit $rc, sidecars exit $rc2"
 exit $(( rc != 0 || rc2 != 0 ))
