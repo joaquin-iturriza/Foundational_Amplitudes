@@ -38655,3 +38655,34 @@ entries:
     or a control. None settles it.'
   blocks: reading the snapshot arms (2a, 2b) against a control; the matched-control searches if chosen
   blocks_steps: *id003
+- id: llm_compare
+  title: LLoCa against Suprio's LLM on the LLM amplitude catalogue
+  question: In the conditions of Suprio's LLM pID run (1501 MadGraph-default processes, 1352 trained, 149 held out; 55,296
+    events per process per epoch, batches of 6144 events of one process, 4 per step, 20 epochs = 60,840 steps; his target
+    z and test metric, RMSE of log|M|^2 pooled), how does a muP LLoCa transformer do (a) after a DyHPO search, (b) scaled
+    by muP width toward the LLM's 359.6M trained parameters at the tuned HPs, (c) in our latest setup (emission-scale target,
+    inputs, MuonAdamW, WSD), against the LLM (0.321 seen / 0.721 held out) and his LLoCa (0.506 / 0.953)?
+  status: running
+  quotes:
+  - said_at: '2026-11-22T02:55:32.558000+00:00'
+    text: The thing is that he didn't particularly optimize the lloca and lgatr runs, (neither the llm, but since it's so
+      expensive to train, we assume doing hp search on it is out of the question) so now what I would like to do is take a
+      lloca transformer in that setup, do HPO and see what we get.
+    decision: D525
+    covers:
+    - llm_compare
+    - LLoCa transformer in Suprio's LLM-comparison setup (1501-process LLM catalogue) with a DyHPO search
+  decisions:
+  - D525
+  next: Get Suprio's setup and data on a site (catalogue, data_running_alpha.npy, his splits, his metric code), map the LLM
+    run's conditions onto run.py, cost one full LLoCa run, design the DyHPO search (fewer steps or a subset only if it still
+    ranks HPs), design review, submit
+  done_when: null
+  notes_ref: null
+  match: llmcmp_*,tp_llmcmp_*
+  evidence:
+    runs: []
+    commit: null
+    paths: []
+  dead_ends: []
+  asks: []
