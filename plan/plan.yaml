@@ -39472,3 +39472,16 @@ entries:
       then the 16 jobs go out whole after an eos quota read. Batch: 2982 pairs, every |z| < 5 and every pool complete -> memmap
       prebuilds and part (a)''s chain resubmitted. A process with |z| >= 5 is listed with z and shift and its pool unused
       until the cause is found and fixed; a short or failed process is rebuilt by resubmitting its shard (idempotent).'
+    fix_at: '2026-11-22T05:48:13+00:00'
+    fix: 'Re-check after 210869da: points (1)-(3) and (5) of the last FIX are addressed (tests/test_check_pp_pools.py and
+      tests/test_mixed_generation.py pass in .venv-cpu; check_pp_pools now requires 2 pairs per process; DANIEL_WORKERS comes
+      first; exact submit lines given; wall targets 0.5 h / 1.5 h with rescaling from the smoke). One check still fails. Check
+      14, disk: the labeller''s compiled standalone_cpp outputs are not counted. mg5_pipeline_final.lhe_standalone_dir puts
+      <process>_standalone under MG5_WORK_DIR = /eos/user/j/joiturri/mg5amcnlo_370, on the EOS quota, and they are kept after
+      the run (only the MadEvent dirs in AMP_LHE_WORK_DIR are deleted; tools/pool_physics.py prune-standalones is a separate
+      step under D208). That is 1491 compiled standalones on EOS beside the ~48 GB of pools and memmap cache, against ~77
+      GB free, and their size is in no line of the design. Fix: in the smoke, read du of the two new dc_*_standalone dirs
+      (or of CC''s existing dc_*_standalone under $WORK/mg5amcnlo), scale it by 1491, and add it to the disk sum. The outcome
+      must say what happens if it does not fit, for example deleting each standalone after its pool is labelled (prune-standalones,
+      D208) or putting MG5_WORK_DIR''s process outputs on node-local disk. The same smoke gate already reads LHE_WORK_PEAK_MB,
+      so this is one more number from the same job.'
