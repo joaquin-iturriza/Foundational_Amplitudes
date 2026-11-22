@@ -38530,6 +38530,62 @@ entries:
       waves 3,3,2, same batch/optimizer, HETEROSC, own target stats; disk ~1 GB; rates from the same sweeps. Searched results.tex
       for ftmech, zng4g, window''s top, window edge, extend_sweep; decisions for extend, window, edge, trials (D97, D244,
       D245, D429, D430, D514): no prior Z+4g fine-tune search beyond these windows.'
+  - at: '2026-11-22T03:04:16+00:00'
+    question: 'D519/D520 (Joaquin: ''I want you to get to the bottom of what''s happening, how is it possible that fine tuning
+      with our current setup is so much worse?''). On q q~ -> Z+4g at 1e4 events the template fine-tune from the 28-process
+      W parent ends above Muon/WSD scratch (F/S b128 1.54 [1.21,1.92], b2048 1.56 [1.45,1.72]). Which mechanism? R1 tests
+      H1 (ARCHITECTURE: the parent''s two input flags, input_soft_eps 1e-8 and input_pair_logs 7, which every fine-tune inherits,
+      make the model worse on Z+4g) against the start-cost hypotheses (H4 plasticity, H5 preprocessing, H7 a fine-tune path
+      bug): is a SEARCHED from-scratch model with the flags (Sf*) at F''s level or at S''s? R3 tests H3 (the fine-tune''s
+      lr window): step 3 stage 1 as passed 2026-11-21T17:39, unchanged. Hypotheses and existing data: finding 2026-11-22 HYPOTHESES.'
+    prior: 'This entry: Sf (scratch + flags at S''s chosen HPs, seeds 42-44, not searched) b128 0.047-0.052 vs S 0.018-0.021
+      (2.5x), b2048 0.150-0.162 vs 0.058-0.067; F/Sf 0.61 [0.50,0.74] (b128), 0.63 [0.60,0.66] (b2048) (zng4g_readout.json
+      @6547b7c1). Start-shock removal moves nothing at the end point (Sg/F8 1.004/0.769, snapshot P/F8 0.874/0.793, Po/F8
+      1.17/0.793; zng4g_snap_read.py @ef9a3301). results.tex highmult grid l.15134-15160: Z+4g pretraining gain ~1 dex at
+      D<=10^1.5, ~0 at 10^4 for every parent. The flags come from the KIT singular-limit benchmark (results.tex l.12365-12397,
+      softpair arms on u u~ g, u u~ g g, t t~ virt; commit 06b9353a, D374); no on/off A/B of the two flags alone on record,
+      none on Z+ng (searched results.tex: input_soft_eps, input_pair_logs, softpair, soft rescale, pair logs; plan finetune_mechanism,
+      zng_uq_benchmark, kit_benchmark; decisions D374, D392, D507, D515, D516, D519, D520).'
+    measure: 'As step 1: best val MSE(log|M|^2) = min val mu-MSE x std^2 (std 1.11978 shared, checked per run) of a search''s
+      lowest-val trial; three-seed means with the 9-pairing range (zng4g_readout.py, extended to arm Sf*). R1: Sf* = the scrflagsrch
+      search''s chosen trial + its seeds 43, 44; Sf*/S and F/Sf* per batch. R3 as passed: the extended ft search''s chosen
+      trial and its lr; if new, its seeds 43, 44 and F/S recomputed. Figure: each arm''s per-trial best val per batch (S,
+      Sf*, F, F extended), and best-so-far curves of the chosen trials; per-trial best val against lr for F (24) beside S
+      and Sf* with the old window edges marked.'
+    check: 'The flags move the measure on existing data: Sf/S 2.5x at fixed HPs (seeds b128 0.0466/0.0512/0.0519 vs 0.0180/0.0214/0.0196;
+      b2048 0.150/0.162/0.155 vs 0.058/0.067/0.064), i.e. 5x the 1.19 seed spread; whether a search recovers it is unknown
+      (the searched lr moves val 1.7-2.8x inside each D507 Muon cell, d507_search.json), so R1 searches. R3''s check as passed:
+      b128 ft driver_state 6 best at lr 8.8e-3..1.10e-2, and both snapshot searches'' b128 bests also at the top (1.098e-2,
+      1.096e-2; zng4g_snap_read.json); b2048 a confirmation (val ~4% flat 3.1e-3..4.9e-3).'
+    fixed: 'R1: sweep/sweep_config_ftmech_zng4g_scrflagsrch_b{128,2048}.yaml, each differing from the D507 scratch twin sweep_config_tp_zng_d1e4_muon_b<B>_zgggg.yaml
+      (@c57dd900) only by model.input_soft_eps 1e-8 and model.input_pair_logs 7 (data, 1e4 events, float64, MuonAdamW/WSD,
+      steps 31250/1953, the same 7-HP space and lr windows, 16 trials, waves 3,3,2,3,3,2, DyHPO seed 42 so the start-up HPs
+      equal S''s; one difference: S''s b128 lr top was tripled to 1.1e-2 after its first 8 trials, Sf* has it from the start).
+      No parent, so any site: sweep/drive.py --sites ccin2p3 lxplus jeanzay --allow-jeanzay (Jean Zay only if up), --mem 32G
+      --cpus 4. Seeds 43, 44 of each chosen trial by run_fixed_hp.py via scripts/job_seed_batch.sh at site pick''s site. R3:
+      as passed (extend_sweep.py on ftmech_zng4g_ft_b128 --high 3.3e-2 and _b2048 --low 1.0e-3, n_trials 24, waves +3,3,2,
+      drive.py --sites ccin2p3 lxplus, the parent''s sites); the trial-count question is moot: the outcome is read by the
+      chosen lr''s position, not by count. Disk ~1.5 GB (46 MB per trial) against CC/EOS free.'
+    control: 'R1: S (the D507 scratch cell, same space, seed, DyHPO seed, 16 trials, three seeds) for the flags'' cost; F
+      (arm 1, the 16-trial ft search, three seeds) for the fine-tune against the same architecture. R3 as passed: S, F''s
+      16-trial best as the before.'
+    seeds: 'Trials seed 42; seeds 43, 44 of each new chosen trial. Cost: R1 16 x 1.06 (b128) + 16 x 0.35 (b2048) = 22.6 GPU-h
+      + seeds 2 x 1.41 = 2.8; R3 11.3 + seeds <= 2.8. Total <= 39.5 GPU-h, over 30: D520 (''I don''t care about gpu hours
+      for this in particular as long as the design is reasonable ... send it anyway''); fewer steps or events would change
+      the cell where the deficit was measured, so the cells stay. Wall: R1 b128 ~6.4 h (6 waves x 1.06 h), b2048 ~2.1 h; R3
+      ~3.2 h; seeds ~1.1 h after.'
+    outcome: 'R1 per batch, single-seed searches read first (bar 1.41 as Sg/F8: two single seeds within the Muon seed spread),
+      then three-seed means: (a) Sf*/S > 1.41 and F/Sf* <= 1.41 (Sf* at or above F) -> H1: the inherited flags account for
+      the deficit; the pretrained start is neutral or helps (F/Sf* < 1/1.41: helps) on the same architecture; next: which
+      flag (single-flag searches at b128) and Joaquin''s call on the parent''s architecture for Z+ng; dilution (H2) then testable
+      only where a gain exists (D <= 10^3). (b) Sf*/S within 1.41 (the flags cost nothing once searched) -> H1 ruled out:
+      the deficit is the pretrained start itself (plasticity H4, preprocessing H5, a path bug H7, or H3), read with R3; if
+      R3 also leaves F HIGHER, next design separates plasticity from a path bug (fine-tune from the parent''s step-0-equivalent:
+      the parent''s architecture at random init loaded through the fine-tune path, F-path-at-init vs S). (c) Sf* between (above
+      S by > 1.41 and below F by > 1.41) -> both: the flags cost Sf*/S, the start costs F/Sf*; each reported, next as (a)
+      and (b). R3 outcome as passed: SAME/LOWER with the new lr outside the old window -> the window (H3); HIGHER with the
+      best interior -> H3 ruled out; HIGHER at the new edge -> unresolved. Diverged and spiking trials listed apart (D398),
+      never retried.'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
