@@ -37870,12 +37870,10 @@ entries:
       arms' null on the restart shock (H4), which the sigma-reset arm (Sg/F8 1.004/0.769) and both snapshot arms (0.79-1.17)
       already give independently at the end point; it tests no open hypothesis
   owner:
-    agent: aea3b3e66649163d1
-    state: closed
-    since: '2026-11-22T02:15:37+00:00'
-    state_at: '2026-11-22T08:24:30.860000+00:00'
-    context: 212418
-    context_at: '2026-11-22T03:16:13+00:00'
+    agent: a134b21ae2a8a78ce
+    state: working
+    since: '2026-11-22T09:22:16+00:00'
+    state_at: '2026-11-22T09:22:16+00:00'
   findings:
   - at: '2026-11-20T03:05:23+00:00'
     text: '2026-11-20 step 1 read (restart_steps.py, plot_restart.py @a5f6c7b3; figs restart_steps, restart_steps_zng, restart_headstart):
