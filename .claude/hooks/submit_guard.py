@@ -275,16 +275,6 @@ def reread_ok(plan, e, st, runs):
     return all(r in mine for r in runs)
 
 
-def design_ok(plan, e):
-    """Any passed, not-withdrawn design of the entry recorded within DESIGN_H covers a submission (a withdrawn later design
-    falls back to the earlier passed one)."""
-    for x in e.get("designs") or []:
-        t = plan.parse(x.get("at"))
-        if x.get("passed_at") and not x.get("withdrawn_at") and t and plan.now() - t <= plan.dt.timedelta(hours=plan.DESIGN_H):
-            return True
-    return False
-
-
 def design(cmd, inp, subs):
     if gives_verdict(cmd) and inp.get("agent_type") != "design-reviewer":
         return ["design: plan design-pass and design-fix are the design reviewer's verdict; only the design-reviewer "
@@ -299,7 +289,7 @@ def design(cmd, inp, subs):
         bad = []
         rereads = REREAD.findall(cmdparse.code_text(cmd))
         for x in sorted({x for s in subs for x in s if x != "*"}):
-            if x in ids and not design_ok(plan, ids[x]) and not reread_ok(plan, ids[x], st, rereads):
+            if x in ids and not plan.design_fresh(ids[x]) and not reread_ok(plan, ids[x], st, rereads):
                 last = plan.last_design(ids[x])
                 old = last and plan.now() - plan.parse(last["at"]) > plan.dt.timedelta(hours=plan.DESIGN_H)
                 bad.append("%s (%s)" % (x, "no design recorded" if not last else

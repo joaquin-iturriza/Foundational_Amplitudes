@@ -97,12 +97,12 @@ def test_own_debris_and_mmap_cache_are_not_data_deletes():
     assert g.data_delete(cmdparse.commands("site run ccin2p3 FA -- rm -rf amp_data_cache/zz_a amp_data_cache/v4_x"))
 
 
-def test_design_check_uses_any_passed_unwithdrawn_design():
-    import datetime as dt
+def test_design_fresh_uses_latest_unwithdrawn_design():
     plan = g._plan()
     t = plan.now().isoformat()
-    ok = {"at": t, "passed_at": t}
-    assert g.design_ok(plan, {"designs": [ok, {"at": t}]})
-    assert g.design_ok(plan, {"designs": [ok, {"at": t, "passed_at": t, "withdrawn_at": t}]})
-    assert not g.design_ok(plan, {"designs": [{"at": t, "passed_at": t, "withdrawn_at": t}]})
-    assert not g.design_ok(plan, {"designs": []})
+    ok, wd = {"at": t, "passed_at": t}, {"at": t, "passed_at": t, "withdrawn_at": t}
+    fresh = lambda *ds: plan.design_fresh({"designs": list(ds)})
+    assert fresh(ok) and fresh(ok, wd)                       # withdrawn later design falls back to the passed one
+    assert not fresh(ok, {"at": t})                          # later design pending
+    assert not fresh(ok, {"at": t, "fix_at": t, "fix": "x"})  # later design sent back
+    assert not fresh(wd) and not fresh()

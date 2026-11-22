@@ -2342,8 +2342,8 @@ def last_design(e):
 
 
 def design_fresh(e, hours=DESIGN_H):
-    """The entry's latest design, if recorded within `hours` and passed by the design reviewer; else None."""
-    x = last_design(e)
+    """The entry's latest design that is not withdrawn, if recorded within `hours` and passed by the design reviewer; else None."""
+    x = next((y for y in reversed(e.get("designs") or []) if not y.get("withdrawn_at")), None)
     t = parse(x.get("at")) if x else None
     return x if t and x.get("passed_at") and now() - t <= dt.timedelta(hours=hours) else None
 
