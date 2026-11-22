@@ -33,12 +33,33 @@ def _mix64(x):
 HEAD_BYTES = 1 << 16
 
 
+STUB_SUFFIX = ".identity.json"
+
+
+def pool_stub(path):
+    """The identity stub standing for a pool whose file is absent (tools/check_pp_pools.py --write-stubs: a run on a
+    site holding its memmap cache but not its train pools), None when the pool file exists or no stub does. It holds
+    only beside the .recipe.json it was written with (the sidecar's sha256): a regenerated pool's sidecar refuses it."""
+    import os
+    if os.path.exists(path) or not os.path.exists(path + STUB_SUFFIX):
+        return None
+    stub = json.load(open(path + STUB_SUFFIX))
+    side = path + ".recipe.json"
+    got = hashlib.sha256(open(side, "rb").read()).hexdigest() if os.path.exists(side) else None
+    assert got == stub["recipe_sha256"], \
+        f"{path + STUB_SUFFIX}: written beside another .recipe.json than the one here; rewrite it beside the pool"
+    return stub
+
+
 def pool_identity(path):
     """A pool file's content identity, independent of where it lies and when it was written: [recipe_id, size in
     bytes, sha256 of its first and last 64 KiB] (the .npy header carries the shape, so a pool cut or extended
     changes it). For a pool composed at load (mix_compose: its sidecar's derived_from.composed_at_load, rewritten in
     node-local /tmp by every job) the sidecar's sha256 of its rows stands for the content."""
     import os
+    stub = pool_stub(path)
+    if stub is not None:
+        return stub["identity"]
     side_doc = None
     for side in (path + ".recipe.json", os.path.splitext(path)[0] + ".recipe.json"):
         if os.path.exists(side):

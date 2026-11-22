@@ -6,6 +6,9 @@ summary; exit 1 if any.
     python tools/check_pp_pools.py [--spec recipes/<spec>.yaml] [--labels]
 --labels: also each train pool's labels (2 pairs per process required, else BAD) against its val and test pools (datagen.mixed_generation, any generator
 version): BADZ above |z| = 5; prints the largest |z|.
+--write-stubs (with --labels, only when no problem is found): writes <train pool>.identity.json beside each train pool
+(keyed_aug.pool_stub: its identity, its alpha_s identity, its shape and this label check), so a site holding the memmap
+cache and these stubs but not the train pools opens the same cache (copy the stubs with the pools' .recipe.json).
 """
 import json, os, sys
 
@@ -21,7 +24,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--spec", default=os.path.join(ROOT, "recipes", "catalog_v3_pp_test.yaml"))
     ap.add_argument("--labels", action="store_true")
+    ap.add_argument("--write-stubs", action="store_true")
     a = ap.parse_args()
+    assert a.labels or not a.write_stubs, "--write-stubs needs --labels (the stub carries the label check)"
     procs = yaml.safe_load(open(a.spec))["processes"]
     bad, paths = [], {"train": {}, "val": {}, "test": {}}
     for e in procs:
@@ -52,6 +57,12 @@ def main():
         if len(allz) != 2 * len(procs):      # a pool without a generator sha is skipped by mixed_generation: never a pass
             bad.append(f"labels: {len(allz)} process-role pairs compared, {2 * len(procs)} expected")
         print("LABELS %d process-role pairs compared, largest |z| %s" % (len(allz), max(allz)[:3] if allz else None))
+    if a.write_stubs and not bad:
+        from data_mmap import write_pool_stub
+        for e in procs:
+            n = e["name"]
+            write_pool_stub(paths["train"][n], {r: paths[r][n] for r in ("val", "test")}, zs.get(n, {}))
+        print(f"STUBS written for {len(procs)} train pools")
     for b in bad:
         print("BAD", b)
     print(f"checked {len(procs)} processes, {len(bad)} problems")

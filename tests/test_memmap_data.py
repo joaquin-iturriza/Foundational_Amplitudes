@@ -148,6 +148,7 @@ def _build(sweep_config, n_procs, out, extra):
     snap["train_eval"] = next(iter(exp.train_eval_loader))
     snap["split_train"] = np.asarray(exp._split_indices["train"])
     snap["mmap_dir"] = getattr(exp, "_mmap_dir", None)
+    snap["pool_paths"] = {r: dict(v) for r, v in exp._pool_paths.items()}
     snap["run_dir"] = exp.cfg.run_dir
     del exp
     return snap
@@ -252,6 +253,80 @@ def _compare(A, B, label):
           f"{len(A['proc_val'])} per-process loaders compared)")
 
 
+def section1_stub_labels():
+    """datagen.mixed_generation on a train pool replaced by its stub returns what it returned on the pool, for pools
+    from different generator versions (the branch the synthetic recipe's one-version pools never reach)."""
+    import json
+    import datagen
+    d = tempfile.mkdtemp()
+    rng = np.random.default_rng(0)
+    paths = {}
+    for k, role in enumerate(("train", "val", "test")):
+        rows = rng.normal(size=(2000, 21)); rows[:, 0] += 10; rows[:, 4] += 10
+        rows[:, -1] = np.exp(rng.normal(size=2000) + (0.3 if role == "train" else 0.0))
+        p = os.path.join(d, f"proc_{role}.npy"); np.save(p, rows)
+        json.dump({"recipe_id": role, "provenance": {"pipeline_sha256": "sha%d" % (k > 0)}}, open(p + ".recipe.json", "w"))
+        paths[role] = {"proc": p}
+    for kw in ({}, {"z_max": 0, "any_version": True}):
+        want = datagen.mixed_generation(paths, **kw)
+        assert want, "the label shift must be flagged"
+        dm.write_pool_stub(paths["train"]["proc"], {r: paths[r]["proc"] for r in ("val", "test")},
+                           datagen.mixed_generation(paths, z_max=0, any_version=True).get("proc", {}))
+        os.rename(paths["train"]["proc"], paths["train"]["proc"] + ".away")
+        assert datagen.mixed_generation(paths, **kw) == want, (kw, datagen.mixed_generation(paths, **kw), want)
+        os.rename(paths["train"]["proc"] + ".away", paths["train"]["proc"])
+    tr = paths["train"]["proc"]                     # a regenerated pool's new sidecar under the old stub refuses
+    os.rename(tr, tr + ".away"); side = open(tr + ".recipe.json").read()
+    open(tr + ".recipe.json", "w").write(side.replace('"train"', '"train2"'))
+    try:
+        datagen.mixed_generation(paths)
+        raise AssertionError("a stub beside another .recipe.json must refuse")
+    except AssertionError as e:
+        assert "another .recipe.json" in str(e), e
+    open(tr + ".recipe.json", "w").write(side); os.rename(tr + ".away", tr)
+    np.save(paths["val"]["proc"], np.load(paths["val"]["proc"])[:-1])      # another val pool than the stub read
+    os.rename(paths["train"]["proc"], paths["train"]["proc"] + ".away")
+    try:
+        datagen.mixed_generation(paths)
+        raise AssertionError("a stub checked against another val pool must refuse")
+    except AssertionError as e:
+        assert "another val pool" in str(e), e
+    shutil.rmtree(d)
+    print("section 1: mixed_generation on identity stubs equals its read of the pools; another val pool refuses")
+
+
+def _stubbed_train_pools(sweep_config, n_procs, out, on, B):
+    """A site holding the cache but not the train pools (keyed_aug.pool_stub): with each train pool renamed away and
+    its identity stub written (data_mmap.write_pool_stub), a memmap run opens the same cache and gets the same data;
+    without the stubs it refuses."""
+    import datagen
+    from keyed_aug import STUB_SUFFIX
+    paths = B["pool_paths"]
+    z = datagen.mixed_generation(paths, z_max=0, any_version=True)
+    moved = []
+    try:
+        for n, p in paths["train"].items():
+            dm.write_pool_stub(p, {r: paths[r][n] for r in ("val", "test")}, z.get(n, {}))
+            os.rename(p, p + ".away"); moved.append(p)
+        assert datagen.mixed_generation(paths, z_max=0, any_version=True) == z, "the stubs' label check differs"
+        C = _build(sweep_config, n_procs, os.path.join(out, "on42_stubbed"), on + ["seed=42"])
+        assert C["mmap_dir"] == B["mmap_dir"], (C["mmap_dir"], B["mmap_dir"])
+        _compare(B, C, "seed 42: memmap on the pools vs on their stubs")
+        for p in moved:
+            os.remove(p + STUB_SUFFIX)
+        try:
+            _build(sweep_config, n_procs, os.path.join(out, "on42_nostub"), on + ["seed=42"])
+            raise AssertionError("a run whose train pools and stubs are both absent must refuse")
+        except (FileNotFoundError, RuntimeError, AssertionError) as e:
+            assert "must refuse" not in str(e), e
+    finally:
+        for p in moved:
+            os.rename(p + ".away", p)
+            if os.path.exists(p + STUB_SUFFIX):
+                os.remove(p + STUB_SUFFIX)
+    print("section 2: a memmap run on identity stubs of its train pools opens the same cache and gets the same data")
+
+
 def section2_end_to_end(sweep_config, n_procs, out):
     """data.memmap against the in-memory path for two seeds from one cache (format 3: the cache holds no seed, cap or
     statistic; the augmentation is drawn per event from (seed, pool, index) in both paths), the refusal without a
@@ -276,6 +351,7 @@ def section2_end_to_end(sweep_config, n_procs, out):
         _compare(A, B, f"seed {seed}: in memory vs memmap")
         snaps[seed] = (A, B)
     assert snaps[42][1]["mmap_dir"] == snaps[43][1]["mmap_dir"], "two seeds must open one cache"
+    _stubbed_train_pools(sweep_config, n_procs, out, on, snaps[42][1])
     assert not np.array_equal(snaps[42][0]["particles_flat"], snaps[43][0]["particles_flat"]), \
         "seeds 42 and 43 drew the same augmentation"
     # smaller caps: a prefix of the same cache (train_subsample / eval_subsample are not in its key)
@@ -343,6 +419,7 @@ if __name__ == "__main__":
         sys.exit(0)
     section0_reductions()
     section1_dataset_sampler()
+    section1_stub_labels()
     if a.sweep_config or a.run_config or a.synthetic:
         section2_end_to_end(a.sweep_config, a.n_procs, os.path.expandvars(a.out))
     print("OK")
