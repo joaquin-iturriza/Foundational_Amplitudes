@@ -2,7 +2,7 @@
 search's chosen trial (its lowest val_loss in sweeps_local/<sweep>/results) at other seeds, one run per chunk. The HPs
 are rebuilt from the sweep config's candidate pool as sweep/seed_list.py does (dyhpo_sampler._sample_candidates).
 
-    python3 analysis/finetune_mechanism/zng4g_seed_chunks.py ftmech_zng4g_ft_b2048 --seeds 43 44
+    python3 analysis/finetune_mechanism/zng4g_seed_chunks.py ftmech_zng4g_ft_b2048 --seeds 43 44   (run in .venv-driver)
 """
 import argparse
 import glob
@@ -18,12 +18,20 @@ sys.path.insert(0, os.path.join(ROOT, "sweep"))
 from dyhpo_sampler import _sample_candidates  # noqa: E402
 
 
-def hps(cfg_path, idx):
+def hps(cfg_path, idx, sweep=None):
+    """A candidate's HPs: from the drive's own state when it exists (extend_sweep appends candidates and widens the
+    config's window, so a fresh draw from the edited config no longer matches old indices), else rebuilt."""
     c = yaml.safe_load(open(os.path.join(ROOT, cfg_path)))
-    d = c.get("dyhpo", {})
-    cand = _sample_candidates(c["search_space"], d.get("n_candidates", 300), d.get("seed", 42))
-    assert idx < len(cand), f"hp{idx} is past the pre-sampled pool"
-    fmt = lambda v: str(v).lower() if isinstance(v, bool) else v   # noqa: E731
+    fmt = lambda v: str(v).lower() if isinstance(v, bool) else (float(v) if hasattr(v, "dtype") else v)  # noqa: E731
+    pkl = os.path.join(ROOT, "sweeps_local", sweep or "", "dyhpo_state.pkl")
+    if sweep and os.path.exists(pkl):
+        import pickle  # needs the env that wrote it (.venv-driver, numpy 2)
+        s = pickle.load(open(pkl, "rb"))
+        cand = s["candidates_raw"] if isinstance(s, dict) else s.candidates_raw
+    else:
+        d = c.get("dyhpo", {})
+        cand = _sample_candidates(c["search_space"], d.get("n_candidates", 300), d.get("seed", 42))
+    assert idx < len(cand), f"hp{idx} is past the candidate pool"
     return c, {k: fmt(v) for k, v in cand[idx].items()}
 
 
@@ -39,7 +47,7 @@ def main():
     ts = [json.load(open(f)) for f in glob.glob(os.path.join(ROOT, "sweeps_local", a.sweep, "results", "*.json"))]
     best = min((t for t in ts if t["val_loss"] is not None), key=lambda t: t["val_loss"])
     cfg = f"sweep/sweep_config_{a.sweep}.yaml"
-    c, h = hps(cfg, best["hp_idx"])
+    c, h = hps(cfg, best["hp_idx"], a.sweep)
     T = c["fidelity_schedule"]["t_steps"][-1]
     assert best["t_steps"] == T
     for s in a.seeds:
