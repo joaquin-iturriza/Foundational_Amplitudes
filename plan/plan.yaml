@@ -39746,6 +39746,23 @@ entries:
       and said so), i.e. HPO does not move this setup, and the comparison rests on (b)/(c). The smoke run passes when it completes
       train, test evaluation and plots, logs s/step and peak memory, and the fitted constants a, b, c are within 10% of 14.017
       / 6.713 / 5.303 in one log base (else the target or metric differs from his and is fixed before any search).'
+    fix_at: '2026-11-22T07:50:07+00:00'
+    fix: 'Batch fits the disk / launch path shown working (checks 14, 15): step (1b) copies only the two memmap cache directories
+      to CC, but a GPU run on CC cannot open them without the train pools on CC. experiment.py:1571-1581 resolves every pool
+      through datagen.ensure_split_set with data.require_cache=true by default, which raises for a missing train pool (the
+      very failure of the 04:24 prebuilds), and data_mmap.base_key_doc hashes keyed_aug.pool_identity(path) of each pool (os.path.getsize
+      and the first/last 64 KiB of the file) before it looks for the cache, so the cache key cannot even be computed on a
+      site without the pools. The CC H100/V100 smokes, the CC scoring job and any CC trial would fail at load. Copying the
+      pools too does not fit: ~30 GB of pools + ~18 GB of caches against 36 GB free on CC /sps/lpnhe (df read 2026-11-22 by
+      this review). Fix, one of: (a) run the smokes, scoring and trials on lxplus GPUs where pools and cache sit, with the
+      ~28 h queue start stated in the timing; (b) make room on CC with scripts/prune_site.sh (under its recorded decision)
+      and copy pools + alpha_s sidecars + caches, with df re-read and the margin stated; (c) a code change (repo-reviewed,
+      with a test) that lets a run open a copied cache on a site lacking the pools, e.g. pool identities read from the cache''s
+      key_doc.json; in every case show a CC (or the chosen site''s) job opening the copied cache with the same key as the
+      lxplus build (the key directory in both logs) before trials are sized on it. Also state that site copy carries the alpha_s
+      sidecars if pools are copied. Other checks unchanged from the 04:21 pass (one change at a time against the lr-1e-3 matched
+      control; measure moves 9.4x across lr on dancat_het_pre per dancat_plain_mse.py; seed-43 pair asked to Joaquin; outcome
+      stated; MSE loss per D524-D527; full template-coupled 8-trial search).'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
