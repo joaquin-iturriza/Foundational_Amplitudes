@@ -39018,7 +39018,8 @@ entries:
       if:
       - 'H3 yes: lr window part of the gap at b128, reported with the matched-count question'
       - 'H3 no: the flags explanation stands alone'
-  step_waits: {}
+  step_waits:
+    '3': FA-lxplus-c08b3944 FA-lxplus-f8120264 ftmech_ftb128_drive3
   handoff:
     state: '2026-11-22 08:25 UTC. D519/D520 widened the entry: find why the Z+4g fine-tune ends ~1.55x above scratch. HYPOTHESES
       recorded (finding ''2026-11-22 HYPOTHESES''): lead H1 = the parent''s inherited input flags (input_soft_eps 1e-8, input_pair_logs
