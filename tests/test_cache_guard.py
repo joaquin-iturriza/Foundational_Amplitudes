@@ -87,3 +87,22 @@ def test_data_reads_and_prune_tools_are_allowed():
     for c in ("site run ccin2p3 FA -- ls amp_data_cache", "site run ccin2p3 FA -- find amp_data_cache -maxdepth 1 -name 'v4_*'",
               "site run ccin2p3 FA -- python3 sweep/prune.py --caches"):
         assert g.data_delete(cmdparse.commands(c)) == [], c
+
+
+def test_own_debris_and_mmap_cache_are_not_data_deletes():
+    for c in ("site run ccin2p3 FA -- rm -rf $SCRATCH/tmp/amp_data_cache/zz_probe_1",
+              "site run ccin2p3 FA -- 'rm -rf $SCRATCH/tmp/amp_data_cache/zz_probe_1/'",
+              "site run ccin2p3 FA -- rm -rf $SCRATCH/amp_mmap_cache/" + FREE):
+        assert g.data_delete(cmdparse.commands(c)) == [], c
+    assert g.data_delete(cmdparse.commands("site run ccin2p3 FA -- rm -rf amp_data_cache/zz_a amp_data_cache/v4_x"))
+
+
+def test_design_check_uses_any_passed_unwithdrawn_design():
+    import datetime as dt
+    plan = g._plan()
+    t = plan.now().isoformat()
+    ok = {"at": t, "passed_at": t}
+    assert g.design_ok(plan, {"designs": [ok, {"at": t}]})
+    assert g.design_ok(plan, {"designs": [ok, {"at": t, "passed_at": t, "withdrawn_at": t}]})
+    assert not g.design_ok(plan, {"designs": [{"at": t, "passed_at": t, "withdrawn_at": t}]})
+    assert not g.design_ok(plan, {"designs": []})

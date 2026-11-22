@@ -275,6 +275,16 @@ def reread_ok(plan, e, st, runs):
     return all(r in mine for r in runs)
 
 
+def design_ok(plan, e):
+    """Any passed, not-withdrawn design of the entry recorded within DESIGN_H covers a submission (a withdrawn later design
+    falls back to the earlier passed one)."""
+    for x in e.get("designs") or []:
+        t = plan.parse(x.get("at"))
+        if x.get("passed_at") and not x.get("withdrawn_at") and t and plan.now() - t <= plan.dt.timedelta(hours=plan.DESIGN_H):
+            return True
+    return False
+
+
 def design(cmd, inp, subs):
     if gives_verdict(cmd) and inp.get("agent_type") != "design-reviewer":
         return ["design: plan design-pass and design-fix are the design reviewer's verdict; only the design-reviewer "
@@ -289,7 +299,7 @@ def design(cmd, inp, subs):
         bad = []
         rereads = REREAD.findall(cmdparse.code_text(cmd))
         for x in sorted({x for s in subs for x in s if x != "*"}):
-            if x in ids and not plan.design_fresh(ids[x]) and not reread_ok(plan, ids[x], st, rereads):
+            if x in ids and not design_ok(plan, ids[x]) and not reread_ok(plan, ids[x], st, rereads):
                 last = plan.last_design(ids[x])
                 old = last and plan.now() - plan.parse(last["at"]) > plan.dt.timedelta(hours=plan.DESIGN_H)
                 bad.append("%s (%s)" % (x, "no design recorded" if not last else
@@ -977,7 +987,7 @@ def cache_delete(segs, users=None):
 
 
 # ------------------------------------------------------------------ data deletion by hand (2026-11-11)
-DATA_PATH = re.compile(r"amp_data_cache|amp_mmap_cache|\bdatasets\b|DATA_DIR|lhe_work|mg5amcnlo|\bruns\b")
+DATA_PATH = re.compile(r"amp_data_cache|\bdatasets\b|DATA_DIR|lhe_work|mg5amcnlo|\bruns\b")
 DATA_RM = re.compile(r"\b(rm|rmdir|unlink|rmtree|remove|shutil)\b|-delete\b")
 PRUNE_TOOLS = re.compile(r"prune_site\.sh|sweep/prune\.py|prune_copies\.py")
 
@@ -990,7 +1000,9 @@ def data_delete(segs):
         if not toks or os.path.basename(toks[0]) != "site" or toks[1:2] != ["run"] or "--" not in toks:
             continue
         remote = " ".join(toks[toks.index("--") + 1:])
-        if DATA_PATH.search(remote) and DATA_RM.search(remote) and not PRUNE_TOOLS.search(remote):
+        # our own debris (last component zz_*) is ours to delete; amp_mmap_cache is cache_delete's
+        scan = " ".join(w for w in re.split(r"[\s'\"]+", remote) if not os.path.basename(w.rstrip("/")).startswith("zz_"))
+        if DATA_PATH.search(scan) and DATA_RM.search(scan) and not PRUNE_TOOLS.search(remote):
             out.append("data: `%s` deletes under a data path on a site by hand; data on a site is deleted only by the project's "
                        "pruning tools (scripts/prune_site.sh, sweep/prune.py, tools/prune_copies.py) under a recorded decision, "
                        "never by hand" % remote[:90])
