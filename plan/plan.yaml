@@ -37715,11 +37715,6 @@ entries:
   - D513
   - D516
   next:
-    2: 'Snapshot arms (2a fresh optimizer, 2b optimizer state, no warmup) on Z+4g: searches done and read against arm (1)
-      with the parent difference stated (finding 2026-11-22: P/F8 0.874/0.793, Po/F8 1.17/0.793 at b2048/b128, all within
-      1.41; all above scratch). Remaining only on Joaquin''s answer to the matched-control question: the template fine-tune
-      from the fp32 rerun''s final model, both batches, 8-trial searches (~11.3 GPU-h), design, review, submit, then 2a/2b
-      re-read against it'
     3: 'R1+R3 (design passed 2026-11-22): searched scratch+flags ftmech_zng4g_scrflagsrch_b{128,2048} (16 trials) for H1,
       and the ft lr-window extension ftmech_zng4g_ft_b{128,2048} (+8 trials) for H3, driven together (ftmech_r1r3_drive);
       then seeds 43, 44 of each new chosen trial and the share readout (zng4g_readout.py extended)'
@@ -38884,12 +38879,6 @@ entries:
     start: '2026-11-22T03:13:00+00:00'
     at: '2026-11-22T03:13:00+00:00'
   step_why:
-    2:
-      feeds: 'D513/D515: does a restart that avoids the cooldown''s end or keeps the optimizer state keep the head start on
-        Z+4g'
-      if:
-      - 'Joaquin wants the matched control: design, review, submit the two control searches, re-read 2a/2b against them'
-      - 'Joaquin accepts the read against arm (1): drop this step; the finding stands with the parent caveat'
     3:
       feeds: 'D519: how much of the fine-tune''s gap to scratch on Z+4g is the inherited input flags (H1) against the pretrained
         start (H4/H5/H7), and whether the lr window (H3) is the cause'
