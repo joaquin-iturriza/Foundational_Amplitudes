@@ -39048,3 +39048,5 @@ entries:
       ~1352 x 8e4 events). Pooled test RMSE seen/held-out: sqrt of the event-weighted mean of per-process test MSEs from per_process_metrics.json,
       tool to write once his metric code fixes the definition. Particle encoding, momentum scaling, precision stay ours (D524:
       match the LLM run''s conditions, not his LLoCa implementation).'
+  step_waits:
+    '2': 'a reviewer: repo-reviewer of branch alphas_input @2786116d'
