@@ -39422,3 +39422,53 @@ entries:
       = each process''s stored val/test pools (lxplus sidecars carry pipeline_sha256, read 2026-11-22); prior searched (results.tex
       catalog_daniel, decisions D51/D54/D131/D134/D113/D114/D527, the entry''s findings); within the entry''s step 3 and D51/D527;
       training-only checks (loss, lr, seeds against spread) not applicable to a generation batch.'
+  - at: '2026-11-22T05:44:42+00:00'
+    question: 'Generation under D51/D54 (step 3): rebuild the 1491 catalog_daniel TRAIN pools (recipes/catalog_daniel_all.yaml,
+      n_train 1e5, seed 42, their MadEvent cards) that D131 deleted from CC''s amp_data_cache on 2026-10-25 (val/test pools
+      and alpha_s sidecars kept on CC and lxplus), on lxplus, the one site with room, with MadGraph 3.7.0 = CC''s version
+      (installed 2026-11-22 at /eos/user/j/joiturri/mg5amcnlo_370, VERSION read 3.7.0; lxplus''s own install is 3.6.7). Do
+      the rebuilt train pools sample the same distribution as each process''s stored val/test pools? Exact launch (code at
+      210869da): (1) smoke, one HTCondor CPU job: site submit lxplus FA scripts/job_gen_daniel_catalog.sh --item llm_compare
+      --hdr=--cpus-per-task=2 --hdr=--mem=8G --hdr=--time=02:00:00 --env DANIEL_ONLY=dc_gb_bbbx,dc_gg_ggg --env DANIEL_WORKERS=2
+      --env AMP_LHE_CORES=1 --env MG5_WORK_DIR=/eos/user/j/joiturri/mg5amcnlo_370 --env MG5_BIN=/eos/user/j/joiturri/mg5amcnlo_370/bin/mg5_aMC;
+      then on the login node python tools/check_pp_pools.py --spec <the two entries> --labels (run 2026-11-22 before the smoke
+      on the stored pools: val/test load with sidecars, train missing, ''LABELS 0 process-role pairs compared ... 4 expected''
+      = BAD, as intended). (2) batch: 16 jobs K=0..15, the same line with --hdr=--cpus-per-task=8 --hdr=--mem=16G --hdr=--time=04:00:00
+      --env DANIEL_SHARD_N=16 --env DANIEL_SHARD_K=K --env DANIEL_WORKERS=8 (tools/shard_recipes.py: backend groups kept together,
+      cost-balanced, 93 processes each), one wave (site pick 2026-11-22: 425 lxplus slots fit 16G/8cpu, done in ~3 h at 3
+      h/job); then check_pp_pools.py --spec recipes/catalog_daniel_all.yaml --labels.'
+    prior: 'FA-ccin2p3-17f91455 (2026-10-15, D51/D54): the first generation, all 1491 x 1e5/1e4/1e4 in one 48-core CC job,
+      13,901 s = 185 core-h (~450 core-s per process, its compile included), MG5 3.7.0; its val/test pools are the control.
+      D131/D134 (2026-10-25, ''Yes, delete daniel''s catalog''): the 31 GB of dc_* train caches deleted on CC as ''they rebuild
+      on demand''; the 2026-10-26 census (analysis/storage/cache_manifest_2026-10-26.tsv) holds none; no copy anywhere (CC
+      DATA_DIR, checkout, /sps root; lxplus amp_data_cache, datasets, checkout: searched 2026-11-22). This entry''s memmap
+      prebuilds then failed at require_cache (FA-ccin2p3-5920ce08, -099e0ce5). datagen.mixed_generation (analysis/zng_uq/data/mixed_generation_z.json):
+      a ~1% label shift read |z| = 8.28 / 6.1, 99 unchanged processes at most 2.7. A train-only lhe_pp rebuild runs the whole
+      MadEvent layout (val+test+train+margin, seeded shuffle) and keeps the train block [2e4, 1.2e5): train rows never coincide
+      with val/test rows. Differs from the first generation only in the site (same MG5 version, cards, seed) and in building
+      train alone.'
+    measure: 'Per process and role (val, test): z = sum over the 10 sqrt(s_hat) deciles of the val/test pool of (median ln|M|^2
+      of train - that of val/test) / its standard error, / sqrt(10) (datagen.mixed_generation any_version via tools/check_pp_pools.py
+      --labels, which fails unless exactly 2 pairs per process are compared: 4 for the smoke, 2982 for the batch); row counts
+      >= 1e5 and an alpha_s sidecar of one value per row; from the smoke log, the wall time per process and LHE_WORK_PEAK_MB
+      (the node-local MadEvent work area''s peak).'
+    check: 'The z statistic moves with a tested change on existing data: zng_uq''s u u~ -> t t~ one-loop train pool regenerated
+      with a ~1% label shift reads |z| = 8.28 (val) / 6.1 (test), the other 25 processes of that parent and the 74 of trial
+      1262 at most 2.7 (analysis/zng_uq/data/mixed_generation_z.json); tests/test_mixed_generation.py (a 1% shift on same-version
+      pools flagged only with any_version) and tests/test_check_pp_pools.py (main --labels end to end: same distribution passes,
+      a 1% shift fails, a pool with no generator sha fails) pass at 210869da.'
+    fixed: 'recipes/catalog_daniel_all.yaml (1491 entries, their run cards, 13 TeV, nn23lo1), seed 42, lhe layout 1e4/1e4/1e5
+      + margin, MadGraph 3.7.0, trunk''s standalone_cpp labeller, val/test pools untouched (cache hits), float64 (D132). Disk:
+      pools ~30 GB (shard_recipes plan: 4.5 GB per 1/8 of the catalog over the three roles, x 1e5/1.2e5) on lxplus SCRATCH/amp_data_cache
+      (EOS, user quota 1.00 TB logical, 922.8 GB used = ~77 GB free, eos quota 2026-11-22, re-read before the batch), plus
+      ~18 GB of memmap cache if the chain''s caches are built there: ~48 GB of 77. MadEvent work dirs node-local ($_CONDOR_SCRATCH_DIR/lhe_work,
+      deleted per process), not on EOS; their peak per job read from the smoke''s LHE_WORK_PEAK_MB before the batch.'
+    control: Each process's own stored val and test pools (CC, MG5 3.7.0, 2026-10-15), the same distribution by the recipe.
+    seeds: Recipe seed 42 (MadEvent iseed from the recipe), as the first generation; no seed axis.
+    outcome: 'Wall targets: smoke 0.5 h (two processes, one per core, ~450 core-s each at CC''s rate plus the heavier dc_gg_ggg''s
+      tail); batch 1.5 h per job (185 core-h / (16 x 8 cores) = 1.45 h at CC''s rate), rescaled by the smoke''s measured time
+      per process against CC''s before submission and recorded with plan target. Smoke passes when both train pools have 1e5
+      rows and alpha_s sidecars, LABELS reports 4 pairs, every |z| < 5, and LHE_WORK_PEAK_MB x 8 fits a node''s local disk:
+      then the 16 jobs go out whole after an eos quota read. Batch: 2982 pairs, every |z| < 5 and every pool complete -> memmap
+      prebuilds and part (a)''s chain resubmitted. A process with |z| >= 5 is listed with z and shift and its pool unused
+      until the cause is found and fixed; a short or failed process is rebuilt by resubmitting its shard (idempotent).'
