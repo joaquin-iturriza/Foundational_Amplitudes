@@ -37720,8 +37720,9 @@ entries:
       1.41; all above scratch). Remaining only on Joaquin''s answer to the matched-control question: the template fine-tune
       from the fp32 rerun''s final model, both batches, 8-trial searches (~11.3 GPU-h), design, review, submit, then 2a/2b
       re-read against it'
-    3: 'Step (3), only on arm (1)''s HIGHER result: separate the parent''s weights from the fine-tune''s lr range or length
-      (design then)'
+    3: 'R1+R3 (design passed 2026-11-22): searched scratch+flags ftmech_zng4g_scrflagsrch_b{128,2048} (16 trials) for H1,
+      and the ft lr-window extension ftmech_zng4g_ft_b{128,2048} (+8 trials) for H3, driven together (ftmech_r1r3_drive);
+      then seeds 43, 44 of each new chosen trial and the share readout (zng4g_readout.py extended)'
   done_when: null
   notes_ref: null
   match: dsave_ftmech_*,ftmech_*
@@ -38890,12 +38891,13 @@ entries:
       - 'Joaquin wants the matched control: design, review, submit the two control searches, re-read 2a/2b against them'
       - 'Joaquin accepts the read against arm (1): drop this step; the finding stands with the parent caveat'
     3:
-      feeds: 'D513 open point: why the fine-tune ends above scratch'
+      feeds: 'D519: how much of the fine-tune''s gap to scratch on Z+4g is the inherited input flags (H1) against the pretrained
+        start (H4/H5/H7), and whether the lr window (H3) is the cause'
       if:
-      - 'arm (1) HIGHER: design, review, submit within budget or ask'
-      - 'arm (1) SAME or LOWER: drop'
-  step_waits:
-    '3': step 1's arm (1) result (not yet submitted)
+      - 'share >= 0.7: H1, next single-flag searches and Joaquin''s call on the parent architecture'
+      - 'share <= 0.3: the start; next the path-bug vs plasticity design'
+      - 'between: both, each reported'
+  step_waits: {}
   handoff:
     state: '2026-11-22 ~01:45 UTC. STEP 1 DONE: F/S HIGHER at both batches (b2048 1.56 [1.45,1.72], b128 1.54 [1.21,1.92];
       zng4g_readout.py @6547b7c1, data eff894f8; figs zng4g_ft_vs_scratch, zng4g_step0 redrawn and handed back with v1 beside,
