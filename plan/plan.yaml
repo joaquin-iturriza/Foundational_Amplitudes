@@ -38057,6 +38057,11 @@ entries:
       val up to 4e3-6e3; recover only in the WSD cooldown, end/best 18x and 30x); their best checkpoints come before, so they
       are read there; on seed 42 alone the share is 1.49 (1.42-1.60), still (a). The flags'' chosen lr 0.031 is unstable at
       2 of 3 seeds.'
+  - at: '2026-11-22T16:59:58+00:00'
+    text: '2026-11-22 R3 batch 128 read (zng4g_r1_read.py 128 --h3, commits e34f4899 and the legend fix after; fig zng4g_r3_b128,
+      caption OK): the 24-trial fine-tune search (window top raised 1.1e-2 -> 3.3e-2) keeps its first-16 best, trial 11 at
+      lr 1.02e-2 (inside the old window), 0.0258; the 8 added trials give 0.029-0.078, those above the old top (1.19e-2, 1.93e-2,
+      2.62e-2, 3.01e-2) 0.030/0.048/0.053/0.078 -> H3 ruled out at b128 as at b2048: the lr window is not part of the gap.'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
