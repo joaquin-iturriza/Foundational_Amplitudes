@@ -8,9 +8,9 @@ only the recipe swapped:
     prediction is mu_N + sigma h, an absolute log|M|^2.
 Writes --out (JSON): per process its MSE of log|M|^2, its MSE in the run's standardized units, events and particle
 count; the pooled RMSE; the statistics used. Needs a GPU and the recipe's memmap cache (scripts/job_mmap_prebuild.sh).
-    python tools/llm_score.py --run <run dir> --out <json> [--eval-subsample 10000] <recipe.yaml>
+    python tools/llm_score.py --run <run dir> --out <json> [--eval-subsample N] <recipe.yaml>
 """
-import argparse, json, os, sys, tempfile
+import argparse, json, os, shutil, sys, tempfile
 
 import numpy as np
 import torch
@@ -26,7 +26,7 @@ from rebuild_run import _build, load_best_weights, load_cfg  # noqa: E402
 ap = argparse.ArgumentParser()
 ap.add_argument("--run", required=True)
 ap.add_argument("--out", required=True)
-ap.add_argument("--eval-subsample", type=int, default=10000)
+ap.add_argument("--eval-subsample", type=int, default=None, help="test events per process (default: the run's own data.eval_subsample)")
 ap.add_argument("recipe")
 a = ap.parse_args()
 
@@ -41,7 +41,8 @@ with open_dict(cfg):
     cfg.warm_start_idx = None
     cfg.run_dir = tempfile.mkdtemp(prefix="llmscore_", dir=os.environ["SCRATCH"])
     cfg.data.processes_file = recipe
-    cfg.data.eval_subsample = a.eval_subsample
+    if a.eval_subsample is not None:
+        cfg.data.eval_subsample = a.eval_subsample
     cfg.fine_tune.pretrained_path = ckpt
     cfg.fine_tune.target_stats = "parent" if own else "parent_shared"
     clear_start_only(cfg.fine_tune)
@@ -65,12 +66,13 @@ assert (n > 0).all(), [nm for nm, k in zip(names, n) if k == 0]
 mse_z = sse_z / n
 mse_log = mse_z * sd ** 2
 rec = {"run": run, "recipe": recipe, "target_stats": str(cfg.fine_tune.target_stats), "ema_applied": ema,
-       "eval_subsample": a.eval_subsample, "affine_multiplicity": getattr(exp, "_affine_multiplicity", None),
+       "eval_subsample": cfg.data.eval_subsample, "amp_trafos": [list(map(str, t)) for t in (exp._amp_trafos_pp or [exp.cfg.data.amp_trafos])], "affine_multiplicity": getattr(exp, "_affine_multiplicity", None),
        "prepd_std": sd.tolist(), "events": int(n.sum()),
        "pooled_rmse_logm2": float(np.sqrt((mse_log * n).sum() / n.sum())),
        "mean_mse_z": float(mse_z.mean()),
        "processes": {nm: {"mse_logm2": float(mse_log[i]), "mse_z": float(mse_z[i]), "n": int(n[i]),
                           "n_particles": int(exp._proc_npart[i])} for i, nm in enumerate(names)}}
+shutil.rmtree(cfg.run_dir, ignore_errors=True)
 os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
 json.dump(rec, open(a.out, "w"), indent=1)
 print("LLM_SCORE " + json.dumps({k: rec[k] for k in ("recipe", "target_stats", "events", "pooled_rmse_logm2",
