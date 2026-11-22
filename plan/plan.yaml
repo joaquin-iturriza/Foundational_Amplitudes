@@ -37953,6 +37953,32 @@ entries:
       1.098e-2, hp570 1.096e-2), as F''s. Val spikes > 10x the best-so-far, read at the best checkpoint and listed apart:
       snap b2048 hp353, hp1470, b128 hp529; snapopt b2048 hp1333, hp1373, hp450 (lr 0.025-0.030, grad norm 1e14-1e15), b128
       hp570 (the chosen trial; recovered, end/best 1.02), hp1413; F b2048 hp353, b128 hp110, hp49. No trial without val.'
+  - at: '2026-11-22T03:02:13+00:00'
+    text: '2026-11-22 HYPOTHESES (D519/D520) for F/S 1.54 (b128) / 1.56 (b2048), the template fine-tune from the 28-process
+      W parent ending above Muon/WSD scratch on Z+4g at 1e4 events. Existing data first: (i) F against scratch WITH the parent''s
+      two input flags at scratch''s HPs (Sf): F/Sf 0.61 (b128, range 0.50-0.74) and 0.63 (b2048, 0.60-0.66): against the same
+      architecture the fine-tune is 1.6x BETTER; Sf/S 2.5x (seeds b128 0.047-0.052 vs 0.018-0.021), but Sf is not searched.
+      (ii) catalog highmult grid (results.tex l.15134-15160): pretraining gain on u u~ -> Z+4g ~1 dex at D<=10^1.5 falling
+      to ~0 at D=10^4 for every parent (finale, +W, synthetic); so at 1e4 no gain is the expected baseline and only the deficit
+      (-0.19 dex) needs explaining. (iii) Removing the start shock moves nothing at the end point: sigma reset Sg/F8 1.004/0.769,
+      pre-sigma snapshot P/F8 0.874/0.793, snapshot+optimizer state 1.17/0.793 (all within 1.41). H1 ARCHITECTURE: the parent''s
+      input flags (input_soft_eps 1e-8 log-rescales every momentum; input_pair_logs 7 adds log(2p_i.p_j/s)/5 of every pair)
+      make the model itself worse on Z+4g; the fine-tune inherits them, pretraining wins back ~1.6x. Predicts a SEARCHED scratch+flags
+      Sf* at or above F (Sf*/F >= 1). Existing: (i) supports it, untuned. H2 DILUTION (Joaquin 2026-11-19): what Z+4g can
+      draw from a 28-process parent is diluted. Predicts a smaller GAIN (F -> S), not F above same-architecture scratch: dilution
+      of useful content cannot make a start worse than random unless it adds a cost (H1/H4). Existing (i) F < Sf and (ii)
+      no gain at 1e4 for any parent: dilution is not testable at 1e4 (no gain to dilute); it is meaningful only at D where
+      gains exist (<=10^3). Held until H1 is read. H3 LR WINDOW: F''s b128 best sits at the window top 1.1e-2, as do both
+      snapshot arms'' (1.098e-2, 1.096e-2); fine-tunes on the old ladder wanted ~3x scratch''s lr (l.14376-14392). Predicts
+      an extended window gives F lower with lr > 1.1e-2. H4 RESTART SHOCK / PLASTICITY from the converged parent (step-0 NLL
+      70.8, grad norm 5e8): ruled out at the end point by (iii); a plasticity loss independent of the shock would show as
+      F above Sf*, read from H1''s run. H5 PREPROCESSING / HEAD SCALE (target_stats own, offshell parent, mu head trained
+      in the parent''s standardisation): same signature as H4 (a start cost), covered by (iii) for the sigma head; F''s first
+      validation is below S''s (0.093 vs 0.133 b128), so the loaded mu head helps at the start. H6 PRECISION (parent float32,
+      child float64): the fp32 and original parents give the same end point within the bar (P/F8); not a lead. H7 FINE-TUNE
+      PATH BUG: loading works (first-val head start, parent loaded, OPT_STATE 32 entries in the smoke); a bug costing the
+      end point would also show as F above Sf*. Discriminating runs: R1 scratch+flags searched (b128, 16 trials, the D507
+      twin + flags): separates H1 from H3/H4/H5/H7; R3 ft lr window extension (b128): tests H3.'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
