@@ -976,6 +976,27 @@ def cache_delete(segs, users=None):
     return out
 
 
+# ------------------------------------------------------------------ data deletion by hand (2026-11-11)
+DATA_PATH = re.compile(r"amp_data_cache|amp_mmap_cache|\bdatasets\b|DATA_DIR|lhe_work|mg5amcnlo|\bruns\b")
+DATA_RM = re.compile(r"\b(rm|rmdir|unlink|rmtree|remove|shutil)\b|-delete\b")
+PRUNE_TOOLS = re.compile(r"prune_site\.sh|sweep/prune\.py|prune_copies\.py")
+
+
+def data_delete(segs):
+    """`site run <site> FA -- <cmd>` whose remote command deletes under a data path, other than the pruning tools, is refused
+    (2026-11-11: a by-hand find -delete in tmp/amp_data_cache removed costly MadEvent probe pools)."""
+    out = []
+    for toks in segs or []:
+        if not toks or os.path.basename(toks[0]) != "site" or toks[1:2] != ["run"] or "--" not in toks:
+            continue
+        remote = " ".join(toks[toks.index("--") + 1:])
+        if DATA_PATH.search(remote) and DATA_RM.search(remote) and not PRUNE_TOOLS.search(remote):
+            out.append("data: `%s` deletes under a data path on a site by hand; data on a site is deleted only by the project's "
+                       "pruning tools (scripts/prune_site.sh, sweep/prune.py, tools/prune_copies.py) under a recorded decision, "
+                       "never by hand" % remote[:90])
+    return out
+
+
 SUBMITTING = re.compile(r"\bsite\s+(?:submit|run|launch)\b|(^|[;&|(]|\$\()\s*(sbatch|condor_submit)", re.M)
 
 
@@ -1025,7 +1046,8 @@ def problems(inp):
 
     checks = (("placement", lambda: placement(cmd, scan)), ("hpo", lambda: hpo(cmd)), ("plot", lambda: plot(cmd, segs)),
               ("design", design_check), ("budget", lambda: budget(cmd, segs)), ("data", lambda: data(segs)), ("rundir", lambda: rundir(segs)),
-              ("expect", lambda: expect(segs)), ("epoch", lambda: epoch(segs)), ("wall", lambda: wall(segs)), ("cache", lambda: cache_delete(segs)))
+              ("expect", lambda: expect(segs)), ("epoch", lambda: epoch(segs)), ("wall", lambda: wall(segs)), ("cache", lambda: cache_delete(segs)),
+              ("datadelete", lambda: data_delete(segs)))
     out = []
     for name, f in checks:
         if only and name not in only:

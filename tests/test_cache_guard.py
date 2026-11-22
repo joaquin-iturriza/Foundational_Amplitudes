@@ -73,3 +73,17 @@ def test_prune_keeps_a_key_a_live_job_names(tmp_path, monkeypatch):
     monkeypatch.setattr(cg, "site_users", lambda key: ["62996676"] if key == USED else [])
     removed = dm.prune(str(tmp_path), need_bytes=10 ** 30, keep="/nonexistent", min_idle_s=0)
     assert removed == [str(tmp_path / FREE / "depth")] and (tmp_path / USED / "depth").exists()
+
+
+DEL = ("site run ccin2p3 FA -- 'C=$SCRATCH/tmp/amp_data_cache; find $C -maxdepth 1 \\( -name \"dsh_*\" -o -name \"pp13*\" -o -name \"d4*\" "
+       "-o \\( -name \"v4_*\" ! -newermt 2026-11-01 \\) \\) -delete'")
+
+
+def test_by_hand_data_delete_is_refused():
+    assert g.data_delete(cmdparse.commands(DEL)) and g.problems({"tool_input": {"command": DEL}})
+
+
+def test_data_reads_and_prune_tools_are_allowed():
+    for c in ("site run ccin2p3 FA -- ls amp_data_cache", "site run ccin2p3 FA -- find amp_data_cache -maxdepth 1 -name 'v4_*'",
+              "site run ccin2p3 FA -- python3 sweep/prune.py --caches"):
+        assert g.data_delete(cmdparse.commands(c)) == [], c
