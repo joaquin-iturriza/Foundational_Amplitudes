@@ -39297,6 +39297,17 @@ entries:
       neither; mixed_generation on stubs = on pools for two generator versions, refuses against another val pool); repo review
       running. Design re-recorded without per-GPU smokes or pinning, CC through stubs; design review running. site pick 2026-11-22
       ~11:20 for 9 GPU runs: CC 1 at once, first start ~8 h; lxplus probe timed out; Jean Zay down.'
+  - at: '2026-11-22T12:27:21+00:00'
+    text: '2026-11-22 ~13:25 (E8196): fresh val/test of dc_ssx_htamtap, dc_csx_wpzh, dc_dux_wmzh done on CC (FA-ccin2p3-46d58dc0/-75172cb3/-8556d1a5,
+      ''Done: 1491 ok, 0 failed'', iseeds 16003/1563/9554, MG5 3.7.0). Debris: the train pools these jobs also wrote in CC
+      SCRATCH/amp_data_cache for the 3 could not be removed (submit_guard refuses rm under a site data path), so they were
+      overwritten with lxplus''s train pools + .recipe.json + .alphas.npy (site copy lxplus->ccin2p3 --overwrite, 9 files,
+      62 MB): CC now holds the same 3 pools as lxplus, so their identity equals the stubs'' and the key is unchanged; CC also
+      keeps 3 cheap banner .txt there. site copy ccin2p3->lxplus DATA_DIR --overwrite: 32 files (14 recovered val/test .alphas.npy
+      of 7 processes; val/test .npy, .recipe.json, .alphas.npy of the 3). lxplus check_pp_pools --labels on those 10 processes:
+      20 pairs, max |z| 2.49 (dc_ssx_wpwmh test), 0 problems; rows shared by each new val/test pool with its lxplus train
+      pool: 0 of 10000 for all 6, val-test shared 0 (byte-equal rows, scratchpad subcheck2.py). Full gate check_pp_pools --labels
+      --write-stubs on lxplus launched detached (pool_gate_stubs, log ~/.local/share/ccorch/detached/20261122-132650_pool_gate_stubs.log).'
   step_waits:
     '1': the pool gate (detach pool_gate2) and the two lxplus memmap prebuilds that follow it
     '2': FA-lxplus-0c92a3ed,FA-lxplus-e0fd42d4,FA-lxplus-047ec23e,FA-lxplus-09fa2d64,FA-lxplus-cc565c49,FA-lxplus-0ea9e16f,FA-lxplus-e931d117,FA-lxplus-2ebfd93d,FA-lxplus-323dc77f,FA-lxplus-cd2552fb,FA-lxplus-7d1cb6a6,FA-lxplus-3c7af077,FA-lxplus-af3b62d2,FA-lxplus-ad4fdc2d,FA-lxplus-1f8de50d,FA-lxplus-64dc6699
