@@ -39286,7 +39286,7 @@ entries:
       running. Design re-recorded without per-GPU smokes or pinning, CC through stubs; design review running. site pick 2026-11-22
       ~11:20 for 9 GPU runs: CC 1 at once, first start ~8 h; lxplus probe timed out; Jean Zay down.'
   step_waits:
-    '1': FA-lxplus-0c92a3ed,FA-lxplus-e0fd42d4,FA-lxplus-047ec23e,FA-lxplus-09fa2d64,FA-lxplus-cc565c49,FA-lxplus-0ea9e16f,FA-lxplus-e931d117,FA-lxplus-2ebfd93d,FA-lxplus-323dc77f,FA-lxplus-cd2552fb,FA-lxplus-7d1cb6a6,FA-lxplus-3c7af077,FA-lxplus-af3b62d2,FA-lxplus-ad4fdc2d,FA-lxplus-1f8de50d,FA-lxplus-64dc6699
+    '1': the pool gate (detach pool_gate2) and the two lxplus memmap prebuilds that follow it
     '2': FA-lxplus-0c92a3ed,FA-lxplus-e0fd42d4,FA-lxplus-047ec23e,FA-lxplus-09fa2d64,FA-lxplus-cc565c49,FA-lxplus-0ea9e16f,FA-lxplus-e931d117,FA-lxplus-2ebfd93d,FA-lxplus-323dc77f,FA-lxplus-cd2552fb,FA-lxplus-7d1cb6a6,FA-lxplus-3c7af077,FA-lxplus-af3b62d2,FA-lxplus-ad4fdc2d,FA-lxplus-1f8de50d,FA-lxplus-64dc6699
     '3': 'the full pool check on lxplus (detach pool_gate2: check_pp_pools --labels, 2982 pairs)'
     '4': the repo reviewer's re-check of llmcmp_stubs b293fbe4 and the synthetic test rerun (detach stub_test4)
