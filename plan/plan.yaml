@@ -39397,8 +39397,8 @@ entries:
       stopped (state: trials 0, 1 submitted) and relaunched as llmcmp_a_drive3 with --sites lxplus ccin2p3 (same config f71cde629,
       --mem 32G --cpus 4 --hours 14.6).'
   step_waits:
-    '1': detached llmcmp_a_drive3 (the 8-trial DyHPO search on lxplus + ccin2p3; trials FA-lxplus-51201734 FA-lxplus-4857eed5
-      + the rest the driver submits) and the control FA-lxplus-cb9273f1
+    '1': detached llmcmp_a_drive3 (the 8-trial DyHPO search on lxplus + ccin2p3; wave 1 FA-lxplus-51201734 FA-lxplus-4857eed5
+      FA-ccin2p3-6cdb4904, later waves by the driver) and the control FA-lxplus-cb9273f1
     '2': 'FA-lxplus-cb9273f1 (the control: first finished run; the scoring check runs on its checkpoint, or on the first trial
       to end before it)'
   handoff:
