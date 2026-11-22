@@ -39577,3 +39577,9 @@ entries:
     units: null
     start: '2026-11-22T05:51:11+00:00'
     at: '2026-11-22T05:51:11+00:00'
+  - batch: gen_batch
+    wall_h: 2.3
+    jobs: 16
+    units: null
+    start: '2026-11-22T07:41:37+00:00'
+    at: '2026-11-22T07:41:37+00:00'
