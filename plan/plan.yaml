@@ -38787,7 +38787,30 @@ entries:
     commit: null
     paths: []
   dead_ends: []
-  asks: []
+  asks:
+  - ask: 'Scope: the data of the LLM run is not within our reach, so the comparison runs either on Suprio''s own files or
+      on another pool. His training data (processes/<name>/data_running_alpha.npy, with |M|^2 and the running alpha_s) is
+      not in the public LLM4LHC repo, not on Zenodo 21257432 (momenta only, no |M|^2), not in his lloca-experiments-uq repo,
+      not on CC. For the comparison on his own test events we need from him: (1) the data_running_alpha.npy files of the 1501
+      processes; (2) which rows his run used for training (55,296 per process), validation and test (16,384 per process),
+      or the config that selects them; (3) the code that computes the pooled RMSE of log|M|^2, and the LLM''s per-process
+      test MSEs for the figure. Can you ask him to put them where a CC compute node can download them (a URL, or read access
+      on a cluster)? If he cannot, the other pool is our regeneration of his catalogue (catalog_daniel: the same 1491 processes
+      and his MadEvent cards, our |M|^2 labels, 1e5 train / 1e4 val / 1e4 test per process); what it costs: the LLM''s 0.321
+      / 0.721 would be measured on different events than ours, generated the same way but not checked to match his labels''
+      conventions.'
+    at: '2026-11-22T03:08:08+00:00'
+    searched: 'CLAUDE.md (a comparison is made only against the reference Joaquin gave; when it lacks what is needed that
+      is said to him, never filled from another source; another pool is his call), site decisions --project FA (D522-D525
+      cover the work, none names a data source), docs/results.tex par. on the arXiv:2606.23791 catalog and its generation
+      (D45, D51, D54), the plan, github heidelberg-hepml/LLM4LHC tree and README, zenodo 21257432 file list, supriodubey/lloca-experiments-uq
+      branches main and uq, CC WORK/ext and WORK/datasets. Joaquin''s messages flagged by the tool: 2026-11-14T04:31 (a pasted
+      SciPost draft; no data location), 2026-11-16T20:00 (the writing-style skill; unrelated), 2026-11-22T02:55 (this request
+      with the setup table; names no data source)'
+    blocks: step 1 (data, smoke run, cost, search design and submission); step 2 (the LLM run's conditions in run.py) keeps
+      moving
+    blocks_steps: &id003
+    - 1
   owner:
     agent: a8a038810c46db8aa
     state: working
@@ -38805,3 +38828,24 @@ entries:
       if:
       - 'tests pass: ready for the smoke run as soon as the data is on a site'
       - 'a condition cannot be matched in our pipeline: say which and what it costs the comparison, to Joaquin'
+  ask: 'Scope: the data of the LLM run is not within our reach, so the comparison runs either on Suprio''s own files or on
+    another pool. His training data (processes/<name>/data_running_alpha.npy, with |M|^2 and the running alpha_s) is not in
+    the public LLM4LHC repo, not on Zenodo 21257432 (momenta only, no |M|^2), not in his lloca-experiments-uq repo, not on
+    CC. For the comparison on his own test events we need from him: (1) the data_running_alpha.npy files of the 1501 processes;
+    (2) which rows his run used for training (55,296 per process), validation and test (16,384 per process), or the config
+    that selects them; (3) the code that computes the pooled RMSE of log|M|^2, and the LLM''s per-process test MSEs for the
+    figure. Can you ask him to put them where a CC compute node can download them (a URL, or read access on a cluster)? If
+    he cannot, the other pool is our regeneration of his catalogue (catalog_daniel: the same 1491 processes and his MadEvent
+    cards, our |M|^2 labels, 1e5 train / 1e4 val / 1e4 test per process); what it costs: the LLM''s 0.321 / 0.721 would be
+    measured on different events than ours, generated the same way but not checked to match his labels'' conventions.'
+  waiting_since: '2026-11-22T03:08:08+00:00'
+  searched: 'CLAUDE.md (a comparison is made only against the reference Joaquin gave; when it lacks what is needed that is
+    said to him, never filled from another source; another pool is his call), site decisions --project FA (D522-D525 cover
+    the work, none names a data source), docs/results.tex par. on the arXiv:2606.23791 catalog and its generation (D45, D51,
+    D54), the plan, github heidelberg-hepml/LLM4LHC tree and README, zenodo 21257432 file list, supriodubey/lloca-experiments-uq
+    branches main and uq, CC WORK/ext and WORK/datasets. Joaquin''s messages flagged by the tool: 2026-11-14T04:31 (a pasted
+    SciPost draft; no data location), 2026-11-16T20:00 (the writing-style skill; unrelated), 2026-11-22T02:55 (this request
+    with the setup table; names no data source)'
+  blocks: step 1 (data, smoke run, cost, search design and submission); step 2 (the LLM run's conditions in run.py) keeps
+    moving
+  blocks_steps: *id003
