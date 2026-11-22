@@ -39020,7 +39020,7 @@ entries:
     decision: D527
   owner:
     agent: aa5836ca091e40268
-    state: working
+    state: closed
     since: '2026-11-22T05:09:11+00:00'
     state_at: '2026-11-22T07:32:48.899000+00:00'
     context: 266414
@@ -39107,29 +39107,44 @@ entries:
     '2': FA-lxplus-a0cc1bc6
     '3': FA-lxplus-a0cc1bc6
   handoff:
-    state: 'Part (a) design PASSED 2026-11-22T04:21 (design-reviewer; covers prebuilds, 60-step smokes H100+V100, scoring
-      on the smoke, then the 8-trial search + matched control costed from the smoke; >30 GPU-h and a seed-43 pair go to Joaquin
-      via plan ask). lr window [1e-3, 9e-3] (f53e1da5). Scoring tool tools/llm_score.py + scripts/job_llm_score.sh merged
-      at 24a677db (repo review PASS a93ba8fa, nits fixed 089c1830); parent_shared now allowed on memmap. BLOCKER: both CC
-      memmap prebuilds (FA-ccin2p3-5920ce08, -099e0ce5) failed at require_cache: the 1491 catalog_daniel 100k TRAIN pools
-      are absent from amp_data_cache on CC and lxplus (val/test pools and alpha_s sidecars are present, 2982/2962 on each
-      site). Dependents cancelled; events E8092-E8096 acked. Next = step 3: find what deleted the pools and fix it at the
-      source, generation design + review, regenerate (D51) where pools (~29 GB est) + memmap cache (~18 GB est) fit (CC /sps/lpnhe
-      had 38 GB free 2026-11-22, does not fit both), then resubmit the chain. A find over /sps/lpnhe/jiturrizaramirez01 (maxdepth
-      5) for a surviving copy of dc_bb_bb_13000-13000GeV_train* was still running at close (local background task); not read.'
-    decisions: 'D525/D522/D523/D524/D526/D527 as before. Test = each process''s 1e4 test pool (same estimand as his 16,384;
-      no train rows). Matched control added: our LLoCa at his LLoCa''s lr 1e-3 constant, no warmup/L2/EMA. Measure check:
-      analysis/catalog_daniel/dancat_plain_mse.py, plain-mean val MSE of log|M|^2 over 1352 moves 0.156 (lr 1.73e-3) -> 0.0167
-      (8.94e-3) on dancat_het_pre. No measured seed spread for this aggregate: seed-43 pair is Joaquin''s call with the costed
-      search.'
-    ruled_out: 16,384-event test with train rows 55,296..61,679 (needs new pool files and a third cache, same estimand). The
-      drafted lr window [4.3e-4, 3.9e-3] (below the measured best on this catalog). zero_shot_parent.py for the held-out read
-      (in-memory path; alphas_input is memmap-only).
-    running: none (prebuilds failed; smokes FA-ccin2p3-6f47ac71/-57ba0c9d and score FA-ccin2p3-c3333b41 cancelled)
-    files: sweep/sweep_config_llmcmp_a_adamw_const.yaml (f53e1da5), tools/llm_score.py, scripts/job_llm_score.sh, analysis/catalog_daniel/dancat_plain_mse.py
-      (24a677db), scripts/job_mmap_prebuild.sh (args after --), scripts/job_config_smoke.sh, the 2026-11-22 findings on this
-      entry (exact overrides and chain)
-    written: '2026-11-22T04:57:45+00:00'
+    state: 'Step 3 (regenerate the 1491 catalog_daniel TRAIN pools, D51/D54) on lxplus with MG5 3.7.0 = CC''s (/eos/user/j/joiturri/mg5amcnlo_370).
+      Generation design PASSED 2026-11-22 (third review; it is the latest design, so part (a)''s chain needs a fresh design
+      review before resubmission). Smoke FA-lxplus-a0cc1bc6 (dc_gb_bbbx, dc_gg_ggg, 2 cores, target 0.5 h) finished cleanly
+      (E8128/E8129, not acked: the next owner reads the log and acks). Smoke checks to run now, in order: (1) site logs FA-lxplus-a0cc1bc6
+      -n 100000: ''MG5 3.7.0'' line, per-process time (vs CC ~450 core-s), LHE_WORK_PEAK_MB, STANDALONES_MB, no DISK_LOW;
+      (2) on the lxplus login node: grep -E ''name: dc_gb_bbbx,|name: dc_gg_ggg,'' recipes/catalog_daniel_all.yaml | sed ''1i
+      processes:'' > $SCRATCH/zz_probe_smoke_spec.yaml; python tools/check_pp_pools.py --spec $SCRATCH/zz_probe_smoke_spec.yaml
+      --labels (pass: 1e5 rows + alpha_s sidecars, ''LABELS 4 process-role pairs'', every |z| < 5, no BAD except none); (3)
+      node-local need of a batch job = 93 x STANDALONES_MB/2 + the MadEvent part of LHE_WORK_PEAK_MB x 8 concurrent, against
+      an lxplus job''s disk (else raise request_disk via --hdr); (4) eos quota: export EOS_MGM_URL=root://eosuser.cern.ch;
+      eos quota /eos/user/j/joiturri/ must show >= 58 GB logical free (prebuild''s own disk guard sees the 2.2 PB filesystem,
+      not the quota). Then: plan target llm_compare --batch gen_batch --wall <1.5 h rescaled by the smoke''s time per process>
+      --jobs 16, site pick FA --jobs 16 --cpus 8 --hours <wall> --mem 16G --gpus 0 --only lxplus, and for K in 0..15: site
+      submit lxplus FA scripts/job_gen_daniel_catalog.sh --item llm_compare --env AMP_LHE_CORES=1 --env DANIEL_LOCAL_MG=1
+      --env MG5_BIN=/eos/user/j/joiturri/mg5amcnlo_370/bin/mg5_aMC --hdr=--cpus-per-task=8 --hdr=--mem=16G --hdr=--time=04:00:00
+      --env DANIEL_SHARD_N=16 --env DANIEL_SHARD_K=$K --env DANIEL_WORKERS=8 --note ''llm_compare: catalog_daniel train regeneration
+      shard K of 16 (lxplus, MG5 3.7.0)'' (sync first; others'' docs/results.tex: stash/pop). After the batch: check_pp_pools.py
+      --spec recipes/catalog_daniel_all.yaml --labels (2982 pairs, all |z| < 5), then memmap prebuilds (train 55,296 / eval
+      10,000, catalog_daniel_train and _heldout) on lxplus; caches are content-keyed (no paths in the key), so site copy to
+      CC works if CC GPUs are used (lxplus GPU first start ~28 h on 2026-11-22); then the smokes/scoring of part (a) under
+      a fresh design review.'
+    decisions: 'Deletion cause: D131/D134 (2026-10-25, ''Yes, delete daniel''s catalog'', premise ''they rebuild on demand''
+      false: memmap prebuild stops at require_cache). Fixed: sweep/prune.py --caches keeps pools of any recipe-named process
+      (2db2f626, repo review PASS). Generation on lxplus, not CC: CC 36 GB free with 15.4 GB generator floor vs ~30 GB of
+      pools; lxplus EOS ~77 GB free; MG5 3.7.0 installed there (setup.sh URL fix bbd507fa). Train-only rebuild keeps the train
+      block [2e4,1.2e5) of the full layout: never overlaps val/test. Standalones and MadEvent dirs node-local (DANIEL_LOCAL_MG=1,
+      D209). site pick patched for HTCondor CPU jobs (~/.local/bin/site, backup ~/.local/share/ccorch/site.bak.pre-condor-cpu).
+      Part (a) decisions as before (D522-D527, test = 1e4 test pool, matched control at lr 1e-3 const, seed-43 pair is Joaquin''s
+      call with the costed search).'
+    ruled_out: 'Generating on CC (disk floor); generating with lxplus''s MG5 3.6.7 (version mix with CC''s val/test); fewer
+      events per pool (55,296) to save disk (changes D54''s scope); standalones on EOS (1491 against the quota). Earlier:
+      16,384-event test with train rows; lr window [4.3e-4, 3.9e-3]; zero_shot_parent.py for the held-out read.'
+    running: none (smoke FA-lxplus-a0cc1bc6 finished; E8128/E8129 open for the next owner)
+    files: scripts/job_gen_daniel_catalog.sh (2964c0bc), tools/check_pp_pools.py + datagen.mixed_generation any_version (210869da),
+      tests/test_check_pp_pools.py, tests/test_mixed_generation.py, sweep/prune.py + tests/test_prune_caches.py (2db2f626),
+      sites/setup.sh (bbd507fa), tools/shard_recipes.py, sweep/sweep_config_llmcmp_a_adamw_const.yaml, tools/llm_score.py,
+      scripts/job_llm_score.sh, scripts/job_mmap_prebuild.sh, scripts/job_config_smoke.sh
+    written: '2026-11-22T07:33:18+00:00'
   designs:
   - at: '2026-11-22T04:13:14+00:00'
     question: 'Part (a), D525: in the conditions of Suprio''s LLM pID run (D524, D526, D527: our catalog_daniel regeneration
