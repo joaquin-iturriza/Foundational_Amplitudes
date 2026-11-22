@@ -2,9 +2,9 @@
 
 CPU only: python tests/test_alphas_input.py
 Checks, on a two-process cache written here: the column is (ln alpha_s + 1.994) / 0.169 of each event in the virtual
-row order, after the order row and before dimensionless_inputs' column; an alpha_s-power-0 process without alpha_s
-reads 1; an event of another process without alpha_s refuses; with the flag off the order rows are unchanged.
-The wiring in init_data_recipes_mmap (n_order_features + 1, the refusal at load) is exercised by the GPU smoke run.
+row order, after the order row and before dimensionless_inputs' column; with the flag off the order rows are
+unchanged. The wiring in init_data_recipes_mmap (n_order_features + 1, the refusal at load of any read event without
+alpha_s) is exercised by the GPU smoke run.
 """
 import os
 import sys
@@ -33,38 +33,29 @@ def _source(d, alphas, dimless=False):
     return src, ev_rows, order_rows
 
 
-def _turn_on(src, d, one):
+def _turn_on(src, d):
     src.alp = dm._open(d, "alphas")
-    src.alp_one = np.array(one)
     src.alp_shift, src.alp_scale = 1.994, 0.169
 
 
 def main():
     with tempfile.TemporaryDirectory() as d:
-        a = np.r_[np.linspace(0.08, 0.2, 5), np.full(5, np.nan)]   # process 1 (base rows 5..9) has no alpha_s
+        a = np.linspace(0.08, 0.2, 10)
         src, ev_rows, order_rows = _source(d, a)
         v = np.arange(10)
         pid = (ev_rows[v] >= 5).astype(np.int64)
         _, _, off, _ = src.gather(v, pid)
         assert np.array_equal(off, order_rows[pid]), "flag off must leave the order rows unchanged"
 
-        _turn_on(src, d, [False, True])              # process 1 has alpha_s power 0
+        _turn_on(src, d)
         _, _, on, _ = src.gather(v, pid)
         assert on.shape == (10, 5) and np.array_equal(on[:, :4], off)
-        want = np.where(np.isnan(a[ev_rows]), 1.0, a[ev_rows])
-        np.testing.assert_allclose(on[:, 4], (np.log(want) + 1.994) / 0.169, rtol=1e-6)
-
-        _turn_on(src, d, [False, False])             # process 1 needs alpha_s and has none: refuse
-        try:
-            src.gather(v, pid)
-            raise SystemExit("an event without alpha_s must refuse")
-        except AssertionError as e:
-            assert "alphas_input" in str(e), e
+        np.testing.assert_allclose(on[:, 4], (np.log(a[ev_rows]) + 1.994) / 0.169, rtol=1e-6)
 
     with tempfile.TemporaryDirectory() as d:         # dimensionless_inputs' column stays last
         a = np.linspace(0.08, 0.2, 10)
         src, ev_rows, _ = _source(d, a, dimless=True)
-        _turn_on(src, d, [False, False])
+        _turn_on(src, d)
         v = np.arange(10)
         _, _, on, _ = src.gather(v, (ev_rows[v] >= 5).astype(np.int64))
         np.testing.assert_allclose(on[:, 4], (np.log(a[ev_rows]) + 1.994) / 0.169, rtol=1e-6)

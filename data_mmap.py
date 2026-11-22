@@ -223,8 +223,6 @@ class MmapSource:
             order[:, self.F - n_pdg:self.F] = ((self.osh_transformed(r) - self.osh_mu) / self.osh_sd).astype(np.float32)
         if self.alp is not None:
             a = np.asarray(self.alp[r], dtype=np.float64)
-            a = np.where(np.isnan(a) & self.alp_one[pid], 1.0, a)
-            assert not np.isnan(a).any(), "data.alphas_input: an event without its alpha_s"
             col = ((np.log(a) + self.alp_shift) / self.alp_scale).astype(np.float32)
             order = np.concatenate([order, col[:, None]], axis=1)
         if self.dimless:
@@ -1131,14 +1129,13 @@ def _open_run(exp, c, d, meta, fdir, need, want_offshell):
         # its place) and before dimensionless_inputs' sqrt(s_hat) column
         assert meta["has_alphas"], "data.alphas_input: no pool of the run has a per-event alpha_s (<pool>.alphas.npy)"
         src.alp = _open(d, "alphas")
-        # alpha_s power 0 (purely electroweak): no alpha_s dependence, so a pool without its sidecar reads alpha_s = 1
-        src.alp_one = np.array([int(exp._orders_of(n)[2]) == 0 for n in names])
         src.alp_shift = float(cfg.data.get("alphas_input_shift", 1.994))
         src.alp_scale = float(cfg.data.get("alphas_input_scale", 0.169))
+        # every event the run reads needs its own alpha_s (the input the LLM run saw), refused here, not at a later step
         for sg in meta["segs"]:
-            if sg["name"] in pidx and need.get((sg["role"], sg["name"]), 0) > 0:
-                assert not (np.isnan(src.alp[sg["ev0"]]) and not src.alp_one[pidx[sg["name"]]]), \
-                    f"data.alphas_input: no per-event alpha_s for {sg['role']}/{sg['name']}"
+            k = need.get((sg["role"], sg["name"]), 0) if sg["name"] in pidx else 0
+            assert not np.isnan(src.alp[sg["ev0"]:sg["ev0"] + k]).any(), \
+                f"data.alphas_input: events without a per-event alpha_s in {sg['role']}/{sg['name']}"
         F += 1
         LOGGER.info(f"alphas_input ON (memmap): (ln alpha_s + {src.alp_shift}) / {src.alp_scale} as order column {F - 1}")
     exp._mmap_src = src
