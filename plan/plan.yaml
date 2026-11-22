@@ -39050,6 +39050,19 @@ entries:
       micro-batch, 4 per step); we use our own memmap data path and sampler (mixed-process batches of 24,576). Supersedes
       the round_robin line of the earlier mapping finding. Cost of one run: measured from our own smoke run in this layout,
       not his 7.2 H100-h.'
+  - at: '2026-11-22T04:27:56+00:00'
+    text: '2026-11-22 (part a launch path): design passed 2026-11-22T04:21 (design-reviewer, after one FIX: prior D83/D87/D88
+      added, measure check by analysis/catalog_daniel/dancat_plain_mse.py, plain-mean val MSE of log|M|^2 over the 1352 from
+      0.156 at lr 1.73e-3 to 0.0167 at 8.94e-3, seeds/outcome/disk/timing). lr window moved to [1e-3, 9e-3] (f53e1da5), reaching
+      dancat_het_pre''s best on this catalog; D83''s shared run blew up at 8.9e-3 with cosine, so a blow-up at the top is
+      expected and listed apart. Test = each process''s 1e4 test pool (not 16,384 with train rows: same estimand, no extra
+      pools). Scoring: tools/llm_score.py + scripts/job_llm_score.sh merged at 24a677db (repo review PASS a93ba8fa); fine_tune.target_stats=parent_shared
+      allowed on memmap (the cache holds no target statistic). In flight on CC: prebuilds FA-ccin2p3-5920ce08 (train) and
+      -099e0ce5 (held-out) -> smokes H100 -6f47ac71 / V100 -57ba0c9d (60 steps, lr 3e-3) -> score -c3333b41 on the H100 smoke.
+      Pools and sidecars exist on lxplus too; its cache is built only if site pick places trials there. CC /sps/lpnhe 38 GB
+      free before the caches (~18 GB after), under the 60 GB alarm floor. Next, on the smoke: s/step -> cost of 8 trials +
+      control (+ the seed-43 pair), fitted a,b,sigma against 14.017/6.713/5.303 (log base), whether 24,576 fits the V100;
+      then plan ask Joaquin (costed search above 30 GPU-h and the seed-43 pair).'
   step_waits:
     '1': FA-ccin2p3-57ba0c9d FA-ccin2p3-c3333b41
     '2': FA-ccin2p3-c3333b41
