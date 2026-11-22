@@ -39427,6 +39427,18 @@ entries:
       ~0.39 s/step on A100 = 6.6 GPU-h per run, ~0.23 on H100 = 3.9: 9 runs ~35-60 GPU-h, under the 40-90 estimate. Reading
       a running lxplus job''s training log: site logs shows only the condor event log (stdout/stderr are transferred at job
       end); condor_tail -stderr <cluster>.0 via site run in the AFS submit dir shows it.'
+  - at: '2026-11-22T23:51:02+00:00'
+    text: '2026-11-23 ~00:45 CET (E8232/E8235): wave 1 and the control ended clean. val_loss_no_reg (plain mean over 1352
+      of MSE of z, best checkpoint): control FA-lxplus-cb9273f1 (lr 1e-3 const, no warmup/L2/EMA) 6.79e-4 (7.56 h on A100-40GB);
+      trial 0 FA-lxplus-51201734 (lr 1.03e-3, EMA 0.998, warmup 0.157) 4.89e-4; trial 1 FA-lxplus-4857eed5 (lr 3.20e-3) 9.41e-3;
+      trial 2 FA-ccin2p3-bd3e4211 (lr 8.92e-3, EMA 0.948) 1.55e-2. At constant lr the lowest lr wins by 19-32x: the optimum
+      sits at or below the window''s lower edge 1e-3 (unlike dancat_het_pre with cosine, best at the top). If the search ends
+      with its best at the edge, an extension below 1e-3 is the next attempt (within part (a)). Fitted target constants (control
+      data_stats.json): mu_N = 27.399 - 6.701 N, sigma 5.316, N all legs, natural log: in his form a = 13.997, b = 6.701,
+      c = 5.316 against 14.017 / 6.713 / 5.303 (0.14%, 0.18%, 0.25%): within the design''s 10%. Control scoring job FA-lxplus-4bfd2286
+      (scripts/job_llm_score.sh @2a597c478, REREAD). site logs on a finished lxplus job: condor_tail now bounded by timeout
+      20 (~/.local/bin/site cmd_logs; backup scratchpad site.bak.condor_tail); tested on FA-lxplus-cb9273f1 -n 5 (1.8 s) and
+      -n 100000 (61 s, earlier >120 s timeout).'
   step_waits:
     '1': FA-lxplus-4bfd2286
     '2': llmcmp_a_drive4
