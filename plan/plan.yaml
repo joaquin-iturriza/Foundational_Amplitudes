@@ -37715,11 +37715,11 @@ entries:
   - D513
   - D516
   next:
-    2: 'Arms (2a) pre-cooldown snapshot of the W parent with a fresh optimizer and (2b) the snapshot with its optimizer state
-      and no warmup, 8-trial searches at both batches (sweep_config_ftmech_zng4g_snap*_b*.yaml, D516 go), from the step-56000
-      model of the fp32 parent rerun dsave_parent_finale_zng_uq_w_lr1p89e-3_snapfp32 (FA-ccin2p3-74805752) once step 4 shows
-      it reproduces _cc: repoint fine_tune.pretrained_path from _snap to _snapfp32, check the D395 smoke FA-lxplus-1407949d''s
-      log, then drive.py --sites ccin2p3 lxplus (parent copied to lxplus by site copy) at site pick''s width, ~22.6 GPU-h'
+    2: 'Snapshot arms (2a fresh optimizer, 2b optimizer state, no warmup) on Z+4g: searches done and read against arm (1)
+      with the parent difference stated (finding 2026-11-22: P/F8 0.874/0.793, Po/F8 1.17/0.793 at b2048/b128, all within
+      1.41; all above scratch). Remaining only on Joaquin''s answer to the matched-control question: the template fine-tune
+      from the fp32 rerun''s final model, both batches, 8-trial searches (~11.3 GPU-h), design, review, submit, then 2a/2b
+      re-read against it'
     3: 'Step (3), only on arm (1)''s HIGHER result: separate the parent''s weights from the fine-tune''s lr range or length
       (design then)'
   done_when: null
@@ -38586,9 +38586,8 @@ entries:
       feeds: 'D513/D515: does a restart that avoids the cooldown''s end or keeps the optimizer state keep the head start on
         Z+4g'
       if:
-      - 'fp32 rerun reproduces _cc and smoke clean: submit the 4 searches'
-      - 'fp32 rerun still outside: ask Joaquin for the matched control (fresh restart from the rerun''s final, both batches,
-        ~11.3 GPU-h)'
+      - 'Joaquin wants the matched control: design, review, submit the two control searches, re-read 2a/2b against them'
+      - 'Joaquin accepts the read against arm (1): drop this step; the finding stands with the parent caveat'
     3:
       feeds: 'D513 open point: why the fine-tune ends above scratch'
       if:
@@ -38596,7 +38595,6 @@ entries:
       - 'arm (1) SAME or LOWER: drop'
   step_waits:
     '3': step 1's arm (1) result (not yet submitted)
-    '2': ftmech_snap_drive3 (drive.py of the 4 snapshot searches on ccin2p3+lxplus; snap_b128 trials 6, 7 re-picked, E8061)
   handoff:
     state: '2026-11-22 ~01:45 UTC. STEP 1 DONE: F/S HIGHER at both batches (b2048 1.56 [1.45,1.72], b128 1.54 [1.21,1.92];
       zng4g_readout.py @6547b7c1, data eff894f8; figs zng4g_ft_vs_scratch, zng4g_step0 redrawn and handed back with v1 beside,
