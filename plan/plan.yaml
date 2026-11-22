@@ -38832,6 +38832,25 @@ entries:
       0.7), or ranges spanning both edges: both share it; stage 2 searches the arm(s) in (0.3, 0.7) as Sf* was, then read
       c_x from searched arms. Any arm whose best sits at a val spike >10x best-so-far, or diverged, listed apart (D398), never
       retried.'
+    fix_at: '2026-11-22T09:39:06+00:00'
+    fix: '(1) Prior incomplete (not a repeat, searched independently): the design says no on/off A/B of either flag alone
+      is on record on any process, but the kit_benchmark input arms ran exactly that on e+e- -> u u~ g (1e5 bulk, 8000 steps,
+      seed 42, plan.yaml findings 2026-11-11T04:38 and 06:36): control f6b2ece9, soft rescale alone FA-ccin2p3-1a14c791, pair
+      logs alone FA-ccin2p3-3fa9854a, both FA-ccin2p3-c15b3337; bulk_test 8.2e-4 / 5.4e-4 / 5.1e-4 / 1.09e-4, i.e. each flag
+      alone helped ~0.2 decades and the pair compounded to 0.88 decades (a strong interaction). Cite them with these numbers
+      in prior, say what differs on Z+4g at 1e4 (process, multiplicity, data, steps, Muon/WSD) and use that interaction in
+      outcome (c)''s reading. (2) Untuned arms read as a verdict (matched control, CLAUDE.md feature rule): running each single-flag
+      arm at S''s chosen HPs is the right first step, but outcomes (a), (b) and (c) attribute the cost and send it to Joaquin''s
+      call on the parent from fixed-HP arms only, while the existing data shows the fixed-HP cost is partly an HP mismatch
+      (both flags: 2.47x at S''s HPs, 1.93x searched; log 0.90 -> 0.66). The rule is: at the baseline''s best HPs, done if
+      better; else the same sweep for the feature, best against best. Fix: any single-flag arm worse than S beyond seed noise
+      (c_x > 0.3) gets the same 16-trial search as Sf* (same space, waves, DyHPO seed 42, then seeds 43/44 of its chosen trial)
+      before its share is read, and the shares are read best against best with Sf* as the denominator (log(mean Sf*/mean S),
+      once Sf* seeds 43/44 are in); the fixed-HP factorial is reported as stage 1. Cost about 6.3 GPU-h per searched arm,
+      inside D520. Everything else checked holds: configs @30b23c29 differ from the passed scrflags_b2048 control by one flag
+      line each (defaults input_soft_eps 0.0, input_pair_logs 0 in config/model/lloca.yaml), chunks at S''s hp1333 HPs, 1953
+      steps, float64, same job script and train_subsample as the Sf seed runs; measure moves 2.47x with both flags (zng4g_readout.json:
+      Sf 0.150/0.162/0.155 vs S 0.058/0.067/0.064), S seed spread log 0.14, so c_x resolves to about +-0.15.'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
