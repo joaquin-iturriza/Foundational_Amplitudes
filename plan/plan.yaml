@@ -38944,8 +38944,10 @@ entries:
   match: llmcmp_*,tp_llmcmp_*
   evidence:
     runs: []
-    commit: null
-    paths: []
+    commit: 2786116d
+    paths:
+    - data_mmap.py
+    - tests/test_alphas_input.py
   dead_ends: []
   asks:
   - ask: 'Scope: the data of the LLM run is not within our reach, so the comparison runs either on Suprio''s own files or
