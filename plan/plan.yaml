@@ -39120,15 +39120,16 @@ entries:
   - D527
   - D528
   next:
-    1: 'Smoke run then cost: muP LLoCa on catalog_daniel (recipes/catalog_daniel_train.yaml, 1352 processes; D51/D527) in
-      the LLM run''s conditions: train_subsample=55296 (the first 55,296 rows, the same rows every epoch), val pool 1e4, 60,840
-      updates of 24,576 mixed-process events (D526), validation every 3042 steps, best-val checkpoint, shared_standardization
-      + affine_multiplicity_std as target z, alphas_input, loss/val aggregation mean; one GPU ~50 steps through every stage
-      [D395], then the step rate gives the cost of one full run'
-    2: 'Scoring tool: pooled RMSE of log|M|^2 (his table''s metric: sqrt of the mean squared error over all test events pooled)
-      on seen (1352) and held-out (139) processes, 16,384 test events per process = the 1e4 test pool + train-pool rows 55,296..61,679
-      (never trained on), held-out processes predicted with the shared multiplicity-affine statistics (no per-process affine
-      map, unlike zero_shot_parent.py), per-process MSEs for the figure in his panels'
+    1: 'Scoring check on the matched control FA-lxplus-cb9273f1 (lr 1e-3 constant, no warmup, no L2, EMA off): tools/llm_score.py
+      via scripts/job_llm_score.sh (FA-lxplus-4bfd2286, 2a597c478): pooled test RMSE of log|M|^2 seen (1352 x 1e4) and held
+      out (139 x 1e4, shared affine statistics), the truly held-out subset and the relabels apart; fitted affine constants
+      already read from its data_stats.json: mu_N = 27.399 - 6.701 N, sigma 5.316, i.e. a = 27.399 - 2*6.701 = 13.997, b =
+      6.701, c = 5.316 against his 14.017 / 6.713 / 5.303 (0.1-0.3%, within the design''s 10%)'
+    2: 'Waves 2 and 3 of the DyHPO search (driver llmcmp_a_drive4; wave 1: trial 0 lr 1.03e-3 EMA on val 4.89e-4, trial 1
+      lr 3.20e-3 val 9.41e-3, trial 2 lr 8.92e-3 EMA on val 1.55e-2): the driver suggests and submits them itself and writes
+      DRIVE_DONE'
+    3: Score the best trial and the control (job_llm_score.sh), figure of pooled RMSE seen/held out (and truly held out, relabels)
+      against LLM 0.321/0.721 and his LLoCa 0.506/0.953, per-process MSEs as dan_per_process.py; write-up in docs/results.tex
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -39237,17 +39238,20 @@ entries:
     state_at: '2026-11-22T23:42:05+00:00'
   step_why:
     1:
-      feeds: the cost of one run and so whether the DyHPO search fits 30 GPU-h at full length
+      feeds: whether the scoring path reproduces his metric before the trials are scored
       if:
-      - 'full-length search above 30 GPU-h: show on existing data whether a shorter horizon ranks HPs, else bring the costed
-        search to Joaquin under the GPU budget rule'
-      - 'within budget: design, review, submit the search'
+      - 'scores finite and the seen RMSE close to the run''s own test MSE: score the trials with the same job'
+      - 'the tool fails or disagrees with the run''s test stage: fix llm_score.py, rescore'
     2:
-      feeds: the numbers and figure of (a)-(c) against the LLM's 0.321/0.721 (measured on his events; ours on our regeneration
-        of the same catalogue)
+      feeds: 'part (a): the best tuned trial'
       if:
-      - 'tool reproduces a run''s own test MSE on seen processes: use it for every arm'
-      - 'it does not: find the difference before any number goes out'
+      - 'search ends: score the best trial, figure and write-up'
+      - 'a trial breaks: read its log, fix, --retry-failed'
+    3:
+      feeds: 'part (a) answer: tuned vs matched control vs LLM'
+      if:
+      - 'best at or below the LLM: part (b) checks width scaling holds it'
+      - 'above the LLM: part (b) width toward 359.6M at the tuned HPs'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
@@ -39423,11 +39427,7 @@ entries:
       ~0.39 s/step on A100 = 6.6 GPU-h per run, ~0.23 on H100 = 3.9: 9 runs ~35-60 GPU-h, under the 40-90 estimate. Reading
       a running lxplus job''s training log: site logs shows only the condor event log (stdout/stderr are transferred at job
       end); condor_tail -stderr <cluster>.0 via site run in the AFS submit dir shows it.'
-  step_waits:
-    '1': detached llmcmp_a_drive4 (the 8-trial DyHPO search on lxplus + ccin2p3; wave 1 FA-lxplus-51201734 FA-lxplus-4857eed5
-      FA-ccin2p3-bd3e4211, waves 2-3 submitted by the driver) and the control FA-lxplus-cb9273f1
-    '2': 'FA-lxplus-cb9273f1 (the control: first finished run; the scoring check runs on its checkpoint, or on the first trial
-      to end before it)'
+  step_waits: {}
   handoff:
     state: 'Part (a) running: the 8-trial single-fidelity DyHPO search (waves 3+3+2) and the matched control, at the LLM run''s
       conditions, config sweep/sweep_config_llmcmp_a_adamw_const.yaml @ 2a597c478. Driven from the local machine by .venv-driver/bin/python
