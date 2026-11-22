@@ -192,8 +192,8 @@ def plot_tv(b, tv):
     for k, lab, col in (("S", "from scratch", ps.C.blue), ("Sf", "from scratch + input flags,\nsearched", ps.C.grey),
                         ("F", "fine-tuned", ps.C.vermillion)):
         for ax, j in ((tr, 0), (va, 1)):
-            m = np.mean([c[j] for c in tv[k]], axis=0)
-            ax.plot((np.arange(len(m)) + 1) / len(m), m, color=col, label=lab)
+            for i, c in enumerate(tv[k]):   # per seed: a blow-up would dominate a mean
+                ax.plot((np.arange(len(c[j])) + 1) / len(c[j]), c[j], color=col, label=lab if i == 0 else None)
     for ax, q in ((tr, "training"), (va, "validation")):
         ax.set_yscale("log"); ax.set_xlabel(f"fraction of the run, batch {b}")
         ax.set_ylabel(q + r" MSE$(\log|\mathcal{M}|^2)$")
