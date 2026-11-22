@@ -37715,7 +37715,9 @@ entries:
   - D511
   - D513
   - D516
-  next: null
+  next:
+    2: Act on Joaquin's answer to the 13:17 question on the W parent's two input settings (input_soft_eps, input_pair_logs)
+      and the batch-128 scratch-with-flags search
   done_when: null
   notes_ref: null
   match: dsave_ftmech_*,ftmech_*
@@ -39062,6 +39064,13 @@ entries:
     (about the ladder + star arm parent and seeds, not the W parent's input flags)
   blocks: any work on the parent; the batch-128 flags share
   blocks_steps: *id003
+  step_why:
+    2:
+      feeds: whether the Z+4g fine-tune deficit is removed by changing the parent's inputs (D519/D520)
+      if:
+      - '(a) one-setting-at-a-time test: design, review, run, read which setting carries the 2.3x'
+      - '(b) retrain the parent without both: design the parent run and its Z+4g fine-tune against scratch'
+      - '(c) leave the parent: write up the mechanism in docs/results.tex and close'
 - id: llm_compare
   title: LLoCa against Suprio's LLM on the LLM amplitude catalogue
   question: In the conditions of Suprio's LLM pID run (1501 MadGraph-default processes, 1352 trained, 149 held out; 55,296
