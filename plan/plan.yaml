@@ -37863,8 +37863,14 @@ entries:
       figures self-contained after referee comments; 2026-10-14T16:48 is a forwarded benchmark discussion with a paper zip;
       none is about this parent or a control. None settles it.'
     blocks: reading the snapshot arms (2a, 2b) against a control; the matched-control searches if chosen
-    blocks_steps: &id003
+    blocks_steps:
     - 4
+    answered_at: '2026-11-22T03:02:27+00:00'
+    decision: D519
+    withdrawn_at: '2026-11-22T03:02:27+00:00'
+    withdrawn_why: D519 asks for the minimal runs that explain the deficit; the matched control would only sharpen the snapshot
+      arms' null on the restart shock (H4), which the sigma-reset arm (Sg/F8 1.004/0.769) and both snapshot arms (0.79-1.17)
+      already give independently at the end point; it tests no open hypothesis
   owner:
     agent: aea3b3e66649163d1
     state: working
@@ -38662,27 +38668,6 @@ entries:
       sweeps_local/ftmech_zng4g_*; step-3 config diff (lr window + n_trials 24 + waves) /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/step3_window_configs.diff
       (scratchpad: re-create from the design if cleared); sweep/drive.py condor_floor (c5d7cf85)'
     written: '2026-11-22T02:14:29+00:00'
-  ask: 'Scope: adding a matched-control arm to the snapshot test. The snapshot arms (restart from the pretrained W parent
-    before its cooldown, with a fresh optimizer or with its optimizer state) need the parent retrained, since the original
-    kept no pre-cooldown snapshot. The retrain in full 32-bit precision, the same command, seed and GPU type, reproduces the
-    original on 23 of its 28 processes within the 0.43-2.5x spread we measured before between reruns of a catalog run. Five
-    fall outside: e+e- -> b b~ is 1159x worse, u u~ -> ZZ at NLO 23x, e+e- -> mu mu EW NLO 3x, while e+e- -> gamma gamma and
-    u u~ -> d d~ are 6x and 14x better; geometric mean 1.39 (figure parent_rerun_check_snapfp32; the earlier rerun with reduced-precision
-    matmuls gave 5.0). So the snapshot arms branch from a parent that is not the one arm (1)''s fine-tune started from. The
-    four snapshot searches are running (they are needed in every case). Do you want the matched control, the template fine-tune
-    restarted from the retrained parent''s final model at both batches (8-trial searches, about 11.3 GPU-h), so the snapshot
-    arms are read against a fine-tune from the same parent run? Or should they be read against arm (1) as designed, with this
-    parent difference stated? Without the control, a snapshot effect smaller than the parent''s run-to-run spread cannot be
-    told apart from it.'
-  waiting_since: '2026-11-21T18:52:50+00:00'
-  searched: 'CLAUDE.md (a new arm is the user''s call, ''a comparison is made only against the reference I gave''); site decisions
-    --project FA: D516 (''Yes, do the rerun then'') approved the parent rerun and snapshot arms, not a second control; the
-    plan''s pre-registered step-4 branch ''if outside it: ask Joaquin for the matched control''. Joaquin''s messages flagged
-    by the tool: 2026-11-14T04:31 is a pasted SciPost LaTeX paper draft; 2026-11-17T01:19 is about making figures self-contained
-    after referee comments; 2026-10-14T16:48 is a forwarded benchmark discussion with a paper zip; none is about this parent
-    or a control. None settles it.'
-  blocks: reading the snapshot arms (2a, 2b) against a control; the matched-control searches if chosen
-  blocks_steps: *id003
 - id: llm_compare
   title: LLoCa against Suprio's LLM on the LLM amplitude catalogue
   question: In the conditions of Suprio's LLM pID run (1501 MadGraph-default processes, 1352 trained, 149 held out; 55,296
