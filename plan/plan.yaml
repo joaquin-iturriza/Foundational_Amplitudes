@@ -41797,3 +41797,37 @@ entries:
     state_at: '2026-11-23T16:15:09.706000+00:00'
     context: 85161
     context_at: '2026-11-23T16:12:27+00:00'
+  designs:
+  - at: '2026-11-23T16:20:16+00:00'
+    question: Can the lab LLMs (deepseek-v4-flash, qwen3.8-27b), run through the opencode agent harness in a bwrap sandbox
+      on a scratch copy, do our subagent work correctly, alone or executing a plan written by a Sonnet subagent, and how many
+      of our tokens does that save?
+    prior: 'agent_redesign model trial (D203/D212, tools/model_trial.py, analysis/agent_redesign/model_trial.json): the same
+      10 past repo fixes run by Sonnet 5.5 and Opus 5.5 low: 9/10 first pass and 10/10 after one rework in both, $0.19 vs
+      $0.29 per task; led to D213 (Sonnet mechanical-worker). This design reuses those 10 tasks, briefs and checks unchanged
+      and adds the lab arms; it adds a log-triage family not tested before. Searched docs/results.tex, plan, site decisions
+      for lab LLM, lpnllm, deepseek, qwen, model trial: nothing else on lab models (results.tex Qwen hits are the LLM-backbone
+      physics arm, unrelated).'
+    measure: 'Family fix (10 tasks, tools/model_trial.py TRIAL): pass = the fix commit''s own tests on the tree the model
+      leaves (model_trial.run_check + verdict, run in the sandbox), first pass and after one rework round fed the check output.
+      Family triage (20 distinct failed-run logs of FA events acked with a note, exactly one log fetched home; 11 diverged,
+      5 time limit, 4 assertion errors): pass = answer.json class matches and its decisive fact matches the log (divergence
+      guard step exactly; the AssertionError''s key token in the quoted error line; training_finished true for time limits).
+      Per run: lab tokens (opencode step usage), wall time, and our tokens/$ (Sonnet planner transcript, tools/model_trial.py
+      cost) against the Sonnet reference''s $ per task.'
+    check: The fix checks fail at each task's parent and pass at its fix (model_trial validate, 2026-10-31, baselines in analysis/agent_redesign/model_trial_baseline);
+      they separated Sonnet's 9/10 from its 10/10 after rework. The triage keys were read from each log by committed code
+      (tools/lab_llm_trial.py cases) and agree with the 20 ack notes (step numbers and error tokens as written in the notes;
+      the 5 time limits all noted 'main stage finished').
+    fixed: 'Task text: model_trial.brief with only the path changed; the same scratch copy (git archive of the fix''s parent,
+      fresh repo, no history); opencode version, its default build agent and tools; sandbox; triage prompt identical across
+      arms; temperature server default; one rework round only.'
+    control: 'Reference: Sonnet 5.5 and Opus 5.5 low on the same 10 fix tasks (model_trial.json, same defect text, interface
+      and check). Triage: the ack notes of our own agents (all correct by construction of the key); our cost there is not
+      recorded per event, so savings are reported as the log tokens the lab model read (an estimate).'
+    seeds: 'One run per task per arm (as the reference: one per arm); triage arms run twice (two independent runs) since a
+      single call is cheap, to show consistency.'
+    outcome: 'Yes for an arm and family: pass rate within one task of Sonnet''s 9/10 first pass on fix (>=8/10) or >=18/20
+      on triage, at our cost <=0.3 of Sonnet''s $ per task (lab tokens are free to us). No: below those; then the failure
+      modes (no edit, wrong file, tool-call errors, timeouts) are read from the transcripts to say what adaptation could close
+      the gap (plan detail, brief shape).'
