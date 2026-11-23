@@ -37981,7 +37981,7 @@ entries:
       configurations (CLAUDE.md 72bef3992), run as part of it
   owner:
     agent: aa74f65831354dd19
-    state: working
+    state: closed
     since: '2026-11-23T15:11:08+00:00'
     state_at: '2026-11-23T21:54:32.464000+00:00'
     context: 220178
@@ -39346,30 +39346,35 @@ entries:
     '5': 'detached drive ftmech_ftnoset_drive (searches ftmech_zng4g_ftnoset_b2048 and _b128 from the no-settings parent)
       ends: its DONE event'
   handoff:
-    state: '2026-11-22 ~13:40 UTC. The Z+4g deficit is explained at batch 2048: the fine-tune inherits the W parent''s two
-      input flags (input_soft_eps 1e-8, input_pair_logs 7), which make the model itself worse on Z+4g. Searched scratch+flags
-      (16 trials, chosen hp1377 lr 0.031, seeds 42-44) 0.122/0.140/0.165 vs scratch 0.058/0.067/0.064 and fine-tuned 0.097/0.100/0.097
-      (best val MSE(log|M|^2)): flags/scratch 2.26, fine-tuned/flags 0.69, share of the gap 1.84 (10-90% over 27 triples 1.45-2.27;
-      seed 42 alone 1.49). Scratch+flags seeds 43/44 blow up mid-run (steps 702, 429 of 1953), read at best checkpoint before
-      it, listed apart. Train vs val: every arm memorises 1e4 events; the fine-tune''s val is best at 10% of the run and rises
-      27% after while its train error is lowest. H3 (lr window) ruled out at both batches: b2048 chosen lr 3.2e-3 inside the
-      old window, 1.02x; b128 chosen trial unchanged (lr 1.02e-2, 0.0258), added trials above 1.1e-2 give 0.030-0.078. Open
-      question to Joaquin (recorded 13:17): the parent''s flags, (a) one-flag test, (b) parent without flags, (c) leave it;
-      and whether the dropped b128 flags search is wanted. Nothing runs until he answers.'
-    decisions: 'D519/D520 (understand the deficit, minimal tests, GPU over 30 h allowed if reasonable). Coordinator check
-      0 (e1faa4fc, 2026-11-22): dropped the b128 searched scratch+flags at 3/16 (fixed-HP b128 shows the b2048 pattern: 2.5x,
-      0.61), the b2048 extended-ft seeds (H3 settled from the chosen trial), and R4 one-flag (reviewer FIX: kit uug one-flag
-      A/B prior FA-ccin2p3-f6b2ece9/1a14c791/3fa9854a/c15b3337, each flag ~0.2 dex, both 0.88 dex; searched stage required);
-      R4 recorded as a dead end and offered to Joaquin. E8145, E8157, E8171, E8202, E8224, E8226 acked.'
-    ruled_out: 'lr window (H3) at b2048 and b128; restart shock (H4) and sigma head (Sg) at the end point; parent precision
-      (H6); fine-tune path bug (H7): F below same-architecture scratch+flags in all seeds; dilution (H2) untestable at 1e4
-      (no gain to dilute).'
-    running: none
-    files: analysis/finetune_mechanism/zng4g_r1_read.py (b2048 R1/R3 readout; --h3 mode for b128), data/zng4g_r1_b2048.json,
-      data/zng4g_r3_b128.json (+ raw caches); figs zng4g_r1_b2048 (v2), zng4g_r1_trainval_b2048 (v2), zng4g_r3_b128 (captions
-      OK); zng4g_seed_chunks.py (HPs from the drive's DyHPO state, @90918fa5); sweep/sweep_config_ftmech_zng4g_scr{soft,pair}_b2048.yaml
-      @30b23c29 (R4, not run)
-    written: '2026-11-22T17:00:34+00:00'
+    state: '2026-11-23 ~23:05 CET. All work of D519/D520/D529 is in flight. (1) One setting at a time, b2048 (design passed
+      2026-11-23): soft-rescale-only search done, 16/16 (chosen hp1961, lr 2.80e-2, objective 0.100); its seeds 43/44 submitted
+      (chunks analysis/finetune_mechanism/seed_chunks/zng4g_scrsoftsrch_b2048_s4{3,4}.txt @2c52f5d64, job_seed_batch.sh, 12G).
+      Pair-logs-only search 14/16 observed, 2 in flight (drive ftmech_onesetting_drive5); when it ends: zng4g_seed_chunks.py
+      ftmech_zng4g_scrpairsrch_b2048 --seeds 43 44, submit, then read c_soft, c_pair (measure: best val MSE(log|M|^2) = mu-MSE
+      x 1.11978^2 at best checkpoint; c_x = log(mean Sx*/mean S)/log(mean Sf*/mean S), S 0.063, Sf* 0.142; outcomes in the
+      design; reviewer asked to report ''both >= 0.7'' as its own branch). (2) b128 scratch-with-both search restored: 8/16
+      observed + 3 in flight (drive ftmech_flagsb128_drive7); then seeds 43/44 of its chosen trial and the b128 share log(Sf*/S)/log(F/S)
+      (S 0.0197, F 0.0300). (3) W parent without input_soft_eps/input_pair_logs FA-ccin2p3-9a73698a done clean (H100, strict
+      fp32, 64000 steps, best checkpoint models/model_run0_best.pt.gz, run dir copied to lxplus); smoke FA-ccin2p3-1b334a7c
+      clean. Its Z+4g fine-tune searches ftnoset_b2048/_b128 (16 trials each) launched 22:55 (drive ftmech_ftnoset_drive;
+      first trials load the new parent); then seeds 43/44 of each chosen trial and Fn/S, Fn/F per batch (yes Fn/S<=1.19 both;
+      partial Fn/F<0.79 both; [0.79,1.19] unresolved). Parent check still to read: its per-process val vs FA-ccin2p3-47e14eae
+      (gmean, count in 0.43-2.5x).'
+    decisions: 'Joaquin''s: D519/D520 (diagnosis, GPU-h), D529 (configurations that test it are the investigation''s work:
+      parent retrain), D531 (restart drivers). Mine: searched one-setting arms directly (reviewer FIX of R4 asked for the
+      searched stage; best against best); b128 trials 3-5 requeued without penalty (removed unrun by check 0); fine-tune of
+      the new parent uses F''s first-16-trial lr windows (the window F''s chosen trial came from); mem 12G on these configs
+      (peak <= 2.7 GB trials, 4.2 GB parent; 32G = 11 CPUs on lxplus matched no slot, E8293); parent placed on CC by site
+      pick at 12G with allow_tf32=false.'
+    ruled_out: lr window (H3) at b2048 and b128; restart shock (H4) and sigma head (Sg) at the end point; parent precision
+      (H6); fine-tune path bug (H7); dilution (H2) untestable at 1e4.
+    running: 'drives (local, detached): ftmech_onesetting_drive5 (~/.local/share/ccorch/detached/20261123-205523_ftmech_onesetting_drive5.log),
+      ftmech_flagsb128_drive7 (20261123-205554_...), ftmech_ftnoset_drive (20261123-225525_...); ftnoset trials FA-ccin2p3-13ce7261/-1b46922a/-4b3621e0
+      (b128), -c0d3030e/-9a00e309/-b31a1b2f (b2048); soft-only seeds 43/44 (job_seed_batch, see evidence).'
+    files: sweep/sweep_config_ftmech_zng4g_{scrsoftsrch_b2048,scrpairsrch_b2048,scrflagsrch_b128,ftnoset_b2048,ftnoset_b128}.yaml
+      (@34536f858); scripts/job_datasaving_parent.sh flags=off (@2c21e65d3); sweep/drive.py sync retry (@54e5204ef, untested
+      against the race); analysis/finetune_mechanism/zng4g_seed_chunks.py, zng4g_r1_read.py (readout to extend); sweeps_local/ftmech_zng4g_*
+    written: '2026-11-23T22:03:49+00:00'
   step_why:
     3:
       feeds: Joaquin's held call on the W parent's two input settings (D519/D520 diagnosis)
