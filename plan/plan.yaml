@@ -37694,7 +37694,7 @@ entries:
   question: Does the restart of a converged parent (full lr, fresh optimizer) destroy a fine-tune's head start, and does a
     restart that avoids the jump (WSD parent branched before its cooldown with its optimizer state; restart with the parent's
     optimizer state; low peak lr with a long warmup) keep it?
-  status: waiting_user
+  status: running
   quotes:
   - said_at: '2026-11-20T02:50:59.573000+00:00'
     text: Open it, size it reasonably and send the jobs right away, don't ask me for permission, I'm giving it ahead of time,
@@ -37919,6 +37919,16 @@ entries:
       upload, no decision on these settings), 2026-10-04T10:57 (about two arms' resonance tests, not this parent), 2026-11-22
       'I have no idea what you mean by flags' (a question, answered)
     holds_all: every remaining step of the entry is the parent decision; the diagnosis is finished
+  - ask: 'Your hold: retrain the W parent without its two input settings (momentum log-rescaling input_soft_eps, pair logarithms
+      input_pair_logs), or leave the parent as it is? (The one-setting-at-a-time test and the batch-128 scratch-with-settings
+      search run now as diagnosis under D519/D520.)'
+    at: '2026-11-23T15:10:36+00:00'
+    searched: CLAUDE.md whole; site decisions --project FA whole (D519, D520 mandate the diagnosis; a repair never changes
+      the setup's inputs without Joaquin, so retraining the parent is his). Joaquin's messages 2026-11-14T04:31, 2026-10-14T16:48,
+      2026-11-18T23:35, 2026-11-10T02:08, 2026-10-04T10:57 (none on this parent); 2026-11-23 'I have no idea what you mean
+      by flags' (a question, answered)
+    blocks: only retraining the parent
+    blocks_steps: &id003 []
   owner:
     agent: a134b21ae2a8a78ce
     state: closed
@@ -39068,17 +39078,14 @@ entries:
       OK); zng4g_seed_chunks.py (HPs from the drive's DyHPO state, @90918fa5); sweep/sweep_config_ftmech_zng4g_scr{soft,pair}_b2048.yaml
       @30b23c29 (R4, not run)
     written: '2026-11-22T17:00:34+00:00'
-  ask: 'Scope: fine-tuning loses on Z+4g because the W parent carries two input settings (momentum log-rescaling input_soft_eps,
-    pair logarithms input_pair_logs) that make the model 2.3x worse from scratch on this process. Run (a) the one-setting-at-a-time
-    test (about 2 GPU-h at fixed HPs, up to about 15 GPU-h with searches), (b) a parent retrained without them, or (c) leave
-    the parent as it is? Also: restore the batch-128 scratch-with-flags search (about 14 GPU-h)?'
-  waiting_since: '2026-11-22T17:14:37+00:00'
-  searched: CLAUDE.md whole; site decisions --project FA whole (D519, D520 mandate the diagnosis, not a change of the parent's
-    inputs; a repair never changes the setup's inputs without Joaquin). Joaquin's messages 2026-11-14T04:31 (a pasted LaTeX
-    draft, no decision on the parent), 2026-10-14T16:48 (a pasted email on benchmarks, not this parent), 2026-11-18T23:35
-    (about the ladder + star arm parent and seeds, not the W parent's input flags), 2026-11-10T02:08 (a draft and slides upload,
-    no decision on these settings), 2026-10-04T10:57 (about two arms' resonance tests, not this parent), 2026-11-22 'I have
-    no idea what you mean by flags' (a question, answered)
+  ask: 'Your hold: retrain the W parent without its two input settings (momentum log-rescaling input_soft_eps, pair logarithms
+    input_pair_logs), or leave the parent as it is? (The one-setting-at-a-time test and the batch-128 scratch-with-settings
+    search run now as diagnosis under D519/D520.)'
+  waiting_since: '2026-11-23T15:10:36+00:00'
+  searched: CLAUDE.md whole; site decisions --project FA whole (D519, D520 mandate the diagnosis; a repair never changes the
+    setup's inputs without Joaquin, so retraining the parent is his). Joaquin's messages 2026-11-14T04:31, 2026-10-14T16:48,
+    2026-11-18T23:35, 2026-11-10T02:08, 2026-10-04T10:57 (none on this parent); 2026-11-23 'I have no idea what you mean by
+    flags' (a question, answered)
   step_why:
     2:
       feeds: whether the Z+4g fine-tune deficit is removed by changing the parent's inputs (D519/D520)
@@ -39086,7 +39093,8 @@ entries:
       - '(a) one-setting-at-a-time test: design, review, run, read which setting carries the 2.3x'
       - '(b) retrain the parent without both: design the parent run and its Z+4g fine-tune against scratch'
       - '(c) leave the parent: write up the mechanism in docs/results.tex and close'
-  holds_all: every remaining step of the entry is the parent decision; the diagnosis is finished
+  blocks: only retraining the parent
+  blocks_steps: *id003
 - id: llm_compare
   title: LLoCa against Suprio's LLM on the LLM amplitude catalogue
   question: In the conditions of Suprio's LLM pID run (1501 MadGraph-default processes, 1352 trained, 149 held out; 55,296
