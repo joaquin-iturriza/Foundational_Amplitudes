@@ -37930,12 +37930,10 @@ entries:
     blocks: only retraining the parent
     blocks_steps: &id003 []
   owner:
-    agent: a134b21ae2a8a78ce
-    state: closed
-    since: '2026-11-22T09:22:16+00:00'
-    state_at: '2026-11-22T16:58:24.517000+00:00'
-    context: 222733
-    context_at: '2026-11-22T13:17:03+00:00'
+    agent: aa74f65831354dd19
+    state: working
+    since: '2026-11-23T15:11:08+00:00'
+    state_at: '2026-11-23T15:11:08+00:00'
   findings:
   - at: '2026-11-20T03:05:23+00:00'
     text: '2026-11-20 step 1 read (restart_steps.py, plot_restart.py @a5f6c7b3; figs restart_steps, restart_steps_zng, restart_headstart):
