@@ -994,7 +994,7 @@ def data_delete(segs):
         scan = " ".join(w for w in re.split(r"[\s'\"]+", remote) if not os.path.basename(w.rstrip("/")).startswith("zz_"))
         if DATA_PATH.search(scan) and DATA_RM.search(scan) and not PRUNE_TOOLS.search(remote):
             out.append("data: `%s` deletes under a data path on a site by hand; data on a site is deleted only by the project's "
-                       "pruning tools (scripts/prune_site.sh, sweep/prune.py, tools/prune_copies.py) under a recorded decision, "
+                       "pruning tools (scripts/prune_site.sh, sweep/prune.py, tools/prune_copies.py) (results: under a recorded decision), "
                        "never by hand" % remote[:90])
     return out
 
