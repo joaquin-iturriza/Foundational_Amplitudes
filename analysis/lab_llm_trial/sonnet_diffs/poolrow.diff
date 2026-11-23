@@ -1,0 +1,75 @@
+diff --git a/analysis/catalog_v4/dipole_residual.py b/analysis/catalog_v4/dipole_residual.py
+index c523bcd54..6a5ca2766 100644
+--- a/analysis/catalog_v4/dipole_residual.py
++++ b/analysis/catalog_v4/dipole_residual.py
+@@ -77,6 +77,19 @@ def r2(u, x):
+     return float(np.corrcoef(u, x)[0, 1] ** 2)
+ 
+ 
++def pool_rows(z):
++    """The pool rows of a read's events: z['pool_row'] when saved, else rebuilt from z['idx'] (positions in the
++    role-contiguous train|val|test array), z['split'] and z['role_counts'] (the three role sizes), each role shuffled by
++    one default_rng(42) drawing permutation(n) for train, val, test in turn (experiment._init_data_recipes)."""
++    if "pool_row" in getattr(z, "files", z):
++        return np.asarray(z["pool_row"])
++    counts = [int(c) for c in z["role_counts"]]
++    rng = np.random.default_rng(seed=42)
++    perms = [rng.permutation(n) for n in counts]
++    role = ("train", "val", "test").index(str(z["split"]))
++    return perms[role][np.asarray(z["idx"]) - sum(counts[:role])]
++
++
+ def main():
+     ap = argparse.ArgumentParser()
+     ap.add_argument("dirs", nargs="+", help="read directories; restrict to cells with --probes")
+@@ -100,7 +113,7 @@ def main():
+                 continue
+             pr = np.load(str(z["pool"]), mmap_mode="r")
+             n = (pr.shape[1] - 1) // 5
+-            mom, pdg, amp = split_pool(np.asarray(pr[np.asarray(z["idx"])]), n)
++            mom, pdg, amp = split_pool(np.asarray(pr[pool_rows(z)]), n)
+             raw = t - z["logF"].astype(np.float64)
+             diff = np.log(np.abs(amp)) - raw
+             if np.corrcoef(np.log(np.abs(amp)), raw)[0, 1] < 0.999 or np.median(np.abs(diff - np.median(diff))) >= 0.05:
+diff --git a/tests/test_pool_rows.py b/tests/test_pool_rows.py
+new file mode 100644
+index 000000000..e179d3fe5
+--- /dev/null
++++ b/tests/test_pool_rows.py
+@@ -0,0 +1,21 @@
++"""analysis/catalog_v4/dipole_residual.pool_rows: a read's pool rows, saved or rebuilt from the role shuffles."""
++import os, sys
++import numpy as np
++ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
++sys.path.insert(0, ROOT)
++from analysis.catalog_v4.dipole_residual import pool_rows  # noqa: E402
++
++
++def test_rebuilt_from_idx_and_saved_wins():
++    counts = [7, 5, 4]
++    rng = np.random.default_rng(seed=42)
++    perms = [rng.permutation(n) for n in counts]
++    for role, start in (("train", 0), ("val", 7), ("test", 12)):
++        i = ["train", "val", "test"].index(role)
++        z = {"idx": start + np.arange(counts[i])[:3], "split": np.array(role), "role_counts": np.array(counts)}
++        np.testing.assert_array_equal(pool_rows(z), perms[i][:3])
++    np.testing.assert_array_equal(pool_rows({**z, "pool_row": np.array([9, 8])}), [9, 8])
++
++
++if __name__ == "__main__":
++    test_rebuilt_from_idx_and_saved_wins(); print("ok")
+diff --git a/tools/zero_shot_parent.py b/tools/zero_shot_parent.py
+index a3b00ebda..25f61788f 100644
+--- a/tools/zero_shot_parent.py
++++ b/tools/zero_shot_parent.py
+@@ -231,5 +231,9 @@ for recipe in a.recipes:
+                             # these, never by matching log|M|^2 (the sampling-sensitivity dead ends)
+                             idx=(np.asarray(split_idx).reshape(-1) if len(np.asarray(split_idx).reshape(-1)) == len(t)
+                                  else np.zeros(0, np.int64)),
+-                            pool=np.array(str(_pool or "")))
++                            pool=np.array(str(_pool or "")),
++                            # each event's row in that pool file (the role's shuffle, seed 42) and the role sizes
++                            # (train, val, test) the shuffle was drawn over: analysis/catalog_v4/dipole_residual.pool_rows
++                            pool_row=np.asarray(exp._role_perm[a.split])[:len(t)],
++                            role_counts=np.asarray(exp._role_counts, np.int64))
+     print("ZERO_SHOT " + json.dumps(rec), flush=True)

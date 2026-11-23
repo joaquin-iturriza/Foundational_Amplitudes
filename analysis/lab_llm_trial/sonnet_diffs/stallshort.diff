@@ -1,0 +1,71 @@
+diff --git a/tests/test_lhe_parts.py b/tests/test_lhe_parts.py
+index 10ddea290..7814ab8f9 100644
+--- a/tests/test_lhe_parts.py
++++ b/tests/test_lhe_parts.py
+@@ -152,13 +152,13 @@ def _worker(q, out):
+         out.put(e.code)
+ 
+ 
+-def test_queue_end_to_end():
+-    _register()
++def test_queue_end_to_end(run_events=400, short=False):
++    _register(run_events=run_events)
+     saved = (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
+              datagen.dest_for_role, lhe_parts.ASSEMBLE_S)
+     try:
+         with tempfile.TemporaryDirectory() as d:
+-            _fakes(d, short=False)
++            _fakes(d, short=short)
+             datagen.dest_for_role = lambda role: os.path.join(d, "pools", role)
+             os.environ["AMP_LHE_PARTS_DIR"] = os.path.join(d, "parts_store")
+             os.environ["AMP_LHE_WORK_DIR"] = os.path.join(d, "work")
+@@ -352,4 +352,5 @@ if __name__ == "__main__":
+     test_runs_and_identity()
+     test_parts_equal_serial()
+     test_queue_end_to_end()
++    test_queue_end_to_end(run_events=None, short=True)   # stall layout: short parts are done, the pool assembles from their sum
+     test_tidy_and_gc()
+diff --git a/tools/lhe_parts.py b/tools/lhe_parts.py
+index 939cecd53..f8da6f056 100644
+--- a/tools/lhe_parts.py
++++ b/tools/lhe_parts.py
+@@ -189,6 +189,12 @@ def _under(root, path):
+     return r
+ 
+ 
++def asked(name, run):
++    """Events a run must deliver: what it asks where lhe.run_events is set; None on the stall layout (every run asks
++    the whole pool and returns a few thousand by design: any events are done, the pool assembles from their sum)."""
++    return run[1] if mg.PROCESSES[name]["lhe"].get("run_events") else None
++
++
+ def part_ok(path, n_asked=None):
+     """A run's events are saved: its part file loads and holds events (all it was asked for, when n_asked is given)."""
+     try:
+@@ -280,7 +286,7 @@ def tidy_run(name, items, k, q):
+             return None
+         root = parts_work_root()
+         _under(root, wd)
+-        saved = part_ok(part, run[1])
++        saved = part_ok(part, asked(name, run))
+         rm, _ = _removals(wd, saved)
+         os.makedirs(os.path.join(q, "gc"), exist_ok=True)
+         man = os.path.join(q, "gc", f"worker_{os.environ.get('SLURM_JOB_ID', f'local{os.getpid()}')}.jsonl")
+@@ -312,7 +318,7 @@ def _run_task(q, t):
+         try:
+             mg.lhe_build_part(name, items, t["k"], mg_cores=int(t.get("cores", 1)), keep_dir=True)
+             part, run = mg.lhe_part_paths(name, items)[t["k"]]
+-            if not part_ok(part, run[1]):        # a short part (MadEvent stopped early) is a failed run, not a done one
++            if not part_ok(part, asked(name, run)):        # a short part (MadEvent stopped early) is a failed run, not a done one
+                 raise RuntimeError(f"{name}: part {t['k']} written but holds fewer events than the {run[1]} asked: "
+                                    f"{part}")
+         finally:
+@@ -440,7 +446,7 @@ def cmd_gc(a):
+                 stats["running_skipped"] += 1
+                 continue
+             _under(root, wd)
+-            saved = part_ok(part, run[1])            # all the events it asked; a short part keeps its logs
++            saved = part_ok(part, asked(name, run))            # all the events it asked; a short part keeps its logs
+             if not saved and part_ok(part):
+                 stats["short_parts"] += 1
+             n, kept = tidy_plan(wd, saved)

@@ -1,0 +1,122 @@
+diff --git a/tests/test_zero_shot_split.py b/tests/test_zero_shot_split.py
+index dda918e1d..90eee0da0 100644
+--- a/tests/test_zero_shot_split.py
++++ b/tests/test_zero_shot_split.py
+@@ -7,7 +7,7 @@ from types import SimpleNamespace
+ 
+ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ sys.path.insert(0, os.path.join(ROOT, "tools"))
+-from rebuild_run import scored_split  # noqa: E402
++from rebuild_run import scored_split, recipe_role_counts, stand_in_role, stand_in_split_set  # noqa: E402
+ 
+ 
+ def _exp():
+@@ -43,6 +43,28 @@ def test_reader_and_job_use_the_split():
+     assert '--split "$SPLIT"' in job and 'SPLIT=val;' in job and '[ "$A" = PP4 ]' in job
+ 
+ 
++def test_stand_in_roles():
++    import tempfile
++    f = tempfile.NamedTemporaryFile("w", suffix=".yaml", delete=False)
++    f.write("processes:\n- {name: ee4, sqrts: [1, 1], n_train: 0, n_val: 0, n_test: 20}\n"
++            "- {name: full, sqrts: [1, 1], n_train: 5, n_val: 3, n_test: 2}\n"
++            "- {name: nov, sqrts: [1, 1], n_train: 5, n_val: 0, n_test: 2}\n")
++    f.close()
++    c = recipe_role_counts(f.name)
++    assert c["ee4"] == {"train": 0, "val": 0, "test": 20}
++    assert stand_in_role(c, "ee4", "train", "val") == ("test", 20)
++    assert stand_in_role(c, "full", "train", "val") == ("train", 5)
++    assert stand_in_role(c, "nov", "val", "test") == ("test", 2)       # the scored split first
++    assert stand_in_role(c, "nov", "val", "val") == ("train", 5)       # else another role
++    assert stand_in_role({"z": {"train": 0, "val": 0, "test": 0}}, "z", "val", "val") == ("val", 0)
++    calls = []
++    real = lambda specs, role, seed, dest_dir=None, require_cache=False: (
++        calls.append((specs[0]["process"], role, specs[0]["n_events"])) or {specs[0]["process"]: "x"})
++    ens = stand_in_split_set(real, c, "val")
++    assert ens([{"process": "ee4", "n_events": 0}], role="train", seed=1) == {"ee4": "x"}
++    assert calls == [("ee4", "test", 20)]
++
++
+ if __name__ == "__main__":
+     for k, f in list(globals().items()):
+         if k.startswith("test_"):
+diff --git a/tools/rebuild_run.py b/tools/rebuild_run.py
+index 80d61dc01..a80ec2218 100644
+--- a/tools/rebuild_run.py
++++ b/tools/rebuild_run.py
+@@ -71,6 +71,34 @@ def scored_split(exp, split, name):
+     return loader, pool, exp._split_indices[split]
+ 
+ 
++def recipe_role_counts(recipe_yaml):
++    """{process: {'train': n, 'val': n, 'test': n}} of a recipe's events per role."""
++    procs = yaml.safe_load(open(recipe_yaml))["processes"]
++    return {p["name"]: {r: int(p.get("n_" + r, 0) or 0) for r in ("train", "val", "test")} for p in procs}
++
++
++def stand_in_role(counts, process, role, scored_split):
++    """(role read, n events) for `role` of `process`: its own when it has events, else the scored split, else another
++    role it has, else its own (0). A probe pool of one role only (the EE4 probes: test) still gets every role read."""
++    c = counts[process]
++    for r in (role, scored_split, "train", "val", "test"):
++        if c.get(r, 0) > 0:
++            return r, c[r]
++    return role, 0
++
++
++def stand_in_split_set(real_ensure_split_set, counts, scored_split):
++    """A datagen.ensure_split_set (same signature) that reads each spec from its stand-in role (stand_in_role)."""
++    def ensure(specs, role, seed, dest_dir=None, require_cache=False):
++        out = {}
++        for s in specs:
++            r, n = stand_in_role(counts, s["process"], role, scored_split)
++            out.update(real_ensure_split_set([{**s, "n_events": n}], role=r, seed=seed, dest_dir=dest_dir,
++                                             require_cache=require_cache))
++        return out
++    return ensure
++
++
+ def _build(cfg, swap, path, name):
+     """The experiment built through init_model, with the `swap` role's pool read from `path` (None: none)."""
+     real = datagen.ensure_split_set
+diff --git a/tools/zero_shot_parent.py b/tools/zero_shot_parent.py
+index a18f6522d..7ad617b30 100644
+--- a/tools/zero_shot_parent.py
++++ b/tools/zero_shot_parent.py
+@@ -36,7 +36,9 @@ sys.path.insert(0, ROOT)
+ sys.path.insert(0, os.path.join(ROOT, "tools"))
+ import siteconf  # noqa: E402
+ import pool_physics  # noqa: E402
+-from rebuild_run import _build, load_best_weights, scored_split  # noqa: E402
++import datagen  # noqa: E402
++from rebuild_run import (_build, load_best_weights, scored_split, recipe_role_counts, stand_in_role,  # noqa: E402
++                         stand_in_split_set)
+ from multiplicity_extrap import parent_target_standardization  # noqa: E402
+ 
+ ap = argparse.ArgumentParser()
+@@ -101,11 +103,17 @@ for recipe in a.recipes:
+         cfg.fine_tune.pretrained_path = ckpt
+         cfg.fine_tune.target_stats = "own"
+         cfg.fine_tune.offshell_stats = "parent"
++    # a probe without a pool of some role (the EE4 probes: test only) reads that role from one it has
++    counts = recipe_role_counts(recipe)
++    real_ensure = datagen.ensure_split_set
++    datagen.ensure_split_set = stand_in_split_set(real_ensure, counts, a.split)
+     try:
+         exp = _build(cfg, None, None, None)          # init_model loads the parent's weights, as a fine-tune does
+     except Exception as e:                            # a missing pool or sidecar on this site: listed, not dropped
+         print("ZERO_SHOT " + json.dumps({"recipe": recipe, "parent": parent, "error": repr(e)[:300]}), flush=True)
+         continue
++    finally:
++        datagen.ensure_split_set = real_ensure
+     assert len(exp.cfg.data.dataset) == 1, f"{recipe}: one probe process per recipe"
+     # the physics check, before anything is scored
+     _spec = exp._recipe_specs[0]
+@@ -159,6 +167,7 @@ for recipe in a.recipes:
+     else:
+         mu_c = sd_c = None; kind = "per_process"
+     rec = {"probe": probe, "split": a.split, "n_particles": N, "recipe": recipe, "parent": parent, "ema_applied": ema_applied, "parent_stats": kind,
++           "own_stats_role": stand_in_role(counts, probe, "train", a.split)[0],   # where the probe's own statistics were fitted
+            "n_val": int(len(z)),   # the events scored, of --split (key kept for the readers)
+            "var_logm2": float(np.var(t)), "val_loss_affine": affine,
+            "affine_ab": [float(c) for c in coef], "twin": twins.get(probe), "transform": str(tr[0]),

@@ -1,0 +1,73 @@
+diff --git a/models/diagram_encoder_llm4lhc.py b/models/diagram_encoder_llm4lhc.py
+index fe59af7eb..aa1b93b65 100644
+--- a/models/diagram_encoder_llm4lhc.py
++++ b/models/diagram_encoder_llm4lhc.py
+@@ -67,7 +67,7 @@ What changed, and why
+    over the diagrams of all of them: a deliberate deviation, since their converter
+    (``generate_diagram_jsons.py``, ``amplitude_index=0``) keeps only the first
+    subprocess's amplitude. Loop diagrams (one-loop datasets) are graphs like the trees;
+-   they have no loop case. The sign of a charged propagator's label comes here from the
++   the one-loop ghosts and Goldstones have the labels of ``_LOOP_LINES``. The sign of a charged propagator's label comes here from the
+    drawing's line id, there from MadGraph's vertex output leg; the two conventions were
+    not checked to agree (the graph is undirected and the labels are learned embeddings,
+    so a consistent flip only relabels). ``per_diagram`` (one prefix token per diagram)
+@@ -90,19 +90,26 @@ VALID_EDGE_FEATURE_MODES = ("bias", "bias_kv")
+ # list is an orientation artefact.
+ _SELF_CONJUGATE = {21, 22, 23, 25}
+ 
++# MadGraph one-loop ghosts and Goldstones, one label each after the 30 SM labels: the
++# ghost 82 and its anti-ghost -82 are distinct lines; the rest are folded by sign.
++_LOOP_LINES = (82, -82, 9000001, 9000002, 9000003, 9000004, 250, 251)
++_LOOP_FOLDED = {abs(p) for p in _LOOP_LINES if p != 82 and p != -82}
++
+ 
+ def particle_label_vocab():
+     """Signed PDG -> edge label in [0, 30): the SM particles and antiparticles of
+     ``particle_ids.PARTICLE_PROPERTIES`` in sorted-PDG order (the same 30 entries as
+-    their ``particles.json``; only the numbering differs, which a learned embedding
++    their ``particles.json``; then one label per ``_LOOP_LINES`` entry; only the numbering differs, which a learned embedding
+     does not see)."""
+     from particle_ids import GLOBAL_PDG_IDX
+-    return {int(pdg): int(i) - 1 for pdg, i in GLOBAL_PDG_IDX.items()}
++    vocab = {int(pdg): int(i) - 1 for pdg, i in GLOBAL_PDG_IDX.items()}
++    vocab.update({p: len(vocab) + k for k, p in enumerate(_LOOP_LINES)})
++    return vocab
+ 
+ 
+ def _label(pdg, vocab):
+     pdg = int(pdg)
+-    if abs(pdg) in _SELF_CONJUGATE:
++    if abs(pdg) in _SELF_CONJUGATE or abs(pdg) in _LOOP_FOLDED:
+         pdg = abs(pdg)
+     if pdg not in vocab:
+         raise KeyError(f"diagram_encoder_llm4lhc: PDG {pdg} not in the particle vocabulary "
+diff --git a/tests/test_diagram_encoder_llm4lhc.py b/tests/test_diagram_encoder_llm4lhc.py
+index fefe1af0f..2fdfc0501 100644
+--- a/tests/test_diagram_encoder_llm4lhc.py
++++ b/tests/test_diagram_encoder_llm4lhc.py
+@@ -183,7 +183,15 @@ def reference_pooled(enc):
+ # ---------------------------------------------------------------------------------------
+ def test_graph_construction():
+     vocab = particle_label_vocab()
+-    assert len(vocab) == 30 and sorted(vocab.values()) == list(range(30))
++    nl = len(_m._LOOP_LINES)
++    assert len(vocab) == 30 + nl and sorted(vocab.values()) == list(range(30 + nl))
++    assert _m._label(-250, vocab) == vocab[250] >= 30
++    assert _m._label(82, vocab) != _m._label(-82, vocab)
++    try:
++        _m._label(9000099, vocab)
++        raise AssertionError("unknown PDG accepted")
++    except KeyError:
++        pass
+     nt, edges = graph_from_sidecar_diagram(schannel(-22), EXT_EEUU, vocab)
+     # externals first, by leg number, typed in/out; then the vertices
+     assert nt == [EXT_IN_TYPE, EXT_IN_TYPE, EXT_OUT_TYPE, EXT_OUT_TYPE, VERTEX_TYPE, VERTEX_TYPE]
+@@ -201,7 +209,7 @@ def test_graph_construction():
+     # pad nodes carry nothing
+     assert not ds.adj[~ds.node_mask].any() and (ds.node_types[~ds.node_mask] == 0).all()
+     # an unknown particle fails loudly
+-    bad = {"subprocesses": [{"external": EXT_EEUU, "diagrams": [schannel(9000001)]}]}
++    bad = {"subprocesses": [{"external": EXT_EEUU, "diagrams": [schannel(9000099)]}]}
+     try:
+         load_llm4lhc_diagram_set([bad])
+         raise AssertionError("unknown PDG accepted")
