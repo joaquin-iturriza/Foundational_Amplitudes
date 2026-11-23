@@ -39128,18 +39128,13 @@ entries:
       DRIVE_DONE'
     3: Score the best trial and the control (job_llm_score.sh), figure of pooled RMSE seen/held out (and truly held out, relabels)
       against LLM 0.321/0.721 and his LLoCa 0.506/0.953, per-process MSEs as dan_per_process.py; write-up in docs/results.tex
-    4: 'Part (c), design passed 2026-11-23 11:13 (config sweep/sweep_config_llmcmp_c_latest.yaml @c49743415): when the four
-      derived-inputs prebuilds (FA-lxplus-c2768355 train, FA-lxplus-a549a64e heldout, FA-ccin2p3-5f11ffd8 train, FA-ccin2p3-e9c3b80d
-      heldout; scripts/job_mmap_prebuild.sh @fcd38bdd0e with the config''s fixed_params, overrides in scratchpad c_overrides.txt)
-      log ''the cache ... is ready'' with derived inputs: launch the search, detached: .venv-driver/bin/python sweep/drive.py
-      --config sweep/sweep_config_llmcmp_c_latest.yaml --item llm_compare --sites lxplus ccin2p3 --mem 16G --cpus 4 --hours
-      14.6 (tools/detach.py --entry llm_compare --name llmcmp_c_drive1), and the matched control via site submit <site from
-      site pick> FA sweep/trial_job.sh --item llm_compare --hdr=--mem=16G --hdr=--cpus-per-task=4 --hdr=--time=22:00:00 --hdr=--gpu-min-mem=40G
-      -- --sweep-config sweep/sweep_config_llmcmp_c_latest.yaml --detached --trial-idx 9000 --hp-idx 9000 --t-steps 60840
-      --hp training.lr=0.003649139 --hp training.muon_weight_decay=0.04733132 --hp training.regularization_lambda=9.114591e-08
-      --hp training.cosanneal_warmup_frac=0.1800024 --hp training.cosanneal_eta_min=1.376875e-08 --hp ema=false --hp training.ema_decay=0.9597525
-      (as part (a)''s control FA-lxplus-cb9273f1). First trial: check s/step, peak memory, ''built propagator masks for N/P''
-      N = P.'
+    4: 'Part (c) running (config sweep/sweep_config_llmcmp_c_latest.yaml @c49743415, deployed 5a842c456): driver llmcmp_c_drive1
+      on CC only (log ~/.local/share/ccorch/detached/20261123-125001_llmcmp_c_drive1.log, state sweeps_local/llmcmp_c_latest),
+      wave 1 FA-ccin2p3-0650cdca (hp1860), -e0a5ffe2 (hp0353), -40a19790 (hp1333); control FA-ccin2p3-677cddca. lxplus derived-inputs
+      prebuilds rerun after the run-name fix 830f8c0a4: FA-lxplus-3224ba9c (train), FA-lxplus-d96a97fa (heldout). When both
+      log ''the cache ... is ready (derived inputs ...)'': stop llmcmp_c_drive1 and relaunch the same command with --sites
+      lxplus ccin2p3 as llmcmp_c_drive2 (state resumes). Also check the first trials and the control: s/step (A100 est 0.83,
+      H100 less), peak memory, ''built propagator masks for N/P'' N = P.'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -39263,8 +39258,9 @@ entries:
     4:
       feeds: 'part (c): our latest setup against part (a), the LLM and his LLoCa'
       if:
-      - 'prebuilds ready on both sites: launch driver + control'
-      - 'a prebuild fails: read its log, fix, resubmit'
+      - 'lxplus caches ready: relaunch the driver with both sites'
+      - 'a prebuild breaks again: read its log, fix, resubmit'
+      - 'a first trial shows N < P, OOM or init refusal: stop the trials, fix, resubmit'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
@@ -39487,7 +39483,6 @@ entries:
   step_waits:
     '2': llmcmp_a_drive5
     '3': llmcmp_a_drive5
-    '4': FA-lxplus-c2768355 FA-lxplus-a549a64e FA-ccin2p3-5f11ffd8 FA-ccin2p3-e9c3b80d
   handoff:
     state: 'Part (a): 8-trial DyHPO search of muP LLoCa in the LLM-run conditions (config sweep/sweep_config_llmcmp_a_adamw_const.yaml
       @2a597c478), driven locally by llmcmp_a_drive5 (.venv-driver/bin/python sweep/drive.py --config sweep/sweep_config_llmcmp_a_adamw_const.yaml
