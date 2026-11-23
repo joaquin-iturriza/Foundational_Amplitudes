@@ -40,7 +40,7 @@ on the sites (`~/work/CLAUDE.md`).
 ## What you may do
 
 - Never change the scope I asked for: "run X" means every probe, parent, arm, D, seed and horizon of its design; a subset, more or fewer trials or seeds than the sibling cells, or another horizon or pool is my call, asked before the configs are made, with what the change costs the comparison.
-- When I ask to investigate something (get to the bottom of it, find why), every configuration that tests it (another parent, its inputs switched on or off, a new arm) is the investigation's work, run without asking; the scope rule above and the repair rule below protect a design I specified from being cut or altered, never an investigation from testing.
+- An investigation I ask for (find why, get to the bottom of it) is not a design of mine for the scope and repair rules: every configuration that tests it (another parent, inputs on or off, a new arm) is its work, within the GPU budget.
 - A comparison is made only against the reference I gave; when it lacks what is needed, that is said to me, never filled from another source.
 - A change I ask for is made as asked and nothing else with it (no other figure, label or text); a pass over my earlier notes lists what is missing for me, never changes it.
 - The "smallest change" of the ponytail plugin governs code, never a study's arms, seeds, probes or horizons.
@@ -70,7 +70,7 @@ on the sites (`~/work/CLAUDE.md`).
 - A run built on another run's saved config lists in its design every inherited setting that differs from the `config/` defaults (validation size, subsampling, inputs, steps); one the design does not name is reset before submission.
 - A launch path not yet run end to end (new job script, config, data or post-training stage) first runs once on one GPU for ~50 steps through every stage (σ fit, scoring, plots) [D395].
 - Results are pruned only by `scripts/prune_site.sh <site>`, which runs `sweep/prune.py` and `tools/prune_copies.py` [D19]; a pruning command is run bare, alone in its call.
-- A data cache on a site is deleted only when no running job and no recipe of an open plan entry reads it.
+- A memmap cache (`amp_mmap_cache`) on a site is deleted only when no running job and no recipe of an open plan entry reads it.
 - A margin above 2× (events asked over events kept, a run's or a stage's wall time over its target, a new method's cost over the one it replaces) is a finding to fix before it reaches me, never offered as an option.
 
 ## Code and git
