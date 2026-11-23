@@ -39340,8 +39340,6 @@ entries:
     start: '2026-11-23T15:32:49+00:00'
     at: '2026-11-23T15:32:49+00:00'
   step_waits:
-    '3': 'detached drive ftmech_onesetting_drive2 (searches ftmech_zng4g_scrsoftsrch_b2048, ftmech_zng4g_scrpairsrch_b2048)
-      ends: its DONE event'
     '4': 'detached drive ftmech_flagsb128_drive4 (search ftmech_zng4g_scrflagsrch_b128) ends: its DONE event'
     '5': 'detached drive ftmech_ftnoset_drive (searches ftmech_zng4g_ftnoset_b2048 and _b128 from the no-settings parent)
       ends: its DONE event'
