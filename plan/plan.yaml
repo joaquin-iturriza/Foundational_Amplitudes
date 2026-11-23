@@ -39460,6 +39460,15 @@ entries:
       copy analysis/llm_compare/suprio_llm_heldout_fig.png): two panels, held-out interpolation and extrapolation, MSE(log|M|^2)
       per process on a log axis, processes grouped by family with labelled vertical separators, 2->2 processes shaded, one
       marker per model. Our result is drawn in that layout with our LLoCa added as another marker.'
+  - at: '2026-11-23T09:15:12+00:00'
+    text: '2026-11-23: control redrawn in Suprio''s held-out layout (Joaquin: ''I sent you a very particular plot''): analysis/llm_compare/heldout_per_process.py
+      @180e542f3, figs/control_heldout_per_process.png; control renamed ''our LLoCa, his optimizer settings'' (Joaquin: ''what
+      do you mean that ours is untuned?''). Ours below his pID-emb.-only run per family: interpolation ss~ 19/19, bb~->mu
+      12/12, gs 15/16, bs~/sb 9/10, cu~ 3/5, ds/s~s~ 4/10, cb 20/24; extrapolation multi-H 1/15, H+tau 7/9, WWW 1/4, ZZZ 1/5,
+      gg->Wqq'' 2/6, gg->ttX 2/4. Per-process data of his other models (without/with pID emb., edge-list, LLoCa, L-GATr-slim
+      of the PNG) not held; the 2026-11 draft PDF (~/drafts/fm_amplitudes_2026-11/figs/cond/mse_per_process_two_rows.pdf)
+      is another version (one-hot, in-out, in-interm-out, edge-list, each with/without pID), its points extractable from vector
+      paths.'
   step_waits:
     '2': llmcmp_a_drive5
     '3': llmcmp_a_drive5
