@@ -41868,7 +41868,7 @@ entries:
   asks: []
   owner:
     agent: a02be936be2a548a6
-    state: working
+    state: closed
     since: '2026-11-23T16:09:44+00:00'
     state_at: '2026-11-23T22:57:24.975000+00:00'
     context: 283717
@@ -42020,3 +42020,25 @@ entries:
       if:
       - 'a lab arm meets the design''s yes rule: propose routing that work type to it'
       - 'none does: read the failure modes in the transcripts and propose the next adaptation'
+  handoff:
+    state: 'Benchmark built and mostly run. Harness: opencode 1.19.6 (native binary ~/.local/lib/node_modules/opencode-ai/node_modules/opencode-linux-x64/bin/opencode)
+      in a bwrap sandbox, tools/lab_llm_trial.py + tools/lab_llm_report.py in worktrees/wt-labllm (branch labllm, last commit
+      e44e915ad). Design passed review (second pass). Done: smoke on both models; 10 Sonnet plans; triage 60/60 runs (auto
+      60/60, hand 59/60, hand_read.json); timed Sonnet mechanical-worker on the 10 fixes (9/10 first pass, median ~3.6 min,
+      ~255k our tokens per fix; records arm sonnet_timed, diffs in sonnet_diffs/); 40 lab fix runs recorded but the 16 of
+      zsrole, ordsrc, skipclaim, stallshort are invalid (grader defects, see findings) and must be rerun. Next: launch rerun_0/1.sh
+      when the resume batch ends, then report + figure.'
+    decisions: 'Joaquin''s: opencode as the harness (his ''Opencode is fine I think''); restart after OOM at <=2 sessions
+      (D531); timed Sonnet reference (his question via the coordinator). Mine: triage keys read from the logs and one case
+      per distinct cause (design review FIX); hand grade of why/action against the ack note; planners run as Plan type on
+      Sonnet because brief_guard refuses general-purpose without the owner rules block; triage gives the run end class as
+      our events did; MG5_OUTPUT_DIR redirected into the run dir in the sandbox so lhe tests can write without touching ~/datasets;
+      report keeps the last record per (task, arm) so reruns replace invalid runs.'
+    ruled_out: 'bwrap --overlay-src (bwrap 0.9 lacks it); a home-made agent loop (Joaquin: use an existing harness); launching
+      6 parallel opencode sessions (OOM at 7.6 GB).'
+    running: 'detach:labllm_resume, pid 843198 (last 2 lab runs: poolrow deepseek+plan, loopenc qwen); reruns not yet launched
+      (/tmp/claude-1000/lab_llm_trial/rerun_0.sh, rerun_1.sh).'
+    files: worktrees/wt-labllm/tools/lab_llm_trial.py; worktrees/wt-labllm/tools/lab_llm_report.py; worktrees/wt-labllm/analysis/lab_llm_trial/{runs.jsonl,triage_cases.json,hand_read.json,planners.json,sonnet_timed.json,plans/,sonnet_diffs/};
+      analysis/agent_redesign/model_trial_baseline/{zsrole,ordsrc}.json (regenerated); /tmp/claude-1000/lab_llm_trial/ (run
+      dirs, rerun scripts)
+    written: '2026-11-23T23:02:36+00:00'
