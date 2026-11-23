@@ -39287,6 +39287,12 @@ entries:
     units: null
     start: '2026-11-23T15:19:20+00:00'
     at: '2026-11-23T15:19:20+00:00'
+  - batch: noset_parent
+    wall_h: 8.5
+    jobs: 2
+    units: null
+    start: '2026-11-23T15:32:43+00:00'
+    at: '2026-11-23T15:32:43+00:00'
   step_waits:
     '3': 'detached drive ftmech_onesetting_drive2 (searches ftmech_zng4g_scrsoftsrch_b2048, ftmech_zng4g_scrpairsrch_b2048)
       ends: its DONE event'
