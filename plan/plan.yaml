@@ -37937,7 +37937,12 @@ entries:
       2026-11-18T23:35, 2026-11-10T02:08, 2026-10-04T10:57 (none on this parent); 2026-11-23 'I have no idea what you mean
       by flags' (a question, answered)
     blocks: only retraining the parent
-    blocks_steps: &id003 []
+    blocks_steps: []
+    answered_at: '2026-11-23T15:25:03+00:00'
+    decision: D519
+    withdrawn_at: '2026-11-23T15:25:03+00:00'
+    withdrawn_why: D519/D520 asked for an investigation; a parent retrained without the two input settings is one of its test
+      configurations (CLAUDE.md 72bef3992), run as part of it
   owner:
     agent: aa74f65831354dd19
     state: working
@@ -39174,14 +39179,6 @@ entries:
       OK); zng4g_seed_chunks.py (HPs from the drive's DyHPO state, @90918fa5); sweep/sweep_config_ftmech_zng4g_scr{soft,pair}_b2048.yaml
       @30b23c29 (R4, not run)
     written: '2026-11-22T17:00:34+00:00'
-  ask: 'Your hold: retrain the W parent without its two input settings (momentum log-rescaling input_soft_eps, pair logarithms
-    input_pair_logs), or leave the parent as it is? (The one-setting-at-a-time test and the batch-128 scratch-with-settings
-    search run now as diagnosis under D519/D520.)'
-  waiting_since: '2026-11-23T15:10:36+00:00'
-  searched: CLAUDE.md whole; site decisions --project FA whole (D519, D520 mandate the diagnosis; a repair never changes the
-    setup's inputs without Joaquin, so retraining the parent is his). Joaquin's messages 2026-11-14T04:31, 2026-10-14T16:48,
-    2026-11-18T23:35, 2026-11-10T02:08, 2026-10-04T10:57 (none on this parent); 2026-11-23 'I have no idea what you mean by
-    flags' (a question, answered)
   step_why:
     2:
       feeds: whether the Z+4g fine-tune deficit is removed by changing the parent's inputs (D519/D520)
@@ -39200,8 +39197,6 @@ entries:
       if:
       - 'share>=0.7: H1 holds at both batches, report'
       - 'share<0.3: reopen H2-H7 at b128, next design mine'
-  blocks: only retraining the parent
-  blocks_steps: *id003
 - id: llm_compare
   title: LLoCa against Suprio's LLM on the LLM amplitude catalogue
   question: In the conditions of Suprio's LLM pID run (1501 MadGraph-default processes, 1352 trained, 149 held out; 55,296
