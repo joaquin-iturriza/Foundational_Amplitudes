@@ -9,6 +9,7 @@ std^2 (std 1.11978, shared). share = log(mean Sf*/mean S) / log(mean F/mean S), 
 triples (one seed each of Sf*, S, F). Each trial's lr is read from its run's saved config.yaml.
 
     python3 analysis/finetune_mechanism/zng4g_r1_read.py 2048 [--cached]  -> data/zng4g_r1_b<B>.json, figs/zng4g_r1_b<B>
+    python3 analysis/finetune_mechanism/zng4g_r1_read.py 2048 --onesetting [--cached]  -> step 3, figs/zng4g_onesetting_b<B>
 """
 import itertools
 import json
@@ -126,10 +127,103 @@ def h3(b):
     ps.save(fig, os.path.join(HERE, "figs", f"zng4g_r3_b{b}"))
 
 
+ONE = (("soft", "scrsoftsrch", "momentum log-rescale only"), ("pair", "scrpairsrch", "pair logs only"))
+
+
+def onesetting(b):
+    """Step 3 (design passed 2026-11-23): scratch with ONE of the parent's two input settings, searched as Sf* (16 trials,
+    same space and window) and its chosen trial's seeds 43, 44. c_x = log(mean Sx*/mean S) / log(mean Sf*/mean S), the
+    setting's share of the both-settings cost; g_x = log(mean Sx*/mean S) / log(mean F/mean S), its share of the
+    fine-tune's gap to scratch; 10-90% over the seed triples. S, Sf*, F from zng4g_r1_b<B>.json (R1 read)."""
+    cache = os.path.join(HERE, "data", f"zng4g_onesetting_raw_b{b}.json")
+    if "--cached" in sys.argv:
+        raw = json.load(open(cache))
+    else:
+        items = {"ccin2p3": [], "lxplus": []}
+        for x, tag, _ in ONE:
+            for ti, hp, v, site, rd, rp in driven(f"ftmech_zng4g_{tag}_b{b}"):
+                items[site].append(f"'{x}|{b}|t{ti}|hp{hp}#{rd}#{rp}'")
+            for s in (43, 44):
+                n = f"ftmech_zng4g_{tag}_b{b}_s{s}"
+                items["ccin2p3"].append(f"'{x}|{b}|s{s}#{CC}/runs/{n}#{CC}/sweeps/{n}/results/fixed.json'")
+        raw = {}
+        for site, args in items.items():
+            raw.update({k: dict(v, site=site) for k, v in site_python(REMOTE, args, "ZNGR1", site=site).items()})
+        json.dump(raw, open(cache, "w"))
+    r1 = json.load(open(os.path.join(HERE, "data", f"zng4g_r1_b{b}.json")))
+    r1raw = json.load(open(os.path.join(HERE, "data", f"zng4g_r1_raw_b{b}.json")))
+    base = analyse(json.load(open(os.path.join(HERE, "data", "zng4g_readout_raw.json"))))[b]
+    k2 = base["std"] ** 2
+    best = {a: r1["best"][a] for a in ("S", "Sf", "F")}
+    curves = {"S": base["curves"]["S"], "F": base["curves"]["F"]}
+    sf_ch = min((v for k, v in r1raw.items() if k.startswith(f"Sfx|{b}|t")), key=lambda v: v["val_loss"])
+    curves["Sf"] = [np.array(sf_ch["val_mse_curve"]) * k2] + [np.array(r1raw[f"Sfx|{b}|s{s}"]["val_mse_curve"]) * k2
+                                                                for s in (43, 44)]
+    trials = {"S": [t for t in r1["trials"]["S"] if t[1]], "Sf": [t for t in r1["trials"]["Sfx"] if t[1]]}
+    chosen = {}
+    for x, _, _ in ONE:
+        ts = [(int(k.split("|")[2][1:]), k.split("|")[3], v) for k, v in raw.items() if k.startswith(f"{x}|{b}|t")]
+        assert len(ts) == 16 and all(isinstance(v["lr"], float) and v["val_loss"] is not None for *_, v in ts), x
+        trials[x] = sorted((v["lr"], v["val_loss"] * k2, i) for i, _, v in ts)
+        ti, hp, ch = min(ts, key=lambda t: t[2]["val_loss"])
+        cs = [ch["val_mse_curve"]] + [raw[f"{x}|{b}|s{s}"]["val_mse_curve"] for s in (43, 44)]
+        assert all(cs), x
+        assert abs(min(cs[0]) / ch["val_loss"] - 1) < 1e-6, (x, min(cs[0]), ch["val_loss"])
+        curves[x] = [np.array(c) * k2 for c in cs]
+        best[x] = [float(min(c)) for c in curves[x]]
+        w = SF_WINDOW[b]
+        chosen[x] = {"trial": ti, "hp": hp, "lr": ch["lr"], "decades_to_low": float(np.log10(ch["lr"] / w[0])),
+                     "decades_to_high": float(np.log10(w[1] / ch["lr"]))}
+    mean = {a: float(np.mean(v)) for a, v in best.items()}
+    res = {"batch": b, "std": base["std"], "best": best, "mean": mean, "chosen": chosen, "over_S": {}, "c": {}, "g": {}}
+    for x in ("soft", "pair", "Sf", "F"):
+        res["over_S"][x] = mean[x] / mean["S"]
+    for x in ("soft", "pair"):
+        res["c"][x] = {"mean": float(np.log(mean[x] / mean["S"]) / np.log(mean["Sf"] / mean["S"])),
+                       "q10_50_90": triples_share(best[x], best["S"], best["Sf"])[0]}
+        res["g"][x] = {"mean": float(np.log(mean[x] / mean["S"]) / np.log(mean["F"] / mean["S"])),
+                       "q10_50_90": triples_share(best[x], best["S"], best["F"])[0]}
+    # blow-ups (D398): validation above 10x its best-so-far, listed apart with where it happened
+    res["blowups"] = {a: [{"seed": 42 + i, "first_at": int(np.argmax(c > 10 * np.minimum.accumulate(c))) + 1,
+                           "n_val": len(c), "max_over_best": float(c.max() / c.min())}
+                          for i, c in enumerate(cs) if np.any(np.asarray(c) > 10 * np.minimum.accumulate(c))]
+                      for a, cs in curves.items()}
+    res["best_at"] = {a: [(int(np.argmin(c)) + 1) / len(c) for c in cs] for a, cs in curves.items()}
+    res["trials"] = trials
+    json.dump(res, open(os.path.join(HERE, "data", f"zng4g_onesetting_b{b}.json"), "w"), indent=1)
+    print(json.dumps({k: v for k, v in res.items() if k != "trials"}, indent=1))
+    import plot_style as ps
+    arms = (("S", "from scratch", ps.C.blue, "o"), ("soft", "from scratch +\nmomentum log-rescale", ps.C.green, "v"),
+            ("pair", "from scratch + pair logs", ps.C.purple, "^"), ("Sf", "from scratch + both", ps.C.grey, "D"),
+            ("F", "fine-tuned", ps.C.vermillion, "s"))
+    fig, axs = ps.figure(ncols=2, nrows=2)
+    a, l, c, leg = axs[0][0], axs[0][1], axs[1][0], axs[1][1]
+    for i, (k, lab, col, m) in enumerate(arms):
+        v = best[k]
+        a.plot(np.full(len(v), i) + np.linspace(-0.15, 0.15, len(v)), v, m, color=col, label=lab)
+        for cv in curves[k]:
+            c.plot((np.arange(len(cv)) + 1) / len(cv), cv, color=col)
+        if k in trials:
+            l.plot([t[0] for t in trials[k]], [t[1] for t in trials[k]], m, color=col)
+    a.set_xticks([]); a.set_xlim(-0.5, 4.5)   # arms named by the legend
+    a.set_yscale("log"); a.set_xlabel(f"arm, batch {b}"); a.set_ylabel(r"best MSE$(\log|\mathcal{M}|^2)$")
+    l.set_xscale("log"); l.set_yscale("log")
+    from matplotlib.ticker import NullFormatter
+    l.xaxis.set_minor_formatter(NullFormatter())   # minor labels collide in a 1.3-decade window
+    l.set_xlabel("learning rate"); l.set_ylabel(r"best MSE$(\log|\mathcal{M}|^2)$")
+    c.set_yscale("log"); c.set_xlabel(f"fraction of the run, batch {b}")
+    c.set_ylabel(r"validation MSE$(\log|\mathcal{M}|^2)$")
+    ps.process_label(a, r"$q\bar q\to Z+4g$")
+    ps.legend_cell(leg, [a])
+    ps.save(fig, os.path.join(HERE, "figs", f"zng4g_onesetting_b{b}"))
+
+
 def main():
     b = sys.argv[1]
     if "--h3" in sys.argv:
         return h3(b)
+    if "--onesetting" in sys.argv:
+        return onesetting(b)
     cache = os.path.join(HERE, "data", f"zng4g_r1_raw_b{b}.json")
     raw = json.load(open(cache)) if "--cached" in sys.argv else collect(b)
     json.dump(raw, open(cache, "w"))
