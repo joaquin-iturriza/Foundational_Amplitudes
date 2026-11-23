@@ -39859,6 +39859,19 @@ entries:
       design differences (check 17). Reading: this setup is unstable at lr 6.02e-3 with Muon. hp0353 (FA-ccin2p3-b25b3d51,
       lr 8.56e-3, warmup 9055) has been skipping non-finite steps since 18:12, near the end of its warmup. The control (lr
       3.65e-3 = trial_1262''s) reaches peak lr only at step 10951 and has not yet been tested there.'
+  - at: '2026-11-23T19:58:53+00:00'
+    text: '2026-11-23 ~21:00 CET: the local machine ran out of memory and both drivers died. Relaunched with D531 (''Then
+      increase the memory for wsl, and yes, restart the processes'') after polling the sites: (a) llmcmp_a_drive6 (log ~/.local/share/ccorch/detached/20261123-205657_llmcmp_a_drive6.log;
+      same command as drive5 without the one-shot --retry-failed f8f72269, whose requeue had already run). State: trials 0-4
+      observed, trial 5 FA-ccin2p3-c891c0c2 RUNNING; wave 3 waits for it. (c) llmcmp_c_qperp_drive3 (log ~/.local/share/ccorch/detached/20261123-205657_llmcmp_c_qperp_drive3.log).
+      It collected trial 1 FAILED; trial 0 FA-ccin2p3-29ce8950 is RUNNING; nothing was submitted twice. Part (c) trial 1 FA-ccin2p3-b25b3d51
+      (hp0353: lr 8.56e-3, L2 8.2e-8, warmup 9055 steps, EMA off) diverged on the repaired config as well. val_loss_no_reg
+      -2.352 at step 3042, -2.175 at 6084, -2.633 at 9126 (best), then non-finite gradients from about step 9150, just as
+      the peak lr was reached. val 6.55 at 12168; abort at step 12854 (50 consecutive non-finite steps). Listed apart at step
+      9126; the driver kept its penalty. So both part (c) trials at lr >= 6e-3 blew up at or after the end of warmup, on both
+      configs. The control FA-ccin2p3-d34535b0 (lr 3.65e-3, trial_1262''s HPs; warmup ends at step 10951) reached step ~21,300
+      with no non-finite step. Its validation NLL at the plateau is noisy: -2.82 at 18252, -3.46 at 21294, -2.92 at 24336.
+      Trial 0 (lr 1.60e-3) falls steadily: -3.66, -3.74, -3.95 at 15210-21294.'
   step_waits:
     '2': llmcmp_a_drive5
     '3': llmcmp_a_drive5
