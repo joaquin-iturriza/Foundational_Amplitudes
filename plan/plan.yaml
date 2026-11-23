@@ -41831,3 +41831,29 @@ entries:
       on triage, at our cost <=0.3 of Sonnet''s $ per task (lab tokens are free to us). No: below those; then the failure
       modes (no edit, wrong file, tool-call errors, timeouts) are read from the transcripts to say what adaptation could close
       the gap (plan detail, brief shape).'
+    fix_at: '2026-11-23T16:22:10+00:00'
+    fix: '1) Triage measure cannot tell diagnosis from line extraction (checks 2 and 4). The prompt gives the run end (TIMEOUT),
+      and the 5 time-limit cases (E4497-E4501) are one sweep with one cause, graded only on class plus training_finished=true.
+      E6124/E6125 are the same Born-sidecar assertion. So the 20 cases are about 14 distinct situations, and the committed
+      regex in cases() already scores 20/20. A result of 18/20 or more would say nothing about the work our acks did: the
+      cause (for example 0.372 s/step against the 0.127 s/step the limit was sized from) and the action (not resubmitted as
+      is, scored failed, and so on). Fix: count each distinct cause once, and add a grade of ''why'' and ''resubmit_as_is''
+      against the ack note, read by hand per answer the way model_trial''s hand_read was. State the yes and no thresholds
+      on that grade. 2) Answers leak into the sandbox (check 8). bwrap ro-binds / and hides only ~/.ssh and ~/.config/ccorch.
+      Every lab run can therefore read ~/work/FA trunk with the fix commits and git log, the worktree''s analysis/lab_llm_trial/triage_cases.json
+      (keys and ack notes), and ~/.local/share/ccorch/runs.db (ack notes). Both families are graded only by tests or keys,
+      so a lookup would pass unseen. Fix: put a tmpfs over ~/work and ~/.local/share/ccorch inside bwrap, ro-bind back only
+      .venv-cpu and what the grader needs, and have the smoke show that reading ~/work/FA fails. 3) The planner+executor arm
+      is not specified (checks 1 and 4). The design must fix the Sonnet planner''s brief: what it reads, whether it sees the
+      check interface or may run tests, and the plan''s form or length. It must also say how the planner''s cost is read.
+      Without that, the +plan arm''s pass rate and our-token saving cannot be reproduced or read. Also state as a difference
+      from the reference that the Sonnet and Opus runs had git history up to the fix''s parent, while the lab copies have
+      none. 4) Prior is incomplete (check 5). It omits analysis/agent_redesign/mechanical_watch.json (Sonnet live on 30 mechanical-worker
+      tasks, 0 failed, D213''s live check), which is the reference for real mechanical work. It omits lookup_trial.json (15
+      lookups with tokens), which is prior work on the lookup family named in the entry''s next. It also omits model_trial_validate_ext_b/c/d
+      (30 more candidate fix tasks validated, some passing). Name them and say whether lookups are in or out and why. Adding
+      extra fix tasks is optional (lab tokens are free, and model_trial_size.json gives a pass-rate interval of [0.60, 0.98]
+      at 10 tasks) and is not required for PASS. Checks 0, 3, 6, 7 and 18 pass: local CPU only, one run per task matches the
+      reference''s one per arm (Joaquin accepted 10 tasks in D213), and nothing is ordered without need. Searched: lpnllm,
+      deepseek, qwen, opencode, lab llm, lab model, model trial, lookup trial, mechanical watch in docs/results.tex, the plan,
+      site decisions and analysis/agent_redesign.'
