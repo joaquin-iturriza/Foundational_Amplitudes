@@ -32,7 +32,7 @@ def rmse(proc, names):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--tag", default="control")
-    ap.add_argument("--label", default="our LLoCa, untuned")
+    ap.add_argument("--label", default="our LLoCa, his optimizer settings")
     a = ap.parse_args()
     seen = json.load(open(os.path.join(HERE, "data", f"{a.tag}_seen.json")))["processes"]
     held = json.load(open(os.path.join(HERE, "data", f"{a.tag}_heldout.json")))["processes"]
