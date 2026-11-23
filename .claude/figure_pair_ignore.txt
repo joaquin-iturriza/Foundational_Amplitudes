@@ -27,3 +27,4 @@ talks/progress_nov2026/figs/width_x1_loss.pdf
 talks/progress_nov2026/figs/arms_zero_shot_axes_a.pdf
 talks/progress_nov2026/figs/arms_zero_shot_axes_b.pdf
 talks/kit_nov2026/main.pdf
+analysis/llm_compare/suprio_llm_heldout_fig.png  # Suprio's reference figure as Joaquin sent it (an image, no source to make a pdf)
