@@ -39132,6 +39132,18 @@ entries:
       best trial and the control (REREAD=<run> scripts/job_llm_score.sh, heldout derived inputs prebuilt on CC feat_6d369c25),
       read per set (seen, held out, relabels, new) pooled RMSE and median per-process MSE against (a)''s best with the 1.38
       margin, figure in Suprio''s layout; write-up'
+    6: 'Part (c) relaunch at the repaired config (sweep/sweep_config_llmcmp_c_latest.yaml @f0590bf2f, sweep llmcmp_c_qperp:
+      dim_ref qperp and llm4lhc width 64 as trial_1262; llmcmp_c_latest void). When the qperp derived-inputs prebuilds log
+      ''the cache ... is ready (derived inputs ...)'' (CC FA-ccin2p3-beef9c14 train, -68a3b13f heldout; lxplus FA-lxplus-413c836c
+      train, -5248270b heldout; overrides scratchpad c_overrides2.txt): launch .venv-driver/bin/python sweep/drive.py --config
+      sweep/sweep_config_llmcmp_c_latest.yaml --item llm_compare --sites lxplus ccin2p3 --mem 16G --cpus 4 --hours 14.6 via
+      tools/detach.py --entry llm_compare --name llmcmp_c_qperp_drive1 (only the sites whose caches are ready), and the control
+      through site pick: site submit <site> FA sweep/trial_job.sh --item llm_compare --est-gpu-hours 15 --hdr=--mem=16G --hdr=--cpus-per-task=4
+      --hdr=--time=22:00:00 --hdr=--gpu-min-mem=40G --hdr=--job-name=llmcmp_c_control -- --sweep-config sweep/sweep_config_llmcmp_c_latest.yaml
+      --detached --trial-idx 9000 --hp-idx 9000 --t-steps 60840 --hp training.lr=0.003649139 --hp training.muon_weight_decay=0.04733132
+      --hp training.regularization_lambda=9.114591e-08 --hp training.cosanneal_warmup_frac=0.1800024 --hp training.cosanneal_eta_min=1.376875e-08
+      --hp ema=false --hp training.ema_decay=0.9597525. Then check the first trials for non-finite steps after warmup (the
+      void sweep''s lr 6.0e-3 and 8.6e-3 trials blew up at peak lr).'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -39260,6 +39272,11 @@ entries:
       - '(c)/(a) < 1/1.38 on held out: (b) starts from (c)''s HPs'
       - '(c)/(a) > 1.38: (b) starts from (a)'
       - 'between: not resolved by one seed, ask Joaquin for the seed-43 pair'
+    6:
+      feeds: 'part (c): our latest setup against part (a), the LLM and his LLoCa'
+      if:
+      - 'caches ready: launch driver + control'
+      - 'a prebuild breaks: read its log, fix, resubmit'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
