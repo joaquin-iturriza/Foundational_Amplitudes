@@ -39454,6 +39454,12 @@ entries:
       CPUs on lxplus, fits CC V100/H100 nodes), every later trial picks it up: llmcmp_a_drive5 (log ~/.local/share/ccorch/detached/20261123-025605_llmcmp_a_drive5.log),
       --retry-failed f8f72269 after condor_rm of 13215369 and one --once pass that recorded it REMOVED (no penalty kept).
       The driver''s sync at 02:55 deployed trunk to both sites (running trials 3, 4 unaffected: config read at start).'
+  - at: '2026-11-23T09:11:08+00:00'
+    text: '2026-11-23 Joaquin on control_score.png: ''I don''t know what this plot is, I didn''t ask you to reinvent the plot,
+      I sent you a very particular plot''. The reference is Suprio''s held-out figure (/tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/suprio_llm_heldout_fig.png,
+      copy analysis/llm_compare/suprio_llm_heldout_fig.png): two panels, held-out interpolation and extrapolation, MSE(log|M|^2)
+      per process on a log axis, processes grouped by family with labelled vertical separators, 2->2 processes shaded, one
+      marker per model. Our result is drawn in that layout with our LLoCa added as another marker.'
   step_waits:
     '2': llmcmp_a_drive5
     '3': llmcmp_a_drive5
