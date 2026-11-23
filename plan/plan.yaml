@@ -38991,6 +38991,22 @@ entries:
       (H1 holds at both batches); < 0.3: at b128 the gap is not the settings and H2-H7 are reopened at b128 only (reported,
       next design mine); between: partial, reported with its range. Any arm whose best sits at a val spike > 10x best-so-far,
       or diverged, listed apart (D398), never retried.'
+    passed_at: '2026-11-23T15:16:25+00:00'
+    reviewer: 'Configs diffed: scrsoftsrch/scrpairsrch_b2048 = scrflagsrch_b2048 minus one setting line (lloca.yaml defaults
+      input_pair_logs 0, input_soft_eps 0.0), and scrflagsrch_b2048 differs from the scratch cell tp_zng_d1e4_muon_b2048_zgggg
+      only by the two settings: 2x2 factorial, same 16-trial space/waves/DyHPO seed as both siblings, 3 seeds as S and Sf*,
+      HETEROSC mu_mse select. Check 2: zng4g_r1_b2048.json S 0.058/0.067/0.064, Sf* 0.122/0.140/0.165, Sf*/S 2.26 (ln 0.81).
+      Check 3: ln seed sd ~0.07 (S), ~0.15 (Sf*) -> c_x se ~0.12, inside the stated +-0.2 and the 0.3/0.7 bands with a spanning
+      branch. b128 resume: driver_state trials 0-2 observed (0.063/0.036/0.038), 3-5 status retry with no observed penalty;
+      Sf*_128 already 0.036 vs S_128 0.020, F_128 0.030, so the share falls below 0.7 only if the search reaches <0.027: the
+      run can answer; b128 runs beside, delays nothing. Ordering: seeds wait only on their own search''s chosen trial. Searched
+      for check 5: input_soft_eps, input_pair_logs, soft_eps, pair logs, soft rescale, softpair, one-flag, scratch+flags,
+      scrflag, null-parent in results.tex, plan (this entry, kit_benchmark, pretrain_data_saving) and site decisions: kit
+      uug one-setting A/B is cited; pretrain_data_saving''s null-parent 2x2 (fresh init through ft config, tt) is related
+      but does not separate the settings. Notes for the owner: the outcome leaves ''both c >= 0.7'' (either setting alone
+      carries the whole cost, redundant) unassigned: report it as its own branch; the two new configs are uncommitted and
+      drive.py refuses uncommitted configs, commit before launch; trial 3 (hp849) did start before removal, no result recorded,
+      retry is right.'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
