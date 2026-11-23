@@ -39455,7 +39455,6 @@ entries:
       --retry-failed f8f72269 after condor_rm of 13215369 and one --once pass that recorded it REMOVED (no penalty kept).
       The driver''s sync at 02:55 deployed trunk to both sites (running trials 3, 4 unaffected: config read at start).'
   step_waits:
-    '2': llmcmp_a_drive4
     '3': llmcmp_a_drive4
   handoff:
     state: 'Part (a) running: the 8-trial single-fidelity DyHPO search (waves 3+3+2) and the matched control, at the LLM run''s
