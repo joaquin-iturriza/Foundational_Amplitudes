@@ -275,9 +275,37 @@ def triage(case, arm):
     print(json.dumps({k: r[k] for k in ("task", "arm", "first_pass", "seconds")}))
 
 
+# ---------------------------------------------------------------- the timed Sonnet reference
+def sonnet_timed():
+    """The 10 fixes rerun by the Sonnet mechanical-worker (agents in sonnet_timed.json, worktrees
+    zz_trial_<task>_sonnettime, model_trial brief and check): first-attempt pass, wall time (first to last call
+    of its transcript), tokens (input + output + cache read + cache write, one count per API message), $."""
+    from datetime import datetime
+    ids = json.load(open(os.path.join(OUT, "sonnet_timed.json")))
+    for task, agent in ids.items():
+        fs = glob.glob(os.path.join(HOME, ".claude/projects/-home-joaquin-work-FA/*/subagents/agent-%s.jsonl" % agent))
+        ts, seen, tok = [], set(), 0
+        for line in open(fs[0]):
+            e = json.loads(line)
+            if e.get("timestamp"):
+                ts.append(datetime.fromisoformat(e["timestamp"].replace("Z", "+00:00")))
+            m = e.get("message") or {}
+            u = m.get("usage") if isinstance(m, dict) else None
+            if u and m.get("id") not in seen:
+                seen.add(m.get("id"))
+                tok += sum(u.get(k, 0) or 0 for k in ("input_tokens", "output_tokens", "cache_read_input_tokens",
+                                                       "cache_creation_input_tokens"))
+        c = mt.check(task, "sonnettime")
+        record({"family": "fix", "task": task, "arm": "sonnet_timed", "model": "sonnet (mechanical-worker)",
+                "agent": agent, "first_pass": c["passed"], "final_pass": c["passed"], "uncommitted": c["uncommitted"],
+                "seconds": round((max(ts) - min(ts)).total_seconds(), 1), "our_tokens": tok,
+                "usd": mt.cost(agent)["usd"], "usage": {}, "rc": 0})
+        print(task, c["passed"], round((max(ts) - min(ts)).total_seconds()), tok)
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["cases", "smoke", "fix", "triage", "_grade", "report"])
+    ap.add_argument("cmd", choices=["cases", "smoke", "fix", "triage", "_grade", "report", "sonnet_timed"])
     ap.add_argument("args", nargs="*")
     ap.add_argument("--plan")
     a = ap.parse_args()
@@ -291,6 +319,8 @@ def main():
         triage(a.args[0], a.args[1])
     elif a.cmd == "_grade":
         _grade(a.args[0], a.args[1])
+    elif a.cmd == "sonnet_timed":
+        sonnet_timed()
     elif a.cmd == "report":
         import lab_llm_report
         lab_llm_report.main()

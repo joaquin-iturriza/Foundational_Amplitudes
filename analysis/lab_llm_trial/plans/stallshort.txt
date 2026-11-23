@@ -1,0 +1,47 @@
+PLAN: short parts fail a task only where the run is meant to deliver its events (lhe.run_events set).
+
+Cause: tools/lhe_parts.py compares each part with run[1] (events asked) via part_ok(part, run[1]) in 3 places.
+In the stall layout (lhe.n_runs > 1, lhe.run_events None) every run asks n_req (the whole pool) and MadEvent
+returns a few thousand by design, so every such part is "short" and its task fails. The assembly
+(mg.lhe_assemble -> _lhe_finish) already sums the parts and only checks the total against the blocks, so it needs no change.
+
+Edit 1: tools/lhe_parts.py, add below part_ok (line ~199):
+
+def asked(name, run):
+    """Events a run must deliver for its task to be done: all it asked where lhe.run_events is set (a run sized to
+    its job); None (any events at all) for the stall layout, whose runs each ask the whole pool and return a few
+    thousand by design (the assembly checks the sum)."""
+    return run[1] if mg.PROCESSES[name]["lhe"].get("run_events") else None
+
+Edit 2: replace the n_asked argument at the 3 call sites with asked(name, run):
+ a) tidy_run (~line 283):          saved = part_ok(part, asked(name, run))
+ b) _run_task (~line 315):         if not part_ok(part, asked(name, run)):
+    (keep the RuntimeError text; it only fires for a run_events pool, or for an empty/unreadable part.)
+ c) cmd_gc (~line 443):            saved = part_ok(part, asked(name, run))
+    line 444 `if not saved and part_ok(part):` stays (it counts short parts; it is then never true for stall pools).
+    A stall part is now "saved": its run directory is deleted by tidy/gc instead of reduced to logs. Intended.
+Do not touch cmd_plan: it already treats an existing part file as done and queues the rest.
+
+Edit 3: mg5_pipeline_final.py, lhe_build_part (~line 4366):
+   if len(m_k) >= n_k and not keep_dir:
+ becomes
+   if len(m_k) >= (n_k if cfg["lhe"].get("run_events") else 1) and not keep_dir:
+ (same rule for the serial-callers path; comment `# a short run keeps its directory (its logs)` stays, add "(not a stall run)").
+ Keep all other names and signatures unchanged.
+
+Test: tests/test_lhe_parts.py. Give test_queue_end_to_end two parameters and run it a second time for the stall layout:
+ - def test_queue_end_to_end(run_events=400, short=False):
+     _register(run_events=run_events)    # was _register()
+     _fakes(d, short=short)              # was short=False
+   (the fake with short=True returns iseed%7 events fewer than asked, so every stall part is short; a part with
+   iseed%7 == 0 is full, fine.) All other asserts stay: 3 tasks, 3 in done/, none failed, NAME assembled, pools cached.
+ - add to the stall run: assert not os.listdir(os.path.join(q, "failed")) (check the dir exists as the others do) and
+   that sum of events of the parts is < 3 * n_req (proves they were short): load with np.load(part)["mom"].
+ - in __main__ add: test_queue_end_to_end(run_events=None, short=True) after test_queue_end_to_end().
+ - add a unit line: _register(run_events=None); assert lhe_parts.asked(NAME, (0, 500, {}, "run_01")) is None
+   and with _register(run_events=400) it returns 500 (del mg.PROCESSES[NAME] afterwards, as the other tests do).
+ Pool sizes in the test: n_train 800 + 100 + 100 = 1000 needed; 3 runs asking n_req each give ~3 * n_req, enough.
+ The existing run_events layout must still fail short parts: test_tidy_and_gc already asserts that (keep it passing).
+
+Run: cd <your repo copy> && /home/joaquin/work/FA/.venv-cpu/bin/python tests/test_lhe_parts.py
+All four existing tests plus the stall run must print ok with no traceback.

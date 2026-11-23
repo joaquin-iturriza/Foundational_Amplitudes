@@ -1,0 +1,72 @@
+PLAN: ftorders (edit only tools/catalog_ft.py and tests/test_optimizer_defaults.py in your worktree)
+
+Cause: command() never sets data.orders_from_diagrams, so the fine-tune takes the default (True, diagrams) from
+config. The parent's config.yaml often lacks the key (it was trained with the table), so the fine-tune reads the
+monomial the other way and experiment._check_frozen_orders_source refuses it or the target shifts. Fix: derive the flag
+from the parent and put it on the run.py command line.
+
+1. tools/catalog_ft.py: add after command() or before it (module level, json and os are already imported):
+
+def parent_orders_flag(parent_dir):
+    """(orders_from_diagrams flag for the fine-tune, the parent's source, how it was read). An alpha_s-only parent is refused."""
+    try:
+        src = json.load(open(os.path.join(parent_dir, "data_stats.json"))).get("target_physics_orders_source")
+    except FileNotFoundError:
+        src = None
+    how = "data_stats.json target_physics_orders_source"
+    if src is None:
+        sys.path.insert(0, ROOT)
+        from experiment import AmplitudeExperiment      # import here: heavy, only needed for old parents
+        src, how = AmplitudeExperiment._infer_orders_source(parent_dir)
+    if src == "table":
+        return False, src, how
+    if src == "diagrams_highest_alphas":
+        return True, src, how
+    raise ValueError(f"parent {parent_dir}: coupling-monomial source {src!r} ({how}) cannot be matched by a fine-tune "
+                     "(only 'table' and 'diagrams_highest_alphas' are supported)")
+
+   (Keep the "src is None" test as "is None", not falsiness. If experiment cannot be imported on this machine the test
+   below must still pass because it always gives data_stats.json with the key for the first cases; the fallback case may
+   be tested with a monkeypatch, see step 4.)
+
+2. command(): add keyword parameter at the END of the signature: orders_from_diagrams=None
+   After the "plot=true" element, before "+ ft", extend the list:
+       "evaluation.train_subsample=2000", "plot=true"] + ([] if orders_from_diagrams is None else
+       [f"++data.orders_from_diagrams={str(orders_from_diagrams).lower()}"]) + ft
+   (the string must be exactly ++data.orders_from_diagrams=true or =false; ++ because the key may be absent from the
+   parent's config). None default keeps the existing test_catalog_ft_default_muon working.
+
+3. main(): after the assert on scratch/keep_parent_stats and before the loops:
+       flag, osrc, how = parent_orders_flag(a.parent)
+       print(f"CATFT parent orders source {osrc} ({how}) -> data.orders_from_diagrams={str(flag).lower()}", flush=True)
+   (a ValueError propagates: the whole run is refused, no cell started.) In the command(...) call inside the cell loop,
+   pass orders_from_diagrams=flag as the last argument (keyword). Applies to --scratch too (it uses the parent's config).
+   Also add one sentence to the module docstring: the fine-tune's data.orders_from_diagrams follows the parent's source.
+
+4. tests/test_optimizer_defaults.py: append a test (the file's tests are plain functions, run with pytest):
+
+def test_catalog_ft_orders_follow_parent():
+    import json, tempfile
+    import tools.catalog_ft as cf
+    with tempfile.TemporaryDirectory() as d:
+        def parent(src):
+            json.dump({"target_physics_orders_source": src}, open(os.path.join(d, "data_stats.json"), "w"))
+            return d
+        assert cf.parent_orders_flag(parent("table"))[:2] == (False, "table")
+        assert cf.parent_orders_flag(parent("diagrams_highest_alphas"))[:2] == (True, "diagrams_highest_alphas")
+        try:
+            cf.parent_orders_flag(parent("diagrams_alphas_only"))
+            raise RuntimeError("an alpha_s-only parent was accepted")
+        except ValueError:
+            pass
+    for flag in (True, False):
+        cmd = cf.command("runs/x", "MuonAdamW", "r.yaml", 10, 176, "rd", "rd_result.json", "e", orders_from_diagrams=flag)
+        assert f"++data.orders_from_diagrams={str(flag).lower()}" in cmd
+    assert not any("orders_from_diagrams" in c for c in cf.command("runs/x", "MuonAdamW", "r.yaml", 10, 176, "rd", "r.json", "e"))
+
+   Optionally a 4th case: an empty dir (no data_stats.json) with a config.yaml lacking the key -> (False, "table", ...)
+   via the real _infer_orders_source (needs experiment import; skip if it fails to import torch).
+
+5. Run:
+   cd <your worktree>/ && /home/joaquin/work/FA/.venv-cpu/bin/python -m pytest tests/test_optimizer_defaults.py -q
+   All tests in that file must pass. Do not touch other files.

@@ -1,0 +1,47 @@
+PLAN: default share overshoot (f_default 0.5, chunks [334, 333, 333])
+
+CAUSE (verified by hand)
+default_share_rows (mg5_pipeline_final.py ~l.3195) is correct: cumulative rounding gives
+[(0,167),(167,334),(334,500)], total round(0.5*1000)=500, no overlap. Do NOT change it or datagen.py.
+The bug is in build_mixture_dataset (~l.3400): it rounds each share on its own,
+  n_flat = round(f_flat*n), n_fwd = round(f_fwd*n), n_def = len(default[0]).
+With V4_SAMPLING (f_flat .35, f_fwd .15) plus f_default .5 the shares sum to exactly 1, so bulk is 0
+and any rounding up overshoots. Chunk 2 (333 events): n_def 167 + n_flat round(116.55)=117
++ n_fwd round(49.95)=50 = 334 > 333, so n_bulk = -1 and it raises ValueError (or overshoots).
+
+FIX (only file to change: mg5_pipeline_final.py, function build_mixture_dataset)
+Right after the line  n_bulk = n_events - n_flat - n_fwd - n_def  replace the
+  if n_bulk < 0: raise ...
+block with a rounding absorber. The default rows are fixed by the caller, so the
+rounded flat and forward parts give way (forward first, then flat), only for rounding slack (<= 2 events):
+
+    n_bulk = n_events - n_flat - n_fwd - n_def
+    if n_def and -2 <= n_bulk < 0:      # rounding of the separately rounded shares: the default rows are fixed
+        cut = min(n_fwd, -n_bulk); n_fwd -= cut; n_flat -= -n_bulk - cut; n_bulk = 0
+    if n_bulk < 0:
+        raise ValueError(...)           # keep the existing message and raise unchanged
+
+Keep the existing raise for real overshoot: the existing test calls
+build_mixture_dataset(50, ..., 40 default rows) and expects ValueError (40+18+8 = 66 > 50).
+Pools with default=None have n_def = 0 so the new branch is skipped: their random streams are unchanged.
+Also leave the final  assert len(events) == n_events  in place.
+
+TEST (update tests/test_default_share.py)
+In test_rows add, after the existing asserts:
+    rows = mg.default_share_rows(0.5, [334, 333, 333])
+    assert rows == [(0, 167), (167, 334), (334, 500)], rows
+    assert rows[-1][1] == round(0.5 * 1000) and all(rows[i][1] == rows[i + 1][0] for i in range(2))
+In test_read_and_mixture (after the 200-event check, before the try: block) add a chunk case that fails before the fix:
+    D2 = truth[:167]; D2sq = np.sqrt(np.clip((lambda q: q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(1))(D2[:, 0] + D2[:, 1]), 0, None))
+    ev2, s2, me2 = mg.build_mixture_dataset(333, 30, 6000, [0.0] * 3, [21] * k, np.random.default_rng(3), cuts, pol,
+                                            label, "log", {}, (D2, D2sq))
+    assert len(ev2) == len(s2) == len(me2) == 333
+(truth must hold >= 167 rows; if it has fewer, use the largest n_d the fixture allows with
+n_events = 2*n_d - 1, e.g. n_d = len(truth)//2... but then check that 0.35/0.15 rounding really
+overshoots: n_flat+n_fwd+n_d > n_events. Simplest: pick n_events = 333 and n_d = 167 and build D2
+from the tests' own generator, as test_read_and_mixture does for truth.)
+
+RUN
+cd <your repo copy>; /home/joaquin/work/FA/.venv-cpu/bin/python tests/test_default_share.py
+(All prints [rows] ok, ..., [read+mixture] ok.) Check the new 333 case raised before your fix.
+Do not edit anything else.

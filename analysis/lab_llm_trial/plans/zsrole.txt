@@ -1,0 +1,57 @@
+PLAN zsrole. Edit only tools/rebuild_run.py, tools/zero_shot_parent.py, tests/test_zero_shot_split.py.
+CAUSE: the EE4 recipe has n_train 0, n_val 0, n_test 2000. experiment._init_data_recipes (~l.1497)
+calls datagen.ensure_split_set per role with n_events = n_<role>, so empty roles give no pool.
+Fix in zero_shot_parent only: wrap datagen.ensure_split_set so an empty role is read from a role
+the probe has. Do not touch experiment.py or datagen.py.
+1) tools/rebuild_run.py, add after scored_split (yaml is already imported):
+ROLES = ("train", "val", "test")
+def recipe_role_counts(recipe_yaml):
+    rec = yaml.safe_load(open(recipe_yaml))
+    return {p["name"]: {r: int(p.get(f"n_{r}", 0)) for r in ROLES} for p in rec["processes"]}
+def stand_in_role(counts, process, role, scored_split):
+    c = counts[process]       # own role, else the scored split, else another role, else own (0)
+    for r in (role, scored_split, *ROLES):
+        if c.get(r, 0) > 0:
+            return r, c[r]
+    return role, 0
+def stand_in_split_set(real_ensure_split_set, counts, scored_split):
+    def split(specs, role, seed, dest_dir=None, require_cache=False):   # real's signature
+        out = {}
+        for s in specs:       # spec keys: process, sqrts_min, sqrts_max, n_events (experiment.py l.1500)
+            r, n = stand_in_role(counts, s["process"], role, scored_split)
+            out.update(real_ensure_split_set([{**s, "n_events": n}], role=r, seed=seed,
+                                             dest_dir=dest_dir, require_cache=require_cache))
+        return out
+    return split
+2) tools/zero_shot_parent.py:
+ - add `import datagen` after the sys.path lines; extend the rebuild_run import with
+   recipe_role_counts, stand_in_role, stand_in_split_set (keep scored_split, used later).
+ - in the recipe loop after `recipe = os.path.abspath(...)`: counts = recipe_role_counts(recipe)
+ - wrap the existing `exp = _build(cfg, None, None, None)` try/except (body and `continue` unchanged):
+       real = datagen.ensure_split_set
+       datagen.ensure_split_set = stand_in_split_set(real, counts, a.split)
+       try: exp = _build(...)
+       except Exception as e: ...
+       finally: datagen.ensure_split_set = real
+ - after `_spec = exp._recipe_specs[0]`:
+       own_stats_role = stand_in_role(counts, _spec["name"], "train", a.split)[0]
+   and add "own_stats_role": own_stats_role to the `rec` dict (goes into the ZERO_SHOT JSON line).
+3) tests/test_zero_shot_split.py: import the three new names next to scored_split, add:
+   def test_stand_in_roles(tmp_path):
+       f = tmp_path / "r.yaml"
+       f.write_text("processes:\n- {name: p, sqrts: [1, 2], n_train: 0, n_val: 0, n_test: 7}\n"
+                    "- {name: q, sqrts: [1, 2], n_train: 5, n_val: 3, n_test: 0}\n")
+       c = recipe_role_counts(str(f))
+       assert c == {"p": {"train": 0, "val": 0, "test": 7}, "q": {"train": 5, "val": 3, "test": 0}}
+       assert stand_in_role(c, "p", "train", "val") == ("test", 7)    # scored split empty: another role
+       assert stand_in_role(c, "q", "test", "val") == ("val", 3)      # the scored split first
+       assert stand_in_role(c, "q", "train", "val") == ("train", 5)   # own role has events
+       assert stand_in_role({"z": {"train": 0, "val": 0, "test": 0}}, "z", "val", "val") == ("val", 0)
+       calls = []
+       def real(specs, role, seed, dest_dir=None, require_cache=False):
+           calls.append((role, specs[0]["n_events"])); return {specs[0]["process"]: role}
+       fn = stand_in_split_set(real, c, "test")
+       assert fn([{"process": "p", "sqrts_min": 1, "sqrts_max": 2, "n_events": 0}], "train", 42) == {"p": "test"}
+       assert calls == [("test", 7)]
+   Also in test_reader_and_job_use_the_split assert "own_stats_role" in zs and "stand_in_split_set" in zs.
+4) RUN: /home/joaquin/work/FA/.venv-cpu/bin/python -m pytest tests/test_zero_shot_split.py -q   (from your checkout root)

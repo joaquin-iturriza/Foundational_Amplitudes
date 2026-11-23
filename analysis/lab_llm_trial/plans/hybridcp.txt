@@ -1,0 +1,71 @@
+CAUSE: experiment.py init_data (~l.1870-1881) always fits self._phys_cp[name] = _physics_hybrid_cp(events) for every
+process, even when the frozen parent stats (stats["target_physics_hybrid_cp"], written by _save_data_stats ~l.2452)
+carry that process's c_p. Fix: read the parent's value for names in it, fit only the others.
+Work in the checkout's files (repo root = the worktree repo dir).
+
+1) physics_scales.py: append (numpy already imported; qperp_logs is in this module):
+
+def hybrid_cp(P):
+    """c_p of one process's momenta P (n, N, 4): mean over events of qperp_logs - (N - 4) log s_hat (0.0 for a 2 -> 2)."""
+    pp = np.asarray(P, dtype=np.float64)
+    q = pp[:, 0] + pp[:, 1]
+    ls = np.log(np.abs(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)))
+    return float(np.mean(qperp_logs(pp) - (pp.shape[1] - 4) * ls))
+
+def hybrid_cps(names, events_of, frozen=None):
+    """({name: c_p}, [reused names]). A name in `frozen` keeps that value and events_of(name) is NOT called;
+    any other is fitted with hybrid_cp(events_of(name))."""
+    frozen = frozen or {}
+    cps, reused = {}, []
+    for n in names:
+        if n in frozen:
+            cps[n] = float(frozen[n]); reused.append(n)
+        else:
+            cps[n] = hybrid_cp(events_of(n))
+    return cps, reused
+
+(Check a 2 -> 2 gives exactly 0.0: qperp_logs returns (N-4) log s_hat = 0 there; if float noise gives -0.0 or 1e-17,
+wrap: `return float(...) if pp.shape[1] > 4 else 0.0`.)
+
+2) experiment.py, _physics_hybrid_cp (staticmethod, ~l.2382): replace the body after the docstring with
+        from physics_scales import hybrid_cp
+        return hybrid_cp(mom_phys)
+   (keep the method: analysis/catalog_v3/hybrid_check.py calls E._physics_hybrid_cp.)
+
+3) experiment.py, frozen-stats block (the `if stats_src is not None:` branch, ~l.1525, right after
+   `_dms_frozen = stats.get("dimless_mass_stats")`) add:
+            _cp_frozen = stats.get("target_physics_hybrid_cp") or {}
+   and just before that `if` (next to `_dms_frozen = None`, ~l.1522) add `_cp_frozen = {}`.
+   (Both are local variables of init_data; the use at ~l.1873 is in the same function. If it turns out not to be,
+   store as self._cp_frozen instead and read it there.)
+
+4) experiment.py, the hybrid fit (~l.1873-1879). Replace the `for name in names:` loop that fills self._phys_cp with:
+                def _cp_events(name):
+                    src = next(((r, name) for r in ("train", "val", "test") if (r, name) in store), None)
+                    assert src is not None, f"target_physics_hybrid: no events of {name} to fit its constant on"
+                    return _phys(store[src])
+                from physics_scales import hybrid_cps
+                self._phys_cp, _reused = hybrid_cps(names, _cp_events, frozen=_cp_frozen)
+                if _reused:
+                    LOGGER.info(f"target_physics_hybrid: c_p of {len(_reused)} processes read from the frozen stats")
+   Keep the `_cps = np.array(list(self._phys_cp.values()))` and its LOGGER.info below unchanged.
+   _save_data_stats already writes self._phys_cp under "target_physics_hybrid_cp": no change needed (it now holds the
+   reused plus newly fitted values).
+
+5) Test: new file tests/test_physics_scales.py (plain pytest, numpy only; look at tests/test_signedlog_scale.py for the
+   import style / sys.path handling and copy it). Cases:
+   - hybrid_cp on a random 2 -> 2 (n=50, shape (50,4,4) with p0+p1=p2+p3 not needed for this formula; any array whose
+     first two rows give positive s_hat) == 0.0.
+   - hybrid_cp on a 2 -> 3 equals the formula by hand: np.mean(qperp_logs(P) - (-1+0)... i.e. use N=5:
+     np.mean(qperp_logs(P) - 1*ls) with ls from the incoming momenta; assert allclose with hybrid_cp(P).
+     Build P with a tiny massless 2 -> 3 sampler (random 3 final momenta, incoming = their sum split into two beams
+     along +-z) or just random positive-energy momenta with p0, p1 head-on.
+   - hybrid_cps with frozen={"a": 1.23}, names ["a","b"], events_of that RAISES for "a" and returns the 2->3 P for "b":
+     cps["a"] == 1.23, cps["b"] == hybrid_cp(P), reused == ["a"].
+   - frozen=None: reused == [] and every name fitted.
+   Optionally: experiment._physics_hybrid_cp(P) == hybrid_cp(P) (skip if importing experiment is heavy/fails).
+
+6) Run:
+   cd <repo> && /home/joaquin/work/FA/.venv-cpu/bin/python -m pytest tests/test_physics_scales.py -q
+   Then a syntax check of the edit: /home/joaquin/work/FA/.venv-cpu/bin/python -c "import experiment"
+   Do not touch anything else (no config, no other analysis scripts).

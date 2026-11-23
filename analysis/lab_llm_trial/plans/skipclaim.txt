@@ -1,0 +1,74 @@
+PLAN: plan --skip-claimed must adopt the taken-over queue's finished parts
+Edit only tools/lhe_parts.py and tests/test_lhe_parts.py (in your worktree).
+
+CAUSE
+cmd_plan with skip_claimed only adds the other queue's *claimed task names* to `known`. Parts already made
+under that queue's layout (names from mg.lhe_part_paths(name, old items)) are never linked to the new layout's
+names. The only linking is _adopt(D, name, its), and it reads the old layout from the NEW queue's own
+specs (D["specs"]/name.json), which does not exist in a fresh queue -> returns 0. So every run is re-queued.
+
+FIX (tools/lhe_parts.py)
+1. _adopt: take the old queue's dirs as an optional argument, and read the old spec from there.
+   Change the head of the function to:
+
+   def _adopt(D, name, its, old_D=None):
+       old_D = old_D or D
+       sf = os.path.join(old_D["specs"], name + ".json")
+       if not os.path.exists(sf):
+           return 0
+       old = [r for r, _ in _spec(old_D, name)]
+       ... (rest unchanged: new = ..., strip, o_n/n_n, o_id/n_id, the link loop)
+
+   Update the docstring by one line: "old_D: the queue whose parts are taken over (plan --skip-claimed)".
+   Do not touch the linking loop: it already uses os.link, skips if src missing or dst exists, never deletes.
+
+2. cmd_plan, in the per-process loop, replace
+       n_adopt += _adopt(D, name, its)
+   by
+       n_adopt += _adopt(D, name, its)
+       for q2 in getattr(a, "skip_claimed", None) or []:
+           n_adopt += _adopt(D, name, its, _dirs(q2))
+   It must stay BEFORE the line that writes this queue's specs/name.json and before the
+   `os.path.exists(part)` test in the k-loop (it is already above both). The `exclude` check stays first.
+   (Own-queue adoption first, then each taken-over queue; the os.path.exists(part) guard in _adopt makes
+   a second source a no-op once a part is linked.)
+
+   Result: a linked part exists at the new path, so `if os.path.exists(part) or tag in known` counts it
+   as present and it is not written to todo/.
+
+3. Update the help text of --skip-claimed in main():
+   "queues whose claimed runs are not planned again and whose finished parts are linked to this layout".
+   Also the module docstring line 16 (same words, short).
+
+TEST (tests/test_lhe_parts.py): add, after test_accept_short_and_adopt, a test copying its setup:
+
+   def test_skip_claimed_adopts_parts():
+       (same saved/try/finally, tempdir, AMP_LHE_PARTS_DIR, spec.yaml, rates.json as test_accept_short_and_adopt;
+        cleanup identical: restore datagen.dest_for_role, pop env, mg.PROCESSES.pop(NAME, None))
+       q_old, q_new = d/queue_old, d/queue_new
+       plan = lambda q, **kw: lhe_parts.cmd_plan(argparse.Namespace(specs=[spec], queue=q, seed=42, rates=rates, cores=[], **kw))
+       _register(n_runs=2, run_events=400, accept_short=True)
+       plan(q_old)
+       old = [p for p, _ in mg.lhe_part_paths(NAME, _items())]
+       for p in old: makedirs(dirname(p), exist_ok=True); np.savez(p, mom=np.zeros((37, K, 4)))
+       _register(n_runs=3, run_events=400, accept_short=True)
+       new = mg.lhe_part_paths(NAME, _items())
+       plan(q_new, skip_claimed=[q_old])
+       assert all(os.path.samefile(a, b) for a, (b, _) in zip(old, new[:2]))
+       assert not os.path.exists(new[2][0])
+       todo = os.listdir(os.path.join(q_new, "todo"))
+       assert len(todo) == 1 and todo[0].endswith(f"__{NAME}__002.json")
+
+   Sanity: before the fix this test must fail (samefile on a missing path); after, pass.
+   If the pytest collection of this file uses a runner list at the bottom (check `grep -n "__main__" tests/test_lhe_parts.py`),
+   add the new test there the same way as test_accept_short_and_adopt.
+
+RUN
+   cd <your worktree> && /home/joaquin/work/FA/.venv-cpu/bin/python -m pytest tests/test_lhe_parts.py -q -k "adopt or end_to_end"
+   then the whole file: ... -m pytest tests/test_lhe_parts.py -q
+
+NOTES
+- Do not change signatures of cmd_plan(args) or lhe_part_paths. args.skip_claimed is a list of queue dirs.
+- Not checked: the exact todo file naming (prio prefix is 8 digits then "__NAME__002.json"), confirm in the test run.
+- Not handled (by design): a taken-over layout that differs in more than n_runs/n_requested, or has lhe.energies;
+  _adopt returns 0 there as for the own-queue case. If the real queue's layouts differ so, say so in the report.

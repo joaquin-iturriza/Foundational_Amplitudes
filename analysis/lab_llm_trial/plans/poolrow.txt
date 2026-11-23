@@ -1,0 +1,54 @@
+PLAN poolrow (edit only in your worktree; 3 files)
+
+CAUSE. experiment._init_data shuffles each role (rng=default_rng(42); perm=rng.permutation(n) for train, val,
+test in turn) and keeps it as exp._role_perm[role] (position i of the role holds pool row perm[i]).
+tools/zero_shot_parent.py saves idx=split_idx = POSITIONS in the role-contiguous train|val|test array
+(exp._split_indices), not pool rows. analysis/catalog_v4/dipole_residual.main() then indexes the pool file
+with z["idx"], so it reads the wrong rows (it only "works" if the check on alignment refuses the probe).
+
+FIX 1: tools/zero_shot_parent.py, in the np.savez_compressed(...) call (about line 232), after idx=..., add
+    pool_row=_pool_row,
+and just before `if a.save_dir:` (about line 209) compute, with the same length guard idx uses:
+    _pos = np.asarray(split_idx).reshape(-1)
+    _perm = getattr(exp, "_role_perm", {}).get(a.split)
+    # position p of the role holds pool row _perm[p - role offset]; the role starts at _pos[0] (events are its first rows)
+    _pool_row = (np.asarray(_perm)[_pos - _pos[0]] if _perm is not None and len(_pos) == len(t) and len(_pos)
+                 else np.zeros(0, np.int64))
+Keep idx as it is (other readers use it). Check `t` is defined before that point (it is used in the savez call).
+
+FIX 2: analysis/catalog_v4/dipole_residual.py. Add `import re` and, above main(), exactly this signature:
+  def pool_rows(z):
+    """Pool rows of a saved read's events. A saved z['pool_row'] wins; else rebuilt: z['idx'] are positions in the
+    role-contiguous train|val|test array, each role shuffled by one default_rng(42) drawing rng.permutation(n) for
+    train, val, test in turn (experiment._init_data)."""
+  - keys = z.files if hasattr(z, "files") else z   (works for npz and for a dict in the test)
+  - if "pool_row" in keys and len(z["pool_row"]) == len(z["idx"])  (or idx absent): return np.asarray(z["pool_row"]).
+    (Only require len(pool_row) > 0.)
+  - role = str(z["split"]); idx = np.asarray(z["idx"]); pool = str(z["pool"]).
+  - sizes: n[role] = np.load(pool, mmap_mode="r").shape[0]; for each other role r in (train,val,test), its pool is the
+    sibling file: glob.glob(re.sub(rf"_{role}_.*", f"_{r}_*amplitudes.npy", pool)) (first match, sorted);
+    n[r] = its shape[0]. Every role before `role` must be found, else raise ValueError (do not guess).
+  - rng = np.random.default_rng(seed=42); perms = {}; for r in ("train","val","test"): perms[r] = rng.permutation(n[r])
+    -- draw in that order and stop after `role`; a role with no sibling after `role` is not needed.
+  - offset = sum(n[r] for roles before `role`); return perms[role][idx - offset].
+In main(): replace the "idx" check/usage: the refusal test becomes
+    if not str(z["pool"]) or ("idx" not in z.files and "pool_row" not in z.files): (same error text)
+  then   rows_idx = pool_rows(z)   (try/except ValueError -> append {"dir","probe","error": str(e)}; continue)
+  and use pr[rows_idx] instead of pr[np.asarray(z["idx"])]. Keep the length check against len(t). Update the module
+  docstring first paragraph by one sentence: reads carry pool_row (idx are positions in the role-contiguous array).
+
+TEST: new file tests/test_dipole_pool_rows.py (pytest, CPU, no model). Use tmp_path:
+  1. write three tiny .npy pools named f"p_10-20GeV_{r}_x_amplitudes.npy" with n_train=7, n_val=5, n_test=4 rows.
+  2. expected = default_rng(42): pt=rng.permutation(7); pv=rng.permutation(5); ps=rng.permutation(4).
+  3. z = {"split": "val", "idx": np.arange(7, 12)[:3], "pool": str(val_path)} -> pool_rows(z) == pv[:3];
+     z test: idx=np.arange(12,16) -> == ps; train: idx=np.arange(7)[:4] -> == pt[:4].
+  4. z with "pool_row": np.array([9,8,7]) plus idx -> returned unchanged (wins).
+  5. missing sibling pool for an earlier role -> pytest.raises(ValueError).
+  Import: sys.path.insert(0, ROOT) then `from analysis.catalog_v4.dipole_residual import pool_rows`
+  (check that importing the module has no side effects; main() is guarded by __name__ == "__main__" -- verify, add the
+  guard if absent).
+  Also extend tests/test_zero_shot_split.py::test_reader_and_job_use_the_split style with one assert that the text of
+  tools/zero_shot_parent.py contains "pool_row=" (cheap source check; the script cannot run on CPU).
+
+RUN: /home/joaquin/work/FA/.venv-cpu/bin/python -m pytest tests/test_dipole_pool_rows.py tests/test_zero_shot_split.py -q
+Do not touch experiment.py (it already keeps _role_perm and writes pool_row for preds). No other files.
