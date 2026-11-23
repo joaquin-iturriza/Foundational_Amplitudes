@@ -41994,7 +41994,8 @@ entries:
       opencode, lab llm, lab model, model trial, lookup trial, mechanical watch in docs/results.tex, the plan, site decisions
       and analysis/agent_redesign.'
   step_waits:
-    '1': detach:labllm_resume (33 lab fix runs, 2 streams) and the 10 timed Sonnet mechanical-worker fix runs (agents in analysis/lab_llm_trial/sonnet_timed.json)
+    '1': detach:labllm_resume (last 2 lab runs), then the 16 reruns /tmp/claude-1000/lab_llm_trial/rerun_0.sh, rerun_1.sh
+      (2 sessions)
     '2': the 10 timed Sonnet mechanical-worker fix agents (analysis/lab_llm_trial/sonnet_timed.json), graded by tools/lab_llm_trial.py
       sonnet_timed
   findings:
