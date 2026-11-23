@@ -41915,3 +41915,5 @@ entries:
       model_trial.json, validate_ext_b/c/d, mechanical_watch.json and lookup_trial.json. Searched: lpnllm, deepseek, qwen,
       opencode, lab llm, lab model, model trial, lookup trial, mechanical watch in docs/results.tex, the plan, site decisions
       and analysis/agent_redesign.'
+  step_waits:
+    '1': the opencode install (npm, background) and the ten Sonnet planners of the +plan arms
