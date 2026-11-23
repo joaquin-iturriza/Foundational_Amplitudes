@@ -39123,11 +39123,6 @@ entries:
   - D527
   - D528
   next:
-    1: 'Scoring check on the matched control FA-lxplus-cb9273f1 (lr 1e-3 constant, no warmup, no L2, EMA off): tools/llm_score.py
-      via scripts/job_llm_score.sh (FA-lxplus-4bfd2286, 2a597c478): pooled test RMSE of log|M|^2 seen (1352 x 1e4) and held
-      out (139 x 1e4, shared affine statistics), the truly held-out subset and the relabels apart; fitted affine constants
-      already read from its data_stats.json: mu_N = 27.399 - 6.701 N, sigma 5.316, i.e. a = 27.399 - 2*6.701 = 13.997, b =
-      6.701, c = 5.316 against his 14.017 / 6.713 / 5.303 (0.1-0.3%, within the design''s 10%)'
     2: 'Waves 2 and 3 of the DyHPO search (driver llmcmp_a_drive4; wave 1: trial 0 lr 1.03e-3 EMA on val 4.89e-4, trial 1
       lr 3.20e-3 val 9.41e-3, trial 2 lr 8.92e-3 EMA on val 1.55e-2): the driver suggests and submits them itself and writes
       DRIVE_DONE'
@@ -39245,11 +39240,6 @@ entries:
     context: 110780
     context_at: '2026-11-23T01:26:49+00:00'
   step_why:
-    1:
-      feeds: whether the scoring path reproduces his metric before the trials are scored
-      if:
-      - 'scores finite and the seen RMSE close to the run''s own test MSE: score the trials with the same job'
-      - 'the tool fails or disagrees with the run''s test stage: fix llm_score.py, rescore'
     2:
       feeds: 'part (a): the best tuned trial'
       if:
@@ -39456,7 +39446,6 @@ entries:
       40; medians 0.688 vs 0.649; ours below the LLM on 14 of 43 new, 82 of 96 relabels. LLM subset RMSEs from draft_pid_by_process.json
       (its 139 give 0.7214 = his table).'
   step_waits:
-    '1': FA-lxplus-4bfd2286
     '2': llmcmp_a_drive4
     '3': llmcmp_a_drive4
   handoff:
