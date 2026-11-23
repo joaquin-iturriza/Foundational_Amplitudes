@@ -39447,6 +39447,14 @@ entries:
       (scripts/job_llm_score.sh @2a597c478, REREAD). site logs on a finished lxplus job: condor_tail now bounded by timeout
       20 (~/.local/bin/site cmd_logs; backup scratchpad site.bak.condor_tail); tested on FA-lxplus-cb9273f1 -n 5 (1.8 s) and
       -n 100000 (61 s, earlier >120 s timeout).'
+  - at: '2026-11-23T01:29:29+00:00'
+    text: '2026-11-23 (E8242): matched control scored (FA-lxplus-4bfd2286, llm_score.py @2a597c478; analysis/llm_compare/control_score.py
+      @15d0b1117, figs/control_score.png). Pooled test RMSE of log|M|^2: seen 0.139 (LLM 0.321, his LLoCa 0.506), held out
+      1.042 (LLM 0.721, his LLoCa 0.953); relabels (96) 0.237 vs LLM 0.341, new (43, relabel no training process) 1.839 vs
+      LLM 1.193. mean MSE of z on seen test 6.807e-4 = the run''s val 6.79e-4. New set: 3 processes (dc_bbx_hhh 29.0, dc_gg_btxwp
+      28.4, dc_gg_tbxwm 24.3; LLM 13.1, 2.48, 2.24) hold 56% of our summed MSE; without them 1.263 vs LLM 1.041 on the same
+      40; medians 0.688 vs 0.649; ours below the LLM on 14 of 43 new, 82 of 96 relabels. LLM subset RMSEs from draft_pid_by_process.json
+      (its 139 give 0.7214 = his table).'
   step_waits:
     '1': FA-lxplus-4bfd2286
     '2': llmcmp_a_drive4
