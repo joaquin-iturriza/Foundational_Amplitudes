@@ -38136,6 +38136,18 @@ entries:
       caption OK): the 24-trial fine-tune search (window top raised 1.1e-2 -> 3.3e-2) keeps its first-16 best, trial 11 at
       lr 1.02e-2 (inside the old window), 0.0258; the 8 added trials give 0.029-0.078, those above the old top (1.19e-2, 1.93e-2,
       2.62e-2, 3.01e-2) 0.030/0.048/0.053/0.078 -> H3 ruled out at b128 as at b2048: the lr window is not part of the gap.'
+  - at: '2026-11-23T22:37:47+00:00'
+    text: '2026-11-24 step 3 one-setting read, b2048 (zng4g_r1_read.py --onesetting @deb1c5ee3; fig zng4g_onesetting_b2048,
+      caption OK). Best val MSE(log|M|^2) seeds 42/43/44 of each searched chosen trial: scratch 0.058/0.067/0.064 (mean 0.0630);
+      + momentum log-rescale only (input_soft_eps 1e-8; hp1961 lr 0.028) 0.125/0.121/0.145 (0.131, 2.07x scratch); + pair
+      logs only (input_pair_logs 7; hp1958 lr 0.023) 0.066/0.083/0.060 (0.070, 1.11x, inside the 1.19 seed bar); + both 0.122/0.140/0.165
+      (0.142, 2.26x); fine-tuned 0.097/0.100/0.097 (0.098, 1.56x). Share of the both-settings cost c=log(Sx/S)/log(Sf*/S):
+      log-rescale 0.90 (10-90% over 27 seed triples 0.70-1.12), pair logs 0.13 (-0.10-0.39) -> branch c_soft>=0.7, c_pair<=0.3:
+      the momentum log-rescale carries the cost. Share of the fine-tune''s gap log(Sx/S)/log(F/S): log-rescale 1.65 (1.43-1.96),
+      pair logs 0.24 (-0.19-0.65). Log-rescale trials 0.121-0.201 all above scratch''s 0.058-0.098 over lr 3e-3..4e-2; pair-logs
+      trials 0.066-0.126 overlap scratch. Blow-ups listed apart (val >10x best-so-far): log-rescale seed 44 from validation
+      18/50 (max 2.9e4x best), both-settings seeds 43, 44 (as before); all read at best checkpoints before the blow-up. Chosen
+      lrs 0.17/0.26 decades below the window top: not edge-limited.'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
