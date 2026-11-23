@@ -40897,6 +40897,17 @@ entries:
       < P in the off-shellness line is fixed before the rest go. The expected effect within our own model on this catalog
       (shared standardization 1.72 vs dimensionless + coupling orders 1.05 on the new set, a factor 1.6) is above 1.38, so
       the read stays informative.'
+    passed_at: '2026-11-23T11:13:26+00:00'
+    reviewer: 'Part (c) at config @c49743415, passed on the third review. One change against a matched control: the latest-setup
+      bundle is D523''s question, every difference from part (a) is listed, and the full template DyHPO runs in waves of 3+3+2
+      with the lr re-tuned for MuonAdamW. HETEROSC, the emission-scale target and the catalog''s own test pools as in (a).
+      Check 2: within our own model, dan_per_process.json @9e02875a gives 1.72 to 1.05 median MSE on the 43 new processes
+      and 0.066 to 0.046 on the relabels; docs/results.tex coupling-orders paragraph gives 1.57 to 0.48. Check 3: the catalog_v4
+      per-class held-out seed spread is a median |log10| ratio of 0.14, a factor of 1.38, used as a conservative margin on
+      the pooled and median reads, with a middle band read as not resolved and the second seed asked of Joaquin. Rate 0.83
+      s/step on A100 at 24,576, scaled from the latest setup''s own probes; 22 h limit, 1.5x; GPU floor 40G against an expected
+      28 GB peak, scaled from the measured 18.6 GB at 16,384; host 16G; derived inputs about 2.5 GB against 23 GB free on
+      CC. Terms searched: DlessInOrd, dancat, catalog_daniel, llm_compare, llmcmp, latest setup, emission scales, seed spread.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
