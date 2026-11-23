@@ -1057,7 +1057,10 @@ def problems(inp):
         try:
             out += f()
         except Exception as e:
-            if SUBMITTING.search(scan):
+            if name in ("cache", "datadelete") and CACHE_RM.search(scan):
+                out.append("%s: the check failed (%s: %s) on a command that deletes; refused until it can be read"
+                           % (name, type(e).__name__, e))
+            elif SUBMITTING.search(scan):
                 out.append("%s: the check failed (%s: %s) on a command that submits; refused until it can be read"
                            % (name, type(e).__name__, e))
     if not out and (not only or "placement" in only):

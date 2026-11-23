@@ -1,6 +1,6 @@
 """cache deletion guard: refuses deleting an amp_mmap_cache key an active FA job names (2026-11-07: 0c897ca2... under
 FA-ccin2p3-a77e20b8), allows a key no job uses; data_mmap.prune keeps a key a live job names."""
-import os, sqlite3, sys
+import os, sqlite3, sys, time
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
@@ -106,3 +106,22 @@ def test_design_fresh_uses_latest_unwithdrawn_design():
     assert not fresh(ok, {"at": t})                          # later design pending
     assert not fresh(ok, {"at": t, "fix_at": t, "fix": "x"})  # later design sent back
     assert not fresh(wd) and not fresh()
+
+
+def test_time_budget_spent_blocks_unread_runs(tmp_path):
+    def slow(run):
+        time.sleep(0.05)
+        return ""
+    u = cg.users("ccin2p3", [FREE], fetch=slow, db=db(tmp_path), budget_s=0)
+    assert u and "time budget" in u[0][3]
+
+
+def test_cache_check_error_refuses_rm_but_not_ls(monkeypatch):
+    monkeypatch.setenv("SUBMIT_TEST", "1")
+    monkeypatch.setenv("SUBMIT_ONLY", "cache")
+    monkeypatch.setattr(g, "cache_delete", lambda segs: 1 / 0)
+    rm = {"tool_input": {"command": "site run ccin2p3 FA --item x -- rm -rf %s%s" % (BASE, USED)}}
+    ls = {"tool_input": {"command": "ls /tmp"}}
+    out = g.problems(rm)
+    assert out and "deletes" in out[0], out
+    assert g.problems(ls) == []

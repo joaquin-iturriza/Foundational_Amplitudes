@@ -11,7 +11,7 @@ log (`site logs <run> -n 100000`), their registry row (note, launch, expect) and
 A run whose log cannot be read counts as a user (fails closed).
 
 Site side (data_mmap.prune): site_users(key) greps the stdout files of the user's live slurm jobs for the key."""
-import glob, os, re, sqlite3, subprocess, sys
+import glob, os, re, sqlite3, subprocess, sys, time
 
 ACTIVE = ("RUNNING", "SUBMITTED", "PENDING", "QUEUED", "CONFIGURING", "UNKNOWN")
 RUNS_DB = os.environ.get("SUBMIT_RUNS_DB") or os.path.expanduser("~/.local/share/ccorch/runs.db")
@@ -38,10 +38,14 @@ def site_logs(run):
     return r.stdout
 
 
-def users(site, keys, fetch=site_logs, db=None):
-    """[(run, state, key, where)] of active runs naming a key in their log, registry row or fetched config"""
-    out = []
+def users(site, keys, fetch=site_logs, db=None, budget_s=80):
+    """[(run, state, key, where)] of active runs naming a key in their log, registry row or fetched config; once
+    budget_s is spent (the hook's own timeout lets a command through) each remaining run is listed unread, as a blocker"""
+    out, t0 = [], time.monotonic()
     for run, state, note, launch, expect in active_runs(site, db=db):
+        if time.monotonic() - t0 > budget_s:
+            out.append((run, state, "*", "not read within the hook time budget"))
+            continue
         texts = {"registry": " ".join(str(x or "") for x in (note, launch, expect))}
         for cfg in glob.glob(os.path.join(ARTIFACTS, run, "**", "config.yaml"), recursive=True):
             texts["config"] = texts.get("config", "") + open(cfg, errors="replace").read()
