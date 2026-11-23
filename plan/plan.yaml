@@ -41849,14 +41849,12 @@ entries:
     - designer-executor setups
   decisions:
   - D530
-  next:
-    1: 'Design the benchmark: tasks drawn from real past subagent work (mechanical-worker briefs, log-reading acks, small
-      tool fixes, lookups) with their known correct outcomes; arms: each lab model alone, each as executor of a plan from
-      our model, our current subagent as reference; measures: task success graded against the known outcome, our tokens spent,
-      wall time; then the harness to run them'
-    2: 'Sonnet (mechanical-worker definition) on the same 10 tool fixes with the same grading, seconds and our tokens per
-      task recorded, beside the lab arms in the figure (Joaquin 2026-11-23: is it slower than our own subagents or just not
-      parallelized?)'
+  next: 'When the resume batch (detach:labllm_resume) ends, launch the 16 reruns of zsrole, ordsrc, skipclaim and stallshort
+    x 4 lab arms (grader defects fixed) as one detached job with 2 streams: tools/detach.py --entry lab_llm_trial --name labllm_rerun
+    --each ''bash /tmp/claude-1000/lab_llm_trial/rerun_0.sh'' --each ''bash /tmp/claude-1000/lab_llm_trial/rerun_1.sh'' (at
+    most 2 opencode sessions, D531); on its end run python3 tools/lab_llm_trial.py report in worktrees/wt-labllm, look at
+    figs/lab_llm_pass.png, check its caption, and hand Joaquin the numbers (pass, minutes and our tokens per fix per arm incl.
+    Sonnet timed; triage auto 60/60 and hand 59/60) with the figure'
   done_when: null
   notes_ref: null
   match: zz_labllm_*
@@ -41994,8 +41992,6 @@ entries:
       opencode, lab llm, lab model, model trial, lookup trial, mechanical watch in docs/results.tex, the plan, site decisions
       and analysis/agent_redesign.'
   step_waits:
-    '1': detach:labllm_resume (last 2 lab runs), then the 16 reruns /tmp/claude-1000/lab_llm_trial/rerun_0.sh, rerun_1.sh
-      (2 sessions)
     '2': the 10 timed Sonnet mechanical-worker fix agents (analysis/lab_llm_trial/sonnet_timed.json), graded by tools/lab_llm_trial.py
       sonnet_timed
   findings:
@@ -42017,8 +42013,9 @@ entries:
       10 tasks at their fix commits (validated). The 16 lab runs of zsrole, ordsrc, skipclaim and stallshort are rerun from
       scratch after the resume batch ends.'
   step_why:
-    2:
-      feeds: whether the lab models are slower per task than our subagents, measured on the same tasks
+    1:
+      feeds: whether lab models take some subagent work (D530), and Joaquin's question whether they are slower or only not
+        parallel
       if:
-      - 'Sonnet much faster per task: report the ratio with the pass rates'
-      - 'similar per task: the slowness was the 2-at-a-time width'
+      - 'a lab arm meets the design''s yes rule: propose routing that work type to it'
+      - 'none does: read the failure modes in the transcripts and propose the next adaptation'
