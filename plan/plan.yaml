@@ -39523,6 +39523,7 @@ entries:
   step_waits:
     '2': llmcmp_a_drive5
     '3': llmcmp_a_drive5
+    '5': the relaunch of step 6 (llmcmp_c_qperp driver and control, not yet submitted)
   handoff:
     state: 'Part (a): 8-trial DyHPO search of muP LLoCa in the LLM-run conditions (config sweep/sweep_config_llmcmp_a_adamw_const.yaml
       @2a597c478), driven locally by llmcmp_a_drive5 (.venv-driver/bin/python sweep/drive.py --config sweep/sweep_config_llmcmp_a_adamw_const.yaml
