@@ -41112,6 +41112,24 @@ entries:
       < P in the off-shellness line is fixed before the rest go. The expected effect within our own model on this catalog
       (shared standardization 1.72 vs dimensionless + coupling orders 1.05 on the new set, a factor 1.6) is above 1.38, so
       the read stays informative.'
+    fix_at: '2026-11-23T14:52:53+00:00'
+    fix: '(1) Time per unit and GPU floor (checks 0 and 15): the design still sizes part (c) from estimates (0.83 s/step A100,
+      1.45 s/step V100 = 24.5 h, ~28 GB VRAM) and keeps cluster.gpu_min_mem 40G to keep V100s out, while the void search of
+      this same setup at batch 24,576 measured H100 0.27 s/step (4.6 h) and V100-PCIE-32GB 0.90 s/step (15.2 h, inside the
+      22 h limit) with peak VRAM 16.0 GB (finding 2026-11-23T13:55); the repair only shrinks the diagram encoder (256 to 64),
+      so these are upper bounds. Keeping V100s out is pinning a GPU class to make a rate hold (Joaquin 2026-11-22: no GPU
+      pinning) and drops lxplus''s 89 V100/V100S slots (of ~220 at >= 32 GB), slowing a search he asked to be done fast; on
+      CC the flag is a no-op anyway (SLURM). Fix: gpu_min_mem 32G as part (a), wall target and the 22 h limit stated from
+      the measured rates (V100 15.2 h + ~0.6 h start-up, 1.4x room; H100 4.6 h), drop the 28 GB and 0.83/1.45 estimates. No
+      new run needed. (2) Stale or wrong statements to correct before it passes: the question still names the config @c49743415
+      and the driver with --mem 12G, while --fixed and plan step 6 say @f0590bf2f and 16G (the yaml says 16G): one commit
+      and one mem everywhere. The check and outcome say dan_per_process.json @9e02875a gives 1.72 vs 1.05 ''on the 43 new''
+      and ''the same 139''; that file''s sets are interp 91 and extrap 9 processes (medians 0.066/0.046 interp, 1.72/1.05
+      extrap, confirmed), so say 9 truly held out and 91 relabels, and that the factor 1.6 rests on 9 processes. Everything
+      else holds: Hydra composition reproduced (73 keys against trial_1262''s config.yaml, identical to c_composed.yaml; against
+      the void control trial_9000''s saved config only dim_ref, encoder width 64 and run bookkeeping differ, so the local
+      composition is what run_trial writes); dim_ref qperp and width 64 now match trial_1262 (D234 emission scales, D6 width
+      64); HETEROSC; template search space with 8 trials 3+3+2; disk (CC 18 GB free, qperp caches already built).'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
