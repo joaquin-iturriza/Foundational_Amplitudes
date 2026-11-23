@@ -39445,6 +39445,15 @@ entries:
       28.4, dc_gg_tbxwm 24.3; LLM 13.1, 2.48, 2.24) hold 56% of our summed MSE; without them 1.263 vs LLM 1.041 on the same
       40; medians 0.688 vs 0.649; ours below the LLM on 14 of 43 new, 82 of 96 relabels. LLM subset RMSEs from draft_pid_by_process.json
       (its 139 give 0.7214 = his table).'
+  - at: '2026-11-23T01:56:16+00:00'
+    text: '2026-11-23 ~03:00 CET (E8244): trial 5 FA-lxplus-f8f72269 (lr 1.24e-3, EMA on) sat IDLE 1.6 h: condor_q -better-analyze:
+      0 of 5270 slots match, 8 match the GPU part; RequestMemory 33000 MB from the driver''s --mem 32G makes the lxplus schedd
+      raise RequestCpus to 11 (3000 MB per CPU), which almost no GPU slot offers; site pick also found 0 slots fitting 32G/4cpu
+      on CC. Measured host memory (condor ''Job terminated'' MemoryUsage): control 5830 MB, trial 0 6625, trial 1 5638 (GPU
+      memory 19.1-19.2 GB, so gpu_min_mem 32G stays). Fix: driver relaunched with --mem 12G (~1.8x the largest measured; 4
+      CPUs on lxplus, fits CC V100/H100 nodes), every later trial picks it up: llmcmp_a_drive5 (log ~/.local/share/ccorch/detached/20261123-025605_llmcmp_a_drive5.log),
+      --retry-failed f8f72269 after condor_rm of 13215369 and one --once pass that recorded it REMOVED (no penalty kept).
+      The driver''s sync at 02:55 deployed trunk to both sites (running trials 3, 4 unaffected: config read at start).'
   step_waits:
     '2': llmcmp_a_drive4
     '3': llmcmp_a_drive4
