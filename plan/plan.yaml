@@ -39441,9 +39441,6 @@ entries:
     5: 'Part (c) readout: when llmcmp_c_qperp''s driver writes DRIVE_DONE and its control ends, score (c)''s best trial and
       the control (REREAD=<run> scripts/job_llm_score.sh), read per set (seen, held out, relabels, new) pooled RMSE and median
       per-process MSE against (a)''s best with the 1.38 margin, figure in Suprio''s layout; write-up'
-    7: Delete the void llmcmp_c_latest derived-input caches (feat_9efdd26e76677b4e008a84ca, feat_6d369c256d3d101e341c76aa)
-      under CC's and lxplus's amp_mmap_cache once part (a)'s CC trial FA-ccin2p3-c891c0c2, which names their parent key, has
-      ended (submit_guard cache rule); report GB freed and df
     8: 'Part (c) llmcmp_c_qperp wave 1 (config sweep/sweep_config_llmcmp_c_latest.yaml @7ca781941, design passed 2026-11-23T14:56):
       driver llmcmp_c_qperp_drive2 on lxplus+ccin2p3 since 16:36 (log ~/.local/share/ccorch/detached/20261123-163617_llmcmp_c_qperp_drive2.log,
       state sweeps_local/llmcmp_c_qperp), trials FA-ccin2p3-29ce8950 (hp1860 lr 1.60e-3), -b25b3d51 (hp0353 lr 8.56e-3), -2d66e301
@@ -39586,11 +39583,6 @@ entries:
       - '(c)/(a) < 1/1.38 on held out: (b) starts from (c)''s HPs'
       - '(c)/(a) > 1.38: (b) starts from (a)'
       - 'between: not resolved by one seed, ask Joaquin for the seed-43 pair'
-    7:
-      feeds: CC disk (97%, 18 GB free) for part (c) and later waves
-      if:
-      - 'deleted: report the freed GB'
-      - 'a guard still refuses: report which and why'
     8:
       feeds: 'part (c): whether the void config''s blow-ups were its defects'
       if:
