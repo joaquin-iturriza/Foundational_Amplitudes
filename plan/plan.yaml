@@ -40666,6 +40666,37 @@ entries:
       and (b) starts from (a). Partial: better on relabels or new only, reported per set. A trial that blows up is listed
       apart at its best checkpoint. The prebuild passes when both sites log ''the cache ... is ready'' with derived inputs
       under the part (a) base keys; a first trial that refuses at init or runs out of memory is fixed before the rest go.'
+    fix_at: '2026-11-23T11:10:21+00:00'
+    fix: 'Reviewed part (c) at config @01a541851 (the ++ prefixes: run_trial passes fixed_params unprefixed without base_config,
+      and data_mmap/experiment read the five keys through cfg.data.get, so they act). (1) Job limit and cost (time per unit
+      from the same setup): the design assumes 0.55 s/step A100 at batch 24,576. The latest setup''s own measured rates (sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml
+      header: A100 0.55 s/step, V100 0.967 s/step at batch 16,384 with diagrams and levers) scale to about 0.83 and 1.45 s/step
+      at 24,576, i.e. about 14 h on A100 and 24.5 h on V100 for 60,840 steps, above the 22 h limit on any admitted V100. On
+      this catalog dancat_het_pre gives about 0.52 s/step on V100 at 16,384 (37 GPU-h for 8 x 32k), about 13 h. Set the limit
+      with room on the slowest GPU the job admits at a measured rate, not an assumed one. Restate the cost as about 9 x 14
+      A100-h, roughly 125 GPU-h and more on V100, instead of 60-90. (2) Memory: the canonical table says batch 16,384 is the
+      largest that fits a 32 GB V100 for the catalog setup with diagrams, and part (a)''s own header says 24,576 is above
+      that. Part (a) peaked at 19 GB of GPU memory without diagrams. State the expected GPU peak at 24,576 with diagrams and
+      levers, then either set gpu_min_mem to what fits (a memory requirement, not a GPU-model pin) or keep 24,576 events per
+      update through accumulation. Host memory: 12G rests on part (a) (6.6 GB, no diagrams), while the latest setup''s probe
+      peaked at 25.2 GB host. Say why 12G holds with the diagram sidecars and off-shell masks, or size it from a measurement.
+      (3) Seeds and outcome: the claim that no seed spread exists is wrong. docs/results.tex has the held-out per-class MSE
+      seed spread on catalog_v4 (claim no_b.heldout.mse.v4_seed_spread=0.14, train 0.10, near line 4485). The outcome ''below
+      (a)''s best'' has no margin, so any small difference reads as yes. State the margin from that spread, plus a middle
+      band read as ''not resolved by one seed'' (a second seed is Joaquin''s call, asked, not added). Also allow for the pooled
+      held-out RMSE being carried by a few processes (3 processes held 56% of the summed MSE in part (a)''s control): give
+      the median per set beside the pooled number. (4) Disk: not stated. The derived inputs are about 1352 x 75,296 = 1.02e8
+      events, logF float64 about 0.8 GB plus osh float32 x 4 about 1.6 GB, roughly 2.5 GB per site plus about 0.25 GB for
+      held out. CC /sps/lpnhe has 23 GB free (df, 2026-11-23). It fits; record it with the prebuild. (5) Finish time: state
+      when the 3 waves end at the measured rate (about 2-3 days) against Joaquin''s ''just get it done''. Add to the launch
+      pass criteria the canonical check that the off-shellness log line ''built propagator masks for N/P processes'' shows
+      N = P. Non-blocking, fix the wording: check 2 holds in substance, but cite the within-model pair rather than the gap
+      to the LLM. dan_per_process.json @9e02875a: shared standardization 1.72 against dimensionless + coupling orders 1.05
+      median MSE on the 43 new processes, 0.066 against 0.046 on the relabels. docs/results.tex par. coupling orders: 1.57
+      to 0.48 on new processes. Passed: one change against a matched control (the setup bundle is D523''s question, every
+      difference listed); the full template sweep, 8 trials in waves 3+3+2, with the lr re-tuned for MuonAdamW; HETEROSC;
+      the emission-scale target asked by D523; test events are the catalog''s own test pools as in (a) and the LLM; llm_score.py
+      splits sigma off under HETEROSC and the log|M|^2 error equals sd times the z error; prior searched.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
