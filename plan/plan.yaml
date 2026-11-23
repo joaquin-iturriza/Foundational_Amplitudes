@@ -38935,6 +38935,62 @@ entries:
       line each (defaults input_soft_eps 0.0, input_pair_logs 0 in config/model/lloca.yaml), chunks at S''s hp1333 HPs, 1953
       steps, float64, same job script and train_subsample as the Sf seed runs; measure moves 2.47x with both flags (zng4g_readout.json:
       Sf 0.150/0.162/0.155 vs S 0.058/0.067/0.064), S seed spread log 0.14, so c_x resolves to about +-0.15.'
+  - at: '2026-11-23T15:13:38+00:00'
+    question: 'D519/D520 diagnosis, run now on the main session''s narrowing (2026-11-23, Joaquin: the one-setting test and
+      the b128 search run as diagnosis; only retraining the parent waits on him). (1) R4 searched: on q q~ -> Z+4g at 1e4
+      training events, batch 2048, which of the W parent''s two input settings, input_soft_eps 1e-8 (every momentum log-rescaled)
+      or input_pair_logs 7 (log(2p_i.p_j/s)/5 of every pair as extra scalars), makes from-scratch training worse than scratch
+      without them, or only the two together? (2) R1 at batch 128 restored (dropped at 3/16 by check 0): is the searched scratch-with-both-settings
+      cost at b128 as at b2048, so the settings'' share of the fine-tune''s gap is read at b128 best against best?'
+    prior: 'This entry: S (D507 Muon/WSD scratch, b2048, chosen hp1333, seeds 42-44) best val MSE(log|M|^2) 0.0580/0.0669/0.0641
+      (mean 0.063); Sf* (both settings, searched 16 trials, chosen hp1377 lr 0.031) 0.122/0.140/0.165 (mean 0.142; seeds 43/44
+      blow up mid-run at steps 702/429 of 1953, read at best checkpoint before it, listed apart); F (fine-tune) 0.097/0.100/0.097;
+      share log(Sf*/S)/log(F/S) 1.84 (zng4g_r1_b2048.json). Fixed-HP both settings Sf 0.150/0.162/0.155 (2.47x). b128: S 0.0180-0.0214
+      (mean 0.0197), F 0.0300, fixed-HP Sf/S 2.5x, F/Sf 0.61 (zng4g_readout.json); the b128 searched Sf* has 3/16 trials observed
+      (hp1860 0.0630, hp353 0.0364, hp1333 0.0384; sweeps_local/ftmech_zng4g_scrflagsrch_b128), trials 3-5 (hp849, hp753,
+      hp1262) removed unrun by check 0. Kit benchmark one-setting A/B on e+e- -> u u~ g (1e5 bulk events, 8000 steps, seed
+      42, AdamW/cosine, plan findings 2026-11-11T04:38/06:36): control FA-ccin2p3-f6b2ece9 8.2e-4, soft rescale alone FA-ccin2p3-1a14c791
+      5.4e-4, pair logs alone FA-ccin2p3-3fa9854a 5.1e-4, both FA-ccin2p3-c15b3337 1.09e-4: each alone ~0.2 dex better, both
+      0.88 dex (strong interaction). Differs here: 4-gluon Z final state (7 particles, 21 pairs vs 3), 1e4 events (memorised
+      by every arm), 1953 steps Muon/WSD, float64; there the settings helped, here both together cost 2.26x. R4 fixed-HP design
+      (2026-11-22T09:37, configs @30b23c29) got FIX (prior missing, searched stage required) and was withdrawn unrun; this
+      design runs the searched stage directly, as the FIX asked..'
+    measure: 'Best val MSE(log|M|^2) = min val mu-MSE x std^2 (std 1.11978, checked per run) at the best checkpoint of each
+      chosen trial (seed 42 = the search trial) and its seeds 43, 44. (1) Per setting x in {soft, pair}: Sx* three-seed mean;
+      cost share c_x = log(mean Sx*/mean S)/log(mean Sf*/mean S) (denominator log(0.142/0.063) = 0.81), 10-90% range over
+      the 27 seed triples (one seed each of Sx*, S, Sf*). (2) b128: Sf*_128/S_128 and share log(Sf*_128/S_128)/log(F_128/S_128)
+      with its 10-90% range over 27 triples, beside b2048''s 1.84. Figures: per-seed best of S, S+soft, S+pair, S+both (b2048)
+      and S, Sf*, F (b128) on a log axis; per-trial best against lr for each search; per-seed val curves. Blow-ups (val >
+      10x best-so-far) listed apart (D398), read at the best checkpoint before them.'
+    check: Both settings together move the measure 2.26x searched (log 0.81; Sf* 0.122-0.165 vs S 0.058-0.067) and 2.47x at
+      fixed HPs, so a setting carrying the cost moves it by up to that much; S's seed spread is log 0.14 (max-min) and Sf*'s
+      0.13 (log10), so c_x resolves to about +-0.2 on three seeds. At b128 fixed-HP Sf/S is 2.5x against S's seed spread 1.19x,
+      and the 3 observed b128 Sf* trials (0.036-0.063) sit above S_128 (0.018-0.021), so the b128 search moves the measure
+      beyond seed noise.
+    fixed: 'Configs: sweep/sweep_config_ftmech_zng4g_scrsoftsrch_b2048.yaml and sweep_config_ftmech_zng4g_scrpairsrch_b2048.yaml
+      = sweep_config_ftmech_zng4g_scrflagsrch_b2048.yaml (the Sf* search) with the other setting''s line removed (code default
+      off: config/model/lloca.yaml input_pair_logs 0, input_soft_eps 0.0); same search space and lr window [3.1e-3, 4.1e-2],
+      16 trials, waves 3,3,2,3,3,2, DyHPO seed 42, 1953 steps, batch 2048, 1e4 training events of the D507 kit_A_uq_zgggg
+      pools, float64, Muon/WSD, evaluation.train_subsample 2000, 32G, 4 CPUs, time limit 1 h. b128: sweep/sweep_config_ftmech_zng4g_scrflagsrch_b128.yaml
+      unchanged (passed R1 design), its local drive state resumed: trials 3-5 requeued at their same HPs (status retry, no
+      penalty: they never ran), then the remaining waves to 16. Seeds 43/44 of each chosen trial by run_fixed_hp.py via scripts/job_seed_batch.sh
+      from the drive''s DyHPO state (zng4g_seed_chunks.py @90918fa5), as Sf* b2048''s. Both b2048 searches and the b128 search
+      are driven at once on ccin2p3 and lxplus (one drive, site pick per trial).'
+    control: 'S (no setting; D507 scratch search, seeds 42-44) and Sf* (both settings, the same search, seeds 42-44) at b2048:
+      already run, no rerun; the two single-setting arms complete the 2x2 factorial, each searched best against best. b128:
+      S_128 (D507 scratch search, seeds 42-44) and F_128 (fine-tune search, seeds 42-44), already run.'
+    seeds: 'Search trials seed 42; seeds 43, 44 of each new chosen trial (3 chosen trials: soft b2048, pair b2048, both b128).
+      Cost: 2 x 16 x 0.35 (b2048) + 13 x 1.06 (b128, A100/H100) + 4 x 0.35 + 2 x 1.06 = 28.7 GPU-h (up to ~33 if b128 trials
+      land on slower GPUs), inside D520. Wall: b2048 searches ~2.1 h (6 waves x 0.35 h) + seeds 0.35 h; b128 ~5.3 h (5 waves
+      x 1.06 h) + seeds 1.06 h; everything starts now, the seeds go as soon as their own search ends.'
+    outcome: '(1) (a) c_soft >= 0.7 and c_pair <= 0.3: the momentum log-rescale carries the cost; (b) c_pair >= 0.7 and c_soft
+      <= 0.3: the pair logs carry it; (c) both <= 0.3: only the combination costs (the interaction seen on u u~ g, here with
+      the opposite sign); (d) both in (0.3, 0.7) or ranges spanning the edges: both share it. Each outcome is reported with
+      its figure and goes to Joaquin''s held call on the parent (retrain without the settings, which, or leave it); no run
+      follows from it without him. (2) b128 share >= 0.7 (range above 0.5): the settings explain the b128 gap as at b2048
+      (H1 holds at both batches); < 0.3: at b128 the gap is not the settings and H2-H7 are reopened at b128 only (reported,
+      next design mine); between: partial, reported with its range. Any arm whose best sits at a val spike > 10x best-so-far,
+      or diverged, listed apart (D398), never retried.'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
