@@ -39080,6 +39080,27 @@ entries:
       next design mine). No: Fn/F > 0.84 -> removing the settings from the parent does not remove the deficit, contradicting
       the scratch-side share; next: read the parent''s own Z+4g-adjacent val and the step-0 start. A parent whose val blows
       up, or any arm at a val spike > 10x best-so-far, listed apart (D398).'
+    fix_at: '2026-11-23T15:29:33+00:00'
+    fix: 'Check 5 (prior): the prior field says the catalog highmult grid parents (results.tex l.15134-15160) were ''all trained
+      with the settings (D392)''. They were not: the grid was collected 2026-10-11 and model.input_soft_eps / input_pair_logs
+      were introduced 2026-11-11 (commit 06b9353aa, D392 same day). So flag-free parents fine-tuned on u u~ -> Z+4g at D=1e4
+      are already on record: gain over scratch -0.11 dex (finale), +0.11 (+W), -0.04 (synthetic), one seed; and finale+W +0.22
+      dex on Z+4g at 1e4 (l.15397). Fix: correct the prior with these numbers, say what differs in this run (D423 template
+      restart, Muon/WSD, 1953/31250 steps at b2048/b128, the 28-process W parent, 3 seeds) and why the old grid does not already
+      answer it, and use it in the outcome (it predicts Fn near S, i.e. the Yes branch). No added runs. Check 1/17 (matched
+      parent): the parent control FA-ccin2p3-47e14eae ran in full fp32 on a V100; config/default.yaml has training.allow_tf32:
+      true, and the parent command does not turn it off. The design only says V100 ''if placed so''. This entry already measured
+      that TF32 alone moves this parent 5x (gmean per-process val MSE, FA-lxplus-e8d15505), which is why the fp32 rerun used
+      ++training.allow_tf32=false. Fix: pass ++training.allow_tf32=false to the new parent (and to its smoke). It is a no-op
+      on a V100 and keeps any placement matched. Also put in the design the diff of the new parent''s composed config (Hydra
+      --cfg job of the job_datasaving_parent.sh finale flags=off command) against 47e14eae''s saved config.yaml, with every
+      differing key listed in fixed (expected: the two settings and the tag only). Check 4 (outcome, wording only): the Partial
+      bar Fn/F <= 0.84 is inside the parent-to-parent spread this entry already saw on the same fine-tune (fp32-rerun parent
+      snapshot against F8: 0.874 at b2048, 0.793 at b128). Say that one parent seed cannot separate a Partial result from
+      parent run-to-run spread, or put the Partial bar outside it (e.g. below 0.79 at both batches). No added runs. Everything
+      else holds: the fine-tune configs differ from F''s only in parent path, the two settings and the first-16 lr window/waves
+      (matches F''s chosen-trial searches); 16 trials and seeds 42-44 as the sibling arms; the fine-tunes wait only on the
+      parent checkpoint and the smoke goes alongside; 33.5 GPU-h is under D520.'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
