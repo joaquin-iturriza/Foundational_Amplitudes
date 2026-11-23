@@ -38,7 +38,7 @@ dyhpo:
 fidelity_schedule:
   t_steps: [60840]
 
-fixed_params:
+fixed_params:   # "++" on the keys absent from config/ (Hydra appends them)
   data.source: recipes
   data.processes_file: recipes/catalog_daniel_train.yaml
   data.require_cache: 'true'
@@ -50,11 +50,11 @@ fixed_params:
   data.preprocess_per_dataset: 'true'
   data.shared_standardization: 'true'
   data.affine_multiplicity_std: 'false'
-  data.target_physics_factor: 'true'
-  data.target_physics_dim_only: 'true'
-  data.target_physics_orders: 'true'
-  data.target_physics_s0: 1.0
-  data.dimensionless_inputs: 'true'
+  ++data.target_physics_factor: 'true'
+  ++data.target_physics_dim_only: 'true'
+  ++data.target_physics_orders: 'true'
+  ++data.target_physics_s0: 1.0
+  ++data.dimensionless_inputs: 'true'
   data.alphas_input: 'true'
   data.drop_coupling_powers: 'false'
   data.use_PIDs: 'false'
