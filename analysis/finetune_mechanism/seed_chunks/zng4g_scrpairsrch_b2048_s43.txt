@@ -1,0 +1,1 @@
+sweep/sweep_config_ftmech_zng4g_scrpairsrch_b2048.yaml ftmech_zng4g_scrpairsrch_b2048_s43 1953 training.lr=0.022780516146619967 training.muon_weight_decay=0.0364134929858573 training.regularization_lambda=9.843933150665646e-07 training.cosanneal_warmup_frac=0.1656497997697443 training.cosanneal_eta_min=2.3257188533386336e-10 ema=true training.ema_decay=0.9240664541702718 seed=43
