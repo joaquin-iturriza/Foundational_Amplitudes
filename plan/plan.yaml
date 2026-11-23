@@ -41842,10 +41842,14 @@ entries:
     - designer-executor setups
   decisions:
   - D530
-  next: 'Design the benchmark: tasks drawn from real past subagent work (mechanical-worker briefs, log-reading acks, small
-    tool fixes, lookups) with their known correct outcomes; arms: each lab model alone, each as executor of a plan from our
-    model, our current subagent as reference; measures: task success graded against the known outcome, our tokens spent, wall
-    time; then the harness to run them'
+  next:
+    1: 'Design the benchmark: tasks drawn from real past subagent work (mechanical-worker briefs, log-reading acks, small
+      tool fixes, lookups) with their known correct outcomes; arms: each lab model alone, each as executor of a plan from
+      our model, our current subagent as reference; measures: task success graded against the known outcome, our tokens spent,
+      wall time; then the harness to run them'
+    2: 'Sonnet (mechanical-worker definition) on the same 10 tool fixes with the same grading, seconds and our tokens per
+      task recorded, beside the lab arms in the figure (Joaquin 2026-11-23: is it slower than our own subagents or just not
+      parallelized?)'
   done_when: null
   notes_ref: null
   match: zz_labllm_*
@@ -41989,3 +41993,9 @@ entries:
     text: 'Local batch width cut from 6 parallel opencode streams to 2 (D531): 6 streams of opencode sessions (~350-400 MB
       each) plus other work exhausted the 7.6 GB WSL memory and killed the batch; resumed with 2 streams for the 33 fix runs
       left (all 60 triage runs and 7 fix runs had graded records), cut-off runs redone from scratch'
+  step_why:
+    2:
+      feeds: whether the lab models are slower per task than our subagents, measured on the same tasks
+      if:
+      - 'Sonnet much faster per task: report the ratio with the pass rates'
+      - 'similar per task: the slowness was the 2-at-a-time width'
