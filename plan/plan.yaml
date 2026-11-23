@@ -39901,7 +39901,6 @@ entries:
     '2': llmcmp_a_drive5
     '3': llmcmp_a_drive5
     '5': FA-ccin2p3-d34535b0 and the DONE event of llmcmp_c_qperp_drive (DRIVE_DONE)
-    '7': FA-ccin2p3-c891c0c2
     '8': FA-ccin2p3-29ce8950 FA-ccin2p3-b25b3d51 FA-ccin2p3-2d66e301 FA-ccin2p3-d34535b0
   handoff:
     state: 'Part (a): 8-trial DyHPO of muP LLoCa in the LLM-run conditions (sweep/sweep_config_llmcmp_a_adamw_const.yaml @2a597c478),
