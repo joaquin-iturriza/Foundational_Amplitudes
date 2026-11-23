@@ -64,6 +64,13 @@ def sandbox(run_dir, cmd, timeout, hide=True):
          *(["--ro-bind"] + [os.path.dirname(os.path.dirname(mt.PY))] * 2 if hide else []),
          "--bind", run_dir, run_dir, "--bind", cache, cache, "--die-with-parent", "--chdir", run_dir]
     env = {k: v for k, v in os.environ.items() if not k.startswith(("SSH_", "KRB5", "CLAUDE", "ANTHROPIC"))}
+    # the lhe tests write mg5_pipeline_final's OUTPUT_DIR (.lhe_work, manifest.json): a copy in the run dir, so the
+    # real ~/datasets is neither needed writable nor touched
+    out = os.path.join(run_dir, ".mg5_output")
+    if not os.path.exists(out):
+        os.makedirs(out)
+        shutil.copy(os.path.join(HOME, "datasets", "manifest.json"), out)
+    env["MG5_OUTPUT_DIR"] = out
     env.update(XDG_DATA_HOME=xdg + "/data", XDG_STATE_HOME=xdg + "/state", XDG_CONFIG_HOME=xdg + "/config",
                OPENCODE_CONFIG=cfg, PYTHONDONTWRITEBYTECODE="1")
     t0 = time.time()
