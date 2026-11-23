@@ -280,27 +280,16 @@ def sonnet_timed():
     """The 10 fixes rerun by the Sonnet mechanical-worker (agents in sonnet_timed.json, worktrees
     zz_trial_<task>_sonnettime, model_trial brief and check): first-attempt pass, wall time (first to last call
     of its transcript), tokens (input + output + cache read + cache write, one count per API message), $."""
-    from datetime import datetime
+    from lab_llm_report import transcript
     ids = json.load(open(os.path.join(OUT, "sonnet_timed.json")))
     for task, agent in ids.items():
-        fs = glob.glob(os.path.join(HOME, ".claude/projects/-home-joaquin-work-FA/*/subagents/agent-%s.jsonl" % agent))
-        ts, seen, tok = [], set(), 0
-        for line in open(fs[0]):
-            e = json.loads(line)
-            if e.get("timestamp"):
-                ts.append(datetime.fromisoformat(e["timestamp"].replace("Z", "+00:00")))
-            m = e.get("message") or {}
-            u = m.get("usage") if isinstance(m, dict) else None
-            if u and m.get("id") not in seen:
-                seen.add(m.get("id"))
-                tok += sum(u.get(k, 0) or 0 for k in ("input_tokens", "output_tokens", "cache_read_input_tokens",
-                                                       "cache_creation_input_tokens"))
+        sec, tok = transcript(agent)
         c = mt.check(task, "sonnettime")
         record({"family": "fix", "task": task, "arm": "sonnet_timed", "model": "sonnet (mechanical-worker)",
                 "agent": agent, "first_pass": c["passed"], "final_pass": c["passed"], "uncommitted": c["uncommitted"],
-                "seconds": round((max(ts) - min(ts)).total_seconds(), 1), "our_tokens": tok,
+                "seconds": round(sec, 1), "our_tokens": tok,
                 "usd": mt.cost(agent)["usd"], "usage": {}, "rc": 0})
-        print(task, c["passed"], round((max(ts) - min(ts)).total_seconds()), tok)
+        print(task, c["passed"], round(sec), tok)
 
 
 def main():

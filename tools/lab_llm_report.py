@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
-"""The lab LLM trial's readout (lab_llm_trial): per family and arm, tasks passed, lab tokens, wall time and our $,
-with the Sonnet / Opus-low reference of the same fix tasks (analysis/agent_redesign/model_trial.json); the figure.
+"""The lab LLM trial's readout (lab_llm_trial): per family and arm, tasks passed, wall time per task and our tokens
+per task; the figure.
 
     python3 tools/lab_llm_trial.py report        (writes analysis/lab_llm_trial/summary.json and figs/)
 
-Our $ of a lab arm is the Sonnet planner's transcript at list price (model_trial.cost) for +plan arms, 0 for a lab
-model alone (lab tokens cost us nothing); the reference's $ is its agents' transcripts, rework included.
-Triage arms ran twice: each run is a task attempt; a case counts as passed in a run when that run's answer passed.
+Our tokens: a Claude agent's transcript (input + output + cache read + cache write, one count per API message):
+the timed Sonnet mechanical-worker for its arm, the Sonnet planner for the +plan arms (whose wall time also adds the
+planner's), 0 for a lab model alone. Lab tokens (opencode's step usage) are free to us and reported apart.
+Fix runs: the last record of each (task, arm) stands; triage runs: every run is an attempt (two per case and arm).
+The earlier trial's Sonnet / Opus-low rows (model_trial.json) carry $ only, no wall time.
 """
-import json, os, sys
+import glob, json, os, sys
 from collections import defaultdict
+from datetime import datetime
 
 TOOLS = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(TOOLS)
@@ -18,70 +21,93 @@ sys.path.insert(0, ROOT)
 import model_trial as mt
 
 OUT = os.path.join(ROOT, "analysis", "lab_llm_trial")
-PLANNERS = os.path.join(OUT, "planners.json")       # {task: planner agent id}
-NAME = {"sonnet": "Sonnet", "opuslow": "Opus, low effort", "deepseek": "DeepSeek alone", "qwen": "Qwen alone",
-        "deepseek+plan": "DeepSeek, Sonnet's plan", "qwen+plan": "Qwen, Sonnet's plan"}
+HOME = os.path.expanduser("~")
+NAME = {"sonnet_timed": "Sonnet", "deepseek+plan": "DeepSeek with\nSonnet's plan", "qwen+plan": "Qwen with\nSonnet's plan",
+        "deepseek": "DeepSeek alone", "qwen": "Qwen alone"}
+ORDER = ["sonnet_timed", "deepseek+plan", "qwen+plan", "deepseek", "qwen"]
 
 
-def load():
-    runs = [json.loads(l) for l in open(os.path.join(OUT, "runs.jsonl"))]
-    last = {}
-    for r in runs:                                   # a fix run repeated after a harness fault: the last one stands
-        if r["family"] == "fix":
-            last[(r["task"], r["arm"])] = r
-    return [r for r in runs if r["family"] == "triage"] + list(last.values())
+def transcript(agent):
+    """(seconds first to last entry, our tokens) of a subagent transcript."""
+    fs = glob.glob(os.path.join(HOME, ".claude/projects/-home-joaquin-work-FA/*/subagents/agent-%s.jsonl" % agent))
+    ts, seen, tok = [], set(), 0
+    for line in open(fs[0]):
+        e = json.loads(line)
+        if e.get("timestamp"):
+            ts.append(datetime.fromisoformat(e["timestamp"].replace("Z", "+00:00")))
+        m = e.get("message") or {}
+        u = m.get("usage") if isinstance(m, dict) else None
+        if u and m.get("id") not in seen:
+            seen.add(m.get("id"))
+            tok += sum(u.get(k, 0) or 0 for k in ("input_tokens", "output_tokens", "cache_read_input_tokens",
+                                                   "cache_creation_input_tokens"))
+    return (max(ts) - min(ts)).total_seconds(), tok
 
 
 def summary():
-    rows = load()
-    plan_usd = {}
-    if os.path.exists(PLANNERS):
-        for t, a in json.load(open(PLANNERS)).items():
-            plan_usd[t] = mt.cost(a)["usd"]
-    s = defaultdict(lambda: defaultdict(lambda: {"n": 0, "first": 0, "final": 0, "sec": [], "tok": [], "usd": []}))
+    runs = [json.loads(l) for l in open(os.path.join(OUT, "runs.jsonl"))]
+    last = {(r["task"], r["arm"]): r for r in runs if r["family"] == "fix"}
+    rows = [r for r in runs if r["family"] == "triage"] + list(last.values())
+    planner = {t: transcript(a) for t, a in json.load(open(os.path.join(OUT, "planners.json"))).items()}
+    s = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
     for r in rows:
         c = s[r["family"]][r["arm"]]
-        c["n"] += 1; c["first"] += bool(r["first_pass"]); c["final"] += bool(r.get("final_pass"))
-        u, u2 = r["usage"], r.get("usage_rework") or {}
-        c["sec"].append(r["seconds"] + r.get("seconds_rework", 0))
-        c["tok"].append(sum(u.get(k, 0) + u2.get(k, 0) for k in ("in", "out", "reasoning", "cache_read")))
-        c["usd"].append(plan_usd.get(r["task"], 0.0) if r["arm"].endswith("+plan") else 0.0)
-    ref = json.load(open(os.path.join(ROOT, "analysis", "agent_redesign", "model_trial.json")))
-    for r in ref["runs"]:
-        c = s["fix"][r["arm"]]
-        c["n"] += 1; c["first"] += r["first_pass"]; c["final"] += r["final_pass"]
-        c["usd"].append(sum(mt.cost(a)["usd"] for a in r["agents"]))
-    out = {f: {a: {"n": c["n"], "passed_first": c["first"], "passed_final": c["final"],
-                   "usd_per_task": round(sum(c["usd"]) / c["n"], 4) if c["usd"] else None,
-                   "lab_tokens_per_task": round(sum(c["tok"]) / len(c["tok"])) if c["tok"] else None,
-                   "minutes_per_task": round(sum(c["sec"]) / len(c["sec"]) / 60, 2) if c["sec"] else None}
-               for a, c in arms.items()} for f, arms in s.items()}
+        u, u2 = r.get("usage") or {}, r.get("usage_rework") or {}
+        sec = r["seconds"] + r.get("seconds_rework", 0)
+        ours = r.get("our_tokens", 0)
+        if r["arm"].endswith("+plan"):
+            sec += planner[r["task"]][0]; ours = planner[r["task"]][1]
+        c["first"].append(bool(r["first_pass"])); c["final"].append(bool(r.get("final_pass")))
+        c["min"].append(sec / 60); c["ours"].append(ours)
+        c["lab"].append(sum(u.get(k, 0) + u2.get(k, 0) for k in ("in", "out", "reasoning", "cache_read")))
+        c["by_class"].append((r.get("key") or {}).get("class"))
+    out = {}
+    for f, arms in s.items():
+        out[f] = {}
+        for a, c in arms.items():
+            n = len(c["first"])
+            out[f][a] = {"n": n, "passed_first": sum(c["first"]), "passed_final": sum(c["final"]),
+                         "minutes_per_task": round(sum(c["min"]) / n, 2),
+                         "minutes_median": round(sorted(c["min"])[n // 2], 2),
+                         "our_tokens_per_task": round(sum(c["ours"]) / n),
+                         "lab_tokens_per_task": round(sum(c["lab"]) / n)}
+            if f == "triage":
+                out[f][a]["passed_by_class"] = {k: [sum(p for p, q in zip(c["first"], c["by_class"]) if q == k),
+                                                    c["by_class"].count(k)] for k in set(c["by_class"])}
+    ref = json.load(open(os.path.join(ROOT, "analysis", "agent_redesign", "model_trial.json")))["summary"]
+    out["fix_earlier_trial"] = ref
     json.dump(out, open(os.path.join(OUT, "summary.json"), "w"), indent=1)
     return out
 
 
 def figure(out):
     import plot_style as ps
-    fig, (axl, axr) = ps.figure(ncols=2)
-    order = ["sonnet", "opuslow", "deepseek+plan", "qwen+plan", "deepseek", "qwen"]
-    fx = out.get("fix", {})
-    arms = [a for a in order if a in fx]
-    for i, a in enumerate(arms):
-        c = fx[a]
-        axl.bar(i - 0.2, c["passed_first"] / c["n"], 0.4, color=ps.C.blue, label="first attempt" if i == 0 else None)
-        axl.bar(i + 0.2, c["passed_final"] / c["n"], 0.4, color=ps.C.vermillion,
-                label="after one rework" if i == 0 else None)
-    axl.set_xticks(range(len(arms)), [NAME[a].replace(", ", ",\n") for a in arms])
-    axl.set_ylabel("tool fixes passed (of 10)")
-    axl.set_ylim(0, 1.0)
-    ps.legend(axl, "upper right")
-    tr = out.get("triage", {})
-    tarms = [a for a in ("deepseek", "qwen") if a in tr]
-    for i, a in enumerate(tarms):
-        axr.bar(i, tr[a]["passed_first"] / tr[a]["n"], 0.5, color=ps.C.blue)
-    axr.set_xticks(range(len(tarms)), [NAME[a] for a in tarms])
-    axr.set_ylabel("failed-run logs read correctly")
-    axr.set_ylim(0, 1.0)
+    fx = out["fix"]
+    arms = [a for a in ORDER if a in fx]
+    x = range(len(arms))
+    lab = [NAME[a] for a in arms]
+    fig, axs = ps.figure(ncols=2, nrows=2)
+    a, b, c, d = axs[0][0], axs[0][1], axs[1][0], axs[1][1]
+    a.bar([i - 0.2 for i in x], [fx[k]["passed_first"] / fx[k]["n"] for k in arms], 0.4, color=ps.C.blue,
+          label="first attempt")
+    a.bar([i + 0.2 for i in x], [fx[k]["passed_final"] / fx[k]["n"] for k in arms], 0.4, color=ps.C.vermillion,
+          label="after one rework")
+    a.set_ylabel("share of the 10 tool fixes passed")
+    a.set_ylim(0, 1.0)
+    ps.legend(a, "upper right")
+    b.bar(x, [fx[k]["minutes_per_task"] for k in arms], 0.6, color=ps.C.blue)
+    b.set_yscale("log")
+    b.set_ylabel("wall time per tool fix (min)")
+    c.bar(x, [fx[k]["our_tokens_per_task"] / 1e3 for k in arms], 0.6, color=ps.C.blue)
+    c.set_ylabel("our tokens per tool fix ($10^3$)")
+    for ax in (a, b, c):
+        ax.set_xticks(list(x), lab)
+    tr = out["triage"]
+    tarms = [k for k in ("deepseek", "qwen") if k in tr]
+    d.bar(range(len(tarms)), [tr[k]["passed_first"] / tr[k]["n"] for k in tarms], 0.5, color=ps.C.blue)
+    d.set_xticks(list(range(len(tarms))), [NAME[k] for k in tarms])
+    d.set_ylabel("share of failed-run logs read right")
+    d.set_ylim(0, 1.0)
     ps.save(fig, os.path.join(OUT, "figs", "lab_llm_pass"))
 
 
