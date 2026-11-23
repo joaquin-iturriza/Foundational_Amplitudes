@@ -39889,6 +39889,23 @@ entries:
       configs. The control FA-ccin2p3-d34535b0 (lr 3.65e-3, trial_1262''s HPs; warmup ends at step 10951) reached step ~21,300
       with no non-finite step. Its validation NLL at the plateau is noisy: -2.82 at 18252, -3.46 at 21294, -2.92 at 24336.
       Trial 0 (lr 1.60e-3) falls steadily: -3.66, -3.74, -3.95 at 15210-21294.'
+  - at: '2026-11-23T23:22:44+00:00'
+    text: '2026-11-24 ~00:00 CET: part (a) trial 5 FA-ccin2p3-c891c0c2 (lr 1.24e-3, L2 1.1e-10, warmup 0.163, EMA on 0.9989;
+      V100) finished at val_loss_no_reg 4.81e-4 (mean MSE of z, best checkpoint), the new best of part (a), just ahead of
+      trial 0 (lr 1.03e-3, 4.89e-4). The control (lr 1e-3 constant) is at 6.79e-4. All six observed trials: 4.81e-4, 4.89e-4,
+      1.07e-3 (trial 4), 9.41e-3, 1.55e-2, 2.68e-2. The best two sit at lr 1.0-1.25e-3, at the window''s lower edge (1e-3).
+      Wave 3 went out from llmcmp_a_drive6 at 00:02: trial 6 FA-ccin2p3-b135e7db (hp1723) and trial 7 FA-ccin2p3-f3e29e87
+      (hp0836), both on CC. lxplus refused at --mem 12G --cpus 4: its schedd gives 3000 MB per CPU, and 12G = 12288 MB > 4
+      x 3000. Part (c)''s trials, measured on CC with sacct, peak at MaxRSS 16.7 GB under --mem 16G (64661587, 64661588),
+      so they cannot fit 4 CPUs on lxplus at all, and part (c)''s later waves go to CC only. Void cache deletion (step 7)
+      done: CC removed feat_9efdd26e76677b4e008a84ca (2.8 GB) and feat_6d369c256d3d101e341c76aa (0.29 GB); /sps/lpnhe went
+      from 16 GB free to 19 GB free (497G to 494G used of 512G, 97%). lxplus removed the same two (2.3 GB + 0.24 GB); EOS
+      home-j 58% used, 2.2 PB free; the qperp caches feat_0e5f.../feat_cc35... remain on both sites. Before the deletion,
+      no active job named the void feat hashes. On CC, b135e7db and f3e29e87 name the parent key 99c164da but read no derived
+      inputs (part (a): no target factor, no off-shellness), and 29ce8950/d34535b0 read the qperp feat dirs; their logs and
+      finetune_mechanism''s 0e7efb0f were unreadable in time. submit_guard''s cache check did not refuse the CC rm, although
+      2 running jobs named the parent key: the check fetches every active job''s log in sequence, takes over 120 s, and the
+      hook timeout lets the command through. The fail-closed fix went to a mechanical-worker.'
   step_waits:
     '2': FA-ccin2p3-b135e7db FA-ccin2p3-f3e29e87
     '3': llmcmp_a_drive5
