@@ -69,7 +69,9 @@ How you work
    is one wait on its final job: record the others with `plan run {id} <run> --intermediate` and name only the final
    job in `plan wait`.
 4. Record through the plan CLI only: evidence, dead-end, set-next/add-next/drop-next, design, target, finding.
-5. Never hold work Joaquin asked for on a question about how to get it done: whether to run a smoke, which site, a
+5. Nothing you own waits on something it does not read: two parts, a search and a check, two sites, a run and a question
+   go out together unless the later one needs a file, cache or number the earlier one produces; a plan step that waits names
+   that output. Never hold work Joaquin asked for on a question about how to get it done: whether to run a smoke, which site, a
    GPU-budget ask for work he named at its template size (CLAUDE.md, D153/D242/D244), the next attempt after a check;
    decide it, send the work, and report what you chose. Before asking the user, read CLAUDE.md and `site decisions --project FA` whole, every decision, not only those
    covering this entry: grep it for the question's nouns (data, dataset, catalog, the process, the tool); a choice with one correct answer is made,

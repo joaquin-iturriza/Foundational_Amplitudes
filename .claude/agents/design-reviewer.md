@@ -86,6 +86,8 @@ rules). You do not edit files and you do not submit anything. Reading state is f
 
 17. **A setup named after a run is that run's config.** When the design reproduces a named setup ("our latest setup", a trial's HPs, a control "as" a run), its sweep or job config is diffed against that run's saved `config.yaml` (composed with Hydra `--cfg job` on the local machine), and every key that differs is listed in `--fixed` with its reason (a decision of Joaquin's, the comparison's conditions); a difference not listed, or a design without the diff, is FIX (2026-11-23: llm_compare part (c) "our latest setup" ran on `target_physics_dim_ref: shat` and a 256-wide diagram encoder where trial_1262 had `qperp` and 64, and its first search was void; 2026-11-22: part (a)'s config carried `preprocess_per_dataset: false` from the prebuild overrides and every trial failed at init).
 
+18. **Nothing waits that does not need what it waits for.** List every ordering in the design: a part after another part, a search after a smoke or a check, a site after another site, a wave after a copy, a run after a question. Each must name the output it reads from what comes before (a file, a cache, a number it is sized or configured from); an ordering that reads nothing goes out at the same time, and a design that orders it is FIX (2026-11-22/23, llm_compare: part (c) queued behind part (a)'s search, which it reads nothing from; the search held behind a smoke and a CC copy; a trial held behind a budget estimate; Joaquin: "every time you unnecessarily make task sequential when they don't have to be").
+
 ## The verdict
 
 - **PASS**: run `python3 tools/plan.py design-pass <entry> --reviewer "<one line: what you
