@@ -593,14 +593,10 @@ def plan(k, sweeps, a, record=True):
     if s0.gpu_min_mem:
         args += ["--gpu-min-mem", str(s0.gpu_min_mem)]     # count only the GPUs the trials may run on
     only = list(a.sites or [])
-    if not lxplus_mem_ok(s0.mem, s0.cpus):
-        log("lxplus refused: it gives 3000 MB per CPU: --mem %s with --cpus %d becomes ceil(M/3000) CPUs and no GPU "
-            "slot matches; ask for <= 3000*C MB, measured trial peaks are 2.7-6.6 GB; using the other sites"
-            % (s0.mem, s0.cpus))
-        only = [x for x in (only or ["ccin2p3", "lxplus"] + (["jeanzay"] if a.allow_jeanzay else [])) if x != "lxplus"]
-        if not only:
-            log("no site left after the lxplus refusal: nothing submitted this round")
-            return [], []
+    raised = not lxplus_mem_ok(s0.mem, s0.cpus)
+    if raised:
+        log("lxplus raises --mem %s / --cpus %d to ceil(M/3000) CPUs (3000 MB per CPU); site pick counts the slots that "
+            "fit the raised request, and lxplus gets only the trials that fit now" % (s0.mem, s0.cpus))
     if only:
         args += ["--only"] + only
     if a.allow_jeanzay:
@@ -611,9 +607,22 @@ def plan(k, sweeps, a, record=True):
     except ValueError:
         log("site pick gave no plan: %s" % out.strip()[-200:])
         return [], []
+    pl = {s: int(n) for s, n in (d.get("plan") or {}).items()}
+    if raised and pl.get("lxplus"):
+        # a raised request queued past the slots that fit it idles for hours (E6895, E8244): the excess goes elsewhere
+        fit = next((int(r.get("slots_now") or 0) for r in d.get("rows", []) if r.get("site") == "lxplus"), 0)
+        extra = pl["lxplus"] - min(pl["lxplus"], fit)
+        others = sorted((s for s in pl if s != "lxplus"), key=lambda s: -pl[s])
+        if extra and others:
+            pl["lxplus"] -= extra
+            pl[others[0]] += extra
+        elif extra:
+            log("lxplus fits %d of %d trials now and no other site is in the plan: %d wait for the next round"
+                % (fit, pl["lxplus"], extra))
+            pl["lxplus"] -= extra
     order = []
-    for s, n in sorted((d.get("plan") or {}).items(), key=lambda kv: -kv[1]):
-        order += [s] * int(n)
+    for s, n in sorted(pl.items(), key=lambda kv: -kv[1]):
+        order += [s] * n
     return order, d.get("rows", [])
 
 

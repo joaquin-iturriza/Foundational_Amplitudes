@@ -14,6 +14,24 @@ def test_lxplus_mem_ok():
     assert not lxplus_mem_ok("lots", 4)
 
 
+def _plan(monkeypatch, plan, lx_fit, mem="20G"):
+    import json, types
+    import sweep.drive as dr
+    monkeypatch.setattr(dr, "site", lambda *a, **k: json.dumps({"plan": plan, "rows": [
+        {"site": "lxplus", "slots_now": lx_fit}, {"site": "ccin2p3", "slots_now": 9}]}))
+    monkeypatch.setattr(dr, "log", lambda *a: None)
+    s0 = types.SimpleNamespace(mem=mem, cpus=4, hours=14.6, gpu_min_mem="32G")
+    a = types.SimpleNamespace(sites=["lxplus", "ccin2p3"], allow_jeanzay=False)
+    return dr.plan(3, [s0], a)[0]
+
+
+def test_raised_request_keeps_lxplus_up_to_its_fitting_slots(monkeypatch):
+    assert sorted(_plan(monkeypatch, {"lxplus": 2, "ccin2p3": 1}, 1)) == ["ccin2p3", "ccin2p3", "lxplus"]
+    assert sorted(_plan(monkeypatch, {"lxplus": 2, "ccin2p3": 1}, 5)) == ["ccin2p3", "lxplus", "lxplus"]
+    assert _plan(monkeypatch, {"lxplus": 3}, 1) == ["lxplus"]          # no other site: the rest waits a round
+    assert sorted(_plan(monkeypatch, {"lxplus": 2, "ccin2p3": 1}, 0, mem="12000M")) == ["ccin2p3", "lxplus", "lxplus"]  # not raised: pick's plan as is
+
+
 if __name__ == "__main__":
     test_lxplus_mem_ok()
     print("ok")
