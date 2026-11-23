@@ -21,8 +21,9 @@ cd "$PROJECT_DIR"
 # --config-path <a finished run's dir> brings that run's run_dir and warm_start_idx: without the two nulls the prebuild
 # "warm-starts" the run and rewrites its config.yaml (2026-11-06: FA-ccin2p3-5e02275b wrote memmap_prebuild=true and
 # num_workers=0 into v4_het_default25_w16_grow_k533/config.yaml, and every trial of the growth sweep built on it only
-# opened the cache and exited). With them it always gets a fresh runs/zz_mmap_prebuild/prebuild_<job> dir.
+# opened the cache and exited). With them it always gets a fresh runs/zz_mmap_prebuild/prebuild_<job> dir; on HTCondor
+# there is no SLURM_JOB_ID and the PID repeats (2026-11-23: FA-lxplus-c2768355 and -a549a64e both hit prebuild_83).
 PYTHONPATH=. python run.py "$@" ++data.memmap=true ++data.memmap_prebuild=true ++warm_start_idx=null ++run_dir=null \
-    exp_name=zz_mmap_prebuild run_name="prebuild_${SLURM_JOB_ID:-$$}" training.num_workers=0; rc=$?
+    exp_name=zz_mmap_prebuild run_name="prebuild_${SLURM_JOB_ID:-$(date +%s)_$RANDOM}" training.num_workers=0; rc=$?
 [ "$rc" = 0 ] && echo "RUN_DONE"   # the end marker the supervisor reads (site projects.toml end_markers)
 exit $rc
