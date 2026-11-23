@@ -37714,10 +37714,18 @@ entries:
     answers_after: '2026-11-20T16:08:55+00:00'
     covers:
     - finetune_mechanism
+  - said_at: '2026-11-23T15:24:12.831000+00:00'
+    text: I asked you to investigate the problem, it's extremely obvious that this implies testing different configurations,
+      it's never a question then if you should send a run or not because it changes the configuration, that's the entire point
+    decision: D529
+    answers_after: '2026-11-23T15:10:36+00:00'
+    covers:
+    - finetune_mechanism
   decisions:
   - D511
   - D513
   - D516
+  - D529
   next:
     2: Act on Joaquin's answer to the 13:17 question on the W parent's two input settings (input_soft_eps, input_pair_logs)
       and the batch-128 scratch-with-flags search
@@ -37942,6 +37950,8 @@ entries:
       upload, no decision on these settings), 2026-10-04T10:57 (about two arms' resonance tests, not this parent), 2026-11-22
       'I have no idea what you mean by flags' (a question, answered)
     holds_all: every remaining step of the entry is the parent decision; the diagnosis is finished
+    answered_at: '2026-11-23T15:24:12.831000+00:00'
+    decision: D529
   - ask: 'Your hold: retrain the W parent without its two input settings (momentum log-rescaling input_soft_eps, pair logarithms
       input_pair_logs), or leave the parent as it is? (The one-setting-at-a-time test and the batch-128 scratch-with-settings
       search run now as diagnosis under D519/D520.)'
