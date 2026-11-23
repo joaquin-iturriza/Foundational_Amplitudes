@@ -39233,9 +39233,9 @@ entries:
     decision: D528
   owner:
     agent: ace1e6bc98c9610b5
-    state: working
+    state: stopped
     since: '2026-11-22T23:42:05+00:00'
-    state_at: '2026-11-22T23:42:05+00:00'
+    state_at: '2026-11-22T23:51:33.918000+00:00'
   step_why:
     1:
       feeds: whether the scoring path reproduces his metric before the trials are scored
