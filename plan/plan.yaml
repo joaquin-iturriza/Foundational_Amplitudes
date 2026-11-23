@@ -42008,6 +42008,13 @@ entries:
       as its rework prompt. Baselines regenerated with model_trial validate (both valid, one target each) and committed in
       the worktree; the 8 lab runs of zsrole and ordsrc are rerun from scratch after the resume batch ends (2 sessions at
       a time).'
+  - at: '2026-11-23T22:52:18+00:00'
+    text: 'Second grader/sandbox defect: tests/test_lhe_parts.py writes mg5_pipeline_final''s OUTPUT_DIR (~/datasets/.lhe_work
+      and manifest.json), read-only in the sandbox, so the skipclaim and stallshort checks failed even at their fix commits,
+      and the lab models'' own test runs of those files failed for the same reason (Sonnet ran unsandboxed, with write access).
+      Fixed: the sandbox sets MG5_OUTPUT_DIR to a run-dir copy (commit after c08ff5045); the sandbox grader now passes all
+      10 tasks at their fix commits (validated). The 16 lab runs of zsrole, ordsrc, skipclaim and stallshort are rerun from
+      scratch after the resume batch ends.'
   step_why:
     2:
       feeds: whether the lab models are slower per task than our subagents, measured on the same tasks
