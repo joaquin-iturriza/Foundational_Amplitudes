@@ -666,7 +666,14 @@ def main():
         for s in sorted(set(a.sites or ["ccin2p3", "lxplus"] + (["jeanzay"] if a.allow_jeanzay else []))):
             log("sync %s" % s)
             try:
-                site("sync", s, PROJECT, "--allow-dirty", timeout=600)
+                for k in range(3):     # two drivers started together race on the push ("cannot lock ref"): retry
+                    try:
+                        site("sync", s, PROJECT, "--allow-dirty", timeout=600)
+                        break
+                    except RuntimeError as e:
+                        if k == 2 or "cannot lock ref" not in str(e):
+                            raise
+                        time.sleep(20)
                 synced.append(s)
             except (RuntimeError, subprocess.TimeoutExpired) as e:
                 # never submit on an unsynced site (stale checkout): a site down at start-up (Jean Zay's probe timing
