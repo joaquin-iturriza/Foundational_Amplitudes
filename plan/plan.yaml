@@ -40789,6 +40789,18 @@ entries:
       blows up is listed apart at its best checkpoint. The prebuild passes when both sites log ''the cache ... is ready''
       with derived inputs under the part (a) base keys; a first trial that refuses at init, runs out of memory or shows N
       < P in the off-shellness line is fixed before the rest go.'
+    fix_at: '2026-11-23T11:12:21+00:00'
+    fix: 'Re-check at @c49743415. Items (1) rate and limit, (2) memory, (4) disk, (5) finish time and the N = P line, and
+      the check-2 wording are now fixed. The 18.6 GB peak at 16,384 is confirmed in sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml
+      line 28. With 40G as the GPU floor, the 22 h limit is 1.5x the A100 estimate of 0.83 s/step. One thing is left, the
+      outcome margin (checks 3 and 4). The design reads the 0.14 seed spread as a ratio of 1.14. In docs/results.tex near
+      line 4491 it is the median |log10| of the per-class seed-to-seed ratio, a factor of 10^0.14 = 1.38 per class (the claim
+      search_zs...seed_spread_muon=0.148 near line 7398 is restated there as a factor of 1.4). It is also a per-class scatter,
+      not the spread of a pooled or median aggregate over 139 processes. The fix is text only, no new run. Either use the
+      factor 1.38 as a conservative margin on both the pooled and the median read (yes: (c)/(a) below 1/1.38; no: above 1.38;
+      between: not resolved by one seed, the seed-43 pair goes to Joaquin), or state the aggregate spread with its source.
+      The expected effect within our own model (1.72 to 1.05, a factor of 1.6 on the new set) stands above 1.38, so the read
+      stays informative. Everything else passes as in the first review.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
