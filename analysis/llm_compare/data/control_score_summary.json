@@ -1,0 +1,39 @@
+{
+ "pooled_rmse_logm2": {
+  "our LLoCa, untuned": {
+   "seen": 0.13871081831494567,
+   "held out": 1.0418327232529996,
+   "relabels": 0.23702759585128416,
+   "new": 1.839358230064396
+  },
+  "LLM (Suprio)": {
+   "seen": 0.321,
+   "held out": 0.721,
+   "relabels": 0.34115618793215297,
+   "new": 1.192596333039571
+  },
+  "LLoCa (Suprio)": {
+   "seen": 0.506,
+   "held out": 0.953
+  }
+ },
+ "median_mse_logm2": {
+  "relabels": {
+   "our LLoCa, untuned": 0.02756084495752755,
+   "LLM (Suprio)": 0.07863770792289987
+  },
+  "new": {
+   "our LLoCa, untuned": 0.6881611576543867,
+   "LLM (Suprio)": 0.6490025910465533
+  }
+ },
+ "ours_below_llm": {
+  "relabels": 82,
+  "new": 14
+ },
+ "counts": {
+  "seen": 1352,
+  "relabels": 96,
+  "new": 43
+ }
+}
