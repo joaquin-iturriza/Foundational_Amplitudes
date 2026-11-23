@@ -1,0 +1,181 @@
+[
+ {
+  "case": "E4497",
+  "run": "FA-ccin2p3-d9a3299e",
+  "end": "TIMEOUT",
+  "log": "/home/joaquin/.local/share/ccorch/artifacts/FA/FA-ccin2p3-d9a3299e/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/vob_tt_V/trial_0178/out_0.log",
+  "bytes": 36065,
+  "key": {
+   "class": "time_limit"
+  },
+  "note": "FA-ccin2p3-d9a3299e: main stage finished all 8000 steps (V100, 0.372 s/step = 50 min), the 0.85 h limit (drive.py --hours 0.5 x1.5+0.1) cut the HETEROSC sigma stage at step ~170/250, no RESULT_JSON. Cause: the design's 0.127 s/step came from a sibling at batch 5000 on 10k events; these run the templ"
+ },
+ {
+  "case": "E4766",
+  "run": "FA-ccin2p3-1d55834c",
+  "end": "FAILED",
+  "log": "/home/joaquin/.local/share/ccorch/artifacts/FA/FA-ccin2p3-1d55834c/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/dsave_s2_ft_ee_ttbar_nlo_d2_t1360/trial_1047/out_0.log",
+  "bytes": 1821,
+  "key": {
+   "class": "error",
+   "token": "target_physics_factor"
+  },
+  "note": "FA-ccin2p3-1d55834c: log shows AssertionError at init, frozen data stats fitted with target_physics_factor=True, this run sets False (trees-in parent factor on, t t~ V/B run off); fixed a08fef9d (target checks skipped under fine_tune.target_stats=own), synced to CC; requeued via drive.py --retry-fai"
+ },
+ {
+  "case": "E4826",
+  "run": "FA-ccin2p3-ff202789",
+  "end": "FAILED",
+  "log": "/home/joaquin/.local/share/ccorch/artifacts/FA/FA-ccin2p3-ff202789/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/dsave_s2_ft_ee_uu_nlo_d8_t8500/trial_1067/out_0.log",
+  "bytes": 22220,
+  "key": {
+   "class": "diverged",
+   "step": 1709
+  },
+  "note": "FA-ccin2p3-ff202789: stage-2 search trial (hp_idx 1067, 8500 steps); log shows Training diverged, 50 consecutive non-finite-gradient steps at step 1709: a real outcome of that trial's sampled HPs, recorded by the driver as a failed trial (DyHPO penalty); no fix, not resubmitted, listed apart as a bl"
+ },
+ {
+  "case": "E4841",
+  "run": "FA-ccin2p3-7fdc6fa7",
+  "end": "FAILED",
+  "log": "/home/joaquin/.local/share/ccorch/artifacts/FA/FA-ccin2p3-7fdc6fa7/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/dsave_s2_ft_epem_ttx_d6_t8500/trial_0613/out_0.log",
+  "bytes": 24237,
+  "key": {
+   "class": "diverged",
+   "step": 3130
+  },
+  "note": "FA-ccin2p3-7fdc6fa7 (dsave_s2_ft_epem_ttx_d6_t8500 start-up trial): diverged, 50 consecutive non-finite grads at step 3130, at sampled lr_scale 8.51 (top of the fine-tune window [0.1,10]); a real outcome of its HPs, the sampler holds its penalty, no resubmit. Same as ff202789 (ft ee_uu_nlo d8, lr_sc"
+ },
+ {
+  "case": "E4986",
+  "run": "FA-ccin2p3-3cc8ed82",
+  "end": "FAILED",
+  "log": "/home/joaquin/.local/share/ccorch/artifacts/FA/FA-ccin2p3-3cc8ed82/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/dsave_s2_scr_ee_ttbar_nlo_d9_t8500/trial_0351/out_0.log",
+  "bytes": 20479,
+  "key": {
+   "class": "diverged",
+   "step": 594
+  },
+  "note": "FA-ccin2p3-3cc8ed82 (scratch t t~ V D=5e4, lr 2.62e-2 = 2.65c, diverged step 594): its centre 9.88e-3 trained cleanly in calibration (only D=1e4 blew up at c, already on c/2); top-edge blow-up, real outcome, penalty kept, no config change; finding recorded"
+ },
+ {
+  "case": "E6124",
+  "run": "FA-ccin2p3-8d518f4f",
+  "end": "FAILED",
+  "log": "/home/joaquin/.local/share/ccorch/artifacts/FA/FA-ccin2p3-8d518f4f/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/dsave_s2_ft_bbx_zz_nlo_d8_t8500/trial_0114/out_0.log",
+  "bytes": 2885,
+  "key": {
+   "class": "error",
+   "token": "GeV_train_amplitudes.born.npy"
+  },
+  "note": "FA-ccin2p3-8d518f4f: log shows AssertionError data.target_over_born: the v4_bbx_zz_nlo train pool's Born sidecar record named the pool it replaced (regen 2026-11-12 02:46; datagen never wrote the record). Fixed in datagen (0e5a650b); record rewritten by tools/born_record.py after its check (50000 ro"
+ },
+ {
+  "case": "E6325",
+  "run": "FA-ccin2p3-6cbf1cdc",
+  "end": "FAILED",
+  "log": "/home/joaquin/.local/share/ccorch/artifacts/FA/FA-ccin2p3-6cbf1cdc/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/dsave_s2_ft_bbx_zz_nlo_d7_t6400/trial_0931/out_0.log",
+  "bytes": 21495,
+  "key": {
+   "class": "diverged",
+   "step": 390
+  },
+  "note": "FA-ccin2p3-6cbf1cdc fine-tune V/B lr_scale 8.59, step 390: b b~ > Z Z one-loop trial (catalog_v4_datasaving_bbx_zz_nlo, bbx_zz_v_LD3) diverged (50 non-finite-gradient steps); a sampled-HP divergence, scored as a failure by the driver, search continues (D398); log read, nothing resubmitted"
+ },
+ {
+  "case": "E6333",
+  "run": "FA-ccin2p3-c33b0bba",
+  "end": "FAILED",
+  "log": "/home/joaquin/.local/share/ccorch/artifacts/FA/FA-ccin2p3-c33b0bba/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/dsave_s2_ft_bbx_zz_nlo_d6_t4800/trial_0953/out_0.log",
+  "bytes": 21753,
+  "key": {
+   "class": "diverged",
+   "step": 545
+  },
+  "note": "FA-ccin2p3-c33b0bba fine-tune V/B lr_scale 7.51, step 545: b b~ > Z Z one-loop trial (catalog_v4_datasaving_bbx_zz_nlo, bbx_zz_v_LD3) diverged (50 non-finite-gradient steps); a sampled-HP divergence, scored as a failure by the driver, search continues (D398); log read, nothing resubmitted"
+ },
+ {
+  "case": "E6390",
+  "run": "FA-ccin2p3-cf4a70a8",
+  "end": "FAILED",
+  "log": "/home/joaquin/.local/share/ccorch/artifacts/FA/FA-ccin2p3-cf4a70a8/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/dsave_s2_scr_bbx_zz_d8_t8500/trial_0976/out_0.log",
+  "bytes": 20976,
+  "key": {
+   "class": "diverged",
+   "step": 974
+  },
+  "note": "FA-ccin2p3-cf4a70a8: LO scratch trial (bbx_zz_lo_scr3, T=8500, lr 2.01e-2, top of the window) diverged at step 974; sampled-HP divergence, scored failed, search continues (D398); 2 of 21 first-wave LO trials so far; log read"
+ },
+ {
+  "case": "E7108",
+  "run": "FA-ccin2p3-923f795d",
+  "end": "FAILED",
+  "log": "/home/joaquin/.local/share/ccorch/artifacts/FA/FA-ccin2p3-923f795d/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/dsave_s5wsdparent_ft_bbx_zz_d7_t8500/trial_1441/out_0.log",
+  "bytes": 22706,
+  "key": {
+   "class": "diverged",
+   "step": 1917
+  },
+  "note": "FA-ccin2p3-923f795d (step 6 W arm, WSD parent + WSD fine-tune, bbZZ D=3162, guided trial, hp 1441, lr_scale 2.38): val -1.14 at step 1530, +1.74 at 1700, +1.31 at 1870; divergence guard at step 1917 of 8500. Diverged at its HPs, no code fault; driver failed + penalty stands, not requeued, listed apa"
+ },
+ {
+  "case": "E7109",
+  "run": "FA-ccin2p3-1f3e43e2",
+  "end": "FAILED",
+  "log": "/home/joaquin/.local/share/ccorch/artifacts/FA/FA-ccin2p3-1f3e43e2/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/dsave_s5wsdparent_ft_bbx_zz_d5_t7840/trial_1942/out_0.log",
+  "bytes": 25908,
+  "key": {
+   "class": "diverged",
+   "step": 3505
+  },
+  "note": "FA-ccin2p3-1f3e43e2 (step 6 W arm, bbZZ D=316, guided trial, hp 1942, lr_scale 2.55): val 5.1e11 to 1.8e12 at steps 3120-3432; divergence guard at step 3505 of 7840. Diverged at its HPs, no code fault; driver failed + penalty stands, not requeued, listed apart (D398)."
+ },
+ {
+  "case": "E7190",
+  "run": "FA-ccin2p3-bf96f2b2",
+  "end": "FAILED",
+  "log": "/home/joaquin/.local/share/ccorch/artifacts/FA/FA-ccin2p3-bf96f2b2/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/dsave_s6cosparentlongwu_ft_bbx_zz_d7_t8500/trial_0430/out_0.log",
+  "bytes": 26861,
+  "key": {
+   "class": "diverged",
+   "step": 3427
+  },
+  "note": "FA-ccin2p3-bf96f2b2: warmup test arm L D=3162 start-up trial hp 430 (lr_scale 2.97, warmup 0.18) diverged at step 3427/8500; the same draw diverged in R and W; driver records it failed, not requeued (D398)"
+ },
+ {
+  "case": "E7192",
+  "run": "FA-ccin2p3-d7f7486f",
+  "end": "FAILED",
+  "log": "/home/joaquin/.local/share/ccorch/artifacts/FA/FA-ccin2p3-d7f7486f/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/dsave_s6cosparentlongwu_ft_bbx_zz_d4_t4960/trial_1395/out_0.log",
+  "bytes": 25341,
+  "key": {
+   "class": "diverged",
+   "step": 4435
+  },
+  "note": "FA-ccin2p3-d7f7486f: warmup test arm L D=100 start-up trial hp 1395 (lr_scale 2.88, warmup 0.41) diverged at step 4435/4960 (in the cooldown); same draw diverged in C and W; not requeued (D398)"
+ },
+ {
+  "case": "E7203",
+  "run": "FA-ccin2p3-5fe66267",
+  "end": "FAILED",
+  "log": "/home/joaquin/.local/share/ccorch/artifacts/FA/FA-ccin2p3-5fe66267/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/dsave_s6cosparentlongwu_ft_bbx_zz_d7_t8500/trial_1678/out_0.log",
+  "bytes": 22697,
+  "key": {
+   "class": "diverged",
+   "step": 2069
+  },
+  "note": "FA-ccin2p3-5fe66267: warmup test arm L D=3162 guided trial hp 1678 (lr_scale 2.64, warmup 0.25) diverged at step 2069/8500; this draw also diverged in W; not requeued (D398)"
+ },
+ {
+  "case": "E8220",
+  "run": "FA-ccin2p3-6cdb4904",
+  "end": "FAILED",
+  "log": "/home/joaquin/.local/share/ccorch/artifacts/FA/FA-ccin2p3-6cdb4904/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/llmcmp_a_adamw_const/trial_1333/out_0.log",
+  "bytes": 22949,
+  "key": {
+   "class": "error",
+   "token": "data.affine_multiplicity_std"
+  },
+  "note": "FA-ccin2p3-6cdb4904: run.py died in init_data at experiment.py _resolve_amp_preprocessing: AssertionError 'data.affine_multiplicity_std refines data.shared_standardization (per-dataset transforms, one sigma)': the sweep config had data.preprocess_per_dataset=false. Not CC-specific (every trial and t"
+ }
+]
