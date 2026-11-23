@@ -39554,6 +39554,14 @@ entries:
     - 1
     answered_at: '2026-11-22T14:38:13.043000+00:00'
     decision: D528
+  - ask: 'Your hold: start part (b), the muP width scale-up toward the LLM''s parameter count, now at part (a)''s best HPs
+      so far (wave 1: lr 1.03e-3), rerunning it if the search moves the optimum, instead of after the search ends as D522
+      says (''once we find near optimal HPs'')?'
+    at: '2026-11-23T22:40:25+00:00'
+    searched: 'D522, D525-D528; CLAUDE.md; Joaquin 2026-11-23 on needless sequencing; Joaquin 2026-11-12T01:19 (tt LO and
+      uu V points, not this); 2026-11-22T02:55 (D522''s own message: scale-up after near-optimal HPs); 2026-11-14T04:31 (a
+      pasted LaTeX draft, no decision on this). Starting early departs from his order, so it is his call'
+    blocks_steps: &id003 []
   owner:
     agent: aee68ef7ecbe3d78a
     state: working
@@ -41813,6 +41821,14 @@ entries:
     units: null
     start: '2026-11-23T14:56:25+00:00'
     at: '2026-11-23T14:56:25+00:00'
+  ask: 'Your hold: start part (b), the muP width scale-up toward the LLM''s parameter count, now at part (a)''s best HPs so
+    far (wave 1: lr 1.03e-3), rerunning it if the search moves the optimum, instead of after the search ends as D522 says
+    (''once we find near optimal HPs'')?'
+  waiting_since: '2026-11-23T22:40:25+00:00'
+  searched: 'D522, D525-D528; CLAUDE.md; Joaquin 2026-11-23 on needless sequencing; Joaquin 2026-11-12T01:19 (tt LO and uu
+    V points, not this); 2026-11-22T02:55 (D522''s own message: scale-up after near-optimal HPs); 2026-11-14T04:31 (a pasted
+    LaTeX draft, no decision on this). Starting early departs from his order, so it is his call'
+  blocks_steps: *id003
 - id: lab_llm_trial
   title: Lab LLMs in place of some subagents
   question: Can the lab's LLMs (deepseek-v4-flash, qwen3.8-27b via lpnllm) do some of our subagent work (mechanical steps,
