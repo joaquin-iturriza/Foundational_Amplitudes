@@ -41857,3 +41857,48 @@ entries:
       reference''s one per arm (Joaquin accepted 10 tasks in D213), and nothing is ordered without need. Searched: lpnllm,
       deepseek, qwen, opencode, lab llm, lab model, model trial, lookup trial, mechanical watch in docs/results.tex, the plan,
       site decisions and analysis/agent_redesign.'
+  - at: '2026-11-23T16:24:26+00:00'
+    question: Can the lab LLMs (deepseek-v4-flash, qwen3.8-27b), run through the opencode agent harness in a bwrap sandbox
+      on a scratch copy, do our subagent work correctly, alone or executing a plan written by a Sonnet subagent, and how many
+      of our tokens does that save?
+    prior: '(1) agent_redesign model trial (D203/D212, tools/model_trial.py, analysis/agent_redesign/model_trial.json): the
+      same 10 past repo fixes run by Sonnet 5.5 and Opus 5.5 low: 9/10 first pass, 10/10 after one rework in both, $0.19 vs
+      $0.29 per task; led to D213. Reused here: tasks, defect text, interface, checks. Difference: those agents worked in
+      git worktrees with history up to the fix''s parent; the lab copies are git-archive copies with no history. (2) model_trial_validate_ext_b/c/d.json:
+      30 more candidate fix tasks validated (some valid): not added in this first round (model_trial_size.json gives a [0.60,0.98]
+      interval at 10 tasks); an extension is a later step. (3) mechanical_watch.json: Sonnet live on 30 mechanical-worker
+      tasks, 0 failed (D213''s live check): the reference for real mechanical work, but those tasks act on clusters and the
+      ledger and have no replayable check, so they are out of this offline benchmark. (4) lookup_trial.json: 15 code lookups
+      with token counts, graded by hand: the lookup family is out of this first round, a next step. (5) Log triage: no prior
+      benchmark. Searched docs/results.tex, plan, site decisions, analysis/agent_redesign for lab llm, lpnllm, deepseek, qwen,
+      opencode, model trial, lookup trial, mechanical watch.'
+    measure: 'Fix (10 tasks, model_trial TRIAL): pass = the fix commit''s own tests on the tree the model leaves (model_trial.run_check
+      + verdict), first pass and after one rework round fed the check output. Triage (15 cases: failed-run logs of FA events
+      acked with a note, exactly one log fetched home, one case per distinct cause: each of 11 divergences (own log, own step),
+      3 distinct assertion errors, 1 time-limit sweep): auto grade = answer.json class and decisive fact match the log (guard
+      step exactly; the assertion''s key token in the quoted line; training_finished true); hand grade = its why and resubmit_as_is
+      read by me against the ack note (as model_trial''s hand_read), recorded in analysis/lab_llm_trial/hand_read.json. Per
+      run: lab tokens (opencode step usage), wall time; our $ = the Sonnet planner''s transcript at list price (model_trial.cost)
+      for +plan arms, 0 for lab alone, against the reference''s $ per task.'
+    check: The fix checks fail at each task's parent and pass at its fix (model_trial_validate.json) and separated Sonnet's
+      9/10 first pass from 10/10 after rework. Triage keys read from each log by committed code (tools/lab_llm_trial.py cases)
+      agree with the ack notes (steps and tokens as written there; the time-limit note says main stage finished). The auto
+      grade alone is reachable by a regex, so the hand grade of why and action against the note is what separates diagnosis
+      from copying.
+    fixed: 'Task text: model_trial.brief with only the path changed; scratch copy = git archive of the fix''s parent in a
+      fresh repo. Sandbox (bwrap): / read-only, /tmp private, ~/work, ~/.claude, ~/.local/share/ccorch, ~/.ssh, ~/.config/ccorch
+      empty, only ~/work/FA/.venv-cpu mounted back, the run dir and opencode''s cache writable; the smoke run shows ~/work/FA,
+      runs.db and ~/.ssh unreadable. opencode 1.19.6, default build agent and tools, server-default temperature, one rework
+      round. Planner (+plan arms): one Sonnet 5.5 subagent per task (general-purpose, model sonnet), given the same brief
+      and its own scratch copy (no history), may read the code and run the existing tests, may not edit; writes a plan of
+      at most 60 lines (files, functions, the change, code snippets allowed, the test command) to a file; the same plan goes
+      to both executors; its cost = model_trial.cost of its transcript. Triage prompt identical across arms and gives the
+      run end class as our agents'' events did.'
+    control: 'Sonnet 5.5 and Opus 5.5 low on the same 10 fix tasks (model_trial.json, same defect text, interface and check).
+      Triage: the ack notes of our agents; their per-event cost is not recorded, so our saving there is given as the log tokens
+      the lab model read (an estimate, labelled).'
+    seeds: One run per task per arm on fix (as the reference); triage arms run twice per case to show consistency.
+    outcome: 'Yes for an arm: fix >=8/10 first pass (within one task of Sonnet''s 9/10) at our $ per task <=0.3x Sonnet''s;
+      triage >=13/15 on both the auto and the hand grade in each run. No: below; then the failure modes read from the transcripts
+      (no edit, wrong file, tool-call errors, timeouts, wrong action) say which adaptation (plan detail, brief shape) to try
+      next.'
