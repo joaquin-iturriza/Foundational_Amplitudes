@@ -41452,3 +41452,9 @@ entries:
     units: null
     start: '2026-11-23T11:54:10+00:00'
     at: '2026-11-23T11:54:10+00:00'
+  - batch: llmcmp_c_qperp_wave1_control
+    wall_h: 16.0
+    jobs: 4
+    units: null
+    start: '2026-11-23T14:56:25+00:00'
+    at: '2026-11-23T14:56:25+00:00'
