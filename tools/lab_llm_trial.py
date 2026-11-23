@@ -31,7 +31,7 @@ if not os.path.exists(mt.PY):                      # a worktree has no venv of i
 OUT = os.path.join(ROOT, "analysis", "lab_llm_trial")
 REC = os.path.join(OUT, "runs.jsonl")
 SCR = os.environ.get("LAB_TRIAL_SCRATCH") or "/tmp/claude-%d/lab_llm_trial" % os.getuid()
-OPENCODE = os.path.expanduser("~/.local/bin/opencode")
+OPENCODE = os.path.expanduser("~/.local/lib/node_modules/opencode-ai/node_modules/opencode-linux-x64/bin/opencode")
 MODELS = {"deepseek": "deepseek-v4-flash", "qwen": "qwen3.8-27b"}
 HOME = os.path.expanduser("~")
 CCORCH = os.path.join(HOME, ".local", "share", "ccorch")
@@ -61,7 +61,7 @@ def sandbox(run_dir, cmd, timeout, hide=True):
     json.dump(CONFIG, open(cfg, "w"), indent=1)
     b = ["bwrap", "--ro-bind", "/", "/", "--dev", "/dev", "--proc", "/proc", "--tmpfs", "/tmp",
          *sum((["--tmpfs", h] for h in (HIDE if hide else HIDE[2:4])), []),
-         *(["--ro-bind", os.path.dirname(os.path.dirname(mt.PY))] * 2 if hide else []),
+         *(["--ro-bind"] + [os.path.dirname(os.path.dirname(mt.PY))] * 2 if hide else []),
          "--bind", run_dir, run_dir, "--bind", cache, cache, "--die-with-parent", "--chdir", run_dir]
     env = {k: v for k, v in os.environ.items() if not k.startswith(("SSH_", "KRB5", "CLAUDE", "ANTHROPIC"))}
     env.update(XDG_DATA_HOME=xdg + "/data", XDG_STATE_HOME=xdg + "/state", XDG_CONFIG_HOME=xdg + "/config",
