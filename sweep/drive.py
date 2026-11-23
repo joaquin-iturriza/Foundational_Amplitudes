@@ -576,6 +576,14 @@ def repick(sweeps, a, rows, now=None):
 repick.last = 0.0
 
 
+def lxplus_mem_ok(mem, cpus):
+    """lxplus (HTCondor) gives 3000 MB per CPU: --mem M becomes ceil(M/3000) CPUs and no GPU slot matches."""
+    m = re.fullmatch(r"(\d+(?:\.\d+)?)\s*([MGmg]?)", str(mem).strip())
+    if not m:
+        return False                                  # unparsable: refuse, never pass silently
+    return float(m.group(1)) * (1024 if m.group(2).upper() == "G" else 1) <= 3000 * cpus
+
+
 def plan(k, sweeps, a, record=True):
     """Sites for the next k trials, from `site pick`: each entry is one job's site. record=False: a re-check that
     leaves the placement quota other agents submit under untouched."""
@@ -584,8 +592,17 @@ def plan(k, sweeps, a, record=True):
             "--hours", "%.2f" % s0.hours, "--json"] + ([] if record else ["--no-record"])
     if s0.gpu_min_mem:
         args += ["--gpu-min-mem", str(s0.gpu_min_mem)]     # count only the GPUs the trials may run on
-    if a.sites:
-        args += ["--only"] + list(a.sites)
+    only = list(a.sites or [])
+    if not lxplus_mem_ok(s0.mem, s0.cpus):
+        log("lxplus refused: it gives 3000 MB per CPU: --mem %s with --cpus %d becomes ceil(M/3000) CPUs and no GPU "
+            "slot matches; ask for <= 3000*C MB, measured trial peaks are 2.7-6.6 GB; using the other sites"
+            % (s0.mem, s0.cpus))
+        only = [x for x in (only or ["ccin2p3", "lxplus"] + (["jeanzay"] if a.allow_jeanzay else [])) if x != "lxplus"]
+        if not only:
+            log("no site left after the lxplus refusal: nothing submitted this round")
+            return [], []
+    if only:
+        args += ["--only"] + only
     if a.allow_jeanzay:
         args.append("--allow-jeanzay")
     out = site(*args, timeout=400, check=False)
