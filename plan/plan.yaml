@@ -41786,8 +41786,10 @@ entries:
   match: zz_labllm_*
   evidence:
     runs: []
-    commit: null
-    paths: []
+    commit: 30955454f
+    paths:
+    - worktrees/wt-labllm/analysis/lab_llm_trial/runs.jsonl
+    - worktrees/wt-labllm/tools/lab_llm_trial.py
   dead_ends: []
   asks: []
   owner:
