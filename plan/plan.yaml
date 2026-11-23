@@ -39128,10 +39128,9 @@ entries:
       DRIVE_DONE'
     3: Score the best trial and the control (job_llm_score.sh), figure of pooled RMSE seen/held out (and truly held out, relabels)
       against LLM 0.321/0.721 and his LLoCa 0.506/0.953, per-process MSEs as dan_per_process.py; write-up in docs/results.tex
-    5: 'Part (c) readout: when llmcmp_c_drive1/2 writes DRIVE_DONE and the control FA-ccin2p3-677cddca ends, score (c)''s
-      best trial and the control (REREAD=<run> scripts/job_llm_score.sh, heldout derived inputs prebuilt on CC feat_6d369c25),
-      read per set (seen, held out, relabels, new) pooled RMSE and median per-process MSE against (a)''s best with the 1.38
-      margin, figure in Suprio''s layout; write-up'
+    5: 'Part (c) readout: when llmcmp_c_qperp''s driver writes DRIVE_DONE and its control ends, score (c)''s best trial and
+      the control (REREAD=<run> scripts/job_llm_score.sh), read per set (seen, held out, relabels, new) pooled RMSE and median
+      per-process MSE against (a)''s best with the 1.38 margin, figure in Suprio''s layout; write-up'
     6: 'Part (c) relaunch at the repaired config (sweep/sweep_config_llmcmp_c_latest.yaml @f0590bf2f, sweep llmcmp_c_qperp:
       dim_ref qperp and llm4lhc width 64 as trial_1262; llmcmp_c_latest void). When the qperp derived-inputs prebuilds log
       ''the cache ... is ready (derived inputs ...)'' (CC FA-ccin2p3-beef9c14 train, -68a3b13f heldout; lxplus FA-lxplus-413c836c
