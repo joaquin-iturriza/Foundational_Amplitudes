@@ -37727,8 +37727,6 @@ entries:
   - D516
   - D529
   next:
-    2: Act on Joaquin's answer to the 13:17 question on the W parent's two input settings (input_soft_eps, input_pair_logs)
-      and the batch-128 scratch-with-flags search
     3: Read the one-setting searches at b2048 (scratch + input_soft_eps only, scratch + input_pair_logs only; 16 trials each),
       send seeds 43/44 of each chosen trial, read c_soft and c_pair best against best
     4: Read the resumed b128 searched scratch-with-both-settings (16 trials), send seeds 43/44 of its chosen trial, read the
@@ -39358,12 +39356,6 @@ entries:
       @30b23c29 (R4, not run)
     written: '2026-11-22T17:00:34+00:00'
   step_why:
-    2:
-      feeds: whether the Z+4g fine-tune deficit is removed by changing the parent's inputs (D519/D520)
-      if:
-      - '(a) one-setting-at-a-time test: design, review, run, read which setting carries the 2.3x'
-      - '(b) retrain the parent without both: design the parent run and its Z+4g fine-tune against scratch'
-      - '(c) leave the parent: write up the mechanism in docs/results.tex and close'
     3:
       feeds: Joaquin's held call on the W parent's two input settings (D519/D520 diagnosis)
       if:
