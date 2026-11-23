@@ -41902,3 +41902,16 @@ entries:
       triage >=13/15 on both the auto and the hand grade in each run. No: below; then the failure modes read from the transcripts
       (no edit, wrong file, tool-call errors, timeouts, wrong action) say which adaptation (plan detail, brief shape) to try
       next.'
+    passed_at: '2026-11-23T16:24:59+00:00'
+    reviewer: 'Re-check passed: CPU only on the local machine. Fix family: model_trial_validate.json shows each check fails
+      at its task''s parent and passes at the fix; those checks separated Sonnet''s 9/10 first pass from 10/10 after rework;
+      one run per task as in the reference (D213 accepted 10 tasks; 10-task interval [0.60,0.98] from model_trial_size.json).
+      Triage: 15 cases, one per distinct cause (triage_cases.json: 11 divergences each with its own step, 3 distinct assertion
+      errors, 1 time limit). A model answering ''diverged'' every time scores 11/15, below the 13/15 threshold. The hand grade
+      of why and resubmit_as_is against the ack note separates diagnosis from copying a log line; two runs per case. Sandbox:
+      an empty tmpfs over ~/work, ~/.claude, ~/.local/share/ccorch, ~/.ssh and ~/.config/ccorch, with only .venv-cpu mounted
+      back, so no fix commit, ack note or key is readable. The planner is fixed (Sonnet, same brief, no-history copy, no edits,
+      plan of at most 60 lines, cost = model_trial.cost). The no-history difference from the reference is stated. Prior names
+      model_trial.json, validate_ext_b/c/d, mechanical_watch.json and lookup_trial.json. Searched: lpnllm, deepseek, qwen,
+      opencode, lab llm, lab model, model trial, lookup trial, mechanical watch in docs/results.tex, the plan, site decisions
+      and analysis/agent_redesign.'
