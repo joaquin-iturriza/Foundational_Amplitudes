@@ -39520,6 +39520,24 @@ entries:
       trial 0 landed on a Tesla V100-PCIE-32GB (--gpu-min-mem is HTCondor-only, not applied on CC''s SLURM) at 0.90 s/step,
       15.2 h, inside the 22 h limit (the design''s V100 estimate of 1.45 s/step was too high); peak VRAM 16.0 GB on all (design
       estimate 28 GB).'
+  - at: '2026-11-23T14:37:45+00:00'
+    text: '2026-11-23 ~16:30 CET (E8266): part (c) trial 1 FA-ccin2p3-e0a5ffe2 (hp0353, lr 8.56e-3, EMA off, warmup 9055 steps)
+      diverged at step 9101 (50 non-finite-gradient steps, inf from ~9050: at the end of warmup, as trial 2 at 6298 after
+      a 5475-step warmup); val_loss_no_reg -2.404 at 3042, -2.688 at 6084. Before calling it the HPs, its config.yaml was
+      diffed against the latest pretraining''s (runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262/config.yaml,
+      FA-ccin2p3-1a46f3e0 tier-0): clip_grad_norm and every Muon/AdamW key (muon_rms 0.2, momentum 0.95, nesterov, ns_steps
+      5; defaults since 6584c2fa8, before the pretraining at 610422cc07) and the HETEROSC/sigma-stage keys are equal. Two
+      defects of the part (c) config against the setup its design names: (1) data.target_physics_dim_ref was left at the default
+      shat (the plain dimensional factor); trial_1262 trained on qperp, the emission-scale target the design and docs/results.tex
+      (''emission scales ... 52 to 2.2'') mean; (2) model.diagram_encoder_llm4lhc.hidden_size was the config default 256 (2.43M-parameter
+      SP encoder) where trial_1262 and every llm4lhc pretraining (tp3_levdiagl, dancat_het_pre) use 64. Design differences
+      that stay: WSD in place of trial_1262''s cosine (the canonical table, D423), batch 24,576, bsm_labels false (Daniel''s
+      catalog has no BSM particle). Whether either defect caused the blow-ups is not settled. Repair (@f0590bf2f): both keys
+      set in sweep/sweep_config_llmcmp_c_latest.yaml, sweep renamed llmcmp_c_qperp (fresh DyHPO state); llmcmp_c_latest void:
+      driver llmcmp_c_drive2 stopped, trial 0 FA-ccin2p3-0650cdca and the control FA-ccin2p3-677cddca cancelled while running
+      (about 3 h of V100 and 2 h of H100 on the wrong target). The derived-inputs cache key includes dim_ref: qperp prebuilds
+      CC FA-ccin2p3-beef9c14 (train) / -68a3b13f (heldout), lxplus FA-lxplus-413c836c / -5248270b. Not added: a check that
+      a run declared to copy another run''s setup matches its config.yaml.'
   step_waits:
     '2': llmcmp_a_drive5
     '3': llmcmp_a_drive5
