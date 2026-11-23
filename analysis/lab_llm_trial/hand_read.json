@@ -1,0 +1,426 @@
+{
+ "by": "owner a02be936be2a548a6, 2026-11-23, each answer's why and resubmit_as_is read against its ack note (triage_cases.json note)",
+ "minor": "peripheral onset steps sometimes misread (E7109 deepseek run 1: blow-up put at ~1248, note 3120-3432; E7190 deepseek run 1: non-finite from ~600); not graded",
+ "reads": [
+  {
+   "case": "E4497",
+   "arm": "qwen",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E4766",
+   "arm": "qwen",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E4497",
+   "arm": "deepseek",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E4826",
+   "arm": "qwen",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E4766",
+   "arm": "deepseek",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E4826",
+   "arm": "deepseek",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E4841",
+   "arm": "qwen",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E4841",
+   "arm": "deepseek",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E4986",
+   "arm": "qwen",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E4986",
+   "arm": "deepseek",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E6124",
+   "arm": "qwen",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E6124",
+   "arm": "deepseek",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E6325",
+   "arm": "qwen",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E6325",
+   "arm": "deepseek",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E6333",
+   "arm": "deepseek",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E6333",
+   "arm": "qwen",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E6390",
+   "arm": "deepseek",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E6390",
+   "arm": "qwen",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E7108",
+   "arm": "deepseek",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E7109",
+   "arm": "deepseek",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E7108",
+   "arm": "qwen",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E7190",
+   "arm": "deepseek",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E7109",
+   "arm": "qwen",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E7192",
+   "arm": "deepseek",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E7190",
+   "arm": "qwen",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E7203",
+   "arm": "deepseek",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E7192",
+   "arm": "qwen",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E8220",
+   "arm": "deepseek",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E7203",
+   "arm": "qwen",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E4497",
+   "arm": "deepseek",
+   "run": 2,
+   "ok": false,
+   "note": "why right, but resubmit_as_is true: the time limit was too short for the run's real step rate (ack note), so the same job would be cut again"
+  },
+  {
+   "case": "E8220",
+   "arm": "qwen",
+   "run": 1,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E4766",
+   "arm": "deepseek",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E4826",
+   "arm": "deepseek",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E4841",
+   "arm": "deepseek",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E4986",
+   "arm": "deepseek",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E6124",
+   "arm": "deepseek",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E6325",
+   "arm": "deepseek",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E4497",
+   "arm": "qwen",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E6333",
+   "arm": "deepseek",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E4766",
+   "arm": "qwen",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E6390",
+   "arm": "deepseek",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E7108",
+   "arm": "deepseek",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E4826",
+   "arm": "qwen",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E7109",
+   "arm": "deepseek",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E4841",
+   "arm": "qwen",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E7190",
+   "arm": "deepseek",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E7192",
+   "arm": "deepseek",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E4986",
+   "arm": "qwen",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E7203",
+   "arm": "deepseek",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E8220",
+   "arm": "deepseek",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E6124",
+   "arm": "qwen",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E6325",
+   "arm": "qwen",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E6333",
+   "arm": "qwen",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E6390",
+   "arm": "qwen",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E7108",
+   "arm": "qwen",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E7109",
+   "arm": "qwen",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E7190",
+   "arm": "qwen",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E7192",
+   "arm": "qwen",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E7203",
+   "arm": "qwen",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  },
+  {
+   "case": "E8220",
+   "arm": "qwen",
+   "run": 2,
+   "ok": true,
+   "note": "why matches the ack note's cause; not resubmitted as is"
+  }
+ ]
+}

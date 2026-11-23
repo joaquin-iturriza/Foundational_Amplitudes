@@ -74,6 +74,11 @@ def summary():
             if f == "triage":
                 out[f][a]["passed_by_class"] = {k: [sum(p for p, q in zip(c["first"], c["by_class"]) if q == k),
                                                     c["by_class"].count(k)] for k in set(c["by_class"])}
+    hr = os.path.join(OUT, "hand_read.json")
+    if os.path.exists(hr):                         # the owner's read of why and resubmit_as_is against the ack note
+        for o in json.load(open(hr))["reads"]:
+            t = out["triage"][o["arm"]]
+            t["hand_ok"] = t.get("hand_ok", 0) + o["ok"]
     ref = json.load(open(os.path.join(ROOT, "analysis", "agent_redesign", "model_trial.json")))["summary"]
     out["fix_earlier_trial"] = ref
     json.dump(out, open(os.path.join(OUT, "summary.json"), "w"), indent=1)
@@ -104,7 +109,11 @@ def figure(out):
         ax.set_xticks(list(x), lab)
     tr = out["triage"]
     tarms = [k for k in ("deepseek", "qwen") if k in tr]
-    d.bar(range(len(tarms)), [tr[k]["passed_first"] / tr[k]["n"] for k in tarms], 0.5, color=ps.C.blue)
+    d.bar([i - 0.2 for i in range(len(tarms))], [tr[k]["passed_first"] / tr[k]["n"] for k in tarms], 0.4,
+          color=ps.C.blue, label="cause and step or error line")
+    d.bar([i + 0.2 for i in range(len(tarms))], [tr[k].get("hand_ok", 0) / tr[k]["n"] for k in tarms], 0.4,
+          color=ps.C.vermillion, label="reason and action, read by hand")
+    ps.legend(d, "lower left")
     d.set_xticks(list(range(len(tarms))), [NAME[k] for k in tarms])
     d.set_ylabel("share of failed-run logs read right")
     d.set_ylim(0, 1.0)
