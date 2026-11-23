@@ -23,7 +23,7 @@ cluster:
   gpu_min_mem: 40G   # latest setup peaked 18.6 GB at batch 16,384 (cov_v4_long_hpo_x4); ~28 GB expected at 24,576 (estimate), and a V100 at ~1.45 s/step would pass the 22 h limit: A100 40/80 GB and H100 only, no model pinned
 
 paths:
-sweep_name: llmcmp_c_latest
+sweep_name: llmcmp_c_qperp   # llmcmp_c_latest ran 2026-11-23 with dim_ref shat and encoder width 256 (not trial_1262's setup): its trials are void
 n_trials: 8
 
 dyhpo:
@@ -54,6 +54,7 @@ fixed_params:   # "++" on the keys absent from config/ (Hydra appends them)
   ++data.target_physics_dim_only: 'true'
   ++data.target_physics_orders: 'true'
   ++data.target_physics_s0: 1.0
+  ++data.target_physics_dim_ref: qperp   # the emission-scale target proper (trial_1262; the default shat is the plain dimensional factor)
   ++data.dimensionless_inputs: 'true'
   data.alphas_input: 'true'
   data.drop_coupling_powers: 'false'
@@ -71,6 +72,7 @@ fixed_params:   # "++" on the keys absent from config/ (Hydra appends them)
   model: lloca
   model.use_diagrams: 'true'
   model.diagram_encoder_impl: llm4lhc
+  model.diagram_encoder_llm4lhc.hidden_size: 64   # as trial_1262 and every llm4lhc pretraining (tp3_levdiagl, dancat_het_pre); config default 256
   model.particle_encoder_hidden: 0
   model.net.num_heads: 8
   model.net.num_blocks: 8
