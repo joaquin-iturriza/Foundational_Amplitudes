@@ -39483,6 +39483,7 @@ entries:
   step_waits:
     '2': llmcmp_a_drive5
     '3': llmcmp_a_drive5
+    '4': FA-lxplus-3224ba9c FA-lxplus-d96a97fa
   handoff:
     state: 'Part (a): 8-trial DyHPO search of muP LLoCa in the LLM-run conditions (config sweep/sweep_config_llmcmp_a_adamw_const.yaml
       @2a597c478), driven locally by llmcmp_a_drive5 (.venv-driver/bin/python sweep/drive.py --config sweep/sweep_config_llmcmp_a_adamw_const.yaml
