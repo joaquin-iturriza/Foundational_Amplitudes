@@ -39343,6 +39343,7 @@ entries:
     '4': 'detached drive ftmech_flagsb128_drive4 (search ftmech_zng4g_scrflagsrch_b128) ends: its DONE event'
     '5': 'detached drive ftmech_ftnoset_drive (searches ftmech_zng4g_ftnoset_b2048 and _b128 from the no-settings parent)
       ends: its DONE event'
+    '3': FA-ccin2p3-0c350a64 FA-ccin2p3-36f1d6b7 FA-ccin2p3-7f80a3ce FA-ccin2p3-a8090851
   handoff:
     state: '2026-11-23 ~23:05 CET. All work of D519/D520/D529 is in flight. (1) One setting at a time, b2048 (design passed
       2026-11-23): soft-rescale-only search done, 16/16 (chosen hp1961, lr 2.80e-2, objective 0.100); its seeds 43/44 submitted
