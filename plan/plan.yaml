@@ -40969,3 +40969,9 @@ entries:
     units: null
     start: '2026-11-23T11:15:39+00:00'
     at: '2026-11-23T11:15:39+00:00'
+  - batch: llmcmp_c_latest
+    wall_h: 15.0
+    jobs: 9
+    units: null
+    start: '2026-11-23T11:15:45+00:00'
+    at: '2026-11-23T11:15:45+00:00'
