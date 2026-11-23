@@ -34261,6 +34261,9 @@ entries:
       (kitvm_paper_median, kitvm_paper_bulk). Deviations accepted by the reviewer: legend fontsize 7.5 pt kept (ps.legend
       overflows the bulk figure without it); the high-energy panel''s process label lower right (off-scale points on the top
       edge and the raw MLP''s line leave no upper corner). Draft 51 pp, Sec. 7 pp. 32-35, overfulls 7. Scratchpad draft_kit5.pdf.'
+  - at: '2026-11-23T00:03:03+00:00'
+    text: '2026-11-23 ~01:00: step 4 needs the 448-process bigrun runs on Jean Zay; Jean Zay still refuses ssh (site list
+      UNREACHABLE, retried with site run jeanzay FA -- hostname: connection refused); step 4 re-waits to 2026-11-24'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
