@@ -39128,6 +39128,18 @@ entries:
       DRIVE_DONE'
     3: Score the best trial and the control (job_llm_score.sh), figure of pooled RMSE seen/held out (and truly held out, relabels)
       against LLM 0.321/0.721 and his LLoCa 0.506/0.953, per-process MSEs as dan_per_process.py; write-up in docs/results.tex
+    4: 'Part (c), design passed 2026-11-23 11:13 (config sweep/sweep_config_llmcmp_c_latest.yaml @c49743415): when the four
+      derived-inputs prebuilds (FA-lxplus-c2768355 train, FA-lxplus-a549a64e heldout, FA-ccin2p3-5f11ffd8 train, FA-ccin2p3-e9c3b80d
+      heldout; scripts/job_mmap_prebuild.sh @fcd38bdd0e with the config''s fixed_params, overrides in scratchpad c_overrides.txt)
+      log ''the cache ... is ready'' with derived inputs: launch the search, detached: .venv-driver/bin/python sweep/drive.py
+      --config sweep/sweep_config_llmcmp_c_latest.yaml --item llm_compare --sites lxplus ccin2p3 --mem 16G --cpus 4 --hours
+      14.6 (tools/detach.py --entry llm_compare --name llmcmp_c_drive1), and the matched control via site submit <site from
+      site pick> FA sweep/trial_job.sh --item llm_compare --hdr=--mem=16G --hdr=--cpus-per-task=4 --hdr=--time=22:00:00 --hdr=--gpu-min-mem=40G
+      -- --sweep-config sweep/sweep_config_llmcmp_c_latest.yaml --detached --trial-idx 9000 --hp-idx 9000 --t-steps 60840
+      --hp training.lr=0.003649139 --hp training.muon_weight_decay=0.04733132 --hp training.regularization_lambda=9.114591e-08
+      --hp training.cosanneal_warmup_frac=0.1800024 --hp training.cosanneal_eta_min=1.376875e-08 --hp ema=false --hp training.ema_decay=0.9597525
+      (as part (a)''s control FA-lxplus-cb9273f1). First trial: check s/step, peak memory, ''built propagator masks for N/P''
+      N = P.'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -39250,6 +39262,11 @@ entries:
       if:
       - 'best at or below the LLM: part (b) checks width scaling holds it'
       - 'above the LLM: part (b) width toward 359.6M at the tuned HPs'
+    4:
+      feeds: 'part (c): our latest setup against part (a), the LLM and his LLoCa'
+      if:
+      - 'prebuilds ready on both sites: launch driver + control'
+      - 'a prebuild fails: read its log, fix, resubmit'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
