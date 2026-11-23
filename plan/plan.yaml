@@ -37730,8 +37730,11 @@ entries:
   match: dsave_ftmech_*,ftmech_*
   evidence:
     runs:
+    - FA-ccin2p3-47240f89
+    - FA-ccin2p3-4b18f6ba
     - FA-ccin2p3-676bd3d0
     - FA-ccin2p3-74805752
+    - FA-ccin2p3-8ab83423
     - FA-lxplus-0ab69a57
     - FA-lxplus-1407949d
     - FA-lxplus-1575600c
@@ -37760,7 +37763,7 @@ entries:
     - FA-lxplus-e8d15505
     - FA-lxplus-fad6ff57
     - FA-lxplus-fbdf6bc6
-    commit: ab57ac74
+    commit: e01a0f2f9
     paths:
     - analysis/finetune_mechanism/data/restart_steps.json
     - analysis/finetune_mechanism/data/restart_summary.json
@@ -37775,6 +37778,8 @@ entries:
     - run.py
     - sweep/sweep_config_ftmech_zng4g_scrflagsrch_b128.yaml
     - sweep/sweep_config_ftmech_zng4g_scrflagsrch_b2048.yaml
+    - sweep/sweep_config_ftmech_zng4g_scrpairsrch_b2048.yaml
+    - sweep/sweep_config_ftmech_zng4g_scrsoftsrch_b2048.yaml
     - tests/test_promote_final_model.py
   dead_ends:
   - tried: R4 one-flag-at-a-time at b2048 (scratch + input_soft_eps only / + input_pair_logs only at S's HPs, configs @30b23c29);
