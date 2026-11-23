@@ -41379,6 +41379,14 @@ entries:
       < P in the off-shellness line is fixed before the rest go. The expected effect within our own model on this catalog
       (shared standardization 1.72 vs dimensionless + coupling orders 1.05 on the 9 truly held-out processes of dan_per_process.json,
       a factor 1.6 resting on 9 processes) is above 1.38, so the read stays informative.'
+    passed_at: '2026-11-23T14:56:39+00:00'
+    reviewer: 'Re-check after FIX: config @7ca781941 changes only gpu_min_mem 40G->32G since f0590bf2f; rates from this setup''s
+      void trials (H100 0.27 s/step 4.6 h, V100-32GB 0.90 s/step 15.2 h, peak 16.0 GB, 22 h limit 1.4x), commit/mem consistent
+      (@7ca781941, 16G); check 17 reproduced (73 keys vs trial_1262, composition = c_composed.yaml, vs void trial_9000 only
+      dim_ref/width/bookkeeping); check 2 dan_per_process.json @9e02875a medians 1.72 vs 1.05 on 9 truly held out, 0.066 vs
+      0.046 on 91 relabels; check 3 v4_seed_spread 0.14 (x1.38) results.tex l.4485; check 5 searched Suprio, LLM, llm_compare,
+      llmcmp, catalog_daniel, qperp, dim_ref, emission scale, D520-D528, D234, D6. Note: plan step 6''s control command still
+      has --gpu-min-mem=40G, to be set to 32G before launch.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
