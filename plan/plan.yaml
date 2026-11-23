@@ -39139,6 +39139,9 @@ entries:
       relaunch the same command with --sites lxplus ccin2p3 --hours 14.6 as llmcmp_c_qperp_drive2. Also read the first trials''
       logs: hp0353 and hp1333 diverged at the end of warmup on the void config (steps 9101, 6298); a repeat at the repaired
       config is a result of the HPs (list apart), a clean pass says the defects caused it.'
+    7: Delete the void llmcmp_c_latest derived-input caches (feat_9efdd26e76677b4e008a84ca, feat_6d369c256d3d101e341c76aa)
+      under CC's and lxplus's amp_mmap_cache once part (a)'s CC trial FA-ccin2p3-c891c0c2, which names their parent key, has
+      ended (submit_guard cache rule); report GB freed and df
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -39272,6 +39275,11 @@ entries:
       if:
       - 'lxplus caches ready: relaunch the driver with both sites'
       - 'a prebuild breaks: read its log, fix, resubmit'
+    7:
+      feeds: CC disk (97%, 18 GB free) for part (c) and later waves
+      if:
+      - 'deleted: report the freed GB'
+      - 'a guard still refuses: report which and why'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
