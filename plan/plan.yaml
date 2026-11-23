@@ -41945,3 +41945,8 @@ entries:
       and analysis/agent_redesign.'
   step_waits:
     '1': 'detach:labllm_resume (pid 843198: the 33 remaining fix runs, 2 streams)'
+  findings:
+  - at: '2026-11-23T19:55:22+00:00'
+    text: 'Local batch width cut from 6 parallel opencode streams to 2 (D531): 6 streams of opencode sessions (~350-400 MB
+      each) plus other work exhausted the 7.6 GB WSL memory and killed the batch; resumed with 2 streams for the 33 fix runs
+      left (all 60 triage runs and 7 fix runs had graded records), cut-off runs redone from scratch'
