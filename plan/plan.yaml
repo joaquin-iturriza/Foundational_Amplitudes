@@ -39524,7 +39524,6 @@ entries:
   step_waits:
     '2': llmcmp_a_drive5
     '3': llmcmp_a_drive5
-    '5': FA-ccin2p3-677cddca and the DONE event of llmcmp_c_drive1/2 (DRIVE_DONE of llmcmp_c_latest)
   handoff:
     state: 'Part (a): 8-trial DyHPO search of muP LLoCa in the LLM-run conditions (config sweep/sweep_config_llmcmp_a_adamw_const.yaml
       @2a597c478), driven locally by llmcmp_a_drive5 (.venv-driver/bin/python sweep/drive.py --config sweep/sweep_config_llmcmp_a_adamw_const.yaml
