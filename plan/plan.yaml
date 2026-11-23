@@ -39488,7 +39488,6 @@ entries:
       paths.'
   step_waits:
     '2': llmcmp_a_drive5
-    '3': FA-lxplus-c2768355 FA-lxplus-a549a64e FA-ccin2p3-5f11ffd8 FA-ccin2p3-e9c3b80d
   handoff:
     state: 'Part (a) running: the 8-trial single-fidelity DyHPO search (waves 3+3+2) and the matched control, at the LLM run''s
       conditions, config sweep/sweep_config_llmcmp_a_adamw_const.yaml @ 2a597c478. Driven from the local machine by .venv-driver/bin/python
