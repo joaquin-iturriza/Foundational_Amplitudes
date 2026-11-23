@@ -39246,7 +39246,7 @@ entries:
     decision: D528
   owner:
     agent: ace1e6bc98c9610b5
-    state: working
+    state: closed
     since: '2026-11-22T23:42:05+00:00'
     state_at: '2026-11-23T11:01:50.047000+00:00'
     context: 183919
@@ -39491,40 +39491,46 @@ entries:
     '3': llmcmp_a_drive5
     '4': FA-lxplus-c2768355 FA-lxplus-a549a64e FA-ccin2p3-5f11ffd8 FA-ccin2p3-e9c3b80d
   handoff:
-    state: 'Part (a) running: the 8-trial single-fidelity DyHPO search (waves 3+3+2) and the matched control, at the LLM run''s
-      conditions, config sweep/sweep_config_llmcmp_a_adamw_const.yaml @ 2a597c478. Driven from the local machine by .venv-driver/bin/python
-      sweep/drive.py --config sweep/sweep_config_llmcmp_a_adamw_const.yaml --item llm_compare --sites lxplus ccin2p3 --mem
-      32G --cpus 4 --hours 14.6 --retry-failed 6cdb4904 (detached llmcmp_a_drive4; log ~/.local/share/ccorch/detached/20261122-163345_llmcmp_a_drive4.log;
-      state sweeps_local/llmcmp_a_adamw_const). Wave 1 training: FA-lxplus-51201734 (trial 0), FA-lxplus-4857eed5 (trial 1),
-      FA-ccin2p3-bd3e4211 (trial 2, retry of 6cdb4904, which died on the preprocess_per_dataset assert, fixed 2a597c478);
-      control FA-lxplus-cb9273f1 (lr 1e-3 constant, warmup 0, L2 0, EMA off; sweep/trial_job.sh --detached --hp-idx 9000).
-      Rates: A100-40GB 0.38-0.40 s/step (6.5-6.8 h), H100 NVL 0.23 (3.9 h); wall target 7.3 h; job limit 22 h. The driver
-      submits waves 2 and 3 itself once wave 1 is observed. Data: pools, stubs and caches done (lxplus caches 99c164da4365de9d7c017b75
-      train / b39fc80c8b10edbe4b07f6a0 heldout; CC opens the same keys through identity stubs, checked FA-ccin2p3-8d817d54/-dd63b9fb).
-      Next: (1) when the control or the first trial ends, the scoring check: tools/llm_score.py via scripts/job_llm_score.sh
-      on its best checkpoint, seen (catalog_daniel_train test pools) and held out (catalog_daniel_heldout, shared affine statistics),
-      also the truly held-out subset and the relabels apart; check the fitted a, b, c against 14.017/6.713/5.303 (design outcome).
-      (2) When the driver ends (DRIVE_DONE): score the best trial and the control, figure per design (pooled RMSE seen/held
-      out against LLM 0.321/0.721 and his LLoCa 0.506/0.953; per-process MSEs as dan_per_process.py), write-up. (3) Then parts
-      (b) (muP width toward 359.6M at the tuned HPs, D522) and (c) (latest setup, D523) need their designs. A running lxplus
-      job''s training log: site run lxplus FA --quote -- bash -c ''cd /afs/cern.ch/user/j/joiturri/Foundational_Amplitudes;
-      condor_tail -stderr -maxbytes 400000 <cluster>.0'' (site logs shows only the condor event log until the job ends).'
-    decisions: 'Joaquin''s: D528 (2026-11-22 ~15:4x UTC, ''just get it done''): no smoke run, the search approved at its cost;
-      no per-GPU smokes, no GPU pinning (2026-11-22 09:28/09:33); D51, D522-D527. Coordinator''s under D528: item estimate
-      216 GPU-h because the site gate charges each job its limit (22 h counted 24 h, 9 x 24); expected use ~35-60 GPU-h from
-      the measured rates. Mine: (i) job limit 22 h rather than lxplus''s 1 week (the gate refused 168 h per job); covers a
-      GPU up to ~2.9x slower than the A100. (ii) gpu_min_mem 32G in the config (design: whole GPUs >= 32 GB; peak VRAM measured
-      13 GB, so it could be lowered to widen lxplus slots). (iii) preprocess_per_dataset true (the only setting the affine_multiplicity_std
-      assert accepts; the cache key does not depend on it). (iv) The 3 CC debris train pools of dc_ssx_htamtap, dc_csx_wpzh,
-      dc_dux_wmzh overwritten with lxplus''s copies instead of deleted (submit_guard refuses rm under site data); CC also
-      keeps their 3 banner .txt in amp_data_cache. (v) site pick gets a per-site probe_timeout (lxplus 360 s in ~/.config/ccorch/sites.toml;
-      ~/.local/bin/site rank_sites; backup site.bak.pre-probe-timeout) because lxplus''s probe takes ~177 s.'
-    ruled_out: A smoke run before the search (D528); a 1-week job limit (gate); deleting the CC debris pools by hand (submit_guard);
-      everything ruled out in the earlier hand-offs.
-    running: llmcmp_a_drive4 (local driver), FA-lxplus-51201734, FA-lxplus-4857eed5, FA-ccin2p3-bd3e4211, FA-lxplus-cb9273f1
-    files: sweep/sweep_config_llmcmp_a_adamw_const.yaml, sweep/drive.py, sweep/trial_job.sh, tools/llm_score.py, scripts/job_llm_score.sh,
-      analysis/catalog_daniel/dan_per_process.py, tools/check_pp_pools.py, scripts/job_mmap_prebuild.sh, sweeps_local/llmcmp_a_adamw_const/
-    written: '2026-11-22T17:03:15+00:00'
+    state: 'Part (a): 8-trial DyHPO search of muP LLoCa in the LLM-run conditions (config sweep/sweep_config_llmcmp_a_adamw_const.yaml
+      @2a597c478), driven locally by llmcmp_a_drive5 (.venv-driver/bin/python sweep/drive.py --config sweep/sweep_config_llmcmp_a_adamw_const.yaml
+      --item llm_compare --sites lxplus ccin2p3 --mem 12G --cpus 4 --hours 14.6 --retry-failed f8f72269; log ~/.local/share/ccorch/detached/20261123-025605_llmcmp_a_drive5.log;
+      state sweeps_local/llmcmp_a_adamw_const). Wave 1 observed: val MSE of z 4.89e-4 (trial 0, lr 1.03e-3, EMA on), 9.41e-3
+      (lr 3.2e-3), 1.55e-2 (lr 8.9e-3): best at the window''s lower edge; if the search ends there, extend below 1e-3. Wave
+      2: FA-lxplus-00d9acc8 (lr 7.0e-3), FA-lxplus-0218e7f1 (3.6e-3), FA-ccin2p3-c891c0c2 (1.24e-3, EMA on). Matched control
+      FA-lxplus-cb9273f1 (lr 1e-3 const, no warmup/L2/EMA) scored (FA-lxplus-4bfd2286): pooled test RMSE of log|M|^2 seen
+      0.139 (LLM 0.321, his LLoCa 0.506), held out 1.042 (LLM 0.721, his LLoCa 0.953), relabels 0.237 (LLM 0.341), new 1.839
+      (LLM 1.193; 3 processes hold 56%); fitted constants 13.997/6.701/5.316 vs his 14.017/6.713/5.303. Figures: analysis/llm_compare/figs/control_score.png
+      (control_score.py @180e542f3) and control_heldout_per_process.png (Suprio''s held-out layout, heldout_per_process.py
+      @180e542f3; Joaquin rejected the first as not his plot; the control''s legend is ''our LLoCa, his optimizer settings'',
+      Joaquin: ''what do you mean that ours is untuned?''). Next (a): when the driver ends (DONE event of llmcmp_a_drive5),
+      score the best trial (REREAD=<run> site submit <site> FA scripts/job_llm_score.sh --no-sync ... -- runs/llmcmp_a_adamw_const/trial_<idx>;
+      JSONs via site run python print, scratchpad pattern), redraw both figures with it (--tag), write-up. Part (c) (D523,
+      launched in parallel per Joaquin 2026-11-23 ''you are also running our setup''s tuning, right?''): design passed 11:13
+      (third review, reviewer aac42155d97d4f982), config sweep/sweep_config_llmcmp_c_latest.yaml @c49743415; derived-inputs
+      prebuilds running: FA-lxplus-c2768355 (train), FA-lxplus-a549a64e (heldout), FA-ccin2p3-5f11ffd8 (train), FA-ccin2p3-e9c3b80d
+      (heldout), scripts/job_mmap_prebuild.sh @fcd38bdd0e with the config''s fixed_params as overrides (local=none + key=val;
+      generated from the yaml); each must log ''the cache ... is ready'' with derived inputs under the part (a) base keys.
+      Then (plan step 4, its full command there): launch the (c) driver detached (llmcmp_c_drive1, --mem 16G --cpus 4 --hours
+      14.6) and the matched control (trial_job.sh hp-idx 9000 at trial_1262''s HPs; check its exact flags against part (a)''s
+      control FA-lxplus-cb9273f1''s submission in site runs / runs.db), site pick first; first trial: s/step (estimate 0.83
+      A100), peak memory, off-shellness line N = P. Then part (b) (D522, width toward 359.6M at the tuned HPs) needs its design.'
+    decisions: 'Joaquin''s: D522-D528 (D528 ''just get it done'': no smoke, the search approved at its cost). Mine: (i) site
+      logs cmd_logs: condor_tail bounded by timeout 20 (~/.local/bin/site, backup scratchpad site.bak.condor_tail). (ii) part
+      (a) driver --mem 32G -> 12G (measured host RSS 5.6-6.6 GB; 32G made lxplus ask 11 CPUs, 0 slots, E8244). (iii) part
+      (c) settings: latest setup = catalog_v4 long best trial_1262''s config (emission-scale target, dimensionless inputs,
+      coupling orders, levers, llm4lhc diagrams, HETEROSC) + WSD 1/8 per the canonical table; softpair inputs not taken (still
+      under test); alphas_input kept; lr window c/3..3c around 3.65e-3; gpu_min_mem 40G (V100 would pass 22 h; ~28 GB GPU
+      expected), mem 16G, job limit 22 h; outcome margin 1.38 (catalog_v4 per-class seed spread). (iv) Item estimate 432 GPU-h
+      for (a)+(c) at the gate''s charge (D528). (v) The held-out split: relabels = his interp 96, new = his extrap 43 (docs:
+      96 relabel a training process, 43 none).'
+    ruled_out: A smoke run (D528); a 1-week job limit (gate); deleting CC debris pools by hand; 'untuned' as the control's
+      name (Joaquin); a redesigned score figure in place of Suprio's layout (Joaquin).
+    running: llmcmp_a_drive5 (local driver), FA-lxplus-00d9acc8, FA-lxplus-0218e7f1, FA-ccin2p3-c891c0c2 (part (a) wave 2);
+      FA-lxplus-c2768355, FA-lxplus-a549a64e, FA-ccin2p3-5f11ffd8, FA-ccin2p3-e9c3b80d (part (c) prebuilds)
+    files: sweep/sweep_config_llmcmp_a_adamw_const.yaml, sweep/sweep_config_llmcmp_c_latest.yaml, sweep/drive.py, tools/llm_score.py,
+      scripts/job_llm_score.sh, scripts/job_mmap_prebuild.sh, analysis/llm_compare/control_score.py, analysis/llm_compare/heldout_per_process.py,
+      analysis/llm_compare/data/, talks/progress_oct2026b/data/draft_pid_by_process.json (not committed), sweeps_local/llmcmp_a_adamw_const/
+    written: '2026-11-23T11:17:13+00:00'
   designs:
   - at: '2026-11-22T04:13:14+00:00'
     question: 'Part (a), D525: in the conditions of Suprio''s LLM pID run (D524, D526, D527: our catalog_daniel regeneration
