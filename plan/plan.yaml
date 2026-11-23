@@ -39906,6 +39906,18 @@ entries:
       finetune_mechanism''s 0e7efb0f were unreadable in time. submit_guard''s cache check did not refuse the CC rm, although
       2 running jobs named the parent key: the check fetches every active job''s log in sequence, takes over 120 s, and the
       hook timeout lets the command through. The fail-closed fix went to a mechanical-worker.'
+  - at: '2026-11-23T23:30:17+00:00'
+    text: '2026-11-24 00:30 CET (E8378 acked; coordinator: put lxplus back into part (c)): part (c) trials peak at MaxRSS
+      16.7 GB (sacct 64661587/8) under --mem 16G. The coordinator proposed --cpus 7 --mem 20G; I kept --cpus 4, because 7
+      CPUs exceed CC''s 5 per V100. lxplus raises a job to ceil(MB/3000) CPUs by itself (site''s CONDOR_MB_PER_CPU; site pick
+      already counts slots at that raised request), so --mem 20G --cpus 4 runs as 4 CPUs/20G on CC and 7 CPUs/21000 MB on
+      lxplus. drive.py had refused lxplus outright for any request above 3000 MB x cpus (b7a7b966f). Fixed at ce7e6754e: lxplus
+      is kept, capped at the slots site pick says fit now (the row''s slots_now), and the excess goes to the other site in
+      the plan, so a raised request never queues past the fitting slots (E6895, E8244). Tested in tests/test_drive_lxplus_mem.py:
+      capped, uncapped, no other site, not raised. Driver relaunched as llmcmp_c_qperp_drive4 (--sites lxplus ccin2p3 --mem
+      20G --cpus 4 --hours 14.6; log ~/.local/share/ccorch/detached/20261124-003001_llmcmp_c_qperp_drive4.log). Host memory
+      20G replaces the design''s 16G, a cluster resource, not a setup change. lxplus is unreachable at 00:30 (its ssh master
+      needs Joaquin''s 2FA, cluster_up lxplus); until he opens it, wave 2 goes to CC.'
   step_waits:
     '2': FA-ccin2p3-b135e7db FA-ccin2p3-f3e29e87
     '3': llmcmp_a_drive5
