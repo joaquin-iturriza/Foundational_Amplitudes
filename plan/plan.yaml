@@ -39131,18 +39131,14 @@ entries:
     5: 'Part (c) readout: when llmcmp_c_qperp''s driver writes DRIVE_DONE and its control ends, score (c)''s best trial and
       the control (REREAD=<run> scripts/job_llm_score.sh), read per set (seen, held out, relabels, new) pooled RMSE and median
       per-process MSE against (a)''s best with the 1.38 margin, figure in Suprio''s layout; write-up'
-    6: 'Part (c) relaunch at the repaired config (sweep/sweep_config_llmcmp_c_latest.yaml @f0590bf2f, sweep llmcmp_c_qperp:
-      dim_ref qperp and llm4lhc width 64 as trial_1262; llmcmp_c_latest void). When the qperp derived-inputs prebuilds log
-      ''the cache ... is ready (derived inputs ...)'' (CC FA-ccin2p3-beef9c14 train, -68a3b13f heldout; lxplus FA-lxplus-413c836c
-      train, -5248270b heldout; overrides scratchpad c_overrides2.txt): launch .venv-driver/bin/python sweep/drive.py --config
-      sweep/sweep_config_llmcmp_c_latest.yaml --item llm_compare --sites lxplus ccin2p3 --mem 16G --cpus 4 --hours 14.6 via
-      tools/detach.py --entry llm_compare --name llmcmp_c_qperp_drive1 (only the sites whose caches are ready), and the control
-      through site pick: site submit <site> FA sweep/trial_job.sh --item llm_compare --est-gpu-hours 15 --hdr=--mem=16G --hdr=--cpus-per-task=4
-      --hdr=--time=22:00:00 --hdr=--gpu-min-mem=40G --hdr=--job-name=llmcmp_c_control -- --sweep-config sweep/sweep_config_llmcmp_c_latest.yaml
-      --detached --trial-idx 9000 --hp-idx 9000 --t-steps 60840 --hp training.lr=0.003649139 --hp training.muon_weight_decay=0.04733132
-      --hp training.regularization_lambda=9.114591e-08 --hp training.cosanneal_warmup_frac=0.1800024 --hp training.cosanneal_eta_min=1.376875e-08
-      --hp ema=false --hp training.ema_decay=0.9597525. Then check the first trials for non-finite steps after warmup (the
-      void sweep''s lr 6.0e-3 and 8.6e-3 trials blew up at peak lr).'
+    6: 'Part (c) llmcmp_c_qperp running (config sweep/sweep_config_llmcmp_c_latest.yaml @7ca781941, design passed 2026-11-23T14:56;
+      deployed b9be0de29): driver llmcmp_c_qperp_drive1 on CC only (log ~/.local/share/ccorch/detached/20261123-155710_llmcmp_c_qperp_drive1.log,
+      state sweeps_local/llmcmp_c_qperp), wave 1 FA-ccin2p3-29ce8950 (hp1860 lr 1.60e-3), -b25b3d51 (hp0353 lr 8.56e-3), -2d66e301
+      (hp1333 lr 6.02e-3), control FA-ccin2p3-d34535b0. When lxplus''s qperp prebuilds FA-lxplus-413c836c (train) and -5248270b
+      (heldout) log ''the cache ... is ready (derived inputs ...)'': stop the driver (wrapper pid first, then python) and
+      relaunch the same command with --sites lxplus ccin2p3 --hours 14.6 as llmcmp_c_qperp_drive2. Also read the first trials''
+      logs: hp0353 and hp1333 diverged at the end of warmup on the void config (steps 9101, 6298); a repeat at the repaired
+      config is a result of the HPs (list apart), a clean pass says the defects caused it.'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -39274,7 +39270,7 @@ entries:
     6:
       feeds: 'part (c): our latest setup against part (a), the LLM and his LLoCa'
       if:
-      - 'caches ready: launch driver + control'
+      - 'lxplus caches ready: relaunch the driver with both sites'
       - 'a prebuild breaks: read its log, fix, resubmit'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
