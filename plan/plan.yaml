@@ -39840,6 +39840,25 @@ entries:
       python) and relaunched on --sites lxplus ccin2p3 (same command otherwise) as llmcmp_c_qperp_drive2 (log ~/.local/share/ccorch/detached/20261123-163617_llmcmp_c_qperp_drive2.log).
       Wave 1 and the control on CC V100-32GB, each logged ''offshell_per_event ON (memmap)''. Part (a) trial 5 FA-ccin2p3-c891c0c2
       still RUNNING (V100, started ~03:00), so the void-cache deletion (step 7) waits on it.'
+  - at: '2026-11-23T17:19:47+00:00'
+    text: '2026-11-23 ~19:05 CET (E8306): part (c) trial 2 FA-ccin2p3-2d66e301 (repaired qperp config @7ca781941; hp1333:
+      lr 6.02e-3, Muon wd 0.0145, L2 8.4e-7, warmup 0.0897 = 5457 steps, EMA on 0.968; V100-PCIE-32GB) diverged again: ''Training
+      diverged: 50 consecutive non-finite-gradient steps at step 8183''. First inf gradient around step 7900, then isolated
+      skips about 40 steps apart, then continuous. That is about 2,700 steps into the peak-lr plateau (void config: step 6298).
+      val_loss_no_reg -2.603 at step 3042 and -2.980 at 6084 (best, EMA). Listed apart at its best checkpoint. The driver
+      recorded it FAILED with its penalty and the search continues. Since the repaired config reproduces it, the void config''s
+      two defects (shat, width 256) did not cause it. Against the latest pretraining''s search (cov_v4_long_hpo8_cc_68224:
+      Muon, cosine, batch 16,384, 68,224 steps): its lr window [4.09e-4, 3.685e-3] never reached 6e-3, and none of its trials
+      blew up (docs/results.tex l.~2611). So no measured Muon run at long horizon exists at this lr. Nearest priors: the catalog_v3
+      Muon sign-head search blew up only at lr >= 8.96e-3 (4264 steps; l.~6682), and dancat_het_pre (AdamW cosine, Daniel''s
+      catalog) blew up once at 8.8e-3 (l.~7736). Differences that could matter: (1) WSD holding peak lr does not explain the
+      onset, because at step 8183 trial_1262''s cosine would still be at 0.5(1+cos(pi*2726/55383)) = 99.4% of peak; it matters
+      only for later steps. (2) Batch 24,576 against 16,384: Muon''s orthogonalized update has a fixed size, and the larger
+      batch lowers gradient noise, so a larger batch is not an expected destabilizer. (3) The data: Daniel''s catalog with
+      alpha_s varying per event, against catalog_v4. No defect found: the config equals trial_1262 key by key except the listed
+      design differences (check 17). Reading: this setup is unstable at lr 6.02e-3 with Muon. hp0353 (FA-ccin2p3-b25b3d51,
+      lr 8.56e-3, warmup 9055) has been skipping non-finite steps since 18:12, near the end of its warmup. The control (lr
+      3.65e-3 = trial_1262''s) reaches peak lr only at step 10951 and has not yet been tested there.'
   step_waits:
     '2': llmcmp_a_drive5
     '3': llmcmp_a_drive5
