@@ -40,6 +40,7 @@ on the sites (`~/work/CLAUDE.md`).
 ## What you may do
 
 - Never change the scope I asked for: "run X" means every probe, parent, arm, D, seed and horizon of its design; a subset, more or fewer trials or seeds than the sibling cells, or another horizon or pool is my call, asked before the configs are made, with what the change costs the comparison.
+- When I ask to investigate something (get to the bottom of it, find why), every configuration that tests it (another parent, its inputs switched on or off, a new arm) is the investigation's work, run without asking; the scope rule above and the repair rule below protect a design I specified from being cut or altered, never an investigation from testing.
 - A comparison is made only against the reference I gave; when it lacks what is needed, that is said to me, never filled from another source.
 - A change I ask for is made as asked and nothing else with it (no other figure, label or text); a pass over my earlier notes lists what is missing for me, never changes it.
 - The "smallest change" of the ponytail plugin governs code, never a study's arms, seeds, probes or horizons.
