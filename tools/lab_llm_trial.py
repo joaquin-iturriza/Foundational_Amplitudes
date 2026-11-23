@@ -281,6 +281,7 @@ def sonnet_timed():
     zz_trial_<task>_sonnettime, model_trial brief and check): first-attempt pass, wall time (first to last call
     of its transcript), tokens (input + output + cache read + cache write, one count per API message), $."""
     from lab_llm_report import transcript
+    mt.ROOT = MAIN                                  # the trial worktrees hang off the main checkout
     ids = json.load(open(os.path.join(OUT, "sonnet_timed.json")))
     for task, agent in ids.items():
         sec, tok = transcript(agent)

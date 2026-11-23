@@ -1,0 +1,9 @@
+{
+ "commit": "9702a254",
+ "fix": {
+  "<rc>": true
+ },
+ "targets": [
+  "<rc>"
+ ]
+}
