@@ -41978,7 +41978,7 @@ entries:
       opencode, lab llm, lab model, model trial, lookup trial, mechanical watch in docs/results.tex, the plan, site decisions
       and analysis/agent_redesign.'
   step_waits:
-    '1': 'detach:labllm_resume (pid 843198: the 33 remaining fix runs, 2 streams)'
+    '1': detach:labllm_resume (33 lab fix runs, 2 streams) and the 10 timed Sonnet mechanical-worker fix runs (agents in analysis/lab_llm_trial/sonnet_timed.json)
   findings:
   - at: '2026-11-23T19:55:22+00:00'
     text: 'Local batch width cut from 6 parallel opencode streams to 2 (D531): 6 streams of opencode sessions (~350-400 MB
