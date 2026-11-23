@@ -39023,6 +39023,57 @@ entries:
       carries the whole cost, redundant) unassigned: report it as its own branch; the two new configs are uncommitted and
       drive.py refuses uncommitted configs, commit before launch; trial 3 (hp849) did start before removal, no result recorded,
       retry is right.'
+  - at: '2026-11-23T15:27:51+00:00'
+    question: 'D519/D520, Joaquin 2026-11-23 (via the coordinator: the parent retrain is part of the investigation, sent in
+      the same go as the one-setting searches and the b128 search, which run already under the design passed today): does
+      the W parent retrained WITHOUT its two input settings (input_soft_eps, input_pair_logs), fine-tuned on q q~ -> Z+4g
+      at 1e4 events, end at or below scratch, i.e. is the fine-tune''s deficit against scratch (F/S 1.56 at b2048, 1.54 at
+      b128) the settings it inherits?'
+    prior: 'This entry: F (fine-tune of the W parent FA-ccin2p3-47e14eae with both settings; 16-trial searches, chosen trial
+      seeds 42-44) b2048 0.097/0.100/0.097, b128 0.0258/0.0306/0.0346 (mean 0.0300); S (scratch, no settings) b2048 0.058/0.067/0.064,
+      b128 0.0180-0.0214 (mean 0.0197); Sf* (scratch with both, searched) b2048 0.122/0.140/0.165: settings'' share of the
+      gap 1.84 (b2048); F/Sf* 0.69, so on the same architecture pretraining helps 1.45x. Ruled out: lr window (H3), restart
+      shock and sigma head (H4, Sg), parent precision (H6), fine-tune path bug (H7). Catalog highmult grid (results.tex l.15134-15160):
+      pretraining gain on u u~ -> Z+4g ~0 at D=1e4 for every parent (finale, +W, synthetic), all trained with the settings
+      (D392). pretrain_data_saving null-parent 2x2 on t t~ does not separate the settings. No parent of this recipe without
+      the settings is on record (searched results.tex, plan, site decisions for input_soft_eps, input_pair_logs, softpair,
+      dsave_parent_finale).'
+    measure: 'Best val MSE(log|M|^2) (min val mu-MSE x std^2, std 1.11978 checked per run) of the new fine-tune Fn''s chosen
+      trial (seed 42) and seeds 43, 44, at b2048 and b128; ratios Fn/S and Fn/F with 10-90% ranges over the 9 seed pairings,
+      beside F/S 1.56/1.54. Parent check: the new parent''s per-process final val MSE against the current parent''s (FA-ccin2p3-47e14eae)
+      over the 28 processes (geometric mean ratio, count inside 0.43-2.5x). Figures: per-seed best of S, Sf*, F, Fn on a log
+      axis per batch; Fn''s and F''s per-trial best against lr; val curves per seed (as zng4g_r1_trainval).'
+    check: 'The settings move the measure on Z+4g scratch 2.26x searched (Sf* vs S, log 0.81) against S''s seed spread log
+      0.14, and F/S is 1.56x with F''s seeds within 1.03x: a fine-tune without the settings that lost their cost would move
+      by up to F/S x (Sf*/F)... at least the 1.56x gap, 4x S''s seed spread. Parent: on its 28 processes the settings were
+      adopted for a gain on kit u u~ g (each ~0.2 dex, both 0.88 dex), so the parent''s own val may move; that is read, not
+      assumed.'
+    fixed: 'Parent: scripts/job_datasaving_parent.sh finale flags=off lr=1.89e-3 tag=zng_uq_w_noset_lr1p89e-3 @2c21e65d3 =
+      the current W parent''s command (finale case: transfer_finale.yaml 28 processes, every train event, 64000 steps, WSD
+      cooldown 1/8, lr 1.89e-3, internal_mass_pdgs [23,6,25,24], trial 1262 base, seed 42, float32, pre-cooldown snapshot
+      at 56000) with the two settings off (++model.input_soft_eps=0.0 ++model.input_pair_logs=0) and nothing else; on CC (pools
+      there; same GPU type V100 as the original if placed so), limit 12 h (7.97 h measured x 1.3 + 1 h). A 50-step smoke (iters=50,
+      D395: flags=off is a new launch argument) goes at the same time and the full run is cancelled if it fails. Fine-tunes:
+      sweep/sweep_config_ftmech_zng4g_ftnoset_b{2048,128}.yaml @2c21e65d3 = the current fine-tune configs with pretrained_path
+      the new parent''s model_run0_best.pt.gz, the two settings 0 (as scratch), and the first-16-trial search of F (16 trials,
+      waves 3,3,2,3,3,2, DyHPO seed 42, lr windows [3.1e-3, 4.1e-2] b2048 and [2.7e-4, 1.1e-2] b128, as F''s chosen trials
+      were searched); 1953/31250 steps, 1e4 events, float64, Muon/WSD, target_stats own, offshell_stats parent, lr_scale 1,
+      layer_decay 1. Seeds 43/44 of each chosen trial by run_fixed_hp.py via job_seed_batch.sh, as F''s. The parent''s run
+      dir is copied to lxplus (site copy) before the fine-tune drive, so trials go to both sites.'
+    control: F (fine-tune of the parent with both settings, same searches, seeds 42-44) and S (scratch, no settings, seeds
+      42-44) at each batch, already run; Sf* (scratch with both) for the share. The parent's control is the current W parent
+      FA-ccin2p3-47e14eae (same command, settings on).
+    seeds: 'Parent seed 42 (as the current one). Fine-tune search trials seed 42; seeds 43, 44 of each chosen trial. Cost:
+      parent 8.0 + smoke 0.1; b2048 16 x 0.35 + 2 x 0.35 = 6.3; b128 16 x 1.06 + 2 x 1.06 = 19.1; total 33.5 GPU-h (D520:
+      GPU-h not limiting for this work if the design is reasonable). Wall: parent ~8.2 h, then fine-tunes b2048 ~2.5 h and
+      b128 ~7.5 h with seeds, in parallel: ~16 h. The fine-tunes wait only on the parent''s checkpoint.'
+    outcome: 'Yes (the inherited settings are the deficit): Fn/S <= 1.19 at both batches (within S''s seed spread; Fn at or
+      below scratch) -> the template parent''s settings cost Z+ng fine-tunes; reported to Joaquin with the figure, the parent
+      choice for Z+ng is his. Partial: Fn below F (Fn/F <= 0.84, beyond F''s seed spread) but Fn/S > 1.19 -> the settings
+      carry part of it; the rest is a pretraining cost not explained by H3/H4/H6/H7 (H2 dilution is then read at lower D,
+      next design mine). No: Fn/F > 0.84 -> removing the settings from the parent does not remove the deficit, contradicting
+      the scratch-side share; next: read the parent''s own Z+4g-adjacent val and the step-0 start. A parent whose val blows
+      up, or any arm at a val spike > 10x best-so-far, listed apart (D398).'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
