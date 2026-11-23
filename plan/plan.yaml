@@ -39826,6 +39826,13 @@ entries:
       (about 3 h of V100 and 2 h of H100 on the wrong target). The derived-inputs cache key includes dim_ref: qperp prebuilds
       CC FA-ccin2p3-beef9c14 (train) / -68a3b13f (heldout), lxplus FA-lxplus-413c836c / -5248270b. Not added: a check that
       a run declared to copy another run''s setup matches its config.yaml.'
+  - at: '2026-11-23T15:39:48+00:00'
+    text: '2026-11-23 ~17:36 CET (E8283): lxplus qperp prebuilds FA-lxplus-413c836c (train, 524 s) and -5248270b (heldout,
+      47 s) logged ''the cache ... is ready (derived inputs ...)'' + RUN_DONE with feat_0e5f346a99a02389ad85b984 / feat_cc35c42b8d1385655f72ae3d,
+      the same hashes as CC''s FA-ccin2p3-beef9c14 / -68a3b13f. Part (c) driver llmcmp_c_qperp_drive1 stopped (wrapper, then
+      python) and relaunched on --sites lxplus ccin2p3 (same command otherwise) as llmcmp_c_qperp_drive2 (log ~/.local/share/ccorch/detached/20261123-163617_llmcmp_c_qperp_drive2.log).
+      Wave 1 and the control on CC V100-32GB, each logged ''offshell_per_event ON (memmap)''. Part (a) trial 5 FA-ccin2p3-c891c0c2
+      still RUNNING (V100, started ~03:00), so the void-cache deletion (step 7) waits on it.'
   step_waits:
     '2': llmcmp_a_drive5
     '3': llmcmp_a_drive5
