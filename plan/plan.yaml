@@ -39160,6 +39160,16 @@ entries:
       from parent-to-parent spread with one parent seed -> reported as no effect resolved; the settings do not explain the
       fine-tune''s gap, against the scratch-side share; next: the parent''s own val and the step-0 start. A parent whose val
       blows up, or any arm at a val spike > 10x best-so-far, listed apart (D398).'
+    passed_at: '2026-11-23T15:32:55+00:00'
+    reviewer: 'Re-check after FIX: prior now corrected (highmult grid 2026-10-11 predates the settings added 06b9353aa 2026-11-11;
+      no-settings parents -0.11/+0.11/-0.04 dex at 1e4, used in the yes branch with the setup differences stated); parent
+      carries ++training.allow_tf32=false (original 47e14eae ran strict fp32 on V100), composed-config diff listed key by
+      key in fixed (two settings, allow_tf32, snapshot save, tag/runtime keys, resolved recipe lists); partial bar moved to
+      Fn/F<0.79, outside the 0.79-0.87 parent-swap spread, [0.79,1.19] read as unresolved. Check 2: settings move Z+4g scratch
+      2.26x vs S seed spread log 0.14, F/S 1.56; check 3: seeds 42-44 and 16 trials as F/S siblings, F b2048 seeds within
+      1.03x. Fine-tune configs differ from F''s only in parent path, the two settings and F''s first-16 window/waves. Searched:
+      noset, flags=off, parent without, soft_eps, pair_log, Z+4g, Z+ng, lowd_ft in results.tex, plan, site decisions; git
+      log -S input_soft_eps.'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
