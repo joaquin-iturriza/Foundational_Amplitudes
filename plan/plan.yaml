@@ -42002,6 +42002,12 @@ entries:
     text: 'Local batch width cut from 6 parallel opencode streams to 2 (D531): 6 streams of opencode sessions (~350-400 MB
       each) plus other work exhausted the 7.6 GB WSL memory and killed the batch; resumed with 2 streams for the 33 fix runs
       left (all 60 triage runs and 7 fix runs had graded records), cut-off runs redone from scratch'
+  - at: '2026-11-23T22:48:39+00:00'
+    text: 'Grader defect: the check baselines of zsrole and ordsrc (analysis/agent_redesign/model_trial_baseline) were missing
+      in every checkout, so model_trial.verdict crashed and every lab run of those two tasks was graded failed and fed a traceback
+      as its rework prompt. Baselines regenerated with model_trial validate (both valid, one target each) and committed in
+      the worktree; the 8 lab runs of zsrole and ordsrc are rerun from scratch after the resume batch ends (2 sessions at
+      a time).'
   step_why:
     2:
       feeds: whether the lab models are slower per task than our subagents, measured on the same tasks
