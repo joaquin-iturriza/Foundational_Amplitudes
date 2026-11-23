@@ -39128,6 +39128,12 @@ entries:
     units: null
     start: '2026-11-23T15:19:14+00:00'
     at: '2026-11-23T15:19:14+00:00'
+  - batch: scrflagsrch_b128_resume
+    wall_h: 6.0
+    jobs: 13
+    units: null
+    start: '2026-11-23T15:19:20+00:00'
+    at: '2026-11-23T15:19:20+00:00'
   step_waits: {}
   handoff:
     state: '2026-11-22 ~13:40 UTC. The Z+4g deficit is explained at batch 2048: the fine-tune inherits the W parent''s two
