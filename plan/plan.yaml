@@ -39490,6 +39490,18 @@ entries:
       of the PNG) not held; the 2026-11 draft PDF (~/drafts/fm_amplitudes_2026-11/figs/cond/mse_per_process_two_rows.pdf)
       is another version (one-hot, in-out, in-interm-out, edge-list, each with/without pID), its points extractable from vector
       paths.'
+  - at: '2026-11-23T11:55:40+00:00'
+    text: '2026-11-23 ~13:00 CET (E8253/E8254/E8256): CC derived-inputs prebuilds FA-ccin2p3-5f11ffd8 (train, feat_9efdd26e76677b4e008a84ca
+      under key 99c164da4365de9d7c017b75) and -e9c3b80d (heldout, feat_6d369c256d3d101e341c76aa under b39fc80c8b10edbe4b07f6a0)
+      logged ''the cache ... is ready (derived inputs ...)'' + RUN_DONE. lxplus FA-lxplus-c2768355 and -a549a64e never built:
+      both died at _init_directory, ''runs/zz_mmap_prebuild/prebuild_83 alredy exists'' (HTCondor has no SLURM_JOB_ID, the
+      PID fallback repeats). Fix scripts/job_mmap_prebuild.sh @830f8c0a4: run name falls back to $(date +%s)_$RANDOM as job_config_smoke.sh
+      does; reruns FA-lxplus-3224ba9c (train), FA-lxplus-d96a97fa (heldout). Part (c) launched on CC: driver llmcmp_c_drive1
+      (sweep/drive.py --config sweep/sweep_config_llmcmp_c_latest.yaml @c49743415 --sites ccin2p3 --mem 16G --cpus 4 --hours
+      14.6), wave 1 FA-ccin2p3-0650cdca (hp1860 lr 1.60e-3 EMA on), -e0a5ffe2 (hp0353 lr 8.56e-3), -40a19790 (hp1333 lr 6.02e-3
+      EMA on); matched control FA-ccin2p3-677cddca (trial_job.sh hp-idx 9000 at trial_1262''s HPs; flags as part (a)''s control
+      FA-lxplus-cb9273f1 with the design''s mem 16G and gpu_min_mem 40G; deployed 5a842c456, config unchanged since c49743415).
+      gpu_min_mem 40G on CC means H100 only. CC free disk 21 GB at submission.'
   step_waits:
     '2': llmcmp_a_drive5
     '3': llmcmp_a_drive5
