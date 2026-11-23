@@ -37980,12 +37980,10 @@ entries:
     withdrawn_why: D519/D520 asked for an investigation; a parent retrained without the two input settings is one of its test
       configurations (CLAUDE.md 72bef3992), run as part of it
   owner:
-    agent: aa74f65831354dd19
-    state: closed
-    since: '2026-11-23T15:11:08+00:00'
-    state_at: '2026-11-23T21:54:32.464000+00:00'
-    context: 220178
-    context_at: '2026-11-23T20:24:06+00:00'
+    agent: abd0ea89f821ee382
+    state: working
+    since: '2026-11-23T22:35:06+00:00'
+    state_at: '2026-11-23T22:35:06+00:00'
   findings:
   - at: '2026-11-20T03:05:23+00:00'
     text: '2026-11-20 step 1 read (restart_steps.py, plot_restart.py @a5f6c7b3; figs restart_steps, restart_steps_zng, restart_headstart):
