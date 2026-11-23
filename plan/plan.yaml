@@ -39329,7 +39329,6 @@ entries:
     '3': 'detached drive ftmech_onesetting_drive2 (searches ftmech_zng4g_scrsoftsrch_b2048, ftmech_zng4g_scrpairsrch_b2048)
       ends: its DONE event'
     '4': 'detached drive ftmech_flagsb128_drive4 (search ftmech_zng4g_scrflagsrch_b128) ends: its DONE event'
-    '5': FA-lxplus-2ae9a2c9
   handoff:
     state: '2026-11-22 ~13:40 UTC. The Z+4g deficit is explained at batch 2048: the fine-tune inherits the W parent''s two
       input flags (input_soft_eps 1e-8, input_pair_logs 7), which make the model itself worse on Z+4g. Searched scratch+flags
