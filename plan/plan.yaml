@@ -40592,6 +40592,80 @@ entries:
       alphas_input, identity stub; plan dan_zeroshot_v4; decisions D484-D527. Search space is the template''s coupled space,
       8 trials in waves 3+3+2; MSE and the shared affine target follow D524; no GPU pinning and no per-model smokes (Joaquin
       09:28/09:33).'
+  - at: '2026-11-23T11:05:08+00:00'
+    question: 'Part (c), D523 (''our latest setup with the modified target, inputs, optimizer, scheduler, and so on''), run
+      in parallel with part (a) (Joaquin 2026-11-23: ''you are also running our setup''s tuning, right?''): in the same LLM-run
+      conditions as part (a) (catalog_daniel''s 1352 training processes, first 55,296 train events each, val 1e4, 60,840 steps
+      of 24,576 mixed-process events, validation every 3042 steps, his test metric), how far does a DyHPO-tuned muP LLoCa
+      in our latest setup get in pooled test RMSE of log|M|^2, seen (1352) and held out (139; the 96 relabels and the 43 new
+      apart), against part (a)''s tuned LLoCa, the LLM (0.321 / 0.721) and his LLoCa (0.506 / 0.953)? Config sweep/sweep_config_llmcmp_c_latest.yaml
+      @17d017684. Every setting that differs from (a) (sweep_config_llmcmp_a_adamw_const.yaml @2a597c478): target = emission-scale
+      factor (data.target_physics_factor, target_physics_dim_only, target_physics_orders true, target_physics_s0 1.0) with
+      one shared standardization, affine_multiplicity_std false (a: true, his z form); data.dimensionless_inputs true (a:
+      false); data.drop_coupling_powers false, coupling orders as inputs (a: true); data.coupling_scalars, internal_mass_scalars,
+      offshell_per_event true with internal_mass_pdgs [23,6,25,24] (D506) (a: all false); model.use_diagrams true, diagram_encoder_impl
+      llm4lhc (a: false); training.loss HETEROSC with its 250-step sigma stage (config default) (a: MSE); val_aggregation
+      the config default geometric_mean (a: mean); training.optimizer MuonAdamW (a: AdamW); WSD cooldown 0.125 (a: 0, constant
+      lr); search space adds training.muon_weight_decay [1e-3, 0.3] and training.cosanneal_eta_min [1e-10, 1e-7] (template),
+      lr window [1.217e-3, 1.095e-2] (a: [1e-3, 9e-3]); cluster mem 12G (a: 32G, E8244). Same as (a): recipe, train_subsample
+      55296, eval_subsample 10000, alphas_input true, use_PIDs false, width 8 heads x 8 blocks, particle_encoder_hidden 0,
+      float32 + tf32, batch 24,576, eval batch 16,384, 60,840 steps, validate every 3042, L2, seed 42, loss_aggregation mean,
+      8 trials waves 3+3+2, gpu_min_mem 32G, no GPU model pinned. Not taken from the latest setup: the softpair inputs (model.input_pair_logs
+      / input_soft_eps, still under test in finetune_mechanism, not in the canonical table). Launch path: (1) CPU memmap prebuild
+      of the derived inputs (target factor, off-shellness masks) on lxplus and on CC (scripts/job_mmap_prebuild.sh with the
+      config''s fixed_params as overrides; the base arrays are the part (a) caches, keys 99c164da4365de9d7c017b75 train /
+      b39fc80c8b10edbe4b07f6a0 heldout, base_key_doc depends only on pools and layout; diagram sidecars present for all 1491
+      dc_ processes on both sites), its log must say ''the cache ... is ready (derived inputs ...)'' on each site; the heldout
+      recipe''s derived inputs prebuilt likewise for scoring; (2) then the 8-trial single-fidelity DyHPO search via sweep/drive.py
+      --sites lxplus ccin2p3 --mem 12G --cpus 4 --hours 14.6 (job limit 22 h, as (a)), and the matched control via sweep/trial_job.sh
+      --detached --hp-idx 9000; no separate smoke (D528 ''I don''t care if you run that test or not, just get it done''):
+      the first trials run every stage (train, sigma stage, test, plots) and their logs give s/step; (3) scoring with tools/llm_score.py
+      via scripts/job_llm_score.sh on the best trial and the control. Cost (estimate, not measured on this setup): (a) measured
+      0.39 s/step A100 at batch 24,576 without diagrams; dancat_het_pre (diagrams, HETEROSC, same catalog) 37 GPU-h for 8
+      x 32k steps at 16,384 on V100; assuming ~1.4x (a)''s step for diagrams + levers: ~0.55 s/step A100, ~9 h per run, 9
+      runs ~60-90 GPU-h; the gate charges 9 x 24 = 216 GPU-h, item estimate raised to 432 for (a) + (c); D528 approves the
+      work at its cost.'
+    prior: 'Searched docs/results.tex, plan, site decisions for: latest setup, emission-scale target, dimensionless, catalog_daniel,
+      DlessInOrd, HETEROSC, MuonAdamW, llm_compare. Part (a) this entry: matched control (AdamW, lr 1e-3 const, his z, MSE)
+      pooled test RMSE seen 0.139, held out 1.042 (relabels 0.237, new 1.839) against LLM 0.321/0.721 (relabels 0.341, new
+      1.193); wave 1 val MSE of z 4.89e-4 (lr 1.03e-3) to 1.55e-2 (8.9e-3), lowest lr best. On Daniel''s catalog: dimensionless
+      + coupling orders arm (catalog_short_DlessInOrd_sigstage, 5 epochs of 1e4, dan_per_process.py @9e02875a) median per-process
+      MSE of log|M|^2 0.046 vs the LLM''s 0.080 on the relabels and 1.05 vs 2.24 on the truly held out (other events, median,
+      2000 val events); docs/results.tex ''The emission scales bought the 2->4 level on Daniel''s catalog (52 to 2.2)''. dancat_het_pre
+      (D59, HETEROSC, diagrams, per-process std, AdamW cosine, 32k steps): best at lr 8.9e-3 at the window top; D83 shared-standardization
+      pretraining blew up at step 8734 at lr 8.9e-3 with cosine. Latest pretraining (cov_v4_long_hpo8_cc_68224 trial_1262,
+      catalog_v4, 68,224 steps at 16,384, MuonAdamW, HETEROSC, emission-scale target, diagrams + off-shellness): lr 3.649e-3,
+      Muon wd 0.0473, L2 9.1e-8, warmup 0.18, eta_min 1.38e-8, EMA off, val NLL -4.201. No earlier run of the latest setup
+      in the LLM-run conditions.'
+    measure: 'Ranking (DyHPO objective): val_loss_no_reg of the HETEROSC run (Gaussian NLL of the target, aggregated as the
+      run''s val_aggregation) at the best checkpoint (once per 3042 steps). Reported, as (a): pooled test RMSE of log|M|^2
+      = sqrt(mean over test events of (mu - true)^2) in log|M|^2 units (tools/llm_score.py: the prediction mu of the emission-scale
+      target plus the event''s known factor; the error in log|M|^2 equals the error of the target times its sigma), seen 1352
+      x 1e4 test events, held out 139 x 1e4 with the shared statistics (no per-process map), relabels and new apart, per-process
+      MSE figure in Suprio''s layout (analysis/llm_compare/heldout_per_process.py).'
+    check: 'The target change moves the held-out read on this catalog: docs/results.tex, the emission scales bought the 2->4
+      level on Daniel''s catalog from 52 to 2.2 (par. The emission scales in training); dan_per_process.json @9e02875a: dimensionless
+      + coupling orders 1.05 vs the LLM''s 2.24 median MSE on the truly held out, 0.046 vs 0.080 on relabels, while part (a)''s
+      control in his target is above the LLM on the new set (1.839 vs 1.193 pooled). So the measure moves with the tested
+      change on existing data.'
+    fixed: 'Data (catalog_daniel_train 1352 recipes, first 55,296 train rows, val 1e4, test 1e4 per process, seed 42), steps
+      60,840, batch 24,576, validation every 3042, width 8 heads x 8 blocks, muP LLoCa, alphas_input, use_PIDs false, float32,
+      the latest setup''s target/inputs/loss/optimizer/scheduler listed in the question; searched: lr [1.217e-3, 1.095e-2]
+      log (c/3..3c around 3.65e-3, the latest pretraining''s Muon best at 68,224 steps), muon_weight_decay [1e-3, 0.3], L2
+      [1e-10, 1e-6], warmup [0.05, 0.2], eta_min [1e-10, 1e-7], EMA {off,on} x decay [0.9, 0.999]; all in sweep/sweep_config_llmcmp_c_latest.yaml.'
+    control: 'Matched internal control: one run of the same fixed setup at the latest pretraining''s searched HPs (trial_1262:
+      lr 3.649e-3, muon_weight_decay 0.0473, L2 9.114e-8, warmup 0.180, eta_min 1.377e-8, EMA off), sweep/trial_job.sh --detached
+      --hp-idx 9000, so tuning in this setup is measured against the setup''s own defaults; across setups (c) is read against
+      part (a)''s best trial and its control on the same data, events, steps and metric, and against the LLM and his LLoCa
+      (his events, said with every comparison).'
+    seeds: One seed (42) per trial and for the control, as part (a) and his seed 0. No measured seed spread of this aggregate
+      exists (part (a)'s seed-43 pair was never approved); a second seed is Joaquin's call.
+    outcome: 'Yes (the latest setup helps in these conditions): its best trial''s pooled held-out RMSE below part (a)''s best
+      (and its new-set RMSE below (a)''s), seen not worse by more than the gap; then (b)''s width scaling would start from
+      (c)''s HPs. No: at or above (a)''s best on held out: the latest setup''s target and inputs do not carry to this comparison,
+      and (b) starts from (a). Partial: better on relabels or new only, reported per set. A trial that blows up is listed
+      apart at its best checkpoint. The prebuild passes when both sites log ''the cache ... is ready'' with derived inputs
+      under the part (a) base keys; a first trial that refuses at init or runs out of memory is fixed before the rest go.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
