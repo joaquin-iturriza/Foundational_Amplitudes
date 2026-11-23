@@ -41944,4 +41944,4 @@ entries:
       opencode, lab llm, lab model, model trial, lookup trial, mechanical watch in docs/results.tex, the plan, site decisions
       and analysis/agent_redesign.'
   step_waits:
-    '1': 'detach:labllm_first (local benchmark batch, pid 708754: 40 fix runs and 60 triage runs on the lab models)'
+    '1': 'detach:labllm_resume (pid 843198: the 33 remaining fix runs, 2 streams)'
