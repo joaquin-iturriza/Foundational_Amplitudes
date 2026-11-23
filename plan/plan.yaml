@@ -39501,6 +39501,19 @@ entries:
       EMA on); matched control FA-ccin2p3-677cddca (trial_job.sh hp-idx 9000 at trial_1262''s HPs; flags as part (a)''s control
       FA-lxplus-cb9273f1 with the design''s mem 16G and gpu_min_mem 40G; deployed 5a842c456, config unchanged since c49743415).
       gpu_min_mem 40G on CC means H100 only. CC free disk 21 GB at submission.'
+  - at: '2026-11-23T13:55:21+00:00'
+    text: '2026-11-23 ~15:00 CET (E8264): part (c) trial 2 FA-ccin2p3-40a19790 (hp1333: lr 6.02e-3, Muon wd 0.0145, L2 8.4e-7,
+      warmup 0.090 = 5475 steps, eta_min 1.1e-8, EMA on 0.968) blew up: ''Training diverged: 50 consecutive non-finite-gradient
+      steps at step 6298'' (inf gradient norm from ~step 6250, just after warmup reached the peak lr); its validations before:
+      val_loss_no_reg (Gaussian NLL of the target, geometric mean) -2.105 at 3042, -3.152 at 6084 (best). Listed apart as
+      the design says; the driver keeps its failure penalty (no --retry-failed: a property of its HPs, not a code crash).
+      Not a setup error: the other three part (c) jobs show no non-finite step (trial 0 FA-ccin2p3-0650cdca at 6761, trial
+      1 -e0a5ffe2 past 1000, control -677cddca at 6761). Off-shellness: both prebuilds (CC FA-ccin2p3-5f11ffd8, lxplus FA-lxplus-3224ba9c)
+      logged ''built propagator masks for 1352/1352 processes'' (the trial reads those memmap columns; in a memmap run the
+      line is ''offshell_per_event ON (memmap)''). Measured rates at batch 24,576: H100 0.27 s/step (60,840 steps 4.6 h);
+      trial 0 landed on a Tesla V100-PCIE-32GB (--gpu-min-mem is HTCondor-only, not applied on CC''s SLURM) at 0.90 s/step,
+      15.2 h, inside the 22 h limit (the design''s V100 estimate of 1.45 s/step was too high); peak VRAM 16.0 GB on all (design
+      estimate 28 GB).'
   step_waits:
     '2': llmcmp_a_drive5
     '3': llmcmp_a_drive5
