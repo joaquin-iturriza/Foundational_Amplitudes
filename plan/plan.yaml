@@ -41757,3 +41757,36 @@ entries:
     units: null
     start: '2026-11-23T14:56:25+00:00'
     at: '2026-11-23T14:56:25+00:00'
+- id: lab_llm_trial
+  title: Lab LLMs in place of some subagents
+  question: Can the lab's LLMs (deepseek-v4-flash, qwen3.8-27b via lpnllm) do some of our subagent work (mechanical steps,
+    log reading, simple fixes) correctly, alone or as executors of a plan written by a stronger model, and how many tokens
+    of ours does that save?
+  status: running
+  quotes:
+  - said_at: '2026-11-23T16:08:39.347000+00:00'
+    text: First I'd like to test them, I'm not sure how good they are. I'd want to use them in place of (some) subagents we
+      are using, for simple work, etc. So I want you to design some tests, benchmarks, etc, to see if they would work for
+      the type of work we are doing, and how we can adapt so that we can make them work. Perhaps something like a smarter
+      model from us designs, the lab's llm executes. I expect this to save a ton of tokens
+    decision: D530
+    covers:
+    - lab_llm_trial
+    - benchmarks of the lab LLMs (deepseek-v4-flash
+    - qwen3.8-27b) on our subagent work
+    - designer-executor setups
+  decisions:
+  - D530
+  next: 'Design the benchmark: tasks drawn from real past subagent work (mechanical-worker briefs, log-reading acks, small
+    tool fixes, lookups) with their known correct outcomes; arms: each lab model alone, each as executor of a plan from our
+    model, our current subagent as reference; measures: task success graded against the known outcome, our tokens spent, wall
+    time; then the harness to run them'
+  done_when: null
+  notes_ref: null
+  match: zz_labllm_*
+  evidence:
+    runs: []
+    commit: null
+    paths: []
+  dead_ends: []
+  asks: []
