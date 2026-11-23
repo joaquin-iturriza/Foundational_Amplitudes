@@ -39128,11 +39128,6 @@ entries:
       DRIVE_DONE'
     3: Score the best trial and the control (job_llm_score.sh), figure of pooled RMSE seen/held out (and truly held out, relabels)
       against LLM 0.321/0.721 and his LLoCa 0.506/0.953, per-process MSEs as dan_per_process.py; write-up in docs/results.tex
-    4: 'Part (c) first-trial checks (config sweep/sweep_config_llmcmp_c_latest.yaml @c49743415): driver llmcmp_c_drive2 (--sites
-      lxplus ccin2p3, log ~/.local/share/ccorch/detached/20261123-133217_llmcmp_c_drive2.log, state sweeps_local/llmcmp_c_latest;
-      drive1 stopped after the lxplus caches were ready, feat hashes equal to CC''s); wave 1 FA-ccin2p3-0650cdca, -e0a5ffe2,
-      -40a19790, control FA-ccin2p3-677cddca. Read the running ones'' logs: s/step (A100 est 0.83, H100 less), peak memory,
-      ''built propagator masks for N/P'' N = P.'
     5: 'Part (c) readout: when llmcmp_c_drive1/2 writes DRIVE_DONE and the control FA-ccin2p3-677cddca ends, score (c)''s
       best trial and the control (REREAD=<run> scripts/job_llm_score.sh, heldout derived inputs prebuilt on CC feat_6d369c25),
       read per set (seen, held out, relabels, new) pooled RMSE and median per-process MSE against (a)''s best with the 1.38
@@ -39259,11 +39254,6 @@ entries:
       if:
       - 'best at or below the LLM: part (b) checks width scaling holds it'
       - 'above the LLM: part (b) width toward 359.6M at the tuned HPs'
-    4:
-      feeds: 'part (c): our latest setup against part (a), the LLM and his LLoCa'
-      if:
-      - 'all fine: record rates, re-set the wall target'
-      - 'N < P, OOM or init refusal: stop the trials, fix, resubmit'
     5:
       feeds: 'part (c): our latest setup against part (a), the LLM and his LLoCa; where part (b) starts'
       if:
