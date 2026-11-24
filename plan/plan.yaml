@@ -40110,6 +40110,29 @@ entries:
       (D) Z+4g at 1e5 r ~ 1 and/or uug at 1e4 r > 1 beyond noise: the cost is a small-data one. Mixed results reported as
       the shares of each. uug at 1e4 and 1e5 at these HPs reproduces or not the D374 bulk gain (seed noise now measured).
       Blow-ups (val > 10x best-so-far) listed apart (D398).'
+    fix_at: '2026-11-24T14:01:29+00:00'
+    fix: '(1) Smoke and readout not shown (D395; check 15): three parts of this launch path have never run end to end: the
+      new model.input_soft_massless_only flag (3ea925fa0) in a GPU job, uug through the Z+4g base config runs/kit/kit_A_uq_zgggg_me2_n500000_t12500
+      by overriding data.processes_file in run_fixed_hp, and kit hard-bin scoring (job_kit.sh KIT_SCORE_ONLY with KIT_SCORE_DIR)
+      on a run_fixed_hp run dir. On CC no kit_benchmark output exists for any run dir outside runs/kit/. Fix: one ~50-step
+      smoke on one GPU (uug 1e4, input_soft_massless_only=true, eps 1e-8, the hp1961 chunk line), then KIT_SCORE_ONLY on its
+      dir, and list the kit_benchmark files it writes. Then send the whole batch. (2) Horizon at 1e5 not stated (checks 11
+      and 4): the 1e5 cells keep 1953 steps at batch 2048, which is 40 epochs against 400 at 1e4. This entry''s own D convention
+      keeps epochs fixed (D=1e3 at 3125 steps, ''400 epochs as the 1e4 cells''). So candidate (D) moves epochs together with
+      D. State the choice (fixed compute) and why, and say what an r of about 1 at 1e5 means under it: more data at fixed
+      steps, not the same training at 10x the data. (3) The outcome has no branch for uug at 1e5 also paying (r>1) at hp1961.
+      The uug arms are not the D374 setup: the kit uug run kit_A_ee_uug_me2_n100000_t8000 used CosineAnnealingLR, 8000 steps,
+      lr 1.19e-2, muon_wd 4.7e-2 and reg 9.1e-8, against WSD, 1953 steps, batch 2048, lr 2.8e-2 here. List those differences
+      against that run''s config.yaml and say what a failed reproduction of the D374 gain changes: it would mean the setup,
+      not the process, sets the sign, so (D) is unreadable. (4) Disk not stated (check 14). Read on CC today: run dirs are
+      47 MB (scrsoftsrch_b2048_s43/s44) and 81 MB (kit uug t8000), so 33 runs need about 2.5 GB, against 16 GB free on /sps/lpnhe
+      (98% full). It fits; write that into the design with the site''s df at submission. (5) Layout (check 13): two runs per
+      job doubles the wall time to about 0.7 h. Use one run per job when site pick offers 33 slots, or state the width that
+      makes two per job the faster choice. Checks that hold: matched off control at the same hp1961 HPs and seeds (the off
+      arm''s searched best lr 2.0e-2; its trials near 2.9e-2 gave 0.065, inside its own seed spread 0.058-0.067); measure
+      moves 2.07x (zng4g_onesetting_b2048.json: soft 0.125/0.121/0.145 against S 0.058/0.067/0.064), well above the ~1.2x
+      two-sigma resolution; input diagnostic numbers confirmed in soft_rescale_inputs.json (Z+4g spread kept 0.16/0.31/0.60/1.00,
+      f_Z 5-95% 1.04-3.0 at 1e-8); prior search found nothing omitted.'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
