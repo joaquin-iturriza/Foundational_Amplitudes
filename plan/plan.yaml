@@ -42138,7 +42138,7 @@ entries:
     - 2
   owner:
     agent: a23c1abc4ec37fc46
-    state: working
+    state: closed
     since: '2026-11-24T00:35:55+00:00'
     state_at: '2026-11-24T01:06:00.940000+00:00'
     context: 248924
@@ -42345,3 +42345,28 @@ entries:
     is about batch size, lr per batch or this cost'
   blocks: step 2 (the batch-size runs); step 1 keeps going
   blocks_steps: *id004
+  handoff:
+    state: 'Step 1: the estimator (McCandlish App. A from 8 chunk gradients of each step''s batch at the batch''s own per-process
+      weights, pre-clip; 16-batch brute check with jackknife errors) is merged (b36a40b3a, repo-reviewer pass at 3c175775d),
+      the design passed twice, the smoke passed every stage (finding 2026-11-24), the full run FA-lxplus-35cf0097 (scripts/job_catalog_v3_short.sh
+      v4_het_noise_scale @3afebebb88, 4264 steps, target 1.75 h) runs on lxplus. NEXT when it ends: fetch <run_dir>/noise_scale.json
+      (runs/catalog_v4_short/v4_het_noise_scale on lxplus) and run python analysis/critical_batch/noise_read.py <json> v4_het_noise_scale
+      (window 20 = 200 steps); report the 5 checks with both errors and S_agree/G2_agree, B_simple(t) against batch 16384,
+      the Muon/AdamW split (windows[].sets), the figure looked at once, caption through tools/check_caption.py; compare its
+      validation curve to v4_het_control_wsd (the control: measurement should not perturb training); write up in docs/results.tex
+      with % src/% claim. Step 2 (batch-size runs) is held on the GPU-budget question to Joaquin (55 GPU-h DyHPO per batch
+      vs 28 GPU-h lr-only under D241).'
+    decisions: 'Joaquin''s: D532 (the work). Mine: canonical setup = the WSD het control of catalog_v4 (v4_het_control_wsd:
+      closest run to the template''s defaults on the catalog; reason: template''s optimizer, schedule, loss and batch); chunks
+      8 x 2048 every 10 steps (overhead ~15%, ~427 measurements); S and |G|^2 averaged separately over 200-step windows (the
+      paper''s prescription, no per-measurement ratio); brute check 16 batches at steps 50/500/1500/3000/4100; lxplus by site
+      pick (CC full), base config copied there with site copy; the scan''s lr from DyHPO per batch (CLAUDE.md rule), asked
+      as a budget question'
+    ruled_out: the old window-of-past-steps estimator (post-clip gradients, mixed weights, abs, ewm 0.9); per-microbatch losses
+      with their own per-process means (biased under the mean-of-process-means loss)
+    running: FA-lxplus-35cf0097 (full noise-scale run)
+    files: base_experiment.py (noise_scale_terms, _noise_measure, _noise_grads, _noise_brute, _write_noise_log), experiment.py
+      (_noise_chunk_losses, full_counts), config/default.yaml BS_finding, tests/test_noise_scale.py, analysis/critical_batch/noise_read.py,
+      scripts/job_catalog_v3_short.sh arm v4_het_noise_scale; worktree worktrees/wt-critbatch (merged; remove with scripts/remove_worktree.sh
+      when the entry closes)
+    written: '2026-11-24T01:13:28+00:00'
