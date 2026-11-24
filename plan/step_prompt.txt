@@ -35,7 +35,6 @@ Whatever the narrowing says, once it is done carry on through every other ready 
   behind a separate probe (time and disk per unit from an earlier run of the same setup or its own first jobs); its wall-time target is recorded before it goes
   (`plan target {id} --batch <name> --wall <hours> --jobs N`). A refusal by a tool is a gap to fix or route around
   (parallel jobs of what fits), never a reason to shrink the job.
-- GPU budget: CLAUDE.md.
 - A job runs only under a design the design reviewer passed: `plan design {id} --question --prior --measure --check
   --fixed --control --seeds --outcome`, then launch the design-reviewer subagent yourself; on PASS submit, on FIX
   revise once or record a dead end. An eval-only re-read of a run under its passed design carries REREAD=<run id>.
