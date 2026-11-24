@@ -44789,3 +44789,14 @@ entries:
       reads are covered by the guard plus the same --job path. Deterministic upkeep, so no seeds; the control is the same
       commands on the login node the same day. Searched docs/results.tex and plan.yaml (login node, login_cap, run --job,
       job_prune_dryrun, non-interactive) and site decisions (login/slurm/htc/maintain): only D544 and D176.'
+  findings:
+  - at: '2026-11-24T17:31:13+00:00'
+    text: 'Inventory of scripts run on CC''s login node (2026-11-24): supervisor maintain every pass (8-10 min apart): disk_watch.py
+      (du up to 300 s per filesystem every 6 h, else seconds; allowed 1190 s), feed_capped.py tp3_ (allowed 1790 s; now exits
+      at once on the disk-full flag), prune_site.sh ccin2p3 = prune.py (allowed 2990 s, real work every 6 h) + prune_copies.py
+      (allowed 1790 s, every pass). No active ledger item has a check_cmd now (watchdog.py --site-report runs only when one
+      does). Agents: transcripts of the last 30 days show ~1000 python scripts sent through site run ccin2p3, analyses among
+      them (pp_compare 120, error_correlates 98, kit_figures 74, check_site_data 179) and site_python (analysis/common/readers.py,
+      89 callers) probes; submitters (sweep_manager 233, generate_sweep 110, lhe_parts 284). site''s own reads (git, df, squeue,
+      find depth 3 + grep of a log, setup.sh --verify with check_site_data under 180 s, cached 10 min) stay. Durations of
+      past login runs were not logged; the jobs'' sacct Elapsed will give them.'
