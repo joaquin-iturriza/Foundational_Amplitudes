@@ -40543,7 +40543,7 @@ entries:
     decision: D537
   owner:
     agent: ae2d14b6689ebb697
-    state: working
+    state: closed
     since: '2026-11-24T08:11:28+00:00'
     state_at: '2026-11-24T13:43:52.071000+00:00'
     context: 234535
@@ -40979,42 +40979,36 @@ entries:
     '7': FA-ccin2p3-bf23e0c4 FA-ccin2p3-b77878e1 FA-ccin2p3-f6f7179d
     '8': FA-ccin2p3-bf23e0c4 FA-ccin2p3-f6f7179d
   handoff:
-    state: 'Part (a), DyHPO of muP LLoCa in the LLM-run conditions (sweep/sweep_config_llmcmp_a_adamw_const.yaml @2a597c478):
-      6 of 8 trials observed; best trial 5 FA-ccin2p3-c891c0c2, lr 1.24e-3, val MSE of z 4.81e-4; trial 0 (lr 1.03e-3) 4.89e-4;
-      control 6.79e-4; the best two sit at the window''s lower edge 1e-3. Wave 3 running on CC: FA-ccin2p3-b135e7db (hp1723),
-      -f3e29e87 (hp0836); driver llmcmp_a_drive6 (log ~/.local/share/ccorch/detached/20261123-205657_llmcmp_a_drive6.log).
-      Next for (a): step 2 then step 3 (score the best trial with job_llm_score.sh REREAD, figure in Suprio''s layout, write-up).
-      Since the best sits at the window edge, an extension below 1e-3 is the next attempt within (a). Part (c), sweep llmcmp_c_qperp
-      (sweep/sweep_config_llmcmp_c_latest.yaml @7ca781941 for the HPs; cluster mem 20G since 7a4a6cff7): driver llmcmp_c_qperp_drive5
-      on lxplus+ccin2p3, --mem 20G --cpus 4 --hours 14.6 (log ~/.local/share/ccorch/detached/20261124-085507_llmcmp_c_qperp_drive5.log;
-      at 08:55 it had synced CC and was syncing lxplus, not yet confirmed). Wave 1: trial 0 hp1860 (lr 1.60e-3) clean, val
-      NLL -5.997 (sigma stage -6.030); trials 1 (lr 8.56e-3) and 2 (lr 6.02e-3) blew up at the end of warmup, listed apart
-      at -2.633 (step 9126) and -2.980 (step 6084). Control FA-ccin2p3-d34535b0 (trial_1262''s HPs, lr 3.65e-3) blew up twice
-      mid-plateau (1.2e7 at step 33462, 1.05e5 at 51714), best -3.544 at step 24336; it finished its training, sigma stage
-      (diverged, sigma only) and test, then a host oom_kill at 16G hit in its final plots; not resubmitted; scoring FA-ccin2p3-48e43133
-      (REREAD, scripts/job_llm_score.sh @2715130f70) running, the first llm_score on the emission-scale target. Wave 2 on
-      CC: FA-ccin2p3-bf23e0c4 (hp0563), -b77878e1 (hp0902), -f6f7179d (hp1736). Figure analysis/llm_compare/figs/c_val_curves.png
-      (c_val_curves.py @b454a17c1). Step 5: readout when the drive writes DRIVE_DONE. Part (b) (D522): design after step 5''s
-      readout. Void caches deleted on both sites (step 7 done). The finding of 2026-11-24 09:00 says trial 0 had EMA on 0.9989:
-      not read, correct it from its config.'
-    decisions: 'Joaquin''s: D522-D528 (D528 ''just get it done''), D423 WSD, D506 W in internal_mass_pdgs, D531 restart the
-      drivers. Mine (re-justify each): (i) --mem 20G --cpus 4 for part (c), not --cpus 7: CC caps at 5 CPUs per V100, and
-      lxplus raises the request to 7 CPUs / 21000 MB by itself; measured host peak 16.7 GB (sacct). (ii) drive.py: lxplus
-      kept for a raised request, capped at the slots site pick says fit now (ce7e6754e); sync retries any failure 3x and re-syncs
-      a left-out site every 30 min (2b3deb024; the 30-min path is not tested). (iii) Part (c) control not resubmitted after
-      its OOM: training, sigma stage, test and predictions were all saved; only the final plots were missing; a rerun costs
-      ~16 GPU-h. (iv) Control scored now, ahead of the search end (independent work). (v) Part (a) drive6 without the one-shot
-      --retry-failed f8f72269. (vi) bsm_labels false (no BSM in Daniel''s catalog). (vii) cache guard made to fail closed
-      (759fdb44d, mechanical-worker); a single slow site logs fetch can still push the hook past its 120 s timeout.'
-    ruled_out: A smoke run (D528); the shat target and llm4lhc width 256 as 'the latest setup'; --cpus 7 (CC caps at 5 per
-      V100); rerunning the control for its plots; deleting amp_mmap_cache by hand without the guard; calling lxplus down without
-      a retry in the same turn (both 00:30 and 07:20 were transient)
-    running: llmcmp_a_drive6 (local) + FA-ccin2p3-b135e7db, FA-ccin2p3-f3e29e87; llmcmp_c_qperp_drive5 (local) + FA-ccin2p3-bf23e0c4,
-      FA-ccin2p3-b77878e1, FA-ccin2p3-f6f7179d; scoring FA-ccin2p3-48e43133
-    files: sweep/sweep_config_llmcmp_c_latest.yaml, sweep/sweep_config_llmcmp_a_adamw_const.yaml, sweep/drive.py, tests/test_drive_lxplus_mem.py,
-      tools/llm_score.py, scripts/job_llm_score.sh, analysis/llm_compare/ (c_val_curves.py, data/c_val_trial_*.txt, control_score.py,
-      heldout_per_process.py), sweeps_local/llmcmp_a_adamw_const, sweeps_local/llmcmp_c_qperp
-    written: '2026-11-24T07:58:26+00:00'
+    state: 'Part (a) DONE: DyHPO ended (8 trials, 0 failed), best trial 5 FA-ccin2p3-c891c0c2 (lr 1.24e-3, EMA on 0.9989,
+      val MSE of z 4.81e-4); scored FA-ccin2p3-037bf5e1: pooled RMSE seen 0.117, held out 1.003, relabels 0.241, new 1.767
+      (control 0.139/1.042/0.237/1.839; LLM 0.321/0.721/0.341/1.193); written up docs/results.tex par:llmcmp_a + fig:llmcmp_heldout
+      @c13ca0b0e. Part (c): control FA-ccin2p3-d34535b0 scored at its best checkpoint (0.171/1.253/0.311/2.205; medians 0.014
+      relabels, 0.385 new, the lowest of all arms); llm_score checked on the emission-scale target against the run''s own
+      test predictions (check_score_vs_preds.py). Search llmcmp_c_qperp (driver llmcmp_c_qperp_drive5): trial 0 clean -5.997;
+      trials 1, 2, 4 and the control blew up (lr >= 3.65e-3); wave 2 trials 3 (FA-ccin2p3-bf23e0c4, lr 1.56e-3) and 5 (-f6f7179d,
+      lr 2.57e-3) running; wave 3 follows from the driver; step 5 reads it. Part (b): Joaquin D537 starts it now at part (a)''s
+      best HPs, plus the same widening at part (c)''s best HPs once (c) ends (step 8). Design recorded 2026-11-24 (widths
+      16/32/64/120 heads = 6.34M/25.2M/101M/354M params; smokes first) got FIX from the design reviewer: step 9 lists the
+      six points to revise (disk, mixed-batch memory fallback needs new code, config diff vs trial_1163''s config.yaml, wall
+      per GPU model + resume, prior par:v4_width / par:v4_warm_start_grow, outcome branches). Next owner: revise (step 9),
+      re-review, smokes, then the GPU-h estimate to Joaquin (above 100 GPU-h under D536; 120 heads alone ~100 H100-h by a
+      FLOP estimate). Figures: only Suprio''s held-out layout (heldout_per_process.py, multi-arm); control_score.py gives
+      numbers only (Joaquin rejected its layout).'
+    decisions: 'Joaquin''s: D522-D528, D537 (start part (b) now, also widen our setup''s best HPs), D536 (decision-named work
+      passes up to 100 GPU-h), D423 WSD, D506, D531. Mine (re-justify): (i) no lower-edge lr extension for part (a): the three
+      trials at lr 1.03e-3 are worse than trial 5 at 1.24e-3 and tuning moved held out inside the seed margin; (ii) widths
+      16/32/64/120 heads, 120 = the LLM''s parameter count within 1.5%; (iii) part (a) trial 5 scored before the search end
+      (it stayed best); (iv) job_llm_score.sh also takes RUN/HELD from env (d150b6d68) though args after -- work too; (v)
+      control_score.py keyed by run tag (claim keys) and no figure; (vi) --mem 20G --cpus 4 for part (c) (earlier owner).'
+    ruled_out: 'control_score.py''s own figure layout (rejected by Joaquin 2026-11-23 and 2026-11-24); per_process_accumulation
+      as the width memory fallback (it changes the batches to single-process); a smoke without the revised design; earlier:
+      shat target, llm4lhc width 256, --cpus 7, rerunning the control for plots'
+    running: llmcmp_c_qperp_drive5 (local) + FA-ccin2p3-bf23e0c4, FA-ccin2p3-f6f7179d (part (c) wave 2); part (a) driver ended
+    files: docs/results.tex (sec:llmcmp), analysis/llm_compare/{heldout_per_process.py, control_score.py, check_score_vs_preds.py,
+      data/a_trial5_*.json, data/c_control_*.json, data/a5_controls_score_summary.json, figs/a5_controls_heldout_per_process.png},
+      tools/llm_score.py, scripts/job_llm_score.sh, scripts/job_config_smoke.sh, sweep/sweep_config_llmcmp_a_adamw_const.yaml,
+      sweep/sweep_config_llmcmp_c_latest.yaml, sweeps_local/llmcmp_c_qperp
+    written: '2026-11-24T13:59:58+00:00'
   designs:
   - at: '2026-11-22T04:13:14+00:00'
     question: 'Part (a), D525: in the conditions of Suprio''s LLM pID run (D524, D526, D527: our catalog_daniel regeneration
