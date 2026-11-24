@@ -43090,8 +43090,13 @@ entries:
       SciPost LaTeX template he pasted), 2026-11-16T20:00 (a writing-style skill), 2026-11-10T02:08 (uploaded slides and code):
       none is about batch size, lr per batch or this cost'
     blocks: step 2 (the batch-size runs); step 1 keeps going
-    blocks_steps: &id002
+    blocks_steps:
     - 2
+    answered_at: '2026-11-24T13:45:30+00:00'
+    decision: D536
+    withdrawn_at: '2026-11-24T13:45:30+00:00'
+    withdrawn_why: 'Joaquin approved the budget-rule change (D536): work a decision names, here D532''s ''its validation against
+      batch-size runs'', passes up to 100 GPU-h; the 55 GPU-h DyHPO-per-batch version goes ahead'
   owner:
     agent: aa75364575cea3cb4
     state: working
@@ -43299,20 +43304,6 @@ entries:
       40.4 / 95.1, 2 windows with mean |G|^2<=0; Muon median 232 (734 in the last window), AdamW median 37.2. The check numbers
       (B_brute 84+-9, 28.2+-1.4, 28+-6, 39+-5; chunk/brute tr Sigma 1.16-1.29) are unchanged. Figure y range now set by rule
       (3x max of batch and the 16-batch B + se), windows above it at the edge.'
-  ask: 'GPU budget: about 55 GPU-h above 30 with no decision covering it. Joaquin, testing the measured noise scale against
-    batch-size runs (D532) needs, at each batch size (2048, 4096, 8192, 16384, 32768; canonical catalog_v4 WSD het setup,
-    5 epochs, lr held at its peak), the lr that reaches a target loss in the fewest steps; then steps S and events E = B S
-    to the control''s stable-phase validation loss, fit S/S_min - 1 = (E/E_min - 1)^-1, B_crit = E_min/S_min, against B_simple.
-    The lr per batch from one 8-trial DyHPO search per batch size (the CLAUDE.md rule): about 55 GPU-h (estimate: 1.0 s/step
-    at 16384 on a V100, scaled with the batch). An lr-only search of 4 values per batch (about 28 GPU-h) would need your yes
-    under D241. Go for 55, 28, or neither?'
-  waiting_since: '2026-11-24T01:13:00+00:00'
-  searched: 'CLAUDE.md (DyHPO rule, D241, 30 GPU-h budget); site decisions --project FA whole for batch, lr, critical, noise:
-    D426, D507, D509, D514, D532; none approves this cost. Joaquin''s messages matched by the tool: 2026-11-14T04:31 (a SciPost
-    LaTeX template he pasted), 2026-11-16T20:00 (a writing-style skill), 2026-11-10T02:08 (uploaded slides and code): none
-    is about batch size, lr per batch or this cost'
-  blocks: step 2 (the batch-size runs); step 1 keeps going
-  blocks_steps: *id002
   handoff:
     state: 'Step 1: the estimator (McCandlish App. A from 8 chunk gradients of each step''s batch at the batch''s own per-process
       weights, pre-clip; 16-batch brute check with jackknife errors) is merged (b36a40b3a, repo-reviewer pass at 3c175775d),
@@ -43338,4 +43329,3 @@ entries:
       scripts/job_catalog_v3_short.sh arm v4_het_noise_scale; worktree worktrees/wt-critbatch (merged; remove with scripts/remove_worktree.sh
       when the entry closes)
     written: '2026-11-24T01:13:28+00:00'
-  checked_until: '2026-11-24T13:13:57+00:00'
