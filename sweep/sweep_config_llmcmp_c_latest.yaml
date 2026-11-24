@@ -18,7 +18,7 @@ cluster:
   auto_submit: false
   request_gpus: 1
   cpus_per_task: 8
-  mem: 16G   # part (a) trials peaked at 5.6-6.6 GB host RSS without diagrams; 16G = 2.4x, 6 CPUs on lxplus (32G asked 11 and found no slot, E8244)
+  mem: 20G   # measured on this setup: host MaxRSS 16.7 GB (sacct 64661587/8, 64661591 the control OOM-killed at 16G in its final plots); 20G = 7 CPUs x 3000 MB on lxplus, 4 CPUs on CC
   time: "20:00:00"
   gpu_min_mem: 32G   # measured on this setup (void llmcmp_c_latest, batch 24,576): peak 16.0 GB; V100-PCIE-32GB 0.90 s/step = 15.2 h, H100 0.27 s/step = 4.6 h, both inside the 22 h limit; as part (a)
 
