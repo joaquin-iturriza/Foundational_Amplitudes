@@ -1,0 +1,50 @@
+PLAN: tools/pool_physics.py only (do not edit tests). Repo copy root = cwd.
+
+RUN THE TESTS WITH THE MODULE RUNNER, NOT pytest. pytest skips setup() (it only runs in __main__), so
+pytest shows 8 failures (KeyError 'MB', NameError TRAIN) that are not the bug. Real command:
+  /home/joaquin/work/FA/.venv-cpu/bin/python tests/test_pool_physics.py
+Now: 8 tests print "ok"; test_real_recipe_shape fails (sources {'sidecar': 1}, v4_ddx_aag unreadable). Goal: last line
+"all pool physics tests passed".
+
+CAUSE: catalog_v4 recipes set the mixture with a TOP-LEVEL `sampling:` key. pool_physics only passes the YAML's
+`default_sampling` to mg.register_recipe_processes (TrainingReference.__init__ ~line 478, and main() ~line 794), so the
+entries lack PROCESSES[name]["sampling"], the pool names lack `_smix_`, and no sidecar is found.
+mg.register_recipe_processes(specs, default_sampling=...) already does the right thing once it gets the dict.
+
+FIX 1 (sampling). Add a helper next to load_recipe_specs (~line 418):
+    def top_sampling(d):
+        """the recipe's mixture: a top-level `sampling:` (catalog_v4), else `default_sampling:`"""
+        return (d.get("sampling") or d.get("default_sampling")) if isinstance(d, dict) else None
+  and use it at both call sites:
+   - TrainingReference.__init__: default_sampling=top_sampling(d)
+   - main(): default_sampling=top_sampling(doc)
+  (replace the two `d.get("default_sampling") if isinstance(...) else None` expressions).
+
+FIX 2 (dropped probes). Near the top constants (after ALLOW_ENV, ~line 54) add:
+    DROPPED = {"ee4_epem_cgsxwm": "its 3 TeV block dropped by decision (D193): no test pool"}
+  (same entry as EE4_DROPPED in tools/collect_run.py; the test only needs the key and compares the report value to
+  DROPPED[name], so any string works).
+  In main(), in the probe loop:
+   - before the loop add `excluded = {}`
+   - at the start of `for p in procs:` after `name = p["name"]`:
+        if name in DROPPED:
+            excluded[name] = DROPPED[name]
+            counts["excluded"] = counts.get("excluded", 0) + 1
+            continue
+     (skip BEFORE val_pool_path: that spec has n_val 0 and would error.)
+   - also filter the registration list so a dropped entry is not registered:
+        mg.register_recipe_processes([... for p in procs if p["name"] not in DROPPED], default_sampling=top_sampling(doc))
+   - add "excluded": excluded to the final printed json.dumps dict (the test reads rep["excluded"] and
+     rep["status"] == {"ok": 1, "excluded": 1}). Do not print a PHYSICS_CHECK line for excluded ones (the test expects
+     exactly one PHYSICS_CHECK line).
+  Optionally mention DROPPED in the main() docstring; keep it short.
+
+CHECK AFTER EDIT, expected in test_real_recipe_shape:
+  - ref.sources == {"sidecar": 2}, no unreadable
+  - the CLI run gives chk[0]["block_source"] == "sidecar" and "_smix_" in chk[0]["pool"]. The probe's pool path comes
+    from val_pool_path -> variable_energy_recipe, which reads PROCESSES[name]["sampling"] set by the registration in
+    main(); the test pops those sampling keys first, so main() must re-register from the probe doc's top-level sampling
+    (FIX 1 does that for v4_ddx_aag__as130 via base != name).
+  If a probe's block_source is not "sidecar", read check_probe (~line 550) and see how it finds the sidecar; the
+  likely culprit is the pool path still being unshaped.
+Then re-run the full runner above; all earlier tests must still print ok. Finish with no other files touched.

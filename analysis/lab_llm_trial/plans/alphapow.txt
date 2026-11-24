@@ -1,0 +1,54 @@
+PLAN: read alpha_s AND alpha powers (and the target monomial) from the diagram sidecar's (QCD, QED) orders.
+Test: cd <repo copy> && /home/joaquin/work/FA/.venv-cpu/bin/python tests/test_order_features.py   (part 1 only; do not edit the test)
+Cause: sidecar_qcd_orders keeps only QCD; alpha power = nfinal - min QCD (wrong with no Yukawa / Z' coupling),
+and the target's e = deg - q in experiment.py. The test wants three new/changed functions in mg5_pipeline_final.py.
+
+1) mg5_pipeline_final.py (~line 519): REPLACE sidecar_qcd_orders by sidecar_born_orders(path). Same loop, but per diagram
+   sum BOTH "QCD" and "QED" over the vertex nodes' "orders" (ignore any other key such as DMV), loop diagram: QCD - 2.
+   Return sorted list of (qcd, qed) tuples (a set, deduped), or None when empty:
+       out = set()
+       ... for dg in sp["diagrams"]:
+               vs = [n.get("orders", {}) for n in dg["nodes"] if n["kind"] == "vertex"]
+               a = sum(int(v.get("QCD", 0)) for v in vs); b = sum(int(v.get("QED", 0)) for v in vs)
+               out.add((a - 2 if dg.get("diagram_type") == "loop" else a, b))
+       return sorted(out) or None
+   (tests expect e.g. [(0, 3)]; a loop diagram with QCD 2, QED 2 -> [(0, 2)].)
+
+2) order_vector_from_diagrams(cfg, qcd_orders, o=None) (~line 533): rename 2nd arg to born_orders (tuples now). Keep the
+   head (o = ...; return o if cfg.get("order") is not None or not born_orders) and pref. Last line becomes
+       return [int(o[0]), int(o[1]), max(q for q, _ in born_orders) + pref, max(e for _, e in born_orders)]
+   (both maxima; no more nfinal - min; Z' orders (DMV) never enter). Update its docstring accordingly.
+   Check by test: mixed [(0,2),(2,0),(1,1)] n=2 -> [0,0,2,2]; Z' [(1,0)] -> [0,0,1,0]; virt+prefactor with
+   o=[1,0,1,2] and [(0,2)] -> [1,0,1,2].
+
+3) ADD right after it:
+   def target_monomial_from_diagrams(cfg, born_orders):
+       """(alpha_s power, alpha power) of the target's single monomial: the diagram with the highest QCD order
+       (the term the stored target is divided by); an alpha_s_prefactor virtual adds one alpha_s power."""
+       pref = 1 if (cfg.get("kind") == "virt" and cfg.get("alphas_prefactor")) else 0
+       q, e = max(born_orders)          # tuples sort by QCD first, then QED
+       return q + pref, e
+   Test: pure [(0,3)] -> (0,3); mixed -> (2,0); Z' [(1,0)] -> (1,0); virt prefactor [(0,2)] -> (1,2).
+
+4) experiment.py:
+   a) rename method _diagram_alphas_powers -> _diagram_born_orders (def ~2484, cache attr may stay), call
+      mg.sidecar_born_orders(path) instead of mg.sidecar_qcd_orders; fix docstring. Test calls exp._diagram_born_orders(name)
+      (None when no sidecar). Update the 2 callers: ~line 2438 (target) and ~2521 (_orders_from_diagrams, variable qd; it
+      passes it to mg.order_vector_from_diagrams(pc, qd, o), which is fine unchanged).
+   b) target code ~2437-2441: replace
+          qd = self._diagram_alphas_powers(name)
+          if qd is not None:
+              q = max(qd) + (1 if (virt and pc.get("alphas_prefactor")) else 0)
+              e = deg - q
+      by
+          qd = self._diagram_born_orders(name)
+          if qd is not None:
+              q, e = mg.target_monomial_from_diagrams(pc, qd)
+      (`mg` is already imported locally just above). Keep the assert below it as is.
+5) grep -rn "sidecar_qcd_orders\|_diagram_alphas_powers" in the repo (tools/, analysis/, tests/ other than the target test)
+   and update any other user to the new names/tuple shape (only experiment.py used them in the .py files at plan time).
+6) Run the test command above; expect "[from_diagrams] ok", "[recipe_id] ok", "all ok". Part 2 (FA_TEST_SITE=1) needs a
+   site and data; skip it. Also run: python -c "import experiment" is NOT needed (torch); a python -m py_compile
+   experiment.py mg5_pipeline_final.py suffices.
+Notes: do not touch order_vector, recipe_id or PROCESSES; the test's last assert (order_vector != EXPECT for affected
+entries) already holds with the table untouched.

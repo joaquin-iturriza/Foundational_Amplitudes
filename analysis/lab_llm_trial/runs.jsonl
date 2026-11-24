@@ -129,3 +129,22 @@
 {"family": "fix", "task": "skipclaim", "arm": "qwen+plan", "model": "qwen3.8-27b", "first_pass": true, "usage": {"in": 951682, "out": 4011, "reasoning": 8507, "cache_read": 0, "steps": 16, "tool_calls": 21}, "seconds": 149.6, "rc": 0, "stderr": "", "failing_first": [], "final_pass": true, "diff": ""}
 {"family": "fix", "task": "stallshort", "arm": "qwen", "model": "qwen3.8-27b", "first_pass": true, "usage": {"in": 1497385, "out": 4924, "reasoning": 14683, "cache_read": 0, "steps": 24, "tool_calls": 27}, "seconds": 216.9, "rc": 0, "stderr": "", "failing_first": [], "final_pass": true, "diff": ""}
 {"family": "fix", "task": "stallshort", "arm": "qwen+plan", "model": "qwen3.8-27b", "first_pass": true, "usage": {"in": 935262, "out": 4251, "reasoning": 7872, "cache_read": 0, "steps": 17, "tool_calls": 26}, "seconds": 128.4, "rc": 0, "stderr": "", "failing_first": [], "final_pass": true, "diff": ""}
+{"family": "fixcheck", "task": "alphapow", "parent": false, "fix": true, "valid": true}
+{"family": "fixcheck", "task": "valtotal", "parent": false, "fix": true, "valid": true}
+{"family": "fixcheck", "task": "emastart", "parent": false, "fix": true, "valid": true}
+{"family": "fixcheck", "task": "statssrc", "parent": false, "fix": true, "valid": true}
+{"family": "fixcheck", "task": "topsampling", "parent": false, "fix": true, "valid": true}
+{"family": "fixcheck", "task": "backlogdepth", "parent": false, "fix": false, "valid": false}
+{"family": "fixcheck", "task": "recheck", "parent": false, "fix": false, "valid": false}
+{"family": "hardfix", "task": "valtotal", "arm": "sonnet", "model": "sonnet (mechanical-worker)", "agent": "a2bfa7a354a7cf78b", "first_pass": true, "final_pass": true, "seconds": 57.1, "our_tokens": 256807, "usd": 0.1716, "usage": {}, "rc": 0, "failing_first": []}
+{"family": "hardfix", "task": "emastart", "arm": "sonnet", "model": "sonnet (mechanical-worker)", "agent": "ae63a63290e77e0ce", "first_pass": true, "final_pass": true, "seconds": 62.9, "our_tokens": 211842, "usd": 0.1518, "usage": {}, "rc": 0, "failing_first": []}
+{"family": "hardfix", "task": "alphapow", "arm": "sonnet", "model": "sonnet (mechanical-worker)", "agent": "a4b3a34aac0e11acf", "first_pass": true, "final_pass": true, "seconds": 68.1, "our_tokens": 245460, "usd": 0.1989, "usage": {}, "rc": 0, "failing_first": []}
+{"family": "fixcheck", "task": "inflight", "parent": false, "fix": false, "valid": false}
+{"family": "hardfix", "task": "statssrc", "arm": "sonnet", "model": "sonnet (mechanical-worker)", "agent": "a1a5d6b0f522a5725", "first_pass": true, "final_pass": true, "seconds": 65.8, "our_tokens": 228038, "usd": 0.1458, "usage": {}, "rc": 0, "failing_first": []}
+{"family": "hardfix", "task": "topsampling", "arm": "sonnet", "model": "sonnet (mechanical-worker)", "agent": "a2ed13d7f5ea6427c", "first_pass": true, "final_pass": true, "seconds": 67.3, "our_tokens": 259882, "usd": 0.1523, "usage": {}, "rc": 0, "failing_first": []}
+{"family": "fixcheck", "task": "endedrun", "parent": false, "fix": false, "valid": false}
+{"family": "fixcheck", "task": "massconv", "parent": false, "fix": true, "valid": true}
+{"family": "fixcheck", "task": "reviewlock", "parent": false, "fix": false, "valid": false}
+{"family": "fixcheck", "task": "replyblock", "parent": false, "fix": false, "valid": false}
+{"family": "fixcheck", "task": "endedrun", "parent": false, "fix": false, "valid": false}
+{"family": "hardfix", "task": "massconv", "arm": "sonnet", "model": "sonnet (mechanical-worker)", "agent": "aadf2808952b95c30", "first_pass": true, "final_pass": true, "seconds": 47.8, "our_tokens": 234138, "usd": 0.1551, "usage": {}, "rc": 0, "failing_first": []}

@@ -1,0 +1,49 @@
+CAUSE: experiment.py _check_frozen_orders_source(stats) treats stats lacking "target_physics_orders_source" as "table".
+Stats written between 6dee967a and 77b43ae3 lack the key but were fitted from diagrams -> wrongly refused/misread.
+FIX: infer the source from the run folder that wrote the stats. Only file to edit: experiment.py (do not touch tests).
+
+1) Add (next to _target_orders_source, ~line 2491) a staticmethod returning (source, why):
+
+    @staticmethod
+    def _infer_orders_source(run_dir):
+        """Source of the coupling monomial of stats lacking the key: the commit in run_dir/out_0.log placed in the
+        history (before 6dee967a table, 6dee967a..5e4040a9 alpha_s only, from 1d9d6a29 current), else config.yaml."""
+        import re, subprocess
+        root = os.path.dirname(os.path.abspath(__file__))
+        def git(*a):
+            return subprocess.run(["git", "-C", root, *a], capture_output=True).returncode == 0
+        log = os.path.join(run_dir, "out_0.log")
+        if os.path.isfile(log):
+            m = re.search(r"git_hash=([0-9a-f]{7,40})", open(log, errors="replace").read())
+            if m and git("cat-file", "-e", m.group(1) + "^{commit}"):
+                c = m.group(1)
+                if git("merge-base", "--is-ancestor", c, "3694e90eba4830d3d4aca8a7fdac6b0791b76186"):  # 6dee967a^
+                    return "table", f"commit {c[:8]} before 6dee967a"
+                if git("merge-base", "--is-ancestor", "1d9d6a29464211df804574c3aeafea1cbbde11f8", c):
+                    return "diagrams_highest_alphas", f"commit {c[:8]} from 1d9d6a29"
+                return "diagrams_alphas_only", f"commit {c[:8]} between 6dee967a and 1d9d6a29"
+        cfg = os.path.join(run_dir, "config.yaml")     # unknown/absent commit: the config decides
+        on = os.path.isfile(cfg) and bool(OmegaConf.load(cfg).get("data", {}).get("orders_from_diagrams", False))
+        return ("diagrams_highest_alphas" if on else "table"), "config.yaml"
+
+ (check that OmegaConf is imported in experiment.py; if not, `from omegaconf import OmegaConf` inside the function.)
+
+2) Change _check_frozen_orders_source(self, stats, run_dir=None). Replace the line computing _a with:
+        _a = stats.get("target_physics_orders_source")
+        if _a is None:
+            _a = self._infer_orders_source(run_dir)[0] if run_dir else "table"
+        _a, _b = str(_a), self._target_orders_source()
+   (keep the assert and its message: it must contain "target_physics_orders_source=table" etc.)
+   Update the docstring: stats without the key are placed by the run that wrote them.
+
+3) In init_data (~line 1575) change the call to EXACTLY (a test greps this text):
+        self._check_frozen_orders_source(stats, os.path.dirname(os.path.abspath(stats_src)))
+   (stats_src is the stats file path already defined there; confirm with grep -n stats_src experiment.py.)
+
+Notes: the repo copy has a single commit, so the test's "commit cases" print "git history not at hand" and skip; the
+config-fallback cases (absent key -> table, true -> diagrams, unknown commit "f"*40 -> config) must pass.
+The "unknown commit" case needs git cat-file to fail cleanly on a missing commit: it does (returncode != 0).
+_save_data_stats and _target_orders_source need no change.
+
+RUN: cd /tmp/claude-1000/lab_llm_trial/fix_statssrc_planner/repo && /home/joaquin/work/FA/.venv-cpu/bin/python tests/test_orders_source.py
+Expect the last line "all ok".
