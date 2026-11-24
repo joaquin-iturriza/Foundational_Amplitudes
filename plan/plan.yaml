@@ -45436,7 +45436,7 @@ entries:
     the ledger of decisions, items and events with the supervisor and waiter; plan.py with owners, briefs, hand-offs, asks
     and designs; the hooks and reviewers that enforce the rules; the lab-LLM route) be separated from what is particular to
     FA and packaged as a standalone repo colleagues can install on their own clusters and projects and improve?
-  status: running
+  status: done
   quotes:
   - said_at: '2026-11-24T19:13:45.963000+00:00'
     text: I believe that instead of just pointing him to my repos and letting him figure it out, and pull apart what's particular
@@ -45720,6 +45720,7 @@ entries:
       if:
       - 'PASS: plan done orchestrator_kit --writeup d7bef3f22'
       - 'BLOCK: fix the subsection as asked, recommit, continue the same reviewer'
+  writeup: d7bef3f22
 - id: selective_rescale
   title: 'Event-dependent momentum rescale: the soft-limit gain without the bulk cost'
   question: Can the momentum log-rescale be applied only where it helps, by a rule that depends only on the event's own information
