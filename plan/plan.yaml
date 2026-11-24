@@ -43553,6 +43553,15 @@ entries:
     decision: D541
     withdrawn_at: '2026-11-24T14:14:55+00:00'
     withdrawn_why: 'answered: D541 says route log reading and simple fixes through DeepSeek and test harder tasks'
+  - ask: 'Scope: the rule that an owner reads a failed run''s whole log itself (~/work/CLAUDE.md). After a checked DeepSeek
+      reading of a failed run''s log, should the owner still read the whole log every time, or only when the cause is left
+      open? Keeping the reread costs about +0.05% of our tokens; dropping it saves up to about 0.6%.'
+    at: '2026-11-24T19:10:42+00:00'
+    searched: D541, D545 (route and cheap check, silent on the owner's reread); ~/work/CLAUDE.md event rule (the owner reads
+      the log); 2026-11-14T04:31 (a pasted LaTeX template); 2026-11-16T20:00 (a writing-style skill); 2026-11-02T05:20 (held
+      resubmissions of width jobs, not log reading)
+    blocks: the owner-reread clause of the lab route only
+    blocks_steps: &id002 []
   owner:
     agent: a87f458be3245c0a6
     state: working
@@ -44021,6 +44030,15 @@ entries:
       if:
       - 'both reviewers passed: plan done'
       - 'a reviewer blocks on lab_llm_trial text or code: fix it, re-check with the same reviewer'
+  ask: 'Scope: the rule that an owner reads a failed run''s whole log itself (~/work/CLAUDE.md). After a checked DeepSeek
+    reading of a failed run''s log, should the owner still read the whole log every time, or only when the cause is left open?
+    Keeping the reread costs about +0.05% of our tokens; dropping it saves up to about 0.6%.'
+  waiting_since: '2026-11-24T19:10:42+00:00'
+  searched: D541, D545 (route and cheap check, silent on the owner's reread); ~/work/CLAUDE.md event rule (the owner reads
+    the log); 2026-11-14T04:31 (a pasted LaTeX template); 2026-11-16T20:00 (a writing-style skill); 2026-11-02T05:20 (held
+    resubmissions of width jobs, not log reading)
+  blocks: the owner-reread clause of the lab route only
+  blocks_steps: *id002
 - id: critical_batch
   title: Critical batch size from the gradient noise scale
   question: What is the critical batch size of our canonical setup, measured from the gradient noise scale B_simple = tr(Sigma)/|G|^2
