@@ -40634,6 +40634,7 @@ entries:
     '3': llmcmp_a_drive5
     '5': llmcmp_c_qperp_drive4 DRIVE_DONE (detach event of the driver)
     '7': FA-ccin2p3-bf23e0c4 FA-ccin2p3-b77878e1 FA-ccin2p3-f6f7179d
+    '8': FA-ccin2p3-037bf5e1
   handoff:
     state: 'Part (a), DyHPO of muP LLoCa in the LLM-run conditions (sweep/sweep_config_llmcmp_a_adamw_const.yaml @2a597c478):
       6 of 8 trials observed; best trial 5 FA-ccin2p3-c891c0c2, lr 1.24e-3, val MSE of z 4.81e-4; trial 0 (lr 1.03e-3) 4.89e-4;
