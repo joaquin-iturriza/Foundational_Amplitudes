@@ -1265,6 +1265,12 @@ def asks_mark(st):
     return parse(st.get("_asks_scanned")) or now() - dt.timedelta(minutes=ASKS_FIRST_MIN)
 
 
+def ask_age_h(e):
+    """Hours the entry's open question has waited (D534: a hold is shown with its age, never silent)."""
+    t = dt.datetime.fromisoformat(e["waiting_since"].replace("Z", "+00:00"))
+    return (dt.datetime.now(dt.timezone.utc) - (t if t.tzinfo else t.replace(tzinfo=dt.timezone.utc))).total_seconds() / 3600
+
+
 def open_question(e):
     """The entry's question to the user not yet answered: on a waiting entry (it holds everything) or on a running one
     (it holds only what `blocks` names; the rest of the entry keeps moving)."""
@@ -2274,8 +2280,8 @@ def cmd_show(a):
             lr = [r for r, state, fin in runs_of(e, st) if live(state)]
             extra = ("live runs " + ", ".join(lr)) if lr else ("last step %s" % ls.isoformat()[:16] if ls else "no step")
             if open_question(e):
-                extra += "; open question asked %s: %s (blocks: %s; searched first: %s)" % (
-                    e["waiting_since"][:16], e["ask"], e.get("blocks") or "not recorded",
+                extra += "; open question asked %s (%.0f h open): %s (blocks: %s; searched first: %s)" % (
+                    e["waiting_since"][:16], ask_age_h(e), e["ask"], e.get("blocks") or "not recorded",
                     e.get("searched") or "not recorded")
             if sweeps_of(st, e["id"]):
                 ended, lv, unread = sweep_status(e["id"], st, site_sweeps(want_of(st, [e["id"]]), all_sites=False,
@@ -3274,6 +3280,9 @@ def cmd_next(a):
         r = replied(e, msgs) if e.get("status") == "running" else None
         if r:
             print("REPLY %s: %s" % (e["id"], r[0]))
+        elif open_question(e):                   # D534: an unanswered hold is listed on every wake with its age
+            print("OPEN %s: %.0f h unanswered, blocks %s: %s" % (
+                e["id"], ask_age_h(e), e.get("blocks") or "not recorded", e["ask"][:160]))
     for e, why in done_problems(d, st):
         print("SUGGEST %s: marked done, but %s; plan reopen %s --why ..., or fix it (plan evidence --drop ...)" % (
             e["id"], why, e["id"]))

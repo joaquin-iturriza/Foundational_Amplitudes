@@ -56,3 +56,11 @@ def test_raw_command_in_an_ask_is_refused():
         else:
             raise AssertionError(ask)
     plan._ask_ok("Permission classifier refusal: an edit of the gate was refused, will you make it yourself?")
+
+
+def test_ask_age_shown():
+    """D534: an open question carries its age (the zng stage-2 ask sat 94 h after one relay, 2026-11-20..24)."""
+    import datetime as dt
+    for since in ((dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=94)).isoformat(),
+                  (dt.datetime.utcnow() - dt.timedelta(hours=94)).strftime("%Y-%m-%dT%H:%M:%SZ")):
+        assert 93.9 < plan.ask_age_h({"waiting_since": since}) < 94.1, since
