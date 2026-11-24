@@ -150,7 +150,7 @@ def plot(res, curves):
     import plot_style as ps
     from matplotlib.ticker import NullFormatter
     sty = {"S1k": ("from scratch", ps.C.blue, "o"), "Fn1k": ("fine-tuned,\n28-process parent", ps.C.green, "^"),
-           "Fg1k": ("fine-tuned,\ngluon parent", ps.C.vermillion, "s")}
+           "Fg1k": ("fine-tuned,\n9-process parent", ps.C.vermillion, "s")}
     fig, axs = ps.figure(ncols=2, nrows=2)
     a, l, c, leg = axs[0][0], axs[0][1], axs[1][0], axs[1][1]
     l.axvspan(*WIDE, color=ps.C.grey, alpha=0.12, lw=0, label="wide lr window")
