@@ -38333,9 +38333,9 @@ entries:
     decision: D539
   owner:
     agent: a6ec5cc852dfce21b
-    state: working
+    state: stopped
     since: '2026-11-24T14:14:38+00:00'
-    state_at: '2026-11-24T18:00:52.682000+00:00'
+    state_at: '2026-11-24T18:09:01.872000+00:00'
     context: 190779
     context_at: '2026-11-24T16:54:51+00:00'
   findings:
@@ -43526,9 +43526,9 @@ entries:
     withdrawn_why: 'answered: D541 says route log reading and simple fixes through DeepSeek and test harder tasks'
   owner:
     agent: a0b32d95ff985a14c
-    state: working
+    state: stopped
     since: '2026-11-24T17:46:29+00:00'
-    state_at: '2026-11-24T17:46:29+00:00'
+    state_at: '2026-11-24T18:03:46.242000+00:00'
     context: 170788
     context_at: '2026-11-24T18:01:00+00:00'
   designs:
