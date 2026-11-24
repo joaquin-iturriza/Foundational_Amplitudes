@@ -15816,10 +15816,11 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-046cc7d3
-    commit: be0f5910
+    commit: c4e1c6dad
     paths:
     - .claude/hooks/notification_absorb.py
     - .claude/hooks/owner_handoff.py
+    - '.claude/hooks/review_backlog.sh (54debf37e: CLAUDE.md pillar covers plan/*prompt*.txt and .claude/agents)'
     - '2026-11-04 owner aaf01b2d42241ffe1: next 1 cleanup done (lock_guard.py, reviewer_resume.py, handback_guard.py deleted;
       review_backlog.sh check|bashpost branch removed; 33 MB of redesign backups removed from the scratchpad: settings diffs
       and pre-A/B settings copies, D/, CLAUDE.md.pre, FA_base/FA_copy/FA_new, hook drafts); repo-reviewer ab72652c9dc1a2ace
@@ -16077,6 +16078,9 @@ entries:
       3.5/6.3/11.2/15.4/27.8 min. Owners (70 agents resumed) 247 resumes / 618.2M (hand-back 169/459.0M, task notification
       49/47.2M, site event 10, main message 9, user 10): 5 min 137, 597-528M; 10 min 110, 591-481M; 20 min 100, 590-459M;
       30 min 94, 589-449M; 60 min 89, 588-433M. Whole session (45 days) in wake_batching_all.json. Figure analysis/agent_redesign/figs/wake_batching.png'
+    - 'worktrees/wt-intent tools/plan.py + .claude/hooks/send_check.py (6c00befdd, 35d1f7206: plan intent, intent first in
+      briefs, send_check refuses a rejected producer; replay: control_score.py figure refused, heldout_per_process.py passes,
+      fabricated quote refused)'
     - 'write-up 2026-11-04 (docs/results.tex sec:agent-redesign, a72fb682; tools d30cb3aa: push_replay --revert/--until, main_turns
       --until, compaction_replay --until + JSON line, model_trial report JSON line): cut 1 over the 40 agents 2026-11-02T05:14Z..2026-11-04T19:00Z:
       replay/recorded 0.999, 0 off by 5%; per call 10802 -> 8111 tokens, median agent 6024 -> 4372, 17.13M -> 12.85M token-calls.
