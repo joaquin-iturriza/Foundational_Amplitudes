@@ -138,9 +138,20 @@ def plot_u(res, curves):
     import plot_style as ps
     lab = {"off": "no rescale", "eps1e-8": r"rescale, $\epsilon=10^{-8}$"}
     cols = {"off": ps.C.blue, "eps1e-8": ps.C.vermillion}
-    fig, axs = ps.figure(ncols=2, nrows=2)
-    (g, h1), (h2, cell) = axs
+    fig, axs = ps.figure(ncols=3, nrows=2)
+    (g, h1, h2), (k1, k2, cell) = axs
     blown = set(res["blowups"])   # open markers: val rose > 10x its best-so-far (D398), read at its best
+    kit = json.load(open(os.path.join(HERE, "data", f"{TAG}_kit.json")))["cells"]   # d539_kit_read.py --set u
+    fam = {"soft_x": "soft", "coll_y": "collinear", "bulk": "bulk"}
+    for ax, d in ((k1, "1e4"), (k2, "1e5")):
+        for j, a in enumerate(("off", "eps1e-8")):
+            for i, f in enumerate(fam):
+                v = [x for x in kit[d][a][f] if x is not None]
+                ax.plot(i + (j - 0.5) * 0.3 + (np.arange(len(v)) - 1) * 0.05, v, "o", color=cols[a])
+        ax.set_xticks(range(len(fam))); ax.set_xticklabels(list(fam.values())); ax.set_xlim(-0.5, len(fam) - 0.5)
+        ax.set_yscale("log"); ax.set_xlabel("deepest kit bin")
+        ax.set_ylabel(r"MSE$(\log_{10}|\mathcal{M}|^2)$")
+        ps.process_label(ax, rf"$e^+e^-\to u\bar ug$, $D_{{\rm train}}=10^{d[-1]}$")
     for i, (p, d) in enumerate(CELLS):
         for j, k in enumerate(("off", "eps1e-8")):
             for m, (sd, x) in enumerate(zip(SEEDS, res["cells"][f"{p}_{d}"][k]["best"])):
