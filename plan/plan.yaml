@@ -38371,6 +38371,15 @@ entries:
       the fine-tune''s 9 best at 1.95e-3..3.1e-3 (best 0.13 dec above the bottom 1.9e-3); the hpo_optima-centred window (repo-reviewer
       fix) is edge-limited for both, so S1k could fall with a higher lr (shrinking the gain) and Fn1k with a lower one. Not
       yet a figure; no claim to Joaquin before the seeds and the edge question are settled.'
+  - at: '2026-11-24T08:14:22+00:00'
+    text: '2026-11-24 ~10:10 D=1e3 seeds recorded, provisional (zng4g_d1e3_read.py @d972272d7, extension mid-way: 18/24 scratch,
+      17/24 fine-tune trials observed, neither best moved yet). Best val MSE(log|M|^2) (= val mu-MSE x prepd_std^2, std 1.1217,
+      same pool both arms) seeds 42/43/44: scratch S1k hp1009 (lr 1.74e-2) 0.1227/0.1361/0.1300 (FA-ccin2p3-b96a2a6c, -2525f488
+      for 43/44); fine-tune from the 28-process no-settings parent Fn1k hp1860 (lr 2.54e-3) 0.0616/0.0653/0.0621 (-ada00163,
+      -3ea9d4fa). Fn1k/S1k = 0.486, 2-sigma [0.454, 0.522] (sigma_r 0.035), 9-pairing 10-90% 0.456-0.511 -> gain at D=1e3
+      (hi<1), provisional until the extension ends. BLOW-UP listed apart (D398): S1k seed 43 has val > 10x best-so-far after
+      its best (best at 60% of the run), read at its best checkpoint. Fn1k best at 14-16% of the run (early-best shape as
+      at 1e4); S1k at 60-96%. Corrects the 07:42 finding: those 0.0976/0.0490 were standardised mu-MSE; x std^2 they are 0.1227/0.0616.'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
