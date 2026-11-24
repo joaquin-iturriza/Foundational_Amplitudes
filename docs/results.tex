@@ -9945,6 +9945,29 @@ $0.09$ decades under the top of the window, as does scratch's.
 % claim: Fn_over_S.mean=1.53
 % allow: 9 28 128 2 10^4 0.09 because they are the parents' process counts, the batch size, the interval width, the training size and the window position read from the plotted trials
 
+At $10^3$ events the order flips (Fig.~\ref{fig:ftm_zng4g_d1e3}). The fine-tune from the 9-process parent, searched over the
+same $24$ trials, reaches $0.0823$, $0.0811$, $0.0845$ at learning rate $3.55\times10^{-3}$. Over the 28-process fine-tune that
+is $1.31$, with a $2\sigma$ interval of $1.26$--$1.37$: the narrower parent is worse, by the design's rule. It still beats
+scratch, $0.64$ ($0.60$--$0.68$). It peaks earlier, at $8$--$10\%$ of the run, and ends $1.33$--$1.39\times$ above its best.
+Where data is scarce the breadth of the parent counts, and where data is plentiful its overlap with the target does.
+% src: python3 analysis/finetune_mechanism/zng4g_d1e3_read.py --cached @e0b02d2e2
+% claim: arms.Fg1k.n_trials=24
+% claim: arms.Fg1k.best.0=0.0823
+% claim: arms.Fg1k.best.1=0.0811
+% claim: arms.Fg1k.best.2=0.0845
+% claim: arms.Fg1k.chosen.lr=3.55e-3
+% claim: Fg1k/Fn1k.r=1.31
+% claim: Fg1k/Fn1k.lo=1.26
+% claim: Fg1k/Fn1k.hi=1.37
+% claim: Fg1k/S1k.r=0.64
+% claim: Fg1k/S1k.lo=0.60
+% claim: Fg1k/S1k.hi=0.68
+% claim: arms.Fg1k.best_at_pct.2=8
+% claim: arms.Fg1k.best_at_pct.0=10
+% claim: arms.Fg1k.end_over_best.0=1.33
+% claim: arms.Fg1k.end_over_best.1=1.39
+% allow: 9 28 10^3 2 because they are the parents' process counts, the training size and the interval width
+
 \begin{figure}[H]
   \centering
   \includegraphics{../analysis/finetune_mechanism/figs/zng4g_d1e3.pdf}
@@ -9952,9 +9975,10 @@ $0.09$ decades under the top of the window, as does scratch's.
   steps, batch $128$. Top left: best validation MSE$(\log|\mathcal M|^2)$ of each arm's chosen trial at seeds $42$, $43$,
   $44$. Top right: best validation MSE$(\log|\mathcal M|^2)$ against learning rate, one open marker per search trial;
   narrow and wide window: the first $16$ trials' and the $8$ added trials' learning-rate bounds. Bottom left: validation
-  MSE$(\log|\mathcal M|^2)$ against the fraction of the run, the chosen trials' three seeds.}
+  MSE$(\log|\mathcal M|^2)$ against the fraction of the run, the chosen trials' three seeds. 28-process parent:
+  \code{FA-ccin2p3-9a73698a}; 9-process parent: \code{FA-ccin2p3-1f2d9ad5}, the 9 gluon and $Z$ processes only.}
   \label{fig:ftm_zng4g_d1e3}
-  % allow: 10^3 128 16 3125 42 43 44 4g 8 2 because they are the design's size, batch, steps, trial counts, seeds and the process name
+  % allow: 10^3 128 16 3125 42 43 44 4g 8 2 9 28 because they are the design's size, batch, steps, trial counts, seeds and the process name
 \end{figure}
 
 \begin{figure}[H]
