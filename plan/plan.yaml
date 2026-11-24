@@ -40605,6 +40605,25 @@ entries:
       catalog. Figure analysis/llm_compare/figs/c_val_curves.png (c_val_curves.py @b454a17c1). Wave 2 sent by drive4 to CC:
       FA-ccin2p3-bf23e0c4 (hp0563), -b77878e1 (hp0902), -f6f7179d (hp1736). CC /sps/lpnhe has 15 GB free (under the 60 GB
       floor).'
+  - at: '2026-11-24T08:22:48+00:00'
+    text: '2026-11-24 ~09:25 CET (E8506): part (c) control FA-ccin2p3-d34535b0 (trial_1262''s HPs, lr 3.65e-3; blew up at
+      steps 33462 and 51714) scored at its best checkpoint (step 24336) by FA-ccin2p3-48e43133 (tools/llm_score.py @2715130f70,
+      the first run on the emission-scale target): pooled test RMSE of log|M|^2 seen 0.171 (1352 x 1e4 events), held out 1.253
+      (139 x 1e4), relabels 0.311 (96), new 2.205 (43); median per-process MSE relabels 0.0140, new 0.385; below the LLM on
+      84/96 relabels and 25/43 new. Against part (a)''s control (his z, AdamW lr 1e-3 const): 0.139 / 1.042 / 0.237 / 1.839,
+      medians 0.0276 / 0.688, 82/96 and 14/43. So the latest setup''s control halves the median per-process held-out MSE on
+      both sets but is worse pooled: a few held-out processes dominate the pooled sum (figure: one relabel at MSE ~4 and the
+      top five new at 10-40). LLM 0.321 / 0.721 / 0.341 / 1.193, medians 0.079 / 0.649. Tool check on the emission-scale target:
+      on the seen set llm_score''s 0.17059 equals the run''s own test-stage predictions (sigma_stage/preds_test.npz, 13.52M
+      events, mu frozen at the best checkpoint) read two ways, through the experiment''s inverse transform with the target
+      factor put back (log raw_pred - log raw_truth) 0.17060 and as (pred - truth) x sigma 3.786 0.17060 (analysis/llm_compare/check_score_vs_preds.py
+      @4d06cfde1); held out used parent_shared with the factor on for all 139 processes (log line ''target_physics_factor
+      ON (memmap): 139 processes''). Numbers: analysis/llm_compare/control_score.py --tag control c_control --out ac_controls
+      @4d06cfde1 -> data/ac_controls_score_summary.json; figure analysis/llm_compare/figs/ac_controls_score.png. Correction:
+      part (c) trial 0 FA-ccin2p3-29ce8950 (hp1860) ran with EMA on, decay 0.983 (ema true, training.ema_decay 0.9831303 in
+      runs/llmcmp_c_qperp/trial_1860/config.yaml; log ''Using EMA for validation and eval''), not 0.9989 as the 09:00 finding
+      said (0.9989 is part (a) trial 5''s); its other HPs: lr 1.604e-3, muon_weight_decay 0.0280, L2 4.69e-8, warmup 0.191,
+      eta_min 4.1e-9.'
   step_waits:
     '2': FA-ccin2p3-b135e7db FA-ccin2p3-f3e29e87
     '3': llmcmp_a_drive5
