@@ -44635,6 +44635,23 @@ entries:
       half a decade over is otherwise judged against the template window). The trunk repo backlog since f7b0f16ab (31 commits,
       953 lines) is held by another repo-reviewer instance, which holds the lock; ac9677801a836098a did not advance the watermark,
       and the merge/close of critical_batch waits on that instance''s pass.'
+  - at: '2026-11-24T21:52:20+00:00'
+    text: '2026-11-24 22:50: (1) Notes-editor item 2 cleared: sec:noisescale reads run and control at the best checkpoint
+      (lowest aggregate val_loss_no_reg = last validation, step 4250, -2.872 vs -2.907), noise_read.py b2b650b45, text e777b1eef+44118754f;
+      notes-editor a5ba589f6a1247baa: item resolved (its remaining BLOCK items are par:ftm_zng4g and par:llmcmp_a, not this
+      entry). (2) Measured V100 step rates of the scan, validation included (Finished iteration lines and sacct): 0.65/0.77/0.90/1.07
+      s/step at B=2048/4096/8192/16384 vs the design''s model 0.12+0.86 B/16384 = 0.23/0.33/0.55/0.98: a ~0.55 s/step fixed
+      overhead the model missed (2.8x at 2048); H100 trials 2-3x faster. Full horizons: 6.2/3.65/2.1/1.27 h, not 2.92/2.07/1.64/1.43.
+      (3) cbs_b2048 trial_0001 (hp_0353, lr 1.17e-2, EMA off) hit its 3:27 limit at ~step 17000 of 34112, best val -1.919
+      (spiky, to 1.7e9), never -2.30: crossings read from its log. cbs_b4096 trial_0001 (same hp_0353) diverged at step 7409
+      (50 non-finite gradient steps), DyHPO penalty; listed apart at the readout. (4) Every finished trial at 4096/8192/16384
+      stopped at -2.30: steps 5100-6630 / 2975-7650 / 2720-3910; sweep bests on S(-2.08): 3997 (2048, 3 results), 2626 (4096),
+      1864 (8192), 1686 (16384). (5) Repairs inside the design (full horizons covered): pending cbs_b2048 trials 6,7 raised
+      to 6:50; wave 3 (64801636-41) submitted on CC, limits 2:21 (8192), 1:41 (16384); 4096''s two started before the raise
+      and keep 3:15 (~15000 of 17056 steps; their siblings stop by 6630); cbs_b32768 limit 3:15 from the measured 16384 rate
+      (6511b281f). (6) lxplus smoke cbs_smoke_b32768 idle 7 h (0 slots fit 33 GB + GPU; site pick: lxplus 0 fit, CC 11 free):
+      removed (DAG 13231064.0), smoke and 32768 sweep moved to CC by site pick. Worst-case total ~95 GPU-h (spent ~35 + limits
+      of what remains), under D536''s 100.'
   handoff:
     state: 'Step 2 (batch-size scan, D532 under the D536 100 GPU-h rule) is partly submitted under a design passed 2026-11-24T14:25
       (plan show critical_batch). Code merged into trunk at f3705b316 (repo-reviewer PASS on cbs_accum at 8de829f32 and on
