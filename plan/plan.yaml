@@ -45090,6 +45090,15 @@ entries:
       and env.python_bin are committed as tested (a rebuild reproduces the live stack); no: the step that failed is reported
       (download, a pin that does not build on 3.11.7, an import), fixed when it is a recipe defect, and only the route that
       changes the stack (a newer torch on the cu124 index under python 3.13) goes to Joaquin with its cost'
+    passed_at: '2026-11-24T22:15:16+00:00'
+    reviewer: 'Re-check of the CC env rebuild: the measure is now a real pip install of requirements.txt into a TMPDIR venv
+      built by the exact bootstrap recipe to be committed (module python/3.13.7, then uv CPython 3.11.7 under /sps), then
+      pip check, imports of torch, numpy, scipy, h5py, xformers, torch_geometric, gpytorch, lloca and mup and of FA''s run
+      path, with versions compared to the live venv (3.11.7, torch 2.1.2+cu118, numpy 1.26.4 from job 64801966). Disk: a 15
+      GB TMPDIR floor against a stack of about 6 GB with the pip cache off. The prior now cites the 2026-10-29 dead end and
+      the recorded call ''a setup gap to fix (site env), not a question''. Note: xformers is unpinned in requirements.txt
+      and may pull a newer torch; the version comparison makes that a no, and the fix is a recipe pin. Searched plan.yaml
+      for anaconda, 3.11, python env, env repair and python_bin, and site decisions (D176, D544).'
   findings:
   - at: '2026-11-24T17:31:13+00:00'
     text: 'Inventory of scripts run on CC''s login node (2026-11-24): supervisor maintain every pass (8-10 min apart): disk_watch.py
