@@ -45121,6 +45121,15 @@ entries:
       htc queue wait 1-29 s; runs ~1 s except disk_watch''s 6-hourly du (301 s) and the prune job (47-305 s, a real prune
       at ~21:45 appended 4 PRUNE records); no MAINTAIN/ALERT/CHECK/REFUSED event since the switch. All design bounds hold:
       the switch stays.'
+  - at: '2026-11-24T22:18:29+00:00'
+    text: 'CC env (job 64801966, 23:10): activate.sh never loads the module on CC; the live .venv imports torch 2.1.2+cu118,
+      numpy 1.26.4 on python 3.11.7, but its interpreter is a symlink to /pbs/software/redhat-9-x86_64/anaconda/3.11/bin/python3.11,
+      inside the module CC now denies (''no longer supported, will soon be removed''): it breaks when CC deletes that install.
+      CC offers python/3.13.7-3.14.9 only (no 3.11); requirements.txt''s torch 2.1.2 has no cp313 wheels, so a module swap
+      alone cannot rebuild it (site env would stop at exit 6 today, at pip exit 9 on 3.13). Test of a standalone CPython 3.11.7
+      via uv (design passed 22:15 UTC): job 64802032, the exact bootstrap recipe in scratchpad boot.txt; sites.yaml change
+      waits on its result. xformers is unpinned in requirements.txt (the job prints live vs fresh versions). CC /sps had 9
+      GB free at 23:00 (coordinator).'
   step_waits: {}
   step_why:
     2:
