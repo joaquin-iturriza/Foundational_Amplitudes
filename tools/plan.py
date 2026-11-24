@@ -1702,9 +1702,9 @@ def owner_actions(d, st, t=None, msgs=None, events=None):
             if not evs and not r:
                 note("%s: its owner %s is stopped while its work is in flight" % (e["id"], o["agent"]))
             if evs:
-                out.append((e, "resume", o["agent"], "open events %s: SendMessage to %s carrying them" % (
+                out.append((e, "resume", o["agent"], "open events %s: %sSendMessage to %s carrying them" % (
                     ", ".join(x[2] for x in evs[:5]) + (" and %d more" % (len(evs) - 5) if len(evs) > 5 else ""),
-                    o["agent"])))
+                    lab_route(e, evs), o["agent"])))
             elif r and (r[0].startswith("ready step") or not (last and r[1] and r[1] <= last)):
                 out.append((e, "resume", o["agent"], r[0]))
             continue
@@ -1714,6 +1714,18 @@ def owner_actions(d, st, t=None, msgs=None, events=None):
             out.append((e, "launch", None, "%s; a fresh owner from %s: plan brief %s, then plan owner %s --agent <id>"
                         % ("open events " + ", ".join(x[0] for x in evs) if evs else r[0], src, e["id"], e["id"])))
     return out
+
+
+def lab_route(e, evs):
+    """D541: a RUN event's log is read first by DeepSeek and checked by a mechanical-worker; the step to launch, or ''
+    when no event is a RUN."""
+    runs = [(x[0], (re.findall(RUN_ID_RE, x[2]) or ["<run>"])[0]) for x in evs if len(x[2].split()) > 4
+            and x[2].split()[4] == "RUN"]
+    if not runs:
+        return ""
+    return ("first a mechanical-worker (plan brief %s --mechanical \"Lab route: %s; check each reading against its "
+            "log; hand back the checked readings, do not ack\"), then " % (e["id"], "; ".join(
+                "python3 tools/labllm.py triage %s --event %s" % (r, i) for i, r in runs)))
 
 
 def owner_brief(e, add=None):

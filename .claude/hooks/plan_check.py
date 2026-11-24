@@ -475,7 +475,8 @@ def bare_acks(inp, kinds=None):
     if not bare:
         return []
     return ["%s acked by you, not by the agent that reads the log: an event whose fix means reading a log goes to "
-            "its entry's owner (SendMessage naming it), or to a mechanical-worker when the entry has no live owner "
+            "its entry's owner (SendMessage naming it; a RUN event first through the lab route `plan next` prints), or to "
+            "a mechanical-worker when the entry has no live owner "
             "(Agent, its brief naming it); send each there now to read the log and confirm or redo the ack" %
             ", ".join("%s (%s)" % (e, kinds[e]) for e in bare)]
 
