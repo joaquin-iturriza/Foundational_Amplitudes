@@ -75,3 +75,32 @@ def test_brute_gram_and_jackknife():
         S_true = D * (d.square().sum() + s ** 2) + d.square().sum()
         hits += abs(S - S_true) <= 2 * se[0]
     assert hits >= 32   # about 95% of 40 within two standard errors
+
+
+def test_chunks_overstate_trace_under_per_process_means():
+    # the loss is a mean over processes of per-process means, so a batch gradient is self-normalised: its spread
+    # across batches has no term from the batch's process counts. Chunks weighted at the whole batch's counts do
+    # carry that term (a chunk's share of each process varies), so the chunk tr Sigma is above the batch one
+    # whenever the processes' mean gradients differ; with one process the two agree (FA-ccin2p3-225d38ea: 1.28x)
+    import numpy as np
+
+    def ratio(P, n, k=8, M=16, reps=150, D=5):
+        rng = np.random.default_rng(0)
+        mu = rng.normal(size=(P, D))
+        Sc = Sb = 0.0
+        for _ in range(reps):
+            gb = []
+            for _ in range(M):
+                p = rng.integers(0, P, n)
+                g = mu[p] + rng.normal(size=(n, D))
+                cnt = np.bincount(p, minlength=P)
+                w = 1.0 / ((cnt > 0).sum() * cnt[p])
+                gb.append((w[:, None] * g).sum(0))
+                ch = np.array([k * (w[c, None] * g[c]).sum(0) for c in np.array_split(np.arange(n), k)])
+                Sc += noise_scale_terms((ch ** 2).sum(1).mean(), (ch.mean(0) ** 2).sum(), n / k, n)[0] / M
+            gb = np.array(gb)
+            Sb += noise_scale_terms((gb ** 2).sum(1).mean(), (gb.mean(0) ** 2).sum(), n, n * M)[0]
+        return Sc / Sb
+
+    assert abs(ratio(1, 512) - 1) < 0.05
+    assert ratio(50, 600) > 1.5

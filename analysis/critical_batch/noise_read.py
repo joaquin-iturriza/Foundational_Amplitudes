@@ -52,12 +52,17 @@ def read(recs, window):
         per = {}
         for s in terms(w[0])[2]:
             a = np.array([terms(r)[2][s] for r in w])
-            per[s] = {"S": float(a[:, 0].mean()), "G2": float(a[:, 1].mean())}
+            per[s] = {"S": float(a[:, 0].mean()), "G2": float(a[:, 1].mean()),
+                      "B_simple": float(a[:, 0].mean() / a[:, 1].mean()) if a[:, 1].mean() > 0 else None}
         S, G2 = ST.mean(0)
         out["windows"].append({"step_lo": w[0]["step"], "step_hi": w[-1]["step"], "S": float(S), "G2": float(G2),
                                "S_se": float(ST[:, 0].std(ddof=1) / np.sqrt(len(w))),
                                "G2_se": float(ST[:, 1].std(ddof=1) / np.sqrt(len(w))),
-                               "B_simple": float(S / G2) if G2 > 0 else None, "sets": per})
+                               "B_simple": float(S / G2) if G2 > 0 else None, "sets": per,
+                               # the largest single measurement's share of the window's summed S: near 1, one
+                               # measurement sets the window's mean (a heavy-tailed gradient)
+                               "S_max_share": float(ST[:, 0].max() / ST[:, 0].sum()),
+                               "S_max_step": int(w[int(ST[:, 0].argmax())]["step"])})
     for r in (r for r in recs if r["kind"] == "brute"):
         same = [terms(c)[:2] for c in recs if c["kind"] == "chunk_at_brute" and c["step"] == r["step"]]
         a = np.array(same)
@@ -78,33 +83,64 @@ def read(recs, window):
     return out
 
 
-def figure(res, batch, base):
+def figure(res, batch, base, curves=None):
+    """(a) B_simple along the run, all parameters and each set, with the brute checks; (b) its two terms; (c) S at
+    the checks, chunk against brute with their errors; (d) the validation curves of `curves` {label: result.json}."""
     import plot_style as ps
-    fig, (axB, axT) = ps.figure(ncols=2)
-    w = [x for x in res["windows"] if x["B_simple"] is not None]
-    mid = [(x["step_lo"] + x["step_hi"]) / 2 for x in w]
-    axB.plot(mid, [x["B_simple"] for x in w], color=ps.C.blue, label=r"$B_{\rm simple}$, batch split in chunks")
+    fig, ((axB, axT), (axS, axV)) = ps.figure(ncols=2, nrows=2)
+    mid = lambda xs: [(x["step_lo"] + x["step_hi"]) / 2 for x in xs]
+    # a window where one of its measurements carries over half the summed trace (a heavy-tailed gradient, S up to
+    # 1e31) would set a log axis 25 decades wide: the axes span the other windows and these are marked at the top edge
+    one = lambda x: x["S_max_share"] > 0.5
+    w = [x for x in res["windows"] if x["B_simple"] is not None and not one(x)]
+    axB.plot(mid(w), [x["B_simple"] for x in w], color=ps.C.blue, label="all, chunks")
+    for s, c, lab in (("muon", ps.C.green, "Muon parameters"), ("adamw", ps.C.orange, "AdamW parameters")):
+        ws = [x for x in w if x["sets"].get(s, {}).get("B_simple") is not None]
+        if ws:
+            axB.plot(mid(ws), [x["sets"][s]["B_simple"] for x in ws], color=c, ls=":", label=lab)
     c = [x for x in res["checks"] if x["B_brute"] is not None]
     M = res["checks"][0]["n_batches"] if res["checks"] else 0
     axB.errorbar([x["step"] for x in c], [x["B_brute"] for x in c], yerr=[x["B_brute_se"] for x in c], fmt="o",
-                 color=ps.C.vermillion, label=rf"$B_{{\rm simple}}$, {M} independent batches")
-    neg = [(x["step_lo"] + x["step_hi"]) / 2 for x in res["windows"] if x["B_simple"] is None]
+                 color=ps.C.vermillion, label=f"all, {M} batches")
+    neg = mid([x for x in res["windows"] if x["B_simple"] is None and not one(x)])
     if neg:   # windows whose mean |G|^2 <= 0 have no B: marked at the bottom, not dropped
-        axB.plot(neg, [min(x["B_simple"] for x in w) / 2 if w else 1.0] * len(neg), "v", color=ps.C.blue,
+        axB.plot(neg, [min(x["B_simple"] for x in w) / 2] * len(neg), "v", color=ps.C.blue,
                  label=r"window with mean $|G|^2\leq 0$")
     axB.axhline(batch, color="k", ls="--", label="training batch")
+    top = 3 * max([batch] + [x["B_simple"] for x in w] + [x["B_brute"] for x in c])
+    big = [x for x in res["windows"] if one(x)]
+    if big:
+        axB.plot(mid(big), [top] * len(big), "^", color=ps.C.grey, label="window set by one measurement")
     axB.set_yscale("log")
     axB.set_xlabel("training step")
     axB.set_ylabel(r"$B_{\rm simple}={\rm tr}\,\Sigma/|G|^2$ (events)")
-    ps.legend(axB, "upper left")
-    allw = res["windows"]
-    m2 = [(x["step_lo"] + x["step_hi"]) / 2 for x in allw]
-    axT.plot(m2, [x["S"] for x in allw], color=ps.C.blue, label=r"${\rm tr}\,\Sigma$")
-    axT.plot(m2, [x["G2"] * batch for x in allw], color=ps.C.vermillion, label=rf"$|G|^2\times {batch}$")
-    axT.set_yscale("symlog", linthresh=max(1e-12, min(abs(x["S"]) for x in allw) / 10))
+    ps.legend(axB, "upper left", ncol=2)
+    wt = [x for x in res["windows"] if not one(x)]
+    axT.plot(mid(wt), [x["S"] for x in wt], color=ps.C.blue, label=r"${\rm tr}\,\Sigma$")
+    axT.plot(mid(wt), [x["G2"] * batch for x in wt], color=ps.C.vermillion, label=rf"$|G|^2\times {batch}$")
+    if big:
+        axT.plot(mid(big), [3 * max(max(x["S"], x["G2"] * batch) for x in wt)] * len(big), "^", color=ps.C.grey,
+                 label="window set by one measurement")
+    axT.set_yscale("log")
     axT.set_xlabel("training step")
-    axT.set_ylabel("gradient norm terms")
+    axT.set_ylabel(r"squared gradient norm terms")
     ps.legend(axT, "upper left")
+    st = [x["step"] for x in res["checks"]]
+    axS.errorbar(st, [x["S_brute"] for x in res["checks"]], yerr=[2 * x["S_brute_se"] for x in res["checks"]],
+                 fmt="o", color=ps.C.vermillion, label=f"{M} independent batches")
+    axS.errorbar(st, [x["S_chunk"] for x in res["checks"]], yerr=[2 * x["S_chunk_se"] for x in res["checks"]],
+                 fmt="s", color=ps.C.blue, label="chunks of the same batches")
+    axS.set_yscale("log")
+    axS.set_xlabel("training step")
+    axS.set_ylabel(r"${\rm tr}\,\Sigma$ at the checks")
+    ps.legend(axS, "upper left")
+    for (lab, r), col in zip((curves or {}).items(), (ps.C.vermillion, ps.C.blue)):
+        v = r["val_curve"]
+        axV.plot([i * r["validate_every"] for i in range(len(v))], v, color=col, label=lab)
+    axV.set_xlabel("training step")
+    axV.set_yscale("symlog", linthresh=1.0)   # the het NLL is negative; its spikes reach 1e9
+    axV.set_ylabel(r"validation loss (no reg.)")
+    ps.legend(axV, "upper right")
     ps.save(fig, base)
 
 
@@ -112,6 +148,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("path"); ap.add_argument("name")
     ap.add_argument("--window", type=int, default=20); ap.add_argument("--batch", type=int, default=16384)
+    ap.add_argument("--result", help="this run's result.json (its validation curve)")
+    ap.add_argument("--control", help="the control run's result.json, same setup without the measurement")
     a = ap.parse_args()
     res = read(json.load(open(a.path)), a.window)
     res["source"] = os.path.abspath(a.path)
@@ -124,7 +162,18 @@ def main():
               f"|G|^2 brute se {x['G2_brute_se']:.2g}; agree S {x['S_agree']} |G|^2 {x['G2_agree']}")
     for x in res["windows"][::max(1, len(res['windows']) // 10)]:
         print(f"WINDOW steps {x['step_lo']}-{x['step_hi']}: S {x['S']:.4g} |G|^2 {x['G2']:.4g} B_simple {x['B_simple']}")
-    figure(res, a.batch, f"{HERE}/figs/{a.name}")
+    for x in res["windows"]:
+        print(f"SETS steps {x['step_lo']}-{x['step_hi']}: " + " ".join(f"{s} B {v['B_simple']}" for s, v in x["sets"].items())
+              + f"; largest S share {x['S_max_share']:.3f} at step {x['S_max_step']}")
+    curves = {}
+    if a.result:
+        curves["with the noise measurement"] = json.load(open(a.result))
+    if a.control:
+        curves["control, no measurement"] = json.load(open(a.control))
+    for lab, r in curves.items():
+        print(f"VAL {lab}: final {r['val_curve'][-1]:.4f} best {min(r['val_curve']):.4f} at step "
+              f"{int(np.argmin(r['val_curve'])) * r['validate_every']}")
+    figure(res, a.batch, f"{HERE}/figs/{a.name}", curves)
 
 
 if __name__ == "__main__":
