@@ -40520,6 +40520,12 @@ entries:
     units: null
     start: '2026-11-24T19:54:57+00:00'
     at: '2026-11-24T19:54:57+00:00'
+  - batch: zng4g_ftglu_b128_seeds
+    wall_h: 1.0
+    jobs: 2
+    units: null
+    start: '2026-11-24T21:46:25+00:00'
+    at: '2026-11-24T21:46:25+00:00'
   step_waits:
     '2': 'a reviewer: notes-editor BLOCKING (2026-11-24 ~21:30) blocks every commit; its item 1 is this entry''s par:ftm_zng4g
       D=1e3 sentence (best at 14-16%, ends 1.43-1.52x, no % src); then commit and launch the D=1e3 gluon extension + 1e4 seeds'
