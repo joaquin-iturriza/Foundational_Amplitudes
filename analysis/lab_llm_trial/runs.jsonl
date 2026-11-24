@@ -148,3 +148,9 @@
 {"family": "fixcheck", "task": "replyblock", "parent": false, "fix": false, "valid": false}
 {"family": "fixcheck", "task": "endedrun", "parent": false, "fix": false, "valid": false}
 {"family": "hardfix", "task": "massconv", "arm": "sonnet", "model": "sonnet (mechanical-worker)", "agent": "aadf2808952b95c30", "first_pass": true, "final_pass": true, "seconds": 47.8, "our_tokens": 234138, "usd": 0.1551, "usage": {}, "rc": 0, "failing_first": []}
+{"family": "fixcheck", "task": "backlogdepth", "parent": false, "fix": true, "valid": true}
+{"family": "fixcheck", "task": "endedrun", "parent": false, "fix": true, "valid": true}
+{"family": "fixcheck", "task": "inflight", "parent": false, "fix": true, "valid": true}
+{"family": "fixcheck", "task": "replyblock", "parent": false, "fix": true, "valid": true}
+{"family": "fixcheck", "task": "recheck", "parent": false, "fix": true, "valid": true}
+{"family": "fixcheck", "task": "reviewlock", "parent": false, "fix": true, "valid": true}
