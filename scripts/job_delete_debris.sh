@@ -12,6 +12,6 @@ _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 mkdir -p "$SCRATCH/zz_cc_disk"
-df -B1M /sps/lpnhe | tail -1
+df -B1M "$SCRATCH" | tail -1
 python tools/delete_debris.py --manifest "$SCRATCH/zz_cc_disk/deleted.tsv" ${DEBRIS_ARGS:-}
-df -B1M /sps/lpnhe | tail -1
+df -B1M "$SCRATCH" | tail -1

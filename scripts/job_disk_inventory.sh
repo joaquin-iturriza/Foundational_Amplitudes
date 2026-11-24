@@ -30,7 +30,7 @@ for A in "" --apparent-size; do
         du -s $A --block-size=1M --files0-from=- 2>/dev/null
     done ) > "$O/top${A:+_apparent}.tsv" &
 done
-df -B1M /sps/lpnhe > "$O/df.txt"
+df -B1M "$SCRATCH" > "$O/df.txt"
 python analysis/storage/inv_runs.py runs runs_from_lxplus runs_from_jeanzay > "$O/inv_runs.jsonl" &
 python analysis/storage/cache_census.py --in-use '*' --days 14 --workers 2 > "$O/census.tsv" &
 find "$WORK/datasets" -maxdepth 1 -type f -printf "%b\t%s\t%f\n" > "$O/files_datasets.tsv"
