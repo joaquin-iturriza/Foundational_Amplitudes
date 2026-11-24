@@ -44131,13 +44131,11 @@ entries:
       on CC-IN2P3): collect each trial''s result.json plus its training.lr into {batch: [dict with hp_idx, lr, val_curve,
       validate_every]} (a timed-out trial has no result.json: read its val_curve from its log; the diverged cbs_b4096 hp_0353
       listed apart with where it blew up), python3 analysis/critical_batch/cbs_read.py <trials.json>: S_B and E_B per target,
-      B_crit with bootstrap, unreached_above_fit, the lr-edge rule; figure of S_B and E_B against B per target beside B_simple;
-      write-up in docs/results.tex sec:noisescale, wall-clock per step beside steps (the measured 0.55 s/step fixed overhead)'
-    2: 'When the 32768 accumulation smoke (sweep cbs_smoke_b32768 on CC-IN2P3, job 64801655) ends: read its log (every stage,
-      STOP_AT_VAL_LOSS at the first validation, train mu-MSE on the accumulation path, RESULT_JSON, plots), then site pick
-      FA --jobs 8, plan target, generate and submit sweep cbs_b32768 on CC (tools/detach.py -- site run ccin2p3 FA --item
-      critical_batch --timeout 1500 -- python sweep/generate_sweep.py --config sweep/sweep_config_cbs_b32768.yaml --submit),
-      record it (plan run --sweep ccin2p3:cbs_b32768)'
+      B_crit with bootstrap, unreached_above_fit, the lr-edge rule; figure of S_B and E_B against B per target beside B_simple
+      (scan_state.py is the interim version); write-up in docs/results.tex sec:noisescale, wall-clock per step beside steps
+      (the measured ~0.5 s/step fixed overhead)'
+    2: 'When the detached submission cbs_b32768_submit ends (its DONE event): read its log (8 trials generated, wave 1 submitted,
+      SWEEP_SUBMITTED), record the sweep (plan run --sweep ccin2p3:cbs_b32768); if the submission failed, fix and resubmit'
   done_when: null
   notes_ref: null
   match: zz_cbs_*,cbs_*
@@ -44578,11 +44576,9 @@ entries:
     2:
       feeds: 'D532: the 32768 point of the scan, the ratio S_2048/S_32768 the design''s outcome rests on'
       if:
-      - 'smoke clean (every stage, the stop taken, finite mu-MSE): submit cbs_b32768 on CC'
-      - 'smoke broken: fix the accumulation path, rerun the smoke once, then submit'
-  step_waits:
-    '2': ccin2p3:cbs_smoke_b32768
-    '1': ccin2p3:cbs_b2048 ccin2p3:cbs_b4096 ccin2p3:cbs_b8192 ccin2p3:cbs_b16384 ccin2p3:cbs_b32768
+      - 'submitted: record it; step 1 then waits on it with the other four'
+      - 'refused or failed: read why, fix, resubmit the same config'
+  step_waits: {}
   targets:
   - batch: noise_smoke
     wall_h: 0.4
