@@ -18238,9 +18238,10 @@ processes (control 0.139, the LLM 0.321, his LLoCa 0.506), but 1.003 on the held
 from 0.688 to 1.144, against the LLM's 0.649, and the searched run is below the LLM on 9 of them (control 14). So the
 search buys error on the trained processes and none on the held-out ones: the held-out gap to the LLM is not an
 untuned optimizer, and it sits in the processes outside the trained classes (fig.~\ref{fig:llmcmp_heldout}). On the
-design's outcomes: the held-out MSE ratio of the searched run to the control lies inside the seed margin of 1.38, so
-part (b)'s width scaling starts from these HPs unless part (c) beats them.
-% src: python3 analysis/llm_compare/control_score.py --tag a_trial5 control c_control --out a5_controls @969687ee5
+design's outcomes: the held-out MSE ratio of the searched run to the control, $(1.003/1.042)^2=0.93$, lies inside the
+seed margin of 1.38, so part (b)'s width scaling starts from these HPs unless part (c) beats them.
+% src: python3 analysis/llm_compare/control_score.py --tag a_trial5 control c_control --out a5_controls @341d562be
+% claim: heldout_mse_ratio_to_control.a_trial5=0.93
 % claim: pooled_rmse_logm2.a_trial5.seen=0.117
 % claim: pooled_rmse_logm2.control.seen=0.139
 % claim: pooled_rmse_logm2.llm.seen=0.321
