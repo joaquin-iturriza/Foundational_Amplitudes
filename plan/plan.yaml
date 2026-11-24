@@ -40003,12 +40003,6 @@ entries:
     5: 'Part (c) readout: when llmcmp_c_qperp''s driver writes DRIVE_DONE and its control ends, score (c)''s best trial and
       the control (REREAD=<run> scripts/job_llm_score.sh), read per set (seen, held out, relabels, new) pooled RMSE and median
       per-process MSE against (a)''s best with the 1.38 margin, figure in Suprio''s layout; write-up'
-    8: 'Part (c) llmcmp_c_qperp wave 1 (config sweep/sweep_config_llmcmp_c_latest.yaml @7ca781941, design passed 2026-11-23T14:56):
-      driver llmcmp_c_qperp_drive2 on lxplus+ccin2p3 since 16:36 (log ~/.local/share/ccorch/detached/20261123-163617_llmcmp_c_qperp_drive2.log,
-      state sweeps_local/llmcmp_c_qperp), trials FA-ccin2p3-29ce8950 (hp1860 lr 1.60e-3), -b25b3d51 (hp0353 lr 8.56e-3), -2d66e301
-      (hp1333 lr 6.02e-3), control FA-ccin2p3-d34535b0, all on V100-32GB. On their ends read the logs: hp0353 and hp1333 diverged
-      at the end of warmup on the void config (steps 9101, 6298); a repeat at the repaired config is a result of the HPs (list
-      apart), a clean pass says the defects caused it. The driver submits waves 2-3 itself.'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -40145,11 +40139,6 @@ entries:
       - '(c)/(a) < 1/1.38 on held out: (b) starts from (c)''s HPs'
       - '(c)/(a) > 1.38: (b) starts from (a)'
       - 'between: not resolved by one seed, ask Joaquin for the seed-43 pair'
-    8:
-      feeds: 'part (c): whether the void config''s blow-ups were its defects'
-      if:
-      - 'a trial diverges again: list apart at its best checkpoint, keep the penalty'
-      - 'all pass warmup cleanly: the void defects caused the blow-ups, said in the readout'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
@@ -40484,7 +40473,6 @@ entries:
     '2': FA-ccin2p3-b135e7db FA-ccin2p3-f3e29e87
     '3': llmcmp_a_drive5
     '5': FA-ccin2p3-d34535b0 and the DONE event of llmcmp_c_qperp_drive (DRIVE_DONE)
-    '8': FA-ccin2p3-29ce8950 FA-ccin2p3-b25b3d51 FA-ccin2p3-2d66e301 FA-ccin2p3-d34535b0
   handoff:
     state: 'Part (a): 8-trial DyHPO of muP LLoCa in the LLM-run conditions (sweep/sweep_config_llmcmp_a_adamw_const.yaml @2a597c478),
       local driver llmcmp_a_drive5 (state sweeps_local/llmcmp_a_adamw_const), waves 2-3 in flight; control FA-lxplus-cb9273f1
