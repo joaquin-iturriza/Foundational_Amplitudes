@@ -38592,6 +38592,18 @@ entries:
       the 28-process parent''s is its last (val -6.88). Fine-tunes run from that best checkpoint as the design fixes (models/model_run0_best.pt.gz);
       the comparison Fg/Fn carries this: the gluon parent is both narrower and missed its cooldown. Run dir copied to lxplus;
       drive of both gluon-parent searches launched (detached ftmech_glu_drive, ccin2p3+lxplus; Jean Zay unreachable, retried).'
+  - at: '2026-11-24T16:08:46+00:00'
+    text: '2026-11-24 D539 step 3 read, Z+4g (d539_read.py @8237ee961, data/d539.json; fig d539, caption OK). Scratch b2048,
+      1953 steps, all arms at hp1961 (lr 2.80e-2), seeds 42/43/44, best val MSE(log|M|^2): Z+4g 1e4 off 0.0466/0.0611/0.0558;
+      arm/off with 2-sigma: eps1e-8 2.41 [1.98,2.92], eps1e-4 1.61 [1.22,2.12], eps1e-2 1.33 [1.13,1.57], eps1 1.10 [0.93,1.30],
+      massless-only 2.34 [1.95,2.82]. -> (M) mass shell REJECTED (Z kept on shell, cost stays 2.34x); (C) the cost falls monotonically
+      with eps toward 1: it is the rescale of the massless momenta (the compression of the energy fractions; bulk spread kept
+      0.16/0.31/0.60/1.00 at eps 1e-8/1e-4/1e-2/1). Curves: eps1e-8 and massless level off after 25% of the run (val at 25%
+      -> best 0.142->0.125, 0.154->0.132 at s42) while off falls to its end (best at 94-100%). BLOW-UPS listed apart (D398):
+      Z+4g 1e4 eps1e-8 s44 (best 12%), eps1e-4 s44, eps1e-2 s43/s44, eps1 s43 (best 59-82%), all three Z+4g 1e5 OFF seeds
+      (best 43-55%, blow-up 61-69%) and all 12 uug runs (val up to 1e7x best). (D) and the uug contrast NOT READ: Z+4g 1e5
+      r=0.96 [0.84,1.09] compares an off arm read at half its run; uug r 0.74 [0.34,1.61] (1e4), 0.94 [0.52,1.71] (1e5) from
+      blown-up runs. hp1961''s lr is unstable for off at 1e5 and for uug.'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
