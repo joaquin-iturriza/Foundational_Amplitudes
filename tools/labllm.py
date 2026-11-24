@@ -26,17 +26,17 @@ def log(rec):
         f.write(json.dumps(rec) + "\n")
 
 
-def unavailable(u, d):
-    """True when DeepSeek never answered (the lab server down: no model step); the caller does the work itself."""
-    if u["steps"]:
+def unavailable(u, rc, se, d):
+    """True when DeepSeek never answered (no model step); the caller does the work itself."""
+    if not lt.no_answer(u, rc, se):
         return False
-    print("labllm: DeepSeek did not answer (no model step; the lab server's errors are in %s/.xdg/data/opencode/log): "
-          "do this step yourself, as before the route" % d)
+    print("labllm: DeepSeek did not answer (opencode's log: %s/.xdg/data/opencode/log): do this step yourself, as "
+          "before the route" % d)
     return True
 
 
 def rid(kind):
-    return "%s%s" % (kind[0].upper(), time.strftime("%Y%m%d%H%M%S"))
+    return "%s%s_%d" % (kind[0].upper(), time.strftime("%Y%m%d%H%M%S"), os.getpid())   # pid: two workers, one second
 
 
 def triage(run, event, end):
@@ -49,7 +49,7 @@ def triage(run, event, end):
         sys.exit("labllm: site logs %s returned nothing (rc %d): read it yourself" % (run, out.returncode))
     ans = os.path.join(d, "answer.json")
     ev, u, sec, rc, se, _ = lt.opencode(d, MODEL, lt.TRIAGE.format(run=run, end=end, log=path, ans=ans), timeout=600)
-    if unavailable(u, d):
+    if unavailable(u, rc, se, d):
         log({"id": i, "kind": "triage", "run": run, "event": event, "unavailable": True, "at": time.strftime("%Y-%m-%dT%H:%M:%S")})
         sys.exit(2)
     try:
@@ -84,7 +84,7 @@ def fix(brief, test):
     if test:
         prompt += "\n\nThe test that must pass: %s" % test
     ev, u, sec, rc, se, _ = lt.opencode(d, MODEL, prompt, timeout=FIX_TIMEOUT)
-    if unavailable(u, d):
+    if unavailable(u, rc, se, d):
         log({"id": i, "kind": "fix", "brief": os.path.abspath(brief), "unavailable": True, "at": time.strftime("%Y-%m-%dT%H:%M:%S")})
         sys.exit(2)
     tres = None

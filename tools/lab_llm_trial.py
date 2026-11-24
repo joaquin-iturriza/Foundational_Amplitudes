@@ -17,7 +17,7 @@ run's log as the owner got it (run end class from the scheduler), the model writ
 log's own decisive line (the divergence guard's step, the AssertionError's message, the time limit).
 Arms: <model> (alone) and <model>+plan (brief plus a plan written by a Sonnet subagent that read the code, fix only).
 Sandbox: bwrap, / read-only, the run directory and opencode's cache writable, /tmp private, ~/.ssh and the ccorch
-config hidden, SSH and Kerberos variables unset (no cluster reachable); network shared (the lab server).
+config, the cluster mounts (~/mnt) and the other credentials hidden, SSH and Kerberos variables unset (no cluster reachable); network shared (the lab server).
 Records: analysis/lab_llm_trial/runs.jsonl, one line per run.
 """
 import argparse, glob, hashlib, json, os, re, shutil, sqlite3, subprocess, sys, time
@@ -89,6 +89,19 @@ CONFIG = {
 
 
 HIDE = [os.path.join(HOME, x) for x in ("work", ".claude", ".ssh", ".config/ccorch", ".local/share/ccorch")]
+# hidden in every sandboxed run, the grader's too: the clusters' sshfs mounts and the other credentials under $HOME
+# (repo-reviewer 2026-11-24: ~/mnt and the gh token were readable); directories get an empty tmpfs, files /dev/null
+SECRET = [os.path.join(HOME, x) for x in ("mnt", ".config/gh", ".codex", ".local/share/keyrings", ".claude.json",
+                                          ".git-credentials", ".netrc")]
+
+
+def no_answer(u, rc, se):
+    """True when the model never answered (no model step: lab server down, opencode or bwrap failing); such a run is
+    not a result and is not recorded."""
+    if u["steps"]:
+        return False
+    print("lab_llm: the model did not answer (no model step; rc %s; stderr: %s)" % (rc, (se or "").strip()[-300:]))
+    return True
 
 
 def sandbox(run_dir, cmd, timeout, hide=True):
@@ -104,6 +117,8 @@ def sandbox(run_dir, cmd, timeout, hide=True):
     json.dump(CONFIG, open(cfg, "w"), indent=1)
     b = ["bwrap", "--ro-bind", "/", "/", "--dev", "/dev", "--proc", "/proc", "--tmpfs", "/tmp",
          *sum((["--tmpfs", h] for h in (HIDE if hide else HIDE[2:4])), []),
+         *sum((["--tmpfs", h] if os.path.isdir(h) else ["--ro-bind", "/dev/null", h]
+               for h in SECRET if os.path.lexists(h)), []),
          *(["--ro-bind"] + [os.path.dirname(os.path.dirname(mt.PY))] * 2 if hide else []),
          "--bind", run_dir, run_dir, "--bind", cache, cache, "--die-with-parent", "--chdir", run_dir]
     env = {k: v for k, v in os.environ.items() if not k.startswith(("SSH_", "KRB5", "CLAUDE", "ANTHROPIC"))}
@@ -173,7 +188,7 @@ def smoke(arm):
     got = open(os.path.join(d, "sum.txt")).read().strip() if os.path.exists(os.path.join(d, "sum.txt")) else None
     # the sandbox: a write outside the run dir must fail
     rc2, so2, se2, _ = sandbox(d, ["bash", "-c", "touch /usr/zz_probe_sandbox 2>&1; echo write_rc=$?; ls %s/tools "
-                                   "%s/runs.db 2>&1 | head -2; ls ~/.ssh | wc -l; %s -c 'import numpy; print(1)'"
+                                   "%s/runs.db 2>&1 | head -2; ls ~/.ssh | wc -l; ls ~/mnt ~/.config/gh 2>/dev/null | wc -l; %s -c 'import numpy; print(1)'"
                                    % (MAIN, CCORCH, mt.PY)], 60)
     res = {"family": "smoke", "arm": arm, "passed": got == "12", "got": got, "usage": u, "seconds": round(sec, 1),
            "rc": rc, "stderr": se[-500:], "outside_write": so2.strip()}
@@ -240,12 +255,19 @@ def fixcheck(task):
 
 def fix(task, arm, plan=None):
     model = MODELS[arm.split("+")[0]]
+    if task in HARD:
+        fc = [r for r in (json.loads(l) for l in open(REC)) if r.get("family") == "fixcheck" and r["task"] == task]
+        if not (fc and fc[-1]["valid"]):
+            sys.exit("lab_llm: %s has no valid fixcheck (sandbox grader failing at the parent, passing at the fix)"
+                     % task)
     d, repo = fix_setup(task, arm)
     prompt = fix_brief(task, repo)
     if plan:
         prompt += ("\n\nA senior engineer read the code and wrote this plan for you; follow it:\n\n"
                    + open(plan).read())
     ev, u, sec, rc, se, sid = opencode(d, model, prompt)
+    if no_answer(u, rc, se):
+        sys.exit(2)
     g1 = fix_grade(task, d, repo)
     r = {"family": "fix" if task in mt.TRIAL else "hardfix", "task": task, "arm": arm, "model": model,
          "first_pass": g1["passed"],
@@ -374,6 +396,8 @@ def triage(case, arm):
     ans = os.path.join(d, "answer.json")
     ev, u, sec, rc, se, _ = opencode(d, MODELS[arm], TRIAGE.format(run=c["run"], end=c["end"], log=log, ans=ans),
                                      timeout=1200)
+    if no_answer(u, rc, se):
+        sys.exit(2)
     try:
         a = json.load(open(ans))
     except (OSError, ValueError):

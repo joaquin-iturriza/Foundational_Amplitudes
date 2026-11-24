@@ -56,6 +56,8 @@ def summary():
         sec = r["seconds"] + r.get("seconds_rework", 0)
         ours = r.get("our_tokens", 0)
         if r["arm"].endswith("+plan"):
+            if r["task"] not in planner:
+                sys.exit("lab_llm_report: no planner recorded for %s (planners.json)" % r["task"])
             sec += planner[r["task"]][0]; ours = planner[r["task"]][1]
         c["first"].append(bool(r["first_pass"])); c["final"].append(bool(r.get("final_pass")))
         c["min"].append(sec / 60); c["ours"].append(ours)
