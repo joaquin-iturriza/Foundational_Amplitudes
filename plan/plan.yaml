@@ -37876,9 +37876,6 @@ entries:
   - D516
   - D529
   next:
-    5: 'When the no-settings W parent (FA-lxplus-2ae9a2c9) ends: read its per-process val against FA-ccin2p3-47e14eae, copy
-      its run dir to ccin2p3, launch the drive over sweep_config_ftmech_zng4g_ftnoset_b2048.yaml and _b128.yaml (16 trials
-      each), then seeds 43/44 of each chosen trial; read Fn/S and Fn/F per batch'
     6: 'Read the b128 no-settings fine-tune Fn (ftnoset_b128 chosen hp353, seeds 43/44 FA-ccin2p3-dbd9680f/-edcaa00e) against
       S=hp0078 (mean 0.00941) and F: Fn/S, Fn/F per the step-5 design'
   done_when: null
@@ -39695,7 +39692,6 @@ entries:
     start: '2026-11-24T04:06:19+00:00'
     at: '2026-11-24T04:06:19+00:00'
   step_waits:
-    '5': FA-ccin2p3-1e43e7a6 FA-ccin2p3-be1dd2e4
     '6': FA-ccin2p3-dbd9680f FA-ccin2p3-edcaa00e
   handoff:
     state: '2026-11-23 ~23:10 CET. Everything of D519/D520/D529 is in flight; nothing waits on Joaquin. (1) One setting at
@@ -39730,12 +39726,6 @@ entries:
       sweeps_local/ftmech_zng4g_*
     written: '2026-11-23T22:06:48+00:00'
   step_why:
-    5:
-      feeds: whether the fine-tune's Z+4g deficit is the parent's two input settings (D519/D520)
-      if:
-      - 'Fn/S<=1.19 at both batches: the settings are the deficit, report with figure'
-      - 'Fn/F<0.79 at both and Fn/S>1.19: partial, H2 read at lower D next'
-      - 'Fn/F in [0.79,1.19] and Fn/S>1.19: no effect resolved, read parent val and step-0 start'
     6:
       feeds: whether the fine-tune's Z+4g deficit at b128 is the parent's two input settings (D519/D520)
       if:
