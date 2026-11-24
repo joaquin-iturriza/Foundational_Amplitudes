@@ -43997,6 +43997,32 @@ entries:
       review with Opus on its FIX or doubt, with FIX missed and false FIX counts and tokens; else keep reviews on Opus.'
     sources: 'D551 (Joaquin: decide what else to use the lab LLMs on); baselines measured by tools/lab_wake_trial.py extract:
       do-nothing 71/100 wakes, always-PASS 77/93 reviews; Wilson 95% for the spread'
+    fix_at: '2026-11-24T23:57:31+00:00'
+    fix: '1) Review key is mispaired (checks 2, 8): design-reviewer agents are resumed for each re-check, so the 93 reviewer
+      transcripts hold 179 verdict calls (91 FIX), and 72 of the 93 start with FIX. reviews_extract pairs the FIRST plan show
+      (the first design) with the LAST verdict, so the key is wrong for 56 of 93 in the design-only arm, and the 16 FIX /
+      77 PASS split and the always-PASS baseline of 77/93 are artefacts. The reviewer''s-material arm joins every round''s
+      reads, including later plan show outputs that print ''review asked for a fix <time>: <reasons>'' from the reviewer''s
+      own earlier round and the step''s revised design, so the label is in the inputs (at least 5 reviews have such a verdict
+      dated after the review began). Fix: make the unit one review round. Split each transcript at its user prompts. For each
+      round take the first plan show/design output after the prompt as the design, only that round''s reads as the material,
+      and that round''s design-pass/design-fix as the verdict. Drop a round that has no fresh design read. Then recompute
+      the FIX/PASS counts and the always-PASS baseline from the rounds, and re-source the outcome on them. 2) Wake send_to
+      cannot be scored (check 2): in 10 of the 15 sampled wakes with a SendMessage, the target agent id appears nowhere in
+      the prompt (wake text plus state reads); 69 of 100 wakes have no state read at all. The main session took those ids
+      from its own context, so exact-id match is out of reach for any model and a miss there says nothing about the model.
+      Fix: give each wake the owner map at that time (the entries'' owners from plan/plan.yaml at the last commit before the
+      wake, or the latest plan owners output earlier in the session) and which agents are live; show on a few active wakes
+      that the target id is now in the prompt; or grade send_to by role (owner of the event''s entry / worker / none) against
+      that map. 3) Outcome (check 4): (a) the yes, beating do-nothing on the 29 active wakes, is near certain, because do-nothing
+      scores 0/29 there by construction (about 4/29 clears its Wilson interval), and it ignores false actions on the 71 quiet
+      wakes (a false tell_joaquin, a wrong ack). Use correct over all 100 against do-nothing''s 71/100 outside the Wilson
+      interval, with the false-action counts on the 71 as part of the read. (b) ''FIX caught > 0'' is met by one lucky FIX.
+      Once the round baselines are recomputed, require agreement above always-PASS''s Wilson interval and state FIX missed
+      as the route''s cost, since a lab PASS would skip Opus. Checks that hold: tell_joaquin proxy read on all 18 cases where
+      it is true (each is a real message to Joaquin); no GPU, lab calls only; prior search (results.tex: dispatch, routing
+      wake, design review + lab/deepseek/qwen, reviewer model; decisions: dispatch, wake, lab llm, deepseek, reviewer) finds
+      no earlier trial; 100 wakes sampled by seed 0 of 524 confirmed (29 active).'
   step_waits:
     '3': notes-editor pass of the results.tex backlog (it blocks on sec:noisescale and fig:llmcmp_heldout, other entries'
       text; the repo-reviewer already passed the merge)
