@@ -44729,3 +44729,27 @@ entries:
       run, no MAINTAIN/ALERT event is opened that the login run would not open, .disk_full is refreshed; no: a different output
       or exit code, a missing flag, a job that fails on htc (sbatch from a job refused, env not found) - then that command
       stays a login read capped at 60 s or is fixed before the switch'
+    fix_at: '2026-11-24T17:29:35+00:00'
+    fix: 'Check 2 (the measure cannot see the main risk): the baseline passes are all in the disk-full state, where feed_capped.py
+      stops at ''FEED 0: disk full'' before submit_sweeps, so comparing its job output with the login run never reaches sbatch
+      from an htc node, the scheduler gate wrapper inside the job, or the unset SLURM_/SBATCH_ variables in run_as_job; the
+      design names ''sbatch from a job refused'' as a no outcome that this test cannot produce. Fix: add one nested-submission
+      check through the same path, site run --job --item ''*'' ccin2p3 FA -- sbatch of scripts/job_probe.sh (the project''s
+      infrastructure probe), read on the next call: a job id back, the gate accepted it, the probe ran; or read a pass where
+      the flag has cleared and feed_capped really submits. Likewise prune.py runs with --every 6, so the pass after submission
+      will most likely print a skip: the yes outcome must include one job in which prune really ran (PRUNE lines appended
+      to ~/.local/share/ccorch/artifacts/FA/prune/ccin2p3.jsonl), not only matching skip lines. Checks 2 and 4 (lag not measured):
+      with --recurring each pass reads the job the previous pass started, so every result is one pass (about 20 min) plus
+      the htc queue wait old, and a pass that finds the job still pending gets exit 75 and skips the command. feed_capped
+      trusts .disk_full only while it is under 30 min old, so a disk_watch job delayed by queue wait can let the flag age
+      past 30 min and the feeder submit onto a full disk, a failure the login run cannot have. Add to the measure: per pass,
+      the age of each result at read (the CCJ_RESULT end time against the pass time), the squeue wait of each ccj_ job, the
+      count of passes that skipped a command with CCJ_PENDING, and the .disk_full age when the feed_capped job reads it; state
+      the yes bound (e.g. result age at most one pass plus 10 min, no pass skipped twice in a row, flag age under 30 min at
+      every feed read, over at least 3 passes) and what a no does (disk_watch and feed_capped in one job so the flag is fresh,
+      or a shorter cadence). Check 6 (minor): the entry''s question also names the item checks (sweep/watchdog.py --units)
+      and agents'' long reads; the design should say these are covered by the login_guard refusal (cap at login_cap s) and
+      a later step, or test one. Checks 1, 3, 5, 8-19: pass or not applicable (one-CPU upkeep jobs, no training, no seeds;
+      control is the same commands on the login node the same day; searched docs/results.tex and plan.yaml for ''login node'',
+      ''login_cap'', ''run --job'', ''job_prune_dryrun'', ''non-interactive'', site decisions for login/slurm/htc/maintain:
+      only D544 and D176, no prior on this question).'
