@@ -444,6 +444,9 @@ def lookup(task, rep):
     """One code lookup of lookup_trial (same question text, its brief with the path changed) by DeepSeek on a plain
     copy of trunk as it was when the recorded lookups ran; graded by lookup_trial.correct with its keys."""
     lk = lookup_module()
+    if task in lk.RECALL or task not in lk.TASKS:   # recall answers live in ~/.claude, which the sandbox hides
+        sys.exit("lab_llm: %s is not one of lookup_trial's code lookups (%s)" % (
+            task, ", ".join(t for t in lk.TASKS if t not in lk.RECALL)))
     f = glob.glob(os.path.expanduser("~/.claude/projects/*/*/subagents/agent-%s.jsonl" % LOOKUP_FIRST))[0]
     rev = mt.git("rev-list", "-1", "--before=%s" % json.loads(open(f).readline())["timestamp"], "trunk").strip()
     d = fresh("lookup_%s_%s" % (task, rep))
