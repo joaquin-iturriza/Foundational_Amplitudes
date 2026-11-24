@@ -41234,7 +41234,6 @@ entries:
       (16 heads given the 80G floor). Disk: 120 (27.4 GB peak) and 64 (7.8 GB) go to lxplus EOS; 16 and 32 (2.5 GB peak together)
       fit CC. Above D536''s 100 GPU-h: asked Joaquin (plan ask), step 10 held.'
   step_waits:
-    '5': llmcmp_c_qperp_drive4 DRIVE_DONE (detach event of the driver)
     '8': FA-ccin2p3-bf23e0c4 FA-ccin2p3-f6f7179d
   handoff:
     state: 'Part (a) DONE: DyHPO ended (8 trials, 0 failed), best trial 5 FA-ccin2p3-c891c0c2 (lr 1.24e-3, EMA on 0.9989,
