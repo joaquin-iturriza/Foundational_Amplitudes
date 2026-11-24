@@ -42109,9 +42109,15 @@ entries:
   notes_ref: null
   match: zz_cbs_*,cbs_*
   evidence:
-    runs: []
-    commit: null
-    paths: []
+    runs:
+    - FA-ccin2p3-6721d3c2
+    commit: b36a40b3a
+    paths:
+    - analysis/critical_batch/noise_read.py
+    - base_experiment.py
+    - experiment.py
+    - scripts/job_catalog_v3_short.sh
+    - tests/test_noise_scale.py
   dead_ends: []
   asks: []
   owner:
