@@ -19,13 +19,14 @@ run config disagrees with this table, the table wins.
 | target-side levers `data.target_propagators` (+`target_propagator_tchannel`, `_max_final: 2`) / `training.sign_head` | adopted at the catalog working point (catalog census, three seeds each; off by default, switch on for the full-horizon catalog sweep). Not for single-process runs: in the transfer study (`sec:ladder`) the t-channel factor sets a loss floor and the Breit-Wigner factor loses in all seeded cells, so it runs both off (`tp3_`; `tp2_` = t-channel off only). They change the target, so their `val_loss_no_reg` is not comparable to runs without them (`analysis/catalog_v2/signed_compare.py` re-bases the signed pools); frozen stats record `target_propagators` and a mismatch asserts | per-run |
 | `use_balanced_sampler` | `false` (equal/uniform sampler) | fixed |
 | `loss` / `loss_aggregation` / `regularization` | `HETEROSC` / `mean` (forced under HETEROSC, training and validation; `geometric_mean` is the default under MSE) / `L2` | `L2` fixed; loss HETEROSC [D52, D71], `MSE` only with a stated reason |
-| **`training.batchsize`** | **`16384`** (biggest that fits; ~36 events/dataset/batch over 448 sets) | fixed |
+| **`training.batchsize`** | **`16384`** (biggest that fits; ~36 events/dataset/batch over 448 sets) | fixed for catalog pretraining; a study at another data size or in another comparison's conditions sets its own in its design [D514, D524] |
+| `data.target_physics_dim_ref` | `qperp` (emission-scale target) in the latest catalog_v4 pretraining (trial_1262); the `config/` default is `shat` | latest setup [D523] |
 | **`evaluation.batchsize`** | **`16384`** (eval forward-only → match train BS) | fixed |
 | `num_workers` | `2` | fixed |
 | `dtype` / `allow_tf32` / `fused_optimizer` | `float32` / `true` (no-op V100) / `true` | fixed |
 | optimizer / betas / eps / weight_decay | `MuonAdamW` (`optim/muon.py`; Muon on μP hidden matrices, AdamW `[0.9,0.999]` / `1e-8` / `0` on the rest) for pretraining and fine-tuning, set in the template's `fixed_params` (`training.optimizer`) [D155, D158]. HPO rules 2 and 4 were measured with AdamW: a Muon sweep centres on its own search, not on them | optimizer fixed; `muon_weight_decay` swept |
 | `scheduler` / `clip_grad_norm` | WSD (`wsd_cooldown_frac` 1/8) / `5` | fixed [D423] |
-| `training.lr` | run-design: centre on `lr*(t,D)` surface at your (t,D), sweep ±½ decade (see rule #2) | per-run |
+| `training.lr` | run-design: centre on `lr*(t,D)` surface at your (t,D), sweep ±½ decade (fa-sweeps-and-hpo, HPO rule 2) | per-run |
 | EMA (`ema` top-level flag) | swept `{false,true}` × `ema_decay∈[0.9,0.999]`; not settled (the big-run DyHPO and the catalog quick sweeps chose it on, the catalog wave's best had it off) | open |
 | fine-tune | full retrain + layer-decay; `lr_scale∈[0.1,10]@1`, `layer_decay∈[0.75,1.0]` | fixed |
 
