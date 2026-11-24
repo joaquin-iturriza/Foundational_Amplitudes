@@ -19,4 +19,3 @@ cmds: \bgit\s+(worktree|merge|checkout|branch|rebase|push)\b
 - Visibility: one GitHub repo, so all branches share visibility; making it public exposes `trunk` and the retired
   branches too (only `main`'s tree is stripped). A truly private dev branch would need a separate repo.
 - `.fuse_hidden*` and `._*` files are filesystem leftovers: ignore them.
-- When `site sync` or `site submit` refuses for uncommitted changes, clear it, in that turn: commit your own files; for others' files, back up the diff to your scratchpad, `git stash push -- <their paths>`, sync, then `git stash pop` and check the diff matches the backup; never end a turn with a step waiting on a blocker that no event will clear.

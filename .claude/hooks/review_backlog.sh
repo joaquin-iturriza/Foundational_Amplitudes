@@ -54,7 +54,7 @@ STATE_REL=".claude/.review_state"
 # text, the CLAUDE.md keeper's, and so is every other file of rules agents follow: the brief templates and the agent
 # definitions (D534: rules added there since 2026-11-22 piled up unreviewed). Hook refusal texts are read whole by the
 # keeper at every review but counted in the code pillar only (a 1-line threshold on hooks would gate every hook fix).
-PILLARS='claudemd-keeper|1|1|CLAUDE.md .claude/context plan/step_prompt.txt plan/step_prompt_legacy.txt plan/mechanical_prompt.txt .claude/agents
+PILLARS='claudemd-keeper|1|1|CLAUDE.md .claude/context plan/step_prompt.txt plan/mechanical_prompt.txt .claude/agents
 notes-editor|200|20|docs/*.tex
 repo-reviewer|520|100000|*.py *.sh config recipes models sweep tools tests scripts IntrinsicDimDeep .claude/settings.json :(exclude,glob)[!.]*/**/*.json :(exclude,glob)*.json :(exclude)*.log :(exclude)*.out :(exclude)*.err :(exclude)runs/* :(exclude)sweeps/* :(exclude)plan/* :(exclude,glob)analysis/**/data/** :(exclude)tests/*_output.txt :(exclude)recipes/catalog_v*_*.yaml :(exclude,glob)recipes/catalog_v*/**'
 
@@ -143,7 +143,7 @@ pillar_for_path() {
   case "$1" in
     CLAUDE.md)                                             echo claudemd-keeper ;;
     docs/*.tex)                                            echo notes-editor ;;
-    plan/step_prompt.txt|plan/step_prompt_legacy.txt|plan/mechanical_prompt.txt|.claude/agents/*)
+    plan/step_prompt.txt|plan/mechanical_prompt.txt|.claude/agents/*)
                                                            echo claudemd-keeper ;;
     .claude/*)                                             echo "" ;;   # hook/agent config
     runs/*|sweeps/*|outputs/*|data/*|plots/*)              echo "" ;;   # generated

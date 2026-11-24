@@ -35,3 +35,4 @@ cd "$PROJECT_DIR"
 
 (SLURM runs a copy of the script from its spool, so `$0` cannot locate the checkout; `site submit` exports
 `CCORCH_SITE` and `CCORCH_PROJECT_DIR`.)
+- When `site sync` or `site submit` refuses for uncommitted changes, clear it, in that turn: commit your own files; for others' files, back up the diff to your scratchpad, `git stash push -- <their paths>`, sync, then `git stash pop` and check the diff matches the backup; never end a turn with a step waiting on a blocker that no event will clear.

@@ -17,6 +17,6 @@ cmds: review_backlog\.sh, /review-now, \bgit\s+merge\b
   same reviewer, naming the fix commits. A lock expires after 180 min.
 - `review_backlog.sh status` lists backlogs; `/review-now` runs reviewers on demand; `begin <name>` and
   `advance <name>` are the reviewer's own (the user's override is a `!` command). Watermarks: `.claude/.review_state/`.
-- All four reviewers (claudemd-keeper, notes-editor, repo-reviewer, design-reviewer) run on opus.
+- All four reviewers (claudemd-keeper, notes-editor, repo-reviewer, design-reviewer) inherit the main session's model.
 - The code reviewer reviews cost: a change to generation or to how a batch is laid out is checked for yield and wall
   time (time per unit and its source, the margin, run size against its limit, the number of waves).

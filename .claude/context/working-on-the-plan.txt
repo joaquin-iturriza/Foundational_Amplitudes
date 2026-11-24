@@ -63,11 +63,3 @@ Done
 - `plan done <entry> --writeup <commit>` passes only when `done_when` passes, the write-up is committed and the
   entry's commits are inside a passed review. A write-up answering a decision lists each of the user's words that names
   a comparison or a reference, with the result that answers it.
-
-The Stop gate refuses only what the turn can clear: a running entry with something to do and no owner; an open event
-handed to no agent (its owner resumed or launched, or a mechanical-worker whose brief names it); a RUN, GAP or OVERRUN
-event the main session acked without handing it to an agent; a table of measured results sent to the user; a
-`waiting_user` question in no message to the user; a running entry with no approval in force or a held one with no
-hold; trunk numbers failing the claims check; a figure without its pair; a context flush wanted; a reply that leaves
-the user's question unanswered (once per message); a main-session reply not opening with "Joaquin"; the supervisor
-down or no armed waiter. A job running, an agent working, a cluster's state and the user's answer are notes.
