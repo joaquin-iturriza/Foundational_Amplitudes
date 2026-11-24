@@ -37889,7 +37889,9 @@ entries:
     - FA-ccin2p3-1b46922a
     - FA-ccin2p3-1f2d9ad5
     - FA-ccin2p3-2281e6d9
+    - FA-ccin2p3-2525f488
     - FA-ccin2p3-3c517c9b
+    - FA-ccin2p3-3ea9d4fa
     - FA-ccin2p3-47240f89
     - FA-ccin2p3-49f3c51a
     - FA-ccin2p3-4b18f6ba
@@ -37901,7 +37903,9 @@ entries:
     - FA-ccin2p3-9a73698a
     - FA-ccin2p3-9ed25dfb
     - FA-ccin2p3-a4c6d9d4
+    - FA-ccin2p3-ada00163
     - FA-ccin2p3-b31a1b2f
+    - FA-ccin2p3-b96a2a6c
     - FA-ccin2p3-c0d3030e
     - FA-ccin2p3-c330b72f
     - FA-lxplus-00c7a2f4
@@ -37943,7 +37947,7 @@ entries:
     - FA-lxplus-e8d15505
     - FA-lxplus-fad6ff57
     - FA-lxplus-fbdf6bc6
-    commit: 45f404900
+    commit: d972272d7
     paths:
     - analysis/finetune_mechanism/data/restart_steps.json
     - analysis/finetune_mechanism/data/restart_summary.json
@@ -37953,6 +37957,7 @@ entries:
     - analysis/finetune_mechanism/plot_restart.py
     - analysis/finetune_mechanism/restart_steps.py
     - analysis/finetune_mechanism/restart_test_readout.py
+    - analysis/finetune_mechanism/zng4g_d1e3_read.py
     - analysis/finetune_mechanism/zng4g_sigreset_read.py
     - analysis/finetune_mechanism/zng4g_snap_read.py
     - recipes/transfer_finale_gluon.yaml
