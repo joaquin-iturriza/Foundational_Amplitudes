@@ -16497,9 +16497,9 @@ entries:
     '34': 2026-11-26 (the first real lxplus submit; read its submit file and gpu_window charge)
   owner:
     agent: a43d971069d45144e
-    state: working
+    state: stopped
     since: '2026-11-24T13:15:27+00:00'
-    state_at: '2026-11-24T14:17:22.293000+00:00'
+    state_at: '2026-11-24T14:33:00.465000+00:00'
     context: 219641
     context_at: '2026-11-24T14:31:06+00:00'
   designs:
@@ -38336,9 +38336,9 @@ entries:
     decision: D539
   owner:
     agent: a6ec5cc852dfce21b
-    state: working
+    state: stopped
     since: '2026-11-24T14:14:38+00:00'
-    state_at: '2026-11-24T14:17:17.693000+00:00'
+    state_at: '2026-11-24T14:30:53.674000+00:00'
     context: 107233
     context_at: '2026-11-24T14:31:14+00:00'
   findings:
@@ -40636,9 +40636,9 @@ entries:
     decision: D537
   owner:
     agent: a1b829d3ccca1f915
-    state: working
+    state: stopped
     since: '2026-11-24T14:04:31+00:00'
-    state_at: '2026-11-24T14:04:31+00:00'
+    state_at: '2026-11-24T14:25:30.002000+00:00'
     context: 156224
     context_at: '2026-11-24T14:31:21+00:00'
   step_why:
@@ -44345,7 +44345,7 @@ entries:
     agent: acc098fc308290fb5
     state: working
     since: '2026-11-24T14:15:22+00:00'
-    state_at: '2026-11-24T14:15:22+00:00'
+    state_at: '2026-11-24T14:30:52+00:00'
     context: 53759
     context_at: '2026-11-24T14:16:19+00:00'
   designs:
