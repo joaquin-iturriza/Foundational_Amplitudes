@@ -5,7 +5,9 @@ CPU job (scripts/job_delete_debris.sh), never on a login node. Classes, each re-
   mmap     amp_mmap_cache keys in MMAP format 2 (current code reads only data_mmap.MMAP_VERSION), kept if any live
            slurm job of the user names the key in its stdout (cache_guard.site_users)
   scratch  the scratch run dirs the probe tools left in $SCRATCH (tempfile.mkdtemp prefixes below), older than --scratch-days
-  joblogs  loose scheduler logs (*.out, *.err) in the checkout root older than --log-days whose job id is not queued
+  joblogs  loose scheduler logs (*.out, *.err) in the checkout root older than --log-days whose job id is not queued and
+           that hold no result line (RUN_SUMMARY, RESULT_JSON: analysis/catalog_v4/size_figs.py reads the root's
+           catalog_v3_short_*.out RUN_SUMMARY lines)
 Writes the manifest (class, apparent bytes, path) to --manifest before deleting anything, then deletes and prints the
 apparent GiB per class. --dry-run lists only.
     python tools/delete_debris.py --manifest $SCRATCH/zz_cc_disk/deleted.tsv [--dry-run]
@@ -28,6 +30,12 @@ NAMED = ["zz_v3_smoke_Q_62382593", "zz_v3_smoke_Q_62382608", "zz_v3_smoke_baseli
 NAMED += [n + ".recipe.yaml" for n in NAMED if n.startswith("zz_v3_smoke_")]
 SCRATCH_PREFIXES = ("zeroshot_", "signed_ab_", "kshot_", "rebuild_", "f24net_run_", "kitprec_", "evalbest_")
 JOBID = re.compile(r"_(\d{7,9})\.(out|err)$")
+RESULT_LINES = (b"RUN_SUMMARY", b"RESULT_JSON")
+
+
+def holds_result(p):
+    with open(p, "rb") as f:
+        return any(m in f.read() for m in RESULT_LINES)
 
 
 def apparent(p):
@@ -72,7 +80,7 @@ def candidates(scratch, project, scratch_days, log_days):
         for e in it:
             m = JOBID.search(e.name)
             if (m and e.is_file(follow_symlinks=False) and m.group(1) not in live
-                    and now - e.stat().st_mtime > log_days * 86400):
+                    and now - e.stat().st_mtime > log_days * 86400 and not holds_result(e.path)):
                 yield "joblogs", e.path
 
 
