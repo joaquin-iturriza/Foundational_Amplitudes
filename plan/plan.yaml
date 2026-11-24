@@ -44420,6 +44420,15 @@ entries:
       (a) our cheap-to-rebuild debris, (b) memmap/training caches no running job or open entry''s recipe reads, (c) runs/results/others''
       data needing Joaquin''s call, each also marked ''already approved under D<n>'' where a decision in force covers it (so
       Joaquin is not asked again), distinct from ''needs Joaquin''s call''. no: a read missing or cut; that part reruns alone'
+    passed_at: '2026-11-24T14:34:24+00:00'
+    reviewer: 'Re-check of the read-only CPU inventory at trunk ea8d84d22: login-node du/census cut (cc_du, cc_du2, cc_du3
+      logs rc=1/255) justifies a job; check numbers confirmed in cc_du3.log.5 (runs 122,051 MiB) and .log.6 (amp_data_cache
+      75,265 MiB), now read like for like from top.tsv and scratch_top.tsv; the reported size is chosen by its sum over /sps/lpnhe
+      against df.txt used (allocated was 1.28x on the login reads), both kept; SCRATCH walked once per size; no arms/seeds
+      (deterministic read), outputs small against 15 GiB free, no GPU. Searched site decisions for disk, space, delete, storage,
+      prune, D542 and results.tex for disk, storage: prior now lists D149/D133, D147, D163/D167, D110, D131, D84/D103/D243,
+      D180/D201, D208/D209/D214, D404, D19, and the outcome separates already-approved classes from Joaquin''s call. Residual:
+      if neither size lands within 5% of df used (others'' dirs partly unreadable), report both and say so.'
   findings:
   - at: '2026-11-24T14:32:44+00:00'
     text: '2026-11-24 login-node reads: /sps/lpnhe 512 GiB group space at 98% (498 GiB used, 15 GiB free), .disk_full flag
