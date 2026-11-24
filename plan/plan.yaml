@@ -44674,3 +44674,32 @@ entries:
       if:
       - 'Joaquin names items: delete exactly those through the decided tools, report freed GiB against df'
       - 'Joaquin keeps everything: record it, close the entry with the inventory as its result'
+- id: cc_login_jobs
+  title: 'CC login node: recurring and long scripts moved to Slurm (CC support''s email)'
+  question: 'Can every non-interactive script we run on CC''s login node (the supervisor''s maintain commands: disk_watch,
+    feed_capped, prune_site; item checks; agents'' long reads) run as short Slurm CPU jobs on htc instead, with the login
+    node keeping only sbatch/squeue/sacct and reads of a few seconds, so CC''s policy (no non-interactive scripts on login
+    servers) holds?'
+  status: running
+  quotes:
+  - said_at: '2026-11-24T17:20:01.269000+00:00'
+    text: Okay but I don't understand, does it make sense to move the recurring scripts to slurm? I'm not sure how that would
+      work. If it's possible, then sure, do all three
+    decision: D544
+    covers:
+    - cc_login_jobs
+  decisions:
+  - D544
+  next: Inventory every command the supervisor and our tools run on CC's login node through site run (projects.toml maintain,
+    item checks, site_python, drive.py, sweep_manager, collect), with its run time; move each heavy one into a CPU job (sbatch
+    on htc, output to a file the next pass reads); add a guard in site run that refuses a long-running command on CC; change
+    the ~/work/CLAUDE.md login-node rule to match; test on the live supervisor
+  done_when: null
+  notes_ref: null
+  match: cc_login_*
+  evidence:
+    runs: []
+    commit: null
+    paths: []
+  dead_ends: []
+  asks: []
