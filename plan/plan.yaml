@@ -15810,6 +15810,8 @@ entries:
       brief and hand-off; (2) a pre-send check comparing what goes to Joaquin (figures, results, questions) against that record;
       (3) event routing that wakes the main session and owners only for results and calls; (4) consolidation of the rule set
       so what remains is followed. Each part shown working by replaying the real cases through the real path.'
+    31: 'Check the D534 part 3 routing on its first real cases: a broken search trial acked as folded with no wake, and the
+      next lxplus ssh-master drop probed twice before ''down'''
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16427,6 +16429,11 @@ entries:
       if:
       - 'a part replays clean on its cases: keep it, report with the cases'
       - 'a part fails a replay: redesign it before reporting'
+    31:
+      feeds: whether the routing works live
+      if:
+      - 'works: note it on the entry'
+      - 'fails: fix and replay'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
