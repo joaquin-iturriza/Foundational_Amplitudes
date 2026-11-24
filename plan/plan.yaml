@@ -44134,6 +44134,16 @@ entries:
       estimator. NO: >= 1.45 (B_crit >~ 1000): B_simple underestimates B_crit here; the scan''s B_crit is the number. Between:
       B_crit 400-1000 reported with its factor over B_simple. A batch at the lr edge or never reaching a target enters as
       a bound, as stated.'
+    passed_at: '2026-11-24T14:25:40+00:00'
+    reviewer: 'Re-check after the FIX of 2026-11-24: stop at the last target (training.stop_at_val_loss -2.30, reads the same
+      val_loss_no_reg[-1] that val_curve logs, break after the readout, schedule unchanged before it, test_stop_at_val_loss,
+      the smoke takes it end to end) re-costs to ~36 GPU-h on the YES, at most 84, under D536''s 100, item estimate 85; lr-edge
+      rule stated (outer tenth of the log window -> S an upper bound, window shifted half a decade and searched again); in-memory
+      data (memmap false), 137 MB per trial; finish times stated. Check 2: steps_to_target recomputed on v4_het_control_wsd
+      and FA-ccin2p3-225d38ea results, 1023/1955/2707 and 1020/1973/2992 steps, spikes upward only; ratio S_2048/S_32768 spans
+      1.02 (B_crit 50) to 16. Check 3: replicate spread 0.3/0.9/10%, YES <=1.2 and NO >=1.45 at every target stand above it
+      at the first two. Searched docs/results.tex for critical, batch size, noise scale, steps-to-target, Muon search, v4_het_control_wsd;
+      plan; decisions for batch, D426, D514, D532-D536: no prior scan on this setup.'
   step_why:
     2:
       feeds: 'whether B_simple can be trusted alone on our setup (Joaquin''s question: once now as a calibration, or every
