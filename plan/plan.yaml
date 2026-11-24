@@ -44058,6 +44058,25 @@ entries:
       here (non-isotropic Hessian, Muon not SGD); B_crit from the scan is the number, B_simple not trusted alone. Between
       1.2 and 1.45: B_crit 400-1000 from the fit, reported with its factor over B_simple. A B whose best trial never reaches
       a target gives a lower bound S_B > its stable-phase end.'
+    fix_at: '2026-11-24T14:22:40+00:00'
+    fix: 'Common sense (check 0, and the 2x margin rule): every trial runs its whole horizon although the readout ends at
+      the crossing of the last target L=-2.30. At batch 2048 the horizon is 34112 steps (2.92 h per trial) while the control
+      crosses -2.30 at step 2707; under the YES you expect, S_B is near 3000 steps at every batch, so about 90% of each 2048-8192
+      trial is spent after its readout, and the NO case still needs only up to 21700. Fix: stop a trial at the first validation
+      with val_loss_no_reg <= -2.30 (a stop option in the training loop, no change to the schedule before the stop; a trial
+      that never gets there runs to its horizon), with a CPU test and covered by the 32768 smoke; re-cost the batch with it
+      (expected roughly 35-45 GPU-h on the YES, 84 at most) and state when the sweeps finish (three waves at the new limits).
+      Learning-rate window (check 17): the same Muon window [1.667e-3, 1.5e-2] at every batch is fine, but say what a best
+      trial at the window''s edge means: its S_B is then an upper bound only and that batch''s window is extended half a decade
+      before its S_B enters the fit, otherwise a NO at small batch can come from an lr optimum outside the window. Budget
+      gate: the site item critical_batch carries est 55 GPU-h while the design costs 84 (the D536 cap is 100); set the item''s
+      estimate to the re-costed total before submission. Disk (check 14): show the memmap cache shared on data, not only from
+      the key code: cite the cache key line in the logs of the control and the noise-scale run (same pools) or a test building
+      the key twice. Everything else holds: one step schedule at every batch (warmup 213-853 steps, the same stable lr, validation
+      every 85 steps, the cooldown past the targets); steps_to_target on the two existing curves gives 1023/1955/2707 and
+      1020/1973/2992 (recomputed), spread 0.3/0.9/10%, and the YES/NO thresholds 1.2/1.45 on S_2048/S_32768 stand above it
+      at the first two targets; 8 trials in waves 3,3,2 match the template; HETEROSC, DIM target and the base run''s config
+      with each changed key listed.'
   step_why:
     2:
       feeds: 'whether B_simple can be trusted alone on our setup (Joaquin''s question: once now as a calibration, or every
