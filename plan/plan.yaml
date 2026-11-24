@@ -44320,6 +44320,14 @@ entries:
       40.4 / 95.1, 2 windows with mean |G|^2<=0; Muon median 232 (734 in the last window), AdamW median 37.2. The check numbers
       (B_brute 84+-9, 28.2+-1.4, 28+-6, 39+-5; chunk/brute tr Sigma 1.16-1.29) are unchanged. Figure y range now set by rule
       (3x max of batch and the 16-batch B + se), windows above it at the edge.'
+  - at: '2026-11-24T14:53:32+00:00'
+    text: '2026-11-24 repo-reviewer ac9677801a836098a: PASS on cbs_read.py 7fcd56bcb (lr-edge rule, ratio S(2048)/S(32768)
+      only). Two nits for the next owner, to fix before the readout: (1) assert that each reached batch''s best trial carries
+      an lr (a collector that omits it empties the fit silently); (2) apply the edge test to the best trial on S_B(-2.08),
+      as the design names, not per target, and pass each batch''s own lr window from its sweep config (a batch re-searched
+      half a decade over is otherwise judged against the template window). The trunk repo backlog since f7b0f16ab (31 commits,
+      953 lines) is held by another repo-reviewer instance, which holds the lock; ac9677801a836098a did not advance the watermark,
+      and the merge/close of critical_batch waits on that instance''s pass.'
   handoff:
     state: 'Step 2 (batch-size scan, D532 under the D536 100 GPU-h rule) is partly submitted under a design passed 2026-11-24T14:25
       (plan show critical_batch). Code merged into trunk at f3705b316 (repo-reviewer PASS on cbs_accum at 8de829f32 and on
