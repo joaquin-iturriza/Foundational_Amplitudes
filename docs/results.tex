@@ -9103,8 +9103,8 @@ fall off the scale of the figure or have no $B_{\rm simple}$ (figure~\ref{fig:no
 So $B_{\rm simple}$ sits two to three decades below our batch over the whole run. In the paper's picture the batch is
 far past the critical size, and a smaller batch would reach the same loss in about as many steps with far fewer events;
 whether that holds for Muon and this loss is the batch-size scan's question, still waiting on the GPU budget. The
-measurement leaves training on its course: at the best checkpoint, the lowest validation loss, which in both runs is
-the last validation (step $4250$), the run reads $-2.872$ against the control's $-2.907$, both runs showing isolated
+measurement leaves training on its course: at the best checkpoint, the lowest aggregate $\mathcal L_{\rm no\,reg}$ (the heteroscedastic
+loss without regularisation), which in both runs is the last validation (step $4250$), the run reads $-2.872$ against the control's $-2.907$, both runs showing isolated
 spikes at different steps. It costs $1.95$ training hours against the control's $1.23$.
 % src: python3 analysis/critical_batch/noise_read.py analysis/critical_batch/data/FA-ccin2p3-225d38ea_noise_scale.json v4_het_noise_scale --result analysis/critical_batch/data/FA-ccin2p3-225d38ea_result.json --control analysis/critical_batch/data/v4_het_control_wsd_result.json @b2b650b45
 % claim: run.val_best=-2.872
@@ -9897,7 +9897,7 @@ The ratio of the three-seed geometric means is $0.486$, with a $2\sigma$ interva
 seed spread. Where data is scarce the parent still gains a factor of two, so the $1.53\times$ residual at $10^4$ is a
 large-$D$ effect. The fine-tune reaches its best at $14$--$16\%$ of the run and ends $1.43$--$1.52\times$ above it.
 Scratch seed $43$ blows up at $85\%$ of its run and is read at its best checkpoint before the blow-up.
-% src: python3 analysis/finetune_mechanism/zng4g_d1e3_read.py --cached @d972272d7
+% src: python3 analysis/finetune_mechanism/zng4g_d1e3_read.py --cached @a1716fc2c
 % claim: arms.S1k.chosen.lr=1.74e-2
 % claim: arms.Fn1k.chosen.lr=2.54e-3
 % claim: arms.S1k.best.0=0.1227
@@ -9910,7 +9910,11 @@ Scratch seed $43$ blows up at $85\%$ of its run and is read at its best checkpoi
 % claim: Fn1k/S1k.lo=0.454
 % claim: Fn1k/S1k.hi=0.522
 % claim: arms.S1k.blowups.0=43
-% allow: 3125 128 400 16 8 85 14 16 1.43 1.52 1.53 42 44 2 10^3 10^4 1.9\times10^{-3} 1.9\times10^{-2} 6\times10^{-4} 6\times10^{-2} because they are the seeds, the windows' bounds and they are the design's steps, batch, epochs and trial counts, the curve positions and end ratios read from the plotted curves, and the 10^4 residual above
+% claim: arms.Fn1k.best_at_pct.0=14
+% claim: arms.Fn1k.best_at_pct.1=16
+% claim: arms.Fn1k.end_over_best.1=1.43
+% claim: arms.Fn1k.end_over_best.0=1.52
+% allow: 3125 128 400 16 8 85 1.53 42 44 2 10^3 10^4 1.9\times10^{-3} 1.9\times10^{-2} 6\times10^{-4} 6\times10^{-2} because they are the seeds, the windows' bounds and they are the design's steps, batch, epochs and trial counts, and the 10^4 residual above
 
 \begin{figure}[H]
   \centering
