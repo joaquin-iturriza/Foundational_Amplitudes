@@ -38140,7 +38140,7 @@ entries:
       configurations (CLAUDE.md 72bef3992), run as part of it
   owner:
     agent: a35b06fe497b1090e
-    state: working
+    state: closed
     since: '2026-11-24T05:16:19+00:00'
     state_at: '2026-11-24T07:54:51.980000+00:00'
     context: 273393
@@ -40016,32 +40016,32 @@ entries:
     '2': FA-ccin2p3-1f2d9ad5
     '1': FA-ccin2p3-b96a2a6c FA-ccin2p3-2525f488 FA-ccin2p3-ada00163 FA-ccin2p3-3ea9d4fa
   handoff:
-    state: '2026-11-24 ~07:00 CET. The investigation''s deciding read is done. (1) One setting at a time, b2048 (3 seeds,
-      @deb1c5ee3, fig zng4g_onesetting_b2048): the momentum log-rescale (input_soft_eps) carries the settings'' scratch cost
-      (c_soft 0.90, 0.70-1.12; c_pair 0.13). (2) b128 share against the matched 16-trial scratch hp0078 (mean 0.00941): 0.92
-      (0.81-1.08), H1 holds at both batches; F/S at b128 is 3.22 (not 1.54: the 8-trial scratch trial_0950 was 2.1x worse).
-      (3) Fine-tune from the W parent retrained WITHOUT the two settings (FA-ccin2p3-9a73698a; per-process val vs 47e14eae
-      gmean 0.854, 19/28 in 0.43-2.5x): b2048 Fn 0.0214/0.0214/0.0234, Fn/S 0.35 (0.32-0.38), Fn/F 0.23 -> YES at b2048; b128
-      Fn 0.0108/0.0184/0.0141, Fn/S 1.53 (1.18-2.07), Fn/F 0.48 -> PARTIAL at b128 (log share recovered 0.64); seed 43 blew
-      up at validation 44/50 (read at best ckpt 28). Figs zng4g_ftnoset_b{2048,128} v2 (captions OK). Overall design branch:
-      partial (yes at b2048, partial at b128). Open: step 2 (the b128 residual; owner''s design: H2 dilution at lower D and/or
-      b128 instability). Not written up in docs/results.tex yet: the write-up of findings 2026-11-24 is the next owner''s
-      (with % src/% claim).'
-    decisions: 'Joaquin''s: D519/D520 (diagnosis, GPU-h), D529 (parent retrain is the investigation''s work), D514 (D507 scratch
-      searches extended: the b128 scratch reference is hp0078). Mine: b128 Sf*-only window extension dropped after reviewer
-      FIX (unmatched; the matched 16-trial scratch existed) -- dead end recorded; step-5 design re-recorded unchanged (b128
-      control updated to hp0078) and re-passed for the 4 seed runs; ftnoset_b2048 trial 10 recollected (drive --recollect,
-      RESULT_JSON present; 0.0228, third best); readouts read S at b128 against hp0078 and keep trial_0950 as ''S8'' for continuity;
-      residual step wait set to date 2026-11-25 (no runs).'
-    ruled_out: lr window (H3) b2048/b128; restart shock (H4) and sigma head at the end point; parent precision (H6); fine-tune
-      path bug (H7); pair logs as the settings' scratch cost (c_pair 0.13); at b2048 any deficit beyond the settings (Fn/S
-      0.35).
-    running: none
-    files: analysis/finetune_mechanism/zng4g_ftnoset_read.py (step 5/6 readout), zng4g_r1_read.py (--onesetting; b128 share
-      vs 8-trial S), parent_rerun_check.py noset; data/zng4g_{onesetting_b2048,ftnoset_b2048,ftnoset_b128,r1_b128}.json, parent_rerun_check_noset.json;
-      figs zng4g_onesetting_b2048, zng4g_r1_b128, zng4g_ftnoset_b{2048,128}; seed_chunks/zng4g_{scrflagsrch_b128,ftnoset_b*}_s4{3,4}.txt;
-      sweeps_local/ftmech_zng4g_ftnoset_b{2048,128}
-    written: '2026-11-24T05:12:09+00:00'
+    state: '2026-11-24 ~09:00 CET. Step 2 (b128 residual, Fn/S 1.53) is in flight as the H2 dilution test (design passed 05:35,
+      configs @5361f5820/45f404900): a parent pretrained on the finale''s 9 gluon/Z processes (recipes/transfer_finale_gluon.yaml;
+      same command as the 28-process no-settings parent 9a73698a, only the recipe) FA-ccin2p3-1f2d9ad5 RUNNING on V100 (limit
+      15 h, ~10.8 h, val combined -3.7 at 08:54); smoke FA-ccin2p3-4e7b6669 completed through the sigma stage. D=1e3 (3125
+      steps, b128) scratch and 28-process fine-tune searches done at 16 trials on [1.9e-3,1.9e-2]: S1k hp1009 0.0976 (lr 1.74e-2),
+      Fn1k hp1860 0.0490 (lr 2.54e-3), Fn1k/S1k 0.50 at seed 42 but both at opposite edges -> matched extension (design passed
+      07:57) to [6e-4,6e-2], 8 more each, driver ftmech_d1e3_ext running (detached log ~/.local/share/ccorch/detached/20261124-085814_ftmech_d1e3_ext.log);
+      seeds 43/44 of the 16-trial chosen trials running (FA-ccin2p3-b96a2a6c/2525f488 scr, ada00163/3ea9d4fa ftnoset). Write-up
+      of the 2026-11-24 findings committed e0b8de321 (par:ftm_zng4g, verify_claims 0). Next: step 1 read (re-pick if a best
+      moved), step 2 when the parent ends (Fg 1e4 + Fg1k with the same narrow-then-extend protocol). Read rule for every ratio:
+      2-sigma interval from the arms'' own seed log-sd; yes hi<1, no-of-needed-size lo>0.65, else unresolved -> question to
+      Joaquin on more seeds.'
+    decisions: 'Joaquin''s: D519/D520/D529 (investigation, GPU-h), D511 (<100 h), D514 (hp0078 reference). Mine: narrow parent
+      = finale''s 8 final-state-gluon processes + ee_ZZ (a massive neutral vector in the pretraining as in the 28), same 64000
+      steps and lr (same compute, 3.1x per-process exposure: the ''intentional pretraining'' comparison); D=1e3 at 3125 steps
+      (400 epochs as the 1e4 cells); D=1e3 window first [1.1e-3,3.3e-2], recentred on hpo_optima [1.9e-3,1.9e-2] by the repo-reviewer''s
+      finding, then widened to [6e-4,6e-2] (coordinator, matched, reviewed); parent limit 15 h from 7.97 h V100 x1.35 x1.3
+      +1; parent_rerun_check gained --cached and a JSON line, both readers print one-line JSON (verify_claims); job_datasaving_parent.sh
+      refuses flags=off/recipe= without tag=; seed runs submitted --allow-stale at a547ecac3e (contains the chunks commit).'
+    ruled_out: As before (H3 lr window, H4 restart shock/sigma head, H6 precision, H7 path bug, pair logs as the settings'
+      cost, any deficit beyond the settings at b2048).
+    running: FA-ccin2p3-1f2d9ad5 (gluon parent), drive ftmech_d1e3_ext (8+8 trials), seed runs FA-ccin2p3-b96a2a6c/2525f488/ada00163/3ea9d4fa
+    files: recipes/transfer_finale_gluon.yaml; scripts/job_datasaving_parent.sh (recipe=); sweep/sweep_config_ftmech_zng4g_{ftglu_b128,d1e3_scr_b128,d1e3_ftnoset_b128,d1e3_ftglu_b128}.yaml;
+      sweeps_local/ftmech_zng4g_d1e3_{scr,ftnoset}_b128; analysis/finetune_mechanism/seed_chunks/zng4g_d1e3_*; readers zng4g_ftnoset_read.py
+      (extend for the D=1e3 and Fg arms), parent_rerun_check.py; docs/results.tex par:ftm_zng4g
+    written: '2026-11-24T07:59:34+00:00'
   step_why:
     1:
       feeds: whether today's 28-process parent gains over scratch at D=1e3 and 3125 steps (Fn1k/S1k)
