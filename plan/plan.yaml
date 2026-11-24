@@ -15804,6 +15804,12 @@ entries:
     29: 'Open to Joaquin since 2026-11-19: the lxplus GPU-h costing fix (the site gate costs an lxplus job by its own --time
       limit, not its HTCondor flavour''s), refused by the auto-mode classifier as Undermining Oversight; also the claudemd-keeper
       a5092cfc3cedbf651 passing d02d1d53 (line 24)'
+    30: 'D534 orchestration infrastructure: diagnose from the 2026-11-22..24 transcripts (main session 71602535 and its subagents)
+      every correction Joaquin made and where his intent was lost (brief, plan entry, hand-off, relay, tool); then build,
+      by cases covered: (1) a per-entry record of Joaquin''s intent and corrections in his words, rendered first in every
+      brief and hand-off; (2) a pre-send check comparing what goes to Joaquin (figures, results, questions) against that record;
+      (3) event routing that wakes the main session and owners only for results and calls; (4) consolidation of the rule set
+      so what remains is followed. Each part shown working by replaying the real cases through the real path.'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16412,6 +16418,11 @@ entries:
       if:
       - 'yes: Joaquin applies it or allows it; then a repo check of site_gate on one lxplus job'
       - 'no: kept as is, recorded'
+    30:
+      feeds: whether the recurring failures of 2026-11-22..24 are stopped as a class
+      if:
+      - 'a part replays clean on its cases: keep it, report with the cases'
+      - 'a part fails a replay: redesign it before reporting'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
