@@ -42457,13 +42457,16 @@ entries:
   match: zz_cbs_*,cbs_*
   evidence:
     runs:
+    - FA-ccin2p3-225d38ea
     - FA-ccin2p3-6721d3c2
     - FA-lxplus-35cf0097
-    commit: b36a40b3a
+    commit: e8376ba0c
     paths:
+    - analysis/critical_batch/data/FA-ccin2p3-225d38ea_noise_scale.json
     - analysis/critical_batch/noise_read.py
     - base_experiment.py
     - experiment.py
+    - noise_scale.py
     - scripts/job_catalog_v3_short.sh
     - tests/test_noise_scale.py
   dead_ends: []
