@@ -43402,6 +43402,46 @@ entries:
       model_trial.json, validate_ext_b/c/d, mechanical_watch.json and lookup_trial.json. Searched: lpnllm, deepseek, qwen,
       opencode, lab llm, lab model, model trial, lookup trial, mechanical watch in docs/results.tex, the plan, site decisions
       and analysis/agent_redesign.'
+  - at: '2026-11-24T14:17:27+00:00'
+    question: 'How far does DeepSeek (deepseek-v4-flash through opencode in the bwrap sandbox) go on harder work than the
+      first round''s: larger multi-file tool fixes and code lookups, alone and executing a Sonnet plan, against Sonnet on
+      the same tasks; and how many of our tokens does that save? (D541: ''test a few more complicated tasks'')'
+    prior: '(1) This entry''s first round (analysis/lab_llm_trial/summary.json at 78d4af8ff): on the 10 model_trial fixes
+      DeepSeek alone 8/10 first pass, 9/10 after rework, 0 of our tokens, 11.8 min mean; DeepSeek+plan 9/10, 189k our tokens;
+      timed Sonnet mechanical-worker 9/10, 297k tokens, 3.7 min; log triage 30/30 auto, 29/30 hand. Those fixes are small
+      (median about 30 changed lines). (2) model_trial_validate_ext_b/c/d.json: 30 candidate fixes, 20 fail at the parent
+      and pass at the fix; never run by any model. (3) lookup_trial.json (D505 dropped its tool dead ends): 15 lookups by
+      Sonnet arms with tokens and hand/auto correctness; the 10 code lookups (callers, defaults, config sources) have answers
+      graded correct in most arms (grep arm: 9/10 correct, 22-111k tokens). The 5 transcript-recall lookups need our transcripts
+      and are out (the sandbox hides them by design). docs/results.tex: no entry on lab models or lookups (searched lab llm,
+      deepseek, lookup, model trial). site decisions: D213 (Sonnet for mechanical work), D505, D530, D531, D541.'
+    measure: 'Hard fixes: the 10 validated extension fixes with the largest fix diffs (changed lines 76-156, 2-5 files: alphapow,
+      valtotal, emastart, statssrc, topsampling, backlogdepth, recheck, inflight, endedrun, massconv); same harness as round
+      one: model_trial brief and defect text, git-archive copy of the fix''s parent, check = the fix commit''s own tests on
+      the tree left (model_trial.run_check + verdict against a baseline from model_trial validate), first pass and after one
+      rework round fed the check output; per run wall time, lab tokens, our tokens (Sonnet transcripts, as round one). Lookups:
+      the 10 code lookups of lookup_trial.json, same question text, on a git-archive copy of trunk at the trial''s first agent''s
+      start; answer = file:function lines; auto grade = the set of answered items equals the key (the items of the Sonnet
+      answers graded correct there, written by committed code to analysis/lab_llm_trial/lookup_keys.json and read by me against
+      those answers), tokens per lookup.'
+    check: 'The fix checks fail at the parent and pass at the fix (ext_b/c/d validation); before any lab run each of the 10
+      is re-validated in the sandbox grader (fails at parent, passes at fix) and a task failing that is replaced by the next
+      largest valid one, recorded. In round one the same checks separated arms (8/10 vs 9/10 first pass, rework recovered
+      one). Lookups: the Sonnet arms of lookup_trial differ in correctness on the same keys (val_combine 2 wrong of 9, is_cached
+      1, het_loss 1), so the grade moves with the answerer.'
+    fixed: 'opencode 1.19.6, server-default temperature, sandbox as round one (only .venv-cpu mounted, no ~/work, transcripts,
+      ledger or keys); one rework round; planner: one Sonnet Plan-type subagent per task, same brief, own no-history copy,
+      no edits, plan of at most 60 lines; Sonnet reference: one mechanical-worker per task in a worktree at the fix''s parent,
+      same brief and check (model_trial wt); lookups: the lookup_trial question text unchanged, run dir = the archive copy,
+      2 opencode sessions at a time (D531).'
+    control: 'Hard fixes: the timed Sonnet mechanical-worker on the same 10 tasks (new, same harness as round one''s sonnet_timed).
+      Lookups: the recorded Sonnet arms of lookup_trial.json on the same 10 questions (correctness and tokens per lookup),
+      no rerun.'
+    seeds: One run per task per arm on fixes (as round one and the reference); lookups twice per question for consistency.
+    outcome: 'Yes for DeepSeek on hard fixes (alone or +plan): first pass within one task of Sonnet''s on these 10, at our
+      tokens per fix at most 0.3x Sonnet''s: route multi-file fixes too. No: list which tasks fail and how (no edit, wrong
+      file, partial change, tool errors, timeouts) from the transcripts, keep hard fixes on Sonnet, try the plan arm''s detail
+      as the adaptation. Lookups yes: at least 9/10 in each run: route code lookups to DeepSeek; no: keep them on Explore.'
   step_waits:
     '2': the 10 timed Sonnet mechanical-worker fix agents (analysis/lab_llm_trial/sonnet_timed.json), graded by tools/lab_llm_trial.py
       sonnet_timed
