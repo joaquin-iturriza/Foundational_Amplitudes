@@ -4277,7 +4277,7 @@ class AmplitudeExperiment(BaseExperiment):
             y_pred, yc, pids, sigma, _ = self._forward_lloca(chunk)
             loss = self._aggregate_per_process_loss(y_pred, yc, pids, "mean", sigma=sigma, sign=self._last_sign,
                                                     full_counts=counts)
-            yield (n / (e1 - e0)) * loss + self._reg_term(self.model)
+            yield k * loss + self._reg_term(self.model)   # k exactly: the chunks then average to the batch loss
 
     def _aggregate_per_process_loss(self, y_pred, y, process_ids, loss_agg, sigma=None, sign=None, full_counts=None):
         """Mean (or geometric mean) over per-process mean losses.
