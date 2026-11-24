@@ -68,7 +68,8 @@ FLAGS = {"pair_logs": dict(input_pair_logs=5), "soft_rescale": dict(input_soft_e
          "local_logs": dict(input_local_log_eps=1e-8),
          "both_6": dict(input_pair_logs=6, input_soft_eps=1e-8),
          "soft_massless": dict(input_soft_eps=1e-8, input_soft_massless_only=True),
-         "soft_x0": dict(input_soft_eps=1e-8, input_soft_x0=0.1)}     # the uugg flags: 15 pair logs + soft rescale
+         "soft_x0": dict(input_soft_eps=1e-8, input_soft_x0=0.1),
+         "soft_gate": dict(input_soft_eps=1e-8, input_soft_gate=0.1)}     # the uugg flags: 15 pair logs + soft rescale
 
 
 def _check(name, lens=LENS):
@@ -118,6 +119,21 @@ def test_soft_x0_only_soft_momenta():
     F = lambda v: torch.log1p(v / 1e-8) / (v * np.log1p(1e8))
     assert torch.allclose(r[soft] / p[soft], (F(x[soft]) / F(torch.tensor(0.1)))[:, None])
     assert torch.equal(_soft_rescale(p, ptr, 1e-8, x0=1.0), _soft_rescale(p, ptr, 1e-8))
+
+
+def test_soft_gate_equivariant():
+    _check("soft_gate")
+
+
+def test_soft_gate_whole_events():
+    """input_soft_gate (D552): an event with a final-state x < gate gets the full rescale, the others factor 1."""
+    p, ptr = _events(1)
+    p = torch.cat([p, torch.tensor([[1., 0, 0, 1], [1., 0, 0, -1], [1., 1, 0, 0], [1., -1, 0, 0]])])   # a hard event
+    ptr = torch.cat([ptr, ptr[-1:] + 4])
+    r, full = _soft_rescale(p, ptr, 1e-8, gate=0.1), _soft_rescale(p, ptr, 1e-8)
+    soft_ev = slice(0, int(ptr[-2]))                   # the three events with a soft leg
+    assert torch.equal(r[soft_ev], full[soft_ev])
+    assert torch.equal(r[int(ptr[-2]):], p[int(ptr[-2]):])
 
 
 def test_pair_log_values():
