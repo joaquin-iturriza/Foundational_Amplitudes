@@ -40274,6 +40274,19 @@ entries:
       stands (uug''s two-body-like bulk is not hurt). If blow-ups recur at hp1333 in a cell, that cell is listed apart and
       goes to the second stage of the rule (the same DyHPO search per arm in that cell, best against best), never read from
       a blown-up arm.'
+    passed_at: '2026-11-24T16:39:31+00:00'
+    reviewer: 'D539 step 4 checked against d539.json, zng4g_r1_b2048.json, chunks d539s_00..07 @0f967c29d and the S search
+      config. Matched: each cell''s off arm at the same hp1333, seeds, steps, config and code; only input_soft_eps, train_subsample
+      and the uug processes_file move, the D axis carrying passes (40 vs 400) as the outcome states. hp1333 rebuilt from the
+      sweep state matches the chunk overrides exactly (lr 2.0296e-2, muon wd 1.4515e-2, reg 8.40e-7, warmup 0.0897, eta_min
+      1.13e-8, ema 0.9683). Check 2: rescale moves Z+4g 1e4 val 2.41x [1.98,2.92] at hp1961, the onesetting search sits 0.121-0.201
+      against S 0.058-0.067 at every lr, D moves off 0.054->0.016 (3.4x), uug kit soft bin moves 4.5-5 decades. Check 3: stable
+      Z+4g sigma_r 0.064-0.097, so r>=1.3 is resolved with 3 seeds; uug''s stable spread is measured by the 3 seeds themselves
+      (step-3 uug spread came from blown-up runs), and the kit soft effect dwarfs any spread. Outcome (a)/(b) and the uug
+      branch stated, a blow-up cell goes to the matched search. Disk: CC /sps/lpnhe 15 GB free now against ~1.6 GB. Searched:
+      input_soft_eps, log-rescale, momentum log, energy fraction, uug rescale in results.tex (fig ftm_zng4g_onesetting, sec
+      kit-deepest), plan findings, site decisions (D374, D392, D507, D520, D529, D539): prior is complete. Note for submission:
+      3 runs x 0.35 h = 1.05 h per chunk, so --hdr=--time must be ~1.5 h, not step 3''s 01:00:00.'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
