@@ -9925,8 +9925,9 @@ $0.0108$, $0.0184$, $0.0141$ from the 28-process parent and $0.00887$, $0.0105$,
 over the 28-process fine-tune is $0.65$, with a $2\sigma$ interval of $0.48$--$0.88$: dilution, by the design's rule.
 Over scratch it is $0.98$ ($0.87$--$1.10$), so the narrower parent closes the $1.53\times$ residual. None of its seeds blows up,
 and all three are still falling at the end of the run, so the comparison holds at this compute. Its chosen learning rate sits
-$0.09$ decades under the top of the window, as does scratch's.
-% src: python3 analysis/finetune_mechanism/zng4g_ftnoset_read.py 128 --cached @75d8985e4
+$0.09$ decades under the top of the window.
+% src: python3 analysis/finetune_mechanism/zng4g_ftnoset_read.py 128 --cached @f8c83b1c3
+% claim: Fg_chosen.dec_below_top=0.09
 % claim: Fg_chosen.lr=8.89e-3
 % claim: best.Fg.0=0.00911
 % claim: best.Fg.1=0.00909
@@ -9943,7 +9944,7 @@ $0.09$ decades under the top of the window, as does scratch's.
 % claim: Fg_over_S.lo=0.87
 % claim: Fg_over_S.hi=1.10
 % claim: Fn_over_S.mean=1.53
-% allow: 9 28 128 2 10^4 0.09 because they are the parents' process counts, the batch size, the interval width, the training size and the window position read from the plotted trials
+% allow: 9 28 128 2 10^4 because they are the parents' process counts, the batch size, the interval width, the training size
 
 At $10^3$ events the order flips (Fig.~\ref{fig:ftm_zng4g_d1e3}). The fine-tune from the 9-process parent, searched over the
 same $24$ trials, reaches $0.0823$, $0.0811$, $0.0845$ at learning rate $3.55\times10^{-3}$. Over the 28-process fine-tune that
@@ -10092,14 +10093,15 @@ whose target is the bulk, the parent is the one without the rescale, as the fine
 
 Since the $u\bar ug$ runs blew up at both fixed hyperparameter sets, each of its four arms (no rescale and $\epsilon=10^{-8}$,
 at $10^4$ and $10^5$ events) got its own $16$-trial search over the same space, read best against best with seeds $42$--$44$
-of each chosen trial (Fig.~\ref{fig:ftm_d539u}). No run blows up, and every chosen learning rate sits at least $0.2$ decades
+of each chosen trial (Fig.~\ref{fig:ftm_d539u}). No run blows up, and every chosen learning rate sits at least $0.22$ decades
 inside the window. At $10^4$ events the rescale costs the bulk of $u\bar ug$ too: $r=2.18$ $[1.32, 3.58]$, with three-seed
 means $0.0055$ without and $0.0119$ with it. At $10^5$ the ratio is $1.68$ $[0.93, 3.07]$, unresolved. By the design, the bulk
 gain of D374 (batch $16384$, $8000$ steps, cosine schedule) does not carry over to this setup, so the rescale pays only where the
 soft limit is the target. The kit bins of the same twelve runs agree (seed medians, rescale over none): the deepest
 soft bin moves by $-4.65$ decades at $10^4$ and $-4.57$ at $10^5$, the bulk rises by $0.33$ and moves by $-0.07$, and the
 deepest collinear bin moves by $0.18$ and $0.21$, inside its seed spread.
-% src: python3 analysis/finetune_mechanism/d539_read.py --set u --cached @5758f6310
+% src: python3 analysis/finetune_mechanism/d539_read.py --set u --cached @f8c83b1c3
+% claim: lr_dec_from_edge_min=0.22
 % claim: cells.uug_1e4.eps1e-8.over_off.r=2.18
 % claim: cells.uug_1e4.eps1e-8.over_off.lo=1.32
 % claim: cells.uug_1e4.eps1e-8.over_off.hi=3.58
@@ -10115,7 +10117,7 @@ deepest collinear bin moves by $0.18$ and $0.21$, inside its seed spread.
 % claim: cells.1e5.delta_dec.bulk=-0.07
 % claim: cells.1e4.delta_dec.coll_y=0.18
 % claim: cells.1e5.delta_dec.coll_y=0.21
-% allow: 16 42 44 10^4 10^5 10^{-8} 0.2 16384 8000 because they are the trial count, the seeds, the training sizes, the rescale's setting, the lr-window margin read from the searches and D374's batch and steps
+% allow: 16 42 44 10^4 10^5 10^{-8} 16384 8000 because they are the trial count, the seeds, the training sizes, the rescale's setting and D374's batch and steps
 
 \begin{figure}[H]
   \centering
