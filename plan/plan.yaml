@@ -44931,12 +44931,10 @@ entries:
   dead_ends: []
   asks: []
   owner:
-    agent: a97209d81e39f1376
-    state: closed
-    since: '2026-11-24T17:21:44+00:00'
-    state_at: '2026-11-24T23:16:07.092000+00:00'
-    context: 267384
-    context_at: '2026-11-24T22:25:40+00:00'
+    agent: af56ff9ec02b765a0
+    state: working
+    since: '2026-11-24T23:30:10+00:00'
+    state_at: '2026-11-24T23:30:10+00:00'
   designs:
   - at: '2026-11-24T17:27:42+00:00'
     question: Does a maintain command run as a 1-CPU job on CC's htc partition (site run --recurring), read by the next supervisor
