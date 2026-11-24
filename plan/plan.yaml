@@ -37112,6 +37112,18 @@ entries:
       result: adam_b128 complete at 16: best hp1141 lr 8.2e-4, 0.0256 vs D507 choice trial_0833 0.0313 (1.22x, inside its
       1.74 seed spread: choice stands); muon_b128 4 of 8: hp0078 lr 9.24e-3 0.00708 vs trial_0950 0.0144 (2.0x, beyond 1.19),
       at log position 0.95 of the new window [2.7e-4, 1.1e-2].'
+  - at: '2026-11-24T03:53:52+00:00'
+    text: '2026-11-24 D514 step 3 read (benchmark.py d507collect/d507fig --v2 @6568c47c, data/d507_v2.json, d507_search_v2.json).
+      Repair trials on CC (folded to the lxplus state, start-up consumed): Muon b128 3 at lr 2.74e-2-3.29e-2 (new top 3.3e-2)
+      at 0.0253-0.0693 standardised, all worse than hp0078 0.00708: best of 19 is hp0078 at log position 0.735, bracketed
+      by the reviewer''s rule (trials above its lr worse). Adam b2048: best of 19 hp0775 0.0401 vs trial_1152 0.0431 (1.07x,
+      inside its 1.58 spread): choice stands. Muon b2048 best of 16 (+3 lxplus repeats) still trial_1333; Adam b128 best of
+      16 1.22x under its 1.74 spread: choice stands. hp0078 seeds (val MSE(ln|M|^2)): 0.00888/0.01048/0.00887, mean 0.00941,
+      spread 1.18, vs trial_0950 mean 0.0197 (2.09x): Muon b128 replaced. Ratios of three-seed means [range over seed pairings]
+      from the v2 read: Muon batch ratio 6.69 [5.53, 7.54] (was 3.20), Adam 1.28 [0.79, 2.17] (unchanged), optimiser b128
+      Muon/Adam 0.17 [0.13, 0.27] (was 0.35), b2048 0.88, G 1.12 [0.85, 1.70] (unchanged: unresolved). Test scoring of hp0078
+      FA-lxplus-8116ba56 pending; zng_d507 v2 drawn after it (d507fig --v2 refuses until then). Reference sent to finetune_mechanism
+      as a finding.'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
