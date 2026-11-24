@@ -16434,6 +16434,7 @@ entries:
       wake_batching_after2.json, redraw, check_caption, report'
     '28': the main session's go after this owner's 2026-11-19 report (an interactive terminal session with Code Mode on must
       be started by hand)
+    '30': 'the main session resuming this owner after the diagnosis hand-back (narrowing: diagnosis first), 2026-11-24'
   owner:
     agent: aa3a1133e1a11b531
     state: working
