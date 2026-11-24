@@ -44646,7 +44646,16 @@ entries:
     paths:
     - scripts/job_disk_inventory.sh
   dead_ends: []
-  asks: []
+  asks:
+  - ask: 'Scope: which of CC''s costly results to delete to free the group space (99% full). Which of these should go: model
+      files under D149/D133 via scripts/prune_site.sh (tens of GiB), zz_catft* 27.3 GiB (muon_test fine-tunes the draft cites),
+      zz_v4_short/long per-pool outputs 27.4, lhe_queue 6.8, runs_from_lxplus 17.3 (its archive held by D122)?'
+    at: '2026-11-24T19:11:39+00:00'
+    searched: D542 (look and list only), D149, D133, D147, D201, D122; ~/work/CLAUDE.md (results pruned only by the project's
+      pruning tool under the user's decision); 2026-11-10T02:08 (draft and slide uploads); 2026-10-01T01:32 (steering issue
+      and seed priority); 2026-11-14T04:31 (a pasted LaTeX template)
+    blocks: the CC deletions of costly results only
+    blocks_steps: &id003 []
   owner:
     agent: acc098fc308290fb5
     state: stopped
@@ -44769,6 +44778,15 @@ entries:
       if:
       - 'Joaquin names items: delete exactly those through the decided tools, report freed GiB against df'
       - 'Joaquin keeps everything: record it, close the entry with the inventory as its result'
+  ask: 'Scope: which of CC''s costly results to delete to free the group space (99% full). Which of these should go: model
+    files under D149/D133 via scripts/prune_site.sh (tens of GiB), zz_catft* 27.3 GiB (muon_test fine-tunes the draft cites),
+    zz_v4_short/long per-pool outputs 27.4, lhe_queue 6.8, runs_from_lxplus 17.3 (its archive held by D122)?'
+  waiting_since: '2026-11-24T19:11:39+00:00'
+  searched: D542 (look and list only), D149, D133, D147, D201, D122; ~/work/CLAUDE.md (results pruned only by the project's
+    pruning tool under the user's decision); 2026-11-10T02:08 (draft and slide uploads); 2026-10-01T01:32 (steering issue
+    and seed priority); 2026-11-14T04:31 (a pasted LaTeX template)
+  blocks: the CC deletions of costly results only
+  blocks_steps: *id003
 - id: cc_login_jobs
   title: 'CC login node: recurring and long scripts moved to Slurm (CC support''s email)'
   question: 'Can every non-interactive script we run on CC''s login node (the supervisor''s maintain commands: disk_watch,
