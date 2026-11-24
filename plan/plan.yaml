@@ -37447,6 +37447,7 @@ entries:
     (a pasted SciPost LaTeX template) share words but set no cost for this ladder'
   blocks: step 4 (stage 2 submission); step 3 keeps running
   blocks_steps: *id002
+  checked_until: '2026-11-24T13:13:38+00:00'
 - id: dan_zeroshot_v4
   title: Catalog_v4 pretraining zero-shot on Daniel's held-out split
   question: How does our best catalog_v4 pretraining (trial 1262) do zero-shot on the held-out processes of Daniel's catalog
