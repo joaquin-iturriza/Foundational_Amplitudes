@@ -54,6 +54,9 @@ def main():
            "ours_below_llm": {lab: {g: int(sum(h[n]["mse_logm2"] < llm_pp[n] for n in ns)) for g, ns in groups.items()}
                               for lab, (_, h) in arms.items()},
            "counts": {"seen": 1352, **{g: len(ns) for g, ns in groups.items()}}}
+    if "control" in ours:   # pooled held-out MSE (RMSE^2) of each arm over the control's, against the 1.38 seed margin
+        out["heldout_mse_ratio_to_control"] = {lab: (r["heldout"] / ours["control"]["heldout"]) ** 2
+                                               for lab, r in ours.items() if lab != "control"}
     print(json.dumps(out))   # one line: tools/verify_claims.py reads the last {...} line
     json.dump(out, open(os.path.join(HERE, "data", f"{out_name}_score_summary.json"), "w"), indent=1)
     # no figure here: Joaquin rejected this layout (2026-11-23); the figure is heldout_per_process.py's
