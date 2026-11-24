@@ -42273,3 +42273,10 @@ entries:
   step_waits:
     '1': repo-reviewer afceb015058181906 re-check of cc6038c92 and the design-reviewer a3f512d7ff8399544
     '2': step 1's B_simple read (noise_scale.json of the v4_het_noise_scale run)
+  targets:
+  - batch: noise_smoke
+    wall_h: 0.4
+    jobs: 1
+    units: null
+    start: '2026-11-24T00:54:27+00:00'
+    at: '2026-11-24T00:54:27+00:00'
