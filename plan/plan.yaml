@@ -39829,6 +39829,15 @@ entries:
       moves: re-pick, run its seeds 43/44, read from them. A new best within 0.1 dec of the wide window''s edge: reported
       as edge-limited, extended once more only on a matched design. Any trial blowing up (val > 10x best-so-far) listed apart
       (D398).'
+    passed_at: '2026-11-24T07:57:48+00:00'
+    reviewer: 'Re-check after my FIX on the D=1e3 extension. The gluon-parent D=1e3 config at 8e0482ffb differs from 45f404900
+      only by a header comment (window [1.9e-3, 1.9e-2], 16 trials). The design now gives all three D=1e3 arms one protocol:
+      16 trials on the narrow window, then extend_sweep.py to [6e-4, 6e-2] and 8 more with the edfcc164d edits (window, n_trials
+      24, waves), so the searches are matched. Checks 2 and 3: the extension is needed because both 16-trial bests crowd an
+      edge (sweeps_local summaries): scratch hp1009 0.0976 at 1.74e-2, 0.04 decade under the top; the 28-process fine-tune
+      hp1860 0.0490 at 2.54e-3, 0.13 decade over the bottom. The ratio uses the passed 2-sigma rule on three seeds. Cost about
+      4.5 GPU-h, no needless ordering. Check 5: the prior was searched in the earlier pass of this step (dilut, intentional,
+      rung, finale/rung 9, Zgg/Zggg, highmult) plus this entry''s R3 extension and its Sf*-alone dead end.'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
