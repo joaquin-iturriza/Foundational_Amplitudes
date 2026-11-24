@@ -38080,6 +38080,9 @@ entries:
     4: 'D539 step 5 (the passed step-4 design''s fallback): u u~ g bulk at stable HPs. At hp1961 and hp1333 the uug runs blew
       up (5/12 at hp1333), so each uug arm gets its own 16-trial DyHPO search over S''s space (sweep_config_ftmech_d539_uug_{1e4,1e5}_{off,eps1e-8}_b2048.yaml
       @352fbb1aa), then seeds 43/44 of each chosen trial, best against best, plus kit scoring of the chosen trials'
+    5: 'Dilution at D=1e3 (from step 2): the widened gluon-parent search ftmech_zng4g_d1e3_ftglu_b128 (8 more trials on [6e-4,6e-2],
+      config @6236e60fd, detached drive ftmech_glu_d1e3_ext) ends -> zng4g_seed_chunks.py on its chosen trial, seeds 43/44
+      after site pick, then zng4g_d1e3_read.py reads Fg1k/Fn1k with the 2-sigma interval'
   done_when: null
   notes_ref: null
   match: dsave_ftmech_*,ftmech_*
@@ -40578,6 +40581,12 @@ entries:
       - 'uug r<=1 or inside noise: the rescale''s bulk cost is specific to Z+4g''s many massless legs; keep it in uug-like
         limit studies'
       - 'uug r>1 beyond noise: the rescale costs the bulk of both processes; it stays only where the soft limit is the target'
+    5:
+      feeds: 'H2 dilution at D=1e3: Fg1k/Fn1k'
+      if:
+      - 'hi<1: dilution yes at D=1e3'
+      - 'lo>0.65 and hi>=1: no dilution of the needed size at D=1e3'
+      - 'lo>1: the gluon parent is worse (it missed its cooldown: best checkpoint pre-cooldown)'
   intent:
   - text: I asked you to investigate the problem, it's extremely obvious that this implies testing different configurations,
       it's never a question then if you should send a run or not because it changes the configuration, that's the entire point
