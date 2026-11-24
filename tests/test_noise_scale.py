@@ -48,3 +48,30 @@ def test_chunks_average_to_the_batch_loss():
     parts = [AmplitudeExperiment._aggregate_per_process_loss(stub, yp[c], y[c], pids[c], "mean", full_counts=counts)
              for c in torch.arange(n).chunk(k)]
     assert torch.allclose(sum(k * p for p in parts) / k, full)
+
+
+def test_brute_gram_and_jackknife():
+    # the brute check's record: its Gram matrix reproduces the summed terms, and the jackknife error over its M batches
+    # covers the known answer of the linear-regression case
+    import sys, os
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "analysis", "critical_batch"))
+    from noise_read import gram_terms, jackknife_se
+    torch.manual_seed(2)
+    D, s, N, M = 10, 0.5, 64, 16
+    w_star = torch.randn(D, dtype=torch.float64)
+    d = 0.3 * torch.randn(D, dtype=torch.float64)
+    w = torch.nn.Parameter(w_star + d)
+    exp = SimpleNamespace(optimizer=torch.optim.SGD([w], lr=0.0))
+    hits = 0
+    for _ in range(40):
+        xs = [torch.randn(N, D, dtype=torch.float64) for _ in range(M)]
+        losses = ((0.5 * (x @ w - (x @ w_star + s * torch.randn(N, dtype=torch.float64))).square()).mean() for x in xs)
+        k, terms, gram = BaseExperiment._noise_grads(exp, losses, {"all": [w]}, gram=True)
+        r = {"k": k, "b_small": float(N), "b_big": float(N * k), "all_gram": gram["all"]}
+        S, G2, _ = gram_terms(r, list(range(k)))
+        S2, G22 = noise_scale_terms(*terms["all"], N, N * k)
+        assert abs(S / S2 - 1) < 1e-9 and abs(G2 / G22 - 1) < 1e-9
+        se = jackknife_se(r)
+        S_true = D * (d.square().sum() + s ** 2) + d.square().sum()
+        hits += abs(S - S_true) <= 2 * se[0]
+    assert hits >= 32   # about 95% of 40 within two standard errors

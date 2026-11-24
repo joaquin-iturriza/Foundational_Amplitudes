@@ -1733,10 +1733,11 @@ class BaseExperiment:
                     "adamw": [p for g in groups if not g.get("use_muon") for p in g["params"]]}
         return {"all": [p for p in self.model.parameters() if p.requires_grad]}
 
-    def _noise_grads(self, losses, sets):
+    def _noise_grads(self, losses, sets, gram=False):
         """Backward each loss of `losses` (one at a time, at the current weights) and return, per parameter set, the
-        mean squared norm of the gradients and the squared norm of their mean, as floats."""
-        sums, sq, k = {n: None for n in sets}, {n: 0.0 for n in sets}, 0
+        mean squared norm of the gradients and the squared norm of their mean, as floats; with gram=True also their
+        Gram matrix g_i.g_j (the gradients kept until the end), from which any subset's terms follow (a jackknife)."""
+        sums, sq, keep, k = {n: None for n in sets}, {n: 0.0 for n in sets}, {n: [] for n in sets}, 0
         for loss in losses:
             self.optimizer.zero_grad()
             loss.backward()
@@ -1745,8 +1746,13 @@ class BaseExperiment:
                 g = torch.cat([(p.grad if p.grad is not None else torch.zeros_like(p)).reshape(-1) for p in ps])
                 sq[n] = sq[n] + g.double().square().sum()
                 sums[n] = g.double() if sums[n] is None else sums[n] + g.double()
+                if gram:
+                    keep[n].append(g.detach().clone())
         self.optimizer.zero_grad()
-        return k, {n: ((sq[n] / k).item(), (sums[n] / k).square().sum().item()) for n in sets}
+        out = {n: ((sq[n] / k).item(), (sums[n] / k).square().sum().item()) for n in sets}
+        if gram:
+            return k, out, {n: (lambda G: (G @ G.T).tolist())(torch.stack(keep[n]).double()) for n in sets}
+        return k, out
 
     def _noise_measure(self, data, step):
         """One gradient-noise measurement (McCandlish et al. 2018, App. A, with micro-batches in place of GPUs): the
@@ -1778,10 +1784,11 @@ class BaseExperiment:
                 collate_fn=tl.collate_fn, num_workers=0)))
         batches = [next(self._noise_iter) for _ in range(M)]
         n = int(batches[0][1].shape[0])
-        kk, terms = self._noise_grads((self._batch_loss(d)[0] for d in batches), self._noise_sets())
+        kk, terms, gram = self._noise_grads((self._batch_loss(d)[0] for d in batches), self._noise_sets(), gram=True)
         self._noise_log.append({"kind": "brute", "step": int(step), "b_small": float(n), "b_big": float(n * kk),
                                 "k": kk, **{f"{s}_{t}": v for s, (g2s, g2b) in terms.items()
-                                            for t, v in (("g2_small", g2s), ("g2_big", g2b))}})
+                                            for t, v in (("g2_small", g2s), ("g2_big", g2b))},
+                                **{f"{s}_gram": g for s, g in gram.items()}})
         for d in batches:
             self._noise_log.append({**self._noise_measure(d, -1), "kind": "chunk_at_brute", "step": int(step)})
         LOGGER.info(f"NOISE brute check at step {step}: {M} batches of {n}")
