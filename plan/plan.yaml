@@ -36743,6 +36743,16 @@ entries:
       2 x 1.0 h (CC V100 0.0886 s/step x 31250 + 0.25 h), Muon b128 3 x 1.0 h on CC, Adam b2048 3 x 0.35 h: 6.1 GPU-h; possible
       2 more seeds 2 GPU-h; test scoring <= 0.4: <= 8.5 GPU-h. Wall: one wave of each at site pick''s width (CC 12 at once),
       ~1.0 h.'
+    passed_at: '2026-11-24T02:21:33+00:00'
+    reviewer: 'Re-check after the FIX: Muon b128 lr top raised to 3.3e-2 (@df7c957a; old bests hp0078 9.24e-3 0.00708, hp1774
+      1.073e-2 0.0080, hp1006 1.086e-2 0.0086 sat at 0.95-0.99 of [2.7e-4,1.1e-2], kit_curves lxplus read 2026-11-24), edge
+      outcome stated (<0.9 log position bracketed; read ''bracketed'' only with a worse trial above the best''s lr). Adam
+      b2048 best hp0775 2.84e-3 interior. Check 2: lr moves val 4.7x (Muon b128) and 2.0x (Adam b2048) in these searches.
+      Check 3: hp0078 0.0089 vs trial_0950 three-seed mean 0.0197 (d507_read.json), 2.2x against spread 1.19 and cross-site
+      1.02-1.38. Seed chunks @2feab608 carry all 7 searched HPs as the D509 ones; CC rate 0.0886 s/step from D509 CC seed
+      logs, 2 h limit with ~2x room; CC placement per site pick, no GPU pin there; seeds and repair parallel. HETEROSC, emission-scale
+      target, their 1e6 test split. Searched: D507/D509/D514, entry findings and dead ends, results.tex terms d1e4, hp0078,
+      D514 extension: no other extension of these searches.'
   step_waits:
     '3': sweeps ccin2p3:tp_zng_d1e4_muon_b2048_zgggg lxplus:tp_zng_d1e4_muon_b128_zgggg lxplus:tp_zng_d1e4_adam_b2048_zgggg
       (then 3 repair trials each in muon_b128 and adam_b2048 on lxplus)
