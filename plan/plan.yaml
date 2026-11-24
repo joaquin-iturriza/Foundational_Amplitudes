@@ -41878,12 +41878,9 @@ entries:
     - designer-executor setups
   decisions:
   - D530
-  next: 'When the resume batch (detach:labllm_resume) ends, launch the 16 reruns of zsrole, ordsrc, skipclaim and stallshort
-    x 4 lab arms (grader defects fixed) as one detached job with 2 streams: tools/detach.py --entry lab_llm_trial --name labllm_rerun
-    --each ''bash /tmp/claude-1000/lab_llm_trial/rerun_0.sh'' --each ''bash /tmp/claude-1000/lab_llm_trial/rerun_1.sh'' (at
-    most 2 opencode sessions, D531); on its end run python3 tools/lab_llm_trial.py report in worktrees/wt-labllm, look at
-    figs/lab_llm_pass.png, check its caption, and hand Joaquin the numbers (pass, minutes and our tokens per fix per arm incl.
-    Sonnet timed; triage auto 60/60 and hand 59/60) with the figure'
+  next: 'Write the benchmark result into docs/results.tex (src: worktrees/wt-labllm/analysis/lab_llm_trial/summary.json at
+    78d4af8ff, figure lab_llm_pass) with the routing Joaquin chooses, then fold the worktree (scripts/remove_worktree.sh)
+    after its reviewer'
   done_when: null
   notes_ref: null
   match: zz_labllm_*
@@ -42025,7 +42022,6 @@ entries:
   step_waits:
     '2': the 10 timed Sonnet mechanical-worker fix agents (analysis/lab_llm_trial/sonnet_timed.json), graded by tools/lab_llm_trial.py
       sonnet_timed
-    '1': detach:labllm_rerun
   findings:
   - at: '2026-11-23T19:55:22+00:00'
     text: 'Local batch width cut from 6 parallel opencode streams to 2 (D531): 6 streams of opencode sessions (~350-400 MB
@@ -42046,11 +42042,11 @@ entries:
       scratch after the resume batch ends.'
   step_why:
     1:
-      feeds: whether lab models take some subagent work (D530), and Joaquin's question whether they are slower or only not
-        parallel
+      feeds: whether lab models take some subagent work (D530)
       if:
-      - 'a lab arm meets the design''s yes rule: propose routing that work type to it'
-      - 'none does: read the failure modes in the transcripts and propose the next adaptation'
+      - 'Joaquin routes log reading and/or simple fixes to lab models: build the route (opencode sandbox runner as an agent
+        step) as its own entry'
+      - 'he does not: write up and close'
   handoff:
     state: 'Benchmark built and mostly run. Harness: opencode 1.19.6 (native binary ~/.local/lib/node_modules/opencode-ai/node_modules/opencode-linux-x64/bin/opencode)
       in a bwrap sandbox, tools/lab_llm_trial.py + tools/lab_llm_report.py in worktrees/wt-labllm (branch labllm, last commit
