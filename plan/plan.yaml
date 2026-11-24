@@ -40276,10 +40276,18 @@ entries:
     answers_after: '2026-11-22T14:33:25+00:00'
     covers:
     - llm_compare
+  - said_at: '2026-11-24T13:41:29.741000+00:00'
+    text: I don't understand what's the question, I said we wait for the HPs to then run the wider network, we got them, then
+      start the runs, why are you asking me? We then also widen the best HPs for our setup
+    decision: D537
+    answers_after: '2026-11-23T22:40:25+00:00'
+    covers:
+    - llm_compare
   decisions:
   - D525
   - D527
   - D528
+  - D537
   next:
     5: 'Part (c) readout: when llmcmp_c_qperp''s driver writes DRIVE_DONE and its control ends, score (c)''s best trial and
       the control (REREAD=<run> scripts/job_llm_score.sh), read per set (seen, held out, relabels, new) pooled RMSE and median
@@ -40408,7 +40416,9 @@ entries:
     searched: 'D522, D525-D528; CLAUDE.md; Joaquin 2026-11-23 on needless sequencing; Joaquin 2026-11-12T01:19 (tt LO and
       uu V points, not this); 2026-11-22T02:55 (D522''s own message: scale-up after near-optimal HPs); 2026-11-14T04:31 (a
       pasted LaTeX draft, no decision on this). Starting early departs from his order, so it is his call'
-    blocks_steps: &id003 []
+    blocks_steps: []
+    answered_at: '2026-11-24T13:41:29.741000+00:00'
+    decision: D537
   owner:
     agent: ae2d14b6689ebb697
     state: stopped
@@ -42766,14 +42776,6 @@ entries:
     units: null
     start: '2026-11-24T08:26:34+00:00'
     at: '2026-11-24T08:26:34+00:00'
-  ask: 'Your hold: start part (b), the muP width scale-up toward the LLM''s parameter count, now at part (a)''s best HPs so
-    far (wave 1: lr 1.03e-3), rerunning it if the search moves the optimum, instead of after the search ends as D522 says
-    (''once we find near optimal HPs'')?'
-  waiting_since: '2026-11-23T22:40:25+00:00'
-  searched: 'D522, D525-D528; CLAUDE.md; Joaquin 2026-11-23 on needless sequencing; Joaquin 2026-11-12T01:19 (tt LO and uu
-    V points, not this); 2026-11-22T02:55 (D522''s own message: scale-up after near-optimal HPs); 2026-11-14T04:31 (a pasted
-    LaTeX draft, no decision on this). Starting early departs from his order, so it is his call'
-  blocks_steps: *id003
   objective: 'In the conditions of Suprio''s LLM pID run (1352 trained, 139 held out; 55,296 events per process; 60,840 steps
     of 24,576 events; his target z and test metric), how a muP LLoCa does (a) after a DyHPO search, (b) scaled by muP width
     toward the LLM''s 359.6M parameters, (c) in our latest setup, against the LLM (0.321 / 0.721) and his LLoCa (0.506 / 0.953).
@@ -42796,7 +42798,6 @@ entries:
       diverges shouldn't wake you and it's owning agent up.
     said_at: '2026-11-24T10:33:58.174000+00:00'
     at: '2026-11-24T11:23:35+00:00'
-  checked_until: '2026-11-24T13:13:45+00:00'
 - id: lab_llm_trial
   title: Lab LLMs in place of some subagents
   question: Can the lab's LLMs (deepseek-v4-flash, qwen3.8-27b via lpnllm) do some of our subagent work (mechanical steps,
@@ -42842,7 +42843,7 @@ entries:
     searched: 'site decisions --project FA whole (D530 approves the benchmark only, D531 the restart; none sends work to lab
       models); CLAUDE.md (mechanical-worker is Sonnet per D213); Joaquin''s messages 2026-11-14T04:31 (a SciPost LaTeX template),
       2026-11-10T02:08 (uploaded paper and slides), 2026-10-26T17:18 (settings warnings): none is about the lab models'
-    blocks_steps: &id004
+    blocks_steps: &id003
     - 1
   owner:
     agent: a6187b6cdb7ca974a
@@ -43035,7 +43036,7 @@ entries:
   searched: 'site decisions --project FA whole (D530 approves the benchmark only, D531 the restart; none sends work to lab
     models); CLAUDE.md (mechanical-worker is Sonnet per D213); Joaquin''s messages 2026-11-14T04:31 (a SciPost LaTeX template),
     2026-11-10T02:08 (uploaded paper and slides), 2026-10-26T17:18 (settings warnings): none is about the lab models'
-  blocks_steps: *id004
+  blocks_steps: *id003
   checked_until: '2026-11-24T13:13:51+00:00'
 - id: critical_batch
   title: Critical batch size from the gradient noise scale
@@ -43093,7 +43094,7 @@ entries:
       SciPost LaTeX template he pasted), 2026-11-16T20:00 (a writing-style skill), 2026-11-10T02:08 (uploaded slides and code):
       none is about batch size, lr per batch or this cost'
     blocks: step 2 (the batch-size runs); step 1 keeps going
-    blocks_steps: &id005
+    blocks_steps: &id004
     - 2
   owner:
     agent: aa75364575cea3cb4
@@ -43315,7 +43316,7 @@ entries:
     LaTeX template he pasted), 2026-11-16T20:00 (a writing-style skill), 2026-11-10T02:08 (uploaded slides and code): none
     is about batch size, lr per batch or this cost'
   blocks: step 2 (the batch-size runs); step 1 keeps going
-  blocks_steps: *id005
+  blocks_steps: *id004
   handoff:
     state: 'Step 1: the estimator (McCandlish App. A from 8 chunk gradients of each step''s batch at the batch''s own per-process
       weights, pre-clip; 16-batch brute check with jackknife errors) is merged (b36a40b3a, repo-reviewer pass at 3c175775d),
