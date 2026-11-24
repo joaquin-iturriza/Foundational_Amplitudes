@@ -71,7 +71,7 @@ def bash(inp):
     os.makedirs(STATE, exist_ok=True)
     with open(LOG, "a") as f:
         f.write(f"{datetime.datetime.now().isoformat(timespec='seconds')} caller={caller or 'main'} "
-                f"calls={calls} keys={sorted(inp)}\n")
+                f"agent={inp.get('agent_id') or '-'} calls={calls}\n")
     for verb, target in calls:
         if not target or caller != target:
             print(f"BLOCKED by review_guard: '{verb} {target or '?'}' may only be run by the {target or 'named'} "
@@ -79,6 +79,18 @@ def bash(inp):
                   f"on its whole backlog; it takes and releases its own lock. The user's override is a '!' command.",
                   file=sys.stderr)
             return 2
+    me = inp.get("agent_id") or ""
+    for verb, target in calls:            # one reviewer per backlog, resumed ones included (2026-11-24: two
+        lock, holder = (os.path.join(STATE, target + x) for x in (".lock", ".holder"))   # resumed keepers both began)
+        held = os.path.exists(lock) and time.time() - os.path.getmtime(lock) < LOCK_TTL_S
+        other = open(holder).read().strip() if held and os.path.exists(holder) else ""
+        if other and other != me:
+            print(f"BLOCKED by review_guard: the {target} lock is held by the reviewer {other}; '{verb}' from {me or '?'} "
+                  f"would review or release another reviewer's backlog. The caller continues {other} (SendMessage) "
+                  f"instead, or waits for its advance or the 180-min expiry.", file=sys.stderr)
+            return 2
+        if verb == "begin" and me:
+            open(holder, "w").write(me + "\n")
     return 0
 
 
