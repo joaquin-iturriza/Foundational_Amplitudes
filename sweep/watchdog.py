@@ -114,7 +114,9 @@ def site_report(prefixes, window_min):
 
 
 def ask(site, prefixes, window_min):
-    cmd = ["site", "--timeout", "590", "run", site, "FA", "--", "python", "sweep/watchdog.py", "--site-report",
+    # CC's login nodes take no scripts (its support, D544): there a CPU job, each call reading the one the last started
+    cmd = ["site", "--timeout", "590", "run", *(["--recurring"] if site == "ccin2p3" else []), site, "FA", "--",
+           "python", "sweep/watchdog.py", "--site-report",
            *prefixes, "--window", str(window_min)]
     try:
         out = subprocess.run(cmd, capture_output=True, text=True, timeout=600).stdout

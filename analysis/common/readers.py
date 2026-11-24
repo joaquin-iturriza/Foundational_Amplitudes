@@ -139,15 +139,20 @@ def ratio_stats(num, den):
 
 
 def site_python(script, args, marker, site="ccin2p3", timeout=900):
-    """Run a short read-only Python `script` on a site's login node (site run, in the checkout, env active) with `args`
+    """Run a short read-only Python `script` on a site (site run, in the checkout, env active; on CC-IN2P3 as a CPU job,
+    `site run --job`: the first call submits it and exits, a later one reads it) with `args`
     and return the JSON after the first output line starting with `marker` + " " (the script prints it). The script
     goes over as base64 into a $SCRATCH/zz_probe_ file, removed after the run."""
     import base64, subprocess, sys
     b64 = base64.b64encode(script.encode()).decode()
     f = f"$SCRATCH/zz_probe_{marker.lower()}_$$.py"   # the remote shell's pid: two calls with one marker never share it
     cmd = f"echo {b64} | base64 -d > {f} && python {f} {' '.join(args)}; rm -f {f}"
-    r = subprocess.run(["site", "--timeout", str(timeout), "run", site, "FA", "--", cmd], capture_output=True,
+    job = ["--job"] if site == "ccin2p3" else []   # CC's login nodes are not for scripts (its support, D544)
+    r = subprocess.run(["site", "--timeout", str(timeout), "run", *job, site, "FA", "--", cmd], capture_output=True,
                        text=True, timeout=timeout + 100)
+    if job and r.returncode == 75 and "CCJ_NO_RESULT" in r.stdout:
+        sys.exit(f"site_python: {marker} runs as a CPU job on {site} (its login nodes take no scripts); the same "
+                 f"call again, once the job has ended, reads its result:\n" + r.stdout[-400:])
     line = next((l for l in r.stdout.splitlines() if l.startswith(marker + " ")), None)
     if line is None:
         sys.exit(f"site_python: no {marker} line: " + (r.stdout + r.stderr)[-800:])
