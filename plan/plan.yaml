@@ -39688,6 +39688,7 @@ entries:
     at: '2026-11-24T04:06:19+00:00'
   step_waits:
     '5': FA-ccin2p3-1e43e7a6 FA-ccin2p3-be1dd2e4
+    '6': FA-ccin2p3-dbd9680f FA-ccin2p3-edcaa00e
   handoff:
     state: '2026-11-23 ~23:10 CET. Everything of D519/D520/D529 is in flight; nothing waits on Joaquin. (1) One setting at
       a time, b2048 (design passed 2026-11-23): both 16-trial searches done (soft-rescale only: chosen hp1961, lr 2.80e-2,
