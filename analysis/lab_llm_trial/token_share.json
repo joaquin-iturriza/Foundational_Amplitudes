@@ -1,0 +1,364 @@
+{
+ "window": [
+  "2026-11-09T00:00",
+  "2026-11-23T00:00"
+ ],
+ "unit": "input+output+cache read+cache write, deduplicated message ids",
+ "total_tokens": 8496467262,
+ "total_usd": 3534.61,
+ "roles": {
+  "main": {
+   "tokens": 2396249634,
+   "usd": 824.31,
+   "agents": 0,
+   "share": 0.28202893745228674,
+   "share_usd": 0.23321140156104644,
+   "mean_per_agent": null
+  },
+  "reviewer": {
+   "tokens": 441620572,
+   "usd": 348.72,
+   "agents": 193,
+   "share": 0.05197696388181528,
+   "share_usd": 0.09865987433361964,
+   "mean_per_agent": 2288189.4922279795
+  },
+  "Explore (trial)": {
+   "tokens": 8355602,
+   "usd": 12.01,
+   "agents": 105,
+   "share": 0.0009834207256196922,
+   "share_usd": 0.003397960668177878,
+   "mean_per_agent": 79577.1619047619
+  },
+  "fix worker": {
+   "tokens": 17220279,
+   "usd": 9.62,
+   "agents": 37,
+   "share": 0.00202675752980498,
+   "share_usd": 0.0027228681276986397,
+   "mean_per_agent": 465412.9459459459
+  },
+  "other mechanical": {
+   "tokens": 38072643,
+   "usd": 20.22,
+   "agents": 73,
+   "share": 0.00448099684562758,
+   "share_usd": 0.005719983741146805,
+   "mean_per_agent": 521543.05479452055
+  },
+  "Explore": {
+   "tokens": 10508963,
+   "usd": 10.93,
+   "agents": 9,
+   "share": 0.0012368626484328116,
+   "share_usd": 0.0030925308993260256,
+   "mean_per_agent": 1167662.5555555555
+  },
+  "owner": {
+   "tokens": 4834263002,
+   "usd": 1995.19,
+   "agents": 123,
+   "share": 0.5689732983049303,
+   "share_usd": 0.5644730408524942,
+   "mean_per_agent": 39302951.23577236
+  },
+  "other agent": {
+   "tokens": 748836856,
+   "usd": 312.22,
+   "agents": 35,
+   "share": 0.08813508401887608,
+   "share_usd": 0.08833133323658586,
+   "mean_per_agent": 21395338.742857143
+  },
+  "event worker": {
+   "tokens": 1339711,
+   "usd": 1.38,
+   "agents": 5,
+   "share": 0.00015767859260657502,
+   "share_usd": 0.00039100657990461635,
+   "mean_per_agent": 267942.2
+  }
+ },
+ "kind1_logs": {
+  "residency": 10640896.285714287,
+  "read_phase": 57065787.2857143,
+  "read_turn": 440142948.2857143,
+  "usd_residency": 2.4639842285714315,
+  "usd_read_phase": 36.638024428571455,
+  "usd_read_turn": 161.60361202857146,
+  "reads": 136,
+  "event_workers": 5,
+  "event_worker_tokens": 1339711,
+  "chars_per_token": 3.5,
+  "calib_next_write_over_T_median": 1.9544980242464112
+ },
+ "kind3_own_searches": {
+  "residency": 613500276.8571423,
+  "usd": 139.92479159999985,
+  "searches": 7496
+ },
+ "explore_production": [
+  [
+   "Find the pp-coverage result",
+   1239796,
+   false
+  ],
+  [
+   "Lookup: where fine-tuning underperforms",
+   858257,
+   false
+  ],
+  [
+   "Lit search: enforcing NN asymptotics",
+   241589,
+   false
+  ],
+  [
+   "Collect catalog and sampling results",
+   1047110,
+   false
+  ],
+  [
+   "Compare our models to Z+ng UQ benchmark",
+   720800,
+   false
+  ],
+  [
+   "Audit today's rule deviations",
+   2181994,
+   false
+  ],
+  [
+   "Gather fine-tune transfer evidence",
+   978571,
+   false
+  ],
+  [
+   "Review emission-scale target port",
+   2679048,
+   false
+  ],
+  [
+   "Collect input conditioning results",
+   561798,
+   false
+  ]
+ ],
+ "workers": {
+  "fix worker": [
+   [
+    "Fix figure-pair check misfire",
+    186379
+   ],
+   [
+    "E8135: agent_tasks maintain timeout",
+    504021
+   ],
+   [
+    "Fix question-sent check misfire",
+    425131
+   ],
+   [
+    "Fix plan_check ask matcher",
+    420675
+   ],
+   [
+    "Fix figures_handed_back incident",
+    478163
+   ],
+   [
+    "Fix figure-sent check regression",
+    153116
+   ],
+   [
+    "Fix table gate incident",
+    362272
+   ],
+   [
+    "Fix plan_check open-ask match",
+    160847
+   ],
+   [
+    "Make draft figures sendable",
+    511011
+   ],
+   [
+    "Fix plan_check question match",
+    520017
+   ],
+   [
+    "Fix failed lxplus protocol runs",
+    2603008
+   ],
+   [
+    "Debounce RUN and OVERRUN events",
+    214135
+   ],
+   [
+    "Gate: per-condition disable; dead chains",
+    2175975
+   ],
+   [
+    "Fix submit_guard cancelled count",
+    176291
+   ],
+   [
+    "Fix plan_check question-sent misfire",
+    489491
+   ],
+   [
+    "Add design-reviewer timing/readout check",
+    43520
+   ],
+   [
+    "Fix submit_guard prebuild misfire",
+    64960
+   ],
+   [
+    "send_check: name draft_*.pdf route",
+    163104
+   ],
+   [
+    "Design-reviewer lr-across-batch check",
+    262873
+   ],
+   [
+    "Fix figure hook: missing files",
+    334448
+   ],
+   [
+    "Fix send_check panel split",
+    196827
+   ],
+   [
+    "Fix plan answer step-level no",
+    1009261
+   ],
+   [
+    "Gate: unsent hand-back figures",
+    798752
+   ],
+   [
+    "plan sweepends: one wake for all",
+    346835
+   ],
+   [
+    "Guard: no hand deletes on clusters",
+    199514
+   ],
+   [
+    "Cut repeat wakes: disk alert, routine acks",
+    455507
+   ],
+   [
+    "Exempt decks from send axes check",
+    375869
+   ],
+   [
+    "Fix plan hold sync for forbids",
+    85666
+   ],
+   [
+    "Fix the CC disk watch now",
+    611381
+   ],
+   [
+    "Fix send_check for draft pages",
+    94122
+   ],
+   [
+    "Cut two duplicates in sweeps section",
+    46323
+   ],
+   [
+    "Fix hook incident I-531d1e89",
+    215041
+   ],
+   [
+    "Fix two submit_guard checks",
+    371439
+   ],
+   [
+    "Readable KIT legend labels",
+    380400
+   ],
+   [
+    "Investigate 9 failing hook-replay scenarios",
+    1097080
+   ],
+   [
+    "Remove leftover draft figures",
+    545426
+   ],
+   [
+    "Resync compact-worker rules copy",
+    141399
+   ]
+  ],
+  "event worker": [
+   [
+    "Submit check: time limit vs job need",
+    267142
+   ],
+   [
+    "E8158: failed regeneration shard",
+    547771
+   ],
+   [
+    "Fix site logs wrong-file fallback",
+    193172
+   ],
+   [
+    "Fix failed parent re-read",
+    96149
+   ],
+   [
+    "Supervisor: diverged trials routine",
+    235477
+   ]
+  ]
+ },
+ "routed_measured": {},
+ "assumptions": {
+  "triage_check": 38200.0,
+  "fix_check": 41500.0,
+  "redo": 0.1,
+  "lookup_check": 10000.0
+ },
+ "saving": {
+  "log_owner_kept": {
+   "now": 441482659.2857143,
+   "after": 445338148.2857143,
+   "note": "current rule (CLAUDE.md: the owner still reads the log): a checked DeepSeek reading is added per event, the owner's read stays",
+   "saved": -3855489.0,
+   "share": -0.0004537755376571002
+  },
+  "log_owner_trusts": {
+   "now_low": 11980607.285714287,
+   "now_mid": 58405498.2857143,
+   "now_high": 441482659.2857143,
+   "after": 5195200.0,
+   "note": "if owners act on the checked reading and open the log only when the cause is left open (Joaquin's open question)",
+   "saved_low": 6785407.285714287,
+   "share_low": 0.0007986151274967729,
+   "saved_mid": 53210298.2857143,
+   "share_mid": 0.006262637946443287,
+   "saved_high": 436287459.2857143,
+   "share_high": 0.05134927798015381
+  },
+  "fixes": {
+   "now": 17220279,
+   "after": 3257527.9,
+   "saved": 13962751.1,
+   "share": 0.0016433596069330679
+  },
+  "lookups": {
+   "now": 0,
+   "after": 0,
+   "note": "production Explore agents whose brief is a code lookup (NONCODE); 0 of 9",
+   "saved": 0,
+   "share": 0.0
+  }
+ }
+}
