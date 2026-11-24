@@ -42681,6 +42681,19 @@ entries:
       - n)/(N - 1) = 0.57 plus the negative covariance of disjoint batches, about 0.5 in all (an estimate); the chunks, a
       partition of one batch, need no such factor. In the full run the pool is 1.4e7 events, factor 0.999, so the check is
       meaningful there. Step 0 of the smoke: S 5.2e29, |G|^2 5.2e23 (the het loss at initialisation).'
+  - at: '2026-11-24T05:24:43+00:00'
+    text: '2026-11-24 full run FA-ccin2p3-225d38ea (v4_het_noise_scale @3afebebb88, CC after lxplus idle; 4264 steps, 1.95
+      training h vs control 1.23 h) read with noise_read.py @e8376ba0c (summary JSON). Checks (16 independent batches vs chunks
+      of the same batches): |G|^2 agrees at all 5; tr Sigma chunk/brute 1.16, 1.29, 1.28, 1.28 at steps 500/1500/3000/4100
+      (outside 2 combined se at 1500 and 4100), step 50 undetermined (brute B 91100 +- 70100). Cause, opposite to the design''s
+      guessed branch: the loss is a mean over processes of per-process means, so a batch gradient is self-normalised by its
+      own process counts; chunks at the whole batch''s counts carry a composition term. Reproduced by tests/test_noise_scale.py::test_chunks_overstate_trace_under_per_process_means
+      (1 process: no excess; 50 processes: >1.5x). So the brute checks are the reference: B_simple 84+-9 (500), 28.2+-1.4
+      (1500), 28+-6 (3000), 39+-5 (4100) events, vs training batch 16384. Chunk windows (step>=400, excluding windows set
+      by one measurement): median 42.4 (18.7-112); Muon set 216 median (63.7 -> 734 over run), AdamW 32.8. 6 of 21 windows
+      set by one measurement (trace up to 8.25e29 in window mean, single measurements to 1.6e31): heavy-tailed het per-event
+      gradients. Control: last val -2.872 vs control -2.907; both runs show isolated validation spikes to ~1e9 at different
+      steps. Figure analysis/critical_batch/figs/v4_het_noise_scale.png; check_caption OK.'
   ask: 'GPU budget: about 55 GPU-h above 30 with no decision covering it. Joaquin, testing the measured noise scale against
     batch-size runs (D532) needs, at each batch size (2048, 4096, 8192, 16384, 32768; canonical catalog_v4 WSD het setup,
     5 epochs, lr held at its peak), the lr that reaches a target loss in the fewest steps; then steps S and events E = B S
