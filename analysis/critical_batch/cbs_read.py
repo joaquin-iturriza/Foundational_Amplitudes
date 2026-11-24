@@ -60,6 +60,9 @@ def read(trials):
             res["S_min"], res["B_crit"] = fit_bcrit(Bs, Ss)
             res["B_crit_q16_50_84"] = bootstrap(Bs, Ss)
             res["S_ratio_smallest_over_largest"] = Ss[0] / Ss[-1]
+            # a batch that never reached L while its lower bound exceeds the fit's S there: B_crit is a lower bound
+            res["unreached_above_fit"] = [r["B"] for r in rows if r.get("S_lower_bound") and
+                                          r["S_lower_bound"] > res["S_min"] * (1 + res["B_crit"] / r["B"])]
         out[str(L)] = res
     return out
 

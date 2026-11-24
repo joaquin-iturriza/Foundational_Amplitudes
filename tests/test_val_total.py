@@ -228,6 +228,7 @@ def test_steps_to_target():
     assert rt.steps_to_target(res, -2.0) == 250.0
     assert rt.steps_to_target(res, 1.0) == 100.0 and rt.steps_to_target(res, -4.0) is None
     assert rt._objective_value({"objective": "steps_to_target", "objective_target": -2.0}, res) == 250.0
+    assert rt.steps_to_target({"val_curve": [0.0, float("nan"), -2.5], "validate_every": 100}, -2.0) == 300.0
     try:
         rt._objective_value({"objective": "steps_to_target", "objective_target": -4.0}, res)
     except ValueError:

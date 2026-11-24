@@ -159,7 +159,8 @@ def steps_to_target(result, target):
     v, n = result["val_curve"], int(result["validate_every"])
     for i, x in enumerate(v):
         if x <= target:
-            return float(n) if i == 0 else n * (i + (v[i - 1] - target) / (v[i - 1] - x))
+            # the crossing validation's own step when there is no finite validation before it
+            return float(n * (i + 1)) if i == 0 or not math.isfinite(v[i - 1]) else n * (i + (v[i - 1] - target) / (v[i - 1] - x))
     return None
 
 
