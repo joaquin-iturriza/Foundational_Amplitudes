@@ -16442,7 +16442,7 @@ entries:
       probe_site tries ssh before DOWN), 2026-11-24
   owner:
     agent: aa3a1133e1a11b531
-    state: working
+    state: closed
     since: '2026-11-24T11:07:38+00:00'
     state_at: '2026-11-24T11:20:32.278000+00:00'
     context: 142921
@@ -17816,26 +17816,27 @@ entries:
       the nested-quote edit refused rc 2); drive.py rejoin only at the start-up commit (2ce104e72) and transient-only sync
       retry with test update (93d906b87; 26 drive tests pass).'
   handoff:
-    state: '2026-11-19. Steps 26, 27, 29 trial ran (design passed by the design-reviewer after two FIXes; scorer 3531dc6e,
-      item-line repair 61005cc0 in worktrees/wt-graphify). Results in the finding of 2026-11-19 (lookup_trial.json). Left:
-      (1) check from the ''tools'' field of each batch record whether batch agents called tools/batch.py at all (lsp agents
-      made 0 LSP calls: the lsp arm did not test LSP); (2) rerun the lsp arm with a brief that makes the agent call LSP (Explore
-      may need ToolSearch; a general-purpose agent, or the LSP tool named in the agent definition) and, if batch was unused,
-      the batch arm likewise, same ten tasks, recorded as new arm names; (3) draw the figure (lookup_trial.py report --arms
-      grep,grep2,lsp,batch --fig analysis/agent_redesign/figs/lookup_trial; and --arms now,now2,recall --fig .../recall_trial),
-      check_caption, hand back to the main session; (4) step 27 verdict on the design''s rule is No (recall 17 calls vs now
-      14 / now2 18), record dead end or keep recall.py on Joaquin''s call; (5) graph arm waits on Joaquin allowing pip install
-      graphifyy in worktrees/wt-graphify/.venv-graphify (classifier refused twice). Merges of the three worktree branches
-      wait on the repo-reviewer.'
-    decisions: Explore at low effort for every arm; controls run twice (grep/grep2, now/now2) to measure spread; recall answers
-      judged by hand read (all 15 correct); code answers scored by (path, function) items, prose lines ignored (repair after
-      two right answers were scored wrong).
-    ruled_out: pip install graphifyy without Joaquin's permission (classifier refused); counting the lsp arm as an LSP result
-      (0 LSP calls).
+    state: 'D534 step 30: diagnosis recorded (findings 2026-11-24: R1-R7 and the correction of the supervisor claim). Parts
+      1+2 merged 6eab900e0 (plan intent; intent first in owner/mechanical briefs; send_check refuses figures by a rejected
+      producer from any checkout); backfilled llm_compare and finetune_mechanism. Part 4 done as the claudemd-keeper''s widened
+      pillar (54debf37e) plus one pass over every rule carrier (keeper passed 092bd0da0). Repo-reviewer whole backlog passed
+      93d906b87 (Stop gate SyntaxError fixed 4d7a3dd1c, hook_syntax_guard parses .py 3714ca1d0, drive.py rejoin/retry 2ce104e72
+      93d906b87). Left: part 3 routing: (a) a single run''s broke end inside a waited batch or sweep opens no event, folded
+      into its RUN_DONE (site_runends.py run_end), unless several in one item share an error class; (b) site probe_site tries
+      ssh before DOWN ''no live ssh master (2FA)'' (~/.local/bin/site ~1819), then remove plan_check site_down (5a3fafd99);
+      replay E8530 and the 11-23 23:40 lxplus case. Then the CLAUDE.md diff (scratchpad claudemd_d534.diff, c4e1c6dad~1..HEAD)
+      goes to Joaquin via the main.'
+    decisions: 'Joaquin''s: D534 (the infrastructure), D533 (divergence is a result). Mine: hook refusal texts read by the
+      keeper but counted only in the code backlog (a 1-line gate on hooks would stop every hook fix); step_prompt_legacy.txt
+      left out of the pillar (unreachable in owner mode); compact-worker loads CLAUDE.md instead of a hand copy; canonical-setup
+      rows written from D514/D523/D524 without asking (read from decisions); intent records are not decisions, quote checked
+      by typed_at, no whole-sentence check yet.'
+    ruled_out: 'plan ask/plan wait refusals (Joaquin 11-23 15:24: blocks what we don''t want blocked); a separate consolidation
+      job (the keeper''s job, per Joaquin).'
     running: none
-    files: worktrees/wt-graphify/tools/lookup_trial.py worktrees/wt-graphify/analysis/agent_redesign/lookup_trial.json worktrees/wt-graphify/analysis/agent_redesign/lookup_trial_agents.txt
-      worktrees/wt-batch/tools/batch.py worktrees/wt-recall/tools/recall.py
-    written: '2026-11-19T13:20:29+00:00'
+    files: tools/plan.py (intent_block, cmd_intent) .claude/hooks/send_check.py (repo_rel, rejected_producers) .claude/hooks/review_backlog.sh
+      .claude/agents/claudemd-keeper.md .claude/hooks/hook_syntax_guard.py sweep/drive.py ~/.local/bin/site_runends.py ~/.local/bin/site
+    written: '2026-11-24T11:44:17+00:00'
   ask: 'Permission classifier refusal: an edit of ~/.local/bin/site and site_gate.py so that the GPU-budget gate charges an
     lxplus job its own time limit (refused 2026-11-19 as ''Undermining Oversight''). Today the gate charges an lxplus job
     the full wall time of its HTCondor flavour, so lxplus jobs count for more than they use against the 30 GPU-h budget. Will
