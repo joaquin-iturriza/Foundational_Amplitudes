@@ -40671,12 +40671,19 @@ entries:
     answers_after: '2026-11-24T16:59:07+00:00'
     covers:
     - llm_compare
+  - said_at: '2026-11-24T23:47:58.902000+00:00'
+    text: 2. run everything and show the results as they come
+    decision: D554
+    answers_after: '2026-11-24T16:59:07+00:00'
+    covers:
+    - llm_compare
   decisions:
   - D525
   - D527
   - D528
   - D537
   - D553
+  - D554
   next:
     5: 'Part (c) readout: when llmcmp_c_qperp''s driver writes DRIVE_DONE and its control ends, score (c)''s best trial and
       the control (REREAD=<run> scripts/job_llm_score.sh), read per set (seen, held out, relabels, new) pooled RMSE and median
@@ -40786,6 +40793,8 @@ entries:
       check go on
     blocks_steps:
     - 1
+    answered_at: '2026-11-24T23:47:58.902000+00:00'
+    decision: D554
   - ask: 'GPU budget: about 40 (A100/H100) to 90 (V100) GPU-h above 30 with no decision covering it, for part (a)''s search:
       8 DyHPO trials plus the matched control at your LLM run''s conditions (60,840 steps at batch 24,576 each, D525/D526)
       (estimate: 0.412 s/step measured for the catalog without diagrams at batch 16,384 on a V100, scaled linearly to 24,576
