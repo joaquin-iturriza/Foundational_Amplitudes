@@ -40237,9 +40237,9 @@ entries:
     blocks_steps: &id003 []
   owner:
     agent: ae2d14b6689ebb697
-    state: working
+    state: stopped
     since: '2026-11-24T08:11:28+00:00'
-    state_at: '2026-11-24T10:35:28.690000+00:00'
+    state_at: '2026-11-24T10:37:32.080000+00:00'
     context: 173808
     context_at: '2026-11-24T10:35:41+00:00'
   step_why:
