@@ -38607,6 +38607,14 @@ entries:
       (best 43-55%, blow-up 61-69%) and all 12 uug runs (val up to 1e7x best). (D) and the uug contrast NOT READ: Z+4g 1e5
       r=0.96 [0.84,1.09] compares an off arm read at half its run; uug r 0.74 [0.34,1.61] (1e4), 0.94 [0.52,1.71] (1e5) from
       blown-up runs. hp1961''s lr is unstable for off at 1e5 and for uug.'
+  - at: '2026-11-24T16:38:09+00:00'
+    text: '2026-11-24 D539 step 3 kit read (d539_kit_read.py @4d0557b0d, data/d539_kit.json; 12/12 uug runs, each scored on
+      its best-checkpoint model; all 12 blew up later in training, hp1961). Deepest-bin log-MSE of log10|M|^2, seeds 42/43/44,
+      off -> eps1e-8, log10 of the seed-median ratio: 1e4 soft 1.8e3/7.5e3/2.45e4 -> 0.066/0.053/0.121 (-5.05 dec), collinear
+      12.6/31.1/38.3 -> 7.5/22.9/25.0 (-0.13), bulk 0.0103/0.0146/0.0133 -> 0.0042/0.0137/0.0072 (-0.27); 1e5 soft 5.6e4/3.5e3/3.1e3
+      -> 0.19/0.060/0.107 (-4.52), collinear 38.8/29.2/27.3 -> 3.8/11.4/25.8 (-0.41), bulk 0.0115/0.0066/0.0061 -> 0.0094/0.0042/0.0097
+      (+0.15). The rescale''s u u~ g soft-limit gain (D374) reproduces in this setup by 4.5-5 decades; the bulk and collinear
+      moves are inside the seed spread. Read from blown-up runs: stability rerun at hp1333 designed (step 4).'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
