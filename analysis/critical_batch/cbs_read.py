@@ -12,6 +12,7 @@ step), never dropped."""
 import argparse, json, os, sys
 
 import numpy as np
+import yaml
 from scipy.optimize import least_squares
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -19,12 +20,19 @@ sys.path.insert(0, os.path.join(ROOT, "sweep"))
 from run_trial import steps_to_target  # noqa: E402
 
 TARGETS = (-1.66, -2.08, -2.30)   # the control's crossings 1023 / 1955 / 2707 steps (critical_batch design)
-LR_WINDOW = (1.667e-3, 1.5e-2)    # the template's Muon window, every batch (design)
+EDGE_TARGET = -2.08                # the design's edge test reads each batch's best trial on S_B(-2.08), the objective
 
 
-def lr_at_edge(lr):
+def lr_window(b):
+    """Batch b's searched lr window, from its own sweep config (a re-searched batch has a shifted window)."""
+    cfg = yaml.safe_load(open(os.path.join(ROOT, "sweep", f"sweep_config_cbs_b{b}.yaml")))
+    p = next(x for x in cfg["search_space"] if x["name"] == "training.lr")
+    return p["low"], p["high"]
+
+
+def lr_at_edge(lr, window):
     """The design's lr-edge rule: lr in the outer tenth of the log window; that batch's S is an upper bound only."""
-    lo, hi = np.log(LR_WINDOW)
+    lo, hi = np.log(window)
     x = (np.log(lr) - lo) / (hi - lo)
     return bool(x < 0.1 or x > 0.9)
 
@@ -47,8 +55,22 @@ def bootstrap(B, S, n=2000, seed=0):
     return [float(q) for q in np.quantile(out, [0.16, 0.5, 0.84])]
 
 
+def best_trial(ts, L):
+    """(S, trial) of the lowest steps-to-target L among ts, (None, None) when none reaches L."""
+    hit = [(v, t) for t in ts if t.get("val_curve") for v in [steps_to_target(t, L)] if v is not None]
+    if not hit:
+        return None, None
+    v, t = min(hit, key=lambda x: x[0])
+    assert t.get("lr") is not None, f"best trial hp {t.get('hp_idx')} carries no lr: the collector must add training.lr"
+    return v, t
+
+
 def read(trials):
-    out = {}
+    out, edge = {}, {}
+    for b, ts in trials.items():
+        _, t = best_trial(ts, EDGE_TARGET)
+        if t is not None:
+            edge[int(b)] = lr_at_edge(t["lr"], lr_window(b))
     for L in TARGETS:
         rows, reach = [], []
         for b, ts in sorted(trials.items(), key=lambda x: int(x[0])):
@@ -57,9 +79,11 @@ def read(trials):
             row = {"B": int(b), "trials": len(ts), "reached": len(hit)}
             if hit:
                 best = next(t for t in ts if t.get("hp_idx") == hit[0][1])
-                lr = best.get("lr")   # the collector puts each trial's training.lr in its dict
+                lr = best_trial(ts, L)[1]["lr"]   # asserts the collector put training.lr in the dict
+                # the edge flag is the batch's, from its best trial on S_B(-2.08); a batch never at -2.08 (it can
+                # still reach -1.66) is judged on this target's best trial
                 row.update(S=hit[0][0], E=int(b) * hit[0][0], hp_idx=hit[0][1], top3=[v for v, _ in hit[:3]],
-                           lr=lr, lr_edge=None if lr is None else lr_at_edge(lr))
+                           lr=lr, lr_edge=edge.get(int(b), lr_at_edge(lr, lr_window(b))))
                 if row["lr_edge"] is False:   # an edge (or unknown) lr: S an upper bound, out of the fit
                     reach.append((int(b), hit[0][0]))
             else:
@@ -101,6 +125,18 @@ def selfcheck():
     assert r["S_2048_over_S_32768"] is None and r["batches"][-1]["lr_edge"] is True, r
     del tr["2048"]
     assert read(tr)["-2.08"]["S_2048_over_S_32768"] is None   # never the 4096 / 16384 pair
+    # the edge flag is the batch's best trial on S_B(-2.08), at every target: trial 1 is first to -1.66 at an edge
+    # lr, trial 2 first to -2.08 at a centre lr, so 4096 stays in the fit at -1.66
+    tr["4096"] = [{"val_curve": [0.0, -1.7, -1.7, -1.7, -3.0], "validate_every": 100, "hp_idx": 1, "lr": 1.6e-3},
+                  {"val_curve": [0.0, 0.0, -3.0], "validate_every": 100, "hp_idx": 2, "lr": 5e-3}]
+    row = next(x for x in read(tr)["-1.66"]["batches"] if x["B"] == 4096)
+    assert row["hp_idx"] == 1 and row["lr_edge"] is False, row
+    tr["4096"][1].pop("lr")                              # a collector that omits lr stops the read
+    try:
+        read(tr)
+        raise AssertionError("missing lr not caught")
+    except AssertionError as e:
+        assert "carries no lr" in str(e), e
     print("selfcheck OK")
 
 
