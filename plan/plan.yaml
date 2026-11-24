@@ -44690,10 +44690,10 @@ entries:
     - cc_login_jobs
   decisions:
   - D544
-  next: Inventory every command the supervisor and our tools run on CC's login node through site run (projects.toml maintain,
-    item checks, site_python, drive.py, sweep_manager, collect), with its run time; move each heavy one into a CPU job (sbatch
-    on htc, output to a file the next pass reads); add a guard in site run that refuses a long-running command on CC; change
-    the ~/work/CLAUDE.md login-node rule to match; test on the live supervisor
+  next: 'Read the CC maintain jobs over >= 3 supervisor passes since 18:32 with tools/ccjob_lag.py (task output bbmrvsqcm):
+    same lines and exit codes as the login runs, result age <= one pass + 10 min, no command skipped two passes in a row,
+    .disk_full under 30 min old at each feed read, no new MAINTAIN event; and one real prune.py run in the job with its PRUNE
+    lines appended to ~/.local/share/ccorch/artifacts/FA/prune/ccin2p3.jsonl'
   done_when: null
   notes_ref: null
   match: cc_login_*
@@ -44808,5 +44808,10 @@ entries:
       login_cap, projects.toml login_scripts). Nested sbatch from an htc job through the gate works (job 64793196 submitted
       64793203, which ran on ccwslurm0031, NESTED_OK). First supervisor jobs: disk_watch 64793199 and feed_capped 64793200
       waited 18-21 s in the htc queue and ran ~1 s (tools/ccjob_lag.py).'
-  step_waits:
-    '1': '2026-11-24T22:30 (UTC): >= 3 passes and CC''s next real prune'
+  step_waits: {}
+  step_why:
+    1:
+      feeds: 'D544: whether CC''s recurring scripts can live as Slurm jobs (the switch stays, or the feeder pairs with disk_watch)'
+      if:
+      - 'all bounds hold: write-up in docs/results.tex and plan done'
+      - 'flag over 30 min or two skipped passes: disk_watch and the feeder in one job (flag right before the feed)'
