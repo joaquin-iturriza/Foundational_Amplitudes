@@ -45293,9 +45293,17 @@ entries:
     answers_after: '2026-11-24T19:50:40+00:00'
     covers:
     - orchestrator_kit
+  - said_at: '2026-11-24T23:35:58.464000+00:00'
+    text: I don't think I've ever intentionally decided the license of any of my public repos, I don't understand why you
+      are making such a big deal about it, just use whatever the other repos use
+    decision: D548
+    answers_after: '2026-11-24T22:08:14+00:00'
+    covers:
+    - orchestrator_kit
   decisions:
   - D546
   - D547
+  - D548
   next:
     2: 'Per Joaquin''s answers: add the LICENSE he picks to the public kit, and if he types an approval in a session in the
       toy checkout, rerun the CC proof with the toy ledger on to test the site-side gate and items'
@@ -45393,8 +45401,10 @@ entries:
       CLAUDE.md rules settle neither. Messages that share terms, none settling it: 2026-11-14T04:31 (a SciPost LaTeX template
       paste), 2026-11-10T02:08 (file uploads for slides), 2026-11-20T15:11 (about a sweep''s trial counts and a ledger refusal
       elsewhere).'
-    blocks_steps: &id005
+    blocks_steps:
     - 2
+    answered_at: '2026-11-24T23:35:58.464000+00:00'
+    decision: D548
   owner:
     agent: a4e37f36ae6953ad8
     state: closed
@@ -45421,15 +45431,6 @@ entries:
       (kit HOME, toy at work/toy); /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/ksite
       (wrapper); CC: /sps/lpnhe/jiturrizaramirez01/kit_proof, ~/.ccorch_kit'
     written: '2026-11-24T22:03:39+00:00'
-  ask: 'Permission classifier refusal: copying your typed message into the kit''s test HOME so the toy''s ledger could record
-    a decision was refused, so the site-side gate and work items stay untested on CC. (1) Do you want them tested, by typing
-    one sentence (e.g. ''run the toy once on CC'') in a Claude session started in the toy checkout? (2) Which license for
-    the public kit (MIT recommended)?'
-  waiting_since: '2026-11-24T22:08:14+00:00'
-  searched: 'site decisions --project FA: D546, D547 (license answered ''Does it matter?'', none named; no gate-test decision);
-    CLAUDE.md rules settle neither. Messages that share terms, none settling it: 2026-11-14T04:31 (a SciPost LaTeX template
-    paste), 2026-11-10T02:08 (file uploads for slides), 2026-11-20T15:11 (about a sweep''s trial counts and a ledger refusal
-    elsewhere).'
   designs:
   - at: '2026-11-24T20:08:44+00:00'
     question: 'Does the published orchestrator-kit, installed under a separate HOME with its own remote state dir (~/.ccorch_kit
@@ -45551,4 +45552,3 @@ entries:
       if:
       - 'license named: add LICENSE, push'
       - 'gate test wanted: rerun proof with ledger on'
-  blocks_steps: *id005
