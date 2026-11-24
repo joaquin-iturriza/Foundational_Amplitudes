@@ -15813,11 +15813,6 @@ entries:
       so what remains is followed. Each part shown working by replaying the real cases through the real path.'
     31: 'Check the D534 part 3 routing on its first real cases: a broken search trial acked as folded with no wake, and the
       next lxplus ssh-master drop probed twice before ''down'''
-    33: 'D534 hold fix (a), budget: approved named work held behind a GPU-budget ask (critical_batch 55 GPU-h, zng_uq_benchmark
-      136 GPU-h). Concrete CLAUDE.md diff to Joaquin: in ''GPU budget'', replace ''or I asked for it by name at the project''s
-      usual size for it (its template, its sibling runs)'' with ''or a decision of mine names that work (its covers) and it
-      stays under 100 GPU-h (D511''s bound)''; on his yes, edit CLAUDE.md, keeper review, set the two items'' est-gpu-hours
-      from his words'
     34: 'Check the lxplus costing fix (step 29) on the first real lxplus submit: its submit file carries +MaxRuntime equal
       to --hdr=--time=, and the site gate''s gpu_window charge equals that time x GPUs, not the flavour''s wall time'
   done_when: null
@@ -16483,11 +16478,6 @@ entries:
       if:
       - 'works: note it on the entry'
       - 'fails: fix and replay'
-    33:
-      feeds: whether approved named work runs without a per-batch budget ask
-      if:
-      - 'yes: edit, keeper, the two held steps'' owners resumed to submit'
-      - 'no: the asks stand; step 34 keeps them visible'
     34:
       feeds: whether lxplus jobs are charged their own time limit against the 30 GPU-h budget
       if:
@@ -16504,7 +16494,6 @@ entries:
     '30': the main session resuming this owner for part (3) routing (single run failures folded into their batch's result;
       probe_site tries ssh before DOWN), 2026-11-24
     '31': '2026-11-26'
-    '33': 'a reviewer: claudemd-keeper a634c9956f79f0404 on the D536 budget-rule edit'
     '34': 2026-11-26 (the first real lxplus submit; read its submit file and gpu_window charge)
   owner:
     agent: a43d971069d45144e
