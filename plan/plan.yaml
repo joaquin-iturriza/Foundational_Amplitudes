@@ -15812,8 +15812,6 @@ entries:
       so what remains is followed. Each part shown working by replaying the real cases through the real path.'
     31: 'Check the D534 part 3 routing on its first real cases: a broken search trial acked as folded with no wake, and the
       next lxplus ssh-master drop probed twice before ''down'''
-    32: 'Send Joaquin the full D534 diagnosis: the three entries that held work behind a question (critical_batch, and the
-      other two), what in the setup made each hold, and what was changed so it cannot recur'
     33: 'D534 hold fix (a), budget: approved named work held behind a GPU-budget ask (critical_batch 55 GPU-h, zng_uq_benchmark
       136 GPU-h). Concrete CLAUDE.md diff to Joaquin: in ''GPU budget'', replace ''or I asked for it by name at the project''s
       usual size for it (its template, its sibling runs)'' with ''or a decision of mine names that work (its covers) and it
@@ -16459,11 +16457,6 @@ entries:
       if:
       - 'works: note it on the entry'
       - 'fails: fix and replay'
-    32:
-      feeds: 'D534: build the infrastructure so the orchestration failures do not recur'
-      if:
-      - 'the diagnosis names a setup cause already fixed: say which commit fixed it'
-      - 'a cause is not yet fixed: add the fix as a step of this entry'
     33:
       feeds: whether approved named work runs without a per-batch budget ask
       if:
