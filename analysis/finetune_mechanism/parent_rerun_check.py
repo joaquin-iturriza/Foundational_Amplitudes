@@ -44,7 +44,12 @@ print("PRC " + json.dumps(out))
 def main():
     res = {}
     key = sys.argv[1] if len(sys.argv) > 1 else "snap"
+    out = os.path.join(os.path.dirname(__file__), "data", "parent_rerun_check%s.json" % ("" if key == "snap" else "_" + key))
+    if "--cached" in sys.argv:   # re-read the saved site reads (verify_claims reruns without ssh)
+        res = {k: json.load(open(out))[k] for k in ("cc", key)}
     for k in ("cc", key):
+        if k in res:
+            continue
         site, d, run = PARENTS[k]
         res[k] = site_python(REMOTE, [d], "PRC", site=site)
         res[k].update(site=site, run_dir=d, run=run)
@@ -60,7 +65,6 @@ def main():
                       "ratio_min": float(r.min()), "ratio_max": float(r.max()),
                       "ratio_gmean": float(np.exp(np.log(r).mean())),
                       "combined_nll": {"cc": a["sigma"]["combined"], key: b["sigma"]["combined"]}, "rerun": key}
-    out = os.path.join(os.path.dirname(__file__), "data", "parent_rerun_check%s.json" % ("" if key == "snap" else "_" + key))
     with open(out, "w") as f:
         json.dump(res, f, indent=1)
     s = res["summary"]
@@ -70,6 +74,9 @@ def main():
     for n in procs:
         print(f"  {n:18s} cc {a['mse'][n]:.3e} {key} {b['mse'][n]:.3e} ratio {ratio[n]:.3f} dNLL {dnll[n]:+.3f}")
     print("wrote", out)
+    print(json.dumps({"ratio_gmean": s["ratio_gmean"], "n_procs": len(procs),
+                      "n_within_0p43_2p5": int(((r >= 0.43) & (r <= 2.5)).sum()),
+                      "combined_nll": s["combined_nll"], "ratio": ratio}))
 
 
 if __name__ == "__main__":
