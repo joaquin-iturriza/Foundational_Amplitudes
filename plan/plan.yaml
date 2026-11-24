@@ -38139,9 +38139,9 @@ entries:
       configurations (CLAUDE.md 72bef3992), run as part of it
   owner:
     agent: a35b06fe497b1090e
-    state: working
+    state: stopped
     since: '2026-11-24T05:16:19+00:00'
-    state_at: '2026-11-24T05:38:05.449000+00:00'
+    state_at: '2026-11-24T05:44:08.027000+00:00'
     context: 254503
     context_at: '2026-11-24T05:55:15+00:00'
   findings:
@@ -42695,9 +42695,9 @@ entries:
     - 2
   owner:
     agent: aa75364575cea3cb4
-    state: stopped
+    state: working
     since: '2026-11-24T05:11:18+00:00'
-    state_at: '2026-11-24T05:30:54.747000+00:00'
+    state_at: '2026-11-24T05:55:05.832000+00:00'
     context: 190546
     context_at: '2026-11-24T05:38:24+00:00'
   designs:
