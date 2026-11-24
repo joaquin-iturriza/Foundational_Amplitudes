@@ -40763,6 +40763,17 @@ entries:
       lists, --out). The rejected PNGs (control_score, ac_controls_score, a5_controls_score) deleted from figs/. Redrawn:
       analysis/llm_compare/figs/a5_controls_heldout_per_process.png (tuned trial 5, his-optimizer control, latest-setup control,
       his pID baseline). Every held-out comparison of this entry is drawn in that layout.'
+  - at: '2026-11-24T13:20:00+00:00'
+    text: '2026-11-24 ~14:30 CET (E8541): part (a)''s DyHPO search ended (llmcmp_a_drive6 rc 0): 8 trials, 0 failed. Validation
+      MSE of z at the best checkpoint: trial 5 hp1163 (lr 1.24e-3, EMA on) 4.81e-4 (best), trial 0 hp1860 (lr 1.03e-3) 4.89e-4,
+      trial 7 hp0836 (lr 1.03e-3) 5.63e-4, trial 6 hp1723 (lr 1.03e-3) 5.63e-4, trial 4 1.07e-3, trial 1 9.41e-3, trial 2
+      1.55e-2, trial 3 2.68e-2; trials 6 and 7 (FA-ccin2p3-b135e7db, -f3e29e87) COMPLETED, 14.1 h on V100. Trial 5 stays the
+      best, so its score (FA-ccin2p3-037bf5e1) is part (a)''s answer: pooled RMSE seen 0.117, held out 1.003, relabels 0.241,
+      new 1.767 (control 0.139/1.042/0.237/1.839; LLM 0.321/0.721/0.341/1.193). Written up in docs/results.tex par:llmcmp_a
+      with fig:llmcmp_heldout @c13ca0b0e (claims verified; src control_score.py @969687ee5). Lower-edge extension (lr < 1e-3)
+      not run, my call: the three trials at lr 1.03e-3 (the window''s lower edge) are all worse than trial 5 at 1.24e-3 (4.89e-4
+      to 5.63e-4 against 4.81e-4), so the search gives no sign that the optimum lies below the window; and tuning moved the
+      held-out read inside the seed margin (MSE ratio searched/control 0.93), so a finer lr would not change what (a) answers.'
   step_waits:
     '3': llmcmp_a_drive5
     '5': llmcmp_c_qperp_drive4 DRIVE_DONE (detach event of the driver)
