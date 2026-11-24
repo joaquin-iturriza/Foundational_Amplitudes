@@ -17778,6 +17778,15 @@ entries:
       since 11-22: 775dae8cd, 19ea38ab4 (duplicates step_prompt 5''s first sentence), 72bef3992, bc31d324d, a55ab3c16, 5a3fafd99,
       5ae992f9 are counter-rules or prose checks the four parts make redundant; 064d9e5d8 (diff a named run''s config) is
       a one-answer check, kept, better run by plan design as a tool; 3015b27e1 is a check repair, kept.'
+  - at: '2026-11-24T11:21:58+00:00'
+    text: '2026-11-24 D534 diagnosis, cause R7 (Joaquin: ''what you are calling consolidation is already part of the job of
+      the claude.md reviewer, what is it doing if not that?''): rules were routed around the reviewer that exists to keep
+      them few. claudemd-keeper''s pillar was CLAUDE.md and .claude/context only, and review_backlog''s gate mapped .claude/*
+      and plan/* to no pillar, so the rules added since 2026-11-22 to plan/step_prompt.txt (775dae8cd, bc31d324d, 19ea38ab4)
+      and .claude/agents/design-reviewer.md (5ae992f9, 064d9e5d8, 19ea38ab4 checks 17-18) were never reviewed as rules. Part
+      (4) as a separate job is dropped: the pillar now covers plan/step_prompt*.txt, plan/mechanical_prompt.txt and .claude/agents
+      (review_backlog.sh, committed); hook refusal texts are read whole by the keeper but counted in the code backlog only
+      (a 1-line gate on hooks would stop every hook fix). Keeper launched once over all carriers since 2026-11-22.'
   handoff:
     state: '2026-11-19. Steps 26, 27, 29 trial ran (design passed by the design-reviewer after two FIXes; scorer 3531dc6e,
       item-line repair 61005cc0 in worktrees/wt-graphify). Results in the finding of 2026-11-19 (lookup_trial.json). Left:
