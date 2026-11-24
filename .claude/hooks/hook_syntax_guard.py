@@ -20,15 +20,18 @@ BACKUP = os.path.join(os.path.dirname(HOOKS), ".hook_backup")
 
 
 def parses(path):
-    return subprocess.run(["bash", "-n", path], capture_output=True, text=True)
+    # a .py hook too (2026-11-24: a nested quote in stop_conditions.py broke the Stop gate's import unseen)
+    cmd = [sys.executable, "-c", "import ast,sys; ast.parse(open(sys.argv[1]).read())", path] if path.endswith(".py") \
+        else ["bash", "-n", path]
+    return subprocess.run(cmd, capture_output=True, text=True)
 
 
 def scripts():
-    return sorted(os.path.join(HOOKS, f) for f in os.listdir(HOOKS) if f.endswith(".sh"))
+    return sorted(os.path.join(HOOKS, f) for f in os.listdir(HOOKS) if f.endswith((".sh", ".py")))
 
 
 def in_hooks(fp):
-    return bool(fp) and fp.endswith(".sh") and os.path.dirname(os.path.realpath(fp)) == os.path.realpath(HOOKS)
+    return bool(fp) and fp.endswith((".sh", ".py")) and os.path.dirname(os.path.realpath(fp)) == os.path.realpath(HOOKS)
 
 
 def pre(inp):
@@ -47,12 +50,12 @@ def pre(inp):
         old = open(fp).read()
         a, b = ti.get("old_string", ""), ti.get("new_string", "")
         new = old.replace(a, b) if ti.get("replace_all") else old.replace(a, b, 1)
-    with tempfile.NamedTemporaryFile("w", suffix=".sh", delete=False) as t:
+    with tempfile.NamedTemporaryFile("w", suffix=os.path.splitext(fp)[1], delete=False) as t:
         t.write(new)
     r = parses(t.name); os.unlink(t.name)
     if r.returncode != 0:
         print(f"BLOCKED by hook_syntax_guard: this edit would leave {os.path.basename(fp)} unparseable, and every tool "
-              f"call runs it. bash -n says:\n{r.stderr.strip()}\nFix the edit; nothing was written.", file=sys.stderr)
+              f"call runs it. The parser says:\n{r.stderr.strip()}\nFix the edit; nothing was written.", file=sys.stderr)
         return 2
     return 0
 
