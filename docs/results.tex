@@ -9896,8 +9896,8 @@ $0.1227$, $0.1361$, $0.1300$ at seeds $42$, $43$, $44$. Fine-tuned, at $2.54\tim
 The ratio of the three-seed geometric means is $0.486$, with a $2\sigma$ interval of $0.454$--$0.522$ from the arms' own
 seed spread. Where data is scarce the parent still gains a factor of two, so the $1.53\times$ residual at $10^4$ is a
 large-$D$ effect. The fine-tune reaches its best at $14$--$16\%$ of the run and ends $1.43$--$1.52\times$ above it.
-Scratch seed $43$ blows up at $85\%$ of its run and is read at its best checkpoint before the blow-up.
-% src: python3 analysis/finetune_mechanism/zng4g_d1e3_read.py --cached @a1716fc2c
+Scratch seed $43$ blows up at $86\%$ of its run and is read at its best checkpoint before the blow-up.
+% src: python3 analysis/finetune_mechanism/zng4g_d1e3_read.py --cached @7306e7128
 % claim: arms.S1k.chosen.lr=1.74e-2
 % claim: arms.Fn1k.chosen.lr=2.54e-3
 % claim: arms.S1k.best.0=0.1227
@@ -9914,7 +9914,8 @@ Scratch seed $43$ blows up at $85\%$ of its run and is read at its best checkpoi
 % claim: arms.Fn1k.best_at_pct.1=16
 % claim: arms.Fn1k.end_over_best.1=1.43
 % claim: arms.Fn1k.end_over_best.0=1.52
-% allow: 3125 128 400 16 8 85 1.53 42 44 2 10^3 10^4 1.9\times10^{-3} 1.9\times10^{-2} 6\times10^{-4} 6\times10^{-2} because they are the seeds, the windows' bounds and they are the design's steps, batch, epochs and trial counts, and the 10^4 residual above
+% claim: arms.S1k.blowup_at_pct.43=86
+% allow: 3125 128 400 16 8 1.53 42 44 2 10^3 10^4 1.9\times10^{-3} 1.9\times10^{-2} 6\times10^{-4} 6\times10^{-2} because they are the seeds, the windows' bounds and they are the design's steps, batch, epochs and trial counts, and the 10^4 residual above
 
 \begin{figure}[H]
   \centering
