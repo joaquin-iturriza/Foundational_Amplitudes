@@ -39794,6 +39794,41 @@ entries:
       crowds an edge, so the extension is needed. It is matched between scratch and the 28-process fine-tune (same window,
       same 8 trials), costs about 4.5 GPU-h, and waits on nothing. The config diff 45f404900 to edfcc164d changes only the
       lr window, n_trials 16 to 24 and the waves.'
+  - at: '2026-11-24T07:57:24+00:00'
+    question: 'Step 1 repair (D519/D520/D529), revised after the reviewer''s FIX: the D=1e3, 3125-step searches of the dilution
+      design both crowd opposite window edges, so Fn1k/S1k 0.50 at seed 42 is not yet a measurement. Does a matched widening
+      of both searches (and the same protocol for the gluon-parent arm) move either best, and what is Fn1k/S1k (and later
+      Fg1k) with edge-free optima?'
+    prior: 'This step''s own searches (16 trials each, window [1.9e-3,1.9e-2] = hpo_optima centre 6.0e-3 +-0.5 dec, repo-reviewer
+      fix 45f404900): scratch S1k hp1009 0.0976 at lr 1.74e-2, its 7 best at 1.47e-2..1.89e-2 (best 0.04 dec under the top);
+      fine-tune Fn1k hp1860 0.0490 at 2.54e-3, its 10 best at 1.95e-3..3.1e-3 (0.13 dec over the bottom). Prior extensions
+      in this entry: R3 (b128 fine-tune window 1.1e-2 -> 3.3e-2, 16 -> 24 trials) kept its best; dead end ''b128 Sf* extended
+      alone'' sent back as UNMATCHED: this extension is matched. At 1e4 the Muon b128 searches chose 9.2e-3 (scratch) and
+      7.3e-3 (fine-tune). Searched: plan show finetune_mechanism (dead ends, findings), sweep configs ftmech_zng4g_*, results.tex
+      par:ftm_zng4g.'
+    measure: Each arm's best val MSE(log|M|^2) over its 24 trials (seed 42) and where its lr sits in [6e-4, 6e-2]; whether
+      the best moves from the 16-trial one; then Fn1k/S1k (and Fg1k/Fn1k) with the design's 2-sigma rule over the chosen trials'
+      seeds 42-44 (re-picked only if the best moves). Per-trial best against lr figure with both windows marked.
+    check: 'Both arms'' trial values fall toward the edge they crowd (scratch 0.098-0.119 over 1.47e-2..1.89e-2; fine-tune
+      0.049-0.054 over 1.95e-3..3.1e-3): the optimum may lie past each edge, and a better scratch at a higher lr or a better
+      fine-tune at a lower lr moves Fn1k/S1k by up to the trials'' own spread near the edge (~1.2x), the size the 2-sigma
+      rule resolves.'
+    fixed: 'One protocol for all three D=1e3 arms: 16 trials on [1.9e-3, 1.9e-2] (configs @45f404900, DyHPO seed 42), then
+      sweep/extend_sweep.py <sweep_dir> --param training.lr --low 6e-4 --high 6e-2 in place (candidates sampled in the added
+      zones, the surrogate keeps the 16 observations) and 8 more trials by sweep/drive.py with the configs @edfcc164d (only
+      window [6.0e-4, 6.0e-2], n_trials 24, waves +[3,3,2] changed). Scratch and the 28-process fine-tune are extended now.
+      The gluon-parent arm (sweep/sweep_config_ftmech_zng4g_d1e3_ftglu_b128.yaml @8e0482ffb = the narrow 16-trial config)
+      runs its 16 when the parent ends, then the same extension and config edit. Everything else as passed (3125 steps, D=1e3,
+      batch 128, Muon/WSD, float64, coupled space).'
+    control: 'Each arm is the others'' control: all three get 16 trials on the narrow window then the same 8 over the same
+      wide one.'
+    seeds: 'Trial seed 42. Seeds 43/44 of the current chosen trials already running (FA-ccin2p3-b96a2a6c, -2525f488, -ada00163,
+      -3ea9d4fa); re-picked and re-run only if a best moves (up to 4 more runs). Cost now: 16 trials x ~0.28 h = 4.5 GPU-h
+      (+1.1 if re-picks); Fg1k''s 8 extra later 2.2. Wall ~1 h. Under D520.'
+    outcome: 'Best unmoved in an arm (added trials all worse): its 16-trial optimum stands, read from the running seeds. Best
+      moves: re-pick, run its seeds 43/44, read from them. A new best within 0.1 dec of the wide window''s edge: reported
+      as edge-limited, extended once more only on a matched design. Any trial blowing up (val > 10x best-so-far) listed apart
+      (D398).'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
