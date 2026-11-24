@@ -37312,29 +37312,26 @@ entries:
     start: '2026-11-24T03:51:42+00:00'
     at: '2026-11-24T03:51:42+00:00'
   handoff:
-    state: '2026-11-24 ~05:00 UTC. Step 3 (D514 extension) read except one score: all four searches ended (Muon b2048 16 on
-      CC + 3 lxplus repeats; Adam b128 16 lxplus; Muon b128 19 and Adam b2048 19 with 3 repair trials each on their CC copies,
-      folded to the lxplus state). Choices: Muon b128 hp0078 replaces trial_0950 (three seeds 0.00888/0.01048/0.00887, mean
-      0.00941 vs 0.0197, 2.09x; window [2.7e-4,3.3e-2] bracketed, log position 0.735, trials above worse 3.6-9.8x); Adam b2048
-      hp0775 1.07x (stands); others unchanged. v2 ratios (three-seed means): Muon batch 6.69 [5.53,7.54], Adam batch 1.28,
-      opt b128 0.17, G 1.12 (unresolved). Reference sent to finetune_mechanism as a finding. NEXT: hp0078 test scoring (job_kit.sh
-      KIT_SCORE_ONLY=1 KIT_SCORE_DIR=runs/tp_zng_d1e4_muon_b128_zgggg/trial_0078, args kit_uq_zgggg__me2 500000 12500 A; on
-      lxplus, where the trial lives, or after site copy of the trial dir to CC); then benchmark.py d507collect --v2 and d507fig
-      --v2 (refuses until scored) -> zng_d507 v2 beside v1 (@0d2064b7) with changes listed (Muon b128 cell: trial_0950 ->
-      hp0078; batch ratio 3.20 -> 6.69; opt b128 0.35 -> 0.17), check_caption, write-up in docs/results.tex with % src/% claim.
-      Step 4 held on Joaquin''s GPU-budget question (asked 2026-11-20).'
+    state: '2026-11-24 ~05:30 UTC. Step 3 (D514 extension) read except one score: all four searches ended. Choices: Muon b128
+      hp0078 replaces trial_0950 (three seeds 0.00888/0.01048/0.00887, mean 0.00941 vs 0.0197, 2.09x; window [2.7e-4,3.3e-2]
+      bracketed, log position 0.735, trials above worse 3.6-9.8x); Adam b2048 hp0775 1.07x (choice stands); Muon b2048, Adam
+      b128 unchanged. v2 ratios (three-seed means): Muon batch 6.69 [5.53,7.54] (v1 3.20), Adam batch 1.28, opt b128 0.17
+      (v1 0.35), G 1.12 (unresolved). Reference sent to finetune_mechanism as a finding (with a correction). NEXT when FA-ccin2p3-5431deeb
+      ends: benchmark.py d507collect --v2 then d507fig --v2 (@1de9d796; refuses until hp0078 is scored) -> zng_d507 v2 beside
+      v1 (@0d2064b7) with changes listed (Muon b128 cell trial_0950 -> hp0078), look at it once, check_caption, write-up in
+      docs/results.tex with % src/% claim. Step 4 held on Joaquin''s GPU-budget question (asked 2026-11-20).'
     decisions: 'D514 extension per the designs passed 2026-11-20 and 2026-11-24 (after one FIX: Muon b128 lr top 1.1e-2 ->
-      3.3e-2, @df7c957a); placement per site pick (CC for the repair trials and seeds, lxplus for the scoring); replacement
-      rule: beat the old choice by more than the cell''s seed spread.'
+      3.3e-2 @df7c957a); placement per site pick (CC for repair trials, seeds and scoring; lxplus GPU slots do not fit the
+      32G these runs need); replacement rule: beat the old choice by more than the cell''s seed spread.'
     ruled_out: Moving started sweeps with rebalance.py; T4/MIG GPUs for float64 trials; drawing v2 with an unscored chosen
-      trial (d507fig --v2 refuses).
-    running: 'hp0078 test scoring: FA-lxplus-8116ba56 removed after 1.1 h pending (12000 MB / 4 CPUs matched 8 slots); resubmission
-      per the E8442 note on the entry''s wait.'
-    files: analysis/zng_uq/benchmark.py (d507collect/d507fig --v2 @6568c47c), analysis/zng_uq/data/{d507_v2.json,d507_search_v2.json},
+      trial; scoring on lxplus at 12000 MB (8 slots match, below the 32G need).
+    running: 'FA-ccin2p3-5431deeb: test scoring of hp0078 (job_kit.sh KIT_SCORE_ONLY=1 KIT_SCORE_DIR=runs/tp_zng_d1e4_muon_b128_zgggg/trial_0078,
+      args kit_uq_zgggg__me2 500000 12500 A, code @18ffa0ce, 1 h limit).'
+    files: analysis/zng_uq/benchmark.py (d507collect/d507fig --v2 @1de9d796), analysis/zng_uq/data/{d507_v2.json,d507_search_v2.json},
       analysis/zng_uq/seed_chunks/d514_muon_b128_hp0078_s{43,44}.txt @2feab608, sweep/sweep_config_tp_zng_d1e4_*_zgggg.yaml
       (muon_b128 @df7c957a), sweep/dyhpo/hpo_method.py + sweep/dyhpo_sampler.py (fold start-up fix @ab6215d5), tools/plan.py
       (sweepends site key @170183dd)
-    written: '2026-11-24T05:11:43+00:00'
+    written: '2026-11-24T05:14:20+00:00'
   step_why:
     3:
       feeds: whether the batch-size and optimiser effects of D507 hold once each cell's search is longer and its lr window
