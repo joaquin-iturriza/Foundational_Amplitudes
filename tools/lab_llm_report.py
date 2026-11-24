@@ -22,8 +22,8 @@ import model_trial as mt
 
 OUT = os.path.join(ROOT, "analysis", "lab_llm_trial")
 HOME = os.path.expanduser("~")
-NAME = {"sonnet_timed": "Sonnet", "deepseek+plan": "DeepSeek with\nSonnet's plan", "qwen+plan": "Qwen with\nSonnet's plan",
-        "deepseek": "DeepSeek alone", "qwen": "Qwen alone"}
+NAME = {"sonnet_timed": "Sonnet", "deepseek+plan": "DeepSeek+plan", "qwen+plan": "Qwen+plan",
+        "deepseek": "DeepSeek", "qwen": "Qwen"}
 ORDER = ["sonnet_timed", "deepseek+plan", "qwen+plan", "deepseek", "qwen"]
 
 
@@ -97,23 +97,25 @@ def figure(out):
           label="first attempt")
     a.bar([i + 0.2 for i in x], [fx[k]["passed_final"] / fx[k]["n"] for k in arms], 0.4, color=ps.C.vermillion,
           label="after one rework")
-    a.set_ylabel("share of the 10 tool fixes passed")
+    a.set_ylabel("share of tool fixes passed")
     a.set_ylim(0, 1.0)
     ps.legend(a, "upper right")
     b.bar(x, [fx[k]["minutes_per_task"] for k in arms], 0.6, color=ps.C.blue)
     b.set_yscale("log")
     b.set_ylabel("wall time per tool fix (min)")
+    from matplotlib.ticker import ScalarFormatter
+    b.yaxis.set_major_formatter(ScalarFormatter()); b.yaxis.set_minor_formatter(ScalarFormatter())
     c.bar(x, [fx[k]["our_tokens_per_task"] / 1e3 for k in arms], 0.6, color=ps.C.blue)
     c.set_ylabel("our tokens per tool fix ($10^3$)")
     for ax in (a, b, c):
-        ax.set_xticks(list(x), lab)
+        ax.set_xticks(list(x), lab, rotation=30, ha="right")
     tr = out["triage"]
     tarms = [k for k in ("deepseek", "qwen") if k in tr]
     d.bar([i - 0.2 for i in range(len(tarms))], [tr[k]["passed_first"] / tr[k]["n"] for k in tarms], 0.4,
           color=ps.C.blue, label="cause and step or error line")
     d.bar([i + 0.2 for i in range(len(tarms))], [tr[k].get("hand_ok", 0) / tr[k]["n"] for k in tarms], 0.4,
           color=ps.C.vermillion, label="reason and action, read by hand")
-    ps.legend(d, "lower left")
+    ps.legend(d, "upper left")
     d.set_xticks(list(range(len(tarms))), [NAME[k] for k in tarms])
     d.set_ylabel("share of failed-run logs read right")
     d.set_ylim(0, 1.0)

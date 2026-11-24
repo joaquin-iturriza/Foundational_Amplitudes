@@ -1,0 +1,123 @@
+{
+ "triage": {
+  "qwen": {
+   "n": 30,
+   "passed_first": 30,
+   "passed_final": 30,
+   "minutes_per_task": 0.68,
+   "minutes_median": 0.54,
+   "our_tokens_per_task": 0,
+   "lab_tokens_per_task": 64065,
+   "passed_by_class": {
+    "diverged": [
+     22,
+     22
+    ],
+    "error": [
+     6,
+     6
+    ],
+    "time_limit": [
+     2,
+     2
+    ]
+   },
+   "hand_ok": 30
+  },
+  "deepseek": {
+   "n": 30,
+   "passed_first": 30,
+   "passed_final": 30,
+   "minutes_per_task": 0.51,
+   "minutes_median": 0.42,
+   "our_tokens_per_task": 0,
+   "lab_tokens_per_task": 52877,
+   "passed_by_class": {
+    "diverged": [
+     22,
+     22
+    ],
+    "error": [
+     6,
+     6
+    ],
+    "time_limit": [
+     2,
+     2
+    ]
+   },
+   "hand_ok": 29
+  }
+ },
+ "fix": {
+  "deepseek+plan": {
+   "n": 10,
+   "passed_first": 9,
+   "passed_final": 9,
+   "minutes_per_task": 8.0,
+   "minutes_median": 3.65,
+   "our_tokens_per_task": 189478,
+   "lab_tokens_per_task": 1055746
+  },
+  "qwen": {
+   "n": 10,
+   "passed_first": 8,
+   "passed_final": 9,
+   "minutes_per_task": 14.73,
+   "minutes_median": 11.78,
+   "our_tokens_per_task": 0,
+   "lab_tokens_per_task": 2948676
+  },
+  "deepseek": {
+   "n": 10,
+   "passed_first": 8,
+   "passed_final": 9,
+   "minutes_per_task": 11.82,
+   "minutes_median": 9.36,
+   "our_tokens_per_task": 0,
+   "lab_tokens_per_task": 2977004
+  },
+  "qwen+plan": {
+   "n": 10,
+   "passed_first": 9,
+   "passed_final": 9,
+   "minutes_per_task": 7.91,
+   "minutes_median": 8.14,
+   "our_tokens_per_task": 189478,
+   "lab_tokens_per_task": 1239987
+  },
+  "sonnet_timed": {
+   "n": 10,
+   "passed_first": 9,
+   "passed_final": 9,
+   "minutes_per_task": 3.67,
+   "minutes_median": 3.78,
+   "our_tokens_per_task": 297195,
+   "lab_tokens_per_task": 0
+  }
+ },
+ "fix_earlier_trial": {
+  "sonnet": {
+   "tasks": 10,
+   "passed_first": 9,
+   "passed_with_rework": 10,
+   "hand_read_ok": 9,
+   "usd_total": 1.908,
+   "usd_per_task_with_rework": 0.191
+  },
+  "opuslow": {
+   "tasks": 10,
+   "passed_first": 9,
+   "passed_with_rework": 10,
+   "hand_read_ok": 9,
+   "usd_total": 2.881,
+   "usd_per_task_with_rework": 0.288
+  },
+  "cost_ratio_sonnet_over_opuslow": {
+   "n": 10,
+   "median": 0.654,
+   "min": 0.585,
+   "max": 0.782
+  }
+ }
+}
