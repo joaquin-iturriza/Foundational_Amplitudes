@@ -44351,3 +44351,25 @@ entries:
     state_at: '2026-11-24T14:15:22+00:00'
     context: 53759
     context_at: '2026-11-24T14:16:19+00:00'
+  designs:
+  - at: '2026-11-24T14:30:34+00:00'
+    question: 'What uses CC''s /sps/lpnhe group space (512 GiB, 98% used, 15 GB free on 2026-11-24) inside our area where
+      login-node reads are cut: the size of every top-level entry of $SCRATCH (126,942 entries, incl. 118,777 zeroshot_* temp
+      dirs), each run''s model files against the rest (inv_runs.py), which training-cache pools no recipe reads (cache_census.py),
+      the loose files of datasets/ and the checkout root, and lhe_queue; feeds Joaquin''s call (D542) on what is deleted'
+    prior: 'analysis/storage/inventory.json (2026-10-25, D103''s breakdown): runs 113 GB, runs_from_lxplus 48, amp_data_cache
+      66, datasets 48, archive tars 28.5 (deleted under D404), zz_lowd 14; cache_manifest_2026-10-26.tsv (census under D147);
+      the held storage entry (D96/D122: 12 test/smoke dirs 5.0 GB, lxplus-era archive). This job repeats those reads today
+      with the same tools; login-node reads today gave runs 122 GB, runs_from_lxplus 24, datasets 80, amp_data_cache 75, amp_mmap_cache
+      45, $SCRATCH zz_* >= 51 GB (cut)'
+    measure: 'allocated MiB per entry (du -s, st_blocks: what the group quota counts); per run model vs other bytes; census
+      keep/delete per cache file'
+    check: 'the login-node du of runs (122,051 MiB) and of amp_data_cache (75,265 MiB) done today: the job''s numbers for
+      the same paths must agree within the growth of the hour'
+    fixed: read-only; same tools and arguments as the October inventory except census --in-use '*' (every recipe in use, so
+      only orphan pools are listed) and --days 14
+    control: 'none: an inventory, no comparison; cross-check against today''s login-node reads (runs, amp_data_cache, amp_mmap_cache)'
+    seeds: none (deterministic read)
+    outcome: 'yes: every output file complete (DISK_INVENTORY_DONE, scratch_top.tsv sums to within 2% of du of $SCRATCH),
+      giving the delete-candidate list by class (our debris, unread caches, results needing Joaquin''s call); no: a read missing
+      or cut, rerun that part alone'
