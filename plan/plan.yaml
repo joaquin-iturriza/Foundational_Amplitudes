@@ -45062,9 +45062,7 @@ entries:
   decisions:
   - D546
   - D547
-  next: 'Prove the kit end to end on one real cluster: install it under a separate HOME (FA''s live site tool, configs and
-    ledger untouched), run examples/toy through site env, site pick, site submit of scripts/job_probe.sh then job.sh, supervisor
-    sorting and site fetch; fix what breaks in the kit; then publish it where Joaquin says'
+  next: null
   done_when: null
   notes_ref: null
   match: orchestrator_kit_*
@@ -45157,12 +45155,6 @@ entries:
     state_at: '2026-11-24T21:57:02.206000+00:00'
     context: 274603
     context_at: '2026-11-24T21:57:44+00:00'
-  step_why:
-    1:
-      feeds: whether the kit is ready to share with colleagues (D546)
-      if:
-      - 'the toy runs and is sorted clean on the cluster: publish the kit (name, host, visibility, license as Joaquin answers)'
-      - 'a kit path breaks on the cluster: fix it in the kit, rerun the toy, then publish'
   handoff:
     state: 'Kit cleaned of project history (one squashed commit 1706c88) and public at github.com/joaquin-iturriza/orchestrator-kit,
       main at d2681fb with on-cluster fixes. Private toy repo github.com/joaquin-iturriza/orchestrator-kit-toy (a818ed5).
@@ -45290,9 +45282,7 @@ entries:
       in a transcript), not a chosen cut; the remote dir is still exercised by the env CPU job (~/.ccorch_kit/jobs). Cost
       <=0.34 GPU-h. Searched orchestrator, kit, toy, ccorch_kit, standalone, examples/toy in docs/results.tex, plan, site
       decisions: no prior kit proof (kit hits only the KIT benchmark).'
-  step_waits:
-    '1': 'on or after 2026-11-24T21:55: read the kit env CPU job ccj_e36372e27bbb (Slurm 64797849, pending at 21:20) with
-      ksite env ccin2p3 toy, then site pick toy --jobs 2 and both GPU jobs'
+  step_waits: {}
   targets:
   - batch: kit_proof_cc
     wall_h: 0.25
