@@ -38675,6 +38675,13 @@ entries:
       uug bulk at 1e4 (design branch: uug r>1 beyond noise, D374''s bulk gain is a setup effect); 1e5 off 0.00095/0.00136/0.00138,
       eps 0.00121/0.00233/0.00302, r 1.68 [0.93,3.07] unresolved. Seeds 43/44 above seed 42 in every arm (winner''s selection).
       Kit scoring of the 12 runs in flight (step 4 wait).'
+  - at: '2026-11-24T23:02:59+00:00'
+    text: '2026-11-25 step 5 read, D=1e3 dilution (zng4g_d1e3_read.py @e0b02d2e2; fig zng4g_d1e3 v2 with the new arm, caption
+      OK; results.tex par:ftm_zng4g @146e2e442). Fine-tune from the 9-process gluon/Z parent Fg1k: 24-trial search best hp1127
+      lr 3.55e-3 (0.77 dec inside the wide window), seeds 42/43/44 (FA-ccin2p3-7a659ef3, -ca958438) 0.0823/0.0811/0.0845;
+      Fn1k 0.0616/0.0653/0.0621; S1k 0.1227/0.1361/0.1300. Fg1k/Fn1k 1.31 [1.26,1.37] -> design branch gluon worse at D=1e3;
+      Fg1k/S1k 0.64 [0.60,0.68]. Fg1k best at 8-10% of the run, ends 1.33-1.39x above. With 1e4 (Fg/Fn 0.65 [0.48,0.88], dilution
+      yes): the narrow parent wins at 1e4, the broad parent at 1e3.'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
