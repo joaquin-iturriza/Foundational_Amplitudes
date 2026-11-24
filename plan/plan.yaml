@@ -43242,6 +43242,56 @@ entries:
       only by the measurement switch; known-answer recovery within 5% for tr Sigma and |G|^2 and within 7% for B_simple; one
       seed justified; cost under 2.1 GPU-h. Terms searched: noise scale, noise_scale, critical batch, B_simple, McCandlish,
       find_BS, gradient noise, batch size, batchsize; site decisions for noise, critical, batch; no earlier measurement.'
+  - at: '2026-11-24T13:46:33+00:00'
+    question: 'Step 2 of critical_batch (D532, ''its validation against batch-size runs''; budget D536): does the measured
+      noise scale (B_simple 28-84 events from 16 independent batches, median 55.5 along the run, sec:noisescale) predict where
+      larger batches stop paying off on our canonical catalog_v4 het setup? Measured as McCandlish et al.''s steps-examples
+      tradeoff: at each batch size B, the steps S and events E = B S to reach a target validation loss, fit S/S_min - 1 =
+      (E/E_min - 1)^-1, B_crit = E_min/S_min, against B_simple.'
+    prior: 'sec:noisescale (c2ab3154a): B_simple 84+-9, 28.2+-1.4, 28+-6, 39+-5 events at steps 500/1500/3000/4100 (16 independent
+      batches), 2-3 decades below the training batch 16384; the chunk estimator overstates tr Sigma 1.16-1.29x (per-process-mean
+      loss). Searched docs/results.tex (critical, batch size, steps examples), the plan and site decisions (batch, lr): no
+      batch-size scan on this setup; D426 forbids searching batch together with lr (here batch is a fixed axis per sweep,
+      lr searched inside each, D426-consistent); D514 (zng_uq_benchmark, Z+4g at 1e4 events): batch matters there, a different
+      data-limited cell; sec:envelope: 16384 is the largest batch that fits a 32 GB V100 at nh 8.'
+    measure: 'Five single-fidelity DyHPO sweeps, one per batch B in {2048, 4096, 8192, 16384, 32768} (sweeps cbs_b<B>), 8
+      trials each (waves 3,3,2), each trial 5 epochs of catalog_v4 base train (1397 pools x 1e4 = 1.397e7 events; T_B = 4264
+      x 16384/B steps: 34112, 17056, 8528, 4264, 2132), validate_frac 0.02 (50 validations). Searched: the template''s coupled
+      space (lr, muon_weight_decay, regularization_lambda, warmup frac, eta_min, ema, ema_decay), lr window [c_B/3, 3 c_B]
+      with c_B = 5e-3 x lr_c(T_B)/lr_c(4264), lr_c the HPO rule-2 horizon law (c = 1.6e-3, 2.3e-3, 3.4e-3, 5.0e-3, 5.1e-3).
+      Readout per B from its best trial (lowest final val_loss_no_reg, NLL): S_B(L) = first validation step with val_loss_no_reg
+      <= L, for targets L = the 16384 best trial''s validation loss at 25%, 50% and 75% of its stable phase (before the WSD
+      cooldown, so every target is a stable-phase level); E_B = B S_B; per target, fit S = S_min (1 + B_crit/B) (equivalently
+      the paper''s hyperbola) by least squares in log S over the B that reach it, B_crit = E_min/S_min with a bootstrap over
+      the B points; compared with B_simple at the step where the 16384 run reaches L. Batch 32768 does not fit a V100 at nh
+      8 (sec:envelope): it runs as 2 accumulated micro-batches of 16384 whose losses use the whole batch''s per-process counts
+      (the chunk weighting of _noise_chunk_losses, full_counts), giving the exact 32768-batch gradient; this accumulation
+      path is new code (test: accumulated gradient equals the one-batch gradient to 1e-6 on CPU) and gets its smoke (D395).'
+    check: 'On existing data the measure moves with B: the 16384 control (v4_het_control_wsd) validation curve falls from
+      0.10 to -2.9 over 4264 steps, so a target at 25-75% of its stable phase is crossed at a well-defined step; McCandlish''s
+      prediction with B_simple ~ 50 says S_B is nearly flat across B >= 2048 (S_min(1 + 50/2048) = 1.02 S_min) while E_B doubles
+      per doubling of B; the opposite outcome (S_B halving with each doubling, B_crit >> 16384) is distinguishable at 5 points
+      spanning 16x in B since S changes by up to 16x. The fit code is checked on synthetic S_B from a known B_crit (tests)
+      before reading.'
+    fixed: 'The v4_het_control_wsd setup (scripts/job_catalog_v3_short.sh arm v4_het_control_wsd: base config runs/dancat_het_pre/trial_0058,
+      recipes/catalog_v4_base_train.yaml, 1e4 train and 200 val events per pool, dimensionless target and inputs (DIM), HETEROSC
+      with mean aggregation, sign head off, bsm_labels, MuonAdamW, WSD cooldown 1/8, clip 5, seed 42, width nh 8), training
+      only, no sigma stage; every setting of trial_0058''s config that differs from config/ defaults is listed in each sweep
+      config''s fixed_params and the sweep''s resolved config diffed against the control''s config.yaml before submission
+      (only batchsize, iterations, the searched HPs and validate_frac may differ). Events seen are equal across B (5 epochs).'
+    control: 'The 16384 sweep is the reference (the canonical batch with the same search as the others, not the hand-tuned
+      control run, so every B gets the same tuning budget); the v4_het_control_wsd run (MUON_BEST HPs) is a sanity point:
+      the 16384 best trial should reach a validation loss within its spread.'
+    seeds: Seed 42 for every trial (the 8-trial search per B is the replication of the lr choice; seed noise of a single run
+      is read from the spread of the top-3 trials of each sweep at their best checkpoints and shown beside S_B).
+    outcome: 'B_crit within a factor ~3 of B_simple (i.e. below ~200 events, S_B flat within 10% across 2048-32768): B_simple
+      is calibrated on our setup and is read alone from the in-run estimator afterwards; our batch 16384 is far past critical,
+      and a smaller batch (2048-4096) reaches the same loss in about as many steps with 4-8x fewer events, a candidate change
+      to the canonical batch that goes to Joaquin. B_crit far above B_simple (S_B falling with B up to >= 8192): B_simple
+      underestimates B_crit here (the paper notes B_noise >= B_simple when the Hessian is not isotropic, and Muon''s update
+      is not SGD); then B_crit from the scan is the number, and B_simple is not trusted alone. Cost: 40 trials x (5 epochs
+      at ~1.01 s per 16384 events = 1.2 h + 15 min start-up, validations) ~ 1.45 h = 58 GPU-h on V100 (D536: up to 100 GPU-h
+      for work a decision names), plus the 32768 accumulation smoke ~0.2 GPU-h.'
   step_why:
     2:
       feeds: whether measured B_simple predicts where larger batches stop paying off
