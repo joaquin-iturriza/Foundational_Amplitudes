@@ -67,7 +67,8 @@ def _out(w, p, ptr, kinds=(1, 1, 2, 3, 4, 2)):
 FLAGS = {"pair_logs": dict(input_pair_logs=5), "soft_rescale": dict(input_soft_eps=1e-8),
          "local_logs": dict(input_local_log_eps=1e-8),
          "both_6": dict(input_pair_logs=6, input_soft_eps=1e-8),
-         "soft_massless": dict(input_soft_eps=1e-8, input_soft_massless_only=True)}     # the uugg flags: 15 pair logs + soft rescale
+         "soft_massless": dict(input_soft_eps=1e-8, input_soft_massless_only=True),
+         "soft_x0": dict(input_soft_eps=1e-8, input_soft_x0=0.1)}     # the uugg flags: 15 pair logs + soft rescale
 
 
 def _check(name, lens=LENS):
@@ -97,6 +98,26 @@ def test_local_logs_equivariant():
 
 def test_both_flags_6particle_equivariant():
     _check("both_6", lens=(6, 5, 4))
+
+
+def test_soft_x0_equivariant():
+    _check("soft_x0")
+
+
+def test_soft_x0_only_soft_momenta():
+    """input_soft_x0 (D552): momenta with x >= x0 unchanged, softer ones scaled by F(x)/F(x0) > 1; x0 = 1 is the rescale."""
+    p, ptr = _events(1)
+    q = p.clone()
+    Q = p[ptr[:-1]] + p[ptr[:-1] + 1]
+    eta = torch.tensor([1., -1., -1., -1.])
+    x = (2 * (p * Q.repeat_interleave(ptr[1:] - ptr[:-1], 0) * eta).sum(-1) / (Q * Q * eta).sum(-1).repeat_interleave(ptr[1:] - ptr[:-1])).abs()
+    r = _soft_rescale(p, ptr, 1e-8, x0=0.1)
+    hard, soft = x >= 0.1, x < 0.1
+    assert hard.any() and soft.any()
+    assert torch.equal(r[hard], q[hard])
+    F = lambda v: torch.log1p(v / 1e-8) / (v * np.log1p(1e8))
+    assert torch.allclose(r[soft] / p[soft], (F(x[soft]) / F(torch.tensor(0.1)))[:, None])
+    assert torch.equal(_soft_rescale(p, ptr, 1e-8, x0=1.0), _soft_rescale(p, ptr, 1e-8))
 
 
 def test_pair_log_values():
