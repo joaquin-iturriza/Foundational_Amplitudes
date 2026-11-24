@@ -38145,7 +38145,7 @@ entries:
     agent: aa696ba79c8f66f6d
     state: stopped
     since: '2026-11-24T08:11:35+00:00'
-    state_at: '2026-11-24T09:02:45+00:00'
+    state_at: '2026-11-24T09:03:25.109000+00:00'
     context: 103899
     context_at: '2026-11-24T08:59:58+00:00'
   findings:
@@ -40236,9 +40236,9 @@ entries:
     blocks_steps: &id003 []
   owner:
     agent: ae2d14b6689ebb697
-    state: working
+    state: stopped
     since: '2026-11-24T08:11:28+00:00'
-    state_at: '2026-11-24T08:59:49.403000+00:00'
+    state_at: '2026-11-24T09:02:11.292000+00:00'
     context: 162919
     context_at: '2026-11-24T09:00:05+00:00'
   step_why:
