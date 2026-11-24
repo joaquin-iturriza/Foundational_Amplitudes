@@ -44821,7 +44821,7 @@ entries:
     blocks_steps: &id002 []
   owner:
     agent: acc098fc308290fb5
-    state: working
+    state: closed
     since: '2026-11-24T14:15:22+00:00'
     state_at: '2026-11-24T23:39:12.102000+00:00'
     context: 272154
@@ -45047,6 +45047,36 @@ entries:
   blocks: the CC deletions of costly results only
   blocks_steps: *id002
   checked_until: '2026-11-24T23:37:47+00:00'
+  handoff:
+    state: 'Inventory done (FA-ccin2p3-b949c4ee, outputs CC SCRATCH/zz_cc_disk/*.tsv; apparent size matches df within 0.8%).
+      /sps/lpnhe 503-505 GiB of 512 used, 7 GB free at 00:50 2026-11-25. Top (apparent GiB): runs 87.7, datasets 55.0, SCRATCH
+      167.9 (amp_data_cache 58.7 all kept by census, amp_mmap_cache 36.8, zz_catft* 27.3, zz_v4_short/long* 27.4 in 194 dirs,
+      lhe_queue 6.8), runs_from_lxplus 17.3, other users 80.9, Joaquin''s other projects ~64. D550 debris deletion running
+      as FA-ccin2p3-67887dff (design passed; tools/delete_debris.py at d0a0b0265; expected smoke 1.4 + mmap 4.8 + scratch
+      2.2 GiB; logs kept as evidence: deviation from D550''s words, must open the report). Step 2 (recommendation per costly
+      group, Joaquin asked ''How would I know which results to delete? What are you calling costly results?'') waits on the
+      CPU read job ccj_3b5290531b03 (slurm 64806812): re-issue the exact same site --timeout 3600 run --job --allow-stale
+      --item cc_disk ccin2p3 FA -- ''<cmd>'' (command text in scratchpad readjob call: lhe_queue status per queue, zz_catft
+      du and model bytes, two zz_v4 dirs'' contents, free_space.py list) to read it; exit 75 = still running. Known: zz_catft*
+      = muon_test fine-tunes, its figure reads committed analysis/catalog_v3/data/catft_curves.json (collected), ~3 GPU-h
+      per batch, 7 batches ~20 GPU-h (estimate); zz_v4_* are PRED dirs of job_catalog_v3_short.sh read by analysis/catalog_v4/{prop_width_check,ee_gain,error_correlates,het_uncertainty,het_oneloop,length_h2p5}.py
+      and catalog_daniel/dan_per_process.py; lhe_queue: lhe_parts queues, gc --parts after assembly is D208''s; runs_from_lxplus:
+      lxplus copy not checked (site run lxplus timed out). Model files 100 GB allocated over 3,322 runs, 91 GB in runs < 5
+      h (free_space.py list applies D133''s concluded-study filter). Risk passed to main session: llm_compare 120-head width
+      smoke FA-ccin2p3-74ba6cdd projects ~19.5 GB of uncompressed checkpoints.'
+    decisions: 'Joaquin''s: D542 (look into CC space), D550 (delete the debris), D149/D133 (model files of concluded studies,
+      never runs over ~5 h), D147, D208, D122 hold on storage. Mine: report apparent size (it matches df; allocated overstates
+      1.3-1.4x); keep checkout-root scheduler logs (ws_objective_check.py and size_figs.py parse them for results.tex numbers;
+      reviewer FIX); scratch dirs deleted only when > 3 days (longest wall limit 48 h); 2x per-class cap on deletion; atexit
+      cleanup of probe temp dirs (acd6b8753) rather than in-function rmtree (one line each, no reader after exit).'
+    ruled_out: long reads on CC's login node (cut after 40 s - 2 min; D544); a site run rm of debris (permission check refused);
+      deleting job .out logs (results evidence)
+    running: FA-ccin2p3-67887dff (D550 debris deletion, CPU, step 1 waits on it); ccj_3b5290531b03 / slurm 64806812 (CPU read
+      job for step 2)
+    files: scripts/job_disk_inventory.sh, scripts/job_delete_debris.sh, tools/delete_debris.py, tests/test_delete_debris.py,
+      analysis/storage/{free_space,cache_census,inv_runs,build_inventory}.py, CC SCRATCH/zz_cc_disk/ (top*.tsv, scratch_top*.tsv,
+      inv_runs.jsonl, census.tsv, files_*.tsv, lhe_queue.tsv, df.txt, deleted.tsv)
+    written: '2026-11-24T23:56:58+00:00'
 - id: cc_login_jobs
   title: 'CC login node: recurring and long scripts moved to Slurm (CC support''s email)'
   question: 'Can every non-interactive script we run on CC''s login node (the supervisor''s maintain commands: disk_watch,
