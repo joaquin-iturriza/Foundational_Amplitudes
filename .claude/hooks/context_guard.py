@@ -42,7 +42,7 @@ INSTR = ("CONTEXT GUARD: the context is near compaction. Before it, record on th
          "main session) record these yourself; the check lists what it finds missing.")
 AFTER = ("CONTEXT GUARD: this context was just compacted. The summary above is a lossy record of the CONVERSATION (what "
          "was in flight), not of the plan: work only from the plan printed below, not from the summary's "
-         "pending list. CLAUDE.md's ground rules hold (0: start every message with 'Joaquin'; 0b: never narrow the scope). "
+         "pending list. CLAUDE.md holds (Talking to me: start every message with 'Joaquin'; What you may do: never change the scope I asked for). "
          "Re-check the running batches with `site` before acting on any number in the summary.")
 AGENT_AFTER = ("CONTEXT GUARD: your context was just compacted. The summary above is a lossy record of the "
                "conversation: re-read your entry (`python3 tools/plan.py show <your entry>`) and the rules block of "

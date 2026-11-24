@@ -17,7 +17,7 @@ A command is refused (exit 2, every reason found) when
   budget     a GPU submission (`site submit` of a script that asks for a GPU) without --est-gpu-hours; or one whose
              estimate plus the item's GPU submissions of the last 60 min (registry runs.est_gpu_hours) passes 30 GPU-h,
              or 10 on Jean Zay (a submission there, or `auto --allow-jeanzay`), unless the item's recorded cost
-             (items.est_gpu_hours, set from the decision that approved it) covers that total (CLAUDE.md rule 2).
+             (items.est_gpu_hours, set from the decision that approved it) covers that total (CLAUDE.md, What you may do: GPU budget).
              The early warning only: the budget is enforced at the site's submission gate (site_gate.py beside the
              site tool), which every sbatch / condor_submit passes, launch scripts and sweep_manager included.
   epoch      a FA training job (job_catalog_v3_short-style scripts) whose steps x batch size is under its training set
@@ -469,7 +469,7 @@ def budget(cmd, segs):
             continue
         if est is None or est < 0:
             out.append("budget: `site submit %s %s %s` asks for a GPU: pass --est-gpu-hours H (wall time x GPUs; "
-                       "CLAUDE.md rule 2)" % (site, project, script))
+                       "CLAUDE.md, What you may do: GPU budget)" % (site, project, script))
             continue
         if n is None:
             out.append("budget: a GPU `site submit` inside a loop whose count is not readable (seq N or {A..B}): "
@@ -491,7 +491,7 @@ def budget(cmd, segs):
             over.append("%.1f GPU-h on Jean Zay (limit %g)" % (total_jz, BUDGET_JZ_GPU_H))
         if over and not (covered is not None and covered >= max(total, total_jz if jz else 0.0)):
             out.append("budget: %s, and the item's recorded cost (%s) does not cover it. Above the budget the user "
-                       "confirms first (CLAUDE.md rule 2); with their words recorded, `site item set %s %s "
+                       "confirms first (CLAUDE.md, What you may do: GPU budget); with their words recorded, `site item set %s %s "
                        "--est-gpu-hours <approved total>`." % ("; ".join(over), "none" if covered is None else
                                                                  "%g GPU-h" % covered, project, item))
     return out

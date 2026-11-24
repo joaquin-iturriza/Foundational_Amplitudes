@@ -339,7 +339,7 @@ def main(argv):
                                                      "send_check: legend entries sent:\n" + "\n".join(shown)}}))
         return 2 if ax else 0
     sys.stderr.write(
-        "send_check: this file does not read on its own (CLAUDE.md 0e: plain names, no internal codes). Redraw it with "
+        "send_check: this file does not read on its own (CLAUDE.md, Talking to me: name a thing by what it is, no code alone). Redraw it with "
         "plain words for each of these, or, for a term the user has accepted, add it with its plain definition to "
         "docs/glossary.txt:\n  " + "\n  ".join(bad) + "\n")
     return 2

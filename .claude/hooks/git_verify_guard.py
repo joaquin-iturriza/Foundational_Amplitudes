@@ -133,7 +133,7 @@ def attributed(repo, args):
     except ImportError:
         return None
     bad = attribution.offending("\n\n".join(msgs))
-    return ("a commit message attributing the work to an assistant (CLAUDE.md rule 4): %s" % "; ".join(bad)) if bad else None
+    return ("a commit message attributing the work to an assistant (~/work/CLAUDE.md, What you may do: no attribution): %s" % "; ".join(bad)) if bad else None
 
 
 def heredoc_attributed(cmd, cwd):

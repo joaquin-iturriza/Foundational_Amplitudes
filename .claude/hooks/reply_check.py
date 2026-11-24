@@ -157,7 +157,7 @@ def _check(inp, ask):
           " Answer that directly in a revised reply (this check runs once per user message). If the check is wrong"
           " (the question was not the researcher's, e.g. it sits in text they pasted from someone else, or the reply"
           " does answer it), do not manufacture an answer: end the turn with one line to the user naming this check, what it"
-          " flagged and why that is wrong (CLAUDE.md 0g).")
+          " flagged and why that is wrong (CLAUDE.md, Code and git: a check that refuses wrongly).")
 
 
 def clip(reply, head=4000, tail=8000):

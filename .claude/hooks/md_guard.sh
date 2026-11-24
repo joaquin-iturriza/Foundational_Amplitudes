@@ -63,7 +63,7 @@ fi
 # Block. exit 2 => tool call denied, stderr shown to the model.
 {
   echo "BLOCKED by md_guard: refusing to create new doc file '$rel'."
-  echo "CLAUDE.md ground rule #3: no scattered .md/.tex/notes/findings/report files anywhere (notes/ included) — results/guidance go in the ONE existing document (docs/results.tex), not a new file. 'It's a report/analysis, not guidance' is NOT an exception, and there is no notes/ loophole."
+  echo "CLAUDE.md, Code and git ("Never create a new .md, .tex or .rst file"): no scattered .md/.tex/notes/findings/report files anywhere (notes/ included) — results/guidance go in the ONE existing document (docs/results.tex), not a new file. 'It's a report/analysis, not guidance' is NOT an exception, and there is no notes/ loophole."
   echo "Write a section into the existing doc instead. Only if the user has EXPLICITLY approved a brand-new file: record its path in .claude/md_allowlist.txt, then retry. Otherwise ask first."
 } >&2
 exit 2
