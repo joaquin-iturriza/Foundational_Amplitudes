@@ -17815,6 +17815,18 @@ entries:
       (broke the Stop gate''s import; fixed 4d7a3dd1c) and hook_syntax_guard now parses .py hooks too (3714ca1d0, replay:
       the nested-quote edit refused rc 2); drive.py rejoin only at the start-up commit (2ce104e72) and transient-only sync
       retry with test update (93d906b87; 26 drive tests pass).'
+  - at: '2026-11-24T12:00:12+00:00'
+    text: '2026-11-24 D534 part 3 (routing) built, outside git (backups site_runends.py.bak-20261124-batchfold, site.bak-20261124-probe2fa;
+      the supervisor reloads on change). (a) site_runends.fold_reason: a broken run that is a search trial (sweep/trial_job.sh)
+      or is named in an owner''s wait is acked routine as folded into its batch, opening no event; a second failure of the
+      same kind (deciding line without numbers, ids, paths) in the same item within 6 h is a pattern and opens an event; a
+      lone run still opens one. Replay on runs.db lines: E8491 (part (c) control OOM, a trial) folded; E8530 (lr 7e-3 trial
+      FAILED) folded; a second OOM in llm_compare -> event; a waited non-trial run folded; a lone run -> event. Supervisor
+      tests 17 pass. (b) probe_site: a 2FA site is DOWN only after the master is checked again 5 s later and one BatchMode
+      ssh fails (ssh_answers); replay with mocks: master back on recheck -> probed, ssh answers -> probed, both fail -> DOWN
+      with the reason; live site list: lxplus up. plan_check site_down kept (keeper: it also covers claims read from site
+      list). main_session_guard.py deleted (unregistered since D185, delegation_note.py does its job), its scenario removed
+      (33c103944); scenario suite 61 failures before and after, the same set.'
   handoff:
     state: 'D534 step 30: diagnosis recorded (findings 2026-11-24: R1-R7 and the correction of the supervisor claim). Parts
       1+2 merged 6eab900e0 (plan intent; intent first in owner/mechanical briefs; send_check refuses figures by a rejected
