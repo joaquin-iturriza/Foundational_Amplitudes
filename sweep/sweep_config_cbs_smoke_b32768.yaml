@@ -1,5 +1,5 @@
 # critical_batch step 2, D395 smoke of the batch-32768 accumulation path (2 micro-batches of 16384) through the sweep
-# path: sweep_config_cbs_b32768.yaml at 50 steps, one trial, validation every 25 steps, objective target 100 (reached
+# path: sweep_config_cbs_b32768.yaml at 50 steps, one trial, validation every 25 steps, objective target 1e30 (reached
 # at the first validation, so steps_to_target runs to its end); every other setting as the b32768 sweep.
 cluster:
   scheduler: slurm
@@ -22,7 +22,7 @@ dyhpo:
   waves: [1]
   total_budget: 10000
 objective: steps_to_target
-objective_target: 100.0
+objective_target: 1.0e+30
 fidelity_schedule:
   t_steps:
   - 50
