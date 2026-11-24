@@ -38072,10 +38072,7 @@ entries:
   - D516
   - D529
   - D539
-  next:
-    4: 'D539 step 5 (the passed step-4 design''s fallback): u u~ g bulk at stable HPs. At hp1961 and hp1333 the uug runs blew
-      up (5/12 at hp1333), so each uug arm gets its own 16-trial DyHPO search over S''s space (sweep_config_ftmech_d539_uug_{1e4,1e5}_{off,eps1e-8}_b2048.yaml
-      @352fbb1aa), then seeds 43/44 of each chosen trial, best against best, plus kit scoring of the chosen trials'
+  next: null
   done_when: null
   notes_ref: null
   match: dsave_ftmech_*,ftmech_*
@@ -40585,10 +40582,7 @@ entries:
     units: null
     start: '2026-11-24T22:51:16+00:00'
     at: '2026-11-24T22:51:16+00:00'
-  step_waits:
-    '4': FA-ccin2p3-e592bba5 FA-ccin2p3-e187ecce FA-ccin2p3-832af449 FA-ccin2p3-9e964957 FA-ccin2p3-ff9bc41f FA-ccin2p3-a5cb84e4
-      FA-ccin2p3-d0bda2e0 FA-ccin2p3-e47ae0ca FA-ccin2p3-d3feb614 FA-ccin2p3-b6a6ded6 FA-ccin2p3-744db631 FA-ccin2p3-7d13ee6f
-      (kit scoring of the 12 uug search-set runs; then d539_kit_read.py --set u, d539_read.py --set u, figure, par:ftm_d539)
+  step_waits: {}
   handoff:
     state: '2026-11-24 ~21:30. D539 (Joaquin''s ''why are they causing a problem now''): ANSWERED and written up (results.tex
       par:ftm_d539 @6c9740c38, figs d539 + d539s): the momentum log-rescale''s compression of the massless momenta costs Z+4g
@@ -40623,14 +40617,6 @@ entries:
       data/{d539,d539s,d539_kit,d539s_kit,glu_parent_curves}.json; figs/{d539,d539s,glu_parent_curves}; sweep/sweep_config_ftmech_d539_uug_*_b2048.yaml;
       sweep/sweep_config_ftmech_zng4g_d1e3_ftglu_b128.yaml(uncommitted); seed_chunks/zng4g_ftglu_b128_s4{3,4}.txt(uncommitted)
     written: '2026-11-24T21:27:26+00:00'
-  step_why:
-    4:
-      feeds: 'D539: whether the rescale also costs u u~ g''s bulk (the process contrast); does not change the Z+ng parent
-        choice, which step 4 settled'
-      if:
-      - 'uug r<=1 or inside noise: the rescale''s bulk cost is specific to Z+4g''s many massless legs; keep it in uug-like
-        limit studies'
-      - 'uug r>1 beyond noise: the rescale costs the bulk of both processes; it stays only where the soft limit is the target'
   intent:
   - text: I asked you to investigate the problem, it's extremely obvious that this implies testing different configurations,
       it's never a question then if you should send a run or not because it changes the configuration, that's the entire point
