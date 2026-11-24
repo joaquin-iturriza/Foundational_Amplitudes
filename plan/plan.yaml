@@ -45032,7 +45032,7 @@ entries:
     - 1
   owner:
     agent: a1f4e7d170cdb83cc
-    state: working
+    state: closed
     since: '2026-11-24T19:14:58+00:00'
     state_at: '2026-11-24T19:48:04.600000+00:00'
     context: 300959
@@ -45056,3 +45056,24 @@ entries:
     member''s writing-style skill to merge): none names a repo, host, visibility or license'
   blocks: the on-cluster proof of the kit with the toy job, and publishing it
   blocks_steps: *id004
+  handoff:
+    state: 'Kit built and committed locally at ~/work/orchestrator-kit (commit 1a90637, author joaquin-iturriza, no remote,
+      no attribution). tests/test_kit.py: 19/19 pass offline (install into a temp HOME, plan CLI, guard verdicts). Scrub grep
+      (30 personal patterns, list kept outside the repo) is clean. FA untouched. Step 1 (on-cluster proof with examples/toy,
+      then publish) is HELD by the open ask: name, host, visibility, license, and a private remote for the toy. Nothing about
+      a cluster is tested yet.'
+    decisions: 'the user''s (D546): a standalone shareable kit, copied not moved, FA unchanged, no push before his go. Mine,
+      to re-justify: kept the internal config dir name ~/.config/ccorch and the ledger DB path (fewer edits); policies live
+      in projects.toml [defaults.policy] / [projects.P.policy] (gpu_cap_h, gpu_cap_scarce_h, context_close, notes_file default
+      notes.txt, opener, data_paths, prune_tools, checks_off), read by site.policy() and plan.POLICY; --allow-jeanzay renamed
+      --allow-scarce (sites.toml budget=scarce); dropped as FA-specific: hpo/plot/md/figure_pair/worktree/send_check/git_verify
+      guards, submit_guard''s data/rundir/epoch/wall/cache checks, review_weight, review_state, switch_settings, notes-editor,
+      compact-worker, tools/labllm.py with lab_llm_trial (the DeepSeek routing layer); the lab LLM ships as bin/labllm (generic
+      OpenAI-compatible client, TLS verified by default); cluster names kept in comments and in site-facts.example (public
+      facilities); verbatim quotes of the user in ~7 comments left for his call (question 6)'
+    ruled_out: 'an on-cluster proof without a remote: site env clones from projects.toml repo, so the toy needs a remote the
+      cluster can reach (question 5)'
+    running: none
+    files: '/home/joaquin/work/orchestrator-kit (README.md, install.sh, bin/site, config/*.example.toml, project/, user/,
+      tests/test_kit.py); scrub pattern list: /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/personal.pat'
+    written: '2026-11-24T19:51:11+00:00'
