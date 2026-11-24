@@ -45168,6 +45168,13 @@ entries:
       node with its reason'
     sources: 'D544 (Joaquin: move CC''s scripts to Slurm), the previous owner''s hand-off naming site env''s pip install as
       the leftover, jobs 64802032 and 64801966 on this entry, design reviewer''s FIX of 2026-11-25'
+    passed_at: '2026-11-24T23:36:03+00:00'
+    reviewer: 'Re-check after FIX: the compute node is now read from sacct NodeList (htc node, not cca*), and yes needs the
+      checkout hash to equal trunk HEAD as synced (a hash behind trunk is a no). The control is now the live stack from job
+      64801966. The code diff against site.bak-20261125-ccenv is only the login_cap block reusing run_as_job (sbatch -t 65
+      min, CCJ_PENDING exit 75 while queued). The render is 3336 bytes, confirmed. Seeds and spread do not apply (deterministic
+      tool path). Searched results.tex, plan.yaml and decisions for site env, env_script, cmd_env, login, D544, D176: only
+      the 2026-10-29 bootstrap failure and job 64802032, both cited.'
   findings:
   - at: '2026-11-24T17:31:13+00:00'
     text: 'Inventory of scripts run on CC''s login node (2026-11-24): supervisor maintain every pass (8-10 min apart): disk_watch.py
