@@ -42877,6 +42877,12 @@ entries:
     units: null
     start: '2026-11-24T08:26:34+00:00'
     at: '2026-11-24T08:26:34+00:00'
+  - batch: b_width_smokes
+    wall_h: 1.5
+    jobs: 4
+    units: null
+    start: '2026-11-24T13:55:51+00:00'
+    at: '2026-11-24T13:55:51+00:00'
   objective: 'In the conditions of Suprio''s LLM pID run (1352 trained, 139 held out; 55,296 events per process; 60,840 steps
     of 24,576 events; his target z and test metric), how a muP LLoCa does (a) after a DyHPO search, (b) scaled by muP width
     toward the LLM''s 359.6M parameters, (c) in our latest setup, against the LLM (0.321 / 0.721) and his LLoCa (0.506 / 0.953).
