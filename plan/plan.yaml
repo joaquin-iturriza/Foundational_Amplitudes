@@ -36758,8 +36758,7 @@ entries:
       target, their 1e6 test split. Searched: D507/D509/D514, entry findings and dead ends, results.tex terms d1e4, hp0078,
       D514 extension: no other extension of these searches.'
   step_waits:
-    '3': FA-ccin2p3-9f2fb2be FA-ccin2p3-8328330a and sweeps ccin2p3:tp_zng_d1e4_muon_b128_zgggg ccin2p3:tp_zng_d1e4_adam_b2048_zgggg
-      (D514 repair trials 0008-0010 each)
+    '3': FA-lxplus-8116ba56 (test scoring of Muon b128 hp0078), then d507fig --v2
   findings:
   - at: '2026-11-17T11:18:43+00:00'
     text: 'Their numbers: the UQ repo (branch uq, 311 files) holds no figures, preds or result files. arXiv:2505.20280''s
