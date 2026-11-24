@@ -39760,8 +39760,7 @@ entries:
     units: null
     start: '2026-11-24T04:06:19+00:00'
     at: '2026-11-24T04:06:19+00:00'
-  step_waits:
-    '2': '2026-11-25'
+  step_waits: {}
   handoff:
     state: '2026-11-24 ~07:00 CET. The investigation''s deciding read is done. (1) One setting at a time, b2048 (3 seeds,
       @deb1c5ee3, fig zng4g_onesetting_b2048): the momentum log-rescale (input_soft_eps) carries the settings'' scratch cost
