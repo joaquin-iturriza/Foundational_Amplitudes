@@ -44972,9 +44972,10 @@ entries:
   decisions:
   - D544
   next:
-    2: 'Close the entry: the repo-reviewer passes the code backlog holding this entry''s commits (cb7b9bbce, 9700edae4, c3b140e52,
-      660d5b7c7, 8187ec5d7, 65872c784; and ~/.local/bin/site''s login_guard/run_as_job, outside git), and the claudemd-keeper''s
-      backlog passes once 419bca13f''s owner applies its fixes; then plan done cc_login_jobs --writeup 4404e1baa'
+    2: 'Close the entry: read the site env CPU job 64806476 on CC (call site env ccin2p3 FA again; node from site run ccin2p3
+      FA -- sacct -j 64806476 -o JobID,NodeList,State,ExitCode,Elapsed) against the passed design; the code reviewer''s re-check
+      of the site-tool fixes (run_as_job stale/lost/stuck, login_guard); then plan done cc_login_jobs --writeup 4404e1baa
+      or later'
   done_when: null
   notes_ref: null
   match: cc_login_*
@@ -45285,14 +45286,15 @@ entries:
       as sites.yaml env.python/python_bin (65872c784); site env --check renders it. The design''s yes branch; the live .venv
       untouched (its interpreter still links into anaconda 3.11: a site env --rebuild ccin2p3 FA moves it to the uv Python
       when CC removes that install).'
-  step_waits:
-    '2': 2026-11-25 00:10 UTC, CC CPU job 64806476 (site env), and the repo-reviewer re-check
+  step_waits: {}
   step_why:
     2:
-      feeds: 'D544: the entry''s close'
+      feeds: 'D544: every CC script off the login node, site env included'
       if:
-      - 'both pass: plan done'
-      - 'a reviewer blocks: fix and continue the same reviewer'
+      - 'the job ends env ready, exit 0, on an htc node, checkout 6ca993c1a9, torch 2.1.2+cu118 / numpy 1.26.4: keep the change,
+        add a sentence to sec:cc_login_jobs, close after the reviewer''s PASS'
+      - 'a step fails or the hash is behind: fix the tool and rerun the same call; a step that cannot run on a compute node
+        goes back to the login node with its reason'
   handoff:
     state: 'Done but for review and close. CC''s three upkeep commands (disk watch, feeder, prune+copies) and the rebalancer''s
       CC inventory run as htc CPU jobs via site run --recurring; site run on CC refuses unlisted scripts and caps other commands
