@@ -43495,7 +43495,7 @@ entries:
   match: zz_labllm_*
   evidence:
     runs: []
-    commit: 072709c5f
+    commit: 7a28103a4
     paths:
     - analysis/lab_llm_trial/runs.jsonl
     - tests/test_lab_route.py
