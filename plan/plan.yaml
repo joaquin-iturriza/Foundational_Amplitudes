@@ -38072,10 +38072,7 @@ entries:
   - D516
   - D529
   - D539
-  next:
-    4: 'Close: once repo-reviewer aee7e3b6b89d84945 and notes-editor a5ba589f6a1247baa pass their backlogs holding this entry''s
-      commits, plan done finetune_mechanism --writeup b67c24b78 (par:ftm_zng4g dilution 1e4/1e3, par:ftm_d539 uug searched
-      + kit)'
+  next: null
   done_when: null
   notes_ref: null
   match: dsave_ftmech_*,ftmech_*
@@ -40625,12 +40622,6 @@ entries:
     another session); 2026-10-15T02:49 and 2026-10-06T00:17 (old transfer-study plan instructions, not this sentence)'
   blocks: nothing
   blocks_steps: *id001
-  step_why:
-    4:
-      feeds: the entry's close
-      if:
-      - 'both pass: plan done'
-      - 'a reviewer blocks: fix, continue that reviewer, then plan done'
 - id: llm_compare
   title: LLoCa against Suprio's LLM on the LLM amplitude catalogue
   question: In the conditions of Suprio's LLM pID run (1501 MadGraph-default processes, 1352 trained, 149 held out; 55,296
