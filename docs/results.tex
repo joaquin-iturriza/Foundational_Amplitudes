@@ -9917,6 +9917,34 @@ Scratch seed $43$ blows up at $86\%$ of its run and is read at its best checkpoi
 % claim: arms.S1k.blowup_at_pct.43=86
 % allow: 3125 128 400 16 8 1.53 42 44 2 10^3 10^4 1.9\times10^{-3} 1.9\times10^{-2} 6\times10^{-4} 6\times10^{-2} because they are the seeds, the windows' bounds and they are the design's steps, batch, epochs and trial counts, and the 10^4 residual above
 
+Dilution at $10^4$ events (D519, D520, D529). The parent trained on the 9 gluon and $Z$ processes only
+(\code{FA-ccin2p3-1f2d9ad5}, without the two settings, read at its best checkpoint before the cooldown blew up its three
+highest-multiplicity processes) gives the better fine-tune (Fig.~\ref{fig:ftm_zng4g_ftnoset}, batch $128$). At its
+search's chosen learning rate $8.89\times10^{-3}$ the three seeds reach $0.00911$, $0.00909$, $0.00935$, against
+$0.0108$, $0.0184$, $0.0141$ from the 28-process parent and $0.00887$, $0.0105$, $0.00887$ from scratch. The 9-process
+over the 28-process fine-tune is $0.65$, with a $2\sigma$ interval of $0.48$--$0.88$: dilution, by the design's rule.
+Over scratch it is $0.98$ ($0.87$--$1.10$), so the narrower parent closes the $1.53\times$ residual. None of its seeds blows up,
+and all three are still falling at the end of the run, so the comparison holds at this compute. Its chosen learning rate sits
+$0.09$ decades under the top of the window, as does scratch's.
+% src: python3 analysis/finetune_mechanism/zng4g_ftnoset_read.py 128 --cached @75d8985e4
+% claim: Fg_chosen.lr=8.89e-3
+% claim: best.Fg.0=0.00911
+% claim: best.Fg.1=0.00909
+% claim: best.Fg.2=0.00935
+% claim: best.Fn.0=0.0108
+% claim: best.Fn.1=0.0184
+% claim: best.Fn.2=0.0141
+% claim: best.S.0=0.00887
+% claim: best.S.1=0.0105
+% claim: Fg_over_Fn.r=0.65
+% claim: Fg_over_Fn.lo=0.48
+% claim: Fg_over_Fn.hi=0.88
+% claim: Fg_over_S.r=0.98
+% claim: Fg_over_S.lo=0.87
+% claim: Fg_over_S.hi=1.10
+% claim: Fn_over_S.mean=1.53
+% allow: 9 28 128 2 10^4 0.09 because they are the parents' process counts, the batch size, the interval width, the training size and the window position read from the plotted trials
+
 \begin{figure}[H]
   \centering
   \includegraphics{../analysis/finetune_mechanism/figs/zng4g_d1e3.pdf}
@@ -9961,10 +9989,11 @@ Scratch seed $43$ blows up at $86\%$ of its run and is read at its best checkpoi
   MSE$(\log|\mathcal M|^2)$ of each arm's chosen trial, seeds $42$--$44$; top right, best validation MSE against learning
   rate of each fine-tune search trial; bottom, validation MSE against the fraction of the run, per seed. Both settings:
   \code{input\_soft\_eps} and \code{input\_pair\_logs}; parent with settings: \code{FA-ccin2p3-47e14eae}; parent without
-  settings: \code{FA-ccin2p3-9a73698a}; 8-trial search: the batch-128 scratch reference used before the extended
+  settings: \code{FA-ccin2p3-9a73698a}; 9-process parent: \code{FA-ccin2p3-1f2d9ad5}, trained on the 9 gluon and $Z$
+  processes only, without the settings; 8-trial search: the batch-128 scratch reference used before the extended
   search.}
   \label{fig:ftm_zng4g_ftnoset}
-% allow: 4g 2048 128 42 44 8 2 10^4 because they are the batch sizes, the seeds, the trial count, the square of |M| and the training size
+% allow: 4g 2048 128 42 44 8 9 2 10^4 because they are the batch sizes, the seeds, the trial count, the parent's process count, the square of |M| and the training size
 \end{figure}
 
 
