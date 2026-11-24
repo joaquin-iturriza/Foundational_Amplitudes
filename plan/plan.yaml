@@ -45015,7 +45015,21 @@ entries:
       not about this kit); 2026-10-26T17:18 (settings warnings relayed from another session); 2026-11-14T04:31 (a pasted LaTeX
       template)
     blocks: the cluster proof and the publishing only
-    blocks_steps: &id004 []
+    blocks_steps: []
+  - ask: 'Scope: publishing the orchestrator kit (~/work/orchestrator-kit, built locally). (1) Name: orchestrator-kit? (2)
+      Where: your GitHub, a lab/group organisation, or the lab GitLab? (3) Private with invited colleagues, or public? (4)
+      License: MIT, Apache-2.0, or none for now? (5) May I create a private repo for the toy example so a cluster can clone
+      it for the end-to-end proof? (6) Strip the ~7 code comments quoting your chat messages and the dated cluster incidents
+      before publishing, or keep them?'
+    at: '2026-11-24T19:50:40+00:00'
+    searched: 'site decisions --project FA (D546 asks for a shareable standalone kit but names no repo, host, visibility or
+      license; the main session''s brief says publishing waits on the user), CLAUDE.md (no rule on where new repos live or
+      their license); the user''s messages sharing its terms: 2026-11-14T04:31 (a pasted SciPost LaTeX template), 2026-11-06T04:28
+      (removing worktrees and how agents work), 2026-10-26T17:18 (permission rules in settings files), 2026-11-16T20:00 (a
+      group member''s writing-style skill to merge): none names a repo, host, visibility or license'
+    blocks: the on-cluster proof of the kit with the toy job, and publishing it
+    blocks_steps: &id004
+    - 1
   owner:
     agent: a1f4e7d170cdb83cc
     state: working
@@ -45034,9 +45048,11 @@ entries:
     MIT, Apache-2.0, or none for now? (5) May I create a private repo for the toy example so a cluster can clone it for the
     end-to-end proof? (6) Strip the ~7 code comments quoting your chat messages and the dated cluster incidents before publishing,
     or keep them?'
-  waiting_since: '2026-11-24T19:46:47+00:00'
-  searched: D546 (build it, silent on hosting, visibility, license); 2026-11-16T20:00 (a writing-style skill from his group,
-    not about this kit); 2026-10-26T17:18 (settings warnings relayed from another session); 2026-11-14T04:31 (a pasted LaTeX
-    template)
-  blocks: the cluster proof and the publishing only
+  waiting_since: '2026-11-24T19:50:40+00:00'
+  searched: 'site decisions --project FA (D546 asks for a shareable standalone kit but names no repo, host, visibility or
+    license; the main session''s brief says publishing waits on the user), CLAUDE.md (no rule on where new repos live or their
+    license); the user''s messages sharing its terms: 2026-11-14T04:31 (a pasted SciPost LaTeX template), 2026-11-06T04:28
+    (removing worktrees and how agents work), 2026-10-26T17:18 (permission rules in settings files), 2026-11-16T20:00 (a group
+    member''s writing-style skill to merge): none names a repo, host, visibility or license'
+  blocks: the on-cluster proof of the kit with the toy job, and publishing it
   blocks_steps: *id004
