@@ -41074,7 +41074,6 @@ entries:
     '5': llmcmp_c_qperp_drive4 DRIVE_DONE (detach event of the driver)
     '7': FA-ccin2p3-bf23e0c4 FA-ccin2p3-b77878e1 FA-ccin2p3-f6f7179d
     '8': FA-ccin2p3-bf23e0c4 FA-ccin2p3-f6f7179d
-    '10': FA-ccin2p3-df391ea7 FA-ccin2p3-6f7904b8 FA-ccin2p3-adb54030 FA-ccin2p3-74ba6cdd
   handoff:
     state: 'Part (a) DONE: DyHPO ended (8 trials, 0 failed), best trial 5 FA-ccin2p3-c891c0c2 (lr 1.24e-3, EMA on 0.9989,
       val MSE of z 4.81e-4); scored FA-ccin2p3-037bf5e1: pooled RMSE seen 0.117, held out 1.003, relabels 0.241, new 1.767
