@@ -1219,6 +1219,11 @@ class BaseExperiment:
                         LOGGER.info(f"Early stopping at iteration {step + 1} = epoch {(step + 1) / len(self.train_loader):.1f}")
                         break
 
+                if self._reached_stop(val_loss_no_reg_now):
+                    LOGGER.info(f"STOP_AT_VAL_LOSS: val_loss_no_reg {val_loss_no_reg_now:.4g} <= "
+                                f"{self.cfg.training.stop_at_val_loss} at iteration {step + 1}")
+                    break
+
                 if self.cfg.training.scheduler == "ReduceLROnPlateau":
                     self.scheduler.step(selection_loss)
 
@@ -1932,6 +1937,12 @@ class BaseExperiment:
             g[k] = r * cs.to(r.dtype)
         return gn + 0.0 * gs
 
+    def _reached_stop(self, val_loss_no_reg):
+        """training.stop_at_val_loss: the run ends at the first validation whose val_loss_no_reg is at or below it
+        (critical_batch step 2: a trial stops once its last steps-to-target readout is crossed); null never."""
+        s = self.cfg.training.get("stop_at_val_loss", None)
+        return s is not None and val_loss_no_reg is not None and float(val_loss_no_reg) <= float(s)
+
     def _step(self, data, step):
         # actual update step
         if getattr(self, "_per_process_accum", False):
@@ -1940,6 +1951,20 @@ class BaseExperiment:
             # once); clipping, the NaN guard, the optimizer/EMA/scheduler steps below are
             # shared with the mixed-batch path and run once per iteration
             loss, loss_no_reg, mse_val = self._per_process_step_grads(data)
+        elif int(self.cfg.training.get("batch_accumulation", 1)) > 1:
+            # training.batch_accumulation k: the batch in k micro-batches, each loss at the whole batch's per-process
+            # counts (_noise_chunk_losses), backward one at a time: the gradient of the one big batch that does not fit
+            # in memory (critical_batch step 2, batch 32768 on a V100)
+            k = int(self.cfg.training.batch_accumulation)
+            self.optimizer.zero_grad()
+            loss, reg, mses = 0.0, torch.as_tensor(self._reg_term(self.model)).detach(), []
+            for lc in self._noise_chunk_losses(data, k, mse_out=mses):
+                (lc / k).backward()
+                loss = loss + lc.detach() / k
+            # the batch's mu-MSE: the chunks' event-weighted mean (None off HETEROSC, as _batch_loss)
+            mse_val = (sum(m * w for m, w in mses) / sum(w for _, w in mses)
+                       if mses and all(m is not None for m, _ in mses) else None)
+            loss_no_reg = loss - reg
         else:
             loss, loss_no_reg, mse_val = self._batch_loss(data)
             if self.ewc is not None:

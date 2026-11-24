@@ -219,3 +219,19 @@ if __name__ == "__main__":
         if k.startswith("test_"):
             f()
             print(k, "ok")
+
+
+def test_steps_to_target():
+    # validations at steps 100, 200, 300, 400; the curve crosses -2 between 200 (-1.5) and 300 (-2.5): step 250
+    import run_trial as rt
+    res = {"val_curve": [0.0, -1.5, -2.5, -3.0], "validate_every": 100}
+    assert rt.steps_to_target(res, -2.0) == 250.0
+    assert rt.steps_to_target(res, 1.0) == 100.0 and rt.steps_to_target(res, -4.0) is None
+    assert rt._objective_value({"objective": "steps_to_target", "objective_target": -2.0}, res) == 250.0
+    assert rt.steps_to_target({"val_curve": [0.0, float("nan"), -2.5], "validate_every": 100}, -2.0) == 300.0
+    try:
+        rt._objective_value({"objective": "steps_to_target", "objective_target": -4.0}, res)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("a run that never reaches the target must fail the trial")

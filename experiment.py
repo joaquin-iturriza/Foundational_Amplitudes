@@ -3007,6 +3007,8 @@ class AmplitudeExperiment(BaseExperiment):
         use_balanced = bool(self.cfg.training.get("use_balanced_sampler", False))
         self._accum_mode = self._accumulation_mode(self.cfg.training.get("per_process_accumulation", False))
         self._per_process_accum = self._accum_mode is not None
+        assert not (self._per_process_accum and int(self.cfg.training.get("batch_accumulation", 1)) > 1), \
+            "training.batch_accumulation > 1 with per_process_accumulation: _step would take the per-process path alone"
         if self._accum_mode == "round_robin":
             # arXiv:2606.23791's batching: G single-process micro-batches of B events per
             # optimizer step, processes in round-robin order; gradient = per-event mean over the
@@ -4253,11 +4255,12 @@ class AmplitudeExperiment(BaseExperiment):
         self._is_weight_cache = (edges, cvals, amp_mean, amp_std)
         return self._is_weight_cache
 
-    def _noise_chunk_losses(self, data, k):
+    def _noise_chunk_losses(self, data, k, mse_out=None):
         """base_experiment._noise_measure: the step's batch cut into k runs of consecutive events (the shuffled
         sampler's order, so random subsets), each chunk's loss the batch's own aggregation restricted to its events:
         per-process weights 1/(P n_p) counted on the whole batch, times k, plus the regularisation term, so the k
-        chunk gradients average to the batch gradient. Yields the losses one at a time (one graph alive)."""
+        chunk gradients average to the batch gradient. Yields the losses one at a time (one graph alive); a list
+        mse_out gets each chunk's (mu-MSE or None, events), for the batch_accumulation path's train mu-MSE curve."""
         if self.modelname not in ("LLOCATransformer", "LLOCAMuPTransformer", "MuPLGATr", "MuPLGATrSlim"):
             raise NotImplementedError(f"find_BS: chunked noise measurement not wired for {self.modelname}")
         agg = "mean" if self.cfg.training.loss == "HETEROSC" else self.cfg.training.get("loss_aggregation", "mean")
@@ -4274,7 +4277,9 @@ class AmplitudeExperiment(BaseExperiment):
             a0, a1 = pt[e0], pt[e1]
             chunk = (particles[a0:a1], y[e0:e1], tokens[a0:a1], order_labels[e0:e1], ptr[e0:e1 + 1] - a0,
                      process_ids[e0:e1])
-            y_pred, yc, pids, sigma, _ = self._forward_lloca(chunk)
+            y_pred, yc, pids, sigma, mse_c = self._forward_lloca(chunk)
+            if mse_out is not None:
+                mse_out.append((mse_c, e1 - e0))
             loss = self._aggregate_per_process_loss(y_pred, yc, pids, "mean", sigma=sigma, sign=self._last_sign,
                                                     full_counts=counts)
             yield k * loss + self._reg_term(self.model)   # k exactly: the chunks then average to the batch loss
