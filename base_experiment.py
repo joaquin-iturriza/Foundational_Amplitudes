@@ -1940,6 +1940,17 @@ class BaseExperiment:
             # once); clipping, the NaN guard, the optimizer/EMA/scheduler steps below are
             # shared with the mixed-batch path and run once per iteration
             loss, loss_no_reg, mse_val = self._per_process_step_grads(data)
+        elif int(self.cfg.training.get("batch_accumulation", 1)) > 1:
+            # training.batch_accumulation k: the batch in k micro-batches, each loss at the whole batch's per-process
+            # counts (_noise_chunk_losses), backward one at a time: the gradient of the one big batch that does not fit
+            # in memory (critical_batch step 2, batch 32768 on a V100)
+            k = int(self.cfg.training.batch_accumulation)
+            self.optimizer.zero_grad()
+            loss, reg = 0.0, torch.as_tensor(self._reg_term(self.model)).detach()
+            for lc in self._noise_chunk_losses(data, k):
+                (lc / k).backward()
+                loss = loss + lc.detach() / k
+            loss_no_reg, mse_val = loss - reg, None
         else:
             loss, loss_no_reg, mse_val = self._batch_loss(data)
             if self.ewc is not None:

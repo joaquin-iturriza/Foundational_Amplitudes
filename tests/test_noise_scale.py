@@ -104,3 +104,26 @@ def test_chunks_overstate_trace_under_per_process_means():
 
     assert abs(ratio(1, 512) - 1) < 0.05
     assert ratio(50, 600) > 1.5
+
+
+def test_batch_accumulation_is_the_batch_gradient():
+    # training.batch_accumulation: k micro-batches at the whole batch's counts, (chunk loss / k) backward each, give
+    # the gradient of the one batch's loss (mean over present processes of per-process means, plus L2)
+    torch.manual_seed(3)
+    lin = torch.nn.Linear(4, 1).double()
+    stub = SimpleNamespace(cfg=OmegaConf.create({"training": {"loss": "MSE"}}), n_datasets=5,
+                           _per_event_loss=lambda yp, y, sigma=None: (yp - y).square().reshape(-1))
+    n, k, lam = 40, 4, 1e-3
+    x, y = torch.randn(n, 4, dtype=torch.float64), torch.randn(n, 1, dtype=torch.float64)
+    pids = torch.randint(0, 4, (n,))   # process 4 absent
+    reg = lambda: lam * sum(p.square().sum() for p in lin.parameters())
+    agg = AmplitudeExperiment._aggregate_per_process_loss
+    lin.zero_grad()
+    (agg(stub, lin(x), y, pids, "mean") + reg()).backward()
+    g_full = [p.grad.clone() for p in lin.parameters()]
+    lin.zero_grad()
+    counts = torch.bincount(pids, minlength=5)
+    for c in torch.arange(n).chunk(k):
+        lc = k * agg(stub, lin(x[c]), y[c], pids[c], "mean", full_counts=counts) + reg()
+        (lc / k).backward()
+    assert all(torch.allclose(a, p.grad, atol=1e-10) for a, p in zip(g_full, lin.parameters()))
