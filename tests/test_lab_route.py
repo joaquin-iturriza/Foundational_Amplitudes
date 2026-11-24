@@ -12,3 +12,11 @@ def test_run_event_gets_the_lab_route():
 
 def test_no_run_event_no_route():
     assert plan.lab_route({"id": "x"}, [("E2", None, "E2  11-24 01:15 FA DONE x batch ended")]) == ""
+
+
+def test_lookup_items_checked_against_the_copy(tmp_path):
+    import labllm
+    (tmp_path / "tools").mkdir()
+    (tmp_path / "tools" / "a.py").write_text("class Foo:\n    def bar(self):\n        pass\n")
+    got = labllm.cited(str(tmp_path), "`tools/a.py:bar`\n%s/tools/a.py:Foo\ntools/a.py:baz\ntools/b.py:bar\n" % tmp_path)
+    assert got == [("tools/a.py:bar", True), ("tools/a.py:Foo", True), ("tools/a.py:baz", False), ("tools/b.py:bar", False)]

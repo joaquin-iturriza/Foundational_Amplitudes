@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Routed work for the lab's DeepSeek (D541): failed-run log reading and small tool fixes, done by deepseek-v4-flash
-through opencode in the lab_llm_trial sandbox, each result checked by a Sonnet mechanical-worker before anything is
-acked, committed or resubmitted.
+"""Routed work for the lab's DeepSeek (D541): failed-run log reading, small tool fixes and code lookups, done by
+deepseek-v4-flash through opencode in the lab_llm_trial sandbox, each result checked against its source by the agent
+that routed it (a Sonnet mechanical-worker for logs and fixes, the asker for a lookup) before it is used.
 
     python3 tools/labllm.py triage RUN [--event E<n>] [--end CLASS]   DeepSeek reads the run's log (site logs)
     python3 tools/labllm.py fix BRIEF_FILE [--test "CMD"]            DeepSeek makes the fix on a copy of HEAD; a diff
+    python3 tools/labllm.py lookup "QUESTION"                        DeepSeek answers a code lookup on a copy of HEAD
     python3 tools/labllm.py check ID --agree|--disagree --note "..."  the checker's verdict on a routed result
     python3 tools/labllm.py stats                                    routed results, checked, agreed
 
@@ -109,6 +110,45 @@ def fix(brief, test):
           "timeout or wrong: --disagree, and do the fix yourself)" % (dpath, base[:10], i))
 
 
+LOOKUP = ("Answer one question about the code in {repo} (ignore worktrees/, tests/, .venv*). Use Grep, Glob and Read "
+          "(or grep via Bash) as you normally would.\nQuestion: {q}\nReply with only the answer: one line per item, as "
+          "path/to/file.py:function_name, no explanation.\nWrite only that answer to {ans}, then stop.")   # lookup_trial's brief (e6f0ef58e), 20/20
+
+
+def cited(repo, answer):
+    """[(item, found)] for each path.py:name line: the file exists in the copy and defines name (def or class)."""
+    out = []
+    for path, name in re.findall(r"([\w./-]+\.py):(\w+)", answer.replace("`", "")):
+        f = os.path.join(repo, path.replace(repo + "/", "").lstrip("./"))
+        ok = os.path.isfile(f) and re.search(r"^\s*(async\s+)?(def|class)\s+%s\b" % name, open(f, errors="replace").read(), re.M)
+        out.append(("%s:%s" % (os.path.relpath(f, repo), name), bool(ok)))
+    return out
+
+
+def lookup(q):
+    i = rid("lookup")
+    d = lt.fresh("route_" + i)
+    repo = os.path.join(d, "repo")
+    os.makedirs(repo)
+    base = subprocess.run(["git", "-C", lt.ROOT, "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
+    subprocess.run("git -C %s archive HEAD | tar -x -C %s" % (lt.ROOT, repo), shell=True, check=True)
+    ans = os.path.join(d, "answer.txt")
+    ev, u, sec, rc, se, _ = lt.opencode(d, MODEL, LOOKUP.format(repo=repo, q=q, ans=ans), timeout=900)
+    if unavailable(u, rc, se, d):
+        log({"id": i, "kind": "lookup", "question": q, "unavailable": True, "at": time.strftime("%Y-%m-%dT%H:%M:%S")})
+        sys.exit(2)
+    a = open(ans).read() if os.path.exists(ans) else ""
+    items = cited(repo, a)
+    rec = {"id": i, "kind": "lookup", "question": q, "base": base, "answer": a[:4000], "items": items,
+           "missing": [x for x, ok in items if not ok], "seconds": round(sec, 1), "lab_tokens": u, "rc": rc,
+           "at": time.strftime("%Y-%m-%dT%H:%M:%S")}
+    log(rec)
+    print(json.dumps({k: rec[k] for k in ("id", "base", "items", "missing", "seconds")}, indent=1))
+    print("check it: read each cited function at HEAD %s (items not found in the copy are listed under missing; none "
+          "named: an empty answer); then python3 tools/labllm.py check %s --agree|--disagree --note \"...\" "
+          "(wrong, missing or empty: --disagree, and do the lookup yourself)" % (base[:10], i))
+
+
 def check(i, ok, note):
     recs = [json.loads(l) for l in open(ROUTED)] if os.path.exists(ROUTED) else []
     if not any(r.get("id") == i for r in recs):
@@ -120,7 +160,7 @@ def check(i, ok, note):
 def stats():
     recs = [json.loads(l) for l in open(ROUTED)] if os.path.exists(ROUTED) else []
     chk = {r["check"]: r["agree"] for r in recs if "check" in r}
-    for kind in ("triage", "fix"):
+    for kind in ("triage", "fix", "lookup"):
         rs = [r for r in recs if r.get("kind") == kind and not r.get("unavailable")]
         c = [chk[r["id"]] for r in rs if r["id"] in chk]
         print("%-6s routed %d, checked %d, agreed %d" % (kind, len(rs), len(c), sum(c)))
@@ -135,6 +175,7 @@ def main():
     sp = ap.add_subparsers(dest="cmd", required=True)
     p = sp.add_parser("triage"); p.add_argument("run"); p.add_argument("--event"); p.add_argument("--end", default="FAILED")
     p = sp.add_parser("fix"); p.add_argument("brief"); p.add_argument("--test")
+    p = sp.add_parser("lookup"); p.add_argument("question")
     p = sp.add_parser("check"); p.add_argument("id"); p.add_argument("--note", required=True)
     g = p.add_mutually_exclusive_group(required=True); g.add_argument("--agree", action="store_true")
     g.add_argument("--disagree", action="store_true")
@@ -144,6 +185,8 @@ def main():
         triage(a.run, a.event, a.end)
     elif a.cmd == "fix":
         fix(a.brief, a.test)
+    elif a.cmd == "lookup":
+        lookup(a.question)
     elif a.cmd == "check":
         check(a.id, a.agree, a.note)
     else:
