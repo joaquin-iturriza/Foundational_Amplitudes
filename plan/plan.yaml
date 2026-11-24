@@ -43950,6 +43950,16 @@ entries:
       disagrees or DeepSeek does not answer; cost in wall time: median 8.33 min against Sonnet''s 1.13. Cause of the error:
       the design''s outcome carried a numeric bar I set without a source and the design reviewer passed it; results.tex par:labllm2
       corrected.'
+  - at: '2026-11-24T18:37:04+00:00'
+    text: 'Cheap check of DeepSeek fixes (D545, Joaquin: ''If it can be made cheaper, then sure ... it''s not like we can''t
+      catch that mistake later''): the Sonnet mechanical-worker reads only what labllm.py prints (diff stat, diff, test failure
+      lines first then pass lines; for triage the cited log lines), agrees unless something there is visibly wrong, opens
+      no other file. Re-run as the trial''s check on the hard round''s ten saved DeepSeek-alone diffs (tools/lab_llm_trial.py
+      cheap_brief/grade_cheap, family hardcheck_cheap, same transcript count as the old check): our tokens per fix mean 41.5k,
+      median 38.2k, range 35-59k, against the full check''s median 99.1k (mean 142k) and Sonnet doing the fix itself 244k:
+      0.17 of Sonnet''s. Agreed on 10/10 (grader 10/10); it no longer flags emastart''s warm-start EMA loss, accepted by D545.
+      The routed flow (labllm.py fix and triage) now prints that material and the mechanical brief''s lab route line carries
+      the rule (keeper review pending).'
   handoff:
     state: 'Hard round done (labllm 7a28103a4, summary.json, figs/lab_llm_hard.png): all ten multi-file fixes valid after
       the sandbox fix (774147232: TMPDIR in run dir, fixcheck copies as git repos; baselines refreshed 571cf7014). First pass
