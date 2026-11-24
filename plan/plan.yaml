@@ -42120,7 +42120,22 @@ entries:
     - scripts/job_catalog_v3_short.sh
     - tests/test_noise_scale.py
   dead_ends: []
-  asks: []
+  asks:
+  - ask: 'GPU budget: about 55 GPU-h above 30 with no decision covering it. Joaquin, testing the measured noise scale against
+      batch-size runs (D532) needs, at each batch size (2048, 4096, 8192, 16384, 32768; canonical catalog_v4 WSD het setup,
+      5 epochs, lr held at its peak), the lr that reaches a target loss in the fewest steps; then steps S and events E = B
+      S to the control''s stable-phase validation loss, fit S/S_min - 1 = (E/E_min - 1)^-1, B_crit = E_min/S_min, against
+      B_simple. The lr per batch from one 8-trial DyHPO search per batch size (the CLAUDE.md rule): about 55 GPU-h (estimate:
+      1.0 s/step at 16384 on a V100, scaled with the batch). An lr-only search of 4 values per batch (about 28 GPU-h) would
+      need your yes under D241. Go for 55, 28, or neither?'
+    at: '2026-11-24T01:13:00+00:00'
+    searched: 'CLAUDE.md (DyHPO rule, D241, 30 GPU-h budget); site decisions --project FA whole for batch, lr, critical, noise:
+      D426, D507, D509, D514, D532; none approves this cost. Joaquin''s messages matched by the tool: 2026-11-14T04:31 (a
+      SciPost LaTeX template he pasted), 2026-11-16T20:00 (a writing-style skill), 2026-11-10T02:08 (uploaded slides and code):
+      none is about batch size, lr per batch or this cost'
+    blocks: step 2 (the batch-size runs); step 1 keeps going
+    blocks_steps: &id004
+    - 2
   owner:
     agent: a23c1abc4ec37fc46
     state: working
@@ -42307,3 +42322,17 @@ entries:
       regression: tr Sigma, |G|^2 within 5%, B within 7%; jackknife covers truth 37/40), arm v4_het_noise_scale. Repo-reviewer
       PASS (watermark 3c175775d) after one BLOCK (brute error bar); design PASS twice. Smoke FA-ccin2p3-6721d3c2 submitted
       (scripts/job_catalog_v3_short.sh v4_het_noise_scale smoke @0ca42577e3).'
+  ask: 'GPU budget: about 55 GPU-h above 30 with no decision covering it. Joaquin, testing the measured noise scale against
+    batch-size runs (D532) needs, at each batch size (2048, 4096, 8192, 16384, 32768; canonical catalog_v4 WSD het setup,
+    5 epochs, lr held at its peak), the lr that reaches a target loss in the fewest steps; then steps S and events E = B S
+    to the control''s stable-phase validation loss, fit S/S_min - 1 = (E/E_min - 1)^-1, B_crit = E_min/S_min, against B_simple.
+    The lr per batch from one 8-trial DyHPO search per batch size (the CLAUDE.md rule): about 55 GPU-h (estimate: 1.0 s/step
+    at 16384 on a V100, scaled with the batch). An lr-only search of 4 values per batch (about 28 GPU-h) would need your yes
+    under D241. Go for 55, 28, or neither?'
+  waiting_since: '2026-11-24T01:13:00+00:00'
+  searched: 'CLAUDE.md (DyHPO rule, D241, 30 GPU-h budget); site decisions --project FA whole for batch, lr, critical, noise:
+    D426, D507, D509, D514, D532; none approves this cost. Joaquin''s messages matched by the tool: 2026-11-14T04:31 (a SciPost
+    LaTeX template he pasted), 2026-11-16T20:00 (a writing-style skill), 2026-11-10T02:08 (uploaded slides and code): none
+    is about batch size, lr per batch or this cost'
+  blocks: step 2 (the batch-size runs); step 1 keeps going
+  blocks_steps: *id004
