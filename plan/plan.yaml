@@ -43962,6 +43962,18 @@ entries:
       0.17 of Sonnet''s. Agreed on 10/10 (grader 10/10); it no longer flags emastart''s warm-start EMA loss, accepted by D545.
       The routed flow (labllm.py fix and triage) now prints that material and the mechanical brief''s lab route line carries
       the rule (keeper review pending).'
+  - at: '2026-11-24T18:59:01+00:00'
+    text: 'Token share of the lab-routed work (Joaquin: ''how many tokens should I expect to save by off loading these tasks'';
+      tools/token_share.py @15fae9da7, analysis/lab_llm_trial/token_share.json): over 2026-11-09..23 UTC (14 days before the
+      route) we spent 8497M tokens (input+output+cache read+cache write; $3535 list price): owners 56.9%, main session 28.2%,
+      other agents 8.8%, reviewers 5.2%, all mechanical workers 0.8%, Explore 0.2% (half the lookup trial''s own). Routed
+      kinds: tool-fix workers 37 tasks, 17.2M (0.20%), expected saving 14.0M = 0.16% (41.5k cheap check per fix + 10% redone
+      by Sonnet); code lookups 0 (none of the 9 production Explore agents was a trunk code lookup: results notebook, web,
+      other repo, transcripts); failed-log reads: 136 owner reads in RUN-event turns, log residency 10.6M, read phase (logs
+      call to first non-read action) 57M (0.67%), whole event turn 440M; log-reading workers 5, 1.3M. Under the current rule
+      (owner still reads the log) routing adds a ~38k check per event: -3.9M (-0.05%); if owners act on the checked reading,
+      saving 7-53M (0.08-0.63%). Total expected saving now ~0.1%, at most ~0.8% if owners stop rereading; the spend sits in
+      owners'' and the main session''s large contexts.'
   handoff:
     state: 'Hard round done (labllm 7a28103a4, summary.json, figs/lab_llm_hard.png): all ten multi-file fixes valid after
       the sandbox fix (774147232: TMPDIR in run dir, fixcheck copies as git repos; baselines refreshed 571cf7014). First pass
