@@ -43560,6 +43560,34 @@ entries:
       tokens per fix at most 0.3x Sonnet''s: route multi-file fixes too. No: list which tasks fail and how (no edit, wrong
       file, partial change, tool errors, timeouts) from the transcripts, keep hard fixes on Sonnet, try the plan arm''s detail
       as the adaptation. Lookups yes: at least 9/10 in each run: route code lookups to DeepSeek; no: keep them on Explore.'
+    fix_at: '2026-11-24T14:20:44+00:00'
+    fix: '(1) Matched control, lookups: the control arms of analysis/agent_redesign/lookup_trial.json were not Sonnet: their
+      transcripts (e.g. grep agent aab31975b2c4d2264, grep2 agent a38f9c02fd235303d) ran claude-opus-5-5 as low-effort Explore.
+      Name the control as what it is, and restrict it to the plain grep and grep2 arms (two runs per question, which also
+      matches your two DeepSeek runs); the lsp, graph and batch arms are the dead ends D505 dropped and serve only as evidence
+      that the grade moves. (2) Matched grading, lookups: the control was scored by tools/lookup_trial.py correct() (commit
+      e6f0ef58e, also at f59de61d5 in wt-graphify): every expected file:function named and, for the who-calls questions, no
+      non-test .py outside the allowed set, with the keys in its TASKS. Your new key built from ''Sonnet answers graded correct''
+      with set equality is a different grader from the one the control was scored with. Score DeepSeek''s answers with that
+      same correct() and its TASKS keys (import it at that commit or copy it verbatim with its source named), no new key file.
+      (3) Prior search incomplete: docs/results.tex does have the model trial (''Which model for small tool fixes'', around
+      line 17686, src tools/model_trial.py report @d30cb3aa: Sonnet vs Opus low, 9/10 first pass each, 10/10 after rework),
+      and the agent_redesign entry holds it as a dead end; the prior says none was found under ''model trial''. Also name
+      tools/lookup_trial.py (e6f0ef58e) as the existing lookup grader. (4) Seeds against spread: one run per task matches
+      round one and D213 (''10 runs is enough''), but state the spread: on 10 tasks at a pass rate near 0.8 the binomial sd
+      is about 1.3 tasks per arm (about 1.8 on a difference of two arms), so ''within one task of Sonnet'' is under the noise;
+      say the hard-fix verdict is indicative at this size, read paired per task (which tasks each arm fails), and give the
+      Wilson interval (model_trial.wilson) beside each pass count. (5) Stated differences between arms: the Sonnet mechanical-worker
+      runs unsandboxed in a git worktree at the fix''s parent, so the later fix commit is reachable in its history (git log/show
+      trunk), and it has our hooks and rules; the DeepSeek arms get a git-archive copy with no history. Either state this
+      difference as part of the question and check the Sonnet transcripts for reads of later commits (a run that read the
+      fix is listed apart), or give Sonnet an archive copy too. (6) The saving question (D530 ''I expect this to save a ton
+      of tokens'') under the route D541 chose (''route ... to DeepSeek with Sonnet checking''): DeepSeek alone shows 0 of
+      our tokens because the Sonnet check of its work is not counted. Say the saving excludes that check, or add one Sonnet
+      check per DeepSeek hard fix as D541''s route has it and count its tokens. Everything else holds: the 10 tasks are the
+      10 largest validated extension fixes (non-test changes 35-87 lines, all lines 76-156, against round one''s 12-65), the
+      plan arm answers D530''s designer-executor idea, qwen dropped per D541, no GPU work, ordering reads its outputs (re-validation
+      before lab runs, plans before plan arm).'
   step_waits:
     '2': the 10 timed Sonnet mechanical-worker fix agents (analysis/lab_llm_trial/sonnet_timed.json), graded by tools/lab_llm_trial.py
       sonnet_timed
