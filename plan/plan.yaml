@@ -37944,11 +37944,12 @@ entries:
     - FA-lxplus-e8d15505
     - FA-lxplus-fad6ff57
     - FA-lxplus-fbdf6bc6
-    commit: d972272d7
+    commit: 9fc114a6e
     paths:
     - analysis/finetune_mechanism/data/restart_steps.json
     - analysis/finetune_mechanism/data/restart_summary.json
     - analysis/finetune_mechanism/data/zng4g_snap_read.json
+    - analysis/finetune_mechanism/figs/zng4g_d1e3.png
     - analysis/finetune_mechanism/parent_rerun_check.py
     - analysis/finetune_mechanism/plot_parent_rerun.py
     - analysis/finetune_mechanism/plot_restart.py
