@@ -1,0 +1,15 @@
+# finetune_mechanism (D519/D520/D529): the finale's 28 processes (recipes/transfer_finale.yaml) cut to the 8 with a
+# final-state gluon, the pretraining closest to q q~ -> Z+4g, plus e+e- -> Z Z so a massive neutral vector (the child's Z,
+# encoded by its properties, use_PIDs false) is in it as in the 28 (ee_ZZ, ee_ZH); 9 processes, pools and event counts as in the finale. Parent of
+# the dilution test (H2): only the recipe differs from the no-settings finale parent (job_datasaving_parent.sh finale recipe=...).
+sampling: {mode: mixture}
+processes:
+  - {name: udbar_Wg, sqrts: [85, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_Wgg, sqrts: [85, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_Wggg, sqrts: [85, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_uug, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_uugg, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_bbbarg, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_bbbargg, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_enug, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_ZZ, sqrts: [192, 1000], n_train: 100000, n_val: 10000, n_test: 10000}

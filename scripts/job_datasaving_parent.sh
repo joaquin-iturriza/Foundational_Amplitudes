@@ -36,7 +36,8 @@
 # at 6; beams first in every pool; the two LO targets add 4-particle pools). Run dir
 # runs/data_saving/dsave_parent_<which>[_<tag>]. lr=<value> replaces the default lr, HPO rule 2's centre 1e-2 (T/3000)^-0.55
 # (at the law 7.82114e-3 (T/17056)^-0.55, 1.88e-2, both r3 parents diverged near step 900-1000, 2026-11-11). iters=<n>
-# replaces T (a smoke run, D395). flags=off sets the finale's two input settings off (input_soft_eps 0, input_pair_logs 0).
+# replaces T (a smoke run, D395). recipe=<path under the checkout> replaces the case's recipe (finetune_mechanism's
+# dilution parent: recipes/transfer_finale_gluon.yaml). flags=off sets the finale's two input settings off (input_soft_eps 0, input_pair_logs 0).
 # (the finale case sets 7: its parent is fine-tuned on q qbar -> Z+4g, 2->5; pairs past an event's multiplicity are zero)
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
@@ -48,8 +49,8 @@ case "$WHICH" in finale) T=64000; LR=3.78e-3; SUB=null
 PARENT="runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262"
 RECIPE="$PROJECT_DIR/recipes/catalog_v4_datasaving_parent_${WHICH}.yaml"
 [ "$WHICH" = finale ] && RECIPE="$PROJECT_DIR/recipes/transfer_finale.yaml"
+TAG=; ARGS=(); for x in "$@"; do case "$x" in tag=*) TAG="_${x#tag=}";; lr=*) LR="${x#lr=}";; flags=off) FIX=("${FIX[@]/#++model.input_soft_eps=*/++model.input_soft_eps=0.0}"); FIX=("${FIX[@]/#++model.input_pair_logs=*/++model.input_pair_logs=0}");; iters=*) T="${x#iters=}";; recipe=*) RECIPE="$PROJECT_DIR/${x#recipe=}";; *) ARGS+=("$x");; esac; done
 [ -e "$RECIPE" ] && [ -e "$PROJECT_DIR/$PARENT/config.yaml" ] || { echo "no $RECIPE or $PARENT/config.yaml"; exit 2; }
-TAG=; ARGS=(); for x in "$@"; do case "$x" in tag=*) TAG="_${x#tag=}";; lr=*) LR="${x#lr=}";; flags=off) FIX=("${FIX[@]/#++model.input_soft_eps=*/++model.input_soft_eps=0.0}"); FIX=("${FIX[@]/#++model.input_pair_logs=*/++model.input_pair_logs=0}");; iters=*) T="${x#iters=}";; *) ARGS+=("$x");; esac; done
 OUT="$PROJECT_DIR/runs/data_saving/dsave_parent_${WHICH}${TAG}"
 # WSD: also save the pre-cooldown model (with its optimizer state) at T x (1 - wsd_cooldown_frac), for snapshot restarts
 if [[ " ${FIX[*]} ${ARGS[*]} " == *" training.scheduler=WSD "* ]]; then
