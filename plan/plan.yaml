@@ -42668,6 +42668,10 @@ entries:
   - text: I don't care if you run that test or not, just get it done
     said_at: '2026-11-22T14:38:13.043000+00:00'
     at: '2026-11-24T11:23:25+00:00'
+  - text: I believe I already told you multiple times that I don't care about individual jobs failing, and that each run that
+      diverges shouldn't wake you and it's owning agent up.
+    said_at: '2026-11-24T10:33:58.174000+00:00'
+    at: '2026-11-24T11:23:35+00:00'
 - id: lab_llm_trial
   title: Lab LLMs in place of some subagents
   question: Can the lab's LLMs (deepseek-v4-flash, qwen3.8-27b via lpnllm) do some of our subagent work (mechanical steps,
