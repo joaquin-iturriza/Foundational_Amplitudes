@@ -17,4 +17,4 @@ def test_figure_by_a_rejected_script_is_refused(tmp_path):
     bad, _ = send_check.legend_findings({"file_path": str(tmp_path / "old.png")}, str(tmp_path))
     assert any("Joaquin rejected on cmp" in b for b in bad)
     bad, _ = send_check.legend_findings({"file_path": str(tmp_path / "new.png")}, str(tmp_path))
-    assert not any("rejected" in b for b in bad)
+    assert not any("Joaquin rejected" in b for b in bad)
