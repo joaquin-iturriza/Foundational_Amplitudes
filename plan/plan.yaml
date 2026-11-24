@@ -38073,7 +38073,8 @@ entries:
   - D529
   - D539
   next: null
-  done_when: null
+  done_when: 'git merge-base --is-ancestor ae083a6ab $(cut -d'' '' -f1 .claude/.review_state/notes-editor) && grep -q ''claim:
+    Fg1k/Fn1k.r=1.31'' docs/results.tex && grep -q ''label{fig:ftm_d539u}'' docs/results.tex'
   notes_ref: par:ftm_zng4g
   match: dsave_ftmech_*,ftmech_*
   evidence:
