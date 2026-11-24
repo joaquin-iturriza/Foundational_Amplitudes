@@ -44900,10 +44900,15 @@ entries:
     - cc_login_jobs
   decisions:
   - D544
-  next: 'Read the CC maintain jobs over >= 3 supervisor passes since 18:32 with tools/ccjob_lag.py (task output bbmrvsqcm):
-    same lines and exit codes as the login runs, result age <= one pass + 10 min, no command skipped two passes in a row,
-    .disk_full under 30 min old at each feed read, no new MAINTAIN event; and one real prune.py run in the job with its PRUNE
-    lines appended to ~/.local/share/ccorch/artifacts/FA/prune/ccin2p3.jsonl'
+  next:
+    1: 'Read the CC maintain jobs over >= 3 supervisor passes since 18:32 with tools/ccjob_lag.py (task output bbmrvsqcm):
+      same lines and exit codes as the login runs, result age <= one pass + 10 min, no command skipped two passes in a row,
+      .disk_full under 30 min old at each feed read, no new MAINTAIN event; and one real prune.py run in the job with its
+      PRUNE lines appended to ~/.local/share/ccorch/artifacts/FA/prune/ccin2p3.jsonl'
+    2: 'CC now refuses ''module load Programming_Languages/anaconda/3.11'', which sites/sites.yaml line 11 uses for FA''s
+      CC env (seen by the orchestrator_kit proof). From a CPU job: does FA''s activate on CC error or only warn, does the
+      live .venv still import torch, what would ''site env ccin2p3 FA'' do on a rebuild; fix sites.yaml so a rebuild works
+      with a module CC still offers, live venv untouched unless broken'
   done_when: null
   notes_ref: null
   match: cc_login_*
@@ -45028,6 +45033,11 @@ entries:
       if:
       - 'all bounds hold: write-up in docs/results.tex and plan done'
       - 'flag over 30 min or two skipped passes: disk_watch and the feeder in one job (flag right before the feed)'
+    2:
+      feeds: whether FA's CC environment survives a rebuild after CC's module change (D544's CC setup)
+      if:
+      - 'live venv works, only the rebuild breaks: fix sites.yaml''s module line and verify with sites/setup.sh --verify'
+      - 'live venv broken: rebuild it on the new module, smoke one job, report to Joaquin'
 - id: orchestrator_kit
   title: 'Standalone shareable kit: main session as orchestrator of subagents, jobs on several clusters'
   question: Can the general machinery behind our setup (the site tool for multi-cluster submission, sync, placement and copy;
