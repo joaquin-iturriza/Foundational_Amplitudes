@@ -5,10 +5,9 @@ CPU job (scripts/job_delete_debris.sh), never on a login node. Classes, each re-
   mmap     amp_mmap_cache keys in MMAP format 2 (current code reads only data_mmap.MMAP_VERSION), kept if any live
            slurm job of the user names the key in its stdout (cache_guard.site_users)
   scratch  the scratch run dirs the probe tools left in $SCRATCH (tempfile.mkdtemp prefixes below), older than --scratch-days
-  joblogs  loose scheduler logs (*.out, *.err) in the checkout root older than --log-days whose job id is not queued and
-           that hold no result line (RUN_SUMMARY, RESULT_JSON: analysis/catalog_v4/size_figs.py reads the root's
-           catalog_v3_short_*.out RUN_SUMMARY lines)
-Writes the manifest (class, apparent bytes, path) to --manifest before deleting anything, then deletes and prints the
+Scheduler logs (*.out in the checkout root) are never deleted here: committed analyses parse them (ws_objective_check.py,
+cited as % src: in docs/results.tex; size_figs.py), so they are evidence, not debris (design review 2026-11-25).
+A class whose listed total exceeds 2x its expected size (--expect-gib) is skipped and reported. Writes the manifest (class, apparent bytes, path) to --manifest before deleting anything, then deletes and prints the
 apparent GiB per class. --dry-run lists only.
     python tools/delete_debris.py --manifest $SCRATCH/zz_cc_disk/deleted.tsv [--dry-run]
 """
@@ -29,13 +28,6 @@ NAMED = ["zz_v3_smoke_Q_62382593", "zz_v3_smoke_Q_62382608", "zz_v3_smoke_baseli
          "zz_probe_long_w8_62932622"]
 NAMED += [n + ".recipe.yaml" for n in NAMED if n.startswith("zz_v3_smoke_")]
 SCRATCH_PREFIXES = ("zeroshot_", "signed_ab_", "kshot_", "rebuild_", "f24net_run_", "kitprec_", "evalbest_")
-JOBID = re.compile(r"_(\d{7,9})\.(out|err)$")
-RESULT_LINES = (b"RUN_SUMMARY", b"RESULT_JSON")
-
-
-def holds_result(p):
-    with open(p, "rb") as f:
-        return any(m in f.read() for m in RESULT_LINES)
 
 
 def apparent(p):
@@ -51,13 +43,7 @@ def apparent(p):
     return t
 
 
-def queued():
-    r = subprocess.run(["squeue", "-h", "-u", os.environ["USER"], "-o", "%i"], capture_output=True, text=True,
-                       timeout=120, check=True)
-    return {j.split("_")[0] for j in r.stdout.split()}
-
-
-def candidates(scratch, project, scratch_days, log_days):
+def candidates(scratch, scratch_days):
     from data_mmap import MMAP_VERSION
     from cache_guard import site_users
     now = time.time()
@@ -75,26 +61,28 @@ def candidates(scratch, project, scratch_days, log_days):
         for e in it:
             if e.name.startswith(SCRATCH_PREFIXES) and now - e.stat(follow_symlinks=False).st_mtime > scratch_days * 86400:
                 yield "scratch", e.path
-    live = queued()
-    with os.scandir(project) as it:
-        for e in it:
-            m = JOBID.search(e.name)
-            if (m and e.is_file(follow_symlinks=False) and m.group(1) not in live
-                    and now - e.stat().st_mtime > log_days * 86400 and not holds_result(e.path)):
-                yield "joblogs", e.path
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--manifest", required=True)
     ap.add_argument("--scratch-days", type=float, default=3.0)
-    ap.add_argument("--log-days", type=float, default=14.0)
+    ap.add_argument("--expect-gib", default="smoke=1.4,mmap=4.8,scratch=2.2",
+                    help="the inventory's apparent GiB per class (FA-ccin2p3-b949c4ee); a class listing over 2x is skipped")
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
-    scratch, project = os.environ["SCRATCH"], os.environ["PROJECT_DIR"]
-    rows = [(c, apparent(p), p) for c, p in candidates(scratch, project, a.scratch_days, a.log_days)]
+    scratch = os.environ["SCRATCH"]
+    rows = [(c, apparent(p), p) for c, p in candidates(scratch, a.scratch_days)]
     for c, _, p in rows:      # every path is a direct child of SCRATCH, of its mmap cache root, or of the checkout
-        assert os.path.dirname(p) in (scratch, project, os.path.join(scratch, "amp_mmap_cache")), p
+        assert os.path.dirname(p) in (scratch, os.path.join(scratch, "amp_mmap_cache")), p
+    expect = {k: float(v) for k, v in (x.split("=") for x in a.expect_gib.split(","))}
+    listed = {}
+    for c, b, _ in rows:
+        listed[c] = listed.get(c, 0) + b
+    over = {c for c, b in listed.items() if b / 2 ** 30 > 2 * expect.get(c, 0)}
+    for c in sorted(over):       # the 2x margin rule: a class far above what was approved is a finding, not deleted
+        print("SKIPPED %s: listed %.2f GiB, over 2x the expected %.2f" % (c, listed[c] / 2 ** 30, expect.get(c, 0)))
+    rows = [r for r in rows if r[0] not in over]
     with open(a.manifest, "w") as f:
         for r in rows:
             f.write("%s\t%d\t%s\n" % r)
