@@ -44808,3 +44808,5 @@ entries:
       login_cap, projects.toml login_scripts). Nested sbatch from an htc job through the gate works (job 64793196 submitted
       64793203, which ran on ccwslurm0031, NESTED_OK). First supervisor jobs: disk_watch 64793199 and feed_capped 64793200
       waited 18-21 s in the htc queue and ran ~1 s (tools/ccjob_lag.py).'
+  step_waits:
+    '1': '2026-11-24T22:30 (UTC): >= 3 passes and CC''s next real prune'
