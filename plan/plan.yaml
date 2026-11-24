@@ -38052,10 +38052,6 @@ entries:
       run dir to lxplus; drive ftmech_zng4g_ftglu_b128 (1e4, 16 trials) and ftmech_zng4g_d1e3_ftglu_b128 (16 trials on [1.9e-3,1.9e-2]
       @8e0482ffb) together; then extend the D=1e3 one as its siblings (extend_sweep.py --low 6e-4 --high 6e-2, config edited
       to window [6.0e-4,6.0e-2], n_trials 24, waves +[3,3,2]) and 8 more; then seeds 43/44 of each chosen trial'
-    3: 'D539: why the momentum log-rescale (input_soft_eps 1e-8) raises Z+4g scratch 2.07x at b2048 while it helped uug''s
-      limits and bulk: (1) what the two settings bought (kit_benchmark D374/D392 records), (2) the b2048 test at hp1961 (eps
-      scan 1e-4/1e-2/1, massless-only rescale, off; Z+4g and uug at 1e4 and 1e5 events, 3 seeds) plus the kit hard-bin scoring
-      of the uug runs; read with figures'
     4: 'D539 follow-up: the data-size and uug contrast at a stable setup. hp1961 (lr 2.8e-2) blew up Z+4g 1e5 off and all
       uug runs; redo Z+4g 1e5, uug 1e4, uug 1e5 (off and eps1e-8, 3 seeds) plus the Z+4g 1e4 pair as link, all at the no-rescale
       scratch b2048 search''s chosen HPs, read with the 12 uug kit hard-bin scorings of step 3; design + review first'
@@ -40467,10 +40463,6 @@ entries:
     at: '2026-11-24T14:20:54+00:00'
   step_waits:
     '2': detached ftmech_glu_drive (both gluon-parent fine-tune searches, 32 trials; its end posts an event)
-    '3': FA-ccin2p3-0918062d FA-ccin2p3-1ee479cf FA-ccin2p3-dd70d180 FA-ccin2p3-faab6c78 FA-ccin2p3-8b209762 FA-ccin2p3-e4e1cd56
-      FA-ccin2p3-28ebe295 FA-ccin2p3-fda4f5d8 FA-ccin2p3-8af63c94 FA-ccin2p3-f562fe47 FA-ccin2p3-53ea523f FA-ccin2p3-ac28ce01
-      FA-ccin2p3-c9d78b1f FA-ccin2p3-bfce7d54 FA-ccin2p3-2b2f8505 FA-ccin2p3-49028220 FA-ccin2p3-f5422b66 FA-ccin2p3-426dd488
-      FA-ccin2p3-2a97ba03 FA-ccin2p3-918e9e20 FA-ccin2p3-fe745f7c
     '4': FA-ccin2p3-f5422b66 FA-ccin2p3-426dd488 FA-ccin2p3-2a97ba03 FA-ccin2p3-918e9e20 FA-ccin2p3-fe745f7c
   handoff:
     state: '2026-11-24 ~15:45. Step 1 done: D=1e3 Fn1k/S1k 0.486 [0.454,0.522] (results.tex 9fc114a6e, fig zng4g_d1e3). Step
@@ -40501,15 +40493,6 @@ entries:
       if:
       - 'hi<1: dilution yes (at 1e4 with Fg/S<=1: the residual is dilution)'
       - 'lo>0.65 and hi>=1: no dilution of the needed size; next the b128 instability'
-    3:
-      feeds: 'Joaquin''s W-parent question (D539): keep, change or drop the log-rescale in the parent'
-      if:
-      - 'cost gone with massless-only and uug unhurt: the rescale''s distortion of the Z''s mass is the cost; parent keeps
-        the rescale on massless momenta only'
-      - 'cost falls with eps toward off and uug at 1e4 also pays: compression costs where data is scarce; eps is a trade-off
-        read against the limit gains'
-      - 'cost only at 1e4 on both processes, not at 1e5: a data-size effect; the parent''s value depends on the fine-tune''s
-        D'
     4:
       feeds: 'D539: whether the rescale''s Z+4g cost is a small-data effect and why it helped uug (parent input settings for
         later Z+ng fine-tunes)'
