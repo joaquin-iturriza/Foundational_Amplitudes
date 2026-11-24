@@ -40549,6 +40549,12 @@ entries:
     units: null
     start: '2026-11-24T22:27:19+00:00'
     at: '2026-11-24T22:27:19+00:00'
+  - batch: zng4g_d1e3_ftglu_seeds
+    wall_h: 0.5
+    jobs: 2
+    units: null
+    start: '2026-11-24T22:35:41+00:00'
+    at: '2026-11-24T22:35:41+00:00'
   step_waits:
     '2': FA-ccin2p3-2865c27d FA-ccin2p3-1f850218 (1e4 gluon-parent seeds 43/44 of hp1998; then read Fg/Fn and Fg/S at 1e4
       with 2-sigma)
