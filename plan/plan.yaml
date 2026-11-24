@@ -44984,6 +44984,12 @@ entries:
     units: null
     start: '2026-11-24T14:35:28+00:00'
     at: '2026-11-24T14:35:28+00:00'
+  - batch: delete_debris
+    wall_h: 1.0
+    jobs: 1
+    units: null
+    start: '2026-11-24T23:50:05+00:00'
+    at: '2026-11-24T23:50:05+00:00'
   step_why:
     1:
       feeds: which CC data is deleted to free /sps/lpnhe (D542)
