@@ -38373,9 +38373,9 @@ entries:
     blocks_steps: &id001 []
   owner:
     agent: a275e674e217bc7c6
-    state: working
+    state: stopped
     since: '2026-11-24T21:40:14+00:00'
-    state_at: '2026-11-24T21:40:14+00:00'
+    state_at: '2026-11-24T21:52:19.090000+00:00'
   findings:
   - at: '2026-11-20T03:05:23+00:00'
     text: '2026-11-20 step 1 read (restart_steps.py, plot_restart.py @a5f6c7b3; figs restart_steps, restart_steps_zng, restart_headstart):
@@ -40816,9 +40816,9 @@ entries:
     - 10
   owner:
     agent: a1b829d3ccca1f915
-    state: working
+    state: stopped
     since: '2026-11-24T14:04:31+00:00'
-    state_at: '2026-11-24T21:39:16.152000+00:00'
+    state_at: '2026-11-24T21:44:54.601000+00:00'
     context: 209885
     context_at: '2026-11-24T21:40:01+00:00'
   step_why:
