@@ -17747,6 +17747,34 @@ entries:
       not heteroscedastic_loss) followed a batch.py crash on a one-file def lookup, fixed 4e7f3858 (grep -H). Step 27 recall:
       dead end recorded (figure recall_trial.png). graphify install refused again by the auto-mode classifier after Joaquin''s
       approval (''Unauthorized Access''; the first attempt, chained with a commit, ''Undermining Oversight'').'
+  - at: '2026-11-24T11:12:40+00:00'
+    text: '2026-11-24 D534 diagnosis (main transcript 71602535, 11-22..24; plan.yaml; runs.db events; ~/.local/bin/site*).
+      Five structural causes behind the ten cases: (R1) Joaquin''s intent and corrections have no home: the ledger records
+      only approve/hold/scope decisions and by policy never a correction; a correction becomes a global rule, a finding, or
+      stays in the main session''s memory; owner_brief renders decision quotes, not corrections or reference files (wrong
+      figure 11-23: Suprio''s file not in the brief; 11-24: the correction sat in a finding, the main''s brief named the rejected
+      layout ac_controls_score and control_score.py still drew it; generation: 16x8 shards inherited from a hand-off as settled).
+      (R2) The only lever is a global rule, so each correction adds a counter-rule to a gating rule instead of fixing the
+      gate (D395 smoke vs never hold on a smoke; 30 GPU-h confirm vs never hold on a budget ask; scope ''inputs/target is
+      my call'' vs investigation configs are its work; capacity rule checks ''fits one wave'', never ''earliest finish'');
+      per owner ~34 KB of rules (CLAUDE.md 19.6k, ~/work 4.7k, step_prompt 9.6k) plus 14.4 KB / 20 checks in the design reviewer
+      and 33 registered hooks (7.1k lines); in a conflict agents take the conservative branch, ask or wait. (R3) A hold costs
+      nothing and is invisible: plan ask/wait hold with no clock; 11-22 17:14 the main itself held the one-setting test as
+      Joaquin''s call (''nothing more runs until you answer'') and then answered ~20 wakes ''nothing new'' until 11-23 15:11
+      (22 h); llm_compare search ~13 h behind smoke and budget asks; part (c) chained behind part (a). Live now: critical_batch
+      step 2 behind a 55 GPU-h ask (since 01:13), zng_uq_benchmark stage 2 behind a 136 GPU-h ask (since 11-20), llm_compare
+      part (b) behind a hold question. (R4) Routing is per run, not per result: any non-clean end is a RUN event for the owner,
+      every owner event wakes the main first, and the main relays the owner''s hand-back unless it starts ROUTINE: (E8530
+      lr 7e-3 divergence -> owner -> E8531 -> Joaquin 09:47). (R5) ''Done'' is claimed from intent or unit tests, not from
+      the live path: 11-24 10:46 ''a run that stops on divergence is now acked ... opens no event'' while the worker handed
+      back at 11:38 (E8533) and the running supervisor (pid 837861, started 11-23 20:18:38) caches site_runends.py on first
+      use (_rx), so the 11:37 change is not live; 11-23 15:21 plan ask/wait refusals ''being built'' never built nor withdrawn;
+      site probe_site reports lxplus DOWN ''no live ssh master (2FA)'' from master_alive alone without trying ssh, which the
+      main relayed as ''needs your 2FA'' (23:40); 5a3fafd99 answered it with a regex on the main''s prose. (R6) The main sends
+      results with no check against the entry''s record (wrong plot twice, ''untuned'', three seeds never asked). Narrow additions
+      since 11-22: 775dae8cd, 19ea38ab4 (duplicates step_prompt 5''s first sentence), 72bef3992, bc31d324d, a55ab3c16, 5a3fafd99,
+      5ae992f9 are counter-rules or prose checks the four parts make redundant; 064d9e5d8 (diff a named run''s config) is
+      a one-answer check, kept, better run by plan design as a tool; 3015b27e1 is a check repair, kept.'
   handoff:
     state: '2026-11-19. Steps 26, 27, 29 trial ran (design passed by the design-reviewer after two FIXes; scorer 3531dc6e,
       item-line repair 61005cc0 in worktrees/wt-graphify). Results in the finding of 2026-11-19 (lookup_trial.json). Left:
