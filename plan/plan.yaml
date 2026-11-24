@@ -40534,6 +40534,7 @@ entries:
       with 2-sigma)
     '4': detached ftmech_d539_uug_drive (4 uug searches, 64 trials; its end posts an event), then seeds 43/44 of each chosen
       trial
+    '5': detached drive ftmech_glu_d1e3_ext (pid 3821100, log ~/.local/share/ccorch/detached/20261124-224830_ftmech_glu_d1e3_ext.log)
   handoff:
     state: '2026-11-24 ~21:30. D539 (Joaquin''s ''why are they causing a problem now''): ANSWERED and written up (results.tex
       par:ftm_d539 @6c9740c38, figs d539 + d539s): the momentum log-rescale''s compression of the massless momenta costs Z+4g
