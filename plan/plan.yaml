@@ -43107,6 +43107,103 @@ entries:
       the estimate to Joaquin; or (b) any width whose bound exceeds what you are willing to charge gets the 80G memory floor
       like the others (same GPU class as its smoke, so its smoke rate applies directly; this is a placement on measured memory
       class, not a model pin). State which, with the resulting limits, in the recorded design. Nothing else needs to change.'
+  - at: '2026-11-24T14:18:14+00:00'
+    question: 'Part (b), D522 + D537 (''we wait for the HPs to then run the wider network, we got them, then start the runs''):
+      in part (a)''s conditions (catalog_daniel_train 1352 processes, first 55,296 train events each, val 1e4, 60,840 steps
+      of 24,576 events mixed across processes, his target z, plain MSE, AdamW constant lr after warmup, sweep/sweep_config_llmcmp_a_adamw_const.yaml
+      @e27b4a5e7), does widening our muP LLoCa along its width axis model.net.num_heads, at part (a)''s best HPs unchanged
+      (trial 5 hp1163, FA-ccin2p3-c891c0c2: training.lr 1.2437236e-3, regularization_lambda 1.1230077e-10, cosanneal_warmup_frac
+      0.16348669, ema true, ema_decay 0.99893151; muP carries lr across width, HPO rule 1), lower the pooled test RMSE of
+      log|M|^2, seen and held out, toward or below the LLM (0.321 / 0.721) and his LLoCa (0.506 / 0.953)? Widths 16, 32, 64,
+      120 heads (8 blocks, attn_reps 8x0n+2x1n; parameters counted on CPU with models.lloca.LLOCAMuPTransformer: 8 heads 1.61M
+      = trial 5''s log 1,608,404; 16: 6.34M; 32: 25.2M; 64: 101M; 120: 354M, the LLM''s 359.6M within 1.5%). Launch path.
+      (1) Smokes (D395: a width is a config not yet run end to end): one per width, scripts/job_config_smoke.sh -- sweep/sweep_config_llmcmp_a_adamw_const.yaml
+      50 <trial 5 HPs> model.net.num_heads=H [model.net.checkpoint_blocks=true at 64 and 120], all with --hdr=--gpu-min-mem=80G
+      --hdr=--mem=64G --hdr=--time=02:00:00 (so peak memory and s/step are read on an 80 GB-class GPU; on CC the site tool
+      now cuts the partition list to gpu_h100 for that floor, e27b4a5e7 + ~/.local/bin/site gpu_partitions), placed by site
+      pick; each gives s/step (log ''avg ...s/iter''), peak GPU memory (''GPU RAM information: max_used''), the models/ bytes
+      per parameter and a test stage with plots. Wall target b_width_smokes 1.5 h, 4 jobs, <= 6 GPU-h. (2) Memory path keeping
+      mixed-process batches of 24,576 (no per_process_accumulation: it would make the micro-batches single-process): checkpoint_blocks
+      (compute only, recomputes block activations) and a GPU-memory floor per width set from its smoke''s peak: peak < 30
+      GB runs on any GPU (no floor); < 75 GB gets --gpu-min-mem=80G (CC H100 NVL 94 GB, Jean Zay A100-80GB, lxplus whole GPUs
+      >= 80 GB); 8 heads measured 13.6 GB (trial 5''s log), and activations grow about linearly with heads, hence checkpoint_blocks
+      from 64 heads. If a width does not fit 80 GB with checkpoint_blocks, plain gradient accumulation over mixed micro-batches
+      (new code, with a test that its gradient equals the full batch''s under loss_aggregation mean, and a repo review) is
+      written then, before its run; it is not built now because 120 heads is estimated at ~40-50 GB with checkpointing (8
+      stored block inputs of ~1.3 GB each at 1920 channels x ~1.7e5 particles plus one block''s activations). (3) Full runs:
+      one per width, seed 42, sweep/trial_job.sh --detached --hp-idx 1163 --t-steps 60840 with trial 5''s --hp list plus model.net.num_heads=H
+      (and checkpoint_blocks where set), through the same run_trial.build_command as trial 5, laid out by site pick in one
+      wave with each width''s floor. (4) Scoring: scripts/job_llm_score.sh REREAD per width (seen 1352 x 1e4, held out 139
+      x 1e4), figure in Suprio''s held-out layout (analysis/llm_compare/heldout_per_process.py, one marker per width plus
+      trial 5 and the LLM), pooled numbers from control_score.py. The batch''s GPU-h (smoke s/step x 60,840 per width, on
+      the GPU each width is allowed) goes to Joaquin before the runs if above 100 (D536). The same widening at part (c)''s
+      best HPs is its own design once part (c)''s search ends (step 8).'
+    prior: 'Searched docs/results.tex, plan show llm_compare and site decisions --project FA for: width, num_heads, muP, scale-up,
+      wider, parameters, 359.6M, grow. (i) par:v4_width (results.tex l.2487, catalog_v4, het loss, 4264 steps, template base
+      HPs at every width, one lr under muP, seeds 42/43, width 8/16/32): R = median over classes of MSE(width k)/MSE(width
+      8): width 16 PP4 0.565, EE4 0.562, held out default-sampled 0.660; width 32 PP4 0.370, EE4 0.374, held out 0.528 ([0.490,
+      0.572]); one-loop H5 classes do not move (0.839 at 32). So width lowers both trained and held-out MSE at fixed HPs under
+      muP, the held-out gain smaller. (The FIX note quoted 0.642 / 0.552; the paragraph''s own numbers are 0.660 / 0.528.)
+      This design differs: Daniel''s catalog, his target z and plain MSE, 60,840 steps (14x longer), widths up to 120. (ii)
+      par:v4_warm_start_grow (l.2940): width 16 from scratch against width 8 on the same catalog_v4 cells, R(B/A) 0.565 on
+      PP4, 0.562 on EE4; growing a width-8 model is a different method (warm start), not used here. (iii) Part (a) of this
+      entry (par:llmcmp_a @c13ca0b0e): searched 8-head LLoCa pooled RMSE seen 0.117, held out 1.003 (relabels 0.241, new 1.767);
+      LLM 0.321 / 0.721; tuning moved held out inside the seed margin. (iv) Phase-1 pretraining width scaling nh 4-32 (fig:phase1scaling):
+      loss falls with width at fixed compute fits. (v) catalog_v2 width 8 -> 16 at 1000 steps: within noise (results.tex ~l.13172),
+      a short horizon. (vi) HPO rule 1: lr transfers across width under muP. No run at 64 or 120 heads anywhere; no width
+      run on Daniel''s catalog.'
+    measure: 'Pooled test RMSE of log|M|^2 = sqrt(mean over test events of (prediction - truth)^2), tools/llm_score.py, per
+      set: seen (1352 x 1e4), held out (139 x 1e4, the run''s shared affine statistics), relabels (96) and new (43) apart;
+      median per-process MSE beside it; each run read at its best checkpoint (lowest val_loss_no_reg, EMA applied). Smokes:
+      s/step, peak GPU memory, models/ bytes per parameter, a completed test stage and plots.'
+    check: 'Width moves a held-out MSE of this kind on existing data: par:v4_width, held-out default-sampled class-median
+      MSE ratio 0.660 at 16 heads and 0.528 at 32 heads against width 8 (bootstrap [0.490, 0.572] at 32), and 0.565 / 0.370
+      on the trained test splits, at fixed muP HPs; at 4x width the held-out ratio 0.528 = 1.9x, above the 1.38 seed margin,
+      so the expected effect is resolvable with one seed. On part (a)''s data the 8-head model is not saturated on trained
+      processes (val MSE of z 4.81e-4, seen RMSE 0.117 against held out 1.003). The catalog_v2 1000-step doubling within noise
+      was a 1000-step horizon, not 60,840.'
+    fixed: 'Every key of trial 5''s composed config except: model.net.num_heads (16/32/64/120), model.net.checkpoint_blocks
+      (true at 64 and 120; compute only), exp_name/run_name/run_dir/result_path (paths). Key-by-key diff of the composed width
+      config (python run.py local=none <fixed_params> <trial 5 HPs> num_heads=H ... --cfg job, as run_trial.build_command)
+      against runs/llmcmp_a_adamw_const/trial_1163/config.yaml read from CC 2026-11-24: besides those keys only (a) runtime-filled
+      keys (data.dataset, data.amp_orders filled from the recipe at init_data; warm_start_idx null -> 0 and run_idx set at
+      run time, as trial 5''s) and (b) code-version drift, both inert: BS_finding.* sub-keys (read only under find_BS, false
+      in both) and model.input_soft_massless_only false (read only when input_soft_eps != 0; 0.0 in both). per_process_accumulation
+      false, accumulation keys as trial 5 (unused). Held: catalog_daniel_train recipe, train_subsample 55296, eval_subsample
+      10000, batch 24,576 mixed across processes, 60,840 steps, validation every 3042, target z (shared + affine multiplicity
+      std), MSE, mean aggregation, AdamW, WSD with no cooldown, trial 5''s lr/L2/warmup/EMA, float32 + tf32, seed 42, 8 blocks,
+      attn_reps 8x0n+2x1n, particle_encoder_hidden 0, use_PIDs false, alphas_input true. Resources (not setup): GPU-memory
+      floor per width from its smoke (none if peak < 30 GB, else 80G), --mem 64G as the part (a) config. Disk: checkpoint
+      22 bytes/parameter (trial 5''s model_run0_best.pt.gz 36 MB at 1.61M), so ~0.15 / 0.56 / 2.3 / 7.9 GB at 16/32/64/120
+      heads plus ~25 MB of plots each (~11 GB in all), replaced by each smoke''s measured bytes; checked against df of the
+      target site at submission (CC /sps/lpnhe 15 GB free now, under its 60 GB floor: 64 and 120 go where the disk is, lxplus
+      EOS, or our own debris on CC is freed first). Wall: CC QOS gpu max 7 days (sacctmgr), lxplus nextweek 7 days, Jean Zay
+      A100 20 h; per width --time = smoke s/step x 60,840 x 1.3 (validation, test, plots), on the slowest GPU it may land
+      on. A width with no floor (likely 16 heads, ~27 GB predicted) may land on a CC V100, where TF32 is absent, so the 8-head
+      V100/H100 ratio 3.9 alone can under-state its V100 time; its limit is max(3.9 x its H100 smoke s/step, 1.06 s x FLOPs(H)/FLOPs(8
+      heads)) x 60,840 x 1.3, capped at CC''s 7 days (FLOPs per step proportional to the muP parameter count at fixed tokens:
+      16 heads 6.34M/1.61M = 3.94, so the bound is >= 4.18 s/step, 60,840 x 4.18 x 1.3 = 92 h), and the GPU-h estimate to
+      Joaquin counts that V100 bound for it (option (a) of the 2026-11-24 FIX); a width whose bound exceeds 7 days gets the
+      80G floor instead, its own smoke rate applying; a width whose wall exceeds a site''s limit is not placed there. By the
+      FLOP estimate 120 heads is ~40-100 h on an H100, inside CC''s and lxplus''s 7 days, so no width needs a resume; if a
+      smoke gives > 150 h for a width, its resume path (run_trial''s warm_start_idx/increment_steps fidelity resumption, which
+      reloads model, optimizer and scheduler) is checked end to end in its own smoke before that width goes.'
+    control: 'Part (a)''s trial 5 itself (8 heads, FA-ccin2p3-c891c0c2, scored by FA-ccin2p3-037bf5e1: seen 0.117, held out
+      1.003, relabels 0.241, new 1.767): same data, steps, HPs and metric; each width is read against it, and against the
+      LLM and his LLoCa (his events, said with every comparison).'
+    seeds: 'One seed (42) per width, as trial 5. Margin: the conservative per-class seed spread 10^0.14 = 1.38 in MSE (docs/results.tex
+      no_b.heldout.mse.v4_seed_spread ~l.4485), the margin used by step 5 for part (c).'
+    outcome: 'Yes (width helps): the held-out MSE (RMSE^2) of the widest width that trained cleanly is below trial 5''s by
+      more than 1.38x and falls with width; then the comparison to the LLM is read at matched parameters (120 heads). No:
+      every width within 1.38x of trial 5: in these conditions parameter count does not close the held-out gap, against D522''s
+      expectation. Seen and held out read apart (width may lower seen only). Worse: a width above trial 5 by more than 1.38x
+      on seen or held out means muP lr transfer failing at that width or the run not training (read its curves first); reported
+      as such, and an HPO at that width is Joaquin''s call, never started by me. Between margins (a ratio inside 1.38x either
+      way with a monotone trend): one seed does not settle it; a seed-43 pair at that width is Joaquin''s call (step 5''s
+      rule), never an added seed. A run that blows up is listed apart at its best checkpoint. Smokes pass when each width
+      logs 50 steps, a test stage and plots without OOM; a width that does not fit is fixed (floor, checkpoint_blocks, then
+      the mixed accumulation code) before the batch; the batch''s measured GPU-h goes to Joaquin before submission if above
+      100 (D536).'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
