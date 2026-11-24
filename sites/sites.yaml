@@ -8,7 +8,11 @@
 ccin2p3:
   env:
     kind: venv
-    python: module load Programming_Languages/anaconda/3.11
+    # CC denies Programming_Languages/anaconda/3.11 since 2026-11 and offers no 3.11 module; torch 2.1.2 has no cp313
+    # wheels, so the venv bootstraps from our own CPython 3.11.7 (uv, under /sps), the live stack reproduced in CPU job
+    # 64802032 (plan entry cc_login_jobs)
+    python: 'module load Programming_Languages/python/3.13.7 && { test -x /sps/lpnhe/jiturrizaramirez01/python/cpython-3.11.7-linux-x86_64-gnu/bin/python3.11 || ( U=$(mktemp -d) && python3 -m venv $U && $U/bin/pip install -q uv && UV_PYTHON_INSTALL_DIR=/sps/lpnhe/jiturrizaramirez01/python $U/bin/uv python install 3.11.7; r=$?; rm -rf $U; exit $r ); }'
+    python_bin: /sps/lpnhe/jiturrizaramirez01/python/cpython-3.11.7-linux-x86_64-gnu/bin/python3.11
   project_dir: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
   sweep_dir:   /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/sweeps
   scratch:     /sps/lpnhe/jiturrizaramirez01/tmp
