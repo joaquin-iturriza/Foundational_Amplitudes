@@ -40101,9 +40101,10 @@ entries:
   - D527
   - D528
   next:
-    2: 'Waves 2 and 3 of the DyHPO search (driver llmcmp_a_drive4; wave 1: trial 0 lr 1.03e-3 EMA on val 4.89e-4, trial 1
-      lr 3.20e-3 val 9.41e-3, trial 2 lr 8.92e-3 EMA on val 1.55e-2): the driver suggests and submits them itself and writes
-      DRIVE_DONE'
+    2: 'Part (a) wave 3 running on CC (driver llmcmp_a_drive6, log ~/.local/share/ccorch/detached/20261123-205657_llmcmp_a_drive6.log):
+      trial 6 FA-ccin2p3-b135e7db (hp1723, lr 1.03e-3, val MSE of z 1.31e-3 at 08:40) and trial 7 FA-ccin2p3-f3e29e87 (hp0836,
+      lr 1.03e-3, 1.07e-3 at 09:00); 6 of 8 observed, best trial 5 FA-ccin2p3-c891c0c2 (lr 1.24e-3) 4.81e-4; the driver writes
+      DRIVE_DONE when both end'
     3: Score the best trial and the control (job_llm_score.sh), figure of pooled RMSE seen/held out (and truly held out, relabels)
       against LLM 0.321/0.721 and his LLoCa 0.506/0.953, per-process MSEs as dan_per_process.py; write-up in docs/results.tex
     5: 'Part (c) readout: when llmcmp_c_qperp''s driver writes DRIVE_DONE and its control ends, score (c)''s best trial and
@@ -40237,7 +40238,7 @@ entries:
     2:
       feeds: 'part (a): the best tuned trial'
       if:
-      - 'search ends: score the best trial, figure and write-up'
+      - 'search ends: score the best trial, figure and write-up (step 3)'
       - 'a trial breaks: read its log, fix, --retry-failed'
     3:
       feeds: 'part (a) answer: tuned vs matched control vs LLM'
