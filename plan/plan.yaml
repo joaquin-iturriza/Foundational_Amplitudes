@@ -40560,6 +40560,12 @@ entries:
     units: null
     start: '2026-11-24T22:35:41+00:00'
     at: '2026-11-24T22:35:41+00:00'
+  - batch: d539_uug_search_kit
+    wall_h: 0.1
+    jobs: 12
+    units: null
+    start: '2026-11-24T22:51:16+00:00'
+    at: '2026-11-24T22:51:16+00:00'
   step_waits:
     '4': FA-ccin2p3-bf8f110f FA-ccin2p3-3548cfd1 FA-ccin2p3-567697b8 FA-ccin2p3-25a02ae7 FA-ccin2p3-8183bacd FA-ccin2p3-54ecdfb2
       FA-ccin2p3-c14d613a FA-ccin2p3-0dbf95e3 (uug seeds 43/44 of the 4 searches' chosen trials, 1e4 off/eps then 1e5 off/eps;
