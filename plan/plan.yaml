@@ -43860,7 +43860,7 @@ entries:
       batch-size runs'', passes up to 100 GPU-h; the 55 GPU-h DyHPO-per-batch version goes ahead'
   owner:
     agent: a584754ef924cc459
-    state: working
+    state: closed
     since: '2026-11-24T14:04:24+00:00'
     state_at: '2026-11-24T14:17:19.097000+00:00'
     context: 278197
@@ -44321,39 +44321,42 @@ entries:
       (B_brute 84+-9, 28.2+-1.4, 28+-6, 39+-5; chunk/brute tr Sigma 1.16-1.29) are unchanged. Figure y range now set by rule
       (3x max of batch and the 16-batch B + se), windows above it at the edge.'
   handoff:
-    state: 'Step 1 done: B_simple read and written up (docs/results.tex sec:noisescale, c2ab3154a; noise_read.py @33bcd0b45).
-      Step 2 (batch-size scan) goes ahead under the budget Joaquin''s D536 rule change allows (coordinator: work a decision
-      names, D532 ''its validation against batch-size runs'', up to 100 GPU-h; site item critical_batch est 55 GPU-h set;
-      budget question withdrawn). Design recorded 2026-11-24T13:46 got FIX from the design reviewer: (1) equal-epoch horizons
-      T_B = 4264*16384/B make the schedule move with B (validate_frac spacing, warmup frac, horizon-law lr centre), so S_B
-      would grow ~1/B from the schedule alone; fix: one step schedule at every B (warmup in steps, same constant-lr stable
-      phase, validation every fixed ~85 steps or finer, horizon long enough for the targets at the largest B), best trial
-      chosen on the read quantity (steps to target / stable-phase loss at fixed steps), not the final post-cooldown loss;
-      (2) the 10% flat band is at the noise level: control vs noise-scale run (same HPs, seed) first crossings 935/935, 1870/1955,
-      2635/2975 steps at targets -1.66/-2.08/-2.30; set bands from that spread or drop the 75% target; more seeds per B would
-      be Joaquin''s call; (3) read step rates at 2048/4096/8192 (per-step overhead does not shrink with B) and re-cost; (4)
-      state disk per trial, memmap cache key/sharing, free disk; (5) say the 2048-16384 sweeps do not wait on the 32768 accumulation
-      smoke. Repo-reviewer (ac9677801a836098a, lock held) BLOCKed branch cbs_accum on the lr window: Muon sweeps must not
-      use HPO rule 2''s horizon law (fa-canonical-setup); use the template''s Muon window [1.667e-3, 1.5e-2] at every B; the
-      accumulation code itself checked correct; minors: mse_val None on the accumulation path (no train mu-MSE curve at 32768),
-      assert batch_accumulation>1 not combined with per_process_accumulation, D536 cites agent_redesign in the ledger. NEXT:
-      revise the design once (plan design), re-run the design reviewer, fix the configs in worktrees/wt-cbs-accum (lr window,
-      schedule in steps, validate_every_n_steps, horizon), continue the repo-reviewer ac9677801a836098a with the fix commit,
-      merge, D395 smoke of the 32768 accumulation path (only the 32768 sweep waits on it), site pick FA --jobs 40, base_config
-      run dir present on the chosen site (site copy), plan target, submit all sweeps (--item critical_batch, sweeps cbs_*).'
-    decisions: 'Joaquin''s: D532 (the work incl. validation against batch-size runs); D536 as relayed by the coordinator (budget
-      up to 100 GPU-h for named work; the ledger lists D536 under agent_redesign, confirm the covering decision before submission).
-      Mine: base_config = the run dir runs/catalog_v4_short/v4_het_control_wsd (the canonical setup itself, no re-listing
-      of inherited settings; reason: the control is the setup); batch 32768 via training.batch_accumulation=2 (exact gradient;
-      16384 is the V100 limit, sec:envelope; never pinned to H100); one 8-trial DyHPO per batch (D426: batch never searched
-      with lr; batch is a fixed axis per sweep); B set 2048-32768 (B<1397 processes leaves most processes absent per batch;
-      B near B_simple~50 is not runnable).'
-    ruled_out: equal-epoch horizons per B (schedule confounds B); horizon-law lr centres for Muon sweeps
-    running: none
-    files: 'worktrees/wt-cbs-accum (branch cbs_accum: 9a2b1c9a0 batch_accumulation + test, 72acea4a9 sweep/sweep_config_cbs_b*.yaml);
-      analysis/critical_batch/noise_read.py; analysis/critical_batch/data/*.json; noise_scale.py; docs/results.tex sec:noisescale;
-      worktrees/wt-critbatch (merged, remove at close)'
-    written: '2026-11-24T13:51:52+00:00'
+    state: 'Step 2 (batch-size scan, D532 under the D536 100 GPU-h rule) is partly submitted under a design passed 2026-11-24T14:25
+      (plan show critical_batch). Code merged into trunk at f3705b316 (repo-reviewer PASS on cbs_accum at 8de829f32 and on
+      the trunk backlog at f7b0f16ab). On CC-IN2P3, 26 jobs 64775729-64775754 are queued: cbs_b2048 all 8, plus waves 1-2
+      (6 each) of cbs_b4096, cbs_b8192, cbs_b16384; first start ~17 h out (CC queue). Their limits were lowered with scontrol
+      to 3:27/2:27/1:56/1:41, the configs at b8d7de880 (1.18x the estimated need, so the batch''s summed limits plus the smoke,
+      99.6 GPU-h, stay under D536''s 100 as the site gate counts them; item estimate 99.6). The smoke of the 32768 accumulation
+      path runs on lxplus: sweep cbs_smoke_b32768, Condor 13231065.0 under DAGMan 13231064.0 (step 2 waits on it; not in site
+      runs, so no RUN_DONE: check it with site status lxplus / the sweep dir). FIRST: (a) the repo-reviewer ac9677801a836098a
+      re-checks cbs_read.py fix 7fcd56bcb (lr-edge rule applied, ratio only S(2048)/S(32768)), which the trunk backlog review
+      was blocked on: read its verdict, fix if BLOCK. (b) When the smoke ends: read its log (training, STOP_AT_VAL_LOSS at
+      the first validation, train mu-MSE on the accumulation path, RESULT_JSON, plots). Then generate + submit sweep cbs_b32768
+      on lxplus (site run lxplus FA --item critical_batch --timeout 1500 -- python sweep/generate_sweep.py --config sweep/sweep_config_cbs_b32768.yaml
+      --submit, through tools/detach.py: the 280 s default timeout cut the first smoke try). Then submit the 6 wave-3 CC jobs
+      the gate refused (site run ccin2p3 FA --item critical_batch -- python sweep/sweep_manager.py submit sweeps/cbs_b4096
+      sweeps/cbs_b8192 sweeps/cbs_b16384; it skips submitted scripts), and lower their limits to 2:27/1:56/1:41 (the scripts
+      on CC carry the old 3:15/2:30/2:15). Record cbs_b32768 with plan run --sweep lxplus:cbs_b32768. (c) Wave 1 gives the
+      real step rates at batches 2048-8192: compare with the model (0.12 s + 0.86 s x B/16384 per step, 5 s per validation)
+      and raise the limits of pending trials if the margin is short, within 100 GPU-h. Readout (step 1): collect each trial''s
+      result.json plus its training.lr into {batch: [dict with hp_idx, lr, val_curve, validate_every]}, then python3 analysis/critical_batch/cbs_read.py
+      <trials.json>; a trial that timed out has no result.json, so its crossings are read from its log.'
+    decisions: 'Joaquin''s: D532 (the work, incl. validation against batch-size runs); D536 (the budget rule: work a decision
+      names passes up to 100 GPU-h, live CLAUDE.md line 50, an uncommitted working-copy edit). Mine, to re-justify: one step
+      schedule at every batch, horizons 34112/17056/8528/4264/4264 (32768 at 4264 so its targets fall before the cooldown);
+      targets fixed from the control (-1.66/-2.08/-2.30); DyHPO objective steps to -2.08; trials stop at -2.30; band 20% on
+      S(2048)/S(32768) from the 10% replicate spread; time limits 1.18x the need, to fit the gate''s 100 GPU-h of limits;
+      placement 4 sweeps CC + 32768 on lxplus per site pick (Jean Zay unreachable); site sync with --allow-dirty past others''
+      uncommitted files (a sync ships commits only).'
+    ruled_out: equal-epoch schedules per batch (the schedule moves with B); horizon-law lr centres for Muon sweeps; 1.5x time
+      limits (131 GPU-h of limits, over D536's 100 as the gate sums them)
+    running: CC-IN2P3 jobs 64775729-64775754 (sweeps cbs_b2048, cbs_b4096, cbs_b8192, cbs_b16384, pending); lxplus smoke cbs_smoke_b32768
+      (Condor DAG 13231064.0, trial 13231065.0)
+    files: sweep/sweep_config_cbs_b{2048,4096,8192,16384,32768}.yaml and sweep/sweep_config_cbs_smoke_b32768.yaml (limits
+      b8d7de880); analysis/critical_batch/cbs_read.py (7fcd56bcb); sweep/run_trial.py steps_to_target; base_experiment.py
+      batch_accumulation, _reached_stop; analysis/critical_batch/data/*_result.json (control and noise-scale run); worktrees/wt-cbs-accum
+      and worktrees/wt-critbatch (merged; remove with scripts/remove_worktree.sh at close)
+    written: '2026-11-24T14:52:14+00:00'
 - id: cc_disk
   title: What uses disk on CC and what can be deleted
   question: 'What is using the disk on CC (checkout runs/sweeps, datasets, memmap caches, scratch, MG5 work dirs), against
