@@ -38334,9 +38334,9 @@ entries:
     decision: D539
   owner:
     agent: aa696ba79c8f66f6d
-    state: working
+    state: stopped
     since: '2026-11-24T08:11:35+00:00'
-    state_at: '2026-11-24T13:47:34.286000+00:00'
+    state_at: '2026-11-24T14:06:01+00:00'
     context: 257269
     context_at: '2026-11-24T14:03:01+00:00'
   findings:
