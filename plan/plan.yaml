@@ -38636,6 +38636,17 @@ entries:
       -> 0.19/0.060/0.107 (-4.52), collinear 38.8/29.2/27.3 -> 3.8/11.4/25.8 (-0.41), bulk 0.0115/0.0066/0.0061 -> 0.0094/0.0042/0.0097
       (+0.15). The rescale''s u u~ g soft-limit gain (D374) reproduces in this setup by 4.5-5 decades; the bulk and collinear
       moves are inside the seed spread. Read from blown-up runs: stability rerun at hp1333 designed (step 4).'
+  - at: '2026-11-24T19:50:24+00:00'
+    text: '2026-11-24 D539 step 4 read (d539_read.py --set s, d539_kit_read.py --set s @c3c6f9516; fig d539s, caption OK;
+      results.tex par:ftm_d539 @6c9740c38). All at hp1333 (no-rescale search optimum, lr 2.03e-2), seeds 42-44, best val MSE(log|M|^2):
+      Z+4g 1e4 off 0.0679/0.0702/0.0620, eps1e-8 0.163/0.155/0.139, r 2.28 [2.03,2.57]; Z+4g 1e5 off 0.0052/0.0052/0.0078,
+      eps1e-8 0.0125/0.0125/0.0119, r 2.07 [1.57,2.71]; no Z+4g blow-up. Curves: at 1e4 both arms flat after 25% (25%->best:
+      off -7..-15%, eps -2..-9%); at 1e5 both still falling at the end (best at 100%, 3x below their 25% value), ratio steady
+      over the run (s42 2.57/2.26/2.40 at 25%/50%/end): fixed-compute read, the converged gap not measured. -> design branch
+      (b): the compression costs Z+4g''s bulk at 1e4 and 1e5, not a small-data effect. uug: 5/12 blow up again (off 1e4 s42/s44,
+      1e5 s43/s44; eps 1e4 s42), bulk r 0.91 [0.39,2.12] (1e4), 1.02 [0.37,2.83] (1e5) unresolved; kit deepest bins (seed
+      medians, eps over off): soft -3.16 dec (1e4) / -4.46 (1e5), bulk +0.12/+0.07, collinear +0.25/+0.02 (noise). Parent
+      for Z+ng fine-tunes: without the rescale (Fn/S 0.35 at b2048, 0.486 at D=1e3).'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
