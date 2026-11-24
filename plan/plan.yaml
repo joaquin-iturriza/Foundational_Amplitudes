@@ -40489,7 +40489,7 @@ entries:
   step_waits:
     '2': FA-ccin2p3-b135e7db FA-ccin2p3-f3e29e87
     '3': llmcmp_a_drive5
-    '5': FA-ccin2p3-d34535b0 and the DONE event of llmcmp_c_qperp_drive (DRIVE_DONE)
+    '5': llmcmp_c_qperp_drive4 DRIVE_DONE (detach event of the driver)
     '6': FA-ccin2p3-48e43133
     '7': FA-ccin2p3-bf23e0c4 FA-ccin2p3-b77878e1 FA-ccin2p3-f6f7179d
   handoff:
