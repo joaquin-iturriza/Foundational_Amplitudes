@@ -340,6 +340,42 @@ def grade_sonnet(task, agent):
     print(json.dumps({k: r[k] for k in ("task", "arm", "first_pass", "seconds", "our_tokens")}))
 
 
+
+CHECK = ("Check one fix made by another model (lab LLM trial; the routed flow's check, D541). The copy is %s, its base "
+         "commit %s is the code before the fix. Read the change whole: git -C %s diff %s (committed and uncommitted). "
+         "The defect it had to fix, as it was seen:\n%s\nIts check is the test file(s) %s, handed over in their fixed "
+         "version and not to be edited. Run them from inside the copy with %s <file> when the file has a __main__ runner, else with that python -m "
+         "pytest -q <file> (in tests/test_setup_scenarios.py the scenarios "
+         "named 'PLAN_TEST=1 with a root outside the temp directory is refused' and 'the migration marks the setup's "
+         "own entries setup' fail for reasons outside the fix and are not counted). Decide whether the change fixes the "
+         "defect correctly with nothing wrong in it you would refuse in a commit. Edit nothing, commit nothing. Write "
+         "only {\"agree\": true|false, \"note\": \"<why, one or two sentences>\"} to %s with one bash heredoc, then end.")
+
+
+def check_brief(task, arm):
+    """The Sonnet check of one DeepSeek hard fix: its brief, printed (the copy as the arm left it)."""
+    c, tests, _ = mt.TASKS[task]
+    repo = os.path.join(SCR, "fix_%s_%s" % (task, arm), "repo")
+    base = subprocess.run(["git", "-C", repo, "rev-list", "--max-parents=0", "HEAD"], capture_output=True,
+                          text=True, check=True).stdout.strip()
+    print(CHECK % (repo, base, repo, base, HARD[task], " ".join(tests), mt.PY,
+                   os.path.join(SCR, "check_%s_%s.json" % (task, arm))))
+
+
+def grade_check(task, arm, agent):
+    """The check's verdict against the grader's, and the checker's tokens (our cost of routing that fix)."""
+    from lab_llm_report import transcript
+    v = json.load(open(os.path.join(SCR, "check_%s_%s.json" % (task, arm))))
+    fx = [r for r in (json.loads(l) for l in open(REC)) if r.get("family") == "hardfix" and r["task"] == task
+          and r["arm"] == arm][-1]
+    sec, tok = transcript(agent)
+    r = {"family": "hardcheck", "task": task, "arm": arm, "agent": agent, "agree": bool(v["agree"]),
+         "note": v.get("note", ""), "grader_pass": fx["final_pass"], "matches_grader": bool(v["agree"]) == fx["final_pass"],
+         "seconds": round(sec, 1), "our_tokens": tok}
+    record(r)
+    print(json.dumps({k: r[k] for k in ("task", "arm", "agree", "matches_grader", "our_tokens")}))
+
+
 # ---------------------------------------------------------------- triage family
 DIVERGED = re.compile(r"Training diverged.*?at step (\d+)")
 ASSERT = re.compile(r"^AssertionError: ?(.*)$", re.M)
@@ -487,7 +523,7 @@ def sonnet_timed():
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["cases", "smoke", "fix", "fixcheck", "briefs", "grade_sonnet", "lookup", "triage", "_grade", "report", "sonnet_timed"])
+    ap.add_argument("cmd", choices=["cases", "smoke", "fix", "fixcheck", "briefs", "grade_sonnet", "check_brief", "grade_check", "lookup", "triage", "_grade", "report", "sonnet_timed"])
     ap.add_argument("args", nargs="*")
     ap.add_argument("--plan")
     a = ap.parse_args()
@@ -504,6 +540,10 @@ def main():
             briefs(t)
     elif a.cmd == "grade_sonnet":
         grade_sonnet(a.args[0], a.args[1])
+    elif a.cmd == "check_brief":
+        check_brief(*a.args)
+    elif a.cmd == "grade_check":
+        grade_check(*a.args)
     elif a.cmd == "fixcheck":
         for t in a.args:
             fixcheck(t)

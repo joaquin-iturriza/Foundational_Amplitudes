@@ -9,6 +9,10 @@
    "our_tokens_per_task": 0,
    "lab_tokens_per_task": 64065,
    "passed_by_class": {
+    "time_limit": [
+     2,
+     2
+    ],
     "error": [
      6,
      6
@@ -16,10 +20,6 @@
     "diverged": [
      22,
      22
-    ],
-    "time_limit": [
-     2,
-     2
     ]
    },
    "hand_ok": 30
@@ -33,6 +33,10 @@
    "our_tokens_per_task": 0,
    "lab_tokens_per_task": 52877,
    "passed_by_class": {
+    "time_limit": [
+     2,
+     2
+    ],
     "error": [
      6,
      6
@@ -40,10 +44,6 @@
     "diverged": [
      22,
      22
-    ],
-    "time_limit": [
-     2,
-     2
     ]
    },
    "hand_ok": 29
@@ -94,6 +94,285 @@
    "minutes_median": 3.78,
    "our_tokens_per_task": 297195,
    "lab_tokens_per_task": 0
+  }
+ },
+ "hardfix": {
+  "sonnet": {
+   "n": 10,
+   "passed_first": 10,
+   "passed_final": 10,
+   "minutes_per_task": 2.71,
+   "minutes_median": 1.14,
+   "our_tokens_per_task": 243586,
+   "lab_tokens_per_task": 0,
+   "per_task": [
+    {
+     "task": "valtotal",
+     "first": true,
+     "min": 0.95,
+     "ours": 256807,
+     "lab": 0
+    },
+    {
+     "task": "emastart",
+     "first": true,
+     "min": 1.05,
+     "ours": 211842,
+     "lab": 0
+    },
+    {
+     "task": "alphapow",
+     "first": true,
+     "min": 1.14,
+     "ours": 245460,
+     "lab": 0
+    },
+    {
+     "task": "statssrc",
+     "first": true,
+     "min": 1.1,
+     "ours": 228038,
+     "lab": 0
+    },
+    {
+     "task": "topsampling",
+     "first": true,
+     "min": 1.12,
+     "ours": 259882,
+     "lab": 0
+    },
+    {
+     "task": "massconv",
+     "first": true,
+     "min": 0.8,
+     "ours": 234138,
+     "lab": 0
+    },
+    {
+     "task": "inflight",
+     "first": true,
+     "min": 3.69,
+     "ours": 134038,
+     "lab": 0
+    },
+    {
+     "task": "backlogdepth",
+     "first": true,
+     "min": 6.15,
+     "ours": 348130,
+     "lab": 0
+    },
+    {
+     "task": "recheck",
+     "first": true,
+     "min": 5.61,
+     "ours": 275255,
+     "lab": 0
+    },
+    {
+     "task": "endedrun",
+     "first": true,
+     "min": 5.5,
+     "ours": 242270,
+     "lab": 0
+    }
+   ]
+  },
+  "deepseek+plan": {
+   "n": 10,
+   "passed_first": 10,
+   "passed_final": 10,
+   "minutes_per_task": 7.3,
+   "minutes_median": 4.02,
+   "our_tokens_per_task": 254302,
+   "lab_tokens_per_task": 959217,
+   "check_agree": 10,
+   "check_matches_grader": 10,
+   "per_task": [
+    {
+     "task": "alphapow",
+     "first": true,
+     "min": 3.25,
+     "ours": 266701,
+     "lab": 550827
+    },
+    {
+     "task": "valtotal",
+     "first": true,
+     "min": 3.0,
+     "ours": 236150,
+     "lab": 553920
+    },
+    {
+     "task": "emastart",
+     "first": true,
+     "min": 4.02,
+     "ours": 211478,
+     "lab": 1111631
+    },
+    {
+     "task": "statssrc",
+     "first": true,
+     "min": 3.41,
+     "ours": 197830,
+     "lab": 324837
+    },
+    {
+     "task": "topsampling",
+     "first": true,
+     "min": 3.0,
+     "ours": 370433,
+     "lab": 429805
+    },
+    {
+     "task": "massconv",
+     "first": true,
+     "min": 2.8,
+     "ours": 275795,
+     "lab": 552613
+    },
+    {
+     "task": "backlogdepth",
+     "first": true,
+     "min": 15.07,
+     "ours": 344400,
+     "lab": 1405390
+    },
+    {
+     "task": "recheck",
+     "first": true,
+     "min": 14.16,
+     "ours": 241364,
+     "lab": 2609063
+    },
+    {
+     "task": "inflight",
+     "first": true,
+     "min": 14.09,
+     "ours": 207726,
+     "lab": 1358806
+    },
+    {
+     "task": "endedrun",
+     "first": true,
+     "min": 10.22,
+     "ours": 191147,
+     "lab": 695278
+    }
+   ]
+  },
+  "deepseek": {
+   "n": 10,
+   "passed_first": 10,
+   "passed_final": 10,
+   "minutes_per_task": 9.24,
+   "minutes_median": 11.17,
+   "our_tokens_per_task": 142163,
+   "lab_tokens_per_task": 2757855,
+   "check_agree": 9,
+   "check_matches_grader": 9,
+   "per_task": [
+    {
+     "task": "alphapow",
+     "first": true,
+     "min": 15.5,
+     "ours": 471933,
+     "lab": 4348358
+    },
+    {
+     "task": "valtotal",
+     "first": true,
+     "min": 4.66,
+     "ours": 151336,
+     "lab": 2174285
+    },
+    {
+     "task": "emastart",
+     "first": true,
+     "min": 5.49,
+     "ours": 114167,
+     "lab": 1845595
+    },
+    {
+     "task": "statssrc",
+     "first": true,
+     "min": 4.88,
+     "ours": 179937,
+     "lab": 948550
+    },
+    {
+     "task": "topsampling",
+     "first": true,
+     "min": 5.08,
+     "ours": 83025,
+     "lab": 2189372
+    },
+    {
+     "task": "massconv",
+     "first": true,
+     "min": 4.13,
+     "ours": 151006,
+     "lab": 1392701
+    },
+    {
+     "task": "backlogdepth",
+     "first": true,
+     "min": 13.99,
+     "ours": 64827,
+     "lab": 4898222
+    },
+    {
+     "task": "recheck",
+     "first": true,
+     "min": 13.42,
+     "ours": 62084,
+     "lab": 3341928
+    },
+    {
+     "task": "inflight",
+     "first": true,
+     "min": 14.08,
+     "ours": 59368,
+     "lab": 3551554
+    },
+    {
+     "task": "endedrun",
+     "first": true,
+     "min": 11.17,
+     "ours": 83949,
+     "lab": 2887987
+    }
+   ]
+  }
+ },
+ "lookup": {
+  "deepseek": {
+   "run1": {
+    "n": 10,
+    "correct": 10,
+    "seconds_per_task": 16.1,
+    "lab_tokens_per_task": 130295,
+    "our_tokens_per_task": 0
+   },
+   "run2": {
+    "n": 10,
+    "correct": 10,
+    "seconds_per_task": 21.1,
+    "lab_tokens_per_task": 149517,
+    "our_tokens_per_task": 0
+   }
+  },
+  "explore_opus_low": {
+   "grep": {
+    "n": 10,
+    "correct": 9,
+    "our_tokens_per_task": 46940
+   },
+   "grep2": {
+    "n": 10,
+    "correct": 10,
+    "our_tokens_per_task": 46794
+   }
   }
  },
  "fix_earlier_trial": {

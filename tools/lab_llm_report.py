@@ -49,6 +49,7 @@ def summary():
     last = {(r["family"], r["task"], r["arm"]): r for r in runs if r["family"] in ("fix", "hardfix")}
     rows = [r for r in runs if r["family"] == "triage"] + list(last.values())
     planner = {t: transcript(a) for t, a in json.load(open(os.path.join(OUT, "planners.json"))).items()}
+    checks = {(r["task"], r["arm"]): r for r in runs if r["family"] == "hardcheck"}
     s = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
     for r in rows:
         c = s[r["family"]][r["arm"]]
@@ -59,7 +60,17 @@ def summary():
             if r["task"] not in planner:
                 sys.exit("lab_llm_report: no planner recorded for %s (planners.json)" % r["task"])
             sec += planner[r["task"]][0]; ours = planner[r["task"]][1]
+        if r["family"] == "hardfix" and r["arm"].startswith("deepseek"):   # the Sonnet check of each DeepSeek fix (D541)
+            ck = checks.get((r["task"], r["arm"]))
+            if ck is None:
+                sys.exit("lab_llm_report: no Sonnet check recorded for %s %s (lab_llm_trial.py grade_check)"
+                         % (r["task"], r["arm"]))
+            ours += ck["our_tokens"]; sec += ck["seconds"]
+            c["agree"].append(ck["agree"]); c["agree_matches"].append(ck["matches_grader"])
         c["first"].append(bool(r["first_pass"])); c["final"].append(bool(r.get("final_pass")))
+        c["per_task"].append({"task": r["task"], "first": bool(r["first_pass"]), "min": round(sec / 60, 2),
+                              "ours": ours, "lab": sum(u.get(k, 0) + u2.get(k, 0)
+                                                       for k in ("in", "out", "reasoning", "cache_read"))})
         c["min"].append(sec / 60); c["ours"].append(ours)
         c["lab"].append(sum(u.get(k, 0) + u2.get(k, 0) for k in ("in", "out", "reasoning", "cache_read")))
         c["by_class"].append((r.get("key") or {}).get("class"))
@@ -73,9 +84,15 @@ def summary():
                          "minutes_median": round(sorted(c["min"])[n // 2], 2),
                          "our_tokens_per_task": round(sum(c["ours"]) / n),
                          "lab_tokens_per_task": round(sum(c["lab"]) / n)}
+            if c["agree"]:
+                out[f][a]["check_agree"] = sum(c["agree"])
+                out[f][a]["check_matches_grader"] = sum(c["agree_matches"])
+            if f == "hardfix":
+                out[f][a]["per_task"] = c["per_task"]
             if f == "triage":
                 out[f][a]["passed_by_class"] = {k: [sum(p for p, q in zip(c["first"], c["by_class"]) if q == k),
                                                     c["by_class"].count(k)] for k in set(c["by_class"])}
+    out["lookup"] = lookups(runs)
     hr = os.path.join(OUT, "hand_read.json")
     if os.path.exists(hr):                         # the owner's read of why and resubmit_as_is against the ack note
         for o in json.load(open(hr))["reads"]:
@@ -85,6 +102,64 @@ def summary():
     out["fix_earlier_trial"] = ref
     json.dump(out, open(os.path.join(OUT, "summary.json"), "w"), indent=1)
     return out
+
+
+def lookups(runs):
+    """DeepSeek's code lookups (two runs per question) against the recorded Opus-low Explore grep and grep2 arms of
+    lookup_trial.json (the design's control), both graded by lookup_trial.correct at e6f0ef58e; the control's tokens
+    recounted from its transcripts as every other arm's."""
+    ds = [r for r in runs if r["family"] == "lookup"]
+    if not ds:
+        return {}
+    ctl = json.load(open(os.path.join(ROOT, "analysis", "agent_redesign", "lookup_trial.json")))
+    tasks = sorted({r["task"] for r in ds})
+    out = {"deepseek": {}, "explore_opus_low": {}}
+    for rep in sorted({str(r["rep"]) for r in ds}):
+        rr = [r for r in ds if str(r["rep"]) == rep]
+        out["deepseek"]["run" + rep] = {"n": len(rr), "correct": sum(bool(r["first_pass"]) for r in rr),
+                                        "seconds_per_task": round(sum(r["seconds"] for r in rr) / len(rr), 1),
+                                        "lab_tokens_per_task": round(sum(sum((r["usage"] or {}).get(k, 0) for k in
+                                            ("in", "out", "reasoning", "cache_read")) for r in rr) / len(rr)),
+                                        "our_tokens_per_task": 0}
+    for arm in ("grep", "grep2"):
+        cc = [ctl[t][arm] for t in tasks if arm in ctl.get(t, {})]
+        out["explore_opus_low"][arm] = {"n": len(cc), "correct": sum(bool(c["correct"]) for c in cc),
+                                        "our_tokens_per_task": round(sum(transcript(c["agent"])[1] for c in cc) / len(cc))}
+    return out
+
+
+def figure_hard(out):
+    """The hard round, task by task: our tokens, wall time and lab tokens per fix of each arm, tasks ordered by
+    Sonnet's tokens; an open marker where the fix failed the grader or its Sonnet check disagreed."""
+    import plot_style as ps
+    hf = out["hardfix"]
+    arms = [a for a in ("sonnet", "deepseek+plan", "deepseek") if a in hf]
+    rows = {a: {p["task"]: p for p in hf[a]["per_task"]} for a in arms}
+    tasks = sorted(rows["sonnet"], key=lambda t: rows["sonnet"][t]["ours"])
+    runs = [json.loads(l) for l in open(os.path.join(OUT, "runs.jsonl"))]
+    bad = {(r["task"], r["arm"]) for r in runs if r["family"] == "hardcheck" and not r["agree"]}
+    col = {"sonnet": ps.C.blue, "deepseek+plan": ps.C.vermillion, "deepseek": ps.C.green}
+    mk = {"sonnet": "o", "deepseek+plan": "s", "deepseek": "^"}
+    lbl = {"sonnet": "Sonnet", "deepseek+plan": "DeepSeek+plan", "deepseek": "DeepSeek"}
+    fig, axs = ps.figure(ncols=2, nrows=2)
+    axs = [axs[0][0], axs[0][1], axs[1][0], axs[1][1]]
+    x = list(range(len(tasks)))
+    for ax, key, ylab, scale in ((axs[0], "ours", "our tokens per fix ($10^3$)", 1e3),
+                                 (axs[1], "min", "wall time per fix (min)", 1),
+                                 (axs[2], "lab", "lab tokens per fix ($10^3$)", 1e3)):
+        for a in arms:
+            if key == "lab" and a == "sonnet":
+                continue
+            ys = [rows[a][t][key] / scale for t in tasks]
+            ax.plot(x, ys, mk[a], color=col[a], label=lbl[a], ms=6)
+            for i, t in enumerate(tasks):
+                if (t, a) in bad or not rows[a][t]["first"]:
+                    ax.plot([i], [ys[i]], mk[a], mfc="white", mec=col[a], ms=11)
+        ax.set_yscale("log")
+        ax.set_ylabel(ylab)
+        ax.set_xticks(x, tasks, rotation=60, ha="right")
+    ps.legend_cell(axs[3], axs[0])
+    ps.save(fig, os.path.join(OUT, "figs", "lab_llm_hard"))
 
 
 def figure(out):
@@ -128,6 +203,8 @@ def main():
     out = summary()
     print(json.dumps(out, indent=1))
     figure(out)
+    if "hardfix" in out:
+        figure_hard(out)
 
 
 if __name__ == "__main__":
