@@ -43352,7 +43352,8 @@ entries:
       if:
       - 'B_crit within ~3x of B_simple: B_simple read alone afterwards; propose a smaller canonical batch to Joaquin'
       - 'B_crit far above B_simple: report B_crit from the scan, B_simple not trusted alone'
-  step_waits: {}
+  step_waits:
+    '2': 'a new owner: design revision after the design reviewer''s FIX and the repo-reviewer''s BLOCK (hand-off 2026-11-24)'
   targets:
   - batch: noise_smoke
     wall_h: 0.4
