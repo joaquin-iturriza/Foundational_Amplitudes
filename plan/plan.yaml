@@ -43834,3 +43834,29 @@ entries:
       analysis/critical_batch/noise_read.py; analysis/critical_batch/data/*.json; noise_scale.py; docs/results.tex sec:noisescale;
       worktrees/wt-critbatch (merged, remove at close)'
     written: '2026-11-24T13:51:52+00:00'
+- id: cc_disk
+  title: What uses disk on CC and what can be deleted
+  question: 'What is using the disk on CC (checkout runs/sweeps, datasets, memmap caches, scratch, MG5 work dirs), against
+    which quotas, and what can be deleted: our cheap-to-rebuild debris at once, costly results only through scripts/prune_site.sh
+    under a decision of Joaquin''s?'
+  status: running
+  quotes:
+  - said_at: '2026-11-24T14:11:52.477000+00:00'
+    text: Look into what is using up space in CC and what can be deleted
+    decision: D542
+    covers:
+    - cc_disk
+  decisions:
+  - D542
+  next: Read quotas and df on CC, then the per-directory inventory (analysis/storage tools; the held storage entry's lists);
+    report the top consumers with sizes and a delete list split into our debris (deleted now, reported), caches no running
+    job or open recipe reads, and results that need Joaquin's decision
+  done_when: null
+  notes_ref: null
+  match: cc_disk_*,zz_probe_*
+  evidence:
+    runs: []
+    commit: null
+    paths: []
+  dead_ends: []
+  asks: []
