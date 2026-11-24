@@ -42078,3 +42078,36 @@ entries:
     units: null
     start: '2026-11-24T00:26:58+00:00'
     at: '2026-11-24T00:26:58+00:00'
+- id: critical_batch
+  title: Critical batch size from the gradient noise scale
+  question: What is the critical batch size of our canonical setup, measured from the gradient noise scale B_simple = tr(Sigma)/|G|^2
+    (McCandlish et al. 2018, arXiv:1812.06162) along training, and does it predict where larger batches stop paying off in
+    measured runs?
+  status: running
+  quotes:
+  - said_at: '2026-11-24T00:34:29.435000+00:00'
+    text: In parallel, I remember trying to implement something about a critical batchsize, related to the gradient's noise
+      scale, but didn't manage to do it. The method they propose involves using multiple gpus, I tried measuring the noise
+      scale along one single run, but didn't get good results and left it there. I believe you are very capable of implementing
+      and testing it, so we can stop worrying about if the batchsize is correct or not
+    decision: D532
+    covers:
+    - critical_batch
+    - gradient noise scale B_simple (McCandlish et al. 2018) measured during training
+    - its validation against batch-size runs
+  decisions:
+  - D532
+  next: Read Joaquin's earlier single-run attempt (base_experiment.py ~l.1005-1410, the S/G2/B_simple estimators and _plot_bs_finding)
+    and the paper; find why it gave poor results; implement the paper's estimator (unbiased small/large-batch gradient norms,
+    B_small and B_big from per-microbatch or per-GPU gradients within one step, EMA of S and |G|^2 separately); validate it
+    on a case with a known answer; then measure B_crit along a canonical run and check it against a short batch-size scan
+    (steps and examples to a target loss)
+  done_when: null
+  notes_ref: null
+  match: zz_cbs_*,cbs_*
+  evidence:
+    runs: []
+    commit: null
+    paths: []
+  dead_ends: []
+  asks: []
