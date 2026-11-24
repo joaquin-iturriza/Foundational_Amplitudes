@@ -45255,6 +45255,13 @@ entries:
       ~/work/CLAUDE.md login-node rule; scripts/prune_site.sh; analysis/common/readers.py (site_python); sweep/watchdog.py;
       sweep/rebalance.py; sites/sites.yaml; tools/ccjob_lag.py; analysis/cc_login/data/
     written: '2026-11-24T23:18:15+00:00'
+  targets:
+  - batch: site_env_job
+    wall_h: 1.0
+    jobs: 1
+    units: null
+    start: '2026-11-24T23:36:37+00:00'
+    at: '2026-11-24T23:36:37+00:00'
 - id: orchestrator_kit
   title: 'Standalone shareable kit: main session as orchestrator of subagents, jobs on several clusters'
   question: Can the general machinery behind our setup (the site tool for multi-cluster submission, sync, placement and copy;
