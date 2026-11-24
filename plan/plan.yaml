@@ -44909,10 +44909,6 @@ entries:
   decisions:
   - D544
   next:
-    1: 'Read the CC maintain jobs over >= 3 supervisor passes since 18:32 with tools/ccjob_lag.py (task output bbmrvsqcm):
-      same lines and exit codes as the login runs, result age <= one pass + 10 min, no command skipped two passes in a row,
-      .disk_full under 30 min old at each feed read, no new MAINTAIN event; and one real prune.py run in the job with its
-      PRUNE lines appended to ~/.local/share/ccorch/artifacts/FA/prune/ccin2p3.jsonl'
     2: 'CC now refuses ''module load Programming_Languages/anaconda/3.11'', which sites/sites.yaml line 11 uses for FA''s
       CC env (seen by the orchestrator_kit proof). From a CPU job: does FA''s activate on CC error or only warn, does the
       live .venv still import torch, what would ''site env ccin2p3 FA'' do on a rebuild; fix sites.yaml so a rebuild works
@@ -45125,14 +45121,8 @@ entries:
       htc queue wait 1-29 s; runs ~1 s except disk_watch''s 6-hourly du (301 s) and the prune job (47-305 s, a real prune
       at ~21:45 appended 4 PRUNE records); no MAINTAIN/ALERT/CHECK/REFUSED event since the switch. All design bounds hold:
       the switch stays.'
-  step_waits:
-    '1': '2026-11-24T22:30 (UTC): >= 3 passes and CC''s next real prune'
+  step_waits: {}
   step_why:
-    1:
-      feeds: 'D544: whether CC''s recurring scripts can live as Slurm jobs (the switch stays, or the feeder pairs with disk_watch)'
-      if:
-      - 'all bounds hold: write-up in docs/results.tex and plan done'
-      - 'flag over 30 min or two skipped passes: disk_watch and the feeder in one job (flag right before the feed)'
     2:
       feeds: whether FA's CC environment survives a rebuild after CC's module change (D544's CC setup)
       if:
