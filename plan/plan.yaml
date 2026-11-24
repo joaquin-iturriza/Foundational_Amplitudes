@@ -38149,6 +38149,14 @@ entries:
       trials 0.066-0.126 overlap scratch. Blow-ups listed apart (val >10x best-so-far): log-rescale seed 44 from validation
       18/50 (max 2.9e4x best), both-settings seeds 43, 44 (as before); all read at best checkpoints before the blow-up. Chosen
       lrs 0.17/0.26 decades below the window top: not edge-limited.'
+  - at: '2026-11-24T01:49:17+00:00'
+    text: '2026-11-24 step 4 read, b128 (zng4g_r1_read.py 128 @262bc965d; fig zng4g_r1_b128, caption OK). Best val MSE(log|M|^2)
+      seeds 42/43/44: scratch 0.0180/0.0214/0.0196 (mean 0.0197; D507 search 8 trials); scratch + both settings searched (16
+      trials, chosen hp1326 lr 1.00e-2) 0.0269/0.0275/0.0287 (0.0277, 1.41x scratch); fine-tuned 0.0258/0.0346/0.0306 (0.0303,
+      1.54x). Share log(Sf*/S)/log(F/S) = 0.79 (10-90% over 27 triples 0.58-1.31) -> branch share>=0.7: H1 holds at both batches
+      (b2048 1.84). F/Sf* 1.10 (b2048 0.69). CAVEAT: Sf*''s chosen lr sits 0.04 decades below the window top 1.1e-2 (edge-limited;
+      12 of 16 trials crowd 8e-3..1.1e-2), and scratch''s search had 8 trials against Sf*''s 16. No blow-ups (val best at
+      94-100% of the run, end/best <= 1.024).'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
