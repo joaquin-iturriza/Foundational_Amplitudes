@@ -40475,11 +40475,11 @@ entries:
     start: '2026-11-24T14:20:54+00:00'
     at: '2026-11-24T14:20:54+00:00'
   - batch: d539s
-    wall_h: 4.2
+    wall_h: 1.4
     jobs: 7
     units: null
-    start: '2026-11-24T16:41:02+00:00'
-    at: '2026-11-24T16:41:02+00:00'
+    start: '2026-11-24T18:03:46+00:00'
+    at: '2026-11-24T18:03:46+00:00'
   step_waits:
     '2': detached ftmech_glu_drive (both gluon-parent fine-tune searches, 32 trials; its end posts an event)
     '4': 'FA-lxplus-2b25f6e5 (design PASSED 2026-11-24; lxplus smoke of job_seed_batch.sh on uug, first run of that script
