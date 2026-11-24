@@ -15822,6 +15822,10 @@ entries:
       next lxplus ssh-master drop probed twice before ''down'''
     34: 'Check the lxplus costing fix (step 29) on the first real lxplus submit: its submit file carries +MaxRuntime equal
       to --hdr=--time=, and the site gate''s gpu_window charge equals that time x GPUs, not the flavour''s wall time'
+    35: 'D534 gate fix (Joaquin 2026-11-24 on lab_llm_trial: "''The design required DeepSeek to cost us at most 0.3x Sonnet''s
+      tokens, and 0.58x misses that'' What?"): an outcome threshold (bar, ratio, band) with no source turned a 42% token saving
+      into a ''no''. plan design refuses an --outcome threshold that cites no source (Joaquin''s words, a decision, a measured
+      spread, a cost he set); the design reviewer FIXes one; keeper reviews the agent definition; diff to Joaquin'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16492,6 +16496,11 @@ entries:
       if:
       - 'charged its own limit: report done'
       - 'charged the flavour: fix condor_sub or the gate, replay on that submit file'
+    35:
+      feeds: 'D534: a design''s yes/no bar comes from Joaquin''s aim or measured noise, never invented'
+      if:
+      - 'built and replayed on the lab_llm_trial outcome: report the diff'
+      - 'a tool refuses: route around'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
