@@ -43837,7 +43837,8 @@ entries:
       files equal the graded ones. The change of task form from round one''s ''meet this interface'' to ''make these failing
       tests pass'' is stated for the result. Checks 2 and 3 and the search as in the previous pass (round one 8/10 vs 9/10;
       spread about 1.3 tasks per arm, indicative, paired, Wilson).'
-  step_waits: {}
+  step_waits:
+    '2': notes-editor review of the results.tex backlog (par:labllm1, par:labllm2)
   findings:
   - at: '2026-11-23T19:55:22+00:00'
     text: 'Local batch width cut from 6 parallel opencode streams to 2 (D531): 6 streams of opencode sessions (~350-400 MB
