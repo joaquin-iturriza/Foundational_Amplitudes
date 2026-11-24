@@ -1715,7 +1715,7 @@ class BaseExperiment:
             
     def _write_step_log(self):
         """<run_dir>/train_steps.npz: the per-step record (_step), columns step, grad_norm (pre-clip), loss, lr."""
-        if not self._step_log or not self.cfg.get("run_dir"):
+        if not self._step_log or not self.cfg.get("run_dir") or not self.cfg.save:   # save=false makes no run_dir
             return
         a = np.asarray(self._step_log, dtype=np.float64)
         tmp = os.path.join(str(self.cfg.run_dir), "train_steps.tmp.npz")
