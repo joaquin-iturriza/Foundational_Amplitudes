@@ -1,6 +1,6 @@
 # finetune_mechanism step 2, the b128 residual (D519/D520/D529): H2 dilution. Fine-tune from the 9-process gluon/Z parent at D=1e3.
 # D=1e3 training events (train_subsample 1000), 3125 steps (400 epochs at batch 128, as the 1e4 cells' 31250); the three
-# D=1e3 arms (scratch, 28-process parent, gluon parent) share every setting, the lr window [1.9e-3, 1.9e-2] and the DyHPO seed.
+# D=1e3 arms (scratch, 28-process parent, gluon parent) share every setting, the lr window [6.0e-4, 6.0e-2] and the DyHPO seed.
 cluster:
   scheduler: slurm
   auto_submit: false
@@ -12,7 +12,7 @@ cluster:
 paths: null
 sweep_name: ftmech_zng4g_d1e3_ftglu_b128
 base_config: ${PROJECT_DIR}/runs/kit/kit_A_uq_zgggg_me2_n500000_t12500
-n_trials: 16
+n_trials: 24   # 16 + 8 after the window extension of 2026-11-24 (both first searches crowded opposite edges)
 dyhpo:
   surrogate: gp
   n_candidates: 2000
@@ -20,7 +20,7 @@ dyhpo:
   seed: 42
   n_startup: 3
   total_budget: 10000
-  waves: [3, 3, 2, 3, 3, 2]
+  waves: [3, 3, 2, 3, 3, 2, 3, 3, 2]
 fidelity_schedule:
   t_steps: [3125]
 fixed_params:
@@ -51,7 +51,7 @@ fixed_params:
 range_extension:
   enabled: false
 search_space:
-- {name: training.lr, type: float_log, low: 1.9e-03, high: 1.9e-02}   # rule 2: analysis/hpo_optima/hpo_optima.json at t~3162, D 700-2212, nh8 (5.2e-3, 5.6e-3, 6.2e-3, 7.3e-3): centre 6.0e-3, +-0.5 decade
+- {name: training.lr, type: float_log, low: 6.0e-04, high: 6.0e-02}   # [1.9e-3, 1.9e-2] (hpo_optima centre 6.0e-3 +-0.5 dec) widened by 0.5 dec each side 2026-11-24: scratch's 16-trial best sat 0.04 dec under the top, the fine-tune's 0.13 dec over the bottom
 - {name: training.muon_weight_decay, type: float_log, low: 1.0e-03, high: 0.3}
 - {name: training.regularization_lambda, type: float_log, low: 1.0e-10, high: 1.0e-06}
 - {name: training.cosanneal_warmup_frac, type: float_uniform, low: 0.05, high: 0.2}
