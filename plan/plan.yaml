@@ -39883,6 +39883,12 @@ entries:
     units: null
     start: '2026-11-24T05:39:49+00:00'
     at: '2026-11-24T05:39:49+00:00'
+  - batch: d1e3_scr_ftnoset
+    wall_h: 2.3
+    jobs: 36
+    units: null
+    start: '2026-11-24T05:39:59+00:00'
+    at: '2026-11-24T05:39:59+00:00'
   step_waits: {}
   handoff:
     state: '2026-11-24 ~07:00 CET. The investigation''s deciding read is done. (1) One setting at a time, b2048 (3 seeds,
