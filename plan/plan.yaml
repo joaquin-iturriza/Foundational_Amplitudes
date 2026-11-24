@@ -42692,9 +42692,9 @@ entries:
     - 2
   owner:
     agent: aa75364575cea3cb4
-    state: working
+    state: stopped
     since: '2026-11-24T05:11:18+00:00'
-    state_at: '2026-11-24T05:55:05.832000+00:00'
+    state_at: '2026-11-24T05:56:48+00:00'
     context: 190546
     context_at: '2026-11-24T05:38:24+00:00'
   designs:
