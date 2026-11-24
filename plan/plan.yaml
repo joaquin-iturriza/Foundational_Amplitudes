@@ -34918,7 +34918,7 @@ entries:
     - 4
   owner:
     agent: a6c82044db5e87909
-    state: working
+    state: closed
     since: '2026-11-21T04:27:37+00:00'
     state_at: '2026-11-24T05:07:49.437000+00:00'
     context: 274930
@@ -37312,30 +37312,29 @@ entries:
     start: '2026-11-24T03:51:42+00:00'
     at: '2026-11-24T03:51:42+00:00'
   handoff:
-    state: '2026-11-20 ~16:00 UTC. D507/D509 read done (zng_d507 v1 @0d2064b7; G 1.12 [0.85,1.70] on three-seed means, unresolved;
-      Muon batch ratio 3.20 [2.71,3.72]; Muon/Adam at b128 0.35; finding 2026-11-20). W parent at half lr FA-ccin2p3-47e14eae
-      read (parent_read.py wlr @b70ad9fd, data @e4696fd4): stable, gmean MSE(ln|M|^2) 7.1e-6 vs first parent 9.6e-5 and old
-      finale 1.44e-5, below the first parent on 28/28; no val/train overlap; stage 2''s parent. Step 3 (D507 extension, design
-      passed after one FIX): 8 guided trials per search submitted on lxplus as HTCondor DAGs (waves 3,3,2), A100/H100 only;
-      the three CC searches recreated on lxplus with their 8 CC observations folded (extend_sweep --fold-points); lr top tripled
-      in the b128 cells; <= 27.3 GPU-h, target 4.5 h. Step 4 (stage 2, D483 fine-tune ladder, 36 runs, <= 136 GPU-h, Z+4g
-      alone <= 34) held on the GPU-budget ask. NEXT when step 3''s sweeps end: read each cell''s best of 16 (benchmark.py
-      d507collect currently reads CC only: add the lxplus trials of the four searches, D507 dict trial names, and the folded
-      hp indices), replace a chosen trial only if it beats the old by more than its seed spread (1.15-1.74x), then seeds 43/44
-      (sweep/run_fixed_hp.py, job_seed_batch.sh) and test scoring (job_kit.sh KIT_SCORE_DIR) of replaced ones, d507fig ->
-      zng_d507 v2 sent beside v1 with changes listed, check_caption.'
-    decisions: 'D507 chosen trials by the design rule; Joaquin 2026-11-20 asked to extend the HPO (''maybe extending a bit
-      the HPO would be smart''; recording as a decision was refused by the permission classifier); lxplus per site pick (CC:
-      0 GPUs fit), A100/H100 only since float64 on a T4 was 3-6x slower; Muon b128 limit 2 h (the site gate counts the HTCondor
-      flavour; workday 8 h refused); stage 2 per D483 only (the scratch-search ladder withdrawn, never asked).'
-    ruled_out: Moving started sweeps with rebalance.py (pending trials lose guidance); the 650-850 GPU-h scratch-search stage
-      2; T4/MIG GPUs for float64 trials.
-    running: 'lxplus sweeps tp_zng_d1e4_{muon_b2048,muon_b128,adam_b2048,adam_b128}_zgggg, 8 new trials each (DAGs sweep_0000/sweep_0008.dag).
-      Unsubmitted debris: lxplus muon_b128 jobs trial_0000-0007 .sh/.sub/sweep_0000.dag (3 h version, never submitted).'
-    files: analysis/zng_uq/benchmark.py (d507collect, d507fig with ratios_seeds), analysis/zng_uq/parent_read.py (wlr, wleak),
-      analysis/zng_uq/data/{d507.json,d507_read.json,parent_wlr.json,parent_wlr_leak.json}, analysis/zng_uq/figs/{zng_d507,zng_parent_wlr}.png,
-      sweep/sweep_config_tp_zng_d1e4_*_zgggg.yaml @c57dd900
-    written: '2026-11-20T15:17:08+00:00'
+    state: '2026-11-24 ~05:00 UTC. Step 3 (D514 extension) read except one score: all four searches ended (Muon b2048 16 on
+      CC + 3 lxplus repeats; Adam b128 16 lxplus; Muon b128 19 and Adam b2048 19 with 3 repair trials each on their CC copies,
+      folded to the lxplus state). Choices: Muon b128 hp0078 replaces trial_0950 (three seeds 0.00888/0.01048/0.00887, mean
+      0.00941 vs 0.0197, 2.09x; window [2.7e-4,3.3e-2] bracketed, log position 0.735, trials above worse 3.6-9.8x); Adam b2048
+      hp0775 1.07x (stands); others unchanged. v2 ratios (three-seed means): Muon batch 6.69 [5.53,7.54], Adam batch 1.28,
+      opt b128 0.17, G 1.12 (unresolved). Reference sent to finetune_mechanism as a finding. NEXT: hp0078 test scoring (job_kit.sh
+      KIT_SCORE_ONLY=1 KIT_SCORE_DIR=runs/tp_zng_d1e4_muon_b128_zgggg/trial_0078, args kit_uq_zgggg__me2 500000 12500 A; on
+      lxplus, where the trial lives, or after site copy of the trial dir to CC); then benchmark.py d507collect --v2 and d507fig
+      --v2 (refuses until scored) -> zng_d507 v2 beside v1 (@0d2064b7) with changes listed (Muon b128 cell: trial_0950 ->
+      hp0078; batch ratio 3.20 -> 6.69; opt b128 0.35 -> 0.17), check_caption, write-up in docs/results.tex with % src/% claim.
+      Step 4 held on Joaquin''s GPU-budget question (asked 2026-11-20).'
+    decisions: 'D514 extension per the designs passed 2026-11-20 and 2026-11-24 (after one FIX: Muon b128 lr top 1.1e-2 ->
+      3.3e-2, @df7c957a); placement per site pick (CC for the repair trials and seeds, lxplus for the scoring); replacement
+      rule: beat the old choice by more than the cell''s seed spread.'
+    ruled_out: Moving started sweeps with rebalance.py; T4/MIG GPUs for float64 trials; drawing v2 with an unscored chosen
+      trial (d507fig --v2 refuses).
+    running: 'hp0078 test scoring: FA-lxplus-8116ba56 removed after 1.1 h pending (12000 MB / 4 CPUs matched 8 slots); resubmission
+      per the E8442 note on the entry''s wait.'
+    files: analysis/zng_uq/benchmark.py (d507collect/d507fig --v2 @6568c47c), analysis/zng_uq/data/{d507_v2.json,d507_search_v2.json},
+      analysis/zng_uq/seed_chunks/d514_muon_b128_hp0078_s{43,44}.txt @2feab608, sweep/sweep_config_tp_zng_d1e4_*_zgggg.yaml
+      (muon_b128 @df7c957a), sweep/dyhpo/hpo_method.py + sweep/dyhpo_sampler.py (fold start-up fix @ab6215d5), tools/plan.py
+      (sweepends site key @170183dd)
+    written: '2026-11-24T05:11:43+00:00'
   step_why:
     3:
       feeds: whether the batch-size and optimiser effects of D507 hold once each cell's search is longer and its lr window
