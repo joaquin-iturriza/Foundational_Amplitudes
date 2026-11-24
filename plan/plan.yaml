@@ -16439,7 +16439,7 @@ entries:
     agent: aa3a1133e1a11b531
     state: working
     since: '2026-11-24T11:07:38+00:00'
-    state_at: '2026-11-24T11:07:38+00:00'
+    state_at: '2026-11-24T11:20:32.278000+00:00'
     context: 142921
     context_at: '2026-11-24T11:20:41+00:00'
   designs:
