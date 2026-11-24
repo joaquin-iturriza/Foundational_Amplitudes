@@ -15826,7 +15826,7 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-046cc7d3
-    commit: c4e1c6dad
+    commit: de109142d
     paths:
     - .claude/hooks/notification_absorb.py
     - .claude/hooks/owner_handoff.py
