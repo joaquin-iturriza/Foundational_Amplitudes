@@ -38334,7 +38334,7 @@ entries:
     decision: D539
   owner:
     agent: aa696ba79c8f66f6d
-    state: stopped
+    state: closed
     since: '2026-11-24T08:11:35+00:00'
     state_at: '2026-11-24T14:06:01+00:00'
     context: 257269
@@ -40393,32 +40393,28 @@ entries:
     '3': FA-ccin2p3-7d78f4f9 (kit scoring of the D539 uug smoke FA-ccin2p3-b11698b9; then check config.yaml shows the chunk's
       recipe/massless values, list the scoring outputs, submit the 17-job batch d539_00..16)
   handoff:
-    state: '2026-11-24 ~09:00 CET. Step 2 (b128 residual, Fn/S 1.53) is in flight as the H2 dilution test (design passed 05:35,
-      configs @5361f5820/45f404900): a parent pretrained on the finale''s 9 gluon/Z processes (recipes/transfer_finale_gluon.yaml;
-      same command as the 28-process no-settings parent 9a73698a, only the recipe) FA-ccin2p3-1f2d9ad5 RUNNING on V100 (limit
-      15 h, ~10.8 h, val combined -3.7 at 08:54); smoke FA-ccin2p3-4e7b6669 completed through the sigma stage. D=1e3 (3125
-      steps, b128) scratch and 28-process fine-tune searches done at 16 trials on [1.9e-3,1.9e-2]: S1k hp1009 0.0976 (lr 1.74e-2),
-      Fn1k hp1860 0.0490 (lr 2.54e-3), Fn1k/S1k 0.50 at seed 42 but both at opposite edges -> matched extension (design passed
-      07:57) to [6e-4,6e-2], 8 more each, driver ftmech_d1e3_ext running (detached log ~/.local/share/ccorch/detached/20261124-085814_ftmech_d1e3_ext.log);
-      seeds 43/44 of the 16-trial chosen trials running (FA-ccin2p3-b96a2a6c/2525f488 scr, ada00163/3ea9d4fa ftnoset). Write-up
-      of the 2026-11-24 findings committed e0b8de321 (par:ftm_zng4g, verify_claims 0). Next: step 1 read (re-pick if a best
-      moved), step 2 when the parent ends (Fg 1e4 + Fg1k with the same narrow-then-extend protocol). Read rule for every ratio:
-      2-sigma interval from the arms'' own seed log-sd; yes hi<1, no-of-needed-size lo>0.65, else unresolved -> question to
-      Joaquin on more seeds.'
-    decisions: 'Joaquin''s: D519/D520/D529 (investigation, GPU-h), D511 (<100 h), D514 (hp0078 reference). Mine: narrow parent
-      = finale''s 8 final-state-gluon processes + ee_ZZ (a massive neutral vector in the pretraining as in the 28), same 64000
-      steps and lr (same compute, 3.1x per-process exposure: the ''intentional pretraining'' comparison); D=1e3 at 3125 steps
-      (400 epochs as the 1e4 cells); D=1e3 window first [1.1e-3,3.3e-2], recentred on hpo_optima [1.9e-3,1.9e-2] by the repo-reviewer''s
-      finding, then widened to [6e-4,6e-2] (coordinator, matched, reviewed); parent limit 15 h from 7.97 h V100 x1.35 x1.3
-      +1; parent_rerun_check gained --cached and a JSON line, both readers print one-line JSON (verify_claims); job_datasaving_parent.sh
-      refuses flags=off/recipe= without tag=; seed runs submitted --allow-stale at a547ecac3e (contains the chunks commit).'
-    ruled_out: As before (H3 lr window, H4 restart shock/sigma head, H6 precision, H7 path bug, pair logs as the settings'
-      cost, any deficit beyond the settings at b2048).
-    running: FA-ccin2p3-1f2d9ad5 (gluon parent), drive ftmech_d1e3_ext (8+8 trials), seed runs FA-ccin2p3-b96a2a6c/2525f488/ada00163/3ea9d4fa
-    files: recipes/transfer_finale_gluon.yaml; scripts/job_datasaving_parent.sh (recipe=); sweep/sweep_config_ftmech_zng4g_{ftglu_b128,d1e3_scr_b128,d1e3_ftnoset_b128,d1e3_ftglu_b128}.yaml;
-      sweeps_local/ftmech_zng4g_d1e3_{scr,ftnoset}_b128; analysis/finetune_mechanism/seed_chunks/zng4g_d1e3_*; readers zng4g_ftnoset_read.py
-      (extend for the D=1e3 and Fg arms), parent_rerun_check.py; docs/results.tex par:ftm_zng4g
-    written: '2026-11-24T07:59:34+00:00'
+    state: '2026-11-24 ~15:45. Step 1 done: D=1e3 Fn1k/S1k 0.486 [0.454,0.522] (results.tex 9fc114a6e, fig zng4g_d1e3). Step
+      2: gluon parent FA-ccin2p3-1f2d9ad5 ended; parent check (parent_rerun_check.py glu --ref noset) gmean 5.04x worse on
+      the 9 shared processes: its three highest-multiplicity processes'' val NLL explode in the WSD cooldown while train loss
+      falls (overfit at 3.1x exposure), best checkpoint pre-cooldown; fine-tune searches ftmech_zng4g_ftglu_b128 (1e4) + ftmech_zng4g_d1e3_ftglu_b128
+      driving (detached ftmech_glu_drive, ccin2p3+lxplus, target 6.5 h); then extend the D=1e3 one as its siblings and seeds
+      43/44 of each chosen trial, read Fg/Fn (2-sigma rule). Step 3 (D539, Joaquin: why do the settings cause a problem now):
+      part 1 answered from kit_benchmark records (see final report); part 2 design PASSED (re-check 15:40): smoke FA-ccin2p3-b11698b9
+      (uug 1e4 massless-only, 50 steps) -> kit scoring FA-ccin2p3-7d78f4f9 (afterok); on its end check runs/ftmech_d539_smoke_uug_massless/config.yaml
+      carries the uug recipe and input_soft_massless_only true (duplicate ++ overrides, last wins as the seed runs showed),
+      list the kit_predict outputs, then submit the 17 chunks seed_chunks/d539_00..16 (job_seed_batch.sh, --hdr=--time=01:00:00,
+      re-read df on /sps/lpnhe, site pick width) and read with d539_read.py (untested on data) + kit scoring of the 12 uug
+      run dirs.'
+    decisions: 'Joaquin''s: D511/D519/D520/D529 (investigation, budget), D539 (the settings question). Mine: D=1e3 extension
+      matched (reviewed); gluon parent fine-tunes from its pre-cooldown best checkpoint as the design fixes, the overfit reported
+      beside Fg/Fn; D539 arms all at hp1961 (the rescale''s searched HPs), fixed compute 1953 steps at 1e5, uug run in the
+      Z+4g setup (differences vs the kit D374 run listed in the design); model.input_soft_massless_only added (3ea925fa0,
+      default off); zng4g_seed_chunks --repick naming.'
+    ruled_out: 'As before; plus: the D=1e3 bests are edge-free (extension moved neither).'
+    running: detached ftmech_glu_drive (32 trials); FA-ccin2p3-b11698b9, FA-ccin2p3-7d78f4f9
+    files: analysis/finetune_mechanism/{zng4g_d1e3_read.py,parent_rerun_check.py,soft_rescale_inputs.py,d539_read.py,zng4g_seed_chunks.py};
+      seed_chunks/d539_*.txt; wrappers.py _soft_rescale; figs zng4g_d1e3, soft_rescale_inputs
+    written: '2026-11-24T14:06:34+00:00'
   step_why:
     2:
       feeds: 'H2 dilution: Fg/Fn at 1e4 and at D=1e3 (designs passed 2026-11-24)'
