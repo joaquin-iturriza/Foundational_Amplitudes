@@ -45203,3 +45203,10 @@ entries:
       decisions: no prior kit proof (kit hits only the KIT benchmark).'
   step_waits:
     '1': the design reviewer (re-check of the revised CC proof design)
+  targets:
+  - batch: kit_proof_cc
+    wall_h: 0.25
+    jobs: 3
+    units: null
+    start: '2026-11-24T20:14:13+00:00'
+    at: '2026-11-24T20:14:13+00:00'
