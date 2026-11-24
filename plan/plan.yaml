@@ -17927,6 +17927,12 @@ entries:
       was already costed); site''s condor_sub writes +MaxRuntime from --hdr=--time= beside +JobFlavour (backups *.bak-20261124-lxpluscost).
       Parsed tests: flavour only 8.00 h, +MaxRuntime 3600 -> 1.00 h, ''abc'' -> Unreadable; site list works. Not tested on
       a real submit.'
+  - at: '2026-11-24T14:31:50+00:00'
+    text: '2026-11-24 step 33 done (D536 ''Yes, make that change''): CLAUDE.md GPU budget now passes work a decision names
+      under 100 GPU-h; step_prompt, mechanical_prompt, step_prompt_legacy restate it (483c6c165, pushed); refusal texts in
+      submit_guard (567e90c31), ~/.local/bin/site_gate.py and site (backups *.bak-20261124-d536); claudemd-keeper FIX then
+      PASS 13:49Z (watermark 1a11a2f33). Gates still pass above 30 GPU-h only on a recorded --est-gpu-hours: critical_batch''s
+      owner sets 55; zng stage 2 at 136 is above 100 (Z+4g only, ~34, fits).'
   handoff:
     state: 'D534 step 30: parts 1, 2, 3, 4 built and replayed (findings 2026-11-24). Left: a live check of part 3 at the next
       real broken trial (expect an acked RUN event with ''folded into its search'', no wake) and at the next lxplus master
