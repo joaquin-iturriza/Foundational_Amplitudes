@@ -44991,7 +44991,7 @@ entries:
   match: cc_login_*
   evidence:
     runs: []
-    commit: 99d20a782
+    commit: bfa12ab9a
     paths:
     - analysis/cc_login/data/supervise_maintain_20261124.txt
     - scripts/prune_site.sh
