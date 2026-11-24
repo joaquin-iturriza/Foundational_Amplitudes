@@ -38364,7 +38364,7 @@ entries:
     blocks_steps: &id001 []
   owner:
     agent: a275e674e217bc7c6
-    state: working
+    state: closed
     since: '2026-11-24T21:40:14+00:00'
     state_at: '2026-11-24T23:14:46.104000+00:00'
     context: 235675
@@ -40584,39 +40584,26 @@ entries:
     at: '2026-11-24T22:51:16+00:00'
   step_waits: {}
   handoff:
-    state: '2026-11-24 ~21:30. D539 (Joaquin''s ''why are they causing a problem now''): ANSWERED and written up (results.tex
-      par:ftm_d539 @6c9740c38, figs d539 + d539s): the momentum log-rescale''s compression of the massless momenta costs Z+4g
-      scratch 2.41x at 1e4 (eps scan monotone 2.41/1.61/1.33/1.10, massless-only 2.34: not the mass shell) and stays at stable
-      HPs hp1333: 2.28x (1e4), 2.07x (1e5); uug soft limit gains 3-5 dec; uug bulk unresolved (5/12 blow-ups) -> step 4 (uug
-      searches per arm, detached ftmech_d539_uug_drive, 4x16 trials, configs @352fbb1aa). Parent for Z+ng: without the rescale.
-      Step 2 (dilution): both gluon-parent searches done (seed-42 bests, standardised val): 1e4 Fg 0.00726 (hp1998, lr 8.9e-3,
-      0.09 dec under window top 1.1e-2, as its sibling) vs Fn 0.00865 -> 0.84; D=1e3 Fg 0.0667 (lr 2.06e-3) vs Fn1k 0.0490
-      -> 1.36, scratch 0.0976. Gluon parent curves (glu_parent_curves.py, fig glu_parent_curves, caption in scratchpad glu_cap.txt,
-      NOT yet checked: script uncommitted): three processes (ee_bbbargg, ee_uugg, udbar_Wggg) blow up in the last ~10% (WSD
-      cooldown): best -3.05/-3.13/-3.98 at validations 40/30/44, last 140/101/64; the same three rise mildly in the 28-process
-      parent (-3.60->-2.76, -3.77->-3.33, -4.41->-4.11). No training-loss series in per_process_metrics.json: the earlier
-      ''train loss falls -> overfit'' is not shown by any figure; do not say overfit. UNCOMMITTED and NOT LAUNCHED (commits
-      blocked by notes-editor BLOCKING): sweep/sweep_config_ftmech_zng4g_d1e3_ftglu_b128.yaml (widened to [6e-4,6e-2], 24
-      trials, waves +[3,3,2] as siblings; extend_sweep.py ALREADY APPLIED to sweeps_local/ftmech_zng4g_d1e3_ftglu_b128 state),
-      seed_chunks/zng4g_ftglu_b128_s43/s44.txt (hp1998, --time 01:45:00, ~1 h each), analysis/finetune_mechanism/glu_parent_curves.py.
-      Next: fix notes-editor item 1 (results.tex ~9896 par:ftm_zng4g D=1e3 ''best at 14--16% ... 1.43--1.52x'' has no % src:
-      add curve_stats output to zng4g_d1e3_read.py with claims, or cut it), continue the notes-editor (SendMessage, same reviewer)
-      to pass; commit the three files; commit glu figure, check_caption; drive the D=1e3 extension (drive.py --config the
-      d1e3_ftglu config --n-trials 24 --sites ccin2p3 lxplus, detached) and submit the two seed chunks (site pick); read Fg/Fn
-      with seeds (zng4g_d1e3_read.py has Fg1k; 1e4 reader zng4g_ftnoset_read.py-style needs Fg). Notes-editor also proposed
-      (needs Joaquin''s yes, not applied): par:ftm_d539 last sentence ''as the fine-tune from that parent already showed''
-      -> ''showed at batch 2048 and in part at batch 128''.'
-    decisions: 'Joaquin''s: D519/D520/D529 (investigation, budget <100 GPU-h), D539 (the settings question). Mine: D539 step
-      4 at hp1333 (S''s optimum; first stage of the feature-vs-baseline rule), passed review; uug searches per arm as the
-      design''s fallback for blown-up cells (passed design); step-4 batch all on CC (lxplus job_seed_batch path untested,
-      lxplus GPU pool full; smoke removed); gluon D=1e3 search widened exactly as its siblings.'
-    ruled_out: 'D539: the Z''s mass shell (massless-only 2.34x); a small-data cause for Z+4g (2.07x at 1e5, stable HPs). hp1961
-      and hp1333 unstable for uug at batch 2048.'
-    running: detached ftmech_d539_uug_drive (4 uug searches, step 4)
-    files: analysis/finetune_mechanism/{d539_read.py,d539_kit_read.py,glu_parent_curves.py(uncommitted),zng4g_d1e3_read.py,zng4g_seed_chunks.py};
-      data/{d539,d539s,d539_kit,d539s_kit,glu_parent_curves}.json; figs/{d539,d539s,glu_parent_curves}; sweep/sweep_config_ftmech_d539_uug_*_b2048.yaml;
-      sweep/sweep_config_ftmech_zng4g_d1e3_ftglu_b128.yaml(uncommitted); seed_chunks/zng4g_ftglu_b128_s4{3,4}.txt(uncommitted)
-    written: '2026-11-24T21:27:26+00:00'
+    state: '2026-11-25. All designed steps read and written up; no step in flight. Dilution (D519/D520/D529): at 1e4/b128
+      the 9-process gluon/Z parent''s fine-tune beats the 28-process one, Fg/Fn 0.65 [0.48,0.88], and matches scratch, Fg/S
+      0.98 [0.87,1.10] (results.tex par:ftm_zng4g @486114d2d, fig zng4g_ftnoset_b128 v3); at D=1e3 it is worse, Fg1k/Fn1k
+      1.31 [1.26,1.37], still below scratch 0.64 (@146e2e442, fig zng4g_d1e3 v2). D539 closed: searched per arm, the rescale
+      costs uug bulk at 1e4 (2.18 [1.32,3.58]), 1e5 unresolved (1.68 [0.93,3.07]); kit soft -4.65/-4.57 dec, bulk +0.33/-0.07,
+      collinear +0.18/+0.21 (par:ftm_d539 @620135773, @b67c24b78, fig d539u v2 with kit panels). Open for Joaquin: whether
+      the entry closes (plan done --writeup b67c24b78) or a further thread opens (e.g. the gluon parent retrained so its cooldown
+      does not blow up its three high-multiplicity processes, so Fg is read at its final model); notes-editor''s proposed
+      rewording of par:ftm_d539''s last sentence waits on his yes.'
+    decisions: 'Joaquin''s: D519/D520/D529 (investigation, <100 GPU-h), D539 (settings question). Mine: uug searches per arm
+      read best against best with seeds 43/44 and kit scoring (the passed step-4 design''s fallback); D=1e3 gluon search widened
+      as its siblings (24 trials); arm name ''9-process parent'' in every figure (one name per arm); kit panels added to d539u
+      as a 2x3 grid (printable width).'
+    ruled_out: 'D539: the Z''s mass shell; a small-data cause for Z+4g; a uug bulk gain from the rescale in this setup (batch
+      2048, 1953 steps, WSD).'
+    running: none
+    files: analysis/finetune_mechanism/{zng4g_ftnoset_read.py,zng4g_d1e3_read.py,d539_read.py (--set u),d539_kit_read.py (--set
+      u),glu_parent_curves.py}; data/{zng4g_ftnoset_b128,zng4g_d1e3,d539u,d539u_kit,glu_parent_curves}.json; figs/{zng4g_ftnoset_b128,zng4g_d1e3,d539u,glu_parent_curves};
+      seed_chunks/{d539_uug_*,zng4g_d1e3_ftglu_b128_s4*,zng4g_ftglu_b128_s4*}.txt
+    written: '2026-11-24T23:18:58+00:00'
   intent:
   - text: I asked you to investigate the problem, it's extremely obvious that this implies testing different configurations,
       it's never a question then if you should send a run or not because it changes the configuration, that's the entire point
