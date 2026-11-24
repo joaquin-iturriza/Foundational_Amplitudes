@@ -179,7 +179,7 @@ def main():
         curves["control, no measurement"] = json.load(open(a.control))
     for lab, r in curves.items():
         print(f"VAL {lab}: final {r['val_curve'][-1]:.4f} best {min(r['val_curve']):.4f} at step "
-              f"{int(np.argmin(r['val_curve'])) * r['validate_every']}")
+              f"{(int(np.argmin(r['val_curve'])) + 1) * r['validate_every']}")  # validation k sits at step (k+1) x every
     figure(res, a.batch, f"{HERE}/figs/{a.name}", curves)
     # the summary the notes' claims key into: each check by its step; B over ALL windows (median, which the
     # heavy-tailed windows cannot move far, and its range), the windows without B counted, the largest |S| shares
@@ -203,7 +203,10 @@ def main():
         summ[f"check{x['step']}"].update(S_ratio=r2(x["S_chunk"] / x["S_brute"]), S_agree=x["S_agree"],
                                          G2_agree=x["G2_agree"])
     for lab, r in zip(("run", "control"), curves.values()):
-        summ[lab] = {"val_last": round(r["val_curve"][-1], 3), "hours": round(r["traintime_hours"], 2)}
+        # the best checkpoint: lowest aggregate val_loss_no_reg (val_curve), validation k at step (k+1) x every
+        k = int(np.argmin(r["val_curve"]))
+        summ[lab] = {"val_last": round(r["val_curve"][-1], 3), "val_best": round(r["val_curve"][k], 3),
+                     "best_step": (k + 1) * r["validate_every"], "hours": round(r["traintime_hours"], 2)}
     print(json.dumps(summ))
 
 
