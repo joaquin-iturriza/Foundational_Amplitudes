@@ -122,6 +122,7 @@ def main():
             "moved": ch[1] != ch16[1], "seeds": sorted(cs),
             "best": [float(c.min()) for c in curves[arm].values()],
             "best_at": [(int(np.argmin(c)) + 1) / len(c) for c in curves[arm].values()],
+            "end_over_best": [float(c[-1] / c.min()) for c in curves[arm].values()],
             "blowups": [s for s, c in curves[arm].items() if np.any(c > 10 * np.minimum.accumulate(c))],
             "trials": [(r[2]["lr"], r[2]["val_loss"] * k2, r[0], r[1]) for r in ok]}
     A = res["arms"]
