@@ -44055,6 +44055,16 @@ entries:
       (owner still reads the log) routing adds a ~38k check per event: -3.9M (-0.05%); if owners act on the checked reading,
       saving 7-53M (0.08-0.63%). Total expected saving now ~0.1%, at most ~0.8% if owners stop rereading; the spend sits in
       owners'' and the main session''s large contexts.'
+  - at: '2026-11-24T23:44:39+00:00'
+    text: 'Correction of the 2026-11-25 token-share finding (tools/token_share.py @b29133b07, json e0e2b1486): the first count
+      took each transcript record of one API message as its own message (one record per content block), counting usage ~1.7x
+      and splitting tool calls off. Corrected over 2026-11-09..23: total 4953M tokens ($2028); owners 55.8%, main 29.3%, other
+      agents 8.7%, reviewers 5.3% (10.0% of $), mechanical workers 0.7%. Tool-fix workers 37, 10.9M (0.22%), expected saving
+      8.3M = 0.17%; failed-log reads 136: under the current rule -4.4M (-0.09%); were owners to trust the checked reading
+      1.9-61M (0.04-1.23%); code lookups 0. Per-kind (each message''s tokens to the kind of its tool calls): owners'' plan/ledger
+      bookkeeping 11.4% of all, file reads and search 11.3%, analyses and tests 8.5%, submit/sync/pick 7.2%, figures 5.0%,
+      git 3.1%; main session''s bookkeeping 9.7%, replies and reasoning without tools 8.1%, briefing agents 4.7%. A message
+      costs its context (owners ~170k, main ~320k tokens), so a kind''s cost is its step count inside that context.'
   handoff:
     state: 'Hard round done (labllm 7a28103a4, summary.json, figs/lab_llm_hard.png): all ten multi-file fixes valid after
       the sandbox fix (774147232: TMPDIR in run dir, fixcheck copies as git repos; baselines refreshed 571cf7014). First pass
