@@ -10,7 +10,12 @@ The step:
   a gap to report, never a reason to shrink the job.
 - Jobs: `site submit ... --item {id}` with `--hdr=--time=` at the job's real need, recorded with `plan run {id} <run>`;
   a broken run's log (`site logs <run> -n 100000`) is read before anything is resubmitted.
-- GPU budget: above 30 GPU-h (10 on Jean Zay) only under a decision in force, or for work a decision of Joaquin's names, under 100 GPU-h.
+- Lab route (D541): a failed run's log is first read by DeepSeek (`python3 tools/labllm.py triage <run> --event E<n>
+  --end <class>`), a small tool fix first made by it (`python3 tools/labllm.py fix <brief file> --test "<cmd>"`, one
+  Bash call with timeout 600000); you check its reading against the log, or read its diff whole and run the test,
+  before anything is acked, committed or resubmitted, record `python3 tools/labllm.py check <id> --agree|--disagree
+  --note "<why>"`, and do the step yourself when you disagree or DeepSeek does not answer.
+- GPU budget: CLAUDE.md.
 - Commit only your own files, named (`git commit -m "..." -- <paths>`).
 === END MECHANICAL RULES ===
 

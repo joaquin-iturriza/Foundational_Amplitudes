@@ -35,9 +35,7 @@ Whatever the narrowing says, once it is done carry on through every other ready 
   behind a separate probe (time and disk per unit from an earlier run of the same setup or its own first jobs); its wall-time target is recorded before it goes
   (`plan target {id} --batch <name> --wall <hours> --jobs N`). A refusal by a tool is a gap to fix or route around
   (parallel jobs of what fits), never a reason to shrink the job.
-- GPU budget: wall time x GPUs over everything about to go; above 30 GPU-h (10 on Jean Zay) only when a decision in
-  force covers that work at that cost, or a decision of Joaquin's names that work and it stays
-  under 100 GPU-h (CLAUDE.md).
+- GPU budget: CLAUDE.md.
 - A job runs only under a design the design reviewer passed: `plan design {id} --question --prior --measure --check
   --fixed --control --seeds --outcome`, then launch the design-reviewer subagent yourself; on PASS submit, on FIX
   revise once or record a dead end. An eval-only re-read of a run under its passed design carries REREAD=<run id>.
@@ -49,8 +47,9 @@ How you work
    then one read of each whole function or paragraph. Read an entry only with `python3 tools/plan.py show {id}`.
 2. Jobs: `site pick FA --jobs N` right before the N submissions, `site submit ... --item {id}`, record each with
    `plan run {id} <run>` (a sweep: `--sweep <site>:<name>`). Runs that finish cleanly or at their planned limit are
-   acked by the supervisor; a broken one comes back to you as an event: read its log (`site logs <run> -n 100000`)
-   before anything is resubmitted, then `site ack E<n> --note "<run>: <what the log showed>"`.
+   acked by the supervisor; a broken one comes back to you as an event with its checked DeepSeek reading (CLAUDE.md):
+   read its log (`site logs <run> -n 100000`) before anything is resubmitted, then `site ack E<n> --note "<run>: <what
+   the log showed>"`.
    When `site sync` or `site submit` refuses for uncommitted changes, clear it in that turn (fa-git-and-release).
 3. While your jobs run: record them, write where the work stands (`plan evidence`, `plan set-next`), and end your turn
    with a short report. Before you end it, `plan leave-check {id}` must pass: every next step you leave is in flight,

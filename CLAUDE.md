@@ -47,7 +47,7 @@ on the sites (`~/work/CLAUDE.md`).
 - A plan I was told is a commitment (its cores, jobs and wall time): a tool's refusal is a gap to fix or route around (parallel jobs of what fits), never a reason to shrink the job; when neither works, the smaller version and its new time come to me before submission.
 - Every message that reports a submission points to the exact config each run or sweep was launched with (its path at a commit, or the file sent when shorter) [D237]; no wait for my reading.
 - Any difference between what I asked and what was submitted opens the message that reports the submission; a figure or number mixing cells run at different compute says so wherever it is shown.
-- GPU budget: estimate wall time × GPUs over everything about to be submitted, sized to what I asked; above 30 GPU-h (10 on Jean Zay) confirm with me unless a decision in force approves that work at that cost, or a decision of mine names that work (its covers) and it stays under 100 GPU-h (D511's bound) [D153, D242, D244, D536]; otherwise run it and show me what ran.
+- GPU budget: estimate wall time × GPUs over everything about to be submitted, sized to what I asked; above 30 GPU-h (10 on Jean Zay) confirm with me unless a decision in force approves that work at that cost, or a decision of mine names that work and it stays under 100 GPU-h [D153, D242, D244, D511, D536]; otherwise run it and show me what ran.
 - Reading state, git and file edits are never confirm-first.
 - A problem whose fix is easy and loses nothing hard to get back is fixed at once and then reported, never asked or left waiting.
 - A defect found is fixed where every later run picks it up (a `config/` default, the canonical setup, a load or submit check), at once or as a plan step that blocks its entry; a sentence in `docs/results.tex` saying it "is being fixed" is never the fix.
@@ -65,6 +65,7 @@ on the sites (`~/work/CLAUDE.md`).
 
 ## Clusters and jobs
 
+- A failed run's log is read first by DeepSeek (`tools/labllm.py triage`) through a `mechanical-worker`, which checks that reading against the log before anything is acked, committed or resubmitted; the owner then reads the log itself [D541].
 - State every batch's wall-time target before submission and record it on its plan entry: the time of its work (training steps at the model's step rate in a plain training run on that GPU, one forward pass per read, generation at the probe's time per event), never a measured rate that includes overhead; the job's `--hdr=--time=` is that need with room; jobs are never pinned to a GPU model.
 - A batch goes out whole, never behind a separate probe: its time and disk per unit come from an earlier run of the same setup or are read from its own first jobs (generation keeps its probe, a new launch path its smoke run); it is laid out to finish in one wave at the width `site pick` offers; disk per unit times the jobs, plus any cache they should share (shown shared by two jobs on the same data), must fit the site's free disk read at submission.
 - A run built on another run's saved config lists in its design every inherited setting that differs from the `config/` defaults (validation size, subsampling, inputs, steps, target), or, for a setup named after a run, from that run's `config.yaml` (Hydra `--cfg job`); one the design does not name is reset before submission.

@@ -15,8 +15,10 @@ Roles
 - On every wake (the user's message, an event of an entry, an
   agent's hand-back) the main session runs `plan next`, which says per entry what moves: `resume <agent>` (SendMessage carrying the
   event), `launch` (a fresh owner from the entry's hand-off), `close <agent>` (context past the threshold), or nothing.
-  Routine events never reach it: the supervisor acks them. A log-reading event (RUN, GAP, OVERRUN) goes by name to its
-  owner (SendMessage), or with no live owner to a `mechanical-worker` (Agent); a hook incident to a `mechanical-worker`.
+  Routine events never reach it: the supervisor acks them. A RUN event first goes to a `mechanical-worker` for the
+  lab route (CLAUDE.md; on a stopped owner's resume line `plan next` prints its step), then with that reading to its
+  owner (SendMessage), or with no live owner it stays with that worker; GAP and OVERRUN go by name to the owner, or
+  with no live owner to a `mechanical-worker`; a hook incident to a `mechanical-worker`.
 - An owner is one background agent per entry in progress (Agent tool, `run_in_background`), its brief rendered by
   `plan brief <entry>` from `plan/step_prompt.txt`, recorded with `plan owner <entry> --agent <id>`. It covers all of
   the entry (analyses, fixes, designs, jobs, write-ups) and is never split into more agents for the same entry.
