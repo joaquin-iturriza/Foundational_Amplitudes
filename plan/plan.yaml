@@ -44931,6 +44931,8 @@ entries:
     state: working
     since: '2026-11-24T23:30:10+00:00'
     state_at: '2026-11-24T23:30:29+00:00'
+    context: 121067
+    context_at: '2026-11-24T23:39:26+00:00'
   designs:
   - at: '2026-11-24T17:27:42+00:00'
     question: Does a maintain command run as a 1-CPU job on CC's htc partition (site run --recurring), read by the next supervisor
