@@ -38153,7 +38153,7 @@ entries:
     - FA-lxplus-e8d15505
     - FA-lxplus-fad6ff57
     - FA-lxplus-fbdf6bc6
-    commit: 6236e60fd
+    commit: a538e3198
     paths:
     - analysis/finetune_mechanism/data/restart_steps.json
     - analysis/finetune_mechanism/data/restart_summary.json
@@ -38165,6 +38165,7 @@ entries:
     - analysis/finetune_mechanism/plot_restart.py
     - analysis/finetune_mechanism/restart_steps.py
     - analysis/finetune_mechanism/restart_test_readout.py
+    - analysis/finetune_mechanism/seed_chunks/d539_uug_1e4_off_b2048_s43.txt
     - analysis/finetune_mechanism/zng4g_d1e3_read.py
     - analysis/finetune_mechanism/zng4g_sigreset_read.py
     - analysis/finetune_mechanism/zng4g_snap_read.py
