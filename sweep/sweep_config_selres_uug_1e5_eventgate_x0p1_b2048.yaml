@@ -1,0 +1,56 @@
+# selective_rescale (D552): e+e- -> u u~ g at 1e5 events, scratch, arm eventgate_x0.1 (model.input_soft_eps=1.0e-08, model.input_soft_gate=0.1);
+# each arm-cell its own 16-trial search over the D539 space (best against best).
+# Identical to sweep_config_ftmech_d539_uug_1e4_off_b2048.yaml except sweep_name, train_subsample and the input flags.
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  request_gpus: 1
+  mem: 32G   # 3e6-event recipe pools in memory, float64 (the 8 runs at job_kit.sh's 32G)
+  cpus_per_task: 4
+  requirements: 'regexp("A100|H100", TARGET.GPUs_DeviceName) && !regexp("MIG", TARGET.GPUs_DeviceName)'   # HTCondor only: float64 trials on a Tesla T4 ran 3-6x slower (trial_0833 0.225 s/step against 0.036-0.074 on A100/H100)
+  time: "01:00:00"
+paths: null
+sweep_name: selres_uug_1e5_eventgate_x0p1_b2048
+base_config: ${PROJECT_DIR}/runs/kit/kit_A_uq_zgggg_me2_n500000_t12500
+n_trials: 16  # as the D539 searches it is read against
+dyhpo:
+  surrogate: gp
+  n_candidates: 2000
+  objective_scale: auto
+  seed: 42
+  n_startup: 3
+  total_budget: 10000
+  waves: [3, 3, 2, 3, 3, 2]
+fidelity_schedule:
+  t_steps: [1953]
+fixed_params:
+  data.source: recipes
+  data.processes_file: ${PROJECT_DIR}/runs/kit/recipes/kit_A_ee_uug_me2_n100000_t8000.yaml
+  data.train_subsample: 100000
+  model.input_soft_eps: 1.0e-08
+  model.input_soft_gate: 0.1
+  data.internal_mass_pdgs: '[23,6,25,24]'
+  data.eval_subsample: 'null'
+  data.memmap: 'false'
+  training.dtype: float64
+  training.heterosc_select: mu_mse
+  evaluation.train_subsample: 2000
+  seed: 42
+  plot: 'true'
+  warm_start_idx: 'null'
+  fine_tune.pretrained_path: 'null'
+  training.optimizer: MuonAdamW
+  training.scheduler: WSD
+  training.wsd_cooldown_frac: 0.125
+  training.validate_frac: 0.02
+  training.batchsize: 2048
+range_extension:
+  enabled: false
+search_space:
+- {name: training.lr, type: float_log, low: 3.1e-03, high: 4.1e-02}
+- {name: training.muon_weight_decay, type: float_log, low: 1.0e-03, high: 0.3}
+- {name: training.regularization_lambda, type: float_log, low: 1.0e-10, high: 1.0e-06}
+- {name: training.cosanneal_warmup_frac, type: float_uniform, low: 0.05, high: 0.2}
+- {name: training.cosanneal_eta_min, type: float_log, low: 1.0e-10, high: 1.0e-07}
+- {name: ema, type: categorical, choices: ["false", "true"]}
+- {name: training.ema_decay, type: float_uniform, low: 0.9, high: 0.999}
