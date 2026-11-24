@@ -42705,9 +42705,9 @@ entries:
       - 'Joaquin approves a version: submit it'
       - 'he declines: report B_simple alone'
   step_waits:
-    '1': repo-reviewer re-check (noise_read finding 1 fixed in working tree; backlog also BLOCKed on other entries' findings
-      2-4), then commit noise_scale.py move + noise_read, redraw, check_caption, insert sec:noisescale (scratchpad cb/insert.py),
-      verify_claims, commit, drop step 1
+    '1': repo-reviewer backlog pass (finding 1 on noise_read resolved, figure follow-ups fixed in working tree; backlog still
+      BLOCKed on other entries' findings 2-4), then commit noise_scale.py move + noise_read, redraw, check_caption (scratchpad
+      cb/caption.txt), insert sec:noisescale (cb/insert.py), verify_claims, commit, drop step 1
     '2': step 1's B_simple read (noise_scale.json of the v4_het_noise_scale run)
   targets:
   - batch: noise_smoke
