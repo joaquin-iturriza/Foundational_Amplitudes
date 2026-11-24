@@ -1,0 +1,1 @@
+sweep/sweep_config_ftmech_zng4g_d1e3_ftglu_b128.yaml ftmech_zng4g_d1e3_ftglu_b128_s43 3125 training.lr=0.0035454691581267954 training.muon_weight_decay=0.006668002793249267 training.regularization_lambda=1.1237904347238446e-08 training.cosanneal_warmup_frac=0.05486317058093846 training.cosanneal_eta_min=2.9358156895554578e-09 ema=true training.ema_decay=0.9931392998518422 seed=43
