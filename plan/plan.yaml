@@ -15823,7 +15823,7 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-046cc7d3
-    commit: de109142d
+    commit: 6bd35859d
     paths:
     - .claude/hooks/notification_absorb.py
     - .claude/hooks/owner_handoff.py
@@ -15959,6 +15959,7 @@ entries:
       URGENT_KINDS change cut nothing; the actual 32 is below the replay''s 56 by what the replay does not model (quiet filter
       of entries whose owner works, re-arm delay, the 04:52-08:47 absence). Step 23 not closed; a longer window than D324''s
       10 min is Joaquin''s call.'
+    - analysis/agent_redesign/figs/wake_batching_after2_per_day.png
     - analysis/agent_redesign/model_trial.json
     - analysis/agent_redesign/push_replay.json
     - analysis/agent_redesign/push_replay_hold.json
