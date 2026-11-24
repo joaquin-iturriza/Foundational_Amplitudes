@@ -45436,7 +45436,10 @@ entries:
   - D547
   - D548
   next: null
-  done_when: null
+  done_when: K=/home/joaquin/work/orchestrator-kit; git ls-remote https://github.com/joaquin-iturriza/orchestrator-kit refs/heads/main
+    | grep -q "^$(git -C $K rev-parse HEAD)" && git -C $K show HEAD:README.md | grep -q "Untested on a cluster:\*\* the site-side
+    gate" && grep -q "label{sec:orchestrator-kit}" docs/results.tex && python3 -c "import sys; sys.path.insert(0, \"tools\");
+    import review_state; sys.exit(1 if review_state.unreviewed(\"d7bef3f22\", \".\") else 0)"
   notes_ref: sec:orchestrator-kit
   match: orchestrator_kit_*
   evidence:
