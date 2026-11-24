@@ -42015,7 +42015,7 @@ entries:
   step_waits:
     '2': the 10 timed Sonnet mechanical-worker fix agents (analysis/lab_llm_trial/sonnet_timed.json), graded by tools/lab_llm_trial.py
       sonnet_timed
-    '1': detach:labllm_resume (last 2 lab runs)
+    '1': detach:labllm_rerun
   findings:
   - at: '2026-11-23T19:55:22+00:00'
     text: 'Local batch width cut from 6 parallel opencode streams to 2 (D531): 6 streams of opencode sessions (~350-400 MB
