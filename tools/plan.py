@@ -490,6 +490,10 @@ def ask_matches(e, text):
     flat = lambda s: re.sub(r"\s+", " ", re.sub(r"[\"'`*_>\u2018\u2019\u201c\u201d~]", "", s or "")).strip().lower()
     if "?" in (text or "") and flat(e.get("ask")) and flat(e.get("ask")) in flat(text):
         return True
+    # the ask quoted whole but typeset differently ("·" for a space, "−" for "-", a lead-in): nearly all its terms in one
+    # message that asks (2026-11-24: critical_batch ask relayed twice, 57 of its 60 terms present, refused)
+    if "?" in (text or "") and len(w) >= 20 and len(w & ask_terms(text)) >= 0.8 * len(w):
+        return True
     eid = (e.get("id") or "").lower()
     keys = blocked_steps(e) or set(step_keys(e))
     # the two looser branches count only a sentence that asks: a "?" or words addressing the user's call

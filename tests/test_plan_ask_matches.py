@@ -216,3 +216,20 @@ def test_lettered_options_one_question_third_reworded_passes():
            "- (b) One search on Z+4g only, then all 8 runs again at its HPs: ~33 GPU-h.\n- (c) No search; runs reported untrained.")
     assert plan.ask_matches(e, msg)
     assert not plan.ask_matches(e, "Joaquin, do you like the plot colours?")
+
+
+CB_ASK = ("GPU budget: about 55 GPU-h above 30 with no decision covering it. Joaquin, testing the measured noise scale against "
+          "batch-size runs (D532) needs, at each batch size (2048, 4096, 8192, 16384, 32768; canonical catalog_v4 WSD het "
+          "setup, 5 epochs, lr held at its peak), the lr that reaches a target loss in the fewest steps; then steps S and "
+          "events E = B S to the control's stable-phase validation loss, fit S/S_min - 1 = (E/E_min - 1)^-1, B_crit = "
+          "E_min/S_min, against B_simple. The lr per batch from one 8-trial DyHPO search per batch size (the CLAUDE.md rule): "
+          "about 55 GPU-h (estimate: 1.0 s/step at 16384 on a V100, scaled with the batch). An lr-only search of 4 values per "
+          "batch (about 28 GPU-h) would need your yes under D241. Go for 55, 28, or neither?")
+
+
+def test_ask_retypeset_with_unicode_passes_unrelated_refuses():
+    e = {"id": "critical_batch", "ask": CB_ASK}
+    msg = ("Joaquin, the recorded form: " + CB_ASK.replace(" - 1", " − 1").replace("E = B S", "E = B·S")
+           .replace("(the CLAUDE.md rule)", "").replace("(estimate: ", "(from "))
+    assert plan.ask_matches(e, msg)
+    assert not plan.ask_matches(e, "Joaquin, the noise scale run is on lxplus; GPU budget is not an issue, ok?")
