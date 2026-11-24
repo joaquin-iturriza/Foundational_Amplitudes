@@ -154,3 +154,7 @@
 {"family": "fixcheck", "task": "replyblock", "parent": false, "fix": true, "valid": true}
 {"family": "fixcheck", "task": "recheck", "parent": false, "fix": true, "valid": true}
 {"family": "fixcheck", "task": "reviewlock", "parent": false, "fix": true, "valid": true}
+{"family": "hardfix", "task": "inflight", "arm": "sonnet", "model": "sonnet (mechanical-worker)", "agent": "a50d52473facc61ec", "first_pass": true, "final_pass": true, "seconds": 221.6, "our_tokens": 134038, "usd": 0.115, "usage": {}, "rc": 0, "failing_first": ["the migration marks the setup's own entries setup"]}
+{"family": "hardfix", "task": "backlogdepth", "arm": "sonnet", "model": "sonnet (mechanical-worker)", "agent": "a34e1aebeaa70dec6", "first_pass": true, "final_pass": true, "seconds": 369.2, "our_tokens": 348130, "usd": 0.2179, "usage": {}, "rc": 0, "failing_first": ["the migration marks the setup's own entries setup"]}
+{"family": "hardfix", "task": "recheck", "arm": "sonnet", "model": "sonnet (mechanical-worker)", "agent": "a5a655ce3d5d66520", "first_pass": true, "final_pass": true, "seconds": 336.4, "our_tokens": 275255, "usd": 0.1804, "usage": {}, "rc": 0, "failing_first": ["the migration marks the setup's own entries setup"]}
+{"family": "hardfix", "task": "endedrun", "arm": "sonnet", "model": "sonnet (mechanical-worker)", "agent": "ab6719d4701322e2e", "first_pass": true, "final_pass": true, "seconds": 330.2, "our_tokens": 242270, "usd": 0.1427, "usage": {}, "rc": 0, "failing_first": ["the migration marks the setup's own entries setup"]}
