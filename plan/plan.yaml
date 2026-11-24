@@ -38373,9 +38373,9 @@ entries:
     blocks_steps: &id001 []
   owner:
     agent: a275e674e217bc7c6
-    state: stopped
+    state: working
     since: '2026-11-24T21:40:14+00:00'
-    state_at: '2026-11-24T21:52:19.090000+00:00'
+    state_at: '2026-11-24T22:25:16.137000+00:00'
     context: 132134
     context_at: '2026-11-24T21:57:14+00:00'
   findings:
@@ -44183,7 +44183,7 @@ entries:
     agent: a27cabf54bbbc7b67
     state: working
     since: '2026-11-24T21:40:30+00:00'
-    state_at: '2026-11-24T22:10:52.006000+00:00'
+    state_at: '2026-11-24T22:25:18.396000+00:00'
     context: 213514
     context_at: '2026-11-24T22:25:33+00:00'
   designs:
@@ -44927,9 +44927,9 @@ entries:
   asks: []
   owner:
     agent: a97209d81e39f1376
-    state: working
+    state: stopped
     since: '2026-11-24T17:21:44+00:00'
-    state_at: '2026-11-24T22:09:24.763000+00:00'
+    state_at: '2026-11-24T22:19:56.214000+00:00'
     context: 267384
     context_at: '2026-11-24T22:25:40+00:00'
   designs:
