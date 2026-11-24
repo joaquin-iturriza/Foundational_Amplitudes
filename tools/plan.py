@@ -1830,8 +1830,12 @@ def cmd_intent(a):
     if not said:
         sys.exit("plan: Joaquin never typed these words (searched his messages); quote him exactly")
     for f in (a.ref, a.rejects):
-        if f and not os.path.exists(os.path.join(ROOT, f)) and not os.path.exists(f):
+        if f and not os.path.exists(f):
             sys.exit("plan: no file %s" % f)
+    sys.path.insert(0, os.path.join(HERE, ".claude", "hooks"))
+    from send_check import repo_rel           # the key send_check compares producers by
+    a.rejects = a.rejects and repo_rel(a.rejects)
+    a.ref = a.ref and repo_rel(a.ref)
     with transaction() as (d, st):
         e = entry(d, a.id)
         if any(x["text"] == a.quote for x in e.get("intent") or []):
