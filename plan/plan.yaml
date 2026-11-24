@@ -44369,3 +44369,14 @@ entries:
     outcome: 'yes: every output file complete (DISK_INVENTORY_DONE, scratch_top.tsv sums to within 2% of du of $SCRATCH),
       giving the delete-candidate list by class (our debris, unread caches, results needing Joaquin''s call); no: a read missing
       or cut, rerun that part alone'
+  findings:
+  - at: '2026-11-24T14:32:44+00:00'
+    text: '2026-11-24 login-node reads: /sps/lpnhe 512 GiB group space at 98% (498 GiB used, 15 GiB free), .disk_full flag
+      present (feed_capped submits nothing). du allocated (MiB): ours runs 122051, runs_from_lxplus 23843, .venv 10475, checkout
+      loose files 8721, datasets 79742, mg5amcnlo 14202, SCRATCH amp_data_cache 75265, amp_mmap_cache 45338 (keys 522bb v4
+      20706 + 99c1 dc 17832 + b39f dc 1847 read today; 7d58 + f5cc 2478 each, format 2 of 2026-11-05, unreadable by MMAP_VERSION
+      3), lhe_queue 11160, zz_* >=50571 (zz_catft* 34.4 GB, muon_test runs cited by draft_rewrite); Joaquin''s other projects
+      likelihoods 28086, madgrav 19506, ext 15512, jitu 10411, critical_networks 8318, .cache 6574, Fin_ML 3115; other users
+      croland 60704, rvandenbrouc 29763, benayoun 21064, ldelbuon 1950. Allocated du sums to 1.28x df used (Isilon). SCRATCH
+      holds 126,942 entries: 118,777 zeroshot_*, 6,749 signed_ab_* etc. temp run dirs never removed (fixed acd6b8753). CC''s
+      login node cuts site run sessions after 40 s-2 min of du/census: long reads go to scripts/job_disk_inventory.sh (htc).'
