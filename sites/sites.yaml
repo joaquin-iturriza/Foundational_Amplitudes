@@ -23,6 +23,7 @@ ccin2p3:
     gpu_flag:  "--gpus={n}"        # job_submit.lua dies on a typed --gres; --gpus is what it reads
     mem:       32G                 # MANDATORY here; a job without --mem is rejected
     max_cpus_per_gpu: 5            # "Max allowed cpus per gpu (v100): 5"
+    partition_gpu_mem: {gpu_v100: 32G, gpu_h100: 94G}   # --hdr=--gpu-min-mem=80G keeps only gpu_h100 (H100 NVL)
   cpu:                             # CPU-only work (dataset prebuild): no GPU hours
     partition: htc
     account:   lpnhe
