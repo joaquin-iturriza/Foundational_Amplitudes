@@ -39703,7 +39703,8 @@ entries:
     units: null
     start: '2026-11-24T04:06:19+00:00'
     at: '2026-11-24T04:06:19+00:00'
-  step_waits: {}
+  step_waits:
+    '2': '2026-11-25'
   handoff:
     state: '2026-11-23 ~23:10 CET. Everything of D519/D520/D529 is in flight; nothing waits on Joaquin. (1) One setting at
       a time, b2048 (design passed 2026-11-23): both 16-trial searches done (soft-rescale only: chosen hp1961, lr 2.80e-2,
