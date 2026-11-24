@@ -44890,6 +44890,27 @@ entries:
     outcome: 'yes: DEBRIS_DONE, the manifest''s per-class totals near the inventory''s (smokes ~1.4, memmap ~4.8, scratch
       ~2.2 GiB, logs), df used down by about the manifest''s total; no: the job stops before DEBRIS_DONE (manifest says what
       was listed; a rerun recomputes the list and deletes only what is still there)'
+    fix_at: '2026-11-24T23:44:15+00:00'
+    fix: '1) The joblogs class deletes logs that reported numbers reproduce from. analysis/catalog_v4/ws_objective_check.py
+      (SITE block) reads end-of-run metrics from checkout-root ''*<scheduler id>*.out'' logs (glob d='''' first), lines ''[..]
+      MSE (prepd) val_X X: v'' / ''L1 (prepd)'' / ''Mean |rel err|'', which are neither RUN_SUMMARY nor RESULT_JSON. docs/results.tex
+      carries ''% src: ws_objective_check.py score FA-ccin2p3-e046ac67 FA-ccin2p3-f35b6a78'' and others (lines 3179, 3206,
+      3266), so those logs are results, not debris. Other committed analyses also parse .out logs (kshot_spread, short_run_bias,
+      multext_compare, dipole_residual, ws_het_split, critical_batch/cbs_read, zng_uq/benchmark, ...) and were not checked.
+      Fix: keep every checkout-root log whose job id belongs to a run in the registry (runs.db) or is named in docs/results.tex
+      or analysis/, or that holds any end-of-training metric line (''Finished training'', ''val_'' metric lines), not only
+      RUN_SUMMARY/RESULT_JSON. Show on the fake tree that a log with only ''[..] MSE (prepd) val_x x: 1.0'' lines is kept.
+      2) The outcome gives no expected size for the joblogs class (''logs'' with no number), and nothing bounds the deletion
+      to what D550 approved (~8.4 GiB: smokes ~1.4, memmap ~4.8, scratch ~2.2). State the joblogs class''s expected size from
+      the inventory''s files_checkout.tsv. Add a guard to the script: no class is deleted when its listed total is over 2x
+      its expected size (the 2x margin rule), and the job reports that class instead. 3) Minor, same fix: holds_result reads
+      the whole file into memory on a 1-CPU, 2 GB job, so a multi-GB .out would kill the job before any deletion. Stream the
+      file in chunks. The local fake-tree check should be committed as a test (tests/), so the next reviewer can rerun it.
+      The rest holds: the four classes match D550''s words (''and yes, delete the debris.'', covers old smoke and probe runs,
+      scratch dirs, loose job .out files, the two unreadable old-format memmap caches); the named smokes are uncited in the
+      repo except zz_probe_long_w* (an output name in job_catalog_v3_short.sh) and zz_memmap_test (a test''s --out); the memmap
+      keys are format 2, unreadable by MMAP_VERSION 3, and kept if a live job names them; the manifest is written before any
+      deletion; squeue failing aborts before the manifest; the paths are asserted to be direct children; it is a CPU job.'
   findings:
   - at: '2026-11-24T14:32:44+00:00'
     text: '2026-11-24 login-node reads: /sps/lpnhe 512 GiB group space at 98% (498 GiB used, 15 GiB free), .disk_full flag
