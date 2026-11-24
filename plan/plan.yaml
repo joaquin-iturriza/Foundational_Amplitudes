@@ -44404,9 +44404,7 @@ entries:
     - cc_disk
   decisions:
   - D542
-  next: Read quotas and df on CC, then the per-directory inventory (analysis/storage tools; the held storage entry's lists);
-    report the top consumers with sizes and a delete list split into our debris (deleted now, reported), caches no running
-    job or open recipe reads, and results that need Joaquin's decision
+  next: null
   done_when: null
   notes_ref: null
   match: cc_disk_*,zz_probe_*
@@ -44525,8 +44523,7 @@ entries:
       1 MiB and overstates. Census --in-use ''*'' --days 14: amp_data_cache all keep (60,138 MiB, 18,498 files). Since 15:20
       the disk fell 15->10 GB through llm_compare part (b) width smokes in runs/zz_smoke (two uncompressed checkpoints each,
       2x2.78 GB at 64 heads); the pending 120-head smoke FA-ccin2p3-74ba6cdd projects ~19.5 GB.'
-  step_waits:
-    '1': FA-ccin2p3-b949c4ee
+  step_waits: {}
   targets:
   - batch: disk_inventory
     wall_h: 1.0
