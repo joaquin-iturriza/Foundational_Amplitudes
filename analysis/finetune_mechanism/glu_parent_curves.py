@@ -1,6 +1,6 @@
 """Plan finetune_mechanism step 2 (H2 dilution): the validation curves of the 9-process gluon/Z parent
 (FA-ccin2p3-1f2d9ad5) beside the 28-process no-settings parent (FA-ccin2p3-9a73698a) on the 9 processes they share,
-per validation of the main stage (val_loss_no_reg per process, HETEROSC NLL), with the training loss. Read before any
+per validation of the main stage (val_loss_no_reg per process, HETEROSC NLL; the metrics file holds no training loss). Read before any
 word on how the gluon parent trained.
 
     python3 analysis/finetune_mechanism/glu_parent_curves.py [--cached]   -> data/glu_parent_curves.json, figs/glu_parent_curves
@@ -23,8 +23,7 @@ out = {}
 for a in sys.argv[1:]:
     tag, d = a.split("#")
     m = json.load(open(os.path.join(d, "plots_0", "per_process_metrics.json")))
-    out[tag] = {"combined": m["val_loss_no_reg"], "proc": m["proc_val_losses_no_reg"],
-                "train": {k: v for k, v in m.items() if "train" in k.lower() and isinstance(v, list)}}
+    out[tag] = {"combined": m["val_loss_no_reg"], "proc": m["proc_val_losses_no_reg"]}
 print("GLUC " + json.dumps(out))
 '''
 
@@ -44,8 +43,7 @@ def main():
         res[t] = {"best_idx": b, "best_val": b + 1, "n_val": len(c), "combined_at_best": float(c[b]),
                   "proc": {p: {"first": raw[t]["proc"][p][0], "at_best": raw[t]["proc"][p][b],
                                "last": raw[t]["proc"][p][-1]}
-                           for p in procs if p in raw[t]["proc"]},
-                  "train_keys": sorted(raw[t]["train"])}
+                           for p in procs if p in raw[t]["proc"]}}
     print(json.dumps(res))
     plot(raw, procs)
 

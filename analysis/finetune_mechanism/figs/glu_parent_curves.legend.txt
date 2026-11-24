@@ -1,4 +1,4 @@
-# producer: /home/joaquin/work/FA/analysis/finetune_mechanism/glu_parent_curves.py 9467eb382fda8c761899829b2f651eb5edd8236e
+# producer: /home/joaquin/work/FA/analysis/finetune_mechanism/glu_parent_curves.py 33107c3e03400e21084e848ece4a2b57a20942bf
 9-process parent
 28-process parent
 $e^+e^-\to ZZ$
