@@ -50,6 +50,14 @@ Answer with one JSON object only: {"send_to": [agent ids messaged], "launch": <n
 "run", "wait", "owner", "answer"]}."""
 
 
+def wilson(k, n, z=1.96):
+    if not n:
+        return None
+    p, d = k / n, 1 + z * z / n
+    c, h = (p + z * z / (2 * n)) / d, z * (p * (1 - p) / n + z * z / (4 * n * n)) ** 0.5 / d
+    return [round(c - h, 3), round(c + h, 3)]
+
+
 def text_of(c):
     return mt.text_of(c) if not isinstance(c, str) else c
 
@@ -107,7 +115,8 @@ def segments(since, until):
 
 def key(s):
     said = s["said"].strip()
-    return {"send_to": sorted({str(i.get("to")) for n, i in s["calls"] if n == "SendMessage"}),
+    return {"send": any(n == "SendMessage" for n, _ in s["calls"]),
+            "send_ids": sorted({str(i.get("to")) for n, i in s["calls"] if n == "SendMessage"}),
             "launch": sum(n in ("Agent", "Task") for n, _ in s["calls"]),
             "ack": sorted({a for n, i in s["calls"] if n == "Bash" for a in ACK.findall(str(i.get("command") or ""))}),
             "tell_joaquin": len(said) > 60 and "nothing new" not in said.lower(),
@@ -144,7 +153,8 @@ def parse(ans):
         j = json.loads(m.group(0)) if m else {}
     except ValueError:
         j = {}
-    return {"send_to": sorted({str(x) for x in j.get("send_to") or []}), "launch": int(j.get("launch") or 0),
+    return {"send": bool(j.get("send_to")), "send_ids": sorted({str(x) for x in j.get("send_to") or []}),
+            "launch": int(j.get("launch") or 0),
             "ack": sorted({str(x) for x in j.get("ack") or []}), "tell_joaquin": bool(j.get("tell_joaquin")),
             "plan": sorted({str(x) for x in j.get("plan") or []})}
 
@@ -172,10 +182,17 @@ def report(a):
     rep = {}
     for name in sorted({m for _, m in last}):
         rs = [r for (t, m), r in last.items() if m == name and not r["answer"].startswith("ERROR")]
-        fields = ("send_to", "launch", "ack", "tell_joaquin", "plan")
+        fields = ("send", "launch", "ack", "tell_joaquin", "plan")
         ok = [r for r in rs if all(r["got"][k] == wakes[r["t"]]["key"][k] for k in fields)]
-        none = sum(not any(wakes[r["t"]]["key"][k] for k in fields) for r in rs)
-        rep[name] = {"n": len(rs), "correct": len(ok), "do_nothing_baseline": none,
+        quiet = [r for r in rs if not any(wakes[r["t"]]["key"][k] for k in fields)]
+        ids = [r for r in rs if wakes[r["t"]]["key"]["send_ids"] and all(
+            i in wakes[r["t"]]["text"] + json.dumps(wakes[r["t"]]["state"]) for i in wakes[r["t"]]["key"]["send_ids"])]
+        rep[name] = {"n": len(rs), "correct": len(ok), "correct_wilson": wilson(len(ok), len(rs)),
+                     "do_nothing_baseline": len(quiet), "do_nothing_wilson": wilson(len(quiet), len(rs)),
+                     "wrong_on_quiet": sum(r not in ok for r in quiet),
+                     "active": len(rs) - len(quiet), "correct_on_active": sum(r in ok for r in rs if r not in quiet),
+                     "exact_ids_when_in_prompt": [sum(r["got"]["send_ids"] == wakes[r["t"]]["key"]["send_ids"]
+                                                      for r in ids), len(ids)],
                      "per_field": {k: sum(r["got"][k] == wakes[r["t"]]["key"][k] for r in rs) for k in fields},
                      "wrong": [(r["t"], wakes[r["t"]]["key"], r["got"]) for r in rs if r not in ok],
                      "seconds_median": sorted(r["seconds"] for r in rs)[len(rs) // 2] if rs else None,
@@ -191,44 +208,53 @@ VERDICT = re.compile(r"tools/plan\.py design-(pass|fix)\b")
 
 
 def reviews_extract(a):
-    """Design reviews of the window with their verdict: brief, the first plan show|design output (the design), every
-    tool output read (the reviewer's material, in order), verdict of its last design-pass|design-fix call."""
+    """Design review rounds of the window: a reviewer agent is resumed for each re-check, so the unit is one round
+    (from a prompt to the next): its prompt, the first plan show|design output after it (the design), only that
+    round's tool outputs (the material), and that round's own design-pass|design-fix verdict. Rounds with no fresh
+    design read or no verdict are dropped."""
     rows = []
     for mp in glob.glob(PROJ + "/*/subagents/agent-*.meta.json"):
         if json.load(open(mp)).get("agentType") != "design-reviewer":
             continue
-        brief, design, material, verdict, first, uses = None, None, [], None, None, {}
+        rounds, cur, uses = [], None, {}
         for line in open(mp[:-10] + ".jsonl", errors="replace"):
             d = json.loads(line)
-            first = first or (d.get("timestamp") or "")[:19]
             m = d.get("message") if isinstance(d.get("message"), dict) else {}
             c = m.get("content")
             if d.get("type") == "user":
-                if brief is None and isinstance(c, str):
-                    brief = c
-                for b in c if isinstance(c, list) else []:
-                    if isinstance(b, dict) and b.get("type") == "tool_result" and b.get("tool_use_id") in uses:
+                res = [b for b in c if isinstance(b, dict) and b.get("type") == "tool_result"] if isinstance(c, list) else []
+                if not res:
+                    txt = text_of(c)
+                    if txt.strip() and not txt.lstrip().startswith("<system-reminder>"):
+                        cur = {"t": (d.get("timestamp") or "")[:19], "brief": txt, "design": None, "material": [],
+                               "verdict": None}
+                        rounds.append(cur)
+                        uses = {}
+                    continue
+                for b in res:
+                    if cur is not None and b.get("tool_use_id") in uses:
                         txt = text_of(b.get("content"))
-                        material.append((uses[b["tool_use_id"]], txt))
-                        if design is None and re.search(r"plan\.py (show|design)\b", uses[b["tool_use_id"]]):
-                            design = txt
-            elif d.get("type") == "assistant":
+                        cur["material"].append((uses[b["tool_use_id"]], txt))
+                        if cur["design"] is None and re.search(r"plan\.py (show|design)\b", uses[b["tool_use_id"]]):
+                            cur["design"] = txt
+            elif d.get("type") == "assistant" and cur is not None:
                 for b in c or []:
                     if isinstance(b, dict) and b.get("type") == "tool_use":
                         cmd = str((b.get("input") or {}).get("command") or (b.get("input") or {}).get("file_path") or "")
                         v = VERDICT.search(cmd)
                         if v:
-                            verdict = v.group(1).upper()
+                            cur["verdict"] = v.group(1).upper()
                         else:
                             uses[b.get("id")] = cmd[:300]
-        if brief and design and verdict and a.since <= first[:16] < a.until:
-            rows.append({"agent": os.path.basename(mp)[6:-10], "t": first, "brief": brief[:6000], "design": design[:30000],
-                         "material": material, "verdict": verdict})
+        for k, r in enumerate(rounds):
+            if r["design"] and r["verdict"] and a.since <= r["t"][:16] < a.until:
+                rows.append({"agent": "%s#%d" % (os.path.basename(mp)[6:-16], k), "t": r["t"], "brief": r["brief"][:6000],
+                             "design": r["design"][:30000], "material": r["material"], "verdict": r["verdict"]})
     random.Random(a.seed).shuffle(rows)
     with open(os.path.join(OUT, "reviews.jsonl"), "w") as f:
         for r in rows[:a.n]:
             f.write(json.dumps(r) + "\n")
-    print("%d design reviews with a verdict in the window (%d FIX), %d sampled" % (
+    print("%d design review rounds with a fresh design read and a verdict in the window (%d FIX), %d kept" % (
         len(rows), sum(r["verdict"] == "FIX" for r in rows), min(a.n, len(rows))))
 
 
@@ -263,13 +289,16 @@ def reviews_report(a):
     for r in (json.loads(l) for l in open(os.path.join(OUT, "review_answers.jsonl"))):
         if r["agent"] in key and not r["answer"].startswith("ERROR"):
             last[(r["agent"], r["arm"], r["model"])] = r
-    rep = {"n": len(key), "fix_in_key": sum(v == "FIX" for v in key.values()), "always_pass_correct":
-           sum(v == "PASS" for v in key.values())}
+    npass = sum(v == "PASS" for v in key.values())
+    rep = {"n": len(key), "fix_in_key": len(key) - npass, "always_pass_correct": npass,
+           "always_pass_wilson": wilson(npass, len(key))}
     for arm in sorted({k[1] for k in last}):
         for m in sorted({k[2] for k in last}):
             rs = [r for (g, aa, mm), r in last.items() if aa == arm and mm == m]
             rep["%s / %s" % (m, arm)] = {
                 "n": len(rs), "agree": sum(r["verdict"] == key[r["agent"]] for r in rs),
+                "agree_wilson": wilson(sum(r["verdict"] == key[r["agent"]] for r in rs), len(rs)),
+                "fix_missed": sum(r["verdict"] != "FIX" and key[r["agent"]] == "FIX" for r in rs),
                 "fix_caught": sum(r["verdict"] == "FIX" and key[r["agent"]] == "FIX" for r in rs),
                 "false_fix": sum(r["verdict"] == "FIX" and key[r["agent"]] == "PASS" for r in rs),
                 "no_verdict": sum(r["verdict"] is None for r in rs),
