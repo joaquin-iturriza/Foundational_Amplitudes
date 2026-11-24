@@ -44753,3 +44753,31 @@ entries:
       control is the same commands on the login node the same day; searched docs/results.tex and plan.yaml for ''login node'',
       ''login_cap'', ''run --job'', ''job_prune_dryrun'', ''non-interactive'', site decisions for login/slurm/htc/maintain:
       only D544 and D176, no prior on this question).'
+  - at: '2026-11-24T17:30:23+00:00'
+    question: 'Does a maintain command run as a 1-CPU job on CC''s htc partition (site run --recurring), read by the next
+      supervisor pass, give the supervisor the same output, exit code, events and flags (.disk_full) as on CC''s login node,
+      within a bounded lag, so the login node keeps only sbatch/squeue/short reads (D544)? Item checks (sweep/watchdog.py
+      --site-report) use the same --recurring path; agents'' long reads (site_python, analyses) are refused on the login node
+      by the guard and go through site run --job: both covered by the nested-submission and disk_watch tests below, no separate
+      test.'
+    prior: 'none found: searched docs/results.tex (login node, sshfs, disk_watch), plan show cc_login_jobs, site decisions
+      (D544, D176 only). Precedent: scripts/job_prune_dryrun.sh ran prune.caches as a CPU job (lxplus).'
+    measure: '(a) per maintain command (disk_watch, feed_capped tp3_, prune_site ccin2p3) over >= 3 supervisor passes: the
+      job''s output and exit code as printed by the next pass, the result''s age when read (CCJ_RESULT end time vs the pass
+      time), the ccj_ job''s queue wait and Elapsed (sacct), the passes that skipped it (exit 75, still pending), the .disk_full
+      mtime age at each feed read; (b) one nested submission through the same path: site run --job --item cc_login_jobs ccin2p3
+      FA -- sbatch of scripts/job_probe.sh, read on the next call: a job id back through the gate wrapper (CCORCH_GPU/refusal
+      lines), the probe ran (its log); (c) one real prune.py run (not the --every 6 skip) inside the job, its PRUNE lines
+      appended to ~/.local/share/ccorch/artifacts/FA/prune/ccin2p3.jsonl (the next prune is due ~4 h after the switch)'
+    check: 'the supervisor passes 17:38-18:15 (task output bbmrvsqcm) printed disk_watch''s ''still low ... flag .disk_full
+      set'' and feed_capped''s ''FEED 0: disk full'', the login-node baseline; passes come every 8-10 min'
+    fixed: the commands, arguments and timeouts (now the job's wall time), checkout and env (sites/activate.sh), the '*' gate,
+      the supervisor's event rules
+    control: the same commands' login-node output in the passes before the switch (same day, same disk state)
+    seeds: none (deterministic upkeep); one job per command per pass
+    outcome: 'yes: same lines and exit codes as the login runs, no event the login run would not open; result age at most
+      one pass + 10 min; no command skipped two passes in a row; .disk_full under 30 min old at every feed read while the
+      disk is full; the nested probe gets a job id and runs; one real prune appends its PRUNE lines. no: a mismatch or a failing
+      job is fixed before it stays; a flag older than 30 min at a feed read or two skipped passes -> disk_watch and the feeder
+      go in one job (flag written right before the feed) or the feed job is chained afterany on the disk_watch job; a refused
+      nested sbatch -> the feeder stays a login-node submitter (allowlisted), capped by its own timeout'
