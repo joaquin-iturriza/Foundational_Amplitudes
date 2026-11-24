@@ -38133,7 +38133,7 @@ entries:
       configurations (CLAUDE.md 72bef3992), run as part of it
   owner:
     agent: abd0ea89f821ee382
-    state: working
+    state: closed
     since: '2026-11-23T22:35:06+00:00'
     state_at: '2026-11-24T05:09:48.977000+00:00'
     context: 245454
@@ -39705,37 +39705,32 @@ entries:
   step_waits:
     '2': '2026-11-25'
   handoff:
-    state: '2026-11-23 ~23:10 CET. Everything of D519/D520/D529 is in flight; nothing waits on Joaquin. (1) One setting at
-      a time, b2048 (design passed 2026-11-23): both 16-trial searches done (soft-rescale only: chosen hp1961, lr 2.80e-2,
-      objective 0.100; pair-logs only: chosen hp1958, objective 0.053). Seeds 43/44 of each on CC (step 3 waits on them):
-      soft FA-ccin2p3-7f80a3ce/-a8090851, pair FA-ccin2p3-0c350a64/-36f1d6b7 (chunks analysis/finetune_mechanism/seed_chunks/zng4g_scr{soft,pair}srch_b2048_s4{3,4}.txt
-      @74b6fcfc1). Then read c_soft, c_pair best against best: best val MSE(log|M|^2) = mu-MSE x 1.11978^2 at best checkpoint;
-      c_x = log(mean Sx*/mean S)/log(mean Sf*/mean S), S 0.063, Sf* 0.142; outcome branches in the design (report ''both >=
-      0.7'' as its own branch, reviewer note); figure per-seed best of S, S+soft, S+pair, S+both + per-trial best vs lr +
-      val curves (extend zng4g_r1_read.py). (2) b128 scratch-with-both search restored: 8/16 observed + 3 in flight (drive
-      ftmech_flagsb128_drive7); step 4: then seeds 43/44 of its chosen trial and the b128 share log(Sf*/S)/log(F/S) (S 0.0197,
-      F 0.0300). (3) W parent without input_soft_eps/input_pair_logs FA-ccin2p3-9a73698a done clean (H100, strict fp32, 64000
-      steps, models/model_run0_best.pt.gz; run dir copied to lxplus); smoke FA-ccin2p3-1b334a7c clean. Fine-tune searches
-      ftnoset_b2048/_b128 (16 trials each) running since 22:55 (drive ftmech_ftnoset_drive; trials load the new parent, checked);
-      step 5: then seeds 43/44 of each chosen trial and Fn/S, Fn/F per batch (yes Fn/S<=1.19 both; partial Fn/F<0.79 both;
-      [0.79,1.19] unresolved), plus the parent check (per-process val vs FA-ccin2p3-47e14eae, gmean, count in 0.43-2.5x).'
-    decisions: 'Joaquin''s: D519/D520 (diagnosis, GPU-h), D529 (configurations that test it are the investigation''s work:
-      parent retrain), D531 (restart drivers). Mine: searched one-setting arms directly (reviewer FIX of R4 asked for the
-      searched stage; best against best); b128 trials 3-5 requeued without penalty (removed unrun by check 0); fine-tune of
-      the new parent uses F''s first-16-trial lr windows (where F''s chosen trial came from); mem 12G on these configs (peak
-      <= 2.7 GB trials, 4.2 GB parent; 32G = 11 CPUs on lxplus matched no slot, E8293); parent at 12G with allow_tf32=false,
-      placed on CC by site pick; site submit needs --allow-dirty while other agents'' files are uncommitted (an earlier auto
-      submit was silently refused for it).'
-    ruled_out: lr window (H3) at b2048 and b128; restart shock (H4) and sigma head (Sg) at the end point; parent precision
-      (H6); fine-tune path bug (H7); dilution (H2) untestable at 1e4.
-    running: 'seed runs FA-ccin2p3-7f80a3ce, -a8090851, -0c350a64, -36f1d6b7; drives (local, detached): ftmech_flagsb128_drive7
-      (~/.local/share/ccorch/detached/20261123-205554_ftmech_flagsb128_drive7.log), ftmech_ftnoset_drive (20261123-225525_ftmech_ftnoset_drive.log);
-      ftnoset first-wave trials FA-ccin2p3-13ce7261/-1b46922a/-4b3621e0 (b128), -c0d3030e/-9a00e309/-b31a1b2f (b2048).'
-    files: sweep/sweep_config_ftmech_zng4g_{scrsoftsrch_b2048,scrpairsrch_b2048,scrflagsrch_b128,ftnoset_b2048,ftnoset_b128}.yaml
-      (@34536f858); scripts/job_datasaving_parent.sh flags=off (@2c21e65d3); sweep/drive.py start-up sync retry (@54e5204ef,
-      untested against the race); analysis/finetune_mechanism/zng4g_seed_chunks.py, zng4g_r1_read.py (readout to extend);
-      sweeps_local/ftmech_zng4g_*
-    written: '2026-11-23T22:06:48+00:00'
+    state: '2026-11-24 ~07:00 CET. The investigation''s deciding read is done. (1) One setting at a time, b2048 (3 seeds,
+      @deb1c5ee3, fig zng4g_onesetting_b2048): the momentum log-rescale (input_soft_eps) carries the settings'' scratch cost
+      (c_soft 0.90, 0.70-1.12; c_pair 0.13). (2) b128 share against the matched 16-trial scratch hp0078 (mean 0.00941): 0.92
+      (0.81-1.08), H1 holds at both batches; F/S at b128 is 3.22 (not 1.54: the 8-trial scratch trial_0950 was 2.1x worse).
+      (3) Fine-tune from the W parent retrained WITHOUT the two settings (FA-ccin2p3-9a73698a; per-process val vs 47e14eae
+      gmean 0.854, 19/28 in 0.43-2.5x): b2048 Fn 0.0214/0.0214/0.0234, Fn/S 0.35 (0.32-0.38), Fn/F 0.23 -> YES at b2048; b128
+      Fn 0.0108/0.0184/0.0141, Fn/S 1.53 (1.18-2.07), Fn/F 0.48 -> PARTIAL at b128 (log share recovered 0.64); seed 43 blew
+      up at validation 44/50 (read at best ckpt 28). Figs zng4g_ftnoset_b{2048,128} v2 (captions OK). Overall design branch:
+      partial (yes at b2048, partial at b128). Open: step 2 (the b128 residual; owner''s design: H2 dilution at lower D and/or
+      b128 instability). Not written up in docs/results.tex yet: the write-up of findings 2026-11-24 is the next owner''s
+      (with % src/% claim).'
+    decisions: 'Joaquin''s: D519/D520 (diagnosis, GPU-h), D529 (parent retrain is the investigation''s work), D514 (D507 scratch
+      searches extended: the b128 scratch reference is hp0078). Mine: b128 Sf*-only window extension dropped after reviewer
+      FIX (unmatched; the matched 16-trial scratch existed) -- dead end recorded; step-5 design re-recorded unchanged (b128
+      control updated to hp0078) and re-passed for the 4 seed runs; ftnoset_b2048 trial 10 recollected (drive --recollect,
+      RESULT_JSON present; 0.0228, third best); readouts read S at b128 against hp0078 and keep trial_0950 as ''S8'' for continuity;
+      residual step wait set to date 2026-11-25 (no runs).'
+    ruled_out: lr window (H3) b2048/b128; restart shock (H4) and sigma head at the end point; parent precision (H6); fine-tune
+      path bug (H7); pair logs as the settings' scratch cost (c_pair 0.13); at b2048 any deficit beyond the settings (Fn/S
+      0.35).
+    running: none
+    files: analysis/finetune_mechanism/zng4g_ftnoset_read.py (step 5/6 readout), zng4g_r1_read.py (--onesetting; b128 share
+      vs 8-trial S), parent_rerun_check.py noset; data/zng4g_{onesetting_b2048,ftnoset_b2048,ftnoset_b128,r1_b128}.json, parent_rerun_check_noset.json;
+      figs zng4g_onesetting_b2048, zng4g_r1_b128, zng4g_ftnoset_b{2048,128}; seed_chunks/zng4g_{scrflagsrch_b128,ftnoset_b*}_s4{3,4}.txt;
+      sweeps_local/ftmech_zng4g_ftnoset_b{2048,128}
+    written: '2026-11-24T05:12:09+00:00'
   step_why:
     2:
       feeds: what remains of the b128 fine-tune deficit once the parent's settings are removed (D519/D520)
