@@ -45059,6 +45059,15 @@ entries:
     searched: 'D546, D547; 2026-11-24T19:13 (his request for the kit, names no license); 2026-11-24T19:53 (his answers: ''Does
       it matter?'' asks, it does not choose); 2026-11-14T04:31 (a pasted LaTeX template)'
     blocks: the LICENSE file only
+    blocks_steps: []
+  - ask: 'Scope: testing the kit''s cluster-side submission gate on CC. It needs one sentence typed by Joaquin (e.g. ''run
+      the toy once on CC'') in a Claude session started in the toy checkout (scratchpad kithome/work/toy), because the kit''s
+      ledger only accepts his own typed words. Do you want it tested, or the README lists the gate as untested on a cluster?'
+    at: '2026-11-24T21:24:12+00:00'
+    searched: D546, D547; 2026-11-24T19:13, 2026-11-24T19:53 (kit requests, silent on the gate test); 2026-11-14T04:31 (a
+      pasted LaTeX template); 2026-11-10T02:08 (draft and slide uploads); 2026-10-26T17:18 (settings warnings relayed from
+      another session)
+    blocks: the cluster-side gate test only
     blocks_steps: &id004 []
   owner:
     agent: a4e37f36ae6953ad8
@@ -45094,14 +45103,13 @@ entries:
     files: '/home/joaquin/work/orchestrator-kit (README.md, install.sh, bin/site, config/*.example.toml, project/, user/,
       tests/test_kit.py); scrub pattern list: /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/personal.pat'
     written: '2026-11-24T19:51:11+00:00'
-  ask: 'Scope: the license of the public orchestrator-kit repo. Without a license, nobody else may legally copy, modify or
-    redistribute the code, so colleagues could not improve it; MIT (use, modify, share, keep the copyright notice) is the
-    simplest and most common. MIT, Apache-2.0 (the same plus an explicit patent grant), or another?'
-  waiting_since: '2026-11-24T19:56:11+00:00'
-  searched: 'D546, D547; 2026-11-24T19:13 (his request for the kit, names no license); 2026-11-24T19:53 (his answers: ''Does
-    it matter?'' asks, it does not choose); 2026-11-14T04:31 (a pasted LaTeX template)'
-  blocks: the LICENSE file only
-  blocks_steps: *id004
+  ask: 'Scope: testing the kit''s cluster-side submission gate on CC. It needs one sentence typed by Joaquin (e.g. ''run the
+    toy once on CC'') in a Claude session started in the toy checkout (scratchpad kithome/work/toy), because the kit''s ledger
+    only accepts his own typed words. Do you want it tested, or the README lists the gate as untested on a cluster?'
+  waiting_since: '2026-11-24T21:24:12+00:00'
+  searched: D546, D547; 2026-11-24T19:13, 2026-11-24T19:53 (kit requests, silent on the gate test); 2026-11-14T04:31 (a pasted
+    LaTeX template); 2026-11-10T02:08 (draft and slide uploads); 2026-10-26T17:18 (settings warnings relayed from another
+    session)
   designs:
   - at: '2026-11-24T20:08:44+00:00'
     question: 'Does the published orchestrator-kit, installed under a separate HOME with its own remote state dir (~/.ccorch_kit
@@ -45213,3 +45221,5 @@ entries:
     units: null
     start: '2026-11-24T20:14:13+00:00'
     at: '2026-11-24T20:14:13+00:00'
+  blocks: the cluster-side gate test only
+  blocks_steps: *id004
