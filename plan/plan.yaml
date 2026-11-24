@@ -43763,6 +43763,11 @@ entries:
       /home/joaquin -maxdepth 4; all timed out or matched nothing, so they traversed (grep read) files under ~/mnt and the
       credential dirs but returned no content to the model. Several runs read git identity (git config --global); one (poolphys
       qwen+plan) committed in its copy as joaquin-iturriza. The sandbox now hides these paths (repo-reviewer passed the fix).'
+  - at: '2026-11-24T15:22:50+00:00'
+    text: 'After the sandbox fix (labllm 774147232) and model_trial validate refreshing the baselines of backlogdepth, inflight,
+      endedrun, replyblock (2 scenarios unscored at the fix each), all six scenario-suite tasks are valid in the sandbox grader
+      (fail at parent, pass at fix): backlogdepth, recheck, inflight, endedrun and spares reviewlock, replyblock. The hard
+      round runs on the design''s ten tasks; no replacement needed.'
   step_why:
     2:
       feeds: 'how far DeepSeek goes on harder work than round one (D541: test a few more complicated tasks)'
