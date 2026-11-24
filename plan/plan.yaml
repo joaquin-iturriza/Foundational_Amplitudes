@@ -43526,7 +43526,7 @@ entries:
     withdrawn_why: 'answered: D541 says route log reading and simple fixes through DeepSeek and test harder tasks'
   owner:
     agent: a41c5b4e5c054ecea
-    state: working
+    state: closed
     since: '2026-11-24T14:50:59+00:00'
     state_at: '2026-11-24T17:09:59.064000+00:00'
     context: 211379
@@ -43906,35 +43906,33 @@ entries:
       10/10 in each of 2 runs, 16-21 s, 0 of our tokens, against Opus-low Explore grep 9/10 and grep2 10/10 at ~47k tokens
       each: outcome yes, route code lookups to DeepSeek.'
   handoff:
-    state: 'Round one reported (summary.json at 78d4af8ff). D541 work: (1) Route built and partly live. tools/labllm.py is
-      merged on trunk at 0062e55a5 (triage, fix, check, stats; records in ~/.local/share/fa_labllm/routed.jsonl). The guidance
-      is committed at 419bca13f after claudemd-keeper passed: the CLAUDE.md rule (DeepSeek reads a failed log first through
-      a mechanical-worker that checks it; the owner then reads the log itself), the mechanical brief''s Lab route rule, and
-      step_prompt and working-on-the-plan. Still uncommitted on trunk, waiting for repo-reviewer a51cecd03c33e3d65 to pass
-      the trunk backlog (933/520 after the merge): tools/plan.py lab_route (plan next puts the worker step on a stopped owner''s
-      RUN resume line), tests/test_lab_route.py (passes), and the .claude/hooks/plan_check.py hook text. Also uncommitted:
-      the worktree''s tools/lab_llm_trial.py lookup runner. (2) Harder round: the design passed (re-check of the HARD defect
-      texts and handed-over tests included). Six hard tasks are valid in the sandbox grader: alphapow, valtotal, emastart,
-      statssrc, topsampling, massconv. backlogdepth, recheck, inflight and endedrun fail at the fix in the sandbox, as do
-      all the scenario-suite tasks; the spares reviewlock and replyblock are fixchecking in detach:labllm_fixcheck_spare.
-      Sonnet planners exist for alphapow, valtotal, emastart, statssrc and topsampling (planners.json); massconv needs one.
-      Sonnet fixers ran on the same five, all first pass: about 210-260k tokens and about 1 min each (grade_sonnet records);
-      massconv needs one. Lab server down since 15:20 UTC (both models), so no DeepSeek run, no lookup run and no route demo
-      has gone.'
-    decisions: 'Joaquin''s: D541 (route through DeepSeek, test harder tasks); D531 (at most 2 sessions). Mine: hard defect
-      texts from the fix commits'' messages and tests handed over (design reviewer passed; alphapow, statssrc and topsampling
-      texts hint the fix, the same for every arm); every fix arm on archive copies; one Sonnet check per DeepSeek fix counted;
-      lookup control = Opus-low Explore grep and grep2 arms, graded by lookup_trial.correct at e6f0ef58e; owner keeps reading
-      the log after the checked reading (claudemd-keeper: the ~/work rule) - whether to drop that to ''only where the cause
-      is left open'' is a question for Joaquin; sandbox hides ~/mnt and credentials (repo-reviewer found them readable in
-      round one).'
-    ruled_out: a wait-for-server loop inside a detached job (sleep_guard refuses it); merging trunk into labllm (verify_claims
-      fails in the worktree on results.tex).
-    running: detach:labllm_fixcheck_spare (reviewlock, replyblock fixcheck); repo-reviewer a51cecd03c33e3d65 on the trunk
-      backlog
-    files: tools/labllm.py; tools/lab_llm_trial.py (trunk and worktrees/wt-labllm, the latter with lookup uncommitted); tools/lab_llm_report.py;
-      tests/test_lab_route.py; analysis/lab_llm_trial/{runs.jsonl,planners.json,plans/}; /tmp/claude-1000/lab_llm_trial/{lookup_0.sh,lookup_1.sh,planner_*.txt,sonnet_*.txt}
-    written: '2026-11-24T14:40:56+00:00'
+    state: 'Hard round done (labllm 7a28103a4, summary.json, figs/lab_llm_hard.png): all ten multi-file fixes valid after
+      the sandbox fix (774147232: TMPDIR in run dir, fixcheck copies as git repos; baselines refreshed 571cf7014). First pass
+      10/10 for Sonnet, DeepSeek+plan and DeepSeek alone. Our tokens per fix: Sonnet 244k, DeepSeek+plan 254k (planner 172k
+      + Sonnet check 81k), DeepSeek alone 142k (Sonnet check only; 0.58x Sonnet; below Sonnet on 9/10 tasks); wall median
+      1.1 / 3.7 / 8.3 min. Sonnet checks matched the grader 19/20; the one refusal (emastart, DeepSeek alone: EMA rebuilt
+      on every run, losing a warm start''s EMA) is a real defect the tests miss (real fix and DeepSeek+plan guard on not warm_start;
+      Sonnet''s own fix lacks that guard on fine-tunes). Design outcome for fixes: no arm meets the <=0.3x token bar. Lookups:
+      DeepSeek 20/20 (two runs), 0 of our tokens, vs Opus-low Explore grep 9/10, grep2 10/10 at ~47k each: route code lookups
+      (outcome yes). Route demo: E8530 case answered (diverged at step 14242, quote and step found in log), E8491 case answered
+      on retry (labllm.py now falls back to 5000 log lines when site logs times out, trunk d0cda09eb); both still to be checked
+      against ack notes. Lab route wiring committed on trunk 9da3cc9d7; lookup runner refuses recall tasks 3558e18f3. Credential
+      audit of round one recorded as a finding (no credential read; three poolrow runs grepped/found over the whole home,
+      nothing returned).'
+    decisions: 'Joaquin''s: D541, D531 (2 opencode sessions). Mine: control-arm and check briefs carry one line that the Lab
+      route rule does not apply (the control must not route to DeepSeek); check tokens and planner tokens counted with lab_llm_report.transcript
+      (same method for every arm and for the lookup control, recounted from transcripts rather than lookup_trial.json''s own
+      count); the ledger-reading scenario left unscored by refreshing baselines with model_trial validate (its documented
+      live-state rule); backlogdepth plan trimmed to 60 lines by its planner (design cap); figure marks the check-refused
+      fix open. Question for Joaquin carried from the previous owner: after a checked DeepSeek log reading, should the owner
+      still read the whole log every time or only when the cause is left open.'
+    ruled_out: a wait-for-server loop in a detached job; merging trunk into labllm; site logs -n 100000 on very long logs
+      (ssh 120 s timeout)
+    running: 'none (E8638 to ack: route case E8491 answered)'
+    files: worktrees/wt-labllm/tools/lab_llm_trial.py (fixcheck, check_brief, grade_check), worktrees/wt-labllm/tools/lab_llm_report.py,
+      worktrees/wt-labllm/analysis/lab_llm_trial/{runs.jsonl,summary.json,planners.json,plans/,figs/lab_llm_hard.png}, tools/labllm.py,
+      ~/.local/share/fa_labllm/routed.jsonl, /tmp/claude-1000/lab_llm_trial/check_*.json
+    written: '2026-11-24T17:38:13+00:00'
   targets:
   - batch: labllm_rerun
     wall_h: 2.5
