@@ -43379,7 +43379,7 @@ entries:
   match: zz_labllm_*
   evidence:
     runs: []
-    commit: 9da3cc9d7
+    commit: 072709c5f
     paths:
     - analysis/lab_llm_trial/runs.jsonl
     - tests/test_lab_route.py
