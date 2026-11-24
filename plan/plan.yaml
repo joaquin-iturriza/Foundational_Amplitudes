@@ -15793,9 +15793,6 @@ entries:
     17: 'Live check of the idle wake (site idle_pass, fix of 2026-11-06 site.bak-20261106-idlelive): at the first real moment
       plan next lists RESUME/LAUNCH with nothing running, confirm a STALLED idle: event is opened by the running supervisor
       within 45 min; report to Joaquin either way.'
-    24: 'Wake measure after RUN/OVERRUN joined the 10-min debounce (2026-11-19): on or after 2026-11-22 re-run tools/wake_batching.py
-      over the 3 days since, against the after-period of step 21; report to Joaquin with its figure, then he decides on owners
-      as separate sessions'
     28: 'Trial Code Mode in a terminal session Joaquin starts in a worktree with CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1 in that
       shell only (not available over Remote Control): checklist that submit_guard, git_verify_guard (compound ''cd X && git
       commit''), review_guard, plan_files_guard, send_check, brief_guard still refuse from inside code; whether PostToolUse
@@ -16430,11 +16427,6 @@ entries:
       if:
       - 'fired: report and drop'
       - 'did not fire: trace and fix, replay again'
-    24:
-      feeds: 'whether owners move to separate sessions (Joaquin: decide after measuring)'
-      if:
-      - 'wakes not by Joaquin fall well below 28/day: report, sessions likely not needed'
-      - 'they stay near 28/day: report with the sessions design question'
     28:
       feeds: whether Code Mode can be used under our hooks
       if:
@@ -16466,9 +16458,6 @@ entries:
     '14': 'Joaquin bringing back the deck cold-read agent (D261: ''we will do it later'')'
     '17': 'the first real idle moment: plan next listing RESUME/LAUNCH with no FA job live; the supervisor''s own STALLED
       idle: event (or its absence after 45 min) is the trigger'
-    '24': 'the repo-reviewer a109ce0a65d92c425, holding its lock on FIX: submit_guard.py data_delete (e1f3b960, not this entry''s)
-      and finetune_mechanism''s dropped arms; my --labels change passed in its read. Then commit tools/wake_batching.py +
-      wake_batching_after2.json, redraw, check_caption, report'
     '28': the main session's go after this owner's 2026-11-19 report (an interactive terminal session with Code Mode on must
       be started by hand)
     '30': the main session resuming this owner for part (3) routing (single run failures folded into their batch's result;
