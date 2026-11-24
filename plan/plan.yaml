@@ -45296,7 +45296,8 @@ entries:
       as sites.yaml env.python/python_bin (65872c784); site env --check renders it. The design''s yes branch; the live .venv
       untouched (its interpreter still links into anaconda 3.11: a site env --rebuild ccin2p3 FA moves it to the uv Python
       when CC removes that install).'
-  step_waits: {}
+  step_waits:
+    '2': '2026-11-25 00:10 UTC: CC CPU job 64806476 (site env) and the repo-reviewer re-check'
   step_why:
     2:
       feeds: 'D544: every CC script off the login node, site env included'
