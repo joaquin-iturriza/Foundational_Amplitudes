@@ -17920,6 +17920,12 @@ entries:
       tokens 54.7M -> 36.1M (replay 52.0-43.3M); owners 20.9 -> 11.3 wakes (replay 11.9), tokens 75.8M -> 36.5M (replay 73.9-66.0M).
       Wakes started by Joaquin also fell (main 26.5 -> 14.0 per day), so part of the token drop is less activity, not batching.
       Held 2 days behind the repo-reviewer backlog (commit of --labels), cleared 2026-11-24.'
+  - at: '2026-11-24T14:18:21+00:00'
+    text: '2026-11-24 step 29 done at Joaquin''s explicit request (''But I''m explicitly asking you to do it, what else does
+      the classifier need?''), by the main session''s worker: site_gate.py refuses a malformed +MaxRuntime (a numeric one
+      was already costed); site''s condor_sub writes +MaxRuntime from --hdr=--time= beside +JobFlavour (backups *.bak-20261124-lxpluscost).
+      Parsed tests: flavour only 8.00 h, +MaxRuntime 3600 -> 1.00 h, ''abc'' -> Unreadable; site list works. Not tested on
+      a real submit.'
   handoff:
     state: 'D534 step 30: parts 1, 2, 3, 4 built and replayed (findings 2026-11-24). Left: a live check of part 3 at the next
       real broken trial (expect an acked RUN event with ''folded into its search'', no wake) and at the next lxplus master
