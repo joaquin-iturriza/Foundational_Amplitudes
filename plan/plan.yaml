@@ -38365,9 +38365,9 @@ entries:
     blocks_steps: &id001 []
   owner:
     agent: a275e674e217bc7c6
-    state: working
+    state: stopped
     since: '2026-11-24T21:40:14+00:00'
-    state_at: '2026-11-24T23:31:46+00:00'
+    state_at: '2026-11-24T23:37:00.914000+00:00'
     context: 235675
     context_at: '2026-11-24T23:14:56+00:00'
   findings:
@@ -43634,9 +43634,9 @@ entries:
     blocks_steps: &id003 []
   owner:
     agent: a87f458be3245c0a6
-    state: stopped
+    state: working
     since: '2026-11-24T18:49:45+00:00'
-    state_at: '2026-11-24T19:00:07.022000+00:00'
+    state_at: '2026-11-24T23:39:14.773000+00:00'
     context: 131194
     context_at: '2026-11-24T19:14:46+00:00'
   designs:
@@ -44780,9 +44780,9 @@ entries:
     blocks_steps: &id004 []
   owner:
     agent: acc098fc308290fb5
-    state: stopped
+    state: working
     since: '2026-11-24T14:15:22+00:00'
-    state_at: '2026-11-24T15:10:03.009000+00:00'
+    state_at: '2026-11-24T23:39:12.102000+00:00'
     context: 226088
     context_at: '2026-11-24T15:06:40+00:00'
   designs:
@@ -44946,7 +44946,7 @@ entries:
     agent: af56ff9ec02b765a0
     state: working
     since: '2026-11-24T23:30:10+00:00'
-    state_at: '2026-11-24T23:30:29+00:00'
+    state_at: '2026-11-24T23:39:16.636000+00:00'
     context: 121067
     context_at: '2026-11-24T23:39:34+00:00'
   designs:
