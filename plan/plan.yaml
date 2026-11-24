@@ -34621,11 +34621,6 @@ entries:
   - D492
   - D508
   next:
-    3: 'D507 search extension (Joaquin 2026-11-20: ''maybe extending a bit the HPO would be smart''): 8 more guided trials
-      in each of the four D507 searches (waves 3,3,2), lr window top tripled in the two batch-128 cells (Muon 3.6e-3 -> 1.1e-2,
-      Adam 1.8e-3 -> 5.4e-3), all four on lxplus per site pick (the three CC searches folded there with their 8 observations
-      each); then seeds 43, 44 of any cell whose chosen trial changes, test scoring of new chosen trials, d507collect/d507fig
-      v2; <= 22 GPU-h'
     4: 'Stage 2 per D483 only (''And add the ladder + star up to 5x10^5''): ladder+star fine-tunes from the new W parent FA-ccin2p3-47e14eae
       up to D=5e5, read against the existing from-scratch results; size it and bring the cost before submission (the 9 D x
       4 n scratch-search design is withdrawn)'
@@ -36760,8 +36755,7 @@ entries:
       logs, 2 h limit with ~2x room; CC placement per site pick, no GPU pin there; seeds and repair parallel. HETEROSC, emission-scale
       target, their 1e6 test split. Searched: D507/D509/D514, entry findings and dead ends, results.tex terms d1e4, hp0078,
       D514 extension: no other extension of these searches.'
-  step_waits:
-    '3': FA-ccin2p3-5431deeb (test scoring of Muon b128 hp0078 on its CC copy), then d507collect --v2 and d507fig --v2 @1de9d796
+  step_waits: {}
   findings:
   - at: '2026-11-17T11:18:43+00:00'
     text: 'Their numbers: the UQ repo (branch uq, 311 files) holds no figures, preds or result files. arXiv:2505.20280''s
@@ -37345,12 +37339,6 @@ entries:
       (sweepends site key @170183dd)
     written: '2026-11-24T05:14:20+00:00'
   step_why:
-    3:
-      feeds: whether the batch-size and optimiser effects of D507 hold once each cell's search is longer and its lr window
-        covers its best
-      if:
-      - 'a b128 cell''s best moves into the widened lr zone: its window was the limit; re-read the ratios'
-      - 'the chosen trials stay or move < seed spread: the D507 read stands at 16 trials per cell'
     4:
       feeds: 'D483: the ladder+star fine-tune curve up to 5e5'
       if:
