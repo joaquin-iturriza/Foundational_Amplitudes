@@ -43903,6 +43903,14 @@ entries:
       outcome: neither DeepSeek arm meets the <=0.3x token bar; the check dominates DeepSeek-alone''s cost. Lookups: DeepSeek
       10/10 in each of 2 runs, 16-21 s, 0 of our tokens, against Opus-low Explore grep 9/10 and grep2 10/10 at ~47k tokens
       each: outcome yes, route code lookups to DeepSeek.'
+  - at: '2026-11-24T17:54:00+00:00'
+    text: 'Route demo checked (E8638): DeepSeek''s reading of E8530 (FA-ccin2p3-b77878e1) agrees with the log and the owner''s
+      ack (diverged at step 14242, quote at log line 1978). Its reading of E8491 (FA-ccin2p3-d34535b0, read from the last
+      5000 log lines after site logs timed out) has the cause right (oom_kill while drawing the sigma stage''s plots, after
+      predictions were saved) but says resubmit as is, which the owner rightly did not do: nothing was missing and the same
+      --mem 16G would OOM again. It also could not see the run''s own blow-up (261 non-finite steps, val NLL 1.2e7), which
+      lies outside the 5000-line tail; recorded --disagree. Routed so far: triage 2 checked, 1 agreed; lookup 1 checked, 1
+      agreed (labllm.py stats).'
   handoff:
     state: 'Hard round done (labllm 7a28103a4, summary.json, figs/lab_llm_hard.png): all ten multi-file fixes valid after
       the sandbox fix (774147232: TMPDIR in run dir, fixcheck copies as git repos; baselines refreshed 571cf7014). First pass
