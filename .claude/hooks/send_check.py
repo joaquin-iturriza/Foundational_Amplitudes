@@ -339,6 +339,22 @@ def legend_findings(tool_input, cwd, drafts=None):
     return bad, shown
 
 
+SENT_STATE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".sent_figs")
+
+
+def record_sent(files, cwd):
+    """Append '<sha1> <basename> <time>' per sent png: stop_conditions.figures_handed_back compares bytes, not mtimes."""
+    import hashlib, time
+    try:
+        with open(SENT_STATE, "a") as f:
+            for p in files:
+                p = p if os.path.isabs(p) else os.path.join(cwd, p)
+                if p.lower().endswith(".png") and os.path.isfile(p):
+                    f.write("%s %s %d\n" % (hashlib.sha1(open(p, "rb").read()).hexdigest(), os.path.basename(p), time.time()))
+    except OSError:
+        pass
+
+
 def sent_files(tool_input, exts=(".png", ".pdf")):
     """Every .png/.pdf path (or exts) in the tool input, whatever its field is called."""
     out = []
@@ -381,6 +397,8 @@ def main(argv):
     if ax:
         sys.stderr.write("send_check: a figure needs its axes named in the caption:\n  " + "\n  ".join(ax) + "\n")
     if not bad:
+        if not ax:
+            record_sent(sent_files(ev.get("tool_input") or {}), cwd)
         if not ax and shown:
             print(json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse", "additionalContext":
                                                      "send_check: legend entries sent:\n" + "\n".join(shown)}}))

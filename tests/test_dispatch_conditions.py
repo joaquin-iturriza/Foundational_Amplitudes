@@ -69,6 +69,23 @@ def test_figure_sent_earlier_in_session_counts():
     assert sc.figures_handed_back({}, [send, user], d)[0] == []          # file older than the send: counts
 
 
+def test_figure_resent_only_when_bytes_changed():
+    sys.path.insert(0, HOOKS)
+    import stop_conditions as sc, send_check
+    d = tempfile.mkdtemp(prefix="fighash_")
+    sc.SENT_STATE = send_check.SENT_STATE = os.path.join(d, "sent")
+    fig = os.path.join(d, "analysis", "e", "figs", "a.png")
+    os.makedirs(os.path.dirname(fig))
+    open(fig, "w").write("v1")
+    open(os.path.join(d, "9999999999_x"), "w").write("Joaquin, see " + fig)
+    user = {"type": "user", "timestamp": "2026-11-12T10:00:00Z", "uuid": "u", "message": {"content": "hi"}}
+    send_check.record_sent([fig], d)
+    os.utime(fig, (4e9, 4e9))
+    assert sc.figures_handed_back({}, [user], d)[0] == []                # (a) same bytes, newer mtime: sent
+    open(fig, "w").write("v2")
+    assert sc.figures_handed_back({}, [user], d)[0] != []                # (b) changed bytes: refused
+
+
 def test_plan_check_skips_disabled_condition_but_not_core():
     off = {"plan_check.py:figures_handed_back": {}, "plan_check.py:ledger": {}, "plan_check.py:context": {}}
     pc = base.world(off)

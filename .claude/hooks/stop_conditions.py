@@ -147,6 +147,19 @@ def _uncommitted(fig):
         return False
 
 
+SENT_STATE = os.path.join(HOOKS, "..", ".sent_figs")
+
+
+def _sent_same_bytes(f):
+    """True when f's current sha1 was recorded by send_check at a SendUserFile of that basename."""
+    import hashlib
+    try:
+        h = hashlib.sha1(open(f, "rb").read()).hexdigest()
+        return any(l.split()[:2] == [h, os.path.basename(f)] for l in open(SENT_STATE))
+    except OSError:
+        return False
+
+
 def figures_handed_back(inp, records=None, spool=SPOOL):
     """a hand-back in the spool newer than Joaquin's last message names a figure (analysis/**/figs/*.png) for him
     and the main session has not SendUserFile'd it (at any time in the session); "ROUTINE:" reports are exempt. Passes when the turn's
@@ -193,7 +206,7 @@ def figures_handed_back(inp, records=None, spool=SPOOL):
                 mt = os.path.getmtime(f)    # a send older than the file is of an earlier version
             except OSError:
                 continue                    # file not here (a figure the owner will draw): nothing to send yet
-            if f not in missing and not any(b == os.path.basename(f) and st >= mt for st, b in sent) \
+            if f not in missing and not _sent_same_bytes(f) and not any(b == os.path.basename(f) and st >= mt for st, b in sent) \
                     and not any(st >= t and os.path.basename(f) in tx for st, tx in said):
                 missing.append(f)
     if not missing:
