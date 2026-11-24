@@ -19,6 +19,14 @@ sys.path.insert(0, os.path.join(ROOT, "sweep"))
 from run_trial import steps_to_target  # noqa: E402
 
 TARGETS = (-1.66, -2.08, -2.30)   # the control's crossings 1023 / 1955 / 2707 steps (critical_batch design)
+LR_WINDOW = (1.667e-3, 1.5e-2)    # the template's Muon window, every batch (design)
+
+
+def lr_at_edge(lr):
+    """The design's lr-edge rule: lr in the outer tenth of the log window; that batch's S is an upper bound only."""
+    lo, hi = np.log(LR_WINDOW)
+    x = (np.log(lr) - lo) / (hi - lo)
+    return bool(x < 0.1 or x > 0.9)
 
 
 def fit_bcrit(B, S):
@@ -48,18 +56,24 @@ def read(trials):
             hit = sorted((v, h) for v, h in s if v is not None)
             row = {"B": int(b), "trials": len(ts), "reached": len(hit)}
             if hit:
-                row.update(S=hit[0][0], E=int(b) * hit[0][0], hp_idx=hit[0][1], top3=[v for v, _ in hit[:3]])
-                reach.append((int(b), hit[0][0]))
+                best = next(t for t in ts if t.get("hp_idx") == hit[0][1])
+                lr = best.get("lr")   # the collector puts each trial's training.lr in its dict
+                row.update(S=hit[0][0], E=int(b) * hit[0][0], hp_idx=hit[0][1], top3=[v for v, _ in hit[:3]],
+                           lr=lr, lr_edge=None if lr is None else lr_at_edge(lr))
+                if row["lr_edge"] is False:   # an edge (or unknown) lr: S an upper bound, out of the fit
+                    reach.append((int(b), hit[0][0]))
             else:
                 row["S_lower_bound"] = max((len(t["val_curve"]) * t["validate_every"] for t in ts
                                             if t.get("val_curve")), default=None)
             rows.append(row)
         res = {"batches": rows}
+        # the design's ratio is S(2048) / S(32768) exactly; with either missing (unreached, edge lr) it is not formed
+        S = {r["B"]: r.get("S") for r in rows if r.get("lr_edge") is False}
+        res["S_2048_over_S_32768"] = S[2048] / S[32768] if S.get(2048) and S.get(32768) else None
         if len(reach) >= 2:
             Bs, Ss = zip(*reach)
             res["S_min"], res["B_crit"] = fit_bcrit(Bs, Ss)
             res["B_crit_q16_50_84"] = bootstrap(Bs, Ss)
-            res["S_ratio_smallest_over_largest"] = Ss[0] / Ss[-1]
             # a batch that never reached L while its lower bound exceeds the fit's S there: B_crit is a lower bound
             res["unreached_above_fit"] = [r["B"] for r in rows if r.get("S_lower_bound") and
                                           r["S_lower_bound"] > res["S_min"] * (1 + res["B_crit"] / r["B"])]
@@ -77,6 +91,16 @@ def selfcheck():
         assert abs(got / bc - 1) < 0.25 and abs(smin / 2000 - 1) < 0.1, (bc, got, smin)
     # a flat S (B_crit far below the batches) fits a B_crit small against 2048
     assert fit_bcrit(B, np.full(5, 2000.0))[1] < 50
+    # read(): the ratio is S(2048)/S(32768) only; an edge lr leaves its batch out of the ratio and the fit
+    curve = lambda n: {"val_curve": [0.0] * (n - 1) + [-3.0], "validate_every": 100}
+    tr = {str(b): [dict(curve(n), hp_idx=0, lr=5e-3)] for b, n in ((2048, 40), (4096, 30), (16384, 20), (32768, 20))}
+    r = read(tr)["-2.08"]
+    assert abs(r["S_2048_over_S_32768"] - 4000 / 2000) < 0.1 and r["B_crit"] > 0, r
+    tr["32768"][0]["lr"] = 1.6e-3                      # outer tenth of the window
+    r = read(tr)["-2.08"]
+    assert r["S_2048_over_S_32768"] is None and r["batches"][-1]["lr_edge"] is True, r
+    del tr["2048"]
+    assert read(tr)["-2.08"]["S_2048_over_S_32768"] is None   # never the 4096 / 16384 pair
     print("selfcheck OK")
 
 
