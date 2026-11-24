@@ -44959,8 +44959,25 @@ entries:
     decision: D546
     covers:
     - orchestrator_kit
+  - said_at: '2026-11-24T19:53:28.621000+00:00'
+    text: '1. yes
+
+      2. https://github.com/joaquin-iturriza/orchestrator-kit
+
+      3. public
+
+      4. Does it matter?
+
+      5. I don''t see why not
+
+      6. I don''t think these should be there, can you be more explicit about what you mean?'
+    decision: D547
+    answers_after: '2026-11-24T19:50:40+00:00'
+    covers:
+    - orchestrator_kit
   decisions:
   - D546
+  - D547
   next: 'Prove the kit end to end on one real cluster: install it under a separate HOME (FA''s live site tool, configs and
     ledger untouched), run examples/toy through site env, site pick, site submit of scripts/job_probe.sh then job.sh, supervisor
     sorting and site fetch; fix what breaks in the kit; then publish it where Joaquin says'
@@ -45028,8 +45045,10 @@ entries:
       (removing worktrees and how agents work), 2026-10-26T17:18 (permission rules in settings files), 2026-11-16T20:00 (a
       group member''s writing-style skill to merge): none names a repo, host, visibility or license'
     blocks: the on-cluster proof of the kit with the toy job, and publishing it
-    blocks_steps: &id004
+    blocks_steps:
     - 1
+    answered_at: '2026-11-24T19:53:28.621000+00:00'
+    decision: D547
   owner:
     agent: a1f4e7d170cdb83cc
     state: closed
@@ -45043,19 +45062,6 @@ entries:
       if:
       - 'the toy runs and is sorted clean on the cluster: publish the kit (name, host, visibility, license as Joaquin answers)'
       - 'a kit path breaks on the cluster: fix it in the kit, rerun the toy, then publish'
-  ask: 'Scope: publishing the orchestrator kit (~/work/orchestrator-kit, built locally). (1) Name: orchestrator-kit? (2) Where:
-    your GitHub, a lab/group organisation, or the lab GitLab? (3) Private with invited colleagues, or public? (4) License:
-    MIT, Apache-2.0, or none for now? (5) May I create a private repo for the toy example so a cluster can clone it for the
-    end-to-end proof? (6) Strip the ~7 code comments quoting your chat messages and the dated cluster incidents before publishing,
-    or keep them?'
-  waiting_since: '2026-11-24T19:50:40+00:00'
-  searched: 'site decisions --project FA (D546 asks for a shareable standalone kit but names no repo, host, visibility or
-    license; the main session''s brief says publishing waits on the user), CLAUDE.md (no rule on where new repos live or their
-    license); the user''s messages sharing its terms: 2026-11-14T04:31 (a pasted SciPost LaTeX template), 2026-11-06T04:28
-    (removing worktrees and how agents work), 2026-10-26T17:18 (permission rules in settings files), 2026-11-16T20:00 (a group
-    member''s writing-style skill to merge): none names a repo, host, visibility or license'
-  blocks: the on-cluster proof of the kit with the toy job, and publishing it
-  blocks_steps: *id004
   handoff:
     state: 'Kit built and committed locally at ~/work/orchestrator-kit (commit 1a90637, author joaquin-iturriza, no remote,
       no attribution). tests/test_kit.py: 19/19 pass offline (install into a temp HOME, plan CLI, guard verdicts). Scrub grep
