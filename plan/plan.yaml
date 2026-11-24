@@ -37872,9 +37872,11 @@ entries:
   - D516
   - D529
   next:
-    1: Read the D=1e3, 3125-step scratch (ftmech_zng4g_d1e3_scr_b128) and 28-process no-settings fine-tune (ftmech_zng4g_d1e3_ftnoset_b128)
-      searches when the driver ends; send seeds 43/44 of each chosen trial (zng4g_seed_chunks.py + job_seed_batch.sh); per-trial
-      time from these runs feeds the Fg1k sizing
+    1: 'When the 4 D=1e3 seed runs end: read Fn1k/S1k with the design''s 2-sigma rule and a figure (per-seed best, per-trial
+      best vs lr, val curves). Both D=1e3 searches crowd opposite edges of [1.9e-3,1.9e-2] (scratch at the top, the fine-tune
+      at the bottom): design and get reviewed a matched extension of both (same added trials, one wider window) BEFORE the
+      gluon parent ends (~17:00), and give ftmech_zng4g_d1e3_ftglu_b128 the same final window and trial count so the three
+      D=1e3 arms stay matched'
     2: 'When the gluon/Z parent FA-ccin2p3-1f2d9ad5 ends (smoke FA-ccin2p3-4e7b6669 first: cancel the full run if the smoke
       fails): parent check vs 9a73698a on the 9 shared processes, site copy its run dir to lxplus, then drive ftmech_zng4g_ftglu_b128
       (1e4) and ftmech_zng4g_d1e3_ftglu_b128 together, then seeds 43/44'
@@ -39916,7 +39918,6 @@ entries:
     at: '2026-11-24T07:41:29+00:00'
   step_waits:
     '2': FA-ccin2p3-1f2d9ad5
-    '1': ftmech_zng4g_d1e3_scr_b128 ftmech_zng4g_d1e3_ftnoset_b128
   handoff:
     state: '2026-11-24 ~07:00 CET. The investigation''s deciding read is done. (1) One setting at a time, b2048 (3 seeds,
       @deb1c5ee3, fig zng4g_onesetting_b2048): the momentum log-rescale (input_soft_eps) carries the settings'' scratch cost
@@ -39946,11 +39947,11 @@ entries:
     written: '2026-11-24T05:12:09+00:00'
   step_why:
     1:
-      feeds: whether today's 28-process parent gains over scratch at D=1e3 (Fn1k/S1k), the control for the dilution read
+      feeds: whether today's 28-process parent gains over scratch at D=1e3 and 3125 steps (Fn1k/S1k), and a matched window
+        for the gluon parent's D=1e3 arm
       if:
-      - 'hi<1: parent gains at 1e3, the 1e4 residual is a large-D effect; report with figure'
-      - 'lo>1: a pretraining cost at every D, report with figure'
-      - 'else: unresolved, question to Joaquin on more seeds'
+      - 'hi<1 with edge-free optima: parent gains at 1e3; report with figure'
+      - 'optimum still at an edge after extension: extend again or report as edge-limited'
     2:
       feeds: 'H2 dilution: Fg/Fn at 1e4 and at D=1e3 (design passed 2026-11-24)'
       if:
