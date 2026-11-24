@@ -42799,6 +42799,47 @@ entries:
       Seen and held out are read apart (width may lower seen only). A run that blows up is listed apart at its best checkpoint.
       Smokes pass when each width logs 50 steps, a test stage and plots without OOM; a width that does not fit is fixed (checkpoint_blocks,
       microbatches) before the batch; the batch''s measured GPU-h goes to Joaquin before submission if above 100 (D536).'
+    fix_at: '2026-11-24T13:58:19+00:00'
+    fix: 'Part (b) width scale-up, FIX on five checks. (1) Disk (check 14): the design states no disk per job. CC /sps/lpnhe
+      has 16 GB free now (df: 497G of 512G, 98%). Trial 5''s run dir (runs/llmcmp_a_adamw_const/trial_1163) is 68 MB at 1.61M
+      parameters, about 42 bytes per parameter. At that rate 120 heads (354M) is about 15 GB, 64 heads about 4.3 GB and 32
+      heads about 1 GB, about 20 GB in all: more than CC''s free disk, and the smokes are aimed at CC. Fix: take the per-width
+      run-dir size from the smokes (du of each smoke dir, scaled from 50 steps to the full run''s saved files), sum it over
+      the jobs site pick places on each site, and check it against df at submission. If it does not fit, free our own debris
+      or place the large widths where the disk is. (2) Batch and memory fallback (checks 1, 11, 18): ''per_process_accumulation
+      microbatches, already the run''s mechanism'' and ''fixed: per_process_accumulation round_robin as in the config'' are
+      false. sweep/sweep_config_llmcmp_a_adamw_const.yaml sets no per_process_accumulation: its batches mix processes (the
+      D526 finding replaced round_robin). The code''s only accumulation (experiment.py _accumulation_mode: all_processes or
+      round_robin) builds single-process micro-batches, which is a second change in batch composition against trial 5. The
+      fallback is likely to be needed. Part (c) measured 16 GB peak at 8 heads and batch 24,576, and activations grow about
+      linearly with heads (8x at 64, 15x at 120), so 64 and 120 heads probably do not fit even with checkpoint_blocks. Fix:
+      before the smokes, name a compute-only path that keeps mixed-process batches of 24,576. Either plain gradient accumulation
+      over mixed micro-batches, a code change with its repo review and an equivalence test against one full batch, or GPUs
+      with enough memory. List it as a key that differs from trial 5. (3) Inherited settings (check 18): no key-by-key diff
+      against trial 5''s config.yaml (on CC under runs/llmcmp_a_adamw_const/trial_1163; the local artifacts hold only the
+      log). Read it, list every key the width runs change (num_heads, checkpoint_blocks, any accumulation key, run name),
+      and give a reason for each. (4) Wall time (check 15, the batch rules): 120 heads is about 220x trial 5''s parameters.
+      Trial 5 took 14.1 h on a V100 at 8 heads. A rough FLOP count (6 x 354M x about 7 tokens x 24,576 events per step) gives
+      tens of s/step on a V100 and several s/step on an H100, so 60,840 steps is hundreds of hours on a V100 and on the order
+      of 100 h on an H100, likely past any site''s job limit. The design gives no wall-time target per width and no plan for
+      a run longer than one job (trial_job.sh --detached is a single job). Also, CC places a job on a V100 or an H100 (0.90
+      vs 0.27 s/step measured at 8 heads, a factor 3.3), so a smoke''s s/step must be read on the GPU model the full run will
+      get, or the limits set from the slowest allowed model. Fix: give the wall-time target per width and GPU model from the
+      smokes, against the site''s maximum time, and a resume path (checkpoint and continue, already run end to end) for any
+      width that exceeds it. That estimate goes to Joaquin with the 100 GPU-h gate. (5) Prior (check 5): the prior misses
+      the direct width evidence in docs/results.tex. par:v4_width (l.2487; gap_capacity, catalog_coverage width_x1.json):
+      catalog_v4, widths 8/16/32 at 4264 steps, same muP HPs, seeds 42/43. Held-out (H2) zero-shot MSE over width 8: 0.642
+      at 16 and 0.552 at 32. Training floor: 0.0857 to 0.0262. Also par:v4_warm_start_grow (l.2940): width 16 from scratch
+      against width 8, R(B/A) 0.565 on PP4 and 0.562 on EE4. Add both to prior, and to check as the measured movement of a
+      held-out read with width (stronger than phase-1 scaling, which is seen loss only). It also sets the expected effect:
+      1.8x at 4x width, above the 1.38 margin. (6) Outcome (check 4): there is no branch for a width that reads worse than
+      trial 5 by more than 1.38x, which would mean muP lr transfer fails at 15x width or the run did not train. Say what that
+      changes: rerun at that width with a full HPO, or report it as a failure of transfer. Copy step 5''s rule for the zone
+      between: one seed does not settle it, so ask Joaquin for a seed-43 pair; this is his call, never an added seed. Checks
+      that hold: one change against the matched control (width only, at trial 5''s HPs, lr carried by muP, HPO rule 1); D522
+      and D537 answered (part (c) widening deferred to its own design once its search ends, as D537 orders); plain MSE and
+      his target z as in part (a) (D524); test events are each process''s 1e4 MadGraph-default test pool; no sweep; the smokes
+      are justified by D395 and the 100 GPU-h gate.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
