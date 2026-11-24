@@ -69,25 +69,11 @@ When a term's scope changes what a number means, say so and **block** — it is 
 wearing a word's clothing. Propose the rewording; do not silently apply it, because choosing
 the convention is the author's call.
 
-## Data provenance: the recipe wins, `data.dataset` lies
-
-Before asserting which processes ANY run trained on, open its `config.yaml` and check
-`data.processes_file` FIRST:
-
-- `processes_file` set (or `data.source: recipes`) -> **the recipe at that path is the only
-  authority**. `data.dataset` in that config is a stale default inherited from
-  `config/amplitudes.yaml` (an 8-entry list every run dumps verbatim) and is meaningless.
-  `runs/dvirt_time` lists 8 datasets and actually trained on the 25 in
-  `recipes/pretrain25_short.yaml`.
-- `processes_file: null` and no recipe source -> **then** `data.dataset` is authoritative.
-
-Reading `data.dataset` on a recipe run silently inverts what was held out, and therefore
-what "zero-shot", "held-out", "never seen" and "in-distribution" mean. Treat a claim about
-training-set membership that was not checked this way as unverified, and say so.
+Which processes a run saw: fa-data, first bullet.
 
 ## Structure the repo requires
 
-- **Results and hand-off do not mix** (CLAUDE.md ground rule #3). A finished finding lives
+- **Results and hand-off do not mix** (the rule against new `.md`/`.tex` files). A finished finding lives
   in its results section, and its hand-off item is deleted. The hand-off sections hold only
   open or future work. A completed item still sitting in a hand-off list is a finding.
 - **No new document.** Everything belongs in this file. If the backlog added a new `.md`/
@@ -101,8 +87,8 @@ each one the backlog adds or changes:
 - **Find its producer** (the script named in the caption or comment, `make_figures.sh`, or a
   grep for the figure basename under `analysis/`) and check the caption says what the script
   does: best checkpoint vs last validation, the exclusions, the fit law. A caption that
-  disagrees with its script, or a script that disagrees with CLAUDE.md ("Reported values",
-  "Scaling fits", the canonical table), is a blocking finding.
+  disagrees with its script, or a script that disagrees with CLAUDE.md (the numbers rule "Every number reported comes from a committed tool",
+  the fit rule "Every scaling fit uses L(C) = A·C^(−α) + L_∞", the canonical table), is a blocking finding.
 - **An exclusion must be stated with its criterion.** "Over the seeds that did not diverge"
   without saying what diverged means, and where it is reported, is a finding (CLAUDE.md: a
   run that blows up is reported separately, never dropped by a threshold).
@@ -110,15 +96,7 @@ each one the backlog adds or changes:
   stated decision is a finding. A count "above 0.05" that the notes elsewhere reject is one.
 - **A superseded reference or method** (a later section or CLAUDE.md replaced it) still carrying
   a result is a finding, with both line numbers.
-- **Scope (blocking, first line of your report).** When the backlog describes an experiment
-  that runs a subset of its design (some probes, parents, arms, D values, seeds or horizons and
-  not the rest: "from each probe's best rung", "for now only", "at the time"), find the user's
-  own message asking for that subset in the session transcripts
-  (`~/.claude/projects/-home-joaquin-work-FA/*.jsonl`, `"type":"user"` entries). The author's
-  prose, commit messages and "(the user's call)" tags are not evidence. With no such message the
-  restriction is a blocking finding, stated in the first line of your verdict so the main agent
-  relays it to the user. Likewise a figure or table that mixes cells at different compute
-  (some at one horizon, the rest at another) without saying so in the caption is blocking.
+- **Scope (blocking, first line of your report).** As in repo-reviewer's scope block.
 Propose the fix; never change a number yourself.
 
 ## Figures
@@ -165,15 +143,11 @@ Your **first action**, before reading the diff, is:
 
     bash .claude/hooks/review_backlog.sh begin notes-editor
 
-The lock means "a review cycle is open on this pillar". A `PreToolUse` gate otherwise
-denies edits to these files while the backlog is overdue, which would block both your own
-fixes and the main agent applying the findings you return. Take it even if you only report
-and never edit. `advance` drops it; a blocking verdict deliberately leaves it held so the
-fixes you demanded can be made.
+`advance` drops the lock; a blocking verdict deliberately leaves it held so the fixes you demanded can be made.
 
 ## Clear the backlog (only when the prose is clean)
 
-The Stop hook blocks the turn until this pillar is reviewed. **If and only if** the prose
+**If and only if** the prose
 now reads clean and your remaining items are non-blocking recommendations, run as your
 final step:
 
