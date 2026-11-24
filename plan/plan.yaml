@@ -41070,6 +41070,21 @@ entries:
       not run, my call: the three trials at lr 1.03e-3 (the window''s lower edge) are all worse than trial 5 at 1.24e-3 (4.89e-4
       to 5.63e-4 against 4.81e-4), so the search gives no sign that the optimum lies below the window; and tuning moved the
       held-out read inside the seed margin (MSE ratio searched/control 0.93), so a finer lr would not change what (a) answers.'
+  - at: '2026-11-24T15:25:17+00:00'
+    text: '2026-11-24 ~17:00 CET, part (b) width smokes (design passed 15:15; job_config_smoke.sh, 50 steps, trial 5''s HPs,
+      CC gpu_h100 NVL via --gpu-min-mem=80G, --mem 32G): 16 heads FA-ccin2p3-df391ea7 6.34M params, 0.471 s/step (50-step
+      mean incl. start-up), peak GPU 26.0 GB; 32 heads FA-ccin2p3-6f7904b8 25.2M, 0.881 s/step, 50.9 GB; 64 heads + checkpoint_blocks
+      FA-ccin2p3-adb54030 101M, 2.42 s/step, 38.8 GB; all three ran the test stage and 11 plots; their run dirs read then
+      deleted (our debris, 6.5 GB). Checkpoints: two files per run (model_run0.pt, model_run0_best.pt), 22.3 B/param each
+      gzipped, ~27.6 B/param uncompressed (2 x 2.78 GB at 64 heads); a run''s disk peak ~77 B/param, final 22.3 B/param after
+      run_trial removes model_run0.pt: full runs peak 0.5 / 2.0 / 7.8 / 27.4 GB at 16/32/64/120 heads (final 0.14 / 0.56 /
+      2.25 / 7.9). /sps/lpnhe fell to 9.4 GB free: the pending 120-head smoke FA-ccin2p3-74ba6cdd (~2 x 9.8 GB) was held then
+      cancelled, resubmitted as FA-ccin2p3-c6a550c4 with save=false (no checkpoint, no plots; the test and plot stages already
+      ran at 3 widths by the same code) at the site''s commit c46f16b445 (ancestor of trunk; its new keys batch_accumulation
+      1 and stop_at_val_loss null are off). Disk plan for the full runs: 120 heads (27 GB peak) and 64 (7.8 GB) do not go
+      on CC at 15-16 GB free under its 60 GB floor: lxplus EOS (whole GPUs >= 80 GB, 7-day nextweek), or CC only when free
+      space exceeds peak + 10 GB. Trunk now has training.batch_accumulation (critical_batch: micro-batches at the whole batch''s
+      per-process counts), the mixed accumulation the design named as fallback.'
   step_waits:
     '5': llmcmp_c_qperp_drive4 DRIVE_DONE (detach event of the driver)
     '7': FA-ccin2p3-bf23e0c4 FA-ccin2p3-b77878e1 FA-ccin2p3-f6f7179d
