@@ -45031,6 +45031,28 @@ entries:
       (python_bin) and site env --rebuild reproduces the live stack; no: uv or the download fails, or a pin does not resolve
       on 3.11.7, which is reported with what failed; the remaining route (a newer torch on the cu124 index under python 3.13,
       a new software stack for every run) is Joaquin''s call, asked with its cost'
+    fix_at: '2026-11-24T22:13:36+00:00'
+    fix: 'Checks 2 and 4 (the measure cannot show the yes it claims): pip install --dry-run only checks that each pin has
+      a wheel for cp311, which the check field already asserts from the index. It cannot show that the standalone CPython
+      3.11.7 runs the stack: compiled wheels loading against that interpreter, torch''s bundled CUDA libraries, any pin built
+      from source, FA''s own imports. Yet the yes outcome concludes that site env --rebuild reproduces the live stack and
+      that sites.yaml changes on that basis. Fix: in the same 1-CPU job, really install requirements.txt into the throwaway
+      venv in node-local TMPDIR (CC compute nodes have internet), then import torch, numpy and every compiled package in requirements.txt,
+      then import FA''s run path (e.g. python -c ''import experiment, models.lloca''). Build the interpreter through the exact
+      python: recipe you will commit to sites/sites.yaml line 11 (the module load of python/3.13.7, then uv), so the tested
+      path is the committed one. Yes = all imports pass and the versions match the live venv''s (python 3.11.7, torch 2.1.2+cu118,
+      numpy 1.26.4). Check 14 (disk): the torch 2.1.2+cu118 wheel with its pip cache is several GB in node-local TMPDIR; give
+      the estimate, ask the job for enough local disk (or read df TMPDIR at its start and fail early), and give the /sps size
+      of the uv Python. Check 5 (prior incomplete): the prior says nothing earlier was found on the CC env build, but the
+      2026-10-29 dead end on the 13 TeV pp regeneration already found the same denial of the anaconda 3.11 module. It listed
+      the same repair options: an env recipe without the module, the existing .venv''s interpreter, or a pure Python 3.11.
+      Joaquin''s call recorded when that ask was withdrawn says the module refusal ''is a setup gap to fix (site env), not
+      a question''. Cite both. The latter supports doing the repair without asking him; on a no, ask him only about the route
+      that changes the software stack (torch on the cu124 index under 3.13). Passing: check 0 (this is the entry''s step 2
+      as written: fix sites.yaml so a rebuild works with a module CC still offers, live venv untouched); check 1 (the control
+      is the live venv''s versions read in job 64801966); check 3 (deterministic install, no seeds); checks 7-13 and 15-19
+      do not apply. Searched: anaconda, 3.11, python env, env repair and python_bin in plan/plan.yaml; the design''s own grep
+      of docs/results.tex; site decisions (D176, D544).'
   findings:
   - at: '2026-11-24T17:31:13+00:00'
     text: 'Inventory of scripts run on CC''s login node (2026-11-24): supervisor maintain every pass (8-10 min apart): disk_watch.py
