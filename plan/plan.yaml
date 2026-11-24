@@ -16396,8 +16396,23 @@ entries:
       is about merging a writing-style skill, 2026-11-11T02:09 is about the optimizer comparison date; none concerns the site
       gate'
     blocks: the lxplus costing fix in the site gate only
-    blocks_steps: &id001
+    blocks_steps:
     - 29
+  - ask: 'GPU budget: approved work held behind a budget ask. critical_batch''s batch-size runs (D532 names them; 55 GPU-h)
+      and zng_uq_benchmark''s ladder fine-tunes (D483 names them; up to 136 GPU-h) both wait on you only because the CLAUDE.md
+      budget rule passes work above 30 GPU-h only when a decision states its cost or it is at the project''s usual size; your
+      approvals never state a cost, so every named study above 30 GPU-h stops for a second ask. Proposed diff to CLAUDE.md
+      ''GPU budget'': replace ''or I asked for it by name at the project''s usual size for it (its template, its sibling runs)''
+      with ''or a decision of mine names that work (its covers) and it stays under 100 GPU-h (D511''s bound)''. Yes, no, or
+      another bound?'
+    at: '2026-11-24T13:26:00+00:00'
+    searched: 'CLAUDE.md GPU budget rule; site decisions --project FA D153 D242 D244 D483 D511 D532; items critical_batch
+      (no est-gpu-hours), zng_uq_benchmark (est 125); Joaquin''s messages 11-20..11-24 (13:22 asks for the questions in detail,
+      answers none); flagged 2026-11-10T02:08 (uploaded slides and code), 2026-11-16T20:00 (a writing-style skill), 2026-11-14T04:31
+      (a pasted SciPost LaTeX template): none sets a budget'
+    blocks: the budget-rule edit (step 33) only
+    blocks_steps: &id001
+    - 33
   step_why:
     11:
       feeds: whether the redesign is finished
@@ -17890,19 +17905,20 @@ entries:
     files: ~/.local/bin/site_runends.py (fold_reason) ~/.local/bin/site (ssh_answers, probe_site) tools/plan.py .claude/hooks/send_check.py
       .claude/hooks/hook_syntax_guard.py .claude/hooks/review_backlog.sh sweep/drive.py
     written: '2026-11-24T12:00:18+00:00'
-  ask: 'Permission classifier refusal: an edit of ~/.local/bin/site and site_gate.py so that the GPU-budget gate charges an
-    lxplus job its own time limit (refused 2026-11-19 as ''Undermining Oversight''). Today the gate charges an lxplus job
-    the full wall time of its HTCondor flavour, so lxplus jobs count for more than they use against the 30 GPU-h budget. Will
-    you make that edit yourself, or add a permission rule that lets it through?'
-  waiting_since: '2026-11-20T02:06:51+00:00'
-  searched: 'both CLAUDE.md files and site decisions --project FA --all: D197 is an earlier site_gate fix (cancelled-while-pending
-    jobs), nothing covers this edit; the earlier ask of the same refusal quoted a raw heredoc and is replaced by this one.
-    Joaquin''s messages flagged by the check, read: 2026-11-14T04:31 is a pasted SciPost LaTeX template, 2026-11-16T20:00
-    is about merging a writing-style skill, 2026-11-11T02:09 is about the optimizer comparison date; none concerns the site
-    gate'
-  blocks: the lxplus costing fix in the site gate only
+  ask: 'GPU budget: approved work held behind a budget ask. critical_batch''s batch-size runs (D532 names them; 55 GPU-h)
+    and zng_uq_benchmark''s ladder fine-tunes (D483 names them; up to 136 GPU-h) both wait on you only because the CLAUDE.md
+    budget rule passes work above 30 GPU-h only when a decision states its cost or it is at the project''s usual size; your
+    approvals never state a cost, so every named study above 30 GPU-h stops for a second ask. Proposed diff to CLAUDE.md ''GPU
+    budget'': replace ''or I asked for it by name at the project''s usual size for it (its template, its sibling runs)'' with
+    ''or a decision of mine names that work (its covers) and it stays under 100 GPU-h (D511''s bound)''. Yes, no, or another
+    bound?'
+  waiting_since: '2026-11-24T13:26:00+00:00'
+  searched: 'CLAUDE.md GPU budget rule; site decisions --project FA D153 D242 D244 D483 D511 D532; items critical_batch (no
+    est-gpu-hours), zng_uq_benchmark (est 125); Joaquin''s messages 11-20..11-24 (13:22 asks for the questions in detail,
+    answers none); flagged 2026-11-10T02:08 (uploaded slides and code), 2026-11-16T20:00 (a writing-style skill), 2026-11-14T04:31
+    (a pasted SciPost LaTeX template): none sets a budget'
+  blocks: the budget-rule edit (step 33) only
   blocks_steps: *id001
-  checked_until: '2026-11-24T13:13:32+00:00'
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
   question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
