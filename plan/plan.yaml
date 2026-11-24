@@ -15820,8 +15820,9 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-046cc7d3
-    commit: 6bd35859d
+    commit: cb2341b07
     paths:
+    - .claude/hooks/context_guard.py
     - .claude/hooks/notification_absorb.py
     - .claude/hooks/owner_handoff.py
     - '.claude/hooks/review_backlog.sh (54debf37e: CLAUDE.md pillar covers plan/*prompt*.txt and .claude/agents)'
