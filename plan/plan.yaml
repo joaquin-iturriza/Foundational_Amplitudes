@@ -39594,6 +39594,12 @@ entries:
     units: null
     start: '2026-11-24T00:30:23+00:00'
     at: '2026-11-24T00:30:23+00:00'
+  - batch: ftnoset_seeds
+    wall_h: 1.1
+    jobs: 4
+    units: null
+    start: '2026-11-24T04:06:19+00:00'
+    at: '2026-11-24T04:06:19+00:00'
   step_waits:
     '5': 'detached drive ftmech_ftnoset_drive (searches ftmech_zng4g_ftnoset_b2048 and _b128 from the no-settings parent)
       ends: its DONE event'
