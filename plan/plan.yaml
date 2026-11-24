@@ -44068,6 +44068,7 @@ entries:
     resubmissions of width jobs, not log reading)
   blocks: the owner-reread clause of the lab route only
   blocks_steps: *id002
+  checked_until: '2026-11-24T21:38:58+00:00'
 - id: critical_batch
   title: Critical batch size from the gradient noise scale
   question: What is the critical batch size of our canonical setup, measured from the gradient noise scale B_simple = tr(Sigma)/|G|^2
