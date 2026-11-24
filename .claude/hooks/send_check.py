@@ -131,11 +131,19 @@ def is_draft(path):
                                            or n.startswith(os.path.expanduser("~/drafts") + os.sep))
 
 
+def is_run_plot(path):
+    """A run's own plot: <artifacts>/<project>/<run>/.../plots_<n>/ (site fetch mirror), drawn by the run's committed code."""
+    parts = os.path.normpath(os.path.expanduser(path)).split(os.sep)
+    root = os.path.normpath(os.path.expanduser("~/.local/share/ccorch/artifacts")).split(os.sep)
+    return (parts[:len(root)] == root and len(parts) > len(root) + 3
+            and any(re.fullmatch(r"plots_\d+", d) for d in parts[len(root) + 2:-1]))
+
+
 def check(path, terms):
     """Lines of findings for one file (empty if it passes)."""
     if is_draft(path):
         return []
-    if "run_plots" in os.path.normpath(path).split(os.sep):   # a run's own plot, copied unchanged: labels are the training code's
+    if is_run_plot(path) or "run_plots" in os.path.normpath(path).split(os.sep):   # a run's own plot, copied unchanged: labels are the training code's
         return []
     try:
         pp = pages(path)
@@ -294,7 +302,7 @@ def legend_findings(tool_input, cwd, drafts=None):
     rejects = None
     for p in sent_files(tool_input, (".png", ".pdf")):
         p = p if os.path.isabs(p) else os.path.join(cwd, p)
-        if is_deck(p) or is_draft(p) or "run_plots" in os.path.normpath(p).split(os.sep):
+        if is_deck(p) or is_draft(p) or is_run_plot(p) or "run_plots" in os.path.normpath(p).split(os.sep):
             continue
         stems = draft_stems(drafts) if stems is None else stems
         lg0 = read_legend(p)
