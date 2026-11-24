@@ -2,7 +2,7 @@
 
     python analysis/critical_batch/noise_read.py <noise_scale.json> <name> [--window 20] [--batch 16384]
 
-S = tr Sigma and |G|^2 per measurement from base_experiment.noise_scale_terms, summed over the parameter sets (Muon,
+S = tr Sigma and |G|^2 per measurement from noise_scale.noise_scale_terms, summed over the parameter sets (Muon,
 AdamW), averaged separately over windows of `window` consecutive chunk measurements, B_simple = mean S / mean |G|^2.
 The brute-force checks: S and |G|^2 from 16 independent batch gradients at one step, beside the chunk estimate on the
 same batches with its bootstrap standard error over them; the brute values' own standard error is a jackknife over
@@ -14,7 +14,7 @@ import argparse, json, os, sys
 import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-from base_experiment import noise_scale_terms  # noqa: E402
+from noise_scale import noise_scale_terms  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -59,10 +59,10 @@ def read(recs, window):
                                "S_se": float(ST[:, 0].std(ddof=1) / np.sqrt(len(w))),
                                "G2_se": float(ST[:, 1].std(ddof=1) / np.sqrt(len(w))),
                                "B_simple": float(S / G2) if G2 > 0 else None, "sets": per,
-                               # the largest single measurement's share of the window's summed S: near 1, one
-                               # measurement sets the window's mean (a heavy-tailed gradient)
-                               "S_max_share": float(ST[:, 0].max() / ST[:, 0].sum()),
-                               "S_max_step": int(w[int(ST[:, 0].argmax())]["step"])})
+                               # the largest single |S| over the window's summed |S| (S can be negative): near 1,
+                               # one measurement sets the window's mean (a heavy-tailed gradient); a description only
+                               "S_max_share": float(np.abs(ST[:, 0]).max() / np.abs(ST[:, 0]).sum()),
+                               "S_max_step": int(w[int(np.abs(ST[:, 0]).argmax())]["step"])})
     for r in (r for r in recs if r["kind"] == "brute"):
         same = [terms(c)[:2] for c in recs if c["kind"] == "chunk_at_brute" and c["step"] == r["step"]]
         a = np.array(same)
@@ -89,38 +89,45 @@ def figure(res, batch, base, curves=None):
     import plot_style as ps
     fig, ((axB, axT), (axS, axV)) = ps.figure(ncols=2, nrows=2)
     mid = lambda xs: [(x["step_lo"] + x["step_hi"]) / 2 for x in xs]
-    # a window where one of its measurements carries over half the summed trace (a heavy-tailed gradient, S up to
-    # 1e31) would set a log axis 25 decades wide: the axes span the other windows and these are marked at the top edge
-    one = lambda x: x["S_max_share"] > 0.5
-    w = [x for x in res["windows"] if x["B_simple"] is not None and not one(x)]
+    c = [x for x in res["checks"] if x["B_brute"] is not None]
+    # the y range is set by rule, never after a look: up to 3x the larger of the training batch and the 16-batch
+    # checks' B (+ its error); a window above it (one heavy-tailed measurement, S up to 1e31) is drawn at that edge
+    top = 3 * max([batch] + [x["B_brute"] + x["B_brute_se"] for x in c])
+    one = lambda x: x["B_simple"] is not None and x["B_simple"] > top
+    pos = lambda x: x["B_simple"] is not None and x["B_simple"] > 0
+    w = [x for x in res["windows"] if pos(x) and not one(x)]
     axB.plot(mid(w), [x["B_simple"] for x in w], color=ps.C.blue, label="all, chunks")
-    for s, c, lab in (("muon", ps.C.green, "Muon parameters"), ("adamw", ps.C.orange, "AdamW parameters")):
+    for s, col, lab in (("muon", ps.C.green, "Muon parameters"), ("adamw", ps.C.orange, "AdamW parameters")):
         ws = [x for x in w if x["sets"].get(s, {}).get("B_simple") is not None]
         if ws:
-            axB.plot(mid(ws), [x["sets"][s]["B_simple"] for x in ws], color=c, ls=":", label=lab)
-    c = [x for x in res["checks"] if x["B_brute"] is not None]
+            axB.plot(mid(ws), [x["sets"][s]["B_simple"] for x in ws], color=col, ls=":", label=lab)
     M = res["checks"][0]["n_batches"] if res["checks"] else 0
     axB.errorbar([x["step"] for x in c], [x["B_brute"] for x in c], yerr=[x["B_brute_se"] for x in c], fmt="o",
                  color=ps.C.vermillion, label=f"all, {M} batches")
-    neg = mid([x for x in res["windows"] if x["B_simple"] is None and not one(x)])
-    if neg:   # windows whose mean |G|^2 <= 0 have no B: marked at the bottom, not dropped
-        axB.plot(neg, [min(x["B_simple"] for x in w) / 2] * len(neg), "v", color=ps.C.blue,
-                 label=r"window with mean $|G|^2\leq 0$")
+    neg = mid([x for x in res["windows"] if not pos(x)])
+    if neg:   # windows with mean |G|^2 <= 0 (no B) or mean S < 0 (B < 0): off a log axis, marked at the bottom
+        axB.plot(neg, [min([x["B_simple"] for x in w] + [batch]) / 2] * len(neg), "v", color=ps.C.blue,
+                 label=r"window with no $B_{\rm simple}>0$")
     axB.axhline(batch, color="k", ls="--", label="training batch")
-    top = 3 * max([batch] + [x["B_simple"] for x in w] + [x["B_brute"] for x in c])
     big = [x for x in res["windows"] if one(x)]
     if big:
-        axB.plot(mid(big), [top] * len(big), "^", color=ps.C.grey, label="window set by one measurement")
+        axB.plot(mid(big), [top] * len(big), "^", color=ps.C.grey, label="window above the range")
     axB.set_yscale("log")
     axB.set_xlabel("training step")
     axB.set_ylabel(r"$B_{\rm simple}={\rm tr}\,\Sigma/|G|^2$ (events)")
     ps.legend(axB, "upper left", ncol=2)
-    wt = [x for x in res["windows"] if not one(x)]
+    # same rule: up to 3x the larger check value of either term; a window above it at that edge
+    tt = 3 * max(max(x["S_brute"] + x["S_brute_se"], (x["G2_brute"] + x["G2_brute_se"]) * batch) for x in res["checks"])
+    big = [x for x in res["windows"] if max(x["S"], x["G2"] * batch) > tt]
+    wt = [x for x in res["windows"] if x not in big and x["S"] > 0 and x["G2"] > 0]
     axT.plot(mid(wt), [x["S"] for x in wt], color=ps.C.blue, label=r"${\rm tr}\,\Sigma$")
     axT.plot(mid(wt), [x["G2"] * batch for x in wt], color=ps.C.vermillion, label=rf"$|G|^2\times {batch}$")
     if big:
-        axT.plot(mid(big), [3 * max(max(x["S"], x["G2"] * batch) for x in wt)] * len(big), "^", color=ps.C.grey,
-                 label="window set by one measurement")
+        axT.plot(mid(big), [tt] * len(big), "^", color=ps.C.grey, label="window above the range")
+    low = [x for x in res["windows"] if x not in big and x not in wt]
+    if low:   # a term <= 0 is off the log axis: marked at the bottom, not dropped
+        axT.plot(mid(low), [min(min(x["S"], x["G2"] * batch) for x in wt) / 3] * len(low), "v", color=ps.C.grey,
+                 label="window with a term $\\leq 0$")
     axT.set_yscale("log")
     axT.set_xlabel("training step")
     axT.set_ylabel(r"squared gradient norm terms")
@@ -174,18 +181,22 @@ def main():
         print(f"VAL {lab}: final {r['val_curve'][-1]:.4f} best {min(r['val_curve']):.4f} at step "
               f"{int(np.argmin(r['val_curve'])) * r['validate_every']}")
     figure(res, a.batch, f"{HERE}/figs/{a.name}", curves)
-    # the summary the notes' claims key into: each check by its step; the windows' B from step 400 on, without the
-    # windows set by one measurement, by median; the validation curves' last values and training hours
+    # the summary the notes' claims key into: each check by its step; B over ALL windows (median, which the
+    # heavy-tailed windows cannot move far, and its range), the windows without B counted, the largest |S| shares
+    # listed apart; the validation curves' last values and training hours
     r2 = lambda v: float(f"{v:.3g}") if v is not None else None
-    late = [x for x in res["windows"] if x["step_lo"] >= 400 and x["S_max_share"] <= 0.5]
+    late = res["windows"]
+    Bs = [x["B_simple"] for x in late if x["B_simple"] is not None]
     med = lambda f: r2(float(np.median([v for v in map(f, late) if v is not None])))
-    summ = {"n_windows": len(res["windows"]), "n_one_measurement": sum(x["S_max_share"] > 0.5 for x in res["windows"]),
-            "S_max": r2(max(x["S"] for x in res["windows"])),
-            "B_median": med(lambda x: x["B_simple"]), "B_min": r2(min(x["B_simple"] for x in late)),
-            "B_max": r2(max(x["B_simple"] for x in late)),
+    summ = {"n_windows": len(late), "n_no_B": len(late) - len(Bs),
+            "share_top": [[x["step_lo"], round(x["S_max_share"], 3)] for x in
+                          sorted(late, key=lambda x: -x["S_max_share"])[:8]],
+            "S_max": r2(max(x["S"] for x in late)),
+            "B_median": med(lambda x: x["B_simple"]), "B_min": r2(min(Bs)), "B_max": r2(max(Bs)),
+            "B_q25": r2(float(np.percentile(Bs, 25))), "B_q75": r2(float(np.percentile(Bs, 75))),
             "B_muon_median": med(lambda x: x["sets"]["muon"]["B_simple"]),
             "B_adamw_median": med(lambda x: x["sets"]["adamw"]["B_simple"]),
-            "B_muon_first": r2(late[0]["sets"]["muon"]["B_simple"]), "B_muon_last": r2(late[-1]["sets"]["muon"]["B_simple"])}
+            "B_muon_last": r2(late[-1]["sets"]["muon"]["B_simple"])}
     for x in res["checks"]:
         summ[f"check{x['step']}"] = {k: r2(x[k]) for k in ("S_brute", "S_brute_se", "S_chunk", "S_chunk_se", "G2_brute",
                                                            "G2_chunk", "B_brute", "B_brute_se", "B_chunk")}
