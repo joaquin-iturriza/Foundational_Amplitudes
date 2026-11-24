@@ -6,7 +6,7 @@ main stage and of the sigma stage (best_checkpoint), and the MSE of the standard
 sigma stage's saved val predictions (preds_val.npz, the final model). Read on each parent's own site (site_python).
 Writes analysis/finetune_mechanism/data/parent_rerun_check.json.
 
-    python3 analysis/finetune_mechanism/parent_rerun_check.py [snap|snapfp32]   (the rerun read against cc; default snap,
+    python3 analysis/finetune_mechanism/parent_rerun_check.py [snap|snapfp32|noset]   (the rerun read against cc; default snap,
     the TF32 rerun; snapfp32 = the strict-fp32 rerun, written to parent_rerun_check_snapfp32.json)
 """
 import json
@@ -18,7 +18,9 @@ from analysis.common.readers import site_python  # noqa: E402
 
 PARENTS = {"cc": ("ccin2p3", "runs/data_saving/dsave_parent_finale_zng_uq_w_lr1p89e-3_cc", "FA-ccin2p3-47e14eae"),
            "snap": ("lxplus", "runs/data_saving/dsave_parent_finale_zng_uq_w_lr1p89e-3_snap", "FA-lxplus-e8d15505"),
-           "snapfp32": ("ccin2p3", "runs/data_saving/dsave_parent_finale_zng_uq_w_lr1p89e-3_snapfp32", "FA-ccin2p3-74805752")}
+           "snapfp32": ("ccin2p3", "runs/data_saving/dsave_parent_finale_zng_uq_w_lr1p89e-3_snapfp32", "FA-ccin2p3-74805752"),
+           # step 5: the parent retrained without input_soft_eps/input_pair_logs (strict fp32, H100)
+           "noset": ("ccin2p3", "runs/data_saving/dsave_parent_finale_zng_uq_w_noset_lr1p89e-3", "FA-ccin2p3-9a73698a")}
 
 REMOTE = r'''
 import json, os, sys
