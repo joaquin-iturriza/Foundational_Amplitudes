@@ -44044,6 +44044,45 @@ entries:
       it is true (each is a real message to Joaquin); no GPU, lab calls only; prior search (results.tex: dispatch, routing
       wake, design review + lab/deepseek/qwen, reviewer model; decisions: dispatch, wake, lab llm, deepseek, reviewer) finds
       no earlier trial; 100 wakes sampled by seed 0 of 524 confirmed (29 active).'
+  - at: '2026-11-24T23:59:11+00:00'
+    question: 'D551: what else can the lab LLMs take? Can deepseek-v4-flash or qwen3.8-27b (a) handle the main session''s
+      routing wakes (an event, an agent''s end or hand-back that the main session answered only with routing and records)
+      and (b) give the design reviewer''s PASS/FIX verdict on a review round, well enough to take them off our tokens?'
+    prior: 'token_share.py @b29133b07 (json e0e2b1486): per-activity breakdown over 2026-11-09..23, 4953M tokens; main session
+      29.3%, of which plan/ledger bookkeeping 9.7% and replies 8.1%; reviewers 5.3% of tokens, 10.0% of $. main_turns.py:
+      orchestration-only main wakes 602 segments, $164 (34% of main). lab_wake_trial.py extract: 524 routing wakes, 208M tokens
+      (4.2% of all), mean 397k; 174 design review rounds with a fresh design read and their own verdict (91 FIX, 83 PASS).
+      par:labllm1/2: log triage 30/30, lookups 20/20, fixes 10/10 for DeepSeek; no earlier trial of wake dispatch or design
+      review by a lab model (results.tex: dispatcher, nothing new, orchestration, reviewer model; decisions: wake, dispatch,
+      review model: D533, D534 not model trials). First version of this design: FIX by the design reviewer (review key paired
+      first read with last verdict; wake ids absent from prompts; outcomes too weak), fixed at the commit recording this.'
+    measure: '(a) 100 wakes (seed 0) of the 524; each model gets RULES, the wake text and the state outputs the main session
+      read in that segment, and returns send_to, launch, ack, plan verbs, tell_joaquin; key fields: send (whether an agent
+      was messaged; the target id is a lookup a dispatcher does in plan owners), launch count, ack set, plan verbs, tell_joaquin;
+      correct = all five match; also wrong actions on the 71 quiet wakes, correct on the 29 active, exact ids where the prompt
+      holds them. (b) all 174 review rounds (unit: one round, its prompt, the first plan show/design read after it, only that
+      round''s reads, its own verdict); each model, two arms (design only; that round''s material capped 80k characters),
+      gets .claude/agents/design-reviewer.md and returns PASS/FIX; agreement, FIX missed (the route''s cost: a lab PASS skips
+      Opus), false FIX. Tokens: our tokens a route would take; lab tokens; seconds. Every disagreement on active wakes and
+      every FIX missed read by hand.'
+    check: 'Keys move: 29 of 100 wakes need an action, 71 none (do-nothing 71/100, Wilson 0.615-0.79); review rounds 91 FIX,
+      83 PASS (always-FIX 91/174, Wilson 0.45-0.60; always-PASS 83/174). The reviewer''s check of the first version: all 18
+      tell_joaquin=true cases are real messages to Joaquin. Smoke: one wake and one review per model through the harness.'
+    fixed: Window 2026-11-09..23; server-default temperature; one call per instance per model per arm, no tools; same prompt
+      for both models; material cap 80k characters; models via https://lpnkarim.in2p3.fr/api, two calls at a time (D531).
+    control: The Opus main session's own actions on the same wakes; the Opus design-reviewer's own verdict on the same rounds;
+      the trivial baselines (do nothing; always FIX, always PASS).
+    seeds: One call per instance (as the earlier rounds); Wilson 95% on every rate; 29 active wakes and 91 FIX read case by
+      case.
+    outcome: '(a) yes for a model whose correct count on all 100 lies above do-nothing''s Wilson upper bound (79/100): propose
+      a lab dispatcher in front of the main session, with its wrong actions on quiet wakes, its misses on active ones and
+      the tokens it would take (up to 208M over 14 days, 4.2%, less escalated wakes); no: no route, misses by field. (b) yes
+      for an arm whose agreement lies above the majority baseline''s Wilson upper bound (always-FIX, 0.60 of 174): propose
+      a lab first review, Opus re-reviewing only on the lab model''s PASS or doubt or on its FIX, with FIX missed stated as
+      the cost; no: keep reviews on Opus. Error rates go to Joaquin for the route call (D551).'
+    sources: 'D551 (Joaquin: decide what else to use the lab LLMs on); baselines measured by tools/lab_wake_trial.py extract
+      and reviews-extract: do-nothing 71/100 wakes (Wilson 0.615-0.79), always-FIX 91/174 review rounds (Wilson 0.45-0.60);
+      Wilson 95% for the spread'
   step_waits:
     '3': notes-editor pass of the results.tex backlog (it blocks on sec:noisescale and fig:llmcmp_heldout, other entries'
       text; the repo-reviewer already passed the merge)
