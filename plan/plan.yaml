@@ -43516,6 +43516,7 @@ entries:
     setup, no width cost), 2026-11-14T04:31 (a pasted SciPost LaTeX paper draft, not about this run), 2026-11-16T20:00 (a
     writing-style skill, not about runs): none sets a budget for part (b)'
   blocks_steps: *id001
+  checked_until: '2026-11-24T21:38:50+00:00'
 - id: lab_llm_trial
   title: Lab LLMs in place of some subagents
   question: Can the lab's LLMs (deepseek-v4-flash, qwen3.8-27b via lpnllm) do some of our subagent work (mechanical steps,
