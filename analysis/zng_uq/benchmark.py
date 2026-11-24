@@ -629,23 +629,51 @@ print("ZNGD507 " + json.dumps(out))
 """
 
 
-def d507collect(out):
-    """Per D507 cell: its chosen trial (seed 42) and the D509 seeds 43, 44 on CC: target std (data_stats prepd_std),
-    val and train mu-MSE curves (standardised), and for the scored trials the test metrics -> d507.json"""
+# D514 (step 3, the extended searches): a cell whose choice changed -> (trial, seed-run tag); its seed-42 trial ran on
+# lxplus (its curves come from the search read), its seeds 43, 44 on CC as runs/<sweep>_<tag>_s<seed>
+D514 = {"muon_b128": ("trial_0078", "hp0078")}
+# the site each chosen trial ran on: a trial name can exist on both (the D514 lxplus copies re-ran CC's start-up points)
+CHOSEN_SITE = {"adam_b128": "lxplus"}
+D514_SITE = {"muon_b128": "lxplus"}
+
+
+# where d507collect reads a chosen trial's scored copy, when not where it ran: trial_0833 was copied to CC and scored
+# there (FA-ccin2p3-7390e5a4)
+SCORED_SITE = {"adam_b128": "ccin2p3"}
+
+
+def chosen_site(c, v2):
+    """The site the cell's chosen seed-42 trial ran on."""
+    return (D514_SITE.get(c) if v2 and c in D514 else None) or CHOSEN_SITE.get(c, "ccin2p3")
+
+
+def cells(v2):
+    """{cell: (label, chosen trial, batch, colour, linestyle, seed-run tag)}: D507's choices, or with v2 D514's."""
+    return {c: (lab, (D514[c][0] if v2 and c in D514 else tr), bs, col, ls, (D514[c][1] if v2 and c in D514 else "best"))
+            for c, (lab, tr, bs, col, ls) in D507.items()}
+
+
+def d507collect(out, v2=False):
+    """Per D507 cell: its chosen trial (seed 42) and its seeds 43, 44 on CC: target std (data_stats prepd_std),
+    val and train mu-MSE curves (standardised), and for the scored trials the test metrics -> d507.json (v2: the
+    D514 choices -> d507_v2.json)"""
     sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
     from analysis.common.readers import site_python
-    args = []
-    for c, (_, tr, _, _, _) in D507.items():
+    args = {}                         # site -> its arguments: each chosen seed-42 trial is read where it ran
+    for c, (_, tr, _, _, _, tag) in cells(v2).items():
         sw = f"tp_zng_d1e4_{c}_zgggg"
-        args.append(f"'{c}|42|runs/{sw}/{tr}|'")
-        for s in (43, 44):
-            args.append(f"'{c}|{s}|runs/{sw}_best_s{s}|sweeps/{sw}_best_s{s}/results/fixed.json'")
-    r = site_python(D507_SITE, args, "ZNGD507", site="ccin2p3")
+        site = SCORED_SITE.get(c) if not (v2 and c in D514) else None
+        args.setdefault(site or chosen_site(c, v2), []).append(f"'{c}|42|runs/{sw}/{tr}|'")
+        for s in (43, 44):        # the seed runs ran on CC
+            args.setdefault("ccin2p3", []).append(f"'{c}|{s}|runs/{sw}_{tag}_s{s}|sweeps/{sw}_{tag}_s{s}/results/fixed.json'")
+    r = {}
+    for site, a in args.items():
+        r.update(site_python(D507_SITE, a, "ZNGD507", site=site))
     json.dump(r, open(out, "w"), indent=1)
     print({k: (v.get("std"), v.get("test", {}).get("median_abs_delta")) for k, v in r.items()})
 
 
-def d507fig(data, search):
+def d507fig(data, search, v2=False):
     """zng_d507: (a) validation MSE(ln|M|^2) of the mean against training events seen for each D507 cell's chosen trial
     (1e4 training events of Z+4g), beside B1 and B2 at 5e5 (n=4); (b) each cell's best validation MSE(ln|M|^2), seeds 42,
     43, 44; (c) each cell's test median |Delta| (seed 42) beside B1 and B2 at 5e5."""
@@ -653,6 +681,13 @@ def d507fig(data, search):
     import plot_style as ps
     ps.use()
     d, sr = json.load(open(data)), json.load(open(search))
+    D = cells(v2)
+    site = {c: chosen_site(c, v2) for c in D}
+    if v2:   # a chosen trial without its test score would drop out of (c) and of ratios_test unseen
+        miss = [c for c in D if not (d[f"{c}|42"].get("test") or {}).get("median_abs_delta")]
+        assert not miss, f"d507fig --v2: chosen trials not test-scored yet: {miss} (job_kit.sh KIT_SCORE_DIR)"
+    stds = {v["std"] for v in d.values() if v.get("std")}
+    assert len(stds) == 1, f"one target std expected for one dataset, got {stds}"
     STD4 = json.load(open(os.path.join(HERE, "data", "zng_std.json")))["4"]
     bench = json.load(open(os.path.join(HERE, "data", "benchmark.json")))["runs"]
     b1 = next(t for t in json.load(open(os.path.join(HERE, "data", "b1_search.json")))["tp_zng_hpo_zgggg"]["trials"]
@@ -670,10 +705,12 @@ def d507fig(data, search):
         v = np.array(t["val"]) * STD4 ** 2
         ax.plot(x, v, color=col, linestyle=ls, label=lab)
         res[k] = {"best_val": float(v.min())}
-    for c, (lab, tr, bs, col, ls) in D507.items():
+    for c, (lab, tr, bs, col, ls, _) in D.items():
         col = getattr(ps.C, col)
-        s42 = d[f"{c}|42"]
-        t = next(t for t in sr[f"tp_zng_d1e4_{c}_zgggg"]["trials"] if t["run_dir"].endswith(tr))
+        s42 = dict(d[f"{c}|42"])
+        s42["std"] = s42.get("std") or next(iter(stds))     # the one std of this dataset (asserted above)
+        t = next(t for t in sr[f"tp_zng_d1e4_{c}_zgggg"]["trials"]
+                 if t["run_dir"].endswith("/" + tr) and t.get("site", site[c]) == site[c])
         every = t["best_step"] / (int(np.argmin(t["val"])) + 1)    # validation cadence from the best step's index
         x = (np.arange(len(t["val"])) + 1) * every * bs
         ax.plot(x, np.array(t["val"]) * s42["std"] ** 2, color=col, linestyle=ls, label=lab)
@@ -685,7 +722,7 @@ def d507fig(data, search):
                 res[c]["seeds"][s] = float(min(r["val_mse"]) * r["std"] ** 2)
         res[c]["test_median_abs_delta"] = s42.get("test", {}).get("median_abs_delta")
     # (b), (c): x = batch size, colour = optimiser (as in (a)); seed 42 the searched trial, seeds 43, 44 its D509 repeats
-    for c, (lab, _, bs, col, _) in D507.items():
+    for c, (lab, _, bs, col, _, _) in D.items():
         col = getattr(ps.C, col)
         sv = res[c]["seeds"]
         bs = bs * (0.93 if c.startswith("muon") else 1.07)   # Muon a little left, Adam right: the two never overlap
@@ -712,7 +749,7 @@ def d507fig(data, search):
     axt.set_ylabel(r"test median $|\Delta|$")
     ps.process_label(ax, r"$q\bar q\to Z+4g$")
     ps.legend_cell(cell, [ax, axv], fontsize=ps.LEGEND_MIN_PT)
-    ps.save(fig, os.path.join(HERE, "figs", "zng_d507"))
+    ps.save(fig, os.path.join(HERE, "figs", "zng_d507_v2" if v2 else "zng_d507"))
     b = {c: res[c]["seeds"]["42"] for c in D507}
     res["ratios"] = {"G": b["muon_b2048"] / b["adam_b128"], "batch_muon": b["muon_b2048"] / b["muon_b128"],
                      "batch_adam": b["adam_b2048"] / b["adam_b128"], "opt_b2048": b["muon_b2048"] / b["adam_b2048"],
@@ -729,7 +766,7 @@ def d507fig(data, search):
         res["ratios_test"] = {"G": t["muon_b2048"] / t["adam_b128"], "batch_muon": t["muon_b2048"] / t["muon_b128"],
                               "batch_adam": t["adam_b2048"] / t["adam_b128"], "opt_b2048": t["muon_b2048"] / t["adam_b2048"],
                               "opt_b128": t["muon_b128"] / t["adam_b128"]}
-    json.dump(res, open(os.path.join(HERE, "data", "d507_read.json"), "w"), indent=1)
+    json.dump(res, open(os.path.join(HERE, "data", "d507_read_v2.json" if v2 else "d507_read.json"), "w"), indent=1)
     print(json.dumps(res, indent=1))
 
 
@@ -741,6 +778,7 @@ def main():
     ap.add_argument("--out", default=os.path.join(HERE, "data", "benchmark.json"))
     ap.add_argument("--data", default=os.path.join(HERE, "data", "benchmark.json"))
     ap.add_argument("--curves", default=os.path.join(HERE, "data", "zng_curves.json"))
+    ap.add_argument("--v2", action="store_true", help="d507collect/d507fig: the D514 extended searches' choices")
     a = ap.parse_args()
     if a.cmd == "collect":
         collect(a.theirs, a.out)
@@ -756,9 +794,10 @@ def main():
     elif a.cmd == "selection":
         selection(os.path.join(HERE, "data", "protocol_steps.json"), os.path.join(HERE, "data", "selection.json"))
     elif a.cmd == "d507collect":
-        d507collect(os.path.join(HERE, "data", "d507.json"))
+        d507collect(os.path.join(HERE, "data", "d507_v2.json" if a.v2 else "d507.json"), a.v2)
     elif a.cmd == "d507fig":
-        d507fig(os.path.join(HERE, "data", "d507.json"), os.path.join(HERE, "data", "d507_search.json"))
+        v = "_v2" if a.v2 else ""
+        d507fig(os.path.join(HERE, "data", f"d507{v}.json"), os.path.join(HERE, "data", f"d507_search{v}.json"), a.v2)
     elif a.cmd == "stepread":
         stepread(os.path.join(HERE, "data", "protocol_steps.json"))
     elif a.cmd == "ptcollect":
