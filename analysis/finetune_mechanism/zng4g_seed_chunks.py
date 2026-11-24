@@ -2,7 +2,7 @@
 search's chosen trial (its lowest val_loss in sweeps_local/<sweep>/results) at other seeds, one run per chunk. The HPs
 are rebuilt from the sweep config's candidate pool as sweep/seed_list.py does (dyhpo_sampler._sample_candidates).
 
-    python3 analysis/finetune_mechanism/zng4g_seed_chunks.py ftmech_zng4g_ft_b2048 --seeds 43 44   (run in .venv-driver)
+    python3 analysis/finetune_mechanism/zng4g_seed_chunks.py ftmech_zng4g_ft_b2048 --seeds 43 44 [--repick]   (run in .venv-driver)
 """
 import argparse
 import glob
@@ -39,6 +39,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("sweep")
     ap.add_argument("--seeds", nargs="+", type=int, default=[43, 44])
+    ap.add_argument("--repick", action="store_true", help="name runs <sweep>_hp<idx>_s<s>: the first pick's "
+                    "<sweep>_s<s> results exist and job_seed_batch.sh would skip a run of that name")
     a = ap.parse_args()
     # self-check: the b2048 scratch cell's chosen trial (hp1333) rebuilds to the lr its scrflags chunk carries (b128's
     # hp0950 does not: its config's lr window was widened after the draw, 16f200fc)
@@ -51,8 +53,9 @@ def main():
     T = c["fidelity_schedule"]["t_steps"][-1]
     assert best["t_steps"] == T
     for s in a.seeds:
-        out = os.path.join(HERE, "seed_chunks", f"{a.sweep.replace('ftmech_', '')}_s{s}.txt")
-        open(out, "w").write(f"{cfg} {a.sweep}_s{s} {T} " + " ".join(f"{k}={v}" for k, v in h.items()) + f" seed={s}\n")
+        n = f"{a.sweep}_hp{best['hp_idx']:04d}_s{s}" if a.repick else f"{a.sweep}_s{s}"
+        out = os.path.join(HERE, "seed_chunks", f"{n.replace('ftmech_', '')}.txt")
+        open(out, "w").write(f"{cfg} {n} {T} " + " ".join(f"{k}={v}" for k, v in h.items()) + f" seed={s}\n")
         print(out)
     print(f"{a.sweep}: chosen hp{best['hp_idx']} (trial {best['trial_idx']}, val {best['val_loss']:.5g}) of {len(ts)} trials")
 
