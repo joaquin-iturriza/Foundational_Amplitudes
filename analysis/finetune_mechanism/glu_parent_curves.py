@@ -40,9 +40,10 @@ def main():
     res = {}
     for t in ("glu", "noset"):
         c = np.array(raw[t]["combined"])
-        res[t] = {"best_idx": int(c.argmin()), "n_val": len(c),
-                  "proc": {p: {"first": raw[t]["proc"][p][0], "min": float(np.min(raw[t]["proc"][p])),
-                               "argmin": int(np.argmin(raw[t]["proc"][p])), "last": raw[t]["proc"][p][-1]}
+        b = int(c.argmin())   # best checkpoint: lowest aggregate val_loss_no_reg, every process read there
+        res[t] = {"best_idx": b, "best_val": b + 1, "n_val": len(c), "combined_at_best": float(c[b]),
+                  "proc": {p: {"first": raw[t]["proc"][p][0], "at_best": raw[t]["proc"][p][b],
+                               "last": raw[t]["proc"][p][-1]}
                            for p in procs if p in raw[t]["proc"]},
                   "train_keys": sorted(raw[t]["train"])}
     print(json.dumps(res))

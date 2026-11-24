@@ -12,7 +12,7 @@ cluster:
 paths: null
 sweep_name: ftmech_d539_uug_1e4_eps1e-8_b2048
 base_config: ${PROJECT_DIR}/runs/kit/kit_A_uq_zgggg_me2_n500000_t12500
-n_trials: 16  # 8 + 8 guided (Joaquin 2026-11-20: extend the D507 searches)
+n_trials: 16  # as the matched baseline S (tp_zng_d1e4_muon_b2048_zgggg, 16 trials): the passed D539 step-4 design's fallback for blown-up cells
 dyhpo:
   surrogate: gp
   n_candidates: 2000
