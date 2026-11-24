@@ -15805,9 +15805,6 @@ entries:
       commit''), review_guard, plan_files_guard, send_check, brief_guard still refuse from inside code; whether PostToolUse
       hooks fire on inner calls; notification_absorb on poll_event output; then one 10-file mechanical edit, tokens against
       a normal session'
-    29: 'Open to Joaquin since 2026-11-19: the lxplus GPU-h costing fix (the site gate costs an lxplus job by its own --time
-      limit, not its HTCondor flavour''s), refused by the auto-mode classifier as Undermining Oversight; also the claudemd-keeper
-      a5092cfc3cedbf651 passing d02d1d53 (line 24)'
     30: 'D534 orchestration infrastructure: diagnose from the 2026-11-22..24 transcripts (main session 71602535 and its subagents)
       every correction Joaquin made and where his intent was lost (brief, plan entry, hand-off, relay, tool); then build,
       by cases covered: (1) a per-entry record of Joaquin''s intent and corrections in his words, rendered first in every
@@ -16473,11 +16470,6 @@ entries:
       if:
       - 'every guard fires and tokens fall: propose the setting to Joaquin as a diff'
       - 'a guard is bypassed: dead end until fixed upstream'
-    29:
-      feeds: whether the GPU-budget gate costs lxplus jobs at their real wall time
-      if:
-      - 'yes: Joaquin applies it or allows it; then a repo check of site_gate on one lxplus job'
-      - 'no: kept as is, recorded'
     30:
       feeds: whether the recurring failures of 2026-11-22..24 are stopped as a class
       if:
