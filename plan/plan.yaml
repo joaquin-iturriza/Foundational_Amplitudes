@@ -39609,6 +39609,35 @@ entries:
       as a cost. Separately at D=1e3: Fn1k/S1k < 1/1.19 -> today''s parent still gains where data is scarce (the 1e4 residual
       is a large-D effect); Fn1k/S1k >= 1.19 -> a pretraining cost at every D beyond dilution, reported with the figure. Any
       parent or arm blowing up (val > 10x best-so-far) listed apart (D398).'
+    fix_at: '2026-11-24T05:31:02+00:00'
+    fix: 'Checks 3 and 4 (bars against the measured spread): the yes/no bars 0.79/1.27 come from single-seed snapshot-vs-F
+      ratios (P/F8 0.79-0.87), not from the spread of the quantity read. Fn''s own seeds at b128 are 0.0108/0.0184/0.0141
+      (log sd ~0.27), so a ratio of two three-seed means has a 1-sigma noise of ~1.25x: Fg/Fn <= 0.79 is a ~1-sigma event,
+      and an Fg/Fn inside [0.79, 1.27] cannot exclude a ~0.65x effect, which is the size that would remove the 1.53x residual,
+      yet the design reads it as ''dilution is not the residual''. Fix (no new runs): name the statistic each bar applies
+      to (ratio of three-seed geometric means, or the 9-pairing range), set the yes and no bars from the measured seed spread
+      (Fn''s at 1e4; at 1e3 the three arms'' own seeds, by a rule stated now), add an UNRESOLVED band between them with what
+      it changes (if unresolved, the question to Joaquin is whether the cells get more seeds, all arms alike; do not add seeds
+      yourself), and state the mixed case (dilution yes at 1e3, in band at 1e4) and what it says about the 1e4 residual. Check
+      5 (prior incomplete): searched results.tex for dilut, intentional, rung, finale/rung 9, Zgg/Zggg, highmult, +W; site
+      decisions for dilut/intentional/D519-D531. The prior cites the highmult +W grid and the replay children but omits the
+      transfer ladder''s parent-composition results on the same family: finale against rung 9 better on all 7 cells of u u~
+      -> Z+2g and Z+3g (median +0.43, +0.56 dex; the suspected source the finale''s e+e- -> u u~ g, u u~ g g, which the gluon
+      recipe keeps; results.tex l.15072-15078) and Z+3g 1.7-3.1x lower from rung 8 (+2->4) than rung 7 at every D (l.14404,
+      l.14454). Add them to prior and say how they fit (there, the wider pretraining helped Z+ng; this tests the narrower
+      side), and use them in check alongside the +W numbers. Check 15 (parent rate): the design sizes the gluon parent from
+      ''7.97 h measured for the 28-process parent on V100'', but that parent (FA-ccin2p3-9a73698a) ran on an H100 NVL (RUN_SUMMARY
+      gpu field; the V100 run was the original 47e14eae), and the 9-process mix is heavier per event (mean ~5.1 particles
+      per event against ~4.4 for the 28, every pool but ee_ZZ and udbar_Wg being 2->3 or 2->4), so the step rate is not the
+      sibling''s. The job header''s own rule (smoke''s s/step x 64000 x 1.3 + 1 h) cannot be used since the smoke goes at
+      the same time. State the --hdr time limit given to the full run, with room on the measured rate scaled for the multiplicity
+      and for the GPU types site pick may give (no pinning), and the wall target recorded from it. Wording (check 12, no extra
+      work): at D=1e3 the steps move with D (3125 against 31250, 400 epochs each); the Fn1k/S1k outcome (''the 1e4 residual
+      is a large-D effect'') should say ''at D=1e3 and 3125 steps'' since steps and D change together. Everything else holds:
+      the four sweep configs differ from ftmech_zng4g_ftnoset_b128 only in pretrained_path (ftglu) or in train_subsample 1000,
+      t_steps 3125, time 1 h, lr window [1.1e-3, 3.3e-2] shared by the three 1e3 arms, scratch with fine_tune.* removed; the
+      parent command is 9a73698a''s with only recipe= added (script diff checked); orderings read what they wait on; ~45 GPU-h
+      within D511/D520.'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
