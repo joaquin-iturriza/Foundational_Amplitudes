@@ -40717,6 +40717,18 @@ entries:
     blocks_steps: []
     answered_at: '2026-11-24T13:41:29.741000+00:00'
     decision: D537
+  - ask: 'GPU budget: 200 GPU-h, above the 100 GPU-h D536 lets decision-named work spend, with no decision covering it. Part
+      (b), widening our muP LLoCa at part (a)''s best HPs toward the LLM''s 359.6M parameters (D522, D537), measured on CC''s
+      H100 NVL by 50-step smokes; a full run = 60,840 steps x s/step x 1.3: 16 heads (6.34M) 10.4 GPU-h; 32 heads (25.2M)
+      19.4; 64 heads (101M) 53.2; 120 heads (354M, the LLM''s size) 117 (one ~4.9-day job on an 80 GB GPU). All four 200 GPU-h;
+      without 120 heads 83 GPU-h, largest model 101M, 3.6x below the LLM. All four, or the three without 120?'
+    at: '2026-11-24T16:59:07+00:00'
+    searched: 'site decisions --project FA (D522, D536, D537: no decision approves part (b) above 100 GPU-h); plan show llm_compare;
+      Joaquin''s messages 2026-11-24T13:41 (''start the runs'', names no cost), 2026-11-22T02:55 (asks for HPO of LLoCa in
+      Suprio''s setup, no width cost), 2026-11-14T04:31 (a pasted SciPost LaTeX paper draft, not about this run), 2026-11-16T20:00
+      (a writing-style skill, not about runs): none sets a budget for part (b)'
+    blocks_steps: &id001
+    - 10
   owner:
     agent: a1b829d3ccca1f915
     state: working
@@ -43432,6 +43444,17 @@ entries:
       diverges shouldn't wake you and it's owning agent up.
     said_at: '2026-11-24T10:33:58.174000+00:00'
     at: '2026-11-24T11:23:35+00:00'
+  ask: 'GPU budget: 200 GPU-h, above the 100 GPU-h D536 lets decision-named work spend, with no decision covering it. Part
+    (b), widening our muP LLoCa at part (a)''s best HPs toward the LLM''s 359.6M parameters (D522, D537), measured on CC''s
+    H100 NVL by 50-step smokes; a full run = 60,840 steps x s/step x 1.3: 16 heads (6.34M) 10.4 GPU-h; 32 heads (25.2M) 19.4;
+    64 heads (101M) 53.2; 120 heads (354M, the LLM''s size) 117 (one ~4.9-day job on an 80 GB GPU). All four 200 GPU-h; without
+    120 heads 83 GPU-h, largest model 101M, 3.6x below the LLM. All four, or the three without 120?'
+  waiting_since: '2026-11-24T16:59:07+00:00'
+  searched: 'site decisions --project FA (D522, D536, D537: no decision approves part (b) above 100 GPU-h); plan show llm_compare;
+    Joaquin''s messages 2026-11-24T13:41 (''start the runs'', names no cost), 2026-11-22T02:55 (asks for HPO of LLoCa in Suprio''s
+    setup, no width cost), 2026-11-14T04:31 (a pasted SciPost LaTeX paper draft, not about this run), 2026-11-16T20:00 (a
+    writing-style skill, not about runs): none sets a budget for part (b)'
+  blocks_steps: *id001
 - id: lab_llm_trial
   title: Lab LLMs in place of some subagents
   question: Can the lab's LLMs (deepseek-v4-flash, qwen3.8-27b via lpnllm) do some of our subagent work (mechanical steps,
