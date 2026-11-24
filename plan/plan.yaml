@@ -17882,6 +17882,13 @@ entries:
       every unanswered one as ''OPEN <entry>: N h unanswered, blocks ...'' on each wake. Live replay: zng_uq_benchmark stage-2
       ask 94 h, llm_compare part (b) 15 h, critical_batch 12 h; tests/test_plan_ask_reason.py 6 pass. Not fixed: whether the
       main repeats an aged ask to Joaquin is still its own choice (''asked once, repeated only with something new'').'
+  - at: '2026-11-24T13:30:40+00:00'
+    text: '2026-11-24 step 24 (wake measure after RUN/OVERRUN joined the 10-min batch on 2026-11-19T10:19Z; wake_batching.py
+      @6bd35859d, figure wake_batching_after2_per_day.png): per day, before (11-11..11-18, run ends at once) vs after (11-19..11-22,
+      batched), vs the before period replayed at 10 min: main session wakes not started by Joaquin 28.4 -> 23.0 (replay 19.6),
+      tokens 54.7M -> 36.1M (replay 52.0-43.3M); owners 20.9 -> 11.3 wakes (replay 11.9), tokens 75.8M -> 36.5M (replay 73.9-66.0M).
+      Wakes started by Joaquin also fell (main 26.5 -> 14.0 per day), so part of the token drop is less activity, not batching.
+      Held 2 days behind the repo-reviewer backlog (commit of --labels), cleared 2026-11-24.'
   handoff:
     state: 'D534 step 30: parts 1, 2, 3, 4 built and replayed (findings 2026-11-24). Left: a live check of part 3 at the next
       real broken trial (expect an acked RUN event with ''folded into its search'', no wake) and at the next lxplus master
