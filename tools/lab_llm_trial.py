@@ -352,6 +352,64 @@ CHECK = ("Check one fix made by another model (lab LLM trial; the routed flow's 
          "only {\"agree\": true|false, \"note\": \"<why, one or two sentences>\"} to %s with one bash heredoc, then end.")
 
 
+FAILLINE = re.compile(r"FAIL|Error|Traceback|failed")
+TESTLINE = re.compile(r"passed|failed|FAIL|PASS|Error|error|Traceback|assert|\bOK\b|\bok\b", re.I)
+
+
+def compact(stat, diff, test_out=None, keep=40):
+    """What a cheap check reads (D545): the diff stat, the diff, and the test run's pass/fail lines (at most `keep`,
+    then its last 5 lines), never the surrounding code."""
+    out = ["== diff stat", stat.rstrip(), "== diff", diff.rstrip()]
+    if test_out is not None:
+        lines = test_out.splitlines()
+        fails = [l for l in lines if FAILLINE.search(l) and not re.match(r"\s*(PASS|ok)\b", l)]
+        passes = [l for l in lines if TESTLINE.search(l) and l not in fails]
+        out += ["== test: %d failure lines, %d pass lines (failures first)" % (len(fails), len(passes))]
+        out += fails[:keep] + passes[:max(0, keep - len(fails))] + ["== test (last lines)"] + lines[-5:]
+    return "\n".join(out) + "\n"
+
+
+def excerpt(text, needle, k=3):
+    """The lines around the first line holding `needle` (a quoted log line or a step), numbered; '' when absent."""
+    lines = text.splitlines()
+    i = next((j for j, l in enumerate(lines) if needle and needle in l), None)
+    if i is None:
+        return ""
+    return "\n".join("%d: %s" % (j + 1, lines[j]) for j in range(max(0, i - k), min(len(lines), i + k + 1)))
+
+
+CHEAP = ("Check one fix made by another model, cheaply (D545). Read only %s: the fix's diff stat, its diff and the "
+         "pass/fail lines of its test run. The defect it had to fix:\n%s\nAgree unless something in that file is "
+         "visibly wrong (a failing test, a change unrelated to the defect, broken code); do not open any other file, "
+         "do not run anything, do not explore the code. Write only {\"agree\": true|false, \"note\": \"<one "
+         "sentence>\"} to %s with one bash heredoc, then end.")
+
+
+def cheap_brief(task, arm):
+    """The cheap check of one DeepSeek hard fix (D545): its compact file (diff against the copy's base and the
+    handed-over tests run in the sandbox, as labllm.py fix runs them), then its brief, printed."""
+    c, tests, _ = mt.TASKS[task]
+    d = os.path.join(SCR, "fix_%s_%s" % (task, arm))
+    repo = os.path.join(d, "repo")
+    base = subprocess.run(["git", "-C", repo, "rev-list", "--max-parents=0", "HEAD"], capture_output=True,
+                          text=True, check=True).stdout.strip()
+    subprocess.run(["git", "-C", repo, "add", "-A"], check=True)
+    stat = subprocess.run(["git", "-C", repo, "diff", "--cached", "--stat", base], capture_output=True, text=True).stdout
+    diff = subprocess.run(["git", "-C", repo, "diff", "--cached", base], capture_output=True, text=True).stdout
+    subprocess.run(["git", "-C", repo, "reset", "-q"], check=True)
+    cmd = " ; ".join("%s %s" % (mt.PY, t) if "__main__" in open(os.path.join(repo, t)).read()
+                     else "%s -m pytest -q %s" % (mt.PY, t) for t in tests)
+    rc, so, se, _ = sandbox(d, ["bash", "-c", "cd %s && %s" % (repo, cmd)], 900)
+    path = os.path.join(SCR, "cheap_%s_%s.txt" % (task, arm))
+    open(path, "w").write(compact(stat, diff, so + se))
+    b = CHEAP % (path, HARD[task], os.path.join(SCR, "cheapcheck_%s_%s.json" % (task, arm)))
+    if "tests/test_setup_scenarios.py" in tests:   # the old check's excuse, word for word in substance (CHECK)
+        b += (" In tests/test_setup_scenarios.py the sandbox has no live ledger (a traceback 'no such table: items') "
+              "and no temp-root guard, so 'PLAN_TEST=1 with a root outside the temp directory is refused' and 'the "
+              "migration marks the setup's own entries setup' fail for reasons outside the fix and are not counted.")
+    print(b)
+
+
 def check_brief(task, arm):
     """The Sonnet check of one DeepSeek hard fix: its brief, printed (the copy as the arm left it)."""
     c, tests, _ = mt.TASKS[task]
@@ -362,14 +420,15 @@ def check_brief(task, arm):
                    os.path.join(SCR, "check_%s_%s.json" % (task, arm))))
 
 
-def grade_check(task, arm, agent):
-    """The check's verdict against the grader's, and the checker's tokens (our cost of routing that fix)."""
+def grade_check(task, arm, agent, kind="check"):
+    """The check's verdict against the grader's, and the checker's tokens (our cost of routing that fix); kind
+    "cheapcheck" grades the cheap check of D545 (family hardcheck_cheap)."""
     from lab_llm_report import transcript
-    v = json.load(open(os.path.join(SCR, "check_%s_%s.json" % (task, arm))))
+    v = json.load(open(os.path.join(SCR, "%s_%s_%s.json" % (kind, task, arm))))
     fx = [r for r in (json.loads(l) for l in open(REC)) if r.get("family") == "hardfix" and r["task"] == task
           and r["arm"] == arm][-1]
     sec, tok = transcript(agent)
-    r = {"family": "hardcheck", "task": task, "arm": arm, "agent": agent, "agree": bool(v["agree"]),
+    r = {"family": "hardcheck_cheap" if kind == "cheapcheck" else "hardcheck", "task": task, "arm": arm, "agent": agent, "agree": bool(v["agree"]),
          "note": v.get("note", ""), "grader_pass": fx["final_pass"], "matches_grader": bool(v["agree"]) == fx["final_pass"],
          "seconds": round(sec, 1), "our_tokens": tok}
     record(r)
@@ -523,7 +582,7 @@ def sonnet_timed():
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["cases", "smoke", "fix", "fixcheck", "briefs", "grade_sonnet", "check_brief", "grade_check", "lookup", "triage", "_grade", "report", "sonnet_timed"])
+    ap.add_argument("cmd", choices=["cases", "smoke", "fix", "fixcheck", "briefs", "grade_sonnet", "check_brief", "grade_check", "cheap_brief", "grade_cheap", "lookup", "triage", "_grade", "report", "sonnet_timed"])
     ap.add_argument("args", nargs="*")
     ap.add_argument("--plan")
     a = ap.parse_args()
@@ -540,6 +599,10 @@ def main():
             briefs(t)
     elif a.cmd == "grade_sonnet":
         grade_sonnet(a.args[0], a.args[1])
+    elif a.cmd == "cheap_brief":
+        cheap_brief(*a.args)
+    elif a.cmd == "grade_cheap":
+        grade_check(*a.args, kind="cheapcheck")
     elif a.cmd == "check_brief":
         check_brief(*a.args)
     elif a.cmd == "grade_check":

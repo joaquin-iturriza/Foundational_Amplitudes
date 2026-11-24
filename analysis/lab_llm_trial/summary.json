@@ -112,6 +112,16 @@
  },
  "hardfix": {
   "deepseek": {
+   "cheap_check": {
+    "agree": 10,
+    "flags_emastart": false,
+    "matches_grader": 10,
+    "n": 10,
+    "old_check_median": 99058,
+    "our_tokens_median": 38180,
+    "our_tokens_per_task": 41504,
+    "ours_over_sonnet": 0.17
+   },
    "check_agree": 9,
    "check_matches_grader": 9,
    "lab_tokens_per_task": 2757855,

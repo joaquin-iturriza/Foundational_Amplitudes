@@ -99,6 +99,17 @@ def summary():
             if a != "sonnet":
                 h[a]["ours_over_sonnet"] = round(h[a]["our_tokens_per_task"] / h["sonnet"]["our_tokens_per_task"], 2)
                 h[a]["tasks_below_sonnet"] = sum(t["ours"] < son[t["task"]] for t in h[a]["per_task"])
+        old = [t["ours"] for t in h["deepseek"]["per_task"]]          # DeepSeek alone: our tokens are its check only
+        cheap = [r for r in runs if r["family"] == "hardcheck_cheap" and r["arm"] == "deepseek"]
+        if cheap:   # D545: the check reads only the diff stat, diff and test pass/fail lines
+            ct = [r["our_tokens"] for r in cheap]
+            h["deepseek"]["cheap_check"] = {
+                "n": len(cheap), "agree": sum(r["agree"] for r in cheap),
+                "matches_grader": sum(r["matches_grader"] for r in cheap),
+                "flags_emastart": any(r["task"] == "emastart" and not r["agree"] for r in cheap),
+                "our_tokens_per_task": round(sum(ct) / len(ct)), "our_tokens_median": round(statistics.median(ct)),
+                "old_check_median": round(statistics.median(old)),
+                "ours_over_sonnet": round(sum(ct) / len(ct) / h["sonnet"]["our_tokens_per_task"], 2)}
     out["lookup"] = lookups(runs)
     hr = os.path.join(OUT, "hand_read.json")
     if os.path.exists(hr):                         # the owner's read of why and resubmit_as_is against the ack note

@@ -24,3 +24,10 @@ def test_lookup_items_checked_against_the_copy(tmp_path):
                        ".claude/hooks/x.py:name\n./tools/a.py:bar\n" % tmp_path)
     assert got == [("tools/a.py:bar", True), ("tools/a.py:Foo", True), ("tools/a.py:baz", False), ("tools/b.py:bar", False),
                    (".claude/hooks/x.py:name", True), ("tools/a.py:bar", True)]
+
+
+def test_cheap_check_material():
+    import lab_llm_trial as lt
+    assert lt.excerpt("a\nb\nboom at 12\nc", "boom at 12", 1) == "2: b\n3: boom at 12\n4: c" and lt.excerpt("a", "zz") == ""
+    c = lt.compact(" f | 2 +-", "+x", "ok t_a\nPASS  M4: a failed item\nFAILED t_b")
+    assert "== test: 1 failure lines, 2 pass lines" in c and c.index("FAILED t_b") < c.index("ok t_a")

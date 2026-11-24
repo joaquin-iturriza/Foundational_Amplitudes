@@ -71,8 +71,12 @@ def triage(run, event, end):
     log(rec)
     print(json.dumps({k: rec[k] for k in ("id", "run", "event", "answer", "quote_in_log", "step_in_log", "log")},
                      indent=1))
-    print("check it: read the log around the quoted line or step (%s), then python3 tools/labllm.py check %s "
-          "--agree|--disagree --note \"...\"; ack or resubmit only after that" % (path, i))
+    for what, needle in (("quoted line", a and a.get("error")), ("step", a and a.get("step") is not None and str(a["step"]))):
+        ex = lt.excerpt(text, str(needle).strip()) if needle else ""
+        print("== log around the %s:\n%s" % (what, ex or "(not in the log)"))
+    print("check it (D545: from these lines only, agree unless something in them is visibly wrong), then python3 "
+          "tools/labllm.py check %s --agree|--disagree --note \"...\"; then the owner reads the log (with no live owner, you do) before any ack "
+          "or resubmit" % i)
 
 
 def fix(brief, test, timeout=FIX_TIMEOUT):
@@ -92,23 +96,24 @@ def fix(brief, test, timeout=FIX_TIMEOUT):
     if unavailable(u, rc, se, d):
         log({"id": i, "kind": "fix", "brief": os.path.abspath(brief), "unavailable": True, "at": time.strftime("%Y-%m-%dT%H:%M:%S")})
         sys.exit(2)
-    tres = None
+    tres, tout = None, None
     if test:            # the test runs the model's code: inside the sandbox
         trc, so, se2, _ = lt.sandbox(d, ["bash", "-c", "cd %s && %s" % (repo, test)], 900)
-        tres = {"rc": trc, "tail": (so + se2)[-1500:]}
+        tres, tout = {"rc": trc, "tail": (so + se2)[-1500:]}, so + se2
     subprocess.run(["git", "-C", repo, "add", "-A"], check=True)
     diff = subprocess.run(["git", "-C", repo, "diff", "--cached", "HEAD"], capture_output=True, text=True).stdout
+    stat = subprocess.run(["git", "-C", repo, "diff", "--cached", "--stat", "HEAD"], capture_output=True, text=True).stdout
     dpath = os.path.join(d, "fix.diff")
     open(dpath, "w").write(diff)
     rec = {"id": i, "kind": "fix", "brief": os.path.abspath(brief), "base": base, "diff": dpath,
            "diff_lines": diff.count("\n"), "test": test, "test_result": tres, "seconds": round(sec, 1),
            "lab_tokens": u, "rc": rc, "at": time.strftime("%Y-%m-%dT%H:%M:%S")}
     log(rec)
-    print(json.dumps({k: rec[k] for k in ("id", "base", "diff", "diff_lines", "test_result", "rc", "seconds")},
-                     indent=1))
-    print("check it: read %s whole; if right, git apply --3way it in your worktree (base %s), run the test, commit "
+    print(json.dumps({k: rec[k] for k in ("id", "base", "diff", "diff_lines", "rc", "seconds")}, indent=1))
+    print(lt.compact(stat, diff, tout if test else None) + ("test rc %d" % tres["rc"] if tres else "(no test given)"))
+    print("check it (D545: from the lines above only, agree unless something in them is visibly wrong); if right, git apply --3way it in your worktree (base %s), run the test, commit "
           "only on a pass; then python3 tools/labllm.py check %s --agree|--disagree --note \"...\" (empty diff, "
-          "timeout or wrong: --disagree, and do the fix yourself)" % (dpath, base[:10], i))
+          "timeout or wrong: --disagree, and do the fix yourself)" % (base[:10], i))
 
 
 LOOKUP = ("Answer one question about the code in {repo} (ignore worktrees/, tests/, .venv*). Use Grep, Glob and Read "
