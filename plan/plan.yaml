@@ -44931,3 +44931,34 @@ entries:
       if:
       - 'all bounds hold: write-up in docs/results.tex and plan done'
       - 'flag over 30 min or two skipped passes: disk_watch and the feeder in one job (flag right before the feed)'
+- id: orchestrator_kit
+  title: 'Standalone shareable kit: main session as orchestrator of subagents, jobs on several clusters'
+  question: Can the general machinery behind our setup (the site tool for multi-cluster submission, sync, placement and copy;
+    the ledger of decisions, items and events with the supervisor and waiter; plan.py with owners, briefs, hand-offs, asks
+    and designs; the hooks and reviewers that enforce the rules; the lab-LLM route) be separated from what is particular to
+    FA and packaged as a standalone repo colleagues can install on their own clusters and projects and improve?
+  status: running
+  quotes:
+  - said_at: '2026-11-24T19:13:45.963000+00:00'
+    text: I believe that instead of just pointing him to my repos and letting him figure it out, and pull apart what's particular
+      to this project vs what are the core functionalities, we should make this a stand alone thing we can share, and perhaps
+      let my other colleagues improve. Can you do that?
+    decision: D546
+    covers:
+    - orchestrator_kit
+  decisions:
+  - D546
+  next: Inventory every piece (~/.local/bin/site*, ~/.config/ccorch, ~/.claude/context, FA tools/plan.py, .claude/hooks, .claude/agents,
+    plan/*prompt*, CLAUDE.md rules) and sort core vs FA-specific vs user-specific (paths, accounts, keys, cluster names);
+    propose the repo layout, config surface (sites, projects, policies) and install path; build it locally as a new git repo
+    under ~/work with no remote, every secret and personal path scrubbed, with a README and a worked example; FA keeps running
+    on its current setup until the kit is proven
+  done_when: null
+  notes_ref: null
+  match: orchestrator_kit_*
+  evidence:
+    runs: []
+    commit: null
+    paths: []
+  dead_ends: []
+  asks: []
