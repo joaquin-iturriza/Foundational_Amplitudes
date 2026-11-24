@@ -31,6 +31,7 @@ sign_pair_bound: false
 input_pair_logs: 0
 input_pair_threshold: false
 input_soft_eps: 0.0
+input_soft_massless_only: false   # with input_soft_eps: massive momenta keep factor 1, on their mass shell (D539)
 input_local_log_eps: 0.0
 # input_scalars_only: the backbone sees only the scalars above (no momenta: local momenta zeroed, identity frames)
 input_scalars_only: false

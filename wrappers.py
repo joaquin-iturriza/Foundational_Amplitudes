@@ -264,15 +264,20 @@ def _asym_mu(mu_raw, alpha, ptr, n, logD, on, members, sd):
     return torch.logsumexp(torch.cat([reg[:, None], terms], 1), 1) / sd
 
 
-def _soft_rescale(p, ptr, eps):
+def _soft_rescale(p, ptr, eps, massless_only=False):
     """p_i -> p_i log1p(x_i/eps) / (x_i log1p(1/eps)), x_i = 2 p_i.Q/s, Q = p_0 + p_1, s = Q^2: an invariant factor per
-    momentum (equivariant), 1 at x_i = 1, so a soft momentum's scale reads logarithmically (model.input_soft_eps)."""
+    momentum (equivariant), 1 at x_i = 1, so a soft momentum's scale reads logarithmically (model.input_soft_eps).
+    massless_only: a massive momentum (m^2/s > 1e-6) keeps factor 1, so it stays on its mass shell
+    (model.input_soft_massless_only, finetune_mechanism D539)."""
     cnt = ptr[1:] - ptr[:-1]
     eta = torch.tensor(_ETA, device=p.device, dtype=torch.float64)
     p64 = p.to(torch.float64)
     Q = (p64[ptr[:-1]] + p64[ptr[:-1] + 1]).repeat_interleave(cnt, dim=0)
     x = (2 * (p64 * Q * eta).sum(-1) / (Q * Q * eta).sum(-1)).abs().clamp(min=1e-30)
-    return p * (torch.log1p(x / eps) / (x * math.log1p(1 / eps))).to(p.dtype)[:, None]
+    f = torch.log1p(x / eps) / (x * math.log1p(1 / eps))
+    if massless_only:
+        f = torch.where(((p64 * p64 * eta).sum(-1) / (Q * Q * eta).sum(-1)).abs() > 1e-6, torch.ones_like(f), f)
+    return p * f.to(p.dtype)[:, None]
 
 
 def _log_skip(p, ptr, types, n, head, threshold=False, quadratic=True):
@@ -411,7 +416,7 @@ class AmplitudeLLoCaWrapper(nn.Module):
                  input_pair_threshold: bool = False, input_scalars_only: bool = False,
                  input_route_off: str = "", input_log_skip: int = 0, input_log_skip_linear: bool = False,
                  input_div_form: bool = False, input_asym_factor: bool = False,
-                 input_asym_sudakov_single: bool = False):
+                 input_asym_sudakov_single: bool = False, input_soft_massless_only: bool = False):
         super().__init__()
         self.net = net
         # input representations for singular limits (D374, kit_benchmark input arms; all Lorentz-exact, 0 = off):
@@ -421,6 +426,7 @@ class AmplitudeLLoCaWrapper(nn.Module):
         self.input_pair_logs = int(input_pair_logs or 0)
         self.input_pair_threshold = bool(input_pair_threshold)   # pair logs of (p_i+p_j)^2 - (m_i+m_j)^2: log beta^2
         self.input_soft_eps = float(input_soft_eps or 0.0)
+        self.input_soft_massless_only = bool(input_soft_massless_only)   # massive momenta keep factor 1 (_soft_rescale)
         net.local_log_eps = float(input_local_log_eps or 0.0)
         # input_scalars_only: the backbone reads only the per-particle scalars (properties, orders, pair logs): local
         # momenta zeroed, identity frames (models/lloca.py), so no momentum reaches it but through the pair logs
@@ -1207,7 +1213,8 @@ class AmplitudeLLoCaWrapper(nn.Module):
             particle_type = torch.cat([particle_type, _div_form_inputs(
                 fourmomenta, ptr, self.input_pair_logs, G[particle_type_indices, 7],
                 G[particle_type_indices, 2] >= 0).to(particle_type.dtype)], dim=-1)
-        fm_net = _soft_rescale(fourmomenta, ptr, self.input_soft_eps) if self.input_soft_eps else fourmomenta
+        fm_net = (_soft_rescale(fourmomenta, ptr, self.input_soft_eps, self.input_soft_massless_only)
+                  if self.input_soft_eps else fourmomenta)
 
         net_kwargs = {} if token_add is None else {"token_add": token_add}
         outputs = self.net(fm_net, particle_type, mean, std, ptr=ptr,

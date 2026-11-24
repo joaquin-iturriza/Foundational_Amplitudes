@@ -66,7 +66,8 @@ def _out(w, p, ptr, kinds=(1, 1, 2, 3, 4, 2)):
 
 FLAGS = {"pair_logs": dict(input_pair_logs=5), "soft_rescale": dict(input_soft_eps=1e-8),
          "local_logs": dict(input_local_log_eps=1e-8),
-         "both_6": dict(input_pair_logs=6, input_soft_eps=1e-8)}     # the uugg flags: 15 pair logs + soft rescale
+         "both_6": dict(input_pair_logs=6, input_soft_eps=1e-8),
+         "soft_massless": dict(input_soft_eps=1e-8, input_soft_massless_only=True)}     # the uugg flags: 15 pair logs + soft rescale
 
 
 def _check(name, lens=LENS):
@@ -424,3 +425,17 @@ if __name__ == "__main__":
               test_soft_rescale_equivariant, test_local_logs_equivariant, test_both_flags_6particle_equivariant]:
         t()
     print("all ok")
+
+
+def test_soft_rescale_massless_only():
+    """model.input_soft_massless_only (D539): a massive momentum keeps factor 1 (its mass shell), a massless one gets the
+    plain rescale's factor; the wrapper stays Lorentz invariant."""
+    p, ptr = _events(1, (5, 4))
+    p = p.clone()
+    p[3, 0] = (p[3, 1:] ** 2).sum().sqrt() * 1.5          # make the first event's second outgoing leg massive
+    a, b = _soft_rescale(p, ptr, 1e-8), _soft_rescale(p, ptr, 1e-8, massless_only=True)
+    assert torch.equal(b[3], p[3]), "the massive momentum was rescaled"
+    keep = torch.ones(len(p), dtype=torch.bool); keep[3] = False
+    assert torch.allclose(a[keep], b[keep], rtol=0, atol=0), "a massless momentum differs from the plain rescale"
+    assert not torch.allclose(a[3], p[3]), "the plain rescale should move the massive momentum"
+    _check("soft_massless")
