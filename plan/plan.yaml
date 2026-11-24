@@ -44817,6 +44817,7 @@ entries:
     and seed priority); 2026-11-14T04:31 (a pasted LaTeX template)
   blocks: the CC deletions of costly results only
   blocks_steps: *id003
+  checked_until: '2026-11-24T21:39:07+00:00'
 - id: cc_login_jobs
   title: 'CC login node: recurring and long scripts moved to Slurm (CC support''s email)'
   question: 'Can every non-interactive script we run on CC''s login node (the supervisor''s maintain commands: disk_watch,
