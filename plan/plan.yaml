@@ -40061,6 +40061,55 @@ entries:
       hp1860 0.0490 at 2.54e-3, 0.13 decade over the bottom. The ratio uses the passed 2-sigma rule on three seeds. Cost about
       4.5 GPU-h, no needless ordering. Check 5: the prior was searched in the earlier pass of this step (dilut, intentional,
       rung, finale/rung 9, Zgg/Zggg, highmult) plus this entry''s R3 extension and its Sf*-alone dead end.'
+  - at: '2026-11-24T13:58:35+00:00'
+    question: 'D539 (Joaquin: ''these input settings were decided for a reason? why are they causing a problem now?''): why
+      does the momentum log-rescale (model.input_soft_eps 1e-8: p_i -> p_i log1p(x_i/eps)/(x_i log1p(1/eps)), x_i = 2 p_i.Q/s)
+      raise Z+4g scratch''s best val MSE(log|M|^2) 2.07x at batch 2048 (1e4 events) while on e+e- -> u u~ g from scratch at
+      1e5 it lowered the soft deepest bin 14180 -> 0.393 and the bulk 8.2e-4 -> 5.4e-4 (log10 MSE, -0.19 dec, one seed, kit_benchmark
+      D374/D392)? Candidates: (M) the rescale moves the massive Z off its mass shell (factor f_Z 1.04-3.0 over the pool, so
+      the network sees a Z of mass 1.04-3.0 m_Z varying per event; uug has no massive particle); (C) the compression of the
+      bulk''s energy fractions; (D) data size (Z+4g 1e4 against uug 1e5).'
+    prior: 'kit_benchmark findings 2026-11-11 (plan kit_benchmark; analysis/kit_benchmark/data/kit_fig_A_inputs.json): uug
+      1e5, 8000 steps, seed 42, control / pair logs / log-rescale / both, deepest bins soft 14180/19100/0.393/0.200, collinear
+      30.1/10.1/47.2/2.21, bulk 8.2e-4/5.1e-4/5.4e-4/1.09e-4: the rescale alone fixes the soft limit and hurts the collinear
+      one (0/5 strata), the two together compound (bulk -0.88 dec) -> D392 adopt both; carry-over (2026-11-11 20:15) uugg
+      every limit gains, bulk unresolved (-0.06), tt virtual Sudakov +1.00 dec worse and tt Born Sudakov +0.31 worse (massive
+      tops; threshold -2.26 better). This entry: one-setting read at b2048 (2026-11-23 22:37): scratch 0.063, rescale only
+      (searched hp1961, lr 0.028) 0.131 (2.07x), pair logs only 0.070 (1.11x, in seed noise), both 0.142; rescale trials 0.121-0.201
+      all above scratch over lr 3e-3..4e-2. Input diagnostic today (soft_rescale_inputs.py @b04c11465, 2e4 val events per
+      pool): bulk spread of the network''s energy fraction kept (x''_95-x''_5)/(x_95-x_5) at eps 1e-8/1e-6/1e-4/1e-2/1: Z+4g
+      0.16/0.21/0.31/0.60/1.00, uug 0.11/0.14/0.21/0.41/0.92 (uug is compressed MORE, yet it gained: compression alone does
+      not set the sign); the Z''s factor 5-95% 1.04-3.0 at 1e-8, 1.03-2.4 at 1e-2, 1.01-1.26 at 1. Searched: results.tex sec:kit-deepest,
+      par:ftm_zng4g, plan kit_benchmark and finetune_mechanism findings, site decisions D374/D376/D392/D405/D539.'
+    measure: 'Best val MSE(log|M|^2) (best checkpoint, x own target std^2) per arm, three seeds; ratio to the off arm of the
+      same process and D at the same HPs with the 2-sigma rule (sigma_r = sqrt((s_a^2+s_b^2)/3)); for uug also the kit hard-bin
+      log10-MSE (soft, collinear deepest bins, bulk_test) by job_kit.sh KIT_SCORE_ONLY on each run dir. Figures: per-seed
+      best per arm (Z+4g eps scan with off and massless-only; process x D grid on/off) and the input diagnostic figure.'
+    check: 'On existing data the tested changes move the candidate mechanisms'' input measures: massless-only sets f_Z = 1
+      (mass shell kept) while leaving every massless factor as at 1e-8 (test_soft_rescale_massless_only); eps 1e-4/1e-2/1
+      move the bulk spread kept 0.31/0.60/1.00 and f_Z 95% 2.8/2.4/1.26 on the Z+4g pool; 1e5 against 1e4 is the 10x data
+      axis the uug 1e5 gain and the Z+4g 1e4 cost differ on. The existing effect is 2.07x (searched, 3 seeds, seed spread
+      1.2x), far above the 2-sigma resolution.'
+    fixed: 'Scratch, batch 2048, 1953 steps, MuonAdamW + WSD (cooldown 1/8), float64, validate_frac 0.02, evaluation.train_subsample
+      2000, the rescale arm''s searched HPs hp1961 for every arm (lr 0.02796, muon_weight_decay 3.49e-3, reg 3.54e-9, warmup
+      0.156, eta_min 6.55e-9, ema 0.9025), config sweep/sweep_config_ftmech_zng4g_scrsoftsrch_b2048.yaml @3ea925fa0 via sweep/run_fixed_hp.py
+      (scripts/job_seed_batch.sh chunks), overrides only: model.input_soft_eps, model.input_soft_massless_only, data.train_subsample
+      (1e4 or 1e5), and for uug data.processes_file = runs/kit/recipes/kit_A_ee_uug_me2_n100000_t8000.yaml (the kit uug pools,
+      1000 GeV). No pair logs anywhere.'
+    control: 'Each process and D: the off arm (input_soft_eps 0) at the same hp1961 HPs and seeds. Z+4g 1e4 at 1e-8: the one-setting
+      runs ftmech_zng4g_scrsoftsrch_b2048 hp1961 seeds 42/43/44 (0.125/0.121/0.145) are reused (same config, HPs, code path);
+      everything else is new.'
+    seeds: '42, 43, 44 per arm. New runs: Z+4g 1e4 off, eps 1e-4, 1e-2, 1, massless-only 1e-8 (15); Z+4g 1e5 off, 1e-8 (6);
+      uug 1e4 off, 1e-8 (6); uug 1e5 off, 1e-8 (6): 33 runs x 0.35 h (b2048 rate incl. sigma stage) = 11.6 GPU-h, two runs
+      per job (17 jobs, ~0.7 h, one wave at site pick''s width on CC); then 12 kit scoring jobs on the uug run dirs (~0.1
+      h each). Under D520/D529.'
+    outcome: 'Per arm r = arm/off with its 2-sigma [lo, hi]. (M) massless-only hi < 1.19x-equivalent, i.e. its r''s interval
+      contains 1 or lies below 1.19 while 1e-8''s stays at ~2: the Z''s mass distortion is the cost -> parent keeps the rescale
+      on massless momenta only (the uug limit gains need no massive leg); (C) r falls monotonically with eps toward 1 and
+      massless-only does not remove it: the bulk compression is the cost, eps is a trade-off read against the uug hard bins;
+      (D) Z+4g at 1e5 r ~ 1 and/or uug at 1e4 r > 1 beyond noise: the cost is a small-data one. Mixed results reported as
+      the shares of each. uug at 1e4 and 1e5 at these HPs reproduces or not the D374 bulk gain (seed noise now measured).
+      Blow-ups (val > 10x best-so-far) listed apart (D398).'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
