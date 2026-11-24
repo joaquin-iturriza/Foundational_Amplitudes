@@ -44800,8 +44800,12 @@ entries:
     - cc_disk
   decisions:
   - D542
-  next: Apply the CC deletions Joaquin chooses from the cc_disk list (debris once the permission check allows it; results
-    through free_space.py and scripts/prune_site.sh under his decision), then reread df
+  next:
+    1: 'Read FA-ccin2p3-67887dff''s manifest and df (D550 debris: smokes, format-2 memmap keys, scratch run dirs) and report
+      the GiB freed per class'
+    2: 'Write the per-group keep/delete recommendation for the costly CC results (model files under D149/D133, zz_catft*,
+      zz_v4_short/long predictions, lhe_queue, runs_from_lxplus) from the CPU read job ccj_3b5290531b03 (slurm 64806812):
+      what each is, what reads it, regeneration cost, copies elsewhere, my call'
   done_when: null
   notes_ref: null
   match: cc_disk_*,zz_probe_*
@@ -45012,8 +45016,7 @@ entries:
       1 MiB and overstates. Census --in-use ''*'' --days 14: amp_data_cache all keep (60,138 MiB, 18,498 files). Since 15:20
       the disk fell 15->10 GB through llm_compare part (b) width smokes in runs/zz_smoke (two uncompressed checkpoints each,
       2x2.78 GB at 64 heads); the pending 120-head smoke FA-ccin2p3-74ba6cdd projects ~19.5 GB.'
-  step_waits:
-    '1': '2026-11-25'
+  step_waits: {}
   targets:
   - batch: disk_inventory
     wall_h: 1.0
@@ -45029,10 +45032,16 @@ entries:
     at: '2026-11-24T23:50:05+00:00'
   step_why:
     1:
-      feeds: which CC data is deleted to free /sps/lpnhe (D542)
+      feeds: how much of CC's /sps/lpnhe D550's debris deletion frees
       if:
-      - 'Joaquin names items: delete exactly those through the decided tools, report freed GiB against df'
-      - 'Joaquin keeps everything: record it, close the entry with the inventory as its result'
+      - 'DEBRIS_DONE, classes within 2x: report freed GiB and the new df'
+      - 'a class SKIPPED or the job cut: report what the manifest listed, fix the cause, rerun that class'
+    2:
+      feeds: which costly CC results Joaquin approves deleting (his yes/no on my list, after his 'How would I know which results
+        to delete?')
+      if:
+      - 'a group is read by an open entry or a results.tex figure and has no copy: keep'
+      - 'a group is a copy, or an evaluation output cheap to regenerate from kept models: recommend delete'
   ask: 'Scope: which of CC''s costly results to delete to free the group space (99% full). Which of these should go: model
     files under D149/D133 via scripts/prune_site.sh (tens of GiB), zz_catft* 27.3 GiB (muon_test fine-tunes the draft cites),
     zz_v4_short/long per-pool outputs 27.4, lhe_queue 6.8, runs_from_lxplus 17.3 (its archive held by D122)?'
