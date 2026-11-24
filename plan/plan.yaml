@@ -40764,7 +40764,6 @@ entries:
       analysis/llm_compare/figs/a5_controls_heldout_per_process.png (tuned trial 5, his-optimizer control, latest-setup control,
       his pID baseline). Every held-out comparison of this entry is drawn in that layout.'
   step_waits:
-    '2': FA-ccin2p3-b135e7db FA-ccin2p3-f3e29e87
     '3': llmcmp_a_drive5
     '5': llmcmp_c_qperp_drive4 DRIVE_DONE (detach event of the driver)
     '7': FA-ccin2p3-bf23e0c4 FA-ccin2p3-b77878e1 FA-ccin2p3-f6f7179d
