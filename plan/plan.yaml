@@ -44580,6 +44580,7 @@ entries:
       - 'refused or failed: read why, fix, resubmit the same config'
   step_waits:
     '1': ccin2p3:cbs_b2048 ccin2p3:cbs_b4096 ccin2p3:cbs_b8192 ccin2p3:cbs_b16384 ccin2p3:cbs_b32768
+    '2': detach:cbs_b32768_submit (pid 3928761, DONE event)
   targets:
   - batch: noise_smoke
     wall_h: 0.4
