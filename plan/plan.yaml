@@ -38663,6 +38663,14 @@ entries:
       1e5 s43/s44; eps 1e4 s42), bulk r 0.91 [0.39,2.12] (1e4), 1.02 [0.37,2.83] (1e5) unresolved; kit deepest bins (seed
       medians, eps over off): soft -3.16 dec (1e4) / -4.46 (1e5), bulk +0.12/+0.07, collinear +0.25/+0.02 (noise). Parent
       for Z+ng fine-tunes: without the rescale (Fn/S 0.35 at b2048, 0.486 at D=1e3).'
+  - at: '2026-11-24T22:49:45+00:00'
+    text: '2026-11-25 step 2 read at 1e4, batch 128 (zng4g_ftnoset_read.py 128 @75d8985e4; fig zng4g_ftnoset_b128 v3 with
+      the new arm, caption OK; results.tex par:ftm_zng4g @486114d2d). Best val MSE(log|M|^2) seeds 42/43/44: fine-tune from
+      the 9-process gluon/Z parent Fg (FA-ccin2p3-1f2d9ad5, best checkpoint pre-cooldown; hp1998, lr 8.89e-3; seeds FA-ccin2p3-2865c27d,
+      -1f850218) 0.00911/0.00909/0.00935; Fn (28-process no-settings parent) 0.0108/0.0184/0.0141; scratch S hp0078 0.00887/0.0105/0.00887.
+      Fg/Fn 0.65 [0.48, 0.88] 2-sigma -> design branch dilution yes; Fg/S 0.98 [0.87, 1.10]: the narrower parent closes the
+      1.53x residual. Fg no blow-up, all seeds best at the last validation, falling 3x from 25% to end (fixed-compute read).
+      Caveat: Fg chosen lr 0.09 dec under the window top 1.1e-2 (S also at its top). D=1e3 half: step 5.'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
