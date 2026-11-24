@@ -44571,6 +44571,7 @@ entries:
       - 'smoke broken: fix the accumulation path, rerun the smoke once, then submit'
   step_waits:
     '2': ccin2p3:cbs_smoke_b32768
+    '1': ccin2p3:cbs_b2048 ccin2p3:cbs_b4096 ccin2p3:cbs_b8192 ccin2p3:cbs_b16384 ccin2p3:cbs_b32768
   targets:
   - batch: noise_smoke
     wall_h: 0.4
