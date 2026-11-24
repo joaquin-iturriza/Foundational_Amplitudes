@@ -57,7 +57,7 @@ def main():
            "ours_below_llm": {lab: {g: int(sum(h[n]["mse_logm2"] < llm_pp[n] for n in ns)) for g, ns in groups.items()}
                               for lab, (_, h) in arms.items()},
            "counts": {"seen": 1352, **{g: len(ns) for g, ns in groups.items()}}}
-    print(json.dumps(out, indent=1))
+    print(json.dumps(out))   # one line: tools/verify_claims.py reads the last {...} line
     json.dump(out, open(os.path.join(HERE, "data", f"{out_name}_score_summary.json"), "w"), indent=1)
     # no figure here: Joaquin rejected this layout (2026-11-23); the figure is heldout_per_process.py's
 
