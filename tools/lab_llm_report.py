@@ -93,6 +93,12 @@ def summary():
             if f == "triage":
                 out[f][a]["passed_by_class"] = {k: [sum(p for p, q in zip(c["first"], c["by_class"]) if q == k),
                                                     c["by_class"].count(k)] for k in set(c["by_class"])}
+    if "hardfix" in out:            # the design's bar: our tokens per fix over Sonnet's, overall and task by task
+        h = out["hardfix"]; son = {t["task"]: t["ours"] for t in h["sonnet"]["per_task"]}
+        for a in h:
+            if a != "sonnet":
+                h[a]["ours_over_sonnet"] = round(h[a]["our_tokens_per_task"] / h["sonnet"]["our_tokens_per_task"], 2)
+                h[a]["tasks_below_sonnet"] = sum(t["ours"] < son[t["task"]] for t in h[a]["per_task"])
     out["lookup"] = lookups(runs)
     hr = os.path.join(OUT, "hand_read.json")
     if os.path.exists(hr):                         # the owner's read of why and resubmit_as_is against the ack note

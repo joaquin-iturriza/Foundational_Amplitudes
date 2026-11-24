@@ -119,6 +119,7 @@
    "minutes_per_task": 9.24,
    "n": 10,
    "our_tokens_per_task": 142163,
+   "ours_over_sonnet": 0.58,
    "passed_final": 10,
    "passed_first": 10,
    "per_task": [
@@ -193,6 +194,7 @@
      "task": "endedrun"
     }
    ],
+   "tasks_below_sonnet": 9,
    "wilson_final": [
     0.722,
     1.0
@@ -210,6 +212,7 @@
    "minutes_per_task": 7.3,
    "n": 10,
    "our_tokens_per_task": 254302,
+   "ours_over_sonnet": 1.04,
    "passed_final": 10,
    "passed_first": 10,
    "per_task": [
@@ -284,6 +287,7 @@
      "task": "endedrun"
     }
    ],
+   "tasks_below_sonnet": 6,
    "wilson_final": [
     0.722,
     1.0
