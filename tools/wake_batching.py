@@ -252,6 +252,8 @@ def main():
     ap.add_argument("--out", default="analysis/agent_redesign/wake_batching.json")
     ap.add_argument("--fig", default="analysis/agent_redesign/figs/wake_batching")
     ap.add_argument("--baseline", help="a JSON of an earlier period: also draw <fig>_per_day, both periods per day")
+    ap.add_argument("--labels", nargs=3, default=["before", "after the\n10-min batch", "before, replayed\nat 10 min"],
+                    help="per-day legend: the baseline period, this period, the baseline's 10-min replay")
     ap.add_argument("--list", help="also write every wake (time, stream, cause, tokens) to this JSON file")
     a = ap.parse_args()
     lo = ts(a.since) if a.since else float("-inf")
@@ -281,7 +283,8 @@ def main():
         json.dump(sorted(rows, key=lambda r: r["iso"]), open(a.list, "w"), indent=0)
     figure(rep, wins, os.path.join(ROOT, a.fig))
     if a.baseline:
-        per_day(json.load(open(os.path.join(ROOT, a.baseline))), rep, os.path.join(ROOT, a.fig + "_per_day"))
+        per_day(json.load(open(os.path.join(ROOT, a.baseline))), rep, os.path.join(ROOT, a.fig + "_per_day"),
+                [l.replace("\\n", "\n") for l in a.labels])
     for who in ("main", "owners"):
         r = rep[who]
         print(f"{who}: {r['wakes']} wakes, {r['raw'] / 1e6:.1f}M tokens, by cause " +
@@ -339,7 +342,7 @@ def per_day_rows(rep, who, win="10"):
     return rows
 
 
-def per_day(base, rep, out):
+def per_day(base, rep, out, labels=("before", "after the\n10-min batch", "before, replayed\nat 10 min")):
     """Wakes that made an API call per day and tokens per day (rows: main session, owners), split by who started the wake, before (base)
     and after (rep); the before period's 10-min replay drawn as the prediction for the wakes not started by Joaquin."""
     sys.path.insert(0, ROOT)
@@ -351,11 +354,11 @@ def per_day(base, rep, out):
     for i, who in enumerate(("main", "owners")):
         b, a = per_day_rows(base, who), per_day_rows(rep, who)
         for j, (ax, lab) in enumerate(zip(axs[i], ("wakes per day", "tokens per day [millions]"))):
-            ax.bar([k - .2 for k in x], [b[g][j] for g in groups], .4, color=ps.C.blue, label="before")
+            ax.bar([k - .2 for k in x], [b[g][j] for g in groups], .4, color=ps.C.blue, label=labels[0])
             ax.bar([k + .2 for k in x], [a[g][j] for g in groups], .4, color=ps.C.vermillion,
-                   label="after the\n10-min batch")
+                   label=labels[1])
             pred = b["replay"][1:] if j else b["replay"][:1]
-            ax.plot([1.2] * len(pred), pred, "kD", label="before, replayed\nat 10 min")
+            ax.plot([1.2] * len(pred), pred, "kD", label=labels[2])
             ax.set_xticks(list(x), ["by Joaquin", "not by Joaquin"])
             ax.set_ylabel(lab)
             ax.set_ylim(bottom=0)
