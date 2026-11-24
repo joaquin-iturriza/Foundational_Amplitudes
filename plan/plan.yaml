@@ -42322,6 +42322,15 @@ entries:
       regression: tr Sigma, |G|^2 within 5%, B within 7%; jackknife covers truth 37/40), arm v4_het_noise_scale. Repo-reviewer
       PASS (watermark 3c175775d) after one BLOCK (brute error bar); design PASS twice. Smoke FA-ccin2p3-6721d3c2 submitted
       (scripts/job_catalog_v3_short.sh v4_het_noise_scale smoke @0ca42577e3).'
+  - at: '2026-11-24T01:13:22+00:00'
+    text: '2026-11-24 smoke FA-ccin2p3-6721d3c2 (19 pools x 2000 events = 38000, batch 16384, 40 steps; code @0ca42577e3)
+      ran every stage: training, noise_scale.json, train-only checks, V3_SHORT_DONE; 1.05 s/iter. Its one 16-batch check at
+      step 20 (noise_read.py, window 2): |G|^2 brute 1004 +- 4.4 against chunk 1003 +- 4.1 (agree); S brute 3806 +- 650 against
+      chunk 7610 +- 840 (disagree, ratio 0.50). Expected in the smoke: its independent batches are drawn without replacement
+      from a 38000-event pool (two disjoint batches per epoch), so their spread is cut by the finite-population factor (N
+      - n)/(N - 1) = 0.57 plus the negative covariance of disjoint batches, about 0.5 in all (an estimate); the chunks, a
+      partition of one batch, need no such factor. In the full run the pool is 1.4e7 events, factor 0.999, so the check is
+      meaningful there. Step 0 of the smoke: S 5.2e29, |G|^2 5.2e23 (the het loss at initialisation).'
   ask: 'GPU budget: about 55 GPU-h above 30 with no decision covering it. Joaquin, testing the measured noise scale against
     batch-size runs (D532) needs, at each batch size (2048, 4096, 8192, 16384, 32768; canonical catalog_v4 WSD het setup,
     5 epochs, lr held at its peak), the lr that reaches a target loss in the fewest steps; then steps S and events E = B S
