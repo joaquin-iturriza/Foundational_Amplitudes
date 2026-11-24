@@ -39252,6 +39252,32 @@ entries:
       with the new share. Chosen trial inside the old window, or share >= 0.7: H1 holds at both batches (step-4 reading stands).
       New chosen trial within 0.1 decade of 3.3e-2: reported as unresolved (edge again). Any trial with val > 10x best-so-far
       listed apart (D398).'
+    fix_at: '2026-11-24T01:53:33+00:00'
+    fix: '(1, 3, 5) One-sided search, prior incomplete: the share''s reference S at b128 is the 8-trial D507 search on lr
+      [2.7e-4, 3.6e-3] (analysis/zng_uq/data/d507_search.json: chosen 2.28e-3 at log position 0.82, no trial above 2.83e-3,
+      best at the last step in 6/8), while Sf* goes to 24 trials on [2.7e-4, 3.3e-2]. Extending Sf* alone can only lower Sf*,
+      so a share below 0.7 would come from search budget, not from the settings. Joaquin asked for the D507 searches to be
+      extended (D514, config sweep_config_tp_zng_d1e4_muon_b128_zgggg.yaml says n_trials 16, top 1.1e-2), and zng_uq_benchmark
+      lists that Muon b128 search on lxplus as 16 submitted / 8 results; zng4g_r1_read.py asserts S has 8 at b128. The prior
+      does not mention this. Fix: say what happened to S''s b128 extension (read its lxplus results if they exist; finish
+      it if it stopped, since Joaquin already asked for it) and compare Sf* with an S searched at least that far. Sf* at 24
+      against S at 16 (F also 24) is a trial count that differs from the sibling cells, so ask Joaquin before configuring:
+      ''Sf* at b128 is edge-limited at 16 trials; extend only Sf* to 24 with lr up to 3.3e-2, or give S the same 24-trial
+      search so the share compares like with like?'' (2) The check overstates how much lr moves the measure: the four quoted
+      trials are picked, and at lr 1.00-1.09e-2 Sf*''s trials already span 0.027-0.044 (1.6x, set by the other HPs). The closest
+      existing data, F''s b128 extension (same two settings, same batch, same 8-trial top-up), gave 0.030-0.078 above 1.1e-2,
+      all worse than its 1.02e-2 best, and b2048 Sf*''s lr 0.031 blew up on 2 of 3 seeds. State this as the expected outcome
+      rather than citing only the trend that supports a gain. (4) The outcome reads a point share against 0.7, but the share''s
+      10-90% over 27 seed triples is already 0.58-1.31, so it straddles the bar whatever the new trial gives. Write the branches
+      on the interval (for example, 90th percentile below 0.7 = partial; interval across 0.7 = unresolved; 10th percentile
+      at or above 0.7 = H1 holds), plus the edge-again branch. (0) Say what this changes next to step 5: the fine-tune from
+      the parent without the settings (ftnoset_b128, running) answers directly whether the settings are the b128 deficit,
+      and the share only backs it up. If it stays, run the 8 added trials as two guided waves of 4 (no start-up wave in an
+      extension, D245: two sequential batches), about 2.1 h instead of the 3.2 h of 3,3,2. Passed: config diff against HEAD
+      is only lr top, n_trials and waves (17); full space searched (13, 16); HETEROSC, mu_mse selection (9); same 1e4 split
+      and settings (10, 11, 12); 46 MB x 10 runs (14); 1.06 h per trial on A100/H100 from this sweep''s own trials (15); nothing
+      ordered (18). Searched: scrflagsrch_b128, edge-limited, window top, extend_sweep, muon_b128, D507 extension in results.tex
+      (none), the finetune_mechanism and zng_uq_benchmark plans, and decisions (D97, D514, D245, D422, D430).'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
