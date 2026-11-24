@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The main session works no entry itself (CLAUDE.md 0i), within a budget: up to 3 work calls per user message.
+"""The main session works no entry itself (CLAUDE.md, What you may do: the main session never does an entry's work), within a budget: up to 3 work calls per user message.
 
 The user (2026-10-29): "It seems a bit to extreme, you should still be able to do those small things in some
 situations". So the main session may make BUDGET work calls since the user's last message; the 4th and later are
@@ -34,7 +34,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from reply_check import MIDTURN, SKIP, texts  # noqa: E402  (the same reading of "the user's message")
 
 BUDGET = 3
-MSG = ("main session: %d work calls already since the user's last message; this is a step agent's work (CLAUDE.md 0i):"
+MSG = ("main session: %d work calls already since the user's last message; this is a step agent's work (CLAUDE.md, What you may do: the main session never does an entry's work):"
        " launch a fresh agent with a written prompt." % BUDGET)
 CHUNK = 1 << 16
 SITE_WORK = {"submit", "sync", "run", "pick", "env", "copy", "fetch"}
