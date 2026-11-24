@@ -76,7 +76,10 @@ def main():
         cs = [ch["val_mse_curve"]] + [raw[f"{arm}|{b}|s{s}"]["val_mse_curve"] for s in sd[1:]]
         curves[arm] = [np.array(c) * k2 for c in cs]
         best[arm] = [float(c.min()) for c in curves[arm]]
-        chosen[arm] = {"trial": ti, "hp": next(k.split("|")[3] for k, v in raw.items() if v is ch), "lr": ch["lr"]}
+        import yaml
+        w = next(x for x in yaml.safe_load(open(os.path.join(ROOT, "sweep", f"sweep_config_{names[arm]}.yaml")))["search_space"] if x["name"] == "training.lr")
+        chosen[arm] = {"trial": ti, "hp": next(k.split("|")[3] for k, v in raw.items() if v is ch), "lr": ch["lr"],
+                       "dec_below_top": float(np.log10(w["high"] / ch["lr"]))}
         trials[arm] = sorted((v["lr"], v["val_loss"] * k2, i) for i, v in ts)
         ft_seeds[arm] = sd
     fn_curves = curves["Fn"]

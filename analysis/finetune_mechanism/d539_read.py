@@ -87,6 +87,16 @@ def main():
                 cell[a]["over_off"] = ratio(np.array([b[s] for s in SEEDS]), np.array([off[s] for s in SEEDS]))
         res["cells"][f"{p}_{d}"] = cell
     res["blowups"] = [k for k, c in curves.items() if np.any(c > 10 * np.minimum.accumulate(c))]
+    if SET == "u":   # each search's chosen lr: decades to the nearer edge of its lr window
+        import yaml
+        dec = {}
+        for (p, d), arms in CELLS.items():
+            for a in arms:
+                w = next(x for x in yaml.safe_load(open(os.path.join(ROOT, "sweep", f"sweep_config_ftmech_d539_uug_{d}_{a}_b2048.yaml")))["search_space"] if x["name"] == "training.lr")
+                lr = raw[f"{p}|{d}|{a}|42"]["lr"]
+                dec[f"{d}_{a}"] = float(min(np.log10(lr / w["low"]), np.log10(w["high"] / lr)))
+        res["lr_dec_from_edge"] = dec
+        res["lr_dec_from_edge_min"] = min(dec.values())
     json.dump(res, open(os.path.join(HERE, "data", f"{TAG}.json"), "w"), indent=1)
     print(json.dumps(res))   # one line: verify_claims reads the last {...} line
     plot(res, curves)
