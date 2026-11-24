@@ -38335,6 +38335,14 @@ entries:
       FA-ccin2p3-9a73698a against FA-ccin2p3-47e14eae, per-process final val MSE ratio gmean 0.854, 19 of 28 inside 0.43-2.5x
       (outside: uubar_ddbar 0.048, udbar_enug 0.067, ee_aa 0.105, dd_dd 0.36, uu_uu 0.40, udbar_Wg 0.41 better; udbar_taunu
       2.8, ee_numu 47, ee_bbbar 78 worse), combined sigma-stage NLL -7.426 vs -7.271; no blow-up.'
+  - at: '2026-11-24T04:40:32+00:00'
+    text: '2026-11-24 step 5 read, b2048 three seeds (zng4g_ftnoset_read.py 2048 @5323930d4+; fig zng4g_ftnoset_b2048 v2,
+      caption OK): fine-tune from the parent WITHOUT the two settings (ftnoset_b2048 chosen hp323, lr 3.11e-3) seeds 42/43/44
+      best val MSE(log|M|^2) 0.0214/0.0214/0.0234 (mean 0.0221) vs scratch mean 0.0630 and old fine-tune (parent with settings)
+      0.0980: Fn/S 0.35 (10-90% over 9 pairings 0.32-0.38), Fn/F 0.23 (0.21-0.24) -> design branch YES at b2048 (Fn/S <= 1.19):
+      the inherited settings are the deficit; without them the fine-tune beats scratch 2.9x. Fn best at 14-16% of the run,
+      end/best 1.34-1.42 (the same early-best shape as F, best at 10%); no blow-ups. Chosen lr at the window bottom (3.1e-3):
+      a wider window could only lower Fn.'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
