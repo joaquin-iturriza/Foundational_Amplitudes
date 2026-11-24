@@ -45130,7 +45130,9 @@ entries:
       via uv (design passed 22:15 UTC): job 64802032, the exact bootstrap recipe in scratchpad boot.txt; sites.yaml change
       waits on its result. xformers is unpinned in requirements.txt (the job prints live vs fresh versions). CC /sps had 9
       GB free at 23:00 (coordinator).'
-  step_waits: {}
+  step_waits:
+    '2': '2026-11-24T23:15 (UTC): CC env rebuild test job 64802032 (site run --job with analysis/cc_login/data/cc_env_rebuild_test_cmd.txt
+      reads it)'
   step_why:
     2:
       feeds: whether FA's CC environment survives a rebuild after CC's module change (D544's CC setup)
