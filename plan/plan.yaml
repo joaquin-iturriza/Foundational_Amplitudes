@@ -38357,6 +38357,16 @@ entries:
       at 44/50, ends 2.2x its best; read at its best checkpoint (validation 28). Seed 44 spiky (best at end). Combined with
       b2048 (Fn/S 0.35, YES): the settings are the deficit at b2048 and most of it at b128; the b128 residual (1.53x) with
       unstable seeds is open (lr 7.3e-3 near scratch''s 9.2e-3; Fn''s trials flat 0.011-0.024 over lr 3e-4..1.1e-2).'
+  - at: '2026-11-24T07:42:24+00:00'
+    text: '2026-11-24 ~08:30 D=1e3 searches (3125 steps, batch 128, window [1.9e-3,1.9e-2], 16 trials each, 0 failed; sweeps_local/ftmech_zng4g_d1e3_{scr,ftnoset}_b128/summary.txt):
+      best val mu-MSE (seed 42, standardised, x std^2 not yet applied) scratch S1k hp1009 0.0976 at lr 1.74e-2, fine-tune
+      from the 28-process no-settings parent Fn1k hp1860 0.0490 at lr 2.54e-3: Fn1k/S1k 0.50 at seed 42 (both arms use target_stats
+      own on the same pool, so the ratio is that of MSE(log|M|^2)). Seeds 43/44 of both chosen trials submitted (FA-ccin2p3-b96a2a6c,
+      -2525f488 scr; -ada00163, -3ea9d4fa ftnoset; chunks @2e6c6b140), the 2-sigma read waits on them. CAVEAT, both searches
+      crowd opposite window edges: scratch''s 7 best trials sit at lr 1.47e-2..1.89e-2 (best 0.04 dec below the top 1.9e-2),
+      the fine-tune''s 9 best at 1.95e-3..3.1e-3 (best 0.13 dec above the bottom 1.9e-3); the hpo_optima-centred window (repo-reviewer
+      fix) is edge-limited for both, so S1k could fall with a higher lr (shrinking the gain) and Fn1k with a lower one. Not
+      yet a figure; no claim to Joaquin before the seeds and the edge question are settled.'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
