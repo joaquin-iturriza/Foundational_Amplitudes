@@ -40633,6 +40633,16 @@ entries:
       runs/llmcmp_c_qperp/trial_1860/config.yaml; log ''Using EMA for validation and eval''), not 0.9989 as the 09:00 finding
       said (0.9989 is part (a) trial 5''s); its other HPs: lr 1.604e-3, muon_weight_decay 0.0280, L2 4.69e-8, warmup 0.191,
       eta_min 4.1e-9.'
+  - at: '2026-11-24T09:01:10+00:00'
+    text: '2026-11-24 (E8524): part (a) best trial so far, trial 5 FA-ccin2p3-c891c0c2 (lr 1.24e-3 const, EMA on, val MSE
+      of z 4.81e-4), scored by FA-ccin2p3-037bf5e1 (llm_score, EMA applied; seen mean MSE of z 4.82e-4 matches its val): pooled
+      test RMSE of log|M|^2 seen 0.117, held out 1.003, relabels 0.241, new 1.767; median per-process MSE relabels 0.0208,
+      new 1.144; below the LLM on 77/96 relabels and 9/43 new. Part (a) control: 0.139 / 1.042 / 0.237 / 1.839, medians 0.0276
+      / 0.688. Part (c) control: 0.171 / 1.253 / 0.311 / 2.205, medians 0.0140 / 0.385. LLM 0.321 / 0.721 / 0.341 / 1.193,
+      medians 0.079 / 0.649. Tuning lowered val and seen error (0.139 -> 0.117) but barely moved held out (1.042 -> 1.003)
+      and raised the median new-set MSE (0.688 -> 1.144): on the 43 new processes the val-tuned model generalizes no better.
+      The LLM stays ahead on pooled held out and new. Source: control_score.py --tag a_trial5 control c_control --out a5_controls
+      @3ee404f21 (data/a5_controls_score_summary.json); figure analysis/llm_compare/figs/a5_controls_score.png.'
   step_waits:
     '2': FA-ccin2p3-b135e7db FA-ccin2p3-f3e29e87
     '3': llmcmp_a_drive5
