@@ -16404,7 +16404,26 @@ entries:
       answers none); flagged 2026-11-10T02:08 (uploaded slides and code), 2026-11-16T20:00 (a writing-style skill), 2026-11-14T04:31
       (a pasted SciPost LaTeX template): none sets a budget'
     blocks: the budget-rule edit (step 33) only
+    blocks_steps:
+    - 33
+  - ask: 'GPU budget: two questions. (1) Approved work held behind a budget ask: critical_batch''s batch-size runs (D532 names
+      them; 55 GPU-h) and zng_uq_benchmark''s ladder fine-tunes (D483 names them; up to 136 GPU-h) both wait on you only because
+      the CLAUDE.md budget rule passes work above 30 GPU-h only when a decision states its cost or it is at the project''s
+      usual size; your approvals never state a cost, so every named study above 30 GPU-h stops for a second ask. Proposed
+      diff to CLAUDE.md ''GPU budget'': replace ''or I asked for it by name at the project''s usual size for it (its template,
+      its sibling runs)'' with ''or a decision of mine names that work (its covers) and it stays under 100 GPU-h (D511''s
+      bound)''. Yes, no, or another bound? (2) Permission classifier refusal (asked 2026-11-20): an edit of ~/.local/bin/site
+      and site_gate.py so the GPU-budget gate charges an lxplus job its own time limit instead of its HTCondor flavour''s
+      full wall time (refused 2026-11-19 as ''Undermining Oversight''); today lxplus jobs count for more than they use against
+      the 30 GPU-h budget. Will you make that edit yourself, or add a permission rule that lets it through?'
+    at: '2026-11-24T13:32:05+00:00'
+    searched: 'CLAUDE.md GPU budget rule; site decisions --project FA D153 D242 D244 D483 D511 D532; items critical_batch
+      (no est-gpu-hours), zng_uq_benchmark (est 125); Joaquin''s messages 11-20..11-24 (13:22 asks for the questions in detail,
+      answers none); flagged 2026-11-10T02:08 (uploaded slides and code), 2026-11-16T20:00 (a writing-style skill), 2026-11-14T04:31
+      (a pasted SciPost LaTeX template): none sets a budget or answers the lxplus edit'
+    blocks: the budget-rule edit (step 33) and the lxplus costing fix (step 29) only
     blocks_steps: &id001
+    - 29
     - 33
   step_why:
     11:
@@ -17892,19 +17911,22 @@ entries:
     files: ~/.local/bin/site_runends.py (fold_reason) ~/.local/bin/site (ssh_answers, probe_site) tools/plan.py .claude/hooks/send_check.py
       .claude/hooks/hook_syntax_guard.py .claude/hooks/review_backlog.sh sweep/drive.py
     written: '2026-11-24T12:00:18+00:00'
-  ask: 'GPU budget: approved work held behind a budget ask. critical_batch''s batch-size runs (D532 names them; 55 GPU-h)
-    and zng_uq_benchmark''s ladder fine-tunes (D483 names them; up to 136 GPU-h) both wait on you only because the CLAUDE.md
-    budget rule passes work above 30 GPU-h only when a decision states its cost or it is at the project''s usual size; your
-    approvals never state a cost, so every named study above 30 GPU-h stops for a second ask. Proposed diff to CLAUDE.md ''GPU
-    budget'': replace ''or I asked for it by name at the project''s usual size for it (its template, its sibling runs)'' with
-    ''or a decision of mine names that work (its covers) and it stays under 100 GPU-h (D511''s bound)''. Yes, no, or another
-    bound?'
-  waiting_since: '2026-11-24T13:26:00+00:00'
+  ask: 'GPU budget: two questions. (1) Approved work held behind a budget ask: critical_batch''s batch-size runs (D532 names
+    them; 55 GPU-h) and zng_uq_benchmark''s ladder fine-tunes (D483 names them; up to 136 GPU-h) both wait on you only because
+    the CLAUDE.md budget rule passes work above 30 GPU-h only when a decision states its cost or it is at the project''s usual
+    size; your approvals never state a cost, so every named study above 30 GPU-h stops for a second ask. Proposed diff to
+    CLAUDE.md ''GPU budget'': replace ''or I asked for it by name at the project''s usual size for it (its template, its sibling
+    runs)'' with ''or a decision of mine names that work (its covers) and it stays under 100 GPU-h (D511''s bound)''. Yes,
+    no, or another bound? (2) Permission classifier refusal (asked 2026-11-20): an edit of ~/.local/bin/site and site_gate.py
+    so the GPU-budget gate charges an lxplus job its own time limit instead of its HTCondor flavour''s full wall time (refused
+    2026-11-19 as ''Undermining Oversight''); today lxplus jobs count for more than they use against the 30 GPU-h budget.
+    Will you make that edit yourself, or add a permission rule that lets it through?'
+  waiting_since: '2026-11-24T13:32:05+00:00'
   searched: 'CLAUDE.md GPU budget rule; site decisions --project FA D153 D242 D244 D483 D511 D532; items critical_batch (no
     est-gpu-hours), zng_uq_benchmark (est 125); Joaquin''s messages 11-20..11-24 (13:22 asks for the questions in detail,
     answers none); flagged 2026-11-10T02:08 (uploaded slides and code), 2026-11-16T20:00 (a writing-style skill), 2026-11-14T04:31
-    (a pasted SciPost LaTeX template): none sets a budget'
-  blocks: the budget-rule edit (step 33) only
+    (a pasted SciPost LaTeX template): none sets a budget or answers the lxplus edit'
+  blocks: the budget-rule edit (step 33) and the lxplus costing fix (step 29) only
   blocks_steps: *id001
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
