@@ -40240,6 +40240,8 @@ entries:
     state: stopped
     since: '2026-11-24T08:11:28+00:00'
     state_at: '2026-11-24T08:30:07.200000+00:00'
+    context: 162919
+    context_at: '2026-11-24T09:00:05+00:00'
   step_why:
     2:
       feeds: 'part (a): the best tuned trial'
