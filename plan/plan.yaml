@@ -40196,6 +40196,17 @@ entries:
       setup the rescale costs the bulk of both processes, so the setup (WSD, 1953 steps, batch 2048, hp1961), not the process
       or the Z''s mass, sets the sign against D374''s gain; (D) is then not read from the process contrast, and the next test
       is the uug on/off at the D374 setup.'
+    passed_at: '2026-11-24T14:03:23+00:00'
+    reviewer: 'Re-check after FIX. All five fixes are in the design and the chunks (bfc86e0f3, 88b77917f). Smoke: uug 1e4,
+      massless-only, 50 steps, then KIT_SCORE_ONLY on its dir. Horizon: fixed compute, 1953 steps, with what r~1 at 1e5 means.
+      Differences against the kit uug t8000 run are listed, with an outcome branch for uug paying too. Disk: 2.5 GB against
+      15 GB free. Layout: 18-wide offer, two per job, one wave. The 33 chunk lines (d539_00..16) differ only in eps, massless_only,
+      train_subsample, processes_file and seed; all carry hp1961 (lr 2.796e-2). Check 2: 2.07x (soft 0.125/0.121/0.145 against
+      scratch 0.058/0.067/0.064, zng4g_onesetting_b2048.json); input factors confirmed in soft_rescale_inputs.json. Check
+      3: seed spread ~10%, two-sigma ~1.2x against an effect of ~2x. Check 5 terms: massless_only, input_soft, log-rescale,
+      soft_eps, mass shell in results.tex, plan, decisions D374/D392/D539. The smoke must confirm, in its config.yaml and
+      data_stats, that the duplicated ++data.processes_file and model.input_soft_* overrides took the chunk''s value (last
+      wins).'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
