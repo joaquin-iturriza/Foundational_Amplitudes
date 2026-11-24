@@ -41890,12 +41890,10 @@ entries:
   dead_ends: []
   asks: []
   owner:
-    agent: a02be936be2a548a6
-    state: closed
-    since: '2026-11-23T16:09:44+00:00'
-    state_at: '2026-11-23T22:57:24.975000+00:00'
-    context: 283717
-    context_at: '2026-11-23T22:57:41+00:00'
+    agent: a6187b6cdb7ca974a
+    state: working
+    since: '2026-11-24T00:26:31+00:00'
+    state_at: '2026-11-24T00:26:31+00:00'
   designs:
   - at: '2026-11-23T16:20:16+00:00'
     question: Can the lab LLMs (deepseek-v4-flash, qwen3.8-27b), run through the opencode agent harness in a bwrap sandbox
