@@ -38340,6 +38340,17 @@ entries:
       the inherited settings are the deficit; without them the fine-tune beats scratch 2.9x. Fn best at 14-16% of the run,
       end/best 1.34-1.42 (the same early-best shape as F, best at 10%); no blow-ups. Chosen lr at the window bottom (3.1e-3):
       a wider window could only lower Fn.'
+  - at: '2026-11-24T05:10:47+00:00'
+    text: '2026-11-24 step 6 read, b128 three seeds (zng4g_ftnoset_read.py 128, data @a46d9a019; fig zng4g_ftnoset_b128 v2,
+      caption OK): fine-tune from the parent WITHOUT the two settings (chosen hp353, lr 7.26e-3) seeds 42/43/44 best val MSE(log|M|^2)
+      0.0108/0.0184/0.0141 (mean 0.0144) vs scratch hp0078 0.00888/0.01048/0.00887 (mean 0.00941) and old fine-tune 0.0303:
+      Fn/S 1.53 (10-90% over 9 pairings 1.18-2.07), Fn/F 0.48 (0.35-0.62), Fn/S8 (8-trial trial_0950) 0.73 -> design branch
+      PARTIAL at b128 (Fn/F < 0.79, Fn/S > 1.19): removing the settings recovers ~2/3 of the log gap (log(F/Fn)/log(F/S) =
+      0.64) but Fn stays above scratch. Seed 42 (the search winner) is 1.5x below seeds 43/44: winner''s selection inflates
+      the search read. BLOW-UP listed apart (D398): seed 43 jumps at validation 29/50 (0.0184 -> 0.039), val > 10x best-so-far
+      at 44/50, ends 2.2x its best; read at its best checkpoint (validation 28). Seed 44 spiky (best at end). Combined with
+      b2048 (Fn/S 0.35, YES): the settings are the deficit at b2048 and most of it at b128; the b128 residual (1.53x) with
+      unstable seeds is open (lr 7.3e-3 near scratch''s 9.2e-3; Fn''s trials flat 0.011-0.024 over lr 3e-4..1.1e-2).'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
