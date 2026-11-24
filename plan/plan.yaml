@@ -42706,7 +42706,8 @@ entries:
       - 'Joaquin approves a version: submit it'
       - 'he declines: report B_simple alone'
   step_waits:
-    '1': FA-ccin2p3-225d38ea
+    '1': repo-reviewer (backlog incl. noise_scale.py move), then commit the docs/results.tex write-up sec:noisescale (scratchpad
+      insert.py) and drop step 1
     '2': step 1's B_simple read (noise_scale.json of the v4_het_noise_scale run)
   targets:
   - batch: noise_smoke
