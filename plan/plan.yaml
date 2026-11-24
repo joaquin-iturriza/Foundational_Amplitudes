@@ -42652,9 +42652,6 @@ entries:
   decisions:
   - D532
   next:
-    1: 'Measure B_simple along the canonical catalog_v4 run (arm v4_het_noise_scale, design recorded 2026-11-24): repo-reviewer
-      pass and merge of branch critical_batch, design-reviewer pass, smoke (40 steps, smoke mode) then the 4264-step run on
-      one GPU; read noise_scale.json with analysis/critical_batch/noise_read.py (brute-force checks, B_simple(t) figure)'
     2: 'Design the batch-size scan that checks B_crit (paper''s steps-vs-examples tradeoff: steps S and examples E to a target
       loss at batch sizes around B_simple, lr tuned per batch size, fit S/Smin - 1 = (E/Emin - 1)^-1) with its cost, and send
       it to Joaquin: the lr per batch is an HP question (DyHPO per batch size, or a one-HP lr search under D241) and the cost
@@ -42839,22 +42836,12 @@ entries:
       seed justified; cost under 2.1 GPU-h. Terms searched: noise scale, noise_scale, critical batch, B_simple, McCandlish,
       find_BS, gradient noise, batch size, batchsize; site decisions for noise, critical, batch; no earlier measurement.'
   step_why:
-    1:
-      feeds: what B_simple of our canonical setup is, and whether the micro-batch estimator agrees with independent batch
-        gradients
-      if:
-      - 'chunk estimate agrees with brute at the 5 checks: B_simple(t) reported against batch 16384; design the batch-size
-        scan (step 2)'
-      - 'disagrees: read B from brute-style measurements, find the missing noise (batch composition), report'
     2:
       feeds: whether measured B_simple predicts where larger batches stop paying off
       if:
       - 'Joaquin approves a version: submit it'
       - 'he declines: report B_simple alone'
   step_waits:
-    '1': repo-reviewer backlog pass (finding 1 on noise_read resolved, figure follow-ups fixed in working tree; backlog still
-      BLOCKed on other entries' findings 2-4), then commit noise_scale.py move + noise_read, redraw, check_caption (scratchpad
-      cb/caption.txt), insert sec:noisescale (cb/insert.py), verify_claims, commit, drop step 1
     '2': step 1's B_simple read (noise_scale.json of the v4_het_noise_scale run)
   targets:
   - batch: noise_smoke
