@@ -37822,6 +37822,14 @@ entries:
     why: 'withdrawn under check 0: it answers which parent change to make (Joaquin''s call), not why the fine-tune is worse;
       offered, not run. Prior uug A/B at 1e5 events: each flag alone ~0.2 dex better than control, both 0.88 dex (interaction)'
     at: '2026-11-22T09:42:16+00:00'
+  - tried: b128 Sf* (scratch with both settings) search extended alone 16->24 trials, lr top 1.1e-2->3.3e-2 (design 2026-11-24T01:49)
+    why: 'design reviewer FIX: unmatched, only Sf* gets more search. The matched control exists: the D507 b128 scratch search
+      was itself extended to 16 trials with the same window [2.7e-4,1.1e-2] on lxplus (D514, zng_uq_benchmark step 3; 8 CC
+      + 8 lxplus results, 3 guided trials and the seeds of its new best still owed). Its best hp0078 (lr 9.24e-3) val mu-MSE
+      0.00708 = MSE(log|M|^2) 0.0089, 2.0x below the 8-trial S used so far. Against it (seed 42 only) F/S 3.42, Sf*/S 3.12,
+      share 0.93 (0.81-1.10 over the 9 Sf*xF pairings): S16, Sf*16, F16 share window and budget, all three at the window top.
+      Not run.'
+    at: '2026-11-24T01:54:53+00:00'
   asks:
   - ask: 'Scope: dropping the design''s pre-registered next step (a sigma-start design) and the top-up of two arms below the
       design''s trial count. The restart test reads branch (c): the parent''s optimizer state does not keep the head start
