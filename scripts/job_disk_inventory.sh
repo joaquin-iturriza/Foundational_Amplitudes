@@ -7,7 +7,9 @@
 #
 # CPU only, read-only: the disk inventory of the user's area (cc_disk, D542). CC's login nodes end a session after
 # ~1-2 min of du (2026-11-24), so the long walks run here. Writes to $SCRATCH/zz_cc_disk/ (cheap, ours):
-#   scratch_top.tsv   du -s (MiB) of every top-level entry of $SCRATCH
+#   scratch_top.tsv   du -s (MiB) of every top-level entry of $SCRATCH; scratch_top_apparent.tsv the same, apparent size
+#   top.tsv, top_apparent.tsv   du -s (MiB) of every entry of /sps/lpnhe, $WORK and the checkout, allocated and apparent
+#                     (Isilon's allocated blocks summed to 1.28x the df "used" on 2026-11-24: both are kept)
 #   inv_runs.jsonl    analysis/storage/inv_runs.py over the run roots (model files against the rest, training time)
 #   census.tsv        analysis/storage/cache_census.py over $SCRATCH/amp_data_cache, every recipe counted in use
 #   files_*.tsv       allocated 512-byte blocks, bytes and name of the loose files of datasets/ and the checkout root
@@ -19,6 +21,11 @@ source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 O="$SCRATCH/zz_cc_disk"; mkdir -p "$O"
 find "$SCRATCH" -mindepth 1 -maxdepth 1 -print0 | du -s --block-size=1M --files0-from=- > "$O/scratch_top.tsv" &
+find "$SCRATCH" -mindepth 1 -maxdepth 1 -print0 | du -s --apparent-size --block-size=1M --files0-from=- > "$O/scratch_top_apparent.tsv" &
+T=(/sps/lpnhe/* "$WORK"/* "$WORK"/.[!.]* "$PROJECT_DIR"/* "$PROJECT_DIR"/.[!.]*)
+du -s --block-size=1M "${T[@]}" > "$O/top.tsv" 2>/dev/null &
+du -s --apparent-size --block-size=1M "${T[@]}" > "$O/top_apparent.tsv" 2>/dev/null &
+df -B1M /sps/lpnhe > "$O/df.txt"
 python analysis/storage/inv_runs.py runs runs_from_lxplus runs_from_jeanzay > "$O/inv_runs.jsonl" &
 python analysis/storage/cache_census.py --in-use '*' --days 14 --workers 2 > "$O/census.tsv" &
 find "$WORK/datasets" -maxdepth 1 -type f -printf "%b\t%s\t%f\n" > "$O/files_datasets.tsv"
