@@ -15819,6 +15819,9 @@ entries:
       usual size for it (its template, its sibling runs)'' with ''or a decision of mine names that work (its covers) and it
       stays under 100 GPU-h (D511''s bound)''; on his yes, edit CLAUDE.md, keeper review, set the two items'' est-gpu-hours
       from his words'
+    34: 'D534 hold fix (b), visibility: plan next and the main''s status show each open question to Joaquin with its age in
+      hours and what sits idle behind it (steps, GPU-h), so an ask relayed once (zng stage 2: 11-20 to 11-24 unseen) cannot
+      go silent; build in tools/plan.py with a test, replay on the 11-20..24 asks'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16451,6 +16454,11 @@ entries:
       if:
       - 'yes: edit, keeper, the two held steps'' owners resumed to submit'
       - 'no: the asks stand; step 34 keeps them visible'
+    34:
+      feeds: 'D534 (3): a hold is visible, never free'
+      if:
+      - 'built and replayed: report the replay'
+      - 'refused by a tool: route around'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
