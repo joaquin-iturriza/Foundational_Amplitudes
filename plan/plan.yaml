@@ -44936,7 +44936,7 @@ entries:
   asks: []
   owner:
     agent: a97209d81e39f1376
-    state: working
+    state: closed
     since: '2026-11-24T17:21:44+00:00'
     state_at: '2026-11-24T23:16:07.092000+00:00'
     context: 267384
@@ -45155,6 +45155,31 @@ entries:
       if:
       - 'both pass: plan done'
       - 'a reviewer blocks: fix and continue the same reviewer'
+  handoff:
+    state: 'Done but for review and close. CC''s three upkeep commands (disk watch, feeder, prune+copies) and the rebalancer''s
+      CC inventory run as htc CPU jobs via site run --recurring; site run on CC refuses unlisted scripts and caps other commands
+      at 60 s; live check over 28 passes held every design bound (docs/results.tex sec:cc_login_jobs, 4404e1baa). CC env:
+      sites.yaml bootstraps from a uv CPython 3.11.7 under /sps (tested in job 64802032, stack identical to the live venv);
+      live .venv untouched. Left: the repo-reviewer pass of the code backlog and the claudemd-keeper backlog (blocked on 419bca13f,
+      another entry''s commit), then plan done --writeup 4404e1baa.'
+    decisions: 'Joaquin''s (D544): move CC''s recurring scripts to Slurm, guard site run, change the login-node rule. Joaquin''s
+      (recorded when the 2026-10-29 pp-regeneration ask was withdrawn): CC''s anaconda refusal is a setup gap to fix, not
+      a question. Mine: one job per command per pass with each pass reading the previous pass''s job (no waiting; lag bounded
+      by one pass, measured); exit 75 + CCJ_NO_RESULT = no news for the supervisor; login allowlist sweep_manager, generate_*,
+      resubmit_*, rerun_failed, lhe_parts, check_site_data, rebalance (submit/queue tools; check_site_data is the submit guard''s
+      synchronous pool query); plain commands capped at 60 s with a remote timeout; site_python and watchdog on CC through
+      --job/--recurring; the rebalancer''s post-move inventories stay synchronous on the login node (rare); nested sbatch
+      inside jobs with SLURM_/SBATCH_ variables unset; the standalone CPython 3.11.7 via uv rather than a 3.13 module, because
+      torch 2.1.2 has no cp313 wheels and a newer torch changes every run''s stack.'
+    ruled_out: a module swap alone (python/3.13.x cannot install torch 2.1.2); pip --dry-run as the rebuild test (cannot show
+      the stack runs; reviewer FIX); job_probe.sh for the nested test (its typed GPU GRES conflicts with CC's --gpus), a CPU
+      --wrap job used instead
+    running: none
+    files: ~/.local/bin/site (login_guard, run_as_job, supervise_pass skip of exit 75); ~/.config/ccorch/projects.toml (maintain
+      --recurring, login_scripts); ~/.config/ccorch/sites.toml (login_cap = 60); each with .bak-20261124-cclogin; ~/.claude/context/site-tool.txt;
+      ~/work/CLAUDE.md login-node rule; scripts/prune_site.sh; analysis/common/readers.py (site_python); sweep/watchdog.py;
+      sweep/rebalance.py; sites/sites.yaml; tools/ccjob_lag.py; analysis/cc_login/data/
+    written: '2026-11-24T23:18:15+00:00'
 - id: orchestrator_kit
   title: 'Standalone shareable kit: main session as orchestrator of subagents, jobs on several clusters'
   question: Can the general machinery behind our setup (the site tool for multi-cluster submission, sync, placement and copy;
