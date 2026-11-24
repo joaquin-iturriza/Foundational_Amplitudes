@@ -36640,6 +36640,44 @@ entries:
       1.15-1.74x as the replacement bar, three-seed means after. Check 5 searched: results.tex tp_zng_d1e4, extend_sweep,
       d507, 1e4 training events; site decisions batch, extend, zng (D429 is the same 8-to-16 extension on another entry; no
       earlier extension of these searches).'
+  - at: '2026-11-24T02:13:49+00:00'
+    question: 'D514 (Joaquin 2026-11-20: ''maybe extending a bit the HPO would be smart''), the passed 2026-11-20 design continued:
+      do the D507 ratios (G, batch per optimiser, optimiser per batch) hold when each search has 8 guided trials beyond its
+      first 8, and is the Muon batch-128 cell''s new best (hp0078) a seed-robust replacement of trial_0950? Owed now: (a)
+      3 guided trials each in the Muon b128 and Adam b2048 searches on lxplus, repairing the 3 trials of each that re-ran
+      the CC random start-up points (sampler defect fixed @ab6215d5) so each search has its design''s 8 guided trials; (b)
+      seeds 43, 44 of hp0078, the design''s seeds of a changed chosen trial.'
+    prior: '2026-11-20 design (passed 15:00) and D507/D509 read (zng_d507 v1 @0d2064b7: G 1.12 [0.85,1.70], Muon batch ratio
+      3.20, Muon/Adam b128 0.35; seed spread 1.15-1.74x). Extension so far (finding 2026-11-21, d507 lxplus read via tools/kit_curves.py
+      sweep): Adam b128 16 trials, best 0.0256 vs trial_0833 0.0313 (1.22x, choice stands); Muon b2048 16 on CC, best still
+      trial_1333 0.0462; Adam b2048 5 guided + 3 repeats, best hp0775 0.0401 vs trial_1152 0.0431 (1.07x); Muon b128 5 guided
+      + 3 repeats, best hp0078 lr 9.24e-3 0.00708 vs trial_0950 0.0144 (2.0x > 1.19 spread), at log position 0.95 of the window
+      [2.7e-4,1.1e-2] (standardised val mu-MSE; x std^2 1.254: 0.0089). Same-HP seed-42 repeats across sites 1.02-1.38x. Searched:
+      results.tex, plan findings, site decisions (D507, D509, D514; no other extension of these searches).'
+    measure: 'As the passed design: per cell the lowest-val trial of its 16 (val MSE(ln|M|^2) = val mu-MSE x 1.1198^2), the
+      three-seed mean of the chosen trial, the D507 ratios on three-seed means with the range over seed pairings (benchmark.py
+      d507fig), test median |Delta| of a new chosen trial (job_kit.sh KIT_SCORE_DIR). For hp0078: best val at seeds 43, 44
+      against its seed-42 0.0089 and trial_0950''s three seeds 0.018/0.021/0.020.'
+    check: 'The measure moves with lr inside these searches: Muon b128 guided trials span 0.00708-0.0146 (2.1x) at lr 9.2e-3-1.09e-2,
+      and the full search 0.0071-0.0334 (4.7x); Adam b2048 0.0401-0.081 (2.0x) (kit_curves sweep read 2026-11-24 of the lxplus
+      results). D509 seeds moved best val 1.15-1.74x at fixed HPs, the bar a replacement must clear.'
+    fixed: Everything of the four sweep configs sweep/sweep_config_tp_zng_d1e4_*_zgggg.yaml @abc47ad9 (1e4 Z+4g events, 1953/31250
+      steps, HETEROSC, mu_mse selection, seed 42, spaces, extended b128 lr tops); the repair trials go to the existing lxplus
+      searches (their state holds 16 observations each, start-up consumed) via generate_sweep --extend --n-trials 3 as one
+      wave; seeds via sweep/run_fixed_hp.py (scripts/job_seed_batch.sh) with hp0078's HPs from its saved config.yaml (analysis/zng_uq/seed_chunks/d514_muon_b128_hp0078_s{43,44}.txt
+      @2feab608), evaluation.train_subsample=2000 as D509.
+    control: Each cell's D507 8-trial choice and its D509 seeds 43/44; for hp0078, trial_0950 at seeds 42/43/44; across cells
+      the 2x2 neighbours as D507.
+    seeds: Trials seed 42; chosen trials at 42, 43, 44 (D509 seeds reused where the choice is unchanged); hp0078 seeds 43,
+      44 now; a repair trial that beats hp0078 by more than the spread gets its own 43/44.
+    outcome: 'hp0078 seeds: three-seed mean below trial_0950''s (0.0197) by more than the 1.19x spread -> Muon b128 replaced,
+      the Muon batch ratio and the b128 optimiser ratio re-read (Muon batch ratio then ~5-7 if the means hold: batch carries
+      the Muon cell); within it -> D507 choice reinstated. Repair trials: a new best beyond the cell''s spread -> that trial
+      chosen, seeds 43/44 (<= 2 more runs, 2 GPU-h); else the choice stands. Bands as before: G >= 3 or <= 1/3 a protocol
+      leads, else unresolved; batch ratios >= 3 for both optimisers -> batch carries it. A b128 best at its new top edge again
+      -> reported, unresolved. Cost: seeds 2 x 1.0 h (CC V100 0.0886 s/step x 31250 + 0.25 h), Muon b128 3 x 1.06 h, Adam
+      b2048 3 x 0.35 h: 6.2 GPU-h; possible 2 more seeds 2 GPU-h; test scoring <= 0.4: <= 8.6 GPU-h. Wall: seeds 1 h on CC
+      (site pick: 2 at once), repair one wave 1.06 h on lxplus.'
   step_waits:
     '3': sweeps ccin2p3:tp_zng_d1e4_muon_b2048_zgggg lxplus:tp_zng_d1e4_muon_b128_zgggg lxplus:tp_zng_d1e4_adam_b2048_zgggg
       (then 3 repair trials each in muon_b128 and adam_b2048 on lxplus)
