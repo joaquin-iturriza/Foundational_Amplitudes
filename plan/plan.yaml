@@ -40007,6 +40007,9 @@ entries:
       @2715130f70; best checkpoint step 24336, val NLL -3.544, before its blow-ups at 33462 and 51714) writes llm_score_{seen,heldout}.json:
       read pooled RMSE seen/held out (relabels, new) against part (a)''s control 0.139/1.042, the LLM 0.321/0.721 and his
       LLoCa 0.506/0.953; listed apart as a run that blew up'
+    7: 'Part (c) wave 2 running on CC (driver llmcmp_c_qperp_drive4, --mem 20G --cpus 4; log ~/.local/share/ccorch/detached/20261124-003001_llmcmp_c_qperp_drive4.log):
+      FA-ccin2p3-bf23e0c4 (hp0563), -b77878e1 (hp0902), -f6f7179d (hp1736); the driver sends wave 3 (2 trials) itself and
+      writes DRIVE_DONE'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -40148,6 +40151,11 @@ entries:
       if:
       - 'scored: keep for step 5''s figure, report with the control''s blow-up'
       - 'job fails: read its log, fix llm_score for the emission-scale target, resubmit'
+    7:
+      feeds: 'part (c): the tuned best trial'
+      if:
+      - 'a trial diverges: list apart at its best checkpoint, penalty kept'
+      - 'all clean: wave 3 follows, then step 5'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
