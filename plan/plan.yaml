@@ -45435,7 +45435,7 @@ entries:
   - D546
   - D547
   - D548
-  next: null
+  next: notes-editor passes the write-up d7bef3f22 (sec:orchestrator-kit), then plan done --writeup d7bef3f22
   done_when: K=/home/joaquin/work/orchestrator-kit; git ls-remote https://github.com/joaquin-iturriza/orchestrator-kit refs/heads/main
     | grep -q "^$(git -C $K rev-parse HEAD)" && git -C $K show HEAD:README.md | grep -q "Untested on a cluster:\*\* the site-side
     gate" && grep -q "label{sec:orchestrator-kit}" docs/results.tex && python3 -c "import sys; sys.path.insert(0, \"tools\");
@@ -45676,6 +45676,12 @@ entries:
       probe V100 RUN_DONE, toy fit w=3.0038 b=0.9986, supervisor sorted 3 runs clean, fetch pulled metrics.json; FA gate sha
       and stamps unchanged, 0 toy rows in FA''s ledger; kit fixes at origin/main d2681fb. Untested: site-side gate and items.
       CC denies module anaconda/3.11, which FA''s sites.yaml env uses.'
+  step_why:
+    1:
+      feeds: 'closing the entry: D546''s standalone kit delivered and written up'
+      if:
+      - 'PASS: plan done orchestrator_kit --writeup d7bef3f22'
+      - 'BLOCK: fix the subsection as asked, recommit, continue the same reviewer'
 - id: selective_rescale
   title: 'Event-dependent momentum rescale: the soft-limit gain without the bulk cost'
   question: Can the momentum log-rescale be applied only where it helps, by a rule that depends only on the event's own information
