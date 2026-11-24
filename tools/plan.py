@@ -2243,7 +2243,8 @@ def cmd_sweepends(a):
         # sites (a search continued elsewhere; 2026-11-21 the ended CC copies closed the live lxplus ones' wait)
         of = lambda lab, x: re.match(r"%s \(%s[,:]" % (re.escape(x["name"]), re.escape(x["site"])), lab)
         done = {(x["site"], x["name"]) for lab, _, _ in ended for x in names.values() if of(lab, x)}
-        named = lambda x, w: re.search(r"(?<![\w-])(%s:)?%s(?![\w-])" % (re.escape(x["site"]), re.escape(x["name"])), str(w))
+        # a bare name never follows a colon: "cc:a" names the cc copy only (E8778: it matched a removed lxplus copy)
+        named = lambda x, w: re.search(r"(?<![\w:-])(%s:)?%s(?![\w-])" % (re.escape(x["site"]), re.escape(x["name"])), str(w))
         # a step is reported once all the recorded sweeps its wait names have ended (the caller merges them into one RUN_DONE)
         ready = {str(k): [x for x in sweeps_of(st, e["id"]) if named(x, w)] for k, w in waits.items()}
         ready = {k: v for k, v in ready.items() if v and all((x["site"], x["name"]) in done for x in v)}

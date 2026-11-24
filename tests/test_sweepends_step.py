@@ -39,3 +39,11 @@ def test_same_name_live_on_another_site_keeps_the_wait(monkeypatch):
     assert all(not r["steps"] for r in rows([("cc", "a")], monkeypatch, sw, "sweeps lx:a"))
     r = rows([("cc", "a"), ("lx", "a")], monkeypatch, sw, "sweeps lx:a")
     assert [x["steps"] for x in r if x["site"] == "lx"] == [["2"]]
+
+
+def test_site_prefixed_wait_ignores_the_other_site(monkeypatch):
+    """critical_batch 2026-11-24 (E8778): a wait on cc:a fired on the removed lx copy of a; a prefixed wait names one site."""
+    sw = [{"site": "cc", "name": "a", "at": None}, {"site": "lx", "name": "a", "at": None}]
+    assert all(not r["steps"] for r in rows([("lx", "a")], monkeypatch, sw, "sweeps cc:a"))
+    r = rows([("cc", "a")], monkeypatch, sw, "sweeps cc:a")
+    assert [x["steps"] for x in r] == [["2"]] and r[0]["step_sweeps"] == {"2": [["cc", "a"]]}
