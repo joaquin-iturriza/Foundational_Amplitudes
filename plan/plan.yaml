@@ -43723,6 +43723,13 @@ entries:
       Fixed: the sandbox sets MG5_OUTPUT_DIR to a run-dir copy (commit after c08ff5045); the sandbox grader now passes all
       10 tasks at their fix commits (validated). The 16 lab runs of zsrole, ordsrc, skipclaim and stallshort are rerun from
       scratch after the resume batch ends.'
+  - at: '2026-11-24T14:39:33+00:00'
+    text: '2026-11-24: the lab server answered neither model from 15:20 UTC (litellm: cannot connect to lpns245:8001 for deepseek-v4-flash,
+      qwen_vllm-qwen38-27b:8002 for qwen), so no lab run of the harder round or of the route demo could go; the sandboxed
+      grader fails at the fix for every tests/test_setup_scenarios.py task (backlogdepth, recheck, inflight, endedrun), so
+      6 hard tasks are valid (alphapow, valtotal, emastart, statssrc, topsampling, massconv) and the scenario-suite tasks
+      need the cause found (likely what the scenario harness needs that the sandbox hides: ~/.claude.json or the user-level
+      hooks) before reviewlock/replyblock spares are tried'
   step_why:
     1:
       feeds: whether lab models take some subagent work (D530)
