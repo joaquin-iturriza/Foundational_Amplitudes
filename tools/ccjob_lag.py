@@ -9,7 +9,7 @@ supervisor pass after its End, minus End); per pass the commands skipped (CCJ_NO
 sacct is read through `site run ccin2p3 FA` (a scheduler query: allowed on the login node). Times are CC's local time,
 the same zone as the supervisor's pass headers (Europe/Paris).
 """
-import argparse, hashlib, re, subprocess, sys
+import argparse, hashlib, json, re, subprocess, sys
 from datetime import datetime
 
 CMDS = {"disk_watch": "python scripts/disk_watch.py", "feed_capped": "python sweep/feed_capped.py tp3_"}
@@ -53,12 +53,16 @@ def main():
     since = datetime.strptime(a.since, "%Y-%m-%dT%H:%M")
     ps = passes(a.log, since)
     names = {key(c): n for n, c in CMDS.items()}
+    worst, run_skip, max_skip, flags = {}, 0, 0, []
     print("passes: %d (%s)" % (len(ps), ", ".join(p[0].strftime("%H:%M") for p in ps)))
     for k, jid, sub, st, end, state in jobs(since):
-        read = next((p[0] for p in ps if end and p[0] >= end.replace(second=0)), None)
+        # pass headers carry the minute the pass started: a job ending inside that minute is read by the next pass
+        read = next((p[0] for p in ps if end and p[0] > end.replace(second=0)), None)
         wait = (st - sub).total_seconds() if st and sub else None
         run = (end - st).total_seconds() if end and st else None
         age = (read - end).total_seconds() / 60 if read and end else None
+        if age is not None:
+            worst[names.get(k, k)] = max(worst.get(names.get(k, k), 0), age)
         print("JOB %-12s %-10s %s submit %s wait %s s run %s s state %s read %s age %s min" % (
             names.get(k, k), jid, k, sub and sub.strftime("%H:%M:%S"), wait, run, state,
             read and read.strftime("%H:%M"), age if age is None else "%.1f" % age))
@@ -66,6 +70,12 @@ def main():
         skipped = sum("CCJ_NO_RESULT" in l for l in lines)
         flag = [m.group(1) for l in lines for m in [re.search(r"\.disk_full, (\d+) min old", l)] if m]
         print("PASS %s skipped %d flag_age_min %s" % (t.strftime("%H:%M"), skipped, ",".join(flag) or "-"))
+        run_skip = run_skip + 1 if skipped else 0
+        max_skip, flags = max(max_skip, run_skip), flags + [int(f) for f in flag]
+    gaps = [(b[0] - a[0]).total_seconds() / 60 for a, b in zip(ps, ps[1:])]
+    print("SUMMARY passes %d, pass gap max %.0f min; max read age min %s; passes in a row with a skip %d; "
+          "max .disk_full age at a feed read %s min" % (len(ps), max(gaps or [0]), json.dumps(
+              {k: round(v, 1) for k, v in worst.items()}), max_skip, max(flags or [None])))
 
 
 if __name__ == "__main__":
