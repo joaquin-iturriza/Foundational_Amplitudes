@@ -44126,16 +44126,13 @@ entries:
     - its validation against batch-size runs
   decisions:
   - D532
-  next:
-    1: 'Read the batch-size scan when all five sweeps end (cbs_b2048, cbs_b4096, cbs_b8192, cbs_b16384 and cbs_b32768, all
-      on CC-IN2P3): collect each trial''s result.json plus its training.lr into {batch: [dict with hp_idx, lr, val_curve,
-      validate_every]} (a timed-out trial has no result.json: read its val_curve from its log; the diverged cbs_b4096 hp_0353
-      listed apart with where it blew up), python3 analysis/critical_batch/cbs_read.py <trials.json>: S_B and E_B per target,
-      B_crit with bootstrap, unreached_above_fit, the lr-edge rule; figure of S_B and E_B against B per target beside B_simple
-      (scan_state.py is the interim version); write-up in docs/results.tex sec:noisescale, wall-clock per step beside steps
-      (the measured ~0.5 s/step fixed overhead)'
-    2: 'When the detached submission cbs_b32768_submit ends (its DONE event): read its log (8 trials generated, wave 1 submitted,
-      SWEEP_SUBMITTED), record the sweep (plan run --sweep ccin2p3:cbs_b32768); if the submission failed, fix and resubmit'
+  next: 'Read the batch-size scan when all five sweeps end (cbs_b2048, cbs_b4096, cbs_b8192, cbs_b16384 and cbs_b32768, all
+    on CC-IN2P3): collect each trial''s result.json plus its training.lr into {batch: [dict with hp_idx, lr, val_curve, validate_every]}
+    (a timed-out trial has no result.json: read its val_curve from its log; the diverged cbs_b4096 hp_0353 listed apart with
+    where it blew up), python3 analysis/critical_batch/cbs_read.py <trials.json>: S_B and E_B per target, B_crit with bootstrap,
+    unreached_above_fit, the lr-edge rule; figure of S_B and E_B against B per target beside B_simple (scan_state.py is the
+    interim version); write-up in docs/results.tex sec:noisescale, wall-clock per step beside steps (the measured ~0.5 s/step
+    fixed overhead)'
   done_when: null
   notes_ref: null
   match: zz_cbs_*,cbs_*
@@ -44573,14 +44570,8 @@ entries:
         to Joaquin, with wall clock per step beside steps'
       - 'S_2048/S_32768 >= 1.45 (NO) or between: report the scan''s B_crit and its factor over B_simple; a batch at the lr
         edge is re-searched half a decade over first'
-    2:
-      feeds: 'D532: the 32768 point of the scan, the ratio S_2048/S_32768 the design''s outcome rests on'
-      if:
-      - 'submitted: record it; step 1 then waits on it with the other four'
-      - 'refused or failed: read why, fix, resubmit the same config'
   step_waits:
     '1': ccin2p3:cbs_b2048 ccin2p3:cbs_b4096 ccin2p3:cbs_b8192 ccin2p3:cbs_b16384 ccin2p3:cbs_b32768
-    '2': detach:cbs_b32768_submit (pid 3928761, DONE event)
   targets:
   - batch: noise_smoke
     wall_h: 0.4
