@@ -39918,6 +39918,7 @@ entries:
     at: '2026-11-24T07:41:29+00:00'
   step_waits:
     '2': FA-ccin2p3-1f2d9ad5
+    '1': FA-ccin2p3-b96a2a6c FA-ccin2p3-2525f488 FA-ccin2p3-ada00163 FA-ccin2p3-3ea9d4fa
   handoff:
     state: '2026-11-24 ~07:00 CET. The investigation''s deciding read is done. (1) One setting at a time, b2048 (3 seeds,
       @deb1c5ee3, fig zng4g_onesetting_b2048): the momentum log-rescale (input_soft_eps) carries the settings'' scratch cost
