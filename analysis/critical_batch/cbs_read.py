@@ -78,14 +78,14 @@ def read(trials):
             hit = sorted((v, h) for v, h in s if v is not None)
             row = {"B": int(b), "trials": len(ts), "reached": len(hit)}
             if hit:
-                best = next(t for t in ts if t.get("hp_idx") == hit[0][1])
-                lr = best_trial(ts, L)[1]["lr"]   # asserts the collector put training.lr in the dict
+                Sb, best = best_trial(ts, L)   # S, hp_idx and lr of one trial; asserts the trial carries training.lr
+                lr = best["lr"]
                 # the edge flag is the batch's, from its best trial on S_B(-2.08); a batch never at -2.08 (it can
                 # still reach -1.66) is judged on this target's best trial
-                row.update(S=hit[0][0], E=int(b) * hit[0][0], hp_idx=hit[0][1], top3=[v for v, _ in hit[:3]],
+                row.update(S=Sb, E=int(b) * Sb, hp_idx=best.get("hp_idx"), top3=[v for v, _ in hit[:3]],
                            lr=lr, lr_edge=edge.get(int(b), lr_at_edge(lr, lr_window(b))))
                 if row["lr_edge"] is False:   # an edge (or unknown) lr: S an upper bound, out of the fit
-                    reach.append((int(b), hit[0][0]))
+                    reach.append((int(b), Sb))
             else:
                 row["S_lower_bound"] = max((len(t["val_curve"]) * t["validate_every"] for t in ts
                                             if t.get("val_curve")), default=None)
