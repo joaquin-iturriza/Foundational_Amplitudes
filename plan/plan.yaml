@@ -41897,9 +41897,9 @@ entries:
   asks: []
   owner:
     agent: a6187b6cdb7ca974a
-    state: stopped
+    state: working
     since: '2026-11-24T00:26:31+00:00'
-    state_at: '2026-11-24T00:27:42.321000+00:00'
+    state_at: '2026-11-24T01:31:58.803000+00:00'
     context: 57486
     context_at: '2026-11-24T00:27:50+00:00'
   designs:
