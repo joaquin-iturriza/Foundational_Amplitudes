@@ -44680,6 +44680,13 @@ entries:
       (6511b281f). (6) lxplus smoke cbs_smoke_b32768 idle 7 h (0 slots fit 33 GB + GPU; site pick: lxplus 0 fit, CC 11 free):
       removed (DAG 13231064.0), smoke and 32768 sweep moved to CC by site pick. Worst-case total ~95 GPU-h (spent ~35 + limits
       of what remains), under D536''s 100.'
+  - at: '2026-11-24T22:14:42+00:00'
+    text: '2026-11-24 23:30 scan state (scan_state.py @2c3815ada+, data/cbs_state.json, figure figs/cbs_scan_state.png): best
+      S(-2.08) 3997/2626/1864/1686 at B=2048/4096/8192/16384 (2048 on 4 ended trials of 8); fit S_min(1+B_crit/B) over the
+      4: S_min 1298, B_crit 4177, S/fit 1.013/1.002/0.951/1.035 (provisional: 2 parameters on 4 points, no 32768 yet); against
+      B_simple ~55 (sec:noisescale) this leans to the design''s NO branch. V100 s/step medians 0.654/0.719/0.820/1.019 vs
+      model 0.23/0.33/0.55/0.98. Step 2''s wait regex also matches the removed lxplus copy of cbs_smoke_b32768, which plan
+      show lists as ended: harmless, no fix.'
   handoff:
     state: 'Step 2 (batch-size scan, D532 under the D536 100 GPU-h rule) is partly submitted under a design passed 2026-11-24T14:25
       (plan show critical_batch). Code merged into trunk at f3705b316 (repo-reviewer PASS on cbs_accum at 8de829f32 and on
