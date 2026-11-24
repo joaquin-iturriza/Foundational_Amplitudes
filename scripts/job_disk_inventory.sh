@@ -22,9 +22,13 @@ cd "$PROJECT_DIR"
 O="$SCRATCH/zz_cc_disk"; mkdir -p "$O"
 find "$SCRATCH" -mindepth 1 -maxdepth 1 -print0 | du -s --block-size=1M --files0-from=- > "$O/scratch_top.tsv" &
 find "$SCRATCH" -mindepth 1 -maxdepth 1 -print0 | du -s --apparent-size --block-size=1M --files0-from=- > "$O/scratch_top_apparent.tsv" &
-T=(/sps/lpnhe/* "$WORK"/* "$WORK"/.[!.]* "$PROJECT_DIR"/* "$PROJECT_DIR"/.[!.]*)
-du -s --block-size=1M "${T[@]}" > "$O/top.tsv" 2>/dev/null &
-du -s --apparent-size --block-size=1M "${T[@]}" > "$O/top_apparent.tsv" 2>/dev/null &
+# one du per group of disjoint paths: given nested paths, du drops the inner one (counted once already)
+for A in "" --apparent-size; do
+  ( for G in "$(dirname "$WORK")" "$WORK" "$PROJECT_DIR"; do
+      find "$G" -mindepth 1 -maxdepth 1 ! -path "$WORK" ! -path "$PROJECT_DIR" -print0 |
+        du -s $A --block-size=1M --files0-from=- 2>/dev/null
+    done ) > "$O/top${A:+_apparent}.tsv" &
+done
 df -B1M /sps/lpnhe > "$O/df.txt"
 python analysis/storage/inv_runs.py runs runs_from_lxplus runs_from_jeanzay > "$O/inv_runs.jsonl" &
 python analysis/storage/cache_census.py --in-use '*' --days 14 --workers 2 > "$O/census.tsv" &
