@@ -37730,8 +37730,6 @@ entries:
   - D516
   - D529
   next:
-    4: Read the resumed b128 searched scratch-with-both-settings (16 trials), send seeds 43/44 of its chosen trial, read the
-      b128 share log(Sf*/S)/log(F/S)
     5: 'When the no-settings W parent (FA-lxplus-2ae9a2c9) ends: read its per-process val against FA-ccin2p3-47e14eae, copy
       its run dir to ccin2p3, launch the drive over sweep_config_ftmech_zng4g_ftnoset_b2048.yaml and _b128.yaml (16 trials
       each), then seeds 43/44 of each chosen trial; read Fn/S and Fn/F per batch'
@@ -39435,7 +39433,6 @@ entries:
     start: '2026-11-24T00:30:23+00:00'
     at: '2026-11-24T00:30:23+00:00'
   step_waits:
-    '4': the design reviewer
     '5': 'detached drive ftmech_ftnoset_drive (searches ftmech_zng4g_ftnoset_b2048 and _b128 from the no-settings parent)
       ends: its DONE event'
   handoff:
@@ -39471,11 +39468,6 @@ entries:
       sweeps_local/ftmech_zng4g_*
     written: '2026-11-23T22:06:48+00:00'
   step_why:
-    4:
-      feeds: whether the settings explain the fine-tune's Z+4g gap at b128 as at b2048 (D519/D520)
-      if:
-      - 'share>=0.7: H1 holds at both batches, report'
-      - 'share<0.3: reopen H2-H7 at b128, next design mine'
     5:
       feeds: whether the fine-tune's Z+4g deficit is the parent's two input settings (D519/D520)
       if:
