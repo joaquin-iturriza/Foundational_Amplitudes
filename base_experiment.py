@@ -77,6 +77,16 @@ torch.autograd.set_detect_anomaly(False)
 MIN_STEP_SKIP = 1000
 
 
+def noise_scale_terms(g2_small, g2_big, b_small, b_big):
+    """McCandlish et al. 2018 (arXiv:1812.06162) eq. A.2: unbiased (tr Sigma, |G|^2) from g2_small, the mean squared
+    norm of gradients over batches of b_small examples, and g2_big, the squared norm of a gradient over b_big examples
+    (E|G_B|^2 = |G|^2 + tr Sigma / B). Either can come out negative on one measurement: average S and |G|^2 over
+    measurements separately, then B_simple = S / |G|^2."""
+    g2 = (b_big * g2_big - b_small * g2_small) / (b_big - b_small)
+    s = (g2_small - g2_big) / (1.0 / b_small - 1.0 / b_big)
+    return s, g2
+
+
 def clear_start_only(ft):
     """Clear, in a config that loads a finished run as its parent (the HETEROSC sigma stage, the zero-shot and k-shot
     readers), the fine_tune keys that shaped only how that run started from its own parent (plan warm_start steps 13
@@ -1002,7 +1012,12 @@ class BaseExperiment:
         avg_iter_time = 0
 
         if self.cfg.find_BS:
-            gradients, S_estimates, G2_estimates, B_simples = [], [], [], []
+            # the gradient noise scale (_noise_measure); the old window-of-past-steps estimator was replaced: it mixed
+            # gradients at 20 different weights, read them after clipping, and took abs() of each estimate
+            if os.environ.get("LLOCA_PROFILE_STEP", "0") == "1":
+                raise RuntimeError("find_BS and LLOCA_PROFILE_STEP together: the measurement would be timed as data")
+            self._noise_log, self._noise_iter = [], None
+            self._noise_brute_at = set(int(x) for x in (self.cfg.BS_finding.get("brute_at", None) or []))
 
         # Log-spaced checkpoints at which to run _evals (save preds / intrinsic dim)
         oom          = math.floor(np.log10(self.cfg.training.iterations))
@@ -1129,6 +1144,11 @@ class BaseExperiment:
                     prof_n += 1
             else:
                 data = next(iterator)
+                if self.cfg.find_BS:
+                    if step in self._noise_brute_at:
+                        self._noise_brute(step)
+                    if step % int(self.cfg.BS_finding.every) == 0:
+                        self._noise_log.append(self._noise_measure(data, step))
                 self._step(data, step)
 
             # --- divergence abort ---
@@ -1144,27 +1164,6 @@ class BaseExperiment:
                     f"gather/scatter and crash on a CUDA index-OOB."
                 )
 
-            # --- batch-size finder ---
-            if self.cfg.find_BS:
-                grads = torch.cat([p.grad.view(-1) for p in self.model.parameters() if p.grad is not None])
-                gradients.append(grads.detach().clone())
-                if len(gradients) > self.cfg.BS_finding.n_batches_big:
-                    gradients = gradients[-self.cfg.BS_finding.n_batches_big:]
-                    grad_big   = torch.stack(gradients).mean(dim=0)
-                    grad_small = torch.stack(random.sample(gradients, self.cfg.BS_finding.n_batches_small)).mean(dim=0)
-                    B_big   = self.cfg.training.batchsize * self.cfg.BS_finding.n_batches_big
-                    B_small = self.cfg.training.batchsize * self.cfg.BS_finding.n_batches_small
-                    S_estimate  = abs(1 / (1/B_small - 1/B_big) * (grad_small.norm()**2 - grad_big.norm()**2))
-                    G2_estimate = abs(1 / (B_big - B_small) * (B_big * grad_big.norm()**2 - B_small * grad_small.norm()**2))
-                    S_estimates.append(S_estimate.item())
-                    G2_estimates.append(G2_estimate.item())
-                    ema_S  = pd.Series(S_estimates).ewm(alpha=self.cfg.BS_finding.ema_alpha,  adjust=False).mean()
-                    ema_G2 = pd.Series(G2_estimates).ewm(alpha=self.cfg.BS_finding.ema_alpha, adjust=False).mean()
-                    B_simple = ema_S.iloc[-1] / ema_G2.iloc[-1]
-                    B_simples.append(B_simple.item())
-                    if step % 100 == 0:
-                        LOGGER.info(f"S={S_estimate.item():.3e}  G2={G2_estimate.item():.3e}  B_simple={B_simple.item():.3e}")
-
             avg_iter_time = (avg_iter_time * step + (time.time() - iter_time_start)) / (step + 1)
 
             # --- validation ---
@@ -1174,6 +1173,7 @@ class BaseExperiment:
             if is_val_step or is_last_step:
                 val_loss = self._validate(step)
                 self._write_step_log()
+                self._write_noise_log()
                 # Select checkpoint on no-reg loss when available; fall back to
                 # regularized loss only if no-reg was never computed.
                 val_loss_no_reg_now = self.val_loss_no_reg[-1] if self.val_loss_no_reg else None
@@ -1392,34 +1392,12 @@ class BaseExperiment:
         """Subclasses can override to add extra fields to the result JSON."""
         return {}
 
-        if self.cfg.find_BS:
-            self._plot_bs_finding(S_estimates, G2_estimates, B_simples, ema_S, ema_G2)
-
     @staticmethod
     def _cycle(iterable):
         while True:
             for x in iterable:
                 yield x
         
-    def _plot_bs_finding(self, S_estimates, G2_estimates, B_simples, ema_S, ema_G2):
-        for values, ema, label, color, ema_color, fname in [
-            (S_estimates,  ema_S,  "S",        "blue",  "cyan",  "S_estimation"),
-            (G2_estimates, ema_G2, "G2",       "green", "lime",  "G2_estimation"),
-            (B_simples,    None,   "B_simple", "red",   None,    "B_simple_estimation"),
-        ]:
-            plt.figure()
-            plt.plot(range(len(values)), values, label=f"{label} estimates", color=color)
-            if ema is not None:
-                plt.plot(range(len(ema)), ema, label=f"EMA of {label}", color=ema_color)
-            plt.xlabel("Iteration")
-            plt.ylabel(f"Estimated {label}")
-            plt.title(f"Estimation of {label} over Iterations")
-            plt.yscale("log")
-            plt.tight_layout()
-            plt.legend()
-            plt.savefig(os.path.join(self.cfg.run_dir, f"{fname}_run{self.cfg.run_idx}.pdf"))
-            plt.close()
-
     def _evals(self, results, smallest_val_loss_step, step):
         if not self.is_main_process():
             return
@@ -1745,6 +1723,77 @@ class BaseExperiment:
         tmp = os.path.join(str(self.cfg.run_dir), "train_steps.tmp.npz")
         np.savez(tmp, step=a[:, 0].astype(np.int64), grad_norm=a[:, 1], loss=a[:, 2], lr=a[:, 3])
         os.replace(tmp, os.path.join(str(self.cfg.run_dir), "train_steps.npz"))
+
+    def _noise_sets(self):
+        """The parameter sets the noise scale is read on: Muon's and AdamW's under MuonAdamW (their sum is the whole
+        gradient), else one set of every trainable parameter."""
+        groups = self.optimizer.param_groups
+        if any(g.get("use_muon", False) for g in groups):
+            return {"muon": [p for g in groups if g.get("use_muon") for p in g["params"]],
+                    "adamw": [p for g in groups if not g.get("use_muon") for p in g["params"]]}
+        return {"all": [p for p in self.model.parameters() if p.requires_grad]}
+
+    def _noise_grads(self, losses, sets):
+        """Backward each loss of `losses` (one at a time, at the current weights) and return, per parameter set, the
+        mean squared norm of the gradients and the squared norm of their mean, as floats."""
+        sums, sq, k = {n: None for n in sets}, {n: 0.0 for n in sets}, 0
+        for loss in losses:
+            self.optimizer.zero_grad()
+            loss.backward()
+            k += 1
+            for n, ps in sets.items():
+                g = torch.cat([(p.grad if p.grad is not None else torch.zeros_like(p)).reshape(-1) for p in ps])
+                sq[n] = sq[n] + g.double().square().sum()
+                sums[n] = g.double() if sums[n] is None else sums[n] + g.double()
+        self.optimizer.zero_grad()
+        return k, {n: ((sq[n] / k).item(), (sums[n] / k).square().sum().item()) for n in sets}
+
+    def _noise_measure(self, data, step):
+        """One gradient-noise measurement (McCandlish et al. 2018, App. A, with micro-batches in place of GPUs): the
+        step's batch cut into chunks of b events, each chunk's gradient that of the batch's own loss restricted to its
+        events (the experiment's _noise_chunk_losses), so the chunks' mean is the batch gradient at the weights the
+        step updates, before clipping. Raw terms only: tr Sigma and |G|^2 follow from noise_scale_terms with
+        b_small = b, b_big = k b, averaged over measurements offline."""
+        k = int(self.cfg.BS_finding.chunks)
+        n = int(data[1].shape[0])
+        kk, terms = self._noise_grads(self._noise_chunk_losses(data, k), self._noise_sets())
+        rec = {"kind": "chunk", "step": int(step), "b_small": n / kk, "b_big": float(n), "k": kk,
+               **{f"{s}_{t}": v for s, (g2s, g2b) in terms.items() for t, v in (("g2_small", g2s), ("g2_big", g2b))}}
+        if step % 100 == 0:
+            S = sum(noise_scale_terms(rec[f"{s}_g2_small"], rec[f"{s}_g2_big"], n / kk, n)[0] for s in terms)
+            G2 = sum(noise_scale_terms(rec[f"{s}_g2_small"], rec[f"{s}_g2_big"], n / kk, n)[1] for s in terms)
+            LOGGER.info(f"NOISE step {step} S {S:.4e} G2 {G2:.4e} (one measurement, unsmoothed)")
+        return rec
+
+    def _noise_brute(self, step):
+        """The check of _noise_measure at one step, on our model (BS_finding.brute_at): M independent batches drawn
+        from a second pass over the training loader, at the current weights; the batch gradients themselves (b_small =
+        the batch, b_big = M batches: tr Sigma by its definition, the spread of real batch gradients, batch
+        composition included) beside the chunk measurement of each of the same M batches."""
+        M = int(self.cfg.BS_finding.brute_batches)
+        if self._noise_iter is None:   # a loader of its own: a second iter() of a persistent-worker loader resets the first
+            tl = self.train_loader
+            self._noise_iter = iter(self._cycle(torch.utils.data.DataLoader(
+                tl.dataset, batch_size=int(self.cfg.training.batchsize), shuffle=True, drop_last=True,
+                collate_fn=tl.collate_fn, num_workers=0)))
+        batches = [next(self._noise_iter) for _ in range(M)]
+        n = int(batches[0][1].shape[0])
+        kk, terms = self._noise_grads((self._batch_loss(d)[0] for d in batches), self._noise_sets())
+        self._noise_log.append({"kind": "brute", "step": int(step), "b_small": float(n), "b_big": float(n * kk),
+                                "k": kk, **{f"{s}_{t}": v for s, (g2s, g2b) in terms.items()
+                                            for t, v in (("g2_small", g2s), ("g2_big", g2b))}})
+        for d in batches:
+            self._noise_log.append({**self._noise_measure(d, -1), "kind": "chunk_at_brute", "step": int(step)})
+        LOGGER.info(f"NOISE brute check at step {step}: {M} batches of {n}")
+
+    def _write_noise_log(self):
+        """<run_dir>/noise_scale.json: the gradient-noise records (_noise_measure, _noise_brute)."""
+        if not getattr(self, "_noise_log", None) or not self.cfg.get("run_dir"):
+            return
+        tmp = os.path.join(str(self.cfg.run_dir), "noise_scale.tmp.json")
+        with open(tmp, "w") as f:
+            json.dump(self._noise_log, f)
+        os.replace(tmp, os.path.join(str(self.cfg.run_dir), "noise_scale.json"))
 
     def _load_parent_optimizer_state(self, path):
         """fine_tune.load_optimizer_state (plan warm_start step 13, D308): the parent checkpoint's optimizer state

@@ -4253,7 +4253,33 @@ class AmplitudeExperiment(BaseExperiment):
         self._is_weight_cache = (edges, cvals, amp_mean, amp_std)
         return self._is_weight_cache
 
-    def _aggregate_per_process_loss(self, y_pred, y, process_ids, loss_agg, sigma=None, sign=None):
+    def _noise_chunk_losses(self, data, k):
+        """base_experiment._noise_measure: the step's batch cut into k runs of consecutive events (the shuffled
+        sampler's order, so random subsets), each chunk's loss the batch's own aggregation restricted to its events:
+        per-process weights 1/(P n_p) counted on the whole batch, times k, plus the regularisation term, so the k
+        chunk gradients average to the batch gradient. Yields the losses one at a time (one graph alive)."""
+        if self.modelname not in ("LLOCATransformer", "LLOCAMuPTransformer", "MuPLGATr", "MuPLGATrSlim"):
+            raise NotImplementedError(f"find_BS: chunked noise measurement not wired for {self.modelname}")
+        agg = "mean" if self.cfg.training.loss == "HETEROSC" else self.cfg.training.get("loss_aggregation", "mean")
+        if (agg != "mean" or getattr(self, "_per_process_accum", False) or self.ewc is not None
+                or os.environ.get("LLOCA_PROC_LOSS", "vectorized") == "loop"):
+            raise NotImplementedError("find_BS: the chunk losses need the mean aggregation on the mixed batch "
+                                      "(no geometric mean, per-process accumulation, EWC or LLOCA_PROC_LOSS=loop)")
+        particles, y, tokens, order_labels, ptr, process_ids = data
+        n = int(y.shape[0])
+        counts = torch.bincount(process_ids.reshape(-1), minlength=self.n_datasets).to(self.device)
+        pt = ptr.tolist()
+        cuts = [round(i * n / k) for i in range(k + 1)]
+        for e0, e1 in zip(cuts[:-1], cuts[1:]):
+            a0, a1 = pt[e0], pt[e1]
+            chunk = (particles[a0:a1], y[e0:e1], tokens[a0:a1], order_labels[e0:e1], ptr[e0:e1 + 1] - a0,
+                     process_ids[e0:e1])
+            y_pred, yc, pids, sigma, _ = self._forward_lloca(chunk)
+            loss = self._aggregate_per_process_loss(y_pred, yc, pids, "mean", sigma=sigma, sign=self._last_sign,
+                                                    full_counts=counts)
+            yield (n / (e1 - e0)) * loss + self._reg_term(self.model)
+
+    def _aggregate_per_process_loss(self, y_pred, y, process_ids, loss_agg, sigma=None, sign=None, full_counts=None):
         """Mean (or geometric mean) over per-process mean losses.
 
         Vectorised replacement for the old
@@ -4325,6 +4351,9 @@ class AmplitudeExperiment(BaseExperiment):
         counts = per_event.new_zeros(n_proc)
         sums.index_add_(0, process_ids, per_event)
         counts.index_add_(0, process_ids, torch.ones_like(per_event))
+        if full_counts is not None:   # _noise_chunk_losses: a chunk's events at the whole batch's per-process weights
+            assert loss_agg == "mean", "full_counts is defined for the mean aggregation only"
+            counts = full_counts.to(per_event.dtype)
         present   = counts > 0
         n_present = present.sum().clamp(min=1)
         proc_mean = sums / counts.clamp(min=1)                         # 0 where a process is absent
