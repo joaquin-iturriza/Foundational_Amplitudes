@@ -9119,7 +9119,7 @@ spikes at different steps. It costs $1.95$ training hours against the control's 
 \includegraphics{../analysis/critical_batch/figs/v4_het_noise_scale.pdf}
 \caption{Gradient noise scale along the catalog\_v4 pretraining (batch $16384$, seed $42$). (a) $B_{\rm simple}$
 against step, windows of $200$ steps, from chunks of each batch (all parameters, Muon and AdamW sets) and from
-$16$ independent batches; the triangles mark windows above the range (up triangles) or without {\rm simple}$
+$16$ independent batches; the triangles mark windows above the range (up triangles) or without $B_{\rm simple}$
 (down triangles). (b) ${\rm tr}\,\Sigma$ and
 $|G|^2$ times the batch. (c) ${\rm tr}\,\Sigma$ at the five checks, independent batches against chunks, bars two
 standard errors. (d) Validation loss, the run against its control without the measurement.}
@@ -9480,7 +9480,7 @@ Table~\ref{tab:datasaving} gives $S$ over all 68 searches: the gap holds on $e^+
 is $S\ge10^{0.5}$) and, on the test measure, on its one loop; on $e^+e^-\to t\bar t$, tree and one loop, the fine-tune
 needs \emph{more} data than scratch (Fig.~\ref{fig:datasaving_LD}). The validation read, in $\ln$ units, agrees
 except on $e^+e^-\to u\bar u$, $V$, whose test read rests on the scratch plateau near $10^{-4}$ where a single test
-event carries most of the MSE. The $t\bar t$ deficit is under test (D400): the catalog holds out every class with a
+event carries most of the MSE. The $t\bar t$ deficit was tested (D400): the catalog holds out every class with a
 top at its physical mass (axis H3), so neither parent has one; parents with those classes added are tested at the end of
 this section.
 % src: python3 analysis/data_saving/stage2_readout.py @5555a0f0
@@ -9576,14 +9576,14 @@ tree fine-tunes keep the parent's scale.
 
 Physical-mass tops in the parents (D400, stage A). catalog\_v4 holds out every class with an external top at
 $m_t=172.5$ (axis H3), so the stage-2 parents saw tops only at the heavy-quark masses. New parents, the top parents, are the stage-2
-recipes plus the 278 physical-mass top classes and nothing else, trained the same way. Eight fine-tunes from the top parents at the
+recipes plus the 278 physical-mass top classes and nothing else, trained the same way. Design: eight fine-tunes from the top parents at the
 stage-2 best trials' HPs and seed, against the same-HP reruns from the stage-2 parents, at
 $D=10^{2.5}$--$10^4$ (Fig.~\ref{fig:datasaving_tops}). The design's pooled rule reads no: 4 of 8 cells below 1,
 geometric mean of top parent over stage-2 parent on validation 0.68. Read per target it splits. On $t\bar t$ the top parent helps: geometric
 mean 0.24 on validation (3 of 4 cells below 1) and 0.08 on test; on validation the two largest cells lie beyond the
 same-HP rerun spread of 0.46--4.84. On $t\bar t$, $V$ it reads 1.92 on validation (1 of 4 below) and 0.60 on test, the validation
 mean carried by the $D=10^4$ cell, which the next paragraph traces to one event. So the physical-mass tops fix part of
-the tree's deficit and leave the one loop's within the rerun spread.
+the tree's deficit and leave the one loop within the rerun spread.
 % src: python3 analysis/data_saving/diag_readout.py tops @e190a6c1
 % claim: n_below=4
 % claim: gmean_own_over_par=0.68
@@ -10021,7 +10021,6 @@ Where data is scarce the breadth of the parent counts, and where data is plentif
   \label{fig:ftm_zng4g_ftnoset}
 % allow: 4g 2048 128 42 44 8 9 2 10^4 because they are the batch sizes, the seeds, the trial count, the parent's process count, the square of |M| and the training size
 \end{figure}
-
 
 
 \paragraph{Why the momentum rescale costs $Z+4g$ (D539, 2026-11-24)}\label{par:ftm_d539} The rescale was adopted for the
@@ -16310,7 +16309,7 @@ validation MSE at seeds 42, 43, 44: Muon at batch 128 $8.9\times10^{-3}$, $1.05\
 at 128 $0.039$, $0.068$, $0.061$; Adam at 2048 $0.054$, $0.076$, $0.085$; Muon at 2048 $0.058$, $0.067$, $0.064$. Batch
 2048 over 128 is $6.69$ $[5.53, 7.54]$ with Muon and $1.28$ $[0.79, 2.17]$ with Adam; Muon over Adam is $0.17$ $[0.13,
 0.27]$ at batch 128 and $0.88$ $[0.68, 1.24]$ at 2048. The two protocols' own pairs, Muon at 2048 over Adam at 128, read
-$1.12$ $[0.85, 1.70]$. By the design's bands the protocols are unresolved at $10^4$ events, and the batch does not carry
+$1.12$ $[0.85, 1.70]$. By the design's bands the protocols are unresolved at $10^4$ events, and the batch size does not explain
 the difference, since only Muon gains from the small batch; the best cell is ours at batch 128. The test median
 $|\Delta|$ (seed 42) orders the cells the same way: $0.047$ (Muon, 128), $0.114$ (Adam, 128), $0.136$ (Adam, 2048),
 $0.141$ (Muon, 2048), Muon over Adam $0.41$ at batch 128. The extension changed one choice. In the Muon batch-128
@@ -18000,8 +17999,7 @@ DeepSeek+plan fixes and on 9 of DeepSeek's alone; the one it refused (\code{emas
 not see: the fix rebuilds the EMA on every run, losing a warm start's restored EMA. Our tokens per fix
 (Fig.~\ref{fig:labllm2}) were 244k for Sonnet, 254k for DeepSeek+plan (planner and check; 1.04 of Sonnet's) and 142k
 for DeepSeek alone (the check only; 0.58 of Sonnet's, below Sonnet on 9 tasks); median wall time 1.13, 3.72 and 8.33
-min. With the arms equal in quality, DeepSeek alone saves our tokens on multi-file fixes too (0.58 of Sonnet's, the
-check included), so they now go to DeepSeek alone with the Sonnet check, and Sonnet makes the fix itself when the check
+min. With the arms equal in quality, DeepSeek alone saves our tokens on multi-file fixes too, the check included, so they now go to DeepSeek alone with the Sonnet check, and Sonnet makes the fix itself when the check
 disagrees or DeepSeek does not answer; the price is wall time, a median of 8.33 min against Sonnet's 1.13. The user then asked for a cheaper check (D545): it
 reads only the diff stat, the diff and the test run's pass/fail lines and agrees unless something there is visibly
 wrong. On the same ten DeepSeek diffs it cost 41.5k of our tokens a fix (median 38.2k, against the full check's
@@ -18029,6 +18027,26 @@ DeepSeek arms the Sonnet check included, and the planner for +plan), wall time p
 DeepSeek: DeepSeek alone. Every arm passed every task; the open marker is the fix the Sonnet check refused.}
 \label{fig:labllm2}
 \end{figure}
+
+\subsection{The orchestrator kit: the general machinery as a standalone repo}\label{sec:orchestrator-kit}
+
+The question (D546) was whether the machinery behind this setup can be pulled apart from what is particular to FA
+and shared with colleagues, who could install it on their own clusters and projects and improve it. That machinery
+is the \code{site} tool, the ledger with its supervisor and waiter, \code{plan.py}, the hooks and reviewers, and the
+lab-LLM route. It now lives as a public repo, \code{github.com/joaquin-iturriza/orchestrator-kit} (local copy
+\code{\textasciitilde/work/orchestrator-kit}). Its history was squashed so no FA history ships with it (D547). It has
+no license file, like the author's other repos of his own (D548). It holds the tools, config templates with the
+policies (sites, projects, budgets), generic CLAUDE.md, hook and reviewer templates, an offline test suite, and an
+example project (\code{examples/toy}) in a private repo.
+
+The proof installed the kit under a separate HOME, with its own state directory on the site
+(\code{CCORCH\_REMOTE\_DIR=.ccorch\_kit}), and took the toy from its private remote to a finished run on CC-IN2P3.
+Every stage passed: \code{site env} as a CPU job (CC's login policy, D544), \code{pick}, the probe and the toy fit on a
+GPU (the fit's own assertion on the recovered slope and intercept held), \code{supervise} sorting the run ends clean,
+and \code{fetch}. FA's own gate, stamps and ledger were unchanged. The design took its yes branch. The fixes this run
+needed went to the public repo, and its README lists what is still untested on a cluster: the site-side submission
+gate and work items (both need the ledger on, and a decision needs the user's typed words in that project's
+transcripts), HTCondor sites, and more than one site at a time.
 
 % ==========================================================================
 \section{The compute envelope: VRAM and step time}\label{sec:envelope}
@@ -18222,7 +18240,7 @@ small-$D$ fine-tunes, part of it the better start (par.~\ref{par:v3_muon}).
 \paragraph{Muon against AdamW on the longest pretraining (2026-11-13).}\label{par:muon_long} The question (D364, plan
 \code{optimizations\_recap} step 3, design passed 2026-11-12 00:25): does Muon's lead of par.~\ref{par:v3_muon}, measured
 at $4264$ steps, hold at the lower errors of the longest catalog\_v4 pretraining, towards MSE $10^{-4}$, and does its
-zero-shot (transfer) lead hold? Design: the width-8 $16\times$ cell ($68224$ steps, the whole training set, $10.2$
+zero-shot lead on the held-out classes hold? Design: the width-8 $16\times$ cell ($68224$ steps, the whole training set, $10.2$
 epochs, trial 1262's HPs, lr $3.65\times10^{-3}$, seed 42) trained with AdamW in place of Muon (\code{FA-ccin2p3-f08e90e8},
 \code{scripts/job\_catalog\_v3\_short.sh v4\_het\_default25 LONG\_OPT=adamw LONG\_HEADS=8 LONG\_FACTOR=16 LONG\_HP=1262
 LONG\_MEMMAP=true} @fbadd4b5, V100, the existing memmap cache opened, $17.2$ h of training against the $20.3$ h target)
@@ -18233,17 +18251,17 @@ validation; AdamW is best at step $19096$ ($3.84\times10^{-2}$), rises to $0.23$
 while its het NLL keeps falling (no blow-up by the blow-up rule: the NLL's best is at the last validation). AdamW's running
 best never reaches Muon's at $8528$ steps ($3.12\times10^{-2}$); the median over the $50$ validations of AdamW over Muon
 is $6.99$. At the final models (best checkpoint, then the $\sigma$ fit), with $R$ the median over classes of the class
-gmean $\mathrm{MSE}_{\rm AdamW}/\mathrm{MSE}_{\rm Muon}$ of $\ln|\mathcal M|^2$, interval widened by the width-8 seed
+geometric mean $\mathrm{MSE}_{\rm AdamW}/\mathrm{MSE}_{\rm Muon}$ of $\ln|\mathcal M|^2$, interval widened by the width-8 seed
 pair: PP4 $5.18$ $[4.64,5.78]$ over 1301 classes (Muon lower on a share $0.929$ of them), EE4 $3.84$ $[3.33,4.55]$ over 169 (share $0.959$),
 held out pooled $2.76$ $[2.39,3.13]$ over 701, every catalog-sampled axis but two between $2.32$ (H3) and $7.24$ (H6,
 8 classes), HD4 $2.70$ $[1.69,3.95]$; AdamW better at $2\to5$ (H2p5 $0.634$ $[0.447,0.835]$), level on one loop (H5
 $0.851$ $[0.717,1.30]$, HD5 $1.06$ $[0.593,2.41]$). The level: median per-class MSE of $\ln|\mathcal M|^2$ $0.0335$ (PP4)
 and $0.0681$ (EE4) for Muon against $0.184$ and $0.224$ for AdamW; a share $0.025$ of Muon's PP4 classes is below $10^{-4}$.
 Plateau rule: Muon's best is $0.887$ of its value at $0.75T$ and at its last validation, so it has not plateaued;
-AdamW's best is before $0.9T$, a rise, not a plateau. Outcome by the design: YES, Muon's lead holds and grows with the
-horizon ($8.03\times$ per pool at $4264$ steps on catalog\_v3, $5.18$ here on PP4 at the final model, $10.6\times$ on the
-validation curve's last point), and carries to the held-out classes zero-shot except $2\to5$ and one loop; neither run
-reaches $10^{-4}$ and Muon is not plateaued, so the longer horizon is a question to Joaquin. The fine-tune transfer at
+AdamW's best is before $0.9T$, a rise, not a plateau. Outcome by the design: YES, Muon's lead holds at this
+horizon at Muon's HPs ($R=5.18$ on PP4 per class; $8.03\times$ per pool best against best at $4264$ steps on catalog\_v3 is a
+different measure), and carries to the held-out classes zero-shot except $2\to5$ and one loop; neither run
+reaches $10^{-4}$ and Muon is not plateaued, so the longer horizon is a question to the user. The fine-tune transfer at
 $10^{-4}$ stays step 2. Examples of the levels: Fig.~\ref{fig:muon_long}c.
 % src: python3 analysis/catalog_v4/muon_long.py read @0d6c9d5b
 % claim: reads.PP4.all.R=5.18
@@ -18271,7 +18289,6 @@ $10^{-4}$ stays step 2. Examples of the levels: Fig.~\ref{fig:muon_long}c.
 % claim: curve.runs.adamw.max_after_best=0.23
 % claim: curve.runs.adamw.last=0.100
 % claim: curve.runs.adamw.traintime_hours=17.2
-% claim: curve.last_ratio=10.6
 % claim: curve.steps_to_level.8528.muon_best_so_far=3.12e-2
 % claim: reads.PP4.all.frac_classes_muon_lower=0.929
 % claim: reads.EE4.all.widened.0=3.33
