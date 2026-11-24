@@ -38382,6 +38382,15 @@ entries:
       (hi<1), provisional until the extension ends. BLOW-UP listed apart (D398): S1k seed 43 has val > 10x best-so-far after
       its best (best at 60% of the run), read at its best checkpoint. Fn1k best at 14-16% of the run (early-best shape as
       at 1e4); S1k at 60-96%. Corrects the 07:42 finding: those 0.0976/0.0490 were standardised mu-MSE; x std^2 they are 0.1227/0.0616.'
+  - at: '2026-11-24T09:02:18+00:00'
+    text: '2026-11-24 ~10:15 step 1 FINAL, D=1e3 (zng4g_d1e3_read.py @d972272d7; fig zng4g_d1e3, caption OK; results.tex 9fc114a6e).
+      The matched extension (8 more trials each over [6e-4,6e-2], 24 per arm, 0 failed) moved neither best: scratch''s added
+      trials up to lr 2.5e-2 gave 0.125-0.216 (best stays hp1009 0.1227 at 1.74e-2), the fine-tune''s down to 6.2e-4 gave
+      0.065-0.076 (best stays hp1860 0.0616 at 2.54e-3); both chosen lrs >= 0.54 dec inside the wide window: edge-free. Best
+      val MSE(log|M|^2) seeds 42/43/44: S1k 0.1227/0.1361/0.1300, Fn1k 0.0616/0.0653/0.0621. Fn1k/S1k = 0.486, 2-sigma [0.454,
+      0.522] -> design branch hi<1: the 28-process no-settings parent gains 2x where data is scarce; the 1.53x residual at
+      1e4 is a large-D effect. Fn1k best at 14-16% of the run, ends 1.43-1.52x above; S1k seed 43 blows up at 85% of its run
+      (val max 45.7, listed apart, read at its best). No re-pick, no new seeds.'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
