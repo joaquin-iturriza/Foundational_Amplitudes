@@ -45119,6 +45119,23 @@ entries:
       its reason'
     sources: 'D544 (Joaquin: move CC''s scripts to Slurm), the previous owner''s hand-off naming site env''s pip install as
       the leftover, 64802032 and 64801966 logs on this entry'
+    fix_at: '2026-11-24T23:34:35+00:00'
+    fix: 'Readout not written by the job (measure / check 15): the design reads ''the job ran on a compute node: hostname
+      in its log'', but nothing in the rendered env script (site env --check ccin2p3 FA, 3336 bytes), sites/setup.sh or activate.sh
+      prints a hostname, and run_as_job sends the inner''s output to ~/.ccorch/jobs/<key>.out while the sbatch -o log gets
+      only the wrapper''s own stderr. Fix: read the node from the scheduler (sacct -j <jobid> -o NodeList,State,ExitCode,
+      a short read allowed on the login node) or prepend ''echo host $(hostname)'' to the inner in cmd_env, and name which.
+      Outcome yes is too loose for the git step (check 4): the script''s git fetch from github over ssh and its ff merge are
+      non-fatal (''note: fetch failed'', ''note: not fast-forwarded'' and it carries on), so ''env ready'' plus exit 0 would
+      pass even if the compute node cannot fetch, which is one of the no-branch failures you list. State what those two lines
+      must be for yes: either absent with the checkout hash equal to origin/trunk, or present exactly as on the login-node
+      path (site sync delivers a bundle because git''s ssh protocol breaks on CC''s login notice, so fetch may fail there
+      too); and name a saved login-node output as the control, or drop ''the previous login-node output format'' from control.
+      Everything else holds: the diff against site.bak-20261125-ccenv is only the login_cap block in cmd_env plus the help
+      text; it reuses run_as_job (timeout max(a.timeout,3600) -> sbatch -t 65, exit 75 with CCJ_PENDING while queued, as the
+      design says); no --rebuild so the live .venv is untouched apart from pip; one 1-CPU htc job, no GPU, no disk concern;
+      prior search (results.tex, plan.yaml ''site env'', decisions D176, D544) finds only the 2026-10-29 bootstrap failure
+      and job 64802032, both cited.'
   findings:
   - at: '2026-11-24T17:31:13+00:00'
     text: 'Inventory of scripts run on CC''s login node (2026-11-24): supervisor maintain every pass (8-10 min apart): disk_watch.py
