@@ -576,6 +576,18 @@ def repick(sweeps, a, rows, now=None):
 repick.last = 0.0
 
 
+def sync_site(s):
+    """`site sync` with three tries 20 s apart: two drivers started together race on the push ("cannot lock ref"),
+    and an ssh hiccup fails a single try (lxplus, 2026-11-24)."""
+    for k in range(3):
+        try:
+            return site("sync", s, PROJECT, "--allow-dirty", timeout=600)
+        except (RuntimeError, subprocess.TimeoutExpired):
+            if k == 2:
+                raise
+            time.sleep(20)
+
+
 def lxplus_mem_ok(mem, cpus):
     """lxplus (HTCondor) gives 3000 MB per CPU: --mem M becomes ceil(M/3000) CPUs and no GPU slot matches."""
     m = re.fullmatch(r"(\d+(?:\.\d+)?)\s*([MGmg]?)", str(mem).strip())
@@ -657,6 +669,7 @@ def main():
     a = ap.parse_args()
     if a.dry_run:
         a.once = True
+    left, retry_at = [], time.time() + 1800    # sites a start-up sync left out, synced again from retry_at on
 
     sweeps = [Sweep(c, a) for c in a.config]
     parallel = a.parallel or max(s.n_startup for s in sweeps)
@@ -672,17 +685,11 @@ def main():
         if mine:
             sys.exit("drive.py: commit the configs first, nothing submitted:\n" + mine)
         synced, failed = [], []
-        for s in sorted(set(a.sites or ["ccin2p3", "lxplus"] + (["jeanzay"] if a.allow_jeanzay else []))):
+        want = sorted(set(a.sites or ["ccin2p3", "lxplus"] + (["jeanzay"] if a.allow_jeanzay else [])))
+        for s in want:
             log("sync %s" % s)
             try:
-                for k in range(3):     # two drivers started together race on the push ("cannot lock ref"): retry
-                    try:
-                        site("sync", s, PROJECT, "--allow-dirty", timeout=600)
-                        break
-                    except RuntimeError as e:
-                        if k == 2 or "cannot lock ref" not in str(e):
-                            raise
-                        time.sleep(20)
+                sync_site(s)
                 synced.append(s)
             except (RuntimeError, subprocess.TimeoutExpired) as e:
                 # never submit on an unsynced site (stale checkout): a site down at start-up (Jean Zay's probe timing
@@ -691,8 +698,20 @@ def main():
                 log(failed[-1] + "; site left out")
         if not synced:
             sys.exit("drive.py: %s; nothing submitted" % "; ".join(failed))
+        left = [s for s in want if s not in synced]
         a.sites = synced
     while True:
+        if left and time.time() > retry_at:
+            # a site left out at start-up by a transient failure (lxplus 2026-11-24) is synced again every 30 min
+            retry_at = time.time() + 1800
+            for s in list(left):
+                try:
+                    sync_site(s)
+                    left.remove(s)
+                    a.sites.append(s)
+                    log("sync %s: back in this driver's sites" % s)
+                except (RuntimeError, subprocess.TimeoutExpired) as e:
+                    log("sync %s still failing: %s" % (s, str(e)[-200:]))
         for sw in sweeps:
             sw.collect(a)
         c = failure_streak([t for sw in sweeps for t in sw.trials("observed", "failed", "lost")], a.stop_after)

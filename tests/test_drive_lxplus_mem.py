@@ -32,6 +32,20 @@ def test_raised_request_keeps_lxplus_up_to_its_fitting_slots(monkeypatch):
     assert sorted(_plan(monkeypatch, {"lxplus": 2, "ccin2p3": 1}, 0, mem="12000M")) == ["ccin2p3", "lxplus", "lxplus"]  # not raised: pick's plan as is
 
 
+def test_sync_site_retries_a_transient_failure(monkeypatch):
+    import sweep.drive as dr
+    n = []
+    monkeypatch.setattr(dr.time, "sleep", lambda s: None)
+
+    def flaky(*a, **k):
+        n.append(1)
+        if len(n) < 3:
+            raise RuntimeError("ssh")
+        return "ok"
+    monkeypatch.setattr(dr, "site", flaky)
+    assert dr.sync_site("lxplus") == "ok" and len(n) == 3
+
+
 if __name__ == "__main__":
     test_lxplus_mem_ok()
     print("ok")
