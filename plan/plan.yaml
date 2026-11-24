@@ -15835,7 +15835,7 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-046cc7d3
-    commit: 483c6c165
+    commit: 980fed580
     paths:
     - .claude/hooks/context_guard.py
     - .claude/hooks/notification_absorb.py
