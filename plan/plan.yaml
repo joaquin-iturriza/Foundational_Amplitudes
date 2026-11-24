@@ -38056,6 +38056,9 @@ entries:
       limits and bulk: (1) what the two settings bought (kit_benchmark D374/D392 records), (2) the b2048 test at hp1961 (eps
       scan 1e-4/1e-2/1, massless-only rescale, off; Z+4g and uug at 1e4 and 1e5 events, 3 seeds) plus the kit hard-bin scoring
       of the uug runs; read with figures'
+    4: 'D539 follow-up: the data-size and uug contrast at a stable setup. hp1961 (lr 2.8e-2) blew up Z+4g 1e5 off and all
+      uug runs; redo Z+4g 1e5, uug 1e4, uug 1e5 (off and eps1e-8, 3 seeds) plus the Z+4g 1e4 pair as link, all at the no-rescale
+      scratch b2048 search''s chosen HPs, read with the 12 uug kit hard-bin scorings of step 3; design + review first'
   done_when: null
   notes_ref: null
   match: dsave_ftmech_*,ftmech_*
@@ -40450,6 +40453,14 @@ entries:
         read against the limit gains'
       - 'cost only at 1e4 on both processes, not at 1e5: a data-size effect; the parent''s value depends on the fine-tune''s
         D'
+    4:
+      feeds: 'D539: whether the rescale''s Z+4g cost is a small-data effect and why it helped uug (parent input settings for
+        later Z+ng fine-tunes)'
+      if:
+      - 'Z+4g 1e5 r~1 and uug r<=1: the cost is data scarcity; the parent keeps the rescale, Z+ng fine-tunes at small D drop
+        it or use eps ~1'
+      - 'Z+4g 1e5 r>1 beyond noise: the rescale costs Z+4g''s bulk at any D; parent without it (or eps 1) for Z+ng, uug''s
+        limit gains read against the kit hard bins'
   intent:
   - text: I asked you to investigate the problem, it's extremely obvious that this implies testing different configurations,
       it's never a question then if you should send a run or not because it changes the configuration, that's the entire point
