@@ -43485,7 +43485,9 @@ entries:
     - designer-executor setups
   decisions:
   - D530
-  next: null
+  next:
+    2: Commit the staged results.tex write-up (par:labllm1, par:labllm2; verify_claims 0 problems) once the notes-editor passes,
+      remove worktrees/wt-labllm with scripts/remove_worktree.sh (folds the figures), then plan done --writeup <commit>
   done_when: null
   notes_ref: null
   match: zz_labllm_*
@@ -43949,6 +43951,12 @@ entries:
     units: null
     start: '2026-11-24T15:39:09+00:00'
     at: '2026-11-24T15:39:09+00:00'
+  step_why:
+    2:
+      feeds: 'which subagent work goes to DeepSeek (D541): log reading and code lookups yes, multi-file fixes stay on Sonnet'
+      if:
+      - 'notes-editor passes: commit, fold the worktree, plan done'
+      - 'notes-editor blocks: apply its fixes, re-check with the same reviewer, then commit'
 - id: critical_batch
   title: Critical batch size from the gradient noise scale
   question: What is the critical batch size of our canonical setup, measured from the gradient noise scale B_simple = tr(Sigma)/|G|^2
