@@ -42116,3 +42116,58 @@ entries:
     state: working
     since: '2026-11-24T00:35:55+00:00'
     state_at: '2026-11-24T00:35:55+00:00'
+  designs:
+  - at: '2026-11-24T00:44:54+00:00'
+    question: 'Step 1 of critical_batch (D532): what is the gradient noise scale B_simple = tr(Sigma)/|G|^2 (McCandlish et
+      al. 2018) along our canonical catalog_v4 pretraining, measured with the paper''s two-batch-size estimator (App. A) from
+      8 micro-batch gradients of each step''s batch instead of 8 GPUs, and does that micro-batch estimate agree with the definition
+      read from independent batch gradients at the same weights?'
+    prior: 'Joaquin''s earlier attempt (base_experiment find_BS before ef2162765; no result recorded anywhere): it averaged
+      the gradients of the last 20 steps (20 different weights) as the big batch and a random 10 of them as the small one,
+      read p.grad AFTER _step, i.e. after clip_grad_norm 5, took abs() of each S and |G|^2 estimate, and smoothed with pandas
+      ewm alpha 0.9 (about one measurement of memory); its plot was dead code after a return. The clipping alone voids it:
+      in the WSD het control (runs/catalog_v4_short/v4_het_control_wsd, train_steps.npz on CC, read today) 98.8% of the 4264
+      steps have pre-clip gradient norm above 5 (median 21.3; medians by eighth of the run 13.4, 10.3, 14.4, 20.3, 25.2, 30.1,
+      33.9, 58.4), so every gradient it read had norm exactly 5. Searched docs/results.tex (noise scale, critical batch, B_simple,
+      batch), the plan and site decisions (batch): no noise-scale measurement. Nearest batch evidence: zng_uq_benchmark D507/D509
+      at 1e4 events of Z+4g, best val MSE batch 2048 over 128 = 3.20 for Muon (three seeds), a data-limited multi-epoch cell,
+      not this setup; D426 (batch not searched with lr), D514.'
+    measure: 'Per measurement (every 10 steps, before the step, at its weights, pre-clip): the step''s 16384 events cut into
+      8 chunks of 2048 (sampler order, random), each chunk''s gradient of the batch''s own loss restricted to its events (mean
+      over present processes of per-process means at the WHOLE batch''s counts, times 8, plus L2 term), so the chunks average
+      to the batch gradient; g2_small = mean_i |g_i|^2, g2_big = |mean_i g_i|^2, per parameter set (Muon matrices, AdamW rest);
+      S = (g2_small - g2_big)/(1/2048 - 1/16384), |G|^2 = (16384 g2_big - 2048 g2_small)/(16384 - 2048) (noise_scale_terms);
+      B_simple(t) = mean S / mean |G|^2 over windows of 20 measurements (200 steps), S and |G|^2 averaged separately, never
+      the ratio per measurement; total and per set. Check at steps 50, 500, 1500, 3000, 4100: 16 independent batches of 16384
+      from a separate loader, their full gradients give S and |G|^2 by the definition (b_small 16384, b_big 16 x 16384; batch-composition
+      noise included), beside the chunk estimate on each of the same 16 batches.'
+    check: 'Known answer (tests/test_noise_scale.py @ef2162765, passes in .venv-cpu): linear regression, x ~ N(0, I_10), noise
+      0.5, at w = w* + d, where G = d and tr Sigma = D(|d|^2 + s^2) + |d|^2 exactly; the same _noise_grads + noise_scale_terms
+      code with 8 chunks of 64 over 400 measurements recovers tr Sigma and |G|^2 within 5% and B_simple within 7%. Chunk weighting:
+      k chunks at the whole batch''s counts average to the batch loss exactly with absent and uneven processes (same test
+      file). On existing data the quantity moves: the pre-clip gradient norm of the control rises 10 -> 58 over the run (above),
+      so |G|^2 + S/16384 changes 30x along it; this run measures where the split between S and |G|^2 goes.'
+    fixed: 'The WSD het control of catalog_v4 exactly (scripts/job_catalog_v3_short.sh arm v4_het_noise_scale = v4_het_control_wsd''s
+      overrides: base config runs/dancat_het_pre/trial_0058, recipes/catalog_v4_base_train.yaml 1397 pools, 1e4 train and
+      200 val events per pool, dimensionless target and inputs, HETEROSC with mean aggregation, sign head off, MuonAdamW lr
+      4.997e-3 muon_weight_decay 0.0217, WSD cooldown 1/8, clip_grad_norm 5, batch 16384, 4264 steps, validate_frac 0.02,
+      seed 42, width 8), training only, no sigma stage; differences from that arm: find_BS on with the settings above, no
+      step-3731 snapshot. Smoke first (D395, new launch path): the same arm in the script''s smoke mode (19 pools, 2000 events
+      each, 40 steps, brute check at step 20) through every stage it has (training, validation, the noise json, the train-only
+      checks).'
+    control: 'The v4_het_control_wsd run itself (same setup and seed, no measurement): its validation curve against this run''s
+      says whether the measurement perturbs training (it changes no weight; the check''s own loader draws from the global
+      RNG, which can reorder later epochs).'
+    seeds: 'Seed 42 only: a measurement along one run, not a comparison of arms; the estimator''s error is read from the 5
+      brute-force checks and the spread of the 20 measurements in each window.'
+    outcome: 'Agreement: at each check step the chunk estimate''s S and |G|^2 (mean over the same 16 batches) within 2 standard
+      errors of the brute value (standard errors by bootstrap over the 16 batches), and |G|^2 > 0 in the window means -> B_simple(t)
+      is read and plotted along the run with the batch 16384 line; B_simple well below 16384 over most of the run says our
+      batch is past the critical batch (steps cost more examples than needed), well above says larger batches would still
+      cut steps nearly 1:1. Disagreement (chunk S off brute by more than that) -> the batch-composition noise the chunks miss
+      is the cause if S_brute > S_chunk; then B_simple is read from brute-style measurements only (more checks), reported
+      as such. Step 2, the check of B_crit against runs at several batch sizes (steps and examples to a target loss, lr tuned
+      per batch), is designed after this read and goes to Joaquin with its cost. Cost: smoke ~0.3 GPU-h; the run 4264 steps
+      x 1.01 s/step (tools/short_wall.py''s training-only rate) x 1.15 for the measurement (one extra forward-backward of
+      the batch every 10 steps) + 5 checks x 32 batch passes + 15 min start-up ~ 1.75 h on one GPU, limit 3 h; total < 2.1
+      GPU-h.'
