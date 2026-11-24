@@ -10066,6 +10066,24 @@ whose target is the bulk, the parent is the one without the rescale, as the fine
 (above).
 % allow: 4g because it is the process
 
+Since the $u\bar ug$ runs blew up at both fixed hyperparameter sets, each of its four arms (no rescale and $\epsilon=10^{-8}$,
+at $10^4$ and $10^5$ events) got its own $16$-trial search over the same space, read best against best with seeds $42$--$44$
+of each chosen trial (Fig.~\ref{fig:ftm_d539u}). No run blows up, and every chosen learning rate sits at least $0.2$ decades
+inside the window. At $10^4$ events the rescale costs the bulk of $u\bar ug$ too: $r=2.18$ $[1.32, 3.58]$, with three-seed
+means $0.0055$ without and $0.0119$ with it. At $10^5$ the ratio is $1.68$ $[0.93, 3.07]$, unresolved. By the design, the bulk
+gain of D374 (batch $16384$, $8000$ steps, cosine schedule) does not carry over to this setup, so the rescale pays only where the
+soft limit is the target. The kit soft and collinear bins of these twelve runs are scored next.
+% src: python3 analysis/finetune_mechanism/d539_read.py --set u --cached @5758f6310
+% claim: cells.uug_1e4.eps1e-8.over_off.r=2.18
+% claim: cells.uug_1e4.eps1e-8.over_off.lo=1.32
+% claim: cells.uug_1e4.eps1e-8.over_off.hi=3.58
+% claim: cells.uug_1e5.eps1e-8.over_off.r=1.68
+% claim: cells.uug_1e5.eps1e-8.over_off.lo=0.93
+% claim: cells.uug_1e5.eps1e-8.over_off.hi=3.07
+% claim: cells.uug_1e4.off.gmean=0.0055
+% claim: cells.uug_1e4.eps1e-8.gmean=0.0119
+% allow: 16 42 44 10^4 10^5 10^{-8} 0.2 16384 8000 because they are the trial count, the seeds, the training sizes, the rescale's setting, the lr-window margin read from the searches and D374's batch and steps
+
 \begin{figure}[H]
   \centering
   \includegraphics{../analysis/finetune_mechanism/figs/d539.pdf}
@@ -10088,6 +10106,17 @@ whose target is the bulk, the parent is the one without the rescale, as the fine
   $\epsilon=10^{-8}$, (c) seed $42$, $Z+4g$ at $10^4$ events.}
   \label{fig:ftm_d539s}
 % allow: 4g 42 10^4 10^{-8} because they are the process, the seed, the training size and the rescale's setting
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{../analysis/finetune_mechanism/figs/d539u.pdf}
+  \caption{\textbf{Searched per arm, the rescale costs the bulk of $u\bar ug$ at $10^4$ events.} $e^+e^-\to u\bar ug$ from
+  scratch, batch $2048$, $1953$ steps, each arm at its own search's chosen trial, seeds $42$--$44$. (a) Best validation
+  MSE$(\log|\mathcal M|^2)$ against the training size. (b), (c) Validation MSE against training progress, every seed, at
+  $10^4$ and $10^5$ events.}
+  \label{fig:ftm_d539u}
+% allow: 2048 1953 42 44 2 10^4 10^5 because they are the batch size, steps, seeds, the square of |M| and the training sizes
 \end{figure}
 % ==========================================================================
 \section{Architecture and encoding ablations}\label{sec:arch}
