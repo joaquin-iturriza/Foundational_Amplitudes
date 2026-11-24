@@ -1,0 +1,11 @@
+RUN_SUMMARY {"T_max": 50, "allow_tf32": true, "batchsize": 24576, "dtype": "float32", "ema": true, "ema_decay": 0.9989315077979117, "gpu": "NVIDIA H100 NVL", "heterosc_select": "nll", "increment_steps": null, "is_dyhpo_run": false, "iterations": 50, "loss": "MSE", "lr": 0.0012437236075771069, "memmap": true, "n_datasets": 1352, "num_heads": 120, "processes_file": "recipes/catalog_daniel_train.yaml", "run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/zz_smoke/zz_smoke_sweep_config_llmcmp_a_adamw_const_64783729", "run_id": "FA-ccin2p3-c6a550c4", "scheduler": "WSD", "scheduler_scale": 1, "seed": 42, "slurm_mem_per_node": "32768", "train_events": 74760192, "train_events_per_process": {"max": 100000, "median": 100000, "min": 100000, "n": 1352}, "warm_start": false, "warmup": 8, "wsd_cooldown_frac": 0.0}
+[2026-11-24 17:22:45 I] Instantiated model LLOCAMuPTransformer with 354107348 learnable parameters
+[2026-11-24 17:22:56 I] Finished iteration 1 after 10.17s | estimate: 8.48min = 0.14h | VRAM alloc: 6869 MB, peak: 68781 MB
+[2026-11-24 17:23:22 I] Finished iteration 6 after 36.47s | estimate: 5.07min = 0.08h | VRAM alloc: 6869 MB, peak: 71478 MB
+[2026-11-24 17:23:54 I] Finished iteration 12 after 68.36s | estimate: 4.75min = 0.08h | VRAM alloc: 6869 MB, peak: 71478 MB
+[2026-11-24 17:24:20 I] Finished iteration 17 after 94.89s | estimate: 4.65min = 0.08h | VRAM alloc: 6872 MB, peak: 71482 MB
+[2026-11-24 17:24:52 I] Finished iteration 23 after 126.83s | estimate: 4.60min = 0.08h | VRAM alloc: 6870 MB, peak: 71482 MB
+[2026-11-24 17:25:19 I] Finished iteration 28 after 153.51s | estimate: 4.57min = 0.08h | VRAM alloc: 6871 MB, peak: 71486 MB
+[2026-11-24 17:25:51 I] Finished iteration 34 after 185.57s | estimate: 4.55min = 0.08h | VRAM alloc: 6871 MB, peak: 71487 MB
+[2026-11-24 17:26:18 I] Finished iteration 39 after 212.27s | estimate: 4.54min = 0.08h | VRAM alloc: 6872 MB, peak: 71487 MB
+[2026-11-24 17:26:50 I] Finished iteration 45 after 244.39s | estimate: 4.53min = 0.08h | VRAM alloc: 6873 MB, peak: 71495 MB

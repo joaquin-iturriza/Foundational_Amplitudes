@@ -1,0 +1,14 @@
+RUN_SUMMARY {"T_max": 50, "allow_tf32": true, "batchsize": 24576, "dtype": "float32", "ema": true, "ema_decay": 0.9989315077979117, "gpu": "NVIDIA H100 NVL", "heterosc_select": "nll", "increment_steps": null, "is_dyhpo_run": false, "iterations": 50, "loss": "MSE", "lr": 0.0012437236075771069, "memmap": true, "n_datasets": 1352, "num_heads": 16, "processes_file": "recipes/catalog_daniel_train.yaml", "run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/zz_smoke/zz_smoke_sweep_config_llmcmp_a_adamw_const_64771325", "run_id": "FA-ccin2p3-df391ea7", "scheduler": "WSD", "scheduler_scale": 1, "seed": 42, "slurm_mem_per_node": "32768", "train_events": 74760192, "train_events_per_process": {"max": 100000, "median": 100000, "min": 100000, "n": 1352}, "warm_start": false, "warmup": 8, "wsd_cooldown_frac": 0.0}
+[2026-11-24 15:28:36 I] Instantiated model LLOCAMuPTransformer with 6339668 learnable parameters
+[2026-11-24 15:28:40 I] Finished iteration 1 after 4.00s | estimate: 3.33min = 0.06h | VRAM alloc: 235 MB, peak: 24736 MB
+[2026-11-24 15:28:42 I] Finished iteration 6 after 6.00s | estimate: 0.83min = 0.01h | VRAM alloc: 234 MB, peak: 24785 MB
+[2026-11-24 15:28:45 I] Finished iteration 12 after 8.40s | estimate: 0.58min = 0.01h | VRAM alloc: 234 MB, peak: 24790 MB
+[2026-11-24 15:28:47 I] Finished iteration 17 after 10.39s | estimate: 0.51min = 0.01h | VRAM alloc: 237 MB, peak: 24790 MB
+[2026-11-24 15:28:49 I] Finished iteration 23 after 12.79s | estimate: 0.46min = 0.01h | VRAM alloc: 236 MB, peak: 24790 MB
+[2026-11-24 15:28:51 I] Finished iteration 28 after 14.78s | estimate: 0.44min = 0.01h | VRAM alloc: 236 MB, peak: 24790 MB
+[2026-11-24 15:28:53 I] Finished iteration 34 after 17.18s | estimate: 0.42min = 0.01h | VRAM alloc: 238 MB, peak: 24790 MB
+[2026-11-24 15:28:55 I] Finished iteration 39 after 19.18s | estimate: 0.41min = 0.01h | VRAM alloc: 237 MB, peak: 24790 MB
+[2026-11-24 15:28:58 I] Finished iteration 45 after 21.57s | estimate: 0.40min = 0.01h | VRAM alloc: 238 MB, peak: 24791 MB
+[2026-11-24 15:30:22 I] Finished iteration 50 after 105.98s | estimate: 1.77min = 0.03h | VRAM alloc: 223 MB, peak: 24791 MB
+[2026-11-24 15:30:22 I] Finished training: 50 iterations = 0.0 epochs in 1.77min (avg 0.4713s/iter)
+[2026-11-24 15:36:46 I] GPU RAM information: max_used = 26.0 GB, max_total = 1e+02 GB
