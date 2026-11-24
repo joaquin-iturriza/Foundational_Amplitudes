@@ -38052,6 +38052,10 @@ entries:
       run dir to lxplus; drive ftmech_zng4g_ftglu_b128 (1e4, 16 trials) and ftmech_zng4g_d1e3_ftglu_b128 (16 trials on [1.9e-3,1.9e-2]
       @8e0482ffb) together; then extend the D=1e3 one as its siblings (extend_sweep.py --low 6e-4 --high 6e-2, config edited
       to window [6.0e-4,6.0e-2], n_trials 24, waves +[3,3,2]) and 8 more; then seeds 43/44 of each chosen trial'
+    3: 'D539: why the momentum log-rescale (input_soft_eps 1e-8) raises Z+4g scratch 2.07x at b2048 while it helped uug''s
+      limits and bulk: (1) what the two settings bought (kit_benchmark D374/D392 records), (2) the b2048 test at hp1961 (eps
+      scan 1e-4/1e-2/1, massless-only rescale, off; Z+4g and uug at 1e4 and 1e5 events, 3 seeds) plus the kit hard-bin scoring
+      of the uug runs; read with figures'
   done_when: null
   notes_ref: null
   match: dsave_ftmech_*,ftmech_*
@@ -40273,6 +40277,15 @@ entries:
       if:
       - 'hi<1: dilution yes (at 1e4 with Fg/S<=1: the residual is dilution)'
       - 'lo>0.65 and hi>=1: no dilution of the needed size; next the b128 instability'
+    3:
+      feeds: 'Joaquin''s W-parent question (D539): keep, change or drop the log-rescale in the parent'
+      if:
+      - 'cost gone with massless-only and uug unhurt: the rescale''s distortion of the Z''s mass is the cost; parent keeps
+        the rescale on massless momenta only'
+      - 'cost falls with eps toward off and uug at 1e4 also pays: compression costs where data is scarce; eps is a trade-off
+        read against the limit gains'
+      - 'cost only at 1e4 on both processes, not at 1e5: a data-size effect; the parent''s value depends on the fine-tune''s
+        D'
   intent:
   - text: I asked you to investigate the problem, it's extremely obvious that this implies testing different configurations,
       it's never a question then if you should send a run or not because it changes the configuration, that's the entire point
