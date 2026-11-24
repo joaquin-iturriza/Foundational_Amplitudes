@@ -34918,9 +34918,9 @@ entries:
     - 4
   owner:
     agent: a5b859722bc712d25
-    state: working
+    state: stopped
     since: '2026-11-24T05:14:31+00:00'
-    state_at: '2026-11-24T05:14:31+00:00'
+    state_at: '2026-11-24T05:15:52.557000+00:00'
     context: 73448
     context_at: '2026-11-24T05:15:33+00:00'
   designs:
