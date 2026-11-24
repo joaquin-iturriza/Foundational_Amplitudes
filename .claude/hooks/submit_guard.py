@@ -490,8 +490,9 @@ def budget(cmd, segs):
         if jz and total_jz > BUDGET_JZ_GPU_H:
             over.append("%.1f GPU-h on Jean Zay (limit %g)" % (total_jz, BUDGET_JZ_GPU_H))
         if over and not (covered is not None and covered >= max(total, total_jz if jz else 0.0)):
-            out.append("budget: %s, and the item's recorded cost (%s) does not cover it. Above the budget the user "
-                       "confirms first (CLAUDE.md, What you may do: GPU budget); with their words recorded, `site item set %s %s "
+            out.append("budget: %s, and the item's recorded cost (%s) does not cover it. Above the budget a decision "
+                       "in force must cover it (its cost, or it names the work and the total stays under 100 GPU-h, D536), "
+                       "else the user confirms first (CLAUDE.md, What you may do: GPU budget); record the covered total with `site item set %s %s "
                        "--est-gpu-hours <approved total>`." % ("; ".join(over), "none" if covered is None else
                                                                  "%g GPU-h" % covered, project, item))
     return out

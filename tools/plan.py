@@ -2823,6 +2823,15 @@ def cmd_withdraw(a):
                                                                                e["status"]))
 
 
+def part_reask(old, new):
+    """The new ask repeats only some parts of an answered multi-part ask (2026-11-24: D536 answered part (1) of a
+    two-part ask and the refusal blocked re-asking part (2)). shortcut: which part the answer settled is not recorded,
+    so this trusts the asker that the repeated part is the unanswered one; record per-part answers if it is misused."""
+    parts = ask_parts(old)
+    hit = [p for p in parts if part_asked(p, new)]
+    return bool(parts) and 0 < len(hit) < len(parts)
+
+
 def answered_asks(d):
     return [(e, x) for e in d["entries"] for x in e.get("asks") or [] if x.get("answered_at")]
 
@@ -2861,7 +2870,8 @@ def cmd_ask(a):
         held_entry = e.get("status") == "held"     # a held entry stays held; the question is recorded on it
         if held_entry and a.holds_all is not None:
             sys.exit("plan: %s is held; a question on it names what it blocks (--blocks), not --holds-all" % a.id)
-        again = [(o, x) for o, x in answered_asks(d) if o["id"] == a.id and (overlap(x["ask"], a.ask) or overlap(a.ask, x["ask"]))]
+        again = [(o, x) for o, x in answered_asks(d) if o["id"] == a.id and (overlap(x["ask"], a.ask) or overlap(a.ask, x["ask"]))
+                 and not part_reask(x["ask"], a.ask)]
         if again:
             o, x = again[0]
             sys.exit("plan: already answered: %r on %s, %s (%s); act on that answer" % (

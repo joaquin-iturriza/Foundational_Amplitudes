@@ -64,3 +64,16 @@ def test_ask_age_shown():
     for since in ((dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=94)).isoformat(),
                   (dt.datetime.utcnow() - dt.timedelta(hours=94)).strftime("%Y-%m-%dT%H:%M:%SZ")):
         assert 93.9 < plan.ask_age_h({"waiting_since": since}) < 94.1, since
+
+
+def test_part_reask():
+    """Re-asking the unanswered part of an answered two-part ask passes; the whole ask again does not."""
+    old = ("GPU budget: two questions. (1) Proposed diff to CLAUDE.md budget rule: replace the usual-size exception "
+           "with a named-work bound of 100 GPU-h. Yes or no? (2) Permission classifier refusal: an edit of site_gate.py "
+           "so the gate charges an lxplus job its own time limit instead of its HTCondor flavour. Will you make that "
+           "edit yourself, or add a permission rule?")
+    new = ("Permission classifier refusal: an edit of site_gate.py so the gate charges an lxplus job its own time "
+           "limit instead of its HTCondor flavour. Will you make that edit yourself, or add a permission rule?")
+    assert plan.part_reask(old, new)
+    assert not plan.part_reask(old, old)
+    assert not plan.part_reask(new, new)
