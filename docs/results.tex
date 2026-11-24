@@ -9103,12 +9103,14 @@ fall off the scale of the figure or have no $B_{\rm simple}$ (figure~\ref{fig:no
 So $B_{\rm simple}$ sits two to three decades below our batch over the whole run. In the paper's picture the batch is
 far past the critical size, and a smaller batch would reach the same loss in about as many steps with far fewer events;
 whether that holds for Muon and this loss is the batch-size scan's question, still waiting on the GPU budget. The
-measurement leaves training on its course within the spread of this setup's validation spikes: the last validation
-loss is $-2.872$ against the control's $-2.907$, both runs showing isolated spikes at different steps. It costs
-$1.95$ training hours against the control's $1.23$.
-% src: python3 analysis/critical_batch/noise_read.py analysis/critical_batch/data/FA-ccin2p3-225d38ea_noise_scale.json v4_het_noise_scale --result analysis/critical_batch/data/FA-ccin2p3-225d38ea_result.json --control analysis/critical_batch/data/v4_het_control_wsd_result.json @33bcd0b45
-% claim: run.val_last=-2.872
-% claim: control.val_last=-2.907
+measurement leaves training on its course: at the best checkpoint, the lowest validation loss, which in both runs is
+the last validation (step $4250$), the run reads $-2.872$ against the control's $-2.907$, both runs showing isolated
+spikes at different steps. It costs $1.95$ training hours against the control's $1.23$.
+% src: python3 analysis/critical_batch/noise_read.py analysis/critical_batch/data/FA-ccin2p3-225d38ea_noise_scale.json v4_het_noise_scale --result analysis/critical_batch/data/FA-ccin2p3-225d38ea_result.json --control analysis/critical_batch/data/v4_het_control_wsd_result.json @b2b650b45
+% claim: run.val_best=-2.872
+% claim: control.val_best=-2.907
+% claim: run.best_step=4250
+% claim: control.best_step=4250
 % claim: run.hours=1.95
 % claim: control.hours=1.23
 
