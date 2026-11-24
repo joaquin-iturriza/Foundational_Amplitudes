@@ -125,6 +125,8 @@ def main():
             "best_at_pct": [100 * (int(np.argmin(c)) + 1) / len(c) for c in curves[arm].values()],
             "end_over_best": [float(c[-1] / c.min()) for c in curves[arm].values()],
             "blowups": [s for s, c in curves[arm].items() if np.any(c > 10 * np.minimum.accumulate(c))],
+            "blowup_at_pct": {s: 100 * (int(np.argmax(c > 10 * np.minimum.accumulate(c))) + 1) / len(c)
+                              for s, c in curves[arm].items() if np.any(c > 10 * np.minimum.accumulate(c))},
             "trials": [(r[2]["lr"], r[2]["val_loss"] * k2, r[0], r[1]) for r in ok]}
     A = res["arms"]
     full = [a for a in A if len(A[a]["best"]) == 3]
