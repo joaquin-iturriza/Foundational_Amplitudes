@@ -44440,3 +44440,5 @@ entries:
       croland 60704, rvandenbrouc 29763, benayoun 21064, ldelbuon 1950. Allocated du sums to 1.28x df used (Isilon). SCRATCH
       holds 126,942 entries: 118,777 zeroshot_*, 6,749 signed_ab_* etc. temp run dirs never removed (fixed acd6b8753). CC''s
       login node cuts site run sessions after 40 s-2 min of du/census: long reads go to scripts/job_disk_inventory.sh (htc).'
+  step_waits:
+    '1': a reviewer
