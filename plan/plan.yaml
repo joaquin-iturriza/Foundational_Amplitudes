@@ -44866,6 +44866,30 @@ entries:
       prune, D542 and results.tex for disk, storage: prior now lists D149/D133, D147, D163/D167, D110, D131, D84/D103/D243,
       D180/D201, D208/D209/D214, D404, D19, and the outcome separates already-approved classes from Joaquin''s call. Residual:
       if neither size lands within 5% of df used (others'' dirs partly unreadable), report both and say so.'
+  - at: '2026-11-24T23:42:27+00:00'
+    question: 'Delete our own CC debris that D550 approves (''and yes, delete the debris.''): the 24 named old smoke/test/probe
+      outputs in SCRATCH (+ their recipe files), the two format-2 memmap keys 7d589cbf and f5ccb555 no code can read, the
+      scratch run dirs left by the probe tools (zeroshot_*, signed_ab_*, kshot_*, rebuild_*, f24net_run_*, kitprec_*, evalbest_*)
+      older than 3 days, and the checkout-root scheduler logs older than 14 days of jobs no longer queued that hold no result
+      line; job scripts/job_delete_debris.sh running tools/delete_debris.py at trunk 815014406'
+    prior: 'the inventory FA-ccin2p3-b949c4ee (design passed 2026-11-24, outputs SCRATCH/zz_cc_disk): smokes ~1.4 GiB apparent,
+      zeroshot_* 1.7 GiB in 415,663 dirs, kshot_* 0.5, the two memmap keys ~4.8 GiB (2478 MiB allocated each), checkout-root
+      loose files 8,727; D550 approves this class; D201 (zz_probe_* outputs), D96 (tests and smokes, held with storage by
+      D122, now covered by D550); the earlier login-node rm was refused by the permission check (2026-11-24) and login nodes
+      are cut at 60 s (D544)'
+    measure: apparent GiB deleted per class from the manifest SCRATCH/zz_cc_disk/deleted.tsv (written before any deletion),
+      and df used before and after in the job log
+    check: 'a local fake tree (2026-11-25): it deleted the named smoke and its recipe file, a format-2 key, a 5-day-old zeroshot
+      dir and a 20-day-old plain log, and kept a queued job''s log, a log with a RUN_SUMMARY line, run.py, zz_catft, a new
+      zeroshot dir and a format-3 key'
+    fixed: nothing outside the four classes; every path a direct child of SCRATCH, of amp_mmap_cache or of the checkout (asserted);
+      memmap keys kept if any live job's stdout names them (cache_guard.site_users); logs with RUN_SUMMARY/RESULT_JSON kept
+      (size_figs.py reads them); scratch dirs of the last 3 days kept (a running probe may use its own)
+    control: 'none: a deletion; the df change against the manifest''s total is the cross-check'
+    seeds: none
+    outcome: 'yes: DEBRIS_DONE, the manifest''s per-class totals near the inventory''s (smokes ~1.4, memmap ~4.8, scratch
+      ~2.2 GiB, logs), df used down by about the manifest''s total; no: the job stops before DEBRIS_DONE (manifest says what
+      was listed; a rerun recomputes the list and deletes only what is still there)'
   findings:
   - at: '2026-11-24T14:32:44+00:00'
     text: '2026-11-24 login-node reads: /sps/lpnhe 512 GiB group space at 98% (498 GiB used, 15 GiB free), .disk_full flag
