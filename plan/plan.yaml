@@ -44442,3 +44442,10 @@ entries:
       login node cuts site run sessions after 40 s-2 min of du/census: long reads go to scripts/job_disk_inventory.sh (htc).'
   step_waits:
     '1': a reviewer
+  targets:
+  - batch: disk_inventory
+    wall_h: 1.0
+    jobs: 1
+    units: null
+    start: '2026-11-24T14:35:28+00:00'
+    at: '2026-11-24T14:35:28+00:00'
