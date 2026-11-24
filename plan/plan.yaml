@@ -43588,6 +43588,55 @@ entries:
       10 largest validated extension fixes (non-test changes 35-87 lines, all lines 76-156, against round one''s 12-65), the
       plan arm answers D530''s designer-executor idea, qwen dropped per D541, no GPU work, ordering reads its outputs (re-validation
       before lab runs, plans before plan arm).'
+  - at: '2026-11-24T14:21:40+00:00'
+    question: 'How far does DeepSeek (deepseek-v4-flash through opencode in the bwrap sandbox) go on harder work than the
+      first round''s: larger multi-file tool fixes, alone and executing a Sonnet plan, against Sonnet on the same tasks and
+      copies; and code lookups against the recorded Opus-low Explore lookups; how many of our tokens does that save, counting
+      the Sonnet check D541 asks for? (D541: ''test a few more complicated tasks'')'
+    prior: '(1) docs/results.tex ''Which model for small tool fixes'' (about line 17686, src tools/model_trial.py report @d30cb3aa):
+      Sonnet 5.5 and Opus 5.5 low on the 10 model_trial fixes, 9/10 first pass each, 10/10 after rework (D213); also a dead
+      end on the agent_redesign entry. (2) This entry''s first round (analysis/lab_llm_trial/summary.json at 78d4af8ff): same
+      10 fixes, DeepSeek alone 8/10 first, 9/10 after rework, 0 of our tokens, 11.8 min mean; DeepSeek+plan 9/10, 189k our
+      tokens; timed Sonnet mechanical-worker 9/10, 297k, 3.7 min; log triage 30/30 auto, 29/30 hand. Those fixes change 12-65
+      lines outside tests. (3) model_trial_validate_ext_b/c/d.json: 30 candidates, 20 fail at the parent and pass at the fix,
+      never run by any model. (4) tools/lookup_trial.py (e6f0ef58e) and analysis/agent_redesign/lookup_trial.json: 10 code
+      lookups (TASKS) run by Opus 5.5 low-effort Explore agents in grep, grep2 and dead-end tool arms (D505 dropped lsp, graph,
+      batch), graded by correct() against its expected file:function keys; the 5 transcript-recall lookups need our transcripts
+      and are out (the sandbox hides them by design). Searched docs/results.tex (lab llm, deepseek, qwen, lpnllm, opencode,
+      lookup, model trial, multi-file), site decisions (D213, D505, D530, D531, D541), the agent_redesign entry.'
+    measure: 'Hard fixes: the 10 validated extension fixes with the largest fix diffs (76-156 changed lines, 35-87 outside
+      tests, 2-5 files: alphapow, valtotal, emastart, statssrc, topsampling, backlogdepth, recheck, inflight, endedrun, massconv);
+      harness of round one: model_trial brief and defect text, git-archive copy of the fix''s parent (no history) for every
+      arm, Sonnet included; check = the fix commit''s own tests on the tree left (model_trial.run_check + verdict against
+      the validate baseline), first pass and after one rework round fed the check output. Per arm: pass counts with the Wilson
+      95% interval (model_trial.wilson) beside each, read paired task by task (which tasks each arm fails); wall time; lab
+      tokens; our tokens = Sonnet planner (plan arm) + one Sonnet mechanical-worker check per DeepSeek fix (reads the diff
+      and the test output, says agree or not, as the routed flow does; its tokens counted and its verdict against the check
+      recorded) for the DeepSeek arms, the Sonnet fixer''s transcript for the Sonnet arm. Lookups: the 10 code lookups of
+      tools/lookup_trial.py TASKS, same question text, on a git-archive copy of trunk at the trial''s first agent''s start,
+      DeepSeek alone, graded by lookup_trial.correct() at e6f0ef58e with its keys (all expected items, no extra non-test caller),
+      tokens per lookup.'
+    check: 'The fix checks fail at the parent and pass at the fix (ext_b/c/d validation); before any lab run each of the 10
+      is re-validated in the sandbox grader (fails at parent, passes at fix), and a task failing that is replaced by the next
+      largest valid one, recorded. In round one the same kind of check separated arms (8/10 vs 9/10 first pass, rework recovered
+      one). Lookups: correct() scored the recorded arms differently on the same keys (val_combine 2 wrong of 9, is_cached_callers
+      1, het_loss 1), so the grade moves with the answerer.'
+    fixed: 'opencode 1.19.6, server-default temperature, sandbox as round one (only .venv-cpu mounted; no ~/work, transcripts,
+      ledger or keys); one rework round; every fix arm on its own git-archive copy of the parent; planner: one Sonnet Plan-type
+      subagent per task, same brief, own copy, no edits, plan of at most 60 lines; Sonnet fixer: one mechanical-worker per
+      task on its own archive copy, same brief and check; lookups: question text unchanged, 2 opencode sessions at a time
+      (D531).'
+    control: 'Hard fixes: the Sonnet mechanical-worker on the same 10 tasks and the same kind of archive copy (new runs).
+      Lookups: the Opus 5.5 low Explore agents of lookup_trial.json, plain grep and grep2 arms only (two runs per question,
+      as DeepSeek''s two), correctness and tokens as recorded; the dead-end tool arms only as evidence that the grade moves.'
+    seeds: One run per task per arm on fixes (as round one and D213); at 10 tasks near 0.8 the spread is about 1.3 tasks per
+      arm and 1.8 on a difference, so the fix verdict is indicative, read paired by task with Wilson intervals. Lookups twice
+      per question.
+    outcome: 'Hard fixes, indicative at this size: yes for a DeepSeek arm when its first pass is within one task of Sonnet''s,
+      the tasks it fails are not a superset pattern of a kind (no edit, wrong file, partial multi-file change) and our tokens
+      per fix, Sonnet check included, are at most 0.3x Sonnet''s: route multi-file fixes too, with the check. No: list which
+      tasks fail and how from the transcripts, keep hard fixes on Sonnet, try plan detail as the adaptation. Lookups: yes
+      at >= 9/10 in each run (the control''s grep arms'' level): route code lookups to DeepSeek; no: keep them on Explore.'
   step_waits:
     '2': the 10 timed Sonnet mechanical-worker fix agents (analysis/lab_llm_trial/sonnet_timed.json), graded by tools/lab_llm_trial.py
       sonnet_timed
