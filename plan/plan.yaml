@@ -44708,3 +44708,24 @@ entries:
     state: working
     since: '2026-11-24T17:21:44+00:00'
     state_at: '2026-11-24T17:21:44+00:00'
+  designs:
+  - at: '2026-11-24T17:27:42+00:00'
+    question: Does a maintain command run as a 1-CPU job on CC's htc partition (site run --recurring), read by the next supervisor
+      pass, give the supervisor the same output, exit code, events and flags (.disk_full) as the same command on CC's login
+      node, so the login node keeps only sbatch/squeue/short reads (CC support's request, D544)?
+    prior: 'none found: searched docs/results.tex (login node, sshfs, disk_watch), plan show cc_login_jobs, site decisions
+      (D544 only). Precedent: scripts/job_prune_dryrun.sh ran prune.caches as a CPU job because the glob outlasted site run''s
+      ssh on lxplus.'
+    measure: 'for disk_watch.py, feed_capped.py tp3_ and prune_site.sh ccin2p3: the job''s output and exit code as printed
+      by the supervisor''s next pass (its log in the supervise task output), the .disk_full flag''s mtime refreshed by the
+      job, sacct Elapsed of each ccj_ job (the per-command run time the inventory asks for)'
+    check: 'the last five supervisor passes (17:38-18:15) printed disk_watch''s ''still low ... flag .disk_full set'' and
+      feed_capped''s ''FEED 0: disk full'', the login-node baseline the job output is compared to'
+    fixed: the commands, their arguments and timeouts (now the job's wall time), the checkout and env (sites/activate.sh),
+      the item '*' gate, the supervisor's event rules
+    control: the same commands' login-node output in the supervisor passes before the switch (same day, same disk state)
+    seeds: none (deterministic upkeep); one job per command per pass
+    outcome: 'yes: the pass after submission prints the job''s result with the same lines and exit code as the login-node
+      run, no MAINTAIN/ALERT event is opened that the login run would not open, .disk_full is refreshed; no: a different output
+      or exit code, a missing flag, a job that fails on htc (sbatch from a job refused, env not found) - then that command
+      stays a login read capped at 60 s or is fixed before the switch'
