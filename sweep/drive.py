@@ -685,6 +685,7 @@ def main():
         if mine:
             sys.exit("drive.py: commit the configs first, nothing submitted:\n" + mine)
         synced, failed = [], []
+        head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True, stdout=subprocess.PIPE).stdout.strip()
         want = sorted(set(a.sites or ["ccin2p3", "lxplus"] + (["jeanzay"] if a.allow_jeanzay else [])))
         for s in want:
             log("sync %s" % s)
@@ -704,6 +705,12 @@ def main():
         if left and time.time() > retry_at:
             # a site left out at start-up by a transient failure (lxplus 2026-11-24) is synced again every 30 min
             retry_at = time.time() + 1800
+            now_head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True, stdout=subprocess.PIPE).stdout.strip()
+            if now_head != head:
+                # one search runs on one code version: a site rejoining at a later trunk commit would mix versions
+                log("sites %s stay out: trunk moved %s -> %s since start-up; restart the driver to include them"
+                    % (",".join(left), head[:9], now_head[:9]))
+                left = []
             for s in list(left):
                 try:
                     sync_site(s)
