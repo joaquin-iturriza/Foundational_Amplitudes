@@ -36697,6 +36697,52 @@ entries:
       0.0089 is 2.2x below), run in parallel with the repair, nothing ordered. The CC placement also removes the A100/H100
       pin question (HTCondor-only requirement). Note the fixed field cites @abc47ad9; at HEAD the b128 config differs only
       in the time limit (3 h -> 2 h, c57dd900), which should be cited.'
+  - at: '2026-11-24T02:20:47+00:00'
+    question: 'D514 (Joaquin 2026-11-20: ''maybe extending a bit the HPO would be smart''), the passed 2026-11-20 design continued,
+      revised after the 2026-11-24 FIX: do the D507 ratios (G, batch per optimiser, optimiser per batch) hold when each search
+      has 8 guided trials beyond its first 8, is the Muon b128 optimum bracketed by a window whose top is raised again, and
+      is that cell''s new best (hp0078) a seed-robust replacement of trial_0950? Owed: (a) 3 guided trials each in the Muon
+      b128 and Adam b2048 searches, repairing the 3 trials of each that re-ran the CC random start-up points (sampler defect
+      fixed @ab6215d5); (b) seeds 43, 44 of hp0078.'
+    prior: '2026-11-20 design (passed) and D507/D509 read (zng_d507 v1 @0d2064b7: G 1.12 [0.85,1.70], Muon batch ratio 3.20,
+      Muon/Adam b128 0.35; seed spread 1.15-1.74x). Extension so far (finding 2026-11-21; kit_curves sweep read 2026-11-24):
+      Adam b128 16 trials, best 0.0256 vs trial_0833 0.0313 (1.22x, choice stands); Muon b2048 16 on CC, best still trial_1333
+      0.0462; Adam b2048 5 guided + 3 repeats, best hp0775 lr 2.84e-3 0.0401 vs trial_1152 0.0431 (1.07x), inside its window;
+      Muon b128 5 guided + 3 repeats, best three hp0078 lr 9.24e-3 0.00708, hp1774 1.073e-2 0.0080, hp1006 1.086e-2 0.0086,
+      at log positions 0.95/0.99/0.99 of [2.7e-4,1.1e-2], val not rising with lr beyond the 1.02-1.38x same-HP cross-site
+      noise: the optimum is not bracketed. hp0078 x std^2 = 0.0089 against trial_0950''s three-seed mean 0.0197 (2.2x > 1.19
+      spread). Searched: results.tex, plan findings, site decisions D507, D509, D514: no other extension of these searches.'
+    measure: 'As the passed design: per cell the lowest-val trial of its searches (val MSE(ln|M|^2) = val mu-MSE x 1.1198^2),
+      three-seed means of the chosen trial, the D507 ratios on three-seed means with the range over seed pairings (benchmark.py
+      d507fig), test median |Delta| of a new chosen trial (job_kit.sh KIT_SCORE_DIR). Plus the Muon b128 best''s log position
+      in its new window [2.7e-4, 3.3e-2]. For hp0078: best val at seeds 43, 44 against its seed-42 0.0089 and trial_0950''s
+      0.018/0.021/0.020.'
+    check: 'The measure moves with lr inside these searches: Muon b128 0.0071-0.0334 (4.7x) over lr 4.3e-4-1.09e-2, Adam b2048
+      0.0401-0.081 (2.0x) (lxplus results read 2026-11-24). D509 seeds moved best val 1.15-1.74x at fixed HPs, the bar a replacement
+      must clear.'
+    fixed: 'Everything of sweep/sweep_config_tp_zng_d1e4_*_zgggg.yaml (1e4 Z+4g events, 1953/31250 steps, HETEROSC, mu_mse
+      selection, seed 42, spaces), b2048 configs @abc47ad9, Muon b128 config @HEAD (time limit 2 h @c57dd900, lr top 3.3e-2
+      @this commit). Placement per site pick FA --jobs 6 --groups 2 and --jobs 2 (2026-11-24: all to CC, lxplus 0 GPUs fit):
+      the repair trials run on each search''s original CC copy, brought to the lxplus state first: Muon b128 extend_sweep
+      --param training.lr --high 3.3e-2 plus the 8 lxplus observations folded (--fold-points, filtered to those not already
+      CC''s, matched on val_loss and lr: 0.0071..0.0334), Adam b2048 its 8 lxplus observations folded (0.0401..0.081); each
+      CC state then holds the lxplus search''s 16 observations, start-up consumed; generate_sweep --extend --n-trials 3 --submit,
+      one wave of 3 per search. Seeds via sweep/run_fixed_hp.py (scripts/job_seed_batch.sh), hp0078''s HPs from its saved
+      config.yaml (analysis/zng_uq/seed_chunks/d514_muon_b128_hp0078_s{43,44}.txt @2feab608), evaluation.train_subsample=2000
+      as D509.'
+    control: Each cell's D507 8-trial choice and its D509 seeds 43/44; for hp0078, trial_0950 at seeds 42/43/44; across cells
+      the 2x2 neighbours as D507.
+    seeds: Trials seed 42; chosen trials at 42, 43, 44 (D509 seeds reused where the choice is unchanged); hp0078 seeds 43,
+      44 now; a repair trial that beats hp0078 by more than the spread gets its own 43/44.
+    outcome: 'Muon b128 window: the best of its searches well inside [2.7e-4, 3.3e-2] (log position < 0.9) -> optimum bracketed,
+      ratios re-read on it; at the new top edge again -> the window is still the limit, reported, unresolved. hp0078 seeds:
+      three-seed mean below trial_0950''s (0.0197) by more than the 1.19x spread -> Muon b128 replaced, the Muon batch ratio
+      and b128 optimiser ratio re-read; within it -> D507 choice reinstated. Repair trials: a new best beyond the cell''s
+      spread -> that trial chosen, seeds 43/44 (<= 2 more runs, 2 GPU-h); else the choice stands. Bands as before: G >= 3
+      or <= 1/3 a protocol leads, else unresolved; batch ratios >= 3 for both optimisers -> batch carries it. Cost: seeds
+      2 x 1.0 h (CC V100 0.0886 s/step x 31250 + 0.25 h), Muon b128 3 x 1.0 h on CC, Adam b2048 3 x 0.35 h: 6.1 GPU-h; possible
+      2 more seeds 2 GPU-h; test scoring <= 0.4: <= 8.5 GPU-h. Wall: one wave of each at site pick''s width (CC 12 at once),
+      ~1.0 h.'
   step_waits:
     '3': sweeps ccin2p3:tp_zng_d1e4_muon_b2048_zgggg lxplus:tp_zng_d1e4_muon_b128_zgggg lxplus:tp_zng_d1e4_adam_b2048_zgggg
       (then 3 repair trials each in muon_b128 and adam_b2048 on lxplus)
