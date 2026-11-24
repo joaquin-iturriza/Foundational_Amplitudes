@@ -40415,6 +40415,7 @@ entries:
       FA-ccin2p3-28ebe295 FA-ccin2p3-fda4f5d8 FA-ccin2p3-8af63c94 FA-ccin2p3-f562fe47 FA-ccin2p3-53ea523f FA-ccin2p3-ac28ce01
       FA-ccin2p3-c9d78b1f FA-ccin2p3-bfce7d54 FA-ccin2p3-2b2f8505 FA-ccin2p3-49028220 FA-ccin2p3-f5422b66 FA-ccin2p3-426dd488
       FA-ccin2p3-2a97ba03 FA-ccin2p3-918e9e20 FA-ccin2p3-fe745f7c
+    '4': FA-ccin2p3-f5422b66 FA-ccin2p3-426dd488 FA-ccin2p3-2a97ba03 FA-ccin2p3-918e9e20 FA-ccin2p3-fe745f7c
   handoff:
     state: '2026-11-24 ~15:45. Step 1 done: D=1e3 Fn1k/S1k 0.486 [0.454,0.522] (results.tex 9fc114a6e, fig zng4g_d1e3). Step
       2: gluon parent FA-ccin2p3-1f2d9ad5 ended; parent check (parent_rerun_check.py glu --ref noset) gmean 5.04x worse on
