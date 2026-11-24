@@ -45147,6 +45147,15 @@ entries:
       via uv (design passed 22:15 UTC): job 64802032, the exact bootstrap recipe in scratchpad boot.txt; sites.yaml change
       waits on its result. xformers is unpinned in requirements.txt (the job prints live vs fresh versions). CC /sps had 9
       GB free at 23:00 (coordinator).'
+  - at: '2026-11-24T23:17:21+00:00'
+    text: 'CC env rebuild test, job 64802032 (ended 2026-11-24 23:22, exit 0): the bootstrap recipe (module python/3.13.7,
+      uv python install 3.11.7 under /sps/lpnhe/jiturrizaramirez01/python, 81 MB) gave an interpreter that runs; pip install
+      -r requirements.txt into a fresh venv in TMPDIR passed (pip check clean) and imported torch, numpy, scipy, h5py, xformers,
+      torch_geometric, gpytorch, lloca, mup and experiment/models.lloca: python 3.11.7, torch 2.1.2+cu118, numpy 1.26.4, xformers
+      0.0.23.post1+cu118, equal to the live venv''s (live xformers 0.0.23.post1+cu118, pyg 2.6.1, gpytorch 1.11). Committed
+      as sites.yaml env.python/python_bin (65872c784); site env --check renders it. The design''s yes branch; the live .venv
+      untouched (its interpreter still links into anaconda 3.11: a site env --rebuild ccin2p3 FA moves it to the uv Python
+      when CC removes that install).'
   step_waits: {}
   step_why:
     2:
