@@ -45149,7 +45149,18 @@ entries:
       pasted LaTeX template); 2026-11-10T02:08 (draft and slide uploads); 2026-10-26T17:18 (settings warnings relayed from
       another session)
     blocks: the cluster-side gate test only
-    blocks_steps: &id005 []
+    blocks_steps: []
+  - ask: 'Permission classifier refusal: copying your typed message into the kit''s test HOME so the toy''s ledger could record
+      a decision was refused, so the site-side gate and work items stay untested on CC. (1) Do you want them tested, by typing
+      one sentence (e.g. ''run the toy once on CC'') in a Claude session started in the toy checkout? (2) Which license for
+      the public kit (MIT recommended)?'
+    at: '2026-11-24T22:08:14+00:00'
+    searched: 'site decisions --project FA: D546, D547 (license answered ''Does it matter?'', none named; no gate-test decision);
+      CLAUDE.md rules settle neither. Messages that share terms, none settling it: 2026-11-14T04:31 (a SciPost LaTeX template
+      paste), 2026-11-10T02:08 (file uploads for slides), 2026-11-20T15:11 (about a sweep''s trial counts and a ledger refusal
+      elsewhere).'
+    blocks_steps: &id005
+    - 2
   owner:
     agent: a4e37f36ae6953ad8
     state: closed
@@ -45176,13 +45187,15 @@ entries:
       (kit HOME, toy at work/toy); /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/ksite
       (wrapper); CC: /sps/lpnhe/jiturrizaramirez01/kit_proof, ~/.ccorch_kit'
     written: '2026-11-24T22:03:39+00:00'
-  ask: 'Scope: testing the kit''s cluster-side submission gate on CC. It needs one sentence typed by Joaquin (e.g. ''run the
-    toy once on CC'') in a Claude session started in the toy checkout (scratchpad kithome/work/toy), because the kit''s ledger
-    only accepts his own typed words. Do you want it tested, or the README lists the gate as untested on a cluster?'
-  waiting_since: '2026-11-24T21:24:12+00:00'
-  searched: D546, D547; 2026-11-24T19:13, 2026-11-24T19:53 (kit requests, silent on the gate test); 2026-11-14T04:31 (a pasted
-    LaTeX template); 2026-11-10T02:08 (draft and slide uploads); 2026-10-26T17:18 (settings warnings relayed from another
-    session)
+  ask: 'Permission classifier refusal: copying your typed message into the kit''s test HOME so the toy''s ledger could record
+    a decision was refused, so the site-side gate and work items stay untested on CC. (1) Do you want them tested, by typing
+    one sentence (e.g. ''run the toy once on CC'') in a Claude session started in the toy checkout? (2) Which license for
+    the public kit (MIT recommended)?'
+  waiting_since: '2026-11-24T22:08:14+00:00'
+  searched: 'site decisions --project FA: D546, D547 (license answered ''Does it matter?'', none named; no gate-test decision);
+    CLAUDE.md rules settle neither. Messages that share terms, none settling it: 2026-11-14T04:31 (a SciPost LaTeX template
+    paste), 2026-11-10T02:08 (file uploads for slides), 2026-11-20T15:11 (about a sweep''s trial counts and a ledger refusal
+    elsewhere).'
   designs:
   - at: '2026-11-24T20:08:44+00:00'
     question: 'Does the published orchestrator-kit, installed under a separate HOME with its own remote state dir (~/.ccorch_kit
@@ -45292,8 +45305,6 @@ entries:
     units: null
     start: '2026-11-24T20:14:13+00:00'
     at: '2026-11-24T20:14:13+00:00'
-  blocks: the cluster-side gate test only
-  blocks_steps: *id005
   findings:
   - at: '2026-11-24T22:03:55+00:00'
     text: 'Kit proven end to end on CC-IN2P3 under a separate HOME (ledger off): env CPU job exit 0, pick allots ccin2p3,
@@ -45306,3 +45317,4 @@ entries:
       if:
       - 'license named: add LICENSE, push'
       - 'gate test wanted: rerun proof with ledger on'
+  blocks_steps: *id005
