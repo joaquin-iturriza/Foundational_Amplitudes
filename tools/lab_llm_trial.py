@@ -264,6 +264,44 @@ def fix(task, arm, plan=None):
     print(json.dumps({k: r[k] for k in ("task", "arm", "first_pass", "final_pass", "seconds")}))
 
 
+PLANNER = ("Task (lab LLM trial, planner: you plan one fix, a weaker model carries it out). Work only in the copy %s "
+           "(this repository at an older commit, no history); read files there by absolute path, never in ~/work/FA "
+           "itself. No jobs, no site commands, no plan.py writes, no reviewers, no other agents.\n\nThe defect, as it "
+           "was seen:\n%s\n\nThe check:\n%s\n\nYou do NOT edit any file in that copy. Read the code (and run the "
+           "tests there with %s if useful) until you know the cause and the fix. Then write, with one bash heredoc "
+           "(cat > FILE <<'EOF' ... EOF, the only command that writes), a plan of at most 60 lines to %s for a weaker "
+           "executor model that will get the same task text plus your plan and will work in an identical copy: the "
+           "files and functions to change, the change itself (code snippets allowed), and the command that runs the "
+           "tests. No other files, no commits. End with one line: PLAN WRITTEN.")
+
+
+def briefs(task):
+    """The hard round's Sonnet briefs (planner and fixer), each on its own fresh copy; written to the scratch dir."""
+    _, _, defect = mt.TASKS[task]
+    d, repo = fix_setup(task, "planner")
+    out = os.path.join(OUT, "plans", task + ".txt")
+    open(os.path.join(SCR, "planner_%s.txt" % task), "w").write(
+        PLANNER % (repo, defect, mt.INTERFACE[task], mt.PY, out))
+    d, repo = fix_setup(task, "sonnet")
+    open(os.path.join(SCR, "sonnet_%s.txt" % task), "w").write(
+        fix_brief(task, repo).replace("git worktree", "copy").replace(" (detached HEAD)", ""))
+    print(task, os.path.join(SCR, "planner_%s.txt" % task), os.path.join(SCR, "sonnet_%s.txt" % task))
+
+
+def grade_sonnet(task, agent):
+    """The hard round's Sonnet fixer: its copy graded by the sandbox grader as the lab arms, its transcript's wall
+    time and tokens (lab_llm_report.transcript)."""
+    from lab_llm_report import transcript
+    d = os.path.join(SCR, "fix_%s_sonnet" % task)
+    g = fix_grade(task, d, os.path.join(d, "repo"))
+    sec, tok = transcript(agent)
+    r = {"family": "hardfix", "task": task, "arm": "sonnet", "model": "sonnet (mechanical-worker)", "agent": agent,
+         "first_pass": g["passed"], "final_pass": g["passed"], "seconds": round(sec, 1), "our_tokens": tok,
+         "usd": mt.cost(agent)["usd"], "usage": {}, "rc": 0, "failing_first": g.get("failing")}
+    record(r)
+    print(json.dumps({k: r[k] for k in ("task", "arm", "first_pass", "seconds", "our_tokens")}))
+
+
 # ---------------------------------------------------------------- triage family
 DIVERGED = re.compile(r"Training diverged.*?at step (\d+)")
 ASSERT = re.compile(r"^AssertionError: ?(.*)$", re.M)
@@ -369,7 +407,7 @@ def sonnet_timed():
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["cases", "smoke", "fix", "fixcheck", "triage", "_grade", "report", "sonnet_timed"])
+    ap.add_argument("cmd", choices=["cases", "smoke", "fix", "fixcheck", "briefs", "grade_sonnet", "triage", "_grade", "report", "sonnet_timed"])
     ap.add_argument("args", nargs="*")
     ap.add_argument("--plan")
     a = ap.parse_args()
@@ -379,6 +417,11 @@ def main():
         smoke(a.args[0])
     elif a.cmd == "fix":
         fix(a.args[0], a.args[1], a.plan)
+    elif a.cmd == "briefs":
+        for t in a.args:
+            briefs(t)
+    elif a.cmd == "grade_sonnet":
+        grade_sonnet(a.args[0], a.args[1])
     elif a.cmd == "fixcheck":
         for t in a.args:
             fixcheck(t)
