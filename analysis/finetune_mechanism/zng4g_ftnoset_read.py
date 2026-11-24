@@ -7,7 +7,9 @@ Measure: best val MSE(log|M|^2) = min val mu-MSE x std^2 (std 1.11978). Fn: the 
 and its seeds 43, 44 (runs/ftmech_zng4g_ftnoset_b<B>_s<s> on CC, missing ones skipped and counted). Ratios of three-seed
 means with the 10-90% range over the seed pairings. S at b2048: the D507 chosen trial's three seeds; at b128: hp0078's
 three seeds (analysis/zng_uq/data/d507_v2.json, d507_search_v2.json), the 8-trial trial_0950 kept as 'S8'.
-Sf* and F from zng4g_r1_b<B>.json.
+Sf* and F from zng4g_r1_b<B>.json. At b128 also Fg, the fine-tune from the 9-process gluon/Z parent (FA-ccin2p3-1f2d9ad5,
+search ftmech_zng4g_ftglu_b128, seeds as Fn): Fg/Fn and Fg/S with the 2-sigma interval of zng4g_d1e3_read.ratio
+(dilution design: hi < 1 dilution yes, lo > 0.65 and hi >= 1 no effect of the needed size, lo > 1 gluon worse).
 
     python3 analysis/finetune_mechanism/zng4g_ftnoset_read.py 2048|128 [--cached]
         -> data/zng4g_ftnoset_b<B>.json, figs/zng4g_ftnoset_b<B>
@@ -25,6 +27,7 @@ import numpy as np  # noqa: E402
 from analysis.common.readers import site_python  # noqa: E402
 from zng4g_readout import analyse, driven, CC  # noqa: E402
 from zng4g_r1_read import REMOTE  # noqa: E402
+from zng4g_d1e3_read import ratio as ratio2s  # noqa: E402
 
 YES_BAR, PARTIAL_BAR = 1.19, 0.79   # design outcome: Fn/S <= 1.19 yes; Fn/F < 0.79 partial
 
@@ -39,17 +42,18 @@ def ratio(num, den):
 
 def main():
     b = sys.argv[1]
-    name = f"ftmech_zng4g_ftnoset_b{b}"
+    names = {"Fn": f"ftmech_zng4g_ftnoset_b{b}", **({"Fg": "ftmech_zng4g_ftglu_b128"} if b == "128" else {})}
     cache = os.path.join(HERE, "data", f"zng4g_ftnoset_raw_b{b}.json")
     if "--cached" in sys.argv:
         raw = json.load(open(cache))
     else:
         items = {"ccin2p3": [], "lxplus": []}
-        for ti, hp, v, site, rd, rp in driven(name):
-            items[site].append(f"'Fn|{b}|t{ti}|hp{hp}#{rd}#{rp}'")
-        for s in (43, 44):
-            n = f"{name}_s{s}"
-            items["ccin2p3"].append(f"'Fn|{b}|s{s}#{CC}/runs/{n}#{CC}/sweeps/{n}/results/fixed.json'")
+        for arm, name in names.items():
+            for ti, hp, v, site, rd, rp in driven(name):
+                items[site].append(f"'{arm}|{b}|t{ti}|hp{hp}#{rd}#{rp}'")
+            for s in (43, 44):
+                n = f"{name}_s{s}"
+                items["ccin2p3"].append(f"'{arm}|{b}|s{s}#{CC}/runs/{n}#{CC}/sweeps/{n}/results/fixed.json'")
         raw = {}
         for site, args in items.items():
             if args:
@@ -59,14 +63,23 @@ def main():
     k2 = base["std"] ** 2
     r1 = json.load(open(os.path.join(HERE, "data", f"zng4g_r1_b{b}.json")))
     r1raw = json.load(open(os.path.join(HERE, "data", f"zng4g_r1_raw_b{b}.json")))
-    ts = [(int(k.split("|")[2][1:]), v) for k, v in raw.items() if k.startswith(f"Fn|{b}|t")]
-    assert len(ts) == 16 and all(isinstance(v["lr"], float) and v["val_loss"] is not None for _, v in ts), len(ts)
-    ti, ch = min(ts, key=lambda t: t[1]["val_loss"])
-    assert abs(min(ch["val_mse_curve"]) / ch["val_loss"] - 1) < 1e-6
-    fn_seeds = [42] + [s for s in (43, 44) if raw.get(f"Fn|{b}|s{s}", {}).get("val_mse_curve")]
-    fn_curves = [ch["val_mse_curve"]] + [raw[f"Fn|{b}|s{s}"]["val_mse_curve"] for s in fn_seeds[1:]]
-    curves = {"Fn": [np.array(c) * k2 for c in fn_curves], "F": [np.array(c) for c in base["curves"]["F"]]}
-    best = {"Fn": [float(c.min()) for c in curves["Fn"]], "F": r1["best"]["F"], "Sf": r1["best"]["Sf"]}
+    curves = {"F": [np.array(c) for c in base["curves"]["F"]]}
+    best = {"F": r1["best"]["F"], "Sf": r1["best"]["Sf"]}
+    chosen, trials, ft_seeds = {}, {}, {}
+    for arm in names:
+        ts = [(int(k.split("|")[2][1:]), v) for k, v in raw.items() if k.startswith(f"{arm}|{b}|t")]
+        assert len(ts) == 16 and all(isinstance(v["lr"], float) and v["val_loss"] is not None for _, v in ts), len(ts)
+        ti, ch = min(ts, key=lambda t: t[1]["val_loss"])
+        assert abs(min(ch["val_mse_curve"]) / ch["val_loss"] - 1) < 1e-6
+        sd = [42] + [s for s in (43, 44) if raw.get(f"{arm}|{b}|s{s}", {}).get("val_mse_curve")]
+        assert all(abs(raw[f"{arm}|{b}|s{s}"]["lr"] / ch["lr"] - 1) < 1e-9 for s in sd[1:]), "seeds of the chosen trial"
+        cs = [ch["val_mse_curve"]] + [raw[f"{arm}|{b}|s{s}"]["val_mse_curve"] for s in sd[1:]]
+        curves[arm] = [np.array(c) * k2 for c in cs]
+        best[arm] = [float(c.min()) for c in curves[arm]]
+        chosen[arm] = {"trial": ti, "hp": next(k.split("|")[3] for k, v in raw.items() if v is ch), "lr": ch["lr"]}
+        trials[arm] = sorted((v["lr"], v["val_loss"] * k2, i) for i, v in ts)
+        ft_seeds[arm] = sd
+    fn_curves = curves["Fn"]
     if b == "128":
         d = json.load(open(os.path.join(ROOT, "analysis", "zng_uq", "data", "d507_v2.json")))
         srch = json.load(open(os.path.join(ROOT, "analysis", "zng_uq", "data", "d507_search_v2.json")))
@@ -80,21 +93,27 @@ def main():
     best["S"] = [float(c.min()) for c in curves["S"]]
     mean = {a: float(np.mean(v)) for a, v in best.items()}
     res = {"batch": b, "std": base["std"], "best": best, "mean": mean, "n_seeds_Fn": len(fn_curves),
-           "Fn_chosen": {"trial": ti, "hp": next(k.split("|")[3] for k, v in raw.items() if v is ch), "lr": ch["lr"]},
+           "Fn_chosen": chosen["Fn"], **({"Fg_chosen": chosen["Fg"]} if "Fg" in chosen else {}),
            "Fn_over_S": ratio(best["Fn"], best["S"]), "Fn_over_F": ratio(best["Fn"], best["F"]),
            "F_over_S": ratio(best["F"], best["S"]), "Sf_over_S": ratio(best["Sf"], best["S"])}
     sh = [np.log(a / s) / np.log(f / s) for a, s, f in itertools.product(best["Sf"], best["S"], best["F"])]
     res["share"] = {"mean": float(np.log(mean["Sf"] / mean["S"]) / np.log(mean["F"] / mean["S"])), "q10_50_90": q(sh)}
     if b == "128":
         res["Fn_over_S8"] = ratio(best["Fn"], best["S8"])
+        if len(best["Fg"]) == 3 and len(best["Fn"]) == 3:
+            res["Fg_over_Fn"] = ratio2s(np.array(best["Fg"]), np.array(best["Fn"]))
+            res["Fg_over_S"] = ratio2s(np.array(best["Fg"]), np.array(best["S"]))
+            x = res["Fg_over_Fn"]
+            x["read"] = ("dilution yes" if x["hi"] < 1 else "gluon worse" if x["lo"] > 1 else
+                         "no effect of the needed size" if x["lo"] > 0.65 else "unresolved")
     fs, ff = res["Fn_over_S"]["mean"], res["Fn_over_F"]["mean"]
     res["branch"] = ("yes" if fs <= YES_BAR else "partial" if ff < PARTIAL_BAR else "unresolved") + " (this batch)"
-    seeds = {a: fn_seeds if a == "Fn" else [42, 43, 44] for a in curves}   # each run's real seed
+    seeds = {a: ft_seeds.get(a, [42, 43, 44]) for a in curves}   # each run's real seed
     assert all(len(seeds[a]) == len(cs) for a, cs in curves.items()), {a: len(cs) for a, cs in curves.items()}
     res["blowups"] = {a: [seeds[a][i] for i, c in enumerate(cs) if np.any(c > 10 * np.minimum.accumulate(c))]
                       for a, cs in curves.items()}
     res["best_at"] = {a: [(int(np.argmin(c)) + 1) / len(c) for c in cs] for a, cs in curves.items()}
-    res["trials"] = {"Fn": sorted((v["lr"], v["val_loss"] * k2, i) for i, v in ts),
+    res["trials"] = {**trials,
                      "F": sorted((t[0], t[1], t[2]) for t in r1["trials"]["Fx"] if t[1] and t[2] < 16)}
     json.dump(res, open(os.path.join(HERE, "data", f"zng4g_ftnoset_b{b}.json"), "w"), indent=1)
     print(json.dumps({k: v for k, v in res.items() if k != "trials"}))   # one line: verify_claims reads the last {...} line
@@ -110,6 +129,8 @@ def plot(res, curves):
             ("Fn", "fine-tuned,\nparent without settings", ps.C.green, "^")]
     if b == "128":
         arms.insert(1, ("S8", "from scratch,\n8-trial search", ps.C.blue, "o"))
+    if "Fg" in res["best"]:
+        arms.append(("Fg", "fine-tuned,\n9-process parent", ps.C.purple, "v"))
     fig, axs = ps.figure(ncols=2, nrows=2)
     a, l, c, leg = axs[0][0], axs[0][1], axs[1][0], axs[1][1]
     for i, (k, lab, col, m) in enumerate(arms):
