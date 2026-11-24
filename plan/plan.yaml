@@ -44248,6 +44248,7 @@ entries:
       - 'smoke breaks: fix the accumulation or stop path from its log, re-smoke; the 6 wave-3 CC jobs go out regardless'
   step_waits:
     '1': sweeps ccin2p3:cbs_b2048, ccin2p3:cbs_b4096, ccin2p3:cbs_b8192, ccin2p3:cbs_b16384, lxplus:cbs_b32768
+    '2': sweep lxplus:cbs_smoke_b32768 (submission in flight from this turn)
   targets:
   - batch: noise_smoke
     wall_h: 0.4
