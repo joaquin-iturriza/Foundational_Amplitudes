@@ -42063,3 +42063,10 @@ entries:
       analysis/agent_redesign/model_trial_baseline/{zsrole,ordsrc}.json (regenerated); /tmp/claude-1000/lab_llm_trial/ (run
       dirs, rerun scripts)
     written: '2026-11-23T23:02:36+00:00'
+  targets:
+  - batch: labllm_rerun
+    wall_h: 2.5
+    jobs: 2
+    units: null
+    start: '2026-11-24T00:26:58+00:00'
+    at: '2026-11-24T00:26:58+00:00'
