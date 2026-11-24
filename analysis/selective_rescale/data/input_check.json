@@ -1,0 +1,222 @@
+{
+ "N": 20000,
+ "pools": {
+  "zgggg": {
+   "x_q001": 0.0334932259,
+   "x_min": 0.01735,
+   "schemes": {
+    "rescale eps=1e-08": {
+     "share_particles_changed": 1.0,
+     "share_events_changed": 1.0,
+     "compression": 2.8493661902811747,
+     "xp_q001": 0.8156196379609391,
+     "r_pred": 2.186981312070936
+    },
+    "rescale eps=0.0001": {
+     "share_particles_changed": 1.0,
+     "share_events_changed": 1.0,
+     "compression": 2.0860938035189274,
+     "xp_q001": 0.6315560706456951,
+     "r_pred": 1.7734104446056251
+    },
+    "rescale eps=0.01": {
+     "share_particles_changed": 1.0,
+     "share_events_changed": 1.0,
+     "compression": 1.2758683928389112,
+     "xp_q001": 0.3185225823944044,
+     "r_pred": 1.4196240413559382
+    },
+    "rescale eps=1": {
+     "share_particles_changed": 1.0,
+     "share_events_changed": 1.0,
+     "compression": 0.15552034543724685,
+     "xp_q001": 0.04752893255016843,
+     "r_pred": 1.0436358166099031
+    },
+    "massless eps=1e-08": {
+     "share_particles_changed": 0.8,
+     "share_events_changed": 1.0,
+     "compression": 2.271596817485659,
+     "xp_q001": 0.1681365172,
+     "r_pred": 1.8660972907513798
+    },
+    "soft-only x0=1": {
+     "share_particles_changed": 0.99751,
+     "share_events_changed": 1.0,
+     "compression": 2.8421085395174037,
+     "xp_q001": 0.8156196379609391,
+     "r_pred": 2.182626626551578
+    },
+    "soft-only x0=0.3": {
+     "share_particles_changed": 0.43461,
+     "share_events_changed": 0.993,
+     "compression": 1.2216156192410792,
+     "xp_q001": 0.2617968950474649,
+     "r_pred": 1.3986292128377764
+    },
+    "soft-only x0=0.1": {
+     "share_particles_changed": 0.05831,
+     "share_events_changed": 0.2517,
+     "compression": 0.16095854471682422,
+     "xp_q001": 0.09321367238210747,
+     "r_pred": 1.0451956450710431
+    },
+    "soft-only x0=0.05": {
+     "share_particles_changed": 0.00564,
+     "share_events_changed": 0.02685,
+     "compression": 0.01534601265906855,
+     "xp_q001": 0.04870119599284431,
+     "r_pred": 1.0042233729569827
+    },
+    "soft-only x0=0.03": {
+     "share_particles_changed": 0.00056,
+     "share_events_changed": 0.0027,
+     "compression": 0.0015067360253594544,
+     "xp_q001": 0.0334932259,
+     "r_pred": 1.0004138809415242
+    },
+    "event gate t=0.1": {
+     "share_particles_changed": 0.2517,
+     "share_events_changed": 0.2517,
+     "compression": 0.7149910609355465,
+     "xp_q001": 0.1008149995,
+     "r_pred": 1.21696272595352
+    },
+    "event gate t=0.05": {
+     "share_particles_changed": 0.02685,
+     "share_events_changed": 0.02685,
+     "compression": 0.07599836584823927,
+     "xp_q001": 0.0520557785,
+     "r_pred": 1.021090783490216
+    },
+    "event gate t=0.03": {
+     "share_particles_changed": 0.0027,
+     "share_events_changed": 0.0027,
+     "compression": 0.007620955465580842,
+     "xp_q001": 0.0367251877,
+     "r_pred": 1.0020951367699726
+    }
+   }
+  },
+  "uug": {
+   "x_q001": 0.046021381900000005,
+   "x_min": 0.0117546,
+   "schemes": {
+    "rescale eps=1e-08": {
+     "share_particles_changed": 1.0,
+     "share_events_changed": 1.0,
+     "compression": 2.8859385597682654,
+     "xp_q001": 0.8328699676378608,
+     "r_pred": 2.209057770078002
+    },
+    "rescale eps=0.0001": {
+     "share_particles_changed": 1.0,
+     "share_events_changed": 1.0,
+     "compression": 2.1638297383271863,
+     "xp_q001": 0.6659683462989742,
+     "r_pred": 1.811677366656471
+    },
+    "rescale eps=0.01": {
+     "share_particles_changed": 1.0,
+     "share_events_changed": 1.0,
+     "compression": 1.4297227116022166,
+     "xp_q001": 0.3733701710780778,
+     "r_pred": 1.480892770970606
+    },
+    "rescale eps=1": {
+     "share_particles_changed": 1.0,
+     "share_events_changed": 1.0,
+     "compression": 0.23892828052704207,
+     "xp_q001": 0.06491234222829442,
+     "r_pred": 1.0678175978200706
+    },
+    "soft-only x0=1": {
+     "share_particles_changed": 1.0,
+     "share_events_changed": 1.0,
+     "compression": 2.8859385597682654,
+     "xp_q001": 0.8328699676378608,
+     "r_pred": 2.209057770078002
+    },
+    "soft-only x0=0.3": {
+     "share_particles_changed": 0.08553333333333334,
+     "share_events_changed": 0.2566,
+     "compression": 0.24106589893586358,
+     "xp_q001": 0.26733389113948336,
+     "r_pred": 1.0684446492129016
+    },
+    "soft-only x0=0.1": {
+     "share_particles_changed": 0.007583333333333333,
+     "share_events_changed": 0.02275,
+     "compression": 0.020894242119196715,
+     "xp_q001": 0.09518513861973739,
+     "r_pred": 1.0057546862397946
+    },
+    "soft-only x0=0.05": {
+     "share_particles_changed": 0.0012166666666666667,
+     "share_events_changed": 0.00365,
+     "compression": 0.00330079206236354,
+     "xp_q001": 0.049731224755561736,
+     "r_pred": 1.00090690839723
+    },
+    "soft-only x0=0.03": {
+     "share_particles_changed": 0.00031666666666666665,
+     "share_events_changed": 0.00095,
+     "compression": 0.0008500526117895848,
+     "xp_q001": 0.046021381900000005,
+     "r_pred": 1.0002334774270645
+    },
+    "event gate t=0.1": {
+     "share_particles_changed": 0.02275,
+     "share_events_changed": 0.02275,
+     "compression": 0.06505169570451841,
+     "xp_q001": 0.105906606,
+     "r_pred": 1.0180257011695548
+    },
+    "event gate t=0.05": {
+     "share_particles_changed": 0.00365,
+     "share_events_changed": 0.00365,
+     "compression": 0.01038778514473796,
+     "xp_q001": 0.06082688570000001,
+     "r_pred": 1.0028568733111516
+    },
+    "event gate t=0.03": {
+     "share_particles_changed": 0.00095,
+     "share_events_changed": 0.00095,
+     "compression": 0.0026948423165624393,
+     "xp_q001": 0.051260490900000004,
+     "r_pred": 1.000740359194679
+    }
+   }
+  }
+ },
+ "calib": {
+  "slope": 0.27463026666097706,
+  "points": {
+   "1e-08": 2.8493661902811747,
+   "0.0001": 2.0860938035189274,
+   "0.01": 1.2758683928389112,
+   "1.0": 0.15552034543724685
+  },
+  "resid_max": 0.09710455085087233
+ },
+ "soft_xp": {
+  "1e-07": {
+   "off": 1e-07,
+   "rescale eps=1e-08": 0.13017408557411078,
+   "soft-only x0=1": 0.13017408557411078,
+   "soft-only x0=0.3": 0.04178316684986107,
+   "soft-only x0=0.1": 0.014877038267102998,
+   "soft-only x0=0.05": 0.007772782017097126,
+   "soft-only x0=0.03": 0.004823405125189313
+  },
+  "1e-06": {
+   "off": 1e-06,
+   "rescale eps=1e-08": 0.25054017158682007,
+   "soft-only x0=1": 0.25054017158682007,
+   "soft-only x0=0.3": 0.08041817037420301,
+   "soft-only x0=0.1": 0.02863316230496313,
+   "soft-only x0=0.05": 0.014959921797658964,
+   "soft-only x0=0.03": 0.009283389565349999
+  }
+ }
+}
