@@ -44138,7 +44138,7 @@ entries:
     - FA-ccin2p3-225d38ea
     - FA-ccin2p3-6721d3c2
     - FA-lxplus-35cf0097
-    commit: f3705b316
+    commit: 6511b281f
     paths:
     - analysis/critical_batch/cbs_read.py
     - analysis/critical_batch/data/FA-ccin2p3-225d38ea_noise_scale.json
