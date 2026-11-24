@@ -161,7 +161,8 @@ def plot_u(res, curves):
         ax.set_yscale("log"); ax.set_xlabel("training progress (step / 1953)")
         ax.set_ylabel(r"val MSE$(\log|\mathcal{M}|^2)$")
         ps.process_label(ax, rf"$e^+e^-\to u\bar ug$, $D_{{\rm train}}=10^{d[-1]}$")
-    g.plot([], [], "o", color="0.5", mfc="none", label="blew up (read\nat its best)")
+    if blown:
+        g.plot([], [], "o", color="0.5", mfc="none", label="blew up (read\nat its best)")
     ps.legend_cell(cell, g)
     ps.save(fig, os.path.join(HERE, "figs", TAG))
 
