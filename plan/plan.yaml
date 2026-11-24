@@ -43716,6 +43716,7 @@ entries:
   step_waits:
     '1': claudemd-keeper ae9b595669c374fca, repo-reviewer a51cecd03c33e3d65
     '2': '2026-11-25'
+    '3': detach:labllm_scenario_revalidate2 (pid 2921310)
   findings:
   - at: '2026-11-23T19:55:22+00:00'
     text: 'Local batch width cut from 6 parallel opencode streams to 2 (D531): 6 streams of opencode sessions (~350-400 MB
