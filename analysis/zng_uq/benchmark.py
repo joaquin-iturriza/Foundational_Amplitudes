@@ -768,7 +768,7 @@ def d507fig(data, search, v2=False):
                               "batch_adam": t["adam_b2048"] / t["adam_b128"], "opt_b2048": t["muon_b2048"] / t["adam_b2048"],
                               "opt_b128": t["muon_b128"] / t["adam_b128"]}
     json.dump(res, open(os.path.join(HERE, "data", "d507_read_v2.json" if v2 else "d507_read.json"), "w"), indent=1)
-    print(json.dumps(res, indent=1))
+    print(json.dumps(res))   # one line: verify_claims reads the last {...} line
 
 
 def main():

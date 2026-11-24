@@ -1,0 +1,9 @@
+# producer: /home/joaquin/work/FA/analysis/zng_uq/benchmark.py be6070877701ec28dbcb7953f620c1d47281af7b
+our protocol, $D_{\rm train}=5\cdot10^5$
+Suprio's protocol, $D_{\rm train}=5\cdot10^5$
+Muon, batch 2048
+Muon, batch 128
+Adam, batch 2048
+Adam, batch 128
+searched trial, seed 42
+seeds 43, 44
