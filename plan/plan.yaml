@@ -38273,6 +38273,15 @@ entries:
     withdrawn_at: '2026-11-23T15:25:03+00:00'
     withdrawn_why: D519/D520 asked for an investigation; a parent retrained without the two input settings is one of its test
       configurations (CLAUDE.md 72bef3992), run as part of it
+  - ask: 'Scope: the inputs of the W parent behind every later Z+ng fine-tune. Which W parent do they use from now on: the
+      parent without both input settings (momentum log-rescale and pair logs), the parent without only the momentum log-rescale,
+      or the current parent?'
+    at: '2026-11-24T13:25:39+00:00'
+    searched: D519, D520, D529, D533 (investigation scope, no parent choice); CLAUDE.md (inputs are the user's call); 2026-11-14T04:31
+      (a pasted LaTeX template, no parent choice); 2026-11-10T02:08 (draft and slide uploads, no parent choice); 2026-10-04T10:57
+      (arm naming in the transfer study, not this parent)
+    blocks: the parent of zng_uq_benchmark stage 2 and later Z+ng fine-tunes only; the dilution test keeps running
+    blocks_steps: &id003 []
   owner:
     agent: aa696ba79c8f66f6d
     state: stopped
@@ -40209,6 +40218,15 @@ entries:
       diverges shouldn't wake you and it's owning agent up.
     said_at: '2026-11-24T10:33:58.174000+00:00'
     at: '2026-11-24T11:23:59+00:00'
+  ask: 'Scope: the inputs of the W parent behind every later Z+ng fine-tune. Which W parent do they use from now on: the parent
+    without both input settings (momentum log-rescale and pair logs), the parent without only the momentum log-rescale, or
+    the current parent?'
+  waiting_since: '2026-11-24T13:25:39+00:00'
+  searched: D519, D520, D529, D533 (investigation scope, no parent choice); CLAUDE.md (inputs are the user's call); 2026-11-14T04:31
+    (a pasted LaTeX template, no parent choice); 2026-11-10T02:08 (draft and slide uploads, no parent choice); 2026-10-04T10:57
+    (arm naming in the transfer study, not this parent)
+  blocks: the parent of zng_uq_benchmark stage 2 and later Z+ng fine-tunes only; the dilution test keeps running
+  blocks_steps: *id003
 - id: llm_compare
   title: LLoCa against Suprio's LLM on the LLM amplitude catalogue
   question: In the conditions of Suprio's LLM pID run (1501 MadGraph-default processes, 1352 trained, 149 held out; 55,296
@@ -40372,7 +40390,7 @@ entries:
     searched: 'D522, D525-D528; CLAUDE.md; Joaquin 2026-11-23 on needless sequencing; Joaquin 2026-11-12T01:19 (tt LO and
       uu V points, not this); 2026-11-22T02:55 (D522''s own message: scale-up after near-optimal HPs); 2026-11-14T04:31 (a
       pasted LaTeX draft, no decision on this). Starting early departs from his order, so it is his call'
-    blocks_steps: &id003 []
+    blocks_steps: &id004 []
   owner:
     agent: ae2d14b6689ebb697
     state: working
@@ -42737,7 +42755,7 @@ entries:
   searched: 'D522, D525-D528; CLAUDE.md; Joaquin 2026-11-23 on needless sequencing; Joaquin 2026-11-12T01:19 (tt LO and uu
     V points, not this); 2026-11-22T02:55 (D522''s own message: scale-up after near-optimal HPs); 2026-11-14T04:31 (a pasted
     LaTeX draft, no decision on this). Starting early departs from his order, so it is his call'
-  blocks_steps: *id003
+  blocks_steps: *id004
   objective: 'In the conditions of Suprio''s LLM pID run (1352 trained, 139 held out; 55,296 events per process; 60,840 steps
     of 24,576 events; his target z and test metric), how a muP LLoCa does (a) after a DyHPO search, (b) scaled by muP width
     toward the LLM''s 359.6M parameters, (c) in our latest setup, against the LLM (0.321 / 0.721) and his LLoCa (0.506 / 0.953).
@@ -42806,7 +42824,7 @@ entries:
     searched: 'site decisions --project FA whole (D530 approves the benchmark only, D531 the restart; none sends work to lab
       models); CLAUDE.md (mechanical-worker is Sonnet per D213); Joaquin''s messages 2026-11-14T04:31 (a SciPost LaTeX template),
       2026-11-10T02:08 (uploaded paper and slides), 2026-10-26T17:18 (settings warnings): none is about the lab models'
-    blocks_steps: &id004
+    blocks_steps: &id005
     - 1
   owner:
     agent: a6187b6cdb7ca974a
@@ -42999,7 +43017,7 @@ entries:
   searched: 'site decisions --project FA whole (D530 approves the benchmark only, D531 the restart; none sends work to lab
     models); CLAUDE.md (mechanical-worker is Sonnet per D213); Joaquin''s messages 2026-11-14T04:31 (a SciPost LaTeX template),
     2026-11-10T02:08 (uploaded paper and slides), 2026-10-26T17:18 (settings warnings): none is about the lab models'
-  blocks_steps: *id004
+  blocks_steps: *id005
   checked_until: '2026-11-24T13:13:51+00:00'
 - id: critical_batch
   title: Critical batch size from the gradient noise scale
@@ -43057,7 +43075,7 @@ entries:
       SciPost LaTeX template he pasted), 2026-11-16T20:00 (a writing-style skill), 2026-11-10T02:08 (uploaded slides and code):
       none is about batch size, lr per batch or this cost'
     blocks: step 2 (the batch-size runs); step 1 keeps going
-    blocks_steps: &id005
+    blocks_steps: &id006
     - 2
   owner:
     agent: aa75364575cea3cb4
@@ -43279,7 +43297,7 @@ entries:
     LaTeX template he pasted), 2026-11-16T20:00 (a writing-style skill), 2026-11-10T02:08 (uploaded slides and code): none
     is about batch size, lr per batch or this cost'
   blocks: step 2 (the batch-size runs); step 1 keeps going
-  blocks_steps: *id005
+  blocks_steps: *id006
   handoff:
     state: 'Step 1: the estimator (McCandlish App. A from 8 chunk gradients of each step''s batch at the batch''s own per-process
       weights, pre-clip; 16-batch brute check with jackknife errors) is merged (b36a40b3a, repo-reviewer pass at 3c175775d),
