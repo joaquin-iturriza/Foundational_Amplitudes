@@ -42601,6 +42601,15 @@ entries:
     V points, not this); 2026-11-22T02:55 (D522''s own message: scale-up after near-optimal HPs); 2026-11-14T04:31 (a pasted
     LaTeX draft, no decision on this). Starting early departs from his order, so it is his call'
   blocks_steps: *id003
+  objective: 'In the conditions of Suprio''s LLM pID run (1352 trained, 139 held out; 55,296 events per process; 60,840 steps
+    of 24,576 events; his target z and test metric), how a muP LLoCa does (a) after a DyHPO search, (b) scaled by muP width
+    toward the LLM''s 359.6M parameters, (c) in our latest setup, against the LLM (0.321 / 0.721) and his LLoCa (0.506 / 0.953).
+    Every per-process result is drawn ONLY in Suprio''s held-out layout (his figure: analysis/llm_compare/suprio_llm_heldout_fig.png;
+    our script: analysis/llm_compare/heldout_per_process.py, one marker per arm); open his figure before drawing (Joaquin
+    2026-11-23/24: ''I sent you a very particular plot''). A run that diverges is a result, never an event (D533).'
+  mechanism: tuning, width and the latest setup's target/inputs/optimizer, each measured against matched controls on the same
+    data
+  expected: seen below the LLM for every arm; held out decided by the per-process layout
 - id: lab_llm_trial
   title: Lab LLMs in place of some subagents
   question: Can the lab's LLMs (deepseek-v4-flash, qwen3.8-27b via lpnllm) do some of our subagent work (mechanical steps,
