@@ -34264,6 +34264,9 @@ entries:
   - at: '2026-11-23T00:03:03+00:00'
     text: '2026-11-23 ~01:00: step 4 needs the 448-process bigrun runs on Jean Zay; Jean Zay still refuses ssh (site list
       UNREACHABLE, retried with site run jeanzay FA -- hostname: connection refused); step 4 re-waits to 2026-11-24'
+  - at: '2026-11-24T00:03:56+00:00'
+    text: '2026-11-24 ~01:05: Jean Zay still refuses ssh (site run jeanzay FA -- hostname: connection refused at lpnclaude03.in2p3.fr:22,
+      the relay host); step 4 re-waits to 2026-11-25'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
