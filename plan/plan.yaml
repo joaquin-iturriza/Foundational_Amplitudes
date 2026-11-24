@@ -43582,6 +43582,8 @@ entries:
       sec:noisescale and fig:llmcmp_heldout) and the repo-reviewer advances over the merge d75c664b9'
     4: 'Breakdown of owners'' and main session''s tokens (2026-11-09..23) by kind of work (tools/token_share.py --kinds):
       each kind''s tokens and share'
+    5: 'Lab trial (DeepSeek, Qwen) on real instances of the largest routable kinds, under a reviewed design: correct rate
+      against our own output and tokens saved per instance; proposal of what to route'
   done_when: null
   notes_ref: par:labllm1
   match: zz_labllm_*
@@ -44107,6 +44109,11 @@ entries:
         of the largest'
       - 'the spend is context carried across every kind (no separable kind): say so with the numbers, propose routing whole
         agents (reviewers, workers) instead'
+    5:
+      feeds: which larger shares of our token use the lab LLMs could take (D551)
+      if:
+      - 'a kind passes at our check''s level with a cheap check: propose routing it, tokens saved and error rate'
+      - 'none passes: report which failed and how, no route'
   ask: 'Scope: the rule that an owner reads a failed run''s whole log itself (~/work/CLAUDE.md). After a checked DeepSeek
     reading of a failed run''s log, should the owner still read the whole log every time, or only when the cause is left open?
     Keeping the reread costs about +0.05% of our tokens; dropping it saves up to about 0.6%.'
