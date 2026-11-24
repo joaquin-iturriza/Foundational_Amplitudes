@@ -1,0 +1,1 @@
+sweep/sweep_config_tp_zng_d1e4_muon_b128_zgggg.yaml tp_zng_d1e4_muon_b128_zgggg_hp0078_s44 31250 training.lr=0.009236722 training.muon_weight_decay=0.08833722 training.regularization_lambda=9.373106e-10 training.cosanneal_warmup_frac=0.05507703 training.cosanneal_eta_min=7.136164e-08 ema=true training.ema_decay=0.9024062 seed=44
