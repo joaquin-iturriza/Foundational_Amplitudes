@@ -40003,6 +40003,10 @@ entries:
     5: 'Part (c) readout: when llmcmp_c_qperp''s driver writes DRIVE_DONE and its control ends, score (c)''s best trial and
       the control (REREAD=<run> scripts/job_llm_score.sh), read per set (seen, held out, relabels, new) pooled RMSE and median
       per-process MSE against (a)''s best with the 1.38 margin, figure in Suprio''s layout; write-up'
+    6: 'Part (c) control score: FA-ccin2p3-48e43133 (REREAD=FA-ccin2p3-d34535b0 scripts/job_llm_score.sh runs/llmcmp_c_qperp/trial_9000
+      @2715130f70; best checkpoint step 24336, val NLL -3.544, before its blow-ups at 33462 and 51714) writes llm_score_{seen,heldout}.json:
+      read pooled RMSE seen/held out (relabels, new) against part (a)''s control 0.139/1.042, the LLM 0.321/0.721 and his
+      LLoCa 0.506/0.953; listed apart as a run that blew up'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -40139,6 +40143,11 @@ entries:
       - '(c)/(a) < 1/1.38 on held out: (b) starts from (c)''s HPs'
       - '(c)/(a) > 1.38: (b) starts from (a)'
       - 'between: not resolved by one seed, ask Joaquin for the seed-43 pair'
+    6:
+      feeds: 'part (c) readout (step 5): the control of the latest setup'
+      if:
+      - 'scored: keep for step 5''s figure, report with the control''s blow-up'
+      - 'job fails: read its log, fix llm_score for the emission-scale target, resubmit'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
