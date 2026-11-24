@@ -45008,6 +45008,29 @@ entries:
       reads are covered by the guard plus the same --job path. Deterministic upkeep, so no seeds; the control is the same
       commands on the login node the same day. Searched docs/results.tex and plan.yaml (login node, login_cap, run --job,
       job_prune_dryrun, non-interactive) and site decisions (login/slurm/htc/maintain): only D544 and D176.'
+  - at: '2026-11-24T22:12:22+00:00'
+    question: Can FA's CC env be rebuilt now that CC denies the module Programming_Languages/anaconda/3.11 (sites.yaml line
+      11), keeping today's stack (Python 3.11.7, torch 2.1.2+cu118, numpy 1.26.4 from requirements.txt), by bootstrapping
+      from a standalone CPython 3.11.7 that we install under /sps with uv (via CC's Programming_Languages/python/3.13.7),
+      so the live .venv, whose interpreter is a symlink into the anaconda 3.11 install CC says it will remove, has a working
+      replacement path?
+    prior: 'CC env check job 64801966 (2026-11-24 23:10): activate.sh does not load the module (only sources .venv); .venv
+      imports torch 2.1.2+cu118 / numpy 1.26.4 on python 3.11.7 from /pbs/software/redhat-9-x86_64/anaconda/3.11; module load
+      of anaconda/3.11 denied (''no longer supported, will soon be removed''); CC offers python/3.13.7..3.14.9 and anaconda
+      3.12/3.13 (deprecated), 3.14; no 3.11. The orchestrator kit used python/3.13.7. Nothing in docs/results.tex or site
+      decisions on the CC env build.'
+    measure: 'one 1-CPU htc job: uv installs CPython 3.11.7 under /sps/lpnhe/jiturrizaramirez01/python; that interpreter runs
+      (ssl, sqlite3, venv, ctypes import); a throwaway venv in node-local $TMPDIR resolves requirements.txt with pip install
+      --dry-run (caches in $TMPDIR): every pin resolves, torch 2.1.2+cu118 among them; disk used on /sps'
+    check: the live venv's pyvenv.cfg names python 3.11.7, the version the standalone build provides; requirements.txt pins
+      torch==2.1.2 with the cu118 index, which has cp311 wheels and no cp313 ones (so a 3.13 module cannot rebuild it)
+    fixed: the live .venv (not touched), requirements.txt, torch/numpy versions, the CC checkout
+    control: the live .venv's own versions (python 3.11.7, torch 2.1.2+cu118, numpy 1.26.4) read in job 64801966
+    seeds: none (deterministic install)
+    outcome: 'yes: the interpreter runs and the dry-run resolves every pin, so sites.yaml bootstraps from that interpreter
+      (python_bin) and site env --rebuild reproduces the live stack; no: uv or the download fails, or a pin does not resolve
+      on 3.11.7, which is reported with what failed; the remaining route (a newer torch on the cu124 index under python 3.13,
+      a new software stack for every run) is Joaquin''s call, asked with its cost'
   findings:
   - at: '2026-11-24T17:31:13+00:00'
     text: 'Inventory of scripts run on CC''s login node (2026-11-24): supervisor maintain every pass (8-10 min apart): disk_watch.py
