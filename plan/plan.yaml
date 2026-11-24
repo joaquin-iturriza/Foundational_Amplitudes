@@ -37875,9 +37875,7 @@ entries:
   - D513
   - D516
   - D529
-  next:
-    6: 'Read the b128 no-settings fine-tune Fn (ftnoset_b128 chosen hp353, seeds 43/44 FA-ccin2p3-dbd9680f/-edcaa00e) against
-      S=hp0078 (mean 0.00941) and F: Fn/S, Fn/F per the step-5 design'
+  next: null
   done_when: null
   notes_ref: null
   match: dsave_ftmech_*,ftmech_*
@@ -39702,8 +39700,7 @@ entries:
     units: null
     start: '2026-11-24T04:06:19+00:00'
     at: '2026-11-24T04:06:19+00:00'
-  step_waits:
-    '6': FA-ccin2p3-dbd9680f FA-ccin2p3-edcaa00e
+  step_waits: {}
   handoff:
     state: '2026-11-23 ~23:10 CET. Everything of D519/D520/D529 is in flight; nothing waits on Joaquin. (1) One setting at
       a time, b2048 (design passed 2026-11-23): both 16-trial searches done (soft-rescale only: chosen hp1961, lr 2.80e-2,
@@ -39736,13 +39733,6 @@ entries:
       untested against the race); analysis/finetune_mechanism/zng4g_seed_chunks.py, zng4g_r1_read.py (readout to extend);
       sweeps_local/ftmech_zng4g_*
     written: '2026-11-23T22:06:48+00:00'
-  step_why:
-    6:
-      feeds: whether the fine-tune's Z+4g deficit at b128 is the parent's two input settings (D519/D520)
-      if:
-      - 'Fn/S<=1.19: yes at b128'
-      - 'Fn/F<0.79 and Fn/S>1.19: partial'
-      - 'Fn/F in [0.79,1.19] and Fn/S>1.19: unresolved'
 - id: llm_compare
   title: LLoCa against Suprio's LLM on the LLM amplitude catalogue
   question: In the conditions of Suprio's LLM pID run (1501 MadGraph-default processes, 1352 trained, 149 held out; 55,296
