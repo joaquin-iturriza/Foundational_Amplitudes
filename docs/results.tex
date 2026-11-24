@@ -18000,6 +18000,58 @@ refitting it discards the level the zero-shot carries (par.~\ref{par:v3_muon}).
 % allow: 2.7 because it is e, the factor an MSE of one means
 
 % ==========================================================================
+\section{Our LLoCa against Suprio's LLM on Daniel's catalogue}\label{sec:llmcmp}
+
+\paragraph{Part (a): a searched LLoCa in the conditions of his LLM run (2026-11-24, D522--D528).}\label{par:llmcmp_a}
+The question: in the conditions of Suprio's LLM pID run (Daniel's catalogue, 1352 trained and 139 held-out processes,
+55296 training events per process, 60840 steps of 24576 events from batches of one process, his target $z$, plain MSE,
+the best validation checkpoint), how does our $\mu$P LLoCa do once its HPs are searched? An 8-trial single-fidelity
+DyHPO search (AdamW at constant lr, \code{sweep/sweep\_config\_llmcmp\_a\_adamw\_const.yaml}, seed 42) ran without a
+failure and chose lr $1.24\times10^{-3}$ with EMA on (FA-ccin2p3-c891c0c2); its matched control is the same network at
+his optimizer settings (AdamW, constant lr $10^{-3}$). Each process is read on its first $10^4$ test events, the
+held-out ones with the trained run's shared statistics, and the metric is his: the pooled RMSE of $\log|\mathcal M|^2$,
+$\sqrt{\langle(\hat y-y)^2\rangle}$ over all test events of a set. The searched run reaches \textbf{0.117} on the trained
+processes (control 0.139, the LLM 0.321, his LLoCa 0.506), but 1.003 on the held-out ones (control 1.042, the LLM
+0.721, his LLoCa 0.953): 0.241 on the 96 that relabel a trained process and 1.767 on the 43 that relabel none (control
+0.237 and 1.839, the LLM 0.341 and 1.193). Per process, the median MSE on the 43 new processes rises with the search,
+from 0.688 to 1.144, against the LLM's 0.649, and the searched run is below the LLM on 9 of them (control 14). So the
+search buys error on the trained processes and none on the held-out ones: the held-out gap to the LLM is not an
+untuned optimizer, and it sits in the processes outside the trained classes (fig.~\ref{fig:llmcmp_heldout}). On the
+design's outcomes: the held-out MSE ratio of the searched run to the control lies inside the seed margin of 1.38, so
+part (b)'s width scaling starts from these HPs unless part (c) beats them.
+% src: python3 analysis/llm_compare/control_score.py --tag a_trial5 control c_control --out a5_controls @969687ee5
+% claim: pooled_rmse_logm2.a_trial5.seen=0.117
+% claim: pooled_rmse_logm2.control.seen=0.139
+% claim: pooled_rmse_logm2.llm.seen=0.321
+% claim: pooled_rmse_logm2.his_lloca.seen=0.506
+% claim: pooled_rmse_logm2.a_trial5.heldout=1.003
+% claim: pooled_rmse_logm2.control.heldout=1.042
+% claim: pooled_rmse_logm2.llm.heldout=0.721
+% claim: pooled_rmse_logm2.his_lloca.heldout=0.953
+% claim: pooled_rmse_logm2.a_trial5.relabels=0.241
+% claim: pooled_rmse_logm2.a_trial5.new=1.767
+% claim: pooled_rmse_logm2.control.relabels=0.237
+% claim: pooled_rmse_logm2.control.new=1.839
+% claim: pooled_rmse_logm2.llm.relabels=0.341
+% claim: pooled_rmse_logm2.llm.new=1.193
+% claim: median_mse_logm2.new.control=0.688
+% claim: median_mse_logm2.new.a_trial5=1.144
+% claim: median_mse_logm2.new.llm=0.649
+% claim: ours_below_llm.a_trial5.new=9
+% claim: ours_below_llm.control.new=14
+% claim: counts.relabels=96
+% claim: counts.new=43
+% claim: counts.seen=1352
+% allow: 2 0 139 55296 60840 24576 8 42 1.24\times10^{-3} 10^{-3} 10^4 1.38 because they are the exponent of the squared amplitude, his seed, the held-out count, the run's settings, the searched lr, the control's lr, the test events and the design's seed margin
+\begin{figure}[htbp]\centering
+\includegraphics{../analysis/llm_compare/figs/a5_controls_heldout_per_process.pdf}
+\caption{MSE of $\log|\mathcal M|^2$ per held-out process in Suprio's held-out layout: top the 96 processes that relabel a
+trained one, bottom the 43 that relabel none, in his order and families, grey bands $2\to2$. Stars his LLM (pID
+embedding, seed 0); circles our searched LLoCa (par.~\ref{par:llmcmp_a}); diamonds its control at his optimizer
+settings; triangles our latest setup at the latest pretraining's HPs, read before it blew up (part (c)'s control).
+Seed 42, first $10^4$ test events per process.}\label{fig:llmcmp_heldout}
+\end{figure}
+
 \section{Methodological principles}\label{sec:principles}
 % ==========================================================================
 
