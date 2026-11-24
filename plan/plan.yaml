@@ -40390,7 +40390,6 @@ entries:
     at: '2026-11-24T13:55:18+00:00'
   step_waits:
     '2': the detached driver ftmech_glu_drive ending (its detach DONE event; 16+16 trials of ftmech_zng4g_ftglu_b128 and ftmech_zng4g_d1e3_ftglu_b128)
-    '3': the design reviewer's verdict on the D539 design (recorded 2026-11-24), then the uug smoke and the 17-job batch
   handoff:
     state: '2026-11-24 ~09:00 CET. Step 2 (b128 residual, Fn/S 1.53) is in flight as the H2 dilution test (design passed 05:35,
       configs @5361f5820/45f404900): a parent pretrained on the finale''s 9 gluon/Z processes (recipes/transfer_finale_gluon.yaml;
