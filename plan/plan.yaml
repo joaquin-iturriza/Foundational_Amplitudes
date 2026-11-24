@@ -44406,7 +44406,8 @@ entries:
     - cc_disk
   decisions:
   - D542
-  next: null
+  next: Apply the CC deletions Joaquin chooses from the cc_disk list (debris once the permission check allows it; results
+    through free_space.py and scripts/prune_site.sh under his decision), then reread df
   done_when: null
   notes_ref: null
   match: cc_disk_*,zz_probe_*
@@ -44533,3 +44534,9 @@ entries:
     units: null
     start: '2026-11-24T14:35:28+00:00'
     at: '2026-11-24T14:35:28+00:00'
+  step_why:
+    1:
+      feeds: which CC data is deleted to free /sps/lpnhe (D542)
+      if:
+      - 'Joaquin names items: delete exactly those through the decided tools, report freed GiB against df'
+      - 'Joaquin keeps everything: record it, close the entry with the inventory as its result'
