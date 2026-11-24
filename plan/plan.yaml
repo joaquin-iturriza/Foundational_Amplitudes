@@ -40475,11 +40475,11 @@ entries:
     start: '2026-11-24T14:20:54+00:00'
     at: '2026-11-24T14:20:54+00:00'
   - batch: d539s
-    wall_h: 1.05
-    jobs: 8
+    wall_h: 4.2
+    jobs: 7
     units: null
-    start: '2026-11-24T16:40:00+00:00'
-    at: '2026-11-24T16:40:00+00:00'
+    start: '2026-11-24T16:41:02+00:00'
+    at: '2026-11-24T16:41:02+00:00'
   step_waits:
     '2': detached ftmech_glu_drive (both gluon-parent fine-tune searches, 32 trials; its end posts an event)
     '4': the design reviewer (design of 2026-11-24, D539 step 4 at hp1333); on PASS submit the 8 chunks d539s_00..07
