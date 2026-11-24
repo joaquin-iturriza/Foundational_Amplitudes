@@ -40401,7 +40401,7 @@ entries:
     start: '2026-11-24T14:20:54+00:00'
     at: '2026-11-24T14:20:54+00:00'
   step_waits:
-    '2': the detached driver ftmech_glu_drive ending (its detach DONE event; 16+16 trials of ftmech_zng4g_ftglu_b128 and ftmech_zng4g_d1e3_ftglu_b128)
+    '2': detached ftmech_glu_drive (both gluon-parent fine-tune searches, 32 trials; its end posts an event)
     '3': FA-ccin2p3-0918062d FA-ccin2p3-1ee479cf FA-ccin2p3-dd70d180 FA-ccin2p3-faab6c78 FA-ccin2p3-8b209762 FA-ccin2p3-e4e1cd56
       FA-ccin2p3-28ebe295 FA-ccin2p3-fda4f5d8 FA-ccin2p3-8af63c94 FA-ccin2p3-f562fe47 FA-ccin2p3-53ea523f FA-ccin2p3-ac28ce01
       FA-ccin2p3-c9d78b1f FA-ccin2p3-bfce7d54 FA-ccin2p3-2b2f8505 FA-ccin2p3-49028220 FA-ccin2p3-f5422b66 FA-ccin2p3-426dd488
