@@ -38679,6 +38679,13 @@ entries:
       Fn1k 0.0616/0.0653/0.0621; S1k 0.1227/0.1361/0.1300. Fg1k/Fn1k 1.31 [1.26,1.37] -> design branch gluon worse at D=1e3;
       Fg1k/S1k 0.64 [0.60,0.68]. Fg1k best at 8-10% of the run, ends 1.33-1.39x above. With 1e4 (Fg/Fn 0.65 [0.48,0.88], dilution
       yes): the narrow parent wins at 1e4, the broad parent at 1e3.'
+  - at: '2026-11-24T23:17:48+00:00'
+    text: '2026-11-25 D539 step 5 kit read (d539_kit_read.py --set u @9499e4c77; data d539u_kit.json; fig d539u v2 with kit
+      panels (d),(e), caption OK; results.tex par:ftm_d539 @b67c24b78). Deepest-bin MSE(log10|M|^2), rescale eps1e-8 over
+      none, log10 of seed-median ratio: soft -4.65 dec (1e4) / -4.57 (1e5); bulk +0.33 / -0.07 (1e4 agrees with the val read
+      r 2.18 = 0.34 dec); collinear +0.18 / +0.21 (inside seed spread). D539 closed: the rescale costs the bulk of Z+4g at
+      1e4 and 1e5 and of uug at 1e4 (1e5 unresolved), and gains 4.5 decades in the uug soft limit; it belongs only where the
+      soft limit is the target.'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
