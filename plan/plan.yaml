@@ -15826,6 +15826,9 @@ entries:
       tokens, and 0.58x misses that'' What?"): an outcome threshold (bar, ratio, band) with no source turned a 42% token saving
       into a ''no''. plan design refuses an --outcome threshold that cites no source (Joaquin''s words, a decision, a measured
       spread, a cost he set); the design reviewer FIXes one; keeper reviews the agent definition; diff to Joaquin'
+    36: 'Fix the reviewer lock (finding 2026-11-24 two claudemd-keepers): begin refuses while another agent id holds the pillar''s
+      lock, advance refuses from an agent that does not hold it, lock_calls.log records agent_id; test with two simulated
+      agents; replay the 19:26:20 double begin'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16500,6 +16503,11 @@ entries:
       feeds: 'D534: a design''s yes/no bar comes from Joaquin''s aim or measured noise, never invented'
       if:
       - 'built and replayed on the lab_llm_trial outcome: report the diff'
+      - 'a tool refuses: route around'
+    36:
+      feeds: one reviewer per backlog actually enforced
+      if:
+      - 'built and replayed: report'
       - 'a tool refuses: route around'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
