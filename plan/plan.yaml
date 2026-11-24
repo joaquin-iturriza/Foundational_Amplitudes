@@ -43485,7 +43485,12 @@ entries:
     - designer-executor setups
   decisions:
   - D530
-  next: null
+  next:
+    2: 'Route demo check: read both DeepSeek readings (labllm ids T20261124180113_3211180 for FA-ccin2p3-b77878e1/E8530 and
+      T20261124183143_3330668 for FA-ccin2p3-d34535b0/E8491, the latter from the last 5000 log lines) against their logs and
+      ack notes, record labllm.py check --agree|--disagree, ack E8638; then the hard-round and lookup write-up in docs/results.tex
+      (% src: tools/lab_llm_report.py at labllm 7a28103a4, % claim: lines) with figs/lab_llm_hard, merge labllm into trunk
+      after its reviewer'
   done_when: null
   notes_ref: null
   match: zz_labllm_*
@@ -43943,6 +43948,12 @@ entries:
     units: null
     start: '2026-11-24T15:39:09+00:00'
     at: '2026-11-24T15:39:09+00:00'
+  step_why:
+    2:
+      feeds: 'D541: which work routes to DeepSeek'
+      if:
+      - 'both readings agree with the ack notes: route demo passes, the rule stands'
+      - 'a reading disagrees: record how, keep the owner''s own read'
 - id: critical_batch
   title: Critical batch size from the gradient noise scale
   question: What is the critical batch size of our canonical setup, measured from the gradient noise scale B_simple = tr(Sigma)/|G|^2
