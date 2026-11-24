@@ -44526,7 +44526,8 @@ entries:
       1 MiB and overstates. Census --in-use ''*'' --days 14: amp_data_cache all keep (60,138 MiB, 18,498 files). Since 15:20
       the disk fell 15->10 GB through llm_compare part (b) width smokes in runs/zz_smoke (two uncompressed checkpoints each,
       2x2.78 GB at 64 heads); the pending 120-head smoke FA-ccin2p3-74ba6cdd projects ~19.5 GB.'
-  step_waits: {}
+  step_waits:
+    '1': '2026-11-25'
   targets:
   - batch: disk_inventory
     wall_h: 1.0
