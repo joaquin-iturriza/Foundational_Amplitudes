@@ -16438,7 +16438,8 @@ entries:
       wake_batching_after2.json, redraw, check_caption, report'
     '28': the main session's go after this owner's 2026-11-19 report (an interactive terminal session with Code Mode on must
       be started by hand)
-    '30': 'a reviewer: repo-reviewer a66f3438052aa1571 on the whole code backlog (686/520); then part (3) routing'
+    '30': the main session resuming this owner for part (3) routing (single run failures folded into their batch's result;
+      probe_site tries ssh before DOWN), 2026-11-24
   owner:
     agent: aa3a1133e1a11b531
     state: working
