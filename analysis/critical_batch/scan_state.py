@@ -73,6 +73,7 @@ def best_steps(v):
 
 
 def draw():
+    import matplotlib.pyplot as plt
     import plot_style as ps
     from cbs_read import fit_bcrit
     d = json.load(open(DATA))
@@ -88,12 +89,12 @@ def draw():
     pts = full + [(b, s) for b, s, _ in part]
     if len(pts) >= 3:
         smin, bc = fit_bcrit(*zip(*pts))
-        x = np.geomspace(1500, 40000, 100)
+        x = np.geomspace(min(pts)[0], max(pts)[0], 100)   # the fit over the batches it was made on
         print(f"fit over {len(pts)} batches: S_min {smin:.0f}, B_crit {bc:.0f}; S over fit: "
               + ", ".join(f"{b} {s / (smin * (1 + bc / b)):.3f}" for b, s in sorted(pts)))
         axS.plot(x, smin * (1 + bc / x), "-", color=ps.C.vermillion,
                  label=rf"$S_{{\min}}(1+B_{{\rm crit}}/B)$, $B_{{\rm crit}}={bc:.0f}$")
-    axS.set_xscale("log"); axS.set_yscale("log")
+    axS.set_yscale("log")
     axS.set_xlabel(r"batch size $B$")
     axS.set_ylabel(r"steps $S$ to $\mathcal{L}_{\rm val}=-2.08$")
     ps.legend(axS, "upper right")
@@ -109,7 +110,11 @@ def draw():
                   f"over {sum(x == b for x, _ in xs)} trials")
     x = np.geomspace(1500, 40000, 100)
     axT.plot(x, 0.12 + 0.86 * x / 16384, "--", color=ps.C.vermillion, label="design's cost model")
-    axT.set_xscale("log"); axT.set_yscale("log")
+    axT.set_yscale("log")
+    for ax in (axS, axT):   # the scanned batches as powers of two: one-line ticks that do not collide
+        ax.set_xscale("log", base=2)
+        ax.set_xticks(BATCHES, [rf"$2^{{{int(np.log2(b))}}}$" for b in BATCHES])
+        ax.xaxis.set_minor_formatter(plt.NullFormatter())
     axT.set_xlabel(r"batch size $B$")
     axT.set_ylabel("seconds per training step")
     ps.legend(axT, "upper left")
