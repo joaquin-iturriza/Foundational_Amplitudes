@@ -45,7 +45,7 @@ fixed_params:
 range_extension:
   enabled: false
 search_space:
-- {name: training.lr, type: float_log, low: 2.7e-04, high: 1.1e-02}   # top 3.6e-3 tripled 2026-11-20 (extend_sweep)
+- {name: training.lr, type: float_log, low: 2.7e-04, high: 3.3e-02}   # top 3.6e-3 tripled 2026-11-20, tripled again 2026-11-24 (extend_sweep): the 16-trial bests sat at 0.95-0.99 of the log window
 - {name: training.muon_weight_decay, type: float_log, low: 1.0e-03, high: 0.3}
 - {name: training.regularization_lambda, type: float_log, low: 1.0e-10, high: 1.0e-06}
 - {name: training.cosanneal_warmup_frac, type: float_uniform, low: 0.05, high: 0.2}
