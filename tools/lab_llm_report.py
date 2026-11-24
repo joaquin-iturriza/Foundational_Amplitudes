@@ -201,7 +201,9 @@ def figure(out):
 
 def main():
     out = summary()
-    print(json.dumps(out, indent=1))
+    print(json.dumps(out))              # one line: verify_claims reads the last {...} line
+    if "--json" in sys.argv:            # the claims rerun: numbers only, figures left as drawn
+        return
     figure(out)
     if "hardfix" in out:
         figure_hard(out)
