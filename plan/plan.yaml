@@ -43519,12 +43519,14 @@ entries:
   match: zz_labllm_*
   evidence:
     runs: []
-    commit: d75c664b9
+    commit: ebd146bad
     paths:
     - analysis/lab_llm_trial/runs.jsonl
     - analysis/lab_llm_trial/summary.json
+    - plan/mechanical_prompt.txt
     - tests/test_lab_route.py
     - tools/lab_llm_report.py
+    - tools/lab_llm_trial.py
     - tools/labllm.py
     - tools/plan.py
     - worktrees/wt-labllm/analysis/lab_llm_trial/planners.json
