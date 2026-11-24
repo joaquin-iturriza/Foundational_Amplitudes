@@ -15831,12 +15831,13 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-046cc7d3
-    commit: 980fed580
+    commit: dc3b8b1c6
     paths:
     - .claude/hooks/context_guard.py
     - .claude/hooks/notification_absorb.py
     - .claude/hooks/owner_handoff.py
     - '.claude/hooks/review_backlog.sh (54debf37e: CLAUDE.md pillar covers plan/*prompt*.txt and .claude/agents)'
+    - .claude/hooks/review_guard.py
     - '2026-11-04 owner aaf01b2d42241ffe1: next 1 cleanup done (lock_guard.py, reviewer_resume.py, handback_guard.py deleted;
       review_backlog.sh check|bashpost branch removed; 33 MB of redesign backups removed from the scratchpad: settings diffs
       and pre-A/B settings copies, D/, CLAUDE.md.pre, FA_base/FA_copy/FA_new, hook drafts); repo-reviewer ab72652c9dc1a2ace
