@@ -40568,6 +40568,9 @@ entries:
     at: '2026-11-24T22:51:16+00:00'
   step_waits:
     '5': FA-ccin2p3-7a659ef3 FA-ccin2p3-ca958438 (D=1e3 gluon-parent seeds 43/44 of hp1127; then zng4g_d1e3_read.py Fg1k/Fn1k)
+    '4': FA-ccin2p3-e592bba5 FA-ccin2p3-e187ecce FA-ccin2p3-832af449 FA-ccin2p3-9e964957 FA-ccin2p3-ff9bc41f FA-ccin2p3-a5cb84e4
+      FA-ccin2p3-d0bda2e0 FA-ccin2p3-e47ae0ca FA-ccin2p3-d3feb614 FA-ccin2p3-b6a6ded6 FA-ccin2p3-744db631 FA-ccin2p3-7d13ee6f
+      (kit scoring of the 12 uug search-set runs; then d539_kit_read.py --set u, d539_read.py --set u, figure, par:ftm_d539)
   handoff:
     state: '2026-11-24 ~21:30. D539 (Joaquin''s ''why are they causing a problem now''): ANSWERED and written up (results.tex
       par:ftm_d539 @6c9740c38, figs d539 + d539s): the momentum log-rescale''s compression of the massless momenta costs Z+4g
