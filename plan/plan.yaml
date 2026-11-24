@@ -38328,6 +38328,14 @@ entries:
     text: '2026-11-24 correction to the zng_uq_benchmark batch-128 Muon scratch reference finding of today: the 3 trials above
       hp0078''s lr (2.74e-2-3.29e-2) are 3.6-9.8x worse in standardised val (0.0253/0.0399/0.0693 against 0.00708), not 2.8-7.8x;
       every other number stands.'
+  - at: '2026-11-24T04:13:27+00:00'
+    text: '2026-11-24 step 6 read (zng4g_ftnoset_read.py 128 @5323930d4+legend fix; fig zng4g_ftnoset_b128): b128 share against
+      the matched scratch hp0078 (16-trial window, seeds 42/43/44 0.00888/0.01048/0.00887, mean 0.00941): Sf*/S 2.94, F/S
+      3.22 (was 1.54 against the 8-trial trial_0950), share log(Sf*/S)/log(F/S) = 0.92 (10-90% over 27 triples 0.81-1.08)
+      -> H1 holds at b128 as at b2048 (1.84). Parent check (parent_rerun_check.py noset @5323930d4): the no-settings parent
+      FA-ccin2p3-9a73698a against FA-ccin2p3-47e14eae, per-process final val MSE ratio gmean 0.854, 19 of 28 inside 0.43-2.5x
+      (outside: uubar_ddbar 0.048, udbar_enug 0.067, ee_aa 0.105, dd_dd 0.36, uu_uu 0.40, udbar_Wg 0.41 better; udbar_taunu
+      2.8, ee_numu 47, ee_bbbar 78 worse), combined sigma-stage NLL -7.426 vs -7.271; no blow-up.'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
