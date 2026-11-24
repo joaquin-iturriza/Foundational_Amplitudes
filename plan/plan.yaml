@@ -43317,6 +43317,34 @@ entries:
       is not SGD); then B_crit from the scan is the number, and B_simple is not trusted alone. Cost: 40 trials x (5 epochs
       at ~1.01 s per 16384 events = 1.2 h + 15 min start-up, validations) ~ 1.45 h = 58 GPU-h on V100 (D536: up to 100 GPU-h
       for work a decision names), plus the 32768 accumulation smoke ~0.2 GPU-h.'
+    fix_at: '2026-11-24T13:49:30+00:00'
+    fix: '1/11 (only the asked axis moves; the measure cannot separate batch from horizon): every per-B schedule is tied to
+      T_B = 4264 x 16384/B. validate_frac 0.02 is a fraction of the run (base_experiment.py:1023-1028), so batch 2048 validates
+      every 682 steps against 85 at 16384; the warmup is searched as a fraction of T_B ([0.05,0.2] -> 1700-6800 steps at 2048,
+      longer than the ~935 steps in which the 16384 control reaches the 25% target); and the lr window is centred by the horizon
+      law (1.6e-3 at 2048 against 5e-3 at 16384). Under the yes outcome (S flat), the 2048 run would still be warming up,
+      at a lower lr, when the 16384 run crosses the target, so S_B would grow as 1/B from the schedule alone: a false ''no''.
+      The same holds in reverse for 32768, which cannot reach the 75% target (~2800 steps) inside its 2132 steps. Fix: keep
+      the step schedule the same at every B (warmup in steps, the same constant-lr stable phase, the same lr window, validation
+      every fixed number of steps, about 85 or finer), with the horizon long enough to reach the targets in the ''no'' case;
+      or show on data that S_B does not depend on these. Select each B''s best trial on the quantity read (stable-phase loss
+      at fixed steps or steps-to-target), not on the final loss after the cooldown at fixed epochs. 2/3 (the measure resolves
+      the 10% band, with the noise measured): the ''flat within 10%'' yes-band sits at the replicate noise. The control (v4_het_control_wsd)
+      and the noise-scale run FA-ccin2p3-225d38ea have the same HPs and seed. Their first crossings are 935/935 steps at L=-1.66,
+      1870/1955 (5%) at -2.08 and 2635/2975 (13%) at -2.30 (analysis/critical_batch/data/*_result.json val_curve). The late
+      stable phase falls ~0.03 per 85 steps against ~0.05-0.15 validation scatter. The spread of the top-3 trials mixes HPs
+      with noise, so it is not a seed spread. Fix: state the step-to-target spread from these two same-HP runs (or measure
+      it) and set the yes/no bands above it, or drop the 75% target. Per-B seed counts stay equal across cells; if more seeds
+      are needed, put it to Joaquin as a question. 15 (the rate from the same setup): the cost and the job limits use 1.01
+      s per 16384 events at every B (linear in events). Per-step overhead (dataloading, validation, the framesnet) does not
+      shrink with batch. Read the rate at 2048/4096/8192 from a run at that batch on this setup, or from each sweep''s first
+      jobs before the limits are set; then re-cost against D536''s 100 GPU-h. 14 (disk): the design gives no disk per trial
+      (run dir and checkpoints from v4_het_control_wsd), no memmap cache per key (23 GB per seed key earlier on CC), does
+      not say whether batch size enters the cache key (one cache shared by the 40 trials, shown in two logs), and gives no
+      free disk at submission. 19 (waits): say that the 2048-16384 sweeps do not wait on the 32768 accumulation smoke (only
+      the 32768 sweep reads it). Passing: the matched control (the 16384 sweep with the same search), lr per B by DyHPO (D426/D241
+      consistent), 8 trials 3/3/2 (D244/D245), HETEROSC, the outcome stated for yes and no, the comparison D532 names, no
+      label in inputs, the prior search (sec:noisescale, sec:envelope, the Z+4g batch cells/D514).'
   step_why:
     2:
       feeds: 'whether B_simple can be trusted alone on our setup (Joaquin''s question: once now as a calibration, or every
