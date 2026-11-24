@@ -1,0 +1,12 @@
+# producer: /home/joaquin/work/FA/analysis/finetune_mechanism/glu_parent_curves.py e757d387ad07528125a7afbcdcc45c9990e1c601
+9-process parent
+28-process parent
+$e^+e^-\to ZZ$
+$e^+e^-\to b\bar bg$
+$e^+e^-\to b\bar bgg$
+$e^+e^-\to u\bar ug$
+$e^+e^-\to u\bar ugg$
+$u\bar d\to Wg$
+$u\bar d\to Wgg$
+$u\bar d\to Wggg$
+$u\bar d\to e\nu g$
