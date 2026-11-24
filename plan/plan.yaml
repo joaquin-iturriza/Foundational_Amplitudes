@@ -45004,6 +45004,7 @@ entries:
       2x2.78 GB at 64 heads); the pending 120-head smoke FA-ccin2p3-74ba6cdd projects ~19.5 GB.'
   step_waits:
     '1': FA-ccin2p3-67887dff
+    '2': '2026-11-25'
   targets:
   - batch: disk_inventory
     wall_h: 1.0
