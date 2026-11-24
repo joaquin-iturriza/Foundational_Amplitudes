@@ -38667,6 +38667,14 @@ entries:
       Fg/Fn 0.65 [0.48, 0.88] 2-sigma -> design branch dilution yes; Fg/S 0.98 [0.87, 1.10]: the narrower parent closes the
       1.53x residual. Fg no blow-up, all seeds best at the last validation, falling 3x from 25% to end (fixed-compute read).
       Caveat: Fg chosen lr 0.09 dec under the window top 1.1e-2 (S also at its top). D=1e3 half: step 5.'
+  - at: '2026-11-24T23:00:29+00:00'
+    text: '2026-11-25 D539 step 5 bulk read, uug searched per arm (d539_read.py --set u @5758f6310; data d539u.json; fig d539u,
+      caption OK; results.tex par:ftm_d539 @620135773). Each arm its own 16-trial search (window [3.1e-3,4.1e-2]; chosen lr
+      1e4 off 7.6e-3, eps 1.72e-2, 1e5 off 5.18e-3, eps 5.19e-3; all >=0.22 dec inside), seeds 42-44, no blow-up. Best val
+      MSE(log|M|^2): 1e4 off 0.00464/0.00633/0.00564, eps1e-8 0.00756/0.0161/0.0140, r 2.18 [1.32,3.58] -> the rescale costs
+      uug bulk at 1e4 (design branch: uug r>1 beyond noise, D374''s bulk gain is a setup effect); 1e5 off 0.00095/0.00136/0.00138,
+      eps 0.00121/0.00233/0.00302, r 1.68 [0.93,3.07] unresolved. Seeds 43/44 above seed 42 in every arm (winner''s selection).
+      Kit scoring of the 12 runs in flight (step 4 wait).'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
