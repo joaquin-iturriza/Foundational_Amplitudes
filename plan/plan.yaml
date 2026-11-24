@@ -44182,7 +44182,7 @@ entries:
     agent: a27cabf54bbbc7b67
     state: stopped
     since: '2026-11-24T21:40:30+00:00'
-    state_at: '2026-11-24T21:57:51+00:00'
+    state_at: '2026-11-24T22:01:34.439000+00:00'
     context: 183875
     context_at: '2026-11-24T22:09:46+00:00'
   designs:
@@ -44922,9 +44922,9 @@ entries:
   asks: []
   owner:
     agent: a97209d81e39f1376
-    state: stopped
+    state: working
     since: '2026-11-24T17:21:44+00:00'
-    state_at: '2026-11-24T17:38:03.743000+00:00'
+    state_at: '2026-11-24T22:09:24.763000+00:00'
     context: 216326
     context_at: '2026-11-24T22:09:53+00:00'
   designs:
