@@ -1,0 +1,1 @@
+module load Programming_Languages/python/3.13.7 && { test -x /sps/lpnhe/jiturrizaramirez01/python/cpython-3.11.7-linux-x86_64-gnu/bin/python3.11 || ( U=$(mktemp -d) && python3 -m venv $U && $U/bin/pip install -q uv && UV_PYTHON_INSTALL_DIR=/sps/lpnhe/jiturrizaramirez01/python $U/bin/uv python install 3.11.7; r=$?; rm -rf $U; exit $r ); }
