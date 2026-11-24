@@ -37872,9 +37872,12 @@ entries:
   - D516
   - D529
   next:
-    2: 'Design (owner''s) the b128 residual of the no-settings fine-tune (Fn/S 1.53, seeds 0.0108/0.0184/0.0141, seed 43 blew
-      up at validation 44/50): per the step-5 partial branch, H2 dilution read at lower D (gains exist at D<=10^3), and/or
-      the b128 instability (Fn''s late spikes at lr 7.3e-3, best-at-end for S)'
+    1: Read the D=1e3, 3125-step scratch (ftmech_zng4g_d1e3_scr_b128) and 28-process no-settings fine-tune (ftmech_zng4g_d1e3_ftnoset_b128)
+      searches when the driver ends; send seeds 43/44 of each chosen trial (zng4g_seed_chunks.py + job_seed_batch.sh); per-trial
+      time from these runs feeds the Fg1k sizing
+    2: 'When the gluon/Z parent FA-ccin2p3-1f2d9ad5 ends (smoke FA-ccin2p3-4e7b6669 first: cancel the full run if the smoke
+      fails): parent check vs 9a73698a on the 9 shared processes, site copy its run dir to lxplus, then drive ftmech_zng4g_ftglu_b128
+      (1e4) and ftmech_zng4g_d1e3_ftglu_b128 together, then seeds 43/44'
   done_when: null
   notes_ref: null
   match: dsave_ftmech_*,ftmech_*
@@ -39918,11 +39921,18 @@ entries:
       sweeps_local/ftmech_zng4g_ftnoset_b{2048,128}
     written: '2026-11-24T05:12:09+00:00'
   step_why:
-    2:
-      feeds: what remains of the b128 fine-tune deficit once the parent's settings are removed (D519/D520)
+    1:
+      feeds: whether today's 28-process parent gains over scratch at D=1e3 (Fn1k/S1k), the control for the dilution read
       if:
-      - 'a matched lower-D read shows Fn below S: dilution not the residual, report'
-      - 'Fn above S at lower D too: pretraining cost beyond the settings, report with figure'
+      - 'hi<1: parent gains at 1e3, the 1e4 residual is a large-D effect; report with figure'
+      - 'lo>1: a pretraining cost at every D, report with figure'
+      - 'else: unresolved, question to Joaquin on more seeds'
+    2:
+      feeds: 'H2 dilution: Fg/Fn at 1e4 and at D=1e3 (design passed 2026-11-24)'
+      if:
+      - 'hi<1: dilution yes (at 1e4 with Fg/S<=1: the residual is dilution)'
+      - 'lo>0.65 and hi>=1: no dilution of the needed size; next the b128 instability'
+      - 'else unresolved: question to Joaquin on more seeds'
 - id: llm_compare
   title: LLoCa against Suprio's LLM on the LLM amplitude catalogue
   question: In the conditions of Suprio's LLM pID run (1501 MadGraph-default processes, 1352 trained, 149 held out; 55,296
