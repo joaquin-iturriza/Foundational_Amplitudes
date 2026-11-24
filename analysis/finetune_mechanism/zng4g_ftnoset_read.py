@@ -63,8 +63,8 @@ def main():
     assert len(ts) == 16 and all(isinstance(v["lr"], float) and v["val_loss"] is not None for _, v in ts), len(ts)
     ti, ch = min(ts, key=lambda t: t[1]["val_loss"])
     assert abs(min(ch["val_mse_curve"]) / ch["val_loss"] - 1) < 1e-6
-    fn_curves = [ch["val_mse_curve"]] + [raw[f"Fn|{b}|s{s}"]["val_mse_curve"] for s in (43, 44)
-                                         if raw.get(f"Fn|{b}|s{s}", {}).get("val_mse_curve")]
+    fn_seeds = [42] + [s for s in (43, 44) if raw.get(f"Fn|{b}|s{s}", {}).get("val_mse_curve")]
+    fn_curves = [ch["val_mse_curve"]] + [raw[f"Fn|{b}|s{s}"]["val_mse_curve"] for s in fn_seeds[1:]]
     curves = {"Fn": [np.array(c) * k2 for c in fn_curves], "F": [np.array(c) for c in base["curves"]["F"]]}
     best = {"Fn": [float(c.min()) for c in curves["Fn"]], "F": r1["best"]["F"], "Sf": r1["best"]["Sf"]}
     if b == "128":
@@ -89,7 +89,9 @@ def main():
         res["Fn_over_S8"] = ratio(best["Fn"], best["S8"])
     fs, ff = res["Fn_over_S"]["mean"], res["Fn_over_F"]["mean"]
     res["branch"] = ("yes" if fs <= YES_BAR else "partial" if ff < PARTIAL_BAR else "unresolved") + " (this batch)"
-    res["blowups"] = {a: [42 + i for i, c in enumerate(cs) if np.any(c > 10 * np.minimum.accumulate(c))]
+    seeds = {a: fn_seeds if a == "Fn" else [42, 43, 44] for a in curves}   # each run's real seed
+    assert all(len(seeds[a]) == len(cs) for a, cs in curves.items()), {a: len(cs) for a, cs in curves.items()}
+    res["blowups"] = {a: [seeds[a][i] for i, c in enumerate(cs) if np.any(c > 10 * np.minimum.accumulate(c))]
                       for a, cs in curves.items()}
     res["best_at"] = {a: [(int(np.argmin(c)) + 1) / len(c) for c in cs] for a, cs in curves.items()}
     res["trials"] = {"Fn": sorted((v["lr"], v["val_loss"] * k2, i) for i, v in ts),

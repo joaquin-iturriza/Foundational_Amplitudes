@@ -50,6 +50,8 @@ PARENT="runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262"
 RECIPE="$PROJECT_DIR/recipes/catalog_v4_datasaving_parent_${WHICH}.yaml"
 [ "$WHICH" = finale ] && RECIPE="$PROJECT_DIR/recipes/transfer_finale.yaml"
 TAG=; ARGS=(); for x in "$@"; do case "$x" in tag=*) TAG="_${x#tag=}";; lr=*) LR="${x#lr=}";; flags=off) FIX=("${FIX[@]/#++model.input_soft_eps=*/++model.input_soft_eps=0.0}"); FIX=("${FIX[@]/#++model.input_pair_logs=*/++model.input_pair_logs=0}");; iters=*) T="${x#iters=}";; recipe=*) RECIPE="$PROJECT_DIR/${x#recipe=}";; *) ARGS+=("$x");; esac; done
+# flags=off and recipe= change the parent: refuse to write them into the default (costly) run dir
+case " $* " in *" flags=off "*|*" recipe="*) [ -n "$TAG" ] || { echo "flags=off and recipe= need tag=<name>"; exit 2; };; esac
 [ -e "$RECIPE" ] && [ -e "$PROJECT_DIR/$PARENT/config.yaml" ] || { echo "no $RECIPE or $PARENT/config.yaml"; exit 2; }
 OUT="$PROJECT_DIR/runs/data_saving/dsave_parent_${WHICH}${TAG}"
 # WSD: also save the pre-cooldown model (with its optimizer state) at T x (1 - wsd_cooldown_frac), for snapshot restarts

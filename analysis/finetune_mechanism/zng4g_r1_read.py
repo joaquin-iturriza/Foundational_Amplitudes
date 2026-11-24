@@ -184,6 +184,9 @@ def onesetting(b):
         res["g"][x] = {"mean": float(np.log(mean[x] / mean["S"]) / np.log(mean["F"] / mean["S"])),
                        "q10_50_90": triples_share(best[x], best["S"], best["F"])[0]}
     # blow-ups (D398): validation above 10x its best-so-far, listed apart with where it happened
+    # every arm holds seeds 42, 43, 44 in that order (the chosen trial, then the two seed runs; a missing one raises
+    # above), so position i is seed 42 + i; checked here so a short arm cannot be mislabelled
+    assert all(len(cs) == 3 for cs in curves.values()), {a: len(cs) for a, cs in curves.items()}
     res["blowups"] = {a: [{"seed": 42 + i, "first_at": int(np.argmax(c > 10 * np.minimum.accumulate(c))) + 1,
                            "n_val": len(c), "max_over_best": float(c.max() / c.min())}
                           for i, c in enumerate(cs) if np.any(np.asarray(c) > 10 * np.minimum.accumulate(c))]
