@@ -1,0 +1,65 @@
+{
+ "pooled_rmse_logm2": {
+  "ours, tuned": {
+   "seen": 0.11674052765148157,
+   "held out": 1.0032835380786782,
+   "relabels": 0.2411965674301106,
+   "new": 1.7674672915885963
+  },
+  "ours, his optimizer": {
+   "seen": 0.13871081831494567,
+   "held out": 1.0418327232529996,
+   "relabels": 0.23702759585128416,
+   "new": 1.839358230064396
+  },
+  "ours, latest setup": {
+   "seen": 0.17058869052002032,
+   "held out": 1.2531043838559104,
+   "relabels": 0.31051661256548985,
+   "new": 2.2047055309328263
+  },
+  "LLM (Suprio)": {
+   "seen": 0.321,
+   "held out": 0.721,
+   "relabels": 0.34115618793215297,
+   "new": 1.192596333039571
+  },
+  "LLoCa (Suprio)": {
+   "seen": 0.506,
+   "held out": 0.953
+  }
+ },
+ "median_mse_logm2": {
+  "relabels": {
+   "ours, tuned": 0.020767137866951692,
+   "ours, his optimizer": 0.02756084495752755,
+   "ours, latest setup": 0.013969916875490249,
+   "LLM (Suprio)": 0.07863770792289987
+  },
+  "new": {
+   "ours, tuned": 1.1436461712812618,
+   "ours, his optimizer": 0.6881611576543867,
+   "ours, latest setup": 0.3854262601754468,
+   "LLM (Suprio)": 0.6490025910465533
+  }
+ },
+ "ours_below_llm": {
+  "ours, tuned": {
+   "relabels": 77,
+   "new": 9
+  },
+  "ours, his optimizer": {
+   "relabels": 82,
+   "new": 14
+  },
+  "ours, latest setup": {
+   "relabels": 84,
+   "new": 25
+  }
+ },
+ "counts": {
+  "seen": 1352,
+  "relabels": 96,
+  "new": 43
+ }
+}
