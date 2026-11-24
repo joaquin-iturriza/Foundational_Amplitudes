@@ -41182,6 +41182,16 @@ entries:
       on CC at 15-16 GB free under its 60 GB floor: lxplus EOS (whole GPUs >= 80 GB, 7-day nextweek), or CC only when free
       space exceeds peak + 10 GB. Trunk now has training.batch_accumulation (critical_batch: micro-batches at the whole batch''s
       per-process counts), the mixed accumulation the design named as fallback.'
+  - at: '2026-11-24T16:59:40+00:00'
+    text: '2026-11-24 ~18:45 CET: 120-head width smoke FA-ccin2p3-c6a550c4 (save=false, checkpoint_blocks, CC H100 NVL, code
+      c46f16b445): 354,107,348 parameters, 50 steps trained with finite loss (val_loss_no_reg 0.163 at step 50), steady 5.33
+      s/step (steps 6-45: 207.9 s / 39), peak GPU 71.5 GB (80 GB-class GPU only). It ended FAILED after training: save=false
+      makes no run_dir, but _write_step_log still wrote train_steps.npz there; fixed at a92234542 (skips the step log when
+      save is off; not exercised on a GPU since). Part (b) GPU-h, 60,840 steps x s/step x 1.3 on H100 NVL: 16 heads 10.4 (peak
+      26.0 GB: under the design''s no-floor rule its V100 bound 4.18 s/step gives 91.8), 32 heads 19.4, 64 heads 53.2, 120
+      heads 117.1 (~4.9 days in one job); all four 200 GPU-h (282 by the V100 bound for 16 heads); without 120 heads 83 GPU-h
+      (16 heads given the 80G floor). Disk: 120 (27.4 GB peak) and 64 (7.8 GB) go to lxplus EOS; 16 and 32 (2.5 GB peak together)
+      fit CC. Above D536''s 100 GPU-h: asked Joaquin (plan ask), step 10 held.'
   step_waits:
     '5': llmcmp_c_qperp_drive4 DRIVE_DONE (detach event of the driver)
     '7': FA-ccin2p3-bf23e0c4 FA-ccin2p3-b77878e1 FA-ccin2p3-f6f7179d
