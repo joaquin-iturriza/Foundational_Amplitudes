@@ -44569,7 +44569,8 @@ entries:
       if:
       - 'smoke clean (every stage, the stop taken, finite mu-MSE): submit cbs_b32768 on CC'
       - 'smoke broken: fix the accumulation path, rerun the smoke once, then submit'
-  step_waits: {}
+  step_waits:
+    '2': ccin2p3:cbs_smoke_b32768
   targets:
   - batch: noise_smoke
     wall_h: 0.4
