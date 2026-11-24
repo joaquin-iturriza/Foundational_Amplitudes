@@ -9042,6 +9042,90 @@ Hyperparameter & Declared (old) & Optima p5--p95 & Redesigned default \\
   \label{fig:2d}
 \end{figure}
 
+\subsection{The gradient noise scale of the canonical setup}\label{sec:noisescale}
+The question (D532) is whether our batch of $16384$ events is below or above the critical batch size, read from the
+simple noise scale $B_{\rm simple}={\rm tr}\,\Sigma/|G|^2$ of McCandlish et al.\ (arXiv:1812.06162), with $\Sigma$ the
+covariance of one event's gradient and $G$ the true gradient. The earlier single-run attempt read gradients after the
+clip at norm $5$, which binds on almost every step of this setup, so no earlier value exists. Here the run
+FA-ccin2p3-225d38ea repeats the WSD heteroscedastic control of catalog\_v4 (\code{v4\_het\_control\_wsd}) and, every
+$10$ steps before the update, cuts the step's batch into $8$ chunks of $2048$ events; the two-batch-size estimator of
+the paper's appendix A gives ${\rm tr}\,\Sigma$ and $|G|^2$ from the chunk gradients, averaged apart over windows of
+$200$ steps. At five steps the same quantities are read by their definition from $16$ independent batch gradients,
+with jackknife errors, beside the chunk estimator on the same batches.
+% allow: 16384 2048 8 16 because they are the batch, the chunk size, the chunk count and the number of independent batches, settings
+% allow: 1812.06162 because it is the arXiv number of the paper
+% allow: 5 10 200 because they are the clip norm, the measurement interval and the window, settings
+% allow: 2 because it is the exponent of a squared norm
+
+The chunk estimator agrees with the independent batches on $|G|^2$ at all five checks, but overstates
+${\rm tr}\,\Sigma$ once training is under way: by a factor $1.16$ at step $500$, $1.29$ at step $1500$, $1.28$ at
+step $3000$ and $1.28$ at step $4100$ (outside two combined standard errors at $1500$ and $4100$). The cause is the
+loss itself: it is a mean over processes of per-process means, so a batch gradient is normalised by the batch's own
+process counts and its spread has no term from them, while chunks weighted at the whole batch's counts carry one.
+A test with known process gradients reproduces it (\code{tests/test\_noise\_scale.py}: no excess with one process,
+a factor above $1.5$ with $50$ processes). The independent batches are therefore the reference, and they give
+$B_{\rm simple}=84\pm9$ events at step $500$, $28.2\pm1.4$ at step $1500$, $28\pm6$ at step $3000$ and $39\pm5$ at
+step $4100$; at step $50$ the value is undetermined ($91100\pm70100$). Along the run, the chunk windows give a median of $55.5$ events (quartiles $40.4$ and $95.1$, over all $21$
+windows; $2$ windows have mean $|G|^2\leq0$ and no $B_{\rm simple}$), split into $232$ for the Muon matrices
+and $37.2$ for the AdamW parameters; the Muon value reaches $734$ in the last window. These chunk values carry the
+excess trace above. In six windows a single measurement carries almost all of the summed trace, whose window mean
+reaches $8.25\times10^{29}$: the per-event gradient of the heteroscedastic loss is heavy-tailed, and those windows
+fall off the scale of the figure or have no $B_{\rm simple}$ (figure~\ref{fig:noisescale}).
+% src: python3 analysis/critical_batch/noise_read.py analysis/critical_batch/data/FA-ccin2p3-225d38ea_noise_scale.json v4_het_noise_scale --result analysis/critical_batch/data/FA-ccin2p3-225d38ea_result.json --control analysis/critical_batch/data/v4_het_control_wsd_result.json @33bcd0b45
+% claim: check500.S_ratio=1.16
+% claim: check1500.S_ratio=1.29
+% claim: check3000.S_ratio=1.28
+% claim: check4100.S_ratio=1.28
+% claim: check500.B_brute=84
+% claim: check500.B_brute_se=9
+% claim: check1500.B_brute=28.2
+% claim: check1500.B_brute_se=1.4
+% claim: check3000.B_brute=28
+% claim: check3000.B_brute_se=6
+% claim: check4100.B_brute=39
+% claim: check4100.B_brute_se=5
+% claim: check50.B_brute=91100
+% claim: check50.B_brute_se=70100
+% claim: S_max=8.25e29
+% claim: B_median=55.5
+% claim: B_q25=40.4
+% claim: B_q75=95.1
+% claim: n_windows=21
+% claim: n_no_B=2
+% claim: B_muon_median=232
+% claim: B_adamw_median=37.2
+% claim: B_muon_last=734
+% allow: 50 500 1500 3000 4100 because they are the check steps, settings
+% allow: 400 because it is the start of the read range, a setting
+% allow: 1.5 50 because they are the test's assertion and its process count, a test setting
+% allow: 2 because it is the exponent of a squared norm
+
+So $B_{\rm simple}$ sits two to three decades below our batch over the whole run. In the paper's picture the batch is
+far past the critical size, and a smaller batch would reach the same loss in about as many steps with far fewer events;
+whether that holds for Muon and this loss is the batch-size scan's question, still waiting on the GPU budget. The
+measurement leaves training on its course within the spread of this setup's validation spikes: the last validation
+loss is $-2.872$ against the control's $-2.907$, both runs showing isolated spikes at different steps. It costs
+$1.95$ training hours against the control's $1.23$.
+% src: python3 analysis/critical_batch/noise_read.py analysis/critical_batch/data/FA-ccin2p3-225d38ea_noise_scale.json v4_het_noise_scale --result analysis/critical_batch/data/FA-ccin2p3-225d38ea_result.json --control analysis/critical_batch/data/v4_het_control_wsd_result.json @33bcd0b45
+% claim: run.val_last=-2.872
+% claim: control.val_last=-2.907
+% claim: run.hours=1.95
+% claim: control.hours=1.23
+
+\begin{figure}[h]
+\centering
+\includegraphics{../analysis/critical_batch/figs/v4_het_noise_scale.pdf}
+\caption{Gradient noise scale along the catalog\_v4 pretraining (batch $16384$, seed $42$). (a) $B_{\rm simple}$
+against step, windows of $200$ steps, from chunks of each batch (all parameters, Muon and AdamW sets) and from
+$16$ independent batches; the triangles mark windows above the range (up triangles) or without {\rm simple}$
+(down triangles). (b) ${\rm tr}\,\Sigma$ and
+$|G|^2$ times the batch. (c) ${\rm tr}\,\Sigma$ at the five checks, independent batches against chunks, bars two
+standard errors. (d) Validation loss, the run against its control without the measurement.}
+\label{fig:noisescale}
+\end{figure}
+% allow: 16384 200 16 42 because they are the batch, the window, the number of independent batches and the seed, settings
+% allow: 2 because it is the exponent of a squared norm
+
 % ==========================================================================
 \section{Physical feature levers: what the momenta cannot encode}\label{sec:levers}
 % ==========================================================================
