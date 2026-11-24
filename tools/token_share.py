@@ -57,7 +57,7 @@ def text_of(c):
 def read(f):
     """(brief, events) of a transcript: events are ('msg', id, usage, model, ts, [tool_use (name, cmd, id)]),
     ('result', tool_use_id, chars), ('user', text) and ('boundary',)."""
-    ev, brief = [], None
+    ev, brief, at = [], None, {}
     for line in open(f, errors="replace"):
         try:
             d = json.loads(line)
@@ -70,6 +70,10 @@ def read(f):
         if d.get("type") == "assistant" and m.get("usage") and m.get("id"):
             uses = [(b.get("name"), json.dumps(b.get("input") or {}), b.get("id"))
                     for b in m.get("content") or [] if isinstance(b, dict) and b.get("type") == "tool_use"]
+            if m["id"] in at:  # one API message is logged as one record per content block: merge its tool calls
+                ev[at[m["id"]]][5].extend(uses)
+                continue
+            at[m["id"]] = len(ev)
             ev.append(("msg", m["id"], m["usage"], m.get("model"), (d.get("timestamp") or "")[:19], uses))
         elif d.get("type") == "user":
             c = m.get("content")
@@ -125,6 +129,43 @@ def role(f, brief, meta, ev):
     return "other agent"
 
 
+KINDS = [  # (kind, test on (tool name, Bash command or file path)); a message goes to the first kind any call matches
+    ("launch or brief agents", lambda n, c: n in ("Agent", "Task", "SendMessage", "TaskStop")),
+    ("final report", lambda n, c: n == "SubagentHandback"),
+    ("write-up (.tex)", lambda n, c: n in ("Edit", "Write") and c.endswith(".tex")
+     or n == "Bash" and re.search(r"\.tex\b", c) and re.search(r"sed -i|python3? - <<|> ?\S+\.tex", c)),
+    ("figures", lambda n, c: n in ("Edit", "Write") and re.search(r"fig|plot", c) or n == "Read" and c.endswith(".png")
+     or n == "Bash" and re.search(r"check_caption|send_check|figs?/", c)),
+    ("code edits", lambda n, c: n in ("Edit", "Write", "NotebookEdit")),
+    ("plan and ledger bookkeeping", lambda n, c: n == "Bash" and re.search(
+        r"tools/plan\.py|\bsite (ack|events|decide|undecide|items?|digest|decisions|hold|release)\b|detach\.py|"
+        r"hook_incident|review_backlog", c)),
+    ("jobs: submit, sync, pick", lambda n, c: n == "Bash" and re.search(
+        r"\bsite (submit|sync|copy|pick|run|cancel|env)\b|sweep_manager|drive\.py", c)),
+    ("git", lambda n, c: n == "Bash" and re.search(r"(^|[;&|]\s*)git ", c)),
+    ("run state and logs", lambda n, c: n == "Bash" and re.search(r"\bsite (logs|runs|status|poll|where|fetch|list)\b|"
+                                                                  r"labllm\.py", c)),
+    ("analyses and tests", lambda n, c: n == "Bash" and re.search(r"python|pytest|\.sh\b", c)),
+    ("read files and search", lambda n, c: n in ("Read", "Grep", "Glob") or n == "Bash"),
+    ("other tools", lambda n, c: True),
+]
+
+
+def kind_of(uses):
+    calls = []
+    for n, c, _ in uses:
+        try:
+            i = json.loads(c)
+        except ValueError:
+            i = {}
+        calls.append((n, i.get("command") or i.get("file_path") or ""))
+    if not calls:
+        return "text only (reply, reasoning)"
+    for k, test in KINDS:
+        if any(test(n, c) for n, c in calls):
+            return k
+
+
 def scan(since, until):
     seen = set()
     roles = defaultdict(lambda: {"tokens": 0, "usd": 0.0, "agents": 0, "per_agent": []})
@@ -154,6 +195,11 @@ def scan(since, until):
         R["usd"] += c
         R["agents"] += r != "main"
         R["per_agent"].append(t)
+        for e in msgs:
+            K = R.setdefault("kinds", {}).setdefault(kind_of(e[5]), [0, 0.0, 0])
+            K[0] += tok(e[2])
+            K[1] += usd(e[2], e[3])
+            K[2] += 1
         if r in ("event worker", "fix worker"):
             worker_desc[r].append((meta.get("description", ""), t))
         if r == "Explore":
@@ -268,7 +314,11 @@ def main():
            "total_tokens": total, "total_usd": round(total_usd, 2),
            "roles": {k: {"tokens": v["tokens"], "usd": round(v["usd"], 2), "agents": v["agents"],
                          "share": v["tokens"] / total, "share_usd": v["usd"] / total_usd,
-                         "mean_per_agent": mean(v) if k != "main" else None} for k, v in roles.items()},
+                         "mean_per_agent": mean(v) if k != "main" else None,
+                         "kinds": {kk: {"tokens": vv[0], "usd": round(vv[1], 2), "messages": vv[2],
+                                        "share_of_total": vv[0] / total}
+                                   for kk, vv in sorted(v.get("kinds", {}).items(), key=lambda kv: -kv[1][0])}}
+                     for k, v in roles.items()},
            "kind1_logs": dict(k1, event_workers=ew["agents"], event_worker_tokens=ew["tokens"],
                               chars_per_token=CHARS_PER_TOKEN,
                               calib_next_write_over_T_median=statistics.median(calib) if calib else None),
@@ -290,6 +340,11 @@ def main():
                                    for kk, vv in v.items() if kk != "note"}, v.get("note", "")[:60])
     print(json.dumps({"total_M": round(total / 1e6, 1), **{k: round(100 * v.get("share", v.get("share_mid", 0)), 2)
                                                            for k, v in save.items()}}))
+    for r in ("owner", "main", "other agent", "reviewer"):
+        print("kinds of %s:" % r)
+        for k, v in rep["roles"][r]["kinds"].items():
+            print("    %-30s %7.1fM  %5.1f%% of all  $%6.0f  msgs %6d  %.0fk/msg" % (
+                k, v["tokens"] / 1e6, 100 * v["share_of_total"], v["usd"], v["messages"], v["tokens"] / v["messages"] / 1e3))
     figure(rep, a.fig)
 
 
