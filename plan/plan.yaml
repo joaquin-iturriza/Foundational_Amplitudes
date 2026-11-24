@@ -44961,7 +44961,10 @@ entries:
   evidence:
     runs: []
     commit: null
-    paths: []
+    paths:
+    - /home/joaquin/work/orchestrator-kit
+    - /home/joaquin/work/orchestrator-kit/README.md
+    - /home/joaquin/work/orchestrator-kit/tests/test_kit.py
   dead_ends: []
   asks: []
   owner:
