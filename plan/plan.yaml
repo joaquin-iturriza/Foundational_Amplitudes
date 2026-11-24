@@ -45848,3 +45848,31 @@ entries:
       +1.05 dec <- the rescale arm''s measured seed spread of the deepest soft bin at 1e5 (d539u_kit.json: 0.033..0.372);
       2-sigma interval of r <- the arms'' own measured three-seed spread (log-sd, zng4g_d1e3_read.ratio, as par:ftm_d539);
       ''without hurting the rest'' and ''keeping the effect on the bins this targets'' <- Joaquin''s words D552'
+    fix_at: '2026-11-24T23:57:06+00:00'
+    fix: '1) Common sense and the feature rule (CLAUDE.md: a feature is judged first at the baseline''s best HPs, done if
+      better; else the same sweep, best against best): the design goes straight to 12 new 16-trial searches plus 2 new Z+4g
+      1e5 control searches (~55 GPU-h). The hand-off''s ''each arm at its own searched optimum'' is not Joaquin''s decision
+      and is re-justified nowhere. Stage 1 must be: each scheme A/B/C at the no-rescale search''s optimum (hp1333 of tp_zng_d1e4_muon_b2048_zgggg
+      for Z+4g; the no-rescale uug searches'' optima for uug), seeds 42/43/44, in all four cells (3 schemes x 4 cells x 3
+      seeds = 36 runs, ~7 GPU-h), read against the existing D539 runs at those same HPs: Z+4g 1e4 and 1e5 off and eps1e-8
+      already exist at the no-rescale optimum (par:ftm_d539, ftmech_d539s_*: 1e5 off gmean 0.0059, eps1e-8 0.0119, r=2.07
+      [1.57,2.71]), so the two new Z+4g 1e5 control searches are not needed for stage 1. For uug, state which control is matched
+      at those HPs (the D539 per-arm searched runs differ in HPs from a scheme run at the no-rescale optimum; reuse what was
+      run at the same HPs, or say which runs are needed). Only on a NO in a cell does that scheme get its 16-trial search
+      (and the matched control search where missing), best against best; state this two-stage plan and its budget per stage.
+      2) D395 smoke: model.input_soft_x0 and model.input_soft_gate are new code paths (7d4dc4ec4, 02929d3d2) never run end
+      to end in a job; add one ~50-step GPU smoke through every stage (sigma fit, scoring, kit score-only, plots) with one
+      of the new flags, and show it writes the val curve and kit file the measure reads. 3) Inherited settings: list every
+      key that differs from the D539 sweep configs the setup is named after (sweep_config_ftmech_d539_uug_<D>_<arm>_b2048.yaml
+      / sweep_config_tp_zng_d1e4_muon_b2048_zgggg.yaml): sweep_name, processes_file, train_subsample, input_soft_eps, input_soft_x0
+      / input_soft_gate, and anything else, with reasons. 4) Disk and time: state the disk per run (read from a D539 run)
+      and the site free disk now, and record the wall-time target per run (1953 steps x 0.139 s/step plus eval) on the entry.
+      5) Outcome wording: the soft-bin tolerances +0.30 dec (1e4) and +1.05 dec (1e5) are log10(max/min) of the rescale arm''s
+      three seeds in d539u_kit.json (0.099..0.198; 0.033..0.372), not the range above the median (+0.25 / +0.26); say which
+      it is and apply that. Also note in the outcome that in u u~ g 1e4 the 2-sigma band of r is about x1.6 each way ([1.32,3.58]
+      for the rescale), so ''interval contains 1'' there cannot exclude a ~1.5x cost; the YES rests on the Z+4g cells. Checks
+      that hold: measure moves (Z+4g 1e4 r 2.28 [2.03,2.57], kit soft -4.65/-4.57 dec, d539u_kit.json confirmed; input_check.json
+      predictions confirmed: A 1.05, B 1.40, C ~1.22 on Z+4g); seeds 3 as siblings; 16 trials/waves 3,3,2,3,3,2 match the
+      D539 sibling sweeps; loss HETEROSC with mu_mse selection as D539; no label in inputs (x_i from the event''s own momenta);
+      no prior selective/gated rescale found (searched results.tex for selective, soft_x0, soft_gate, gated rescale, event
+      gate, rescale only; decisions for rescale, D374, D392, D539, D552).'
