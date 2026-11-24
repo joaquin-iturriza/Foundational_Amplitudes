@@ -45302,3 +45302,9 @@ entries:
     at: '2026-11-24T20:14:13+00:00'
   blocks: the cluster-side gate test only
   blocks_steps: *id005
+  findings:
+  - at: '2026-11-24T22:03:55+00:00'
+    text: 'Kit proven end to end on CC-IN2P3 under a separate HOME (ledger off): env CPU job exit 0, pick allots ccin2p3,
+      probe V100 RUN_DONE, toy fit w=3.0038 b=0.9986, supervisor sorted 3 runs clean, fetch pulled metrics.json; FA gate sha
+      and stamps unchanged, 0 toy rows in FA''s ledger; kit fixes at origin/main d2681fb. Untested: site-side gate and items.
+      CC denies module anaconda/3.11, which FA''s sites.yaml env uses.'
