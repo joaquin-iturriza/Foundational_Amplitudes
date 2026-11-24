@@ -1,0 +1,4 @@
+# producer: /home/joaquin/work/FA/worktrees/wt-labllm/tools/lab_llm_report.py a1d6099f629b4cb2886ed302bfbd5e23a14f3352
+Sonnet
+DeepSeek+plan
+DeepSeek

@@ -17714,6 +17714,114 @@ over all tasks and a median of 0.654 per pair (0.585 to 0.782), above the 0.6 li
 With equal quality on the 10 pairs, the user switched mechanical steps to Sonnet anyway (D213), watching its first 30
 tasks and reverting after 5 failures.
 
+% src: python3 tools/lab_llm_report.py --json @d75c664b9
+% claim: fix.deepseek.n=10
+% claim: triage.deepseek.n=30
+% claim: triage.deepseek.passed_first=30
+% claim: triage.qwen.passed_first=30
+% claim: triage.deepseek.hand_ok=29
+% claim: triage.qwen.hand_ok=30
+% claim: fix.sonnet_timed.passed_first=9
+% claim: fix.sonnet_timed.passed_final=9
+% claim: fix.deepseek+plan.passed_first=9
+% claim: fix.qwen+plan.passed_first=9
+% claim: fix.deepseek.passed_first=8
+% claim: fix.qwen.passed_first=8
+% claim: fix.deepseek.passed_final=9
+% claim: fix.qwen.passed_final=9
+% claim: fix.deepseek.wilson_first.0=0.49
+% claim: fix.deepseek.wilson_first.1=0.94
+% claim: fix.sonnet_timed.wilson_first.0=0.60
+% claim: fix.sonnet_timed.wilson_first.1=0.98
+% claim: fix.sonnet_timed.our_tokens_per_task=297k
+% claim: fix.deepseek+plan.our_tokens_per_task=189k
+% claim: fix.sonnet_timed.minutes_median=3.63
+% claim: fix.deepseek+plan.minutes_median=3.24
+% claim: fix.deepseek.minutes_median=8.89
+% allow: 95 because it is the interval's level, a setting
+\paragraph{Lab LLMs in place of subagents, first round.}\label{par:labllm1} The user asked (D530) whether the lab's
+LLMs (\code{deepseek-v4-flash} and \code{qwen3.8-27b}, served by the lab) can do some of our subagent work, alone or
+executing a plan written by a stronger model, and how many of our tokens that saves. Each lab model ran through
+opencode in a sandbox that sees only a copy of the code and the CPU environment. Two kinds of work were set: reading
+the logs of 30 failed runs (the cause, and the step or error line, scored against keys; then the reason and the action
+read by hand against the ack note), and the 10 small tool fixes of the model trial above, from each fix's parent with
+the same brief and the fix's own tests as the check, one rework round on the failing output. Fix arms: DeepSeek and
+Qwen alone, each executing a Sonnet plan (+plan), and a timed Sonnet mechanical-worker. Log reading was right in 30 of
+30 for both models on the keys, and by hand in 29 (DeepSeek) and 30 (Qwen). On the fixes (Fig.~\ref{fig:labllm1}) the
+Sonnet worker and both +plan arms passed 9 at the first attempt (Wilson 95\% interval 0.60--0.98), DeepSeek and Qwen
+alone 8 (0.49--0.94) and 9 after rework. Our tokens per fix were 297k for Sonnet, 189k for each +plan arm (the
+planner) and none for the lab models alone; median wall time 3.63 min for Sonnet, 3.24 for DeepSeek+plan and 8.89 for
+DeepSeek alone (the figure shows means). The user then routed failed-run log reading and small tool fixes to DeepSeek, each result checked by
+Sonnet, and asked for harder tasks (D541).
+
+% allow: 10^3 10 30 because they are the axis unit and the design's task counts
+\begin{figure}[htbp]\centering
+\includegraphics{../analysis/lab_llm_trial/figs/lab_llm_pass.pdf}
+\caption{First round. Top left: share of the 10 tool fixes passed, per arm, at the first attempt and after one
+rework; top right: mean wall time per fix (min); bottom left: our tokens per fix ($10^3$; none for a lab model alone);
+bottom right: share of the 30 failed-run logs read right, on the keys (cause and step or error line) and by hand
+(reason and action). Sonnet: a Sonnet mechanical-worker; DeepSeek, Qwen: the lab model alone; +plan: executing a
+Sonnet plan.}\label{fig:labllm1}
+\end{figure}
+
+% src: python3 tools/lab_llm_report.py --json @d75c664b9
+% claim: hardfix.sonnet.n=10
+% claim: hardfix.sonnet.passed_first=10
+% claim: hardfix.deepseek+plan.passed_first=10
+% claim: hardfix.deepseek.passed_first=10
+% claim: hardfix.sonnet.wilson_first.0=0.72
+% claim: hardfix.sonnet.wilson_first.1=1.0
+% claim: hardfix.deepseek+plan.check_matches_grader=10
+% claim: hardfix.deepseek.check_matches_grader=9
+% claim: hardfix.sonnet.our_tokens_per_task=244k
+% claim: hardfix.deepseek+plan.our_tokens_per_task=254k
+% claim: hardfix.deepseek.our_tokens_per_task=142k
+% claim: hardfix.deepseek.ours_over_sonnet=0.58
+% claim: hardfix.deepseek+plan.ours_over_sonnet=1.04
+% claim: hardfix.deepseek.tasks_below_sonnet=9
+% claim: hardfix.sonnet.minutes_median=1.13
+% claim: hardfix.deepseek+plan.minutes_median=3.72
+% claim: hardfix.deepseek.minutes_median=8.33
+% claim: lookup.deepseek.run1.correct=10
+% claim: lookup.deepseek.run2.correct=10
+% claim: lookup.deepseek.run1.seconds_per_task=16.1
+% claim: lookup.deepseek.run2.seconds_per_task=21.1
+% claim: lookup.explore_opus_low.grep.correct=9
+% claim: lookup.explore_opus_low.grep2.correct=10
+% claim: lookup.explore_opus_low.grep.our_tokens_per_task=47k
+% claim: lookup.explore_opus_low.grep2.our_tokens_per_task=47k
+% allow: 0.3 95 because they are the design's token bar and the interval's level, settings
+\paragraph{Lab LLMs on harder work: multi-file fixes and code lookups.}\label{par:labllm2} The second round (D541) set
+DeepSeek the 10 largest validated fixes of the extended model trial (two to five files each, the defect written from
+the fix commit's message, its failing tests handed over and graded from the fix commit), alone and executing a Sonnet
+plan, against a Sonnet mechanical-worker on the same copies; each DeepSeek fix was then read by one Sonnet check, as
+the routed flow does, and its tokens count as ours. All three arms passed 10 of 10 at the first attempt (Wilson
+0.72--1.0), so on this set quality does not separate them. The Sonnet check agreed with the grader on 10 of the
+DeepSeek+plan fixes and on 9 of DeepSeek's alone; the one it refused (\code{emastart}) is a real defect the tests do
+not see: the fix rebuilds the EMA on every run, losing a warm start's restored EMA. Our tokens per fix
+(Fig.~\ref{fig:labllm2}) were 244k for Sonnet, 254k for DeepSeek+plan (planner and check; 1.04 of Sonnet's) and 142k
+for DeepSeek alone (the check only; 0.58 of Sonnet's, below Sonnet on 9 tasks); median wall time 1.13, 3.72 and 8.33
+min. The design's bar for routing multi-file fixes was at most 0.3 of Sonnet's tokens with the check, so the answer is
+no: they stay on Sonnet, and with the arms equal in quality, the check is what sets DeepSeek's cost. Code lookups (the
+code questions of the earlier lookup trial, graded by its keys) went the other way: DeepSeek answered 10 of 10 in
+each of two runs (16.1 and 21.1 s a lookup) using none of our tokens, against 9 and 10 of 10 for the Opus low-effort
+Explore agents at 47k tokens a lookup, so code lookups now go to DeepSeek first (\code{tools/labllm.py lookup}),
+checked by the asker against the functions it cites (that check's tokens not counted here). Of the first two routed log readings, the one of
+\code{FA-ccin2p3-b77878e1} matched its log and the owner's ack; the one of \code{FA-ccin2p3-d34535b0}, read from the
+log's tail after the full log timed out, had the cause right (killed for memory while drawing plots, after the
+predictions were saved) but advised resubmitting as is, which would have failed the same way, and could not see the
+run's own blow-up earlier in the log.
+
+% allow: 10^3 10 because they are the axis unit and the design's task count
+\begin{figure}[htbp]\centering
+\includegraphics{../analysis/lab_llm_trial/figs/lab_llm_hard.pdf}
+\caption{Second round, the 10 multi-file fixes, ordered by Sonnet's tokens. Our tokens per fix ($10^3$; for the
+DeepSeek arms the Sonnet check included, and the planner for +plan), wall time per fix (min) and lab tokens per fix
+($10^3$) against the task. Sonnet: a Sonnet mechanical-worker; DeepSeek+plan: DeepSeek executing a Sonnet plan;
+DeepSeek: DeepSeek alone. Every arm passed every task; the open marker is the fix the Sonnet check refused.}
+\label{fig:labllm2}
+\end{figure}
+
 % ==========================================================================
 \section{The compute envelope: VRAM and step time}\label{sec:envelope}
 % ==========================================================================
