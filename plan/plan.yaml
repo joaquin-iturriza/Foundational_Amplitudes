@@ -39515,6 +39515,19 @@ entries:
       from parent-to-parent spread with one parent seed -> reported as no effect resolved; the settings do not explain the
       fine-tune''s gap, against the scratch-side share; next: the parent''s own val and the step-0 start. A parent whose val
       blows up, or any arm at a val spike > 10x best-so-far, listed apart (D398).'
+    passed_at: '2026-11-24T04:12:02+00:00'
+    reviewer: 'Re-recorded step-5 design for its last 4 jobs (seeds 43/44 of the no-settings-parent fine-tune searches'' chosen
+      trials, ~3 GPU-h, one wave). Chunks @663dc6f33 match the searches'' summaries (b2048 hp323 lr 3.114e-3, b128 hp353 lr
+      7.257e-3, all coupled HPs). Fn arm differs from F only in the parent (same 16-trial space, windows, DyHPO seed). Check
+      2: Fn seed 42 already reads b2048 0.0171x1.254=0.0214 vs S 0.063 (0.34) and b128 0.00865x1.254=0.0108 vs new S hp0078
+      mean 0.00941 (1.15, vs trial_0950 0.55): the measure moves by far more than S''s seed spread. Check 3: S hp0078 seed
+      spread 1.18x at b128, S b2048 seeds within 1.16x; 3 seeds as F and S, 9 pairings; b128 sits near the 1.19 bar, so the
+      two seeds are what decides it. New b128 control: d507_search_v2.json has 19 trials (8 at top 3.6e-3, 8 to 1.1e-2, 3
+      at 2.7e-2..3.3e-2, all 3.6-9.8x worse), so its best hp0078 (lr 9.24e-3) is inside Fn''s window [2.7e-4,1.1e-2], a matched-budget
+      control in effect. Note for the read: b2048 hp323 sits at the window bottom (3.114e-3 vs 3.1e-3), which can only make
+      Fn lower, so it does not threaten a yes; say so if b2048 lands no. Rates from the searches'' own trials (0.35/1.06 GPU-h).
+      Searched: noset, ftnoset, flags=off, soft_eps, pair_log, hp0078, d507, Z+4g in results.tex, plan show, the entry''s
+      dead ends.'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
