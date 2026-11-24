@@ -45062,7 +45062,9 @@ entries:
   decisions:
   - D546
   - D547
-  next: null
+  next:
+    2: 'Per Joaquin''s answers: add the LICENSE he picks to the public kit, and if he types an approval in a session in the
+      toy checkout, rerun the CC proof with the toy ledger on to test the site-side gate and items'
   done_when: null
   notes_ref: null
   match: orchestrator_kit_*
@@ -45298,3 +45300,9 @@ entries:
       probe V100 RUN_DONE, toy fit w=3.0038 b=0.9986, supervisor sorted 3 runs clean, fetch pulled metrics.json; FA gate sha
       and stamps unchanged, 0 toy rows in FA''s ledger; kit fixes at origin/main d2681fb. Untested: site-side gate and items.
       CC denies module anaconda/3.11, which FA''s sites.yaml env uses.'
+  step_why:
+    2:
+      feeds: finishing the shareable kit (D546)
+      if:
+      - 'license named: add LICENSE, push'
+      - 'gate test wanted: rerun proof with ledger on'
