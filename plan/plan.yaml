@@ -40395,11 +40395,11 @@ entries:
     start: '2026-11-24T13:55:18+00:00'
     at: '2026-11-24T13:55:18+00:00'
   - batch: d539
-    wall_h: 0.7
-    jobs: 17
+    wall_h: 1.4
+    jobs: 9
     units: null
-    start: '2026-11-24T14:20:07+00:00'
-    at: '2026-11-24T14:20:07+00:00'
+    start: '2026-11-24T14:20:54+00:00'
+    at: '2026-11-24T14:20:54+00:00'
   step_waits:
     '2': the detached driver ftmech_glu_drive ending (its detach DONE event; 16+16 trials of ftmech_zng4g_ftglu_b128 and ftmech_zng4g_d1e3_ftglu_b128)
     '3': FA-ccin2p3-7d78f4f9 (kit scoring of the D539 uug smoke FA-ccin2p3-b11698b9; then check config.yaml shows the chunk's
