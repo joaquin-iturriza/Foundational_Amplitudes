@@ -38337,8 +38337,8 @@ entries:
     state: working
     since: '2026-11-24T08:11:35+00:00'
     state_at: '2026-11-24T13:47:34.286000+00:00'
-    context: 182276
-    context_at: '2026-11-24T13:47:51+00:00'
+    context: 257269
+    context_at: '2026-11-24T14:03:01+00:00'
   findings:
   - at: '2026-11-20T03:05:23+00:00'
     text: '2026-11-20 step 1 read (restart_steps.py, plot_restart.py @a5f6c7b3; figs restart_steps, restart_steps_zng, restart_headstart):
