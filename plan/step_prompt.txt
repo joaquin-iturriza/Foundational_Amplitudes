@@ -36,7 +36,8 @@ Whatever the narrowing says, once it is done carry on through every other ready 
   (`plan target {id} --batch <name> --wall <hours> --jobs N`). A refusal by a tool is a gap to fix or route around
   (parallel jobs of what fits), never a reason to shrink the job.
 - GPU budget: wall time x GPUs over everything about to go; above 30 GPU-h (10 on Jean Zay) only when a decision in
-  force covers that work at that cost, or Joaquin asked for it by name at the project's usual size for it (CLAUDE.md).
+  force covers that work at that cost, or a decision of Joaquin's names that work and it stays
+  under 100 GPU-h (CLAUDE.md).
 - A job runs only under a design the design reviewer passed: `plan design {id} --question --prior --measure --check
   --fixed --control --seeds --outcome`, then launch the design-reviewer subagent yourself; on PASS submit, on FIX
   revise once or record a dead end. An eval-only re-read of a run under its passed design carries REREAD=<run id>.

@@ -10,7 +10,7 @@ The step:
   a gap to report, never a reason to shrink the job.
 - Jobs: `site submit ... --item {id}` with `--hdr=--time=` at the job's real need, recorded with `plan run {id} <run>`;
   a broken run's log (`site logs <run> -n 100000`) is read before anything is resubmitted.
-- GPU budget: above 30 GPU-h (10 on Jean Zay) only under a decision in force, or for work Joaquin asked for by name at its usual size.
+- GPU budget: above 30 GPU-h (10 on Jean Zay) only under a decision in force, or for work a decision of Joaquin's names, under 100 GPU-h.
 - Commit only your own files, named (`git commit -m "..." -- <paths>`).
 === END MECHANICAL RULES ===
 
