@@ -44699,8 +44699,10 @@ entries:
   match: cc_login_*
   evidence:
     runs: []
-    commit: null
-    paths: []
+    commit: a477043cf
+    paths:
+    - scripts/prune_site.sh
+    - tools/ccjob_lag.py
   dead_ends: []
   asks: []
   owner:
