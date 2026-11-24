@@ -18366,6 +18366,9 @@ seed margin of 1.38, so part (b)'s width scaling starts from these HPs unless pa
 trained one, bottom the 43 that relabel none, in his order and families, grey bands $2\to2$. Stars his LLM (pID
 embedding, seed 0); circles our searched LLoCa (par.~\ref{par:llmcmp_a}); diamonds its control at his optimizer
 settings; triangles our latest setup at the latest pretraining's HPs, read before it blew up (part (c)'s control).
+Seed 42, first $10^4$ test events per process.}\label{fig:llmcmp_heldout}
+\end{figure}
+
 \section{CC-IN2P3 upkeep as CPU jobs, off the login node}\label{sec:cc_login_jobs}
 CC-IN2P3's user support asked on 2026-11-24 that no non-interactive script run on its login nodes (D544). The
 supervisor's three upkeep commands there (the disk watch, the queue feeder, the prune) now run as one-CPU jobs on the
@@ -18387,9 +18390,6 @@ was at most 21.3 minutes old when read and the feeder's 20.9, both at the one 22
 which submitted the jobs, skipped a command; the flag was at most 13 minutes old at a feed read, against the feeder's
 30-minute limit; no job waited more than 30 seconds in the queue. A job inside a job submits through the same item
 and budget gate, and one real prune ran inside its job. The switch stays: the outcome is the design's yes branch.
-
-Seed 42, first $10^4$ test events per process.}\label{fig:llmcmp_heldout}
-\end{figure}
 
 \section{Methodological principles}\label{sec:principles}
 % ==========================================================================
