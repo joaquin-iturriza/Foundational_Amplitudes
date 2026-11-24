@@ -45662,7 +45662,8 @@ entries:
       in a transcript), not a chosen cut; the remote dir is still exercised by the env CPU job (~/.ccorch_kit/jobs). Cost
       <=0.34 GPU-h. Searched orchestrator, kit, toy, ccorch_kit, standalone, examples/toy in docs/results.tex, plan, site
       decisions: no prior kit proof (kit hits only the KIT benchmark).'
-  step_waits: {}
+  step_waits:
+    '1': 'a reviewer: notes-editor on the docs backlog from 70fe902321'
   targets:
   - batch: kit_proof_cc
     wall_h: 0.25
