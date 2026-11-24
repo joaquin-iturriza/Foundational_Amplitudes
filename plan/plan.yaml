@@ -43354,10 +43354,6 @@ entries:
   decisions:
   - D530
   next:
-    1: 'Commit the lab route wiring (uncommitted on trunk: CLAUDE.md rule, plan/step_prompt.txt, plan/mechanical_prompt.txt,
-      .claude/context/working-on-the-plan.txt, .claude/hooks/plan_check.py, tools/plan.py lab_route, tests/test_lab_route.py)
-      once claudemd-keeper ae9b595669c374fca and repo-reviewer a51cecd03c33e3d65 pass; commit worktree tools/lab_llm_trial.py
-      (lookup)'
     2: 'When the lab server answers deepseek-v4-flash: run the route demo (labllm.py triage FA-ccin2p3-b77878e1 --event E8530
       and FA-ccin2p3-d34535b0 --event E8491, checked against their ack notes), the hard-fix lab batch (deepseek and deepseek+plan
       on the valid hard tasks, 2 streams, D531; plans in analysis/lab_llm_trial/plans/) and the lookup batch (/tmp/claude-1000/lab_llm_trial/lookup_0.sh,
@@ -43715,7 +43711,6 @@ entries:
       tests pass'' is stated for the result. Checks 2 and 3 and the search as in the previous pass (round one 8/10 vs 9/10;
       spread about 1.3 tasks per arm, indicative, paired, Wilson).'
   step_waits:
-    '1': claudemd-keeper ae9b595669c374fca, repo-reviewer a51cecd03c33e3d65
     '2': '2026-11-25'
     '3': detach:labllm_scenario_revalidate2 (pid 2921310)
   findings:
@@ -43767,11 +43762,6 @@ entries:
       credential dirs but returned no content to the model. Several runs read git identity (git config --global); one (poolphys
       qwen+plan) committed in its copy as joaquin-iturriza. The sandbox now hides these paths (repo-reviewer passed the fix).'
   step_why:
-    1:
-      feeds: whether failed-run log reading and small fixes go through DeepSeek with a Sonnet check (D541)
-      if:
-      - 'both pass: commit and the route is live for the next RUN event'
-      - 'either blocks: apply its fixes and continue that same reviewer'
     2:
       feeds: 'how far DeepSeek goes on harder work than round one (D541: test a few more complicated tasks)'
       if:
