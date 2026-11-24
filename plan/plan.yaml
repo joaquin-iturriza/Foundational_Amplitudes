@@ -43519,16 +43519,18 @@ entries:
   match: zz_labllm_*
   evidence:
     runs: []
-    commit: ebd146bad
+    commit: 15fae9da7
     paths:
     - analysis/lab_llm_trial/runs.jsonl
     - analysis/lab_llm_trial/summary.json
+    - analysis/lab_llm_trial/token_share.json
     - plan/mechanical_prompt.txt
     - tests/test_lab_route.py
     - tools/lab_llm_report.py
     - tools/lab_llm_trial.py
     - tools/labllm.py
     - tools/plan.py
+    - tools/token_share.py
     - worktrees/wt-labllm/analysis/lab_llm_trial/planners.json
     - worktrees/wt-labllm/analysis/lab_llm_trial/runs.jsonl
     - worktrees/wt-labllm/analysis/lab_llm_trial/summary.json
