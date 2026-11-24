@@ -10,7 +10,7 @@ planner's), 0 for a lab model alone. Lab tokens (opencode's step usage) are free
 Fix runs: the last record of each (task, arm) stands; triage runs: every run is an attempt (two per case and arm).
 The earlier trial's Sonnet / Opus-low rows (model_trial.json) carry $ only, no wall time.
 """
-import glob, json, os, sys
+import glob, json, os, statistics, sys
 from collections import defaultdict
 from datetime import datetime
 
@@ -81,9 +81,10 @@ def summary():
             n = len(c["first"])
             out[f][a] = {"n": n, "passed_first": sum(c["first"]), "passed_final": sum(c["final"]),
                          "minutes_per_task": round(sum(c["min"]) / n, 2),
-                         "minutes_median": round(sorted(c["min"])[n // 2], 2),
+                         "minutes_median": round(statistics.median(c["min"]), 2),
                          "our_tokens_per_task": round(sum(c["ours"]) / n),
-                         "lab_tokens_per_task": round(sum(c["lab"]) / n)}
+                         "lab_tokens_per_task": round(sum(c["lab"]) / n),
+                         "wilson_first": mt.wilson(sum(c["first"]), n), "wilson_final": mt.wilson(sum(c["final"]), n)}
             if c["agree"]:
                 out[f][a]["check_agree"] = sum(c["agree"])
                 out[f][a]["check_matches_grader"] = sum(c["agree_matches"])
@@ -100,7 +101,7 @@ def summary():
             t["hand_ok"] = t.get("hand_ok", 0) + o["ok"]
     ref = json.load(open(os.path.join(ROOT, "analysis", "agent_redesign", "model_trial.json")))["summary"]
     out["fix_earlier_trial"] = ref
-    json.dump(out, open(os.path.join(OUT, "summary.json"), "w"), indent=1)
+    json.dump(out, open(os.path.join(OUT, "summary.json"), "w"), indent=1, sort_keys=True)
     return out
 
 
@@ -117,6 +118,7 @@ def lookups(runs):
     for rep in sorted({str(r["rep"]) for r in ds}):
         rr = [r for r in ds if str(r["rep"]) == rep]
         out["deepseek"]["run" + rep] = {"n": len(rr), "correct": sum(bool(r["first_pass"]) for r in rr),
+                                        "wilson": mt.wilson(sum(bool(r["first_pass"]) for r in rr), len(rr)),
                                         "seconds_per_task": round(sum(r["seconds"] for r in rr) / len(rr), 1),
                                         "lab_tokens_per_task": round(sum(sum((r["usage"] or {}).get(k, 0) for k in
                                             ("in", "out", "reasoning", "cache_read")) for r in rr) / len(rr)),
@@ -124,6 +126,7 @@ def lookups(runs):
     for arm in ("grep", "grep2"):
         cc = [ctl[t][arm] for t in tasks if arm in ctl.get(t, {})]
         out["explore_opus_low"][arm] = {"n": len(cc), "correct": sum(bool(c["correct"]) for c in cc),
+                                        "wilson": mt.wilson(sum(bool(c["correct"]) for c in cc), len(cc)),
                                         "our_tokens_per_task": round(sum(transcript(c["agent"])[1] for c in cc) / len(cc))}
     return out
 
@@ -201,7 +204,7 @@ def figure(out):
 
 def main():
     out = summary()
-    print(json.dumps(out))              # one line: verify_claims reads the last {...} line
+    print(json.dumps(out, sort_keys=True))   # one line: verify_claims reads the last {...} line
     if "--json" in sys.argv:            # the claims rerun: numbers only, figures left as drawn
         return
     figure(out)
