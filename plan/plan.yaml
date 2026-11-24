@@ -15826,7 +15826,7 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-046cc7d3
-    commit: cb2341b07
+    commit: 483c6c165
     paths:
     - .claude/hooks/context_guard.py
     - .claude/hooks/notification_absorb.py
@@ -15939,6 +15939,7 @@ entries:
       wait, floor 1 h, and E7582 (1.1 h) was that floor; no change. 22(2) CLAUDE.md line 24 reworded to ''a repair that keeps
       the setup I asked for'', ''objective'' kept under D298 (d02d1d53); sent to the claudemd-keeper a5092cfc3cedbf651 now
       reviewing the pillar. 22(1) site_gate lxplus costing stays a question to Joaquin (classifier refusal).'
+    - CLAUDE.md
     - analysis/agent_redesign/agent_tasks.json
     - analysis/agent_redesign/context_breakdown.json
     - 'analysis/agent_redesign/figs/cache_census_a.png, cache_census_b.png: CC cache census 2026-11-12 ~04:20 (data/cache_census_v2.json
