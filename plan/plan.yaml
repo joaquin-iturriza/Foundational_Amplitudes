@@ -44802,3 +44802,9 @@ entries:
       89 callers) probes; submitters (sweep_manager 233, generate_sweep 110, lhe_parts 284). site''s own reads (git, df, squeue,
       find depth 3 + grep of a log, setup.sh --verify with check_site_data under 180 s, cached 10 min) stay. Durations of
       past login runs were not logged; the jobs'' sacct Elapsed will give them.'
+  - at: '2026-11-24T17:34:57+00:00'
+    text: 'Switch live 2026-11-24 18:32 (supervisor restarted on the new site code, PID 3338686): CC maintain commands run
+      as htc CPU jobs via site run --recurring; site run on CC refuses unlisted scripts and caps other commands at 60 s (sites.toml
+      login_cap, projects.toml login_scripts). Nested sbatch from an htc job through the gate works (job 64793196 submitted
+      64793203, which ran on ccwslurm0031, NESTED_OK). First supervisor jobs: disk_watch 64793199 and feed_capped 64793200
+      waited 18-21 s in the htc queue and ran ~1 s (tools/ccjob_lag.py).'
