@@ -43898,6 +43898,71 @@ entries:
       the 32768 sweep reads it). Passing: the matched control (the 16384 sweep with the same search), lr per B by DyHPO (D426/D241
       consistent), 8 trials 3/3/2 (D244/D245), HETEROSC, the outcome stated for yes and no, the comparison D532 names, no
       label in inputs, the prior search (sec:noisescale, sec:envelope, the Z+4g batch cells/D514).'
+  - at: '2026-11-24T14:19:30+00:00'
+    question: 'Step 2 of critical_batch (D532, ''its validation against batch-size runs''; budget D536): does the measured
+      noise scale (B_simple 28-84 events from 16 independent batches, median 55.5 along the run, sec:noisescale) predict where
+      larger batches stop paying off on our canonical catalog_v4 het setup? Measured as McCandlish et al.''s steps-examples
+      tradeoff: at each batch B the steps S_B to reach a target validation loss, E_B = B S_B, fit S = S_min (1 + B_crit/B),
+      compared with B_simple. Revised after the design FIX of 2026-11-24T13:49 and the repo-reviewer BLOCK (ac9677801a836098a).'
+    prior: 'sec:noisescale (c2ab3154a): B_simple 84+-9, 28.2+-1.4, 28+-6, 39+-5 events at steps 500/1500/3000/4100, 2-3 decades
+      below the training batch 16384. Searched docs/results.tex (critical, batch size, steps examples), the plan and site
+      decisions (batch, lr): no batch-size scan on this setup; D426 (batch never searched with lr; here batch is a fixed axis
+      per sweep); D514 (Z+4g at 1e4 events, a data-limited cell); sec:envelope (16384 the largest batch on a 32 GB V100 at
+      nh 8). Previous design (13:46) ruled out: equal-epoch schedules (warmup/validation/lr centre moving with B) and horizon-law
+      lr centres for Muon.'
+    measure: 'Five single-fidelity DyHPO sweeps cbs_b<B>, B in {2048, 4096, 8192, 16384, 32768}, 8 trials each (waves 3,3,2),
+      configs sweep/sweep_config_cbs_b<B>.yaml @ee924a219 (branch cbs_accum). ONE STEP SCHEDULE at every B: warmup searched
+      in the same 213-853 steps (the template''s frac window [0.05,0.2] of 4264 steps, the frac window scaled by 4264/T_B
+      so warmup = frac x T_B is the same in steps), the same constant WSD stable-phase lr from the template''s Muon window
+      [1.667e-3, 1.5e-2] at every B, validation every 85 steps at every B (validate_every_n_steps 85, validate_frac 0; the
+      control''s spacing, so the replicate band below was measured at the same spacing). Horizons T_B = 34112, 17056, 8528,
+      4264, 4264 steps: 5 epochs for B <= 16384 (so the ''no'' case is inside: S_2048 up to 8 x 2707 = 21700 < cooldown start
+      29848), and 4264 at 32768 (cooldown start 3731 > the 16384 control''s 2707-step crossing of the last target; was 2132).
+      Every target is read in the stable phase, where the lr at step s is the same at every B; the horizon only moves the
+      cooldown. Targets fixed now from the v4_het_control_wsd run (not from a sweep''s best): L = -1.66, -2.08, -2.30 (25/50/75%
+      of its stable phase). S_B(L) = first step with val_loss_no_reg <= L, linear between the two validations around the crossing
+      (sweep/run_trial.py steps_to_target; a spike validation next to the crossing degrades it to the validation step). DyHPO
+      objective = S_B(-2.08) (objective: steps_to_target, a trial never reaching it gets the failure penalty), so the search
+      and the readout ask the same thing. Best trial per B and target = lowest S_B(L) among its 8 trials (not the final post-cooldown
+      loss); E_B = B S_B; fit S = S_min(1 + B_crit/B) by least squares in log S over the B that reach L, bootstrap over the
+      B points; B_crit compared with B_simple at the step where the 16384 best trial reaches L. Batch 32768 = 2 accumulated
+      micro-batches of 16384 at the whole batch''s per-process counts (training.batch_accumulation 2; exact batch gradient,
+      CPU test to 1e-10; train mu-MSE curve on that path now from the chunks; assert against per_process_accumulation). Its
+      D395 smoke: sweep_config_cbs_smoke_b32768.yaml (1 trial, 50 steps, validation every 25, objective target 100 so steps_to_target
+      runs, plots on).'
+    check: 'On existing data: the control (v4_het_control_wsd) and the noise-scale run FA-ccin2p3-225d38ea (same HPs, seed
+      42) cross L = -1.66/-2.08/-2.30 at steps 1023/1955/2707 and 1020/1973/2992 (steps_to_target on analysis/critical_batch/data/*_result.json),
+      so S is well defined and its replicate spread is 0.3%, 0.9%, 10%. Under McCandlish with B_crit ~ B_simple ~ 50, S_2048/S_32768
+      = 1.02; with B_crit >> 16384 it is 16; the measure spans the two. steps_to_target known-answer test (tests/test_val_total.py::test_steps_to_target),
+      the batch-accumulation gradient and mu-MSE test (tests/test_noise_scale.py), 13 passed in .venv-cpu. The fit code (reader
+      under analysis/critical_batch/) is checked on synthetic S_B from a known B_crit before reading.'
+    fixed: 'The v4_het_control_wsd setup as base_config (runs/catalog_v4_short/v4_het_control_wsd: recipe catalog_v4_base_train,
+      DIM target and inputs, HETEROSC mean, sign head off, MuonAdamW, WSD cooldown 1/8, clip 5, seed 42, nh 8, EMA for validation),
+      training only (no sigma stage, evaluate off), plots on. Differing from that run''s config.yaml, all named: training.batchsize,
+      batch_accumulation (2 at 32768), iterations (T_B), validate_every_n_steps 85 / validate_frac 0 (the control had frac
+      0.02 = 85 steps at 4264, so the same spacing), save_model_at_steps [], the searched HPs. Cost (re-costed from measured
+      rates): the control log (out_0.log on CC) gives 0.98 s/step at 16384 without validation and ~5 s per validation (85-step
+      blocks of 88 s); batch-1581 runs of the same nh 8 model (FA-lxplus-a34721ce, dc0c0f8b) ran 0.11-0.12 s/step, so the
+      per-step floor is <= 0.12 s; model 0.12 s + 0.86 s x B/16384 per step (an estimate between those two measured points;
+      32768 = 2 x the event term). Per trial 2.92/2.07/1.64/1.43/2.45 h -> 10.5 h x 8 = 84 GPU-h + smoke 0.3 GPU-h, under
+      D536''s 100 GPU-h; time limits 4:30/3:15/2:30/2:15/3:45, re-read from wave 1 (3 trials per sweep start together) before
+      waves 2-3 run. Disk: 137 MB per trial (the control run dir with model and plots) x 40 = 5.5 GB; memmap cache keyed by
+      pool content and layout only (data_mmap.py: no batch, seed or caps in the key), so one cache serves all 40 trials and
+      the control; CC /sps/lpnhe is at 98% (15 GB free, feeder paused at 14:58), so placement follows site pick and the free
+      disk read at submission; base run dir copied to the chosen site if absent. Waits: the 2048-16384 sweeps do not wait
+      on the 32768 smoke; only cbs_b32768 does.'
+    control: The 16384 sweep (same search, same schedule) is the reference; the v4_het_control_wsd run is a sanity point (the
+      16384 best trial should cross the targets within the replicate spread of its 1023/1955/2707 steps).
+    seeds: 'Seed 42 every trial, as the control. Seed noise of S from the same-HP pair (control vs noise-scale run): 0.3/0.9/10%
+      at the three targets, the band below. Equal seeds per B; more seeds per B would be Joaquin''s call.'
+    outcome: 'Band = 20% on S_2048/S_32768 (2 x the largest replicate spread, 10% at L=-2.30), which resolves B_crit down
+      to ~400 events. YES (B_simple calibrated): S_2048/S_32768 <= 1.2 at every target (B_crit <~ 400, within ~5x of B_simple
+      <= 84): our 16384 batch is far past critical; a 2048-4096 batch reaches the same loss in about as many steps with 4-8x
+      fewer events, a candidate change to the canonical batch that goes to Joaquin; B_simple is then read alone from the in-run
+      estimator in later setups. NO: S_2048/S_32768 >= 1.45 (B_crit >~ 1000, >10x B_simple): B_simple underestimates B_crit
+      here (non-isotropic Hessian, Muon not SGD); B_crit from the scan is the number, B_simple not trusted alone. Between
+      1.2 and 1.45: B_crit 400-1000 from the fit, reported with its factor over B_simple. A B whose best trial never reaches
+      a target gives a lower bound S_B > its stable-phase end.'
   step_why:
     2:
       feeds: 'whether B_simple can be trusted alone on our setup (Joaquin''s question: once now as a calibration, or every
