@@ -86,6 +86,26 @@ def test_figure_resent_only_when_bytes_changed():
     assert sc.figures_handed_back({}, [user], d)[0] != []                # (b) changed bytes: refused
 
 
+def test_figure_newer_than_handback_or_skipped():
+    sys.path.insert(0, HOOKS)
+    import stop_conditions as sc
+    d = tempfile.mkdtemp(prefix="figskip_")
+    sc.SENT_STATE = os.path.join(d, "sent")
+    fig = os.path.join(d, "analysis", "e", "figs", "a.png")
+    os.makedirs(os.path.dirname(fig))
+    open(fig, "w").write("v1")
+    user = {"type": "user", "timestamp": "2026-11-12T10:00:00Z", "uuid": "u", "message": {"content": "hi"}}
+    hb = os.path.join(d, "9999999999_x")
+    open(hb, "w").write("Joaquin, see " + fig)
+    os.utime(fig, (2e10, 2e10))
+    assert sc.figures_handed_back({}, [user], d)[0] == []                # (a) file newer than its hand-back: passes
+    os.utime(fig, (1, 1))
+    r = sc.figures_handed_back({}, [user], d)[0]
+    assert r and "--skip-figure" in r[0]                                 # (c) unsent, older, no record: refuses, CLI named
+    sc.skip_figure(fig)
+    assert sc.figures_handed_back({}, [user], d)[0] == []                # (b) skip record: passes
+
+
 def test_plan_check_skips_disabled_condition_but_not_core():
     off = {"plan_check.py:figures_handed_back": {}, "plan_check.py:ledger": {}, "plan_check.py:context": {}}
     pc = base.world(off)

@@ -185,8 +185,6 @@ def figures_handed_back(inp, records=None, spool=SPOOL):
                     sent += [(_epoch(r.get("timestamp")), os.path.basename(f)) for f in b["input"].get("files") or []]
                 except (ValueError, TypeError, AttributeError):
                     pass
-    said = [(_epoch(r.get("timestamp")), "".join(_texts((r.get("message") or {}).get("content"))))
-            for r in records if r.get("type") == "assistant"]     # a text message naming the file counts as "say why not"
     missing = []
     for n in names:
         try:
@@ -206,13 +204,26 @@ def figures_handed_back(inp, records=None, spool=SPOOL):
                 mt = os.path.getmtime(f)    # a send older than the file is of an earlier version
             except OSError:
                 continue                    # file not here (a figure the owner will draw): nothing to send yet
-            if f not in missing and not _sent_same_bytes(f) and not any(b == os.path.basename(f) and st >= mt for st, b in sent) \
-                    and not any(st >= t and os.path.basename(f) in tx for st, tx in said):
+            if mt > t:
+                continue                    # redrawn after the hand-back: the owner's next hand-back carries it
+            if f not in missing and not _sent_same_bytes(f) and not any(b == os.path.basename(f) and st >= mt for st, b in sent):
                 missing.append(f)
     if not missing:
         return [], []
-    return ["figures handed back for Joaquin not sent: %s; send them (SendUserFile) or say why not, naming each file (its basename) in the text"
+    return ["figures handed back for Joaquin not sent: %s; send them (SendUserFile), or clear one that must not go with: python3 .claude/hooks/stop_conditions.py --skip-figure <path> (no text to the user)"
             % ", ".join(missing)], []
+
+
+def skip_figure(path):
+    """Record '<sha1> <basename> <time> skip' so figures_handed_back treats these bytes as handled."""
+    import hashlib, time
+    with open(SENT_STATE, "a") as f:
+        f.write("%s %s %d skip\n" % (hashlib.sha1(open(path, "rb").read()).hexdigest(), os.path.basename(path), time.time()))
+
+
+if __name__ == "__main__" and sys.argv[1:2] == ["--skip-figure"]:
+    for _p in sys.argv[2:]:
+        skip_figure(_p)
 
 
 # ------------------------------------------------------------------ opener
