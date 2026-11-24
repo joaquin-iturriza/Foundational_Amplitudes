@@ -9886,6 +9886,42 @@ apart, read at its best checkpoint before the blow-up.
 % claim: blowups.Fn.0=43
 % allow: 2048 128 0.43 2.5 because they are the batch sizes and the parent check's band
 
+At $D_{\rm train}=10^3$ events ($3125$ steps, batch $128$, the same $400$ epochs as the $10^4$ cells) the fine-tune from
+the parent without the two settings gains over scratch beyond seed noise (Fig.~\ref{fig:ftm_zng4g_d1e3}). Both searches
+ran $16$ trials on $[1.9\times10^{-3}, 1.9\times10^{-2}]$, then $8$ more on $[6\times10^{-4}, 6\times10^{-2}]$, since their
+bests sat at opposite edges of the first window; neither best moved. Scratch, at learning rate $1.74\times10^{-2}$:
+$0.1227$, $0.1361$, $0.1300$ at seeds $42$, $43$, $44$. Fine-tuned, at $2.54\times10^{-3}$: $0.0616$, $0.0653$, $0.0621$.
+The ratio of the three-seed geometric means is $0.486$, with a $2\sigma$ interval of $0.454$--$0.522$ from the arms' own
+seed spread. Where data is scarce the parent still gains a factor of two, so the $1.53\times$ residual at $10^4$ is a
+large-$D$ effect. The fine-tune reaches its best at $14$--$16\%$ of the run and ends $1.43$--$1.52\times$ above it.
+Scratch seed $43$ blows up at $85\%$ of its run and is read at its best checkpoint before the blow-up.
+% src: python3 analysis/finetune_mechanism/zng4g_d1e3_read.py --cached @d972272d7
+% claim: arms.S1k.chosen.lr=1.74e-2
+% claim: arms.Fn1k.chosen.lr=2.54e-3
+% claim: arms.S1k.best.0=0.1227
+% claim: arms.S1k.best.1=0.1361
+% claim: arms.S1k.best.2=0.1300
+% claim: arms.Fn1k.best.0=0.0616
+% claim: arms.Fn1k.best.1=0.0653
+% claim: arms.Fn1k.best.2=0.0621
+% claim: Fn1k/S1k.r=0.486
+% claim: Fn1k/S1k.lo=0.454
+% claim: Fn1k/S1k.hi=0.522
+% claim: arms.S1k.blowups.0=43
+% allow: 3125 128 400 16 8 85 14 16 1.43 1.52 1.53 42 44 2 10^3 10^4 1.9\times10^{-3} 1.9\times10^{-2} 6\times10^{-4} 6\times10^{-2} because they are the seeds, the windows' bounds and they are the design's steps, batch, epochs and trial counts, the curve positions and end ratios read from the plotted curves, and the 10^4 residual above
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{../analysis/finetune_mechanism/figs/zng4g_d1e3.pdf}
+  \caption{\textbf{At $10^3$ events the fine-tune gains a factor of two.} $q\bar q\to Z+4g$, $D_{\rm train}=10^3$, $3125$
+  steps, batch $128$. Top left: best validation MSE$(\log|\mathcal M|^2)$ of each arm's chosen trial at seeds $42$, $43$,
+  $44$. Top right: best validation MSE$(\log|\mathcal M|^2)$ against learning rate, one open marker per search trial;
+  narrow and wide window: the first $16$ trials' and the $8$ added trials' learning-rate bounds. Bottom left: validation
+  MSE$(\log|\mathcal M|^2)$ against the fraction of the run, the chosen trials' three seeds.}
+  \label{fig:ftm_zng4g_d1e3}
+  % allow: 10^3 128 16 3125 42 43 44 4g 8 2 because they are the design's size, batch, steps, trial counts, seeds and the process name
+\end{figure}
+
 \begin{figure}[H]
   \centering
   \includegraphics{../analysis/finetune_mechanism/figs/zng4g_r3_b128.pdf}
