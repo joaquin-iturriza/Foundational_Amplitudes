@@ -17884,6 +17884,11 @@ entries:
       window; fix (mechanical-worker, refuse once per cycle, let through above 1.3x, carry items) in the working tree 13:16,
       first compaction 13:13:02; commit waits on the repo-reviewer. Step 24 (wake re-measure, done 11-22) also unreported
       2 days behind the same reviewer backlog.'
+  - at: '2026-11-24T13:28:16+00:00'
+    text: '2026-11-24 step 34 done (de109142d): plan show prints each open question''s age (''(N h open)''), plan next lists
+      every unanswered one as ''OPEN <entry>: N h unanswered, blocks ...'' on each wake. Live replay: zng_uq_benchmark stage-2
+      ask 94 h, llm_compare part (b) 15 h, critical_batch 12 h; tests/test_plan_ask_reason.py 6 pass. Not fixed: whether the
+      main repeats an aged ask to Joaquin is still its own choice (''asked once, repeated only with something new'').'
   handoff:
     state: 'D534 step 30: parts 1, 2, 3, 4 built and replayed (findings 2026-11-24). Left: a live check of part 3 at the next
       real broken trial (expect an acked RUN event with ''folded into its search'', no wake) and at the next lxplus master
