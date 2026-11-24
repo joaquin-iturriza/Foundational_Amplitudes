@@ -44925,7 +44925,10 @@ entries:
     - cc_login_jobs
   decisions:
   - D544
-  next: null
+  next:
+    2: 'Close the entry: the repo-reviewer passes the code backlog holding this entry''s commits (cb7b9bbce, 9700edae4, c3b140e52,
+      660d5b7c7, 8187ec5d7, 65872c784; and ~/.local/bin/site''s login_guard/run_as_job, outside git), and the claudemd-keeper''s
+      backlog passes once 419bca13f''s owner applies its fixes; then plan done cc_login_jobs --writeup 4404e1baa'
   done_when: null
   notes_ref: null
   match: cc_login_*
@@ -45153,6 +45156,12 @@ entries:
       untouched (its interpreter still links into anaconda 3.11: a site env --rebuild ccin2p3 FA moves it to the uv Python
       when CC removes that install).'
   step_waits: {}
+  step_why:
+    2:
+      feeds: 'D544: the entry''s close'
+      if:
+      - 'both pass: plan done'
+      - 'a reviewer blocks: fix and continue the same reviewer'
 - id: orchestrator_kit
   title: 'Standalone shareable kit: main session as orchestrator of subagents, jobs on several clusters'
   question: Can the general machinery behind our setup (the site tool for multi-cluster submission, sync, placement and copy;
