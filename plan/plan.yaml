@@ -40491,6 +40491,7 @@ entries:
     '3': llmcmp_a_drive5
     '5': FA-ccin2p3-d34535b0 and the DONE event of llmcmp_c_qperp_drive (DRIVE_DONE)
     '6': FA-ccin2p3-48e43133
+    '7': FA-ccin2p3-bf23e0c4 FA-ccin2p3-b77878e1 FA-ccin2p3-f6f7179d
   handoff:
     state: 'Part (a): 8-trial DyHPO of muP LLoCa in the LLM-run conditions (sweep/sweep_config_llmcmp_a_adamw_const.yaml @2a597c478),
       local driver llmcmp_a_drive5 (state sweeps_local/llmcmp_a_adamw_const), waves 2-3 in flight; control FA-lxplus-cb9273f1
