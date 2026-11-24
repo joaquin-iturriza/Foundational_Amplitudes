@@ -43267,3 +43267,4 @@ entries:
       scripts/job_catalog_v3_short.sh arm v4_het_noise_scale; worktree worktrees/wt-critbatch (merged; remove with scripts/remove_worktree.sh
       when the entry closes)
     written: '2026-11-24T01:13:28+00:00'
+  checked_until: '2026-11-24T13:13:57+00:00'
