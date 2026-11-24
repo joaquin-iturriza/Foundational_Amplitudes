@@ -15840,6 +15840,82 @@ Suprio's protocol at batch $1024$ remains our best arm, $1.5$--$3.7$ times above
 % claim: ratio.1.b2_suprio=3.7
 % allow: 16384 12{,}500 1024 1 2 3 4 because they are the batch sizes, the steps and the multiplicities
 
+\paragraph{Batch or optimiser at $10^4$ training events (2026-11-20 to 2026-11-24, D507, D509, D514).} The protocol test
+could not split the two ingredients, so the question moved to a cheap setting: $10^4$ training events of $Z+4g$, the
+$10^6$ test events, and the two optimisers (MuonAdamW with WSD, ours; Adam with plateau decay, Suprio's) crossed with the
+batch sizes $128$ and $2048$. Each cell is the lowest-validation trial of its own DyHPO search, $8$ trials extended by
+$8$ guided ones (D514), retrained at seeds 43 and 44 (D509); the measure is the best validation MSE of $\log|\mathcal
+M|^2$, read as ratios of three-seed means with their range over every seed pairing (Fig.~\ref{fig:zng_d507}). Best
+validation MSE at seeds 42, 43, 44: Muon at batch 128 $8.9\times10^{-3}$, $1.05\times10^{-2}$, $8.9\times10^{-3}$; Adam
+at 128 $0.039$, $0.068$, $0.061$; Adam at 2048 $0.054$, $0.076$, $0.085$; Muon at 2048 $0.058$, $0.067$, $0.064$. Batch
+2048 over 128 is $6.69$ $[5.53, 7.54]$ with Muon and $1.28$ $[0.79, 2.17]$ with Adam; Muon over Adam is $0.17$ $[0.13,
+0.27]$ at batch 128 and $0.88$ $[0.68, 1.24]$ at 2048. The two protocols' own pairs, Muon at 2048 over Adam at 128, read
+$1.12$ $[0.85, 1.70]$. By the design's bands the protocols are unresolved at $10^4$ events, and the batch does not carry
+the difference, since only Muon gains from the small batch; the best cell is ours at batch 128. The test median
+$|\Delta|$ (seed 42) orders the cells the same way: $0.047$ (Muon, 128), $0.114$ (Adam, 128), $0.136$ (Adam, 2048),
+$0.141$ (Muon, 2048), Muon over Adam $0.41$ at batch 128. The extension changed one choice. In the Muon batch-128
+search, whose first learning-rate window ended at $3.6\times10^{-3}$, the raised window found trial hp0078 at
+$\mathrm{lr}=9.24\times10^{-3}$, with trials at higher learning rates worse; its three seeds spread by $1.18$ and its mean
+lies below the first choice's by more than that. With the first choice the batch ratio with Muon was $3.20$ and Muon over
+Adam at 128 was $0.35$. All four cells stay far above the two references at $5\times10^5$ events: best validation
+$1.6\times10^{-3}$ (our protocol) and $9.2\times10^{-4}$ (Suprio's), test median $|\Delta|$ $0.016$ and $0.0087$.
+% src: python3 analysis/zng_uq/benchmark.py d507fig --v2 @ef6ecbed
+% claim: muon_b128.seeds.42=8.9e-3
+% claim: muon_b128.seeds.43=1.05e-2
+% claim: muon_b128.seeds.44=8.9e-3
+% claim: adam_b128.seeds.42=0.039
+% claim: adam_b128.seeds.43=0.068
+% claim: adam_b128.seeds.44=0.061
+% claim: adam_b2048.seeds.42=0.054
+% claim: adam_b2048.seeds.43=0.076
+% claim: adam_b2048.seeds.44=0.085
+% claim: muon_b2048.seeds.42=0.058
+% claim: muon_b2048.seeds.43=0.067
+% claim: muon_b2048.seeds.44=0.064
+% claim: ratios_seeds.batch_muon.mean=6.69
+% claim: ratios_seeds.batch_muon.min=5.53
+% claim: ratios_seeds.batch_muon.max=7.54
+% claim: ratios_seeds.batch_adam.mean=1.28
+% claim: ratios_seeds.batch_adam.min=0.79
+% claim: ratios_seeds.batch_adam.max=2.17
+% claim: ratios_seeds.opt_b128.mean=0.17
+% claim: ratios_seeds.opt_b128.min=0.13
+% claim: ratios_seeds.opt_b128.max=0.27
+% claim: ratios_seeds.opt_b2048.mean=0.88
+% claim: ratios_seeds.opt_b2048.min=0.68
+% claim: ratios_seeds.opt_b2048.max=1.24
+% claim: ratios_seeds.G.mean=1.12
+% claim: ratios_seeds.G.min=0.85
+% claim: ratios_seeds.G.max=1.70
+% claim: muon_b128.test_median_abs_delta=0.047
+% claim: adam_b128.test_median_abs_delta=0.114
+% claim: adam_b2048.test_median_abs_delta=0.136
+% claim: muon_b2048.test_median_abs_delta=0.141
+% claim: ratios_test.opt_b128=0.41
+% claim: seed_spread.muon_b128=1.18
+% claim: B1.best_val=1.6e-3
+% claim: B2.best_val=9.2e-4
+% claim: B1.test_median_abs_delta=0.016
+% claim: B2.test_median_abs_delta=0.0087
+% src: python3 analysis/zng_uq/benchmark.py d507fig @ef6ecbed
+% claim: ratios_seeds.batch_muon.mean=3.20
+% claim: ratios_seeds.opt_b128.mean=0.35
+% allow: 10^4 10^6 128 2048 8 42 43 44 3.6\times10^{-3} 9.24\times10^{-3} 5\times10^5 4g 2 because they are the event counts, the batch sizes, the trial counts, the seeds, the learning-rate window's first top and hp0078's learning rate (sweep configs and the trial's config.yaml), the reference runs' training size, the process and the square of |M|
+
+\begin{figure}[t]
+\centering
+\includegraphics{../analysis/zng_uq/figs/zng_d507_v2.pdf}
+\caption{$q\bar q\to Z+4g$ trained on $10^4$ events, four cells of optimiser and batch size, each the lowest-validation
+trial of its DyHPO search, beside two runs at $D_{\rm train}=5\cdot10^5$. Top left: validation MSE of
+$\log|\mathcal M|^2$ against training events seen (seed 42). Top right: each cell's best validation MSE of
+$\log|\mathcal M|^2$ against batch size. Bottom left: median $|\Delta|$ on the $10^6$ test events (seed 42) against
+batch size. ``our protocol'': our network with MuonAdamW and WSD at searched HPs; ``Suprio's protocol'': our network with
+Adam, plateau decay and early stopping at batch $16384$; horizontal lines: their values. ``Muon'': MuonAdamW with WSD;
+``Adam'': Adam with plateau decay. Circles: the searched trial at seed 42; crosses: the same HPs at seeds 43 and 44.}
+\label{fig:zng_d507}
+% allow: 10^4 5\cdot10^5 10^6 16384 42 43 44 4g 2 because they are the event counts, the batch size, the seeds, the process and the square of |M|
+\end{figure}
+
 \begin{figure}[t]
 \centering
 \includegraphics{../analysis/zng_uq/figs/zng_b1_vs_b2.pdf}\\[1ex]
