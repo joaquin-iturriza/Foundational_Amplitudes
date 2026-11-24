@@ -37124,6 +37124,15 @@ entries:
       Muon/Adam 0.17 [0.13, 0.27] (was 0.35), b2048 0.88, G 1.12 [0.85, 1.70] (unchanged: unresolved). Test scoring of hp0078
       FA-lxplus-8116ba56 pending; zng_d507 v2 drawn after it (d507fig --v2 refuses until then). Reference sent to finetune_mechanism
       as a finding.'
+  - at: '2026-11-24T05:24:00+00:00'
+    text: '2026-11-24 step 3 done (D514). hp0078 scored on CC (FA-ccin2p3-5431deeb, job_kit.sh KIT_SCORE_ONLY=1 KIT_SCORE_DIR=runs/tp_zng_d1e4_muon_b128_zgggg/trial_0078
+      @18ffa0ce): test median |Delta| 0.047 (trial_0950 was 0.072). zng_d507 v2 (benchmark.py d507collect/d507fig --v2 @ef6ecbed,
+      data/d507_v2.json, d507_read_v2.json; d507fig now prints its JSON on one line so verify_claims can read it). Three-seed
+      best val MSE(ln|M|^2) ratios [range over seed pairings]: Muon batch 2048/128 6.69 [5.53,7.54] (v1 3.20), Adam 1.28 [0.79,2.17],
+      Muon/Adam b128 0.17 [0.13,0.27] (v1 0.35), b2048 0.88 [0.68,1.24], G 1.12 [0.85,1.70] unresolved. Test median |Delta|
+      seed 42: Muon128 0.047, Adam128 0.114, Adam2048 0.136, Muon2048 0.141; test Muon/Adam b128 0.41. Design outcome: protocols
+      unresolved at 1e4; batch does not carry it (only Muon gains); hp0078 replaces trial_0950. Write-up results.tex par.
+      ''Batch or optimiser at 10^4 training events'', fig:zng_d507 @3598de8e (verify_claims 0 problems).'
   targets:
   - batch: zng_fetch
     wall_h: 3.0
