@@ -42097,11 +42097,14 @@ entries:
     - its validation against batch-size runs
   decisions:
   - D532
-  next: Read Joaquin's earlier single-run attempt (base_experiment.py ~l.1005-1410, the S/G2/B_simple estimators and _plot_bs_finding)
-    and the paper; find why it gave poor results; implement the paper's estimator (unbiased small/large-batch gradient norms,
-    B_small and B_big from per-microbatch or per-GPU gradients within one step, EMA of S and |G|^2 separately); validate it
-    on a case with a known answer; then measure B_crit along a canonical run and check it against a short batch-size scan
-    (steps and examples to a target loss)
+  next:
+    1: 'Measure B_simple along the canonical catalog_v4 run (arm v4_het_noise_scale, design recorded 2026-11-24): repo-reviewer
+      pass and merge of branch critical_batch, design-reviewer pass, smoke (40 steps, smoke mode) then the 4264-step run on
+      one GPU; read noise_scale.json with analysis/critical_batch/noise_read.py (brute-force checks, B_simple(t) figure)'
+    2: 'Design the batch-size scan that checks B_crit (paper''s steps-vs-examples tradeoff: steps S and examples E to a target
+      loss at batch sizes around B_simple, lr tuned per batch size, fit S/Smin - 1 = (E/Emin - 1)^-1) with its cost, and send
+      it to Joaquin: the lr per batch is an HP question (DyHPO per batch size, or a one-HP lr search under D241) and the cost
+      likely exceeds 30 GPU-h'
   done_when: null
   notes_ref: null
   match: zz_cbs_*,cbs_*
@@ -42171,3 +42174,16 @@ entries:
       x 1.01 s/step (tools/short_wall.py''s training-only rate) x 1.15 for the measurement (one extra forward-backward of
       the batch every 10 steps) + 5 checks x 32 batch passes + 15 min start-up ~ 1.75 h on one GPU, limit 3 h; total < 2.1
       GPU-h.'
+  step_why:
+    1:
+      feeds: what B_simple of our canonical setup is, and whether the micro-batch estimator agrees with independent batch
+        gradients
+      if:
+      - 'chunk estimate agrees with brute at the 5 checks: B_simple(t) reported against batch 16384; design the batch-size
+        scan (step 2)'
+      - 'disagrees: read B from brute-style measurements, find the missing noise (batch composition), report'
+    2:
+      feeds: whether measured B_simple predicts where larger batches stop paying off
+      if:
+      - 'Joaquin approves a version: submit it'
+      - 'he declines: report B_simple alone'
