@@ -26,6 +26,48 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import model_trial as mt
 
+# the harder round (D541): the ten largest validated extension fixes; model_trial has their commits and tests but no
+# defect text, so the defect as seen comes from each fix commit's message (the symptom, not the change) and the check
+# is handed over as the fix commit's own test files, already in the copy (the same for every arm)
+HARD = {
+    "alphapow": "The order features and the target's coupling monomial are taken from the process table, so for "
+                "processes whose Born diagrams carry other QCD/QED orders (mixed orders, Z' couplings) the alpha and "
+                "alpha_s powers are wrong; they should be read from the diagrams' orders (the diagram sidecar), the "
+                "Z' coupling counting in neither power.",
+    "valtotal": "A fine-tune's step-0 validation shifts val_total one validation off the selected checkpoint "
+                "(val_total keeps the step-0 entry while the other curves drop it), and run_trial's RESULT_JSON "
+                "reports the objective under val_loss, so the sweep reads the objective as the best checkpoint's "
+                "val_loss_no_reg.",
+    "emastart": "In a fine-tune the EMA of the weights is built on the random initialisation before the parent's "
+                "weights are loaded, so early validations blend in a fraction of the random init; and nothing "
+                "validates the starting weights before the first update.",
+    "statssrc": "A run that reuses frozen data stats written without target_physics_orders_source is read as if the "
+                "source were the table, so parents trained with diagram orders are refused or misread; the source "
+                "should be inferred from the run that wrote the stats.",
+    "topsampling": "tools/pool_physics.py's check reads the training reference only from sidecars and ignores a "
+                   "recipe's top-level sampling (the mixture pools, _smix_), so it found a reference for 108 of 1153 "
+                   "entries and refused every shaped probe; probes dropped by decision (ee4_epem_cgsxwm, D193) "
+                   "should be excluded from the check.",
+    "backlogdepth": "review_backlog.sh never counts .py changes below the repository root (the pillar pathspec *.py "
+                    "is expanded by the shell), verify_claims reads registry run ids such as FA-ccin2p3-60b47206 as "
+                    "numbers, and plan_files_guard refuses heredocs whose body merely mentions plan/plan.yaml.",
+    "recheck": "A done entry's daily recheck that runs out of the stop check's time is retried at every stop instead "
+               "of being noted once; there is no command that finishes those rechecks with no time limit, and no way "
+               "to replace a done entry's done_when check.",
+    "inflight": "tools/plan.py treats a step agent that is still writing its transcript, but has not handed back, as "
+                "not in flight, so its entry is listed as stalled while the agent works.",
+    "endedrun": "tools/plan.py hides every ended run of an entry whose step agent is working, even ended runs that "
+                "agent does not own, so nothing moves past them.",
+    "massconv": "The LO catalog uses the sm card's default heavy-quark masses while the virtual pipeline pins m_t at "
+                "172.5, and some entries sample a final-state mass that disagrees with their own card (virt ee_bb at "
+                "4.18 against MB=4.7; ee_wwbb's b quarks sampled massless).",
+}
+for _t, _d in HARD.items():
+    _c, _tests, _ = mt.TASKS[_t]
+    mt.TASKS[_t] = (_c, _tests, _d)
+    mt.INTERFACE[_t] = ("The check is the fix's own test file(s), %s, already in your copy in their fixed version; "
+                        "they fail now. Make them pass without editing them." % ", ".join(_tests))
+
 MAIN = os.path.expanduser("~/work/FA")
 if not os.path.exists(mt.PY):                      # a worktree has no venv of its own
     mt.PY = os.path.join(MAIN, ".venv-cpu", "bin", "python")
@@ -147,6 +189,9 @@ def fix_setup(task, arm):
     repo = os.path.join(d, "repo")
     os.makedirs(repo)
     subprocess.run("git -C %s archive %s^ | tar -x -C %s" % (ROOT, c, repo), shell=True, check=True)
+    if task in HARD:                               # the check handed over: the fix's test files
+        for t in mt.TASKS[task][1]:
+            open(os.path.join(repo, t), "w").write(mt.git("show", "%s:%s" % (c, t)))
     for cmd in (["init", "-q"], ["add", "-A"], ["-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qm", "base"]):
         subprocess.run(["git", "-C", repo] + cmd, check=True, capture_output=True)
     return d, repo
