@@ -40122,6 +40122,10 @@ entries:
       it's never a question then if you should send a run or not because it changes the configuration, that's the entire point
     said_at: '2026-11-23T15:24:12.831000+00:00'
     at: '2026-11-24T11:23:50+00:00'
+  - text: I believe I already told you multiple times that I don't care about individual jobs failing, and that each run that
+      diverges shouldn't wake you and it's owning agent up.
+    said_at: '2026-11-24T10:33:58.174000+00:00'
+    at: '2026-11-24T11:23:59+00:00'
 - id: llm_compare
   title: LLoCa against Suprio's LLM on the LLM amplitude catalogue
   question: In the conditions of Suprio's LLM pID run (1501 MadGraph-default processes, 1352 trained, 149 held out; 55,296
