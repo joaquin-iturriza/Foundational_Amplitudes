@@ -43368,12 +43368,7 @@ entries:
     - designer-executor setups
   decisions:
   - D530
-  next:
-    3: 'When detach:labllm_scenario_revalidate2 ends: read the six fixchecks (backlogdepth, recheck, inflight, endedrun; spares
-      reviewlock, replyblock); for each of the design''s four that is valid, write its briefs (lab_llm_trial.py briefs), run
-      its Sonnet planner (Plan, sonnet) and Sonnet fixer (mechanical-worker, control-arm line), grade_sonnet it, commit baselines
-      and records; a still-invalid one is replaced by a valid spare, recorded; then the DeepSeek arms cover the valid tasks
-      when the lab server answers'
+  next: null
   done_when: null
   notes_ref: null
   match: zz_labllm_*
@@ -43723,8 +43718,7 @@ entries:
       files equal the graded ones. The change of task form from round one''s ''meet this interface'' to ''make these failing
       tests pass'' is stated for the result. Checks 2 and 3 and the search as in the previous pass (round one 8/10 vs 9/10;
       spread about 1.3 tasks per arm, indicative, paired, Wilson).'
-  step_waits:
-    '3': detach:labllm_scenario_revalidate2 (pid 2921310)
+  step_waits: {}
   findings:
   - at: '2026-11-23T19:55:22+00:00'
     text: 'Local batch width cut from 6 parallel opencode streams to 2 (D531): 6 streams of opencode sessions (~350-400 MB
@@ -43778,12 +43772,6 @@ entries:
       endedrun, replyblock (2 scenarios unscored at the fix each), all six scenario-suite tasks are valid in the sandbox grader
       (fail at parent, pass at fix): backlogdepth, recheck, inflight, endedrun and spares reviewlock, replyblock. The hard
       round runs on the design''s ten tasks; no replacement needed.'
-  step_why:
-    3:
-      feeds: 'D541: how far DeepSeek goes on harder multi-file fixes against Sonnet'
-      if:
-      - 'all four valid: the hard round runs on the design''s ten tasks'
-      - 'some invalid after the fix: trace the scenario left, use reviewlock/replyblock as replacements, record which'
   handoff:
     state: 'Round one reported (summary.json at 78d4af8ff). D541 work: (1) Route built and partly live. tools/labllm.py is
       merged on trunk at 0062e55a5 (triage, fix, check, stats; records in ~/.local/share/fa_labllm/routed.jsonl). The guidance
