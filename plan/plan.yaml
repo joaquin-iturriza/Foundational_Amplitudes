@@ -43095,6 +43095,18 @@ entries:
       logs 50 steps, a test stage and plots without OOM; a width that does not fit is fixed (floor, checkpoint_blocks, then
       the mixed accumulation code) before the batch; the batch''s measured GPU-h goes to Joaquin before submission if above
       100 (D536).'
+    fix_at: '2026-11-24T14:15:37+00:00'
+    fix: 'One point only; every other check holds (config diff, disk, prior, outcome, seeds re-verified below). Check 15 (time
+      per unit from the same setup): the job limit of a width with no GPU-memory floor (likely 16 heads, predicted peak ~27
+      GB, so it may land on a CC V100) is set from its H100 smoke rate times the 8-head V100/H100 ratio 1.06/0.27 = 3.9. That
+      ratio was measured where the step is not matmul-bound (it equals the plain fp32 throughput ratio of the two GPUs); at
+      4x the FLOPs per step the H100''s TF32 tensor cores take over and a V100 (no TF32) can be several times slower than
+      3.9x, so the 60,840-step run would time out and lose the run (only the best checkpoint is saved, no resume from the
+      last step). Fix, either: (a) bound the V100 limit from the measured 8-head V100 rate scaled by FLOPs: limit = max(3.9
+      x H100 smoke s/step, 1.06 s x FLOPs(H)/FLOPs(8 heads)) x 60,840 x 1.3, capped at CC''s 7 days, its GPU-h counted in
+      the estimate to Joaquin; or (b) any width whose bound exceeds what you are willing to charge gets the 80G memory floor
+      like the others (same GPU class as its smoke, so its smoke rate applies directly; this is a placement on measured memory
+      class, not a model pin). State which, with the resulting limits, in the recorded design. Nothing else needs to change.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
