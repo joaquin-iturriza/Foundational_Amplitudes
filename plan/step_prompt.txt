@@ -57,7 +57,7 @@ How you work
    Never wait on jobs (no poll loop, no Monitor). Background work of your own (a slow test,
    a build, `site run`, a long du or copy) is fine while you keep working, but always through
    `tools/detach.py --entry {id} -- <cmd>`: its end comes
-   back as a site event that resumes you. Every event that reaches a stopped owner wakes the main session first, so
+   back as a site event that resumes you (a DeepSeek fix's end, `labllm.py fix`: a `mechanical-worker` checks its diff). Every event that reaches a stopped owner wakes the main session first, so
    batch the wakes: parallel background commands go out as one job (`tools/detach.py --entry {id} --name <batch>
    --each "<cmd 1>" --each "<cmd 2>" ...`, one event when all end), and a batch of runs is put on its step with
    `plan wait {id} <step> --on "<the run ids>"` (one RUN_DONE when all of them end; a broken one still comes at once).

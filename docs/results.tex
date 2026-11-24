@@ -17801,9 +17801,11 @@ DeepSeek+plan fixes and on 9 of DeepSeek's alone; the one it refused (\code{emas
 not see: the fix rebuilds the EMA on every run, losing a warm start's restored EMA. Our tokens per fix
 (Fig.~\ref{fig:labllm2}) were 244k for Sonnet, 254k for DeepSeek+plan (planner and check; 1.04 of Sonnet's) and 142k
 for DeepSeek alone (the check only; 0.58 of Sonnet's, below Sonnet on 9 tasks); median wall time 1.13, 3.72 and 8.33
-min. The design's bar for routing multi-file fixes was at most 0.3 of Sonnet's tokens with the check, so the answer is
-no: they stay on Sonnet, and with the arms equal in quality, the check is what sets DeepSeek's cost. Code lookups (the
-code questions of the earlier lookup trial, graded by its keys) went the other way: DeepSeek answered 10 of 10 in
+min. With the arms equal in quality, DeepSeek alone saves our tokens on multi-file fixes too (0.58 of Sonnet's, the
+check included), so they now go to DeepSeek alone with the Sonnet check, and Sonnet makes the fix itself when the check
+disagrees or DeepSeek does not answer; the price is wall time, a median of 8.33 min against Sonnet's 1.13. (The design
+had set a bar of at most 0.3 of Sonnet's tokens, which no decision of the user's gave; it was dropped on his question.)
+Code lookups (the code questions of the earlier lookup trial, graded by its keys) also go to DeepSeek: it answered 10 of 10 in
 each of two runs (16.1 and 21.1 s a lookup) using none of our tokens, against 9 and 10 of 10 for the Opus low-effort
 Explore agents at 47k tokens a lookup, so code lookups now go to DeepSeek first (\code{tools/labllm.py lookup}),
 checked by the asker against the functions it cites (that check's tokens not counted here). Of the first two routed log readings, the one of

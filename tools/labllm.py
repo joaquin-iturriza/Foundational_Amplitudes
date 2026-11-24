@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Routed work for the lab's DeepSeek (D541): failed-run log reading, small tool fixes and code lookups, done by
+"""Routed work for the lab's DeepSeek (D541): failed-run log reading, tool fixes (multi-file ones included) and code lookups, done by
 deepseek-v4-flash through opencode in the lab_llm_trial sandbox, each result checked against its source by the agent
 that routed it (a Sonnet mechanical-worker for logs and fixes, the asker for a lookup) before it is used.
 
     python3 tools/labllm.py triage RUN [--event E<n>] [--end CLASS]   DeepSeek reads the run's log (site logs)
-    python3 tools/labllm.py fix BRIEF_FILE [--test "CMD"]            DeepSeek makes the fix on a copy of HEAD; a diff
+    python3 tools/labllm.py fix BRIEF_FILE [--test "CMD"] [--timeout S]  DeepSeek makes the fix on a copy of HEAD; a diff
     python3 tools/labllm.py lookup "QUESTION"                        DeepSeek answers a code lookup on a copy of HEAD
     python3 tools/labllm.py check ID --agree|--disagree --note "..."  the checker's verdict on a routed result
     python3 tools/labllm.py stats                                    routed results, checked, agreed
@@ -19,6 +19,7 @@ import lab_llm_trial as lt
 ROUTED = os.path.expanduser("~/.local/share/fa_labllm/routed.jsonl")
 MODEL = lt.MODELS["deepseek"]
 FIX_TIMEOUT = 540          # one opencode session inside a 10-min tool call; a timeout hands the fix back to Sonnet
+MULTI_TIMEOUT = 2400       # a multi-file fix (hard round: 196-702 s a session, the trial's limit 2400): run detached
 
 
 def log(rec):
@@ -74,7 +75,7 @@ def triage(run, event, end):
           "--agree|--disagree --note \"...\"; ack or resubmit only after that" % (path, i))
 
 
-def fix(brief, test):
+def fix(brief, test, timeout=FIX_TIMEOUT):
     i = rid("fix")
     d = lt.fresh("route_" + i)
     repo = os.path.join(d, "repo")
@@ -87,7 +88,7 @@ def fix(brief, test):
               "change, run the tests that cover it, end with a short report." % (repo, lt.mt.PY, open(brief).read()))
     if test:
         prompt += "\n\nThe test that must pass: %s" % test
-    ev, u, sec, rc, se, _ = lt.opencode(d, MODEL, prompt, timeout=FIX_TIMEOUT)
+    ev, u, sec, rc, se, _ = lt.opencode(d, MODEL, prompt, timeout=timeout)
     if unavailable(u, rc, se, d):
         log({"id": i, "kind": "fix", "brief": os.path.abspath(brief), "unavailable": True, "at": time.strftime("%Y-%m-%dT%H:%M:%S")})
         sys.exit(2)
@@ -176,6 +177,8 @@ def main():
     sp = ap.add_subparsers(dest="cmd", required=True)
     p = sp.add_parser("triage"); p.add_argument("run"); p.add_argument("--event"); p.add_argument("--end", default="FAILED")
     p = sp.add_parser("fix"); p.add_argument("brief"); p.add_argument("--test")
+    p.add_argument("--timeout", type=int, default=FIX_TIMEOUT, help="seconds; %d for a multi-file fix, run through "
+                   "tools/detach.py" % MULTI_TIMEOUT)
     p = sp.add_parser("lookup"); p.add_argument("question")
     p = sp.add_parser("check"); p.add_argument("id"); p.add_argument("--note", required=True)
     g = p.add_mutually_exclusive_group(required=True); g.add_argument("--agree", action="store_true")
@@ -185,7 +188,7 @@ def main():
     if a.cmd == "triage":
         triage(a.run, a.event, a.end)
     elif a.cmd == "fix":
-        fix(a.brief, a.test)
+        fix(a.brief, a.test, a.timeout)
     elif a.cmd == "lookup":
         lookup(a.question)
     elif a.cmd == "check":

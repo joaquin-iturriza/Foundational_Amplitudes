@@ -11,8 +11,9 @@ The step:
 - Jobs: `site submit ... --item {id}` with `--hdr=--time=` at the job's real need, recorded with `plan run {id} <run>`;
   a broken run's log (`site logs <run> -n 100000`) is read before anything is resubmitted.
 - Lab route (D541): a failed run's log is first read by DeepSeek (`python3 tools/labllm.py triage <run> --event E<n>
-  --end <class>`), a small tool fix first made by it (`python3 tools/labllm.py fix <brief file> --test "<cmd>"`, one
-  Bash call with timeout 600000); you check its reading against the log, or read its diff whole and run the test,
+  --end <class>`), a tool fix first made by it (`python3 tools/labllm.py fix <brief file> --test "<cmd>"`, one Bash
+  call with timeout 600000; a multi-file fix with `--timeout 2400` through `tools/detach.py --entry <entry> --`, whose
+  end resumes the entry's owner, which has a `mechanical-worker` check the diff as below); you check its reading against the log, or read its diff whole and run the test,
   record `python3 tools/labllm.py check <id> --agree|--disagree
   --note "<why>"`, and do the step yourself when you disagree or DeepSeek does not answer.
 - Commit only your own files, named (`git commit -m "..." -- <paths>`).

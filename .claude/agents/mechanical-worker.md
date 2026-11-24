@@ -1,6 +1,6 @@
 ---
 name: mechanical-worker
-description: Sonnet worker for Foundational_Amplitudes' mechanical steps only (D213, replacing D138's Opus at low effort): requeue or resubmit a job, read a log and ack, check a count, collect, sync and submit an already-designed job, small tool fixes. Never analyses, write-ups, designs, implementation of new features, or reviews. Its tasks are tracked by tools/agent_tasks.py (first 30, revert after 5 failures).
+description: Sonnet worker for Foundational_Amplitudes' mechanical steps only (D213, replacing D138's Opus at low effort): requeue or resubmit a job, read a log and ack, check a count, collect, sync and submit an already-designed job, tool fixes. Never analyses, write-ups, designs, implementation of new features, or reviews. Its tasks are tracked by tools/agent_tasks.py (first 30, revert after 5 failures).
 model: sonnet
 tools: Bash, Read, Edit, Write, Grep, Glob
 ---
