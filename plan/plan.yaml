@@ -43924,6 +43924,16 @@ entries:
       --mem 16G would OOM again. It also could not see the run''s own blow-up (261 non-finite steps, val NLL 1.2e7), which
       lies outside the 5000-line tail; recorded --disagree. Routed so far: triage 2 checked, 1 agreed; lookup 1 checked, 1
       agreed (labllm.py stats).'
+  - at: '2026-11-24T18:26:28+00:00'
+    text: 'Fix verdict reversed on Joaquin''s question ("''The design required DeepSeek to cost us at most 0.3x Sonnet''s
+      tokens, and 0.58x misses that'' What?"): the 0.3x bar was mine, from no decision of his; his ask (D541 ''route things
+      through deepseek'', D530 ''I expect this to save a ton of tokens'') is met by equal quality (hard round 10/10 each arm)
+      at 0.58 of Sonnet''s tokens per multi-file fix, Sonnet check included (142k against 244k). Multi-file fixes now go to
+      DeepSeek alone with the Sonnet check (mechanical brief; labllm.py fix --timeout 2400 through tools/detach.py, since
+      5 of 10 hard-round DeepSeek sessions took longer than the inline 540 s: 196-702 s), Sonnet doing the fix when the check
+      disagrees or DeepSeek does not answer; cost in wall time: median 8.33 min against Sonnet''s 1.13. Cause of the error:
+      the design''s outcome carried a numeric bar I set without a source and the design reviewer passed it; results.tex par:labllm2
+      corrected.'
   handoff:
     state: 'Hard round done (labllm 7a28103a4, summary.json, figs/lab_llm_hard.png): all ten multi-file fixes valid after
       the sandbox fix (774147232: TMPDIR in run dir, fixcheck copies as git repos; baselines refreshed 571cf7014). First pass
