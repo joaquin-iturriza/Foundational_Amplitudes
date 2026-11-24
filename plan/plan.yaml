@@ -40516,6 +40516,12 @@ entries:
     units: null
     start: '2026-11-24T18:03:46+00:00'
     at: '2026-11-24T18:03:46+00:00'
+  - batch: d539_uug_search
+    wall_h: 3.0
+    jobs: 64
+    units: null
+    start: '2026-11-24T19:54:57+00:00'
+    at: '2026-11-24T19:54:57+00:00'
   step_waits:
     '2': detached ftmech_glu_drive (both gluon-parent fine-tune searches, 32 trials; its end posts an event)
   handoff:
