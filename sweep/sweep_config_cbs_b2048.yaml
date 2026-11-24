@@ -10,7 +10,7 @@ cluster:
   request_gpus: 1
   mem: 32G  # measured peak RSS 19.9 GB per trial (sacct, 62936975-84), margin 1.6x
   cpus_per_task: 5
-  time: '04:30:00'   # need 2.92 h: steps x (0.12 s + 0.86 s x B/16384) + 5 s per validation every 85 steps + 0.2 h start-up and end (critical_batch design 2026-11-24)
+  time: '03:27:00'   # need 2.92 h (steps x (0.12 s + 0.86 s x B/16384) + 5 s per validation + 0.2 h start-up and end), room 1.18x: the 40 limits plus the smoke stay under D536's 100 GPU-h as the site gate counts them
   gpu_min_mem: 24G
 paths: null
 sweep_name: cbs_b2048

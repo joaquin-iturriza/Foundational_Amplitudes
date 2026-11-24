@@ -7,7 +7,7 @@ cluster:
   request_gpus: 1
   mem: 32G  # measured peak RSS 19.9 GB per trial (sacct, 62936975-84), margin 1.6x
   cpus_per_task: 5
-  time: '00:45:00'   # need ~0.3 h: 50 steps x 1.84 s + 2 validations + 0.2 h start-up and end
+  time: '00:30:00'   # need ~0.3 h
   gpu_min_mem: 24G
 paths: null
 sweep_name: cbs_smoke_b32768
