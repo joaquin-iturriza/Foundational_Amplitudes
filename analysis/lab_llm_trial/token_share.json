@@ -4,144 +4,744 @@
   "2026-11-23T00:00"
  ],
  "unit": "input+output+cache read+cache write, deduplicated message ids",
- "total_tokens": 8496467262,
- "total_usd": 3534.61,
+ "total_tokens": 4953460461,
+ "total_usd": 2028.42,
  "roles": {
   "main": {
-   "tokens": 2396249634,
-   "usd": 824.31,
+   "tokens": 1453520627,
+   "usd": 482.73,
    "agents": 0,
-   "share": 0.28202893745228674,
-   "share_usd": 0.23321140156104644,
-   "mean_per_agent": null
+   "share": 0.2934353950019346,
+   "share_usd": 0.23798491929806356,
+   "mean_per_agent": null,
+   "kinds": {
+    "plan and ledger bookkeeping": {
+     "tokens": 480723619,
+     "usd": 169.73,
+     "messages": 1514,
+     "share_of_total": 0.09704803798977976
+    },
+    "text only (reply, reasoning)": {
+     "tokens": 400850655,
+     "usd": 101.85,
+     "messages": 1217,
+     "share_of_total": 0.0809233581565879
+    },
+    "launch or brief agents": {
+     "tokens": 234152018,
+     "usd": 74.61,
+     "messages": 733,
+     "share_of_total": 0.04727039205087944
+    },
+    "read files and search": {
+     "tokens": 132439426,
+     "usd": 58.57,
+     "messages": 483,
+     "share_of_total": 0.02673674838887545
+    },
+    "other tools": {
+     "tokens": 47645359,
+     "usd": 15.46,
+     "messages": 162,
+     "share_of_total": 0.009618600849875644
+    },
+    "figures": {
+     "tokens": 46042875,
+     "usd": 17.39,
+     "messages": 158,
+     "share_of_total": 0.009295092867402217
+    },
+    "analyses and tests": {
+     "tokens": 44926957,
+     "usd": 19.24,
+     "messages": 160,
+     "share_of_total": 0.009069812377371877
+    },
+    "git": {
+     "tokens": 27993498,
+     "usd": 12.28,
+     "messages": 93,
+     "share_of_total": 0.005651301392309629
+    },
+    "jobs: submit, sync, pick": {
+     "tokens": 19514664,
+     "usd": 4.92,
+     "messages": 58,
+     "share_of_total": 0.003939602254554061
+    },
+    "run state and logs": {
+     "tokens": 13568186,
+     "usd": 7.11,
+     "messages": 49,
+     "share_of_total": 0.0027391327955125873
+    },
+    "code edits": {
+     "tokens": 4202650,
+     "usd": 1.17,
+     "messages": 14,
+     "share_of_total": 0.0008484270810453936
+    },
+    "write-up (.tex)": {
+     "tokens": 1460720,
+     "usd": 0.43,
+     "messages": 5,
+     "share_of_total": 0.00029488879774062257
+    }
+   }
   },
   "reviewer": {
-   "tokens": 441620572,
-   "usd": 348.72,
+   "tokens": 260266810,
+   "usd": 202.78,
    "agents": 193,
-   "share": 0.05197696388181528,
-   "share_usd": 0.09865987433361964,
-   "mean_per_agent": 2288189.4922279795
+   "share": 0.05254242201974851,
+   "share_usd": 0.09996869003459545,
+   "mean_per_agent": 1348532.6943005181,
+   "kinds": {
+    "read files and search": {
+     "tokens": 68495497,
+     "usd": 43.74,
+     "messages": 1122,
+     "share_of_total": 0.0138278073559453
+    },
+    "plan and ledger bookkeeping": {
+     "tokens": 53908678,
+     "usd": 60.22,
+     "messages": 918,
+     "share_of_total": 0.010883033875901164
+    },
+    "analyses and tests": {
+     "tokens": 34774032,
+     "usd": 22.66,
+     "messages": 519,
+     "share_of_total": 0.007020149302449433
+    },
+    "git": {
+     "tokens": 33854028,
+     "usd": 30.08,
+     "messages": 562,
+     "share_of_total": 0.0068344197488891595
+    },
+    "final report": {
+     "tokens": 32865504,
+     "usd": 20.77,
+     "messages": 383,
+     "share_of_total": 0.006634857441330044
+    },
+    "jobs: submit, sync, pick": {
+     "tokens": 13801884,
+     "usd": 9.16,
+     "messages": 202,
+     "share_of_total": 0.0027863115308310524
+    },
+    "figures": {
+     "tokens": 12976574,
+     "usd": 11.27,
+     "messages": 209,
+     "share_of_total": 0.002619698714094571
+    },
+    "run state and logs": {
+     "tokens": 6719083,
+     "usd": 3.19,
+     "messages": 111,
+     "share_of_total": 0.0013564422392994245
+    },
+    "text only (reply, reasoning)": {
+     "tokens": 1676937,
+     "usd": 0.93,
+     "messages": 23,
+     "share_of_total": 0.0003385384850051799
+    },
+    "write-up (.tex)": {
+     "tokens": 833319,
+     "usd": 0.6,
+     "messages": 16,
+     "share_of_total": 0.00016822966622242309
+    },
+    "launch or brief agents": {
+     "tokens": 183704,
+     "usd": 0.1,
+     "messages": 2,
+     "share_of_total": 3.7085993003548476e-05
+    },
+    "other tools": {
+     "tokens": 177570,
+     "usd": 0.07,
+     "messages": 2,
+     "share_of_total": 3.584766677720737e-05
+    }
+   }
   },
   "Explore (trial)": {
-   "tokens": 8355602,
-   "usd": 12.01,
+   "tokens": 6709354,
+   "usd": 9.96,
    "agents": 105,
-   "share": 0.0009834207256196922,
-   "share_usd": 0.003397960668177878,
-   "mean_per_agent": 79577.1619047619
+   "share": 0.0013544781578100095,
+   "share_usd": 0.004912269226992106,
+   "mean_per_agent": 63898.60952380952,
+   "kinds": {
+    "read files and search": {
+     "tokens": 2730606,
+     "usd": 3.39,
+     "messages": 188,
+     "share_of_total": 0.0005512522046958558
+    },
+    "final report": {
+     "tokens": 1797044,
+     "usd": 1.66,
+     "messages": 105,
+     "share_of_total": 0.0003627855746802942
+    },
+    "other tools": {
+     "tokens": 826743,
+     "usd": 2.13,
+     "messages": 69,
+     "share_of_total": 0.00016690210944635215
+    },
+    "analyses and tests": {
+     "tokens": 783713,
+     "usd": 1.72,
+     "messages": 58,
+     "share_of_total": 0.00015821525298736003
+    },
+    "jobs: submit, sync, pick": {
+     "tokens": 315112,
+     "usd": 0.47,
+     "messages": 18,
+     "share_of_total": 6.361451806892701e-05
+    },
+    "plan and ledger bookkeeping": {
+     "tokens": 244546,
+     "usd": 0.52,
+     "messages": 14,
+     "share_of_total": 4.9368719489209624e-05
+    },
+    "write-up (.tex)": {
+     "tokens": 11590,
+     "usd": 0.06,
+     "messages": 1,
+     "share_of_total": 2.339778442010663e-06
+    }
+   }
   },
   "fix worker": {
-   "tokens": 17220279,
-   "usd": 9.62,
+   "tokens": 10942742,
+   "usd": 6.37,
    "agents": 37,
-   "share": 0.00202675752980498,
-   "share_usd": 0.0027228681276986397,
-   "mean_per_agent": 465412.9459459459
+   "share": 0.00220911059776399,
+   "share_usd": 0.003141835371706863,
+   "mean_per_agent": 295749.7837837838,
+   "kinds": {
+    "read files and search": {
+     "tokens": 2774855,
+     "usd": 1.7,
+     "messages": 93,
+     "share_of_total": 0.0005601851517433562
+    },
+    "plan and ledger bookkeeping": {
+     "tokens": 2401851,
+     "usd": 1.53,
+     "messages": 93,
+     "share_of_total": 0.00048488345045053947
+    },
+    "analyses and tests": {
+     "tokens": 1402244,
+     "usd": 0.84,
+     "messages": 48,
+     "share_of_total": 0.00028308371713880933
+    },
+    "final report": {
+     "tokens": 1369809,
+     "usd": 0.55,
+     "messages": 43,
+     "share_of_total": 0.0002765357694453998
+    },
+    "git": {
+     "tokens": 978676,
+     "usd": 0.46,
+     "messages": 37,
+     "share_of_total": 0.0001975742024601577
+    },
+    "figures": {
+     "tokens": 962055,
+     "usd": 0.74,
+     "messages": 46,
+     "share_of_total": 0.0001942187704079869
+    },
+    "jobs: submit, sync, pick": {
+     "tokens": 726035,
+     "usd": 0.29,
+     "messages": 18,
+     "share_of_total": 0.00014657127188483275
+    },
+    "text only (reply, reasoning)": {
+     "tokens": 123467,
+     "usd": 0.1,
+     "messages": 3,
+     "share_of_total": 2.492540335631842e-05
+    },
+    "run state and logs": {
+     "tokens": 94232,
+     "usd": 0.08,
+     "messages": 3,
+     "share_of_total": 1.902346869262716e-05
+    },
+    "other tools": {
+     "tokens": 76037,
+     "usd": 0.07,
+     "messages": 3,
+     "share_of_total": 1.535027898146374e-05
+    },
+    "write-up (.tex)": {
+     "tokens": 33481,
+     "usd": 0.02,
+     "messages": 1,
+     "share_of_total": 6.75911320249862e-06
+    }
+   }
   },
   "other mechanical": {
-   "tokens": 38072643,
-   "usd": 20.22,
+   "tokens": 22609176,
+   "usd": 12.42,
    "agents": 73,
-   "share": 0.00448099684562758,
-   "share_usd": 0.005719983741146805,
-   "mean_per_agent": 521543.05479452055
+   "share": 0.004564319464747616,
+   "share_usd": 0.006120660799036874,
+   "mean_per_agent": 309714.7397260274,
+   "kinds": {
+    "read files and search": {
+     "tokens": 4009187,
+     "usd": 2.61,
+     "messages": 156,
+     "share_of_total": 0.0008093709501802764
+    },
+    "analyses and tests": {
+     "tokens": 3740791,
+     "usd": 1.88,
+     "messages": 117,
+     "share_of_total": 0.0007551874148289483
+    },
+    "jobs: submit, sync, pick": {
+     "tokens": 3468703,
+     "usd": 1.79,
+     "messages": 122,
+     "share_of_total": 0.0007002585419445826
+    },
+    "git": {
+     "tokens": 3278804,
+     "usd": 1.83,
+     "messages": 124,
+     "share_of_total": 0.000661921908091314
+    },
+    "final report": {
+     "tokens": 2616826,
+     "usd": 1.2,
+     "messages": 86,
+     "share_of_total": 0.0005282824039079374
+    },
+    "plan and ledger bookkeeping": {
+     "tokens": 2461570,
+     "usd": 1.55,
+     "messages": 93,
+     "share_of_total": 0.0004969394667385839
+    },
+    "figures": {
+     "tokens": 2036974,
+     "usd": 0.99,
+     "messages": 65,
+     "share_of_total": 0.0004112224203741353
+    },
+    "run state and logs": {
+     "tokens": 460572,
+     "usd": 0.26,
+     "messages": 17,
+     "share_of_total": 9.297984785105566e-05
+    },
+    "text only (reply, reasoning)": {
+     "tokens": 397366,
+     "usd": 0.2,
+     "messages": 12,
+     "share_of_total": 8.021987923969017e-05
+    },
+    "write-up (.tex)": {
+     "tokens": 86263,
+     "usd": 0.05,
+     "messages": 4,
+     "share_of_total": 1.7414694369557017e-05
+    },
+    "launch or brief agents": {
+     "tokens": 39589,
+     "usd": 0.02,
+     "messages": 2,
+     "share_of_total": 7.992190572973264e-06
+    },
+    "code edits": {
+     "tokens": 12531,
+     "usd": 0.03,
+     "messages": 1,
+     "share_of_total": 2.5297466485621757e-06
+    }
+   }
   },
   "Explore": {
-   "tokens": 10508963,
-   "usd": 10.93,
+   "tokens": 5505511,
+   "usd": 5.56,
    "agents": 9,
-   "share": 0.0012368626484328116,
-   "share_usd": 0.0030925308993260256,
-   "mean_per_agent": 1167662.5555555555
+   "share": 0.0011114474503928012,
+   "share_usd": 0.0027405553718890985,
+   "mean_per_agent": 611723.4444444445,
+   "kinds": {
+    "read files and search": {
+     "tokens": 3022351,
+     "usd": 2.73,
+     "messages": 83,
+     "share_of_total": 0.0006101494144943372
+    },
+    "analyses and tests": {
+     "tokens": 1066271,
+     "usd": 0.81,
+     "messages": 17,
+     "share_of_total": 0.0002152577997533349
+    },
+    "final report": {
+     "tokens": 585416,
+     "usd": 1.17,
+     "messages": 9,
+     "share_of_total": 0.00011818323868922469
+    },
+    "figures": {
+     "tokens": 369527,
+     "usd": 0.26,
+     "messages": 8,
+     "share_of_total": 7.459976776021349e-05
+    },
+    "plan and ledger bookkeeping": {
+     "tokens": 177614,
+     "usd": 0.19,
+     "messages": 6,
+     "share_of_total": 3.5856549456365996e-05
+    },
+    "jobs: submit, sync, pick": {
+     "tokens": 109592,
+     "usd": 0.1,
+     "messages": 2,
+     "share_of_total": 2.2124331235274595e-05
+    },
+    "run state and logs": {
+     "tokens": 87721,
+     "usd": 0.03,
+     "messages": 2,
+     "share_of_total": 1.7709034056222377e-05
+    },
+    "other tools": {
+     "tokens": 63472,
+     "usd": 0.15,
+     "messages": 4,
+     "share_of_total": 1.2813668444460811e-05
+    },
+    "git": {
+     "tokens": 23547,
+     "usd": 0.12,
+     "messages": 2,
+     "share_of_total": 4.753646503367134e-06
+    }
+   }
   },
   "owner": {
-   "tokens": 4834263002,
-   "usd": 1995.19,
+   "tokens": 2762574020,
+   "usd": 1134.4,
    "agents": 123,
-   "share": 0.5689732983049303,
-   "share_usd": 0.5644730408524942,
-   "mean_per_agent": 39302951.23577236
+   "share": 0.5577058789003222,
+   "share_usd": 0.5592510473341104,
+   "mean_per_agent": 22459951.38211382,
+   "kinds": {
+    "plan and ledger bookkeeping": {
+     "tokens": 566384400,
+     "usd": 245.67,
+     "messages": 3215,
+     "share_of_total": 0.11434115694660432
+    },
+    "read files and search": {
+     "tokens": 560006795,
+     "usd": 220.87,
+     "messages": 3718,
+     "share_of_total": 0.11305365196898055
+    },
+    "analyses and tests": {
+     "tokens": 421503080,
+     "usd": 164.9,
+     "messages": 2509,
+     "share_of_total": 0.08509265054573734
+    },
+    "jobs: submit, sync, pick": {
+     "tokens": 354691256,
+     "usd": 132.43,
+     "messages": 2020,
+     "share_of_total": 0.07160474153222478
+    },
+    "figures": {
+     "tokens": 249825880,
+     "usd": 95.73,
+     "messages": 1388,
+     "share_of_total": 0.05043461676275607
+    },
+    "git": {
+     "tokens": 151666249,
+     "usd": 56.87,
+     "messages": 901,
+     "share_of_total": 0.030618241569527287
+    },
+    "run state and logs": {
+     "tokens": 124035650,
+     "usd": 89.29,
+     "messages": 799,
+     "share_of_total": 0.02504020189049007
+    },
+    "final report": {
+     "tokens": 96057849,
+     "usd": 36.52,
+     "messages": 457,
+     "share_of_total": 0.019392069393970278
+    },
+    "launch or brief agents": {
+     "tokens": 94914593,
+     "usd": 32.32,
+     "messages": 467,
+     "share_of_total": 0.019161269933875423
+    },
+    "text only (reply, reasoning)": {
+     "tokens": 56215300,
+     "usd": 22.39,
+     "messages": 265,
+     "share_of_total": 0.011348692584224506
+    },
+    "write-up (.tex)": {
+     "tokens": 41399612,
+     "usd": 16.0,
+     "messages": 202,
+     "share_of_total": 0.008357715242899563
+    },
+    "code edits": {
+     "tokens": 24387892,
+     "usd": 13.74,
+     "messages": 140,
+     "share_of_total": 0.004923404999800199
+    },
+    "other tools": {
+     "tokens": 21485464,
+     "usd": 7.65,
+     "messages": 129,
+     "share_of_total": 0.004337465529231767
+    }
+   }
   },
   "other agent": {
-   "tokens": 748836856,
-   "usd": 312.22,
+   "tokens": 430562983,
+   "usd": 173.42,
    "agents": 35,
-   "share": 0.08813508401887608,
-   "share_usd": 0.08833133323658586,
-   "mean_per_agent": 21395338.742857143
+   "share": 0.08692165535385708,
+   "share_usd": 0.08549287790199232,
+   "mean_per_agent": 12301799.514285713,
+   "kinds": {
+    "read files and search": {
+     "tokens": 98604772,
+     "usd": 41.76,
+     "messages": 678,
+     "share_of_total": 0.019906239845123092
+    },
+    "figures": {
+     "tokens": 67354383,
+     "usd": 25.36,
+     "messages": 411,
+     "share_of_total": 0.013597440320822215
+    },
+    "plan and ledger bookkeeping": {
+     "tokens": 62387451,
+     "usd": 25.85,
+     "messages": 369,
+     "share_of_total": 0.012594720699033354
+    },
+    "analyses and tests": {
+     "tokens": 59209691,
+     "usd": 20.58,
+     "messages": 364,
+     "share_of_total": 0.01195319745987168
+    },
+    "git": {
+     "tokens": 39437974,
+     "usd": 15.6,
+     "messages": 259,
+     "share_of_total": 0.007961701584277569
+    },
+    "write-up (.tex)": {
+     "tokens": 27718901,
+     "usd": 10.14,
+     "messages": 146,
+     "share_of_total": 0.005595866004834151
+    },
+    "launch or brief agents": {
+     "tokens": 16748115,
+     "usd": 5.65,
+     "messages": 93,
+     "share_of_total": 0.0033810939103809676
+    },
+    "final report": {
+     "tokens": 14632618,
+     "usd": 7.39,
+     "messages": 82,
+     "share_of_total": 0.002954019339652906
+    },
+    "jobs: submit, sync, pick": {
+     "tokens": 14357173,
+     "usd": 6.22,
+     "messages": 88,
+     "share_of_total": 0.002898412758724552
+    },
+    "text only (reply, reasoning)": {
+     "tokens": 11638659,
+     "usd": 6.47,
+     "messages": 59,
+     "share_of_total": 0.002349601675764744
+    },
+    "code edits": {
+     "tokens": 8763711,
+     "usd": 4.16,
+     "messages": 51,
+     "share_of_total": 0.0017692098420890171
+    },
+    "run state and logs": {
+     "tokens": 5499265,
+     "usd": 2.89,
+     "messages": 31,
+     "share_of_total": 0.00111018651371042
+    },
+    "other tools": {
+     "tokens": 4210270,
+     "usd": 1.34,
+     "messages": 34,
+     "share_of_total": 0.0008499653995724102
+    }
+   }
   },
   "event worker": {
-   "tokens": 1339711,
-   "usd": 1.38,
+   "tokens": 769238,
+   "usd": 0.79,
    "agents": 5,
-   "share": 0.00015767859260657502,
-   "share_usd": 0.00039100657990461635,
-   "mean_per_agent": 267942.2
+   "share": 0.00015529305342324402,
+   "share_usd": 0.00038714466161340416,
+   "mean_per_agent": 153847.6,
+   "kinds": {
+    "jobs: submit, sync, pick": {
+     "tokens": 161269,
+     "usd": 0.08,
+     "messages": 5,
+     "share_of_total": 3.255683602800842e-05
+    },
+    "text only (reply, reasoning)": {
+     "tokens": 133571,
+     "usd": 0.33,
+     "messages": 1,
+     "share_of_total": 2.696518949765369e-05
+    },
+    "run state and logs": {
+     "tokens": 129057,
+     "usd": 0.14,
+     "messages": 7,
+     "share_of_total": 2.605390736760743e-05
+    },
+    "final report": {
+     "tokens": 108892,
+     "usd": 0.05,
+     "messages": 4,
+     "share_of_total": 2.1983015885023737e-05
+    },
+    "read files and search": {
+     "tokens": 101519,
+     "usd": 0.12,
+     "messages": 6,
+     "share_of_total": 2.049456148873861e-05
+    },
+    "plan and ledger bookkeeping": {
+     "tokens": 76272,
+     "usd": 0.03,
+     "messages": 2,
+     "share_of_total": 1.5397720563333673e-05
+    },
+    "git": {
+     "tokens": 39136,
+     "usd": 0.03,
+     "messages": 2,
+     "share_of_total": 7.90073935345378e-06
+    },
+    "analyses and tests": {
+     "tokens": 19522,
+     "usd": 0.01,
+     "messages": 1,
+     "share_of_total": 3.941083239424691e-06
+    }
+   }
   }
  },
  "kind1_logs": {
-  "residency": 10640896.285714287,
-  "read_phase": 57065787.2857143,
-  "read_turn": 440142948.2857143,
-  "usd_residency": 2.4639842285714315,
-  "usd_read_phase": 36.638024428571455,
-  "usd_read_turn": 161.60361202857146,
+  "residency": 6283916.0,
+  "read_phase": 65153857.99999999,
+  "read_turn": 256630134.00000006,
+  "usd_residency": 1.5925881714285721,
+  "usd_read_phase": 40.25365417142855,
+  "usd_read_turn": 101.15819297142858,
   "reads": 136,
   "event_workers": 5,
-  "event_worker_tokens": 1339711,
+  "event_worker_tokens": 769238,
   "chars_per_token": 3.5,
-  "calib_next_write_over_T_median": 1.9544980242464112
+  "calib_next_write_over_T_median": 1.9484586874558052
  },
  "kind3_own_searches": {
-  "residency": 613500276.8571423,
-  "usd": 139.92479159999985,
+  "residency": 356426316.28571373,
+  "usd": 88.50999948571445,
   "searches": 7496
  },
  "explore_production": [
   [
    "Find the pp-coverage result",
-   1239796,
+   772087,
    false
   ],
   [
    "Lookup: where fine-tuning underperforms",
-   858257,
+   416782,
    false
   ],
   [
    "Lit search: enforcing NN asymptotics",
-   241589,
+   90182,
    false
   ],
   [
    "Collect catalog and sampling results",
-   1047110,
+   628014,
    false
   ],
   [
    "Compare our models to Z+ng UQ benchmark",
-   720800,
+   432617,
    false
   ],
   [
    "Audit today's rule deviations",
-   2181994,
+   1186814,
    false
   ],
   [
    "Gather fine-tune transfer evidence",
-   978571,
+   564546,
    false
   ],
   [
    "Review emission-scale target port",
-   2679048,
+   1044727,
    false
   ],
   [
    "Collect input conditioning results",
-   561798,
+   369742,
    false
   ]
  ],
@@ -149,63 +749,63 @@
   "fix worker": [
    [
     "Fix figure-pair check misfire",
-    186379
+    150432
    ],
    [
     "E8135: agent_tasks maintain timeout",
-    504021
+    319483
    ],
    [
     "Fix question-sent check misfire",
-    425131
+    291711
    ],
    [
     "Fix plan_check ask matcher",
-    420675
+    252254
    ],
    [
     "Fix figures_handed_back incident",
-    478163
+    300123
    ],
    [
     "Fix figure-sent check regression",
-    153116
+    101647
    ],
    [
     "Fix table gate incident",
-    362272
+    199064
    ],
    [
     "Fix plan_check open-ask match",
-    160847
+    119897
    ],
    [
     "Make draft figures sendable",
-    511011
+    327442
    ],
    [
     "Fix plan_check question match",
-    520017
+    393663
    ],
    [
     "Fix failed lxplus protocol runs",
-    2603008
+    1665279
    ],
    [
     "Debounce RUN and OVERRUN events",
-    214135
+    156000
    ],
    [
     "Gate: per-condition disable; dead chains",
-    2175975
+    1339790
    ],
    [
     "Fix submit_guard cancelled count",
-    176291
+    89899
    ],
    [
     "Fix plan_check question-sent misfire",
-    489491
+    306081
    ],
    [
     "Add design-reviewer timing/readout check",
@@ -217,55 +817,55 @@
    ],
    [
     "send_check: name draft_*.pdf route",
-    163104
+    143605
    ],
    [
     "Design-reviewer lr-across-batch check",
-    262873
+    174674
    ],
    [
     "Fix figure hook: missing files",
-    334448
+    254877
    ],
    [
     "Fix send_check panel split",
-    196827
+    124459
    ],
    [
     "Fix plan answer step-level no",
-    1009261
+    605359
    ],
    [
     "Gate: unsent hand-back figures",
-    798752
+    446903
    ],
    [
     "plan sweepends: one wake for all",
-    346835
+    228972
    ],
    [
     "Guard: no hand deletes on clusters",
-    199514
+    124738
    ],
    [
     "Cut repeat wakes: disk alert, routine acks",
-    455507
+    289220
    ],
    [
     "Exempt decks from send axes check",
-    375869
+    193383
    ],
    [
     "Fix plan hold sync for forbids",
-    85666
+    67482
    ],
    [
     "Fix the CC disk watch now",
-    611381
+    356560
    ],
    [
     "Fix send_check for draft pages",
-    94122
+    73853
    ],
    [
     "Cut two duplicates in sweeps section",
@@ -273,49 +873,49 @@
    ],
    [
     "Fix hook incident I-531d1e89",
-    215041
+    134117
    ],
    [
     "Fix two submit_guard checks",
-    371439
+    241665
    ],
    [
     "Readable KIT legend labels",
-    380400
+    183850
    ],
    [
     "Investigate 9 failing hook-replay scenarios",
-    1097080
+    654439
    ],
    [
     "Remove leftover draft figures",
-    545426
+    389331
    ],
    [
     "Resync compact-worker rules copy",
-    141399
+    87687
    ]
   ],
   "event worker": [
    [
     "Submit check: time limit vs job need",
-    267142
+    133571
    ],
    [
     "E8158: failed regeneration shard",
-    547771
+    329088
    ],
    [
     "Fix site logs wrong-file fallback",
-    193172
+    122939
    ],
    [
     "Fix failed parent re-read",
-    96149
+    55356
    ],
    [
     "Supervisor: diverged trials routine",
-    235477
+    128284
    ]
   ]
  },
@@ -328,30 +928,30 @@
  },
  "saving": {
   "log_owner_kept": {
-   "now": 441482659.2857143,
-   "after": 445338148.2857143,
+   "now": 257399372.00000006,
+   "after": 261825334.00000006,
    "note": "current rule (CLAUDE.md: the owner still reads the log): a checked DeepSeek reading is added per event, the owner's read stays",
-   "saved": -3855489.0,
-   "share": -0.0004537755376571002
+   "saved": -4425962.0,
+   "share": -0.0008935091003242794
   },
   "log_owner_trusts": {
-   "now_low": 11980607.285714287,
-   "now_mid": 58405498.2857143,
-   "now_high": 441482659.2857143,
+   "now_low": 7053154.0,
+   "now_mid": 65923095.99999999,
+   "now_high": 257399372.00000006,
    "after": 5195200.0,
    "note": "if owners act on the checked reading and open the log only when the cause is left open (Joaquin's open question)",
-   "saved_low": 6785407.285714287,
-   "share_low": 0.0007986151274967729,
-   "saved_mid": 53210298.2857143,
-   "share_mid": 0.006262637946443287,
-   "saved_high": 436287459.2857143,
-   "share_high": 0.05134927798015381
+   "saved_low": 1857954.0,
+   "share_low": 0.00037508202894283684,
+   "saved_mid": 60727895.99999999,
+   "share_mid": 0.012259691276053973,
+   "saved_high": 252204172.00000006,
+   "share_high": 0.05091474414415439
   },
   "fixes": {
-   "now": 17220279,
-   "after": 3257527.9,
-   "saved": 13962751.1,
-   "share": 0.0016433596069330679
+   "now": 10942742,
+   "after": 2629774.2,
+   "saved": 8312967.8,
+   "share": 0.0016782142232587408
   },
   "lookups": {
    "now": 0,
