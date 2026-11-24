@@ -40524,6 +40524,8 @@ entries:
     at: '2026-11-24T19:54:57+00:00'
   step_waits:
     '2': detached ftmech_glu_drive (both gluon-parent fine-tune searches, 32 trials; its end posts an event)
+    '4': detached ftmech_d539_uug_drive (4 uug searches, 64 trials; its end posts an event), then seeds 43/44 of each chosen
+      trial
   handoff:
     state: '2026-11-24 ~15:45. Step 1 done: D=1e3 Fn1k/S1k 0.486 [0.454,0.522] (results.tex 9fc114a6e, fig zng4g_d1e3). Step
       2: gluon parent FA-ccin2p3-1f2d9ad5 ended; parent check (parent_rerun_check.py glu --ref noset) gmean 5.04x worse on
