@@ -45099,6 +45099,35 @@ entries:
       the recorded call ''a setup gap to fix (site env), not a question''. Note: xformers is unpinned in requirements.txt
       and may pull a newer torch; the version comparison makes that a no, and the fix is a recipe pin. Searched plan.yaml
       for anaconda, 3.11, python env, env repair and python_bin, and site decisions (D176, D544).'
+  - at: '2026-11-24T23:32:54+00:00'
+    question: Does site env on CC (the last script still run on CC's login node, D544's leftover) now run whole as one htc
+      CPU job through run_as_job, with its output and exit code read by the next call, and does it leave FA's CC env as it
+      was (idempotent rebuild-free path)?
+    prior: 'D544 and this entry''s switch (docs/results.tex sec:cc_login_jobs, 4404e1baa): maintain commands as htc jobs via
+      run_as_job, 28 passes clean. CC env rebuild test job 64802032 (1 CPU htc, timeout 3600) ran this same bootstrap and
+      pip install -r requirements.txt on a compute node in 9 s + install, exit 0, so network, /sps and pip work from htc.
+      Searched plan.yaml (site env, env_script, login node) and site decisions (D176, D544): no other test of site env as
+      a job.'
+    measure: 'one call ''site env ccin2p3 FA'' (no --rebuild) submits job ccj_<key> on htc (1 CPU, -t 65 min, the sites.yaml
+      cpu flags); a second call after it ends reads it. Read: the job ran on a compute node (not the login node: hostname
+      in its log), the env script''s lines in the result (checkout <hash> (trunk), venv exists: .venv, the verify print, activate.sh
+      ok: <python> 2.1.2+cu118, setup verify passed, ''env ready: FA @ ccin2p3''), exit 0; a call while it is queued prints
+      CCJ_PENDING and exits 75; afterwards site run ccin2p3 FA -- python -c ''import torch,numpy;print(torch.__version__,numpy.__version__)''
+      shows the stack unchanged'
+    check: site env --check ccin2p3 FA renders the same script the login-node path ran (3336 bytes); run_as_job passes it
+      through bash -c (heredocs survive), as the maintain jobs' multi-command inners do
+    fixed: 'the env script itself (env_script unchanged), sites.yaml, requirements.txt, the live .venv (no --rebuild: pip
+      install -r of satisfied pins is a no-op, only pip itself may be upgraded), the CC checkout follows trunk as site sync
+      would'
+    control: the live stack read in job 64801966 (python 3.11.7, torch 2.1.2+cu118, numpy 1.26.4) and the previous login-node
+      site env output format
+    seeds: none (deterministic tool path)
+    outcome: 'yes: the job''s result carries ''env ready: FA @ ccin2p3'', exit 0, versions unchanged: the change stays, documented
+      in site-tool.txt; no: the failing step (sbatch refusal, script quoting, git fetch from a compute node, setup.sh) is
+      fixed in the tool and the same call rerun; a step that cannot run on a compute node goes back to the login node with
+      its reason'
+    sources: 'D544 (Joaquin: move CC''s scripts to Slurm), the previous owner''s hand-off naming site env''s pip install as
+      the leftover, 64802032 and 64801966 logs on this entry'
   findings:
   - at: '2026-11-24T17:31:13+00:00'
     text: 'Inventory of scripts run on CC''s login node (2026-11-24): supervisor maintain every pass (8-10 min apart): disk_watch.py
