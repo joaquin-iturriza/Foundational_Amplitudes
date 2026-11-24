@@ -42,7 +42,10 @@ def rid(kind):
 def triage(run, event, end):
     i = rid("triage")
     d = lt.fresh("route_" + i)
-    out = subprocess.run(["site", "logs", run, "-n", "100000"], capture_output=True, text=True, timeout=300)
+    for n in ("100000", "5000"):         # a very long log times the site's ssh out at 100000 lines; its end is what counts
+        out = subprocess.run(["site", "logs", run, "-n", n], capture_output=True, text=True, timeout=300)
+        if out.stdout.strip():
+            break
     path = os.path.join(d, run + ".log")
     open(path, "w").write(out.stdout)
     if not out.stdout.strip():
@@ -61,7 +64,7 @@ def triage(run, event, end):
     quoted = bool(a and a.get("error") and str(a["error"]).strip() in text)
     step = bool(a and a.get("step") is not None and re.search(r"\b%s\b" % re.escape(str(a["step"])), text))
     rec = {"id": i, "kind": "triage", "run": run, "event": event, "end": end, "log": path, "answer": a,
-           "quote_in_log": quoted, "step_in_log": step, "seconds": round(sec, 1), "lab_tokens": u, "rc": rc,
+           "quote_in_log": quoted, "step_in_log": step, "tail_lines": int(n), "seconds": round(sec, 1), "lab_tokens": u, "rc": rc,
            "at": time.strftime("%Y-%m-%dT%H:%M:%S")}
     log(rec)
     print(json.dumps({k: rec[k] for k in ("id", "run", "event", "answer", "quote_in_log", "step_in_log", "log")},
