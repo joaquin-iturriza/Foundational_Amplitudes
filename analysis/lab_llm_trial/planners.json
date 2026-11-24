@@ -1,1 +1,17 @@
-{"defshare": "ac02d4186f997f3e3", "ftorders": "ac60ceebaae874c2b", "poolphys": "abd94bf6add038034", "skipclaim": "a9b2e6bad4790d341", "stallshort": "a4195bb603cffaa5a", "zsrole": "a8dca2238611c3f52", "ordsrc": "a84ac8d8a61a4343e", "hybridcp": "af30b7ffb08844e74", "loopenc": "a8a95c0d90dfd32e3", "poolrow": "ae04b6766458998b3"}
+{
+ "defshare": "ac02d4186f997f3e3",
+ "ftorders": "ac60ceebaae874c2b",
+ "poolphys": "abd94bf6add038034",
+ "skipclaim": "a9b2e6bad4790d341",
+ "stallshort": "a4195bb603cffaa5a",
+ "zsrole": "a8dca2238611c3f52",
+ "ordsrc": "a84ac8d8a61a4343e",
+ "hybridcp": "af30b7ffb08844e74",
+ "loopenc": "a8a95c0d90dfd32e3",
+ "poolrow": "ae04b6766458998b3",
+ "alphapow": "a7fca410ec57c2417",
+ "valtotal": "a71c6ea3b8136f075",
+ "emastart": "ace72678293389c59",
+ "statssrc": "ab216a5db27bcf571",
+ "topsampling": "a60e79b46e046d4f1"
+}

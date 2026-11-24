@@ -58,6 +58,12 @@ HARD = {
                 "not in flight, so its entry is listed as stalled while the agent works.",
     "endedrun": "tools/plan.py hides every ended run of an entry whose step agent is working, even ended runs that "
                 "agent does not own, so nothing moves past them.",
+    "reviewlock": "A pillar reviewer can be launched fresh while a recorded reviewer of the same pillar still holds "
+                  "the review lock, so two reviewers work one backlog; the recorded one should be continued with "
+                  "SendMessage instead.",
+    "replyblock": "A message from the user sent while an entry waits on the user blocks the stop at every turn that "
+                  "is not an answer (the block is shown on the user's screen each time), and a stop check that blocks "
+                  "for another reason prints its notes into the block message.",
     "massconv": "The LO catalog uses the sm card's default heavy-quark masses while the virtual pipeline pins m_t at "
                 "172.5, and some entries sample a final-state mass that disagrees with their own card (virt ee_bb at "
                 "4.18 against MB=4.7; ee_wwbb's b quarks sampled massless).",
