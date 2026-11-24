@@ -40232,6 +40232,12 @@ entries:
     units: null
     start: '2026-11-24T07:58:11+00:00'
     at: '2026-11-24T07:58:11+00:00'
+  - batch: ftmech_glu_drive
+    wall_h: 6.5
+    jobs: 32
+    units: null
+    start: '2026-11-24T13:55:18+00:00'
+    at: '2026-11-24T13:55:18+00:00'
   step_waits:
     '2': the detached driver ftmech_glu_drive ending (its detach DONE event; 16+16 trials of ftmech_zng4g_ftglu_b128 and ftmech_zng4g_d1e3_ftglu_b128)
   handoff:
