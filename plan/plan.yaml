@@ -42286,3 +42286,15 @@ entries:
     units: null
     start: '2026-11-24T00:54:27+00:00'
     at: '2026-11-24T00:54:27+00:00'
+  findings:
+  - at: '2026-11-24T00:54:54+00:00'
+    text: '2026-11-24: why Joaquin''s single-run attempt failed (base_experiment find_BS before ef2162765): it read p.grad
+      after _step, i.e. after clip_grad_norm 5, and in the WSD het control 98.8% of 4264 steps have pre-clip norm above 5
+      (median 21.3, rising 10 -> 58 over the run; train_steps.npz on CC), so every gradient it read had norm 5; its big batch
+      was the mean of the last 20 steps'' gradients (20 different weights), it took abs() of each estimate, pandas ewm alpha
+      0.9 kept ~1 measurement, and its plot was dead code after a return. Replaced (merged b36a40b3a) by the paper''s App.
+      A estimator from 8 chunk gradients of each step''s batch at the batch''s own per-process weights (pre-clip, before the
+      step), a brute-force check against 16 independent batch gradients with jackknife errors, a known-answer CPU test (linear
+      regression: tr Sigma, |G|^2 within 5%, B within 7%; jackknife covers truth 37/40), arm v4_het_noise_scale. Repo-reviewer
+      PASS (watermark 3c175775d) after one BLOCK (brute error bar); design PASS twice. Smoke FA-ccin2p3-6721d3c2 submitted
+      (scripts/job_catalog_v3_short.sh v4_het_noise_scale smoke @0ca42577e3).'
