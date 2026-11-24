@@ -9465,7 +9465,7 @@ validation, read on the test pool with its final model (the mean at the best che
 MSE$(\ln|\mathcal M|^2)$ for the trees, MSE$(V/B)$ for the one loops. The fine-tunes start from parents cut from
 the catalog recipe of trial 1262 (\S\ref{sec:catalog}), all four targets held out for the tree fine-tunes, the two
 trees in for the one-loop ones. $D^*$ is read from a joint fit of $\log L$ against $\log D$ per target with one
-exponent shared by the arms (\code{analysis/data_saving/dstar\_fit.py}); the saving is
+exponent shared by the arms (\code{analysis/data\_saving/dstar\_fit.py}); the saving is
 $S=D^*_{\rm scratch}/D^*_{\rm fine\text{-}tune}$, its band the 16--84\% range of a bootstrap over cells. On
 $e^+e^-\to u\bar u$, $V$ scratch does not go below $1.1\times10^{-4}$, so $S$ is read there (the lowest level both
 arms reach, D373).
@@ -16386,7 +16386,7 @@ protocol, and the protocol test's two arms. Bottom: median $|\Delta|$ on the $10
 % allow: 10^6 2 because they are the test event count and the square of |M|
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[tp]
 \centering
 \includegraphics{../analysis/zng_uq/figs/zng_median_delta.pdf}\\[1ex]
 \includegraphics{../analysis/zng_uq/figs/zng_delta_z4g.pdf}\\[1ex]
@@ -16395,7 +16395,7 @@ protocol, and the protocol test's two arms. Bottom: median $|\Delta|$ on the $10
 (left); validation and training $\mu$-MSE against step (right).}
 \label{fig:zng}
 % allow: 4g 0 1 6 2 because they are the process, the normal's parameters and the pull edge
-\end{figure}
+\end{figure}\clearpage
 
 \subsection{Hand-off: open items}\label{sec:ladder-open}
 \begin{itemize}
