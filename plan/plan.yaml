@@ -44964,3 +44964,8 @@ entries:
     paths: []
   dead_ends: []
   asks: []
+  owner:
+    agent: a1f4e7d170cdb83cc
+    state: working
+    since: '2026-11-24T19:14:58+00:00'
+    state_at: '2026-11-24T19:14:58+00:00'
