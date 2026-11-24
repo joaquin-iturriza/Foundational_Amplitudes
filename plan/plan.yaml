@@ -38324,6 +38324,10 @@ entries:
       step (31250), so the curve test flags them like every D507 choice; the lr window [2.7e-4, 3.3e-2] brackets it (best
       at log position 0.735; the 3 trials above it at lr 2.7e-2-3.3e-2 are 2.8-7.8x worse, the 4 at 9.9e-3-1.09e-2 1.1-2.1x
       worse). Test median |Delta| of hp0078 pending (FA-lxplus-8116ba56).'
+  - at: '2026-11-24T03:54:14+00:00'
+    text: '2026-11-24 correction to the zng_uq_benchmark batch-128 Muon scratch reference finding of today: the 3 trials above
+      hp0078''s lr (2.74e-2-3.29e-2) are 3.6-9.8x worse in standardised val (0.0253/0.0399/0.0693 against 0.00708), not 2.8-7.8x;
+      every other number stands.'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
