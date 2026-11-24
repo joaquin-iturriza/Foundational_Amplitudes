@@ -43945,6 +43945,43 @@ entries:
       files equal the graded ones. The change of task form from round one''s ''meet this interface'' to ''make these failing
       tests pass'' is stated for the result. Checks 2 and 3 and the search as in the previous pass (round one 8/10 vs 9/10;
       spread about 1.3 tasks per arm, indicative, paired, Wilson).'
+  - at: '2026-11-24T23:53:17+00:00'
+    question: 'D551: what else can the lab LLMs take? Can deepseek-v4-flash or qwen3.8-27b (a) handle the main session''s
+      routing wakes (an event, an agent''s end or hand-back that the main session answered only with routing and records)
+      and (b) give the design reviewer''s PASS/FIX verdict, well enough to take them off our tokens?'
+    prior: 'token_share.py @b29133b07 (json e0e2b1486): per-activity breakdown over 2026-11-09..23, 4953M tokens; main session
+      29.3%, of which plan/ledger bookkeeping 9.7% and replies 8.1%; reviewers 5.3% of tokens, 10.0% of $. main_turns.py over
+      the same window: orchestration-only main wakes 602 segments, $164 (34% of main). lab_wake_trial.py extract: 524 routing
+      wakes (trigger waiter/agent_done/handback, did orchestration/none), 208M tokens (4.2% of all), mean 397k; 93 design
+      reviews with a verdict (16 FIX). par:labllm1/2: log triage 30/30, lookups 20/20, fixes 10/10 for DeepSeek; no earlier
+      trial of wake dispatch or design review by a lab model (searched results.tex for dispatcher, nothing new, orchestration,
+      reviewer model; site decisions for wake, dispatch, review model: D533, D534 are about wakes not reaching agents, no
+      model trial).'
+    measure: '(a) 100 wakes sampled (seed 0) of the 524; each model gets the dispatcher rules (RULES in tools/lab_wake_trial.py),
+      the wake text and the state outputs the main session read in that segment, and returns send_to, launch count, ack, plan
+      verbs, tell_joaquin; correct = all five equal the main session''s actions; per-field counts; Wilson 95%; correct on
+      the 29 wakes that needed an action. (b) all 93 design reviews; each model, two arms (design only: brief + first plan
+      show/design output; reviewer''s material: everything the Opus reviewer read, capped 80k characters), gets .claude/agents/design-reviewer.md
+      and returns PASS/FIX; agreement, FIX caught of 16, false FIX of 77. Tokens: our tokens of the wakes and reviews a route
+      would take (token_share unit); lab tokens; seconds. Every disagreement read by hand (the Opus key can be the one wrong).'
+    check: 'The key moves: of the 100 wakes 29 need an action (send, launch, ack, plan record or telling Joaquin) and 71 none,
+      so a do-nothing dispatcher scores 71 and an answer must beat it on the 29; of the reviews, 16 FIX against 77 PASS, so
+      always-PASS scores 77/93 and FIX caught separates. Smoke: one wake and one review per model through the harness (parsed
+      answers).'
+    fixed: Window 2026-11-09..23; server-default temperature; one call per instance per model per arm, no tools; same prompt
+      for both models; material cap 80k characters; models via https://lpnkarim.in2p3.fr/api, two calls at a time (D531).
+    control: The Opus main session's own actions on the same wakes; the Opus design-reviewer's own verdicts on the same reviews;
+      with the trivial baselines (do nothing; always PASS).
+    seeds: One call per instance (as the earlier rounds); 100 wakes and 93 reviews give a Wilson half-width of about 0.1 on
+      the totals; 29 active wakes and 16 FIX are the small parts, read case by case.
+    outcome: 'No numeric bar of mine: the outcome is each model''s error rate against the Opus key, beside the trivial baselines,
+      for Joaquin''s call (D551: decide what to use the lab LLMs on). (a) a model that beats do-nothing on the 29 active wakes
+      outside its Wilson interval: propose a lab dispatcher in front of the main session, with its misses by field and the
+      tokens it would take (up to 208M over 14 days, 4.2%, less escalated wakes); one that does not: no route, misses listed.
+      (b) an arm that catches FIX beyond always-PASS (FIX caught > 0 with agreement at or above 77/93): propose a lab first
+      review with Opus on its FIX or doubt, with FIX missed and false FIX counts and tokens; else keep reviews on Opus.'
+    sources: 'D551 (Joaquin: decide what else to use the lab LLMs on); baselines measured by tools/lab_wake_trial.py extract:
+      do-nothing 71/100 wakes, always-PASS 77/93 reviews; Wilson 95% for the spread'
   step_waits:
     '3': notes-editor pass of the results.tex backlog (it blocks on sec:noisescale and fig:llmcmp_heldout, other entries'
       text; the repo-reviewer already passed the merge)
