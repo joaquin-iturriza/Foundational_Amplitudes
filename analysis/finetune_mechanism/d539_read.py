@@ -9,6 +9,9 @@ process and D, three-seed geometric means, 2-sigma interval from the arms' own s
     python3 analysis/finetune_mechanism/d539_read.py [--cached]   -> data/d539.json, figs/d539
     python3 analysis/finetune_mechanism/d539_read.py --set s [--cached]   -> the step-4 set at hp1333 (S's optimum),
         runs ftmech_d539s_*, every cell off/eps1e-8 and all new: data/d539s.json, figs/d539s
+    python3 analysis/finetune_mechanism/d539_read.py --set u [--cached]   -> step 5, u u~ g only, best against best: each
+        arm's own 16-trial search ftmech_d539_uug_<D>_<arm>_b2048 (seed 42 = its chosen trial, the lowest val_loss)
+        and seeds 43/44 of that trial (runs ftmech_d539_uug_<D>_<arm>_b2048_s4x): data/d539u.json, figs/d539u
 """
 import json
 import os
@@ -28,7 +31,7 @@ CELLS = {("zng", "1e4"): ["off", "eps1e-8", "eps1e-4", "eps1e-2", "eps1", "massl
 SEEDS = (42, 43, 44)
 SET = sys.argv[sys.argv.index("--set") + 1] if "--set" in sys.argv else ""   # "" = hp1961 (step 3), "s" = hp1333
 if SET:
-    CELLS = {c: ["off", "eps1e-8"] for c in CELLS}
+    CELLS = {c: ["off", "eps1e-8"] for c in CELLS if SET != "u" or c[0] == "uug"}
 TAG = f"d539{SET}"
 REUSED = "ftmech_zng4g_scrsoftsrch_b2048"   # Z+4g 1e4 eps1e-8: the one-setting search's chosen trial hp1961
 
@@ -39,7 +42,14 @@ def collect():
         for a in arms:
             for s in SEEDS:
                 lab = f"{p}|{d}|{a}|{s}"
-                if (p, d, a) == ("zng", "1e4", "eps1e-8") and not SET:
+                if SET == "u":
+                    n = f"ftmech_d539_uug_{d}_{a}_b2048"
+                    if s == 42:
+                        t = min(driven(n), key=lambda t: t[2])
+                        args.append(f"'{lab}#{t[4]}#{t[5]}'")
+                        continue
+                    n = f"{n}_s{s}"
+                elif (p, d, a) == ("zng", "1e4", "eps1e-8") and not SET:
                     if s == 42:
                         t = next(t for t in driven(REUSED) if t[1] == 1961)
                         args.append(f"'{lab}#{t[4]}#{t[5]}'")
@@ -62,6 +72,8 @@ def main():
             continue
         c = np.array(v["val_mse_curve"]) * v["std"] ** 2
         p, d, a, s = k.split("|")
+        if SET == "u" and s != "42":   # seeds of the chosen trial: same lr as its seed-42 trial run
+            assert abs(v["lr"] / raw[f"{p}|{d}|{a}|42"]["lr"] - 1) < 1e-9, k
         best.setdefault((p, d, a), {})[int(s)] = float(c.min())
         curves[k] = c
     res = {"missing": missing, "cells": {}}
@@ -82,6 +94,8 @@ def main():
 
 def plot(res, curves):
     import plot_style as ps
+    if SET == "u":
+        return plot_u(res, curves)
     lab = {"off": "no rescale", "eps1e-8": r"rescale, $\epsilon=10^{-8}$", "eps1e-4": r"rescale, $\epsilon=10^{-4}$",
            "eps1e-2": r"rescale, $\epsilon=10^{-2}$", "eps1": r"rescale, $\epsilon=1$",
            "massless": "rescale of massless\nmomenta only"}
@@ -117,6 +131,38 @@ def plot(res, curves):
     h.set_ylabel(r"val MSE$(\log|\mathcal{M}|^2)$"); ps.process_label(h, r"$q\bar q\to Z+4g$")
     a.plot([], [], "o", color="0.5", mfc="none", label="blew up (read\nat its best)")
     ps.legend_cell(cell, a)   # panel (b) plots off and eps1e-8 with panel (a)'s markers
+    ps.save(fig, os.path.join(HERE, "figs", TAG))
+
+
+def plot_u(res, curves):
+    import plot_style as ps
+    lab = {"off": "no rescale", "eps1e-8": r"rescale, $\epsilon=10^{-8}$"}
+    cols = {"off": ps.C.blue, "eps1e-8": ps.C.vermillion}
+    fig, axs = ps.figure(ncols=2, nrows=2)
+    (g, h1), (h2, cell) = axs
+    blown = set(res["blowups"])   # open markers: val rose > 10x its best-so-far (D398), read at its best
+    for i, (p, d) in enumerate(CELLS):
+        for j, k in enumerate(("off", "eps1e-8")):
+            for m, (sd, x) in enumerate(zip(SEEDS, res["cells"][f"{p}_{d}"][k]["best"])):
+                if x is not None:
+                    g.plot(i + (j - 0.5) * 0.3 + (m - 1) * 0.05, x, "o", color=cols[k],
+                           label=lab[k] if (i, m) == (0, 0) else None,
+                           mfc="none" if f"{p}|{d}|{k}|{sd}" in blown else cols[k])
+    g.set_xlim(-0.5, len(CELLS) - 0.5); g.set_xticks(range(len(CELLS)))
+    g.set_xticklabels([f"$10^{{{d[-1]}}}$" for _, d in CELLS]); g.set_yscale("log")
+    g.set_xlabel(r"$D_{\rm train}$"); g.set_ylabel(r"best MSE$(\log|\mathcal{M}|^2)$")
+    ps.process_label(g, r"$e^+e^-\to u\bar ug$")
+    for ax, d in ((h1, "1e4"), (h2, "1e5")):
+        for k in ("off", "eps1e-8"):
+            for sd in SEEDS:
+                c = curves.get(f"uug|{d}|{k}|{sd}")
+                if c is not None:
+                    ax.plot(np.linspace(0, 1, len(c)), c, color=cols[k])
+        ax.set_yscale("log"); ax.set_xlabel("training progress (step / 1953)")
+        ax.set_ylabel(r"val MSE$(\log|\mathcal{M}|^2)$")
+        ps.process_label(ax, rf"$e^+e^-\to u\bar ug$, $D_{{\rm train}}=10^{d[-1]}$")
+    g.plot([], [], "o", color="0.5", mfc="none", label="blew up (read\nat its best)")
+    ps.legend_cell(cell, g)
     ps.save(fig, os.path.join(HERE, "figs", TAG))
 
 
