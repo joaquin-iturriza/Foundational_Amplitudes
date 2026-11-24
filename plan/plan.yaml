@@ -45100,3 +45100,38 @@ entries:
     it matter?'' asks, it does not choose); 2026-11-14T04:31 (a pasted LaTeX template)'
   blocks: the LICENSE file only
   blocks_steps: *id004
+  designs:
+  - at: '2026-11-24T20:08:44+00:00'
+    question: 'Does the published orchestrator-kit, installed under a separate HOME with its own remote state dir (~/.ccorch_kit
+      on the site, so FA''s live gate in ~/.ccorch is never overwritten), take examples/toy from a private GitHub remote to
+      a finished, supervisor-sorted and fetched run on CC-IN2P3 while keeping CC''s login-node policy (login: submissions
+      and short reads only; the env build runs as a CPU job)?'
+    prior: 'tests/test_kit.py: 19/19 offline (install into a temp HOME, plan CLI, guard verdicts; hand-off of 2026-11-24 19:51).
+      Nothing on a cluster was tested. FA''s live site tool runs the same submit/poll/logs/fetch code on CC daily; the kit
+      is that code with history stripped plus two changes made today and untested on a site: CCORCH_REMOTE_DIR (remote state
+      dir) and site env as a CPU job on login_cap sites. No earlier kit proof in docs/results.tex, the plan or site decisions
+      (searched: orchestrator, kit, toy, ccorch_kit).'
+    measure: 'Per stage, pass or fail read from its output: (1) site list: ccin2p3 up; (2) site env ccin2p3 toy: CPU job ccj_*
+      ends exit 0, checkout at the pushed toy commit, .venv imports numpy; (3) site pick toy --jobs 1 allots ccin2p3; (4)
+      site submit scripts/job_probe.sh: log shows a GPU name and RUN_DONE; (5) site submit job.sh: log RUN_DONE and metrics.json
+      with the fitted a, b near 3, 1; (6) site supervise --once sorts both runs clean (acked, deciding log line named); (7)
+      site fetch pulls metrics.json locally; (8) FA''s live gate untouched: sha1 of ~/.ccorch/bin/ccorch_gate.py on CC equal
+      before and after, FA''s runs.db row count unchanged.'
+    check: 'Checked locally on the kit code that the measures can fail: with CCORCH_REMOTE_DIR=.ccorch_kit, ssh_cmd rewrites
+      $HOME/.ccorch to $HOME/.ccorch_kit and both base64 payloads of the gate installer (gate and sbatch wrapper) decode to
+      text naming .ccorch_kit (2 of 2 True); without the variable they name .ccorch, which would have changed FA''s gate sha
+      in measure (8). site env on a login_cap site now goes through run_as_job (CCJ_SUBMITTED / CCJ_RESULT lines), so measure
+      (2) reads a job result, not login-node output.'
+    fixed: toy code at the commit pushed to the private repo; train.py 500 steps seed 0; 1 GPU, job time limit 10 min (probe
+      5 min); one site, CC-IN2P3 (Jean Zay unreachable at 2026-11-24 ~20:30; lxplus needs the 2FA master and condor from AFS,
+      a second cluster is outside the one-cluster proof asked); kit HOME under the scratchpad, CCORCH_REMOTE_DIR=.ccorch_kit
+    control: 'FA''s live setup as the untouched control: the CC gate file sha1 and FA''s local runs.db row count read before
+      and after; a change in either is a failure regardless of the toy''s outcome.'
+    seeds: 'one seed (0): an infrastructure proof, pass or fail per stage; a second seed tests nothing more'
+    outcome: 'yes: all 8 stages pass -> README ''Status and limits'' says the kit was proven end to end on a Slurm site (CC-IN2P3),
+      the fixes are pushed to the public repo, step 1 done. no: the first failing stage''s output is read, the kit fixed and
+      the proof rerun from that stage; a failure only Joaquin can clear (e.g. CC cannot read the private GitHub repo) goes
+      to him as a question with the fallback (public toy repo or a bundle push).'
+    sources: 'D547 (Joaquin: private repo for the toy so a cluster can clone it, ''I don''t see why not''); the main session''s
+      narrowing (one real cluster, separate HOME, CC login policy: submit and short reads only); D544 (CC login nodes: no
+      scripts); cost: 2 GPU jobs x <=10 min = <=0.34 GPU-h, under the 30 GPU-h budget'
