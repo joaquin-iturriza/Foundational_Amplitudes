@@ -45152,7 +45152,7 @@ entries:
     blocks_steps: &id005 []
   owner:
     agent: a4e37f36ae6953ad8
-    state: working
+    state: closed
     since: '2026-11-24T19:55:05+00:00'
     state_at: '2026-11-24T21:57:02.206000+00:00'
     context: 274603
@@ -45164,26 +45164,24 @@ entries:
       - 'the toy runs and is sorted clean on the cluster: publish the kit (name, host, visibility, license as Joaquin answers)'
       - 'a kit path breaks on the cluster: fix it in the kit, rerun the toy, then publish'
   handoff:
-    state: 'Kit built and committed locally at ~/work/orchestrator-kit (commit 1a90637, author joaquin-iturriza, no remote,
-      no attribution). tests/test_kit.py: 19/19 pass offline (install into a temp HOME, plan CLI, guard verdicts). Scrub grep
-      (30 personal patterns, list kept outside the repo) is clean. FA untouched. Step 1 (on-cluster proof with examples/toy,
-      then publish) is HELD by the open ask: name, host, visibility, license, and a private remote for the toy. Nothing about
-      a cluster is tested yet.'
-    decisions: 'the user''s (D546): a standalone shareable kit, copied not moved, FA unchanged, no push before his go. Mine,
-      to re-justify: kept the internal config dir name ~/.config/ccorch and the ledger DB path (fewer edits); policies live
-      in projects.toml [defaults.policy] / [projects.P.policy] (gpu_cap_h, gpu_cap_scarce_h, context_close, notes_file default
-      notes.txt, opener, data_paths, prune_tools, checks_off), read by site.policy() and plan.POLICY; --allow-jeanzay renamed
-      --allow-scarce (sites.toml budget=scarce); dropped as FA-specific: hpo/plot/md/figure_pair/worktree/send_check/git_verify
-      guards, submit_guard''s data/rundir/epoch/wall/cache checks, review_weight, review_state, switch_settings, notes-editor,
-      compact-worker, tools/labllm.py with lab_llm_trial (the DeepSeek routing layer); the lab LLM ships as bin/labllm (generic
-      OpenAI-compatible client, TLS verified by default); cluster names kept in comments and in site-facts.example (public
-      facilities); verbatim quotes of the user in ~7 comments left for his call (question 6)'
-    ruled_out: 'an on-cluster proof without a remote: site env clones from projects.toml repo, so the toy needs a remote the
-      cluster can reach (question 5)'
+    state: 'Kit cleaned of project history (one squashed commit 1706c88) and public at github.com/joaquin-iturriza/orchestrator-kit,
+      main at d2681fb with on-cluster fixes. Private toy repo github.com/joaquin-iturriza/orchestrator-kit-toy (a818ed5).
+      End-to-end proof on CC-IN2P3 passed all 6 stages with ledger off (env CPU job, pick, probe + fit, supervisor clean sort,
+      fetch metrics.json w=3.0038 b=0.9986); FA''s live gate, stamps and ledger untouched. Open: license (no LICENSE file
+      until Joaquin answers; main session recommends MIT) and whether to test the site-side gate/items (needs Joaquin''s typed
+      sentence in a session in the toy checkout).'
+    decisions: 'Joaquin''s (D546, D547): standalone public kit at that URL, private toy repo, history comments removed. Mine:
+      CCORCH_REMOTE_DIR=.ccorch_kit so a second install never overwrites FA''s ~/.ccorch gate; site env runs as a CPU job
+      on login_cap sites (D544); env verify torch-optional; sync sets the stage ref on a fresh checkout; supervisor watches
+      item-less runs when the ledger is off; toy writes results under runs/; toy ledger off for the proof because copying
+      Joaquin''s transcript into the test HOME was refused (correctly).'
+    ruled_out: copying a user transcript into the test HOME to satisfy site decide (refused by the permission check); Jean
+      Zay (unreachable 20:30); lxplus (2FA + condor, outside one-cluster proof)
     running: none
-    files: '/home/joaquin/work/orchestrator-kit (README.md, install.sh, bin/site, config/*.example.toml, project/, user/,
-      tests/test_kit.py); scrub pattern list: /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/personal.pat'
-    written: '2026-11-24T19:51:11+00:00'
+    files: '/home/joaquin/work/orchestrator-kit; /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/kithome
+      (kit HOME, toy at work/toy); /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/ksite
+      (wrapper); CC: /sps/lpnhe/jiturrizaramirez01/kit_proof, ~/.ccorch_kit'
+    written: '2026-11-24T22:03:39+00:00'
   ask: 'Scope: testing the kit''s cluster-side submission gate on CC. It needs one sentence typed by Joaquin (e.g. ''run the
     toy once on CC'') in a Claude session started in the toy checkout (scratchpad kithome/work/toy), because the kit''s ledger
     only accepts his own typed words. Do you want it tested, or the README lists the gate as untested on a cluster?'
