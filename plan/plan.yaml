@@ -44514,6 +44514,14 @@ entries:
       croland 60704, rvandenbrouc 29763, benayoun 21064, ldelbuon 1950. Allocated du sums to 1.28x df used (Isilon). SCRATCH
       holds 126,942 entries: 118,777 zeroshot_*, 6,749 signed_ab_* etc. temp run dirs never removed (fixed acd6b8753). CC''s
       login node cuts site run sessions after 40 s-2 min of du/census: long reads go to scripts/job_disk_inventory.sh (htc).'
+  - at: '2026-11-24T15:04:01+00:00'
+    text: 'CORRECTION 2026-11-24 16:10: the 126,942 SCRATCH entries / 118,777 zeroshot_* counted at 15:25 came from a listing
+      cut by a broken pipe; the job (FA-ccin2p3-b949c4ee, SCRATCH/zz_cc_disk/scratch_top*.tsv) counts 526,361 top-level SCRATCH
+      entries, 415,663 zeroshot_* (1.7 GiB apparent), 546 kshot_* (0.5 GiB). Apparent size reconciles with df (top 342,224
+      + SCRATCH 171,960 = 514,184 MiB vs df used 509,969, +0.8%); du allocated with --block-size=1M rounds each entry up to
+      1 MiB and overstates. Census --in-use ''*'' --days 14: amp_data_cache all keep (60,138 MiB, 18,498 files). Since 15:20
+      the disk fell 15->10 GB through llm_compare part (b) width smokes in runs/zz_smoke (two uncompressed checkpoints each,
+      2x2.78 GB at 64 heads); the pending 120-head smoke FA-ccin2p3-74ba6cdd projects ~19.5 GB.'
   step_waits:
     '1': FA-ccin2p3-b949c4ee
   targets:
