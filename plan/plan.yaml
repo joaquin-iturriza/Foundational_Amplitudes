@@ -37875,7 +37875,10 @@ entries:
   - D513
   - D516
   - D529
-  next: null
+  next:
+    2: 'Design (owner''s) the b128 residual of the no-settings fine-tune (Fn/S 1.53, seeds 0.0108/0.0184/0.0141, seed 43 blew
+      up at validation 44/50): per the step-5 partial branch, H2 dilution read at lower D (gains exist at D<=10^3), and/or
+      the b128 instability (Fn''s late spikes at lr 7.3e-3, best-at-end for S)'
   done_when: null
   notes_ref: null
   match: dsave_ftmech_*,ftmech_*
@@ -39733,6 +39736,12 @@ entries:
       untested against the race); analysis/finetune_mechanism/zng4g_seed_chunks.py, zng4g_r1_read.py (readout to extend);
       sweeps_local/ftmech_zng4g_*
     written: '2026-11-23T22:06:48+00:00'
+  step_why:
+    2:
+      feeds: what remains of the b128 fine-tune deficit once the parent's settings are removed (D519/D520)
+      if:
+      - 'a matched lower-D read shows Fn below S: dilution not the residual, report'
+      - 'Fn above S at lower D too: pretraining cost beyond the settings, report with figure'
 - id: llm_compare
   title: LLoCa against Suprio's LLM on the LLM amplitude catalogue
   question: In the conditions of Suprio's LLM pID run (1501 MadGraph-default processes, 1352 trained, 149 held out; 55,296
