@@ -44390,6 +44390,36 @@ entries:
       and take its total from the scratch_top sums, so the job''s 2 h limit is not spent on duplicate walks. Everything else
       holds: read-only CPU job, no GPU budget, outputs small against 15 GB free, no control/seeds needed for a deterministic
       read, the login-node cuts (detached cc_du/cc_du2/cc_du3 logs, rc=255 ''closed by remote host'') justify a job.'
+  - at: '2026-11-24T14:33:49+00:00'
+    question: 'What uses CC''s /sps/lpnhe group space (512 GiB, 98% used, 15 GiB free on 2026-11-24) where login-node reads
+      are cut: every top-level entry of /sps/lpnhe, $WORK, the checkout and $SCRATCH (126,942 entries, 118,777 zeroshot_*
+      temp dirs), allocated and apparent; each run''s model files against the rest and its training time (inv_runs.py); the
+      training-cache pools no recipe reads (cache_census.py); the loose files of datasets/ and the checkout root; lhe_queue.
+      Feeds Joaquin''s call (D542) on what is deleted. Job: scripts/job_disk_inventory.sh at trunk ea8d84d22'
+    prior: 'analysis/storage/inventory.json (2026-10-25, D103''s breakdown): runs 113 GB, runs_from_lxplus 48, amp_data_cache
+      66, datasets 48, zz_lowd 14; cache_manifest_2026-10-26.tsv (census under D147); held storage entry (D96/D122: 12 test/smoke
+      dirs, lxplus-era archive). Decisions in force that already approve deletion classes: D149 model files of finished runs
+      (keep plot inputs), bounded by D133 (concluded studies only, never a run over ~5 h of training: inv_runs'' training
+      time reads it); D147 unused training-cache entries; D163/D167 catalog_v3 pools; D110 catalog_v2; D131 Daniel''s catalog
+      pools; D84/D103/D243 old mmap caches; D180/D201 MadEvent work dirs, lhe_work/parts, zz_probe_*; D208/D209/D214 MadGraph
+      standalones (install kept); D404 the lxplus-era archive tars; D19 sweep/prune.py rules. Today''s login-node reads: runs
+      122,051 MiB, runs_from_lxplus 23,843, datasets 79,742, amp_data_cache 75,265, amp_mmap_cache 45,338, SCRATCH zz_* >=
+      50,571 (cut)'
+    measure: 'MiB per entry, both allocated (du) and apparent (du --apparent-size). The delete list is ranked and reported
+      in the size whose sum over /sps/lpnhe (others'' dirs + ours, SCRATCH from scratch_top) is within 5% of df.txt''s used;
+      the other is shown beside it. Per run: model vs other bytes and training hours (inv_runs); census keep/delete per cache
+      file'
+    check: runs in top.tsv (allocated) against the login-node du 122,051 MiB (cc_du3.log.5); amp_data_cache in scratch_top.tsv
+      against 75,265 MiB (cc_du3.log.6); both within the growth of the hour. The chosen size's sum over /sps/lpnhe against
+      df.txt used and the 512 GiB quota
+    fixed: read-only; same tools and arguments as the October inventory except census --in-use '*' (every recipe in use, so
+      only orphan pools are listed) and --days 14; SCRATCH walked once per size
+    control: 'none: an inventory, no comparison; cross-checks above'
+    seeds: none (deterministic read)
+    outcome: 'yes: DISK_INVENTORY_DONE, every output complete, the size sum within 5% of df used; the candidates sorted into
+      (a) our cheap-to-rebuild debris, (b) memmap/training caches no running job or open entry''s recipe reads, (c) runs/results/others''
+      data needing Joaquin''s call, each also marked ''already approved under D<n>'' where a decision in force covers it (so
+      Joaquin is not asked again), distinct from ''needs Joaquin''s call''. no: a read missing or cut; that part reruns alone'
   findings:
   - at: '2026-11-24T14:32:44+00:00'
     text: '2026-11-24 login-node reads: /sps/lpnhe 512 GiB group space at 98% (498 GiB used, 15 GiB free), .disk_full flag
