@@ -38011,11 +38011,18 @@ entries:
     answers_after: '2026-11-23T15:10:36+00:00'
     covers:
     - finetune_mechanism
+  - said_at: '2026-11-24T13:41:29.741000+00:00'
+    text: But these input settings were decided for a reason? why are they causing a problem now? We need to understand this
+    decision: D539
+    answers_after: '2026-11-24T13:25:39+00:00'
+    covers:
+    - finetune_mechanism
   decisions:
   - D511
   - D513
   - D516
   - D529
+  - D539
   next:
     2: 'When the gluon/Z parent FA-ccin2p3-1f2d9ad5 ends: parent check vs 9a73698a on the 9 shared processes; site copy its
       run dir to lxplus; drive ftmech_zng4g_ftglu_b128 (1e4, 16 trials) and ftmech_zng4g_d1e3_ftglu_b128 (16 trials on [1.9e-3,1.9e-2]
@@ -38294,7 +38301,9 @@ entries:
       (a pasted LaTeX template, no parent choice); 2026-11-10T02:08 (draft and slide uploads, no parent choice); 2026-10-04T10:57
       (arm naming in the transfer study, not this parent)
     blocks: the parent of zng_uq_benchmark stage 2 and later Z+ng fine-tunes only; the dilution test keeps running
-    blocks_steps: &id001 []
+    blocks_steps: []
+    answered_at: '2026-11-24T13:41:29.741000+00:00'
+    decision: D539
   owner:
     agent: aa696ba79c8f66f6d
     state: stopped
@@ -40231,15 +40240,6 @@ entries:
       diverges shouldn't wake you and it's owning agent up.
     said_at: '2026-11-24T10:33:58.174000+00:00'
     at: '2026-11-24T11:23:59+00:00'
-  ask: 'Scope: the inputs of the W parent behind every later Z+ng fine-tune. Which W parent do they use from now on: the parent
-    without both input settings (momentum log-rescale and pair logs), the parent without only the momentum log-rescale, or
-    the current parent?'
-  waiting_since: '2026-11-24T13:25:39+00:00'
-  searched: D519, D520, D529, D533 (investigation scope, no parent choice); CLAUDE.md (inputs are the user's call); 2026-11-14T04:31
-    (a pasted LaTeX template, no parent choice); 2026-11-10T02:08 (draft and slide uploads, no parent choice); 2026-10-04T10:57
-    (arm naming in the transfer study, not this parent)
-  blocks: the parent of zng_uq_benchmark stage 2 and later Z+ng fine-tunes only; the dilution test keeps running
-  blocks_steps: *id001
 - id: llm_compare
   title: LLoCa against Suprio's LLM on the LLM amplitude catalogue
   question: In the conditions of Suprio's LLM pID run (1501 MadGraph-default processes, 1352 trained, 149 held out; 55,296
@@ -42838,7 +42838,7 @@ entries:
     searched: 'site decisions --project FA whole (D530 approves the benchmark only, D531 the restart; none sends work to lab
       models); CLAUDE.md (mechanical-worker is Sonnet per D213); Joaquin''s messages 2026-11-14T04:31 (a SciPost LaTeX template),
       2026-11-10T02:08 (uploaded paper and slides), 2026-10-26T17:18 (settings warnings): none is about the lab models'
-    blocks_steps: &id002
+    blocks_steps: &id001
     - 1
   owner:
     agent: a6187b6cdb7ca974a
@@ -43031,7 +43031,7 @@ entries:
   searched: 'site decisions --project FA whole (D530 approves the benchmark only, D531 the restart; none sends work to lab
     models); CLAUDE.md (mechanical-worker is Sonnet per D213); Joaquin''s messages 2026-11-14T04:31 (a SciPost LaTeX template),
     2026-11-10T02:08 (uploaded paper and slides), 2026-10-26T17:18 (settings warnings): none is about the lab models'
-  blocks_steps: *id002
+  blocks_steps: *id001
   checked_until: '2026-11-24T13:13:51+00:00'
 - id: critical_batch
   title: Critical batch size from the gradient noise scale
@@ -43089,7 +43089,7 @@ entries:
       SciPost LaTeX template he pasted), 2026-11-16T20:00 (a writing-style skill), 2026-11-10T02:08 (uploaded slides and code):
       none is about batch size, lr per batch or this cost'
     blocks: step 2 (the batch-size runs); step 1 keeps going
-    blocks_steps: &id003
+    blocks_steps: &id002
     - 2
   owner:
     agent: aa75364575cea3cb4
@@ -43311,7 +43311,7 @@ entries:
     LaTeX template he pasted), 2026-11-16T20:00 (a writing-style skill), 2026-11-10T02:08 (uploaded slides and code): none
     is about batch size, lr per batch or this cost'
   blocks: step 2 (the batch-size runs); step 1 keeps going
-  blocks_steps: *id003
+  blocks_steps: *id002
   handoff:
     state: 'Step 1: the estimator (McCandlish App. A from 8 chunk gradients of each step''s batch at the batch''s own per-process
       weights, pre-clip; 16-batch brute check with jackknife errors) is merged (b36a40b3a, repo-reviewer pass at 3c175775d),
