@@ -40524,6 +40524,12 @@ entries:
       5 by > 1.38 (muP transfer failing: report, HPO at that width is Joaquin''s call) and the between-margins rule of step
       5 (seed-43 pair to Joaquin). Then re-run the design reviewer, smokes (scripts/job_config_smoke.sh, args after --, ~50
       steps, 4 jobs, wall target b_width_smokes 1.5 h recorded), then the estimate.'
+    10: 'Part (b) width smokes readout (design passed 2026-11-24 15:15): FA-ccin2p3-df391ea7 (16 heads), -6f7904b8 (32), -adb54030
+      (64, checkpoint_blocks), -74ba6cdd (120, checkpoint_blocks), all on CC gpu_h100 via --gpu-min-mem=80G, --mem 32G (part
+      (c) peaked 16.7 GB host; 64G fit 1 at once). Read per width s/step, peak GPU memory, models/ bytes per parameter, test
+      stage + plots; set floors (none if peak < 30 GB) and per-width --time by the design''s rule (no-floor width: max(3.9
+      x H100 s/step, 1.06 x FLOPs ratio) x 60,840 x 1.3, cap 7 d); GPU-h of the 4 full runs; disk by df (CC 16 GB free); delete
+      the zz_smoke dirs (our debris) after reading.'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -40677,6 +40683,16 @@ entries:
       if:
       - 'revised design passes: smokes, then runs or the estimate to Joaquin'
       - 'second FIX: record a dead end per the brief'
+    10:
+      feeds: 'D522/D537 part (b): whether muP width toward the LLM''s 359.6M parameters closes the held-out gap at part (a)''s
+        best HPs'
+      if:
+      - 'all widths fit and the 4 runs total <= 100 GPU-h: submit them in one wave by site pick (sweep/trial_job.sh --detached,
+        trial 5''s --hp list + num_heads)'
+      - 'total > 100 GPU-h (D536): the measured estimate per width goes to Joaquin as the question; nothing else of part (b)
+        waits'
+      - 'a width OOMs at 80 GB with checkpoint_blocks: write the mixed micro-batch accumulation (equivalence test, repo review)
+        and re-smoke that width'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
