@@ -5,8 +5,10 @@ His points: the "pID emb. only (baseline)" run, seed 0, 20 epochs (talks/progres
 {"interp"|"extrap": {name: [x in his figure, MSE]}}, read off his figure's vector paths; not committed). Ours: a run's
 data/<tag>_heldout.json from tools/llm_score.py (first 1e4 test events per process, shared affine statistics).
 Process families and labels: analysis/catalog_daniel/classes_default.json (test_group, process).
-    python analysis/llm_compare/heldout_per_process.py [--tag control] [--label "our LLoCa, his optimizer settings"]
-Output: figs/<tag>_heldout_per_process.{png,pdf}.
+    python analysis/llm_compare/heldout_per_process.py [--tag control ...] [--label "..." ...] [--out NAME]
+Several --tag/--label pairs draw several of our arms, one marker each (output named by --out, default the first tag).
+This is the layout Joaquin asked for (his model figure); the per-set pooled numbers come from control_score.py.
+Output: figs/<out>_heldout_per_process.{png,pdf}.
 """
 import argparse, json, os, sys
 
@@ -37,13 +39,17 @@ TITLE = {"interp": "held-out: interpolation", "extrap": "held-out: extrapolation
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--tag", default="control")
-    ap.add_argument("--label", default="our LLoCa, his optimizer settings")
+    ap.add_argument("--tag", nargs="+", default=["control"])
+    ap.add_argument("--label", nargs="+", default=["our LLoCa, his optimizer settings"])
+    ap.add_argument("--out", default=None)
     a = ap.parse_args()
+    assert len(a.tag) == len(a.label), (a.tag, a.label)
     draft = json.load(open(os.path.join(ROOT, "talks", "progress_oct2026b", "data", "draft_pid_by_process.json")))
-    ours = json.load(open(os.path.join(HERE, "data", f"{a.tag}_heldout.json")))["processes"]
+    arms = [(lab, json.load(open(os.path.join(HERE, "data", f"{t}_heldout.json")))["processes"], c, mk)
+            for t, lab, c, mk in zip(a.tag, a.label, (ps.C.blue, ps.C.green, ps.C.orange), ("o", "D", "^"))]
     meta = {"dc_" + p["folder"]: p for p in json.load(open(os.path.join(DAN, "classes_default.json")))["processes"]}
-    assert set(ours) == {n for g in draft.values() for n in g}, "held-out sets differ"
+    for _, ours, _, _ in arms:
+        assert set(ours) == {n for g in draft.values() for n in g}, "held-out sets differ"
     w0, h0 = ps.PLOT_W_IN, ps.PLOT_H_IN
     ps.PLOT_W_IN, ps.PLOT_H_IN = 7.5, 1.9      # his wide rows: room for one tick per process
     fig, axes = ps.figure(ncols=1, nrows=2)
@@ -55,8 +61,9 @@ def main():
                 ax.axvspan(i - 0.5, i + 0.5, color="0.88", lw=0, zorder=0)
         ax.plot(x, [draft[sp][n][1] for n in names], "*", color="k", ls="none", zorder=3,
                 label="pID emb. only (Suprio)")
-        ax.plot(x, [ours[n]["mse_logm2"] for n in names], "o", color=ps.C.blue, ls="none", zorder=2, alpha=0.85,
-                label=a.label)
+        for lab, ours, c, mk in arms:
+            ax.plot(x, [ours[n]["mse_logm2"] for n in names], mk, color=c, ls="none", zorder=2, alpha=0.85,
+                    ms=3, label=lab)
         g_of = [meta[n]["test_group"] for n in names]
         assert set(g_of) <= {g for g, _ in GROUPS[sp]}, set(g_of) - {g for g, _ in GROUPS[sp]}
         for g, short in GROUPS[sp]:
@@ -80,7 +87,7 @@ def main():
         ax._ps_equal_limits = True    # his fixed y range; the legend sits in the free band above the data
     axes[0].fill_between([], [], color="0.88", label=r"$2\to2$ processes (others $2\to3$)")
     ps.legend(axes[0], "upper left", ncol=3)
-    ps.save(fig, os.path.join(HERE, "figs", f"{a.tag}_heldout_per_process"))
+    ps.save(fig, os.path.join(HERE, "figs", f"{a.out or a.tag[0]}_heldout_per_process"))
     ps.PLOT_W_IN, ps.PLOT_H_IN = w0, h0
 
 
