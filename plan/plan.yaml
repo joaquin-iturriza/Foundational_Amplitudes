@@ -40486,6 +40486,21 @@ entries:
       20G --cpus 4 --hours 14.6; log ~/.local/share/ccorch/detached/20261124-003001_llmcmp_c_qperp_drive4.log). Host memory
       20G replaces the design''s 16G, a cluster resource, not a setup change. lxplus is unreachable at 00:30 (its ssh master
       needs Joaquin''s 2FA, cluster_up lxplus); until he opens it, wave 2 goes to CC.'
+  - at: '2026-11-24T07:44:29+00:00'
+    text: '2026-11-24 ~09:00 CET (E8491, E8494). The part (c) control FA-ccin2p3-d34535b0 (trial_1262''s HPs, lr 3.65e-3,
+      V100) blew up but finished. Its main stage ran all 60,840 steps with 261 non-finite-gradient steps; validation NLL 1.2e7
+      at step 33462 and 1.05e5 at 51714, back to -2.85 at the end of the cooldown. Best checkpoint -3.544 at step 24336. Its
+      sigma stage (sigma only, mu frozen) started from -3.55 and diverged to ~1e5. Test and predictions were saved; the host
+      oom_kill (MaxRSS 16.7 GB at --mem 16G) hit only while it drew the sigma stage''s final plots. Not resubmitted: everything
+      the readout reads exists (models/model_run0_best.pt.gz). Scoring job FA-ccin2p3-48e43133 (REREAD, scripts/job_llm_score.sh
+      @2715130f70, 1.5 GPU-h). Config mem set to 20G (7a4a6cff7). Trial 0 FA-ccin2p3-29ce8950 (lr 1.60e-3, EMA on 0.9989?
+      see its HPs, warmup 0.191) ran cleanly: validation NLL falls steadily from -1.90 to -5.997 at step 60840 (best, end
+      of the WSD cooldown, -0.57 over the last 2 validations), no non-finite step; sigma stage to -6.030. So in this setup
+      only lr 1.6e-3 trained stably; 3.65e-3 (trial_1262''s lr) blew up twice mid-plateau, and 6.0e-3 and 8.6e-3 blew up at
+      the end of warmup. The constant-lr WSD plateau at batch 24,576 with Muon does not hold trial_1262''s lr on Daniel''s
+      catalog. Figure analysis/llm_compare/figs/c_val_curves.png (c_val_curves.py @b454a17c1). Wave 2 sent by drive4 to CC:
+      FA-ccin2p3-bf23e0c4 (hp0563), -b77878e1 (hp0902), -f6f7179d (hp1736). CC /sps/lpnhe has 15 GB free (under the 60 GB
+      floor).'
   step_waits:
     '2': FA-ccin2p3-b135e7db FA-ccin2p3-f3e29e87
     '3': llmcmp_a_drive5
