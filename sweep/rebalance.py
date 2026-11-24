@@ -319,11 +319,13 @@ def _has(site, path):
     return any(l.strip() == "__HAVE__" for l in out.splitlines())
 
 
-def site_run(site, *cmd, timeout=900):
+def site_run(site, *cmd, timeout=900, recurring=False):
     # moving work is upkeep of every active work item: `--item *` (site refuses work outside active items and the
     # submitters on the site any sweep of a held one, ~/work/CLAUDE.md "Decisions and work items")
-    p = subprocess.run(["timeout", str(timeout + 10), "site", "--timeout", str(timeout), "run", "--quote", "--item", "*", site,
-                        "FA", "--"] + list(cmd), capture_output=True, text=True)
+    # recurring: on CC-IN2P3 (its login nodes take no scripts, D544) a CPU job, each call reading the one the last started
+    job = ["--recurring"] if recurring and site == "ccin2p3" else []
+    p = subprocess.run(["timeout", str(timeout + 10), "site", "--timeout", str(timeout), "run", "--quote", *job, "--item", "*",
+                        site, "FA", "--"] + list(cmd), capture_output=True, text=True)
     return p.stdout + p.stderr
 
 
@@ -574,7 +576,7 @@ def main():
     inv = {}
     for s in sites:
         out = site_run(s, "python", "sweep/rebalance.py", "--inventory", "--window", str(a.window),
-                       "--scope", *a.scope, "--", *a.prefixes)
+                       "--scope", *a.scope, "--", *a.prefixes, recurring=True)
         line = next((l for l in out.splitlines() if l.startswith("INVENTORY ")), None)
         try:
             inv[s] = json.loads(line[len("INVENTORY "):]) if line else None
