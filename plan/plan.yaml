@@ -39713,6 +39713,19 @@ entries:
       next. Fn1k/S1k at D=1e3 and 3125 steps: hi < 1 -> today''s parent still gains where data is scarce (the 1e4 residual
       is a large-D effect); lo > 1 -> a pretraining cost at every D, reported with the figure; else unresolved. Any parent
       or arm blowing up (val > 10x best-so-far) listed apart (D398).'
+    passed_at: '2026-11-24T05:36:13+00:00'
+    reviewer: 'Re-check of the 2026-11-24T05:35 design after my FIX. Configs @5361f5820 diffed against ftmech_zng4g_ftnoset_b128:
+      the 1e4 gluon/Z fine-tune differs only in pretrained_path; the three 1e3 configs differ only in train_subsample 1000,
+      t_steps 3125, time 1 h and the lr window [1.1e-3, 3.3e-2], which all three share; the scratch config has fine_tune.*
+      removed; the parent command is 9a73698a''s plus recipe= only. Check 2: parent content moves Z+ng children by 0.18-0.56
+      dex (adding W over the finale, results.tex l.15134-15160; finale over rung 9 +0.43/+0.56 dex on Zgg/Zggg, l.15072-15078;
+      rung 8 over rung 7 1.7-3.1x, l.14404/14454). Check 3: I recomputed the seed log-sd: Fn 0.27 (0.0108/0.0184/0.0141),
+      scratch 0.10. sigma_r 0.22, so the 2-sigma band is a factor 1.55, and the 0.65x effect that would remove the 1.53x residual
+      sits at about 2 sigma. The yes, no-of-needed-size, unresolved and gluon-worse bands are on that interval, with unresolved
+      going to Joaquin as a seeds question; the mixed case and Fn1k/S1k use the same rule. Check 15: parent limit 15 h = 7.97
+      h (V100) x 1.35 for heavier events x 1.3 + 1 h; the 9a73698a H100 rate is 3.2 h; no GPU pinning. Check 12: ''at D=1e3
+      and 3125 steps'' is stated. Cost 42-52 GPU-h under D511/D520. Terms searched for check 5: dilut, intentional, rung,
+      finale/rung 9, Zgg/Zggg, highmult, +W in results.tex; dilut, intentional, D511-D531 in site decisions.'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
