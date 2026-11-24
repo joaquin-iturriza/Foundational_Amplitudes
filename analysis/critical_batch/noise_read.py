@@ -174,6 +174,26 @@ def main():
         print(f"VAL {lab}: final {r['val_curve'][-1]:.4f} best {min(r['val_curve']):.4f} at step "
               f"{int(np.argmin(r['val_curve'])) * r['validate_every']}")
     figure(res, a.batch, f"{HERE}/figs/{a.name}", curves)
+    # the summary the notes' claims key into: each check by its step; the windows' B from step 400 on, without the
+    # windows set by one measurement, by median; the validation curves' last values and training hours
+    r2 = lambda v: float(f"{v:.3g}") if v is not None else None
+    late = [x for x in res["windows"] if x["step_lo"] >= 400 and x["S_max_share"] <= 0.5]
+    med = lambda f: r2(float(np.median([v for v in map(f, late) if v is not None])))
+    summ = {"n_windows": len(res["windows"]), "n_one_measurement": sum(x["S_max_share"] > 0.5 for x in res["windows"]),
+            "S_max": r2(max(x["S"] for x in res["windows"])),
+            "B_median": med(lambda x: x["B_simple"]), "B_min": r2(min(x["B_simple"] for x in late)),
+            "B_max": r2(max(x["B_simple"] for x in late)),
+            "B_muon_median": med(lambda x: x["sets"]["muon"]["B_simple"]),
+            "B_adamw_median": med(lambda x: x["sets"]["adamw"]["B_simple"]),
+            "B_muon_first": r2(late[0]["sets"]["muon"]["B_simple"]), "B_muon_last": r2(late[-1]["sets"]["muon"]["B_simple"])}
+    for x in res["checks"]:
+        summ[f"check{x['step']}"] = {k: r2(x[k]) for k in ("S_brute", "S_brute_se", "S_chunk", "S_chunk_se", "G2_brute",
+                                                           "G2_chunk", "B_brute", "B_brute_se", "B_chunk")}
+        summ[f"check{x['step']}"].update(S_ratio=r2(x["S_chunk"] / x["S_brute"]), S_agree=x["S_agree"],
+                                         G2_agree=x["G2_agree"])
+    for lab, r in zip(("run", "control"), curves.values()):
+        summ[lab] = {"val_last": round(r["val_curve"][-1], 3), "hours": round(r["traintime_hours"], 2)}
+    print(json.dumps(summ))
 
 
 if __name__ == "__main__":
