@@ -43355,9 +43355,15 @@ entries:
     - designer-executor setups
   decisions:
   - D530
-  next: 'Write the benchmark result into docs/results.tex (src: worktrees/wt-labllm/analysis/lab_llm_trial/summary.json at
-    78d4af8ff, figure lab_llm_pass) with the routing Joaquin chooses, then fold the worktree (scripts/remove_worktree.sh)
-    after its reviewer'
+  next:
+    1: 'Commit the lab route wiring (uncommitted on trunk: CLAUDE.md rule, plan/step_prompt.txt, plan/mechanical_prompt.txt,
+      .claude/context/working-on-the-plan.txt, .claude/hooks/plan_check.py, tools/plan.py lab_route, tests/test_lab_route.py)
+      once claudemd-keeper ae9b595669c374fca and repo-reviewer a51cecd03c33e3d65 pass; commit worktree tools/lab_llm_trial.py
+      (lookup)'
+    2: 'When the lab server answers deepseek-v4-flash: run the route demo (labllm.py triage FA-ccin2p3-b77878e1 --event E8530
+      and FA-ccin2p3-d34535b0 --event E8491, checked against their ack notes), the hard-fix lab batch (deepseek and deepseek+plan
+      on the valid hard tasks, 2 streams, D531; plans in analysis/lab_llm_trial/plans/) and the lookup batch (/tmp/claude-1000/lab_llm_trial/lookup_0.sh,
+      lookup_1.sh); then one Sonnet check per DeepSeek hard fix, report and figure'
   done_when: null
   notes_ref: null
   match: zz_labllm_*
@@ -43702,9 +43708,7 @@ entries:
       files equal the graded ones. The change of task form from round one''s ''meet this interface'' to ''make these failing
       tests pass'' is stated for the result. Checks 2 and 3 and the search as in the previous pass (round one 8/10 vs 9/10;
       spread about 1.3 tasks per arm, indicative, paired, Wilson).'
-  step_waits:
-    '2': the 10 timed Sonnet mechanical-worker fix agents (analysis/lab_llm_trial/sonnet_timed.json), graded by tools/lab_llm_trial.py
-      sonnet_timed
+  step_waits: {}
   findings:
   - at: '2026-11-23T19:55:22+00:00'
     text: 'Local batch width cut from 6 parallel opencode streams to 2 (D531): 6 streams of opencode sessions (~350-400 MB
@@ -43732,11 +43736,15 @@ entries:
       hooks) before reviewlock/replyblock spares are tried'
   step_why:
     1:
-      feeds: whether lab models take some subagent work (D530)
+      feeds: whether failed-run log reading and small fixes go through DeepSeek with a Sonnet check (D541)
       if:
-      - 'Joaquin routes log reading and/or simple fixes to lab models: build the route (opencode sandbox runner as an agent
-        step) as its own entry'
-      - 'he does not: write up and close'
+      - 'both pass: commit and the route is live for the next RUN event'
+      - 'either blocks: apply its fixes and continue that same reviewer'
+    2:
+      feeds: 'how far DeepSeek goes on harder work than round one (D541: test a few more complicated tasks)'
+      if:
+      - 'a DeepSeek arm meets the design''s yes rule on hard fixes or lookups: propose routing that work too'
+      - 'it does not: read the failure modes in the transcripts and try plan detail as the adaptation'
   handoff:
     state: 'Benchmark built and mostly run. Harness: opencode 1.19.6 (native binary ~/.local/lib/node_modules/opencode-ai/node_modules/opencode-linux-x64/bin/opencode)
       in a bwrap sandbox, tools/lab_llm_trial.py + tools/lab_llm_report.py in worktrees/wt-labllm (branch labllm, last commit
