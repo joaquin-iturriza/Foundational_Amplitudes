@@ -138,8 +138,8 @@ def plot_u(res, curves):
     import plot_style as ps
     lab = {"off": "no rescale", "eps1e-8": r"rescale, $\epsilon=10^{-8}$"}
     cols = {"off": ps.C.blue, "eps1e-8": ps.C.vermillion}
-    fig, axs = ps.figure(ncols=3, nrows=2)
-    (g, h1, h2), (k1, k2, cell) = axs
+    fig, axs = ps.figure(ncols=2, nrows=3)
+    (g, h1), (h2, k1), (k2, cell) = axs
     blown = set(res["blowups"])   # open markers: val rose > 10x its best-so-far (D398), read at its best
     kit = json.load(open(os.path.join(HERE, "data", f"{TAG}_kit.json")))["cells"]   # d539_kit_read.py --set u
     fam = {"soft_x": "soft", "coll_y": "collinear", "bulk": "bulk"}
