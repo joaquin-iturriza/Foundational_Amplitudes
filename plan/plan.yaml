@@ -40637,6 +40637,16 @@ entries:
       and raised the median new-set MSE (0.688 -> 1.144): on the 43 new processes the val-tuned model generalizes no better.
       The LLM stays ahead on pooled held out and new. Source: control_score.py --tag a_trial5 control c_control --out a5_controls
       @3ee404f21 (data/a5_controls_score_summary.json); figure analysis/llm_compare/figs/a5_controls_score.png.'
+  - at: '2026-11-24T09:36:17+00:00'
+    text: '2026-11-24 ~10:20 CET (E8530): part (c) wave-2 trial 4 FA-ccin2p3-b77878e1 (hp0902: lr 7.01e-3, Muon wd 0.021,
+      L2 1.4e-10, warmup 0.0805 = 4901 steps, EMA off; V100-SXM2-32GB) diverged: ''Training diverged: 50 consecutive non-finite-gradient
+      steps at step 14242''; first inf gradient norm at 09:43, between the validations at steps 9126 and 12168 (~6,000 steps
+      into the peak-lr plateau, later than trials 1 and 2, which broke at the end of warmup); 352 skipped steps. val_loss_no_reg
+      -2.505 at 3042, -2.533 at 6084 (best), -2.499 at 9126, 4.3e10 at 12168. Listed apart at its best checkpoint (step 6084,
+      -2.533). Same non-finite blow-up as every part (c) trial at lr >= 3.65e-3 (trials 1, 2 and the control); the driver
+      recorded it FAILED with its penalty and continues (no --retry-failed: a property of the HPs). Part (c) now: 3 of 4 trials
+      at lr >= 6e-3 or the control''s 3.65e-3 blew up; only lr 1.6e-3 (trial 0) has finished cleanly; wave-2 trials 3 (lr
+      1.56e-3) and 5 (lr 2.57e-3) still running.'
   step_waits:
     '2': FA-ccin2p3-b135e7db FA-ccin2p3-f3e29e87
     '3': llmcmp_a_drive5
