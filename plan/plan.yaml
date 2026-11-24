@@ -44964,7 +44964,21 @@ entries:
     - /home/joaquin/work/orchestrator-kit/README.md
     - /home/joaquin/work/orchestrator-kit/tests/test_kit.py
   dead_ends: []
-  asks: []
+  asks:
+  - ask: 'Scope: publishing the kit (a remote repo, its visibility and license) goes beyond the local build you approved,
+      and the brief reserves it to you. The kit is built at ~/work/orchestrator-kit (one commit, yours, no remote). Four calls:
+      (1) its name (orchestrator-kit?); (2) where it lives: your GitHub account, a lab or group organisation, or the lab GitLab;
+      (3) private with invited colleagues, or public; (4) the license (MIT, Apache-2.0, or none for now). Running the toy
+      job on a cluster to prove the kit also needs a git remote the cluster can clone: may I create a private repo for the
+      toy next to the kit''s?'
+    at: '2026-11-24T19:38:44+00:00'
+    searched: 'site decisions --project FA (D546 asks for a shareable standalone kit but names no repo, host, visibility or
+      license; the main session''s brief says publishing waits on you), CLAUDE.md (no rule on where new repos live or their
+      license); your messages sharing its terms: 2026-11-14T04:31 (a pasted SciPost LaTeX template), 2026-11-06T04:28 (removing
+      worktrees and how agents work), 2026-10-26T17:18 (permission rules in settings files): none names a repo, host, visibility
+      or license for a new repo'
+    blocks: the on-cluster proof of the kit with the toy job, and publishing it
+    blocks_steps: &id004 []
   owner:
     agent: a1f4e7d170cdb83cc
     state: working
@@ -44976,3 +44990,17 @@ entries:
       if:
       - 'the toy runs and is sorted clean on the cluster: publish the kit (name, host, visibility, license as Joaquin answers)'
       - 'a kit path breaks on the cluster: fix it in the kit, rerun the toy, then publish'
+  ask: 'Scope: publishing the kit (a remote repo, its visibility and license) goes beyond the local build you approved, and
+    the brief reserves it to you. The kit is built at ~/work/orchestrator-kit (one commit, yours, no remote). Four calls:
+    (1) its name (orchestrator-kit?); (2) where it lives: your GitHub account, a lab or group organisation, or the lab GitLab;
+    (3) private with invited colleagues, or public; (4) the license (MIT, Apache-2.0, or none for now). Running the toy job
+    on a cluster to prove the kit also needs a git remote the cluster can clone: may I create a private repo for the toy next
+    to the kit''s?'
+  waiting_since: '2026-11-24T19:38:44+00:00'
+  searched: 'site decisions --project FA (D546 asks for a shareable standalone kit but names no repo, host, visibility or
+    license; the main session''s brief says publishing waits on you), CLAUDE.md (no rule on where new repos live or their
+    license); your messages sharing its terms: 2026-11-14T04:31 (a pasted SciPost LaTeX template), 2026-11-06T04:28 (removing
+    worktrees and how agents work), 2026-10-26T17:18 (permission rules in settings files): none names a repo, host, visibility
+    or license for a new repo'
+  blocks: the on-cluster proof of the kit with the toy job, and publishing it
+  blocks_steps: *id004
