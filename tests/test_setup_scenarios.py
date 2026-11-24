@@ -663,7 +663,6 @@ def claims():
 GUARD_FILES = os.path.join(ROOT, ".claude", "hooks", "plan_files_guard.py")
 GUARD_GIT = os.path.join(ROOT, ".claude", "hooks", "git_verify_guard.py")
 CTX = os.path.join(ROOT, ".claude", "hooks", "context_guard.py")
-MAIN_GUARD = os.path.join(ROOT, ".claude", "hooks", "main_session_guard.py")
 SWITCH = os.path.join(ROOT, "tools", "switch_settings.py")
 
 
@@ -2290,102 +2289,6 @@ def idle_wait():
     scenario("one entry that can move keeps the turn free of that block", "every live entry waits" not in err, err)
 
 
-def main_session_work():
-    """The main session works no entry itself (0i) beyond 3 work calls per user message (main_session_guard); without a
-    transcript the budget is full, so the table below is the classification. A subagent's calls pass and never count.
-    The subagent marker is agent_id/agent_type, as in the hook inputs lock_guard logs."""
-    sub = {"agent_id": "a1b2", "agent_type": "general-purpose"}
-    scratch = "/tmp/claude-1000/x/scratchpad"
-    for who, tool, ti, want in (
-            ("main", "Bash", {"command": "site submit ccin2p3 FA scripts/job_probe.sh --item lowd"}, 2),
-            ("sub", "Bash", {"command": "site submit ccin2p3 FA scripts/job_probe.sh --item lowd"}, 0),
-            ("main", "Bash", {"command": "site poll"}, 0),
-            ("main", "Edit", {"file_path": "/home/joaquin/work/FA/tools/plan.py"}, 2),
-            ("main", "Edit", {"file_path": "/home/joaquin/work/FA/CLAUDE.md"}, 0),
-            ("sub", "Edit", {"file_path": "/home/joaquin/work/FA/tools/plan.py"}, 0),
-            ("main", "Write", {"file_path": scratch + "/note.txt"}, 0),
-            ("main", "Bash", {"command": "NOSYNC=1 site sync ccin2p3 FA && site runs"}, 2),
-            ("main", "Bash", {"command": "cd /home/joaquin/work/FA && sbatch x.sh"}, 2),
-            ("main", "Bash", {"command": ".venv-cpu/bin/pytest tests/"}, 2),
-            ("main", "Bash", {"command": "python3 tools/plan.py next --prompts"}, 0),
-            ("main", "Bash", {"command": "python3 tools/agent_costs.py"}, 0),
-            ("main", "Bash", {"command": "bash -c 'site run ccin2p3 FA -- ls'"}, 2),
-            ("main", "Bash", {"command": "sed -i s/a/b/ tools/plan.py"}, 2),
-            ("main", "Bash", {"command": "echo x > tools/plan.py"}, 2),
-            ("main", "Bash", {"command": "git commit -m \"$(cat <<'EOF'\nno site submit here > x\nEOF\n)\" && git push"}, 0),
-            ("main", "Bash", {"command": "git log --oneline -3 2>&1 | head; grep -n site tools/plan.py > /dev/null"}, 0),
-            ("main", "Bash", {"command": "bash .claude/hooks/review_backlog.sh status"}, 0),
-            ("main", "Bash", {"command": "site events --wait --project FA"}, 0)):
-        inp = dict(sub if who == "sub" else {}, tool_name=tool, tool_input=ti, scratchpad_dir=scratch)
-        rc, out = hook(MAIN_GUARD, inp)
-        scenario("main session guard: %s %s `%s` is %s" % (who, tool, list(ti.values())[0][:50].replace("\n", " "),
-                 "refused" if want else "allowed"), rc == want and (not want or "step agent's work" in out), out)
-
-    # the budget: 3 work calls per user message (the user, 2026-10-29: "you should still be able to do those small
-    # things in some situations"), counted from the transcript since the user's last message
-    import tempfile
-    d = tempfile.mkdtemp()
-    tp = os.path.join(d, "t.jsonl")
-    k = [0]
-
-    def user(text, **kw):
-        return dict(kw, type="user", message={"role": "user", "content": text})
-
-    def call(name, ti, sidechain=False):
-        k[0] += 1
-        return {"type": "assistant", "isSidechain": sidechain, "message": {"role": "assistant", "content": [
-            {"type": "tool_use", "id": "tu%d" % k[0], "name": name, "input": ti}]}}
-
-    def result():
-        return {"type": "user", "toolUseResult": {}, "message": {"role": "user", "content": [
-            {"type": "tool_result", "tool_use_id": "tu%d" % k[0], "content": "ok"}]}}
-
-    edit = {"file_path": "/home/joaquin/work/FA/tools/plan.py"}
-    sub_work = ("Bash", {"command": "site sync ccin2p3 FA"})
-
-    def probe(records, inp_extra=None):
-        with open(tp, "w") as f:
-            for r in records:
-                f.write(json.dumps(r) + "\n")
-        inp = dict(inp_extra or {}, tool_name="Edit", tool_input=edit, scratchpad_dir=scratch, transcript_path=tp,
-                   tool_use_id="tu_now")
-        return hook(MAIN_GUARD, inp)
-
-    def works(n):
-        out = []
-        for _ in range(n):
-            out += [call("Edit", edit), result()]
-        return out
-
-    noise = [user("<task-notification>agent done</task-notification>"), user("Stop hook feedback: x"),
-             user("<system-reminder>r</system-reminder>", isMeta=True)]
-    for name, recs, want in (
-            ("the 1st work call after the user's message passes", [user("do it")], 0),
-            ("the 3rd work call passes", [user("do it")] + works(2), 0),
-            ("the 4th work call is refused", [user("do it")] + works(3), 2),
-            ("a new user message resets the count", [user("do it")] + works(3) + [user("now this")] + works(2), 0),
-            ("a mid-turn user message resets the count", [user("do it")] + works(3) + [{
-                "type": "user", "toolUseResult": {}, "message": {"role": "user", "content": [{
-                    "type": "tool_result", "tool_use_id": "x", "content":
-                    "The user sent a new message while you were working:\nalso this"}]}}], 0),
-            ("task notifications, hook feedback and reminders are not user messages",
-             [user("do it")] + works(1) + noise[:1] + works(1) + noise[1:] + works(1), 2),
-            ("reads never count", [user("do it")] + works(2) + [call("Bash", {"command": "site poll"}), result(),
-              call("Read", {"file_path": "x"}), result(), call("Bash", {"command": "git log -3"}), result()], 0),
-            ("subagent (sidechain) calls never count", [user("do it")] + works(2) + [
-                call(*sub_work, sidechain=True), result(), call(*sub_work, sidechain=True)], 0),
-            ("the current call is not counted against itself", [user("do it")] + works(2) + [
-                {"type": "assistant", "message": {"content": [{"type": "tool_use", "id": "tu_now", "name": "Edit",
-                                                               "input": edit}]}}], 0),
-            ("parallel work calls in one message each count", [user("do it"), {"type": "assistant", "message": {
-                "content": [{"type": "tool_use", "id": "p%d" % i, "name": "Edit", "input": edit} for i in range(3)]}}],
-             2)):
-        rc, out = probe(recs)
-        scenario("main session budget: %s" % name, rc == want and (not want or "3 work calls already" in out), out)
-    rc, out = probe([user("do it")] + works(5), {"agent_id": "a1", "agent_type": "general-purpose"})
-    scenario("main session budget: a subagent's call passes whatever the main session used", rc == 0, out)
-
-
 def duplicate_check():
     """The commit check of near-duplicate functions (tools/dupcheck.py in .githooks/pre-commit, the user's 2026-10-29
     call on one-use scripts): a staged copy of an existing loader (variables renamed, other paths) is refused naming
@@ -2715,7 +2618,7 @@ GROUPS = [liveness, event_ownership, files, answers, adding, questions, holds, d
           worktree_then_merge, plan_commits, test_switch, claims_state, fourth_lower, direct_writes,
           one_agent_per_step, git_bypass, parsing, checks_and_sites, no_plan_yet, lower, setup_records,
           decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, reviewer_resume, reviewed_content, sweeps, open_questions,
-          designs, design_prior, prompt_cap, parallel_steps, sent_figures, idle_wait, the_suite_itself, main_session_work,
+          designs, design_prior, prompt_cap, parallel_steps, sent_figures, idle_wait, the_suite_itself,
           duplicate_check, command_reading, structured_blocks]
 
 

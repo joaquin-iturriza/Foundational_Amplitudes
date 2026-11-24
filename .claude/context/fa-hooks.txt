@@ -27,8 +27,8 @@ cmds: \bhook_incident\.py\b, \bswitch_settings\.py\b
   `context_guard.py`. `.githooks/commit-msg` refuses
   attribution lines in every commit.
 - The Stop gate refuses only what the turn can clear: a running entry with something to do and no owner; an open event handed to no agent (its owner resumed or launched, or a mechanical-worker whose brief names it); a RUN, GAP or OVERRUN event the main session acked without handing it to an agent; a table of measured results sent to the user; a `waiting_user` question in no message to the user; a running entry with no approval in force or a held one with no hold; trunk numbers failing the claims check; a figure without its pair; a context flush wanted; a reply that leaves the user's question unanswered (once per message); a main-session reply not opening with "Joaquin"; the supervisor down or no armed waiter. A job running, an agent working, a cluster's state and the user's answer are notes.
-- Python hooks exit 1 on a crash (non-blocking); shell hooks are parsed before a write and restored from the last good
-  copy after one.
+- Python hooks exit 1 on a crash (non-blocking); every hook (shell and Python) is parsed before a write and restored
+  from the last good copy after one.
 - Tests: `tests/test_setup_scenarios.py` and `tests/test_hooks_real.py` over the recorded states in
   `tests/fixtures/hooks_20261029/`. A registration change goes in with the fix it completes when Joaquin asked for that fix [D280], shown to him as the
   diff `tools/switch_settings.py` prints; any other registration change goes to him as that diff first.
