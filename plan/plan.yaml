@@ -44781,3 +44781,11 @@ entries:
       job is fixed before it stays; a flag older than 30 min at a feed read or two skipped passes -> disk_watch and the feeder
       go in one job (flag written right before the feed) or the feed job is chained afterany on the disk_watch job; a refused
       nested sbatch -> the feeder stays a login-node submitter (allowlisted), capped by its own timeout'
+    passed_at: '2026-11-24T17:30:44+00:00'
+    reviewer: 'Re-check of the revised infra equivalence design: the nested sbatch of job_probe.sh through site run --job
+      now reaches the submission path that the disk-full baseline (feed_capped stops at FEED 0) cannot reach; one real prune.py
+      run (not the --every 6 skip) is required; result age, queue wait, skipped passes and .disk_full age at each feed read
+      (30 min rule in feed_capped.py) are measured over >=3 passes, with bounds and a no action stated; item checks and long
+      reads are covered by the guard plus the same --job path. Deterministic upkeep, so no seeds; the control is the same
+      commands on the login node the same day. Searched docs/results.tex and plan.yaml (login node, login_cap, run --job,
+      job_prune_dryrun, non-interactive) and site decisions (login/slurm/htc/maintain): only D544 and D176.'
