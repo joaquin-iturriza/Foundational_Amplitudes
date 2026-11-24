@@ -15758,6 +15758,12 @@ entries:
     answers_after: '2026-11-19T13:37:50+00:00'
     covers:
     - agent_redesign
+  - said_at: '2026-11-24T13:41:29.741000+00:00'
+    text: Yes, make that change
+    decision: D536
+    answers_after: '2026-11-24T13:32:05+00:00'
+    covers:
+    - agent_redesign
   decisions:
   - D186
   - D203
@@ -15777,6 +15783,7 @@ entries:
   - D416
   - D500
   - D504
+  - D536
   next:
     11: 'Close: write up in docs/results.tex what the redesign changed and measured (cut 1 replay and check, the main-session
       wake re-measure, the compaction leak fix, the model trial), with % src lines from push_replay.py, main_turns.py --split
@@ -16423,9 +16430,11 @@ entries:
       answers none); flagged 2026-11-10T02:08 (uploaded slides and code), 2026-11-16T20:00 (a writing-style skill), 2026-11-14T04:31
       (a pasted SciPost LaTeX template): none sets a budget or answers the lxplus edit'
     blocks: the budget-rule edit (step 33) and the lxplus costing fix (step 29) only
-    blocks_steps: &id001
+    blocks_steps:
     - 29
     - 33
+    answered_at: '2026-11-24T13:41:29.741000+00:00'
+    decision: D536
   step_why:
     11:
       feeds: whether the redesign is finished
@@ -17912,23 +17921,6 @@ entries:
     files: ~/.local/bin/site_runends.py (fold_reason) ~/.local/bin/site (ssh_answers, probe_site) tools/plan.py .claude/hooks/send_check.py
       .claude/hooks/hook_syntax_guard.py .claude/hooks/review_backlog.sh sweep/drive.py
     written: '2026-11-24T12:00:18+00:00'
-  ask: 'GPU budget: two questions. (1) Approved work held behind a budget ask: critical_batch''s batch-size runs (D532 names
-    them; 55 GPU-h) and zng_uq_benchmark''s ladder fine-tunes (D483 names them; up to 136 GPU-h) both wait on you only because
-    the CLAUDE.md budget rule passes work above 30 GPU-h only when a decision states its cost or it is at the project''s usual
-    size; your approvals never state a cost, so every named study above 30 GPU-h stops for a second ask. Proposed diff to
-    CLAUDE.md ''GPU budget'': replace ''or I asked for it by name at the project''s usual size for it (its template, its sibling
-    runs)'' with ''or a decision of mine names that work (its covers) and it stays under 100 GPU-h (D511''s bound)''. Yes,
-    no, or another bound? (2) Permission classifier refusal (asked 2026-11-20): an edit of ~/.local/bin/site and site_gate.py
-    so the GPU-budget gate charges an lxplus job its own time limit instead of its HTCondor flavour''s full wall time (refused
-    2026-11-19 as ''Undermining Oversight''); today lxplus jobs count for more than they use against the 30 GPU-h budget.
-    Will you make that edit yourself, or add a permission rule that lets it through?'
-  waiting_since: '2026-11-24T13:32:05+00:00'
-  searched: 'CLAUDE.md GPU budget rule; site decisions --project FA D153 D242 D244 D483 D511 D532; items critical_batch (no
-    est-gpu-hours), zng_uq_benchmark (est 125); Joaquin''s messages 11-20..11-24 (13:22 asks for the questions in detail,
-    answers none); flagged 2026-11-10T02:08 (uploaded slides and code), 2026-11-16T20:00 (a writing-style skill), 2026-11-14T04:31
-    (a pasted SciPost LaTeX template): none sets a budget or answers the lxplus edit'
-  blocks: the budget-rule edit (step 33) and the lxplus costing fix (step 29) only
-  blocks_steps: *id001
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
   question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
@@ -35069,7 +35061,7 @@ entries:
       (section 2 resampling and a caption), 2026-11-12T01:19 (tt LO / uu V points, what ''stage 2'' meant in another entry)
       and 2026-11-14T04:31 (a pasted SciPost LaTeX template) share words but set no cost for this ladder'
     blocks: step 4 (stage 2 submission); step 3 keeps running
-    blocks_steps: &id002
+    blocks_steps: &id001
     - 4
   owner:
     agent: a5b859722bc712d25
@@ -37514,7 +37506,7 @@ entries:
     resampling and a caption), 2026-11-12T01:19 (tt LO / uu V points, what ''stage 2'' meant in another entry) and 2026-11-14T04:31
     (a pasted SciPost LaTeX template) share words but set no cost for this ladder'
   blocks: step 4 (stage 2 submission); step 3 keeps running
-  blocks_steps: *id002
+  blocks_steps: *id001
   checked_until: '2026-11-24T13:13:38+00:00'
 - id: dan_zeroshot_v4
   title: Catalog_v4 pretraining zero-shot on Daniel's held-out split
@@ -38307,7 +38299,7 @@ entries:
       (a pasted LaTeX template, no parent choice); 2026-11-10T02:08 (draft and slide uploads, no parent choice); 2026-10-04T10:57
       (arm naming in the transfer study, not this parent)
     blocks: the parent of zng_uq_benchmark stage 2 and later Z+ng fine-tunes only; the dilution test keeps running
-    blocks_steps: &id003 []
+    blocks_steps: &id002 []
   owner:
     agent: aa696ba79c8f66f6d
     state: stopped
@@ -40252,7 +40244,7 @@ entries:
     (a pasted LaTeX template, no parent choice); 2026-11-10T02:08 (draft and slide uploads, no parent choice); 2026-10-04T10:57
     (arm naming in the transfer study, not this parent)
   blocks: the parent of zng_uq_benchmark stage 2 and later Z+ng fine-tunes only; the dilution test keeps running
-  blocks_steps: *id003
+  blocks_steps: *id002
 - id: llm_compare
   title: LLoCa against Suprio's LLM on the LLM amplitude catalogue
   question: In the conditions of Suprio's LLM pID run (1501 MadGraph-default processes, 1352 trained, 149 held out; 55,296
@@ -40416,7 +40408,7 @@ entries:
     searched: 'D522, D525-D528; CLAUDE.md; Joaquin 2026-11-23 on needless sequencing; Joaquin 2026-11-12T01:19 (tt LO and
       uu V points, not this); 2026-11-22T02:55 (D522''s own message: scale-up after near-optimal HPs); 2026-11-14T04:31 (a
       pasted LaTeX draft, no decision on this). Starting early departs from his order, so it is his call'
-    blocks_steps: &id004 []
+    blocks_steps: &id003 []
   owner:
     agent: ae2d14b6689ebb697
     state: stopped
@@ -42781,7 +42773,7 @@ entries:
   searched: 'D522, D525-D528; CLAUDE.md; Joaquin 2026-11-23 on needless sequencing; Joaquin 2026-11-12T01:19 (tt LO and uu
     V points, not this); 2026-11-22T02:55 (D522''s own message: scale-up after near-optimal HPs); 2026-11-14T04:31 (a pasted
     LaTeX draft, no decision on this). Starting early departs from his order, so it is his call'
-  blocks_steps: *id004
+  blocks_steps: *id003
   objective: 'In the conditions of Suprio''s LLM pID run (1352 trained, 139 held out; 55,296 events per process; 60,840 steps
     of 24,576 events; his target z and test metric), how a muP LLoCa does (a) after a DyHPO search, (b) scaled by muP width
     toward the LLM''s 359.6M parameters, (c) in our latest setup, against the LLM (0.321 / 0.721) and his LLoCa (0.506 / 0.953).
@@ -42850,7 +42842,7 @@ entries:
     searched: 'site decisions --project FA whole (D530 approves the benchmark only, D531 the restart; none sends work to lab
       models); CLAUDE.md (mechanical-worker is Sonnet per D213); Joaquin''s messages 2026-11-14T04:31 (a SciPost LaTeX template),
       2026-11-10T02:08 (uploaded paper and slides), 2026-10-26T17:18 (settings warnings): none is about the lab models'
-    blocks_steps: &id005
+    blocks_steps: &id004
     - 1
   owner:
     agent: a6187b6cdb7ca974a
@@ -43043,7 +43035,7 @@ entries:
   searched: 'site decisions --project FA whole (D530 approves the benchmark only, D531 the restart; none sends work to lab
     models); CLAUDE.md (mechanical-worker is Sonnet per D213); Joaquin''s messages 2026-11-14T04:31 (a SciPost LaTeX template),
     2026-11-10T02:08 (uploaded paper and slides), 2026-10-26T17:18 (settings warnings): none is about the lab models'
-  blocks_steps: *id005
+  blocks_steps: *id004
   checked_until: '2026-11-24T13:13:51+00:00'
 - id: critical_batch
   title: Critical batch size from the gradient noise scale
@@ -43101,7 +43093,7 @@ entries:
       SciPost LaTeX template he pasted), 2026-11-16T20:00 (a writing-style skill), 2026-11-10T02:08 (uploaded slides and code):
       none is about batch size, lr per batch or this cost'
     blocks: step 2 (the batch-size runs); step 1 keeps going
-    blocks_steps: &id006
+    blocks_steps: &id005
     - 2
   owner:
     agent: aa75364575cea3cb4
@@ -43323,7 +43315,7 @@ entries:
     LaTeX template he pasted), 2026-11-16T20:00 (a writing-style skill), 2026-11-10T02:08 (uploaded slides and code): none
     is about batch size, lr per batch or this cost'
   blocks: step 2 (the batch-size runs); step 1 keeps going
-  blocks_steps: *id006
+  blocks_steps: *id005
   handoff:
     state: 'Step 1: the estimator (McCandlish App. A from 8 chunk gradients of each step''s batch at the batch''s own per-process
       weights, pre-clip; 16-batch brute check with jackknife errors) is merged (b36a40b3a, repo-reviewer pass at 3c175775d),
