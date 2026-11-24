@@ -43813,6 +43813,12 @@ entries:
     units: null
     start: '2026-11-24T00:26:58+00:00'
     at: '2026-11-24T00:26:58+00:00'
+  - batch: labllm_hard_round
+    wall_h: 4.5
+    jobs: 2
+    units: null
+    start: '2026-11-24T15:39:09+00:00'
+    at: '2026-11-24T15:39:09+00:00'
   step_why:
     2:
       feeds: 'D541: how far DeepSeek goes on harder multi-file fixes and code lookups against Sonnet and Opus-low Explore'
