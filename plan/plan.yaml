@@ -45189,3 +45189,5 @@ entries:
       read the private repo) goes to him with the fallback (public toy repo or a bundle push).'
     sources: 'D547 (private toy repo, ''I don''t see why not''); the main session''s narrowing (one real cluster, separate
       HOME, CC login policy); D544 (CC login nodes: no scripts); cost 2 GPU jobs x <=10 min = <=0.34 GPU-h'
+  step_waits:
+    '1': the design reviewer (re-check of the revised CC proof design)
