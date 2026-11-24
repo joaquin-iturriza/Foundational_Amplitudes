@@ -6,8 +6,8 @@ its first 1e4 test events, pooled RMSE = sqrt(mean over events of (pred - true)^
 sqrt of the mean of the per-process MSEs). His: the table's pooled RMSEs (LLM 0.321 / 0.721, his LLoCa 0.506 / 0.953),
 the LLM's per-process MSEs from talks/progress_oct2026b/data/draft_pid_by_process.json (not committed; sqrt of their
 mean over the 139 is 0.7214, his table's 0.721), so the LLM's subset RMSEs are read from it; his LLoCa has none.
-    python analysis/llm_compare/control_score.py [--tag control ...] [--label "matched control" ...] [--out NAME]
-Several --tag/--label pairs draw several of our arms side by side (output named by --out, default the first tag).
+    python analysis/llm_compare/control_score.py [--tag control ...] [--out NAME]
+Several --tag give several of our arms, keyed by tag (output named by --out, default the first tag).
 Output: data/<out>_score_summary.json (numbers only). The figure of a held-out comparison is
 analysis/llm_compare/heldout_per_process.py, Suprio's held-out layout: this script's own layout was rejected.
 """
@@ -19,9 +19,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, ROOT)
 
-LLM = {"seen": 0.321, "held out": 0.721}
-HIS_LLOCA = {"seen": 0.506, "held out": 0.953}
-SETS = ["seen", "held out", "relabels", "new"]
+LLM = {"seen": 0.321, "heldout": 0.721}
+HIS_LLOCA = {"seen": 0.506, "heldout": 0.953}
 
 
 def rmse(proc, names):
@@ -33,26 +32,24 @@ def rmse(proc, names):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--tag", nargs="+", default=["control"])
-    ap.add_argument("--label", nargs="+", default=["our LLoCa, his optimizer settings"])
     ap.add_argument("--out", default=None)
     a = ap.parse_args()
-    assert len(a.tag) == len(a.label), (a.tag, a.label)
     out_name = a.out or a.tag[0]
-    arms = {lab: tuple(json.load(open(os.path.join(HERE, "data", f"{t}_{s}.json")))["processes"]
-                       for s in ("seen", "heldout")) for t, lab in zip(a.tag, a.label)}
+    arms = {t: tuple(json.load(open(os.path.join(HERE, "data", f"{t}_{s}.json")))["processes"]
+                       for s in ("seen", "heldout")) for t in a.tag}   # keyed by tag: claim keys hold no spaces
     draft = json.load(open(os.path.join(ROOT, "talks", "progress_oct2026b", "data", "draft_pid_by_process.json")))
     llm_pp = {n: v[1] for g in draft.values() for n, v in g.items()}
     groups = {"relabels": sorted(draft["interp"]), "new": sorted(draft["extrap"])}
     for seen, held in arms.values():
         assert len(seen) == 1352 and set(held) == set(llm_pp) and len(held) == 139, (len(seen), len(held))
-    ours = {lab: {"seen": rmse(seen, list(seen)), "held out": rmse(held, list(held)),
+    ours = {lab: {"seen": rmse(seen, list(seen)), "heldout": rmse(held, list(held)),
                   **{g: rmse(held, ns) for g, ns in groups.items()}} for lab, (seen, held) in arms.items()}
     llm = dict(LLM, **{g: float(np.sqrt(np.mean([llm_pp[n] for n in ns]))) for g, ns in groups.items()})
-    assert abs(np.sqrt(np.mean(list(llm_pp.values()))) - LLM["held out"]) < 1e-3   # the draft is the table's run
-    out = {"pooled_rmse_logm2": {**ours, "LLM (Suprio)": llm, "LLoCa (Suprio)": HIS_LLOCA},
+    assert abs(np.sqrt(np.mean(list(llm_pp.values()))) - LLM["heldout"]) < 1e-3   # the draft is the table's run
+    out = {"pooled_rmse_logm2": {**ours, "llm": llm, "his_lloca": HIS_LLOCA},
            "median_mse_logm2": {g: {**{lab: float(np.median([h[n]["mse_logm2"] for n in ns]))
                                        for lab, (_, h) in arms.items()},
-                                    "LLM (Suprio)": float(np.median([llm_pp[n] for n in ns]))}
+                                    "llm": float(np.median([llm_pp[n] for n in ns]))}
                                 for g, ns in groups.items()},
            "ours_below_llm": {lab: {g: int(sum(h[n]["mse_logm2"] < llm_pp[n] for n in ns)) for g, ns in groups.items()}
                               for lab, (_, h) in arms.items()},
