@@ -255,11 +255,43 @@ def draft_stems(drafts=None):
     return out
 
 
+def repo_rel(path):
+    """`path` relative to the top of its own checkout (the main one or a worktree: the nearest parent holding .git),
+    so the same script compares equal from any checkout; the absolute path when none holds it."""
+    p = os.path.realpath(path)
+    d = os.path.dirname(p)
+    while d != os.path.dirname(d):
+        if os.path.exists(os.path.join(d, ".git")):
+            return os.path.relpath(p, d)
+        d = os.path.dirname(d)
+    return p
+
+
+def rejected_producers(root=ROOT):
+    """{repo-relative path: (entry, Joaquin's words)} of every file an entry's intent record says he rejected
+    (`plan intent --rejects`, D534): a figure drawn by one, from any checkout, never reaches him again."""
+    try:
+        import yaml
+        with open(os.path.join(root, "plan", "plan.yaml"), encoding="utf-8") as f:
+            d = yaml.load(f, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader)) or {}   # 4 MB: C loader 0.2 s vs 3.6 s
+    except Exception:
+        return {}
+    es = d.get("entries", d) if isinstance(d, dict) else d
+    es = es.values() if isinstance(es, dict) else es
+    out = {}
+    for e in es or []:
+        for x in (e.get("intent") or []) if isinstance(e, dict) else []:
+            if x.get("rejects"):
+                out[x["rejects"]] = (e.get("id"), x.get("text"))
+    return out
+
+
 def legend_findings(tool_input, cwd, drafts=None):
     """([refusal lines], [legend lines shown]) for the figures of a SendUserFile call (see the legend rule)."""
     cap = tool_input.get("caption") if isinstance(tool_input, dict) else None
     ncap = norm(cap if isinstance(cap, str) else "")
     bad, shown, stems = [], [], None
+    rejects = None
     for p in sent_files(tool_input, (".png", ".pdf")):
         p = p if os.path.isabs(p) else os.path.join(cwd, p)
         if is_deck(p) or is_draft(p) or "run_plots" in os.path.normpath(p).split(os.sep):
@@ -280,6 +312,13 @@ def legend_findings(tool_input, cwd, drafts=None):
                        "as a figure." % (p, os.path.basename(legend_file(p))))
             continue
         script, blob, warns, labels = lg
+        if script and rejects is None:
+            rejects = rejected_producers()       # read only when a sent figure names a producer
+        rej = rejects.get(repo_rel(script)) if script else None
+        if rej:
+            bad.append('%s: drawn by %s, which Joaquin rejected on %s ("%s"): draw it with the tool his reference '
+                       'calls for (plan brief %s, first lines)' % (p, script, rej[0], rej[1], rej[0]))
+            continue
         if not committed(script, blob):
             bad.append("%s: drawn by %s, not committed at the content that drew it: commit the script and redraw"
                        % (p, script or "no script"))
