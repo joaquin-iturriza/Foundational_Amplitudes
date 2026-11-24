@@ -17957,6 +17957,16 @@ entries:
       into the watermark de6a5429d. Not fixed yet: review_guard/review_backlog begin should refuse a second begin while the
       lock is held by another agent id, and advance should refuse from an agent that does not hold the lock; the lock log
       should record agent_id.'
+  - at: '2026-11-24T18:31:46+00:00'
+    text: '2026-11-24 step 35 done (980fed580, pushed; claudemd-keeper FIX then PASS, watermark 463addf3e): plan design --sources
+      is required when --outcome sets a threshold (comparison, Nx, %, at most/least N, a/b) and each item must name a source
+      (quoted words, D<n>, spread/noise/seeds/sd/control/measured/budget/Joaquin); refused in the test: the lab_llm_trial
+      outcome with no sources and with ''0.3x <- a round number''. design-reviewer check 4 FIXes an unsourced threshold, one
+      whose source does not give the number, or a bar stricter than Joaquin''s stated aim. CLAUDE.md design rule adds ''each
+      threshold with its source (my words, a decision, a measured spread, a cost I set), never stricter than my stated aim''.
+      Flag lists in step_prompt, step_prompt_legacy, working-on-the-plan and the design_guard/submit_guard refusal texts (which
+      also lacked --prior) carry it; review_backlog counts step_prompt_legacy.txt. Not fixed: the regex accepts a source word
+      without checking it gives the number; that is the reviewer''s check.'
   handoff:
     state: 'D534 step 30: parts 1, 2, 3, 4 built and replayed (findings 2026-11-24). Left: a live check of part 3 at the next
       real broken trial (expect an acked RUN event with ''folded into its search'', no wake) and at the next lxplus master
