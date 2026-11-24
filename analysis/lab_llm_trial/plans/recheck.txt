@@ -1,0 +1,56 @@
+PLAN: all edits in tools/plan.py (repo copy). Do not touch tests.
+Cause: done_problems() (~l.687) on subprocess.TimeoutExpired only appends a NOTE and `continue`s, so nothing is cached and
+the note repeats at every stop. Missing: `plan recheck` command and `plan check --replace`.
+
+1. done_problems(d, st) -> done_problems(d, st, only=None, limit=True):
+   - in the loop: `if e.get("status") != "done" or (only and e["id"] != only): continue`
+   - cache hit logic unchanged (cache key is the same for stop and recheck, so recheck's result is what the stops read).
+   - the compute branch: timeout = min(30, budget()) if limit else None.
+   - on TimeoutExpired (only reachable with limit=True): cache it like a pass, noted once:
+         NOTES.append("%s: its done check did not finish in the stop's time; run `python3 tools/plan.py recheck %s` "
+                      "(no time limit), or `plan check %s --done-when CMD --replace` for a faster check" % ((e["id"],)*3))
+         why = []      # then fall through to the `cache[key], changed = ...` line instead of `continue`
+     (test needs "did not finish" and "plan.py recheck rd" in the first stop's output, absent from the second.)
+2. done_refusals(): trivial_check(chk, min(timeout, 120)) breaks when timeout is None -> use min(timeout or 120, 120).
+   (subprocess.run(timeout=None) is already "no limit".) Note trivial_check itself can raise TimeoutExpired at the
+   stop's small budget; that is inside the same try, so it is covered by step 1.
+3. New cmd_recheck(a) near cmd_reopen:
+       def cmd_recheck(a):
+           """Rerun done entries' finishing checks with no time limit (the Stop hook runs them within its budget)."""
+           with transaction(write=False) as (d, st):
+               if a.id and entry(d, a.id).get("status") != "done":
+                   sys.exit("plan: %s is not done" % a.id)
+               ids = [e["id"] for e in d["entries"] if e.get("status") == "done" and (not a.id or e["id"] == a.id)]
+               bad = done_problems(d, st, only=a.id, limit=False)   # (if only=None means all, fine)
+           for e, why in bad:
+               print("REGRESSED %s: %s; plan reopen %s --why ..." % (e["id"], why, e["id"]))
+           print("plan: %d done entr(ies) rechecked, %d regressed" % (len(ids), len(bad)))
+   The test needs "0 regressed" in the output and rc 0 (return 0 even when some regressed). BUT the recheck must
+   bypass a cached hit-for-a-timeout: the timeout entry was cached as a pass (why=[]), so with limit=False skip the
+   cache read: `if limit and hit and (...) < 3600*DONE_RECHECK_H:`  (recheck always recomputes and overwrites the cache).
+   Check how transaction(write=False) is used in cmd_commit/cmd_claims to confirm it yields (d, st).
+4. cmd_check(a): add `--replace` and handle done entries. At the top:
+       with transaction(write=False) as (d, st): e = entry(d, a.id)   # or load entry the way other cmds do
+       done = e.get("status") == "done"
+   - if a.replace and not done: sys.exit("plan: --replace is for a done entry; %s is %s" % (a.id, status))
+     (message must contain "is for a done entry")
+   - if done and not a.replace: sys.exit("plan: %s is done; to swap its check pass --replace" % a.id)
+   - trivial_check(...) refusal stays first for both ("checks nothing about the work", already worded so).
+   - non-done path unchanged (refuse if it already passes).
+   - done path: run the check (timeout 600); if returncode != 0:
+         sys.exit("plan: %r fails now; a done entry's new check must pass (reopen it with plan reopen if the work regressed)")
+     (message must contain "reopen it"; write it exactly like that: "... fails now: reopen it (plan reopen %s --why ...) instead")
+   - then in the transaction: e.setdefault("history", []).append({"at": now().isoformat(), "was_done_when":
+         e.get("done_when")}); e["done_when"] = a.done_when   (status stays done; the entry's key changes, so the
+     stop recomputes the fast check once, it passes, and no "marked done" text appears).
+   - ordering for the test: the running-entry case (w2/run1) must hit the "is for a done entry" exit BEFORE any other
+     refusal; the "true" case on the done entry must say "checks nothing".
+5. main(): cmd("check", cmd_check, A("id"), A("--done-when", required=True), A("--replace", action="store_true"))
+   and add cmd("recheck", cmd_recheck, A("id", nargs="?")). Add `recheck` / `check --replace` lines to the docstring
+   at the top of the file (l.6-14 usage block).
+
+Run tests (the file has a __main__ runner; plain pytest passes trivially without running the scenarios):
+  cd <repo copy> && /home/joaquin/work/FA/.venv-cpu/bin/python tests/test_setup_scenarios.py 2>&1 | grep -A6 "^FAIL"
+Target: the slow_done_checks scenarios (all PASS). Two other FAILs exist before the fix and are unrelated to this task
+("3: PLAN_TEST=1 with a root outside the temp directory is refused", "the migration marks the setup's own entries
+setup": environment/repo-state); do not chase them, but make sure no new FAIL appears. Exit code may stay 1 because of them.

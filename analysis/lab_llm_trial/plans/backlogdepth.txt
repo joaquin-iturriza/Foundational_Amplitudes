@@ -1,0 +1,60 @@
+PLAN: three small fixes in the repo copy. Do not edit tests/.
+Run (pytest only runs 1 wrapper test; the real suite is the __main__ runner):
+  cd <repo> && /home/joaquin/work/FA/.venv-cpu/bin/python tests/test_setup_scenarios.py | grep -v "^ok"
+Now 218/225. Some FAILs are unrelated and stay (PLAN_TEST root outside temp dir, migration marks setup).
+Target: no FAIL for "review backlog: a .py change...", "verify: a registry run id...", and the three
+"heredoc: ... is allowed" lines. The "refused" heredoc lines already pass and must keep passing.
+
+1) .claude/hooks/review_backlog.sh
+   Cause: $paths is expanded unquoted, so bash globs pathspec `*.py` against the cwd into root_module.py;
+   git then sees only root files. Fix: right after the line `set -uo pipefail` add
+       set -f   # pathspecs like *.py are git's globs (any depth), never the shell's
+   Other unquoted expansions only word-split, so nothing else needs globbing.
+   Expected status row: repo-reviewer 10/600 1/30.
+
+2) tools/verify_claims.py (SKIP list, ~line 22)
+   Cause: PLAIN reads "60b" out of the run id FA-ccin2p3-60b47206. SKIP patterns are blanked before numbers
+   are read, so append to SKIP:
+       r"\bFA-[A-Za-z0-9]+-[0-9a-f]+\b"
+   "At 13 TeV" must still be reported; it is untouched.
+
+3) .claude/hooks/plan_files_guard.py (bash_refusal)
+   Cause: the whole command text, heredoc body included, is searched for plan file names.
+   Fix: split bodies off, judge the command line without them, judge each body by its interpreter.
+   a) After TOOLS add:
+      HEREDOC = re.compile(r"^([^\n]*?)<<-?\s*(['\"]?)(\w+)\2([^\n]*)\n(.*?)\n[ \t]*\3[ \t]*$", re.M | re.S)
+
+      def heredocs(cmd):
+          found = []
+          def cut(m):
+              found.append((m.group(1), m.group(5)))
+              return m.group(1) + m.group(4)
+          return HEREDOC.sub(cut, cmd), found
+
+      def body_refusal(line, body):
+          if not re.search(DATA, body):
+              return None
+          segs = segments(line) or [[]]
+          words = [t for t in segs[-1] if not re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", t)]
+          prog = os.path.basename(words[0]) if words else ""
+          if prog in ("bash", "sh", "zsh", "dash"):
+              return bash_refusal(body)
+          if prog.startswith("python"):
+              for m in re.finditer(r"open\(\s*([^,)]+)(?:,\s*['\"]([^'\"]*)['\"])?", body):
+                  arg, mode = m.group(1).strip(), m.group(2) or ""
+                  # shortcut: a variable path (open(p, 'w')) counts as the plan file when the body names one
+                  if re.search(r"[wax+]", mode) and (re.search(DATA, arg) or arg[:1] not in "'\""):
+                      return "a python heredoc that writes a plan file"
+              if re.search(r"\.(?:write_text|write_bytes|unlink|rename|replace)\(|shutil|os\.(?:remove|rename|replace)", body):
+                  return "a python heredoc that writes a plan file"
+          return None   # cat, git commit -F -, ...: the body is data
+
+   b) In bash_refusal, after the `PLAN_[A-Z_]+` check and before `if not re.search(DATA, cmd)` add:
+          cmd, bodies = heredocs(cmd)
+          for line, body in bodies:
+              why = body_refusal(line, body)
+              if why:
+                  return why
+      `cat <<'EOF' > plan/plan.yaml` stays refused by its redirection on the command line.
+
+Finish: rerun the runner; only the unrelated FAILs should remain (about 223/225).
