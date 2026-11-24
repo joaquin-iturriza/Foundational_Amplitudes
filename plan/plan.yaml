@@ -40523,7 +40523,8 @@ entries:
     start: '2026-11-24T19:54:57+00:00'
     at: '2026-11-24T19:54:57+00:00'
   step_waits:
-    '2': detached ftmech_glu_drive (both gluon-parent fine-tune searches, 32 trials; its end posts an event)
+    '2': 'a reviewer: notes-editor BLOCKING (2026-11-24 ~21:30) blocks every commit; its item 1 is this entry''s par:ftm_zng4g
+      D=1e3 sentence (best at 14-16%, ends 1.43-1.52x, no % src); then commit and launch the D=1e3 gluon extension + 1e4 seeds'
     '4': detached ftmech_d539_uug_drive (4 uug searches, 64 trials; its end posts an event), then seeds 43/44 of each chosen
       trial
   handoff:
