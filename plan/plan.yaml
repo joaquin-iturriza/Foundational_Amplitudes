@@ -44386,9 +44386,9 @@ entries:
   asks: []
   owner:
     agent: acc098fc308290fb5
-    state: working
+    state: stopped
     since: '2026-11-24T14:15:22+00:00'
-    state_at: '2026-11-24T14:30:52+00:00'
+    state_at: '2026-11-24T14:38:59.538000+00:00'
     context: 184223
     context_at: '2026-11-24T14:50:22+00:00'
   designs:
