@@ -39898,6 +39898,12 @@ entries:
     units: null
     start: '2026-11-24T05:39:59+00:00'
     at: '2026-11-24T05:39:59+00:00'
+  - batch: d1e3_seeds
+    wall_h: 0.4
+    jobs: 4
+    units: null
+    start: '2026-11-24T07:41:29+00:00'
+    at: '2026-11-24T07:41:29+00:00'
   step_waits:
     '2': FA-ccin2p3-1f2d9ad5
     '1': ftmech_zng4g_d1e3_scr_b128 ftmech_zng4g_d1e3_ftnoset_b128
