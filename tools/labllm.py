@@ -119,7 +119,8 @@ def cited(repo, answer):
     """[(item, found)] for each path.py:name line: the file exists in the copy and defines name (def or class)."""
     out = []
     for path, name in re.findall(r"([\w./-]+\.py):(\w+)", answer.replace("`", "")):
-        f = os.path.join(repo, path.replace(repo + "/", "").lstrip("./"))
+        p = path.replace(repo + "/", "")
+        f = os.path.join(repo, p[2:] if p.startswith("./") else p)
         ok = os.path.isfile(f) and re.search(r"^\s*(async\s+)?(def|class)\s+%s\b" % name, open(f, errors="replace").read(), re.M)
         out.append(("%s:%s" % (os.path.relpath(f, repo), name), bool(ok)))
     return out

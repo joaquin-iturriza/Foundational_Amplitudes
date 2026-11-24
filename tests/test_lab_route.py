@@ -18,5 +18,9 @@ def test_lookup_items_checked_against_the_copy(tmp_path):
     import labllm
     (tmp_path / "tools").mkdir()
     (tmp_path / "tools" / "a.py").write_text("class Foo:\n    def bar(self):\n        pass\n")
-    got = labllm.cited(str(tmp_path), "`tools/a.py:bar`\n%s/tools/a.py:Foo\ntools/a.py:baz\ntools/b.py:bar\n" % tmp_path)
-    assert got == [("tools/a.py:bar", True), ("tools/a.py:Foo", True), ("tools/a.py:baz", False), ("tools/b.py:bar", False)]
+    (tmp_path / ".claude" / "hooks").mkdir(parents=True)
+    (tmp_path / ".claude" / "hooks" / "x.py").write_text("def name():\n    pass\n")
+    got = labllm.cited(str(tmp_path), "`tools/a.py:bar`\n%s/tools/a.py:Foo\ntools/a.py:baz\ntools/b.py:bar\n"
+                       ".claude/hooks/x.py:name\n./tools/a.py:bar\n" % tmp_path)
+    assert got == [("tools/a.py:bar", True), ("tools/a.py:Foo", True), ("tools/a.py:baz", False), ("tools/b.py:bar", False),
+                   (".claude/hooks/x.py:name", True), ("tools/a.py:bar", True)]
