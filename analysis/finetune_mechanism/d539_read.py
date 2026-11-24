@@ -71,21 +71,24 @@ def main():
     res["blowups"] = [k for k, c in curves.items() if np.any(c > 10 * np.minimum.accumulate(c))]
     json.dump(res, open(os.path.join(HERE, "data", "d539.json"), "w"), indent=1)
     print(json.dumps(res))   # one line: verify_claims reads the last {...} line
-    plot(res)
+    plot(res, curves)
 
 
-def plot(res):
+def plot(res, curves):
     import plot_style as ps
     lab = {"off": "no rescale", "eps1e-8": r"rescale, $\epsilon=10^{-8}$", "eps1e-4": r"rescale, $\epsilon=10^{-4}$",
            "eps1e-2": r"rescale, $\epsilon=10^{-2}$", "eps1": r"rescale, $\epsilon=1$",
            "massless": "rescale of massless\nmomenta only"}
     cols = dict(zip(lab, [ps.C.blue] + ps.sequence(4) + [ps.C.vermillion]))
-    fig, axs = ps.figure(ncols=2, nrows=1)
-    a, g = axs
+    fig, axs = ps.figure(ncols=2, nrows=2)
+    (a, g), (h, cell) = axs
+    blown = set(res["blowups"])   # open markers: a run whose val rose > 10x its best-so-far (D398), read at its best
     arms = CELLS[("zng", "1e4")]
     for i, k in enumerate(arms):
-        v = [x for x in res["cells"]["zng_1e4"][k]["best"] if x is not None]
-        a.plot(np.full(len(v), i) + np.linspace(-0.15, 0.15, len(v)), v, "o", color=cols[k], label=lab[k])
+        for j, (s, x) in enumerate(zip(SEEDS, res["cells"]["zng_1e4"][k]["best"])):
+            if x is not None:
+                a.plot(i + (j - 1) * 0.15, x, "o", color=cols[k], label=lab[k] if j == 0 else None,
+                       mfc="none" if f"zng|1e4|{k}|{s}" in blown else cols[k])
     a.set_xticks([]); a.set_xlim(-0.5, len(arms) - 0.5); a.set_yscale("log")
     a.set_xlabel(r"input, $D_{\rm train}=10^4$"); a.set_ylabel(r"best MSE$(\log|\mathcal{M}|^2)$")
     ps.process_label(a, r"$q\bar q\to Z+4g$")
@@ -93,13 +96,21 @@ def plot(res):
     ticks = []
     for i, (p, d) in enumerate([c for c in CELLS]):
         for j, k in enumerate(("off", "eps1e-8")):
-            v = [x for x in res["cells"][f"{p}_{d}"][k]["best"] if x is not None]
-            g.plot(np.full(len(v), i + (j - 0.5) * 0.3) + np.linspace(-0.05, 0.05, len(v)), v,
-                   "o", color=cols[k])
+            for m, (s, x) in enumerate(zip(SEEDS, res["cells"][f"{p}_{d}"][k]["best"])):
+                if x is not None:
+                    g.plot(i + (j - 0.5) * 0.3 + (m - 1) * 0.05, x, "o", color=cols[k],
+                           mfc="none" if f"{p}|{d}|{k}|{s}" in blown else cols[k])
         ticks.append(f"{names[p]}, $10^{{{d[-1]}}}$")
-    g.set_xlim(-0.5, len(ticks) - 0.5); g.set_xticks(range(len(ticks))); g.set_xticklabels(ticks, fontsize="small"); g.set_yscale("log")
+    g.set_xlim(-0.5, len(ticks) - 0.5); g.set_xticks(range(len(ticks))); g.set_xticklabels(ticks, fontsize="x-small"); g.set_yscale("log")
     g.set_xlabel(r"process, $D_{\rm train}$"); g.set_ylabel(r"best MSE$(\log|\mathcal{M}|^2)$")
-    ps.legend(a)   # panel (b) plots off and eps1e-8 with panel (a)'s markers
+    for k in arms:   # validation curves of seed 42, every Z+4g 1e4 arm
+        c = curves.get(f"zng|1e4|{k}|42")
+        if c is not None:
+            h.plot(np.linspace(0, 1, len(c)), c, color=cols[k])
+    h.set_yscale("log"); h.set_xlabel("training progress (step / 1953)")
+    h.set_ylabel(r"val MSE$(\log|\mathcal{M}|^2)$"); ps.process_label(h, r"$q\bar q\to Z+4g$")
+    a.plot([], [], "o", color="0.5", mfc="none", label="blew up (read\nat its best)")
+    ps.legend_cell(cell, a)   # panel (b) plots off and eps1e-8 with panel (a)'s markers
     ps.save(fig, os.path.join(HERE, "figs", "d539"))
 
 
