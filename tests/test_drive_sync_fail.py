@@ -70,7 +70,9 @@ def test_site_down_at_sync_is_left_out(monkeypatch):
     monkeypatch.setattr(drive, "Sweep", lambda c, a: sw)
     monkeypatch.setattr(drive.subprocess, "run", lambda *a, **k: types.SimpleNamespace(stdout=""))
     monkeypatch.setattr(sys, "argv", ["drive.py", "--config", "x.yaml", "--item", "i", "--allow-jeanzay"])
+    monkeypatch.setattr(drive.time, "sleep", lambda s: None)
     with pytest.raises(SystemExit) as e:
         drive.main()
     assert str(e.value) == "past sync"
-    assert [c[1] for c in calls if c[0] == "sync"] == ["ccin2p3", "jeanzay", "lxplus"]
+    # a timeout is transient: tried three times, then the site is left out
+    assert [c[1] for c in calls if c[0] == "sync"] == ["ccin2p3", "jeanzay", "jeanzay", "jeanzay", "lxplus"]

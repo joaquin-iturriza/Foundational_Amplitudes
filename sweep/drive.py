@@ -582,8 +582,10 @@ def sync_site(s):
     for k in range(3):
         try:
             return site("sync", s, PROJECT, "--allow-dirty", timeout=600)
-        except (RuntimeError, subprocess.TimeoutExpired):
-            if k == 2:
+        except (RuntimeError, subprocess.TimeoutExpired) as e:
+            # only a transient failure is tried again; a refusal (untracked files, a diverged checkout) fails at once
+            if k == 2 or not (isinstance(e, subprocess.TimeoutExpired) or re.search(
+                    r"cannot lock ref|ssh|connection|timed out|broken pipe|temporar", str(e), re.I)):
                 raise
             time.sleep(20)
 
