@@ -9695,6 +9695,152 @@ against 9 of 19): removing the shock does not keep the head start.
 % allow: 400 0 because they are the plotted window and the step named
 \end{figure}
 
+\paragraph{Why the $Z+4g$ fine-tune ends above scratch (2026-11-24)}\label{par:ftm_zng4g} The question (D519, D520,
+D529; plan \code{finetune\_mechanism}): fine-tuned from the $28$-process $W$ parent of the uncertainty benchmark
+(\code{FA-ccin2p3-47e14eae}), $q\bar q\to Z+4g$ at $10^4$ training events ends above a search over scratch, the opposite
+of a head start. Setup: MuonAdamW with WSD, $400$ epochs ($1953$ steps at batch $2048$, $31250$ at batch $128$), every
+arm the best of a $16$-trial DyHPO search over the same coupled space (the batch-$128$ fine-tune's later extended to
+$24$, below, without changing its best), then seeds $42$, $43$ and $44$ of that trial;
+the measure is the best validation MSE$(\log|\mathcal M|^2)$ of the $\mu$ head, a ratio of arms is the mean over the
+$9$ seed pairings with its $10$--$90\%$ range. The parent carries two input settings scratch does not: a logarithmic
+rescale of every momentum (\code{input\_soft\_eps}) and the logarithms of every pair invariant
+(\code{input\_pair\_logs}).
+% allow: 4g 24 28 10^4 400 1953 2048 31250 128 16 42 43 44 2 9 10 90 because they are the parent's process count, the training size, the epochs, steps and batch sizes, the trial count, the seeds, the square of |M|, the pairings and the quantiles
+
+The learning-rate window is not the gap. At batch $128$ the fine-tune's search best sat at the window's top,
+$1.1\times10^{-2}$; eight more trials with the top raised to $3.3\times10^{-2}$ keep the first $16$ trials' best,
+$0.0258$ at $1.02\times10^{-2}$, inside the old window, and every added trial above the old top is worse
+(Fig.~\ref{fig:ftm_zng4g_lr}).
+% src: python3 analysis/finetune_mechanism/zng4g_r1_read.py 128 --h3 --cached @0a496d2cf
+% claim: chosen_val=0.0258
+% claim: chosen_lr=1.02e-2
+% allow: 128 16 because they are the batch size and the trial count
+% allow: 1.1\times10^{-2} 3.3\times10^{-2} because they are the two windows' tops, settings
+
+The momentum rescale alone raises scratch's validation nearly as much as both settings (Fig.~\ref{fig:ftm_zng4g_onesetting}). At batch $2048$, each setting
+added alone to scratch and searched: scratch $0.0630$ (mean of three seeds), with the rescale alone $0.131$
+($2.07\times$ scratch), with the pair logarithms alone $0.0701$ ($1.11\times$, inside scratch's seed spread), with both
+$0.142$ ($2.26\times$); the fine-tune $0.0980$ ($1.56\times$). As a share of both settings' excess,
+$\log(S_x/S)/\log(S_{\rm both}/S)$ with $S$, $S_x$, $S_{\rm both}$ the three-seed means of scratch, scratch with setting $x$
+and scratch with both, the rescale accounts for $0.90$ ($0.70$--$1.12$ over the $27$ seed triples), the pair
+logarithms for $0.13$. Their chosen learning rates, $0.028$ and $0.023$, sit below the window's top. Three runs blow up
+(validation above ten times its best so far) and are listed apart, read at their best checkpoint before it: the rescale
+arm's seed $44$ from validation $18$ of $50$, the both-settings arm's seeds $43$ and $44$ from validations $18$ and $11$.
+% src: python3 analysis/finetune_mechanism/zng4g_r1_read.py 2048 --onesetting --cached @0a496d2cf
+% claim: mean.S=0.0630
+% claim: mean.soft=0.131
+% claim: over_S.soft=2.07
+% claim: mean.pair=0.0701
+% claim: over_S.pair=1.11
+% claim: mean.Sf=0.142
+% claim: over_S.Sf=2.26
+% claim: mean.F=0.0980
+% claim: over_S.F=1.56
+% claim: c.soft.mean=0.90
+% claim: c.soft.q10_50_90.0=0.70
+% claim: c.soft.q10_50_90.2=1.12
+% claim: c.pair.mean=0.13
+% claim: chosen.soft.lr=0.028
+% claim: chosen.pair.lr=0.023
+% claim: blowups.soft.0.first_at=18
+% claim: blowups.Sf.0.first_at=18
+% claim: blowups.Sf.1.first_at=11
+% allow: 2048 27 50 43 44 because they are the batch size, the count of seed triples, the validations per run and the seeds
+
+At batch $128$ the scratch reference is the extended $16$-trial search's best (trial hp0078, the uncertainty benchmark's
+reference), $0.00941$ over its three seeds, $2.1\times$ below the $8$-trial search's best used before ($0.0197$). Against
+it the fine-tune is $3.22\times$ scratch and scratch with both settings, searched, $2.94\times$: the settings account for a log
+share of $0.92$ ($0.81$--$1.08$) of the fine-tune's gap, against $1.84$ at batch $2048$.
+% src: python3 analysis/finetune_mechanism/zng4g_ftnoset_read.py 128 --cached @9b78f8c90
+% claim: mean.S=0.00941
+% claim: mean.S8=0.0197
+% claim: F_over_S.mean=3.22
+% claim: Sf_over_S.mean=2.94
+% claim: share.mean=0.92
+% claim: share.q10_50_90.0=0.81
+% claim: share.q10_50_90.2=1.08
+% allow: 128 16 8 2048 because they are the batch sizes and the trial counts
+% allow: 2.1 because it is 0.0197/0.00941 of the two claims
+% allow: 1.84 because it is the batch-2048 share claimed in the next paragraph
+
+Without the two settings in the parent the fine-tune beats scratch at batch $2048$ and recovers most of the gap at
+batch $128$ (Fig.~\ref{fig:ftm_zng4g_ftnoset}). The parent was retrained with only the two settings off
+(\code{FA-ccin2p3-9a73698a}); its per-process final validation MSE against the original's has geometric mean $0.854$,
+$19$ of the $28$ processes within $0.43$--$2.5\times$. Fine-tuned from it and searched as the original fine-tune, at batch
+$2048$: $0.0214$, $0.0214$, $0.0234$, $0.35\times$ scratch ($0.32$--$0.38$) and $0.23\times$ the original fine-tune, with
+the settings' share of the old gap $1.84$; the chosen learning rate, $3.11\times10^{-3}$, sits at the window's bottom.
+At batch $128$: $0.0108$, $0.0184$, $0.0141$, $1.53\times$ scratch ($1.18$--$2.07$) and $0.48\times$ the original
+fine-tune ($0.35$--$0.62$), at learning rate $7.26\times10^{-3}$. By the design's branches this is a yes at batch $2048$
+and a partial at batch $128$: the parent's two settings are the deficit at the larger batch and most of it at the
+smaller, where a residual of $1.53\times$ is open. Seed $43$ at batch $128$ blows up late in its run and is listed
+apart, read at its best checkpoint before the blow-up.
+% src: python3 analysis/finetune_mechanism/parent_rerun_check.py noset --cached @8155d6b31
+% claim: ratio_gmean=0.854
+% claim: n_within_0p43_2p5=19
+% claim: n_procs=28
+% src: python3 analysis/finetune_mechanism/zng4g_ftnoset_read.py 2048 --cached @9b78f8c90
+% claim: best.Fn.0=0.0214
+% claim: best.Fn.1=0.0214
+% claim: best.Fn.2=0.0234
+% claim: Fn_over_S.mean=0.35
+% claim: Fn_over_S.q10_50_90.0=0.32
+% claim: Fn_over_S.q10_50_90.2=0.38
+% claim: Fn_over_F.mean=0.23
+% claim: share.mean=1.84
+% claim: Fn_chosen.lr=3.11e-3
+% src: python3 analysis/finetune_mechanism/zng4g_ftnoset_read.py 128 --cached @9b78f8c90
+% claim: best.Fn.0=0.0108
+% claim: best.Fn.1=0.0184
+% claim: best.Fn.2=0.0141
+% claim: Fn_over_S.mean=1.53
+% claim: Fn_over_S.q10_50_90.0=1.18
+% claim: Fn_over_S.q10_50_90.2=2.07
+% claim: Fn_over_F.mean=0.48
+% claim: Fn_over_F.q10_50_90.0=0.35
+% claim: Fn_over_F.q10_50_90.2=0.62
+% claim: Fn_chosen.lr=7.26e-3
+% claim: blowups.Fn.0=43
+% allow: 2048 128 0.43 2.5 because they are the batch sizes and the parent check's band
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{../analysis/finetune_mechanism/figs/zng4g_r3_b128.pdf}
+  \caption{\textbf{A wider window does not lower the fine-tune.} Best validation MSE$(\log|\mathcal M|^2)$ against
+  learning rate of each trial of the fine-tune's search, $q\bar q\to Z+4g$, $10^4$ events, batch $128$, seed $42$.
+  First 16 trials: the original search; 8 added trials: those with the window's top raised; window: the search's
+  learning-rate bounds before and after.}
+  \label{fig:ftm_zng4g_lr}
+% allow: 4g 16 8 128 42 2 10^4 because they are the trial counts, the batch size, the seed, the square of |M| and the training size
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{../analysis/finetune_mechanism/figs/zng4g_onesetting_b2048.pdf}
+  \caption{\textbf{The momentum rescale alone raises scratch's validation nearly as much as both settings.} $q\bar q\to Z+4g$, $10^4$ events, batch $2048$.
+  Top left: best validation MSE$(\log|\mathcal M|^2)$ of each arm's chosen trial, seeds $42$--$44$. Top right: best
+  validation MSE against learning rate of every search trial. Bottom: validation MSE against the fraction of the run,
+  per seed. Momentum log-rescale: \code{input\_soft\_eps}; pair logs: \code{input\_pair\_logs}; both: the two together;
+  fine-tuned: from the parent that carries both.}
+  \label{fig:ftm_zng4g_onesetting}
+% allow: 4g 2048 42 44 2 10^4 because they are the batch size, the seeds, the square of |M| and the training size
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{../analysis/finetune_mechanism/figs/zng4g_ftnoset_b2048.pdf}
+  \includegraphics{../analysis/finetune_mechanism/figs/zng4g_ftnoset_b128.pdf}
+  \caption{\textbf{Without the settings in the parent the fine-tune beats scratch at batch 2048, not at batch 128.}
+  $q\bar q\to Z+4g$, $10^4$ events; batch $2048$ (first figure) and $128$ (second). In each: top left, best validation
+  MSE$(\log|\mathcal M|^2)$ of each arm's chosen trial, seeds $42$--$44$; top right, best validation MSE against learning
+  rate of each fine-tune search trial; bottom, validation MSE against the fraction of the run, per seed. Both settings:
+  \code{input\_soft\_eps} and \code{input\_pair\_logs}; parent with settings: \code{FA-ccin2p3-47e14eae}; parent without
+  settings: \code{FA-ccin2p3-9a73698a}; 8-trial search: the batch-128 scratch reference used before the extended
+  search.}
+  \label{fig:ftm_zng4g_ftnoset}
+% allow: 4g 2048 128 42 44 8 2 10^4 because they are the batch sizes, the seeds, the trial count, the square of |M| and the training size
+\end{figure}
+
+
 % ==========================================================================
 \section{Architecture and encoding ablations}\label{sec:arch}
 % ==========================================================================
