@@ -17958,6 +17958,12 @@ entries:
       Flag lists in step_prompt, step_prompt_legacy, working-on-the-plan and the design_guard/submit_guard refusal texts (which
       also lacked --prior) carry it; review_backlog counts step_prompt_legacy.txt. Not fixed: the regex accepts a source word
       without checking it gives the number; that is the reviewer''s check.'
+  - at: '2026-11-24T18:33:06+00:00'
+    text: '2026-11-24 step 36 done (dc3b8b1c6, pushed): review_guard records the agent that ran ''begin'' as the pillar''s
+      holder and refuses a begin or advance from another agent while the lock is fresh (the launch guard only saw new launches,
+      so two resumed claudemd-keepers both began at 19:26:20 and the other one''s advance swept step 35''s backlog); lock_calls.log
+      now records agent_id. tests/test_review_guard_holder.py replays it: second begin 2, second advance 2, holder''s advance
+      0, new begin after release 0. Not tested live; a lock begun before this change has no holder file and is not checked.'
   handoff:
     state: 'D534 step 30: parts 1, 2, 3, 4 built and replayed (findings 2026-11-24). Left: a live check of part 3 at the next
       real broken trial (expect an acked RUN event with ''folded into its search'', no wake) and at the next lxplus master
