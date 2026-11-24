@@ -17812,7 +17812,10 @@ disagrees or DeepSeek does not answer; the price is wall time, a median of 8.33 
 reads only the diff stat, the diff and the test run's pass/fail lines and agrees unless something there is visibly
 wrong. On the same ten DeepSeek diffs it cost 41.5k of our tokens a fix (median 38.2k, against the full check's
 99.1k), 0.17 of Sonnet's; it agreed on all 10, so it no longer catches the \code{emastart} defect, which the user
-accepted as one to catch later. (The design
+accepted as one to catch later. These checks read their material before three corrections made at review: the
+test's return code line added, pytest's error lines counted as failures, and one sandbox scenario no longer
+excused; none of the ten held an error line or a failure of that scenario, so what each checker saw differed only
+by the return code. (The design
 had set a bar of at most 0.3 of Sonnet's tokens, which no decision of the user's gave; it was dropped on his question.)
 Code lookups (the code questions of the earlier lookup trial, graded by its keys) also go to DeepSeek: it answered 10 of 10 in
 each of two runs (16.1 and 21.1 s a lookup) using none of our tokens, against 9 and 10 of 10 for the Opus low-effort

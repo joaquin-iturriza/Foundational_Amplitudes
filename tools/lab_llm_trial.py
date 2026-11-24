@@ -352,11 +352,11 @@ CHECK = ("Check one fix made by another model (lab LLM trial; the routed flow's 
          "only {\"agree\": true|false, \"note\": \"<why, one or two sentences>\"} to %s with one bash heredoc, then end.")
 
 
-FAILLINE = re.compile(r"FAIL|Error|Traceback|failed")
+FAILLINE = re.compile(r"FAIL|ERROR|Error|\berrors?\b|Traceback|failed")
 TESTLINE = re.compile(r"passed|failed|FAIL|PASS|Error|error|Traceback|assert|\bOK\b|\bok\b", re.I)
 
 
-def compact(stat, diff, test_out=None, keep=40):
+def compact(stat, diff, test_out=None, keep=40, rc=None):
     """What a cheap check reads (D545): the diff stat, the diff, and the test run's pass/fail lines (at most `keep`,
     then its last 5 lines), never the surrounding code."""
     out = ["== diff stat", stat.rstrip(), "== diff", diff.rstrip()]
@@ -366,6 +366,8 @@ def compact(stat, diff, test_out=None, keep=40):
         passes = [l for l in lines if TESTLINE.search(l) and l not in fails]
         out += ["== test: %d failure lines, %d pass lines (failures first)" % (len(fails), len(passes))]
         out += fails[:keep] + passes[:max(0, keep - len(fails))] + ["== test (last lines)"] + lines[-5:]
+        if rc is not None:
+            out.append("test rc %d" % rc)
     return "\n".join(out) + "\n"
 
 
@@ -401,12 +403,12 @@ def cheap_brief(task, arm):
                      else "%s -m pytest -q %s" % (mt.PY, t) for t in tests)
     rc, so, se, _ = sandbox(d, ["bash", "-c", "cd %s && %s" % (repo, cmd)], 900)
     path = os.path.join(SCR, "cheap_%s_%s.txt" % (task, arm))
-    open(path, "w").write(compact(stat, diff, so + se))
+    open(path, "w").write(compact(stat, diff, so + se, rc=rc))
     b = CHEAP % (path, HARD[task], os.path.join(SCR, "cheapcheck_%s_%s.json" % (task, arm)))
-    if "tests/test_setup_scenarios.py" in tests:   # the old check's excuse, word for word in substance (CHECK)
-        b += (" In tests/test_setup_scenarios.py the sandbox has no live ledger (a traceback 'no such table: items') "
-              "and no temp-root guard, so 'PLAN_TEST=1 with a root outside the temp directory is refused' and 'the "
-              "migration marks the setup's own entries setup' fail for reasons outside the fix and are not counted.")
+    if "tests/test_setup_scenarios.py" in tests:   # the live ledger the sandbox hides (the temp-root scenario passes there since 774147232)
+        b += (" In tests/test_setup_scenarios.py the sandbox has no live ledger, so 'the migration marks the setup's "
+              "own entries setup' fails (a traceback 'no such table: items') for a reason outside the fix and is not "
+              "counted.")
     print(b)
 
 

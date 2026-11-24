@@ -110,7 +110,7 @@ def fix(brief, test, timeout=FIX_TIMEOUT):
            "lab_tokens": u, "rc": rc, "at": time.strftime("%Y-%m-%dT%H:%M:%S")}
     log(rec)
     print(json.dumps({k: rec[k] for k in ("id", "base", "diff", "diff_lines", "rc", "seconds")}, indent=1))
-    print(lt.compact(stat, diff, tout if test else None) + ("test rc %d" % tres["rc"] if tres else "(no test given)"))
+    print(lt.compact(stat, diff, tout, rc=tres["rc"] if tres else None) + ("" if tres else "(no test given)"))
     print("check it (D545: from the lines above only, agree unless something in them is visibly wrong); if right, git apply --3way it in your worktree (base %s), run the test, commit "
           "only on a pass; then python3 tools/labllm.py check %s --agree|--disagree --note \"...\" (empty diff, "
           "timeout or wrong: --disagree, and do the fix yourself)" % (base[:10], i))

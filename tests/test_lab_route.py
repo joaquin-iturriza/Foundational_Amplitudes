@@ -31,3 +31,5 @@ def test_cheap_check_material():
     assert lt.excerpt("a\nb\nboom at 12\nc", "boom at 12", 1) == "2: b\n3: boom at 12\n4: c" and lt.excerpt("a", "zz") == ""
     c = lt.compact(" f | 2 +-", "+x", "ok t_a\nPASS  M4: a failed item\nFAILED t_b")
     assert "== test: 1 failure lines, 2 pass lines" in c and c.index("FAILED t_b") < c.index("ok t_a")
+    c = lt.compact("", "", "ERROR collecting tests/x.py\n1 error in 0.1s\nok t_a", rc=2)
+    assert "== test: 2 failure lines, 1 pass lines" in c and c.rstrip().endswith("test rc 2")
