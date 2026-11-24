@@ -42174,6 +42174,20 @@ entries:
       x 1.01 s/step (tools/short_wall.py''s training-only rate) x 1.15 for the measurement (one extra forward-backward of
       the batch every 10 steps) + 5 checks x 32 batch passes + 15 min start-up ~ 1.75 h on one GPU, limit 3 h; total < 2.1
       GPU-h.'
+    passed_at: '2026-11-24T00:46:26+00:00'
+    reviewer: 'One measurement run of the WSD het control (arm v4_het_noise_scale differs from v4_het_control_wsd only by
+      find_BS settings and no step-3731 save, read in scripts/job_catalog_v3_short.sh @93524f1dd l.431-444); training loss
+      HETEROSC mean, dimensionless qperp target, MuonAdamW at the Muon search best, batch 16384, as the control. Check 2:
+      tests/test_noise_scale.py passes in .venv-cpu (2 passed): known-answer linear regression recovers tr Sigma and |G|^2
+      within 5%, B_simple within 7% (asserts l.32-34), chunk weighting averages exactly to the batch loss (l.50); the brute
+      check draws uniform shuffled batches of the training subset, the same distribution as the default training loader (experiment.py
+      l.3088, no balanced sampler), so chunk and brute should agree including composition noise. Check 3: single seed justified
+      (a measurement, not a comparison); error from 16-batch bootstrap and 20-measurement windows; outcome stated for agreement
+      and disagreement; step 2 (batch-size runs) deferred to its own design with cost to Joaquin. Cost under 2.1 GPU-h, smoke
+      required by D395. Searched docs/results.tex for noise scale, noise_scale, critical batch, B_simple, McCandlish, find_BS,
+      gradient noise, batch size/batchsize (only the VRAM envelope section''s rationale for bs 16384, not a noise-scale measurement),
+      site decisions for noise, critical, batch (D426, D507/D509, D532): no prior noise-scale measurement. Note for the owner:
+      report the brute standard errors with the agreement so a 2-SE pass is shown to be informative.'
   step_why:
     1:
       feeds: what B_simple of our canonical setup is, and whether the micro-batch estimator agrees with independent batch
