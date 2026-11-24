@@ -45152,3 +45152,40 @@ entries:
       only FA''s per-command prefix does, so the kit''s gate''s shutil.which finds the real sbatch, not FA''s wrapper); toy
       pass bar is train.py''s own assert |w-3|,|b-1|<0.1; CC has ~/.ssh/id_ed25519_github for the private clone and CC compute
       nodes have internet; cost <=0.34 GPU-h; no prior kit proof found.'
+  - at: '2026-11-24T20:12:28+00:00'
+    question: 'Does the published orchestrator-kit, installed under a separate HOME with its own remote state dir (~/.ccorch_kit
+      on the site, so FA''s live ~/.ccorch is never written), take examples/toy from a private GitHub remote to a finished,
+      supervisor-sorted and fetched run on CC-IN2P3 while keeping CC''s login-node policy (login: submissions and short reads
+      only; the env build runs as a CPU job)?'
+    prior: 'tests/test_kit.py 19/19 offline (hand-off 2026-11-24 19:51); nothing on a cluster tested. FA''s live site tool
+      runs the same submit/poll/logs/fetch code on CC daily. Changes since, untested on a site: CCORCH_REMOTE_DIR; site env
+      as a CPU job on login_cap sites; env verify no longer requires torch (the toy has none: the dry --check showed the old
+      verify would exit 10). Searched docs/results.tex, the plan, site decisions for orchestrator, kit, toy, ccorch_kit, standalone:
+      none found (kit only hits the KIT benchmark).'
+    measure: 'Per stage, pass/fail read from output: (1) site list: ccin2p3 up; (2) site env ccin2p3 toy: CPU job ccj_* result
+      exit 0, checkout at toy commit 76935b0, verify and activate.sh ok; (3) site pick toy --jobs 2 allots ccin2p3; (4) both
+      GPU jobs submitted together after the pick: scripts/job_probe.sh log shows a GPU name and RUN_DONE; job.sh log RUN_DONE
+      and metrics.json, train.py''s own assert |w-3|<0.1, |b-1|<0.1 passing; (5) site supervise --once sorts both clean; (6)
+      site fetch pulls metrics.json. Toy ledger is off in the kit HOME: a decision needs the user''s typed words in a transcript
+      of the toy checkout, which this HOME does not have, so items and the site-side gate are not exercised here (listed as
+      untested).'
+    check: 'Checked locally: with CCORCH_REMOTE_DIR=.ccorch_kit, ssh_cmd rewrites $HOME/.ccorch to $HOME/.ccorch_kit and both
+      base64 gate-installer payloads decode to text naming .ccorch_kit (2 of 2); without it they name .ccorch. site env --check
+      for the toy printed the script; the old verify imported torch and would have failed, the fixed one prints python only
+      when torch is absent (run locally: ''verify python 3.12.3 torch None''). site env on a login_cap site goes through run_as_job
+      (CCJ_SUBMITTED / CCJ_RESULT).'
+    fixed: toy commit 76935b0 in the private repo; train.py 500 steps seed 0; 1 GPU, job limit 10 min, probe 5 min; one site
+      CC-IN2P3 (Jean Zay unreachable at ~20:30; lxplus needs the 2FA master and condor from AFS, outside the one-cluster proof);
+      kit HOME in the scratchpad, CCORCH_REMOTE_DIR=.ccorch_kit, toy ledger off
+    control: 'FA''s live setup, checked with what only the kit could change: no row with project toy or the kit''s job ids
+      in FA''s ~/.local/share/ccorch/runs.db; no toy decision, item or event in FA''s ledger; on CC no new file under ~/.ccorch/jobs
+      (the kit''s env job must land in ~/.ccorch_kit/jobs) and no toy line in ~/.ccorch/gpu_window.jsonl; sha1 of ~/.ccorch/bin/ccorch_gate.py
+      and sbatch plus the list of FA''s gate stamp files before (1f842294c0d2..., stamps .g4081de1332fc .g8ed80e53b3af .gbd80d2625147
+      .gef5b342ccf71) and after, so a reinstall by FA''s own tool is told apart.'
+    seeds: 'one seed (0): pass/fail infrastructure proof; train.py''s assert is the bar'
+    outcome: 'yes: all 6 stages pass and the controls are clean -> README Status says the kit was proven end to end on a Slurm
+      site (CC-IN2P3), fixes pushed to the public repo, step 1 done; the gate/ledger on a site listed as still untested. no:
+      the first failing stage''s output read, the kit fixed, rerun from that stage; a failure only Joaquin can clear (CC cannot
+      read the private repo) goes to him with the fallback (public toy repo or a bundle push).'
+    sources: 'D547 (private toy repo, ''I don''t see why not''); the main session''s narrowing (one real cluster, separate
+      HOME, CC login policy); D544 (CC login nodes: no scripts); cost 2 GPU jobs x <=10 min = <=0.34 GPU-h'
