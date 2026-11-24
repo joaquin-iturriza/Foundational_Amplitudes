@@ -44922,8 +44922,9 @@ entries:
   match: cc_login_*
   evidence:
     runs: []
-    commit: a477043cf
+    commit: 99d20a782
     paths:
+    - analysis/cc_login/data/supervise_maintain_20261124.txt
     - scripts/prune_site.sh
     - tools/ccjob_lag.py
   dead_ends: []
