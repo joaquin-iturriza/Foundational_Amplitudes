@@ -43489,7 +43489,7 @@ entries:
     2: Commit the staged results.tex write-up (par:labllm1, par:labllm2; verify_claims 0 problems) once the notes-editor passes,
       remove worktrees/wt-labllm with scripts/remove_worktree.sh (folds the figures), then plan done --writeup <commit>
   done_when: null
-  notes_ref: null
+  notes_ref: par:labllm1
   match: zz_labllm_*
   evidence:
     runs: []
