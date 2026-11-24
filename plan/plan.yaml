@@ -45202,7 +45202,8 @@ entries:
       <=0.34 GPU-h. Searched orchestrator, kit, toy, ccorch_kit, standalone, examples/toy in docs/results.tex, plan, site
       decisions: no prior kit proof (kit hits only the KIT benchmark).'
   step_waits:
-    '1': the design reviewer (re-check of the revised CC proof design)
+    '1': 'on or after 2026-11-24T21:55: read the kit env CPU job ccj_e36372e27bbb (Slurm 64797849, pending at 21:20) with
+      ksite env ccin2p3 toy, then site pick toy --jobs 2 and both GPU jobs'
   targets:
   - batch: kit_proof_cc
     wall_h: 0.25
