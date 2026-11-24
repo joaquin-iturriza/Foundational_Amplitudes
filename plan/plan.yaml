@@ -40113,6 +40113,10 @@ entries:
     7: 'Part (c) wave 2 running on CC (driver llmcmp_c_qperp_drive5, --mem 20G --cpus 4, log ~/.local/share/ccorch/detached/20261124-085507_llmcmp_c_qperp_drive5.log):
       FA-ccin2p3-bf23e0c4 (hp0563, lr 1.56e-3, val NLL -3.19 at 09:18), -b77878e1 (hp0902, lr 7.01e-3, -2.50), -f6f7179d (hp1736,
       lr 2.57e-3, -3.24 at 08:49); the driver sends wave 3 (2 trials) itself and writes DRIVE_DONE'
+    8: 'Part (a) best-so-far score: FA-ccin2p3-037bf5e1 (REREAD=FA-ccin2p3-c891c0c2, scripts/job_llm_score.sh @d150b6d68 --env
+      RUN=runs/llmcmp_a_adamw_const/trial_1163; trial 5, lr 1.24e-3, val MSE of z 4.81e-4) writes llm_score_{seen,heldout}.json:
+      read pooled RMSE seen / held out / relabels / new with control_score.py beside both controls (ac_controls figure), against
+      the LLM 0.321/0.721 and his LLoCa 0.506/0.953'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -40256,6 +40260,11 @@ entries:
       if:
       - 'a trial diverges: list apart at its best checkpoint, penalty kept'
       - 'all clean: wave 3 follows, then step 5'
+    8:
+      feeds: part (a) answer (step 3) if trial 5 stays the best after wave 3
+      if:
+      - 'scored: add to the figure; step 3 reuses it if trials 6 and 7 do not beat 4.81e-4'
+      - 'job fails: read its log, fix, resubmit'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
