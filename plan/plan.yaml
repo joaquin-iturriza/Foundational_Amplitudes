@@ -40628,9 +40628,6 @@ entries:
     5: 'Part (c) readout: when llmcmp_c_qperp''s driver writes DRIVE_DONE and its control ends, score (c)''s best trial and
       the control (REREAD=<run> scripts/job_llm_score.sh), read per set (seen, held out, relabels, new) pooled RMSE and median
       per-process MSE against (a)''s best with the 1.38 margin, figure in Suprio''s layout; write-up'
-    7: 'Part (c) wave 2 running on CC (driver llmcmp_c_qperp_drive5, --mem 20G --cpus 4, log ~/.local/share/ccorch/detached/20261124-085507_llmcmp_c_qperp_drive5.log):
-      FA-ccin2p3-bf23e0c4 (hp0563, lr 1.56e-3, val NLL -3.19 at 09:18), -b77878e1 (hp0902, lr 7.01e-3, -2.50), -f6f7179d (hp1736,
-      lr 2.57e-3, -3.24 at 08:49); the driver sends wave 3 (2 trials) itself and writes DRIVE_DONE'
     8: 'Part (b) from our setup (D537 ''We then also widen the best HPs for our setup''): once part (c)''s search ends (step
       5 names its best trial), the same muP width scale-up (num_heads 16, 32, 64, 120 toward 359.6M) at part (c)''s best HPs
       in its config (sweep/sweep_config_llmcmp_c_latest.yaml), its own design (reusing part (b)''s smoke rates where the setup''s
@@ -40792,11 +40789,6 @@ entries:
       - '(c)/(a) < 1/1.38 on held out: (b) starts from (c)''s HPs'
       - '(c)/(a) > 1.38: (b) starts from (a)'
       - 'between: not resolved by one seed, ask Joaquin for the seed-43 pair'
-    7:
-      feeds: 'part (c): the tuned best trial'
-      if:
-      - 'a trial diverges: list apart at its best checkpoint, penalty kept'
-      - 'all clean: wave 3 follows, then step 5'
     8:
       feeds: 'part (b) for our setup: does width close the held-out gap in the latest setup'
       if:
@@ -41243,7 +41235,6 @@ entries:
       fit CC. Above D536''s 100 GPU-h: asked Joaquin (plan ask), step 10 held.'
   step_waits:
     '5': llmcmp_c_qperp_drive4 DRIVE_DONE (detach event of the driver)
-    '7': FA-ccin2p3-bf23e0c4 FA-ccin2p3-b77878e1 FA-ccin2p3-f6f7179d
     '8': FA-ccin2p3-bf23e0c4 FA-ccin2p3-f6f7179d
   handoff:
     state: 'Part (a) DONE: DyHPO ended (8 trials, 0 failed), best trial 5 FA-ccin2p3-c891c0c2 (lr 1.24e-3, EMA on 0.9989,
