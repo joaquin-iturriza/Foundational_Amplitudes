@@ -43368,7 +43368,11 @@ entries:
     - designer-executor setups
   decisions:
   - D530
-  next: null
+  next:
+    2: 'When the lab server answers deepseek-v4-flash: run the route demo (labllm.py triage FA-ccin2p3-b77878e1 --event E8530
+      and FA-ccin2p3-d34535b0 --event E8491, checked against their ack notes), the hard-fix lab batch (deepseek and deepseek+plan
+      on the ten valid hard tasks, 2 streams, D531; plans in analysis/lab_llm_trial/plans/) and the lookup batch (/tmp/claude-1000/lab_llm_trial/lookup_0.sh,
+      lookup_1.sh); then one Sonnet check per DeepSeek hard fix, report and figure'
   done_when: null
   notes_ref: null
   match: zz_labllm_*
@@ -43809,6 +43813,13 @@ entries:
     units: null
     start: '2026-11-24T00:26:58+00:00'
     at: '2026-11-24T00:26:58+00:00'
+  step_why:
+    2:
+      feeds: 'D541: how far DeepSeek goes on harder multi-file fixes and code lookups against Sonnet and Opus-low Explore'
+      if:
+      - 'a DeepSeek arm within one task of Sonnet''s 10/10 first pass at <=0.3x our tokens: route multi-file fixes too, with
+        the check'
+      - 'otherwise: list the failed tasks and how, keep hard fixes on Sonnet, try plan detail'
 - id: critical_batch
   title: Critical batch size from the gradient noise scale
   question: What is the critical batch size of our canonical setup, measured from the gradient noise scale B_simple = tr(Sigma)/|G|^2
