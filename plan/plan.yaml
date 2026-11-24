@@ -38576,6 +38576,18 @@ entries:
       0.522] -> design branch hi<1: the 28-process no-settings parent gains 2x where data is scarce; the 1.53x residual at
       1e4 is a large-D effect. Fn1k best at 14-16% of the run, ends 1.43-1.52x above; S1k seed 43 blows up at 85% of its run
       (val max 45.7, listed apart, read at its best). No re-pick, no new seeds.'
+  - at: '2026-11-24T13:55:00+00:00'
+    text: '2026-11-24 15:00 step 2 parent check (parent_rerun_check.py glu --ref noset): the gluon/Z parent FA-ccin2p3-1f2d9ad5
+      (9 processes, same 64000 steps and lr as the 28-process no-settings parent 9a73698a, 3.1x per-process exposure) is worse
+      on all 9 shared processes: MSE(log|M|^2) of its final model (best checkpoint, validation 43 of 50, then sigma fit; each
+      parent''s own target std) over the 28-process parent''s, gmean 5.04, 1.19 (udbar_enug) to 416 (udbar_Wg); sigma-stage
+      NLL -4.25 vs -7.43. Cause read from its curves: in the WSD cooldown (last 4 validations) the val NLL of its three highest-multiplicity
+      processes explodes (udbar_Wggg -3.3 -> 63.9, ee_uugg -1.9 -> 101, ee_bbbargg -1.7 -> 141) while train loss keeps falling
+      (-4.1 -> -5.9) and the other six still improve: an overfit of those pools (100k train events each, 3.1x the exposure),
+      not a training blow-up (grad norms bounded); listed apart (D398). Its best checkpoint is therefore pre-cooldown, while
+      the 28-process parent''s is its last (val -6.88). Fine-tunes run from that best checkpoint as the design fixes (models/model_run0_best.pt.gz);
+      the comparison Fg/Fn carries this: the gluon parent is both narrower and missed its cooldown. Run dir copied to lxplus;
+      drive of both gluon-parent searches launched (detached ftmech_glu_drive, ccin2p3+lxplus; Jean Zay unreachable, retried).'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
