@@ -108,7 +108,7 @@ def h3(b):
                ("yes" if (not inside and f16 / fx["val_loss"] > SEED_BAR) else "ruled out"),
          "trials": sorted((v["lr"], v["val_loss"] * k2, i) for i, v in ts)}
     json.dump(r, open(os.path.join(HERE, "data", f"zng4g_r3_b{b}.json"), "w"), indent=1)
-    print(json.dumps({k: v for k, v in r.items() if k != "trials"}, indent=1))
+    print(json.dumps({k: v for k, v in r.items() if k != "trials"}))
     import plot_style as ps
     fig, ax = ps.figure()
     old = [t for t in r["trials"] if t[2] < 16]; new = [t for t in r["trials"] if t[2] >= 16]
@@ -191,7 +191,7 @@ def onesetting(b):
     res["best_at"] = {a: [(int(np.argmin(c)) + 1) / len(c) for c in cs] for a, cs in curves.items()}
     res["trials"] = trials
     json.dump(res, open(os.path.join(HERE, "data", f"zng4g_onesetting_b{b}.json"), "w"), indent=1)
-    print(json.dumps({k: v for k, v in res.items() if k != "trials"}, indent=1))
+    print(json.dumps({k: v for k, v in res.items() if k != "trials"}))
     import plot_style as ps
     arms = (("S", "from scratch", ps.C.blue, "o"), ("soft", "from scratch +\nmomentum log-rescale", ps.C.green, "v"),
             ("pair", "from scratch + pair logs", ps.C.purple, "^"), ("Sf", "from scratch + both", ps.C.grey, "D"),
@@ -263,7 +263,7 @@ def main():
            "trials": {a: [(t["lr"], t["val_loss"] * k2 if t["val_loss"] is not None else None, t_idx(t, raw)) for t in ts]
                       for a, ts in trials.items()}}
     json.dump(res, open(os.path.join(HERE, "data", f"zng4g_r1_b{b}.json"), "w"), indent=1)
-    print(json.dumps({k: v for k, v in res.items() if k != "trials"}, indent=1))
+    print(json.dumps({k: v for k, v in res.items() if k != "trials"}))
     plot(res, base["curves"], [np.array(c) * k2 for c in sf_curves], ow)
     # train against val, per arm the mean over its seeds; end/best of val and train per seed
     tv = {"S": [raw[f"TVS|{b}|s{s}"] for s in (42, 43, 44)], "F": [raw[f"TVF|{b}|s{s}"] for s in (42, 43, 44)],
@@ -275,7 +275,7 @@ def main():
                   "val_over_train_end": r["val_mse_curve"][-1] / r["train_mse_curve"][-1]} for r in rs] for a, rs in tv.items()}
     res["shape"] = shape
     json.dump(res, open(os.path.join(HERE, "data", f"zng4g_r1_b{b}.json"), "w"), indent=1)
-    print(json.dumps(shape, indent=1))
+    print(json.dumps(shape))   # one line each: verify_claims reads the last {...} line
     plot_tv(b, {a: [(np.array(r["train_mse_curve"]) * k2, np.array(r["val_mse_curve"]) * k2) for r in rs] for a, rs in tv.items()})
 
 
