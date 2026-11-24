@@ -43806,12 +43806,14 @@ entries:
   decisions:
   - D532
   next:
-    2: 'Run the batch-size scan (design recorded 2026-11-24, step 2; D532 + D536 budget, item est 55 GPU-h): design-reviewer
-      verdict; repo-reviewer pass of branch cbs_accum (training.batch_accumulation + sweep/sweep_config_cbs_b{2048..32768}.yaml)
-      and merge; D395 smoke of the accumulation path through the sweep path (b32768, ~50 steps, one GPU); site pick FA --jobs
-      40, ensure runs/catalog_v4_short/v4_het_control_wsd (base_config) on the chosen site (site copy), plan target --batch
-      cbs_scan --wall 1.45 --jobs 40, generate + sweep_manager submit all five sweeps in one go (--item critical_batch); then
-      read S_B, E_B per target and fit B_crit against B_simple (new reader under analysis/critical_batch/)'
+    1: 'Read the batch-size scan when all five sweeps end (cbs_b2048, cbs_b4096, cbs_b8192, cbs_b16384 on CC-IN2P3; cbs_b32768
+      on lxplus): collect each trial''s result.json (val_curve, validate_every, lr), python3 analysis/critical_batch/cbs_read.py
+      <trials.json>: S_B and E_B per target, B_crit with bootstrap, unreached_above_fit; apply the lr-edge rule; figure of
+      S_B and E_B against B per target beside B_simple; write-up in docs/results.tex sec:noisescale'
+    2: 'When the 32768 accumulation smoke (sweep cbs_smoke_b32768 on lxplus) ends: read its log (every stage, the STOP_AT_VAL_LOSS
+      line, train mu-MSE on the accumulation path, RESULT_JSON), then submit sweep cbs_b32768 on lxplus (generate_sweep --submit,
+      --item critical_batch) and the 6 CC wave-3 jobs the site gate refused (sweep_manager.py submit sweeps/cbs_b4096 sweeps/cbs_b8192
+      sweeps/cbs_b16384 on CC, then lower their limits to 2:27/1:56/1:41 as in the configs at b8d7de880)'
   done_when: null
   notes_ref: null
   match: zz_cbs_*,cbs_*
@@ -44233,14 +44235,18 @@ entries:
       at the first two. Searched docs/results.tex for critical, batch size, noise scale, steps-to-target, Muon search, v4_het_control_wsd;
       plan; decisions for batch, D426, D514, D532-D536: no prior scan on this setup.'
   step_why:
-    2:
-      feeds: 'whether B_simple can be trusted alone on our setup (Joaquin''s question: once now as a calibration, or every
-        time)'
+    1:
+      feeds: 'whether B_simple can be trusted alone on our setup (Joaquin''s question: once, as a calibration), and whether
+        the canonical batch 16384 is past critical'
       if:
-      - 'B_crit within ~3x of B_simple: B_simple read alone afterwards; propose a smaller canonical batch to Joaquin'
-      - 'B_crit far above B_simple: report B_crit from the scan, B_simple not trusted alone'
-  step_waits:
-    '2': 'a new owner: design revision after the design reviewer''s FIX and the repo-reviewer''s BLOCK (hand-off 2026-11-24)'
+      - 'S_2048/S_32768 <= 1.2 at every target: B_simple calibrated; propose a smaller canonical batch to Joaquin'
+      - 'S_2048/S_32768 >= 1.45: B_crit from the scan is the number, B_simple not trusted alone'
+    2:
+      feeds: whether the batch-32768 point of the scan can run (the accumulation path end to end, D395)
+      if:
+      - 'smoke runs every stage: submit cbs_b32768 and the 6 wave-3 CC jobs'
+      - 'smoke breaks: fix the accumulation or stop path from its log, re-smoke; the 6 wave-3 CC jobs go out regardless'
+  step_waits: {}
   targets:
   - batch: noise_smoke
     wall_h: 0.4
