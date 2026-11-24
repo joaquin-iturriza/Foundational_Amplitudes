@@ -43368,10 +43368,12 @@ entries:
   match: zz_labllm_*
   evidence:
     runs: []
-    commit: 6a8b3262f
+    commit: 9da3cc9d7
     paths:
     - analysis/lab_llm_trial/runs.jsonl
+    - tests/test_lab_route.py
     - tools/labllm.py
+    - tools/plan.py
     - worktrees/wt-labllm/analysis/lab_llm_trial/planners.json
     - worktrees/wt-labllm/analysis/lab_llm_trial/runs.jsonl
     - worktrees/wt-labllm/analysis/lab_llm_trial/summary.json
