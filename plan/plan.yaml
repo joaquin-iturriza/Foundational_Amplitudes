@@ -43488,6 +43488,9 @@ entries:
   next:
     2: Commit the staged results.tex write-up (par:labllm1, par:labllm2; verify_claims 0 problems) once the notes-editor passes,
       remove worktrees/wt-labllm with scripts/remove_worktree.sh (folds the figures), then plan done --writeup <commit>
+    3: 'plan done lab_llm_trial --writeup a3bcab715 (write-up par:labllm1, par:labllm2 committed a3bcab715 and ac845711e,
+      figures committed, worktree folded) once the notes-editor backlog passes (its blocks are in other entries'' sections:
+      sec:noisescale and fig:llmcmp_heldout) and the repo-reviewer advances over the merge d75c664b9'
   done_when: null
   notes_ref: par:labllm1
   match: zz_labllm_*
@@ -43960,6 +43963,11 @@ entries:
       if:
       - 'notes-editor passes: commit, fold the worktree, plan done'
       - 'notes-editor blocks: apply its fixes, re-check with the same reviewer, then commit'
+    3:
+      feeds: 'which subagent work goes to DeepSeek (D541): log reading and code lookups yes, multi-file fixes stay on Sonnet'
+      if:
+      - 'both reviewers passed: plan done'
+      - 'a reviewer blocks on lab_llm_trial text or code: fix it, re-check with the same reviewer'
 - id: critical_batch
   title: Critical batch size from the gradient noise scale
   question: What is the critical batch size of our canonical setup, measured from the gradient noise scale B_simple = tr(Sigma)/|G|^2
