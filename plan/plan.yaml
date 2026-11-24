@@ -38033,7 +38033,7 @@ entries:
   question: Does the restart of a converged parent (full lr, fresh optimizer) destroy a fine-tune's head start, and does a
     restart that avoids the jump (WSD parent branched before its cooldown with its optimizer state; restart with the parent's
     optimizer state; low peak lr with a long warmup) keep it?
-  status: running
+  status: done
   quotes:
   - said_at: '2026-11-20T02:50:59.573000+00:00'
     text: Open it, size it reasonably and send the jobs right away, don't ask me for permission, I'm giving it ahead of time,
@@ -40623,6 +40623,10 @@ entries:
     another session); 2026-10-15T02:49 and 2026-10-06T00:17 (old transfer-study plan instructions, not this sentence)'
   blocks: nothing
   blocks_steps: *id001
+  writeup: ae083a6ab
+  runs_override: the 14 listed sweeps were driven by sweep/drive.py with their state on the local machine (sweeps_local/<name>;
+    'local' has no site registry); each summary.txt lists every trial finished, 0 failed, and every result is read in results.tex
+    par:ftm_zng4g / par:ftm_d539
 - id: llm_compare
   title: LLoCa against Suprio's LLM on the LLM amplitude catalogue
   question: In the conditions of Suprio's LLM pID run (1501 MadGraph-default processes, 1352 trained, 149 held out; 55,296
