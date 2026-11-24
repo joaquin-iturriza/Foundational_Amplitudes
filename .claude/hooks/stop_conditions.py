@@ -271,7 +271,7 @@ def opener(inp, state, records=None):
         return [], []
     done.append(key)
     del done[:-200]
-    return ["the reply does not start with \"%s\" (CLAUDE.md, Talking to me: start every message with "Joaquin"): start the message with it" % OPENER], []
+    return ["the reply does not start with \"%s\" (CLAUDE.md, Talking to me: start every message with 'Joaquin'): start the message with it" % OPENER], []
 
 
 # ------------------------------------------------------------------ incidents
