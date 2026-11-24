@@ -38073,10 +38073,6 @@ entries:
   - D529
   - D539
   next:
-    2: 'When the gluon/Z parent FA-ccin2p3-1f2d9ad5 ends: parent check vs 9a73698a on the 9 shared processes; site copy its
-      run dir to lxplus; drive ftmech_zng4g_ftglu_b128 (1e4, 16 trials) and ftmech_zng4g_d1e3_ftglu_b128 (16 trials on [1.9e-3,1.9e-2]
-      @8e0482ffb) together; then extend the D=1e3 one as its siblings (extend_sweep.py --low 6e-4 --high 6e-2, config edited
-      to window [6.0e-4,6.0e-2], n_trials 24, waves +[3,3,2]) and 8 more; then seeds 43/44 of each chosen trial'
     4: 'D539 step 5 (the passed step-4 design''s fallback): u u~ g bulk at stable HPs. At hp1961 and hp1333 the uug runs blew
       up (5/12 at hp1333), so each uug arm gets its own 16-trial DyHPO search over S''s space (sweep_config_ftmech_d539_uug_{1e4,1e5}_{off,eps1e-8}_b2048.yaml
       @352fbb1aa), then seeds 43/44 of each chosen trial, best against best, plus kit scoring of the chosen trials'
@@ -40604,11 +40600,6 @@ entries:
       sweep/sweep_config_ftmech_zng4g_d1e3_ftglu_b128.yaml(uncommitted); seed_chunks/zng4g_ftglu_b128_s4{3,4}.txt(uncommitted)
     written: '2026-11-24T21:27:26+00:00'
   step_why:
-    2:
-      feeds: 'H2 dilution: Fg/Fn at 1e4 and at D=1e3 (designs passed 2026-11-24)'
-      if:
-      - 'hi<1: dilution yes (at 1e4 with Fg/S<=1: the residual is dilution)'
-      - 'lo>0.65 and hi>=1: no dilution of the needed size; next the b128 instability'
     4:
       feeds: 'D539: whether the rescale also costs u u~ g''s bulk (the process contrast); does not change the Z+ng parent
         choice, which step 4 settled'
