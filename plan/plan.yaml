@@ -44921,6 +44921,37 @@ entries:
       repo except zz_probe_long_w* (an output name in job_catalog_v3_short.sh) and zz_memmap_test (a test''s --out); the memmap
       keys are format 2, unreadable by MMAP_VERSION 3, and kept if a live job names them; the manifest is written before any
       deletion; squeue failing aborts before the manifest; the paths are asserted to be direct children; it is a CPU job.'
+  - at: '2026-11-24T23:48:18+00:00'
+    question: 'Delete our own CC debris that D550 approves (''and yes, delete the debris.'', ~8.4 GiB): the 24 named old smoke/test/probe
+      outputs in SCRATCH (+ their recipe files), the two format-2 memmap keys 7d589cbf and f5ccb555 no code can read, and
+      the scratch run dirs left by the probe tools (zeroshot_*, signed_ab_*, kshot_*, rebuild_*, f24net_run_*, kitprec_*,
+      evalbest_*) older than 3 days; job scripts/job_delete_debris.sh running tools/delete_debris.py at trunk d0a0b0265. The
+      checkout-root scheduler logs are NOT deleted: committed analyses parse them (ws_objective_check.py, cited as % src:
+      in docs/results.tex; size_figs.py), so they are evidence'
+    prior: 'the inventory FA-ccin2p3-b949c4ee (design passed 2026-11-24, outputs SCRATCH/zz_cc_disk): smokes ~1.4 GiB apparent,
+      zeroshot_* 1.7 GiB in 415,663 dirs, kshot_* 0.5, the two memmap keys ~4.8 GiB; D550 approves this class (its ~8.4 GiB
+      = 1.4 + 4.8 + 2.2); D201 (zz_probe_* outputs); the first review of this design (FIX 2026-11-25: logs carry results)
+      removed the log class; the login-node rm was refused by the permission check (2026-11-24) and login nodes are cut at
+      60 s (D544)'
+    measure: apparent GiB deleted per class from the manifest SCRATCH/zz_cc_disk/deleted.tsv (written before any deletion),
+      and df used before and after in the job log
+    check: 'tests/test_delete_debris.py (committed, passes): on a fake tree it deletes the named smoke and its recipe file,
+      a format-2 key and a 5-day-old zeroshot dir, and keeps a checkout-root log holding only an ''MSE (prepd) val_'' line,
+      zz_catft, a new zeroshot dir and a format-3 key; a class listed over 2x its expected size is skipped and the others
+      still go'
+    fixed: nothing outside the three classes; every path a direct child of SCRATCH or of amp_mmap_cache (asserted); memmap
+      keys kept if any live job's stdout names them (cache_guard.site_users); scratch dirs of the last 3 days kept (a running
+      probe may use its own); a class listed over 2x its expected GiB (smoke 1.4, mmap 4.8, scratch 2.2) is skipped and reported
+    control: 'none: a deletion; the df change against the manifest''s total is the cross-check'
+    seeds: none
+    outcome: 'yes: DEBRIS_DONE, per-class totals within 2x of 1.4 / 4.8 / 2.2 GiB, df used down by about the manifest''s total;
+      no: a class SKIPPED (over 2x: reported as a finding, nothing of it deleted) or the job stops before DEBRIS_DONE (the
+      manifest says what was listed; a rerun recomputes the list and deletes only what is still there)'
+    sources: '2x: Joaquin''s words in FA/CLAUDE.md, ''A margin above 2x (events asked over events kept, a run''s or a stage''s
+      wall time over its target, a new method''s cost over the one it replaces) is a finding to fix before it reaches me'';
+      expected 1.4 / 4.8 / 2.2 GiB: measured by the inventory FA-ccin2p3-b949c4ee (scratch_top_apparent.tsv), and D550''s
+      ~8.4 GiB; 3 days: measured, the longest wall limit in scripts/*.sh and sweep/*.sh is 48 h (#SBATCH --time=48:00:00),
+      so a scratch dir 3 days old belongs to no live job; D550 for the classes'
   findings:
   - at: '2026-11-24T14:32:44+00:00'
     text: '2026-11-24 login-node reads: /sps/lpnhe 512 GiB group space at 98% (498 GiB used, 15 GiB free), .disk_full flag
