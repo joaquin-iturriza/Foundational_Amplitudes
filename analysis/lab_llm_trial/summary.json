@@ -9,6 +9,10 @@
    "our_tokens_per_task": 0,
    "lab_tokens_per_task": 64065,
    "passed_by_class": {
+    "error": [
+     6,
+     6
+    ],
     "diverged": [
      22,
      22
@@ -16,10 +20,6 @@
     "time_limit": [
      2,
      2
-    ],
-    "error": [
-     6,
-     6
     ]
    },
    "hand_ok": 30
@@ -33,6 +33,10 @@
    "our_tokens_per_task": 0,
    "lab_tokens_per_task": 52877,
    "passed_by_class": {
+    "error": [
+     6,
+     6
+    ],
     "diverged": [
      22,
      22
@@ -40,10 +44,6 @@
     "time_limit": [
      2,
      2
-    ],
-    "error": [
-     6,
-     6
     ]
    },
    "hand_ok": 29

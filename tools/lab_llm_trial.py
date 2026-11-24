@@ -6,6 +6,7 @@ check of its own (never by a model).
     python3 tools/lab_llm_trial.py cases                       write the log-triage cases (analysis/lab_llm_trial/triage_cases.json)
     python3 tools/lab_llm_trial.py smoke MODEL                 one trivial task through opencode in the sandbox
     python3 tools/lab_llm_trial.py fix TASK ARM [--plan FILE]  one tool-fix task (tools/model_trial.py TRIAL), graded
+    python3 tools/lab_llm_trial.py fixcheck TASK...            the sandbox grader fails at the parent, passes at the fix
     python3 tools/lab_llm_trial.py triage CASE ARM             one log-triage case, graded
     python3 tools/lab_llm_trial.py report                      per arm: passed, tokens, wall time; the figure
 
@@ -172,6 +173,26 @@ def _grade(task, repo):
                       "tail": out[-1500:]}))
 
 
+def fixcheck(task):
+    """The sandbox grader on plain copies of the task's parent and fix: valid when it fails at the parent and passes
+    at the fix (the design's re-validation before any lab run of a task); a missing baseline is made first."""
+    c, _, _ = mt.TASKS[task]
+    if not os.path.exists(os.path.join(mt.BASE, task + ".json")):
+        mt.validate([task])
+    out = {}
+    for rev in ("parent", "fix"):
+        d = fresh("fixcheck_%s_%s" % (task, rev))
+        repo = os.path.join(d, "repo")
+        os.makedirs(repo)
+        subprocess.run("git -C %s archive %s%s | tar -x -C %s" % (ROOT, c, "^" if rev == "parent" else "", repo),
+                       shell=True, check=True)
+        out[rev] = fix_grade(task, d, repo)["passed"]
+    r = {"family": "fixcheck", "task": task, "parent": out["parent"], "fix": out["fix"],
+         "valid": out["fix"] and not out["parent"]}
+    record(r)
+    print(json.dumps(r))
+
+
 def fix(task, arm, plan=None):
     model = MODELS[arm.split("+")[0]]
     d, repo = fix_setup(task, arm)
@@ -181,7 +202,8 @@ def fix(task, arm, plan=None):
                    + open(plan).read())
     ev, u, sec, rc, se, sid = opencode(d, model, prompt)
     g1 = fix_grade(task, d, repo)
-    r = {"family": "fix", "task": task, "arm": arm, "model": model, "first_pass": g1["passed"],
+    r = {"family": "fix" if task in mt.TRIAL else "hardfix", "task": task, "arm": arm, "model": model,
+         "first_pass": g1["passed"],
          "usage": u, "seconds": round(sec, 1), "rc": rc, "stderr": se[-500:], "failing_first": g1.get("failing")}
     if not g1["passed"]:                          # one rework round with the check's output, as in D203's trial
         ev2, u2, sec2, rc2, se2, _ = opencode(d, model, "The check that judges the fix failed. Its output:\n\n%s\n\n"
@@ -302,7 +324,7 @@ def sonnet_timed():
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["cases", "smoke", "fix", "triage", "_grade", "report", "sonnet_timed"])
+    ap.add_argument("cmd", choices=["cases", "smoke", "fix", "fixcheck", "triage", "_grade", "report", "sonnet_timed"])
     ap.add_argument("args", nargs="*")
     ap.add_argument("--plan")
     a = ap.parse_args()
@@ -312,6 +334,9 @@ def main():
         smoke(a.args[0])
     elif a.cmd == "fix":
         fix(a.args[0], a.args[1], a.plan)
+    elif a.cmd == "fixcheck":
+        for t in a.args:
+            fixcheck(t)
     elif a.cmd == "triage":
         triage(a.args[0], a.args[1])
     elif a.cmd == "_grade":

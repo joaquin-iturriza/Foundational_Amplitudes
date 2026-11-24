@@ -46,7 +46,7 @@ def transcript(agent):
 
 def summary():
     runs = [json.loads(l) for l in open(os.path.join(OUT, "runs.jsonl"))]
-    last = {(r["task"], r["arm"]): r for r in runs if r["family"] == "fix"}
+    last = {(r["family"], r["task"], r["arm"]): r for r in runs if r["family"] in ("fix", "hardfix")}
     rows = [r for r in runs if r["family"] == "triage"] + list(last.values())
     planner = {t: transcript(a) for t, a in json.load(open(os.path.join(OUT, "planners.json"))).items()}
     s = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
