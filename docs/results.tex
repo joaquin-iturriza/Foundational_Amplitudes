@@ -18271,6 +18271,28 @@ seed margin of 1.38, so part (b)'s width scaling starts from these HPs unless pa
 trained one, bottom the 43 that relabel none, in his order and families, grey bands $2\to2$. Stars his LLM (pID
 embedding, seed 0); circles our searched LLoCa (par.~\ref{par:llmcmp_a}); diamonds its control at his optimizer
 settings; triangles our latest setup at the latest pretraining's HPs, read before it blew up (part (c)'s control).
+\section{CC-IN2P3 upkeep as CPU jobs, off the login node}\label{sec:cc_login_jobs}
+CC-IN2P3's user support asked on 2026-11-24 that no non-interactive script run on its login nodes (D544). The
+supervisor's three upkeep commands there (the disk watch, the queue feeder, the prune) now run as one-CPU jobs on the
+\code{htc} partition (\code{site run --recurring}): each supervisor pass reads the result of the job the previous pass
+started and submits the next. On the login node \code{site run} refuses any script outside a short list of submitters
+and queue readers and stops every other command after a minute; longer work goes through \code{site run --job}.
+The design asked that each result be read at most one pass plus ten minutes after its job ended, that no command be
+skipped two passes in a row, and that the disk-full flag the feeder trusts be fresh at every read.
+% src: python3 tools/ccjob_lag.py analysis/cc_login/data/supervise_maintain_20261124.txt --since 2026-11-24T18:30 --until 2026-11-24T23:09 @8187ec5d7
+% claim: passes=28
+% claim: gap_max_min=22
+% claim: flag_age_max_min=13
+% claim: queue_wait_max_s=30
+% claim: age_max_min.disk_watch=21.3
+% claim: age_max_min.feed_capped=20.9
+% allow: 30 because the feeder's freshness limit in minutes (sweep/feed_capped.py DISK_FULL_FRESH_S)
+Over the first 28 passes (18:32 to 23:09, passes at most 22 minutes apart) every bound held: the disk watch's result
+was at most 21.3 minutes old when read and the feeder's 20.9, both at the one 22-minute gap; only the first pass,
+which submitted the jobs, skipped a command; the flag was at most 13 minutes old at a feed read, against the feeder's
+30-minute limit; no job waited more than 30 seconds in the queue. A job inside a job submits through the same item
+and budget gate, and one real prune ran inside its job. The switch stays: the outcome is the design's yes branch.
+
 Seed 42, first $10^4$ test events per process.}\label{fig:llmcmp_heldout}
 \end{figure}
 
