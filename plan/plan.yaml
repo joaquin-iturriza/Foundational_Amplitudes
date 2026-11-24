@@ -45025,6 +45025,14 @@ entries:
       login_cap, projects.toml login_scripts). Nested sbatch from an htc job through the gate works (job 64793196 submitted
       64793203, which ran on ccwslurm0031, NESTED_OK). First supervisor jobs: disk_watch 64793199 and feed_capped 64793200
       waited 18-21 s in the htc queue and ran ~1 s (tools/ccjob_lag.py).'
+  - at: '2026-11-24T22:11:07+00:00'
+    text: 'Live check 2026-11-24 18:32-23:09 (tools/ccjob_lag.py at 660d5b7c7 over the supervise output): 28 passes (gap max
+      22 min); every pass read a result of each CC maintain job, none skipped a command two passes in a row (only the first
+      pass, by design); max read age disk_watch 21.3 min, feed_capped 20.9, prune 16.9, rebalance inventory 20.8 (all within
+      one pass + 10 min, the largest at the one 22-min pass gap); .disk_full at most 13 min old at a feed read (bound 30);
+      htc queue wait 1-29 s; runs ~1 s except disk_watch''s 6-hourly du (301 s) and the prune job (47-305 s, a real prune
+      at ~21:45 appended 4 PRUNE records); no MAINTAIN/ALERT/CHECK/REFUSED event since the switch. All design bounds hold:
+      the switch stays.'
   step_waits:
     '1': '2026-11-24T22:30 (UTC): >= 3 passes and CC''s next real prune'
   step_why:
