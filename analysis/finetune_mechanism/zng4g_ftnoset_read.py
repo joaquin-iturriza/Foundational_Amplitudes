@@ -103,11 +103,11 @@ def plot(res, curves):
     import plot_style as ps
     from matplotlib.ticker import NullFormatter
     b = res["batch"]
-    arms = [("S", "from scratch", ps.C.blue, "o"), ("Sf", "from scratch + both settings", ps.C.grey, "D"),
-            ("F", "fine-tuned, parent with settings", ps.C.vermillion, "s"),
-            ("Fn", "fine-tuned, parent without settings", ps.C.green, "^")]
+    arms = [("S", "from scratch", ps.C.blue, "o"), ("Sf", "from scratch +\nboth settings", ps.C.grey, "D"),
+            ("F", "fine-tuned,\nparent with settings", ps.C.vermillion, "s"),
+            ("Fn", "fine-tuned,\nparent without settings", ps.C.green, "^")]
     if b == "128":
-        arms.insert(1, ("S8", "from scratch, 8-trial search", ps.C.blue, "o"))
+        arms.insert(1, ("S8", "from scratch,\n8-trial search", ps.C.blue, "o"))
     fig, axs = ps.figure(ncols=2, nrows=2)
     a, l, c, leg = axs[0][0], axs[0][1], axs[1][0], axs[1][1]
     for i, (k, lab, col, m) in enumerate(arms):
