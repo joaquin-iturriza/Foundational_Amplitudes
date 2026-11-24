@@ -43077,10 +43077,12 @@ entries:
   decisions:
   - D532
   next:
-    2: 'Design the batch-size scan that checks B_crit (paper''s steps-vs-examples tradeoff: steps S and examples E to a target
-      loss at batch sizes around B_simple, lr tuned per batch size, fit S/Smin - 1 = (E/Emin - 1)^-1) with its cost, and send
-      it to Joaquin: the lr per batch is an HP question (DyHPO per batch size, or a one-HP lr search under D241) and the cost
-      likely exceeds 30 GPU-h'
+    2: 'Run the batch-size scan (design recorded 2026-11-24, step 2; D532 + D536 budget, item est 55 GPU-h): design-reviewer
+      verdict; repo-reviewer pass of branch cbs_accum (training.batch_accumulation + sweep/sweep_config_cbs_b{2048..32768}.yaml)
+      and merge; D395 smoke of the accumulation path through the sweep path (b32768, ~50 steps, one GPU); site pick FA --jobs
+      40, ensure runs/catalog_v4_short/v4_het_control_wsd (base_config) on the chosen site (site copy), plan target --batch
+      cbs_scan --wall 1.45 --jobs 40, generate + sweep_manager submit all five sweeps in one go (--item critical_batch); then
+      read S_B, E_B per target and fit B_crit against B_simple (new reader under analysis/critical_batch/)'
   done_when: null
   notes_ref: null
   match: zz_cbs_*,cbs_*
@@ -43317,12 +43319,12 @@ entries:
       for work a decision names), plus the 32768 accumulation smoke ~0.2 GPU-h.'
   step_why:
     2:
-      feeds: whether measured B_simple predicts where larger batches stop paying off
+      feeds: 'whether B_simple can be trusted alone on our setup (Joaquin''s question: once now as a calibration, or every
+        time)'
       if:
-      - 'Joaquin approves a version: submit it'
-      - 'he declines: report B_simple alone'
-  step_waits:
-    '2': step 1's B_simple read (noise_scale.json of the v4_het_noise_scale run)
+      - 'B_crit within ~3x of B_simple: B_simple read alone afterwards; propose a smaller canonical batch to Joaquin'
+      - 'B_crit far above B_simple: report B_crit from the scan, B_simple not trusted alone'
+  step_waits: {}
   targets:
   - batch: noise_smoke
     wall_h: 0.4
