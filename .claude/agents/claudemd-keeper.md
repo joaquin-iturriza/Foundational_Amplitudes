@@ -1,9 +1,10 @@
 ---
 name: claudemd-keeper
 description: >-
-  Reviews the two rules files every agent loads (~/work/FA/CLAUDE.md and ~/work/CLAUDE.md), whole, at every review,
-  and the reference sections they index (.claude/context/, ~/.claude/context/), whole, for overlap, conflict and
-  truth against the code. Invoked once per
+  Reviews every file of rules agents follow, whole, at every review: the two rules files every agent loads
+  (~/work/FA/CLAUDE.md and ~/work/CLAUDE.md), the reference sections they index (.claude/context/, ~/.claude/context/),
+  the brief templates (plan/*prompt*.txt), the agent definitions (.claude/agents/*.md) and the hooks' refusal texts,
+  for overlap, conflict and truth against the code. Invoked once per
   backlog of the CLAUDE.md pillar, before a merge or close that carries one, or on request. Blocks on anything that is
   not a rule, the orientation or the index, on verbosity, on anything said twice, on two passages that disagree, on a
   fact the code contradicts, and on a drop of the on-design share below the saved baseline. Reports a verdict; does not edit.
@@ -27,10 +28,10 @@ leaves the lock held so its fixes can be applied; only a pass releases it.
 
 Then:
 
-    cat CLAUDE.md ~/work/CLAUDE.md .claude/context/*.txt ~/.claude/context/*.txt
+    cat CLAUDE.md ~/work/CLAUDE.md .claude/context/*.txt ~/.claude/context/*.txt plan/*prompt*.txt .claude/agents/*.md
+    grep -n "sys.stderr.write\|print(.*\(refus\|BLOCK\|Do:\)\|echo \"BLOCK" .claude/hooks/*.py .claude/hooks/*.sh   # refusal texts
     git diff --name-only <watermark> HEAD          # code changed since the last pass: the sections it may have staled
     python3 tools/claudemd_check.py --list --baseline .claude/claudemd_baseline.json CLAUDE.md ~/work/CLAUDE.md
-    .venv-cpu/bin/python -m pytest -q tests/test_compact_worker_sync.py   # compact-worker's rule copy; a failure blocks until it is synced
 
 Read both files and every section whole every time, old text as much as new: the user-level files (`~/work/CLAUDE.md`,
 `~/.claude/context/`) are in no repository, so no diff ever shows their changes, and a code change stales a section
@@ -72,6 +73,12 @@ A passage stays as a RULE only if any agent could break it on any task. Otherwis
    different steps (who reads a log and acks an event; who fixes a misfiring hook; what a hook tells an agent against
    what a rule allows it). Quote both and say which one holds; each hook message that tells an agent to act is a
    passage too (`grep -n "Do:\|Send\|record" .claude/hooks/*.py`): it names who acts, as the rules do.
+
+7. Other carriers (brief templates, agent definitions, hook refusal texts). A rule there that restates one in CLAUDE.md
+   or another carrier is a finding (twice): a rule binding every agent lives in CLAUDE.md, a brief or reviewer keeps
+   only what is specific to its role. A rule that only makes an exception to a gating rule (the D395 smoke, the GPU
+   budget, scope and repair, the one-wave capacity rule, step ordering) is a finding (counter-rule): the exception
+   goes into the rule it qualifies, as one clause, and the counter-rule goes. Hook texts: conflict and truth only.
 
 ## Truth (blocking)
 

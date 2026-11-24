@@ -5,12 +5,12 @@ Before a full queue
 1. Probe every process (each energy of an e+e- pool) with a short run: `scripts/job_lhe_probe.sh` running
    `tools/lhe_probe.py run`; it measures the kept fraction after the pool's cuts, wall time per event and disk per
    run; `lhe_probe kept --yields-out` writes `analysis/catalog_v4/data/lhe_probe_yields.json`. `lhe_parts plan`
-   refuses a queue with a process the probe file lacks. Generation keeps this separate probe: the queue's run sizes come from the kept fraction it measures.
+   refuses a queue with a process the probe file lacks. The queue's run sizes come from the kept fraction it measures.
 2. Generate at the pool's cuts wherever MadGraph's run card can express them (pT, η, ΔR, pair mass), so the kept
    fraction is near 1; only what the card cannot express is cut afterwards, by rejection.
 3. Events asked = events needed / measured kept fraction, times at most 1.25 (`KEPT_SAFETY`). A process whose factor
    exceeds 2× is listed by `lhe_parts plan` (cuts matched, its sampling changed).
-4. Run size from the probe's time per event, so a run fits its wall limit with room; workers = the width
+4. Run size from the probe's time per event, so a run fits its wall limit with room; the wall time is the slowest single process's: one job per process (or a few light ones); workers = the width
    `site pick FA --jobs N --cpus C --hours H` offers, so the whole queue finishes in one wave; the wall-time target is
    recorded (`plan target`) before submission.
 5. MadEvent working directories on node-local disk (`$TMPDIR`), copied back as parts; a saved run's directory is

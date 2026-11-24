@@ -443,7 +443,7 @@ def site_down(inp):
     bad = [k for k, pat in _SITES.items()
            if re.search(r"(?:%s)\W[^.\n]{0,60}?%s|%s\W[^.\n]{0,60}?(?:%s)" % (pat, _DOWN, _DOWN, pat), last or "", re.I)
            and not ran(k)]
-    return ["a site is called down only after a retry in this turn: site run <site> FA -- hostname "
+    return ["a site is called down only after a retry in this turn: site run <site> FA -- hostname, or site list twice "
             "(~/work/CLAUDE.md, Verify before claiming); said of: " + ", ".join(bad)] if bad else []
 
 

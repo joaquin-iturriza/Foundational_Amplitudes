@@ -1,9 +1,9 @@
 paths: .claude/agents/**, .claude/.review_state/**
 cmds: review_backlog\.sh, /review-now, \bgit\s+merge\b
 ---
-- Pillars: `CLAUDE.md`, `~/work/CLAUDE.md` and `.claude/context/**` → claudemd-keeper; `docs/*.tex` → notes-editor;
+- Pillars: `CLAUDE.md`, `~/work/CLAUDE.md`, `.claude/context/**`, `plan/*prompt*.txt` and `.claude/agents/**` → claudemd-keeper (which also reads the hooks' refusal texts); `docs/*.tex` → notes-editor;
   source → repo-reviewer (`*.py`, `*.sh`, `config`, `recipes` code, `models`, `sweep`, `tools`, `tests`, `scripts`,
-  `.claude/hooks/**`, `.claude/settings.json`). Not counted in any backlog: plan bookkeeping (`plan/**`) and data
+  `.claude/hooks/**`, `.claude/settings.json`). Not counted in any backlog: plan bookkeeping (`plan/**` but its prompt templates) and data
   files (`*.json`, `*.log`, `*.out`, `*.err`, `analysis/**/data/**`, `tests/*_output.txt`, generated recipe lists
   `recipes/catalog_v*_*.yaml` and `recipes/catalog_v*/**`), `runs/`, `sweeps/`.
 - A backlog is everything since its pillar's watermark. Thresholds: any change for the CLAUDE.md pillar; 200 changed

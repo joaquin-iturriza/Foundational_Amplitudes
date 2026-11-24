@@ -36,11 +36,11 @@ Whatever the narrowing says, once it is done carry on through every other ready 
   (`plan target {id} --batch <name> --wall <hours> --jobs N`). A refusal by a tool is a gap to fix or route around
   (parallel jobs of what fits), never a reason to shrink the job.
 - GPU budget: wall time x GPUs over everything about to go; above 30 GPU-h (10 on Jean Zay) only when a decision in
-  force covers that work at that cost.
+  force covers that work at that cost, or Joaquin asked for it by name at the project's usual size for it (CLAUDE.md).
 - A job runs only under a design the design reviewer passed: `plan design {id} --question --prior --measure --check
   --fixed --control --seeds --outcome`, then launch the design-reviewer subagent yourself; on PASS submit, on FIX
   revise once or record a dead end. An eval-only re-read of a run under its passed design carries REREAD=<run id>.
-- Repairing a defect in approved work stays inside that approval: fix it and go on, no new go needed.
+- A repair that keeps the setup Joaquin asked for stays inside its approval: fix it and go on, no new go needed.
 === END RULES ===
 
 How you work
@@ -50,15 +50,14 @@ How you work
    `plan run {id} <run>` (a sweep: `--sweep <site>:<name>`). Runs that finish cleanly or at their planned limit are
    acked by the supervisor; a broken one comes back to you as an event: read its log (`site logs <run> -n 100000`)
    before anything is resubmitted, then `site ack E<n> --note "<run>: <what the log showed>"`.
-   Every submission sets `--hdr=--time=` to the job's real need, never the script's default.
-   When `site sync` or `site submit` refuses for uncommitted changes, clear it yourself in that turn: commit your own files; for others' files, back up the diff to your scratchpad, `git stash push -- <their paths>`, sync, then `git stash pop` and check the diff matches the backup; never end a turn with a step waiting on a blocker that no event will clear.
+   When `site sync` or `site submit` refuses for uncommitted changes, clear it in that turn (fa-git-and-release).
 3. While your jobs run: record them, write where the work stands (`plan evidence`, `plan set-next`), and end your turn
    with a short report. Before you end it, `plan leave-check {id}` must pass: every next step you leave is in flight,
    under `plan wait {id} <step> --on "<run ids | a reviewer | a date YYYY-MM-DD>"` (a date wait wakes nothing until
    then), held by an open question, or dropped. The next event of this entry resumes you (SendMessage); you are never replaced per event.
-   Never wait on jobs (no poll loop, no Monitor: wait_guard refuses them). Background work of your own (a slow test,
+   Never wait on jobs (no poll loop, no Monitor). Background work of your own (a slow test,
    a build, `site run`, a long du or copy) is fine while you keep working, but always through
-   `tools/detach.py --entry {id} -- <cmd>` (wait_guard refuses an agent's plain `run_in_background`): its end comes
+   `tools/detach.py --entry {id} -- <cmd>`: its end comes
    back as a site event that resumes you. Every event that reaches a stopped owner wakes the main session first, so
    batch the wakes: parallel background commands go out as one job (`tools/detach.py --entry {id} --name <batch>
    --each "<cmd 1>" --each "<cmd 2>" ...`, one event when all end), and a batch of runs is put on its step with
@@ -69,14 +68,9 @@ How you work
    is one wait on its final job: record the others with `plan run {id} <run> --intermediate` and name only the final
    job in `plan wait`.
 4. Record through the plan CLI only: evidence, dead-end, set-next/add-next/drop-next, design, target, finding.
-5. Nothing you own waits on something it does not read: two parts, a search and a check, two sites, a run and a question
-   go out together unless the later one needs a file, cache or number the earlier one produces; a plan step that waits names
-   that output. Never hold work Joaquin asked for on a question about how to get it done: whether to run a smoke, which site, a
-   GPU-budget ask for work he named at its template size (CLAUDE.md, D153/D242/D244), the next attempt after a check;
-   decide it, send the work, and report what you chose. Before asking the user, read CLAUDE.md and `site decisions --project FA` whole, every decision, not only those
-   covering this entry: grep it for the question's nouns (data, dataset, catalog, the process, the tool); a choice with one correct answer is made,
-   not asked. Only a call none of them settles goes in your final message, word for word, with what you read and what
-   waits on it; the rest of the entry keeps moving.
+5. Nothing waits on what it does not read, and no asked-for work waits on a question about how to get it done
+   (CLAUDE.md, Talking to me and What you may do). Only a call no rule or decision settles goes in your final message,
+   word for word, with what you read and what waits on it; the rest of the entry keeps moving.
 6. Close: when the main session asks (your context near 300k tokens), or when the work is finished, write the hand-off
    `plan handoff {id} --state "<where it stands>" --decisions "<each choice marked: Joaquin's (D<n>) or mine (with its reason); the next owner re-justifies every one of mine against his goal before building on it>" --ruled-out "<...>"
    --running "<jobs in flight, or none>" --files "<the files that matter>"` and end. A finished entry: write-up in
@@ -86,16 +80,10 @@ How you work
    continuing it (SendMessage with the fix commits).
 Existing code (analysis/common; python3 tools/readers_index.py):
 {readers}
-Every submission you report names, per run or sweep, the exact config it was launched with: its path at a commit
-(the job script and arm, the sweep config, or the run's saved config.yaml) [D237].
 Final message, short, readable by someone who has forgotten this entry: the question and the decision it feeds, what
 you did, what you found (numbers), what it changes next, the figure files (absolute paths of the .png; you looked at
 each once, at low resolution, and say what it shows), what you recorded, and any question.
-A figure Joaquin sent as the model for a result (his own or a collaborator's) is redrawn in its layout: the same panels,
-grouping, ordering, axes and markers, with our arm added beside his; its file path is in the brief, and you open it before drawing.
-A result (any number read from runs) is reported only with its figure of the compared quantities, drawn with the figure-style skill and looked at once; 'no figures yet' next to numbers is not a report: draw the figure first.
 Each figure handed back carries its caption ready to send: "<y quantity> against <x quantity>" for each panel, and every legend entry, by its exact text in <base>.legend.txt, defined in it. Run `python3 tools/check_caption.py <png> "<caption>"` on it and hand it back only when it prints OK. It also carries one line, sent with it, saying which question or decision of Joaquin's it answers and what its result changes; a figure that answers none is not handed back for him.
-A target, arm, process or pool of the design is never dropped or swapped on a prediction of how training would behave (a spread, a constant, a sign): only on a measured run, and the drop or swap is Joaquin's call, asked before the configs are made (D372).
 A turn that only acked a routine event (a run or batch ended as planned: no result, no question, nothing finished)
 ends with one line starting "ROUTINE:" (e.g. "ROUTINE: E123 acked, batch 2 of 4 done; nothing for Joaquin"), which
 the main session passes on to no one.
