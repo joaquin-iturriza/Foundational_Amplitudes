@@ -44180,9 +44180,9 @@ entries:
       batch-size runs'', passes up to 100 GPU-h; the 55 GPU-h DyHPO-per-batch version goes ahead'
   owner:
     agent: a27cabf54bbbc7b67
-    state: working
+    state: stopped
     since: '2026-11-24T21:40:30+00:00'
-    state_at: '2026-11-24T21:40:37+00:00'
+    state_at: '2026-11-24T21:57:51+00:00'
     context: 169817
     context_at: '2026-11-24T21:57:33+00:00'
   designs:
