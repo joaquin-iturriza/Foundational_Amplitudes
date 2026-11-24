@@ -45265,7 +45265,7 @@ entries:
       untouched (its interpreter still links into anaconda 3.11: a site env --rebuild ccin2p3 FA moves it to the uv Python
       when CC removes that install).'
   step_waits:
-    '2': 'a reviewer: design-reviewer ab38bab6ebc4487b7 re-check and repo-reviewer ad1aabcb322a8abd6 on the site-tool diff'
+    '2': 2026-11-25 00:10 UTC, CC CPU job 64806476 (site env), and the repo-reviewer re-check
   step_why:
     2:
       feeds: 'D544: the entry''s close'
