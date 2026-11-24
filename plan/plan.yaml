@@ -37735,6 +37735,9 @@ entries:
     5: 'When the no-settings W parent (FA-lxplus-2ae9a2c9) ends: read its per-process val against FA-ccin2p3-47e14eae, copy
       its run dir to ccin2p3, launch the drive over sweep_config_ftmech_zng4g_ftnoset_b2048.yaml and _b128.yaml (16 trials
       each), then seeds 43/44 of each chosen trial; read Fn/S and Fn/F per batch'
+    6: 'Re-read the b128 share and F/S against the extended D507 b128 scratch search (16 trials, window [2.7e-4,1.1e-2], best
+      hp0078 lr 9.24e-3, 0.0089 at seed 42) once zng_uq_benchmark step 3 has its seeds 43/44 (and its 3 owed guided trials):
+      S16 vs Sf*16 vs F16, same window and budget'
   done_when: null
   notes_ref: null
   match: dsave_ftmech_*,ftmech_*
@@ -39479,6 +39482,11 @@ entries:
       - 'Fn/S<=1.19 at both batches: the settings are the deficit, report with figure'
       - 'Fn/F<0.79 at both and Fn/S>1.19: partial, H2 read at lower D next'
       - 'Fn/F in [0.79,1.19] and Fn/S>1.19: no effect resolved, read parent val and step-0 start'
+    6:
+      feeds: whether the settings explain the fine-tune's Z+4g gap at b128 against the matched scratch (D519/D520)
+      if:
+      - 'share>=0.7 over the seed triples: H1 holds at b128 against the matched scratch, report'
+      - 'share<0.7: the settings explain only part of the b128 gap, report with figure; next design mine'
 - id: llm_compare
   title: LLoCa against Suprio's LLM on the LLM amplitude catalogue
   question: In the conditions of Suprio's LLM pID run (1501 MadGraph-default processes, 1352 trained, 149 held out; 55,296
