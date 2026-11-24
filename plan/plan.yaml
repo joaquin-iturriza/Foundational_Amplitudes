@@ -40506,24 +40506,6 @@ entries:
       in its config (sweep/sweep_config_llmcmp_c_latest.yaml), its own design (reusing part (b)''s smoke rates where the setup''s
       cost matches), smokes, then the runs; its GPU-h estimate to Joaquin if above 100 (D536). Does not hold part (b) from
       part (a).'
-    9: 'Part (b) from part (a) (D522, D537): revise the width scale-up design after the reviewer''s FIX (2026-11-24, recorded
-      by plan design-fix) and launch. Widths num_heads 16, 32, 64, 120 (6.34M, 25.2M, 101M, 354M parameters, counted on CPU;
-      LLM 359.6M) at trial 5''s HPs (--hp training.lr=0.0012437236075771069 training.regularization_lambda=1.1230076981781986e-10
-      training.cosanneal_warmup_frac=0.16348669333383442 ema=true training.ema_decay=0.9989315077979117) on sweep/sweep_config_llmcmp_a_adamw_const.yaml.
-      The six FIX points: (1) disk per width from its smoke dir (trial 5''s run dir 68 MB at 1.61M params, ~42 B/param: ~15
-      GB at 120 heads), checked against df per site at submission (CC /sps/lpnhe 16 GB free); (2) the memory fallback must
-      keep mixed-process batches of 24,576: per_process_accumulation is NOT set in the part (a) config and its code builds
-      single-process micro-batches, so either plain gradient accumulation over mixed micro-batches (new code, test that it
-      equals one full batch, review) or GPUs that fit; model.net.checkpoint_blocks is the compute-only knob; (3) key-by-key
-      diff of the composed config against runs/llmcmp_a_adamw_const/trial_1163/config.yaml on CC (num_heads, checkpoint_blocks,
-      any accumulation key, run name); (4) wall target per width and GPU model (CC places on V100 0.90 or H100 0.27 s/step
-      at 8 heads) against each site''s job limit, and a resume path for widths past it (run_trial.py''s warm_start_idx / increment_steps
-      resumption); 120 heads is ~100 h on an H100 by a FLOP estimate, so the batch''s GPU-h goes to Joaquin above 100 (D536);
-      (5) prior and check add par:v4_width (results.tex l.2487: held-out zero-shot MSE 0.642 and 0.552 of width 8''s at 16
-      and 32 heads, catalog_v4, 4264 steps) and par:v4_warm_start_grow (l.2940); (6) outcome adds a width worse than trial
-      5 by > 1.38 (muP transfer failing: report, HPO at that width is Joaquin''s call) and the between-margins rule of step
-      5 (seed-43 pair to Joaquin). Then re-run the design reviewer, smokes (scripts/job_config_smoke.sh, args after --, ~50
-      steps, 4 jobs, wall target b_width_smokes 1.5 h recorded), then the estimate.'
     10: 'Part (b) width smokes readout (design passed 2026-11-24 15:15): FA-ccin2p3-df391ea7 (16 heads), -6f7904b8 (32), -adb54030
       (64, checkpoint_blocks), -74ba6cdd (120, checkpoint_blocks), all on CC gpu_h100 via --gpu-min-mem=80G, --mem 32G (part
       (c) peaked 16.7 GB host; 64G fit 1 at once). Read per width s/step, peak GPU memory, models/ bytes per parameter, test
@@ -40678,11 +40660,6 @@ entries:
       if:
       - 'part (c) best known: design and launch'
       - 'part (c) search still running: wait for DRIVE_DONE'
-    9:
-      feeds: 'part (b): does width toward the LLM''s parameter count close the held-out gap'
-      if:
-      - 'revised design passes: smokes, then runs or the estimate to Joaquin'
-      - 'second FIX: record a dead end per the brief'
     10:
       feeds: 'D522/D537 part (b): whether muP width toward the LLM''s 359.6M parameters closes the held-out gap at part (a)''s
         best HPs'
@@ -41101,7 +41078,6 @@ entries:
     '5': llmcmp_c_qperp_drive4 DRIVE_DONE (detach event of the driver)
     '7': FA-ccin2p3-bf23e0c4 FA-ccin2p3-b77878e1 FA-ccin2p3-f6f7179d
     '8': FA-ccin2p3-bf23e0c4 FA-ccin2p3-f6f7179d
-    '9': design reviewer of the revised part (b) design (2026-11-24 ~15:20)
   handoff:
     state: 'Part (a) DONE: DyHPO ended (8 trials, 0 failed), best trial 5 FA-ccin2p3-c891c0c2 (lr 1.24e-3, EMA on 0.9989,
       val MSE of z 4.81e-4); scored FA-ccin2p3-037bf5e1: pooled RMSE seen 0.117, held out 1.003, relabels 0.241, new 1.767
