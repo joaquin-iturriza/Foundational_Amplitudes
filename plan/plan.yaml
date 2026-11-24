@@ -44101,14 +44101,17 @@ entries:
   decisions:
   - D532
   next:
-    1: 'Read the batch-size scan when all five sweeps end (cbs_b2048, cbs_b4096, cbs_b8192, cbs_b16384 on CC-IN2P3; cbs_b32768
-      on lxplus): collect each trial''s result.json (val_curve, validate_every, lr), python3 analysis/critical_batch/cbs_read.py
-      <trials.json>: S_B and E_B per target, B_crit with bootstrap, unreached_above_fit; apply the lr-edge rule; figure of
-      S_B and E_B against B per target beside B_simple; write-up in docs/results.tex sec:noisescale'
-    2: 'When the 32768 accumulation smoke (sweep cbs_smoke_b32768 on lxplus) ends: read its log (every stage, the STOP_AT_VAL_LOSS
-      line, train mu-MSE on the accumulation path, RESULT_JSON), then submit sweep cbs_b32768 on lxplus (generate_sweep --submit,
-      --item critical_batch) and the 6 CC wave-3 jobs the site gate refused (sweep_manager.py submit sweeps/cbs_b4096 sweeps/cbs_b8192
-      sweeps/cbs_b16384 on CC, then lower their limits to 2:27/1:56/1:41 as in the configs at b8d7de880)'
+    1: 'Read the batch-size scan when all five sweeps end (cbs_b2048, cbs_b4096, cbs_b8192, cbs_b16384 and cbs_b32768, all
+      on CC-IN2P3): collect each trial''s result.json plus its training.lr into {batch: [dict with hp_idx, lr, val_curve,
+      validate_every]} (a timed-out trial has no result.json: read its val_curve from its log; the diverged cbs_b4096 hp_0353
+      listed apart with where it blew up), python3 analysis/critical_batch/cbs_read.py <trials.json>: S_B and E_B per target,
+      B_crit with bootstrap, unreached_above_fit, the lr-edge rule; figure of S_B and E_B against B per target beside B_simple;
+      write-up in docs/results.tex sec:noisescale, wall-clock per step beside steps (the measured 0.55 s/step fixed overhead)'
+    2: 'When the 32768 accumulation smoke (sweep cbs_smoke_b32768 on CC-IN2P3, job 64801655) ends: read its log (every stage,
+      STOP_AT_VAL_LOSS at the first validation, train mu-MSE on the accumulation path, RESULT_JSON, plots), then site pick
+      FA --jobs 8, plan target, generate and submit sweep cbs_b32768 on CC (tools/detach.py -- site run ccin2p3 FA --item
+      critical_batch --timeout 1500 -- python sweep/generate_sweep.py --config sweep/sweep_config_cbs_b32768.yaml --submit),
+      record it (plan run --sweep ccin2p3:cbs_b32768)'
   done_when: null
   notes_ref: null
   match: zz_cbs_*,cbs_*
@@ -44536,19 +44539,19 @@ entries:
       plan; decisions for batch, D426, D514, D532-D536: no prior scan on this setup.'
   step_why:
     1:
-      feeds: 'whether B_simple can be trusted alone on our setup (Joaquin''s question: once, as a calibration), and whether
-        the canonical batch 16384 is past critical'
+      feeds: 'D532: whether the measured noise scale predicts where larger batches stop paying off, and whether the canonical
+        batch 16384 changes'
       if:
-      - 'S_2048/S_32768 <= 1.2 at every target: B_simple calibrated; propose a smaller canonical batch to Joaquin'
-      - 'S_2048/S_32768 >= 1.45: B_crit from the scan is the number, B_simple not trusted alone'
+      - 'S_2048/S_32768 <= 1.2 at every target (YES): report B_crit and a 2048-4096 batch as a candidate canonical change
+        to Joaquin, with wall clock per step beside steps'
+      - 'S_2048/S_32768 >= 1.45 (NO) or between: report the scan''s B_crit and its factor over B_simple; a batch at the lr
+        edge is re-searched half a decade over first'
     2:
-      feeds: whether the batch-32768 point of the scan can run (the accumulation path end to end, D395)
+      feeds: 'D532: the 32768 point of the scan, the ratio S_2048/S_32768 the design''s outcome rests on'
       if:
-      - 'smoke runs every stage: submit cbs_b32768 and the 6 wave-3 CC jobs'
-      - 'smoke breaks: fix the accumulation or stop path from its log, re-smoke; the 6 wave-3 CC jobs go out regardless'
-  step_waits:
-    '1': sweeps ccin2p3:cbs_b2048, ccin2p3:cbs_b4096, ccin2p3:cbs_b8192, ccin2p3:cbs_b16384, lxplus:cbs_b32768
-    '2': sweep lxplus:cbs_smoke_b32768 (Condor 13231065.0 under DAGMan 13231064.0)
+      - 'smoke clean (every stage, the stop taken, finite mu-MSE): submit cbs_b32768 on CC'
+      - 'smoke broken: fix the accumulation path, rerun the smoke once, then submit'
+  step_waits: {}
   targets:
   - batch: noise_smoke
     wall_h: 0.4
