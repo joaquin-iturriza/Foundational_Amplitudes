@@ -427,6 +427,26 @@ def result_table(inp):
     return [TABLE_MSG] if any(_has_result_table(t) for t in texts + [last]) else []
 
 
+_SITES = {"lxplus": r"lxplus", "ccin2p3": r"ccin2p3|cc-in2p3|\bCC\b", "jeanzay": r"jean\s*zay|jeanzay"}
+_DOWN = r"\b(?:down|unreachable|2FA|reconnect\w*|not answering)\b"
+
+
+def site_down(inp):
+    """~/work/CLAUDE.md, Verify before claiming: the final message calls a site down, unreachable or in need of
+    2FA/reconnecting without a retry in this turn (`site run <site> FA -- hostname`, or `site list` twice)."""
+    turn, last = _turn(inp)
+    cmds = [(b.get("input") or {}).get("command") or "" for b in _tool_uses(turn, "Bash")]
+    if sum(len(re.findall(r"\bsite\s+list\b", c)) for c in cmds) >= 2:
+        return []
+    ran = lambda k: any(re.search(r"\bsite\s+run\s+(?:%s)\s+FA\s+--\s+hostname" % _SITES[k].replace(r"\bCC\b", "cc"), c, re.I)
+                        for c in cmds)
+    bad = [k for k, pat in _SITES.items()
+           if re.search(r"(?:%s)\W[^.\n]{0,60}?%s|%s\W[^.\n]{0,60}?(?:%s)" % (pat, _DOWN, _DOWN, pat), last or "", re.I)
+           and not ran(k)]
+    return ["a site is called down only after a retry in this turn: site run <site> FA -- hostname "
+            "(~/work/CLAUDE.md, Verify before claiming); said of: " + ", ".join(bad)] if bad else []
+
+
 LOG_KINDS = ("RUN", "GAP", "OVERRUN")      # events whose fix starts with reading a run's log
 _QUOTES = re.compile(r"'[^']*'|\"(?:\\.|[^\"\\])*\"")   # quoted text is data: a commit message naming `site ack`
 _ACK = re.compile(r"\bsite\s+ack\s+((?:E\d+[\s,]*)+)")
@@ -565,7 +585,7 @@ def main():
             import stop_conditions as sc_f
             hooks = os.path.join(plan.ENV.get("PLAN_ROOT") if plan.ENV.get("PLAN_TEST") == "1" else sc_f.REPO,
                                  ".claude", "hooks")
-            for cond, f in (("result_table", result_table), ("bare_acks", bare_acks),
+            for cond, f in (("result_table", result_table), ("bare_acks", bare_acks), ("site_down", site_down),
                             ("figures_handed_back", lambda i: sc_f.figures_handed_back(i)[0])):
                 b = [] if sc_f.disabled("plan_check.py:" + cond, hooks) else f(inp)
                 if b:

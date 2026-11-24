@@ -57,6 +57,20 @@ def test_routed_ids():
     assert plan_check.routed_ids(plan_check._turn(t)[0]) == {"E12", "E13", "E7"}
 
 
+def test_site_called_down_needs_a_retry():
+    def say(tools, text):
+        t = transcript(tools)
+        recs = [json.loads(l) for l in open(t["transcript_path"])]
+        recs[-1]["message"]["content"][0]["text"] = text
+        open(t["transcript_path"], "w").write("\n".join(json.dumps(r) for r in recs) + "\n")
+        return plan_check.site_down(t)
+    assert say([], "Joaquin, lxplus needs 2FA, reconnect it.")
+    assert say([("Bash", {"command": "site run ccin2p3 FA -- hostname"})], "Joaquin, lxplus is down.")
+    assert not say([("Bash", {"command": "site run lxplus FA -- hostname"})], "Joaquin, lxplus is down.")
+    assert not say([("Bash", {"command": "site list"}), ("Bash", {"command": "site list"})], "Joaquin, lxplus is down.")
+    assert not say([], "Joaquin, lxplus is up; jobs finished.")
+
+
 if __name__ == "__main__":
     for k, f in list(globals().items()):
         if k.startswith("test_"):
