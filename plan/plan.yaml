@@ -15818,6 +15818,8 @@ entries:
       usual size for it (its template, its sibling runs)'' with ''or a decision of mine names that work (its covers) and it
       stays under 100 GPU-h (D511''s bound)''; on his yes, edit CLAUDE.md, keeper review, set the two items'' est-gpu-hours
       from his words'
+    34: 'Check the lxplus costing fix (step 29) on the first real lxplus submit: its submit file carries +MaxRuntime equal
+      to --hdr=--time=, and the site gate''s gpu_window charge equals that time x GPUs, not the flavour''s wall time'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16485,6 +16487,11 @@ entries:
       if:
       - 'yes: edit, keeper, the two held steps'' owners resumed to submit'
       - 'no: the asks stand; step 34 keeps them visible'
+    34:
+      feeds: whether lxplus jobs are charged their own time limit against the 30 GPU-h budget
+      if:
+      - 'charged its own limit: report done'
+      - 'charged the flavour: fix condor_sub or the gate, replay on that submit file'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
