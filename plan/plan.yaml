@@ -39747,6 +39747,40 @@ entries:
       h (V100) x 1.35 for heavier events x 1.3 + 1 h; the 9a73698a H100 rate is 3.2 h; no GPU pinning. Check 12: ''at D=1e3
       and 3125 steps'' is stated. Cost 42-52 GPU-h under D511/D520. Terms searched for check 5: dilut, intentional, rung,
       finale/rung 9, Zgg/Zggg, highmult, +W in results.tex; dilut, intentional, D511-D531 in site decisions.'
+  - at: '2026-11-24T07:56:06+00:00'
+    question: 'Step 1 repair (D519/D520/D529): the D=1e3, 3125-step searches of the dilution design (passed 2026-11-24) both
+      crowd opposite window edges, so Fn1k/S1k 0.50 at seed 42 is not yet a measurement. Does a matched widening of both searches
+      move either best, and what is Fn1k/S1k (and later Fg1k) with edge-free optima?'
+    prior: 'This step''s own searches (16 trials each, window [1.9e-3,1.9e-2] = hpo_optima centre 6.0e-3 +-0.5 dec, repo-reviewer
+      fix 45f404900): scratch S1k hp1009 0.0976 at lr 1.74e-2, its 7 best at 1.47e-2..1.89e-2 (best 0.04 dec under the top);
+      fine-tune Fn1k hp1860 0.0490 at 2.54e-3, its 9 best at 1.95e-3..3.1e-3 (0.13 dec over the bottom). Prior extensions
+      in this entry: R3 (b128 fine-tune window 1.1e-2 -> 3.3e-2, 16 -> 24 trials) kept its best; the dead end ''b128 Sf* extended
+      alone'' was sent back as UNMATCHED: this extension is matched (both arms, same window, same 8 trials). At 1e4 the Muon
+      b128 searches chose 9.2e-3 (scratch) and 7.3e-3 (fine-tune), and the scratch trials above 2.7e-2 were 3.6-9.8x worse.
+      Searched: plan show finetune_mechanism (dead ends, findings), sweep configs ftmech_zng4g_*, results.tex par:ftm_zng4g.'
+    measure: Each arm's best val MSE(log|M|^2) over its 24 trials (seed 42) and where its lr sits in [6e-4, 6e-2]; whether
+      the best moves from the 16-trial one; then Fn1k/S1k with the design's 2-sigma rule over the chosen trials' seeds 42-44
+      (re-picked only if the best moves). Per-trial best against lr figure with both windows marked.
+    check: 'Both arms'' trial values fall steeply toward the edge they crowd (scratch 0.098-0.119 over 1.47e-2..1.89e-2 against
+      0.12+ lower down; fine-tune 0.049-0.054 over 1.95e-3..3.1e-3): the optimum may lie past each edge, and a better scratch
+      at a higher lr or a better fine-tune at a lower lr moves Fn1k/S1k by as much as the trials'' own spread near the edge
+      (~1.2x), the size the 2-sigma rule resolves.'
+    fixed: 'Configs @edfcc164d: sweep/sweep_config_ftmech_zng4g_d1e3_{scr,ftnoset,ftglu}_b128.yaml: only the lr window [1.9e-3,1.9e-2]
+      -> [6.0e-4, 6.0e-2] (0.5 dec added each side), n_trials 16 -> 24, waves + [3,3,2]; everything else as passed (3125 steps,
+      D=1e3, batch 128, Muon/WSD, float64, coupled space, DyHPO seed 42). The two run searches are extended in place (sweep/extend_sweep.py
+      <sweep_dir> --param training.lr --low 6e-4 --high 6e-2 on sweeps_local, candidates sampled in the added zones, surrogate
+      keeps the 16 observations), then sweep/drive.py continues both to 24. The gluon parent''s D=1e3 arm (not yet run) gets
+      the same window and 24 trials from the start, its own DyHPO seed 42: its 24 trials see the whole window from trial 1,
+      the two extended arms see the narrow one for 16 then the wide one; a difference noted in the read.'
+    control: 'Each arm is the other''s control: scratch and the 28-process fine-tune get the same 8 added trials over the
+      same window, as the gluon-parent arm gets 24 over it.'
+    seeds: 'Trial seed 42. Seeds 43/44 of the current chosen trials already running (FA-ccin2p3-b96a2a6c, -2525f488, -ada00163,
+      -3ea9d4fa); re-picked and re-run only if a best moves (4 more runs). Cost: 16 trials x ~0.28 h = 4.5 GPU-h (+1.1 if
+      re-picks); wall ~1 h (3 waves of ~0.3 h). Under D520.'
+    outcome: 'Best unmoved in both arms (added trials all worse): the 16-trial optima stand, Fn1k/S1k read from the running
+      seeds. Best moves in either arm: re-pick, run its seeds 43/44, read Fn1k/S1k from them. A new best again within 0.1
+      dec of the wide window''s edge: reported as edge-limited, with the window extended once more only on a matched design.
+      Any trial blowing up (val > 10x best-so-far) listed apart (D398).'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
