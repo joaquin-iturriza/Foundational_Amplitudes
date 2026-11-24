@@ -45296,6 +45296,20 @@ entries:
       as sites.yaml env.python/python_bin (65872c784); site env --check renders it. The design''s yes branch; the live .venv
       untouched (its interpreter still links into anaconda 3.11: a site env --rebuild ccin2p3 FA moves it to the uv Python
       when CC removes that install).'
+  - at: '2026-11-24T23:47:07+00:00'
+    text: '2026-11-25: site env on CC now runs as an htc CPU job (cmd_env through run_as_job, ident = the env script). Job
+      64806476 submitted 00:37 CET; a call while queued printed CCJ_PENDING and exited 75. Read pending. Code review of the
+      out-of-git site-tool code (login_guard, run_as_job; first FIX, 3 blocking items) fixed and passed on re-check: an unread
+      result of an older env script or over 24 h old is discarded (CCJ_STALE); a lost job (no result, not queued), a job 30
+      min past its limit (CCJ_STUCK) and a failed squeue now exit non-zero, so maintain opens an event instead of skipping
+      silently; calls on one key are flock-serialised and .rc is written atomically; an allowed script runs uncapped on CC''s
+      login node only alone (piped to head/tail/grep/sort/uniq/wc/cut at most). Tested: 9 login_guard cases, the four bypasses
+      among them; the rendered remote under bash with fake squeue/sbatch (submit, queued, read, no trailing newline, older
+      script, 2-day-old result, lost, stuck, squeue error, legacy job without .h). On CC the first new-code read failed (the
+      remote''s last test returned 1 and run_ssh read it as no answer), fixed with a final true. Not tested: concurrent callers,
+      an htc outage, collect_run.py''s 60 s cap on a large prediction set, the supervisor''s first pass on the new code (after
+      00:45 CET). Also fixed: 4404e1baa had put sec:cc_login_jobs inside fig:llmcmp_heldout''s caption (bfa12ab9a); results.tex
+      still has 64 pre-existing LaTeX errors elsewhere (first at l.9125) and figures not found from docs/.'
   step_waits:
     '2': '2026-11-25 00:10 UTC: CC CPU job 64806476 (site env) and the repo-reviewer re-check'
   step_why:
