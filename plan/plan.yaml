@@ -36678,6 +36678,25 @@ entries:
       -> reported, unresolved. Cost: seeds 2 x 1.0 h (CC V100 0.0886 s/step x 31250 + 0.25 h), Muon b128 3 x 1.06 h, Adam
       b2048 3 x 0.35 h: 6.2 GPU-h; possible 2 more seeds 2 GPU-h; test scoring <= 0.4: <= 8.6 GPU-h. Wall: seeds 1 h on CC
       (site pick: 2 at once), repair one wave 1.06 h on lxplus.'
+    fix_at: '2026-11-24T02:19:47+00:00'
+    fix: 'Checks 0/4/13 (Muon batch-128 repair trials): the 3 guided repair trials in tp_zng_d1e4_muon_b128_zgggg keep the
+      lr window top at 1.1e-2 (the amended plan: extend_sweep --high 1.1e-2 on the CC copy), but the search''s three best
+      trials already sit at that edge: hp0078 lr 9.24e-3 val 0.00708 (log position 0.95), hp1774 1.073e-2 0.0080 (0.99), hp1006
+      1.086e-2 0.0086 (0.99) (kit_curves sweep lxplus read 2026-11-24). Between 9.2e-3 and 1.09e-2 the val does not rise with
+      lr beyond the same-HP cross-site noise (1.02-1.38x), so the optimum is not bracketed from above and the GP will put
+      the 3 repair trials at the edge again; the outcome branch ''a b128 best at its new top edge again -> reported, unresolved''
+      is already the state now, so those 3 trials cannot change the read. The previous design''s own branch (''best moves
+      into the widened lr zone: its window was the limit'') applies. Fix: in the same extend_sweep on the CC copy, raise the
+      Muon b128 lr top again (about 3x, ~3.3e-2, still under where batch 2048 Muon''s best sits, 2.0e-2, times a margin) and
+      keep the 3 trials; state the yes/no for the edge (best below ~0.8 of the new log range -> bracketed, ratios re-read;
+      at the new edge again -> the window is still the limit, reported). Same 3 jobs, no extra GPU-h. The Adam batch-2048
+      repair is fine as is (best hp0775 lr 2.84e-3, interior of [1.4e-3, 1.8e-2]). Everything else holds and can go as designed,
+      including with the CC placement of the owner''s amendment: seeds 43/44 of hp0078 (seed chunk files @2feab608 carry hp0078''s
+      seven searched HPs, same format as the D509 muon b128 chunks; rate 0.0886 s/step from the D509 CC seed logs of the same
+      setup; trial_0950 three-seed mean 0.0197 and spread 1.19 confirmed in analysis/zng_uq/data/d507_read.json; hp0078 at
+      0.0089 is 2.2x below), run in parallel with the repair, nothing ordered. The CC placement also removes the A100/H100
+      pin question (HTCondor-only requirement). Note the fixed field cites @abc47ad9; at HEAD the b128 config differs only
+      in the time limit (3 h -> 2 h, c57dd900), which should be cited.'
   step_waits:
     '3': sweeps ccin2p3:tp_zng_d1e4_muon_b2048_zgggg lxplus:tp_zng_d1e4_muon_b128_zgggg lxplus:tp_zng_d1e4_adam_b2048_zgggg
       (then 3 repair trials each in muon_b128 and adam_b2048 on lxplus)
