@@ -45000,9 +45000,9 @@ entries:
   asks: []
   owner:
     agent: af56ff9ec02b765a0
-    state: working
+    state: stopped
     since: '2026-11-24T23:30:10+00:00'
-    state_at: '2026-11-24T23:39:16.636000+00:00'
+    state_at: '2026-11-24T23:48:09+00:00'
     context: 155024
     context_at: '2026-11-24T23:44:54+00:00'
   designs:
