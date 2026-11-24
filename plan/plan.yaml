@@ -44070,6 +44070,70 @@ entries:
       1020/1973/2992 (recomputed), spread 0.3/0.9/10%, and the YES/NO thresholds 1.2/1.45 on S_2048/S_32768 stand above it
       at the first two targets; 8 trials in waves 3,3,2 match the template; HETEROSC, DIM target and the base run''s config
       with each changed key listed.'
+  - at: '2026-11-24T14:24:47+00:00'
+    question: 'Step 2 of critical_batch (D532, ''its validation against batch-size runs''; budget rule D536: work a decision
+      names, up to 100 GPU-h): does the measured noise scale (B_simple 28-84 events, median 55.5, sec:noisescale) predict
+      where larger batches stop paying off on the canonical catalog_v4 het setup? McCandlish et al.''s steps-examples tradeoff:
+      steps S_B to a target validation loss at each batch B, E_B = B S_B, fit S = S_min(1 + B_crit/B), against B_simple. Second
+      revision: answers the design FIX of 2026-11-24 (stop at readout, lr edge rule, item estimate, cache).'
+    prior: 'sec:noisescale (c2ab3154a): B_simple 84+-9, 28.2+-1.4, 28+-6, 39+-5 events at steps 500/1500/3000/4100. Searched
+      docs/results.tex (critical, batch size, steps examples, noise scale), the plan and site decisions (batch, lr, D426,
+      D514, D532-D536): no batch-size scan on this setup; D426 respected (batch a fixed axis per sweep); D514 Z+4g batch cells
+      are a data-limited single-process cell; sec:envelope: 16384 the largest batch on a 32 GB V100 at nh 8. Ruled out before:
+      equal-epoch schedules; horizon-law lr centres for Muon.'
+    measure: 'Five single-fidelity DyHPO sweeps cbs_b<B>, B in {2048, 4096, 8192, 16384, 32768}, 8 trials each (waves 3,3,2);
+      configs sweep/sweep_config_cbs_b<B>.yaml @8de829f32 (branch cbs_accum, repo-reviewer PASS at c4220851f; 8de829f32 adds
+      the stop, under re-review). One step schedule at every B: warmup 213-853 steps (template frac window x 4264/T_B), constant
+      WSD stable lr from the template''s Muon window [1.667e-3, 1.5e-2], validation every 85 steps. Horizons T_B = 34112/17056/8528/4264/4264
+      (cooldown starts 29848/14924/7462/3731/3731, after every target even in the NO case: S_2048(-2.30) <= 8 x 2707 = 21700).
+      NEW: each trial stops at its first validation with val_loss_no_reg <= -2.30, the last target (training.stop_at_val_loss,
+      base_experiment._reached_stop, the early-stopping break; CPU test tests/test_noise_scale.py::test_stop_at_val_loss;
+      the 32768 smoke takes the stop at its first validation end to end): nothing after the readout is trained; a trial never
+      reaching -2.30 runs its horizon. Targets fixed from the v4_het_control_wsd run: L = -1.66, -2.08, -2.30. S_B(L) = first
+      step with val_loss_no_reg <= L, interpolated between validations (run_trial.steps_to_target; the crossing step itself
+      after a non-finite validation). DyHPO objective = S_B(-2.08) (objective steps_to_target; never reached -> failure penalty).
+      Best trial per B and target = lowest S_B(L) of its 8 trials. Fit S = S_min(1 + B_crit/B) in log S over the B that reach
+      L, bootstrap over B points (analysis/critical_batch/cbs_read.py @c4220851f, selfcheck: B_crit 500 and 20000 recovered
+      within 25% at 3% noise); a batch none of whose trials reaches L gives a lower bound, flagged (unreached_above_fit) when
+      it exceeds the fit there, B_crit then a lower bound. NEW lr-edge rule: if a batch''s best trial (on S_B(-2.08)) has
+      lr in the outer tenth of the log window ([1.667e-3, 2.1e-3] or [1.2e-2, 1.5e-2]), its S_B is an upper bound only, and
+      that batch''s window is shifted half a decade toward the edge and searched again (8 trials, same config otherwise) before
+      the batch enters the fit. Batch 32768 = 2 accumulated micro-batches at the whole batch''s per-process counts (exact
+      gradient, tested), smoke sweep_config_cbs_smoke_b32768.yaml (1 trial, validation every 25, stop and objective target
+      1e30).'
+    check: 'On existing data the control and the noise-scale run FA-ccin2p3-225d38ea (same HPs, seed 42) cross L = -1.66/-2.08/-2.30
+      at 1023/1955/2707 and 1020/1973/2992 steps (cbs_read.py on analysis/critical_batch/data/*_result.json): replicate spread
+      0.3/0.9/10%; validation spikes are upward only (to ~7e9), so they cannot fake a crossing; S_2048/S_32768 = 1.02 at B_crit
+      50 and 16 at B_crit >> 16384. Tests: test_steps_to_target, test_batch_accumulation_is_the_batch_gradient (with mu-MSE),
+      test_stop_at_val_loss pass in .venv-cpu; cbs_read --selfcheck OK.'
+    fixed: 'Base config runs/catalog_v4_short/v4_het_control_wsd (recipe catalog_v4_base_train, DIM target and inputs, HETEROSC
+      mean, sign head off, MuonAdamW, WSD 1/8, clip 5, seed 42, nh 8, EMA for validation), training only, plots on. Differing
+      from its config.yaml, all named: batchsize, batch_accumulation (2 at 32768), iterations T_B, validate_every_n_steps
+      85 / validate_frac 0 (same 85-step spacing as the control), stop_at_val_loss -2.30, save_model_at_steps [], the searched
+      HPs. Cache (FIX 4): the base config has data.memmap false (its config.yaml on CC, line 1173), so these runs use the
+      in-memory data path: no memmap cache is built, read or shared; host memory is the measured 19.9 GB RSS per trial under
+      mem 32G. Disk: 137 MB per trial (the control''s run dir with model and plots) x 40 = 5.5 GB at most; free disk read
+      at submission. Cost from measured rates (control log: 0.98 s/step at 16384 without validation, ~5 s per validation;
+      batch-1581 runs of the nh 8 model 0.11-0.12 s/step), model 0.12 s + 0.86 s x B/16384 per step: with the stop, a trial
+      reaching -2.30 near the control''s 2700-3000 steps costs 0.44/0.53/0.71/1.07/1.78 h (B = 2048...32768) -> ~36 GPU-h
+      for 40 trials in the YES case; at most 84 GPU-h if no trial stops (full horizons 2.92/2.07/1.64/1.43/2.45 h); plus smoke
+      0.3 GPU-h; a lr-edge re-search adds at most one sweep (<= 23 GPU-h at 2048), kept under the 100 GPU-h bound (if it would
+      pass 100, it goes to Joaquin first). Item critical_batch estimate set to 85 GPU-h (site item set). Time limits stay
+      at the full horizons with room (4:30/3:15/2:30/2:15/3:45). Placement (site pick FA --jobs 40 --groups 5, 15:20 today):
+      4 sweeps on CC-IN2P3 (queue wait ~24 h, first start ~25 h), 1 on lxplus (first start ~30 min, 1 slot); Jean Zay unreachable
+      on retry. The 32768 sweep and its smoke go to lxplus (base run dir copied there), the others to CC. Finish: CC ~25 h
+      wait + 3 waves (YES ~0.5-1.1 h each, at most ~2.9 h each) = ~27-34 h from submission; lxplus 32768 at one slot 8 x 1.8-2.45
+      h = 14-20 h after the smoke. Only cbs_b32768 waits on the smoke.'
+    control: The 16384 sweep (same search and schedule) is the reference; the v4_het_control_wsd run a sanity point (the 16384
+      best trial should cross within the replicate spread of 1023/1955/2707 steps).
+    seeds: 'Seed 42 every trial, as the control; seed noise of S from the same-HP pair: 0.3/0.9/10% at the three targets.
+      Equal seeds per B; more seeds would be Joaquin''s call.'
+    outcome: 'Band 20% on S_2048/S_32768 (2 x the largest replicate spread). YES: <= 1.2 at every target (B_crit <~ 400, within
+      ~5x of B_simple): 16384 is far past critical; a 2048-4096 batch reaches the same loss in about as many steps with 4-8x
+      fewer events, a candidate change to the canonical batch that goes to Joaquin; B_simple then read alone from the in-run
+      estimator. NO: >= 1.45 (B_crit >~ 1000): B_simple underestimates B_crit here; the scan''s B_crit is the number. Between:
+      B_crit 400-1000 reported with its factor over B_simple. A batch at the lr edge or never reaching a target enters as
+      a bound, as stated.'
   step_why:
     2:
       feeds: 'whether B_simple can be trusted alone on our setup (Joaquin''s question: once now as a calibration, or every
