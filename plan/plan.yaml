@@ -44370,6 +44370,26 @@ entries:
     outcome: 'yes: every output file complete (DISK_INVENTORY_DONE, scratch_top.tsv sums to within 2% of du of $SCRATCH),
       giving the delete-candidate list by class (our debris, unread caches, results needing Joaquin''s call); no: a read missing
       or cut, rerun that part alone'
+    fix_at: '2026-11-24T14:33:06+00:00'
+    fix: '1) The recorded design (14:30) no longer describes the job: the script at trunk 9cb7ad178 adds top.tsv/top_apparent.tsv
+      (every entry of /sps/lpnhe, $WORK, the checkout), scratch_top_apparent.tsv and df.txt, and the step agent found allocated
+      du sums to 1.28x df ''used'' on Isilon, while the design''s measure still says allocated st_blocks are ''what the group
+      quota counts''. Re-record the design for this script: which size (allocated or apparent) ranks the delete list and is
+      reported to Joaquin, and a check that reconciles the chosen size''s sum over /sps/lpnhe with df.txt (and the 512 GiB
+      quota). The runs check now has a like-for-like number (runs in top.tsv against the login du 122,051 MiB; amp_data_cache
+      75,265 MiB is in the login log 20261124-152512_cc_du3.log.6): name top.tsv as the source, not inv_runs, whose sum covers
+      only dirs holding config.yaml. 2) Prior is incomplete (searched site decisions for disk/space/delete/storage/prune,
+      results.tex for disk/storage): decisions in force already authorise deletion classes this inventory sorts, and the prior
+      names only D103/D147/D96/D122: model files of finished runs (D149, bounded by D133: concluded studies only, never a
+      run over ~5 h of training, which inv_runs'' training time reads), catalog_v3 pools (D163/D167), MadGraph generation
+      leftovers and standalones (D208/D209), MadEvent work dirs (D180/D201), old mmap caches (D84/D103), catalog_v2 (D110),
+      Daniel''s catalog pools (D131). Add them to prior and add a class to the outcome: ''already approved under decision
+      X'' (deleted under that decision, reported), distinct from ''needs Joaquin''s call'', so the list sent for D542 does
+      not ask him again what he already decided. 3) Cut: $SCRATCH (= $WORK/tmp, 126,942 entries) is now walked four times
+      at once (scratch_top x2 and as the tmp entry of top.tsv x2); exclude $SCRATCH from the $WORK group (! -path "$SCRATCH")
+      and take its total from the scratch_top sums, so the job''s 2 h limit is not spent on duplicate walks. Everything else
+      holds: read-only CPU job, no GPU budget, outputs small against 15 GB free, no control/seeds needed for a deterministic
+      read, the login-node cuts (detached cc_du/cc_du2/cc_du3 logs, rc=255 ''closed by remote host'') justify a job.'
   findings:
   - at: '2026-11-24T14:32:44+00:00'
     text: '2026-11-24 login-node reads: /sps/lpnhe 512 GiB group space at 98% (498 GiB used, 15 GiB free), .disk_full flag
