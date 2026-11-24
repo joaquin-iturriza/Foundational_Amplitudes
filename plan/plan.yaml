@@ -39548,6 +39548,67 @@ entries:
       Fn lower, so it does not threaten a yes; say so if b2048 lands no. Rates from the searches'' own trials (0.35/1.06 GPU-h).
       Searched: noset, ftnoset, flags=off, soft_eps, pair_log, hp0078, d507, Z+4g in results.tex, plan show, the entry''s
       dead ends.'
+  - at: '2026-11-24T05:25:34+00:00'
+    question: 'Step 2, the b128 residual (D519/D520/D529): after the parent''s two settings are removed, the Z+4g fine-tune
+      at batch 128 and 1e4 events still ends 1.53x above scratch hp0078 (Fn/S, 1.18-2.07). H2 dilution (Joaquin 2026-11-13:
+      ''by blowing up the catalog ... we are diluting the transfers from the processes that could be useful ... it can also
+      hurt the general performance of the finetuning ... we need to be more intentional with the datasets''): does a parent
+      pretrained on only the processes close to Z+4g (the finale''s 8 with a final-state gluon plus e+e- -> ZZ, 9 of 28) give
+      a better Z+4g fine-tune than the 28-process parent, at D=1e3 (where pretraining gains exist) and at D=1e4 (the residual
+      itself)? And does today''s 28-process parent gain over scratch at D=1e3 at all?'
+    prior: 'This entry: at 1e4 b128 S (scratch hp0078, 16-trial search) 0.00888/0.01048/0.00887, Fn (28-process no-settings
+      parent FA-ccin2p3-9a73698a, 16-trial search hp353) 0.0108/0.0184/0.0141 (Fn/S 1.53, seed 43 blew up at validation 44/50,
+      read at its best); F (parent with settings) 0.0303; at b2048 Fn/S 0.35 (yes). Ruled out: H3 lr window, H4 restart shock/sigma
+      head, H6 precision, H7 path bug; settings carry the b2048 deficit. results.tex l.15134-15160 (highmult grid, old AdamW/cosine
+      setup, one seed, 8k steps up to D=1e3): every parent gains ~1 dex at D<=10^1.5 falling to ~0 at 1e4 on u u~ -> Z+4g
+      (finale +0.48 dex at 1e3, -0.11 at 1e4); adding the neighbouring family W+4g/W+5g to the pretraining (+W) is +0.18-0.54
+      dex over the finale at D<=10^3.5 and +0.22 at 1e4; l.15380-15410 replay children: the more a parent learned W, the more
+      its child gains on Z+ng (+0.2-0.4 dex at 10^1.5-10^3). No prior run of a parent restricted to the processes close to
+      the probe (a narrower, not wider, pretraining) and no D=1e3 cell of today''s Muon/WSD b128 template on Z+4g. Searched:
+      results.tex (dilut, Z+4g, highmult, replay, finale+W), plan show finetune_mechanism and zng_uq_benchmark, site decisions
+      (dilut, finale, Z+4g, D507-D532), sweep/ (zng, ftmech, d1e3).'
+    measure: 'Best val MSE(log|M|^2) (min val mu-MSE x std^2, std read per run) of each arm''s chosen search trial (seed 42)
+      and its seeds 43, 44: at D=1e4 b128 Fg (gluon/Z parent) against Fn and S (existing); at D=1e3 b128 S1k, Fn1k, Fg1k.
+      Ratios Fg/Fn, Fg/S, Fn/S per D with 10-90% ranges over the 9 seed pairings; gains log10(S/F) in dex beside the old grid''s.
+      Parent check: Fg-parent per-process final val against the 28-process parent''s on the 9 shared processes (gmean ratio).
+      Figures: per-seed best of S, Fn, Fg per D on a log axis (D on x); per-trial best against lr per arm; val curves per
+      seed; blow-ups (val > 10x best-so-far) listed apart.'
+    check: 'Parent content moves the child on this probe by far more than the bars: old grid +W over the finale +0.18-0.54
+      dex (1.5-3.5x) at D<=10^3.5 and +0.22 dex (1.7x) at 1e4; replay children +0.2-0.4 dex; against S''s seed spread 1.18x
+      (hp0078) and the parent-to-parent spread 0.79-0.87 (snapshot arms). A narrower parent''s child can therefore land well
+      outside [0.79, 1.27] of Fn if dilution matters. Gains at 1e3: finale +0.48 dex in the old grid, so S1k vs Fn1k can separate
+      (3x) at D=1e3.'
+    fixed: 'Gluon/Z parent: scripts/job_datasaving_parent.sh finale flags=off recipe=recipes/transfer_finale_gluon.yaml tag=zng_uq_w_noset_glu
+      lr=1.89e-3 ++training.allow_tf32=false @5361f5820: the 28-process no-settings parent''s exact command (FA-ccin2p3-9a73698a:
+      finale flags=off lr=1.89e-3 ++training.allow_tf32=false) with only the recipe changed (9 of its pools, every train event,
+      the same 64000 steps, batch 16384, WSD cooldown 1/8, lr 1.89e-3, internal_mass_pdgs [23,6,25,24], trial 1262 base, seed
+      42, float32, eval_subsample 10000); run dir runs/data_saving/dsave_parent_finale_zng_uq_w_noset_glu_lr1p89e-3; its pre-cooldown
+      snapshot saved as the other. Per-process exposure is 28/9 = 3.1x the 28-process parent''s (same compute, the ''intentional''
+      pretraining). A 50-step smoke (iters=50, D395: recipe= is a new launch argument) goes at the same time; the full run
+      is cancelled if it fails. Fine-tunes @5361f5820: sweep/sweep_config_ftmech_zng4g_ftglu_b128.yaml = ftmech_zng4g_ftnoset_b128.yaml
+      with only pretrained_path changed (16 trials, waves 3,3,2,3,3,2, DyHPO seed 42, lr [2.7e-4, 1.1e-2], 31250 steps, 1e4
+      events, float64, Muon/WSD, target_stats own, offshell_stats parent, lr_scale 1, layer_decay 1, settings 0). D=1e3: sweep/sweep_config_ftmech_zng4g_d1e3_{scr,ftnoset,ftglu}_b128.yaml
+      = the same config with train_subsample 1000, 3125 steps (400 epochs at batch 128, as the 1e4 cells), time 1 h, lr window
+      [1.1e-3, 3.3e-2] (rule 2''s centre at t=3125 ~1e-2, lowered for small D, +-0.5 dec around 6e-3; one window for all three
+      arms), scratch with fine_tune.* removed (pretrained_path null); val on the whole val pool as at 1e4. Seeds 43/44 of
+      every chosen trial by run_fixed_hp.py via job_seed_batch.sh, as F''s and Fn''s. The gluon parent''s run dir is copied
+      to the other site (site copy) before its fine-tune drives.'
+    control: 'At D=1e4: Fn (28-process no-settings parent, same search) and S (scratch hp0078), both already run, seeds 42-44.
+      At D=1e3: S1k (scratch) and Fn1k (28-process no-settings parent), same config and window as Fg1k, run now. The gluon
+      parent''s control is the 28-process no-settings parent FA-ccin2p3-9a73698a (same command, all 28 pools).'
+    seeds: 'Parent seed 42 (one parent, as the 28-process one). Search trials seed 42; seeds 43, 44 of each chosen trial.
+      Cost: gluon parent ~8.0 (7.97 h measured for the 28-process parent on V100, same steps and batch) + smoke 0.1; Fg at
+      1e4: 16 x 1.06 + 2 x 1.06 = 19.1; D=1e3: 3 arms x 18 runs x ~0.33 h (0.08 h of steps at 0.093 s/step + the 1e4 trials''
+      ~0.25 h of validation, sigma stage and start; read from the first wave) = 17.8; total ~45 GPU-h (D520, under D511''s
+      100 h). Wall: S1k and Fn1k now, ~2.3 h with seeds; parent ~8.2 h, then Fg (1e4, ~7.5 h with seeds) and Fg1k (~2.3 h)
+      in parallel: ~16 h. Fg arms wait only on the parent''s checkpoint.'
+    outcome: 'Dilution yes: Fg/Fn <= 0.79 at D=1e3 (beyond the parent-to-parent spread) -> the 28-process parent dilutes what
+      transfers to Z+4g; at 1e4 Fg/S <= 1.19 -> the b128 residual is dilution; Fg/Fn <= 0.79 with Fg/S > 1.19 at 1e4 -> dilution
+      carries part of it. No: Fg/Fn in [0.79, 1.27] at both D -> dilution is not the residual; next the b128 instability of
+      Fn (late spikes at lr 7.3e-3, seed 43''s blow-up). Fg/Fn > 1.27: the other 19 processes help Z+4g, dilution ruled out
+      as a cost. Separately at D=1e3: Fn1k/S1k < 1/1.19 -> today''s parent still gains where data is scarce (the 1e4 residual
+      is a large-D effect); Fn1k/S1k >= 1.19 -> a pretraining cost at every D beyond dilution, reported with the figure. Any
+      parent or arm blowing up (val > 10x best-so-far) listed apart (D398).'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
