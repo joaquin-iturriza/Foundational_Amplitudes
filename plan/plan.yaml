@@ -44578,7 +44578,8 @@ entries:
       if:
       - 'submitted: record it; step 1 then waits on it with the other four'
       - 'refused or failed: read why, fix, resubmit the same config'
-  step_waits: {}
+  step_waits:
+    '1': ccin2p3:cbs_b2048 ccin2p3:cbs_b4096 ccin2p3:cbs_b8192 ccin2p3:cbs_b16384 ccin2p3:cbs_b32768
   targets:
   - batch: noise_smoke
     wall_h: 0.4
