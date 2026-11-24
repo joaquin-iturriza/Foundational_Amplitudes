@@ -15822,9 +15822,6 @@ entries:
       next lxplus ssh-master drop probed twice before ''down'''
     34: 'Check the lxplus costing fix (step 29) on the first real lxplus submit: its submit file carries +MaxRuntime equal
       to --hdr=--time=, and the site gate''s gpu_window charge equals that time x GPUs, not the flavour''s wall time'
-    36: 'Fix the reviewer lock (finding 2026-11-24 two claudemd-keepers): begin refuses while another agent id holds the pillar''s
-      lock, advance refuses from an agent that does not hold it, lock_calls.log records agent_id; test with two simulated
-      agents; replay the 19:26:20 double begin'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16496,11 +16493,6 @@ entries:
       if:
       - 'charged its own limit: report done'
       - 'charged the flavour: fix condor_sub or the gate, replay on that submit file'
-    36:
-      feeds: one reviewer per backlog actually enforced
-      if:
-      - 'built and replayed: report'
-      - 'a tool refuses: route around'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
