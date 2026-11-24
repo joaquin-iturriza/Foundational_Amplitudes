@@ -37284,6 +37284,12 @@ entries:
     units: null
     start: '2026-11-24T02:13:07+00:00'
     at: '2026-11-24T02:13:07+00:00'
+  - batch: d514_repair_cc
+    wall_h: 1.0
+    jobs: 6
+    units: null
+    start: '2026-11-24T02:22:51+00:00'
+    at: '2026-11-24T02:22:51+00:00'
   handoff:
     state: '2026-11-20 ~16:00 UTC. D507/D509 read done (zng_d507 v1 @0d2064b7; G 1.12 [0.85,1.70] on three-seed means, unresolved;
       Muon batch ratio 3.20 [2.71,3.72]; Muon/Adam at b128 0.35; finding 2026-11-20). W parent at half lr FA-ccin2p3-47e14eae
