@@ -39359,7 +39359,7 @@ entries:
     start: '2026-11-24T00:30:23+00:00'
     at: '2026-11-24T00:30:23+00:00'
   step_waits:
-    '4': 'detached drive ftmech_flagsb128_drive4 (search ftmech_zng4g_scrflagsrch_b128) ends: its DONE event'
+    '4': FA-ccin2p3-19366c0d FA-ccin2p3-369a57e3
     '5': 'detached drive ftmech_ftnoset_drive (searches ftmech_zng4g_ftnoset_b2048 and _b128 from the no-settings parent)
       ends: its DONE event'
   handoff:
