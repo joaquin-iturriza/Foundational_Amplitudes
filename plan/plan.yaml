@@ -44336,8 +44336,9 @@ entries:
   match: cc_disk_*,zz_probe_*
   evidence:
     runs: []
-    commit: null
-    paths: []
+    commit: 9cb7ad178
+    paths:
+    - scripts/job_disk_inventory.sh
   dead_ends: []
   asks: []
   owner:
