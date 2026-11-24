@@ -95,7 +95,7 @@ def main():
     res["trials"] = {"Fn": sorted((v["lr"], v["val_loss"] * k2, i) for i, v in ts),
                      "F": sorted((t[0], t[1], t[2]) for t in r1["trials"]["Fx"] if t[1] and t[2] < 16)}
     json.dump(res, open(os.path.join(HERE, "data", f"zng4g_ftnoset_b{b}.json"), "w"), indent=1)
-    print(json.dumps({k: v for k, v in res.items() if k != "trials"}, indent=1))
+    print(json.dumps({k: v for k, v in res.items() if k != "trials"}))   # one line: verify_claims reads the last {...} line
     plot(res, curves)
 
 
