@@ -39,9 +39,7 @@ or sensible, and list its flaws ranked by what they cost in practice: design mis
 memory, GPU or wall time, behaviour under many concurrent jobs on a shared filesystem, across seeds,
 code versions and sites, and correctness risks, each with the line, a concrete scenario, its cost and
 the fix. A flaw that costs real resources or can corrupt results is blocking whether or not any rule
-below names it. The axes that follow are additional checks, never the limit of the review (2026-11-02:
-a blind flaw hunt found twelve flaws in data_mmap.py, among them per-job and per-seed 22 GB caches,
-GPUs held through a CPU build and an unsafe lock on NFS, in code this review had passed).
+below names it. The axes that follow are additional checks, never the limit of the review.
 
 ## Axes, in priority order
 
@@ -81,11 +79,8 @@ GPUs held through a CPU build and an unsafe lock on NFS, in code this review had
    with `"type":"user"`) for the message that asked for it. A commit message or a line in the
    notes written by the author is **not** a user decision, however it is phrased ("the user's
    call" included: check the transcript). A restriction with no user message behind it is a
-   blocking finding that you put in the FIRST line of your verdict, worded so the main agent
-   relays it to the user verbatim. This axis exists because the 32k fine-tunes of the transfer
-   study (2026-10-03, commit bc0694e) were set up for one rung per probe out of ten, nobody
-   asked for it, the restriction sat in a commit message and a hand-off line, and it surfaced
-   two days later, hours before the work was presented.
+   blocking finding that you put in the FIRST line of your verdict, worded so the main
+   session can put it to the user.
 
 1. **Correctness.** Real bugs a test would not obviously catch: off-by-one, wrong axis, sign
    errors, mutated shared state, silent NaN paths, event-boundary (`ptr`/`offsets`) mistakes
@@ -126,20 +121,16 @@ GPUs held through a CPU build and an unsafe lock on NFS, in code this review had
    each unit's time is compared with the work it does (a forward pass over its events, a pool's
    rows), and a loop over hundreds of units that rebuilds an experiment, reloads weights or data,
    or runs serially per unit where one batched pass would do is **blocking**, to be batched, never
-   absorbed into the limit (2026-10-31: the zero-shot reads at about 2 s per probe over about 2700
-   probes and the 70 min serial pool composition passed review inside a raised limit, 9510604e).
+   absorbed into the limit.
    The same holds across jobs: anything a batch's jobs could share (a cache, a composed pool, a
    prebuilt dataset, a download) that each job builds or writes again instead is **blocking**. Read
    how the artifact is keyed or named and check that two jobs on the same data resolve to one copy;
    then multiply what one job writes to shared storage by the jobs that run at once and compare it
-   with the site's free disk (2026-11-01: the memmap cache keyed composed pools by each job's
-   node-local path and mtime, so every job wrote its own 20 GB and /sps/lpnhe, shared by the whole
-   lab, filled to 100%).
+   with the site's free disk.
    A copy per seed, per code version or per run of data that differs only by a cheap transform
    (an augmentation, a shuffle, a standardisation) is the same waste: the shared part is stored once
    and the transform applied at read time; matching a reference path bit for bit is no reason to
-   store its derived arrays (2026-11-02: the memmap cache stored events after the random Lorentz
-   augmentation, one 23 GB copy per seed, and hashed its whole source file, one copy per lock fix).
+   store its derived arrays.
 4. **Repo structure & hygiene.** New files in the right place. No needless new top-level
    dirs. No new scattered `.md`/`.tex` docs (the rule against new `.md`/`.tex` files). Reuse over duplication.
 5. **Committed artifacts.** Nothing `.gitignore` should catch: `runs/`, `outputs/`, `*.npz`,
