@@ -45061,6 +45061,35 @@ entries:
       is the live venv''s versions read in job 64801966); check 3 (deterministic install, no seeds); checks 7-13 and 15-19
       do not apply. Searched: anaconda, 3.11, python env, env repair and python_bin in plan/plan.yaml; the design''s own grep
       of docs/results.tex; site decisions (D176, D544).'
+  - at: '2026-11-24T22:14:49+00:00'
+    question: Can FA's CC env be rebuilt now that CC denies the module Programming_Languages/anaconda/3.11 (sites.yaml line
+      11), keeping today's stack (Python 3.11.7, torch 2.1.2+cu118, numpy 1.26.4 from requirements.txt), by bootstrapping
+      from a standalone CPython 3.11.7 installed under /sps with uv via CC's Programming_Languages/python/3.13.7, the exact
+      recipe to be committed as sites.yaml's env.python (bootstrap) and env.python_bin (the interpreter)? The live .venv (its
+      interpreter a symlink into the anaconda 3.11 install CC says it will remove) stays untouched.
+    prior: 'CC env check job 64801966 (2026-11-24 23:10): activate.sh does not load the module; .venv imports torch 2.1.2+cu118
+      / numpy 1.26.4 on python 3.11.7 from /pbs/software/redhat-9-x86_64/anaconda/3.11; anaconda/3.11 denied (''no longer
+      supported, will soon be removed''); CC offers python/3.13.7..3.14.9, anaconda 3.12/3.13 (deprecated) and 3.14; no 3.11.
+      Earlier: the 2026-10-29 dead end on the 13 TeV pp regeneration (plan.yaml ~4719) found the same denial and listed the
+      same options (a recipe without the module, the live venv''s interpreter, a pure Python 3.11); the ask was withdrawn
+      (plan.yaml ~5052) with Joaquin''s call that CC''s anaconda refusal ''is a setup gap to fix (site env), not a question'',
+      so this repair goes ahead without him; only a stack-changing route would go to him. Nothing in docs/results.tex or site
+      decisions (D176, D544).'
+    measure: 'one 1-CPU htc job, --timeout 3600: df of node-local TMPDIR first (stop below 15 GB free: torch 2.1.2+cu118 wheel
+      ~2.3 GB, installed stack ~6 GB, pip cache off with PIP_NO_CACHE_DIR); the committed bootstrap recipe run verbatim (module
+      load python/3.13.7, uv in TMPDIR, uv python install 3.11.7 into /sps/lpnhe/jiturrizaramirez01/python, ~100 MB, du reported);
+      python_bin runs; a venv in TMPDIR from python_bin gets the real pip install -r requirements.txt (the lloca git pin included),
+      then pip check, then imports of torch, numpy, scipy, h5py, xformers, torch_geometric, gpytorch, lloca, mup and FA''s
+      run path (import experiment, models.lloca) from the checkout; versions printed; TMPDIR removed at the end'
+    check: the live venv's pyvenv.cfg names python 3.11.7, the version uv provides; requirements.txt pins torch==2.1.2 with
+      the cu118 index, which has cp311 wheels and none for cp313, so a 3.13 module cannot rebuild the stack
+    fixed: the live .venv (not touched), requirements.txt, torch/numpy versions, the CC checkout
+    control: the live .venv's versions (python 3.11.7, torch 2.1.2+cu118, numpy 1.26.4) read in job 64801966
+    seeds: none (deterministic install)
+    outcome: 'yes: the install succeeds, every import passes and the versions equal the live venv''s, so sites.yaml''s env.python
+      and env.python_bin are committed as tested (a rebuild reproduces the live stack); no: the step that failed is reported
+      (download, a pin that does not build on 3.11.7, an import), fixed when it is a recipe defect, and only the route that
+      changes the stack (a newer torch on the cu124 index under python 3.13) goes to Joaquin with its cost'
   findings:
   - at: '2026-11-24T17:31:13+00:00'
     text: 'Inventory of scripts run on CC''s login node (2026-11-24): supervisor maintain every pass (8-10 min apart): disk_watch.py
