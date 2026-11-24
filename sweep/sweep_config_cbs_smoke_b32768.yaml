@@ -34,6 +34,7 @@ fixed_params:
   training.save_model_at_steps: '[]'
   training.validate_frac: '0'
   training.validate_every_n_steps: 25
+  training.stop_at_val_loss: 1.0e+30   # the stop path, taken at the first validation
   training.heterosc_sigma_stage_steps: 0
   find_BS: 'false'
   evaluate: 'false'

@@ -37,6 +37,7 @@ fixed_params:
   training.save_model_at_steps: '[]'
   training.validate_frac: '0'
   training.validate_every_n_steps: 85
+  training.stop_at_val_loss: -2.30   # the last readout target: a trial ends once read (a trial never there runs its horizon)
   training.heterosc_sigma_stage_steps: 0
   find_BS: 'false'
   evaluate: 'false'

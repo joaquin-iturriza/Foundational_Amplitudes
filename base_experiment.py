@@ -1219,6 +1219,11 @@ class BaseExperiment:
                         LOGGER.info(f"Early stopping at iteration {step + 1} = epoch {(step + 1) / len(self.train_loader):.1f}")
                         break
 
+                if self._reached_stop(val_loss_no_reg_now):
+                    LOGGER.info(f"STOP_AT_VAL_LOSS: val_loss_no_reg {val_loss_no_reg_now:.4g} <= "
+                                f"{self.cfg.training.stop_at_val_loss} at iteration {step + 1}")
+                    break
+
                 if self.cfg.training.scheduler == "ReduceLROnPlateau":
                     self.scheduler.step(selection_loss)
 
@@ -1931,6 +1936,12 @@ class BaseExperiment:
         for g, r in rows:
             g[k] = r * cs.to(r.dtype)
         return gn + 0.0 * gs
+
+    def _reached_stop(self, val_loss_no_reg):
+        """training.stop_at_val_loss: the run ends at the first validation whose val_loss_no_reg is at or below it
+        (critical_batch step 2: a trial stops once its last steps-to-target readout is crossed); null never."""
+        s = self.cfg.training.get("stop_at_val_loss", None)
+        return s is not None and val_loss_no_reg is not None and float(val_loss_no_reg) <= float(s)
 
     def _step(self, data, step):
         # actual update step

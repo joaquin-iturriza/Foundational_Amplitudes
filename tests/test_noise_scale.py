@@ -131,3 +131,11 @@ def test_batch_accumulation_is_the_batch_gradient():
     with torch.no_grad():
         mses = [(torch.nn.functional.mse_loss(lin(x[c]), y[c]), len(c)) for c in torch.arange(n).chunk(k)]
         assert torch.isclose(sum(m * w for m, w in mses) / n, torch.nn.functional.mse_loss(lin(x), y))
+
+
+def test_stop_at_val_loss():
+    from base_experiment import BaseExperiment
+    stub = lambda v: SimpleNamespace(cfg=OmegaConf.create({"training": {"stop_at_val_loss": v}}))
+    assert BaseExperiment._reached_stop(stub(-2.3), -2.31) and BaseExperiment._reached_stop(stub(-2.3), -2.3)
+    assert not BaseExperiment._reached_stop(stub(-2.3), -2.29) and not BaseExperiment._reached_stop(stub(None), -9.0)
+    assert not BaseExperiment._reached_stop(stub(-2.3), None) and not BaseExperiment._reached_stop(stub(-2.3), float("nan"))
