@@ -17842,6 +17842,22 @@ entries:
       with the reason; live site list: lxplus up. plan_check site_down kept (keeper: it also covers claims read from site
       list). main_session_guard.py deleted (unregistered since D185, delegation_note.py does its job), its scenario removed
       (33c103944); scenario suite 61 failures before and after, the same set.'
+  - at: '2026-11-24T13:20:54+00:00'
+    text: '2026-11-24 step 32, D534 diagnosis of the three holds (runs.db decisions/items, main transcript relays, plan asks).
+      critical_batch step 2: 55 GPU-h ask 01:13; D532''s recorded covers name ''its validation against batch-size runs'' but
+      the item has no est-gpu-hours and the budget rule passes only an approval ''at that cost'' or the project''s usual size,
+      so approved named work above 30 GPU-h always asks; the step was itself written ''send it to Joaquin''; relayed 01:25
+      and in 5 status lists to 13:15, unanswered 13 h. zng_uq_benchmark step 4: 136 GPU-h ask 11-20 15:16 for D483''s named
+      ladder (no cost in D483, item est 125); relayed once 11-20 15:20, then not again until 11-24 13:15 (4 days unseen: ''an
+      open question is asked once, repeated only with something new''). llm_compare part (b): ''Your hold'' ask 11-23 22:40
+      whether to start before part (a) ends, recorded with blocks: not recorded; D522 already orders it after near-optimal
+      HPs, so the question held nothing D522 had not; part (a)''s search ended 14:15 (E8541, 8 trials, 0 failed), so D522''s
+      condition is met once (a) is scored. No commit since 11-22 changes how a question holds work (c4e1c6dad''s asked-by-name
+      exception covers neither: no usual size). R5 case: context_guard PreCompact refused every auto compaction while pending()
+      found omissions and the PostToolUse note never listed them; main context peaked 691,429 tokens 13:10:15 against a 500k
+      window; fix (mechanical-worker, refuse once per cycle, let through above 1.3x, carry items) in the working tree 13:16,
+      first compaction 13:13:02; commit waits on the repo-reviewer. Step 24 (wake re-measure, done 11-22) also unreported
+      2 days behind the same reviewer backlog.'
   handoff:
     state: 'D534 step 30: parts 1, 2, 3, 4 built and replayed (findings 2026-11-24). Left: a live check of part 3 at the next
       real broken trial (expect an acked RUN event with ''folded into its search'', no wake) and at the next lxplus master
