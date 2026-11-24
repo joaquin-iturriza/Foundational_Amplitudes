@@ -16507,9 +16507,9 @@ entries:
     '34': 2026-11-26 (the first real lxplus submit; read its submit file and gpu_window charge)
   owner:
     agent: a43d971069d45144e
-    state: working
+    state: stopped
     since: '2026-11-24T13:15:27+00:00'
-    state_at: '2026-11-24T18:24:02.558000+00:00'
+    state_at: '2026-11-24T18:33:57.728000+00:00'
     context: 253155
     context_at: '2026-11-24T18:29:15+00:00'
   designs:
@@ -43553,9 +43553,9 @@ entries:
     withdrawn_why: 'answered: D541 says route log reading and simple fixes through DeepSeek and test harder tasks'
   owner:
     agent: a0b32d95ff985a14c
-    state: working
+    state: stopped
     since: '2026-11-24T17:46:29+00:00'
-    state_at: '2026-11-24T18:29:08.299000+00:00'
+    state_at: '2026-11-24T18:42:48.992000+00:00'
     context: 203292
     context_at: '2026-11-24T18:29:21+00:00'
   designs:
