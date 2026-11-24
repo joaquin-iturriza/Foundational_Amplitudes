@@ -428,7 +428,7 @@ def result_table(inp):
 
 
 _SITES = {"lxplus": r"lxplus", "ccin2p3": r"ccin2p3|cc-in2p3|\bCC\b", "jeanzay": r"jean\s*zay|jeanzay"}
-_DOWN = r"\b(?:down|unreachable|2FA|reconnect\w*|not answering)\b"
+_DOWN = r"(?<!reported )(?<!called )(?<!said )(?<!declared )\b(?:down|unreachable|2FA|reconnect\w*|not answering)\b"
 
 
 def site_down(inp):
