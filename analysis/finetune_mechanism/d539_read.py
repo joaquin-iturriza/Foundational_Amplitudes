@@ -7,6 +7,8 @@ Measure: best val MSE(log|M|^2) = min val mu-MSE x prepd_std^2 (each run's own d
 process and D, three-seed geometric means, 2-sigma interval from the arms' own seed log-sd (zng4g_d1e3_read.ratio).
 
     python3 analysis/finetune_mechanism/d539_read.py [--cached]   -> data/d539.json, figs/d539
+    python3 analysis/finetune_mechanism/d539_read.py --set s [--cached]   -> the step-4 set at hp1333 (S's optimum),
+        runs ftmech_d539s_*, every cell off/eps1e-8 and all new: data/d539s.json, figs/d539s
 """
 import json
 import os
@@ -24,6 +26,10 @@ from zng4g_d1e3_read import REMOTE, ratio  # noqa: E402
 CELLS = {("zng", "1e4"): ["off", "eps1e-8", "eps1e-4", "eps1e-2", "eps1", "massless"],
          ("zng", "1e5"): ["off", "eps1e-8"], ("uug", "1e4"): ["off", "eps1e-8"], ("uug", "1e5"): ["off", "eps1e-8"]}
 SEEDS = (42, 43, 44)
+SET = sys.argv[sys.argv.index("--set") + 1] if "--set" in sys.argv else ""   # "" = hp1961 (step 3), "s" = hp1333
+if SET:
+    CELLS = {c: ["off", "eps1e-8"] for c in CELLS}
+TAG = f"d539{SET}"
 REUSED = "ftmech_zng4g_scrsoftsrch_b2048"   # Z+4g 1e4 eps1e-8: the one-setting search's chosen trial hp1961
 
 
@@ -33,20 +39,20 @@ def collect():
         for a in arms:
             for s in SEEDS:
                 lab = f"{p}|{d}|{a}|{s}"
-                if (p, d, a) == ("zng", "1e4", "eps1e-8"):
+                if (p, d, a) == ("zng", "1e4", "eps1e-8") and not SET:
                     if s == 42:
                         t = next(t for t in driven(REUSED) if t[1] == 1961)
                         args.append(f"'{lab}#{t[4]}#{t[5]}'")
                         continue
                     n = f"{REUSED}_s{s}"
                 else:
-                    n = f"ftmech_d539_{p}_{d}_{a}_s{s}"
+                    n = f"ftmech_{TAG}_{p}_{d}_{a}_s{s}"
                 args.append(f"'{lab}#{CC}/runs/{n}#{CC}/sweeps/{n}/results/fixed.json'")
     return site_python(REMOTE.replace("ZNG1K", "D539"), args, "D539")
 
 
 def main():
-    cache = os.path.join(HERE, "data", "d539_raw.json")
+    cache = os.path.join(HERE, "data", f"{TAG}_raw.json")
     raw = json.load(open(cache)) if "--cached" in sys.argv else collect()
     json.dump(raw, open(cache, "w"))
     best, curves, missing = {}, {}, []
@@ -69,7 +75,7 @@ def main():
                 cell[a]["over_off"] = ratio(np.array([b[s] for s in SEEDS]), np.array([off[s] for s in SEEDS]))
         res["cells"][f"{p}_{d}"] = cell
     res["blowups"] = [k for k, c in curves.items() if np.any(c > 10 * np.minimum.accumulate(c))]
-    json.dump(res, open(os.path.join(HERE, "data", "d539.json"), "w"), indent=1)
+    json.dump(res, open(os.path.join(HERE, "data", f"{TAG}.json"), "w"), indent=1)
     print(json.dumps(res))   # one line: verify_claims reads the last {...} line
     plot(res, curves)
 
@@ -111,7 +117,7 @@ def plot(res, curves):
     h.set_ylabel(r"val MSE$(\log|\mathcal{M}|^2)$"); ps.process_label(h, r"$q\bar q\to Z+4g$")
     a.plot([], [], "o", color="0.5", mfc="none", label="blew up (read\nat its best)")
     ps.legend_cell(cell, a)   # panel (b) plots off and eps1e-8 with panel (a)'s markers
-    ps.save(fig, os.path.join(HERE, "figs", "d539"))
+    ps.save(fig, os.path.join(HERE, "figs", TAG))
 
 
 if __name__ == "__main__":

@@ -16,7 +16,9 @@ import numpy as np  # noqa: E402
 from analysis.common.readers import site_python  # noqa: E402
 from tools.kit_mlp_readout import deepest  # noqa: E402
 
-RUNS = [f"ftmech_d539_uug_{d}_{a}_s{s}" for d in ("1e4", "1e5") for a in ("off", "eps1e-8") for s in (42, 43, 44)]
+SET = sys.argv[sys.argv.index("--set") + 1] if "--set" in sys.argv else ""   # "s" = the step-4 set at hp1333
+TAG = f"d539{SET}"
+RUNS = [f"ftmech_{TAG}_uug_{d}_{a}_s{s}" for d in ("1e4", "1e5") for a in ("off", "eps1e-8") for s in (42, 43, 44)]
 SITE = r'''
 import json, os, sys
 out = {}
@@ -30,19 +32,19 @@ print("D539KIT " + json.dumps(out))
 
 
 def main():
-    cache = os.path.join(HERE, "data", "d539_kit_raw.json")
-    raw = json.load(open(cache)) if "--cached" in sys.argv else site_python(SITE, RUNS, "D539KIT")
+    cache = os.path.join(HERE, "data", f"{TAG}_kit_raw.json")
+    raw = json.load(open(cache)) if "--cached" in sys.argv else site_python(SITE, RUNS, "D539KIT")   # same marker for both sets
     json.dump(raw, open(cache, "w"))
     deep = {r: deepest(st) for r, st in raw.items()}
     res = {"missing": [r for r in RUNS if r not in raw], "cells": {}}
     for d in ("1e4", "1e5"):
-        cell = {a: {f: [deep.get(f"ftmech_d539_uug_{d}_{a}_s{s}", {}).get(f) for s in (42, 43, 44)]
+        cell = {a: {f: [deep.get(f"ftmech_{TAG}_uug_{d}_{a}_s{s}", {}).get(f) for s in (42, 43, 44)]
                     for f in sorted(deep[next(iter(deep))])} for a in ("off", "eps1e-8")}
         # logmse is the MSE of log10|M|^2: log10 of the seed-median ratio, eps1e-8 over off, in decades
         cell["delta_dec"] = {f: float(np.log10(np.median([x for x in cell["eps1e-8"][f] if x is not None])
                                                / np.median([x for x in cell["off"][f] if x is not None]))) for f in cell["off"]}
         res["cells"][d] = cell
-    json.dump(res, open(os.path.join(HERE, "data", "d539_kit.json"), "w"), indent=1)
+    json.dump(res, open(os.path.join(HERE, "data", f"{TAG}_kit.json"), "w"), indent=1)
     print(json.dumps(res))
 
 
