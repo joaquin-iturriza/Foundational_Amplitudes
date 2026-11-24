@@ -43577,8 +43577,6 @@ entries:
     3: 'plan done lab_llm_trial --writeup a3bcab715 (write-up par:labllm1, par:labllm2 committed a3bcab715 and ac845711e,
       figures committed, worktree folded) once the notes-editor backlog passes (its blocks are in other entries'' sections:
       sec:noisescale and fig:llmcmp_heldout) and the repo-reviewer advances over the merge d75c664b9'
-    4: 'Breakdown of owners'' and main session''s tokens (2026-11-09..23) by kind of work (tools/token_share.py --kinds):
-      each kind''s tokens and share'
     5: 'Lab trial (DeepSeek, Qwen) on real instances of the largest routable kinds, under a reviewed design: correct rate
       against our own output and tokens saved per instance; proposal of what to route'
   done_when: null
@@ -44151,13 +44149,6 @@ entries:
       if:
       - 'both reviewers passed: plan done'
       - 'a reviewer blocks on lab_llm_trial text or code: fix it, re-check with the same reviewer'
-    4:
-      feeds: which larger shares of our token use the lab LLMs could take (D551)
-      if:
-      - 'a few kinds hold most of the spend and some are plausibly routable: design and run a lab trial on real instances
-        of the largest'
-      - 'the spend is context carried across every kind (no separable kind): say so with the numbers, propose routing whole
-        agents (reviewers, workers) instead'
     5:
       feeds: which larger shares of our token use the lab LLMs could take (D551)
       if:
