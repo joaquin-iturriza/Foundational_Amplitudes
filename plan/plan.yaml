@@ -45189,5 +45189,17 @@ entries:
       read the private repo) goes to him with the fallback (public toy repo or a bundle push).'
     sources: 'D547 (private toy repo, ''I don''t see why not''); the main session''s narrowing (one real cluster, separate
       HOME, CC login policy); D544 (CC login nodes: no scripts); cost 2 GPU jobs x <=10 min = <=0.34 GPU-h'
+    passed_at: '2026-11-24T20:13:13+00:00'
+    reviewer: 'Re-check after FIX: control now uses only kit-trippable checks (no toy rows/job ids in FA runs.db, no toy decision/item/event
+      in FA ledger, no new file under CC ~/.ccorch/jobs, no toy line in ~/.ccorch/gpu_window.jsonl, gate+sbatch sha1 with
+      FA''s stamp list 1f842294.../4 stamps before and after); both GPU jobs go out together after one site pick --jobs 2
+      (no ordering without a read). Check 2: _rd rewrites $HOME/.ccorch and quoted .ccorch in ssh_cmd, run_ssh_input, run_as_job
+      and both gate payloads (2 of 2 decode to .ccorch_kit); CC profile files carry no ccorch PATH line, so the kit never
+      reaches FA''s wrapper. Check 3: one seed, pass/fail, bar is train.py''s assert |w-3|,|b-1|<0.1. Ledger off in the kit
+      HOME: with ledger off bin/site skips ensure_gate and the wrapper (submit path line 916), so the gate and items are not
+      exercised; the design lists them as untested in README and in the result, a blocked part (decide needs typed user words
+      in a transcript), not a chosen cut; the remote dir is still exercised by the env CPU job (~/.ccorch_kit/jobs). Cost
+      <=0.34 GPU-h. Searched orchestrator, kit, toy, ccorch_kit, standalone, examples/toy in docs/results.tex, plan, site
+      decisions: no prior kit proof (kit hits only the KIT benchmark).'
   step_waits:
     '1': the design reviewer (re-check of the revised CC proof design)
