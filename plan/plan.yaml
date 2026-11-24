@@ -40211,10 +40211,6 @@ entries:
   - D527
   - D528
   next:
-    2: 'Part (a) wave 3 running on CC (driver llmcmp_a_drive6, log ~/.local/share/ccorch/detached/20261123-205657_llmcmp_a_drive6.log):
-      trial 6 FA-ccin2p3-b135e7db (hp1723, lr 1.03e-3, val MSE of z 1.31e-3 at 08:40) and trial 7 FA-ccin2p3-f3e29e87 (hp0836,
-      lr 1.03e-3, 1.07e-3 at 09:00); 6 of 8 observed, best trial 5 FA-ccin2p3-c891c0c2 (lr 1.24e-3) 4.81e-4; the driver writes
-      DRIVE_DONE when both end'
     5: 'Part (c) readout: when llmcmp_c_qperp''s driver writes DRIVE_DONE and its control ends, score (c)''s best trial and
       the control (REREAD=<run> scripts/job_llm_score.sh), read per set (seen, held out, relabels, new) pooled RMSE and median
       per-process MSE against (a)''s best with the 1.38 margin, figure in Suprio''s layout; write-up'
@@ -40351,11 +40347,6 @@ entries:
     context: 194316
     context_at: '2026-11-24T13:15:16+00:00'
   step_why:
-    2:
-      feeds: 'part (a): the best tuned trial'
-      if:
-      - 'search ends: score the best trial, figure and write-up (step 3)'
-      - 'a trial breaks: read its log, fix, --retry-failed'
     5:
       feeds: 'part (c): our latest setup against part (a), the LLM and his LLoCa; where part (b) starts'
       if:
