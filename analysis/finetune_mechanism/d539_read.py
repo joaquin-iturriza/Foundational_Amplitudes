@@ -95,11 +95,11 @@ def plot(res):
         for j, k in enumerate(("off", "eps1e-8")):
             v = [x for x in res["cells"][f"{p}_{d}"][k]["best"] if x is not None]
             g.plot(np.full(len(v), i + (j - 0.5) * 0.3) + np.linspace(-0.05, 0.05, len(v)), v,
-                   "o" if k == "off" else "s", color=cols[k], mfc="none" if k == "off" else cols[k])
+                   "o", color=cols[k])
         ticks.append(f"{names[p]}, $10^{{{d[-1]}}}$")
-    g.set_xticks(range(len(ticks))); g.set_xticklabels(ticks, fontsize="small"); g.set_yscale("log")
+    g.set_xlim(-0.5, len(ticks) - 0.5); g.set_xticks(range(len(ticks))); g.set_xticklabels(ticks, fontsize="small"); g.set_yscale("log")
     g.set_xlabel(r"process, $D_{\rm train}$"); g.set_ylabel(r"best MSE$(\log|\mathcal{M}|^2)$")
-    ps.shared_legend(fig, a)
+    ps.legend(a)   # panel (b) plots off and eps1e-8 with panel (a)'s markers
     ps.save(fig, os.path.join(HERE, "figs", "d539"))
 
 
