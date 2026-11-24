@@ -34643,6 +34643,7 @@ entries:
     - FA-ccin2p3-2d4d3709
     - FA-ccin2p3-394f20ac
     - FA-ccin2p3-47e14eae
+    - FA-ccin2p3-5431deeb
     - FA-ccin2p3-67fb62ef
     - FA-ccin2p3-6b5c5372
     - FA-ccin2p3-7390e5a4
@@ -34669,12 +34670,13 @@ entries:
     - FA-lxplus-8b928927
     - FA-lxplus-9a0f77c5
     - FA-lxplus-f3901ad0
-    commit: df7c957a
+    commit: 3598de8e
     paths:
     - analysis/zng_uq/benchmark.py
     - analysis/zng_uq/data/benchmark.json
     - analysis/zng_uq/data/d507.json
     - analysis/zng_uq/data/d507_read.json
+    - analysis/zng_uq/data/d507_read_v2.json
     - analysis/zng_uq/data/paper_mse.json
     - analysis/zng_uq/data/parent_bbx.json
     - analysis/zng_uq/data/parent_wlr.json
@@ -34683,6 +34685,7 @@ entries:
     - analysis/zng_uq/data/protocol_test_delta_lxplus.json
     - analysis/zng_uq/data/selection.json
     - analysis/zng_uq/data/zng_curves.json
+    - analysis/zng_uq/figs/zng_d507_v2.png
     - analysis/zng_uq/seed_chunks/d514_muon_b128_hp0078_s43.txt
     - analysis/zng_uq/seed_chunks/d514_muon_b128_hp0078_s44.txt
     - config/amplitudes.yaml
