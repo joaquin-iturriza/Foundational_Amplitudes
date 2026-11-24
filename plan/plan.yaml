@@ -45552,3 +45552,31 @@ entries:
       if:
       - 'license named: add LICENSE, push'
       - 'gate test wanted: rerun proof with ledger on'
+- id: selective_rescale
+  title: 'Event-dependent momentum rescale: the soft-limit gain without the bulk cost'
+  question: Can the momentum log-rescale be applied only where it helps, by a rule that depends only on the event's own information
+    (e.g. a smooth gate on the energy fractions x_i or pair invariants, or the rescale fed as an extra input beside the raw
+    momenta), so that e+e- -> u u~ g keeps its ~4.6-decade soft-limit gain while q q~ -> Z+4g and u u~ g at 1e4 lose the ~2x
+    bulk cost found under D539?
+  status: running
+  quotes:
+  - said_at: '2026-11-24T23:35:58.464000+00:00'
+    text: But can't we just use the rescale when it matters and not when it hurts? there has to be a way of keeping the effect
+      on the bins this targets without hurting the rest, in a way that only depends on the information of the event
+    decision: D552
+    covers:
+    - selective_rescale
+  decisions:
+  - D552
+  next: Design against D539's arms (no rescale, rescale eps=1e-8) on Z+4g and u u~ g at 1e4 and 1e5 events, kit bins and bulk
+    validation, each arm at its own searched optimum, three seeds; propose candidate event-dependent schemes, pick by a cheap
+    check on existing data, design review, then run
+  done_when: null
+  notes_ref: null
+  match: selres_*
+  evidence:
+    runs: []
+    commit: null
+    paths: []
+  dead_ends: []
+  asks: []
