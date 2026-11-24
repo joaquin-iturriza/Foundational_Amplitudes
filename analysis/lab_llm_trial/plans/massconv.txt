@@ -1,0 +1,34 @@
+PLAN massconv (edit only mg5_pipeline_final.py and tools/nlo_virtual_pipeline.py)
+
+Cause: test_masses_match_card needs mg.LOCKED_MT (missing). Also LO entries with an external top
+sample m=173.0 with empty param_card_patches (card default 173.0), but the pipeline pins MT=172.5.
+Test rule: for every non-virt entry with pdg_ids, sampled final masses == card mass
+(card = defaults {b 4.7, t 173.0, ...} overridden by MT/MB patches); if a top is a final,
+patches must have MT == ymt == mg.LOCKED_MT.
+
+Failing entries (found by running the test logic): ee_ttbar, uubar_ttbar, udbar_tbbar,
+ee_ttbarg, ee_ttbarH, uubar_ttbarg (top external, 173.0, no patches), and ee_wwbb
+(b sampled 0.0 but card MB=4.7).
+
+Step 1. In mg5_pipeline_final.py, near the top (before PROCESSES, e.g. just above line ~105
+comment block), add:
+    LOCKED_MT = 172.5   # = tools/nlo_conventions.py MT/ymt, the virtual pipeline's pinned top mass
+Step 2. For each of the 6 top entries (lines ~444, 838, 890, 959, 1015, 1076):
+  - replace every 173.0 by 172.5 (m_final / m_finals; udbar_tbbar becomes [172.5, 4.7])
+  - set "param_card_patches": {"MT": LOCKED_MT, "ymt": LOCKED_MT}
+    (ee_ttbar at ~line 441 has "param_card_patches": {} just above its m_final; the others the
+    same, just above their m_final(s) lines. Use LOCKED_MT, not a literal.)
+  Leave the comment on line 102 alone.
+Step 3. ee_wwbb (line ~503): "m_finals": [80.419, 80.419, 4.7, 4.7]  (b at its card mass;
+  fix the comment, "mb=4.7"). Do NOT patch MB.
+Step 4. Virtual entries: ee_bb_nlo (~line 1222) "m_finals": [4.7, 4.7] instead of 4.18;
+  same in tools/nlo_virtual_pipeline.py line 50 ("ee_bb"). Leave ee_ttbar (already 172.5).
+  (Not checked by the test, but it is the reported defect; MB is not patched, so 4.7.)
+Step 5. Check nothing else consumed 173.0 for these: grep -n "173" mg5_pipeline_final.py
+  (line 102 is only a doc example). If the patch mechanism needs a parameter name check, MT/ymt are
+  the names used in tools/nlo_conventions.py lines 100-101.
+
+Run tests (from the repo root):
+  /home/joaquin/work/FA/.venv-cpu/bin/python -m pytest tests/test_beam_order.py -q
+Expect 2 passed (+ the cpp test, which skips without a standalone; if collected and not skipped
+it is fine as long as it passes). Do not edit the test file.

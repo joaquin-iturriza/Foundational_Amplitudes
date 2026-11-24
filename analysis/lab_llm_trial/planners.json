@@ -13,5 +13,10 @@
  "valtotal": "a71c6ea3b8136f075",
  "emastart": "ace72678293389c59",
  "statssrc": "ab216a5db27bcf571",
- "topsampling": "a60e79b46e046d4f1"
+ "topsampling": "a60e79b46e046d4f1",
+ "massconv": "aac043f7b42b8f615",
+ "backlogdepth": "a8e2c3f6795c42476",
+ "recheck": "ae52e87f135ecae3c",
+ "inflight": "a7d4e3056343f9f76",
+ "endedrun": "adaf3c0cbfbf7dd68"
 }

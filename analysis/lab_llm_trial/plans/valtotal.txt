@@ -1,0 +1,45 @@
+PLAN: val_total step-0 alignment + RESULT_JSON field names. Two small edits, no test edits.
+
+CAUSE
+ (1) base_experiment.py BaseExperiment._validate_start trims the step-0 validation back out of the curves listed in
+     _START_CURVES, but val_total (rebound in experiment._validate: self.val_total = getattr(...)+[vt]) is not listed,
+     so it keeps the step-0 entry and is one index ahead of val_loss_no_reg's best index.
+ (2) sweep/run_trial.py main(): `val_loss = _objective_value(cfg, result)` is then printed in RESULT_JSON as "val_loss",
+     so with objective val_total the sweep reads val_total as the val_loss. Tests want val_loss = result["val_loss"]
+     (best ckpt val_loss_no_reg) and the objective under new key "objective_value".
+
+EDIT 1: /tmp/.../repo/base_experiment.py (~line 1256), add "val_total" to the tuple:
+    _START_CURVES = ("val_loss", "val_loss_no_reg", "val_mse", "val_loss_no_reg_all",
+                     "train_eval_loss_no_reg", "train_eval_mse", "val_total")
+ _validate_start needs no other change: if val_total existed before, it is cut back to its old length; if it did not,
+ it is delattr'ed (the loop already handles both).
+
+EDIT 2: sweep/run_trial.py
+ a) add a module-level function next to _objective_value (~line 165):
+    def result_fields(res):
+        """(val_loss_no_reg, objective name, objective value) of a RESULT_JSON dict, new or pre-fix lines."""
+        obj = res.get("objective", "val_loss")
+        if "objective_value" in res:
+            return res["val_loss"], obj, res["objective_value"]
+        # old line: val_loss carried the objective, so it is val_loss_no_reg only when the objective is val_loss
+        return (res["val_loss"] if obj == "val_loss" else None), obj, res["observe_loss"]
+ b) in main() (~line 454), non-cells branch: replace
+        val_loss        = _objective_value(cfg, result)
+    by
+        val_loss        = result["val_loss"]
+        objective_value = _objective_value(cfg, result)
+    and in the cells branch (~line 445) after `result = {"val_loss": val_loss}` add `objective_value = val_loss`.
+ c) ~line 461: `observe_loss = hpo_obj if hpo_obj is not None else objective_value`
+ d) RESULT_JSON dict (~line 470): keep "val_loss": val_loss, "objective": ..., and add
+        "objective_value": float(objective_value),
+    (observe_loss stays; test expects observe_loss == objective value when no scaling_law.)
+    The print line above may keep val_loss=...; optionally add objective_value too.
+ e) optional (not needed by tests): sweep/drive.py ~lines 327-332 reads res["val_loss"]/res["observe_loss"]; leave as is.
+
+NOTE: the failure RESULT_JSON (failed: True) has no such fields; leave it.
+
+RUN (from the repo copy root):
+    cd /tmp/claude-1000/lab_llm_trial/fix_valtotal_planner/repo   # use YOUR identical copy's path
+    /home/joaquin/work/FA/.venv-cpu/bin/python -m pytest tests/test_val_total.py -q
+ (or: /home/joaquin/work/FA/.venv-cpu/bin/python tests/test_val_total.py). All 7 tests must pass; do not edit the test file.
+ Tests that fail before the fix: test_validate_start_val_total, test_result_json_fields, test_detached_result_json.

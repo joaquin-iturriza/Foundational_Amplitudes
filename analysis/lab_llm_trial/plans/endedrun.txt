@@ -1,0 +1,51 @@
+PLAN: ended runs vs a working step agent (tools/plan.py only; do not edit tests)
+
+Cause: in why_moves() (tools/plan.py ~line 526), the `if ended:` branch returns "runs ended: ..." BEFORE the
+step_working() check, so a working step agent never owns any ended run. The tests (tests/test_setup_scenarios.py
+lines ~220-260) want: while a step agent is working (not handed back, last transcript record within STEP_MIN),
+an ended run it OWNS is not listed. A run is owned by that agent if it was submitted at/after the agent started,
+or it finished at/before the agent's last transcript record. If ANY ended run is not owned by a working agent,
+list ALL ended runs (unchanged text). Once the agent hands back, everything is listed again (already works).
+
+Failing scenarios now (the other 2 failures, "PLAN_TEST=1 with a root outside..." and "the migration marks the
+setup's own entries setup", are unrelated/environmental: leave them):
+ - "a run that ended while the step agent kept working is its to handle: not listed"
+ - "a run the working step agent submitted is its to handle, even if it ended after its last record"
+
+Change (1): add this helper right after step_working() (~line 432). Do NOT change runs_of()'s tuple shape
+(other callers unpack 3 fields); read submitted with a separate query. Table runs has columns
+id, project, state, item, submitted, finished.
+
+def owned_ended(st, eid, ended, t):
+    """True when every ended run (ids) belongs to a working step agent of the entry: it was submitted after the
+    agent started, or finished by the agent's last transcript record."""
+    ws = []
+    for x in (st.get(eid) or {}).get("steps") or []:
+        a = None if step_problem(st, eid, x) else subagent_activity(x.get("agent"))
+        if a and not a[1] and 0 <= (t - a[0]).total_seconds() / 60 <= STEP_MIN:
+            ws.append((parse(x.get("at")), a[0]))          # (agent start, last record)
+    c = db()
+    sub = {r: s for r, s in c.execute("SELECT id, submitted FROM runs WHERE project=?", [PROJECT])} if c else {}
+    return bool(ws) and all(any((sub.get(r) and parse(sub[r]) >= s0) or parse(fin) <= last for s0, last in ws)
+                            for r, fin in ended)
+
+Change (2): in why_moves(), the `ended = [...]` list holds (run, fin) pairs already. Replace
+        if ended:
+            return "runs ended: " ...
+with
+        if ended and owned_ended(st, e["id"], ended, t):
+            return None          # a working step agent owns them; they are listed again after its handback
+        if ended:
+            return "runs ended: " ... (keep the existing return line exactly)
+
+Note `fin` in `ended` is the raw registry value (epoch int); parse() accepts ints. `t` is a tz-aware datetime
+(same as step_working's argument). Keep the later unreachable-looking `acts`/step_working code as is.
+
+Run (from the repo copy root):
+  cd /tmp/claude-1000/lab_llm_trial/fix_endedrun_planner/repo   (use your identical copy's path)
+  /home/joaquin/work/FA/.venv-cpu/bin/python tests/test_setup_scenarios.py 2>&1 | grep -E "FAIL|scenarios pass"
+(pytest tests/test_setup_scenarios.py only runs 1 wrapper test and passes already: it is not the check.)
+Expected: the two scenarios above plus all PASS ones around them pass; baseline was 236/240, aim for 238/240 with
+only the two unrelated failures left. Check especially "with a working step agent and one run it does not own",
+"A owns r1, r2 is not", and "once it hands back" still PASS.
+Also verify `plan next` path: why_moves is used at lines ~587 and ~1102 so both get the fix; no other edit needed.

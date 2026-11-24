@@ -1,0 +1,57 @@
+PLAN: step agent still writing its transcript counts as in flight
+Work in your copy; edit only tools/plan.py (do not edit tests).
+
+Cause: why_moves() (tools/plan.py ~line 505) decides "in flight" from the recorded step's
+start time only: `if ls and 0 <= (t - ls).total_seconds()/60 <= STEP_MIN: return None`.
+A step started >30 min ago that is still writing is thus "nothing in flight" (stalled).
+Failing scenario: "a step agent started 40 min ago that wrote a record 5 min ago is in flight"
+(tests/test_setup_scenarios.py ~line 182). Handed-back agents (transcript contains a
+SubagentHandback tool_use) must stay NOT in flight; quiet >30 min also not in flight.
+
+Fix, 2 edits:
+
+1) Add a helper after subagent_started() (~line 430). Transcript lines are JSON with
+   "timestamp" and message.content list items {"type":"tool_use","name":...}:
+
+def agent_activity(agent_id):
+    """(last record time, handed back?) of the subagent's transcript; (None, False) if unreadable."""
+    base = ENV.get("PLAN_AGENTS")
+    pat = os.path.join(base, "agent-%s.jsonl" % agent_id) if base else \
+        os.path.join(S().TRANSCRIPTS, slug() + "*", "*", "subagents", "agent-%s.jsonl" % agent_id)
+    last, back = None, False
+    for f in glob.glob(pat) if re.fullmatch(r"[A-Za-z0-9_-]+", agent_id or "") else []:
+        for line in open(f, errors="replace"):
+            try:
+                m = json.loads(line)
+            except ValueError:
+                continue
+            last = max([x for x in (last, parse(m.get("timestamp"))) if x] or [None]) if m.get("timestamp") else last
+            c = (m.get("message") or {}).get("content")
+            back = back or (isinstance(c, list) and any(
+                isinstance(x, dict) and x.get("type") == "tool_use" and x.get("name") == "SubagentHandback" for x in c))
+    return last, back
+
+2) In why_moves(), replace the line `if ls and 0 <= (t - ls)... <= STEP_MIN: return None` by:
+
+        for s_ in (st.get(e["id"]) or {}).get("steps") or []:
+            if step_problem(st, e["id"], s_):
+                continue
+            last, back = agent_activity(s_["agent"])
+            last = max([x for x in (last, parse(s_["at"])) if x])
+            if not back and 0 <= (t - last).total_seconds() / 60 <= STEP_MIN:
+                return None
+
+   (Handed-back agent: skipped, so never in flight. Started 10 min ago with no later records:
+   last == its start, still in flight, as before.)
+   Leave the `marks` / since computation below it unchanged.
+
+3) Optionally update the docstring line ~28 ("started within STEP_MIN minutes") to say
+   "wrote its transcript within STEP_MIN minutes and has not handed back".
+
+Run (from the repo copy root; the file is a script with its own runner, pytest only collects one test):
+  /home/joaquin/work/FA/.venv-cpu/bin/python tests/test_setup_scenarios.py 2>&1 | grep -E "FAIL|scenarios pass"
+Success: the "wrote a record 5 min ago is in flight" scenario passes. Two other FAILs exist before
+the change and are unrelated (environment): "3: PLAN_TEST=1 with a root outside the temp
+directory is refused" and "the migration marks the setup's own entries setup"; expect 227/229
+(baseline 226/229). If either of those two also flips, do not chase it.
+Check also that "one that handed back 5 min ago is not" and "quiet >30 min ago is not" still PASS.

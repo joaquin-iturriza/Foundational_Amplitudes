@@ -1,0 +1,65 @@
+PLAN: fine-tune EMA start (edit ONLY base_experiment.py in the repo copy; do not touch tests)
+
+Cause: init_model() (base_experiment.py ~l.396) builds self.ema = ExponentialMovingAverage(model.parameters())
+BEFORE the fine-tune loads the parent (AmplitudeExperiment.init_model in experiment.py ~l.1411, after
+super().init_model()). The shadow is a copy of the random init, so EMA-scored validations blend it in.
+Neither _restart_ema nor _validate_start exists yet (grep finds nothing); the tests call them unbound with a
+types.SimpleNamespace as self, so they may only use: self.ema/model/device/cfg.training.ema_decay and the class
+attrs _START_CURVES, _START_PER_PROCESS, self.train_sampler, self._validate (+ the curve attributes).
+
+1) In class BaseExperiment (put next to train() / _validate, ~l.927) add class attributes:
+    _START_CURVES = ("val_loss", "val_loss_no_reg", "val_mse", "val_loss_no_reg_all",
+                     "train_eval_loss_no_reg", "train_eval_mse")   # lists; some created on first use
+    _START_PER_PROCESS = ("proc_val_losses", "proc_val_losses_no_reg")  # dict name -> list
+
+2) Add method:
+    def _restart_ema(self):
+        """Rebuild the EMA on the current (loaded) weights."""
+        self.ema = ExponentialMovingAverage(self.model.parameters(), decay=self.cfg.training.ema_decay)
+        self.ema.to(self.device)
+
+3) Add method (step -1 so (step+1)%validate_every==0 makes _validate record its curve entry, which we then remove):
+    def _validate_start(self):
+        """Score the weights before any update; the entry is taken back out of every curve (never a checkpoint
+        candidate). Returns the no-reg loss (else the loss), or None with the balanced sampler (its
+        _validate calls train_sampler.record_snapshot, which would skew it)."""
+        if self.train_sampler is not None:
+            return None
+        lens = {k: len(getattr(self, k)) for k in self._START_CURVES if hasattr(self, k)}
+        plens = {k: {p: len(v) for p, v in getattr(self, k).items()} for k in self._START_PER_PROCESS}
+        v = self._validate(-1)
+        nr = self.val_loss_no_reg
+        v0 = nr[-1] if len(nr) > lens["val_loss_no_reg"] else v
+        for k in self._START_CURVES:
+            if k in lens:
+                setattr(self, k, getattr(self, k)[:lens[k]])   # slice: the multi-process path reassigns lists
+            elif hasattr(self, k):
+                delattr(self, k)                               # created by this validation
+        for k, pl in plens.items():
+            d = getattr(self, k)
+            for p in list(d):
+                if p in pl: del d[p][pl[p]:]
+                else: del d[p]
+        return v0
+   Test expects: returns 0.25 (the no-reg value), val_* lists empty, `train_eval_loss_no_reg` attr gone,
+   proc dicts == {}. Note the test's stub has no val_mse growth: fine (len unchanged).
+
+4) In train() (base_experiment.py), right after `self.val_metrics = self._init_metrics()` is too early for
+   nothing; put it just BEFORE the "evaluate at initialisation (step 0 ...)" block (~l.1010), after the curves
+   are initialised:
+        ft_path = (self.cfg.get("fine_tune", None) or {}).get("pretrained_path", None)
+        if ft_path is not None and self.ema is not None and not self.warm_start:   # a resume keeps its loaded EMA
+            self._restart_ema()
+            self._validate_start()
+   (Also fixes LoRA params injected after the EMA was built.) If self.cfg.get on a DictConfig misbehaves, copy
+   the `ft = self.cfg.get("fine_tune", None)` idiom used in experiment.py l.1411.
+   Optionally keep the value: self.start_val_loss = self._validate_start() (not required).
+
+5) Check _validate(-1) is harmless: base _validate calls log_mlflow(step=-1) only inside the (step+1)%every
+   branch and _sigma_rank_probe(-1) / _track_train_eval(-1); glance at _sigma_rank_probe (base ~l.1640) and
+   experiment.py _validate (l.4233-4430) for use of `step` that breaks at -1; guard in _validate_start only if so.
+   Do NOT change experiment.py unless that check forces it.
+
+Run tests (from the repo root):
+   /home/joaquin/work/FA/.venv-cpu/bin/python tests/test_ft_ema_start.py
+   (or: .venv-cpu/bin/python -m pytest tests/test_ft_ema_start.py -q). Both tests must print ok / pass.

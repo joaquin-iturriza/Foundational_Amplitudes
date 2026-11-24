@@ -135,6 +135,10 @@ def sandbox(run_dir, cmd, timeout, hide=True):
         os.makedirs(out)
         shutil.copy(os.path.join(HOME, "datasets", "manifest.json"), out)
     env["MG5_OUTPUT_DIR"] = out
+    # a temp dir apart from the run dir: run dirs sit under /tmp, so plan.py's "PLAN_ROOT under the temp directory"
+    # guard would take the copy's own root for a test root and the scenario suite's refusal check would fail
+    env["TMPDIR"] = os.path.join(run_dir, ".tmp")
+    os.makedirs(env["TMPDIR"], exist_ok=True)
     env.update(XDG_DATA_HOME=xdg + "/data", XDG_STATE_HOME=xdg + "/state", XDG_CONFIG_HOME=xdg + "/config",
                OPENCODE_CONFIG=cfg, PYTHONDONTWRITEBYTECODE="1")
     t0 = time.time()
@@ -213,9 +217,14 @@ def fix_setup(task, arm):
     if task in HARD:                               # the check handed over: the fix's test files
         for t in mt.TASKS[task][1]:
             open(os.path.join(repo, t), "w").write(mt.git("show", "%s:%s" % (c, t)))
+    git_base(repo)
+    return d, repo
+
+
+def git_base(repo):
+    """The copy as its own fresh git repository with one commit (the scenario suite runs git worktree in it)."""
     for cmd in (["init", "-q"], ["add", "-A"], ["-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qm", "base"]):
         subprocess.run(["git", "-C", repo] + cmd, check=True, capture_output=True)
-    return d, repo
 
 
 def fix_brief(task, repo):
@@ -252,6 +261,7 @@ def fixcheck(task):
         os.makedirs(repo)
         subprocess.run("git -C %s archive %s%s | tar -x -C %s" % (ROOT, c, "^" if rev == "parent" else "", repo),
                        shell=True, check=True)
+        git_base(repo)                             # as the arms' copies (fix_setup)
         out[rev] = fix_grade(task, d, repo)["passed"]
     r = {"family": "fixcheck", "task": task, "parent": out["parent"], "fix": out["fix"],
          "valid": out["fix"] and not out["parent"]}
@@ -328,6 +338,42 @@ def grade_sonnet(task, agent):
          "usd": mt.cost(agent)["usd"], "usage": {}, "rc": 0, "failing_first": g.get("failing")}
     record(r)
     print(json.dumps({k: r[k] for k in ("task", "arm", "first_pass", "seconds", "our_tokens")}))
+
+
+
+CHECK = ("Check one fix made by another model (lab LLM trial; the routed flow's check, D541). The copy is %s, its base "
+         "commit %s is the code before the fix. Read the change whole: git -C %s diff %s (committed and uncommitted). "
+         "The defect it had to fix, as it was seen:\n%s\nIts check is the test file(s) %s, handed over in their fixed "
+         "version and not to be edited. Run them from inside the copy with %s <file> when the file has a __main__ runner, else with that python -m "
+         "pytest -q <file> (in tests/test_setup_scenarios.py the scenarios "
+         "named 'PLAN_TEST=1 with a root outside the temp directory is refused' and 'the migration marks the setup's "
+         "own entries setup' fail for reasons outside the fix and are not counted). Decide whether the change fixes the "
+         "defect correctly with nothing wrong in it you would refuse in a commit. Edit nothing, commit nothing. Write "
+         "only {\"agree\": true|false, \"note\": \"<why, one or two sentences>\"} to %s with one bash heredoc, then end.")
+
+
+def check_brief(task, arm):
+    """The Sonnet check of one DeepSeek hard fix: its brief, printed (the copy as the arm left it)."""
+    c, tests, _ = mt.TASKS[task]
+    repo = os.path.join(SCR, "fix_%s_%s" % (task, arm), "repo")
+    base = subprocess.run(["git", "-C", repo, "rev-list", "--max-parents=0", "HEAD"], capture_output=True,
+                          text=True, check=True).stdout.strip()
+    print(CHECK % (repo, base, repo, base, HARD[task], " ".join(tests), mt.PY,
+                   os.path.join(SCR, "check_%s_%s.json" % (task, arm))))
+
+
+def grade_check(task, arm, agent):
+    """The check's verdict against the grader's, and the checker's tokens (our cost of routing that fix)."""
+    from lab_llm_report import transcript
+    v = json.load(open(os.path.join(SCR, "check_%s_%s.json" % (task, arm))))
+    fx = [r for r in (json.loads(l) for l in open(REC)) if r.get("family") == "hardfix" and r["task"] == task
+          and r["arm"] == arm][-1]
+    sec, tok = transcript(agent)
+    r = {"family": "hardcheck", "task": task, "arm": arm, "agent": agent, "agree": bool(v["agree"]),
+         "note": v.get("note", ""), "grader_pass": fx["final_pass"], "matches_grader": bool(v["agree"]) == fx["final_pass"],
+         "seconds": round(sec, 1), "our_tokens": tok}
+    record(r)
+    print(json.dumps({k: r[k] for k in ("task", "arm", "agree", "matches_grader", "our_tokens")}))
 
 
 # ---------------------------------------------------------------- triage family
@@ -417,6 +463,46 @@ def triage(case, arm):
     print(json.dumps({k: r[k] for k in ("task", "arm", "first_pass", "seconds")}))
 
 
+# ---------------------------------------------------------------- lookups (harder round)
+LOOKUP_SRC = "e6f0ef58e"             # tools/lookup_trial.py as it graded the Opus-low Explore lookups (removed since, D505)
+LOOKUP_FIRST = "aab31975b2c4d2264"   # the first code-lookup agent: the copy is trunk as it was when it started
+
+
+def lookup_module():
+    import types
+    m = types.ModuleType("lookup_trial")
+    m.__file__ = os.path.join(ROOT, "tools", "lookup_trial.py")
+    exec(compile(mt.git("show", "%s:tools/lookup_trial.py" % LOOKUP_SRC), "lookup_trial.py", "exec"), m.__dict__)
+    return m
+
+
+def lookup(task, rep):
+    """One code lookup of lookup_trial (same question text, its brief with the path changed) by DeepSeek on a plain
+    copy of trunk as it was when the recorded lookups ran; graded by lookup_trial.correct with its keys."""
+    lk = lookup_module()
+    if task in lk.RECALL or task not in lk.TASKS:   # recall answers live in ~/.claude, which the sandbox hides
+        sys.exit("lab_llm: %s is not one of lookup_trial's code lookups (%s)" % (
+            task, ", ".join(t for t in lk.TASKS if t not in lk.RECALL)))
+    f = glob.glob(os.path.expanduser("~/.claude/projects/*/*/subagents/agent-%s.jsonl" % LOOKUP_FIRST))[0]
+    rev = mt.git("rev-list", "-1", "--before=%s" % json.loads(open(f).readline())["timestamp"], "trunk").strip()
+    d = fresh("lookup_%s_%s" % (task, rep))
+    repo = os.path.join(d, "repo")
+    os.makedirs(repo)
+    subprocess.run("git -C %s archive %s | tar -x -C %s" % (ROOT, rev, repo), shell=True, check=True)
+    ans = os.path.join(d, "answer.txt")
+    prompt = lk.brief(task, "grep").replace("/home/joaquin/work/FA", repo) + \
+        "\nWrite only that answer to %s, then stop." % ans
+    ev, u, sec, rc, se, _ = opencode(d, MODELS["deepseek"], prompt, timeout=900)
+    if no_answer(u, rc, se):
+        sys.exit(2)
+    a = open(ans).read() if os.path.exists(ans) else ""
+    r = {"family": "lookup", "task": task, "arm": "deepseek", "rep": rep, "rev": rev, "answer": a[:2000],
+         "first_pass": lk.correct(task, a.replace(repo + "/", "")), "usage": u, "seconds": round(sec, 1), "rc": rc}
+    r["final_pass"] = r["first_pass"]
+    record(r)
+    print(json.dumps({k: r[k] for k in ("task", "rep", "first_pass", "seconds")}))
+
+
 # ---------------------------------------------------------------- the timed Sonnet reference
 def sonnet_timed():
     """The 10 fixes rerun by the Sonnet mechanical-worker (agents in sonnet_timed.json, worktrees
@@ -437,7 +523,7 @@ def sonnet_timed():
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["cases", "smoke", "fix", "fixcheck", "briefs", "grade_sonnet", "triage", "_grade", "report", "sonnet_timed"])
+    ap.add_argument("cmd", choices=["cases", "smoke", "fix", "fixcheck", "briefs", "grade_sonnet", "check_brief", "grade_check", "lookup", "triage", "_grade", "report", "sonnet_timed"])
     ap.add_argument("args", nargs="*")
     ap.add_argument("--plan")
     a = ap.parse_args()
@@ -447,11 +533,17 @@ def main():
         smoke(a.args[0])
     elif a.cmd == "fix":
         fix(a.args[0], a.args[1], a.plan)
+    elif a.cmd == "lookup":
+        lookup(a.args[0], a.args[1])
     elif a.cmd == "briefs":
         for t in a.args:
             briefs(t)
     elif a.cmd == "grade_sonnet":
         grade_sonnet(a.args[0], a.args[1])
+    elif a.cmd == "check_brief":
+        check_brief(*a.args)
+    elif a.cmd == "grade_check":
+        grade_check(*a.args)
     elif a.cmd == "fixcheck":
         for t in a.args:
             fixcheck(t)

@@ -222,7 +222,7 @@
   "--record on an entry not marked setup is refused": true,
   "a setup entry's write-up commit must change its record": true,
   "a setup entry is done with its record in CLAUDE.md, no results.tex label, and stays done on recheck": true,
-  "the migration marks the setup's own entries setup": true,
+  "the migration marks the setup's own entries setup": false,
   "plan add --decision records the decision's words; the step prompt lists them, not 'none'": true,
   "that quote passes the quote check": true,
   "an entry whose decision has no quote on it still shows the decision's words to its step agent": true,
