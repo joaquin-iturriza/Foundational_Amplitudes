@@ -40007,6 +40007,12 @@ entries:
     units: null
     start: '2026-11-24T07:41:29+00:00'
     at: '2026-11-24T07:41:29+00:00'
+  - batch: d1e3_extension
+    wall_h: 1.0
+    jobs: 16
+    units: null
+    start: '2026-11-24T07:58:11+00:00'
+    at: '2026-11-24T07:58:11+00:00'
   step_waits:
     '2': FA-ccin2p3-1f2d9ad5
     '1': FA-ccin2p3-b96a2a6c FA-ccin2p3-2525f488 FA-ccin2p3-ada00163 FA-ccin2p3-3ea9d4fa
