@@ -16507,9 +16507,9 @@ entries:
     '33': 'a reviewer: claudemd-keeper a634c9956f79f0404 on the D536 budget-rule edit'
   owner:
     agent: a43d971069d45144e
-    state: working
+    state: stopped
     since: '2026-11-24T13:15:27+00:00'
-    state_at: '2026-11-24T13:47:32.530000+00:00'
+    state_at: '2026-11-24T13:50:41.591000+00:00'
     context: 208439
     context_at: '2026-11-24T13:47:43+00:00'
   designs:
@@ -43279,9 +43279,9 @@ entries:
     withdrawn_why: 'answered: D541 says route log reading and simple fixes through DeepSeek and test harder tasks'
   owner:
     agent: a6187b6cdb7ca974a
-    state: stopped
+    state: working
     since: '2026-11-24T00:26:31+00:00'
-    state_at: '2026-11-24T01:35:33.905000+00:00'
+    state_at: '2026-11-24T14:13:55.346000+00:00'
     context: 120501
     context_at: '2026-11-24T14:16:11+00:00'
   designs:
