@@ -38362,6 +38362,15 @@ entries:
     blocks_steps: []
     answered_at: '2026-11-24T13:41:29.741000+00:00'
     decision: D539
+  - ask: 'Scope: a reviewer''s rewording of the last sentence of par:ftm_d539 in docs/results.tex (the rescale write-up).
+      Change ''as the fine-tune from that parent already showed'' to ''showed at batch 2048 and in part at batch 128''? (At
+      batch 128 the no-settings parent''s fine-tune beat scratch only in part.)'
+    at: '2026-11-24T21:55:39+00:00'
+    searched: 'D539 (the investigation, silent on this wording); CLAUDE.md: a reviewer''s rewording waits for his yes; 2026-11-14T04:31
+      (a pasted LaTeX template); 2026-11-10T02:08 (draft and slide uploads); 2026-10-26T17:18 (settings warnings relayed from
+      another session); 2026-10-15T02:49 and 2026-10-06T00:17 (old transfer-study plan instructions, not this sentence)'
+    blocks: nothing
+    blocks_steps: &id001 []
   owner:
     agent: a275e674e217bc7c6
     state: working
@@ -40600,6 +40609,15 @@ entries:
       diverges shouldn't wake you and it's owning agent up.
     said_at: '2026-11-24T10:33:58.174000+00:00'
     at: '2026-11-24T11:23:59+00:00'
+  ask: 'Scope: a reviewer''s rewording of the last sentence of par:ftm_d539 in docs/results.tex (the rescale write-up). Change
+    ''as the fine-tune from that parent already showed'' to ''showed at batch 2048 and in part at batch 128''? (At batch 128
+    the no-settings parent''s fine-tune beat scratch only in part.)'
+  waiting_since: '2026-11-24T21:55:39+00:00'
+  searched: 'D539 (the investigation, silent on this wording); CLAUDE.md: a reviewer''s rewording waits for his yes; 2026-11-14T04:31
+    (a pasted LaTeX template); 2026-11-10T02:08 (draft and slide uploads); 2026-10-26T17:18 (settings warnings relayed from
+    another session); 2026-10-15T02:49 and 2026-10-06T00:17 (old transfer-study plan instructions, not this sentence)'
+  blocks: nothing
+  blocks_steps: *id001
 - id: llm_compare
   title: LLoCa against Suprio's LLM on the LLM amplitude catalogue
   question: In the conditions of Suprio's LLM pID run (1501 MadGraph-default processes, 1352 trained, 149 held out; 55,296
@@ -40794,7 +40812,7 @@ entries:
       Joaquin''s messages 2026-11-24T13:41 (''start the runs'', names no cost), 2026-11-22T02:55 (asks for HPO of LLoCa in
       Suprio''s setup, no width cost), 2026-11-14T04:31 (a pasted SciPost LaTeX paper draft, not about this run), 2026-11-16T20:00
       (a writing-style skill, not about runs): none sets a budget for part (b)'
-    blocks_steps: &id001
+    blocks_steps: &id002
     - 10
   owner:
     agent: a1b829d3ccca1f915
@@ -43527,7 +43545,7 @@ entries:
     Joaquin''s messages 2026-11-24T13:41 (''start the runs'', names no cost), 2026-11-22T02:55 (asks for HPO of LLoCa in Suprio''s
     setup, no width cost), 2026-11-14T04:31 (a pasted SciPost LaTeX paper draft, not about this run), 2026-11-16T20:00 (a
     writing-style skill, not about runs): none sets a budget for part (b)'
-  blocks_steps: *id001
+  blocks_steps: *id002
   checked_until: '2026-11-24T21:38:50+00:00'
 - id: lab_llm_trial
   title: Lab LLMs in place of some subagents
@@ -43600,7 +43618,7 @@ entries:
       the log); 2026-11-14T04:31 (a pasted LaTeX template); 2026-11-16T20:00 (a writing-style skill); 2026-11-02T05:20 (held
       resubmissions of width jobs, not log reading)
     blocks: the owner-reread clause of the lab route only
-    blocks_steps: &id002 []
+    blocks_steps: &id003 []
   owner:
     agent: a87f458be3245c0a6
     state: stopped
@@ -44079,7 +44097,7 @@ entries:
     the log); 2026-11-14T04:31 (a pasted LaTeX template); 2026-11-16T20:00 (a writing-style skill); 2026-11-02T05:20 (held
     resubmissions of width jobs, not log reading)
   blocks: the owner-reread clause of the lab route only
-  blocks_steps: *id002
+  blocks_steps: *id003
   checked_until: '2026-11-24T21:38:58+00:00'
 - id: critical_batch
   title: Critical batch size from the gradient noise scale
@@ -44727,7 +44745,7 @@ entries:
       pruning tool under the user's decision); 2026-11-10T02:08 (draft and slide uploads); 2026-10-01T01:32 (steering issue
       and seed priority); 2026-11-14T04:31 (a pasted LaTeX template)
     blocks: the CC deletions of costly results only
-    blocks_steps: &id003 []
+    blocks_steps: &id004 []
   owner:
     agent: acc098fc308290fb5
     state: stopped
@@ -44858,7 +44876,7 @@ entries:
     pruning tool under the user's decision); 2026-11-10T02:08 (draft and slide uploads); 2026-10-01T01:32 (steering issue
     and seed priority); 2026-11-14T04:31 (a pasted LaTeX template)
   blocks: the CC deletions of costly results only
-  blocks_steps: *id003
+  blocks_steps: *id004
   checked_until: '2026-11-24T21:39:07+00:00'
 - id: cc_login_jobs
   title: 'CC login node: recurring and long scripts moved to Slurm (CC support''s email)'
@@ -45125,7 +45143,7 @@ entries:
       pasted LaTeX template); 2026-11-10T02:08 (draft and slide uploads); 2026-10-26T17:18 (settings warnings relayed from
       another session)
     blocks: the cluster-side gate test only
-    blocks_steps: &id004 []
+    blocks_steps: &id005 []
   owner:
     agent: a4e37f36ae6953ad8
     state: stopped
@@ -45279,4 +45297,4 @@ entries:
     start: '2026-11-24T20:14:13+00:00'
     at: '2026-11-24T20:14:13+00:00'
   blocks: the cluster-side gate test only
-  blocks_steps: *id004
+  blocks_steps: *id005
