@@ -22,10 +22,11 @@ cd "$PROJECT_DIR"
 O="$SCRATCH/zz_cc_disk"; mkdir -p "$O"
 find "$SCRATCH" -mindepth 1 -maxdepth 1 -print0 | du -s --block-size=1M --files0-from=- > "$O/scratch_top.tsv" &
 find "$SCRATCH" -mindepth 1 -maxdepth 1 -print0 | du -s --apparent-size --block-size=1M --files0-from=- > "$O/scratch_top_apparent.tsv" &
-# one du per group of disjoint paths: given nested paths, du drops the inner one (counted once already)
+# one du per group of disjoint paths: given nested paths, du drops the inner one (counted once already); $SCRATCH is
+# left out here, its total is the sum of scratch_top
 for A in "" --apparent-size; do
   ( for G in "$(dirname "$WORK")" "$WORK" "$PROJECT_DIR"; do
-      find "$G" -mindepth 1 -maxdepth 1 ! -path "$WORK" ! -path "$PROJECT_DIR" -print0 |
+      find "$G" -mindepth 1 -maxdepth 1 ! -path "$WORK" ! -path "$PROJECT_DIR" ! -path "$SCRATCH" -print0 |
         du -s $A --block-size=1M --files0-from=- 2>/dev/null
     done ) > "$O/top${A:+_apparent}.tsv" &
 done
