@@ -42755,6 +42755,13 @@ entries:
       set by one measurement (trace up to 8.25e29 in window mean, single measurements to 1.6e31): heavy-tailed het per-event
       gradients. Control: last val -2.872 vs control -2.907; both runs show isolated validation spikes to ~1e9 at different
       steps. Figure analysis/critical_batch/figs/v4_het_noise_scale.png; check_caption OK.'
+  - at: '2026-11-24T05:28:54+00:00'
+    text: 'Correction to the 2026-11-24 read (repo-reviewer BLOCK, finding 1): the run-wide B numbers 42.4 (18.7-112), Muon
+      216, AdamW 32.8 came from post-hoc filters (step>=400, one-measurement share >0.5) that no design names; withdrawn.
+      Over ALL 21 windows (noise_read.py working tree, uncommitted until the backlog passes): median 55.5 events, quartiles
+      40.4 / 95.1, 2 windows with mean |G|^2<=0; Muon median 232 (734 in the last window), AdamW median 37.2. The check numbers
+      (B_brute 84+-9, 28.2+-1.4, 28+-6, 39+-5; chunk/brute tr Sigma 1.16-1.29) are unchanged. Figure y range now set by rule
+      (3x max of batch and the 16-batch B + se), windows above it at the edge.'
   ask: 'GPU budget: about 55 GPU-h above 30 with no decision covering it. Joaquin, testing the measured noise scale against
     batch-size runs (D532) needs, at each batch size (2048, 4096, 8192, 16384, 32768; canonical catalog_v4 WSD het setup,
     5 epochs, lr held at its peak), the lr that reaches a target loss in the fewest steps; then steps S and events E = B S
