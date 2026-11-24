@@ -682,8 +682,9 @@ def stop_conditions():
              "text and the plan's steps", len(u) == 1 and len(says) == 3 and "STEPS" in p_ and
              "Run the mixture arms" in p_, (u, says))
     import io, reply_check
-    saved = (cg.WANTED, cg.CHECKED, cg.FLUSHED, reply_check.ask_model, cg.plan_text, sys.stdin, sys.stderr)
-    cg.WANTED, cg.CHECKED, cg.FLUSHED = (os.path.join(d, ".claude", x) for x in ("w2", "c2", "f2"))
+    saved = (cg.WANTED, cg.CHECKED, cg.FLUSHED, reply_check.ask_model, cg.plan_text, sys.stdin, sys.stderr,
+             cg.REFUSED, cg.CARRY)
+    cg.WANTED, cg.CHECKED, cg.FLUSHED, cg.REFUSED, cg.CARRY = (os.path.join(d, ".claude", x) for x in ("w2", "c2", "f2", "r2", "y2"))
     cg.plan_text = lambda: ""
     pre = []
     for v in (miss, {"questions": [], "answers": [], "commitments": []}, None):
@@ -694,7 +695,8 @@ def stop_conditions():
     sys.stdin = io.StringIO(json.dumps({"hook_event_name": "PreCompact", "trigger": "manual", "transcript_path": tr}))
     reply_check.ask_model = lambda prompt: miss
     pre.append((cg.main(), ""))
-    (cg.WANTED, cg.CHECKED, cg.FLUSHED, reply_check.ask_model, cg.plan_text, sys.stdin, sys.stderr) = saved
+    (cg.WANTED, cg.CHECKED, cg.FLUSHED, reply_check.ask_model, cg.plan_text, sys.stdin, sys.stderr,
+     cg.REFUSED, cg.CARRY) = saved
     scenario("B1: PreCompact (auto) is held with the list while something is unrecorded; it goes through when "
              "nothing is, when the model fails, and on a manual /compact",
              pre[0][0] == 2 and "no `plan ask`" in pre[0][1] and [x[0] for x in pre[1:]] == [0, 0, 0], pre)
@@ -1123,7 +1125,7 @@ def attribution():
             "tool_name": "Bash", "tool_input": {"command": "git commit -m 'a change\n\n%s'" % ln}, "cwd": repo}),
             capture_output=True, text=True)
         scenario("B7: `git commit -m` with `%s` is refused before it runs" % ln.split(":")[0],
-                 r.returncode == 2 and "rule 4" in r.stderr, r.stderr)
+                 r.returncode == 2 and "no attribution" in r.stderr, r.stderr)
     open(msg, "w").write("a change\n\nCo-authored-by: Daniel Maitre <daniel@durham.ac.uk>\n")
     r = g("commit", "-qa", "-F", msg)
     scenario("B7: a real collaborator's Co-authored-by passes", r.returncode == 0, r.stderr)

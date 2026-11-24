@@ -120,7 +120,7 @@ D_IN = (("PreToolUse", "Agent", "brief_guard.py", None),
 
 def hook_set_d(s):
     """D, from B's project file: the owner's brief guard, the pushed sections, the owner context and the note-only
-    delegation hook (main_session_guard.py stays unregistered, D185). owner_context.py being registered is also what
+    delegation hook (main_session_guard.py was deleted, 33c103944). owner_context.py being registered is also what
     switches tools/plan.py and plan_check.py to owners (plan.owner_mode)."""
     s = copy.deepcopy(s)
     H = s.setdefault("hooks", {})

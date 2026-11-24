@@ -13,10 +13,13 @@ A model (reply_check's sonnet call) reads the user's messages, the main session'
 and lists each omission with a quote; an item stands only when its quote is in the window. Any failure of the model
 passes: the check never stalls the compaction or the turn.
 
-  PreCompact    (trigger "auto") omissions found: refuse (exit 2) with the list, record WANTED. None: let it through.
+  PreCompact    (trigger "auto") omissions found: refuse (exit 2) with the list, record WANTED, at most once per cycle
+                (REFUSED); a second time, or above 1.3 x the window, compaction goes through and the still-pending
+                items are written to CARRY, which the SessionStart compact branch puts at the top of the new context.
   Stop          a compaction is wanted (WANTED, or the context at notes_at()) and omissions are found: block once per
                 state of the transcript (CHECKED holds the size checked), with the list.
-  PostToolUse   a compaction is wanted: the instruction as additional context (no model call).
+  PostToolUse   a compaction is wanted: the instruction and the items the last Stop check found (CHECKED), one
+                per line; no model call here (it would stall a tool call up to reply_check's 120 s).
   SessionStart  every source: print the plan (tools/plan.py show --compact); after a compaction also clear the
                 markers and say that the summary is not the plan. A subagent's compaction also fires SessionStart,
                 with the main session's ids and no agent_id: compacted_agent() tells it apart (the newest
@@ -33,6 +36,8 @@ FLUSHED = os.path.join(REPO, ".claude", ".notes_flushed")
 WANTED = os.path.join(REPO, ".claude", ".compact_wanted")
 
 CHECKED = os.path.join(REPO, ".claude", ".compact_checked")
+REFUSED = os.path.join(REPO, ".claude", ".compact_refused")   # a PreCompact refusal happened this cycle
+CARRY = os.path.join(REPO, ".claude", ".compact_carry")       # omissions still pending when compaction was let through
 
 INSTR = ("CONTEXT GUARD: the context is near compaction. Before it, record on the plan and the ledger what it would "
          "lose: every question you put to Joaquin (`python3 tools/plan.py ask <entry> ...`), every decision of his "
@@ -123,10 +128,7 @@ def plan_text():
 def notes_at():
     """Context size at which the notes are asked for: 50k below the auto-compaction window (Joaquin, 2026-10-30:
     "Reduce the threshold of compaction to 400k, and the notes updating a bit lower")."""
-    try:
-        return int(os.environ.get("CLAUDE_CODE_AUTO_COMPACT_WINDOW") or 400000) - 50000
-    except ValueError:
-        return 350000
+    return window_tokens() - 50000
 
 
 def context_tokens(path):
@@ -297,6 +299,28 @@ def stop_items(inp, ask=None, repo=REPO, steps=None, notes=None):
     return [INSTR + "\n" + "\n".join("  - " + g for g in got)] if new else []
 
 
+def window_tokens():
+    try:
+        return int(os.environ.get("CLAUDE_CODE_AUTO_COMPACT_WINDOW") or 400000)
+    except ValueError:
+        return 400000
+
+
+def checked_dict():
+    try:
+        return json.load(open(CHECKED))
+    except (OSError, ValueError):
+        return {}
+
+
+def checked_items():
+    """The omissions the last Stop check found (stop_items writes them to CHECKED)."""
+    try:
+        return json.load(open(CHECKED)).get("items") or []
+    except (OSError, ValueError):
+        return []
+
+
 def _clear(path):
     try:
         os.unlink(path)
@@ -317,6 +341,15 @@ def main():
         got = pending(inp.get("transcript_path"))
         if not got:
             return 0
+        try:                                  # PostToolUse only reads this list (no model call on its hot path)
+            json.dump({**checked_dict(), "items": got}, open(CHECKED, "w"))
+        except OSError:
+            pass
+        # the 1.3x bound: a stuck refusal can never let the context pass ~650k at a 500k window
+        if os.path.exists(REFUSED) or context_tokens(inp.get("transcript_path")) > 1.3 * window_tokens():
+            open(CARRY, "w").write("\n".join("  - " + g for g in got) + "\n")   # let it through; nothing is lost
+            return 0
+        open(REFUSED, "w").close()
         sys.stderr.write(INSTR + "\n" + "\n".join("  - " + g for g in got) + "\n")
         return 2
     if ev == "SessionStart":
@@ -324,10 +357,21 @@ def main():
             print(json.dumps({"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": AGENT_AFTER}}))
             return 0
         ctx = plan_text()                     # every source (startup, resume, clear, compact) starts from the plan
+        if inp.get("source") in ("startup", "clear"):
+            for p in (REFUSED, CARRY):        # a new session's first auto compaction gets its one refusal
+                _clear(p)
         if inp.get("source") == "compact":
-            for p in (FLUSHED, WANTED, CHECKED):
+            carried = ""
+            try:
+                carried = open(CARRY).read()
+            except OSError:
+                pass
+            for p in (FLUSHED, WANTED, CHECKED, REFUSED, CARRY):
                 _clear(p)
             ctx = AFTER + "\n\n" + ctx
+            if carried:
+                ctx = ("CONTEXT GUARD: omissions still unrecorded when the compaction went through (record them: "
+                       "`plan ask`, `site decide`, `plan add-next`):\n" + carried + "\n" + ctx)
         print(json.dumps({"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": ctx}}))
         return 0
     if ev == "Stop":
@@ -339,7 +383,9 @@ def main():
     elif ev == "PostToolUse" and not inp.get("agent_id"):
         if os.path.exists(WANTED) or context_tokens(inp.get("transcript_path")) >= notes_at():
             open(WANTED, "w").close()
-            print(json.dumps({"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext": INSTR}}))
+            got = checked_items()
+            print(json.dumps({"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext":
+                              INSTR + ("\nPending now:\n" + "\n".join("  - " + g for g in got) if got else "")}}))
     return 0
 
 

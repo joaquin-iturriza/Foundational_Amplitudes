@@ -97,6 +97,83 @@ def test_push_skips_agent_compaction():
         assert "additionalContext" not in out, out
 
 
+def _main(m, tmp, ev, monkey_pending, **k):
+    """Run context_guard.main in-process with its markers under tmp and pending() stubbed."""
+    import io
+    for n in ("WANTED", "REFUSED", "CARRY", "CHECKED", "FLUSHED"):
+        setattr(m, n, os.path.join(tmp, ".claude", "." + n.lower()))
+    m.pending = lambda *a, **kw: list(monkey_pending)
+    d = {"hook_event_name": ev, "transcript_path": os.path.join(tmp, "t.jsonl")}
+    d.update(k)
+    old = sys.stdin, sys.stdout, sys.stderr
+    sys.stdin, sys.stdout, sys.stderr = io.StringIO(json.dumps(d)), io.StringIO(), io.StringIO()
+    try:
+        rc = m.main()
+        return rc, sys.stdout.getvalue()
+    finally:
+        sys.stdin, sys.stdout, sys.stderr = old
+
+
+def test_posttooluse_lists_pending():
+    """PostToolUse lists what the last Stop check stored in CHECKED (pending() is stubbed empty, so the items can only
+    come from CHECKED); nothing stored, no header."""
+    with tempfile.TemporaryDirectory() as tmp:
+        os.makedirs(os.path.join(tmp, ".claude"))
+        m = cg()
+        for n in ("WANTED", "REFUSED", "CARRY", "CHECKED", "FLUSHED"):
+            setattr(m, n, os.path.join(tmp, ".claude", "." + n.lower()))
+        open(m.WANTED, "w").close()
+        json.dump({"size": 1, "items": ["omission ONE", "omission TWO"]}, open(m.CHECKED, "w"))
+        rc, out = _main(m, tmp, "PostToolUse", [])
+        assert "  - omission ONE" in out and "  - omission TWO" in out, out
+        os.unlink(m.CHECKED)
+        rc, out = _main(m, tmp, "PostToolUse", [])
+        assert "Pending now" not in out and "CONTEXT GUARD" in out, out
+
+
+def test_precompact_refuses_once_then_carries():
+    with tempfile.TemporaryDirectory() as tmp:
+        m = cg()
+        main_t = world(tmp, main_age=0.4, agent_age=5000)
+        ev = dict(trigger="auto")
+        assert _main(m, tmp, "PreCompact", ["omission ONE"], **ev)[0] == 2
+        assert _main(m, tmp, "PreCompact", ["omission ONE"], **ev)[0] == 0
+        assert "omission ONE" in open(m.CARRY).read()
+        out = _main(m, tmp, "SessionStart", [], source="compact", session_id="sess1", transcript_path=main_t)[1]
+        ctx = json.loads(out)["hookSpecificOutput"]["additionalContext"]
+        assert ctx.startswith("CONTEXT GUARD: omissions still unrecorded") and "omission ONE" in ctx, ctx
+        assert not os.path.exists(m.CARRY) and not os.path.exists(m.REFUSED)
+
+
+def test_precompact_far_over_window_lets_through():
+    with tempfile.TemporaryDirectory() as tmp:
+        os.makedirs(os.path.join(tmp, ".claude"))
+        m = cg()
+        m.context_tokens = lambda p: 700000
+        old = os.environ.get("CLAUDE_CODE_AUTO_COMPACT_WINDOW")
+        os.environ["CLAUDE_CODE_AUTO_COMPACT_WINDOW"] = "500000"
+        try:
+            assert _main(m, tmp, "PreCompact", ["omission ONE"], trigger="auto")[0] == 0
+        finally:
+            os.environ.pop("CLAUDE_CODE_AUTO_COMPACT_WINDOW")
+            if old is not None:
+                os.environ["CLAUDE_CODE_AUTO_COMPACT_WINDOW"] = old
+        assert os.path.exists(m.CARRY)
+        assert "omission ONE" in m.checked_items()      # PreCompact feeds PostToolUse's list
+
+
+def test_startup_clears_stale_refused():
+    with tempfile.TemporaryDirectory() as tmp:
+        m = cg()
+        world(tmp, main_age=5000)
+        _main(m, tmp, "PreCompact", ["omission ONE"], trigger="auto")      # refuses: REFUSED written
+        assert os.path.exists(m.REFUSED)
+        _main(m, tmp, "SessionStart", [], source="resume")
+        assert os.path.exists(m.REFUSED)                                   # resume keeps it
+        _main(m, tmp, "SessionStart", [], source="clear")
+        assert not os.path.exists(m.REFUSED)
+
+
 if __name__ == "__main__":
     n = 0
     for k, f in sorted(globals().items()):
