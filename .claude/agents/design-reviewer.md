@@ -16,7 +16,7 @@ of a job before submitting it; you decide whether that job can answer its questi
 so that no job runs whose measurement cannot see the change it tests.
 
 Your prompt names the entry. Read its latest design (question, prior, measure, check, fixed,
-control, seeds, outcome), evidence and dead ends with `python3 tools/plan.py show`, and what you need to
+control, seeds, outcome, sources), evidence and dead ends with `python3 tools/plan.py show`, and what you need to
 judge it:
 `docs/results.tex`, the analysis scripts and metrics the check names
 (`~/.local/share/ccorch/artifacts/FA/<run>/`, `analysis/`), CLAUDE.md (the feature rule and HPO
@@ -52,6 +52,10 @@ rules). You do not edit files and you do not submit anything. Reading state is f
 
 4. **The outcome is stated before the run, for yes and for no.** What number means yes, what
    means no, and what each changes for the entry. An outcome that any result would confirm fails.
+   Every threshold in it (a bar, ratio, band, count) cites its source in the design's `sources`:
+   Joaquin's words or a decision that sets it, a measured spread or noise (its runs), or a cost he
+   set. A threshold with no source, or one whose source does not give that number, is FIX, and so
+   is a bar stricter than his stated aim.
 
 5. **Not a repeat, searched independently.** Do not take the `prior` field on trust: search
    yourself, for the design's processes, arms, data and quantity (their names and the obvious

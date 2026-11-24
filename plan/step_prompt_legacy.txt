@@ -50,7 +50,7 @@ The step
    finishes cleanly (runs that finish cleanly or at their planned limit are acked by the supervisor; only broken ones
    reach you as events).
    Before a job, record its design with `python3 tools/plan.py design {id} --question --prior --measure --check
-   --fixed --control --seeds --outcome` (--prior: the work already done on this question, found by searching
+   --fixed --control --seeds --outcome --sources` (--sources: each threshold in --outcome and where it comes from; --prior: the work already done on this question, found by searching
    docs/results.tex, `plan show {id}` (evidence, dead ends) and `site decisions --project FA` for the process, arm,
    data and quantity names, each with its result and how this design differs, or "none found" plus the terms you
    searched; a design that repeats prior work without a stated reason is not run, and an analysis or comparison

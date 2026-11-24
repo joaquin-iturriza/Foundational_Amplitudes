@@ -77,3 +77,18 @@ def test_part_reask():
     assert plan.part_reask(old, new)
     assert not plan.part_reask(old, old)
     assert not plan.part_reask(new, new)
+
+
+def test_design_outcome_sources():
+    """A design's threshold must cite its source (lab_llm_trial 2026-11-24: an invented 0.3x bar)."""
+    lab = ("Hard fixes: yes when first pass is within one task of Sonnet's and our tokens per fix are at most 0.3x "
+           "Sonnet's: route multi-file fixes too.")
+    for src in ("", "0.3x <- a round number"):
+        try:
+            plan._sources_ok(lab, src)
+        except SystemExit:
+            pass
+        else:
+            raise AssertionError(src)
+    plan._sources_ok(lab, "0.3x <- Joaquin: \"I expect this to save a ton of tokens\" (D530)")
+    plan._sources_ok("yes when the arms finish and plots are drawn", "")

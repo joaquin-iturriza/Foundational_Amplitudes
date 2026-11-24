@@ -2458,7 +2458,30 @@ def design_text(x, indent="  "):
                "not reviewed yet")
     return "\n".join(["%srecorded %s, %s" % (indent, (x.get("at") or "")[:16], verdict)] +
                       ["%s%s: %s" % (indent, k, x.get(k) if x.get(k) is not None else "not recorded")
-                       for k in DESIGN_FIELDS])
+                       for k in DESIGN_FIELDS + (("sources",) if x.get("sources") else ())])
+
+
+THRESHOLD = re.compile(r"(?:<=|>=|≤|≥|<|>)\s*\d|\b\d+(?:\.\d+)?\s*[x×](?![a-z\d])|\b\d+(?:\.\d+)?\s*%|"
+                       r"\bat (?:most|least) \d|\b\d+\s*/\s*\d+\b")
+SOURCE = re.compile(r"\bD\d{2,}\b|\"[^\"]{6,}\"|\u201c[^\u201d]{6,}\u201d|\bspread\b|\bnoise\b|\bseeds?\b|\bsd\b|"
+                    r"\bstandard (?:error|deviation)|\bcontrol|\bmeasured\b|\bbudget\b|\bJoaquin\b", re.I)
+
+
+def _sources_ok(outcome, sources):
+    """An outcome's yes/no bar comes from Joaquin's aim or measured noise, never invented (2026-11-24, lab_llm_trial:
+    an unsourced 'tokens at most 0.3x Sonnet's' turned a 42% saving at equal quality into a no; Joaquin: "'The
+    design required DeepSeek to cost us at most 0.3x Sonnet's tokens, and 0.58x misses that' What?")."""
+    if not THRESHOLD.search(outcome):
+        return
+    items = [x.strip() for x in (sources or "").split(";") if x.strip()]
+    if not items:
+        sys.exit("plan: --outcome sets a threshold (%s) but --sources is empty: name each threshold and where it comes "
+                 "from (Joaquin's words quoted, a decision D<n>, a measured spread or noise with its runs, a cost he "
+                 "set); a bar with no source is not a design" % THRESHOLD.search(outcome).group(0))
+    bad = [x for x in items if not SOURCE.search(x)]
+    if bad:
+        sys.exit("plan: these --sources items name no source (Joaquin's words quoted, D<n>, a measured spread or "
+                 "noise, a cost he set): %s" % "; ".join(bad))
 
 
 def _prior_ok(prior):
@@ -2492,13 +2515,15 @@ def cmd_design(a):
     if empty:
         sys.exit("plan: a design needs every field; empty: %s" % ", ".join("--" + k for k in empty))
     _prior_ok(vals["prior"])
+    _sources_ok(vals["outcome"], a.sources)
     if len(vals["check"]) < CHECK_MIN:
         sys.exit("plan: --check must say how it was verified, on existing data, that the measure moves with the "
                  "tested change (which runs or pools, what moved and by how much), in at least %d characters"
                  % CHECK_MIN)
     with transaction() as (d, st):
         e = entry(d, a.id)
-        e.setdefault("designs", []).append(dict(at=now().isoformat(), **vals))
+        e.setdefault("designs", []).append(dict(at=now().isoformat(), **vals, **({"sources": a.sources.strip()}
+                                                                                   if a.sources.strip() else {})))
     print("plan: design recorded on %s; now run the design-reviewer subagent on it (Agent tool, subagent_type "
           "design-reviewer); submissions for it pass design_guard for %d h once it passes" % (a.id, DESIGN_H))
 
@@ -3556,7 +3581,10 @@ def main(argv=None):
             "fixed": "what is held fixed",
             "control": "the matched control",
             "seeds": "the seeds",
-            "outcome": "how the outcome reads as yes and as no"}.get(k)) for k in DESIGN_FIELDS])
+            "outcome": "how the outcome reads as yes and as no"}.get(k)) for k in DESIGN_FIELDS],
+        A("--sources", default="", help="required when --outcome sets a threshold (a bar, ratio, band, count): each "
+          "threshold and where it comes from, ';'-separated, e.g. '1.38x <- the control's seed spread (run X)'; "
+          "a source is Joaquin's words (quoted), a decision (D<n>), a measured spread or noise, or a cost he set"))
     cmd("design-pass", cmd_design_pass, "the design reviewer's PASS on the latest design (the reviewer runs it)", ID,
         A("--reviewer", required=True, help="the reviewer's note"))
     cmd("design-fix", cmd_design_fix, "the design reviewer's FIX on the latest design (the reviewer runs it)", ID,

@@ -47,7 +47,8 @@ Questions
   [D10].
 
 Designs
-- `plan design <entry> --question --prior --measure --check --fixed --control --seeds --outcome`. `--prior` names the
+- `plan design <entry> --question --prior --measure --check --fixed --control --seeds --outcome --sources`;
+  `--sources`: each threshold in `--outcome` and its source (CLAUDE.md's design rule). `--prior` names the
   prior work found in `docs/results.tex`, `plan show` and `site decisions` with its result, or "none found" with the
   terms searched; `--check` says how the measure was shown, on existing data, to move with the tested change. The
   owner launches the design-reviewer subagent itself: on PASS it submits, on FIX it revises once or records a dead end.

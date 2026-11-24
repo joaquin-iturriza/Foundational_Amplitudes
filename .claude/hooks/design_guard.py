@@ -158,10 +158,10 @@ def main():
           "eval-only re-read of a run of the entry under its passed design carries REREAD=<run id>. "
           "Otherwise record it first, every field (the check says how it was verified, on existing data, that the measure "
           "moves with the tested change; a design whose check fails is not run):\n"
-          "  python3 tools/plan.py design <entry> --question \"<what the job answers>\" --measure \"<the number that "
+          "  python3 tools/plan.py design <entry> --question \"<what the job answers>\" --prior \"<prior work found, or none found + terms>\" --measure \"<the number that "
           "answers it>\" --check \"<how it was seen to move with the change, on which data>\" --fixed \"<what is "
           "held fixed>\" --control \"<the matched control>\" --seeds \"<seeds>\" --outcome \"<what yes and what no "
-          "look like>\"\nthen submit again." % (hours, ", ".join(bad)), file=sys.stderr)
+          "look like>\" --sources \"<each threshold <- its source>\"\nthen submit again." % (hours, ", ".join(bad)), file=sys.stderr)
     return 2
 
 
