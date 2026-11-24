@@ -17799,6 +17799,17 @@ entries:
       reading the loop. R5 stands on the 10:46 claim preceding the worker''s 11:38 hand-back, the plan ask/wait refusals never
       built, and probe_site''s untried 2FA DOWN. The main session restarted the supervisor at 12:20:59 on my false report;
       harmless.'
+  - at: '2026-11-24T11:34:23+00:00'
+    text: '2026-11-24 D534 parts 1, 2 and 4 done. (1)+(2) merged 6eab900e0 (repo-reviewer passed c9e7bef72): plan intent records
+      Joaquin''s words, refs and rejected producers per entry, verified as typed, rendered first in owner and mechanical briefs;
+      send_check refuses a figure whose producer an entry rejected, from any checkout. Backfilled llm_compare (Suprio''s figure
+      ref, control_score.py rejected, D528 and D533 words) and finetune_mechanism (D529, D533 words). Replay: the 11-24 ac_controls_score
+      figure (control_score.py at 1a11e36a7^) refused; a5_controls_heldout_per_process.png passes; fabricated quote refused.
+      (4) replaced by the claudemd-keeper''s widened pillar (54debf37e: plan/*prompt*.txt and .claude/agents) and one pass
+      over every rule carrier (c4e1c6dad, 005e29d10, 4fe0f36f4, 5309e3a5d, a3de02774, ab17d6255, 092bd0da0; keeper passed
+      092bd0da0): counter-rules folded into the rules they qualify; carriers in bytes CLAUDE.md 19588->20278, step_prompt
+      9571->7659, design-reviewer 14392->10361, repo-reviewer 15410->13288, notes-editor 11551->9757, compact-worker 19990->409
+      (its stale copy dropped: it loads CLAUDE.md). Part (3) routing not yet built beyond D533''s divergence class.'
   handoff:
     state: '2026-11-19. Steps 26, 27, 29 trial ran (design passed by the design-reviewer after two FIXes; scorer 3531dc6e,
       item-line repair 61005cc0 in worktrees/wt-graphify). Results in the finding of 2026-11-19 (lookup_trial.json). Left:
