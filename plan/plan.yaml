@@ -42550,6 +42550,12 @@ entries:
     units: null
     start: '2026-11-24T07:41:35+00:00'
     at: '2026-11-24T07:41:35+00:00'
+  - batch: a_trial5_score
+    wall_h: 0.5
+    jobs: 1
+    units: null
+    start: '2026-11-24T08:26:34+00:00'
+    at: '2026-11-24T08:26:34+00:00'
   ask: 'Your hold: start part (b), the muP width scale-up toward the LLM''s parameter count, now at part (a)''s best HPs so
     far (wave 1: lr 1.03e-3), rerunning it if the search moves the optimum, instead of after the search ends as D522 says
     (''once we find near optimal HPs'')?'
