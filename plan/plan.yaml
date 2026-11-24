@@ -37886,6 +37886,7 @@ entries:
     - FA-ccin2p3-055bc416
     - FA-ccin2p3-13ce7261
     - FA-ccin2p3-1b46922a
+    - FA-ccin2p3-1f2d9ad5
     - FA-ccin2p3-2281e6d9
     - FA-ccin2p3-3c517c9b
     - FA-ccin2p3-47240f89
@@ -37941,7 +37942,7 @@ entries:
     - FA-lxplus-e8d15505
     - FA-lxplus-fad6ff57
     - FA-lxplus-fbdf6bc6
-    commit: 54e5204ef
+    commit: 45f404900
     paths:
     - analysis/finetune_mechanism/data/restart_steps.json
     - analysis/finetune_mechanism/data/restart_summary.json
@@ -37953,7 +37954,12 @@ entries:
     - analysis/finetune_mechanism/restart_test_readout.py
     - analysis/finetune_mechanism/zng4g_sigreset_read.py
     - analysis/finetune_mechanism/zng4g_snap_read.py
+    - recipes/transfer_finale_gluon.yaml
     - run.py
+    - sweep/sweep_config_ftmech_zng4g_d1e3_ftglu_b128.yaml
+    - sweep/sweep_config_ftmech_zng4g_d1e3_ftnoset_b128.yaml
+    - sweep/sweep_config_ftmech_zng4g_d1e3_scr_b128.yaml
+    - sweep/sweep_config_ftmech_zng4g_ftglu_b128.yaml
     - sweep/sweep_config_ftmech_zng4g_scrflagsrch_b128.yaml
     - sweep/sweep_config_ftmech_zng4g_scrflagsrch_b2048.yaml
     - sweep/sweep_config_ftmech_zng4g_scrpairsrch_b2048.yaml
