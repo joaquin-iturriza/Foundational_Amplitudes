@@ -89,7 +89,8 @@ def draw():
     if len(pts) >= 3:
         smin, bc = fit_bcrit(*zip(*pts))
         x = np.geomspace(1500, 40000, 100)
-        print(f"fit over {len(pts)} batches: S_min {smin:.0f}, B_crit {bc:.0f}")
+        print(f"fit over {len(pts)} batches: S_min {smin:.0f}, B_crit {bc:.0f}; S over fit: "
+              + ", ".join(f"{b} {s / (smin * (1 + bc / b)):.3f}" for b, s in sorted(pts)))
         axS.plot(x, smin * (1 + bc / x), "-", color=ps.C.vermillion,
                  label=rf"$S_{{\min}}(1+B_{{\rm crit}}/B)$, $B_{{\rm crit}}={bc:.0f}$")
     axS.set_xscale("log"); axS.set_yscale("log")
