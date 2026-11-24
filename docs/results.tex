@@ -9961,6 +9961,98 @@ Scratch seed $43$ blows up at $85\%$ of its run and is read at its best checkpoi
 \end{figure}
 
 
+
+\paragraph{Why the momentum rescale costs $Z+4g$ (D539, 2026-11-24)}\label{par:ftm_d539} The rescale was adopted for the
+soft limit of $e^+e^-\to u\bar u g$ (D374, D392); here it raises the validation of $q\bar q\to Z+4g$ from scratch
+$2.07\times$ (above). The question (D539): which property of the rescale costs $Z+4g$, and whether the cost needs scarce
+data. Setup: scratch at batch $2048$, $1953$ steps at every training size (fixed compute), all arms of one figure at one
+set of hyperparameters, seeds $42$, $43$, $44$; the measure is the best validation MSE$(\log|\mathcal M|^2)$, and $r$ the
+three-seed geometric mean of an arm over the arm without the rescale, with its two-sigma interval. Candidates: the
+rescale moves the massive $Z$ off its mass shell; it compresses the spread of the massless momenta's energy fractions;
+or the cost is a small-data one.
+% allow: 4g 2048 1953 42 43 44 2 because they are the process, the batch size, the steps, the seeds and the square of |M|
+% allow: 2.07 because it is the one-setting ratio claimed in the paragraph above
+
+The cost is the compression of the massless momenta, not the mass shell (Fig.~\ref{fig:ftm_d539}). At $10^4$ events,
+at the rescale arm's searched hyperparameters, $r=2.41$ $[1.98,2.92]$ at $\epsilon=10^{-8}$ and it falls with $\epsilon$:
+$1.61$ at $10^{-4}$, $1.33$ at $10^{-2}$, $1.10$ $[0.93,1.30]$ at $\epsilon=1$, where the rescale is nearly linear. The
+rescale applied to the massless momenta only, which keeps the $Z$ on its mass shell, costs as much, $r=2.34$
+$[1.95,2.82]$.
+% src: python3 analysis/finetune_mechanism/d539_read.py --cached @c3c6f9516
+% claim: cells.zng_1e4.eps1e-8.over_off.r=2.41
+% claim: cells.zng_1e4.eps1e-8.over_off.lo=1.98
+% claim: cells.zng_1e4.eps1e-8.over_off.hi=2.92
+% claim: cells.zng_1e4.eps1e-4.over_off.r=1.61
+% claim: cells.zng_1e4.eps1e-2.over_off.r=1.33
+% claim: cells.zng_1e4.eps1.over_off.r=1.10
+% claim: cells.zng_1e4.eps1.over_off.lo=0.93
+% claim: cells.zng_1e4.eps1.over_off.hi=1.30
+% claim: cells.zng_1e4.massless.over_off.r=2.34
+% claim: cells.zng_1e4.massless.over_off.lo=1.95
+% claim: cells.zng_1e4.massless.over_off.hi=2.82
+% allow: 10^4 10^{-8} 10^{-4} 10^{-2} 1 because they are the training size and the rescale's epsilon, settings
+
+At those hyperparameters the arm without the rescale blew up (validation above ten times its best so far) in all three
+$Z+4g$ runs at $10^5$ events and in every $u\bar ug$ run, so the data-size and process contrasts were re-run at the
+optimum of the no-rescale search (Fig.~\ref{fig:ftm_d539s}). There all twelve $Z+4g$ runs train without a blow-up, and
+the cost does not need scarce data: $r=2.28$ $[2.03,2.57]$ at $10^4$ events and $2.07$ $[1.57,2.71]$ at $10^5$, where
+both arms are still falling at the end of the run, $0.0059$ without the rescale against $0.0123$ with it. For $u\bar ug$
+the bulk does not resolve, $r=0.91$ $[0.39,2.12]$ at $10^4$ and $1.02$ $[0.37,2.83]$ at $10^5$, with five of its
+twelve runs blowing up again and read at their best checkpoint; its soft limit, the reason for the rescale, gains in
+both, the deepest soft bin's MSE of $\log_{10}|\mathcal M|^2$ moving by $-3.16$ decades at $10^4$ and $-4.46$ at
+$10^5$ (seed medians), while its bulk moves by $0.12$ and $0.07$ decades, inside the seed spread.
+% src: python3 analysis/finetune_mechanism/d539_read.py --set s --cached @c3c6f9516
+% claim: cells.zng_1e4.eps1e-8.over_off.r=2.28
+% claim: cells.zng_1e4.eps1e-8.over_off.lo=2.03
+% claim: cells.zng_1e4.eps1e-8.over_off.hi=2.57
+% claim: cells.zng_1e5.eps1e-8.over_off.r=2.07
+% claim: cells.zng_1e5.eps1e-8.over_off.lo=1.57
+% claim: cells.zng_1e5.eps1e-8.over_off.hi=2.71
+% claim: cells.zng_1e5.off.gmean=0.0059
+% claim: cells.zng_1e5.eps1e-8.gmean=0.0123
+% claim: cells.uug_1e4.eps1e-8.over_off.r=0.91
+% claim: cells.uug_1e4.eps1e-8.over_off.lo=0.39
+% claim: cells.uug_1e4.eps1e-8.over_off.hi=2.12
+% claim: cells.uug_1e5.eps1e-8.over_off.r=1.02
+% claim: cells.uug_1e5.eps1e-8.over_off.lo=0.37
+% claim: cells.uug_1e5.eps1e-8.over_off.hi=2.83
+% src: python3 analysis/finetune_mechanism/d539_kit_read.py --set s --cached @c3c6f9516
+% claim: cells.1e4.delta_dec.soft_x=-3.16
+% claim: cells.1e5.delta_dec.soft_x=-4.46
+% claim: cells.1e4.delta_dec.bulk=0.12
+% claim: cells.1e5.delta_dec.bulk=0.07
+% allow: 4g 2 10 10^4 10^5 because they are the process, the square of |M|, the log base and the training sizes
+% allow: five twelve 10 because they are run counts and the blow-up threshold
+
+The design's outcome is its branch (b): the compression of the massless energy fractions costs the bulk of $Z+4g$ at
+both training sizes, while the gain it was adopted for, the soft limit of $u\bar ug$, holds. For fine-tunes to $Z+ng$,
+whose target is the bulk, the parent is the one without the rescale, as the fine-tune from that parent already showed
+(above).
+% allow: 4g because it is the process
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{../analysis/finetune_mechanism/figs/d539.pdf}
+  \caption{\textbf{The rescale's cost falls with $\epsilon$ and does not need the $Z$ off its mass shell.} Scratch
+  training, batch $2048$, $1953$ steps, every run at the rescale arm's searched hyperparameters, seeds $42$--$44$. (a) Best
+  validation MSE$(\log|\mathcal M|^2)$ against the input setting, $q\bar q\to Z+4g$ at $10^4$ events. (b) The same
+  against process and training size, without the rescale and at $\epsilon=10^{-8}$. (c) Validation MSE against the
+  fraction of the run, seed $42$, $Z+4g$ at $10^4$. Rescale: $p_i\to p_i\log(1+x_i/\epsilon)/(x_i\log(1+1/\epsilon))$,
+  $x_i=2p_i\cdot Q/s$; massless only: the rescale on the massless momenta, the $Z$ untouched; open markers: runs whose
+  validation rose above ten times its best so far, read at their best checkpoint.}
+  \label{fig:ftm_d539}
+% allow: 4g 2048 1953 42 44 2 10^4 10^{-8} 1 because they are the process, batch size, steps, seeds, the square of |M|, the training size and the rescale's settings
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{../analysis/finetune_mechanism/figs/d539s.pdf}
+  \caption{\textbf{At stable hyperparameters the rescale costs $Z+4g$ at ten times the data too.} As
+  Fig.~\ref{fig:ftm_d539}, every run at the no-rescale search's optimum; (a) and (b) without the rescale and at
+  $\epsilon=10^{-8}$, (c) seed $42$, $Z+4g$ at $10^4$ events.}
+  \label{fig:ftm_d539s}
+% allow: 4g 42 10^4 10^{-8} because they are the process, the seed, the training size and the rescale's setting
+\end{figure}
 % ==========================================================================
 \section{Architecture and encoding ablations}\label{sec:arch}
 % ==========================================================================
