@@ -37875,9 +37875,10 @@ entries:
     1: 'When the extension driver (ftmech_d1e3_ext, 8 more trials each over [6e-4,6e-2]) and the 4 seed runs end: if a search''s
       best moved, re-pick it (zng4g_seed_chunks.py) and run its seeds 43/44; then read Fn1k/S1k with the 2-sigma rule and
       a figure (per-seed best, per-trial best vs lr with both windows marked, val curves)'
-    2: 'When the gluon/Z parent FA-ccin2p3-1f2d9ad5 ends (smoke FA-ccin2p3-4e7b6669 first: cancel the full run if the smoke
-      fails): parent check vs 9a73698a on the 9 shared processes, site copy its run dir to lxplus, then drive ftmech_zng4g_ftglu_b128
-      (1e4) and ftmech_zng4g_d1e3_ftglu_b128 together, then seeds 43/44'
+    2: 'When the gluon/Z parent FA-ccin2p3-1f2d9ad5 ends: parent check vs 9a73698a on the 9 shared processes; site copy its
+      run dir to lxplus; drive ftmech_zng4g_ftglu_b128 (1e4, 16 trials) and ftmech_zng4g_d1e3_ftglu_b128 (16 trials on [1.9e-3,1.9e-2]
+      @8e0482ffb) together; then extend the D=1e3 one as its siblings (extend_sweep.py --low 6e-4 --high 6e-2, config edited
+      to window [6.0e-4,6.0e-2], n_trials 24, waves +[3,3,2]) and 8 more; then seeds 43/44 of each chosen trial'
   done_when: null
   notes_ref: null
   match: dsave_ftmech_*,ftmech_*
@@ -40047,11 +40048,10 @@ entries:
       - 'hi<1 with edge-free optima: parent gains at 1e3; report with figure'
       - 'new best within 0.1 dec of the wide edge: edge-limited, matched re-extension only on a reviewed design'
     2:
-      feeds: 'H2 dilution: Fg/Fn at 1e4 and at D=1e3 (design passed 2026-11-24)'
+      feeds: 'H2 dilution: Fg/Fn at 1e4 and at D=1e3 (designs passed 2026-11-24)'
       if:
       - 'hi<1: dilution yes (at 1e4 with Fg/S<=1: the residual is dilution)'
       - 'lo>0.65 and hi>=1: no dilution of the needed size; next the b128 instability'
-      - 'else unresolved: question to Joaquin on more seeds'
 - id: llm_compare
   title: LLoCa against Suprio's LLM on the LLM amplitude catalogue
   question: In the conditions of Suprio's LLM pID run (1501 MadGraph-default processes, 1352 trained, 149 held out; 55,296
