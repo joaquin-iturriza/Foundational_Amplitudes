@@ -39781,6 +39781,19 @@ entries:
       seeds. Best moves in either arm: re-pick, run its seeds 43/44, read Fn1k/S1k from them. A new best again within 0.1
       dec of the wide window''s edge: reported as edge-limited, with the window extended once more only on a matched design.
       Any trial blowing up (val > 10x best-so-far) listed apart (D398).'
+    fix_at: '2026-11-24T07:56:42+00:00'
+    fix: 'Check 1, matched control: the gluon-parent D=1e3 arm (Fg1k) is the arm that Fn1k is compared against for the dilution
+      read at D=1e3, and the design gives it a different search: 24 trials drawn over [6e-4, 6e-2] from trial 1, while Fn1k
+      and S1k get 16 trials on [1.9e-3, 1.9e-2] and then 8 over the wide window. The design notes the difference but does
+      not remove it, and removing it costs nothing because Fg1k has not run yet and needs the same 24 trials either way. Fix:
+      run Fg1k exactly as the other two, its first 16 trials on the [1.9e-3, 1.9e-2] window (the config at 45f404900, DyHPO
+      seed 42), then extend_sweep.py to [6e-4, 6e-2] with 8 more. That means one narrow-window config for its start, or its
+      config kept at the narrow window until the extension. Everything else holds: I read the 16-trial summaries in sweeps_local.
+      Scratch hp1009 has 0.0976 at lr 1.74e-2, 0.04 decade under the 1.9e-2 top, with its top 7 at 1.47e-2 to 1.89e-2. The
+      fine-tune hp1860 has 0.0490 at 2.54e-3, 0.13 decade over the 1.9e-3 bottom, with its top 10 at 1.95e-3 to 3.1e-3. Each
+      crowds an edge, so the extension is needed. It is matched between scratch and the 28-process fine-tune (same window,
+      same 8 trials), costs about 4.5 GPU-h, and waits on nothing. The config diff 45f404900 to edfcc164d changes only the
+      lr window, n_trials 16 to 24 and the waves.'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
