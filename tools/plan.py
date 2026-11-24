@@ -1730,7 +1730,7 @@ def owner_brief(e, add=None):
         oq = ("WAITING ON JOAQUIN, do not do:\n  question: %s\n  blocks: %s\n" % (
             e["ask"], e.get("holds_all") and "the whole entry (%s)" % e["holds_all"] or e.get("blocks") or
             "only what the question decides")) + oq
-    return tpl.format(id=e["id"], title=e.get("title"), question=e.get("question"),
+    return intent_block(e) + tpl.format(id=e["id"], title=e.get("title"), question=e.get("question"),
                       objective=e.get("objective") or e.get("question"), mechanism=e.get("mechanism") or "not recorded",
                       expected=e.get("expected") or "not recorded",
                       steps="\n".join("  %d: %s" % (k, x) for k, x in nexts(e)) or "  none",
@@ -1807,6 +1807,42 @@ def cmd_describe(a):
     print("plan: %s described" % a.id)
 
 
+def intent_block(e):
+    """Joaquin's intent and corrections on the entry, in his words, first in every brief (D534): what he wants from it,
+    what he corrected, the reference files he gave and the outputs he rejected."""
+    xs = e.get("intent") or []
+    if not xs:
+        return ""
+    lines = ["JOAQUIN'S INTENT AND CORRECTIONS ON THIS ENTRY (his words; they bind every step, brief and message below):"]
+    for x in xs:
+        lines.append('  "%s" (%s)' % (x["text"], (x.get("said_at") or "")[:16]))
+        if x.get("ref"):
+            lines.append("    reference he gave: %s (open it before drawing or designing; redraw in its layout)" % x["ref"])
+        if x.get("rejects"):
+            lines.append("    rejected by it, never used or sent again: %s" % x["rejects"])
+    return "\n".join(lines) + "\n\n"
+
+
+def cmd_intent(a):
+    """Record Joaquin's words on the entry (a request, a correction, a reference he gave): verified as typed by him,
+    rendered first in every brief and hand-off of the entry."""
+    said = typed_at(a.quote)
+    if not said:
+        sys.exit("plan: Joaquin never typed these words (searched his messages); quote him exactly")
+    for f in (a.ref, a.rejects):
+        if f and not os.path.exists(os.path.join(ROOT, f)) and not os.path.exists(f):
+            sys.exit("plan: no file %s" % f)
+    with transaction() as (d, st):
+        e = entry(d, a.id)
+        if any(x["text"] == a.quote for x in e.get("intent") or []):
+            print("plan: note: already recorded")
+            return
+        e.setdefault("intent", []).append({k: v for k, v in (
+            ("text", a.quote), ("said_at", said[-1].isoformat()), ("ref", a.ref), ("rejects", a.rejects),
+            ("at", now().isoformat())) if v})
+    print("plan: Joaquin's words recorded on %s; every brief of it now starts with them" % a.id)
+
+
 MECH_TEMPLATE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "plan", "mechanical_prompt.txt")
 
 
@@ -1815,7 +1851,7 @@ def cmd_brief(a):
     e = entry(d, a.id)
     if getattr(a, "mechanical", None):
         # one mechanical step for a mechanical-worker (D213): the short template, its own rules block (brief_guard)
-        print(open(MECH_TEMPLATE).read().replace("{id}", e["id"]).replace("{step}", a.mechanical.strip()))
+        print(intent_block(e) + open(MECH_TEMPLATE).read().replace("{id}", e["id"]).replace("{step}", a.mechanical.strip()))
         return
     if e.get("status") != "running":
         sys.exit("plan: %s is %s; only a running entry gets an owner" % (a.id, e.get("status")))
@@ -3560,6 +3596,10 @@ def main(argv=None):
         A("--text", required=True, help="the finding"))
     cmd("describe", cmd_describe, "the entry's objective, the mechanism it tests and the expected outcome", ID,
         A("--objective"), A("--mechanism"), A("--expected"))
+    cmd("intent", cmd_intent, "record Joaquin's words on the entry (a request, a correction, a reference he gave); "
+        "every brief of it starts with them", ID, A("--quote", required=True, help="his exact words"),
+        A("--ref", help="a file he gave as the model (a figure, a table)"),
+        A("--rejects", help="a script or file his words reject (send_check refuses figures it drew)"))
     cmd("brief", cmd_brief, "the owner's brief of the entry (plan/step_prompt.txt filled)", ID,
         A("--add", help="the main session's narrowing (it never overrides the rules block)"),
         A("--mechanical", metavar="STEP", help="instead: a mechanical-worker's brief for this one step "

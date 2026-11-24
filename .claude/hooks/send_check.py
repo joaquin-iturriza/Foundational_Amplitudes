@@ -255,11 +255,30 @@ def draft_stems(drafts=None):
     return out
 
 
+def rejected_producers(root=ROOT):
+    """{absolute path: (entry, Joaquin's words)} of every file an entry's intent record says he rejected
+    (`plan intent --rejects`, D534): a figure drawn by one never reaches him again."""
+    try:
+        import yaml
+        d = yaml.safe_load(open(os.path.join(root, "plan", "plan.yaml"), encoding="utf-8")) or {}
+    except Exception:
+        return {}
+    es = d.get("entries", d) if isinstance(d, dict) else d
+    es = es.values() if isinstance(es, dict) else es
+    out = {}
+    for e in es or []:
+        for x in (e.get("intent") or []) if isinstance(e, dict) else []:
+            if x.get("rejects"):
+                out[os.path.realpath(os.path.join(root, x["rejects"]))] = (e.get("id"), x.get("text"))
+    return out
+
+
 def legend_findings(tool_input, cwd, drafts=None):
     """([refusal lines], [legend lines shown]) for the figures of a SendUserFile call (see the legend rule)."""
     cap = tool_input.get("caption") if isinstance(tool_input, dict) else None
     ncap = norm(cap if isinstance(cap, str) else "")
     bad, shown, stems = [], [], None
+    rejects = rejected_producers()
     for p in sent_files(tool_input, (".png", ".pdf")):
         p = p if os.path.isabs(p) else os.path.join(cwd, p)
         if is_deck(p) or is_draft(p) or "run_plots" in os.path.normpath(p).split(os.sep):
@@ -280,6 +299,11 @@ def legend_findings(tool_input, cwd, drafts=None):
                        "as a figure." % (p, os.path.basename(legend_file(p))))
             continue
         script, blob, warns, labels = lg
+        rej = rejects.get(os.path.realpath(script)) if script else None
+        if rej:
+            bad.append('%s: drawn by %s, which Joaquin rejected on %s ("%s"): draw it with the tool his reference '
+                       'calls for (plan brief %s, first lines)' % (p, script, rej[0], rej[1], rej[0]))
+            continue
         if not committed(script, blob):
             bad.append("%s: drawn by %s, not committed at the content that drew it: commit the script and redraw"
                        % (p, script or "no script"))
