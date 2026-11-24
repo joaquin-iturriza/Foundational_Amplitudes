@@ -1,0 +1,55 @@
+CAUSE: models/diagram_encoder_llm4lhc.py particle_label_vocab() returns only the 30 SM labels
+(GLOBAL_PDG_IDX - 1). _label() raises KeyError for PDG 82 (MadGraph one-loop ghost) and the
+other loop-only lines. edge_vocab = len(vocab) sizes every embedding, so extending the vocab
+is enough; nothing else hardcodes 30 except the test.
+
+CHANGE (only models/diagram_encoder_llm4lhc.py):
+1. Next to _SELF_CONJUGATE add a module-level tuple of SIGNED ids (82 and -82 are separate
+   labels, so both are listed):
+     # one-loop ghosts (82) and Goldstones/R2 lines MadGraph emits in loop processes
+     _LOOP_LINES = (82, -82, 9000001, 9000002, 9000003, 9000004, 250, 251)
+   and a set of the ids whose sign is an orientation artefact (everything but 82):
+     _LOOP_SIGN_FOLDED = {250, 251, 9000001, 9000002, 9000003, 9000004}
+2. particle_label_vocab(): after building the 30-entry dict `v` (rename the return), do
+     v = {int(pdg): int(i) - 1 for pdg, i in GLOBAL_PDG_IDX.items()}
+     for k, pdg in enumerate(_LOOP_LINES):
+         v[pdg] = 30 + k
+     return v
+   (30 = number of SM labels; use len(v) before the loop if you prefer, but it must be 30.)
+   Update the docstring: 30 SM labels then one label per _LOOP_LINES entry.
+3. _label(): extend the sign fold, keep 82/-82 untouched:
+     if abs(pdg) in _SELF_CONJUGATE or abs(pdg) in _LOOP_SIGN_FOLDED:
+         pdg = abs(pdg)
+   The KeyError for unknown PDGs (e.g. 9000099) stays as is (the `if pdg not in vocab` check).
+4. Module docstring, "The same" bullet "a 30-entry vocabulary" and item 4's "they have no
+   loop case": one-line edit saying the vocabulary is 30 SM labels plus the loop lines
+   (_LOOP_LINES). Optional, keep it short.
+
+TEST (tests/test_diagram_encoder_llm4lhc.py):
+- test_graph_construction line ~186: replace
+     assert len(vocab) == 30 and sorted(vocab.values()) == list(range(30))
+  by
+     n = 30 + len(_m._LOOP_LINES)
+     assert len(vocab) == n and sorted(vocab.values()) == list(range(n))
+  (_m is the loaded module, already used at line 30.)
+- add a new test:
+     def test_loop_lines():
+         vocab = particle_label_vocab()
+         assert [vocab[p] for p in _m._LOOP_LINES] == list(range(30, 30 + len(_m._LOOP_LINES)))
+         assert _m._label(-250, vocab) == vocab[250]
+         assert _m._label(82, vocab) != _m._label(-82, vocab)
+         for p in (82, 9000001, 9000004, 250, 251):
+             _m._label(p, vocab)           # no KeyError
+         # unknown PDG still raises through the loader: copy payloads()[0], change one
+         # edge "pdg" to 9000099 (see how `payloads`/`schannel(prop)` build one at lines
+         # 51-110; schannel(9000099) gives the propagator), then
+         with pytest.raises(KeyError):
+             load_llm4lhc_diagram_set([<that payload>])
+  Check at the top of the test file whether pytest is imported; add `import pytest` if not.
+  Look at how test_real_sidecar/build() hand payloads to load_llm4lhc_diagram_set to
+  build the bad payload the same way (a dict with "subprocesses":[{"external":..., "diagrams":[...]}]).
+- Also make sure build()/encoder still runs with the larger edge_vocab (existing tests cover it).
+
+RUN:
+  cd <your repo copy> && /home/joaquin/work/FA/.venv-cpu/bin/python -m pytest tests/test_diagram_encoder_llm4lhc.py -q
+All tests must pass. Do not edit any other file; no commits.

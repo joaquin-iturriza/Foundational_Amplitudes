@@ -1,0 +1,59 @@
+PLAN (all edits in experiment.py of your checkout; no other source file changes)
+
+Cause: in _physics_logF (~line 2407-2445) the block
+    if pc.get("order") is None:
+        bo = self._diagram_born_orders(name)
+        if bo is not None:
+            q, e = mg.target_monomial_from_diagrams(pc, bo)
+ignores data.orders_from_diagrams, and _save_data_stats does not record the source.
+(_orders_of(name) already returns the table's vector when orders_from_diagrams is false,
+because _orders_from_diagrams then leaves cfg.data.amp_orders as the table.)
+
+1. Add two small methods next to _orders_from_diagrams (same class):
+
+    def _orders_source(self):
+        """Where the target's coupling monomial comes from: the diagrams' highest alpha_s power
+        (data.orders_from_diagrams, default true) or the hand-set table."""
+        return "diagrams_highest_alphas" if bool(self.cfg.data.get("orders_from_diagrams", True)) else "table"
+
+    def _check_frozen_orders_source(self, stats):
+        """A frozen run reloaded under another monomial source would silently use a different target."""
+        if not bool(self.cfg.data.get("target_physics_orders", False)):
+            return
+        a, b = stats.get("target_physics_orders_source", "table"), self._orders_source()
+        assert a == b, (f"frozen data stats were fitted with target_physics_orders_source={a}, "
+                        f"this run sets {b} (data.orders_from_diagrams)")
+
+2. _physics_logF: gate the sidecar read on the source:
+        if pc.get("order") is None and self._orders_source() == "diagrams_highest_alphas":
+   and change the mixed-entry assert message (keep the condition) to contain the required text, e.g.
+        f"target_physics_orders: coupling homogeneity is not exact for {name}: a mixed-order entry {o} "
+        f"(source {self._orders_source()}; the table has several monomials, or no diagram sidecar to read its powers)"
+   Do not change anything else there (q, e = int(o[2]), int(o[3]) is already the table's).
+
+3. _save_data_stats: right after the "target_physics_orders" key add
+        "target_physics_orders_source": self._orders_source(),
+
+4. init_data, in the frozen-stats reload branch, right after the signedlog_scale_shift assert
+   (just before LOGGER.info(f"Loaded frozen data stats from {stats_src}") ~line 1591) add
+            self._check_frozen_orders_source(stats)
+   (the existing per-key loop at ~1563 uses str() compare and would not know the new key; leave it.)
+
+5. Test: add test_orders_source() to /tmp/.../repo/tests/test_order_features.py (before the __main__ block, call it
+   from __main__ too). Style as test_site: build exp = AmplitudeExperiment.__new__(AmplitudeExperiment),
+   exp.cfg = OmegaConf.create({"data": {...}}). Assert:
+   - cfg {} (unset) -> _orders_source() == "diagrams_highest_alphas"; orders_from_diagrams False -> "table".
+   - target_physics_orders True, orders_from_diagrams False: _check_frozen_orders_source({}) passes (no key = table);
+     with {"target_physics_orders_source": "diagrams_highest_alphas"} raises AssertionError whose text contains
+     "target_physics_orders_source" (use pytest-free try/except AssertionError and check str(e)).
+   - orders_from_diagrams unset: stats {} raises; stats with 'diagrams_highest_alphas' passes.
+   - target_physics_orders False: any stats pass.
+   - (if cheap) _save_data_stats writes the key: needs mom_mean etc., skip unless easy; otherwise grep-check only.
+   - (optional, only if a mixed table entry is easy to build with __new__: mom_phys, alphas, _phys_ls0, _phys_logc
+     needed) the _physics_logF mixed refusal; skip if it takes more than ~15 lines, and say so.
+
+6. Run (from the checkout root):
+   /home/joaquin/work/FA/.venv-cpu/bin/python tests/test_order_features.py
+   (also run tests/test_parent_target_stats.py and tests/test_hybrid_cp_frozen.py to check init_data reload paths still pass,
+   with the same python, as `python tests/<file>` or `-m pytest tests/<file>` whichever the file supports.)
+Do not edit anything outside the checkout. Finish with a short summary of what you changed.

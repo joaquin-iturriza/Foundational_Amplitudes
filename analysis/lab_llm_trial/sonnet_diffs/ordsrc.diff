@@ -1,0 +1,97 @@
+diff --git a/experiment.py b/experiment.py
+index 6e3958020..97b1f29e1 100644
+--- a/experiment.py
++++ b/experiment.py
+@@ -1588,6 +1588,7 @@ class AmplitudeExperiment(BaseExperiment):
+             assert abs(_ss_stats - self._signedlog_scale_shift()) < 1e-12, (
+                 f"frozen data stats were fitted with signedlog_scale_shift={_ss_stats}, "
+                 f"this run sets {self._signedlog_scale_shift()}")
++            self._check_frozen_orders_source(stats)
+             LOGGER.info(f"Loaded frozen data stats from {stats_src}")
+             if ft_path is not None and not self.warm_start:
+                 # the off-shellness input's column stats, kept so the backbone reads a propagator's
+@@ -2435,12 +2436,13 @@ class AmplitudeExperiment(BaseExperiment):
+             # sidecar also corrects the order vector's alpha_s power where it is wrong: v4's b-quark Higgs entries
+             # (massless b, no Yukawa: purely electroweak) and the gluon of zp_uux_Y1g and thdm_uux_h2h3g; the order
+             # features read the same sidecar (_orders_from_diagrams), so input and target agree
+-            if pc.get("order") is None:
++            if pc.get("order") is None and bool(self.cfg.data.get("orders_from_diagrams", True)):
+                 bo = self._diagram_born_orders(name)
+                 if bo is not None:
+                     q, e = mg.target_monomial_from_diagrams(pc, bo)
+             assert not (int(o[1]) == 0 and (int(o[0]) == 0 or virt) and q + e > deg), \
+-                f"target_physics_orders: {name} is a mixed-order entry {o} with no diagram sidecar to read its powers"
++                (f"target_physics_orders: {name} is a mixed-order entry {o}: coupling homogeneity is not exact "
++                f"(no diagram sidecar read, or data.orders_from_diagrams is false)")
+             a_em = 1.0 / float(self.cfg.data.get("target_physics_alpha_inv", 132.507))
+             lord = q * np.log(4 * np.pi * np.asarray(alphas, dtype=np.float64)) + e * np.log(4 * np.pi * a_em)
+         n_eik, leik = 0, 0.0
+@@ -2573,6 +2575,16 @@ class AmplitudeExperiment(BaseExperiment):
+             n += 1
+         return n, out
+ 
++    def _orders_source(self):
++        return "diagrams_highest_alphas" if bool(self.cfg.data.get("orders_from_diagrams", True)) else "table"
++
++    def _check_frozen_orders_source(self, stats):
++        """A reload under another source of the target's coupling monomial would change the target silently."""
++        if not bool(self.cfg.data.get("target_physics_orders", False)):
++            return
++        a, b = stats.get("target_physics_orders_source", "table"), self._orders_source()
++        assert a == b, f"frozen data stats were fitted with target_physics_orders_source={a}, this run sets {b}"
++
+     def _save_data_stats(self, stats_path, mom_div, amp_trafos, per_dataset):
+         """Write the frozen data statistics (data_stats.json) a resume / fine-tune / rebuild reloads."""
+         with open(stats_path, "w") as f:
+@@ -2593,6 +2605,7 @@ class AmplitudeExperiment(BaseExperiment):
+                 "target_physics_dim_only": bool(self.cfg.data.get("target_physics_dim_only", False)),
+                 "target_physics_eikonal": bool(self.cfg.data.get("target_physics_eikonal", False)),
+                 "target_physics_orders": bool(self.cfg.data.get("target_physics_orders", False)),
++                "target_physics_orders_source": self._orders_source(),
+                 "target_physics_hybrid": bool(self.cfg.data.get("target_physics_hybrid", False)),
+                 "target_physics_hybrid_cp": getattr(self, "_phys_cp", None) or None,
+                 "target_physics_hybrid_blend": float(self.cfg.data.get("target_physics_hybrid_blend", 0.0)),
+diff --git a/tests/test_order_features.py b/tests/test_order_features.py
+index 24ad76887..a06a026ad 100644
+--- a/tests/test_order_features.py
++++ b/tests/test_order_features.py
+@@ -160,7 +160,39 @@ def test_site():
+         print(f"[site] {os.path.basename(rf)}: {3 * len(hit)} affected pools are cache hits (keys unchanged)")
+ 
+ 
++def test_frozen_orders_source():
++    from types import SimpleNamespace as NS
++    try:
++        from experiment import AmplitudeExperiment as E
++    except ImportError:
++        print("[orders_source] skipped: experiment not importable here")
++        return
++
++    def mk(**d):
++        return NS(cfg=NS(data=NS(get=lambda k, dflt=None, d=d: d.get(k, dflt))), _orders_source=lambda: E._orders_source(mk_self[0]))
++    mk_self = [None]
++
++    def chk(stats, **d):
++        o = mk(**d)
++        mk_self[0] = o
++        E._check_frozen_orders_source(o, stats)
++
++    chk({}, target_physics_orders=True, orders_from_diagrams=False)            # no key counts as table
++    chk({"target_physics_orders_source": "diagrams_highest_alphas"}, target_physics_orders=True)  # unset = true
++    chk({}, orders_from_diagrams=False, target_physics_orders=False)
++    chk({}, target_physics_orders=False)                                       # off: anything passes
++    for stats, d in (({}, {}), ({"target_physics_orders_source": "diagrams_highest_alphas"}, {"orders_from_diagrams": False})):
++        try:
++            chk(stats, target_physics_orders=True, **d)
++        except AssertionError as e:
++            assert "target_physics_orders_source" in str(e)
++        else:
++            raise AssertionError("mismatch not refused")
++    print("[orders_source] ok")
++
++
+ if __name__ == "__main__":
++    test_frozen_orders_source()
+     test_from_diagrams()
+     test_recipe_id_ignores_orders()
+     if os.environ.get("FA_TEST_SITE"):

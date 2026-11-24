@@ -1,0 +1,52 @@
+PLAN (pool physics guard: a scan entry is no reference for the field it scans)
+
+CAUSE (tools/pool_physics.py)
+TrainingReference.same_process / catalog_wide return `plain or es`: when a process's only training entries are
+scans (alpha_s points), the scans are used as references, and compare() then sees their alphas_mz (e.g. 0.130)
+differ from the probe's 0.118 -> mismatch. Fix: in compare(), a reference entry does not contribute a value for a
+field its own scan declares. If no reference is left for that field, the existing code already puts it in `skipped`
+(= result["not_compared"]) and does not refuse. Status stays 'ok'.
+
+CHANGES (only tools/pool_physics.py, then the test)
+1. TrainingReference.__init__: in the self.entries.append({...}) dict add the key
+       "declared": declared_fields(s["physics"]),
+   (declared_fields is defined above in the same module; for a plain entry it returns an empty set.)
+2. compare(): the line building `rv` must keep the entry, so replace
+       rv = [_view(r["block"], r["pdg"]) for r in refs]
+   with
+       rv = [(_view(r["block"], r["pdg"]), r.get("declared", ())) for r in refs]
+   and in the loop over fields replace
+       for v in rv:
+           if f in v and not any(_same(v[f], w) for w in vals):
+               vals.append(v[f])
+   with
+       for v, dec in rv:
+           if f in dec:      # this entry scans f on purpose: not a reference for it
+               continue
+           if f in v and not any(_same(v[f], w) for w in vals):
+               vals.append(v[f])
+   Nothing else changes: `if f not in pv or not vals: skipped.append(f)` then reports the field.
+   Do not change check_probe's signature or the names same_process / catalog_wide / compare / check_probe.
+3. Update the module docstring sentence about scans (line ~26) with a few words: "a training entry that scans a
+   field is not a reference for that field".
+
+TEST (tests/test_pool_physics.py, end of test_scenario, before the `print("ok scenario")` line)
+Add a scan-only reference and check the probe passes with the field skipped:
+    # a training entry that scans alpha_s is no reference for alpha_s: pp13_ddx_aag against a catalog whose only
+    # d d~ > a a g entry is an alpha_s scan point (a different alpha_s by design)
+    mg.register_recipe_processes([{"name": "v4_ddx_aag__as", "base": "v4_ddx_aag", "physics": {"alpha_s": 0.130}}])
+    backend("v4_ddx_aag__as", "sm-no_b_mass", mg.PROCESSES["v4_ddx_aag"]["mg5_generate"], V4_CARD)
+    rec2 = os.path.join(TMP, "train_as.yaml")
+    yaml.safe_dump({"processes": [{"name": "v4_ddx_aag__as", "base": "v4_ddx_aag", "physics": {"alpha_s": 0.130},
+                    "sqrts": [100, 6000], "n_train": 10, "n_val": 10, "n_test": 10}]}, open(rec2, "w"))
+    c = pp.check_probe("pp13_ddx_aag", None, None, pp.TrainingReference(rec2))
+    assert c["status"] == "ok" and "alphas_mz" in c["not_compared"], c
+(Model it on setup(): same helper `backend(name, model, gens, card)`; the exact names of helpers/vars are those of
+that file. If `physics_block` for the scan entry needs the backend dir, the backend() call above provides it. If the
+test shows alphas_mz is not in not_compared, print c and inspect _view / physics_block for how alpha_s of a scan
+entry is read, but do not widen the fix beyond compare().)
+
+RUN
+  cd <your repo copy> && /home/joaquin/work/FA/.venv-cpu/bin/python tests/test_pool_physics.py
+Expect "all pool physics tests passed". Existing assertions must still hold (the mt300 probe without its
+declaration is still refused: its same-process reference is the plain v4_gg_ttx entry, which declares nothing).
