@@ -40647,6 +40647,15 @@ entries:
       recorded it FAILED with its penalty and continues (no --retry-failed: a property of the HPs). Part (c) now: 3 of 4 trials
       at lr >= 6e-3 or the control''s 3.65e-3 blew up; only lr 1.6e-3 (trial 0) has finished cleanly; wave-2 trials 3 (lr
       1.56e-3) and 5 (lr 2.57e-3) still running.'
+  - at: '2026-11-24T10:36:58+00:00'
+    text: '2026-11-24: Joaquin on a5_controls_score.png: ''I don''t understand why you decide to show me this random plot
+      again that I never asked for, instead of the plot I care about.'' Cause: I drew the comparison with control_score.py''s
+      own layout (pooled points + per-process ordered by the LLM), rejected on 2026-11-23, without opening his model figure
+      (analysis/llm_compare/suprio_llm_heldout_fig.png) as the brief requires. Fix @1a11e36a7: control_score.py draws no figure
+      any more (numbers only, its docstring points to heldout_per_process.py); heldout_per_process.py takes several arms (--tag/--label
+      lists, --out). The rejected PNGs (control_score, ac_controls_score, a5_controls_score) deleted from figs/. Redrawn:
+      analysis/llm_compare/figs/a5_controls_heldout_per_process.png (tuned trial 5, his-optimizer control, latest-setup control,
+      his pID baseline). Every held-out comparison of this entry is drawn in that layout.'
   step_waits:
     '2': FA-ccin2p3-b135e7db FA-ccin2p3-f3e29e87
     '3': llmcmp_a_drive5
