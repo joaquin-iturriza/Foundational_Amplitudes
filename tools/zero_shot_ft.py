@@ -12,6 +12,7 @@ dir. Needs a GPU.
     python tools/zero_shot_ft.py <ft_run_dir> [<ft_run_dir> ...]
 """
 import json, os, sys, tempfile
+import atexit, shutil
 
 import numpy as np
 import torch
@@ -38,6 +39,7 @@ for run_dir in args:
         cfg.warm_start_idx = None
         cfg.training.validate_frac = 0; cfg.training.validate_every_n_steps = 1
         cfg.run_dir = tempfile.mkdtemp(prefix="zeroshot_", dir=os.environ["SCRATCH"])
+        atexit.register(shutil.rmtree, cfg.run_dir, True)  # a scratch run dir: nothing reads it after the process
         if cfg.data.get("processes_file"):
             cfg.data.processes_file = siteconf._expand_str(str(cfg.data.processes_file))
         # the parent checkpoint, re-rooted to this site (a config written on another site keeps its paths)

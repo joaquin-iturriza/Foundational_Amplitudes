@@ -10,6 +10,7 @@ data_stats.json, or for older runs a build on the run's own pools): a swapped sp
 every event's input (the steering cross-pool offset, docs/results.tex sec:ladder).
 """
 import copy, gzip, io, json, os, sys, tempfile
+import atexit, shutil
 
 import numpy as np
 import torch
@@ -187,6 +188,7 @@ def own_offshell_stats(run_dir):
         cfg.use_mlflow = False; cfg.count_flops = False
         cfg.warm_start_idx = None; cfg.fine_tune.pretrained_path = None
         cfg.run_dir = tempfile.mkdtemp(prefix="rebuild_", dir=os.environ["SCRATCH"])
+        atexit.register(shutil.rmtree, cfg.run_dir, True)  # a scratch run dir: nothing reads it after the process
     exp = _build(cfg, None, None, name)
     saved = json.load(open(os.path.join(run_dir, "data_stats.json")))
     assert np.allclose([float(x) for x in exp.prepd_std], saved["prepd_std"], rtol=1e-6), "not the run's own build"
@@ -267,6 +269,7 @@ def rebuild(run_dir, role, path, n_events, event_frame=False):
             cfg.data.unaugmented_roles = [role]
             deterministic_frame_noise()
         cfg.run_dir = tempfile.mkdtemp(prefix="rebuild_", dir=os.environ["SCRATCH"])
+        atexit.register(shutil.rmtree, cfg.run_dir, True)  # a scratch run dir: nothing reads it after the process
     if OmegaConf.select(load_cfg(run_dir), "fine_tune.pretrained_path"):
         # a fine-tuned run trained on frozen stats (its parent's, kept in its own data_stats.json), not on stats of
         # its own train split (protocol B adds hard events, which moves mom_div): the experiment reads frozen stats

@@ -29,6 +29,7 @@ starts from the same tensors as before; s_stages in each ZERO_SHOT record gives 
         [--allow-physics-mismatch "<reason>"] <probe recipe.yaml> [...]
 """
 import argparse, copy, json, os, sys, tempfile, time
+import atexit, shutil
 
 import numpy as np
 import torch
@@ -156,6 +157,7 @@ def _read(recipe):
         cfg.warm_start_idx = None
         cfg.training.validate_frac = 0; cfg.training.validate_every_n_steps = 1
         cfg.run_dir = tempfile.mkdtemp(prefix="zeroshot_", dir=os.environ["SCRATCH"])
+        atexit.register(shutil.rmtree, cfg.run_dir, True)  # a scratch run dir: nothing reads it after the process
         cfg.data.source = "recipes"
         cfg.data.processes_file = recipe
         cfg.data.train_subsample = a.train_subsample

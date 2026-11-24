@@ -13,6 +13,7 @@ log t3 + e3 + h, h the correction (analysis/catalog_daniel/factorised_2to4.py). 
     python tools/factorised_2to4_net.py --parent <run dir> --f24 <factorised_2to4 npz dir> [--n 2000] [--out DIR]
 """
 import argparse, json, os, sys, tempfile
+import atexit, shutil
 
 import numpy as np
 import torch
@@ -48,6 +49,7 @@ def main():
     top = {k: v for k, v in tr.items() if k != "processes"}     # catalog_v3's sampling: mixture
     train = {e["name"]: e for e in tr["processes"]}
     rdir = tempfile.mkdtemp(prefix="f24net_", dir=os.environ["SCRATCH"])
+    atexit.register(shutil.rmtree, rdir, True)  # a scratch run dir: nothing reads it after the process
     if a.v3_nfinal:
         jobs = v3_probes(a.v3_nfinal)
     else:
@@ -95,6 +97,7 @@ def main():
             cfg.warm_start_idx = None
             cfg.training.validate_frac = 0; cfg.training.validate_every_n_steps = 1
             cfg.run_dir = tempfile.mkdtemp(prefix="f24net_run_", dir=os.environ["SCRATCH"])
+            atexit.register(shutil.rmtree, cfg.run_dir, True)  # a scratch run dir: nothing reads it after the process
             cfg.data.source = "recipes"; cfg.data.processes_file = rec_path
             cfg.data.train_subsample = 10000; cfg.data.memmap = False; cfg.data.eval_subsample = n
             cfg.data.shared_standardization = False; cfg.data.affine_multiplicity_std = False

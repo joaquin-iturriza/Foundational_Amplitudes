@@ -14,6 +14,7 @@ indices and their post-fit and plain-offset MSEs. A GPU for speed (runs on CPU t
         [--lr 0.05] [--save-dir D] <probe recipe.yaml> [...]
 """
 import argparse, json, os, sys, tempfile
+import atexit, shutil
 
 import numpy as np
 import torch
@@ -88,6 +89,7 @@ def main():
             cfg.warm_start_idx = None
             cfg.training.validate_frac = 0; cfg.training.validate_every_n_steps = 1
             cfg.run_dir = tempfile.mkdtemp(prefix="kshot_", dir=os.environ["SCRATCH"])
+            atexit.register(shutil.rmtree, cfg.run_dir, True)  # a scratch run dir: nothing reads it after the process
             cfg.data.source = "recipes"
             cfg.data.processes_file = recipe
             cfg.data.train_subsample = a.train_subsample

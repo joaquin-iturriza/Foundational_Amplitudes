@@ -16,6 +16,7 @@ refitting them on this site's train pools: for a run read on a site whose train 
 (each site generates its own; the finale parent trained on lxplus, read on CC). The val pools must still be the run's.
 """
 import json, os, sys, tempfile
+import atexit, shutil
 
 import numpy as np
 import torch
@@ -46,6 +47,7 @@ for run_dir in sys.argv[1:]:
         if os.environ.get("EVAL_FULL") == "1":
             cfg.data.eval_subsample = None   # the whole val pools, whatever cap the run trained with
         cfg.run_dir = tempfile.mkdtemp(prefix="evalbest_", dir=os.environ["SCRATCH"])
+        atexit.register(shutil.rmtree, cfg.run_dir, True)  # a scratch run dir: nothing reads it after the process
         # a run copied from another site keeps that site's absolute paths (its recipe): re-root them here
         if cfg.data.get("processes_file"):
             cfg.data.processes_file = siteconf._expand_str(str(cfg.data.processes_file))

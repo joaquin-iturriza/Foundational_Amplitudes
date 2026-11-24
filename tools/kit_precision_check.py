@@ -19,6 +19,7 @@ import json
 import os
 import sys
 import tempfile
+import atexit, shutil
 
 import numpy as np
 
@@ -110,6 +111,7 @@ def main():
                 rec["definition"] = float(np.max(np.abs(fm / sv - 1)))
                 for dtype in ("float32", "float64"):
                     tmp = tempfile.mkdtemp(prefix="kitprec_", dir=os.environ.get("SCRATCH"))
+                    atexit.register(shutil.rmtree, tmp, True)  # a scratch run dir: nothing reads it after the process
                     p, perm = build(name, rows, dtype, tmp, min(a.n, 2000))
                     r = np.abs(singular_from_momenta(st, p, pdgs) / sv[perm] - 1)
                     rec[dtype] = {"median": float(np.median(r)), "max": float(np.max(r))}
