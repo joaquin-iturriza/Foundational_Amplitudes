@@ -43393,12 +43393,10 @@ entries:
     withdrawn_at: '2026-11-24T14:14:55+00:00'
     withdrawn_why: 'answered: D541 says route log reading and simple fixes through DeepSeek and test harder tasks'
   owner:
-    agent: a6187b6cdb7ca974a
-    state: closed
-    since: '2026-11-24T00:26:31+00:00'
-    state_at: '2026-11-24T14:13:55.346000+00:00'
-    context: 229866
-    context_at: '2026-11-24T14:32:13+00:00'
+    agent: a41c5b4e5c054ecea
+    state: working
+    since: '2026-11-24T14:50:59+00:00'
+    state_at: '2026-11-24T14:50:59+00:00'
   designs:
   - at: '2026-11-23T16:20:16+00:00'
     question: Can the lab LLMs (deepseek-v4-flash, qwen3.8-27b), run through the opencode agent harness in a bwrap sandbox
