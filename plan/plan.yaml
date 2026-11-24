@@ -43894,6 +43894,17 @@ entries:
       endedrun, replyblock (2 scenarios unscored at the fix each), all six scenario-suite tasks are valid in the sandbox grader
       (fail at parent, pass at fix): backlogdepth, recheck, inflight, endedrun and spares reviewlock, replyblock. The hard
       round runs on the design''s ten tasks; no replacement needed.'
+  - at: '2026-11-24T17:37:12+00:00'
+    text: 'Hard round (10 multi-file fixes, tests handed over, sandbox grader; summary.json at labllm 7a28103a4, tools/lab_llm_report.py):
+      first pass Sonnet 10/10, DeepSeek+plan 10/10, DeepSeek alone 10/10. Our tokens per fix (Sonnet check included for DeepSeek
+      arms): Sonnet 244k (median 243k), DeepSeek+plan 254k (planner ~172k + check ~81k; 1.04x Sonnet), DeepSeek alone 142k
+      (median 99k, range 59-471k; 0.58x Sonnet, below Sonnet on 9/10 tasks). Wall per fix: Sonnet median 1.1 min, DeepSeek+plan
+      3.7, DeepSeek 8.3. Sonnet checks agreed with the grader on 19/20; the one disagreement (emastart, DeepSeek alone) was
+      right: its fix rebuilds the EMA on every run, losing a warm start''s restored EMA (real fix guards on not warm_start;
+      DeepSeek+plan guards; Sonnet''s own fix lacks the warm-start guard on fine-tunes), a defect the tests do not see. Design
+      outcome: neither DeepSeek arm meets the <=0.3x token bar; the check dominates DeepSeek-alone''s cost. Lookups: DeepSeek
+      10/10 in each of 2 runs, 16-21 s, 0 of our tokens, against Opus-low Explore grep 9/10 and grep2 10/10 at ~47k tokens
+      each: outcome yes, route code lookups to DeepSeek.'
   handoff:
     state: 'Round one reported (summary.json at 78d4af8ff). D541 work: (1) Route built and partly live. tools/labllm.py is
       merged on trunk at 0062e55a5 (triage, fix, check, stats; records in ~/.local/share/fa_labllm/routed.jsonl). The guidance
