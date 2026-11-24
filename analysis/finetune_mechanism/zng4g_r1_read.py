@@ -234,7 +234,8 @@ def main():
               for a in ("Sfx", "Fx", "S")}
     for a, ts in trials.items():
         assert all(isinstance(t["lr"], float) for t in ts), [t["lr"] for t in ts if not isinstance(t["lr"], float)]
-    assert len(trials["S"]) == 16 and len(trials["Sfx"]) == 16, {a: len(t) for a, t in trials.items()}
+    # D507's scratch search ran 16 trials at b2048 and 8 at b128 (analysis/zng_uq/data/d507_search.json)
+    assert len(trials["S"]) == {"2048": 16, "128": 8}[b] and len(trials["Sfx"]) == 16, {a: len(t) for a, t in trials.items()}
     chosen = trials["Sfx"][0]
     # the cached S seed-42 best is the S search's best trial
     assert abs(trials["S"][0]["val_loss"] * k2 / base["best"]["S"][0] - 1) < 1e-6
