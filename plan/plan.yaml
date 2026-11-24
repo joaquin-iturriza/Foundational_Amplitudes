@@ -41235,6 +41235,8 @@ entries:
       fit CC. Above D536''s 100 GPU-h: asked Joaquin (plan ask), step 10 held.'
   step_waits:
     '8': FA-ccin2p3-bf23e0c4 FA-ccin2p3-f6f7179d
+    '5': part (c) driver llmcmp_c_qperp_drive5 ending (its detach DONE event; wave 3 of 2 trials after trials 3 -5.816 and
+      5 -5.938 of wave 2)
   handoff:
     state: 'Part (a) DONE: DyHPO ended (8 trials, 0 failed), best trial 5 FA-ccin2p3-c891c0c2 (lr 1.24e-3, EMA on 0.9989,
       val MSE of z 4.81e-4); scored FA-ccin2p3-037bf5e1: pooled RMSE seen 0.117, held out 1.003, relabels 0.241, new 1.767
