@@ -38092,8 +38092,10 @@ entries:
     - FA-ccin2p3-13ce7261
     - FA-ccin2p3-1b46922a
     - FA-ccin2p3-1f2d9ad5
+    - FA-ccin2p3-1f850218
     - FA-ccin2p3-2281e6d9
     - FA-ccin2p3-2525f488
+    - FA-ccin2p3-2865c27d
     - FA-ccin2p3-3c517c9b
     - FA-ccin2p3-3ea9d4fa
     - FA-ccin2p3-47240f89
@@ -38151,12 +38153,13 @@ entries:
     - FA-lxplus-e8d15505
     - FA-lxplus-fad6ff57
     - FA-lxplus-fbdf6bc6
-    commit: 9fc114a6e
+    commit: 6236e60fd
     paths:
     - analysis/finetune_mechanism/data/restart_steps.json
     - analysis/finetune_mechanism/data/restart_summary.json
     - analysis/finetune_mechanism/data/zng4g_snap_read.json
     - analysis/finetune_mechanism/figs/zng4g_d1e3.png
+    - analysis/finetune_mechanism/glu_parent_curves.py
     - analysis/finetune_mechanism/parent_rerun_check.py
     - analysis/finetune_mechanism/plot_parent_rerun.py
     - analysis/finetune_mechanism/plot_restart.py
