@@ -640,6 +640,7 @@ D514_SITE = {"muon_b128": "lxplus"}
 # where d507collect reads a chosen trial's scored copy, when not where it ran: trial_0833 was copied to CC and scored
 # there (FA-ccin2p3-7390e5a4)
 SCORED_SITE = {"adam_b128": "ccin2p3"}
+D514_SCORED = {"muon_b128": "ccin2p3"}   # trial_0078 copied lxplus -> CC and scored there (FA-ccin2p3-5431deeb, E8442)
 
 
 def chosen_site(c, v2):
@@ -662,7 +663,7 @@ def d507collect(out, v2=False):
     args = {}                         # site -> its arguments: each chosen seed-42 trial is read where it ran
     for c, (_, tr, _, _, _, tag) in cells(v2).items():
         sw = f"tp_zng_d1e4_{c}_zgggg"
-        site = SCORED_SITE.get(c) if not (v2 and c in D514) else None
+        site = (D514_SCORED if v2 and c in D514 else SCORED_SITE).get(c)
         args.setdefault(site or chosen_site(c, v2), []).append(f"'{c}|42|runs/{sw}/{tr}|'")
         for s in (43, 44):        # the seed runs ran on CC
             args.setdefault("ccin2p3", []).append(f"'{c}|{s}|runs/{sw}_{tag}_s{s}|sweeps/{sw}_{tag}_s{s}/results/fixed.json'")
