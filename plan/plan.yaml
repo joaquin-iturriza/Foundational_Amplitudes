@@ -44952,6 +44952,19 @@ entries:
       expected 1.4 / 4.8 / 2.2 GiB: measured by the inventory FA-ccin2p3-b949c4ee (scratch_top_apparent.tsv), and D550''s
       ~8.4 GiB; 3 days: measured, the longest wall limit in scripts/*.sh and sweep/*.sh is 48 h (#SBATCH --time=48:00:00),
       so a scratch dir 3 days old belongs to no live job; D550 for the classes'
+    fix_at: '2026-11-24T23:48:34+00:00'
+    fix: 'The code at trunk d0a0b0265 is right, but the plan still holds the 23:42 design: it names the checkout-root log
+      class, trunk 815014406, ''logs with RUN_SUMMARY/RESULT_JSON kept'' under fixed, and ''logs'' in the outcome. The re-recorded
+      design never reached the plan (plan show cc_disk, 2026-11-25). Record the design that matches d0a0b0265: three classes
+      (smoke, mmap, scratch); the log class dropped because committed analyses parse checkout-root logs (ws_objective_check.py,
+      cited as % src: in docs/results.tex lines 3179, 3206, 3266); the --expect-gib guard (smoke 1.4, mmap 4.8, scratch 2.2
+      GiB, a class over 2x skipped and reported); check = tests/test_delete_debris.py (2 passed locally at d0a0b0265: the
+      MSE-only log kept, the 2x skip). Dropping the logs leaves part of what D550 approved (''loose job .out files'') undeleted.
+      Say so in the design as a deviation that opens the report to Joaquin; no ask is needed before the run. Checked and holding:
+      the seven scratch prefixes are exactly the tempfile.mkdtemp run_dir prefixes of zero_shot_ft, signed_ab_score, kshot_context,
+      rebuild_run, factorised_2to4_net, kit_precision_check and eval_best_val, so no zz_kshot*/zz_signed_ab* output matches
+      them; paths asserted to be direct children of SCRATCH or amp_mmap_cache; manifest written before deletion. Once re-recorded
+      as above, this passes.'
   findings:
   - at: '2026-11-24T14:32:44+00:00'
     text: '2026-11-24 login-node reads: /sps/lpnhe 512 GiB group space at 98% (498 GiB used, 15 GiB free), .disk_full flag
