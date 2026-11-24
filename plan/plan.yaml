@@ -45135,3 +45135,20 @@ entries:
     sources: 'D547 (Joaquin: private repo for the toy so a cluster can clone it, ''I don''t see why not''); the main session''s
       narrowing (one real cluster, separate HOME, CC login policy: submit and short reads only); D544 (CC login nodes: no
       scripts); cost: 2 GPU jobs x <=10 min = <=0.34 GPU-h, under the 30 GPU-h budget'
+    fix_at: '2026-11-24T20:11:20+00:00'
+    fix: '(1) Control (measure 8) cannot tell the kit''s effect from FA''s own live work: FA''s local runs.db gains rows whenever
+      any FA agent submits or polls during the proof, so ''row count unchanged'' fails for reasons unrelated to the kit (and
+      the gate sha changes if FA''s own site tool reinstalls its gate meanwhile). Replace it with checks that only the kit
+      could trip: no row in FA''s ~/.local/share/ccorch/runs.db whose project is toy or whose job id is one of the kit''s
+      jobs; no entry for the toy in FA''s ledger (decisions, items, events); on CC no line in ~/.ccorch/gpu_window.jsonl naming
+      the kit''s item, and nothing new under ~/.ccorch/jobs keyed to the kit''s env job (the kit must write ~/.ccorch_kit/jobs);
+      keep the sha1 of ~/.ccorch/bin/ccorch_gate.py and ~/.ccorch/bin/sbatch, read before and after, with FA''s gate stamp
+      file name recorded so a reinstall by FA''s own tool is told apart. (2) Ordering with nothing read: job.sh is submitted
+      after scripts/job_probe.sh but reads no output of it (CLAUDE.md: nothing waits on work whose output it does not read).
+      Submit both GPU jobs together after site pick (the probe stays as the infrastructure check; a failure of both costs
+      two jobs of at most 10 min), or name the output of the probe that job.sh reads. Everything else holds: one change (the
+      kit''s code path, CCORCH_REMOTE_DIR=.ccorch_kit) against FA''s live setup; the measures can fail (_rd rewrites $HOME/.ccorch
+      and the quoted ".ccorch" in site_gate.py line 544, both payloads; CC''s profile does not put ~/.ccorch/bin on PATH,
+      only FA''s per-command prefix does, so the kit''s gate''s shutil.which finds the real sbatch, not FA''s wrapper); toy
+      pass bar is train.py''s own assert |w-3|,|b-1|<0.1; CC has ~/.ssh/id_ed25519_github for the private clone and CC compute
+      nodes have internet; cost <=0.34 GPU-h; no prior kit proof found.'
