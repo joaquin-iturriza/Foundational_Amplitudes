@@ -40222,6 +40222,54 @@ entries:
       soft_eps, mass shell in results.tex, plan, decisions D374/D392/D539. The smoke must confirm, in its config.yaml and
       data_stats, that the duplicated ++data.processes_file and model.input_soft_* overrides took the chunk''s value (last
       wins).'
+  - at: '2026-11-24T16:37:40+00:00'
+    question: 'D539 step 4 (Joaquin: ''these input settings were decided for a reason? why are they causing a problem now?''):
+      is the momentum log-rescale''s (input_soft_eps 1e-8) Z+4g cost a small-data effect, and does e+e- -> u u~ g pay or gain
+      in its bulk, when the runs are stable? Step 3 (d539.json @8237ee961) answered the mechanism at Z+4g 1e4 (cost falls
+      with eps 2.41/1.61/1.33/1.10x, massless-only 2.34x: the compression of the massless momenta, not the Z''s mass shell)
+      but could not read data size or the process contrast: at hp1961 (lr 2.80e-2) all three Z+4g 1e5 OFF runs blew up at
+      61-69% of the run (best at 43-55%) and all 12 uug runs blew up (val up to 1e7x best).'
+    prior: 'Step 3 read (finding 2026-11-24, d539.json, d539_kit.json @4d0557b0d): Z+4g 1e4 at hp1961 above; Z+4g 1e5 r 0.96
+      [0.84,1.09] and uug r 0.74 [0.34,1.61] (1e4) / 0.94 [0.52,1.71] (1e5) unreadable (blown-up arms); uug kit deepest bins
+      even at hp1961 (best checkpoints): soft -5.05 dec (1e4) / -4.52 dec (1e5), collinear -0.13/-0.41, bulk -0.27/+0.15 (eps1e-8
+      over off, seed medians). D374/D392 kit_benchmark: uug 1e5, 8000 steps at batch 16384, cosine, soft 14180->0.393, bulk
+      8.2e-4->5.4e-4. S = D507 b2048 scratch search (tp_zng_d1e4_muon_b2048_zgggg, chosen hp1333, seeds 42/43/44 0.058/0.067/0.064,
+      no blow-up). One-setting rescale search (ftmech_zng4g_scrsoftsrch_b2048): every trial 0.121-0.201 above S over lr 3e-3..4e-2.
+      Searched: results.tex par:ftm_zng4g, sec:kit-deepest; plan finetune_mechanism and kit_benchmark findings; site decisions
+      D374/D392/D507/D539.'
+    measure: 'Best val MSE(log|M|^2) (best checkpoint x the run''s own target std^2, d539_read.py) per run, three seeds; r
+      = eps1e-8/off per process and D with the 2-sigma interval (sigma_r = sqrt((s_a^2+s_b^2)/3)); blow-ups (val > 10x best-so-far)
+      listed apart with where; for uug also the kit deepest-bin log-MSE (soft, collinear, bulk) by job_kit.sh KIT_SCORE_ONLY
+      on each of the 12 uug run dirs (d539_kit_read.py). Figure: d539_read.py''s figure for the hp1333 set beside the hp1961
+      one.'
+    check: 'On existing data: (1) the 1e4->1e5 axis moves the measure: Z+4g OFF at hp1961 1e5 bests 0.018/0.015/0.015 vs 1e4
+      0.047/0.061/0.056 (3-4x), so D is resolved; (2) the rescale moves the uug kit soft bin by 4.5-5 decades at both D (d539_kit.json),
+      so the kit read resolves the uug side; (3) hp1333 is stable where it was searched: S seeds best at the end of the run,
+      no blow-up (zng4g_r1_b2048.json), while hp1961 off arms blew up only at 1e5 and uug; hp1333 has lr 0.73x hp1961, muon
+      wd 4.2x, warmup 0.090 vs 0.156. Seed spread at stable Z+4g cells ~10% (sigma_r ~0.08), so r=1.3 is resolved.'
+    fixed: 'Scratch, batch 2048, 1953 steps (fixed compute as step 3: 400 epochs at 1e4, 40 at 1e5), MuonAdamW + WSD (cooldown
+      1/8), float64, validate_frac 0.02, evaluation.train_subsample 2000, heterosc_select mu_mse, config sweep/sweep_config_tp_zng_d1e4_muon_b2048_zgggg.yaml
+      (S''s own search config; equal to scrsoftsrch_b2048 minus the eps line) via sweep/run_fixed_hp.py (scripts/job_seed_batch.sh
+      chunks seed_chunks/d539s_*), every arm at S''s searched optimum hp1333 (lr 2.0296e-2, muon_weight_decay 1.4515e-2, reg
+      8.398e-7, warmup 0.0897, eta_min 1.127e-8, ema true 0.9683): the baseline''s best HPs, the first stage of the feature-vs-baseline
+      rule. Overrides only model.input_soft_eps (0 or 1e-8), data.train_subsample (1e4/1e5), uug data.processes_file = runs/kit/recipes/kit_A_ee_uug_me2_n100000_t8000.yaml.
+      Disk: step 3 run dirs 47-81 MB, 24 runs ~1.6 GB; CC /sps/lpnhe 15 GB free at step 3 (re-read at submission). Launch
+      path already run end to end by step 3 (same script, same overrides on the sister config, kit scoring), no smoke.'
+    control: 'Each process and D: the off arm (input_soft_eps 0) at the same hp1333 and seeds, rerun on today''s code (S''s
+      own Z+4g 1e4 seeds 0.058/0.067/0.064 are older code; the rerun checks them). Cross-check: the hp1961 step-3 cells where
+      they are clean (Z+4g 1e4).'
+    seeds: '42, 43, 44 per arm. 24 new runs: {Z+4g, uug} x {1e4, 1e5} x {off, eps1e-8} x 3 seeds, at 0.35 h each (step 3 rate)
+      = 8.4 GPU-h; plus 12 kit scorings ~0.1 h = 1.2 GPU-h; total ~9.6 GPU-h, under D520/D529. Layout: site pick 24 offers
+      7 CC + 1 lxplus at once -> 8 jobs of 3 runs (~1.05 h, one wave; lxplus takes Z+4g 1e4 runs, whose pool it holds).'
+    outcome: 'Per cell r with 2-sigma [lo,hi]. (a) Z+4g 1e5 r within noise of 1 (lo<=1<=hi or hi<1.19) while Z+4g 1e4 r>1
+      beyond noise: the cost needs data scarcity per step (40 vs 400 passes; which of the two not split here) -> the rescale
+      stays in parents trained at large D, Z+ng fine-tunes at small D decide it per case. (b) Z+4g 1e5 r>1 beyond noise: the
+      compression costs Z+4g''s bulk at any D at this budget -> parent for Z+ng without the rescale (or eps ~1, step-3 1.10x),
+      the uug soft-limit gain kept only where limits are the target. uug bulk r>1 beyond noise: the rescale also costs uug''s
+      bulk in this setup, the D374 bulk gain is a setup effect (batch 16384, 8000 steps, cosine); uug r<=1: the process contrast
+      stands (uug''s two-body-like bulk is not hurt). If blow-ups recur at hp1333 in a cell, that cell is listed apart and
+      goes to the second stage of the rule (the same DyHPO search per arm in that cell, best against best), never read from
+      a blown-up arm.'
   targets:
   - batch: ftm_parents
     wall_h: 1.6
