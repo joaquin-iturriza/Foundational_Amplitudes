@@ -43396,7 +43396,7 @@ entries:
     withdrawn_why: 'answered: D541 says route log reading and simple fixes through DeepSeek and test harder tasks'
   owner:
     agent: a6187b6cdb7ca974a
-    state: working
+    state: closed
     since: '2026-11-24T00:26:31+00:00'
     state_at: '2026-11-24T14:13:55.346000+00:00'
     context: 229866
@@ -43750,27 +43750,35 @@ entries:
       - 'a DeepSeek arm meets the design''s yes rule on hard fixes or lookups: propose routing that work too'
       - 'it does not: read the failure modes in the transcripts and try plan detail as the adaptation'
   handoff:
-    state: 'Benchmark built and mostly run. Harness: opencode 1.19.6 (native binary ~/.local/lib/node_modules/opencode-ai/node_modules/opencode-linux-x64/bin/opencode)
-      in a bwrap sandbox, tools/lab_llm_trial.py + tools/lab_llm_report.py in worktrees/wt-labllm (branch labllm, last commit
-      e44e915ad). Design passed review (second pass). Done: smoke on both models; 10 Sonnet plans; triage 60/60 runs (auto
-      60/60, hand 59/60, hand_read.json); timed Sonnet mechanical-worker on the 10 fixes (9/10 first pass, median ~3.6 min,
-      ~255k our tokens per fix; records arm sonnet_timed, diffs in sonnet_diffs/); 40 lab fix runs recorded but the 16 of
-      zsrole, ordsrc, skipclaim, stallshort are invalid (grader defects, see findings) and must be rerun. Next: launch rerun_0/1.sh
-      when the resume batch ends, then report + figure.'
-    decisions: 'Joaquin''s: opencode as the harness (his ''Opencode is fine I think''); restart after OOM at <=2 sessions
-      (D531); timed Sonnet reference (his question via the coordinator). Mine: triage keys read from the logs and one case
-      per distinct cause (design review FIX); hand grade of why/action against the ack note; planners run as Plan type on
-      Sonnet because brief_guard refuses general-purpose without the owner rules block; triage gives the run end class as
-      our events did; MG5_OUTPUT_DIR redirected into the run dir in the sandbox so lhe tests can write without touching ~/datasets;
-      report keeps the last record per (task, arm) so reruns replace invalid runs.'
-    ruled_out: 'bwrap --overlay-src (bwrap 0.9 lacks it); a home-made agent loop (Joaquin: use an existing harness); launching
-      6 parallel opencode sessions (OOM at 7.6 GB).'
-    running: 'detach:labllm_resume, pid 843198 (last 2 lab runs: poolrow deepseek+plan, loopenc qwen); reruns not yet launched
-      (/tmp/claude-1000/lab_llm_trial/rerun_0.sh, rerun_1.sh).'
-    files: worktrees/wt-labllm/tools/lab_llm_trial.py; worktrees/wt-labllm/tools/lab_llm_report.py; worktrees/wt-labllm/analysis/lab_llm_trial/{runs.jsonl,triage_cases.json,hand_read.json,planners.json,sonnet_timed.json,plans/,sonnet_diffs/};
-      analysis/agent_redesign/model_trial_baseline/{zsrole,ordsrc}.json (regenerated); /tmp/claude-1000/lab_llm_trial/ (run
-      dirs, rerun scripts)
-    written: '2026-11-23T23:02:36+00:00'
+    state: 'Round one reported (summary.json at 78d4af8ff). D541 work: (1) Route built and partly live. tools/labllm.py is
+      merged on trunk at 0062e55a5 (triage, fix, check, stats; records in ~/.local/share/fa_labllm/routed.jsonl). The guidance
+      is committed at 419bca13f after claudemd-keeper passed: the CLAUDE.md rule (DeepSeek reads a failed log first through
+      a mechanical-worker that checks it; the owner then reads the log itself), the mechanical brief''s Lab route rule, and
+      step_prompt and working-on-the-plan. Still uncommitted on trunk, waiting for repo-reviewer a51cecd03c33e3d65 to pass
+      the trunk backlog (933/520 after the merge): tools/plan.py lab_route (plan next puts the worker step on a stopped owner''s
+      RUN resume line), tests/test_lab_route.py (passes), and the .claude/hooks/plan_check.py hook text. Also uncommitted:
+      the worktree''s tools/lab_llm_trial.py lookup runner. (2) Harder round: the design passed (re-check of the HARD defect
+      texts and handed-over tests included). Six hard tasks are valid in the sandbox grader: alphapow, valtotal, emastart,
+      statssrc, topsampling, massconv. backlogdepth, recheck, inflight and endedrun fail at the fix in the sandbox, as do
+      all the scenario-suite tasks; the spares reviewlock and replyblock are fixchecking in detach:labllm_fixcheck_spare.
+      Sonnet planners exist for alphapow, valtotal, emastart, statssrc and topsampling (planners.json); massconv needs one.
+      Sonnet fixers ran on the same five, all first pass: about 210-260k tokens and about 1 min each (grade_sonnet records);
+      massconv needs one. Lab server down since 15:20 UTC (both models), so no DeepSeek run, no lookup run and no route demo
+      has gone.'
+    decisions: 'Joaquin''s: D541 (route through DeepSeek, test harder tasks); D531 (at most 2 sessions). Mine: hard defect
+      texts from the fix commits'' messages and tests handed over (design reviewer passed; alphapow, statssrc and topsampling
+      texts hint the fix, the same for every arm); every fix arm on archive copies; one Sonnet check per DeepSeek fix counted;
+      lookup control = Opus-low Explore grep and grep2 arms, graded by lookup_trial.correct at e6f0ef58e; owner keeps reading
+      the log after the checked reading (claudemd-keeper: the ~/work rule) - whether to drop that to ''only where the cause
+      is left open'' is a question for Joaquin; sandbox hides ~/mnt and credentials (repo-reviewer found them readable in
+      round one).'
+    ruled_out: a wait-for-server loop inside a detached job (sleep_guard refuses it); merging trunk into labllm (verify_claims
+      fails in the worktree on results.tex).
+    running: detach:labllm_fixcheck_spare (reviewlock, replyblock fixcheck); repo-reviewer a51cecd03c33e3d65 on the trunk
+      backlog
+    files: tools/labllm.py; tools/lab_llm_trial.py (trunk and worktrees/wt-labllm, the latter with lookup uncommitted); tools/lab_llm_report.py;
+      tests/test_lab_route.py; analysis/lab_llm_trial/{runs.jsonl,planners.json,plans/}; /tmp/claude-1000/lab_llm_trial/{lookup_0.sh,lookup_1.sh,planner_*.txt,sonnet_*.txt}
+    written: '2026-11-24T14:40:56+00:00'
   targets:
   - batch: labllm_rerun
     wall_h: 2.5
