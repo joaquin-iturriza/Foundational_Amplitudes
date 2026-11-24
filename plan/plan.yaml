@@ -38336,7 +38336,7 @@ entries:
     agent: a6ec5cc852dfce21b
     state: working
     since: '2026-11-24T14:14:38+00:00'
-    state_at: '2026-11-24T15:50:06.773000+00:00'
+    state_at: '2026-11-24T16:05:48.254000+00:00'
     context: 107233
     context_at: '2026-11-24T14:31:14+00:00'
   findings:
