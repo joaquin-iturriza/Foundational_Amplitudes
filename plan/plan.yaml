@@ -38300,6 +38300,18 @@ entries:
       (b2048 1.84). F/Sf* 1.10 (b2048 0.69). CAVEAT: Sf*''s chosen lr sits 0.04 decades below the window top 1.1e-2 (edge-limited;
       12 of 16 trials crowd 8e-3..1.1e-2), and scratch''s search had 8 trials against Sf*''s 16. No blow-ups (val best at
       94-100% of the run, end/best <= 1.024).'
+  - at: '2026-11-24T03:53:46+00:00'
+    text: '2026-11-24 from zng_uq_benchmark (step 3, D514): the batch-128 Muon from-scratch reference on Z+4g at 1e4 training
+      events is now hp0078 of the extended search tp_zng_d1e4_muon_b128_zgggg (MuonAdamW+WSD, batch 128, 31250 steps, lr 9.24e-3,
+      muon_weight_decay 0.0883, reg 9.37e-10, warmup 0.0551, eta_min 7.14e-8, ema true / 0.9024), replacing trial_0950. Best
+      val MSE(ln|M|^2) (= min val mu-MSE x 1.1198^2, mu_mse selection): seed 42 0.00888 (lxplus runs/tp_zng_d1e4_muon_b128_zgggg/trial_0078),
+      seed 43 0.01048 (CC FA-ccin2p3-9f2fb2be, runs/tp_zng_d1e4_muon_b128_zgggg_hp0078_s43), seed 44 0.00887 (CC FA-ccin2p3-8328330a,
+      runs/..._hp0078_s44); three-seed mean 0.00941, spread 1.18x; trial_0950''s three seeds 0.0180/0.0214/0.0196 (mean 0.0197)
+      -> 2.09x lower. Source: analysis/zng_uq/benchmark.py d507collect --v2 @6568c47c -> analysis/zng_uq/data/d507_v2.json
+      (seed 42 from d507_search_v2.json, tools/kit_curves.py sweep). Caveats: all three seeds reach their best at the last
+      step (31250), so the curve test flags them like every D507 choice; the lr window [2.7e-4, 3.3e-2] brackets it (best
+      at log position 0.735; the 3 trials above it at lr 2.7e-2-3.3e-2 are 2.8-7.8x worse, the 4 at 9.9e-3-1.09e-2 1.1-2.1x
+      worse). Test median |Delta| of hp0078 pending (FA-lxplus-8116ba56).'
   designs:
   - at: '2026-11-20T03:07:37+00:00'
     question: 'On b b~ > Z Z tree level (held-out parent without the f f~ > Z Z class, data saving''s setup), does a restart
