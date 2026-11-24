@@ -42247,6 +42247,16 @@ entries:
       4264 steps x 1.01 s/step (tools/short_wall.py''s training-only rate) x 1.15 for the measurement (one extra forward-backward
       of the batch every 10 steps) + 5 checks x 32 batch passes + 15 min start-up ~ 1.75 h on one GPU, limit 3 h; total <
       2.1 GPU-h.'
+    passed_at: '2026-11-24T00:49:39+00:00'
+    reviewer: 'Re-check after the repo-reviewer''s BLOCK; only the brute check''s error changed. The brute record now keeps
+      the 16x16 Gram matrix of the batch gradients. Agreement is now within 2 combined standard errors sqrt(se_chunk^2 + se_brute^2),
+      with the brute error a jackknife over the 16 batches, and both errors are reported beside the result. tests/test_noise_scale.py
+      @3c175775d: 3 passed in .venv-cpu. test_brute_gram_and_jackknife checks that the Gram-matrix S and |G|^2 equal the direct
+      ones to 1e-9, and that the jackknife covers the known S in at least 32 of 40 repeats (the owner reports 37). The job
+      script and arm are unchanged since 93524f1dd. Everything else as in the earlier pass: the arm differs from v4_het_control_wsd
+      only by the measurement switch; known-answer recovery within 5% for tr Sigma and |G|^2 and within 7% for B_simple; one
+      seed justified; cost under 2.1 GPU-h. Terms searched: noise scale, noise_scale, critical batch, B_simple, McCandlish,
+      find_BS, gradient noise, batch size, batchsize; site decisions for noise, critical, batch; no earlier measurement.'
   step_why:
     1:
       feeds: what B_simple of our canonical setup is, and whether the micro-batch estimator agrees with independent batch
