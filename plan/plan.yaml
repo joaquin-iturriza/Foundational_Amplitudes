@@ -45136,6 +45136,37 @@ entries:
       design says); no --rebuild so the live .venv is untouched apart from pip; one 1-CPU htc job, no GPU, no disk concern;
       prior search (results.tex, plan.yaml ''site env'', decisions D176, D544) finds only the 2026-10-29 bootstrap failure
       and job 64802032, both cited.'
+  - at: '2026-11-24T23:35:23+00:00'
+    question: Does site env on CC (the last script still run on CC's login node, D544's leftover) now run whole as one htc
+      CPU job through run_as_job, with its output and exit code read by the next call, and does it leave FA's CC env as it
+      was (no --rebuild)?
+    prior: 'D544 and this entry''s switch (docs/results.tex sec:cc_login_jobs, 4404e1baa): maintain commands as htc jobs via
+      run_as_job, 28 passes clean. CC env rebuild test job 64802032 (1 CPU htc, timeout 3600) ran this bootstrap and pip install
+      -r requirements.txt on a compute node, exit 0, so network, /sps and pip work from htc. The orchestrator-kit''s copy
+      of cmd_env (same login_cap block) ran its toy project''s site env as a CC CPU job, exit 0 (orchestrator_kit owner''s
+      report). Searched plan.yaml (site env, env_script, login node) and site decisions (D176, D544): no other test of FA''s
+      site env as a job.'
+    measure: 'one call ''site env ccin2p3 FA'' (no --rebuild) submits job ccj_<key> on htc (1 CPU, -t 65 min, sites.yaml cpu
+      flags); a call while queued prints CCJ_PENDING and exits 75; a call after it ends reads it. Read: the job''s node from
+      sacct -j <id> -o JobID,NodeList,State,ExitCode,Elapsed (a short login-node read through site run), which must be an
+      htc compute node, not a login node (cca*); the result''s lines: ''checkout <hash> (trunk)'', the presence or absence
+      of ''note: fetch failed'' / ''note: not fast-forwarded'', ''venv   exists: .venv'', ''activate.sh ok: <python> 2.1.2+cu118'',
+      setup verify passed, ''env ready: FA @ ccin2p3'', exit 0; then site run ccin2p3 FA -- python -c ''import torch,numpy;print(torch.__version__,numpy.__version__)'''
+    check: site env --check ccin2p3 FA renders the same script the login-node path ran (3336 bytes, reviewer-confirmed); run_as_job
+      runs it through bash -c, its exit code is the script's
+    fixed: env_script unchanged, sites.yaml, requirements.txt, the live .venv (no --rebuild; only pip itself may be upgraded),
+      the CC checkout follows trunk as site sync makes it
+    control: the live stack read in job 64801966 (python 3.11.7, torch 2.1.2+cu118, numpy 1.26.4); the checkout hash site
+      sync leaves on CC, equal to local trunk HEAD after the sync that precedes the call
+    seeds: none (deterministic tool path)
+    outcome: 'yes: sacct shows an htc compute node, COMPLETED 0:0; the result ends ''env ready: FA @ ccin2p3'', exit 0; its
+      checkout hash equals trunk HEAD as synced (a ''note: fetch failed'' line is then accepted, since site sync delivers
+      commits by bundle and the env path only needs the checkout current; a hash behind trunk is a no); torch 2.1.2+cu118
+      and numpy 1.26.4 after: the change stays. no: the failing step (sbatch refusal, quoting, an old hash, setup.sh, a version
+      change) is fixed in the tool and the same call rerun; a step that cannot run on a compute node goes back to the login
+      node with its reason'
+    sources: 'D544 (Joaquin: move CC''s scripts to Slurm), the previous owner''s hand-off naming site env''s pip install as
+      the leftover, jobs 64802032 and 64801966 on this entry, design reviewer''s FIX of 2026-11-25'
   findings:
   - at: '2026-11-24T17:31:13+00:00'
     text: 'Inventory of scripts run on CC''s login node (2026-11-24): supervisor maintain every pass (8-10 min apart): disk_watch.py
