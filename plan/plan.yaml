@@ -40214,8 +40214,6 @@ entries:
       trial 6 FA-ccin2p3-b135e7db (hp1723, lr 1.03e-3, val MSE of z 1.31e-3 at 08:40) and trial 7 FA-ccin2p3-f3e29e87 (hp0836,
       lr 1.03e-3, 1.07e-3 at 09:00); 6 of 8 observed, best trial 5 FA-ccin2p3-c891c0c2 (lr 1.24e-3) 4.81e-4; the driver writes
       DRIVE_DONE when both end'
-    3: Score the best trial and the control (job_llm_score.sh), figure of pooled RMSE seen/held out (and truly held out, relabels)
-      against LLM 0.321/0.721 and his LLoCa 0.506/0.953, per-process MSEs as dan_per_process.py; write-up in docs/results.tex
     5: 'Part (c) readout: when llmcmp_c_qperp''s driver writes DRIVE_DONE and its control ends, score (c)''s best trial and
       the control (REREAD=<run> scripts/job_llm_score.sh), read per set (seen, held out, relabels, new) pooled RMSE and median
       per-process MSE against (a)''s best with the 1.38 margin, figure in Suprio''s layout; write-up'
@@ -40357,11 +40355,6 @@ entries:
       if:
       - 'search ends: score the best trial, figure and write-up (step 3)'
       - 'a trial breaks: read its log, fix, --retry-failed'
-    3:
-      feeds: 'part (a) answer: tuned vs matched control vs LLM'
-      if:
-      - 'best at or below the LLM: part (b) checks width scaling holds it'
-      - 'above the LLM: part (b) width toward 359.6M at the tuned HPs'
     5:
       feeds: 'part (c): our latest setup against part (a), the LLM and his LLoCa; where part (b) starts'
       if:
@@ -40778,7 +40771,6 @@ entries:
       to 5.63e-4 against 4.81e-4), so the search gives no sign that the optimum lies below the window; and tuning moved the
       held-out read inside the seed margin (MSE ratio searched/control 0.93), so a finer lr would not change what (a) answers.'
   step_waits:
-    '3': llmcmp_a_drive5
     '5': llmcmp_c_qperp_drive4 DRIVE_DONE (detach event of the driver)
     '7': FA-ccin2p3-bf23e0c4 FA-ccin2p3-b77878e1 FA-ccin2p3-f6f7179d
   handoff:
