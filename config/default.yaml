@@ -238,10 +238,11 @@ evaluation:
                          # to preds_<split>.npz in the run dir
 
 find_BS: false
-BS_finding:
- ema_alpha: 0.9
- n_batches_big: 20
- n_batches_small: 10
+BS_finding:          # find_BS: the gradient noise scale (McCandlish et al. 2018), base_experiment._noise_measure
+ every: 10            # one measurement per this many steps (cost: about one extra step each)
+ chunks: 8            # chunks of the step's batch: b_small = batchsize / chunks, b_big = batchsize
+ brute_at: []         # steps of the check against M independent batch gradients (_noise_brute)
+ brute_batches: 16    # M
 
 count_flops: false
 
