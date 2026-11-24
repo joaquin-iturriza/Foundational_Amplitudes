@@ -152,12 +152,28 @@ def _failure_penalty(sampler, cfg):
     return worst * margin if worst > 0 else worst + (margin - 1) * (abs(worst) or (worst - min(observed)) or 1.0)
 
 
+def steps_to_target(result, target):
+    """The first step at which a run's validation curve (result val_curve: val_loss_no_reg, one entry every
+    validate_every steps, the first at step validate_every) is at or below target, linear between the two validations
+    around the crossing; None when it never gets there (critical_batch step 2: McCandlish et al.'s steps to a loss)."""
+    v, n = result["val_curve"], int(result["validate_every"])
+    for i, x in enumerate(v):
+        if x <= target:
+            return float(n) if i == 0 else n * (i + (v[i - 1] - target) / (v[i - 1] - x))
+    return None
+
+
 def _objective_value(cfg, result):
     """What DyHPO observes from a run's result json: result[cfg["objective"]], default "val_loss" (the best
     checkpoint's val_loss_no_reg). A sign-head search sets `objective: val_total` (the magnitude loss plus the sign
     head's cross-entropy at that checkpoint, experiment._val_total). A result without the key fails the trial: a
     silent fall-back would mix two objectives in one surrogate."""
     key = cfg.get("objective", "val_loss")
+    if key == "steps_to_target":   # needs objective_target; a run that never reaches it fails (the penalty)
+        s = steps_to_target(result, float(cfg["objective_target"]))
+        if s is None:
+            raise ValueError(f"steps_to_target: validation never at or below {cfg['objective_target']}")
+        return s
     if key not in result:
         raise KeyError(f"objective {key} not in the run's result ({sorted(result)[:8]}...)")
     return float(result[key])
@@ -248,6 +264,8 @@ def _check_objective(cfg):
         raise ValueError("objective zero_shot_score and a zero_shot_objective block go together")
     if cfg.get("zero_shot_objective") and cfg.get("cells"):
         raise ValueError("zero_shot_objective with cells: not implemented")
+    if (cfg.get("objective") == "steps_to_target") != ("objective_target" in cfg):
+        raise ValueError("objective steps_to_target and objective_target go together")
     if cfg.get("objective") == "val_total":
         searched = {e["name"] for e in cfg.get("search_space", [])}
         if "training.sign_loss_weight" in searched:

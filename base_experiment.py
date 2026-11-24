@@ -1946,11 +1946,14 @@ class BaseExperiment:
             # in memory (critical_batch step 2, batch 32768 on a V100)
             k = int(self.cfg.training.batch_accumulation)
             self.optimizer.zero_grad()
-            loss, reg = 0.0, torch.as_tensor(self._reg_term(self.model)).detach()
-            for lc in self._noise_chunk_losses(data, k):
+            loss, reg, mses = 0.0, torch.as_tensor(self._reg_term(self.model)).detach(), []
+            for lc in self._noise_chunk_losses(data, k, mse_out=mses):
                 (lc / k).backward()
                 loss = loss + lc.detach() / k
-            loss_no_reg, mse_val = loss - reg, None
+            # the batch's mu-MSE: the chunks' event-weighted mean (None off HETEROSC, as _batch_loss)
+            mse_val = (sum(m * w for m, w in mses) / sum(w for _, w in mses)
+                       if mses and all(m is not None for m, _ in mses) else None)
+            loss_no_reg = loss - reg
         else:
             loss, loss_no_reg, mse_val = self._batch_loss(data)
             if self.ewc is not None:

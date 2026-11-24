@@ -127,3 +127,7 @@ def test_batch_accumulation_is_the_batch_gradient():
         lc = k * agg(stub, lin(x[c]), y[c], pids[c], "mean", full_counts=counts) + reg()
         (lc / k).backward()
     assert all(torch.allclose(a, p.grad, atol=1e-10) for a, p in zip(g_full, lin.parameters()))
+    # the train mu-MSE on this path: the chunks' event-weighted mean of their MSEs is the batch's MSE
+    with torch.no_grad():
+        mses = [(torch.nn.functional.mse_loss(lin(x[c]), y[c]), len(c)) for c in torch.arange(n).chunk(k)]
+        assert torch.isclose(sum(m * w for m, w in mses) / n, torch.nn.functional.mse_loss(lin(x), y))

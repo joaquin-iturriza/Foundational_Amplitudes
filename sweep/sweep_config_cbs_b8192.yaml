@@ -1,15 +1,16 @@
-# critical_batch step 2 (D532, budget D536): the batch-size scan, batch 8192, 5 epochs of catalog_v4 base train
-# (8528 steps), the v4_het_control_wsd run as base config (its setup exactly: recipe, DIM target and inputs, HETEROSC
-# mean, sign head off, MuonAdamW, WSD 1/8, clip 5, seed 42, nh 8); only the batch, the steps, the searched HPs and
-# the dropped step-3731 snapshot differ. lr window [c/3, 3c], c = 5e-3 x lr_c(8528)/lr_c(4264) = 0.00342 (HPO rule 2's
-# horizon law scaled to the Muon search's best at 4264 steps).
+# critical_batch step 2 (D532, budget D536): the batch-size scan at batch 8192, 8528 steps (5.0 epochs of
+# catalog_v4 base train), the v4_het_control_wsd run as base config (its setup exactly: recipe, DIM target and inputs,
+# HETEROSC mean, sign head off, MuonAdamW, WSD 1/8, clip 5, seed 42, nh 8). One step schedule at every batch: warmup
+# 213-853 steps (the template's frac window [0.05, 0.2] of 4264 steps, here x 4264/8528), the template's Muon lr
+# window [1.667e-3, 1.5e-2], validation every 85 steps (the control's spacing), the WSD cooldown after step
+# 7462, past the targets. Objective: steps to val_loss_no_reg -2.08 (the control's crossing at step 1955).
 cluster:
   scheduler: slurm
   auto_submit: false
   request_gpus: 1
   mem: 32G  # measured peak RSS 19.9 GB per trial (sacct, 62936975-84), margin 1.6x
   cpus_per_task: 5
-  time: '03:00:00'   # need: 4264 x 16384 events at 1.01 s per 16384 (tools/short_wall.py) = 1.2 h + 15 min start-up
+  time: '02:30:00'   # need 1.64 h: steps x (0.12 s + 0.86 s x B/16384) + 5 s per validation every 85 steps + 0.2 h start-up and end (critical_batch design 2026-11-24)
   gpu_min_mem: 24G
 paths: null
 sweep_name: cbs_b8192
@@ -23,6 +24,8 @@ dyhpo:
   n_startup: 3
   waves: [3, 3, 2]
   total_budget: 10000
+objective: steps_to_target
+objective_target: -2.08
 fidelity_schedule:
   t_steps:
   - 8528
@@ -32,7 +35,8 @@ fixed_params:
   training.batch_accumulation: 1
   evaluation.batchsize: 16384
   training.save_model_at_steps: '[]'
-  training.validate_frac: '0.02'
+  training.validate_frac: '0'
+  training.validate_every_n_steps: 85
   training.heterosc_sigma_stage_steps: 0
   find_BS: 'false'
   evaluate: 'false'
@@ -40,8 +44,8 @@ fixed_params:
 search_space:
 - name: training.lr
   type: float_log
-  low: 0.001138
-  high: 0.01025
+  low: 0.001667
+  high: 0.015
 - name: training.muon_weight_decay
   type: float_log
   low: 1.0e-03
@@ -52,8 +56,8 @@ search_space:
   high: 1.0e-06
 - name: training.cosanneal_warmup_frac
   type: float_uniform
-  low: 0.05
-  high: 0.2
+  low: 0.025
+  high: 0.1
 - name: training.cosanneal_eta_min
   type: float_log
   low: 1.0e-10
