@@ -44142,12 +44142,10 @@ entries:
     withdrawn_why: 'Joaquin approved the budget-rule change (D536): work a decision names, here D532''s ''its validation against
       batch-size runs'', passes up to 100 GPU-h; the 55 GPU-h DyHPO-per-batch version goes ahead'
   owner:
-    agent: a584754ef924cc459
-    state: closed
-    since: '2026-11-24T14:04:24+00:00'
-    state_at: '2026-11-24T14:17:19.097000+00:00'
-    context: 278197
-    context_at: '2026-11-24T14:50:16+00:00'
+    agent: a27cabf54bbbc7b67
+    state: working
+    since: '2026-11-24T21:40:30+00:00'
+    state_at: '2026-11-24T21:40:30+00:00'
   designs:
   - at: '2026-11-24T00:44:54+00:00'
     question: 'Step 1 of critical_batch (D532): what is the gradient noise scale B_simple = tr(Sigma)/|G|^2 (McCandlish et
