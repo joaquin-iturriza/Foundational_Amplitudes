@@ -561,6 +561,15 @@ def leave_check(inp):
     return 0
 
 
+REPEAT = ("REPEATED REFUSAL: if this check is wrong, do not answer it again; send it now to a mechanical-worker to "
+          "fix, or disable it with tools/hook_incident.py <hook> --why ...: ")
+
+
+def mark_repeats(shown, prev):
+    """The refusal lines, those also in the previous consecutive refusal of this turn prefixed with REPEAT."""
+    return [REPEAT + b if b in prev else b for b in shown]
+
+
 def main():
     try:
         try:
@@ -624,6 +633,13 @@ def main():
         shown = [short(b) for b in bad if not b.startswith("open event:")] + ev[:5]
         if len(ev) > 5:
             shown.append("open event: ... and %d more (site events --project FA)" % (len(ev) - 5))
+        try:
+            st_ = json.load(open(plan.STATE_FILE)) if os.path.exists(plan.STATE_FILE) else {}
+            prev = (st_.get("_last_refusal") or {}).get(inp.get("session_id") or "")
+            plan._set_state("_last_refusal", {inp.get("session_id") or "": shown})
+            shown = mark_repeats(shown, prev or [])
+        except Exception:
+            pass
         sys.stderr.write("PLAN CHECK: the turn cannot end yet.\n" + "\n".join("  " + b for b in shown) + "\n")
         if REFUSED:                               # for dispatch.py: which conditions refused, which are core
             sys.stderr.write("DISPATCH-CONDITIONS disableable=%s core=%s\n" % (
@@ -634,6 +650,10 @@ def main():
     # to the main session once.
     if plan.NOTES:
         plan._set_state("_stop_notes", list(plan.NOTES))
+    try:
+        plan._set_state("_last_refusal", {})      # a passing stop ends the run of consecutive refusals
+    except Exception:
+        pass
     return 0
 
 

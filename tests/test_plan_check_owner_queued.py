@@ -38,5 +38,13 @@ def test_unqueued_stop_still_counts():
     assert kinds(False) == ["resumed", "stopped"]
 
 
+def test_repeated_refusal_prefixed_single_not():
+    line = "llm_compare: resume its owner x (SendMessage): open events E1"
+    assert plan_check.mark_repeats([line], []) == [line]
+    assert plan_check.mark_repeats([line], [line]) == [plan_check.REPEAT + line]
+    assert plan_check.mark_repeats([line, "other"], [line]) == [plan_check.REPEAT + line, "other"]
+
+
 if __name__ == "__main__":
-    test_queued_message_cancels_later_stop(); test_unqueued_stop_still_counts(); print("ok")
+    test_queued_message_cancels_later_stop(); test_unqueued_stop_still_counts()
+    test_repeated_refusal_prefixed_single_not(); print("ok")
