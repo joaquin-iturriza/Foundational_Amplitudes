@@ -9102,7 +9102,7 @@ fall off the scale of the figure or have no $B_{\rm simple}$ (figure~\ref{fig:no
 
 So $B_{\rm simple}$ sits two to three decades below our batch over the whole run. In the paper's picture the batch is
 far past the critical size, and a smaller batch would reach the same loss in about as many steps with far fewer events;
-whether that holds for Muon and this loss is the batch-size scan's question, still waiting on the GPU budget. The
+whether that holds for Muon and this loss is the batch-size scan's question (par.~\ref{par:cbs_scan}). The
 measurement leaves training on its course: at the best checkpoint, the lowest aggregate $\mathcal L_{\rm no\,reg}$ (the heteroscedastic
 loss without regularisation), which in both runs is the last validation (step $4250$), the run reads $-2.872$ against the control's $-2.907$, both runs showing isolated
 spikes at different steps. It costs $1.95$ training hours against the control's $1.23$.
@@ -9127,6 +9127,80 @@ standard errors. (d) Validation loss, the run against its control without the me
 \end{figure}
 % allow: 16384 200 16 42 because they are the batch, the window, the number of independent batches and the seed, settings
 % allow: 2 because it is the exponent of a squared norm
+
+\paragraph{Batch-size scan (D532, 2026-11-25).}\label{par:cbs_scan} The question: does $B_{\rm simple}$ predict where a
+larger batch stops paying off? Design (passed 2026-11-24): the setup of the control run (MuonAdamW, WSD, seed $42$), one
+DyHPO search of $8$ trials per batch $B=2048$, $4096$, $8192$, $16384$, $32768$ (the last as two accumulated
+micro-batches) over the template's Muon window, one step schedule at every batch, each trial stopped at
+$\mathcal L_{\rm val}=-2.30$. $S_B$ is the step at which a batch's best trial first reaches $\mathcal L_{\rm val}=-1.66$,
+$-2.08$ or $-2.30$, fitted with $S=S_{\min}(1+B_{\rm crit}/B)$, the steps-examples law of the same paper. The law describes the scan at all
+three targets (Fig.~\ref{fig:cbs_readout}a), and no best trial sits at the edge of its lr window. At $-2.08$,
+$B_{\rm crit}=4420$ ($16$--$84\%$ bootstrap $3750$--$5030$); it rises as the loss falls, from $2500$ at $-1.66$ to
+$6690$ at $-2.30$, as in the paper. $S_{2048}/S_{32768}$ is $2.1$, $3.02$ and $3.91$, above the design's $1.45$ at
+every target, so the scan takes the design's NO branch: $B_{\rm crit}$ stands $45.1$ to $120$ times above the noise
+scale's median $55.5$ (Fig.~\ref{fig:cbs_readout}c), and $B_{\rm simple}$, measured along one run, does not locate the
+critical batch here; the scan's $B_{\rm crit}$ is the number. Our batch $16384$ lies above $B_{\rm crit}$ at every
+target, in the regime where doubling the batch saves few steps.
+% src: python3 analysis/critical_batch/scan_state.py @8fb4916cb
+% claim: t208.B_crit=4420
+% claim: t208.q16=3750
+% claim: t208.q84=5030
+% claim: t166.B_crit=2500
+% claim: t230.B_crit=6690
+% claim: t166.ratio=2.1
+% claim: t208.ratio=3.02
+% claim: t230.ratio=3.91
+% claim: t166.over_Bsimple=45.1
+% claim: t230.over_Bsimple=120
+% claim: Bsimple.median=55.5
+% allow: 2048 4096 8192 16384 32768 because they are the scanned batches, settings
+% allow: 8 42 because they are the trials per search and the seed, settings
+% allow: 1.66 2.08 2.30 because they are the targets, settings
+% allow: 1.45 because it is the design's threshold, a setting
+% allow: 16 84 because they are the bootstrap quantiles, settings
+% allow: 1 because it is the constant of the law S_min(1+B_crit/B), a formula
+
+Wall clock does not follow the steps. On a V100 a step costs $0.663$\,s at $B=2048$ and $1.02$\,s at $16384$, against
+the design's cost model $0.12\,{\rm s}+0.86\,{\rm s}\times B/16384$, which leaves out a per-step overhead that dominates
+small batches (Fig.~\ref{fig:cbs_readout}b); at $32768$ it is $1.89$\,s. The best trial reaches $-2.08$ in $0.425$\,V100
+hours at $8192$, $0.477$ at $16384$, $0.736$ at $2048$ and $0.693$ at $32768$. So smaller batches save events but not
+time on this setup until that overhead is removed. Five trials diverged and are listed apart, by batch and step:
+$2048$ at step $3251$, $4096$ at $7409$, $32768$ at $918$, $3184$ and $3769$. Three trials at $2048$ reached their time
+limit at steps $18020$, $18190$ and $19125$, set before the overhead was measured, short of their $34112$-step horizon;
+none can change a batch's best, which reaches every target by step $7100$, and their crossings are read from their logs.
+% src: python3 analysis/critical_batch/scan_state.py @8fb4916cb
+% claim: v100.2048=0.663
+% claim: v100.16384=1.02
+% claim: v100.32768=1.89
+% claim: t208.hours.8192=0.425
+% claim: t208.hours.16384=0.477
+% claim: t208.hours.2048=0.736
+% claim: t208.hours.32768=0.693
+% claim: diverged_at.2048.0=3251
+% claim: diverged_at.4096.0=7409
+% claim: diverged_at.32768.0=918
+% claim: diverged_at.32768.1=3184
+% claim: diverged_at.32768.2=3769
+% claim: timeout_at.2048.0=18020
+% claim: timeout_at.2048.1=18190
+% claim: timeout_at.2048.2=19125
+% claim: t230.S.2048=7100
+% allow: 2048 4096 8192 16384 32768 because they are the scanned batches, settings
+% allow: 0.12 0.86 because they are the design's cost model, a setting
+% allow: 34112 because it is the 2048 horizon, a setting
+% allow: 2.08 because it is the target, a setting
+
+\begin{figure}[h]
+\centering
+\includegraphics{../analysis/critical_batch/figs/cbs_readout.pdf}
+\caption{Batch-size scan of the catalog\_v4 pretraining. (a) Steps to three target validation losses against the
+batch, the best of $8$ trials per batch, with the fits $S=S_{\min}(1+B_{\rm crit}/B)$. (b) Seconds per training step,
+validation included, per trial and GPU model, against the design's cost model. (c) $B_{\rm crit}$ per target, bars the
+$16$--$84\%$ bootstrap, against the noise scale $B_{\rm simple}$ of Fig.~\ref{fig:noisescale} and our batch.}
+\label{fig:cbs_readout}
+\end{figure}
+% allow: 8 16 84 because they are the trials per batch and the bootstrap quantiles, settings
+% allow: 1 because it is the constant of the law S_min(1+B_crit/B), a formula
 
 % ==========================================================================
 \section{Physical feature levers: what the momenta cannot encode}\label{sec:levers}
