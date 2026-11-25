@@ -45347,6 +45347,26 @@ entries:
       training caches; 14 days: Joaquin''s D147 ''not used by any run in the last days'', at the census window of the 2026-11-24
       inventory; CLAUDE.md, Joaquin''s words, ''A memmap cache (amp_mmap_cache) on a site is deleted only when no running
       job and no recipe of an open plan entry reads it'''
+    fix_at: '2026-11-25T01:11:50+00:00'
+    fix: 'Check 0/6/7 (the census answers Joaquin''s ''are they all needed?'' and feeds the later deletion job, so its in-use
+      set must be the open entries'' recipes): the hard-coded extra in-use list in scripts/job_ccdisk_d556.sh names 6 recipes,
+      but the open plan entries (status not done/withdrawn, held included) name about 55 recipe files. Missing even from running
+      entries: catalog_daniel_heldout.yaml, catalog_daniel_train.yaml, catalog_v4_dan_identical.yaml (dan_zeroshot_v4), catalog_v4_train.yaml,
+      catalog_v4_pp_parts.yaml (agent_redesign), catalog_v4_datasaving_parent_heldout.yaml (optimizations_recap). Missing
+      from held entries, which D147 (''not needed by a running or planned entry'') and the memmap rule (''no recipe of an
+      open plan entry'') both count: catalog_v4_default25_train, default50_train, pp_mixed_train, the datasaving_* set, kit_pretrain_heldout,
+      heldout_default_test, transfer_finale, zng_ttv_rebuild, kit_A_uq_zgggg..., and others. Unless one of the last 14 days''
+      configs happens to name them, the census marks their pools ''delete''. Fix: build the --in-use set in the job from the
+      open entries of plan/plan.yaml (every *.yaml they name that resolves under recipes/; cache_census already reports ''not
+      a recipe'' for the rest), unioned with cache_readers'' INUSE, and print that list in the log. Check 0, memmap half:
+      MMAP lines give size, last_used, live jobs, logs and process names, but nothing ties a key to a recipe of an open entry,
+      which the memmap rule needs before anything is deleted. Fix: add the key''s train pool basenames from key_doc.json (its
+      ''pools''), so they can be matched against the census''s recipe-to-pool map. The catft part is fine: Joaquin''s ''Yes''
+      at 2026-11-25 01:01 answers ''Delete the 15.1 GiB?'' about exactly zz_catft, zz_catft_lowloss2 and zz_catft_lowloss3.
+      The find limits the deletion to their model-file suffixes, and the only code readers (collect_catft_curves.py, ema_start_audit.json)
+      read *_result.json, which stays. The deletion can stay in the same job. Checks 1-3, 8-18 do not apply (no training,
+      control or seeds). Disk: the outputs are small TSVs and the job frees space. Terms searched: zz_catft, catft_lowloss,
+      amp_data_cache, amp_mmap_cache, D147, D556, the recipe names in plan/plan.yaml.'
   findings:
   - at: '2026-11-24T14:32:44+00:00'
     text: '2026-11-24 login-node reads: /sps/lpnhe 512 GiB group space at 98% (498 GiB used, 15 GiB free), .disk_full flag
