@@ -2462,8 +2462,7 @@ class AmplitudeExperiment(BaseExperiment):
                                 f"{len(names)} processes, per-process transforms kept")
                     if self.cfg.data.get("level_file"):
                         # llm_compare step 16 (D564): each process's mean from a frozen level predicted from the
-                        # process alone (analysis/catalog_daniel/norm_explore3.py --level-file), one sigma pooled over
-                        # the train processes' own spreads and their offsets from it (as fit_affine_multiplicity)
+                        # process alone (analysis/catalog_daniel/norm_explore3.py, level_file_B_diag.json), one sigma
                         assert not bool(self.cfg.data.get("affine_multiplicity_std", False)), \
                             "data.level_file replaces data.affine_multiplicity_std's mu_N: set one of them"
                         lp = str(self.cfg.data.level_file)
@@ -2472,7 +2471,8 @@ class AmplitudeExperiment(BaseExperiment):
                         missing = [nm for nm in names if nm not in lv]
                         assert not missing, f"data.level_file {lp}: no level for {missing}"
                         lev = np.array([float(lv[nm]) for nm in names])
-                        sd = float(np.sqrt((n * (sd_p ** 2 + (mu_p - lev) ** 2)).sum() / n.sum()))
+                        # sigma is affine_multiplicity_std's own (the run it replaces): only the means change
+                        sd = fit_affine_multiplicity(n, [int(npart_of(nm)) for nm in names], mu_p, sd_p)[2]
                         prepd_means, prepd_stds = lev.tolist(), [sd] * len(names)
                         self._level_file = {"path": str(self.cfg.data.level_file), "sigma": sd,
                                             "levels": {k: float(v) for k, v in lv.items()}}
