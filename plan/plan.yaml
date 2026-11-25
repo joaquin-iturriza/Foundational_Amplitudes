@@ -46163,3 +46163,10 @@ entries:
       - 'a scheme passes the design''s YES at the baseline HPs: done for it; propose it to Joaquin with the figure'
       - 'a scheme misses YES in a cell: stage 2, its own search there, read best against best'
       - 'every scheme loses the soft bin: report decades kept per scheme and the trade-off along x0'
+  targets:
+  - batch: smoke
+    wall_h: 0.1
+    jobs: 1
+    units: null
+    start: '2026-11-25T00:11:17+00:00'
+    at: '2026-11-25T00:11:17+00:00'
