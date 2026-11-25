@@ -10320,6 +10320,84 @@ blows up (validation above ten times its best so far).
   \label{fig:selres_stage1}
 % allow: 2048 1953 42 44 2 10^4 10^5 0.1 4g because the 4g of Z+4g is a process name, and they are the batch size, steps, seeds, the square of |M|, the training sizes and the threshold
 \end{figure}
+
+% plan selective_rescale (Event-dependent momentum rescale: the soft-limit gain without the bulk cost), stage 2
+\paragraph{Each rule at its own optimum (D552, 2026-11-25)}\label{par:selres_stage2} Stage 1 trained every rule at the
+no-rescale optimum (par.~\ref{par:selres_stage1}). Here a rule gets its own $16$-trial search over D539's space in each
+cell where stage 1 left it short (the threshold $0.3$ and the event gate on $Z+4g$, the rescale below $x=0.1$ on the bulk of
+$u\bar ug$), its chosen trial rerun at seeds $43$ and $44$, against controls chosen the same way
+(Fig.~\ref{fig:selres_stage2}): on $Z+4g$ at $10^4$ events no rescale at hp1333 and the full rescale at hp1961, each its
+own search's choice in D539; at $10^5$ two new searches; on $u\bar ug$ D539's per-arm searches. The threshold $0.3$ and
+the event gate still cost $Z+4g$ at $10^4$: over no rescale $1.29$ ($1.18$--$1.40$) and
+$2.37$ ($1.19$--$4.74$), and over no rescale at hp1961, which trains better, $1.58$ and
+$2.92$. Two of the gate's seeds blow up there, at $76\%$ and $16\%$ of training (validation
+above ten times its best so far, read at their best). At $10^5$ both are unresolved, $0.98$ ($0.37$--$2.55$) and
+$1.16$ ($0.44$--$3.02$), because one no-rescale seed blows up at $24\%$; over the full rescale they
+are $0.70$ ($0.65$--$0.75$) and $0.83$ ($0.76$--$0.90$). A cost resolved in
+one $Z+4g$ cell ends both rules, by the design's rule. The rescale below $x=0.1$, searched on $u\bar ug$, still costs its
+bulk at its own optimum: over no rescale $1.33$ ($1.10$--$1.61$) at $10^4$ and
+$2.90$ ($1.95$--$4.31$) at $10^5$, over the full rescale $0.61$ ($0.38$--$0.98$) and
+$1.72$ ($0.91$--$3.24$). It keeps the soft gain: its seed-median MSE in the deepest soft bin moves by
+$-5.04$ and $-5.19$ decades against no rescale, and by
+$-0.39$ and $-0.62$ against the full rescale. At $10^5$ its chosen learning
+rate sits $0.11$ decades above the lower edge of the window. Of the three rules, the rescale below
+$x=0.1$ alone keeps the soft gain without the $Z+4g$ bulk cost; on $u\bar ug$ it costs less than the full rescale at $10^4$
+and is not resolved from it at $10^5$, but it does not reach the bulk of no rescale.
+% src: python3 analysis/selective_rescale/stage2_read.py --cached @e8889b84f
+% claim: cells.zng_1e4.softbelow_x0p3.over_off.r=1.29
+% claim: cells.zng_1e4.softbelow_x0p3.over_off.lo=1.18
+% claim: cells.zng_1e4.softbelow_x0p3.over_off.hi=1.40
+% claim: cells.zng_1e4.eventgate_x0p1.over_off.r=2.37
+% claim: cells.zng_1e4.eventgate_x0p1.over_off.lo=1.19
+% claim: cells.zng_1e4.eventgate_x0p1.over_off.hi=4.74
+% claim: cells.zng_1e4.softbelow_x0p3.over_off_hp1961.r=1.58
+% claim: cells.zng_1e4.eventgate_x0p1.over_off_hp1961.r=2.92
+% claim: blowups.1.at_pct=76
+% claim: blowups.2.at_pct=16
+% claim: cells.zng_1e5.softbelow_x0p3.over_off.r=0.98
+% claim: cells.zng_1e5.softbelow_x0p3.over_off.lo=0.37
+% claim: cells.zng_1e5.softbelow_x0p3.over_off.hi=2.55
+% claim: cells.zng_1e5.eventgate_x0p1.over_off.r=1.16
+% claim: cells.zng_1e5.eventgate_x0p1.over_off.lo=0.44
+% claim: cells.zng_1e5.eventgate_x0p1.over_off.hi=3.02
+% claim: blowups.0.at_pct=24
+% claim: cells.zng_1e5.softbelow_x0p3.over_rescale.r=0.70
+% claim: cells.zng_1e5.softbelow_x0p3.over_rescale.lo=0.65
+% claim: cells.zng_1e5.softbelow_x0p3.over_rescale.hi=0.75
+% claim: cells.zng_1e5.eventgate_x0p1.over_rescale.r=0.83
+% claim: cells.zng_1e5.eventgate_x0p1.over_rescale.lo=0.76
+% claim: cells.zng_1e5.eventgate_x0p1.over_rescale.hi=0.90
+% claim: cells.uug_1e4.softbelow_x0p1.over_off.r=1.33
+% claim: cells.uug_1e4.softbelow_x0p1.over_off.lo=1.10
+% claim: cells.uug_1e4.softbelow_x0p1.over_off.hi=1.61
+% claim: cells.uug_1e5.softbelow_x0p1.over_off.r=2.90
+% claim: cells.uug_1e5.softbelow_x0p1.over_off.lo=1.95
+% claim: cells.uug_1e5.softbelow_x0p1.over_off.hi=4.31
+% claim: cells.uug_1e4.softbelow_x0p1.over_rescale.r=0.61
+% claim: cells.uug_1e4.softbelow_x0p1.over_rescale.lo=0.38
+% claim: cells.uug_1e4.softbelow_x0p1.over_rescale.hi=0.98
+% claim: cells.uug_1e5.softbelow_x0p1.over_rescale.r=1.72
+% claim: cells.uug_1e5.softbelow_x0p1.over_rescale.lo=0.91
+% claim: cells.uug_1e5.softbelow_x0p1.over_rescale.hi=3.24
+% claim: cells.uug_1e4.softbelow_x0p1.kit_dec_vs_off.soft_x=-5.04
+% claim: cells.uug_1e5.softbelow_x0p1.kit_dec_vs_off.soft_x=-5.19
+% claim: cells.uug_1e4.softbelow_x0p1.kit_dec_vs_rescale.soft_x=-0.39
+% claim: cells.uug_1e5.softbelow_x0p1.kit_dec_vs_rescale.soft_x=-0.62
+% claim: lr_dec_from_edge.uug_1e5_softbelow_x0p1=0.11
+% allow: 16 43 44 0.3 0.1 2 1 10^4 10^5 4g because they are the trial count, the seeds, the thresholds, the interval width, the ratio of no change, the training sizes and the 4g of Z+4g
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{../analysis/selective_rescale/figs/stage2.pdf}
+  \caption{\textbf{At its own optimum the rescale below $x=0.1$ keeps the soft gain but still costs the bulk of $u\bar ug$.}
+  Scratch, batch $2048$, $1953$ steps; each arm is the chosen trial of its own $16$-trial search (seed $42$) and that trial
+  at seeds $43$ and $44$, one point each. Top: best validation MSE$(\log|\mathcal M|^2)$ against the training size,
+  $q\bar q\to Z+4g$ (left) and $e^+e^-\to u\bar ug$ (right). Bottom: MSE of $\log_{10}|\mathcal M|^2$ in the deepest bin of
+  each kit family (soft, collinear, bulk) at $10^4$ and $10^5$ events, $e^+e^-\to u\bar ug$. Open markers: runs that blew
+  up, read at their best.}
+  \label{fig:selres_stage2}
+% allow: 2048 1953 16 42 43 44 2 10^4 10^5 0.1 4g because they are the batch size, steps, trial count, seeds, the square of |M|, the training sizes, the threshold and the 4g of Z+4g
+\end{figure}
 % ==========================================================================
 \section{Architecture and encoding ablations}\label{sec:arch}
 % ==========================================================================
