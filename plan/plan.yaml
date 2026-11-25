@@ -45431,6 +45431,28 @@ entries:
     sources: '1.22 <- a measured spread: the largest best-to-third-best gap of the four D507 400-epoch searches (0.099-0.216,
       d507_search_v2.json, every trial); outer 5% of the lr window <- a measured spread: the D507 extension trigger (bests
       at 0.95-0.99 of the window, sweep config comments); 50 epochs <- Joaquin''s words (D563, ''~50 epochs'')'
+    fix_at: '2026-11-25T13:24:03+00:00'
+    fix: 'D563 50-epoch design (13:22). Two points fail; the rest holds. (3, Joaquin''s scope) The outcome says a cell whose
+      best trial sits in the outer 5% of its log lr window gets the window extended 3x and its search ''continued by the guided
+      waves''. That adds trials to the cells that hit an edge, so they get more trials than their siblings and than the searches
+      they replace. Under FA CLAUDE.md, more or fewer trials than the sibling cells is Joaquin''s call, asked before the configs
+      are made, and D563 (''Probably retuning some HPs will be needed, but since the runs will be quick I don''t think that''s
+      a problem'') approves retuning but names no extra trials. Fix: either keep the extension inside each cell''s trial budget
+      (re-centre the window for the remaining guided waves, the count unchanged), or put the question to Joaquin with its
+      cost (about 0.1-0.2 GPU-h per extra trial) and leave that branch out of the design until he answers. (14) Disk is not
+      stated. Give the disk per trial from the replaced 400-epoch trials (their run dirs on CC and lxplus: drive.py trials,
+      kit recipe pools already staged), the peak number of trials at once from site pick, and the free disk read at submission
+      on each site drive.py will use. Checks that hold: 0 (six cells, all named in D563; about 16 GPU-h for 105 trials, under
+      30); 1 and 11 (only the horizon moves; the lr window shift and Adam''s validation spacing and patiences, kept in validations,
+      follow from the horizon under ''retuning'', and are stated); 2 (I recomputed with ft_bcrit.py''s loaders the best validation
+      by epoch 50 in the 400-epoch trials: 2048/128 = 3.34 Muon, 5.05 Adam, 1.84 Fn, against r400 6.53/1.57/1.98, so the measure
+      moves with the horizon); 3 and 4 (1.22 confirmed: the best-to-third-best gap of the D507 searches is 0.099/0.160/0.206/0.216;
+      trial counts 19/19/16 and 19/16/16 match the collected trials of the replaced searches); 5 (I searched results.tex for
+      50 epochs, over-train and trained too long, and the decisions D507, D519, D520, D560, D563: no earlier run of these
+      cells at another horizon); 7 (control: the 400-epoch searches); 9 (HETEROSC, mu_mse selection, as the replaced searches);
+      12 (DyHPO over the same space; waves 3,3,2,...); 15 (rate 0.086 s/step at batch 128 from the same float64 setup; the
+      configs are copies of runs that already wrote the read curves); 16 (same validation events); 17 (steps change, lr re-searched);
+      18 (configs at 7e742b868 differ from their 400-epoch copies only in the listed keys); 19 (no ordering).'
   step_why:
     1:
       feeds: 'D532: the scan''s answer (NO branch, B_crit 2500-6690 vs B_simple 55.5) reaches Joaquin as a finished entry'
