@@ -41531,6 +41531,28 @@ entries:
       figs/all_arms_bias_heldout_per_process.png (|bias| per process beside the LLM''s whole RMSE, heldout_per_process.py
       --part bias @HEAD). Next per the passed design (level branch): configurations that change what sets a new family''s
       level, each its own design.'
+  - at: '2026-11-25T15:01:32+00:00'
+    text: '2026-11-25 step 15 (D564) what sets a new family''s level, existing data (level_source.py @868c56f2f; norm_explore3.py
+      re-fit, medians reproduce the committed 0.448 / 0.0447). Our per-process bias = mean(pred - true) of log|M|^2 on the
+      43 new processes, set beside two small level networks fitted on the 1352 trained processes'' mean log|M|^2 from the
+      process alone, no events (2x64 MLP, 3 seeds; par. ''More data-free normalizations'', results.tex ~l.7919): ''level from
+      process'' (multiplicity, coupling orders, particle-kind counts, flavour flow) and ''level from process, diagrams'' (+
+      leading coupling product, sum over diagrams, number, massive internal lines). Median bias^2 on the 43: his setup 8 heads
+      0.86, 16 heads 1.32; our setup control 0.21, searched 0.31; level from process 0.79; level from process, diagrams 0.096;
+      LLM whole MSE 0.649 (an upper bound on its bias^2). bias^2 below the LLM''s whole MSE on 19 / 11 / 27 / 28 / 25 / 30
+      of 43. (1) The LLM''s per-process MSE ranks with the content-only level error (Spearman 0.57) and with our his-setup
+      8-head bias^2 (0.72), not with the diagram-level error (-0.10): the LLM fails where particle content cannot fix a level,
+      and at median it places levels about as well as a content-only regressor (0.649 vs 0.79), while our content-only networks
+      are a little worse (0.86) and worse with width (16 heads 1.32, as their seen error falls 0.117 -> 0.103): the LLM''s
+      weaker fit and its better new-family level go together. Prediction for steps 12-14: in his setup the new-set bias^2
+      grows with width. (2) Our signed bias is not the level networks'' error (Pearson -0.11 to +0.52, Spearman -0.36 to +0.12):
+      our networks do not place levels by the same process-only rule. (3) Each arm''s own predicted mean replaced by the diagram-level
+      network''s (no held-out label used; MSE'' = MSE - bias^2 + its error^2): new-set median MSE 1.14 -> 0.58 (8 heads),
+      1.46 -> 0.54 (16), 0.385 -> 0.385 (our control), 0.98 -> 0.51 (our searched), against the LLM''s 0.649; below the LLM
+      on 25/23/30/28 of 43; pooled RMSE 1.77 -> 1.31, 1.76 -> 1.30, 2.21 -> 1.34, 2.12 -> 1.36 vs LLM 1.193 (the gg->tbW pair,
+      |bias| 3-5 in every arm and both level networks, keeps the pooled number above). On relabels the replacement hurts (our
+      own levels there are far better: median 7e-4 -> 0.026 for our searched), so it is a new-family effect. Figure analysis/llm_compare/figs/all_arms_bias_heldout_per_process.png
+      (heldout_per_process.py --part bias @868c56f2f, level networks added as fixed arms).'
   step_waits:
     '8': FA-ccin2p3-8acd3fc1 FA-ccin2p3-39f4ab2e FA-ccin2p3-e5265194 FA-ccin2p3-e1d1fbaf
     '12': FA-ccin2p3-e9dfa8b9
