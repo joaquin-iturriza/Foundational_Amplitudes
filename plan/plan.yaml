@@ -45051,10 +45051,7 @@ entries:
   - D542
   - D556
   - D557
-  next:
-    2: 'After Joaquin''s yes on the costly-results list: one CPU deletion job (manifest first) of exactly the groups he approves
-      (zz_catft, zz_catft_lowloss2, zz_catft_lowloss3 model files; runs/zz_smoke* model files older than 3 days), design passed
-      by the design reviewer first'
+  next: null
   done_when: null
   notes_ref: null
   match: cc_disk_*,zz_probe_*
@@ -45603,8 +45600,7 @@ entries:
       KEEP; memmap b39fc80c 1.50 GiB Daniel''s held-out (139 processes), used 0.7 d ago, in use (catalog_daniel_heldout):
       KEEP. Training cache amp_data_cache 58.73 GiB in 44,069 files: every entry touched within 14 days: KEEP. Nothing of
       the caches is unread; nothing deleted, no duplicate key (the three keys hold different pool sets).'
-  step_waits:
-    '2': FA-ccin2p3-170b2eff
+  step_waits: {}
   targets:
   - batch: disk_inventory
     wall_h: 1.0
@@ -45660,12 +45656,6 @@ entries:
       analysis/storage/{free_space,cache_census,inv_runs,build_inventory}.py, CC SCRATCH/zz_cc_disk/ (top*.tsv, scratch_top*.tsv,
       inv_runs.jsonl, census.tsv, files_*.tsv, lhe_queue.tsv, df.txt, deleted.tsv)
     written: '2026-11-24T23:56:58+00:00'
-  step_why:
-    2:
-      feeds: which costly CC results are deleted
-      if:
-      - 'yes: design, review, submit the deletion, report GiB freed and df'
-      - 'no or partial: delete only what he approved; record the rest as kept'
 - id: cc_login_jobs
   title: 'CC login node: recurring and long scripts moved to Slurm (CC support''s email)'
   question: 'Can every non-interactive script we run on CC''s login node (the supervisor''s maintain commands: disk_watch,
