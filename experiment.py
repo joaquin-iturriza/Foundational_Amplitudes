@@ -2429,6 +2429,9 @@ class AmplitudeExperiment(BaseExperiment):
         assert not self.cfg.data.get("affine_multiplicity_std", False) or (
             per_dataset and self.cfg.data.get("shared_standardization", False)), \
             "data.affine_multiplicity_std refines data.shared_standardization (per-dataset transforms, one sigma)"
+        assert not self.cfg.data.get("level_file") or (
+            per_dataset and self.cfg.data.get("shared_standardization", False)), \
+            "data.level_file sets the means of data.shared_standardization (per-dataset transforms, one sigma)"
         _pts = getattr(self, "_ft_parent_target_stats", None)
         if prepd_means is None and _pts is not None:
             prepd_means, prepd_stds, _kind = parent_target_standardization(_pts, [npart_of(nm) for nm in names],
