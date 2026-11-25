@@ -46749,6 +46749,12 @@ entries:
     units: null
     start: '2026-11-25T01:28:18+00:00'
     at: '2026-11-25T01:28:18+00:00'
+  - batch: stage2_searches
+    wall_h: 2.5
+    jobs: 128
+    units: null
+    start: '2026-11-25T02:28:59+00:00'
+    at: '2026-11-25T02:28:59+00:00'
   step_waits:
     '1': 'a reviewer: notes-editor re-check of par:selres_stage1 (staged), then commit the write-up'
   handoff:
