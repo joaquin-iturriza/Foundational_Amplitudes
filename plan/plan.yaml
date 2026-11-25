@@ -41515,6 +41515,24 @@ entries:
       arm with a score file into figs/all_arms_heldout_per_process. Steps 12-14 and every later readout redraw THAT figure
       (python analysis/llm_compare/heldout_per_process.py, no arguments) once data/b_h<H>_heldout.json exists; the per-readout
       subset figures (b_h16_, c_best_, a5_controls_) are superseded and are not sent again.'
+  - at: '2026-11-25T14:29:19+00:00'
+    text: '2026-11-25 step 15 (D564) level/scale/floor split read (re-reads FA-ccin2p3-550001b5 trial 5, -edb07e43 16 heads,
+      -d46fa6dc our-setup control, -31184b71 our-setup searched; tools/llm_score.py @ae5427d12; per-process MSE reproduces
+      the earlier scores, pooled to 1e-5, median per process 1e-7 to 5e-7, up to 14% only on processes of MSE <= 5e-3, float
+      evaluation noise; error_split.py @09d08faf4). New 43: the error is a misplaced level: median share of bias^2 in the
+      MSE 0.86 (8 heads), 0.86 (16 heads), 0.75 (our control), 0.77 (our searched); bias^2 the largest part on 30/29/35/29
+      of 43; bias^2 alone above the LLM''s whole MSE on 24/32/16/15 of 43. Relabels: the floor (shape beyond an affine map)
+      is the largest part on 76/69/79/95 of 96, bias^2 median share 0.12/0.11/0.23/0.00. Failing processes: gg->t b~ W- /
+      gg->b t~ W+ bias -4.8/-4.7 (8 heads), -5.7/-5.5 (our searched) in log|M|^2 (predicted level e^5 too low), rho 0.36/0.43
+      (his setup), -0.12/-0.11 (our searched): level and shape both wrong; LLM whole MSE 2.2/2.5. b b~->hhh bias +4.7 (8 heads),
+      rho 0.93: level only. The b-initiated hh+X (g b~->b~hh, g b->bhh, b b~->g hh): bias about +2 in his setup and about
+      -4 in ours, rho ~0.9: shape right, level wrong, with the sign flipped by the setup. Per family new (median bias^2 share,
+      8 heads / our searched): multi-H 0.89/0.91, H+tau 0.35/0.40, WWW 0.52/0.52, ZZZ 0.94/0.85, gg->Wqq'' 0.88/0.92, gg->ttX
+      0.38/0.21. Answer so far to D564: where the LLM extrapolates better it places a new family''s level better; our networks
+      get the shape of those families (rho ~0.9) but not their normalization, except gg->tbW where both are wrong. Figure
+      figs/all_arms_bias_heldout_per_process.png (|bias| per process beside the LLM''s whole RMSE, heldout_per_process.py
+      --part bias @HEAD). Next per the passed design (level branch): configurations that change what sets a new family''s
+      level, each its own design.'
   step_waits:
     '8': the design reviewer (step-8 width design at hp1860), then the 4 smokes
     '12': FA-ccin2p3-e9dfa8b9
