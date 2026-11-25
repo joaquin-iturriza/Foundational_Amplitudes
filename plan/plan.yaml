@@ -40841,8 +40841,10 @@ entries:
     - FA-lxplus-4bfd2286
     - FA-lxplus-71f15edb
     - FA-lxplus-a0cc1bc6
+    - FA-lxplus-b43687b7
     - FA-lxplus-cb9273f1
-    commit: 041084987
+    - FA-lxplus-e48ee20a
+    commit: d2137361b
     paths:
     - analysis/catalog_daniel/dancat_plain_mse.py
     - analysis/llm_compare/check_score_vs_preds.py
@@ -40850,6 +40852,7 @@ entries:
     - analysis/llm_compare/data/a5_controls_score_summary.json
     - analysis/llm_compare/data/ac_controls_score_summary.json
     - analysis/llm_compare/data/step15_level_source.json
+    - analysis/llm_compare/factor_split.py
     - analysis/llm_compare/heldout_per_process.py
     - analysis/llm_compare/level_source.py
     - config/amplitudes.yaml
@@ -40862,6 +40865,7 @@ entries:
     - sites/setup.sh
     - sweep/prune.py
     - sweep/sweep_config_llmcmp_a_adamw_const.yaml
+    - sweep/sweep_config_llmcmp_c_nooffshell.yaml
     - tests/test_alphas_input.py
     - tests/test_level_file.py
     - tests/test_memmap_data.py
