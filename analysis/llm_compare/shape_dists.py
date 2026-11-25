@@ -1,8 +1,9 @@
 """llm_compare D567: the shape of the predicted log|M|^2 distribution with each arm's own level removed, on the new-family
 held-out processes where the arms differ most. Per process, true log|M|^2 against each arm's prediction shifted by its
 bias (pred - mean(pred - true)), so only the shape (scale and floor of tools/llm_score.py's split) is compared; ratio
-panel pred/true (ps.true_pred_hist). Processes: the 4 of the 43 new whose MSE - bias^2 differs most across the arms
-(largest worst/best ratio, data/split/<tag>_heldout.json).
+panel pred/true (ps.true_pred_hist). Processes: among the 43 new, per family the one whose MSE - bias^2 (of these
+events) differs most across the arms (largest worst/best ratio), the 3 families where that ratio is largest; the fourth
+cell holds the legend.
 Events: data/events/<tag>_heldout_events.csv (tools/llm_score.py --events-out, first 5000 test events per process).
     python analysis/llm_compare/shape_dists.py
 Output: figs/shape_dists.{png,pdf}.
@@ -39,9 +40,15 @@ def main():
         y, q = ev[t][n].T
         return float(np.mean((q - y) ** 2) - np.mean(q - y) ** 2)
     sh = {n: [shape(t, n) for t in tags] for n in new}
-    pick = sorted(new, key=lambda n: -max(sh[n]) / min(sh[n]))[:4]
+    spread = {n: max(sh[n]) / min(sh[n]) for n in new}
+    top = {}
+    for n in new:  # one process per family: its most differing one
+        g = meta[n]["test_group"]
+        if g not in top or spread[n] > spread[top[g]]:
+            top[g] = n
+    pick = sorted(top.values(), key=lambda n: -spread[n])[:3]
     fig, axes = ps.figure(ncols=2, nrows=2)
-    for ax, n in zip(np.ravel(axes), pick):
+    for ax, n in zip(np.ravel(axes)[:3], pick):
         y = ev[tags[0]][n][:, 0]
         for t in tags[1:]:
             assert np.allclose(ev[t][n][:, 0], y, rtol=1e-5), f"{t}: other test events for {n}"
@@ -54,7 +61,7 @@ def main():
         r = ps.true_pred_hist(ax, models, xlabel=r"$\log|\mathcal{M}|^2$, level removed")
         ax.text(0.03, 0.95, proc_label(meta[n]["process"]), transform=ax.transAxes, ha="left", va="top")
         print(meta[n]["process"], meta[n]["test_group"], {t: round(s, 4) for t, s in zip(tags, sh[n])})
-    ps.legend(np.ravel(axes)[0], "upper right")
+    ps.legend_cell(np.ravel(axes)[3], np.ravel(axes)[0])
     ps.save(fig, os.path.join(HERE, "figs", "shape_dists"))
 
 
