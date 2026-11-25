@@ -42,14 +42,19 @@ for a in sys.argv[1:]:
         pools = re.findall(r"\[(train|val|test)\] \S+: \d+ events.*? from (\S+\.npy)",
                            open(os.path.join(siteconf.PROJECT_DIR, "runs", log)).read())
     for role, path in pools:
-        rows = np.load(path, mmap_mode="r"); n = (rows.shape[1] - 1) // 5; xs = []
+        rows = np.load(path, mmap_mode="r"); n = (rows.shape[1] - 1) // 5; xs = []; pid_min = (np.inf, 0); soft = {}
         for i in range(0, len(rows), 50000):
             p = np.asarray(rows[i:i + 50000, :4 * n], dtype=np.float64).reshape(-1, n, 4)
+            ids = np.asarray(rows[i:i + 50000, 4 * n:5 * n]).astype(np.int64)[:, 2:]
             Q = p[:, 0] + p[:, 1]; s = (Q * Q * eta).sum(-1)
-            xs.append(np.abs(2 * (p * Q[:, None] * eta).sum(-1) / s[:, None])[:, 2:].min(1))
+            xi = np.abs(2 * (p * Q[:, None] * eta).sum(-1) / s[:, None])[:, 2:]
+            xs.append(xi.min(1)); k = np.unravel_index(xi.argmin(), xi.shape)
+            pid_min = min(pid_min, (float(xi[k]), int(ids[k])))
+            for q in ids[xi < 0.009]:   # the final-state momenta a rule at x0 = 0.009 would change, by PDG id
+                soft[str(q)] = soft.get(str(q), 0) + 1
         x = np.concatenate(xs)
         r[role if not log.startswith("recipe:") else role + "/" + os.path.basename(path)] = {"path": path, "n": int(len(x)), "min": float(x.min()), "q1e-4": float(np.quantile(x, 1e-4)),
-                   "below_0.01": int((x < 0.01).sum())}
+                   "below_0.01": int((x < 0.01).sum()), "pid_min": pid_min[1], "below_0.009_by_pid": soft}
     out[lab] = r
 print("SRMIN " + json.dumps(out))
 '''
