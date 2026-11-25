@@ -44,9 +44,12 @@ def main():
     ap.add_argument("--out", default=None)
     a = ap.parse_args()
     assert len(a.tag) == len(a.label), (a.tag, a.label)
+    cols = (ps.C.blue, ps.C.green, ps.C.orange, ps.C.vermillion, ps.C.purple, ps.C.sky)
+    marks = ("o", "D", "^", "s", "v", "P")
+    assert len(a.tag) <= len(cols), f"at most {len(cols)} arms, got {len(a.tag)}"   # zip would drop the rest silently
     draft = json.load(open(os.path.join(ROOT, "talks", "progress_oct2026b", "data", "draft_pid_by_process.json")))
     arms = [(lab, json.load(open(os.path.join(HERE, "data", f"{t}_heldout.json")))["processes"], c, mk)
-            for t, lab, c, mk in zip(a.tag, a.label, (ps.C.blue, ps.C.green, ps.C.orange), ("o", "D", "^"))]
+            for t, lab, c, mk in zip(a.tag, a.label, cols, marks)]
     meta = {"dc_" + p["folder"]: p for p in json.load(open(os.path.join(DAN, "classes_default.json")))["processes"]}
     for _, ours, _, _ in arms:
         assert set(ours) == {n for g in draft.values() for n in g}, "held-out sets differ"
