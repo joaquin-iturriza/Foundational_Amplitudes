@@ -639,12 +639,120 @@ def refusal_report(since, until, out_path, fig):
             " ".join("%s %d/%.1fM" % (r[:5], v["n"], v["hi"] / 1e6) for r, v in sorted(C["roles"].items()))))
     hi = sum(v["hi"] for v in role_sum.values())
     lo = sum(v["lo"] for v in role_sum.values())
+    ver = refusal_verdicts(since, until)
+    rep["verdicts"] = ver
+    json.dump(rep, open(out_path, "w"), indent=1, default=float)
+    slug = lambda c: re.sub(r"[^a-z0-9]+", "_", next((w for h, k, w in PLAIN if c["hook"] == h and c["check"].startswith(k)),
+                                                     c["hook"] + " " + c["check"][:20]).lower()).strip("_")
     print(json.dumps({"refusals": sum(v["n"] for v in role_sum.values()), "hi_M": round(hi / 1e6, 1),
+                      "verdicts": ver,
+                      "role_pct_hi": {r.replace(" ", "_"): round(100 * v["share_of_role_hi"], 1)
+                                      for r, v in rep["refusal_tokens_by_role"].items()},
+                      "role_pct_lo": {r.replace(" ", "_"): round(100 * v["share_of_role_lo"], 1)
+                                      for r, v in rep["refusal_tokens_by_role"].items()},
+                      "role_n": {r.replace(" ", "_"): v["n"] for r, v in rep["refusal_tokens_by_role"].items()},
+                      "top": {slug(c): {"hi_M": round(c["hi"] / 1e6, 1), "lo_M": round(c["lo"] / 1e6, 1), "n": c["n"],
+                                        "repeat": c["repeat"], "dropped": c["dropped"]}
+                              for c in rep["checks"][:13]},
                       "lo_M": round(lo / 1e6, 1), "share_hi_pct": round(100 * hi / total, 1),
                       "share_lo_pct": round(100 * lo / total, 1),
                       "by_role_hi_M": {r.replace(" ", "_"): round(v["hi"] / 1e6, 1) for r, v in role_sum.items()},
-                      "top10_hi_M": [[h, c, round(C["hi"] / 1e6, 1), C["n"]] for (h, c), C in rows[:10]]}))
+                      }))
     figure_refusals(rep, fig)
+
+
+CTX_FIX = "2026-11-19T11:12"  # ee7afdfb7 (UTC): context_guard refuses the Stop at most once per compaction period
+PILLAR_FILE = {  # review_backlog.sh PILLARS, as path tests (shortcut: prefix tests, not git pathspecs; enough here)
+    "claudemd-keeper": lambda p: p == "CLAUDE.md" or p.startswith((".claude/context", ".claude/agents",
+                                                                   "plan/step_prompt", "plan/mechanical_prompt")),
+    "notes-editor": lambda p: p.startswith("docs/") and p.endswith(".tex"),
+    "repo-reviewer": lambda p: (p.endswith((".py", ".sh")) or p.split("/")[0] in (
+        "config", "recipes", "models", "sweep", "tools", "tests", "scripts") or p == ".claude/settings.json")
+    and not p.endswith((".json", ".log", ".out", ".err")) and not p.startswith(("runs/", "sweeps/", "plan/"))
+    and "/data/" not in p}
+
+
+def refusal_verdicts(since, until):
+    """The counts behind the right/misfire reading of four checks (D558): the refused Bash calls of sleep_guard (a loop,
+    a sleep over 5 s, one short sleep, no sleep outside quotes) and of review_backlog's commit block (the named paths
+    against the blocking pillar); the main session's context-guard bounces and compactions before and after CTX_FIX;
+    every 'question open' bounce replayed through today's plan.ask_matches_set (the recorded ask, the texts sent in
+    the 3 h before)."""
+    import datetime as dt, yaml
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import plan
+    sleep, commit = defaultdict(int), defaultdict(int)
+    files = sorted(glob.glob(PROJ + "/*.jsonl")) + sorted(glob.glob(PROJ + "/*/subagents/agent-*.jsonl"))
+    for f in files:
+        uses = {}
+        for line in open(f, errors="replace"):
+            if "tool_use" not in line:
+                continue
+            try:
+                d = json.loads(line)
+            except ValueError:
+                continue
+            ts = (d.get("timestamp") or "")[:19]
+            m = d.get("message") if isinstance(d.get("message"), dict) else {}
+            for b in m.get("content") if isinstance(m.get("content"), list) else []:
+                if not isinstance(b, dict):
+                    continue
+                if b.get("type") == "tool_use":
+                    uses[b.get("id")] = (b.get("input") or {}).get("command", "")
+                if b.get("type") != "tool_result" or not b.get("is_error") or not since <= ts < until:
+                    continue
+                t, cmd = text_of(b.get("content"))[:400], uses.get(b.get("tool_use_id"), "")
+                if "sleep_guard" in t:
+                    bare = re.sub(r"'[^']*'|\"(?:\\.|[^\"\\])*\"", "''", cmd)
+                    secs = [float(x) for x in re.findall(r"\bsleep\s+(\d+(?:\.\d+)?)", bare)]
+                    sleep["loop" if re.search(r"\b(until|while|for)\b.*\bdo\b|\bwatch\s|tail\s+-\w*[fF]", bare)
+                          else "over_5s" if secs and max(secs) > 5 else "short" if secs else "quoted_only"] += 1
+                g = re.search(r"a commit while the (\S+) pillar", t)
+                if g:
+                    named = re.search(r"git commit\b.*?\s--\s+([^;&|\n]+)", cmd)
+                    ps = [x[len(ROOT):] if x.startswith(ROOT) else x for x in (named.group(1).split() if named else [])
+                          if not x.startswith((">", "2>"))]
+                    commit["unknown" if not ps or any("$" in x for x in ps) else
+                           "names_pillar_file" if any(PILLAR_FILE[g.group(1)](x) for x in ps) else "names_none"] += 1
+    # the main session: context-guard bounces and compactions around the fix; question bounces replayed
+    d = yaml.safe_load(open(ROOT + "plan/plan.yaml"))
+    asks = [(e, x.get("ask") or "") for e in d["entries"] for x in e.get("asks") or []] + \
+           [(e, e.get("ask") or "") for e in d["entries"] if e.get("ask")]
+    ctx, texts, ask = defaultdict(int), [], defaultdict(int)
+    main = [f for f in files if "/subagents/" not in f and os.path.getsize(f) > 1e8]  # the one long main session
+    for line in open(main[0], errors="replace") if main else []:
+        try:
+            m = json.loads(line)
+        except ValueError:
+            continue
+        ts = (m.get("timestamp") or "")[:19]
+        c = (m.get("message") or {}).get("content") if isinstance(m.get("message"), dict) else None
+        if m.get("type") == "assistant" and isinstance(c, list):
+            t = " ".join(b.get("text", "") for b in c if isinstance(b, dict) and b.get("type") == "text")
+            if t.strip():
+                texts.append((ts, t))
+        if not since <= ts < until:
+            continue
+        half = "before" if ts < CTX_FIX else "after"
+        if m.get("type") == "system" and m.get("subtype") == "compact_boundary":
+            ctx["compactions_" + half] += 1
+        if m.get("type") != "user" or not isinstance(c, str) or not c.startswith("Stop hook feedback"):
+            continue
+        if "CONTEXT GUARD" in c:
+            ctx["bounces_" + half] += 1
+        for g in re.finditer(r"  (\S+) has a question open for the user, but no message sent to them asks: (.*?)(?=\n  |\n?$)",
+                             c, re.S):
+            a = g.group(2).strip()
+            full = next((x for e, x in asks if e["id"] == g.group(1) and x[:100] == a[:100]), None)
+            if not full:
+                ask["ask_not_found"] += 1
+                continue
+            t0 = (dt.datetime.fromisoformat(ts) - dt.timedelta(hours=3)).isoformat()
+            e = dict(next(e for e in d["entries"] if e["id"] == g.group(1)), ask=full)
+            ask["passes_today" if plan.ask_matches_set(e, [t for tt, t in texts if t0 <= tt <= ts])
+                else "refused_today"] += 1
+    return {"sleep_guard": dict(sleep), "commit_block": dict(commit), "context_guard": dict(ctx),
+            "question_replay": dict(ask)}
 
 
 PLAIN = [  # (hook, start of check) -> what the check refuses, in plain words, for the figure
