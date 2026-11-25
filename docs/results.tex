@@ -10633,6 +10633,7 @@ Finale parents trained before this change carry the full rescale, so a compariso
 % claim: 1e5.shallow_dec=-0.67
 % claim: 1e5.shallow_spread=0.98
 % allow: 0.009 0.1 10^4 10^5 43 44 10^{-7} 10^{-6} 10^{-3} 10^{-2} 4g 2 because they are the thresholds, the training sizes, the seeds, the strata edges, the process Z+4g and the square of |M|
+% plan selective_rescale, step 3 (par:selres_support): the rule in the D392 setup, x0=1e-5
 % src: python3 analysis/selective_rescale/support_rule.py minima --cached @94ec344b0
 % claim: finale_min=1.99e-5
 % claim: finale_below_0.009=481
