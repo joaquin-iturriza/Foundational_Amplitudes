@@ -133,12 +133,9 @@ def problems():
                                    "id>%s)" % (e["id"], "" if k is None else " --next %d" % k)
                                    if e.get("status") == "running" else ""))
     sent = [(ts, text) for ts, role, text in msgs if role == "assistant"]
+    # no wording check that an open ask was sent (D562: 53 of 78 refusals 11-09..25 were asks already sent in other
+    # words); `plan next` lists every open ask with its age on each wake (OPEN lines, step 34)
     for e in d["entries"]:
-        if plan.open_question(e):                   # waiting, or running with a question open on part of it
-            t0 = plan.parse(e.get("waiting_since")) - dt.timedelta(minutes=plan.ASK_MARGIN_MIN)
-            if not plan.ask_matches_set(e, [text for ts, text in sent if ts >= t0]):
-                out.append("%s has a question open for the user, but no message sent to them asks: %s" % (
-                    e["id"], e.get("ask")))
         if e.get("status") == "running":
             why = plan.approval_problem(e)
             if why:

@@ -482,14 +482,11 @@ def questions():
     ask = "Should the small study also run the frozen lower blocks at every rung?"
     w = World([E("lowd", status="waiting_user", ask=ask, waiting_since=ago(20))])
     rc, err = w.check()
-    scenario("waiting with no question sent blocks", rc == 2 and "no message sent" in err, err)
+    scenario("D562: an open ask not found in the messages no longer blocks the stop", "no message sent" not in err, err)
     w = World([E("lowd", status="waiting_user", ask=ask, waiting_since=ago(20))],
               transcript=[(ago(25), "assistant", "Joaquin, should the small study also run the frozen lower blocks at "
                                                   "every rung?")])
     scenario("a question written just before plan ask counts (15 min margin)", w.check()[0] == 0, w.check()[1])
-    w = World([E("lowd", status="waiting_user", ask=ask, waiting_since=ago(20))],
-              transcript=[(ago(90), "assistant", "should the small study also run the frozen lower blocks at every rung?")])
-    scenario("one sent long before the ask does not", w.check()[0] == 2, w.check()[1])
     w = World([E("lowd")])
     rc, out = w.plan_cmd("ask", "lowd", "--ask", "ok?", "--searched", SEARCHED)
     scenario("an ask with no checkable words is refused", rc != 0, out)
@@ -1752,8 +1749,7 @@ def open_questions():
     w = World([E("cov", ask=q, blocks=blocks, waiting_since=ago(20), asks=[{"ask": q, "at": ago(20)}])],
               state={"cov": step(1)})
     rc, err = w.check()
-    scenario("open question: a running entry's question must still reach the user", rc == 2 and "no message sent" in err,
-             err)
+    scenario("D562: a running entry's open ask is not matched against the messages", "no message sent" not in err, err)
     w = World([E("cov", ask=q, blocks=blocks, waiting_since=ago(20), asks=[{"ask": q, "at": ago(20)}])],
               state={"cov": step(1)},
               transcript=[(ago(19), "assistant", "Joaquin, should the heavy-quark pools take the leading-order width "
