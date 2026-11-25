@@ -10398,6 +10398,72 @@ and is not resolved from it at $10^5$, but it does not reach the bulk of no resc
   \label{fig:selres_stage2}
 % allow: 2048 1953 16 42 43 44 2 10^4 10^5 0.1 4g because they are the batch size, steps, trial count, seeds, the square of |M|, the training sizes, the threshold and the 4g of Z+4g
 \end{figure}
+
+% plan selective_rescale (Event-dependent momentum rescale: the soft-limit gain without the bulk cost), step 3
+\paragraph{Where the rescale below $x=0.1$ costs $u\bar ug$ (D552, 2026-11-25)}\label{par:selres_split} At its own
+optimum the rescale below $x=0.1$ raises the validation MSE of $u\bar ug$ to $1.33$ and $2.90$ times that of no rescale at
+$10^4$ and $10^5$ events (par.~\ref{par:selres_stage2}), although it changes the input of only the $2304$ of $100000$
+validation events whose softest final-state particle has $x<0.1$. Splitting each run's squared error of
+$\log|\mathcal M|^2$ at that line, on the same chosen trials and seeds read at their final model, after the $\sigma$ fit (totals $1.34$ and
+$2.50$; the $2.90$ above is the best point of the validation curve during training), puts the cost in the events the rule changes (Fig.~\ref{fig:selres_split}). There its MSE over no rescale is
+$4.23$ ($2\sigma$ over the three seeds: $3.50$--$5.10$) at $10^4$ and $8.56$ ($5.91$--$12.38$) at $10^5$; on the untouched rest it is $0.88$
+($0.68$--$1.13$) and $1.61$ ($1.12$--$2.33$). As a fraction of the extra squared error, the changed events carry $1.30$ at
+$10^4$, more than all of it since the rest gains, and $0.64$ at $10^5$. The full rescale costs the same changed events $4.36$ ($2.56$--$7.42$) and $2.41$
+($1.15$--$5.05$), and the rest $1.85$ ($1.05$--$3.24$) and $1.20$ ($0.87$--$1.64$). The changed events are the soft end
+of the trained range: the pool's softest $x$ is $0.0118$, and the rule maps the $0.93$ decades of $x$ between it
+and $0.1$ onto $0.062$ decades of $x'$, beside a full decade of untouched momenta above $0.1$. The full rescale squeezes
+the same range to the same $0.062$ decades, inside $0.12$ decades for all momenta. The rule's soft gain is measured at
+$x=10^{-6}$ and $10^{-7}$, far below every trained event; inside the trained range it costs the changed events at both
+sizes and the untouched rest at $10^5$.
+% src: python3 analysis/selective_rescale/uug_split.py --cached @b98b2e723
+% claim: cells.1e4.off.changed.n=2304
+% claim: cells.1e4.below_x0p1.over_off.total.r=1.34
+% claim: cells.1e5.below_x0p1.over_off.total.r=2.50
+% claim: cells.1e4.below_x0p1.over_off.changed.r=4.23
+% claim: cells.1e4.below_x0p1.over_off.changed.lo=3.50
+% claim: cells.1e4.below_x0p1.over_off.changed.hi=5.10
+% claim: cells.1e5.below_x0p1.over_off.changed.r=8.56
+% claim: cells.1e5.below_x0p1.over_off.changed.lo=5.91
+% claim: cells.1e5.below_x0p1.over_off.changed.hi=12.38
+% claim: cells.1e4.below_x0p1.over_off.rest.r=0.88
+% claim: cells.1e4.below_x0p1.over_off.rest.lo=0.68
+% claim: cells.1e4.below_x0p1.over_off.rest.hi=1.13
+% claim: cells.1e5.below_x0p1.over_off.rest.r=1.61
+% claim: cells.1e5.below_x0p1.over_off.rest.lo=1.12
+% claim: cells.1e5.below_x0p1.over_off.rest.hi=2.33
+% claim: cells.1e4.below_x0p1.extra_share.changed=1.30
+% claim: cells.1e5.below_x0p1.extra_share.changed=0.64
+% claim: cells.1e4.rescale.over_off.changed.r=4.36
+% claim: cells.1e4.rescale.over_off.changed.lo=2.56
+% claim: cells.1e4.rescale.over_off.changed.hi=7.42
+% claim: cells.1e5.rescale.over_off.changed.r=2.41
+% claim: cells.1e5.rescale.over_off.changed.lo=1.15
+% claim: cells.1e5.rescale.over_off.changed.hi=5.05
+% claim: cells.1e4.rescale.over_off.rest.r=1.85
+% claim: cells.1e4.rescale.over_off.rest.lo=1.05
+% claim: cells.1e4.rescale.over_off.rest.hi=3.24
+% claim: cells.1e5.rescale.over_off.rest.r=1.20
+% claim: cells.1e5.rescale.over_off.rest.lo=0.87
+% claim: cells.1e5.rescale.over_off.rest.hi=1.64
+% claim: soft_range_map.x_min=0.0118
+% claim: soft_range_map.dec_in=0.93
+% claim: soft_range_map.below_x0p1.dec_out=0.062
+% claim: soft_range_map.rescale.dec_out=0.062
+% claim: soft_range_map.rescale.dec_all=0.12
+% allow: 1.33 2.90 because they are par:selres_stage2's claims (stage2_read.py)
+% allow: 0.1 10^4 10^5 100000 10^{-6} 10^{-7} 2 because they are the threshold, the training sizes, the validation pool size, the kit's deepest soft bins and the square of |M|
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{../analysis/selective_rescale/figs/uug_split.pdf}
+  \caption{\textbf{The rescale below $x=0.1$ loses the soft events it changes.} $e^+e^-\to u\bar ug$, scratch, batch
+  $2048$, $1953$ steps; each arm is its own search's chosen trial and that trial at seeds $43$ and $44$, read at the final
+  model on the validation pool. Top left: MSE$(\log|\mathcal M|^2)$ per bin of the event's softest final-state $x$ (seed
+  median, band: seed range). Top right: the same over no rescale. Bottom left: validation events per bin. Dotted: $x=0.1$;
+  only events left of it change under the rule.}
+  \label{fig:selres_split}
+% allow: 2048 1953 43 44 0.1 2 because they are the batch size, steps, seeds, the threshold and the square of |M|
+\end{figure}
 % ==========================================================================
 \section{Architecture and encoding ablations}\label{sec:arch}
 % ==========================================================================
