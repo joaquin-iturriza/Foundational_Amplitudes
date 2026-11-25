@@ -41690,6 +41690,18 @@ entries:
       flag per HP): FA-ccin2p3-89671610. Step 17 tree and network resubmitted on lxplus (CC lacks catalog_daniel train-role
       pools; both CC jobs failed with 2 pools read): FA-lxplus-294e9e5e, FA-lxplus-49899ef8 running; perevent_level.py now
       stops on missing pools @851b00282.'
+  - at: '2026-11-25T19:53:05+00:00'
+    text: '2026-11-25 step 17 (D566 candidate B, per-event level map; perevent_level.py tree FA-lxplus-294e9e5e and 2x64 network
+      FA-lxplus-49899ef8, data/perevent_level{,_mlp}.json @1bd9d3152, figure figs/perevent_level.png by perevent_level_fig.py
+      @1bd9d3152). References reproduce (shared 44.7 vs 47, regressor 0.0466 vs 0.044). Median over the 43 new of the level
+      error <y_hat-y>_p^2/sigma_p^2: shared 44.7, diagram regressor 0.047, propagator factor (A) 4.14, tree 3.64, network
+      1.63; relabels 2.54 / 0.0041 / 0.0072 / 0.0005 / 0.0004; cross-fitted training: tree 0.036. Median flat shift (sigma_p):
+      regressor 0.176 (bootstrap sd 0.037), tree 0.155 (0.029), network 0.084 (0.026). Gate (passed design 17:11): (i) level
+      error <= 0.19 FAILS for both (network 1.63, tree 3.64); (ii) network''s shift below the regressor''s by 0.092 > 2x0.037
+      PASSES, tree''s by 0.021 fails. Per family the network beats the tree on the level in HH(X) 9.8 vs 11.5 and ttX 19.2
+      vs ~ (tree higher), loses in Htau 0.35 vs 0.30 and WWW 2.1 vs 0.1. Outcome per design: fail on (i) is not a verdict
+      on the per-event map; next an equal-size search for tree and network cross-fitted by relabelling class on the training
+      processes, best against best, its own design (step 20).'
   step_waits:
     '8': FA-ccin2p3-8acd3fc1 FA-ccin2p3-39f4ab2e FA-ccin2p3-e5265194 FA-ccin2p3-e1d1fbaf
     '13': FA-ccin2p3-623a3af6
