@@ -23,5 +23,14 @@ def test_windows():
     assert r["summary"]["n_fitted"] == 5 and abs(r["summary"]["B_dL_median"] - 150) < 1e-6
 
 
+def test_scaled_optimal_step():
+    # dL(s) = s A - s^2 Q with A = 2 and Q = 1 + 150/b: dL_opt = A^2/(4Q) = 1/(1 + 150/b), B_opt = 150
+    sc = [0.01, 0.03, 0.1, 0.3, 1.0]
+    rec = {"kind": "chunk", "step": 0, **{f"dL_b{b}": -1.0 for b in BS}, **{f"all_A_b{b}": 2.0 for b in BS},
+           **{f"dL_s{s:g}_b{b}": 2 * s - s * s * (1 + 150 / b) for s in sc for b in BS}}
+    w = dl_read.window([rec], BS)
+    assert abs(w["B_opt"] - 150) < 1e-6, w["B_opt"]
+
+
 if __name__ == "__main__":
-    test_fit_known_answer(); test_fit_listed_apart(); test_windows(); print("ok")
+    test_fit_known_answer(); test_fit_listed_apart(); test_windows(); test_scaled_optimal_step(); print("ok")

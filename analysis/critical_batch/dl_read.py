@@ -37,6 +37,20 @@ def fit(dl, bs):
     return (np.inf, np.inf) if a <= 0 else (max(c, 0.0) / a, 1.0 / a)
 
 
+def scaled(rs, bs, sc, A, smax=0.3):
+    """Reads at step sizes s u (dL_s<s>_b<b>): per b the curvature term Q of dL(s) = s A - s^2 Q (least squares over
+    s <= smax), the optimal-step decrease dL_opt = A^2 / (4 Q) fitted as dL_max / (1 + B_opt / b), and each scale's own
+    B_dL fit; Q from s = 1 (A - dL) beside it as the check of the quadratic."""
+    dls = {s: [float(np.mean([r[f"dL_s{s:g}_b{b}"] for r in rs])) for b in bs] for s in sc}
+    use = [s for s in sc if s <= smax]
+    Q = [sum(s * s * (s * A[str(b)] - dls[s][i]) for s in use) / sum(s ** 4 for s in use) for i, b in enumerate(bs)]
+    opt = [A[str(b)] ** 2 / (4 * q) if q > 0 else -1.0 for b, q in zip(bs, Q)]
+    fo = fit(opt, bs)
+    return {"dL_s": {f"{s:g}": dict(zip(map(str, bs), v)) for s, v in dls.items()}, "Q": dict(zip(map(str, bs), Q)),
+            "dL_opt": dict(zip(map(str, bs), opt)), "B_opt": None if fo is None else float(fo[0]),
+            "B_s": {f"{s:g}": (None if fit(v, bs) is None else float(fit(v, bs)[0])) for s, v in dls.items()}}
+
+
 def window(rs, bs):
     D = np.array([[r[f"dL_b{b}"] for b in bs] for r in rs], float)
     m = D.mean(0)
@@ -50,6 +64,9 @@ def window(rs, bs):
     # a read whose |dL| or |A| at some b exceeds 100x the window's median read (an exploding step) is flagged
     mags = np.abs(D).max(1)
     out["n_exploding_reads"] = int((mags > 100 * np.median(mags)).sum())
+    sc = sorted({float(k[4:].split("_b")[0]) for k in rs[0] if k.startswith("dL_s")})
+    if sc:
+        out.update(scaled(rs, bs, sc, out["A"]))
     if f is None:
         return {**out, "status": "dL<=0"}
     out.update(status="above range" if np.isinf(f[0]) else "fitted", B_dL=float(f[0]), dL_inf=float(f[1]))
@@ -86,7 +103,9 @@ def read(recs, win, ref, start=0):
                         "n_in_band": sum(band[0] <= x <= band[1] for x in fitted),
                         "B_A_median": float(np.median(BA)) if BA else None,
                         "B_A_min_max": [float(min(BA)), float(max(BA))] if BA else None,
-                        "n_windows_with_exploding_read": sum(w["n_exploding_reads"] > 0 for w in ws)}}
+                        "n_windows_with_exploding_read": sum(w["n_exploding_reads"] > 0 for w in ws),
+                        "B_opt_clean": [[w["step_lo"], w["B_opt"]] for w in ws if w.get("B_opt") is not None
+                                        and w["n_exploding_reads"] == 0]}}
 
 
 def figure(res, base):
@@ -162,7 +181,7 @@ def main():
     json.dump(res, open(os.path.join(HERE, "data", f"{a.name}.json"), "w"), indent=1)
     print(json.dumps(res["summary"]))
     for w in res["windows"]:
-        print(w["step_lo"], w["step_hi"], w["status"], w.get("B_dL"), w.get("B_A"), w["n_exploding_reads"])
+        print(w["step_lo"], w["step_hi"], w["status"], w.get("B_dL"), w.get("B_A"), w["n_exploding_reads"], w.get("B_opt"), w.get("B_s"))
     figure(res, os.path.join(HERE, "figs", a.name))
 
 
