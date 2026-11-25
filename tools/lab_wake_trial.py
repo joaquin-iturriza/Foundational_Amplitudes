@@ -256,7 +256,7 @@ def reviews_extract(a):
             if r["design"] and r["verdict"] and a.since <= r["t"][:16] < a.until:
                 rows.append({"agent": "%s#%d" % (os.path.basename(mp)[6:-16], k), "t": r["t"], "brief": r["brief"][:6000],
                              "design": r["design"][:30000], "design_cmd": r.get("design_cmd", ""),
-                             "slice": bool(re.search(r"\b(sed|grep|head|tail|awk)\b", r.get("design_cmd", ""))), "material": r["material"], "verdict": r["verdict"]})
+                             "slice": bool(re.search(r"\b(sed|grep|awk)\b", r.get("design_cmd", ""))), "material": r["material"], "verdict": r["verdict"]})
     random.Random(a.seed).shuffle(rows)
     with open(os.path.join(OUT, "reviews.jsonl"), "w") as f:
         for r in rows[:a.n]:
