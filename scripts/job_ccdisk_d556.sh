@@ -31,5 +31,6 @@ python analysis/storage/cache_census.py --in-use $INUSE --days 14 --workers 4 > 
 tail -3 "$O/census_d556.err"
 awk -F'\t' 'NR>1 {s[$8]+=$2; n[$8]++} END {for (k in s) printf "CENSUS %s %d files %.2f GiB\n", k, n[k], s[k]/2^30}' "$O/census_d556.tsv"
 awk -F'\t' 'NR>1 && $8=="delete" {split($7,e,"/"); s[$6]+=$2} END {for (k in s) printf "CENSUS_DELETE_BY_RECIPE %.2f GiB\t%s\n", s[k]/2^30, k}' "$O/census_d556.tsv" | sort -rn | head -30
-awk -F'\t' 'NR>1 && $8=="keep" {s[$9]+=$2} END {for (k in s) printf "CENSUS_KEEP_BY_REASON %.2f GiB\t%s\n", s[k]/2^30, k}' "$O/census_d556.tsv" | sort -rn | head -10
+# reason classes: the touch date and the file's own note stripped (cache_census.py's reason strings)
+awk -F'\t' 'NR>1 {r=$9; sub(/^touched [0-9-]+ [0-9:]+, /, "touched ", r); sub(/^last touched [0-9-]+; /, "", r); sub(/ \(.*$/, "", r); s[$8 ": " r]+=$2; n[$8 ": " r]++} END {for (k in s) printf "CENSUS_BY_REASON %.2f GiB\t%d files\t%s\n", s[k]/2^30, n[k], k}' "$O/census_d556.tsv" | sort -rn
 echo D556_READ_DONE

@@ -137,7 +137,7 @@ def main():
         if last >= cut:
             dec, why = "keep", f"touched {time.strftime('%Y-%m-%d %H:%M', time.localtime(last))}, within {a.days:g} days"
         elif used:
-            dec, why = "keep", "train pool of an in-use recipe (" + ",".join(a.in_use) + ")"
+            dec, why = "keep", "train pool of an in-use recipe"          # which ones: the recipe column
         else:
             dec = "delete"
             why = (f"last touched {time.strftime('%Y-%m-%d', time.localtime(last))}; "
