@@ -45596,6 +45596,16 @@ entries:
       GB (df -> 504631); smoke_models listed nothing: runs/zz_smoke is empty now (read on CC 02:40), so the inventory''s 7.5
       GB there is already gone (who removed it not checked). Total df used 512973 -> 504631 MiB = 8.1 GiB freed; free 19.7
       GiB.'
+  - at: '2026-11-25T02:18:14+00:00'
+    text: '2026-11-25 D556 job FA-ccin2p3-170b2eff (job_ccdisk_d556.sh @133a1b1022), D556_READ_DONE: superseded fine-tune
+      models (zz_catft, zz_catft_lowloss2, zz_catft_lowloss3) 432 files 15.01 GiB deleted, df used 505108 -> 489740 MiB (15.0
+      GiB), free 34.5 GiB. Cache read (in use = 545 of 632 recipes, from 35 not-done entries + 14-day configs): memmap 522bb4e8
+      16.79 GiB catalog_v4 (1153 processes), last used 12.0 d ago, named by 14 logs of the last 14 days, all 1153 train pools
+      of in-use recipes (catalog_v4_base_train, catalog_v4_dan_identical, datasaving_*): KEEP; memmap 99c164da 14.46 GiB Daniel''s
+      catalog (1352 processes), used 0.0 d ago (llm_compare llm_score jobs), all pools in use (catalog_daniel_all/train/top):
+      KEEP; memmap b39fc80c 1.50 GiB Daniel''s held-out (139 processes), used 0.7 d ago, in use (catalog_daniel_heldout):
+      KEEP. Training cache amp_data_cache 58.73 GiB in 44,069 files: every entry touched within 14 days: KEEP. Nothing of
+      the caches is unread; nothing deleted, no duplicate key (the three keys hold different pool sets).'
   step_waits:
     '2': FA-ccin2p3-170b2eff
     '4': FA-ccin2p3-170b2eff (its cache_readers.txt and census_d556.tsv)
