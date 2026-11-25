@@ -45727,6 +45727,18 @@ entries:
       d507_search_v2.json, every trial); outer 5% of the lr window <- a measured spread: the D507 extension trigger (bests
       at 0.95-0.99 of the window, sweep config comments), used only to flag a bound; 50 epochs <- Joaquin''s words (D563,
       ''~50 epochs'')'
+    passed_at: '2026-11-25T14:05:30+00:00'
+    reviewer: 'Re-check of the D563 50-epoch design after the repo-reviewer''s lr-window FIX. Only the lr windows changed
+      (configs at 9e28b161d, six one-line diffs). I recomputed them with sweep/gen_transfer_pilot.lr_surface. Adam: c = lr*(t,
+      D=1e4) = 4.249e-3 at 244 steps and 4.994e-3 at 3906, window [c/3, 3c], which is HPO rule 2 as written; Adam''s own 400-epoch
+      best at 2048 (4.18e-3) times the t-factor gives 2.45e-3, inside the new window. Muon and Fn: own 400-epoch best times
+      the surface''s t-factor at D=1e4 (0.5855 from 1953 to 244 steps, 3.170 from 31250 to 3906, both recomputed). Muon 2048
+      0.0203 -> c 1.19e-2; Muon 128 9.237e-3 -> 2.93e-2; Fn 2048 3.114e-3 -> 1.82e-3; Fn 128 7.257e-3 -> 2.30e-2. Every window
+      is +-1/2 decade, as stated. Old DyHPO states removed; detached trials start in fresh dirs. Trial counts, horizons, protocol,
+      cost and disk unchanged, so my 13:25 pass stands. Check 2: best validation by epoch 50 in the 400-epoch trials gives
+      2048/128 ratios of 3.34 (Muon), 5.05 (Adam) and 1.84 (Fn), against r400 6.53/1.57/1.98. Check 3: the 1.22 threshold
+      is the largest best-to-third-best gap of the D507 searches (0.216). Check 5 terms: 50 epochs, over-train, trained too
+      long; decisions D507, D519, D520, D560, D563: no earlier run of these cells at another horizon.'
   step_why:
     1:
       feeds: 'D532: the scan''s answer (NO branch, B_crit 2500-6690 vs B_simple 55.5) reaches Joaquin as a finished entry'
