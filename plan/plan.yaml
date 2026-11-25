@@ -40985,7 +40985,7 @@ entries:
     decision: D553
   owner:
     agent: a0660e99fe060d6fd
-    state: working
+    state: closed
     since: '2026-11-25T22:27:16.441000+00:00'
     state_at: '2026-11-25T23:45:52.752000+00:00'
     context: 222444
@@ -41832,40 +41832,38 @@ entries:
     '19': FA-ccin2p3-0165aa58
     '21': FA-lxplus-a1b7d826
   handoff:
-    state: 'Part (a) DONE, part (c) DONE. Suprio''s own per-process metrics (pID only, seeds 0-2) now drive every LLM comparison:
-      data/suprio_cond/ + suprio.py @dfa26d84c; heldout_per_process.py (MSE / |bias| = his |level| / MSE-bias^2 = his shape^2,
-      median with min-max seed bar), error_split.py, level_source.py, family_gap.py @2e8d4d366; redraws sent to Joaquin with
-      the step-15 question (his own new-set level error 0.231 vs content-only network 0.79: reading (1) of step 15 changes;
-      text unchanged until he answers). Step 18 DONE: gg->ttH split not log F (AUC 0.52). Step 21 DONE: the split is the sign
-      of the internal-top off-shellness input (offshell_6), both our-setup arms, AUC 1.00, eta2 0.93 (finding 2026-11-25;
-      figs/c_{best,control}_factor_split_offshell_6.png). NEXT (step 21 in the list, the matched test, labelled 22): design
-      recorded, design-reviewer FIX (revise once, else dead end): (1) baseline = part (c) best trial_1860 (FA-ccin2p3-29ce8950,
-      lr 1.6e-3, clean), not the blown-up control d34535b0 (261 non-finite steps, val NLL 1.2e7 at 33462); time/step from
-      29ce8950''s log; (2) split measure: both 2-means groups with a real share (ttH 0.518/0.482) with a sourced bar, and
-      the arm''s d against the baseline CSV''s offshell_6 joined row by row over the same 5000 events (checked on true_logm2);
-      (3) thresholds from measured spread (part (b) widths 0.287/0.241/0.333 ~1.4x, data/split/error_split.json), drop 0.5
-      from his setup, state the mixed outcomes; (4) prior: results.tex l.16536 (off-shellness-off lever arm on transfer, levers_accum
-      (b), D2) and l.9750 (input-scale mismatch on tt, D400: a rival scale reading); (5) flag off changes the derived-inputs
-      cache key: prebuild as CPU job (~2.8 GB train + 0.3 GB held out), read CC df (/sps was 26 G free 23:00), show smoke
-      and run open the same key; (6) smoke also through job_llm_score.sh EVENTS=1 ONLY=heldout + factor_split.py; (7) list
-      keys differing from 29ce8950''s config.yaml (Hydra --cfg job). Step 8: 64/120-head smokes resubmitted with outputs saved
-      (save=false had left the sigma stage no checkpoint): FA-ccin2p3-1969f226, -caf1170e, queued on CC (64G fits nowhere
-      now).'
-    decisions: 'Joaquin''s: D522-D528, D536, D537, D553, D564, D566, D567. Mine (re-justify): earlier hand-offs'' (i)-(xix);
-      (xx) LLM compared at the median over his seeds 0-2 with per-seed counts beside (his seeds spread x0.12-x113 per process);
-      our bias^2 vs his level^2 and MSE-bias^2 vs his shape^2 (like for like); his figure''s x order kept from draft_pid_by_process.json;
-      (xxi) factor_split.py run on the site holding the CSV (CC CPU job / lxplus site run, ~10 s) since 26 MB does not pass
-      site fetch/run cat from CC; (xxii) llm_score --events-out writes the standardized off-shellness slot (exp._offshell_cols
-      in both data paths, test_memmap_data compares); (xxiii) step 8 smokes resubmitted on CC with --allow-unfit (repair inside
-      step 8''s approval).'
-    ruled_out: As before; plus log F (emission-scale factor) as the cause of the gg->ttH split (step 18); the blown-up control
-      d34535b0 as a matched baseline (design reviewer).
-    running: FA-ccin2p3-623a3af6 (step 13), FA-ccin2p3-f0b997a2 (step 14), FA-ccin2p3-89671610 (step 16), FA-ccin2p3-0165aa58
-      (step 19), FA-lxplus-affc2e5a (step 20; tree c894babe done), FA-ccin2p3-1969f226 and -caf1170e (step 8 smokes)
-    files: analysis/llm_compare/{suprio.py, data/suprio_cond/, factor_split.py, data/c_{best,control}_factor_split.json, heldout_per_process.py,
-      error_split.py, level_source.py, family_gap.py}, tools/llm_score.py (--events-out offshell columns), experiment.py/data_mmap.py
-      (_offshell_cols)
-    written: '2026-11-25T22:14:58+00:00'
+    state: 'Part (a) DONE, part (c) DONE. Step 20 DONE: D566 candidate (B) dead end (matched 8-trial searches: tuned tree
+      4.75, tuned network 2.64 against the 0.19 bar on the 43 new; proxy check fails; figure analysis/catalog_daniel/figs/perevent_level.png
+      beside perevent_level_step17.png, handed back with caption). STEP 22 (list step 21, the no-off-shellness arm): design
+      PASSED (design-reviewer, last pass 2026-11-25T23:06 after the slot repair; reviewer note: split gone with eta2<=0.25
+      but gg->ttH MSE-bias^2 > 2.97 reads ''the input causes the split, the remaining ttH error has another source''). Config
+      sweep/sweep_config_llmcmp_c_nooffshell.yaml @fa499b8c0 (offshell_per_event AND internal_mass_scalars false). Caches
+      built on lxplus: train feat_722a8424ff703926d2895327, held out feat_ed46b1c1488b64f0f46b2a23. Smoke FA-lxplus-a1b7d826
+      in flight (step waits on it). NEXT on its end: (1) check SMOKE_EXIT 0 and that its log opens feat_722a8424...; (2) score
+      the smoke: site submit lxplus FA scripts/job_llm_score.sh --env RUN=<smoke run dir from its log, runs/zz_smoke/zz_smoke_sweep_config_llmcmp_c_nooffshell_*>
+      --env ONLY=heldout --env EVENTS=1 (--est-gpu-hours, --hdr=--mem=20G --hdr=--cpus-per-task=7), then factor_split.py --csv
+      <smoke>/llm_events_heldout.csv --vars-from runs/llmcmp_c_qperp/trial_1860/llm_events_heldout.csv on lxplus (site run
+      --job); (3) the run, same flags as the finding of 2026-11-25 (step 22) but --hdr=--cpus-per-task=7 and the exact HPs
+      of the 2026-11-26 corrections finding (full precision), --est-gpu-hours 16, wall target 16 h via plan target; site pick
+      FA --jobs 1 --mem 20G --hours 16 right before. The smoke and score may go together with the run only if the smoke passed.
+      Readouts (steps 8, 13, 14, 16, 19) as their jobs end. Open question to Joaquin on step 15''s text stands; paragraph
+      unchanged.'
+    decisions: 'Joaquin''s: D522-D528, D536, D537, D553, D564, D566, D567. Mine (re-justify): earlier hand-offs'' (i)-(xxiii);
+      (xxiv) step 22 baseline = part (c)''s best trial_1860 (design reviewer: the control blew up); (xxv) the arm removes
+      the slot (internal_mass_scalars false with offshell_per_event false) because dimensionless_inputs refuses the slot without
+      off-shellness and the slot held only the off-shellness (data_mmap._open_run); offshell_zero is a silent no-op on memmap;
+      (xxvi) arm on lxplus: site pick, caches and the baseline''s offshell CSV are there; (xxvii) thresholds of step 22 from
+      measured arm-to-arm spread (design sources); (xxviii) step 20 figure redraw kept beside a regenerated step-17 version
+      (figs untracked).'
+    ruled_out: As before; plus D566 (B) per-event level map (untuned and tuned); data.offshell_zero on the memmap path (not
+      read there); internal_mass_scalars on with offshell off under dimensionless_inputs (refused).
+    running: FA-lxplus-a1b7d826 (step 22 smoke), FA-ccin2p3-623a3af6 (step 13, 64 heads), FA-ccin2p3-f0b997a2 (step 14, 120
+      heads), FA-ccin2p3-89671610 (step 16), FA-ccin2p3-0165aa58 (step 19), FA-ccin2p3-1969f226 and -caf1170e (step 8 smokes,
+      pending)
+    files: sweep/sweep_config_llmcmp_c_nooffshell.yaml, analysis/llm_compare/factor_split.py (--vars-from), analysis/catalog_daniel/data/perevent_level{,_mlp}_search.json,
+      analysis/catalog_daniel/figs/perevent_level{,_step17}.png, analysis/llm_compare/{suprio.py, heldout_per_process.py,
+      error_split.py, level_source.py, shape_dists.py}, tools/llm_score.py
+    written: '2026-11-25T23:51:57+00:00'
   designs:
   - at: '2026-11-22T04:13:14+00:00'
     question: 'Part (a), D525: in the conditions of Suprio''s LLM pID run (D524, D526, D527: our catalog_daniel regeneration
