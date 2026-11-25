@@ -16541,8 +16541,6 @@ entries:
     '31': '2026-11-26'
     '34': 2026-11-26 (the first real lxplus submit; read its submit file and gpu_window charge)
     '35': '2026-12-03'
-    '36': a fresh owner launched by the main session from the 2026-11-25 hand-off (the closing owner was stopped at ~261k
-      context)
   owner:
     agent: a0d1202aa8c88f150
     state: closed
