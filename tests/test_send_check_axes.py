@@ -59,3 +59,31 @@ def test_figure_pdf_still_needs_axes(tmp_path):
 def test_draft_pages_are_documents(tmp_path):
     small_pdf(tmp_path / "draft_sec2_pages4-6.pdf")
     assert run(str(tmp_path / "draft_sec2_pages4-6.pdf"), "the ratio D1_scr / D1_ft").returncode == 0
+
+
+def test_x_is_and_parenthesised_axes_pass(tmp_path):
+    # the 2026-11-16 and 11-15 captions refused although they named both axes
+    assert run(str(tmp_path / "f.svg"), "Four panels: x is log|M|^2, y the number of validation events").returncode == 0
+    assert run(str(tmp_path / "f.svg"), "top, histograms of log10|M|^2 (x) for truth, events on a log scale (y)"
+               ).returncode == 0
+    assert run(str(tmp_path / "f.svg"), "x axis: beta. Top panel: sigma in pb").returncode == 2
+
+
+def test_multipage_pdf_is_a_document(tmp_path):
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.backends.backend_pdf import PdfPages
+    d = tmp_path / "analysis" / "x" / "figs"
+    d.mkdir(parents=True)
+    with PdfPages(d / "paper.pdf") as pp:
+        for t in ("page one", "page two"):
+            fig = plt.figure(figsize=(2, 1))
+            fig.text(0.1, 0.5, t)
+            pp.savefig(fig)
+            plt.close(fig)
+    sys.path.insert(0, os.path.dirname(HOOK))
+    import send_check   # the legend rule refuses both first in main(): the axes rule is read on its own
+    small_pdf(d / "one.pdf")
+    assert send_check.axes_findings({"file_path": str(d / "paper.pdf"), "caption": "the whole paper"}, "/") == []
+    assert send_check.axes_findings({"file_path": str(d / "one.pdf"), "caption": "the whole paper"}, "/") != []

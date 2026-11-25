@@ -157,8 +157,9 @@ def check(path, terms):
 
 
 FIG_EXT = (".png", ".pdf", ".svg")
-X_AXIS = re.compile(r"\bx[\s-]*axis|\bx\s*:|horizontal|\bx\b.*\bagainst\b", re.I | re.S)
-Y_AXIS = re.compile(r"\by[\s-]*axis|\by\s*:|vertical", re.I)
+# "x is log|M|², y the events" and "log10|M|² (x) ... events (y)" name the axes too (2026-11-15, 11-16 refusals)
+X_AXIS = re.compile(r"\bx[\s-]*axis|\bx\s*:|\bx\s+is\b|\(x\)|horizontal|\bx\b.*\bagainst\b", re.I | re.S)
+Y_AXIS = re.compile(r"\by[\s-]*axis|\by\s*:|\by\s+(?:is|the)\b|\(y\)|vertical", re.I)
 AGAINST = re.compile(r"\S.*\bagainst\b\s*\S", re.I | re.S)
 PANEL = re.compile(r"(?:^|(?<=\. ))\(([a-h])\)", re.M)   # only a letter opening a line or sentence
 
@@ -182,12 +183,20 @@ def is_deck(path):
     return path.lower().endswith(".pdf") and "talks" in os.path.normpath(path).split(os.sep)
 
 
+def is_document(path):
+    """A PDF of several pages (the whole paper, a set of pages) is a document, not one figure: no axes to name."""
+    try:
+        return path.lower().endswith(".pdf") and len(pages(path)) > 1
+    except (ValueError, OSError):
+        return False
+
+
 def axes_findings(tool_input, cwd):
     cap = tool_input.get("caption") if isinstance(tool_input, dict) else None
     cap = cap if isinstance(cap, str) else ""
     out = []
     for p in sent_files(tool_input, FIG_EXT):
-        if is_deck(p) or is_draft(p):
+        if is_deck(p) or is_draft(p) or is_document(p):
             continue
         if axes_missing(cap):
             out.append("%s: its caption must say what the x and y axes are (e.g. \"x axis: ..., y axis: ...\" or "
