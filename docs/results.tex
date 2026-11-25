@@ -18888,6 +18888,44 @@ settings; triangles our latest setup at the latest pretraining's HPs, read befor
 Seed 42, first $10^4$ test events per process.}\label{fig:llmcmp_heldout}
 \end{figure}
 
+\paragraph{Part (c): our latest setup in the same conditions (2026-11-25, D523).}\label{par:llmcmp_c}
+The question: on the same data, steps and test as part (a), does our latest setup (the emission-scale target, its
+inputs, MuonAdamW, the WSD schedule) after its own 8-trial search do better than part (a)'s searched LLoCa? Its best
+trial (lr $1.60\times10^{-3}$, FA-ccin2p3-29ce8950, all 60840 steps) is read like part (a), and its score reproduces the
+run's own test stage. It reaches \textbf{0.053} on the trained processes (part (a) 0.117, the LLM 0.321) and 0.068 on
+the 96 relabels (0.241, the LLM 0.341), below the LLM on every one of them, with a median per-process MSE of
+$7.1\times10^{-4}$ against the LLM's 0.079. On the 43 new processes it is 2.116 (part (a) 1.767, the LLM 1.193), with
+a median per-process MSE of 0.979 (1.144, the LLM 0.649) and 26 of them below the LLM. So the latest setup buys a
+factor $4.8$ in MSE on the trained processes and $12.6$ on the relabels, well past the seed margin of 1.38, and none
+on the new ones, where its MSE is $1.43$ times part (a)'s. The pooled number on the new set is carried by
+$gg\to t\bar bW^-$ and $gg\to b\bar tW^+$ (MSE near 30 against the LLM's 2.4) and the multi-Higgs processes with a $b$
+(fig.~\ref{fig:llmcmp_c_heldout}).
+% src: python3 analysis/llm_compare/control_score.py --tag a_trial5 c_control c_best --out c_best_vs_a5 @ae5427d12
+% claim: pooled_rmse_logm2.c_best.seen=0.053
+% claim: pooled_rmse_logm2.c_best.relabels=0.068
+% claim: pooled_rmse_logm2.c_best.new=2.116
+% claim: pooled_rmse_logm2.a_trial5.new=1.767
+% claim: median_mse_logm2.relabels.c_best=7.1e-4
+% claim: median_mse_logm2.new.c_best=0.979
+% claim: ours_below_llm.c_best.relabels=96
+% claim: ours_below_llm.c_best.new=26
+% claim: pooled_rmse_logm2.a_trial5.seen=0.117
+% claim: pooled_rmse_logm2.a_trial5.relabels=0.241
+% claim: pooled_rmse_logm2.llm.seen=0.321
+% claim: pooled_rmse_logm2.llm.relabels=0.341
+% claim: pooled_rmse_logm2.llm.new=1.193
+% claim: median_mse_logm2.relabels.llm=0.079
+% claim: median_mse_logm2.new.a_trial5=1.144
+% claim: median_mse_logm2.new.llm=0.649
+% allow: 8 60840 1.60\times10^{-3} 43 96 30 2.4 10^{-3} 2 because they are the search's trial count, the run's steps and lr, the set counts and the order of the gg->tbW MSEs quoted from the figure, the figure's former lower limit and the exponent of the squared amplitude
+% allow: 4.8 12.6 1.43 1.38 because they are the squared ratios of the quoted RMSEs (0.117/0.053, 0.241/0.068, 2.116/1.767) and the design's seed margin
+\begin{figure}[htbp]\centering
+\includegraphics{../analysis/llm_compare/figs/c_best_heldout_per_process.pdf}
+\caption{MSE of $\log|\mathcal M|^2$ per held-out process in Suprio's held-out layout, as fig.~\ref{fig:llmcmp_heldout}
+with part (c)'s searched best trial added (triangles); y range extended below $10^{-3}$ so no point is clipped.}
+\label{fig:llmcmp_c_heldout}
+\end{figure}
+
 \section{CC-IN2P3 upkeep as CPU jobs, off the login node}\label{sec:cc_login_jobs}
 CC-IN2P3's user support asked on 2026-11-24 that no non-interactive script run on its login nodes (D544). The
 supervisor's three upkeep commands there (the disk watch, the queue feeder, the prune) now run as one-CPU jobs on the
