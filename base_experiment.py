@@ -1011,6 +1011,9 @@ class BaseExperiment:
                 raise RuntimeError("find_BS and LLOCA_PROFILE_STEP together: the measurement would be timed as data")
             self._noise_log, self._noise_iter = [], None
             self._noise_brute_at = set(int(x) for x in (self.cfg.BS_finding.get("brute_at", None) or []))
+            if self.cfg.BS_finding.get("update", False):
+                assert int(self.cfg.BS_finding.update_every) % int(self.cfg.BS_finding.every) == 0, \
+                    "BS_finding.update_every must be a multiple of BS_finding.every"
 
         # Log-spaced checkpoints at which to run _evals (save preds / intrinsic dim)
         oom          = math.floor(np.log10(self.cfg.training.iterations))
@@ -1767,20 +1770,15 @@ class BaseExperiment:
         bs = self.cfg.BS_finding
         upd = [] if bs.get("update", False) and step % int(bs.get("update_every", 50)) == 0 else None
         sets = self._noise_sets()
-        base = []
-
-        def tap(losses):   # each chunk's loss value at the current weights (the step's own events)
-            for loss in losses:
-                base.append(float(loss.detach()))
-                yield loss
-        kk, terms = self._noise_grads(tap(self._noise_chunk_losses(data, k)), sets, per_param=upd)
+        kk, terms = self._noise_grads(self._noise_chunk_losses(data, k), sets, per_param=upd)
         rec = {"kind": "chunk", "step": int(step), "b_small": n / kk, "b_big": float(n), "k": kk,
                **{f"{s}_{t}": v for s, (g2s, g2b) in terms.items() for t, v in (("g2_small", g2s), ("g2_big", g2b))}}
         if upd is not None:
-            def chunk_losses():
+            def chunk_losses():   # each chunk's loss without the regularisation term, one forward path for both reads
                 with torch.no_grad():
-                    return [float(x.detach()) for x in self._noise_chunk_losses(data, k)]
-            rec.update(self._noise_update(upd, sets, n / kk, dl=(base, chunk_losses)))
+                    reg = float(self._reg_term(self.model))
+                    return [float(x.detach()) - reg for x in self._noise_chunk_losses(data, k)]
+            rec.update(self._noise_update(upd, sets, n / kk, dl=(chunk_losses(), chunk_losses)))
         if step % 100 == 0:
             S = sum(noise_scale_terms(rec[f"{s}_g2_small"], rec[f"{s}_g2_big"], n / kk, n)[0] for s in terms)
             G2 = sum(noise_scale_terms(rec[f"{s}_g2_small"], rec[f"{s}_g2_big"], n / kk, n)[1] for s in terms)
@@ -1795,21 +1793,33 @@ class BaseExperiment:
         moment (its first step)."""
         from optim.muon import newton_schulz, muon_scale
         opt = self.optimizer
+        tr = self.cfg.training
+        if tr.get("clip_grad_value", None) is not None or any(getattr(m, "sign_branch", False)
+                                                              for m in self.model.modules()):
+            raise NotImplementedError("BS_finding.update: value clipping and the sign branch's split clip are not mirrored")
+        # the training step's clip (_clip_grad_norm without sign branch: clip_grad_norm_ over all parameters)
+        mx = tr.get("clip_grad_norm", None)
+        if mx is not None:
+            norm = float(torch.stack([g.double().square().sum() for g in grads]).sum().sqrt())
+            c = min(1.0, float(mx) / (norm + 1e-6))
+            grads = [g * c for g in grads]
         inner = getattr(opt, "_adamw", None)
+        mult = {True: getattr(opt, "muon_lr_mult", 1.0), False: getattr(opt, "adamw_lr_mult", 1.0)}
         group = {id(p): g for g in opt.param_groups for p in g["params"]}
         out = []
         for p, g in zip((p for ps in sets.values() for p in ps), grads):
             pg = group[id(p)]
-            if pg.get("use_muon", False):
+            lr = pg["lr"] * mult[bool(pg.get("use_muon", False))]
+            if pg.get("use_muon", False):    # weight decay left out: the update of the gradient only
                 o = newton_schulz(g.reshape(p.shape[0], -1), pg["ns_steps"]).reshape(p.shape)
-                out.append(o.double() * (pg["lr"] * muon_scale(p, pg["rms"], opt._mup)))
+                out.append(o.double() * (lr * muon_scale(p, pg["rms"], opt._mup)))
                 continue
             st = (inner.state if inner is not None else opt.state).get(p, {})
             if "exp_avg_sq" not in st:
                 return None
             t = float(st["step"])
             vhat = st["exp_avg_sq"].double() / (1.0 - pg["betas"][1] ** t)
-            out.append(g.double() / (vhat.sqrt() + pg["eps"]) * pg["lr"])
+            out.append(g.double() / (vhat.sqrt() + pg["eps"]) * lr)
         return out
 
     def _noise_update(self, per_loss, sets, b, jack=False, dl=None):

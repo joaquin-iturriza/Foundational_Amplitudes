@@ -149,7 +149,8 @@ def test_update_map_is_the_optimizer_step():
     bvec = torch.nn.Parameter(torch.randn(4, dtype=torch.float64))
     opt = MuonAdamW([W, bvec], lr=0.01, momentum=0.0, nesterov=False, muon_weight_decay=0.0, mup=False,
                     muon_filter=lambda p: p.ndim == 2)
-    exp = SimpleNamespace(optimizer=opt)
+    exp = SimpleNamespace(optimizer=opt, model=torch.nn.Module(),
+                          cfg=OmegaConf.create({"training": {"clip_grad_norm": None, "clip_grad_value": None}}))
     sets = {"muon": [W], "adamw": [bvec]}
     loss = lambda: (W.sum(1).square().sum() + (bvec * torch.arange(4.0, dtype=torch.float64)).square().sum())
     opt.zero_grad(); loss().backward(); opt.step()                 # one step: AdamW gets its second moment
@@ -167,6 +168,33 @@ def test_update_map_is_the_optimizer_step():
     t_before = float(st["step"]) - 1
     vhat0 = (v_after - 0.001 * g[1].square()) / 0.999 / (1 - 0.999 ** t_before)
     assert torch.allclose(u[1], g[1] / (vhat0.sqrt() + 1e-8) * 0.01)
+
+
+def test_update_map_clips_as_the_step():
+    # the clip binds (|g| >> max norm): the map equals clip_grad_norm_ then a real MuonAdamW step, on both sets
+    from optim.muon import MuonAdamW
+    torch.manual_seed(6)
+    W = torch.nn.Parameter(torch.randn(6, 4, dtype=torch.float64))
+    bvec = torch.nn.Parameter(torch.randn(4, dtype=torch.float64))
+    opt = MuonAdamW([W, bvec], lr=0.01, momentum=0.0, nesterov=False, muon_weight_decay=0.0, weight_decay=0.0,
+                    mup=False, muon_filter=lambda p: p.ndim == 2)
+    exp = SimpleNamespace(optimizer=opt, model=torch.nn.Module(),
+                          cfg=OmegaConf.create({"training": {"clip_grad_norm": 0.5, "clip_grad_value": None}}))
+    sets = {"muon": [W], "adamw": [bvec]}
+    loss = lambda: 30 * (W.sum(1).square().sum() + (bvec * torch.arange(1.0, 5.0, dtype=torch.float64)).square().sum())
+    for _ in range(3):                                            # a few clipped steps: AdamW's moments from clipped gradients
+        opt.zero_grad(); loss().backward(); torch.nn.utils.clip_grad_norm_([W, bvec], 0.5); opt.step()
+    opt.zero_grad(); loss().backward()
+    g = [W.grad.clone(), bvec.grad.clone()]
+    assert float(torch.cat([x.reshape(-1) for x in g]).norm()) > 10 * 0.5
+    st = opt._adamw.state[bvec]
+    v_before, t_before = st["exp_avg_sq"].clone(), float(st["step"])
+    u = BaseExperiment._update_map(exp, g, sets)
+    W0, b0 = W.detach().clone(), bvec.detach().clone()
+    torch.nn.utils.clip_grad_norm_([W, bvec], 0.5); gc = bvec.grad.clone(); opt.step()
+    assert torch.allclose(W0 - W.detach(), u[0], rtol=1e-4, atol=1e-7)
+    vhat = v_before.double() / (1 - 0.999 ** t_before)
+    assert torch.allclose(u[1], gc / (vhat.sqrt() + 1e-8) * 0.01)
 
 
 def test_update_terms_known_answer():
