@@ -45734,6 +45734,13 @@ entries:
       50 as the passed design; the 200-vs-400-step window pooling is decided from the full run''s own read-to-read spread
       of the ratio (an analysis step, no rerun; 400-step windows still separate the crossings 765/1700/2720). Rule fixed before
       the data: a window whose mean dL at any b is <= 0 is not fitted and is listed apart (as the |G|^2<=0 windows of sec:noisescale).'
+  - at: '2026-11-25T13:26:59+00:00'
+    text: '2026-11-25 Z+4g part-B smoke FA-ccin2p3-0ac97e10 (job_cbs_update_zng.sh smoke, d2d9efc9b, V100): every stage ran
+      (50 steps, noise_scale.json, sigma stage, CBS_UPD_ZNG_DONE), 1337 s: training 0.16 s/step, ~60 s per 10-step block of
+      reads (32-chunk noise read + dL read over 62 grouped updates), and ~1080 s in the 250-step sigma stage, which re-ran
+      the noise reads (find_BS copied into the stage''s config). Fixed: run.py sigma_stage_cfg sets find_BS false (7677e3d67;
+      tests/test_start_only_keys.py, test_grow_width.py 9/9 and a direct check). Full-run target corrected from 0.3 h (a training-step
+      estimate that left out the reads) to 1.0 h, limit 1:45.'
   handoff:
     state: 'D560 step (next 2). Part A done and written up: par:cbs_regimes + fig:cbs_regimes in docs/results.tex (adf0da30a),
       reader analysis/critical_batch/ft_bcrit.py @2a98dcca3 (data/ft_bcrit.json, figs/ft_regimes.png; check_caption OK, caption
