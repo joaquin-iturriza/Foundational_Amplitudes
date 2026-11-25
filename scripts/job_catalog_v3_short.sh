@@ -429,12 +429,18 @@ case "$ARM" in
     # it (find_BS: every 10 steps, the batch's 8 chunk gradients of 2048 events; base_experiment._noise_measure) and its
     # check against 16 independent batch gradients at 5 steps (_noise_brute); records in <run>/noise_scale.json
     v4_het_noise_scale|v4_het_update_noise)
-                            CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}" ++training.scheduler=WSD ++training.wsd_cooldown_frac=0.125
+                            # D560: the update arm runs at the scan's batch-16384 best (runs/cbs_b16384/trial_1333/config.yaml,
+                            # every HP that differs from the control, validation spacing included), so B_dL and B_crit share it
+                            HPS=("${MUON_BEST[@]}"); [ "$ARM" = v4_het_update_noise ] && HPS=(training.optimizer=MuonAdamW
+                                ++training.lr=0.008246561 ++training.muon_weight_decay=0.01451547 ++training.regularization_lambda=8.398127e-07
+                                ++training.cosanneal_warmup_frac=0.089705 ++training.cosanneal_eta_min=1.127397e-08 ++ema=true
+                                ++training.ema_decay=0.968325 ++training.validate_every_n_steps=85 ++training.validate_frac=0)
+                            CAT=v4; NORM=("${DIM[@]}" "${HPS[@]}" ++training.scheduler=WSD ++training.wsd_cooldown_frac=0.125
                                           ++training.heterosc_sigma_stage_steps=0 ++find_BS=true ++BS_finding.every=10
                                           ++BS_finding.chunks=8 ++BS_finding.brute_batches=16
-                                          "++BS_finding.brute_at=[$([ "$MODE" = smoke ] && echo 20 || { [ "$ARM" = v4_het_update_noise ] && echo 50,1000,1950,2950 || echo 50,500,1500,3000,4100; })]")
+                                          "++BS_finding.brute_at=[$([ "$MODE" = smoke ] && echo 20 || { [ "$ARM" = v4_het_update_noise ] && echo 50,700,1690,2700 || echo 50,500,1500,3000,4100; })]")
                             # critical_batch D560: also the update-direction terms and the step's loss decrease, brute
-                            # checks at the control's target crossings, stopped at the last target (-2.30)
+                            # checks at hp 1333's target crossings (765/1700/2720), stopped at the last target (-2.30)
                             [ "$ARM" = v4_het_update_noise ] && NORM+=(++BS_finding.update=true ++training.stop_at_val_loss=-2.30
                                           "++BS_finding.update_every=$([ "$MODE" = smoke ] && echo 10 || echo 50)")
                             COMMON=(training.loss=HETEROSC ++training.loss_aggregation=mean ++training.sign_head=false
