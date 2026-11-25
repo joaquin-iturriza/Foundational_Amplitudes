@@ -45417,7 +45417,7 @@ entries:
     blocks_steps: &id003 []
   owner:
     agent: a894e56980ab75e51
-    state: working
+    state: closed
     since: '2026-11-25T14:00:43+00:00'
     state_at: '2026-11-25T15:01:38.180000+00:00'
     context: 233126
@@ -46600,47 +46600,30 @@ entries:
       adds variance only); fixed by _noise_dl_losses (fork_rng, seed=step), merged 4237a0be1 with update_scales (default [1.0],
       unused).'
   handoff:
-    state: 'Steps 2-4 in flight or stopped. Step 2 (D560 part B, pretraining): FA-ccin2p3-3e856594 runs v4_het_update_noise
-      at the scan''s batch-16384 best hp 1333 (design passed 12:38 by a4f3d7192edf30268; code merged 5109b8182; smoke FA-ccin2p3-b587c065
-      clean; reads every 50, 200- vs 400-step window pooling decided from the run''s own spread; windows with mean dL<=0 at
-      any b listed apart). Read B_dL at the run''s crossings of -1.66/-2.08/-2.30 against B_crit 2500/4420/6690 (outcome:
-      within 2x YES, beyond 3x at two targets NO). Step 3 (part B, Z+4g Adam hp1152): FA-ccin2p3-cedaa6dd (target 1.0 h, limit
-      1:45; smoke FA-ccin2p3-0ac97e10 clean; run.py 7677e3d67 turned off the noise reads in the sigma stage, which had cost
-      ~1080 s of the smoke''s 1337) -> B_dL over the stable phase against 87-261. Step 4 (D563, the six Z+4g 1e4-event searches
-      at 50 epochs: Muon/Adam scratch and Fn at batch 2048 and 128, trial counts 19/19/16 and 19/16/16, design passed at 13:25):
-      STOPPED on repo-review FIX (via the llm_compare owner; reviewer id in that owner''s report): (1) the lr windows in sweep/sweep_config_*_ep50*.yaml
-      (7e742b868) come from the t-only lr_c(t) factor (x0.353 at 2048, x3.14 at 128), against HPO rule 2: evaluate the measured
-      lr*(t,D) surface (analysis/hpo_optima, make_fig_2d.py, hpo_optima.json) at (t=244 or 3906, D=1e4) and sweep +-1/2 decade;
-      for the Muon arms (Muon scratch, Fn) fa-canonical-setup says a Muon sweep centres on its own search, so the surface
-      supplies only the t-dependence at D=1e4 applied to each 400-epoch search''s best lr (Fn bests: 3.11e-3 at 2048, at the
-      window''s low edge; 7.26e-3 at 128, 0.89 of the window; D507 bests: read from d507_search_v2.json hp indices through
-      the sweeps'' candidate sets, lxplus or CC run configs); check before re-recording. Driver killed; its wave 1 (18 trials)
-      cancelled on CC; remove sweeps_local/*_ep50* (DyHPO states built on the old windows) before relaunching with tools/detach.py
-      --entry critical_batch --name zng_ep50_searches -- .venv-driver/bin/python sweep/drive.py <6 --config> --item critical_batch
-      --sites ccin2p3 lxplus. (2) fixed 0d93d3dc9. (3) open: analysis/critical_batch/ft_bcrit.py:31 applies STABLE=7/8 (the
-      WSD cooldown cut) to the ReduceLROnPlateau Adam cells, which have no cooldown; fix (Adam cells read over the whole run,
-      or their own stop), rerun, check the par:cbs_regimes numbers (~l.9223-9235 of docs/results.tex: Adam two-batch B_crit
-      87-261, train/val) and answer the same repo reviewer with the fix commits. Next 1 (close of the D532 part) unchanged.
-      Coordinator note: do not stash others'' changes around site sync any more (a worker is changing site sync to proceed
-      with a note).'
-    decisions: 'Joaquin''s: D532, D536, D560, D563. Mine, to re-justify: pretraining arm at hp 1333 (so B_dL and B_crit share
-      the setting); brute reads at 50,700,1690,2700 (2700 before the -2.30 stop at 2720); dL read every 50 kept after the
-      smoke could not measure the stable scatter (its 3 reads in the first 40 steps were set by a b-independent overshoot);
-      windows with mean dL<=0 not fitted; D563 trial counts = the replaced searches'' collected trials (19/19/19/16, 16/16);
-      Adam''s plateau protocol kept in validations (validate every 1 at 2048, every 20 at 128; patience 10, early stop 20
-      validations); 1.22 threshold = largest best-to-third gap of the D507 searches; an edge best reported as a bound, a wider
-      search asked, not run; sigma stage keeps its canonical 250 steps (mu selection unaffected); Jean Zay left out of D563
-      (down; Fn parent verified only on CC and lxplus).'
-    ruled_out: 'the t-only lr_c(t) factor for the ep50 lr windows (repo-review FIX 1, HPO rule 2); extending an edge lr window
-      with extra trials (design FIX: changes trial counts, Joaquin''s call); the smoke''s dL reads as the scatter estimate
-      (early overshoot); plus the previous owner''s: A(b) alone, D507 CC result dirs as curve source, memorisation rule by
-      D/B'
-    running: FA-ccin2p3-3e856594 (step 2, pretraining v4_het_update_noise, limit 2:45), FA-ccin2p3-cedaa6dd (step 3, Z+4g
-      update reads, limit 1:45); D563 driver stopped, wave 1 cancelled
-    files: scripts/job_catalog_v3_short.sh (v4_het_update_noise), scripts/job_cbs_update_zng.sh, run.py sigma_stage_cfg (find_BS
-      off), base_experiment.py _noise_update/_update_map, tests/test_noise_scale.py, sweep/sweep_config_*_ep50*.yaml, analysis/critical_batch/ft_bcrit.py,
-      analysis/critical_batch/data/{ft_bcrit,cbs_state,cbs_readout}.json, docs/results.tex par:cbs_regimes, ~/.local/share/ccorch/detached/20261125-142737_zng_ep50_searches.log
-    written: '2026-11-25T13:49:00+00:00'
+    state: 'D560 part B settled NO on existing data (finding 16:40, dead end of the step-size rerun after design FIX by a4f3d7192edf30268):
+      B_simple 55.5, first-order B_A 28-111 (Z+4g 6-51), optimal-step B_q 48-137 (one window 1082; Z+4g 3-196) against B_crit
+      2500-6690 (Z+4g 87-261); the momentum-0 step overshoots (dL<0 at every b). Reader analysis/critical_batch/dl_read.py
+      (40f9a2997, tests/test_dl_read.py), data/{pretrain,zng4g}_update_bdl.json, raw reads data/{pretrain,zng4g}_update_noise_scale.json,
+      figs/{pretrain,zng4g}_update_bdl.png (captions in the 16:05 hand-back; B_q not drawn yet). Step 2 = write par:cbs_update
+      + report to Joaquin. Step 4 (D563): driver zng_ep50_searches running (pid 1376403, log ~/.local/share/ccorch/detached/20261125-150854_zng_ep50_searches.log;
+      42 of 105 trials collected by 16:45, all on CC; windows 9e28b161d by HPO rule 2, design passed); when it ends extend
+      ft_bcrit.py to read sweeps_local/*_ep50*/results (per-cell bests, r50 vs r400, E50 vs E400, lr-edge flags, figure).
+      Step 1: close after 2 and 4. Repo backlog clear at 989f440df; noise-update code merged 4237a0be1 (update_scales, _noise_dl_losses
+      RNG fix).'
+    decisions: 'Joaquin''s: D532, D536, D560, D563. Mine, to re-justify: D563 lr windows (Adam on lr*(t,1e4) surface, Muon/Fn
+      on own best x surface t-factor 0.5855/3.170); ft_bcrit reads Adam (plateau) cells over the whole run; 100x-median exploding-read
+      rule; B_q from Q = A - dL(1) (quadratic model) taken as the part-B read instead of a rerun (design FIX option a); update_scales
+      kept in code as a no-op default; noise_scale.json files copied into analysis/critical_batch/data because site fetch
+      timed out on CC; plus the previous owner''s list (hp 1333 arm, brute reads, 1.22 threshold, edge best as a bound, Jean
+      Zay left out of D563).'
+    ruled_out: 'the t-only lr_c(t) window factor; rerunning the update runs at reduced step sizes (dead end: existing reads
+      settle it); the smoke''s dL as scatter; extending an edge lr window with extra trials; A(b) alone; D507 CC result dirs
+      as curve source'
+    running: D563 driver zng_ep50_searches (sweep/drive.py, 6 searches, 105 trials, CC)
+    files: analysis/critical_batch/dl_read.py, analysis/critical_batch/ft_bcrit.py, analysis/critical_batch/data/{pretrain,zng4g}_update_{bdl,noise_scale}.json,
+      sweep/sweep_config_*_ep50*.yaml, sweeps_local/*_ep50*, base_experiment.py _noise_update/_noise_dl_losses, scripts/job_cbs_update_zng.sh,
+      scripts/job_catalog_v3_short.sh (v4_het_update_*), docs/results.tex par:cbs_regimes/par:cbs_scan
+    written: '2026-11-25T15:10:48+00:00'
   ask: 'Scope: the canonical batch. The batch-size scan finds 8192 about 10% faster in wall clock to validation loss -2.08
     on V100 than our canonical 16384 (0.43 h against 0.48 h, best trial each). Keep 16384, or change the canonical batch to
     8192?'
