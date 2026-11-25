@@ -45466,6 +45466,24 @@ entries:
       covers: not used by any run in the last days and not needed by a running or planned entry); 14 days: the census window
       of the 2026-11-24 inventory under D147''s ''the last days''; CLAUDE.md, Joaquin''s words, ''A memmap cache (amp_mmap_cache)
       on a site is deleted only when no running job and no recipe of an open plan entry reads it'''
+    fix_at: '2026-11-25T01:35:49+00:00'
+    fix: 'Readout (measure shown written by the job, check 15): the design''s ''keep GiB per reason'' line cannot come out
+      readable. scripts/job_ccdisk_d556.sh groups CENSUS_KEEP_BY_REASON on cache_census.py''s full reason column ($9), and
+      that string differs per entry: a recent keep carries its own touch time (''touched 2026-11-20 13:05, within 14 days'',
+      cache_census.py line 138), and an in-use keep carries the whole --in-use list joined (''train pool of an in-use recipe
+      ('' + '',''.join(a.in_use) + '')'', line 140), which is now 563 recipe names, about 14 KB per row. So the per-reason
+      sums split into one line per touch time, head -10 cuts them, and census_d556.tsv grows by about 14 KB per kept row (up
+      to about 0.25 GB over the 18,498 files of the last census) on a disk with 19.7 GiB free. Fix: make the in-use reason
+      short (the matching recipes are already in the recipe column; e.g. ''train pool of an in-use recipe''), and aggregate
+      the keep lines on the reason class (strip the timestamp and the bracket, e.g. sub(/ [0-9].*| \(.*/,"",r)), then re-record
+      the design. Everything else holds: Joaquin''s yes to ''Delete the 15.1 GiB?'' names exactly zz_catft, zz_catft_lowloss2,
+      zz_catft_lowloss3; the find takes only *.pt/*.pt.gz/*.ckpt/*.pth; only collect_catft_curves.py and ema_start_audit.py
+      read zz_catft*, and only *_result.json; no catft job runs on CC; the D550 precedent shows df matching the manifest within
+      1.4%. The plan-word matching, rerun locally on today''s plan/plan.yaml (46 entries, 35 not done): 563 of 632 recipes
+      named, every dead-end example (pp13v4_uc_cggu, pretrain25_zs, catalog_v3_twin_train, catalog_loop_probes, ref_solo_ee_uu,
+      vob_ee_uu_nlo) in use, stripping trailing punctuation adds none, and the only stems found as substrings but not as words
+      are job-script names (job_collision_ab.sh, job_needle_probe.sh, gen_scan_bigrun.py, pretrain25_zs_pid) named in a code-maintenance
+      note. The fake-tree check of the design is not a committed test; worth committing with the fix.'
   findings:
   - at: '2026-11-24T14:32:44+00:00'
     text: '2026-11-24 login-node reads: /sps/lpnhe 512 GiB group space at 98% (498 GiB used, 15 GiB free), .disk_full flag
