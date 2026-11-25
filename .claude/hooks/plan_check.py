@@ -440,7 +440,7 @@ def result_table(inp):
 
 
 _SITES = {"lxplus": r"lxplus", "ccin2p3": r"ccin2p3|cc-in2p3|\bCC\b", "jeanzay": r"jean\s*zay|jeanzay"}
-_DOWN = r"(?<!reported )(?<!called )(?<!said )(?<!declared )\b(?:down|unreachable|2FA|reconnect\w*|not answering)\b"
+_DOWN = r"(?:(?:is|was|are|'s|seems|looks|still|currently)\s+)+(?:down|unreachable|not answering|needs 2FA)|needs 2FA"
 
 
 def site_down(inp):
@@ -453,7 +453,7 @@ def site_down(inp):
     ran = lambda k: any(re.search(r"\bsite\s+run\s+(?:%s)\s+FA\s+--\s+hostname" % _SITES[k].replace(r"\bCC\b", "cc"), c, re.I)
                         for c in cmds)
     bad = [k for k, pat in _SITES.items()
-           if re.search(r"(?:%s)\W[^.\n]{0,60}?%s|%s\W[^.\n]{0,60}?(?:%s)" % (pat, _DOWN, _DOWN, pat), last or "", re.I)
+           if re.search(r"(?:%s)\s*(?:%s)\b" % (pat, _DOWN), last or "", re.I)
            and not ran(k)]
     return ["a site is called down only after a retry in this turn: site run <site> FA -- hostname, or site list twice "
             "(~/work/CLAUDE.md, Verify before claiming); said of: " + ", ".join(bad)] if bad else []

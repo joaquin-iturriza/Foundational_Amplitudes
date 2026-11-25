@@ -70,6 +70,10 @@ def test_site_called_down_needs_a_retry():
     assert not say([("Bash", {"command": "site list"}), ("Bash", {"command": "site list"})], "Joaquin, lxplus is down.")
     assert not say([], "Joaquin, lxplus is up; jobs finished.")
     assert say([], "Joaquin, lxplus is down.")
+    assert not say([], "The site picker marked CC down after one slow reply and sent the job to lxplus, where our jobs never start. A worker is making it retry once before calling a site down")
+    assert not say([], "a site is reported down only after a retry")
+    assert say([], "Jean Zay is still down since 11-20")
+    assert say([], "CC was unreachable")
     assert not say([], "lxplus should only be reported down after a real ssh retry")
 
 
