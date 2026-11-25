@@ -43633,11 +43633,12 @@ entries:
   match: zz_labllm_*
   evidence:
     runs: []
-    commit: 7a8d16eb8
+    commit: ad9405eab
     paths:
     - analysis/lab_llm_trial/runs.jsonl
     - analysis/lab_llm_trial/summary.json
     - analysis/lab_llm_trial/token_share.json
+    - docs/results.tex
     - plan/mechanical_prompt.txt
     - tests/test_lab_route.py
     - tools/lab_llm_report.py
