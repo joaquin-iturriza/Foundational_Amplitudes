@@ -8,7 +8,8 @@ from b events (base_experiment._noise_update). Per window of `window` steps the 
 fitted with McCandlish et al.'s per-step form dL(b) = dL_inf / (1 + B_dL / b), as the line 1/dL = 1/dL_inf + (B_dL /
 dL_inf) / b (least squares over the b's). A window whose mean dL is <= 0 at any b is not fitted and is listed apart
 (rule fixed in the design before the data). A fit with 1/dL_inf <= 0 (dL still growing linearly at the largest b) is
-listed as above the range. B_dL's standard error is a jackknife over the window's reads. The read-to-read spread of
+listed as above the range. The first-order part A(b) = <G_hat, u(g_b)> is fitted the same way (B_A), over the
+windows without an exploding read (|dL| or |A| above 100x the window's median read). B_dL's standard error is a jackknife over the window's reads. The read-to-read spread of
 dL(b_max)/dL(b_min) gives the standard error of each window's ratio (the 200- against 400-step pooling choice).
 --ref lo hi: the critical batches it is compared with; the band is [lo/2, 2 hi] (the design's factor 2).
 Writes analysis/critical_batch/data/<name>.json and figs/<name>.png/.pdf."""
@@ -43,6 +44,12 @@ def window(rs, bs):
     out = {"step_lo": rs[0]["step"], "step_hi": rs[-1]["step"], "n_reads": len(rs),
            "dL": {str(b): float(v) for b, v in zip(bs, m)},
            "A": {str(b): float(np.mean([sum(v for k, v in r.items() if k.endswith(f"_A_b{b}")) for r in rs])) for b in bs}}
+    fa = fit([out["A"][str(b)] for b in bs], bs)
+    if fa is not None:
+        out["B_A"], out["A_inf"] = float(fa[0]), float(fa[1])
+    # a read whose |dL| or |A| at some b exceeds 100x the window's median read (an exploding step) is flagged
+    mags = np.abs(D).max(1)
+    out["n_exploding_reads"] = int((mags > 100 * np.median(mags)).sum())
     if f is None:
         return {**out, "status": "dL<=0"}
     out.update(status="above range" if np.isinf(f[0]) else "fitted", B_dL=float(f[0]), dL_inf=float(f[1]))
@@ -68,6 +75,7 @@ def read(recs, win, ref, start=0):
             ws.append(window(w, bs))
         lo += win
     band = [ref[0] / 2, ref[1] * 2]
+    BA = [w["B_A"] for w in ws if np.isfinite(w.get("B_A", np.nan)) and w["n_exploding_reads"] == 0]
     fitted = [w["B_dL"] for w in ws if w["status"] == "fitted"]
     return {"b": bs, "window": win, "ref": ref, "band": band, "windows": ws,
             "summary": {"n_windows": len(ws), "n_fitted": len(fitted),
@@ -75,7 +83,10 @@ def read(recs, win, ref, start=0):
                         "n_above_range": sum(w["status"] == "above range" for w in ws),
                         "B_dL_median": float(np.median(fitted)) if fitted else None,
                         "B_dL_q16_q84": [float(np.quantile(fitted, q)) for q in (0.16, 0.84)] if fitted else None,
-                        "n_in_band": sum(band[0] <= x <= band[1] for x in fitted)}}
+                        "n_in_band": sum(band[0] <= x <= band[1] for x in fitted),
+                        "B_A_median": float(np.median(BA)) if BA else None,
+                        "B_A_min_max": [float(min(BA)), float(max(BA))] if BA else None,
+                        "n_windows_with_exploding_read": sum(w["n_exploding_reads"] > 0 for w in ws)}}
 
 
 def figure(res, base):
@@ -122,6 +133,7 @@ def figure(res, base):
         axD.plot([], [], ":", color=ps.C.grey, label=r"fit $\Delta L_\infty/(1+B_{\rm dL}/b)$")
     axD.axhline(0, color="black", label="no change")
     axD.set_xscale("log")
+    axD.set_yscale("symlog", linthresh=10)   # exploding reads (up to 1e10) stay on the frame with the -10..10 bulk
     axD.set_xlabel(r"events per update $b$")
     axD.set_ylabel(r"loss change per step")
     ps.legend(axD, "upper left")
@@ -142,7 +154,7 @@ def main():
     json.dump(res, open(os.path.join(HERE, "data", f"{a.name}.json"), "w"), indent=1)
     print(json.dumps(res["summary"]))
     for w in res["windows"]:
-        print(w["step_lo"], w["step_hi"], w["status"], w.get("B_dL"), w.get("B_dL_se"), w.get("ratio"), w.get("ratio_se"))
+        print(w["step_lo"], w["step_hi"], w["status"], w.get("B_dL"), w.get("B_A"), w["n_exploding_reads"])
     figure(res, os.path.join(HERE, "figs", a.name))
 
 
