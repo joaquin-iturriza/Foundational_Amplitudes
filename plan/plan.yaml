@@ -49267,8 +49267,7 @@ entries:
     start: '2026-11-25T15:32:21+00:00'
     at: '2026-11-25T15:32:21+00:00'
   step_waits:
-    '3': detached srmin_recipe (support_rule.py minima, finale pools from recipes/transfer_finale.yaml; reads ~25 min after
-      22:00)
+    '3': notes-editor and repo-reviewer reviews of da9b0bdd5 / 94ec344b0
   handoff:
     state: 'D561 test done: rescale only below x0=0.009 (below every trained u u~ g and Z+4g momentum) scored eval-only on
       the 6 no-rescale u u~ g runs: YES at both sizes (deepest soft kit bin 4924->1.44 at 1e4, 7580->0.93 at 1e5, -3.53/-3.91
