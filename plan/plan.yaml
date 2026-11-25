@@ -41587,6 +41587,29 @@ entries:
       (docstring 0.01); the hex colours of the two level arms; tools/zero_shot_parent.py:238 calls without names (asserts
       on a level-file parent, not on the scoring path). In the smoke, read ''median |own mean - level|'' beside the sigma
       line (scale check).'
+  - at: '2026-11-25T15:52:03+00:00'
+    text: '2026-11-25 step 15 (D564) reconciliation. (1) Pooled share of the error that is a misplaced level, sum(bias^2)/sum(MSE)
+      of log|M|^2 (error_split.py @65cd9d92e): 43 new: his setup 8 heads 0.854, 16 heads 0.861, our setup control 0.891, searched
+      0.869; without gg->tbW 0.845/0.874/0.889/0.870. 96 relabels: 0.334/0.425/0.122/0.005 (the floor, wrong shape, is the
+      rest: 0.54/0.52/0.75/0.99). The level is the majority on new families, not on relabels. (2) The level networks are the
+      2026-10-22 D83 result re-read, not new: level_source.py''s bias^2/var medians 0.044 (diagrams) and 0.451 (content only)
+      reproduce results.tex par. More data-free normalizations'' 0.045 and 0.45 (in units of sigma_p^2; 0.096 and 0.789 in
+      log|M|^2 squared). (3) Earlier conditioning tests and what they measured: sec:levers (D2 lever arms, D5 diagram encoder
+      arm): one feature toggled, per-dataset standardization, in-distribution and fine-tune val loss at D=1e2-1e4; the per-process
+      offset is removed from the target there, and the principle reads features as neutral when the per-process offset carries
+      the information; diagram encoder -8% at most; big run (sec:bigrun) dropped the diagram encoder (tail for bulk), in-distribution.
+      None of them scored a level on processes without data. D83 shared-target pretraining (hp58 config, diagram embedding
+      on, D45): on the 43 new, level part median 0.11 vs shape 0.23, level share 0.38, best of three targets on new (but blew
+      up at step 8734); s_hat+coupling pretraining: level 2.3, share 0.90, keeps its factor''s wrong multi-H levels; correcting
+      afterwards made it worse. (4) So today''s result does not contradict the earlier ones: they measured the shape (level
+      removed by per-process standardization) or in-distribution loss, where diagrams/content are neutral; the level of a
+      new family is only in play with a shared target on held-out processes, where D83 already saw a diagram-fed network place
+      levels near the regressor (0.11 vs 0.096). His setup (parts a/b) has no diagrams or content scalars (use_diagrams false,
+      coupling/internal-mass scalars off), so its 0.86-1.32 is a content-only placement, about the content-only regressor''s
+      0.79. Our setup (part c, diagrams via llm4lhc, coupling/internal mass/offshell scalars on) is at 0.21/0.31: better than
+      his setup, worse than the regressor and than D83''s shared target. Its target carries the emission-scale factor; by
+      D83''s s_hat+coupling reading a network keeps a factor''s level, so a factor misplaced on new families would hold the
+      bias. That cause is a hypothesis: not tested on existing data.'
   step_waits:
     '8': FA-ccin2p3-8acd3fc1 FA-ccin2p3-39f4ab2e FA-ccin2p3-e5265194 FA-ccin2p3-e1d1fbaf
     '12': FA-ccin2p3-e9dfa8b9
