@@ -41676,6 +41676,23 @@ entries:
       part of gg->ttX and H+tau in his setup. The untuned his-setup control has no split yet (re-read FA-lxplus-b30f10dd).
       (2) level-removed distributions: re-reads with --events-out (llm_score.py @d937b2f1c) FA-lxplus-b532f161/-7c661cac/-e5a942b0/-1401b26e/-b30f10dd,
       figure script shape_dists.py @a2f912060.'
+  - at: '2026-11-25T18:26:11+00:00'
+    text: '2026-11-25 D567 (2) level-removed distributions (tools/llm_score.py --events-out @d937b2f1c re-reads FA-lxplus-b532f161
+      trial 5, -7c661cac 16 heads, -e5a942b0 our control, -1401b26e our searched; same first 5000 test events per process
+      in every arm, checked; shape_dists.py @e8ea0904f, figs/shape_dists.png). Per family, the process whose MSE-bias^2 differs
+      most across arms (worst/best): u d~ > h ta+ vt (8 heads 0.052, 16 heads 0.50, our control 0.012, our searched 0.0030),
+      g g > t t~ h (0.23, 0.17, 5.66, 5.92), g g > s c~ w+ (0.096, 0.16, 0.0070, 0.0064). Figure: on Htau and gg->Wqq'' every
+      arm follows the true distribution once its level is removed (16 heads a little low in the middle of Htau); on gg->ttH
+      both our-setup arms split the events into two groups, about 3 units of log|M|^2 below and above the true peak, while
+      his setup''s prediction has the truth''s single peak. Not diagnosed (the emission-scale target''s per-event factor is
+      a candidate; not checked). The untuned his-setup control (FA-lxplus-cb9273f1) cannot be re-read: its models/ dir on
+      lxplus was emptied 2026-11-24 16:25 (pruned); re-read FA-lxplus-b30f10dd failed FileNotFoundError and the scheduler
+      still reported COMPLETED. Step 12: 32 heads FA-ccin2p3-e9dfa8b9 ended clean, val MSE of z best 4.06e-4 at step 54756
+      (8 heads 4.81e-4, 16 heads 3.74e-4), a spike to 2.1e-2 at ~36500 recovered by ~40000 (figs/b_width_curves.png); score
+      FA-ccin2p3-2c3a581b queued. Step 16 run resubmitted twice (hand-off command lacked --trial-idx; then --hp needs one
+      flag per HP): FA-ccin2p3-89671610. Step 17 tree and network resubmitted on lxplus (CC lacks catalog_daniel train-role
+      pools; both CC jobs failed with 2 pools read): FA-lxplus-294e9e5e, FA-lxplus-49899ef8 running; perevent_level.py now
+      stops on missing pools @851b00282.'
   step_waits:
     '8': FA-ccin2p3-8acd3fc1 FA-ccin2p3-39f4ab2e FA-ccin2p3-e5265194 FA-ccin2p3-e1d1fbaf
     '12': FA-ccin2p3-2c3a581b
