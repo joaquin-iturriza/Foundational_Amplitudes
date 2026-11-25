@@ -15825,6 +15825,12 @@ entries:
     35: 'Refusal cost after the D558 fixes (133a1b102, 2026-11-25): python3 tools/token_share.py --refusals --since 2026-11-26T00:00
       --until 2026-12-03T00:00, per role and check against the 2026-11-09..23 window (13.7% of all tokens upper, 5.0% lower;
       main session 32.1%, owners 6.5%); per day, since the windows differ in length; add the after-window to par:refusal-cost'
+    36: 'D562 audit (Joaquin: ''Yes, other hooks should be audited too.''): every Stop/PreToolUse check that judges the session''s
+      wording (plan_check''s question-open, result_table, site_down, figures_handed_back, reply; send_check caption/legend
+      checks; brief_guard cut check; plan ask reason checks; stop_conditions), each read against its code and its refusals
+      in the transcripts (tools/token_share.py --refusals gives counts, repeats and examples per check; refusal_cost.json
+      lists them): drop those whose rule a tool already enforces, or that misfire more than they catch (case counts from the
+      transcripts, hand-read samples); misfires fixed by a mechanical-worker or disabled with tools/hook_incident.py'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16516,6 +16522,12 @@ entries:
         step'
       - 'a fixed check still misfires or a new misfire enters the top ten: fix it through a mechanical-worker and measure
         again'
+    36:
+      feeds: 'D562: which wording-judging hooks stay'
+      if:
+      - 'a check misfires more than it catches, or a tool already enforces its rule: drop it (hook_incident or removal), report
+        with its counts'
+      - 'a check catches more than it misfires: keep it, fix its misfires with named test cases'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
