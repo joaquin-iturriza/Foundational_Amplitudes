@@ -15834,7 +15834,7 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-046cc7d3
-    commit: dc3b8b1c6
+    commit: 74b362473
     paths:
     - .claude/hooks/context_guard.py
     - .claude/hooks/notification_absorb.py
@@ -15965,6 +15965,7 @@ entries:
     - analysis/agent_redesign/figs/context_breakdown.png
     - analysis/agent_redesign/figs/lookup_trial_v2.png
     - analysis/agent_redesign/figs/recall_trial.png
+    - analysis/agent_redesign/figs/refusal_cost.png
     - 'analysis/agent_redesign/figs/waiter_live_20261112.png: step 24 live measure, 2026-11-12 00:19-12:19 UTC (waiter first
       re-armed on the URGENT_KINDS code 00:18:38). tools/waiter_replay.py over 196 events open >5 s (HANDBACK 87, RUN 70,
       DONE 17, RUN_DONE 11, STALLED 7, ALERT 4): returns none 103, old rule 56, new rule 56 at 600 s; at 1200 s 41/41, 1800
@@ -15977,6 +15978,7 @@ entries:
     - analysis/agent_redesign/model_trial.json
     - analysis/agent_redesign/push_replay.json
     - analysis/agent_redesign/push_replay_hold.json
+    - analysis/agent_redesign/refusal_cost.json
     - analysis/agent_redesign/usage_report.json
     - analysis/agent_redesign/usage_report_v2.json
     - analysis/agent_redesign/usage_windows.json
