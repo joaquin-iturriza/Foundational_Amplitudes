@@ -99,6 +99,48 @@ def main():
         res.setdefault("yes", {})[a] = {"bulk": bulk, "soft": bool(soft) and all(soft), "complete": len(soft) == 2}
     json.dump(res, open(os.path.join(HERE, "data", "stage1.json"), "w"), indent=1)
     print(json.dumps(res))   # one line: verify_claims reads the last {...} line
+    plot(res)
+
+
+def plot(res):
+    """(a)-(b) best val MSE per seed against the arm, Z+4g and u u~ g, both sizes; (c) u u~ g kit deepest bins at both sizes."""
+    sys.path.insert(0, ROOT)
+    import plot_style as ps
+    k539 = json.load(open(os.path.join(FM, "d539u_kit.json")))["cells"]
+    arms = ["off", "rescale"] + SCHEMES
+    lab = {"off": "no rescale", "rescale": r"rescale, all $x$", "softbelow_x0p1": r"rescale below $x=0.1$",
+           "softbelow_x0p3": r"rescale below $x=0.3$", "eventgate_x0p1": r"rescale if $\min x<0.1$"}
+    cols = dict(zip(arms, [ps.C.blue, ps.C.vermillion] + ps.sequence(3)))
+    blown = set(res["blowups"])
+    fig, axs = ps.figure(ncols=2, nrows=2)
+    (za, ua), (kk, cell) = axs
+    for ax, p, nm in ((za, "zng", r"$q\bar q\to Z+4g$"), (ua, "uug", r"$e^+e^-\to u\bar ug$")):
+        for i, d in enumerate(("1e4", "1e5")):
+            c = res["cells"][f"{p}_{d}"]
+            for j, a in enumerate(arms):
+                for m, (sd, x) in enumerate(zip(SEEDS, c.get(a, {}).get("best", []))):
+                    if x is not None:
+                        ax.plot(i + (j - 2) * 0.15 + (m - 1) * 0.03, x, "o", color=cols[a], ms=3,
+                                label=lab[a] if (i, m) == (0, 0) and p == "zng" else None,
+                                mfc="none" if name(p, d, a, sd) in blown else cols[a])
+        ax.set_xlim(-0.5, 1.5); ax.set_xticks([0, 1]); ax.set_xticklabels([r"$10^4$", r"$10^5$"]); ax.set_yscale("log")
+        ax.set_xlabel(r"$D_{\rm train}$"); ax.set_ylabel(r"best MSE$(\log|\mathcal{M}|^2)$"); ps.process_label(ax, nm)
+    fam = {"soft_x": "soft", "coll_y": "coll.", "bulk": "bulk"}
+    groups = [(f, d) for d in ("1e4", "1e5") for f in fam]
+    for j, a in enumerate(arms):
+        for i, (f, d) in enumerate(groups):
+            kv = {"off": k539[d]["off"], "rescale": k539[d]["eps1e-8"]}.get(a, res["cells"][f"uug_{d}"].get(a, {}).get("kit"))
+            if kv:
+                v = [x for x in kv[f] if x is not None]
+                kk.plot(i + (j - 2) * 0.15 + (np.arange(len(v)) - 1) * 0.03, v, "o", color=cols[a], ms=3)
+    kk.set_xticks(range(len(groups))); kk.set_xlim(-0.5, len(groups) - 0.5)
+    kk.set_xticklabels([f"{fam[f]}\n$10^{d[-1]}$" for f, d in groups], fontsize="x-small")
+    kk.set_yscale("log"); kk.set_xlabel(r"deepest kit bin, $D_{\rm train}$"); kk.set_ylabel(r"MSE$(\log_{10}|\mathcal{M}|^2)$")
+    ps.process_label(kk, r"$e^+e^-\to u\bar ug$")
+    if blown:
+        za.plot([], [], "o", color="0.5", mfc="none", label="blew up (read\nat its best)")
+    ps.legend_cell(cell, za)
+    ps.save(fig, os.path.join(HERE, "figs", "stage1"))
 
 
 if __name__ == "__main__":
