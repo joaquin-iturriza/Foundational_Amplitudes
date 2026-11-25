@@ -18028,6 +18028,56 @@ DeepSeek: DeepSeek alone. Every arm passed every task; the open marker is the fi
 \label{fig:labllm2}
 \end{figure}
 
+% src: python3 tools/token_share.py @7ddc8128c
+% claim: total_M=4953
+% claim: usd=2028
+% claim: roles_pct.owner=55.8
+% claim: roles_pct.main=29.3
+% claim: roles_pct.reviewer=5.3
+% claim: reviewer_usd_pct=10.0
+% claim: kinds_pct.owner.plan_and_ledger_bookkeeping=11.4
+% claim: kinds_pct.owner.read_files_and_search=11.3
+% claim: kinds_pct.owner.analyses_and_tests=8.5
+% claim: kinds_pct.owner.jobs_submit_sync_pick=7.2
+% claim: kinds_pct.owner.figures=5.0
+% claim: kinds_pct.owner.write_up_tex=0.8
+% claim: kinds_pct.main.plan_and_ledger_bookkeeping=9.7
+% claim: kinds_pct.main.text_only_reply_reasoning=8.1
+% claim: kinds_pct.main.launch_or_brief_agents=4.7
+% claim: fix_workers=37
+% claim: fix_worker_M=10.9
+% claim: saving_pct.fixes=0.17
+% claim: log_reads=136
+% claim: log_read_phase_M=65
+% claim: saving_pct.logs_reread=-0.09
+% claim: saving_pct.logs_d555=1.23
+% claim: saving_pct.total_d555=1.39
+% allow: 14 because it is the window's length in days
+\paragraph{How much of our token use the routed work is.}\label{par:labllm3} The user asked how many tokens the routed
+work saves. Over the 14 days before the route went live (2026-11-09 to 2026-11-23), our transcripts used 4953 million
+tokens (input, output, cache read and cache write of every API message; \$2028 at list price): 55.8\% by the entry
+owners, 29.3\% by the main session and 5.3\% by reviewers (10.0\% of the cost). Each message carries its agent's whole
+context, so the cost of an activity is the number of steps taken inside that context (Fig.~\ref{fig:labllm3}). Plan and
+ledger bookkeeping is the largest activity for both (11.4\% of all tokens by owners, 9.7\% by the main session),
+followed by the owners' file reads and searches (11.3\%), analyses and tests (8.5\%), job submission (7.2\%) and
+figures (5.0\%); the main session's replies and hand-back summaries take 8.1\% and its agent briefs 4.7\%; writing
+\code{docs/results.tex} takes 0.8\%. The routed work is small beside this. The 37 tool fixes by mechanical-workers
+used 10.9 million tokens; done by DeepSeek with the cheap check (10\% assumed redone by Sonnet) they save 0.17\% of the
+total. No production lookup in the window was a code lookup. The owners read the log of a failed run in 136 event
+turns, 65 million tokens from the log read to their first action that is not a read. Kept as a reread after the checked
+DeepSeek reading, routing those logs costs $-0.09\%$; under the user's rule that the owner reads the log only where the
+checked reading leaves the cause open (D555) it saves up to 1.23\%, the value if every checked reading settles the
+cause. The three routed kinds together save up to 1.39\% of our tokens, which is why the user asked to look for larger
+shares the lab models could take (D551).
+
+% allow: 10^6 14 because they are the axis unit and the window's length in days
+\begin{figure}[htbp]\centering
+\includegraphics{../analysis/lab_llm_trial/figs/token_activity.pdf}
+\caption{Our tokens over 14 days by activity (log scale), each API message counted under the activity of its tool
+calls, for the entry owners and the main session. Text only: messages with no tool call (replies, hand-back summaries,
+reasoning); final report: an owner's hand-back; write-up: edits to \code{docs/results.tex}.}\label{fig:labllm3}
+\end{figure}
+
 \subsection{The orchestrator kit: the general machinery as a standalone repo}\label{sec:orchestrator-kit}
 
 The question (D546) was whether the machinery behind this setup can be pulled apart from what is particular to FA
