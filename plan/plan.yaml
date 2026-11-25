@@ -46074,6 +46074,61 @@ entries:
       2048/128 ratios of 3.34 (Muon), 5.05 (Adam) and 1.84 (Fn), against r400 6.53/1.57/1.98. Check 3: the 1.22 threshold
       is the largest best-to-third-best gap of the D507 searches (0.216). Check 5 terms: 50 epochs, over-train, trained too
       long; decisions D507, D519, D520, D560, D563: no earlier run of these cells at another horizon.'
+  - at: '2026-11-25T15:04:52+00:00'
+    question: 'D560 (''understand what number to trust, and have something that we can use in the future''), repair of the
+      update-based measure after its first read (finding 2026-11-25 16:05): read at step sizes below the overshoot, does the
+      per-step loss decrease of the optimizer''s own update locate the scan''s critical batch on fresh data (pretraining)
+      and the two-batch critical batch on Z+4g, where B_simple (~55) and the update''s first-order part B_A (28-111; Z+4g
+      6-51) do not?'
+    prior: 'Finding 16:05 (dl_read.py f2f846e79, data/{pretrain,zng4g}_update_bdl.json): runs FA-ccin2p3-3e856594 (pretraining,
+      hp 1333, b 2048-8192) and FA-ccin2p3-cedaa6dd (Z+4g Adam hp1152, b 64-1024): dL(b) < 0 in 19 of 20 windows (the one
+      fitted window set by an exploding read), first-order A(b) > 0 and b-flat: B_A 28-111 against B_crit 2500-6690, 6-51
+      against 87-261; second-order part (A-dL)/A = 2.4-5.8 and 5.7-22.5 at the largest b: the full momentum-0 step u = lr
+      g/sqrt(v_hat) (Muon: lr NS(g)) overshoots. par:cbs_scan B_crit 2500/4420/6690 at -1.66/-2.08/-2.30; ft_bcrit Adam two-batch
+      87-261; sec:noisescale B_simple 55.5. Searched docs/results.tex (overshoot, step size, update, noise scale), plan, site
+      decisions (D532, D536, D560): no earlier read at reduced step.'
+    measure: 'Same runs, same reads, plus dL at step sizes s u for s in {0.01, 0.03, 0.1, 0.3, 1} (BS_finding.update_scales,
+      keys dL_s<s>_b<b>; same chunks, weights restored exactly; tests/test_noise_scale.py known answer at s=0.25 within 5%).
+      Per 200-step window and b: Q(b) from the least-squares fit of dL(s) = s A(b) - s^2 Q(b) over s <= 0.3 (A(b) measured),
+      the optimal-step decrease dL_opt(b) = A(b)^2 / (4 Q(b)) (McCandlish et al.''s quadratic model, their B_noise definition
+      at the optimal step), fitted dL_opt(b) = dL_max / (1 + B_dL / b) -> B_dL. Also B_dL from the fixed-scale reads at the
+      s closest to the real step''s current-batch share (Z+4g Adam beta1 0.99: s = 0.01; pretraining MuonAdamW: s = 0.1 for
+      its AdamW beta1 0.9) where dL > 0. Quadratic check: Q from s <= 0.3 against A - dL at s = 1, reported. Windows holding
+      a read with |dL| or |A| above 100x the window''s median read listed apart (rule from the first read); windows with Q
+      <= 0 listed apart. Reads: pretraining B_dL at the windows holding the run''s own crossings of -1.66/-2.08/-2.30 against
+      2500/4420/6690; Z+4g B_dL over the run against [87/2, 261x2]. Reader: analysis/critical_batch/dl_read.py extended, committed
+      before the read.'
+    check: 'Existing reads move with the step size: in both first reads dL(s=1) = A - Q < 0 with A > 0, so dL(s) = sA - s^2
+      Q changes sign at s = A/Q = 0.17-0.42 (pretraining) and 0.04-0.15 (Z+4g): s in {0.01, 0.03, 0.1} sits below the turning
+      point in both, s = 0.3 near it in pretraining, so the grid brackets the optimum A/(2Q) (0.09-0.21 and 0.02-0.08). Known-answer
+      test (12/12 pass, branch cbs_scales 7929ae693): the scaled step''s dL matches s eta |G|^2 - (s eta)^2/2 (sum h G^2 +
+      sum h sigma^2 / b) within 5%.'
+    fixed: 'Everything of the two passed part-B arms (design 2026-11-25 12:38): pretraining arm as FA-ccin2p3-3e856594 (catalog_v4
+      base, DIM inputs, HETEROSC mean, MuonAdamW at the scan''s batch-16384 best hp 1333 HPs, WSD 1/8, batch 16384, clip 5,
+      seed 42, BS_finding every 10, chunks 8, 16 brute batches at 50/700/1690/2700, update every 50, stop at -2.30), new arm
+      name v4_het_update_scales (new run dir) adding only BS_finding.update_scales=[0.01,0.03,0.1,0.3,1.0]; Z+4g as FA-ccin2p3-cedaa6dd
+      (run_fixed_hp on the D507 Adam b2048 config at hp1152, 10^4 events, 1953 steps, float64, seed 42, chunks 32, update
+      every 50) with SCALES=0.01,0.03,0.1,0.3,1.0 (run name cbs_upd_zng_adam_b2048_scales). Code: branch cbs_scales 7929ae693,
+      merged to trunk after repo review. Smokes (D395, the new key through every stage): one each, the scripts'' smoke modes
+      (0.3 h targets). Cost: the reads add 4 x 14 (pretraining) and 4 x 62 (Z+4g) forward passes per update read: targets
+      1.9 h (pretraining, was 1.55 h measured) and 0.8 h (Z+4g, was 0.63 h); with smokes about 3.3 GPU-h, inside D560.'
+    control: 'The first reads of the same runs (FA-ccin2p3-3e856594, FA-ccin2p3-cedaa6dd): same seed and HPs, so their validation
+      curves must match (training unchanged by the reads) and their s = 1 reads must repeat; the measured critical batches
+      B_crit (scan) and the Adam two-batch range (ft_bcrit) as references.'
+    seeds: Seed 42 each, as the runs they repeat; errors from the window jackknife over reads (dl_read).
+    outcome: 'Pretraining decides, as the passed part-B design: YES if B_dL is within a factor 2 of B_crit at each of the
+      three targets (the rule stands: a pilot run with the reads on gives the critical batch); NO if B_dL is below B_crit/3
+      or above 3 B_crit at two or more targets, or no target window gives a B_dL (no in-run measure found B_crit; the scan''s
+      B_crit stays the number and the rule is a short scan); between: reported with its factor. Z+4g secondary: inside [87/2,
+      261x2] extends the rule to repeated-data runs, outside restricts it to fresh data.'
+    sources: 'factor 2 <- a measured spread: the scan''s V100 hours to -2.08 stay within 12% (0.425-0.477) from batch 4096
+      to 16384, a 4x span around B_crit 4420 (par:cbs_scan, data/cbs_readout.json); factor 3 <- a measured spread: 3x outside
+      B_crit reaches batch 2048 or 32768, where the hours to -2.08 rise to 0.736 and 0.693, 1.63-1.73x the best (same source);
+      [87/2, 261x2] <- a measured spread: the Adam two-batch B_crit range over levels in data/ft_bcrit.json, widened by the
+      same factor 2; 100x exploding-read rule <- a measured spread: in the first pretraining read the clean reads stay below
+      10 in |dL| and |A| while the exploding ones reach 1e6-1e11 (data/pretrain_update_bdl.json); scales 0.01-1 <- a measured
+      spread: the turning points A/Q = 0.04-0.42 of the first reads (same data); 5% in the CPU test <- a measured noise: the
+      toy''s Monte Carlo error at 400 repetitions'
   step_why:
     1:
       feeds: the entry's close
