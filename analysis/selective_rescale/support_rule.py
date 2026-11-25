@@ -22,7 +22,7 @@ from analysis.common.readers import site_python  # noqa: E402
 
 LOGS = {"uug": "ftmech_d539_uug_1e5_off_b2048/trial_0020/out_0.log",
         "zng": "selres_zng_1e5_off_b2048/trial_1333/out_0.log",   # pools named in a 1e5 no-rescale run's log, under the site's runs/
-        "finale": "data_saving/dsave_parent_finale_zng_uq_w_lr1p89e-3/out_0.log"}   # the D392 setup's 28-process parent
+        "finale": "recipe:recipes/transfer_finale.yaml"}   # the D392 setup's 28 processes (its parent's log lists no pools)
 
 MINIMA = r'''
 import json, os, re, sys
@@ -31,15 +31,23 @@ sys.path.insert(0, os.getcwd()); import siteconf
 eta = np.array([1., -1., -1., -1.]); out = {}
 for a in sys.argv[1:]:
     lab, log = a.split("#"); r = {}
-    log = os.path.join(siteconf.PROJECT_DIR, "runs", log)
-    for role, path in re.findall(r"\[(train|val|test)\] \S+: \d+ events.*? from (\S+\.npy)", open(log).read()):
+    if log.startswith("recipe:"):   # every process's frozen pools of each role (find_pool, the recipe's sqrts window)
+        import yaml
+        from analysis.common.readers import find_pool
+        pools = [(role, find_pool(p["name"], p.get("sqrts"), role)) for p in yaml.safe_load(open(log[7:]))["processes"]
+                 for role in ("train", "val", "test")]
+        assert all(q for _, q in pools), [x for x in pools if not x[1]]
+    else:
+        pools = re.findall(r"\[(train|val|test)\] \S+: \d+ events.*? from (\S+\.npy)",
+                           open(os.path.join(siteconf.PROJECT_DIR, "runs", log)).read())
+    for role, path in pools:
         rows = np.load(path, mmap_mode="r"); n = (rows.shape[1] - 1) // 5; xs = []
         for i in range(0, len(rows), 50000):
             p = np.asarray(rows[i:i + 50000, :4 * n], dtype=np.float64).reshape(-1, n, 4)
             Q = p[:, 0] + p[:, 1]; s = (Q * Q * eta).sum(-1)
             xs.append(np.abs(2 * (p * Q[:, None] * eta).sum(-1) / s[:, None])[:, 2:].min(1))
         x = np.concatenate(xs)
-        r[role] = {"path": path, "n": int(len(x)), "min": float(x.min()), "q1e-4": float(np.quantile(x, 1e-4)),
+        r[role if not log.startswith("recipe:") else role + "/" + os.path.basename(path)] = {"path": path, "n": int(len(x)), "min": float(x.min()), "q1e-4": float(np.quantile(x, 1e-4)),
                    "below_0.01": int((x < 0.01).sum())}
     out[lab] = r
 print("SRMIN " + json.dumps(out))
