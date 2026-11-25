@@ -41521,8 +41521,7 @@ entries:
     '12': FA-ccin2p3-e9dfa8b9
     '13': FA-ccin2p3-623a3af6
     '14': FA-ccin2p3-f0b997a2
-    '15': 'site sync ccin2p3 FA: refused for other agents'' uncommitted files in the shared checkout (lab_llm_trial, selective_rescale,
-      zng_uq, hooks/tests); the step-15 re-reads (design passed, scorer @ae5427d12) go out once CC is synced'
+    '15': FA-ccin2p3-550001b5 FA-ccin2p3-edb07e43 FA-ccin2p3-d46fa6dc FA-ccin2p3-31184b71
   handoff:
     state: 'Part (a) DONE (par:llmcmp_a). Part (b) (D522/D537/D553 ''run everything and show the results as they come''),
       muP width at part (a) trial 5''s HPs: 16 heads DONE and handed back: FA-ccin2p3-dcb66b14, scored FA-ccin2p3-3b19137a:
