@@ -46472,10 +46472,7 @@ entries:
     - selective_rescale
   decisions:
   - D552
-  next:
-    3: 'Split the u u~ g validation MSE(log|M|^2) of rescale below x=0.1 (stage-2 chosen trial + seeds 43/44), no rescale
-      and the full rescale (D539 searched arms), at 1e4 and 1e5, by event: min final-state x<0.1 (changed by the rule) against
-      the rest, from each run''s sigma_stage/preds_val.npz and the val pool; a CPU read of existing runs, no training (REREAD)'
+  next: null
   done_when: null
   notes_ref: null
   match: selres_*
@@ -46926,14 +46923,6 @@ entries:
     files: analysis/selective_rescale/{stage1_read.py,stage2_read.py,stage2_seeds.py,data/stage1.json,data/stage2.json,data/stage2_chosen.json,seed_chunks/stage2_submitted.txt,figs/stage1.png,figs/stage2.png},
       docs/results.tex par:selres_stage1 par:selres_stage2, sweeps_local/selres_*_b2048
     written: '2026-11-25T07:13:33+00:00'
-  step_why:
-    3:
-      feeds: 'D552 ''without hurting the rest'': whether the u u~ g validation cost of rescale below x=0.1 sits in the events
-        it changes (min x<0.1, 2.3%) or in the untouched rest'
-      if:
-      - 'cost confined to the changed events: the rest is not hurt; report it with the proposal'
-      - 'cost in the unchanged events too: the rule hurts the rest; next rule designed against that (e.g. a smaller x0 with
-        a trained log branch, or the rescale as a separate input)'
   ask: 'Scope: replacing the full rescale in your D392 setup with rescale below x=0.1 changes a setup you decided. Rescale
     below x=0.1 (the D539 log-rescale applied only to momenta with energy fraction x<0.1) keeps the u u~ g soft-limit gain
     (deepest soft bin -5.04/-5.19 decades against no rescale, -0.39/-0.62 against the full rescale) and removes the Z+4g bulk
