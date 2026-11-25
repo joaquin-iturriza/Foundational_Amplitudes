@@ -41505,6 +41505,16 @@ entries:
       analysis/llm_compare/figs/c_best_heldout_per_process.png (heldout_per_process.py, y range now widened so nothing is
       clipped: 52 of c_best''s 139 held-out points were below 1e-3). For step 8 (D537 ''We then also widen the best HPs for
       our setup''): the width scale-up at part (c)''s best HPs starts from hp1860.'
+  - at: '2026-11-25T14:01:07+00:00'
+    text: '2026-11-25 Joaquin on b_h16_heldout_per_process.png vs c_best_heldout_per_process.png: ''Do you not see that these
+      two figures are showing different things? ... It''s not possible to analyze results if you show me inconsistent plots''.
+      Cause: each readout drew its own subset of arms with free-text --label (trial 5 was ''8 heads (our best)'' in one, ''searched,
+      his setup'' in the other) and the y range followed the data (1e-3 -> 1e-7, unlisted). Fix @34367102d: heldout_per_process.py
+      has one fixed name/colour/marker per arm (ARMS: his setup 8/16/32/64/120 heads, his setup 8 heads untuned, our setup
+      control/searched), no --label, a fixed y range 1e-7..1e3 that asserts instead of clipping, and by default draws every
+      arm with a score file into figs/all_arms_heldout_per_process. Steps 12-14 and every later readout redraw THAT figure
+      (python analysis/llm_compare/heldout_per_process.py, no arguments) once data/b_h<H>_heldout.json exists; the per-readout
+      subset figures (b_h16_, c_best_, a5_controls_) are superseded and are not sent again.'
   step_waits:
     '8': part (c)'s best is hp1860 (step 5 done, par:llmcmp_c @1aa1030ec); design next, its smokes need CC synced, refused
       for other agents' uncommitted files in the shared checkout
