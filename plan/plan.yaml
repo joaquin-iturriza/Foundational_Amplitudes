@@ -46502,7 +46502,23 @@ entries:
     why: 'resolved Z+4g bulk cost at 1e4: 1.75 [1.60,1.91] (stage 1), 2.37 [1.19,4.74] at its own optimum with two of three
       seeds blowing up (par:selres_stage2 @7a65c7ebe)'
     at: '2026-11-25T07:10:20+00:00'
-  asks: []
+  asks:
+  - ask: 'Scope: replacing the full rescale in your D392 setup with rescale below x=0.1 changes a setup you decided. Rescale
+      below x=0.1 (the D539 log-rescale applied only to momenta with energy fraction x<0.1) keeps the u u~ g soft-limit gain
+      (deepest soft bin -5.04/-5.19 decades against no rescale, -0.39/-0.62 against the full rescale) and removes the Z+4g
+      bulk cost (0.92x [0.80,1.05] and 1.05x [0.75,1.48] of no rescale, against the full rescale''s 2.28x/2.07x). On u u~
+      g at its own optimum it still costs bulk: 1.33x [1.10,1.61] at 1e4 (the full rescale: 2.18x) and 2.90x [1.95,4.31] at
+      1e5 (the full rescale: 1.68x). Should it replace the full rescale in the D392 setup now, or only once the u u~ g cost
+      is explained?'
+    at: '2026-11-25T07:12:27+00:00'
+    searched: 'site decisions --project FA (D392, D539, D552), docs/results.tex par:ftm_d539, par:selres_stage1, par:selres_stage2:
+      no decision on replacing the rescale. Joaquin''s messages sharing terms, none about replacing the rescale: 2026-11-14T04:31
+      (a pasted SciPost LaTeX template), 2026-11-10T02:08 (an uploaded file), 2026-10-08T19:02 (keeping the setup with gluons
+      added), 2026-11-17T01:19 (paper corrections), 2026-10-05T19:32 (dropped D 1e4.5 and 1e5 cells), 2026-10-21T22:53 (heteroscedastic-loss
+      explanations), 2026-09-30T02:14 (splitting process groups), 2026-10-25T23:09 (energy hold-out tradeoff), 2026-10-27T02:14
+      (figure corrections), 2026-10-06T00:17 (transfer study plan), 2026-11-13T00:03 (two figures'' results)'
+    blocks: replacing the full rescale in the D392 setup
+    blocks_steps: &id004 []
   owner:
     agent: a4ab30797e0606c86
     state: working
@@ -46920,3 +46936,18 @@ entries:
       - 'cost confined to the changed events: the rest is not hurt; report it with the proposal'
       - 'cost in the unchanged events too: the rule hurts the rest; next rule designed against that (e.g. a smaller x0 with
         a trained log branch, or the rescale as a separate input)'
+  ask: 'Scope: replacing the full rescale in your D392 setup with rescale below x=0.1 changes a setup you decided. Rescale
+    below x=0.1 (the D539 log-rescale applied only to momenta with energy fraction x<0.1) keeps the u u~ g soft-limit gain
+    (deepest soft bin -5.04/-5.19 decades against no rescale, -0.39/-0.62 against the full rescale) and removes the Z+4g bulk
+    cost (0.92x [0.80,1.05] and 1.05x [0.75,1.48] of no rescale, against the full rescale''s 2.28x/2.07x). On u u~ g at its
+    own optimum it still costs bulk: 1.33x [1.10,1.61] at 1e4 (the full rescale: 2.18x) and 2.90x [1.95,4.31] at 1e5 (the
+    full rescale: 1.68x). Should it replace the full rescale in the D392 setup now, or only once the u u~ g cost is explained?'
+  waiting_since: '2026-11-25T07:12:27+00:00'
+  searched: 'site decisions --project FA (D392, D539, D552), docs/results.tex par:ftm_d539, par:selres_stage1, par:selres_stage2:
+    no decision on replacing the rescale. Joaquin''s messages sharing terms, none about replacing the rescale: 2026-11-14T04:31
+    (a pasted SciPost LaTeX template), 2026-11-10T02:08 (an uploaded file), 2026-10-08T19:02 (keeping the setup with gluons
+    added), 2026-11-17T01:19 (paper corrections), 2026-10-05T19:32 (dropped D 1e4.5 and 1e5 cells), 2026-10-21T22:53 (heteroscedastic-loss
+    explanations), 2026-09-30T02:14 (splitting process groups), 2026-10-25T23:09 (energy hold-out tradeoff), 2026-10-27T02:14
+    (figure corrections), 2026-10-06T00:17 (transfer study plan), 2026-11-13T00:03 (two figures'' results)'
+  blocks: replacing the full rescale in the D392 setup
+  blocks_steps: *id004
