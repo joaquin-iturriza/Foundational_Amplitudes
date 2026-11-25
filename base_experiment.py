@@ -300,7 +300,7 @@ class BaseExperiment:
             self._init_optimizer()
             self._init_scheduler()
             self.train()
-            self._save_model()
+            self._save_last_model()
 
         if self.device == torch.device("cuda"):
             peak = torch.cuda.max_memory_allocated()
@@ -2215,6 +2215,12 @@ class BaseExperiment:
         if (step + 1) in set(int(x) for x in steps) and self.is_main_process():
             self._save_model(step + 1, f"model_run{self.cfg.run_idx}_step{step + 1}.pt")
             LOGGER.info(f"Saved the model at step {step + 1} (training.save_model_at_steps)")
+
+    def _save_last_model(self):
+        """models/model_run<idx>.pt after training; training.save_last false skips it only when a best checkpoint
+        is kept in its place (es_load_best_model), so a run always ends with a model."""
+        if self.cfg.training.get("save_last", True) or not self.cfg.training.es_load_best_model:
+            self._save_model()
 
     def _save_model(self, step="end", filename=None):
         if not self.cfg.save:
