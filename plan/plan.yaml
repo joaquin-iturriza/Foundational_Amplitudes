@@ -47057,6 +47057,17 @@ entries:
       tolerance 0.01 dec <- measured: the same script at pinned KIT_THREADS 1 (kit_predict.py: thread count moved predictions
       by up to 5.5e-3 at 4 threads, 0 at 1); reference no rescale <- Joaquin''s words D561 ''not use it where it hurts, and
       only where it helps'' and D552; cost 0 GPU-h <- D552''s 100 GPU-h budget, CPU only'
+    passed_at: '2026-11-25T12:13:29+00:00'
+    reviewer: 'Re-check after FIX: all three points addressed. Every hard_test and bulk_test stratum is scored under both
+      arms, with per-stratum counts of changed events, and YES now also requires no changed stratum above its own no-rescale
+      seed spread (d539u_kit_raw.json, same runs). Pipeline proof: REBUILD_SET_MODEL line asserted, and a changed stratum
+      identical under both arms counts as a broken pipeline, not NO; the no-rescale arm must reproduce the stored kit scores
+      to |log10| < 0.01 (same kit_predict and rebuild path, KIT_THREADS 1). Z+4g is scored only where its kit has events below
+      x0; kh.strata returns [] for a missing split. Check 2: deepest soft bin 4917->0.111 (1e4) and 7580->0.204 (1e5), no
+      rescale vs full rescale (d539u_kit.json). Check 3: no-rescale seeds 1427/4917/5510 -> 0.59 dec and 1758/7580/7680 ->
+      0.64 dec, confirmed. x0 0.009 is below every pool minimum (0.01107 u u~ g, 0.00923 Z+4g train). 0 GPU-h. Searched: input_soft_x0,
+      below/outside the trained range, eval-only, REBUILD_SET, rescale (results.tex, decisions D374/D539/D552/D561, entry
+      dead ends): no prior test below the trained range.'
   targets:
   - batch: smoke
     wall_h: 0.1
