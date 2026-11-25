@@ -45198,6 +45198,16 @@ entries:
       1 MiB and overstates. Census --in-use ''*'' --days 14: amp_data_cache all keep (60,138 MiB, 18,498 files). Since 15:20
       the disk fell 15->10 GB through llm_compare part (b) width smokes in runs/zz_smoke (two uncompressed checkpoints each,
       2x2.78 GB at 64 heads); the pending 120-head smoke FA-ccin2p3-74ba6cdd projects ~19.5 GB.'
+  - at: '2026-11-25T00:14:04+00:00'
+    text: '2026-11-25 01:15 read job ccj_3b5290531b03 (exit 0): free_space.py list (D149/D133 filter) finds 0 model paths
+      deletable (every model run is ''study not concluded'' or ''family not in trim_plan.tsv'': trim_plan.tsv''s study map
+      dates from 2026-10-23, so every family since is OPEN) and 18 MadGraph events dirs, 0.94 GB (D136 ''yes to 1''). zz_catft*:
+      27.3 GiB apparent in 7 dirs (zz_catft 10217 MiB pre-EMA-fix, superseded by emafix; emafix 4505; refit_emafix 4503; sep
+      3485 = draft Fig. 15; lowloss3 3478 = probes Joaquin rejected; lowloss2 1739 = batch that failed every cell; lowloss
+      1), of which 784 model files 27.15 GiB; curves collected in committed analysis/catalog_v3/data/catft_curves.json. lhe_queue:
+      21 queues 6.8 GiB, todo 0 everywhere; unassembled: catalog_v4_default 899/1082, w3 162/203, w2 0/203, gridpack 54/56;
+      specs_in has no todo dir. zz_v4 prediction dirs ~150 MiB each (H2 15, H3 19, PP4 84 MiB). lxplus keeps only sweep state
+      for runs_from_lxplus'' sweeps (AFS sweeps/tp_scr_ee_nnbar_d2 430 KB, no trial dirs): CC''s copy is the only one.'
   step_waits:
     '1': FA-ccin2p3-67887dff
     '2': 'detach ccdisk_read2 (CPU read job ccj_e7fd8463789f, slurm 64807324: model_groups.py per-family model GB @0bc52e3d6,
