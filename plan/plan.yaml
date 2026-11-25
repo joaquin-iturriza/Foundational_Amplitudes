@@ -46755,6 +46755,12 @@ entries:
     units: null
     start: '2026-11-25T02:28:59+00:00'
     at: '2026-11-25T02:28:59+00:00'
+  - batch: stage2_seeds_kit
+    wall_h: 0.5
+    jobs: 22
+    units: null
+    start: '2026-11-25T02:29:07+00:00'
+    at: '2026-11-25T02:29:07+00:00'
   step_waits:
     '1': 'a reviewer: notes-editor re-check of par:selres_stage1 (staged), then commit the write-up'
   handoff:
