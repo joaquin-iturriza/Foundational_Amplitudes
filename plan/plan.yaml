@@ -34021,12 +34021,12 @@ entries:
     agent: a9673ff5df07651dd
     state: working
     since: '2026-11-21T17:02:36+00:00'
-    state_at: '2026-11-22T00:23:35.438000+00:00'
-    context: 206936
-    context_at: '2026-11-21T17:38:23+00:00'
+    state_at: '2026-11-25T00:03:53.781000+00:00'
+    context: 226448
+    context_at: '2026-11-25T00:04:26+00:00'
   step_waits:
     '3': '2026-12-15: deferred, marked for later on 2026-11-17; no run'
-    '4': '2026-11-25'
+    '4': '2026-11-26'
   findings:
   - at: '2026-11-13T02:46:58+00:00'
     text: '2026-11-13 ~03:50 Joaquin: ''we should start actually doing the work on the draft with what we have ... Let''s
@@ -34465,6 +34465,11 @@ entries:
   - at: '2026-11-24T00:03:56+00:00'
     text: '2026-11-24 ~01:05: Jean Zay still refuses ssh (site run jeanzay FA -- hostname: connection refused at lpnclaude03.in2p3.fr:22,
       the relay host); step 4 re-waits to 2026-11-25'
+  - at: '2026-11-25T00:05:39+00:00'
+    text: '2026-11-25: Jean Zay still refuses ssh (site list UNREACHABLE; retry site run jeanzay FA -- hostname: connection
+      refused at the relay host lpnclaude03.in2p3.fr:22), down since 2026-11-20. Step 4 needs the 448-process bigrun runs''
+      data_stats.json, which exist only there: no copy in the tier-0 mirror (~/.local/share/ccorch/artifacts/FA, searched
+      for bigrun and data_stats.json) and none in the run registry on another site. Step 4 re-waits to 2026-11-26.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
@@ -40843,9 +40848,9 @@ entries:
     decision: D553
   owner:
     agent: a1b829d3ccca1f915
-    state: working
+    state: stopped
     since: '2026-11-24T14:04:31+00:00'
-    state_at: '2026-11-24T23:50:09.155000+00:00'
+    state_at: '2026-11-25T00:00:15.543000+00:00'
     context: 293787
     context_at: '2026-11-25T00:02:10+00:00'
   step_why:
@@ -43626,7 +43631,7 @@ entries:
   match: zz_labllm_*
   evidence:
     runs: []
-    commit: 15fae9da7
+    commit: 7a8d16eb8
     paths:
     - analysis/lab_llm_trial/runs.jsonl
     - analysis/lab_llm_trial/summary.json
@@ -43635,6 +43640,7 @@ entries:
     - tests/test_lab_route.py
     - tools/lab_llm_report.py
     - tools/lab_llm_trial.py
+    - tools/lab_wake_trial.py
     - tools/labllm.py
     - tools/plan.py
     - tools/token_share.py
@@ -44155,10 +44161,24 @@ entries:
     sources: 'D551 (Joaquin: decide what else to use the lab LLMs on); baselines measured by tools/lab_wake_trial.py extract
       and reviews-extract: do-nothing 71/100 wakes (Wilson 0.615-0.79), always-FIX 89/159 review rounds (Wilson 0.48-0.635);
       Wilson 95% for the spread'
+    passed_at: '2026-11-25T00:03:28+00:00'
+    reviewer: 'Third round @940251cb8, extraction re-run in scratch: 159 review rounds (89 FIX, 70 PASS), each paired with
+      its own verdict; all 159 design reads hold measure: and outcome:, and none is a saved-output placeholder. Material stops
+      at the verdict. The one remaining fix note (a51bab46162#0, 18:04:24) is a read of another entry (pretrain_data_saving)
+      made before that round''s own design-fix of kit_benchmark at 18:05:00, so it is not its label. Check 2: the keys move
+      against trivial answers (do-nothing 71/100 wakes, always-FIX 89/159). Check 3: Wilson upper bounds 0.79 and 0.635 are
+      the bars, sourced to those measured baselines and D551. Check 4: yes and no are stated for each part; the review route
+      is ''lab PASS skips Opus'' with FIX missed as its cost; the target-agent choice of a wake is ungraded and is tested
+      before any route; 36/159 rounds'' material is cut at 80k. Caveat for the report: in about 31 rounds the design-only
+      read is a sed or grep slice of the entry''s saved output, so report that arm''s agreement on full reads apart from slices.
+      Prior search: results.tex for dispatch, routing wake, design review with lab/deepseek/qwen, reviewer model; site decisions
+      for dispatch, wake, lab llm, deepseek, reviewer. No earlier trial found.'
   step_waits:
     '3': notes-editor pass of the results.tex backlog (it blocks on sec:noisescale and fig:llmcmp_heldout, other entries'
       text; the repo-reviewer already passed the merge)
-    '5': the design reviewer on the 2026-11-25 design (wake and review replay)
+    '5': the lab server answering again (503 from both models at 2026-11-25T00:05 UTC); then python3 tools/detach.py --entry
+      lab_llm_trial --name wake_review_replay --each 'python3 tools/lab_wake_trial.py run' --each 'python3 tools/lab_wake_trial.py
+      reviews-run'
   findings:
   - at: '2026-11-23T19:55:22+00:00'
     text: 'Local batch width cut from 6 parallel opencode streams to 2 (D531): 6 streams of opencode sessions (~350-400 MB
@@ -44273,6 +44293,13 @@ entries:
       bookkeeping 11.4% of all, file reads and search 11.3%, analyses and tests 8.5%, submit/sync/pick 7.2%, figures 5.0%,
       git 3.1%; main session''s bookkeeping 9.7%, replies and reasoning without tools 8.1%, briefing agents 4.7%. A message
       costs its context (owners ~170k, main ~320k tokens), so a kind''s cost is its step count inside that context.'
+  - at: '2026-11-25T00:07:30+00:00'
+    text: 'D551 trial (wake dispatch, design review rounds; design passed 940251cb8 after two FIX rounds: review unit one
+      round, material cut at the verdict, design read holding measure and outcome; wake target graded as messaged or not):
+      not run. The lab server answered at 2026-11-24T23:2x (ok from both models via /api/chat/completions; /openai/v1 refuses
+      passthrough, 403) but from ~23:50 UTC gives DeepSeek 502 proxy error and both 503 Service Unavailable, retried at 2026-11-25T00:05
+      UTC. Samples extracted: 100 wakes (do-nothing 71/100), 159 review rounds (89 FIX, 70 PASS; 118 of them with a sed/grep/awk
+      design read, reported apart).'
   handoff:
     state: 'Hard round done (labllm 7a28103a4, summary.json, figs/lab_llm_hard.png): all ten multi-file fixes valid after
       the sandbox fix (774147232: TMPDIR in run dir, fixcheck copies as git repos; baselines refreshed 571cf7014). First pass
@@ -44984,12 +45011,10 @@ entries:
     blocks: the CC deletions of costly results only
     blocks_steps: &id002 []
   owner:
-    agent: acc098fc308290fb5
-    state: closed
-    since: '2026-11-24T14:15:22+00:00'
-    state_at: '2026-11-24T23:39:12.102000+00:00'
-    context: 272154
-    context_at: '2026-11-24T23:44:24+00:00'
+    agent: af74e499d5513dfe4
+    state: working
+    since: '2026-11-25T00:05:14+00:00'
+    state_at: '2026-11-25T00:05:14+00:00'
   designs:
   - at: '2026-11-24T14:30:34+00:00'
     question: 'What uses CC''s /sps/lpnhe group space (512 GiB, 98% used, 15 GB free on 2026-11-24) inside our area where
@@ -45774,9 +45799,9 @@ entries:
     decision: D548
   owner:
     agent: a499e0baf988614d6
-    state: working
+    state: stopped
     since: '2026-11-24T23:45:01+00:00'
-    state_at: '2026-11-24T23:45:01+00:00'
+    state_at: '2026-11-24T23:54:43.818000+00:00'
   handoff:
     state: 'Kit cleaned of project history (one squashed commit 1706c88) and public at github.com/joaquin-iturriza/orchestrator-kit,
       main at d2681fb with on-cluster fixes. Private toy repo github.com/joaquin-iturriza/orchestrator-kit-toy (a818ed5).
@@ -45935,24 +45960,28 @@ entries:
     - selective_rescale
   decisions:
   - D552
-  next: 'Run the passed design: the D395 smoke (seed_chunks/selres_smoke.txt, 50 steps each of soft-only x0=0.1 and event
-    gate 0.1 on u u~ g 1e4, then job_kit.sh KIT_SCORE_ONLY on both), then the 14 searches (sweep/sweep_config_selres_*.yaml)
-    through sweep/drive.py, then seeds 43/44 of each chosen trial, then kit scoring of the 18 new u u~ g runs; read with a
-    selres reader against D539''s controls, figure, write-up in results.tex'
+  next: 'Stage 1 of the passed design: the D395 smoke (seed_chunks/selres_smoke.txt on branch selres: 50 steps each of soft-only
+    x0=0.1 and event gate 0.1 on u u~ g 1e4, then job_kit.sh KIT_SCORE_ONLY on both), then the 36 stage-1 runs (seed_chunks/selres_stage1_all.txt:
+    schemes x0=0.1, x0=0.3, event gate 0.1 at each cell''s no-rescale best HPs, seeds 42-44) and kit scoring of their 18 u
+    u~ g runs; read with analysis/selective_rescale/stage1_read.py against D539''s controls. Stage 2 (a 16-trial search per
+    failing scheme-cell, and the Z+4g 1e5 control searches) only for a scheme-cell that misses YES'
   done_when: null
   notes_ref: null
   match: selres_*
   evidence:
     runs: []
-    commit: null
-    paths: []
+    commit: 560a4d1a3
+    paths:
+    - analysis/selective_rescale/data/input_check.json
+    - analysis/selective_rescale/input_check.py
+    - wrappers.py
   dead_ends: []
   asks: []
   owner:
     agent: a8af961df29d56c2e
     state: working
     since: '2026-11-24T23:40:11+00:00'
-    state_at: '2026-11-24T23:40:11+00:00'
+    state_at: '2026-11-25T00:01:50.086000+00:00'
     context: 203507
     context_at: '2026-11-25T00:02:59+00:00'
   designs:
@@ -46113,13 +46142,24 @@ entries:
       0.033..0.372); 2-sigma interval of r <- the arms'' own measured three-seed spread (log-sd, zng4g_d1e3_read.ratio, as
       par:ftm_d539); ''without hurting the rest'' and ''keeping the effect on the bins this targets'' <- Joaquin''s words
       D552'
+    passed_at: '2026-11-25T00:05:25+00:00'
+    reviewer: 'Re-check after FIX: two stages, stage 1 = 36 runs (schemes A/B/C x 4 cells x seeds 42-44, seed_chunks/selres_stage1_all.txt,
+      3 lines per config confirmed) at the no-rescale baseline''s best HPs, against existing same-HP controls (Z+4g hp1333
+      off/rescale at 1e4 and 1e5; u u~ g off at its optimum; u u~ g rescale at its own optimum as the soft reference, which
+      can only favour the rescale), searches only on a NO; ~9.5 GPU-h. Check 2: Z+4g r 2.28 [2.03,2.57] (1e4), 2.07 [1.57,2.71]
+      (1e5), kit soft -4.65/-4.57 dec (d539u_kit.json read); input_check.json event gate compression 0.715 r_pred 1.22 confirmed.
+      Check 3: three seeds as the D539 sibling cells; YES rests on the resolved Z+4g cells; soft tolerance = rescale arm''s
+      log10(max/min) 0.30 (0.099..0.198) / 1.05 (0.033..0.372), confirmed. D395 smoke: selres_smoke.txt, 50 steps each of
+      input_soft_x0=0.1 and input_soft_gate=0.1, then kit score-only. Differing keys listed (sweep_name, train_subsample,
+      input flags). Disk ~2.5 GB on lxplus EOS (EOS user quota unreadable via eos quota; read free space at submission). Check
+      5 terms: selective, soft_x0, soft_gate, gated rescale, event gate, rescale only (results.tex); rescale, D374, D392,
+      D539, D552 (decisions); none found. Note: the entry''s next field still says ''14 searches''; update it with plan set-next
+      to the two-stage plan.'
   step_why:
     1:
       feeds: whether an event-dependent rescale (soft-only below x0, or an event gate) keeps the u u~ g soft-bin gain without
-        the Z+4g / u u~ g bulk cost, so it can replace the rescale in the setup (Joaquin's call, D392)
+        the Z+4g bulk cost, so it can replace the rescale in the setup (Joaquin's call, D392)
       if:
-      - 'a scheme passes the design''s YES: propose it to Joaquin as the rescale''s replacement, with the figure'
-      - 'soft bin lost by every scheme: the log branch needs more trained particles; report the decades each kept and the
-        trade-off along x0'
-      - 'bulk cost kept by every scheme: the compression mechanism is wrong or incomplete; compare measured r against the
-        input check''s prediction'
+      - 'a scheme passes the design''s YES at the baseline HPs: done for it; propose it to Joaquin with the figure'
+      - 'a scheme misses YES in a cell: stage 2, its own search there, read best against best'
+      - 'every scheme loses the soft bin: report decades kept per scheme and the trade-off along x0'

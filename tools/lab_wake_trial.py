@@ -239,7 +239,7 @@ def reviews_extract(a):
                         # the design: the round's first read holding a design's measure and outcome (a saved-output
                         # placeholder or a slice of the entry without them is not one)
                         if cur["design"] is None and re.search(r"\bmeasure:", txt) and re.search(r"\boutcome:", txt):
-                            cur["design"] = txt
+                            cur["design"], cur["design_cmd"] = txt, uses[b["tool_use_id"]]
             elif d.get("type") == "assistant" and cur is not None:
                 for b in c or []:
                     if isinstance(b, dict) and b.get("type") == "tool_use":
@@ -255,7 +255,8 @@ def reviews_extract(a):
                 nverdict += bool(r["verdict"])
             if r["design"] and r["verdict"] and a.since <= r["t"][:16] < a.until:
                 rows.append({"agent": "%s#%d" % (os.path.basename(mp)[6:-16], k), "t": r["t"], "brief": r["brief"][:6000],
-                             "design": r["design"][:30000], "material": r["material"], "verdict": r["verdict"]})
+                             "design": r["design"][:30000], "design_cmd": r.get("design_cmd", ""),
+                             "slice": bool(re.search(r"\b(sed|grep|awk)\b", r.get("design_cmd", ""))), "material": r["material"], "verdict": r["verdict"]})
     random.Random(a.seed).shuffle(rows)
     with open(os.path.join(OUT, "reviews.jsonl"), "w") as f:
         for r in rows[:a.n]:
@@ -291,7 +292,9 @@ def reviews_run(a):
 
 
 def reviews_report(a):
-    key = {r["agent"]: r["verdict"] for r in (json.loads(l) for l in open(os.path.join(OUT, "reviews.jsonl")))}
+    rows = [json.loads(l) for l in open(os.path.join(OUT, "reviews.jsonl"))]
+    key = {r["agent"]: r["verdict"] for r in rows}
+    sl = {r["agent"]: r.get("slice", False) for r in rows}
     last = {}
     for r in (json.loads(l) for l in open(os.path.join(OUT, "review_answers.jsonl"))):
         if r["agent"] in key and not r["answer"].startswith("ERROR"):
@@ -309,7 +312,10 @@ def reviews_report(a):
                 "fix_caught": sum(r["verdict"] == "FIX" and key[r["agent"]] == "FIX" for r in rs),
                 "false_fix": sum(r["verdict"] == "FIX" and key[r["agent"]] == "PASS" for r in rs),
                 "no_verdict": sum(r["verdict"] is None for r in rs),
-                "seconds_median": sorted(r["seconds"] for r in rs)[len(rs) // 2] if rs else None}
+                "seconds_median": sorted(r["seconds"] for r in rs)[len(rs) // 2] if rs else None,
+                # the design-only arm sees a slice of the entry when the reviewer's design read was sed/grep/head
+                "agree_by_design_read": {w: [sum(r["verdict"] == key[r["agent"]] for r in rs if sl[r["agent"]] == (w == "slice")),
+                                             sum(sl[r["agent"]] == (w == "slice") for r in rs)] for w in ("full", "slice")}}
     print(json.dumps(rep, indent=1))
     json.dump(rep, open(os.path.join(OUT, "review_summary.json"), "w"), indent=1)
 
