@@ -45672,6 +45672,61 @@ entries:
       the largest best-to-third-best gap of the D507 searches (0.099/0.160/0.206/0.216); seed 42 as the replaced searches.
       Check 5, terms searched: 50 epochs, over-train, trained too long (results.tex); D507, D519, D520, D560, D563 (decisions):
       no earlier run of these cells at another horizon.'
+  - at: '2026-11-25T14:04:37+00:00'
+    question: 'D563 (Joaquin: ''So it''s clear that these z+4g runs are just trained for too long, can you repeat these trainings
+      at ~50 epochs to see what happens? Probably retuning some HPs will be needed''): on q q~ -> Z+4g at 10^4 training events,
+      retuned by DyHPO at 50 epochs, what best validation MSE(log|M|^2) do Muon scratch, Adam scratch and the fine-tune from
+      the parent without the two input settings (Fn) reach at batch 2048 and 128; does the 400-epoch batch-128 gain (best
+      val MSE 2048 over 128: Muon 6.53, Adam 1.57, Fn 1.98) persist, and is 50 epochs better or worse than 400 at each batch?'
+    prior: 'This entry''s part A (ft_bcrit.py 528910f43, data/ft_bcrit.json, par:cbs_regimes): at 400 epochs best val MSE
+      Muon 0.0580/0.00887, Adam 0.0503/0.0321, Fn 0.0214/0.0109 at 2048/128; best epochs Muon 359/400, Adam 289/120, Fn 64/400;
+      train/val at the stable end Muon 0.048/0.381, Adam 0.095/0.008, Fn 0.004/0.242: Muon and Fn memorise at 2048; Adam two-batch
+      B_crit 87-261. The replaced searches: sweep/sweep_config_tp_zng_d1e4_{muon,adam}_b{2048,128}_zgggg.yaml (D507, 19/19/19/16
+      trials) and sweep_config_ftmech_zng4g_ftnoset_b{2048,128}.yaml (D519/D520, 16/16). Searched docs/results.tex (50 epochs,
+      400 epochs, over-train, trained too long), plan, site decisions (D507, D519, D520, D560, D563): no earlier run of these
+      cells at another horizon.'
+    measure: 'Per cell (arm x batch) the best trial''s best validation MSE(log|M|^2) = min val mu-MSE x std^2 (the searches''
+      mu_mse selection; best of the cell''s trials, as part A), its epoch, and train/val at the end of its stable phase; ratios
+      r50 = E2048/E128 at 50 epochs against r400, and E50/E400 per cell. Figure: per arm, the best trial''s validation curves
+      at 2048 and 128 against epochs, 50-epoch searches beside the 400-epoch ones (log y), and the per-cell bests; read by
+      a committed reader (ft_bcrit.py extended) at a named commit.'
+    check: 'Existing data move with the horizon: in the 400-epoch curves (ft_bcrit.d507_cells/local_cells, every trial), the
+      best validation reached by epoch 50 gives 2048/128 ratios Muon 0.0742/0.0222 = 3.34, Adam 0.2162/0.0428 = 5.05, Fn 0.0234/0.0127
+      = 1.84 against r400 6.53/1.57/1.98: the comparison changes with the horizon even untuned (those runs were at the top
+      of a 400-epoch schedule, not annealed; the retuned 50-epoch runs anneal, so these are not the answer).'
+    fixed: 'Each search is its 400-epoch config (recipe kit_A_uq_zgggg_me2_n500000_t12500, train_subsample 10^4, float64,
+      HETEROSC with its 250-step sigma stage, mu_mse selection, seed 42, DyHPO gp, 2000 candidates, n_startup 3, the same
+      search space and parameters, Fn''s parent and fine-tune settings) with only: t_steps 244 at 2048 (was 1953) and 3906
+      at 128 (was 31250) = 50 epochs; the lr window set by HPO rule 2 (repo-review FIX 1 on 7e742b868), +-1/2 decade [c/3,
+      3c] around c: Adam arms c = the measured lr*(t,D) surface (sweep/gen_transfer_pilot.lr_surface: high-D row lr*(t) times
+      the fitted D factor, over analysis/hpo_optima/hpo_optima.json) at D=1e4: 4.249e-3 at t=244, 4.994e-3 at t=3906 -> Adam
+      2048 [1.416e-3,1.275e-2], Adam 128 [1.665e-3,1.498e-2]; Muon arms (Muon scratch, Fn) centre on their own 400-epoch search
+      (fa-canonical-setup), c = that search''s best lr times the surface''s t-factor at D=1e4 (lr*(244,1e4)/lr*(1953,1e4)
+      = 0.5855, lr*(3906,1e4)/lr*(31250,1e4) = 3.170): Muon 2048 0.0203 (hp1333, d507_search_v2.json) -> [3.961e-3,3.565e-2],
+      Muon 128 9.237e-3 (hp0078) -> [9.760e-3,8.784e-2], Fn 2048 3.114e-3 (trial 14, zng4g_ftnoset_raw_b2048.json) -> [6.077e-4,5.470e-3],
+      Fn 128 7.257e-3 (trial 1) -> [7.669e-3,6.902e-2]; Adam''s plateau protocol kept in validations (about 200 per run, plateau
+      patience 10 and early stop 20 validations): validate every 1 step at 2048 (was 10) and 20 at 128 (was 156), es_patience
+      20 / 400 steps; Muon and Fn keep validate_frac 0.02. Trial counts as the replaced searches: 19/19/16 (Muon, Adam, Fn)
+      at 2048, 19/16/16 at 128, waves 3,3,2,3,3,2(,3). Configs sweep/sweep_config_*_ep50*.yaml at 9e28b161d (the old DyHPO
+      states, built on the 7e742b868 windows, removed from sweeps_local/), driven by sweep/drive.py on the sites site pick
+      gives (parent and kit recipe on CC and lxplus). Cost: ~0.1 h per trial at 2048, ~0.2 h at 128 (400-epoch trials: 0.086
+      s/step at 128 on V100, registry), about 16 GPU-h for 105 trials, under D563''s approval and 30. Disk: the replaced 400-epoch
+      trials take 22-79 MB each (du on CC: ftnoset b128 trial_0353 33 MB, D507 Muon b128 trial_0950 79 MB; lxplus 46-47 MB),
+      so 105 trials need at most 105 x 79 MB = 8.3 GB; at most 18 trials at once (6 searches x a wave of 3); CC /sps/lpnhe
+      free 26 GB read 2026-11-25 14:3x, re-read at submission; the whole batch fits on CC alone. The sigma stage no longer
+      runs the noise reads (run.py 7677e3d67; these sweeps have find_BS false anyway).'
+    control: The six 400-epoch searches they replace (d507_search_v2.json, finetune_mechanism data, ft_bcrit.json cells),
+      same arms, data, seed and trial counts.
+    seeds: Seed 42 for every trial, as the replaced searches; spread from the cell's best-of-trials (best to third-best gap).
+    outcome: 'Per arm: the batch-128 gain is the horizon if r50 <= 1.22 (the batches match at 50 epochs); it persists if r50
+      > 1.22. Per cell: 50 epochs better than 400 if E50 < E400/1.22, worse if E50 > 1.22 E400, else equal. Every cell keeps
+      its trial count; a cell whose best trial sits in the outer 5% of its log lr window is reported as a bound on that side
+      (its best may lie outside), and a wider search of it is put to Joaquin as a question with its cost (0.1-0.2 GPU-h per
+      trial), not run. Reported with the figure for every arm, whichever way.'
+    sources: '1.22 <- a measured spread: the largest best-to-third-best gap of the four D507 400-epoch searches (0.099-0.216,
+      d507_search_v2.json, every trial); outer 5% of the lr window <- a measured spread: the D507 extension trigger (bests
+      at 0.95-0.99 of the window, sweep config comments), used only to flag a bound; 50 epochs <- Joaquin''s words (D563,
+      ''~50 epochs'')'
   step_why:
     1:
       feeds: 'D532: the scan''s answer (NO branch, B_crit 2500-6690 vs B_simple 55.5) reaches Joaquin as a finished entry'
