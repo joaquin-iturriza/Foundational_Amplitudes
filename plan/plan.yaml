@@ -44996,8 +44996,9 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-b949c4ee
-    commit: acd6b8753
+    commit: 0bc52e3d6
     paths:
+    - analysis/storage/model_groups.py
     - scripts/job_disk_inventory.sh
   dead_ends: []
   asks:
