@@ -45103,6 +45103,25 @@ entries:
       at 8/16/32 heads (1.9x), 2.28 vs 2.91 c_control vs c_best (1.28x), gg->ttH MSE-bias^2 0.17-0.30 over widths (1.8x),
       5.68 vs 5.94 (1.05x), (data/split/*_heldout.json, error_split.json @2e8d4d366); 1.5x on new-43 medians <- measured spread
       0.241/0.287/0.333 over widths (1.38x), 0.106 vs 0.135 c_control vs c_best (1.27x)'
+    fix_at: '2026-11-25T22:45:39+00:00'
+    fix: 'Re-check of step 22 (no off-shellness arm). The seven earlier items are answered (baseline trial_1860, joined offshell_6
+      via join_vars @d2137361b, sourced bars, prior l.16450/l.9750, cache prebuild and disk, smoke through scoring and factor_split,
+      key diff); config diff against sweep_config_llmcmp_c_latest.yaml is the flag and sweep_name only. Two items fail. (1)
+      Checks 2 and 4, the internal-top measure cannot see the gg->t b W part of the question: the 6-process median of MSE-bias^2
+      for c_best is the mean of the 3rd and 4th of [0.14 gttx, 0.87 ttxa, 1.07 ttxz, 4.74 btxwp, 4.85 tbxwm, 5.94 ttxh] (data/split/c_best_heldout.json).
+      If gg->ttH alone falls to ~0.3, the median drops to 0.97 (3x) with the pair unchanged, so Yes fires on ttH alone and
+      Mixed A''s claim about the pair is never read. It also reads the shape, while the pair''s error is level: bias^2 30.7/32.1
+      of MSE 35.5/36.9 (c_best), 28.0/33.0 (c_control), and 12.3-22.8 in his setup, which has no off-shellness input (a_trial5,
+      b_h16, b_h32). Fix: read the gg->t b W pair on its own, bias^2 and MSE-bias^2 each against c_best, with a bar from that
+      spread (c_control vs c_best about 1.1x; across widths 12.3-22.8, about 1.8x; so 2x is sourced). Use the internal-top
+      median without gg->ttH (or the 5 others) if it is kept. Rewrite Yes and Mixed A on these reads. Add to the prior that
+      his setup already has a pair bias^2 of 12-23 without the input. (2) Check 4, an outcome is missing: split gone needs
+      separation <= 4 (or minority < 10%) AND eta2 <= 0.25, and split kept needs separation > 4 with minority >= 10%. Separation
+      <= 4 with eta2 > 0.25 (the two groups gone but d still trending on the joined offshell_6, the network rebuilding the
+      top virtuality from the momenta) falls in neither. State that branch and what it means for the next step. The other
+      checks hold: one change; HETEROSC; same target and preprocessing; no sweep (at baseline HPs); step rate from trial_1860;
+      lxplus about 26 GB free against about 2.5 GB; held-out events as his; ordering prebuild, then smoke, then run, each
+      reading the previous output.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
