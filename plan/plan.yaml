@@ -40798,11 +40798,6 @@ entries:
       instead of mu_N = a + bN; code (data.level_file in _resolve_amp_preprocessing and parent_target_standardization, unit
       test, repo review), one ~50-step smoke (D395), the run, scoring by job_llm_score.sh, read against trial 5 and the post-hoc
       substitution (level_source.py). Design recorded 2026-11-25, in review.'
-    18: 'D567 follow-up: on gg -> t t~ h both our-setup arms split the events into two groups ~3 units of log|M|^2 below and
-      above the true peak (MSE-bias^2 5.7/5.9 vs his setup 0.17-0.23; figs/shape_dists.png). Check on existing models whether
-      the two groups follow the emission-scale target''s per-event factor: re-read our searched run (REREAD FA-ccin2p3-29ce8950,
-      lxplus copy) with llm_score.py --events-out @63ffc44ab (adds log F per event), then per event pred - true against log
-      F on gg->ttH and the other gg->ttX processes.'
     19: '19: D564/D567 repair: retrain the untuned his-setup control (part (a) matched control, lr 1e-3 constant, no warmup,
       L2 0, EMA off, seed 42, 60,840 steps; its first run FA-lxplus-cb9273f1 lost models/ to the 11-24 prune, now blocked
       by prune.py @b1aea28e0) on CC as trial_9000, identical flags; when it ends: compare its best val MSE of z to the first
@@ -41012,12 +41007,6 @@ entries:
         set by the target''s per-process mean; the fix is a process-level level predictor in the target, carried to our setup'
       - 'the network overrides it (new median within 1.38x of trial 5''s 1.144): the level is learned from the particles whatever
         the target says; next, what in the inputs sets it (pID embedding vs property table)'
-    18:
-      feeds: 'D567/D564: what sets our setup''s shape failure on gg->ttX'
-      if:
-      - 'the groups follow log F (pred - true correlates with the factor): the factor misplaces events on this family; report
-        with figure, a target-side fix is its own design'
-      - 'they do not: report the split as unexplained, with what was ruled out'
     19:
       feeds: 'D567 (how well each model gets the shape) and D564 (why the LLM extrapolates better): whether tuning changes
         the level-removed shape error in his setup'
@@ -41747,7 +41736,6 @@ entries:
     '15': 'steps 16-18''s reads (FA-ccin2p3-89671610 level_file run, FA-lxplus-49899ef8 per-event network, FA-ccin2p3-996866f8
       log F re-read): the level-branch configurations are those three; the next one is designed from what they show'
     '16': FA-ccin2p3-89671610
-    '18': FA-ccin2p3-996866f8
     '19': FA-ccin2p3-0165aa58
     '20': FA-lxplus-affc2e5a FA-lxplus-c894babe
   handoff:
