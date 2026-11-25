@@ -11,6 +11,8 @@ Per process, from d = pred - true of log|M|^2 over the CSV's events (first 5000 
     it); for the gg -> t t~ X processes also the 2D histogram of d against x (counts) and the binned mean of d.
     python analysis/llm_compare/factor_split.py --csv <run>/llm_events_heldout.csv [--out data/<tag>_factor_split.json]
     python analysis/llm_compare/factor_split.py --fig data/<tag>_factor_split.json [--x offshell_6]   (figure, locally)
+  --vars-from <other run>/llm_events_heldout.csv: the variables this CSV lacks (offshell_<pdg> of a run without the
+    off-shellness input) taken from another run's CSV row by row, the same test events checked on true_logm2.
 Without --out the JSON is printed on the last line (FACTOR_SPLIT ...), for a CPU job on the site that holds the CSV.
 """
 import argparse, csv, json, os, sys
@@ -49,6 +51,15 @@ def read(path):
         ev.setdefault(r["process"], []).append([float(r["true_logm2"]), float(r["pred_logm2"])] + [float(r[k]) for k in xs])
     return {n: (a[:, 0], a[:, 1], {k: a[:, 2 + i] for i, k in enumerate(xs)}) for n, a in
             ((n, np.array(v)) for n, v in ev.items())}
+
+
+def join_vars(ev, other):
+    """ev with the per-event variables it lacks taken from `other` (read() of another run's CSV over the same events)"""
+    for n, (t, q, X) in ev.items():
+        t2, _, X2 = other[n]
+        assert t.size == t2.size and np.allclose(t, t2, rtol=0, atol=1e-4), f"{n}: not the same test events"
+        X.update({k: v for k, v in X2.items() if k not in X})
+    return ev
 
 
 def against(d, x, hi, full):
@@ -119,11 +130,14 @@ def main():
     ap.add_argument("--out", default=None)
     ap.add_argument("--fig", default=None, help="draw the figure from this JSON")
     ap.add_argument("--x", default="log_factor", help="the figure's per-event variable")
+    ap.add_argument("--vars-from", default=None, help="another run's events CSV giving the variables this one lacks")
     a = ap.parse_args()
     if a.fig:
         return fig(a.fig, a.x)
     ev = read(a.csv)
-    out = {"csv": a.csv, "processes": {n: stats(t, q, X, n in TTX) for n, (t, q, X) in ev.items()}}
+    if a.vars_from:
+        ev = join_vars(ev, read(a.vars_from))
+    out = {"csv": a.csv, "vars_from": a.vars_from, "processes": {n: stats(t, q, X, n in TTX) for n, (t, q, X) in ev.items()}}
     out["all"] = {}
     for k in next(iter(ev.values()))[2]:
         vs = [p["vars"][k] for p in out["processes"].values() if p["vars"][k]]

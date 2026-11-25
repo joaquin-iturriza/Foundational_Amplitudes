@@ -1,0 +1,126 @@
+# llm_compare step 22 (D567/D564): part (c)'s setup with the per-event off-shellness input off, the only change
+# (data.offshell_per_event false; the internal-mass slot then holds each process's internal log-mass). Run at part (c)'s
+# best trial's HPs (llmcmp_c_qperp/trial_1860, FA-ccin2p3-29ce8950) as --hp-idx 1860: does the gg->ttH two-group split
+# and the internal-top new-family error go with the input? Everything else as sweep_config_llmcmp_c_latest.yaml, below.
+# llm_compare part (c) (D523: "our latest setup with the modified target, inputs, optimizer, scheduler, and so on"):
+# the same LLM-run conditions as part (a) (sweep_config_llmcmp_a_adamw_const.yaml: catalog_daniel's 1352 training
+# processes, the first 55,296 train events each, val pool 1e4, 60,840 steps of 24,576 mixed-process events, validation
+# every 3042 steps, seed 42, his test metric through tools/llm_score.py), with our latest setup in place of (a)'s
+# LLM-matched one: the latest catalog pretraining's setup (runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262,
+# the fa-canonical-setup table): emission-scale target (target_physics_factor + dim_only + orders, s0 = 1) with one
+# shared standardization, dimensionless inputs, coupling orders as inputs, physics levers (coupling scalars, internal
+# mass scalars with off-shellness, internal_mass_pdgs [23,6,25,24] per D506), the llm4lhc diagram encoder, HETEROSC
+# (+ its sigma stage), MuonAdamW, WSD with cooldown 1/8. Kept from (a): alphas_input (each event's alpha_s; Daniel's
+# pools vary it), use_PIDs false, particle_encoder_hidden 0, width 8 heads x 8 blocks, float32.
+# Not taken: the softpair inputs (model.input_pair_logs, input_soft_eps; still under test in finetune_mechanism, not
+# in the canonical table).
+# Space: the template's coupled space; lr window [c/3, 3c] around c = 3.65e-3, the Muon search's best at 68,224 steps
+# of the latest pretraining (cov_v4_long_hpo8, trial_1262, same width) at this horizon (60,840 steps).
+# Matched control: trial_1262's HPs (lr 3.649e-3, Muon wd 0.0473, L2 9.1e-8, warmup 0.18, eta_min 1.38e-8, EMA off).
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  request_gpus: 1
+  cpus_per_task: 8
+  mem: 20G   # measured on this setup: host MaxRSS 16.7 GB (sacct 64661587/8, 64661591 the control OOM-killed at 16G in its final plots); 20G = 7 CPUs x 3000 MB on lxplus, 4 CPUs on CC
+  time: "20:00:00"
+  gpu_min_mem: 32G   # measured on this setup (void llmcmp_c_latest, batch 24,576): peak 16.0 GB; V100-PCIE-32GB 0.90 s/step = 15.2 h, H100 0.27 s/step = 4.6 h, both inside the 22 h limit; as part (a)
+
+paths:
+sweep_name: llmcmp_c_nooffshell
+n_trials: 8
+
+dyhpo:
+  surrogate: gp
+  n_candidates: 2000
+  objective_scale: auto
+  seed: 42
+  n_startup: 3
+  total_budget: 10000
+  waves: [3, 3, 2]
+
+fidelity_schedule:
+  t_steps: [60840]
+
+fixed_params:   # "++" on the keys absent from config/ (Hydra appends them)
+  data.source: recipes
+  data.processes_file: recipes/catalog_daniel_train.yaml
+  data.require_cache: 'true'
+  data.memmap: 'true'
+  data.train_subsample: 55296
+  data.eval_subsample: 10000
+  data.phase_space_on_pool: 'false'
+  data.seed: 42
+  data.preprocess_per_dataset: 'true'
+  data.shared_standardization: 'true'
+  data.affine_multiplicity_std: 'false'
+  ++data.target_physics_factor: 'true'
+  ++data.target_physics_dim_only: 'true'
+  ++data.target_physics_orders: 'true'
+  ++data.target_physics_s0: 1.0
+  ++data.target_physics_dim_ref: qperp   # the emission-scale target proper (trial_1262; the default shat is the plain dimensional factor)
+  ++data.dimensionless_inputs: 'true'
+  data.alphas_input: 'true'
+  data.drop_coupling_powers: 'false'
+  data.use_PIDs: 'false'
+  data.spin_onehot: 'true'
+  data.color_onehot: 'true'
+  data.prop_is_massless: 'true'
+  data.standardize_props: 'true'
+  data.generation_onehot: 'true'
+  data.coupling_scalars: 'true'
+  data.internal_mass_scalars: 'true'
+  data.internal_mass_pdgs: '[23,6,25,24]'
+  data.offshell_per_event: 'false'   # the one change against sweep_config_llmcmp_c_latest.yaml
+  data.target_propagators: 'false'
+  model: lloca
+  model.use_diagrams: 'true'
+  model.diagram_encoder_impl: llm4lhc
+  model.diagram_encoder_llm4lhc.hidden_size: 64   # as trial_1262 and every llm4lhc pretraining (tp3_levdiagl, dancat_het_pre); config default 256
+  model.particle_encoder_hidden: 0
+  model.net.num_heads: 8
+  model.net.num_blocks: 8
+  seed: 42
+  plot: 'true'
+  training.batchsize: 24576
+  evaluation.batchsize: 16384
+  training.loss: HETEROSC
+  training.loss_aggregation: mean
+  training.sign_head: 'false'
+  training.validate_frac: '0'
+  training.validate_every_n_steps: 3042
+  training.get_ID: 'false'
+  training.regularization: L2
+  training.save_intermediate: 'false'
+  training.optimizer: MuonAdamW
+  training.scheduler: WSD
+  training.wsd_cooldown_frac: 0.125
+
+search_space:
+- name: training.lr
+  type: float_log
+  low: 1.217e-03    # [c/3, 3c] around c = 3.65e-3 (header)
+  high: 1.095e-02
+- name: training.muon_weight_decay
+  type: float_log
+  low: 1.0e-03
+  high: 0.3
+- name: training.regularization_lambda
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-06
+- name: training.cosanneal_warmup_frac
+  type: float_uniform
+  low: 0.05
+  high: 0.2
+- name: training.cosanneal_eta_min
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-07
+- name: ema
+  type: categorical
+  choices: ["false", "true"]
+- name: training.ema_decay
+  type: float_uniform
+  low: 0.9
+  high: 0.999
