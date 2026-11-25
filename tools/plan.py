@@ -976,7 +976,7 @@ def user_said(ask, top=SAID_TOP):
         if len(h) >= SAID_MIN:
             hits.append((sum(math.log(n / df[x]) for x in h), ts, t, sorted(h)))
     hits.sort(key=lambda x: (-x[0], x[1]))
-    return [(ts, t, h) for _, ts, t, h in hits[:top]]
+    return [(ts, t, h) for _, ts, t, h in hits[:top]]   # top=None: all
 
 
 def _said_stamp(ts):
@@ -987,12 +987,12 @@ def _said_ok(ask, searched):
     """A question is asked only after the user's own messages that may answer it were read: each one user_said finds
     is named in --searched by its time (YYYY-MM-DDTHH:MM UTC, or with a space for the T)."""
     s = searched or ""
-    missing = [(ts, t, h) for ts, t, h in user_said(ask)
+    missing = [(ts, t, h) for ts, t, h in user_said(ask, top=None)
                if _said_stamp(ts) not in s and _said_stamp(ts).replace("T", " ") not in s]
     if missing:
         sys.exit("plan: Joaquin's own messages share this question's rare terms and may already answer it; read each "
                  "and name it in --searched by its time (UTC), with why it does not settle the question:\n" + "\n".join(
-                     "  %s [%s] %s" % (_said_stamp(ts), ", ".join(h), re.sub(r"\s+", " ", t)[:200])
+                     "  %s [%s] %s" % (_said_stamp(ts), ", ".join(h), re.sub(r"\s+", " ", t)[:80])
                      for ts, t, h in missing))
 
 

@@ -86,6 +86,25 @@ def test_ask_refused_until_named():
         restore(d, old)
 
 
+def test_all_flagged_messages_listed_at_once():
+    msgs = [user("2026-10-20T10:%02d:00Z" % (i % 60), x) for i, x in enumerate(FILLER)]
+    stamps = ["2026-10-21T01:01", "2026-10-22T02:02", "2026-10-23T03:03"]
+    for st, words in zip(stamps, ["zebrafish quokka", "narwhal axolotl", "platypus wombat"]):
+        msgs.append(user(st + ":00Z", "Remember the %s thing" % words))
+    d, old = world(msgs)
+    try:
+        ask = "Scope: zebrafish quokka narwhal axolotl platypus wombat?"
+        try:
+            plan._said_ok(ask, "looked at rules")
+            assert False, "not refused"
+        except SystemExit as e:
+            why = str(e)
+        assert all(st in why for st in stamps), why        # one refusal lists all three
+        plan._said_ok(ask, "read " + " ".join(stamps))     # next call naming them passes
+    finally:
+        restore(d, old)
+
+
 def test_unrelated_question_passes():
     d, old = world(corpus())
     try:
