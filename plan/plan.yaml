@@ -46497,6 +46497,18 @@ entries:
       0.99 -> 1%; AdamW part of MuonAdamW 0.9 -> 10%; Muon''s newton_schulz of the momentum keeps its norm). Reading for D560:
       neither the noise scale B_simple nor the update''s first-order critical batch B_A finds the scan''s B_crit (both 30-100x
       below); the step''s loss decrease as measured cannot be read.'
+  - at: '2026-11-25T15:09:07+00:00'
+    text: '2026-11-25 16:40 D560 part B closed on existing data (design FIX option a): dl_read.py 40f9a2997, data/{pretrain,zng4g}_update_bdl.json
+      d6fb2a7c7: the quadratic model''s optimal-step critical batch from the full-step reads (Q = A - dL(s=1), dL_opt = A^2/(4Q),
+      fit dL_max/(1+B_q/b)), windows without an exploding read: pretraining B_q 48, 73, 101, 102, 112, 124, 137, 1082 (8 windows)
+      against B_crit 2500/4420/6690: below B_crit/3 at every target window -> the design''s NO branch; Z+4g B_q 3, 4, 20,
+      23, 33, 114, 196 (7 windows) against [43.5, 522]: 3 of 7 inside. With B_simple 55.5 and B_A 28-111: no in-run measure
+      of this family (noise scale, first-order update, optimal-step update) locates the scan''s critical batch; the scan''s
+      B_crit is the number to trust and the rule for a future run is a short batch scan. Not tested (a new design if wanted):
+      a momentum-aware measure (Muon 0.95, AdamW 0.9, Adam 0.99 average gradients over ~10-100 steps, which none of these
+      reads models). Code: repo-reviewer a42f06a79d72773c9 found the dL reads'' forwards drew independent frame noise (zero-mean,
+      adds variance only); fixed by _noise_dl_losses (fork_rng, seed=step), merged 4237a0be1 with update_scales (default [1.0],
+      unused).'
   handoff:
     state: 'Steps 2-4 in flight or stopped. Step 2 (D560 part B, pretraining): FA-ccin2p3-3e856594 runs v4_het_update_noise
       at the scan''s batch-16384 best hp 1333 (design passed 12:38 by a4f3d7192edf30268; code merged 5109b8182; smoke FA-ccin2p3-b587c065
