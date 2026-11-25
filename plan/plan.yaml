@@ -46192,7 +46192,7 @@ entries:
   asks: []
   owner:
     agent: a8af961df29d56c2e
-    state: working
+    state: closed
     since: '2026-11-24T23:40:11+00:00'
     state_at: '2026-11-25T01:12:30.434000+00:00'
     context: 301110
@@ -46402,3 +46402,33 @@ entries:
       FA-ccin2p3-0168649a FA-ccin2p3-e8ddcffe FA-ccin2p3-21e43382 FA-ccin2p3-04668c18 FA-ccin2p3-4fe7b586 FA-ccin2p3-268dc7ef
       FA-ccin2p3-c50cabed FA-ccin2p3-f18df9da FA-ccin2p3-28030297 FA-ccin2p3-3c7f89ec FA-ccin2p3-b6ddd86a  FA-ccin2p3-b8aac80f
       FA-ccin2p3-7f0f1995 FA-ccin2p3-a6ccc801 FA-ccin2p3-b920c9fb FA-ccin2p3-58eca6a9 FA-ccin2p3-7ed03b54
+  handoff:
+    state: 'Design passed (two stages). Smoke (D395) passed: FA-ccin2p3-2f5d1f17 + kit 9c1687f8/5debc82a wrote config flags,
+      fixed.json val_mse_curve, sigma_stage, plots, kit_result.json. Stage 1 (36 runs, seed_chunks/stage1/<run>.txt @02c31b393):
+      29 queued/running on CC (ids in analysis/selective_rescale/seed_chunks/stage1_submitted.txt @d7aca65c5). NOT YET SUBMITTED:
+      the 7 Z+4g 1e5 runs selres_s1_zng_1e5_{softbelow_x0p1_s42,s43,s44, softbelow_x0p3_s42,s43,s44, eventgate_x0p1_s44}:
+      site submit auto picked lxplus and nothing registered there (log ~/.local/share/ccorch/detached/20261125-020739_selres_stage1_resubmit.log,
+      the earlier attempt was refused as stale); submit them per site pick with --allow-stale (sites synced to 4f54d69ea;
+      trunk moves with others'' plan commits). Kit scoring: 6 of 18 submitted (uug 1e5 softbelow x0p1/x0p3, runs FA-ccin2p3-b8aac80f
+      7f0f1995 a6ccc801 b920c9fb 58eca6a9 7ed03b54, afterok their training); 12 failed ''Job dependency problem'' (uug 1e4
+      all three schemes and uug 1e5 eventgate: their training jobs had likely already ended): submit those 12 as job_kit.sh
+      KIT_SCORE_ONLY=1 KIT_SCORE_DIR=runs/<run> -- kit_ee_uug__me2 <1e4->10000|1e5->100000> 1953 A without dependency once
+      each training run ended clean (scratchpad script submit_kit18.sh pattern). Step 1''s wait currently names 35 run ids
+      (29 training + 6 kit); extend it with the 7 training and 12 kit ids. Then read: python3 analysis/selective_rescale/stage1_read.py
+      (collects from CC and lxplus; CC site_python is a CPU job: call twice), look at figs/stage1.png, apply the design''s
+      YES per scheme; stage 2 (own 16-trial search, configs sweep/sweep_config_selres_*.yaml incl. Z+4g 1e5 control searches)
+      only for a scheme-cell missing YES. Item est-gpu-hours set to 60 (stage 1 + stage 2, under D552''s 100).'
+    decisions: 'Joaquin''s: D552 (the question, scope). Mine: schemes rescale-below-x0 (0.1, 0.3) and event gate 0.1 chosen
+      by the input check (compression c tracks D539''s eps ladder, ln r = 0.275 c); x0<=0.05 and raw+rescaled two-input dropped
+      on that check and on D374''s pair-logs precedent; two-stage design (stage 1 at the no-rescale best HPs, reviewer''s
+      FIX per the CLAUDE.md feature rule); soft tolerance = rescale arm''s three-seed log10(max/min) (+0.30/+1.05 dec); bulk
+      YES rests on the two Z+4g cells; one run per job; 12G memory (D539 peak RSS 2.7 GB); item estimate 60 GPU-h.'
+    ruled_out: 'Event gate / per-particle thresholds <= 0.05 (no trained log branch: <0.6% of Z+4g, <=0.1% of uug particles);
+      raw plus rescaled momenta as two inputs (D374 pair logs beside raw momenta left the soft bin at 19100 vs 14180; needs
+      a second vector input).'
+    running: 29 stage-1 training runs on CC (stage1_submitted.txt) and 6 kit runs FA-ccin2p3-b8aac80f 7f0f1995 a6ccc801 b920c9fb
+      58eca6a9 7ed03b54; 7 training runs and 12 kit jobs still to submit (see state).
+    files: 'wrappers.py (_soft_rescale: input_soft_x0, input_soft_gate @7d4dc4ec4, 02929d3d2), config/model/lloca.yaml, tests/test_input_reps.py,
+      analysis/selective_rescale/{input_check.py,data/input_check.json,stage1_read.py,seed_chunks/selres_stage1_all.txt,seed_chunks/stage1/*.txt,seed_chunks/stage1_submitted.txt,seed_chunks/selres_smoke.txt},
+      sweep/sweep_config_selres_*.yaml (14, incl. stage-2 controls)'
+    written: '2026-11-25T01:15:27+00:00'
