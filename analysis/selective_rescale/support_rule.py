@@ -31,12 +31,13 @@ sys.path.insert(0, os.getcwd()); import siteconf
 eta = np.array([1., -1., -1., -1.]); out = {}
 for a in sys.argv[1:]:
     lab, log = a.split("#"); r = {}
-    if log.startswith("recipe:"):   # every process's frozen pools of each role (find_pool, the recipe's sqrts window)
-        import yaml
-        from analysis.common.readers import find_pool
-        pools = [(role, find_pool(p["name"], p.get("sqrts"), role)) for p in yaml.safe_load(open(log[7:]))["processes"]
-                 for role in ("train", "val", "test")]
-        assert all(q for _, q in pools), [x for x in pools if not x[1]]
+    if log.startswith("recipe:"):   # every pool the recipe trains, validates and tests on, resolved as training resolves it
+        import subprocess, yaml   # (train pools sit in the train cache, not DATA_DIR; mixture pools carry _smix)
+        n = len(yaml.safe_load(open(log[7:]))["processes"])
+        out = subprocess.run([sys.executable, "tools/check_site_data.py", "--paths", log[7:]], capture_output=True, text=True).stdout
+        pools = [(re.search(r"GeV_(train|val|test)", q).group(1), q) for q in
+                 (l[5:] for l in out.splitlines() if l.startswith("POOL ") and l.endswith(".npy"))]
+        assert len(pools) == 3 * n and all(os.path.exists(q) for _, q in pools), (n, [q for _, q in pools if not os.path.exists(q)], out[-2000:])
     else:
         pools = re.findall(r"\[(train|val|test)\] \S+: \d+ events.*? from (\S+\.npy)",
                            open(os.path.join(siteconf.PROJECT_DIR, "runs", log)).read())
