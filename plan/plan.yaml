@@ -44300,6 +44300,12 @@ entries:
       passthrough, 403) but from ~23:50 UTC gives DeepSeek 502 proxy error and both 503 Service Unavailable, retried at 2026-11-25T00:05
       UTC. Samples extracted: 100 wakes (do-nothing 71/100), 159 review rounds (89 FIX, 70 PASS; 118 of them with a sed/grep/awk
       design read, reported apart).'
+  - at: '2026-11-25T00:22:58+00:00'
+    text: 'Under D555 (owner reads a failed run''s log only where the checked reading leaves the cause open; CLAUDE.md 2013ca3e4)
+      the log-reading saving is the read-phase scenario: up to 1.23% of our tokens (60.7M of 4953M over 2026-11-09..23), its
+      value when every checked reading settles the cause; with tool fixes 0.17% and lookups 0, the routed kinds save up to
+      1.39% (tools/token_share.py last JSON line). Written as par:labllm3 with fig:labllm3 (token_activity), commit pending
+      the repo-reviewer pass (backlog overdue).'
   handoff:
     state: 'Hard round done (labllm 7a28103a4, summary.json, figs/lab_llm_hard.png): all ten multi-file fixes valid after
       the sandbox fix (774147232: TMPDIR in run dir, fixcheck copies as git repos; baselines refreshed 571cf7014). First pass
