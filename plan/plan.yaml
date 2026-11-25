@@ -45173,6 +45173,23 @@ entries:
       scan''s hours to -2.08 rise to 0.736 and 0.693, 1.63-1.73x the best (same source); [87/2, 261x2] <- a measured spread:
       the Adam two-batch B_crit range over levels in data/ft_bcrit.json, widened by the same factor 2; 5% in the CPU tests
       <- a measured noise: the toys'' Monte Carlo error at 300-400 repetitions, below it in the tests themselves'
+    passed_at: '2026-11-25T12:26:39+00:00'
+    reviewer: 'Re-check of the 12:24 revision against the 2026-11-25 FIX. All points addressed: stop_at_val_loss -2.30 and
+      brute_at [50,1000,1950,2950] listed; Z+4g 32 chunks (b 64-1024), so dL(1024)/dL(64) is 3.6 at B=261, 2.2 at B=87 and
+      1.4 at B=30; the outcome is two-sided; factor 2 and factor 3 are sourced from the scan''s V100 hours to -2.08 (0.425-0.477
+      from 4096 to 16384, 0.736/0.693 at 2048/32768, par:cbs_scan, checked); the tested rule is stated (B_dL at the step of
+      crossing L against B_crit(L), used through a pilot run, early reading reported); pretraining decides and Z+4g only extends
+      or restricts; wall time 1.5 h + 0.3 h + 2 smokes of 0.3 h, about 2.5 GPU-h; disk 137 MB per run. Check 2: the scan''s
+      steps to -2.08 fall 3997 -> 1324 from 2048 to 32768 at the same lr (cbs_readout.json), against the 1.025 B_simple predicts;
+      dL(b) at the run''s lr is that per-step gain, and its 2048-8192 points give a ratio of 2.05 at B=4420 against 1.02 at
+      B=55. Known-answer tests at 5e4d42794. Check 3: one seed, as the runs repeated; spread from windows and the jackknife.
+      Notes for the owner: (a) the claim that chunk composition is absent from dL is not right for pretraining, because the
+      composition term inflates the chunk g_b noise and so can bias B_dL up, by at most the measured 1.16-1.29x trace excess
+      (inside the factor-2 band; say so in the readout); (b) at update_every 50 a 200-step window holds 4 dL reads, and separating
+      the factor-2 edges needs the dL(8192)/dL(2048) ratio to about 20% (1.64 at B=2210, 2.56 at B=8840); read the scatter
+      on the smoke (run it at update_every 10) and pool adjacent windows or raise the read rate if 4 reads do not reach that.
+      Terms searched: noise scale, critical batch, B_noise, B_u, update direction, normalis, curvature (results.tex); noise,
+      critical, B_crit, batch (decisions); none found earlier.'
   step_why:
     1:
       feeds: 'D532: the scan''s answer (NO branch, B_crit 2500-6690 vs B_simple 55.5) reaches Joaquin as a finished entry'
