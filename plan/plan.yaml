@@ -40813,14 +40813,6 @@ entries:
       (both arms), look at it, check_caption, hand back reads (i)-(iii) per candidate with the figure and the answer to ''why
       a boosted tree?'' (no reason beyond CPU; a tree is piecewise constant and cannot extrapolate; per-process trees 0.32
       vs network 0.045, l.7814/l.8510). (C), g fed to LLoCa per event, only if (B) passes, its own design.'
-    18: 'D567 (Joaquin: ''It would be nice to see also how good the different models get the shape of the distribution, not
-      only the bias ... Perhaps we get more insight by looking at this as well''): (1) DONE @41820f764: figs/all_arms_shape_heldout_per_process.png
-      (heldout_per_process.py --part shape, MSE - bias^2 per held-out process) and error_split.py shape medians; the untuned
-      his-setup control has no split file yet. (2) level-removed true-vs-predicted log|M|^2 distributions with ratio panels
-      (ps.true_pred_hist) on new-family processes where the arms differ most: llm_score.py --events-out @d937b2f1c re-reads
-      (REREAD, ONLY=heldout, EVENTS=1) of trial 5, 16 heads, our control, our searched (run dirs copied CC -> lxplus, detached
-      d567_copy) and the his-setup control on lxplus (also its split); fetch each run''s llm_events_heldout.csv, draw, look,
-      check_caption, hand back with figure (1).'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -41035,12 +41027,6 @@ entries:
         noise: design (C)'
       - 'fail on (i): equal-size search for both models cross-fitted on training processes, its own design'
       - 'fail on (ii) only: report, places levels but follows the sample no better than a constant'
-    18:
-      feeds: 'D567/D564: how well each arm gets the shape apart from the level'
-      if:
-      - 'shapes right where levels are wrong (rho ~0.9, small MSE-bias^2): the new-family gap is the level, the D566 level
-        work is the lever'
-      - 'shapes also wrong on the failing families (gg->tbW, ttX): a shape cause to investigate beside the level'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
@@ -41702,7 +41688,6 @@ entries:
       configurations (finding 2026-11-25 split read)'
     '16': FA-ccin2p3-89671610
     '17': FA-lxplus-294e9e5e FA-lxplus-49899ef8
-    '18': detached d567_fetch (the three remaining event CSVs, fetched one after another)
   handoff:
     state: 'Part (a) DONE, part (c) DONE. Part (b) his setup: 16 heads done; 32 FA-ccin2p3-e9dfa8b9 and 64 FA-ccin2p3-623a3af6
       RUNNING, 120 FA-ccin2p3-f0b997a2 PENDING (steps 12-14: score with job_llm_score.sh REREAD, redraw the ONE all-arms figure
