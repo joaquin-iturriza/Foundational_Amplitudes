@@ -346,6 +346,26 @@ def main():
             print("    %-30s %7.1fM  %5.1f%% of all  $%6.0f  msgs %6d  %.0fk/msg" % (
                 k, v["tokens"] / 1e6, 100 * v["share_of_total"], v["usd"], v["messages"], v["tokens"] / v["messages"] / 1e3))
     figure(rep, a.fig)
+    figure_kinds(rep, a.fig.replace("token_share", "token_activity"))
+
+
+def figure_kinds(rep, base):
+    """Tokens of the owners and of the main session per kind of activity (each message to the kind of its calls)."""
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    import plot_style as ps
+    ko, km = rep["roles"]["owner"]["kinds"], rep["roles"]["main"]["kinds"]
+    kinds = sorted(set(ko) | set(km), key=lambda k: -(ko.get(k, {}).get("tokens", 0) + km.get(k, {}).get("tokens", 0)))
+    fig, ax = ps.figure(1, 1)
+    for j, (kk, name, col) in enumerate(((ko, "entry owners", ps.C.blue), (km, "main session", ps.C.vermillion))):
+        ax.barh([i + 0.2 * (2 * j - 1) for i in range(len(kinds))], [kk.get(k, {}).get("tokens", 0) / 1e6 for k in kinds],
+                height=0.4, color=col, label=name)
+    ax.set_yticks(range(len(kinds)), [k.replace(" (reply, reasoning)", ", no tool call") for k in kinds])
+    ax.invert_yaxis()
+    ax.set_xscale("log")
+    ax.set_xlim(1, 1e5)  # clear lower-right corner for the legend (the bottom bars end below 10^2)
+    ax.set_xlabel("our tokens over 14 days ($10^6$)")
+    ps.legend(ax, "lower right")
+    ps.save(fig, base)
 
 
 def figure(rep, base):
