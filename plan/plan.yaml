@@ -44581,7 +44581,7 @@ entries:
     '3': notes-editor pass of the results.tex backlog (it blocks on sec:noisescale and fig:llmcmp_heldout, other entries'
       text; the repo-reviewer already passed the merge)
     '5': detach wake_replay3
-    '6': detach:review_replay2
+    '6': detach review_replay3
     '7': repo-reviewer ad976c1837d8c4c7d (holds the lock; asked to include tools/lab_wake_trial.py)
   findings:
   - at: '2026-11-23T19:55:22+00:00'
