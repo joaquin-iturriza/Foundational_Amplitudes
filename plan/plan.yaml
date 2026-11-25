@@ -43809,6 +43809,19 @@ entries:
     sources: largest of bias^2, scale, floor <- the exact three-part split of MSE, naming the largest part, no tuned threshold;
       1.38x <- the seed spread 10^0.14 (docs/results.tex v4_seed_spread ~l.4485), only to say the 10x gap is not noise; 1e-6
       relative <- float reproducibility of an unchanged quantity
+    passed_at: '2026-11-25T13:30:23+00:00'
+    reviewer: 'Re-check after FIX. The measure is now in absolute log|M|^2 on every arm: q = mu + sigma h - log F, t = mu
+      + sigma z - log F. F is exp.all_amp_factor at the test split''s indices, the same alignment the run''s own test stage
+      uses (experiment.py ~l.3268-3276; the test loader runs with shuffle=False and drop_last=False), and the memmap path
+      sets it (data_mmap.py l.1125). There is a length assert and an assert that the sums give back the MSE, and the absolute
+      inversion is checked once against a part (c) run''s saved predictions. The outcome is the exact three-part split bias^2
+      + scale + floor, naming the largest part with no threshold, with a next step for each. Prior now names the catalog_v4
+      offset/floor reads and the statistics predictor on the 43. The part (c) control is REREAD=FA-ccin2p3-d34535b0; the part
+      (c) best re-read runs after FA-ccin2p3-c9d44ad3. Check 2: hp58 1-rho^2 from 5.9e-3 to 0.94 on the same 43 and raw-to-affine
+      median MSE 1.27 -> 0.080 (results.tex ~l.7752-7820); existing per-process MSEs 15.6-36.6 against the LLM''s 2.2-2.5
+      (data/*_heldout.json, verified). Check 3: deterministic eval, a 10x gap against the 1.38x seed spread. Check 5 terms:
+      llmcmp, bias, level error, misplaced, offset, extrapolat, gg->tbW, bbx_hhh, wrong shape, zero_shot_parts. Eval only,
+      under 2 GPU-h.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
