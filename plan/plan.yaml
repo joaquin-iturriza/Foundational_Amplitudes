@@ -40763,9 +40763,6 @@ entries:
   - D553
   - D554
   next:
-    5: 'Part (c) readout: when llmcmp_c_qperp''s driver writes DRIVE_DONE and its control ends, score (c)''s best trial and
-      the control (REREAD=<run> scripts/job_llm_score.sh), read per set (seen, held out, relabels, new) pooled RMSE and median
-      per-process MSE against (a)''s best with the 1.38 margin, figure in Suprio''s layout; write-up'
     8: 'Part (b) from our setup (D537 ''We then also widen the best HPs for our setup''): once part (c)''s search ends (step
       5 names its best trial), the same muP width scale-up (num_heads 16, 32, 64, 120 toward 359.6M) at part (c)''s best HPs
       in its config (sweep/sweep_config_llmcmp_c_latest.yaml), its own design (reusing part (b)''s smoke rates where the setup''s
@@ -40946,12 +40943,6 @@ entries:
     context: 95105
     context_at: '2026-11-25T13:19:09+00:00'
   step_why:
-    5:
-      feeds: 'part (c): our latest setup against part (a), the LLM and his LLoCa; where part (b) starts'
-      if:
-      - '(c)/(a) < 1/1.38 on held out: (b) starts from (c)''s HPs'
-      - '(c)/(a) > 1.38: (b) starts from (a)'
-      - 'between: not resolved by one seed, ask Joaquin for the seed-43 pair'
     8:
       feeds: 'part (b) for our setup: does width close the held-out gap in the latest setup'
       if:
@@ -41509,7 +41500,6 @@ entries:
       clipped: 52 of c_best''s 139 held-out points were below 1e-3). For step 8 (D537 ''We then also widen the best HPs for
       our setup''): the width scale-up at part (c)''s best HPs starts from hp1860.'
   step_waits:
-    '5': FA-ccin2p3-c9d44ad3
     '8': part (c) driver llmcmp_c_qperp_drive5 ending (its detach DONE event; wave 3 of 2 trials after trials 3 -5.816 and
       5 -5.938 of wave 2)
     '12': FA-ccin2p3-e9dfa8b9
