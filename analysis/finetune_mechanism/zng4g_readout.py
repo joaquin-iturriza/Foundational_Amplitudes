@@ -23,7 +23,6 @@ sys.path.insert(0, ROOT)
 import numpy as np  # noqa: E402
 from analysis.common.readers import site_python  # noqa: E402
 
-CC = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 S_TRIAL = {"2048": "trial_1333", "128": "trial_0950"}
 N_FT = 16
 FIRST = 41
@@ -31,9 +30,12 @@ FIRST = 41
 REMOTE = r'''
 import json, os, sys
 import numpy as np
+sys.path.insert(0, os.getcwd()); import siteconf
 out = {}
 for a in sys.argv[1:]:
     lab, d, res = a.split("|")
+    d = os.path.join(siteconf.PROJECT_DIR, d)   # absolute paths (from driver_state) pass unchanged
+    res = os.path.join(siteconf.PROJECT_DIR, res) if res else res
     r = {"run_dir": d}
     try:
         r["std"] = json.load(open(os.path.join(d, "data_stats.json")))["prepd_std"][0]
@@ -78,14 +80,14 @@ def collect():
                 meta[lab] = {"hp": hp, "trial": ti, "val_loss": v}
         for s in (43, 44):
             n = f"ftmech_zng4g_ft_b{b}_s{s}"
-            items["ccin2p3"].append(f"'F|{b}|s{s}|{CC}/runs/{n}|{CC}/sweeps/{n}/results/fixed.json'")
+            items["ccin2p3"].append(f"'F|{b}|s{s}|runs/{n}|sweeps/{n}/results/fixed.json'")
         for s in (42, 43, 44):
             n = f"ftmech_zng4g_scrflags_b{b}_s{s}"
-            items["ccin2p3"].append(f"'Sf|{b}|s{s}|{CC}/runs/{n}|{CC}/sweeps/{n}/results/fixed.json'")
+            items["ccin2p3"].append(f"'Sf|{b}|s{s}|runs/{n}|sweeps/{n}/results/fixed.json'")
         sw = f"tp_zng_d1e4_muon_b{b}_zgggg"
-        items["ccin2p3"].append(f"'S|{b}|s42|{CC}/runs/{sw}/{S_TRIAL[b]}|'")
+        items["ccin2p3"].append(f"'S|{b}|s42|runs/{sw}/{S_TRIAL[b]}|'")
         for s in (43, 44):
-            items["ccin2p3"].append(f"'S|{b}|s{s}|{CC}/runs/{sw}_best_s{s}|'")
+            items["ccin2p3"].append(f"'S|{b}|s{s}|runs/{sw}_best_s{s}|'")
     # labels with "|" inside: re-join the first fields (arm|batch|tag) on the site side
     out = {}
     for site, args in items.items():
