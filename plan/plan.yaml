@@ -47111,6 +47111,12 @@ entries:
     units: null
     start: '2026-11-25T02:29:07+00:00'
     at: '2026-11-25T02:29:07+00:00'
+  - batch: support_rule_kit
+    wall_h: 1.0
+    jobs: 12
+    units: null
+    start: '2026-11-25T12:15:32+00:00'
+    at: '2026-11-25T12:15:32+00:00'
   step_waits:
     '3': Joaquin's answer to the open question on the D392 input map
   handoff:
