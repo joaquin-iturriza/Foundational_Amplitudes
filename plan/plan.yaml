@@ -40799,6 +40799,11 @@ entries:
       (per-family errors in Suprio''s layout already in figs/*heldout_per_process.png; candidate causes: his input encoding/pID
       embedding, his target standardisation on held-out, our shared affine statistics on new multiplicities, model capacity),
       design review, then the configurations that test it within the GPU budget'
+    16: '16: D564 level branch, the configuration: his setup (part (a) trial 5''s config and HPs, 8 heads, seed 42) with each
+      process''s target mean taken from the process-only level network with diagram descriptors (frozen level file, data-free)
+      instead of mu_N = a + bN; code (data.level_file in _resolve_amp_preprocessing and parent_target_standardization, unit
+      test, repo review), one ~50-step smoke (D395), the run, scoring by job_llm_score.sh, read against trial 5 and the post-hoc
+      substitution (level_source.py). Design recorded 2026-11-25, in review.'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -40989,6 +40994,13 @@ entries:
       if:
       - 'a cause found that a configuration of ours can test: design and run it (investigation scope, GPU budget)'
       - 'no candidate survives the checks on existing data: report what was ruled out with its evidence'
+    16:
+      feeds: 'D564: why the LLM extrapolates to new families better than our LLoCa (what sets a new family''s level)'
+      if:
+      - 'the network keeps the given level (new median MSE near the post-hoc 0.58, below trial 5 by >1.38x): the level is
+        set by the target''s per-process mean; the fix is a process-level level predictor in the target, carried to our setup'
+      - 'the network overrides it (new median within 1.38x of trial 5''s 1.144): the level is learned from the particles whatever
+        the target says; next, what in the inputs sets it (pID embedding vs property table)'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
