@@ -46499,6 +46499,11 @@ entries:
     why: 'resolved Z+4g bulk cost at 1e4 both times: 1.26 [1.16,1.38] (stage 1), 1.29 [1.18,1.40] at its own optimum (par:selres_stage2
       @7a65c7ebe); the design ends a rule on a resolved cost in a Z+4g cell'
     at: '2026-11-25T07:10:14+00:00'
+  - tried: 'event gate: full rescale on every momentum of an event with min x<0.1 (model.input_soft_gate=0.1), at the no-rescale
+      optimum and at its own search''s optimum'
+    why: 'resolved Z+4g bulk cost at 1e4: 1.75 [1.60,1.91] (stage 1), 2.37 [1.19,4.74] at its own optimum with two of three
+      seeds blowing up (par:selres_stage2 @7a65c7ebe)'
+    at: '2026-11-25T07:10:20+00:00'
   asks: []
   owner:
     agent: a4ab30797e0606c86
