@@ -45581,7 +45581,7 @@ entries:
       GiB.'
   step_waits:
     '2': FA-ccin2p3-170b2eff
-    '4': 'job_ccdisk_d556.sh''s read (not yet submitted: design review pending)'
+    '4': FA-ccin2p3-170b2eff (its cache_readers.txt and census_d556.tsv)
   targets:
   - batch: disk_inventory
     wall_h: 1.0
