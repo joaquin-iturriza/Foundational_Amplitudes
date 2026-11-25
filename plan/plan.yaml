@@ -40945,7 +40945,7 @@ entries:
     agent: a115825542ebec00a
     state: working
     since: '2026-11-25T13:16:50+00:00'
-    state_at: '2026-11-25T13:58:06.236000+00:00'
+    state_at: '2026-11-25T14:13:07.513000+00:00'
     context: 235528
     context_at: '2026-11-25T14:00:12+00:00'
   step_why:
@@ -44084,9 +44084,9 @@ entries:
       it is'
   owner:
     agent: a5ba353786b0cf99d
-    state: working
+    state: stopped
     since: '2026-11-25T13:58:11.325000+00:00'
-    state_at: '2026-11-25T13:58:11.325000+00:00'
+    state_at: '2026-11-25T14:04:49.897000+00:00'
     context: 83485
     context_at: '2026-11-25T14:13:23+00:00'
   designs:
