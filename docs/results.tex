@@ -10228,6 +10228,98 @@ deepest collinear bin moves by $0.18$ and $0.21$, inside its seed spread.
   \label{fig:ftm_d539u}
 % allow: 2048 1953 42 44 2 10^4 10^5 because they are the batch size, steps, seeds, the square of |M| and the training sizes
 \end{figure}
+
+% plan selective_rescale (Event-dependent momentum rescale: the soft-limit gain without the bulk cost), stage 1
+\paragraph{The rescale applied only where it helps (D552, 2026-11-25)}\label{par:selres_stage1} The momentum rescale buys
+$e^+e^-\to u\bar ug$ its soft limit and costs $q\bar q\to Z+4g$ its bulk (par.~\ref{par:ftm_d539}). Three rules apply it
+from each event's own momenta, through the energy fraction $x_i=2p_i\cdot Q/s$: the rescale on the momenta with $x<0.1$
+only, continuous at $0.1$; the same below $x=0.3$; and the full rescale on every momentum of an event whose softest
+particle has $x<0.1$. Each trains at its cell's no-rescale optimum, seeds $42$--$44$, against D539's controls
+(Fig.~\ref{fig:selres_stage1}). Rescaling below $x=0.1$ removes the bulk cost on $Z+4g$. Its $r$ over no rescale is
+$0.92$ ($2\sigma$: $0.80$--$1.05$) at $10^4$ events and $1.05$ ($0.75$--$1.48$) at $10^5$, and over the full rescale
+$0.40$ ($0.35$--$0.46$) and $0.51$ ($0.41$--$0.63$). It keeps the soft gain on $u\bar ug$: its seed-median MSE in the deepest soft bin moves by
+$-4.78$ and $-4.89$ decades against no rescale, and by $-0.13$ and $-0.32$ decades against the full rescale at its own optimum. By
+the design's rule that is a yes. The rule needs, in both $Z+4g$ cells, an $r$ over no rescale whose $2\sigma$ interval
+reaches $1$ or lies below it and an $r$ over the full rescale whose upper bound is below $1$, and on $u\bar ug$ a
+deepest-soft-bin seed median at most the full rescale's three-seed spread $\log_{10}(\max/\min)$ above that arm's median
+($0.30$ decades at $10^4$, $1.05$ at $10^5$). The threshold $0.3$ and the event gate keep the soft gain ($-4.91$, $-5.22$ and $-5.38$,
+$-5.93$ decades against no rescale) but not the bulk: on $Z+4g$ they cost $1.26$ ($1.16$--$1.38$) and $1.58$
+($1.17$--$2.12$), and $1.75$ ($1.60$--$1.91$) and $1.90$ ($1.40$--$2.58$). The input check predicted these costs before
+any training, from the compression $c$, the mean over final-state particles of $-\ln(\mathrm{d}\ln x'/\mathrm{d}\ln x)$ in
+the validation pool, fitted to D539's rescale ladder as $\ln r=0.275\,c$: $1.05$, $1.40$ and $1.22$. They lie within
+both intervals for $x<0.1$, just above the $10^4$ interval and within the $10^5$ one for $x<0.3$, and below both for the
+gate, which rescales every particle of a fraction $0.25$ of the events.
+On the bulk of $u\bar ug$ no rule is free at the no-rescale optimum. Below $x=0.1$ costs $1.65$ ($1.33$--$2.04$) at $10^4$
+and $3.14$ ($2.00$--$4.91$) at $10^5$, though it changes a fraction $0.023$ of the events and the input
+check predicted $1.01$; below $0.3$ costs $2.5$ and $2.4$, the gate
+$5.1$ and $3.6$. Each rule's own search decides whether that is a cost or a learning rate tuned for raw momenta. No run
+blows up (validation above ten times its best so far).
+% src: python3 analysis/selective_rescale/stage1_read.py --cached @c5c19c279
+% claim: cells.zng_1e4.softbelow_x0p1.over_off.r=0.92
+% claim: cells.uug_1e4.soft_tolerance_dec=0.30
+% claim: cells.uug_1e5.soft_tolerance_dec=1.05
+% claim: pred.slope=0.275
+% claim: pred.zng.softbelow_x0p1.r=1.05
+% claim: pred.zng.softbelow_x0p3.r=1.40
+% claim: pred.zng.eventgate_x0p1.r=1.22
+% claim: pred.zng.eventgate_x0p1.events_changed=0.25
+% claim: pred.uug.softbelow_x0p1.events_changed=0.023
+% claim: pred.uug.softbelow_x0p1.r=1.01
+% claim: cells.zng_1e4.softbelow_x0p1.over_off.lo=0.80
+% claim: cells.zng_1e4.softbelow_x0p1.over_off.hi=1.05
+% claim: cells.zng_1e5.softbelow_x0p1.over_off.r=1.05
+% claim: cells.zng_1e5.softbelow_x0p1.over_off.lo=0.75
+% claim: cells.zng_1e5.softbelow_x0p1.over_off.hi=1.48
+% claim: cells.zng_1e4.softbelow_x0p1.over_rescale.r=0.40
+% claim: cells.zng_1e4.softbelow_x0p1.over_rescale.lo=0.35
+% claim: cells.zng_1e4.softbelow_x0p1.over_rescale.hi=0.46
+% claim: cells.zng_1e5.softbelow_x0p1.over_rescale.r=0.51
+% claim: cells.zng_1e5.softbelow_x0p1.over_rescale.lo=0.41
+% claim: cells.zng_1e5.softbelow_x0p1.over_rescale.hi=0.63
+% claim: cells.uug_1e4.softbelow_x0p1.kit_dec_vs_off.soft_x=-4.78
+% claim: cells.uug_1e5.softbelow_x0p1.kit_dec_vs_off.soft_x=-4.89
+% claim: cells.uug_1e4.softbelow_x0p1.kit_dec_vs_rescale.soft_x=-0.13
+% claim: cells.uug_1e5.softbelow_x0p1.kit_dec_vs_rescale.soft_x=-0.32
+% claim: cells.uug_1e4.softbelow_x0p3.kit_dec_vs_off.soft_x=-4.91
+% claim: cells.uug_1e5.softbelow_x0p3.kit_dec_vs_off.soft_x=-5.22
+% claim: cells.uug_1e4.eventgate_x0p1.kit_dec_vs_off.soft_x=-5.38
+% claim: cells.uug_1e5.eventgate_x0p1.kit_dec_vs_off.soft_x=-5.93
+% claim: cells.zng_1e4.softbelow_x0p3.over_off.r=1.26
+% claim: cells.zng_1e4.softbelow_x0p3.over_off.lo=1.16
+% claim: cells.zng_1e4.softbelow_x0p3.over_off.hi=1.38
+% claim: cells.zng_1e5.softbelow_x0p3.over_off.r=1.58
+% claim: cells.zng_1e5.softbelow_x0p3.over_off.lo=1.17
+% claim: cells.zng_1e5.softbelow_x0p3.over_off.hi=2.12
+% claim: cells.zng_1e4.eventgate_x0p1.over_off.r=1.75
+% claim: cells.zng_1e4.eventgate_x0p1.over_off.lo=1.60
+% claim: cells.zng_1e4.eventgate_x0p1.over_off.hi=1.91
+% claim: cells.zng_1e5.eventgate_x0p1.over_off.r=1.90
+% claim: cells.zng_1e5.eventgate_x0p1.over_off.lo=1.40
+% claim: cells.zng_1e5.eventgate_x0p1.over_off.hi=2.58
+% claim: cells.uug_1e4.softbelow_x0p1.over_off.r=1.65
+% claim: cells.uug_1e4.softbelow_x0p1.over_off.lo=1.33
+% claim: cells.uug_1e4.softbelow_x0p1.over_off.hi=2.04
+% claim: cells.uug_1e5.softbelow_x0p1.over_off.r=3.14
+% claim: cells.uug_1e5.softbelow_x0p1.over_off.lo=2.00
+% claim: cells.uug_1e5.softbelow_x0p1.over_off.hi=4.91
+% claim: cells.uug_1e4.softbelow_x0p3.over_off.r=2.5
+% claim: cells.uug_1e5.softbelow_x0p3.over_off.r=2.4
+% claim: cells.uug_1e4.eventgate_x0p1.over_off.r=5.1
+% claim: cells.uug_1e5.eventgate_x0p1.over_off.r=3.6
+% allow: 0.1 0.3 42 44 2 1 10^4 10^5 4g because the 4g of Z+4g is a process name, and they are the rules' thresholds, the seeds, the interval width, the ratio of no change and the training sizes
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{../analysis/selective_rescale/figs/stage1.pdf}
+  \caption{\textbf{Rescaling only the momenta below $x=0.1$ keeps the soft gain without the bulk cost on $Z+4g$.}
+  Scratch, batch $2048$, $1953$ steps, seeds $42$--$44$ (one point each), every rule and both $Z+4g$ controls at the
+  no-rescale optimum of their cell; on $u\bar ug$ the full rescale is at its own optimum. Top: best validation
+  MSE$(\log|\mathcal M|^2)$ against the training size, $q\bar q\to Z+4g$ (left) and $e^+e^-\to u\bar ug$ (right).
+  Bottom: MSE of $\log_{10}|\mathcal M|^2$ in the deepest bin of each kit family (soft, collinear, bulk) at $10^4$ and
+  $10^5$ events, $e^+e^-\to u\bar ug$.}
+  \label{fig:selres_stage1}
+% allow: 2048 1953 42 44 2 10^4 10^5 0.1 4g because the 4g of Z+4g is a process name, and they are the batch size, steps, seeds, the square of |M|, the training sizes and the threshold
+\end{figure}
 % ==========================================================================
 \section{Architecture and encoding ablations}\label{sec:arch}
 % ==========================================================================
