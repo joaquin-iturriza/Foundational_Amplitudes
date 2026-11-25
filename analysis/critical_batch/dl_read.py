@@ -46,7 +46,7 @@ def scaled(rs, bs, sc, A, smax=0.3):
     Q = [sum(s * s * (s * A[str(b)] - dls[s][i]) for s in use) / sum(s ** 4 for s in use) for i, b in enumerate(bs)]
     opt = [A[str(b)] ** 2 / (4 * q) if q > 0 else -1.0 for b, q in zip(bs, Q)]
     fo = fit(opt, bs)
-    return {"dL_s": {f"{s:g}": dict(zip(map(str, bs), v)) for s, v in dls.items()}, "Q": dict(zip(map(str, bs), Q)),
+    return {"B_opt_status": "Q<=0" if min(Q) <= 0 else "fitted" if fo is not None else "dL_opt<=0","dL_s": {f"{s:g}": dict(zip(map(str, bs), v)) for s, v in dls.items()}, "Q": dict(zip(map(str, bs), Q)),
             "dL_opt": dict(zip(map(str, bs), opt)), "B_opt": None if fo is None else float(fo[0]),
             "B_s": {f"{s:g}": (None if fit(v, bs) is None else float(fit(v, bs)[0])) for s, v in dls.items()}}
 
@@ -64,10 +64,12 @@ def window(rs, bs):
     # the quadratic model's optimal step from the full-step read alone: Q = A - dL(s=1), dL_opt = A^2 / (4 Q)
     q1 = [out["A"][str(b)] - out["dL"][str(b)] for b in bs]
     fq = fit([out["A"][str(b)] ** 2 / (4 * q) if q > 0 else -1.0 for b, q in zip(bs, q1)], bs)
+    out["B_q_status"] = "Q<=0" if min(q1) <= 0 else "fitted" if fq is not None else "dL_opt<=0"   # Q<=0: listed apart
     if fq is not None:
         out["B_q"] = float(fq[0])
     # a read whose |dL| or |A| at some b exceeds 100x the window's median read (an exploding step) is flagged
-    mags = np.abs(D).max(1)
+    Ar = np.array([[sum(v for k, v in r.items() if k.endswith(f"_A_b{b}")) for b in bs] for r in rs], float)
+    mags = np.maximum(np.abs(D), np.abs(Ar)).max(1)
     out["n_exploding_reads"] = int((mags > 100 * np.median(mags)).sum())
     sc = sorted({float(k[4:].split("_b")[0]) for k in rs[0] if k.startswith("dL_s")})
     if sc:
@@ -108,6 +110,8 @@ def read(recs, win, ref, start=0):
                         "n_in_band": sum(band[0] <= x <= band[1] for x in fitted),
                         "B_A_median": float(np.median(BA)) if BA else None,
                         "B_A_min_max": [float(min(BA)), float(max(BA))] if BA else None,
+                        "n_windows_Q_nonpositive": sum(w["B_q_status"] == "Q<=0" for w in ws),
+                        "n_windows_Q_nonpositive_scaled": sum(w.get("B_opt_status") == "Q<=0" for w in ws),
                         "n_windows_with_exploding_read": sum(w["n_exploding_reads"] > 0 for w in ws),
                         "B_q_clean": [[w["step_lo"], w["B_q"]] for w in ws if w.get("B_q") is not None
                                       and w["n_exploding_reads"] == 0],

@@ -34,5 +34,16 @@ def test_scaled_optimal_step():
     assert abs(dl_read.window([full], BS)["B_q"] - 150) < 1e-6
 
 
+
+def test_exploding_A_and_Q_nonpositive():
+    # an exploding read in A alone is flagged; a window whose Q = A - dL(1) <= 0 is listed apart, not silently dropped
+    rec = lambda s, a: {"kind": "chunk", "step": s, **{f"dL_b{b}": 0.5 for b in BS}, **{f"all_A_b{b}": a for b in BS}}
+    w = dl_read.window([rec(s, 1.0) for s in range(0, 450, 50)] + [rec(450, 1e6)], BS)
+    assert w["n_exploding_reads"] == 1
+    r = dl_read.read([rec(s, 0.2) for s in range(0, 200, 50)], 200, [87, 261])
+    assert r["windows"][0]["B_q_status"] == "Q<=0" and r["summary"]["n_windows_Q_nonpositive"] == 1
+
+
 if __name__ == "__main__":
-    test_fit_known_answer(); test_fit_listed_apart(); test_windows(); test_scaled_optimal_step(); print("ok")
+    test_fit_known_answer(); test_fit_listed_apart(); test_windows(); test_scaled_optimal_step()
+    test_exploding_A_and_Q_nonpositive(); print("ok")
