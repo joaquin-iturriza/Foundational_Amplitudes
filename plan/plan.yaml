@@ -45016,9 +45016,16 @@ entries:
     answers_after: '2026-11-25T00:40:23+00:00'
     covers:
     - cc_disk
+  - said_at: '2026-11-25T01:01:32.066000+00:00'
+    text: Yes, you also mentioned there were a bunch of caches that were relatively big, are they all needed?
+    decision: D557
+    answers_after: '2026-11-25T00:40:23+00:00'
+    covers:
+    - cc_disk
   decisions:
   - D542
   - D556
+  - D557
   next:
     2: 'After Joaquin''s yes on the costly-results list: one CPU deletion job (manifest first) of exactly the groups he approves
       (zz_catft, zz_catft_lowloss2, zz_catft_lowloss3 model files; runs/zz_smoke* model files older than 3 days), design passed
@@ -45049,6 +45056,8 @@ entries:
       and seed priority); 2026-11-14T04:31 (a pasted LaTeX template)
     blocks: the CC deletions of costly results only
     blocks_steps: []
+    answered_at: '2026-11-25T01:01:32.066000+00:00'
+    decision: D557
   - ask: 'Scope: deleting costly results on CC goes beyond D550, and D133 makes which studies count as concluded your call.
       What I call costly results is everything that took GPU time or that analyses read: model files, fine-tune runs, prediction
       files, and the only copy of a run. Our own leftovers from D550 are gone: 5.85 GiB, so CC now has 12.8 GiB free of 512
