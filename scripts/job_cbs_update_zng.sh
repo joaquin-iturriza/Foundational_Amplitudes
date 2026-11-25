@@ -1,12 +1,13 @@
 #!/bin/bash
 #SBATCH --job-name=cbs_upd_zng
 #SBATCH --cpus-per-task=4
-#SBATCH --time=01:00:00
+#SBATCH --time=01:45:00
 #SBATCH --gres=gpu:1
 #SBATCH --output=cbs_upd_zng_%j.out
 #SBATCH --error=cbs_upd_zng_%j.out
-# Wall-time target: 1953 steps x 0.036-0.074 s/step (A100/H100, sweep_config_tp_zng_d1e4_adam_b2048_zgggg.yaml) plus
-# the noise reads (32 chunk gradients every 10 steps, 62 batch forwards every 50) and start-up: 0.3 h.
+# Wall-time target: 1.0 h on V100 (smoke FA-ccin2p3-0ac97e10: 0.16 s per training step, ~60 s per 10-step block with
+# the 32-chunk noise read and the dL read (62 grouped updates); full run: 1953 steps, 195 noise reads, 39 dL reads,
+# the sigma stage without reads since run.py 7677e3d67).
 #
 # critical_batch D560: the D507 Adam batch-2048 chosen trial (hp1152) on q q~ -> Z+4g at 10^4 events, rerun at its HPs
 # (sweep/run_fixed_hp.py) with the gradient noise measurement and the update-direction terms on: 32 chunks of 64 events
