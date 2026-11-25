@@ -41479,6 +41479,20 @@ entries:
       3.65e-3) best -3.544 at 24,336, blew up at 33,462 and 51,714. Figure analysis/llm_compare/figs/c_val_curves.png (c_val_curves.py
       @bde7216d0). Best trial scored by FA-ccin2p3-c9d44ad3 (job_llm_score.sh REREAD=FA-ccin2p3-29ce8950, site pick: CC);
       control already scored (FA-ccin2p3-48e43133, data/c_control_*.json).'
+  - at: '2026-11-25T13:24:14+00:00'
+    text: '2026-11-25 step 15 (D564) first read on existing data (scratch read of data/{a_trial5,b_h16,control,c_control}_heldout.json
+      against Suprio''s per-process MSEs; tool analysis/llm_compare/family_gap.py to be committed once the repo backlog clears,
+      numbers re-made by it before they reach Joaquin). (1) His target z = (log|M|^2 - 14.017 + 6.713 n_out)/5.303 equals
+      ours (a=27.40, b=-6.70 per particle, sigma 5.32) within 0.2%: standardisation is no difference. (2) No held-out process
+      has a new multiplicity (43 new: 42 2->3, one 2->2; training 1116/236). (3) The pooled new-set gap is a few processes:
+      gg->t b~ W- / gg->b t~ W+ MSE 25.5/26.6 (trial 5), 16.3/15.6 (16 heads), 36.6/31.6 (part (c) control) vs LLM 2.2/2.5;
+      b b~->hhh 22.6-36.6 vs 13.1; top-3 processes 47-56% of our pooled new MSE. Without the gg->tbW pair pooled new RMSE
+      1.42 (trial 5) vs LLM 1.17. (4) Median per-process new MSE: trial 5 1.14, 16 heads 1.46, his-optimizer control 0.69,
+      part (c) control 0.385 (below the LLM on 25/43) vs LLM 0.649; Spearman ours vs LLM over the 43: 0.82 (trial 5), 0.61-0.84
+      across arms. Per family (median MSE, trial 5 / LLM): multi-H 2.13/1.29, H+tau 1.05/0.487, WWW 1.03/0.937, ZZZ 0.86/0.175,
+      gg->Wqq'' 0.743/0.314, gg->ttX 0.478/0.707. Next: level/shape split per process by an extended tools/llm_score.py (bias,
+      residual variance, rho), held-out-only re-reads of trial 5, 16 heads, part (c) control and best; design recorded, in
+      design review.'
   step_waits:
     '5': FA-ccin2p3-c9d44ad3
     '8': part (c) driver llmcmp_c_qperp_drive5 ending (its detach DONE event; wave 3 of 2 trials after trials 3 -5.816 and
