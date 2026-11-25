@@ -45724,9 +45724,9 @@ entries:
   asks: []
   owner:
     agent: af56ff9ec02b765a0
-    state: stopped
+    state: working
     since: '2026-11-24T23:30:10+00:00'
-    state_at: '2026-11-25T00:26:27.120000+00:00'
+    state_at: '2026-11-25T02:31:42.305000+00:00'
     context: 183934
     context_at: '2026-11-25T00:34:31+00:00'
   designs:
@@ -46413,9 +46413,9 @@ entries:
   asks: []
   owner:
     agent: a4ab30797e0606c86
-    state: working
+    state: stopped
     since: '2026-11-25T01:20:41+00:00'
-    state_at: '2026-11-25T02:13:15.724000+00:00'
+    state_at: '2026-11-25T02:31:10.950000+00:00'
     context: 216704
     context_at: '2026-11-25T02:32:11+00:00'
   designs:
