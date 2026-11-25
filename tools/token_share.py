@@ -71,7 +71,9 @@ def read(f):
             uses = [(b.get("name"), json.dumps(b.get("input") or {}), b.get("id"))
                     for b in m.get("content") or [] if isinstance(b, dict) and b.get("type") == "tool_use"]
             if m["id"] in at:  # one API message is logged as one record per content block: merge its tool calls
-                ev[at[m["id"]]][5].extend(uses)
+                e = ev[at[m["id"]]]
+                e[5].extend(uses)
+                ev[at[m["id"]]] = (e[0], e[1], m["usage"], e[3], e[4], e[5])  # the last record's usage is the final one
                 continue
             at[m["id"]] = len(ev)
             ev.append(("msg", m["id"], m["usage"], m.get("model"), (d.get("timestamp") or "")[:19], uses))
@@ -174,7 +176,7 @@ def scan(since, until):
     k3own = {"residency": 0, "usd": 0.0, "searches": 0}
     calib, explore_desc, routed, worker_desc = [], [], defaultdict(list), defaultdict(list)
     files = sorted(glob.glob(PROJ + "/*.jsonl")) + sorted(glob.glob(PROJ + "/*/subagents/agent-*.jsonl"))
-    # subagent files first: a subagent's message also appears in its parent's progress records (not read here)
+    # a subagent's message also appears in its parent's progress records, which read() never takes
     for f in files:
         mp = f[:-6] + ".meta.json"
         meta = json.load(open(mp)) if os.path.exists(mp) else {}
@@ -338,8 +340,22 @@ def main():
     for k, v in save.items():
         print("saving %-17s" % k, {kk: (round(vv / 1e6, 2) if "share" not in kk else round(100 * vv, 2))
                                    for kk, vv in v.items() if kk != "note"}, v.get("note", "")[:60])
-    print(json.dumps({"total_M": round(total / 1e6, 1), **{k: round(100 * v.get("share", v.get("share_mid", 0)), 2)
-                                                           for k, v in save.items()}}))
+    slug = lambda k: re.sub(r"[^a-z0-9]+", "_", k.lower()).strip("_")
+    R = rep["roles"]
+    # D555: the owner reads the log only where the checked reading leaves the cause open; the read-phase saving is
+    # its value when every checked reading settles the cause
+    d555 = save["log_owner_trusts"]["share_mid"] + save["fixes"]["share"] + save["lookups"]["share"]
+    last = json.dumps({
+        "total_M": round(total / 1e6), "usd": round(total_usd),
+        "roles_pct": {k.replace(" ", "_"): round(100 * R[k]["share"], 1) for k in ("owner", "main", "other agent", "reviewer")},
+        "reviewer_usd_pct": round(100 * R["reviewer"]["share_usd"], 1),
+        "fix_workers": R["fix worker"]["agents"], "fix_worker_M": round(R["fix worker"]["tokens"] / 1e6, 1),
+        "log_reads": k1["reads"], "log_read_phase_M": round(k1["read_phase"] / 1e6),
+        "saving_pct": {"fixes": round(100 * save["fixes"]["share"], 2), "lookups": round(100 * save["lookups"]["share"], 2),
+                       "logs_reread": round(100 * save["log_owner_kept"]["share"], 2),
+                       "logs_d555": round(100 * save["log_owner_trusts"]["share_mid"], 2), "total_d555": round(100 * d555, 2)},
+        "kinds_pct": {r: {slug(k): round(100 * v["share_of_total"], 1) for k, v in R[r]["kinds"].items()}
+                      for r in ("owner", "main")}})
     for r in ("owner", "main", "other agent", "reviewer"):
         print("kinds of %s:" % r)
         for k, v in rep["roles"][r]["kinds"].items():
@@ -347,6 +363,7 @@ def main():
                 k, v["tokens"] / 1e6, 100 * v["share_of_total"], v["usd"], v["messages"], v["tokens"] / v["messages"] / 1e3))
     figure(rep, a.fig)
     figure_kinds(rep, a.fig.replace("token_share", "token_activity"))
+    print(last)  # the last {...} line: tools/verify_claims.py reads it
 
 
 def figure_kinds(rep, base):

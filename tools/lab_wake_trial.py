@@ -218,7 +218,10 @@ def reviews_extract(a):
             continue
         rounds, cur, uses = [], None, {}
         for line in open(mp[:-10] + ".jsonl", errors="replace"):
-            d = json.loads(line)
+            try:
+                d = json.loads(line)
+            except ValueError:
+                continue
             m = d.get("message") if isinstance(d.get("message"), dict) else {}
             c = m.get("content")
             if d.get("type") == "user":
