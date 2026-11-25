@@ -46914,7 +46914,8 @@ entries:
     units: null
     start: '2026-11-25T02:29:07+00:00'
     at: '2026-11-25T02:29:07+00:00'
-  step_waits: {}
+  step_waits:
+    '3': Joaquin's answer to the open question on the D392 input map
   handoff:
     state: 'Stage 1 and stage 2 done and written up: par:selres_stage1 (ae07b1f4c) and par:selres_stage2 (7a65c7ebe), figs
       analysis/selective_rescale/figs/stage1.png and stage2.png, data/stage1.json and stage2.json. Rescale below x=0.1 (A)
