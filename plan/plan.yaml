@@ -40747,12 +40747,6 @@ entries:
       in its config (sweep/sweep_config_llmcmp_c_latest.yaml), its own design (reusing part (b)''s smoke rates where the setup''s
       cost matches), smokes, then the runs; its GPU-h estimate to Joaquin if above 100 (D536). Does not hold part (b) from
       part (a).'
-    11: 'Part (b) readout, 16 heads (FA-ccin2p3-dcb66b14; D553 "show the results as they come"): when it ends, save its "Val
-      loss (combined)" lines to analysis/llm_compare/data/b_val_h16.txt (runs/llmcmp_b_width/trial_0016/out_0.log), score
-      it REREAD=FA-ccin2p3-dcb66b14 with scripts/job_llm_score.sh on its site, copy llm_score_{seen,heldout}.json to data/b_h16_{seen,heldout}.json;
-      figures: b_width_curves.py (validation MSE of z per width beside trial 5) and heldout_per_process.py --tag a_trial5
-      <widths done> (Suprio layout); pooled RMSE seen/held out/relabels/new and median per-process MSE via control_score.py
-      against trial 5 (0.117 / 1.003 / 0.241 / 1.767) with the 1.38 margin; hand back to Joaquin'
     12: 'Part (b) readout, 32 heads (FA-ccin2p3-e9dfa8b9; D553 "show the results as they come"): when it ends, save its "Val
       loss (combined)" lines to analysis/llm_compare/data/b_val_h32.txt (runs/llmcmp_b_width/trial_0032/out_0.log), score
       it REREAD=FA-ccin2p3-e9dfa8b9 with scripts/job_llm_score.sh on its site, copy llm_score_{seen,heldout}.json to data/b_h32_{seen,heldout}.json;
@@ -40932,14 +40926,6 @@ entries:
       if:
       - 'part (c) best known: design and launch'
       - 'part (c) search still running: wait for DRIVE_DONE'
-    11:
-      feeds: 'D522/D537 part (b): whether muP width toward the LLM''s 359.6M parameters closes the held-out gap at part (a)''s
-        best HPs'
-      if:
-      - 'held-out MSE below trial 5''s by more than 1.38x: width helps at 16 heads, read beside the other widths'
-      - 'within 1.38x of trial 5: no resolvable width gain at 16 heads (one seed); a seed-43 pair is Joaquin''s call'
-      - 'above trial 5 by more than 1.38x or curves not falling: read curves first; muP transfer or training failure, an HPO
-        there is Joaquin''s call'
     12:
       feeds: 'D522/D537 part (b): whether muP width toward the LLM''s 359.6M parameters closes the held-out gap at part (a)''s
         best HPs'
@@ -41453,7 +41439,6 @@ entries:
       5 -5.938 of wave 2)
     '8': part (c) driver llmcmp_c_qperp_drive5 ending (its detach DONE event; wave 3 of 2 trials after trials 3 -5.816 and
       5 -5.938 of wave 2)
-    '11': FA-ccin2p3-3b19137a
     '12': FA-ccin2p3-e9dfa8b9
     '13': FA-ccin2p3-623a3af6
     '14': FA-ccin2p3-f0b997a2
