@@ -44354,6 +44354,12 @@ entries:
     units: null
     start: '2026-11-25T00:30:01+00:00'
     at: '2026-11-25T00:30:01+00:00'
+  - batch: review_replay
+    wall_h: 18.0
+    jobs: 4
+    units: null
+    start: '2026-11-25T00:30:11+00:00'
+    at: '2026-11-25T00:30:11+00:00'
   step_why:
     3:
       feeds: 'which subagent work goes to DeepSeek (D541): log reading and code lookups yes, multi-file fixes stay on Sonnet'
