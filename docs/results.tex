@@ -18542,6 +18542,11 @@ was at most 21.3 minutes old when read and the feeder's 20.9, both at the one 22
 which submitted the jobs, skipped a command; the flag was at most 13 minutes old at a feed read, against the feeder's
 30-minute limit; no job waited more than 30 seconds in the queue. A job inside a job submits through the same item
 and budget gate, and one real prune ran inside its job. The switch stays: the outcome is the design's yes branch.
+% allow: 2.1.2 1.26.4 64806476 because the torch and numpy versions and the job id, as read in analysis/cc_login/data/site_env_job_64806476.txt
+The environment build (\code{site env}) left the login node as well: on CC it runs as one such job (64806476, on a
+compute node), a call before the job ends reads nothing, and its first run rebuilt nothing, leaving the
+checkout at trunk and the stack at torch 2.1.2 and numpy 1.26.4. A job that ends without a result, overruns its time
+limit, or meets a failed queue query now raises a supervisor event instead of being skipped.
 
 \section{Methodological principles}\label{sec:principles}
 % ==========================================================================

@@ -1,0 +1,15 @@
+# site env ccin2p3 FA, read 2026-11-25 (cc_login_jobs): the CPU job's result
+  result of job ccj_c8c20918f1e6 (ended 2026-11-25 00:52:39, exit 0):
+checkout 6ca993c1a9 (trunk) at /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes
+venv   exists: .venv
+recipe pip install -r requirements.txt
+verify python 3.11.7 torch 2.1.2+cu118 cuda 11.8 exe /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/python
+activate.sh ok: /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/bin/python 2.1.2+cu118
+setup  running sites/setup.sh
+ok: MG5 3.7.0, gfortran, /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/lib/python3.11/site-packages/torch/_utils.py:831: UserWarning: TypedStorage is deprecated. It will be removed in th
+ok: MG5 3.7.0, gfortran, /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/.venv/lib/python3.11/site-packages/torch/_utils.py:831: UserWarning: TypedStorage is deprecated. It will be removed in th
+env    ready: FA @ ccin2p3
+# site run ccin2p3 FA -- sacct -j 64806476 -X -o JobID,NodeList,State,ExitCode,Elapsed,Start,End
+64806476        ccwslurm0097  COMPLETED      0:0   00:14:50 2026-11-25T00:37:49 2026-11-25T00:52:39
+# site run ccin2p3 FA -- python -c 'import torch,numpy;print("STACK",torch.__version__,numpy.__version__)'
+STACK 2.1.2+cu118 1.26.4
