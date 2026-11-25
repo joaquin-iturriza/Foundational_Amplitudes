@@ -45059,7 +45059,14 @@ entries:
     - analysis/storage/model_groups.py
     - scripts/job_disk_inventory.sh
     - scripts/job_storage_frees.sh
-  dead_ends: []
+  dead_ends:
+  - tried: D556 cache census with the in-use recipes taken from 'plan show' text of the entries with an owner (commit 6feea6e1f,
+      analysis/storage/open_recipes_2026-11-25.txt, 52 stems + datasaving glob)
+    why: 'design review FIX twice: plan show omits fields and skips entries without an owner, so 14 recipes named by not-done
+      entries were missing (e.g. pp13v4_uc_cggu, pretrain25_zs, catalog_v3_twin_train, catalog_loop_probes, ref_solo_ee_uu,
+      vob_ee_uu_nlo); their pools would have been marked delete. Replaced by reading the full plan/plan.yaml records at run
+      time in cache_readers.py --plan'
+    at: '2026-11-25T01:27:54+00:00'
   asks:
   - ask: 'Scope: which of CC''s costly results to delete to free the group space (99% full). Which of these should go: model
       files under D149/D133 via scripts/prune_site.sh (tens of GiB), zz_catft* 27.3 GiB (muon_test fine-tunes the draft cites),
