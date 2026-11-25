@@ -41755,6 +41755,7 @@ entries:
     '16': FA-ccin2p3-89671610
     '19': FA-ccin2p3-0165aa58
     '20': FA-lxplus-affc2e5a FA-lxplus-c894babe
+    '21': FA-lxplus-e3b67532 FA-lxplus-b1f5a43f
   handoff:
     state: 'Part (a) DONE, part (c) DONE. Part (b) his setup: 8/16/32 heads read (32 heads FA-ccin2p3-e9dfa8b9 scored @fa6e51441:
       pooled RMSE seen 0.107, all 139 held out 1.170 vs 16 heads 0.103/0.990, 8 heads 0.117/1.003; relabels median MSE-bias^2
