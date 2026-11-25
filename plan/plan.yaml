@@ -46987,6 +46987,29 @@ entries:
     sources: 'thresholds 0.59/0.64 dec <- no rescale''s own measured seed spread (d539u_kit.json); x0 0.009 <- the measured
       softest x of every pool (measured: support_minima.json, 0.00923); reference no rescale <- Joaquin''s words D561 ''not
       use it where it hurts, and only where it helps'' and D552; cost 0 GPU-h <- D552''s 100 GPU-h budget, CPU only'
+    fix_at: '2026-11-25T12:10:47+00:00'
+    fix: '1) Outcome does not test Joaquin''s ''without hurting the rest'' (checks 4, 6): YES reads only the deepest soft
+      bin and the bulk, but the rule (x0=0.009) changes every momentum below 0.009, i.e. all five kit soft_x strata (1e-7..1e-2,
+      d539u_kit_raw.json strata list) and any coll_y stratum event holding a momentum below 0.009. Fix: score and report every
+      hard_test stratum under both arms; YES additionally requires that no changed stratum (each soft_x and coll_y bin) has
+      the rule''s seed median above no rescale''s by more than that stratum''s own no-rescale three-seed spread log10(max/min)
+      (source: d539u_kit_raw.json, same runs); state how many kit events per stratum the rule changes (0 changed = identical
+      by construction). 2) The rule arm''s readout is not shown to reach the model (check 15): REBUILD_SET is new and uncommitted;
+      a merge that silently does not reach the wrapper gives rule == off and would be read as NO. Fix: one CPU dry run (site
+      run --job) of tools/kit_predict.py on one no-rescale run with REBUILD_SET on a soft_x stratum, printing the rebuilt
+      wrapper''s input_soft_eps/input_soft_x0 and showing predictions differ from off; and in the outcome, rule identical
+      to off in a soft stratum = pipeline fault, not NO. Also state the tolerance for the off arm reproducing the stored kit
+      scores (stored ones were written by job_kit.sh KIT_SCORE_ONLY, the new ones by kit_predict --out with event_frame; say
+      whether they are the same path or what agreement is expected). 3) The six Z+4g jobs are not justified yet (check 0):
+      support_minima.json shows no Z+4g val/test momentum below 0.009, so its bulk is identical by construction; score Z+4g
+      only if its kit file (zng_uq uq_zgggg.h5) has hard strata reaching x<0.009 (a read-only look settles it before the design);
+      otherwise drop the six jobs and state the bulk identity from support_minima.json. Passing as is: control (same run,
+      same job, only the two REBUILD_SET keys differ), spread (no rescale soft_x seeds 1427/4917/5510 -> 0.59 dec at 1e4,
+      1758/7580/7680 -> 0.64 dec at 1e5, confirmed), the measure (deepest soft bin moved 4917->0.111 and 7580->0.204 with
+      the input map, d539u_kit.json; the rule changes every momentum in those bins), x0 below all pool minima (uug 0.01107,
+      Z+4g train 0.00923), 0 GPU-h, no label in the rule (x from the event''s own momenta). Searched: input_soft_x0, below/outside
+      the trained range, eval-only, REBUILD_SET, rescale in results.tex and decisions (D374, D539, D552, D561): no prior test
+      of a rule below the trained range.'
   targets:
   - batch: smoke
     wall_h: 0.1
