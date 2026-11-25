@@ -45603,7 +45603,8 @@ entries:
       KEEP; memmap b39fc80c 1.50 GiB Daniel''s held-out (139 processes), used 0.7 d ago, in use (catalog_daniel_heldout):
       KEEP. Training cache amp_data_cache 58.73 GiB in 44,069 files: every entry touched within 14 days: KEEP. Nothing of
       the caches is unread; nothing deleted, no duplicate key (the three keys hold different pool sets).'
-  step_waits: {}
+  step_waits:
+    '2': the next owner of cc_disk (hand-off written 2026-11-25; the closing owner reached its context limit)
   targets:
   - batch: disk_inventory
     wall_h: 1.0
