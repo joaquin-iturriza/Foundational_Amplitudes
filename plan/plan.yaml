@@ -41610,6 +41610,20 @@ entries:
       his setup, worse than the regressor and than D83''s shared target. Its target carries the emission-scale factor; by
       D83''s s_hat+coupling reading a network keeps a factor''s level, so a factor misplaced on new families would hold the
       bias. That cause is a hypothesis: not tested on existing data.'
+  - at: '2026-11-25T16:10:50+00:00'
+    text: '2026-11-25 D566 prior per-event factors and new-family levels (search: results.tex sec:target paragraphs l.2270-2400,
+      7067, 7889-8010, 8254-8417, 13257, 14075; site decisions D82-D99, D128, D135, D436, D523, D566). Sampling: D82 (l.7889)
+      already set that a pool''s mean log|M|^2 depends on its sqrt(s) window, sampling and cuts, which no process description
+      carries; flat-in-log s_hat reweighting moves the shared target''s level by 0.30 sigma_p on Daniel''s catalog (0.39 with
+      s_hat^(4-N)), the emission scales'' by 0.087-0.11 on catalog_v3 (l.7067). New-family level, median no-level error (m_p-M)^2/sigma_p^2
+      on the 43 new: log|M|^2 47, s_hat+coupling factor 4.8, + MadGraph averaging/symmetry/colour 2.3, per-event singular
+      scales ~9, emission history (composition proxy) 3.3 vs s_hat 0.48; with a 2x64 level net on process features 0.45, +
+      diagram descriptors 0.045 (ensembles 0.087; cross-fit by multiplicity 10.4). Trained: emission scales cost the 43 new
+      x1.6 (0.48 -> 0.75 median MSE, level 0.19 -> 0.31, shape 0.26 -> 0.48; l.8346); s_hat+coupling kept its factor''s wrong
+      multi-H levels (level share 0.90; l.7972). Diagram propagator product P (catalog_v4 multiplicity gap, l.2300): explains
+      0.87 of log|M|^2, 0.106 of the emission-scale target; between, no GPU arm. Asymptotic factors (D436, l.13257) and target_propagators
+      (l.14075) measured on single-process shape/limits only, never on new-family levels. No per-event factor tried so far
+      places new-family levels as well as the diagram descriptors'' level regressor.'
   step_waits:
     '8': FA-ccin2p3-8acd3fc1 FA-ccin2p3-39f4ab2e FA-ccin2p3-e5265194 FA-ccin2p3-e1d1fbaf
     '12': FA-ccin2p3-e9dfa8b9
