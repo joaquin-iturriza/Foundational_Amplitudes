@@ -44672,6 +44672,16 @@ entries:
     sources: 0.19 <- the regressor's measured spread over its 10-seed ensemble, 0.016-0.19, results.tex l.8510; shift bar
       <- the regressor's own shift measured by this job; 2x bootstrap noise <- the job's 30-resample std; model choice <-
       Joaquin 2026-11-25 'why a boosted tree? I don't see the point instead of just using a neural network'
+    passed_at: '2026-11-25T17:11:46+00:00'
+    reviewer: 'Re-check of the D566 (B) network design after FIX: (1) alpha scaled 1e-2*4096/200 so sklearn''s alpha/batch
+      equals norm_explore3''s (read in @2d0b3be2c), lr 3e-3 kept for Adam, and a fail on (i) is now not a verdict but leads
+      to an equal-size search for tree and network cross-fitted by relabelling class, best against best; tree vs network reported
+      as untuned vs untuned until then. (2) committed @2d0b3be2c; time 0.22 s/epoch/100k rows measured -> ~5 s/epoch at 2.3M,
+      18 fits x ~50 epochs = 1.3 h, target 1.5 h, 200-epoch cap 5 h under the 8 h limit, ~1 GB rows in 16G. (3) prior now
+      cites pool_stats.py trees on ridge residuals 0.32 vs descriptor network 0.045 (l.7814, l.8510). Check 2: references
+      asserted (shared 47, regressor 0.044), shift read moves 0.30 vs 0.074-0.10 sigma_p (inherited from the passed tree design).
+      Check 3: gate 0.19 = top of the regressor''s 10-ensemble spread 0.016-0.19 (l.8510, read), shift bar 2x the job''s 30-resample
+      bootstrap. Terms searched: boosted, gradient-boost, per-event level, perevent, norm_explore6, D566.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
