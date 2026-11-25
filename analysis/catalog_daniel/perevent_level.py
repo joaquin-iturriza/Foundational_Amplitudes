@@ -8,7 +8,9 @@ log|M|^2 per event:
              (stats_net features, no diagram descriptors: the diagrams enter through P per event)
   A0         log P + the training processes' mean of r (no level model)
   B          a per-event regressor g(process features, diagram descriptors, log s_hat, Lmin - log s_hat, E, log P)
-             of log|M|^2 (HistGradientBoosting), cross-fitted by relabelling class on the training processes
+             of log|M|^2 (HistGradientBoosting), cross-fitted by relabelling class on the training processes;
+             with --model mlp the same map as norm_explore3's level network instead (2x64 MLP, inputs and target
+             standardized, 3 seeds averaged, batches of 4096 events), written as candidate B_mlp
 Per process, err = prediction - log|M|^2 over its events, sigma_p = std of log|M|^2: (i) level error
 mean(err)^2 / sigma_p^2 (and mean(err)^2 in nat^2); (ii) sampling shift |mean_w(err) - mean(err)| / sigma_p, w flat in
 log s_hat (20 bins between the 1st and 99th percentile, equal weight per non-empty bin) or toward the singular regions
@@ -20,7 +22,7 @@ Existing-data mode, locally (--surrogate): (A)'s level error (i) and spread (iii
 norm_surrogate.py's "prop" in data/surrogate.json (mean, std, correlation with log|M|^2 over the same 2000 events; prop =
 the leading coupling product, MadGraph's averaging, symmetry and colour, and the diagrams' propagators at the event's
 invariants), with the factor's coefficient 1 and norm_surrogate_more.py's fitted 0.57 / 0.66 (2->2 / 2->3); no shifts.
-Output: analysis/catalog_daniel/data/perevent_level.json; its summary on stdout.
+Output: analysis/catalog_daniel/data/perevent_level.json (perevent_level_mlp.json with --model mlp); summary on stdout.
 """
 import argparse, json, os, sys
 
@@ -88,6 +90,27 @@ def mlp(r):  # norm_explore3.py's level network
                         early_stopping=True, validation_fraction=0.15, random_state=r)
 
 
+class Net:  # norm_explore3's level network on events: scaled inputs and target, 3 seeds averaged
+    def fit(self, X, y):
+        self.sx, self.m, self.s = StandardScaler().fit(X), y.mean(), y.std()
+        Z, t = self.sx.transform(X), (y - self.m) / self.s
+        self.nets = []
+        for r in range(3):
+            # shortcut: 200 epochs cap (2.7M events an epoch, ~660 updates), early stopping usually ends it first
+            # sklearn weighs L2 by alpha / batch: keep norm_explore3's 1e-2 / 200 (its batch) at batch 4096
+            net = MLPRegressor(hidden_layer_sizes=(64, 64), alpha=1e-2 * 4096 / 200, learning_rate_init=3e-3,
+                               max_iter=200,
+                               batch_size=4096, early_stopping=True, validation_fraction=0.15, random_state=r)
+            self.nets.append(net.fit(Z, t))
+            print(f"  mlp seed {r}: {net.n_iter_} epochs, best val R2 {net.best_validation_score_:.4f}", flush=True)
+        return self
+
+    def predict(self, X):
+        Z = self.sx.transform(X)
+        return self.m + self.s * np.mean([n.predict(Z) for n in self.nets], 0)
+
+
+
 def level_net(Xtr, ytr, grp, Xho):
     """cross-fitted predictions on the training processes, and the full fit's on the held-out, 3 seeds averaged"""
     cf = np.zeros(len(Xtr))
@@ -142,6 +165,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--events", type=int, default=2000)
     ap.add_argument("--surrogate", action="store_true")
+    ap.add_argument("--model", choices=("hgb", "mlp"), default="hgb")
     a = ap.parse_args()
     if a.surrogate:
         return from_surrogate()
@@ -178,6 +202,10 @@ def main():
                   float(mi[int(np.argmax(l))]), float(max(mi))]
         return np.array(f, float)
 
+    global CANDS
+    if a.model == "mlp":
+        CANDS = CANDS[:-1] + ("B_mlp",)
+    B = CANDS[-1]
     pred = {c: {} for c in CANDS}
     My = np.mean([D[n]["y"].mean() for n in tr])
     r_mean = {n: float((D[n]["y"] - D[n]["logP"]).mean()) for n in D}
@@ -200,14 +228,15 @@ def main():
     def hgb():
         return HistGradientBoostingRegressor(max_iter=300, learning_rate=0.1, max_leaf_nodes=63, random_state=0)
 
+    model = Net if a.model == "mlp" else hgb
     for i, j in GroupKFold(5).split(tr, groups=grp_p):
         Xi, yi = rows([tr[k] for k in i])
-        m = hgb().fit(Xi, yi)
+        m = model().fit(Xi, yi)
         for k in j:
-            pred["B"][tr[k]] = m.predict(rows([tr[k]])[0])
-    m = hgb().fit(*rows(tr))
+            pred[B][tr[k]] = m.predict(rows([tr[k]])[0])
+    m = model().fit(*rows(tr))
     for n in ho:
-        pred["B"][n] = m.predict(rows([n])[0])
+        pred[B][n] = m.predict(rows([n])[0])
 
     R = {c: {} for c in CANDS}
     rng = np.random.default_rng(0)
@@ -243,11 +272,13 @@ def main():
     e_sh, e_rg = summary["shared"]["new"]["e"], summary["regressor"]["new"]["e"]
     print(f"check: shared e median {e_sh:.3g} (2026-10-22: 47), regressor {e_rg:.3g} (level_source.py: 0.044)")
     assert abs(e_sh / 47 - 1) < 0.10 and abs(e_rg / 0.044 - 1) < 0.10, (e_sh, e_rg)
-    out = {"events": a.events, "missing": missing, "n": {"train": len(tr), "new": len(new), "relabels": len(rel_ho)},
+    out = {"events": a.events, "model": a.model, "missing": missing,
+           "n": {"train": len(tr), "new": len(new), "relabels": len(rel_ho)},
            "summary": summary,
            "per_process_new": {meta[n]["process"]: {c: R[c][n] for c in CANDS} | {"family": meta[n]["test_group"]}
                                for n in new}}
-    json.dump(out, open(os.path.join(HERE, "data", "perevent_level.json"), "w"), indent=1)
+    json.dump(out, open(os.path.join(HERE, "data", "perevent_level%s.json" % ("_mlp" if a.model == "mlp" else "")), "w"),
+              indent=1)
     for c in CANDS:
         print(c, {s: {k: round(v, 4) for k, v in summary[c][s].items()} for s in ("new", "relabels", "train_crossfit")})
         for g, f in summary[c]["families"].items():
