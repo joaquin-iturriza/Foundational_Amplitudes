@@ -46126,6 +46126,19 @@ entries:
       0.033..0.372); 2-sigma interval of r <- the arms'' own measured three-seed spread (log-sd, zng4g_d1e3_read.ratio, as
       par:ftm_d539); ''without hurting the rest'' and ''keeping the effect on the bins this targets'' <- Joaquin''s words
       D552'
+    passed_at: '2026-11-25T00:05:25+00:00'
+    reviewer: 'Re-check after FIX: two stages, stage 1 = 36 runs (schemes A/B/C x 4 cells x seeds 42-44, seed_chunks/selres_stage1_all.txt,
+      3 lines per config confirmed) at the no-rescale baseline''s best HPs, against existing same-HP controls (Z+4g hp1333
+      off/rescale at 1e4 and 1e5; u u~ g off at its optimum; u u~ g rescale at its own optimum as the soft reference, which
+      can only favour the rescale), searches only on a NO; ~9.5 GPU-h. Check 2: Z+4g r 2.28 [2.03,2.57] (1e4), 2.07 [1.57,2.71]
+      (1e5), kit soft -4.65/-4.57 dec (d539u_kit.json read); input_check.json event gate compression 0.715 r_pred 1.22 confirmed.
+      Check 3: three seeds as the D539 sibling cells; YES rests on the resolved Z+4g cells; soft tolerance = rescale arm''s
+      log10(max/min) 0.30 (0.099..0.198) / 1.05 (0.033..0.372), confirmed. D395 smoke: selres_smoke.txt, 50 steps each of
+      input_soft_x0=0.1 and input_soft_gate=0.1, then kit score-only. Differing keys listed (sweep_name, train_subsample,
+      input flags). Disk ~2.5 GB on lxplus EOS (EOS user quota unreadable via eos quota; read free space at submission). Check
+      5 terms: selective, soft_x0, soft_gate, gated rescale, event gate, rescale only (results.tex); rescale, D374, D392,
+      D539, D552 (decisions); none found. Note: the entry''s next field still says ''14 searches''; update it with plan set-next
+      to the two-stage plan.'
   step_why:
     1:
       feeds: whether an event-dependent rescale (soft-only below x0, or an event gate) keeps the u u~ g soft-bin gain without
