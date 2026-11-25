@@ -9202,6 +9202,63 @@ $16$--$84\%$ bootstrap, against the noise scale $B_{\rm simple}$ of Fig.~\ref{fi
 % allow: 8 16 84 because they are the trials per batch and the bootstrap quantiles, settings
 % allow: 1 because it is the constant of the law S_min(1+B_crit/B), a formula
 
+\paragraph{Why batch $128$ beats $2048$ on $Z+4g$ (D560, 2026-11-25).}\label{par:cbs_regimes} The question: the scan
+puts the critical batch of the pretraining at a few thousand events, while on $q\bar q\to Z+4g$ at $10^4$ training
+events batch $128$ reaches a validation MSE$(\log|\mathcal M|^2)$ several times below batch $2048$
+(par.~\ref{par:ftm_zng4g}); do the two disagree? They measure different regimes. The scan's best trials reach their
+targets after $0.224$ to $1.04$ passes over the $1.4\times10^7$-event pool at batch $2048$ and $0.827$ to $3.18$ at
+$16384$: fresh data, where only the number of steps is at stake. The $Z+4g$ searches run $400$ epochs of $10^4$ events
+at both batches, so batch $128$ takes $16$ times more steps over the same events. There the best trial at $2048$ ends
+$6.53$ times above the best at $128$ with Muon from scratch, $1.57$ with Adam, $3.75$ for the fine-tune from the
+original parent and $1.98$ from the parent without the two input settings. McCandlish et al.'s law in events,
+$E=E_{\min}(1+B/B_{\rm crit})$, read through the two batches at a validation MSE both reach in the stable phase
+gives, for Adam, $B_{\rm crit}$ between $87$ and $261$ over $8$ levels; for Muon from scratch the events ratio
+$E_{2048}/E_{128}$ is $31.1$, above the $16$ any critical batch allows at equal events, so the gain there is not a
+critical-batch effect. It is memorisation (Fig.~\ref{fig:cbs_regimes}): at batch $2048$ Muon fits the training events
+far below validation, train over validation MSE $0.048$ at the end of the stable phase against $0.381$ at $128$, and
+its validation stops falling after about $50$ epochs; the fine-tune without the settings reaches its best validation
+a fraction $0.16$ of the way through and ends $1.41$ times above it (train over validation $0.004$, against $0.242$ at $128$).
+So the scan's $B_{\rm crit}$ is the number for runs that see their data a few times; for runs that repeat a small set
+hundreds of times the batch also sets how fast the model memorises it, which no noise scale of the gradient measures.
+% src: python3 analysis/critical_batch/ft_bcrit.py @2a98dcca3
+% claim: scan_epochs.-1.66.2048=0.224
+% claim: scan_epochs.-2.3.2048=1.04
+% claim: scan_epochs.-1.66.16384=0.827
+% claim: scan_epochs.-2.3.16384=3.18
+% claim: cells.muon|ratio_2048_over_128=6.53
+% claim: cells.adam|ratio_2048_over_128=1.57
+% claim: cells.F|ratio_2048_over_128=3.75
+% claim: cells.Fn|ratio_2048_over_128=1.98
+% claim: summary.adam_bcrit_min=87
+% claim: summary.adam_bcrit_max=261
+% claim: summary.adam_levels=8
+% claim: summary.muon_r=31.1
+% claim: cells.muon|2048.train_over_val_stable_end=0.048
+% claim: cells.muon|128.train_over_val_stable_end=0.381
+% claim: cells.Fn|2048.frac_best=0.16
+% claim: cells.Fn|2048.val_last_over_best=1.41
+% claim: cells.Fn|2048.train_over_val_stable_end=0.004
+% claim: cells.Fn|128.train_over_val_stable_end=0.242
+% allow: 128 2048 16384 because they are batch sizes, settings
+% allow: 4g 10^4 400 because they are the process multiplicity, the training size and the epochs, settings
+% allow: 1.4\times10^7 because it is the pool size, a setting (critical_batch finding 2026-11-24)
+% allow: 16 because it is 2048/128, the largest events ratio the law allows
+% allow: 50 because it is a reading of the figure's axis, approximate
+% allow: 1 because it is the constant of the law, a formula
+% allow: 2 because it is the exponent of |M|^2
+
+\begin{figure}[h]
+\centering
+\includegraphics{../analysis/critical_batch/figs/ft_regimes.pdf}
+\caption{$q\bar q\to Z+4g$ at $10^4$ training events, $400$ epochs at both batches: validation and train
+MSE$(\log|\mathcal M|^2)$ against epochs, the best trial of each batch's search. (a) From scratch, Muon. (b) From
+scratch, Adam with plateau decay (a curve ends where the run stopped early). (c) Fine-tuned from the parent without the
+two input settings (\code{FA-ccin2p3-9a73698a}). The last eighth of each Muon run is the cooldown.}
+\label{fig:cbs_regimes}
+\end{figure}
+% allow: 4g 10^4 400 because they are the process multiplicity, the training size and the epochs, settings
+% allow: 2 because it is the exponent of |M|^2
+
 % ==========================================================================
 \section{Physical feature levers: what the momenta cannot encode}\label{sec:levers}
 % ==========================================================================
