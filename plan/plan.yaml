@@ -45237,6 +45237,18 @@ entries:
       21 queues 6.8 GiB, todo 0 everywhere; unassembled: catalog_v4_default 899/1082, w3 162/203, w2 0/203, gridpack 54/56;
       specs_in has no todo dir. zz_v4 prediction dirs ~150 MiB each (H2 15, H3 19, PP4 84 MiB). lxplus keeps only sweep state
       for runs_from_lxplus'' sweeps (AFS sweeps/tp_scr_ee_nnbar_d2 430 KB, no trial dirs): CC''s copy is the only one.'
+  - at: '2026-11-25T00:36:21+00:00'
+    text: '2026-11-25 D550 debris deletion FA-ccin2p3-67887dff DEBRIS_DONE (manifest SCRATCH/zz_cc_disk/deleted.tsv): memmap
+      format-2 keys 2 entries 4.01 GiB apparent (expected 4.8), smoke outputs 38 entries 1.74 GiB (expected 1.4), probe scratch
+      dirs 525,734 entries 0.10 GiB (expected 2.2: the inventory''s du --apparent-size counted directory entries'' own size,
+      which the manifest''s file bytes leave out); manifest 5.85 GiB; df used 517,353 -> 511,441 MiB (5.77 GiB freed, within
+      1.4% of the manifest), free 6.9 -> 12.8 GiB. Loose job .out files kept (committed analyses parse them): deviation from
+      D550''s words. Read job ccj_e7fd8463789f (model_groups.py @0bc52e3d6 over inv_runs.jsonl): model files 100.4 GB (runs
+      78.5, runs_from_lxplus 21.9); OPEN families 81.7 GB, CONCLUDED 18.6 GB; D133 candidates 0 runs 0 GB. Largest families:
+      runs/catalog* 12.9 (9 runs over 5 h), dsave* 9.1 (max 1.0 h), muon* 8.0 (max 1.2 h), zz_smoke* 7.5 (max 0.13 h), DyPHO_sweep_test*
+      6.5 (concluded, 35 runs over 5 h), kit* 5.0. lhe_queue: ~6.6 of its 6.8 GiB are Q/gc/ deletion manifests (JSON, read
+      only by tests); lhe_parts part files 1.47 GiB. zz_v4_*: 235 dirs, 28,338 MiB, none written in the last 7 days, ~2,300
+      per-probe npz of ~70 KB per dir. runs_from_lxplus 24.9 GB total. Output /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/ccdisk_read2.out.'
   step_waits:
     '1': FA-ccin2p3-67887dff
     '2': 'detach ccdisk_read2 (CPU read job ccj_e7fd8463789f, slurm 64807324: model_groups.py per-family model GB @0bc52e3d6,
