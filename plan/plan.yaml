@@ -45049,11 +45049,14 @@ entries:
   match: cc_disk_*,zz_probe_*
   evidence:
     runs:
+    - FA-ccin2p3-170b2eff
     - FA-ccin2p3-9cf1ce5d
     - FA-ccin2p3-b949c4ee
-    commit: 0b9185621
+    commit: ae44541e5
     paths:
+    - analysis/storage/cache_readers.py
     - analysis/storage/model_groups.py
+    - scripts/job_ccdisk_d556.sh
     - scripts/job_disk_inventory.sh
     - scripts/job_storage_frees.sh
   dead_ends:
