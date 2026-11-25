@@ -45519,6 +45519,17 @@ entries:
       d507_search_v2.json, every trial); outer 5% of the lr window <- a measured spread: the D507 extension trigger (bests
       at 0.95-0.99 of the window, sweep config comments), used only to flag a bound; 50 epochs <- Joaquin''s words (D563,
       ''~50 epochs'')'
+    passed_at: '2026-11-25T13:26:44+00:00'
+    reviewer: 'Re-check of the D563 50-epoch design (13:25) after my FIX. Both points are fixed. (1) Every cell keeps its
+      trial count (19/19/16 at 2048, 19/16/16 at 128). An lr-edge best is reported as a bound, and a wider search goes to
+      Joaquin as a question with its cost, not run. (2) Disk: 22-79 MB per trial from the replaced 400-epoch trials (CC and
+      lxplus du); 105 x 79 MB = 8.3 GB in all against 26 GB free on CC /sps/lpnhe, re-read at submission. Pools are held in
+      memory (memmap false), so there is no shared cache to show. Unchanged from my 13:22 review. Check 2: with ft_bcrit.py''s
+      loaders I recomputed the best validation by epoch 50 in the 400-epoch trials: the 2048/128 ratios are 3.34 Muon, 5.05
+      Adam, 1.84 Fn, against r400 6.53/1.57/1.98, so the measure moves with the horizon. Check 3: the 1.22 threshold matches
+      the largest best-to-third-best gap of the D507 searches (0.099/0.160/0.206/0.216); seed 42 as the replaced searches.
+      Check 5, terms searched: 50 epochs, over-train, trained too long (results.tex); D507, D519, D520, D560, D563 (decisions):
+      no earlier run of these cells at another horizon.'
   step_why:
     1:
       feeds: 'D532: the scan''s answer (NO branch, B_crit 2500-6690 vs B_simple 55.5) reaches Joaquin as a finished entry'
