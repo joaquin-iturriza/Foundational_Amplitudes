@@ -40737,6 +40737,12 @@ entries:
       figures: b_width_curves.py (validation MSE of z per width beside trial 5) and heldout_per_process.py --tag a_trial5
       <widths done> (Suprio layout); pooled RMSE seen/held out/relabels/new and median per-process MSE via control_score.py
       against trial 5 (0.117 / 1.003 / 0.241 / 1.767) with the 1.38 margin; hand back to Joaquin'
+    12: 'Part (b) readout, 32 heads (FA-ccin2p3-e9dfa8b9; D553 "show the results as they come"): when it ends, save its "Val
+      loss (combined)" lines to analysis/llm_compare/data/b_val_h32.txt (runs/llmcmp_b_width/trial_0032/out_0.log), score
+      it REREAD=FA-ccin2p3-e9dfa8b9 with scripts/job_llm_score.sh on its site, copy llm_score_{seen,heldout}.json to data/b_h32_{seen,heldout}.json;
+      figures: b_width_curves.py (validation MSE of z per width beside trial 5) and heldout_per_process.py --tag a_trial5
+      <widths done> (Suprio layout); pooled RMSE seen/held out/relabels/new and median per-process MSE via control_score.py
+      against trial 5 (0.117 / 1.003 / 0.241 / 1.767) with the 1.38 margin; hand back to Joaquin'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -40914,6 +40920,14 @@ entries:
       if:
       - 'held-out MSE below trial 5''s by more than 1.38x: width helps at 16 heads, read beside the other widths'
       - 'within 1.38x of trial 5: no resolvable width gain at 16 heads (one seed); a seed-43 pair is Joaquin''s call'
+      - 'above trial 5 by more than 1.38x or curves not falling: read curves first; muP transfer or training failure, an HPO
+        there is Joaquin''s call'
+    12:
+      feeds: 'D522/D537 part (b): whether muP width toward the LLM''s 359.6M parameters closes the held-out gap at part (a)''s
+        best HPs'
+      if:
+      - 'held-out MSE below trial 5''s by more than 1.38x: width helps at 32 heads, read beside the other widths'
+      - 'within 1.38x of trial 5: no resolvable width gain at 32 heads (one seed); a seed-43 pair is Joaquin''s call'
       - 'above trial 5 by more than 1.38x or curves not falling: read curves first; muP transfer or training failure, an HPO
         there is Joaquin''s call'
   findings:
