@@ -46723,9 +46723,9 @@ entries:
     decision: D561
   owner:
     agent: ad098506c65b574e6
-    state: working
+    state: stopped
     since: '2026-11-25T07:26:28+00:00'
-    state_at: '2026-11-25T12:01:42.390000+00:00'
+    state_at: '2026-11-25T12:17:56.044000+00:00'
     context: 267253
     context_at: '2026-11-25T12:15:18+00:00'
   designs:
