@@ -46648,6 +46648,16 @@ entries:
       58c989d27 (exploding flag on max(|dL|,|A|); Q<=0 windows listed and counted; test added; reads unchanged), reviewer
       a3cecd844515d9849 advanced the watermark to 58c989d27. Figures redrawn: B_q in the left panel, pretraining reference
       labelled as the scan''s range, legend clear of the data; captions check_caption OK.'
+  - at: '2026-11-25T15:36:03+00:00'
+    text: '2026-11-25 ~17:00 D563 interim (reader ft_bcrit.py ep50 at ae99a4010; 48 of 105 trials, 7-9 per cell; not the answer):
+      best val MSE at 50 epochs Muon 0.0676/0.0157, Adam 0.422/0.0301, Fn 0.0229/0.0155 at 2048/128; r50 = 4.30 (Muon), 14.0
+      (Adam), 1.48 (Fn) against r400 6.53/1.57/1.98: all > 1.22 so far (persists). E50/E400: Muon 1.17 (2048) / 1.77 (128),
+      Adam 8.39 / 0.94, Fn 1.07 / 1.42. Adam 2048 at 244 steps unsettled (third-best/best 1.82). Fn|128''s best sits at 1%
+      of its log lr window (lower edge): by the passed design (14:04) reported as a bound and a wider search put to Joaquin
+      with its cost, not run. Driver timing: target 1.5 h, at 1 h 50 min 48/105 done; CC slurm wait estimate 6.5 h for 18
+      queued, lxplus 0/259 slots fit 32G/4cpu, Jean Zay down (connection backoff): nowhere to move the queued trials, so the
+      overrun (>2x) is queue-bound; the driver keeps placing through site pick as sites free up. Collection: ft_bcrit.py ep50
+      --collect runs a CC CPU job (site_python); rerun the same call once no new trial lands to read it.'
   handoff:
     state: 'D560 part B settled NO on existing data (finding 16:40, dead end of the step-size rerun after design FIX by a4f3d7192edf30268):
       B_simple 55.5, first-order B_A 28-111 (Z+4g 6-51), optimal-step B_q 48-137 (one window 1082; Z+4g 3-196) against B_crit
