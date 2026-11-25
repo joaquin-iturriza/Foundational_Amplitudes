@@ -21,7 +21,8 @@ sys.path.insert(0, ROOT)
 from analysis.common.readers import site_python  # noqa: E402
 
 LOGS = {"uug": "ftmech_d539_uug_1e5_off_b2048/trial_0020/out_0.log",
-        "zng": "selres_zng_1e5_off_b2048/trial_1333/out_0.log"}   # pools named in a 1e5 no-rescale run's log, under the site's runs/
+        "zng": "selres_zng_1e5_off_b2048/trial_1333/out_0.log",   # pools named in a 1e5 no-rescale run's log, under the site's runs/
+        "finale": "data_saving/dsave_parent_finale_zng_uq_w_lr1p89e-3/out_0.log"}   # the D392 setup's 28-process parent
 
 MINIMA = r'''
 import json, os, re, sys
@@ -230,7 +231,7 @@ def plot(out):
 
 def minima(cached):
     f = os.path.join(HERE, "data", "support_minima.json")
-    res = json.load(open(f)) if cached else site_python(MINIMA, [f"'{k}#{v}'" for k, v in LOGS.items()], "SRMIN")
+    res = json.load(open(f)) if cached else site_python(MINIMA, [f"'{k}#{v}'" for k, v in LOGS.items()], "SRMIN", timeout=5400)
     json.dump(res, open(f, "w"), indent=1)
     print(json.dumps(res))
 
