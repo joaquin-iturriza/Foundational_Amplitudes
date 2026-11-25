@@ -102,7 +102,7 @@ def score(cached):
                 try:
                     v = site_python(SCORE, [f"'{lab}#{d}'", RULE], "SRKIT", timeout=3600)
                     if any(isinstance(a, dict) and "error" in a for a in v.values()):   # kept out: listed missing, its error shown
-                        print(f"{lab}: error {json.dumps(v)[:400]}")
+                        print(f"{lab}: error " + json.dumps({k: a for k, a in v.items() if k != "changed"})[:1500])
                     else:
                         res[lab] = v
                 except SystemExit as e:   # submitted or still running: read on the next call
