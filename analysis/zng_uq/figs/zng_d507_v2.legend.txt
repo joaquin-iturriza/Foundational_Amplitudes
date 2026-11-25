@@ -1,4 +1,4 @@
-# producer: /home/joaquin/work/FA/analysis/zng_uq/benchmark.py be6070877701ec28dbcb7953f620c1d47281af7b
+# producer: /home/joaquin/work/FA/analysis/zng_uq/benchmark.py 88281a97dbef1e457d13d97c38206b0cadb8a572
 our protocol, $D_{\rm train}=5\cdot10^5$
 Suprio's protocol, $D_{\rm train}=5\cdot10^5$
 Muon, batch 2048
