@@ -45279,6 +45279,7 @@ entries:
       - 'no candidate predicts both: report what each explains, and design the smallest scan that settles it'
   step_waits:
     '1': repo-reviewer aee7e3b6b89d84945 and the notes-editor backlog (par:cbs_scan)
+    '2': FA-ccin2p3-b587c065 FA-ccin2p3-0ac97e10
   targets:
   - batch: noise_smoke
     wall_h: 0.4
