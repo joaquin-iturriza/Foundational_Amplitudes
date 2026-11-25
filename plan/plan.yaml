@@ -45281,6 +45281,20 @@ entries:
       3 days: measured, the longest wall limit in scripts/*.sh and sweep/*.sh is #SBATCH --time=48:00:00; 2x: Joaquin''s words
       in FA/CLAUDE.md, ''A margin above 2x ... is a finding to fix before it reaches me''; 6 h: measured, longer than any
       lhe_parts worker''s run (job_lhe_parts.sh wall limit) and free_space.py''s RECENT window'
+    passed_at: '2026-11-25T00:48:25+00:00'
+    reviewer: 'Storage frees, no A/B (control/seeds n/a). Read scripts/job_storage_frees.sh and tools/delete_debris.py at
+      c142fee58; tests/test_delete_debris.py 3 passed locally (smoke_models deletes only .pt/.ckpt of the 5-day-old unnamed
+      run, keeps config/log, today''s and the named run). gc --parts: parts_plan deletes only processes assembled with every
+      spec item a cache hit and holds those a sibling queue still needs (lhe_parts.py:846-873), so the dsh_eea only-copy case
+      of 2026-11-12 is covered in code. gc manifests: git grep finds only writers (lhe_parts.py tidy_run/gc/gc_parts) and
+      tests, no reader; gzip is lossless; 6 h window > job_lhe_parts.sh 02:00:00, no lhe jobs queued. Events: free_space delete
+      --kind events (D136 ''yes to 1''). Smoke models: D550 covers old smoke runs; D96 (zz_smoke deletion, then held under
+      the D122 storage hold) also names them; the prior should cite it. Thresholds sourced: 3 days vs 48 h longest wall limit,
+      2x of 7.0 GiB (inventory 7.52 GB), 6 h. Disk: CC df now 500G used, 13G free; the job only frees. Notes, not blocking:
+      the design gives no wall-time target for the 04:00:00 limit (record one, minutes expected); delete_debris ignores git
+      grep''s exit code, so a failed git grep would treat every smoke run as unnamed (cheap 50-step smoke models only). Searched:
+      gzip, gc manifest, deletion manifest, smoke_models, zz_smoke, LHE_PARTS_AUTO_GC, re-assembly, dsh_eea parts, D96/D122/D550/D208/D136
+      in results.tex, plan.yaml and site decisions.'
   findings:
   - at: '2026-11-24T14:32:44+00:00'
     text: '2026-11-24 login-node reads: /sps/lpnhe 512 GiB group space at 98% (498 GiB used, 15 GiB free), .disk_full flag
