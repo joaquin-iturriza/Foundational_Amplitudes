@@ -46039,6 +46039,18 @@ entries:
       FA-ccin2p3-2c2ea070 ... 43b2083b, scancel). (2) fixed 0d93d3dc9 (batch-2048 wall comments now from the batch-2048 trials''
       own times). (3) open: ft_bcrit.py:31 applies the 7/8 stable cut (WSD cooldown) to the ReduceLROnPlateau Adam cells,
       which feeds par:cbs_regimes (~l.9223-9235).'
+  - at: '2026-11-25T14:21:04+00:00'
+    text: '2026-11-25 15:20: (1) D563 relaunched: lr windows by HPO rule 2 (9e28b161d; Adam c = lr*(t,1e4) from sweep/gen_transfer_pilot.lr_surface
+      = 4.249e-3 at t=244, 4.994e-3 at t=3906; Muon and Fn c = own 400-epoch best x the surface''s t-factor at D=1e4, 0.5855
+      and 3.170: Muon 1.19e-2/2.93e-2, Fn 1.82e-3/2.30e-2 at 2048/128; all +-1/2 decade), stale DyHPO states removed (5 cancelled
+      wave-1 results on the old windows), design re-passed by a4f3d7192edf30268, driver detached 15:08 (pid 1376403), wave
+      1 (18 trials) on CC; CC /sps free 25 GB vs 8.3 GB needed. (2) Repo-review point 3: ft_bcrit.py reads the ReduceLROnPlateau
+      Adam cells over the whole run (210db5bab); ft_bcrit.json numerically unchanged (5 Adam trials ran past epoch 350, none
+      holds a cell best or a matched level''s fewest events), par:cbs_regimes numbers stand; repo-reviewer a42f06a79d72773c9
+      cleared the backlog (watermark 210db5bab), header nit fixed 584ba9b77. (3) FA-ccin2p3-cedaa6dd (Z+4g update reads) COMPLETED
+      clean in 0.63 h of its 1.0 h target (every stage, CBS_UPD_ZNG_DONE); reader dl_read.py 4ab0987c8 with known-answer test;
+      noise_scale.json fetch pending (CC ssh timeout). (4) wt-cbs-accum removed (remove_worktree.sh); wt-critbatch already
+      gone.'
   handoff:
     state: 'Steps 2-4 in flight or stopped. Step 2 (D560 part B, pretraining): FA-ccin2p3-3e856594 runs v4_het_update_noise
       at the scan''s batch-16384 best hp 1333 (design passed 12:38 by a4f3d7192edf30268; code merged 5109b8182; smoke FA-ccin2p3-b587c065
