@@ -46543,8 +46543,19 @@ entries:
       explanations), 2026-09-30T02:14 (splitting process groups), 2026-10-25T23:09 (energy hold-out tradeoff), 2026-10-27T02:14
       (figure corrections), 2026-10-06T00:17 (transfer study plan), 2026-11-13T00:03 (two figures'' results)'
     blocks: replacing the full rescale in the D392 setup
-    blocks_steps: &id004
+    blocks_steps:
     - 3
+  - ask: 'Scope: the momentum input of your D392 setup. The u u~ g split (par:selres_split) puts the remaining cost of rescale
+      below x=0.1 in the 2304 of 100000 events it changes (4.23x / 8.56x no rescale''s MSE at 1e4 / 1e5; untouched rest 0.88x
+      unresolved / 1.61x). Choose: (a) replace the full rescale with rescale below x=0.1, (b) keep the full rescale, or (c)
+      drop the rescale?'
+    at: '2026-11-25T10:06:21+00:00'
+    searched: D552 (asks for the rule, not which setup); D392 (the setup itself); D539 (the full-rescale searches); fa-canonical-setup;
+      2026-11-14T04:31 (pasted LaTeX template); 2026-09-30T02:14 (process split for catalogs); 2026-10-05T19:32 (dropped D
+      points of an old sweep); 2026-10-21T22:53 (heteroscedastic loss complaint); 2026-11-13T03:05 (untouched sections of
+      a draft); 2026-11-06T19:52 (an old problem walkthrough); 2026-11-13T06:45 (resampling cells in a draft)
+    blocks: 'step 3: acting on the answer'
+    blocks_steps: &id004 []
   owner:
     agent: ad098506c65b574e6
     state: stopped
@@ -46953,24 +46964,20 @@ entries:
     files: analysis/selective_rescale/{stage1_read.py,stage2_read.py,stage2_seeds.py,data/stage1.json,data/stage2.json,data/stage2_chosen.json,seed_chunks/stage2_submitted.txt,figs/stage1.png,figs/stage2.png},
       docs/results.tex par:selres_stage1 par:selres_stage2, sweeps_local/selres_*_b2048
     written: '2026-11-25T07:13:33+00:00'
-  ask: 'Scope: replacing the full rescale in your D392 setup with rescale below x=0.1 changes a setup you decided. Rescale
-    below x=0.1 (the D539 log-rescale applied only to momenta with energy fraction x<0.1) keeps the u u~ g soft-limit gain
-    (deepest soft bin -5.04/-5.19 decades against no rescale, -0.39/-0.62 against the full rescale) and removes the Z+4g bulk
-    cost (0.92x [0.80,1.05] and 1.05x [0.75,1.48] of no rescale, against the full rescale''s 2.28x/2.07x). On u u~ g at its
-    own optimum it still costs bulk: 1.33x [1.10,1.61] at 1e4 (the full rescale: 2.18x) and 2.90x [1.95,4.31] at 1e5 (the
-    full rescale: 1.68x). Should it replace the full rescale in the D392 setup now, or only once the u u~ g cost is explained?'
-  waiting_since: '2026-11-25T07:43:38+00:00'
-  searched: 'site decisions --project FA (D392, D539, D552), docs/results.tex par:ftm_d539, par:selres_stage1, par:selres_stage2:
-    no decision on replacing the rescale. Joaquin''s messages sharing terms, none about replacing the rescale: 2026-11-14T04:31
-    (a pasted SciPost LaTeX template), 2026-11-10T02:08 (an uploaded file), 2026-10-08T19:02 (keeping the setup with gluons
-    added), 2026-11-17T01:19 (paper corrections), 2026-10-05T19:32 (dropped D 1e4.5 and 1e5 cells), 2026-10-21T22:53 (heteroscedastic-loss
-    explanations), 2026-09-30T02:14 (splitting process groups), 2026-10-25T23:09 (energy hold-out tradeoff), 2026-10-27T02:14
-    (figure corrections), 2026-10-06T00:17 (transfer study plan), 2026-11-13T00:03 (two figures'' results)'
+  ask: 'Scope: the momentum input of your D392 setup. The u u~ g split (par:selres_split) puts the remaining cost of rescale
+    below x=0.1 in the 2304 of 100000 events it changes (4.23x / 8.56x no rescale''s MSE at 1e4 / 1e5; untouched rest 0.88x
+    unresolved / 1.61x). Choose: (a) replace the full rescale with rescale below x=0.1, (b) keep the full rescale, or (c)
+    drop the rescale?'
+  waiting_since: '2026-11-25T10:06:21+00:00'
+  searched: D552 (asks for the rule, not which setup); D392 (the setup itself); D539 (the full-rescale searches); fa-canonical-setup;
+    2026-11-14T04:31 (pasted LaTeX template); 2026-09-30T02:14 (process split for catalogs); 2026-10-05T19:32 (dropped D points
+    of an old sweep); 2026-10-21T22:53 (heteroscedastic loss complaint); 2026-11-13T03:05 (untouched sections of a draft);
+    2026-11-06T19:52 (an old problem walkthrough); 2026-11-13T06:45 (resampling cells in a draft)
   step_why:
     3:
       feeds: 'D552: which input map the D392 setup keeps'
       if:
       - 'replace: set model.input_soft_x0=0.1 in the D392 setup'
       - 'keep or drop: close the entry with the write-up'
-  blocks: replacing the full rescale in the D392 setup
+  blocks: 'step 3: acting on the answer'
   blocks_steps: *id004
