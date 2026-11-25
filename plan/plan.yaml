@@ -45315,6 +45315,35 @@ entries:
       grep''s exit code, so a failed git grep would treat every smoke run as unnamed (cheap 50-step smoke models only). Searched:
       gzip, gc manifest, deletion manifest, smoke_models, zz_smoke, LHE_PARTS_AUTO_GC, re-assembly, dsh_eea parts, D96/D122/D550/D208/D136
       in results.tex, plan.yaml and site decisions.'
+  - at: '2026-11-25T01:09:30+00:00'
+    question: 'D556 (''Yes, you also mentioned there were a bunch of caches that were relatively big, are they all needed?''):
+      (1) delete the model files (*.pt, *.pt.gz, *.ckpt, *.pth) of the superseded fine-tune sets zz_catft, zz_catft_lowloss2,
+      zz_catft_lowloss3 (~15.1 GiB; results files, logs, configs stay); (2) read, without deleting, who reads each memmap
+      key (live job, last_used, logs of the last 14 days, process names) and census the training cache amp_data_cache against
+      the recipes of the last 14 days'' run and sweep configs plus those open plan entries name. The cache deletions come
+      in a second job built from this census (delete_from_manifest.py, which skips anything read or changed since). Job scripts/job_ccdisk_d556.sh
+      at trunk 98656b350.'
+    prior: 'Read jobs ccj_3b5290531b03/ccj_e7fd8463789f: zz_catft 10217 MiB, lowloss2 1739, lowloss3 3478 apparent, 784 model
+      files 27.15 GiB over the seven catft dirs, non-model files 121 MiB; curves collected in committed analysis/catalog_v3/data/catft_curves.json
+      (collect_catft_curves.py reads only *_result.json). Inventory FA-ccin2p3-b949c4ee: amp_mmap_cache 36.8 GiB (two format-2
+      keys 4.0 GiB since deleted by FA-ccin2p3-67887dff), amp_data_cache 58.7 GiB all kept by census --in-use ''*'' --days
+      14 (every recipe counted as in use). D147 (''do delete the unused caches''); CLAUDE.md: a memmap cache is deleted only
+      when no running job and no recipe of an open plan entry reads it.'
+    measure: CATFT listed count and GiB from deleted_catft.tsv and df before/after; per memmap key the MMAP line (GiB, last
+      used days, live jobs, recent logs naming it); census totals per decision, delete GiB per recipe, keep GiB per reason
+    check: cache_readers.py on a fake SCRATCH (one key, key_doc names, last_used) printed its MMAP line and an empty INUSE;
+      cache_census.py and delete_from_manifest.py are the tools used for D147's deletion of 2026-10-26 (cache_manifest_2026-10-26.tsv);
+      the find lists only the three named dirs' model-file suffixes
+    fixed: only the three superseded catft sets' model files are deleted; zz_catft_sep, zz_catft_emafix, zz_catft_refit_emafix
+      untouched; no cache file is deleted by this job
+    control: 'none: a deletion and a read; the df change against the manifest''s total is the cross-check'
+    seeds: none
+    outcome: 'yes: D556_READ_DONE, CATFT ~15 GiB listed and df used down by about as much, cache_readers and census written;
+      no: the job stops before D556_READ_DONE (the catft manifest says what was listed; rerunning lists only what is left)'
+    sources: 'D556 (Joaquin''s yes to the list, quoted) for the catft sets and the cache question; D147 for deleting unused
+      training caches; 14 days: Joaquin''s D147 ''not used by any run in the last days'', at the census window of the 2026-11-24
+      inventory; CLAUDE.md, Joaquin''s words, ''A memmap cache (amp_mmap_cache) on a site is deleted only when no running
+      job and no recipe of an open plan entry reads it'''
   findings:
   - at: '2026-11-24T14:32:44+00:00'
     text: '2026-11-24 login-node reads: /sps/lpnhe 512 GiB group space at 98% (498 GiB used, 15 GiB free), .disk_full flag
