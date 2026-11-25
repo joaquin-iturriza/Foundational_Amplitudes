@@ -46076,7 +46076,7 @@ entries:
     '2': FA-ccin2p3-3e856594
     '4': detached driver zng_ep50_searches (pid 1376403, sweep/drive.py, 105 trials)
     '1': steps 2, 3 and 4 (FA-ccin2p3-3e856594, FA-ccin2p3-cedaa6dd, driver zng_ep50_searches)
-    '3': FA-ccin2p3-3e856594
+    '3': step 2's read of the pretraining update run (whether its dL reads overshoot too), then one repaired design for both
   targets:
   - batch: noise_smoke
     wall_h: 0.4
