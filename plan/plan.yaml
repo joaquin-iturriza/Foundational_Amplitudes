@@ -41710,6 +41710,7 @@ entries:
     '16': FA-ccin2p3-89671610
     '17': FA-lxplus-294e9e5e FA-lxplus-49899ef8
     '18': FA-ccin2p3-996866f8
+    '19': FA-ccin2p3-0165aa58
   handoff:
     state: 'Part (a) DONE, part (c) DONE. Part (b) his setup: 16 heads read; 32 heads FA-ccin2p3-e9dfa8b9 COMPLETED (val best
       4.06e-4 @54756, spike at ~36500; data/b_val_h32.txt, figs/b_width_curves.png sent), its score FA-ccin2p3-2c3a581b (EVENTS=1)
