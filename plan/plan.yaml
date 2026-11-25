@@ -17967,6 +17967,20 @@ entries:
       so two resumed claudemd-keepers both began at 19:26:20 and the other one''s advance swept step 35''s backlog); lock_calls.log
       now records agent_id. tests/test_review_guard_holder.py replays it: second begin 2, second advance 2, holder''s advance
       0, new begin after release 0. Not tested live; a lock begun before this change has no holder file and is not checked.'
+  - at: '2026-11-25T02:05:12+00:00'
+    text: '2026-11-25 step 35 done (D558; tools/token_share.py --refusals @e1b708a35, write-up 74b362473 par:refusal-cost,
+      figure analysis/agent_redesign/figs/refusal_cost.png): over 2026-11-09..23, 1000 refusals followed by 677.6M tokens
+      (13.7% of 4953.5M; lower bound 249.6M, 5.0%); main session 466.5M after 525 refusals = 32.1% of its tokens (12.0% lower),
+      owners 180.8M after 347 = 6.5% (2.3%), other agents 28.1M, mechanical workers 2.0M, reviewers 0.2M. Top ten: right on
+      every case read: resume the owner (91.6M), owners'' leave-check (54.1M), events/ready step with no owner, no waiter.
+      Misfires: context guard 121 bounces over 13 compactions before ee7afdfb7 (11-19), 2 over 3 after (113.9M); commit block
+      12 of 80 commits named no file of the blocking pillar (63 did); question check missed restated short questions (''Add
+      them?'', ''Do you want it?''), 16 of 54 repeats; sleep guard 50 single sleeps <=5 s and 16 quoted-only of 90; brief
+      guard''s refusal did not name its COLD READ exemption. Fixed in 133a1b102 (mechanical-worker; tests test_review_backlog_paths,
+      test_sleep_guard_short, test_plan_ask_short incl. the corrected pretrain case 77bddd6a9, COLD READ cases replayed on
+      brief_guard). Not fixed: sleep_guard keeps the strict rule for any command with the words for/while; a wrapped short
+      sleep (timeout 60 sleep 3) is still refused; the commit block was tested on equivalent cases in a throwaway repo, not
+      on the real commands; md_guard refuses a scratchpad .tex by its own design (not counted a misfire).'
   handoff:
     state: 'D534 step 30: parts 1, 2, 3, 4 built and replayed (findings 2026-11-24). Left: a live check of part 3 at the next
       real broken trial (expect an acked RUN event with ''folded into its search'', no wake) and at the next lxplus master
