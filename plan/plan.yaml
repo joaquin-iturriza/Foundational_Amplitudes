@@ -45033,6 +45033,9 @@ entries:
     3: 'Lossless and already-decided frees: gzip the lhe_queue Q/gc/ deletion manifests in place (nothing but tests reads
       them; est. ~6 GiB, ratio not measured), D208''s lhe_parts gc --parts on each fully assembled queue, D136''s 18 MadGraph
       events dirs (0.94 GB) via free_space.py delete --kind events; one CPU job under a design the design reviewer passes'
+    4: 'D556 cache question: from SCRATCH/zz_cc_disk/cache_readers.txt and census_d556.tsv, delete the training-cache entries
+      nothing reads (delete_from_manifest.py --apply, D147) and any memmap key no running job or open entry''s recipe reads;
+      report each cache with its size, reader and what went'
   done_when: null
   notes_ref: null
   match: cc_disk_*,zz_probe_*
@@ -45448,6 +45451,11 @@ entries:
       if:
       - 'done: report GiB freed per class and df'
       - 'a class fails or a reader of the manifests turns up: keep it, fix, report'
+    4:
+      feeds: which CC caches are needed (D556)
+      if:
+      - 'census read: design, review, submit the deletion; report what went and what stays with why'
+      - 'every cache read by a running job or open entry: report that, nothing deleted'
 - id: cc_login_jobs
   title: 'CC login node: recurring and long scripts moved to Slurm (CC support''s email)'
   question: 'Can every non-interactive script we run on CC''s login node (the supervisor''s maintain commands: disk_watch,
