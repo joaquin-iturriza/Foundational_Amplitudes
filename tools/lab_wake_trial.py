@@ -212,7 +212,7 @@ def reviews_extract(a):
     (from a prompt to the next): its prompt, the first plan show|design output after it (the design), only that
     round's tool outputs (the material), and that round's own design-pass|design-fix verdict. Rounds with no fresh
     design read or no verdict are dropped."""
-    rows = []
+    rows, nall, nverdict = [], 0, 0
     for mp in glob.glob(PROJ + "/*/subagents/agent-*.meta.json"):
         if json.load(open(mp)).get("agentType") != "design-reviewer":
             continue
@@ -232,10 +232,13 @@ def reviews_extract(a):
                         uses = {}
                     continue
                 for b in res:
-                    if cur is not None and b.get("tool_use_id") in uses:
+                    # material stops at the round's verdict call: later reads can print the round's own verdict
+                    if cur is not None and cur["verdict"] is None and b.get("tool_use_id") in uses:
                         txt = text_of(b.get("content"))
                         cur["material"].append((uses[b["tool_use_id"]], txt))
-                        if cur["design"] is None and re.search(r"plan\.py (show|design)\b", uses[b["tool_use_id"]]):
+                        # the design: the round's first read holding a design's measure and outcome (a saved-output
+                        # placeholder or a slice of the entry without them is not one)
+                        if cur["design"] is None and re.search(r"\bmeasure:", txt) and re.search(r"\boutcome:", txt):
                             cur["design"] = txt
             elif d.get("type") == "assistant" and cur is not None:
                 for b in c or []:
@@ -247,6 +250,9 @@ def reviews_extract(a):
                         else:
                             uses[b.get("id")] = cmd[:300]
         for k, r in enumerate(rounds):
+            if a.since <= r["t"][:16] < a.until:
+                nall += 1
+                nverdict += bool(r["verdict"])
             if r["design"] and r["verdict"] and a.since <= r["t"][:16] < a.until:
                 rows.append({"agent": "%s#%d" % (os.path.basename(mp)[6:-16], k), "t": r["t"], "brief": r["brief"][:6000],
                              "design": r["design"][:30000], "material": r["material"], "verdict": r["verdict"]})
@@ -254,8 +260,9 @@ def reviews_extract(a):
     with open(os.path.join(OUT, "reviews.jsonl"), "w") as f:
         for r in rows[:a.n]:
             f.write(json.dumps(r) + "\n")
-    print("%d design review rounds with a fresh design read and a verdict in the window (%d FIX), %d kept" % (
-        len(rows), sum(r["verdict"] == "FIX" for r in rows), min(a.n, len(rows))))
+    print("%d design review rounds in the window, %d with a verdict, %d of them with a read holding the design's measure "
+          "and outcome (%d FIX), %d kept" % (nall, nverdict, len(rows), sum(r["verdict"] == "FIX" for r in rows),
+                                              min(a.n, len(rows))))
 
 
 def reviews_run(a):
