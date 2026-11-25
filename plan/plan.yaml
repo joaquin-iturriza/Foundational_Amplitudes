@@ -48097,12 +48097,10 @@ entries:
     answered_at: '2026-11-25T11:59:22.479000+00:00'
     decision: D561
   owner:
-    agent: ad098506c65b574e6
-    state: closed
-    since: '2026-11-25T07:26:28+00:00'
-    state_at: '2026-11-25T13:48:50.150000+00:00'
-    context: 267253
-    context_at: '2026-11-25T12:15:18+00:00'
+    agent: acfbcee1963f1ac62
+    state: working
+    since: '2026-11-25T15:24:52+00:00'
+    state_at: '2026-11-25T15:24:52+00:00'
   designs:
   - at: '2026-11-24T23:55:03+00:00'
     question: 'Can the momentum log-rescale be applied only where it helps, by a rule using only the event''s own momenta,
