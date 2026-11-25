@@ -69,6 +69,7 @@ FLAGS = {"pair_logs": dict(input_pair_logs=5), "soft_rescale": dict(input_soft_e
          "both_6": dict(input_pair_logs=6, input_soft_eps=1e-8),
          "soft_massless": dict(input_soft_eps=1e-8, input_soft_massless_only=True),
          "soft_x0": dict(input_soft_eps=1e-8, input_soft_x0=0.1),
+         "soft_nu": dict(input_soft_eps=1e-8, input_soft_x0=0.1, input_soft_skip_neutrinos=True),
          "soft_gate": dict(input_soft_eps=1e-8, input_soft_gate=0.1)}     # the uugg flags: 15 pair logs + soft rescale
 
 
@@ -476,3 +477,18 @@ def test_soft_rescale_massless_only():
     assert torch.allclose(a[keep], b[keep], rtol=0, atol=0), "a massless momentum differs from the plain rescale"
     assert not torch.allclose(a[3], p[3]), "the plain rescale should move the massive momentum"
     _check("soft_massless")
+
+
+def test_soft_rescale_skip_neutrinos():
+    """model.input_soft_skip_neutrinos (D561): neutrinos (and only they, among the SM ids) keep factor 1, every other
+    momentum gets the x0 rule's factor; the wrapper stays Lorentz invariant."""
+    from particle_ids import GLOBAL_PDG_IDX
+    from wrappers import _neutrinos
+    pdg = sorted(GLOBAL_PDG_IDX)
+    nu = _neutrinos(torch.tensor([GLOBAL_PDG_IDX[q] for q in pdg]))
+    assert [q for q, k in zip(pdg, nu) if k] == [-16, -14, -12, 12, 14, 16], nu
+    p, ptr = _events(1)
+    keep = torch.zeros(len(p), dtype=torch.bool); keep[2] = True     # the first event's first outgoing leg
+    a, b = _soft_rescale(p, ptr, 1e-8, x0=0.1), _soft_rescale(p, ptr, 1e-8, x0=0.1, keep=keep)
+    assert torch.equal(b[2], p[2]) and torch.equal(b[~keep], a[~keep])
+    _check("soft_nu")

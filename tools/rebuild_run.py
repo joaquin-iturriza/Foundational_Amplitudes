@@ -302,7 +302,8 @@ def rebuild(run_dir, role, path, n_events, event_frame=False):
     exp.model.to(exp.device, dtype=exp.dtype).eval()
     if os.environ.get("REBUILD_SET"):   # proof the set keys reached the rebuilt model
         print("REBUILD_SET_MODEL " + json.dumps({k: getattr(exp.model, k, None) for k in
-                                                 ("input_soft_eps", "input_soft_x0", "input_soft_gate")}), flush=True)
+                                                 ("input_soft_eps", "input_soft_x0", "input_soft_gate",
+                                                  "input_soft_skip_neutrinos")}), flush=True)
     loader = exp.val_loader if role == "val" else exp.test_loader
     n = len(loader.dataset) if hasattr(loader.dataset, "__len__") else None
     assert n in (None, int(n_events)), f"{role} loader holds {n} events, expected {n_events}"

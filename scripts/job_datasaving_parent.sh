@@ -23,9 +23,10 @@
 #            lr 3.78e-3 = trial 1262's 3.649e-3 at its 68224 steps moved along its law 7.82114e-3 (T/17056)^-0.55;
 #            WSD (cooldown 1/8, D423) and the D392 input flags set here. Its limit is not this header's 3 h: submit with
 #            --hdr=--time=<the smoke's measured s/step x 64000 x 1.3 + 1 h>
-#            The soft rescale acts only below x0 = 1e-5 (D561, selective_rescale): under the softest x of every finale
-#            pool, 1.99e-5 (a u d~ > e nu g neutrino; analysis/selective_rescale/data/support_minima.json), and of the Z+4g
-#            train pool its fine-tunes train on (0.00923), so training is that of no rescale; runs before 2026-11-25 had it everywhere.
+#            The soft rescale acts only below x0 = 0.009, neutrinos exempt (D561, selective_rescale): every finale pool's
+#            momenta below 0.009 are u d~ > e nu g neutrinos (analysis/selective_rescale/data/support_minima.json), and the
+#            Z+4g train pool its fine-tunes train on starts at 0.00923, so training is that of no rescale and the rescale acts
+#            only on softer, untrained momenta; runs before 2026-11-25 had it everywhere.
 # D506: every case adds the W (24) to trial 1262's internal_mass_pdgs [23,6,25].
 # Base config:
 # trial 1262 of cov_v4_long_hpo8_cc_68224 (model, HPs, HETEROSC + sigma stage); in memory (data.memmap=false: the
@@ -48,7 +49,7 @@ cd "$PROJECT_DIR"
 WHICH="$1"; shift
 SUB=10000; FIX=()
 case "$WHICH" in finale) T=64000; LR=3.78e-3; SUB=null
-    FIX=(training.scheduler=WSD ++training.wsd_cooldown_frac=0.125 ++model.input_soft_eps=1e-8 ++model.input_soft_x0=1e-5 ++model.input_pair_logs=7 data.eval_subsample=10000) ;; heldoutbbzz) T=3458; LR=9.248e-3 ;; heldout|heldoutthr|heldoutthrloop) T=4307; LR=8.196e-3 ;; treesin) T=4313; LR=8.190e-3 ;; *) echo "finale, heldout, heldoutbbzz, heldoutthr, heldoutthrloop or treesin"; exit 2 ;; esac
+    FIX=(training.scheduler=WSD ++training.wsd_cooldown_frac=0.125 ++model.input_soft_eps=1e-8 ++model.input_soft_x0=0.009 ++model.input_soft_skip_neutrinos=true ++model.input_pair_logs=7 data.eval_subsample=10000) ;; heldoutbbzz) T=3458; LR=9.248e-3 ;; heldout|heldoutthr|heldoutthrloop) T=4307; LR=8.196e-3 ;; treesin) T=4313; LR=8.190e-3 ;; *) echo "finale, heldout, heldoutbbzz, heldoutthr, heldoutthrloop or treesin"; exit 2 ;; esac
 PARENT="runs/catalog_v4_long/best_cov_v4_long_hpo8_cc_68224_trial_1262"
 RECIPE="$PROJECT_DIR/recipes/catalog_v4_datasaving_parent_${WHICH}.yaml"
 [ "$WHICH" = finale ] && RECIPE="$PROJECT_DIR/recipes/transfer_finale.yaml"

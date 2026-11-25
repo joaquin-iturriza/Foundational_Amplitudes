@@ -264,7 +264,14 @@ def _asym_mu(mu_raw, alpha, ptr, n, logD, on, members, sd):
     return torch.logsumexp(torch.cat([reg[:, None], terms], 1), 1) / sd
 
 
-def _soft_rescale(p, ptr, eps, massless_only=False, x0=1.0, gate=0.0):
+def _neutrinos(idx):
+    """(N,) bool: the particles of GLOBAL_PROPERTY_MATRIX rows `idx` that are neutrinos (charge 0, lepton number != 0)."""
+    from particle_ids import GLOBAL_PROPERTY_MATRIX as _G
+    G = torch.as_tensor(_G, device=idx.device)[idx]
+    return (G[:, 0] == 0) & (G[:, 5] != 0)
+
+
+def _soft_rescale(p, ptr, eps, massless_only=False, x0=1.0, gate=0.0, keep=None):
     """p_i -> p_i log1p(x_i/eps) / (x_i log1p(1/eps)), x_i = 2 p_i.Q/s, Q = p_0 + p_1, s = Q^2: an invariant factor per
     momentum (equivariant), 1 at x_i = 1, so a soft momentum's scale reads logarithmically (model.input_soft_eps).
     massless_only: a massive momentum (m^2/s > 1e-6) keeps factor 1, so it stays on its mass shell
@@ -272,7 +279,9 @@ def _soft_rescale(p, ptr, eps, massless_only=False, x0=1.0, gate=0.0):
     x0 < 1: the factor over its value at x0, never below 1, so a momentum with x_i >= x0 is unchanged and only the
     softer ones are rescaled, continuously at x0 (model.input_soft_x0, selective_rescale D552; 1 = the rescale above).
     gate > 0: only events whose softest final-state momentum has x_i < gate are rescaled, every momentum of them; the
-    others keep factor 1 (model.input_soft_gate, D552)."""
+    others keep factor 1 (model.input_soft_gate, D552).
+    keep: (N,) bool, momenta that keep factor 1 (model.input_soft_skip_neutrinos: a soft neutrino has no soft
+    singularity, selective_rescale D561)."""
     cnt = ptr[1:] - ptr[:-1]
     eta = torch.tensor(_ETA, device=p.device, dtype=torch.float64)
     p64 = p.to(torch.float64)
@@ -288,6 +297,8 @@ def _soft_rescale(p, ptr, eps, massless_only=False, x0=1.0, gate=0.0):
         f = torch.where(xmin[ev] < gate, f, torch.ones_like(f))
     if massless_only:
         f = torch.where(((p64 * p64 * eta).sum(-1) / (Q * Q * eta).sum(-1)).abs() > 1e-6, torch.ones_like(f), f)
+    if keep is not None:
+        f = torch.where(keep, torch.ones_like(f), f)
     return p * f.to(p.dtype)[:, None]
 
 
@@ -428,7 +439,7 @@ class AmplitudeLLoCaWrapper(nn.Module):
                  input_route_off: str = "", input_log_skip: int = 0, input_log_skip_linear: bool = False,
                  input_div_form: bool = False, input_asym_factor: bool = False,
                  input_asym_sudakov_single: bool = False, input_soft_massless_only: bool = False,
-                 input_soft_x0: float = 1.0, input_soft_gate: float = 0.0):
+                 input_soft_x0: float = 1.0, input_soft_gate: float = 0.0, input_soft_skip_neutrinos: bool = False):
         super().__init__()
         self.net = net
         # input representations for singular limits (D374, kit_benchmark input arms; all Lorentz-exact, 0 = off):
@@ -441,6 +452,7 @@ class AmplitudeLLoCaWrapper(nn.Module):
         self.input_soft_massless_only = bool(input_soft_massless_only)   # massive momenta keep factor 1 (_soft_rescale)
         self.input_soft_x0 = float(input_soft_x0)   # < 1: only momenta with x_i < x0 rescaled (_soft_rescale, D552)
         self.input_soft_gate = float(input_soft_gate)   # > 0: only events with min final-state x_i < gate rescaled (D552)
+        self.input_soft_skip_neutrinos = bool(input_soft_skip_neutrinos)   # neutrinos keep factor 1 (_soft_rescale, D561)
         net.local_log_eps = float(input_local_log_eps or 0.0)
         # input_scalars_only: the backbone reads only the per-particle scalars (properties, orders, pair logs): local
         # momenta zeroed, identity frames (models/lloca.py), so no momentum reaches it but through the pair logs
@@ -1227,8 +1239,9 @@ class AmplitudeLLoCaWrapper(nn.Module):
             particle_type = torch.cat([particle_type, _div_form_inputs(
                 fourmomenta, ptr, self.input_pair_logs, G[particle_type_indices, 7],
                 G[particle_type_indices, 2] >= 0).to(particle_type.dtype)], dim=-1)
+        keep = _neutrinos(particle_type_indices) if self.input_soft_eps and self.input_soft_skip_neutrinos else None
         fm_net = (_soft_rescale(fourmomenta, ptr, self.input_soft_eps, self.input_soft_massless_only,
-                                self.input_soft_x0, self.input_soft_gate)
+                                self.input_soft_x0, self.input_soft_gate, keep)
                   if self.input_soft_eps else fourmomenta)
 
         net_kwargs = {} if token_add is None else {"token_add": token_add}

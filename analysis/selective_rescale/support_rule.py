@@ -28,6 +28,8 @@ MINIMA = r'''
 import json, os, re, sys
 import numpy as np
 sys.path.insert(0, os.getcwd()); import siteconf
+import torch, wrappers
+from particle_ids import GLOBAL_PDG_IDX
 eta = np.array([1., -1., -1., -1.]); out = {}
 for a in sys.argv[1:]:
     lab, log = a.split("#"); r = {}
@@ -43,6 +45,7 @@ for a in sys.argv[1:]:
                            open(os.path.join(siteconf.PROJECT_DIR, "runs", log)).read())
     for role, path in pools:
         rows = np.load(path, mmap_mode="r"); n = (rows.shape[1] - 1) // 5; xs = []; pid_min = (np.inf, 0); soft = {}
+        moved = 0   # momenta the shipped finale rule changes, through wrappers._soft_rescale itself (D561)
         for i in range(0, len(rows), 50000):
             p = np.asarray(rows[i:i + 50000, :4 * n], dtype=np.float64).reshape(-1, n, 4)
             ids = np.asarray(rows[i:i + 50000, 4 * n:5 * n]).astype(np.int64)[:, 2:]
@@ -50,11 +53,16 @@ for a in sys.argv[1:]:
             xi = np.abs(2 * (p * Q[:, None] * eta).sum(-1) / s[:, None])[:, 2:]
             xs.append(xi.min(1)); k = np.unravel_index(xi.argmin(), xi.shape)
             pid_min = min(pid_min, (float(xi[k]), int(ids[k])))
+            t = torch.from_numpy(p.reshape(-1, 4)); ptr = torch.arange(0, len(p) * n + 1, n)
+            idx = torch.tensor([GLOBAL_PDG_IDX[int(q)] for q in np.asarray(rows[i:i + 50000, 4 * n:5 * n]).reshape(-1)])
+            r_ = wrappers._soft_rescale(t, ptr, 1e-8, x0=0.009, keep=wrappers._neutrinos(idx))
+            moved += int((r_ != t).any(-1).sum())
             for q in ids[xi < 0.009]:   # the final-state momenta a rule at x0 = 0.009 would change, by PDG id
                 soft[str(q)] = soft.get(str(q), 0) + 1
         x = np.concatenate(xs)
         r[role if not log.startswith("recipe:") else role + "/" + os.path.basename(path)] = {"path": path, "n": int(len(x)), "min": float(x.min()), "q1e-4": float(np.quantile(x, 1e-4)),
-                   "below_0.01": int((x < 0.01).sum()), "pid_min": pid_min[1], "below_0.009_by_pid": soft}
+                   "below_0.01": int((x < 0.01).sum()), "pid_min": pid_min[1], "below_0.009_by_pid": soft,
+                   "moved_x0_0.009_nu_exempt": moved}
     out[lab] = r
 print("SRMIN " + json.dumps(out))
 '''
@@ -62,6 +70,7 @@ print("SRMIN " + json.dumps(out))
 
 X0 = 0.009   # below every pool's softest x (data/support_minima.json: Z+4g train 0.00923, u u~ g train 0.01107)
 RULE = f"model.input_soft_eps=1e-8,model.input_soft_x0={X0}"
+RULE_NU = RULE + ",model.input_soft_skip_neutrinos=true"   # the finale's shipped rule (D561 step 4)
 SEEDS = (42, 43, 44)
 RUNS = {**{f"uug_{d}_{s}": f"ftmech_d539_uug_{d}_off_b2048/{t}" if s == 42 else f"ftmech_d539_uug_{d}_off_b2048_s{s}"
            for d, t in (("1e4", "trial_1559"), ("1e5", "trial_0020")) for s in SEEDS},
@@ -104,18 +113,24 @@ for arm, env in (("off", {}), ("rule", {"REBUILD_SET": sys.argv[2]})):
             out["rule_model"] = json.loads(m[0].split(" ", 1)[1])
             want = dict(kv.split("=") for kv in sys.argv[2].split(","))
             assert out["rule_model"]["input_soft_x0"] == float(want["model.input_soft_x0"]) and \
-                out["rule_model"]["input_soft_eps"] == float(want["model.input_soft_eps"]), f"rule not on the model: {m[0]}"
+                out["rule_model"]["input_soft_eps"] == float(want["model.input_soft_eps"]) and \
+                out["rule_model"].get("input_soft_skip_neutrinos") in (None, want.get("model.input_soft_skip_neutrinos") == "true"), \
+                f"rule not on the model: {m[0]}"
     except Exception as e:
         out[arm] = {"error": repr(e)[:200], "tail": (r.stdout + r.stderr)[-600:]}
 print("SRKIT " + json.dumps(out))
 '''
 
 
-def score(cached):
-    f = os.path.join(HERE, "data", "support_kit.json")
+RUNS_NU = {f"{k}_nu": v for k, v in RUNS.items() if k.startswith("uug_")}   # u u~ g has no neutrino: must equal RULE
+
+
+def score(cached, nu=False):
+    f = os.path.join(HERE, "data", "support_kit_nu.json" if nu else "support_kit.json")
+    runs = RUNS_NU if nu else RUNS
     res = json.load(open(f)) if os.path.exists(f) else {}
     if not cached:
-        for lab, d in RUNS.items():
+        for lab, d in runs.items():
             if lab not in res:
                 try:
                     v = job_result(lab)
@@ -128,9 +143,33 @@ def score(cached):
                 except SystemExit as e:   # submitted or still running: read on the next call
                     print(f"{lab}: {str(e).splitlines()[0][:120]}")
         json.dump(res, open(f, "w"), indent=1)
-    missing = [k for k in RUNS if k not in res]
+    missing = [k for k in runs if k not in res]
     print(json.dumps({"missing": missing, "read": sorted(res)}))
     return not missing
+
+
+def read_nu():
+    """D561 step 4: per u u~ g run and kit stratum, the neutrino-exempt rule against the x0 = 0.009 rule scored before
+    (data/support_kit.json, same runs and kit_predict at KIT_THREADS 1): u u~ g has no neutrino, so both arms must agree
+    to the pipeline tolerance 0.01 dec, and the off arm must reproduce the earlier off arm -> data/support_nu.json"""
+    import numpy as np
+    old = json.load(open(os.path.join(HERE, "data", "support_kit.json")))
+    new = json.load(open(os.path.join(HERE, "data", "support_kit_nu.json")))
+    out = {"max_abs_dec": {}, "problems": []}
+    for lab in RUNS_NU:
+        k, o = new[lab], old[lab[:-3]]
+        if k["rule_model"].get("input_soft_skip_neutrinos") is not True:
+            out["problems"].append(f"{lab}: rule_model {k['rule_model']}")
+        if k["changed"] != o["changed"]:
+            out["problems"].append(f"{lab}: changed counts differ")
+        for arm in ("off", "rule"):
+            d = max(abs(np.log10(k[arm][sk] / o[arm][sk])) for sk in o[arm])
+            out["max_abs_dec"][f"{lab}/{arm}"] = float(d)
+            if d >= 0.01:
+                out["problems"].append(f"{lab} {arm}: max |log10 new/old| {d:.3g}")
+    out["outcome"] = "SAME" if not out["problems"] else "DIFFERENT"
+    json.dump(out, open(os.path.join(HERE, "data", "support_nu.json"), "w"), indent=1)
+    print(json.dumps(out))
 
 
 def job_result(lab):
@@ -148,9 +187,9 @@ def job_result(lab):
     return json.loads(line.split(" ", 1)[1])
 
 
-def jobs():
-    for lab, d in RUNS.items():
-        print(f"{lab}\t{lab}#{d}\t{RULE}")
+def jobs(nu=False):
+    for lab, d in (RUNS_NU if nu else RUNS).items():
+        print(f"{lab}\t{lab}#{d}\t{RULE_NU if nu else RULE}")
 
 
 def remote(arg, rule):
@@ -265,6 +304,11 @@ if __name__ == "__main__":
     if sys.argv[1] == "read":
         read(); sys.exit(0)
     if sys.argv[1] == "jobs":
-        jobs(); sys.exit(0)
-    ok = {"minima": minima, "score": score}[sys.argv[1]]("--cached" in sys.argv)
+        jobs("--nu" in sys.argv); sys.exit(0)
+    if sys.argv[1] == "read_nu":
+        read_nu(); sys.exit(0)
+    if sys.argv[1] == "score":
+        ok = score("--cached" in sys.argv, "--nu" in sys.argv)
+    else:
+        ok = minima("--cached" in sys.argv)
     sys.exit(0 if ok is not False else 75)
