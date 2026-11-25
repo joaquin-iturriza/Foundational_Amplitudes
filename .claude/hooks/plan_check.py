@@ -443,6 +443,9 @@ _SITES = {"lxplus": r"lxplus", "ccin2p3": r"ccin2p3|cc-in2p3|\bCC\b", "jeanzay":
 _DOWN = r"(?:(?:is|was|are|'s|seems|looks|still|currently)\s+)+(?:down|unreachable|not answering|needs 2FA)|needs 2FA"
 
 
+_QUOTED = re.compile(r'"[^"\n]*"|\u201c[^\u201d\n]*\u201d|`[^`\n]*`')   # quoted text is an example, not a claim
+
+
 def site_down(inp):
     """~/work/CLAUDE.md, Verify before claiming: the final message calls a site down, unreachable or in need of
     2FA/reconnecting without a retry in this turn (`site run <site> FA -- hostname`, or `site list` twice)."""
@@ -453,7 +456,7 @@ def site_down(inp):
     ran = lambda k: any(re.search(r"\bsite\s+run\s+(?:%s)\s+FA\s+--\s+hostname" % _SITES[k].replace(r"\bCC\b", "cc"), c, re.I)
                         for c in cmds)
     bad = [k for k, pat in _SITES.items()
-           if re.search(r"(?:%s)\s*(?:%s)\b" % (pat, _DOWN), last or "", re.I)
+           if re.search(r"(?:%s)\s*(?:%s)\b" % (pat, _DOWN), _QUOTED.sub(" ", last or ""), re.I)
            and not ran(k)]
     return ["a site is called down only after a retry in this turn: site run <site> FA -- hostname, or site list twice "
             "(~/work/CLAUDE.md, Verify before claiming); said of: " + ", ".join(bad)] if bad else []
