@@ -44032,7 +44032,7 @@ entries:
   match: zz_labllm_*
   evidence:
     runs: []
-    commit: ad9405eab
+    commit: bfe873b5f
     paths:
     - analysis/lab_llm_trial/runs.jsonl
     - analysis/lab_llm_trial/summary.json
