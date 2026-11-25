@@ -45093,8 +45093,8 @@ entries:
     state: stopped
     since: '2026-11-25T00:05:14+00:00'
     state_at: '2026-11-25T01:03:59.656000+00:00'
-    context: 197086
-    context_at: '2026-11-25T01:03:25+00:00'
+    context: 207587
+    context_at: '2026-11-25T01:06:33+00:00'
   designs:
   - at: '2026-11-24T14:30:34+00:00'
     question: 'What uses CC''s /sps/lpnhe group space (512 GiB, 98% used, 15 GB free on 2026-11-24) inside our area where
