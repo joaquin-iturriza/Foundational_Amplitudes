@@ -40828,7 +40828,7 @@ entries:
     - FA-lxplus-71f15edb
     - FA-lxplus-a0cc1bc6
     - FA-lxplus-cb9273f1
-    commit: 868c56f2f
+    commit: 8af1c56bd
     paths:
     - analysis/catalog_daniel/dancat_plain_mse.py
     - analysis/llm_compare/check_score_vs_preds.py
@@ -40849,6 +40849,7 @@ entries:
     - sweep/prune.py
     - sweep/sweep_config_llmcmp_a_adamw_const.yaml
     - tests/test_alphas_input.py
+    - tests/test_level_file.py
     - tests/test_memmap_data.py
     - tools/check_pp_pools.py
     - tools/llm_score.py
