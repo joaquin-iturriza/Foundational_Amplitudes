@@ -41580,8 +41580,8 @@ entries:
     '14': FA-ccin2p3-f0b997a2
     '15': 'the next owner (this owner closes near the context limit after step 8''s smokes go out): design the level-branch
       configurations (finding 2026-11-25 split read)'
-    '16': 'a reviewer: design-reviewer re-check of the revised step-16 design, then repo-reviewer for the levelfile branch
-      merge'
+    '16': 'a reviewer: repo-reviewer on the trunk backlog + branch levelfile (design PASSED 2026-11-25 15:1x); then tests/test_level_file.py,
+      merge, sync, smoke + score'
   handoff:
     state: 'Part (a) DONE (par:llmcmp_a). Part (c) DONE: best hp1860 FA-ccin2p3-29ce8950 scored, par:llmcmp_c @1aa1030ec (seen
       0.053, held out 1.178, relabels 0.068, new 2.116; LLM 0.321/0.721/0.341/1.193). Part (b) his setup: 16 heads done; 32
