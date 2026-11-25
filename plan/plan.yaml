@@ -44741,6 +44741,55 @@ entries:
       asserted (shared 47, regressor 0.044), shift read moves 0.30 vs 0.074-0.10 sigma_p (inherited from the passed tree design).
       Check 3: gate 0.19 = top of the regressor''s 10-ensemble spread 0.016-0.19 (l.8510, read), shift bar 2x the job''s 30-resample
       bootstrap. Terms searched: boosted, gradient-boost, per-event level, perevent, norm_explore6, D566.'
+  - at: '2026-11-25T20:07:12+00:00'
+    question: 'Step 20, D566 candidate (B) after step 17''s fail on (i) (its passed design: a fail on (i) is not a verdict;
+      next an equal-size search for tree and network, best against best, its own design). Tuned on training processes only,
+      does the per-event map g(process features, diagram descriptors, log s_hat, Lmin - log s_hat, E, log P) -> log|M|^2,
+      as a boosted tree or a network, place the 43 new families'' levels within the diagram regressor''s spread (median level
+      error <= 0.19) while its flat-sampling shift stays below the regressor''s?'
+    prior: 'Step 17 (FA-lxplus-294e9e5e tree, -49899ef8 network, untuned, data/perevent_level{,_mlp}.json @1bd9d3152): new-set
+      level error tree 3.64, network 1.63, regressor 0.047, shared 44.7; flat shift tree 0.155, network 0.084, regressor 0.176
+      (sd 0.037); relabelling-class cross-fit tree 0.036, i.e. that cross-fit did not track the new set (x100). results.tex
+      l.7817-7823: per-process trees chosen on the relabelling-class cross-fit (0.064 cross-fit, 0.32 new); l.8510-8518: the
+      diagram regressor 0.12 relabelling cross-fit vs 0.045 new, but 10.4 cross-fitted by multiplicity (does not extrapolate
+      in multiplicity); widths 128/64 0.04-0.10, width 32 or 3 layers 0.34-0.53. Candidate (A) dead end (6.3/3.1). Searched:
+      cross-fit, leave-*-out, perevent, D566, boosted in results.tex, the entry, site decisions.'
+    measure: 'perevent_level.py --search 12 --model {hgb,mlp}: per model, DyHPO single-fidelity GP (sweep/dyhpo_sampler.py,
+      surrogate gp, 2000 candidates, 5 random start-up then 7 guided, seed 42) minimises the median level error <y_hat-y>_p^2/sigma_p^2
+      of the 1352 training processes cross-fitted in 5 folds grouped by final-state content signature (content_sig: 66 signatures
+      on train; 33 of the 43 new have one no training process has), 1 network seed per fit. The best configuration is then
+      read exactly as step 17 (relabelling-class cross-fit, full fit on the 1352, 3 network seeds, reads (i) level error,
+      (ii) flat and singular shift with 30-resample bootstrap noise, (iii) spread; medians over the 43 new, relabels, per
+      family) as candidate B_tuned / B_mlp_tuned into data/perevent_level{,_mlp}_search.json; perevent_level_fig.py adds them
+      beside step 17''s arms.'
+    check: 'Proxy check inside each job: step 17''s default configuration scored on the signature cross-fit first (default_sig_cv);
+      the proxy is trusted for the reading only if it ranks the two defaults as the new set does (network 1.63 < tree 3.64)
+      and is within 10x of their new-set values, else the result is reported with the proxy named as untracked. That the measure
+      moves with the tested change: step 17''s tree and network differ x2.2 on the new set (3.64 vs 1.63) and the per-process
+      network moves 0.04-0.53 with width/depth (l.8514), so the HPs searched move it. Code checked locally (tests/test_perevent_search.py:
+      sampler loop over both spaces, builders fit, defaults = step 17, signatures). Time: step 17 network 1.19 h for 18 seed-fits
+      (~4 min each), tree 0.15 h for 6 fits (~1.5 min): network 1 + 12 trials x 5 fits x ~6 min + final 18 seed-fits = ~8
+      h, tree ~2 h; memory as step 17 (16G).'
+    fixed: 'Data, rows, features, references, reads, bootstrap and final reading identical to step 17 (catalog_daniel train-role
+      pools on lxplus, first 2000 events per pool, 1352 train / 43 new / 96 relabels, frozen regressor level_file_B_diag.json).
+      Spaces: network width int_log [32,128], depth [1,3], l2 = alpha/batch float_log [5e-6,5e-4] (step 17''s 5e-5 +/- 1 decade),
+      lr float_log [1e-3,9e-3] (3e-3 +/- 1/2 decade), batch {1024,4096,16384}; tree learning_rate float_log [0.02,0.3], max_leaf_nodes
+      int_log [8,255], max_iter int_log [100,1000], l2_regularization float_log [1e-3,10]. Same trial count for both: 12 (the
+      template''s 8, waves 3,3,2, raised for 4-5 dimensional spaces). Folds of the objective grouped by content signature,
+      because the relabelling-class cross-fit read 0.036 for step 17''s tree against 3.64 on the new set, and l.8515''s multiplicity
+      cross-fit (10.4) shows held-out-structure folds are what extrapolation needs. CPU jobs on lxplus, 4 CPUs, 16G.'
+    control: Step 17's untuned tree and network (same code with no search), the diagram regressor and the shared level, all
+      re-read in the same jobs; best tree against best network at equal search size.
+    seeds: 'Sampler seed 42; network 1 seed per search fit, 3 averaged in the final reading (as step 17); tree random_state
+      0. Noise of the level read: the regressor''s 10-ensemble spread 0.016-0.19 (l.8510); of the shift: the 30-resample bootstrap.'
+    outcome: 'Yes (go to (C), g fed to LLoCa per event, its own design): the best of either model has median level error on
+      the 43 new <= 0.19 AND median flat shift below the regressor''s by more than 2x bootstrap noise. No: both stay above
+      0.19 after the matched search: (B) recorded as a dead end for new-family level placement (the shift result reported
+      alone); tree against network reported as a model-class difference at equal search size. If the proxy check fails, the
+      reading says the search optimised an objective that does not track the new set.'
+    sources: '0.19 <- a measured spread: the regressor''s 10-ensemble spread 0.016-0.19, results.tex l.8510 (as step 17''s
+      passed design); 2x bootstrap noise <- a measured noise: the job''s 30-resample bootstrap std of the shift (step 17:
+      0.026-0.037)'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
