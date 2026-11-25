@@ -295,12 +295,38 @@ except Exception: print("")' 2>/dev/null)
     # the code only (cmdparse.py): a heredoc or a quoted string that names a git commit runs none
     scan=$(printf '%s' "$cmd" | python3 "$(dirname "${BASH_SOURCE[0]}")/cmdparse.py" scan 2>/dev/null) || scan="$cmd"
     if printf '%s' "${scan:-$cmd}" | grep -qE '(^|[;&|(]|\s)git(\s+-C\s+\S+)?\s+commit(\s|$)'; then
+      # D558: a commit that names its paths after `--` is refused only when one is a changed file of the overdue pillar
+      # (13 of 80 refusals named only files outside it); one run in another repository (`cd <outside dir> &&`,
+      # `git -C <outside dir>`) is not checked; a commit without `--` keeps the whole-pillar rule.
       for who in $overdue; do
         paths=$(pillar_field "$who" 4)
-        if [ -n "$(git status --porcelain -- $paths 2>/dev/null)" ]; then
-          deny "a commit while the $who pillar is overdue and has uncommitted changes ($(git status --porcelain -- $paths | wc -l) file(s))." "$who"
-          exit 2
-        fi
+        st=$(git status --porcelain -- $paths 2>/dev/null)
+        [ -n "$st" ] || continue
+        hit=$(printf '%s\n' "$st" | SCAN="${scan:-$cmd}" REPO="$REPO" python3 -c '
+import os, re, shlex, sys
+repo = os.path.realpath(os.environ["REPO"])
+segs = re.split(r"&&|\|\||[;&|\n]", os.environ["SCAN"])
+cwd, hit = repo, None
+for seg in segs:
+    try: w = shlex.split(seg)
+    except ValueError: w = seg.split()
+    if w[:1] == ["cd"] and len(w) > 1:
+        cwd = os.path.realpath(os.path.join(cwd, os.path.expanduser(w[1]))); continue
+    if "git" in w and "commit" in w:
+        i = w.index("git"); d = cwd
+        if "-C" in w[i:] and w.index("-C", i) + 1 < len(w): d = os.path.realpath(os.path.join(cwd, os.path.expanduser(w[w.index("-C", i) + 1])))
+        if d != repo and not d.startswith(repo + os.sep): print("OTHER"); sys.exit()
+        if "--" not in w[i:]: print("ALL"); sys.exit()
+        named = [os.path.relpath(os.path.join(d, x), repo) for x in w[w.index("--", i) + 1:]]
+        for l in sys.stdin:
+            f = l[3:].rstrip("\n").split(" -> ")[-1].strip("\"")
+            if any(f == n or f.startswith(n.rstrip("/") + "/") or n.startswith(f) and f.endswith("/") for n in named):
+                print(f); sys.exit()
+        print("NONE"); sys.exit()
+print("ALL")' 2>/dev/null) || hit=ALL
+        case "$hit" in OTHER|NONE) continue ;; esac
+        deny "a commit while the $who pillar is overdue and has uncommitted changes ($(printf '%s\n' "$st" | wc -l) file(s))." "$who"
+        exit 2
       done
     fi
     exit 0

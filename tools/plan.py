@@ -515,6 +515,19 @@ def ask_matches(e, text):
     # (2026-11-06: "Do you want 4 seeds, 2, or none ..." asked as "4 more from-scratch seeds ..., 2, or none ...")
     if not parts and not ask_questions(e.get("ask")) and any(part_asked(e.get("ask"), x) for x in sents):
         return True
+    # a short asking sentence ("Do you want it?") carries nothing of the ask: it counts with the two sentences before it
+    # when the ask has no question sentence of 4 content words (2026-11-18: zng_uq_benchmark, "a second seed ... is your
+    # call. That would cost ~1 GPU-h each. Do you want it?", refused). Stricter than the branches below: >= 5 and 0.3.
+    sl = [x for x in re.split(r"(?<=[.?!;])\s+|\n+", text or "") if x.strip()]
+    flat_ask = re.sub(r"\([^()]*\)", " ", e.get("ask") or "")
+    aq = [y for y in re.split(r"(?<=[.?!;])\s+|\n+", flat_ask) if "?" in y]
+    if len(core_terms(aq[-1] if aq else "")) < 4:
+        ca = core_terms(e.get("ask"))
+        for i, x in enumerate(sl):
+            if "?" in x or re.search(r"your (call|pick|go|choice|decision)", x.lower()):
+                n = len(ca & core_terms(" ".join(sl[max(0, i - 2):i + 1])))
+                if ca and n >= 5 and n >= 0.3 * len(ca):
+                    return True
     for sent in re.split(r"(?<=[.?!;])\s+|\n+", text or ""):
         low = sent.lower()
         if "?" not in sent and not re.search(r"your (call|pick|go|choice|decision)|tell me|let me know|which (one|do)", low):

@@ -194,7 +194,8 @@ def main():
     if not block_re(b).search(norm(prompt)):
         sys.stderr.write("brief_guard: this brief lacks the rules block of plan/step_prompt.txt (CLAUDE.md: a brief to "
                          "an agent starts from it). Build it with `python3 tools/plan.py brief <entry> --add "
-                         "\"<narrowing>\"` and pass its output whole as the prompt.\n")
+                         "\"<narrowing>\"` and pass its output whole as the prompt. A read-only review or lookup that "
+                         "writes nothing starts its prompt with the line COLD READ: instead.\n")
         return 2
     bad = cuts(added_text(prompt, open(TEMPLATE).read()))
     if bad:
