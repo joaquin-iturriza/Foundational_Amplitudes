@@ -17,9 +17,11 @@ _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 MODE="${1:?full or smoke}"
-if [ "$MODE" = smoke ]; then STEPS=50; EVERY=10; NAME=cbs_upd_zng_adam_b2048_smoke; else STEPS=1953; EVERY=50; NAME=cbs_upd_zng_adam_b2048; fi
+# SCALES (2nd argument, optional): dL also read at these step sizes (critical_batch D560 repair: the full step overshoots)
+SCALES="${2:-}"; SFX="${SCALES:+_scales}"
+if [ "$MODE" = smoke ]; then STEPS=50; EVERY=10; NAME=cbs_upd_zng_adam_b2048${SFX}_smoke; else STEPS=1953; EVERY=50; NAME=cbs_upd_zng_adam_b2048$SFX; fi
 python sweep/run_fixed_hp.py --config sweep/sweep_config_tp_zng_d1e4_adam_b2048_zgggg.yaml --name "$NAME" --steps "$STEPS" \
     training.lr=0.004179596 training.regularization_lambda=6.567441e-07 training.cosanneal_warmup_frac=0.1320452 \
     training.cosanneal_eta_min=4.333021e-10 training.ema_decay=0.9976223 ema=false seed=42 \
-    find_BS=true BS_finding.every=10 BS_finding.chunks=32 BS_finding.update=true BS_finding.update_every=$EVERY \
+    find_BS=true BS_finding.every=10 BS_finding.chunks=32 BS_finding.update=true BS_finding.update_every=$EVERY ${SCALES:+"BS_finding.update_scales=[$SCALES]"} \
     && ls "$PROJECT_DIR/runs/$NAME/noise_scale.json" && echo "CBS_UPD_ZNG_DONE $NAME"

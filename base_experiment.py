@@ -1778,7 +1778,8 @@ class BaseExperiment:
                 with torch.no_grad():
                     reg = float(self._reg_term(self.model))
                     return [float(x.detach()) - reg for x in self._noise_chunk_losses(data, k)]
-            rec.update(self._noise_update(upd, sets, n / kk, dl=(chunk_losses(), chunk_losses)))
+            rec.update(self._noise_update(upd, sets, n / kk, dl=(chunk_losses(), chunk_losses),
+                                          scales=tuple(float(s) for s in bs.get("update_scales", [1.0]))))
         if step % 100 == 0:
             S = sum(noise_scale_terms(rec[f"{s}_g2_small"], rec[f"{s}_g2_big"], n / kk, n)[0] for s in terms)
             G2 = sum(noise_scale_terms(rec[f"{s}_g2_small"], rec[f"{s}_g2_big"], n / kk, n)[1] for s in terms)
@@ -1822,21 +1823,23 @@ class BaseExperiment:
             out.append(g.double() / (vhat.sqrt() + pg["eps"]) * lr)
         return out
 
-    def _noise_update(self, per_loss, sets, b, jack=False, dl=None):
+    def _noise_update(self, per_loss, sets, b, jack=False, dl=None, scales=(1.0,)):
         """The update-direction terms (critical_batch D560): from K per-loss gradients of b events each, for m = 1, 2,
         4, ... < K, the first-order progress A(m b) = <G_hat, u(g_{m b})>, g_{m b} the mean of m consecutive gradients,
         u the optimizer's update (_update_map), G_hat the mean of the other K - m (disjoint events), averaged over the
         K/m groups; per parameter set as <set>_A_b<m b>. jack=True also keeps each group's value (<set>_A_b<m b>_each).
         dl = (the K losses at the current weights, a function returning them at the weights it is called at): also the
         loss decrease of the step itself on the disjoint events, dL(m b) = mean over the other K - m losses of
-        L(w) - L(w - u(g_{m b})), as dL_b<m b> (all parameters moved; the weights restored exactly after each)."""
+        L(w) - L(w - u(g_{m b})), as dL_b<m b> (all parameters moved; the weights restored exactly after each).
+        scales: the step is also read at s u for each s != 1, as dL_s<s>_b<m b> (the full u overshoots: the real step
+        carries the current batch at (1 - beta1) of it; dL(s) = s A - s^2 Q fits the step's curvature term Q)."""
         K = len(per_loss)
         names = [n for n, ps in sets.items() for _ in ps]
         params = [p for ps in sets.values() for p in ps]
         total = [sum(gs[i] for gs in per_loss) for i in range(len(names))]
         rec, m = {}, 1
         while m < K:
-            vals, dls = {n: [] for n in sets}, []
+            vals, dls = {n: [] for n in sets}, {s: [] for s in scales}
             for j in range(K // m):
                 grp = per_loss[j * m:(j + 1) * m]
                 gu = [sum(gs[i] for gs in grp) / m for i in range(len(names))]
@@ -1845,15 +1848,16 @@ class BaseExperiment:
                     return {}
                 if dl is not None:
                     keep = [p.detach().clone() for p in params]
-                    with torch.no_grad():
-                        for p, x in zip(params, u):
-                            p.sub_(x.to(p.dtype))
-                    after = dl[1]()
-                    with torch.no_grad():
-                        for p, x in zip(params, keep):
-                            p.copy_(x)
                     rest = [c for c in range(K) if not j * m <= c < (j + 1) * m]
-                    dls.append(sum(dl[0][c] - after[c] for c in rest) / len(rest))
+                    for s in scales:
+                        with torch.no_grad():
+                            for p, x in zip(params, u):
+                                p.sub_((s * x).to(p.dtype))
+                        after = dl[1]()
+                        with torch.no_grad():
+                            for p, x in zip(params, keep):
+                                p.copy_(x)
+                        dls[s].append(sum(dl[0][c] - after[c] for c in rest) / len(rest))
                 acc = {n: 0.0 for n in sets}
                 for i, n in enumerate(names):
                     gc = (total[i] - gu[i] * m) / (K - m)
@@ -1864,8 +1868,9 @@ class BaseExperiment:
                 rec[f"{n}_A_b{int(m * b)}"] = sum(vals[n]) / len(vals[n])
                 if jack:
                     rec[f"{n}_A_b{int(m * b)}_each"] = vals[n]
-            if dls:
-                rec[f"dL_b{int(m * b)}"] = sum(dls) / len(dls)
+            for s, v in dls.items():
+                if v:
+                    rec[f"dL_b{int(m * b)}" if s == 1.0 else f"dL_s{s:g}_b{int(m * b)}"] = sum(v) / len(v)
             m *= 2
         return rec
 

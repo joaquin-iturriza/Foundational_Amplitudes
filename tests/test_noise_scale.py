@@ -243,10 +243,12 @@ def test_step_loss_decrease_known_answer():
     for _ in range(reps):
         xi = [sig * torch.randn(D, dtype=torch.float64) / math.sqrt(b) for _ in range(K)]
         L = lambda: [float(0.5 * (h * (w.detach() - w_star).square()).sum() + (x * w.detach()).sum()) for x in xi]
-        rec = BaseExperiment._noise_update(exp, [[G + x] for x in xi], sets, b, dl=(L(), L))
+        rec = BaseExperiment._noise_update(exp, [[G + x] for x in xi], sets, b, dl=(L(), L), scales=(0.25, 1.0))
         for kname, v in rec.items():
             acc[kname] = acc.get(kname, 0.0) + v / reps
     assert torch.equal(w.detach(), w0)
     for m in (1, 2, 4):
-        exact = float(eta * G.square().sum() - eta ** 2 / 2 * ((h * G.square()).sum() + (h * sig ** 2).sum() / (m * b)))
-        assert abs(acc[f"dL_b{m * b}"] / exact - 1) < 0.05, (m, acc[f"dL_b{m * b}"], exact)
+        for s, key in ((1.0, f"dL_b{m * b}"), (0.25, f"dL_s0.25_b{m * b}")):   # the scaled step: eta -> s eta
+            e = s * eta
+            exact = float(e * G.square().sum() - e ** 2 / 2 * ((h * G.square()).sum() + (h * sig ** 2).sum() / (m * b)))
+            assert abs(acc[key] / exact - 1) < 0.05, (m, s, acc[key], exact)
