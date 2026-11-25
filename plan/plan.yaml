@@ -41812,6 +41812,16 @@ entries:
       (3) GPU-h basis: trial_1860 ran on a Tesla V100-SXM2-32GB at 0.672 s/step averaged over training with validations (735.8
       min) plus a 2.39 h sigma stage = 15.2 h; the plan''s 0.90 s/step was the void llmcmp_c_latest trial on a V100-PCIE-32GB
       with the 256-wide diagram encoder.'
+  - at: '2026-11-25T23:51:24+00:00'
+    text: '2026-11-26 step 22: rebuilds FA-lxplus-74026f3a / -4167db91 ended clean; logs: ''the cache .../99c164da4365de9d7c017b75/train55296_val10000_test10000
+      is ready (derived inputs .../feat_722a8424ff703926d2895327)'' (1352 train processes) and ''.../b39fc80c8b10edbe4b07f6a0/...
+      (derived inputs .../feat_ed46b1c1488b64f0f46b2a23)'' (139 held out); new keys, not qperp''s feat_0e5f346a/feat_cc35c42b.
+      The smoke and the run must open these two. Smoke FA-lxplus-a1b7d826 (job_config_smoke.sh sweep_config_llmcmp_c_nooffshell.yaml
+      50, code 20bb7c282e, --mem 20G --cpus-per-task 7: lxplus gives 3000 MB per CPU and refuses 20G with 4; the run needs
+      --hdr=--cpus-per-task=7 too). site pick for a short job needs --hours (its default, the median run time, costs lxplus
+      12 h and sent the 0.5 h smoke to CC with a 6.8 h start). Sync to lxplus first refused: step 20''s outputs analysis/catalog_daniel/data/perevent_level{,_mlp}_search.json
+      were untracked there and tracked by b501ac2a2; same content (canonical JSON md5 equal), moved aside to *.pre_sync on
+      lxplus.'
   step_waits:
     '8': FA-ccin2p3-1969f226 FA-ccin2p3-caf1170e
     '13': FA-ccin2p3-623a3af6
