@@ -48655,7 +48655,7 @@ entries:
   match: selres_*
   evidence:
     runs: []
-    commit: d424ea5b0
+    commit: da9b0bdd5
     paths:
     - analysis/selective_rescale/data/input_check.json
     - analysis/selective_rescale/data/stage1.json
@@ -48671,7 +48671,9 @@ entries:
     - analysis/selective_rescale/support_rule.py
     - analysis/selective_rescale/uug_split.py
     - docs/results.tex
+    - scripts/job_datasaving_parent.sh
     - scripts/job_support_rule.sh
+    - tests/test_parent_soft_x0.py
     - tools/rebuild_run.py
     - wrappers.py
   dead_ends:
