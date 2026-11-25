@@ -45338,8 +45338,8 @@ entries:
     wall_h: 0.3
     jobs: 2
     units: null
-    start: '2026-11-25T12:25:20+00:00'
-    at: '2026-11-25T12:25:20+00:00'
+    start: '2026-11-25T12:40:42+00:00'
+    at: '2026-11-25T12:40:42+00:00'
   findings:
   - at: '2026-11-24T00:54:54+00:00'
     text: '2026-11-24: why Joaquin''s single-run attempt failed (base_experiment find_BS before ef2162765): it read p.grad
