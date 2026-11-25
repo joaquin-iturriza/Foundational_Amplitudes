@@ -44979,6 +44979,42 @@ entries:
       than ttH, both arms) against 8.4-12.1 on the two-group gg->ttH (data/c_{best,control}_factor_split.json); MSE-bias^2
       0.5: a measured spread, his setup''s 0.17-0.23 against the control''s 5.66 on gg->ttH (shape_dists, step 15/D567 finding
       2026-11-25T18:26); 2x on medians: CLAUDE.md margin rule, one seed.'
+    fix_at: '2026-11-25T22:14:10+00:00'
+    fix: '(1, matched control) The control FA-ccin2p3-d34535b0 (lr 3.65e-3) blew up: 261 non-finite-gradient steps, validation
+      NLL 1.2e7 at step 33462, best checkpoint at step 24336, sigma stage diverged to ~1e5 (entry finding 2026-11-24T07:44).
+      A retrain at the same lr without the input will likely blow up at another step and select its best checkpoint elsewhere,
+      so any change in the split or the new-family errors is confounded with the instability. Part (c)''s best trial (runs/llmcmp_c_qperp/trial_1860,
+      FA-ccin2p3-29ce8950, lr 1.6e-3) trained cleanly to 60,840 steps and shows the same split: gg->ttH separation 12.14,
+      offshell_6 eta2 0.93, AUC 1.00 (data/c_best_factor_split.json). Ablate from it at its own HPs, which is also the feature
+      rule''s baseline (best of the sweep, its best HPs). The prior''s gg->tbW eta2 0.82/0.81 are already c_best''s numbers;
+      the control''s are 0.51/0.59. Re-read time per step from 29ce8950''s log (V100 about 15.2 h). (2/4, the split read)
+      The 2-means separation is not a one-group test: unimodal processes with a few outlier events score far above 4 (c_best
+      dc_bbx_avmvmx 16.3 at lo_share 0.996, dc_bbx_hmummup 29.7 at 0.998, dc_bbx_vmvmx 81 at 0.999). As written, a tail on
+      gg->ttH in the no-input arm would read as No. Require both groups to hold a real share (the gg->ttH split is 0.518;
+      for example a minority share >= 10%, with its source). The direct read is d''s dependence on the internal-top off-shellness
+      in the no-input arm, but its CSV will not carry the offshell_6 column (factor_split.py reads the columns llm_score.py
+      writes, and that column is written only with offshell_per_event on). State how it is obtained, for example by joining
+      the baseline CSV''s offshell_6 column row by row over the same first 5000 test events, checked on true_logm2, then eta2
+      and AUC of d on it. (4, thresholds and outcomes) MSE-bias^2 < 0.5 cites his setup''s 0.17-0.23. That is another arm''s
+      value, not a spread, and it does not give 0.5. The 2x on medians cites the CLAUDE.md margin rule, which is about margins
+      to fix, not a noise level. Cite a measured run-to-run spread of the new-set medians, for example part (b) at 8/16/32
+      heads (0.287/0.241/0.333, about 1.4x, error_split.json) or c_best against c_control, and set the bar above it. The outcome
+      also leaves the mixed cases open (split gone but medians not 2x lower, or medians lower with the split kept). Say what
+      each one means for the entry. (5, prior) Searched offshell, off-shell, off-shellness in results.tex, site decisions
+      and the entry. The prior leaves out the off-shellness-off lever arm on transfer (results.tex l.16536, fig levers_accum
+      panel (b), D2) and the off-shellness input-scale result on tt (l.9750: the parent''s scale hundreds of times wider than
+      the column''s spread on tt, own scale fitted, D400). The latter bears directly on held-out new families, which are standardized
+      with the train-fitted off-shellness statistics. Name both, and say what differs here: zero-shot held-out families against
+      fine-tunes, and whether a scale mismatch on gg->ttH, rather than the sign, is a rival reading the ablation cannot separate.
+      (14, disk and cache) With offshell_per_event false and the qperp target on, the derived-inputs feature key changes (data_mmap.features_key_doc
+      drops its offshell part), so a new logF-only feature cache gets built, about 2.8 GB train plus 0.3 GB held out like
+      the qperp ones. CC /sps/lpnhe had 15 GB free at the last reading. Read df now, prebuild the cache as a CPU job as the
+      other caches were, and show the smoke and the run open the same key (both logs). (15, D395 smoke through every stage)
+      The smoke has to go through scoring as well: job_llm_score.sh EVENTS=1 ONLY=heldout on the smoke, with factor_split.py
+      run on its CSV. That shows the readout (llm_events_heldout.csv without the off-shellness columns) is written and read
+      by this exact config. (18) List the keys that differ from the baseline run''s config.yaml (Hydra --cfg job against trial_1860''s),
+      not from the sweep''s fixed_params. Passes as recorded: one change (the flag), HETEROSC, same pools and test events,
+      single seed stated, cost about 16 GPU-h under the line, no label input, no waits without outputs.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
