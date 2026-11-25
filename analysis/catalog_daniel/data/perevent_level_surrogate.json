@@ -1,0 +1,72 @@
+{
+ "n": {
+  "train": 1352,
+  "new": 43
+ },
+ "e_new_median": {
+  "shared": 44.72000914652227,
+  "regressor": 0.04655279595021613,
+  "A0": 22.12548475476695,
+  "A": 6.3118549503947445,
+  "Abeta0": 12.04964543911778,
+  "Abeta": 3.101311319205417
+ },
+ "spread_new_median": {
+  "A": 0.8508242391590766,
+  "Abeta": 0.6081060274298353
+ },
+ "families": {
+  "shared": {
+   "Multi-Higgs production (hh, hhh, Xhh)": 320.9291109155426,
+   "Higgs + tau lepton processes": 22.55272915647055,
+   "Triple-Z production (ZZZ)": 82.26646932387213,
+   "Triple-W production (W+W+W-, W+W-W-)": 19.811433234574913,
+   "gg -> W + qq' (W production from gluon fusion)": 1.9031971689722282,
+   "gg -> tt~ + boson (ttX via gluon fusion)": 24.913446077624418
+  },
+  "regressor": {
+   "Multi-Higgs production (hh, hhh, Xhh)": 0.04051449128529005,
+   "Higgs + tau lepton processes": 0.01748112082725454,
+   "Triple-Z production (ZZZ)": 0.3122710382321861,
+   "Triple-W production (W+W+W-, W+W-W-)": 0.0004824496080774442,
+   "gg -> W + qq' (W production from gluon fusion)": 0.48819839880059,
+   "gg -> tt~ + boson (ttX via gluon fusion)": 3.005525843092288
+  },
+  "A0": {
+   "Multi-Higgs production (hh, hhh, Xhh)": 14.114611071864198,
+   "Higgs + tau lepton processes": 40.93151307351319,
+   "Triple-Z production (ZZZ)": 0.30110106964817035,
+   "Triple-W production (W+W+W-, W+W-W-)": 4.243917274319298,
+   "gg -> W + qq' (W production from gluon fusion)": 22.202313950508668,
+   "gg -> tt~ + boson (ttX via gluon fusion)": 71.04256766917197
+  },
+  "A": {
+   "Multi-Higgs production (hh, hhh, Xhh)": 857.4308832966786,
+   "Higgs + tau lepton processes": 6.3118549503947445,
+   "Triple-Z production (ZZZ)": 0.5751139732354895,
+   "Triple-W production (W+W+W-, W+W-W-)": 2.1162200399109032,
+   "gg -> W + qq' (W production from gluon fusion)": 3.7134324167073265,
+   "gg -> tt~ + boson (ttX via gluon fusion)": 10.638040732807516
+  },
+  "Abeta0": {
+   "Multi-Higgs production (hh, hhh, Xhh)": 60.92784503026247,
+   "Higgs + tau lepton processes": 7.419638151276139,
+   "Triple-Z production (ZZZ)": 10.73784979621575,
+   "Triple-W production (W+W+W-, W+W-W-)": 7.498530671281866,
+   "gg -> W + qq' (W production from gluon fusion)": 11.84770859968267,
+   "gg -> tt~ + boson (ttX via gluon fusion)": 14.737973151710726
+  },
+  "Abeta": {
+   "Multi-Higgs production (hh, hhh, Xhh)": 359.9251077605562,
+   "Higgs + tau lepton processes": 2.3698266341513157,
+   "Triple-Z production (ZZZ)": 0.22541026774956074,
+   "Triple-W production (W+W+W-, W+W-W-)": 3.1839757166344294,
+   "gg -> W + qq' (W production from gluon fusion)": 2.382416492427436,
+   "gg -> tt~ + boson (ttX via gluon fusion)": 4.750516721728612
+  }
+ },
+ "crossfit_train_median": {
+  "A_crossfit_train_median": 0.19422574395592002,
+  "Abeta_crossfit_train_median": 0.11252033782918508
+ }
+}

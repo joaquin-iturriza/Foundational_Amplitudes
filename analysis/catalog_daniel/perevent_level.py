@@ -16,6 +16,10 @@ log s_hat (20 bins between the 1st and 99th percentile, equal weight per non-emp
 new held-out processes (per family: classes_default.json test_group) and, cross-fitted, the 1352 training processes.
 CPU, on CC (pool cache and diagram sidecars there), as a CPU job:
     python analysis/catalog_daniel/perevent_level.py [--events 2000]
+Existing-data mode, locally (--surrogate): (A)'s level error (i) and spread (iii) from the per-process moments of
+norm_surrogate.py's "prop" in data/surrogate.json (mean, std, correlation with log|M|^2 over the same 2000 events; prop =
+the leading coupling product, MadGraph's averaging, symmetry and colour, and the diagrams' propagators at the event's
+invariants), with the factor's coefficient 1 and norm_surrogate_more.py's fitted 0.57 / 0.66 (2->2 / 2->3); no shifts.
 Output: analysis/catalog_daniel/data/perevent_level.json; its summary on stdout.
 """
 import argparse, json, os, sys
@@ -95,10 +99,52 @@ def level_net(Xtr, ytr, grp, Xho):
     return cf, ho
 
 
+def from_surrogate():
+    S = {k: v for k, v in json.load(open(os.path.join(HERE, "data", "surrogate.json"))).items() if "error" not in v}
+    meta = {"dc_" + p["folder"]: p for p in json.load(open(os.path.join(HERE, "classes_default.json")))["processes"]}
+    rel = set(json.load(open(os.path.join(HERE, "heldout_twins.json"))))
+    lev = json.load(open(os.path.join(HERE, "data", "level_file_B_diag.json")))["levels"]
+    tr = sorted(n for n in S if meta[n]["split"] == "train")
+    new = sorted(n for n in S if meta[n]["split"] != "train" and n not in rel)
+    grp = np.array([meta[n]["weak_key"] for n in tr])
+    beta = {4: 0.5702, 5: 0.6595}  # data/surrogate_more.json factor|prop.beta
+    out = {"n": {"train": len(tr), "new": len(new)}}
+    sd = {n: S[n]["y_std"] for n in S}
+    My = np.mean([S[n]["y_mean"] for n in tr])
+    out["shared"] = {n: (My - S[n]["y_mean"]) ** 2 / sd[n] ** 2 for n in new}
+    out["regressor"] = {n: (lev[n] - S[n]["y_mean"]) ** 2 / sd[n] ** 2 for n in new}
+    spread = {}
+    for tag, b in (("A", None), ("Abeta", beta)):
+        bb = {n: (1.0 if b is None else b[S[n]["N"]]) for n in S}
+        m = {n: S[n]["y_mean"] - bb[n] * S[n]["prop"][0] for n in S}
+        Mr = np.mean([m[n] for n in tr])
+        out[tag + "0"] = {n: (Mr - m[n]) ** 2 / sd[n] ** 2 for n in new}
+        Xtr = np.array([sn.features(meta[n]) for n in tr]); Xho = np.array([sn.features(meta[n]) for n in new])
+        cf, ho = level_net(Xtr, np.array([m[n] - Mr for n in tr]), grp, Xho)
+        out[tag] = {n: (h + Mr - m[n]) ** 2 / sd[n] ** 2 for n, h in zip(new, ho)}
+        out[tag + "_crossfit_train_median"] = float(np.median([(c + Mr - m[n]) ** 2 / sd[n] ** 2 for n, c in zip(tr, cf)]))
+        ps, c = {n: S[n]["prop"][1] for n in S}, {n: S[n]["prop"][2] for n in S}
+        spread[tag] = float(np.median([np.sqrt(max(sd[n] ** 2 + (bb[n] * ps[n]) ** 2 - 2 * bb[n] * c[n] * sd[n] * ps[n],
+                                                   0)) / sd[n] for n in new]))
+    summ = {k: float(np.median(list(v.values()))) for k, v in out.items() if isinstance(v, dict) and k != "n"}
+    fams = {}
+    for n in new:
+        fams.setdefault(meta[n]["test_group"], []).append(n)
+    fam = {k: {g: float(np.median([out[k][n] for n in ns])) for g, ns in fams.items()}
+           for k, v in out.items() if isinstance(v, dict) and k != "n"}
+    res = {"n": out["n"], "e_new_median": summ, "spread_new_median": spread, "families": fam,
+           "crossfit_train_median": {k: out[k] for k in out if k.endswith("_crossfit_train_median")}}
+    json.dump(res, open(os.path.join(HERE, "data", "perevent_level_surrogate.json"), "w"), indent=1)
+    print(json.dumps(res, indent=1))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--events", type=int, default=2000)
+    ap.add_argument("--surrogate", action="store_true")
     a = ap.parse_args()
+    if a.surrogate:
+        return from_surrogate()
     meta = {"dc_" + p["folder"]: p for p in json.load(open(os.path.join(HERE, "classes_default.json")))["processes"]}
     dc = json.load(open(os.path.join(HERE, "data", "diagram_couplings.json")))
     rel = set(json.load(open(os.path.join(HERE, "heldout_twins.json"))))
@@ -164,10 +210,19 @@ def main():
         pred["B"][n] = m.predict(rows([n])[0])
 
     R = {c: {} for c in CANDS}
+    rng = np.random.default_rng(0)
     for n in D:
         wf, ws = weights(D[n]["L"], D[n]["q"])
         for c in CANDS:
             R[c][n] = reads(pred[c][n] - D[n]["y"], D[n]["y"], wf, ws)
+        if n in new:  # the shift's noise at this event count: its std over 30 bootstrap resamples of the events
+            bs = [rng.integers(0, len(D[n]["y"]), len(D[n]["y"])) for _ in range(30)]
+            for c in CANDS:
+                v = []
+                for i in bs:
+                    w1, w2 = weights(D[n]["L"][i], D[n]["q"][i])
+                    v.append(reads(pred[c][n][i] - D[n]["y"][i], D[n]["y"][i], w1, w2)["shift_flat"])
+                R[c][n]["shift_flat_sd"] = float(np.std(v))
 
     def med(c, ns, k):
         return float(np.median([R[c][n][k] for n in ns]))
@@ -181,6 +236,7 @@ def main():
                    for s, ns in (("new", new), ("relabels", rel_ho), ("train_crossfit", tr),
                                  ("new_no_ggtbw", [n for n in new if n not in ggtbw]))} for c in CANDS}
     for c in CANDS:
+        summary[c]["new"]["shift_flat_sd"] = med(c, new, "shift_flat_sd")
         summary[c]["families"] = {g: {k: med(c, ns, k) for k in ("e", "shift_flat", "shift_sing")} | {"n": len(ns)}
                                   for g, ns in fams.items()}
     # the references reproduce the 2026-10-22 and step-15 numbers (design check): shared 47, regressor 0.044
