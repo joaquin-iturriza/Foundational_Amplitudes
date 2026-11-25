@@ -98,6 +98,10 @@ def figure(res, base):
     if fw:
         axB.errorbar([mid(w) for w in fw], [w["B_dL"] for w in fw], yerr=[w.get("B_dL_se", 0) for w in fw], fmt="o",
                      color=ps.C.vermillion, label="update's critical batch")
+    ok = [w for w in res["windows"] if w["n_exploding_reads"] == 0 and np.isfinite(w.get("B_A", np.nan))]
+    axB.plot([mid(w) for w in ok], [max(w["B_A"], 1.0) for w in ok], "s", color=ps.C.green, mfc="none",
+             label="first-order part's critical batch")
+    ex = [w for w in res["windows"] if w["n_exploding_reads"] > 0]
     lo, hi = res["ref"]
     axB.axhline(lo, color=ps.C.blue, ls="--", label="two-batch critical batch, range")
     axB.axhline(hi, color=ps.C.blue, ls="--")
@@ -110,15 +114,17 @@ def figure(res, base):
         axB.plot([mid(w) for w in neg], [min([w["B_dL"] for w in fw] + [lo]) / 2] * len(neg), "v", color=ps.C.grey,
                  label="loss rises at some batch")
     axB.set_yscale("log")
-    ys = [w["B_dL"] for w in fw] + [lo, hi]
+    ys = [w["B_dL"] for w in fw] + [max(w["B_A"], 1.0) for w in ok] + [lo, hi]
     axB.set_ylim(min(ys) / 4, max(ys) * 4)   # the reference lines and the edge markers inside the frame
+    if ex:
+        axB.plot([mid(w) for w in ex], [max(ys) * 2] * len(ex), "x", color=ps.C.grey, label="window with an exploding read")
     axB.set_xlabel("training step")
     axB.set_ylabel(r"$B_{\rm dL}$ (events)")
     ps.legend(axB, "upper left")
     cmap = mpl.colormaps["viridis"]
     bs = np.array(res["b"], float)
     xx = np.geomspace(bs.min(), bs.max(), 50)
-    allw = res["windows"]
+    allw = [w for w in res["windows"] if w["n_exploding_reads"] == 0]   # the exploding ones are marked in the left panel
     steps = [mid(w) for w in allw]
     norm = mpl.colors.Normalize(min(steps), max(steps)) if steps else None
     for w in allw:
@@ -133,7 +139,9 @@ def figure(res, base):
         axD.plot([], [], ":", color=ps.C.grey, label=r"fit $\Delta L_\infty/(1+B_{\rm dL}/b)$")
     axD.axhline(0, color="black", label="no change")
     axD.set_xscale("log")
-    axD.set_yscale("symlog", linthresh=10)   # exploding reads (up to 1e10) stay on the frame with the -10..10 bulk
+    axD.set_yscale("symlog", linthresh=10)   # the loss rises by 3 to 100 per step, A is 0.5 to 15
+    axD.set_xticks(bs, [str(int(b)) for b in bs])
+    axD.minorticks_off()
     axD.set_xlabel(r"events per update $b$")
     axD.set_ylabel(r"loss change per step")
     ps.legend(axD, "upper left")
