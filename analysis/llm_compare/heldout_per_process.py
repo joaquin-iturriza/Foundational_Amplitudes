@@ -5,8 +5,9 @@ His points: the "pID emb. only (baseline)" run, seed 0, 20 epochs (talks/progres
 {"interp"|"extrap": {name: [x in his figure, MSE]}}, read off his figure's vector paths; not committed). Ours: a run's
 data/<tag>_heldout.json from tools/llm_score.py (first 1e4 test events per process, shared affine statistics).
 Process families and labels: analysis/catalog_daniel/classes_default.json (test_group, process).
-    python analysis/llm_compare/heldout_per_process.py [--tag control ...] [--label "..." ...] [--out NAME]
-Several --tag/--label pairs draw several of our arms, one marker each (output named by --out, default the first tag).
+    python analysis/llm_compare/heldout_per_process.py [--tag a_trial5 ...] [--out NAME]
+Default: every arm read so far (each tag of ARMS with a score file), one fixed name, colour and marker per arm, one fixed
+y range, output figs/all_arms_heldout_per_process.
 This is the layout Joaquin asked for (his model figure); the per-set pooled numbers come from control_score.py.
 Output: figs/<out>_heldout_per_process.{png,pdf}.
 """
@@ -37,19 +38,30 @@ GROUPS = {"interp": [("ss~ annihilation processes (flavor-degenerate with dd~ an
 TITLE = {"interp": "held-out: interpolation", "extrap": "held-out: extrapolation"}
 
 
+# One fixed name, colour and marker per arm, used in every figure (Joaquin 2026-11-25: the same run under two names and
+# changing arms made two figures look inconsistent). "his setup": his target z, AdamW at constant lr, his inputs (part
+# (a)/(b)); "our setup": the emission-scale target, our inputs, MuonAdamW, WSD (part (c)). Order = legend order.
+ARMS = {"a_trial5": ("his setup, 8 heads", ps.C.blue, "o"),
+        "control": ("his setup, 8 heads, untuned", ps.C.grey, "x"),
+        "b_h16": ("his setup, 16 heads", ps.C.sky, "D"),
+        "b_h32": ("his setup, 32 heads", ps.C.purple, "v"),
+        "b_h64": ("his setup, 64 heads", ps.C.vermillion, "s"),
+        "b_h120": ("his setup, 120 heads", ps.C.yellow, "P"),
+        "c_control": ("our setup, control", ps.C.green, "<"),
+        "c_best": ("our setup, searched", ps.C.orange, "^")}
+YLIM = (1e-7, 1e3)   # one range for every figure: his 1e-3..1e3 extended below our lowest point; never data-dependent
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--tag", nargs="+", default=["control"])
-    ap.add_argument("--label", nargs="+", default=["our LLoCa, his optimizer settings"])
-    ap.add_argument("--out", default=None)
+    ap.add_argument("--tag", nargs="+", default=None, help="default: every arm of ARMS whose data/<tag>_heldout.json exists")
+    ap.add_argument("--out", default="all_arms")
     a = ap.parse_args()
-    assert len(a.tag) == len(a.label), (a.tag, a.label)
-    cols = (ps.C.blue, ps.C.green, ps.C.orange, ps.C.vermillion, ps.C.purple, ps.C.sky)
-    marks = ("o", "D", "^", "s", "v", "P")
-    assert len(a.tag) <= len(cols), f"at most {len(cols)} arms, got {len(a.tag)}"   # zip would drop the rest silently
+    tags = a.tag or [t for t in ARMS if os.path.exists(os.path.join(HERE, "data", f"{t}_heldout.json"))]
+    assert all(t in ARMS for t in tags), f"no fixed name for {set(tags) - set(ARMS)}: add it to ARMS"
     draft = json.load(open(os.path.join(ROOT, "talks", "progress_oct2026b", "data", "draft_pid_by_process.json")))
-    arms = [(lab, json.load(open(os.path.join(HERE, "data", f"{t}_heldout.json")))["processes"], c, mk)
-            for t, lab, c, mk in zip(a.tag, a.label, cols, marks)]
+    arms = [(ARMS[t][0], json.load(open(os.path.join(HERE, "data", f"{t}_heldout.json")))["processes"], ARMS[t][1], ARMS[t][2])
+            for t in sorted(tags, key=list(ARMS).index)]
     meta = {"dc_" + p["folder"]: p for p in json.load(open(os.path.join(DAN, "classes_default.json")))["processes"]}
     for _, ours, _, _ in arms:
         assert set(ours) == {n for g in draft.values() for n in g}, "held-out sets differ"
@@ -83,17 +95,16 @@ def main():
         ax.tick_params(axis="x", length=1.5, pad=1)
         ax.set_xlim(-0.6, len(names) - 0.4)
         ax.set_yscale("log")
-        # his range 1e-3..1e3, widened down to the lowest point drawn: data is never clipped
-        lo = min([1e-3] + [v["mse_logm2"] for _, ours, _, _ in arms for v in ours.values()])   # both panels alike
-        lo = 10.0 ** np.floor(np.log10(lo))
-        ax.set_ylim(lo, 1e3)
-        ax.set_yticks(10.0 ** np.arange(np.log10(lo), 4))
+        lo = min(v["mse_logm2"] for _, ours, _, _ in arms for v in ours.values())
+        assert lo >= YLIM[0], f"a point at {lo:.2g} is below the fixed range: lower YLIM (never clip)"
+        ax.set_ylim(*YLIM)
+        ax.set_yticks(10.0 ** np.arange(np.log10(YLIM[0]), 4))
         ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
         ax.grid(False)
         ax._ps_equal_limits = True    # his fixed y range; the legend sits in the free band above the data
     axes[0].fill_between([], [], color="0.88", label=r"$2\to2$ processes (others $2\to3$)")
     ps.legend(axes[0], "upper left", ncol=3)
-    ps.save(fig, os.path.join(HERE, "figs", f"{a.out or a.tag[0]}_heldout_per_process"))
+    ps.save(fig, os.path.join(HERE, "figs", f"{a.out}_heldout_per_process"))
     ps.PLOT_W_IN, ps.PLOT_H_IN = w0, h0
 
 
