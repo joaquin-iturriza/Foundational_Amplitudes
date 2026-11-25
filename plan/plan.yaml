@@ -45010,8 +45010,7 @@ entries:
     - cc_disk
   decisions:
   - D542
-  next: 'Read FA-ccin2p3-67887dff''s manifest and df (D550 debris: smokes, format-2 memmap keys, scratch run dirs) and report
-    the GiB freed per class'
+  next: null
   done_when: null
   notes_ref: null
   match: cc_disk_*,zz_probe_*
@@ -45245,8 +45244,7 @@ entries:
       6.5 (concluded, 35 runs over 5 h), kit* 5.0. lhe_queue: ~6.6 of its 6.8 GiB are Q/gc/ deletion manifests (JSON, read
       only by tests); lhe_parts part files 1.47 GiB. zz_v4_*: 235 dirs, 28,338 MiB, none written in the last 7 days, ~2,300
       per-probe npz of ~70 KB per dir. runs_from_lxplus 24.9 GB total. Output /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/ccdisk_read2.out.'
-  step_waits:
-    '1': FA-ccin2p3-67887dff
+  step_waits: {}
   targets:
   - batch: disk_inventory
     wall_h: 1.0
@@ -45260,12 +45258,6 @@ entries:
     units: null
     start: '2026-11-24T23:50:05+00:00'
     at: '2026-11-24T23:50:05+00:00'
-  step_why:
-    1:
-      feeds: how much of CC's /sps/lpnhe D550's debris deletion frees
-      if:
-      - 'DEBRIS_DONE, classes within 2x: report freed GiB and the new df'
-      - 'a class SKIPPED or the job cut: report what the manifest listed, fix the cause, rerun that class'
   ask: 'Scope: which of CC''s costly results to delete to free the group space (99% full). Which of these should go: model
     files under D149/D133 via scripts/prune_site.sh (tens of GiB), zz_catft* 27.3 GiB (muon_test fine-tunes the draft cites),
     zz_v4_short/long per-pool outputs 27.4, lhe_queue 6.8, runs_from_lxplus 17.3 (its archive held by D122)?'
