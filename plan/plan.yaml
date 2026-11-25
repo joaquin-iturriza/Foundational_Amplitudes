@@ -45687,8 +45687,8 @@ entries:
     '1': repo-reviewer aee7e3b6b89d84945 and the notes-editor backlog (par:cbs_scan)
     '2': FA-ccin2p3-3e856594
     '3': FA-ccin2p3-cedaa6dd
-    '4': 'detached sweep/drive.py zng_ep50_searches (pid 1249412, log ~/.local/share/ccorch/detached/20261125-142737_zng_ep50_searches.log):
-      the six 50-epoch searches, 105 trials; its DONE event'
+    '4': 'the next owner: re-derive the ep50 lr windows by HPO rule 2 (repo-review FIX 1), re-record the design and re-run
+      drive.py; the old sweeps_local/*ep50* states must be removed first (their candidates come from the old windows)'
   targets:
   - batch: noise_smoke
     wall_h: 0.4
