@@ -345,5 +345,6 @@
   ],
   "B_opt_clean": []
  },
- "source": "analysis/critical_batch/data/pretrain_update_noise_scale.json"
+ "source": "analysis/critical_batch/data/pretrain_update_noise_scale.json",
+ "ref_label": "scan's critical batch, range"
 }

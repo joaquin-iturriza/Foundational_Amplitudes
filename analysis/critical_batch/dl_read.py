@@ -1,7 +1,7 @@
 """critical_batch (D560 part B): the critical batch of the optimizer's own update, B_dL, from a run's
 <run>/noise_scale.json (find_BS with BS_finding.update: chunk records carrying dL_b<b>).
 
-    python analysis/critical_batch/dl_read.py <noise_scale.json> <name> --ref 87 261 [--window 200] [--from 0]
+    python analysis/critical_batch/dl_read.py <noise_scale.json> <name> --ref 87 261 [--ref-label TEXT] [--window 200] [--from 0]
 
 dL(b) = mean over the other chunks' events of L(w) - L(w - u(g_b)), the loss decrease of one step of the update made
 from b events (base_experiment._noise_update). Per window of `window` steps the reads' dL(b) are averaged at each b and
@@ -131,22 +131,25 @@ def figure(res, base):
     ok = [w for w in res["windows"] if w["n_exploding_reads"] == 0 and np.isfinite(w.get("B_A", np.nan))]
     axB.plot([mid(w) for w in ok], [max(w["B_A"], 1.0) for w in ok], "s", color=ps.C.green, mfc="none",
              label="first-order part's critical batch")
+    oq = [w for w in ok if w.get("B_q") is not None]
+    axB.plot([mid(w) for w in oq], [max(w["B_q"], 1.0) for w in oq], "D", color=ps.C.purple, mfc="none",
+             label="optimal step's critical batch")
     ex = [w for w in res["windows"] if w["n_exploding_reads"] > 0]
     lo, hi = res["ref"]
-    axB.axhline(lo, color=ps.C.blue, ls="--", label="two-batch critical batch, range")
+    axB.axhline(lo, color=ps.C.blue, ls="--", label=res.get("ref_label", "two-batch critical batch, range"))
     axB.axhline(hi, color=ps.C.blue, ls="--")
     up = [w for w in res["windows"] if w["status"] == "above range"]
     top = max([w["B_dL"] for w in fw] + [hi]) * 2
     if up:
         axB.plot([mid(w) for w in up], [top] * len(up), "^", color=ps.C.grey, label="above the measured batches")
     axB.set_yscale("log")
-    ys = [w["B_dL"] for w in fw] + [max(w["B_A"], 1.0) for w in ok] + [lo, hi]
-    axB.set_ylim(min(ys) / 4, max(ys) * (400 if ex else 4))   # reference lines, edge markers and the legend above them
+    ys = [w["B_dL"] for w in fw] + [max(w["B_A"], 1.0) for w in ok] + [max(w["B_q"], 1.0) for w in oq] + [lo, hi]
+    axB.set_ylim(min(ys) / 8, max(ys) * (3e4 if ex else 300))   # the legend above the reference lines and edge markers
     neg = [w for w in res["windows"] if w["status"] == "dL<=0"]
     if neg:
-        axB.plot([mid(w) for w in neg], [min(ys) / 2.5] * len(neg), "v", color=ps.C.grey, label="loss rises at some batch")
+        axB.plot([mid(w) for w in neg], [min(ys) / 5] * len(neg), "v", color=ps.C.grey, label="loss rises at some batch")
     if ex:
-        axB.plot([mid(w) for w in ex], [max(ys) * 2] * len(ex), "x", color=ps.C.grey, label="window with an exploding read")
+        axB.plot([mid(w) for w in ex], [min(ys) / 2] * len(ex), "x", color=ps.C.grey, label="window with an exploding read")
     axB.set_xlabel("training step")
     axB.set_ylabel("critical batch (events)")
     ps.legend(axB, "upper left")
@@ -185,10 +188,11 @@ def main():
     ap.add_argument("path"); ap.add_argument("name")
     ap.add_argument("--ref", type=float, nargs=2, required=True)
     ap.add_argument("--window", type=int, default=200)
+    ap.add_argument("--ref-label", default="two-batch critical batch, range")
     ap.add_argument("--from", dest="start", type=int, default=0)
     a = ap.parse_args()
     res = read(json.load(open(a.path)), a.window, a.ref, a.start)
-    res["source"] = a.path
+    res["source"], res["ref_label"] = a.path, a.ref_label
     json.dump(res, open(os.path.join(HERE, "data", f"{a.name}.json"), "w"), indent=1)
     print(json.dumps(res["summary"]))
     for w in res["windows"]:

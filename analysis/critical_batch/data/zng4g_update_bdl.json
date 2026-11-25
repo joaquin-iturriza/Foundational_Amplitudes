@@ -240,5 +240,6 @@
   ],
   "B_opt_clean": []
  },
- "source": "analysis/critical_batch/data/zng4g_update_noise_scale.json"
+ "source": "analysis/critical_batch/data/zng4g_update_noise_scale.json",
+ "ref_label": "two-batch critical batch, range"
 }
