@@ -139,3 +139,114 @@ def test_stop_at_val_loss():
     assert BaseExperiment._reached_stop(stub(-2.3), -2.31) and BaseExperiment._reached_stop(stub(-2.3), -2.3)
     assert not BaseExperiment._reached_stop(stub(-2.3), -2.29) and not BaseExperiment._reached_stop(stub(None), -9.0)
     assert not BaseExperiment._reached_stop(stub(-2.3), None) and not BaseExperiment._reached_stop(stub(-2.3), float("nan"))
+
+
+def test_update_map_is_the_optimizer_step():
+    # Muon matrices: the map equals a real MuonAdamW step at momentum 0; AdamW parameters: g / (sqrt(v_hat) + eps) x lr
+    from optim.muon import MuonAdamW
+    torch.manual_seed(3)
+    W = torch.nn.Parameter(torch.randn(6, 4, dtype=torch.float64))
+    bvec = torch.nn.Parameter(torch.randn(4, dtype=torch.float64))
+    opt = MuonAdamW([W, bvec], lr=0.01, momentum=0.0, nesterov=False, muon_weight_decay=0.0, mup=False,
+                    muon_filter=lambda p: p.ndim == 2)
+    exp = SimpleNamespace(optimizer=opt, model=torch.nn.Module(),
+                          cfg=OmegaConf.create({"training": {"clip_grad_norm": None, "clip_grad_value": None}}))
+    sets = {"muon": [W], "adamw": [bvec]}
+    loss = lambda: (W.sum(1).square().sum() + (bvec * torch.arange(4.0, dtype=torch.float64)).square().sum())
+    opt.zero_grad(); loss().backward(); opt.step()                 # one step: AdamW gets its second moment
+    assert BaseExperiment._update_map(exp, [torch.zeros_like(W), torch.zeros_like(bvec)], sets) is not None
+    opt.zero_grad(); loss().backward()
+    g = [W.grad.clone(), bvec.grad.clone()]
+    u = BaseExperiment._update_map(exp, g, sets)
+    st = opt._adamw.state[bvec]
+    v_after = st["exp_avg_sq"] * 0.999 + 0.001 * g[1].square()     # AdamW's moment after the next step's update
+    W0 = W.detach().clone()
+    opt.step()
+    assert torch.allclose(W0 - W.detach(), u[0], rtol=1e-4, atol=1e-7)
+    vhat = st["exp_avg_sq"].double() / (1 - 0.999 ** float(st["step"]))
+    assert torch.allclose(st["exp_avg_sq"], v_after)
+    t_before = float(st["step"]) - 1
+    vhat0 = (v_after - 0.001 * g[1].square()) / 0.999 / (1 - 0.999 ** t_before)
+    assert torch.allclose(u[1], g[1] / (vhat0.sqrt() + 1e-8) * 0.01)
+
+
+def test_update_map_clips_as_the_step():
+    # the clip binds (|g| >> max norm): the map equals clip_grad_norm_ then a real MuonAdamW step, on both sets
+    from optim.muon import MuonAdamW
+    torch.manual_seed(6)
+    W = torch.nn.Parameter(torch.randn(6, 4, dtype=torch.float64))
+    bvec = torch.nn.Parameter(torch.randn(4, dtype=torch.float64))
+    opt = MuonAdamW([W, bvec], lr=0.01, momentum=0.0, nesterov=False, muon_weight_decay=0.0, weight_decay=0.0,
+                    mup=False, muon_filter=lambda p: p.ndim == 2)
+    exp = SimpleNamespace(optimizer=opt, model=torch.nn.Module(),
+                          cfg=OmegaConf.create({"training": {"clip_grad_norm": 0.5, "clip_grad_value": None}}))
+    sets = {"muon": [W], "adamw": [bvec]}
+    loss = lambda: 30 * (W.sum(1).square().sum() + (bvec * torch.arange(1.0, 5.0, dtype=torch.float64)).square().sum())
+    for _ in range(3):                                            # a few clipped steps: AdamW's moments from clipped gradients
+        opt.zero_grad(); loss().backward(); torch.nn.utils.clip_grad_norm_([W, bvec], 0.5); opt.step()
+    opt.zero_grad(); loss().backward()
+    g = [W.grad.clone(), bvec.grad.clone()]
+    assert float(torch.cat([x.reshape(-1) for x in g]).norm()) > 10 * 0.5
+    st = opt._adamw.state[bvec]
+    v_before, t_before = st["exp_avg_sq"].clone(), float(st["step"])
+    u = BaseExperiment._update_map(exp, g, sets)
+    W0, b0 = W.detach().clone(), bvec.detach().clone()
+    torch.nn.utils.clip_grad_norm_([W, bvec], 0.5); gc = bvec.grad.clone(); opt.step()
+    assert torch.allclose(W0 - W.detach(), u[0], rtol=1e-4, atol=1e-7)
+    vhat = v_before.double() / (1 - 0.999 ** t_before)
+    assert torch.allclose(u[1], gc / (vhat.sqrt() + 1e-8) * 0.01)
+
+
+def test_update_terms_known_answer():
+    # per-example gradient G + xi, xi ~ N(0, diag sigma^2): a mean over b examples is G + N(0, sigma^2 / b). The
+    # disjoint complement is an unbiased G, so A(b) = sum_i G_i E[u_i(g_b)]: for u = g it is |G|^2 at every b; for
+    # u = sign(g) it is sum_i |G_i| erf(|G_i| sqrt(b) / (sigma_i sqrt 2)).
+    import math
+    torch.manual_seed(4)
+    D, b, K, reps = 200, 16, 8, 300
+    G = torch.cat([torch.full((5,), 1.0), torch.full((D - 5,), 0.02)]).double()   # |G| on few coordinates
+    sig = torch.full((D,), 1.0, dtype=torch.float64)
+    w = torch.nn.Parameter(torch.zeros(D, dtype=torch.float64))
+    sets = {"all": [w]}
+    for name, umap in (("identity", lambda g, s: g), ("sign", lambda g, s: [x.sign() for x in g])):
+        exp = SimpleNamespace(_update_map=umap)
+        acc = {}
+        for _ in range(reps):
+            per = [[G + sig * torch.randn(D, dtype=torch.float64) / math.sqrt(b)] for _ in range(K)]
+            for kname, v in BaseExperiment._noise_update(exp, per, sets, b).items():
+                acc[kname] = acc.get(kname, 0.0) + v / reps
+        for m in (1, 2, 4):
+            a = acc[f"all_A_b{m * b}"]
+            if name == "identity":
+                assert abs(a / float(G.square().sum()) - 1) < 0.05, (m, a)
+            else:
+                exact = float((G.abs() * torch.erf(G.abs() * math.sqrt(m * b) / (sig * math.sqrt(2)))).sum())
+                assert abs(a / exact - 1) < 0.05, (m, a, exact)
+
+
+def test_step_loss_decrease_known_answer():
+    # chunk loss L_c(w) = 1/2 sum h (w - w*)^2 + <xi_c, w>, xi_c ~ N(0, sigma^2 / b): gradient G + xi_c with
+    # G = h (w - w*). With the SGD map u = eta g and disjoint chunks for the read, E dL(b) =
+    # eta |G|^2 - eta^2 / 2 (sum h G^2 + sum h sigma^2 / b); the weights come back exactly
+    import math
+    torch.manual_seed(5)
+    D, b, K, reps, eta = 50, 8, 8, 400, 0.3
+    h = torch.linspace(0.2, 2.0, D, dtype=torch.float64)
+    w_star = torch.randn(D, dtype=torch.float64)
+    w = torch.nn.Parameter(w_star + torch.randn(D, dtype=torch.float64))
+    w0 = w.detach().clone()
+    sig = 1.5
+    sets = {"all": [w]}
+    G = h * (w0 - w_star)
+    exp = SimpleNamespace(_update_map=lambda g, s: [eta * x for x in g])
+    acc = {}
+    for _ in range(reps):
+        xi = [sig * torch.randn(D, dtype=torch.float64) / math.sqrt(b) for _ in range(K)]
+        L = lambda: [float(0.5 * (h * (w.detach() - w_star).square()).sum() + (x * w.detach()).sum()) for x in xi]
+        rec = BaseExperiment._noise_update(exp, [[G + x] for x in xi], sets, b, dl=(L(), L))
+        for kname, v in rec.items():
+            acc[kname] = acc.get(kname, 0.0) + v / reps
+    assert torch.equal(w.detach(), w0)
+    for m in (1, 2, 4):
+        exact = float(eta * G.square().sum() - eta ** 2 / 2 * ((h * G.square()).sum() + (h * sig ** 2).sum() / (m * b)))
+        assert abs(acc[f"dL_b{m * b}"] / exact - 1) < 0.05, (m, acc[f"dL_b{m * b}"], exact)
