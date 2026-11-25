@@ -46237,11 +46237,11 @@ entries:
     - selective_rescale
   decisions:
   - D552
-  next: 'Stage 1 of the passed design: the D395 smoke (seed_chunks/selres_smoke.txt on branch selres: 50 steps each of soft-only
-    x0=0.1 and event gate 0.1 on u u~ g 1e4, then job_kit.sh KIT_SCORE_ONLY on both), then the 36 stage-1 runs (seed_chunks/selres_stage1_all.txt:
-    schemes x0=0.1, x0=0.3, event gate 0.1 at each cell''s no-rescale best HPs, seeds 42-44) and kit scoring of their 18 u
-    u~ g runs; read with analysis/selective_rescale/stage1_read.py against D539''s controls. Stage 2 (a 16-trial search per
-    failing scheme-cell, and the Z+4g 1e5 control searches) only for a scheme-cell that misses YES'
+  next: 'Read stage 1 once its 54 jobs end (36 training runs: rescale below x0=0.1, below x0=0.3, event gate 0.1, on Z+4g
+    and u u~ g at 1e4 and 1e5, seeds 42-44; 18 kit scorings of the u u~ g runs; ids in analysis/selective_rescale/seed_chunks/stage1_submitted.txt
+    @85b7c45f7) with analysis/selective_rescale/stage1_read.py against D539''s controls; draw each scheme''s bulk error and
+    deepest soft-bin error beside the two D539 arms per process and size, seeds as points; apply the design''s YES per scheme;
+    write up'
   done_when: null
   notes_ref: null
   match: selres_*
@@ -46432,12 +46432,10 @@ entries:
       to the two-stage plan.'
   step_why:
     1:
-      feeds: whether an event-dependent rescale (soft-only below x0, or an event gate) keeps the u u~ g soft-bin gain without
-        the Z+4g bulk cost, so it can replace the rescale in the setup (Joaquin's call, D392)
+      feeds: D552 (keep the rescale's soft-bin gain without its bulk cost)
       if:
-      - 'a scheme passes the design''s YES at the baseline HPs: done for it; propose it to Joaquin with the figure'
-      - 'a scheme misses YES in a cell: stage 2, its own search there, read best against best'
-      - 'every scheme loses the soft bin: report decades kept per scheme and the trade-off along x0'
+      - 'YES for a scheme: propose it to Joaquin as the rescale''s replacement'
+      - 'NO-soft or NO-bulk in a cell: stage 2, that scheme''s own 16-trial search there (Z+4g 1e5 also its two control searches)'
   targets:
   - batch: smoke
     wall_h: 0.1
@@ -46469,16 +46467,7 @@ entries:
     units: null
     start: '2026-11-25T01:28:18+00:00'
     at: '2026-11-25T01:28:18+00:00'
-  step_waits:
-    '1': 'FA-ccin2p3-0168649a FA-ccin2p3-04668c18 FA-ccin2p3-089b822f FA-ccin2p3-118be066 FA-ccin2p3-1d1faa3c FA-ccin2p3-1d2777f7
-      FA-ccin2p3-1d551606 FA-ccin2p3-21c49954 FA-ccin2p3-21e43382 FA-ccin2p3-268dc7ef FA-ccin2p3-28030297 FA-ccin2p3-2b4e89e3
-      FA-ccin2p3-3c7f89ec FA-ccin2p3-4224d437 FA-ccin2p3-467a8298 FA-ccin2p3-491fc955 FA-ccin2p3-4ba48dff FA-ccin2p3-4fc31d44
-      FA-ccin2p3-4fe7b586 FA-ccin2p3-52666f36 FA-ccin2p3-52e6abb9 FA-ccin2p3-57f6b512 FA-ccin2p3-58eca6a9 FA-ccin2p3-639881df
-      FA-ccin2p3-679ca6c6 FA-ccin2p3-6c195e83 FA-ccin2p3-6c5932dc FA-ccin2p3-6ccbd535 FA-ccin2p3-6e5b8e59 FA-ccin2p3-76e88d05
-      FA-ccin2p3-7ed03b54 FA-ccin2p3-7f0f1995 FA-ccin2p3-8e1bed37 FA-ccin2p3-8fc08404 FA-ccin2p3-95706b29 FA-ccin2p3-a6ccc801
-      FA-ccin2p3-aa9df519 FA-ccin2p3-b6ddd86a FA-ccin2p3-b8aac80f FA-ccin2p3-b920c9fb FA-ccin2p3-b9de76e4 FA-ccin2p3-ba630213
-      FA-ccin2p3-ba8f02e9 FA-ccin2p3-c50cabed FA-ccin2p3-c747879e FA-ccin2p3-c78e701c FA-ccin2p3-d524f449 FA-ccin2p3-d6596a40
-      FA-ccin2p3-d7bb600e FA-ccin2p3-e17a5203 FA-ccin2p3-e8ddcffe FA-ccin2p3-f18df9da FA-ccin2p3-f26a4f1e FA-ccin2p3-fac7c776 '
+  step_waits: {}
   handoff:
     state: 'Design passed (two stages). Smoke (D395) passed: FA-ccin2p3-2f5d1f17 + kit 9c1687f8/5debc82a wrote config flags,
       fixed.json val_mse_curve, sigma_stage, plots, kit_result.json. Stage 1 (36 runs, seed_chunks/stage1/<run>.txt @02c31b393):
