@@ -4,7 +4,7 @@ short mechanical rules block of plan/mechanical_prompt.txt, which brief_guard ac
 
   K1  mechanical-worker with the --mechanical brief: passes
   K2  mechanical-worker with no rules block: refused
-  K3  mechanical-worker whose step cuts the work ("only 2 of the jobs"): refused
+  K3  mechanical-worker whose step names a cut ("only 2 of the jobs"): passes (no wording cut check, D562)
   K4  compact-worker with the mechanical block only: refused (the owner block is still required)
   K5  mechanical-worker launched with model opus: refused (the definition's model check is unchanged)
   K6  mechanical-worker with an owner's full brief: passes
@@ -45,8 +45,8 @@ def test_all():
     assert rc == 2 and "mechanical rules block" in err, err
     print("K2 ok: no block, refused")
     rc, err = guard(plan("brief", "agent_redesign", "--mechanical", "Resubmit only 2 of the jobs."))
-    assert rc == 2 and "cuts the work" in err, err
-    print("K3 ok: a cut in the step, refused")
+    assert rc == 0, err
+    print("K3 ok: no wording cut check (D562)")
     rc, err = guard(mech, typ="compact-worker")
     assert rc == 2 and "lacks the rules block" in err, err
     print("K4 ok: compact-worker still needs the owner block")
@@ -63,10 +63,7 @@ def test_drawing_sentence_is_not_a_cut():
     step = ("Redraw the figure. If the control has only one seed on some row, say so and leave that row without a bar.")
     rc, err = guard(plan("brief", "agent_redesign", "--mechanical", step))
     assert rc == 0, err
-    for cut in ("Run only one seed of the sweep.", "Drop the arm at 16x and run only two arms, with fewer trials."):
-        rc, err = guard(plan("brief", "agent_redesign", "--mechanical", cut))
-        assert rc == 2 and "cuts the work" in err, (cut, err)
-    print("K7 ok: a drawing sentence passes, real cuts refused")
+    print("K7 ok: a drawing sentence passes")
 
 
 def test_cut_patterns_need_a_closing_word_boundary():
@@ -74,10 +71,7 @@ def test_cut_patterns_need_a_closing_word_boundary():
     ok = "Advance the watermark at the branch tip, instead of the reviewed branch tip of trunk's head."
     rc, err = guard(plan("brief", "agent_redesign", "--mechanical", ok))
     assert rc == 0, err
-    for cut in ("Resubmit the job without the review.", "Skip the reviewer and go on.", "Do not run the review."):
-        rc, err = guard(plan("brief", "agent_redesign", "--mechanical", cut))
-        assert rc == 2 and "cuts the work" in err, (cut, err)
-    print("K8 ok: no false cut on a longer word, real cuts refused")
+    print("K8 ok: no false cut on a longer word")
 
 
 if __name__ == "__main__":

@@ -340,22 +340,8 @@ def d4():
              brief(bn)[0] == 0, (brief(b), brief(bn)))
     scenario("D4: a brief without the rules block is refused", brief("Entry: cov\nDo the thing.")[0] == 2)
     cut = brief(w.plan_cmd("brief", "cov", "--add", "Run only 2 seeds and skip the design review.")[1])
-    scenario("D4: an addition that cuts seeds and skips the review is refused, naming the line",
-             cut[0] == 2 and "only 2 seeds" in cut[1], cut)
-    open(os.path.join(w.tr, "s.jsonl"), "a").write(J({"type": "user", "timestamp": ago(30), "entrypoint": "cli",
-                                                      "message": {"content": "ok, only 2 seeds for now"}}) + "\n")
-    env = dict(w.env, CLAUDE_PROJECT_DIR=ROOT)
-
-    def brief_w(text):
-        inp = {"hook_event_name": "PreToolUse", "tool_name": "Agent", "session_id": "s",
-               "tool_input": {"subagent_type": "general-purpose", "prompt": text}}
-        r = subprocess.run([sys.executable, os.path.join(HOOKS, "brief_guard.py")], input=J(inp), env=env,
-                           capture_output=True, text=True)
-        return r.returncode, r.stderr
-    quoted = brief_w(w.plan_cmd("brief", "cov", "--add", 'Joaquin: "only 2 seeds for now"; narrow to the 3 TeV block.')[1])
-    invented = brief_w(w.plan_cmd("brief", "cov", "--add", 'run "only two probes" for now')[1])
-    scenario("D4: a cut quoted as words the user typed passes; an invented quote is refused (repo-reviewer)",
-             quoted[0] == 0 and invented[0] == 2, (quoted, invented))
+    scenario("D4: no wording cut check on the addition (D562: 4 refusals, all misfires; the design review holds cuts)",
+             cut[0] == 0, cut)
     sub = brief("Entry: cov\nhelp me", agent="o1")
     scenario("D4: a subagent's launch of a helper without the rules block is refused (one agent per entry)",
              sub[0] == 2, sub)

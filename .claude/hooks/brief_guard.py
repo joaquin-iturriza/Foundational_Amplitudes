@@ -3,10 +3,9 @@
 (`plan brief <entry>`); the main session's addition may narrow the task, never override its capacity and scope rules
 (CLAUDE.md). An Agent launch is refused (exit 2, the offending lines) when
   - its prompt lacks the template's rules block (between "=== RULES" and "=== END RULES ===") verbatim, the entry id
-    filled in; or
-  - its added text (the narrowing slot, and anything outside the template) cuts the work: fewer or only N jobs, seeds,
-    arms, workers, trials, probes, parents or pools; another horizon or pool; a subset; skipping, or going without or
-    instead of, the design, its review or `site pick`.
+    filled in.
+No wording check of the added text for cuts (D562 audit: its 4 refusals 2026-11-03..22 were all misfires; the design
+reviewer's scope check and submit_guard's PASS requirement hold a cut before any job).
 Subagents' launches are checked too (an owner is never split into more agents for its entry; repo-reviewer
 2026-10-30). Exempt: the reviewers with their own definitions (design-reviewer, repo-reviewer, notes-editor, claudemd-keeper), read-only search and planning agents
 (Explore, Plan) and the harness's helpers (claude-code-guide, statusline-setup), and a resumed agent (SendMessage is
@@ -15,8 +14,6 @@ then ~/.claude/agents/) is refused for every type, the exempt ones included: the
 owners went out on sonnet on 2026-10-30 against definitions saying opus; nobody decided it). No `model` given passes.
 Also exempt: a cold read, a prompt starting with the line `COLD READ:` that names no `site submit|run|copy|sync`,
 `git commit|push` or other writing command.
-A cut the user asked for is quoted in the brief as his words in double quotes: a quote he typed
-(tools/plan.py typed_at) is not read, an invented one is.
 Python on purpose: a crash exits 1, which blocks nothing."""
 import json, os, re, sys
 
@@ -26,19 +23,9 @@ EXEMPT = {"design-reviewer", "repo-reviewer", "notes-editor", "claudemd-keeper",
           "claude-code-guide", "statusline-setup"}
 BEGIN, END = "=== RULES", "=== END RULES ==="
 # a mechanical-worker (D213) may instead carry the short block of plan/mechanical_prompt.txt (`plan brief <entry>
-# --mechanical "<step>"`); the cut check then reads everything outside that block
+# --mechanical "<step>"`)
 MECH_TYPE, MECH_TEMPLATE = "mechanical-worker", os.path.join(ROOT, "plan", "mechanical_prompt.txt")
 MBEGIN, MEND = "=== MECHANICAL RULES", "=== END MECHANICAL RULES ==="
-N = r"(?:\d+|one|two|three|four|five|a few|some|half)"
-UNITS = r"(?:jobs?|seeds?|arms?|workers?|trials?|probes?|parents?|pools?|horizons?|energies|cells?|processes)"
-CUTS = [r"\b(?:fewer|less)\s+(?:\w+\s+)?" + UNITS + r"\b",
-        r"\bonly\s+(?:the\s+first\s+)?" + N + r"\s+(?:of\s+the\s+)?(?:\w+\s+)?" + UNITS + r"\b",
-        # "a subset per job" splits the work; a subset of the design's units cuts it (the night's replay, 2026-10-30)
-        r"\b(?:run|use|take|only)\s+a\s+subset\b|\ba\s+subset\s+of\s+(?:the\s+)?(?:\w+\s+)?" + UNITS + r"\b",
-        r"\b(?:another|other|different|shorter|smaller)\s+(?:horizon|pool)\b",
-        r"\bskip(?:ping|s)?\s+(?:the\s+)?(?:design|review|reviewer|site pick)\b",
-        r"\b(?:without|no need for|instead of)\s+(?:a\s+|the\s+)?(?:design|review|reviewer|site pick)\b",
-        r"\b(?:do not|don't|no need to)\s+(?:run|launch|wait for)\s+(?:the\s+)?(?:design\s+)?review\b"]
 
 
 def block():
@@ -55,56 +42,6 @@ def block_re(b):
     """The block as a regex over whitespace-normalised text, {id} filled with an entry id."""
     return re.compile(re.escape(norm(b)).replace(re.escape("{id}"), r"[A-Za-z0-9_-]+"))
 
-
-def added_text(prompt, tpl):
-    """The text the main session added: the narrowing slot's content and whatever lies outside the template's frame
-    (before its first line, after its last)."""
-    out = []
-    m = re.search(r"never overrides the rules block below\):\n(.*?)\n\s*" + re.escape(BEGIN), prompt, re.S)
-    if m:
-        out.append(m.group(1))
-    first, last = tpl.strip().splitlines()[0][:40], tpl.strip().splitlines()[-1][-40:]
-    i, j = prompt.find(first), prompt.rfind(last)
-    if i > 0:
-        out.append(prompt[:i])
-    if j >= 0:
-        out.append(prompt[j + len(last):])
-    return "\n".join(out)
-
-
-def users_words(q):
-    """A quoted span is exempt only when the user typed it (tools/plan.py typed_at: site's own search, the one
-    `site decide` uses). An invented quote is read like any other text (repo-reviewer, 2026-10-30)."""
-    try:
-        sys.path.insert(0, os.path.join(ROOT, "tools"))
-        import plan
-        return bool(plan.typed_at(q))
-    except BaseException:        # site's search exits on a quote too short to identify a message: not his words
-        return False
-
-
-# a sentence about drawing (an error bar, a line, a legend, a panel, a row of a figure) names units without cutting them
-DRAW = re.compile(r"\b(?:bars?|error bars?|lines?|markers?|legends?|labels?|panels?|axes|axis|figures?|plots?|rows?|"
-                  r"curves?|points?|whiskers?|ticks?|colou?rs?)\b", re.I)
-COUNT_CUTS = CUTS[:3]        # the unit-count patterns; the design/review-skipping patterns are never excused by drawing words
-
-
-def is_cut(line):
-    for sent in re.split(r"(?<=[^.][.;!?])\s+", line):
-        for p in CUTS:
-            if re.search(p, sent, re.I) and not (p in COUNT_CUTS and DRAW.search(sent)):
-                return True
-    return False
-
-
-def cuts(text):
-    text = re.sub(r"\"([^\"\n]*)\"|“([^”]*)”",
-                  lambda m: " " if users_words(m.group(1) or m.group(2)) else m.group(0), text)
-    bad = []
-    for line in text.splitlines():
-        if is_cut(line) and line.strip().lower() != "none":
-            bad.append(line.strip())
-    return bad
 
 
 def definition_model(agent_type):
@@ -145,7 +82,7 @@ def cold_read(prompt):
 
 
 def mech_check(prompt):
-    """A mechanical-worker brief: the mechanical rules block verbatim ({id} filled), and no cut outside it."""
+    """A mechanical-worker brief: the mechanical rules block verbatim ({id} filled)."""
     try:
         t = open(MECH_TEMPLATE).read()
     except OSError:          # no template, no short block to accept: the owner block is then required
@@ -159,13 +96,6 @@ def mech_check(prompt):
         sys.stderr.write("brief_guard: a mechanical-worker brief carries the mechanical rules block of "
                          "plan/mechanical_prompt.txt (or an owner's full rules block). Build it with `python3 "
                          "tools/plan.py brief <entry> --mechanical \"<the step>\"` and pass its output whole.\n")
-        return 2
-    i, j = prompt.find(MBEGIN), prompt.find(MEND)
-    rest = prompt[:i] + prompt[j + len(MEND):] if 0 <= i < j else prompt   # header spaced otherwise: read it all
-    bad = cuts(rest)
-    if bad:
-        sys.stderr.write("brief_guard: the step cuts the work (a cut of the design is the user's call):\n"
-                         + "\n".join("  " + x for x in bad) + "\n")
         return 2
     return 0
 
@@ -196,13 +126,6 @@ def main():
                          "an agent starts from it). Build it with `python3 tools/plan.py brief <entry> --add "
                          "\"<narrowing>\"` and pass its output whole as the prompt. A read-only review or lookup that "
                          "writes nothing starts its prompt with the line COLD READ: instead.\n")
-        return 2
-    bad = cuts(added_text(prompt, open(TEMPLATE).read()))
-    if bad:
-        sys.stderr.write("brief_guard: the added text overrides the capacity and scope rules (a cut of the design is "
-                         "the user's call, asked before the configs are made):\n" + "\n".join("  " + x for x in bad)
-                         + "\nNarrow what the agent does now without cutting the design, or quote the user's words "
-                         "that make the cut.\n")
         return 2
     return 0
 
