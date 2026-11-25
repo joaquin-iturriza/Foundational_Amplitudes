@@ -46041,7 +46041,7 @@ entries:
       sentence added to sec:cc_login_jobs (verify_claims 0 problems), its commit refused while the repo-reviewer backlog is
       overdue (1004/520 lines from other entries; reviewer aa6a431c30051e7ba holds the lock since 01:21).'
   step_waits:
-    '2': 'a reviewer: repo-reviewer aa6a431c30051e7ba (lock since 01:21) passing the backlog so the commit gate lifts'
+    '2': 'a reviewer: notes-editor a7e8e54e0e3888164 re-check of 3e91f2f0f, then plan done cc_login_jobs --writeup 3e91f2f0f'
   step_why:
     2:
       feeds: 'D544: every CC script off the login node, site env included; the entry''s close'
