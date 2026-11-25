@@ -40985,9 +40985,9 @@ entries:
     decision: D553
   owner:
     agent: a0660e99fe060d6fd
-    state: working
+    state: stopped
     since: '2026-11-25T22:27:16.441000+00:00'
-    state_at: '2026-11-25T23:03:29.780000+00:00'
+    state_at: '2026-11-25T23:12:55.952000+00:00'
     context: 222444
     context_at: '2026-11-25T23:17:50+00:00'
   step_why:
@@ -49336,12 +49336,10 @@ entries:
     withdrawn_why: 'D561, Joaquin''s words ''not use it where it hurts, and only where it helps'', settles it: the rescale
       goes into the D392 setup only below every trained momentum (coordinator, 2026-11-25)'
   owner:
-    agent: a5e0bbe3e450173d8
-    state: closed
-    since: '2026-11-25T22:04:57+00:00'
-    state_at: '2026-11-25T22:04:57+00:00'
-    context: 75653
-    context_at: '2026-11-25T22:05:49+00:00'
+    agent: a12f73f92c7b46127
+    state: working
+    since: '2026-11-25T23:17:54.598000+00:00'
+    state_at: '2026-11-25T23:17:54.598000+00:00'
   designs:
   - at: '2026-11-24T23:55:03+00:00'
     question: 'Can the momentum log-rescale be applied only where it helps, by a rule using only the event''s own momenta,
