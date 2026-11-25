@@ -41371,6 +41371,15 @@ entries:
       heads 117.1 (~4.9 days in one job); all four 200 GPU-h (282 by the V100 bound for 16 heads); without 120 heads 83 GPU-h
       (16 heads given the 80G floor). Disk: 120 (27.4 GB peak) and 64 (7.8 GB) go to lxplus EOS; 16 and 32 (2.5 GB peak together)
       fit CC. Above D536''s 100 GPU-h: asked Joaquin (plan ask), step 10 held.'
+  - at: '2026-11-25T02:35:53+00:00'
+    text: '2026-11-25 ~03:45 CET (E8908): part (b) 16/32/64-head runs sat idle on lxplus: condor -better-analyze shows the
+      free 80 GB H100 NVL slots (e.g. b9pgpun802, 7 free GPUs) rejecting them on their own group filters SCond_vo_filter/SCond_dteam_bypass,
+      ~6 matching slots busy. Removed (condor 13232060-62) and resubmitted on CC gpu_h100 (H100 NVL, where the smoke rates
+      were measured; site pick: CC 16 fit, lxplus 0 of 244) with the same command and config sweep/sweep_config_llmcmp_b_width.yaml,
+      code @038a261875: 16 heads FA-ccin2p3-dcb66b14 (12 h limit), 32 FA-ccin2p3-e9dfa8b9 (24 h), 64 FA-ccin2p3-623a3af6 (72
+      h, checkpoint_blocks). 120 heads FA-lxplus-25e06bc1 stays queued on lxplus: its 27.4 GB disk peak does not fit CC (36
+      GB free; the three CC runs peak 10.3 GB; design rule peak + 10 GB). Wall targets unchanged (H100 NVL rates). heldout_per_process.py
+      now takes up to 6 arms (it dropped arms past 3 silently, 1fc401964); width curve tool b_width_curves.py @eebf536a5.'
   step_waits:
     '5': part (c) driver llmcmp_c_qperp_drive5 ending (its detach DONE event; wave 3 of 2 trials after trials 3 -5.816 and
       5 -5.938 of wave 2)
