@@ -46247,10 +46247,11 @@ entries:
   match: selres_*
   evidence:
     runs: []
-    commit: 560a4d1a3
+    commit: 85b7c45f7
     paths:
     - analysis/selective_rescale/data/input_check.json
     - analysis/selective_rescale/input_check.py
+    - analysis/selective_rescale/seed_chunks/stage1_submitted.txt
     - wrappers.py
   dead_ends: []
   asks: []
