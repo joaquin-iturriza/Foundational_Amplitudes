@@ -44396,6 +44396,65 @@ entries:
       seed as trial 5, held-out seed spread 10^0.14 = 1.38 (results.tex l.4485). Check 5 terms: level, normalized by the predictor,
       predicted level, context vector, s_hat+coupling, per-process pretraining (results.tex l.7800-8010, entry findings, decisions
       D83/D105/D564).'
+  - at: '2026-11-25T16:25:42+00:00'
+    question: 'D566 (Joaquin: ''there is something strange about predicting a single number for a new dataset that depends
+      on how that data was sample ... this has to perform correctly in individual events regardless of that. I believe there
+      is a way to marry these two ideas''): can a per-event quantity built from the process and its diagrams place a new family''s
+      level as well as the per-process diagram regressor while staying insensitive to how the pool was sampled? Two CPU candidates
+      on catalog_daniel''s existing pools: (A) a diagram-built per-event factor log F = log P = log sum_d C_d prod_S 1/|s_S
+      - M_S^2 + i M_S Gamma_S|^k (analysis/catalog_v4/dipole_residual.py log_prop, the sidecars'' tree diagrams, couplings
+      C_d, the event''s own invariants), the residual r = log|M|^2 - log F placed by the content-only 2x64 level network (stats_net
+      features, no diagram descriptors: the diagrams enter only through F per event); (B) a per-event regressor g(process
+      features + norm_explore3''s diagram descriptors + the event''s log s_hat, smallest pair invariant Lmin, soft-emission
+      log E, log P) fitted to log|M|^2 over the 1352 training pools'' events (sklearn HistGradientBoosting), cross-fitted
+      by relabelling class; a process''s level is then the mean of g over whatever sample it has. No GPU; step 16 stays a
+      diagnostic.'
+    prior: 'Searched docs/results.tex (sec:target paragraphs l.2270-2400 soft-dipole/propagator product, l.7067 sampling sensitivity,
+      l.7889-8010 D82/D83 factors and level networks, l.8254-8417 candidate targets and emission scales, l.8510 robustness,
+      l.13257 asymptotic factor, l.14075 target_propagators), plan llm_compare findings 2026-11-25, site decisions D82-D99,
+      D128, D135, D436, D523, D566. Found: shared-target level moves 0.30 sigma_p under flat-in-log s_hat reweighting (Daniel''s
+      catalog, l.7919); no-level error on the 43 new: log|M|^2 47, s_hat+coupling 4.8 (2.3 with IDEN/colour), per-event singular
+      scales ~9, emission history 3.3 (proxy); 2x64 level net on process features 0.45, + diagram descriptors 0.045 (ensembles
+      0.087, multiplicity cross-fit 10.4); trained emission scales cost the 43 new x1.6; s_hat+coupling network kept its factor''s
+      wrong multi-H levels. The diagram propagator product P was read only on catalog_v4''s multiplicity gap (explains 0.87
+      of log|M|^2, 0.106 of the emission target; no GPU arm), never on new-family levels or sampling; no per-event regressor
+      of log|M|^2 from process + diagram descriptors + event invariants exists (grep norm_explore*, norm_surrogate*, stats_net,
+      lco_map: lco_map maps a residual on catalog_v4 multiplicity pools without process descriptors).'
+    measure: 'New tool analysis/catalog_daniel/perevent_level.py, one CC CPU job (site run --job) over the cached train pools
+      of recipes/catalog_daniel_{train,heldout}.yaml, 2000 events per pool (first 2000 rows; the pools are i.i.d. draws).
+      Per candidate and per process p of the 43 new (and, cross-fitted, the 1352 training): (i) level error e_p = (mean over
+      p''s events of prediction - log|M|^2)^2 / sigma_p^2, sigma_p = std of log|M|^2 over p''s events (one unit for every
+      candidate), also bias^2 in nat^2; medians over the 43, per family (classes_default.json test_group) and the gg->tbW
+      pair; (ii) sampling shift |mean_w(err) - mean(err)| / sigma_p under two reweightings of p''s events: flat in log s_hat
+      (20 equal-width bins between the 1st and 99th percentile, equal weight per non-empty bin, as norm_moments2.py) and toward
+      the singular regions (the fifth with the smallest Lmin - log s_hat carrying half the weight, as l.7067), medians over
+      the 43; (iii) within-process std of the error over sigma_p, median over the 1352 (cross-fit) and the 43. References
+      computed by the same code: the shared target (prediction = the training processes'' mean of log|M|^2) and the diagram
+      regressor (prediction = its frozen per-process level, analysis/catalog_daniel/data/level_file_B_diag.json). Figure:
+      per family of the 43 new, median e_p (log scale) and median flat-log s_hat shift, the four candidates side by side.'
+    check: 'The reads move with the candidate on existing data: the 2026-10-22 numbers already separate shared target (no-level
+      47) from the diagram regressor (0.045) on e_p, and flat-log s_hat reweighting moves the shared target''s level 0.30
+      sigma_p (l.7919); on catalog_v3 the s_hat factor and emission scales cut that shift to 0.074-0.11 (l.7067): a per-event
+      factor moves (ii). The tool reproduces the shared target''s 47 and the regressor''s 0.044 (level_source.py @868c56f2f:
+      bias^2/var median on the 43) as its first assertion (within 10%; pools here are the train role, 2000 events, against
+      norm_moments2''s full train pools).'
+    fixed: 'Data: catalog_daniel train-role pools on CC, 2000 events per process, the 1352/139 split (43 new, 96 relabels);
+      process features (stats_net.features) and diagram descriptors (norm_explore3 feats diag=True) unchanged; level network
+      for (A): norm_explore3''s 2x64 MLP, 3 seeds averaged, cross-fitted by relabelling class (GroupKFold 5 on weak_key);
+      (B): HistGradientBoostingRegressor(max_iter 300, learning_rate 0.1, max_leaf_nodes 63, random_state 0), the same GroupKFold
+      for the training processes, fitted on all 1352 for the held-out; masses and widths of log_prop (MT 172.5, WT 1.4915,
+      Z, W, H as catalog_v4; b massless in propagators). No GPU.'
+    control: The shared target (no level model) and the per-process diagram regressor (level_file_B_diag.json, the constant-level
+      method step 16 trains with), scored by the same code on the same events.
+    seeds: Level MLP 3 seeds averaged (as norm_explore3); HGB random_state 0; the 2026-10-22 ensemble spread of the diagram
+      regressor (0.016-0.19 over 10 ensembles, l.8510) is the spread a single level-net read carries.
+    outcome: 'Pass (go to the GPU arm (C), the candidate fed to LLoCa): median e_p on the 43 new at or below the content-only
+      level network''s 0.45 AND median flat-log s_hat shift at or below the shared target''s 0.30. Fail on either: reported
+      per family with where it fails, no GPU. A candidate at or below the diagram regressor''s e_p (0.087 ensemble median)
+      with a smaller shift than the regressor''s is the marriage D566 asks for. (iii) is reported, no threshold.'
+    sources: 0.45 <- content-only level network on the 43 new, results.tex par. More data-free normalizations l.7919 (D83);
+      0.30 <- the shared target's flat-in-log s_hat level shift on Daniel's catalog, same paragraph; 0.087 <- diagram-descriptor
+      ensembles' median, par. How robust is the diagram-descriptor level l.8510
   targets:
   - batch: gen_smoke
     wall_h: 0.5
