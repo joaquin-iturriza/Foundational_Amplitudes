@@ -46206,5 +46206,11 @@ entries:
     units: null
     start: '2026-11-25T00:11:31+00:00'
     at: '2026-11-25T00:11:31+00:00'
+  - batch: stage1
+    wall_h: 0.1
+    jobs: 36
+    units: null
+    start: '2026-11-25T00:25:57+00:00'
+    at: '2026-11-25T00:25:57+00:00'
   step_waits:
     '1': FA-ccin2p3-9c1687f8 FA-ccin2p3-5debc82a
