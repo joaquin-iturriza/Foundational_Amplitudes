@@ -29,6 +29,15 @@ def test_table_without_figure_refused():
     assert check(TABLE, [("SendUserFile", {"file_path": "/x/notes.txt"})]) == [plan_check.TABLE_MSG]
 
 
+def test_id_and_time_limit_table_passes():
+    assert check("Joaquin, submitted:\n\n| Heads | Run | Time limit |\n|---|---|---|\n| 4 | run_a1 | 2 h |\n"
+                 "| 8 | run_b2 | 1.5 h |\n") == []
+
+
+def test_per_arm_mse_table_refused():
+    assert check("Joaquin:\n\n| arm | MSE |\n|---|---|\n| a | 1.6e-4 |\n| b | 0.012 |\n") == [plan_check.TABLE_MSG]
+
+
 def test_table_with_png_refused():
     assert check(TABLE, [("SendUserFile", {"file_path": "/x/fig.png"})]) == [plan_check.TABLE_MSG]
     assert check(TABLE, [("SendUserFile", {"file_path": "/x/fig.pdf"})]) == [plan_check.TABLE_MSG]

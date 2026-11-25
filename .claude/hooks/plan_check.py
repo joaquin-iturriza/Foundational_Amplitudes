@@ -378,6 +378,7 @@ _RESULT = re.compile(r"^(?:about\s+|~\s*|≈\s*|[<>±+\-−]\s*)?(?:\d*\.\d+|\d+
                      r"\d+(?:[.,]\d+)?\s*(?:%|×|x\b|s\b|min\b|h\b|dex\b|[kMG]\b))")
 
 
+_IDCOL = re.compile(r"limit|\bids?\b|run\b|path|commit|setting|config", re.I)
 _SIZE = re.compile(r"^[\d.,]+\s*[kMGT]i?B\b")   # a file size (11.8 GB) is storage bookkeeping, not a result
 
 
@@ -407,10 +408,14 @@ def _has_result_table(text):
     lines = text.splitlines()
     for i in range(len(lines) - 1):
         if _ROW.match(lines[i]) and _SEP.match(lines[i + 1]):
+            heads = [h.strip() for h in lines[i].strip().strip("|").split("|")]
             for l in lines[i + 2:]:
                 if not _ROW.match(l):
                     break
-                if any(_RESULT.match(c.strip()) and not _SIZE.match(c.strip()) for c in l.strip().strip("|").split("|")):
+                cells = l.strip().strip("|").split("|")
+                # a column of limits, ids, paths, commits or settings holds no measurement (time limits, 2 h, run ids)
+                if any(_RESULT.match(c.strip()) and not _SIZE.match(c.strip())
+                       and not (k < len(heads) and _IDCOL.search(heads[k])) for k, c in enumerate(cells)):
                     return True
     return False
 
