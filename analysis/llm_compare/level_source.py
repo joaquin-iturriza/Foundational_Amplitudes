@@ -10,7 +10,7 @@ level network places better, and the Pearson/Spearman correlation of our signed 
 error (does our network err where a level read from the process alone errs, and in the same direction?). The LLM's
 whole MSE is an upper bound on its own bias^2 (his figure gives no split).
 Also writes data/split/lvl_feat_heldout.json and lvl_diag_heldout.json (bias_logm2 = the level network's signed error)
-so heldout_per_process.py --part bias draws them under fixed names.
+so heldout_per_process.py --part bias draws them under fixed names. And per arm, the MSE once its own predicted mean\nper process is replaced by a level network's (no held-out label used): MSE - bias^2 + (that network's error)^2.
     python analysis/llm_compare/level_source.py [--tag a_trial5 b_h16 c_control c_best]
 Output: data/step15_level_source.json.
 """
@@ -65,6 +65,18 @@ def main():
                 r[t][f"vs_{k}"] = {"pearson": float(np.corrcoef(x, y)[0, 1]), "spearman": spearman(x, y),
                                    "same_sign": int((np.sign(x) == np.sign(y)).sum()),
                                    "net_better": int((y ** 2 < x ** 2).sum())}
+        # each arm's own predicted mean replaced by a level network's (no held-out label used):
+        # MSE' = MSE - bias^2 + (level network's signed error)^2; pooled over equal 1e4 events per process
+        for t in a.tag:
+            mse = np.array([ours[t][n]["mse_logm2"] for n in names])
+            x = np.array([bias[t][n] for n in names])
+            for k in NETS:
+                m2 = mse - x ** 2 + np.array([bias[k][n] for n in names]) ** 2
+                r[t][f"level_from_{k}"] = {"median_mse": float(np.median(m2)), "pooled_rmse": float(np.sqrt(m2.mean())),
+                                           "below_llm": int((m2 < L).sum())}
+            r[t]["as_is"] = {"median_mse": float(np.median(mse)), "pooled_rmse": float(np.sqrt(mse.mean())),
+                             "below_llm": int((mse < L).sum())}
+        r["llm_pooled_rmse"] = float(np.sqrt(L.mean()))
         fams = {}
         for n in names:
             fams.setdefault(meta[n]["test_group"], []).append(n)
@@ -85,6 +97,11 @@ def main():
                   " ".join(f"{k}: r {q[f'vs_{k}']['pearson']:+.2f} rho {q[f'vs_{k}']['spearman']:+.2f} "
                            f"same sign {q[f'vs_{k}']['same_sign']} net better {q[f'vs_{k}']['net_better']}"
                            for k in NETS))
+        print(f"  LLM pooled {r['llm_pooled_rmse']:.3f}")
+        for t in a.tag:
+            print(f"  {t:10s} " + " | ".join(f"{v}: median {r[t][v]['median_mse']:.3g} pooled {r[t][v]['pooled_rmse']:.3f} "
+                                             f"below LLM {r[t][v]['below_llm']}"
+                                             for v in ["as_is"] + [f"level_from_{k}" for k in NETS]))
     print("wrote", p)
 
 
