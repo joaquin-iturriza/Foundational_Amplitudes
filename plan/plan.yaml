@@ -45642,7 +45642,8 @@ entries:
       1.26.4 after (analysis/cc_login/data/site_env_job_64806476.txt): the design''s yes branch, the change stays. Write-up
       sentence added to sec:cc_login_jobs (verify_claims 0 problems), its commit refused while the repo-reviewer backlog is
       overdue (1004/520 lines from other entries; reviewer aa6a431c30051e7ba holds the lock since 01:21).'
-  step_waits: {}
+  step_waits:
+    '2': 'a reviewer: repo-reviewer aa6a431c30051e7ba (lock since 01:21) passing the backlog so the commit gate lifts'
   step_why:
     2:
       feeds: 'D544: every CC script off the login node, site env included; the entry''s close'
