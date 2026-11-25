@@ -45484,6 +45484,43 @@ entries:
       vob_ee_uu_nlo) in use, stripping trailing punctuation adds none, and the only stems found as substrings but not as words
       are job-script names (job_collision_ab.sh, job_needle_probe.sh, gen_scan_bigrun.py, pretrain25_zs_pid) named in a code-maintenance
       note. The fake-tree check of the design is not a committed test; worth committing with the fix.'
+  - at: '2026-11-25T01:39:09+00:00'
+    question: 'D556 (''Yes, you also mentioned there were a bunch of caches that were relatively big, are they all needed?''):
+      (1) delete the model files (*.pt, *.pt.gz, *.ckpt, *.pth) of the superseded fine-tune sets zz_catft, zz_catft_lowloss2,
+      zz_catft_lowloss3 (~15.1 GiB; results files, logs, configs stay); (2) read, without deleting, who reads each memmap
+      key and each training-cache entry. In use = the recipes of the last 14 days'' run and sweep configs plus every recipe
+      whose name (with or without .yaml) is a whole word, or matches a family glob, in the full plan/plan.yaml record of any
+      entry not done or withdrawn (held included), read at run time on the site (cache_readers.py --plan). Per memmap key:
+      train-pool recipe_ids matched to the in-use recipes'' train pools, live jobs, last_used, logs of the last 14 days (runs,
+      scheduler, sweep trials). Training cache: cache_census.py --in-use <that set> --days 14, aggregated per decision and
+      reason class (CENSUS_BY_REASON) and delete GiB per recipe. Cache deletions come in a second job from this read (delete_from_manifest.py
+      skips anything read or changed since). Job scripts/job_ccdisk_d556.sh at trunk ae44541e5.'
+    prior: 'Dead end 2026-11-25: the in-use list from plan show text missed 14 recipes. Design review 2026-11-25 (a3819f0c,
+      FIX): the census keep reason carried the whole in-use list (~14 KB per row) and a touch time, so the keep sums could
+      not be read; now the reason is ''train pool of an in-use recipe'' (the recipes are in the recipe column) and the job
+      sums by reason class with dates stripped. Read jobs ccj_3b5290531b03/ccj_e7fd8463789f: zz_catft 10217 MiB, lowloss2
+      1739, lowloss3 3478; curves in committed catft_curves.json. Inventory FA-ccin2p3-b949c4ee: amp_mmap_cache 36.8 GiB (format-2
+      keys 4.0 GiB since deleted), amp_data_cache 58.7 GiB all kept by census --in-use ''*''. The reviewer''s run on today''s
+      plan: 35 entries not done, 563 of 632 recipes named, all six of the dead end''s examples in use.'
+    measure: 'CATFT listed count and GiB (deleted_catft.tsv) and df before/after; PLAN line; per memmap key the MMAP line;
+      CENSUS lines per decision; CENSUS_BY_REASON (GiB, files, decision: reason class); CENSUS_DELETE_BY_RECIPE'
+    check: 'tests/test_cache_readers.py (1 passed @ae44541e5): on a fake plan with a held entry naming catalog_v3_sep_probes,
+      vob_ee_uu_nlo.yaml and the catalog_v4_datasaving_* family and a done entry naming ref_solo_ee_uu, the first two and
+      catalog_v4_datasaving_trees.yaml are in use and ref_solo_ee_uu.yaml is not; a key whose train pool carries catalog_v3_sep_probes.yaml''s
+      first recipe_id prints ''1 train pools, 1 of in-use recipes catalog_v3_sep_probes.yaml'', one with a made-up id ''0
+      of in-use recipes -''. The reason-class awk on a fake census gives one line each for ''keep: touched within 14 days'',
+      ''keep: train pool of an in-use recipe'', ''delete: its recipes are not in use''.'
+    fixed: only the three superseded catft sets' model files are deleted; zz_catft_sep, zz_catft_emafix, zz_catft_refit_emafix
+      untouched; no cache file deleted by this job; matching errs towards in use (family globs count)
+    control: 'none: a deletion and a read; the df change against the manifest''s total is the cross-check'
+    seeds: none
+    outcome: 'yes: D556_READ_DONE, CATFT ~15 GiB listed and df down by about as much, cache_readers and census written and
+      summed; no: the job stops before D556_READ_DONE (the catft manifest says what was listed; a rerun lists only what is
+      left); an empty INUSE makes cache_census refuse (--in-use required)'
+    sources: 'D556 (Joaquin''s yes, quoted) for the catft sets and the cache question; D147 (''do delete the unused caches'',
+      covers: not used by any run in the last days and not needed by a running or planned entry); 14 days: the census window
+      of the 2026-11-24 inventory under D147''s ''the last days''; CLAUDE.md, Joaquin''s words, ''A memmap cache (amp_mmap_cache)
+      on a site is deleted only when no running job and no recipe of an open plan entry reads it'''
   findings:
   - at: '2026-11-24T14:32:44+00:00'
     text: '2026-11-24 login-node reads: /sps/lpnhe 512 GiB group space at 98% (498 GiB used, 15 GiB free), .disk_full flag
