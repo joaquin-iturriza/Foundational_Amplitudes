@@ -44544,6 +44544,18 @@ entries:
     sources: 0.19 <- the diagram-descriptor level network's 10-ensemble range 0.016-0.19, results.tex par. How robust is the
       diagram-descriptor level l.8510; the shift bar is the diagram regressor's own shift measured by this job on the same
       events; 2x bootstrap noise <- the 30-resample std computed by the job
+    passed_at: '2026-11-25T16:32:01+00:00'
+    reviewer: 'Re-check of the D566 design, now candidate (B) only: a per-event HistGradientBoosting regressor, one CC CPU
+      job. Prior now cites norm_surrogate prop (corr 0.83 on the new), surrogate_more (beta 0.57/0.66; surrogate statistics
+      in the level net 0.20 vs 0.058) and norm_explore6 (MLP, 400 events, too weak). Candidate (A) is closed on existing data,
+      data/perevent_level_surrogate.json @0e3e3fe35: 6.3 at coefficient 1, 3.1 at fitted beta. Check 2: references read on
+      the same 2000 events, shared target 44.7 vs diagram regressor 0.047; the flat-in-log s_hat shift moves with a per-event
+      factor, 0.30 -> 0.074-0.10 (l.7067, l.7919). Check 3: level gate 0.19 is the top of the regressor''s 10-ensemble range
+      (0.016-0.19, l.8510). Shift bar: the regressor''s own shift on the same 43 processes, beaten by more than 2x its 30-resample
+      bootstrap noise. Controls scored by the same code; job asserts the references reproduce. Inputs are momenta and process
+      descriptors only, no label. Job: scripts/job_perevent_level.sh, 4 CPU, 16G, 3 h limit, 1 h target. Searched: propagator
+      product, log_prop, dipole_residual, per-event regressor, HistGradient, perevent, surrogate, norm_explore5/6/7, norm_surrogate*,
+      norm_blend, residual_kinematics, kshot_level, D564/D566.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
