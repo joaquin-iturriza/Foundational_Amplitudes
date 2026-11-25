@@ -46465,6 +46465,12 @@ entries:
     units: null
     start: '2026-11-25T01:28:03+00:00'
     at: '2026-11-25T01:28:03+00:00'
+  - batch: stage1_kit12
+    wall_h: 0.3
+    jobs: 12
+    units: null
+    start: '2026-11-25T01:28:18+00:00'
+    at: '2026-11-25T01:28:18+00:00'
   step_waits:
     '1': FA-ccin2p3-639881df FA-ccin2p3-e17a5203 FA-ccin2p3-679ca6c6 FA-ccin2p3-8fc08404 FA-ccin2p3-b9de76e4 FA-ccin2p3-f26a4f1e
       FA-ccin2p3-52666f36 FA-ccin2p3-8e1bed37 FA-ccin2p3-d6596a40 FA-ccin2p3-d524f449 FA-ccin2p3-1d551606 FA-ccin2p3-ba8f02e9
