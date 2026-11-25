@@ -41380,6 +41380,20 @@ entries:
       h, checkpoint_blocks). 120 heads FA-lxplus-25e06bc1 stays queued on lxplus: its 27.4 GB disk peak does not fit CC (36
       GB free; the three CC runs peak 10.3 GB; design rule peak + 10 GB). Wall targets unchanged (H100 NVL rates). heldout_per_process.py
       now takes up to 6 arms (it dropped arms past 3 silently, 1fc401964); width curve tool b_width_curves.py @eebf536a5.'
+  - at: '2026-11-25T02:42:12+00:00'
+    text: '2026-11-25 ~04:30 CET, storage and placement of the 120-head run (coordinator: can the big models be stored). EOS
+      user quota /eos/user/j/joiturri (eos root://eosuser.cern.ch quota, 2026-11-25): 971.23 GB logical of 1.00 TB (97.12%,
+      warning), ~28.8 GB free. 120-head run (354,107,348 params): disk ~9.8 GB during training (model_run0_best.pt, EMA +
+      live weights + AdamW state, 27.6 B/param), 27.4 GB transient at the end (best + last model_run0.pt + gzip being written),
+      7.9 GB final; GPU peak 71,486 MB in its smoke FA-ccin2p3-c6a550c4 (H100 NVL 95.8 GB; under 80 GB). lxplus: condor -better-analyze
+      on 13232063 (FA-lxplus-25e06bc1): 0 slots match and are willing, 14 free slots reject it on their own group filters,
+      11 would match if drained, so it starts only when one of those busy 80 GB slots frees; EOS fits its end peak by only
+      1.4 GB. CC: 36 GB free; the design''s rule needs peak + 10 = 37.4 GB beside the three CC width runs (10.3 GB peak),
+      no own rebuildable debris left (cc_disk freed 34.5 GiB, runs/zz_smoke empty; EOS zz_* dirs ~0.1 GB); prune_site.sh (D19)
+      is the supervisor''s 6-hourly upkeep. Fix in review: training.save_last=false skips the last model that run_trial._drop_last_model
+      deletes anyway (branch save_last ab30d5798, tests/test_save_last.py OK), cutting the end peak to ~17.7 GB: EOS 28.8
+      GB free >= 17.7 + 10. On PASS: merge, sync lxplus, condor_rm 13232063, resubmit 120 heads on lxplus with --hp training.save_last=false
+      (same command otherwise).'
   step_waits:
     '5': part (c) driver llmcmp_c_qperp_drive5 ending (its detach DONE event; wave 3 of 2 trials after trials 3 -5.816 and
       5 -5.938 of wave 2)
