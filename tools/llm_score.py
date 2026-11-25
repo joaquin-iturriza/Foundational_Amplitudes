@@ -29,6 +29,8 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--run", required=True)
 ap.add_argument("--out", required=True)
 ap.add_argument("--eval-subsample", type=int, default=None, help="test events per process (default: the run's own data.eval_subsample)")
+ap.add_argument("--events-out", default=None, help="CSV of process, true and predicted log|M|^2 per test event (D567)")
+ap.add_argument("--events-max", type=int, default=5000, help="events per process written to --events-out")
 ap.add_argument("recipe")
 a = ap.parse_args()
 
@@ -65,7 +67,8 @@ F = getattr(exp, "all_amp_factor", None)
 assert F is not None or not bool(cfg.data.get("target_physics_factor", False)), "target factor on but no all_amp_factor"
 logF = np.log(np.asarray(F, dtype=np.float64)[exp._split_indices["test"]]).ravel() if F is not None else None
 sse_z, n = np.zeros(len(names)), np.zeros(len(names), dtype=np.int64)
-S = np.zeros((len(names), 5))   # per process sums of pred, true, pred^2, true^2, pred true (absolute log|M|^2)
+S = np.zeros((len(names), 5))
+EV = []   # per process sums of pred, true, pred^2, true^2, pred true (absolute log|M|^2)
 k = 0
 with torch.no_grad():
     for data in exp.test_loader:
@@ -76,6 +79,8 @@ with torch.no_grad():
         lf = logF[k:k + p.size] if logF is not None else 0.0
         q, t = mu[p] + sd[p] * hd - lf, mu[p] + sd[p] * zd - lf
         np.add.at(S, p, np.stack([q, t, q * q, t * t, q * t], 1))
+        if a.events_out:
+            EV.append(np.stack([p, t, q], 1))
         k += p.size
 assert logF is None or k == logF.size, (k, None if logF is None else logF.size)
 assert (n > 0).all(), [nm for nm, k in zip(names, n) if k == 0]
@@ -100,6 +105,12 @@ rec = {"run": run, "recipe": recipe, "target_stats": str(cfg.fine_tune.target_st
                           "scale_logm2": float(scale_log[i]), "floor_logm2": float(floor_log[i]), "rho": float(rho[i]),
                           "true_mean_logm2": float(mt[i]), "true_std_logm2": float(np.sqrt(max(vt[i], 0.0)))}
                      for i, nm in enumerate(names)}}
+if a.events_out:  # the first --events-max test events of each process, in loader order
+    ev = np.concatenate(EV)
+    keep = np.concatenate([np.flatnonzero(ev[:, 0] == i)[: a.events_max] for i in range(len(names))])
+    with open(a.events_out, "w") as f:
+        f.write("process,true_logm2,pred_logm2\n")
+        f.writelines("%s,%.6g,%.6g\n" % (names[int(r[0])], r[1], r[2]) for r in ev[keep])
 shutil.rmtree(cfg.run_dir, ignore_errors=True)
 os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
 json.dump(rec, open(a.out, "w"), indent=1)
