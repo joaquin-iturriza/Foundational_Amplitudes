@@ -40804,10 +40804,6 @@ entries:
       run''s 6.79e-4, then job_llm_score.sh RUN=runs/llmcmp_a_adamw_const/trial_9000 EVENTS=1, copy the scores to data/ under
       the untuned arm''s names, redraw heldout_per_process.py (all arms, --part shape) and shape_dists.py with the untuned
       arm'
-    20: '20: D566 (B) matched search (step 17''s passed design, fail on (i)): an equal-size search for the per-event network
-      (width, depth, alpha, lr, batch) and the boosted tree (learning rate, leaves, iterations, l2) over their coupled spaces,
-      cross-fitted by relabelling class on the 1352 training processes (never on the 43 new), best against best on the level
-      error and flat shift of step 17; its own design and review, CPU jobs on lxplus (catalog_daniel train-role pools)'
     21: '22: D567/D564 matched test after step 21 (the gg->ttH split follows the sign of the internal-top off-shellness input):
       does our setup without the off-shellness input lose the split and the gg->tbW level error? Arm: part (c)''s control
       config and HPs (runs/llmcmp_c_qperp/trial_9000, FA-ccin2p3-d34535b0), identical flags except data.offshell_per_event=false
@@ -41034,13 +41030,6 @@ entries:
       if:
       - 'best val within the seed spread of 6.79e-4: score it and add the untuned arm to the shape figures'
       - 'best val far from 6.79e-4: report the retrain as not reproducing, read the curves before scoring'
-    20:
-      feeds: 'D566: whether a per-event map can place a new family''s level as well as the per-process diagram regressor (0.047)
-        while following the sample better than a constant'
-      if:
-      - 'best network or tree <= 0.19 on the 43 new with its shift below the regressor''s by more than 2x noise: marriage
-        found, go to (C), g fed to LLoCa per event, its own design'
-      - 'both stay above 0.19 after the search: record (B) as a dead end for level placement; report the shift result alone'
     21:
       feeds: 'D567/D564: whether the off-shellness input causes our setup''s new-family shape split and level errors'
       if:
@@ -41820,7 +41809,6 @@ entries:
       log F re-read): the level-branch configurations are those three; the next one is designed from what they show'
     '16': FA-ccin2p3-89671610
     '19': FA-ccin2p3-0165aa58
-    '20': FA-lxplus-affc2e5a FA-lxplus-c894babe
     '21': FA-lxplus-74026f3a FA-lxplus-4167db91
   handoff:
     state: 'Part (a) DONE, part (c) DONE. Suprio''s own per-process metrics (pID only, seeds 0-2) now drive every LLM comparison:
