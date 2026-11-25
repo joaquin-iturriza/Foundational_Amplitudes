@@ -56,9 +56,18 @@ def main():
                                 [], "SITEDIRS", site=site)
             v = site_python(REMOTE.replace("ZNG1K", "SELRES"),
                             [f"'{r}#{paths[0]}/runs/{r}#{paths[1]}/{r}/results/fixed.json'" for r in runs], "SELRES", site=site)
-            val |= {r: x | {"site": site} for r, x in v.items() if x.get("val_mse_curve")}
-            kit |= site_python(KIT, [r for r in runs if "_uug_" in r], "SELRESKIT", site=site)
-        raw = {"val": val, "kit": kit}
+            k = site_python(KIT, [r for r in runs if "_uug_" in r], "SELRESKIT", site=site)
+            v = {r: x | {"site": site} for r, x in v.items() if x.get("val_mse_curve")}
+            for got, new in ((val, v), (kit, {r: x | {"site": site} for r, x in k.items()})):
+                both = sorted(set(got) & set(new))   # a run's numbers come from the one site that ran it
+                if both:
+                    sys.exit(f"stage1_read: runs with records on {got[both[0]]['site']} and {site}: {both}")
+                got |= new
+        bad = sorted(r for r in kit if r in val and kit[r]["site"] != val[r]["site"])
+        if bad:
+            sys.exit(f"stage1_read: kit and validation numbers from different sites: {bad}")
+        raw = {"val": val, "kit": {r: {f: x for f, x in d.items() if f != "site"} for r, d in kit.items()},
+               "kit_site": {r: d["site"] for r, d in kit.items()}}
         json.dump(raw, open(cache, "w"))
     s539, u539 = (json.load(open(os.path.join(FM, f))) for f in ("d539s.json", "d539u.json"))
     k539 = json.load(open(os.path.join(FM, "d539u_kit.json")))["cells"]
