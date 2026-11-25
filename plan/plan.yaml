@@ -34021,7 +34021,7 @@ entries:
     agent: a9673ff5df07651dd
     state: working
     since: '2026-11-21T17:02:36+00:00'
-    state_at: '2026-11-22T00:23:35.438000+00:00'
+    state_at: '2026-11-25T00:03:53.781000+00:00'
     context: 226448
     context_at: '2026-11-25T00:04:26+00:00'
   step_waits:
@@ -40848,9 +40848,9 @@ entries:
     decision: D553
   owner:
     agent: a1b829d3ccca1f915
-    state: working
+    state: stopped
     since: '2026-11-24T14:04:31+00:00'
-    state_at: '2026-11-24T23:50:09.155000+00:00'
+    state_at: '2026-11-25T00:00:15.543000+00:00'
     context: 293787
     context_at: '2026-11-25T00:02:10+00:00'
   step_why:
@@ -45789,9 +45789,9 @@ entries:
     decision: D548
   owner:
     agent: a499e0baf988614d6
-    state: working
+    state: stopped
     since: '2026-11-24T23:45:01+00:00'
-    state_at: '2026-11-24T23:45:01+00:00'
+    state_at: '2026-11-24T23:54:43.818000+00:00'
   handoff:
     state: 'Kit cleaned of project history (one squashed commit 1706c88) and public at github.com/joaquin-iturriza/orchestrator-kit,
       main at d2681fb with on-cluster fixes. Private toy repo github.com/joaquin-iturriza/orchestrator-kit-toy (a818ed5).
@@ -45970,7 +45970,7 @@ entries:
     agent: a8af961df29d56c2e
     state: working
     since: '2026-11-24T23:40:11+00:00'
-    state_at: '2026-11-24T23:40:11+00:00'
+    state_at: '2026-11-25T00:01:50.086000+00:00'
     context: 203507
     context_at: '2026-11-25T00:02:59+00:00'
   designs:
