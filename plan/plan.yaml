@@ -43626,8 +43626,6 @@ entries:
       sec:noisescale and fig:llmcmp_heldout) and the repo-reviewer advances over the merge d75c664b9'
     5: 'Lab trial (DeepSeek, Qwen) on real instances of the largest routable kinds, under a reviewed design: correct rate
       against our own output and tokens saved per instance; proposal of what to route'
-    6: Commit par:labllm3 and fig:labllm3 (token share, D555 saving; only my hunk of docs/results.tex) at the token_share.py
-      commit that prints its claims, once the repo-reviewer passes its overdue backlog
   done_when: null
   notes_ref: par:labllm1
   match: zz_labllm_*
@@ -44182,7 +44180,6 @@ entries:
     '5': 'detach job wake_review_replay_qwen (Qwen half, running); DeepSeek half when it answers (500 at 2026-11-25T00:19
       UTC): python3 tools/detach.py --entry lab_llm_trial --name wake_review_replay_deepseek --each ''python3 tools/lab_wake_trial.py
       run --models deepseek'' --each ''python3 tools/lab_wake_trial.py reviews-run --models deepseek'''
-    '6': the repo-reviewer on its overdue backlog (launched 2026-11-25)
   findings:
   - at: '2026-11-23T19:55:22+00:00'
     text: 'Local batch width cut from 6 parallel opencode streams to 2 (D531): 6 streams of opencode sessions (~350-400 MB
@@ -44362,11 +44359,6 @@ entries:
       if:
       - 'a kind passes at our check''s level with a cheap check: propose routing it, tokens saved and error rate'
       - 'none passes: report which failed and how, no route'
-    6:
-      feeds: how many tokens the routed work saves (Joaquin's question, D551, D555)
-      if:
-      - 'repo-reviewer passes: commit tool and paragraph, verify_claims passes'
-      - 'repo-reviewer blocks on token_share.py or lab_wake_trial.py: fix, re-check with the same reviewer'
 - id: critical_batch
   title: Critical batch size from the gradient noise scale
   question: What is the critical batch size of our canonical setup, measured from the gradient noise scale B_simple = tr(Sigma)/|G|^2
