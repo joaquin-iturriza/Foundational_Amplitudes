@@ -44837,10 +44837,9 @@ entries:
     2: 'D560: explain why B_simple (~55 events) sits ~80x below the scan''s B_crit (~4420), explain the batch-128 gain of
       the Z+4g fine-tunes (par:ftm_*, zng4g_ftnoset_b128) against the scan, and give a batch rule usable before a run, checked
       on both settings (existing data first; new jobs only under a passed design)'
-    3: 'D560 part B, Z+4g arm (secondary): read smoke FA-ccin2p3-0ac97e10 (scripts/job_cbs_update_zng.sh smoke, d2d9efc9b:
-      every stage, noise_scale.json with dL_b64..dL_b1024), then site pick and submit the full run (job_cbs_update_zng.sh
-      full, target upd_noise_zng_adam 0.3 h), then read B_dL over its stable phase against the Adam two-batch B_crit 87-261
-      (band [87/2, 261x2])'
+    3: 'D560 part B, Z+4g arm (secondary): full run FA-ccin2p3-cedaa6dd (job_cbs_update_zng.sh full, Adam hp1152, target 1.0
+      h, limit 1:45; smoke FA-ccin2p3-0ac97e10 clean; sigma stage without noise reads, 7677e3d67): read B_dL over its stable
+      phase against the Adam two-batch B_crit 87-261 (band [87/2, 261x2])'
     4: 'D563: the six Z+4g 1e4-event searches at 50 epochs (Muon scratch, Adam scratch, Fn; batch 2048 and 128; 19/19/16 and
       19/16/16 trials), design passed 15:0x by a4f3d7192edf30268, lr windows by HPO rule 2 at 9e28b161d (header nit 584ba9b77),
       driven by sweep/drive.py (detached zng_ep50_searches, log ~/.local/share/ccorch/detached/20261125-150854_zng_ep50_searches.log),
@@ -45756,8 +45755,8 @@ entries:
     3:
       feeds: 'D560: whether the dL rule extends to repeated-data runs or is restricted to fresh data'
       if:
-      - 'smoke ran every stage: submit the full Z+4g run'
-      - 'smoke broke: read its log, fix, resmoke'
+      - 'B_dL within [87/2, 261x2]: the update-based rule holds on repeated data'
+      - 'B_dL outside the band: the rule is limited to fresh data; report both'
     4:
       feeds: 'D563: is the batch-128 gain at 400 epochs a horizon effect'
       if:
