@@ -45843,8 +45843,8 @@ entries:
       - 'r50 > 1.22: the gain persists at 50 epochs'
   step_waits:
     '2': FA-ccin2p3-3e856594
-    '3': detached cedaa6dd_fetch (site fetch of FA-ccin2p3-cedaa6dd's noise_scale.json; first fetch timed out on CC ssh);
-      then python analysis/critical_batch/dl_read.py <noise_scale.json> zng4g_update_bdl --ref 87 261 (4ab0987c8)
+    '3': detached cedaa6dd_fetch (site fetch of the Z+4g update run's noise_scale.json; the first fetch timed out on CC ssh);
+      then dl_read.py --ref 87 261 (4ab0987c8)
     '4': detached driver zng_ep50_searches (pid 1376403, sweep/drive.py, 105 trials)
     '1': steps 2, 3 and 4 (FA-ccin2p3-3e856594, FA-ccin2p3-cedaa6dd, driver zng_ep50_searches)
   targets:
