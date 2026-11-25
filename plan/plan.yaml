@@ -40978,7 +40978,7 @@ entries:
     decision: D553
   owner:
     agent: aa15d8a3186c27693
-    state: working
+    state: closed
     since: '2026-11-25T17:01:09.151000+00:00'
     state_at: '2026-11-25T18:31:32.332000+00:00'
     context: 274312
@@ -41701,42 +41701,40 @@ entries:
     '17': FA-lxplus-294e9e5e FA-lxplus-49899ef8
     '18': FA-ccin2p3-996866f8
   handoff:
-    state: 'Part (a) DONE, part (c) DONE. Part (b) his setup: 16 heads done; 32 FA-ccin2p3-e9dfa8b9 and 64 FA-ccin2p3-623a3af6
-      RUNNING, 120 FA-ccin2p3-f0b997a2 PENDING (steps 12-14: score with job_llm_score.sh REREAD, redraw the ONE all-arms figure
-      heldout_per_process.py, hand back). Step 8 (our-setup widths): smokes FA-ccin2p3-8acd3fc1/-39f4ab2e/-e5265194/-e1d1fbaf
-      PENDING on CC; then measured GPU-h to Joaquin if above 100 (D536). Step 15 reconciliation DONE (finding 2026-11-25:
-      pooled bias^2/MSE on the 43 new 0.85-0.89 every arm, error_split.py @65cd9d92e; level networks = the 10-22 D83 result
-      re-read; earlier diagram/content tests measured shape or in-distribution, none a new-family level). Step 16: levelfile
-      merged (8f1aee1e0, tests/test_level_file.py), config sweep/sweep_config_llmcmp_level_file.yaml @344f87fd3; smoke FA-ccin2p3-8dbfeb52
-      on CC (wait set). When it ends: job_llm_score.sh REREAD=<smoke run dir>, check the log''s ''level_file: ... sigma =''
-      equals trial 5''s 5.316 and read the ''median |own mean - level|'' (scale), the held-out parent line kind level_file;
-      key-by-key diff of run.py --cfg job against trial 5''s config.yaml (trial 5''s run dir on CC not yet located: it is
-      a detached trial, look under runs/llmcmp_a_adamw_const/); plan target; then the run: sweep/trial_job.sh --detached --hp-idx
-      7001 --t-steps 60840 --sweep-config sweep/sweep_config_llmcmp_level_file.yaml with --hp training.lr=1.2437e-3 training.regularization_lambda=1.123e-10
-      training.cosanneal_warmup_frac=0.1635 ema=true training.ema_decay=0.99893, placed by site pick, --hdr=--time from trial
-      5''s wall x1.3. Step 16 is a diagnostic of whether the network keeps a given level, not a method (coordinator after
-      D566). Step 17 (D566): candidate (A) dead end on existing data (perevent_level.py --surrogate @0e3e3fe35: median level
-      error 6.3 / 3.1 vs 0.45 and the regressor''s 0.047); (B) per-event level map, design PASSED 16:32, CPU job FA-ccin2p3-3bdfcc32
-      (CC htc, 3 h limit, target 1 h). When it ends: site logs FA-ccin2p3-3bdfcc32 -n 100000, take the PEL_JSON line into
-      analysis/catalog_daniel/data/perevent_level.json, run perevent_level_fig.py (committed, not yet run on data: look at
-      the PNG, check_caption), hand back reads (i)-(iii) per candidate; (C) GPU arm only if B passes (level error <= 0.19
-      and flat shift below the regressor''s by > 2x bootstrap noise), its own design.'
-    decisions: 'Joaquin''s: D522-D528, D536, D537, D553, D564, D566. Mine (re-justify): (i)-(ix) of the previous hand-off;
-      (x) step 16''s config as a separate sweep config (llmcmp_level_file) so its run dir is named, as part (b) did; (xi)
-      step 16 smoke resent to CC because lxplus became unreadable (condor 401, AFS permission denied twice), not a scope change;
-      (xii) D566 (A) settled from surrogate.json moments instead of a job (reviewer FIX); (B) gate 0.19 = diagram regressor
-      ensemble top (keeps the diagram gain), shift bar = the regressor''s own shift on the same events, 2x bootstrap noise.'
-    ruled_out: As before; plus D566 (A), the diagram propagator factor per event (dead end recorded); merging with the trunk
-      backlog over threshold (git_verify_guard; the reviewer itself must advance at a branch tip); git stash -u in the shared
-      checkout (guard); site sync over others' untracked files uses --allow-dirty.
-    running: 'FA-ccin2p3-e9dfa8b9, FA-ccin2p3-623a3af6, FA-ccin2p3-f0b997a2 (part b); FA-ccin2p3-8acd3fc1/-39f4ab2e/-e5265194/-e1d1fbaf
-      (step 8 smokes); FA-ccin2p3-8dbfeb52 (step 16 smoke); FA-ccin2p3-3bdfcc32 (step 17 CPU); FA-lxplus-02e87d7e (step 16
-      smoke, unreadable: lxplus condor 401 / AFS token expired, needs Joaquin''s relogin ssh -O exit lxplus && ssh -fN lxplus;
-      cancel it once lxplus reads work, superseded by the CC smoke).'
-    files: analysis/catalog_daniel/{perevent_level.py, perevent_level_fig.py, data/perevent_level_surrogate.json, data/level_file_B_diag.json},
-      scripts/job_perevent_level.sh, sweep/sweep_config_llmcmp_level_file.yaml, tests/test_level_file.py, analysis/llm_compare/{error_split.py,
-      level_source.py, heldout_per_process.py, data/split/error_split.json, data/step15_level_source.json}
-    written: '2026-11-25T16:46:57+00:00'
+    state: 'Part (a) DONE, part (c) DONE. Part (b) his setup: 16 heads read; 32 heads FA-ccin2p3-e9dfa8b9 COMPLETED (val best
+      4.06e-4 @54756, spike at ~36500; data/b_val_h32.txt, figs/b_width_curves.png sent), its score FA-ccin2p3-2c3a581b (EVENTS=1)
+      queued on CC: step 12 readout = copy llm_score_{seen,heldout}.json to data/b_h32_*.json and data/split/b_h32_heldout.json,
+      control_score.py vs trial 5, heldout_per_process.py (mse, shape), error_split.py. 64 heads FA-ccin2p3-623a3af6 and 120
+      heads FA-ccin2p3-f0b997a2 RUNNING (steps 13/14; step 14 text names the removed FA-lxplus-25e06bc1, the live 120-head
+      run is f0b997a2). Step 8: smokes FA-ccin2p3-8acd3fc1/-39f4ab2e RUNNING, -e5265194/-e1d1fbaf PENDING. Step 16: smoke
+      passed all stages (sigma 5.3165, held-out parent level_file); run FA-ccin2p3-89671610 queued on CC (trial 5 exact HPs,
+      --trial-idx 1, one --hp per HP, 26 h limit, target 19.9 h); when it ends: job_llm_score.sh REREAD, read against trial
+      5 and level_source.py''s post-hoc substitution. Step 17 (D566 B): tree FA-lxplus-294e9e5e and 2x64 network FA-lxplus-49899ef8
+      (perevent_level.py --model mlp, design passed 17:11) RUNNING on lxplus; read PEL_JSON lines into data/perevent_level.json
+      and perevent_level_mlp.json, perevent_level_fig.py, gate 0.19 + shift bar; Joaquin''s ''why a boosted tree?'' answered
+      (no reason beyond CPU; trees cannot extrapolate; l.7814 0.32 vs network 0.045). D567 (1) and (2) DONE and handed back
+      (figs/all_arms_shape_heldout_per_process.png, figs/shape_dists.png). Step 18 (D567 follow-up): gg->ttH split into two
+      groups ~±3 in both our-setup arms; re-read FA-ccin2p3-996866f8 (our searched, --events-out with log F @63ffc44ab) queued:
+      fetch runs/llmcmp_c_qperp/trial_1860/llm_events_heldout.csv (site --timeout 300 fetch --dir, one at a time on lxplus;
+      CC normal), plot pred - true against log_factor on gg->ttX.'
+    decisions: 'Joaquin''s: D522-D528, D536, D537, D553, D564, D566, D567 (shape: ''It would be nice to see also how good
+      the different models get the shape of the distribution''). Mine (re-justify): (i)-(xii) of the previous hand-offs; (xiii)
+      D566 (B) as the 2x64 network beside the tree, untuned vs untuned until a matched search (reviewer FIX 1), alpha scaled
+      1e-2*4096/200 to keep sklearn''s per-sample L2; (xiv) D567 (2) process choice: per family the process with the largest
+      worst/best MSE-bias^2 ratio, the 3 families where it is largest, legend in the spare cell; (xv) event dumps as CSV (site
+      fetch takes *.csv, not .npz), 5000 events per process; (xvi) placement by site pick: re-reads and step 17 on lxplus
+      (run dirs copied CC->lxplus by site copy), step 16 run on CC after lxplus memory ceiling (12000 MB for 4 CPUs).'
+    ruled_out: 'As before; plus: the untuned his-setup control (FA-lxplus-cb9273f1) cannot be re-read, its models/ was pruned
+      2026-11-24 16:25 (to a worker); CC for catalog_daniel per-event jobs (no train-role pools there); parallel site fetch
+      on lxplus EOS (times out; one at a time with --timeout 300).'
+    running: FA-ccin2p3-2c3a581b (step 12 score), FA-ccin2p3-623a3af6, FA-ccin2p3-f0b997a2 (part b), FA-ccin2p3-8acd3fc1/-39f4ab2e/-e5265194/-e1d1fbaf
+      (step 8 smokes), FA-ccin2p3-89671610 (step 16 run), FA-lxplus-294e9e5e, FA-lxplus-49899ef8 (step 17), FA-ccin2p3-996866f8
+      (step 18)
+    files: analysis/catalog_daniel/{perevent_level.py, perevent_level_fig.py}, scripts/job_perevent_level.sh (PEL_MODEL),
+      tools/llm_score.py (--events-out with log F), scripts/job_llm_score.sh (EVENTS=1), analysis/llm_compare/{heldout_per_process.py
+      (--part shape), error_split.py (shape medians), shape_dists.py, b_width_curves.py, data/b_val_h32.txt, data/events/*.csv
+      (ignored)}, sweep/sweep_config_llmcmp_level_file.yaml
+    written: '2026-11-25T18:33:17+00:00'
   designs:
   - at: '2026-11-22T04:13:14+00:00'
     question: 'Part (a), D525: in the conditions of Suprio''s LLM pID run (D524, D526, D527: our catalog_daniel regeneration
