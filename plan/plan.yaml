@@ -45297,10 +45297,8 @@ entries:
   decisions:
   - D544
   next:
-    2: 'Close the entry: read the site env CPU job 64806476 on CC (call site env ccin2p3 FA again; node from site run ccin2p3
-      FA -- sacct -j 64806476 -o JobID,NodeList,State,ExitCode,Elapsed) against the passed design; the code reviewer''s re-check
-      of the site-tool fixes (run_as_job stale/lost/stuck, login_guard); then plan done cc_login_jobs --writeup 4404e1baa
-      or later'
+    2: Commit the write-up (docs/results.tex hunk in scratchpad rt2_mine.diff, still in the working tree, plus analysis/cc_login/data/site_env_job_64806476.txt)
+      once the repo-reviewer pass lifts the commit gate, then plan done cc_login_jobs --writeup <that commit>
   done_when: null
   notes_ref: null
   match: cc_login_*
@@ -45631,16 +45629,13 @@ entries:
       1.26.4 after (analysis/cc_login/data/site_env_job_64806476.txt): the design''s yes branch, the change stays. Write-up
       sentence added to sec:cc_login_jobs (verify_claims 0 problems), its commit refused while the repo-reviewer backlog is
       overdue (1004/520 lines from other entries; reviewer aa6a431c30051e7ba holds the lock since 01:21).'
-  step_waits:
-    '2': '2026-11-25 00:10 UTC: CC CPU job 64806476 (site env) and the repo-reviewer re-check'
+  step_waits: {}
   step_why:
     2:
-      feeds: 'D544: every CC script off the login node, site env included'
+      feeds: 'D544: every CC script off the login node, site env included; the entry''s close'
       if:
-      - 'the job ends env ready, exit 0, on an htc node, checkout 6ca993c1a9, torch 2.1.2+cu118 / numpy 1.26.4: keep the change,
-        add a sentence to sec:cc_login_jobs, close after the reviewer''s PASS'
-      - 'a step fails or the hash is behind: fix the tool and rerun the same call; a step that cannot run on a compute node
-        goes back to the login node with its reason'
+      - 'the reviewer passes: commit, plan done'
+      - 'the reviewer blocks on another entry''s code: its owner fixes, commit after the re-check passes'
   handoff:
     state: 'Done but for review and close. CC''s three upkeep commands (disk watch, feeder, prune+copies) and the rebalancer''s
       CC inventory run as htc CPU jobs via site run --recurring; site run on CC refuses unlisted scripts and caps other commands
