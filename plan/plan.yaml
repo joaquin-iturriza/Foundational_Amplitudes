@@ -45720,7 +45720,7 @@ entries:
     feed_capped, prune_site; item checks; agents'' long reads) run as short Slurm CPU jobs on htc instead, with the login
     node keeping only sbatch/squeue/sacct and reads of a few seconds, so CC''s policy (no non-interactive scripts on login
     servers) holds?'
-  status: running
+  status: done
   quotes:
   - said_at: '2026-11-24T17:20:01.269000+00:00'
     text: Okay but I don't understand, does it make sense to move the recurring scripts to slurm? I'm not sure how that would
@@ -46105,6 +46105,7 @@ entries:
     units: null
     start: '2026-11-24T23:36:37+00:00'
     at: '2026-11-24T23:36:37+00:00'
+  writeup: 4de15dfe1
 - id: orchestrator_kit
   title: 'Standalone shareable kit: main session as orchestrator of subagents, jobs on several clusters'
   question: Can the general machinery behind our setup (the site tool for multi-cluster submission, sync, placement and copy;
