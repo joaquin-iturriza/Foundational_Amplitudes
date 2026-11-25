@@ -28,7 +28,7 @@ global best is kept wherever it ran.
     python sweep/prune.py [PREFIX ...] [--apply] [--caches] [--submit-logs] [--cache-days 30] [--every HOURS]
 --every: skip this run if the last applied one on this site was less than HOURS ago (for the supervisor's upkeep).
 """
-import argparse, errno, glob, json, os, re, shutil, sys, time
+import argparse, errno, fnmatch, glob, json, os, re, shutil, sys, time
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, REPO)
@@ -156,8 +156,27 @@ def finished(sweep, q, dags=frozenset()):
 RECENT_H = 6       # a trial dir written to this recently may belong to a live run: never touched
 
 
-def plan_sweep(sweep, q, protect, apply, dags=frozenset(), exclude=()):
+OPEN_STATUS = ("running", "waiting_user", "held")
+
+
+def open_globs(plan_file=None):
+    """Sweep-name globs (`match`) of the plan entries still open: what they ran is still read (llm_compare's untuned
+    control lost its model on 2026-11-24 to rule 2 while the entry was open). An unreadable plan raises: no blind prune."""
+    import fnmatch, yaml
+    d = yaml.safe_load(open(plan_file or os.path.join(REPO, "plan", "plan.yaml")))
+    return [(e["id"], g.strip()) for e in d["entries"] if e.get("status") in OPEN_STATUS
+            for g in (e.get("match") or "").split(",") if g.strip()]
+
+
+def plan_sweep(sweep, q, protect, apply, dags=frozenset(), exclude=(), holds=()):
     if any(sweep.startswith(x) for x in exclude):
+        return None
+    import fnmatch
+    hold = [i for i, g in holds if fnmatch.fnmatchcase(sweep, g)]
+    if hold:
+        for root in RUN_ROOTS:
+            for td in sorted(glob.glob(os.path.join(siteconf.PROJECT_DIR, root, sweep, "trial_*"))):
+                print("PROTECTED %s (open plan entry %s)" % (os.path.relpath(td, siteconf.PROJECT_DIR), hold[0]))
         return None
     tf = top_fidelity(sweep)
     res = results(sweep)
@@ -347,6 +366,7 @@ def main():
     q = _queue()                     # raises on a failed scheduler query: nothing is pruned blind
     dags = live_dags()
     protect = parents() | delta_runs()
+    holds = open_globs()
     names = set()
     for root in RUN_ROOTS:
         for d in glob.glob(os.path.join(siteconf.PROJECT_DIR, root, "*")):
@@ -355,7 +375,7 @@ def main():
                 names.add(n)
     total, nsw = 0, 0
     for n in sorted(names):
-        man = plan_sweep(n, q, protect, a.apply, dags, a.exclude)
+        man = plan_sweep(n, q, protect, a.apply, dags, a.exclude, holds)
         if man and man["freed_bytes"]:
             total += man["freed_bytes"]; nsw += 1         # its PRUNE line was printed by plan_sweep, before deleting
     print("SUMMARY %s %s: %d sweeps, %.1f GB %s; %d parent trials protected" % (
@@ -368,7 +388,8 @@ def main():
             print("PRUNE_WARN stamp %s not written: %s" % (stamp, e), flush=True)
     if a.submit_logs:
         sl = sum(submit_logs(n, a.apply) for n in sorted(names)
-                 if finished(n, q, dags) and not any(n.startswith(x) for x in a.exclude))
+                 if finished(n, q, dags) and not any(n.startswith(x) for x in a.exclude)
+                 and not any(fnmatch.fnmatchcase(n, g) for _, g in holds))
         print("SUMMARY submit logs: %.2f GB %s" % (sl / 1e9, "freed" if a.apply else "to free (estimate)"))
     if a.caches:
         c = caches(a.cache_days, a.apply)

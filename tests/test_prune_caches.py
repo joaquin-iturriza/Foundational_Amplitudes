@@ -16,3 +16,16 @@ def test_caches_keeps_pools(tmp_path, monkeypatch):
     prune.caches(30, True)
     assert all((d / n).exists() for n in names + kept)   # a recipe (catalog_daniel_all) names dc_bb_bb
     assert not (d / "other.npy").exists() and not (d / "dc_notaprocess_x.npy").exists()
+
+
+def test_open_entry_sweeps_protected(tmp_path, monkeypatch, capsys):
+    plan = tmp_path / "plan.yaml"
+    plan.write_text("entries:\n- {id: a, status: running, match: 'llmcmp_*,x_*'}\n- {id: b, status: done, match: 'old_*'}\n")
+    holds = prune.open_globs(str(plan))
+    assert holds == [("a", "llmcmp_*"), ("a", "x_*")]
+    monkeypatch.setattr(prune.siteconf, "PROJECT_DIR", str(tmp_path))
+    for sw in ("llmcmp_a", "old_a"):
+        (tmp_path / "runs" / sw / "trial_0001").mkdir(parents=True)
+    assert prune.plan_sweep("llmcmp_a", {}, set(), False, holds=holds) is None
+    assert "PROTECTED runs/llmcmp_a/trial_0001 (open plan entry a)" in capsys.readouterr().out
+    assert prune.plan_sweep("old_a", {}, set(), False, holds=holds) is not None
