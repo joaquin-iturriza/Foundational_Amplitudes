@@ -49246,6 +49246,47 @@ entries:
       0.64 dec, confirmed. x0 0.009 is below every pool minimum (0.01107 u u~ g, 0.00923 Z+4g train). 0 GPU-h. Searched: input_soft_x0,
       below/outside the trained range, eval-only, REBUILD_SET, rescale (results.tex, decisions D374/D539/D552/D561, entry
       dead ends): no prior test below the trained range.'
+  - at: '2026-11-25T22:09:49+00:00'
+    question: 'D561 step 4: in the D392 finale setup, does the rescale below x0=0.009 with neutrinos exempt (model.input_soft_skip_neutrinos:
+      a soft neutrino has no soft singularity) (a) leave every finale, Z+4g and u u~ g training/validation/test momentum unchanged,
+      so finale training equals no-rescale training, and (b) keep the u u~ g soft-limit gain measured for the plain x0=0.009
+      rule (par:selres_support)? u u~ g has no neutrino, so (b) must reproduce that result exactly; it is a pipeline proof
+      that the new flag reaches the model and changes nothing where there is no neutrino.'
+    prior: 'par:selres_support @d424ea5b0 (support_read.json): plain x0=0.009 rule on the 6 no-rescale u u~ g runs, YES at
+      both sizes, deepest soft kit bin 4924->1.44 (1e4), 7580->0.93 (1e5). support_minima.json: below x=0.009 in every finale
+      pool only PDG 12 (u d~ > e nu g: 410 train, 30 val, 41 test), Z+4g train min 0.00923, u u~ g min 0.01107; step 3 set
+      x0=1e-5 (finale min 1.99e-5, a neutrino) which makes the rule inert on the kit''s x>=1e-5 soft bins. Searched skip_neutrinos,
+      neutrino, soft_x0, support in results.tex, plan, decisions: no prior neutrino exemption.'
+    measure: '(a) Per pool of the 28-process finale recipe (84 pools, train/val/test as training resolves them), the Z+4g
+      and u u~ g pools: the number of momenta changed by wrappers._soft_rescale(eps=1e-8, x0=0.009, keep=wrappers._neutrinos(ids))
+      itself (moved_x0_0.009_nu_exempt, added to the minima job, support_rule.py minima), with the per-PDG counts below 0.009
+      kept. (b) Per u u~ g run (chosen trial + seeds 43/44 at 1e4 and 1e5): kit log10-MSE of every hard_test and bulk_test
+      stratum without and with REBUILD_SET=model.input_soft_eps=1e-8,model.input_soft_x0=0.009,model.input_soft_skip_neutrinos=true
+      (support_rule.py score --nu, one CPU job per run), read against the stored rule and off arms of support_kit.json (support_rule.py
+      read_nu).'
+    check: '(a) Checked locally on a synthetic pool (an e+e- event with a soft nu_e at x=5e-5 and one with a soft gluon at
+      x=5e-5): moved=1 (the gluon only), so the count moves with the exemption. tests/test_input_reps.py::test_soft_rescale_skip_neutrinos:
+      the mask picks exactly PDG +-12,14,16, a kept momentum is unchanged, others equal the x0 rule. (b) The rule arm moves
+      the soft strata on these runs (4924->1.44, 7580->0.93, support_read.json), so a broken flag build (rule not applied)
+      would show.'
+    fixed: 'The 6 existing no-rescale u u~ g runs, unretrained (ftmech_d539_uug_{1e4,1e5}_off_b2048 trial_1559/trial_0020
+      + _s43/_s44), their kit files and strata as D539, tools/kit_predict.py at KIT_THREADS 1, 16G CPU jobs (scripts/job_support_rule.sh);
+      pools as recipes/transfer_finale.yaml and the two runs'' logs (support_rule.py LOGS). Z+4g kit not rescored: none of
+      its kit events lies below 0.009 (support_kit.json: ''no kit event below x0'' for all 6 runs) and it has no neutrino.
+      CPU only, 0 GPU-h.'
+    control: (b) The same runs' plain x0=0.009 rule arm and off arm scored earlier with the same script and kit_predict (support_kit.json);
+      the off arm of the new jobs must reproduce the earlier off arm. (a) The per-PDG counts below 0.009 from the same pass.
+    seeds: 42 (each search's chosen trial), 43, 44, as the passed D561 design.
+    outcome: 'Broken pipeline: a rule arm whose REBUILD_SET_MODEL lacks input_soft_skip_neutrinos=true, or an off arm off
+      by >=0.01 dec from support_kit.json -> fix and rescore. YES: (a) moved=0 in every finale, Z+4g and u u~ g pool AND (b)
+      every stratum''s neutrino-exempt rule score equals the plain rule''s within 0.01 dec in all 6 runs -> finale keeps x0=0.009
+      with the exemption; write up in par:selres_support; close. NO-(a): a pool with moved>0 -> report the pool, PDG and count,
+      revert the finale to x0=1e-5. NO-(b): a stratum differing by >=0.01 dec -> the flag changes non-neutrino momenta (a
+      bug): find and fix, rescore.'
+    sources: 'x0=0.009 and the neutrino exemption <- D561 ''not use it where it hurts, and only where it helps'' and step
+      4; moved=0 <- D561 ''not use it where it hurts'' with no rescale as its reference: training equals no rescale only when
+      no trained momentum changes; 0.01 dec <- measured: kit_predict pipeline tolerance at KIT_THREADS 1 (passed D561 design);
+      0 GPU-h, 7 CPU jobs <- D552 budget, CPU only'
   targets:
   - batch: smoke
     wall_h: 0.1
