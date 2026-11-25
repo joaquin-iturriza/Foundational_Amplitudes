@@ -40818,6 +40818,10 @@ entries:
       run''s 6.79e-4, then job_llm_score.sh RUN=runs/llmcmp_a_adamw_const/trial_9000 EVENTS=1, copy the scores to data/ under
       the untuned arm''s names, redraw heldout_per_process.py (all arms, --part shape) and shape_dists.py with the untuned
       arm'
+    20: '20: D566 (B) matched search (step 17''s passed design, fail on (i)): an equal-size search for the per-event network
+      (width, depth, alpha, lr, batch) and the boosted tree (learning rate, leaves, iterations, l2) over their coupled spaces,
+      cross-fitted by relabelling class on the 1352 training processes (never on the 43 new), best against best on the level
+      error and flat shift of step 17; its own design and review, CPU jobs on lxplus (catalog_daniel train-role pools)'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -41038,6 +41042,13 @@ entries:
       if:
       - 'best val within the seed spread of 6.79e-4: score it and add the untuned arm to the shape figures'
       - 'best val far from 6.79e-4: report the retrain as not reproducing, read the curves before scoring'
+    20:
+      feeds: 'D566: whether a per-event map can place a new family''s level as well as the per-process diagram regressor (0.047)
+        while following the sample better than a constant'
+      if:
+      - 'best network or tree <= 0.19 on the 43 new with its shift below the regressor''s by more than 2x noise: marriage
+        found, go to (C), g fed to LLoCa per event, its own design'
+      - 'both stay above 0.19 after the search: record (B) as a dead end for level placement; report the shift result alone'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
