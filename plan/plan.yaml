@@ -44181,6 +44181,7 @@ entries:
     '5': the lab server answering again (503 from both models at 2026-11-25T00:05 UTC); then python3 tools/detach.py --entry
       lab_llm_trial --name wake_review_replay --each 'python3 tools/lab_wake_trial.py run' --each 'python3 tools/lab_wake_trial.py
       reviews-run'
+    '6': the repo-reviewer on its overdue backlog (launched 2026-11-25)
   findings:
   - at: '2026-11-23T19:55:22+00:00'
     text: 'Local batch width cut from 6 parallel opencode streams to 2 (D531): 6 streams of opencode sessions (~350-400 MB
