@@ -46884,8 +46884,7 @@ entries:
     at: '2026-11-25T02:29:07+00:00'
   step_waits:
     '1': 'a reviewer: notes-editor re-check of par:selres_stage1 (staged), then commit the write-up'
-    '2': 'the detached driver selres_stage2_drive (sweep/drive.py, 8 searches; log ~/.local/share/ccorch/detached/20261125-032933_selres_stage2_drive.log):
-      its end event'
+    '2': the detached submission selres_stage2_seeds_kit (16 seed runs + 6 kit on CC); its run ids then replace this wait
   handoff:
     state: 'Design passed (two stages). Smoke (D395) passed: FA-ccin2p3-2f5d1f17 + kit 9c1687f8/5debc82a wrote config flags,
       fixed.json val_mse_curve, sigma_stage, plots, kit_result.json. Stage 1 (36 runs, seed_chunks/stage1/<run>.txt @02c31b393):
