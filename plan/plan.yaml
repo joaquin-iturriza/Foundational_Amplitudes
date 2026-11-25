@@ -44575,7 +44575,7 @@ entries:
     - FA-ccin2p3-225d38ea
     - FA-ccin2p3-6721d3c2
     - FA-lxplus-35cf0097
-    commit: 145d14839
+    commit: 5109b8182
     paths:
     - analysis/critical_batch/cbs_read.py
     - analysis/critical_batch/data/FA-ccin2p3-225d38ea_noise_scale.json
@@ -44586,6 +44586,7 @@ entries:
     - experiment.py
     - noise_scale.py
     - scripts/job_catalog_v3_short.sh
+    - scripts/job_cbs_update_zng.sh
     - sweep/sweep_config_cbs_b16384.yaml
     - sweep/sweep_config_cbs_b2048.yaml
     - sweep/sweep_config_cbs_b32768.yaml
