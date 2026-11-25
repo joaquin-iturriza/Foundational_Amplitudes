@@ -41439,6 +41439,15 @@ entries:
       analysis/llm_compare/figs/b_width_curves.png (b_width_curves.py, data b_val_h16.txt @5129234f0). Score: site pick allotted
       lxplus; run dir copied CC->lxplus (site copy, 187 MB); FA-lxplus-df30bfe5 (job_llm_score.sh REREAD, code @58804b477);
       held-out figure in Suprio''s layout when it ends.'
+  - at: '2026-11-25T12:36:23+00:00'
+    text: '2026-11-25 (E9105) part (b) 16 heads read: FA-ccin2p3-dcb66b14 scored by FA-ccin2p3-3b19137a (tools/llm_score.py
+      REREAD, EMA applied, 1e4 test events per process). Pooled test RMSE of log|M|^2, 16 heads vs trial 5 (8 heads): seen
+      0.103 vs 0.117 (MSE ratio 16/8 = 0.78), held out 0.990 vs 1.003 (0.97), relabels 0.192 vs 0.241 (0.64), new 1.756 vs
+      1.767 (0.99); median per-process MSE relabels 0.0102 vs 0.0208, new 1.457 vs 1.144; below the LLM on 87/96 relabels
+      (8 heads 77) and 11/43 new (9). LLM 0.321 / 0.721 / 0.341 / 1.193. Every MSE ratio is inside the 1.38 seed margin except
+      the median relabel MSE (16/8 = 0.49): width 8->16 improves interpolation, not extrapolation. Source: control_score.py
+      --tag a_trial5 b_h16 --out b_h16_vs_a5 @9b4d41705; figure analysis/llm_compare/figs/b_h16_heldout_per_process.png (heldout_per_process.py)
+      and b_width_curves.png.'
   step_waits:
     '5': part (c) driver llmcmp_c_qperp_drive5 ending (its detach DONE event; wave 3 of 2 trials after trials 3 -5.816 and
       5 -5.938 of wave 2)
