@@ -65,6 +65,7 @@ def main():
                   "".join(f" {t} {r[t]['median']:.3g} ({r[t]['below_llm']}<, r {r[t]['median_ratio_to_llm']:.2g})"
                           for t in a.tag))
     print("wrote", p)
+    print(json.dumps(out))
 
 
 if __name__ == "__main__":
