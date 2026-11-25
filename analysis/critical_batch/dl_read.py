@@ -41,7 +41,8 @@ def window(rs, bs):
     m = D.mean(0)
     f = fit(m, bs)
     out = {"step_lo": rs[0]["step"], "step_hi": rs[-1]["step"], "n_reads": len(rs),
-           "dL": {str(b): float(v) for b, v in zip(bs, m)}}
+           "dL": {str(b): float(v) for b, v in zip(bs, m)},
+           "A": {str(b): float(np.mean([sum(v for k, v in r.items() if k.endswith(f"_A_b{b}")) for r in rs])) for b in bs}}
     if f is None:
         return {**out, "status": "dL<=0"}
     out.update(status="above range" if np.isinf(f[0]) else "fitted", B_dL=float(f[0]), dL_inf=float(f[1]))
@@ -83,8 +84,9 @@ def figure(res, base):
     fig, (axB, axD) = ps.figure(ncols=2)
     mid = lambda w: 0.5 * (w["step_lo"] + w["step_hi"])
     fw = [w for w in res["windows"] if w["status"] == "fitted"]
-    axB.errorbar([mid(w) for w in fw], [w["B_dL"] for w in fw], yerr=[w.get("B_dL_se", 0) for w in fw], fmt="o",
-                 color=ps.C.vermillion, label="update's critical batch")
+    if fw:
+        axB.errorbar([mid(w) for w in fw], [w["B_dL"] for w in fw], yerr=[w.get("B_dL_se", 0) for w in fw], fmt="o",
+                     color=ps.C.vermillion, label="update's critical batch")
     lo, hi = res["ref"]
     axB.axhline(lo, color=ps.C.blue, ls="--", label="two-batch critical batch, range")
     axB.axhline(hi, color=ps.C.blue, ls="--")
@@ -100,20 +102,26 @@ def figure(res, base):
     axB.set_xlabel("training step")
     axB.set_ylabel(r"$B_{\rm dL}$ (events)")
     ps.legend(axB, "upper left")
-    steps = [mid(w) for w in fw]
-    norm = mpl.colors.Normalize(min(steps), max(steps)) if steps else None
     cmap = mpl.colormaps["viridis"]
     bs = np.array(res["b"], float)
     xx = np.geomspace(bs.min(), bs.max(), 50)
-    for w in fw:
+    allw = res["windows"]
+    steps = [mid(w) for w in allw]
+    norm = mpl.colors.Normalize(min(steps), max(steps)) if steps else None
+    for w in allw:
         c = cmap(norm(mid(w)))
-        axD.plot(bs, [w["dL"][str(int(b))] / w["dL_inf"] for b in bs], "o", color=c)
-        axD.plot(xx, 1 / (1 + w["B_dL"] / xx), color=c)
-    axD.plot([], [], "o", color=ps.C.grey, label="measured")
-    axD.plot([], [], color=ps.C.grey, label=r"fit $1/(1+B_{\rm dL}/b)$")
+        axD.plot(bs, [w["dL"][str(int(b))] for b in bs], "o-", color=c)
+        axD.plot(bs, [w["A"][str(int(b))] for b in bs], "s--", color=c, mfc="none")
+        if w["status"] == "fitted":
+            axD.plot(xx, w["dL_inf"] / (1 + w["B_dL"] / xx), ":", color=c)
+    axD.plot([], [], "o-", color=ps.C.grey, label=r"loss decrease $\Delta L(b)$")
+    axD.plot([], [], "s--", color=ps.C.grey, mfc="none", label=r"first-order part $A(b)$")
+    if fw:
+        axD.plot([], [], ":", color=ps.C.grey, label=r"fit $\Delta L_\infty/(1+B_{\rm dL}/b)$")
+    axD.axhline(0, color="black", label="no change")
     axD.set_xscale("log")
     axD.set_xlabel(r"events per update $b$")
-    axD.set_ylabel(r"$\Delta L(b)/\Delta L_\infty$")
+    axD.set_ylabel(r"loss change per step")
     ps.legend(axD, "upper left")
     if norm:
         ps.colorbar(axD, mpl.cm.ScalarMappable(norm=norm, cmap=cmap), "training step")
