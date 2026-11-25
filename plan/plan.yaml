@@ -43709,6 +43709,30 @@ entries:
     sources: bias^2 > residual variance <- the exact two-part split of MSE, naming the larger part, no tuned threshold; 1.38x
       <- the seed spread 10^0.14 (docs/results.tex v4_seed_spread ~l.4485), only to say the 10x gap is not noise; 1e-6 relative
       <- float reproducibility of an unchanged quantity
+    fix_at: '2026-11-25T13:27:24+00:00'
+    fix: '(1) Check 2, the measure does not read what it claims on two of the four arms. The design gets rho and the true
+      std of log|M|^2 from per-process sums of h and z, calling rho affine invariant. On the two part (c) runs (control runs/llmcmp_c_qperp/trial_9000
+      and best FA-ccin2p3-29ce8950) the target is log|M|^2 minus a per-event emission-scale factor (data.target_physics_factor,
+      experiment.py ~l.2026). So h and z are in the factor-removed target space, and the map back to log|M|^2 is not one affine
+      map per process. The factor cancels in pred - true, so bias and residual variance hold. It does not cancel in corr(pred,
+      true) or in std(true log|M|^2), and those are exactly what the ''his target and ours side by side'' comparison reads.
+      Fix: accumulate per process the sums of pred_log and true_log in absolute log|M|^2 (mu_N + sigma h plus the event''s
+      log factor where it is on; the same inverse that check_score_vs_preds.py verified to 0.17060), and compute rho and the
+      true spread from those. Check it once on a part (c) run against its saved sigma_stage/preds_test.npz on the seen set,
+      as check_score_vs_preds.py does. (2) Check 4, the outcome leaves a case unassigned. A process whose residual variance
+      is the larger part while rho^2 is high (a wrong scale or slope) is neither ''Level'' nor ''Shape'' as written, and ''rho^2
+      low'' has no source. Fix: use the exact three-part split MSE = bias^2 + [var(e) - var(t)(1-rho^2)] (removed by the best
+      rescale) + var(t)(1-rho^2) (floor after the best affine map, as hp58''s 1-rho^2 at results.tex ~l.7755), name the largest
+      part per process, and give the next step for each of level, scale and floor. That needs no threshold. (3) Check 5, prior
+      work is incomplete. The same offset-against-floor split (seed-mean absolute offset and floor var(q-t) per held-out pool)
+      was read on catalog_v4 (par:v4_tree_shape, par:v4_loop_groups ~l.4130-4140; level misplacement ~l.1648-1703). The statistics
+      predictor''s level error and spread ratio on the same 43 (fig:zero_shot_parts, ~l.7810-7822: median level error 0.76
+      / 0.32 on the 43) is also missing. Name both with their results and say what is new here (a model trained on his shared
+      z, beside the LLM). (4) Minor: name the part (c) control''s REREAD id (FA-ccin2p3-d34535b0, best checkpoint step 24336).
+      The part (c) best''s full score FA-ccin2p3-c9d44ad3 is in flight on the old tool: say whether this re-read replaces
+      it or runs beside it. Everything else holds: one-seed eval (deterministic, gaps about 10x against the 1.38x seed spread),
+      the existing per-process MSEs (verified: a_trial5 gg->b t~ W+ 25.5, gg->t b~ W- 26.6, b b~->hhh 22.6; b_h16 15.6/16.3/30.2;
+      c_control 31.6/36.6/36.6), the test pools, cost under 2 GPU-h, and no training (loss, HPO and lr checks do not apply).'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
