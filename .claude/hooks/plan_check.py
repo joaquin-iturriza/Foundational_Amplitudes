@@ -216,7 +216,7 @@ def turn_owner_events(path, since):
 def owner_events_of(lines, since):
     """turn_owner_events on transcript lines."""
     import plan
-    out, seen = [], set()
+    out, seen, sent, queued = [], set(), {}, {}
     for ln in lines:
         try:
             m = json.loads(ln)
@@ -234,7 +234,12 @@ def owner_events_of(lines, since):
                     to = (x.get("input") or {}).get("to")
                     if isinstance(to, str) and re.fullmatch(r"a[0-9a-f]{16}", to):
                         out.append((ts, "resumed", to, None))
+                        sent[x.get("id")] = (to, ts)
         r = m.get("toolUseResult")
+        for x in c if isinstance(c, list) else []:
+            if isinstance(x, dict) and x.get("type") == "tool_result" and x.get("tool_use_id") in sent \
+                    and "queued for delivery" in json.dumps(x.get("content")):
+                queued[sent[x["tool_use_id"]][0]] = sent[x["tool_use_id"]][1]   # an agent ending first is resumed with it
         if isinstance(r, dict) and r.get("agentId") and r.get("status") == "async_launched":
             k = re.search(r"plan\.py owner (\S+) --agent", r.get("prompt") or "")
             if k:
@@ -250,6 +255,8 @@ def owner_events_of(lines, since):
                 if status in ("completed", "failed", "killed", "stopped") and key not in seen:
                     seen.add(key)     # one notification, written at its arrival and again when it wakes the turn
                     out.append((ts, "stopped", agent, None))
+    # a stop written after a queued message is interim: the message resumes the agent (its result record may come later)
+    out = [o for o in out if not (o[1] == "stopped" and o[2] in queued and o[0] > queued[o[2]])]
     return sorted(out, key=lambda x: x[0])
 
 
