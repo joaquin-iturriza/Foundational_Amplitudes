@@ -191,6 +191,20 @@ def read():
                   f"  rule {np.median(v['rule']):10.4g}  dec {v['dec']:+.3f}  spread {v['spread']:.3f}")
     print("pipeline", out["pipeline"] or "ok", "outcome", out["outcome"])
     plot(out)
+    full = json.load(open(RAW.replace("_raw", "")))["cells"]   # D539's full rescale (eps1e-8), same seeds
+    summ = {"outcome": out["outcome"], "pipeline_problems": len(out["pipeline"])}
+    for d, c in out["cells"].items():
+        dp = c["strata"][c["deepest_soft"]]; ch = {sk: v for sk, v in c["strata"].items() if v["changed"][0] > 0}
+        summ[d] = {"deep_off": float(np.median(dp["off"])), "deep_rule": float(np.median(dp["rule"])),
+                   "deep_dec": dp["dec"], "deep_spread": dp["spread"], "deep_full": float(np.median(full[d]["eps1e-8"]["soft_x"])),
+                   "n_changed_strata": len(ch), "changed_dec_max": max(v["dec"] for v in ch.values()),
+                   "changed_dec_min": min(v["dec"] for v in ch.values()),
+                   "shallow_changed": c["strata"]["hard_test/soft_x_0.001_0.01/log10_me2"]["changed"][0],
+                   "shallow_dec": c["strata"]["hard_test/soft_x_0.001_0.01/log10_me2"]["dec"],
+                   "shallow_spread": c["strata"]["hard_test/soft_x_0.001_0.01/log10_me2"]["spread"],
+                   "bulk_off": float(np.median(c["strata"]["bulk_test/bulk/log10_me2"]["off"])),
+                   "bulk_dec": c["strata"]["bulk_test/bulk/log10_me2"]["dec"]}
+    print(json.dumps(summ))
 
 
 def plot(out):
