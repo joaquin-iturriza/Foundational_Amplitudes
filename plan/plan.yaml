@@ -41672,7 +41672,7 @@ entries:
       configurations (finding 2026-11-25 split read)'
     '16': FA-lxplus-7d2180f8
     '17': FA-ccin2p3-3bdfcc32 FA-ccin2p3-fd907afa
-    '18': detached d567_copy (site copy of 5 run dirs CC -> lxplus)
+    '18': FA-lxplus-b532f161 FA-lxplus-7c661cac FA-lxplus-e5a942b0 FA-lxplus-1401b26e FA-lxplus-b30f10dd
   handoff:
     state: 'Part (a) DONE, part (c) DONE. Part (b) his setup: 16 heads done; 32 FA-ccin2p3-e9dfa8b9 and 64 FA-ccin2p3-623a3af6
       RUNNING, 120 FA-ccin2p3-f0b997a2 PENDING (steps 12-14: score with job_llm_score.sh REREAD, redraw the ONE all-arms figure
