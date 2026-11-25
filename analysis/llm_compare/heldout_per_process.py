@@ -53,7 +53,7 @@ YLIM = (1e-7, 1e3)   # one range for every figure: his 1e-3..1e3 extended below 
 # --part bias2 (step 15): our arms' level part bias^2 = mean(pred - true)^2 of the MSE (tools/llm_score.py's split,
 # data/split/<tag>_heldout.json) beside the LLM's whole MSE (an upper bound on its own bias^2); its own fixed range
 PART = {"mse": ("data", YLIM, r"MSE$(\log|\mathcal{M}|^2)$", "pID emb. only (Suprio)"),
-        "bias2": (os.path.join("data", "split"), (1e-10, 1e3), r"level part bias$^2$ of MSE$(\log|\mathcal{M}|^2)$",
+        "bias2": (os.path.join("data", "split"), (1e-10, 1e3), r"bias$^2$ of $\log|\mathcal{M}|^2$",
                   "pID emb. only (Suprio), whole MSE")}
 
 
