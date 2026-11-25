@@ -1913,6 +1913,8 @@ def item_exists(eid):
 def ensure_item(e, did):
     """The site work item of the same id with the entry's globs, so `site submit --item <id>` and work_gate pass."""
     if item_exists(e["id"]):
+        # a done item (its entry was reopened) is reactivated under the decision; an active one stays as it is
+        rc, out, err = site_call("item", "set", PROJECT, e["id"], "--decision", did)
         return True, ""
     rc, out, err = site_call("item", "add", PROJECT, e["id"], "--decision", did, "--title", e.get("title") or e["id"],
                              "--scope", e.get("question") or e["id"], "--match", e.get("match") or e["id"] + "*",
@@ -2100,6 +2102,10 @@ def cmd_reopen(a):
         e.setdefault("history", []).append({"at": now().isoformat(), "was": "done", "writeup": e.pop("writeup", None),
                                             "why": a.why})
         e["status"] = "running"
+        dd = next((x for x in (decision(i) for i in reversed(e.get("decisions", []))) if x and x["in_force"]
+                   and x["kind"] in ("approve", "scope", "release") and covers_name(x, a.id)), None)
+        if dd:
+            ensure_item(e, dd["id"])
     print("plan: %s reopened" % a.id)
 
 
