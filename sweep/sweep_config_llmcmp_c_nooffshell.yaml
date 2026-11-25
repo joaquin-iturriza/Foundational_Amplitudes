@@ -1,5 +1,5 @@
 # llm_compare step 22 (D567/D564): part (c)'s setup with the per-event off-shellness input off, the only change
-# (data.offshell_per_event false; the internal-mass slot then holds each process's internal log-mass). Run at part (c)'s
+# (data.offshell_per_event and data.internal_mass_scalars false: the slot, which holds only the off-shellness, removed). Run at part (c)'s
 # best trial's HPs (llmcmp_c_qperp/trial_1860, FA-ccin2p3-29ce8950) as --hp-idx 1860: does the gg->ttH two-group split
 # and the internal-top new-family error go with the input? Everything else as sweep_config_llmcmp_c_latest.yaml, below.
 # llm_compare part (c) (D523: "our latest setup with the modified target, inputs, optimizer, scheduler, and so on"):
@@ -69,7 +69,7 @@ fixed_params:   # "++" on the keys absent from config/ (Hydra appends them)
   data.standardize_props: 'true'
   data.generation_onehot: 'true'
   data.coupling_scalars: 'true'
-  data.internal_mass_scalars: 'true'
+  data.internal_mass_scalars: 'false'   # with the flag below: under dimensionless_inputs the slot holds only the off-shellness (data_mmap._open_run fills it per batch); experiment.py refuses the slot without it (GeV masses), and its offshell_zero note: zero columns = both flags false
   data.internal_mass_pdgs: '[23,6,25,24]'
   data.offshell_per_event: 'false'   # the one change against sweep_config_llmcmp_c_latest.yaml
   data.target_propagators: 'false'
