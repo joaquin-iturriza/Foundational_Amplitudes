@@ -45022,6 +45022,61 @@ entries:
       1.02 (B_crit 50) to 16. Check 3: replicate spread 0.3/0.9/10%, YES <=1.2 and NO >=1.45 at every target stand above it
       at the first two. Searched docs/results.tex for critical, batch size, noise scale, steps-to-target, Muon search, v4_het_control_wsd;
       plan; decisions for batch, D426, D514, D532-D536: no prior scan on this setup.'
+  - at: '2026-11-25T12:17:36+00:00'
+    question: 'D560 (''understand what number to trust, and have something that we can use in the future''): does an optimizer-aware
+      noise scale B_u, read from how the first-order progress of the optimizer''s actual update grows with the batch, locate
+      the measured critical batch where B_simple = tr Sigma/|G|^2 (median 55.5) misses the scan''s B_crit (2500/4420/6690)
+      by 45-120x? If yes, B_u read in a run''s first part is the batch rule usable before the production run.'
+    prior: 'sec:noisescale (c2ab3154a, b2b650b45): B_simple 84/28/28/39 (independent batches), chunk median 55.5, Muon set
+      232 (734 last window), AdamW 37.2. par:cbs_scan (145d14839): B_crit 2500/4420/6690 at L=-1.66/-2.08/-2.30, same best
+      HPs (hp 1333, lr 8.2e-3) at 2048/8192/16384/32768. This entry''s ft_bcrit.py (528910f43, data/ft_bcrit.json): Z+4g 10^4
+      events, Adam two-batch B_crit 87-261 at matched val MSE 0.25-0.05 (stable phase); Muon r=31 > 16 (the 128 gain is memorisation
+      at 2048, train/val 0.048 vs 0.38 at 128, not a critical-batch effect). Searched docs/results.tex (noise scale, critical,
+      batch, normalis, orthogonal, update direction), plan show critical_batch, site decisions (batch, D532, D536, D560):
+      no update-direction noise scale measured before.'
+    measure: 'A(b) = E<G_hat, u(g_b)>, u = the optimizer''s update map at momentum 0: Muon matrices newton_schulz(g) x muon_scale
+      (optim/muon.py, as MuonAdamW.step), AdamW/Adam params g/(sqrt(v_hat)+eps) at the optimizer''s current second moment;
+      G_hat = the gradient of disjoint events (in a measured step: the complement of the chunks forming g_b within the step''s
+      batch; at brute steps: the other independent batches). Per measured step (every 10, chunks 8, as now) A at b = batch/8,
+      /4, /2 from chunk unions vs their complements; at the 5 brute steps of the pretraining run (16 independent batches)
+      also b = 16384, 32768, 65536, 131072 (gradients of independent batches averaged before u). Reported per parameter set
+      (muon, adamw) and summed with each set''s lr multipliers. Fit A(b) = A_inf b/(b + B_u) (least squares in log A over
+      b; windows of 200 steps; at brute steps over all b, jackknife over batches). Read: pretraining B_u at the steps where
+      the control crosses -1.66/-2.08/-2.30 (1020/1973/2992) against the scan''s B_crit 2500/4420/6690; Z+4g Adam B_u over
+      the stable phase against the two-batch 87-261. B_simple recorded alongside (existing estimator unchanged). Code: base_experiment._noise_measure/_noise_brute
+      gain the update terms behind BS_finding.update (default false), CPU known-answer test (sign-descent toy: A(b) against
+      the analytic erf curve, B_u within 20%; SGD map u=g gives flat A), smoke one GPU ~50 steps through every stage (D395).'
+    check: 'Existing data: (1) at a fixed lr (hp 1333 best at 2048, 8192, 16384, 32768) the scan''s steps to -2.08 fall 3997
+      -> 1324 from 2048 to 32768, a per-step gain the SGD law at B_simple=55 puts at (1+55/2048)/(1+55/32768) = 1.025: the
+      gain is in the update direction at fixed step size, which A(b) measures and B_simple cannot. (2) The set whose update
+      is normalised per matrix (Muon) has B_simple 232 against 37.2 for AdamW in the same run (sec:noisescale): the noise
+      scale moves up when read closer to the update. (3) On the toy of the CPU test, sign descent''s A(b) saturates at b ~
+      the per-coordinate sigma_i^2/g_i^2 while B_simple sits far below it when |G| is carried by few coordinates (the test
+      asserts both).'
+    fixed: 'Pretraining: the v4_het_noise_scale arm exactly as FA-ccin2p3-225d38ea (base v4_het_control_wsd, DIM inputs, HETEROSC
+      mean, MuonAdamW hp 1333 lr 8.2e-3, WSD 1/8, batch 16384, 4264 steps, clip 5, seed 42, BS_finding every 10, chunks 8,
+      brute_at [50,500,1500,3000,4100], 16 batches), only BS_finding.update true added. Z+4g: the D507 Adam batch-2048 chosen
+      trial hp1152 (runs/tp_zng_d1e4_adam_b2048_zgggg/trial_1152 config: Adam ReduceLROnPlateau, lr 4.18e-3, 10^4 training
+      events, 1953 steps, float64), seed 42, BS_finding every 10, chunks 8, update true, no brute steps (a 10^4-event pool
+      cannot give independent batches of 2048). Training is unchanged by the measurement (it reads gradients before the step,
+      as now).'
+    control: 'B_simple from the same runs (unchanged estimator) and the existing measured critical batches: the scan''s B_crit
+      per target (pretraining), the ft_bcrit Adam two-batch B_crit (Z+4g); validation curves against the earlier runs (FA-ccin2p3-225d38ea,
+      trial_1152) to show the measurement leaves training unchanged.'
+    seeds: Seed 42 each, as the run and the trial it repeats; errors from the jackknife over the 16 independent batches (pretraining
+      brute steps) and the spread over windows (both settings).
+    outcome: 'YES: B_u within a factor 2 of the measured critical batch at each of the three pretraining targets and inside
+      [87/2, 261x2] on Z+4g Adam: B_u is the number to trust and the rule is to read it in a run''s first ~1000 steps (B ~
+      B_u at the target''s loss) when the run sees its data a few times; the repeated-data regime keeps its own rule (ft_bcrit).
+      NO: B_u below B_crit/3 at two or more targets: normalisation is not the gap; reported with both numbers and the next
+      candidate (momentum, curvature) named. Between: B_u reported with its factor to B_crit, usable only with that calibration.'
+    sources: 'factor 2 <- a measured spread: the scan''s B_crit changes 1.51-1.77x between adjacent targets (par:cbs_scan,
+      data/cbs_readout.json), so a reading within 2x points at the right target; factor 3 for NO <- a measured spread: 2x
+      the scan''s 16-84% bootstrap span at -2.08 (3750-5030, 1.34x) plus the factor-2 band, and 15-40x inside the 45-120x
+      gap B_simple leaves (D560: ''what number to trust''); [87/2, 261x2] <- a measured spread: the Adam two-batch B_crit
+      range over levels in data/ft_bcrit.json, widened by the same factor 2; 20% in the CPU test <- a measured noise: the
+      toy''s B_u fit scatter over 40 seeds is checked to be below it in the test itself (as the jackknife coverage 37/40 of
+      the existing known-answer test)'
   step_why:
     1:
       feeds: 'D532: the scan''s answer (NO branch, B_crit 2500-6690 vs B_simple 55.5) reaches Joaquin as a finished entry'
