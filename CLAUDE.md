@@ -33,6 +33,7 @@ on the sites (`~/work/CLAUDE.md`).
 - A "not checked" that a lookup can settle never reaches me: the owner checks it, or the main session reads it when the owner has closed, before the message goes.
 - Asked about an agent's work or report, the main session reads its sources itself (its transcript `subagents/agent-<id>.jsonl`, the files, commits and logs it names) and answers from them, never that it does not know what the agent meant.
 - A claim that something is absent (no decision, no run, no record) rests on a whole search, never a truncated one (`head`, a range of ids, a pattern cut short), and names what was searched.
+- A proposal to change our tooling or process names the code or rule it would change, read in that turn, and what it already does; one that exists is never proposed as new.
 - A statement to me about what waits on me is checked against my own words (`site decisions`, my messages), never against the plan's notes.
 - A status overview lists every open question to me, every step I marked to come back to or held, every idea I asked to keep in mind, and nothing I rejected, each said in full (never "the item you marked"); a proposal I reject is withdrawn on its entry in that turn (`plan withdraw`).
 - A diagnosis word about a run (never learns, memorises, overfits, diverged) reaches me only with the figure that shows it and after its data's provenance (pools, generator commit, config) is read.
