@@ -46552,6 +46552,58 @@ entries:
       5 terms: selective, soft_x0, soft_gate, gated rescale, event gate, rescale only (results.tex); rescale, D374, D392,
       D539, D552 (decisions); none found. Note: the entry''s next field still says ''14 searches''; update it with plan set-next
       to the two-stage plan.'
+  - at: '2026-11-25T02:19:54+00:00'
+    question: 'Stage 2 of the passed two-stage design (D552): searched best against searched best, does each event-dependent
+      rescale rule (A: rescale below x=0.1; B: below x=0.3; C: event gate min x<0.1) keep the u u~ g soft-limit gain without
+      the bulk cost, on q q~ -> Z+4g (1e4, 1e5) and on e+e- -> u u~ g (1e4, 1e5)? Stage 1 (par:selres_stage1, at each cell''s
+      no-rescale optimum) gave A a design YES, missed B and C on Z+4g bulk (NO-bulk -> stage 2 there, as the passed design
+      says), and found all three resolved worse than no rescale on u u~ g bulk at the no-rescale HPs (A 1.65x [1.33,2.04]
+      / 3.14x [2.00,4.91]), which the stage-1 design assumed unresolvable.'
+    prior: 'par:selres_stage1 (stage 1 @e9cff9a2a, data/stage1.json): Z+4g r(scheme/off) A 0.92 [0.80,1.05] (1e4), 1.05 [0.75,1.48]
+      (1e5); B 1.26 [1.16,1.38], 1.58 [1.17,2.12]; C 1.75 [1.60,1.91], 1.90 [1.40,2.58]; u u~ g r(scheme/off) A 1.65/3.14,
+      B 2.5/2.4, C 5.1/3.6, all resolved above 1; kit deepest soft bin A -4.78/-4.89 dec vs off, -0.13/-0.32 vs rescale; B
+      -4.91/-5.22; C -5.38/-5.93. par:ftm_d539: searched per arm, rescale costs u u~ g 2.18x [1.32,3.58] (1e4), 1.68x [0.93,3.07]
+      (1e5); Z+4g 2.41x at its own HPs (1e4). Searched: selres, selective, soft_x0, soft_gate, event gate, D552, D539 in results.tex,
+      plan and decisions: only stage 1 and D539.'
+    measure: 'As stage 1 (stage1_read.py): best val MSE(log|M|^2) = min val mu-MSE x prepd_std^2 of the search''s chosen trial
+      (seed 42) and its seeds 43/44; r = three-seed geometric mean over the searched control''s chosen trial + seeds, 2-sigma
+      interval from the seeds'' log-sd (zng4g_d1e3_read.ratio). u u~ g: kit deepest-bin log10-MSE per family (job_kit.sh KIT_SCORE_ONLY
+      of the chosen trial and its seeds), seed medians, decades against D539''s searched off and eps1e-8 arms (d539u_kit.json).
+      Chosen learning rate''s distance from the window edge reported (lr_dec_from_edge, as d539u).'
+    check: 'Existing data moves with the tested change: stage 1 resolves the schemes apart on Z+4g (A 0.92 vs B 1.26 vs C
+      1.75 at 1e4, intervals disjoint) and on u u~ g bulk (A 1.65 [1.33,2.04] vs C 5.1); D539''s searched u u~ g arms moved
+      the bulk r from 1 to 2.18x and soft by -4.65/-4.57 dec. The HP question is real: D539''s set-s rescale runs at the no-rescale
+      optimum hp1333 differed from the rescale at its own HPs (2.28x vs 2.41x on Z+4g 1e4) and u u~ g rescale at hp1333 blew
+      up, so the optimum moves with the input map.'
+    fixed: 'Configs sweep/sweep_config_selres_<proc>_<D>_<scheme>_b2048.yaml (12) and sweep_config_selres_zng_1e5_{off,eps1e-8}_b2048.yaml
+      (2) @043cc03af: the D539 search space and setup (n_trials 16, DyHPO gp seed 42, n_startup 3, waves 3,3,2,3,3,2, t_steps
+      1953, batch 2048, MuonAdamW, WSD cooldown 1/8, float64, heterosc_select mu_mse, validate_frac 0.02, evaluation.train_subsample
+      2000, plot on, scratch, recipes kit_A_uq_zgggg_me2_n500000_t12500 / kit_A_ee_uug_me2_n100000_t8000, internal_mass_pdgs
+      [23,6,25,24]); keys differing from D539''s searched configs (ftmech_d539_uug_<D>_<arm>_b2048, the Z+4g 1e4 D539 searches):
+      sweep_name, model.input_soft_eps 1e-8 plus model.input_soft_x0 (0.1/0.3) or model.input_soft_gate (0.1); Z+4g 1e5 data.train_subsample
+      1e5. Run by sweep/drive.py (as D539''s u u~ g searches, sweeps_local/), then seeds 43/44 of each chosen trial by run_fixed_hp.py
+      through job_seed_batch.sh, then kit scoring of the u u~ g chosen trials and seeds.'
+    control: 'Searched controls, best against best: Z+4g 1e4 off and rescale eps1e-8 = D539''s searches (d539.json zng_1e4);
+      Z+4g 1e5 off and rescale = the two new control searches selres_zng_1e5_{off,eps1e-8}_b2048 (the passed design''s stage
+      2), each with seeds 43/44; u u~ g 1e4 and 1e5 off and rescale = ftmech_d539_uug_<D>_{off,eps1e-8}_b2048 chosen trial
+      + seeds with kit scores (d539u.json, d539u_kit.json, existing).'
+    seeds: Search DyHPO seed 42; its chosen trial (training seed 42) plus seeds 43 and 44, as the D539 searched arms.
+    outcome: 'Per scheme, read searched against searched. YES (the stage-1 rule, unchanged): in Z+4g 1e4 and 1e5 r(scheme/off)
+      2-sigma interval contains 1 or lies below it AND r(scheme/rescale) upper bound below 1; on u u~ g 1e4 and 1e5 the seed-median
+      deepest soft-bin log10-MSE at most the rescale arm''s seed median + its three-seed spread (+0.30 / +1.05 dec). Added
+      for Joaquin''s ''without hurting the rest'': u u~ g bulk r(scheme/off) interval contains 1 or lies below it -> no u
+      u~ g bulk cost; resolved above 1 -> the rule costs u u~ g bulk even at its own optimum, reported with its size against
+      the full rescale''s 2.18x/1.68x. A scheme YES on all -> proposed to Joaquin as the rescale''s replacement (D392 setup
+      is his call); A YES on Z+4g and soft but a u u~ g bulk cost -> proposed with that cost stated, beside the full rescale''s;
+      B or C still NO-bulk on Z+4g -> dead end for that rule, measured r against the input check''s predicted 1.40 / 1.22.
+      A chosen learning rate within 0.1 dec of the window edge -> the window is extended once for that search before it is
+      read.'
+    sources: '2-sigma intervals <- the arms'' own measured three-seed spread; +0.30 / +1.05 dec <- the rescale arm''s measured
+      three-seed spread log10(max/min) (d539u_kit.json); which scheme-cells are searched <- the measured stage-1 seed spread:
+      every cell whose 2-sigma interval of r(scheme/off) does not lie below 1 (A Z+4g 0.80-1.05 and 0.75-1.48 include 1, every
+      u u~ g cell and B, C on Z+4g resolved above 1); u u~ g bulk criterion <- Joaquin''s words D552 ''without hurting the
+      rest''; 16 trials and waves <- D539, the searches they are read against; cost ~39 GPU-h (224 trials + 28 seed runs at
+      the measured stage-1 run times, Z+4g ~10.5 min, u u~ g ~7.5 min) <- D552, under its 100 GPU-h with stage 1''s ~8'
   step_why:
     1:
       feeds: D552 (keep the rescale's soft-bin gain without its bulk cost)
