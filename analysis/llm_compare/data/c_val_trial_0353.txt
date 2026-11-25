@@ -1,4 +1,4 @@
-[2026-11-23 16:43:31 I] Val loss (combined): -2.35 | val_loss_no_reg: -2.351566e+00 | dc_bb_bb=-2.741, dc_bb_b
-[2026-11-23 17:22:19 I] Val loss (combined): -2.174 | val_loss_no_reg: -2.175455e+00 | dc_bb_bb=-1.627, dc_bb_
-[2026-11-23 18:01:14 I] Val loss (combined): -2.63 | val_loss_no_reg: -2.632995e+00 | dc_bb_bb=-3.235, dc_bb_b
-[2026-11-23 18:40:14 I] Val loss (combined): 6.557 | val_loss_no_reg: 6.550025e+00 | dc_bb_bb=5.971, dc_bb_bba
+[2026-11-23 16:43:31 I] Val loss (combined): -2.35 | val_loss_no_reg: -2.351566e+00 | dc_bb_bb=-2.741, dc_bb_bba=-2.016, dc_bb_bbh=-1.838, d
+[2026-11-23 17:22:19 I] Val loss (combined): -2.174 | val_loss_no_reg: -2.175455e+00 | dc_bb_bb=-1.627, dc_bb_bba=-2.171, dc_bb_bbh=-2.062, 
+[2026-11-23 18:01:14 I] Val loss (combined): -2.63 | val_loss_no_reg: -2.632995e+00 | dc_bb_bb=-3.235, dc_bb_bba=-2.005, dc_bb_bbh=-2.9, dc_
+[2026-11-23 18:40:14 I] Val loss (combined): 6.557 | val_loss_no_reg: 6.550025e+00 | dc_bb_bb=5.971, dc_bb_bba=7.163, dc_bb_bbh=6.478, dc_bb

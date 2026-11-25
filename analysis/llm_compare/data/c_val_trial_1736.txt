@@ -1,0 +1,53 @@
+[2026-11-24 08:10:00 I] Val loss (combined): -2.543 | val_loss_no_reg: -2.543078e+00 | dc_bb_bb=-3.335, dc_bb_bba=-2.368, dc_bb_bbh=-2.006, 
+[2026-11-24 08:48:58 I] Val loss (combined): -3.236 | val_loss_no_reg: -3.236185e+00 | dc_bb_bb=-3.84, dc_bb_bba=-3.076, dc_bb_bbh=-2.855, d
+[2026-11-24 09:27:46 I] Val loss (combined): -3.572 | val_loss_no_reg: -3.572339e+00 | dc_bb_bb=-4.046, dc_bb_bba=-3.475, dc_bb_bbh=-3.211, 
+[2026-11-24 10:06:37 I] Val loss (combined): -3.709 | val_loss_no_reg: -3.708689e+00 | dc_bb_bb=-3.893, dc_bb_bba=-3.228, dc_bb_bbh=-3.301, 
+[2026-11-24 10:45:10 I] Val loss (combined): -3.837 | val_loss_no_reg: -3.837375e+00 | dc_bb_bb=-4.227, dc_bb_bba=-3.78, dc_bb_bbh=-3.385, d
+[2026-11-24 11:23:21 I] Val loss (combined): -4.035 | val_loss_no_reg: -4.035068e+00 | dc_bb_bb=-4.527, dc_bb_bba=-3.965, dc_bb_bbh=-3.563, 
+[2026-11-24 12:02:12 I] Val loss (combined): -4.072 | val_loss_no_reg: -4.071505e+00 | dc_bb_bb=-4.519, dc_bb_bba=-4.012, dc_bb_bbh=-3.608, 
+[2026-11-24 12:40:53 I] Val loss (combined): -4.062 | val_loss_no_reg: -4.061848e+00 | dc_bb_bb=-4.483, dc_bb_bba=-3.991, dc_bb_bbh=-3.607, 
+[2026-11-24 13:19:25 I] Val loss (combined): -4.198 | val_loss_no_reg: -4.197862e+00 | dc_bb_bb=-4.642, dc_bb_bba=-4.174, dc_bb_bbh=-3.753, 
+[2026-11-24 13:58:06 I] Val loss (combined): -3.98 | val_loss_no_reg: -3.980061e+00 | dc_bb_bb=-3.881, dc_bb_bba=-3.915, dc_bb_bbh=-3.738, d
+[2026-11-24 14:36:19 I] Val loss (combined): -4.201 | val_loss_no_reg: -4.200721e+00 | dc_bb_bb=-4.642, dc_bb_bba=-4.164, dc_bb_bbh=-3.776, 
+[2026-11-24 15:14:44 I] Val loss (combined): -4.294 | val_loss_no_reg: -4.294111e+00 | dc_bb_bb=-4.701, dc_bb_bba=-4.212, dc_bb_bbh=-3.831, 
+[2026-11-24 15:52:58 I] Val loss (combined): -4.314 | val_loss_no_reg: -4.314060e+00 | dc_bb_bb=-4.751, dc_bb_bba=-4.325, dc_bb_bbh=-3.941, 
+[2026-11-24 16:31:11 I] Val loss (combined): -2.034 | val_loss_no_reg: -2.033721e+00 | dc_bb_bb=-2.866, dc_bb_bba=-1.926, dc_bb_bbh=-1.472, 
+[2026-11-24 17:09:29 I] Val loss (combined): -3.932 | val_loss_no_reg: -3.932008e+00 | dc_bb_bb=-4.503, dc_bb_bba=-3.934, dc_bb_bbh=-3.527, 
+[2026-11-24 17:48:05 I] Val loss (combined): -4.106 | val_loss_no_reg: -4.106348e+00 | dc_bb_bb=-4.679, dc_bb_bba=-4.131, dc_bb_bbh=-3.672, 
+[2026-11-24 18:26:45 I] Val loss (combined): -4.236 | val_loss_no_reg: -4.236279e+00 | dc_bb_bb=-4.782, dc_bb_bba=-4.271, dc_bb_bbh=-3.797, 
+[2026-11-24 19:05:00 I] Val loss (combined): -4.758 | val_loss_no_reg: -4.758278e+00 | dc_bb_bb=-5.24, dc_bb_bba=-4.705, dc_bb_bbh=-4.282, d
+[2026-11-24 19:43:25 I] Val loss (combined): -5.353 | val_loss_no_reg: -5.352809e+00 | dc_bb_bb=-6.055, dc_bb_bba=-5.218, dc_bb_bbh=-4.836, 
+[2026-11-24 20:22:01 I] Val loss (combined): -5.938 | val_loss_no_reg: -5.938129e+00 | dc_bb_bb=-7.584, dc_bb_bba=-5.431, dc_bb_bbh=-5.277, 
+[2026-11-24 20:44:06 I] Creating new experiment llmcmp_c_qperp/sigma_stage
+[2026-11-24 20:44:07 I] ### Starting experiment llmcmp_c_qperp/sigma_stage (mlflowid=None) (jobid=None) (git_hash=c5237f6ad3945255ee1939ecfc
+[2026-11-24 20:47:41 I] Val loss (combined): -5.938 | val_loss_no_reg: -5.938129e+00 | dc_bb_bb=-7.584, dc_bb_bba=-5.431, dc_bb_bbh=-5.277, 
+[2026-11-24 20:52:50 I] Val loss (combined): -5.956 | val_loss_no_reg: -5.956288e+00 | dc_bb_bb=-7.765, dc_bb_bba=-5.39, dc_bb_bbh=-5.254, d
+[2026-11-24 20:55:51 I] Val loss (combined): -5.96 | val_loss_no_reg: -5.960057e+00 | dc_bb_bb=-7.771, dc_bb_bba=-5.375, dc_bb_bbh=-5.261, d
+[2026-11-24 20:58:50 I] Val loss (combined): -5.962 | val_loss_no_reg: -5.961931e+00 | dc_bb_bb=-7.778, dc_bb_bba=-5.381, dc_bb_bbh=-5.238, 
+[2026-11-24 21:01:49 I] Val loss (combined): -5.965 | val_loss_no_reg: -5.964911e+00 | dc_bb_bb=-7.781, dc_bb_bba=-5.382, dc_bb_bbh=-5.251, 
+[2026-11-24 21:04:47 I] Val loss (combined): -5.965 | val_loss_no_reg: -5.964745e+00 | dc_bb_bb=-7.789, dc_bb_bba=-5.379, dc_bb_bbh=-5.257, 
+[2026-11-24 21:07:44 I] Val loss (combined): -5.966 | val_loss_no_reg: -5.966403e+00 | dc_bb_bb=-7.785, dc_bb_bba=-5.389, dc_bb_bbh=-5.25, d
+[2026-11-24 21:10:43 I] Val loss (combined): -5.966 | val_loss_no_reg: -5.966218e+00 | dc_bb_bb=-7.752, dc_bb_bba=-5.382, dc_bb_bbh=-5.259, 
+[2026-11-24 21:13:41 I] Val loss (combined): -5.967 | val_loss_no_reg: -5.967164e+00 | dc_bb_bb=-7.757, dc_bb_bba=-5.389, dc_bb_bbh=-5.256, 
+[2026-11-24 21:16:38 I] Val loss (combined): -5.968 | val_loss_no_reg: -5.967759e+00 | dc_bb_bb=-7.776, dc_bb_bba=-5.379, dc_bb_bbh=-5.257, 
+[2026-11-24 21:19:37 I] Val loss (combined): -5.968 | val_loss_no_reg: -5.967958e+00 | dc_bb_bb=-7.795, dc_bb_bba=-5.39, dc_bb_bbh=-5.26, dc
+[2026-11-24 21:22:36 I] Val loss (combined): -5.968 | val_loss_no_reg: -5.968491e+00 | dc_bb_bb=-7.793, dc_bb_bba=-5.392, dc_bb_bbh=-5.252, 
+[2026-11-24 21:25:33 I] Val loss (combined): -5.969 | val_loss_no_reg: -5.968860e+00 | dc_bb_bb=-7.792, dc_bb_bba=-5.395, dc_bb_bbh=-5.259, 
+[2026-11-24 21:28:30 I] Val loss (combined): -5.968 | val_loss_no_reg: -5.968290e+00 | dc_bb_bb=-7.78, dc_bb_bba=-5.384, dc_bb_bbh=-5.263, d
+[2026-11-24 21:31:27 I] Val loss (combined): -5.969 | val_loss_no_reg: -5.969163e+00 | dc_bb_bb=-7.777, dc_bb_bba=-5.39, dc_bb_bbh=-5.259, d
+[2026-11-24 21:34:25 I] Val loss (combined): -5.969 | val_loss_no_reg: -5.969479e+00 | dc_bb_bb=-7.791, dc_bb_bba=-5.392, dc_bb_bbh=-5.26, d
+[2026-11-24 21:37:20 I] Val loss (combined): -5.97 | val_loss_no_reg: -5.969602e+00 | dc_bb_bb=-7.788, dc_bb_bba=-5.39, dc_bb_bbh=-5.255, dc
+[2026-11-24 21:40:15 I] Val loss (combined): -5.97 | val_loss_no_reg: -5.969828e+00 | dc_bb_bb=-7.791, dc_bb_bba=-5.382, dc_bb_bbh=-5.259, d
+[2026-11-24 21:43:10 I] Val loss (combined): -5.97 | val_loss_no_reg: -5.969647e+00 | dc_bb_bb=-7.798, dc_bb_bba=-5.389, dc_bb_bbh=-5.261, d
+[2026-11-24 21:46:10 I] Val loss (combined): -5.97 | val_loss_no_reg: -5.970132e+00 | dc_bb_bb=-7.789, dc_bb_bba=-5.391, dc_bb_bbh=-5.255, d
+[2026-11-24 21:49:07 I] Val loss (combined): -5.97 | val_loss_no_reg: -5.970155e+00 | dc_bb_bb=-7.789, dc_bb_bba=-5.395, dc_bb_bbh=-5.261, d
+[2026-11-24 21:52:05 I] Val loss (combined): -5.97 | val_loss_no_reg: -5.970440e+00 | dc_bb_bb=-7.782, dc_bb_bba=-5.395, dc_bb_bbh=-5.261, d
+[2026-11-24 21:55:02 I] Val loss (combined): -5.97 | val_loss_no_reg: -5.970467e+00 | dc_bb_bb=-7.781, dc_bb_bba=-5.394, dc_bb_bbh=-5.261, d
+[2026-11-24 21:58:01 I] Val loss (combined): -5.97 | val_loss_no_reg: -5.970466e+00 | dc_bb_bb=-7.782, dc_bb_bba=-5.394, dc_bb_bbh=-5.259, d
+[2026-11-24 22:00:57 I] Val loss (combined): -5.97 | val_loss_no_reg: -5.970464e+00 | dc_bb_bb=-7.782, dc_bb_bba=-5.393, dc_bb_bbh=-5.259, d
+[2026-11-24 22:03:56 I] Val loss (combined): -5.97 | val_loss_no_reg: -5.970470e+00 | dc_bb_bb=-7.782, dc_bb_bba=-5.393, dc_bb_bbh=-5.259, d
+[2026-11-24 22:03:56 I] Loading model from /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/llmcmp_c_qperp/trial_1736/sigma_stage/
+[2026-11-24 22:28:08 I] Creating plots in /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/llmcmp_c_qperp/trial_1736/sigma_stage/p
+[2026-11-24 22:31:37 I] Compressing /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/llmcmp_c_qperp/trial_1736/sigma_stage/models/
+[2026-11-24 22:31:38 I] Compressing /sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/llmcmp_c_qperp/trial_1736/sigma_stage/models/
+[2026-11-24 22:31:38 I] Finished experiment llmcmp_c_qperp/sigma_stage after 107.53min = 1.79h

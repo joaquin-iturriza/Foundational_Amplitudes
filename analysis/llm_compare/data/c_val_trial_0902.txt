@@ -1,0 +1,4 @@
+[2026-11-24 08:07:30 I] Val loss (combined): -2.505 | val_loss_no_reg: -2.505172e+00 | dc_bb_bb=-3.008, dc_bb_bba=-2.575, dc_bb_bbh=-2.095, 
+[2026-11-24 08:43:10 I] Val loss (combined): -2.533 | val_loss_no_reg: -2.532572e+00 | dc_bb_bb=-3.155, dc_bb_bba=-2.806, dc_bb_bbh=-1.737, 
+[2026-11-24 09:18:42 I] Val loss (combined): -2.499 | val_loss_no_reg: -2.499402e+00 | dc_bb_bb=-2.852, dc_bb_bba=-2.4, dc_bb_bbh=-2.912, dc
+[2026-11-24 09:54:15 I] Val loss (combined): 4.3e+10 | val_loss_no_reg: 4.300200e+10 | dc_bb_bb=3.524, dc_bb_bba=3.696, dc_bb_bbh=3.903, dc_
