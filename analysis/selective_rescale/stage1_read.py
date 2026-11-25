@@ -7,7 +7,7 @@ Measure (design 2026-11-25): best val MSE(log|M|^2) = min val mu-MSE x prepd_std
 the control, 2-sigma interval (zng4g_d1e3_read.ratio). u u~ g kit deepest-bin log10-MSE (tools/kit_mlp_readout.deepest),
 seed medians; soft tolerance = the rescale arm's seed median plus its three-seed spread log10(max/min).
 
-    python3 analysis/selective_rescale/stage1_read.py [--cached] [--site lxplus]   -> data/stage1.json, figs/stage1
+    python3 analysis/selective_rescale/stage1_read.py [--cached]   -> data/stage1.json, figs/stage1
 """
 import json
 import os
@@ -22,7 +22,7 @@ from analysis.common.readers import site_python  # noqa: E402
 from tools.kit_mlp_readout import deepest  # noqa: E402
 from zng4g_d1e3_read import REMOTE, ratio  # noqa: E402
 
-SITE = sys.argv[sys.argv.index("--site") + 1] if "--site" in sys.argv else "lxplus"
+SITES = ("ccin2p3", "lxplus")
 SCHEMES = ["softbelow_x0p1", "softbelow_x0p3", "eventgate_x0p1"]
 CELLS = [(p, d) for p in ("zng", "uug") for d in ("1e4", "1e5")]
 SEEDS = (42, 43, 44)
@@ -50,11 +50,14 @@ def main():
         raw = json.load(open(cache))
     else:
         runs = [name(p, d, a, s) for p, d in CELLS for a in SCHEMES for s in SEEDS]
-        paths = site_python('import json, os, sys; sys.path.insert(0, os.getcwd()); import siteconf; print("SITEDIRS " + json.dumps([siteconf.PROJECT_DIR, siteconf.SWEEP_DIR]))',
-                            [], "SITEDIRS", site=SITE)
-        val = site_python(REMOTE.replace("ZNG1K", "SELRES"),
-                          [f"'{r}#{paths[0]}/runs/{r}#{paths[1]}/{r}/results/fixed.json'" for r in runs], "SELRES", site=SITE)
-        kit = site_python(KIT, [r for r in runs if "_uug_" in r], "SELRESKIT", site=SITE)
+        val, kit = {}, {}
+        for site in SITES:   # runs of one batch can land on either site (site pick); keep each run's complete record
+            paths = site_python('import json, os, sys; sys.path.insert(0, os.getcwd()); import siteconf; print("SITEDIRS " + json.dumps([siteconf.PROJECT_DIR, siteconf.SWEEP_DIR]))',
+                                [], "SITEDIRS", site=site)
+            v = site_python(REMOTE.replace("ZNG1K", "SELRES"),
+                            [f"'{r}#{paths[0]}/runs/{r}#{paths[1]}/{r}/results/fixed.json'" for r in runs], "SELRES", site=site)
+            val |= {r: x | {"site": site} for r, x in v.items() if x.get("val_mse_curve")}
+            kit |= site_python(KIT, [r for r in runs if "_uug_" in r], "SELRESKIT", site=site)
         raw = {"val": val, "kit": kit}
         json.dump(raw, open(cache, "w"))
     s539, u539 = (json.load(open(os.path.join(FM, f))) for f in ("d539s.json", "d539u.json"))
