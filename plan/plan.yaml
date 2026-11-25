@@ -45873,6 +45873,14 @@ entries:
       the noise reads (find_BS copied into the stage''s config). Fixed: run.py sigma_stage_cfg sets find_BS false (7677e3d67;
       tests/test_start_only_keys.py, test_grow_width.py 9/9 and a direct check). Full-run target corrected from 0.3 h (a training-step
       estimate that left out the reads) to 1.0 h, limit 1:45.'
+  - at: '2026-11-25T13:47:59+00:00'
+    text: '2026-11-25 repo-review FIX on D563 (via the llm_compare owner): (1) the six ep50 sweep configs (7e742b868) set
+      their lr windows by the t-only lr_c(t), against HPO rule 2 (evaluate the measured lr*(t,D) surface, analysis/hpo_optima,
+      at the run''s (t, D=1e4) and sweep +-1/2 decade; Muon arms centre on their own search, per fa-canonical-setup). Driver
+      stopped (detached pid 1249412 killed) and its wave 1 cancelled on CC (18 start-up trials, 3 per search, none finished:
+      FA-ccin2p3-2c2ea070 ... 43b2083b, scancel). (2) fixed 0d93d3dc9 (batch-2048 wall comments now from the batch-2048 trials''
+      own times). (3) open: ft_bcrit.py:31 applies the 7/8 stable cut (WSD cooldown) to the ReduceLROnPlateau Adam cells,
+      which feeds par:cbs_regimes (~l.9223-9235).'
   handoff:
     state: 'D560 step (next 2). Part A done and written up: par:cbs_regimes + fig:cbs_regimes in docs/results.tex (adf0da30a),
       reader analysis/critical_batch/ft_bcrit.py @2a98dcca3 (data/ft_bcrit.json, figs/ft_regimes.png; check_caption OK, caption
