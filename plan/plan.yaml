@@ -35209,7 +35209,7 @@ entries:
     agent: a5b859722bc712d25
     state: stopped
     since: '2026-11-24T05:14:31+00:00'
-    state_at: '2026-11-24T05:25:10.279000+00:00'
+    state_at: '2026-11-25T13:57:59.161000+00:00'
     context: 121846
     context_at: '2026-11-24T05:38:12+00:00'
   designs:
@@ -40945,7 +40945,7 @@ entries:
     agent: a115825542ebec00a
     state: working
     since: '2026-11-25T13:16:50+00:00'
-    state_at: '2026-11-25T13:47:38.377000+00:00'
+    state_at: '2026-11-25T13:58:06.236000+00:00'
     context: 217540
     context_at: '2026-11-25T13:47:15+00:00'
   step_why:
@@ -44075,12 +44075,10 @@ entries:
     withdrawn_why: 'D551 drops the owner-reread question: the rule that an owner reads a failed run''s whole log stays as
       it is'
   owner:
-    agent: a87f458be3245c0a6
-    state: closed
-    since: '2026-11-24T18:49:45+00:00'
-    state_at: '2026-11-25T12:02:29.858000+00:00'
-    context: 291484
-    context_at: '2026-11-25T12:05:58+00:00'
+    agent: a5ba353786b0cf99d
+    state: working
+    since: '2026-11-25T13:58:11.325000+00:00'
+    state_at: '2026-11-25T13:58:11.325000+00:00'
   designs:
   - at: '2026-11-23T16:20:16+00:00'
     question: Can the lab LLMs (deepseek-v4-flash, qwen3.8-27b), run through the opencode agent harness in a bwrap sandbox
@@ -47365,9 +47363,9 @@ entries:
     decision: D561
   owner:
     agent: ad098506c65b574e6
-    state: working
+    state: stopped
     since: '2026-11-25T07:26:28+00:00'
-    state_at: '2026-11-25T13:47:40.399000+00:00'
+    state_at: '2026-11-25T13:48:50.150000+00:00'
     context: 267253
     context_at: '2026-11-25T12:15:18+00:00'
   designs:
