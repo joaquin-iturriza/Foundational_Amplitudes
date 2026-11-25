@@ -1,0 +1,56 @@
+{
+ "zng_1e4_42": {
+  "changed": {
+   "bulk_test/bulk": [
+    0,
+    1000000
+   ]
+  },
+  "skipped": "no kit event below x0: the rule changes nothing"
+ },
+ "zng_1e4_43": {
+  "changed": {
+   "bulk_test/bulk": [
+    0,
+    1000000
+   ]
+  },
+  "skipped": "no kit event below x0: the rule changes nothing"
+ },
+ "zng_1e4_44": {
+  "changed": {
+   "bulk_test/bulk": [
+    0,
+    1000000
+   ]
+  },
+  "skipped": "no kit event below x0: the rule changes nothing"
+ },
+ "zng_1e5_42": {
+  "changed": {
+   "bulk_test/bulk": [
+    0,
+    1000000
+   ]
+  },
+  "skipped": "no kit event below x0: the rule changes nothing"
+ },
+ "zng_1e5_43": {
+  "changed": {
+   "bulk_test/bulk": [
+    0,
+    1000000
+   ]
+  },
+  "skipped": "no kit event below x0: the rule changes nothing"
+ },
+ "zng_1e5_44": {
+  "changed": {
+   "bulk_test/bulk": [
+    0,
+    1000000
+   ]
+  },
+  "skipped": "no kit event below x0: the rule changes nothing"
+ }
+}

@@ -27,7 +27,6 @@ import numpy as np  # noqa: E402
 from analysis.common.readers import site_python  # noqa: E402
 from zng4g_d1e3_read import driven, ratio  # noqa: E402
 
-CC = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 X0 = 0.1          # model.input_soft_x0 of the rule
 EPS = 1e-8        # model.input_soft_eps (D539)
 SEEDS = (42, 43, 44)
@@ -38,9 +37,11 @@ BIN = 10          # bins per decade of min x
 REMOTE = r'''
 import json, os, re, sys
 import numpy as np
+sys.path.insert(0, os.getcwd()); import siteconf
 eta = np.array([1., -1., -1., -1.]); out = {}
 for a in sys.argv[1:]:
     lab, d = a.split("#"); r = {}
+    d = os.path.join(siteconf.PROJECT_DIR, "runs", d)
     try:
         log = open(os.path.join(d, "out_0.log")).read()
         m = re.search(r"\[val\] (\S+): (\d+) events.*? from (\S+\.npy)", log)
@@ -76,12 +77,12 @@ def runs():
     out = {}
     for d in ("1e4", "1e5"):
         for a, sweep in (("off", f"ftmech_d539_uug_{d}_off_b2048"), ("rescale", f"ftmech_d539_uug_{d}_eps1e-8_b2048")):
-            out[f"{d}|{a}|42"] = min(driven(sweep), key=lambda t: t[2])[4]
+            out[f"{d}|{a}|42"] = min(driven(sweep), key=lambda t: t[2])[4].split("/runs/", 1)[1]
             for s in SEEDS[1:]:
-                out[f"{d}|{a}|{s}"] = f"{CC}/runs/{sweep}_s{s}"
-        out[f"{d}|below0.1|42"] = ch[f"uug_{d}_softbelow_x0p1"]["run_dir"]
+                out[f"{d}|{a}|{s}"] = f"{sweep}_s{s}"
+        out[f"{d}|below0.1|42"] = ch[f"uug_{d}_softbelow_x0p1"]["run_dir"].split("/runs/", 1)[1]
         for s in SEEDS[1:]:
-            out[f"{d}|below0.1|{s}"] = f"{CC}/runs/selres_s2_uug_{d}_softbelow_x0p1_s{s}"
+            out[f"{d}|below0.1|{s}"] = f"selres_s2_uug_{d}_softbelow_x0p1_s{s}"
     return out
 
 
