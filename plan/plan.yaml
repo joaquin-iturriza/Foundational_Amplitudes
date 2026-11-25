@@ -44941,6 +44941,43 @@ entries:
       leave-*-family, DyHPO tree in results.tex, the entry, site decisions D564/D566/D567; only l.2352 (another question),
       now cited. Note: the network''s 6 h target sits 5x below its 33 h worst-case bound; if its first trials land in the
       dear corner, re-set the target from the logged per-fit times.'
+  - at: '2026-11-25T22:11:25+00:00'
+    question: 'Step 22 (D567/D564): in our setup, does the gg->ttH two-group split (and the large new-family level errors
+      on processes with an internal top, the gg->t b W pair) come from the per-event off-shellness input? Same run without
+      it: does the split disappear and do the new-family shape and level errors fall?'
+    prior: 'Step 21 (data/c_{best,control}_factor_split.json @080b04ed8): on gg->ttH the d-groups are decided by the internal-top
+      off-shellness input in both our-setup arms (AUC 1.00, share of var(d) 0.93); it also explains 0.82/0.81 of var(d) on
+      gg->tbW (|bias| 3-5) and 0.60-0.82 on tt gamma/ttZ; his setup (no such input) has one peak (shape_dists, D567). Step
+      18: log F not the cause (AUC 0.52). results.tex l.9373-9426: off-shellness adopted for ~50x in-distribution gain (levers
+      A/B), l.10855 reconfirmed; kit_benchmark off arms (D418) in-distribution only; no prior held-out/new-family read of
+      the input. Searched: offshell, off-shellness in results.tex, site decisions, the entry.'
+    measure: 'On the 139 held-out processes (tools/llm_score.py ONLY=heldout EVENTS=1, first 1e4 test events, first 5000 per
+      process in the events CSV): (1) gg->ttH MSE-bias^2 of log|M|^2 and the 2-means separation of d (factor_split.py); (2)
+      median MSE-bias^2 and median bias^2 over the 43 new (error_split.py), and the subset with an internal top (gg->ttX,
+      gg->tbW pair, 6 processes); (3) pooled RMSE seen/held out; all against the control''s own numbers.'
+    check: 'The measure moves with the input on existing data: in the control the input explains 0.93 of var(d) on gg->ttH
+      (separation 8.4, MSE-bias^2 5.66) and 0.82 on its bbx->W mu nu relabels; removing it changes what the network can condition
+      on for exactly these events. Launch path: data.offshell_per_event=false with memmap + target_physics qperp + llm4lhc
+      has not run: one 50-step smoke (scripts/job_config_smoke.sh on sweep_config_llmcmp_c_latest.yaml with the control''s
+      HPs and the flag) through the sigma stage (D395), outputs saved.'
+    fixed: 'Everything of the control FA-ccin2p3-d34535b0 (sweep/sweep_config_llmcmp_c_latest.yaml fixed_params, trial_idx
+      9000''s HPs: lr 3.649e-3, Muon wd 0.0473, L2 9.11e-8, warmup 0.18, eta_min 1.38e-8, EMA off, ema_decay 0.9598; seed
+      42; 60,840 steps; batch 24576; data, recipe, HETEROSC, scoring), only data.offshell_per_event false (the slot then holds
+      each process''s internal log-mass, internal_mass_scalars stays true). Cost: the control''s 16.4 h on a V100 -> about
+      16 GPU-h plus a 2 GPU-h smoke, CC, under the 30 GPU-h line.'
+    control: 'Part (c)''s control FA-ccin2p3-d34535b0 (our setup, untuned HPs, off-shellness on), its re-read FA-lxplus-b1f5a43f:
+      gg->ttH MSE 8.78, separation 8.4, new-set median MSE-bias^2 0.106, bias^2 0.209, pooled held-out 1.270.'
+    seeds: One seed (42), as the control; no second seed of our setup exists, so a difference below 2x on a median is reported
+      as not resolved.
+    outcome: 'Yes (the input causes it): gg->ttH separation below 4 (one group) and its MSE-bias^2 below 0.5, and the internal-top
+      new subset''s median MSE-bias^2 at least 2x lower than the control''s -> report with figures, then the fix question
+      to Joaquin (e.g. |o| instead of its sign, or the pole side as its own feature). No: split stays (separation above 4)
+      -> the input is not the cause; next candidate the diagram encoder''s per-process input, recorded open. Either way the
+      in-distribution cost of removing it (seen pooled RMSE, val loss) is reported beside it.'
+    sources: 'Separation 4: a measured spread, step 21''s 2-means separation on single-band processes 2.7-3.3 (gg->ttX other
+      than ttH, both arms) against 8.4-12.1 on the two-group gg->ttH (data/c_{best,control}_factor_split.json); MSE-bias^2
+      0.5: a measured spread, his setup''s 0.17-0.23 against the control''s 5.66 on gg->ttH (shape_dists, step 15/D567 finding
+      2026-11-25T18:26); 2x on medians: CLAUDE.md margin rule, one seed.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
