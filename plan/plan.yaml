@@ -46605,6 +46605,38 @@ entries:
       u u~ g cell and B, C on Z+4g resolved above 1); u u~ g bulk criterion <- Joaquin''s words D552 ''without hurting the
       rest''; 16 trials and waves <- D539, the searches they are read against; cost ~39 GPU-h (224 trials + 28 seed runs at
       the measured stage-1 run times, Z+4g ~10.5 min, u u~ g ~7.5 min) <- D552, under its 100 GPU-h with stage 1''s ~8'
+    fix_at: '2026-11-25T02:22:49+00:00'
+    fix: '(0, 5) The two scheme-A searches on Z+4g (1e4, 1e5) re-measure what stage 1 settled: under the YES rule the design
+      keeps unchanged (r(scheme/no rescale) 2-sigma interval contains 1 or lies below it, and r(scheme/rescale) upper bound
+      below 1), A passed both cells (stage1.json: 0.92 [0.80,1.05] and 1.05 [0.75,1.48] over no rescale; 0.40 [0.35,0.46]
+      and 0.51 [0.41,0.63] over the rescale). The new selection rule, ''every cell whose interval does not lie below 1'',
+      contradicts that YES rule and is not in the passed design (stage 2 only for a scheme-cell that misses YES). Cut those
+      two searches and their seeds (about 6 GPU-h; the Z+4g 1e5 control searches stay, B and C need them), or name the result
+      of an A Z+4g search that would change the call. (4) The learning-rate window rule (''a chosen lr within 0.1 dec of the
+      window edge -> the window is extended once for that search'') has no source for 0.1 dec, and extending one arm''s window
+      while its control keeps the D539 window breaks the matched search. D539''s controls sit 0.22 to 0.39 dec from the edge
+      (d539u.json lr_dec_from_edge). Give the threshold a source and extend the control''s search the same way, or drop the
+      rule and report the distance only. (3, 4) The new u u~ g bulk criterion is in scope: D552 ''without hurting the rest'',
+      and the entry''s own question names u u~ g 1e4 losing the bulk cost. It is warranted now that stage 1 resolved A at
+      1.65 [1.33,2.04] and 3.14 [2.00,4.91]. But on u u~ g the three-seed band is about x1.6 at 1e4 and x1.8 at 1e5: the full
+      rescale''s own searched cost there is 2.18 [1.32,3.58] and 1.68 [0.93,3.07] (d539u.json), so an interval that contains
+      1 cannot rule out a cost of about 1.5x. Write that branch as ''unresolved'', with the smallest cost three seeds resolve,
+      not as ''no u u~ g bulk cost'' (the earlier passed design already noted this, and this design drops it). (14) Disk is
+      missing. Give the disk per trial and seed run (read from a stage-1 or D539 run), the sites drive.py will use, and their
+      free disk now. With 224 trials plus 28 seeds and kit scorings, show that it fits. (12, 15) Give the per-trial wall-time
+      target, which is the job''s --time (Z+4g about 10.5 min and u u~ g about 7.5 min from stage 1, same setup), and when
+      the stage finishes: 6 sequential waves per search at the width site pick offers. Record it on the entry. (0) The B and
+      C searches on u u~ g (4 searches, about 9 GPU-h) matter only if B or C reaches YES on Z+4g after its own search. Their
+      Z+4g costs are resolved well above 1 (1.26 [1.16,1.38], 1.58 [1.17,2.12], 1.75 [1.60,1.91], 1.90 [1.40,2.58]). Either
+      run them only once a B or C Z+4g search gives YES, a wait that reads that output, or state that they run now to save
+      a stage of wall time, with the cost. Checks that hold: the extension is within D552 and the item (stage 1 about 8 +
+      about 39 GPU-h, under the item''s 60 and D552''s 100). The configs differ from D539''s only in sweep_name, input_soft_eps
+      1e-8 plus input_soft_x0 or input_soft_gate (diff read for uug 1e5 x0p1 and zng 1e5 off against x0p1). 16 trials, waves
+      3,3,2,3,3,2, heterosc_select mu_mse match the D539 searches they are read against. The searched controls are reused
+      (d539.json, d539u.json, d539u_kit.json), so it is best against best. Seeds 42-44 as the siblings. The measure moves
+      (stage-1 Z+4g A 0.92 vs C 1.75, intervals disjoint). The soft tolerances +0.30 and +1.05 dec match d539u_kit.json log10(max/min).
+      Searched: selective, soft_x0, soft_gate, event gate, selres, rescale only, window edge (results.tex); rescale, D374,
+      D539, D552 (decisions): only stage 1 and D539.'
   step_why:
     1:
       feeds: D552 (keep the rescale's soft-bin gain without its bulk cost)
