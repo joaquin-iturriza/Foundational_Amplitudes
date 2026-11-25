@@ -45311,6 +45311,18 @@ entries:
       2x on the pair''s MSE-bias^2 <- measured spread 3.51/3.60 vs 4.74/4.85 c_control vs c_best (1.35x), 2.83-3.73 over widths
       (1.3x); 1.5x on new-43 medians <- measured spread 0.241/0.287/0.333 over widths (1.38x), 0.106 vs 0.135 c_control vs
       c_best (1.27x)'
+    passed_at: '2026-11-25T22:47:54+00:00'
+    reviewer: 'Re-check of step 22, the no-off-shellness arm, after the 22:14 and 22:47 FIXes. Checked: config @d2137361b
+      differs from sweep_config_llmcmp_c_latest.yaml only in sweep_name and data.offshell_per_event false; run at trial_1860''s
+      HPs, seed 42, 60,840 steps, HETEROSC; key diff listed; prebuild then smoke (scoring, factor_split --vars-from) then
+      run; lxplus about 26 GB free against about 2.5 GB. Check 2: c_best offshell_6 eta2 0.934 on gg->ttH (AUC 1.0, separation
+      12.14), 0.81/0.82 on the gg->t b W pair; single-band gg->ttX separation 2.7-3.3 (c_best/c_control_factor_split.json).
+      Check 3: pair bias^2 30.7/32.1 (c_best) against 28.0/33.0 (c_control, 1.10x/1.03x) and 12.3-22.8 in his setup over widths
+      (1.8x), so the 2x bars stand above the spread; gg->ttH MSE-bias^2 5.94 against 5.68 (data/split/*_heldout.json). Outcome
+      note: groups gone with eta2 <= 0.25 but gg->ttH MSE-bias^2 above 2.97 has no branch; report it as ''input causes the
+      split, the remaining gg->ttH error has another source''. Check 5 terms: offshell, off-shell, off-shellness, offshell_per_event,
+      held, zero-shot, without, ablat in results.tex (54 hits, l.14592 table catv2_offshell in-distribution only), decisions
+      D2/D90/D364/D400/D418/D506, the entry.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
