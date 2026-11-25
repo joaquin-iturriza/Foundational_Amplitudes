@@ -48526,13 +48526,14 @@ entries:
   match: selres_*
   evidence:
     runs: []
-    commit: 52144d396
+    commit: d424ea5b0
     paths:
     - analysis/selective_rescale/data/input_check.json
     - analysis/selective_rescale/data/stage1.json
     - analysis/selective_rescale/data/stage2.json
     - analysis/selective_rescale/data/support_jobs.json
     - analysis/selective_rescale/data/support_minima.json
+    - analysis/selective_rescale/data/support_read.json
     - analysis/selective_rescale/data/uug_split.json
     - analysis/selective_rescale/input_check.py
     - analysis/selective_rescale/seed_chunks/stage1_submitted.txt
