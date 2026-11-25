@@ -45391,6 +45391,7 @@ entries:
   step_waits:
     '3': FA-ccin2p3-9cf1ce5d
     '2': the design reviewer on job_ccdisk_d556.sh (98656b350); on PASS submit
+    '4': 'job_ccdisk_d556.sh''s read (not yet submitted: design review pending)'
   targets:
   - batch: disk_inventory
     wall_h: 1.0
