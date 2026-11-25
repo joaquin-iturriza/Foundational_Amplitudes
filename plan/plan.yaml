@@ -40940,7 +40940,7 @@ entries:
     decision: D553
   owner:
     agent: afd7ef53b90b9afa4
-    state: working
+    state: closed
     since: '2026-11-25T02:18:05+00:00'
     state_at: '2026-11-25T13:12:37.336000+00:00'
     context: 259028
@@ -41487,38 +41487,42 @@ entries:
     '13': FA-ccin2p3-623a3af6
     '14': FA-ccin2p3-f0b997a2
   handoff:
-    state: 'Part (a) DONE (par:llmcmp_a; held-out MSE ratio searched/control 0.93 added at b109edd37 for the notes-editor).
-      Part (b) (D522, D537; Joaquin approved all four widths, D553, ~196 GPU-h): design passed 2026-11-24; smokes on CC H100
-      NVL read (steady s/step 16 heads 0.399, 32 0.814, 64 0.817->2.376 with checkpoint_blocks, 120 5.331; peak GPU 26.0/50.9/38.8/71.5
-      GB; data analysis/llm_compare/data/width_smokes/*.txt @fc2eab325); config sweep/sweep_config_llmcmp_b_width.yaml committed
-      21800c233, lxplus synced at 8fb46d7f9d, lxplus caches 99c164da/b39fc80c present; wall targets b_width_h16 8.8 h, h32
-      17.9, h64 52.2, h120 117.1 recorded; site pick (2026-11-25 ~01:30) places all 4 on lxplus. NOT YET SUBMITTED: two submits
-      of 16 and 32 heads printed nothing and registered no run (reason hidden by an output filter; run without the grep to
-      see it). Exact submit per width (H, --time, --est-gpu-hours: 16 12:00:00 8.8; 32 24:00:00 17.9; 64 72:00:00 52.2 + --hp
-      model.net.checkpoint_blocks=true; 120 167:00:00 117.1 + checkpoint_blocks): site submit lxplus FA sweep/trial_job.sh
-      --no-sync --item llm_compare --est-gpu-hours <G> --note ''llm_compare part (b) width <H> heads'' --hdr=--gpu-min-mem=80G
-      --hdr=--mem=32G --hdr=--cpus-per-task=4 --hdr=--time=<T> --hdr=--job-name=llmcmp_b_h<H> -- --sweep-config sweep/sweep_config_llmcmp_b_width.yaml
-      --detached --trial-idx <H> --hp-idx <H> --t-steps 60840 --hp training.lr=0.0012437236075771069 --hp training.regularization_lambda=1.1230076981781986e-10
-      --hp training.cosanneal_warmup_frac=0.16348669333383442 --hp ema=true --hp training.ema_decay=0.9989315077979117 --hp
-      model.net.num_heads=<H>. Then plan run each, put step 10''s readout on a wait per width (each width read as it ends,
-      D553: ''show the results as they come'': loss curves and per-process errors in Suprio''s held-out layout, scoring REREAD
-      with scripts/job_llm_score.sh). Part (c): driver llmcmp_c_qperp_drive5 running wave 3; wave 2 trials 3 -5.816, 5 -5.938;
-      trial 0 -5.997 best; steps 5 and 8 wait on its end.'
-    decisions: 'Joaquin''s: D522-D528, D536, D537, D553 (run all four widths; D554 is a duplicate record of D553 made by plan
-      answer, removable only on his words). Mine (re-justify): (i) 80 GB GPU floor on all four widths, 16 heads included (its
-      26 GB peak is under the design''s 30 GB no-floor line; the floor keeps it at the ~200 GPU-h Joaquin approved, the V100
-      bound would be 92 GPU-h for it alone); (ii) host --mem 32G (part (c) peaked 16.7 GB host; smokes ran at 32G); (iii)
-      hp-idx = number of heads for descriptive run dirs runs/llmcmp_b_width/trial_00H; (iv) 120-head smoke run with save=false
-      after the disk alarm (plots/test proven at 3 widths); (v) site tool --gpu-min-mem on SLURM cuts partitions (CC -> gpu_h100),
-      ~/.local/bin/site gpu_partitions + sites/sites.yaml partition_gpu_mem @e27b4a5e7.'
-    ruled_out: per_process_accumulation as memory fallback (single-process batches); CC for 64/120 heads at its current free
-      disk (runs peak 7.8/27.4 GB, CC 15 GB free); the cost-vs-width figure (coordinator dropped it); 'avg s/iter' as step
-      rate (use steady wall-clock 'Finished iteration' deltas).
-    running: 'llmcmp_c_qperp_drive5 (local driver, part (c) wave 3). Part (b) full runs: none submitted yet.'
-    files: sweep/sweep_config_llmcmp_b_width.yaml, analysis/llm_compare/data/width_smokes/*.txt, analysis/llm_compare/control_score.py,
-      analysis/llm_compare/heldout_per_process.py, docs/results.tex (sec:llmcmp), scripts/job_config_smoke.sh, scripts/job_llm_score.sh,
-      base_experiment.py (_write_step_log save=false fix a92234542), sites/sites.yaml
-    written: '2026-11-25T00:40:58+00:00'
+    state: 'Part (a) DONE (par:llmcmp_a). Part (b) (D522/D537/D553 ''run everything and show the results as they come''),
+      muP width at part (a) trial 5''s HPs: 16 heads DONE and handed back: FA-ccin2p3-dcb66b14, scored FA-ccin2p3-3b19137a:
+      pooled RMSE log|M|^2 seen 0.103 / held out 0.990 / relabels 0.192 / new 1.756 vs trial 5 0.117 / 1.003 / 0.241 / 1.767
+      (LLM 0.321/0.721/0.341/1.193); median relabel MSE 0.0102 vs 0.0208, new 1.457 vs 1.144; data analysis/llm_compare/data/b_h16_*
+      @9b4d41705; figures figs/b_h16_heldout_per_process.png, figs/b_width_curves.png. 32 heads FA-ccin2p3-e9dfa8b9 and 64
+      heads FA-ccin2p3-623a3af6 RUNNING on CC gpu_h100 (steps 12, 13); 120 heads FA-ccin2p3-f0b997a2 (slurm 64817455, run
+      dir runs/llmcmp_b_width/trial_0120 on CC, --hp training.save_last=false) PENDING Resources on CC gpu_h100 (step 14:
+      its text still names the removed FA-lxplus-25e06bc1; the wait is on f0b997a2, use REREAD=FA-ccin2p3-f0b997a2). RULE
+      for steps 12-14 (coordinator, Joaquin ''show me the plot I care about''): when a width ends, score-and-draw FIRST, before
+      anything else: site pick (re-run it if CC''s probe times out: a timed-out probe marks CC DOWN and allots lxplus, where
+      our GPU jobs never start because the 80 GB slots refuse by group filter), submit scripts/job_llm_score.sh --env RUN=runs/llmcmp_b_width/trial_0<H>
+      --env REREAD=<run> --hdr=--mem=32G --hdr=--time=02:00:00 on the allotted site (run dirs are on CC; if lxplus, site copy
+      first), save val lines to data/b_val_h<H>.txt, on the score''s end fetch llm_score_{seen,heldout}.json to data/b_h<H>_*.json,
+      run control_score.py --tag a_trial5 b_h16 ... b_h<H> --out b_widths_vs_a5 and heldout_per_process.py --tag a_trial5
+      <widths done> --label ... (max 6 arms), b_width_curves.py; checked caption; hand back. Part (c): search DONE (8 trials,
+      3 blew up; best hp1860 lr 1.60e-3 val NLL -5.997, FA-ccin2p3-29ce8950); curves figs/c_val_curves.png @bde7216d0 handed
+      back; best trial''s score FA-ccin2p3-c9d44ad3 (job_llm_score.sh REREAD=FA-ccin2p3-29ce8950) in flight, step 5 waits
+      on it: then held-out figure (heldout_per_process.py --tag a_trial5 c_control c_best ... with data/c_best_*.json) and
+      pooled numbers vs part (a) with the 1.38 margin, which decides where step 8 (width at part (c)''s HPs) starts. Control
+      already scored (data/c_control_*.json). Step 15 new: D564 investigation (why the LLM extrapolates better), not started.'
+    decisions: 'Joaquin''s: D522-D528, D536, D537, D553 (all four widths; D554 duplicate), D564 (investigate why the LLM extrapolates
+      better). Mine (re-justify): (i) 80 GB GPU floor on all widths (16 heads'' 26 GB peak is under the 30 GB line; keeps
+      the approved ~200 GPU-h); (ii) 16/32/64/120 moved lxplus -> CC because lxplus 80 GB slots refuse our jobs by group filter
+      (SCond_vo_filter), 0 willing slots for hours; (iii) training.save_last=false for 120 heads (58804b477, repo review PASS):
+      skips the last model run_trial deletes anyway, end disk peak 27.4 -> ~17.7 GB; CC placement by peaks not coinciding:
+      17.7 + 10 < 29 GB free at submission; (iv) scoring on V100 (inference only, no floor); (v) heldout_per_process.py up
+      to 6 arms (1fc401964).'
+    ruled_out: lxplus for part (b) GPU jobs and scores (80 GB and other GPU slots refuse by group filter; site pick's lxplus
+      estimate ignores it); CC for 120 heads under the old 27.4 GB peak; cleanup for disk (no rebuildable debris of ours left;
+      prune_site.sh already runs 6-hourly); per_process_accumulation as memory fallback.
+    running: FA-ccin2p3-e9dfa8b9 (32 heads), FA-ccin2p3-623a3af6 (64 heads), FA-ccin2p3-f0b997a2 (120 heads, pending), FA-ccin2p3-c9d44ad3
+      (part (c) best-trial score)
+    files: sweep/sweep_config_llmcmp_b_width.yaml, sweep/sweep_config_llmcmp_c_latest.yaml, scripts/job_llm_score.sh, tools/llm_score.py,
+      analysis/llm_compare/{heldout_per_process.py,control_score.py,b_width_curves.py,c_val_curves.py}, analysis/llm_compare/data/{b_h16_*,b_val_h16.txt,a_val_trial_1163.txt,c_val_trial_*.txt,c_control_*},
+      analysis/llm_compare/suprio_llm_heldout_fig.png, base_experiment.py (_save_last_model), config/default.yaml (training.save_last)
+    written: '2026-11-25T13:14:15+00:00'
   designs:
   - at: '2026-11-22T04:13:14+00:00'
     question: 'Part (a), D525: in the conditions of Suprio''s LLM pID run (D524, D526, D527: our catalog_daniel regeneration
