@@ -44447,6 +44447,13 @@ entries:
       value when every checked reading settles the cause; with tool fixes 0.17% and lookups 0, the routed kinds save up to
       1.39% (tools/token_share.py last JSON line). Written as par:labllm3 with fig:labllm3 (token_activity), commit pending
       the repo-reviewer pass (backlog overdue).'
+  - at: '2026-11-25T12:06:29+00:00'
+    text: 'Replay data loss 2026-11-25: another owner''s ''git stash push -u ... && site sync ...; git stash pop'' at 01:06:41
+      UTC (selective_rescale) unlinked and recreated every untracked file of the shared checkout, among them this entry''s
+      answers files under running writers; wake answers after that point lost, review answers recovered from /proc. Fix here:
+      lab_wake_trial data in ~/.local/share/fa_labllm/wake_trial (outside the checkout). The stash pattern itself is unguarded
+      (any agent''s untracked outputs being written by a detached job are exposed); routed to the coordinator for a hook.
+      Also: 6 concurrent calls (my widening from the design''s 2) gave 219 timeouts at 600 s; relaunched at 3 with 1200 s.'
   handoff:
     state: 'Hard round done (labllm 7a28103a4, summary.json, figs/lab_llm_hard.png): all ten multi-file fixes valid after
       the sandbox fix (774147232: TMPDIR in run dir, fixcheck copies as git repos; baselines refreshed 571cf7014). First pass
