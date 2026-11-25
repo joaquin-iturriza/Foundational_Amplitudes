@@ -45055,9 +45055,6 @@ entries:
     2: 'After Joaquin''s yes on the costly-results list: one CPU deletion job (manifest first) of exactly the groups he approves
       (zz_catft, zz_catft_lowloss2, zz_catft_lowloss3 model files; runs/zz_smoke* model files older than 3 days), design passed
       by the design reviewer first'
-    4: 'D556 cache question: from SCRATCH/zz_cc_disk/cache_readers.txt and census_d556.tsv, delete the training-cache entries
-      nothing reads (delete_from_manifest.py --apply, D147) and any memmap key no running job or open entry''s recipe reads;
-      report each cache with its size, reader and what went'
   done_when: null
   notes_ref: null
   match: cc_disk_*,zz_probe_*
@@ -45608,7 +45605,6 @@ entries:
       the caches is unread; nothing deleted, no duplicate key (the three keys hold different pool sets).'
   step_waits:
     '2': FA-ccin2p3-170b2eff
-    '4': FA-ccin2p3-170b2eff (its cache_readers.txt and census_d556.tsv)
   targets:
   - batch: disk_inventory
     wall_h: 1.0
@@ -45670,11 +45666,6 @@ entries:
       if:
       - 'yes: design, review, submit the deletion, report GiB freed and df'
       - 'no or partial: delete only what he approved; record the rest as kept'
-    4:
-      feeds: which CC caches are needed (D556)
-      if:
-      - 'census read: design, review, submit the deletion; report what went and what stays with why'
-      - 'every cache read by a running job or open entry: report that, nothing deleted'
 - id: cc_login_jobs
   title: 'CC login node: recurring and long scripts moved to Slurm (CC support''s email)'
   question: 'Can every non-interactive script we run on CC''s login node (the supervisor''s maintain commands: disk_watch,
