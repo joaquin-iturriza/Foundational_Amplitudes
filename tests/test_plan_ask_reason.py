@@ -92,3 +92,14 @@ def test_design_outcome_sources():
             raise AssertionError(src)
     plan._sources_ok(lab, "0.3x <- Joaquin: \"I expect this to save a ton of tokens\" (D530)")
     plan._sources_ok("yes when the arms finish and plots are drawn", "")
+
+
+def test_debris_words_only_match_within_one_sentence():
+    ok = ("Scope: our debris was already deleted. Yes or no: delete the superseded fine-tune model files?")
+    plan._ask_ok(ok)
+    try:
+        plan._ask_ok("Scope: delete the duplicate cache on CC, yes or no?")
+    except SystemExit as e:
+        assert "own cheap-to-rebuild debris" in str(e)
+    else:
+        raise AssertionError("duplicate cache")

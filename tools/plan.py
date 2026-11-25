@@ -2359,8 +2359,8 @@ ASK_REASONS = (
     ("hold", re.compile(r"^(your|a) hold\b[^:]{0,40}:", re.I), None),
 )
 # deleting our own rebuildable debris is never the user's call (~/work/CLAUDE.md), whatever else the ask says
-ASK_OWN_DEBRIS = re.compile(r"\b(delet\w*|remov\w*)\b.*\b(cach\w*|rebuild\w*|debris|zz_probe\w*|duplicate)\b|"
-                            r"\b(cach\w*|rebuild\w*|debris|zz_probe\w*|duplicate)\b.*\b(delet\w*|remov\w*)\b", re.I | re.S)
+ASK_OWN_DEBRIS = re.compile(r"\b(delet(?!ed\b)\w*|remov(?!ed\b)\w*)\b[^.?!]{0,60}\b(cach\w*|rebuild\w*|debris|zz_probe\w*|duplicate)\b|"
+                            r"\b(cach\w*|rebuild\w*|debris|zz_probe\w*|duplicate)\b[^.?!]{0,60}\b(delet(?!ed\b)\w*|remov(?!ed\b)\w*)\b", re.I)  # both words within one sentence
 
 
 def ask_reason(ask):
