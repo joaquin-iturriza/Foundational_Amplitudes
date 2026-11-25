@@ -40943,7 +40943,7 @@ entries:
     decision: D553
   owner:
     agent: a115825542ebec00a
-    state: working
+    state: closed
     since: '2026-11-25T13:16:50+00:00'
     state_at: '2026-11-25T14:13:07.513000+00:00'
     context: 294133
@@ -41541,42 +41541,36 @@ entries:
     '15': 'the next owner (this owner closes near the context limit after step 8''s smokes go out): design the level-branch
       configurations (finding 2026-11-25 split read)'
   handoff:
-    state: 'Part (a) DONE (par:llmcmp_a). Part (b) (D522/D537/D553 ''run everything and show the results as they come''),
-      muP width at part (a) trial 5''s HPs: 16 heads DONE and handed back: FA-ccin2p3-dcb66b14, scored FA-ccin2p3-3b19137a:
-      pooled RMSE log|M|^2 seen 0.103 / held out 0.990 / relabels 0.192 / new 1.756 vs trial 5 0.117 / 1.003 / 0.241 / 1.767
-      (LLM 0.321/0.721/0.341/1.193); median relabel MSE 0.0102 vs 0.0208, new 1.457 vs 1.144; data analysis/llm_compare/data/b_h16_*
-      @9b4d41705; figures figs/b_h16_heldout_per_process.png, figs/b_width_curves.png. 32 heads FA-ccin2p3-e9dfa8b9 and 64
-      heads FA-ccin2p3-623a3af6 RUNNING on CC gpu_h100 (steps 12, 13); 120 heads FA-ccin2p3-f0b997a2 (slurm 64817455, run
-      dir runs/llmcmp_b_width/trial_0120 on CC, --hp training.save_last=false) PENDING Resources on CC gpu_h100 (step 14:
-      its text still names the removed FA-lxplus-25e06bc1; the wait is on f0b997a2, use REREAD=FA-ccin2p3-f0b997a2). RULE
-      for steps 12-14 (coordinator, Joaquin ''show me the plot I care about''): when a width ends, score-and-draw FIRST, before
-      anything else: site pick (re-run it if CC''s probe times out: a timed-out probe marks CC DOWN and allots lxplus, where
-      our GPU jobs never start because the 80 GB slots refuse by group filter), submit scripts/job_llm_score.sh --env RUN=runs/llmcmp_b_width/trial_0<H>
-      --env REREAD=<run> --hdr=--mem=32G --hdr=--time=02:00:00 on the allotted site (run dirs are on CC; if lxplus, site copy
-      first), save val lines to data/b_val_h<H>.txt, on the score''s end fetch llm_score_{seen,heldout}.json to data/b_h<H>_*.json,
-      run control_score.py --tag a_trial5 b_h16 ... b_h<H> --out b_widths_vs_a5 and heldout_per_process.py --tag a_trial5
-      <widths done> --label ... (max 6 arms), b_width_curves.py; checked caption; hand back. Part (c): search DONE (8 trials,
-      3 blew up; best hp1860 lr 1.60e-3 val NLL -5.997, FA-ccin2p3-29ce8950); curves figs/c_val_curves.png @bde7216d0 handed
-      back; best trial''s score FA-ccin2p3-c9d44ad3 (job_llm_score.sh REREAD=FA-ccin2p3-29ce8950) in flight, step 5 waits
-      on it: then held-out figure (heldout_per_process.py --tag a_trial5 c_control c_best ... with data/c_best_*.json) and
-      pooled numbers vs part (a) with the 1.38 margin, which decides where step 8 (width at part (c)''s HPs) starts. Control
-      already scored (data/c_control_*.json). Step 15 new: D564 investigation (why the LLM extrapolates better), not started.'
-    decisions: 'Joaquin''s: D522-D528, D536, D537, D553 (all four widths; D554 duplicate), D564 (investigate why the LLM extrapolates
-      better). Mine (re-justify): (i) 80 GB GPU floor on all widths (16 heads'' 26 GB peak is under the 30 GB line; keeps
-      the approved ~200 GPU-h); (ii) 16/32/64/120 moved lxplus -> CC because lxplus 80 GB slots refuse our jobs by group filter
-      (SCond_vo_filter), 0 willing slots for hours; (iii) training.save_last=false for 120 heads (58804b477, repo review PASS):
-      skips the last model run_trial deletes anyway, end disk peak 27.4 -> ~17.7 GB; CC placement by peaks not coinciding:
-      17.7 + 10 < 29 GB free at submission; (iv) scoring on V100 (inference only, no floor); (v) heldout_per_process.py up
-      to 6 arms (1fc401964).'
-    ruled_out: lxplus for part (b) GPU jobs and scores (80 GB and other GPU slots refuse by group filter; site pick's lxplus
-      estimate ignores it); CC for 120 heads under the old 27.4 GB peak; cleanup for disk (no rebuildable debris of ours left;
-      prune_site.sh already runs 6-hourly); per_process_accumulation as memory fallback.
-    running: FA-ccin2p3-e9dfa8b9 (32 heads), FA-ccin2p3-623a3af6 (64 heads), FA-ccin2p3-f0b997a2 (120 heads, pending), FA-ccin2p3-c9d44ad3
-      (part (c) best-trial score)
-    files: sweep/sweep_config_llmcmp_b_width.yaml, sweep/sweep_config_llmcmp_c_latest.yaml, scripts/job_llm_score.sh, tools/llm_score.py,
-      analysis/llm_compare/{heldout_per_process.py,control_score.py,b_width_curves.py,c_val_curves.py}, analysis/llm_compare/data/{b_h16_*,b_val_h16.txt,a_val_trial_1163.txt,c_val_trial_*.txt,c_control_*},
-      analysis/llm_compare/suprio_llm_heldout_fig.png, base_experiment.py (_save_last_model), config/default.yaml (training.save_last)
-    written: '2026-11-25T13:14:15+00:00'
+    state: 'Part (a) DONE (par:llmcmp_a). Part (c) DONE: best hp1860 FA-ccin2p3-29ce8950 scored, par:llmcmp_c @1aa1030ec (seen
+      0.053, held out 1.178, relabels 0.068, new 2.116; LLM 0.321/0.721/0.341/1.193). Part (b) his setup: 16 heads done; 32
+      FA-ccin2p3-e9dfa8b9 and 64 FA-ccin2p3-623a3af6 running, 120 FA-ccin2p3-f0b997a2 pending (steps 12-14). FIGURES: every
+      held-out comparison is ONE figure, python analysis/llm_compare/heldout_per_process.py (no args; fixed names/colours
+      in ARMS, fixed y range; Joaquin 2026-11-25 on inconsistent figures), figs/all_arms_heldout_per_process.png; add each
+      new arm to ARMS (our setup widths: add ''our setup, 16/32/64/120 heads''). Step 15 (D564): split read done (finding
+      2026-11-25): on the 43 new processes our error is a misplaced level (bias^2 median share 0.75-0.86, bias^2 alone above
+      the LLM''s whole MSE on 15-32 of 43), shape right (rho ~0.9) except gg->tbW (rho 0.3-0.4, -0.1 in our setup); relabels
+      are floor; figure figs/all_arms_bias_heldout_per_process.png (--part bias). NEXT on 15: the level branch of the passed
+      design: configurations that change what sets a new family''s level (candidates: learned per-species embedding as his
+      pID vs our fixed property table; the coupling-order inputs already in our setup did not fix it; the multi-H-with-b sign
+      flip between setups), each its own design + review. Step 8 (D537): design PASSED (3rd review); smokes FA-ccin2p3-8acd3fc1
+      (16), -39f4ab2e (32), -e5265194 (64, save=false, checkpoint_blocks), -e1d1fbaf (120, same) in flight; then measured
+      GPU-h (est ~210) and the disk timing to Joaquin (D536): 16/32 full runs fit CC now, 64/120 wait for part (b)''s 120-head
+      run to end or space freed.'
+    decisions: 'Joaquin''s: D522-D528, D536, D537, D553, D564; 2026-11-25 figure-consistency comment (one figure, fixed names).
+      Mine (re-justify): (i) smokes at 16/32 save on (full path incl. sigma stage/plots, 0.9 GB), 64/120 save=false (disk)
+      - the passed design said save=false for all; (ii) y range fixed 1e-7..1e3 (MSE) and 1e-5..1e2 (|bias|), asserting instead
+      of clipping; (iii) the his-setup untuned control included in the all-arms figure; (iv) step-15 re-reads on H100 reproduce
+      per-process MSE to 1e-7 median, up to 14% only on MSE<=5e-3 processes (float noise), pooled to 1e-5; (v) part (b) choices
+      of the previous owner (80 GB floor, CC placement, save_last=false at 120).'
+    ruled_out: lxplus for GPU jobs (80 GB slots refuse by group filter); site sync --allow-dirty and git stash -u (denied/refused;
+      wait for owners to commit); target standardisation (his z = ours within 0.2%) and new multiplicities (none) as causes
+      of D564's gap.
+    running: FA-ccin2p3-e9dfa8b9 (b 32h), FA-ccin2p3-623a3af6 (b 64h), FA-ccin2p3-f0b997a2 (b 120h, pending), smokes FA-ccin2p3-8acd3fc1/-39f4ab2e/-e5265194/-e1d1fbaf
+      (step 8)
+    files: analysis/llm_compare/{heldout_per_process.py (ARMS, --part bias), family_gap.py, error_split.py, control_score.py,
+      b_width_curves.py}, analysis/llm_compare/data/{split/*, step15_family_gap.json, c_best_*}, tools/llm_score.py (level/scale/floor
+      split), scripts/job_llm_score.sh (ONLY=heldout), sweep/sweep_config_llmcmp_c_width.yaml, docs/results.tex par:llmcmp_c
+    written: '2026-11-25T14:36:57+00:00'
   designs:
   - at: '2026-11-22T04:13:14+00:00'
     question: 'Part (a), D525: in the conditions of Suprio''s LLM pID run (D524, D526, D527: our catalog_daniel regeneration
