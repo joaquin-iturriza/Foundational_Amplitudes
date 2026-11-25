@@ -18078,6 +18078,91 @@ calls, for the entry owners and the main session. Text only: messages with no to
 reasoning); final report: an owner's hand-back; write-up: edits to \code{docs/results.tex}.}\label{fig:labllm3}
 \end{figure}
 
+% src: python3 tools/token_share.py --refusals @e1b708a35
+% claim: refusals=1000
+% claim: hi_M=677.6
+% claim: lo_M=249.6
+% claim: share_hi_pct=13.7
+% claim: share_lo_pct=5.0
+% claim: by_role_hi_M.main_session=466.5
+% claim: by_role_hi_M.owners=180.8
+% claim: role_pct_hi.main_session=32.1
+% claim: role_pct_lo.main_session=12.0
+% claim: role_pct_hi.owners=6.5
+% claim: role_pct_lo.owners=2.3
+% claim: role_n.main_session=525
+% claim: role_n.owners=347
+% allow: 14 because it is the window's length in days
+\paragraph{What the refusals of our checks cost.}\label{par:refusal-cost} The user pointed out that the subagents, not
+only the main session, spend a large share of the tokens (D558), so the cost of refusals was measured for every role
+over the same 14 days and in the same token unit as Paragraph~\ref{par:labllm3}. A refusal is a hook's denial of a tool
+call, a Stop or agent-stop bounce, or a refusal printed by \code{tools/plan.py} or \code{site}; its cost is every
+message after it until the refused action succeeds, or, when the agent never retries, until its first message whose
+calls all go through (the lower bound stops there for every refusal). Each message goes to the newest open refusal, so
+nothing is counted twice. The 1000 refusals were followed by 677.6 million tokens (13.7\% of all; lower bound 249.6
+million, 5.0\%). The main session carries most of it: 466.5 million after its 525 refusals, 32.1\% of its own tokens
+(12.0\% at the lower bound), against 180.8 million after the owners' 347, 6.5\% of theirs (2.3\%). Each message of the
+main session carries its whole context, so one bounce of its Stop gate costs about a million tokens.
+
+% src: python3 tools/token_share.py --refusals @e1b708a35
+% claim: top.stop_record_before_compaction.hi_M=113.9
+% claim: top.stop_resume_the_entry_s_owner.hi_M=91.6
+% claim: top.agent_stop_steps_left_uncovered.hi_M=54.1
+% claim: top.commit_a_review_is_overdue.hi_M=51.6
+% claim: top.commit_a_review_is_overdue.n=80
+% claim: top.stop_open_question_not_sent.hi_M=48.6
+% claim: top.stop_open_question_not_sent.n=54
+% claim: top.stop_open_question_not_sent.repeat=16
+% claim: top.shell_foreground_sleep.n=90
+% claim: top.shell_foreground_sleep.hi_M=14.6
+% claim: verdicts.context_guard.bounces_before=121
+% claim: verdicts.context_guard.compactions_before=13
+% claim: verdicts.context_guard.bounces_after=2
+% claim: verdicts.context_guard.compactions_after=3
+% claim: verdicts.commit_block.names_pillar_file=63
+% claim: verdicts.commit_block.names_none=12
+% claim: verdicts.sleep_guard.short=50
+% claim: verdicts.sleep_guard.quoted_only=16
+% claim: verdicts.sleep_guard.loop=19
+% claim: verdicts.sleep_guard.over_5s=5
+% claim: verdicts.question_replay.passes_today=24
+% claim: verdicts.question_replay.refused_today=36
+% allow: 10 13 3 2 5 because they are the number of checks drawn, the compactions and bounces read in the same output (verdicts.context_guard), and the sleep limit in seconds
+The ten costliest checks (Fig.~\ref{fig:refusal-cost}) were read against their code and their cases. Six were right on
+every case read: resuming the owner of an entry with open events or a ready step (91.6 million; the main session then
+messaged the owner or updated the plan), the owners' leave check (54.1 million), and the main session's checks for open
+events with no owner, a ready step with no owner, and an armed event waiter. Four misfired on part of their cases. The
+context guard asked for recording before compaction 121 times over 13 compactions before its fix of 2026-11-19
+(\code{ee7afdfb7}, once per compaction period) and 2 times over 3 after; the first bounce of a period is right, the
+rest were the misfire (113.9 million in all). The commit block of the review backlog (80 refusals, 51.6 million)
+refused every commit while any overdue pillar had uncommitted changes anywhere in the shared checkout: 63 commits named
+a file of that pillar, 12 named none (another agent's files, or a commit in the draft's own repository). The
+open-question check (54 refusals, 48.6 million, 16 of them bouncing again at the next attempt) missed questions restated
+in other words whose asking sentence is short (``Add them?'', ``Do you want it?''); replayed through today's matcher,
+24 questions named in its bounces pass and 36 are still refused, which includes the cases where the question
+was never sent. The sleep guard (90 refusals, 14.6 million) refused 50 single sleeps of at most 5 seconds and 16 commands
+that held \code{sleep} only inside a quoted string, against 19 loops and 5 longer sleeps it should refuse. The brief
+guard's refusals included read-only reviews of draft sections and cold reads, for which it already has an exemption
+that its refusal text did not name.
+
+% allow: 5 2026 11 25 26 four two because they are the sleep limit in seconds, dates and the test's case counts
+The misfires were fixed where every later call meets them (\code{133a1b102}): the commit block now refuses only a
+commit naming a changed file of the overdue pillar, or one naming no paths, and leaves commits in other repositories
+alone; the sleep guard lets a single sleep of up to 5 seconds outside a loop through, and since 2026-11-25 ignores
+quoted text; the question matcher reads a short asking sentence with the two sentences before it, tested on four real
+cases (\code{tests/test\_plan\_ask\_short.py}: two restated questions now pass, a status that never asked and a
+different question stay refused); the brief guard's refusal names the cold-read exemption. The right checks are kept
+as they are: their cost is the work they ask for. The share after the fixes is measured on the week from 2026-11-26.
+
+% allow: 10^6 14 because they are the axis unit and the window's length in days
+\begin{figure}[htbp]\centering
+\includegraphics{../analysis/agent_redesign/figs/refusal_cost.pdf}
+\caption{Tokens after the refusals of the ten costliest checks over 14 days (log scale), by role, upper bound: the
+messages from a refusal until the refused action succeeds, or until the agent's next message whose calls all go through
+when it never retries; a Stop bounce until the next attempt to end. Stop: the main session's end of turn; agent stop: an
+owner's; commit, launch, shell: a git commit, an agent launch, a shell command.}\label{fig:refusal-cost}
+\end{figure}
+
 \subsection{The orchestrator kit: the general machinery as a standalone repo}\label{sec:orchestrator-kit}
 
 The question (D546) was whether the machinery behind this setup can be pulled apart from what is particular to FA
