@@ -40808,13 +40808,6 @@ entries:
       (width, depth, alpha, lr, batch) and the boosted tree (learning rate, leaves, iterations, l2) over their coupled spaces,
       cross-fitted by relabelling class on the 1352 training processes (never on the 43 new), best against best on the level
       error and flat shift of step 17; its own design and review, CPU jobs on lxplus (catalog_daniel train-role pools)'
-    21: '21: D567 follow-up after step 18 (the gg->ttH two-group split does not follow log F): does it follow the network''s
-      per-event off-shellness input (offshell_per_event, signed-log (s_prop - M^2) of the internal top/Z/H/W, an input only
-      our setup has)? Re-read both our-setup arms with llm_score.py --events-out @1c3f0e546 (adds offshell_<pdg> columns):
-      searched REREAD=FA-ccin2p3-29ce8950 (runs/llmcmp_c_qperp/trial_1860), control REREAD=FA-ccin2p3-d34535b0 (trial_9000),
-      ONLY=heldout EVENTS=1 on CC; then factor_split.py as a CC CPU job per arm into data/c_{best,control}_factor_split.json
-      (log F numbers of c_best must reproduce step 18''s), figures --x offshell_6 (and the variable with the largest gg->ttH
-      AUC)'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -41029,14 +41022,6 @@ entries:
       - 'best network or tree <= 0.19 on the 43 new with its shift below the regressor''s by more than 2x noise: marriage
         found, go to (C), g fed to LLoCa per event, its own design'
       - 'both stay above 0.19 after the search: record (B) as a dead end for level placement; report the shift result alone'
-    21:
-      feeds: 'D567: why our setup''s level-removed distributions split on gg->ttH'
-      if:
-      - 'split follows an off-shellness column (AUC near 0 or 1): the input''s sign/scale on new families is the cause; report
-        with the figure, then design the matched check (offshell_zero on the searched run''s re-read is not possible without
-        retraining: a question to Joaquin if it needs GPU above budget)'
-      - 'no column separates the groups: report; next candidate the diagram encoder''s per-process input (llm4lhc) or the
-        frames, recorded as open'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
@@ -41779,7 +41764,6 @@ entries:
     '16': FA-ccin2p3-89671610
     '19': FA-ccin2p3-0165aa58
     '20': FA-lxplus-affc2e5a FA-lxplus-c894babe
-    '21': FA-lxplus-e3b67532 FA-lxplus-b1f5a43f
   handoff:
     state: 'Part (a) DONE, part (c) DONE. Part (b) his setup: 8/16/32 heads read (32 heads FA-ccin2p3-e9dfa8b9 scored @fa6e51441:
       pooled RMSE seen 0.107, all 139 held out 1.170 vs 16 heads 0.103/0.990, 8 heads 0.117/1.003; relabels median MSE-bias^2
