@@ -9259,6 +9259,75 @@ two input settings (\code{FA-ccin2p3-9a73698a}). The last eighth of each Muon ru
 % allow: 4g 10^4 400 because they are the process multiplicity, the training size and the epochs, settings
 % allow: 2 because it is the exponent of |M|^2
 
+\paragraph{The critical batch of the optimizer's step (D560, 2026-11-25).}\label{par:cbs_update} The question: the noise
+scale $B_{\rm simple}$ sits far below the scan's $B_{\rm crit}$ (Sec.~\ref{sec:noisescale}, par.~\ref{par:cbs_scan});
+does the loss decrease of the optimizer's own step, read along one run, find it? We want that step's dependence on the
+batch, so every $50$ steps we form the update $u(g_b)$ the optimizer takes from $b$ events, without momentum, and
+read on held-out chunks its loss decrease $\Delta L(b)$ and first-order part $A(b)=\langle G,u(g_b)\rangle$, with
+$G$ the full gradient. Per window of $200$ steps we fit McCandlish et al.'s per-step form
+$\Delta L_\infty/(1+B/b)$ to $\Delta L$ (giving $B_{\rm dL}$), to $A$ (giving $B_A$) and to the quadratic model's
+optimal step $A^2/(4(A-\Delta L))$ (giving $B_q$). For the pretraining at the scan's batch-$16384$ best
+hyperparameters, read at $b=2048$, $4096$ and $8192$, the full step raises the loss at some $b$ in $12$ of
+$13$ windows (Fig.~\ref{fig:cbs_update}, top): it overshoots by the same amount at every $b$. $5$ windows hold a
+read above $100$ times their median and are set apart; the one fitted $B_{\rm dL}$, $201$, is among them. In the
+other windows $B_A$ lies between $27.9$ and $111$, and in the windows holding the run's own crossings of the scan's
+three loss targets $B_q$ is $102$, $112$ and $137$, below a third of $B_{\rm crit}$ at each: the design's NO.
+% src: python3 analysis/critical_batch/dl_read.py analysis/critical_batch/data/pretrain_update_noise_scale.json pretrain_update_bdl --ref 2500 6690 --ref-label "scan's critical batch, range" @ada4a16c8
+% claim: n_dL_nonpositive=12
+% claim: n_windows=13
+% claim: n_windows_with_exploding_read=5
+% claim: B_dL_median=201
+% claim: B_A_min_max.0=27.9
+% claim: B_A_min_max.1=111
+% claim: B_q_clean.2.1=102
+% claim: B_q_clean.5.1=112
+% claim: B_q_clean.7.1=137
+% allow: 50 200 because they are the read spacing and the window length, settings
+% allow: 16384 2048 4096 8192 because they are batch sizes, settings
+% allow: 100 because it is the design's exploding-read threshold, a rule fixed before the data
+% allow: 1 4 2 because they are constants of the fitted law and the quadratic model, formulas
+
+For $q\bar q\to Z+4g$ at $10^4$ training events, Adam from scratch at batch $2048$ read at $b=64$ to $1024$, the
+step raises the loss in all $7$ windows (Fig.~\ref{fig:cbs_update}, bottom); $B_A$ lies between $5.86$ and $50.8$
+and $B_q$ between $2.72$ and $196$, mostly below the two-batch range of par.~\ref{par:cbs_regimes}. The reason is that
+the step we read carries no momentum, while Adam ($\beta_1=0.99$) and the AdamW part of MuonAdamW ($\beta_1=0.9$) put
+the current batch into the real step at $1\%$ and $10\%$ of that size. So none of the reads along one run, the noise
+scale, the first-order step or the optimal step, finds the critical batch; the scan's $B_{\rm crit}$ is the number to
+use, and a new setup takes its batch from a short batch scan of its own. A measure that follows the momentum is not
+tested.
+% src: python3 analysis/critical_batch/dl_read.py analysis/critical_batch/data/zng4g_update_noise_scale.json zng4g_update_bdl --ref 87 261 @ada4a16c8
+% claim: n_dL_nonpositive=7
+% claim: n_windows=7
+% claim: B_A_min_max.0=5.86
+% claim: B_A_min_max.1=50.8
+% claim: B_q_clean.5.1=2.72
+% claim: B_q_clean.1.1=196
+% allow: 4g 10^4 because they are the process multiplicity and the training size, settings
+% allow: 2048 64 1024 because they are batch sizes, settings
+% allow: 0.99 0.9 1\% 10\% because they are the optimizers' momentum settings and 1-beta_1, settings
+
+\begin{figure}[h]
+\centering
+\includegraphics{../analysis/critical_batch/figs/pretrain_update_bdl.pdf}\\
+\includegraphics{../analysis/critical_batch/figs/zng4g_update_bdl.pdf}
+\caption{Critical batch of the optimizer's step without momentum, read along one run. Top: the catalog\_v4 pretraining
+(MuonAdamW at the batch-$16384$ scan's best hyperparameters, seed $42$, stopped at $\mathcal L_{\rm val}=-2.30$).
+Bottom: $q\bar q\to Z+4g$ at $10^4$ training events, Adam from scratch at batch $2048$ (float64, seed $42$). Left:
+critical batch against training step, one point per $200$-step window: $B_A$ fitted to the first-order part $A(b)$
+(squares), $B_q$ to the quadratic model's optimal step $A^2/(4(A-\Delta L))$ (diamonds), $B_{\rm dL}$ to the loss
+decrease $\Delta L(b)$ with its jackknife error (dot), the reference range as dashed lines (top: the scan's
+$B_{\rm crit}$ at $\mathcal L_{\rm val}=-1.66$ and $-2.30$; bottom: the two-batch range of Adam at $128$ against
+$2048$); down triangles mark windows where the step raises the loss at some $b$, crosses windows holding a read above
+$100$ times their median. Right: $\Delta L(b)$ (dots, solid) and $A(b)$ (squares, dashed) against the events per
+update $b$, each clean window coloured by its training step; the black line is no change.}
+\label{fig:cbs_update}
+\end{figure}
+% allow: 16384 2048 128 because they are batch sizes, settings
+% allow: 42 because it is the seed, a setting
+% allow: -2.30 -1.66 because they are the scan's loss targets, settings (par:cbs_scan)
+% allow: 4g 10^4 200 100 because they are the process multiplicity, the training size, the window and the exploding-read threshold, settings
+% allow: 4 2 because they are constants of the quadratic model, a formula
+
 % ==========================================================================
 \section{Physical feature levers: what the momenta cannot encode}\label{sec:levers}
 % ==========================================================================
