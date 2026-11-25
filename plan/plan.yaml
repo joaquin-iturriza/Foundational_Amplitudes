@@ -46548,18 +46548,21 @@ entries:
   match: selres_*
   evidence:
     runs: []
-    commit: 33726387b
+    commit: 4237aca39
     paths:
     - analysis/selective_rescale/data/input_check.json
     - analysis/selective_rescale/data/stage1.json
     - analysis/selective_rescale/data/stage2.json
+    - analysis/selective_rescale/data/support_minima.json
     - analysis/selective_rescale/data/uug_split.json
     - analysis/selective_rescale/input_check.py
     - analysis/selective_rescale/seed_chunks/stage1_submitted.txt
     - analysis/selective_rescale/stage1_read.py
     - analysis/selective_rescale/stage2_read.py
+    - analysis/selective_rescale/support_rule.py
     - analysis/selective_rescale/uug_split.py
     - docs/results.tex
+    - tools/rebuild_run.py
     - wrappers.py
   dead_ends:
   - tried: rescale below x=0.3 (model.input_soft_x0=0.3), at the no-rescale optimum and at its own 16-trial search's optimum
