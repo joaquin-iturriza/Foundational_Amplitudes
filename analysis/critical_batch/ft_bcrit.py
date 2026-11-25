@@ -12,6 +12,14 @@ at the levels both batches reach there. The pretraining scan's epochs at each ta
 trial (cbs_readout.json) over the 1.4e7-event pool.
 
     python3 analysis/critical_batch/ft_bcrit.py  -> data/ft_bcrit.json, figs/ft_regimes.{png,pdf}
+
+D563, the same cells retuned at 50 epochs (sweeps_local/*_ep50*, design passed 2026-11-25): per cell the best trial's
+best validation MSE, its epoch and lr (flagged in the outer 5% of the log lr window), the best-to-third-best spread;
+per arm r50 = best_2048 / best_128 against r400 (the batch-128 gain is the horizon if r50 <= 1.22), per cell
+E50/E400 = best at 50 over best at 400 epochs (better below 1/1.22, worse above 1.22); the figure of both horizons.
+
+    python3 analysis/critical_batch/ft_bcrit.py ep50 [--collect]  -> data/ft_bcrit_ep50.json, figs/ft_ep50.{png,pdf}
+    (--collect reads every observed trial's curves from its site into data/ft_bcrit_ep50_raw.json first)
 """
 import json
 import os
@@ -70,22 +78,23 @@ def local_cells():
     return cells
 
 
-def best_row(rows, stable=STABLE):
-    val, train, ep = min(rows, key=lambda r: np.nanmin(r[0]))
+def best_row(rows, stable=STABLE, epochs=EPOCHS):
+    val, train, ep = min(rows, key=lambda r: np.nanmin(r[0]))[:3]
     i = int(np.nanargmin(val))
-    return {"val_best": float(val[i]), "epoch_best": float(ep[i]), "frac_best": float(ep[i] / EPOCHS),
+    return {"val_best": float(val[i]), "epoch_best": float(ep[i]), "frac_best": float(ep[i] / epochs),
             "train_at_best": float(train[i]), "train_over_val": float(train[i] / val[i]),
-            "val_last_over_best": float(val[-1] / val[i]), "n_trials": len(rows), **stable_end(val, train, ep, stable)}
+            "val_last_over_best": float(val[-1] / val[i]), "n_trials": len(rows),
+            **stable_end(val, train, ep, stable, epochs)}
 
 
-def stable_end(val, train, ep, stable=STABLE):
+def stable_end(val, train, ep, stable=STABLE, epochs=EPOCHS):
     """Train over validation at the last validation of the stable phase (before the cooldown memorises)."""
-    j = int(np.nonzero(in_stable(ep, stable))[0][-1])
+    j = int(np.nonzero(in_stable(ep, stable, epochs))[0][-1])
     return {"epoch_stable_end": float(ep[j]), "val_stable_end": float(val[j]), "train_over_val_stable_end": float(train[j] / val[j])}
 
 
-def in_stable(ep, stable):
-    return ep <= stable * EPOCHS * (1 + 1e-9)
+def in_stable(ep, stable, epochs=EPOCHS):
+    return ep <= stable * epochs * (1 + 1e-9)
 
 
 def events_to(val, ep, L, stable=STABLE):
@@ -134,6 +143,130 @@ def plot(cells):
     ps.save(fig, FIG)
 
 
+EP50, EDGE, BAR = 50, 0.05, 1.22   # design (D563): horizon, outer 5% of the log lr window, the 1.22 spread
+SW50 = {"muon": "tp_zng_d1e4_muon_b{b}_ep50_zgggg", "adam": "tp_zng_d1e4_adam_b{b}_ep50_zgggg",
+        "Fn": "ftmech_zng4g_ftnoset_b{b}_ep50"}
+STEPS50 = {128: 3906, 2048: 244}
+RAW50 = os.path.join(HERE, "data", "ft_bcrit_ep50_raw.json")
+REMOTE50 = r'''
+import json, sys
+out = {}
+for a in sys.argv[1:]:
+    lab, p = a.split("#")
+    try:
+        d = json.load(open(p))
+        out[lab] = {k: d.get(k) for k in ("val_loss", "validate_every", "best_step", "val_mse_curve", "train_eval_mse_curve")}
+    except Exception as e:
+        out[lab] = {"error": repr(e)[:100]}
+print("FTB50 " + json.dumps(out))
+'''
+
+
+def collect50():
+    """Every observed trial of the six searches: its curves from its site, its lr from the local driver state."""
+    sys.path.insert(0, os.path.join(ROOT, "analysis", "finetune_mechanism"))
+    from zng4g_readout import driven
+    from analysis.common.readers import site_python
+    items, lr = {}, {}
+    for arm, pat in SW50.items():
+        for b in (128, 2048):
+            name = pat.format(b=b)
+            hp = {v["hp_idx"]: v["hp"]["training.lr"] for v in
+                  json.load(open(os.path.join(ROOT, "sweeps_local", name, "driver_state.json")))["trials"].values()}
+            for ti, h, v, site, rd, rp in driven(name):
+                lab = f"{arm}|{b}|t{ti}"
+                items.setdefault(site, []).append(f"'{lab}#{rp}'")
+                lr[lab] = hp[h]
+    raw = {}
+    for site, args in items.items():
+        raw.update({k: dict(v, lr=lr[k], site=site) for k, v in site_python(REMOTE50, args, "FTB50", site=site).items()})
+    json.dump(raw, open(RAW50, "w"))
+
+
+def cells50():
+    """(val, train, epochs, lr) per trial; validation i sits at step (i + 1) x validate_every."""
+    cells = {}
+    for lab, t in json.load(open(RAW50)).items():
+        arm, b, _ = lab.split("|")
+        assert "error" not in t, (lab, t)
+        val = np.array(t["val_mse_curve"], float)
+        assert abs(np.nanmin(val) / t["val_loss"] - 1) < 1e-6, lab   # the searches' selection is the val mu-MSE
+        ep = np.arange(1, len(val) + 1) * t["validate_every"] / STEPS50[int(b)] * EP50
+        cells.setdefault((arm, int(b)), []).append((val * STD2, np.array(t["train_eval_mse_curve"], float) * STD2, ep, t["lr"]))
+    return cells
+
+
+def lr_window(arm, b):
+    import yaml
+    sp = yaml.safe_load(open(os.path.join(ROOT, "sweep", f"sweep_config_{SW50[arm].format(b=b)}.yaml")))["search_space"]
+    w = next(x for x in sp if x["name"] == "training.lr")
+    return w["low"], w["high"]
+
+
+def read50(c400, c50):
+    res = {"cells": {}, "arms": {}}
+    for (arm, b), rows in sorted(c50.items()):
+        r = best_row(rows, STABLE_ARM.get(arm, STABLE), EP50)
+        best = sorted(np.nanmin(x[0]) for x in rows)
+        lr = min(rows, key=lambda x: np.nanmin(x[0]))[3]
+        lo, hi = lr_window(arm, b)
+        pos = float(np.log(lr / lo) / np.log(hi / lo))
+        e400 = best_row(c400[(arm, b)], STABLE_ARM.get(arm, STABLE))["val_best"]
+        e = r["val_best"] / e400
+        res["cells"][f"{arm}|{b}"] = {**r, "lr": lr, "lr_window": [lo, hi], "lr_pos": pos, "lr_edge": not EDGE <= pos <= 1 - EDGE,
+                                      "third_over_best": float(best[2] / best[0]) if len(best) > 2 else None,
+                                      "val_best_400": e400, "E50_over_E400": e,
+                                      "read": "better" if e < 1 / BAR else "worse" if e > BAR else "equal"}
+    for arm in SW50:
+        if all(f"{arm}|{b}" in res["cells"] for b in (128, 2048)):
+            r50 = res["cells"][f"{arm}|2048"]["val_best"] / res["cells"][f"{arm}|128"]["val_best"]
+            r400 = res["cells"][f"{arm}|2048"]["val_best_400"] / res["cells"][f"{arm}|128"]["val_best_400"]
+            res["arms"][arm] = {"r50": r50, "r400": r400, "read": "horizon" if r50 <= BAR else "persists"}
+    res["n_trials"] = {k: v["n_trials"] for k, v in res["cells"].items()}
+    return res
+
+
+def plot50(c400, c50):
+    import plot_style as ps
+    fig, axs = ps.figure(ncols=2, nrows=2)
+    cols = {2048: ps.C.blue, 128: ps.C.vermillion}
+    for (arm, ax) in (("muon", axs[0][0]), ("adam", axs[0][1]), ("Fn", axs[1][0])):
+        for b in (2048, 128):
+            for cs, ls in ((c400, "-"), (c50, "--")):
+                if (arm, b) in cs:
+                    val, _, ep = min(cs[(arm, b)], key=lambda r: np.nanmin(r[0]))[:3]
+                    ax.plot(ep, val, color=cols[b], ls=ls)
+        ax.set_xscale("log"); ax.set_yscale("log")
+        ax.set_xlabel("epochs over the $10^4$ training events")
+        ax.set_ylabel(r"validation MSE$(\log|\mathcal{M}|^2)$")
+        ps.process_label(ax, r"$q\bar q\to Z+4g$")
+    ax = axs[1][1]
+    names = (("muon", "Muon"), ("adam", "Adam"), ("Fn", "fine-tuned"))
+    for b, dx in ((2048, -0.12), (128, 0.12)):
+        for cs, ls, mfc, ep in ((c400, "-", None, 400), (c50, "--", "none", 50)):
+            xs = [i + dx for i, (k, _) in enumerate(names) if (k, b) in cs]
+            ys = [min(np.nanmin(r[0]) for r in cs[(k, b)]) for k, _ in names if (k, b) in cs]
+            ax.plot(xs, ys, "o", color=cols[b], mfc=mfc or cols[b])
+            ax.plot([], [], "o", ls=ls, color=cols[b], mfc=mfc or cols[b], label=f"batch {b}, {ep} epochs")   # curves and bests
+    ax.set_xticks(range(len(names)), [n for _, n in names])
+    ax.set_xlim(-0.5, len(names) - 0.5)
+    ax.set_yscale("log")
+    ax.set_xlabel("arm")
+    ax.set_ylabel(r"best MSE$(\log|\mathcal{M}|^2)$")
+    ps.legend(ax, "upper left")
+    ps.save(fig, os.path.join(HERE, "figs", "ft_ep50"))
+
+
+def main50():
+    if "--collect" in sys.argv:
+        collect50()
+    c400, c50 = {**d507_cells(), **local_cells()}, cells50()
+    res = read50(c400, c50)
+    json.dump(res, open(os.path.join(HERE, "data", "ft_bcrit_ep50.json"), "w"), indent=1)
+    print(json.dumps(res))
+    plot50(c400, c50)
+
+
 def main():
     cells = {**d507_cells(), **local_cells()}
     res = {"cells": {f"{k}|{b}": best_row(rows, STABLE_ARM.get(k, STABLE)) for (k, b), rows in cells.items()},
@@ -153,4 +286,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main50() if "ep50" in sys.argv[1:] else main()
