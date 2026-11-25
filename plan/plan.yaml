@@ -45077,6 +45077,40 @@ entries:
       range over levels in data/ft_bcrit.json, widened by the same factor 2; 20% in the CPU test <- a measured noise: the
       toy''s B_u fit scatter over 40 seeds is checked to be below it in the test itself (as the jackknife coverage 37/40 of
       the existing known-answer test)'
+    fix_at: '2026-11-25T12:22:50+00:00'
+    fix: '(0, cut) The pretraining rerun reads B_u only at the control''s crossings of -1.66/-2.08/-2.30 (steps 1020/1973/2992);
+      steps 2992-4264 feed nothing. Add training.stop_at_val_loss: -2.30 (the key the cbs_b<B> scan configs already use) and
+      list it as a difference from FA-ccin2p3-225d38ea''s config, saving about a third of the run. Move brute_at to the read
+      points (e.g. 50, 1000, 1950, 2950), so the independent-batch reference sits where B_u is read: today''s 1500 and 4100
+      are not read points, and 4100 is never reached once the run stops at -2.30. (2) Z+4g: at batch 2048 with 8 chunks the
+      design reads A(b) only at b = 256, 512 and 1024. All of these sit at or above the band it must locate (two-batch B_crit
+      87-261, data/ft_bcrit.json, checked). For B_u=87, A(256)/A(1024) = 0.79; for B_u=30 it is 0.92: an 8% against 21% rise,
+      read from window spread alone, with no brute steps. The measure cannot separate the bottom of the band, or B_simple-like
+      values, from noise. Use 32 chunks (b = 64 ... 1024), or show from the smoke''s per-step A scatter that 3 points of b
+      >= 256 resolve B_u = 87 from B_u = 30. Pretraining passes this check: chunk b = 2048-8192 plus brute b up to 131072
+      bracket 2500-6690 (A(2048)/A(8192) about 0.49 at B_u = 4420). Also state how the chunk composition excess (chunk trace
+      1.16-1.29x the brute trace, sec:noisescale) enters A(b) at the chunk b values. (4) Outcome. (a) NO covers only B_u below
+      B_crit/3. B_u far above B_crit (e.g. 5x) falls into ''Between, usable with calibration'', so too large a reading is
+      never a no: make NO two-sided. (b) The factor-2 source does not give 2. Adjacent targets'' B_crit differ by 1.51-1.77x
+      (cbs_readout.json, checked), so a 2x band does not ''point at the right target'': it spans the neighbours. Re-source
+      the band from something that sets it, e.g. the wall-clock cost of a factor-2 batch error read from the scan (hours to
+      -2.08: 0.476/0.425/0.477 at 4096/8192/16384) or Joaquin''s words, and give the factor-3 NO bar a derivation that yields
+      3 (the stated ''2x the 1.34x span plus the factor-2 band'' and ''15-40x'' do not). (c) The YES rule (''read B_u in a
+      run''s first ~1000 steps, B ~ B_u at the target''s loss'') is not what the read tests: B_u is read at each target''s
+      own crossing step, up to 2992, and B_crit rises 2.7x from -1.66 to -2.30. State the rule as tested: either B_u from
+      the early window (<= step 1000) against B_crit at all three targets, or B_u at the target''s loss, with how it is obtained
+      before a production run. (d) YES requires Z+4g to match, yet the same rule says the repeated-data regime ''keeps its
+      own rule''. Say which regime the rule claims and what a Z+4g mismatch with a pretraining match means. (14, 15) Neither
+      the wall-time target nor the disk is stated. Give the step rate from FA-ccin2p3-225d38ea (same setup: 1.95 training
+      h for 4264 steps with the measurement), the extra cost of the update terms (Newton-Schulz per chunk union, read on the
+      smoke before the two runs are sized), the Z+4g rate from trial_1152''s run, disk per job from those runs, and the site''s
+      free disk at submission. Checks found to hold: 1 (only BS_finding.update moves; same runs, seeds, HPs), 3 (one seed
+      each, as the runs repeated; errors from the jackknife over 16 batches and the window spread), 5, 6, 7 (D560''s batch-128
+      part answered by ft_bcrit, cited), 8, 9 (both HETEROSC; the Z+4g kit base with heterosc_select mu_mse), 10, 11, 12 and
+      13 (n/a), 16, 17 (no batch, step or optimizer change), 18 (the differences are listed; trial_1152''s sweep config has
+      seed 42), 19 (only the D395 smoke orders the jobs). Terms searched for 5: results.tex ''noise scale'', ''critical batch'',
+      ''B_noise'', ''B_u'', ''update direction'', ''normalis'', ''curvature''; site decisions ''noise'', ''critical'', ''B_crit'',
+      ''batch''. No update-direction noise scale was found, as the design''s prior says.'
   step_why:
     1:
       feeds: 'D532: the scan''s answer (NO branch, B_crit 2500-6690 vs B_simple 55.5) reaches Joaquin as a finished entry'
