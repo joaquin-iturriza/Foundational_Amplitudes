@@ -46703,6 +46703,15 @@ entries:
       <- Joaquin's words D552 'without hurting the rest'; 16 trials and waves <- D539, the searches they are read against;
       cost ~24 GPU-h (Z+4g 6 searches x 18 runs x 0.175 h, u u~ g 2 x 18 x 0.125 h, kit 6 x 0.05 h, measured stage-1 run times)
       <- D552, under its 100 GPU-h with stage 1's ~8
+    passed_at: '2026-11-25T02:25:56+00:00'
+    reviewer: 'Re-check after FIX. The six FIX items are addressed: A''s Z+4g searches cut (8 searches, A passed YES in both
+      cells); the window-extension rule dropped; a u u~ g bulk interval containing 1 reads unresolved, with the smallest resolvable
+      cost exp(2 sigma_r) = 1.24 / 1.57 (stage1.json sigma_r 0.107 / 0.224 confirmed); disk 47 / 69 MB per run x 152 = ~11
+      GB; wall time 10.5 / 7.5 min per trial, 6 waves, ~3 h; B and C u u~ g searches gated on a Z+4g YES. Cost 6x18x0.175
+      + 2x18x0.125 + 0.3 = ~24 GPU-h, under the item''s 60 and D552''s 100. Check 2: stage-1 Z+4g A 0.92 vs B 1.26 vs C 1.75
+      (disjoint); u u~ g A 1.65 [1.33,2.04]. Check 3: seeds 42-44 as the D539 siblings; soft tolerances +0.30 / +1.05 dec
+      from d539u_kit.json. Check 5 terms: selective, soft_x0, soft_gate, event gate, selres, rescale only, window edge (results.tex);
+      rescale, D374, D539, D552 (decisions): only stage 1 and D539.'
   step_why:
     1:
       feeds: D552 (keep the rescale's soft-bin gain without its bulk cost)
