@@ -41493,6 +41493,21 @@ entries:
       gg->Wqq'' 0.743/0.314, gg->ttX 0.478/0.707. Next: level/shape split per process by an extended tools/llm_score.py (bias,
       residual variance, rho), held-out-only re-reads of trial 5, 16 heads, part (c) control and best; design recorded, in
       design review.'
+  - at: '2026-11-25T13:37:50+00:00'
+    text: '2026-11-25 step 5 part (c) readout: best trial hp1860 (FA-ccin2p3-29ce8950) scored by FA-ccin2p3-c9d44ad3 (tools/llm_score.py
+      REREAD; cross-check against its own test-stage preds_test.npz: seen RMSE 0.053293 vs 0.053296, check_score_vs_preds.py;
+      ema_applied false as the part (c) control, consistent with the run''s own evaluation). Pooled test RMSE of log|M|^2,
+      part (c) best / part (a) trial 5 / LLM: seen 0.053 / 0.117 / 0.321, held out 1.178 / 1.003 / 0.721, relabels 0.068 /
+      0.241 / 0.341, new 2.116 / 1.767 / 1.193. Median per-process MSE relabels 7.1e-4 / 0.0208 / 0.0786 (below the LLM on
+      96/96), new 0.979 / 1.144 / 0.649 (below the LLM on 26/43). MSE ratios c_best / trial 5: seen 0.21, relabels 0.079 (both
+      far beyond the 1.38 margin: better), held out 1.379 (at the margin), new 1.43 (just above it: worse). The pooled new
+      number is carried by gg->t b~ W- / gg->b t~ W+ (MSE ~30 vs the LLM''s ~2.4) and the heavy multi-H processes; without
+      the gg->tbW pair new 1.71 vs LLM 1.17. Per family new (median, c_best / LLM): multi-H 1.18/1.29, H+tau 0.064/0.487,
+      WWW 1.31/0.937, ZZZ 1.17/0.175, gg->Wqq'' 0.090/0.314, gg->ttX 1.50/0.707. Source: control_score.py --tag a_trial5 c_control
+      c_best --out c_best_vs_a5, family_gap.py --tag a_trial5 b_h16 control c_control c_best --out step15 @ae5427d12; figure
+      analysis/llm_compare/figs/c_best_heldout_per_process.png (heldout_per_process.py, y range now widened so nothing is
+      clipped: 52 of c_best''s 139 held-out points were below 1e-3). For step 8 (D537 ''We then also widen the best HPs for
+      our setup''): the width scale-up at part (c)''s best HPs starts from hp1860.'
   step_waits:
     '5': FA-ccin2p3-c9d44ad3
     '8': part (c) driver llmcmp_c_qperp_drive5 ending (its detach DONE event; wave 3 of 2 trials after trials 3 -5.816 and
