@@ -46375,7 +46375,7 @@ entries:
       - 'r50 <= 1.22 for an arm: the gain is the horizon for that arm'
       - 'r50 > 1.22: the gain persists at 50 epochs'
   step_waits:
-    '4': detached driver zng_ep50_searches (pid 1376403, sweep/drive.py, 105 trials)
+    '4': 'the detached driver zng_ep50_searches (pid 1376403) ending: its DONE event'
     '1': steps 2, 3 and 4 read and written up
     '2': the next owner (this owner closed near its context limit, hand-off 16:45)
   targets:
