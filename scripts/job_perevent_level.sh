@@ -8,7 +8,7 @@
 # CPU only (llm_compare, D566): analysis/catalog_daniel/perevent_level.py over catalog_daniel's cached train pools and
 # diagram sidecars on CC. Its own job, not `site run --job`, for the memory (~2.7M events x 43 features, the CPU block's
 # 2G is too small).
-#     site submit ccin2p3 FA scripts/job_perevent_level.sh --item llm_compare [--env PEL_MODEL=mlp]
+#     site submit <site with the pools: lxplus> FA scripts/job_perevent_level.sh --item llm_compare [--env PEL_MODEL=mlp]
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"

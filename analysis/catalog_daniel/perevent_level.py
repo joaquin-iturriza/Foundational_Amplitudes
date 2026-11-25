@@ -192,6 +192,8 @@ def main():
     ho = sorted(n for n in D if D[n]["split"] == "heldout")
     new = [n for n in ho if n not in rel]
     print(f"{len(tr)} train, {len(ho)} held-out ({len(new)} new) pools read; missing or no sidecar: {missing}")
+    # a site without catalog_daniel's train-role pools (CC after D131/D134) must stop here, not in the cross-fit
+    assert not missing, f"{len(missing)} pools missing or without sidecar under {cache}: run where the pools are"
     grp_p = np.array([meta[n]["weak_key"] for n in tr])
 
     def pfeat(n, diag):
