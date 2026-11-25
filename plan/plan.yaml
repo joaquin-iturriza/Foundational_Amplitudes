@@ -44491,6 +44491,59 @@ entries:
       47 vs 0.045 shared vs diagram regressor, l.7919; flat-log shift 0.30 -> 0.10 with the s_hat factor on catalog_v3, l.7067);
       no label in the inputs (stats_net features are process-only; event inputs are momenta-only); no GPU, so loss/preprocessing/HPO/disk
       checks do not apply.'
+  - at: '2026-11-25T16:30:59+00:00'
+    question: 'D566 (Joaquin: ''there is something strange about predicting a single number for a new dataset that depends
+      on how that data was sample ... this has to perform correctly in individual events regardless of that. I believe there
+      is a way to marry these two ideas''), revised after design review FIX: candidate (B) only. A per-event regressor g(process
+      features + norm_explore3''s diagram descriptors + the event''s log s_hat, Lmin - log s_hat, soft-emission E, log P)
+      of log|M|^2, fitted over the 1352 training pools'' events (HistGradientBoosting), cross-fitted by relabelling class;
+      a new process''s level is the mean of g over whatever sample it has. Does it keep the diagram regressor''s new-family
+      level (per-process constant, 0.047) while its error''s mean moves less than the constant''s when the sample is reweighted?
+      Candidate (A), the diagram propagator factor, is a dead end on existing data (6.3 / 3.1 vs 0.45; recorded).'
+    prior: 'Searched results.tex l.2270-2400, 7067, 7889-8073 (incl. par. Few-shot calibration, and surrogates computed from
+      momenta alone l.8013), 8254-8417, 8510, 13257, 14075; analysis/catalog_daniel norm_surrogate*.py, norm_explore5/6/7,
+      norm_blend, residual_kinematics, kshot_level; site decisions D82-D99, D128, D135, D436, D523, D564, D566. Found: (1)
+      norm_surrogate.py prop (= log P with the process constant) per event, 2000 events per pool: within-process corr 0.83
+      on the 43 new, as a level predictor its mean does not beat the statistics predictor (l.8013); (2) norm_surrogate_more.py:
+      prop as a target factor with fitted beta 0.57/0.66, residual std ratio 0.61 on the new; adding surrogate statistics
+      to the level network made the new level error worse, 0.20 vs 0.058 (data/surrogate_more.json); (3) norm_explore6.py:
+      a 3x128 MLP on 400 events per process with summary invariants, no diagram descriptors, as a shape stand-in for ten targets:
+      0.40-0.57 on the new, ''too weak to test with'' (l.8030); (4) today, perevent_level.py --surrogate @0e3e3fe35 on surrogate.json:
+      candidate (A) at coefficient 1 / fitted beta, content-only level net on the residual: median level error on the 43 new
+      6.3 / 3.1 (dead end recorded), references reproduce (shared 44.7 vs 47; diagram regressor 0.047 vs 0.044). What (B)
+      adds: a per-event map that sees the diagram descriptors (the 0.045 level information) and the event''s invariants jointly,
+      fitted on 2000 events per pool (5x norm_explore6) with log P as an input, read for level AND sampling shift, which no
+      earlier read measured for any per-event map.'
+    measure: 'perevent_level.py @0e3e3fe35 (CC CPU job scripts/job_perevent_level.sh: 4 CPUs, 16G, cached train pools of recipes/catalog_daniel_{train,heldout}.yaml,
+      first 2000 events per pool). Per process of the 43 new and (cross-fitted) the 1352 training: (i) level error (mean err)^2/sigma_p^2,
+      err = g - log|M|^2 per event, sigma_p = std of log|M|^2; (ii) sampling shift |mean_w(err) - mean(err)|/sigma_p, w flat
+      in log s_hat (20 bins, 1st-99th percentile, equal weight per non-empty bin) and toward the singular regions (the fifth
+      with the smallest Lmin - log s_hat at half the weight), with its noise: std over 30 bootstrap resamples of the events,
+      median over the 43; (iii) std(err)/sigma_p. Same reads for the shared target and the diagram regressor (constant per
+      process: its shift is the shift of the sample''s mean log|M|^2) and for (A) as a diagnostic. Medians over the 43 and
+      per family (test_group); figure: per family, median (i) on a log scale and median flat shift, the shared target, the
+      diagram regressor, (A) and (B) side by side.'
+    check: '(i) separates the references on existing data: shared 44.7 vs diagram regressor 0.047 (perevent_level.py --surrogate
+      on surrogate.json, same 2000 events); (ii) moves with a per-event factor: flat-log s_hat reweighting moves the shared
+      target''s level 0.30 sigma_p on Daniel''s catalog (l.7919) and the s_hat factor''s 0.074-0.10 on catalog_v3 (l.7067);
+      the job asserts the references reproduce (shared within 10% of 47, regressor of 0.044) before writing anything.'
+    fixed: 'Data: catalog_daniel train-role pools on CC, first 2000 rows per pool (the pools are i.i.d.), 1352/139 split (43
+      new, 96 relabels); process features (stats_net.features), diagram descriptors (norm_explore3 feats diag=True), log P
+      (dipole_residual.log_prop: MT 172.5, WT 1.4915, Z/W/H as catalog_v4, b massless in propagators); HistGradientBoostingRegressor(max_iter
+      300, learning_rate 0.1, max_leaf_nodes 63, random_state 0), GroupKFold 5 on weak_key for the training processes, the
+      full fit for the held-out; the frozen diagram regressor level_file_B_diag.json. No GPU.'
+    control: The diagram regressor (the per-process constant level, level_file_B_diag.json, what step 16 trains with) and
+      the shared target, scored by the same code on the same events.
+    seeds: HGB random_state 0 (deterministic); the diagram regressor's ensemble spread 0.016-0.19 (l.8510) is the noise of
+      a single level read; the shift's own noise from the 30-resample bootstrap.
+    outcome: 'Marriage found (go to the GPU arm (C): g fed to LLoCa per event, its own design): (B)''s median level error
+      on the 43 new at or below 0.19 (the upper end of the diagram regressor''s ensemble range, i.e. it keeps the diagram
+      gain) AND its median flat-log s_hat shift below the diagram regressor''s on the same 43 by more than twice the bootstrap
+      noise. Fail on (i): the per-event map loses the diagram level, reported per family. Fail on (ii) only: the per-event
+      map places levels but follows the sample no better than a constant, reported. (iii) reported, no threshold.'
+    sources: 0.19 <- the diagram-descriptor level network's 10-ensemble range 0.016-0.19, results.tex par. How robust is the
+      diagram-descriptor level l.8510; the shift bar is the diagram regressor's own shift measured by this job on the same
+      events; 2x bootstrap noise <- the 30-resample std computed by the job
   targets:
   - batch: gen_smoke
     wall_h: 0.5
