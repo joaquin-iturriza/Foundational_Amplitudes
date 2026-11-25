@@ -41713,8 +41713,7 @@ entries:
     '16': FA-ccin2p3-89671610
     '18': FA-ccin2p3-996866f8
     '19': FA-ccin2p3-0165aa58
-    '20': 'the owner aa33851c0da219299, resumed right after its step 17 hand-back: write the design, run the design reviewer,
-      submit'
+    '20': FA-lxplus-affc2e5a FA-lxplus-c894babe
   handoff:
     state: 'Part (a) DONE, part (c) DONE. Part (b) his setup: 16 heads read; 32 heads FA-ccin2p3-e9dfa8b9 COMPLETED (val best
       4.06e-4 @54756, spike at ~36500; data/b_val_h32.txt, figs/b_width_curves.png sent), its score FA-ccin2p3-2c3a581b (EVENTS=1)
