@@ -44291,6 +44291,13 @@ entries:
       bookkeeping 11.4% of all, file reads and search 11.3%, analyses and tests 8.5%, submit/sync/pick 7.2%, figures 5.0%,
       git 3.1%; main session''s bookkeeping 9.7%, replies and reasoning without tools 8.1%, briefing agents 4.7%. A message
       costs its context (owners ~170k, main ~320k tokens), so a kind''s cost is its step count inside that context.'
+  - at: '2026-11-25T00:07:30+00:00'
+    text: 'D551 trial (wake dispatch, design review rounds; design passed 940251cb8 after two FIX rounds: review unit one
+      round, material cut at the verdict, design read holding measure and outcome; wake target graded as messaged or not):
+      not run. The lab server answered at 2026-11-24T23:2x (ok from both models via /api/chat/completions; /openai/v1 refuses
+      passthrough, 403) but from ~23:50 UTC gives DeepSeek 502 proxy error and both 503 Service Unavailable, retried at 2026-11-25T00:05
+      UTC. Samples extracted: 100 wakes (do-nothing 71/100), 159 review rounds (89 FIX, 70 PASS; 118 of them with a sed/grep/awk
+      design read, reported apart).'
   handoff:
     state: 'Hard round done (labllm 7a28103a4, summary.json, figs/lab_llm_hard.png): all ten multi-file fixes valid after
       the sandbox fix (774147232: TMPDIR in run dir, fixcheck copies as git repos; baselines refreshed 571cf7014). First pass
