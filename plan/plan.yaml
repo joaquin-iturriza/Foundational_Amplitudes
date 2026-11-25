@@ -44085,6 +44085,28 @@ entries:
     sources: 'D551 (Joaquin: decide what else to use the lab LLMs on); baselines measured by tools/lab_wake_trial.py extract
       and reviews-extract: do-nothing 71/100 wakes (Wilson 0.615-0.79), always-FIX 91/174 review rounds (Wilson 0.45-0.60);
       Wilson 95% for the spread'
+    fix_at: '2026-11-25T00:00:44+00:00'
+    fix: 'Re-check of the df9ca937c version. Fixed and confirmed: the review unit is now one round (extraction re-run in scratch:
+      174 rounds, 91 FIX, 83 PASS; always-FIX Wilson 0.449-0.596; do-nothing 71/100, Wilson 0.615-0.79); the wake outcome
+      is now judged on all 100 against do-nothing''s upper bound, with wrong actions on the 71 quiet wakes reported; reading
+      the earlier round''s fix note is legitimate. Still failing: 1) The design-only arm shows no design in 79 of the 174
+      rounds (47 of them FIX); this fails check 2, the measure must see what it judges. The ''first plan show/design read''
+      (regex plan.py (show|design) anywhere in the command) is often a ''<persisted-output> Output too large ... saved to
+      <file>'' stub (e.g. ad9780ab323#0, a3468b01f1a#0, a8a51708816#0, a41b130531a#0), a git show output whose command also
+      named plan.py (ab2cf3cf413#2), or a sed/grep slice without the measure and outcome. In those rounds the model judges
+      a design it never sees, and the agreement mixes them in. Fix: take the first read of that round whose text holds the
+      design''s measure: and outcome: fields, following a persisted-output stub to the Read of its saved file; drop or report
+      apart the rounds that still have none; print the count kept. 2) The material arm can still hold the round''s own verdict;
+      this fails check 8 (label in the inputs). Reads after the round''s design-pass/design-fix call are still collected.
+      In round a51bab46162#0 (key FIX), material item 21 of 24 is a plan show printing that round''s own ''review asked for
+      a fix 2026-11-12T18:04: Check 1 ...''. Fix: stop collecting a round''s material at its verdict call. 3) The outcome
+      (b) wording contradicts itself; this fails check 4. ''Opus re-reviewing only on the lab model''s PASS or doubt or on
+      its FIX'' covers every verdict, which removes the saving and leaves FIX missed with no meaning. State the route: a lab
+      PASS skips Opus; Opus reviews the lab''s FIX or doubt; FIX missed is then the route''s cost. For (a), say in the yes
+      that the choice of target agent is not graded (send is a bool; exact ids are checked only on the 5 active wakes whose
+      prompt holds them), so the proposed dispatcher still needs its owner lookup tested. Searched for prior work (check 5):
+      results.tex for dispatch, routing wake, design review with lab/deepseek/qwen, reviewer model; site decisions for dispatch,
+      wake, lab llm, deepseek, reviewer. No earlier trial found.'
   step_waits:
     '3': notes-editor pass of the results.tex backlog (it blocks on sec:noisescale and fig:llmcmp_heldout, other entries'
       text; the repo-reviewer already passed the merge)
