@@ -249,8 +249,12 @@ def rebuild(run_dir, role, path, n_events, event_frame=False):
     in eval mode with its best weights; loader iterates that role in the order of exp._role_perm[role].
     event_frame: that role unaugmented (data.unaugmented_roles), each event read in its own centre-of-mass frame, so
     its prediction depends on the event alone, not on the pool (the augmentation is keyed on the pool's identity), and
-    the frames' degeneracy noise a function of each particle (deterministic_frame_noise)."""
+    the frames' degeneracy noise a function of each particle (deterministic_frame_noise).
+    REBUILD_SET (env, comma-separated key=value): config keys set on the rebuilt run, e.g. an input map switched on at
+    evaluation (selective_rescale D561: model.input_soft_eps=1e-8,model.input_soft_x0=0.009)."""
     cfg = load_cfg(run_dir)
+    if os.environ.get("REBUILD_SET"):
+        cfg = OmegaConf.merge(cfg, OmegaConf.from_dotlist(os.environ["REBUILD_SET"].split(",")))
     own_recipe = os.path.expandvars(str(cfg.data.processes_file))
     rec = yaml.safe_load(open(own_recipe))
     (spec,) = rec["processes"]
@@ -296,6 +300,9 @@ def rebuild(run_dir, role, path, n_events, event_frame=False):
         assert np.allclose(exp._tch_norm, saved["tchannel_norm"], rtol=1e-6), (exp._tch_norm, saved["tchannel_norm"])
     load_best_weights(exp.model, run_dir)
     exp.model.to(exp.device, dtype=exp.dtype).eval()
+    if os.environ.get("REBUILD_SET"):   # proof the set keys reached the rebuilt model
+        print("REBUILD_SET_MODEL " + json.dumps({k: getattr(exp.model, k, None) for k in
+                                                 ("input_soft_eps", "input_soft_x0", "input_soft_gate")}), flush=True)
     loader = exp.val_loader if role == "val" else exp.test_loader
     n = len(loader.dataset) if hasattr(loader.dataset, "__len__") else None
     assert n in (None, int(n_events)), f"{role} loader holds {n} events, expected {n_events}"
