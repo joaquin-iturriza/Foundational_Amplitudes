@@ -45182,6 +45182,77 @@ entries:
       on the smoke (run it at update_every 10) and pool adjacent windows or raise the read rate if 4 reads do not reach that.
       Terms searched: noise scale, critical batch, B_noise, B_u, update direction, normalis, curvature (results.tex); noise,
       critical, B_crit, batch (decisions); none found earlier.'
+  - at: '2026-11-25T12:38:23+00:00'
+    question: 'D560 (''understand what number to trust, and have something that we can use in the future''), revision fixing
+      the pretraining arm to the scan''s hp 1333 (repo-review finding of 2026-11-25): on fresh data (the regime of the scan,
+      targets at 0.22-3.2 epochs), does the per-step loss decrease of the optimizer''s own update, measured against the batch
+      inside one run, locate the scan''s critical batch where B_simple = tr Sigma/|G|^2 (median 55.5) misses it by 45-120x?
+      The rule tested: B_dL(L), read at the step where the run reaches validation loss L, equals B_crit(L) of the scan within
+      the band below; used before a production run as a pilot run to the target loss with the measurement on.'
+    prior: 'sec:noisescale (c2ab3154a, b2b650b45): B_simple 84/28/28/39 (independent batches), chunk median 55.5, Muon set
+      232, AdamW 37.2. par:cbs_scan (145d14839): B_crit 2500/4420/6690 at L=-1.66/-2.08/-2.30; same best HPs (hp 1333, lr
+      8.2e-3) at 2048/8192/16384/32768; hp 1333 at 16384 crosses -1.66/-2.08/-2.30 at validation steps 765/1700/2720 (data/cbs_state.json,
+      every 85); V100 hours to -2.08: 0.736/0.476/0.425/0.477/0.693 at 2048...32768. This entry''s ft_bcrit.py (528910f43,
+      data/ft_bcrit.json): Z+4g 10^4 events, Adam two-batch B_crit 87-261 at matched val MSE 0.25-0.05; Muon r=31 > 16 (memorisation
+      at 2048, not the critical batch). CPU toy (worktree cbs_update 5e4d42794): sign descent''s first-order progress A(b)
+      half-saturates at b=4 against B_simple=39 on a toy where |G| sits on few coordinates, so A(b) alone does not carry the
+      gap; hence the step''s loss decrease dL(b) as the measure. Searched docs/results.tex (noise scale, critical batch, B_noise,
+      update direction, normalis, curvature), plan, site decisions (noise, critical, batch, D532, D536, D560): none earlier.'
+    measure: 'dL(b) = mean over disjoint events of L(w) - L(w - u(g_b)): the loss decrease of one step of the optimizer''s
+      own update at the run''s current lr, u = Muon newton_schulz(g) x muon_scale x lr on matrices, g/(sqrt(v_hat)+eps) x
+      lr on Adam/AdamW parameters (second moment from the optimizer state, momentum 0), g_b the mean of m consecutive chunk
+      gradients of the step''s batch (b = m x chunk), read on the other chunks'' events (same events before and after, weights
+      restored exactly; tests/test_noise_scale.py known answers: dL against the quadratic formula within 5%, the map against
+      a real MuonAdamW step, A against the erf curve). Also A(b) = <G_hat, u(g_b)> (first-order part) and B_simple (unchanged).
+      Fit dL(b) = dL_inf / (1 + B_dL/b) (McCandlish et al.''s per-step form) per window of 200 steps (dL every 50 steps: BS_finding.update_every
+      50) and A(b) also at the brute steps from independent batches. Pretraining (8 chunks of 2048): b = 2048, 4096, 8192,
+      bracketing B_crit 2500-6690 (dL(8192)/dL(2048) = 2.05 at B=4420 against 1.02 at B=55); A at brute steps b = 16384-131072.
+      Z+4g (32 chunks of 64 at batch 2048): b = 64...1024 bracketing 87-261 (dL(1024)/dL(64) = 3.6 at B=261, 2.2 at B=87).
+      Chunk composition: a chunk carries the whole batch''s process counts, so the composition term of sec:noisescale (chunk/brute
+      trace 1.16-1.29) inflates the noise of g_b and can bias B_dL up by at most that factor, inside the factor-2 band; the
+      readout states it. Z+4g is one process: none. Scatter: the smoke reads dL every 10 steps; separating the factor-2 edges
+      needs dL(8192)/dL(2048) to about 20% (1.64 at B=2210, 2.56 at B=8840); if 4 reads per 200-step window do not reach it
+      (standard error of the window ratio from the smoke''s per-read spread), adjacent windows are pooled to 400 steps, or
+      update_every lowered to 25 before the full run. Reads: B_dL at the windows holding the run''s own crossings of -1.66/-2.08/-2.30
+      (hp 1333 in the scan: 765/1700/2720) against 2500/4420/6690; B_dL at ~step 700 reported as the early reading; Z+4g Adam
+      B_dL over the stable phase against 87-261.'
+    check: 'Existing data: (1) at a fixed lr (hp 1333 best at most batches) the scan''s steps to -2.08 fall 3997 -> 1324 from
+      2048 to 32768: the per-step loss decrease grows with the batch far past B_simple, which predicts (1+55/2048)/(1+55/32768)
+      = 1.025; dL(b) measures exactly that per-step gain. (2) Muon-set B_simple 232 against AdamW 37.2: the noise scale depends
+      on the update''s geometry. (3) CPU known-answer tests pass (9/9, worktree 5e4d42794 + dL test): dL(b) and A(b) recover
+      their analytic values within 5% on toys where they differ.'
+    fixed: 'Pretraining: the v4_het_noise_scale arm as FA-ccin2p3-225d38ea (base v4_het_control_wsd: catalog_v4 base train
+      recipe, DIM inputs, HETEROSC mean, sign head off, MuonAdamW, WSD 1/8 over 4264 steps, batch 16384, clip 5, seed 42,
+      BS_finding every 10, chunks 8, 16 brute batches), differing in: (i) every HP of the scan''s batch-16384 best trial that
+      differs from the control''s config.yaml, read from CC runs/cbs_b16384/trial_1333/config.yaml: lr 8.246561e-3 (control
+      4.997e-3), muon_weight_decay 0.01451547 (0.02172), regularization_lambda 8.398127e-7 (4.956e-7), cosanneal_warmup_frac
+      0.089705 (0.158), cosanneal_eta_min 1.127397e-8 (1.82e-10), ema true with ema_decay 0.968325 (true, 0.9412), validation
+      every 85 steps, validate_frac 0 (every 100 via frac 0.02); its other differences (exp_name, run paths, is_dyhpo_run,
+      increment_steps, save_model_at_steps [], evaluate false) are bookkeeping, the arm being training only; (ii) BS_finding.update
+      true, update_every 50, brute_at [50,700,1690,2700] (at hp 1333''s crossings; 2700 before the -2.30 stop at 2720), training.stop_at_val_loss
+      -2.30 (the scan configs'' key). New arm v4_het_update_noise in scripts/job_catalog_v3_short.sh (branch cbs_update cff742c7c).
+      Z+4g: sweep/run_fixed_hp.py on sweep_config_tp_zng_d1e4_adam_b2048_zgggg.yaml at the chosen trial hp1152''s HPs (Adam,
+      ReduceLROnPlateau, lr 4.18e-3, reg 6.57e-7, warmup 0.132, eta_min 4.3e-10, EMA off, 10^4 events, 1953 steps, float64,
+      seed 42), plus find_BS true, BS_finding every 10, chunks 32, update true, update_every 50, no brute steps (a 10^4-event
+      pool has no independent batches of 2048). Training unchanged by the measurement (read before the step, weights restored).'
+    control: 'B_simple from the same runs and the existing measured critical batches: the scan''s B_crit per target (pretraining),
+      the ft_bcrit Adam two-batch B_crit (Z+4g). Training unchanged by the measurement: the pretraining run''s validation
+      curve against cbs_b16384 trial_1333 (same HPs and seed; FA-ccin2p3-225d38ea ran at the control''s HPs, so it is not
+      this curve''s control), crossing steps reported against 765/1700/2720; Z+4g against trial_1152.'
+    seeds: Seed 42 each, as the run and trial they repeat; errors from the spread over windows and the jackknife over independent
+      batches at brute steps (A).
+    outcome: 'Pretraining decides. YES: B_dL within a factor 2 of B_crit at each of the three targets: B_dL is the number
+      to trust on fresh data and the rule above stands. NO (two-sided): B_dL below B_crit/3 or above 3 B_crit at two or more
+      targets: the per-step decrease does not locate B_crit; both numbers reported and the next candidate named. Between:
+      B_dL reported with its factor, usable only with that calibration. Z+4g is secondary: inside [87/2, 261x2] extends the
+      rule to the optimisation phase of repeated-data runs; outside it restricts the rule to fresh data (the repeated-data
+      regime keeps the generalisation reading of ft_bcrit), said as such, never a NO of the pretraining result.'
+    sources: 'factor 2 <- a measured spread: the scan''s V100 hours to -2.08 stay within 12% (0.425-0.477) from batch 4096
+      to 16384, a 4x span around B_crit 4420 (par:cbs_scan, data/cbs_readout.json), so a batch picked within 2x of B_crit
+      costs at most 12% wall clock; factor 3 <- a measured spread: 3x outside B_crit reaches batch 2048 or 32768, where the
+      scan''s hours to -2.08 rise to 0.736 and 0.693, 1.63-1.73x the best (same source); [87/2, 261x2] <- a measured spread:
+      the Adam two-batch B_crit range over levels in data/ft_bcrit.json, widened by the same factor 2; 5% in the CPU tests
+      <- a measured noise: the toys'' Monte Carlo error at 300-400 repetitions, below it in the tests themselves'
   step_why:
     1:
       feeds: 'D532: the scan''s answer (NO branch, B_crit 2500-6690 vs B_simple 55.5) reaches Joaquin as a finished entry'
