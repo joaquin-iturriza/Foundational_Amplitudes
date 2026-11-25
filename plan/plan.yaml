@@ -41776,7 +41776,7 @@ entries:
     '16': FA-ccin2p3-89671610
     '19': FA-ccin2p3-0165aa58
     '20': FA-lxplus-affc2e5a FA-lxplus-c894babe
-    '21': the design reviewer
+    '21': FA-lxplus-e48ee20a FA-lxplus-b43687b7
   handoff:
     state: 'Part (a) DONE, part (c) DONE. Suprio''s own per-process metrics (pID only, seeds 0-2) now drive every LLM comparison:
       data/suprio_cond/ + suprio.py @dfa26d84c; heldout_per_process.py (MSE / |bias| = his |level| / MSE-bias^2 = his shape^2,
