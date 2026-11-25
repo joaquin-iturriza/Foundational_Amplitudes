@@ -41754,6 +41754,22 @@ entries:
       FA-ccin2p3-e1d1fbaf (same flags) will fail the same way. Repair: both resubmitted identically without save=false on
       CC (--allow-unfit; 64G fits nowhere now; CC /sps 26G free): 64 heads FA-ccin2p3-1969f226, 120 heads FA-ccin2p3-caf1170e,
       target 1 h each.'
+  - at: '2026-11-25T22:08:06+00:00'
+    text: '2026-11-25 step 21 (D567, after step 18''s no on log F): the gg->ttH two-group split of both our-setup arms is
+      the sign of the network''s internal-top off-shellness input (offshell_per_event column for pdg 6: sign(o) log1p(|o|/eps),
+      o = (s_prop - m_t^2)/s_hat, standardized; two clusters, -3.4..-2.3 below the pole and +2.7..+3.4 above). Re-reads with
+      llm_score.py --events-out @1c3f0e546: searched FA-lxplus-e3b67532 (pooled held-out RMSE 1.178, as step 18), control
+      FA-lxplus-b1f5a43f (1.270); factor_split.py @2e8d4d366/1c3f0e546 on lxplus, data/c_{best,control}_factor_split.json
+      @080b04ed8; figures figs/c_{best,control}_factor_split_offshell_6.png. gg->ttH, searched / control: AUC of the input
+      for the d-groups 1.00 / 1.00, Spearman(d, input) 0.78 / 0.78, share of var(d) explained 0.93 / 0.93; d below the pole
+      -3.5 to -5.4 per input bin, above the pole -0.8 to +1.4; log F reproduces step 18 (AUC 0.519, eta2 0.048). The same
+      input explains var(d) on the other gg->ttX (searched: ttZ 0.82, tt gamma 0.60, g tt 0.20) and the gg->t b W pair (0.82/0.81,
+      the pair with |bias| 3-5), but there both clusters sit near d = 0 with trends inside each; on relabels the control also
+      splits bb~ -> W mu nu by it (eta2 0.80-0.82, separation 23). Over all 139 held-out the median eta2 of the top column
+      is 0 (most processes have no internal top). Reading: on new families with an internal top the network gives the two
+      sides of the top pole different levels, by up to ~5 units of log|M|^2 on gg->ttH; his setup has no off-shellness input
+      and no split. Not yet tested whether the input causes it (matched arm needed: our setup with offshell_per_event off
+      or offshell_zero, a retrain).'
   step_waits:
     '8': FA-ccin2p3-1969f226 FA-ccin2p3-caf1170e
     '13': FA-ccin2p3-623a3af6
