@@ -60,3 +60,26 @@ def test_class_over_twice_expected_is_skipped():
 
 if __name__ == "__main__":
     test_deletes_only_debris(); test_class_over_twice_expected_is_skipped(); print("ok")
+
+
+def test_smoke_models_old_unnamed_only():
+    with tempfile.TemporaryDirectory() as t:
+        s, p, b = _tree(t)
+        old = time.time() - 5 * 86400
+        runs = os.path.join(p, "runs", "zz_smoke")
+        z = "zz_smoke" + "_"          # built here: a literal run name in this tracked file would count as named in the repo
+        for n in (z + "old_1", z + "new_2", "zz_smoke_sweep_config_llmcmp_a_adamw_const_64771325"):
+            os.makedirs(os.path.join(runs, n, "models"))
+            for f in ("config.yaml", "out_0.log", "models/model_run0.pt", "best.ckpt"):
+                open(os.path.join(runs, n, f), "wb").write(b"\0" * 100)
+            if n != "zz_smoke_new_2":                    # the new one keeps today's mtimes
+                for d, _, fs in os.walk(os.path.join(runs, n)):
+                    for f in fs:
+                        os.utime(os.path.join(d, f), (old, old))
+        out = _run(s, p, b)
+        assert "deleted smoke_models: 2 entries" in out, out
+        o = os.path.join(runs, z + "old_1")
+        assert not os.path.exists(os.path.join(o, "models/model_run0.pt")) and not os.path.exists(os.path.join(o, "best.ckpt"))
+        assert os.path.exists(os.path.join(o, "config.yaml")) and os.path.exists(os.path.join(o, "out_0.log"))
+        for n in (z + "new_2", "zz_smoke_sweep_config_llmcmp_a_adamw_const_64771325"):   # recent; named in the repo
+            assert os.path.exists(os.path.join(runs, n, "models/model_run0.pt")), n

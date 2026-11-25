@@ -5,6 +5,9 @@ CPU job (scripts/job_delete_debris.sh), never on a login node. Classes, each re-
   mmap     amp_mmap_cache keys in MMAP format 2 (current code reads only data_mmap.MMAP_VERSION), kept if any live
            slurm job of the user names the key in its stdout (cache_guard.site_users)
   scratch  the scratch run dirs the probe tools left in $SCRATCH (tempfile.mkdtemp prefixes below), older than --scratch-days
+  smoke_models  the model files (WEIGHTS, anything under models/) of the launch-path smoke runs in runs/zz_smoke/
+           (scripts/job_config_smoke.sh, 50 steps) with no file newer than --scratch-days and whose name no committed
+           file names; their configs, logs and metrics stay (D550's "old smoke and probe runs")
 Scheduler logs (*.out in the checkout root) are never deleted here: committed analyses parse them (ws_objective_check.py,
 cited as % src: in docs/results.tex; size_figs.py), so they are evidence, not debris (design review 2026-11-25).
 A class whose listed total exceeds 2x its expected size (--expect-gib) is skipped and reported. Writes the manifest (class, apparent bytes, path) to --manifest before deleting anything, then deletes and prints the
@@ -27,6 +30,7 @@ NAMED = ["zz_v3_smoke_Q_62382593", "zz_v3_smoke_Q_62382608", "zz_v3_smoke_baseli
          "zz_probe_long_w16_62932850", "zz_probe_long_w32_62932851", "zz_probe_long_w8_62929015",
          "zz_probe_long_w8_62932622"]
 NAMED += [n + ".recipe.yaml" for n in NAMED if n.startswith("zz_v3_smoke_")]
+WEIGHTS = (".pt", ".pt.gz", ".ckpt", ".pth")
 SCRATCH_PREFIXES = ("zeroshot_", "signed_ab_", "kshot_", "rebuild_", "f24net_run_", "kitprec_", "evalbest_")
 
 
@@ -61,20 +65,36 @@ def candidates(scratch, scratch_days):
         for e in it:
             if e.name.startswith(SCRATCH_PREFIXES) and now - e.stat(follow_symlinks=False).st_mtime > scratch_days * 86400:
                 yield "scratch", e.path
+    smokes = os.path.join(os.environ["PROJECT_DIR"], "runs", "zz_smoke")
+    named = subprocess.run(["git", "-C", ROOT, "grep", "-h", "-o", "zz_smoke_[A-Za-z0-9_.-]*"], capture_output=True,
+                           text=True).stdout.split()
+    for r in sorted(glob.glob(os.path.join(smokes, "*/"))):
+        r = r.rstrip("/")
+        files = [os.path.join(d, f) for d, _, fs in os.walk(r) for f in fs]
+        if os.path.basename(r) in named or any(now - os.lstat(f).st_mtime <= scratch_days * 86400 for f in files):
+            continue
+        for f in files:
+            if f.endswith(WEIGHTS) or "/models/" in f[len(r):]:
+                yield "smoke_models", f
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--manifest", required=True)
     ap.add_argument("--scratch-days", type=float, default=3.0)
-    ap.add_argument("--expect-gib", default="smoke=1.4,mmap=4.8,scratch=2.2",
+    ap.add_argument("--classes", default="smoke,mmap,scratch,smoke_models")
+    ap.add_argument("--expect-gib", default="smoke=1.4,mmap=4.8,scratch=2.2,smoke_models=7.0",
                     help="the inventory's apparent GiB per class (FA-ccin2p3-b949c4ee); a class listing over 2x is skipped")
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
     scratch = os.environ["SCRATCH"]
-    rows = [(c, apparent(p), p) for c, p in candidates(scratch, a.scratch_days)]
-    for c, _, p in rows:      # every path is a direct child of SCRATCH, of its mmap cache root, or of the checkout
-        assert os.path.dirname(p) in (scratch, os.path.join(scratch, "amp_mmap_cache")), p
+    keep = set(a.classes.split(","))
+    rows = [(c, apparent(p), p) for c, p in candidates(scratch, a.scratch_days) if c in keep]
+    for c, _, p in rows:      # a direct child of SCRATCH or of its mmap cache root; a smoke model file under runs/zz_smoke/
+        if c == "smoke_models":
+            assert p.startswith(os.path.join(os.environ["PROJECT_DIR"], "runs", "zz_smoke") + "/") and os.path.isfile(p), p
+        else:
+            assert os.path.dirname(p) in (scratch, os.path.join(scratch, "amp_mmap_cache")), p
     expect = {k: float(v) for k, v in (x.split("=") for x in a.expect_gib.split(","))}
     listed = {}
     for c, b, _ in rows:
