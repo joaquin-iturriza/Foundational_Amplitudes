@@ -45147,6 +45147,7 @@ entries:
   evidence:
     runs:
     - FA-ccin2p3-225d38ea
+    - FA-ccin2p3-3e856594
     - FA-ccin2p3-6721d3c2
     - FA-ccin2p3-cedaa6dd
     - FA-lxplus-35cf0097
@@ -45155,6 +45156,7 @@ entries:
     - analysis/critical_batch/cbs_read.py
     - analysis/critical_batch/data/FA-ccin2p3-225d38ea_noise_scale.json
     - analysis/critical_batch/data/cbs_state.json
+    - analysis/critical_batch/data/pretrain_update_bdl.json
     - analysis/critical_batch/data/zng4g_update_bdl.json
     - analysis/critical_batch/dl_read.py
     - analysis/critical_batch/ft_bcrit.py
