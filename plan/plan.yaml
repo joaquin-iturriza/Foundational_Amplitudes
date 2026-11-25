@@ -44628,6 +44628,50 @@ entries:
       and shared target, same code and events, asserted references 47 and 0.044), gate 0.19 = top of the regressor''s 10-ensemble
       spread 0.016-0.19 (l.8510, read), shift bar from the job''s own regressor shift and 30-resample bootstrap, CPU only,
       no label in the inputs, same events as the tree job.'
+  - at: '2026-11-25T17:11:15+00:00'
+    question: 'D566 candidate (B) as a network (Joaquin 2026-11-25: ''why a boosted tree? I don''t see the point instead of
+      just using a neural network''). The tree design gave no reason beyond a CPU job; a boosted tree is piecewise constant
+      in its inputs and cannot extrapolate past the trained feature range, which is the new-family question itself; the per-process
+      level evidence agrees: trees on ridge residuals placed the 43 new at 0.32 (pool_stats.py, results.tex l.7814) where
+      the 2x64 descriptor network placed them at 0.045. Does a per-event map g(process features + norm_explore3 diagram descriptors
+      + log s_hat, Lmin - log s_hat, E, log P) of log|M|^2, built as that 2x64 network, keep the regressor''s new-family level
+      while its error''s mean moves less than the constant''s when the sample is reweighted? Read beside the tree job FA-ccin2p3-3bdfcc32
+      on the same events.'
+    prior: 'As the passed tree design (2026-11-25T16:32): norm_surrogate prop (corr 0.83 on the new), surrogate_more (beta
+      0.57/0.66; surrogate statistics in the level net 0.20 vs 0.058), norm_explore6 (3x128 MLP, 400 events per pool, no diagram
+      descriptors: 0.40-0.57, too weak, l.8030), candidate (A) dead end (6.3/3.1). Tree against network on the per-process
+      level: pool_stats.py (l.7814) gradient-boosted trees on ridge residuals, 43 new 0.32 (ridge 0.76; cross-fitted 0.064),
+      against the descriptor network''s 0.045 (l.8510; width/depth changes 0.34-0.53). Tree arm FA-ccin2p3-3bdfcc32 PENDING.
+      Searched: boosted, gradient-boost, per-event level, perevent, norm_explore6, D566 in results.tex, the entry, site decisions.'
+    measure: 'perevent_level.py --model mlp @2d0b3be2c: identical rows, folds, references, reads (i) level error, (ii) flat
+      and singular shift with 30-resample bootstrap noise, (iii) spread, medians over the 43 new, relabels, cross-fitted training
+      and per family; output data/perevent_level_mlp.json (candidate B_mlp). Figure perevent_level_fig.py: per family median
+      (i) and flat shift; shared, regressor, A, tree, network side by side.'
+    check: 'The job asserts the references reproduce (shared within 10% of 47, regressor of 0.044) before writing. The network
+      checked on synthetic data @2d0b3be2c (100k rows, 3 seeds, 45-54 epochs each, MSE 0.011 vs var 2.6). (ii) moves with
+      a per-event factor: 0.30 sigma_p shared (l.7919) vs 0.074-0.10 s_hat factor (l.7067). Time: 0.22 s per epoch per 100k
+      rows single-thread (measured locally) -> ~5 s/epoch at 2.3M rows; 18 fits x ~50 epochs = 1.3 h, 200-epoch cap worst
+      5 h; memory ~1 GB of float64 rows, 16G.'
+    fixed: 'Data: catalog_daniel train-role pools on CC, first 2000 rows per pool, 1352/139 (43 new, 96 relabels); same inputs
+      as the tree; network = norm_explore3''s level net: MLPRegressor (64,64), lr 3e-3 (Adam, batch-size invariant), early
+      stopping on 15%, inputs StandardScaler, target standardized, 3 seeds averaged; batch 4096 events, alpha 1e-2*4096/200
+      = 0.205 so sklearn''s L2 weight alpha/batch equals norm_explore3''s 1e-2/200 (its batch); max 200 epochs; GroupKFold
+      5 on weak_key, full fit for held-out; frozen regressor level_file_B_diag.json. CPU job, 4 CPUs, 16G, target 1.5 h, limit
+      8 h.'
+    control: The diagram regressor (per-process constant) and the shared target, same code and events; the tree (B) of FA-ccin2p3-3bdfcc32
+      as the model-class contrast (both at their stated untuned settings).
+    seeds: 3 network seeds averaged (as the regressor); the regressor's ensemble spread 0.016-0.19 (l.8510) is the noise of
+      a level read; shift noise from the 30-resample bootstrap.
+    outcome: 'Marriage found (go to (C), its own design) if B_mlp''s median level error on the 43 new <= 0.19 AND its median
+      flat shift below the regressor''s by more than 2x bootstrap noise. Fail on (i): not a verdict on the per-event map (l.8510:
+      the level net leaves 0.19 under architecture changes); next both models get a search of equal size over their coupled
+      spaces (network: width, depth, alpha, lr, batch; tree: learning rate, leaves, iterations, l2), cross-fitted by relabelling
+      class on the training processes, never on the 43 new, best against best, its own design. Fail on (ii) only: places levels,
+      follows the sample no better than a constant. Tree against network read as a model-class difference only after that
+      matched search; at this read it is reported as untuned against untuned.'
+    sources: 0.19 <- the regressor's measured spread over its 10-seed ensemble, 0.016-0.19, results.tex l.8510; shift bar
+      <- the regressor's own shift measured by this job; 2x bootstrap noise <- the job's 30-resample std; model choice <-
+      Joaquin 2026-11-25 'why a boosted tree? I don't see the point instead of just using a neural network'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
