@@ -1774,10 +1774,7 @@ class BaseExperiment:
         rec = {"kind": "chunk", "step": int(step), "b_small": n / kk, "b_big": float(n), "k": kk,
                **{f"{s}_{t}": v for s, (g2s, g2b) in terms.items() for t, v in (("g2_small", g2s), ("g2_big", g2b))}}
         if upd is not None:
-            def chunk_losses():   # each chunk's loss without the regularisation term, one forward path for both reads
-                with torch.no_grad():
-                    reg = float(self._reg_term(self.model))
-                    return [float(x.detach()) - reg for x in self._noise_chunk_losses(data, k)]
+            chunk_losses = lambda: self._noise_dl_losses(data, k, seed=int(step))
             rec.update(self._noise_update(upd, sets, n / kk, dl=(chunk_losses(), chunk_losses),
                                           scales=tuple(float(s) for s in bs.get("update_scales", [1.0]))))
         if step % 100 == 0:
@@ -1785,6 +1782,16 @@ class BaseExperiment:
             G2 = sum(noise_scale_terms(rec[f"{s}_g2_small"], rec[f"{s}_g2_big"], n / kk, n)[1] for s in terms)
             LOGGER.info(f"NOISE step {step} S {S:.4e} G2 {G2:.4e} (one measurement, unsmoothed)")
         return rec
+
+    def _noise_dl_losses(self, data, k, seed):
+        """Each chunk's loss without the regularisation term, for the dL reads: every call of one read runs under the
+        same RNG state, so random parts of the forward (lloca's frame noise for degenerate frames) cancel in
+        L(w) - L(w - s u) instead of adding a draw-to-draw difference that does not shrink with s."""
+        devs = [torch.cuda.current_device()] if torch.cuda.is_available() else []
+        with torch.no_grad(), torch.random.fork_rng(devices=devs):
+            torch.manual_seed(seed)
+            reg = float(self._reg_term(self.model))
+            return [float(x.detach()) - reg for x in self._noise_chunk_losses(data, k)]
 
     @torch.no_grad()
     def _update_map(self, grads, sets):

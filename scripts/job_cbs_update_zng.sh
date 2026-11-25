@@ -5,7 +5,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --output=cbs_upd_zng_%j.out
 #SBATCH --error=cbs_upd_zng_%j.out
-# Wall-time target: 1.0 h on V100 (smoke FA-ccin2p3-0ac97e10: 0.16 s per training step, ~60 s per 10-step block with
+# Wall-time target (SCALES of 5 values: each update read 5x its forwards, a few minutes more over 39 reads): 1.0 h on V100 (smoke FA-ccin2p3-0ac97e10: 0.16 s per training step, ~60 s per 10-step block with
 # the 32-chunk noise read and the dL read (62 grouped updates); full run: 1953 steps, 195 noise reads, 39 dL reads,
 # the sigma stage without reads since run.py 7677e3d67).
 #

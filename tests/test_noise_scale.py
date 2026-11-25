@@ -252,3 +252,16 @@ def test_step_loss_decrease_known_answer():
             e = s * eta
             exact = float(e * G.square().sum() - e ** 2 / 2 * ((h * G.square()).sum() + (h * sig ** 2).sum() / (m * b)))
             assert abs(acc[key] / exact - 1) < 0.05, (m, s, acc[key], exact)
+
+
+def test_dl_losses_share_the_rng_state():
+    # a forward with random parts (lloca's frame noise) returns the same chunk losses at the same weights in one read,
+    # and leaves the global RNG where it was
+    exp = SimpleNamespace(model=None, _reg_term=lambda m: torch.tensor(0.0),
+                          _noise_chunk_losses=lambda data, k: [torch.randn(()) for _ in range(k)])
+    torch.manual_seed(0)
+    before = torch.random.get_rng_state()
+    a = BaseExperiment._noise_dl_losses(exp, None, 4, seed=17)
+    b = BaseExperiment._noise_dl_losses(exp, None, 4, seed=17)
+    assert a == b and len(set(a)) == 4
+    assert torch.equal(torch.random.get_rng_state(), before)
