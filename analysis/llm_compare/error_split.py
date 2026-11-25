@@ -56,6 +56,12 @@ def main():
                 rows[g] = {"n": len(ns), "median_share": {k: float(np.median(v)) for k, v in sh.items()},
                            "largest_count": {k: largest.count(k) for k in PARTS},
                            "bias2_above_llm_mse": sum(parts(procs[n])["bias2"] > draft[sp][n][1] for n in ns),
+                           # D567: the error with the arm's own level removed, MSE - bias^2 = scale + floor
+                           "shape_median": float(np.median([procs[n]["mse_logm2"] - parts(procs[n])["bias2"]
+                                                            for n in ns])),
+                           "shape_below_llm_mse": sum(procs[n]["mse_logm2"] - parts(procs[n])["bias2"]
+                                                      < draft[sp][n][1] for n in ns),
+                           "llm_mse_median": float(np.median([draft[sp][n][1] for n in ns])),
                            "pooled_share": pooled(procs, ns),
                            "pooled_share_no_ggtbw": pooled(procs, [n for n in ns if n not in GGTBW])}
             worst = sorted(names, key=lambda n: -procs[n]["mse_logm2"])[:6]
@@ -70,11 +76,15 @@ def main():
             al = r["families"]["all"]
             print(t, sp, "median share", {k: round(v, 2) for k, v in al["median_share"].items()}, "largest",
                   al["largest_count"], "bias2>LLM", al["bias2_above_llm_mse"])
+            print("   MSE-bias2 median %.4g (LLM whole MSE median %.4g), below the LLM's MSE on %d of %d"
+                  % (al["shape_median"], al["llm_mse_median"], al["shape_below_llm_mse"], al["n"]))
             print("   pooled share", {k: round(v, 3) for k, v in al["pooled_share"].items()}, "without gg->tbW",
                   {k: round(v, 3) for k, v in al["pooled_share_no_ggtbw"].items()})
             if sp == "extrap":
                 for g, f in r["families"].items():
-                    print(f"   {g[:34]:34s}", {k: round(v, 2) for k, v in f["median_share"].items()}, f["largest_count"])
+                    print(f"   {g[:34]:34s}", {k: round(v, 2) for k, v in f["median_share"].items()}, f["largest_count"],
+                          "MSE-bias2 %.3g vs LLM %.3g, below %d/%d" % (f["shape_median"], f["llm_mse_median"],
+                                                                     f["shape_below_llm_mse"], f["n"]))
                 for w in r["worst"]:
                     print("   ", w["process"], {k: round(v, 3) for k, v in w.items() if k != "process"})
     print(json.dumps(out))

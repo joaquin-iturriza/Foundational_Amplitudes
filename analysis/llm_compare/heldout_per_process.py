@@ -57,21 +57,28 @@ YLIM = (1e-7, 1e3)   # one range for every figure: his 1e-3..1e3 extended below 
 # data/split/<tag>_heldout.json) beside the LLM's whole RMSE (an upper bound on its own |bias|); its own fixed range
 PART = {"mse": ("data", YLIM, r"MSE$(\log|\mathcal{M}|^2)$", "pID emb. only (Suprio)"),
         "bias": (os.path.join("data", "split"), (1e-5, 1e2), r"$|$bias$|$ of $\log|\mathcal{M}|^2$",
-                 "pID emb. only (Suprio), whole RMSE")}
+                 "pID emb. only (Suprio), whole RMSE"),
+        # --part shape (D567): the error with each arm's own level removed, MSE - bias^2 = scale + floor (same split
+        # files), beside the LLM's whole MSE (an upper bound on its own shape error); the MSE figure's range
+        "shape": (os.path.join("data", "split"), YLIM, r"MSE$-$bias$^2$ of $\log|\mathcal{M}|^2$",
+                  "pID emb. only (Suprio), whole MSE")}
+LEVEL_ONLY = ("lvl_feat", "lvl_diag")   # no events, no shape
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--tag", nargs="+", default=None, help="default: every arm of ARMS whose data/<tag>_heldout.json exists")
-    ap.add_argument("--out", default=None, help="default all_arms (mse) or all_arms_bias")
+    ap.add_argument("--out", default=None, help="default all_arms (mse) or all_arms_<part>")
     ap.add_argument("--part", choices=list(PART), default="mse")
     a = ap.parse_args()
     ddir, ylim, ylabel, llm_label = PART[a.part]
-    a.out = a.out or ("all_arms" if a.part == "mse" else "all_arms_bias")
-    tags = a.tag or [t for t in ARMS if os.path.exists(os.path.join(HERE, ddir, f"{t}_heldout.json"))]
+    a.out = a.out or ("all_arms" if a.part == "mse" else "all_arms_" + a.part)
+    tags = a.tag or [t for t in ARMS if os.path.exists(os.path.join(HERE, ddir, f"{t}_heldout.json"))
+                     and not (a.part == "shape" and t in LEVEL_ONLY)]
     assert all(t in ARMS for t in tags), f"no fixed name for {set(tags) - set(ARMS)}: add it to ARMS"
     draft = json.load(open(os.path.join(ROOT, "talks", "progress_oct2026b", "data", "draft_pid_by_process.json")))
-    val = (lambda q: q["mse_logm2"]) if a.part == "mse" else (lambda q: abs(q["bias_logm2"]))
+    val = {"mse": lambda q: q["mse_logm2"], "bias": lambda q: abs(q["bias_logm2"]),
+           "shape": lambda q: q["mse_logm2"] - q["bias_logm2"] ** 2}[a.part]
     arms = [(ARMS[t][0], {n: {"y": val(q)} for n, q in
                           json.load(open(os.path.join(HERE, ddir, f"{t}_heldout.json")))["processes"].items()},
              ARMS[t][1], ARMS[t][2]) for t in sorted(tags, key=list(ARMS).index)]
@@ -87,7 +94,7 @@ def main():
         for i, n in enumerate(names):
             if meta[n]["n_out"] == 2:
                 ax.axvspan(i - 0.5, i + 0.5, color="0.88", lw=0, zorder=0)
-        ax.plot(x, [draft[sp][n][1] if a.part == "mse" else draft[sp][n][1] ** 0.5 for n in names], "*", color="k", ls="none", zorder=3,
+        ax.plot(x, [draft[sp][n][1] ** (0.5 if a.part == "bias" else 1) for n in names], "*", color="k", ls="none", zorder=3,
                 label=llm_label)
         for lab, ours, c, mk in arms:
             ax.plot(x, [ours[n]["y"] for n in names], mk, color=c, ls="none", zorder=2, alpha=0.85,
