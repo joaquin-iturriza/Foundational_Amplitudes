@@ -45139,9 +45139,11 @@ entries:
     2: 'D560: explain why B_simple (~55 events) sits ~80x below the scan''s B_crit (~4420), explain the batch-128 gain of
       the Z+4g fine-tunes (par:ftm_*, zng4g_ftnoset_b128) against the scan, and give a batch rule usable before a run, checked
       on both settings (existing data first; new jobs only under a passed design)'
-    3: 'D560 part B, Z+4g arm (secondary): full run FA-ccin2p3-cedaa6dd (job_cbs_update_zng.sh full, Adam hp1152, target 1.0
-      h, limit 1:45; smoke FA-ccin2p3-0ac97e10 clean; sigma stage without noise reads, 7677e3d67): read B_dL over its stable
-      phase against the Adam two-batch B_crit 87-261 (band [87/2, 261x2])'
+    3: 'D560 part B, Z+4g arm (secondary): FA-ccin2p3-cedaa6dd read gave no B_dL (every dL(b) < 0: the momentum-0 update overshoots,
+      finding 15:45). Once the pretraining run FA-ccin2p3-3e856594 (step 2) is read and shows whether its reads overshoot
+      too, design one repair of the measure for both runs (the step at the scale of the batch''s share of the real update,
+      e.g. (1 - beta1) for Adam, Muon''s equivalent through its momentum), have the design reviewer pass it, and rerun what
+      it needs'
     4: 'D563: the six Z+4g 1e4-event searches at 50 epochs (Muon scratch, Adam scratch, Fn; batch 2048 and 128; 19/19/16 and
       19/16/16 trials), design passed 15:0x by a4f3d7192edf30268, lr windows by HPO rule 2 at 9e28b161d (header nit 584ba9b77),
       driven by sweep/drive.py (detached zng_ep50_searches, log ~/.local/share/ccorch/detached/20261125-150854_zng_ep50_searches.log),
@@ -46061,8 +46063,9 @@ entries:
     3:
       feeds: 'D560: whether the dL rule extends to repeated-data runs or is restricted to fresh data'
       if:
-      - 'B_dL within [87/2, 261x2]: the update-based rule holds on repeated data'
-      - 'B_dL outside the band: the rule is limited to fresh data; report both'
+      - 'the repaired measure gives dL > 0 and B_dL inside [87/2, 261x2]: the rule extends to repeated-data runs'
+      - 'B_dL outside the band, or dL still <= 0: the rule is restricted to fresh data, or the measure is dropped; report
+        both'
     4:
       feeds: 'D563: is the batch-128 gain at 400 epochs a horizon effect'
       if:
@@ -46070,8 +46073,6 @@ entries:
       - 'r50 > 1.22: the gain persists at 50 epochs'
   step_waits:
     '2': FA-ccin2p3-3e856594
-    '3': detached cedaa6dd_fetch (site fetch of the Z+4g update run's noise_scale.json; the first fetch timed out on CC ssh);
-      then dl_read.py --ref 87 261 (4ab0987c8)
     '4': detached driver zng_ep50_searches (pid 1376403, sweep/drive.py, 105 trials)
     '1': steps 2, 3 and 4 (FA-ccin2p3-3e856594, FA-ccin2p3-cedaa6dd, driver zng_ep50_searches)
   targets:
