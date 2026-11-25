@@ -7,7 +7,7 @@ Cells (all 400 epochs of 10^4 events: 31250 steps at batch 128, 1953 at 2048):
 Per cell, the best trial (lowest validation MSE(log|M|^2) = min val mu-MSE x std^2): its best validation, the epoch of
 it, the train MSE there, and train over validation at the last validation of the stable phase. The two-batch critical batch at matched loss,
     B_crit(L) = (2048 - 128 r) / (r - 1),  r = E_2048(L) / E_128(L)   (McCandlish et al.'s E = E_min (1 + B/B_crit)),
-with E_B(L) the fewest events to first reach L over the cell's trials, read in the stable phase (first 7/8 of the run),
+with E_B(L) the fewest events to first reach L over the cell's trials, read in the stable phase (first 7/8 of a WSD run; the whole run for the ReduceLROnPlateau Adam cells),
 at the levels both batches reach there. The pretraining scan's epochs at each target: events of each batch's best
 trial (cbs_readout.json) over the 1.4e7-event pool.
 
@@ -28,7 +28,8 @@ OUT = os.path.join(HERE, "data", "ft_bcrit.json")
 FIG = os.path.join(HERE, "figs", "ft_regimes")
 EPOCHS = 400
 EVENTS = EPOCHS * 10_000
-STABLE = 7 / 8                 # wsd_cooldown_frac 0.125
+STABLE = 7 / 8                 # wsd_cooldown_frac 0.125 of the WSD arms
+STABLE_ARM = {"adam": 1.0}     # ReduceLROnPlateau has no cooldown: the Adam cells are read over the whole run
 STD2 = 1.1197787003759445 ** 2  # target std of the Z+4g pools (zng4g_r1_read, d507_v2), shared by every cell
 POOL = 1.4e7                   # catalog_v4 training pool of the scan (critical_batch finding 2026-11-24T01:13)
 NTRIAL = 16
@@ -69,24 +70,28 @@ def local_cells():
     return cells
 
 
-def best_row(rows):
+def best_row(rows, stable=STABLE):
     val, train, ep = min(rows, key=lambda r: np.nanmin(r[0]))
     i = int(np.nanargmin(val))
     return {"val_best": float(val[i]), "epoch_best": float(ep[i]), "frac_best": float(ep[i] / EPOCHS),
             "train_at_best": float(train[i]), "train_over_val": float(train[i] / val[i]),
-            "val_last_over_best": float(val[-1] / val[i]), "n_trials": len(rows), **stable_end(val, train, ep)}
+            "val_last_over_best": float(val[-1] / val[i]), "n_trials": len(rows), **stable_end(val, train, ep, stable)}
 
 
-def stable_end(val, train, ep):
+def stable_end(val, train, ep, stable=STABLE):
     """Train over validation at the last validation of the stable phase (before the cooldown memorises)."""
-    j = int(np.nonzero(ep <= STABLE * EPOCHS)[0][-1])
+    j = int(np.nonzero(in_stable(ep, stable))[0][-1])
     return {"epoch_stable_end": float(ep[j]), "val_stable_end": float(val[j]), "train_over_val_stable_end": float(train[j] / val[j])}
 
 
-def events_to(val, ep, L):
+def in_stable(ep, stable):
+    return ep <= stable * EPOCHS * (1 + 1e-9)
+
+
+def events_to(val, ep, L, stable=STABLE):
     """Events at the first stable-phase validation <= L, log-interpolated from the one before; None if not reached
     there or reached at the first validation."""
-    m = ep <= STABLE * EPOCHS
+    m = in_stable(ep, stable)
     c, e = val[m], ep[m]
     ok = np.isfinite(c) & (c <= L)
     if not ok.any() or int(np.argmax(ok)) == 0:
@@ -97,13 +102,13 @@ def events_to(val, ep, L):
     return float((e[i - 1] + w * (e[i] - e[i - 1])) / EPOCHS * EVENTS)
 
 
-def two_batch(r128, r2048, nlev=8):
+def two_batch(r128, r2048, nlev=8, stable=STABLE):
     """B_crit at levels both batches reach in the stable phase (r <= 1: above any value; r >= 16: below 0)."""
-    floor = {b: min(np.nanmin(v[ep <= STABLE * EPOCHS]) for v, _, ep in rows) for b, rows in ((128, r128), (2048, r2048))}
+    floor = {b: min(np.nanmin(v[in_stable(ep, stable)]) for v, _, ep in rows) for b, rows in ((128, r128), (2048, r2048))}
     start = min(np.nanmin(v[:2]) for v, _, _ in r128 + r2048)
     out = []
     for L in np.geomspace(start, max(floor.values()) * 1.001, nlev):
-        E = {b: [x for x in (events_to(v, ep, L) for v, _, ep in rows) if x] for b, rows in ((128, r128), (2048, r2048))}
+        E = {b: [x for x in (events_to(v, ep, L, stable) for v, _, ep in rows) if x] for b, rows in ((128, r128), (2048, r2048))}
         if E[128] and E[2048]:
             r = min(E[2048]) / min(E[128])
             out.append({"L": float(L), "E128": min(E[128]), "E2048": min(E[2048]), "r": r,
@@ -131,8 +136,8 @@ def plot(cells):
 
 def main():
     cells = {**d507_cells(), **local_cells()}
-    res = {"cells": {f"{k}|{b}": best_row(rows) for (k, b), rows in cells.items()},
-           "two_batch": {k: two_batch(cells[(k, 128)], cells[(k, 2048)]) for k in ("muon", "adam", "F", "Fn", "Sfx")}}
+    res = {"cells": {f"{k}|{b}": best_row(rows, STABLE_ARM.get(k, STABLE)) for (k, b), rows in cells.items()},
+           "two_batch": {k: two_batch(cells[(k, 128)], cells[(k, 2048)], stable=STABLE_ARM.get(k, STABLE)) for k in ("muon", "adam", "F", "Fn", "Sfx")}}
     for k in ("muon", "adam", "F", "Fn", "Sfx"):
         res["cells"][f"{k}|ratio_2048_over_128"] = res["cells"][f"{k}|2048"]["val_best"] / res["cells"][f"{k}|128"]["val_best"]
     ro = json.load(open(os.path.join(HERE, "data", "cbs_readout.json")))
