@@ -30,6 +30,8 @@ def test_scaled_optimal_step():
            **{f"dL_s{s:g}_b{b}": 2 * s - s * s * (1 + 150 / b) for s in sc for b in BS}}
     w = dl_read.window([rec], BS)
     assert abs(w["B_opt"] - 150) < 1e-6, w["B_opt"]
+    full = {**rec, **{f"dL_b{b}": 2 - (1 + 150 / b) for b in BS}}   # the s = 1 read of the same quadratic
+    assert abs(dl_read.window([full], BS)["B_q"] - 150) < 1e-6
 
 
 if __name__ == "__main__":

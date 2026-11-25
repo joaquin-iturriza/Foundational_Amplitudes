@@ -61,6 +61,11 @@ def window(rs, bs):
     fa = fit([out["A"][str(b)] for b in bs], bs)
     if fa is not None:
         out["B_A"], out["A_inf"] = float(fa[0]), float(fa[1])
+    # the quadratic model's optimal step from the full-step read alone: Q = A - dL(s=1), dL_opt = A^2 / (4 Q)
+    q1 = [out["A"][str(b)] - out["dL"][str(b)] for b in bs]
+    fq = fit([out["A"][str(b)] ** 2 / (4 * q) if q > 0 else -1.0 for b, q in zip(bs, q1)], bs)
+    if fq is not None:
+        out["B_q"] = float(fq[0])
     # a read whose |dL| or |A| at some b exceeds 100x the window's median read (an exploding step) is flagged
     mags = np.abs(D).max(1)
     out["n_exploding_reads"] = int((mags > 100 * np.median(mags)).sum())
@@ -104,6 +109,8 @@ def read(recs, win, ref, start=0):
                         "B_A_median": float(np.median(BA)) if BA else None,
                         "B_A_min_max": [float(min(BA)), float(max(BA))] if BA else None,
                         "n_windows_with_exploding_read": sum(w["n_exploding_reads"] > 0 for w in ws),
+                        "B_q_clean": [[w["step_lo"], w["B_q"]] for w in ws if w.get("B_q") is not None
+                                      and w["n_exploding_reads"] == 0],
                         "B_opt_clean": [[w["step_lo"], w["B_opt"]] for w in ws if w.get("B_opt") is not None
                                         and w["n_exploding_reads"] == 0]}}
 
@@ -181,7 +188,7 @@ def main():
     json.dump(res, open(os.path.join(HERE, "data", f"{a.name}.json"), "w"), indent=1)
     print(json.dumps(res["summary"]))
     for w in res["windows"]:
-        print(w["step_lo"], w["step_hi"], w["status"], w.get("B_dL"), w.get("B_A"), w["n_exploding_reads"], w.get("B_opt"), w.get("B_s"))
+        print(w["step_lo"], w["step_hi"], w["status"], w.get("B_dL"), w.get("B_A"), w["n_exploding_reads"], w.get("B_q"), w.get("B_opt"))
     figure(res, os.path.join(HERE, "figs", a.name))
 
 
