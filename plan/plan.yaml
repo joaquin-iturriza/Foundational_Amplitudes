@@ -45764,6 +45764,7 @@ entries:
   step_waits:
     '2': FA-ccin2p3-3e856594
     '3': FA-ccin2p3-cedaa6dd
+    '4': detached driver zng_ep50_searches (pid 1376403, sweep/drive.py, 105 trials)
   targets:
   - batch: noise_smoke
     wall_h: 0.4
