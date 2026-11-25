@@ -159,13 +159,23 @@ def parse(ans):
             "plan": sorted({str(x) for x in j.get("plan") or []})}
 
 
+def answered(path, key):
+    """Instances already answered (no ERROR) in an answers file: a rerun resumes."""
+    if not os.path.exists(path):
+        return set()
+    return {key(r) for r in (json.loads(l) for l in open(path)) if not r["answer"].startswith("ERROR")}
+
+
 def run(a):
     wakes = [json.loads(l) for l in open(os.path.join(OUT, "wakes.jsonl"))]
+    done = answered(os.path.join(OUT, "wake_answers.jsonl"), lambda r: (r["t"], r["model"]))
     with open(os.path.join(OUT, "wake_answers.jsonl"), "a") as f:
         for w in wakes:
             prompt = "WAKE (%s, %s):\n%s\n\nSTATE READ:\n%s" % (w["trigger"], w["t"], w["text"], "\n\n".join(
                 "$ %s\n%s" % (c, o) for c, o in w["state"]) or "(none)")
             for name in a.models.split(","):
+                if (w["t"], name) in done:
+                    continue
                 try:
                     ans, u, sec = ask(MODELS[name], prompt)
                 except Exception as e:  # a lab outage: recorded, not scored
@@ -273,8 +283,12 @@ def reviews_run(a):
     rules = open(REVIEWER).read()
     rules = rules.split("---", 2)[-1] + "\n\nYou cannot run commands: judge from what is given. End with one line " \
         "'VERDICT: PASS' or 'VERDICT: FIX', after the reasons."
+    done = answered(os.path.join(OUT, "review_answers.jsonl"), lambda r: (r["agent"], r["arm"], r["model"]))
+    k, n = (int(x) for x in a.shard.split("/"))
     with open(os.path.join(OUT, "review_answers.jsonl"), "a") as f:
-        for r in (json.loads(l) for l in open(os.path.join(OUT, "reviews.jsonl"))):
+        for i, r in enumerate(json.loads(l) for l in open(os.path.join(OUT, "reviews.jsonl"))):
+            if i % n != k:  # --shard k/n: every n-th round from the k-th, for parallel streams
+                continue
             mat = ""
             for cmd, out in r["material"]:
                 if len(mat) > a.cap:
@@ -284,6 +298,8 @@ def reviews_run(a):
                     "reviewer's material": "BRIEF:\n%s\n\nMATERIAL READ:\n%s" % (r["brief"], mat)}
             for arm, prompt in arms.items():
                 for name in a.models.split(","):
+                    if (r["agent"], arm, name) in done:
+                        continue
                     try:
                         ans, u, sec = ask(MODELS[name], prompt, rules)
                     except Exception as e:
@@ -343,6 +359,7 @@ def main():
         p.add_argument("--seed", type=int, default=0)
         p.add_argument("--models", default="deepseek,qwen")
         p.add_argument("--cap", type=int, default=80000, help="characters of the reviewer's material handed over")
+        p.add_argument("--shard", default="0/1", help="k/n: this stream takes every n-th round from the k-th")
     a = ap.parse_args()
     {"extract": extract, "run": run, "report": report, "reviews-extract": reviews_extract, "reviews-run": reviews_run,
      "reviews-report": reviews_report}[a.cmd](a)
