@@ -48521,10 +48521,6 @@ entries:
     3: 'On Joaquin''s answer to the open question (replace the full rescale in the D392 setup with rescale below x=0.1, keep
       it, or drop it): record his decision and carry it into the D392 setup''s config default; with par:selres_split (u u~
       g cost in the changed soft events 4.23x/8.56x, rest 0.88x/1.61x) sent with the question'
-    4: 'Read the D561 rule''s kit scores (support_rule.py score -> data/support_kit.json: 12 no-rescale runs scored without
-      and with the rescale below x0=0.009, below every trained momentum), apply the passed design''s outcome (pipeline checks,
-      YES / NO-gain / NO-cost), figure against no rescale (bulk validation Z+4g and u u~ g at 1e4/1e5, identical by construction;
-      kit strata), write-up, hand back'
   done_when: null
   notes_ref: null
   match: selres_*
@@ -49137,7 +49133,6 @@ entries:
     at: '2026-11-25T15:32:21+00:00'
   step_waits:
     '3': FA-ccin2p3-5f21b740 FA-ccin2p3-20b55f3f FA-ccin2p3-b66f0d5c FA-ccin2p3-00b76197 FA-ccin2p3-4aaa0bd7 FA-ccin2p3-e287a498
-    '4': FA-ccin2p3-5f21b740 FA-ccin2p3-20b55f3f FA-ccin2p3-b66f0d5c FA-ccin2p3-00b76197 FA-ccin2p3-4aaa0bd7 FA-ccin2p3-e287a498
   handoff:
     state: 'Step 3 done: par:selres_split (33726387b, fig analysis/selective_rescale/figs/uug_split.png): rescale below x=0.1''s
       u u~ g cost sits in the events it changes (softest x<0.1, 2304/100000 val events) 4.23x [3.50,5.10] / 8.56x [5.91,12.38]
@@ -49198,12 +49193,6 @@ entries:
       if:
       - 'replace: set model.input_soft_x0=0.1 in the D392 setup'
       - 'keep or drop: close the entry with the write-up'
-    4:
-      feeds: 'D561/D552: whether the rescale applied only outside the trained range keeps a soft gain with no cost on the
-        rest'
-      if:
-      - 'YES: goes to Joaquin as the replacement'
-      - 'NO-gain or NO-cost: reported with the figure; the next rule is his question'
   ask: 'Scope: replacing the full rescale in the D392 setup, which other entries'' parents and scaling runs start from. The
     rescale applied only below x=0.009 (below every trained u u~ g and Z+4g momentum) keeps the soft-limit gain with no cost:
     deepest soft kit bin 4924 -> 1.44 (1e4) and 7580 -> 0.93 (1e5) against no rescale, every other stratum and the bulk unchanged
