@@ -16542,10 +16542,10 @@ entries:
     '34': 2026-11-26 (the first real lxplus submit; read its submit file and gpu_window charge)
     '35': '2026-12-03'
   owner:
-    agent: a115825542ebec00a
-    state: closed
-    since: '2026-11-25T13:16:41+00:00'
-    state_at: '2026-11-25T13:17:53+00:00'
+    agent: ac4f3bf623a93600d
+    state: working
+    since: '2026-11-25T13:18:03+00:00'
+    state_at: '2026-11-25T13:18:03+00:00'
   designs:
   - at: '2026-10-30T19:52:22+00:00'
     question: 'Can lxplus''s HTCondor GPU nodes run FA jobs: does the env activate, the GPU show, the xformers attention kernel
