@@ -41516,8 +41516,7 @@ entries:
       (python analysis/llm_compare/heldout_per_process.py, no arguments) once data/b_h<H>_heldout.json exists; the per-readout
       subset figures (b_h16_, c_best_, a5_controls_) are superseded and are not sent again.'
   step_waits:
-    '8': part (c)'s best is hp1860 (step 5 done, par:llmcmp_c @1aa1030ec); design next, its smokes need CC synced, refused
-      for other agents' uncommitted files in the shared checkout
+    '8': the design reviewer (step-8 width design at hp1860), then the 4 smokes
     '12': FA-ccin2p3-e9dfa8b9
     '13': FA-ccin2p3-623a3af6
     '14': FA-ccin2p3-f0b997a2
