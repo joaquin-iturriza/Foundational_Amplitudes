@@ -43631,7 +43631,7 @@ entries:
   match: zz_labllm_*
   evidence:
     runs: []
-    commit: 15fae9da7
+    commit: 7a8d16eb8
     paths:
     - analysis/lab_llm_trial/runs.jsonl
     - analysis/lab_llm_trial/summary.json
@@ -43640,6 +43640,7 @@ entries:
     - tests/test_lab_route.py
     - tools/lab_llm_report.py
     - tools/lab_llm_trial.py
+    - tools/lab_wake_trial.py
     - tools/labllm.py
     - tools/plan.py
     - tools/token_share.py
