@@ -109,17 +109,16 @@ def figure(res, base):
     top = max([w["B_dL"] for w in fw] + [hi]) * 2
     if up:
         axB.plot([mid(w) for w in up], [top] * len(up), "^", color=ps.C.grey, label="above the measured batches")
-    neg = [w for w in res["windows"] if w["status"] == "dL<=0"]
-    if neg:
-        axB.plot([mid(w) for w in neg], [min([w["B_dL"] for w in fw] + [lo]) / 2] * len(neg), "v", color=ps.C.grey,
-                 label="loss rises at some batch")
     axB.set_yscale("log")
     ys = [w["B_dL"] for w in fw] + [max(w["B_A"], 1.0) for w in ok] + [lo, hi]
     axB.set_ylim(min(ys) / 4, max(ys) * 4)   # the reference lines and the edge markers inside the frame
+    neg = [w for w in res["windows"] if w["status"] == "dL<=0"]
+    if neg:
+        axB.plot([mid(w) for w in neg], [min(ys) / 2.5] * len(neg), "v", color=ps.C.grey, label="loss rises at some batch")
     if ex:
         axB.plot([mid(w) for w in ex], [max(ys) * 2] * len(ex), "x", color=ps.C.grey, label="window with an exploding read")
     axB.set_xlabel("training step")
-    axB.set_ylabel(r"$B_{\rm dL}$ (events)")
+    axB.set_ylabel("critical batch (events)")
     ps.legend(axB, "upper left")
     cmap = mpl.colormaps["viridis"]
     bs = np.array(res["b"], float)
@@ -135,12 +134,13 @@ def figure(res, base):
             axD.plot(xx, w["dL_inf"] / (1 + w["B_dL"] / xx), ":", color=c)
     axD.plot([], [], "o-", color=ps.C.grey, label=r"loss decrease $\Delta L(b)$")
     axD.plot([], [], "s--", color=ps.C.grey, mfc="none", label=r"first-order part $A(b)$")
-    if fw:
+    if any(w["status"] == "fitted" for w in allw):
         axD.plot([], [], ":", color=ps.C.grey, label=r"fit $\Delta L_\infty/(1+B_{\rm dL}/b)$")
     axD.axhline(0, color="black", label="no change")
     axD.set_xscale("log")
     axD.set_yscale("symlog", linthresh=10)   # the loss rises by 3 to 100 per step, A is 0.5 to 15
     axD.set_xticks(bs, [str(int(b)) for b in bs])
+    axD.set_ylim(top=1e3)   # room for the legend above the A(b) lines
     axD.minorticks_off()
     axD.set_xlabel(r"events per update $b$")
     axD.set_ylabel(r"loss change per step")
