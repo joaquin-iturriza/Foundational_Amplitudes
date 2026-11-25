@@ -41534,7 +41534,7 @@ entries:
       --part bias @HEAD). Next per the passed design (level branch): configurations that change what sets a new family''s
       level, each its own design.'
   step_waits:
-    '8': the design reviewer (step-8 width design at hp1860), then the 4 smokes
+    '8': FA-ccin2p3-8acd3fc1 FA-ccin2p3-39f4ab2e FA-ccin2p3-e5265194 FA-ccin2p3-e1d1fbaf
     '12': FA-ccin2p3-e9dfa8b9
     '13': FA-ccin2p3-623a3af6
     '14': FA-ccin2p3-f0b997a2
