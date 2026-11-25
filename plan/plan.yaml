@@ -41663,6 +41663,19 @@ entries:
       0.87 of log|M|^2, 0.106 of the emission-scale target; between, no GPU arm. Asymptotic factors (D436, l.13257) and target_propagators
       (l.14075) measured on single-process shape/limits only, never on new-family levels. No per-event factor tried so far
       places new-family levels as well as the diagram descriptors'' level regressor.'
+  - at: '2026-11-25T17:47:40+00:00'
+    text: '2026-11-25 D567 (1), shape with each arm''s level removed (existing split files, tools/llm_score.py @ae5427d12;
+      error_split.py @41820f764; figure analysis/llm_compare/figs/all_arms_shape_heldout_per_process.png, heldout_per_process.py
+      --part shape). MSE - bias^2 of log|M|^2 (= scale + floor) per held-out process, median over the 43 new / 96 relabels,
+      against the LLM''s whole MSE (0.649 / 0.0786; an upper bound on its own shape error): his setup 8 heads 0.287 / 0.0143
+      (below the LLM on 37/43, 82/96); 16 heads 0.241 / 0.0074 (35/43, 93/96); our setup control 0.106 / 0.0082 (40/43, 91/96);
+      searched 0.135 / 0.00071 (36/43, 96/96). Per new family (median, 8 heads / our searched / LLM whole MSE): multi-H 0.29/0.12/1.29
+      (15/15 below in every arm), H+tau 0.70/0.060/0.49, WWW 0.43/0.64/0.94, ZZZ 0.070/0.17/0.175, gg->Wqq'' 0.098/0.0070/0.31
+      (4/6; the gg->tbW pair above at ~3-5 vs LLM ~2.3), gg->ttX 0.31/0.97/0.71. Reading: with the level removed every arm''s
+      shape error is below the LLM''s whole error on 35-40 of 43 new; exceptions gg->t b~ W- / gg->b t~ W+ (every arm) and
+      part of gg->ttX and H+tau in his setup. The untuned his-setup control has no split yet (re-read FA-lxplus-b30f10dd).
+      (2) level-removed distributions: re-reads with --events-out (llm_score.py @d937b2f1c) FA-lxplus-b532f161/-7c661cac/-e5a942b0/-1401b26e/-b30f10dd,
+      figure script shape_dists.py @a2f912060.'
   step_waits:
     '8': FA-ccin2p3-8acd3fc1 FA-ccin2p3-39f4ab2e FA-ccin2p3-e5265194 FA-ccin2p3-e1d1fbaf
     '12': FA-ccin2p3-e9dfa8b9
