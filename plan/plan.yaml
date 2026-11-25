@@ -46241,6 +46241,12 @@ entries:
     units: null
     start: '2026-11-25T15:06:03+00:00'
     at: '2026-11-25T15:06:03+00:00'
+  - batch: upd_scales_pretrain
+    wall_h: 1.9
+    jobs: 1
+    units: null
+    start: '2026-11-25T15:06:16+00:00'
+    at: '2026-11-25T15:06:16+00:00'
   findings:
   - at: '2026-11-24T00:54:54+00:00'
     text: '2026-11-24: why Joaquin''s single-run attempt failed (base_experiment find_BS before ef2162765): it read p.grad
