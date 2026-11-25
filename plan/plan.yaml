@@ -44498,13 +44498,9 @@ entries:
     - its validation against batch-size runs
   decisions:
   - D532
-  next: 'Read the batch-size scan when all five sweeps end (cbs_b2048, cbs_b4096, cbs_b8192, cbs_b16384 and cbs_b32768, all
-    on CC-IN2P3): collect each trial''s result.json plus its training.lr into {batch: [dict with hp_idx, lr, val_curve, validate_every]}
-    (a timed-out trial has no result.json: read its val_curve from its log; the diverged cbs_b4096 hp_0353 listed apart with
-    where it blew up), python3 analysis/critical_batch/cbs_read.py <trials.json>: S_B and E_B per target, B_crit with bootstrap,
-    unreached_above_fit, the lr-edge rule; figure of S_B and E_B against B per target beside B_simple (scan_state.py is the
-    interim version); write-up in docs/results.tex sec:noisescale, wall-clock per step beside steps (the measured ~0.5 s/step
-    fixed overhead)'
+  next: 'Close critical_batch: when the trunk repo-reviewer backlog (reviewer aee7e3b6b89d84945, blocked on finetune_mechanism''s
+    glu_parent_curves.py) and the notes-editor backlog carrying par:cbs_scan pass, plan done critical_batch --writeup 145d14839
+    and remove worktrees/wt-cbs-accum and worktrees/wt-critbatch with scripts/remove_worktree.sh'
   done_when: null
   notes_ref: null
   match: zz_cbs_*,cbs_*
@@ -44936,15 +44932,11 @@ entries:
       plan; decisions for batch, D426, D514, D532-D536: no prior scan on this setup.'
   step_why:
     1:
-      feeds: 'D532: whether the measured noise scale predicts where larger batches stop paying off, and whether the canonical
-        batch 16384 changes'
+      feeds: 'D532: the scan''s answer (NO branch, B_crit 2500-6690 vs B_simple 55.5) reaches Joaquin as a finished entry'
       if:
-      - 'S_2048/S_32768 <= 1.2 at every target (YES): report B_crit and a 2048-4096 batch as a candidate canonical change
-        to Joaquin, with wall clock per step beside steps'
-      - 'S_2048/S_32768 >= 1.45 (NO) or between: report the scan''s B_crit and its factor over B_simple; a batch at the lr
-        edge is re-searched half a decade over first'
-  step_waits:
-    '1': ccin2p3:cbs_b2048 ccin2p3:cbs_b4096 ccin2p3:cbs_b8192 ccin2p3:cbs_b16384 ccin2p3:cbs_b32768
+      - 'both reviewers pass: plan done with the write-up commit, remove the worktrees'
+      - 'a reviewer blocks on par:cbs_scan or scan_state.py: fix and continue the same reviewer'
+  step_waits: {}
   targets:
   - batch: noise_smoke
     wall_h: 0.4
