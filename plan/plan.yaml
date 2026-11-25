@@ -41430,6 +41430,15 @@ entries:
       --gpu-min-mem=80G, --time 167:00:00, --hp training.save_last=false). Disk: CC 29 GB free at submission; peaks do not
       coincide: now ~9.8 GB (its best checkpoint) + the CC widths'' remaining ~6.7 GB, its 17.7 GB end transient ~5 days in,
       after the 64-head run ends (~2 days); 17.7 + 10 = 27.7 < 29 GB.'
+  - at: '2026-11-25T10:30:31+00:00'
+    text: '2026-11-25 (E9094): 16 heads FA-ccin2p3-dcb66b14 COMPLETED all 60,840 steps (20 validations). Validation MSE of
+      z (plain mean over processes, his target) at its best checkpoint 3.74e-4 at step 60,840 (the last validation), against
+      trial 5 (8 heads) 4.81e-4 also at its last validation; ratio 16/8 = 0.778 (1/1.29), inside the 1.38 seed margin. Both
+      curves fall ~2 decades (4.0e-2 -> 3.7e-4; 4.2e-2 -> 4.8e-4), still falling at the end, each with transient spikes recovered
+      within 1-2 validations (16 heads 1.53e-3 and 1.98e-3 at steps 36,504 and 39,546; 8 heads 1.11e-2 at 24,336). Figure
+      analysis/llm_compare/figs/b_width_curves.png (b_width_curves.py, data b_val_h16.txt @5129234f0). Score: site pick allotted
+      lxplus; run dir copied CC->lxplus (site copy, 187 MB); FA-lxplus-df30bfe5 (job_llm_score.sh REREAD, code @58804b477);
+      held-out figure in Suprio''s layout when it ends.'
   step_waits:
     '5': part (c) driver llmcmp_c_qperp_drive5 ending (its detach DONE event; wave 3 of 2 trials after trials 3 -5.816 and
       5 -5.938 of wave 2)
