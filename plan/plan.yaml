@@ -18006,6 +18006,24 @@ entries:
       brief_guard). Not fixed: sleep_guard keeps the strict rule for any command with the words for/while; a wrapped short
       sleep (timeout 60 sleep 3) is still refused; the commit block was tested on equivalent cases in a throwaway repo, not
       on the real commands; md_guard refuses a scratchpad .tex by its own design (not counted a misfire).'
+  - at: '2026-11-25T13:41:26+00:00'
+    text: '2026-11-25 step 36 done (D562 audit of the checks that judge wording; refusals 2026-11-09..25 hand-read from the
+      main transcript, cases in the scratchpad audit/): REMOVED (1) plan_check open-ask check, 8da026b88: 78 refusals, 53
+      asks already sent in other words or verbatim, <=25 not sent; plan next''s OPEN line (step 34) lists every open ask with
+      its age each wake. (2) reply check at Stop, 8e53d6eb0: model reading, 2 of 3 refusals misfired, disabled since 11-09
+      (I-edf7c73a). (3) brief_guard cut check, 2022ad363: 4 refusals in its life (11-03, 11-05, 11-11, 11-22), all misfires,
+      no catch; design-reviewer check 6 plus submit_guard''s PASS hold cuts. FIXED and KEPT send_check axes, a675aee7a: 23
+      refusals, ~10 catches; ''x is'', ''(x)'', ''y the'', ''(y)'' and multi-page PDFs now pass (replay 9 of 23 now pass;
+      the 14 still refused are the catches plus ''Top panel: sigma in pb'' and ''along the run''). KEPT as is: result-table
+      (15: ~9 catches; its 4 misfires already pass since _SIZE/_IDCOL), figures_handed_back (55: ~33 led to a send; misfires
+      fixed by --skip-figure 665321793), send_check read-on-its-own (11, nearly all catches), legend definitions (20: ~12
+      catches, ~8 misfires on entries the caption defines collectively, not fixed: loosening it passes the catches), plan
+      ask reason/rare-terms/already-answered (at the source; the one already-answered misfire was fixed by f6976b90c), context
+      guard (since ee7afdfb7: ~4 of 5-8 refusals led to recordings). Also: plan owner now refuses an agent launched to own
+      another entry (caba98687, test D1): on 11-25 the agent_redesign owner took the llm_compare owner''s id from the newest
+      transcript (both launched 8 s apart) and recorded it; the hook was not at fault. Tests: send_check_axes 10, check_caption
+      2, mechanical_brief 3, redesign_d 56/59 (3 failures predate: D3 context push, D4 model ''inherit'', STALLED note), setup_scenarios
+      questions/open_questions (open_questions'' STALLED failures predate).'
   handoff:
     state: 'D558 step done 2026-11-25: refusal cost per role and check (tools/token_share.py --refusals @e1b708a35; write-up
       74b362473 par:refusal-cost, fig:refusal-cost, analysis/agent_redesign/figs/refusal_cost.png, data refusal_cost.json
