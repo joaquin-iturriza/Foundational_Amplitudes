@@ -45122,7 +45122,7 @@ entries:
     agent: af74e499d5513dfe4
     state: stopped
     since: '2026-11-25T00:05:14+00:00'
-    state_at: '2026-11-25T01:03:59.656000+00:00'
+    state_at: '2026-11-25T01:47:39.041000+00:00'
     context: 288140
     context_at: '2026-11-25T01:58:26+00:00'
   designs:
@@ -46369,7 +46369,7 @@ entries:
     agent: a4ab30797e0606c86
     state: working
     since: '2026-11-25T01:20:41+00:00'
-    state_at: '2026-11-25T01:20:41+00:00'
+    state_at: '2026-11-25T01:58:07.714000+00:00'
     context: 98630
     context_at: '2026-11-25T01:58:35+00:00'
   designs:
