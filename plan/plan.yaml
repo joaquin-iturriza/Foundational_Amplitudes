@@ -46494,7 +46494,11 @@ entries:
     - analysis/selective_rescale/seed_chunks/stage1_submitted.txt
     - analysis/selective_rescale/stage1_read.py
     - wrappers.py
-  dead_ends: []
+  dead_ends:
+  - tried: rescale below x=0.3 (model.input_soft_x0=0.3), at the no-rescale optimum and at its own 16-trial search's optimum
+    why: 'resolved Z+4g bulk cost at 1e4 both times: 1.26 [1.16,1.38] (stage 1), 1.29 [1.18,1.40] at its own optimum (par:selres_stage2
+      @7a65c7ebe); the design ends a rule on a resolved cost in a Z+4g cell'
+    at: '2026-11-25T07:10:14+00:00'
   asks: []
   owner:
     agent: a4ab30797e0606c86
