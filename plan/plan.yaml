@@ -45200,7 +45200,8 @@ entries:
       2x2.78 GB at 64 heads); the pending 120-head smoke FA-ccin2p3-74ba6cdd projects ~19.5 GB.'
   step_waits:
     '1': FA-ccin2p3-67887dff
-    '2': '2026-11-25'
+    '2': 'detach ccdisk_read2 (CPU read job ccj_e7fd8463789f, slurm 64807324: model_groups.py per-family model GB @0bc52e3d6,
+      lhe_queue inner du, zz_v4 file list, runs_from_lxplus families)'
   targets:
   - batch: disk_inventory
     wall_h: 1.0
