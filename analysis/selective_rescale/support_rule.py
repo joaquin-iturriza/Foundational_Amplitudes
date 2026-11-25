@@ -5,8 +5,11 @@ on the existing no-rescale runs with the rule switched on at evaluation (kit sco
 
     python3 analysis/selective_rescale/support_rule.py minima [--cached]   softest x per pool (train/val/test), u u~ g and Z+4g
     python3 analysis/selective_rescale/support_rule.py score [--cached]    kit scores of the 12 no-rescale runs (u u~ g, Z+4g;
-        1e4, 1e5; chosen trial + seeds 43/44), each without and with the rule (REBUILD_SET, tools/rebuild_run.py), CPU jobs
-        on CC (a call submits the missing ones, a later call reads them)  -> data/support_kit.json
+        1e4, 1e5; chosen trial + seeds 43/44), each without and with the rule (REBUILD_SET, tools/rebuild_run.py): reads
+        the SRKIT line of each run's CPU job (scripts/job_support_rule.sh, its run id in data/support_jobs.json) from its
+        log; Z+4g read earlier through site_python  -> data/support_kit.json
+    python3 analysis/selective_rescale/support_rule.py jobs          the job_support_rule.sh arguments of each missing run
+    python analysis/selective_rescale/support_rule.py remote '<lab>#<dir>' <rule>   (on the site, in the job) one run's SCORE
 """
 import json
 import os
@@ -100,7 +103,9 @@ def score(cached):
         for lab, d in RUNS.items():
             if lab not in res:
                 try:
-                    v = site_python(SCORE, [f"'{lab}#{d}'", RULE], "SRKIT", timeout=3600)
+                    v = job_result(lab)
+                    if v is None:
+                        continue
                     if any(isinstance(a, dict) and "error" in a for a in v.values()):   # kept out: listed missing, its error shown
                         print(f"{lab}: error " + json.dumps({k: a for k, a in v.items() if k != "changed"})[:1500])
                     else:
@@ -113,6 +118,31 @@ def score(cached):
     return not missing
 
 
+def job_result(lab):
+    """The SRKIT dict of `lab`'s job_support_rule.sh job (its run id in data/support_jobs.json), None while it has none.
+    site_python's `site run --job` gives 2G (the CPU block's mem_per_cpu, one CPU): kit_predict was killed there."""
+    import subprocess
+    jobs = json.load(open(os.path.join(HERE, "data", "support_jobs.json")))
+    if lab not in jobs:
+        print(f"{lab}: no job submitted (support_rule.py jobs)"); return None
+    r = subprocess.run(["site", "logs", jobs[lab], "-n", "100000"], capture_output=True, text=True, timeout=300)
+    line = next((l for l in r.stdout.splitlines() if l.startswith("SRKIT ")), None)
+    if line is None:
+        print(f"{lab}: {jobs[lab]} has no SRKIT line yet: " + (r.stdout + r.stderr)[-300:].replace("\n", " | "))
+        return None
+    return json.loads(line.split(" ", 1)[1])
+
+
+def jobs():
+    for lab, d in RUNS.items():
+        print(f"{lab}\t{lab}#{d}\t{RULE}")
+
+
+def remote(arg, rule):
+    sys.argv = [sys.argv[0], arg, rule]
+    exec(SCORE, {"__name__": "__main__"})
+
+
 def minima(cached):
     f = os.path.join(HERE, "data", "support_minima.json")
     res = json.load(open(f)) if cached else site_python(MINIMA, [f"'{k}#{v}'" for k, v in LOGS.items()], "SRMIN")
@@ -121,5 +151,9 @@ def minima(cached):
 
 
 if __name__ == "__main__":
+    if sys.argv[1] == "remote":
+        remote(*sys.argv[2:4]); sys.exit(0)
+    if sys.argv[1] == "jobs":
+        jobs(); sys.exit(0)
     ok = {"minima": minima, "score": score}[sys.argv[1]]("--cached" in sys.argv)
     sys.exit(0 if ok is not False else 75)
