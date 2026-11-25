@@ -29,6 +29,10 @@ import main_turns as mt  # noqa: E402
 
 PROJ = os.path.expanduser("~/.claude/projects/-home-joaquin-work-FA")
 OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "analysis", "lab_llm_trial")
+# samples and answers live outside the checkout: another agent's `git stash -u` there unlinks untracked files under
+# running writers (2026-11-25 01:06 UTC: the replay's answers went to deleted inodes)
+DATA = os.path.expanduser("~/.local/share/fa_labllm/wake_trial")
+os.makedirs(DATA, exist_ok=True)
 URL = "https://lpnkarim.in2p3.fr/api/chat/completions"  # the /openai/v1 passthrough is disabled (403)
 MODELS = {"deepseek": "deepseek-v4-flash", "qwen": "qwen3.8-27b"}
 STATE = re.compile(r"tools/plan\.py (owners|status|show|next|unanswered|where)|\bsite (events|items|decisions|runs|"
@@ -128,11 +132,11 @@ def extract(a):
             and mt.did_of([(n, str(i.get("command") or "")) for n, i in s["calls"]]) in ("orchestration", "none")]
     random.Random(a.seed).shuffle(segs)
     pick = segs[:a.n]
-    with open(os.path.join(OUT, "wakes.jsonl"), "w") as f:
+    with open(os.path.join(DATA, "wakes.jsonl"), "w") as f:
         for s in pick:
             f.write(json.dumps({"file": s["file"], "t": s["t"], "trigger": s["trigger"], "text": s["text"],
                                 "state": s["state"], "tokens": s["tokens"], "key": key(s)}) + "\n")
-    print("%d routing wakes in the window, %d sampled -> %s" % (len(segs), len(pick), os.path.join(OUT, "wakes.jsonl")))
+    print("%d routing wakes in the window, %d sampled -> %s" % (len(segs), len(pick), os.path.join(DATA, "wakes.jsonl")))
     print("population tokens %.1fM, mean %.0fk" % (sum(s["tokens"] for s in segs) / 1e6,
                                                   sum(s["tokens"] for s in segs) / max(len(segs), 1) / 1e3))
 
@@ -143,7 +147,7 @@ def ask(model, prompt, system=RULES):
         {"role": "system", "content": system}, {"role": "user", "content": prompt}]}).encode(),
         headers={"Authorization": "Bearer " + k, "Content-Type": "application/json", "User-Agent": "generic-client/1.0"})
     t = time.time()
-    d = json.load(urllib.request.urlopen(r, timeout=600))
+    d = json.load(urllib.request.urlopen(r, timeout=1200))
     return d["choices"][0]["message"].get("content") or "", d.get("usage") or {}, time.time() - t
 
 
@@ -167,9 +171,9 @@ def answered(path, key):
 
 
 def run(a):
-    wakes = [json.loads(l) for l in open(os.path.join(OUT, "wakes.jsonl"))]
-    done = answered(os.path.join(OUT, "wake_answers.jsonl"), lambda r: (r["t"], r["model"]))
-    with open(os.path.join(OUT, "wake_answers.jsonl"), "a") as f:
+    wakes = [json.loads(l) for l in open(os.path.join(DATA, "wakes.jsonl"))]
+    done = answered(os.path.join(DATA, "wake_answers.jsonl"), lambda r: (r["t"], r["model"]))
+    with open(os.path.join(DATA, "wake_answers.jsonl"), "a") as f:
         for w in wakes:
             prompt = "WAKE (%s, %s):\n%s\n\nSTATE READ:\n%s" % (w["trigger"], w["t"], w["text"], "\n\n".join(
                 "$ %s\n%s" % (c, o) for c, o in w["state"]) or "(none)")
@@ -186,8 +190,8 @@ def run(a):
 
 
 def report(a):
-    wakes = {w["t"]: w for w in (json.loads(l) for l in open(os.path.join(OUT, "wakes.jsonl")))}
-    rows = [json.loads(l) for l in open(os.path.join(OUT, "wake_answers.jsonl"))]
+    wakes = {w["t"]: w for w in (json.loads(l) for l in open(os.path.join(DATA, "wakes.jsonl")))}
+    rows = [json.loads(l) for l in open(os.path.join(DATA, "wake_answers.jsonl"))]
     last = {(r["t"], r["model"]): r for r in rows if r["t"] in wakes}
     rep = {}
     for name in sorted({m for _, m in last}):
@@ -271,7 +275,7 @@ def reviews_extract(a):
                              "design": r["design"][:30000], "design_cmd": r.get("design_cmd", ""),
                              "slice": bool(re.search(r"\b(sed|grep|awk)\b", r.get("design_cmd", ""))), "material": r["material"], "verdict": r["verdict"]})
     random.Random(a.seed).shuffle(rows)
-    with open(os.path.join(OUT, "reviews.jsonl"), "w") as f:
+    with open(os.path.join(DATA, "reviews.jsonl"), "w") as f:
         for r in rows[:a.n]:
             f.write(json.dumps(r) + "\n")
     print("%d design review rounds in the window, %d with a verdict, %d of them with a read holding the design's measure "
@@ -283,10 +287,10 @@ def reviews_run(a):
     rules = open(REVIEWER).read()
     rules = rules.split("---", 2)[-1] + "\n\nYou cannot run commands: judge from what is given. End with one line " \
         "'VERDICT: PASS' or 'VERDICT: FIX', after the reasons."
-    done = answered(os.path.join(OUT, "review_answers.jsonl"), lambda r: (r["agent"], r["arm"], r["model"]))
+    done = answered(os.path.join(DATA, "review_answers.jsonl"), lambda r: (r["agent"], r["arm"], r["model"]))
     k, n = (int(x) for x in a.shard.split("/"))
-    with open(os.path.join(OUT, "review_answers.jsonl"), "a") as f:
-        for i, r in enumerate(json.loads(l) for l in open(os.path.join(OUT, "reviews.jsonl"))):
+    with open(os.path.join(DATA, "review_answers.jsonl"), "a") as f:
+        for i, r in enumerate(json.loads(l) for l in open(os.path.join(DATA, "reviews.jsonl"))):
             if i % n != k:  # --shard k/n: every n-th round from the k-th, for parallel streams
                 continue
             mat = ""
@@ -311,11 +315,11 @@ def reviews_run(a):
 
 
 def reviews_report(a):
-    rows = [json.loads(l) for l in open(os.path.join(OUT, "reviews.jsonl"))]
+    rows = [json.loads(l) for l in open(os.path.join(DATA, "reviews.jsonl"))]
     key = {r["agent"]: r["verdict"] for r in rows}
     sl = {r["agent"]: r.get("slice", False) for r in rows}
     last = {}
-    for r in (json.loads(l) for l in open(os.path.join(OUT, "review_answers.jsonl"))):
+    for r in (json.loads(l) for l in open(os.path.join(DATA, "review_answers.jsonl"))):
         if r["agent"] in key and not r["answer"].startswith("ERROR"):
             last[(r["agent"], r["arm"], r["model"])] = r
     npass = sum(v == "PASS" for v in key.values())
