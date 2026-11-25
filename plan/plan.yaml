@@ -48631,7 +48631,7 @@ entries:
     start: '2026-11-25T15:32:21+00:00'
     at: '2026-11-25T15:32:21+00:00'
   step_waits:
-    '3': Joaquin's answer to the open question on the D392 input map
+    '3': FA-ccin2p3-5f21b740 FA-ccin2p3-20b55f3f FA-ccin2p3-b66f0d5c FA-ccin2p3-00b76197 FA-ccin2p3-4aaa0bd7 FA-ccin2p3-e287a498
     '4': FA-ccin2p3-5f21b740 FA-ccin2p3-20b55f3f FA-ccin2p3-b66f0d5c FA-ccin2p3-00b76197 FA-ccin2p3-4aaa0bd7 FA-ccin2p3-e287a498
   handoff:
     state: 'Step 3 done: par:selres_split (33726387b, fig analysis/selective_rescale/figs/uug_split.png): rescale below x=0.1''s
