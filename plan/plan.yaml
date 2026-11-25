@@ -45724,7 +45724,7 @@ entries:
     2: Commit the write-up (docs/results.tex hunk in scratchpad rt2_mine.diff, still in the working tree, plus analysis/cc_login/data/site_env_job_64806476.txt)
       once the repo-reviewer pass lifts the commit gate, then plan done cc_login_jobs --writeup <that commit>
   done_when: null
-  notes_ref: null
+  notes_ref: sec:cc_login_jobs
   match: cc_login_*
   evidence:
     runs: []
