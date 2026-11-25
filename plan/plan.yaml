@@ -46284,6 +46284,20 @@ entries:
       run''s Adam (beta1 0.99) puts (1 - beta1) = 1% of the current gradient into its step: the measured step is ~100x the
       current batch''s share of the real step and sits past the quadratic''s turning point (A/(A-dL) = 0.04-0.15 of it would
       still decrease the loss). Same b-independent overshoot as the pretraining smoke (dL -458, read then as an early effect).'
+  - at: '2026-11-25T14:44:48+00:00'
+    text: '2026-11-25 16:05 D560 part B read, both runs (dl_read.py at 1e0a..HEAD, data/{pretrain,zng4g}_update_bdl.json,
+      figs/{pretrain,zng4g}_update_bdl.png; raw reads kept as data/{pretrain,zng4g}_update_noise_scale.json, fetched by site
+      run cat as site fetch timed out on CC ssh). Pretraining FA-ccin2p3-3e856594 (clean, V3_SHORT_DONE, stop at -2.304, step
+      2635; 52 dL reads, b = 2048/4096/8192): dL(b) < 0 in 12 of 13 windows (-3.9 to -10 over the 8 windows without an exploding
+      read); 5 windows hold an exploding read (|dL| or |A| > 100x the median read, up to 1e10); the one fitted window (2050-2200,
+      B_dL 201) is set by such a read: no B_dL measurement at any crossing (765/1700/2720), so the design''s YES/NO cannot
+      be read. First-order part A(b) > 0 everywhere, A(8192)/A(2048) = 1.011-1.041: B_A = 28-111 events (8 clean windows),
+      23-240x below B_crit 2500-6690 and with B_simple ~55. Z+4g FA-ccin2p3-cedaa6dd: dL < 0 in all 7 windows, B_A = 6-51
+      against 87-261. Cause (both): the momentum-0 update overshoots, second-order part (A - dL)/A = 2.4-5.8 (pretraining),
+      5.7-22.5 (Z+4g) at the largest b; the real optimizer''s step carries the current batch at (1 - beta1) of this size (Adam
+      0.99 -> 1%; AdamW part of MuonAdamW 0.9 -> 10%; Muon''s newton_schulz of the momentum keeps its norm). Reading for D560:
+      neither the noise scale B_simple nor the update''s first-order critical batch B_A finds the scan''s B_crit (both 30-100x
+      below); the step''s loss decrease as measured cannot be read.'
   handoff:
     state: 'Steps 2-4 in flight or stopped. Step 2 (D560 part B, pretraining): FA-ccin2p3-3e856594 runs v4_het_update_noise
       at the scan''s batch-16384 best hp 1333 (design passed 12:38 by a4f3d7192edf30268; code merged 5109b8182; smoke FA-ccin2p3-b587c065
