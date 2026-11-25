@@ -45601,6 +45601,12 @@ entries:
     units: null
     start: '2026-11-25T00:49:35+00:00'
     at: '2026-11-25T00:49:35+00:00'
+  - batch: d556_read
+    wall_h: 1.5
+    jobs: 1
+    units: null
+    start: '2026-11-25T01:42:13+00:00'
+    at: '2026-11-25T01:42:13+00:00'
   handoff:
     state: 'Inventory done (FA-ccin2p3-b949c4ee, outputs CC SCRATCH/zz_cc_disk/*.tsv; apparent size matches df within 0.8%).
       /sps/lpnhe 503-505 GiB of 512 used, 7 GB free at 00:50 2026-11-25. Top (apparent GiB): runs 87.7, datasets 55.0, SCRATCH
