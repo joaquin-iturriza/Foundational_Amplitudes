@@ -33,7 +33,8 @@ def owner_world(entries, agents=(), events="  no open events", runs=(), acked=()
     db.commit()
     for aid, eid, recs in agents:
         out = [{"type": "user", "timestamp": recs[0][0] if recs else ago(60), "message": {
-            "role": "user", "content": "You own one entry.\n\nEntry: %s (t)\nQuestion: q" % eid}}]
+            "role": "user", "content": "You own one entry: `python3 tools/plan.py owner %s --agent <id>`.\n\n"
+            "Entry: %s (t)\nQuestion: q" % (eid, eid)}}]
         for ts, kind in recs:
             if kind == "compact":
                 out.append({"type": "system", "subtype": "compact_boundary", "timestamp": ts})
@@ -87,6 +88,12 @@ def d1():
     r = w.plan_cmd("owner", "a", "--agent", "o2")
     scenario("D1: a second owner is refused while the first works (one agent per piece of work)",
              r[0] != 0 and w.entries()["a"]["owner"]["agent"] == "o1", r)
+    w = owner_world([E("a"), E("b")], agents=[("ob", "b", [(ago(1), "work")]), ("oa", "a", [(ago(1), "work")])])
+    r = w.plan_cmd("owner", "a", "--agent", "ob")
+    r2 = w.plan_cmd("owner", "a", "--agent", "oa")
+    scenario("D1: an agent launched to own another entry is refused as this one's owner (2026-11-25 two launches)",
+             r[0] != 0 and "launched to own b" in r[1] + str(r[2:]) and r2[0] == 0
+             and w.entries()["a"]["owner"]["agent"] == "oa", r + r2)
     w = World([E("a", next={1: "x", 2: "y"})], state={"a": {"steps": []}}, agents=[("s1", ago(5), "a")])
     w.env.update(OWN)
     r = w.plan_cmd("step", "a", "--agent", "s1", "--next", "2")

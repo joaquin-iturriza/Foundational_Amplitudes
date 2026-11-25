@@ -1781,8 +1781,14 @@ def cmd_owner(a):
         if a.agent and (not o or o["agent"] != a.agent):
             if e.get("status") != "running":
                 sys.exit("plan: %s is %s; only a running entry gets an owner" % (a.id, e.get("status")))
-            if subagent(a.agent) is None:
+            r = subagent(a.agent)
+            if r is None:
                 sys.exit("plan: no subagent %s in this project's transcripts" % a.agent)
+            # two owners launched together: one took the other's id from the newest transcript (2026-11-25)
+            k = re.search(r"plan\.py owner (\S+) --agent", r[1] or "")
+            if k and k.group(1) != a.id:
+                sys.exit("plan: subagent %s was launched to own %s, not %s: give this agent's own id (its transcript's "
+                         "first prompt names its entry)" % (a.agent, k.group(1), a.id))
             if o and owner_state(e) == "working":
                 sys.exit("plan: %s's owner %s is working; one agent per piece of work: resume it (SendMessage), or "
                          "close it with its hand-off first" % (a.id, o["agent"]))
