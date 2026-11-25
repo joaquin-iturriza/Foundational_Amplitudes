@@ -80,12 +80,21 @@ def fit_affine_multiplicity(n_events, n_particles, means, stds):
     return a, b, sigma
 
 
-def parent_target_standardization(stats, n_particles):
+def parent_target_standardization(stats, n_particles, names=None):
     """A parent's target standardization carried onto processes it never saw (fine_tune.target_stats=parent_shared,
     and the zero-shot read tools/zero_shot_parent.py): stats = the parent's data_stats.json, n_particles = each new
     process's particle count. Returns (means, stds, kind): data.affine_multiplicity_std, mu_N = a + b N and the
-    shared sigma; data.shared_standardization, the pooled (mu, sigma) for every process; a per-process parent has
+    shared sigma; data.level_file, each process's entry of the parent's frozen level file and its sigma
+    (names needed); data.shared_standardization, the pooled (mu, sigma) for every process; a per-process parent has
     no standardization for a new process (ValueError)."""
+    lf = stats.get("level_file")
+    if lf:
+        # data.level_file: each process's mean from a frozen per-process level (a level predicted from the process
+        # alone), one shared sigma; a new process takes its own entry of the same file
+        assert names is not None, "a level-file parent needs the processes' names"
+        missing = [n for n in names if n not in lf["levels"]]
+        assert not missing, f"no level in the parent's level file for {missing}"
+        return [float(lf["levels"][n]) for n in names], [float(lf["sigma"])] * len(names), "level_file"
     am = stats.get("affine_multiplicity")
     if am:
         a, b, s = float(am["a"]), float(am["b"]), float(am["sigma"])

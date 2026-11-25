@@ -2429,11 +2429,17 @@ class AmplitudeExperiment(BaseExperiment):
         assert not self.cfg.data.get("affine_multiplicity_std", False) or (
             per_dataset and self.cfg.data.get("shared_standardization", False)), \
             "data.affine_multiplicity_std refines data.shared_standardization (per-dataset transforms, one sigma)"
+        assert not self.cfg.data.get("level_file") or (
+            per_dataset and self.cfg.data.get("shared_standardization", False)), \
+            "data.level_file sets the means of data.shared_standardization (per-dataset transforms, one sigma)"
         _pts = getattr(self, "_ft_parent_target_stats", None)
         if prepd_means is None and _pts is not None:
-            prepd_means, prepd_stds, _kind = parent_target_standardization(_pts, [npart_of(nm) for nm in names])
+            prepd_means, prepd_stds, _kind = parent_target_standardization(_pts, [npart_of(nm) for nm in names],
+                                                                            names=list(names))
             if _kind == "affine_multiplicity":
                 self._affine_multiplicity = dict(_pts["affine_multiplicity"])
+            if _kind == "level_file":
+                self._level_file = dict(_pts["level_file"])
             LOGGER.info(f"parent_shared: the parent's {_kind} standardization, means "
                         f"{[f'{m:.3f}' for m in prepd_means]}, sigma {prepd_stds[0]:.3f}")
         elif prepd_means is None:
@@ -2457,6 +2463,24 @@ class AmplitudeExperiment(BaseExperiment):
                     prepd_means, prepd_stds = [mu] * len(names), [sd] * len(names)
                     LOGGER.info(f"shared_standardization: one (mu, sigma) = ({mu:.3f}, {sd:.3f}) pooled over "
                                 f"{len(names)} processes, per-process transforms kept")
+                    if self.cfg.data.get("level_file"):
+                        # llm_compare step 16 (D564): each process's mean from a frozen level predicted from the
+                        # process alone (analysis/catalog_daniel/norm_explore3.py, level_file_B_diag.json), one sigma
+                        assert not bool(self.cfg.data.get("affine_multiplicity_std", False)), \
+                            "data.level_file replaces data.affine_multiplicity_std's mu_N: set one of them"
+                        lp = str(self.cfg.data.level_file)
+                        lp = lp if os.path.isabs(lp) else os.path.join(os.path.dirname(os.path.abspath(__file__)), lp)
+                        lv = json.load(open(lp))["levels"]
+                        missing = [nm for nm in names if nm not in lv]
+                        assert not missing, f"data.level_file {lp}: no level for {missing}"
+                        lev = np.array([float(lv[nm]) for nm in names])
+                        # sigma is affine_multiplicity_std's own (the run it replaces): only the means change
+                        sd = fit_affine_multiplicity(n, [int(npart_of(nm)) for nm in names], mu_p, sd_p)[2]
+                        prepd_means, prepd_stds = lev.tolist(), [sd] * len(names)
+                        self._level_file = {"path": str(self.cfg.data.level_file), "sigma": sd,
+                                            "levels": {k: float(v) for k, v in lv.items()}}
+                        LOGGER.info(f"level_file: per-process means from {lp}, sigma = {sd:.4f}; median |own mean - "
+                                    f"level| over the train processes {float(np.median(np.abs(mu_p - lev))):.3f}")
                     if bool(self.cfg.data.get("affine_multiplicity_std", False)):
                         # the draft's multiplicity preprocessing (Sec. "Extrapolating to more legs"):
                         # mu_N = a + b N over the particle count N, one shared sigma (multiplicity_extrap)
@@ -2847,6 +2871,7 @@ class AmplitudeExperiment(BaseExperiment):
                 "shared_standardization": bool(self.cfg.data.get("shared_standardization", False)),
                 **({"affine_multiplicity": self._affine_multiplicity}
                    if getattr(self, "_affine_multiplicity", None) else {}),
+                **({"level_file": self._level_file} if getattr(self, "_level_file", None) else {}),
                 "target_propagators": bool(self.cfg.data.get("target_propagators", False)),
                 "target_over_born": bool(self.cfg.data.get("target_over_born", False)),
                 "signedlog_scale_shift": self._signedlog_scale_shift(),

@@ -7,7 +7,8 @@ reweighted flat in log s_hat (the mean over the 20 bins of norm_moments2.py, eac
 tied to how the pool drew s_hat. Network: sklearn MLPRegressor 2x64, 3 seeds averaged, cross-fitted by relabelling
 class on the training processes; scored on the 43 new held-out processes by the level error against the same level
 definition. Output data/norm_explore3.json (per key also each held-out process's signed level error, predicted minus
-true, and its std).
+true, and its std); data/level_file_B_diag.json, every process's predicted level of B|diag|sampled
+(data.level_file of llm_compare step 16).
     python analysis/catalog_daniel/norm_explore3.py
 """
 import json, math, os, sys
@@ -83,6 +84,13 @@ def main():
                     p = np.mean([m_.predict(sc.transform(feats(n, diag)[None]))[0] for m_ in nets])
                     signed[n] = float(p - (L[n][0] - M))
                     lv[n] = signed[n] ** 2 / L[n][1] ** 2
+                if (target, diag, flat) == ("B", True, False):
+                    # the frozen level file of llm_compare step 16 (data.level_file): every process's predicted mean
+                    # log|M|^2 from the process alone (the final networks; train processes in-sample, held-out unseen)
+                    allp = {n: float(np.mean([m_.predict(sc.transform(feats(n, diag)[None]))[0] for m_ in nets]) + M)
+                            for n in sorted(R)}
+                    json.dump({"source": "analysis/catalog_daniel/norm_explore3.py B|diag|sampled", "levels": allp},
+                              open(os.path.join(HERE, "data", "level_file_B_diag.json"), "w"), indent=1)
                 cfl = (cf - ytr) ** 2 / sd ** 2
                 key = f"{target}|{'diag' if diag else 'nodiag'}|{'flat' if flat else 'sampled'}"
                 out[key] = dict(crossfit=float(np.median(cfl)), crossfit90=float(np.quantile(cfl, .9)),
