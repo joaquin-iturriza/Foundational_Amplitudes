@@ -44012,6 +44012,20 @@ entries:
       GPU-h from the smoke rates goes to Joaquin before submission if above 100 (D536).'
     sources: 1.38x <- the seed spread 10^0.14 measured on catalog_v4 (docs/results.tex v4_seed_spread ~l.4485); 100 GPU-h
       <- D536
+    fix_at: '2026-11-25T14:24:28+00:00'
+    fix: 'Re-check: the run-directory fix holds (--hp-idx H gives trial_0016/_0032/_0064/_0120, as in part (b)), and so does
+      the scoring check on hp1860 (0.053293 against 0.053296). One problem is left, disk (check 14). The design says it counts
+      part (b)''s pending 120-head run, but its arithmetic for ''fits CC now'' does not: ''~6.5 GB peaks + part (b)''s 64-head
+      remainder, under 24 - 10'' leaves out part (b)''s 120-head run. With the design''s own numbers: CC has 24 GB free. Part
+      (b)''s 64-head remainder takes ~2.5 GB and part (b)''s 120-head run ~9.8 GB during training and 17.7 GB at its end,
+      which leaves ~3.8 GB. Against that, part (c)''s 16/32/64 need 0.2+0.7+2.8 = 3.7 GB of best checkpoints that stay, and
+      6.5 GB at their end transients. So the 10 GB margin is gone. When part (b)''s 120-head run ends (~90 h at 5.33 s/step)
+      it would find about 17.8 GB free for a 17.7 GB peak, and that is the most expensive run of the entry. Fix: redo the
+      placement with part (b)''s 120-head end transient in the sum, and launch now only what fits with the margin. Say 16
+      and 32 heads (persistent 0.9 GB, transient 1.5 GB) if the sum allows. 64 heads joins 120 heads once part (b)''s 120-head
+      run has ended, or once space is freed. Or state another way it fits (for example, the 64-head end transient and its
+      checkpoints going somewhere else). Since the entry''s ruled_out says no debris of ours is left to clean, freeing space
+      on CC is a call to put to Joaquin with the GPU-h ask, alongside the timing. Everything else as in the first review.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
