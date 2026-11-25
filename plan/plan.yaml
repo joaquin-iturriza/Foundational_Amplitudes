@@ -44581,6 +44581,15 @@ entries:
       2026-09-28T15:30 (a complaint about a long report); 2026-11-13T06:45 (resampling in another section); 2026-11-14T04:31
       (a pasted LaTeX template)'
     blocks: nothing
+    blocks_steps: []
+  - ask: 'Scope: the canonical batch. The batch-size scan finds 8192 about 10% faster in wall clock to validation loss -2.08
+      on V100 than our canonical 16384 (0.43 h against 0.48 h, best trial each). Keep 16384, or change the canonical batch
+      to 8192?'
+    at: '2026-11-25T06:28:53+00:00'
+    searched: D532 (the scan, silent on changing the batch); fa-canonical-setup; 2026-11-14T04:31 (a pasted LaTeX template);
+      2026-10-06T00:17 (old transfer plan); 2026-10-05T21:17 (a pin on an old plot); 2026-10-02T11:24 (tf32 speed, not the
+      batch); 2026-10-06T16:02 (a forwarded colleague message)
+    blocks: nothing
     blocks_steps: &id003 []
   owner:
     agent: a27cabf54bbbc7b67
@@ -45117,15 +45126,13 @@ entries:
       analysis/critical_batch/data/{cbs_state,cbs_trials,cbs_readout,v4_het_noise_scale}.json, analysis/critical_batch/figs/cbs_readout.png,
       sweep/sweep_config_cbs_b*.yaml, docs/results.tex par:cbs_scan
     written: '2026-11-25T05:41:39+00:00'
-  ask: 'Scope: 3 of the 8 batch-2048 trials of the batch-size scan hit their 3:27 time limit (set before the 0.66 s/step rate
-    was measured) and never finished; the owner did not rerun them, because the batch''s best trial already reaches every
-    target by step 7100 and the cut trials cannot beat it. Rerun them to complete the design''s 8 trials (3 x 6.2 h, about
-    19 GPU-h), or keep the readout on the 5 that finished?'
-  waiting_since: '2026-11-25T05:55:07+00:00'
-  searched: 'D532 (the scan design: 8 trials per batch); CLAUDE.md scope rule; 2026-10-05T21:17 (a pin on an old plot); 2026-10-15T02:49
-    and 2026-10-06T00:17 (old transfer-study plan instructions); 2026-11-22T09:32 (generation job lengths); 2026-09-28T15:30
-    (a complaint about a long report); 2026-11-13T06:45 (resampling in another section); 2026-11-14T04:31 (a pasted LaTeX
-    template)'
+  ask: 'Scope: the canonical batch. The batch-size scan finds 8192 about 10% faster in wall clock to validation loss -2.08
+    on V100 than our canonical 16384 (0.43 h against 0.48 h, best trial each). Keep 16384, or change the canonical batch to
+    8192?'
+  waiting_since: '2026-11-25T06:28:53+00:00'
+  searched: D532 (the scan, silent on changing the batch); fa-canonical-setup; 2026-11-14T04:31 (a pasted LaTeX template);
+    2026-10-06T00:17 (old transfer plan); 2026-10-05T21:17 (a pin on an old plot); 2026-10-02T11:24 (tf32 speed, not the batch);
+    2026-10-06T16:02 (a forwarded colleague message)
   blocks: nothing
   blocks_steps: *id003
 - id: cc_disk
