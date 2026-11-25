@@ -41791,6 +41791,20 @@ entries:
       wall target 16 h; each log must open the same feat_ key as the prebuild; (4) job_llm_score.sh EVENTS=1 ONLY=heldout,
       factor_split --vars-from, error_split.py, heldout_per_process.py. Baseline rate: trial_1860 735.8 min training (0.672
       s/step) + 2.39 h sigma stage.'
+  - at: '2026-11-25T23:10:32+00:00'
+    text: '2026-11-26 step 20 (D566 candidate B, matched search; passed design 2026-11-25T20:15): perevent_level.py --search
+      8, tree FA-lxplus-c894babe, network FA-lxplus-affc2e5a, data/perevent_level{,_mlp}_search.json @b501ac2a2, figure analysis/catalog_daniel/figs/perevent_level.png
+      (redraw of perevent_level_step17.png adding the tuned markers; perevent_level_fig.py @d3bd3003b). 8-trial DyHPO each,
+      objective median training-process level error cross-fitted by content signature: tree default 0.406 -> best 0.235 (lr
+      0.043, 15 leaves, 194 iter, l2 8.7), network 0.220 -> 0.155 (width 36, depth 2, l2 2.2e-4, lr 8.6e-3, batch 4096). Final
+      3-seed reads, median over the 43 new of <y_hat-y>_p^2/sigma_p^2: tuned tree 4.75 (untuned 3.64), tuned network 2.64
+      (untuned 1.63), diagram regressor 0.047; bar 0.19. Flat shift: tuned tree 0.151 (sd 0.033), tuned network 0.187 (sd
+      0.029), regressor 0.176 (sd 0.037). Relabels level: 0.0136 / 0.0015. Per family (level, regressor / tree tuned / network
+      tuned): HH(X) 0.040/14.2/47.2, Htau 0.018/0.21/0.84, ZZZ 0.31/6.5/0.74, WWW 0.0005/0.17/3.9, Wqq'' 0.49/0.69/0.16, ttX
+      3.0/2.6/18.9. Outcome (3) of the design: both above 0.19 after the matched search, (B) a dead end for new-family level
+      placement; network beats tree on the 43 new at equal search size (2.64 vs 4.75). Proxy check fails: the search lowered
+      its objective by 1.4-1.7x while the new-set level error rose by 1.3-1.6x, so the content-signature cross-fit does not
+      track the new families. Shift alone: neither tuned model below the regressor by 2x noise.'
   step_waits:
     '8': FA-ccin2p3-1969f226 FA-ccin2p3-caf1170e
     '13': FA-ccin2p3-623a3af6
