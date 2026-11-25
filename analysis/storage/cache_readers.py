@@ -4,10 +4,14 @@
   MMAP lines:   each amp_mmap_cache key: apparent GiB, its depths, days since any depth was last used (data_mmap's
                 last_used, refreshed every 30 min by an open run), live slurm jobs naming it (cache_guard.site_users),
                 the run logs and scheduler logs of the last --days days naming it, and the first process names it holds
-  INUSE line:   the recipe basenames for cache_census.py --in-use
-    python analysis/storage/cache_readers.py --days 14
+                and its training pools: how many, how many are train pools of an in-use recipe (recipe_id match through
+                cache_census.pools_of, as datagen names them), and those recipes
+  INUSE line:   the recipe basenames for cache_census.py --in-use: the recent configs' plus --in-use-file's (the recipes
+                the open plan entries name)
+    python analysis/storage/cache_readers.py --days 14 --in-use-file analysis/storage/open_recipes_2026-11-25.txt
 """
-import argparse, collections, glob, json, os, re, sys, time
+import argparse, collections, fnmatch, glob, json, os, re, sys, time
+from multiprocessing import Pool
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
@@ -21,6 +25,8 @@ def recent(paths, cut):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--days", type=float, default=14.0)
+    ap.add_argument("--in-use-file", help="recipe basenames, one per line, that open plan entries name")
+    ap.add_argument("--workers", type=int, default=4)
     a = ap.parse_args()
     cut = time.time() - a.days * 86400
     scratch, sweeps = os.environ["SCRATCH"], os.environ.get("SWEEP_DIR", "")
@@ -35,6 +41,17 @@ def main():
                 rec[os.path.basename(m.strip("'\""))] += 1
     for r, n in rec.most_common():
         print("RECIPE\t%d\t%s" % (n, r))
+    inuse = set(rec) | ({l.strip() for l in open(a.in_use_file) if l.strip()} if a.in_use_file else set())
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from cache_census import pools_of
+    files = [r for r in sorted(glob.glob(os.path.join(ROOT, "recipes", "**", "*.yaml"), recursive=True))
+             if any(fnmatch.fnmatch(os.path.basename(r), g) for g in inuse)]
+    with Pool(a.workers, maxtasksperchild=1) as pool:
+        res = pool.map(pools_of, [(r, 42) for r in files], chunksize=1)
+    rid_recipes = collections.defaultdict(set)
+    for path, pools, _ in res:
+        for _, rid in pools:
+            rid_recipes[rid].add(os.path.basename(path))
     logs = recent(glob.glob(os.path.join(ROOT, "*.out")) + glob.glob(os.path.join(ROOT, "runs", "**", "out_*.log"), recursive=True), cut)
     texts = {}
     for p in logs:
@@ -53,12 +70,17 @@ def main():
         lu = [os.path.getmtime(os.path.join(kd, d, "last_used")) if os.path.exists(os.path.join(kd, d, "last_used"))
               else os.path.getmtime(os.path.join(kd, d)) for d in deps]
         kdp = os.path.join(kd, "key_doc.json")
-        names = json.load(open(kdp)).get("names", []) if os.path.exists(kdp) else []
+        kdoc = json.load(open(kdp)) if os.path.exists(kdp) else {}
+        names = kdoc.get("names", [])
+        train = [i[0] for i in kdoc.get("pools", {}).get("train", []) if isinstance(i, list) and i]
+        used_by = sorted(set().union(*[rid_recipes.get(rid, set()) for rid in train])) if train else []
         readers = [os.path.relpath(p, ROOT) for p, t in texts.items() if k in t]
-        print("MMAP\t%s\t%.2f GiB\t%d depths\tlast used %.1f d ago\tlive %s\t%d recent logs %s\t%d processes %s" % (
+        print("MMAP\t%s\t%.2f GiB\t%d depths\tlast used %.1f d ago\tlive %s\t%d recent logs %s\t%d processes %s"
+              "\t%d train pools, %d of in-use recipes %s" % (
             k, size / 2 ** 30, len(deps), (time.time() - max(lu)) / 86400 if lu else -1, site_users(k) or "-",
-            len(readers), ",".join(readers[:4]), len(names), ",".join(names[:3])))
-    print("INUSE\t" + " ".join(sorted(rec)))
+            len(readers), ",".join(readers[:4]), len(names), ",".join(names[:3]),
+            len(train), sum(rid in rid_recipes for rid in train), ",".join(used_by[:6]) or "-"))
+    print("INUSE\t" + " ".join(sorted(inuse)))
 
 
 if __name__ == "__main__":
