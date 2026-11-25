@@ -46520,12 +46520,10 @@ entries:
     blocks: replacing the full rescale in the D392 setup
     blocks_steps: &id004 []
   owner:
-    agent: a4ab30797e0606c86
-    state: closed
-    since: '2026-11-25T01:20:41+00:00'
-    state_at: '2026-11-25T07:06:16.136000+00:00'
-    context: 257862
-    context_at: '2026-11-25T07:06:26+00:00'
+    agent: ad098506c65b574e6
+    state: working
+    since: '2026-11-25T07:26:28+00:00'
+    state_at: '2026-11-25T07:26:28+00:00'
   designs:
   - at: '2026-11-24T23:55:03+00:00'
     question: 'Can the momentum log-rescale be applied only where it helps, by a rule using only the event''s own momenta,
