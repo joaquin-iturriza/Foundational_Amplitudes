@@ -45253,6 +45253,19 @@ entries:
       scan''s hours to -2.08 rise to 0.736 and 0.693, 1.63-1.73x the best (same source); [87/2, 261x2] <- a measured spread:
       the Adam two-batch B_crit range over levels in data/ft_bcrit.json, widened by the same factor 2; 5% in the CPU tests
       <- a measured noise: the toys'' Monte Carlo error at 300-400 repetitions, below it in the tests themselves'
+    passed_at: '2026-11-25T12:39:21+00:00'
+    reviewer: 'Re-check of the 12:38 revision against the version passed at 12:26. The pretraining arm now runs at the scan''s
+      batch-16384 best (hp 1333, lr 8.246561e-3), with every HP that differs from the control''s config.yaml listed (muon_weight_decay,
+      reg, warmup, eta_min, EMA, validation every 85) and the bookkeeping keys named. B_dL and B_crit therefore share one
+      setting, and the control is trial_1333 itself (same HPs, same seed). I checked the read points in data/cbs_state.json:
+      trial_1333''s validation crosses -1.66/-2.08/-2.30 at steps 765/1700/2720 (85-step spacing). brute_at [50,700,1690,2700]
+      sits at them, and stop_at_val_loss -2.30 ends the run at the last read. Both earlier notes are now in the measure: composition
+      bias at most 1.16-1.29x, stated in the readout; the smoke reads dL every 10 steps, with pooling to 400-step windows
+      or update_every 25 if the window ratio misses about 20%. Checks 2 and 3 unchanged from the 12:26 pass: dL(8192)/dL(2048)
+      is 2.05 at B=4420 against 1.02 at B=55; the scan''s steps to -2.08 fall 3997 -> 1324 from 2048 to 32768 at fixed lr;
+      one seed, errors from windows and the jackknife. Residual risk: if this run crosses -2.30 before step 2700, the last
+      independent-batch point is lost; the chunk read still stands. Terms searched as before (noise scale, critical batch,
+      B_noise, B_u, update direction, normalis, curvature; decisions noise, critical, B_crit, batch): nothing earlier.'
   step_why:
     1:
       feeds: 'D532: the scan''s answer (NO branch, B_crit 2500-6690 vs B_simple 55.5) reaches Joaquin as a finished entry'
