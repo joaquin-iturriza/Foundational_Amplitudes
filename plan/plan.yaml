@@ -45515,8 +45515,7 @@ entries:
       GB there is already gone (who removed it not checked). Total df used 512973 -> 504631 MiB = 8.1 GiB freed; free 19.7
       GiB.'
   step_waits:
-    '2': the repo-reviewer of the code backlog (blocks the commit of cache_readers.py --plan), then a new design review of
-      job_ccdisk_d556.sh
+    '2': the design reviewer on the new job_ccdisk_d556.sh design (903a5507f); on PASS pick and submit
     '4': 'job_ccdisk_d556.sh''s read (not yet submitted: design review pending)'
   targets:
   - batch: disk_inventory
