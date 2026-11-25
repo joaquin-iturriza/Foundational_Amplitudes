@@ -41573,6 +41573,19 @@ entries:
       |bias| 3-5 in every arm and both level networks, keeps the pooled number above). On relabels the replacement hurts (our
       own levels there are far better: median 7e-4 -> 0.026 for our searched), so it is a new-family effect. Figure analysis/llm_compare/figs/all_arms_bias_heldout_per_process.png
       (heldout_per_process.py --part bias @868c56f2f, level networks added as fixed arms).'
+  - at: '2026-11-25T15:13:58+00:00'
+    text: '2026-11-25 repo-reviewer (agent a3cecd844515d9849) verdict after the hand-off: trunk backlog FIX FIRST, lock held,
+      NOT advanced. Its two blockers are critical_batch''s (analysis/critical_batch/dl_read.py:169-170 exploding-read flag
+      uses |dL| only, the design says |dL| or |A|; :146-147,213-214 windows with Q<=0 dropped, not listed apart): critical_batch''s
+      owner fixes them, then the same reviewer is continued to advance. Branch levelfile: PASS once (a) the assert that data.level_file
+      needs preprocess_per_dataset + shared_standardization (DONE @4243955a9, pushed) and (b) tests/test_level_file.py are
+      in. The test covers: means from the file in names order; sigma = fit_affine_multiplicity''s; a missing name asserts;
+      affine_multiplicity_std + level_file asserts; parent_target_standardization by name, and without names asserts; the
+      level_file entry of data_stats.json surviving the parent_shared reload. Writing it is blocked by the backlog hook until
+      the reviewer advances. Non-blocking: level_source.py asserts only the sds (within 5%), not the means; check those agree
+      (docstring 0.01); the hex colours of the two level arms; tools/zero_shot_parent.py:238 calls without names (asserts
+      on a level-file parent, not on the scoring path). In the smoke, read ''median |own mean - level|'' beside the sigma
+      line (scale check).'
   step_waits:
     '8': FA-ccin2p3-8acd3fc1 FA-ccin2p3-39f4ab2e FA-ccin2p3-e5265194 FA-ccin2p3-e1d1fbaf
     '12': FA-ccin2p3-e9dfa8b9
