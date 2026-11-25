@@ -45024,11 +45024,13 @@ entries:
   match: cc_disk_*,zz_probe_*
   evidence:
     runs:
+    - FA-ccin2p3-9cf1ce5d
     - FA-ccin2p3-b949c4ee
-    commit: 0bc52e3d6
+    commit: 0b9185621
     paths:
     - analysis/storage/model_groups.py
     - scripts/job_disk_inventory.sh
+    - scripts/job_storage_frees.sh
   dead_ends: []
   asks:
   - ask: 'Scope: which of CC''s costly results to delete to free the group space (99% full). Which of these should go: model
