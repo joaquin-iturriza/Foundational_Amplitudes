@@ -111,7 +111,7 @@ def figure(res, base):
         axB.plot([mid(w) for w in up], [top] * len(up), "^", color=ps.C.grey, label="above the measured batches")
     axB.set_yscale("log")
     ys = [w["B_dL"] for w in fw] + [max(w["B_A"], 1.0) for w in ok] + [lo, hi]
-    axB.set_ylim(min(ys) / 4, max(ys) * 4)   # the reference lines and the edge markers inside the frame
+    axB.set_ylim(min(ys) / 4, max(ys) * (400 if ex else 4))   # reference lines, edge markers and the legend above them
     neg = [w for w in res["windows"] if w["status"] == "dL<=0"]
     if neg:
         axB.plot([mid(w) for w in neg], [min(ys) / 2.5] * len(neg), "v", color=ps.C.grey, label="loss rises at some batch")
