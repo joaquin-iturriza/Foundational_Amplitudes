@@ -48600,9 +48600,10 @@ entries:
   - D552
   - D561
   next:
-    3: 'On Joaquin''s answer to the scope question (replace the full rescale in the D392 setup by the rescale only below every
-      trained momentum, par:selres_support d424ea5b0): measure the softest x of that setup''s catalog pools (support_rule.py
-      minima on its parent log), set ++model.input_soft_x0 below it in scripts/job_datasaving_parent.sh, record his decision'
+    3: 'D561 (settled, plan ask withdrawn): read the softest x of the D392 setup''s finale parent pools (support_rule.py minima,
+      CC CPU job 64868410, read by detached srmin_finale_read), set ++model.input_soft_x0 below min(it, Z+4g train 0.00923)
+      in scripts/job_datasaving_parent.sh finale, test the flag build, note in par:selres_support that runs trained before
+      the switch keep the full rescale, review, close'
   done_when: null
   notes_ref: null
   match: selres_*
@@ -49219,8 +49220,7 @@ entries:
     units: null
     start: '2026-11-25T15:32:21+00:00'
     at: '2026-11-25T15:32:21+00:00'
-  step_waits:
-    '3': '2026-11-25'
+  step_waits: {}
   handoff:
     state: 'Step 3 done: par:selres_split (33726387b, fig analysis/selective_rescale/figs/uug_split.png): rescale below x=0.1''s
       u u~ g cost sits in the events it changes (softest x<0.1, 2304/100000 val events) 4.23x [3.50,5.10] / 8.56x [5.91,12.38]
@@ -49277,7 +49277,7 @@ entries:
     written: '2026-11-25T15:22:53+00:00'
   step_why:
     3:
-      feeds: 'D392/D561: which input map the D392 setup keeps'
+      feeds: 'D392/D561: the D392 setup''s input map'
       if:
-      - 'replace: set input_soft_x0 below the measured catalog minimum'
-      - 'keep: close the entry with the write-up'
+      - 'catalog minimum read: set x0 below it and close'
+      - 'minima job fails: read its log, fix, rerun'
