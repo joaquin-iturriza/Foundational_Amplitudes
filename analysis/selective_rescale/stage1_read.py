@@ -76,6 +76,12 @@ def main():
     ctl |= {("uug", d): {"off": u539["cells"][f"uug_{d}"]["off"]["best"], "rescale": u539["cells"][f"uug_{d}"]["eps1e-8"]["best"]}
             for d in ("1e4", "1e5")}
     res = {"missing": [], "blowups": [], "cells": {}}
+    ic = json.load(open(os.path.join(HERE, "data", "input_check.json")))   # input_check.py @560a4d1a3: predicted r = exp(slope c)
+    icn = {"softbelow_x0p1": "soft-only x0=0.1", "softbelow_x0p3": "soft-only x0=0.3", "eventgate_x0p1": "event gate t=0.1"}
+    res["pred"] = {"slope": ic["calib"]["slope"]} | {
+        p: {a: {"r": ic["pools"][pool]["schemes"][icn[a]]["r_pred"],
+                "events_changed": ic["pools"][pool]["schemes"][icn[a]]["share_events_changed"]} for a in SCHEMES}
+        for p, pool in (("zng", "zgggg"), ("uug", "uug"))}
     for p, d in CELLS:
         cell = {k: {"best": v} for k, v in ctl[(p, d)].items()}
         for a in SCHEMES:
