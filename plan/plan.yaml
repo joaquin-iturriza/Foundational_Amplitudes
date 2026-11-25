@@ -44176,7 +44176,9 @@ entries:
   step_waits:
     '3': notes-editor pass of the results.tex backlog (it blocks on sec:noisescale and fig:llmcmp_heldout, other entries'
       text; the repo-reviewer already passed the merge)
-    '5': the design reviewer on the 2026-11-25 design (wake and review replay)
+    '5': the lab server answering again (503 from both models at 2026-11-25T00:05 UTC); then python3 tools/detach.py --entry
+      lab_llm_trial --name wake_review_replay --each 'python3 tools/lab_wake_trial.py run' --each 'python3 tools/lab_wake_trial.py
+      reviews-run'
   findings:
   - at: '2026-11-23T19:55:22+00:00'
     text: 'Local batch width cut from 6 parallel opencode streams to 2 (D531): 6 streams of opencode sessions (~350-400 MB
