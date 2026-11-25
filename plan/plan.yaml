@@ -44571,6 +44571,17 @@ entries:
     withdrawn_at: '2026-11-24T13:45:30+00:00'
     withdrawn_why: 'Joaquin approved the budget-rule change (D536): work a decision names, here D532''s ''its validation against
       batch-size runs'', passes up to 100 GPU-h; the 55 GPU-h DyHPO-per-batch version goes ahead'
+  - ask: 'Scope: 3 of the 8 batch-2048 trials of the batch-size scan hit their 3:27 time limit (set before the 0.66 s/step
+      rate was measured) and never finished; the owner did not rerun them, because the batch''s best trial already reaches
+      every target by step 7100 and the cut trials cannot beat it. Rerun them to complete the design''s 8 trials (3 x 6.2
+      h, about 19 GPU-h), or keep the readout on the 5 that finished?'
+    at: '2026-11-25T05:55:07+00:00'
+    searched: 'D532 (the scan design: 8 trials per batch); CLAUDE.md scope rule; 2026-10-05T21:17 (a pin on an old plot);
+      2026-10-15T02:49 and 2026-10-06T00:17 (old transfer-study plan instructions); 2026-11-22T09:32 (generation job lengths);
+      2026-09-28T15:30 (a complaint about a long report); 2026-11-13T06:45 (resampling in another section); 2026-11-14T04:31
+      (a pasted LaTeX template)'
+    blocks: nothing
+    blocks_steps: &id003 []
   owner:
     agent: a27cabf54bbbc7b67
     state: closed
@@ -45106,6 +45117,17 @@ entries:
       analysis/critical_batch/data/{cbs_state,cbs_trials,cbs_readout,v4_het_noise_scale}.json, analysis/critical_batch/figs/cbs_readout.png,
       sweep/sweep_config_cbs_b*.yaml, docs/results.tex par:cbs_scan
     written: '2026-11-25T05:41:39+00:00'
+  ask: 'Scope: 3 of the 8 batch-2048 trials of the batch-size scan hit their 3:27 time limit (set before the 0.66 s/step rate
+    was measured) and never finished; the owner did not rerun them, because the batch''s best trial already reaches every
+    target by step 7100 and the cut trials cannot beat it. Rerun them to complete the design''s 8 trials (3 x 6.2 h, about
+    19 GPU-h), or keep the readout on the 5 that finished?'
+  waiting_since: '2026-11-25T05:55:07+00:00'
+  searched: 'D532 (the scan design: 8 trials per batch); CLAUDE.md scope rule; 2026-10-05T21:17 (a pin on an old plot); 2026-10-15T02:49
+    and 2026-10-06T00:17 (old transfer-study plan instructions); 2026-11-22T09:32 (generation job lengths); 2026-09-28T15:30
+    (a complaint about a long report); 2026-11-13T06:45 (resampling in another section); 2026-11-14T04:31 (a pasted LaTeX
+    template)'
+  blocks: nothing
+  blocks_steps: *id003
 - id: cc_disk
   title: What uses disk on CC and what can be deleted
   question: 'What is using the disk on CC (checkout runs/sweeps, datasets, memmap caches, scratch, MG5 work dirs), against
