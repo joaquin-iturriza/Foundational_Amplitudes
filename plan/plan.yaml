@@ -45223,12 +45223,10 @@ entries:
     1: 'Close critical_batch once steps 2-4 are read and written up: plan done critical_batch with the write-up commits (par:cbs_scan
       145d14839 plus the D560 part B and D563 write-ups). Both review backlogs it waited on have passed (repo-reviewer watermark
       210db5bab, notes-editor c203b49ae contains 145d14839); worktrees wt-cbs-accum and wt-critbatch are removed'
-    2: 'D560: the dL measure as built gives no B_dL (finding 16:05: the momentum-0 step overshoots, dL<0 at every b; B_A 28-111
-      sits with B_simple 30-100x below B_crit). Next attempt (owner''s call, inside D560''s approval): design the repair of
-      the measure, dL at step scales s below the overshoot (s in {1-beta1, A/(A-dL) from these reads, 1}, read with the same
-      chunks) so dL(b) is positive and can be fitted, code it in base_experiment._noise_update with a known-answer test, design-review,
-      one smoke (D395), then rerun the pretraining arm (1.5 h) and the Z+4g arm (1.0 h) and read B_dL against B_crit 2500/4420/6690
-      and 87-261'
+    2: 'D560 write-up: part B''s NO (finding 16:40): write par:cbs_update in docs/results.tex (B_simple 55.5, B_A 28-111 /
+      6-51, B_q 48-137 / 3-196 against B_crit 2500-6690 / 87-261; the momentum-0 step overshoots, dL<0 at every b), with figs
+      pretrain_update_bdl and zng4g_update_bdl (dl_read.py 40f9a2997, captions in the 16:05 hand-back, add B_q to the left
+      panel first), % src / % claim lines; then the batch rule for future runs as the design''s NO says: a short batch scan'
     3: 'D560 part B, Z+4g arm (secondary): read done (finding 16:05: no B_dL, B_A 6-51 against 87-261); its rerun with the
       repaired measure goes with step 2''s design'
     4: 'D563: the six Z+4g 1e4-event searches at 50 epochs (Muon scratch, Adam scratch, Fn; batch 2048 and 128; 19/19/16 and
@@ -46232,9 +46230,8 @@ entries:
     2:
       feeds: 'D560: which batch number to trust and a rule for future runs'
       if:
-      - 'the repaired dL gives B_dL within 2x of B_crit at the three targets: the rule stands'
-      - 'B_dL still 3x off or unreadable: report that no in-run measure found B_crit; the scan''s B_crit is the number, and
-        the rule is a short scan'
+      - 'write-up passes the notes-editor: report to Joaquin under D560 and close step 1'
+      - 'notes-editor blocks: fix and re-check'
     3:
       feeds: 'D560: whether the dL rule extends to repeated-data runs or is restricted to fresh data'
       if:
@@ -46249,7 +46246,6 @@ entries:
     '4': detached driver zng_ep50_searches (pid 1376403, sweep/drive.py, 105 trials)
     '1': steps 2, 3 and 4 read and written up
     '3': step 2's repaired design (one design for both arms)
-    '2': 'the owner''s resume: the repair design starts in the owner''s next turn, after the read handed back now'
   targets:
   - batch: noise_smoke
     wall_h: 0.4
