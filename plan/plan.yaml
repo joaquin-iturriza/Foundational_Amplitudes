@@ -44854,11 +44854,12 @@ entries:
     - FA-ccin2p3-225d38ea
     - FA-ccin2p3-6721d3c2
     - FA-lxplus-35cf0097
-    commit: 5109b8182
+    commit: 584ba9b77
     paths:
     - analysis/critical_batch/cbs_read.py
     - analysis/critical_batch/data/FA-ccin2p3-225d38ea_noise_scale.json
     - analysis/critical_batch/data/cbs_state.json
+    - analysis/critical_batch/ft_bcrit.py
     - analysis/critical_batch/noise_read.py
     - analysis/critical_batch/scan_state.py
     - base_experiment.py
@@ -44872,6 +44873,7 @@ entries:
     - sweep/sweep_config_cbs_b4096.yaml
     - sweep/sweep_config_cbs_b8192.yaml
     - sweep/sweep_config_cbs_smoke_b32768.yaml
+    - sweep/sweep_config_tp_zng_d1e4_muon_b2048_ep50_zgggg.yaml
     - tests/test_noise_scale.py
   dead_ends: []
   asks:
