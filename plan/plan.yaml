@@ -48651,7 +48651,7 @@ entries:
       in scripts/job_datasaving_parent.sh finale, test the flag build, note in par:selres_support that runs trained before
       the switch keep the full rescale, review, close'
   done_when: null
-  notes_ref: null
+  notes_ref: par:selres_support
   match: selres_*
   evidence:
     runs: []
