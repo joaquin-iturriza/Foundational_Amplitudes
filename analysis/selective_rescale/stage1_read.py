@@ -125,7 +125,7 @@ def main():
     plot(res)
 
 
-def plot(res):
+def plot(res, base="stage1"):
     """(a)-(b) best val MSE per seed against the arm, Z+4g and u u~ g, both sizes; (c) u u~ g kit deepest bins at both sizes."""
     sys.path.insert(0, ROOT)
     import plot_style as ps
@@ -144,8 +144,7 @@ def plot(res):
                 for m, (sd, x) in enumerate(zip(SEEDS, c.get(a, {}).get("best", []))):
                     if x is not None:
                         ax.plot(i + (j - 2) * 0.15 + (m - 1) * 0.03, x, "o", color=cols[a], ms=3,
-                                label=lab[a] if (i, m) == (0, 0) and p == "zng" else None,
-                                mfc="none" if name(p, d, a, sd) in blown else cols[a])
+                                mfc="none" if {name(p, d, a, sd), f"{p}_{d}_{a}|{sd}"} & blown else cols[a])
         ax.set_xlim(-0.5, 1.5); ax.set_xticks([0, 1]); ax.set_xticklabels([r"$10^4$", r"$10^5$"]); ax.set_yscale("log")
         ax.set_xlabel(r"$D_{\rm train}$"); ax.set_ylabel(r"best MSE$(\log|\mathcal{M}|^2)$"); ps.process_label(ax, nm)
     fam = {"soft_x": "soft", "coll_y": "coll.", "bulk": "bulk"}
@@ -160,10 +159,13 @@ def plot(res):
     kk.set_xticklabels([f"{fam[f]}\n$10^{d[-1]}$" for f, d in groups], fontsize="x-small")
     kk.set_yscale("log"); kk.set_xlabel(r"deepest kit bin, $D_{\rm train}$"); kk.set_ylabel(r"MSE$(\log_{10}|\mathcal{M}|^2)$")
     ps.process_label(kk, r"$e^+e^-\to u\bar ug$")
+    for a in arms:   # one legend entry per arm drawn in any panel (the legend cell reads za's handles)
+        if any(x is not None for c in res["cells"].values() for x in c.get(a, {}).get("best", [])):
+            za.plot([], [], "o", color=cols[a], ms=3, label=lab[a])
     if blown:
         za.plot([], [], "o", color="0.5", mfc="none", label="blew up (read\nat its best)")
     ps.legend_cell(cell, za)
-    ps.save(fig, os.path.join(HERE, "figs", "stage1"))
+    ps.save(fig, os.path.join(HERE, "figs", base))
 
 
 if __name__ == "__main__":
