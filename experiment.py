@@ -2305,6 +2305,7 @@ class AmplitudeExperiment(BaseExperiment):
                 LOGGER.info("offshell_zero: off-shellness columns held at 0")
             n_pdg = len(self._internal_mass_pdgs)
             self.all_order_labels[:, -n_pdg:] = osh
+            self._offshell_cols = (self.all_order_labels.shape[1] - n_pdg, self.all_order_labels.shape[1])
             LOGGER.info(f"offshell_per_event ON: internal-mass slot ({n_pdg} col) filled "
                         f"per-event with signed-log-standardized (s−M²) for pdgs "
                         f"{self._internal_mass_pdgs}")

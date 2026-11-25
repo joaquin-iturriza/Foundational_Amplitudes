@@ -1140,6 +1140,7 @@ def _open_run(exp, c, d, meta, fdir, need, want_offshell):
         mu, sdv = exp._resolve_offshell_stats(lambda: (mean0, std0), n_pdg)
         exp._offshell_stats = [np.asarray(mu).tolist(), np.asarray(sdv).tolist()]
         src.osh_mu, src.osh_sd = np.asarray(mu, np.float64), np.asarray(sdv, np.float64)
+        exp._offshell_cols = (F - n_pdg, F)   # the slot's columns of each event's order labels (tools/llm_score.py)
         LOGGER.info(f"offshell_per_event ON (memmap): internal-mass slot ({n_pdg} col) filled per batch with "
                     f"signed-log-standardized (s-M^2) for pdgs {exp._internal_mass_pdgs}")
     if bool(cfg.data.get("alphas_input", False)):

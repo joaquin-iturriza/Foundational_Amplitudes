@@ -127,7 +127,7 @@ def _build(sweep_config, n_procs, out, extra):
         snap[k] = exp.mom_div
     for k in ("mom_mean", "mom_std", "prepd_mean", "prepd_std", "_offshell_stats", "_amp_trafos_pp",
               "_role_counts", "n_order_features", "N_events", "_slot_pdgs_by_name", "_proc_npart",
-              "_dimless_mass_stats"):
+              "_dimless_mass_stats", "_offshell_cols"):
         snap[k] = getattr(exp, k, None)
     snap["amp_trafos"] = list(exp.cfg.data.amp_trafos)
     snap["vocab"] = dict(exp.tokenizer._pdg_to_idx)

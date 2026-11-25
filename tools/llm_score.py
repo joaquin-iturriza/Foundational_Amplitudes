@@ -68,11 +68,13 @@ assert F is not None or not bool(cfg.data.get("target_physics_factor", False)), 
 logF = np.log(np.asarray(F, dtype=np.float64)[exp._split_indices["test"]]).ravel() if F is not None else None
 sse_z, n = np.zeros(len(names)), np.zeros(len(names), dtype=np.int64)
 S = np.zeros((len(names), 5))   # per process sums of pred, true, pred^2, true^2, pred true (absolute log|M|^2)
-EV = []   # --events-out: per event process index, true, pred, log F
+EV = []   # --events-out: per event process index, true, pred, log F[, the standardized off-shellness slot]
+OSH = getattr(exp, "_offshell_cols", None)
 k = 0
 with torch.no_grad():
     for data in exp.test_loader:
         h, z, pid, _, _ = exp._forward_lloca(data)
+        osh = data[3][:, OSH[0]:OSH[1]].double().cpu().numpy() if OSH else None
         hd, zd = h.reshape(-1).double().cpu().numpy(), z.reshape(-1).double().cpu().numpy()
         p = pid.reshape(-1).cpu().numpy()
         np.add.at(sse_z, p, (hd - zd) ** 2); np.add.at(n, p, 1)
@@ -80,7 +82,8 @@ with torch.no_grad():
         q, t = mu[p] + sd[p] * hd - lf, mu[p] + sd[p] * zd - lf
         np.add.at(S, p, np.stack([q, t, q * q, t * t, q * t], 1))
         if a.events_out:
-            EV.append(np.stack([p, t, q, np.broadcast_to(lf, p.shape)], 1))   # + the target factor log F (0 without)
+            ev = np.stack([p, t, q, np.broadcast_to(lf, p.shape)], 1)   # + the target factor log F (0 without)
+            EV.append(np.concatenate([ev, osh], 1) if OSH else ev)
         k += p.size
 assert logF is None or k == logF.size, (k, None if logF is None else logF.size)
 assert (n > 0).all(), [nm for nm, k in zip(names, n) if k == 0]
@@ -109,8 +112,9 @@ if a.events_out:  # the first --events-max test events of each process, in loade
     ev = np.concatenate(EV)
     keep = np.concatenate([np.flatnonzero(ev[:, 0] == i)[: a.events_max] for i in range(len(names))])
     with open(a.events_out, "w") as f:
-        f.write("process,true_logm2,pred_logm2,log_factor\n")
-        f.writelines("%s,%.6g,%.6g,%.6g\n" % (names[int(r[0])], r[1], r[2], r[3]) for r in ev[keep])
+        f.write("process,true_logm2,pred_logm2,log_factor"
+                + "".join(",offshell_%d" % g for g in (exp._internal_mass_pdgs if OSH else [])) + "\n")
+        f.writelines(names[int(r[0])] + "".join(",%.6g" % v for v in r[1:]) + "\n" for r in ev[keep])
 shutil.rmtree(cfg.run_dir, ignore_errors=True)
 os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
 json.dump(rec, open(a.out, "w"), indent=1)
