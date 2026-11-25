@@ -46194,6 +46194,29 @@ entries:
       10 in |dL| and |A| while the exploding ones reach 1e6-1e11 (data/pretrain_update_bdl.json); scales 0.01-1 <- a measured
       spread: the turning points A/Q = 0.04-0.42 of the first reads (same data); 5% in the CPU test <- a measured noise: the
       toy''s Monte Carlo error at 400 repetitions'
+    fix_at: '2026-11-25T15:06:31+00:00'
+    fix: 'Repair design of the part-B update measure (15:04). (0, 2, 5) The first reads already give the answer this rerun
+      would measure, and the design does not say so. Under the design''s own quadratic model dL(s) = sA - s^2 Q, the first
+      read fixes Q(b) = A(b) - dL(b, s=1). So dL_opt(b) = A^2/(4Q) can be computed now from data/pretrain_update_bdl.json
+      and data/zng4g_update_bdl.json (windows without an exploding read). I computed it. Pretraining, 8 windows: dL_opt(8192)/dL_opt(2048)
+      = 1.02-1.05 (one window 1.31), two-point B_dL 50-138 (one window 952), against the 2.05 ratio B=4420 needs and B_crit
+      2500-6690. Z+4g, 7 windows: dL_opt(1024)/dL_opt(64) = 1.04-2.95, B_dL 3-153, against 87-261 (inside the band in only
+      2 windows). The fixed-scale read at small s is dL ~ sA, so its B_dL is B_A, already measured at 28-111 (pretraining)
+      and 6-51 (Z+4g), model-free. Both read-outs are therefore predicted from existing data to land 20-50x below B_crit on
+      pretraining: the design''s NO branch. A rerun can change that only if the loss along u is far from quadratic between
+      s <= 0.3 and s = 1, i.e. if Q fitted at small s falls steeply with b while Q at s=1 does not. Nothing in the check shows
+      that, so as designed the 2.7 GPU-h rerun re-measures what the evidence settles. Fix, one of: (a) write this existing-data
+      read (a committed extension of dl_read.py computing A^2/(4(A - dL(1))) per window and b) and take the outcome''s NO
+      branch with no new jobs: no in-run measure of this family (B_simple, B_A, B_dL) locates B_crit; the scan''s B_crit is
+      the number; the rule is a short scan. Report it to Joaquin under D560. Or (b) if a run is still wanted, put the existing-data
+      B_dL in prior and state what the rerun would have to find to change it: how non-quadratic the loss must be, i.e. Q(s<=0.3)(2048)/Q(s<=0.3)(8192)
+      of about 2 where the s=1 read gives about 1, with a reason to expect it. Then size the smallest test of that. Note:
+      the real optimizer''s momentum (Muon 0.95, AdamW 0.9, Adam 0.99) is a different candidate. The s = current-batch-share
+      read is not it: at small s it collapses to A. A momentum-aware measure would be a new design. Checks otherwise holding:
+      1, 9, 10, 18 (same arms, only update_scales added); 4 (thresholds as passed at 12:38, sources checked then); 3 (seed
+      42 as the runs repeated). Terms searched: overshoot, step size, update, noise scale (results.tex); D532, D536, D560
+      (decisions); plus the first-read data files above, which the prior names but does not carry through to the predicted
+      B_dL.'
   step_why:
     1:
       feeds: the entry's close
