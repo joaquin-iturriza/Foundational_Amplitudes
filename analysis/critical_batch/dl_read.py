@@ -99,6 +99,8 @@ def figure(res, base):
         axB.plot([mid(w) for w in neg], [min([w["B_dL"] for w in fw] + [lo]) / 2] * len(neg), "v", color=ps.C.grey,
                  label="loss rises at some batch")
     axB.set_yscale("log")
+    ys = [w["B_dL"] for w in fw] + [lo, hi]
+    axB.set_ylim(min(ys) / 4, max(ys) * 4)   # the reference lines and the edge markers inside the frame
     axB.set_xlabel("training step")
     axB.set_ylabel(r"$B_{\rm dL}$ (events)")
     ps.legend(axB, "upper left")
