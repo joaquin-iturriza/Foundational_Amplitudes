@@ -29,9 +29,10 @@ SEEDS = (42, 43, 44)
 FM = os.path.join(ROOT, "analysis", "finetune_mechanism", "data")
 KIT = r'''
 import json, os, sys
+sys.path.insert(0, os.getcwd()); import siteconf
 out = {}
 for r in sys.argv[1:]:
-    p = os.path.join("runs", r, "kit_benchmark", "kit_result.json")
+    p = os.path.join(siteconf.PROJECT_DIR, "runs", r, "kit_benchmark", "kit_result.json")
     if os.path.exists(p):
         d = json.load(open(p)); d = d.get("strata", d)
         out[r] = {k: v["logmse"] for k, v in d.items() if isinstance(v, dict) and "logmse" in v}
@@ -49,8 +50,10 @@ def main():
         raw = json.load(open(cache))
     else:
         runs = [name(p, d, a, s) for p, d in CELLS for a in SCHEMES for s in SEEDS]
-        val = site_python(REMOTE.replace("ZNG1K", "SELRES"), [f"'{r}#runs/{r}#sweeps/{r}/results/fixed.json'" for r in runs],
-                          "SELRES", site=SITE)
+        paths = site_python('import json, os, sys; sys.path.insert(0, os.getcwd()); import siteconf; print("SITEDIRS " + json.dumps([siteconf.PROJECT_DIR, siteconf.SWEEP_DIR]))',
+                            [], "SITEDIRS", site=SITE)
+        val = site_python(REMOTE.replace("ZNG1K", "SELRES"),
+                          [f"'{r}#{paths[0]}/runs/{r}#{paths[1]}/{r}/results/fixed.json'" for r in runs], "SELRES", site=SITE)
         kit = site_python(KIT, [r for r in runs if "_uug_" in r], "SELRESKIT", site=SITE)
         raw = {"val": val, "kit": kit}
         json.dump(raw, open(cache, "w"))
@@ -70,8 +73,9 @@ def main():
                 if not v.get("val_mse_curve") or "std" not in v:
                     res["missing"].append(name(p, d, a, s)); b.append(None); continue
                 c = np.array(v["val_mse_curve"]) * v["std"] ** 2
-                if np.any(c > 10 * np.minimum.accumulate(c)):
-                    res["blowups"].append(name(p, d, a, s))
+                up = c > 10 * np.minimum.accumulate(c)   # val above 10x its best so far (D398)
+                if up.any():
+                    res["blowups"].append({"run": name(p, d, a, s), "at_pct": 100 * (int(np.argmax(up)) + 1) / len(c)})
                 b.append(float(c.min()))
             cell[a] = {"best": b}
             if None not in b:
@@ -91,12 +95,13 @@ def main():
             cell["soft_tolerance_dec"] = float(np.log10(max(rs) / min(rs)))
         res["cells"][f"{p}_{d}"] = cell
     for a in SCHEMES:   # the design's YES, per scheme
-        bulk = all(res["cells"][f"zng_{d}"].get(a, {}).get("over_off", {}).get("lo", 9) <= 1 and
-                   res["cells"][f"zng_{d}"][a]["over_rescale"]["hi"] < 1 for d in ("1e4", "1e5")
-                   if "over_off" in res["cells"][f"zng_{d}"].get(a, {}))
+        zc = [res["cells"][f"zng_{d}"][a] for d in ("1e4", "1e5")]
+        bulk_complete = all("over_off" in c for c in zc)   # the YES needs both Z+4g cells read
+        bulk = bulk_complete and all(c["over_off"]["lo"] <= 1 and c["over_rescale"]["hi"] < 1 for c in zc)
         soft = [res["cells"][f"uug_{d}"][a]["kit_dec_vs_rescale"]["soft_x"] <= res["cells"][f"uug_{d}"]["soft_tolerance_dec"]
                 for d in ("1e4", "1e5") if "kit_dec_vs_rescale" in res["cells"][f"uug_{d}"].get(a, {})]
-        res.setdefault("yes", {})[a] = {"bulk": bulk, "soft": bool(soft) and all(soft), "complete": len(soft) == 2}
+        res.setdefault("yes", {})[a] = {"bulk": bulk, "soft": len(soft) == 2 and all(soft),
+                                        "complete": bulk_complete and len(soft) == 2}
     json.dump(res, open(os.path.join(HERE, "data", "stage1.json"), "w"), indent=1)
     print(json.dumps(res))   # one line: verify_claims reads the last {...} line
     plot(res)
@@ -111,7 +116,7 @@ def plot(res):
     lab = {"off": "no rescale", "rescale": r"rescale, all $x$", "softbelow_x0p1": r"rescale below $x=0.1$",
            "softbelow_x0p3": r"rescale below $x=0.3$", "eventgate_x0p1": r"rescale if $\min x<0.1$"}
     cols = dict(zip(arms, [ps.C.blue, ps.C.vermillion] + ps.sequence(3)))
-    blown = set(res["blowups"])
+    blown = {b["run"] for b in res["blowups"]}
     fig, axs = ps.figure(ncols=2, nrows=2)
     (za, ua), (kk, cell) = axs
     for ax, p, nm in ((za, "zng", r"$q\bar q\to Z+4g$"), (ua, "uug", r"$e^+e^-\to u\bar ug$")):
