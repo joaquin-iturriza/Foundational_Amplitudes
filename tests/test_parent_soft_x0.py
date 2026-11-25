@@ -33,6 +33,9 @@ def main():
            if set(r["below_0.009_by_pid"]) - {"12", "-12", "14", "-14", "16", "-16"} or
            (not r["below_0.009_by_pid"] and r["min"] < x0[0])}
     assert not bad, bad
+    # the rule itself (wrappers._soft_rescale, neutrinos kept) changes no momentum of any pool
+    moved = {r["path"]: r.get("moved_x0_0.009_nu_exempt") for r in pools if r.get("moved_x0_0.009_nu_exempt") != 0}
+    assert x0[0] == 0.009 and not moved, moved
     floor = min(r["min"] for r in pools if not r["below_0.009_by_pid"])
     assert "++model.input_soft_eps=1e-8" in on
     off = fix("flags=off", "tag=t")

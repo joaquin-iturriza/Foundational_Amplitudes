@@ -7,7 +7,8 @@
    "q1e-4": 0.017541374522011155,
    "below_0.01": 0,
    "pid_min": -2,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/kit_ee_uug__me2_1000-1000GeV_val_n100000_kit_amplitudes.npy",
@@ -16,7 +17,8 @@
    "q1e-4": 0.016045736306800572,
    "below_0.01": 0,
    "pid_min": 2,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/kit_ee_uug__me2_1000-1000GeV_test_n200000_kit_amplitudes.npy",
@@ -25,7 +27,8 @@
    "q1e-4": 0.017481595259362395,
    "below_0.01": 0,
    "pid_min": 2,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   }
  },
  "zng": {
@@ -36,7 +39,8 @@
    "q1e-4": 0.01597300502620415,
    "below_0.01": 1,
    "pid_min": 21,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/kit_uq_zgggg__me2_1000-1000GeV_val_n100000_kit_amplitudes.npy",
@@ -45,7 +49,8 @@
    "q1e-4": 0.016426733403695663,
    "below_0.01": 0,
    "pid_min": 21,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/kit_uq_zgggg__me2_1000-1000GeV_test_n200000_kit_amplitudes.npy",
@@ -54,7 +59,8 @@
    "q1e-4": 0.01615836145870571,
    "below_0.01": 0,
    "pid_min": 21,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   }
  },
  "finale": {
@@ -65,7 +71,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": 2,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/ee_uu_25-1000GeV_val_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_uu_25-1000GeV_val_smix_amplitudes.npy",
@@ -74,7 +81,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": 2,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/ee_uu_25-1000GeV_test_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_uu_25-1000GeV_test_smix_amplitudes.npy",
@@ -83,7 +91,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": 2,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/ee_mumu_25-1000GeV_train_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/ee_mumu_25-1000GeV_train_smix_amplitudes.npy",
@@ -92,7 +101,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": -13,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/ee_mumu_25-1000GeV_val_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_mumu_25-1000GeV_val_smix_amplitudes.npy",
@@ -101,7 +111,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": -13,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/ee_mumu_25-1000GeV_test_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_mumu_25-1000GeV_test_smix_amplitudes.npy",
@@ -110,7 +121,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": -13,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/ee_numu_25-1000GeV_train_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/ee_numu_25-1000GeV_train_smix_amplitudes.npy",
@@ -119,7 +131,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": 14,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/ee_numu_25-1000GeV_val_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_numu_25-1000GeV_val_smix_amplitudes.npy",
@@ -128,7 +141,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": 14,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/ee_numu_25-1000GeV_test_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_numu_25-1000GeV_test_smix_amplitudes.npy",
@@ -137,7 +151,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": 14,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/ee_bhabha_25-1000GeV_train_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/ee_bhabha_25-1000GeV_train_smix_amplitudes.npy",
@@ -146,7 +161,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": -11,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/ee_bhabha_25-1000GeV_val_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_bhabha_25-1000GeV_val_smix_amplitudes.npy",
@@ -155,7 +171,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": -11,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/ee_bhabha_25-1000GeV_test_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_bhabha_25-1000GeV_test_smix_amplitudes.npy",
@@ -164,7 +181,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": -11,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/ee_aa_25-1000GeV_train_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/ee_aa_25-1000GeV_train_smix_amplitudes.npy",
@@ -173,7 +191,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": 22,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/ee_aa_25-1000GeV_val_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_aa_25-1000GeV_val_smix_amplitudes.npy",
@@ -182,7 +201,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": 22,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/ee_aa_25-1000GeV_test_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_aa_25-1000GeV_test_smix_amplitudes.npy",
@@ -191,7 +211,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": 22,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/uubar_ddbar_25-1000GeV_train_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/uubar_ddbar_25-1000GeV_train_smix_amplitudes.npy",
@@ -200,7 +221,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": 1,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/uubar_ddbar_25-1000GeV_val_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/uubar_ddbar_25-1000GeV_val_smix_amplitudes.npy",
@@ -209,7 +231,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": 1,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/uubar_ddbar_25-1000GeV_test_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/uubar_ddbar_25-1000GeV_test_smix_amplitudes.npy",
@@ -218,7 +241,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": 1,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/uu_uu_25-1000GeV_train_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/uu_uu_25-1000GeV_train_smix_amplitudes.npy",
@@ -227,7 +251,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": 2,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/uu_uu_25-1000GeV_val_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/uu_uu_25-1000GeV_val_smix_amplitudes.npy",
@@ -236,7 +261,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": 2,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/uu_uu_25-1000GeV_test_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/uu_uu_25-1000GeV_test_smix_amplitudes.npy",
@@ -245,7 +271,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": 2,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/uubar_uubar_25-1000GeV_train_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/uubar_uubar_25-1000GeV_train_smix_amplitudes.npy",
@@ -254,7 +281,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": 2,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/uubar_uubar_25-1000GeV_val_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/uubar_uubar_25-1000GeV_val_smix_amplitudes.npy",
@@ -263,7 +291,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": 2,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/uubar_uubar_25-1000GeV_test_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/uubar_uubar_25-1000GeV_test_smix_amplitudes.npy",
@@ -272,7 +301,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": 2,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/dd_dd_25-1000GeV_train_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/dd_dd_25-1000GeV_train_smix_amplitudes.npy",
@@ -281,7 +311,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": 1,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/dd_dd_25-1000GeV_val_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/dd_dd_25-1000GeV_val_smix_amplitudes.npy",
@@ -290,7 +321,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": 1,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/dd_dd_25-1000GeV_test_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/dd_dd_25-1000GeV_test_smix_amplitudes.npy",
@@ -299,7 +331,8 @@
    "q1e-4": 1.0,
    "below_0.01": 0,
    "pid_min": 1,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/ee_bbbar_25-1000GeV_train_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/ee_bbbar_25-1000GeV_train_smix_amplitudes.npy",
@@ -308,7 +341,8 @@
    "q1e-4": 0.9999999999999997,
    "below_0.01": 0,
    "pid_min": -5,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/ee_bbbar_25-1000GeV_val_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_bbbar_25-1000GeV_val_smix_amplitudes.npy",
@@ -317,7 +351,8 @@
    "q1e-4": 0.9999999999999997,
    "below_0.01": 0,
    "pid_min": -5,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/ee_bbbar_25-1000GeV_test_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_bbbar_25-1000GeV_test_smix_amplitudes.npy",
@@ -326,7 +361,8 @@
    "q1e-4": 0.9999999999999997,
    "below_0.01": 0,
    "pid_min": -5,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/uubar_ttbar_363-1000GeV_train_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/uubar_ttbar_363-1000GeV_train_smix_amplitudes.npy",
@@ -335,7 +371,8 @@
    "q1e-4": 0.9999999999999998,
    "below_0.01": 0,
    "pid_min": -6,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/uubar_ttbar_363-1000GeV_val_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/uubar_ttbar_363-1000GeV_val_smix_amplitudes.npy",
@@ -344,7 +381,8 @@
    "q1e-4": 0.9999999999999998,
    "below_0.01": 0,
    "pid_min": -6,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/uubar_ttbar_363-1000GeV_test_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/uubar_ttbar_363-1000GeV_test_smix_amplitudes.npy",
@@ -353,7 +391,8 @@
    "q1e-4": 0.9999999999999998,
    "below_0.01": 0,
    "pid_min": -6,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/ee_ZZ_192-1000GeV_train_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/ee_ZZ_192-1000GeV_train_smix_amplitudes.npy",
@@ -362,7 +401,8 @@
    "q1e-4": 0.9999999999999997,
    "below_0.01": 0,
    "pid_min": 23,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/ee_ZZ_192-1000GeV_val_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_ZZ_192-1000GeV_val_smix_amplitudes.npy",
@@ -371,7 +411,8 @@
    "q1e-4": 0.9999999999999998,
    "below_0.01": 0,
    "pid_min": 23,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/ee_ZZ_192-1000GeV_test_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_ZZ_192-1000GeV_test_smix_amplitudes.npy",
@@ -380,7 +421,8 @@
    "q1e-4": 0.9999999999999997,
    "below_0.01": 0,
    "pid_min": 23,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/ee_ZH_227-1000GeV_train_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/ee_ZH_227-1000GeV_train_smix_amplitudes.npy",
@@ -389,7 +431,8 @@
    "q1e-4": 0.8581895730148865,
    "below_0.01": 0,
    "pid_min": 23,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/ee_ZH_227-1000GeV_val_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_ZH_227-1000GeV_val_smix_amplitudes.npy",
@@ -398,7 +441,8 @@
    "q1e-4": 0.8583659276542667,
    "below_0.01": 0,
    "pid_min": 23,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/ee_ZH_227-1000GeV_test_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_ZH_227-1000GeV_test_smix_amplitudes.npy",
@@ -407,7 +451,8 @@
    "q1e-4": 0.8581807293497503,
    "below_0.01": 0,
    "pid_min": 23,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/udbar_Wg_85-1000GeV_train_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/udbar_Wg_85-1000GeV_train_smix_amplitudes.npy",
@@ -416,7 +461,8 @@
    "q1e-4": 0.22174863823938248,
    "below_0.01": 0,
    "pid_min": 21,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/udbar_Wg_85-1000GeV_val_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/udbar_Wg_85-1000GeV_val_smix_amplitudes.npy",
@@ -425,7 +471,8 @@
    "q1e-4": 0.22435771129174786,
    "below_0.01": 0,
    "pid_min": 21,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/udbar_Wg_85-1000GeV_test_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/udbar_Wg_85-1000GeV_test_smix_amplitudes.npy",
@@ -434,7 +481,8 @@
    "q1e-4": 0.22048609906157554,
    "below_0.01": 0,
    "pid_min": 21,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/udbar_Wgg_85-1000GeV_train_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/udbar_Wgg_85-1000GeV_train_smix_amplitudes.npy",
@@ -443,7 +491,8 @@
    "q1e-4": 0.02633359867174283,
    "below_0.01": 0,
    "pid_min": 21,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/udbar_Wgg_85-1000GeV_val_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/udbar_Wgg_85-1000GeV_val_smix_amplitudes.npy",
@@ -452,7 +501,8 @@
    "q1e-4": 0.02741005254554557,
    "below_0.01": 0,
    "pid_min": 21,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/udbar_Wgg_85-1000GeV_test_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/udbar_Wgg_85-1000GeV_test_smix_amplitudes.npy",
@@ -461,7 +511,8 @@
    "q1e-4": 0.024605552865379736,
    "below_0.01": 0,
    "pid_min": 21,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/udbar_Wggg_85-1000GeV_train_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/udbar_Wggg_85-1000GeV_train_smix_amplitudes.npy",
@@ -470,7 +521,8 @@
    "q1e-4": 0.023650995582558572,
    "below_0.01": 0,
    "pid_min": 21,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/udbar_Wggg_85-1000GeV_val_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/udbar_Wggg_85-1000GeV_val_smix_amplitudes.npy",
@@ -479,7 +531,8 @@
    "q1e-4": 0.025423656534357804,
    "below_0.01": 0,
    "pid_min": 21,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/udbar_Wggg_85-1000GeV_test_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/udbar_Wggg_85-1000GeV_test_smix_amplitudes.npy",
@@ -488,7 +541,8 @@
    "q1e-4": 0.02543285820016399,
    "below_0.01": 0,
    "pid_min": 21,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/ee_uu_nlo_25-1000GeV_train_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/ee_uu_nlo_25-1000GeV_train_amplitudes.npy",
@@ -497,7 +551,8 @@
    "q1e-4": 0.9999999999974535,
    "below_0.01": 0,
    "pid_min": 2,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/ee_uu_nlo_25-1000GeV_val_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_uu_nlo_25-1000GeV_val_amplitudes.npy",
@@ -506,7 +561,8 @@
    "q1e-4": 0.9999999999988878,
    "below_0.01": 0,
    "pid_min": -2,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/ee_uu_nlo_25-1000GeV_test_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_uu_nlo_25-1000GeV_test_amplitudes.npy",
@@ -515,7 +571,8 @@
    "q1e-4": 0.9999999999995085,
    "below_0.01": 0,
    "pid_min": 2,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/uubar_ddbar_nlo_25-1000GeV_train_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/uubar_ddbar_nlo_25-1000GeV_train_amplitudes.npy",
@@ -524,7 +581,8 @@
    "q1e-4": 0.9999999999974535,
    "below_0.01": 0,
    "pid_min": 1,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/uubar_ddbar_nlo_25-1000GeV_val_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/uubar_ddbar_nlo_25-1000GeV_val_amplitudes.npy",
@@ -533,7 +591,8 @@
    "q1e-4": 0.9999999999988878,
    "below_0.01": 0,
    "pid_min": -1,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/uubar_ddbar_nlo_25-1000GeV_test_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/uubar_ddbar_nlo_25-1000GeV_test_amplitudes.npy",
@@ -542,7 +601,8 @@
    "q1e-4": 0.9999999999995085,
    "below_0.01": 0,
    "pid_min": 1,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/uubar_ZZ_nlo_192-1000GeV_train_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/uubar_ZZ_nlo_192-1000GeV_train_amplitudes.npy",
@@ -551,7 +611,8 @@
    "q1e-4": 0.9999999999996334,
    "below_0.01": 0,
    "pid_min": 23,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/uubar_ZZ_nlo_192-1000GeV_val_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/uubar_ZZ_nlo_192-1000GeV_val_amplitudes.npy",
@@ -560,7 +621,8 @@
    "q1e-4": 0.9999999999997341,
    "below_0.01": 0,
    "pid_min": 23,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/uubar_ZZ_nlo_192-1000GeV_test_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/uubar_ZZ_nlo_192-1000GeV_test_amplitudes.npy",
@@ -569,7 +631,8 @@
    "q1e-4": 0.9999999999998223,
    "below_0.01": 0,
    "pid_min": 23,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/ee_uug_25-1000GeV_train_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/ee_uug_25-1000GeV_train_smix_amplitudes.npy",
@@ -578,7 +641,8 @@
    "q1e-4": 0.025682248145935147,
    "below_0.01": 0,
    "pid_min": -2,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/ee_uug_25-1000GeV_val_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_uug_25-1000GeV_val_smix_amplitudes.npy",
@@ -587,7 +651,8 @@
    "q1e-4": 0.027463322094416567,
    "below_0.01": 0,
    "pid_min": 21,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/ee_uug_25-1000GeV_test_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_uug_25-1000GeV_test_smix_amplitudes.npy",
@@ -596,7 +661,8 @@
    "q1e-4": 0.02585377742968018,
    "below_0.01": 0,
    "pid_min": 21,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/ee_uugg_25-1000GeV_train_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/ee_uugg_25-1000GeV_train_smix_amplitudes.npy",
@@ -605,7 +671,8 @@
    "q1e-4": 0.0239071049876288,
    "below_0.01": 0,
    "pid_min": 21,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/ee_uugg_25-1000GeV_val_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_uugg_25-1000GeV_val_smix_amplitudes.npy",
@@ -614,7 +681,8 @@
    "q1e-4": 0.024835861125414894,
    "below_0.01": 0,
    "pid_min": 21,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/ee_uugg_25-1000GeV_test_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_uugg_25-1000GeV_test_smix_amplitudes.npy",
@@ -623,7 +691,8 @@
    "q1e-4": 0.030280046335765365,
    "below_0.01": 0,
    "pid_min": 2,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/ee_bbbarg_25-1000GeV_train_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/ee_bbbarg_25-1000GeV_train_smix_amplitudes.npy",
@@ -632,7 +701,8 @@
    "q1e-4": 0.014001720935351224,
    "below_0.01": 0,
    "pid_min": 5,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/ee_bbbarg_25-1000GeV_val_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_bbbarg_25-1000GeV_val_smix_amplitudes.npy",
@@ -641,7 +711,8 @@
    "q1e-4": 0.019095807603866585,
    "below_0.01": 0,
    "pid_min": -5,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/ee_bbbarg_25-1000GeV_test_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_bbbarg_25-1000GeV_test_smix_amplitudes.npy",
@@ -650,7 +721,8 @@
    "q1e-4": 0.01566772446870397,
    "below_0.01": 0,
    "pid_min": -5,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/ee_bbbargg_25-1000GeV_train_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/ee_bbbargg_25-1000GeV_train_smix_amplitudes.npy",
@@ -659,7 +731,8 @@
    "q1e-4": 0.014146820145036222,
    "below_0.01": 0,
    "pid_min": 5,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/ee_bbbargg_25-1000GeV_val_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_bbbargg_25-1000GeV_val_smix_amplitudes.npy",
@@ -668,7 +741,8 @@
    "q1e-4": 0.016568538521427447,
    "below_0.01": 0,
    "pid_min": 5,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/ee_bbbargg_25-1000GeV_test_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_bbbargg_25-1000GeV_test_smix_amplitudes.npy",
@@ -677,7 +751,8 @@
    "q1e-4": 0.011221945105829334,
    "below_0.01": 1,
    "pid_min": 5,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/uubar_ttbar_nlo_363-450GeV_train_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/uubar_ttbar_nlo_363-450GeV_train_amplitudes.npy",
@@ -686,7 +761,8 @@
    "q1e-4": 0.9999999999997846,
    "below_0.01": 0,
    "pid_min": -6,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/uubar_ttbar_nlo_363-450GeV_val_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/uubar_ttbar_nlo_363-450GeV_val_amplitudes.npy",
@@ -695,7 +771,8 @@
    "q1e-4": 0.9999999999999155,
    "below_0.01": 0,
    "pid_min": -6,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/uubar_ttbar_nlo_363-450GeV_test_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/uubar_ttbar_nlo_363-450GeV_test_amplitudes.npy",
@@ -704,7 +781,8 @@
    "q1e-4": 0.9999999999999476,
    "below_0.01": 0,
    "pid_min": 6,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/udbar_enug_25-1000GeV_train_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/udbar_enug_25-1000GeV_train_smix_amplitudes.npy",
@@ -715,7 +793,8 @@
    "pid_min": 12,
    "below_0.009_by_pid": {
     "12": 410
-   }
+   },
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/udbar_enug_25-1000GeV_val_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/udbar_enug_25-1000GeV_val_smix_amplitudes.npy",
@@ -726,7 +805,8 @@
    "pid_min": 12,
    "below_0.009_by_pid": {
     "12": 30
-   }
+   },
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/udbar_enug_25-1000GeV_test_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/udbar_enug_25-1000GeV_test_smix_amplitudes.npy",
@@ -737,7 +817,8 @@
    "pid_min": 12,
    "below_0.009_by_pid": {
     "12": 41
-   }
+   },
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/udbar_taunu_25-1000GeV_train_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/udbar_taunu_25-1000GeV_train_smix_amplitudes.npy",
@@ -746,7 +827,8 @@
    "q1e-4": 0.9949665765174898,
    "below_0.01": 0,
    "pid_min": 16,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/udbar_taunu_25-1000GeV_val_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/udbar_taunu_25-1000GeV_val_smix_amplitudes.npy",
@@ -755,7 +837,8 @@
    "q1e-4": 0.9950374522504941,
    "below_0.01": 0,
    "pid_min": 16,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/udbar_taunu_25-1000GeV_test_smix_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/udbar_taunu_25-1000GeV_test_smix_amplitudes.npy",
@@ -764,7 +847,8 @@
    "q1e-4": 0.994962985924714,
    "below_0.01": 0,
    "pid_min": 16,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/ee_mumu_ew_nlo_500-1000GeV_train_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/ee_mumu_ew_nlo_500-1000GeV_train_amplitudes.npy",
@@ -773,7 +857,8 @@
    "q1e-4": 0.9999999999974536,
    "below_0.01": 0,
    "pid_min": -13,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/ee_mumu_ew_nlo_500-1000GeV_val_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_mumu_ew_nlo_500-1000GeV_val_amplitudes.npy",
@@ -782,7 +867,8 @@
    "q1e-4": 0.9999999999988879,
    "below_0.01": 0,
    "pid_min": 13,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/ee_mumu_ew_nlo_500-1000GeV_test_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_mumu_ew_nlo_500-1000GeV_test_amplitudes.npy",
@@ -791,7 +877,8 @@
    "q1e-4": 0.9999999999995522,
    "below_0.01": 0,
    "pid_min": -13,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "train/ee_uu_ew_nlo_500-1000GeV_train_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/ee_uu_ew_nlo_500-1000GeV_train_amplitudes.npy",
@@ -800,7 +887,8 @@
    "q1e-4": 0.9999999999974536,
    "below_0.01": 0,
    "pid_min": 2,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "val/ee_uu_ew_nlo_500-1000GeV_val_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_uu_ew_nlo_500-1000GeV_val_amplitudes.npy",
@@ -809,7 +897,8 @@
    "q1e-4": 0.9999999999988879,
    "below_0.01": 0,
    "pid_min": -2,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   },
   "test/ee_uu_ew_nlo_500-1000GeV_test_amplitudes.npy": {
    "path": "/sps/lpnhe/jiturrizaramirez01/datasets/ee_uu_ew_nlo_500-1000GeV_test_amplitudes.npy",
@@ -818,7 +907,8 @@
    "q1e-4": 0.9999999999995522,
    "below_0.01": 0,
    "pid_min": 2,
-   "below_0.009_by_pid": {}
+   "below_0.009_by_pid": {},
+   "moved_x0_0.009_nu_exempt": 0
   }
  }
 }
