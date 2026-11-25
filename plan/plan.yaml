@@ -48867,7 +48867,7 @@ entries:
       goes into the D392 setup only below every trained momentum (coordinator, 2026-11-25)'
   owner:
     agent: a5e0bbe3e450173d8
-    state: working
+    state: closed
     since: '2026-11-25T22:04:57+00:00'
     state_at: '2026-11-25T22:04:57+00:00'
     context: 75653
@@ -49438,32 +49438,31 @@ entries:
   step_waits:
     '4': 'FA-ccin2p3-f217e59e FA-ccin2p3-c7f86f9d FA-ccin2p3-d091ec88 FA-ccin2p3-0624d767 FA-ccin2p3-4ae89ccc FA-ccin2p3-829d792c '
   handoff:
-    state: 'D561 test done: rescale only below x0=0.009 (below every trained u u~ g and Z+4g momentum) scored eval-only on
-      the 6 no-rescale u u~ g runs: YES at both sizes (deepest soft kit bin 4924->1.44 at 1e4, 7580->0.93 at 1e5, -3.53/-3.91
-      dec vs spreads 0.59/0.64; all 5 changed strata fall; bulk and collinear identical; pipeline checks pass). Write-up par:selres_support
-      + fig:selres_support (d424ea5b0, notes-editor passed; fig analysis/selective_rescale/figs/support_rule.png, caption
-      checked). Step 3 (coordinator: settled by D561, ask withdrawn): put the rule into the D392 setup. The finale parent''s
-      log lists no pools, so minima now reads the finale''s 28 processes from recipes/transfer_finale.yaml (f5545dd50); running
-      as detached srmin_recipe. NEXT: (1) read data/support_minima.json finale (min over every key''s ''min''); (2) in scripts/job_datasaving_parent.sh
-      finale FIX add ++model.input_soft_x0=<x0>, x0 below min(finale minimum, Z+4g train 0.00923) (the parent''s fine-tunes
-      train on Z+4g), state its source in the header comment; flags=off still zeroes input_soft_eps; (3) test the flag build
-      (extract the case/FIX in bash, check x0 present and flags=off gives eps 0) and tests/test_input_reps.py::test_soft_x0_only_soft_momenta
-      in .venv-cpu; (4) add to par:selres_support that runs trained before the switch keep the full rescale, so comparisons
-      across it mix the two; with x0 below every trained momentum, D392-setup training equals no-rescale training and the
-      rescale acts only on out-of-range soft momenta; (5) notes-editor review (review_backlog.sh), commit, plan done --writeup.'
-    decisions: 'Joaquin''s: D552 (question), D561 (only where it helps; reference no rescale; per the coordinator it also
-      settles putting the rule into the D392 setup), D392 (incorporate what gives a gain). Mine (re-justify): x0=0.009 from
-      measured pool minima; eval-only scoring since the rule leaves training unchanged; own CPU job at 16G (site run --job
-      gives 2G, kit_predict OOM); site pick --only ccin2p3 (run dirs on CC only); full rescale kept out of the figure (reference
-      is no rescale), quoted in text as context; x0 for the D392 setup also below Z+4g train 0.00923 because its fine-tunes
-      train on Z+4g.'
-    ruled_out: Rescale below x=0.3 and the event gate (Z+4g bulk cost); rescale below x=0.1 (costs the trained soft events
-      it changes, par:selres_split); x0<=0.05 by argument; two-input by D374's pair-log measurement.
-    running: detached srmin_recipe (CC CPU job via site_python, minima on the finale recipe pools)
-    files: analysis/selective_rescale/support_rule.py (score/read/plot/minima/remote/jobs), scripts/job_support_rule.sh, data/support_kit.json,
-      support_read.json, support_jobs.json, support_minima.json, figs/support_rule.png, docs/results.tex par:selres_support,
-      scripts/job_datasaving_parent.sh (to change)
-    written: '2026-11-25T21:01:30+00:00'
+    state: 'Step 4 (D561) in flight. Done: model.input_soft_skip_neutrinos (wrappers._neutrinos: charge 0 and lepton number
+      != 0, exactly PDG +-12/14/16; _soft_rescale keep=), finale FIX in scripts/job_datasaving_parent.sh now ++model.input_soft_x0=0.009
+      ++model.input_soft_skip_neutrinos=true (4785e87f8); tests pass (test_input_reps 18/18, test_parent_soft_x0: every pool
+      momentum below 0.009 is a neutrino, softest non-neutrino 0.00923 Z+4g train); done_when updated; design passed review.
+      Running: 6 CC CPU re-score jobs (support_rule.py score --nu) and minima CPU job 64873211 (adds moved_x0_0.009_nu_exempt
+      per pool via wrappers._soft_rescale). NEXT: (1) when jobs end: .venv-cpu/bin/python analysis/selective_rescale/support_rule.py
+      score --nu, then read_nu -> data/support_nu.json, expect SAME (|log10|<0.01 per stratum vs support_kit.json rule and
+      off arms); (2) srmin_nu_read event: minima result -> support_minima.json; require moved_x0_0.009_nu_exempt==0 in every
+      pool (add that assert to tests/test_parent_soft_x0.py); (3) rewrite the step-3 sentences of par:selres_support (x0=1e-5)
+      to x0=0.009 with neutrinos exempt, new % src/% claim lines (support_nu.json, minima --cached); no new figure if SAME
+      (numbers equal the D561 figure); (4) notes-editor + repo-reviewer backlogs, commit, plan done --writeup. If a pool has
+      moved>0 or a stratum differs: report, revert finale to x0=1e-5.'
+    decisions: 'Joaquin''s: D561 (only where it helps; reference no rescale), D552, D392. Mine (re-justify): neutrino = neutral
+      lepton from GLOBAL_PROPERTY_MATRIX (assumes particle_type_indices are global-table rows, true with use_PIDs false, as
+      input_div_form already assumes); wrapper-level changed count added to the minima job rather than a separate job; Z+4g
+      kit not rescored (no kit event below 0.009, no neutrinos); sync with --allow-dirty (only another agent''s untracked
+      critical_batch data present); site pick --gpus 0 --only ccin2p3 (run dirs on CC only).'
+    ruled_out: Rescale below x=0.3 and the event gate (Z+4g bulk cost); below x=0.1 (costs trained soft events); x0=1e-5 inert
+      on kit soft bins (superseded by step 4).
+    running: FA-ccin2p3-f217e59e c7f86f9d d091ec88 0624d767 4ae89ccc 829d792c (support_nu u u~ g re-score, 2 h target); CC
+      CPU job 64873211 (minima) read by detached srmin_nu_read (~50 min)
+    files: wrappers.py, config/model/lloca.yaml, tools/rebuild_run.py, scripts/job_datasaving_parent.sh, tests/test_input_reps.py,
+      tests/test_parent_soft_x0.py, analysis/selective_rescale/support_rule.py (score --nu, read_nu, MINIMA moved count),
+      data/support_jobs.json, support_kit.json, support_minima.json, docs/results.tex par:selres_support
+    written: '2026-11-25T22:21:23+00:00'
   step_why:
     4:
       feeds: 'D561: rescale only where it helps in the D392 setup'
