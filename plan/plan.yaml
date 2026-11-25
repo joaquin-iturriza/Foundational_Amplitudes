@@ -45950,10 +45950,11 @@ entries:
     - selective_rescale
   decisions:
   - D552
-  next: 'Run the passed design: the D395 smoke (seed_chunks/selres_smoke.txt, 50 steps each of soft-only x0=0.1 and event
-    gate 0.1 on u u~ g 1e4, then job_kit.sh KIT_SCORE_ONLY on both), then the 14 searches (sweep/sweep_config_selres_*.yaml)
-    through sweep/drive.py, then seeds 43/44 of each chosen trial, then kit scoring of the 18 new u u~ g runs; read with a
-    selres reader against D539''s controls, figure, write-up in results.tex'
+  next: 'Stage 1 of the passed design: the D395 smoke (seed_chunks/selres_smoke.txt on branch selres: 50 steps each of soft-only
+    x0=0.1 and event gate 0.1 on u u~ g 1e4, then job_kit.sh KIT_SCORE_ONLY on both), then the 36 stage-1 runs (seed_chunks/selres_stage1_all.txt:
+    schemes x0=0.1, x0=0.3, event gate 0.1 at each cell''s no-rescale best HPs, seeds 42-44) and kit scoring of their 18 u
+    u~ g runs; read with analysis/selective_rescale/stage1_read.py against D539''s controls. Stage 2 (a 16-trial search per
+    failing scheme-cell, and the Z+4g 1e5 control searches) only for a scheme-cell that misses YES'
   done_when: null
   notes_ref: null
   match: selres_*
@@ -46147,10 +46148,8 @@ entries:
   step_why:
     1:
       feeds: whether an event-dependent rescale (soft-only below x0, or an event gate) keeps the u u~ g soft-bin gain without
-        the Z+4g / u u~ g bulk cost, so it can replace the rescale in the setup (Joaquin's call, D392)
+        the Z+4g bulk cost, so it can replace the rescale in the setup (Joaquin's call, D392)
       if:
-      - 'a scheme passes the design''s YES: propose it to Joaquin as the rescale''s replacement, with the figure'
-      - 'soft bin lost by every scheme: the log branch needs more trained particles; report the decades each kept and the
-        trade-off along x0'
-      - 'bulk cost kept by every scheme: the compression mechanism is wrong or incomplete; compare measured r against the
-        input check''s prediction'
+      - 'a scheme passes the design''s YES at the baseline HPs: done for it; propose it to Joaquin with the figure'
+      - 'a scheme misses YES in a cell: stage 2, its own search there, read best against best'
+      - 'every scheme loses the soft bin: report decades kept per scheme and the trade-off along x0'
