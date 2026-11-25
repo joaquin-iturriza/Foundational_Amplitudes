@@ -41746,6 +41746,14 @@ entries:
       LLM placing new levels about as well as a content-only regressor, 0.649 vs 0.79, from its whole MSE as an upper bound):
       its own level error is 3.4x below the content-only network''s and about our control''s; per CLAUDE.md the text of that
       reading stands until Joaquin has the question with the figure.'
+  - at: '2026-11-25T21:54:50+00:00'
+    text: '2026-11-25 step 8 smokes: the 64-head smoke FA-ccin2p3-e5265194 failed (SMOKE_EXIT 1, sigma stage: Pretrained checkpoint
+      not found .../zz_smoke_sweep_config_llmcmp_c_width_64847542/models/model_run0_best.pt) because the 64- and 120-head
+      smokes were submitted with model.net.checkpoint_blocks=true save=false (copied from part (b)''s 120-head smoke): no
+      checkpoint, so the sigma stage D395 requires cannot run; the 16/32-head smokes (saved) passed SMOKE_EXIT 0. The 120-head
+      FA-ccin2p3-e1d1fbaf (same flags) will fail the same way. Repair: both resubmitted identically without save=false on
+      CC (--allow-unfit; 64G fits nowhere now; CC /sps 26G free): 64 heads FA-ccin2p3-1969f226, 120 heads FA-ccin2p3-caf1170e,
+      target 1 h each.'
   step_waits:
     '8': FA-ccin2p3-1969f226 FA-ccin2p3-caf1170e
     '13': FA-ccin2p3-623a3af6
