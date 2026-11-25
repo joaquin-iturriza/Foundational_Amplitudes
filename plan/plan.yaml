@@ -40808,6 +40808,14 @@ entries:
       (width, depth, alpha, lr, batch) and the boosted tree (learning rate, leaves, iterations, l2) over their coupled spaces,
       cross-fitted by relabelling class on the 1352 training processes (never on the 43 new), best against best on the level
       error and flat shift of step 17; its own design and review, CPU jobs on lxplus (catalog_daniel train-role pools)'
+    21: '22: D567/D564 matched test after step 21 (the gg->ttH split follows the sign of the internal-top off-shellness input):
+      does our setup without the off-shellness input lose the split and the gg->tbW level error? Arm: part (c)''s control
+      config and HPs (runs/llmcmp_c_qperp/trial_9000, FA-ccin2p3-d34535b0), identical flags except data.offshell_per_event=false
+      (offshell_zero is not equivalent for a fresh run: check which flag the kit_benchmark off arms used, D418), seed 42,
+      60,840 steps; time per step from d34535b0''s own log; one smoke if the flag changes the launch path (D395); score by
+      job_llm_score.sh EVENTS=1 ONLY=heldout; read factor_split.py on gg->ttX and gg->tbW, heldout_per_process.py all parts,
+      error_split.py against the control. Prior: results.tex l.9373-9426 (off-shellness adopted, ~50x in-distribution), l.10855,
+      kit_benchmark off arms (D418), none on held-out new families. Its design and design review first.'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -41022,6 +41030,12 @@ entries:
       - 'best network or tree <= 0.19 on the 43 new with its shift below the regressor''s by more than 2x noise: marriage
         found, go to (C), g fed to LLoCa per event, its own design'
       - 'both stay above 0.19 after the search: record (B) as a dead end for level placement; report the shift result alone'
+    21:
+      feeds: 'D567/D564: whether the off-shellness input causes our setup''s new-family shape split and level errors'
+      if:
+      - 'split gone and new-set shape/level better: the input''s sign misleads on new families; report, then the fix question
+        (e.g. |o| only) to Joaquin'
+      - 'split stays: the input is not the cause; report, next candidate the diagram encoder'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
