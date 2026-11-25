@@ -25,6 +25,7 @@ data:
  preprocess_per_dataset: true
  shared_standardization: false  # one pooled (mu, sigma), per-process transforms kept: zero-shot scoring (results.tex)
  affine_multiplicity_std: false  # with shared_standardization: mu_N = a + b N over the particle count, one sigma (draft Sec. 5, multiplicity_extrap.py)
+ level_file: null  # with shared_standardization: each process's mean from a frozen per-process level file ({"levels": {name: mean log|M|^2}}, repo-relative), one sigma (llm_compare step 16)
  alphas_input: false   # each event's alpha_s (<pool>.alphas.npy) as one more input column, (ln alpha_s + shift) / scale; memmap path (plan llm_compare)
  alphas_input_shift: 1.994
  alphas_input_scale: 0.169
