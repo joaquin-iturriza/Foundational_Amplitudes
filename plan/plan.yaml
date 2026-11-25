@@ -44831,9 +44831,9 @@ entries:
   decisions:
   - D532
   next:
-    1: 'Close critical_batch: when the trunk repo-reviewer backlog (reviewer aee7e3b6b89d84945, blocked on finetune_mechanism''s
-      glu_parent_curves.py) and the notes-editor backlog carrying par:cbs_scan pass, plan done critical_batch --writeup 145d14839
-      and remove worktrees/wt-cbs-accum and worktrees/wt-critbatch with scripts/remove_worktree.sh'
+    1: 'Close critical_batch once steps 2-4 are read and written up: plan done critical_batch with the write-up commits (par:cbs_scan
+      145d14839 plus the D560 part B and D563 write-ups). Both review backlogs it waited on have passed (repo-reviewer watermark
+      210db5bab, notes-editor c203b49ae contains 145d14839); worktrees wt-cbs-accum and wt-critbatch are removed'
     2: 'D560: explain why B_simple (~55 events) sits ~80x below the scan''s B_crit (~4420), explain the batch-128 gain of
       the Z+4g fine-tunes (par:ftm_*, zng4g_ftnoset_b128) against the scan, and give a batch rule usable before a run, checked
       on both settings (existing data first; new jobs only under a passed design)'
@@ -45741,10 +45741,10 @@ entries:
       long; decisions D507, D519, D520, D560, D563: no earlier run of these cells at another horizon.'
   step_why:
     1:
-      feeds: 'D532: the scan''s answer (NO branch, B_crit 2500-6690 vs B_simple 55.5) reaches Joaquin as a finished entry'
+      feeds: the entry's close
       if:
-      - 'both reviewers pass: plan done with the write-up commit, remove the worktrees'
-      - 'a reviewer blocks on par:cbs_scan or scan_state.py: fix and continue the same reviewer'
+      - 'steps 2-4 written up and reviewed: plan done'
+      - 'a step still open: wait on it'
     2:
       feeds: 'D560: which batch number to trust and a rule for future runs'
       if:
@@ -45763,7 +45763,6 @@ entries:
       - 'the ratio stays above 1.22: the gain persists at 50 epochs; report it with the figure and what part A''s critical
         batch says'
   step_waits:
-    '1': repo-reviewer aee7e3b6b89d84945 and the notes-editor backlog (par:cbs_scan)
     '2': FA-ccin2p3-3e856594
     '3': FA-ccin2p3-cedaa6dd
     '4': 'the next owner: re-derive the ep50 lr windows by HPO rule 2 (repo-review FIX 1), re-record the design and re-run
