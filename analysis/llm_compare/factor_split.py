@@ -80,16 +80,17 @@ def fig(path):
     fig, axes = ps.figure(ncols=2, nrows=2)
     for ax, n in zip(axes.ravel(), TTX):
         h = o["processes"][n]["hist2d"]
-        ax.pcolormesh(h["logF_edges"], h["d_edges"], np.ma.masked_equal(np.array(h["counts"]), 0), cmap="viridis",
-                      norm=LogNorm(), rasterized=True)
+        im = ax.pcolormesh(h["logF_edges"], h["d_edges"], np.ma.masked_equal(np.array(h["counts"]), 0), cmap="viridis",
+                           norm=LogNorm(), rasterized=True)
+        ps.colorbar(ax, im, "events")
         bb = o["processes"][n]["binned"]
-        ax.plot(bb["logF_mid"], bb["mean_d"], "o-", color="w", ms=2, lw=0.8, label="mean in bins of $\\log F$")
+        ax.plot(bb["logF_mid"], bb["mean_d"], "o-", color=ps.C.vermillion, ms=2, lw=0.8, label="mean in bins of $\\log F$")
         ax.axhline(0, color="0.5", lw=0.5)
         ax.text(0.03, 0.95, proc_label(meta[n]), transform=ax.transAxes, va="top", color="k")
         ax.set_xlabel(r"$\log F$")
         ax.set_ylabel(r"pred $-$ true of $\log|\mathcal{M}|^2$")
     ps.legend(axes.ravel()[0], "lower right")
-    ps.save(fig, os.path.splitext(path.replace(os.sep + "data" + os.sep, os.sep + "figs" + os.sep))[0])
+    ps.save(fig, os.path.join(HERE, "figs", os.path.splitext(os.path.basename(path))[0]))
 
 
 def main():

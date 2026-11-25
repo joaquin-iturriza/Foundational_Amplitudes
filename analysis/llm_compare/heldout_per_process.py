@@ -1,8 +1,10 @@
 """llm_compare part (a): MSE of log|M|^2 per held-out process in the layout of Suprio's held-out figure
 (analysis/llm_compare/suprio_llm_heldout_fig.png): two rows, interpolation (96 relabels) and extrapolation (43 new),
 one tick per process in his order and families, 2->2 processes shaded.
-His points: the "pID emb. only (baseline)" run, seed 0, 20 epochs (talks/progress_oct2026b/data/draft_pid_by_process.json,
-{"interp"|"extrap": {name: [x in his figure, MSE]}}, read off his figure's vector paths; not committed). Ours: a run's
+His points: the "pID emb. only (baseline)" runs, seeds 0-2, from his own per-process test metrics (suprio.py,
+data/suprio_cond/): the median over the seeds, the bar from the lowest to the highest seed; MSE = rmse^2, |bias| =
+|level|, MSE - bias^2 = shape^2. His order of the processes: the x positions read off his figure
+(talks/progress_oct2026b/data/draft_pid_by_process.json, {"interp"|"extrap": {name: [x, MSE]}}; not committed). Ours: a run's
 data/<tag>_heldout.json from tools/llm_score.py (first 1e4 test events per process, shared affine statistics).
 Process families and labels: analysis/catalog_daniel/classes_default.json (test_group, process).
     python analysis/llm_compare/heldout_per_process.py [--tag a_trial5 ...] [--out NAME]
@@ -22,6 +24,7 @@ sys.path.insert(0, ROOT)
 sys.path.insert(0, DAN)
 import plot_style as ps  # noqa: E402
 from heldout_delta import proc_label  # noqa: E402
+import suprio  # noqa: E402
 
 GROUPS = {"interp": [("ss~ annihilation processes (flavor-degenerate with dd~ and uu~)", r"$s\bar s$ annihilation"),
                      ("Muon final states from bb~ annihilation", r"$b\bar b\to\mu,\ \nu_\mu$"),
@@ -53,15 +56,14 @@ ARMS = {"a_trial5": ("his setup, 8 heads", ps.C.blue, "o"),
         "lvl_feat": ("level from process", "#999999", "h"),
         "lvl_diag": ("level from process, diagrams", "#8c564b", "p")}
 YLIM = (1e-7, 1e3)   # one range for every figure: his 1e-3..1e3 extended below our lowest point; never data-dependent
-# --part bias (step 15): our arms' level offset |bias| = |mean(pred - true)| in log|M|^2 (tools/llm_score.py's split,
-# data/split/<tag>_heldout.json) beside the LLM's whole RMSE (an upper bound on its own |bias|); its own fixed range
-PART = {"mse": ("data", YLIM, r"MSE$(\log|\mathcal{M}|^2)$", "pID emb. only (Suprio)"),
-        "bias": (os.path.join("data", "split"), (1e-5, 1e2), r"$|$bias$|$ of $\log|\mathcal{M}|^2$",
-                 "pID emb. only (Suprio), whole RMSE"),
-        # --part shape (D567): the error with each arm's own level removed, MSE - bias^2 = scale + floor (same split
-        # files), beside the LLM's whole MSE (an upper bound on its own shape error); the MSE figure's range
-        "shape": (os.path.join("data", "split"), YLIM, r"MSE$-$bias$^2$ of $\log|\mathcal{M}|^2$",
-                  "pID emb. only (Suprio), whole MSE")}
+# --part bias (step 15): the level offset |bias| = |mean(pred - true)| in log|M|^2 (ours: tools/llm_score.py's split,
+# data/split/<tag>_heldout.json; his: |level|); its own fixed range
+PART = {"mse": ("data", YLIM, r"MSE$(\log|\mathcal{M}|^2)$", "mse"),
+        "bias": (os.path.join("data", "split"), (1e-5, 1e2), r"$|$bias$|$ of $\log|\mathcal{M}|^2$", "bias"),
+        # --part shape (D567): the error with the level removed, MSE - bias^2 = scale + floor (same split files; his:
+        # shape^2); the MSE figure's range
+        "shape": (os.path.join("data", "split"), YLIM, r"MSE$-$bias$^2$ of $\log|\mathcal{M}|^2$", "shape")}
+LLM_LABEL = "pID emb. only (Suprio)"
 LEVEL_ONLY = ("lvl_feat", "lvl_diag")   # no events, no shape
 
 
@@ -71,7 +73,7 @@ def main():
     ap.add_argument("--out", default=None, help="default all_arms (mse) or all_arms_<part>")
     ap.add_argument("--part", choices=list(PART), default="mse")
     a = ap.parse_args()
-    ddir, ylim, ylabel, llm_label = PART[a.part]
+    ddir, ylim, ylabel, llm_stat = PART[a.part]
     a.out = a.out or ("all_arms" if a.part == "mse" else "all_arms_" + a.part)
     tags = a.tag or [t for t in ARMS if os.path.exists(os.path.join(HERE, ddir, f"{t}_heldout.json"))
                      and not (a.part == "shape" and t in LEVEL_ONLY)]
@@ -83,8 +85,11 @@ def main():
                           json.load(open(os.path.join(HERE, ddir, f"{t}_heldout.json")))["processes"].items()},
              ARMS[t][1], ARMS[t][2]) for t in sorted(tags, key=list(ARMS).index)]
     meta = {"dc_" + p["folder"]: p for p in json.load(open(os.path.join(DAN, "classes_default.json")))["processes"]}
+    sp_his = suprio.split()
+    assert all(set(draft[sp]) == set(sp_his[sp]) for sp in draft), "his split differs from his figure's"
     for _, ours, _, _ in arms:
         assert set(ours) == {n for g in draft.values() for n in g}, "held-out sets differ"
+    llm = {n: np.abs(v) for n, v in suprio.llm(llm_stat).items()}   # per seed; |level| for the bias
     w0, h0 = ps.PLOT_W_IN, ps.PLOT_H_IN
     ps.PLOT_W_IN, ps.PLOT_H_IN = 7.5, 1.9      # his wide rows: room for one tick per process
     fig, axes = ps.figure(ncols=1, nrows=2)
@@ -94,8 +99,9 @@ def main():
         for i, n in enumerate(names):
             if meta[n]["n_out"] == 2:
                 ax.axvspan(i - 0.5, i + 0.5, color="0.88", lw=0, zorder=0)
-        ax.plot(x, [draft[sp][n][1] ** (0.5 if a.part == "bias" else 1) for n in names], "*", color="k", ls="none", zorder=3,
-                label=llm_label)
+        med, lo_, hi_ = (np.array([f(llm[n]) for n in names]) for f in (np.median, np.min, np.max))
+        ax.errorbar(x, med, yerr=[med - lo_, hi_ - med], fmt="*", color="k", ms=4, elinewidth=0.6, capsize=0, zorder=3,
+                    label=LLM_LABEL)
         for lab, ours, c, mk in arms:
             ax.plot(x, [ours[n]["y"] for n in names], mk, color=c, ls="none", zorder=2, alpha=0.85,
                     ms=3, label=lab)
@@ -115,7 +121,7 @@ def main():
         ax.tick_params(axis="x", length=1.5, pad=1)
         ax.set_xlim(-0.6, len(names) - 0.4)
         ax.set_yscale("log")
-        lo = min(v["y"] for _, ours, _, _ in arms for v in ours.values())
+        lo = min([v["y"] for _, ours, _, _ in arms for v in ours.values()] + [lo_.min()])
         assert lo >= ylim[0], f"a point at {lo:.2g} is below the fixed range: lower it in PART (never clip)"
         ax.set_ylim(*ylim)
         ax.set_yticks(10.0 ** np.arange(np.log10(ylim[0]), np.log10(ylim[1]) + 1))

@@ -3,7 +3,8 @@ Per family (his test_group; analysis/catalog_daniel/classes_default.json) and pe
 MSE(log|M|^2), how many processes are below the LLM, the median per-process ratio MSE(ours)/MSE(LLM); per set the
 Spearman rank correlation of ours against the LLM across processes (do both find the same processes hard?), the share
 of the pooled MSE held by the 3 worst processes, and the pooled RMSE of the new set without the gg -> t b W pair.
-LLM points: talks/progress_oct2026b/data/draft_pid_by_process.json (read off his figure, as heldout_per_process.py).
+LLM: his own per-process MSE, pID embedding only, median over seeds 0-2 (suprio.py); his figure's process order
+(talks/progress_oct2026b/data/draft_pid_by_process.json, as heldout_per_process.py).
 Ours: data/<tag>_heldout.json (tools/llm_score.py).
     python analysis/llm_compare/family_gap.py --tag a_trial5 b_h16 [--out NAME]
 Output: data/<out>_family_gap.json (default out: family_gap).
@@ -11,6 +12,8 @@ Output: data/<out>_family_gap.json (default out: family_gap).
 import argparse, json, os
 
 import numpy as np
+
+import suprio
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -34,7 +37,9 @@ def main():
     out = {}
     for sp in ("interp", "extrap"):
         names = sorted(draft[sp], key=lambda n: draft[sp][n][0])
-        arms = {"llm": np.array([draft[sp][n][1] for n in names])}
+        L = suprio.llm("mse")
+        assert set(names) == set(suprio.split()[sp])
+        arms = {"llm": np.array([np.median(L[n]) for n in names])}
         arms.update({t: np.array([ours[t][n]["mse_logm2"] for n in names]) for t in a.tag})
         fams = {}
         for i, n in enumerate(names):

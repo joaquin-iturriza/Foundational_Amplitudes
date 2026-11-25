@@ -3,17 +3,21 @@ Per process, from tools/llm_score.py's exact split MSE(log|M|^2) = bias^2 + scal
 misplaced level; floor = var(true)(1 - rho^2): what the best affine map of the prediction leaves, a wrong shape; scale
 = the rest, what the best rescale removes): per arm and per family of his figure the median share of each part and
 how many processes have each part as their largest; the processes that carry the pooled new-set gap listed with their
-parts and the LLM's whole MSE; how many processes have bias^2 alone above the LLM's whole MSE; the pooled share of each part, sum over processes of
-the part over sum of the MSE (what the pooled RMSE is made of), with and without the gg -> t b W pair (gg_tbxwm,
-gg_btxwp: the two processes that carry the pooled new-set gap).
+parts and the LLM's; how many processes have bias^2 above the LLM's own bias^2 (his level^2) and MSE - bias^2 below
+his own shape^2; the pooled share of each part, sum over processes of the part over sum of the MSE (what the pooled
+RMSE is made of), with and without the gg -> t b W pair (gg_tbxwm, gg_btxwp: the two processes that carry the pooled
+new-set gap), and the LLM's own pooled bias^2 share sum(level^2)/sum(rmse^2).
 Ours: data/split/<tag>_heldout.json (job_llm_score.sh ONLY=heldout, tools/llm_score.py @ae5427d12). LLM:
-talks/progress_oct2026b/data/draft_pid_by_process.json (his per-process MSE, read off his figure).
+his own per-process level and shape, pID embedding only, seeds 0-2 (suprio.py): compared at the median over the seeds,
+with the count against each seed beside it; his split (suprio.split()).
     python analysis/llm_compare/error_split.py --tag a_trial5 b_h16 c_control c_best
 Output: data/split/error_split.json, and its JSON on the last line.
 """
 import argparse, json, os
 
 import numpy as np
+
+import suprio
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -34,7 +38,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--tag", nargs="+", required=True)
     a = ap.parse_args()
-    draft = json.load(open(os.path.join(ROOT, "talks", "progress_oct2026b", "data", "draft_pid_by_process.json")))
+    split = suprio.split()
+    L = {k: suprio.llm(k) for k in ("mse", "bias", "bias2", "shape")}
+    Lm = {k: {n: float(np.median(v)) for n, v in d.items()} for k, d in L.items()}
+
+    def per_seed(f, ns):   # count of f(process, LLM value of seed s) over ns, for each seed
+        return [int(sum(f(n, s) for n in ns)) for s in range(len(suprio.SEEDS))]
     meta = {"dc_" + p["folder"]: p for p in
             json.load(open(os.path.join(ROOT, "analysis", "catalog_daniel", "classes_default.json")))["processes"]}
     out = {}
@@ -45,7 +54,7 @@ def main():
             assert abs(s - p["mse_logm2"]) <= 1e-6 * p["mse_logm2"] + 1e-12, (t, n, s, p["mse_logm2"])
         out[t] = {}
         for sp in ("interp", "extrap"):
-            names = list(draft[sp])
+            names = split[sp]
             fams = {}
             for n in names:
                 fams.setdefault(meta[n]["test_group"], []).append(n)
@@ -55,18 +64,28 @@ def main():
                 largest = [max(PARTS, key=lambda k: parts(procs[n])[k]) for n in ns]
                 rows[g] = {"n": len(ns), "median_share": {k: float(np.median(v)) for k, v in sh.items()},
                            "largest_count": {k: largest.count(k) for k in PARTS},
-                           "bias2_above_llm_mse": sum(parts(procs[n])["bias2"] > draft[sp][n][1] for n in ns),
+                           "bias2_above_llm_bias2": sum(parts(procs[n])["bias2"] > Lm["bias2"][n] for n in ns),
+                           "bias2_above_llm_bias2_per_seed": per_seed(
+                               lambda n, s: parts(procs[n])["bias2"] > L["bias2"][n][s], ns),
                            # D567: the error with the arm's own level removed, MSE - bias^2 = scale + floor
                            "shape_median": float(np.median([procs[n]["mse_logm2"] - parts(procs[n])["bias2"]
                                                             for n in ns])),
-                           "shape_below_llm_mse": sum(procs[n]["mse_logm2"] - parts(procs[n])["bias2"]
-                                                      < draft[sp][n][1] for n in ns),
-                           "llm_mse_median": float(np.median([draft[sp][n][1] for n in ns])),
+                           "shape_below_llm_shape": sum(procs[n]["mse_logm2"] - parts(procs[n])["bias2"]
+                                                        < Lm["shape"][n] for n in ns),
+                           "shape_below_llm_shape_per_seed": per_seed(
+                               lambda n, s: procs[n]["mse_logm2"] - parts(procs[n])["bias2"] < L["shape"][n][s], ns),
+                           "llm_mse_median": float(np.median([Lm["mse"][n] for n in ns])),
+                           "llm_bias2_median": float(np.median([Lm["bias2"][n] for n in ns])),
+                           "llm_shape_median": float(np.median([Lm["shape"][n] for n in ns])),
+                           "llm_pooled_bias2_share_per_seed": [
+                               float(sum(L["bias2"][n][s] for n in ns) / sum(L["mse"][n][s] for n in ns))
+                               for s in range(len(suprio.SEEDS))],
                            "pooled_share": pooled(procs, ns),
                            "pooled_share_no_ggtbw": pooled(procs, [n for n in ns if n not in GGTBW])}
             worst = sorted(names, key=lambda n: -procs[n]["mse_logm2"])[:6]
             out[t][sp] = {"families": rows, "worst": [
-                {"process": meta[n]["process"], "mse": procs[n]["mse_logm2"], "llm_mse": draft[sp][n][1],
+                {"process": meta[n]["process"], "mse": procs[n]["mse_logm2"], "llm_mse": Lm["mse"][n],
+                 "llm_bias": float(np.median(L["bias"][n])), "llm_shape": Lm["shape"][n],
                  "bias": procs[n]["bias_logm2"], **{k: parts(procs[n])[k] for k in PARTS}, "rho": procs[n]["rho"],
                  "true_std": procs[n]["true_std_logm2"]} for n in worst]}
     p = os.path.join(HERE, "data", "split", "error_split.json")
@@ -75,16 +94,21 @@ def main():
         for sp, r in o.items():
             al = r["families"]["all"]
             print(t, sp, "median share", {k: round(v, 2) for k, v in al["median_share"].items()}, "largest",
-                  al["largest_count"], "bias2>LLM", al["bias2_above_llm_mse"])
-            print("   MSE-bias2 median %.4g (LLM whole MSE median %.4g), below the LLM's MSE on %d of %d"
-                  % (al["shape_median"], al["llm_mse_median"], al["shape_below_llm_mse"], al["n"]))
+                  al["largest_count"], "bias2 > LLM's bias2", al["bias2_above_llm_bias2"],
+                  al["bias2_above_llm_bias2_per_seed"])
+            print("   MSE-bias2 median %.4g (LLM shape^2 median %.4g), below the LLM's shape^2 on %d of %d %s"
+                  % (al["shape_median"], al["llm_shape_median"], al["shape_below_llm_shape"], al["n"],
+                     al["shape_below_llm_shape_per_seed"]))
+            print("   LLM bias2 median %.4g, LLM pooled bias2 share per seed %s" % (
+                al["llm_bias2_median"], [round(v, 3) for v in al["llm_pooled_bias2_share_per_seed"]]))
             print("   pooled share", {k: round(v, 3) for k, v in al["pooled_share"].items()}, "without gg->tbW",
                   {k: round(v, 3) for k, v in al["pooled_share_no_ggtbw"].items()})
             if sp == "extrap":
                 for g, f in r["families"].items():
                     print(f"   {g[:34]:34s}", {k: round(v, 2) for k, v in f["median_share"].items()}, f["largest_count"],
-                          "MSE-bias2 %.3g vs LLM %.3g, below %d/%d" % (f["shape_median"], f["llm_mse_median"],
-                                                                     f["shape_below_llm_mse"], f["n"]))
+                          "MSE-bias2 %.3g vs LLM shape^2 %.3g, below %d/%d; bias2 above LLM's %d" % (
+                              f["shape_median"], f["llm_shape_median"], f["shape_below_llm_shape"], f["n"],
+                              f["bias2_above_llm_bias2"]))
                 for w in r["worst"]:
                     print("   ", w["process"], {k: round(v, 3) for k, v in w.items() if k != "process"})
     print(json.dumps(out))
