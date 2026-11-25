@@ -23,8 +23,8 @@ awk -F'\t' '{s+=$1;n++} END {printf "CATFT listed %d model files, %.2f GiB\n", n
 cut -f2 "$M" | tr '\n' '\0' | xargs -0 -r rm -f --
 echo "DF catft $(df -B1M "$SCRATCH" | tail -1)"
 # in use: the recipes of the last 14 days' run and sweep configs, plus every recipe the not-done plan entries name
-# (analysis/storage/open_recipes_2026-11-25.txt, from plan show of each entry, held ones included)
-python analysis/storage/cache_readers.py --days 14 --in-use-file analysis/storage/open_recipes_2026-11-25.txt > "$O/cache_readers.txt"; cat "$O/cache_readers.txt"
+# (their full plan/plan.yaml records, held ones included, read here at run time)
+python analysis/storage/cache_readers.py --days 14 --plan plan/plan.yaml > "$O/cache_readers.txt"; cat "$O/cache_readers.txt"
 INUSE="$(grep '^INUSE' "$O/cache_readers.txt" | cut -f2)"
 set -f                     # the in-use globs go to cache_census as written
 python analysis/storage/cache_census.py --in-use $INUSE --days 14 --workers 4 > "$O/census_d556.tsv" 2> "$O/census_d556.err"

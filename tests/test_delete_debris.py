@@ -58,10 +58,6 @@ def test_class_over_twice_expected_is_skipped():
         assert not os.path.exists(os.path.join(s, "zeroshot_old1"))
 
 
-if __name__ == "__main__":
-    test_deletes_only_debris(); test_class_over_twice_expected_is_skipped(); print("ok")
-
-
 def test_smoke_models_old_unnamed_only():
     with tempfile.TemporaryDirectory() as t:
         s, p, b = _tree(t)
@@ -83,3 +79,7 @@ def test_smoke_models_old_unnamed_only():
         assert os.path.exists(os.path.join(o, "config.yaml")) and os.path.exists(os.path.join(o, "out_0.log"))
         for n in (z + "new_2", "zz_smoke_sweep_config_llmcmp_a_adamw_const_64771325"):   # recent; named in the repo
             assert os.path.exists(os.path.join(runs, n, "models/model_run0.pt")), n
+
+
+if __name__ == "__main__":
+    test_deletes_only_debris(); test_class_over_twice_expected_is_skipped(); test_smoke_models_old_unnamed_only(); print("ok")
