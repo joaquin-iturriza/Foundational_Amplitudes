@@ -44455,6 +44455,33 @@ entries:
     sources: 0.45 <- content-only level network on the 43 new, results.tex par. More data-free normalizations l.7919 (D83);
       0.30 <- the shared target's flat-in-log s_hat level shift on Daniel's catalog, same paragraph; 0.087 <- diagram-descriptor
       ensembles' median, par. How robust is the diagram-descriptor level l.8510
+    fix_at: '2026-11-25T16:27:48+00:00'
+    fix: '(1) Not a repeat (prior incomplete and partly wrong): the prior says the diagram propagator product was never read
+      on new-family levels and that no per-event regressor of log|M|^2 from process + diagram descriptors + event invariants
+      exists. Both exist on catalog_daniel: norm_surrogate.py ''prop'' (= candidate A''s log P, same formula, 2000 events
+      per pool; results.tex par. ''Few-shot calibration, and surrogates computed from momenta alone'' l.8013-8045: within-process
+      correlation 0.83 on the 43 new, as a level predictor no surrogate mean beats the statistics predictor) and norm_surrogate_more.py
+      (data/surrogate_more.json: ''factor|prop'' as a per-event target factor with fitted beta 0.57 / 0.66 per multiplicity,
+      within-process std ratio 0.61 on the new; ''net|sur'' level network with the surrogate statistics 0.20 on the new against
+      0.058 without). Candidate B is norm_explore6.py''s arm B (3x128 MLP on stats_net features + diagram descriptors + log
+      s_hat, pair invariants, Lmin, Lnn, E, trained on the 1352 pools'' events; data/norm_explore6.json own_new 1.84, shape_new
+      0.50; results.tex calls it ''too weak to test with''). Fix: cite these in prior with their numbers, say what A and B
+      do differently (A: coefficient 1 on log P where the fitted beta was 0.57-0.66 - justify or fit it; B: HGB on 2000 events
+      vs the MLP on 400, plus log P) and why that difference can change the answer; first read what the existing surrogate.json
+      / surrogate_more.json already give for (ii) the flat-log s_hat shift and (i) the level, so the new job only computes
+      what is missing. (2) Outcome thresholds: the GPU gate ''e_p at or below 0.45'' is the content-only level network, i.e.
+      no diagram gain; D566 covers ''keeps the level gain on new families'', and the gain is the diagram regressor''s 0.087
+      (ensemble median, spread 0.016-0.19, l.8510). Gate the GPU arm on keeping that gain (e.g. at or below the regressor''s
+      0.19 upper ensemble value, sourced) or say why a candidate at 0.45 is worth a GPU arm against our LLoCa''s own new-family
+      level. The shift bar 0.30 is the training processes'' median from norm_moments2 on full pools; compare against the shared
+      target''s shift on the same 43 computed by this job (for any per-process constant, the shared target and the regressor,
+      it is the same number), and state the shift''s sampling noise at 2000 events (e.g. bootstrap over events) so ''at or
+      below'' is read against it. (3) Job sizing: state the CPU job''s wall-time target and --timeout (HGB on about 2.7M events
+      with 5-fold cross-fit, the MLP 3 seeds x 5 folds), from a timed run of the same scripts (norm_explore3/6 timings), and
+      the memory it needs. Checks passed: matched controls scored by the same code on the same events; the measures move (e_p
+      47 vs 0.045 shared vs diagram regressor, l.7919; flat-log shift 0.30 -> 0.10 with the s_hat factor on catalog_v3, l.7067);
+      no label in the inputs (stats_net features are process-only; event inputs are momenta-only); no GPU, so loss/preprocessing/HPO/disk
+      checks do not apply.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
