@@ -40813,6 +40813,11 @@ entries:
       (both arms), look at it, check_caption, hand back reads (i)-(iii) per candidate with the figure and the answer to ''why
       a boosted tree?'' (no reason beyond CPU; a tree is piecewise constant and cannot extrapolate; per-process trees 0.32
       vs network 0.045, l.7814/l.8510). (C), g fed to LLoCa per event, only if (B) passes, its own design.'
+    18: 'D567 follow-up: on gg -> t t~ h both our-setup arms split the events into two groups ~3 units of log|M|^2 below and
+      above the true peak (MSE-bias^2 5.7/5.9 vs his setup 0.17-0.23; figs/shape_dists.png). Check on existing models whether
+      the two groups follow the emission-scale target''s per-event factor: re-read our searched run (REREAD FA-ccin2p3-29ce8950,
+      lxplus copy) with llm_score.py --events-out @63ffc44ab (adds log F per event), then per event pred - true against log
+      F on gg->ttH and the other gg->ttX processes.'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -41027,6 +41032,12 @@ entries:
         noise: design (C)'
       - 'fail on (i): equal-size search for both models cross-fitted on training processes, its own design'
       - 'fail on (ii) only: report, places levels but follows the sample no better than a constant'
+    18:
+      feeds: 'D567/D564: what sets our setup''s shape failure on gg->ttX'
+      if:
+      - 'the groups follow log F (pred - true correlates with the factor): the factor misplaces events on this family; report
+        with figure, a target-side fix is its own design'
+      - 'they do not: report the split as unexplained, with what was ruled out'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
