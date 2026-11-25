@@ -45625,6 +45625,12 @@ entries:
       an htc outage, collect_run.py''s 60 s cap on a large prediction set, the supervisor''s first pass on the new code (after
       00:45 CET). Also fixed: 4404e1baa had put sec:cc_login_jobs inside fig:llmcmp_heldout''s caption (bfa12ab9a); results.tex
       still has 64 pre-existing LaTeX errors elsewhere (first at l.9125) and figures not found from docs/.'
+  - at: '2026-11-25T00:22:18+00:00'
+    text: '2026-11-25 01:20: site env job 64806476 read: ran on compute node ccwslurm0097, COMPLETED 0:0 in 14:50 (00:37:49-00:52:39),
+      result ''env ready: FA @ ccin2p3'', checkout 6ca993c1a9 (trunk, no fetch note), python 3.11.7, torch 2.1.2+cu118, numpy
+      1.26.4 after (analysis/cc_login/data/site_env_job_64806476.txt): the design''s yes branch, the change stays. Write-up
+      sentence added to sec:cc_login_jobs (verify_claims 0 problems), its commit refused while the repo-reviewer backlog is
+      overdue (1004/520 lines from other entries; reviewer aa6a431c30051e7ba holds the lock since 01:21).'
   step_waits:
     '2': '2026-11-25 00:10 UTC: CC CPU job 64806476 (site env) and the repo-reviewer re-check'
   step_why:
