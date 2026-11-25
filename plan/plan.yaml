@@ -41423,6 +41423,13 @@ entries:
       FA-lxplus-e4c9641a (condor 13232084, code @58804b477, 11 CPUs as before, --hp training.save_last=false, otherwise the
       same command): end disk peak ~17.7 GB against EOS ~28.8 GB free. FA-lxplus-25e06bc1 removed. It still starts only when
       one of the ~11 matching 80 GB lxplus slots drains.'
+  - at: '2026-11-25T08:55:18+00:00'
+    text: '2026-11-25 (E9088): 120 heads FA-lxplus-e4c9641a sat 5.9 h idle on lxplus (condor 13232084: 0 slots willing, 14
+      refuse by group filter, 11 match only if drained); removed. Moved to CC gpu_h100 by site pick (CC pick after one probe
+      timeout, retried; lxplus 0 of 248 fit): FA-ccin2p3-f0b997a2 (slurm 64817455, code @4b47e8dca8, same command with 4 CPUs,
+      --gpu-min-mem=80G, --time 167:00:00, --hp training.save_last=false). Disk: CC 29 GB free at submission; peaks do not
+      coincide: now ~9.8 GB (its best checkpoint) + the CC widths'' remaining ~6.7 GB, its 17.7 GB end transient ~5 days in,
+      after the 64-head run ends (~2 days); 17.7 + 10 = 27.7 < 29 GB.'
   step_waits:
     '5': part (c) driver llmcmp_c_qperp_drive5 ending (its detach DONE event; wave 3 of 2 trials after trials 3 -5.816 and
       5 -5.938 of wave 2)
