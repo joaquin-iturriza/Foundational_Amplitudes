@@ -45434,6 +45434,15 @@ entries:
       (Fn 0.24) at 128, validation flat from ~50 epochs (Muon) or rising after 30-60 (Fn, best at 16% of the run, last 1.41x
       above). Sfx at 2048 stalls without memorising (train/val 0.48). So the 6.5x is generalisation on repeated data, not
       the critical batch.'
+  - at: '2026-11-25T12:46:50+00:00'
+    text: '2026-11-25 D560 part B: arm v4_het_update_noise fixed to the scan''s batch-16384 best trial_1333 (lr 8.246561e-3,
+      muon_weight_decay 0.01451547, reg 8.398127e-7, warmup_frac 0.089705, eta_min 1.127397e-8, ema 0.968325, validation every
+      85, frac 0; read from CC runs/cbs_b16384/trial_1333/config.yaml against the control''s), brute_at [50,700,1690,2700]
+      at its crossings 765/1700/2720 (cff742c7c). Design re-recorded 12:38, PASS by a4f3d7192edf30268; repo-reviewer aeda1b763b27811e8
+      PASS through cff742c7c (10/10 tests); merged 5109b8182, CC synced d2d9efc9b. Smokes (D395) on CC: FA-ccin2p3-b587c065
+      (pretraining arm) and FA-ccin2p3-0ac97e10 (Z+4g), 0.3 h target each. The pretraining smoke''s per-read dL spread decides
+      200-step windows at update_every 50, or pooling to 400 / reading every 25, before the full runs (upd_noise_pretrain
+      1.5 h, upd_noise_zng_adam 0.3 h).'
   handoff:
     state: 'D560 step (next 2). Part A done and written up: par:cbs_regimes + fig:cbs_regimes in docs/results.tex (adf0da30a),
       reader analysis/critical_batch/ft_bcrit.py @2a98dcca3 (data/ft_bcrit.json, figs/ft_regimes.png; check_caption OK, caption
