@@ -43606,8 +43606,15 @@ entries:
     - benchmarks of the lab LLMs (deepseek-v4-flash
     - qwen3.8-27b) on our subagent work
     - designer-executor setups
+  - said_at: '2026-11-25T00:01:10.258000+00:00'
+    text: 2. then only read it when need it, why reread it?
+    decision: D555
+    answers_after: '2026-11-24T19:10:42+00:00'
+    covers:
+    - lab_llm_trial
   decisions:
   - D530
+  - D555
   next:
     3: 'plan done lab_llm_trial --writeup a3bcab715 (write-up par:labllm1, par:labllm2 committed a3bcab715 and ac845711e,
       figures committed, worktree folded) once the notes-editor backlog passes (its blocks are in other entries'' sections:
