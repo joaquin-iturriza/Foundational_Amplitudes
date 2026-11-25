@@ -45041,9 +45041,6 @@ entries:
     2: 'After Joaquin''s yes on the costly-results list: one CPU deletion job (manifest first) of exactly the groups he approves
       (zz_catft, zz_catft_lowloss2, zz_catft_lowloss3 model files; runs/zz_smoke* model files older than 3 days), design passed
       by the design reviewer first'
-    3: 'Lossless and already-decided frees: gzip the lhe_queue Q/gc/ deletion manifests in place (nothing but tests reads
-      them; est. ~6 GiB, ratio not measured), D208''s lhe_parts gc --parts on each fully assembled queue, D136''s 18 MadGraph
-      events dirs (0.94 GB) via free_space.py delete --kind events; one CPU job under a design the design reviewer passes'
     4: 'D556 cache question: from SCRATCH/zz_cc_disk/cache_readers.txt and census_d556.tsv, delete the training-cache entries
       nothing reads (delete_from_manifest.py --apply, D147) and any memmap key no running job or open entry''s recipe reads;
       report each cache with its size, reader and what went'
@@ -45481,7 +45478,6 @@ entries:
       GB there is already gone (who removed it not checked). Total df used 512973 -> 504631 MiB = 8.1 GiB freed; free 19.7
       GiB.'
   step_waits:
-    '3': FA-ccin2p3-9cf1ce5d
     '2': the repo-reviewer of the code backlog (blocks the commit of cache_readers.py --plan), then a new design review of
       job_ccdisk_d556.sh
     '4': 'job_ccdisk_d556.sh''s read (not yet submitted: design review pending)'
@@ -45540,11 +45536,6 @@ entries:
       if:
       - 'yes: design, review, submit the deletion, report GiB freed and df'
       - 'no or partial: delete only what he approved; record the rest as kept'
-    3:
-      feeds: how much CC space frees without deleting results
-      if:
-      - 'done: report GiB freed per class and df'
-      - 'a class fails or a reader of the manifests turns up: keep it, fix, report'
     4:
       feeds: which CC caches are needed (D556)
       if:
