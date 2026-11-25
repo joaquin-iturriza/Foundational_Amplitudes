@@ -45014,6 +45014,9 @@ entries:
     2: 'After Joaquin''s yes on the costly-results list: one CPU deletion job (manifest first) of exactly the groups he approves
       (zz_catft, zz_catft_lowloss2, zz_catft_lowloss3 model files; runs/zz_smoke* model files older than 3 days), design passed
       by the design reviewer first'
+    3: 'Lossless and already-decided frees: gzip the lhe_queue Q/gc/ deletion manifests in place (nothing but tests reads
+      them; est. ~6 GiB, ratio not measured), D208''s lhe_parts gc --parts on each fully assembled queue, D136''s 18 MadGraph
+      events dirs (0.94 GB) via free_space.py delete --kind events; one CPU job under a design the design reviewer passes'
   done_when: null
   notes_ref: null
   match: cc_disk_*,zz_probe_*
@@ -45307,6 +45310,11 @@ entries:
       if:
       - 'yes: design, review, submit the deletion, report GiB freed and df'
       - 'no or partial: delete only what he approved; record the rest as kept'
+    3:
+      feeds: how much CC space frees without deleting results
+      if:
+      - 'done: report GiB freed per class and df'
+      - 'a class fails or a reader of the manifests turns up: keep it, fix, report'
 - id: cc_login_jobs
   title: 'CC login node: recurring and long scripts moved to Slurm (CC support''s email)'
   question: 'Can every non-interactive script we run on CC''s login node (the supervisor''s maintain commands: disk_watch,
