@@ -45010,8 +45010,15 @@ entries:
     decision: D542
     covers:
     - cc_disk
+  - said_at: '2026-11-25T01:01:32.066000+00:00'
+    text: Yes, you also mentioned there were a bunch of caches that were relatively big, are they all needed?
+    decision: D556
+    answers_after: '2026-11-25T00:40:23+00:00'
+    covers:
+    - cc_disk
   decisions:
   - D542
+  - D556
   next:
     2: 'After Joaquin''s yes on the costly-results list: one CPU deletion job (manifest first) of exactly the groups he approves
       (zz_catft, zz_catft_lowloss2, zz_catft_lowloss3 model files; runs/zz_smoke* model files older than 3 days), design passed
@@ -45077,8 +45084,10 @@ entries:
       his call. Joaquin''s messages flagged: 2026-11-14T04:31 (a pasted LaTeX template), 2026-11-10T02:08 (draft and slide
       uploads), 2026-10-06T00:17 (transfer study''s plan to finish, compute approvals): none is about CC storage.'
     blocks: step 2 only (deleting the superseded fine-tune models); step 3 keeps moving
-    blocks_steps: &id002
+    blocks_steps:
     - 2
+    answered_at: '2026-11-25T01:01:32.066000+00:00'
+    decision: D556
   owner:
     agent: af74e499d5513dfe4
     state: working
@@ -45359,40 +45368,6 @@ entries:
     units: null
     start: '2026-11-25T00:49:35+00:00'
     at: '2026-11-25T00:49:35+00:00'
-  ask: 'Scope: deleting costly results on CC goes beyond D550, and D133 makes which studies count as concluded your call.
-    What I call costly results is everything that took GPU time or that analyses read: model files, fine-tune runs, prediction
-    files, and the only copy of a run. Our own leftovers from D550 are gone: 5.85 GiB, so CC now has 12.8 GiB free of 512
-    (was 6.9). The loose job .out files were kept, because committed analyses parse them for results.tex numbers. Below is
-    each costly group with its size, what reads it, what it costs to remake and my call. Yes or no on my list? (1) Model files
-    of finished runs under D149/D133, 100.4 GB in total. D133 lets the pruning tool take only models of concluded studies
-    trained under 5 h. The tool finds 0 GB today, because its study list dates from 2026-10-23 and marks everything newer
-    as open. The new families are runs/catalog* 12.9 GB (v3/v4 pretraining parents, 9 of them over 5 h), dsave* 9.1, muon*
-    8.0, kit* 5.0, data* 2.9 and ftmech* 2.1; they are studies still open, under 1.2 h per run. The concluded families hold
-    18.6 GB, all held by D133 (runs over 5 h, models an analysis loads, or no measured training time). My call: KEEP. (2)
-    zz_catft*, the muon_test catalog fine-tunes: 27.15 GiB of model files. Their validation curves are already collected in
-    the committed catft_curves.json. No analysis loads the models. Each batch cost about 3 GPU-h (estimate). My call: DELETE
-    the models of the three superseded sets, 15.1 GiB in all: zz_catft 10.0 GiB (the runs from before the EMA-start fix, whose
-    early curves were wrong, rerun as emafix); zz_catft_lowloss2 1.7 GiB (a batch that failed every cell); zz_catft_lowloss3
-    3.4 GiB (the low-loss probes you rejected). KEEP zz_catft_sep (3.4 GiB, the runs of the draft''s Fig. 15), zz_catft_emafix
-    and zz_catft_refit_emafix (4.4 GiB each, the current median-probe runs). Results files and logs of all seven stay. (3)
-    zz_v4_short/long zero-shot prediction files: 27.7 GiB in 235 dirs. Committed catalog_v4 analyses (ee_gain, error_correlates,
-    het_uncertainty, het_oneloop, length_h2p5, prop_width_check, dan_per_process) read them on CC for results.tex numbers,
-    and dan_zeroshot_v4 is still open. They exist nowhere else. Remaking them means rereading every parent zero-shot, about
-    50 GPU-h (my estimate, not measured). My call: KEEP. (4) lhe_queue, 6.8 GiB: about 6.6 GiB of it is the generation queues''
-    deletion manifests (JSON records nothing reads). I will gzip them in place, which loses nothing. The part files (lhe_parts,
-    1.47 GiB) are freed by D208''s gc --parts once a queue is assembled. Neither needs your yes. (5) runs_from_lxplus, 24.9
-    GB: the sweeps copied from lxplus. lxplus keeps only the sweep state (I checked one sweep, tp_scr_ee_nnbar_d2), so CC
-    holds the only copy of the trials. The pruning tool already strips the models of every sweep''s non-best trials (D19).
-    My call: KEEP (D122 holds storage). My yes deletes 15.1 GiB. Under D550 and the earlier decisions I also free, without
-    asking, the old smoke runs'' models in runs/zz_smoke (up to 7.5 GB; the last 3 days kept) and the MadGraph event dirs
-    (0.94 GB, D136), along with item (4).'
-  waiting_since: '2026-11-25T00:40:23+00:00'
-  searched: 'site decisions --project FA: D542, D550 (done: 5.85 GiB freed), D149+D133 (model files only of concluded studies,
-    never runs over ~5 h), D19 (prune_site.sh, prune_copies on runs_from_lxplus), D136 (events dirs), D208 (lhe_parts after
-    assembly), D122 (storage hold), D147; analysis/storage/trim_plan.tsv (study map of 2026-10-23); plan show draft_rewrite,
-    dan_zeroshot_v4; git grep of committed readers. None says which of these groups to delete: D133 makes ''concluded'' his
-    call. Joaquin''s messages flagged: 2026-11-14T04:31 (a pasted LaTeX template), 2026-11-10T02:08 (draft and slide uploads),
-    2026-10-06T00:17 (transfer study''s plan to finish, compute approvals): none is about CC storage.'
   handoff:
     state: 'Inventory done (FA-ccin2p3-b949c4ee, outputs CC SCRATCH/zz_cc_disk/*.tsv; apparent size matches df within 0.8%).
       /sps/lpnhe 503-505 GiB of 512 used, 7 GB free at 00:50 2026-11-25. Top (apparent GiB): runs 87.7, datasets 55.0, SCRATCH
@@ -45434,8 +45409,6 @@ entries:
       if:
       - 'done: report GiB freed per class and df'
       - 'a class fails or a reader of the manifests turns up: keep it, fix, report'
-  blocks: step 2 only (deleting the superseded fine-tune models); step 3 keeps moving
-  blocks_steps: *id002
 - id: cc_login_jobs
   title: 'CC login node: recurring and long scripts moved to Slurm (CC support''s email)'
   question: 'Can every non-interactive script we run on CC''s login node (the supervisor''s maintain commands: disk_watch,
