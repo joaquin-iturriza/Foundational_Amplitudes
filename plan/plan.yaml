@@ -40731,6 +40731,12 @@ entries:
       stage + plots; set floors (none if peak < 30 GB) and per-width --time by the design''s rule (no-floor width: max(3.9
       x H100 s/step, 1.06 x FLOPs ratio) x 60,840 x 1.3, cap 7 d); GPU-h of the 4 full runs; disk by df (CC 16 GB free); delete
       the zz_smoke dirs (our debris) after reading.'
+    11: 'Part (b) readout, 16 heads (FA-ccin2p3-dcb66b14; D553 "show the results as they come"): when it ends, save its "Val
+      loss (combined)" lines to analysis/llm_compare/data/b_val_h16.txt (runs/llmcmp_b_width/trial_0016/out_0.log), score
+      it REREAD=FA-ccin2p3-dcb66b14 with scripts/job_llm_score.sh on its site, copy llm_score_{seen,heldout}.json to data/b_h16_{seen,heldout}.json;
+      figures: b_width_curves.py (validation MSE of z per width beside trial 5) and heldout_per_process.py --tag a_trial5
+      <widths done> (Suprio layout); pooled RMSE seen/held out/relabels/new and median per-process MSE via control_score.py
+      against trial 5 (0.117 / 1.003 / 0.241 / 1.767) with the 1.38 margin; hand back to Joaquin'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -40902,6 +40908,14 @@ entries:
         waits'
       - 'a width OOMs at 80 GB with checkpoint_blocks: write the mixed micro-batch accumulation (equivalence test, repo review)
         and re-smoke that width'
+    11:
+      feeds: 'D522/D537 part (b): whether muP width toward the LLM''s 359.6M parameters closes the held-out gap at part (a)''s
+        best HPs'
+      if:
+      - 'held-out MSE below trial 5''s by more than 1.38x: width helps at 16 heads, read beside the other widths'
+      - 'within 1.38x of trial 5: no resolvable width gain at 16 heads (one seed); a seed-43 pair is Joaquin''s call'
+      - 'above trial 5 by more than 1.38x or curves not falling: read curves first; muP transfer or training failure, an HPO
+        there is Joaquin''s call'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
