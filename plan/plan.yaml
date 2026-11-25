@@ -44128,6 +44128,16 @@ entries:
       GPU-h from the smoke rates goes to Joaquin before submission if above 100 (D536).'
     sources: 1.38x <- the seed spread 10^0.14 measured on catalog_v4 (docs/results.tex v4_seed_spread ~l.4485); 100 GPU-h
       <- D536
+    passed_at: '2026-11-25T14:30:19+00:00'
+    reviewer: 'Third review. Only num_heads moves (checkpoint_blocks and save_last are compute only; key-by-key diff against
+      trial_1860''s config.yaml before the runs); run dirs trial_0016/_0032/_0064/_0120. Check 2: part (b) 16 heads against
+      8 heads gave relabel MSE 0.64x and seen 0.78x (b_h16_vs_a5_score_summary.json); par:v4_width 0.66/0.53. Control hp1860:
+      0.053/1.178/0.068/2.116 (c_best_vs_a5_score_summary.json; the score reproduces the run''s test stage, 0.053293 against
+      0.053296). Check 3: margin 1.38 = 10^0.14 (results.tex l.4485), one seed as in part (b) and hp1860. Disk: CC 24 GB free;
+      part (b)''s remaining 2.5 + 17.7 GB leave 3.8; 16 and 32 heads add 0.9 GB kept (1.5 GB at their ends, ~1 day in, when
+      about 10 GB is free); 64 and 120 heads wait for part (b)''s 120-head run or freed space, put to Joaquin with the ~210
+      GPU-h ask. Risk to watch: when part (b)''s 120-head run ends, about 2.9 GB stays free on CC. Searched: width, num_heads,
+      widen, Muon width, 359.6, llmcmp_c, v4_width, seed_spread in results.tex, the plan and the FA decisions.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
