@@ -48703,8 +48703,13 @@ entries:
       fine-tune results points; 2026-10-23T20:25 catalog questions; 2026-10-22T00:15 preprocessing design; 2026-10-06T00:17
       transfer study plan; 2026-11-17T01:19 draft corrections; 2026-10-31T03:31 an old figure; 2026-11-11T15:19 a restart;
       2026-11-13T00:03 fine-tuning figures (read in full); 2026-11-13T06:45 draft section 2 resampling'
-    blocks_steps: &id004
+    blocks_steps:
     - 3
+    answered_at: '2026-11-25T20:23:02+00:00'
+    decision: D561
+    withdrawn_at: '2026-11-25T20:23:02+00:00'
+    withdrawn_why: 'D561, Joaquin''s words ''not use it where it hurts, and only where it helps'', settles it: the rescale
+      goes into the D392 setup only below every trained momentum (coordinator, 2026-11-25)'
   owner:
     agent: acfbcee1963f1ac62
     state: working
@@ -49275,23 +49280,3 @@ entries:
       if:
       - 'replace: set input_soft_x0 below the measured catalog minimum'
       - 'keep: close the entry with the write-up'
-  ask: 'Scope: replacing the full rescale in the D392 setup, which other entries'' parents and scaling runs start from. The
-    rescale applied only below x=0.009 (below every trained u u~ g and Z+4g momentum) keeps the soft-limit gain with no cost:
-    deepest soft kit bin 4924 -> 1.44 (1e4) and 7580 -> 0.93 (1e5) against no rescale, every other stratum and the bulk unchanged
-    (par:selres_support). Should it replace the full rescale in that setup (scripts/job_datasaving_parent.sh finale: ++model.input_soft_eps=1e-8
-    gets ++model.input_soft_x0=<x0>), x0 set below the softest x of that setup''s catalog pools, measured first as support_minima.json
-    was for u u~ g and Z+4g? Runs already trained keep the full rescale, so comparisons across the switch mix the two. The
-    full rescale reaches 0.11/0.20 in that bin but costs the bulk (D539, ~2x on Z+4g); the rule gives up that last decade
-    of soft gain for zero bulk cost.'
-  waiting_since: '2026-11-25T20:10:23+00:00'
-  searched: 'site decisions --project FA read (D392 incorporate what gives a gain, D539, D552, D561 only where it helps):
-    none names replacing the input map of a setup other entries train from; docs/results.tex par:selres_split, par:selres_stage2,
-    par:selres_support read. Joaquin''s messages flagged by plan ask, none about the rescale in the D392 setup: 2026-11-14T04:31
-    pasted LaTeX template; 2026-11-10T02:08 kit benchmark upload; 2026-11-16T20:00 writing-style skill; 2026-10-08T19:02 gluons
-    in the catalog; 2026-10-05T19:32 dropped scaling points; 2026-10-26T17:18 hook warnings; 2026-11-20T01:46 lookup-trial
-    dead ends and W offshellness; 2026-11-06T19:52 an earlier problem list; 2026-11-17T02:12 figure style; 2026-11-24T17:14
-    CC email; 2026-09-30T02:14 catalog split; 2026-10-26T22:54 draft plot; 2026-10-25T17:25 lr scaling rule; 2026-11-12T01:19
-    fine-tune results points; 2026-10-23T20:25 catalog questions; 2026-10-22T00:15 preprocessing design; 2026-10-06T00:17
-    transfer study plan; 2026-11-17T01:19 draft corrections; 2026-10-31T03:31 an old figure; 2026-11-11T15:19 a restart; 2026-11-13T00:03
-    fine-tuning figures (read in full); 2026-11-13T06:45 draft section 2 resampling'
-  blocks_steps: *id004
