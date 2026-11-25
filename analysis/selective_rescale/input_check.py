@@ -13,7 +13,7 @@ c = mean over final-state particles of -ln k, k = dln x'/dln x (0 when unchanged
 the measure calibrated on D539's eps ladder against its bulk cost r (Z+4g, 1e4). Soft lift: x' at the kit's deepest
 soft bin (x = 1e-7, 1e-6) and the trained range of x' (its 0.1% quantile).
 
-    python3 analysis/selective_rescale/input_check.py [--cached]   -> data/input_check.json, figs/input_check
+    python3 analysis/selective_rescale/input_check.py [--cached]   -> data/input_check.json (no figure)
 """
 import json
 import os
