@@ -48682,8 +48682,9 @@ entries:
       no soft singularity; only u d~ -> e nu g neutrinos lie below x=0.009 in the finale), set x0=0.009 with it in the finale
       FIX of scripts/job_datasaving_parent.sh, test that no finale or Z+4g training/val/test momentum changes, and re-score
       the u u~ g kit runs (eval-only, CPU) with the neutrino-exempt rule at x0=0.009 to show the soft gain is the one measured'
-  done_when: .venv-cpu/bin/python tests/test_parent_soft_x0.py && grep -q 'input_soft_x0=1e-5' scripts/job_datasaving_parent.sh
-    && grep -q 'label{par:selres_support}' docs/results.tex
+  done_when: .venv-cpu/bin/python tests/test_parent_soft_x0.py && .venv-cpu/bin/python -m pytest -q tests/test_input_reps.py
+    -k skip_neutrinos && grep -q 'input_soft_x0=0.009 ++model.input_soft_skip_neutrinos=true' scripts/job_datasaving_parent.sh
+    && grep -q 'label{par:selres_support}' docs/results.tex && python3 -c "import json,sys; sys.exit(json.load(open('analysis/selective_rescale/data/support_nu.json'))['outcome']!='SAME')"
   notes_ref: par:selres_support
   match: selres_*
   evidence:
