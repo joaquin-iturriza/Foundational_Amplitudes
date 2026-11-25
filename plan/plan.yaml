@@ -45387,6 +45387,7 @@ entries:
       per-probe npz of ~70 KB per dir. runs_from_lxplus 24.9 GB total. Output /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/ccdisk_read2.out.'
   step_waits:
     '3': FA-ccin2p3-9cf1ce5d
+    '2': the design reviewer on job_ccdisk_d556.sh (98656b350); on PASS submit
   targets:
   - batch: disk_inventory
     wall_h: 1.0
