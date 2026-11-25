@@ -34,10 +34,10 @@ for a in sys.argv[1:]:
     if log.startswith("recipe:"):   # every pool the recipe trains, validates and tests on, resolved as training resolves it
         import subprocess, yaml   # (train pools sit in the train cache, not DATA_DIR; mixture pools carry _smix)
         n = len(yaml.safe_load(open(log[7:]))["processes"])
-        out = subprocess.run([sys.executable, "tools/check_site_data.py", "--paths", log[7:]], capture_output=True, text=True).stdout
+        ps = subprocess.run([sys.executable, "tools/check_site_data.py", "--paths", log[7:]], capture_output=True, text=True).stdout
         pools = [(re.search(r"GeV_(train|val|test)", q).group(1), q) for q in
-                 (l[5:] for l in out.splitlines() if l.startswith("POOL ") and l.endswith(".npy"))]
-        assert len(pools) == 3 * n and all(os.path.exists(q) for _, q in pools), (n, [q for _, q in pools if not os.path.exists(q)], out[-2000:])
+                 (l[5:] for l in ps.splitlines() if l.startswith("POOL ") and l.endswith(".npy"))]
+        assert len(pools) == 3 * n and all(os.path.exists(q) for _, q in pools), (n, [q for _, q in pools if not os.path.exists(q)], ps[-2000:])
     else:
         pools = re.findall(r"\[(train|val|test)\] \S+: \d+ events.*? from (\S+\.npy)",
                            open(os.path.join(siteconf.PROJECT_DIR, "runs", log)).read())
