@@ -49221,7 +49221,8 @@ entries:
     start: '2026-11-25T15:32:21+00:00'
     at: '2026-11-25T15:32:21+00:00'
   step_waits:
-    '3': 'detached srmin_finale_read (CC CPU job 64868410: support_rule.py minima on the finale parent pools)'
+    '3': detached srmin_recipe (support_rule.py minima, finale pools from recipes/transfer_finale.yaml; reads ~25 min after
+      22:00)
   handoff:
     state: 'Step 3 done: par:selres_split (33726387b, fig analysis/selective_rescale/figs/uug_split.png): rescale below x=0.1''s
       u u~ g cost sits in the events it changes (softest x<0.1, 2304/100000 val events) 4.23x [3.50,5.10] / 8.56x [5.91,12.38]
