@@ -44841,10 +44841,11 @@ entries:
       every stage, noise_scale.json with dL_b64..dL_b1024), then site pick and submit the full run (job_cbs_update_zng.sh
       full, target upd_noise_zng_adam 0.3 h), then read B_dL over its stable phase against the Adam two-batch B_crit 87-261
       (band [87/2, 261x2])'
-    4: 'D563: repeat the Z+4g 1e4-event searches of ft_regimes at ~50 epochs with DyHPO retuning: Muon scratch, Adam scratch,
-      fine-tune from the parent without the two settings (Fn), batch 2048 and 128, each at the trial count of the 400-epoch
-      search it replaces (19/19/16 at 2048, 19/16/16 at 128); then the figure of the 50-epoch bests against the 400-epoch
-      searches'
+    4: 'D563: the six Z+4g 1e4-event searches at 50 epochs (Muon scratch, Adam scratch, Fn; batch 2048 and 128; 19/19/16 and
+      19/16/16 trials), design passed 15:0x by a4f3d7192edf30268, lr windows by HPO rule 2 at 9e28b161d (header nit 584ba9b77),
+      driven by sweep/drive.py (detached zng_ep50_searches, log ~/.local/share/ccorch/detached/20261125-150854_zng_ep50_searches.log),
+      target 1.5 h for 105 jobs; when it ends: extend ft_bcrit.py to read the 50-epoch searches (sweeps_local/*_ep50*/results),
+      per-cell bests, r50 vs r400, E50 vs E400, lr-edge flags, and the figure of 50-epoch against 400-epoch curves'
   done_when: null
   notes_ref: null
   match: zz_cbs_*,cbs_*
@@ -45756,17 +45757,13 @@ entries:
       - 'smoke ran every stage: submit the full Z+4g run'
       - 'smoke broke: read its log, fix, resmoke'
     4:
-      feeds: 'D563: whether the 400-epoch batch-128 gain of the Z+4g runs comes from training too long'
+      feeds: 'D563: is the batch-128 gain at 400 epochs a horizon effect'
       if:
-      - 'the 2048/128 ratio of best validation MSE falls within 1.22 at 50 epochs: the gain was the horizon; report it with
-        the figure'
-      - 'the ratio stays above 1.22: the gain persists at 50 epochs; report it with the figure and what part A''s critical
-        batch says'
+      - 'r50 <= 1.22 for an arm: the gain is the horizon for that arm'
+      - 'r50 > 1.22: the gain persists at 50 epochs'
   step_waits:
     '2': FA-ccin2p3-3e856594
     '3': FA-ccin2p3-cedaa6dd
-    '4': 'the next owner: re-derive the ep50 lr windows by HPO rule 2 (repo-review FIX 1), re-record the design and re-run
-      drive.py; the old sweeps_local/*ep50* states must be removed first (their candidates come from the old windows)'
   targets:
   - batch: noise_smoke
     wall_h: 0.4
