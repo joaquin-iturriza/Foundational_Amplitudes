@@ -43912,6 +43912,24 @@ entries:
       GPU-h from the smoke rates goes to Joaquin before submission if above 100 (D536).'
     sources: 1.38x <- the seed spread 10^0.14 measured on catalog_v4 (docs/results.tex v4_seed_spread ~l.4485); 100 GPU-h
       <- D536
+    fix_at: '2026-11-25T14:22:49+00:00'
+    fix: '(1) Run directories (checks 11/18 and the naming rule): step (3) launches all four widths with sweep/trial_job.sh
+      --detached --hp-idx 1860, and run_trial.py names the run dir runs/<sweep_name>/trial_{hp_idx:04d} (cold starts take
+      trial_1860_r1, _r2 ... on a shared filesystem, and every site gets its own trial_1860) and the result files hp1860_t60840_<time>.json:
+      the four widths become indistinguishable by name and the readout''s width->run mapping rests on run ids alone. Part
+      (b) used the width as the index (runs/llmcmp_b_width/trial_0016, trial_0032). Fix: --hp-idx 16/32/64/120 (the hp1860
+      HPs still passed by --hp), and say so in the fixed list. (2) Disk (check 14): the design defers the disk check to submission.
+      Read now: CC /sps/lpnhe has 24G free of 512G (96% used, df 2026-11-25). From part (b)''s 27.6 B/param, this batch needs
+      about 354M x 27.6 B = 9.8 GB at 120 heads plus ~2.5 GB at 64 heads (+ <1 GB for 16/32), and part (b)''s 64- and 120-head
+      runs, still pending, need about the same again: ~25 GB against 24 GB free, with no margin. Fix: state the disk per width
+      (an upper bound from part (b)''s bytes/param is enough before the smokes), read df on every site site pick may use (CC,
+      lxplus, Jean Zay), count part (b)''s pending runs that land on the same filesystem, and say where the 64- and 120-head
+      runs fit with margin. If none fits, the fix is space freed under the cc_disk decisions (D550/D556), or a site with room.
+      Everything else holds: one change (num_heads, plus checkpoint_blocks/save_last for compute only, and the diff against
+      trial_1860''s config.yaml before the runs); response shown (part (b) 16 heads: relabel MSE 0.192^2/0.241^2 = 0.64, seen
+      0.78, read from b_h16_vs_a5_score_summary.json; par:v4_width 0.66/0.53); control hp1860 scores confirmed (0.053/1.178/0.068/2.116,
+      c_best_vs_a5_score_summary.json); margin 1.38 = 10^0.14 (results.tex l.4485); 4 smokes at <=6 GPU-h justified by the
+      memory floors and the measured GPU-h that has to go to Joaquin (~210 > 100).'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
