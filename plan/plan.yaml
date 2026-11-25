@@ -44902,7 +44902,7 @@ entries:
     blocks_steps: &id003 []
   owner:
     agent: aa714c56df5dba4f3
-    state: working
+    state: closed
     since: '2026-11-25T12:35:48+00:00'
     state_at: '2026-11-25T13:46:55.526000+00:00'
     context: 248856
@@ -45882,40 +45882,47 @@ entries:
       own times). (3) open: ft_bcrit.py:31 applies the 7/8 stable cut (WSD cooldown) to the ReduceLROnPlateau Adam cells,
       which feeds par:cbs_regimes (~l.9223-9235).'
   handoff:
-    state: 'D560 step (next 2). Part A done and written up: par:cbs_regimes + fig:cbs_regimes in docs/results.tex (adf0da30a),
-      reader analysis/critical_batch/ft_bcrit.py @2a98dcca3 (data/ft_bcrit.json, figs/ft_regimes.png; check_caption OK, caption
-      in the finding of 2026-11-25). The scan (fresh data: targets at 0.22-3.2 epochs) and the Z+4g batch-128 gain (10^4 events
-      x 400 epochs) are different regimes: Muon 2048/128 = 6.53 is memorisation (train/val 0.048 vs 0.381; r = E2048/E128
-      = 31 > 16, the ceiling any critical batch allows); Adam two-batch B_crit 87-261. Part B (why B_simple 55 << B_crit 4420;
-      a pre-run rule): design PASSED (design-reviewer a4f3d7192edf30268, 12:26): the step''s loss decrease dL(b) of the optimizer''s
-      own update on disjoint chunk events, fit dL_inf/(1+B_dL/b), read at the target crossings vs the scan''s B_crit; Z+4g
-      Adam hp1152 (32 chunks) secondary. Code on branch cbs_update (worktrees/wt-cbs-update, tip c6f2ac29f): BS_finding.update/update_every
-      in base_experiment._noise_update/_update_map, arm v4_het_update_noise, scripts/job_cbs_update_zng.sh; 10/10 tests/test_noise_scale.py.
-      Repo-reviewer aeda1b763b27811e8 BLOCKED on 5e4d42794..d5dbb5b69; c6f2ac29f fixes its findings 1 (clip), 3 (one forward
-      path), 4 (reg out), 5 (lr mults, assert) -- continue that reviewer with c6f2ac29f. Its finding 2 open: the passed design
-      says the pretraining arm runs at the scan''s hp 1333 (lr 8.2e-3), the arm uses MUON_BEST (lr 4.997e-3, the control''s).
-      My choice: run at hp 1333 (the scan''s 16384 best, so B_dL and B_crit share the setting); its other HPs (muon_weight_decay,
-      reg, warmup, eta_min, ema) must be read from CC runs/cbs_b16384/trial_1333/config.yaml (site_python), set in the arm,
-      the read points moved to hp 1333''s 16384 crossings (706/1686/~2720 steps; brute_at e.g. 50,700,1690,2720), the design
-      re-recorded and re-checked by a4f3d7192edf30268 (also address its non-blocking notes: chunk composition may bias B_dL
-      up by <=1.16-1.29x; 4 dL reads per 200-step window, pool windows if scatter too large -- the smoke reads every 10).
-      Then: repo PASS, merge cbs_update, site sync, smokes (both launch paths, D395), then the two full runs (targets recorded:
-      upd_noise_pretrain 1.5 h, upd_noise_zng_adam 0.3 h, upd_noise_smokes 0.3 h x2; ~2.5 GPU-h, under 30). Next 1 (close
-      of D532 part) unchanged.'
-    decisions: 'Joaquin''s: D532, D536, D560 (this step). Mine, to re-justify: part A pools every search trial per cell and
-      takes the lowest-validation trial (as the scan''s best-of); train/val read at the last stable-phase validation (the
-      cooldown memorises at both batches); Adam''s curves keep their own validation spacing (best_step/(argmin+1)); dL(b)
-      instead of A(b) as the primary measure (CPU toy: sign-type normalisation half-saturates A(b) below B_simple, so A cannot
-      carry the gap); run the pretraining arm at hp 1333 not MUON_BEST (pending, see state); brute steps only for A, dL from
-      chunks only.'
-    ruled_out: 'A(b) (first-order progress) alone as the critical-batch measure (toy: b_half 4 vs B_simple 39); the D507 sweeps''
-      CC result dirs as the curve source (partial: trials ran on lxplus; d507_search_v2.json holds all); a memorisation rule
-      by steps per epoch D/B (mixed across D539 cells, not supported)'
-    running: none
-    files: analysis/critical_batch/ft_bcrit.py, analysis/critical_batch/data/ft_bcrit.json, analysis/critical_batch/figs/ft_regimes.png,
-      docs/results.tex par:cbs_regimes, worktrees/wt-cbs-update (base_experiment.py _noise_update/_update_map, config/default.yaml
-      BS_finding.update*, tests/test_noise_scale.py, scripts/job_catalog_v3_short.sh v4_het_update_noise, scripts/job_cbs_update_zng.sh)
-    written: '2026-11-25T12:30:31+00:00'
+    state: 'Steps 2-4 in flight or stopped. Step 2 (D560 part B, pretraining): FA-ccin2p3-3e856594 runs v4_het_update_noise
+      at the scan''s batch-16384 best hp 1333 (design passed 12:38 by a4f3d7192edf30268; code merged 5109b8182; smoke FA-ccin2p3-b587c065
+      clean; reads every 50, 200- vs 400-step window pooling decided from the run''s own spread; windows with mean dL<=0 at
+      any b listed apart). Read B_dL at the run''s crossings of -1.66/-2.08/-2.30 against B_crit 2500/4420/6690 (outcome:
+      within 2x YES, beyond 3x at two targets NO). Step 3 (part B, Z+4g Adam hp1152): FA-ccin2p3-cedaa6dd (target 1.0 h, limit
+      1:45; smoke FA-ccin2p3-0ac97e10 clean; run.py 7677e3d67 turned off the noise reads in the sigma stage, which had cost
+      ~1080 s of the smoke''s 1337) -> B_dL over the stable phase against 87-261. Step 4 (D563, the six Z+4g 1e4-event searches
+      at 50 epochs: Muon/Adam scratch and Fn at batch 2048 and 128, trial counts 19/19/16 and 19/16/16, design passed at 13:25):
+      STOPPED on repo-review FIX (via the llm_compare owner; reviewer id in that owner''s report): (1) the lr windows in sweep/sweep_config_*_ep50*.yaml
+      (7e742b868) come from the t-only lr_c(t) factor (x0.353 at 2048, x3.14 at 128), against HPO rule 2: evaluate the measured
+      lr*(t,D) surface (analysis/hpo_optima, make_fig_2d.py, hpo_optima.json) at (t=244 or 3906, D=1e4) and sweep +-1/2 decade;
+      for the Muon arms (Muon scratch, Fn) fa-canonical-setup says a Muon sweep centres on its own search, so the surface
+      supplies only the t-dependence at D=1e4 applied to each 400-epoch search''s best lr (Fn bests: 3.11e-3 at 2048, at the
+      window''s low edge; 7.26e-3 at 128, 0.89 of the window; D507 bests: read from d507_search_v2.json hp indices through
+      the sweeps'' candidate sets, lxplus or CC run configs); check before re-recording. Driver killed; its wave 1 (18 trials)
+      cancelled on CC; remove sweeps_local/*_ep50* (DyHPO states built on the old windows) before relaunching with tools/detach.py
+      --entry critical_batch --name zng_ep50_searches -- .venv-driver/bin/python sweep/drive.py <6 --config> --item critical_batch
+      --sites ccin2p3 lxplus. (2) fixed 0d93d3dc9. (3) open: analysis/critical_batch/ft_bcrit.py:31 applies STABLE=7/8 (the
+      WSD cooldown cut) to the ReduceLROnPlateau Adam cells, which have no cooldown; fix (Adam cells read over the whole run,
+      or their own stop), rerun, check the par:cbs_regimes numbers (~l.9223-9235 of docs/results.tex: Adam two-batch B_crit
+      87-261, train/val) and answer the same repo reviewer with the fix commits. Next 1 (close of the D532 part) unchanged.
+      Coordinator note: do not stash others'' changes around site sync any more (a worker is changing site sync to proceed
+      with a note).'
+    decisions: 'Joaquin''s: D532, D536, D560, D563. Mine, to re-justify: pretraining arm at hp 1333 (so B_dL and B_crit share
+      the setting); brute reads at 50,700,1690,2700 (2700 before the -2.30 stop at 2720); dL read every 50 kept after the
+      smoke could not measure the stable scatter (its 3 reads in the first 40 steps were set by a b-independent overshoot);
+      windows with mean dL<=0 not fitted; D563 trial counts = the replaced searches'' collected trials (19/19/19/16, 16/16);
+      Adam''s plateau protocol kept in validations (validate every 1 at 2048, every 20 at 128; patience 10, early stop 20
+      validations); 1.22 threshold = largest best-to-third gap of the D507 searches; an edge best reported as a bound, a wider
+      search asked, not run; sigma stage keeps its canonical 250 steps (mu selection unaffected); Jean Zay left out of D563
+      (down; Fn parent verified only on CC and lxplus).'
+    ruled_out: 'the t-only lr_c(t) factor for the ep50 lr windows (repo-review FIX 1, HPO rule 2); extending an edge lr window
+      with extra trials (design FIX: changes trial counts, Joaquin''s call); the smoke''s dL reads as the scatter estimate
+      (early overshoot); plus the previous owner''s: A(b) alone, D507 CC result dirs as curve source, memorisation rule by
+      D/B'
+    running: FA-ccin2p3-3e856594 (step 2, pretraining v4_het_update_noise, limit 2:45), FA-ccin2p3-cedaa6dd (step 3, Z+4g
+      update reads, limit 1:45); D563 driver stopped, wave 1 cancelled
+    files: scripts/job_catalog_v3_short.sh (v4_het_update_noise), scripts/job_cbs_update_zng.sh, run.py sigma_stage_cfg (find_BS
+      off), base_experiment.py _noise_update/_update_map, tests/test_noise_scale.py, sweep/sweep_config_*_ep50*.yaml, analysis/critical_batch/ft_bcrit.py,
+      analysis/critical_batch/data/{ft_bcrit,cbs_state,cbs_readout}.json, docs/results.tex par:cbs_regimes, ~/.local/share/ccorch/detached/20261125-142737_zng_ep50_searches.log
+    written: '2026-11-25T13:49:00+00:00'
   ask: 'Scope: the canonical batch. The batch-size scan finds 8192 about 10% faster in wall clock to validation loss -2.08
     on V100 than our canonical 16384 (0.43 h against 0.48 h, best trial each). Keep 16384, or change the canonical batch to
     8192?'
