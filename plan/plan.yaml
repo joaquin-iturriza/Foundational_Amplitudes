@@ -44322,6 +44322,7 @@ entries:
       text; the repo-reviewer already passed the merge)
     '5': detach:wake_replay2
     '6': detach:review_replay2
+    '7': repo-reviewer ad976c1837d8c4c7d (holds the lock; asked to include tools/lab_wake_trial.py)
   findings:
   - at: '2026-11-23T19:55:22+00:00'
     text: 'Local batch width cut from 6 parallel opencode streams to 2 (D531): 6 streams of opencode sessions (~350-400 MB
