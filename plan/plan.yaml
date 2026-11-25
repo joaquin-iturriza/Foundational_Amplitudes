@@ -16531,9 +16531,9 @@ entries:
     '35': '2026-12-03'
   owner:
     agent: ac4f3bf623a93600d
-    state: working
+    state: stopped
     since: '2026-11-25T13:18:03+00:00'
-    state_at: '2026-11-25T13:18:27.070000+00:00'
+    state_at: '2026-11-25T13:42:37.552000+00:00'
     context: 268062
     context_at: '2026-11-25T13:47:05+00:00'
   designs:
@@ -40945,7 +40945,7 @@ entries:
     agent: a115825542ebec00a
     state: working
     since: '2026-11-25T13:16:50+00:00'
-    state_at: '2026-11-25T13:16:50+00:00'
+    state_at: '2026-11-25T13:47:38.377000+00:00'
     context: 217540
     context_at: '2026-11-25T13:47:15+00:00'
   step_why:
@@ -44904,7 +44904,7 @@ entries:
     agent: aa714c56df5dba4f3
     state: working
     since: '2026-11-25T12:35:48+00:00'
-    state_at: '2026-11-25T13:12:35.408000+00:00'
+    state_at: '2026-11-25T13:46:55.526000+00:00'
     context: 248856
     context_at: '2026-11-25T13:47:24+00:00'
   designs:
@@ -47358,9 +47358,9 @@ entries:
     decision: D561
   owner:
     agent: ad098506c65b574e6
-    state: stopped
+    state: working
     since: '2026-11-25T07:26:28+00:00'
-    state_at: '2026-11-25T12:17:56.044000+00:00'
+    state_at: '2026-11-25T13:47:40.399000+00:00'
     context: 267253
     context_at: '2026-11-25T12:15:18+00:00'
   designs:
