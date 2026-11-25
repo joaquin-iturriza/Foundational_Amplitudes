@@ -44642,12 +44642,10 @@ entries:
     blocks: nothing
     blocks_steps: &id003 []
   owner:
-    agent: afa774b9a43050714
-    state: closed
-    since: '2026-11-25T12:04:01+00:00'
-    state_at: '2026-11-25T12:04:01+00:00'
-    context: 236472
-    context_at: '2026-11-25T12:22:40+00:00'
+    agent: aa714c56df5dba4f3
+    state: working
+    since: '2026-11-25T12:35:48+00:00'
+    state_at: '2026-11-25T12:35:48+00:00'
   designs:
   - at: '2026-11-24T00:44:54+00:00'
     question: 'Step 1 of critical_batch (D532): what is the gradient noise scale B_simple = tr(Sigma)/|G|^2 (McCandlish et
