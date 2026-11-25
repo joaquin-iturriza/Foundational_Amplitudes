@@ -45521,6 +45521,16 @@ entries:
       covers: not used by any run in the last days and not needed by a running or planned entry); 14 days: the census window
       of the 2026-11-24 inventory under D147''s ''the last days''; CLAUDE.md, Joaquin''s words, ''A memmap cache (amp_mmap_cache)
       on a site is deleted only when no running job and no recipe of an open plan entry reads it'''
+    passed_at: '2026-11-25T01:41:38+00:00'
+    reviewer: 'Re-check at ae44541e5 of the readout FIX: cache_census in-use reason is now the short ''train pool of an in-use
+      recipe''; the job''s CENSUS_BY_REASON awk, run by me on sample rows with distinct touch times and a delete reason, sums
+      to one line per decision and reason class (keep: touched within 14 days / keep: train pool of an in-use recipe / delete:
+      produced by no recipe under recipes/); tests/test_cache_readers.py 1 passed locally. Earlier review holds: Joaquin''s
+      yes to ''Delete the 15.1 GiB?'' names exactly zz_catft, zz_catft_lowloss2, zz_catft_lowloss3; find limited to model
+      files, only *_result.json read by collect_catft_curves.py/ema_start_audit.py; df against manifest matched within 1.4%
+      on the D550 deletion; plan matching on today''s plan 563 of 632 recipes named, all six dead-end examples in use. Searched
+      results.tex for amp_data_cache, amp_mmap_cache, cache census, cache_census, zz_catft, catft (none) and decisions for
+      cache, catft (D19, D84, D103, D110, D131, D147, D243, D550, D556, D557).'
   findings:
   - at: '2026-11-24T14:32:44+00:00'
     text: '2026-11-24 login-node reads: /sps/lpnhe 512 GiB group space at 98% (498 GiB used, 15 GiB free), .disk_full flag
