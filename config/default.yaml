@@ -247,6 +247,8 @@ BS_finding:          # find_BS: the gradient noise scale (McCandlish et al. 2018
  chunks: 8            # chunks of the step's batch: b_small = batchsize / chunks, b_big = batchsize
  brute_at: []         # steps of the check against M independent batch gradients (_noise_brute)
  brute_batches: 16    # M
+ update: false        # also the update-direction terms A(b) and the step's loss decrease dL(b) (_noise_update, critical_batch D560)
+ update_every: 50     # steps between those (a multiple of every; each costs about 14 forward passes of the batch)
 
 count_flops: false
 

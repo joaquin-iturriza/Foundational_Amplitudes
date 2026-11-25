@@ -1731,15 +1731,19 @@ class BaseExperiment:
                     "adamw": [p for g in groups if not g.get("use_muon") for p in g["params"]]}
         return {"all": [p for p in self.model.parameters() if p.requires_grad]}
 
-    def _noise_grads(self, losses, sets, gram=False):
+    def _noise_grads(self, losses, sets, gram=False, per_param=None):
         """Backward each loss of `losses` (one at a time, at the current weights) and return, per parameter set, the
         mean squared norm of the gradients and the squared norm of their mean, as floats; with gram=True also their
-        Gram matrix g_i.g_j (the gradients kept until the end), from which any subset's terms follow (a jackknife)."""
+        Gram matrix g_i.g_j (the gradients kept until the end), from which any subset's terms follow (a jackknife).
+        per_param: a list that receives each loss's gradients, one tensor per parameter of `sets` (_noise_update)."""
         sums, sq, keep, k = {n: None for n in sets}, {n: 0.0 for n in sets}, {n: [] for n in sets}, 0
         for loss in losses:
             self.optimizer.zero_grad()
             loss.backward()
             k += 1
+            if per_param is not None:
+                per_param.append([(p.grad if p.grad is not None else torch.zeros_like(p)).detach().clone()
+                                  for ps in sets.values() for p in ps])
             for n, ps in sets.items():
                 g = torch.cat([(p.grad if p.grad is not None else torch.zeros_like(p)).reshape(-1) for p in ps])
                 sq[n] = sq[n] + g.double().square().sum()
@@ -1760,13 +1764,99 @@ class BaseExperiment:
         b_small = b, b_big = k b, averaged over measurements offline."""
         k = int(self.cfg.BS_finding.chunks)
         n = int(data[1].shape[0])
-        kk, terms = self._noise_grads(self._noise_chunk_losses(data, k), self._noise_sets())
+        bs = self.cfg.BS_finding
+        upd = [] if bs.get("update", False) and step % int(bs.get("update_every", 50)) == 0 else None
+        sets = self._noise_sets()
+        base = []
+
+        def tap(losses):   # each chunk's loss value at the current weights (the step's own events)
+            for loss in losses:
+                base.append(float(loss.detach()))
+                yield loss
+        kk, terms = self._noise_grads(tap(self._noise_chunk_losses(data, k)), sets, per_param=upd)
         rec = {"kind": "chunk", "step": int(step), "b_small": n / kk, "b_big": float(n), "k": kk,
                **{f"{s}_{t}": v for s, (g2s, g2b) in terms.items() for t, v in (("g2_small", g2s), ("g2_big", g2b))}}
+        if upd is not None:
+            def chunk_losses():
+                with torch.no_grad():
+                    return [float(x.detach()) for x in self._noise_chunk_losses(data, k)]
+            rec.update(self._noise_update(upd, sets, n / kk, dl=(base, chunk_losses)))
         if step % 100 == 0:
             S = sum(noise_scale_terms(rec[f"{s}_g2_small"], rec[f"{s}_g2_big"], n / kk, n)[0] for s in terms)
             G2 = sum(noise_scale_terms(rec[f"{s}_g2_small"], rec[f"{s}_g2_big"], n / kk, n)[1] for s in terms)
             LOGGER.info(f"NOISE step {step} S {S:.4e} G2 {G2:.4e} (one measurement, unsmoothed)")
+        return rec
+
+    @torch.no_grad()
+    def _update_map(self, grads, sets):
+        """The optimizer's update for gradients `grads` (one tensor per parameter of `sets`) at momentum 0, times each
+        group's lr: Muon matrices newton_schulz(g) x muon_scale (MuonAdamW.step), Adam/AdamW parameters
+        g / (sqrt(v_hat) + eps) at the optimizer's current second moment. None before the optimizer has a second
+        moment (its first step)."""
+        from optim.muon import newton_schulz, muon_scale
+        opt = self.optimizer
+        inner = getattr(opt, "_adamw", None)
+        group = {id(p): g for g in opt.param_groups for p in g["params"]}
+        out = []
+        for p, g in zip((p for ps in sets.values() for p in ps), grads):
+            pg = group[id(p)]
+            if pg.get("use_muon", False):
+                o = newton_schulz(g.reshape(p.shape[0], -1), pg["ns_steps"]).reshape(p.shape)
+                out.append(o.double() * (pg["lr"] * muon_scale(p, pg["rms"], opt._mup)))
+                continue
+            st = (inner.state if inner is not None else opt.state).get(p, {})
+            if "exp_avg_sq" not in st:
+                return None
+            t = float(st["step"])
+            vhat = st["exp_avg_sq"].double() / (1.0 - pg["betas"][1] ** t)
+            out.append(g.double() / (vhat.sqrt() + pg["eps"]) * pg["lr"])
+        return out
+
+    def _noise_update(self, per_loss, sets, b, jack=False, dl=None):
+        """The update-direction terms (critical_batch D560): from K per-loss gradients of b events each, for m = 1, 2,
+        4, ... < K, the first-order progress A(m b) = <G_hat, u(g_{m b})>, g_{m b} the mean of m consecutive gradients,
+        u the optimizer's update (_update_map), G_hat the mean of the other K - m (disjoint events), averaged over the
+        K/m groups; per parameter set as <set>_A_b<m b>. jack=True also keeps each group's value (<set>_A_b<m b>_each).
+        dl = (the K losses at the current weights, a function returning them at the weights it is called at): also the
+        loss decrease of the step itself on the disjoint events, dL(m b) = mean over the other K - m losses of
+        L(w) - L(w - u(g_{m b})), as dL_b<m b> (all parameters moved; the weights restored exactly after each)."""
+        K = len(per_loss)
+        names = [n for n, ps in sets.items() for _ in ps]
+        params = [p for ps in sets.values() for p in ps]
+        total = [sum(gs[i] for gs in per_loss) for i in range(len(names))]
+        rec, m = {}, 1
+        while m < K:
+            vals, dls = {n: [] for n in sets}, []
+            for j in range(K // m):
+                grp = per_loss[j * m:(j + 1) * m]
+                gu = [sum(gs[i] for gs in grp) / m for i in range(len(names))]
+                u = self._update_map(gu, sets)
+                if u is None:
+                    return {}
+                if dl is not None:
+                    keep = [p.detach().clone() for p in params]
+                    with torch.no_grad():
+                        for p, x in zip(params, u):
+                            p.sub_(x.to(p.dtype))
+                    after = dl[1]()
+                    with torch.no_grad():
+                        for p, x in zip(params, keep):
+                            p.copy_(x)
+                    rest = [c for c in range(K) if not j * m <= c < (j + 1) * m]
+                    dls.append(sum(dl[0][c] - after[c] for c in rest) / len(rest))
+                acc = {n: 0.0 for n in sets}
+                for i, n in enumerate(names):
+                    gc = (total[i] - gu[i] * m) / (K - m)
+                    acc[n] += float((gc.double() * u[i]).sum())
+                for n in sets:
+                    vals[n].append(acc[n])
+            for n in sets:
+                rec[f"{n}_A_b{int(m * b)}"] = sum(vals[n]) / len(vals[n])
+                if jack:
+                    rec[f"{n}_A_b{int(m * b)}_each"] = vals[n]
+            if dls:
+                rec[f"dL_b{int(m * b)}"] = sum(dls) / len(dls)
+            m *= 2
         return rec
 
     def _noise_brute(self, step):
@@ -1782,11 +1872,15 @@ class BaseExperiment:
                 collate_fn=tl.collate_fn, num_workers=0)))
         batches = [next(self._noise_iter) for _ in range(M)]
         n = int(batches[0][1].shape[0])
-        kk, terms, gram = self._noise_grads((self._batch_loss(d)[0] for d in batches), self._noise_sets(), gram=True)
+        upd = [] if self.cfg.BS_finding.get("update", False) else None
+        sets = self._noise_sets()
+        kk, terms, gram = self._noise_grads((self._batch_loss(d)[0] for d in batches), sets, gram=True, per_param=upd)
         self._noise_log.append({"kind": "brute", "step": int(step), "b_small": float(n), "b_big": float(n * kk),
                                 "k": kk, **{f"{s}_{t}": v for s, (g2s, g2b) in terms.items()
                                             for t, v in (("g2_small", g2s), ("g2_big", g2b))},
-                                **{f"{s}_gram": g for s, g in gram.items()}})
+                                **{f"{s}_gram": g for s, g in gram.items()},
+                                **(self._noise_update(upd, sets, n, jack=True) if upd is not None else {})})
+        del upd
         for d in batches:
             self._noise_log.append({**self._noise_measure(d, -1), "kind": "chunk_at_brute", "step": int(step)})
         LOGGER.info(f"NOISE brute check at step {step}: {M} batches of {n}")
