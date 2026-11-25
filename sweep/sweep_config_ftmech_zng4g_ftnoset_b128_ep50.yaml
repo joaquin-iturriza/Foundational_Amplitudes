@@ -55,7 +55,7 @@ fixed_params:
 range_extension:
   enabled: false
 search_space:
-- {name: training.lr, type: float_log, low: 8.47e-04, high: 3.45e-02}   # ftmech_zng4g_ftnoset_b128's window x 3.138 (HPO rule 2's lr_c(t) from 31250 to 3906 steps)
+- {name: training.lr, type: float_log, low: 7.669e-03, high: 6.902e-02}   # Muon centres on its own search: ftmech_zng4g_ftnoset_b128 best lr 0.007257 x 3.1701 (surface lr*(t,1e4) from 31250 to 3906 steps), +-1/2 decade
 - {name: training.muon_weight_decay, type: float_log, low: 1.0e-03, high: 0.3}
 - {name: training.regularization_lambda, type: float_log, low: 1.0e-10, high: 1.0e-06}
 - {name: training.cosanneal_warmup_frac, type: float_uniform, low: 0.05, high: 0.2}

@@ -53,7 +53,7 @@ fixed_params:
 range_extension:
   enabled: false
 search_space:
-- {name: training.lr, type: float_log, low: 4.95e-04, high: 6.36e-03}   # tp_zng_d1e4_adam_b2048_zgggg's window x 0.353 (HPO rule 2's lr_c(t) from 1953 to 244 steps)
+- {name: training.lr, type: float_log, low: 1.416e-03, high: 1.275e-02}   # HPO rule 2: lr*(t,D) surface (sweep/gen_transfer_pilot.lr_surface) at t=244, D=1e4, +-1/2 decade
 - {name: training.regularization_lambda, type: float_log, low: 1.0e-10, high: 1.0e-06}
 - {name: ema, type: categorical, choices: ["false", "true"]}
 - {name: training.ema_decay, type: float_uniform, low: 0.9, high: 0.999}
