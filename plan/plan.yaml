@@ -45473,6 +45473,13 @@ entries:
       6.5 (concluded, 35 runs over 5 h), kit* 5.0. lhe_queue: ~6.6 of its 6.8 GiB are Q/gc/ deletion manifests (JSON, read
       only by tests); lhe_parts part files 1.47 GiB. zz_v4_*: 235 dirs, 28,338 MiB, none written in the last 7 days, ~2,300
       per-probe npz of ~70 KB per dir. runs_from_lxplus 24.9 GB total. Output /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/ccdisk_read2.out.'
+  - at: '2026-11-25T01:29:36+00:00'
+    text: '2026-11-25 storage frees FA-ccin2p3-9cf1ce5d (job_storage_frees.sh @02c31b3934), STORAGE_FREES_DONE: lhe_queue
+      gc manifests gzipped 6868 -> 297 MiB (df used 512973 -> 506212 MiB, 6.6 GiB); D208 gc --parts freed 1.14 GB (hd_test_measured,
+      106 processes, 516 files; the other queues 0, their parts held by sibling queues); D136 events dirs 18 deleted, 0.94
+      GB (df -> 504631); smoke_models listed nothing: runs/zz_smoke is empty now (read on CC 02:40), so the inventory''s 7.5
+      GB there is already gone (who removed it not checked). Total df used 512973 -> 504631 MiB = 8.1 GiB freed; free 19.7
+      GiB.'
   step_waits:
     '3': FA-ccin2p3-9cf1ce5d
     '2': the repo-reviewer of the code backlog (blocks the commit of cache_readers.py --plan), then a new design review of
