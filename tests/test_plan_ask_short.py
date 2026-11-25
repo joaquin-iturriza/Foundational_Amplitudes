@@ -1,5 +1,5 @@
 """A short asking sentence ("Do you want it?") counts with the two sentences before it (real messages of 2026-11-18,
-11-16, 11-20); a status that never asks and a different question stay unmatched. Not fixed: pretrain_data_saving 11-12."""
+11-16, 11-20); a status that never asks and a different question stay unmatched. pretrain_data_saving 11-12 (restated, "Add them?") matches too."""
 import _tmpdir  # noqa: F401
 import json, os, sys
 

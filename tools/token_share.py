@@ -39,6 +39,7 @@ REVIEW = {"repo-reviewer", "notes-editor", "claudemd-keeper", "design-reviewer"}
 READONLY = re.compile(r"^\s*(cd [^;&]+&&\s*)?(cat|head|tail|sed -n|grep|rg|ls|wc|site (logs|runs|status|poll|events|list))\b")
 SEARCH = re.compile(r"(^|[;&|(]\s*)(grep|rg|git grep)\s")
 CHARS_PER_TOKEN = 3.5
+ENTRIES = []
 # an Explore brief naming any of these is not a lookup in trunk's code (results notebook, plan, transcripts, web,
 # another repo): the lab route (CLAUDE.md, D541) covers code lookups only
 NONCODE = re.compile(r"results\.tex|plan\.yaml|transcript|WebSearch|github\.com|research result", re.I)
@@ -283,7 +284,11 @@ def main():
                     "routed worker is on record yet: the cheap fix check's median (par:labllm2), the same Sonnet worker "
                     "reading only printed lines")
     ap.add_argument("--lookup-check", type=float, default=10e3, help="assumed our tokens to check one routed lookup")
+    ap.add_argument("--refusals", action="store_true", help="the refusal-cost pass (D558) instead of the routing shares")
     a = ap.parse_args()
+    if a.refusals:
+        return refusal_report(a.since, a.until, "analysis/agent_redesign/refusal_cost.json",
+                              "analysis/agent_redesign/figs/refusal_cost")
     roles, k1, k3own, calib, explore_desc, routed, worker_desc = scan(a.since, a.until)
     total = sum(R["tokens"] for R in roles.values())
     total_usd = sum(R["usd"] for R in roles.values())
@@ -406,6 +411,279 @@ def figure(rep, base):
     ax.set_xscale("log")
     ax.set_xlim(0.8, 1e5)  # clear lower-right corner for the legend (the bottom bars end below 10^2)
     ax.set_xlabel("our tokens over 14 days ($10^6$)")
+    ps.legend(ax, "lower right")
+    ps.save(fig, base)
+
+
+# ---- refusal cost (D558): tokens each role spends after a hook or tool refusal until the refused action succeeds ----
+HOOK_ERR = re.compile(r"^(PreToolUse|PostToolUse):\w+ hook error: \[[^\]]*\]: ?", re.S)
+CLASSIFIER = re.compile(r"denied by the Claude Code auto mode classifier|denied by a built-in Claude Code safety")
+TOOL_REFUSAL = re.compile(r"^(plan|site gate|site)(:| \S+ refused)", re.M)
+ROLE5 = {"main": "main session", "owner": "owners", "reviewer": "reviewers", "event worker": "mechanical workers",
+         "fix worker": "mechanical workers", "other mechanical": "mechanical workers"}
+
+
+def check_of(text):
+    """(hook, check) named from a refusal's own text: the hook, then its first reason with names and numbers cut."""
+    t = HOOK_ERR.sub("", text).strip()
+    if t.startswith("Stop hook feedback:"):
+        t = re.sub(r"^Stop hook feedback:\s*(\[[^\]]*\]:\s*)?", "", t)
+    if CLASSIFIER.search(t):
+        return "auto-mode classifier (not ours)", "permission denied"
+    m = (re.match(r"BLOCKED by (?:\.claude/hooks/)?([\w.-]+?)(?:\.sh|\.py)?:\s*(.*)", t, re.S)
+         or re.match(r"(git verify guard|plan files guard|site gate|brief_guard|send_check|wait_guard|plan leave-check"
+                     r"|md_guard|context_guard|design_guard|figure_guard)\W*(.*)", t, re.S)
+         or re.match(r"PLAN CHECK: the turn cannot end yet\.\s*(?:PLAN CHECK: )?()(.*)", t, re.S)
+         or re.match(r"(plan|site):\s*(.*)", t, re.S) or re.match(r"(\S+)\s+(.*)", t, re.S))
+    if not m:
+        return "?", t[:60]
+    hook = m.group(1) or "plan_check"
+    hook = {"review-backlog": "review_backlog", "git verify guard": "git_verify_guard", "plan files guard":
+            "plan_files_guard", "plan": "plan.py", "site": "site", "plan leave-check": "plan_check"}.get(hook, hook)
+    r = m.group(2).strip().split("\n")[0]
+    r = re.sub(r"^refused \((.*?)\)?\.?$", r"\1", r)
+    r = re.sub(r"^(placement|design|budget):.*", r"\1", r) if hook == "submit_guard" else r
+    r = re.sub(r"\b(%s)\b" % "|".join(sorted(ENTRIES, key=len, reverse=True)), "<entry>", r) if ENTRIES else r
+    r = re.sub(r"\b(repo-reviewer|notes-editor|claudemd-keeper|design-reviewer)\b", "<pillar>", r)
+    r = re.sub(r"'[^']*'|`[^`]*`|\"[^\"]*\"|\S*/\S+|\bE\d+|\b[0-9a-f]{12,}\b|\d+(\.\d+)?", "_", r)
+    r = re.sub(r"_(\s*,?\s*(and\s+)?_)+", "_", r)
+    r = re.split(r"(?<=[\w)])[.;]\s|\s\(| \u2014 ", r)[0]
+    return hook, re.sub(r"\s+", " ", r)[:70]
+
+
+def action_of(name, inp):
+    """What a call does, so a later call can be told the same action: the Bash program and its verb, an edited file."""
+    if name == "Bash":
+        c = re.sub(r"^\s*(cd [^;&]+&&\s*|\w+=\S+\s+)*", "", inp.get("command", ""))
+        w = c.split()
+        n = 3 if w[:1] in (["python3"], ["python"]) and len(w) > 1 and w[1].endswith(".py") else 2
+        return "Bash " + " ".join(w[:n])
+    if name in ("Edit", "Write", "NotebookEdit"):
+        return name + " " + inp.get("file_path", "")
+    return name
+
+
+def read_refusals(f):
+    """The ordered events of a transcript for the refusal pass: ('msg', id, usage, model, ts, [(uid, action)]),
+    ('res', uid, refusal (hook, check) or None, error), ('stop', (hook, check), ts) for a Stop bounce,
+    ('post', uid, (hook, check)) for a PostToolUse block, ('user',) for a real user turn, ('boundary',)."""
+    ev, at = [], {}
+    for line in open(f, errors="replace"):
+        try:
+            d = json.loads(line)
+        except ValueError:
+            continue
+        ts = (d.get("timestamp") or "")[:19]
+        if d.get("type") == "system" and d.get("subtype") == "compact_boundary" or d.get("isCompactSummary"):
+            ev.append(("boundary",))
+            continue
+        a = d.get("attachment") if isinstance(d.get("attachment"), dict) else {}
+        if a.get("type") == "hook_blocking_error" and str(a.get("hookName", "")).startswith("PostToolUse"):
+            b = a.get("blockingError")
+            ev.append(("post", a.get("toolUseID"), check_of(b.get("blockingError", "") if isinstance(b, dict) else str(b))))
+            continue
+        m = d.get("message") if isinstance(d.get("message"), dict) else {}
+        if d.get("type") == "assistant" and m.get("usage") and m.get("id"):
+            uses = [(b.get("id"), action_of(b.get("name"), b.get("input") or {})) for b in m.get("content") or []
+                    if isinstance(b, dict) and b.get("type") == "tool_use"]
+            if m["id"] in at:
+                e = ev[at[m["id"]]]
+                ev[at[m["id"]]] = (e[0], e[1], m["usage"], e[3], e[4], e[5] + uses)
+                continue
+            at[m["id"]] = len(ev)
+            ev.append(("msg", m["id"], m["usage"], m.get("model"), ts, uses))
+        elif d.get("type") == "user":
+            c = m.get("content")
+            if isinstance(c, str) and re.match(r"(Subagent)?Stop hook feedback", c):
+                ev.append(("stop", check_of(c), ts))
+                continue
+            for b in c if isinstance(c, list) else []:
+                if isinstance(b, dict) and b.get("type") == "tool_result":
+                    t = text_of(b.get("content"))
+                    ref = None
+                    if b.get("is_error") and (HOOK_ERR.match(t) or CLASSIFIER.search(t)):
+                        ref = check_of(t)
+                    elif b.get("is_error") and TOOL_REFUSAL.search(t) and "Traceback" not in t and "usage:" not in t:
+                        ref = check_of(t[TOOL_REFUSAL.search(t).start():])
+                    ev.append(("res", b.get("tool_use_id"), ref, bool(b.get("is_error"))))
+            if isinstance(c, str) or any(isinstance(b, dict) and b.get("type") == "text" for b in c or []):
+                ev.append(("user",))
+    return ev
+
+
+def refusal_scan(since, until):
+    """Per (hook, check, role): refusals, and the tokens of the messages after each one, two bounds. Upper: until the
+    refused action succeeds (a later call of the same action not refused; a Stop bounce: the next attempt to end) or
+    is dropped (the turn ends, the context is compacted). Lower: until the first message whose calls all go through.
+    A message goes to the newest refusal still open, so no token is counted twice; the refused call itself is not
+    counted (it was spent before the refusal). A refused call that is never retried is dropped: it costs only until the
+    agent moves on (its upper bound is its lower one); a Stop bounce costs until the next attempt to end.
+    shortcut: usd_hi and msgs_hi keep a dropped refusal's later messages; tokens are the reported unit.
+    shortcut: messages taken back from a dropped refusal go to no older open refusal (a slight undercount)."""
+    seen, out, examples = set(), defaultdict(lambda: {"n": 0, "lo": 0, "hi": 0, "usd_hi": 0.0, "msgs_hi": 0,
+                                                      "dropped": 0, "repeat": 0}), defaultdict(list)
+    files = sorted(glob.glob(PROJ + "/*.jsonl")) + sorted(glob.glob(PROJ + "/*/subagents/agent-*.jsonl"))
+    for f in files:
+        mp = f[:-6] + ".meta.json"
+        meta = json.load(open(mp)) if os.path.exists(mp) else {}
+        brief, ev0 = read(f)
+        r = ROLE5.get(role(f, brief, meta, ev0), "other agents")
+        ev = read_refusals(f)
+        res = {e[1]: e for e in ev if e[0] == "res"}
+        action = {uid: a for e in ev if e[0] == "msg" for uid, a in e[5]}
+        opened = []  # open refusals: dict(key, action, lo_open)
+        last_stop = None  # the check of the last Stop bounce, until a message with no call passes
+
+        def close(o, dropped=False):
+            if o in opened:
+                opened.remove(o)
+                K = out[o["key"] + (r,)]
+                K["dropped"] += dropped
+                if dropped and o["action"] not in ("stop", None):
+                    K["hi"] -= o.get("after_lo", 0)  # dropped: it cost only until the agent moved on
+
+        for i, e in enumerate(ev):
+            if e[0] in ("user", "boundary"):
+                for o in list(opened):
+                    close(o, dropped=True)
+                continue
+            new = []
+            if e[0] == "res" and e[2] and e[1] in action:
+                new.append({"key": e[2], "action": action[e[1]], "lo": True})
+            elif e[0] == "stop":
+                new.append({"key": e[1], "action": "stop", "lo": True})
+                if last_stop == e[1] and since <= e[2] < until:
+                    out[e[1] + (r,)]["repeat"] += 1  # the same check bounced the very next attempt to end
+                last_stop = e[1]
+            elif e[0] == "post":
+                new.append({"key": e[2], "action": None, "lo": True})
+            for o in new:
+                ts = next((x[4] for x in ev[i::-1] if x[0] == "msg"), "")
+                if not since <= ts < until:
+                    continue
+                out[o["key"] + (r,)]["n"] += 1
+                if len(examples[o["key"]]) < 6:
+                    examples[o["key"]].append((os.path.basename(f), ts))
+                opened.append(o)
+            if e[0] != "msg" or not opened:
+                continue
+            if e[1] in seen or not since <= e[4] < until:
+                continue
+            seen.add(e[1])
+            o = opened[-1]
+            K = out[o["key"] + (r,)]
+            K["hi"] += tok(e[2])
+            K["usd_hi"] += usd(e[2], e[3])
+            K["msgs_hi"] += 1
+            if o["lo"]:
+                K["lo"] += tok(e[2])
+            else:
+                o["after_lo"] = o.get("after_lo", 0) + tok(e[2])  # taken back if the action is dropped
+            ok = [uid for uid, _ in e[5] if not (res.get(uid) and (res[uid][2] or res[uid][3]))]
+            for o2 in list(opened):
+                if all(not (res.get(uid) and (res[uid][2] or res[uid][3])) for uid, _ in e[5]):
+                    o2["lo"] = False  # every call of this message went through: the agent has moved on
+                if o2["action"] == "stop" and not e[5]:
+                    last_stop = None if not (i + 1 < len(ev) and ev[i + 1][0] == "stop") else last_stop
+                    close(o2)  # the next attempt to end (its own bounce, if any, opens a new refusal)
+                elif o2["action"] is None and not o2["lo"]:
+                    close(o2)
+                elif o2["action"] and any(a == o2["action"] for uid, a in e[5] if uid in ok):
+                    close(o2)
+        for o in list(opened):
+            close(o, dropped=True)
+    return out, examples
+
+
+def refusal_report(since, until, out_path, fig):
+    global ENTRIES
+    try:
+        import yaml
+        ENTRIES = [x.get("id") for x in yaml.safe_load(open(ROOT + "plan/plan.yaml"))["entries"] if x.get("id")]
+    except Exception:
+        ENTRIES = []
+    out, examples = refusal_scan(since, until)
+    roles, *_ = scan(since, until)
+    total = sum(R["tokens"] for R in roles.values())
+    by_role_total = defaultdict(int)
+    for k, R in roles.items():
+        by_role_total[ROLE5.get(k, "other agents")] += R["tokens"]
+    checks = defaultdict(lambda: {"n": 0, "lo": 0, "hi": 0, "usd_hi": 0.0, "dropped": 0, "repeat": 0, "roles": {}})
+    for (hook, chk, r), K in out.items():
+        C = checks[(hook, chk)]
+        for k in ("n", "lo", "hi", "usd_hi", "dropped", "repeat"):
+            C[k] += K[k]
+        C["roles"][r] = {k: K[k] for k in ("n", "lo", "hi", "msgs_hi", "dropped")}
+    rows = sorted(checks.items(), key=lambda kv: -kv[1]["hi"])
+    role_sum = defaultdict(lambda: {"n": 0, "lo": 0, "hi": 0})
+    for (_, _, r), K in out.items():
+        for k in ("n", "lo", "hi"):
+            role_sum[r][k] += K[k]
+    rep = {"window": [since, until], "unit": "input+output+cache read+cache write, deduplicated message ids",
+           "total_tokens": total, "role_tokens": by_role_total,
+           "refusal_tokens_by_role": {r: dict(v, share_of_role_hi=v["hi"] / max(by_role_total[r], 1),
+                                              share_of_role_lo=v["lo"] / max(by_role_total[r], 1))
+                                      for r, v in role_sum.items()},
+           "checks": [{"hook": h, "check": c, **{k: v for k, v in C.items()}, "examples": examples[(h, c)]}
+                      for (h, c), C in rows]}
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    json.dump(rep, open(out_path, "w"), indent=1, default=float)
+    print("window %s .. %s  all tokens %.1fM" % (since, until, total / 1e6))
+    for r, v in sorted(rep["refusal_tokens_by_role"].items(), key=lambda kv: -kv[1]["hi"]):
+        print("  %-19s refusals %5d  tokens after them %6.1f-%6.1fM  = %4.1f-%4.1f%% of the role's %6.1fM" % (
+            r, v["n"], v["lo"] / 1e6, v["hi"] / 1e6, 100 * v["share_of_role_lo"], 100 * v["share_of_role_hi"],
+            by_role_total[r] / 1e6))
+    for (h, c), C in rows[:25]:
+        print("  %6.1fM (lo %6.1fM) n %4d dropped %3d repeat %3d  %-16s %s  | %s" % (
+            C["hi"] / 1e6, C["lo"] / 1e6, C["n"], C["dropped"], C["repeat"], h, c,
+            " ".join("%s %d/%.1fM" % (r[:5], v["n"], v["hi"] / 1e6) for r, v in sorted(C["roles"].items()))))
+    hi = sum(v["hi"] for v in role_sum.values())
+    lo = sum(v["lo"] for v in role_sum.values())
+    print(json.dumps({"refusals": sum(v["n"] for v in role_sum.values()), "hi_M": round(hi / 1e6, 1),
+                      "lo_M": round(lo / 1e6, 1), "share_hi_pct": round(100 * hi / total, 1),
+                      "share_lo_pct": round(100 * lo / total, 1),
+                      "by_role_hi_M": {r.replace(" ", "_"): round(v["hi"] / 1e6, 1) for r, v in role_sum.items()},
+                      "top10_hi_M": [[h, c, round(C["hi"] / 1e6, 1), C["n"]] for (h, c), C in rows[:10]]}))
+    figure_refusals(rep, fig)
+
+
+PLAIN = [  # (hook, start of check) -> what the check refuses, in plain words, for the figure
+    ("plan_check", "CONTEXT GUARD", "stop: record before compaction"),
+    ("plan_check", "<entry>: resume its owner", "stop: resume the entry's owner"),
+    ("plan_check", "<entry>: steps you leave", "agent stop: steps left uncovered"),
+    ("review_backlog", "a commit while", "commit: a review is overdue"),
+    ("plan_check", "<entry> has a question open", "stop: open question not sent"),
+    ("brief_guard", "this brief lacks", "launch: brief lacks the rules"),
+    ("plan_check", "<entry>: no live owner: open events", "stop: events with no owner"),
+    ("plan_check", "no waiter is armed", "stop: no event waiter running"),
+    ("plan_check", "<entry>: no live owner: ready step", "stop: ready step with no owner"),
+    ("sleep_guard", "foreground waiting", "shell: foreground sleep"),
+    ("submit_guard", "placement", "submit: site not picked"),
+    ("plan_check", "figures handed back", "stop: figures not sent"),
+]
+
+
+def figure_refusals(rep, base, top=10):
+    """Tokens spent after the refusals of each of the `top` costliest checks of ours (the auto-mode classifier is
+    Claude Code's, left out), one bar per role, upper bound."""
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    import plot_style as ps
+    rows = [c for c in rep["checks"] if not c["hook"].startswith("auto-mode")][:top]
+    name = lambda c: next((w for h, k, w in PLAIN if c["hook"] == h and c["check"].startswith(k)),
+                          c["hook"] + ": " + c["check"][:20])
+    roles = [("main session", ps.C.vermillion), ("owners", ps.C.blue), ("other agents", ps.C.green),
+             ("mechanical workers", ps.C.orange), ("reviewers", ps.C.purple)]
+    roles = [(r, col) for r, col in roles if any(c["roles"].get(r, {}).get("hi") for c in rows)]
+    fig, ax = ps.figure(1, 1)
+    h = 0.8 / len(roles)
+    for j, (r, col) in enumerate(roles):
+        ys = [i - 0.4 + h * (j + 0.5) for i in range(len(rows))]
+        ax.barh(ys, [c["roles"].get(r, {}).get("hi", 0) / 1e6 for c in rows], height=h, color=col, label=r)
+    ax.set_yticks(range(len(rows)), [name(c) for c in rows])
+    ax.invert_yaxis()
+    ax.set_xscale("log")
+    ax.set_xlim(0.1, 1e5)  # clear right side for the legend (the longest bar ends near 10^2)
+    ax.set_xlabel("tokens after the refusals, 14 days ($10^6$)")
     ps.legend(ax, "lower right")
     ps.save(fig, base)
 
