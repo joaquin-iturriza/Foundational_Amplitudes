@@ -1,9 +1,10 @@
 """llm_compare D567: the shape of the predicted log|M|^2 distribution with each arm's own level removed, on the new-family
-held-out processes where the arms differ most. Per process, true log|M|^2 against each arm's prediction shifted by its
+held-out processes, one representative per family. Per process, true log|M|^2 against each arm's prediction shifted by its
 bias (pred - mean(pred - true)), so only the shape (scale and floor of tools/llm_score.py's split) is compared; ratio
-panel pred/true (ps.true_pred_hist). Processes: among the 43 new, per family the one whose MSE - bias^2 (of these
-events) differs most across the arms (largest worst/best ratio), the 3 families where that ratio is largest; the fourth
-cell holds the legend.
+panel pred/true (ps.true_pred_hist). Processes: every new family in Suprio's layout order (heldout_per_process.GROUPS),
+each by its process at the median (lower median) of the across-arm spread of MSE - bias^2 of these events (worst/best
+ratio): a representative example, never the extreme (CLAUDE.md; repo review 2026-11-25). The legend sits in the gg->Wqq'
+panel, whose narrow peak leaves its upper corners free.
 Events: data/events/<tag>_heldout_events.csv (tools/llm_score.py --events-out, first 5000 test events per process).
     python analysis/llm_compare/shape_dists.py
 Output: figs/shape_dists.{png,pdf}.
@@ -17,7 +18,7 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, HERE)
 import plot_style as ps  # noqa: E402
-from heldout_per_process import ARMS, proc_label  # noqa: E402
+from heldout_per_process import ARMS, GROUPS, proc_label  # noqa: E402
 
 DAN = os.path.join(ROOT, "analysis", "catalog_daniel")
 
@@ -41,14 +42,12 @@ def main():
         return float(np.mean((q - y) ** 2) - np.mean(q - y) ** 2)
     sh = {n: [shape(t, n) for t in tags] for n in new}
     spread = {n: max(sh[n]) / min(sh[n]) for n in new}
-    top = {}
-    for n in new:  # one process per family: its most differing one
-        g = meta[n]["test_group"]
-        if g not in top or spread[n] > spread[top[g]]:
-            top[g] = n
-    pick = sorted(top.values(), key=lambda n: -spread[n])[:3]
-    fig, axes = ps.figure(ncols=2, nrows=2)
-    for ax, n in zip(np.ravel(axes)[:3], pick):
+    pick = []
+    for g, _ in GROUPS["extrap"]:  # one process per family: the median of its spread
+        ns = sorted((n for n in new if meta[n]["test_group"] == g), key=lambda n: spread[n])
+        pick.append(ns[(len(ns) - 1) // 2])
+    fig, axes = ps.figure(ncols=2, nrows=3)
+    for ax, n in zip(np.ravel(axes)[:len(pick)], pick):
         y = ev[tags[0]][n][:, 0]
         for t in tags[1:]:
             assert np.allclose(ev[t][n][:, 0], y, rtol=1e-5), f"{t}: other test events for {n}"
@@ -59,9 +58,9 @@ def main():
         models = [{"label": ARMS[t][0], "edges": e, "pred": np.histogram(sq[t], e)[0], "truth": tc,
                    "style": {"color": ARMS[t][1]}} for t in tags]
         r = ps.true_pred_hist(ax, models, xlabel=r"$\log|\mathcal{M}|^2$, level removed")
-        ax.text(0.03, 0.95, proc_label(meta[n]["process"]), transform=ax.transAxes, ha="left", va="top")
+        ps.process_label(ax, proc_label(meta[n]["process"]), "upper left")   # registered: the legend avoids it
         print(meta[n]["process"], meta[n]["test_group"], {t: round(s, 4) for t, s in zip(tags, sh[n])})
-    ps.legend_cell(np.ravel(axes)[3], np.ravel(axes)[0])
+    ps.legend(axes[2, 0], "upper right", ncol=2)   # a 7th cell leaves an empty one or overflows the page; ncol=2 brings the font down
     ps.save(fig, os.path.join(HERE, "figs", "shape_dists"))
 
 

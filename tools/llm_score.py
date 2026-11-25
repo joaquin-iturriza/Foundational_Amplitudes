@@ -67,8 +67,8 @@ F = getattr(exp, "all_amp_factor", None)
 assert F is not None or not bool(cfg.data.get("target_physics_factor", False)), "target factor on but no all_amp_factor"
 logF = np.log(np.asarray(F, dtype=np.float64)[exp._split_indices["test"]]).ravel() if F is not None else None
 sse_z, n = np.zeros(len(names)), np.zeros(len(names), dtype=np.int64)
-S = np.zeros((len(names), 5))
-EV = []   # per process sums of pred, true, pred^2, true^2, pred true (absolute log|M|^2)
+S = np.zeros((len(names), 5))   # per process sums of pred, true, pred^2, true^2, pred true (absolute log|M|^2)
+EV = []   # --events-out: per event process index, true, pred, log F
 k = 0
 with torch.no_grad():
     for data in exp.test_loader:

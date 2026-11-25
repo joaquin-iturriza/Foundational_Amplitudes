@@ -90,17 +90,22 @@ def mlp(r):  # norm_explore3.py's level network
                         early_stopping=True, validation_fraction=0.15, random_state=r)
 
 
-class Net:  # norm_explore3's level network on events: scaled inputs and target, 3 seeds averaged
+class Net:  # norm_explore3's level network on events: scaled inputs and target, seeds averaged
+    # defaults = step 17's network; l2 is sklearn's alpha / batch (norm_explore3's 1e-2 / 200, its batch)
+    def __init__(self, width=64, depth=2, l2=1e-2 / 200, lr=3e-3, batch=4096, seeds=3):
+        self.hp = dict(width=int(width), depth=int(depth), l2=float(l2), lr=float(lr), batch=int(batch))
+        self.seeds = seeds
+
     def fit(self, X, y):
         self.sx, self.m, self.s = StandardScaler().fit(X), y.mean(), y.std()
         Z, t = self.sx.transform(X), (y - self.m) / self.s
         self.nets = []
-        for r in range(3):
+        h = self.hp
+        for r in range(self.seeds):
             # shortcut: 200 epochs cap (2.7M events an epoch, ~660 updates), early stopping usually ends it first
-            # sklearn weighs L2 by alpha / batch: keep norm_explore3's 1e-2 / 200 (its batch) at batch 4096
-            net = MLPRegressor(hidden_layer_sizes=(64, 64), alpha=1e-2 * 4096 / 200, learning_rate_init=3e-3,
-                               max_iter=200,
-                               batch_size=4096, early_stopping=True, validation_fraction=0.15, random_state=r)
+            net = MLPRegressor(hidden_layer_sizes=(h["width"],) * h["depth"], alpha=h["l2"] * h["batch"],
+                               learning_rate_init=h["lr"], max_iter=200, batch_size=h["batch"],
+                               early_stopping=True, validation_fraction=0.15, random_state=r)
             self.nets.append(net.fit(Z, t))
             print(f"  mlp seed {r}: {net.n_iter_} epochs, best val R2 {net.best_validation_score_:.4f}", flush=True)
         return self
@@ -109,6 +114,29 @@ class Net:  # norm_explore3's level network on events: scaled inputs and target,
         Z = self.sx.transform(X)
         return self.m + self.s * np.mean([n.predict(Z) for n in self.nets], 0)
 
+
+
+# step 20's search spaces (DyHPO single-fidelity GP): network around step 17's 2x64, l2 and lr +/- 1 and 1/2 decade;
+# tree around sklearn's defaults and results.tex l.7820's 800 rounds at 0.03
+SPACE = {"mlp": [{"name": "width", "type": "int_log", "low": 32, "high": 128},
+                 {"name": "depth", "type": "int_uniform", "low": 1, "high": 3},
+                 {"name": "l2", "type": "float_log", "low": 5e-6, "high": 5e-4},
+                 {"name": "lr", "type": "float_log", "low": 1e-3, "high": 9e-3},
+                 {"name": "batch", "type": "categorical", "choices": [1024, 4096, 16384]}],
+         "hgb": [{"name": "learning_rate", "type": "float_log", "low": 0.02, "high": 0.3},
+                 {"name": "max_leaf_nodes", "type": "int_log", "low": 8, "high": 255},
+                 {"name": "max_iter", "type": "int_log", "low": 100, "high": 1000},
+                 {"name": "l2_regularization", "type": "float_log", "low": 1e-3, "high": 10.0}]}
+HEAVY = {"h": "h", "w+": "w", "w-": "w", "z": "z", "t": "t", "t~": "t", "ta+": "ta", "ta-": "ta", "a": "a",
+         "e+": "l", "e-": "l", "mu+": "l", "mu-": "l", "ve": "v", "ve~": "v", "vm": "v", "vm~": "v", "vt": "v", "vt~": "v"}
+
+
+def content_sig(process):
+    """The final state's non-QCD content as a sorted multiset ('h h z'; '(jets)' for none): the new families are
+    defined by it (33 of the 43 new carry a signature no training process has), so folds that hold out whole
+    signatures make the cross-fit an extrapolation, where relabelling-class folds measure a lookup (step 17's tree:
+    cross-fit 0.036, new 3.64)."""
+    return " ".join(sorted(HEAVY[x] for x in process.split(">")[1].split() if x in HEAVY)) or "(jets)"
 
 
 def level_net(Xtr, ytr, grp, Xho):
@@ -166,6 +194,8 @@ def main():
     ap.add_argument("--events", type=int, default=2000)
     ap.add_argument("--surrogate", action="store_true")
     ap.add_argument("--model", choices=("hgb", "mlp"), default="hgb")
+    ap.add_argument("--search", type=int, default=0, help="step 20: DyHPO GP trials on the content-signature "
+                    "cross-fit (1 network seed per fit), then the best read as candidate B[_mlp]_tuned")
     a = ap.parse_args()
     if a.surrogate:
         return from_surrogate()
@@ -207,6 +237,8 @@ def main():
     global CANDS
     if a.model == "mlp":
         CANDS = CANDS[:-1] + ("B_mlp",)
+    if a.search:
+        CANDS = CANDS[:-1] + (CANDS[-1] + "_tuned",)
     B = CANDS[-1]
     pred = {c: {} for c in CANDS}
     My = np.mean([D[n]["y"].mean() for n in tr])
@@ -227,16 +259,48 @@ def main():
                                              D[n]["q"], D[n]["E"], D[n]["logP"]]) for n in ns])
         return X, np.concatenate([D[n]["y"] for n in ns])
 
-    def hgb():
-        return HistGradientBoostingRegressor(max_iter=300, learning_rate=0.1, max_leaf_nodes=63, random_state=0)
+    def hgb(learning_rate=0.1, max_leaf_nodes=63, max_iter=300, l2_regularization=0.0, seeds=None):  # step 17's
+        return HistGradientBoostingRegressor(max_iter=int(max_iter), learning_rate=float(learning_rate),
+                                             max_leaf_nodes=int(max_leaf_nodes),
+                                             l2_regularization=float(l2_regularization), random_state=0)
 
-    model = Net if a.model == "mlp" else hgb
-    for i, j in GroupKFold(5).split(tr, groups=grp_p):
-        Xi, yi = rows([tr[k] for k in i])
-        m = model().fit(Xi, yi)
-        for k in j:
-            pred[B][tr[k]] = m.predict(rows([tr[k]])[0])
-    m = model().fit(*rows(tr))
+    make = Net if a.model == "mlp" else hgb
+
+    def crossfit(hp, groups, seeds=3):
+        out = {}
+        for i, j in GroupKFold(5).split(tr, groups=groups):
+            m = make(**hp, seeds=seeds).fit(*rows([tr[k] for k in i]))
+            for k in j:
+                out[tr[k]] = m.predict(rows([tr[k]])[0])
+        return out
+
+    def cv_e(p):  # median level error of the cross-fitted training processes
+        return float(np.median([reads(p[n] - D[n]["y"], D[n]["y"], *weights(D[n]["L"], D[n]["q"]))["e"] for n in tr]))
+
+    best, search = {}, None
+    if a.search:
+        sys.path.insert(0, os.path.join(ROOT, "sweep"))
+        from dyhpo_sampler import DyHPOSampler
+        sig = np.array([content_sig(meta[n]["process"]) for n in tr])
+        # proxy check: step 17's model on this cross-fit, to set beside its new-set level error (tree 3.64, net 1.63)
+        search = {"objective": "median level error, cross-fit by content signature (5 folds, 1 seed)",
+                  "n_signatures": int(len(set(sig))), "default_sig_cv": cv_e(crossfit({}, sig, 1)), "trials": []}
+        print("default (step 17) on the signature cross-fit:", search["default_sig_cv"], flush=True)
+        out_dir = os.path.join(os.environ["SCRATCH"], "perevent_search_" + a.model)
+        os.makedirs(out_dir, exist_ok=True)
+        S = DyHPOSampler(SPACE[a.model], {"t_steps": [1]}, n_candidates=2000, seed=42, output_path=out_dir,
+                         n_startup=3, surrogate="gp")
+        for t in range(a.search):
+            idx, hp, ts = S.suggest()
+            v = cv_e(crossfit(hp, sig, 1))
+            S.observe(idx, ts, v)
+            search["trials"].append({"hp": {k: (v_ if isinstance(v_, str) else float(v_)) for k, v_ in hp.items()},
+                                     "sig_cv_e": v})
+            print(f"trial {t}: {hp} -> {v:.4g}", flush=True)
+        best = min(search["trials"], key=lambda r: r["sig_cv_e"])["hp"]
+        search["best"] = best
+    pred[B] = crossfit(best, grp_p)
+    m = make(**best).fit(*rows(tr))
     for n in ho:
         pred[B][n] = m.predict(rows([n])[0])
 
@@ -274,13 +338,13 @@ def main():
     e_sh, e_rg = summary["shared"]["new"]["e"], summary["regressor"]["new"]["e"]
     print(f"check: shared e median {e_sh:.3g} (2026-10-22: 47), regressor {e_rg:.3g} (level_source.py: 0.044)")
     assert abs(e_sh / 47 - 1) < 0.10 and abs(e_rg / 0.044 - 1) < 0.10, (e_sh, e_rg)
-    out = {"events": a.events, "model": a.model, "missing": missing,
+    out = {"events": a.events, "model": a.model, "missing": missing, "search": search,
            "n": {"train": len(tr), "new": len(new), "relabels": len(rel_ho)},
            "summary": summary,
            "per_process_new": {meta[n]["process"]: {c: R[c][n] for c in CANDS} | {"family": meta[n]["test_group"]}
                                for n in new}}
-    json.dump(out, open(os.path.join(HERE, "data", "perevent_level%s.json" % ("_mlp" if a.model == "mlp" else "")), "w"),
-              indent=1)
+    json.dump(out, open(os.path.join(HERE, "data", "perevent_level%s%s.json" % ("_mlp" if a.model == "mlp" else "",
+                                                                         "_search" if a.search else "")), "w"), indent=1)
     for c in CANDS:
         print(c, {s: {k: round(v, 4) for k, v in summary[c][s].items()} for s in ("new", "relabels", "train_crossfit")})
         for g, f in summary[c]["families"].items():

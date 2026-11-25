@@ -21,7 +21,9 @@ SHORT = {"Multi-Higgs production (hh, hhh, Xhh)": "$HH(X)$", "Higgs + tau lepton
 ARMS = (("shared", "one shared level", ps.C.grey, "o"), ("regressor", "level from process\nand diagrams", ps.C.blue, "s"),
         ("A", "propagator factor\nper event", ps.C.green, "v"), ("B", "per-event tree",
                                                                  ps.C.vermillion, "D"),
-        ("B_mlp", "per-event network", ps.C.orange, "^"))
+        ("B_mlp", "per-event network", ps.C.orange, "^"),
+        ("B_tuned", "per-event tree, tuned", ps.C.vermillion, "d"),
+        ("B_mlp_tuned", "per-event network, tuned", ps.C.orange, "2"))
 
 
 def main():
@@ -29,6 +31,10 @@ def main():
     f = os.path.join(HERE, "data", "perevent_level_mlp.json")
     if os.path.exists(f):
         d["B_mlp"] = json.load(open(f))["summary"]["B_mlp"]
+    for c, f in (("B_tuned", "perevent_level_search.json"), ("B_mlp_tuned", "perevent_level_mlp_search.json")):
+        f = os.path.join(HERE, "data", f)   # step 20's searched models, when read
+        if os.path.exists(f):
+            d[c] = json.load(open(f))["summary"][c]
     arms = [r for r in ARMS if r[0] in d]
     fams = sorted(d["shared"]["families"], key=lambda g: -d["regressor"]["families"][g]["e"])
     x = np.arange(len(fams))
