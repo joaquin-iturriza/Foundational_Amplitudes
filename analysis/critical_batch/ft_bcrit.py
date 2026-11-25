@@ -138,8 +138,12 @@ def main():
     ro = json.load(open(os.path.join(HERE, "data", "cbs_readout.json")))
     res["scan_epochs"] = {t: {str(x["B"]): x["E"] / POOL for x in ro[t]["batches"] if x.get("E")}
                           for t in ro if t.startswith("-")}
+    bc = [x["B_crit"] for x in res["two_batch"]["adam"]["levels"] if x["B_crit"] is not None]
+    res["summary"] = {"adam_bcrit_min": min(bc), "adam_bcrit_max": max(bc), "adam_levels": len(bc),
+                      **{f"{k}_r": res["two_batch"][k]["levels"][0]["r"] for k in ("muon", "Sfx", "F", "Fn")},
+                      **{f"{k}_bcrit": res["two_batch"][k]["levels"][0]["B_crit"] for k in ("F", "Fn")}}
     json.dump(res, open(OUT, "w"), indent=1)
-    print(json.dumps(res, indent=1))
+    print(json.dumps(res))
     plot(cells)
 
 
