@@ -143,6 +143,77 @@ def remote(arg, rule):
     exec(SCORE, {"__name__": "__main__"})
 
 
+RAW = os.path.join(ROOT, "analysis", "finetune_mechanism", "data", "d539u_kit_raw.json")   # stored kit scores, same runs
+
+
+def read():
+    """The passed design's readout (D561): pipeline checks, per kit stratum the seed medians of both arms and no rescale's
+    own seed spread log10(max/min) from the stored scores, YES / NO-gain / NO-cost  -> data/support_read.json, figure"""
+    import numpy as np
+    from tools.kit_mlp_readout import deepest
+    kit = json.load(open(os.path.join(HERE, "data", "support_kit.json"))); raw = json.load(open(RAW))
+    out = {"pipeline": [], "cells": {}}
+    for d in ("1e4", "1e5"):
+        labs = [f"uug_{d}_{s}" for s in SEEDS]
+        stored = [raw[f"ftmech_d539u_uug_{d}_off_s{s}"] for s in SEEDS]
+        for lab, st in zip(labs, stored):
+            k = kit[lab]
+            if k["rule_model"] != {"input_soft_eps": 1e-8, "input_soft_x0": X0, "input_soft_gate": k["rule_model"].get("input_soft_gate")}:
+                out["pipeline"].append(f"{lab}: rule_model {k['rule_model']}")
+            for sk, v in k["off"].items():   # the off arm reproduces the stored no-rescale scores
+                if abs(np.log10(v / st[sk])) >= 0.01:
+                    out["pipeline"].append(f"{lab} off {sk}: {v:.4g} vs stored {st[sk]:.4g}")
+            for sk in k["off"]:
+                n = k["changed"]["/".join(sk.split("/")[:2])][0]
+                dl = abs(np.log10(k["rule"][sk] / k["off"][sk]))
+                if (n == 0 and dl >= 0.01) or (n > 0 and dl == 0):
+                    out["pipeline"].append(f"{lab} {sk}: {n} changed, |log10 rule/off| {dl:.3g}")
+        k0 = kit[labs[0]]; cell = {}
+        for sk in sorted(k0["off"]):
+            off = [kit[l]["off"][sk] for l in labs]; rule = [kit[l]["rule"][sk] for l in labs]
+            spread = float(np.log10(max(t[sk] for t in stored) / min(t[sk] for t in stored)))
+            cell[sk] = {"changed": k0["changed"]["/".join(sk.split("/")[:2])], "off": off, "rule": rule,
+                        "dec": float(np.log10(np.median(rule) / np.median(off))), "spread": spread}
+        dp = deepest({sk: sk for sk in cell})   # the deepest stratum's key per family
+        deep = cell[dp["soft_x"]]
+        cost = {sk: c["dec"] for sk, c in cell.items() if c["changed"][0] > 0 and c["dec"] > c["spread"]}
+        gain = deep["dec"] < -deep["spread"]
+        out["cells"][d] = {"strata": cell, "deepest_soft": dp["soft_x"], "gain": gain, "cost_strata": cost,
+                           "outcome": "YES" if gain and not cost else ("NO-cost" if cost else "NO-gain")}
+    out["outcome"] = "BROKEN" if out["pipeline"] else (
+        "YES" if all(c["outcome"] == "YES" for c in out["cells"].values()) else
+        ",".join(f"{d}:{c['outcome']}" for d, c in out["cells"].items()))
+    json.dump(out, open(os.path.join(HERE, "data", "support_read.json"), "w"), indent=1)
+    for d, c in out["cells"].items():
+        print(d, c["outcome"], "deepest", c["deepest_soft"], "cost", c["cost_strata"])
+        for sk, v in c["strata"].items():
+            print(f"  {sk:45s} changed {v['changed'][0]:6d}/{v['changed'][1]:6d}  off {np.median(v['off']):10.4g}"
+                  f"  rule {np.median(v['rule']):10.4g}  dec {v['dec']:+.3f}  spread {v['spread']:.3f}")
+    print("pipeline", out["pipeline"] or "ok", "outcome", out["outcome"])
+    plot(out)
+
+
+def plot(out):
+    """MSE(log10|M|^2) of each soft kit stratum against its x range, both arms (seed median, bars min to max)"""
+    import numpy as np
+    sys.path.insert(0, ROOT)
+    import plot_style as ps
+    from tools.kit_mlp_readout import edges
+    fig, axs = ps.figure(ncols=2)
+    for ax, (d, c) in zip(axs, out["cells"].items()):
+        soft = sorted((sk for sk in c["strata"] if "/soft_x_" in sk), key=lambda sk: edges(sk.split("/")[1])[0])
+        x = [np.log10(np.sqrt(np.prod(edges(sk.split("/")[1])))) for sk in soft]   # the stratum's log-centre
+        for arm, col, lab in (("off", ps.C.blue, "no rescale"), ("rule", ps.C.vermillion, "rescale below $x=0.009$")):
+            v = np.array([c["strata"][sk][arm] for sk in soft]); m = np.median(v, 1)
+            ax.errorbar(x, m, yerr=[m - v.min(1), v.max(1) - m], color=col, marker="o", label=lab)
+        ax.set_yscale("log")
+        ax.set_xlabel(r"$\log_{10} x_{\min}$, $x_i=2p_i\cdot Q/s$")
+        ax.set_ylabel(r"MSE$(\log_{10}|\mathcal{M}|^2)$")
+        ps.process_label(ax, r"$e^+e^-\to u\bar ug$")
+    ps.legend(axs[0], "upper left")
+    ps.save(fig, os.path.join(HERE, "figs", "support_rule"))
+
+
 def minima(cached):
     f = os.path.join(HERE, "data", "support_minima.json")
     res = json.load(open(f)) if cached else site_python(MINIMA, [f"'{k}#{v}'" for k, v in LOGS.items()], "SRMIN")
@@ -153,6 +224,8 @@ def minima(cached):
 if __name__ == "__main__":
     if sys.argv[1] == "remote":
         remote(*sys.argv[2:4]); sys.exit(0)
+    if sys.argv[1] == "read":
+        read(); sys.exit(0)
     if sys.argv[1] == "jobs":
         jobs(); sys.exit(0)
     ok = {"minima": minima, "score": score}[sys.argv[1]]("--cached" in sys.argv)
