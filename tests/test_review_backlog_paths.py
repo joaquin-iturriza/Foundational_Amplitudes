@@ -48,3 +48,10 @@ def test_repo_reviewer_overdue_named_file_refused():
     assert _pre(run, "git commit -m x -- a.py") == 2
     assert _pre(run, "git commit -m x -- b.py") == 0
     assert _pre(run, "git commit -qam x") == 2
+
+
+def test_covering_pathspecs_refused():
+    repo, run = _repo()
+    open(os.path.join(repo, "a.py"), "a").write("".join("y%d = %d\n" % (i, i) for i in range(600)))
+    assert _pre(run, "git commit -m x -- .") == 2
+    assert _pre(run, "git commit -m x -- '*.py'") == 2

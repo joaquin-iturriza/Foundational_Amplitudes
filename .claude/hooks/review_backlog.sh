@@ -320,7 +320,7 @@ for seg in segs:
         named = [os.path.relpath(os.path.join(d, x), repo) for x in w[w.index("--", i) + 1:]]
         for l in sys.stdin:
             f = l[3:].rstrip("\n").split(" -> ")[-1].strip("\"")
-            if any(f == n or f.startswith(n.rstrip("/") + "/") or n.startswith(f) and f.endswith("/") for n in named):
+            if any(n == "." or n.startswith(":") or any(c in n for c in "*?[") or f == n or f.startswith(n.rstrip("/") + "/") or n.startswith(f) and f.endswith("/") for n in named):
                 print(f); sys.exit()
         print("NONE"); sys.exit()
 print("ALL")' 2>/dev/null) || hit=ALL
