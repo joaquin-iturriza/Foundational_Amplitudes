@@ -15822,12 +15822,6 @@ entries:
       next lxplus ssh-master drop probed twice before ''down'''
     34: 'Check the lxplus costing fix (step 29) on the first real lxplus submit: its submit file carries +MaxRuntime equal
       to --hdr=--time=, and the site gate''s gpu_window charge equals that time x GPUs, not the flavour''s wall time'
-    35: 'Token cost of refusals and bounces, every role (D558): extend tools/token_share.py (same transcripts, unit and window)
-      to count, per role (owners, mechanical workers, reviewers, other agents, main session), the API messages and tokens
-      spent after a hook refusal (PreToolUse deny, Stop-check bounce, plan.py/site refusals) until the refused action succeeds
-      or is dropped, split by the hook/check and its refusal text; list the top ten by tokens with example transcripts; for
-      each, read the hook''s code and say whether the refusal was right (a real error caught) or a misfire, and fix misfires
-      (mechanical-worker) and the cheapest right-but-costly ones; measure the share before and after'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16501,11 +16495,6 @@ entries:
       if:
       - 'charged its own limit: report done'
       - 'charged the flavour: fix condor_sub or the gate, replay on that submit file'
-    35:
-      feeds: 'D558: how much of every role''s tokens refusals and bounces cost, and which to fix'
-      if:
-      - 'a few checks carry most of it: fix or narrow those, re-measure'
-      - 'spread thin across many: report the spread to Joaquin with the per-role totals and stop'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
