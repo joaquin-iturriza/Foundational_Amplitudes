@@ -34019,9 +34019,9 @@ entries:
       me this exactly?''; Fig. 15 stays out under his hold, no rerun asked'
   owner:
     agent: a9673ff5df07651dd
-    state: working
+    state: stopped
     since: '2026-11-21T17:02:36+00:00'
-    state_at: '2026-11-25T00:03:53.781000+00:00'
+    state_at: '2026-11-25T00:07:05.254000+00:00'
     context: 226448
     context_at: '2026-11-25T00:04:26+00:00'
   step_waits:
@@ -43684,7 +43684,7 @@ entries:
     agent: a87f458be3245c0a6
     state: working
     since: '2026-11-24T18:49:45+00:00'
-    state_at: '2026-11-24T23:50:11.087000+00:00'
+    state_at: '2026-11-25T00:18:46.239000+00:00'
     context: 237056
     context_at: '2026-11-25T00:19:22+00:00'
   designs:
@@ -45013,9 +45013,9 @@ entries:
     blocks_steps: &id002 []
   owner:
     agent: af74e499d5513dfe4
-    state: working
+    state: stopped
     since: '2026-11-25T00:05:14+00:00'
-    state_at: '2026-11-25T00:05:14+00:00'
+    state_at: '2026-11-25T00:14:57.826000+00:00'
     context: 120600
     context_at: '2026-11-25T00:19:32+00:00'
   designs:
