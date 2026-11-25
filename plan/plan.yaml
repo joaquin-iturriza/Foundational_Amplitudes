@@ -41434,6 +41434,15 @@ entries:
       the median relabel MSE (16/8 = 0.49): width 8->16 improves interpolation, not extrapolation. Source: control_score.py
       --tag a_trial5 b_h16 --out b_h16_vs_a5 @9b4d41705; figure analysis/llm_compare/figs/b_h16_heldout_per_process.png (heldout_per_process.py)
       and b_width_curves.png.'
+  - at: '2026-11-25T13:10:20+00:00'
+    text: '2026-11-25 (E9114) part (c) search ended (llmcmp_c_qperp_drive5 rc 0): 8 trials, 3 blew up. Validation NLL at the
+      best checkpoint: hp1860 (lr 1.60e-3, EMA 0.983) -5.997 (best; FA-ccin2p3-29ce8950), hp1736 (lr 2.57e-3) -5.938, hp0563
+      (lr 1.56e-3) -5.816, hp0756 (lr 2.02e-3) -5.563, hp0308 (lr 2.07e-3) -5.454, all at step 60,840 (end of the WSD cooldown);
+      blew up: hp0902 (lr 7.01e-3) best -2.533 at 6084, hp1333 (lr 6.02e-3) -2.980 at 6084 (its log now holds 2 validations,
+      a rerun''s; the 2026-11-23 finding read -3.152), hp0353 (lr 8.56e-3) -2.633 at 9126. Control (trial_1262''s HPs, lr
+      3.65e-3) best -3.544 at 24,336, blew up at 33,462 and 51,714. Figure analysis/llm_compare/figs/c_val_curves.png (c_val_curves.py
+      @bde7216d0). Best trial scored by FA-ccin2p3-c9d44ad3 (job_llm_score.sh REREAD=FA-ccin2p3-29ce8950, site pick: CC);
+      control already scored (FA-ccin2p3-48e43133, data/c_control_*.json).'
   step_waits:
     '5': FA-ccin2p3-c9d44ad3
     '8': part (c) driver llmcmp_c_qperp_drive5 ending (its detach DONE event; wave 3 of 2 trials after trials 3 -5.816 and
