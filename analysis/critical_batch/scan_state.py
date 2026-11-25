@@ -165,6 +165,7 @@ def draw():
     axC.axhline(16384, color=ps.C.purple, ls=":", label="canonical batch 16384")
     axC.errorbar([], [], yerr=[], fmt="o", color="k", label=r"$B_{\rm crit}$, 16-84% bootstrap")
     axC.set_yscale("log")
+    axC.set_ylim(q25 / 2, 2 * 16384)   # by rule: the noise scale's band and the canonical batch both on the frame
     axC.set_xlabel(r"target $\mathcal{L}_{\rm val}$")
     axC.set_ylabel(r"batch size $B$")
     axC.set_xticks(TARGETS, [str(L) for L in TARGETS])
