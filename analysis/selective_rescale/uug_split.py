@@ -8,7 +8,7 @@ binned in log10(min x).
 Arms per size D (1e4, 1e5), each its search's chosen trial (seed 42) + seeds 43/44, all on CC:
   off       no rescale      ftmech_d539_uug_<D>_off_b2048 chosen trial (d539_read), + _s43/_s44
   rescale   full rescale    ftmech_d539_uug_<D>_eps1e-8_b2048 chosen trial, + _s43/_s44
-  below0.1  rescale below x=0.1   data/stage2_chosen.json uug_<D>_softbelow_x0p1, + selres_s2_uug_<D>_softbelow_x0p1_s4x
+  below_x0p1  rescale below x=0.1   data/stage2_chosen.json uug_<D>_softbelow_x0p1, + selres_s2_uug_<D>_softbelow_x0p1_s4x
 Per run: sigma_stage/preds_val.npz (the final model, after the sigma fit), rows matched to the val pool named in the
 run log by the saved pool_row, checked against the raw |M|^2 (float32 as saved, rel < 1e-5; repeated rows counted); residual = (pred - truth) x prepd_std.
 Group MSE ratios over the three seeds: zng4g_d1e3_read.ratio (geometric means, 2-sigma from the seeds' log spread).
@@ -31,7 +31,8 @@ CC = "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes"
 X0 = 0.1          # model.input_soft_x0 of the rule
 EPS = 1e-8        # model.input_soft_eps (D539)
 SEEDS = (42, 43, 44)
-ARMS = ("off", "rescale", "below0.1")
+ARMS = ("off", "rescale", "below_x0p1")
+RAW = {"off": "off", "rescale": "rescale", "below_x0p1": "below0.1"}   # arm labels of the site read (uug_split_raw.json)
 BIN = 10          # bins per decade of min x
 
 REMOTE = r'''
@@ -99,18 +100,18 @@ def main():
     assert not bad, bad
     lb = int(np.floor(np.log10(X0) * BIN))   # bins below X0 have index < lb (log10 0.1 * 10 = -10 exactly)
     groups = {"changed": lambda k, b: b < lb, "rest": lambda k, b: b >= lb,
-              "rest_0.1-0.2": lambda k, b: lb <= b < lb + 3, "rest_ge0.2": lambda k, b: b >= lb + 3}
+              "rest_x0p1_0p2": lambda k, b: lb <= b < lb + 3, "rest_ge_x0p2": lambda k, b: b >= lb + 3}
     res = {"run_dirs": rd, "pdg": raw[next(iter(raw))]["pdg"], "cells": {}}
     for d in ("1e4", "1e5"):
         c = {}
         for a in ARMS:
-            rr = [raw[f"{d}|{a}|{s}"] for s in SEEDS]
+            rr = [raw[f"{d}|{RAW[a]}|{s}"] for s in SEEDS]
             c[a] = {"mse": [r["mse"] for r in rr], "n": [r["n"] for r in rr], "n_ambiguous": [r["n_ambiguous"] for r in rr]}
             for g, f in groups.items():
                 ns = [group(r["hist"], f) for r in rr]
                 c[a][g] = {"n": ns[0][0], "mse": [s / n for n, s in ns],
                            "se_share": [s / (r["mse"] * r["n"]) for (n, s), r in zip(ns, rr)]}
-        for a in ("below0.1", "rescale"):
+        for a in ("below_x0p1", "rescale"):
             c[a]["over_off"] = {g: ratio(np.array(c[a][g]["mse"]), np.array(c["off"][g]["mse"]))
                                 for g in groups}
             c[a]["over_off"]["total"] = ratio(np.array(c[a]["mse"]), np.array(c["off"]["mse"]))
@@ -123,11 +124,11 @@ def main():
         for a in ARMS:
             pooled = {}
             for s in SEEDS:
-                for k, v in raw[f"{d}|{a}|{s}"]["hist"].items():
+                for k, v in raw[f"{d}|{RAW[a]}|{s}"]["hist"].items():
                     b = int(k.split("|")[1]); t = pooled.setdefault(b, [0, 0.0, []])
                     t[0] += v[0]; t[1] += v[2]
-            per_seed = {b: [sum(v[2] for k, v in raw[f"{d}|{a}|{s}"]["hist"].items() if int(k.split("|")[1]) == b)
-                            / max(1, sum(v[0] for k, v in raw[f"{d}|{a}|{s}"]["hist"].items() if int(k.split("|")[1]) == b))
+            per_seed = {b: [sum(v[2] for k, v in raw[f"{d}|{RAW[a]}|{s}"]["hist"].items() if int(k.split("|")[1]) == b)
+                            / max(1, sum(v[0] for k, v in raw[f"{d}|{RAW[a]}|{s}"]["hist"].items() if int(k.split("|")[1]) == b))
                             for s in SEEDS] for b in pooled}
             c["bins"][a] = {str(b): {"n": pooled[b][0] // 3, "mse_seeds": per_seed[b]} for b in sorted(pooled)}
         res["cells"][d] = c
@@ -135,13 +136,12 @@ def main():
     xmin = json.load(open(os.path.join(HERE, "data", "input_check.json")))["pools"]["uug"]["x_min"]
     lx = lambda x, x0: x0 * np.log1p(x / EPS) / np.log1p(x0 / EPS)   # x' = x F(x) / F(x0)
     res["soft_range_map"] = {"x_min": xmin, "dec_in": float(np.log10(X0 / xmin)),
-                             "below0.1": {"xp_min": float(lx(xmin, X0)), "dec_out": float(np.log10(X0 / lx(xmin, X0)))},
+                             "below_x0p1": {"xp_min": float(lx(xmin, X0)), "dec_out": float(np.log10(X0 / lx(xmin, X0)))},
                              "rescale": {"xp_min": float(lx(xmin, 1.0)), "xp_x0": float(lx(X0, 1.0)),
                                          "dec_out": float(np.log10(lx(X0, 1.0) / lx(xmin, 1.0))),
                                          "dec_all": float(np.log10(1.0 / lx(xmin, 1.0)))}}
     json.dump(res, open(os.path.join(HERE, "data", "uug_split.json"), "w"), indent=1)
-    print(json.dumps({d: {a: {g: res["cells"][d][a]["over_off"][g]["r"] for g in res["cells"][d][a]["over_off"]}
-                          for a in ("below0.1", "rescale")} for d in res["cells"]}))
+    print(json.dumps(res))   # one line: verify_claims reads the last {...} line
     plot(res)
 
 
@@ -162,8 +162,8 @@ def display_bins(B, nmin=50, wmin=2):
 def plot(res):
     sys.path.insert(0, ROOT)
     import plot_style as ps
-    lab = {"off": "no rescale", "rescale": r"rescale, all $x$", "below0.1": r"rescale below $x=0.1$"}
-    cols = {"off": ps.C.blue, "rescale": ps.C.vermillion, "below0.1": ps.sequence(3)[0]}
+    lab = {"off": "no rescale", "rescale": r"rescale, all $x$", "below_x0p1": r"rescale below $x=0.1$"}
+    cols = {"off": ps.C.blue, "rescale": ps.C.vermillion, "below_x0p1": ps.sequence(3)[0]}
     ls = {"1e4": "-", "1e5": "--"}
     fig, axs = ps.figure(ncols=2, nrows=2)
     (am, ar), (an, cell) = axs
