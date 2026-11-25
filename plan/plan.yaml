@@ -40804,13 +40804,6 @@ entries:
       instead of mu_N = a + bN; code (data.level_file in _resolve_amp_preprocessing and parent_target_standardization, unit
       test, repo review), one ~50-step smoke (D395), the run, scoring by job_llm_score.sh, read against trial 5 and the post-hoc
       substitution (level_source.py). Design recorded 2026-11-25, in review.'
-    17: 'D566 (''there is something strange about predicting a single number for a new dataset that depends on how that data
-      was sample ... I believe there is a way to marry these two ideas''): candidate (B), the per-event level map g(process
-      features, diagram descriptors, event invariants, log P), CC CPU job FA-ccin2p3-3bdfcc32 (scripts/job_perevent_level.sh,
-      perevent_level.py @1a4862f5f, design passed 2026-11-25T16:32). When it ends: read the PEL_JSON line of its log (site
-      logs) into analysis/catalog_daniel/data/perevent_level.json, draw perevent_level_fig.py, hand back reads (i)-(iii) per
-      candidate with the figure; (A) is a dead end on existing data. (C), g fed to LLoCa per event, only if (B) passes, its
-      own design.'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -41018,11 +41011,6 @@ entries:
         set by the target''s per-process mean; the fix is a process-level level predictor in the target, carried to our setup'
       - 'the network overrides it (new median within 1.38x of trial 5''s 1.144): the level is learned from the particles whatever
         the target says; next, what in the inputs sets it (pID embedding vs property table)'
-    17:
-      feeds: 'D566: a sampling-independent per-event level that keeps the diagram gain on new families'
-      if:
-      - 'B passes (level error <= 0.19 and flat shift below the diagram regressor''s by > 2x noise): design the GPU arm (C)'
-      - 'B fails: report per family where, no GPU'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
@@ -41653,7 +41641,6 @@ entries:
     '15': 'the next owner (this owner closes near the context limit after step 8''s smokes go out): design the level-branch
       configurations (finding 2026-11-25 split read)'
     '16': FA-ccin2p3-8dbfeb52
-    '17': FA-ccin2p3-3bdfcc32
   handoff:
     state: 'Part (a) DONE, part (c) DONE. Part (b) his setup: 16 heads done; 32 FA-ccin2p3-e9dfa8b9 and 64 FA-ccin2p3-623a3af6
       RUNNING, 120 FA-ccin2p3-f0b997a2 PENDING (steps 12-14: score with job_llm_score.sh REREAD, redraw the ONE all-arms figure
