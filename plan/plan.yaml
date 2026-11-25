@@ -41435,8 +41435,7 @@ entries:
       --tag a_trial5 b_h16 --out b_h16_vs_a5 @9b4d41705; figure analysis/llm_compare/figs/b_h16_heldout_per_process.png (heldout_per_process.py)
       and b_width_curves.png.'
   step_waits:
-    '5': part (c) driver llmcmp_c_qperp_drive5 ending (its detach DONE event; wave 3 of 2 trials after trials 3 -5.816 and
-      5 -5.938 of wave 2)
+    '5': FA-ccin2p3-c9d44ad3
     '8': part (c) driver llmcmp_c_qperp_drive5 ending (its detach DONE event; wave 3 of 2 trials after trials 3 -5.816 and
       5 -5.938 of wave 2)
     '12': FA-ccin2p3-e9dfa8b9
