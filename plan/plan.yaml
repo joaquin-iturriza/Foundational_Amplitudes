@@ -44536,9 +44536,13 @@ entries:
     - its validation against batch-size runs
   decisions:
   - D532
-  next: 'Close critical_batch: when the trunk repo-reviewer backlog (reviewer aee7e3b6b89d84945, blocked on finetune_mechanism''s
-    glu_parent_curves.py) and the notes-editor backlog carrying par:cbs_scan pass, plan done critical_batch --writeup 145d14839
-    and remove worktrees/wt-cbs-accum and worktrees/wt-critbatch with scripts/remove_worktree.sh'
+  next:
+    1: 'Close critical_batch: when the trunk repo-reviewer backlog (reviewer aee7e3b6b89d84945, blocked on finetune_mechanism''s
+      glu_parent_curves.py) and the notes-editor backlog carrying par:cbs_scan pass, plan done critical_batch --writeup 145d14839
+      and remove worktrees/wt-cbs-accum and worktrees/wt-critbatch with scripts/remove_worktree.sh'
+    2: 'D560: explain why B_simple (~55 events) sits ~80x below the scan''s B_crit (~4420), explain the batch-128 gain of
+      the Z+4g fine-tunes (par:ftm_*, zng4g_ftnoset_b128) against the scan, and give a batch rule usable before a run, checked
+      on both settings (existing data first; new jobs only under a passed design)'
   done_when: null
   notes_ref: null
   match: zz_cbs_*,cbs_*
@@ -44992,6 +44996,11 @@ entries:
       if:
       - 'both reviewers pass: plan done with the write-up commit, remove the worktrees'
       - 'a reviewer blocks on par:cbs_scan or scan_state.py: fix and continue the same reviewer'
+    2:
+      feeds: 'D560: which batch number to trust and a rule for future runs'
+      if:
+      - 'a candidate rule predicts both settings: write it up with its figure and propose it as the batch rule'
+      - 'no candidate predicts both: report what each explains, and design the smallest scan that settles it'
   step_waits:
     '1': repo-reviewer aee7e3b6b89d84945 and the notes-editor backlog (par:cbs_scan)
   targets:
