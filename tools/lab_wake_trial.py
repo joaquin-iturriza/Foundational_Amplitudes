@@ -22,13 +22,12 @@ over 60 characters, not "nothing new"). Correct = all five match; beside it, the
 would get right. Our tokens of a wake: input + output + cache read + cache write of its messages (the unit
 of tools/token_share.py).
 """
-import argparse, glob, json, os, random, re, sys, time, urllib.request
+import argparse, glob, json, os, random, re, sys, time, urllib.error, urllib.request
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import main_turns as mt  # noqa: E402
 
 PROJ = os.path.expanduser("~/.claude/projects/-home-joaquin-work-FA")
-OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "analysis", "lab_llm_trial")
 # samples and answers live outside the checkout: another agent's `git stash -u` there unlinks untracked files under
 # running writers (2026-11-25 01:06 UTC: the replay's answers went to deleted inodes)
 DATA = os.path.expanduser("~/.local/share/fa_labllm/wake_trial")
@@ -146,8 +145,15 @@ def ask(model, prompt, system=RULES):
     r = urllib.request.Request(URL, data=json.dumps({"model": model, "messages": [
         {"role": "system", "content": system}, {"role": "user", "content": prompt}]}).encode(),
         headers={"Authorization": "Bearer " + k, "Content-Type": "application/json", "User-Agent": "generic-client/1.0"})
-    t = time.time()
-    d = json.load(urllib.request.urlopen(r, timeout=1200))
+    for i in range(5):  # a 502/503 from the proxy comes back at once: retried, so one busy spell does not skip a pass
+        t = time.time()
+        try:
+            d = json.load(urllib.request.urlopen(r, timeout=1200))
+            break
+        except urllib.error.HTTPError as e:
+            if e.code not in (502, 503) or i == 4:
+                raise
+            time.sleep(120)
     return d["choices"][0]["message"].get("content") or "", d.get("usage") or {}, time.time() - t
 
 
@@ -213,7 +219,7 @@ def report(a):
                      "our_tokens_of_these_wakes": sum(wakes[r["t"]]["tokens"] for r in rs)}
     print(json.dumps(rep, indent=1) if a.json else "\n".join("%s: %d/%d correct %s, %.0f s median" % (
         k, v["correct"], v["n"], v["per_field"], v["seconds_median"] or 0) for k, v in rep.items()))
-    json.dump(rep, open(os.path.join(OUT, "wake_summary.json"), "w"), indent=1)
+    json.dump(rep, open(os.path.join(DATA, "wake_summary.json"), "w"), indent=1)
 
 
 REVIEWER = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".claude", "agents",
@@ -340,7 +346,7 @@ def reviews_report(a):
                 "agree_by_design_read": {w: [sum(r["verdict"] == key[r["agent"]] for r in rs if sl[r["agent"]] == (w == "slice")),
                                              sum(sl[r["agent"]] == (w == "slice") for r in rs)] for w in ("full", "slice")}}
     print(json.dumps(rep, indent=1))
-    json.dump(rep, open(os.path.join(OUT, "review_summary.json"), "w"), indent=1)
+    json.dump(rep, open(os.path.join(DATA, "review_summary.json"), "w"), indent=1)
 
 
 def main():
