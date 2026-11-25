@@ -38,13 +38,14 @@ def main():
         axE.plot(x + off, [d[c]["families"][g]["e"] for g in fams], mk, color=col, label=lab)
         axS.plot(x + off, [d[c]["families"][g]["shift_flat"] for g in fams], mk, color=col, label=lab)
     for ax in (axE, axS):
-        ax.set_xticks(x, [SHORT.get(g, g) for g in fams])
+        ax.set_xticks(x, [SHORT.get(g, g) for g in fams], rotation=45)
         ax.set_xlabel("new held-out family")
     axE.set_yscale("log")
     axE.set_ylabel(r"level error $\langle\hat y-y\rangle_p^2/\sigma_p^2$")
     axS.set_yscale("log")
     axS.set_ylabel(r"shift $|\langle\hat y-y\rangle_{p,{\rm flat}}-\langle\hat y-y\rangle_p|/\sigma_p$")
-    ps.legend(axE, "upper left")
+    ps.layout(fig)
+    ps.legend_free(axS, ncol=2)   # at the default size it covers points even at make_room's growth cap; ncol=2 makes ps.legend bring the font down
     ps.save(fig, os.path.join(HERE, "figs", "perevent_level"))
 
 
