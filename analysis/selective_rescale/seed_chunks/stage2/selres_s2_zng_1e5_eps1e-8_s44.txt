@@ -1,0 +1,1 @@
+sweep/sweep_config_selres_zng_1e5_eps1e-8_b2048.yaml selres_s2_zng_1e5_eps1e-8_s44 1953 training.lr=0.004885170779772217 training.muon_weight_decay=0.2183285654484036 training.regularization_lambda=4.4826413309030283e-10 training.cosanneal_warmup_frac=0.07177891316823662 training.cosanneal_eta_min=2.4745216395877e-08 ema=true training.ema_decay=0.9287329454049468 seed=44

@@ -1,0 +1,122 @@
+{
+ "zng_1e4_softbelow_x0p3": {
+  "sweep": "selres_zng_1e4_softbelow_x0p3_b2048",
+  "hp_idx": 1668,
+  "val_loss": 0.06622137068886992,
+  "run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/selres_zng_1e4_softbelow_x0p3_b2048/trial_1668",
+  "hp": [
+   "training.lr=0.004619030077832502",
+   "training.muon_weight_decay=0.09135442476805637",
+   "training.regularization_lambda=2.7197097721696086e-08",
+   "training.cosanneal_warmup_frac=0.12361691417172553",
+   "training.cosanneal_eta_min=2.513014633054498e-10",
+   "ema=true",
+   "training.ema_decay=0.9007748891115189"
+  ]
+ },
+ "zng_1e4_eventgate_x0p1": {
+  "sweep": "selres_zng_1e4_eventgate_x0p1_b2048",
+  "hp_idx": 33,
+  "val_loss": 0.08314416168923953,
+  "run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/selres_zng_1e4_eventgate_x0p1_b2048/trial_0033",
+  "hp": [
+   "training.lr=0.03204504683402528",
+   "training.muon_weight_decay=0.016693083230222415",
+   "training.regularization_lambda=9.96432447968912e-07",
+   "training.cosanneal_warmup_frac=0.05086875520646572",
+   "training.cosanneal_eta_min=3.750683425059731e-08",
+   "ema=true",
+   "training.ema_decay=0.9643876309264452"
+  ]
+ },
+ "zng_1e5_softbelow_x0p3": {
+  "sweep": "selres_zng_1e5_softbelow_x0p3_b2048",
+  "hp_idx": 102,
+  "val_loss": 0.006648958029693157,
+  "run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/selres_zng_1e5_softbelow_x0p3_b2048/trial_0102",
+  "hp": [
+   "training.lr=0.02212209379167596",
+   "training.muon_weight_decay=0.10946970081815507",
+   "training.regularization_lambda=1.222136181593156e-09",
+   "training.cosanneal_warmup_frac=0.19405670678243042",
+   "training.cosanneal_eta_min=2.103387707402371e-09",
+   "ema=true",
+   "training.ema_decay=0.9741672215396538"
+  ]
+ },
+ "zng_1e5_eventgate_x0p1": {
+  "sweep": "selres_zng_1e5_eventgate_x0p1_b2048",
+  "hp_idx": 1706,
+  "val_loss": 0.006925506483976585,
+  "run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/selres_zng_1e5_eventgate_x0p1_b2048/trial_1706",
+  "hp": [
+   "training.lr=0.018667473064588477",
+   "training.muon_weight_decay=0.28561770635511",
+   "training.regularization_lambda=7.187760807038894e-10",
+   "training.cosanneal_warmup_frac=0.05069375964812935",
+   "training.cosanneal_eta_min=3.696738219259984e-10",
+   "ema=true",
+   "training.ema_decay=0.9290779586294666"
+  ]
+ },
+ "zng_1e5_off": {
+  "sweep": "selres_zng_1e5_off_b2048",
+  "hp_idx": 1333,
+  "val_loss": 0.003969862307159466,
+  "run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/selres_zng_1e5_off_b2048/trial_1333",
+  "hp": [
+   "training.lr=0.020296374402503814",
+   "training.muon_weight_decay=0.014515467363670901",
+   "training.regularization_lambda=8.398127493149626e-07",
+   "training.cosanneal_warmup_frac=0.08970500268042089",
+   "training.cosanneal_eta_min=1.1273967447750811e-08",
+   "ema=true",
+   "training.ema_decay=0.9683249635146931"
+  ]
+ },
+ "zng_1e5_eps1e-8": {
+  "sweep": "selres_zng_1e5_eps1e-8_b2048",
+  "hp_idx": 996,
+  "val_loss": 0.008809220852887174,
+  "run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/selres_zng_1e5_eps1e-8_b2048/trial_0996",
+  "hp": [
+   "training.lr=0.004885170779772217",
+   "training.muon_weight_decay=0.2183285654484036",
+   "training.regularization_lambda=4.4826413309030283e-10",
+   "training.cosanneal_warmup_frac=0.07177891316823662",
+   "training.cosanneal_eta_min=2.4745216395877e-08",
+   "ema=true",
+   "training.ema_decay=0.9287329454049468"
+  ]
+ },
+ "uug_1e4_softbelow_x0p1": {
+  "sweep": "selres_uug_1e4_softbelow_x0p1_b2048",
+  "hp_idx": 180,
+  "val_loss": 0.002480146605367982,
+  "run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/selres_uug_1e4_softbelow_x0p1_b2048/trial_0180",
+  "hp": [
+   "training.lr=0.005896557814811166",
+   "training.muon_weight_decay=0.1372304409756154",
+   "training.regularization_lambda=5.330207263027145e-07",
+   "training.cosanneal_warmup_frac=0.19657233329489832",
+   "training.cosanneal_eta_min=6.832373154571198e-09",
+   "ema=true",
+   "training.ema_decay=0.9292131883576512"
+  ]
+ },
+ "uug_1e5_softbelow_x0p1": {
+  "sweep": "selres_uug_1e5_softbelow_x0p1_b2048",
+  "hp_idx": 1651,
+  "val_loss": 0.0009387292205898359,
+  "run_dir": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/selres_uug_1e5_softbelow_x0p1_b2048/trial_1651",
+  "hp": [
+   "training.lr=0.004000094330473858",
+   "training.muon_weight_decay=0.001466685349737937",
+   "training.regularization_lambda=4.8174433181490554e-08",
+   "training.cosanneal_warmup_frac=0.13904053536243738",
+   "training.cosanneal_eta_min=3.304006866848715e-10",
+   "ema=false",
+   "training.ema_decay=0.9641681452179328"
+  ]
+ }
+}
