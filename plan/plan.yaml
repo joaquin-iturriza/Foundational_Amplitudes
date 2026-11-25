@@ -45445,6 +45445,15 @@ entries:
       (pretraining arm) and FA-ccin2p3-0ac97e10 (Z+4g), 0.3 h target each. The pretraining smoke''s per-read dL spread decides
       200-step windows at update_every 50, or pooling to 400 / reading every 25, before the full runs (upd_noise_pretrain
       1.5 h, upd_noise_zng_adam 0.3 h).'
+  - at: '2026-11-25T12:51:52+00:00'
+    text: '2026-11-25 smoke FA-ccin2p3-b587c065 (v4_het_update_noise smoke, d2d9efc9b, V100): every stage ran (40 steps, 1.36
+      min, NOISE step 0, brute check step 20, noise_scale.json, V3_SHORT_DONE; lr 8.246561e-3, EMA 0.968325 in RUN_SUMMARY).
+      dL reads at steps 10/20/30: dL_b2048/4096/8192 = -458.64/-459.15/-459.40, 2.4731/2.4742/2.4745, -3.642/-3.627/-3.612:
+      ratio dL(8192)/dL(2048) 1.002, 1.0006, 0.992. In the first 40 steps on a 38000-event pool dL is set by a b-independent
+      overshoot (sign changes), so the smoke cannot give the scatter of the stable windows. Choice (mine): keep update_every
+      50 as the passed design; the 200-vs-400-step window pooling is decided from the full run''s own read-to-read spread
+      of the ratio (an analysis step, no rerun; 400-step windows still separate the crossings 765/1700/2720). Rule fixed before
+      the data: a window whose mean dL at any b is <= 0 is not fitted and is listed apart (as the |G|^2<=0 windows of sec:noisescale).'
   handoff:
     state: 'D560 step (next 2). Part A done and written up: par:cbs_regimes + fig:cbs_regimes in docs/results.tex (adf0da30a),
       reader analysis/critical_batch/ft_bcrit.py @2a98dcca3 (data/ft_bcrit.json, figs/ft_regimes.png; check_caption OK, caption
