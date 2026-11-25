@@ -44576,8 +44576,8 @@ entries:
       Prior search: results.tex for dispatch, routing wake, design review with lab/deepseek/qwen, reviewer model; site decisions
       for dispatch, wake, lab llm, deepseek, reviewer. No earlier trial found.'
   step_waits:
-    '3': notes-editor pass of the results.tex backlog (it blocks on sec:noisescale and fig:llmcmp_heldout, other entries'
-      text; the repo-reviewer already passed the merge)
+    '3': 'the D551 replays'' write-up (detach wake_replay3, detach review_replay3): both reviewers already cover a3bcab715,
+      ac845711e, ad9405eab and d75c664b9; plan done closes the entry, so it follows steps 5 and 6'
     '5': detach wake_replay3
     '6': detach review_replay3
   findings:
