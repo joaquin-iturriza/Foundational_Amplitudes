@@ -44604,6 +44604,30 @@ entries:
       <- the regressor's own shift measured by this job; 2x bootstrap noise <- the job's 30-resample std; model choice and
       architecture <- Joaquin 2026-11-25 'why a boosted tree? I don't see the point instead of just using a neural network',
       the network of the D83 level regressor
+    fix_at: '2026-11-25T17:08:10+00:00'
+    fix: '(1) Learning rate and HPs carried across a batch, data and regularization change with no plan for a NO (check 17,
+      the feature rule): the network is norm_explore3''s per-process level net (1352 rows, sklearn''s default batch 200) moved
+      to 2.7M event rows at batch 4096 with the same lr 3e-3 and alpha 1e-2; sklearn scales the L2 term by the batch size,
+      so the effective regularization is ~20x weaker, and results.tex l.8510 shows this level net moving from 0.04-0.10 to
+      0.34-0.53 with width or depth alone, above the 0.19 gate. As written, a fail on (i) is reported as a verdict on the
+      per-event map. Fix: say that on a fail on (i) the network gets a search over its coupled space (width, depth, alpha,
+      lr, batch), cross-fitted by relabelling class on the training processes (never on the 43 new), and the tree the same-sized
+      search over its own (learning rate, leaves, iterations, l2), best against best; or state the scaling rule used for lr/alpha
+      and its source. The tree-vs-network read in the outcome (''the tree''s piecewise-constant extrapolation was the limit'')
+      holds only at matched tuning effort: tie it to that. (2) No wall-time target for the network job (checks 13 and 15):
+      the job script keeps the tree''s 3 h limit, while the network job is 18 fits (5 folds + full, 3 seeds) of up to 200
+      epochs over ~2.3M rows. Fix: take the time per epoch from the synthetic Net().fit run (200k rows) scaled to 2.3M rows
+      at 4 CPUs, state the target (fits x expected epochs x time per epoch) and set --hdr=--time from it; check the peak memory
+      (X float64 ~0.9 GB plus the scaler and early-stopping copies) against 16G. Also commit perevent_level.py and perevent_level_fig.py
+      (the design says ''this commit'' but the diff is uncommitted) and name the commit. (3) Prior incomplete (check 5): results.tex
+      l.7814 (pool_stats.py) already compared trees against linear for the per-process level: gradient-boosted trees on the
+      ridge residuals placed the 43 new at 0.32 (ridge 0.76; cross-fitted 0.064), and the descriptor network got 0.045 (l.8508).
+      This is the earlier tree-vs-network evidence on the same quantity, and it is the honest answer to Joaquin''s ''why a
+      boosted tree?''; the prior and the design''s reasoning that a tree cannot extrapolate should cite it. Terms searched:
+      boosted, gradient-boost, per-event level, perevent, norm_explore6, D566. Checks that hold: matched control (regressor
+      and shared target, same code and events, asserted references 47 and 0.044), gate 0.19 = top of the regressor''s 10-ensemble
+      spread 0.016-0.19 (l.8510, read), shift bar from the job''s own regressor shift and 30-resample bootstrap, CPU only,
+      no label in the inputs, same events as the tree job.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
