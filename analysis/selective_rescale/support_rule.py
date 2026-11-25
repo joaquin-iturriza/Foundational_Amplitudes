@@ -248,6 +248,15 @@ def minima(cached):
     res = json.load(open(f)) if cached else site_python(MINIMA, [f"'{k}#{v}'" for k, v in LOGS.items()], "SRMIN", timeout=5400)
     json.dump(res, open(f, "w"), indent=1)
     print(json.dumps(res))
+    import math
+    fin = res["finale"].values(); soft = [v for v in fin if v["below_0.009_by_pid"]]
+    # where a momentum at x enters the model under the rule at x0: x0 log1p(x/eps) / log1p(x0/eps) (wrappers._soft_rescale)
+    enter = {f"enter_1e-7_x0_{x0}": x0 * math.log1p(1e-7 / 1e-8) / math.log1p(x0 / 1e-8) for x0 in (X0, 1e-5)}
+    print(json.dumps({"finale_min": min(v["min"] for v in fin), "finale_min_pid": min(fin, key=lambda v: v["min"])["pid_min"],
+                      "finale_below_0.009": sum(n for v in soft for n in v["below_0.009_by_pid"].values()),
+                      "finale_below_0.009_pids": sorted({q for v in soft for q in v["below_0.009_by_pid"]}),
+                      "finale_min_others": min(v["min"] for v in fin if not v["below_0.009_by_pid"]),
+                      "zng_train_min": res["zng"]["train"]["min"], **enter}))
 
 
 if __name__ == "__main__":
