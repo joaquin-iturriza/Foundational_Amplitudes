@@ -171,6 +171,24 @@ def draw():
     axC.set_xticks(TARGETS, [str(L) for L in TARGETS])
     ps.legend_cell(cell, [axS, axC])
     ps.save(fig, f"{HERE}/figs/cbs_readout")
+    # the summary the notes' claims key into: per target (t166, t208, t230) the fit, its bootstrap, the design's ratio
+    # S(2048)/S(32768), B_crit over the noise scale's median, each batch's best S and V100 hours to the target
+    r3 = lambda v: float(f"{v:.3g}")
+    summ = {"Bsimple": {"q25": r3(q25), "median": r3(q50), "q75": r3(q75)},
+            "v100": {str(b): r3(x) for b, x in med.get("V100", {}).items()},
+            "n_diverged": sum(bool(t["diverged_at"]) for ts in tr.values() for t in ts),
+            "n_timeout": sum(t["timeout"] for ts in tr.values() for t in ts),
+            "diverged_at": {b: sorted(t["diverged_at"] for t in ts if t["diverged_at"]) for b, ts in tr.items()},
+            "timeout_at": {b: sorted(len(t["val_curve"]) * t["validate_every"] for t in ts if t["timeout"])
+                           for b, ts in tr.items()}}
+    for L in TARGETS:
+        r, k = res[str(L)], "t%d" % round(-100 * L)
+        summ[k] = {"B_crit": r3(r["B_crit"]), "q16": r3(r["B_crit_q16_50_84"][0]), "q84": r3(r["B_crit_q16_50_84"][2]),
+                   "S_min": r3(r["S_min"]), "ratio": r3(r["S_2048_over_S_32768"]), "over_Bsimple": r3(r["B_crit"] / q50),
+                   "S": {str(x["B"]): r3(x["S"]) for x in r["batches"] if x.get("S")},
+                   "hours": {str(x["B"]): r3(x["S"] * med["V100"][x["B"]] / 3600) for x in r["batches"]
+                             if x.get("S") and x["B"] in med.get("V100", {})}}
+    print(json.dumps(summ))
 
 
 if __name__ == "__main__":
