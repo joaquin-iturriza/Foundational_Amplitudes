@@ -1,0 +1,1426 @@
+{
+ "a_trial5": {
+  "interp": {
+   "families": {
+    "ss~ annihilation processes (flavor-degenerate with dd~ and uu~)": {
+     "n": 19,
+     "median_share": {
+      "bias2": 0.04574293727738184,
+      "scale": 0.0051423197000604525,
+      "floor": 0.948379541739177
+     },
+     "largest_count": {
+      "bias2": 2,
+      "scale": 0,
+      "floor": 17
+     },
+     "bias2_above_llm_mse": 1
+    },
+    "Muon final states from bb~ annihilation": {
+     "n": 12,
+     "median_share": {
+      "bias2": 0.045740049850578085,
+      "scale": 0.0025813390690481385,
+      "floor": 0.9102814505595664
+     },
+     "largest_count": {
+      "bias2": 0,
+      "scale": 0,
+      "floor": 12
+     },
+     "bias2_above_llm_mse": 0
+    },
+    "g+s processes from gluon + light-quark families": {
+     "n": 16,
+     "median_share": {
+      "bias2": 0.21631406515579912,
+      "scale": 0.01170334228116755,
+      "floor": 0.6480775566903223
+     },
+     "largest_count": {
+      "bias2": 5,
+      "scale": 0,
+      "floor": 11
+     },
+     "bias2_above_llm_mse": 1
+    },
+    "b+s(~) scattering from b+light-quark families": {
+     "n": 10,
+     "median_share": {
+      "bias2": 0.2535517010628717,
+      "scale": 0.05710695102282234,
+      "floor": 0.5782736509303696
+     },
+     "largest_count": {
+      "bias2": 1,
+      "scale": 1,
+      "floor": 8
+     },
+     "bias2_above_llm_mse": 2
+    },
+    "c+u~ scattering from c+light-quark families": {
+     "n": 5,
+     "median_share": {
+      "bias2": 0.29896701271621395,
+      "scale": 0.05003510046501111,
+      "floor": 0.5513268962513508
+     },
+     "largest_count": {
+      "bias2": 1,
+      "scale": 0,
+      "floor": 4
+     },
+     "bias2_above_llm_mse": 1
+    },
+    "ds and s~s~ from same-sign light quark families": {
+     "n": 10,
+     "median_share": {
+      "bias2": 0.22831634811420948,
+      "scale": 0.12153816766212713,
+      "floor": 0.4974431107836268
+     },
+     "largest_count": {
+      "bias2": 3,
+      "scale": 2,
+      "floor": 5
+     },
+     "bias2_above_llm_mse": 1
+    },
+    "Same-sign charm-bottom scattering (cb, c~b~)": {
+     "n": 24,
+     "median_share": {
+      "bias2": 0.1300319292424093,
+      "scale": 0.020861152308438723,
+      "floor": 0.7049639827047909
+     },
+     "largest_count": {
+      "bias2": 5,
+      "scale": 0,
+      "floor": 19
+     },
+     "bias2_above_llm_mse": 5
+    },
+    "all": {
+     "n": 96,
+     "median_share": {
+      "bias2": 0.12123518654057631,
+      "scale": 0.01984933237462469,
+      "floor": 0.7768973491878213
+     },
+     "largest_count": {
+      "bias2": 17,
+      "scale": 3,
+      "floor": 76
+     },
+     "bias2_above_llm_mse": 11
+    }
+   },
+   "worst": [
+    {
+     "process": "c u~ > c u~ a",
+     "mse": 0.654714711348206,
+     "llm_mse": 0.08059290385671361,
+     "bias": -0.6929343151099785,
+     "bias2": 0.480157965056935,
+     "scale": 0.09022838550116458,
+     "floor": 0.08432836079010647,
+     "rho": 0.994342824564239,
+     "true_std": 2.733928159477055
+    },
+    {
+     "process": "s s~ > d u~ w+",
+     "mse": 0.6066881991081648,
+     "llm_mse": 0.08828214255478053,
+     "bias": 0.4713811660140479,
+     "bias2": 0.22220020367276339,
+     "scale": 0.1758547110821594,
+     "floor": 0.20863328435324208,
+     "rho": 0.6220261990834121,
+     "true_std": 0.583353779697979
+    },
+    {
+     "process": "b s~ > b s~ a",
+     "mse": 0.3536241643782809,
+     "llm_mse": 0.08006152477516085,
+     "bias": -0.3017696409327586,
+     "bias2": 0.09106491618868605,
+     "scale": 0.09274202090594416,
+     "floor": 0.1698172272836507,
+     "rho": 0.9876756815330991,
+     "true_std": 2.632913883304435
+    },
+    {
+     "process": "b b~ > w+ mu- vm~",
+     "mse": 0.30632371863580615,
+     "llm_mse": 0.644022190793832,
+     "bias": 0.0199400244986343,
+     "bias2": 0.0003976045770061361,
+     "scale": 0.00020684843742202474,
+     "floor": 0.30571926562137797,
+     "rho": 0.9675167862308657,
+     "true_std": 2.18712037068819
+    },
+    {
+     "process": "b b~ > w- mu+ vm",
+     "mse": 0.2914121165037241,
+     "llm_mse": 0.6000953683439675,
+     "bias": -0.017428418452011485,
+     "bias2": 0.0003037497697384144,
+     "scale": 2.0958023729256148e-06,
+     "floor": 0.2911062709316128,
+     "rho": 0.967845176699571,
+     "true_std": 2.1449010088859195
+    },
+    {
+     "process": "b s~ > b s~",
+     "mse": 0.2164823728258514,
+     "llm_mse": 0.012023768322944384,
+     "bias": -0.23244491583111593,
+     "bias2": 0.05403063889573457,
+     "scale": 0.1118710602724165,
+     "floor": 0.05058067365770034,
+     "rho": 0.9971332184496027,
+     "true_std": 2.972292095222495
+    }
+   ]
+  },
+  "extrap": {
+   "families": {
+    "Multi-Higgs production (hh, hhh, Xhh)": {
+     "n": 15,
+     "median_share": {
+      "bias2": 0.8853280721363057,
+      "scale": 0.012810846503255062,
+      "floor": 0.10353335352677327
+     },
+     "largest_count": {
+      "bias2": 15,
+      "scale": 0,
+      "floor": 0
+     },
+     "bias2_above_llm_mse": 11
+    },
+    "Higgs + tau lepton processes": {
+     "n": 9,
+     "median_share": {
+      "bias2": 0.3493534105763009,
+      "scale": 0.014309428856884743,
+      "floor": 0.6488132172412976
+     },
+     "largest_count": {
+      "bias2": 0,
+      "scale": 0,
+      "floor": 9
+     },
+     "bias2_above_llm_mse": 0
+    },
+    "Triple-W production (W+W+W-, W+W-W-)": {
+     "n": 4,
+     "median_share": {
+      "bias2": 0.5154031802249897,
+      "scale": 0.019219216214231474,
+      "floor": 0.4705055228711996
+     },
+     "largest_count": {
+      "bias2": 2,
+      "scale": 0,
+      "floor": 2
+     },
+     "bias2_above_llm_mse": 0
+    },
+    "Triple-Z production (ZZZ)": {
+     "n": 5,
+     "median_share": {
+      "bias2": 0.9386821710069625,
+      "scale": 0.015873629767170164,
+      "floor": 0.04529492965627667
+     },
+     "largest_count": {
+      "bias2": 5,
+      "scale": 0,
+      "floor": 0
+     },
+     "bias2_above_llm_mse": 5
+    },
+    "gg -> W + qq' (W production from gluon fusion)": {
+     "n": 6,
+     "median_share": {
+      "bias2": 0.8769031736012038,
+      "scale": 0.00822050882218809,
+      "floor": 0.118297226480295
+     },
+     "largest_count": {
+      "bias2": 6,
+      "scale": 0,
+      "floor": 0
+     },
+     "bias2_above_llm_mse": 6
+    },
+    "gg -> tt~ + boson (ttX via gluon fusion)": {
+     "n": 4,
+     "median_share": {
+      "bias2": 0.37907956350910377,
+      "scale": 0.0467216813757812,
+      "floor": 0.49974333936444004
+     },
+     "largest_count": {
+      "bias2": 2,
+      "scale": 0,
+      "floor": 2
+     },
+     "bias2_above_llm_mse": 2
+    },
+    "all": {
+     "n": 43,
+     "median_share": {
+      "bias2": 0.8587553824677414,
+      "scale": 0.014748417796981982,
+      "floor": 0.12446380034750047
+     },
+     "largest_count": {
+      "bias2": 30,
+      "scale": 0,
+      "floor": 13
+     },
+     "bias2_above_llm_mse": 24
+    }
+   },
+   "worst": [
+    {
+     "process": "g g > t b~ w-",
+     "mse": 26.571033600205343,
+     "llm_mse": 2.2391468685628966,
+     "bias": -4.778940053682234,
+     "bias2": 22.838268036688355,
+     "scale": 0.5135795138327133,
+     "floor": 3.219186049684275,
+     "rho": 0.3638648803658862,
+     "true_std": 1.9262501208235503
+    },
+    {
+     "process": "g g > b t~ w+",
+     "mse": 25.546289971443624,
+     "llm_mse": 2.4837673720678675,
+     "bias": -4.738500538816328,
+     "bias2": 22.45338735636263,
+     "scale": 0.17549494601287563,
+     "floor": 2.917407669068119,
+     "rho": 0.4332940290221075,
+     "true_std": 1.8951867877488902
+    },
+    {
+     "process": "b b~ > h h h",
+     "mse": 22.572890613900633,
+     "llm_mse": 13.108471357358122,
+     "bias": 4.70125640631467,
+     "bias2": 22.101811797914724,
+     "scale": 0.3518430543303003,
+     "floor": 0.11923576165560822,
+     "rho": 0.9260173402623623,
+     "true_std": 0.9147621750508034
+    },
+    {
+     "process": "g b~ > b~ h h",
+     "mse": 5.262493803184695,
+     "llm_mse": 4.686172987632555,
+     "bias": 2.1584794401158334,
+     "bias2": 4.659033493402761,
+     "scale": 0.002869662557800523,
+     "floor": 0.600590647224133,
+     "rho": 0.90161864310383,
+     "true_std": 1.7917242228751744
+    },
+    {
+     "process": "b b~ > a h h",
+     "mse": 4.659039244139701,
+     "llm_mse": 2.0799022208642115,
+     "bias": 2.094987811125595,
+     "bias2": 4.388973928764811,
+     "scale": 0.01121531941197862,
+     "floor": 0.2588499959629118,
+     "rho": 0.933843122683293,
+     "true_std": 1.4224138167517637
+    },
+    {
+     "process": "g b > b h h",
+     "mse": 4.537189046657374,
+     "llm_mse": 4.297603162910566,
+     "bias": 1.9884394805528096,
+     "bias2": 3.9538915678211275,
+     "scale": 0.024781568720105618,
+     "floor": 0.5585159101161405,
+     "rho": 0.9124338310059552,
+     "true_std": 1.826233860186268
+    }
+   ]
+  }
+ },
+ "b_h16": {
+  "interp": {
+   "families": {
+    "ss~ annihilation processes (flavor-degenerate with dd~ and uu~)": {
+     "n": 19,
+     "median_share": {
+      "bias2": 0.06212169448878034,
+      "scale": 0.002764163026999833,
+      "floor": 0.9372706866406438
+     },
+     "largest_count": {
+      "bias2": 3,
+      "scale": 0,
+      "floor": 16
+     },
+     "bias2_above_llm_mse": 2
+    },
+    "Muon final states from bb~ annihilation": {
+     "n": 12,
+     "median_share": {
+      "bias2": 0.051062173639786976,
+      "scale": 0.009921690938121907,
+      "floor": 0.936944732930403
+     },
+     "largest_count": {
+      "bias2": 2,
+      "scale": 0,
+      "floor": 10
+     },
+     "bias2_above_llm_mse": 0
+    },
+    "g+s processes from gluon + light-quark families": {
+     "n": 16,
+     "median_share": {
+      "bias2": 0.19321170361150286,
+      "scale": 0.017265837093061703,
+      "floor": 0.7116567674122216
+     },
+     "largest_count": {
+      "bias2": 4,
+      "scale": 0,
+      "floor": 12
+     },
+     "bias2_above_llm_mse": 0
+    },
+    "b+s(~) scattering from b+light-quark families": {
+     "n": 10,
+     "median_share": {
+      "bias2": 0.21021993229547142,
+      "scale": 0.09131577021380666,
+      "floor": 0.6230889051657745
+     },
+     "largest_count": {
+      "bias2": 1,
+      "scale": 2,
+      "floor": 7
+     },
+     "bias2_above_llm_mse": 0
+    },
+    "c+u~ scattering from c+light-quark families": {
+     "n": 5,
+     "median_share": {
+      "bias2": 0.06330595528917615,
+      "scale": 0.07997448554437017,
+      "floor": 0.6525556563015238
+     },
+     "largest_count": {
+      "bias2": 1,
+      "scale": 0,
+      "floor": 4
+     },
+     "bias2_above_llm_mse": 1
+    },
+    "ds and s~s~ from same-sign light quark families": {
+     "n": 10,
+     "median_share": {
+      "bias2": 0.8037701216038258,
+      "scale": 0.03503228604990624,
+      "floor": 0.15526973672684502
+     },
+     "largest_count": {
+      "bias2": 10,
+      "scale": 0,
+      "floor": 0
+     },
+     "bias2_above_llm_mse": 3
+    },
+    "Same-sign charm-bottom scattering (cb, c~b~)": {
+     "n": 24,
+     "median_share": {
+      "bias2": 0.06453418612375413,
+      "scale": 0.04480727765482698,
+      "floor": 0.8132947747814387
+     },
+     "largest_count": {
+      "bias2": 2,
+      "scale": 2,
+      "floor": 20
+     },
+     "bias2_above_llm_mse": 0
+    },
+    "all": {
+     "n": 96,
+     "median_share": {
+      "bias2": 0.11288907248623217,
+      "scale": 0.02611825243794258,
+      "floor": 0.7672946348719922
+     },
+     "largest_count": {
+      "bias2": 23,
+      "scale": 4,
+      "floor": 69
+     },
+     "bias2_above_llm_mse": 6
+    }
+   },
+   "worst": [
+    {
+     "process": "s s~ > u d~ w-",
+     "mse": 0.5800347054975598,
+     "llm_mse": 0.24597012996876316,
+     "bias": 0.644747786585901,
+     "bias2": 0.4156997083074186,
+     "scale": 0.03015998736634945,
+     "floor": 0.1341750098237917,
+     "rho": 0.7725757934958056,
+     "true_std": 0.5769192984245272
+    },
+    {
+     "process": "s s~ > d u~ w+",
+     "mse": 0.515845077383278,
+     "llm_mse": 0.08828214255478053,
+     "bias": 0.5596663298440863,
+     "bias2": 0.31322640076114955,
+     "scale": 0.045541184659638995,
+     "floor": 0.15707749196248946,
+     "rho": 0.7337689498756192,
+     "true_std": 0.583353779697979
+    },
+    {
+     "process": "b b~ > w+ mu- vm~",
+     "mse": 0.29596921949813176,
+     "llm_mse": 0.644022190793832,
+     "bias": -0.02784852815864003,
+     "bias2": 0.0007755405206025666,
+     "scale": 0.0008893160150051371,
+     "floor": 0.29430436296252405,
+     "rho": 0.9687492149821932,
+     "true_std": 2.18712037068819
+    },
+    {
+     "process": "b b~ > w- mu+ vm",
+     "mse": 0.28243423622543995,
+     "llm_mse": 0.6000953683439675,
+     "bias": 0.014909801334593631,
+     "bias2": 0.00022230217583705,
+     "scale": 2.529720376520661e-05,
+     "floor": 0.28218663684583767,
+     "rho": 0.968846264336986,
+     "true_std": 2.1449010088859195
+    },
+    {
+     "process": "d s > d s h",
+     "mse": 0.19376911684824097,
+     "llm_mse": 0.04002284148846235,
+     "bias": -0.43487870793961925,
+     "bias2": 0.18911949061923267,
+     "scale": 0.0006360226037857705,
+     "floor": 0.004013603625222532,
+     "rho": 0.9997879141632052,
+     "true_std": 3.076234489082257
+    },
+    {
+     "process": "b b~ > z mu- mu+",
+     "mse": 0.14145977257108025,
+     "llm_mse": 0.37526143352917385,
+     "bias": -0.005971615316342493,
+     "bias2": 3.566018948637626e-05,
+     "scale": 0.0005280317390775613,
+     "floor": 0.14089608064251632,
+     "rho": 0.9807310106593858,
+     "true_std": 1.921353330061681
+    }
+   ]
+  },
+  "extrap": {
+   "families": {
+    "Multi-Higgs production (hh, hhh, Xhh)": {
+     "n": 15,
+     "median_share": {
+      "bias2": 0.9223805123365855,
+      "scale": 0.004867355856780333,
+      "floor": 0.07462957133743477
+     },
+     "largest_count": {
+      "bias2": 15,
+      "scale": 0,
+      "floor": 0
+     },
+     "bias2_above_llm_mse": 14
+    },
+    "Higgs + tau lepton processes": {
+     "n": 9,
+     "median_share": {
+      "bias2": 0.468072130114041,
+      "scale": 0.004406231143170817,
+      "floor": 0.5275216387427882
+     },
+     "largest_count": {
+      "bias2": 1,
+      "scale": 0,
+      "floor": 8
+     },
+     "bias2_above_llm_mse": 6
+    },
+    "Triple-W production (W+W+W-, W+W-W-)": {
+     "n": 4,
+     "median_share": {
+      "bias2": 0.22378660560345887,
+      "scale": 0.0009496871071420906,
+      "floor": 0.77071127083018
+     },
+     "largest_count": {
+      "bias2": 0,
+      "scale": 0,
+      "floor": 4
+     },
+     "bias2_above_llm_mse": 0
+    },
+    "Triple-Z production (ZZZ)": {
+     "n": 5,
+     "median_share": {
+      "bias2": 0.9758079161145597,
+      "scale": 0.00014934647450948793,
+      "floor": 0.024009121992034213
+     },
+     "largest_count": {
+      "bias2": 5,
+      "scale": 0,
+      "floor": 0
+     },
+     "bias2_above_llm_mse": 5
+    },
+    "gg -> W + qq' (W production from gluon fusion)": {
+     "n": 6,
+     "median_share": {
+      "bias2": 0.8606895815342566,
+      "scale": 0.006777837769855986,
+      "floor": 0.13120765529513478
+     },
+     "largest_count": {
+      "bias2": 6,
+      "scale": 0,
+      "floor": 0
+     },
+     "bias2_above_llm_mse": 6
+    },
+    "gg -> tt~ + boson (ttX via gluon fusion)": {
+     "n": 4,
+     "median_share": {
+      "bias2": 0.45444802065329354,
+      "scale": 0.06735828569446187,
+      "floor": 0.4207862549882212
+     },
+     "largest_count": {
+      "bias2": 2,
+      "scale": 0,
+      "floor": 2
+     },
+     "bias2_above_llm_mse": 1
+    },
+    "all": {
+     "n": 43,
+     "median_share": {
+      "bias2": 0.8632905465739794,
+      "scale": 0.004867355856780333,
+      "floor": 0.11378151145189196
+     },
+     "largest_count": {
+      "bias2": 29,
+      "scale": 0,
+      "floor": 14
+     },
+     "bias2_above_llm_mse": 32
+    }
+   },
+   "worst": [
+    {
+     "process": "b b~ > h h h",
+     "mse": 30.187208974155922,
+     "llm_mse": 13.108471357358122,
+     "bias": 5.433575153727883,
+     "bias2": 29.52373895120899,
+     "scale": 0.14693188840020965,
+     "floor": 0.516538134546722,
+     "rho": 0.618639327474563,
+     "true_std": 0.9147621750508034
+    },
+    {
+     "process": "g g > t b~ w-",
+     "mse": 16.291358742333383,
+     "llm_mse": 2.2391468685628966,
+     "bias": -3.66902635620958,
+     "bias2": 13.46175440256055,
+     "scale": 0.058532678005344785,
+     "floor": 2.771071661767489,
+     "rho": 0.5031589138227985,
+     "true_std": 1.9262501208235503
+    },
+    {
+     "process": "g g > b t~ w+",
+     "mse": 15.62345690376286,
+     "llm_mse": 2.4837673720678675,
+     "bias": -3.5631346512711763,
+     "bias2": 12.695928543089368,
+     "scale": 0.20567402619566222,
+     "floor": 2.7218543344778294,
+     "rho": 0.49212713267342345,
+     "true_std": 1.8951867877488902
+    },
+    {
+     "process": "b b~ > a h h",
+     "mse": 5.553897903429743,
+     "llm_mse": 2.0799022208642115,
+     "bias": 2.2633619228109794,
+     "bias2": 5.122807193630614,
+     "scale": 0.11175235481145324,
+     "floor": 0.31933835498767577,
+     "rho": 0.9176963060432711,
+     "true_std": 1.4224138167517637
+    },
+    {
+     "process": "g b~ > b~ h h",
+     "mse": 5.464241144268824,
+     "llm_mse": 4.686172987632555,
+     "bias": 2.212829634468278,
+     "bias2": 4.896614991181013,
+     "scale": 0.1044280846093314,
+     "floor": 0.4631980684784792,
+     "rho": 0.9250480681068693,
+     "true_std": 1.7917242228751744
+    },
+    {
+     "process": "g b > b h h",
+     "mse": 4.937652963335308,
+     "llm_mse": 4.297603162910566,
+     "bias": 2.0890636443617474,
+     "bias2": 4.364186910193985,
+     "scale": 0.11088966686055635,
+     "floor": 0.4625763862807668,
+     "rho": 0.928063493024173,
+     "true_std": 1.826233860186268
+    }
+   ]
+  }
+ },
+ "c_control": {
+  "interp": {
+   "families": {
+    "ss~ annihilation processes (flavor-degenerate with dd~ and uu~)": {
+     "n": 19,
+     "median_share": {
+      "bias2": 0.4476893821126876,
+      "scale": 0.011571788815171884,
+      "floor": 0.5309056843907014
+     },
+     "largest_count": {
+      "bias2": 9,
+      "scale": 0,
+      "floor": 10
+     },
+     "bias2_above_llm_mse": 1
+    },
+    "Muon final states from bb~ annihilation": {
+     "n": 12,
+     "median_share": {
+      "bias2": 0.43057348718688593,
+      "scale": 0.01597778731032432,
+      "floor": 0.5534487255027898
+     },
+     "largest_count": {
+      "bias2": 4,
+      "scale": 0,
+      "floor": 8
+     },
+     "bias2_above_llm_mse": 0
+    },
+    "g+s processes from gluon + light-quark families": {
+     "n": 16,
+     "median_share": {
+      "bias2": 0.19586201834928146,
+      "scale": 0.02526463509403163,
+      "floor": 0.7345080457983941
+     },
+     "largest_count": {
+      "bias2": 0,
+      "scale": 0,
+      "floor": 16
+     },
+     "bias2_above_llm_mse": 0
+    },
+    "b+s(~) scattering from b+light-quark families": {
+     "n": 10,
+     "median_share": {
+      "bias2": 0.21514852700906656,
+      "scale": 0.05341877098608322,
+      "floor": 0.678028144822168
+     },
+     "largest_count": {
+      "bias2": 1,
+      "scale": 0,
+      "floor": 9
+     },
+     "bias2_above_llm_mse": 0
+    },
+    "c+u~ scattering from c+light-quark families": {
+     "n": 5,
+     "median_share": {
+      "bias2": 0.0723681581021489,
+      "scale": 0.04539361865742044,
+      "floor": 0.7987246367609228
+     },
+     "largest_count": {
+      "bias2": 0,
+      "scale": 0,
+      "floor": 5
+     },
+     "bias2_above_llm_mse": 0
+    },
+    "ds and s~s~ from same-sign light quark families": {
+     "n": 10,
+     "median_share": {
+      "bias2": 0.11412761082778675,
+      "scale": 0.012939473345206893,
+      "floor": 0.8741582738120248
+     },
+     "largest_count": {
+      "bias2": 0,
+      "scale": 0,
+      "floor": 10
+     },
+     "bias2_above_llm_mse": 0
+    },
+    "Same-sign charm-bottom scattering (cb, c~b~)": {
+     "n": 24,
+     "median_share": {
+      "bias2": 0.24237591655923033,
+      "scale": 0.020729633701538956,
+      "floor": 0.702932638855084
+     },
+     "largest_count": {
+      "bias2": 3,
+      "scale": 0,
+      "floor": 21
+     },
+     "bias2_above_llm_mse": 0
+    },
+    "all": {
+     "n": 96,
+     "median_share": {
+      "bias2": 0.23082352867422684,
+      "scale": 0.020718386337435155,
+      "floor": 0.7209429401405034
+     },
+     "largest_count": {
+      "bias2": 17,
+      "scale": 0,
+      "floor": 79
+     },
+     "bias2_above_llm_mse": 1
+    }
+   },
+   "worst": [
+    {
+     "process": "b b~ > w+ mu- vm~",
+     "mse": 3.884535340405914,
+     "llm_mse": 0.644022190793832,
+     "bias": -0.6070342133872577,
+     "bias2": 0.36849053622268674,
+     "scale": 0.5959243791239519,
+     "floor": 2.9201204250592756,
+     "rho": 0.6241334468988802,
+     "true_std": 2.1871203691803336
+    },
+    {
+     "process": "b b~ > w- mu+ vm",
+     "mse": 3.5635638988026535,
+     "llm_mse": 0.6000953683439675,
+     "bias": -0.5716572359581349,
+     "bias2": 0.32679199542329473,
+     "scale": 0.5057118180834346,
+     "floor": 2.7310600852959244,
+     "rho": 0.6374705957220158,
+     "true_std": 2.1449010103935358
+    },
+    {
+     "process": "b b~ > z mu- mu+",
+     "mse": 0.14549510057557505,
+     "llm_mse": 0.37526143352917385,
+     "bias": -0.13424946535166704,
+     "bias2": 0.01802291894720845,
+     "scale": 0.0002443678762387158,
+     "floor": 0.12722781375212788,
+     "rho": 0.9826168370918728,
+     "true_std": 1.921353328599286
+    },
+    {
+     "process": "d s > d s a",
+     "mse": 0.1163768291135353,
+     "llm_mse": 0.11884757287263517,
+     "bias": -0.06851146563808719,
+     "bias2": 0.004693820923878801,
+     "scale": 0.0006518591232395621,
+     "floor": 0.11103114906641692,
+     "rho": 0.9946857365864272,
+     "true_std": 3.236410767528969
+    },
+    {
+     "process": "b b~ > z vm vm~",
+     "mse": 0.09262628354858499,
+     "llm_mse": 0.24454126459263476,
+     "bias": -0.1492296061137175,
+     "bias2": 0.02226947534085527,
+     "scale": 0.00014083549179197408,
+     "floor": 0.07021597271593774,
+     "rho": 0.989964750817834,
+     "true_std": 1.8751291536998627
+    },
+    {
+     "process": "d s > g d s",
+     "mse": 0.07342759316439028,
+     "llm_mse": 0.03729810095812508,
+     "bias": -0.11619405762991697,
+     "bias2": 0.013501059028504465,
+     "scale": 0.0066736407652820615,
+     "floor": 0.05325289337060375,
+     "rho": 0.9981928256248545,
+     "true_std": 3.8401914553892476
+    }
+   ]
+  },
+  "extrap": {
+   "families": {
+    "Multi-Higgs production (hh, hhh, Xhh)": {
+     "n": 15,
+     "median_share": {
+      "bias2": 0.8550679675191006,
+      "scale": 0.029547837083606567,
+      "floor": 0.07132560586752507
+     },
+     "largest_count": {
+      "bias2": 12,
+      "scale": 0,
+      "floor": 3
+     },
+     "bias2_above_llm_mse": 10
+    },
+    "Higgs + tau lepton processes": {
+     "n": 9,
+     "median_share": {
+      "bias2": 0.6490122978479251,
+      "scale": 0.023775758363618074,
+      "floor": 0.33348508754953177
+     },
+     "largest_count": {
+      "bias2": 8,
+      "scale": 0,
+      "floor": 1
+     },
+     "bias2_above_llm_mse": 0
+    },
+    "Triple-W production (W+W+W-, W+W-W-)": {
+     "n": 4,
+     "median_share": {
+      "bias2": 0.6189683396773058,
+      "scale": 0.00453604109646892,
+      "floor": 0.37760481734788637
+     },
+     "largest_count": {
+      "bias2": 4,
+      "scale": 0,
+      "floor": 0
+     },
+     "bias2_above_llm_mse": 0
+    },
+    "Triple-Z production (ZZZ)": {
+     "n": 5,
+     "median_share": {
+      "bias2": 0.8166608380495645,
+      "scale": 0.02602229701720465,
+      "floor": 0.1419991327806487
+     },
+     "largest_count": {
+      "bias2": 5,
+      "scale": 0,
+      "floor": 0
+     },
+     "bias2_above_llm_mse": 3
+    },
+    "gg -> W + qq' (W production from gluon fusion)": {
+     "n": 6,
+     "median_share": {
+      "bias2": 0.9057780545771656,
+      "scale": 0.004264555886789533,
+      "floor": 0.09061766208075614
+     },
+     "largest_count": {
+      "bias2": 6,
+      "scale": 0,
+      "floor": 0
+     },
+     "bias2_above_llm_mse": 2
+    },
+    "gg -> tt~ + boson (ttX via gluon fusion)": {
+     "n": 4,
+     "median_share": {
+      "bias2": 0.2918181433794149,
+      "scale": 0.1387267634617049,
+      "floor": 0.6601070541088536
+     },
+     "largest_count": {
+      "bias2": 0,
+      "scale": 1,
+      "floor": 3
+     },
+     "bias2_above_llm_mse": 1
+    },
+    "all": {
+     "n": 43,
+     "median_share": {
+      "bias2": 0.7455238387001782,
+      "scale": 0.01815069780421199,
+      "floor": 0.18036341640391948
+     },
+     "largest_count": {
+      "bias2": 35,
+      "scale": 1,
+      "floor": 7
+     },
+     "bias2_above_llm_mse": 16
+    }
+   },
+   "worst": [
+    {
+     "process": "g g > t b~ w-",
+     "mse": 36.596593138277846,
+     "llm_mse": 2.2391468685628966,
+     "bias": -5.744419982528453,
+     "bias2": 32.99836093567219,
+     "scale": 0.26688427908361234,
+     "floor": 3.3313479235220456,
+     "rho": 0.3196387355928922,
+     "true_std": 1.9262501207192784
+    },
+    {
+     "process": "b b~ > h h h",
+     "mse": 36.59239104736809,
+     "llm_mse": 13.108471357358122,
+     "bias": 5.893462172425121,
+     "bias2": 34.73289637780582,
+     "scale": 1.6163985382277355,
+     "floor": 0.24309613133453134,
+     "rho": 0.8423120684038196,
+     "true_std": 0.9147621718894876
+    },
+    {
+     "process": "g g > b t~ w+",
+     "mse": 31.551583045956473,
+     "llm_mse": 2.4837673720678675,
+     "bias": -5.295471953031916,
+     "bias2": 28.04202320534765,
+     "scale": 0.3579625834639142,
+     "floor": 3.1515972571449087,
+     "rho": 0.3500590240496349,
+     "true_std": 1.8951867865141079
+    },
+    {
+     "process": "g b~ > b~ h h",
+     "mse": 20.72715983800159,
+     "llm_mse": 4.686172987632555,
+     "bias": -4.435387495321329,
+     "bias2": 19.672662233652815,
+     "scale": 0.6124427420991441,
+     "floor": 0.44205486224963103,
+     "rho": 0.9286011151510359,
+     "true_std": 1.7917242215206841
+    },
+    {
+     "process": "g b > b h h",
+     "mse": 18.85171731193657,
+     "llm_mse": 4.297603162910566,
+     "bias": -4.233832695473588,
+     "bias2": 17.925339293261146,
+     "scale": 0.5104702245868413,
+     "floor": 0.415907794088584,
+     "rho": 0.935571954388361,
+     "true_std": 1.8262338588137499
+    },
+    {
+     "process": "b b~ > g h h",
+     "mse": 15.398227770583379,
+     "llm_mse": 6.757813900232473,
+     "bias": -3.864444687621223,
+     "bias2": 14.93393274368389,
+     "scale": 0.16187636176291104,
+     "floor": 0.3024186651365777,
+     "rho": 0.9245324484402464,
+     "true_std": 1.4429841044566487
+    }
+   ]
+  }
+ },
+ "c_best": {
+  "interp": {
+   "families": {
+    "ss~ annihilation processes (flavor-degenerate with dd~ and uu~)": {
+     "n": 19,
+     "median_share": {
+      "bias2": 0.0007852350938395863,
+      "scale": 0.002952713335235012,
+      "floor": 0.9941689555819142
+     },
+     "largest_count": {
+      "bias2": 0,
+      "scale": 0,
+      "floor": 19
+     },
+     "bias2_above_llm_mse": 0
+    },
+    "Muon final states from bb~ annihilation": {
+     "n": 12,
+     "median_share": {
+      "bias2": 0.001955408676431169,
+      "scale": 0.004798813931778246,
+      "floor": 0.9914412250131692
+     },
+     "largest_count": {
+      "bias2": 0,
+      "scale": 0,
+      "floor": 12
+     },
+     "bias2_above_llm_mse": 0
+    },
+    "g+s processes from gluon + light-quark families": {
+     "n": 16,
+     "median_share": {
+      "bias2": 0.0026727972975823704,
+      "scale": 0.0012709732229555524,
+      "floor": 0.9910357632525364
+     },
+     "largest_count": {
+      "bias2": 0,
+      "scale": 0,
+      "floor": 16
+     },
+     "bias2_above_llm_mse": 0
+    },
+    "b+s(~) scattering from b+light-quark families": {
+     "n": 10,
+     "median_share": {
+      "bias2": 0.0014072687881350058,
+      "scale": 0.004822255797559077,
+      "floor": 0.9940356224413889
+     },
+     "largest_count": {
+      "bias2": 0,
+      "scale": 0,
+      "floor": 10
+     },
+     "bias2_above_llm_mse": 0
+    },
+    "c+u~ scattering from c+light-quark families": {
+     "n": 5,
+     "median_share": {
+      "bias2": 0.012680449271471175,
+      "scale": 0.021837440316684248,
+      "floor": 0.9654821104118446
+     },
+     "largest_count": {
+      "bias2": 0,
+      "scale": 0,
+      "floor": 5
+     },
+     "bias2_above_llm_mse": 0
+    },
+    "ds and s~s~ from same-sign light quark families": {
+     "n": 10,
+     "median_share": {
+      "bias2": 0.011536334968797832,
+      "scale": 0.009350334676543478,
+      "floor": 0.9723336854240106
+     },
+     "largest_count": {
+      "bias2": 0,
+      "scale": 1,
+      "floor": 9
+     },
+     "bias2_above_llm_mse": 0
+    },
+    "Same-sign charm-bottom scattering (cb, c~b~)": {
+     "n": 24,
+     "median_share": {
+      "bias2": 0.0007922814155813269,
+      "scale": 0.002728739646617305,
+      "floor": 0.9953335017733498
+     },
+     "largest_count": {
+      "bias2": 0,
+      "scale": 0,
+      "floor": 24
+     },
+     "bias2_above_llm_mse": 0
+    },
+    "all": {
+     "n": 96,
+     "median_share": {
+      "bias2": 0.0014618174549031956,
+      "scale": 0.004068624400030106,
+      "floor": 0.9920324259760372
+     },
+     "largest_count": {
+      "bias2": 0,
+      "scale": 1,
+      "floor": 95
+     },
+     "bias2_above_llm_mse": 0
+    }
+   },
+   "worst": [
+    {
+     "process": "b b~ > z mu- mu+",
+     "mse": 0.15681110499835285,
+     "llm_mse": 0.37526143352917385,
+     "bias": -0.034038480093538936,
+     "bias2": 0.0011586181270782465,
+     "scale": 0.00020954828687741456,
+     "floor": 0.1554429385843972,
+     "rho": 0.9787199724316724,
+     "true_std": 1.921353328599286
+    },
+    {
+     "process": "b b~ > z vm vm~",
+     "mse": 0.09502318357128131,
+     "llm_mse": 0.24454126459263476,
+     "bias": -0.010964196159543249,
+     "bias2": 0.00012021359742494293,
+     "scale": 0.0003629653226566443,
+     "floor": 0.09454000465119973,
+     "rho": 0.986464558501209,
+     "true_std": 1.8751291536998627
+    },
+    {
+     "process": "s s~ > a e- e+",
+     "mse": 0.025266113627642355,
+     "llm_mse": 0.08822917205772099,
+     "bias": 0.005854116112957719,
+     "bias2": 3.427067546399119e-05,
+     "scale": 7.460359063790264e-05,
+     "floor": 0.025157239361540462,
+     "rho": 0.9968921411591803,
+     "true_std": 2.0133697749405792
+    },
+    {
+     "process": "b b~ > a mu- mu+",
+     "mse": 0.023121958227210016,
+     "llm_mse": 0.08757226629845381,
+     "bias": 0.005934155504526473,
+     "bias2": 3.5214201551901835e-05,
+     "scale": 0.00015883953322611347,
+     "floor": 0.022927904492432,
+     "rho": 0.9971974797537675,
+     "true_std": 2.0239384355570045
+    },
+    {
+     "process": "c b > c b h",
+     "mse": 0.015452779291847064,
+     "llm_mse": 0.10564982621606939,
+     "bias": 0.003898231670206087,
+     "bias2": 1.5196210154597739e-05,
+     "scale": 8.702859058890532e-05,
+     "floor": 0.015350554491103561,
+     "rho": 0.999232722374843,
+     "true_std": 3.1633998609028153
+    },
+    {
+     "process": "b b~ > w+ mu- vm~",
+     "mse": 0.011115651149384717,
+     "llm_mse": 0.644022190793832,
+     "bias": -0.003964952784190068,
+     "bias2": 1.572085058085657e-05,
+     "scale": 0.00014745322492396365,
+     "floor": 0.010952477073879897,
+     "rho": 0.9988545245266431,
+     "true_std": 2.1871203691803336
+    }
+   ]
+  },
+  "extrap": {
+   "families": {
+    "Multi-Higgs production (hh, hhh, Xhh)": {
+     "n": 15,
+     "median_share": {
+      "bias2": 0.9091700524352438,
+      "scale": 0.00889248137335891,
+      "floor": 0.0665434942754418
+     },
+     "largest_count": {
+      "bias2": 14,
+      "scale": 0,
+      "floor": 1
+     },
+     "bias2_above_llm_mse": 7
+    },
+    "Higgs + tau lepton processes": {
+     "n": 9,
+     "median_share": {
+      "bias2": 0.39942870818259757,
+      "scale": 0.01605151257486815,
+      "floor": 0.5709434010592823
+     },
+     "largest_count": {
+      "bias2": 4,
+      "scale": 0,
+      "floor": 5
+     },
+     "bias2_above_llm_mse": 0
+    },
+    "Triple-W production (W+W+W-, W+W-W-)": {
+     "n": 4,
+     "median_share": {
+      "bias2": 0.5157956464788238,
+      "scale": 0.013809963034452526,
+      "floor": 0.467850073564301
+     },
+     "largest_count": {
+      "bias2": 2,
+      "scale": 0,
+      "floor": 2
+     },
+     "bias2_above_llm_mse": 2
+    },
+    "Triple-Z production (ZZZ)": {
+     "n": 5,
+     "median_share": {
+      "bias2": 0.8540220434365552,
+      "scale": 0.04521311306999078,
+      "floor": 0.1341214380286356
+     },
+     "largest_count": {
+      "bias2": 3,
+      "scale": 0,
+      "floor": 2
+     },
+     "bias2_above_llm_mse": 3
+    },
+    "gg -> W + qq' (W production from gluon fusion)": {
+     "n": 6,
+     "median_share": {
+      "bias2": 0.9221553945355481,
+      "scale": 0.019563202613338857,
+      "floor": 0.05874583081232454
+     },
+     "largest_count": {
+      "bias2": 6,
+      "scale": 0,
+      "floor": 0
+     },
+     "bias2_above_llm_mse": 2
+    },
+    "gg -> tt~ + boson (ttX via gluon fusion)": {
+     "n": 4,
+     "median_share": {
+      "bias2": 0.21134145080909322,
+      "scale": 0.1264417590804382,
+      "floor": 0.5514731489999832
+     },
+     "largest_count": {
+      "bias2": 0,
+      "scale": 1,
+      "floor": 3
+     },
+     "bias2_above_llm_mse": 1
+    },
+    "all": {
+     "n": 43,
+     "median_share": {
+      "bias2": 0.7747198240572637,
+      "scale": 0.019105087260068095,
+      "floor": 0.20242474992028775
+     },
+     "largest_count": {
+      "bias2": 29,
+      "scale": 1,
+      "floor": 13
+     },
+     "bias2_above_llm_mse": 15
+    }
+   },
+   "worst": [
+    {
+     "process": "g g > t b~ w-",
+     "mse": 36.908277384440964,
+     "llm_mse": 2.2391468685628966,
+     "bias": -5.661987949766771,
+     "bias2": 32.058107543304125,
+     "scale": 1.1929574255010351,
+     "floor": 3.6572124156358043,
+     "rho": -0.11977157820737278,
+     "true_std": 1.9262501207192784
+    },
+    {
+     "process": "g g > b t~ w+",
+     "mse": 35.45372734535961,
+     "llm_mse": 2.4837673720678675,
+     "bias": -5.541985717751203,
+     "bias2": 30.713605695758314,
+     "scale": 1.1938637252658233,
+     "floor": 3.5462579243354724,
+     "rho": -0.11252123345345366,
+     "true_std": 1.8951867865141079
+    },
+    {
+     "process": "b b~ > g h h",
+     "mse": 24.8079234147313,
+     "llm_mse": 6.757813900232473,
+     "bias": -4.934522157367667,
+     "bias2": 24.349508921552452,
+     "scale": 0.1007806085246517,
+     "floor": 0.3576338846541948,
+     "rho": 0.9100783246578704,
+     "true_std": 1.4429841044566487
+    },
+    {
+     "process": "g b > b h h",
+     "mse": 17.693329744360753,
+     "llm_mse": 4.297603162910566,
+     "bias": -4.138905835190084,
+     "bias2": 17.130541512570524,
+     "scale": 0.013448060718012855,
+     "floor": 0.5493401710722162,
+     "rho": 0.913940224751937,
+     "true_std": 1.8262338588137499
+    },
+    {
+     "process": "g b~ > b~ h h",
+     "mse": 17.63043426986399,
+     "llm_mse": 4.686172987632555,
+     "bias": -4.128671799878639,
+     "bias2": 17.045930831113118,
+     "scale": 0.014434156689021704,
+     "floor": 0.5700692820618501,
+     "rho": 0.9068757214896395,
+     "true_std": 1.7917242215206841
+    },
+    {
+     "process": "b b~ > h h",
+     "mse": 16.886150543989253,
+     "llm_mse": 0.6490025910465533,
+     "bias": -4.082120105937607,
+     "bias2": 16.663704559300058,
+     "scale": 0.022485007360864256,
+     "floor": 0.19996097732833037,
+     "rho": -0.20557027936946992,
+     "true_std": 0.4569288894193388
+    }
+   ]
+  }
+ }
+}
