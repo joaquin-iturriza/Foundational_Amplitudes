@@ -49340,6 +49340,8 @@ entries:
     state: working
     since: '2026-11-25T23:17:54.598000+00:00'
     state_at: '2026-11-25T23:17:54.598000+00:00'
+    context: 77446
+    context_at: '2026-11-25T23:46:10+00:00'
   designs:
   - at: '2026-11-24T23:55:03+00:00'
     question: 'Can the momentum log-rescale be applied only where it helps, by a rule using only the event''s own momenta,
