@@ -46377,7 +46377,7 @@ entries:
   step_waits:
     '4': 'the detached driver zng_ep50_searches (pid 1376403) ending: its DONE event'
     '1': steps 2, 3 and 4 read and written up
-    '2': the next owner (this owner closed near its context limit, hand-off 16:45)
+    '2': the notes-editor review of par:cbs_update (e05fc9e32), batched with the D563 write-up
   targets:
   - batch: noise_smoke
     wall_h: 0.4
