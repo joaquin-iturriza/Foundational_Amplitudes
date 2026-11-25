@@ -45051,7 +45051,10 @@ entries:
   - D542
   - D556
   - D557
-  next: null
+  next:
+    2: 'Write the cc_disk result into docs/results.tex (what used CC''s /sps/lpnhe and what was freed: D550 debris 5.85 GiB,
+      frees 8.1 GiB, D556 fine-tune models 15.0 GiB; every cache kept with its reader), % src: lines to the job logs and analysis/storage
+      tools at their commits; then plan done cc_disk --writeup <commit>'
   done_when: null
   notes_ref: null
   match: cc_disk_*,zz_probe_*
@@ -45656,6 +45659,12 @@ entries:
       analysis/storage/{free_space,cache_census,inv_runs,build_inventory}.py, CC SCRATCH/zz_cc_disk/ (top*.tsv, scratch_top*.tsv,
       inv_runs.jsonl, census.tsv, files_*.tsv, lhe_queue.tsv, df.txt, deleted.tsv)
     written: '2026-11-24T23:56:58+00:00'
+  step_why:
+    2:
+      feeds: the entry's write-up and close
+      if:
+      - 'written and the notes-editor passes: plan done'
+      - 'the notes-editor blocks: fix its items, then plan done'
 - id: cc_login_jobs
   title: 'CC login node: recurring and long scripts moved to Slurm (CC support''s email)'
   question: 'Can every non-interactive script we run on CC''s login node (the supervisor''s maintain commands: disk_watch,
