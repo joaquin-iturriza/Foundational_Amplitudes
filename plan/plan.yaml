@@ -49436,7 +49436,8 @@ entries:
     start: '2026-11-25T22:13:08+00:00'
     at: '2026-11-25T22:13:08+00:00'
   step_waits:
-    '4': the design reviewer (step 4 design)
+    '4': mechanical-worker reopening item FA/selective_rescale (then 6 support_nu CPU jobs); detached srmin_nu_read (CC CPU
+      job 64873211, pool minima with the wrapper-level changed count)
   handoff:
     state: 'D561 test done: rescale only below x0=0.009 (below every trained u u~ g and Z+4g momentum) scored eval-only on
       the 6 no-rescale u u~ g runs: YES at both sizes (deepest soft kit bin 4924->1.44 at 1e4, 7580->0.93 at 1e5, -3.53/-3.91
