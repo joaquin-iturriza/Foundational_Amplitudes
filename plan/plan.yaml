@@ -47123,6 +47123,7 @@ entries:
     at: '2026-11-25T12:15:32+00:00'
   step_waits:
     '3': Joaquin's answer to the open question on the D392 input map
+    '4': detach:support_rule_kit (12 CC CPU kit-scoring jobs of support_rule.py score)
   handoff:
     state: 'Stage 1 and stage 2 done and written up: par:selres_stage1 (ae07b1f4c) and par:selres_stage2 (7a65c7ebe), figs
       analysis/selective_rescale/figs/stage1.png and stage2.png, data/stage1.json and stage2.json. Rescale below x=0.1 (A)
