@@ -10611,11 +10611,11 @@ $Z+4g$ untouched. In the D392 setup (the finale parent of \texttt{scripts/job\_d
 fine-tunes train on $Z+4g$) the rule is set at $x_0=10^{-5}$, not $0.009$: one of the finale's processes,
 $u\bar d\to e\nu g$, has neutrinos down to $x=1.99\times10^{-5}$ ($481$ momenta below $x=0.009$ over its training,
 validation and test pools, all neutrinos), while every other pool's softest momentum lies at $x\ge0.0099$ and the
-$Z+4g$ training pool's at $0.00923$. Below $x_0=10^{-5}$ the finale trains exactly as without rescale, and the $Z+4g$ kit
-has no momentum below $x=0.009$, so in that setup the rule changes nothing that is trained or scored: it is inert
-there. At $x_0=10^{-5}$ a momentum at $x=10^{-7}$ enters the model at $x=3.5\times10^{-6}$, against
-$1.6\times10^{-3}$ at $x_0=0.009$, so the soft-limit gain measured above is not shown for it. Finale parents trained
-before the switch carry the full rescale, so a comparison across it mixes the two.
+$Z+4g$ training pool's at $0.00923$. No finale pool has a momentum below $x_0=10^{-5}$, so the finale trains exactly as
+without rescale, and the $Z+4g$ kit has no momentum below $x=0.009$: in that setup the rule changes nothing that is
+trained or scored. At $x_0=10^{-5}$ a momentum at $x=10^{-7}$ enters the model at $x=3.5\times10^{-6}$, against
+$1.6\times10^{-3}$ at $x_0=0.009$, so the soft-limit gain measured above at $x_0=0.009$ is not shown for $x_0=10^{-5}$.
+Finale parents trained before this change carry the full rescale, so a comparison across the change mixes the two.
 % src: python3 analysis/selective_rescale/support_rule.py read @6214117b7
 % claim: 1e4.deep_off=4924
 % claim: 1e4.deep_rule=1.44
