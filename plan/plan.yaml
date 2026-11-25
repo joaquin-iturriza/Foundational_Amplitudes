@@ -45134,11 +45134,8 @@ entries:
       chunks) so dL(b) is positive and can be fitted, code it in base_experiment._noise_update with a known-answer test, design-review,
       one smoke (D395), then rerun the pretraining arm (1.5 h) and the Z+4g arm (1.0 h) and read B_dL against B_crit 2500/4420/6690
       and 87-261'
-    3: 'D560 part B, Z+4g arm (secondary): FA-ccin2p3-cedaa6dd read gave no B_dL (every dL(b) < 0: the momentum-0 update overshoots,
-      finding 15:45). Once the pretraining run FA-ccin2p3-3e856594 (step 2) is read and shows whether its reads overshoot
-      too, design one repair of the measure for both runs (the step at the scale of the batch''s share of the real update,
-      e.g. (1 - beta1) for Adam, Muon''s equivalent through its momentum), have the design reviewer pass it, and rerun what
-      it needs'
+    3: 'D560 part B, Z+4g arm (secondary): read done (finding 16:05: no B_dL, B_A 6-51 against 87-261); its rerun with the
+      repaired measure goes with step 2''s design'
     4: 'D563: the six Z+4g 1e4-event searches at 50 epochs (Muon scratch, Adam scratch, Fn; batch 2048 and 128; 19/19/16 and
       19/16/16 trials), design passed 15:0x by a4f3d7192edf30268, lr windows by HPO rule 2 at 9e28b161d (header nit 584ba9b77),
       driven by sweep/drive.py (detached zng_ep50_searches, log ~/.local/share/ccorch/detached/20261125-150854_zng_ep50_searches.log),
@@ -46060,9 +46057,8 @@ entries:
     3:
       feeds: 'D560: whether the dL rule extends to repeated-data runs or is restricted to fresh data'
       if:
-      - 'the repaired measure gives dL > 0 and B_dL inside [87/2, 261x2]: the rule extends to repeated-data runs'
-      - 'B_dL outside the band, or dL still <= 0: the rule is restricted to fresh data, or the measure is dropped; report
-        both'
+      - 'step 2''s repaired measure reads on Z+4g inside [87/2, 261x2]: extends'
+      - 'outside: restricted to fresh data'
     4:
       feeds: 'D563: is the batch-128 gain at 400 epochs a horizon effect'
       if:
@@ -46071,7 +46067,6 @@ entries:
   step_waits:
     '4': detached driver zng_ep50_searches (pid 1376403, sweep/drive.py, 105 trials)
     '1': steps 2, 3 and 4 read and written up (pretraining update run, the repaired Z+4g measure, driver zng_ep50_searches)
-    '3': step 2's read of the pretraining update run (whether its dL reads overshoot too), then one repaired design for both
   targets:
   - batch: noise_smoke
     wall_h: 0.4
