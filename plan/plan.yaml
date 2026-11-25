@@ -41820,7 +41820,7 @@ entries:
       log F re-read): the level-branch configurations are those three; the next one is designed from what they show'
     '16': FA-ccin2p3-89671610
     '19': FA-ccin2p3-0165aa58
-    '21': FA-lxplus-74026f3a FA-lxplus-4167db91
+    '21': FA-lxplus-a1b7d826
   handoff:
     state: 'Part (a) DONE, part (c) DONE. Suprio''s own per-process metrics (pID only, seeds 0-2) now drive every LLM comparison:
       data/suprio_cond/ + suprio.py @dfa26d84c; heldout_per_process.py (MSE / |bias| = his |level| / MSE-bias^2 = his shape^2,
