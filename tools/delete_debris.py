@@ -66,8 +66,9 @@ def candidates(scratch, scratch_days):
             if e.name.startswith(SCRATCH_PREFIXES) and now - e.stat(follow_symlinks=False).st_mtime > scratch_days * 86400:
                 yield "scratch", e.path
     smokes = os.path.join(os.environ["PROJECT_DIR"], "runs", "zz_smoke")
-    named = subprocess.run(["git", "-C", ROOT, "grep", "-h", "-o", "zz_smoke_[A-Za-z0-9_.-]*"], capture_output=True,
-                           text=True).stdout.split()
+    g = subprocess.run(["git", "-C", ROOT, "grep", "-h", "-o", "zz_smoke_[A-Za-z0-9_.-]*"], capture_output=True, text=True)
+    assert g.returncode in (0, 1), "git grep failed (%d): no smoke run can be shown unnamed" % g.returncode
+    named = g.stdout.split()
     for r in sorted(glob.glob(os.path.join(smokes, "*/"))):
         r = r.rstrip("/")
         files = [os.path.join(d, f) for d, _, fs in os.walk(r) for f in fs]
