@@ -7,7 +7,9 @@ only the recipe swapped:
     shared statistics (mu_N = a + b N and the one sigma under data.affine_multiplicity_std), no per-process map; the
     prediction is mu_N + sigma h, an absolute log|M|^2.
 Writes --out (JSON): per process its MSE of log|M|^2, its MSE in the run's standardized units, events and particle
-count; the pooled RMSE; the statistics used. Needs a GPU and the recipe's memmap cache (scripts/job_mmap_prebuild.sh).
+count, its exact split MSE = bias^2 + scale + floor (bias = mean(pred - true); floor = var(true)(1 - rho^2), left by the
+best affine map; scale the rest), rho = corr(pred, true) and the true mean and std, all in absolute log|M|^2 (target
+factor divided out); the pooled RMSE; the statistics used. Needs a GPU and the recipe's memmap cache (scripts/job_mmap_prebuild.sh).
     python tools/llm_score.py --run <run dir> --out <json> [--eval-subsample N] <recipe.yaml>
 """
 import argparse, json, os, shutil, sys, tempfile
@@ -55,23 +57,49 @@ exp._init_regularization()
 names = [str(n) for n in exp.cfg.data.dataset]
 sd = np.asarray(exp.prepd_std, dtype=np.float64)
 sd = np.full(len(names), sd[0]) if sd.size == 1 else sd
+mu = np.asarray(exp.prepd_mean, dtype=np.float64).ravel()
+mu = np.full(len(names), mu[0]) if mu.size == 1 else mu
+# the per-event target factor (target_physics_factor, propagators: the target is |M|^2 F) in the test loader's order,
+# divided out so pred and true are absolute log|M|^2 (as the test stage's raw arrays, check_score_vs_preds.py)
+F = getattr(exp, "all_amp_factor", None)
+assert F is not None or not bool(cfg.data.get("target_physics_factor", False)), "target factor on but no all_amp_factor"
+logF = np.log(np.asarray(F, dtype=np.float64)[exp._split_indices["test"]]).ravel() if F is not None else None
 sse_z, n = np.zeros(len(names)), np.zeros(len(names), dtype=np.int64)
+S = np.zeros((len(names), 5))   # per process sums of pred, true, pred^2, true^2, pred true (absolute log|M|^2)
+k = 0
 with torch.no_grad():
     for data in exp.test_loader:
         h, z, pid, _, _ = exp._forward_lloca(data)
-        r2 = ((h.reshape(-1) - z.reshape(-1)).double() ** 2).cpu().numpy()
+        hd, zd = h.reshape(-1).double().cpu().numpy(), z.reshape(-1).double().cpu().numpy()
         p = pid.reshape(-1).cpu().numpy()
-        np.add.at(sse_z, p, r2); np.add.at(n, p, 1)
+        np.add.at(sse_z, p, (hd - zd) ** 2); np.add.at(n, p, 1)
+        lf = logF[k:k + p.size] if logF is not None else 0.0
+        q, t = mu[p] + sd[p] * hd - lf, mu[p] + sd[p] * zd - lf
+        np.add.at(S, p, np.stack([q, t, q * q, t * t, q * t], 1))
+        k += p.size
+assert logF is None or k == logF.size, (k, None if logF is None else logF.size)
 assert (n > 0).all(), [nm for nm, k in zip(names, n) if k == 0]
 mse_z = sse_z / n
 mse_log = mse_z * sd ** 2
+# MSE = bias^2 + scale + floor, exactly: bias = mean(q - t); floor = var(t)(1 - rho^2), what the best affine map of q
+# leaves (hp58's 1 - rho^2, docs/results.tex 'Its held-out split'); scale = var(q - t) - floor, what the best rescale removes
+mq, mt = S[:, 0] / n, S[:, 1] / n
+vq, vt, cov = S[:, 2] / n - mq ** 2, S[:, 3] / n - mt ** 2, S[:, 4] / n - mq * mt
+bias_log = mq - mt
+rho = cov / np.sqrt(np.clip(vq * vt, 1e-300, None))
+floor_log = vt * (1 - rho ** 2)
+scale_log = mse_log - bias_log ** 2 - floor_log
+assert np.allclose(vq + vt - 2 * cov + bias_log ** 2, mse_log, rtol=1e-6, atol=1e-9), "absolute-log sums disagree with the MSE"
 rec = {"run": run, "recipe": recipe, "target_stats": str(cfg.fine_tune.target_stats), "ema_applied": ema,
        "eval_subsample": cfg.data.eval_subsample, "amp_trafos": [list(map(str, t)) for t in (exp._amp_trafos_pp or [exp.cfg.data.amp_trafos])], "affine_multiplicity": getattr(exp, "_affine_multiplicity", None),
        "prepd_std": sd.tolist(), "events": int(n.sum()),
        "pooled_rmse_logm2": float(np.sqrt((mse_log * n).sum() / n.sum())),
        "mean_mse_z": float(mse_z.mean()),
        "processes": {nm: {"mse_logm2": float(mse_log[i]), "mse_z": float(mse_z[i]), "n": int(n[i]),
-                          "n_particles": int(exp._proc_npart[i])} for i, nm in enumerate(names)}}
+                          "n_particles": int(exp._proc_npart[i]), "bias_logm2": float(bias_log[i]),
+                          "scale_logm2": float(scale_log[i]), "floor_logm2": float(floor_log[i]), "rho": float(rho[i]),
+                          "true_mean_logm2": float(mt[i]), "true_std_logm2": float(np.sqrt(max(vt[i], 0.0)))}
+                     for i, nm in enumerate(names)}}
 shutil.rmtree(cfg.run_dir, ignore_errors=True)
 os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
 json.dump(rec, open(a.out, "w"), indent=1)

@@ -83,8 +83,11 @@ def main():
         ax.tick_params(axis="x", length=1.5, pad=1)
         ax.set_xlim(-0.6, len(names) - 0.4)
         ax.set_yscale("log")
-        ax.set_ylim(1e-3, 1e3)
-        ax.set_yticks(10.0 ** np.arange(-3, 4))
+        # his range 1e-3..1e3, widened down to the lowest point drawn: data is never clipped
+        lo = min([1e-3] + [v["mse_logm2"] for _, ours, _, _ in arms for v in ours.values()])   # both panels alike
+        lo = 10.0 ** np.floor(np.log10(lo))
+        ax.set_ylim(lo, 1e3)
+        ax.set_yticks(10.0 ** np.arange(np.log10(lo), 4))
         ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
         ax.grid(False)
         ax._ps_equal_limits = True    # his fixed y range; the legend sits in the free band above the data

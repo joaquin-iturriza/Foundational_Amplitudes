@@ -1,0 +1,555 @@
+{
+ "interp": {
+  "families": {
+   "ss~ annihilation processes (flavor-degenerate with dd~ and uu~)": {
+    "n": 19,
+    "llm_median": 0.08828214255478053,
+    "a_trial5": {
+     "median": 0.006088423681626635,
+     "below_llm": 18,
+     "median_ratio_to_llm": 0.07861531652638079
+    },
+    "b_h16": {
+     "median": 0.0048862200768464,
+     "below_llm": 17,
+     "median_ratio_to_llm": 0.07489373269608118
+    },
+    "control": {
+     "median": 0.01181618112418858,
+     "below_llm": 19,
+     "median_ratio_to_llm": 0.14426644988956308
+    },
+    "c_control": {
+     "median": 0.01299102500466942,
+     "below_llm": 17,
+     "median_ratio_to_llm": 0.045449655303382984
+    },
+    "c_best": {
+     "median": 0.0007081745453898508,
+     "below_llm": 19,
+     "median_ratio_to_llm": 0.006120981979753231
+    }
+   },
+   "Muon final states from bb~ annihilation": {
+    "n": 12,
+    "llm_median": 0.2092380556609797,
+    "a_trial5": {
+     "median": 0.008417810525848534,
+     "below_llm": 12,
+     "median_ratio_to_llm": 0.16820870482756606
+    },
+    "b_h16": {
+     "median": 0.008470822234755376,
+     "below_llm": 12,
+     "median_ratio_to_llm": 0.19538779457726052
+    },
+    "control": {
+     "median": 0.013991701726279265,
+     "below_llm": 12,
+     "median_ratio_to_llm": 0.2824772005865382
+    },
+    "c_control": {
+     "median": 0.023350800027773955,
+     "below_llm": 9,
+     "median_ratio_to_llm": 0.43089485105321484
+    },
+    "c_best": {
+     "median": 0.003950004798122869,
+     "below_llm": 12,
+     "median_ratio_to_llm": 0.017351479519903883
+    }
+   },
+   "g+s processes from gluon + light-quark families": {
+    "n": 16,
+    "llm_median": 0.06451053102214681,
+    "a_trial5": {
+     "median": 0.00800182782782837,
+     "below_llm": 15,
+     "median_ratio_to_llm": 0.1716207560941769
+    },
+    "b_h16": {
+     "median": 0.006228304840943489,
+     "below_llm": 16,
+     "median_ratio_to_llm": 0.12697092274909005
+    },
+    "control": {
+     "median": 0.01185593025454694,
+     "below_llm": 15,
+     "median_ratio_to_llm": 0.22267114346843364
+    },
+    "c_control": {
+     "median": 0.003676195362704234,
+     "below_llm": 16,
+     "median_ratio_to_llm": 0.09369303468470627
+    },
+    "c_best": {
+     "median": 0.0002964098516583971,
+     "below_llm": 16,
+     "median_ratio_to_llm": 0.0043125615239746175
+    }
+   },
+   "b+s(~) scattering from b+light-quark families": {
+    "n": 10,
+    "llm_median": 0.06874768775895806,
+    "a_trial5": {
+     "median": 0.05475867043034579,
+     "below_llm": 5,
+     "median_ratio_to_llm": 0.8533247711280153
+    },
+    "b_h16": {
+     "median": 0.013921774449354992,
+     "below_llm": 10,
+     "median_ratio_to_llm": 0.3376855503728876
+    },
+    "control": {
+     "median": 0.03599671168042841,
+     "below_llm": 9,
+     "median_ratio_to_llm": 0.48573546043579874
+    },
+    "c_control": {
+     "median": 0.008849840832979173,
+     "below_llm": 10,
+     "median_ratio_to_llm": 0.12068286085883458
+    },
+    "c_best": {
+     "median": 0.0008858421245779462,
+     "below_llm": 10,
+     "median_ratio_to_llm": 0.011065821857544615
+    }
+   },
+   "c+u~ scattering from c+light-quark families": {
+    "n": 5,
+    "llm_median": 0.043985403594747674,
+    "a_trial5": {
+     "median": 0.08435967095365664,
+     "below_llm": 1,
+     "median_ratio_to_llm": 2.136622709500015
+    },
+    "b_h16": {
+     "median": 0.08501665522441337,
+     "below_llm": 2,
+     "median_ratio_to_llm": 1.0714123612170616
+    },
+    "control": {
+     "median": 0.0424971883217659,
+     "below_llm": 3,
+     "median_ratio_to_llm": 0.7321086326197309
+    },
+    "c_control": {
+     "median": 0.00951643749585402,
+     "below_llm": 5,
+     "median_ratio_to_llm": 0.25503385185689237
+    },
+    "c_best": {
+     "median": 0.000509269553833508,
+     "below_llm": 5,
+     "median_ratio_to_llm": 0.006319037154176007
+    }
+   },
+   "ds and s~s~ from same-sign light quark families": {
+    "n": 10,
+    "llm_median": 0.1017350209896736,
+    "a_trial5": {
+     "median": 0.026732413728345086,
+     "below_llm": 8,
+     "median_ratio_to_llm": 0.32105894803581925
+    },
+    "b_h16": {
+     "median": 0.04612267487711777,
+     "below_llm": 7,
+     "median_ratio_to_llm": 0.414526586807917
+    },
+    "control": {
+     "median": 0.1492292535020023,
+     "below_llm": 4,
+     "median_ratio_to_llm": 1.6670411532559153
+    },
+    "c_control": {
+     "median": 0.02926316891501885,
+     "below_llm": 7,
+     "median_ratio_to_llm": 0.33794502674868554
+    },
+    "c_best": {
+     "median": 0.000777249033520185,
+     "below_llm": 10,
+     "median_ratio_to_llm": 0.005209983282366137
+    }
+   },
+   "Same-sign charm-bottom scattering (cb, c~b~)": {
+    "n": 24,
+    "llm_median": 0.06344229512537464,
+    "a_trial5": {
+     "median": 0.03271804050145719,
+     "below_llm": 18,
+     "median_ratio_to_llm": 0.3344287345249405
+    },
+    "b_h16": {
+     "median": 0.009970023810423289,
+     "below_llm": 23,
+     "median_ratio_to_llm": 0.14398584721608637
+    },
+    "control": {
+     "median": 0.03639513903146617,
+     "below_llm": 20,
+     "median_ratio_to_llm": 0.3988199022047419
+    },
+    "c_control": {
+     "median": 0.015273193209339859,
+     "below_llm": 20,
+     "median_ratio_to_llm": 0.18196774473391414
+    },
+    "c_best": {
+     "median": 0.0010814761564978447,
+     "below_llm": 24,
+     "median_ratio_to_llm": 0.01969524257685968
+    }
+   },
+   "all": {
+    "n": 96,
+    "llm_median": 0.07863770792289987,
+    "a_trial5": {
+     "median": 0.020767137866951692,
+     "below_llm": 77,
+     "median_ratio_to_llm": 0.2985394116729104
+    },
+    "b_h16": {
+     "median": 0.010165628926687095,
+     "below_llm": 87,
+     "median_ratio_to_llm": 0.15502528858455533
+    },
+    "control": {
+     "median": 0.02756084495752755,
+     "below_llm": 82,
+     "median_ratio_to_llm": 0.3553501301222779
+    },
+    "c_control": {
+     "median": 0.013969916875490249,
+     "below_llm": 84,
+     "median_ratio_to_llm": 0.17689263357301083
+    },
+    "c_best": {
+     "median": 0.0007076581644805259,
+     "below_llm": 96,
+     "median_ratio_to_llm": 0.010084779157139602
+    }
+   }
+  },
+  "spearman_vs_llm": {
+   "a_trial5": 0.23665219750406946,
+   "b_h16": 0.3333423765599566,
+   "control": 0.36827183939229513,
+   "c_control": 0.3730873575691807,
+   "c_best": 0.5230059685295714
+  },
+  "top3_share": {
+   "llm": 0.1761906451144312,
+   "a_trial5": 0.289178906264536,
+   "b_h16": 0.392135920622317,
+   "control": 0.23011244533552122,
+   "c_control": 0.8203637637906037,
+   "c_best": 0.6274934052867095
+  },
+  "top3": {
+   "llm": [
+    "s s~ > d d~ h",
+    "b b~ > w+ mu- vm~",
+    "b b~ > w- mu+ vm"
+   ],
+   "a_trial5": [
+    "c u~ > c u~ a",
+    "s s~ > d u~ w+",
+    "b s~ > b s~ a"
+   ],
+   "b_h16": [
+    "s s~ > u d~ w-",
+    "s s~ > d u~ w+",
+    "b b~ > w+ mu- vm~"
+   ],
+   "control": [
+    "g s > s c c~",
+    "b b~ > w+ mu- vm~",
+    "b b~ > w- mu+ vm"
+   ],
+   "c_control": [
+    "b b~ > w+ mu- vm~",
+    "b b~ > w- mu+ vm",
+    "b b~ > z mu- mu+"
+   ],
+   "c_best": [
+    "b b~ > z mu- mu+",
+    "b b~ > z vm vm~",
+    "s s~ > a e- e+"
+   ]
+  },
+  "pooled_rmse_without_gg_tbW": {
+   "llm": 0.341156187932153,
+   "a_trial5": 0.2411965674301106,
+   "b_h16": 0.1922835518147127,
+   "control": 0.23702759585128416,
+   "c_control": 0.31051661256548985,
+   "c_best": 0.06782321109018624
+  }
+ },
+ "extrap": {
+  "families": {
+   "Multi-Higgs production (hh, hhh, Xhh)": {
+    "n": 15,
+    "llm_median": 1.293765889770206,
+    "a_trial5": {
+     "median": 2.12740766359873,
+     "below_llm": 1,
+     "median_ratio_to_llm": 1.674738370057617
+    },
+    "b_h16": {
+     "median": 2.662592795102304,
+     "below_llm": 1,
+     "median_ratio_to_llm": 2.1572177585347747
+    },
+    "control": {
+     "median": 3.2099500438586746,
+     "below_llm": 1,
+     "median_ratio_to_llm": 2.224424099827205
+    },
+    "c_control": {
+     "median": 1.600567921504082,
+     "below_llm": 5,
+     "median_ratio_to_llm": 1.4913426975636683
+    },
+    "c_best": {
+     "median": 1.1827720986532468,
+     "below_llm": 8,
+     "median_ratio_to_llm": 0.9736133860392352
+    }
+   },
+   "Higgs + tau lepton processes": {
+    "n": 9,
+    "llm_median": 0.4868073729334571,
+    "a_trial5": {
+     "median": 1.0474353296487815,
+     "below_llm": 4,
+     "median_ratio_to_llm": 1.0871856451019892
+    },
+    "b_h16": {
+     "median": 0.9945884022714158,
+     "below_llm": 3,
+     "median_ratio_to_llm": 2.560821770283776
+    },
+    "control": {
+     "median": 0.4465822714731562,
+     "below_llm": 7,
+     "median_ratio_to_llm": 0.8649204932060514
+    },
+    "c_control": {
+     "median": 0.05952174443512424,
+     "below_llm": 9,
+     "median_ratio_to_llm": 0.11172442808214991
+    },
+    "c_best": {
+     "median": 0.06345048481820502,
+     "below_llm": 9,
+     "median_ratio_to_llm": 0.06585843948212526
+    }
+   },
+   "Triple-W production (W+W+W-, W+W-W-)": {
+    "n": 4,
+    "llm_median": 0.9366954869406319,
+    "a_trial5": {
+     "median": 1.0328842820064597,
+     "below_llm": 2,
+     "median_ratio_to_llm": 1.0680412687228036
+    },
+    "b_h16": {
+     "median": 0.4055457382207316,
+     "below_llm": 4,
+     "median_ratio_to_llm": 0.4032911232470442
+    },
+    "control": {
+     "median": 0.9414654454811269,
+     "below_llm": 1,
+     "median_ratio_to_llm": 1.0379823993904815
+    },
+    "c_control": {
+     "median": 0.4522272567081837,
+     "below_llm": 3,
+     "median_ratio_to_llm": 0.6006511305461939
+    },
+    "c_best": {
+     "median": 1.309737195681254,
+     "below_llm": 2,
+     "median_ratio_to_llm": 1.7942085676803194
+    }
+   },
+   "Triple-Z production (ZZZ)": {
+    "n": 5,
+    "llm_median": 0.1748559099732906,
+    "a_trial5": {
+     "median": 0.8598641570876547,
+     "below_llm": 0,
+     "median_ratio_to_llm": 3.1641285459584276
+    },
+    "b_h16": {
+     "median": 1.338731725083942,
+     "below_llm": 0,
+     "median_ratio_to_llm": 5.222012836415013
+    },
+    "control": {
+     "median": 0.33225212469303295,
+     "below_llm": 1,
+     "median_ratio_to_llm": 1.1443960035406626
+    },
+    "c_control": {
+     "median": 0.5727854871599801,
+     "below_llm": 2,
+     "median_ratio_to_llm": 3.275757091924852
+    },
+    "c_best": {
+     "median": 1.1665616395263798,
+     "below_llm": 2,
+     "median_ratio_to_llm": 6.952373520147537
+    }
+   },
+   "gg -> W + qq' (W production from gluon fusion)": {
+    "n": 6,
+    "llm_median": 0.31351099091596124,
+    "a_trial5": {
+     "median": 0.7432035908560921,
+     "below_llm": 0,
+     "median_ratio_to_llm": 2.7679311547059817
+    },
+    "b_h16": {
+     "median": 1.8116215211680717,
+     "below_llm": 0,
+     "median_ratio_to_llm": 6.1976531751607675
+    },
+    "control": {
+     "median": 0.6872579821133776,
+     "below_llm": 2,
+     "median_ratio_to_llm": 2.455318418704718
+    },
+    "c_control": {
+     "median": 0.08351799516908393,
+     "below_llm": 4,
+     "median_ratio_to_llm": 0.3223939517803427
+    },
+    "c_best": {
+     "median": 0.0900905136193349,
+     "below_llm": 4,
+     "median_ratio_to_llm": 0.35034729797692493
+    }
+   },
+   "gg -> tt~ + boson (ttX via gluon fusion)": {
+    "n": 4,
+    "llm_median": 0.7067831692150772,
+    "a_trial5": {
+     "median": 0.4778532255846295,
+     "below_llm": 2,
+     "median_ratio_to_llm": 1.1606277766896178
+    },
+    "b_h16": {
+     "median": 0.9056021212763639,
+     "below_llm": 3,
+     "median_ratio_to_llm": 0.8201621598309585
+    },
+    "control": {
+     "median": 0.7805203465537146,
+     "below_llm": 2,
+     "median_ratio_to_llm": 1.0545533792835065
+    },
+    "c_control": {
+     "median": 1.060255924174947,
+     "below_llm": 2,
+     "median_ratio_to_llm": 0.9245289058369979
+    },
+    "c_best": {
+     "median": 1.4958549870801097,
+     "below_llm": 1,
+     "median_ratio_to_llm": 1.218515317567732
+    }
+   },
+   "all": {
+    "n": 43,
+    "llm_median": 0.6490025910465533,
+    "a_trial5": {
+     "median": 1.1436461712812618,
+     "below_llm": 9,
+     "median_ratio_to_llm": 1.7349312031461364
+    },
+    "b_h16": {
+     "median": 1.4574138397484586,
+     "below_llm": 11,
+     "median_ratio_to_llm": 2.4792786767014943
+    },
+    "control": {
+     "median": 0.6881611576543867,
+     "below_llm": 14,
+     "median_ratio_to_llm": 1.2371845001446913
+    },
+    "c_control": {
+     "median": 0.3854262601754468,
+     "below_llm": 25,
+     "median_ratio_to_llm": 0.6225273682263639
+    },
+    "c_best": {
+     "median": 0.9788618993401109,
+     "below_llm": 26,
+     "median_ratio_to_llm": 0.7546247672728414
+    }
+   }
+  },
+  "spearman_vs_llm": {
+   "a_trial5": 0.8236182422228935,
+   "b_h16": 0.6484445786771368,
+   "control": 0.8366052552099064,
+   "c_control": 0.6087284808215041,
+   "c_best": 0.5520990637269707
+  },
+  "top3_share": {
+   "llm": 0.40145750967114663,
+   "a_trial5": 0.5560226659308463,
+   "b_h16": 0.4683303264734369,
+   "control": 0.561591755419649,
+   "c_control": 0.5011240951373259,
+   "c_best": 0.5047343928105745
+  },
+  "top3": {
+   "llm": [
+    "b b~ > h h h",
+    "b b~ > g h h",
+    "g b~ > b~ h h"
+   ],
+   "a_trial5": [
+    "g g > t b~ w-",
+    "g g > b t~ w+",
+    "b b~ > h h h"
+   ],
+   "b_h16": [
+    "b b~ > h h h",
+    "g g > t b~ w-",
+    "g g > b t~ w+"
+   ],
+   "control": [
+    "b b~ > h h h",
+    "g g > b t~ w+",
+    "g g > t b~ w-"
+   ],
+   "c_control": [
+    "g g > t b~ w-",
+    "b b~ > h h h",
+    "g g > b t~ w+"
+   ],
+   "c_best": [
+    "g g > t b~ w-",
+    "g g > b t~ w+",
+    "b b~ > g h h"
+   ]
+  },
+  "pooled_rmse_without_gg_tbW": {
+   "llm": 1.1732317711605855,
+   "a_trial5": 1.416041573717067,
+   "b_h16": 1.5671025325940233,
+   "control": 1.5043595460591948,
+   "c_control": 1.8535599383598134,
+   "c_best": 1.7119020074489015
+  }
+ }
+}
