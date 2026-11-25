@@ -6,6 +6,7 @@ tools/verify_claims.py over every trunk commit since the last verified one (`pla
   - git commit -n / --no-verify, git merge --no-verify;
   - git -c core.hooksPath=..., --config-env for it, git config of core.hooksPath (set, unset, any scope), any GIT_CONFIG_*
     variable (they inject config), and Edit/Write of .git/config or .git/hooks;
+  - git stash with -u / --include-untracked / -a / --all in the shared checkout;
   - git pull (fetch, then merge: the merge is checked);
   - the same inside sh -c, bash -c, eval or a heredoc fed to a shell;
   - git merge <ref> and git cherry-pick <commit> whose incoming change to docs/results.tex fails
@@ -95,6 +96,22 @@ def commit_skips(args):
                    "--cleanup", "--fixup", "--squash", "--trailer", "--pathspec-from-file"):
             skip = True
     return False
+
+
+def stash_untracked(args):
+    """git stash [push|save] with -u / --include-untracked / -a / --all (short flags may be clustered), before any --."""
+    for t in args:
+        if t == "--":
+            break
+        if t in ("--include-untracked", "--all") or (re.match(r"^-[A-Za-z]+$", t) and set(t[1:]) & set("ua")):
+            return True
+    return False
+
+
+def shared_checkout(repo):
+    """repo's worktree is the checkout these hooks live in (~/work/FA), not a worktree under worktrees/."""
+    top = git(repo, "rev-parse", "--show-toplevel").stdout.strip()
+    return bool(top) and os.path.realpath(top) == os.path.realpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 
 
 def refs(args, with_value=("-m", "-s", "-X", "--strategy", "--strategy-option", "-F", "--file", "--into-name")):
@@ -237,6 +254,9 @@ def refusal(cmd, cwd, depth=0):
                 return why
         if sub == "merge" and any(no_verify(a) for a in args):
             return "git merge --no-verify"
+        if sub == "stash" and stash_untracked(args) and shared_checkout(repo):
+            return ("git stash -u unlinks every agent's untracked files in this shared checkout, including outputs "
+                    "detached jobs are writing; commit or name your own paths instead.")
         if sub == "pull":
             return "git pull (git fetch, then git merge, so the incoming change is checked)"
         if sub == "merge" and not any(a in ("--abort", "--continue", "--quit") for a in args):

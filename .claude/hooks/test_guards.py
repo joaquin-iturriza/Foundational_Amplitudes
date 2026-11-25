@@ -123,6 +123,14 @@ def main():
     ok.append(check("Write ~/.claude/projects/x/memory/MEMORY.md", "md_guard.sh",
                     write(os.path.expanduser("~/.claude/projects/x/memory/MEMORY.md"), "remember this\n"), True))
 
+    print("\nstash -u in the shared checkout:")
+    def gbash(cmd):
+        return {**bash(cmd), "cwd": REPO}
+    ok.append(check("git stash push -u -- a b", "git_verify_guard.py", gbash("git stash push -u -- a b"), True))
+    ok.append(check("git stash --include-untracked", "git_verify_guard.py", gbash("git stash --include-untracked"), True))
+    ok.append(check("git stash list", "git_verify_guard.py", gbash("git stash list"), False))
+    ok.append(check("git stash push -- a", "git_verify_guard.py", gbash("git stash push -- a"), False))
+
     print("\nagents — every .claude/agents/*.md inherits the main session's opus (mechanical-worker on sonnet, D213):")
     ok += agents_on_opus(os.path.join(REPO, ".claude", "agents"))
 
