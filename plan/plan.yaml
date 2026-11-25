@@ -44155,6 +44155,18 @@ entries:
     sources: 'D551 (Joaquin: decide what else to use the lab LLMs on); baselines measured by tools/lab_wake_trial.py extract
       and reviews-extract: do-nothing 71/100 wakes (Wilson 0.615-0.79), always-FIX 89/159 review rounds (Wilson 0.48-0.635);
       Wilson 95% for the spread'
+    passed_at: '2026-11-25T00:03:28+00:00'
+    reviewer: 'Third round @940251cb8, extraction re-run in scratch: 159 review rounds (89 FIX, 70 PASS), each paired with
+      its own verdict; all 159 design reads hold measure: and outcome:, and none is a saved-output placeholder. Material stops
+      at the verdict. The one remaining fix note (a51bab46162#0, 18:04:24) is a read of another entry (pretrain_data_saving)
+      made before that round''s own design-fix of kit_benchmark at 18:05:00, so it is not its label. Check 2: the keys move
+      against trivial answers (do-nothing 71/100 wakes, always-FIX 89/159). Check 3: Wilson upper bounds 0.79 and 0.635 are
+      the bars, sourced to those measured baselines and D551. Check 4: yes and no are stated for each part; the review route
+      is ''lab PASS skips Opus'' with FIX missed as its cost; the target-agent choice of a wake is ungraded and is tested
+      before any route; 36/159 rounds'' material is cut at 80k. Caveat for the report: in about 31 rounds the design-only
+      read is a sed or grep slice of the entry''s saved output, so report that arm''s agreement on full reads apart from slices.
+      Prior search: results.tex for dispatch, routing wake, design review with lab/deepseek/qwen, reviewer model; site decisions
+      for dispatch, wake, lab llm, deepseek, reviewer. No earlier trial found.'
   step_waits:
     '3': notes-editor pass of the results.tex backlog (it blocks on sec:noisescale and fig:llmcmp_heldout, other entries'
       text; the repo-reviewer already passed the merge)
