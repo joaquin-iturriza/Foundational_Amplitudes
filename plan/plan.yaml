@@ -45270,7 +45270,13 @@ entries:
     - sweep/sweep_config_cbs_smoke_b32768.yaml
     - sweep/sweep_config_tp_zng_d1e4_muon_b2048_ep50_zgggg.yaml
     - tests/test_noise_scale.py
-  dead_ends: []
+  dead_ends:
+  - tried: rerunning the two part-B update runs with dL read at step sizes s in {0.01..1} (design 2026-11-25 ~16:20, code
+      merged 4237a0be1)
+    why: 'design FIX (a4f3d7192edf30268): the first reads already give the quadratic model''s answer, Q = A - dL(1), dL_opt
+      = A^2/4Q: B_q 48-137 (one window 1082) on pretraining against B_crit 2500-6690, 3-196 on Z+4g; small-s reads collapse
+      to B_A (28-111); a rerun would re-measure it at 3.3 GPU-h'
+    at: '2026-11-25T15:08:59+00:00'
   asks:
   - ask: 'GPU budget: about 55 GPU-h above 30 with no decision covering it. Joaquin, testing the measured noise scale against
       batch-size runs (D532) needs, at each batch size (2048, 4096, 8192, 16384, 32768; canonical catalog_v4 WSD het setup,
