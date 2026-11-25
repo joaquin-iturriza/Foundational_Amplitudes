@@ -41657,6 +41657,7 @@ entries:
     '15': 'the next owner (this owner closes near the context limit after step 8''s smokes go out): design the level-branch
       configurations (finding 2026-11-25 split read)'
     '16': FA-ccin2p3-8dbfeb52
+    '17': FA-ccin2p3-3bdfcc32 FA-ccin2p3-fd907afa
   handoff:
     state: 'Part (a) DONE, part (c) DONE. Part (b) his setup: 16 heads done; 32 FA-ccin2p3-e9dfa8b9 and 64 FA-ccin2p3-623a3af6
       RUNNING, 120 FA-ccin2p3-f0b997a2 PENDING (steps 12-14: score with job_llm_score.sh REREAD, redraw the ONE all-arms figure
