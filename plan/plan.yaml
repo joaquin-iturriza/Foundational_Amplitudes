@@ -44619,6 +44619,10 @@ entries:
       every stage, noise_scale.json with dL_b64..dL_b1024), then site pick and submit the full run (job_cbs_update_zng.sh
       full, target upd_noise_zng_adam 0.3 h), then read B_dL over its stable phase against the Adam two-batch B_crit 87-261
       (band [87/2, 261x2])'
+    4: 'D563: repeat the Z+4g 1e4-event searches of ft_regimes at ~50 epochs with DyHPO retuning: Muon scratch, Adam scratch,
+      fine-tune from the parent without the two settings (Fn), batch 2048 and 128, each at the trial count of the 400-epoch
+      search it replaces (19/19/16 at 2048, 19/16/16 at 128); then the figure of the 50-epoch bests against the 400-epoch
+      searches'
   done_when: null
   notes_ref: null
   match: zz_cbs_*,cbs_*
@@ -45337,6 +45341,13 @@ entries:
       if:
       - 'smoke ran every stage: submit the full Z+4g run'
       - 'smoke broke: read its log, fix, resmoke'
+    4:
+      feeds: 'D563: whether the 400-epoch batch-128 gain of the Z+4g runs comes from training too long'
+      if:
+      - 'the 2048/128 ratio of best validation MSE falls within 1.22 at 50 epochs: the gain was the horizon; report it with
+        the figure'
+      - 'the ratio stays above 1.22: the gain persists at 50 epochs; report it with the figure and what part A''s critical
+        batch says'
   step_waits:
     '1': repo-reviewer aee7e3b6b89d84945 and the notes-editor backlog (par:cbs_scan)
     '2': FA-ccin2p3-3e856594
