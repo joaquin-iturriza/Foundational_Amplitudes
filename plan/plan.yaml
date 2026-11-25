@@ -46539,6 +46539,10 @@ entries:
     3: 'On Joaquin''s answer to the open question (replace the full rescale in the D392 setup with rescale below x=0.1, keep
       it, or drop it): record his decision and carry it into the D392 setup''s config default; with par:selres_split (u u~
       g cost in the changed soft events 4.23x/8.56x, rest 0.88x/1.61x) sent with the question'
+    4: 'Read the D561 rule''s kit scores (support_rule.py score -> data/support_kit.json: 12 no-rescale runs scored without
+      and with the rescale below x0=0.009, below every trained momentum), apply the passed design''s outcome (pipeline checks,
+      YES / NO-gain / NO-cost), figure against no rescale (bulk validation Z+4g and u u~ g at 1e4/1e5, identical by construction;
+      kit strata), write-up, hand back'
   done_when: null
   notes_ref: null
   match: selres_*
@@ -47153,3 +47157,9 @@ entries:
       if:
       - 'replace: set model.input_soft_x0=0.1 in the D392 setup'
       - 'keep or drop: close the entry with the write-up'
+    4:
+      feeds: 'D561/D552: whether the rescale applied only outside the trained range keeps a soft gain with no cost on the
+        rest'
+      if:
+      - 'YES: goes to Joaquin as the replacement'
+      - 'NO-gain or NO-cost: reported with the figure; the next rule is his question'
