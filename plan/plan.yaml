@@ -49326,6 +49326,20 @@ entries:
       4; moved=0 <- D561 ''not use it where it hurts'' with no rescale as its reference: training equals no rescale only when
       no trained momentum changes; 0.01 dec <- measured: kit_predict pipeline tolerance at KIT_THREADS 1 (passed D561 design);
       0 GPU-h, 7 CPU jobs <- D552 budget, CPU only'
+    passed_at: '2026-11-25T22:12:26+00:00'
+    reviewer: 'CPU-only identity check of the neutrino-exempt rescale at x0=0.009 (0 GPU-h, minima job + 6 parallel kit rescoring
+      jobs). One change against matched controls: (b) differs from the plain x0=0.009 rule arm of support_kit.json only in
+      input_soft_skip_neutrinos, same runs/kit/kit_predict; (a) reference is no rescale per D561. Check 2: support_minima.json
+      gives 410/30/41 u d~ > e nu g neutrino momenta below 0.009 (the count a missing exemption would show), every other pool
+      min >= 0.0099 (Z+4g train 0.00923, u u~ g 0.01107); the count goes through wrappers._soft_rescale itself with GLOBAL_PDG_IDX
+      indices, the same index space as the wrapper''s particle_type_indices; test_soft_rescale_skip_neutrinos shows the mask
+      picks exactly +-12,14,16 and torch.equal on non-kept momenta. (b) a flag that fails to apply the rule would move the
+      soft strata by 1.0-3.5 dec (support_read.json 1e4: 4924->1.44 deepest bin), and unchanged strata reproduced at 0.0 dec
+      off vs rule, so 0.01 dec is far below a bug''s signal and far above the observed pipeline noise (exactly 0). Check 3:
+      identity test, no seed spread needed; same 3 seeds x 2 sizes as the passed D561 design. Rebuild path now prints input_soft_skip_neutrinos
+      and score asserts it. Searched results.tex, plan, decisions for neutrino, skip_neutrinos, nu_exempt, soft_x0: only results.tex
+      l.10612 (finale neutrinos below 0.009, already cited); no prior exemption. Not checked: that the minima job''s torch/wrappers
+      import fits site run --job''s 2G (a failure is handled by the design''s read-log-and-rerun branch).'
   targets:
   - batch: smoke
     wall_h: 0.1
