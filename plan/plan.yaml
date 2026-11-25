@@ -45203,6 +45203,8 @@ entries:
       - 'no candidate predicts both: report what each explains, and design the smallest scan that settles it'
   step_waits:
     '1': repo-reviewer aee7e3b6b89d84945 and the notes-editor backlog (par:cbs_scan)
+    '2': 'a reviewer: repo-reviewer aeda1b763b27811e8 re-check of cbs_update c6f2ac29f, after the next owner sets hp 1333
+      in the arm and the design-reviewer a4f3d7192edf30268 re-checks it (hand-off)'
   targets:
   - batch: noise_smoke
     wall_h: 0.4
