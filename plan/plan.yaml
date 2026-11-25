@@ -40818,6 +40818,12 @@ entries:
       the two groups follow the emission-scale target''s per-event factor: re-read our searched run (REREAD FA-ccin2p3-29ce8950,
       lxplus copy) with llm_score.py --events-out @63ffc44ab (adds log F per event), then per event pred - true against log
       F on gg->ttH and the other gg->ttX processes.'
+    19: '19: D564/D567 repair: retrain the untuned his-setup control (part (a) matched control, lr 1e-3 constant, no warmup,
+      L2 0, EMA off, seed 42, 60,840 steps; its first run FA-lxplus-cb9273f1 lost models/ to the 11-24 prune, now blocked
+      by prune.py @b1aea28e0) on CC as trial_9000, identical flags; when it ends: compare its best val MSE of z to the first
+      run''s 6.79e-4, then job_llm_score.sh RUN=runs/llmcmp_a_adamw_const/trial_9000 EVENTS=1, copy the scores to data/ under
+      the untuned arm''s names, redraw heldout_per_process.py (all arms, --part shape) and shape_dists.py with the untuned
+      arm'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -41036,6 +41042,12 @@ entries:
       - 'the groups follow log F (pred - true correlates with the factor): the factor misplaces events on this family; report
         with figure, a target-side fix is its own design'
       - 'they do not: report the split as unexplained, with what was ruled out'
+    19:
+      feeds: 'D567 (how well each model gets the shape) and D564 (why the LLM extrapolates better): whether tuning changes
+        the level-removed shape error in his setup'
+      if:
+      - 'best val within the seed spread of 6.79e-4: score it and add the untuned arm to the shape figures'
+      - 'best val far from 6.79e-4: report the retrain as not reproducing, read the curves before scoring'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
