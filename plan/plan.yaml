@@ -48627,7 +48627,7 @@ entries:
     (e.g. a smooth gate on the energy fractions x_i or pair invariants, or the rescale fed as an extra input beside the raw
     momenta), so that e+e- -> u u~ g keeps its ~4.6-decade soft-limit gain while q q~ -> Z+4g and u u~ g at 1e4 lose the ~2x
     bulk cost found under D539?
-  status: running
+  status: done
   quotes:
   - said_at: '2026-11-24T23:35:58.464000+00:00'
     text: But can't we just use the rescale when it matters and not when it hurts? there has to be a way of keeping the effect
@@ -49308,3 +49308,4 @@ entries:
     was_done_when: ''
     stale_because: 'the entry never had a check (Done when: None); its step 3 finished before one was set, so the check names
       what step 3 produced: the finale x0 in job_datasaving_parent.sh, its test, par:selres_support'
+  writeup: f44d1f2e3
