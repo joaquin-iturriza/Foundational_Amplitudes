@@ -40848,7 +40848,7 @@ entries:
     decision: D553
   owner:
     agent: a1b829d3ccca1f915
-    state: working
+    state: closed
     since: '2026-11-24T14:04:31+00:00'
     state_at: '2026-11-25T00:34:07.773000+00:00'
     context: 293787
@@ -41312,36 +41312,38 @@ entries:
     '10': repo-reviewer pass (ad722e4df9897e63e holds the lock) once selective_rescale's 14 uncommitted sweep/sweep_config_selres_*.yaml
       leave the tree; then commit sweep/sweep_config_llmcmp_b_width.yaml, sync lxplus, submit the 4 widths (D553)
   handoff:
-    state: 'Part (a) DONE: DyHPO ended (8 trials, 0 failed), best trial 5 FA-ccin2p3-c891c0c2 (lr 1.24e-3, EMA on 0.9989,
-      val MSE of z 4.81e-4); scored FA-ccin2p3-037bf5e1: pooled RMSE seen 0.117, held out 1.003, relabels 0.241, new 1.767
-      (control 0.139/1.042/0.237/1.839; LLM 0.321/0.721/0.341/1.193); written up docs/results.tex par:llmcmp_a + fig:llmcmp_heldout
-      @c13ca0b0e. Part (c): control FA-ccin2p3-d34535b0 scored at its best checkpoint (0.171/1.253/0.311/2.205; medians 0.014
-      relabels, 0.385 new, the lowest of all arms); llm_score checked on the emission-scale target against the run''s own
-      test predictions (check_score_vs_preds.py). Search llmcmp_c_qperp (driver llmcmp_c_qperp_drive5): trial 0 clean -5.997;
-      trials 1, 2, 4 and the control blew up (lr >= 3.65e-3); wave 2 trials 3 (FA-ccin2p3-bf23e0c4, lr 1.56e-3) and 5 (-f6f7179d,
-      lr 2.57e-3) running; wave 3 follows from the driver; step 5 reads it. Part (b): Joaquin D537 starts it now at part (a)''s
-      best HPs, plus the same widening at part (c)''s best HPs once (c) ends (step 8). Design recorded 2026-11-24 (widths
-      16/32/64/120 heads = 6.34M/25.2M/101M/354M params; smokes first) got FIX from the design reviewer: step 9 lists the
-      six points to revise (disk, mixed-batch memory fallback needs new code, config diff vs trial_1163''s config.yaml, wall
-      per GPU model + resume, prior par:v4_width / par:v4_warm_start_grow, outcome branches). Next owner: revise (step 9),
-      re-review, smokes, then the GPU-h estimate to Joaquin (above 100 GPU-h under D536; 120 heads alone ~100 H100-h by a
-      FLOP estimate). Figures: only Suprio''s held-out layout (heldout_per_process.py, multi-arm); control_score.py gives
-      numbers only (Joaquin rejected its layout).'
-    decisions: 'Joaquin''s: D522-D528, D537 (start part (b) now, also widen our setup''s best HPs), D536 (decision-named work
-      passes up to 100 GPU-h), D423 WSD, D506, D531. Mine (re-justify): (i) no lower-edge lr extension for part (a): the three
-      trials at lr 1.03e-3 are worse than trial 5 at 1.24e-3 and tuning moved held out inside the seed margin; (ii) widths
-      16/32/64/120 heads, 120 = the LLM''s parameter count within 1.5%; (iii) part (a) trial 5 scored before the search end
-      (it stayed best); (iv) job_llm_score.sh also takes RUN/HELD from env (d150b6d68) though args after -- work too; (v)
-      control_score.py keyed by run tag (claim keys) and no figure; (vi) --mem 20G --cpus 4 for part (c) (earlier owner).'
-    ruled_out: 'control_score.py''s own figure layout (rejected by Joaquin 2026-11-23 and 2026-11-24); per_process_accumulation
-      as the width memory fallback (it changes the batches to single-process); a smoke without the revised design; earlier:
-      shat target, llm4lhc width 256, --cpus 7, rerunning the control for plots'
-    running: llmcmp_c_qperp_drive5 (local) + FA-ccin2p3-bf23e0c4, FA-ccin2p3-f6f7179d (part (c) wave 2); part (a) driver ended
-    files: docs/results.tex (sec:llmcmp), analysis/llm_compare/{heldout_per_process.py, control_score.py, check_score_vs_preds.py,
-      data/a_trial5_*.json, data/c_control_*.json, data/a5_controls_score_summary.json, figs/a5_controls_heldout_per_process.png},
-      tools/llm_score.py, scripts/job_llm_score.sh, scripts/job_config_smoke.sh, sweep/sweep_config_llmcmp_a_adamw_const.yaml,
-      sweep/sweep_config_llmcmp_c_latest.yaml, sweeps_local/llmcmp_c_qperp
-    written: '2026-11-24T13:59:58+00:00'
+    state: 'Part (a) DONE (par:llmcmp_a; held-out MSE ratio searched/control 0.93 added at b109edd37 for the notes-editor).
+      Part (b) (D522, D537; Joaquin approved all four widths, D553, ~196 GPU-h): design passed 2026-11-24; smokes on CC H100
+      NVL read (steady s/step 16 heads 0.399, 32 0.814, 64 0.817->2.376 with checkpoint_blocks, 120 5.331; peak GPU 26.0/50.9/38.8/71.5
+      GB; data analysis/llm_compare/data/width_smokes/*.txt @fc2eab325); config sweep/sweep_config_llmcmp_b_width.yaml committed
+      21800c233, lxplus synced at 8fb46d7f9d, lxplus caches 99c164da/b39fc80c present; wall targets b_width_h16 8.8 h, h32
+      17.9, h64 52.2, h120 117.1 recorded; site pick (2026-11-25 ~01:30) places all 4 on lxplus. NOT YET SUBMITTED: two submits
+      of 16 and 32 heads printed nothing and registered no run (reason hidden by an output filter; run without the grep to
+      see it). Exact submit per width (H, --time, --est-gpu-hours: 16 12:00:00 8.8; 32 24:00:00 17.9; 64 72:00:00 52.2 + --hp
+      model.net.checkpoint_blocks=true; 120 167:00:00 117.1 + checkpoint_blocks): site submit lxplus FA sweep/trial_job.sh
+      --no-sync --item llm_compare --est-gpu-hours <G> --note ''llm_compare part (b) width <H> heads'' --hdr=--gpu-min-mem=80G
+      --hdr=--mem=32G --hdr=--cpus-per-task=4 --hdr=--time=<T> --hdr=--job-name=llmcmp_b_h<H> -- --sweep-config sweep/sweep_config_llmcmp_b_width.yaml
+      --detached --trial-idx <H> --hp-idx <H> --t-steps 60840 --hp training.lr=0.0012437236075771069 --hp training.regularization_lambda=1.1230076981781986e-10
+      --hp training.cosanneal_warmup_frac=0.16348669333383442 --hp ema=true --hp training.ema_decay=0.9989315077979117 --hp
+      model.net.num_heads=<H>. Then plan run each, put step 10''s readout on a wait per width (each width read as it ends,
+      D553: ''show the results as they come'': loss curves and per-process errors in Suprio''s held-out layout, scoring REREAD
+      with scripts/job_llm_score.sh). Part (c): driver llmcmp_c_qperp_drive5 running wave 3; wave 2 trials 3 -5.816, 5 -5.938;
+      trial 0 -5.997 best; steps 5 and 8 wait on its end.'
+    decisions: 'Joaquin''s: D522-D528, D536, D537, D553 (run all four widths; D554 is a duplicate record of D553 made by plan
+      answer, removable only on his words). Mine (re-justify): (i) 80 GB GPU floor on all four widths, 16 heads included (its
+      26 GB peak is under the design''s 30 GB no-floor line; the floor keeps it at the ~200 GPU-h Joaquin approved, the V100
+      bound would be 92 GPU-h for it alone); (ii) host --mem 32G (part (c) peaked 16.7 GB host; smokes ran at 32G); (iii)
+      hp-idx = number of heads for descriptive run dirs runs/llmcmp_b_width/trial_00H; (iv) 120-head smoke run with save=false
+      after the disk alarm (plots/test proven at 3 widths); (v) site tool --gpu-min-mem on SLURM cuts partitions (CC -> gpu_h100),
+      ~/.local/bin/site gpu_partitions + sites/sites.yaml partition_gpu_mem @e27b4a5e7.'
+    ruled_out: per_process_accumulation as memory fallback (single-process batches); CC for 64/120 heads at its current free
+      disk (runs peak 7.8/27.4 GB, CC 15 GB free); the cost-vs-width figure (coordinator dropped it); 'avg s/iter' as step
+      rate (use steady wall-clock 'Finished iteration' deltas).
+    running: 'llmcmp_c_qperp_drive5 (local driver, part (c) wave 3). Part (b) full runs: none submitted yet.'
+    files: sweep/sweep_config_llmcmp_b_width.yaml, analysis/llm_compare/data/width_smokes/*.txt, analysis/llm_compare/control_score.py,
+      analysis/llm_compare/heldout_per_process.py, docs/results.tex (sec:llmcmp), scripts/job_config_smoke.sh, scripts/job_llm_score.sh,
+      base_experiment.py (_write_step_log save=false fix a92234542), sites/sites.yaml
+    written: '2026-11-25T00:40:58+00:00'
   designs:
   - at: '2026-11-22T04:13:14+00:00'
     question: 'Part (a), D525: in the conditions of Suprio''s LLM pID run (D524, D526, D527: our catalog_daniel regeneration
