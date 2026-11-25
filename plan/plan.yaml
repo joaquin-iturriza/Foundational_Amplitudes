@@ -48050,11 +48050,12 @@ entries:
   match: selres_*
   evidence:
     runs: []
-    commit: 4237aca39
+    commit: 52144d396
     paths:
     - analysis/selective_rescale/data/input_check.json
     - analysis/selective_rescale/data/stage1.json
     - analysis/selective_rescale/data/stage2.json
+    - analysis/selective_rescale/data/support_jobs.json
     - analysis/selective_rescale/data/support_minima.json
     - analysis/selective_rescale/data/uug_split.json
     - analysis/selective_rescale/input_check.py
@@ -48064,6 +48065,7 @@ entries:
     - analysis/selective_rescale/support_rule.py
     - analysis/selective_rescale/uug_split.py
     - docs/results.tex
+    - scripts/job_support_rule.sh
     - tools/rebuild_run.py
     - wrappers.py
   dead_ends:
