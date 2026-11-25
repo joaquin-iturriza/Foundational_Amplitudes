@@ -43733,6 +43733,82 @@ entries:
       it or runs beside it. Everything else holds: one-seed eval (deterministic, gaps about 10x against the 1.38x seed spread),
       the existing per-process MSEs (verified: a_trial5 gg->b t~ W+ 25.5, gg->t b~ W- 26.6, b b~->hhh 22.6; b_h16 15.6/16.3/30.2;
       c_control 31.6/36.6/36.6), the test pools, cost under 2 GPU-h, and no training (loss, HPO and lr checks do not apply).'
+  - at: '2026-11-25T13:29:17+00:00'
+    question: 'Step 15, D564 (Joaquin: "So despite the llm being so much worse at training and at relabels, it seems to extrapolate
+      better, we should understand why this is the case"). Existing data (data/*_heldout.json against Suprio''s per-process
+      MSEs; tool analysis/llm_compare/family_gap.py, committed once the repo backlog clears): on the 43 new-family held-out
+      processes the LLM''s pooled advantage sits in a few processes where our LLoCa fails badly: gg->t b~ W- and gg->b t~
+      W+ have per-process MSE(log|M|^2) 25.5-26.6 (trial 5), 15.6-16.3 (16 heads), 31.6-36.6 (part (c) control) against the
+      LLM''s 2.2-2.5; b b~->hhh 22.6-36.6 against 13.1; the hh+X processes (g b~->b~hh, g b->bhh, b b~->a hh) 4.5-20.7 against
+      2.1-4.7. Without the two gg->tbW the pooled new RMSE is 1.42 (trial 5) vs the LLM''s 1.17; the median per-process new
+      MSE is 1.14 (trial 5), 0.69 (his-optimizer control), 0.385 (part (c) control, below the LLM on 25/43) vs the LLM''s
+      0.649; the Spearman rank correlation ours vs LLM over the 43 is 0.82 (trial 5): the same processes are hard for both.
+      Question of this job: on those failing processes, is our error a misplaced level (a constant offset in log|M|^2 over
+      the process''s events) or a wrong shape (prediction uncorrelated with the truth across its events)? Level points to
+      what sets a new family''s normalization (species encoding, the shared affine statistics a+bN, coupling information);
+      shape points to the phase-space structure (the t->bW resonance in gg->tbW). It decides which configurations step 15
+      tests next.'
+    prior: 'Searched docs/results.tex, plan show llm_compare, site decisions --project FA for: extrapolat, new family, relabel,
+      heldout_zero_shot, 1-rho^2, gg->tbW, Suprio, his target. (i) ''Its held-out split: zero-shot on 43, in-class on 96''
+      (results.tex ~l.7752, hp58, per-process standardization, read up to the best affine map): median 1-rho^2 on the 43 0.098,
+      worst gg->b t~ W+ 0.94, gg->t t~ Z 0.88, gg->t b~ W- 0.74; with the statistics predictor the raw median MSE on the 43
+      is 1.27 and 0.080 after the best rescale and shift: for that model the typical error is level/scale while gg->tbW is
+      shape (rho^2 ~0.06). It differs: another model (het loss, per-process standardization, 32k steps), no LLM beside it.
+      (ii) Part (a) par:llmcmp_a: pooled new 1.767 vs LLM 1.193; median new MSE rises with the search 0.688 -> 1.144. (iii)
+      His target z = (log|M|^2 - 14.017 + 6.713 n_out)/5.303 (plan finding 2026-11-22T03:12) = our a+bN with a=27.40, b=-6.70
+      per particle, sigma 5.32 (data/a_trial5_heldout.json): same form, constants within 0.2%, so the standardization is not
+      a difference between the two models. (iv) No held-out process has a multiplicity outside training (43 new: 42 2->3,
+      one 2->2; training 1116 2->3, 236 2->2; classes_default.json), so ''shared affine statistics on new multiplicities''
+      has no new multiplicity to fail on. No prior level/shape split of a model trained on his z on this split. (v) The same
+      offset-against-floor split on catalog_v4 (par:v4_tree_shape, par:v4_loop_groups ~l.4130-4140; level misplacement ~l.1648-1703):
+      seed-mean absolute offset and floor var(q-t) per held-out pool; on trees both the offset and the floor are largest where
+      the top is held out at its mass (gg->tbW here carries a top). (vi) The statistics predictor on the same 43 (fig:zero_shot_parts
+      ~l.7810-7822): median level error (mu_hat-mu)^2/sigma^2 45 with one shared normalization, 31 linear in N, 0.76 physics
+      ridge, 0.32 with trees; spread ratio 10-90% 0.61-2.49 for one spread. New here: the split for models trained on his
+      shared z (and on our latest target), read beside the LLM.'
+    measure: 'Per held-out process (139, first 1e4 test events, the run''s shared statistics, EMA, best checkpoint, as tools/llm_score.py
+      now), all in ABSOLUTE log|M|^2: pred q = mu + sigma h - log F, true t = mu + sigma z - log F, with F the per-event target
+      factor (exp.all_amp_factor at exp._split_indices[''test''], the test loader''s order; 1 on part (a)/(b) runs, the emission-scale
+      factor on part (c) runs, the same inverse the run''s own test stage applies, checked by check_score_vs_preds.py at 0.17060).
+      The exact three-part split MSE = bias^2 + scale + floor: bias = mean(q - t) (level); floor = var(t)(1 - rho^2) with
+      rho = corr(q, t), what the best affine map of q leaves (hp58''s 1 - rho^2 at results.tex ~l.7755); scale = var(q - t)
+      - floor, what the best rescale removes; plus the true mean and std. Extension of tools/llm_score.py accumulating per
+      process the sums of q, t, q^2, t^2, q t; asserts the sums reproduce the per-process MSE to 1e-6 relative and that the
+      factor array length equals the events read. Checked once against a part (c) run''s saved sigma_stage/preds_test.npz
+      (or its test-stage raw arrays) for the absolute inversion. Read with a committed tool beside the LLM''s per-process
+      MSE, per family of his figure.'
+    check: 'The split moves on this data: hp58 on the same 43 had 1-rho^2 from 5.9e-3 to 0.94 and a raw-to-affine median MSE
+      drop 1.27 -> 0.080 (results.tex ~l.7752-7820), so level and shape parts separate per process on this split; and our
+      existing per-process MSEs on the failing processes (15.6-36.6) are about 10x the LLM''s (2.2-2.5), far above the seed
+      spread (1.38x), so the split is read where the effect is.'
+    fixed: 'Everything of each run: weights (best checkpoint, EMA), config, the held-out recipe recipes/catalog_daniel_heldout.yaml,
+      1e4 test events per process, shared statistics (fine_tune.target_stats=parent_shared). Eval only, REREAD of the runs
+      below; no training. scripts/job_llm_score.sh gains ONLY=heldout to skip the seen pools (unchanged otherwise). Cost:
+      4 inference jobs on the 139 held-out pools, <0.5 GPU-h each (the full seen+held-out score fits its 2 h limit), <2 GPU-h
+      in all, on whatever GPU site pick allots (inference, no floor).'
+    control: 'Arms read the same way: part (a) trial 5 (8 heads, REREAD=FA-ccin2p3-c891c0c2, runs/llmcmp_a_adamw_const/trial_1163),
+      part (b) 16 heads (REREAD=FA-ccin2p3-dcb66b14, runs/llmcmp_b_width/trial_0016), part (c) control (REREAD=FA-ccin2p3-d34535b0,
+      runs/llmcmp_c_qperp/trial_9000, latest-setup target, best checkpoint at step 24,336, before it blew up) and part (c)
+      best (REREAD=FA-ccin2p3-29ce8950, runs/llmcmp_c_qperp/trial_1860; its full score FA-ccin2p3-c9d44ad3 on the current
+      tool runs on for step 5, this held-out re-read runs beside it and writes llm_score_heldout.json again with the same
+      MSEs plus the split, after c9d44ad3 has ended): his target and ours side by side. Reference: the 96 relabels of the
+      same runs (in-class, where our MSE is below the LLM''s on 77-87), and the LLM''s per-process MSE (an upper bound on
+      its own bias^2; his predictions are not ours to split).'
+    seeds: One seed (42) per run, as trained; eval is deterministic up to float order (per-process MSE reproduced to 1e-6
+      relative).
+    outcome: 'Per process the largest of the three parts is named (no threshold), reported per family of his figure, for the
+      processes that carry the pooled gap first (gg->tbW pair, b b~->hhh, the hh+X ones). Level (bias^2 largest): our network
+      misplaces that family''s normalization; next, configurations that change what sets the level (a learned pID embedding
+      as his against our species encoding; coupling powers on, as part (c)''s inputs), each its own design. Scale (scale largest:
+      right ordering of events, wrong spread of log|M|^2): the network under- or over-stretches the process''s kinematic dependence;
+      next, the slope of q on t per process and whether the same families are mis-stretched on their trained relabels. Floor
+      (floor largest: prediction uncorrelated with the truth beyond an affine map): the phase-space structure of those processes
+      is not learned (for gg->tbW the t->bW resonance, cf. catalog_v4''s top-held-out floor); next, true against predicted
+      distributions there and whether training holds that resonance in another initial state. Either way, where bias^2 alone
+      exceeds the LLM''s whole MSE on a process, the LLM places that level better than we do.'
+    sources: largest of bias^2, scale, floor <- the exact three-part split of MSE, naming the largest part, no tuned threshold;
+      1.38x <- the seed spread 10^0.14 (docs/results.tex v4_seed_spread ~l.4485), only to say the 10x gap is not noise; 1e-6
+      relative <- float reproducibility of an unchanged quantity
   targets:
   - batch: gen_smoke
     wall_h: 0.5
