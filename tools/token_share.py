@@ -287,8 +287,11 @@ def main():
     ap.add_argument("--refusals", action="store_true", help="the refusal-cost pass (D558) instead of the routing shares")
     a = ap.parse_args()
     if a.refusals:
-        return refusal_report(a.since, a.until, "analysis/agent_redesign/refusal_cost.json",
-                              "analysis/agent_redesign/figs/refusal_cost")
+        # another window than the default writes beside it, never over it (the before/after comparison keeps both)
+        tag = "" if (a.since, a.until) == (ap.get_default("since"), ap.get_default("until")) else \
+            "_%s_%s" % (a.since[:10], a.until[:10])
+        return refusal_report(a.since, a.until, "analysis/agent_redesign/refusal_cost%s.json" % tag,
+                              "analysis/agent_redesign/figs/refusal_cost%s" % tag)
     roles, k1, k3own, calib, explore_desc, routed, worker_desc = scan(a.since, a.until)
     total = sum(R["tokens"] for R in roles.values())
     total_usd = sum(R["usd"] for R in roles.values())
