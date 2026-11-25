@@ -40977,7 +40977,7 @@ entries:
     agent: aa33851c0da219299
     state: working
     since: '2026-11-25T18:44:51.090000+00:00'
-    state_at: '2026-11-25T19:42:16.217000+00:00'
+    state_at: '2026-11-25T20:03:04.213000+00:00'
     context: 184093
     context_at: '2026-11-25T20:03:17+00:00'
   step_why:
@@ -48539,9 +48539,9 @@ entries:
     decision: D561
   owner:
     agent: acfbcee1963f1ac62
-    state: stopped
+    state: working
     since: '2026-11-25T15:24:52+00:00'
-    state_at: '2026-11-25T15:43:32.442000+00:00'
+    state_at: '2026-11-25T20:03:02.915000+00:00'
     context: 153249
     context_at: '2026-11-25T15:47:57+00:00'
   designs:
