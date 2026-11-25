@@ -41500,8 +41500,8 @@ entries:
       clipped: 52 of c_best''s 139 held-out points were below 1e-3). For step 8 (D537 ''We then also widen the best HPs for
       our setup''): the width scale-up at part (c)''s best HPs starts from hp1860.'
   step_waits:
-    '8': part (c) driver llmcmp_c_qperp_drive5 ending (its detach DONE event; wave 3 of 2 trials after trials 3 -5.816 and
-      5 -5.938 of wave 2)
+    '8': part (c)'s best is hp1860 (step 5 done, par:llmcmp_c @1aa1030ec); design next, its smokes need CC synced, refused
+      for other agents' uncommitted files in the shared checkout
     '12': FA-ccin2p3-e9dfa8b9
     '13': FA-ccin2p3-623a3af6
     '14': FA-ccin2p3-f0b997a2
