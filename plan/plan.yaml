@@ -46000,6 +46000,76 @@ entries:
       D539 sibling sweeps; loss HETEROSC with mu_mse selection as D539; no label in inputs (x_i from the event''s own momenta);
       no prior selective/gated rescale found (searched results.tex for selective, soft_x0, soft_gate, gated rescale, event
       gate, rescale only; decisions for rescale, D374, D392, D539, D552).'
+  - at: '2026-11-25T00:01:54+00:00'
+    question: 'Can the momentum log-rescale be applied only where it helps, by a rule using only the event''s own momenta,
+      so that e+e- -> u u~ g keeps the deepest-soft-bin gain of the rescale (eps=1e-8; -4.65 / -4.57 decades at 1e4 / 1e5)
+      while q q~ -> Z+4g (1e4, 1e5) loses its bulk cost (2.28x / 2.07x at the no-rescale optimum) and u u~ g 1e4 (2.18x) is
+      not made worse? Three event-dependent schemes, each a Lorentz-invariant factor f_i on p_i from x_i = 2 p_i.Q/s (code
+      @02929d3d2, tests/test_input_reps.py): (A) rescale below x0=0.1: f = max(1, F(x)/F(0.1)), F the D539 factor, so a momentum
+      with x >= 0.1 is unchanged and softer ones get the D539 log map, continuous at 0.1 (model.input_soft_x0=0.1); (B) the
+      same at x0=0.3; (C) event gate: the full D539 rescale on every momentum of an event whose softest final-state x < 0.1,
+      others unchanged (model.input_soft_gate=0.1). All with model.input_soft_eps=1e-8.'
+    prior: 'docs/results.tex par:ftm_d539 (finetune_mechanism, D539): at fixed compute (batch 2048, 1953 steps) the rescale
+      costs Z+4g bulk 2.41x at its own HPs, 2.28x [2.03,2.57] (1e4) and 2.07x [1.57,2.71] (1e5; 0.0059 vs 0.0119) at the no-rescale
+      optimum hp1333, falls with eps (1.61 at 1e-4, 1.33 at 1e-2, 1.10 at 1); massless-only costs as much (2.34x), so not
+      the Z mass shell; u u~ g searched per arm: 2.18x [1.32,3.58] at 1e4, 1.68x [0.93,3.07] at 1e5; kit soft bin -4.65/-4.57
+      dec, collinear +0.18/+0.21. par:ftm_zng4g: rescale alone 2.07x scratch on Z+4g. D374 input arms (plan kit_benchmark
+      finding 2026-11-11, uug 1e5, 8000 steps): soft rescale soft deepest 0.393 vs control 14180; pair logs (log invariants
+      as extra scalars beside raw momenta) soft 19100: a log side channel next to the raw momenta did not move the soft bin;
+      local-frame logs 4150. sec:kit-deepest: asymptotic factor 0.0152 soft (another lever). Searched: rescale, soft_eps,
+      pair logs, input arms, kit soft, selective, gate, D374, D392, D539, D552; no selective or gated rescale found. Differs:
+      new schemes, judged first at the baseline''s best HPs (CLAUDE.md feature rule), against D539''s existing controls.'
+    measure: 'Per scheme and cell (process x D): best validation MSE(log|M|^2) = min val mu-MSE x prepd_std^2 (as d539_read.py);
+      r = three-seed geometric mean of scheme over the no-rescale control at the same HPs, with its 2-sigma interval from
+      the seeds'' log-sd (zng4g_d1e3_read.ratio); also r against the rescale control (Z+4g: same HPs). For u u~ g: kit deepest-bin
+      log10-MSE of log10|M|^2 per family (soft_x, coll_y, bulk; scripts/job_kit.sh KIT_SCORE_ONLY, tools/kit_mlp_readout.deepest),
+      seed medians, delta in decades against both controls (as d539_kit_read.py).'
+    check: 'Existing data: the measure moves with the rescale: Z+4g 1e4 bulk r 2.28x [2.03,2.57], 1e5 2.07x, u u~ g 1e4 2.18x
+      [1.32,3.58], kit soft -4.65 / -4.57 dec (par:ftm_d539, d539u_kit.json). Input-level check (analysis/selective_rescale/input_check.py
+      @560a4d1a3, data/input_check.json, val pools, 2e4 events): the compression c = mean over final-state particles of -ln(dln
+      x''/dln x) tracks D539''s measured bulk cost over its eps ladder, ln r = 0.275 c (max residual 0.10 in ln r; massless
+      arm predicted 1.87 vs measured 2.34). Predicted r (Z+4g / uug): full rescale 2.19 / 2.21; A x0=0.1: 1.05 / 1.01 (5.8%
+      / 0.8% of particles, 25% / 2.3% of events changed); B x0=0.3: 1.40 / 1.07; C gate 0.1: 1.22 / 1.02 (compression 0.715
+      / 0.065). Soft lift at the kit''s deepest soft bin x=1e-7: x'' = 0.130 (rescale), 0.042 (B), 0.015 (A), 1e-7 (off).
+      Dropped on this check: x0 <= 0.05 and gates <= 0.05 (<0.6% of Z+4g particles, <=0.1% of uug in the log branch: no trained
+      branch to extrapolate from); raw plus rescaled momenta as two inputs (D374''s pair logs, a log side channel beside raw
+      momenta, left the soft bin at 19100 against 14180; and it needs a second vector input to the frames net).'
+    fixed: 'Configs sweep/sweep_config_selres_<proc>_<D>_<scheme>_b2048.yaml @043cc03af. Keys differing from their named configs,
+      every one: against sweep_config_ftmech_d539_uug_<D>_off_b2048.yaml: sweep_name (new name), model.input_soft_eps 0 ->
+      1e-8, plus model.input_soft_x0 (0.1 / 0.3) or model.input_soft_gate (0.1) (the tested change); against sweep_config_tp_zng_d1e4_muon_b2048_zgggg.yaml
+      (the config of D539''s Z+4g set-s controls): sweep_name, data.train_subsample 1e4 -> 1e5 in the 1e5 cells (as D539''s
+      1e5 controls, set by override there), input_soft_eps 1e-8 plus the scheme flag; comments otherwise (diffs read 2026-11-25).
+      Held as D539: scratch, base_config runs/kit/kit_A_uq_zgggg_me2_n500000_t12500, recipes kit_A_uq_zgggg_me2_n500000_t12500
+      / kit_A_ee_uug_me2_n100000_t8000, batch 2048, 1953 steps at every size, MuonAdamW, WSD cooldown 1/8, float64, heterosc_select
+      mu_mse, validate_frac 0.02, internal_mass_pdgs [23,6,25,24], evaluation.train_subsample 2000, plot on, no pair logs.
+      Stage 1 HPs = the no-rescale baseline''s best per cell: Z+4g hp1333 at 1e4 and 1e5 (S''s optimum, as D539 set s); u
+      u~ g the chosen trial of ftmech_d539_uug_<D>_off_b2048 (1e4 lr 7.60e-3, 1e5 lr 5.18e-3, full strings in seed_chunks/selres_stage1_all.txt).
+      Run by sweep/run_fixed_hp.py through scripts/job_seed_batch.sh; kit by job_kit.sh KIT_SCORE_ONLY.'
+    control: 'Same HPs (stage 1): Z+4g 1e4 and 1e5 no rescale and rescale eps=1e-8 at hp1333, seeds 42/43/44 = ftmech_d539s_zng_<D>_{off,eps1e-8}_s4x
+      (existing); u u~ g 1e4 and 1e5 no rescale at its own optimum = ftmech_d539_uug_<D>_off_b2048 chosen trial (seed 42)
+      + _s43/_s44, with kit scores (existing). The u u~ g rescale at those HPs has no run (D539''s set s rescale runs at hp1333
+      blew up, a different HP); its soft-bin reference is the rescale at its own optimum, ftmech_d539_uug_<D>_eps1e-8_b2048
+      + seeds with kit scores (existing), i.e. the scheme at the bulk baseline''s HPs against the rescale at its best, which
+      can only favour the rescale on the soft bin. No new control runs in stage 1. Stage 2 (only a scheme that misses YES
+      in a cell): its own 16-trial search in that cell over the D539 space (DyHPO seed 42, waves 3,3,2,3,3,2) + seeds 43/44
+      of its chosen trial, read best against best against D539''s searched arms; for Z+4g 1e5 this needs the two control searches
+      selres_zng_1e5_{off,eps1e-8}_b2048 (configs ready), run only then.'
+    seeds: 42, 43, 44 at the cell's baseline HPs, as the D539 controls.
+    outcome: 'Per scheme. YES: (bulk) in Z+4g 1e4 and 1e5, r(scheme/no rescale) has a 2-sigma interval containing 1 or below
+      it AND r(scheme/rescale) has its 2-sigma upper bound below 1; the YES rests on these two cells, where the rescale''s
+      cost is resolved; u u~ g 1e4 and 1e5 bulk r reported beside (2-sigma band ~x1.6 each way there, it cannot resolve a
+      ~1.5x cost); (soft) on u u~ g at 1e4 and 1e5 the scheme''s seed-median deepest soft-bin log10-MSE is at most the rescale
+      arm''s seed median plus the rescale arm''s three-seed spread log10(max/min) (1e4: +0.30 dec, 1e5: +1.05 dec). YES ->
+      that scheme is proposed to Joaquin as the rescale''s replacement (the D392 setup is his call). NO-soft (soft bin above
+      that band, toward the no-rescale 4917 / 7580): the log branch trained on too few particles; report decades kept per
+      scheme; stage 2 for that scheme-cell (its own search) before calling it lost. NO-bulk (r(scheme/no rescale) resolved
+      above 1 in a Z+4g cell): stage 2 search there; read measured r against the input check''s predicted r, a test of the
+      compression mechanism. Collinear bin reported beside, no threshold (D539: inside its spread).'
+    sources: '+0.30 dec <- the rescale arm''s measured seed spread log10(max/min) of the deepest soft bin at 1e4 (d539u_kit.json:
+      0.099..0.198); +1.05 dec <- the rescale arm''s measured seed spread log10(max/min) of the deepest soft bin at 1e5 (d539u_kit.json:
+      0.033..0.372); 2-sigma interval of r <- the arms'' own measured three-seed spread (log-sd, zng4g_d1e3_read.ratio, as
+      par:ftm_d539); ''without hurting the rest'' and ''keeping the effect on the bins this targets'' <- Joaquin''s words
+      D552'
   step_why:
     1:
       feeds: whether an event-dependent rescale (soft-only below x0, or an event gate) keeps the u u~ g soft-bin gain without
