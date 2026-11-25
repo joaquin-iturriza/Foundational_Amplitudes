@@ -334,8 +334,7 @@ REFUSED = {}
 
 def stop_conditions(inp, refused):
     """(refusals, notes) of the Stop conditions taken over from the standalone hooks (stop_conditions.py); each is
-    skipped while its own hook is still registered for Stop (before switch-over B), so nothing is asked twice. The
-    reply check (a model call) runs only when nothing else refuses the turn."""
+    skipped while its own hook is still registered for Stop (before switch-over B), so nothing is asked twice."""
     import plan
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     import stop_conditions as sc
@@ -357,15 +356,8 @@ def stop_conditions(inp, refused):
             REFUSED[cond] = cond in CORE
         bad += b
         notes += n
-    # a check disabled by an incident (.claude/hooks/disabled.json) is off here too: the dispatcher skips only the
-    # standalone hook, and reply_check kept refusing through plan_check while disabled (D335; 2026-11-09 23:45,
-    # "what do you mean you can't kill it?")
-    if not refused and not bad and not sc.registered_at_stop("reply_check.py", repo) \
-            and not sc.disabled("reply_check.py", hooks) and not sc.disabled("plan_check.py:reply", hooks):
-        b, n = sc.reply(inp)
-        if b:
-            REFUSED["reply"] = False
-        bad += b
+    # no reply check at Stop (D562 audit: a model's reading of whether the reply answers; 2 of its 3 refusals
+    # misfired and it was disabled from 2026-11-09, I-edf7c73a)
     return bad, notes
 
 

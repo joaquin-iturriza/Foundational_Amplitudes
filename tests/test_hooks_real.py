@@ -725,16 +725,6 @@ def stop_conditions():
     json.dump({"plan_check.py": {"why": "loop", "time": "2026-10-30T05:00"}}, open(os.path.join(hd, "disabled.json"), "w"))
     r2, n2 = sc.incidents(hd)
     scenario("B1: an open incident is a note, never a refusal", not r and not n and not r2 and len(n2) == 1, (r2, n2))
-    tr = os.path.join(d, "t.jsonl")
-    with open(tr, "w") as f:
-        f.write(J({"type": "user", "message": {"content": "why is the queue empty?"}}) + "\n")
-        f.write(J({"type": "assistant", "message": {"content": [{"type": "text", "text": "Joaquin, it is not."}]}}) + "\n")
-    code = ("import sys, json; sys.path.insert(0, %r); import stop_conditions as sc; print(json.dumps(sc.reply(%r)))"
-            % (HOOKS, {"transcript_path": tr}))
-    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True,
-                       env=dict(os.environ, PATH="/usr/bin:/bin", CLAUDE_PROJECT_DIR=d))
-    scenario("B1: the reply check with no `claude` CLI on PATH passes",
-             r.returncode == 0 and json.loads(r.stdout or "[[1]]")[0] == [], r.stdout + r.stderr)
     proj = os.path.join(d, ".claude", "settings.json")
     shutil.copy(os.path.join(ROOT, ".claude", "settings.json"), proj)
     names = ("figure_pair_guard.sh", "reply_check.py", "context_guard.py")

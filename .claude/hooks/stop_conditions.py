@@ -7,8 +7,6 @@ waiter); a note waits on the outside (an agent, a job, a cluster, Joaquin) and n
                    counterpart (same pruned trees, same marker .claude/.figpair_last, same ignore list)
   context          context_guard.py's Stop branch: a compaction is wanted and the window's questions,
                    answers or commitments are not recorded on the plan or the ledger
-  reply            reply_check.py: does the reply answer the user's message (once per message, passes when the check
-                   cannot run)
   ledger           `site guard --stop`: for a plan_check project, the supervisor and the armed waiter (its open events
                    are plan_check's own); ~/.claude/hooks/ledger_guard.sh stop defers to this (LEDGER_MARK)
   opener           (not registered, 2026-10-31: the opener is Joaquin's drift signal; forcing it hides the drift)
@@ -89,15 +87,6 @@ def context(inp, repo=REPO, ask=None, steps=None):
     import context_guard
     notes = []
     return context_guard.stop_items(inp, ask, repo, steps, notes), notes
-
-
-# ------------------------------------------------------------------ reply
-def reply(inp):
-    """reply_check.py's verdict (it keeps its own once-per-message state and passes when it cannot run)."""
-    sys.path.insert(0, HOOKS)
-    import reply_check
-    rc, msg = reply_check.check(inp)
-    return ([msg] if rc == 2 else []), []
 
 
 # ------------------------------------------------------------------ ledger
