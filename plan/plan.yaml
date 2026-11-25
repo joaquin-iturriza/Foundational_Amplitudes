@@ -41376,6 +41376,7 @@ entries:
       5 -5.938 of wave 2)
     '8': part (c) driver llmcmp_c_qperp_drive5 ending (its detach DONE event; wave 3 of 2 trials after trials 3 -5.816 and
       5 -5.938 of wave 2)
+    '11': FA-ccin2p3-dcb66b14
   handoff:
     state: 'Part (a) DONE (par:llmcmp_a; held-out MSE ratio searched/control 0.93 added at b109edd37 for the notes-editor).
       Part (b) (D522, D537; Joaquin approved all four widths, D553, ~196 GPU-h): design passed 2026-11-24; smokes on CC H100
