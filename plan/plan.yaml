@@ -44179,9 +44179,7 @@ entries:
   step_waits:
     '3': notes-editor pass of the results.tex backlog (it blocks on sec:noisescale and fig:llmcmp_heldout, other entries'
       text; the repo-reviewer already passed the merge)
-    '5': 'detach job wake_review_replay_qwen (Qwen half, running); DeepSeek half when it answers (500 at 2026-11-25T00:19
-      UTC): python3 tools/detach.py --entry lab_llm_trial --name wake_review_replay_deepseek --each ''python3 tools/lab_wake_trial.py
-      run --models deepseek'' --each ''python3 tools/lab_wake_trial.py reviews-run --models deepseek'''
+    '5': detach:wake_replay
   findings:
   - at: '2026-11-23T19:55:22+00:00'
     text: 'Local batch width cut from 6 parallel opencode streams to 2 (D531): 6 streams of opencode sessions (~350-400 MB
